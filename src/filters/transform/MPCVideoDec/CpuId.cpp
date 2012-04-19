@@ -1,5 +1,5 @@
 /*
- * $Id: CpuId.cpp 4407 2012-04-16 19:04:37Z XhmikosR $
+ * $Id$
  *
  * (C) 2006-2012 see Authors.txt
  *

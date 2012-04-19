@@ -1,5 +1,5 @@
 /*
- * $Id: DXVADecoderH264.h 4359 2012-04-12 22:58:01Z Aleksoid $
+ * $Id$
  *
  * (C) 2006-2012 see Authors.txt
  *

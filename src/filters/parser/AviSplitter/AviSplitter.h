@@ -1,5 +1,5 @@
 /*
- * $Id: AviSplitter.h 4360 2012-04-13 00:53:09Z Aleksoid $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt

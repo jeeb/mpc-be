@@ -1,5 +1,5 @@
 /*
- * $Id: RenderersSettings.cpp 4342 2012-04-11 15:44:27Z XhmikosR $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt

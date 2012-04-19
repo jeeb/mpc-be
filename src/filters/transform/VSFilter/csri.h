@@ -29,7 +29,7 @@
  ****************************************************************************/
 
 /** \file csri.h - main CSRI (common subtitle renderer interface) include.
- * $Id: csri.h 3788 2011-10-21 17:54:24Z nevcairiel $ */
+ * $Id$ */
 
 #ifndef _CSRI_H
 /** \cond */

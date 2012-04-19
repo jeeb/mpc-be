@@ -1,5 +1,5 @@
 /*
- * $Id: MpaDecFilter.h 4374 2012-04-14 21:09:03Z v0lt $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt

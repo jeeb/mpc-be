@@ -1,5 +1,5 @@
 /*
- * $Id: DXVADecoder.cpp 4415 2012-04-17 03:57:55Z Aleksoid $
+ * $Id$
  *
  * (C) 2006-2012 see Authors.txt
  *

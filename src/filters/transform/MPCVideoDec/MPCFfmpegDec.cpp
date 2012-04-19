@@ -1,5 +1,5 @@
 /*
- * $Id: MPCFfmpegDec.cpp 3967 2012-01-14 19:02:00Z v0lt $
+ * $Id$
  *
  * (C) 2006-2012 see Authors.txt
  *

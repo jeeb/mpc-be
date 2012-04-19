@@ -1,5 +1,5 @@
 /*
- * $Id: MpegSplitter.h 4348 2012-04-12 13:19:37Z v0lt $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt

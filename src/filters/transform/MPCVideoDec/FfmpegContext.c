@@ -1,5 +1,5 @@
 /*
- * $Id: FfmpegContext.c 4329 2012-04-10 13:29:28Z XhmikosR $
+ * $Id$
  *
  * (C) 2006-2012 see Authors.txt
  *

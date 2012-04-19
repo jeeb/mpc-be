@@ -1,5 +1,5 @@
 /*
- * $Id: MPCVideoDecFilter.h 4420 2012-04-17 22:14:49Z Aleksoid $
+ * $Id$
  *
  * (C) 2006-2012 see Authors.txt
  *

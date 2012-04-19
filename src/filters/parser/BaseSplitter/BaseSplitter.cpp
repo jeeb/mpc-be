@@ -1,5 +1,5 @@
 /*
- * $Id: BaseSplitter.cpp 4404 2012-04-16 10:31:14Z XhmikosR $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt

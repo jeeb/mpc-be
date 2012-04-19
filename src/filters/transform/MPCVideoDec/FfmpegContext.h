@@ -1,5 +1,5 @@
 /*
- * $Id: FfmpegContext.h 4169 2012-03-22 03:07:51Z Aleksoid $
+ * $Id$
  *
  * (C) 2006-2012 see Authors.txt
  *

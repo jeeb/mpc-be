@@ -1,5 +1,5 @@
 /*
- * $Id: BaseSplitterFileEx.h 4375 2012-04-15 02:45:28Z Aleksoid $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt

@@ -1,5 +1,5 @@
 /*
- * $Id: Scale2x.cpp 4424 2012-04-18 07:25:50Z XhmikosR $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt

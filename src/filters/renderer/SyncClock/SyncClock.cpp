@@ -1,5 +1,5 @@
 /*
- * $Id: SyncClock.cpp 4350 2012-04-12 14:28:49Z XhmikosR $
+ * $Id$
  *
  * (C) 2009-2012 see Authors.txt
  *

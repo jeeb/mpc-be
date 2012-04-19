@@ -1,5 +1,5 @@
 /*
- * $Id: MpcAudioRendererSettingsWnd.h 4330 2012-04-10 15:45:58Z XhmikosR $
+ * $Id$
  *
  * (C) 2010-2012 see Authors.txt
  *
