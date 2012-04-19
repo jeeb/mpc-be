@@ -1,5 +1,5 @@
 /*
- * $Id: PlayerBar.cpp 4334 2012-04-10 20:37:53Z underground78 $
+ * $Id$
  *
  * (C) 2012 see Authors.txt
  *

@@ -1,5 +1,5 @@
 /*
- * $Id: VobSubFile.cpp 4432 2012-04-19 05:38:23Z XhmikosR $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt

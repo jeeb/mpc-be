@@ -1,5 +1,5 @@
 /*
- * $Id: PlayerToolBar.h 4388 2012-04-15 11:32:18Z underground78 $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt

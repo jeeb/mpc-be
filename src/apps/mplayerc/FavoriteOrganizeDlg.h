@@ -1,5 +1,5 @@
 /*
- * $Id: FavoriteOrganizeDlg.h 4367 2012-04-13 21:50:20Z underground78 $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt

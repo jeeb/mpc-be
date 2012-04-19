@@ -1,5 +1,5 @@
 /*
- * $Id: stdafx.h 4395 2012-04-15 20:25:16Z XhmikosR $
+ * $Id$
  *
  * (C) 2011-2012 see Authors.txt
  *

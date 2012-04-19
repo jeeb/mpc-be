@@ -1,5 +1,5 @@
 /*
- * $Id: UpdateCheckerDlg.cpp 4336 2012-04-10 20:53:46Z XhmikosR $
+ * $Id$
  *
  * (C) 2012 see Authors.txt
  *

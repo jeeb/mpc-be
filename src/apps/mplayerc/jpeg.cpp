@@ -1,5 +1,5 @@
 /*
- * $Id: jpeg.cpp 4408 2012-04-16 19:26:53Z XhmikosR $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt

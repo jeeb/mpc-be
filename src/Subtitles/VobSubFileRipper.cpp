@@ -1,5 +1,5 @@
 /*
- * $Id: VobSubFileRipper.cpp 4433 2012-04-19 05:46:22Z XhmikosR $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt

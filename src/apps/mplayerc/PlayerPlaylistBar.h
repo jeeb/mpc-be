@@ -1,5 +1,5 @@
 /*
- * $Id: PlayerPlaylistBar.h 4343 2012-04-11 19:16:28Z underground78 $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt

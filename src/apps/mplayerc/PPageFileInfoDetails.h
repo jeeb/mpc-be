@@ -1,5 +1,5 @@
 /*
- * $Id: PPageFileInfoDetails.h 4414 2012-04-16 21:30:38Z XhmikosR $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt

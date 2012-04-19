@@ -1,5 +1,5 @@
 /*
- * $Id: MPCTestAPIDlg.cpp 4411 2012-04-16 19:59:31Z XhmikosR $
+ * $Id$
  *
  * (C) 2008-2012 see Authors.txt
  *

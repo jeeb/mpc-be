@@ -1,5 +1,5 @@
 /*
- * $Id: FilterEnum.h 4422 2012-04-18 04:51:33Z Aleksoid $
+ * $Id$
  *
  * (C) 2010-2012 see Authors.txt
  *

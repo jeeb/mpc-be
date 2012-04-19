@@ -1,5 +1,5 @@
 /*
- * $Id: Rasterizer.cpp 4417 2012-04-17 16:36:23Z XhmikosR $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt

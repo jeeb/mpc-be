@@ -1,5 +1,5 @@
 /*
- * $Id: WebClientSocket.cpp 4381 2012-04-15 08:33:37Z XhmikosR $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt

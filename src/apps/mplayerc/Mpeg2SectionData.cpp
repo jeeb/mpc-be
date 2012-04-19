@@ -1,5 +1,5 @@
 /*
- * $Id: Mpeg2SectionData.cpp 4390 2012-04-15 14:09:05Z XhmikosR $
+ * $Id$
  *
  * (C) 2006-2012 see Authors.txt
  *
