@@ -175,8 +175,8 @@ Name: reset_settings;     Description: {cm:tsk_ResetSettings};     GroupDescript
 [Files]
 Source: {#bindir}\{#mpchc_exe};             DestDir: {app};      Components: main;         Flags: ignoreversion
 Source: {#bindir}\mpciconlib.dll;           DestDir: {app};      Components: mpciconlib;   Flags: ignoreversion
-Source: {#bindir}\check_update_for_MPC-HC.url; DestDir: {app}; Components: main; Flags: ignoreversion
-Source: {#bindir}\xvidvideo.ico; DestDir: {app}; Components: main; Flags: ignoreversion
+;Source: {#bindir}\check_update_for_MPC-HC.url; DestDir: {app}; Components: main; Flags: ignoreversion
+;Source: {#bindir}\xvidvideo.ico; DestDir: {app}; Components: main; Flags: ignoreversion
 #ifdef localize
 Source: {#bindir}\Lang\mpcresources.br.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
 Source: {#bindir}\Lang\mpcresources.by.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
@@ -223,7 +223,7 @@ Name: {group}\Changelog;                         Filename: {app}\Changelog.txt; 
 Name: {group}\{cm:ProgramOnTheWeb,{#app_name}};  Filename: http://mpc-hc.sourceforge.net/
 Name: {group}\{cm:UninstallProgram,{#app_name}}; Filename: {uninstallexe};      Comment: {cm:UninstallProgram,{#app_name}}; WorkingDir: {app}
 
-Name: {group}\Check update for MPC-HC; Filename: {app}\check_update_for_MPC-HC.url; IconFilename: {app}\xvidvideo.ico; Comment: Check update for MPC-HC
+;Name: {group}\Check update for MPC-HC; Filename: {app}\check_update_for_MPC-HC.url; IconFilename: {app}\xvidvideo.ico; Comment: Check update for MPC-HC
 
 [Run]
 Filename: {app}\{#mpchc_exe};                    Description: {cm:LaunchProgram,{#app_name}}; WorkingDir: {app}; Flags: nowait postinstall skipifsilent unchecked
