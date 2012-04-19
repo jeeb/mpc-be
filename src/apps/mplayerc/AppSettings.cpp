@@ -1,5 +1,5 @@
 /*
- * $Id: AppSettings.cpp 4422 2012-04-18 04:51:33Z Aleksoid $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt

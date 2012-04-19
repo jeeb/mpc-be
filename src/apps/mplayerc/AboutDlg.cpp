@@ -1,5 +1,5 @@
 /*
- * $Id: AboutDlg.cpp 4413 2012-04-16 21:30:16Z underground78 $
+ * $Id$
  *
  * (C) 2012 see Authors.txt
  *
