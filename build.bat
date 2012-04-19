@@ -1,5 +1,5 @@
 @ECHO OFF
-REM $Id: build.bat 4434 2012-04-19 05:52:51Z XhmikosR $
+REM $Id$
 REM
 REM (C) 2009-2012 see Authors.txt
 REM
@@ -25,17 +25,17 @@ CD /D %~dp0
 REM Check if the bin folder exists otherwise MSBuild will fail
 IF NOT EXIST "bin" MD "bin"
 
-IF /I "%~1"=="help"   GOTO ShowHelp
-IF /I "%~1"=="/help"  GOTO ShowHelp
-IF /I "%~1"=="-help"  GOTO ShowHelp
-IF /I "%~1"=="--help" GOTO ShowHelp
-IF /I "%~1"=="/?"     GOTO ShowHelp
+IF /I "%~1" == "help"   GOTO ShowHelp
+IF /I "%~1" == "/help"  GOTO ShowHelp
+IF /I "%~1" == "-help"  GOTO ShowHelp
+IF /I "%~1" == "--help" GOTO ShowHelp
+IF /I "%~1" == "/?"     GOTO ShowHelp
 
 
 REM pre-build checks
-IF "%VS100COMNTOOLS%"=="" GOTO MissingVar
-IF "%MINGW32%"==""        GOTO MissingVar
-IF "%MINGW64%"==""        GOTO MissingVar
+IF "%VS100COMNTOOLS%" == "" GOTO MissingVar
+IF "%MINGW32%" == ""        GOTO MissingVar
+IF "%MINGW64%" == ""        GOTO MissingVar
 
 
 REM Check for the first switch
@@ -130,30 +130,30 @@ IF "%~4" == "" (
 
 :Start
 SET START_TIME=%DATE%-%TIME%
-IF "%PLATFORM%"=="Win32" GOTO Win32
-IF "%PLATFORM%"=="x64"   GOTO x64
+IF "%PLATFORM%" == "Win32" GOTO Win32
+IF "%PLATFORM%" == "x64"   GOTO x64
 
 
 :Win32
 CALL "%VS100COMNTOOLS%..\..\VC\vcvarsall.bat" x86
 
-IF "%CONFIG%"=="Resource" CALL :SubResources Win32 && GOTO x64
+IF "%CONFIG%" == "Resource" CALL :SubResources Win32 && GOTO x64
 CALL :SubMPCHC Win32
-IF "%CONFIG%"=="Main" GOTO x64
+IF "%CONFIG%" == "Main" GOTO x64
 
 CALL :SubResources Win32
 CALL :SubCreatePackages Win32
 
 
 :x64
-IF "%PLATFORM%"=="Win32" GOTO End
+IF "%PLATFORM%" == "Win32" GOTO End
 
-IF DEFINED PROGRAMFILES(x86) (SET build_type=amd64) ELSE (SET build_type=x86_amd64)
-CALL "%VS100COMNTOOLS%..\..\VC\vcvarsall.bat" %build_type%
+IF DEFINED PROGRAMFILES(x86) (SET x64_type=amd64) ELSE (SET x64_type=x86_amd64)
+CALL "%VS100COMNTOOLS%..\..\VC\vcvarsall.bat" %x64_type%
 
-IF "%CONFIG%"=="Resource" CALL :SubResources x64 && GOTO END
+IF "%CONFIG%" == "Resource" CALL :SubResources x64 && GOTO END
 CALL :SubMPCHC x64
-IF "%CONFIG%"=="Main" GOTO End
+IF "%CONFIG%" == "Main" GOTO End
 
 CALL :SubResources x64
 CALL :SubCreatePackages x64
@@ -161,7 +161,7 @@ CALL :SubCreatePackages x64
 
 :End
 TITLE Compiling MPC-HC [FINISHED]
-CALL :SubMsg "INFO" "MPC-HC's compilation started on %START_TIME% and completed on %DATE%-%TIME%"
+CALL :SubMsg "INFO" "Compilation started on %START_TIME% and completed on %DATE%-%TIME%"
 ENDLOCAL
 EXIT /B
 
@@ -173,7 +173,11 @@ TITLE Compiling MPC-HC BE - %BUILDCONFIG%^|%1...
  /consoleloggerparameters:Verbosity=minimal /maxcpucount /nodeReuse:true^
  /flp1:LogFile=bin\errors_%1.txt;errorsonly;Verbosity=diagnostic^
  /flp2:LogFile=bin\warnings_%1.txt;warningsonly;Verbosity=diagnostic
-IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Compilation failed!"
+IF %ERRORLEVEL% NEQ 0 (
+  CALL :SubMsg "ERROR" "mpc-hc.sln - Compilation failed!"
+) ELSE (
+  CALL :SubMsg "INFO" "mpc-hc.sln %1 compiled successfully"
+)
 EXIT /B
 
 
@@ -182,7 +186,11 @@ TITLE Compiling mpciconlib BE - Release^|%1...
 "%WINDIR%\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe" /nologo mpciconlib.sln^
  /target:%BUILDTYPE% /property:Configuration=Release;Platform=%1^
  /consoleloggerparameters:Verbosity=minimal /maxcpucount /nodeReuse:true
-IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Compilation failed!"
+IF %ERRORLEVEL% NEQ 0 (
+  CALL :SubMsg "ERROR" "mpciconlib.sln - Compilation failed!"
+) ELSE (
+  CALL :SubMsg "INFO" "mpciconlib.sln %1 compiled successfully"
+)
 
 FOR %%A IN ("Armenian" "Belarusian" "Catalan" "Chinese Simplified" "Chinese Traditional"
  "Czech" "Dutch" "French" "German" "Hebrew" "Hungarian" "Italian" "Japanese" "Korean"
@@ -198,11 +206,11 @@ EXIT /B
 
 
 :SubCreatePackages
-IF "%BUILDTYPE%"=="Clean"   EXIT /B
-IF "%BUILDCONFIG%"=="Debug" EXIT /B
+IF "%BUILDTYPE%" == "Clean"   EXIT /B
+IF "%BUILDCONFIG%" == "Debug" EXIT /B
 
-IF "%~1"=="Win32" SET OUTDIR=bin\mpc-hc_x86
-IF "%~1"=="x64"   SET OUTDIR=bin\mpc-hc_x64 & SET ISDefs=/Dx64Build
+IF "%~1" == "Win32" SET OUTDIR=bin\mpc-hc_x86
+IF "%~1" == "x64"   SET OUTDIR=bin\mpc-hc_x64 & SET ISDefs=/Dx64Build
 
 XCOPY "COPYING.txt"        "%OUTDIR%\" /Y /V >NUL
 XCOPY "docs\Authors.txt"   "%OUTDIR%\" /Y /V >NUL
@@ -217,7 +225,7 @@ IF DEFINED InnoSetupPath (
   IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Compilation failed!"
   CALL :SubMsg "INFO" "%1 installer successfully built"
 ) ELSE (
-  CALL :SubMsg "INFO" "Inno Setup wasn't found, the %1 installer wasn't built"
+  CALL :SubMsg "WARNING" "Inno Setup wasn't found, the %1 installer wasn't built"
 )
 EXIT /B
 
@@ -289,6 +297,8 @@ ECHO. & ECHO ------------------------------
 IF /I "%~1" == "ERROR" (
   CALL :ColorText "0C" "[%~1]" & ECHO  %~2
 ) ELSE IF /I "%~1" == "INFO" (
+  CALL :ColorText "0A" "[%~1]" & ECHO  %~2
+) ELSE IF /I "%~1" == "WARNING" (
   CALL :ColorText "0E" "[%~1]" & ECHO  %~2
 )
 ECHO ------------------------------ & ECHO.
