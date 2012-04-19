@@ -1,0 +1,146 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "mpciconlib.h"
+#include "Version.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// The icons should have the exact same order as in "mpciconlib.h" !
+
+IDI_AVI_ICON              ICON                    "icons\\m0001.ico"
+IDI_MPG_ICON              ICON                    "icons\\m0002.ico"
+IDI_MP4_ICON              ICON                    "icons\\m0003.ico"
+IDI_MKV_ICON              ICON                    "icons\\m0004.ico"
+IDI_OGM_ICON              ICON                    "icons\\m0005.ico"
+IDI_FLV_ICON              ICON                    "icons\\m0006.ico"
+IDI_WMV_ICON              ICON                    "icons\\m0007.ico"
+IDI_MOV_ICON              ICON                    "icons\\m0008.ico"
+IDI_RM_ICON               ICON                    "icons\\m0009.ico"
+IDI_MP3_ICON              ICON                    "icons\\mu001.ico"
+IDI_OGG_ICON              ICON                    "icons\\mu002.ico"
+IDI_AAC_ICON              ICON                    "icons\\mu003.ico"
+IDI_MKA_ICON              ICON                    "icons\\mu004.ico"
+IDI_WMA_ICON              ICON                    "icons\\mu005.ico"
+IDI_RA_ICON               ICON                    "icons\\mu006.ico"
+IDI_WAV_ICON              ICON                    "icons\\mu007.ico"
+IDI_MPA_ICON              ICON                    "icons\\mu008.ico"
+IDI_CDA_ICON              ICON                    "icons\\mu009.ico"
+IDI_MPC_ICON              ICON                    "icons\\mu010.ico"
+IDI_FLAC_ICON             ICON                    "icons\\mu011.ico"
+IDI_ALAC_ICON             ICON                    "icons\\mu012.ico"
+IDI_PLAYLIST_ICON         ICON                    "icons\\pl0005.ico"
+IDI_D2V_ICON              ICON                    "icons\\m0010.ico"
+IDI_MID_ICON              ICON                    "icons\\mu013.ico"
+IDI_AIFF_ICON             ICON                    "icons\\mu014.ico"
+IDI_AU_ICON               ICON                    "icons\\mu015.ico"
+IDI_IVF_ICON              ICON                    "icons\\m0011.ico"
+IDI_FLIC_ICON             ICON                    "icons\\m0012.ico"
+IDI_BIK_ICON              ICON                    "icons\\m0013.ico"
+IDI_RATDVD_ICON           ICON                    "icons\\m0013.ico"
+IDI_RT_ICON               ICON                    "icons\\m0016.ico"
+IDI_DSM_ICON              ICON                    "icons\\m0016.ico"
+IDI_SWF_ICON              ICON                    "icons\\m0015.ico"
+IDI_OTHER_ICON            ICON                    "icons\\pl0004.ico"
+IDI_DVDA_ICON             ICON                    "icons\\mu016.ico"
+IDI_DVDF_ICON             ICON                    "icons\\m0008.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION MPC_VERSION_NUM
+ PRODUCTVERSION MPC_VERSION_NUM
+ FILEFLAGSMASK 0x17L
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "Media Player Classic - Home Cinema Icon Library"
+            VALUE "CompanyName", MPC_COMP_NAME_STR
+            VALUE "FileDescription", "Media Player Classic - Home Cinema Icon Library"
+            VALUE "FileVersion", MPC_VERSION_STR
+            VALUE "InternalName", "mpciconlib"
+            VALUE "LegalCopyright", MPC_COPYRIGHT_STR
+            VALUE "OriginalFilename", "mpciconlib.dll"
+            VALUE "ProductName", "Media Player Classic - Home Cinema Icon Library"
+            VALUE "ProductVersion", MPC_VERSION_STR
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
