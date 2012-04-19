@@ -1,0 +1,171 @@
+//
+// mplayerc.rc2 - resources Microsoft Visual C++ does not edit directly
+//
+
+#ifdef APSTUDIO_INVOKED
+#error this file is not editable by Microsoft Visual C++
+#endif //APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Add manually edited resources here...
+#include "resource.h"
+#include "Version.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// RT_MANIFEST
+//
+
+1                       RT_MANIFEST             "res\\mpc-hc.exe.manifest"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// FILE
+//
+
+IDF_LOGO0                        FILE                    "res\\logo.0.png"
+#ifdef _WIN64
+IDF_LOGO1                        FILE                    "res\\logo.1_x64.png"
+IDF_LOGO2                        FILE                    "res\\logo.2_x64.png"
+IDF_LOGO3                        FILE                    "res\\logo.3_x64.png"
+#else
+IDF_LOGO1                        FILE                    "res\\logo.1.png"
+IDF_LOGO2                        FILE                    "res\\logo.2.png"
+IDF_LOGO3                        FILE                    "res\\logo.3.png"
+#endif
+W7_TOOLBAR                       PNG                     "res\\Toolbarw7.png"
+IDF_SHADER_BT601_BT709           FILE                    "res\\shaders\\BT601BT709.psh"
+IDF_SHADER_CONTOUR               FILE                    "res\\shaders\\contour.psh"
+IDF_SHADER_DEINTERLACE           FILE                    "res\\shaders\\deinterlace (blend).psh"
+IDF_SHADER_DENOISE               FILE                    "res\\shaders\\denoise.psh"
+IDF_SHADER_EDGE_SHARPEN          FILE                    "res\\shaders\\EdgeSharpen.psh"
+IDF_SHADER_EMBOSS                FILE                    "res\\shaders\\emboss.psh"
+IDF_SHADER_EMPTY                 FILE                    "res\\shaders\\empty.psh"
+IDF_SHADER_FINAL                 FILE                    "res\\shaders\\final.psh"
+IDF_SHADER_GRAYSCALE             FILE                    "res\\shaders\\grayscale.psh"
+IDF_SHADER_INVERT                FILE                    "res\\shaders\\invert.psh"
+IDF_SHADER_LETTERBOX             FILE                    "res\\shaders\\letterbox.psh"
+IDF_SHADER_LEVELS                FILE                    "res\\shaders\\levels.psh"
+IDF_SHADER_LEVELS2               FILE                    "res\\shaders\\levels2.psh"
+IDF_SHADER_LEVELS3               FILE                    "res\\shaders\\levels3.psh"
+IDF_SHADER_NIGHTVISION           FILE                    "res\\shaders\\nightvision.psh"
+IDF_SHADER_PROCAMP               FILE                    "res\\shaders\\procamp.psh"
+IDF_SHADER_RESIZER               FILE                    "res\\shaders\\resizer.psh"
+IDF_SHADER_SHARPEN               FILE                    "res\\shaders\\sharpen.psh"
+IDF_SHADER_SHARPEN_COMPLEX       FILE                    "res\\shaders\\SharpenComplex.psh"
+IDF_SHADER_SHARPEN_COMPLEX2      FILE                    "res\\shaders\\SharpenComplex2.psh"
+IDF_SHADER_SPHERE                FILE                    "res\\shaders\\sphere.psh"
+IDF_SHADER_SPOTLIGHT             FILE                    "res\\shaders\\spotlight.psh"
+IDF_SHADER_WAVE                  FILE                    "res\\shaders\\wave.psh"
+IDF_SHADER_YV12CHROMAUP          FILE                    "res\\shaders\\YV12ChromaUpsampling.psh"
+IDF_1PIX_GIF                     FILE                    "res\\web\\1pix.gif"
+IDF_BOTTOMSIDE_PNG               FILE                    "res\\web\\bottomside.png"
+IDF_CONTROLBACK_PNG              FILE                    "res\\web\\controlback.png"
+IDF_CONTROLBUTTONDECRATE_PNG     FILE                    "res\\web\\controlbuttondecrate.png"
+IDF_CONTROLBUTTONINCRATE_PNG     FILE                    "res\\web\\controlbuttonincrate.png"
+IDF_CONTROLBUTTONPAUSE_PNG       FILE                    "res\\web\\controlbuttonpause.png"
+IDF_CONTROLBUTTONPLAY_PNG        FILE                    "res\\web\\controlbuttonplay.png"
+IDF_CONTROLBUTTONSKIPBACK_PNG    FILE                    "res\\web\\controlbuttonskipback.png"
+IDF_CONTROLBUTTONSKIPFORWARD_PNG FILE                    "res\\web\\controlbuttonskipforward.png"
+IDF_CONTROLBUTTONSTEP_PNG        FILE                    "res\\web\\controlbuttonstep.png"
+IDF_CONTROLBUTTONSTOP_PNG        FILE                    "res\\web\\controlbuttonstop.png"
+IDF_CONTROLVOLUMEBAR_PNG         FILE                    "res\\web\\controlvolumebar.png"
+IDF_CONTROLVOLUMEGRIP_PNG        FILE                    "res\\web\\controlvolumegrip.png"
+IDF_CONTROLVOLUMEOFF_PNG         FILE                    "res\\web\\controlvolumeoff.png"
+IDF_CONTROLVOLUMEON_PNG          FILE                    "res\\web\\controlvolumeon.png"
+IDF_DEFAULT_CSS                  FILE                    "res\\web\\default.css"
+IDF_HEADERBACK_PNG               FILE                    "res\\web\\headerback.png"
+IDF_HEADERCLOSE_PNG              FILE                    "res\\web\\headerclose.png"
+IDF_HEADERICON_PNG               FILE                    "res\\web\\headericon.png"
+IDF_LEFTBOTTOMSIDE_PNG           FILE                    "res\\web\\leftbottomside.png"
+IDF_LEFTSIDE_PNG                 FILE                    "res\\web\\leftside.png"
+IDF_RIGHTBOTTOMSIDE_PNG          FILE                    "res\\web\\rightbottomside.png"
+IDF_RIGHTSIDE_PNG                FILE                    "res\\web\\rightside.png"
+IDF_SEEKBARGRIP_PNG              FILE                    "res\\web\\seekbargrip.png"
+IDF_SEEKBARLEFT_PNG              FILE                    "res\\web\\seekbarleft.png"
+IDF_SEEKBARMID_PNG               FILE                    "res\\web\\seekbarmid.png"
+IDF_SEEKBARRIGHT_PNG             FILE                    "res\\web\\seekbarright.png"
+IDF_SLIDERBACK_GIF               FILE                    "res\\web\\sliderback.gif"
+IDF_SLIDERBAR_GIF                FILE                    "res\\web\\sliderbar.gif"
+IDF_SLIDERGRIP_GIF               FILE                    "res\\web\\slidergrip.gif"
+IDF_VBR_GIF                      FILE                    "res\\web\\vbg.gif"
+IDF_VBS_GIF                      FILE                    "res\\web\\vbs.gif"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// HTML
+//
+
+IDR_HTML_404                     HTML                    "res\\web\\404.html"
+IDR_HTML_BROWSER                 HTML                    "res\\web\\browser.html"
+IDR_HTML_CONTROLS                HTML                    "res\\web\\controls.html"
+IDR_HTML_INDEX                   HTML                    "res\\web\\index.html"
+IDR_HTML_INFO                    HTML                    "res\\web\\info.html"
+IDR_HTML_PLAYER                  HTML                    "res\\web\\player.html"
+IDR_HTML_VARIABLES               HTML                    "res\\web\\variables.html"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION MPC_VERSION_NUM
+ PRODUCTVERSION MPC_VERSION_NUM
+ FILEFLAGSMASK 0x1fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "Based on the original Media Player Classic v6.4.9.0 © Gabest"
+            VALUE "CompanyName", MPC_COMP_NAME_STR
+            VALUE "FileDescription", "Media Player Classic - Home Cinema"
+            VALUE "FileVersion", MPC_VERSION_STR
+            VALUE "InternalName", "mpc-hc"
+            VALUE "LegalCopyright", MPC_COPYRIGHT_STR
+#ifdef _WIN64
+            VALUE "OriginalFilename", "mpc-hc64.exe"
+#else
+            VALUE "OriginalFilename", "mpc-hc.exe"
+#endif
+            VALUE "ProductName", "Media Player Classic - Home Cinema"
+            VALUE "ProductVersion", MPC_VERSION_STR
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // English (United States) resources

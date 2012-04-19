@@ -1,0 +1,58 @@
+/*
+ * $Id: VolumeCtrl.h 4330 2012-04-10 15:45:58Z XhmikosR $
+ *
+ * (C) 2003-2006 Gabest
+ * (C) 2006-2012 see Authors.txt
+ *
+ * This file is part of MPC-HC.
+ *
+ * MPC-HC is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MPC-HC is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+#pragma once
+
+
+// CVolumeCtrl
+
+class CVolumeCtrl : public CSliderCtrl
+{
+	DECLARE_DYNAMIC(CVolumeCtrl)
+
+private:
+	bool m_fSelfDrawn;
+	CBitmap m_bmUnderCtrl;//ins:2233 bobdynlan:copy area behind the control//
+
+public:
+	CVolumeCtrl(bool fSelfDrawn = true);
+	virtual ~CVolumeCtrl();
+
+	bool Create(CWnd* pParentWnd);
+
+	void IncreaseVolume(), DecreaseVolume();
+
+	void SetPosInternal(int pos);
+
+protected:
+	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
+
+	DECLARE_MESSAGE_MAP()
+
+public:
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);//ins:2217 bobdynlan:anti-flicker//
+	afx_msg void OnNMCustomdraw(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnSetFocus(CWnd* pOldWnd);
+	afx_msg void HScroll(UINT nSBCode, UINT nPos);
+};
