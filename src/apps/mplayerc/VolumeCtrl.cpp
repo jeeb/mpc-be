@@ -263,9 +263,9 @@ void CVolumeCtrl::HScroll(UINT nSBCode, UINT nPos)
 {
 //INS:2233 bobdynlan: invalidate
 //-----------------------------------------------------------------------------
-	int nVolMin,nVolMax;
-	GetRange(nVolMin,nVolMax);
-	if (nVolMin <= nSBCode && nSBCode <= nVolMax)
+	int nVolMin, nVolMax;
+	GetRange(nVolMin, nVolMax);
+	if ((UINT)nVolMin <= nSBCode && nSBCode <= (UINT)nVolMax)
 	{
 		CRect r;
 		GetClientRect(&r);
