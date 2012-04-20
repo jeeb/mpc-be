@@ -1001,7 +1001,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuildStep Include="res\mpc-hc.exe.manifest">
+    <CustomBuildStep Include="res\mpc-be.exe.manifest">
       <Filter>Resource Files</Filter>
     </CustomBuildStep>
     <CustomBuildStep Include="res\mplayerc.rc2">

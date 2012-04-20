@@ -525,7 +525,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_HELP_CHECKFORUPDATE, OnHelpCheckForUpdate)
 	//ON_COMMAND(ID_HELP_DOCUMENTATION, OnHelpDocumentation)
 	ON_COMMAND(ID_HELP_TOOLBARIMAGES, OnHelpToolbarImages)
-	ON_COMMAND(ID_HELP_DONATE, OnHelpDonate)
+	//ON_COMMAND(ID_HELP_DONATE, OnHelpDonate)
 
 	// Open Dir incl. SubDir
 	ON_COMMAND(ID_FILE_OPENDIRECTORY, OnFileOpendirectory)
@@ -9299,10 +9299,12 @@ void CMainFrame::OnHelpToolbarImages()
 	ShellExecute(m_hWnd, _T("open"), _T("http://sourceforge.net/apps/trac/mpc-hc/wiki/Toolbar_images"), NULL, NULL, SW_SHOWDEFAULT);
 }
 
+/*
 void CMainFrame::OnHelpDonate()
 {
 	ShellExecute(m_hWnd, _T("open"), _T("http://sourceforge.net/donate/index.php?group_id=170561"), NULL, NULL, SW_SHOWDEFAULT);
 }
+*/
 
 //////////////////////////////////
 

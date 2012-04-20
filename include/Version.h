@@ -3,14 +3,14 @@
 //
 // (C) 2010-2012 see Authors.txt
 //
-// This file is part of MPC-HC.
+// This file is part of MPC-BE.
 //
-// MPC-HC is free software; you can redistribute it and/or modify
+// MPC-BE is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
 //
-// MPC-HC is distributed in the hope that it will be useful,
+// MPC-BE is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
@@ -30,7 +30,7 @@
 //   for ISPP being buggy and throwing an error for the various defines.
 //
 // * DIRECTX_SDK_DATE is the date of the DirectX SDK used for compilation and it's used
-//   in the error message in mpc-hc and in the installer when the DX runtime is out of date.
+//   in the error message in mpc-be and in the installer when the DX runtime is out of date.
 //
 // * DIRECTX_SDK_NUMBER is used in the installer when the DX runtime is out of date.
 
@@ -53,7 +53,7 @@
 
 #ifndef ISPP_IS_BUGGY
 
-#define MPC_COMP_NAME_STR    L"MPC-HC Team"
+#define MPC_COMP_NAME_STR    L"MPC-BE Team"
 #define MPC_COPYRIGHT_STR    L"Copyright © 2002-2012 all contributors, see Authors.txt"
 
 #ifdef  NO_VERSION_REV_NEEDED
@@ -66,7 +66,7 @@
 
 #endif // ISPP_IS_BUGGY
 
-#define MPC_VERSION_COMMENTS "http://sourceforge.net/projects/mpc-hc/"
+#define MPC_VERSION_COMMENTS "http://sourceforge.net/projects/mpc-be/"
 
 #define DIRECTX_SDK_DATE     "June 2010"
 #define DIRECTX_SDK_NUMBER   "43"

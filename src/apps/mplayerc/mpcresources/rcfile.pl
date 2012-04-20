@@ -59,7 +59,7 @@ Options:
 	example 1: you want to check if there are differences between mplayerc.rc and mplayerc.language.rc files.
 	Go to the mpcresources directory, then 	>perl rcfile.pl
 
-	example 2: you changed some gui of mpc-hc, that means you also modified the mplayerc.rc file.
+	example 2: you changed some gui of mpc-be, that means you also modified the mplayerc.rc file.
 	First: checkout the head revision of mplayerc.rc using the svn client, give it any other name, for example:
 	>svn cat -r head ../mplayerc.rc > mplayer.rc.old
 	Second: >perl rcfile.pl -b mplayerc.rc.old

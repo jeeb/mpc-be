@@ -51,13 +51,13 @@
 
 
 #ifdef x64Build
-  #define bindir       = "..\bin\mpc-hc_x64"
-  #define mpchc_exe    = "mpc-hc64.exe"
-  #define mpchc_ini    = "mpc-hc64.ini"
+  #define bindir       = "..\bin\mpc-be_x64"
+  #define mpcbe_exe    = "mpc-be64.exe"
+  #define mpcbe_ini    = "mpc-be64.ini"
 #else
-  #define bindir       = "..\bin\mpc-hc_x86"
-  #define mpchc_exe    = "mpc-hc.exe"
-  #define mpchc_ini    = "mpc-hc.ini"
+  #define bindir       = "..\bin\mpc-be_x86"
+  #define mpcbe_exe    = "mpc-be.exe"
+  #define mpcbe_ini    = "mpc-be.ini"
 #endif
 
 [Setup]
@@ -92,7 +92,7 @@ VersionInfoProductVersion={#app_version}
 VersionInfoProductTextVersion={#app_version}
 VersionInfoTextVersion={#app_version}
 VersionInfoVersion={#app_version}
-UninstallDisplayIcon={app}\{#mpchc_exe}
+UninstallDisplayIcon={app}\{#mpcbe_exe}
 DefaultDirName={code:GetInstallFolder}
 LicenseFile=..\COPYING.txt
 OutputDir=.
@@ -173,7 +173,7 @@ Name: reset_settings;     Description: {cm:tsk_ResetSettings};     GroupDescript
 
 
 [Files]
-Source: {#bindir}\{#mpchc_exe};             DestDir: {app};      Components: main;         Flags: ignoreversion
+Source: {#bindir}\{#mpcbe_exe};             DestDir: {app};      Components: main;         Flags: ignoreversion
 Source: {#bindir}\mpciconlib.dll;           DestDir: {app};      Components: mpciconlib;   Flags: ignoreversion
 ;Source: {#bindir}\check_update_for_MPC-BE.url; DestDir: {app}; Components: main; Flags: ignoreversion
 ;Source: {#bindir}\xvidvideo.ico; DestDir: {app}; Components: main; Flags: ignoreversion
@@ -209,15 +209,15 @@ Source: ..\docs\Readme.txt;                 DestDir: {app};      Components: mai
 
 [Icons]
 #ifdef x64Build
-Name: {group}\{#app_name} x64;                   Filename: {app}\{#mpchc_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpchc_exe}; IconIndex: 0
-Name: {commondesktop}\{#app_name} x64;           Filename: {app}\{#mpchc_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpchc_exe}; IconIndex: 0; Tasks: desktopicon\common
-Name: {userdesktop}\{#app_name} x64;             Filename: {app}\{#mpchc_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpchc_exe}; IconIndex: 0; Tasks: desktopicon\user
-Name: {#quick_launch}\{#app_name} x64;           Filename: {app}\{#mpchc_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpchc_exe}; IconIndex: 0; Tasks: quicklaunchicon
+Name: {group}\{#app_name} x64;                   Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0
+Name: {commondesktop}\{#app_name} x64;           Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\common
+Name: {userdesktop}\{#app_name} x64;             Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\user
+Name: {#quick_launch}\{#app_name} x64;           Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: quicklaunchicon
 #else
-Name: {group}\{#app_name};                       Filename: {app}\{#mpchc_exe}; Comment: {#app_name} {#app_version}; WorkingDir: {app}; IconFilename: {app}\{#mpchc_exe}; IconIndex: 0
-Name: {commondesktop}\{#app_name};               Filename: {app}\{#mpchc_exe}; Comment: {#app_name} {#app_version}; WorkingDir: {app}; IconFilename: {app}\{#mpchc_exe}; IconIndex: 0; Tasks: desktopicon\common
-Name: {userdesktop}\{#app_name};                 Filename: {app}\{#mpchc_exe}; Comment: {#app_name} {#app_version}; WorkingDir: {app}; IconFilename: {app}\{#mpchc_exe}; IconIndex: 0; Tasks: desktopicon\user
-Name: {#quick_launch}\{#app_name};               Filename: {app}\{#mpchc_exe}; Comment: {#app_name} {#app_version}; WorkingDir: {app}; IconFilename: {app}\{#mpchc_exe}; IconIndex: 0; Tasks: quicklaunchicon
+Name: {group}\{#app_name};                       Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version}; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0
+Name: {commondesktop}\{#app_name};               Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version}; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\common
+Name: {userdesktop}\{#app_name};                 Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version}; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\user
+Name: {#quick_launch}\{#app_name};               Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version}; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: quicklaunchicon
 #endif
 Name: {group}\Changelog;                         Filename: {app}\Changelog.txt; Comment: {cm:ViewChangelog};                WorkingDir: {app}
 Name: {group}\{cm:ProgramOnTheWeb,{#app_name}};  Filename: https://sourceforge.net/p/mpcbe/
@@ -226,7 +226,7 @@ Name: {group}\{cm:UninstallProgram,{#app_name}}; Filename: {uninstallexe};      
 ;Name: {group}\Check update for MPC-BE; Filename: {app}\check_update_for_MPC-BE.url; IconFilename: {app}\xvidvideo.ico; Comment: Check update for MPC-BE
 
 [Run]
-Filename: {app}\{#mpchc_exe};                    Description: {cm:LaunchProgram,{#app_name}}; WorkingDir: {app}; Flags: nowait postinstall skipifsilent unchecked
+Filename: {app}\{#mpcbe_exe};                    Description: {cm:LaunchProgram,{#app_name}}; WorkingDir: {app}; Flags: nowait postinstall skipifsilent unchecked
 Filename: {app}\Changelog.txt;                   Description: {cm:ViewChangelog};             WorkingDir: {app}; Flags: nowait postinstall skipifsilent unchecked shellexec
 
 
@@ -248,18 +248,18 @@ function IsProcessorFeaturePresent(Feature: Integer): Boolean;
 external 'IsProcessorFeaturePresent@kernel32.dll stdcall';
 #endif
 
-const installer_mutex_name = 'mpchc_setup_mutex';
+const installer_mutex_name = 'mpcbe_setup_mutex';
 
 
 function GetInstallFolder(Default: String): String;
 var
   sInstallPath: String;
 begin
-  if not RegQueryStringValue(HKLM, 'SOFTWARE\Gabest\MPC-BE', 'ExePath', sInstallPath) then begin
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\MPC-BE', 'ExePath', sInstallPath) then begin
     Result := ExpandConstant('{pf}\MPC-BE');
   end
   else begin
-    RegQueryStringValue(HKLM, 'SOFTWARE\Gabest\MPC-BE', 'ExePath', sInstallPath);
+    RegQueryStringValue(HKLM, 'SOFTWARE\MPC-BE', 'ExePath', sInstallPath);
     Result := ExtractFileDir(sInstallPath);
     if (Result = '') or not DirExists(Result) then begin
       Result := ExpandConstant('{pf}\MPC-BE');
@@ -307,8 +307,8 @@ end;
 // Check if MPC-BE's settings exist
 function SettingsExistCheck(): Boolean;
 begin
-  if RegKeyExists(HKEY_CURRENT_USER, 'Software\Gabest\MPC-BE') or
-  FileExists(ExpandConstant('{app}\{#mpchc_ini}')) then
+  if RegKeyExists(HKEY_CURRENT_USER, 'Software\MPC-BE') or
+  FileExists(ExpandConstant('{app}\{#mpcbe_ini}')) then
     Result := True
   else
     Result := False;
@@ -326,14 +326,12 @@ end;
 procedure CleanUpSettingsAndFiles();
 begin
   DeleteFile(ExpandConstant('{app}\*.bak'));
-  DeleteFile(ExpandConstant('{app}\{#mpchc_ini}'));
+  DeleteFile(ExpandConstant('{app}\{#mpcbe_ini}'));
   DeleteFile(ExpandConstant('{userappdata}\MPC-BE\default.mpcpl'));
   RemoveDir(ExpandConstant('{userappdata}\MPC-BE'));
-  RegDeleteKeyIncludingSubkeys(HKCU, 'Software\Gabest\Filters');
-  RegDeleteKeyIncludingSubkeys(HKCU, 'Software\Gabest\MPC-BE');
-  RegDeleteKeyIncludingSubkeys(HKLM, 'SOFTWARE\Gabest\MPC-BE');
-  RegDeleteKeyIfEmpty(HKCU, 'Software\Gabest');
-  RegDeleteKeyIfEmpty(HKLM, 'SOFTWARE\Gabest');
+  RegDeleteKeyIncludingSubkeys(HKCU, 'Software\MPC-BE Filters');
+  RegDeleteKeyIncludingSubkeys(HKCU, 'Software\MPC-BE');
+  RegDeleteKeyIncludingSubkeys(HKLM, 'SOFTWARE\MPC-BE');
 end;
 
 
@@ -346,12 +344,12 @@ begin
       CleanUpSettingsAndFiles();
 
     iLanguage := StrToInt(ExpandConstant('{cm:langid}'));
-    RegWriteStringValue(HKLM, 'SOFTWARE\Gabest\MPC-BE', 'ExePath', ExpandConstant('{app}\{#mpchc_exe}'));
+    RegWriteStringValue(HKLM, 'SOFTWARE\MPC-BE', 'ExePath', ExpandConstant('{app}\{#mpcbe_exe}'));
 
-    if IsComponentSelected('mpcresources') and FileExists(ExpandConstant('{app}\{#mpchc_ini}')) then
-      SetIniInt('Settings', 'InterfaceLanguage', iLanguage, ExpandConstant('{app}\{#mpchc_ini}'))
+    if IsComponentSelected('mpcresources') and FileExists(ExpandConstant('{app}\{#mpcbe_ini}')) then
+      SetIniInt('Settings', 'InterfaceLanguage', iLanguage, ExpandConstant('{app}\{#mpcbe_ini}'))
     else
-      RegWriteDWordValue(HKCU, 'Software\Gabest\MPC-BE\Settings', 'InterfaceLanguage', iLanguage);
+      RegWriteDWordValue(HKCU, 'Software\MPC-BE\Settings', 'InterfaceLanguage', iLanguage);
   end;
 
   if (CurStep = ssDone) and not WizardSilent() and not D3DX9DLLExists() then

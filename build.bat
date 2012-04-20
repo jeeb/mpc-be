@@ -3,14 +3,14 @@ REM $Id$
 REM
 REM (C) 2009-2012 see Authors.txt
 REM
-REM This file is part of MPC-HC.
+REM This file is part of MPC-BE.
 REM
-REM MPC-HC is free software; you can redistribute it and/or modify
+REM MPC-BE is free software; you can redistribute it and/or modify
 REM it under the terms of the GNU General Public License as published by
 REM the Free Software Foundation; either version 3 of the License, or
 REM (at your option) any later version.
 REM
-REM MPC-HC is distributed in the hope that it will be useful,
+REM MPC-BE is distributed in the hope that it will be useful,
 REM but WITHOUT ANY WARRANTY; without even the implied warranty of
 REM MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 REM GNU General Public License for more details.
@@ -160,23 +160,23 @@ CALL :SubCreatePackages x64
 
 
 :End
-TITLE Compiling MPC-HC [FINISHED]
+TITLE Compiling MPC-BE [FINISHED]
 CALL :SubMsg "INFO" "Compilation started on %START_TIME% and completed on %DATE%-%TIME%"
 ENDLOCAL
 EXIT /B
 
 
 :SubMPCHC
-TITLE Compiling MPC-HC BE - %BUILDCONFIG%^|%1...
-"%WINDIR%\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe" /nologo mpc-hc.sln^
+TITLE Compiling MPC-BE - %BUILDCONFIG%^|%1...
+"%WINDIR%\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe" /nologo mpc-be.sln^
  /target:%BUILDTYPE% /property:Configuration=%BUILDCONFIG%;Platform=%1^
  /consoleloggerparameters:Verbosity=minimal /maxcpucount /nodeReuse:true^
  /flp1:LogFile=bin\errors_%1.txt;errorsonly;Verbosity=diagnostic^
  /flp2:LogFile=bin\warnings_%1.txt;warningsonly;Verbosity=diagnostic
 IF %ERRORLEVEL% NEQ 0 (
-  CALL :SubMsg "ERROR" "mpc-hc.sln - Compilation failed!"
+  CALL :SubMsg "ERROR" "mpc-be.sln - Compilation failed!"
 ) ELSE (
-  CALL :SubMsg "INFO" "mpc-hc.sln %1 compiled successfully"
+  CALL :SubMsg "INFO" "mpc-be.sln %1 compiled successfully"
 )
 EXIT /B
 
@@ -209,8 +209,8 @@ EXIT /B
 IF "%BUILDTYPE%" == "Clean"   EXIT /B
 IF "%BUILDCONFIG%" == "Debug" EXIT /B
 
-IF "%~1" == "Win32" SET OUTDIR=bin\mpc-hc_x86
-IF "%~1" == "x64"   SET OUTDIR=bin\mpc-hc_x64 & SET ISDefs=/Dx64Build
+IF "%~1" == "Win32" SET OUTDIR=bin\mpc-be_x86
+IF "%~1" == "x64"   SET OUTDIR=bin\mpc-be_x64 & SET ISDefs=/Dx64Build
 
 XCOPY "COPYING.txt"        "%OUTDIR%\" /Y /V >NUL
 XCOPY "docs\Authors.txt"   "%OUTDIR%\" /Y /V >NUL
@@ -221,7 +221,7 @@ CALL :SubDetectInnoSetup
 
 IF DEFINED InnoSetupPath (
   TITLE Compiling %1 installer...
-  "%InnoSetupPath%\iscc.exe" /Q /O"bin" "distrib\mpc-hc_setup.iss" %ISDefs%
+  "%InnoSetupPath%\iscc.exe" /Q /O"bin" "distrib\mpc-be_setup.iss" %ISDefs%
   IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Compilation failed!"
   CALL :SubMsg "INFO" "%1 installer successfully built"
 ) ELSE (
@@ -249,7 +249,7 @@ ECHO %~nx0 build x86              -Builds x86 Main exe and the resources
 ECHO %~nx0 build x86 all Debug    -Builds x86 Main Debug exe and resources
 ECHO.
 ECHO NOTES:
-ECHO Debug only applies to Main project [mpc-hc.sln]
+ECHO Debug only applies to Main project [mpc-be.sln]
 ECHO "%~nx0 x86" or "%~nx0 debug" won't work.
 ECHO.
 ENDLOCAL
@@ -258,8 +258,8 @@ EXIT /B
 
 :MissingVar
 COLOR 0C
-TITLE Compiling MPC-HC BE [ERROR]
-ECHO Not all build dependencies were found. To build MPC-HC you need:
+TITLE Compiling MPC-BE [ERROR]
+ECHO Not all build dependencies were found. To build MPC-BE you need:
 ECHO * Visual Studio 2010 SP1 installed
 ECHO * MinGW 32bit with MSYS pointed to in MINGW32 environment variable
 ECHO * MinGW 64bit with MSYS pointed to in MINGW64 environment variable

@@ -265,7 +265,7 @@ sub skipNonTranslatedStr {
 					|MS\sShell\sDlg|MS\sSans\sSerif|MS\sUI\sGothic									#skip dialog font, but maybe should not because 3 asian languages need change this
 					|\\000|(LANGUAGE.+)?\\r\\n|\+\/-												#skip \r\n  \000 +- etc
 					|<a>http.+<\/a>|http:\/\/														#skip http links
-					|Media\sPlayer\sClassic\s-?\sHome\sCinema|mpc-hc|MPC-BE\sTeam					#skip app names
+					|Media\sPlayer\sClassic\s-?\sHome\sCinema|mpc-be|MPC-BE\sTeam					#skip app names
 			|Comments|CompanyName|FileDescription|FileVersion|InternalName|VarFileInfo|StringFileInfo|Translation
 			|LegalCopyright|OriginalFilename|ProductName|ProductVersion								#skip versioninfo for locale rc not in mplayerc.rc
 				|[-&\/\d\s\.:,%]+(Hz)?																#skip any thing like 6.4.0.0, 100%, 23.976Hz

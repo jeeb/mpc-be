@@ -4,14 +4,14 @@
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt
  *
- * This file is part of MPC-HC.
+ * This file is part of MPC-BE.
  *
- * MPC-HC is free software; you can redistribute it and/or modify
+ * MPC-BE is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
- * MPC-HC is distributed in the hope that it will be useful,
+ * MPC-BE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -1093,7 +1093,7 @@ DEFINE_GUID(MEDIASUBTYPE_ALAC,
 DEFINE_GUID(MEDIASUBTYPE_ALS,
 			0x20534C41, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
 
-// {949F97FD-56F6-4527-B4AE-DDEB375AB80F}		Mpc-hc specific !
+// {949F97FD-56F6-4527-B4AE-DDEB375AB80F}		Mpc-be specific !
 DEFINE_GUID(MEDIASUBTYPE_HDMV_LPCM_AUDIO,
 			0x949f97fd, 0x56f6, 0x4527, 0xb4, 0xae, 0xdd, 0xeb, 0x37, 0x5a, 0xb8, 0xf);
 

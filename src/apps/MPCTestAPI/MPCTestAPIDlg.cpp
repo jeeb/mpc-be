@@ -174,9 +174,9 @@ BOOL CRegisterCopyDataDlg::OnInitDialog()
 	m_strMPCPath = _T("..\\..\\..\\..\\..\\bin\\");
 
 #if defined (_WIN64)
-	m_strMPCPath += _T("mpc-hc_x64");
+	m_strMPCPath += _T("mpc-be_x64");
 #else
-	m_strMPCPath += _T("mpc-hc_x86");
+	m_strMPCPath += _T("mpc-be_x86");
 #endif // _WIN64
 
 #if defined (_DEBUG)
@@ -186,9 +186,9 @@ BOOL CRegisterCopyDataDlg::OnInitDialog()
 #endif // _DEBUG
 
 #if defined (_WIN64)
-	m_strMPCPath += _T("mpc-hc64.exe");
+	m_strMPCPath += _T("mpc-be64.exe");
 #else
-	m_strMPCPath += _T("mpc-hc.exe");
+	m_strMPCPath += _T("mpc-be.exe");
 #endif // _WIN64
 
 	UpdateData(FALSE);
