@@ -811,7 +811,6 @@ void CAppSettings::UpdateData(bool fSave)
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CLRFACEABGR, clrFaceABGR);//ins:2452 bobdynlan:Toolbar button color//
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CLROUTLINEABGR, clrOutlineABGR);//ins:2452 bobdynlan:Toolbar button outline color//
 //--------------------------------------------------------------------------INS
-		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_USEWMASFREADER, fUseWMASFReader);
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTS, nJumpDistS);
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTM, nJumpDistM);
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTL, nJumpDistL);
@@ -1231,7 +1230,6 @@ void CAppSettings::UpdateData(bool fSave)
 		clrFaceABGR = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CLRFACEABGR, 0x00ff8080);//ins:2452 bobdynlan:Toolbar button color//
 		clrOutlineABGR = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CLROUTLINEABGR, 0x00ffffff);//ins:2452 bobdynlan:Toolbar button outline color//
 //--------------------------------------------------------------------------INS
-		fUseWMASFReader = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_USEWMASFREADER, FALSE);
 		nJumpDistS = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTS, DEFAULT_JUMPDISTANCE_1);
 		nJumpDistM = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTM, DEFAULT_JUMPDISTANCE_2);
 		nJumpDistL = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTL, DEFAULT_JUMPDISTANCE_3);

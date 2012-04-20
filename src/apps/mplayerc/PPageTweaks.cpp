@@ -35,7 +35,6 @@ CPPageTweaks::CPPageTweaks()
 	, m_fDisableXPToolbars(FALSE)
 	, m_clrFaceABGR(0x00e9e9e9)//ins:2452 bobdynlan:default clrFace//
 	, m_clrOutlineABGR(0x00a0a0a0)//ins:2452 bobdynlan:default clrOutline//
-	, m_fUseWMASFReader(FALSE)
 	, m_nJumpDistS(0)
 	, m_nJumpDistM(0)
 	, m_nJumpDistL(0)
@@ -58,8 +57,6 @@ void CPPageTweaks::DoDataExchange(CDataExchange* pDX)
 	__super::DoDataExchange(pDX);
 	DDX_Check(pDX, IDC_CHECK3, m_fDisableXPToolbars);
 	DDX_Control(pDX, IDC_CHECK3, m_fDisableXPToolbarsCtrl);
-	DDX_Check(pDX, IDC_CHECK2, m_fUseWMASFReader);
-	DDX_Control(pDX, IDC_CHECK2, m_fUseWMASFReaderCtrl);
 	DDX_Text(pDX, IDC_EDIT1, m_nJumpDistS);
 	DDX_Text(pDX, IDC_EDIT2, m_nJumpDistM);
 	DDX_Text(pDX, IDC_EDIT3, m_nJumpDistL);
@@ -94,7 +91,6 @@ BOOL CPPageTweaks::OnInitDialog()
 	m_fDisableXPToolbars = s.fDisableXPToolbars;
 	m_clrFaceABGR = s.clrFaceABGR;//ins:2452 bobdynlan:initiate clrFace from reg//
 	m_clrOutlineABGR = s.clrOutlineABGR;//ins:2452 bobdynlan:initiate clrOutline from reg//
-	m_fUseWMASFReader = s.fUseWMASFReader;
 	m_nJumpDistS = s.nJumpDistS;
 	m_nJumpDistM = s.nJumpDistM;
 	m_nJumpDistL = s.nJumpDistL;
@@ -180,7 +176,6 @@ BOOL CPPageTweaks::OnApply()
 	}
 //--------------------------------------------------------------------------INS
 	s.fDisableXPToolbars = !!m_fDisableXPToolbars;
-	s.fUseWMASFReader = !!m_fUseWMASFReader;
 	s.nJumpDistS = m_nJumpDistS;
 	s.nJumpDistM = m_nJumpDistM;
 	s.nJumpDistL = m_nJumpDistL;
