@@ -15,7 +15,7 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;
-; $Id: custom_messages.iss 4423 2012-04-18 07:17:44Z XhmikosR $
+; $Id$
 
 ; Do NOT translate your language's name
 ; Do NOT translate [name]
