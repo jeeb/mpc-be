@@ -62,14 +62,14 @@
 
 [Setup]
 #ifdef x64Build
-AppId={{2ACBF1FA-F5C3-4B19-A774-B22A31F231B9}
+AppId={{FE09AF6D-78B2-4093-B012-FCDAF78693CE}
 DefaultGroupName={#app_name} x64
 OutputBaseFilename=MPC-BE.{#app_version}.x64
 UninstallDisplayName={#app_name} {#app_version} x64
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 #else
-AppId={{2624B969-7135-4EB1-B0F6-2D8C397B45F7}
+AppId={{903D098F-DD50-4342-AD23-DA868FCA3126}
 DefaultGroupName={#app_name}
 OutputBaseFilename=MPC-BE.{#app_version}.x86
 UninstallDisplayName={#app_name} {#app_version}
