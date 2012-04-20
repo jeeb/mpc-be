@@ -132,17 +132,17 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	nPosY += VERTICAL_SPACING;
 	m_txtThreadNumber.Create (ResStr (IDS_VDF_THREADNUMBER), WS_VISIBLE|WS_CHILD, CRect (LEFT_SPACING,  nPosY, 220, nPosY+15), this, (UINT)IDC_STATIC);
 	m_cbThreadNumber.Create  (WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect (230,  nPosY-4, 290, nPosY+90), this, IDC_PP_THREAD_NUMBER);
-	m_cbThreadNumber.AddString(_T("Auto"));
+	m_cbThreadNumber.AddString (ResStr (IDS_VDF_IDCT_AUTO));
 	CString ThreadNumberStr;
 	for (int i=0; i<16; i++) {
-		ThreadNumberStr.Format(_T("%d"), i+1);
-		m_cbThreadNumber.AddString(ThreadNumberStr);
+		ThreadNumberStr.Format		(_T("%d"), i+1);
+		m_cbThreadNumber.AddString	(ThreadNumberStr);
 	}
 
 #if INTERNAL_DECODER_H264
 	// H264 deblocking mode
 	nPosY += VERTICAL_SPACING;
-	m_txtDiscardMode.Create (ResStr (IDS_VDF_SKIPDEBLOCK), WS_VISIBLE|WS_CHILD, CRect (LEFT_SPACING,  nPosY, 220, nPosY+15), this, (UINT)IDC_STATIC);
+	m_txtDiscardMode.Create	(ResStr (IDS_VDF_SKIPDEBLOCK), WS_VISIBLE|WS_CHILD, CRect (LEFT_SPACING,  nPosY, 220, nPosY+15), this, (UINT)IDC_STATIC);
 	m_cbDiscardMode.Create  (WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect (230,  nPosY-4, 345, nPosY+90), this, IDC_PP_DISCARD_MODE);
 	m_cbDiscardMode.AddString (ResStr (IDS_VDF_DBLK_NONE));
 	m_cbDiscardMode.AddString (ResStr (IDS_VDF_DBLK_DEFAULT));
@@ -183,14 +183,14 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	nPosY += VERTICAL_SPACING;
 	m_txtDXVACompatibilityCheck.Create (ResStr (IDS_VDF_DXVACOMPATIBILITY), WS_VISIBLE|WS_CHILD, CRect (LEFT_SPACING,  nPosY, 225, nPosY+15), this, (UINT)IDC_STATIC);
 	m_cbDXVACompatibilityCheck.Create  (WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect (230,  nPosY-4, 345, nPosY+90), this, IDC_PP_DXVA_CHECK);
-	m_cbDXVACompatibilityCheck.AddString(ResStr(IDS_VDF_DXVA_FULLCHECK));
-	m_cbDXVACompatibilityCheck.AddString(ResStr(IDS_VDF_DXVA_SKIP_LEVELCHECK));
-	m_cbDXVACompatibilityCheck.AddString(ResStr(IDS_VDF_DXVA_SKIP_REFCHECK));
-	m_cbDXVACompatibilityCheck.AddString(ResStr(IDS_VDF_DXVA_SKIP_ALLCHECK));
+	m_cbDXVACompatibilityCheck.AddString (ResStr(IDS_VDF_DXVA_FULLCHECK));
+	m_cbDXVACompatibilityCheck.AddString (ResStr(IDS_VDF_DXVA_SKIP_LEVELCHECK));
+	m_cbDXVACompatibilityCheck.AddString (ResStr(IDS_VDF_DXVA_SKIP_REFCHECK));
+	m_cbDXVACompatibilityCheck.AddString (ResStr(IDS_VDF_DXVA_SKIP_ALLCHECK));
 
 	nPosY += VERTICAL_SPACING;
 	m_cbDXVA_SD.Create (ResStr (IDS_VDF_DXVA_SD), WS_VISIBLE|WS_CHILD|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect (LEFT_SPACING,  nPosY, 345, nPosY+15), this, IDC_PP_DXVA_SD);
-	m_cbDXVA_SD.SetCheck(FALSE);
+	m_cbDXVA_SD.SetCheck (FALSE);
 
 	// DXVA mode
 	nPosY += VERTICAL_SPACING;
