@@ -1641,71 +1641,52 @@ void CMPCVideoDecFilter::InitSwscale()
 		BITMAPINFOHEADER bihOut;
 		ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
 
-		const CMediaType& mt = m_pOutput->CurrentMediaType(); //check RGB32/NV12
-		
-		if (mt.subtype == MEDIASUBTYPE_RGB32 || mt.subtype == MEDIASUBTYPE_YUY2) {
-		
-				switch (m_nSwChromaToRGB) {									// RGB32, YUY2
-							case 0  :										// GUI 'Fast'
-								sws_FlagsO = SWS_ACCURATE_RND;
-								break;
-							case 1  :										// GUI 'Normal'
-							default :
-								sws_FlagsO = SWS_FULL_CHR_H_INP | SWS_ACCURATE_RND;
-								break;
-							case 2  :										// GUI 'Full'
-								sws_FlagsO = SWS_FULL_CHR_H_INT | SWS_FULL_CHR_H_INP | SWS_ACCURATE_RND;
-								break;
-						}
-			} else {
-				switch (m_nSwChromaToRGB) {									// NV12 and etc...
-							case 0  :										// GUI 'Fast'
-								sws_FlagsO = NULL;
-								break;
-							case 1  :										// GUI 'Normal'
-							default :
-								sws_FlagsO = SWS_FULL_CHR_H_INP | SWS_ACCURATE_RND;	
-								break;
-							case 2  :										// GUI 'Full'
-								sws_FlagsO =  SWS_FULL_CHR_H_INT | SWS_FULL_CHR_H_INP | SWS_ACCURATE_RND;
-								break;
-						}
+		switch (m_nSwChromaToRGB) {
+			case 0  :										// GUI 'Fast'
+				sws_FlagsO = SWS_ACCURATE_RND;
+				break;
+			case 1  :										// GUI 'Normal'
+			default :
+				sws_FlagsO = SWS_FULL_CHR_H_INP | SWS_ACCURATE_RND;
+				break;
+			case 2  :										// GUI 'Full'
+				sws_FlagsO = SWS_FULL_CHR_H_INT | SWS_FULL_CHR_H_INP | SWS_ACCURATE_RND;
+				break;
 		}
-			
-				
+
 		switch (m_nSwResizeMethodBE) {
-					case 0  :										// GUI 'Area'
-						sws_FlagsR = SWS_AREA;
-						break;
-					case 1  :										// GUI 'Bicubic'
-						sws_FlagsR = SWS_BICUBIC;
-						break;
-					case 2  :										// GUI 'Bilinear'
-					default :
-						sws_FlagsR = SWS_BILINEAR;
-						break;
-					case 3  :										// GUI 'Fast Bilinear'
-						sws_FlagsR = SWS_FAST_BILINEAR;
-						break;
-					case 4  :										// GUI 'Gauss'
-						sws_FlagsR = SWS_GAUSS;
-						break;
-					case 5  :										// GUI 'Lanczos'
-						sws_FlagsR = SWS_LANCZOS;
-						break;
-					case 6  :										// GUI 'Point'
-						sws_FlagsR = SWS_POINT;
-						break;
-					case 7  :										// GUI 'Sinc'
-						sws_FlagsR = SWS_SINC;
-						break;
-					case 8  :										// GUI 'Spline'
-						sws_FlagsR = SWS_SPLINE;
-						break;
-					case 9  :										// GUI 'Spline'
-						sws_FlagsR = SWS_X;
-						break;
-				}
+			case 0  :										// GUI 'Area'
+				sws_FlagsR = SWS_AREA;
+				break;
+			case 1  :										// GUI 'Bicubic'
+				sws_FlagsR = SWS_BICUBIC;
+				break;
+			case 2  :										// GUI 'Bilinear'
+			default :
+				sws_FlagsR = SWS_BILINEAR;
+				break;
+			case 3  :										// GUI 'Fast Bilinear'
+				sws_FlagsR = SWS_FAST_BILINEAR;
+				break;
+			case 4  :										// GUI 'Gauss'
+				sws_FlagsR = SWS_GAUSS;
+				break;
+			case 5  :										// GUI 'Lanczos'
+				sws_FlagsR = SWS_LANCZOS;
+				break;
+			case 6  :										// GUI 'Point'
+				sws_FlagsR = SWS_POINT;
+				break;
+			case 7  :										// GUI 'Sinc'
+				sws_FlagsR = SWS_SINC;
+				break;
+			case 8  :										// GUI 'Spline'
+				sws_FlagsR = SWS_SPLINE;
+				break;
+			case 9  :										// GUI 'Spline'
+				sws_FlagsR = SWS_X;
+				break;
+		}
 		
 		int sws_Flags = sws_FlagsR | sws_FlagsO;
 		
