@@ -111,6 +111,8 @@ using namespace MediaInfoLib;
 using namespace MediaInfoDLL;
 #endif
 
+#define DEV_BUILD 1 // set to 1 only for the DEV builds
+
 DWORD last_run = 0;
 UINT flast_nID = 0;
 bool b_firstPlay = false;
@@ -825,9 +827,17 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_bToggleShaderScreenSpace = s.fToggleShaderScreenSpace;
 
 #ifdef _WIN64
+	#if DEV_BUILD
+	m_strTitle.Format (L"%s x64 - v%s -dev", ResStr(IDR_MAINFRAME), AfxGetMyApp()->m_strVersion);
+	#else
 	m_strTitle.Format (L"%s x64 - v%s", ResStr(IDR_MAINFRAME), AfxGetMyApp()->m_strVersion);
+	#endif
 #else
+	#if DEV_BUILD
+	m_strTitle.Format (L"%s - v%s -dev", ResStr(IDR_MAINFRAME), AfxGetMyApp()->m_strVersion);
+	#else
 	m_strTitle.Format (L"%s - v%s", ResStr(IDR_MAINFRAME), AfxGetMyApp()->m_strVersion);
+	#endif
 #endif
 
 	SetWindowText(m_strTitle);
