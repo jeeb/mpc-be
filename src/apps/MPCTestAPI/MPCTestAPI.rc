@@ -75,11 +75,11 @@ IDR_MAINFRAME           ICON                    "res\\MPCTestAPI.ico"
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 244, 57
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
-CAPTION "About MPC-HC Test API"
+CAPTION "About MPC-BE Test API"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
-    LTEXT           "MPC-HC Test API Version 1.0.1.0",IDC_STATIC,40,10,120,10,SS_NOPREFIX
+    LTEXT           "MPC-BE Test API Version 1.0.1.0",IDC_STATIC,40,10,120,10,SS_NOPREFIX
     LTEXT           "Copyright © 2005-2012 all contributors, see Authors.txt",IDC_STATIC,40,27,197,10
     DEFPUSHBUTTON   "OK",IDOK,187,7,50,14,WS_GROUP
 END
@@ -87,13 +87,13 @@ END
 IDD_REGISTERCOPYDATA_DIALOG DIALOGEX 0, 0, 521, 406
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_APPWINDOW
-CAPTION "MPC-HC Test API"
+CAPTION "MPC-BE Test API"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    PUSHBUTTON      "Start MPC-HC",IDC_BUTTON_FINDWINDOW,457,7,57,18
+    PUSHBUTTON      "Start MPC-BE",IDC_BUTTON_FINDWINDOW,457,7,57,18
     EDITTEXT        IDC_EDIT1,7,7,434,14,ES_AUTOHSCROLL
     LISTBOX         IDC_LOGLIST,7,89,507,310,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
-    LTEXT           "Messages from MPC-HC",IDC_STATIC,7,74,507,10
+    LTEXT           "Messages from MPC-BE",IDC_STATIC,7,74,507,10
     EDITTEXT        IDC_EDIT2,154,41,287,14,ES_AUTOHSCROLL
     PUSHBUTTON      "Send command",IDC_BUTTON_SENDCOMMAND,457,39,57,18
     COMBOBOX        IDC_COMBO1,7,42,132,158,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -122,13 +122,13 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "CompanyName", "MPC-HC Team"
-            VALUE "FileDescription", "MPC-HC Test API"
+            VALUE "CompanyName", "MPC-BE Team"
+            VALUE "FileDescription", "MPC-BE Test API"
             VALUE "FileVersion", "1, 0, 1, 0"
-            VALUE "InternalName", "MPC-HC Test API"
+            VALUE "InternalName", "MPC-BE Test API"
             VALUE "LegalCopyright", "Copyright © 2005-2012 all contributors, see AUTHORS file"
             VALUE "OriginalFilename", "MPCTestAPI.exe"
-            VALUE "ProductName", "MPC-HC Test API"
+            VALUE "ProductName", "MPC-BE Test API"
             VALUE "ProductVersion", "1, 0, 1, 0"
         END
     END
@@ -240,7 +240,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_ABOUTBOX            "&About MPC-HC Test API..."
+    IDS_ABOUTBOX            "&About MPC-BE Test API..."
 END
 
 #endif    // English (United States) resources

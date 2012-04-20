@@ -4,14 +4,14 @@
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt
  *
- * This file is part of MPC-HC.
+ * This file is part of MPC-BE.
  *
- * MPC-HC is free software; you can redistribute it and/or modify
+ * MPC-BE is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
- * MPC-HC is distributed in the hope that it will be useful,
+ * MPC-BE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -37,14 +37,14 @@ CComPtr<IApplicationAssociationRegistration> CPPageFormats::m_pAAR;
 // TODO: change this along with the root key for settings and the mutex name to
 //       avoid possible risks of conflict with the old MPC (non HC version).
 #ifdef _WIN64
-	#define PROGID _T("mplayerc64")
+	#define PROGID _T("mpc-be64")
 #else
-	#define PROGID _T("mplayerc")
+	#define PROGID _T("mpc-be")
 #endif // _WIN64
 
-LPCTSTR g_strRegisteredAppName = _T("Media Player Classic");
+LPCTSTR g_strRegisteredAppName = _T("MPC-BE");
 LPCTSTR g_strOldAssoc          = _T("PreviousRegistration");
-CString g_strRegisteredKey     = _T("Software\\Clients\\Media\\Media Player Classic\\Capabilities");
+CString g_strRegisteredKey     = _T("Software\\Clients\\Media\\MPC-BE\\Capabilities");
 
 int f_setContextFiles = 0;
 int f_getContextFiles = 0;
@@ -269,7 +269,7 @@ bool CPPageFormats::RegisterApp()
 		CRegKey key;
 
 		if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\RegisteredApplications"))) {
-			key.SetStringValue(_T("Media Player Classic"), g_strRegisteredKey);
+			key.SetStringValue(_T("MPC-BE"), g_strRegisteredKey);
 
 			if (ERROR_SUCCESS != key.Create(HKEY_LOCAL_MACHINE, g_strRegisteredKey)) {
 				return false;
@@ -443,7 +443,7 @@ void CPPageFormats::AddAutoPlayToRegistry(autoplay_t ap, bool fRegister)
 			return;
 		}
 		key.SetStringValue(_T("Action"), ResStr(handlers[i].action));
-		key.SetStringValue(_T("Provider"), _T("Media Player Classic"));
+		key.SetStringValue(_T("Provider"), _T("MPC-BE"));
 		key.SetStringValue(_T("InvokeProgID"), _T("MediaPlayerClassic.Autorun"));
 		key.SetStringValue(_T("InvokeVerb"), CString(CStringA("Play") + handlers[i].verb));
 		key.SetStringValue(_T("DefaultIcon"), exe + _T(",0"));

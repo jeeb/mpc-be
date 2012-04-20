@@ -1,13 +1,13 @@
 ; (C) 2009-2012 see Authors.txt
 ;
-; This file is part of MPC-HC.
+; This file is part of MPC-BE.
 ;
-; MPC-HC is free software; you can redistribute it and/or modify
+; MPC-BE is free software; you can redistribute it and/or modify
 ; it under the terms of the GNU General Public License as published by
 ; the Free Software Foundation; either version 3 of the License, or
 ; (at your option) any later version.
 ;
-; MPC-HC is distributed in the hope that it will be useful,
+; MPC-BE is distributed in the hope that it will be useful,
 ; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ; GNU General Public License for more details.
@@ -15,7 +15,7 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;
-; $Id: mpc-hc_setup.iss 4426 2012-04-18 07:57:26Z XhmikosR $
+; $Id: MPC-BE_setup.iss 4426 2012-04-18 07:57:26Z XhmikosR $
 
 
 ; Requirements:
@@ -45,7 +45,7 @@
 #include "..\include\Version.h"
 
 #define copyright_year "2002-2012"
-#define app_name       "Media Player Classic - Home Cinema"
+#define app_name       "MPC-BE"
 #define app_version    str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_PATCH) + "." + str(MPC_VERSION_REV)
 #define quick_launch   "{userappdata}\Microsoft\Internet Explorer\Quick Launch"
 
@@ -64,28 +64,28 @@
 #ifdef x64Build
 AppId={{2ACBF1FA-F5C3-4B19-A774-B22A31F231B9}
 DefaultGroupName={#app_name} x64
-OutputBaseFilename=MPC-HomeCinema.{#app_version}.x64-BE
+OutputBaseFilename=MPC-BE.{#app_version}.x64
 UninstallDisplayName={#app_name} {#app_version} x64
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 #else
 AppId={{2624B969-7135-4EB1-B0F6-2D8C397B45F7}
 DefaultGroupName={#app_name}
-OutputBaseFilename=MPC-HomeCinema.{#app_version}.x86-BE
+OutputBaseFilename=MPC-BE.{#app_version}.x86
 UninstallDisplayName={#app_name} {#app_version}
 #endif
 
 AppName={#app_name}
 AppVersion={#app_version}
 AppVerName={#app_name} {#app_version}
-AppPublisher=MPC-HC Team
-AppPublisherURL=http://mpc-hc.sourceforge.net/
-AppSupportURL=http://mpc-hc.sourceforge.net/
-AppUpdatesURL=http://mpc-hc.sourceforge.net/
-AppContact=http://mpc-hc.sourceforge.net/
+AppPublisher=MPC-BE Team
+AppPublisherURL=https://sourceforge.net/p/mpcbe/
+AppSupportURL=https://sourceforge.net/p/mpcbe/
+AppUpdatesURL=https://sourceforge.net/p/mpcbe/
+AppContact=https://sourceforge.net/p/mpcbe/
 AppCopyright=Copyright © {#copyright_year} all contributors, see Authors.txt
-VersionInfoCompany=MPC-HC Team
-VersionInfoCopyright=Copyright © {#copyright_year}, MPC-HC Team
+VersionInfoCompany=MPC-BE Team
+VersionInfoCopyright=Copyright © {#copyright_year}, MPC-BE Team
 VersionInfoDescription={#app_name} Setup
 VersionInfoProductName={#app_name}
 VersionInfoProductVersion={#app_version}
@@ -175,7 +175,7 @@ Name: reset_settings;     Description: {cm:tsk_ResetSettings};     GroupDescript
 [Files]
 Source: {#bindir}\{#mpchc_exe};             DestDir: {app};      Components: main;         Flags: ignoreversion
 Source: {#bindir}\mpciconlib.dll;           DestDir: {app};      Components: mpciconlib;   Flags: ignoreversion
-;Source: {#bindir}\check_update_for_MPC-HC.url; DestDir: {app}; Components: main; Flags: ignoreversion
+;Source: {#bindir}\check_update_for_MPC-BE.url; DestDir: {app}; Components: main; Flags: ignoreversion
 ;Source: {#bindir}\xvidvideo.ico; DestDir: {app}; Components: main; Flags: ignoreversion
 #ifdef localize
 Source: {#bindir}\Lang\mpcresources.br.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
@@ -220,10 +220,10 @@ Name: {userdesktop}\{#app_name};                 Filename: {app}\{#mpchc_exe}; C
 Name: {#quick_launch}\{#app_name};               Filename: {app}\{#mpchc_exe}; Comment: {#app_name} {#app_version}; WorkingDir: {app}; IconFilename: {app}\{#mpchc_exe}; IconIndex: 0; Tasks: quicklaunchicon
 #endif
 Name: {group}\Changelog;                         Filename: {app}\Changelog.txt; Comment: {cm:ViewChangelog};                WorkingDir: {app}
-Name: {group}\{cm:ProgramOnTheWeb,{#app_name}};  Filename: http://mpc-hc.sourceforge.net/
+Name: {group}\{cm:ProgramOnTheWeb,{#app_name}};  Filename: https://sourceforge.net/p/mpcbe/
 Name: {group}\{cm:UninstallProgram,{#app_name}}; Filename: {uninstallexe};      Comment: {cm:UninstallProgram,{#app_name}}; WorkingDir: {app}
 
-;Name: {group}\Check update for MPC-HC; Filename: {app}\check_update_for_MPC-HC.url; IconFilename: {app}\xvidvideo.ico; Comment: Check update for MPC-HC
+;Name: {group}\Check update for MPC-BE; Filename: {app}\check_update_for_MPC-BE.url; IconFilename: {app}\xvidvideo.ico; Comment: Check update for MPC-BE
 
 [Run]
 Filename: {app}\{#mpchc_exe};                    Description: {cm:LaunchProgram,{#app_name}}; WorkingDir: {app}; Flags: nowait postinstall skipifsilent unchecked
@@ -255,14 +255,14 @@ function GetInstallFolder(Default: String): String;
 var
   sInstallPath: String;
 begin
-  if not RegQueryStringValue(HKLM, 'SOFTWARE\Gabest\Media Player Classic', 'ExePath', sInstallPath) then begin
-    Result := ExpandConstant('{pf}\Media Player Classic - Home Cinema');
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\Gabest\MPC-BE', 'ExePath', sInstallPath) then begin
+    Result := ExpandConstant('{pf}\MPC-BE');
   end
   else begin
-    RegQueryStringValue(HKLM, 'SOFTWARE\Gabest\Media Player Classic', 'ExePath', sInstallPath);
+    RegQueryStringValue(HKLM, 'SOFTWARE\Gabest\MPC-BE', 'ExePath', sInstallPath);
     Result := ExtractFileDir(sInstallPath);
     if (Result = '') or not DirExists(Result) then begin
-      Result := ExpandConstant('{pf}\Media Player Classic - Home Cinema');
+      Result := ExpandConstant('{pf}\MPC-BE');
     end;
   end;
 end;
@@ -304,10 +304,10 @@ begin
 end;
 
 
-// Check if MPC-HC's settings exist
+// Check if MPC-BE's settings exist
 function SettingsExistCheck(): Boolean;
 begin
-  if RegKeyExists(HKEY_CURRENT_USER, 'Software\Gabest\Media Player Classic') or
+  if RegKeyExists(HKEY_CURRENT_USER, 'Software\Gabest\MPC-BE') or
   FileExists(ExpandConstant('{app}\{#mpchc_ini}')) then
     Result := True
   else
@@ -327,11 +327,11 @@ procedure CleanUpSettingsAndFiles();
 begin
   DeleteFile(ExpandConstant('{app}\*.bak'));
   DeleteFile(ExpandConstant('{app}\{#mpchc_ini}'));
-  DeleteFile(ExpandConstant('{userappdata}\Media Player Classic\default.mpcpl'));
-  RemoveDir(ExpandConstant('{userappdata}\Media Player Classic'));
+  DeleteFile(ExpandConstant('{userappdata}\MPC-BE\default.mpcpl'));
+  RemoveDir(ExpandConstant('{userappdata}\MPC-BE'));
   RegDeleteKeyIncludingSubkeys(HKCU, 'Software\Gabest\Filters');
-  RegDeleteKeyIncludingSubkeys(HKCU, 'Software\Gabest\Media Player Classic');
-  RegDeleteKeyIncludingSubkeys(HKLM, 'SOFTWARE\Gabest\Media Player Classic');
+  RegDeleteKeyIncludingSubkeys(HKCU, 'Software\Gabest\MPC-BE');
+  RegDeleteKeyIncludingSubkeys(HKLM, 'SOFTWARE\Gabest\MPC-BE');
   RegDeleteKeyIfEmpty(HKCU, 'Software\Gabest');
   RegDeleteKeyIfEmpty(HKLM, 'SOFTWARE\Gabest');
 end;
@@ -346,12 +346,12 @@ begin
       CleanUpSettingsAndFiles();
 
     iLanguage := StrToInt(ExpandConstant('{cm:langid}'));
-    RegWriteStringValue(HKLM, 'SOFTWARE\Gabest\Media Player Classic', 'ExePath', ExpandConstant('{app}\{#mpchc_exe}'));
+    RegWriteStringValue(HKLM, 'SOFTWARE\Gabest\MPC-BE', 'ExePath', ExpandConstant('{app}\{#mpchc_exe}'));
 
     if IsComponentSelected('mpcresources') and FileExists(ExpandConstant('{app}\{#mpchc_ini}')) then
       SetIniInt('Settings', 'InterfaceLanguage', iLanguage, ExpandConstant('{app}\{#mpchc_ini}'))
     else
-      RegWriteDWordValue(HKCU, 'Software\Gabest\Media Player Classic\Settings', 'InterfaceLanguage', iLanguage);
+      RegWriteDWordValue(HKCU, 'Software\Gabest\MPC-BE\Settings', 'InterfaceLanguage', iLanguage);
   end;
 
   if (CurStep = ssDone) and not WizardSilent() and not D3DX9DLLExists() then
@@ -362,7 +362,7 @@ end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
-  // When uninstalling, ask the user to delete MPC-HC settings
+  // When uninstalling, ask the user to delete MPC-BE settings
   if (CurUninstallStep = usUninstall) and SettingsExistCheck() then begin
     if SuppressibleMsgBox(CustomMessage('msg_DeleteSettings'), mbConfirmation, MB_YESNO or MB_DEFBUTTON2, IDNO) = IDYES then
       CleanUpSettingsAndFiles();

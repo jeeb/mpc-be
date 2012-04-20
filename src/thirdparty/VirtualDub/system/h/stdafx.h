@@ -1,4 +1,4 @@
-/* MPC-HC comment out
+/* MPC-BE comment out
 // Detect the Windows SDK in use and select Windows 2000 baseline
 // if the Vista SDK, else Windows 98 baseline.
 #include <ntverp.h>
@@ -13,7 +13,7 @@
 #include <vd2/system/atomic.h>
 #include <vd2/system/thread.h>
 #include <vd2/system/error.h>
-#include <vd2/system/filesys.h> // MPC-HC patch
+#include <vd2/system/filesys.h> // MPC-BE patch
 #include <windows.h>
 #include <process.h>
 #include <vd2/system/win32/intrin.h>

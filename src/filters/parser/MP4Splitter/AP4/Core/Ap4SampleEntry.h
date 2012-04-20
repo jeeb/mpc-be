@@ -139,7 +139,7 @@ class AP4_AudioSampleEntry : public AP4_MpegSampleEntry
     AP4_UI32 GetSampleRate();
 //  AP4_UI16 GetSampleSize() { return m_SampleSize; }
     AP4_UI16 GetChannelCount();
-// mpc-hc custom code start
+// MPC-BE custom code start
 	AP4_UI32 GetSamplesPerPacket()
 	{
 		if (m_QtVersion == 2) {
@@ -181,7 +181,7 @@ class AP4_AudioSampleEntry : public AP4_MpegSampleEntry
 #define ENDIAN_BIG     0
 #define ENDIAN_LITTLE  1
 
-// mpc-hc custom code end
+// MPC-BE custom code end
 
     // methods
     AP4_SampleDescription* ToSampleDescription();

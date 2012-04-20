@@ -274,7 +274,7 @@ AP4_Track::GetSampleIndexForTimeStampMs(AP4_TimeStamp ts, AP4_Ordinal& index)
     return m_SampleTable->GetSampleIndexForTimeStamp(ts, index);
 }
 
-// mpc-hc custom code start
+// MPC-BE custom code start
 AP4_Result  
 AP4_Track::GetSampleIndexForRefTime(REFERENCE_TIME rt, AP4_Ordinal& index)
 {
@@ -283,7 +283,7 @@ AP4_Track::GetSampleIndexForRefTime(REFERENCE_TIME rt, AP4_Ordinal& index)
 
 	return m_SampleTable->GetSampleIndexForTimeStamp(ts, index);
 }
-// mpc-hc custom code end
+// MPC-BE custom code end
 
 /*----------------------------------------------------------------------
 |       AP4_Track::SetMovieTimeScale

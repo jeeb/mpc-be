@@ -4,14 +4,14 @@
 #
 # (C) 2010-2012 see Authors.txt
 #
-# This file is part of MPC-HC.
+# This file is part of MPC-BE.
 #
-# MPC-HC is free software; you can redistribute it and/or modify
+# MPC-BE is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 3 of the License, or
 # (at your option) any later version.
 #
-# MPC-HC is distributed in the hope that it will be useful,
+# MPC-BE is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -265,7 +265,7 @@ sub skipNonTranslatedStr {
 					|MS\sShell\sDlg|MS\sSans\sSerif|MS\sUI\sGothic									#skip dialog font, but maybe should not because 3 asian languages need change this
 					|\\000|(LANGUAGE.+)?\\r\\n|\+\/-												#skip \r\n  \000 +- etc
 					|<a>http.+<\/a>|http:\/\/														#skip http links
-					|Media\sPlayer\sClassic\s-?\sHome\sCinema|mpc-hc|MPC-HC\sTeam					#skip app names
+					|Media\sPlayer\sClassic\s-?\sHome\sCinema|mpc-hc|MPC-BE\sTeam					#skip app names
 			|Comments|CompanyName|FileDescription|FileVersion|InternalName|VarFileInfo|StringFileInfo|Translation
 			|LegalCopyright|OriginalFilename|ProductName|ProductVersion								#skip versioninfo for locale rc not in mplayerc.rc
 				|[-&\/\d\s\.:,%]+(Hz)?																#skip any thing like 6.4.0.0, 100%, 23.976Hz

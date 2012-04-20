@@ -3,14 +3,14 @@
  *
  * (C) 2006-2012 see Authors.txt
  *
- * This file is part of MPC-HC.
+ * This file is part of MPC-BE.
  *
- * MPC-HC is free software; you can redistribute it and/or modify
+ * MPC-BE is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
- * MPC-HC is distributed in the hope that it will be useful,
+ * MPC-BE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -22,22 +22,22 @@
 
 
 
-// This file define commands used for "Media Player Classic - Homecinema" API. To send commands
+// This file define commands used for "MPC-BE" API. To send commands
 // to mpc-hc, and receive playback notifications, first launch process with the /slave command line
 // argument follow by an HWnd handle use to receive notification :
 //
 // ..\bin\mplayerc /slave 125421
 //
-// After startup, mpc-hc send a WM_COPYDATA message to host with COPYDATASTRUCT struct filled with :
+// After startup, MPC-BE send a WM_COPYDATA message to host with COPYDATASTRUCT struct filled with :
 //		- dwData	: CMD_CONNECT
-//		- lpData	: Unicode string containing mpc-hc main window Handle
+//		- lpData	: Unicode string containing MPC-BE main window Handle
 //
 // To pilot mpc-hc, send WM_COPYDATA messages to Hwnd provided on connection. All messages should be
 // formatted as Unicode strings. For commands or notifications with multiple parameters, values are
 // separated by |
 // If a string contains a |, it will be escaped with a \ so a \| is not a separator
 //
-// Ex : When a file is opened, mpc-hc send to host the "now playing" notification :
+// Ex : When a file is opened, MPC-BE send to host the "now playing" notification :
 //		- dwData	: CMD_NOWPLAYING
 //		- lpData	: title|author|description|filename|duration
 //

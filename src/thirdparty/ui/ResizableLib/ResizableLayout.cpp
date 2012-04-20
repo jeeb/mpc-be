@@ -257,9 +257,9 @@ void CResizableLayout::EraseBackground(CDC* pDC)
 
 	// is this a dialog box?
 	// (using class atom is quickier than using the class name)
-//mpc-hc custom code start
+//MPC-BE custom code start
 	ATOM atomWndClass = (ATOM)::GetClassLongPtr(hWnd, GCW_ATOM);
-//mpc-hc custom code end
+//MPC-BE custom code end
 	if (atomWndClass == (ATOM)0x8002)
 	{
 		// send a message to the dialog box
@@ -269,9 +269,9 @@ void CResizableLayout::EraseBackground(CDC* pDC)
 	else
 	{
 		// take the background brush from the window's class
-//mpc-hc custom code start
+//MPC-BE custom code start
 		hBrush = (HBRUSH)::GetClassLongPtr(hWnd, GCLP_HBRBACKGROUND);
-//mpc-hc custom code end
+//MPC-BE custom code end
 	}
 
 	// fill the clipped background
@@ -321,9 +321,9 @@ BOOL CResizableLayout::NeedsRefresh(const CResizableLayout::LayoutInfo& layout,
 	// window classes that need refresh when resized
 	if (layout.sWndClass == WC_STATIC)
 	{
-//mpc-hc custom code start
+//MPC-BE custom code start
 		DWORD style = ::GetWindowLongPtr(layout.hWnd, GWL_STYLE);
-//mpc-hc custom code end
+//MPC-BE custom code end
 
 		switch (style & SS_TYPEMASK)
 		{
@@ -400,9 +400,9 @@ BOOL CResizableLayout::LikesClipping(const CResizableLayout::LayoutInfo& layout)
 			return clipping.bLikesClipping;
 	}
 
-//mpc-hc custom code start
+//MPC-BE custom code start
 	DWORD style = ::GetWindowLongPtr(layout.hWnd, GWL_STYLE);
-//mpc-hc custom code end
+//MPC-BE custom code end
 
 	// skip windows that wants background repainted
 	if (layout.sWndClass == TOOLBARCLASSNAME && (style & TBSTYLE_TRANSPARENT))

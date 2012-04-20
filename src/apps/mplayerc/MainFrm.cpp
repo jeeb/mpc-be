@@ -4,14 +4,14 @@
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt
  *
- * This file is part of MPC-HC.
+ * This file is part of MPC-BE.
  *
- * MPC-HC is free software; you can redistribute it and/or modify
+ * MPC-BE is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
- * MPC-HC is distributed in the hope that it will be useful,
+ * MPC-BE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -1084,7 +1084,7 @@ void CMainFrame::ShowTrayIcon(bool fShow)
 			tnid.hIcon = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 			tnid.uFlags = NIF_MESSAGE|NIF_ICON|NIF_TIP;
 			tnid.uCallbackMessage = WM_NOTIFYICON;
-			StringCchCopy(tnid.szTip, countof(tnid.szTip), TEXT("Media Player Classic"));
+			StringCchCopy(tnid.szTip, countof(tnid.szTip), TEXT("MPC-BE"));
 			Shell_NotifyIcon(NIM_ADD, &tnid);
 
 			m_fTrayIcon = true;
@@ -1868,7 +1868,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 				2. Pause video
 				3. Hibernate computer
 				4. Start computer again
-				MPC-HC window should now be hung
+				MPC-BE window should now be hung
 
 				Stack dump from a Windows 7 64-bit machine:
 				Thread 1:
@@ -1915,7 +1915,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 				ntdll_77d30000!__RtlUserThreadStart+0x70
 				ntdll_77d30000!_RtlUserThreadStart+0x1b
 
-				There can be a bug in QUARTZ or more likely mpc-hc is doing something wrong
+				There can be a bug in QUARTZ or more likely MPC-BE is doing something wrong
 				*/
 				pQP->get_AvgFrameRate(&val); // We hang here due to a lock that never gets released.
 				info.Format(_T("%d.%02d %s"), val / 100, val % 100, rate);
@@ -5034,7 +5034,7 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 		rts.AddStyle(_T("thumbs"), style);
 
 		CStringW str;
-		str.Format(L"{\\an9\\fs%d\\b1\\bord0\\shad0\\1c&Hffffff&}%s", infoheight-10, width >= 550 ? L"Media Player Classic" : L"MPC");
+		str.Format(L"{\\an9\\fs%d\\b1\\bord0\\shad0\\1c&Hffffff&}%s", infoheight-10, width >= 550 ? L"MPC-BE" : L"MPC");
 
 		rts.Add(str, true, 0, 1, _T("thumbs"), _T(""), _T(""), CRect(0,0,0,0), -1);
 
@@ -9140,9 +9140,9 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 	}
 
 	// NOTE: This is just for the favorites but we could add a global settings that does this always when on. Could be useful when using removable devices.
-	//       All you have to do then is plug in your 500 gb drive, full with movies and/or music, start MPC-HC (from the 500 gb drive) with a preloaded playlist and press play.
+	//       All you have to do then is plug in your 500 gb drive, full with movies and/or music, start MPC-BE (from the 500 gb drive) with a preloaded playlist and press play.
 	if ( bRelativeDrive ) {
-		// Get the drive MPC-HC is on and apply it to the path list
+		// Get the drive MPC-BE is on and apply it to the path list
 		CString exePath;
 		DWORD dwLength = GetModuleFileName( AfxGetInstanceHandle(), exePath.GetBuffer(_MAX_PATH), _MAX_PATH );
 		exePath.ReleaseBuffer( dwLength );
@@ -9268,12 +9268,12 @@ void CMainFrame::OnUpdateFavoritesDevice(CCmdUI* pCmdUI)
 
 void CMainFrame::OnHelpHomepage()
 {
-	ShellExecute(m_hWnd, _T("open"), _T("http://mpc-hc.sourceforge.net/"), NULL, NULL, SW_SHOWDEFAULT);
+	ShellExecute(m_hWnd, _T("open"), _T("https://sourceforge.net/p/mpcbe/"), NULL, NULL, SW_SHOWDEFAULT);
 }
 
 UINT CMainFrame::CheckForUpdate(LPVOID pParam)
 {
-//	UpdateChecker updateChecker(_T("http://mpc-hc.sourceforge.net/version.txt"));
+//	UpdateChecker updateChecker(_T("https://sourceforge.net/p/mpcbe/version.txt"));
 	UpdateChecker updateChecker(_T("http://www.xvidvideo.ru/updates/be_version.txt"));
 	UpdateCheckerDlg dlg(updateChecker.isUpdateAvailable(), updateChecker.getLatestVersion());
 	dlg.DoModal();
@@ -14835,7 +14835,7 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 
 	if (nID == 22) { // Show a warning when switching to Hebrew (must not be translated)
 		MessageBox(_T("The Hebrew translation will be correctly displayed (with a right-to-left layout) after restarting the application.\n"),
-				   _T("Media Player Classic - Home Cinema"), MB_ICONINFORMATION | MB_OK);
+				   _T("MPC-BE"), MB_ICONINFORMATION | MB_OK);
 	}
 
 	AfxGetMyApp()->SetLanguage(nID);

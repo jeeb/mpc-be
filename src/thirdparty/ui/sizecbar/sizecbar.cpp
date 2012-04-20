@@ -432,9 +432,9 @@ void CSizingControlBar::OnNcCalcSize(BOOL bCalcValidRects,
         if (pFrame != NULL &&
             pFrame->IsKindOf(RUNTIME_CLASS(CMiniFrameWnd)))
         {
-//mpc-hc custom code start
+//MPC-BE custom code start
             DWORD dwStyle = ::GetWindowLongPtr(pFrame->m_hWnd, GWL_STYLE);
-//mpc-hc custom code end
+//MPC-BE custom code end
             if ((dwStyle & MFS_4THICKFRAME) != 0)
             {
                 pFrame->ModifyStyle(MFS_4THICKFRAME, 0); // clear
@@ -524,10 +524,10 @@ void CSizingControlBar::OnNcPaint()
     DrawBorders(&mdc, rcDraw);
 
     // erase the NC background
-//mpc-hc custom code start
+//MPC-BE custom code start
     mdc.FillRect(rcDraw, CBrush::FromHandle(
         (HBRUSH) GetClassLongPtr(m_hWnd, GCLP_HBRBACKGROUND)));
-//mpc-hc custom code end
+//MPC-BE custom code end
 
     if (m_dwSCBStyle & SCBS_SHOWEDGES)
     {
@@ -1372,7 +1372,7 @@ void CSCBMiniDockFrameWnd::OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI)
 #endif //_SCB_MINIFRAME_CAPTION
         lpMMI->ptMinTrackSize.x = r.Width();
         lpMMI->ptMinTrackSize.y = r.Height();
-// mpc-hc custom code start
+// MPC-BE custom code start
         if(pBar->m_bFixedFloat)
         {
             lpMMI->ptMinTrackSize.x = pBar->m_szFixedFloat.cx;
@@ -1380,7 +1380,7 @@ void CSCBMiniDockFrameWnd::OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI)
             lpMMI->ptMaxTrackSize.x = pBar->m_szFixedFloat.cx;
             lpMMI->ptMaxTrackSize.y = pBar->m_szFixedFloat.cy;
         }
-// mpc-hc custom code end
+// MPC-BE custom code end
     }
 }
 

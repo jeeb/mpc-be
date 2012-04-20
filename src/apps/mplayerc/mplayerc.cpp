@@ -4,14 +4,14 @@
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt
  *
- * This file is part of MPC-HC.
+ * This file is part of MPC-BE.
  *
- * MPC-HC is free software; you can redistribute it and/or modify
+ * MPC-BE is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
- * MPC-HC is distributed in the hope that it will be useful,
+ * MPC-BE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -136,7 +136,7 @@ bool LoadType(CString fn, CString& type)
 			ext = _T(".") + fn.Mid(fn.ReverseFind('.')+1);
 		}
 
-		// Try MPC-HC's internal formats list
+		// Try MPC-BE's internal formats list
 		CMediaFormatCategory* mfc = AfxGetAppSettings().m_Formats.FindMediaByExt(ext);
 
 		if (mfc != NULL) {
@@ -316,7 +316,7 @@ bool CMPlayerCApp::StoreSettingsToIni()
 	// So to ensure we have correct encoding for ini files, create a file with right BOM first,
 	// then add some comments in first line to make sure it's not empty.
 	if (!::PathFileExists(m_pszProfileName)) { // don't overwrite existing ini file
-		LPTSTR pszComments = _T("; Media Player Classic - Home Cinema");
+		LPTSTR pszComments = _T("; MPC-BE");
 		WORD wBOM = 0xFEFF; // UTF16-LE BOM (FFFE)
 		DWORD nBytes;
 
@@ -388,7 +388,7 @@ bool CMPlayerCApp::GetAppSavePath(CString& path)
 			return false;
 		}
 		CPath p;
-		p.Combine(path, _T("Media Player Classic"));
+		p.Combine(path, _T("MPC-BE"));
 		path = (LPCTSTR)p;
 	}
 
@@ -989,7 +989,7 @@ BOOL CMPlayerCApp::InitInstance()
 	}
 
 	CRegKey key;
-	if (ERROR_SUCCESS == key.Create(HKEY_LOCAL_MACHINE, _T("Software\\Gabest\\Media Player Classic"))) {
+	if (ERROR_SUCCESS == key.Create(HKEY_LOCAL_MACHINE, _T("Software\\MPC-BE"))) {
 		CString path;
 		GetModuleFileName(AfxGetInstanceHandle(), path.GetBuffer(_MAX_PATH), _MAX_PATH);
 		path.ReleaseBuffer();
@@ -1692,7 +1692,7 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 			CStringA hdr;
 			hdr.Format(
 				"GET %s HTTP/1.0\r\n"
-				"User-Agent: Media Player Classic\r\n"
+				"User-Agent: MPC-BE\r\n"
 				"Host: %s\r\n"
 				"Accept: */*\r\n"
 				"\r\n", path, host);
@@ -2229,8 +2229,8 @@ void CMPlayerCApp::SetLanguage (int nLanguage)
 				s.iLanguage = nLanguage;
 			} else {
 				// This message should stay in English!
-				MessageBox(NULL, _T("Your language pack will not work with this version. Please download a compatible one from the MPC-HC homepage."),
-						   _T("Media Player Classic - Home Cinema"), MB_OK);
+				MessageBox(NULL, _T("Your language pack will not work with this version. Please download a compatible one from the MPC-BE homepage."),
+						   _T("MPC-BE"), MB_OK);
 			}
 		}
 	}

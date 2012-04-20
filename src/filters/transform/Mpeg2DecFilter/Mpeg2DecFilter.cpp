@@ -4,14 +4,14 @@
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt
  *
- * This file is part of MPC-HC.
+ * This file is part of MPC-BE.
  *
- * MPC-HC is free software; you can redistribute it and/or modify
+ * MPC-BE is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
- * MPC-HC is distributed in the hope that it will be useful,
+ * MPC-BE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -237,7 +237,7 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 #ifdef REGISTER_FILTER
 	CRegKey key;
-	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\Gabest\\Filters Next\\MPEG Video Decoder"), KEY_READ)) {
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\MPC-BE Filters\\MPEG Video Decoder"), KEY_READ)) {
 		DWORD dw;
 		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("DeinterlaceMethod"), dw)) {
 			SetDeinterlaceMethod((ditype)dw);
@@ -306,7 +306,7 @@ STDMETHODIMP CMpeg2DecFilter::Apply()
 {
 #ifdef REGISTER_FILTER
 	CRegKey key;
-	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, _T("Software\\Gabest\\Filters Next\\MPEG Video Decoder"))) {
+	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, _T("Software\\MPC-BE Filters\\MPEG Video Decoder"))) {
 		key.SetDWORDValue(_T("DeinterlaceMethod"), m_ditype);
 		key.SetDWORDValue(_T("Brightness"), *(DWORD*)&m_bright);
 		key.SetDWORDValue(_T("Contrast"), *(DWORD*)&m_cont);

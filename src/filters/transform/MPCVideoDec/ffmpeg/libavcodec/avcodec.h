@@ -4689,7 +4689,7 @@ int av_codec_is_decoder(AVCodec *codec);
 FF_EXPORT int avcodec_h264_search_recovery_point(AVCodecContext *avctx,
                          const uint8_t *buf, int buf_size, int *recovery_frame_cnt);
 
-/* Media Player Classic - Homecinema specific functions */
+/* MPC-BE specific functions */
 FF_EXPORT int FFGetChannelMap(struct AVCodecContext* avctx);
 
 #endif /* AVCODEC_AVCODEC_H */

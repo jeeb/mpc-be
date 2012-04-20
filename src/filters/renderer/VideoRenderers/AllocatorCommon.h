@@ -4,14 +4,14 @@
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt
  *
- * This file is part of MPC-HC.
+ * This file is part of MPC-BE.
  *
- * MPC-HC is free software; you can redistribute it and/or modify
+ * MPC-BE is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
- * MPC-HC is distributed in the hope that it will be useful,
+ * MPC-BE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -63,7 +63,7 @@ extern HRESULT CreateAP9(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPi
 extern HRESULT CreateEVR(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter** ppAP);
 
 // Support ffdshow queuing.
-// This interface is used to check version of Media Player Classic.
+// This interface is used to check version of MPC-BE.
 // {A273C7F6-25D4-46b0-B2C8-4F7FADC44E37}
 DEFINE_GUID(IID_IVMRffdshow9,
 			0xa273c7f6, 0x25d4, 0x46b0, 0xb2, 0xc8, 0x4f, 0x7f, 0xad, 0xc4, 0x4e, 0x37);

@@ -55,11 +55,11 @@ AP4_SttsAtom::AP4_SttsAtom(AP4_Size size, AP4_ByteStream& stream) :
         AP4_UI32 sample_duration;
         if (stream.ReadUI32(sample_count)    == AP4_SUCCESS &&
             stream.ReadUI32(sample_duration) == AP4_SUCCESS) {
-// mpc-hc custom code start
+// MPC-BE custom code start
             if((int)sample_duration < 0) {
                 sample_duration = 0;
             }
-// mpc-hc custom code end
+// MPC-BE custom code end
             m_Entries.Append(AP4_SttsTableEntry(sample_count,
                                                 sample_duration));
         }
