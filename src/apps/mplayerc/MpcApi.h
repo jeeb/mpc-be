@@ -23,7 +23,7 @@
 
 
 // This file define commands used for "MPC-BE" API. To send commands
-// to mpc-hc, and receive playback notifications, first launch process with the /slave command line
+// to mpc-be, and receive playback notifications, first launch process with the /slave command line
 // argument follow by an HWnd handle use to receive notification :
 //
 // ..\bin\mplayerc /slave 125421
@@ -32,7 +32,7 @@
 //		- dwData	: CMD_CONNECT
 //		- lpData	: Unicode string containing MPC-BE main window Handle
 //
-// To pilot mpc-hc, send WM_COPYDATA messages to Hwnd provided on connection. All messages should be
+// To pilot mpc-be, send WM_COPYDATA messages to Hwnd provided on connection. All messages should be
 // formatted as Unicode strings. For commands or notifications with multiple parameters, values are
 // separated by |
 // If a string contains a |, it will be escaped with a \ so a \| is not a separator

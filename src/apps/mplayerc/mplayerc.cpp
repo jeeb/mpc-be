@@ -337,7 +337,7 @@ bool CMPlayerCApp::StoreSettingsToRegistry()
 	free((void*)m_pszRegistryKey);
 	m_pszRegistryKey = NULL;
 
-	SetRegistryKey(_T("Gabest"));
+	SetRegistryKey(_T(""));
 
 	return true;
 }
@@ -428,7 +428,7 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 void CMPlayerCApp::ExportSettings()
 {
 	CString ext = IsIniValid() ? _T("ini") : _T("reg");
-	CFileDialog fileSaveDialog(FALSE, ext, _T("mpc-hc-settings.")+ext);
+	CFileDialog fileSaveDialog(FALSE, ext, _T("mpc-be-settings.")+ext);
 
 	if (fileSaveDialog.DoModal() == IDOK) {
 		CString savePath = fileSaveDialog.GetPathName();
@@ -440,7 +440,7 @@ void CMPlayerCApp::ExportSettings()
 			success = !!CopyFile(GetIniPath(), savePath, FALSE);
 		} else {
 			CString regKey;
-			regKey.Format(_T("Software\\%s\\%s"), m_pszRegistryKey, m_pszProfileName);
+			regKey.Format(_T("Software\\%s"), m_pszProfileName);
 
 			FILE* fStream;
 			errno_t error = _tfopen_s(&fStream, savePath, _T("wt,ccs=UNICODE"));
