@@ -562,47 +562,21 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 				dc.RoundRect(r.left +1,r.top +1,r.right -2,r.bottom -1, 6, 4);
 			}
 			
-//----------INS: judelaw : Hide SEPARATORS ---- BEGIN
-			//Hide Separator3
-			CRect r3;
-			GetItemRect(3, &r3);
-			TRIVERTEX tv3[2] = {
-				{ r3.left, r3.top, 85*256, 90*256, 95*256, 255*256},
-				{ r3.right, r3.bottom, 15*256, 20*256, 25*256, 255*256},
-			};
-			GRADIENT_RECT gr3[1] = {{0, 1},};
-			dc.GradientFill(tv3, 2, gr3, 1, GRADIENT_FILL_RECT_V);
+//----------INS: judelaw, exodus8 : Hide SEPARATORS ---- BEGIN
 
-			//Hide Separator8
-			CRect r8;
-			GetItemRect(8, &r8);
-			TRIVERTEX tv8[2] = {
-				{ r8.left, r8.top, 85*256, 90*256, 95*256, 255*256},
-				{ r8.right, r8.bottom, 15*256, 20*256, 25*256, 255*256},
-			};
-			GRADIENT_RECT gr8[1] = {{0, 1},};
-			dc.GradientFill(tv8, 2, gr8, 1, GRADIENT_FILL_RECT_V);
+			GRADIENT_RECT gr[1] = {{0, 1}};
+			CRect rt;
+			int sep[4] = {3, 8, 10, 11};
+			for (int j = 0; j < 4; j++) {
+				GetItemRect(sep[j], &rt);
+				TRIVERTEX tv[2] = {
+					{rt.left, rt.top, 85*256, 90*256, 95*256, 255*256},
+					{rt.right, rt.bottom, 15*256, 20*256, 25*256, 255*256},
+				};
+				dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+			}
 
-			//Hide Separator10
-			CRect r10;
-			GetItemRect(10, &r10);
-			TRIVERTEX tv10[2] = {
-				{ r10.left, r10.top, 85*256, 90*256, 95*256, 255*256},
-				{ r10.right, r10.bottom, 15*256, 20*256, 25*256, 255*256},
-			};
-			GRADIENT_RECT gr10[1] = {{0, 1},};
-			dc.GradientFill(tv10, 2, gr10, 1, GRADIENT_FILL_RECT_V);
-
-			//Hide Separator11
-			CRect r11;
-			GetItemRect(11, &r11);
-			TRIVERTEX tv11[2] = {
-				{ r11.left, r11.top, 85*256, 90*256, 95*256, 255*256},
-				{ r11.right, r11.bottom, 15*256, 20*256, 25*256, 255*256},
-			};
-			GRADIENT_RECT gr11[1] = {{0, 1},};
-			dc.GradientFill(tv11, 2, gr11, 1, GRADIENT_FILL_RECT_V);
-//----------INS: judelaw : Hide SEPARATORS ------ END
+//----------INS: judelaw, exodus8 : Hide SEPARATORS ------ END
 			
 			dc.SelectObject(&penSaved);
 			dc.SelectObject(&brushSaved);
