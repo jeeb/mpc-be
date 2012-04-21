@@ -426,13 +426,13 @@ void CPPageFormats::AddAutoPlayToRegistry(autoplay_t ap, bool fRegister)
 	CRegKey key;
 
 	if (fRegister) {
-		if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, _T("MediaPlayerClassic.Autorun"))) {
+		if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, _T("MPCBE.Autorun"))) {
 			return;
 		}
 		key.Close();
 
 		if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT,
-										CString(CStringA("MediaPlayerClassic.Autorun\\Shell\\Play") + handlers[i].verb + "\\Command"))) {
+										CString(CStringA("MPCBE.Autorun\\Shell\\Play") + handlers[i].verb + "\\Command"))) {
 			return;
 		}
 		key.SetStringValue(NULL, _T("\"") + exe + _T("\"") + handlers[i].cmd);
@@ -444,7 +444,7 @@ void CPPageFormats::AddAutoPlayToRegistry(autoplay_t ap, bool fRegister)
 		}
 		key.SetStringValue(_T("Action"), ResStr(handlers[i].action));
 		key.SetStringValue(_T("Provider"), _T("MPC-BE"));
-		key.SetStringValue(_T("InvokeProgID"), _T("MediaPlayerClassic.Autorun"));
+		key.SetStringValue(_T("InvokeProgID"), _T("MPCBE.Autorun"));
 		key.SetStringValue(_T("InvokeVerb"), CString(CStringA("Play") + handlers[i].verb));
 		key.SetStringValue(_T("DefaultIcon"), exe + _T(",0"));
 		key.Close();
@@ -495,7 +495,7 @@ bool CPPageFormats::IsAutoPlayRegistered(autoplay_t ap)
 	key.Close();
 
 	if (ERROR_SUCCESS != key.Open(HKEY_CLASSES_ROOT,
-								  CString(CStringA("MediaPlayerClassic.Autorun\\Shell\\Play") + handlers[i].verb + "\\Command"),
+								  CString(CStringA("MPCBE.Autorun\\Shell\\Play") + handlers[i].verb + "\\Command"),
 								  KEY_READ)) {
 		return false;
 	}
