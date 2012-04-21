@@ -159,6 +159,7 @@ Name: custom;             Description: {cm:types_CustomInstallation};           
 [Components]
 Name: main;               Description: {#app_name} {#app_version}; Types: default custom; Flags: fixed
 Name: mpciconlib;         Description: {cm:comp_mpciconlib};       Types: default custom
+Name: mpcbeshellext;      Description: {cm:comp_mpcbeshellext};    Types: default custom
 #ifdef localize
 Name: mpcresources;       Description: {cm:comp_mpcresources};     Types: default custom; Flags: disablenouninstallwarning
 #endif
@@ -173,38 +174,42 @@ Name: reset_settings;     Description: {cm:tsk_ResetSettings};     GroupDescript
 
 
 [Files]
-Source: {#bindir}\{#mpcbe_exe};             DestDir: {app};      Components: main;         Flags: ignoreversion
-Source: {#bindir}\mpciconlib.dll;           DestDir: {app};      Components: mpciconlib;   Flags: ignoreversion
+Source: "{#bindir}\{#mpcbe_exe}";        DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "{#bindir}\mpciconlib.dll";      DestDir: "{app}"; Flags: ignoreversion; Components: mpciconlib
+#ifdef x64Build
+Source: "{#bindir}\MPCBEShellExt64.dll"; DestDir: "{app}"; Flags: ignoreversion noregerror regserver restartreplace uninsrestartdelete; Components: mpcbeshellext
+#else
+Source: "{#bindir}\MPCBEShellExt.dll";   DestDir: "{app}"; Flags: ignoreversion noregerror regserver restartreplace uninsrestartdelete; Components: mpcbeshellext
+#endif
 
 #ifdef localize
-Source: {#bindir}\Lang\mpcresources.br.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
-Source: {#bindir}\Lang\mpcresources.by.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
-Source: {#bindir}\Lang\mpcresources.ca.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
-Source: {#bindir}\Lang\mpcresources.cz.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
-Source: {#bindir}\Lang\mpcresources.de.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
-Source: {#bindir}\Lang\mpcresources.es.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
-Source: {#bindir}\Lang\mpcresources.fr.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
-Source: {#bindir}\Lang\mpcresources.he.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
-Source: {#bindir}\Lang\mpcresources.hu.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
-Source: {#bindir}\Lang\mpcresources.hy.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
-Source: {#bindir}\Lang\mpcresources.it.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
-Source: {#bindir}\Lang\mpcresources.ja.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
-Source: {#bindir}\Lang\mpcresources.kr.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
-Source: {#bindir}\Lang\mpcresources.nl.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
-Source: {#bindir}\Lang\mpcresources.pl.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
-Source: {#bindir}\Lang\mpcresources.ru.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
-Source: {#bindir}\Lang\mpcresources.sc.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
-Source: {#bindir}\Lang\mpcresources.sk.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
-Source: {#bindir}\Lang\mpcresources.sv.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
-Source: {#bindir}\Lang\mpcresources.tc.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
-Source: {#bindir}\Lang\mpcresources.tr.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
-Source: {#bindir}\Lang\mpcresources.ua.dll; DestDir: {app}\Lang; Components: mpcresources; Flags: ignoreversion
+Source: "{#bindir}\Lang\mpcresources.br.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
+Source: "{#bindir}\Lang\mpcresources.by.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
+Source: "{#bindir}\Lang\mpcresources.ca.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
+Source: "{#bindir}\Lang\mpcresources.cz.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
+Source: "{#bindir}\Lang\mpcresources.de.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
+Source: "{#bindir}\Lang\mpcresources.es.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
+Source: "{#bindir}\Lang\mpcresources.fr.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
+Source: "{#bindir}\Lang\mpcresources.he.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
+Source: "{#bindir}\Lang\mpcresources.hu.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
+Source: "{#bindir}\Lang\mpcresources.hy.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
+Source: "{#bindir}\Lang\mpcresources.it.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
+Source: "{#bindir}\Lang\mpcresources.ja.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
+Source: "{#bindir}\Lang\mpcresources.kr.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
+Source: "{#bindir}\Lang\mpcresources.nl.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
+Source: "{#bindir}\Lang\mpcresources.pl.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
+Source: "{#bindir}\Lang\mpcresources.ru.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
+Source: "{#bindir}\Lang\mpcresources.sc.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
+Source: "{#bindir}\Lang\mpcresources.sk.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
+Source: "{#bindir}\Lang\mpcresources.sv.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
+Source: "{#bindir}\Lang\mpcresources.tc.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
+Source: "{#bindir}\Lang\mpcresources.tr.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
+Source: "{#bindir}\Lang\mpcresources.ua.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
 #endif
-Source: ..\COPYING.txt;                     DestDir: {app};      Components: main;         Flags: ignoreversion
-Source: ..\docs\Authors.txt;                DestDir: {app};      Components: main;         Flags: ignoreversion
-Source: ..\docs\Changelog.txt;              DestDir: {app};      Components: main;         Flags: ignoreversion
-Source: ..\docs\Readme.txt;                 DestDir: {app};      Components: main;         Flags: ignoreversion
-
+Source: "..\COPYING.txt";                     DestDir: "{app}";      Flags: ignoreversion; Components: main
+Source: "..\docs\Authors.txt";                DestDir: "{app}";      Flags: ignoreversion; Components: main
+Source: "..\docs\Changelog.txt";              DestDir: "{app}";      Flags: ignoreversion; Components: main
+Source: "..\docs\Readme.txt";                 DestDir: "{app}";      Flags: ignoreversion; Components: main
 
 [Icons]
 #ifdef x64Build
