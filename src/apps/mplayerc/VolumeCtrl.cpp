@@ -49,6 +49,8 @@ bool CVolumeCtrl::Create(CWnd* pParentWnd)
 	SetPageSize(5);
 	SetLineSize(0);
 
+	Invalidate();
+
 	return true;
 }
 
