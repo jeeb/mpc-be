@@ -7108,6 +7108,8 @@ void CMainFrame::OnPlayPlay()
 			m_OSD.DisplayMessage(OSD_TOPLEFT, m_strOSD, 3000);
 		}
 	}
+
+	UpdateThumbarButton();
 }
 
 void CMainFrame::OnPlayPauseI()
