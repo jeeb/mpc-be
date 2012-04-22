@@ -1044,7 +1044,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						mt.majortype = MEDIATYPE_Audio;
 						mt.formattype = FORMAT_WaveFormatEx;
-						wfe = (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX) + (type == AP4_ATOM_TYPE_MP4A ? 0 : type == AP4_ATOM_TYPE_ALAC ? 36 : db.GetDataSize()));
+						wfe = (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX));
 						memset(wfe, 0, mt.FormatLength());
 						if (!(fourcc & 0xffff0000)) {
 							wfe->wFormatTag = (WORD)fourcc;
@@ -1053,8 +1053,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						wfe->nChannels = nChannels;
 						wfe->wBitsPerSample = ase->GetSampleSize();
 						wfe->nBlockAlign = ase->GetBytesPerFrame();
-						wfe->nAvgBytesPerSec = nAvgBytesPerSec ? nAvgBytesPerSec : wfe->nSamplesPerSec * wfe->nChannels * wfe->wBitsPerSample / 8;
-						//wfe->nAvgBytesPerSec = nAvgBytesPerSec ? nAvgBytesPerSec : wfe->nSamplesPerSec * wfe->nBlockAlign / ase->GetSamplesPerPacket();
+						//wfe->nAvgBytesPerSec = nAvgBytesPerSec ? nAvgBytesPerSec : wfe->nSamplesPerSec * wfe->nChannels * wfe->wBitsPerSample / 8;
+						wfe->nAvgBytesPerSec = nAvgBytesPerSec ? nAvgBytesPerSec : wfe->nSamplesPerSec * wfe->nBlockAlign / ase->GetSamplesPerPacket();
 
 						if (type == AP4_ATOM_TYPE_LPCM) {
 							mt.subtype = GetLPCMGUID(wfe->wBitsPerSample, ase->GetFormatSpecificFlags());
@@ -1062,27 +1062,54 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							mt.subtype = FOURCCMap(fourcc);
 						}
 
-						if (type != AP4_ATOM_TYPE_MP4A && type != AP4_ATOM_TYPE_ALAW && type != AP4_ATOM_TYPE_ULAW) {
-							if (type == AP4_ATOM_TYPE_ALAC) {
-								const AP4_Byte* data = db.GetData();
-								AP4_Size size = db.GetDataSize();
-
-								while (size >= 36) {
-									if ((*(DWORD*)(data) == 0x24000000) && (*(DWORD*)(data+4) == 0x63616c61)) {
-										break;
-									}
-									size--;
-									data++;
-								}
-
-								if (size >= 36) {
-									wfe->cbSize = 36;
-									memcpy(wfe+1, data, 36);
-								}
-							} else {
-								wfe->cbSize = db.GetDataSize();
-								memcpy(wfe+1, db.GetData(), db.GetDataSize());
+						if (type == AP4_ATOM_TYPE_MP4A ||
+							type == AP4_ATOM_TYPE_ALAW ||
+							type == AP4_ATOM_TYPE_ULAW) {
+							//fe->cbSize = 0;
+						} else if (type == AP4_ATOM_TYPE('m', 's', 0x00, 0x02)) {
+							const WORD numcoef = 7;
+							static ADPCMCOEFSET coef[] = { {256, 0}, {512, -256}, {0,0}, {192,64}, {240,0}, {460, -208}, {392,-232} };
+							const ULONG size = sizeof(ADPCMWAVEFORMAT) + (numcoef * sizeof(ADPCMCOEFSET));
+							ADPCMWAVEFORMAT* format = (ADPCMWAVEFORMAT*)mt.ReallocFormatBuffer(size);
+							if (format != NULL) {
+								format->wfx.wFormatTag = WAVE_FORMAT_ADPCM;
+								format->wfx.wBitsPerSample = 4;
+								format->wfx.cbSize = (WORD)(size - sizeof(WAVEFORMATEX));
+								format->wSamplesPerBlock = format->wfx.nBlockAlign * 2 / format->wfx.nChannels - 12;
+								format->wNumCoef = numcoef;
+								memcpy( format->aCoef, coef, sizeof(coef) );
 							}
+						} else if (type == AP4_ATOM_TYPE('m', 's', 0x00, 0x11)) {
+							IMAADPCMWAVEFORMAT* format = (IMAADPCMWAVEFORMAT*)mt.ReallocFormatBuffer(sizeof(IMAADPCMWAVEFORMAT));
+							if (format != NULL) {
+								format->wfx.wFormatTag = WAVE_FORMAT_IMA_ADPCM;
+								format->wfx.wBitsPerSample = 4;
+								format->wfx.cbSize = (WORD)(sizeof(IMAADPCMWAVEFORMAT) - sizeof(WAVEFORMATEX));
+								int X = (format->wfx.nBlockAlign - (4 * format->wfx.nChannels)) * 8;
+								int Y = format->wfx.wBitsPerSample * format->wfx.nChannels;
+								format->wSamplesPerBlock = (X / Y) + 1;
+							}
+						} else if (type == AP4_ATOM_TYPE_ALAC) {
+							const AP4_Byte* data = db.GetData();
+							AP4_Size size = db.GetDataSize();
+
+							while (size >= 36) {
+								if ((*(DWORD*)(data) == 0x24000000) && (*(DWORD*)(data+4) == 0x63616c61)) {
+									break;
+								}
+								size--;
+								data++;
+							}
+
+							if (size >= 36) {
+								wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 36);
+								wfe->cbSize = 36;
+								memcpy(wfe+1, data, 36);
+							}
+						} else if (db.GetDataSize() > 0) {
+							wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + db.GetDataSize());
+							wfe->cbSize = db.GetDataSize();
+							memcpy(wfe+1, db.GetData(), db.GetDataSize());
 						}
 
 						mts.Add(mt);
