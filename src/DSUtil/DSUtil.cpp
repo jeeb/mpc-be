@@ -897,7 +897,7 @@ cdrom_t GetCDROMType(TCHAR drive, CAtlList<CString>& files)
 			CDROM_TOC TOC;
 			if (DeviceIoControl(hDrive, IOCTL_CDROM_READ_TOC, NULL, 0, &TOC, sizeof(TOC), &BytesReturned, 0)) {
 				for (ptrdiff_t i = TOC.FirstTrack; i <= TOC.LastTrack; i++) {
-					// MMC-3 Draft Revision 10g: Table 222 – Q Sub-channel control field
+					// MMC-3 Draft Revision 10g: Table 222 - Q Sub-channel control field
 					TOC.TrackData[i-1].Control &= 5;
 					if (TOC.TrackData[i-1].Control == 0 || TOC.TrackData[i-1].Control == 1) {
 						CString fn;
@@ -1782,7 +1782,7 @@ static struct {
 	{"Greenlandic; Kalaallisut", "kal", "kl",	MAKELCID( MAKELANGID(LANG_GREENLANDIC, SUBLANG_DEFAULT), SORT_DEFAULT)},
 	{"Guarani", "grn", "gn"},
 	{"Gujarati", "guj", "gu",					MAKELCID( MAKELANGID(LANG_GUJARATI, SUBLANG_DEFAULT), SORT_DEFAULT)},
-	{"Gwich´in", "gwi", ""},
+	{"Gwich’in", "gwi", ""},
 	{"Haida", "hai", ""},
 	{"Hausa", "hau", "ha",						MAKELCID( MAKELANGID(LANG_HAUSA, SUBLANG_DEFAULT), SORT_DEFAULT)},
 	{"Hawaiian", "haw", ""},

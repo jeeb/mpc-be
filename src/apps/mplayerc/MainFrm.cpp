@@ -93,9 +93,9 @@
 
 #define MENUBARBREAK 30
 
-static UINT s_uTaskbarRestart = RegisterWindowMessage(TEXT("TaskbarCreated"));
-static UINT WM_NOTIFYICON = RegisterWindowMessage(TEXT("MYWM_NOTIFYICON"));
-static UINT s_uTBBC = RegisterWindowMessage(TEXT("TaskbarButtonCreated"));
+static UINT s_uTaskbarRestart = RegisterWindowMessage(_T("TaskbarCreated"));
+static UINT WM_NOTIFYICON = RegisterWindowMessage(_T("MYWM_NOTIFYICON"));
+static UINT s_uTBBC = RegisterWindowMessage(_T("TaskbarButtonCreated"));
 
 #include "../../filters/transform/VSFilter/IDirectVobSub.h"
 
@@ -11447,8 +11447,8 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 				fn = ResStr(IDS_CAPTURE_LIVE);
 			}
 		}
-/*		title = fn;  rem Alexins */
-		title = fn + _T(" - ") + m_strTitle; /* ins Alexins */
+
+		title = fn + _T(" - ") + m_strTitle;
 	}
 
 	SetWindowText(title);
@@ -12459,7 +12459,7 @@ void CMainFrame::SetupFiltersSubMenu()
 						CStringW stream(ResStr(IDS_AG_UNKNOWN_STREAM));
 						size_t count = stream.GetLength()+3+1;
 						wname = (WCHAR*)CoTaskMemAlloc(count*sizeof(WCHAR));
-						swprintf(wname, count, L"%s %d", stream, min(i+1,999));
+						swprintf_s(wname, count, L"%s %d", stream, min(i+1,999));
 					}
 
 					CString name(wname);
@@ -15012,7 +15012,7 @@ void CMainFrame::SendAPICommand (MPCAPI_COMMAND nCommand, LPCWSTR fmt, ...)
 
 		va_list args;
 		va_start(args, fmt);
-		_vstprintf(buff, sizeof(buff)/sizeof(TCHAR), fmt, args);
+		_vstprintf_s(buff, countof(buff), fmt, args);
 
 		CDS.cbData = (_tcslen (buff) + 1) * sizeof(TCHAR);
 		CDS.dwData = nCommand;

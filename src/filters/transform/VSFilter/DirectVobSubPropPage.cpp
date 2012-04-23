@@ -351,7 +351,7 @@ bool CDVSMainPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 						CFileDialog fd(TRUE, NULL, NULL,
 									   OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST,
-									   _T(".idx .smi .sub .srt .psb .ssa .ass .usf .ssf|*.idx;*.smi;*.sub;*.srt;*.psb;*.ssa;*.ass;*.usf;*.ssf|")
+									   _T(".idx .smi .sub .srt .psb .ssa .ass .usf|*.idx;*.smi;*.sub;*.srt;*.psb;*.ssa;*.ass;*.usf|")
 									   _T("All files (*.*)|*.*||"),
 									   CDialog::FromHandle(m_Dlg), 0);
 
@@ -786,11 +786,7 @@ bool CDVSAboutPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg) {
 		case WM_INITDIALOG: {
-#ifdef _VSMOD
-			SetDlgItemTextA( m_Dlg, IDC_VERSION, "DirectVobSub 2.40."MAKE_STR(MPC_VERSION_PATCH)"."MAKE_STR(MPC_VERSION_REV)" "MAKE_STR(VERSION_ARCH)", MOD\nCopyright 2001-2011 MPC-BE & VSFilterMod Teams" );
-#else
-			SetDlgItemTextA( m_Dlg, IDC_VERSION, "DirectVobSub 2.40."MAKE_STR(MPC_VERSION_PATCH)"."MAKE_STR(MPC_VERSION_REV)" "MAKE_STR(VERSION_ARCH)"\nCopyright 2001-2011 MPC-BE Team" );
-#endif
+			SetDlgItemTextA( m_Dlg, IDC_VERSION, "DirectVobSub 2.41."MAKE_STR(MPC_VERSION_PATCH)"."MAKE_STR(MPC_VERSION_REV)" "MAKE_STR(VERSION_ARCH)"\nCopyright 2001-2012 MPC-HC Team" );
 		}
 		break;
 		case WM_COMMAND: {

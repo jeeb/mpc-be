@@ -766,7 +766,7 @@ avcsuccess:
 					mt.formattype = FORMAT_SubtitleInfo;
 					SUBTITLEINFO* psi = (SUBTITLEINFO*)mt.AllocFormatBuffer(sizeof(SUBTITLEINFO) + pTE->CodecPrivate.GetCount());
 					memset(psi, 0, mt.FormatLength());
-					strncpy(psi->IsoLang, pTE->Language, countof(psi->IsoLang)-1);
+					strncpy_s(psi->IsoLang, pTE->Language, countof(psi->IsoLang)-1);
 					CString subtitle_Name = pTE->Name;
 					if (pTE->FlagForced) { // "Forced" overrides "Default"
 						subtitle_Name += L" [Forced]";
@@ -775,14 +775,13 @@ avcsuccess:
 					}
 					subtitle_Name = subtitle_Name.Trim();
 
-					wcsncpy(psi->TrackName, subtitle_Name, countof(psi->TrackName)-1);
+					wcsncpy_s(psi->TrackName, subtitle_Name, countof(psi->TrackName)-1);
 					memcpy(mt.pbFormat + (psi->dwOffset = sizeof(SUBTITLEINFO)), pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 
 					mt.subtype =
 						CodecID == "S_TEXT/UTF8" ? MEDIASUBTYPE_UTF8 :
 						CodecID == "S_TEXT/SSA" || CodecID == "S_SSA" ? MEDIASUBTYPE_SSA :
 						CodecID == "S_TEXT/ASS" || CodecID == "S_ASS" ? MEDIASUBTYPE_ASS :
-						CodecID == "S_TEXT/SSF" || CodecID == "S_SSF" ? MEDIASUBTYPE_SSF :
 						CodecID == "S_TEXT/USF" || CodecID == "S_USF" ? MEDIASUBTYPE_USF :
 						CodecID == "S_HDMV/PGS" ? MEDIASUBTYPE_HDMVSUB :
 						//CodecID == "S_DVBSUB" ? MEDIASUBTYPE_DVB_SUBTITLES : // does not work
@@ -1551,9 +1550,9 @@ STDMETHODIMP_(BOOL) CMatroskaSplitterFilter::GetTrackInfo(UINT aTrackIdx, struct
 	pStructureToFill->FlagDefault = !!pTE->FlagDefault;
 	pStructureToFill->FlagForced = !!pTE->FlagForced;
 	pStructureToFill->FlagLacing = !!pTE->FlagLacing;
-	strncpy(pStructureToFill->Language, pTE->Language, 3);
+	strncpy_s(pStructureToFill->Language, pTE->Language, 3);
 	if (pStructureToFill->Language[0] == '\0') {
-		strncpy(pStructureToFill->Language, "eng", 3);
+		strncpy_s(pStructureToFill->Language, "eng", 3);
 	}
 	pStructureToFill->Language[3] = '\0';
 	pStructureToFill->MaxCache = (UINT)pTE->MaxCache;

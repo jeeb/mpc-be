@@ -172,11 +172,6 @@ void CBaseMuxerRawOutputPin::MuxHeader(const CMediaType& mt)
 		if (str.Find("[Events]") < 0) {
 			pBitStream->StrWrite("\n\n[Events]\n", true);
 		}
-	} else if (mt.subtype == MEDIASUBTYPE_SSF) {
-		DWORD dwOffset = ((SUBTITLEINFO*)mt.pbFormat)->dwOffset;
-		try {
-			m_ssf.Parse(ssf::MemoryInputStream(mt.pbFormat + dwOffset, mt.cbFormat - dwOffset, false, false));
-		} catch (ssf::Exception&) {}
 	} else if (mt.subtype == MEDIASUBTYPE_VOBSUB) {
 		m_idx.RemoveAll();
 	} else if (mt.majortype == MEDIATYPE_Audio
@@ -357,11 +352,6 @@ void CBaseMuxerRawOutputPin::MuxPacket(const CMediaType& mt, const MuxerPacket* 
 		pBitStream->StrWrite(str, true);
 
 		return;
-	} else if (mt.subtype == MEDIASUBTYPE_SSF) {
-		float start = (float)pPacket->rtStart / 10000000;
-		float stop = (float)pPacket->rtStop / 10000000;
-		m_ssf.Append(ssf::WCharInputStream(UTF8To16(CStringA((char*)pData, DataSize))), start, stop, true);
-		return;
 	} else if (mt.subtype == MEDIASUBTYPE_VOBSUB) {
 		bool fTimeValid = pPacket->IsTimeValid();
 
@@ -454,13 +444,6 @@ void CBaseMuxerRawOutputPin::MuxFooter(const CMediaType& mt)
 		size -= sizeof(RIFFLIST) + sizeof(RIFFCHUNK) + mt.FormatLength();
 		pBitStream->Seek(sizeof(RIFFLIST) + sizeof(RIFFCHUNK) + mt.FormatLength() + 4);
 		pBitStream->ByteWrite(&size, 4);
-	} else if (mt.subtype == MEDIASUBTYPE_SSF) {
-		ssf::WCharOutputStream s;
-		try {
-			m_ssf.Dump(s);
-		} catch (ssf::Exception&) {}
-		CStringA str = UTF16To8(s.GetString());
-		pBitStream->StrWrite(str, true);
 	} else if (mt.subtype == MEDIASUBTYPE_VOBSUB) {
 		if (CComQIPtr<IFileSinkFilter> pFSF = GetFilterFromPin(GetConnected())) {
 			WCHAR* fn = NULL;
@@ -472,7 +455,7 @@ void CBaseMuxerRawOutputPin::MuxFooter(const CMediaType& mt)
 				if (FILE* f = _tfopen(CString((LPCWSTR)p), _T("w"))) {
 					SUBTITLEINFO* si = (SUBTITLEINFO*)mt.Format();
 
-					_ftprintf(f, _T("%s\n"), _T("# VobSub index file, v7 (do not modify this line!)"));
+					_ftprintf_s(f, _T("%s\n"), _T("# VobSub index file, v7 (do not modify this line!)"));
 
 					fwrite(mt.Format() + si->dwOffset, mt.FormatLength() - si->dwOffset, 1, f);
 
@@ -480,18 +463,18 @@ void CBaseMuxerRawOutputPin::MuxFooter(const CMediaType& mt)
 					if (iso6391.IsEmpty()) {
 						iso6391 = _T("--");
 					}
-					_ftprintf(f, _T("\nlangidx: 0\n\nid: %s, index: 0\n"), iso6391);
+					_ftprintf_s(f, _T("\nlangidx: 0\n\nid: %s, index: 0\n"), iso6391);
 
 					CString alt = CString(CStringW(si->TrackName));
 					if (!alt.IsEmpty()) {
-						_ftprintf(f, _T("alt: %s\n"), alt);
+						_ftprintf_s(f, _T("alt: %s\n"), alt);
 					}
 
 					POSITION pos = m_idx.GetHeadPosition();
 					while (pos) {
 						const idx_t& i = m_idx.GetNext(pos);
 						DVD_HMSF_TIMECODE start = RT2HMSF(i.rt, 25);
-						_ftprintf(f, _T("timestamp: %02d:%02d:%02d:%03d, filepos: %09I64x\n"),
+						_ftprintf_s(f, _T("timestamp: %02d:%02d:%02d:%03d, filepos: %09I64x\n"),
 								  start.bHours, start.bMinutes, start.bSeconds, (int)((i.rt/10000)%1000),
 								  i.fp);
 					}

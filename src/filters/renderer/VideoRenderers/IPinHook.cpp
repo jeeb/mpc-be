@@ -306,7 +306,7 @@ static void LOG_TOFILE(LPCTSTR FileName, LPCTSTR fmt, ...)
 		_vstprintf_s(buff, nCount, fmt, args);
 		if (_tfopen_s(&f, FileName, _T("at")) == 0) {
 			fseek(f, 0, 2);
-			_ftprintf(f, _T("%s\n"), buff);
+			_ftprintf_s(f, _T("%s\n"), buff);
 			fclose(f);
 		}
 		delete [] buff;
@@ -318,13 +318,13 @@ static void LOG(LPCTSTR fmt, ...)
 {
 	va_list args;
 	va_start(args, fmt);
-	//	int		nCount	= _vsctprintf(fmt, args) + 1;
+	//int		nCount = _vsctprintf(fmt, args) + 1;
 	TCHAR	buff[3000];
 	FILE*	f;
 	_vstprintf_s(buff, countof(buff), fmt, args);
 	if (_tfopen_s(&f, LOG_FILE_DXVA, _T("at")) == 0) {
 		fseek(f, 0, 2);
-		_ftprintf(f, _T("%s\n"), buff);
+		_ftprintf_s(f, _T("%s\n"), buff);
 		fclose(f);
 	}
 
