@@ -147,7 +147,20 @@ en.tsk_ResetSettings=Reset settings
 en.types_DefaultInstallation=Default installation
 en.types_CustomInstallation=Custom installation
 en.ViewChangelog=View Changelog
-
+en.AssociationFormatsAV=Configuring associations with video and audio files:
+en.AssociationFormats=Association with video and audio files
+en.AssociationVideo=Association with video files
+en.AssociationAudio=Association with audio files
+en.AssociationPlaylist=Association with playlists
+en.AutoPlayType=Auto play:
+en.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+en.AssociationMPCPlayCDAudioS=Audio CD
+en.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+en.AssociationMPCPlayDVDMovieS=DVD Movie
+en.AssociationMPCPlayMusicFilesF=Play Music
+en.AssociationMPCPlayMusicFilesS=Music Files
+en.AssociationMPCPlayVideoFilesF=Play Video
+en.AssociationMPCPlayVideoFilesS=Video Files
 
 
 #ifdef localize
@@ -172,6 +185,20 @@ br.tsk_ResetSettings=Reiniciar as configurações
 br.types_DefaultInstallation=Instalação padrão
 br.types_CustomInstallation=Instalação personalizada
 br.ViewChangelog=Ver registro de alterações
+br.AssociationFormatsAV=Configuring associations with video and audio files:
+br.AssociationFormats=Association with video and audio files
+br.AssociationVideo=Association with video files
+br.AssociationAudio=Association with audio files
+br.AssociationPlaylist=Association with playlists
+br.AutoPlayType=Auto play:
+br.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+br.AssociationMPCPlayCDAudioS=Audio CD
+br.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+br.AssociationMPCPlayDVDMovieS=DVD Movie
+br.AssociationMPCPlayMusicFilesF=Play Music
+br.AssociationMPCPlayMusicFilesS=Music Files
+br.AssociationMPCPlayVideoFilesF=Play Video
+br.AssociationMPCPlayVideoFilesS=Video Files
 
 
 ;Belarusian
@@ -194,6 +221,20 @@ by.tsk_ResetSettings=Вярнуць налады
 by.types_DefaultInstallation=Перадвызначанае ўсталяванне
 by.types_CustomInstallation=Адмысловае ўсталяванне
 by.ViewChangelog=Спіс зменаў
+by.AssociationFormatsAV=Configuring associations with video and audio files:
+by.AssociationFormats=Association with video and audio files
+by.AssociationVideo=Association with video files
+by.AssociationAudio=Association with audio files
+by.AssociationPlaylist=Association with playlists
+by.AutoPlayType=Auto play:
+by.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+by.AssociationMPCPlayCDAudioS=Audio CD
+by.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+by.AssociationMPCPlayDVDMovieS=DVD Movie
+by.AssociationMPCPlayMusicFilesF=Play Music
+by.AssociationMPCPlayMusicFilesS=Music Files
+by.AssociationMPCPlayVideoFilesF=Play Video
+by.AssociationMPCPlayVideoFilesS=Video Files
 
 
 ;Catalan
@@ -216,6 +257,20 @@ ca.tsk_ResetSettings=Reiniciar preferències
 ca.types_DefaultInstallation=Instal.lació per defecte
 ca.types_CustomInstallation=Instal.lació personalitzada
 ca.ViewChangelog=Veure registre de canvis
+ca.AssociationFormatsAV=Configuring associations with video and audio files:
+ca.AssociationFormats=Association with video and audio files
+ca.AssociationVideo=Association with video files
+ca.AssociationAudio=Association with audio files
+ca.AssociationPlaylist=Association with playlists
+ca.AutoPlayType=Auto play:
+ca.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+ca.AssociationMPCPlayCDAudioS=Audio CD
+ca.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+ca.AssociationMPCPlayDVDMovieS=DVD Movie
+ca.AssociationMPCPlayMusicFilesF=Play Music
+ca.AssociationMPCPlayMusicFilesS=Music Files
+ca.AssociationMPCPlayVideoFilesF=Play Video
+ca.AssociationMPCPlayVideoFilesS=Video Files
 
 
 ;Czech
@@ -238,6 +293,20 @@ cz.tsk_ResetSettings=Obnovit výchozí nastavení
 cz.types_DefaultInstallation=Standardní instalace
 cz.types_CustomInstallation=Volitelná instalace
 cz.ViewChangelog=Zobrazit seznam změn
+cz.AssociationFormatsAV=Configuring associations with video and audio files:
+cz.AssociationFormats=Association with video and audio files
+cz.AssociationVideo=Association with video files
+cz.AssociationAudio=Association with audio files
+cz.AssociationPlaylist=Association with playlists
+cz.AutoPlayType=Auto play:
+cz.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+cz.AssociationMPCPlayCDAudioS=Audio CD
+cz.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+cz.AssociationMPCPlayDVDMovieS=DVD Movie
+cz.AssociationMPCPlayMusicFilesF=Play Music
+cz.AssociationMPCPlayMusicFilesS=Music Files
+cz.AssociationMPCPlayVideoFilesF=Play Video
+cz.AssociationMPCPlayVideoFilesS=Video Files
 
 
 ;German
@@ -260,6 +329,20 @@ de.tsk_ResetSettings=Einstellungen zurücksetzen
 de.types_DefaultInstallation=Standard Installation
 de.types_CustomInstallation=Benutzerdefinierte Installation
 de.ViewChangelog=Zeige Änderungsprotokoll
+de.AssociationFormatsAV=Configuring associations with video and audio files:
+de.AssociationFormats=Association with video and audio files
+de.AssociationVideo=Association with video files
+de.AssociationAudio=Association with audio files
+de.AssociationPlaylist=Association with playlists
+de.AutoPlayType=Auto play:
+de.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+de.AssociationMPCPlayCDAudioS=Audio CD
+de.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+de.AssociationMPCPlayDVDMovieS=DVD Movie
+de.AssociationMPCPlayMusicFilesF=Play Music
+de.AssociationMPCPlayMusicFilesS=Music Files
+de.AssociationMPCPlayVideoFilesF=Play Video
+de.AssociationMPCPlayVideoFilesS=Video Files
 
 
 ;Spanish
@@ -282,6 +365,20 @@ es.tsk_ResetSettings=Restaurar preferencias
 es.types_DefaultInstallation=Instalación por defecto
 es.types_CustomInstallation=Instalación personalizada
 es.ViewChangelog=Ver registro de cambios
+es.AssociationFormatsAV=Configuring associations with video and audio files:
+es.AssociationFormats=Association with video and audio files
+es.AssociationVideo=Association with video files
+es.AssociationAudio=Association with audio files
+es.AssociationPlaylist=Association with playlists
+es.AutoPlayType=Auto play:
+es.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+es.AssociationMPCPlayCDAudioS=Audio CD
+es.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+es.AssociationMPCPlayDVDMovieS=DVD Movie
+es.AssociationMPCPlayMusicFilesF=Play Music
+es.AssociationMPCPlayMusicFilesS=Music Files
+es.AssociationMPCPlayVideoFilesF=Play Video
+es.AssociationMPCPlayVideoFilesS=Video Files
 
 
 ;French
@@ -304,6 +401,20 @@ fr.tsk_ResetSettings=Réinitialisation des paramètres
 fr.types_DefaultInstallation=Installation par défaut
 fr.types_CustomInstallation=Installation personnalisée
 fr.ViewChangelog=Voir la liste des changements
+fr.AssociationFormatsAV=Configuring associations with video and audio files:
+fr.AssociationFormats=Association with video and audio files
+fr.AssociationVideo=Association with video files
+fr.AssociationAudio=Association with audio files
+fr.AssociationPlaylist=Association with playlists
+fr.AutoPlayType=Auto play:
+fr.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+fr.AssociationMPCPlayCDAudioS=Audio CD
+fr.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+fr.AssociationMPCPlayDVDMovieS=DVD Movie
+fr.AssociationMPCPlayMusicFilesF=Play Music
+fr.AssociationMPCPlayMusicFilesS=Music Files
+fr.AssociationMPCPlayVideoFilesF=Play Video
+fr.AssociationMPCPlayVideoFilesS=Video Files
 
 
 ;Hebrew
@@ -326,6 +437,20 @@ he.tsk_ResetSettings=אפס הגדרות
 he.types_DefaultInstallation=התקנת ברירת מחדל
 he.types_CustomInstallation=התקנה מותאמת אישית
 he.ViewChangelog=הצג רשימת עדכונים
+he.AssociationFormatsAV=Configuring associations with video and audio files:
+he.AssociationFormats=Association with video and audio files
+he.AssociationVideo=Association with video files
+he.AssociationAudio=Association with audio files
+he.AssociationPlaylist=Association with playlists
+he.AutoPlayType=Auto play:
+he.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+he.AssociationMPCPlayCDAudioS=Audio CD
+he.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+he.AssociationMPCPlayDVDMovieS=DVD Movie
+he.AssociationMPCPlayMusicFilesF=Play Music
+he.AssociationMPCPlayMusicFilesS=Music Files
+he.AssociationMPCPlayVideoFilesF=Play Video
+he.AssociationMPCPlayVideoFilesS=Video Files
 
 
 ;Hungarian
@@ -348,6 +473,20 @@ hu.tsk_ResetSettings=Beállítások alaphelyzetbe állítása
 hu.types_DefaultInstallation=Szokásos telepítés
 hu.types_CustomInstallation=Egyedi telepítés
 hu.ViewChangelog=Verziótörténet megtekintése
+hu.AssociationFormatsAV=Configuring associations with video and audio files:
+hu.AssociationFormats=Association with video and audio files
+hu.AssociationVideo=Association with video files
+hu.AssociationAudio=Association with audio files
+hu.AssociationPlaylist=Association with playlists
+hu.AutoPlayType=Auto play:
+hu.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+hu.AssociationMPCPlayCDAudioS=Audio CD
+hu.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+hu.AssociationMPCPlayDVDMovieS=DVD Movie
+hu.AssociationMPCPlayMusicFilesF=Play Music
+hu.AssociationMPCPlayMusicFilesS=Music Files
+hu.AssociationMPCPlayVideoFilesF=Play Video
+hu.AssociationMPCPlayVideoFilesS=Video Files
 
 
 ;Armenian
@@ -370,6 +509,20 @@ hy.tsk_ResetSettings=Ետարկել կարգավորումները
 hy.types_DefaultInstallation=Տեղակայել ըստ ծրագրայինի
 hy.types_CustomInstallation=Ընտրովի տեղակայում
 hy.ViewChangelog=Նայել փոփոխությունների ցանկը
+hy.AssociationFormatsAV=Configuring associations with video and audio files:
+hy.AssociationFormats=Association with video and audio files
+hy.AssociationVideo=Association with video files
+hy.AssociationAudio=Association with audio files
+hy.AssociationPlaylist=Association with playlists
+hy.AutoPlayType=Auto play:
+hy.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+hy.AssociationMPCPlayCDAudioS=Audio CD
+hy.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+hy.AssociationMPCPlayDVDMovieS=DVD Movie
+hy.AssociationMPCPlayMusicFilesF=Play Music
+hy.AssociationMPCPlayMusicFilesS=Music Files
+hy.AssociationMPCPlayVideoFilesF=Play Video
+hy.AssociationMPCPlayVideoFilesS=Video Files
 
 
 ;Italian
@@ -392,6 +545,15 @@ it.tsk_ResetSettings=Ripristina impostazioni
 it.types_DefaultInstallation=Installazione predefinita
 it.types_CustomInstallation=Installazione personalizzata
 it.ViewChangelog=Visualizza Changelog
+it.AutoPlayType=Auto play:
+it.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+it.AssociationMPCPlayCDAudioS=Audio CD
+it.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+it.AssociationMPCPlayDVDMovieS=DVD Movie
+it.AssociationMPCPlayMusicFilesF=Play Music
+it.AssociationMPCPlayMusicFilesS=Music Files
+it.AssociationMPCPlayVideoFilesF=Play Video
+it.AssociationMPCPlayVideoFilesS=Video Files
 
 
 ;Japanese
@@ -414,6 +576,20 @@ ja.tsk_ResetSettings=設定を初期化する
 ja.types_DefaultInstallation=デフォルト インストール
 ja.types_CustomInstallation=カスタム インストール
 ja.ViewChangelog=変更履歴を見る
+ja.AssociationFormatsAV=Configuring associations with video and audio files:
+ja.AssociationFormats=Association with video and audio files
+ja.AssociationVideo=Association with video files
+ja.AssociationAudio=Association with audio files
+ja.AssociationPlaylist=Association with playlists
+ja.AutoPlayType=Auto play:
+ja.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+ja.AssociationMPCPlayCDAudioS=Audio CD
+ja.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+ja.AssociationMPCPlayDVDMovieS=DVD Movie
+ja.AssociationMPCPlayMusicFilesF=Play Music
+ja.AssociationMPCPlayMusicFilesS=Music Files
+ja.AssociationMPCPlayVideoFilesF=Play Video
+ja.AssociationMPCPlayVideoFilesS=Video Files
 
 
 ;Korean
@@ -436,6 +612,20 @@ kr.tsk_ResetSettings=설정 초기화
 kr.types_DefaultInstallation=기본 설치
 kr.types_CustomInstallation=사용자정의 설치
 kr.ViewChangelog=버전 변경사항 보기
+kr.AssociationFormatsAV=Configuring associations with video and audio files:
+kr.AssociationFormats=Association with video and audio files
+kr.AssociationVideo=Association with video files
+kr.AssociationAudio=Association with audio files
+kr.AssociationPlaylist=Association with playlists
+kr.AutoPlayType=Auto play:
+kr.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+kr.AssociationMPCPlayCDAudioS=Audio CD
+kr.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+kr.AssociationMPCPlayDVDMovieS=DVD Movie
+kr.AssociationMPCPlayMusicFilesF=Play Music
+kr.AssociationMPCPlayMusicFilesS=Music Files
+kr.AssociationMPCPlayVideoFilesF=Play Video
+kr.AssociationMPCPlayVideoFilesS=Video Files
 
 
 ;Dutch
@@ -458,6 +648,20 @@ nl.tsk_ResetSettings=Instellingen resetten
 nl.types_DefaultInstallation=Standaard installatie
 nl.types_CustomInstallation=Aangepaste installatie
 nl.ViewChangelog=Bekijk Wijzigingsoverzicht
+nl.AssociationFormatsAV=Configuring associations with video and audio files:
+nl.AssociationFormats=Association with video and audio files
+nl.AssociationVideo=Association with video files
+nl.AssociationAudio=Association with audio files
+nl.AssociationPlaylist=Association with playlists
+nl.AutoPlayType=Auto play:
+nl.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+nl.AssociationMPCPlayCDAudioS=Audio CD
+nl.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+nl.AssociationMPCPlayDVDMovieS=DVD Movie
+nl.AssociationMPCPlayMusicFilesF=Play Music
+nl.AssociationMPCPlayMusicFilesS=Music Files
+nl.AssociationMPCPlayVideoFilesF=Play Video
+nl.AssociationMPCPlayVideoFilesS=Video Files
 
 
 ;Polish
@@ -480,6 +684,20 @@ pl.tsk_ResetSettings=Resetuj ustawienia
 pl.types_DefaultInstallation=Instalacja domyślna
 pl.types_CustomInstallation=Instalacja częściowa
 pl.ViewChangelog=Pokaż zmiany
+pl.AssociationFormatsAV=Configuring associations with video and audio files:
+pl.AssociationFormats=Association with video and audio files
+pl.AssociationVideo=Association with video files
+pl.AssociationAudio=Association with audio files
+pl.AssociationPlaylist=Association with playlists
+pl.AutoPlayType=Auto play:
+pl.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+pl.AssociationMPCPlayCDAudioS=Audio CD
+pl.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+pl.AssociationMPCPlayDVDMovieS=DVD Movie
+pl.AssociationMPCPlayMusicFilesF=Play Music
+pl.AssociationMPCPlayMusicFilesS=Music Files
+pl.AssociationMPCPlayVideoFilesF=Play Video
+pl.AssociationMPCPlayVideoFilesS=Video Files
 
 
 ;Russian
@@ -502,6 +720,21 @@ ru.tsk_ResetSettings=Восстановить параметры по умолч
 ru.types_DefaultInstallation=Установка по умолчанию
 ru.types_CustomInstallation=Выборочная установка
 ru.ViewChangelog=Просмотреть журнал изменений
+ru.AssociationFormatsAV=Настройка ассоциаций с видео и аудио файлами:
+ru.AssociationFormats=Ассоциация с видео и аудио файлами
+ru.AssociationVideo=Ассоциация с видео-файлами
+ru.AssociationAudio=Ассоциация с аудио-файлами
+ru.AssociationPlaylist=Ассоциация с плейлистами
+ru.AutoPlayType=Автоматическое воспроизведение:
+ru.AssociationMPCPlayCDAudioOnArrivalF=Воспроизведение Audio CD
+ru.AssociationMPCPlayCDAudioS=Audio CD
+ru.AssociationMPCPlayDVDMovieArrivalF=Воспроизведение DVD
+ru.AssociationMPCPlayDVDMovieS=DVD Видео
+ru.AssociationMPCPlayMusicFilesF=Воспроизведение музыки
+ru.AssociationMPCPlayMusicFilesS=Музыкальные файлы
+ru.AssociationMPCPlayVideoFilesF=Воспроизведение видео
+ru.AssociationMPCPlayVideoFilesS=Видео файлы
+
 
 
 ;Chinese Simplified
@@ -524,6 +757,20 @@ sc.tsk_ResetSettings=重置设置
 sc.types_DefaultInstallation=默认安装
 sc.types_CustomInstallation=自定义安装
 sc.ViewChangelog=查看更新日志
+sc.AssociationFormatsAV=Configuring associations with video and audio files:
+sc.AssociationFormats=Association with video and audio files
+sc.AssociationVideo=Association with video files
+sc.AssociationAudio=Association with audio files
+sc.AssociationPlaylist=Association with playlists
+sc.AutoPlayType=Auto play:
+sc.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+sc.AssociationMPCPlayCDAudioS=Audio CD
+sc.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+sc.AssociationMPCPlayDVDMovieS=DVD Movie
+sc.AssociationMPCPlayMusicFilesF=Play Music
+sc.AssociationMPCPlayMusicFilesS=Music Files
+sc.AssociationMPCPlayVideoFilesF=Play Video
+sc.AssociationMPCPlayVideoFilesS=Video Files
 
 
 ;Swedish
@@ -546,6 +793,20 @@ sv.tsk_ResetSettings=Återställ inställningar
 sv.types_DefaultInstallation=Standardinstallation
 sv.types_CustomInstallation=Anpassad installation
 sv.ViewChangelog=Visa ändringslogg
+sv.AssociationFormatsAV=Configuring associations with video and audio files:
+sv.AssociationFormats=Association with video and audio files
+sv.AssociationVideo=Association with video files
+sv.AssociationAudio=Association with audio files
+sv.AssociationPlaylist=Association with playlists
+sv.AutoPlayType=Auto play:
+sv.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+sv.AssociationMPCPlayCDAudioS=Audio CD
+sv.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+sv.AssociationMPCPlayDVDMovieS=DVD Movie
+sv.AssociationMPCPlayMusicFilesF=Play Music
+sv.AssociationMPCPlayMusicFilesS=Music Files
+sv.AssociationMPCPlayVideoFilesF=Play Video
+sv.AssociationMPCPlayVideoFilesS=Video Files
 
 
 ;Slovakian
@@ -568,6 +829,20 @@ sk.tsk_ResetSettings=Obnoviť pôvodné nastavenia
 sk.types_DefaultInstallation=Predvolená inštalácia
 sk.types_CustomInstallation=Vlastná inštalácia
 sk.ViewChangelog=Zobraziť zoznam zmien
+sk.AssociationFormatsAV=Configuring associations with video and audio files:
+sk.AssociationFormats=Association with video and audio files
+sk.AssociationVideo=Association with video files
+sk.AssociationAudio=Association with audio files
+sk.AssociationPlaylist=Association with playlists
+sk.AutoPlayType=Auto play:
+sk.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+sk.AssociationMPCPlayCDAudioS=Audio CD
+sk.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+sk.AssociationMPCPlayDVDMovieS=DVD Movie
+sk.AssociationMPCPlayMusicFilesF=Play Music
+sk.AssociationMPCPlayMusicFilesS=Music Files
+sk.AssociationMPCPlayVideoFilesF=Play Video
+sk.AssociationMPCPlayVideoFilesS=Video Files
 
 
 ;Chinese Traditional
@@ -590,6 +865,20 @@ tc.tsk_ResetSettings=重設設定
 tc.types_DefaultInstallation=預設安裝
 tc.types_CustomInstallation=自訂安裝
 tc.ViewChangelog=檢視更新日誌
+tc.AssociationFormatsAV=Configuring associations with video and audio files:
+tc.AssociationFormats=Association with video and audio files
+tc.AssociationVideo=Association with video files
+tc.AssociationAudio=Association with audio files
+tc.AssociationPlaylist=Association with playlists
+tc.AutoPlayType=Auto play:
+tc.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+tc.AssociationMPCPlayCDAudioS=Audio CD
+tc.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+tc.AssociationMPCPlayDVDMovieS=DVD Movie
+tc.AssociationMPCPlayMusicFilesF=Play Music
+tc.AssociationMPCPlayMusicFilesS=Music Files
+tc.AssociationMPCPlayVideoFilesF=Play Video
+tc.AssociationMPCPlayVideoFilesS=Video Files
 
 
 ;Turkish
@@ -612,6 +901,20 @@ tr.tsk_ResetSettings=Ayarları sıfırla
 tr.types_DefaultInstallation=Varsayılan yükleme
 tr.types_CustomInstallation=Özel yükleme
 tr.ViewChangelog=Sürüm Notları
+tr.AssociationFormatsAV=Configuring associations with video and audio files:
+tr.AssociationFormats=Association with video and audio files
+tr.AssociationVideo=Association with video files
+tr.AssociationAudio=Association with audio files
+tr.AssociationPlaylist=Association with playlists
+tr.AutoPlayType=Auto play:
+tr.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+tr.AssociationMPCPlayCDAudioS=Audio CD
+tr.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+tr.AssociationMPCPlayDVDMovieS=DVD Movie
+tr.AssociationMPCPlayMusicFilesF=Play Music
+tr.AssociationMPCPlayMusicFilesS=Music Files
+tr.AssociationMPCPlayVideoFilesF=Play Video
+tr.AssociationMPCPlayVideoFilesS=Video Files
 
 
 ;Ukrainian
@@ -634,5 +937,19 @@ ua.tsk_ResetSettings=Скинути налаштування
 ua.types_DefaultInstallation=Типове встановлення
 ua.types_CustomInstallation=Вибіркове встановлення
 ua.ViewChangelog=Показати журнал змін
+ua.AssociationFormatsAV=Configuring associations with video and audio files:
+ua.AssociationFormats=Association with video and audio files
+ua.AssociationVideo=Association with video files
+ua.AssociationAudio=Association with audio files
+ua.AssociationPlaylist=Association with playlists
+ua.AutoPlayType=Auto play:
+ua.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+ua.AssociationMPCPlayCDAudioS=Audio CD
+ua.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+ua.AssociationMPCPlayDVDMovieS=DVD Movie
+ua.AssociationMPCPlayMusicFilesF=Play Music
+ua.AssociationMPCPlayMusicFilesS=Music Files
+ua.AssociationMPCPlayVideoFilesF=Play Video
+ua.AssociationMPCPlayVideoFilesS=Video Files
 
 #endif
