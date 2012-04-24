@@ -1058,19 +1058,14 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						wfe->nChannels = channels;
 						wfe->wBitsPerSample = ase->GetSampleSize();
 						wfe->nBlockAlign = ase->GetBytesPerFrame();
-						//wfe->nAvgBytesPerSec = nAvgBytesPerSec ? nAvgBytesPerSec : wfe->nSamplesPerSec * wfe->nChannels * wfe->wBitsPerSample / 8;
-						wfe->nAvgBytesPerSec = nAvgBytesPerSec ? nAvgBytesPerSec : wfe->nSamplesPerSec * wfe->nBlockAlign / ase->GetSamplesPerPacket();
+						if (nAvgBytesPerSec == 0) {
+							wfe->nAvgBytesPerSec = wfe->nSamplesPerSec * wfe->nBlockAlign / ase->GetSamplesPerPacket();
+						}
 
 						mt.subtype = FOURCCMap(fourcc);
 
 
-						if (type == AP4_ATOM_TYPE_MP4A ||
-							type == AP4_ATOM_TYPE_ALAW ||
-							type == AP4_ATOM_TYPE_ULAW ||
-							type == WAVE_FORMAT_IEEE_FLOAT) {
-							//not need any extra data
-							//fe->cbSize = 0;
-						} else if (type == AP4_ATOM_TYPE('m', 's', 0x00, 0x02)) {
+						if (type == AP4_ATOM_TYPE('m', 's', 0x00, 0x02)) {
 							const WORD numcoef = 7;
 							static ADPCMCOEFSET coef[] = { {256, 0}, {512, -256}, {0,0}, {192,64}, {240,0}, {460, -208}, {392,-232} };
 							const ULONG size = sizeof(ADPCMWAVEFORMAT) + (numcoef * sizeof(ADPCMCOEFSET));
@@ -1110,17 +1105,25 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								wfe->cbSize = 36;
 								memcpy(wfe+1, data, 36);
 							}
-						} else if (type == WAVE_FORMAT_PCM && (channels > 2 || bitspersample > 16)) {
-							WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEXTENSIBLE));
-							if (wfex != NULL) {
-								wfex->Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
-								wfex->Format.cbSize = 22;
-								wfex->Samples.wValidBitsPerSample = bitspersample;
-								wfex->dwChannelMask = GetDefChannelMask(channels);
-								wfex->SubFormat = MEDIASUBTYPE_PCM;
+						} else if (type == WAVE_FORMAT_PCM) {
+							if (channels > 2 || bitspersample > 16) {
+								WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEXTENSIBLE));
+								if (wfex != NULL) {
+									wfex->Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
+									wfex->Format.cbSize = 22;
+									wfex->Samples.wValidBitsPerSample = bitspersample;
+									wfex->dwChannelMask = GetDefChannelMask(channels);
+									wfex->SubFormat = MEDIASUBTYPE_PCM;
+								}
 							}
+						} else if (type == AP4_ATOM_TYPE_MP4A ||
+								   type == AP4_ATOM_TYPE_ALAW ||
+								   type == AP4_ATOM_TYPE_ULAW ||
+								   type == WAVE_FORMAT_IEEE_FLOAT) {
+							// not need any extra data for ALAW, ULAW, IEEE_FLOAT
+							// also extra data is not required for IMA4, MAC3, MAC6
 						} else if (db.GetDataSize() > 0) {
-							//AP4_ATOM_TYPE_QDM2
+							//always needed extra data QDM2
 							wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + db.GetDataSize());
 							wfe->cbSize = db.GetDataSize();
 							memcpy(wfe+1, db.GetData(), db.GetDataSize());
