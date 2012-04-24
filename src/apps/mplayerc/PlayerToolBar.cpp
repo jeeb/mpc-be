@@ -28,7 +28,6 @@
 #include <afxpriv.h>
 #include "PlayerToolBar.h"
 #include "MainFrm.h"
-#include <libpng/png.h>
 
 
 typedef HRESULT (__stdcall * SetWindowThemeFunct)(HWND hwnd, LPCWSTR pszSubAppName, LPCWSTR pszSubIdList);
@@ -46,43 +45,6 @@ CPlayerToolBar::~CPlayerToolBar()
 	if (NULL != m_pButtonsImages) {
 		delete m_pButtonsImages;
 		m_pButtonsImages = NULL;
-	}
-}
-
-HBITMAP CPlayerToolBar::LoadExternalToolBar()
-{
-	CString path;
-	GetModuleFileName(AfxGetInstanceHandle(), path.GetBuffer(_MAX_PATH), _MAX_PATH);
-	path.ReleaseBuffer();
-	path = path.Left(path.ReverseFind('\\')+1);
-
-	FILE* fp = _tfopen(path + _T("toolbar.png"), _T("rb"));
-	if (fp) {
-		png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
-		png_infop info_ptr = png_create_info_struct(png_ptr);
-		png_init_io(png_ptr, fp);
-
-		png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_EXPAND | PNG_TRANSFORM_BGR | PNG_TRANSFORM_PACKING, 0);
-
-		png_bytep* row_pointers = png_get_rows(png_ptr, info_ptr);
-		int bpp = png_get_channels(png_ptr, info_ptr) * 8;
-		int width = png_get_image_width(png_ptr, info_ptr);
-		int memWidth = width * bpp / 8;
-		int height = png_get_image_height(png_ptr, info_ptr);
-		BYTE* pData;
-		BITMAPINFO bmi = {{sizeof(BITMAPINFOHEADER), width, -height, 1, bpp, BI_RGB, 0, 0, 0, 0, 0}};
-
-		HBITMAP hbm = CreateDIBSection(0, &bmi, DIB_RGB_COLORS, (void**)&pData, 0, 0);
-		for (int i = 0; i < height; i++) {
-			memcpy(pData + memWidth * i, row_pointers[i], memWidth);
-		}
-
-		png_destroy_read_struct(&png_ptr, &info_ptr, 0);
-		fclose(fp);
-
-		return hbm;
-	} else {
-		return (HBITMAP)LoadImage(NULL, path + _T("toolbar.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 	}
 }
 
@@ -138,7 +100,7 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 	}
 
 	m_nButtonHeight = 16; //reset m_nButtonHeight
-	HBITMAP hBmp = LoadExternalToolBar();
+	HBITMAP hBmp = m_logobm.LoadExternalImage("toolbar");
 	if (NULL != hBmp) {
 		CBitmap *bmp = new CBitmap();
 		bmp->Attach(hBmp);
@@ -250,6 +212,7 @@ void CPlayerToolBar::CreateRemappedImgList(UINT bmID, int nRemapState, CImageLis
 	VERIFY(reImgList.Create(bmInfo.bmHeight, bmInfo.bmHeight, bmInfo.bmBitsPixel | ILC_MASK, 1, 0));//ILC_COLOR8
 	VERIFY(reImgList.Add(&bm, 0x00ff00ff) != -1);
 }
+
 void CPlayerToolBar::SwitchRemmapedImgList(UINT bmID, int nRemapState)
 {
 	//nRemapState = 0 Remap Active
@@ -269,7 +232,6 @@ void CPlayerToolBar::SwitchRemmapedImgList(UINT bmID, int nRemapState)
 		ctrl.SetDisabledImageList(&m_reImgListDisabled);//switch to
 	}
 }
-//--------------------------------------------------------------------------INS
 
 void CPlayerToolBar::ArrangeControls()
 {
@@ -433,6 +395,8 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 		iBlueRB		= 65;
 		iAlphaRB	= 255;
 
+		FILE* fp = m_logobm.FileExists("background");
+
 		switch(pTBCD->nmcd.dwDrawStage)
 		{
 		case CDDS_PREPAINT:
@@ -441,16 +405,20 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			CDC dc;
 			dc.Attach(pTBCD->nmcd.hdc);
 			CRect r;
+
+			GRADIENT_RECT gr[1] = {{0, 1}};
 			GetClientRect(&r);
-			TRIVERTEX tv[2] = {
-				//bobdynlan: {x, y, Red*256, Green*256, Blue*256, Alpha*256}
-				{ r.left, r.top, iRedLT*256, iGreenLT*256, iBlueLT*256, iAlphaLT*256},
-				{ r.right, r.bottom, iRedRB*256, iGreenRB*256, iBlueRB*256, iAlphaRB*256},
-			};
-			GRADIENT_RECT gr[1] = {
-				{0, 1},
-			};
-			dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+
+			if (NULL != fp) {
+				m_logobm.LoadExternalGradient("background", &dc, r, 21);
+			} else {
+				TRIVERTEX tv[2] = {
+					{r.left, r.top, iRedLT*256, iGreenLT*256, iBlueLT*256, iAlphaLT*256},
+					{r.right, r.bottom, iRedRB*256, iGreenRB*256, iBlueRB*256, iAlphaRB*256},
+				};
+				dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+			}
+
 			dc.Detach();
 			}
 			lr |= CDRF_NOTIFYITEMDRAW;
@@ -528,15 +496,20 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			}
 			
 			GRADIENT_RECT gr[1] = {{0, 1}};
-			CRect rt;
+
 			int sep[4] = {3, 8, 10, 11};
 			for (int j = 0; j < 4; j++) {
-				GetItemRect(sep[j], &rt);
-				TRIVERTEX tv[2] = {
-					{ rt.left, rt.top, iRedLT*256, iGreenLT*256, iBlueLT*256, iAlphaLT*256},
-					{ rt.right, rt.bottom, iRedRB*256, iGreenRB*256, iBlueRB*256, iAlphaRB*256},
-				};
-				dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+				GetItemRect(sep[j], &r);
+
+				if (NULL != fp) {
+					m_logobm.LoadExternalGradient("background", &dc, r, 21);
+				} else {
+					TRIVERTEX tv[2] = {
+						{r.left, r.top, iRedLT*256, iGreenLT*256, iBlueLT*256, iAlphaLT*256},
+						{r.right, r.bottom, iRedRB*256, iGreenRB*256, iBlueRB*256, iAlphaRB*256},
+					};
+					dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+				}
 			}
 
 			dc.SelectObject(&penSaved);

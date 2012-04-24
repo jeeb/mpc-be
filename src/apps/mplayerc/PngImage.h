@@ -31,4 +31,9 @@ class CPngImage : public CImage
 {
 public:
 	bool LoadFromResource(UINT id);
+
+	CString LoadCurrentPath();
+	FILE* FileExists(CString fn);
+	HBITMAP LoadExternalImage(CString fn);
+	void LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop);
 };

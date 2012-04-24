@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include "PngImage.h"
 #include "StatusLabel.h"
 
 
@@ -37,6 +38,8 @@ class CPlayerStatusBar : public CDialogBar
 	CBitmap m_bm;
 	UINT m_bmid;
 	HICON m_hIcon;
+
+	CPngImage m_logobm;
 
 	CRect m_time_rect;
 	CRect m_time_rect2;

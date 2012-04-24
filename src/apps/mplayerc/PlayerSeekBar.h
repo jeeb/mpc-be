@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include "PngImage.h"
+
 #define SHOW_DELAY 100
 #define AUTOPOP_DELAY 1000
 
@@ -43,6 +45,8 @@ private:
 	__int64 m_tooltipPos, m_tooltipLastPos;
 	CString m_tooltipText;
 	UINT_PTR m_tooltipTimer;
+
+	CPngImage m_logobm;
 
 	void MoveThumb(CPoint point);
 	__int64 CalculatePosition(CPoint point);

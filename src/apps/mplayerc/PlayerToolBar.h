@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include "PngImage.h"
 #include "VolumeCtrl.h"
 
 
@@ -36,7 +37,8 @@ private:
 	bool IsMuted();
 	void SetMute(bool fMute = true);
 	int getHitButtonIdx(CPoint point);
-	HBITMAP LoadExternalToolBar();
+
+	CPngImage m_logobm;
 
 	int m_nButtonHeight;
 	CImageList *m_pButtonsImages;

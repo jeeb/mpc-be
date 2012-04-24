@@ -364,17 +364,24 @@ void CPlayerStatusBar::OnPaint()
 		memdc.CreateCompatibleDC(&dc);
 		m_bmPaint.CreateCompatibleBitmap(&dc, r.Width(), r.Height());
 		CBitmap *bmOld = memdc.SelectObject(&m_bmPaint);
-		//background
-		TRIVERTEX tv[2] = {
-			{ r.left, r.top, 55*256, 60*256, 65*256, 255*256},
-			{ r.right, r.bottom, 35*256, 40*256, 45*256, 255*256},
-		};
-		GRADIENT_RECT gr[1] = {
-			{0, 1},
-		};
-		memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 
-		memdc.SetBkMode( TRANSPARENT );
+		//background
+
+		GRADIENT_RECT gr[1] = {{0, 1}};
+
+		FILE* fp = m_logobm.FileExists("background");
+
+		if (NULL != fp) {
+			m_logobm.LoadExternalGradient("background", &memdc, r, 54);
+		} else {
+			TRIVERTEX tv[2] = {
+				{r.left, r.top, 55*256, 60*256, 65*256, 255*256},
+				{r.right, r.bottom, 35*256, 40*256, 45*256, 255*256},
+			};
+			memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+		}
+
+		memdc.SetBkMode(TRANSPARENT);
 
 		CPen penPlayed1(PS_SOLID,0,RGB(0,0,0));
 		memdc.SelectObject(&penPlayed1);

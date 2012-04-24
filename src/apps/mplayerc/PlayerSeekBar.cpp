@@ -269,17 +269,25 @@ void CPlayerSeekBar::OnPaint()
 		memdc.CreateCompatibleDC(&dc);
 		m_bmPaint.CreateCompatibleBitmap(&dc, r.Width(), r.Height());
 		CBitmap *bmOld = memdc.SelectObject(&m_bmPaint);
-		//background
-		TRIVERTEX tv[2] = {
-			{ r.left, r.top, 80*256, 85*256, 90*256, 255*256},
-			{ r.right, r.bottom, 35*256, 40*256, 45*256, 255*256},
-		};
-		GRADIENT_RECT gr[1] = {
-			{0, 1},
-		};
-		memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 
-		memdc.SetBkMode( TRANSPARENT );
+		//background
+
+		GRADIENT_RECT gr[1] = {{0, 1}};
+
+		FILE* fp = m_logobm.FileExists("background");
+
+		if (NULL != fp) {
+			m_logobm.LoadExternalGradient("background", &memdc, r, 0);
+		} else {
+			TRIVERTEX tv[2] = {
+				{r.left, r.top, 80*256, 85*256, 90*256, 255*256},
+				{r.right, r.bottom, 35*256, 40*256, 45*256, 255*256},
+			};
+			memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+		}
+
+		memdc.SetBkMode(TRANSPARENT);
+
 		CPen penPlayed(AfxGetAppSettings().clrFaceABGR == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, AfxGetAppSettings().clrFaceABGR);//ins:2452 bobdynlan:Hide pen if color = transparency mask////clr_resLight 0x00ffffff = RGB(255,255,255)
 		CPen penPlayedOutline(AfxGetAppSettings().clrOutlineABGR == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, AfxGetAppSettings().clrOutlineABGR);//ins:2452 bobdynlan:Hide pen if color = transparency mask////clr_resShadow 0x00c0c0c0 = RGB(192,192,192)
 
