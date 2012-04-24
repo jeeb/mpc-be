@@ -924,6 +924,7 @@ public:
 	long		m_lSubtitleShift;
 	__int64		m_rtCurSubPos;
 	CString		m_strTitle;
+	CString		m_strFn;
 	bool		m_bToggleShader;
 	bool		m_bToggleShaderScreenSpace;
 	bool		m_bInOptions;
@@ -983,4 +984,8 @@ public:
 	CAtlList<CHdmvClipInfo::PlaylistItem> m_MPLSPlaylist;
 	bool m_bIsBDPlay;
 	bool OpenBD(CString Path);
+
+protected:
+	CString m_OldMessage;
+	CString FillMessage();
 };

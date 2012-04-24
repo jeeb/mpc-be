@@ -33,9 +33,6 @@ class CPPageTweaks : public CPPageBase
 {
 	DECLARE_DYNAMIC(CPPageTweaks)
 
-private:
-	bool m_fWMASFReader;
-
 public:
 	CPPageTweaks();
 	virtual ~CPPageTweaks();
@@ -45,8 +42,8 @@ public:
 
 	// Dialog Data
 	enum { IDD = IDD_PPAGETWEAKS };
-	int m_clrFaceABGR;//ins:2452 bobdynlan: user-selectable button color//
-	int m_clrOutlineABGR;//ins:2452 bobdynlan: user-selectable button outline color//
+	int m_clrFaceABGR;
+	int m_clrOutlineABGR;
 	int m_nJumpDistS;
 	int m_nJumpDistM;
 	int m_nJumpDistL;
@@ -73,11 +70,10 @@ protected:
 
 public:
 	afx_msg void OnUpdateCheck3(CCmdUI* pCmdUI);
-	afx_msg void OnClickClrDefault();//ins:2452 bobdynlan: reset colors//
-	afx_msg void OnClickClrFace();//ins:2452 bobdynlan: clrFace picker//
-	afx_msg void OnClickClrOutline();//ins:2452 bobdynlan: clrOutline picker//
-	afx_msg void OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult);//ins:2452 bobdynlan: show colors instead of an ungly number//
-	afx_msg void OnUpdateCheck2(CCmdUI* pCmdUI);
+	afx_msg void OnClickClrDefault();
+	afx_msg void OnClickClrFace();
+	afx_msg void OnClickClrOutline();
+	afx_msg void OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnBnClickedButton1();
 	afx_msg void OnUseTimeTooltipClicked();
 	afx_msg void OnChngOSDCombo();

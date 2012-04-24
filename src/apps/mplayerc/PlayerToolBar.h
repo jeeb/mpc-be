@@ -45,16 +45,13 @@ public:
 	CPlayerToolBar();
 	virtual ~CPlayerToolBar();
 
-//INS:2452 bobdynlan: system-independent colors for rc toolbar buttons
-//-----------------------------------------------------------------------------
 protected:
-	CImageList	m_reImgListActive;//ins:2452 bobdynlan:holds remapped active imgl//
-	CImageList	m_reImgListDisabled;//ins:2452 bobdynlan:holds remapped disabled imgl//
-	void CreateRemappedImgList(UINT bmID, int nRemapState, CImageList& reImgList);//ins:2452 bobdynlan:create remapped//
+	CImageList	m_reImgListActive;
+	CImageList	m_reImgListDisabled;
+	void CreateRemappedImgList(UINT bmID, int nRemapState, CImageList& reImgList);
 public:
-	void SwitchRemmapedImgList(UINT bmID, int nRemapState);//ins:2452 bobdynlan:switch remapped//
-	bool fDisableImgListRemap;//ins:2452 bobdynlan:dont remap if external bmp is used//
-//--------------------------------------------------------------------------INS
+	void SwitchRemmapedImgList(UINT bmID, int nRemapState);
+	bool fDisableImgListRemap;
 	int GetVolume();
 	int GetMinWidth();
 	void SetVolume(int volume);
@@ -74,15 +71,13 @@ public:
 	// Generated message map functions
 protected:
 	//{{AFX_MSG(CPlayerToolBar)
-        afx_msg void OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult);//ins:2217 bobdynlan:customdraw//
-	//rem:2103 bobdynlan:moved to customdraw//afx_msg void OnPaint();
+	afx_msg void OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnInitialUpdate();
 	afx_msg BOOL OnVolumeMute(UINT nID);
 	afx_msg void OnUpdateVolumeMute(CCmdUI* pCmdUI);
 	afx_msg BOOL OnVolumeUp(UINT nID);
 	afx_msg BOOL OnVolumeDown(UINT nID);
-	//rem:2233 bobdynlan:no more NC-area//afx_msg void OnNcPaint();
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	//}}AFX_MSG

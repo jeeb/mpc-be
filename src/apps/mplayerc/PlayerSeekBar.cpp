@@ -131,21 +131,13 @@ void CPlayerSeekBar::SetPos(__int64 pos)
 
 void CPlayerSeekBar::SetPosInternal(__int64 pos)
 {
-//INS:2452 bobdynlan: try to fix OnPaint spam when paused and after playback ends
-//dont want to mess with mainfrm timers, but something is wrong
-//TRACE("(SeekPosInternal) pos=%I64x old=%I64x",pos,m_pos);
-//-----------------------------------------------------------------------------
-	if(AfxGetAppSettings().fDisableXPToolbars)
-	{
+	if(AfxGetAppSettings().fDisableXPToolbars) {
 		if(m_pos == pos || m_stop <= pos) return;
+	} else {
+		if (m_pos == pos) {
+			return;
+		}
 	}
-	else
-	{
-//--------------------------------------------------------------------------INS
-	if (m_pos == pos) {
-		return;
-	}
-	}//ins:2452 bobdynlan://
 
 	CRect before = GetThumbRect();
 	m_pos = min(max(pos, m_start), m_stop);
@@ -153,12 +145,13 @@ void CPlayerSeekBar::SetPosInternal(__int64 pos)
 	CRect after = GetThumbRect();
 
 	if (before != after) {
-		if(!AfxGetAppSettings().fDisableXPToolbars)/*ins:2452 bobdynlan:no more thumb*/
-		InvalidateRect(before | after);
+		if(!AfxGetAppSettings().fDisableXPToolbars) {
+			InvalidateRect (before | after);
+		}
 
 		CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
 		if (pFrame && (AfxGetAppSettings().fUseWin7TaskBar && pFrame->m_pTaskbarList)) {
-			pFrame->m_pTaskbarList->SetProgressValue ( pFrame->m_hWnd, pos, m_stop );
+			pFrame->m_pTaskbarList->SetProgressValue (pFrame->m_hWnd, pos, m_stop);
 		}
 	}
 }
@@ -167,41 +160,31 @@ CRect CPlayerSeekBar::GetChannelRect()
 {
 	CRect r;
 	GetClientRect(&r);
-//INS:2452 bobdynlan: move channel
-//-----------------------------------------------------------------------------
-	if(AfxGetAppSettings().fDisableXPToolbars)
-	{
-		r.DeflateRect(10,10,12,5);
+	
+	if(AfxGetAppSettings().fDisableXPToolbars) {
+		r.DeflateRect(1,1,1,1); 
+	} else {
+		r.DeflateRect(8, 9, 9, 0);
+		r.bottom = r.top + 5;
 	}
-	else
-	{
-//--------------------------------------------------------------------------INS
-	r.DeflateRect(8, 9, 9, 0);
-	r.bottom = r.top + 5;
-	}//ins:2452 bobdynlan://	//TRACE("(Channel %d,%d W=%d,H=%d)\n",r.left,r.top,r.Width(),r.Height());
+
 	return(r);
 }
 
 CRect CPlayerSeekBar::GetThumbRect()
 {
-	//	bool fEnabled = m_fEnabled || m_start >= m_stop;
-
 	CRect r = GetChannelRect();
 
-	int x = r.left + (int)((m_start < m_stop /*&& fEnabled*/) ? (__int64)r.Width() * (m_pos - m_start) / (m_stop - m_start) : 0);
+	int x = r.left + (int)((m_start < m_stop) ? (__int64)r.Width() * (m_pos - m_start) / (m_stop - m_start) : 0);
 	int y = r.CenterPoint().y;
-//INS:2452 bobdynlan: small rounded thumb width=3pix(outline,active,outline), height=5pix(same as channel)
-//-----------------------------------------------------------------------------
-	if(AfxGetAppSettings().fDisableXPToolbars)
-	{
+
+	if(AfxGetAppSettings().fDisableXPToolbars) {
 		 r.SetRect(x, y-2, x+3, y+3);
+	} else {
+		r.SetRect(x, y, x, y);
+		r.InflateRect(6, 7, 7, 8);
 	}
-	else
-	{
-//--------------------------------------------------------------------------INS
-	r.SetRect(x, y, x, y);
-	r.InflateRect(6, 7, 7, 8);
-	}//ins:2452 bobdynlan://	//TRACE("(Thumb %d,%d W=%d,H=%d)\n",r.left,r.top,r.Width(),r.Height());
+
 	return(r);
 }
 
@@ -268,11 +251,17 @@ void CPlayerSeekBar::OnPaint()
 	CPaintDC dc(this); // device context for painting
 
 	bool fEnabled = m_fEnabled && m_start < m_stop;
-//INS:2212 bobdynlan: redesigned progress bar
-//not much flicker on Aero, hell without. 2452: have to use memdc... 
-//-----------------------------------------------------------------------------
-	if (AfxGetAppSettings().fDisableXPToolbars)
-	{
+	if (AfxGetAppSettings().fDisableXPToolbars) {
+		CRect rt;
+		CString str;
+		str = ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strFn; 
+		
+		BLENDFUNCTION bf;  
+		bf.AlphaFormat	= 0;
+		bf.BlendFlags	= 0;
+		bf.BlendOp		= AC_SRC_OVER;
+		bf.SourceConstantAlpha = 100;
+		
 		CDC memdc;
 		CBitmap m_bmPaint;
 		CRect r,rf,rc;
@@ -282,9 +271,8 @@ void CPlayerSeekBar::OnPaint()
 		CBitmap *bmOld = memdc.SelectObject(&m_bmPaint);
 		//background
 		TRIVERTEX tv[2] = {
-			//bobdynlan: {x,y,Red*256,Green*256,Blue*256,Alpha*256}
-			{ r.left, r.top, 15*256, 20*256, 25*256, 255*256},
-			{ r.right, r.bottom, 85*256, 90*256, 95*256, 255*256}//same as PlayerToolBar gradient - top
+			{ r.left, r.top, 80*256, 85*256, 90*256, 255*256},
+			{ r.right, r.bottom, 35*256, 40*256, 45*256, 255*256},
 		};
 		GRADIENT_RECT gr[1] = {
 			{0, 1},
@@ -297,114 +285,146 @@ void CPlayerSeekBar::OnPaint()
 
    		//outer frame shadow
 		rf = GetChannelRect();
-		rf.InflateRect(2, 2, 2 + GetThumbRect().Width(), 1);
-		memdc.Draw3dRect(rf,0x0019140f,0x0019140f);//clr_tbGrdShadow,clr_tbGrdShadow
-		//outer frame light
+		rf.InflateRect(1, 0, GetThumbRect().Width()-2, 1);
+		COLORREF col = RGB(15,20,25);
+		memdc.Draw3dRect(rf,col,col);
 		rf.InflateRect(1,1,1,1);
-		memdc.Draw3dRect(rf,0x00645f5a,0x0037322d);//clr_pbFrame,clr_csShadow 
-
-		//channel
+		memdc.Draw3dRect(rf,col,col);
 		rc = GetChannelRect();
-		int nposx = GetThumbRect().right;
+		int nposx = GetThumbRect().right-2;
 		int nposy = r.top;
+		
+		CPen penPlayed1(PS_SOLID,0,RGB(145,150,155));
+		memdc.SelectObject(&penPlayed1);
+		memdc.MoveTo(rc.left +1, rc.top +1);
+		memdc.LineTo(rc.right, rc.top +1);	
+		memdc.MoveTo(rc.left +1, rc.top +17);
+		memdc.LineTo(rc.right, rc.top +17);	
+
 		if (fEnabled)
 		{	
-			//dc.RoundRect(rc.left,rc.top,nposx +1,rc.top +5,3,3);
-			CPen *penOld = memdc.SelectObject(&penPlayedOutline);
-			memdc.MoveTo(rc.left, rc.top +1);//outline_left
-			memdc.LineTo(rc.left, rc.top +4);
-			memdc.MoveTo(rc.left +1, rc.top);//outline_top
-			memdc.LineTo(nposx, rc.top);
-			memdc.MoveTo(nposx, rc.top +1);//outline_right
-			memdc.LineTo(nposx, rc.top +4);
-			memdc.MoveTo(rc.left +1, rc.top +4);//outline_bottom
-			memdc.LineTo(nposx, rc.top +4);
-			memdc.SelectObject(&penPlayed);
+			CBrush b(RGB(145, 150, 155));
+			CRect rb(rc.left + 1,rc.top + 2,nposx, rc.bottom - 1);
+			memdc.FillRect(rb,&b);
+
+			AlphaBlend(memdc.m_hDC, rc.left,rc.top+10, r.Width() -2, 0.4*rc.Height(), memdc, 0, 0, rc.left,rc.top+10, bf);
+
+			CPen penPlayed2(PS_SOLID,0,RGB(215,220,225));
+			memdc.SelectObject(&penPlayed2);
 			memdc.MoveTo(rc.left +1, rc.top +1);//active_top
 			memdc.LineTo(nposx, rc.top +1);		
-			memdc.MoveTo(rc.left +1, rc.top +2);//active_middle
-			memdc.LineTo(nposx, rc.top +2);		
-			memdc.MoveTo(rc.left +1, rc.top +3);//active_bottom
-			memdc.LineTo(nposx, rc.top +3);		
-			memdc.SelectObject(penOld);
+
+			CPen penPlayed3(PS_SOLID,0,RGB(165,170,175));
+			memdc.SelectObject(&penPlayed3);
+			memdc.MoveTo(rc.left +1, rc.top +17);//active_top
+			memdc.LineTo(nposx, rc.top +17);
 		}
+
+		CFont font2;
+		memdc.SetTextColor(RGB(165,170,175));
+		font2.CreateFont(
+						13,							// nHeight
+						0,							// nWidth
+						0,							// nEscapement
+						0,							// nOrientation
+						FW_NORMAL,					// nWeight
+						FALSE,						// bItalic
+						FALSE,						// bUnderline
+						0,							// cStrikeOut
+						ANSI_CHARSET,				// nCharSet
+						OUT_RASTER_PRECIS,			// nOutPrecision
+						CLIP_DEFAULT_PRECIS,		// nClipPrecision
+						ANTIALIASED_QUALITY,        // nQuality
+						VARIABLE_PITCH | FF_MODERN, // nPitchAndFamily
+						_T("Tahoma")                // lpszFacename
+						);
+		CFont* oldfont2 = memdc.SelectObject(&font2);
+		SetBkMode(memdc, TRANSPARENT);
+		rt = rc;
+		rt.left = rc.left+6;
+		memdc.DrawText(str, str.GetLength(), &rt, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
+
+		memdc.SetTextColor(RGB(235,240,245));
+		CRect rt2;
+		rt2 = rc;
+		rt2.left = rc.left+6;
+		rt2.right = nposx;
+		memdc.DrawText(str, str.GetLength(), &rt2, DT_LEFT|DT_VCENTER|DT_SINGLELINE);
+
 		dc.BitBlt(r.left, r.top, r.Width(), r.Height(), &memdc, 0, 0, SRCCOPY);
-		//memdc.SelectObject(bmOld);
 		DeleteObject(memdc.SelectObject(bmOld));
 		memdc.DeleteDC();
 		m_bmPaint.DeleteObject();
-	}
-	else
-	{
-//--------------------------------------------------------------------------INS
-	COLORREF
-	white = GetSysColor(COLOR_WINDOW),
-	shadow = GetSysColor(COLOR_3DSHADOW),
-	light = GetSysColor(COLOR_3DHILIGHT),
-	bkg = GetSysColor(COLOR_BTNFACE);
+	} else {
+		COLORREF
+		white	= GetSysColor(COLOR_WINDOW),
+		shadow	= GetSysColor(COLOR_3DSHADOW),
+		light	= GetSysColor(COLOR_3DHILIGHT),
+		bkg		= GetSysColor(COLOR_BTNFACE);
 
-	// thumb
-	{
-		CRect r = GetThumbRect(), r2 = GetInnerThumbRect();
-		CRect rt = r, rit = r2;
-
-		dc.Draw3dRect(&r, light, 0);
-		r.DeflateRect(0, 0, 1, 1);
-		dc.Draw3dRect(&r, light, shadow);
-		r.DeflateRect(1, 1, 1, 1);
-
-		CBrush b(bkg);
-
-		dc.FrameRect(&r, &b);
-		r.DeflateRect(0, 1, 0, 1);
-		dc.FrameRect(&r, &b);
-
-		r.DeflateRect(1, 1, 0, 0);
-		dc.Draw3dRect(&r, shadow, bkg);
-
-		if (fEnabled) {
-			r.DeflateRect(1, 1, 1, 2);
-			CPen white(PS_INSIDEFRAME, 1, white);
-			CPen* old = dc.SelectObject(&white);
-			dc.MoveTo(r.left, r.top);
-			dc.LineTo(r.right, r.top);
-			dc.MoveTo(r.left, r.bottom);
-			dc.LineTo(r.right, r.bottom);
-			dc.SelectObject(old);
-			dc.SetPixel(r.CenterPoint().x, r.top, 0);
-			dc.SetPixel(r.CenterPoint().x, r.bottom, 0);
-		}
-
-		dc.SetPixel(r.CenterPoint().x+5, r.top-4, bkg);
-
+		// thumb
 		{
-			CRgn rgn1, rgn2;
-			rgn1.CreateRectRgnIndirect(&rt);
-			rgn2.CreateRectRgnIndirect(&rit);
-			ExtSelectClipRgn(dc, rgn1, RGN_DIFF);
-			ExtSelectClipRgn(dc, rgn2, RGN_OR);
+			CRect r = GetThumbRect(), r2 = GetInnerThumbRect();
+			CRect rt = r, rit = r2;
+
+			dc.Draw3dRect(&r, light, 0);
+			r.DeflateRect(0, 0, 1, 1);
+			dc.Draw3dRect(&r, light, shadow);
+			r.DeflateRect(1, 1, 1, 1);
+
+			CBrush b(bkg);
+
+			dc.FrameRect(&r, &b);
+			r.DeflateRect(0, 1, 0, 1);
+			dc.FrameRect(&r, &b);
+
+			r.DeflateRect(1, 1, 0, 0);
+			dc.Draw3dRect(&r, shadow, bkg);
+
+			if (fEnabled) {
+				r.DeflateRect(1, 1, 1, 2);
+				CPen white(PS_INSIDEFRAME, 1, white);
+				CPen* old = dc.SelectObject(&white);
+				dc.MoveTo(r.left, r.top);
+				dc.LineTo(r.right, r.top);
+				dc.MoveTo(r.left, r.bottom);
+				dc.LineTo(r.right, r.bottom);
+				dc.SelectObject(old);
+				dc.SetPixel(r.CenterPoint().x, r.top, 0);
+				dc.SetPixel(r.CenterPoint().x, r.bottom, 0);
+			}
+
+			dc.SetPixel(r.CenterPoint().x+5, r.top-4, bkg);
+
+			{
+				CRgn rgn1, rgn2;
+				rgn1.CreateRectRgnIndirect(&rt);
+				rgn2.CreateRectRgnIndirect(&rit);
+				ExtSelectClipRgn(dc, rgn1, RGN_DIFF);
+				ExtSelectClipRgn(dc, rgn2, RGN_OR);
+			}
 		}
+
+		// channel
+		{
+			CRect r = GetChannelRect();
+
+			dc.FillSolidRect(&r, fEnabled ? white : bkg);
+			r.InflateRect(1, 1);
+			dc.Draw3dRect(&r, shadow, light);
+			dc.ExcludeClipRect(&r);
+		}
+
+		// background
+		{
+			CRect r;
+			GetClientRect(&r);
+			CBrush b(bkg);
+			dc.FillRect(&r, &b);
+		}
+
 	}
-
-	// channel
-	{
-		CRect r = GetChannelRect();
-
-		dc.FillSolidRect(&r, fEnabled ? white : bkg);
-		r.InflateRect(1, 1);
-		dc.Draw3dRect(&r, shadow, light);
-		dc.ExcludeClipRect(&r);
-	}
-
-	// background
-	{
-		CRect r;
-		GetClientRect(&r);
-		CBrush b(bkg);
-		dc.FillRect(&r, &b);
-	}
-
-	}//ins:2452 bobdynlan://
+	
 	// Do not call CDialogBar::OnPaint() for painting messages
 }
 
@@ -419,28 +439,22 @@ void CPlayerSeekBar::OnSize(UINT nType, int cx, int cy)
 
 void CPlayerSeekBar::OnLButtonDown(UINT nFlags, CPoint point)
 {
-//INS:2452 bobdynlan: no update until drag end
-//-----------------------------------------------------------------------------
-	if (AfxGetAppSettings().fDisableXPToolbars && m_fEnabled)
-	{
+	if (AfxGetAppSettings().fDisableXPToolbars && m_fEnabled) {
 		SetCapture();
 		MoveThumb(point);
-	}
-	else
-	{
-//--------------------------------------------------------------------------INS
-	if (m_fEnabled && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
-		SetCapture();
-		MoveThumb(point);
-		GetParent()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
 	} else {
-		CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
-		if (!pFrame->m_fFullScreen) {
-			MapWindowPoints(pFrame, &point, 1);
-			pFrame->PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
+		if (m_fEnabled && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
+			SetCapture();
+			MoveThumb(point);
+			GetParent()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
+		} else {
+			CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
+			if (!pFrame->m_fFullScreen) {
+				MapWindowPoints(pFrame, &point, 1);
+				pFrame->PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
+			}
 		}
 	}
-        }//ins:2452 bobdynlan://
 
 	CDialogBar::OnLButtonDown(nFlags, point);
 }
@@ -448,11 +462,10 @@ void CPlayerSeekBar::OnLButtonDown(UINT nFlags, CPoint point)
 void CPlayerSeekBar::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	ReleaseCapture();
-//INS:2452 bobdynlan: no update until drag end
-//-----------------------------------------------------------------------------
-	if(AfxGetAppSettings().fDisableXPToolbars && m_fEnabled)
+	if(AfxGetAppSettings().fDisableXPToolbars && m_fEnabled) {
 		GetParent()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
-//--------------------------------------------------------------------------INS
+	}
+
 	CDialogBar::OnLButtonUp(nFlags, point);
 }
 
@@ -537,7 +550,8 @@ BOOL CPlayerSeekBar::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 BOOL CPlayerSeekBar::OnPlayStop(UINT nID)
 {
 	SetPos(0);
-	Invalidate();//ins:2212 bobdynlan://
+	Invalidate();
+
 	return FALSE;
 }
 

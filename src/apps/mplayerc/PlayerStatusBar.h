@@ -39,6 +39,7 @@ class CPlayerStatusBar : public CDialogBar
 	HICON m_hIcon;
 
 	CRect m_time_rect;
+	CRect m_time_rect2;
 
 	void Relayout();
 
@@ -55,6 +56,8 @@ public:
 	void SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur, bool fHighPrecision, const GUID* pTimeFormat = &TIME_FORMAT_MEDIA_TIME);
 
 	CString GetStatusTimer();
+	CString GetStatusMessage();
+
 	void ShowTimer(bool fShow);
 
 	// Overrides

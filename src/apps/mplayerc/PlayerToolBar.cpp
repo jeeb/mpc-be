@@ -37,19 +37,17 @@ typedef HRESULT (__stdcall * SetWindowThemeFunct)(HWND hwnd, LPCWSTR pszSubAppNa
 // CPlayerToolBar
 
 IMPLEMENT_DYNAMIC(CPlayerToolBar, CToolBar)
-CPlayerToolBar::CPlayerToolBar() : fDisableImgListRemap(false)//ins:2452 bobdynlan:dont remap if external bmp is used//
-//	: m_nButtonHeight(16)
+CPlayerToolBar::CPlayerToolBar() : fDisableImgListRemap(false)
 {
 }
 
 CPlayerToolBar::~CPlayerToolBar()
 {
-//	if (m_reImgListActive.GetSafeHandle()) m_reImgListActive.DeleteImageList();//ins:2452 bobdynlan:cleanup, not needed//
-//	if (m_reImgListDisabled.GetSafeHandle()) m_reImgListDisabled.DeleteImageList();//ins:2452 bobdynlan:cleanup, not needed//
 	if (NULL != m_pButtonsImages) {
 		delete m_pButtonsImages;
 		m_pButtonsImages = NULL;
-	}}
+	}
+}
 
 HBITMAP CPlayerToolBar::LoadExternalToolBar()
 {
@@ -91,10 +89,11 @@ HBITMAP CPlayerToolBar::LoadExternalToolBar()
 BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 {
 	if (!__super::CreateEx(pParentWnd,
-						  TBSTYLE_FLAT|TBSTYLE_TRANSPARENT|TBSTYLE_AUTOSIZE/*ins:2233 bobdynlan:add erase msg in customdraw*/|TBSTYLE_CUSTOMERASE,
-						  WS_CHILD|WS_VISIBLE|CBRS_ALIGN_BOTTOM|CBRS_TOOLTIPS/*rem:2233 bobdynlan:disabled borders for now, hate NC-area*, CRect(2,2,0,3)*/)) {
+						  TBSTYLE_FLAT|TBSTYLE_TRANSPARENT|TBSTYLE_AUTOSIZE|TBSTYLE_CUSTOMERASE,
+						  WS_CHILD|WS_VISIBLE|CBRS_ALIGN_BOTTOM|CBRS_TOOLTIPS)) {
 		return FALSE;
 	}
+
 	if (!LoadToolBar(IDB_PLAYERTOOLBAR)) {
 		return FALSE;
 	}
@@ -115,11 +114,10 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 		TBBS_SEPARATOR,
 		TBBS_BUTTON, TBBS_BUTTON, TBBS_BUTTON, TBBS_BUTTON,
 		TBBS_SEPARATOR,
-		TBBS_BUTTON/*|TBSTYLE_DROPDOWN*/,
+		TBBS_BUTTON,
 		TBBS_SEPARATOR,
 		TBBS_SEPARATOR,
 		TBBS_CHECKBOX,
-		/*TBBS_SEPARATOR,*/
 	};
 
 	for (int i = 0; i < countof(styles); i++) {
@@ -139,7 +137,6 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 		}
 	}
 
-	// quick and dirty code from foxx1337; will leak, but don't care yet
 	m_nButtonHeight = 16; //reset m_nButtonHeight
 	HBITMAP hBmp = LoadExternalToolBar();
 	if (NULL != hBmp) {
@@ -167,31 +164,27 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 			}
 			m_nButtonHeight = bitmapBmp.bmHeight;
 			GetToolBarCtrl().SetImageList(m_pButtonsImages);
-			fDisableImgListRemap = true;//ins:2452 bobdynlan:dont remap if external bmp is used//
+			fDisableImgListRemap = true;
 		}
 		delete bmp;
 		DeleteObject(hBmp);
 	}
-//INS:2452 bobdynlan: system-independent colors for rc toolbar buttons
-//-----------------------------------------------------------------------------
+
 	AppSettings& s = AfxGetAppSettings();
-	if (s.fDisableXPToolbars)
-	{
-		if (!fDisableImgListRemap)
-		{
+	if (s.fDisableXPToolbars) {
+		if (!fDisableImgListRemap) {
 			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 0);//nRemapState = 0 Remap Active
 			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 1);//nRemapState = 1 Remap Disabled
 		}
-		//ins:2451 bobdynlan: blend in separators when no XP-theming//
+		
 		COLORSCHEME cs;
-			cs.dwSize = sizeof(COLORSCHEME);
-			cs.clrBtnHighlight = 0x0046413c; //clr_csLight = RGB( 60, 65, 70)
-			cs.clrBtnShadow    = 0x0037322d;//clr_csShadow = RGB( 45, 50, 55)
+		cs.dwSize			= sizeof(COLORSCHEME);
+		cs.clrBtnHighlight	= 0x0046413c; //clr_csLight = RGB( 60, 65, 70)
+		cs.clrBtnShadow		= 0x0037322d;//clr_csShadow = RGB( 45, 50, 55)
 		GetToolBarCtrl().SetColorScheme(&cs);
-		//ins:2451 bobdynlan:toolbar left border//
 		GetToolBarCtrl().SetIndent(5);
 	}
-//--------------------------------------------------------------------------INS
+
 	return TRUE;
 }
 
@@ -203,18 +196,10 @@ BOOL CPlayerToolBar::PreCreateWindow(CREATESTRUCT& cs)
 
 	m_dwStyle &= ~CBRS_BORDER_TOP;
 	m_dwStyle &= ~CBRS_BORDER_BOTTOM;
-	//	m_dwStyle |= CBRS_SIZE_FIXED;
 
 	return TRUE;
 }
 
-//INS:2452 bobdynlan: system-independent colors for rc toolbar buttons
-//my first version was around foxx1337's implementation. 
-//fine on create, but after adding switch support without restart, 
-//gdi leaks counter increased with ~8 every time :)
-//then I took a peek at XTrueColorToolBar to see if I can fix it
-//got some skeleton parts of functions from there but did not help me much
-//-----------------------------------------------------------------------------
 void CPlayerToolBar::CreateRemappedImgList(UINT bmID, int nRemapState, CImageList& reImgList)
 {
 	//nRemapState = 0 Remap Active
@@ -262,8 +247,6 @@ void CPlayerToolBar::CreateRemappedImgList(UINT bmID, int nRemapState, CImageLis
 	}
 	BITMAP bmInfo;
 	VERIFY(bm.GetBitmap(&bmInfo));
-	//int m_nBtnCount = bmInfo.bmWidth / bmInfo.bmHeight;
-	//ASSERT(m_nBtnCount >= 10);
 	VERIFY(reImgList.Create(bmInfo.bmHeight, bmInfo.bmHeight, bmInfo.bmBitsPixel | ILC_MASK, 1, 0));//ILC_COLOR8
 	VERIFY(reImgList.Add(&bm, 0x00ff00ff) != -1);
 }
@@ -274,15 +257,12 @@ void CPlayerToolBar::SwitchRemmapedImgList(UINT bmID, int nRemapState)
 	//nRemapState = 2 Undo  Active
 	//nRemapState = 3 Undo  Disabled
 	CToolBarCtrl& ctrl = GetToolBarCtrl();
-	if (nRemapState == 0 || nRemapState == 2)
-	{
+	if (nRemapState == 0 || nRemapState == 2) {
 		if (m_reImgListActive.GetSafeHandle()) m_reImgListActive.DeleteImageList();//cleanup
 		CreateRemappedImgList(bmID, nRemapState, m_reImgListActive);//remap
 		ASSERT(m_reImgListActive.GetSafeHandle());
 		ctrl.SetImageList(&m_reImgListActive);//switch to
-	}
-	else
-	{
+	} else {
 		if (m_reImgListDisabled.GetSafeHandle()) m_reImgListDisabled.DeleteImageList();//cleanup
 		CreateRemappedImgList(bmID, nRemapState, m_reImgListDisabled);//remap
 		ASSERT(m_reImgListDisabled.GetSafeHandle());
@@ -296,73 +276,62 @@ void CPlayerToolBar::ArrangeControls()
 	if (!::IsWindow(m_volctrl.m_hWnd)) {
 		return;
 	}
-//INS:2451 bobdynlan: system-independent colors for rc toolbar buttons 
-//-----------------------------------------------------------------------------
+
 	AppSettings& s = AfxGetAppSettings();
-	//TRACE("\nfToolbarRefresh=%d\n",s.fToolbarRefresh);
-	if (s.fDisableXPToolbars && s.fToolbarRefresh)//if switching from default to handsome :)
-	{
-		if (!fDisableImgListRemap)
-		{		
+	if (s.fDisableXPToolbars && s.fToolbarRefresh) {//if switching from default to handsome :)
+		if (!fDisableImgListRemap) {		
 			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 0);//nRemapState = 0 Remap Active
 			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 1);//nRemapState = 1 Remap Disabled
 		}
-		//ins:2451 bobdynlan: blend in separators when no XP-theming//
+
 		COLORSCHEME cs;
-			cs.dwSize = sizeof(COLORSCHEME);
-			cs.clrBtnHighlight = 0x0046413c; //clr_csLight = RGB( 60, 65, 70)
-			cs.clrBtnShadow    = 0x0037322d;//clr_csShadow = RGB( 45, 50, 55)
+		cs.dwSize			= sizeof(COLORSCHEME);
+		cs.clrBtnHighlight	= 0x0046413c; //clr_csLight = RGB( 60, 65, 70)
+		cs.clrBtnShadow		= 0x0037322d;//clr_csShadow = RGB( 45, 50, 55)
+
 		GetToolBarCtrl().SetColorScheme(&cs);
-		//ins:2451 bobdynlan:toolbar left border//
 		GetToolBarCtrl().SetIndent(5);
-		//ins:2233 bobdynlan: refresh volume control, too
-		if (::IsWindow(m_volctrl.GetSafeHwnd()))
-		{
+
+		if (::IsWindow(m_volctrl.GetSafeHwnd())) {
 			m_volctrl.EnableWindow(FALSE);
 			m_volctrl.EnableWindow(TRUE);
 		}
 		//reset flag from PPageTweaks
 		s.fToolbarRefresh=false;
 		//kill default theme?!
-		if (HMODULE h = LoadLibrary(_T("uxtheme.dll")))
-		{
+		if (HMODULE h = LoadLibrary(_T("uxtheme.dll"))) {
 			SetWindowThemeFunct f = (SetWindowThemeFunct)GetProcAddress(h, "SetWindowTheme");
 			if (f) f(m_hWnd, L" ", L" ");
 			FreeLibrary(h);
 		}
-	}
-	else if (!s.fDisableXPToolbars && s.fToolbarRefresh)//if switching from handsome to default :(
-	{
-		if (!fDisableImgListRemap)
-		{		
+	} else if (!s.fDisableXPToolbars && s.fToolbarRefresh) {//if switching from handsome to default :(
+		if (!fDisableImgListRemap) {		
 			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 2);//nRemapState = 2 Undo  Active
 			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 3);//nRemapState = 3 Undo  Disabled
 		}
-		//ins:2451 bobdynlan: blend in separators when no XP-theming//
+		
 		COLORSCHEME cs;
-			cs.dwSize = sizeof(COLORSCHEME);
-			cs.clrBtnHighlight = GetSysColor(COLOR_BTNFACE);
-			cs.clrBtnShadow    = GetSysColor(COLOR_BTNSHADOW);
+		cs.dwSize			= sizeof(COLORSCHEME);
+		cs.clrBtnHighlight	= GetSysColor(COLOR_BTNFACE);
+		cs.clrBtnShadow		= GetSysColor(COLOR_BTNSHADOW);
+
 		GetToolBarCtrl().SetColorScheme(&cs);
-		//ins:2451 bobdynlan:toolbar left border//
 		GetToolBarCtrl().SetIndent(0);
-		//ins:2233 bobdynlan: refresh volume control, too
-		if (::IsWindow(m_volctrl.GetSafeHwnd()))
-		{
+
+		if (::IsWindow(m_volctrl.GetSafeHwnd())) {
 			m_volctrl.EnableWindow(FALSE);
 			m_volctrl.EnableWindow(TRUE);
 		}
 		//reset flag from PPageTweaks
 		s.fToolbarRefresh=false;
 		//restore default theme?!
-		if (HMODULE h = LoadLibrary(_T("uxtheme.dll")))
-		{
+		if (HMODULE h = LoadLibrary(_T("uxtheme.dll"))) {
 			SetWindowThemeFunct f = (SetWindowThemeFunct)GetProcAddress(h, "SetWindowTheme");
 			if (f) f(m_hWnd, L"Explorer", NULL);
 			FreeLibrary(h);
 		}
 	}
-//--------------------------------------------------------------------------INS
+
 	CRect r;
 	GetClientRect(&r);
 
@@ -374,14 +343,12 @@ void CPlayerToolBar::ArrangeControls()
 	CRect vr;
 	m_volctrl.GetClientRect(&vr);
 	CRect vr2(r.right + br.right - 60, r.bottom - 25, r.right +br.right + 6, r.bottom);
-//INS:2451 bobdynlan: centered volume control with large external toolbar bitmap
-//-----------------------------------------------------------------------------
-	if (s.fDisableXPToolbars)
-	{
+
+	if (s.fDisableXPToolbars) {
 		int m_nBMedian = r.bottom - 3 - 0.5 * m_nButtonHeight;
 		vr2.SetRect(r.right + br.right - 60, m_nBMedian - 14, r.right +br.right + 6, m_nBMedian + 11);
 	}
-//--------------------------------------------------------------------------INS
+
 	m_volctrl.MoveWindow(vr2);
 
 	UINT nID;
@@ -389,7 +356,6 @@ void CPlayerToolBar::ArrangeControls()
 	int iImage;
 	GetButtonInfo(12, nID, nStyle, iImage);
 	SetButtonInfo(11, GetItemID(11), TBBS_SEPARATOR, vr2.left - iImage - r10.right - (r10.bottom - r10.top) + 11);
-	//SetButtonInfo(10, GetItemID(10),TBBS_SEPARATOR, 1);//ins:2451 bobdynlan:litle hack to hide dummy separator, XP-theming only//
 }
 
 void CPlayerToolBar::SetMute(bool fMute)
@@ -433,39 +399,40 @@ int CPlayerToolBar::GetMinWidth()
 
 void CPlayerToolBar::SetVolume(int volume)
 {
-	/*
-		volume = (int)pow(10, ((double)volume)/5000+2);
-		volume = max(min(volume, 100), 1);
-	*/
 	m_volctrl.SetPosInternal(volume);
 }
 
 BEGIN_MESSAGE_MAP(CPlayerToolBar, CToolBar)
-	//rem:2103 bobdynlan:paint on customdraw//ON_WM_PAINT()
-	ON_NOTIFY_REFLECT(NM_CUSTOMDRAW, OnCustomDraw)//ins:2217 bobdynlan:customdraw//
+	ON_NOTIFY_REFLECT(NM_CUSTOMDRAW, OnCustomDraw)
 	ON_WM_SIZE()
 	ON_MESSAGE_VOID(WM_INITIALUPDATE, OnInitialUpdate)
 	ON_COMMAND_EX(ID_VOLUME_MUTE, OnVolumeMute)
 	ON_UPDATE_COMMAND_UI(ID_VOLUME_MUTE, OnUpdateVolumeMute)
 	ON_COMMAND_EX(ID_VOLUME_UP, OnVolumeUp)
 	ON_COMMAND_EX(ID_VOLUME_DOWN, OnVolumeDown)
-	//rem:2103 bobdynlan:no more NC-area//ON_WM_NCPAINT()
 	ON_WM_LBUTTONDOWN()
 	ON_WM_MOUSEMOVE()
 END_MESSAGE_MAP()
 
 // CPlayerToolBar message handlers
 
-//INS:2217 bobdynlan: customdraw
-//-----------------------------------------------------------------------------
 void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 {  
-	//if (m_bDelayedButtonLayout) Layout(); //I guess this is not needed on customdraw
 	NMTBCUSTOMDRAW* pTBCD = reinterpret_cast<NMTBCUSTOMDRAW*>( pNMHDR );
 	LRESULT lr = CDRF_DODEFAULT;
 	AppSettings& s = AfxGetAppSettings();
-	if (s.fDisableXPToolbars)
-	{
+	if (s.fDisableXPToolbars) {
+	
+		int iRedRB, iGreenRB, iBlueRB, iRedLT, iGreenLT, iBlueLT, iAlphaLT, iAlphaRB;
+		iRedLT		= 85;
+		iGreenLT	= 90;
+		iBlueLT		= 95;
+		iAlphaLT	= 255;
+		iRedRB		= 55;
+		iGreenRB	= 60;
+		iBlueRB		= 65;
+		iAlphaRB	= 255;
+
 		switch(pTBCD->nmcd.dwDrawStage)
 		{
 		case CDDS_PREPAINT:
@@ -477,8 +444,8 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			GetClientRect(&r);
 			TRIVERTEX tv[2] = {
 				//bobdynlan: {x, y, Red*256, Green*256, Blue*256, Alpha*256}
-				{ r.left, r.top, 85*256, 90*256, 95*256, 255*256},//same as PlayerSeekBar gradient - bottom
-				{ r.right, r.bottom, 15*256, 20*256, 25*256, 255*256}
+				{ r.left, r.top, iRedLT*256, iGreenLT*256, iBlueLT*256, iAlphaLT*256},
+				{ r.right, r.bottom, iRedRB*256, iGreenRB*256, iBlueRB*256, iAlphaRB*256},
 			};
 			GRADIENT_RECT gr[1] = {
 				{0, 1},
@@ -487,10 +454,9 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			dc.Detach();
 			}
 			lr |= CDRF_NOTIFYITEMDRAW;
-			//lr |= CDRF_NOTIFYPOSTPAINT;
 			break;
 		case CDDS_POSTPAINT:
-			TRACE(" TB-POSTPAINT ");
+			//TRACE(" TB-POSTPAINT ");
 			lr = CDRF_DODEFAULT;
 			break;
 		case CDDS_PREERASE:
@@ -538,10 +504,10 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			memdc.FillSolidRect(rGlassLike, 0x00ffffff);//clr_resLight/white RGB(255,255,255)
 
 			BLENDFUNCTION bf;  
-				bf.AlphaFormat = 0;
-				bf.BlendFlags = 0;
-				bf.BlendOp = AC_SRC_OVER;
-				bf.SourceConstantAlpha = 80;
+			bf.AlphaFormat	= 0;
+			bf.BlendFlags	= 0;
+			bf.BlendOp		= AC_SRC_OVER;
+			bf.SourceConstantAlpha = 80;
 
 			CPen penFrHot (PS_SOLID,0,0x00e9e9e9);//clr_resFace	RGB(233,233,233)
 			CPen penFrChecked (PS_SOLID,0,0x00808080);//clr_resDark	RGB(128,128,128)
@@ -550,72 +516,41 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			CBrush *brushSaved = (CBrush*)dc.SelectStockObject(NULL_BRUSH);
 
 			//CDIS_SELECTED,CDIS_GRAYED,CDIS_DISABLED,CDIS_CHECKED,CDIS_FOCUS,CDIS_DEFAULT,CDIS_HOT,CDIS_MARKED,CDIS_INDETERMINATE
-			if (CDIS_HOT == pTBCD->nmcd.uItemState || CDIS_CHECKED + CDIS_HOT == pTBCD->nmcd.uItemState) 
-			{
+			if (CDIS_HOT == pTBCD->nmcd.uItemState || CDIS_CHECKED + CDIS_HOT == pTBCD->nmcd.uItemState) {
 				dc.SelectObject(&penFrHot);
 				dc.RoundRect(r.left +1,r.top +1,r.right -2,r.bottom -1, 6, 4);		
 				AlphaBlend(dc.m_hDC, r.left +2,r.top +2, r.Width() -4, 0.5* r.Height() -2, memdc, 0, 0, nW, nH, bf);
 			}
-			if (CDIS_CHECKED == pTBCD->nmcd.uItemState)		
-			{
+
+			if (CDIS_CHECKED == pTBCD->nmcd.uItemState) {
 				dc.SelectObject(&penFrChecked);
 				dc.RoundRect(r.left +1,r.top +1,r.right -2,r.bottom -1, 6, 4);
 			}
 			
-//----------INS: judelaw, exodus8 : Hide SEPARATORS ---- BEGIN
-
 			GRADIENT_RECT gr[1] = {{0, 1}};
 			CRect rt;
 			int sep[4] = {3, 8, 10, 11};
 			for (int j = 0; j < 4; j++) {
 				GetItemRect(sep[j], &rt);
 				TRIVERTEX tv[2] = {
-					{rt.left, rt.top, 85*256, 90*256, 95*256, 255*256},
-					{rt.right, rt.bottom, 15*256, 20*256, 25*256, 255*256},
+					{ rt.left, rt.top, iRedLT*256, iGreenLT*256, iBlueLT*256, iAlphaLT*256},
+					{ rt.right, rt.bottom, iRedRB*256, iGreenRB*256, iBlueRB*256, iAlphaRB*256},
 				};
 				dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 			}
 
-//----------INS: judelaw, exodus8 : Hide SEPARATORS ------ END
-			
 			dc.SelectObject(&penSaved);
 			dc.SelectObject(&brushSaved);
 			dc.Detach();
 			DeleteObject(memdc.SelectObject(bmOld));
 			memdc.DeleteDC();
-			//TRACE("\n\n uItemState=%2x (%2d,%2d,W=%2d,H=%2d)\n\n",pTBCD->nmcd.uItemState, r.left, r.top, r.Width(), r.Height()); 
 			lr |= CDRF_SKIPDEFAULT;
 			break;
 		}
 	}
+
 	*pResult = lr;
 }
-//--------------------------------------------------------------------------INS
-//REM:2103 bobdynlan: backup, no need to paint resized item 11 when customdraw
-//-----------------------------------------------------------------------------
-/*
-void CPlayerToolBar::OnPaint()
-{
-	if (m_bDelayedButtonLayout) {
-		Layout();
-	}
-
-	CPaintDC dc(this); // device context for painting
-
-	DefWindowProc(WM_PAINT, WPARAM(dc.m_hDC), 0);
-
-	{
-		UINT nID;
-		UINT nStyle = 0;
-		int iImage = 0;
-		GetButtonInfo(11, nID, nStyle, iImage);
-		CRect ItemRect;
-		GetItemRect(11, ItemRect);
-		dc.FillSolidRect(ItemRect, GetSysColor(COLOR_BTNFACE));
-	}
-}
-*/
-//--------------------------------------------------------------------------REM
 
 void CPlayerToolBar::OnSize(UINT nType, int cx, int cy)
 {
@@ -632,14 +567,12 @@ void CPlayerToolBar::OnInitialUpdate()
 BOOL CPlayerToolBar::OnVolumeMute(UINT nID)
 {
 	SetMute(!IsMuted());
-//INS:2233 bobdynlan: refresh volume control
-//-----------------------------------------------------------------------------
-	if (::IsWindow(m_volctrl.GetSafeHwnd()))
-	{
+
+	if (::IsWindow(m_volctrl.GetSafeHwnd())) {
 		m_volctrl.EnableWindow(FALSE);
 		m_volctrl.EnableWindow(TRUE);
 	}
-//--------------------------------------------------------------------------INS
+
 	return FALSE;
 }
 
@@ -660,27 +593,6 @@ BOOL CPlayerToolBar::OnVolumeDown(UINT nID)
 	m_volctrl.DecreaseVolume();
 	return FALSE;
 }
-
-//REM:2103 bobdynlan: backup, removed borders from Create so no more NC-area
-//-----------------------------------------------------------------------------
-/*
-void CPlayerToolBar::OnNcPaint() // when using XP styles the NC area isn't drawn for our toolbar...
-{
-	CRect wr, cr;
-
-	CWindowDC dc(this);
-	GetClientRect(&cr);
-	ClientToScreen(&cr);
-	GetWindowRect(&wr);
-	cr.OffsetRect(-wr.left, -wr.top);
-	wr.OffsetRect(-wr.left, -wr.top);
-	dc.ExcludeClipRect(&cr);
-	dc.FillSolidRect(wr, GetSysColor(COLOR_BTNFACE));
-
-	// Do not call CToolBar::OnNcPaint() for painting messages
-}
-*/
-//--------------------------------------------------------------------------REM
 
 void CPlayerToolBar::OnMouseMove(UINT nFlags, CPoint point)
 {

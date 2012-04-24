@@ -665,7 +665,8 @@ CMainFrame::CMainFrame() :
 	m_nSeekDirection(SEEK_DIRECTION_NONE),
 	m_bIsBDPlay(false),
 	m_LastOpenBDPath(_T("")),
-	m_fClosingState(false)
+	m_fClosingState(false),
+	m_OldMessage(_T(""))
 {
 	//m_Lcd.SetVolumeRange(0, 100);
 	m_LastSaveTime.QuadPart = 0;
@@ -3379,113 +3380,7 @@ void CMainFrame::OnUpdatePlayerStatus(CCmdUI* pCmdUI)
 			m_pTaskbarList->SetProgressState(m_hWnd, TBPF_INDETERMINATE);
 		}
 	} else if (m_iMediaLoadState == MLS_LOADED) {
-		CString msg;
-
-		if (!m_playingmsg.IsEmpty()) {
-			msg = m_playingmsg;
-		} else if (m_fCapturing) {
-			msg = ResStr(IDS_CONTROLS_CAPTURING);
-
-			if (pAMDF) {
-				long lDropped = 0;
-				pAMDF->GetNumDropped(&lDropped);
-				long lNotDropped = 0;
-				pAMDF->GetNumNotDropped(&lNotDropped);
-
-				if ((lDropped + lNotDropped) > 0) {
-					CString str;
-					str.Format(ResStr(IDS_MAINFRM_37), lDropped + lNotDropped, lDropped);
-					msg += str;
-				}
-			}
-
-			CComPtr<IPin> pPin;
-			if (SUCCEEDED(pCGB->FindPin(m_wndCaptureBar.m_capdlg.m_pDst, PINDIR_INPUT, NULL, NULL, FALSE, 0, &pPin))) {
-				LONGLONG size = 0;
-				if (CComQIPtr<IStream> pStream = pPin) {
-					pStream->Commit(STGC_DEFAULT);
-
-					WIN32_FIND_DATA findFileData;
-					HANDLE h = FindFirstFile(m_wndCaptureBar.m_capdlg.m_file, &findFileData);
-					if (h != INVALID_HANDLE_VALUE) {
-						size = ((LONGLONG)findFileData.nFileSizeHigh << 32) | findFileData.nFileSizeLow;
-
-						CString str;
-						if (size < 1024i64*1024) {
-							str.Format(ResStr(IDS_MAINFRM_38), size/1024);
-						} else { //if (size < 1024i64*1024*1024)
-							str.Format(ResStr(IDS_MAINFRM_39), size/1024/1024);
-						}
-						msg += str;
-
-						FindClose(h);
-					}
-				}
-
-				ULARGE_INTEGER FreeBytesAvailable, TotalNumberOfBytes, TotalNumberOfFreeBytes;
-				if (GetDiskFreeSpaceEx(
-							m_wndCaptureBar.m_capdlg.m_file.Left(m_wndCaptureBar.m_capdlg.m_file.ReverseFind('\\')+1),
-							&FreeBytesAvailable, &TotalNumberOfBytes, &TotalNumberOfFreeBytes)) {
-					CString str;
-					if (FreeBytesAvailable.QuadPart < 1024i64*1024) {
-						str.Format(ResStr(IDS_MAINFRM_40), FreeBytesAvailable.QuadPart/1024);
-					} else { //if (FreeBytesAvailable.QuadPart < 1024i64*1024*1024)
-						str.Format(ResStr(IDS_MAINFRM_41), FreeBytesAvailable.QuadPart/1024/1024);
-					}
-					msg += str;
-				}
-
-				if (m_wndCaptureBar.m_capdlg.m_pMux) {
-					__int64 pos = 0;
-					CComQIPtr<IMediaSeeking> pMuxMS = m_wndCaptureBar.m_capdlg.m_pMux;
-					if (pMuxMS && SUCCEEDED(pMuxMS->GetCurrentPosition(&pos)) && pos > 0) {
-						double bytepersec = 10000000.0 * size / pos;
-						if (bytepersec > 0) {
-							m_rtDurationOverride = __int64(10000000.0 * (FreeBytesAvailable.QuadPart+size) / bytepersec);
-						}
-					}
-				}
-
-				if (m_wndCaptureBar.m_capdlg.m_pVidBuffer
-						|| m_wndCaptureBar.m_capdlg.m_pAudBuffer) {
-					int nFreeVidBuffers = 0, nFreeAudBuffers = 0;
-					if (CComQIPtr<IBufferFilter> pVB = m_wndCaptureBar.m_capdlg.m_pVidBuffer) {
-						nFreeVidBuffers = pVB->GetFreeBuffers();
-					}
-					if (CComQIPtr<IBufferFilter> pAB = m_wndCaptureBar.m_capdlg.m_pAudBuffer) {
-						nFreeAudBuffers = pAB->GetFreeBuffers();
-					}
-
-					CString str;
-					str.Format(ResStr(IDS_MAINFRM_42), nFreeVidBuffers, nFreeAudBuffers);
-					msg += str;
-				}
-			}
-		} else if (m_fBuffering) {
-			BeginEnumFilters(pGB, pEF, pBF) {
-				if (CComQIPtr<IAMNetworkStatus, &IID_IAMNetworkStatus> pAMNS = pBF) {
-					long BufferingProgress = 0;
-					if (SUCCEEDED(pAMNS->get_BufferingProgress(&BufferingProgress)) && BufferingProgress > 0) {
-						msg.Format(ResStr(IDS_CONTROLS_BUFFERING), BufferingProgress);
-
-						__int64 start = 0, stop = 0;
-						m_wndSeekBar.GetRange(start, stop);
-						m_fLiveWM = (stop == start);
-					}
-					break;
-				}
-			}
-			EndEnumFilters;
-		} else if (pAMOP) {
-			__int64 t = 0, c = 0;
-			if (SUCCEEDED(pAMOP->QueryProgress(&t, &c)) && t > 0 && c < t) {
-				msg.Format(ResStr(IDS_CONTROLS_BUFFERING), c*100/t);
-			}
-
-			if (m_fUpdateInfoBar) {
-				OpenSetupInfoBar();
-			}
-		}
+		CString msg = FillMessage();
 
 		OAFilterState fs = GetMediaState();
 		CString UI_Text =
@@ -3501,6 +3396,13 @@ void CMainFrame::OnUpdatePlayerStatus(CCmdUI* pCmdUI)
 			}
 		}
 		pCmdUI->SetText(UI_Text);
+		if (m_OldMessage != UI_Text) {
+			TRACE(_T("Change msg = %ws\n"), UI_Text);
+			m_wndStatusBar.SetStatusMessage(UI_Text);
+		}
+
+		m_OldMessage = UI_Text;
+
 	} else if (m_iMediaLoadState == MLS_CLOSING) {
 		pCmdUI->SetText(ResStr(IDS_CONTROLS_CLOSING));
 		if ((AfxGetAppSettings().fUseWin7TaskBar) && (m_pTaskbarList)) {
@@ -11449,6 +11351,7 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 		}
 
 		title = fn + _T(" - ") + m_strTitle;
+		m_strFn = fn;
 	}
 
 	SetWindowText(title);
@@ -14298,6 +14201,9 @@ void CMainFrame::ShowOptions(int idPage)
 
 	}
 	Invalidate();
+
+	m_wndStatusBar.Relayout();
+
 	m_bInOptions = false;
 }
 
@@ -15914,4 +15820,117 @@ bool CMainFrame::OpenBD(CString Path)
 
 	m_LastOpenBDPath = _T("");
 	return false;
+}
+
+CString CMainFrame::FillMessage()
+{
+	CString msg = _T("");
+
+	if (!m_playingmsg.IsEmpty()) {
+		msg = m_playingmsg;
+	} else if (m_fCapturing) {
+		msg = ResStr(IDS_CONTROLS_CAPTURING);
+
+		if (pAMDF) {
+			long lDropped = 0;
+			pAMDF->GetNumDropped(&lDropped);
+			long lNotDropped = 0;
+			pAMDF->GetNumNotDropped(&lNotDropped);
+
+			if ((lDropped + lNotDropped) > 0) {
+				CString str;
+				str.Format(ResStr(IDS_MAINFRM_37), lDropped + lNotDropped, lDropped);
+				msg += str;
+			}
+		}
+
+		CComPtr<IPin> pPin;
+		if (SUCCEEDED(pCGB->FindPin(m_wndCaptureBar.m_capdlg.m_pDst, PINDIR_INPUT, NULL, NULL, FALSE, 0, &pPin))) {
+			LONGLONG size = 0;
+			if (CComQIPtr<IStream> pStream = pPin) {
+				pStream->Commit(STGC_DEFAULT);
+
+				WIN32_FIND_DATA findFileData;
+				HANDLE h = FindFirstFile(m_wndCaptureBar.m_capdlg.m_file, &findFileData);
+				if (h != INVALID_HANDLE_VALUE) {
+					size = ((LONGLONG)findFileData.nFileSizeHigh << 32) | findFileData.nFileSizeLow;
+
+					CString str;
+					if (size < 1024i64*1024) {
+						str.Format(ResStr(IDS_MAINFRM_38), size/1024);
+					} else { //if (size < 1024i64*1024*1024)
+						str.Format(ResStr(IDS_MAINFRM_39), size/1024/1024);
+					}
+					msg += str;
+
+					FindClose(h);
+				}
+			}
+
+			ULARGE_INTEGER FreeBytesAvailable, TotalNumberOfBytes, TotalNumberOfFreeBytes;
+			if (GetDiskFreeSpaceEx(
+						m_wndCaptureBar.m_capdlg.m_file.Left(m_wndCaptureBar.m_capdlg.m_file.ReverseFind('\\')+1),
+						&FreeBytesAvailable, &TotalNumberOfBytes, &TotalNumberOfFreeBytes)) {
+				CString str;
+				if (FreeBytesAvailable.QuadPart < 1024i64*1024) {
+					str.Format(ResStr(IDS_MAINFRM_40), FreeBytesAvailable.QuadPart/1024);
+				} else { //if (FreeBytesAvailable.QuadPart < 1024i64*1024*1024)
+					str.Format(ResStr(IDS_MAINFRM_41), FreeBytesAvailable.QuadPart/1024/1024);
+				}
+				msg += str;
+			}
+
+			if (m_wndCaptureBar.m_capdlg.m_pMux) {
+				__int64 pos = 0;
+				CComQIPtr<IMediaSeeking> pMuxMS = m_wndCaptureBar.m_capdlg.m_pMux;
+				if (pMuxMS && SUCCEEDED(pMuxMS->GetCurrentPosition(&pos)) && pos > 0) {
+					double bytepersec = 10000000.0 * size / pos;
+					if (bytepersec > 0) {
+						m_rtDurationOverride = __int64(10000000.0 * (FreeBytesAvailable.QuadPart+size) / bytepersec);
+					}
+				}
+			}
+
+			if (m_wndCaptureBar.m_capdlg.m_pVidBuffer
+					|| m_wndCaptureBar.m_capdlg.m_pAudBuffer) {
+				int nFreeVidBuffers = 0, nFreeAudBuffers = 0;
+				if (CComQIPtr<IBufferFilter> pVB = m_wndCaptureBar.m_capdlg.m_pVidBuffer) {
+					nFreeVidBuffers = pVB->GetFreeBuffers();
+				}
+				if (CComQIPtr<IBufferFilter> pAB = m_wndCaptureBar.m_capdlg.m_pAudBuffer) {
+					nFreeAudBuffers = pAB->GetFreeBuffers();
+				}
+
+				CString str;
+				str.Format(ResStr(IDS_MAINFRM_42), nFreeVidBuffers, nFreeAudBuffers);
+				msg += str;
+			}
+		}
+	} else if (m_fBuffering) {
+		BeginEnumFilters(pGB, pEF, pBF) {
+			if (CComQIPtr<IAMNetworkStatus, &IID_IAMNetworkStatus> pAMNS = pBF) {
+				long BufferingProgress = 0;
+				if (SUCCEEDED(pAMNS->get_BufferingProgress(&BufferingProgress)) && BufferingProgress > 0) {
+					msg.Format(ResStr(IDS_CONTROLS_BUFFERING), BufferingProgress);
+
+					__int64 start = 0, stop = 0;
+					m_wndSeekBar.GetRange(start, stop);
+					m_fLiveWM = (stop == start);
+				}
+				break;
+			}
+		}
+		EndEnumFilters;
+	} else if (pAMOP) {
+		__int64 t = 0, c = 0;
+		if (SUCCEEDED(pAMOP->QueryProgress(&t, &c)) && t > 0 && c < t) {
+			msg.Format(ResStr(IDS_CONTROLS_BUFFERING), c*100/t);
+		}
+
+		if (m_fUpdateInfoBar) {
+			OpenSetupInfoBar();
+		}
+	}
+
+	return msg;
 }
