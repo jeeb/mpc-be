@@ -25,11 +25,18 @@
 
 #include <afxwin.h>
 #include "PPageBase.h"
+#include "afxcmn.h"
 
+enum {
+	SOURCE,
+	VIDEO,
+	AUDIO
+};
 
 struct filter_t {
 	LPCTSTR label;
 	int type;
+	int filter_type;
 	int flag;
 	UINT nHintID;
 	CUnknown* (WINAPI * CreateInstance)(LPUNKNOWN lpunk, HRESULT* phr);
@@ -74,7 +81,10 @@ public:
 	// Dialog Data
 	enum { IDD = IDD_PPAGEINTERNALFILTERS };
 	CPPageInternalFiltersListBox m_listSrc;
-	CPPageInternalFiltersListBox m_listTra;
+	CPPageInternalFiltersListBox m_listVideo;
+	CPPageInternalFiltersListBox m_listAudio;
+
+	CTabCtrl m_Tab;
 
 	void ShowPPage(CPPageInternalFiltersListBox& l);
 
@@ -88,6 +98,8 @@ protected:
 public:
 	afx_msg void OnLbnDblclkList1();
 	afx_msg void OnLbnDblclkList2();
+	afx_msg void OnLbnDblclkList3();
 	afx_msg void OnSelChange();
 	afx_msg void OnCheckBoxChange();
+	afx_msg void OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult);
 };

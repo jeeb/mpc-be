@@ -103,9 +103,6 @@ CAppSettings::CAppSettings()
 #if INTERNAL_DECODER_REALAUDIO
 	TraFiltersKeys[TRA_RA] = _T("TRA_RA");
 #endif
-#if INTERNAL_DECODER_MPEGAUDIO
-	TraFiltersKeys[TRA_MPA] = _T("TRA_MPA");
-#endif
 #if INTERNAL_DECODER_DTS
 	TraFiltersKeys[TRA_DTS] = _T("TRA_DTS");
 	TraFiltersKeys[TRA_LPCM] = _T("TRA_LPCM");
@@ -113,32 +110,11 @@ CAppSettings::CAppSettings()
 #if INTERNAL_DECODER_AC3
 	TraFiltersKeys[TRA_AC3] = _T("TRA_AC3");
 #endif
-#if INTERNAL_DECODER_AAC
-	TraFiltersKeys[TRA_AAC] = _T("TRA_AAC");
-#endif
-#if INTERNAL_DECODER_ALAC
-	TraFiltersKeys[TRA_ALAC] = _T("TRA_ALAC");
-#endif
-#if INTERNAL_DECODER_ALS
-	TraFiltersKeys[TRA_ALS] = _T("TRA_ALS");
-#endif
 #if INTERNAL_DECODER_PS2AUDIO
 	TraFiltersKeys[TRA_PS2AUD] = _T("TRA_PS2AUD");
 #endif
-#if INTERNAL_DECODER_VORBIS
-	TraFiltersKeys[TRA_VORBIS] = _T("TRA_VORBIS");
-#endif
 #if INTERNAL_DECODER_FLAC
 	TraFiltersKeys[TRA_FLAC] = _T("TRA_FLAC");
-#endif
-#if INTERNAL_DECODER_NELLYMOSER
-	TraFiltersKeys[TRA_NELLY] = _T("TRA_NELLY");
-#endif
-#if INTERNAL_DECODER_AMR
-	TraFiltersKeys[TRA_AMR] = _T("TRA_AMR");
-#endif
-#if INTERNAL_DECODER_PCM
-	TraFiltersKeys[TRA_PCM] = _T("TRA_PCM");
 #endif
 
 	// Internal DXVA decoders
@@ -156,6 +132,30 @@ CAppSettings::CAppSettings()
 #endif
 
 	// Internal FFMpeg decoders
+#if INTERNAL_DECODER_MPEGAUDIO
+	TraFiltersKeys[FFM_MPA] = _T("FFM_MPA");
+#endif
+#if INTERNAL_DECODER_AAC
+	TraFiltersKeys[FFM_AAC] = _T("FFM_AAC");
+#endif
+#if INTERNAL_DECODER_ALAC
+	TraFiltersKeys[FFM_ALAC] = _T("FFM_ALAC");
+#endif
+#if INTERNAL_DECODER_ALS
+	TraFiltersKeys[FFM_ALS] = _T("FFM_ALS");
+#endif
+#if INTERNAL_DECODER_VORBIS
+	TraFiltersKeys[FFM_VORBIS] = _T("FFM_VORBIS");
+#endif
+#if INTERNAL_DECODER_NELLYMOSER
+	TraFiltersKeys[FFM_NELLY] = _T("FFM_NELLY");
+#endif
+#if INTERNAL_DECODER_AMR
+	TraFiltersKeys[FFM_AMR] = _T("FFM_AMR");
+#endif
+#if INTERNAL_DECODER_PCM
+	TraFiltersKeys[FFM_PCM] = _T("FFM_PCM");
+#endif
 #if INTERNAL_DECODER_H264
 	FFMFiltersKeys[FFM_H264] = _T("FFM_H264");
 #endif
