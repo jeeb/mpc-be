@@ -23,7 +23,6 @@
 
 #include "stdafx.h"
 #include <malloc.h>
-#include <atlbase.h>
 #include <afxpriv.h>
 #include "PngImage.h"
 #include <libpng/png.h>
@@ -156,11 +155,12 @@ CString CPngImage::LoadCurrentPath()
 	return path.Left(path.ReverseFind('\\') + 1);
 }
 
-FILE* CPngImage::FileExists(CString fn)
+int CPngImage::FileExists(CString fn)
 {
 	FILE* fp = _tfopen(LoadCurrentPath() + fn + _T(".png"), _T("rb"));
 	if (fp) {
-		return fp;
+		fclose(fp);
+		return 1;
 	} else {
 		return NULL;
 	}

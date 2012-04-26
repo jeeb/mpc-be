@@ -274,7 +274,7 @@ void CPlayerSeekBar::OnPaint()
 
 		GRADIENT_RECT gr[1] = {{0, 1}};
 
-		FILE* fp = m_logobm.FileExists("background");
+		int fp = m_logobm.FileExists("background");
 
 		if (NULL != fp) {
 			m_logobm.LoadExternalGradient("background", &memdc, r, 0);

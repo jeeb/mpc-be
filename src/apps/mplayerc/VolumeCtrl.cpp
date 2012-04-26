@@ -35,7 +35,7 @@ CVolumeCtrl::CVolumeCtrl(bool fSelfDrawn) : m_fSelfDrawn(fSelfDrawn)
 
 CVolumeCtrl::~CVolumeCtrl()
 {
-if (m_bmUnderCtrl.GetSafeHandle() != NULL) m_bmUnderCtrl.DeleteObject();//ins:2233 bobdynlan:cleanup//
+	if (m_bmUnderCtrl.GetSafeHandle() != NULL) m_bmUnderCtrl.DeleteObject();
 }
 
 bool CVolumeCtrl::Create(CWnd* pParentWnd)
@@ -71,7 +71,7 @@ void CVolumeCtrl::DecreaseVolume()
 }
 
 BEGIN_MESSAGE_MAP(CVolumeCtrl, CSliderCtrl)
-	ON_WM_ERASEBKGND()//ins:2217 bobdynlan:anti-flicker//
+	ON_WM_ERASEBKGND()
 	ON_NOTIFY_REFLECT(NM_CUSTOMDRAW, OnNMCustomdraw)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_SETFOCUS()
@@ -81,13 +81,10 @@ END_MESSAGE_MAP()
 
 // CVolumeCtrl message handlers
 
-//INS:2217 bobdynlan:anti-flicker 
-//-----------------------------------------------------------------------------
 BOOL CVolumeCtrl::OnEraseBkgnd(CDC* pDC)
 {
 	return TRUE;
 }
-//--------------------------------------------------------------------------INS
 
 void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 {
@@ -95,13 +92,11 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 	LRESULT lr = CDRF_DODEFAULT;
 
-	AppSettings& s = AfxGetAppSettings();//ins:2233 bobdynlan://
+	AppSettings& s = AfxGetAppSettings();
 
 	if (m_fSelfDrawn)
 		switch (pNMCD->dwDrawStage) {
 			case CDDS_PREPAINT:
-//INS:2233 bobdynlan: grab the area behind the control (gradient-filled ToolBar)
-//-----------------------------------------------------------------------------
 			//TRACE(" PREPAINT ");
 			if (s.fDisableXPToolbars && m_bmUnderCtrl.GetSafeHandle() == NULL)
 			{			
@@ -119,16 +114,12 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					GetParent()->ReleaseDC(dc);
 					memdc.DeleteDC();
 			}
-//--------------------------------------------------------------------------INS
 				lr = CDRF_NOTIFYITEMDRAW;
 				break;
 
 			case CDDS_ITEMPREPAINT:
-//INS:2212 bobdynlan: custom channel
-//-----------------------------------------------------------------------------
 			if (s.fDisableXPToolbars && m_bmUnderCtrl.GetSafeHandle() != NULL)
 			{
-				//ins:2233 bobdynlan:reuse the grabbed background image//
 				CDC dc;
 				dc.Attach(pNMCD->hdc);
 				CRect r;
@@ -136,6 +127,24 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 				CDC memdc;
 				memdc.CreateCompatibleDC(&dc);
 				CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
+
+				GRADIENT_RECT gr[1] = {{0, 1}};
+				int pa = 255 * 256;
+				unsigned p1 = s.clrOutlineABGR, p2 = s.clrFaceABGR;
+
+				TRIVERTEX tv[2] = {
+					{0, 0, p1 * 256, (p1 >> 8) * 256, (p1 >> 16) * 256, pa},
+					{r.Width(), 1, p2 * 256, (p2 >> 8) * 256, (p2 >> 16) * 256, pa},
+				};
+				dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_H);
+
+				int nVolume = GetPos();
+				if (nVolume <= GetPageSize()) nVolume = 0;
+				int m_nVolPos = nVolume * 0.5;
+
+				unsigned p3 = dc.GetPixel(m_nVolPos, 0) == 0x00000000 ? dc.GetPixel(m_nVolPos - 5, 0) : dc.GetPixel(m_nVolPos + 10, 0);
+				CPen penLeft(p2 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p3);
+
 				dc.BitBlt(0, 0, r.Width(), r.Height(), &memdc, 0, 0, SRCCOPY);
 				//MemDC.SelectObject(bmOld);
 				DeleteObject(memdc.SelectObject(bmOld));
@@ -143,13 +152,10 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 				r.DeflateRect(4, 2, 9, 6);
 				CopyRect(&pNMCD->rc, &r);
 				//TRACE("VOLUME RECT=(%d,%d,%d,%d) state=%d",r.left,r.top,r.right,r.bottom,pNMCD->uItemState);
-				int nVolume = GetPos();
-				if (nVolume <= GetPageSize()) nVolume = 0;
-				int m_nVolPos=r.left + nVolume * 0.5;
-				CPen penLeft(s.clrFaceABGR == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, s.clrFaceABGR);//ins:2452 bobdynlan:Hide pen if color = transparency mask////clr_resLight 0x00ffffff (RGB(255,255,255))
-				CPen penRight(s.clrOutlineABGR == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, s.clrOutlineABGR);//ins:2452 bobdynlan:Hide pen if color = transparency mask////clr_resDark 0x00808080 (RGB(128,128,128))
+
+				CPen penRight(p1 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p1);
 				CPen *penOld = dc.SelectObject(&penRight);
-				//ins:2452 bobdynlan:redesign//
+
 				int nposx,nposy;
 				for (int i = 5 ; i <= 50;)
 				{
@@ -172,10 +178,10 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 				dc.Detach();
 				lr = CDRF_SKIPDEFAULT;
 			}
-			//rem:2103 bobdynlan:old code when fDisableXPToolbars=false//
+
 			if (!s.fDisableXPToolbars && pNMCD->dwItemSpec == TBCD_CHANNEL)
 			{
-				if (m_bmUnderCtrl.GetSafeHandle() != NULL) m_bmUnderCtrl.DeleteObject();//ins:2233 bobdynlan:cleanup//
+				if (m_bmUnderCtrl.GetSafeHandle() != NULL) m_bmUnderCtrl.DeleteObject();
 				CDC dc;
 				dc.Attach(pNMCD->hdc);
 
@@ -263,8 +269,6 @@ void CVolumeCtrl::OnSetFocus(CWnd* pOldWnd)
 
 void CVolumeCtrl::HScroll(UINT nSBCode, UINT nPos)
 {
-//INS:2233 bobdynlan: invalidate
-//-----------------------------------------------------------------------------
 	int nVolMin, nVolMax;
 	GetRange(nVolMin, nVolMax);
 	if ((UINT)nVolMin <= nSBCode && nSBCode <= (UINT)nVolMax)
@@ -273,14 +277,14 @@ void CVolumeCtrl::HScroll(UINT nSBCode, UINT nPos)
 		GetClientRect(&r);
 		InvalidateRect(&r);
 		UpdateWindow();
-//--------------------------------------------------------------------------INS
-	AfxGetAppSettings().nVolume = GetPos();
 
-	CFrameWnd* pFrame = GetParentFrame();
-	if (pFrame && pFrame != GetParent()) {
-		pFrame->PostMessage(WM_HSCROLL, MAKEWPARAM((short)nPos, nSBCode), (LPARAM)m_hWnd);
+		AfxGetAppSettings().nVolume = GetPos();
+
+		CFrameWnd* pFrame = GetParentFrame();
+		if (pFrame && pFrame != GetParent()) {
+			pFrame->PostMessage(WM_HSCROLL, MAKEWPARAM((short)nPos, nSBCode), (LPARAM)m_hWnd);
+		}
 	}
-	}//ins:2233 bobdynlan: ignore message if not in range//
 }
 
 BOOL CVolumeCtrl::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)

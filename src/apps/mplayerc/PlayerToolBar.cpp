@@ -395,7 +395,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 		iBlueRB		= 65;
 		iAlphaRB	= 255;
 
-		FILE* fp = m_logobm.FileExists("background");
+		int fp = m_logobm.FileExists("background");
 
 		switch(pTBCD->nmcd.dwDrawStage)
 		{
