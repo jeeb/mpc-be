@@ -490,24 +490,24 @@ BOOL CPPageInternalFilters::OnInitDialog()
 
 		switch (s_filters[i].type) {
 			case SOURCE_FILTER:
-				l = &m_listSrc;
-				checked = s.SrcFilters[s_filters[i].flag];
+				l		= &m_listSrc;
+				checked	= s.SrcFilters[s_filters[i].flag];
 				break;
 			case DECODER:
-				l = (s_filters[i].filter_type == AUDIO) ? &m_listAudio : &m_listVideo;
-				checked = s.TraFilters[s_filters[i].flag];
+				l		= (s_filters[i].filter_type == AUDIO) ? &m_listAudio : &m_listVideo;
+				checked	= s.TraFilters[s_filters[i].flag];
 				break;
 			case DXVA_DECODER:
-				l = &m_listVideo;
-				checked = s.DXVAFilters[s_filters[i].flag];
+				l		= &m_listVideo;
+				checked	= s.DXVAFilters[s_filters[i].flag];
 				break;
 			case FFMPEG_DECODER:
-				l = (s_filters[i].filter_type == AUDIO) ? &m_listAudio : &m_listVideo;
-				checked = s.FFmpegFilters[s_filters[i].flag];
+				l		= (s_filters[i].filter_type == AUDIO) ? &m_listAudio : &m_listVideo;
+				checked	= s.FFmpegFilters[s_filters[i].flag];
 				break;
 			default:
-				l = NULL;
-				checked = false;
+				l		= NULL;
+				checked	= false;
 		}
 
 		if (l) {
@@ -520,16 +520,22 @@ BOOL CPPageInternalFilters::OnInitDialog()
 	m_listAudio.UpdateCheckState();
 
 	TC_ITEM tci;
-	memset(&tci,0,sizeof(tci));
+	memset(&tci, 0, sizeof(tci));
 	tci.mask = TCIF_TEXT;
 
-	tci.pszText = (LPWSTR)(LPCTSTR)ResStr(IDS_FILTERS_SOURCE);
+	CString TabName	= ResStr(IDS_FILTERS_SOURCE);
+	tci.pszText		= TabName.GetBuffer();
+	tci.cchTextMax	= TabName.GetLength();
 	m_Tab.InsertItem(0, &tci);
 
-	tci.pszText = (LPWSTR)(LPCTSTR)ResStr(IDS_FILTERS_VIDEO);
+	TabName			= ResStr(IDS_FILTERS_VIDEO);
+	tci.pszText		= TabName.GetBuffer();
+	tci.cchTextMax	= TabName.GetLength();
 	m_Tab.InsertItem(1, &tci);
 
-	tci.pszText = (LPWSTR)(LPCTSTR)ResStr(IDS_FILTERS_AUDIO);
+	TabName			= ResStr(IDS_FILTERS_AUDIO);
+	tci.pszText		= TabName.GetBuffer();
+	tci.cchTextMax	= TabName.GetLength();
 	m_Tab.InsertItem(2, &tci);
 
 	NMHDR hdr;
