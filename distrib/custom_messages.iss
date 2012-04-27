@@ -237,6 +237,41 @@ by.AssociationMPCPlayVideoFilesF=Play Video
 by.AssociationMPCPlayVideoFilesS=Video Files
 
 
+;Basque
+eu.langid=00000023
+eu.comp_mpciconlib=Ikur Liburutegia
+eu.comp_mpcresources=Itzulpenak
+eu.msg_DeleteSettings=MPC-HC ezarpenak kentzea ere nahi dituzu?%n%nMPC-HC berriro ezartzeko asmoa baduzu ez dituzu ezabatu behar.
+eu.msg_NoD3DX9DLL_found=Azken DirectX bertsioa ez dago ezarrita!%n%nMesedez jeitsi eta ezarri azken DirectX bertsioa ({#DIRECTX_SDK_DATE}) sistema eragileari kasu egin gabe.
+eu.msg_SetupIsRunningWarning=MPC-HC ezarpena jadanik ekinean dago!
+#if defined(sse_required)
+eu.msg_simd_sse=MPC-HC eraiketa honek SSE hedapen sostengua duen CPU bat behar du.%n%nZure CPU-ak ez ditu gaitasun hauek.
+#elif defined(sse2_required)
+eu.msg_simd_sse2=MPC-HC erakiketa honek SSE2 hedapen sostengua duen CPU bat behar du.%n%nZure CPU-ak ez ditu gaitasun hauek.
+#endif
+eu.tsk_AllUsers=Erabiltzaile guztientzat
+eu.tsk_CurrentUser=Oraingo erabiltzailearentzat bakarrrik
+eu.tsk_Other=Beste eginkizunak:
+eu.tsk_ResetSettings=Berrezarri ezarpenak
+eu.types_DefaultInstallation=Berezko ezarpena
+eu.types_CustomInstallation=Norbere ezarpena
+eu.ViewChangelog=Ikusi Aldaketa-oharra
+by.AssociationFormatsAV=Configuring associations with video and audio files:
+by.AssociationFormats=Association with video and audio files
+by.AssociationVideo=Association with video files
+by.AssociationAudio=Association with audio files
+by.AssociationPlaylist=Association with playlists
+by.AutoPlayType=Auto play:
+by.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+by.AssociationMPCPlayCDAudioS=Audio CD
+by.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+by.AssociationMPCPlayDVDMovieS=DVD Movie
+by.AssociationMPCPlayMusicFilesF=Play Music
+by.AssociationMPCPlayMusicFilesS=Music Files
+by.AssociationMPCPlayVideoFilesF=Play Video
+by.AssociationMPCPlayVideoFilesS=Video Files
+
+
 ;Catalan
 ca.langid=00000019
 ca.comp_mpciconlib=Llibreria d'icones
