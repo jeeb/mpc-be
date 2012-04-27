@@ -47,6 +47,11 @@ private:
 	UINT_PTR m_tooltipTimer;
 
 	CPngImage m_logobm;
+	__int64 iThemeBrightness;
+	__int64 iThemeRed;
+	__int64 iThemeGreen;
+	__int64 iThemeBlue;
+	bool bFileNameOnSeekBar;
 
 	void MoveThumb(CPoint point);
 	__int64 CalculatePosition(CPoint point);

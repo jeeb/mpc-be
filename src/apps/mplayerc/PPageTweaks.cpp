@@ -33,8 +33,13 @@ IMPLEMENT_DYNAMIC(CPPageTweaks, CPPageBase)
 CPPageTweaks::CPPageTweaks()
 	: CPPageBase(CPPageTweaks::IDD, CPPageTweaks::IDD)
 	, m_fDisableXPToolbars(FALSE)
-	, m_clrFaceABGR(0x00e9e9e9)
-	, m_clrOutlineABGR(0x00a0a0a0)
+	, m_nThemeBrightness(25)
+	, m_nThemeRed(256)
+	, m_nThemeGreen(256)
+	, m_nThemeBlue(256)
+	, m_fFileNameOnSeekBar(TRUE)
+	, m_clrFaceABGR(0x00ff8080)
+	, m_clrOutlineABGR(0x00ffffff)
 	, m_nJumpDistS(0)
 	, m_nJumpDistM(0)
 	, m_nJumpDistL(0)
@@ -55,6 +60,15 @@ void CPPageTweaks::DoDataExchange(CDataExchange* pDX)
 	__super::DoDataExchange(pDX);
 	DDX_Check(pDX, IDC_CHECK3, m_fDisableXPToolbars);
 	DDX_Control(pDX, IDC_CHECK3, m_fDisableXPToolbarsCtrl);
+	DDX_Slider(pDX, IDC_SLIDER1, m_nThemeBrightness);
+	DDX_Slider(pDX, IDC_SLIDER2, m_nThemeRed);
+	DDX_Slider(pDX, IDC_SLIDER3, m_nThemeGreen);
+	DDX_Slider(pDX, IDC_SLIDER4, m_nThemeBlue);
+	DDX_Control(pDX, IDC_SLIDER1, m_ThemeBrightnessCtrl);
+	DDX_Control(pDX, IDC_SLIDER2, m_ThemeRedCtrl);
+	DDX_Control(pDX, IDC_SLIDER3, m_ThemeGreenCtrl);
+	DDX_Control(pDX, IDC_SLIDER4, m_ThemeBlueCtrl);
+	DDX_Check(pDX, IDC_CHECK5, m_fFileNameOnSeekBar);
 	DDX_Text(pDX, IDC_EDIT1, m_nJumpDistS);
 	DDX_Text(pDX, IDC_EDIT2, m_nJumpDistM);
 	DDX_Text(pDX, IDC_EDIT3, m_nJumpDistL);
@@ -87,6 +101,15 @@ BOOL CPPageTweaks::OnInitDialog()
 	AppSettings& s = AfxGetAppSettings();
 
 	m_fDisableXPToolbars	= s.fDisableXPToolbars;
+	m_nThemeBrightness		= m_nThemeBrightness_Old	= s.nThemeBrightness;
+	m_nThemeRed				= m_nThemeRed_Old			= s.nThemeRed;
+	m_nThemeGreen			= m_nThemeGreen_Old			= s.nThemeGreen;
+	m_nThemeBlue			= m_nThemeBlue_Old			= s.nThemeBlue;
+	m_ThemeBrightnessCtrl.SetRange(0, 100);
+	m_ThemeRedCtrl.SetRange(0, 256);
+	m_ThemeGreenCtrl.SetRange(0, 256);
+	m_ThemeBlueCtrl.SetRange(0, 256);
+	m_fFileNameOnSeekBar	= s.fFileNameOnSeekBar;
 	m_clrFaceABGR			= s.clrFaceABGR;
 	m_clrOutlineABGR		= s.clrOutlineABGR;
 	m_nJumpDistS			= s.nJumpDistS;
@@ -161,12 +184,24 @@ BOOL CPPageTweaks::OnApply()
 	if (s.clrFaceABGR != m_clrFaceABGR || s.clrOutlineABGR != m_clrOutlineABGR) {
 		m_fToolbarRefresh = true;
 	}
+	if (s.nThemeBrightness != m_nThemeBrightness 
+		|| s.nThemeRed != m_nThemeRed
+		|| s.nThemeGreen != m_nThemeGreen
+		|| s.nThemeBlue != m_nThemeBlue
+		|| s.fFileNameOnSeekBar != !!m_fFileNameOnSeekBar) {
+		m_fToolbarRefresh=true;
+	}
 
 	if (m_fToolbarRefresh)
 	{
 		s.clrFaceABGR		= m_clrFaceABGR;
 		s.clrOutlineABGR	= m_clrOutlineABGR;
-		
+		s.nThemeBrightness	= m_nThemeBrightness;
+		s.nThemeRed			= m_nThemeRed;
+		s.nThemeGreen		= m_nThemeGreen;
+		s.nThemeBlue		= m_nThemeBlue;
+		s.fFileNameOnSeekBar = !!m_fFileNameOnSeekBar;
+
 		HWND WndToolBar = ((CMainFrame*)AfxGetMainWnd())->m_hWnd_toolbar;
 	    if (::IsWindow(WndToolBar)) {
 			s.fToolbarRefresh = true;//set refresh flag
@@ -197,9 +232,31 @@ BOOL CPPageTweaks::OnApply()
 		pFrame->CreateThumbnailToolbar();
 	}
 	pFrame->UpdateThumbarButton();
-
+	pFrame->Invalidate();
 	return __super::OnApply();
 }
+
+void CPPageTweaks::OnCancel()
+{
+	AfxGetAppSettings().nThemeBrightness	= m_nThemeBrightness_Old;
+	AfxGetAppSettings().nThemeRed			= m_nThemeRed_Old;
+	AfxGetAppSettings().nThemeGreen			= m_nThemeGreen_Old;
+	AfxGetAppSettings().nThemeBlue			= m_nThemeBlue_Old;
+	OnThemeChange();
+}
+
+void CPPageTweaks::OnThemeChange()
+{
+	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
+	HWND WndToolBar = ((CMainFrame*)AfxGetMainWnd())->m_hWnd_toolbar;
+	if (::IsWindow(WndToolBar)) {
+		AfxGetAppSettings().fToolbarRefresh = true;//set refresh flag
+		//triggers PlayerToolBar::ArrangeControls() at OnSize
+		::PostMessage(WndToolBar, WM_SIZE, SIZE_RESTORED, MAKELPARAM(320, 240));//w,h ignored(good) by SIZE_RESTORED?!
+	}
+	pFrame->Invalidate();
+}
+
 
 BEGIN_MESSAGE_MAP(CPPageTweaks, CPPageBase)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK3, OnUpdateCheck3)
@@ -212,6 +269,11 @@ BEGIN_MESSAGE_MAP(CPPageTweaks, CPPageBase)
 	ON_BN_CLICKED(IDC_CHECK8, OnUseTimeTooltipClicked)
 	ON_CBN_SELCHANGE(IDC_COMBO1, OnChngOSDCombo)
 	ON_CBN_SELCHANGE(IDC_COMBO2, OnChngOSDCombo)
+	ON_UPDATE_COMMAND_UI(IDC_SLIDER1, OnUpdateThemeBrightness)
+	ON_UPDATE_COMMAND_UI(IDC_SLIDER2, OnUpdateThemeRed)
+	ON_UPDATE_COMMAND_UI(IDC_SLIDER3, OnUpdateThemeGreen)
+	ON_UPDATE_COMMAND_UI(IDC_SLIDER4, OnUpdateThemeBlue)
+	ON_WM_HSCROLL()
 END_MESSAGE_MAP()
 
 
@@ -227,11 +289,17 @@ void CPPageTweaks::OnUpdateCheck3(CCmdUI* pCmdUI)
 
 void CPPageTweaks::OnClickClrDefault()
 {
-	m_clrFaceABGR = 0x00e9e9e9;
-	m_clrOutlineABGR = 0x00a0a0a0;
+	m_clrFaceABGR = 0x00ff8080;
+	m_clrOutlineABGR = 0x00ffffff;
 	GetDlgItem(IDC_BUTTON_CLRFACE)->Invalidate();
 	GetDlgItem(IDC_BUTTON_CLROUTLINE)->Invalidate();
 	PostMessage(WM_COMMAND, IDC_CHECK3);
+
+	AfxGetAppSettings().nThemeBrightness	= m_nThemeBrightness	= 25;
+	AfxGetAppSettings().nThemeRed			= m_nThemeRed			= 256;
+	AfxGetAppSettings().nThemeGreen			= m_nThemeGreen			= 256;
+	AfxGetAppSettings().nThemeBlue			= m_nThemeBlue			= 256;
+	OnThemeChange();
 
 	UpdateData(FALSE);
 }
@@ -312,3 +380,53 @@ void CPPageTweaks::OnUseTimeTooltipClicked()
 
 	SetModified();
 }
+
+void CPPageTweaks::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+	if (*pScrollBar == m_ThemeBrightnessCtrl) {
+		UpdateData();
+		AfxGetAppSettings().nThemeBrightness	= m_nThemeBrightness;
+		OnThemeChange();
+	}
+	if (*pScrollBar == m_ThemeRedCtrl) {
+		UpdateData();
+		AfxGetAppSettings().nThemeRed			= m_nThemeRed;
+		OnThemeChange();
+	}
+	if (*pScrollBar == m_ThemeGreenCtrl) {
+		UpdateData();
+		AfxGetAppSettings().nThemeGreen			= m_nThemeGreen;
+		OnThemeChange();
+	}
+	if (*pScrollBar == m_ThemeBlueCtrl) {
+		UpdateData();
+		AfxGetAppSettings().nThemeBlue			= m_nThemeBlue;
+		OnThemeChange();
+	}
+	SetModified();
+	__super::OnHScroll(nSBCode, nPos, pScrollBar);
+}
+
+void CPPageTweaks::OnUpdateThemeBrightness(CCmdUI* pCmdUI)
+{
+	UpdateData();
+	pCmdUI->Enable(IsDlgButtonChecked(IDC_CHECK3)/*m_fEnableAudioSwitcher*/);
+ }
+
+void CPPageTweaks::OnUpdateThemeRed(CCmdUI* pCmdUI)
+{
+	UpdateData();
+	pCmdUI->Enable(IsDlgButtonChecked(IDC_CHECK3)/*m_fEnableAudioSwitcher*/);
+ }
+
+void CPPageTweaks::OnUpdateThemeGreen(CCmdUI* pCmdUI)
+{
+	UpdateData();
+	pCmdUI->Enable(IsDlgButtonChecked(IDC_CHECK3)/*m_fEnableAudioSwitcher*/);
+ }
+
+void CPPageTweaks::OnUpdateThemeBlue(CCmdUI* pCmdUI)
+{
+	UpdateData();
+	pCmdUI->Enable(IsDlgButtonChecked(IDC_CHECK3)/*m_fEnableAudioSwitcher*/);
+ }

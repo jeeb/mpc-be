@@ -33,6 +33,7 @@ class CVolumeCtrl : public CSliderCtrl
 private:
 	bool m_fSelfDrawn;
 	CBitmap m_bmUnderCtrl;//ins:2233 bobdynlan:copy area behind the control//
+	__int64 iThemeBrightness;
 
 public:
 	CVolumeCtrl(bool fSelfDrawn = true);

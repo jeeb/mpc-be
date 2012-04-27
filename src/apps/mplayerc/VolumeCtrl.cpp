@@ -35,7 +35,9 @@ CVolumeCtrl::CVolumeCtrl(bool fSelfDrawn) : m_fSelfDrawn(fSelfDrawn)
 
 CVolumeCtrl::~CVolumeCtrl()
 {
-	if (m_bmUnderCtrl.GetSafeHandle() != NULL) m_bmUnderCtrl.DeleteObject();
+	if (m_bmUnderCtrl.GetSafeHandle() != NULL) {
+		m_bmUnderCtrl.DeleteObject();
+	}
 }
 
 bool CVolumeCtrl::Create(CWnd* pParentWnd)
@@ -48,6 +50,8 @@ bool CVolumeCtrl::Create(CWnd* pParentWnd)
 	SetPosInternal(AfxGetAppSettings().nVolume);
 	SetPageSize(5);
 	SetLineSize(0);
+
+	iThemeBrightness = AfxGetAppSettings().nThemeBrightness;
 
 	Invalidate();
 
@@ -94,137 +98,136 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 	AppSettings& s = AfxGetAppSettings();
 
-	if (m_fSelfDrawn)
+	if (m_fSelfDrawn) {
 		switch (pNMCD->dwDrawStage) {
 			case CDDS_PREPAINT:
 			//TRACE(" PREPAINT ");
-			if (s.fDisableXPToolbars && m_bmUnderCtrl.GetSafeHandle() == NULL)
-			{			
+				if (s.fDisableXPToolbars/* && (m_bmUnderCtrl.GetSafeHandle() == NULL || iThemeBrightness != AfxGetAppSettings().nThemeBrightness)*/) {			
 					CDC *dc = GetParent()->GetDC();					
 					CDC memdc;
 					memdc.CreateCompatibleDC(dc);
 					CRect wr;
 					GetWindowRect(&wr);
 					GetParent()->ScreenToClient(&wr);
-					m_bmUnderCtrl.CreateCompatibleBitmap(dc, wr.Width(), wr.Height());
+
+					if (m_bmUnderCtrl.GetSafeHandle() == NULL) {
+						m_bmUnderCtrl.CreateCompatibleBitmap(dc, wr.Width(), wr.Height());
+					}
 					CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
 					memdc.BitBlt(0, 0, wr.Width(), wr.Height(), dc, wr.left, wr.top, SRCCOPY);
-					//MemDC.SelectObject(bmOld);
 					DeleteObject(memdc.SelectObject(bmOld));
 					GetParent()->ReleaseDC(dc);
 					memdc.DeleteDC();
-			}
+				}
 				lr = CDRF_NOTIFYITEMDRAW;
 				break;
 
 			case CDDS_ITEMPREPAINT:
-			if (s.fDisableXPToolbars && m_bmUnderCtrl.GetSafeHandle() != NULL)
-			{
-				CDC dc;
-				dc.Attach(pNMCD->hdc);
-				CRect r;
-				GetClientRect(&r);
-				CDC memdc;
-				memdc.CreateCompatibleDC(&dc);
-				CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
+				if (s.fDisableXPToolbars && m_bmUnderCtrl.GetSafeHandle() != NULL) {
+					CDC dc;
+					dc.Attach(pNMCD->hdc);
+					CRect r;
+					GetClientRect(&r);
+					CDC memdc;
+					memdc.CreateCompatibleDC(&dc);
+					CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
 
-				GRADIENT_RECT gr[1] = {{0, 1}};
-				int pa = 255 * 256;
-				unsigned p1 = s.clrOutlineABGR, p2 = s.clrFaceABGR;
+					GRADIENT_RECT gr[1] = {{0, 1}};
+					int pa = 255 * 256;
+					unsigned p1 = s.clrOutlineABGR, p2 = s.clrFaceABGR;
 
-				TRIVERTEX tv[2] = {
-					{0, 0, p1 * 256, (p1 >> 8) * 256, (p1 >> 16) * 256, pa},
-					{r.Width(), 1, p2 * 256, (p2 >> 8) * 256, (p2 >> 16) * 256, pa},
-				};
-				dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_H);
+					TRIVERTEX tv[2] = {
+						{0, 0, p1 * 256, (p1 >> 8) * 256, (p1 >> 16) * 256, pa},
+						{r.Width(), 1, p2 * 256, (p2 >> 8) * 256, (p2 >> 16) * 256, pa},
+					};
+					dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_H);
 
-				int nVolume = GetPos();
-				if (nVolume <= GetPageSize()) nVolume = 0;
-				int m_nVolPos = nVolume * 0.5;
+					int nVolume = GetPos();
+					if (nVolume <= GetPageSize()) nVolume = 0;
+					int m_nVolPos = nVolume * 0.5;
 
-				unsigned p3 = dc.GetPixel(m_nVolPos, 0) == 0x00000000 ? dc.GetPixel(m_nVolPos - 5, 0) : dc.GetPixel(m_nVolPos + 10, 0);
-				CPen penLeft(p2 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p3);
+					unsigned p3 = dc.GetPixel(m_nVolPos, 0) == 0x00000000 ? dc.GetPixel(m_nVolPos - 5, 0) : dc.GetPixel(m_nVolPos + 10, 0);
+					CPen penLeft(p2 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p3);
 
-				dc.BitBlt(0, 0, r.Width(), r.Height(), &memdc, 0, 0, SRCCOPY);
-				//MemDC.SelectObject(bmOld);
-				DeleteObject(memdc.SelectObject(bmOld));
-				memdc.DeleteDC();
-				r.DeflateRect(4, 2, 9, 6);
-				CopyRect(&pNMCD->rc, &r);
-				//TRACE("VOLUME RECT=(%d,%d,%d,%d) state=%d",r.left,r.top,r.right,r.bottom,pNMCD->uItemState);
+					dc.BitBlt(0, 0, r.Width(), r.Height(), &memdc, 0, 0, SRCCOPY);
+					//MemDC.SelectObject(bmOld);
+					DeleteObject(memdc.SelectObject(bmOld));
+					memdc.DeleteDC();
+					r.DeflateRect(4, 2, 9, 6);
+					CopyRect(&pNMCD->rc, &r);
+					//TRACE("VOLUME RECT=(%d,%d,%d,%d) state=%d",r.left,r.top,r.right,r.bottom,pNMCD->uItemState);
 
-				CPen penRight(p1 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p1);
-				CPen *penOld = dc.SelectObject(&penRight);
+					CPen penRight(p1 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p1);
+					CPen *penOld = dc.SelectObject(&penRight);
 
-				int nposx,nposy;
-				for (int i = 5 ; i <= 50;)
-				{
-					nposy = (int)r.bottom - r.Height() *i / ( r.Width() +10 ) -1;
-					nposx = r.left -5 +i -1;
-					i <= m_nVolPos ? dc.SelectObject(penLeft) : dc.SelectObject(penRight);
-					dc.MoveTo(nposx, nposy);				//top_left
-					dc.LineTo(nposx +2, nposy);				//top_right
-					dc.LineTo(nposx +2, r.bottom);			//bottom_right
-					dc.LineTo(nposx, r.bottom);				//bottom_left
-					dc.LineTo(nposx, nposy);				//top_left
-					if (!s.fMute)
+					int nposx,nposy;
+					for (int i = 5 ; i <= 50;)
 					{
-						dc.MoveTo(nposx +1, nposy -1);		//top_middle
-						dc.LineTo(nposx +1, r.bottom +2);	//bottom_middle
+						nposy = (int)r.bottom - r.Height() *i / ( r.Width() +10 ) -1;
+						nposx = r.left -5 +i -1;
+						i <= m_nVolPos ? dc.SelectObject(penLeft) : dc.SelectObject(penRight);
+						dc.MoveTo(nposx, nposy);				//top_left
+						dc.LineTo(nposx +2, nposy);				//top_right
+						dc.LineTo(nposx +2, r.bottom);			//bottom_right
+						dc.LineTo(nposx, r.bottom);				//bottom_left
+						dc.LineTo(nposx, nposy);				//top_left
+						if (!s.fMute)
+						{
+							dc.MoveTo(nposx +1, nposy -1);		//top_middle
+							dc.LineTo(nposx +1, r.bottom +2);	//bottom_middle
+						}
+						i+=5;
 					}
-					i+=5;
-				}
-				dc.SelectObject(penOld);
-				dc.Detach();
-				lr = CDRF_SKIPDEFAULT;
-			}
-
-			if (!s.fDisableXPToolbars && pNMCD->dwItemSpec == TBCD_CHANNEL)
-			{
-				if (m_bmUnderCtrl.GetSafeHandle() != NULL) m_bmUnderCtrl.DeleteObject();
-				CDC dc;
-				dc.Attach(pNMCD->hdc);
-
-				CRect r;
-				GetClientRect(r);
-				r.DeflateRect(8, 4, 10, 6);
-				CopyRect(&pNMCD->rc, &r);
-				CPen shadow(PS_SOLID, 1, GetSysColor(COLOR_3DSHADOW));
-				CPen light(PS_SOLID, 1, GetSysColor(COLOR_3DHILIGHT));
-				CPen* old = dc.SelectObject(&light);
-				dc.MoveTo(pNMCD->rc.right, pNMCD->rc.top);
-				dc.LineTo(pNMCD->rc.right, pNMCD->rc.bottom);
-				dc.LineTo(pNMCD->rc.left, pNMCD->rc.bottom);
-				dc.SelectObject(&shadow);
-				dc.LineTo(pNMCD->rc.right, pNMCD->rc.top);
-				dc.SelectObject(old);
-
-				dc.Detach();
-				lr = CDRF_SKIPDEFAULT;
-			}
-			else if (!s.fDisableXPToolbars && pNMCD->dwItemSpec == TBCD_THUMB)
-			{
-				CDC dc;
-				dc.Attach(pNMCD->hdc);
-				pNMCD->rc.bottom--;
-				CRect r(pNMCD->rc);
-				r.DeflateRect(0, 0, 1, 0);
-
-				COLORREF shadow = GetSysColor(COLOR_3DSHADOW);
-				COLORREF light = GetSysColor(COLOR_3DHILIGHT);
-				dc.Draw3dRect(&r, light, 0);
-				r.DeflateRect(0, 0, 1, 1);
-				dc.Draw3dRect(&r, light, shadow);
-				r.DeflateRect(1, 1, 1, 1);
-				dc.FillSolidRect(&r, GetSysColor(COLOR_BTNFACE));
-				dc.SetPixel(r.left+7, r.top-1, GetSysColor(COLOR_BTNFACE));
-
-				dc.Detach();
-				lr = CDRF_SKIPDEFAULT;
+					dc.SelectObject(penOld);
+					dc.Detach();
+					lr = CDRF_SKIPDEFAULT;
 				}
 
+				if (!s.fDisableXPToolbars && pNMCD->dwItemSpec == TBCD_CHANNEL) {
+					if (m_bmUnderCtrl.GetSafeHandle() != NULL) m_bmUnderCtrl.DeleteObject();
+					CDC dc;
+					dc.Attach(pNMCD->hdc);
+
+					CRect r;
+					GetClientRect(r);
+					r.DeflateRect(8, 4, 10, 6);
+					CopyRect(&pNMCD->rc, &r);
+					CPen shadow(PS_SOLID, 1, GetSysColor(COLOR_3DSHADOW));
+					CPen light(PS_SOLID, 1, GetSysColor(COLOR_3DHILIGHT));
+					CPen* old = dc.SelectObject(&light);
+					dc.MoveTo(pNMCD->rc.right, pNMCD->rc.top);
+					dc.LineTo(pNMCD->rc.right, pNMCD->rc.bottom);
+					dc.LineTo(pNMCD->rc.left, pNMCD->rc.bottom);
+					dc.SelectObject(&shadow);
+					dc.LineTo(pNMCD->rc.right, pNMCD->rc.top);
+					dc.SelectObject(old);
+
+					dc.Detach();
+					lr = CDRF_SKIPDEFAULT;
+				} else if (!s.fDisableXPToolbars && pNMCD->dwItemSpec == TBCD_THUMB) {
+					CDC dc;
+					dc.Attach(pNMCD->hdc);
+					pNMCD->rc.bottom--;
+					CRect r(pNMCD->rc);
+					r.DeflateRect(0, 0, 1, 0);
+
+					COLORREF shadow = GetSysColor(COLOR_3DSHADOW);
+					COLORREF light = GetSysColor(COLOR_3DHILIGHT);
+					dc.Draw3dRect(&r, light, 0);
+					r.DeflateRect(0, 0, 1, 1);
+					dc.Draw3dRect(&r, light, shadow);
+					r.DeflateRect(1, 1, 1, 1);
+					dc.FillSolidRect(&r, GetSysColor(COLOR_BTNFACE));
+					dc.SetPixel(r.left+7, r.top-1, GetSysColor(COLOR_BTNFACE));
+
+					dc.Detach();
+					lr = CDRF_SKIPDEFAULT;
+				}
 				break;
-		};
+			default:
+				break;
+		}
+	}
 
 	pNMCD->uItemState &= ~CDIS_FOCUS;
 
@@ -271,8 +274,7 @@ void CVolumeCtrl::HScroll(UINT nSBCode, UINT nPos)
 {
 	int nVolMin, nVolMax;
 	GetRange(nVolMin, nVolMax);
-	if ((UINT)nVolMin <= nSBCode && nSBCode <= (UINT)nVolMax)
-	{
+	if ((UINT)nVolMin <= nSBCode && nSBCode <= (UINT)nVolMax) {
 		CRect r;
 		GetClientRect(&r);
 		InvalidateRect(&r);

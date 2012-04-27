@@ -69,6 +69,8 @@ BOOL CPlayerSeekBar::Create(CWnd* pParentWnd)
 
 	m_tooltip.SendMessage(TTM_ADDTOOL, 0, (LPARAM)&m_ti);
 
+	iThemeBrightness = AfxGetAppSettings().nThemeBrightness;
+
 	return TRUE;
 }
 
@@ -271,7 +273,11 @@ void CPlayerSeekBar::OnPaint()
 		CBitmap *bmOld = memdc.SelectObject(&m_bmPaint);
 
 		//background
-
+		iThemeBrightness = AfxGetAppSettings().nThemeBrightness;
+		iThemeRed = AfxGetAppSettings().nThemeRed;
+		iThemeGreen = AfxGetAppSettings().nThemeGreen;
+		iThemeBlue = AfxGetAppSettings().nThemeBlue;
+		bFileNameOnSeekBar = AfxGetAppSettings().fFileNameOnSeekBar;
 		GRADIENT_RECT gr[1] = {{0, 1}};
 
 		int fp = m_logobm.FileExists("background");
@@ -280,8 +286,8 @@ void CPlayerSeekBar::OnPaint()
 			m_logobm.LoadExternalGradient("background", &memdc, r, 0);
 		} else {
 			TRIVERTEX tv[2] = {
-				{r.left, r.top, 80*256, 85*256, 90*256, 255*256},
-				{r.right, r.bottom, 35*256, 40*256, 45*256, 255*256},
+				{r.left, r.top, (iThemeBrightness+65)*iThemeRed, (iThemeBrightness+70)*iThemeGreen, (iThemeBrightness+75)*iThemeBlue, 255*256},
+				{r.right, r.bottom, (iThemeBrightness+0)*iThemeRed, (iThemeBrightness+5)*iThemeGreen, (iThemeBrightness+10)*iThemeBlue, 255*256},
 			};
 			memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 		}
@@ -290,7 +296,7 @@ void CPlayerSeekBar::OnPaint()
 
 		CPen penPlayed(AfxGetAppSettings().clrFaceABGR == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, AfxGetAppSettings().clrFaceABGR);//ins:2452 bobdynlan:Hide pen if color = transparency mask////clr_resLight 0x00ffffff = RGB(255,255,255)
 		CPen penPlayedOutline(AfxGetAppSettings().clrOutlineABGR == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, AfxGetAppSettings().clrOutlineABGR);//ins:2452 bobdynlan:Hide pen if color = transparency mask////clr_resShadow 0x00c0c0c0 = RGB(192,192,192)
-
+		
    		//outer frame shadow
 		rf = GetChannelRect();
 		rf.InflateRect(1, 0, GetThumbRect().Width()-2, 1);
@@ -302,62 +308,65 @@ void CPlayerSeekBar::OnPaint()
 		int nposx = GetThumbRect().right-2;
 		int nposy = r.top;
 		
-		CPen penPlayed1(PS_SOLID,0,RGB(145,150,155));
+		CPen penPlayed1(PS_SOLID,0,RGB((iThemeBrightness+110),(iThemeBrightness+115),(iThemeBrightness+120)));
 		memdc.SelectObject(&penPlayed1);
 		memdc.MoveTo(rc.left +1, rc.top +1);
 		memdc.LineTo(rc.right, rc.top +1);	
+		CPen penPlayed2(PS_SOLID,0,RGB((iThemeBrightness+80),(iThemeBrightness+85),(iThemeBrightness+90)));
+		memdc.SelectObject(&penPlayed2);
 		memdc.MoveTo(rc.left +1, rc.top +17);
 		memdc.LineTo(rc.right, rc.top +17);	
 
-		if (fEnabled)
-		{	
-			CBrush b(RGB(145, 150, 155));
+		if (fEnabled) {	
+			CBrush b(RGB((iThemeRed-110<0?0:iThemeRed-110), (iThemeGreen-105<0?0:iThemeGreen-105), (iThemeBlue-100<0?0:iThemeBlue-100)/*145, 150, 155*/));
 			CRect rb(rc.left + 1,rc.top + 2,nposx, rc.bottom - 1);
 			memdc.FillRect(rb,&b);
 
 			AlphaBlend(memdc.m_hDC, rc.left,rc.top+10, r.Width() -2, 0.4*rc.Height(), memdc, 0, 0, rc.left,rc.top+10, bf);
 
-			CPen penPlayed2(PS_SOLID,0,RGB(215,220,225));
-			memdc.SelectObject(&penPlayed2);
+			CPen penPlayed3(PS_SOLID,0,RGB(215,220,225));
+			memdc.SelectObject(&penPlayed3);
 			memdc.MoveTo(rc.left +1, rc.top +1);//active_top
 			memdc.LineTo(nposx, rc.top +1);		
 
-			CPen penPlayed3(PS_SOLID,0,RGB(165,170,175));
-			memdc.SelectObject(&penPlayed3);
+			CPen penPlayed4(PS_SOLID,0,RGB(165,170,175));
+			memdc.SelectObject(&penPlayed4);
 			memdc.MoveTo(rc.left +1, rc.top +17);//active_top
 			memdc.LineTo(nposx, rc.top +17);
 		}
 
-		CFont font2;
-		memdc.SetTextColor(RGB(165,170,175));
-		font2.CreateFont(
-						13,							// nHeight
-						0,							// nWidth
-						0,							// nEscapement
-						0,							// nOrientation
-						FW_NORMAL,					// nWeight
-						FALSE,						// bItalic
-						FALSE,						// bUnderline
-						0,							// cStrikeOut
-						ANSI_CHARSET,				// nCharSet
-						OUT_RASTER_PRECIS,			// nOutPrecision
-						CLIP_DEFAULT_PRECIS,		// nClipPrecision
-						ANTIALIASED_QUALITY,        // nQuality
-						VARIABLE_PITCH | FF_MODERN, // nPitchAndFamily
-						_T("Tahoma")                // lpszFacename
-						);
-		CFont* oldfont2 = memdc.SelectObject(&font2);
-		SetBkMode(memdc, TRANSPARENT);
-		rt = rc;
-		rt.left = rc.left+6;
-		memdc.DrawText(str, str.GetLength(), &rt, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
+		if (bFileNameOnSeekBar) {
+			CFont font2;
+			memdc.SetTextColor(RGB(165,170,175));
+			font2.CreateFont(
+							13,							// nHeight
+							0,							// nWidth
+							0,							// nEscapement
+							0,							// nOrientation
+							FW_NORMAL,					// nWeight
+							FALSE,						// bItalic
+							FALSE,						// bUnderline
+							0,							// cStrikeOut
+							ANSI_CHARSET,				// nCharSet
+							OUT_RASTER_PRECIS,			// nOutPrecision
+							CLIP_DEFAULT_PRECIS,		// nClipPrecision
+							ANTIALIASED_QUALITY,        // nQuality
+							VARIABLE_PITCH | FF_MODERN, // nPitchAndFamily
+							_T("Tahoma")                // lpszFacename
+							);
+			CFont* oldfont2 = memdc.SelectObject(&font2);
+			SetBkMode(memdc, TRANSPARENT);
+			rt = rc;
+			rt.left = rc.left+6;
+			memdc.DrawText(str, str.GetLength(), &rt, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
 
-		memdc.SetTextColor(RGB(235,240,245));
-		CRect rt2;
-		rt2 = rc;
-		rt2.left = rc.left+6;
-		rt2.right = nposx;
-		memdc.DrawText(str, str.GetLength(), &rt2, DT_LEFT|DT_VCENTER|DT_SINGLELINE);
+			memdc.SetTextColor(RGB(235,240,245));
+			CRect rt2;
+			rt2 = rc;
+			rt2.left = rc.left+6;
+			rt2.right = nposx;
+			memdc.DrawText(str, str.GetLength(), &rt2, DT_LEFT|DT_VCENTER|DT_SINGLELINE);
+		}
 
 		dc.BitBlt(r.left, r.top, r.Width(), r.Height(), &memdc, 0, 0, SRCCOPY);
 		DeleteObject(memdc.SelectObject(bmOld));

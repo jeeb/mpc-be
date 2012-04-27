@@ -80,6 +80,8 @@ int CPlayerStatusBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_status.SetWindowPos(&m_time, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
 	m_time.Create(_T(""), WS_CHILD|WS_VISIBLE|SS_OWNERDRAW, r, this, IDC_PLAYERTIME);
 
+	iThemeBrightness = AfxGetAppSettings().nThemeBrightness;
+
 	Relayout();
 
 	return 0;
@@ -125,6 +127,7 @@ void CPlayerStatusBar::Relayout()
 		GetClientRect(r);
 		r.SetRect(6, r.top+4, 22, r.bottom-4);
 		m_type.MoveWindow(r);
+		iThemeBrightness = AfxGetAppSettings().nThemeBrightness;
 	} else {
 		m_type.ShowWindow(SW_HIDE);
 		m_status.ShowWindow(SW_HIDE);
@@ -357,7 +360,6 @@ void CPlayerStatusBar::OnPaint()
 			dc.BitBlt(r.right-bm.bmWidth-1, (r.Height() - bm.bmHeight)/2, bm.bmWidth, bm.bmHeight, &memdc, 0, 0, SRCCOPY);
 		}
 	} else {
-
  		CDC memdc;
  		GetClientRect(&r);
 		CBitmap m_bmPaint;
@@ -366,6 +368,10 @@ void CPlayerStatusBar::OnPaint()
 		CBitmap *bmOld = memdc.SelectObject(&m_bmPaint);
 
 		//background
+		iThemeBrightness  = AfxGetAppSettings().nThemeBrightness;
+		iThemeRed = AfxGetAppSettings().nThemeRed;
+		iThemeGreen = AfxGetAppSettings().nThemeGreen;
+		iThemeBlue = AfxGetAppSettings().nThemeBlue;
 
 		GRADIENT_RECT gr[1] = {{0, 1}};
 
@@ -375,8 +381,8 @@ void CPlayerStatusBar::OnPaint()
 			m_logobm.LoadExternalGradient("background", &memdc, r, 54);
 		} else {
 			TRIVERTEX tv[2] = {
-				{r.left, r.top, 55*256, 60*256, 65*256, 255*256},
-				{r.right, r.bottom, 35*256, 40*256, 45*256, 255*256},
+				{r.left, r.top, (iThemeBrightness + 30)*iThemeRed, (iThemeBrightness + 35)*iThemeGreen, (iThemeBrightness + 40)*iThemeBlue, 255*256},
+				{r.right, r.bottom, (iThemeBrightness + 0)*iThemeRed, (iThemeBrightness + 5)*iThemeGreen, (iThemeBrightness + 10)*iThemeBlue, 255*256},
 			};
 			memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 		}
@@ -390,7 +396,7 @@ void CPlayerStatusBar::OnPaint()
 		memdc.MoveTo(r.left +1, r.top +2);
 		memdc.LineTo(r.right, r.top +2);	
 		
-		CPen penPlayed2(PS_SOLID,0,RGB(145,150,155));
+		CPen penPlayed2(PS_SOLID,0,RGB((iThemeBrightness+50),(iThemeBrightness+55),(iThemeBrightness+60)));
 		memdc.SelectObject(&penPlayed2);
 		memdc.MoveTo(r.left +1, r.top +3);
 		memdc.LineTo(r.right, r.top +3);	

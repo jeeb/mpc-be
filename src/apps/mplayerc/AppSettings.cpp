@@ -116,6 +116,9 @@ CAppSettings::CAppSettings()
 #if INTERNAL_DECODER_FLAC
 	TraFiltersKeys[TRA_FLAC] = _T("TRA_FLAC");
 #endif
+#if INTERNAL_DECODER_PCM
+	TraFiltersKeys[TRA_PCM] = _T("TRA_PCM");
+#endif
 
 	// Internal DXVA decoders
 #if INTERNAL_DECODER_H264_DXVA
@@ -133,28 +136,25 @@ CAppSettings::CAppSettings()
 
 	// Internal FFMpeg decoders
 #if INTERNAL_DECODER_MPEGAUDIO
-	TraFiltersKeys[FFM_MPA] = _T("FFM_MPA");
+	FFMFiltersKeys[FFM_MPA] = _T("FFM_MPA");
 #endif
 #if INTERNAL_DECODER_AAC
-	TraFiltersKeys[FFM_AAC] = _T("FFM_AAC");
+	FFMFiltersKeys[FFM_AAC] = _T("FFM_AAC");
 #endif
 #if INTERNAL_DECODER_ALAC
-	TraFiltersKeys[FFM_ALAC] = _T("FFM_ALAC");
+	FFMFiltersKeys[FFM_ALAC] = _T("FFM_ALAC");
 #endif
 #if INTERNAL_DECODER_ALS
-	TraFiltersKeys[FFM_ALS] = _T("FFM_ALS");
+	FFMFiltersKeys[FFM_ALS] = _T("FFM_ALS");
 #endif
 #if INTERNAL_DECODER_VORBIS
-	TraFiltersKeys[FFM_VORBIS] = _T("FFM_VORBIS");
+	FFMFiltersKeys[FFM_VORBIS] = _T("FFM_VORBIS");
 #endif
 #if INTERNAL_DECODER_NELLYMOSER
-	TraFiltersKeys[FFM_NELLY] = _T("FFM_NELLY");
+	FFMFiltersKeys[FFM_NELLY] = _T("FFM_NELLY");
 #endif
 #if INTERNAL_DECODER_AMR
-	TraFiltersKeys[FFM_AMR] = _T("FFM_AMR");
-#endif
-#if INTERNAL_DECODER_PCM
-	TraFiltersKeys[FFM_PCM] = _T("FFM_PCM");
+	FFMFiltersKeys[FFM_AMR] = _T("FFM_AMR");
 #endif
 #if INTERNAL_DECODER_H264
 	FFMFiltersKeys[FFM_H264] = _T("FFM_H264");
@@ -805,6 +805,11 @@ void CAppSettings::UpdateData(bool fSave)
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_GLOBALMEDIA, fGlobalMedia);
 
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DISABLEXPTOOLBARS, fDisableXPToolbars);
+		pApp->WriteProfileInt(IDS_R_SETTINGS, _T("ThemeBrightness"), nThemeBrightness);
+		pApp->WriteProfileInt(IDS_R_SETTINGS, _T("ThemeRed"), nThemeRed);
+		pApp->WriteProfileInt(IDS_R_SETTINGS, _T("ThemeGreen"), nThemeGreen);
+		pApp->WriteProfileInt(IDS_R_SETTINGS, _T("ThemeBlue"), nThemeBlue);
+		pApp->WriteProfileInt(IDS_R_SETTINGS, _T("FileNameOnSeekBar"), fFileNameOnSeekBar);
 //INS:2451 bobdynlan: hijack XP Toolbars settings
 //-----------------------------------------------------------------------------
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TBREFRESH, fToolbarRefresh);//ins:2452 bobdynlan:Toolbar refresh flag//
@@ -1224,6 +1229,11 @@ void CAppSettings::UpdateData(bool fSave)
 		fGlobalMedia = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_GLOBALMEDIA, 0);
 
 		fDisableXPToolbars = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DISABLEXPTOOLBARS, 1);
+		nThemeBrightness = pApp->GetProfileInt(IDS_R_SETTINGS, _T("ThemeBrightness"), 25);
+		nThemeRed = pApp->GetProfileInt(IDS_R_SETTINGS, _T("ThemeRed"), 256);
+		nThemeGreen = pApp->GetProfileInt(IDS_R_SETTINGS, _T("ThemeGreen"), 256);
+		nThemeBlue = pApp->GetProfileInt(IDS_R_SETTINGS, _T("ThemeBlue"), 256);
+		fFileNameOnSeekBar = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("FileNameOnSeekBar"), TRUE);
 //INS:2451 bobdynlan: hijack XP Toolbars settings
 //-----------------------------------------------------------------------------
 		fToolbarRefresh = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TBREFRESH, FALSE);//ins:2452 bobdynlan:Toolbar refresh flag//

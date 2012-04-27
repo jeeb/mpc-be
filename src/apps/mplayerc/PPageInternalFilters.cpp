@@ -123,7 +123,7 @@ static filter_t s_filters[] = {
 	{_T("PS2 Audio (PCM/ADPCM)"), DECODER, AUDIO, TRA_PS2AUD, IDS_TRA_PS2AUD, CreateInstance<CMpaDecFilter>},
 #endif
 #if INTERNAL_DECODER_PCM
-	{_T("Other PCM/ADPCM"), FFMPEG_DECODER, AUDIO, FFM_PCM, IDS_TRA_FFMPEG, CreateInstance<CMpaDecFilter>},
+	{_T("Other PCM/ADPCM"), DECODER, AUDIO, TRA_PCM, IDS_TRA_FFMPEG, CreateInstance<CMpaDecFilter>},
 #endif
 
 // DXVA decoder

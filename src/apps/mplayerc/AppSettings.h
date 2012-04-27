@@ -136,7 +136,6 @@ enum MCE_RAW_INPUT {
 #define DEFAULT_JUMPDISTANCE_2  5000
 #define DEFAULT_JUMPDISTANCE_3 20000
 
-
 typedef enum {
 	DVS_HALF,
 	DVS_NORMAL,
@@ -422,9 +421,15 @@ public:
 	CString			strSubtitlePaths;
 
 	bool			fDisableXPToolbars;
-	bool fToolbarRefresh;//ins:2452 bobdynlan:Toolbar refresh flag//
-	int clrFaceABGR;//ins:2452 bobdynlan:Toolbar button color//
-	int clrOutlineABGR;//ins:2452 bobdynlan:Toolbar button outline color//
+	int				nThemeBrightness;
+	int				nThemeRed;
+	int				nThemeGreen;
+	int				nThemeBlue;
+	bool			fFileNameOnSeekBar;
+
+	bool			fToolbarRefresh;//ins:2452 bobdynlan:Toolbar refresh flag//
+	int				clrFaceABGR;//ins:2452 bobdynlan:Toolbar button color//
+	int				clrOutlineABGR;//ins:2452 bobdynlan:Toolbar button outline color//
 	int				nJumpDistS;
 	int				nJumpDistM;
 	int				nJumpDistL;

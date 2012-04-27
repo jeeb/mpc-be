@@ -42,6 +42,19 @@ public:
 
 	// Dialog Data
 	enum { IDD = IDD_PPAGETWEAKS };
+	int m_nThemeBrightness;
+	int m_nThemeBrightness_Old;
+	int m_nThemeRed;
+	int m_nThemeGreen;
+	int m_nThemeBlue;
+	int m_nThemeRed_Old;
+	int m_nThemeGreen_Old;
+	int m_nThemeBlue_Old;
+	BOOL m_fFileNameOnSeekBar;
+	CSliderCtrl m_ThemeBrightnessCtrl;
+	CSliderCtrl m_ThemeRedCtrl;
+	CSliderCtrl m_ThemeGreenCtrl;
+	CSliderCtrl m_ThemeBlueCtrl;
 	int m_clrFaceABGR;
 	int m_clrOutlineABGR;
 	int m_nJumpDistS;
@@ -65,6 +78,7 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
+	void OnCancel();
 
 	DECLARE_MESSAGE_MAP()
 
@@ -77,4 +91,10 @@ public:
 	afx_msg void OnBnClickedButton1();
 	afx_msg void OnUseTimeTooltipClicked();
 	afx_msg void OnChngOSDCombo();
+	afx_msg void OnUpdateThemeBrightness(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateThemeRed(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateThemeGreen(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateThemeBlue(CCmdUI* pCmdUI);
+	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+	afx_msg void OnThemeChange();
 };

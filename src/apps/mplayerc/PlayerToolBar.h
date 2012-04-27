@@ -39,6 +39,10 @@ private:
 	int getHitButtonIdx(CPoint point);
 
 	CPngImage m_logobm;
+	__int64 iThemeBrightness;
+	__int64 iThemeRed;
+	__int64 iThemeGreen;
+	__int64 iThemeBlue;
 
 	int m_nButtonHeight;
 	CImageList *m_pButtonsImages;

@@ -384,15 +384,18 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 	LRESULT lr = CDRF_DODEFAULT;
 	AppSettings& s = AfxGetAppSettings();
 	if (s.fDisableXPToolbars) {
-	
+		iThemeBrightness = AfxGetAppSettings().nThemeBrightness;
+		iThemeRed = AfxGetAppSettings().nThemeRed;
+		iThemeGreen = AfxGetAppSettings().nThemeGreen;
+		iThemeBlue = AfxGetAppSettings().nThemeBlue;
 		int iRedRB, iGreenRB, iBlueRB, iRedLT, iGreenLT, iBlueLT, iAlphaLT, iAlphaRB;
-		iRedLT		= 85;
-		iGreenLT	= 90;
-		iBlueLT		= 95;
+		iRedLT		= 50 + iThemeBrightness;
+		iGreenLT	= 55 + iThemeBrightness;
+		iBlueLT		= 60 + iThemeBrightness;
 		iAlphaLT	= 255;
-		iRedRB		= 55;
-		iGreenRB	= 60;
-		iBlueRB		= 65;
+		iRedRB		= 20 + iThemeBrightness;
+		iGreenRB	= 25 + iThemeBrightness;
+		iBlueRB		= 30 + iThemeBrightness;
 		iAlphaRB	= 255;
 
 		int fp = m_logobm.FileExists("background");
@@ -413,8 +416,8 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 				m_logobm.LoadExternalGradient("background", &dc, r, 21);
 			} else {
 				TRIVERTEX tv[2] = {
-					{r.left, r.top, iRedLT*256, iGreenLT*256, iBlueLT*256, iAlphaLT*256},
-					{r.right, r.bottom, iRedRB*256, iGreenRB*256, iBlueRB*256, iAlphaRB*256},
+					{r.left, r.top, iRedLT*iThemeRed, iGreenLT*iThemeGreen, iBlueLT*iThemeBlue, iAlphaLT*256},
+					{r.right, r.bottom, iRedRB*iThemeRed, iGreenRB*iThemeGreen, iBlueRB*iThemeBlue, iAlphaRB*256},
 				};
 				dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 			}
@@ -505,8 +508,8 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 					m_logobm.LoadExternalGradient("background", &dc, r, 21);
 				} else {
 					TRIVERTEX tv[2] = {
-						{r.left, r.top, iRedLT*256, iGreenLT*256, iBlueLT*256, iAlphaLT*256},
-						{r.right, r.bottom, iRedRB*256, iGreenRB*256, iBlueRB*256, iAlphaRB*256},
+						{r.left, r.top, iRedLT*iThemeRed, iGreenLT*iThemeGreen, iBlueLT*iThemeBlue, iAlphaLT*256},
+						{r.right, r.bottom, iRedRB*iThemeRed, iGreenRB*iThemeGreen, iBlueRB*iThemeBlue, iAlphaRB*256},
 					};
 					dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 				}

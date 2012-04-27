@@ -607,6 +607,8 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_nPosB					= 1;
 	m_bFrame_repeat_pict	= false;
 	m_bIsEVO				= false;
+
+	m_nFrameType			= PICT_FRAME;
 	
 	// === New swscaler options
 	m_nSwRefresh = 0;
@@ -1067,6 +1069,7 @@ STDMETHODIMP CMPCVideoDecFilter::NonDelegatingQueryInterface(REFIID riid, void**
 {
 	return
 		QI(IMPCVideoDecFilter)
+		QI(IMPCVideoDecFilter2)
 		QI(ISpecifyPropertyPages)
 		QI(ISpecifyPropertyPages2)
 		__super::NonDelegatingQueryInterface(riid, ppv);
@@ -1142,8 +1145,10 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 			if ((ClsidSourceFilter == __uuidof(COggSourceFilter)) || (ClsidSourceFilter == __uuidof(COggSplitterFilter))) {
 				m_bTheoraMTSupport = false;
 			} else if ((ClsidSourceFilter == __uuidof(CMpegSourceFilter)) || (ClsidSourceFilter == __uuidof(CMpegSplitterFilter))) {
-				if (IBaseFilter* mpegsp = GetFilterFromPin(m_pInput->GetConnected())) {
-					m_bIsEVO = (m_nCodecId == CODEC_ID_VC1 && mpeg_ps == (static_cast<CMpegSplitterFilter*>(mpegsp))->GetMPEGType());
+				if (CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected()) ) {
+					if (CComQIPtr<IMpegSplitterFilter> MpegSplitterFilter = pFilter ) {
+						m_bIsEVO = (m_nCodecId == CODEC_ID_VC1 && mpeg_ps == MpegSplitterFilter->GetMPEGType());
+					}
 				}
 			}
 
@@ -1583,11 +1588,14 @@ void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 		if (SUCCEEDED(pMS2->GetProperties(sizeof(props), (BYTE*)&props))) {
 			props.dwTypeSpecificFlags &= ~0x7f;
 
+			m_nFrameType = PICT_BOTTOM_FIELD;
 			if (!m_pFrame->interlaced_frame) {
-				props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
+				props.dwTypeSpecificFlags	|= AM_VIDEO_FLAG_WEAVE;
+				m_nFrameType				= PICT_FRAME;
 			} else {
 				if (m_pFrame->top_field_first) {
-					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_FIELD1FIRST;
+					props.dwTypeSpecificFlags	|= AM_VIDEO_FLAG_FIELD1FIRST;
+					m_nFrameType				= PICT_TOP_FIELD;
 				}
 			}
 
@@ -2654,6 +2662,11 @@ STDMETHODIMP CMPCVideoDecFilter::CreatePage(const GUID& guid, IPropertyPage** pp
 	return *ppPage ? S_OK : E_FAIL;
 }
 
+void CMPCVideoDecFilter::SetFrameType(FF_FIELD_TYPE nFrameType)
+{
+	m_nFrameType = nFrameType;
+}
+
 // IFFmpegDecFilter
 STDMETHODIMP CMPCVideoDecFilter::Apply()
 {
@@ -2905,5 +2918,11 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetSwOutputLevels()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_nSwOutputLevels;
+}
+
+STDMETHODIMP_(int) CMPCVideoDecFilter::GetFrameType()
+{
+	CAutoLock cAutoLock(&m_csProps);
+	return m_nFrameType;
 }
 //
