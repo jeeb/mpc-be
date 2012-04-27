@@ -59,14 +59,14 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CButton		m_cbDXVA_SD;
 
 	// === New swscaler options
-	CStatic     m_txtSwOutputFormats;
+	CStatic			m_txtSwOutputFormats;
 	CCheckListBox	m_lstSwOutputFormats;
-	CImageList	m_onoff;
-	CButton     m_cbSwOutputFormatUp;
-	CButton     m_cbSwOutputFormatDown;
+	CImageList		m_onoff;
+	CButton			m_cbSwOutputFormatUp;
+	CButton			m_cbSwOutputFormatDown;
 
-	int					m_nSwIndex[6];
-	int					m_nSwChecked[6];
+	int			m_nSwIndex[6];
+	int			m_nSwChecked[6];
 
 	CStatic     m_txtSwChromaToRGB;
 	CComboBox   m_cbSwChromaToRGB;
@@ -129,15 +129,14 @@ public:
 
 };
 
-
 class __declspec(uuid("3C395D46-8B0F-440d-B962-2F4A97355453"))
 	CMPCVideoDecCodecWnd : public CInternalPropertyPageWnd
 {
 	CComQIPtr<IMPCVideoDecFilter> m_pMDF;
 
-	CButton		m_grpSelectedCodec;
+	CButton			m_grpSelectedCodec;
 	CCheckListBox	m_lstCodecs;
-	CImageList	m_onoff;
+	CImageList		m_onoff;
 
 public:
 	CMPCVideoDecCodecWnd();

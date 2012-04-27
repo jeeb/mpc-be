@@ -3379,6 +3379,8 @@ void CMainFrame::OnUpdatePlayerStatus(CCmdUI* pCmdUI)
 		if ((AfxGetAppSettings().fUseWin7TaskBar) && (m_pTaskbarList)) {
 			m_pTaskbarList->SetProgressState(m_hWnd, TBPF_INDETERMINATE);
 		}
+
+		SetStatusMessage(ResStr(IDS_CONTROLS_OPENING));
 	} else if (m_iMediaLoadState == MLS_LOADED) {
 		CString msg = FillMessage();
 
@@ -3396,20 +3398,19 @@ void CMainFrame::OnUpdatePlayerStatus(CCmdUI* pCmdUI)
 			}
 		}
 		pCmdUI->SetText(UI_Text);
-		if (m_OldMessage != UI_Text) {
-			TRACE(_T("Change msg = %ws\n"), UI_Text);
-			m_wndStatusBar.SetStatusMessage(UI_Text);
-		}
 
-		m_OldMessage = UI_Text;
-
+		SetStatusMessage(UI_Text);
 	} else if (m_iMediaLoadState == MLS_CLOSING) {
 		pCmdUI->SetText(ResStr(IDS_CONTROLS_CLOSING));
 		if ((AfxGetAppSettings().fUseWin7TaskBar) && (m_pTaskbarList)) {
 			m_pTaskbarList->SetProgressState(m_hWnd, TBPF_INDETERMINATE);
 		}
+
+		SetStatusMessage(ResStr(IDS_CONTROLS_CLOSING));
 	} else {
 		pCmdUI->SetText(m_closingmsg);
+
+		SetStatusMessage(m_closingmsg);
 	}
 }
 
@@ -3505,6 +3506,8 @@ void CMainFrame::OnFilePostClosemedia()
 	m_wndStatsBar.RemoveAllLines();
 	m_wndStatusBar.Clear();
 	m_wndStatusBar.ShowTimer(false);
+	m_strFn = _T("");
+	m_wndStatusBar.Relayout();
 
 	if (AfxGetAppSettings().fEnableEDLEditor) {
 		m_wndEditListEditor.CloseFile();
@@ -15824,6 +15827,15 @@ bool CMainFrame::OpenBD(CString Path)
 
 	m_LastOpenBDPath = _T("");
 	return false;
+}
+
+void CMainFrame::SetStatusMessage(CString m_msg)
+{
+	if (m_OldMessage != m_msg) {
+		TRACE(_T("Change msg = %ws\n"), m_msg);
+		m_wndStatusBar.SetStatusMessage(m_msg);
+	}
+	m_OldMessage = m_msg;
 }
 
 CString CMainFrame::FillMessage()

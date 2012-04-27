@@ -96,6 +96,8 @@ public IUnknown {
 	STDMETHOD(SetSwOutputLevels(int nValue)) = 0;
 	STDMETHOD_(int, GetSwOutputLevels()) = 0;
 	//
+
+	STDMETHOD_(unsigned __int64, GetOutputFormat()) = 0;	
 };
 
 interface __declspec(uuid("F0ABC515-19ED-4D65-9D5F-59E36AE7F2AF"))

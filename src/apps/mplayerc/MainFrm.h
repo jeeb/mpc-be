@@ -987,5 +987,7 @@ public:
 
 protected:
 	CString m_OldMessage;
+	void SetStatusMessage(CString m_msg);
+
 	CString FillMessage();
 };

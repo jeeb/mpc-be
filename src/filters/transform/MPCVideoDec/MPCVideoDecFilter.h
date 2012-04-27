@@ -288,6 +288,8 @@ public:
 	STDMETHOD_(int, GetSwOutputLevels());
 	//
 
+	STDMETHOD_(unsigned __int64, GetOutputFormat());
+
 	// === IMPCVideoDecFilter2
 	STDMETHOD_(int, GetFrameType());
 

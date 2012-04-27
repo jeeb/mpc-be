@@ -609,6 +609,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_bIsEVO				= false;
 
 	m_nFrameType			= PICT_FRAME;
+	m_nOutCsp				= 0;
 	
 	// === New swscaler options
 	m_nSwRefresh = 0;
@@ -1480,6 +1481,10 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 		CLSID	ClsidSourceFilter = GetCLSID(m_pInput->GetConnected());
 		if ((ClsidSourceFilter == __uuidof(CMpegSourceFilter)) || (ClsidSourceFilter == __uuidof(CMpegSplitterFilter))) {
 			m_bReorderBFrame = false;
+		}
+
+		if (m_nDXVAMode != MODE_SOFTWARE) {
+			m_nOutCsp = FF_CSP_UNSUPPORTED;
 		}
 	}
 
@@ -2721,6 +2726,8 @@ STDMETHODIMP CMPCVideoDecFilter::Apply()
 	return S_OK;
 }
 
+// === IMPCVideoDecFilter
+
 STDMETHODIMP CMPCVideoDecFilter::SetThreadNumber(int nValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
@@ -2920,9 +2927,15 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetSwOutputLevels()
 	return m_nSwOutputLevels;
 }
 
+STDMETHODIMP_(unsigned __int64) CMPCVideoDecFilter::GetOutputFormat()
+{
+	CAutoLock cAutoLock(&m_csProps);
+	return m_nOutCsp;
+}
+
+// === IMPCVideoDecFilter2
 STDMETHODIMP_(int) CMPCVideoDecFilter::GetFrameType()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_nFrameType;
 }
-//

@@ -25,7 +25,9 @@
 #include "MPCVideoDecSettingsWnd.h"
 #include "../../../DSUtil/DSUtil.h"
 
+#include "PODtypes.h"
 #include "avcodec.h"
+#include "ffImgfmt.h"
 
 #include "../../../apps/mplayerc/InternalFiltersConfig.h"
 
@@ -222,8 +224,9 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_txtSwOutputFormats.Create (_T("Output formats:"), WS_VISIBLE|WS_CHILD, CRect (nPosX, nPosY, nPosX+nSizeX, nPosY+nSizeY), this, (UINT)IDC_STATIC);
 	nPosY += 16;
 	m_lstSwOutputFormats.Create (WS_VISIBLE|WS_CHILD|WS_BORDER|LBS_OWNERDRAWFIXED|LBS_HASSTRINGS|WS_VSCROLL, CRect (nPosX, nPosY, nPosX+nSizeX, nPosY+90), this, 0);
-	for (int i=0; i<6; i++)	
+	for (int i=0; i<6; i++) {
 		m_lstSwOutputFormats.AddString (SwOutputFormatNames[m_nSwIndex[i]]);
+	}
 	// Software Output formats order
 	nPosY += 80;
 	m_cbSwOutputFormatUp.Create (_T("<"), WS_VISIBLE|WS_CHILD|BS_PUSHBUTTON, CRect (nPosX+nSizeX-32, nPosY, nPosX+nSizeX-16, nPosY+nSizeY), this, IDC_PP_SWOUTPUTFORMATUP);
@@ -310,14 +313,26 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		m_cbDXVA_SD.SetCheck(m_pMDF->GetDXVA_SD());
 
 		// === New swscaler options
-		for (int i=0; i<6; i++)
+		for (int i=0; i<6; i++) {
 			m_lstSwOutputFormats.SetCheck(i, m_nSwChecked[i]);
+		}
 		m_cbSwChromaToRGB.SetCurSel(m_pMDF->GetSwChromaToRGB());
 		m_cbSwResizeMethodBE.SetCurSel(m_pMDF->GetSwResizeMethodBE());
 		m_cbSwColorspace.SetCurSel(m_pMDF->GetSwColorspace());
 		m_cbSwInputLevels.SetCurSel(m_pMDF->GetSwInputLevels());
 		m_cbSwOutputLevels.SetCurSel(m_pMDF->GetSwOutputLevels());
 		//
+
+		unsigned __int64 m_nOutCsp = m_pMDF->GetOutputFormat();
+		if (!((m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp)))) {
+			if (m_nOutCsp == FF_CSP_UNSUPPORTED) {
+				m_cbSwResizeMethodBE.EnableWindow(false);			
+			}
+			m_cbSwChromaToRGB.EnableWindow(false);
+			m_cbSwColorspace.EnableWindow(false);
+			m_cbSwInputLevels.EnableWindow(false);
+			m_cbSwOutputLevels.EnableWindow(false);
+		}
 	}
 
 	return true;
@@ -418,8 +433,7 @@ void CMPCVideoDecSettingsWnd::OnClickedSwOutputFormatUp()
 	int count = m_lstSwOutputFormats.GetCount();
 	int selected;	int selectedUp; 
 	CString text;
-	if ((pos != LB_ERR) && (count > 1) && (pos-1 >= 0))
-	{
+	if ((pos != LB_ERR) && (count > 1) && (pos-1 >= 0)) {
 		selected = m_lstSwOutputFormats.GetCheck(pos);
 		selectedUp = m_lstSwOutputFormats.GetCheck(pos-1);
 		m_lstSwOutputFormats.GetText(pos, text);        
@@ -438,8 +452,7 @@ void CMPCVideoDecSettingsWnd::OnClickedSwOutputFormatDown()
 	int count = m_lstSwOutputFormats.GetCount();
 	int selected;	int selectedDown; 
 	CString text;
-	if ((pos != LB_ERR) && (count > 1) && (pos+1 < count))
-	{
+	if ((pos != LB_ERR) && (count > 1) && (pos+1 < count)) {
 		selected = m_lstSwOutputFormats.GetCheck(pos);
 		selectedDown = m_lstSwOutputFormats.GetCheck(pos+1);
 		m_lstSwOutputFormats.GetText(pos,text);
@@ -565,8 +578,8 @@ bool CMPCVideoDecCodecWnd::OnApply()
 	OnDeactivate();
 
 	if (m_pMDF) {
-		int			nActiveCodecs = 0;
-		int			nPos		  = 0;
+		int nActiveCodecs = 0;
+		int nPos		  = 0;
 
 #if INTERNAL_DECODER_H264_DXVA
 		if (m_lstCodecs.GetCheck  (nPos++)) {
