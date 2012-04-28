@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include "PngImage.h"
+
 
 // CVolumeCtrl
 
@@ -32,8 +34,13 @@ class CVolumeCtrl : public CSliderCtrl
 
 private:
 	bool m_fSelfDrawn;
-	CBitmap m_bmUnderCtrl;//ins:2233 bobdynlan:copy area behind the control//
+	CBitmap m_bmUnderCtrl;
+
+	CPngImage m_logobm;
 	__int64 iThemeBrightness;
+	__int64 iThemeRed;
+	__int64 iThemeGreen;
+	__int64 iThemeBlue;
 
 public:
 	CVolumeCtrl(bool fSelfDrawn = true);
@@ -51,7 +58,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	afx_msg BOOL OnEraseBkgnd(CDC* pDC);//ins:2217 bobdynlan:anti-flicker//
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnNMCustomdraw(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnSetFocus(CWnd* pOldWnd);

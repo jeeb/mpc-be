@@ -132,19 +132,37 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					memdc.CreateCompatibleDC(&dc);
 					CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
 
+					iThemeBrightness = AfxGetAppSettings().nThemeBrightness;
+					iThemeRed = AfxGetAppSettings().nThemeRed;
+					iThemeGreen = AfxGetAppSettings().nThemeGreen;
+					iThemeBlue = AfxGetAppSettings().nThemeBlue;
+
 					GRADIENT_RECT gr[1] = {{0, 1}};
 					int pa = 255 * 256;
 					unsigned p1 = s.clrOutlineABGR, p2 = s.clrFaceABGR;
 
-					TRIVERTEX tv[2] = {
-						{0, 0, p1 * 256, (p1 >> 8) * 256, (p1 >> 16) * 256, pa},
-						{r.Width(), 1, p2 * 256, (p2 >> 8) * 256, (p2 >> 16) * 256, pa},
-					};
-					dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_H);
+					int fp = m_logobm.FileExists("volume");
+
+					if (NULL != fp) {
+						m_logobm.LoadExternalGradient("volume", &dc, r, 0, iThemeBrightness, iThemeRed, iThemeGreen, iThemeBlue);
+					} else {
+						int ir1 = p1 * iThemeRed;
+						int ig1 = (p1 >> 8) * iThemeGreen;
+						int ib1 = (p1 >> 16) * iThemeBlue;
+						int ir2 = p2 * iThemeRed;
+						int ig2 = (p2 >> 8) * iThemeGreen;
+						int ib2 = (p2 >> 16) * iThemeBlue;
+
+						TRIVERTEX tv[2] = {
+							{r.left, r.top, ir1, ig1, ib1, pa},
+							{r.right, 1, ir2, ig2, ib2, pa},
+						};
+						dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_H);
+					}
 
 					int nVolume = GetPos();
 					if (nVolume <= GetPageSize()) nVolume = 0;
-					int m_nVolPos = nVolume * 0.5;
+					int m_nVolPos = r.left + nVolume * 0.5;
 
 					unsigned p3 = dc.GetPixel(m_nVolPos, 0) == 0x00000000 ? dc.GetPixel(m_nVolPos - 5, 0) : dc.GetPixel(m_nVolPos + 10, 0);
 					CPen penLeft(p2 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p3);
@@ -254,7 +272,7 @@ void CVolumeCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 	} else if (point.x >= r.right) {
 		SetPos(stop);
 	} else {
-		int w = r.right - r.left;
+		int w = r.right - r.left - 6;
 		if (start < stop) {
 			SetPosInternal(start + ((stop - start) * (point.x - r.left) + (w/2)) / w);
 		}

@@ -283,7 +283,7 @@ void CPlayerSeekBar::OnPaint()
 		int fp = m_logobm.FileExists("background");
 
 		if (NULL != fp) {
-			m_logobm.LoadExternalGradient("background", &memdc, r, 0);
+			m_logobm.LoadExternalGradient("background", &memdc, r, 0, iThemeBrightness, iThemeRed, iThemeGreen, iThemeBlue);
 		} else {
 			TRIVERTEX tv[2] = {
 				{r.left, r.top, (iThemeBrightness+65)*iThemeRed, (iThemeBrightness+70)*iThemeGreen, (iThemeBrightness+75)*iThemeBlue, 255*256},

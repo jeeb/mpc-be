@@ -368,7 +368,7 @@ void CPlayerStatusBar::OnPaint()
 		CBitmap *bmOld = memdc.SelectObject(&m_bmPaint);
 
 		//background
-		iThemeBrightness  = AfxGetAppSettings().nThemeBrightness;
+		iThemeBrightness = AfxGetAppSettings().nThemeBrightness;
 		iThemeRed = AfxGetAppSettings().nThemeRed;
 		iThemeGreen = AfxGetAppSettings().nThemeGreen;
 		iThemeBlue = AfxGetAppSettings().nThemeBlue;
@@ -378,7 +378,7 @@ void CPlayerStatusBar::OnPaint()
 		int fp = m_logobm.FileExists("background");
 
 		if (NULL != fp) {
-			m_logobm.LoadExternalGradient("background", &memdc, r, 54);
+			m_logobm.LoadExternalGradient("background", &memdc, r, 55, iThemeBrightness, iThemeRed, iThemeGreen, iThemeBlue);
 		} else {
 			TRIVERTEX tv[2] = {
 				{r.left, r.top, (iThemeBrightness + 30)*iThemeRed, (iThemeBrightness + 35)*iThemeGreen, (iThemeBrightness + 40)*iThemeBlue, 255*256},

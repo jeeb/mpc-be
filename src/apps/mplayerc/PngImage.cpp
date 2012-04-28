@@ -200,7 +200,7 @@ HBITMAP CPngImage::LoadExternalImage(CString fn)
 	}
 }
 
-void CPngImage::LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop)
+void CPngImage::LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop, int br, int rc, int gc, int bc)
 {
 	FILE* fp = _tfopen(LoadCurrentPath() + fn + _T(".png"), _T("rb"));
 	if (fp) {
@@ -229,14 +229,24 @@ void CPngImage::LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop)
 		GRADIENT_RECT gr[1] = {{0, 1}};
 
 		int bt = bpp / 8, st = 2, pa = 255 * 256;
-		int sp = bt * ptop, hs = bt * st, sz = width * height * bt;
+		int sp = bt * ptop, hs = bt * st;
 
-		for (int k = sp, t = 0; t < r.bottom; k += hs, t += st) {
-			TRIVERTEX tv[2] = {
-				{r.left, t, pData[k + 2] * 256, pData[k + 1] * 256, pData[k] * 256, pa},
-				{r.right, t + st, pData[k + hs + 2] * 256, pData[k + hs + 1] * 256, pData[k + hs] * 256, pa},
-			};
-			dc->GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+		if (width > height) {
+			for (int k = sp, t = 0; t < r.right; k += hs, t += st) {
+				TRIVERTEX tv[2] = {
+					{t, r.top, (br + pData[k + 2]) * rc, (br + pData[k + 1]) * gc, (br + pData[k]) * bc, pa},
+					{t + st, r.bottom, (br + pData[k + hs + 2]) * rc, (br + pData[k + hs + 1]) * gc, (br + pData[k + hs]) * bc, pa},
+				};
+				dc->GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_H);
+			}
+		} else {
+			for (int k = sp, t = 0; t < r.bottom; k += hs, t += st) {
+				TRIVERTEX tv[2] = {
+					{r.left, t, (br + pData[k + 2]) * rc, (br + pData[k + 1]) * gc, (br + pData[k]) * bc, pa},
+					{r.right, t + st, (br + pData[k + hs + 2]) * rc, (br + pData[k + hs + 1]) * gc, (br + pData[k + hs]) * bc, pa},
+				};
+				dc->GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+			}
 		}
 	}
 }

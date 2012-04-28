@@ -413,7 +413,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			GetClientRect(&r);
 
 			if (NULL != fp) {
-				m_logobm.LoadExternalGradient("background", &dc, r, 21);
+				m_logobm.LoadExternalGradient("background", &dc, r, 21, iThemeBrightness, iThemeRed, iThemeGreen, iThemeBlue);
 			} else {
 				TRIVERTEX tv[2] = {
 					{r.left, r.top, iRedLT*iThemeRed, iGreenLT*iThemeGreen, iBlueLT*iThemeBlue, iAlphaLT*256},
@@ -505,7 +505,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 				GetItemRect(sep[j], &r);
 
 				if (NULL != fp) {
-					m_logobm.LoadExternalGradient("background", &dc, r, 21);
+					m_logobm.LoadExternalGradient("background", &dc, r, 21, iThemeBrightness, iThemeRed, iThemeGreen, iThemeBlue);
 				} else {
 					TRIVERTEX tv[2] = {
 						{r.left, r.top, iRedLT*iThemeRed, iGreenLT*iThemeGreen, iBlueLT*iThemeBlue, iAlphaLT*256},
