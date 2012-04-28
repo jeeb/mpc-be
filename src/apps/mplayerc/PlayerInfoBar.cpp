@@ -183,10 +183,8 @@ BOOL CPlayerInfoBar::OnEraseBkgnd(CDC* pDC)
 	if (pFrame->m_fFullScreen) {
 		r.InflateRect(1, 0, 1, 0);
 	}
-//INS:2451 bobdynlan: blend in; prevent white flicker at the down+right sides when resizing 
-//-----------------------------------------------------------------------------
-	if(AfxGetAppSettings().fDisableXPToolbars)
-	{
+
+	if (AfxGetAppSettings().fDisableXPToolbars) {
 		CPen penBlend (PS_SOLID,0,0x002d2823);//clr_ibBlend = RGB(35,40,45)
 		CPen *penSaved = pDC->SelectObject(&penBlend);
 		pDC->MoveTo(r.left,r.top);
@@ -194,16 +192,14 @@ BOOL CPlayerInfoBar::OnEraseBkgnd(CDC* pDC)
 		pDC->SelectObject(&penSaved);
 		r.DeflateRect(0,1,0,0);
 		pDC->FillSolidRect(&r, 0);
+	} else {
+		pDC->Draw3dRect(&r, GetSysColor(COLOR_3DSHADOW), GetSysColor(COLOR_3DHILIGHT));
+
+		r.DeflateRect(1, 1);
+
+		pDC->FillSolidRect(&r, 0);
 	}
-	else
-	{
-//--------------------------------------------------------------------------INS
-	pDC->Draw3dRect(&r, GetSysColor(COLOR_3DSHADOW), GetSysColor(COLOR_3DHILIGHT));
 
-	r.DeflateRect(1, 1);
-
-	pDC->FillSolidRect(&r, 0);
-	}//ins:2451 bobdynlan://
 	return TRUE;
 }
 

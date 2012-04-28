@@ -405,20 +405,20 @@ void CPlayerStatusBar::OnPaint()
 		CFont font2;
 		memdc.SetTextColor(RGB(165,170,175));
 		font2.CreateFont(
-						13,							// nHeight
-						0,							// nWidth
-						0,							// nEscapement
-						0,							// nOrientation
-						FW_NORMAL,					// nWeight
-						FALSE,						// bItalic
-						FALSE,						// bUnderline
-						0,							// cStrikeOut
-						ANSI_CHARSET,				// nCharSet
-						OUT_RASTER_PRECIS,			// nOutPrecision
+						13,				// nHeight
+						0,				// nWidth
+						0,				// nEscapement
+						0,				// nOrientation
+						FW_NORMAL,			// nWeight
+						FALSE,				// bItalic
+						FALSE,				// bUnderline
+						0,				// cStrikeOut
+						ANSI_CHARSET,			// nCharSet
+						OUT_RASTER_PRECIS,		// nOutPrecision
 						CLIP_DEFAULT_PRECIS,		// nClipPrecision
-						ANTIALIASED_QUALITY,        // nQuality
-						VARIABLE_PITCH | FF_MODERN, // nPitchAndFamily
-						_T("Tahoma")              // lpszFacename
+						ANTIALIASED_QUALITY,        	// nQuality
+						VARIABLE_PITCH | FF_MODERN, 	// nPitchAndFamily
+						_T("Tahoma")              	// lpszFacename
 						);
 
 		CFont* oldfont2 = memdc.SelectObject(&font2);

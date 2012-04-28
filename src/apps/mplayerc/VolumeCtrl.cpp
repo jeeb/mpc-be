@@ -102,7 +102,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 		switch (pNMCD->dwDrawStage) {
 			case CDDS_PREPAINT:
 			//TRACE(" PREPAINT ");
-				if (s.fDisableXPToolbars/* && (m_bmUnderCtrl.GetSafeHandle() == NULL || iThemeBrightness != AfxGetAppSettings().nThemeBrightness)*/) {			
+				if (s.fDisableXPToolbars && (m_bmUnderCtrl.GetSafeHandle() == NULL/* || iThemeBrightness != AfxGetAppSettings().nThemeBrightness*/)) {			
 					CDC *dc = GetParent()->GetDC();					
 					CDC memdc;
 					memdc.CreateCompatibleDC(dc);
@@ -113,6 +113,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					if (m_bmUnderCtrl.GetSafeHandle() == NULL) {
 						m_bmUnderCtrl.CreateCompatibleBitmap(dc, wr.Width(), wr.Height());
 					}
+
 					CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
 					memdc.BitBlt(0, 0, wr.Width(), wr.Height(), dc, wr.left, wr.top, SRCCOPY);
 					DeleteObject(memdc.SelectObject(bmOld));
@@ -161,7 +162,10 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					}
 
 					int nVolume = GetPos();
-					if (nVolume <= GetPageSize()) nVolume = 0;
+					if (nVolume <= GetPageSize()) {
+						nVolume = 0;
+					}
+
 					int m_nVolPos = r.left + nVolume * 0.5;
 
 					unsigned p3 = dc.GetPixel(m_nVolPos, 0) == 0x00000000 ? dc.GetPixel(m_nVolPos - 5, 0) : dc.GetPixel(m_nVolPos + 10, 0);

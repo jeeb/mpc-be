@@ -261,7 +261,7 @@ void CPlayerSeekBar::OnPaint()
 		BLENDFUNCTION bf;  
 		bf.AlphaFormat	= 0;
 		bf.BlendFlags	= 0;
-		bf.BlendOp		= AC_SRC_OVER;
+		bf.BlendOp	= AC_SRC_OVER;
 		bf.SourceConstantAlpha = 100;
 		
 		CDC memdc;
@@ -294,8 +294,8 @@ void CPlayerSeekBar::OnPaint()
 
 		memdc.SetBkMode(TRANSPARENT);
 
-		CPen penPlayed(AfxGetAppSettings().clrFaceABGR == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, AfxGetAppSettings().clrFaceABGR);//ins:2452 bobdynlan:Hide pen if color = transparency mask////clr_resLight 0x00ffffff = RGB(255,255,255)
-		CPen penPlayedOutline(AfxGetAppSettings().clrOutlineABGR == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, AfxGetAppSettings().clrOutlineABGR);//ins:2452 bobdynlan:Hide pen if color = transparency mask////clr_resShadow 0x00c0c0c0 = RGB(192,192,192)
+		CPen penPlayed(AfxGetAppSettings().clrFaceABGR == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, AfxGetAppSettings().clrFaceABGR);
+		CPen penPlayedOutline(AfxGetAppSettings().clrOutlineABGR == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, AfxGetAppSettings().clrOutlineABGR);
 		
    		//outer frame shadow
 		rf = GetChannelRect();
@@ -339,20 +339,20 @@ void CPlayerSeekBar::OnPaint()
 			CFont font2;
 			memdc.SetTextColor(RGB(165,170,175));
 			font2.CreateFont(
-							13,							// nHeight
-							0,							// nWidth
-							0,							// nEscapement
-							0,							// nOrientation
-							FW_NORMAL,					// nWeight
-							FALSE,						// bItalic
-							FALSE,						// bUnderline
-							0,							// cStrikeOut
-							ANSI_CHARSET,				// nCharSet
-							OUT_RASTER_PRECIS,			// nOutPrecision
+							13,				// nHeight
+							0,				// nWidth
+							0,				// nEscapement
+							0,				// nOrientation
+							FW_NORMAL,			// nWeight
+							FALSE,				// bItalic
+							FALSE,				// bUnderline
+							0,				// cStrikeOut
+							ANSI_CHARSET,			// nCharSet
+							OUT_RASTER_PRECIS,		// nOutPrecision
 							CLIP_DEFAULT_PRECIS,		// nClipPrecision
-							ANTIALIASED_QUALITY,        // nQuality
-							VARIABLE_PITCH | FF_MODERN, // nPitchAndFamily
-							_T("Tahoma")                // lpszFacename
+							ANTIALIASED_QUALITY,        	// nQuality
+							VARIABLE_PITCH | FF_MODERN, 	// nPitchAndFamily
+							_T("Tahoma")                	// lpszFacename
 							);
 			CFont* oldfont2 = memdc.SelectObject(&font2);
 			SetBkMode(memdc, TRANSPARENT);
@@ -518,8 +518,9 @@ void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 	CWnd* w = GetCapture();
 	if (w && w->m_hWnd == m_hWnd && (nFlags & MK_LBUTTON)) {
 		MoveThumb(point);
-		if (!AfxGetAppSettings().fDisableXPToolbars)/*ins:2452 bobdynlan:no update until drag end*/ 
-		GetParent()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBTRACK), (LPARAM)m_hWnd);
+		if (!AfxGetAppSettings().fDisableXPToolbars) {
+			GetParent()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBTRACK), (LPARAM)m_hWnd);
+		}
 	}
 
 	if (AfxGetAppSettings().fUseTimeTooltip) {

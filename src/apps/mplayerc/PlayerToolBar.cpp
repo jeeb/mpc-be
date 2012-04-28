@@ -140,7 +140,7 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 		}
 		
 		COLORSCHEME cs;
-		cs.dwSize			= sizeof(COLORSCHEME);
+		cs.dwSize		= sizeof(COLORSCHEME);
 		cs.clrBtnHighlight	= 0x0046413c; //clr_csLight = RGB( 60, 65, 70)
 		cs.clrBtnShadow		= 0x0037322d;//clr_csShadow = RGB( 45, 50, 55)
 		GetToolBarCtrl().SetColorScheme(&cs);
@@ -247,7 +247,7 @@ void CPlayerToolBar::ArrangeControls()
 		}
 
 		COLORSCHEME cs;
-		cs.dwSize			= sizeof(COLORSCHEME);
+		cs.dwSize		= sizeof(COLORSCHEME);
 		cs.clrBtnHighlight	= 0x0046413c; //clr_csLight = RGB( 60, 65, 70)
 		cs.clrBtnShadow		= 0x0037322d;//clr_csShadow = RGB( 45, 50, 55)
 
@@ -273,7 +273,7 @@ void CPlayerToolBar::ArrangeControls()
 		}
 		
 		COLORSCHEME cs;
-		cs.dwSize			= sizeof(COLORSCHEME);
+		cs.dwSize		= sizeof(COLORSCHEME);
 		cs.clrBtnHighlight	= GetSysColor(COLOR_BTNFACE);
 		cs.clrBtnShadow		= GetSysColor(COLOR_BTNSHADOW);
 
@@ -477,7 +477,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			BLENDFUNCTION bf;  
 			bf.AlphaFormat	= 0;
 			bf.BlendFlags	= 0;
-			bf.BlendOp		= AC_SRC_OVER;
+			bf.BlendOp	= AC_SRC_OVER;
 			bf.SourceConstantAlpha = 80;
 
 			CPen penFrHot (PS_SOLID,0,0x00e9e9e9);//clr_resFace	RGB(233,233,233)
