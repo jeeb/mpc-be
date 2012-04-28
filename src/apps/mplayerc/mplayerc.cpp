@@ -57,25 +57,48 @@ HICON LoadIcon(CString fn, bool fSmall)
 		ext = _T(".") + fn.Mid(fn.ReverseFind('.')+1);
 	}
 
-	CSize size(fSmall?16:32,fSmall?16:32);
+	CSize size(fSmall?16:32, fSmall?16:32);
 
 	if (!ext.CompareNoCase(_T(".ifo"))) {
 		if (HICON hIcon = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DVD), IMAGE_ICON, size.cx, size.cy, 0)) {
-			return(hIcon);
+			return hIcon;
 		}
 	}
 
 	if (!ext.CompareNoCase(_T(".cda"))) {
 		if (HICON hIcon = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_AUDIOCD), IMAGE_ICON, size.cx, size.cy, 0)) {
-			return(hIcon);
+			return hIcon;
+		}
+	}
+
+	WORD iconIndex;
+	TCHAR buff[256];
+	ULONG len;
+
+	lstrcpy(buff, fn);
+	HICON hIcon = ExtractAssociatedIcon(NULL, buff, &iconIndex);
+	UNUSED_ALWAYS(iconIndex);
+	if (hIcon) {
+		if (HICON _hIcon = (HICON)CopyImage(hIcon, IMAGE_ICON, size.cx, size.cy, LR_COPYFROMRESOURCE)) {
+			return _hIcon;
 		}
 	}
 
 	do {
 		CRegKey key;
 
-		TCHAR buff[256];
-		ULONG len;
+		CString RegPathAssociated;
+		RegPathAssociated.Format(_T("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\%ws\\UserChoice"), ext);
+
+		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, RegPathAssociated, KEY_READ)) {
+			len = sizeof(buff)/sizeof(buff[0]);
+			memset(buff, 0, sizeof(buff));
+
+			CString ext_Associated = ext;
+			if (ERROR_SUCCESS == key.QueryStringValue(_T("Progid"), buff, &len) && !(ext_Associated = buff).Trim().IsEmpty()) {
+				ext = ext_Associated;
+			}
+		}
 
 		if (ERROR_SUCCESS != key.Open(HKEY_CLASSES_ROOT, ext + _T("\\DefaultIcon"), KEY_READ)) {
 			if (ERROR_SUCCESS != key.Open(HKEY_CLASSES_ROOT, ext, KEY_READ)) {
@@ -112,8 +135,9 @@ HICON LoadIcon(CString fn, bool fSmall)
 		}
 
 		icon = icon.Left(i);
+		icon.Replace(_T("\""), _T(""));
 
-		HICON hIcon = NULL;
+		hIcon = NULL;
 		UINT cnt = fSmall
 				   ? ExtractIconEx(icon, id, NULL, &hIcon, 1)
 				   : ExtractIconEx(icon, id, &hIcon, NULL, 1);
@@ -123,7 +147,7 @@ HICON LoadIcon(CString fn, bool fSmall)
 		}
 	} while (0);
 
-	return((HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_UNKNOWN), IMAGE_ICON, size.cx, size.cy, 0));
+	return (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_UNKNOWN), IMAGE_ICON, size.cx, size.cy, 0);
 }
 
 bool LoadType(CString fn, CString& type)

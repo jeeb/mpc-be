@@ -11310,13 +11310,9 @@ void CMainFrame::OpenSetupStatusBar()
 	HICON hIcon = NULL;
 
 	if (GetPlaybackMode() == PM_FILE) {
-		CString fn = m_wndPlaylistBar.GetCurFileName();
-		CString ext = fn.Mid(fn.ReverseFind('.')+1);
-		hIcon = LoadIcon(ext, true);
+		hIcon = LoadIcon(m_wndPlaylistBar.GetCurFileName(), true);		
 	} else if (GetPlaybackMode() == PM_DVD) {
 		hIcon = LoadIcon(_T(".ifo"), true);
-	} else if (GetPlaybackMode() == PM_DVD) {
-		//hIcon = ; // TODO
 	}
 
 	m_wndStatusBar.SetStatusTypeIcon(hIcon);
