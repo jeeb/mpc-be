@@ -185,6 +185,8 @@ protected:
 	RMDemuxContext							rm;
 	REFERENCE_TIME							m_rtStart;
 
+	HWND									m_nDialogHWND;
+
 	// === Private functions
 	void				Cleanup();
 	int					FindCodec(const CMediaType* mtIn);
@@ -288,6 +290,7 @@ public:
 	STDMETHOD_(int, GetSwOutputLevels());
 	//
 
+	STDMETHOD(SetDialogHWND(HWND nValue));
 	STDMETHOD_(unsigned __int64, GetOutputFormat());
 
 	// === IMPCVideoDecFilter2

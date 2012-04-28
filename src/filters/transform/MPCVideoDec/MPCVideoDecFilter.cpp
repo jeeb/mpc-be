@@ -612,20 +612,21 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_nOutCsp				= 0;
 	
 	// === New swscaler options
-	m_nSwRefresh = 0;
-	m_nSwOutputFormats = 0;
+	m_nSwRefresh			= 0;
+	m_nSwOutputFormats		= 0;
 	// set the output formats order in the DWORD nibbles with literal values [0x00543210] = 0,1,2,3,4,5
 	// set the output formats count in the DWORD nibbles adding checked flag (8) [0x0054ba98] = 4
 	for (int i=0; i<6; i++) {
 		m_nSwOutputFormats = (m_nSwOutputFormats<<4) | (5-i + (i>1 ? 8 : 0));
 	}
-	m_nSwChromaToRGB = 1;
-	m_nSwResizeMethodBE = 2;
-	m_nSwColorspace = 2;
-	m_nSwInputLevels = 2;
-	m_nSwOutputLevels = 2;
+	m_nSwChromaToRGB		= 1;
+	m_nSwResizeMethodBE		= 2;
+	m_nSwColorspace			= 2;
+	m_nSwInputLevels		= 2;
+	m_nSwOutputLevels		= 2;
 	//
 
+	m_nDialogHWND			= 0;
 #ifdef REGISTER_FILTER
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\MPC-BE Filters\\MPC Video Decoder"), KEY_READ)) {
@@ -1648,8 +1649,8 @@ unsigned __int64 CMPCVideoDecFilter::GetCspFromMediaType(GUID& subtype)
 void CMPCVideoDecFilter::InitSwscale()
 {
 	if (m_pSwsContext == NULL) {
-		int sws_FlagsR;
-		int sws_FlagsO;
+		int sws_FlagsR = 0;
+		int sws_FlagsO = 0;
 
 		BITMAPINFOHEADER bihOut;
 		ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
@@ -1705,6 +1706,14 @@ void CMPCVideoDecFilter::InitSwscale()
 		
 		m_nOutCsp = GetCspFromMediaType(m_pOutput->CurrentMediaType().subtype);
 
+		if (m_nDialogHWND) {
+			EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_RESIZEMETHODBE), TRUE);
+			EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWCHROMATORGB), (m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp)));
+			EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWCOLORSPACE), (m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp)));
+			EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWINPUTLEVELS), (m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp)));
+			EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWOUTPUTLEVELS), (m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp)));
+		}
+
 		PixelFormat pix_fmt = csp_ffdshow2lavc(csp_lavc2ffdshow(m_pAVCtx->pix_fmt));
 		if (pix_fmt == PIX_FMT_NB) {
 			pix_fmt = m_pAVCtx->pix_fmt;
@@ -1732,10 +1741,11 @@ void CMPCVideoDecFilter::InitSwscale()
 		int ret = sws_getColorspaceDetails(m_pSwsContext, &inv_tbl, &srcRange, &tbl, &dstRange, &brightness, &contrast, &saturation);
 		if (ret >= 0) {
 			int nColorspace;
-			if (m_nSwColorspace == 2)
+			if (m_nSwColorspace == 2) {
 				nColorspace = PictWidthRounded() > 768 ? SWS_CS_ITU709 : SWS_CS_ITU601;	// GUI 'Auto'
-			else
+			} else {
 				nColorspace = m_nSwColorspace == 1 ? SWS_CS_ITU709 : SWS_CS_ITU601;	// GUI 'HD(BT.709)' : 'SD(BT.601)'
+			}
 		
 			dstRange = m_nSwOutputLevels>1 ? 0 : m_nSwOutputLevels; // GUI 'Auto' = 'TV(16-235)'
 			srcRange = m_nSwInputLevels>1 ? 0 : m_nSwInputLevels; // GUI 'Auto' = 'TV(16-235)'
@@ -1934,21 +1944,18 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 
 		// === New swscaler options
 		//soft refresh - signal new swscaler colorspace details
-		if (m_nSwRefresh > 0){
-#if HAS_FFMPEG_VIDEO_DECODERS
+		if (m_nSwRefresh == 1){
+			m_nSwRefresh--;
 			if (m_pSwsContext) {
 				sws_freeContext(m_pSwsContext);
 				m_pSwsContext = NULL;
 			}
-#endif /* HAS_FFMPEG_VIDEO_DECODERS */			
 		}
-
 
 		// === New swscaler options
 		// hard refresh - signal new output format
-		if (m_nSwRefresh > 0){
+		if (m_nSwRefresh == 2){
 			m_nSwRefresh--;
-#if HAS_FFMPEG_VIDEO_DECODERS
 			CComPtr<IPin> pRendererPin;
 			CComPtr<IPinConnection> pRendererConn;
 			CMediaType cmtRenderer;
@@ -1967,28 +1974,29 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			if (FAILED(hr))	{
 				// madVR accepts dynamic media type changes but does not support IPinConnection
 				if (S_OK == (hr = pRendererPin->QueryAccept(&cmtRenderer))) {
-					if (S_OK == (hr = m_pOutput->SetMediaType(&cmtRenderer)))
+					if (S_OK == (hr = m_pOutput->SetMediaType(&cmtRenderer))) {
 						ReconnectOutput(PictWidthRounded()-64, PictHeightRounded(), true, PictWidth(), PictHeight()); // Force by altering 'w'
+					}
 				}
 				return hr;
 			}
 			hr = pRendererConn->DynamicQueryAccept(&cmtRenderer);
 			if (SUCCEEDED(hr)) {
 				//VMR accepts dynamic media type changes.
-				if (S_OK == (hr = m_pOutput->SetMediaType(&cmtRenderer)))
+				if (S_OK == (hr = m_pOutput->SetMediaType(&cmtRenderer))) {
 					ReconnectOutput(PictWidthRounded()-64, PictHeightRounded(), true, PictWidth(), PictHeight());  // Force by altering 'w'
+				}
 			}	else {
 				//EVR does not accept dynamic media type changes so it needs the DISPLAY CHANGED hack
-				hr=m_pOutput->AddRef();
-				if (S_OK == (hr=NotifyEvent(EC_DISPLAY_CHANGED, (LONG_PTR)m_pOutput->GetConnected(), 0))) {
+				hr = m_pOutput->AddRef();
+				if (S_OK == (hr = NotifyEvent(EC_DISPLAY_CHANGED, (LONG_PTR)m_pOutput->GetConnected(), 0))) {
 					SleepEx(300,TRUE); // lame...
-					if (S_OK == (hr=m_pOutput->Release())) {
+					if (S_OK == (hr = m_pOutput->Release())) {
 						hr = m_pOutput->SetMediaType(&cmtRenderer);
 					}
 				}
 			}
 			return hr;
-#endif /* HAS_FFMPEG_VIDEO_DECODERS */
 		}
 		//
 
@@ -2925,6 +2933,13 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetSwOutputLevels()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_nSwOutputLevels;
+}
+
+STDMETHODIMP CMPCVideoDecFilter::SetDialogHWND(HWND nValue)
+{
+	CAutoLock cAutoLock(&m_csProps);
+	m_nDialogHWND = nValue;
+	return S_OK;
 }
 
 STDMETHODIMP_(unsigned __int64) CMPCVideoDecFilter::GetOutputFormat()

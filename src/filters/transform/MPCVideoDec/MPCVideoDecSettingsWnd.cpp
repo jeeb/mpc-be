@@ -98,6 +98,10 @@ bool CMPCVideoDecSettingsWnd::OnConnect(const CInterfaceList<IUnknown, &IID_IUnk
 
 void CMPCVideoDecSettingsWnd::OnDisconnect()
 {
+	if (m_pMDF) {
+		m_pMDF->SetDialogHWND(0);
+	}
+
 	m_pMDF.Release();
 }
 
@@ -298,6 +302,8 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 #endif
 
 	if (m_pMDF) {
+		m_pMDF->SetDialogHWND(this->GetSafeHwnd());
+
 #if HAS_FFMPEG_VIDEO_DECODERS
 #if INTERNAL_DECODER_H264
 		m_cbThreadNumber.SetCurSel		(m_pMDF->GetThreadNumber());
@@ -321,18 +327,19 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		m_cbSwColorspace.SetCurSel(m_pMDF->GetSwColorspace());
 		m_cbSwInputLevels.SetCurSel(m_pMDF->GetSwInputLevels());
 		m_cbSwOutputLevels.SetCurSel(m_pMDF->GetSwOutputLevels());
-		//
 
 		unsigned __int64 m_nOutCsp = m_pMDF->GetOutputFormat();
-		if (!((m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp)))) {
-			if (m_nOutCsp == FF_CSP_UNSUPPORTED) {
-				m_cbSwResizeMethodBE.EnableWindow(false);			
-			}
-			m_cbSwChromaToRGB.EnableWindow(false);
-			m_cbSwColorspace.EnableWindow(false);
-			m_cbSwInputLevels.EnableWindow(false);
-			m_cbSwOutputLevels.EnableWindow(false);
-		}
+
+		m_lstSwOutputFormats.EnableWindow(m_nOutCsp != FF_CSP_UNSUPPORTED);
+		m_cbSwOutputFormatUp.EnableWindow(m_nOutCsp != FF_CSP_UNSUPPORTED);
+		m_cbSwOutputFormatDown.EnableWindow(m_nOutCsp != FF_CSP_UNSUPPORTED);
+
+		m_cbSwResizeMethodBE.EnableWindow(m_nOutCsp == 0 || m_nOutCsp != FF_CSP_UNSUPPORTED);
+		m_cbSwChromaToRGB.EnableWindow(m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp));
+		m_cbSwColorspace.EnableWindow(m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp));
+		m_cbSwInputLevels.EnableWindow(m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp));
+		m_cbSwOutputLevels.EnableWindow(m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp));
+		//
 	}
 
 	return true;
@@ -346,7 +353,7 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 {
 	OnDeactivate();
 
-	if (m_pMDF && m_cbDXVACompatibilityCheck.m_hWnd) {
+	if (m_pMDF) {
 #if HAS_FFMPEG_VIDEO_DECODERS
 #if INTERNAL_DECODER_H264
 		m_pMDF->SetThreadNumber		(m_cbThreadNumber.GetCurSel());
@@ -448,10 +455,12 @@ void CMPCVideoDecSettingsWnd::OnClickedSwOutputFormatUp()
 
 void CMPCVideoDecSettingsWnd::OnClickedSwOutputFormatDown()
 {
-	int pos = m_lstSwOutputFormats.GetCurSel();
-	int count = m_lstSwOutputFormats.GetCount();
-	int selected;	int selectedDown; 
+	int pos		= m_lstSwOutputFormats.GetCurSel();
+	int count	= m_lstSwOutputFormats.GetCount();
+	int selected;
+	int selectedDown; 
 	CString text;
+
 	if ((pos != LB_ERR) && (count > 1) && (pos+1 < count)) {
 		selected = m_lstSwOutputFormats.GetCheck(pos);
 		selectedDown = m_lstSwOutputFormats.GetCheck(pos+1);
@@ -662,7 +671,6 @@ bool CMPCVideoDecCodecWnd::OnApply()
 
 	return true;
 }
-
 
 BEGIN_MESSAGE_MAP(CMPCVideoDecCodecWnd, CInternalPropertyPageWnd)
 END_MESSAGE_MAP()

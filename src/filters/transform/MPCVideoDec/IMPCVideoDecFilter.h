@@ -97,6 +97,7 @@ public IUnknown {
 	STDMETHOD_(int, GetSwOutputLevels()) = 0;
 	//
 
+	STDMETHOD(SetDialogHWND(HWND nValue)) = 0;
 	STDMETHOD_(unsigned __int64, GetOutputFormat()) = 0;	
 };
 
