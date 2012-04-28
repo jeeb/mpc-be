@@ -234,8 +234,8 @@ void CPngImage::LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop, int
 		if (width > height) {
 			for (int k = sp, t = 0; t < r.right; k += hs, t += st) {
 				TRIVERTEX tv[2] = {
-					{t, r.top, (br + pData[k + 2]) * rc, (br + pData[k + 1]) * gc, (br + pData[k]) * bc, pa},
-					{t + st, r.bottom, (br + pData[k + hs + 2]) * rc, (br + pData[k + hs + 1]) * gc, (br + pData[k + hs]) * bc, pa},
+					{t, 0, (br + pData[k + 2]) * rc, (br + pData[k + 1]) * gc, (br + pData[k]) * bc, pa},
+					{t + st, height, (br + pData[k + hs + 2]) * rc, (br + pData[k + hs + 1]) * gc, (br + pData[k + hs]) * bc, pa},
 				};
 				dc->GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_H);
 			}
