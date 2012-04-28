@@ -7,28 +7,26 @@
 #define MPC_WND_CLASS_NAME L"MediaPlayerClassicW"
 
 // CMPCBEContextMenu
-#define PLAY_MPC_RU	_T("&Воспроизвести в MPC-BE")
+#define PLAY_MPC_RU		_T("&Воспроизвести в MPC-BE")
 #define ADDTO_MPC_RU	_T("&Добавить в плейлист MPC-BE")
 
-#define PLAY_MPC_EN	_T("&Play with MPC-BE")
+#define PLAY_MPC_EN		_T("&Play with MPC-BE")
 #define ADDTO_MPC_EN	_T("&Add to MPC-BE Playlist")
 
 HBITMAP TransparentBMP(HBITMAP hBmp)
 {
 	HBITMAP RetBmp=NULL;
-	if (hBmp)
-	{	
+	if (hBmp) {	
 		HDC BufferDC=CreateCompatibleDC(NULL);	// DC for Source Bitmap
 
-		if (BufferDC)
-		{
+		if (BufferDC) {
+
 			HGDIOBJ PreviousBufferObject=SelectObject(BufferDC,hBmp);
 			// here BufferDC contains the bitmap
 
 			HDC DirectDC=CreateCompatibleDC(NULL); // DC for working
 
-			if (DirectDC)
-			{
+			if (DirectDC) {
 				// Get bitmap size
 
 				BITMAP bm;
@@ -54,8 +52,7 @@ HBITMAP TransparentBMP(HBITMAP hBmp)
 					DIB_RGB_COLORS,
 					(void **)&ptPixels, 
 					NULL, 0);
-				if (DirectBitmap)
-				{
+				if (DirectBitmap) {
 					// here DirectBitmap!=NULL so ptPixels!=NULL no need to test
 					HGDIOBJ PreviousObject=SelectObject(DirectDC, DirectBitmap);
 					BitBlt(DirectDC,0,0,
@@ -85,41 +82,36 @@ HBITMAP TransparentBMP(HBITMAP hBmp)
 bool IsVistaOrAbove()
 {
 	OSVERSIONINFO osver;
+	osver.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 
-	osver.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
-
-	if (	::GetVersionEx( &osver ) && 
+	if (::GetVersionEx(&osver) && 
 		osver.dwPlatformId == VER_PLATFORM_WIN32_NT && 
-		(osver.dwMajorVersion >= 6 ) )
+		(osver.dwMajorVersion >= 6 )) {
 		return TRUE;
+	}
 
 	return FALSE;
 }
 
 CMPCBEContextMenu::CMPCBEContextMenu()
 {
-	if(IsVistaOrAbove())
-	{
-		m_hPlayBmp = LoadBitmap ( _AtlBaseModule.GetModuleInstance(),
-			MAKEINTRESOURCE(IDB_MPCBEBMP_PLAY) );
-		m_hAddBmp = LoadBitmap ( _AtlBaseModule.GetModuleInstance(),
-			MAKEINTRESOURCE(IDB_MPCBEBMP_ADD) );
-	}
-	else
-	{
-		m_hPlayBmp = LoadBitmap ( _AtlBaseModule.GetModuleInstance(),
-			MAKEINTRESOURCE(IDB_MPCBEBMP_PLAY_XP) );
-		m_hAddBmp = LoadBitmap ( _AtlBaseModule.GetModuleInstance(),
-			MAKEINTRESOURCE(IDB_MPCBEBMP_ADD_XP) );
+	if (IsVistaOrAbove()) {
+		m_hPlayBmp	= LoadBitmap( _AtlBaseModule.GetModuleInstance(), MAKEINTRESOURCE(IDB_MPCBEBMP_PLAY));
+		m_hAddBmp	= LoadBitmap( _AtlBaseModule.GetModuleInstance(), MAKEINTRESOURCE(IDB_MPCBEBMP_ADD));
+	} else {
+		m_hPlayBmp	= LoadBitmap( _AtlBaseModule.GetModuleInstance(), MAKEINTRESOURCE(IDB_MPCBEBMP_PLAY_XP));
+		m_hAddBmp	= LoadBitmap( _AtlBaseModule.GetModuleInstance(), MAKEINTRESOURCE(IDB_MPCBEBMP_ADD_XP));
 	}
 }
 
 CMPCBEContextMenu::~CMPCBEContextMenu()
 {
-	if ( NULL != m_hPlayBmp )
-		DeleteObject ( m_hPlayBmp );
-	if ( NULL != m_hAddBmp )
-		DeleteObject ( m_hAddBmp );
+	if (NULL != m_hPlayBmp) {
+		DeleteObject(m_hPlayBmp);
+	}
+	if (NULL != m_hAddBmp) {
+		DeleteObject(m_hAddBmp);
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -134,13 +126,15 @@ STDMETHODIMP CMPCBEContextMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UI
 		::InsertMenu(hmenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, 0, NULL);
 
 		::InsertMenu(hmenu, indexMenu, MF_STRING | MF_BYPOSITION, idCmdFirst + ID_MPCBE_PLAY, PLAY_MPC);
-		if ( NULL != m_hPlayBmp )
-			SetMenuItemBitmaps ( hmenu, indexMenu, MF_BYPOSITION, TransparentBMP(m_hPlayBmp), NULL );
+		if (NULL != m_hPlayBmp) {
+			SetMenuItemBitmaps(hmenu, indexMenu, MF_BYPOSITION, TransparentBMP(m_hPlayBmp), NULL);
+		}
 		indexMenu++;
 
 		::InsertMenu(hmenu, indexMenu, MF_STRING | MF_BYPOSITION, idCmdFirst + ID_MPCBE_PLAY + 1, ADDTO_MPC);
-		if ( NULL != m_hAddBmp )
-			SetMenuItemBitmaps ( hmenu, indexMenu, MF_BYPOSITION, TransparentBMP(m_hAddBmp), NULL );
+		if (NULL != m_hAddBmp) {
+			SetMenuItemBitmaps(hmenu, indexMenu, MF_BYPOSITION, TransparentBMP(m_hAddBmp), NULL);
+		}
 		indexMenu++;
 
 		::InsertMenu(hmenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, 0, NULL);
@@ -171,18 +165,19 @@ STDMETHODIMP CMPCBEContextMenu::Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJEC
 	TCHAR				strFilePath[MAX_PATH];
 
 	// No data object
-	if (lpdobj == NULL)
+	if (lpdobj == NULL) {
 		return E_FAIL;
+	}
 
 	// Use the given IDataObject to get a list of filenames (CF_HDROP).
 	hres = lpdobj->GetData(&fmte, &medium);
 
-	if (FAILED(hres))
+	if (FAILED(hres)) {
 		return E_FAIL;
+	}
 
 	// Make sure HDROP contains at least one file.
-	if ((nFileCount = DragQueryFile((HDROP)medium.hGlobal, (UINT)(-1), NULL, 0)) >= 1)
-	{
+	if ((nFileCount = DragQueryFile((HDROP)medium.hGlobal, (UINT)(-1), NULL, 0)) >= 1) {
 		for (i = 0; i < nFileCount; i++) {
 			DragQueryFile((HDROP)medium.hGlobal, i, strFilePath, MAX_PATH);
 			if (::GetFileAttributes(strFilePath) & FILE_ATTRIBUTE_DIRECTORY) {
@@ -199,31 +194,28 @@ STDMETHODIMP CMPCBEContextMenu::Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJEC
 		// sort list by path
 		pStrCmpLogicalW = NULL;
 		HMODULE h = LoadLibrary(_T("Shlwapi.dll"));
-		if(h)
-		{
+		if (h) {
 			pStrCmpLogicalW = (StrCmpLogicalWPtr)GetProcAddress(h, "StrCmpLogicalW");
-			if(pStrCmpLogicalW)
-			{
+			if (pStrCmpLogicalW) {
 				CAtlArray<plsort_t> a;
 				a.SetCount(m_listFileNames.GetCount());
 				POSITION pos = m_listFileNames.GetHeadPosition();
 				for(int i = 0; pos; i++, m_listFileNames.GetNext(pos))
 					a[i].str = m_listFileNames.GetAt(pos), a[i].pos = pos;
 				qsort(a.GetData(), a.GetCount(), sizeof(plsort_t), compare);
-				for(size_t i = 0; i < a.GetCount(); i++)
-				{
+				for(size_t i = 0; i < a.GetCount(); i++) {
 					m_listFileNames.AddTail(m_listFileNames.GetAt(a[i].pos));
 					m_listFileNames.RemoveAt(a[i].pos);
 				}
 			}
 			FreeLibrary(h);
 		}
-	}
-	else
+	} else {
 		hres = E_FAIL;
+	}
 
 	// Release the data.
-	ReleaseStgMedium (&medium);
+	ReleaseStgMedium(&medium);
 
 	return hres;
 }
@@ -243,79 +235,73 @@ STDMETHODIMP CMPCBEContextMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 
 void CMPCBEContextMenu::SendData(bool add_pl)
 {
-	if(add_pl) m_listFileNames.AddTail(_T("/add"));
+	if (add_pl) {
+		m_listFileNames.AddTail(_T("/add"));
+	}
 
 	int bufflen = sizeof(DWORD);
 
 	POSITION pos = m_listFileNames.GetHeadPosition();
-	while(pos) bufflen += (m_listFileNames.GetNext(pos).GetLength()+1)*sizeof(TCHAR);
+	while(pos) {
+		bufflen += (m_listFileNames.GetNext(pos).GetLength()+1)*sizeof(TCHAR);
+	}
 
 	CAutoVectorPtr<BYTE> buff;
-	if(!buff.Allocate(bufflen))
+	if(!buff.Allocate(bufflen)) {
 		return;
+	}
 
 	BYTE* p = buff;
 
-	*(DWORD*)p = m_listFileNames.GetCount(); 
+	*(DWORD*)p = (DWORD)m_listFileNames.GetCount(); 
 	p += sizeof(DWORD);
 
 	pos = m_listFileNames.GetHeadPosition();
-	while(pos)
-	{
+	while(pos) {
 		CString s = m_listFileNames.GetNext(pos); 
 		int len = (s.GetLength()+1)*sizeof(TCHAR);
 		memcpy(p, s, len);
 		p += len;
 	}
 
-	if(HWND hWnd = ::FindWindow(MPC_WND_CLASS_NAME, NULL))
-	{
+	if (HWND hWnd = ::FindWindow(MPC_WND_CLASS_NAME, NULL)) {
 		COPYDATASTRUCT cds;
 		cds.dwData = 0x6ABE51;
 		cds.cbData = bufflen;
 		cds.lpData = (void*)(BYTE*)buff;
 		SendMessage(hWnd, WM_COPYDATA, (WPARAM)NULL, (LPARAM)&cds);
-	} 
-	else
-	{
+	} else {
 		CRegKey key;
 		TCHAR path_buff[MAX_PATH];
 		CString mpc_path = _T("");
 		ULONG len = sizeof(path_buff);
 		
-		if(ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt")))
-		{
-			if(ERROR_SUCCESS == key.QueryStringValue(_T("MpcPath"), path_buff, &len) && !CString(path_buff).Trim().IsEmpty())
-			{
+		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
+			if (ERROR_SUCCESS == key.QueryStringValue(_T("MpcPath"), path_buff, &len) && !CString(path_buff).Trim().IsEmpty()) {
 				mpc_path = path_buff;
 			}
 		}
 
-		if(mpc_path.Trim().IsEmpty())
-		{
-			if(ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\MPC-BE")))
-			{
+		if (mpc_path.Trim().IsEmpty()) {
+			if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\MPC-BE"))) {
 				len = sizeof(path_buff);
-				if(ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && !CString(path_buff).Trim().IsEmpty())
-				{
+				if(ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && !CString(path_buff).Trim().IsEmpty()) {
 					mpc_path = path_buff;
 				}
 			}
 		}
 
-		if(!mpc_path.Trim().IsEmpty())
-		{
-			if(HINSTANCE_ERROR<(int)ShellExecute(NULL, _T(""), path_buff, NULL, 0, SW_SHOWDEFAULT))
-			{
+		if (!mpc_path.Trim().IsEmpty()) {
+			if (HINSTANCE(HINSTANCE_ERROR) < ShellExecute(NULL, _T(""), path_buff, NULL, 0, SW_SHOWDEFAULT)) {
 				Sleep(100);
 				int wait_count = 0;
 				HWND hWnd = ::FindWindow(MPC_WND_CLASS_NAME, NULL);
-				while(!hWnd && (wait_count++<200))
-				{
+				while (!hWnd && (wait_count++<200)) {
 					Sleep(100);
 					hWnd = ::FindWindow(MPC_WND_CLASS_NAME, NULL);
 				}
-				if(hWnd && (wait_count<200))
+
+				if (hWnd && (wait_count<200))
 				{
 					COPYDATASTRUCT cds;
 					cds.dwData = 0x6ABE51;

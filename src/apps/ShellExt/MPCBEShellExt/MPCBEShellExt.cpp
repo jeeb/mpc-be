@@ -42,22 +42,32 @@ STDAPI DllRegisterServer(void)
 	HRESULT hr = _AtlModule.DllRegisterServer();
 
 	if (SUCCEEDED(hr)) {
-		DllConfig();
+		TCHAR path_buff[MAX_PATH];
+		ULONG len = sizeof(path_buff);
+
+		bool found_registry_path = false;
+		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
+			if (ERROR_SUCCESS == key.QueryStringValue(_T("MpcPath"), path_buff, &len) && !CString(path_buff).Trim().IsEmpty()) {
+				found_registry_path = true;
+			}
+		}
+
+		if (!found_registry_path) {
+			DllConfig();
+		}
+
 		if (::StringFromGUID2(CLSID_MPCBEContextMenu, strWideCLSID, 50) > 0) {
 			key.SetValue(HKEY_CLASSES_ROOT, _T("directory\\shellex\\ContextMenuHandlers\\MPCBEShellExt\\"), strWideCLSID);
 
 			CRegKey reg;
-			if(reg.Open(HKEY_CLASSES_ROOT, NULL, KEY_READ) == ERROR_SUCCESS)
-			{
+			if (reg.Open(HKEY_CLASSES_ROOT, NULL, KEY_READ) == ERROR_SUCCESS) {
 				DWORD dwIndex = 0;
 				DWORD cbName = IS_KEY_LEN;
 				TCHAR szSubKeyName[IS_KEY_LEN];
 				LONG lRet;
 
-				while ((lRet = reg.EnumKey(dwIndex, szSubKeyName, &cbName)) != ERROR_NO_MORE_ITEMS)
-				{
-					if (lRet == ERROR_SUCCESS)
-					{
+				while ((lRet = reg.EnumKey(dwIndex, szSubKeyName, &cbName)) != ERROR_NO_MORE_ITEMS) {
+					if (lRet == ERROR_SUCCESS) {
 						CString key_name = szSubKeyName;
 						if(!key_name.Find(_T("mpc-be.")))
 						{
@@ -85,26 +95,21 @@ STDAPI DllUnregisterServer(void)
 	HRESULT hr = _AtlModule.DllUnregisterServer();
 
 	if (SUCCEEDED(hr)) {
-		if (key.Open(HKEY_CLASSES_ROOT, _T("directory\\shellex\\ContextMenuHandlers\\")) == ERROR_SUCCESS) 
-		{
+		if (key.Open(HKEY_CLASSES_ROOT, _T("directory\\shellex\\ContextMenuHandlers\\")) == ERROR_SUCCESS) {
 			key.DeleteSubKey(_T("MPCBEShellExt"));
 		}
 
 		CRegKey reg;
-		if(reg.Open(HKEY_CLASSES_ROOT, NULL, KEY_READ) == ERROR_SUCCESS)
-		{
+		if (reg.Open(HKEY_CLASSES_ROOT, NULL, KEY_READ) == ERROR_SUCCESS) {
 			DWORD dwIndex = 0;
 			DWORD cbName = IS_KEY_LEN;
 			TCHAR szSubKeyName[IS_KEY_LEN];
 			LONG lRet;
 
-			while ((lRet = reg.EnumKey(dwIndex, szSubKeyName, &cbName)) != ERROR_NO_MORE_ITEMS)
-			{
-				if (lRet == ERROR_SUCCESS)
-				{
+			while ((lRet = reg.EnumKey(dwIndex, szSubKeyName, &cbName)) != ERROR_NO_MORE_ITEMS) {
+				if (lRet == ERROR_SUCCESS) {
 					CString key_name = szSubKeyName;
-					if(!key_name.Find(_T("mpc-be.")))
-					{
+					if(!key_name.Find(_T("mpc-be."))) {
 						key_name.Append(_T("\\shellex\\ContextMenuHandlers\\"));
 
 						if (key.Open(HKEY_CLASSES_ROOT, key_name) == ERROR_SUCCESS) {
@@ -130,24 +135,18 @@ STDAPI DllInstall(BOOL bInstall, LPCWSTR pszCmdLine)
     HRESULT hr = E_FAIL;
     static const wchar_t szUserSwitch[] = _T("user");
 
-    if (pszCmdLine != NULL)
-    {
-    	if (_wcsnicmp(pszCmdLine, szUserSwitch, _countof(szUserSwitch)) == 0)
-    	{
+    if (pszCmdLine != NULL) {
+    	if (_wcsnicmp(pszCmdLine, szUserSwitch, _countof(szUserSwitch)) == 0) {
     		AtlSetPerUserRegistration(true);
     	}
     }
 
-    if (bInstall)
-    {	
+    if (bInstall) {	
     	hr = DllRegisterServer();
-    	if (FAILED(hr))
-    	{	
+    	if (FAILED(hr)) {	
     		DllUnregisterServer();
     	}
-    }
-    else
-    {
+    } else {
     	hr = DllUnregisterServer();
     }
 

@@ -31,15 +31,12 @@ BEGIN_MESSAGE_MAP(CConfigDlg, CDialog)
 	ON_BN_CLICKED(IDCANCEL, &CConfigDlg::OnBnClickedCancel)
 END_MESSAGE_MAP()
 
-
 // CConfigDlg message handlers
 
 void CConfigDlg::OnBnClickedOk()
 {
-	// TODO: Add your control notification handler code here
 	CRegKey key;
-	if(ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt")))
-	{
+	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
 		CString path;
 		m_MPCPath.GetLBText(m_MPCPath.GetCurSel(), path);
 		key.SetStringValue(_T("MpcPath"), path);
@@ -66,30 +63,24 @@ BOOL CConfigDlg::OnInitDialog()
 	TCHAR path_buff[MAX_PATH];
 	ULONG len = sizeof(path_buff);
 
-	if(ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\MPC-BE")))
-	{
-		if(ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && !CString(path_buff).Trim().IsEmpty())
-		{
+	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\MPC-BE"))) {
+		if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && !CString(path_buff).Trim().IsEmpty()) {
 			m_MPCPath.AddString(path_buff);
 		}
 	}
 #ifdef _WIN64
-	if(ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\Wow6432Node\\MPC-BE")))
-	{
+	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\Wow6432Node\\MPC-BE"))) {
 		len = sizeof(path_buff);
-		if(ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && !CString(path_buff).Trim().IsEmpty())
-		{
+		if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && !CString(path_buff).Trim().IsEmpty()) {
 			m_MPCPath.AddString(path_buff);
 		}
 	}
 #endif
 
 	CString mpc_path = _T("");
-	if(ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt")))
-	{
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
 		len = sizeof(path_buff);
-		if(ERROR_SUCCESS == key.QueryStringValue(_T("MpcPath"), path_buff, &len) && !CString(path_buff).Trim().IsEmpty())
-		{
+		if (ERROR_SUCCESS == key.QueryStringValue(_T("MpcPath"), path_buff, &len) && !CString(path_buff).Trim().IsEmpty()) {
 			mpc_path = CString(path_buff).Trim();
 		}
 	}
