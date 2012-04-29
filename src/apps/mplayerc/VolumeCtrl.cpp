@@ -52,6 +52,9 @@ bool CVolumeCtrl::Create(CWnd* pParentWnd)
 	SetLineSize(0);
 
 	iThemeBrightness = AfxGetAppSettings().nThemeBrightness;
+	iThemeRed = AfxGetAppSettings().nThemeRed;
+	iThemeGreen = AfxGetAppSettings().nThemeGreen;
+	iThemeBlue = AfxGetAppSettings().nThemeBlue;
 
 	Invalidate();
 
@@ -87,6 +90,25 @@ END_MESSAGE_MAP()
 
 BOOL CVolumeCtrl::OnEraseBkgnd(CDC* pDC)
 {
+	AppSettings& s = AfxGetAppSettings();
+
+	if (s.fDisableXPToolbars) {
+		CDC *dc = GetDC();
+		CDC memdc;
+		memdc.CreateCompatibleDC(dc);
+
+		CBitmap bmCtrl;
+		bmCtrl.CreateCompatibleBitmap(dc, 60, 30);
+		CBitmap *bmOld = memdc.SelectObject(&bmCtrl);
+
+		memdc.BitBlt(0, 0, 60, 30, dc, 0, 0, SRCCOPY);
+		memdc.SetBkMode(TRANSPARENT);
+
+		DeleteObject(memdc.SelectObject(bmOld));
+		memdc.DeleteDC();
+		ReleaseDC(dc);
+	}
+
 	return TRUE;
 }
 
@@ -102,8 +124,12 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 		switch (pNMCD->dwDrawStage) {
 			case CDDS_PREPAINT:
 			//TRACE(" PREPAINT ");
-				if (s.fDisableXPToolbars && (m_bmUnderCtrl.GetSafeHandle() == NULL/* || iThemeBrightness != AfxGetAppSettings().nThemeBrightness*/)) {			
-					CDC *dc = GetParent()->GetDC();					
+				if (s.fDisableXPToolbars && (m_bmUnderCtrl.GetSafeHandle() == NULL
+								|| iThemeBrightness != s.nThemeBrightness
+								|| iThemeRed != s.nThemeRed
+								|| iThemeGreen != s.nThemeGreen
+								|| iThemeBlue != s.nThemeBlue)) {
+					CDC *dc = GetParent()->GetDC();
 					CDC memdc;
 					memdc.CreateCompatibleDC(dc);
 					CRect wr;
@@ -116,6 +142,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 					CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
 					memdc.BitBlt(0, 0, wr.Width(), wr.Height(), dc, wr.left, wr.top, SRCCOPY);
+
 					DeleteObject(memdc.SelectObject(bmOld));
 					GetParent()->ReleaseDC(dc);
 					memdc.DeleteDC();
@@ -131,6 +158,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					GetClientRect(&r);
 					CDC memdc;
 					memdc.CreateCompatibleDC(&dc);
+
 					CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
 
 					iThemeBrightness = AfxGetAppSettings().nThemeBrightness;
@@ -155,7 +183,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						int ib2 = (p2 >> 16) * iThemeBlue;
 
 						TRIVERTEX tv[2] = {
-							{r.left, r.top, ir1, ig1, ib1, pa},
+							{r.left, 0, ir1, ig1, ib1, pa},
 							{r.right, 1, ir2, ig2, ib2, pa},
 						};
 						dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_H);
@@ -172,9 +200,11 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					CPen penLeft(p2 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p3);
 
 					dc.BitBlt(0, 0, r.Width(), r.Height(), &memdc, 0, 0, SRCCOPY);
+
 					//MemDC.SelectObject(bmOld);
 					DeleteObject(memdc.SelectObject(bmOld));
 					memdc.DeleteDC();
+
 					r.DeflateRect(4, 2, 9, 6);
 					CopyRect(&pNMCD->rc, &r);
 					//TRACE("VOLUME RECT=(%d,%d,%d,%d) state=%d",r.left,r.top,r.right,r.bottom,pNMCD->uItemState);
@@ -206,7 +236,10 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 				}
 
 				if (!s.fDisableXPToolbars && pNMCD->dwItemSpec == TBCD_CHANNEL) {
-					if (m_bmUnderCtrl.GetSafeHandle() != NULL) m_bmUnderCtrl.DeleteObject();
+					if (m_bmUnderCtrl.GetSafeHandle() != NULL) {
+						m_bmUnderCtrl.DeleteObject();
+					}
+
 					CDC dc;
 					dc.Attach(pNMCD->hdc);
 
