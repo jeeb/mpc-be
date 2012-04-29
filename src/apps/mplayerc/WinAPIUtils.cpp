@@ -103,23 +103,23 @@ bool SetPrivilege(LPCTSTR privilege, bool bEnable)
 CString GetHiveName(HKEY hive)
 {
 	switch ((ULONG_PTR)hive) {
-		case HKEY_CLASSES_ROOT:
+		case (ULONG_PTR)HKEY_CLASSES_ROOT:
 			return _T("HKEY_CLASSES_ROOT");
-		case HKEY_CURRENT_USER:
+		case (ULONG_PTR)HKEY_CURRENT_USER:
 			return _T("HKEY_CURRENT_USER");
-		case HKEY_LOCAL_MACHINE:
+		case (ULONG_PTR)HKEY_LOCAL_MACHINE:
 			return _T("HKEY_LOCAL_MACHINE");
-		case HKEY_USERS:
+		case (ULONG_PTR)HKEY_USERS:
 			return _T("HKEY_USERS");
-		case HKEY_PERFORMANCE_DATA:
+		case (ULONG_PTR)HKEY_PERFORMANCE_DATA:
 			return _T("HKEY_PERFORMANCE_DATA");
-		case HKEY_CURRENT_CONFIG:
+		case (ULONG_PTR)HKEY_CURRENT_CONFIG:
 			return _T("HKEY_CURRENT_CONFIG");
-		case HKEY_DYN_DATA:
+		case (ULONG_PTR)HKEY_DYN_DATA:
 			return _T("HKEY_DYN_DATA");
-		case HKEY_PERFORMANCE_TEXT:
+		case (ULONG_PTR)HKEY_PERFORMANCE_TEXT:
 			return _T("HKEY_PERFORMANCE_TEXT");
-		case HKEY_PERFORMANCE_NLSTEXT:
+		case (ULONG_PTR)HKEY_PERFORMANCE_NLSTEXT:
 			return _T("HKEY_PERFORMANCE_NLSTEXT");
 		default:
 			return _T("");
@@ -265,4 +265,23 @@ bool IsFontInstalled(LPCTSTR lpszFont)
 	EnumFontFamiliesEx(dc.GetSafeHdc(), &lf, (FONTENUMPROC)EnumFontFamExProc, (LPARAM)&lParam, 0);
 
 	return lParam ? true : false;
+}
+
+bool ExploreToFile(CString path)
+{
+	bool success = false;
+	HRESULT res = CoInitialize(NULL);
+
+	if (res == S_OK || res == S_FALSE) {
+		PIDLIST_ABSOLUTE pidl;
+
+		if (SHParseDisplayName(path, NULL, &pidl, 0, NULL) == S_OK) {
+			success = SUCCEEDED(SHOpenFolderAndSelectItems(pidl, 0, NULL, 0));
+			CoTaskMemFree(pidl);
+		}
+
+		CoUninitialize();
+	}
+
+	return success;
 }
