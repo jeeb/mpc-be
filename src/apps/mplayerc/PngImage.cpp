@@ -91,8 +91,8 @@ static unsigned char* DecompressPNG(struct png_t* png, int* w, int* h)
 
 	png_read_png(
 		png_ptr, info_ptr,
-		PNG_TRANSFORM_STRIP_16 |
-		PNG_TRANSFORM_STRIP_ALPHA |
+		//PNG_TRANSFORM_STRIP_16 |
+		//PNG_TRANSFORM_STRIP_ALPHA |
 		PNG_TRANSFORM_PACKING |
 		PNG_TRANSFORM_EXPAND |
 		PNG_TRANSFORM_BGR,
@@ -150,7 +150,7 @@ bool CPngImage::LoadFromResource(UINT id) {
 CString CPngImage::LoadCurrentPath()
 {
 	CString path;
-	GetModuleFileName(AfxGetInstanceHandle(), path.GetBuffer(_MAX_PATH), _MAX_PATH);
+	GetModuleFileName(NULL, path.GetBuffer(_MAX_PATH), _MAX_PATH);
 	path.ReleaseBuffer();
 	return path.Left(path.ReverseFind('\\') + 1);
 }
@@ -166,65 +166,87 @@ int CPngImage::FileExists(CString fn)
 	}
 }
 
+HBITMAP CPngImage::TypeLoadImage(BYTE** pData, int* width, int* height, int* bpp, FILE* fp, int resid)
+{
+	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
+
+	if (fp) {
+		png_init_io(png_ptr, fp);
+	} else {
+		HRSRC hRes = FindResource(NULL, MAKEINTRESOURCE(resid), _T("PNG"));
+		HANDLE lRes = LoadResource(NULL, hRes);
+
+		struct png_t png;
+		png.data = (unsigned char*)LockResource(lRes);
+		png.size = SizeofResource(NULL, hRes);
+		png.pos = 8;
+		png_set_read_fn(png_ptr, (png_voidp)&png, read_data_fn);
+		png_set_sig_bytes(png_ptr, 8);
+
+		UnlockResource(lRes);
+		FreeResource(lRes);
+	}
+
+	png_infop info_ptr = png_create_info_struct(png_ptr);
+	png_infop end_info = png_create_info_struct(png_ptr);
+
+	png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_EXPAND | PNG_TRANSFORM_BGR | PNG_TRANSFORM_PACKING, 0);
+
+	png_bytep* row_pointers = png_get_rows(png_ptr, info_ptr);
+	*width = png_get_image_width(png_ptr, info_ptr);
+	*height = png_get_image_height(png_ptr, info_ptr);
+	*bpp = png_get_channels(png_ptr, info_ptr) * 8;
+	int memWidth = (*width) * (*bpp) / 8;
+
+	BITMAPINFO bmi = {{sizeof(BITMAPINFOHEADER), *width, -(*height), 1, *bpp, BI_RGB, 0, 0, 0, 0, 0}};
+
+	HBITMAP hbm = CreateDIBSection(0, &bmi, DIB_RGB_COLORS, (void**)&(*pData), 0, 0);
+	for (int i = 0; i < *height; i++) {
+		memcpy((*pData) + memWidth * i, row_pointers[i], memWidth);
+	}
+
+	png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+
+	if (fp) {
+		fclose(fp);
+	}
+
+	return hbm;
+}
+
 HBITMAP CPngImage::LoadExternalImage(CString fn)
 {
 	CString path = LoadCurrentPath();
 
+	BYTE* pData;
+	int width, height, bpp;
+
 	FILE* fp = _tfopen(path + fn + _T(".png"), _T("rb"));
 	if (fp) {
-		png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
-		png_infop info_ptr = png_create_info_struct(png_ptr);
-		png_init_io(png_ptr, fp);
-
-		png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_EXPAND | PNG_TRANSFORM_BGR | PNG_TRANSFORM_PACKING, 0);
-
-		png_bytep* row_pointers = png_get_rows(png_ptr, info_ptr);
-		int bpp = png_get_channels(png_ptr, info_ptr) * 8;
-		int width = png_get_image_width(png_ptr, info_ptr);
-		int memWidth = width * bpp / 8;
-		int height = png_get_image_height(png_ptr, info_ptr);
-		BYTE* pData;
-		BITMAPINFO bmi = {{sizeof(BITMAPINFOHEADER), width, -height, 1, bpp, BI_RGB, 0, 0, 0, 0, 0}};
-
-		HBITMAP hbm = CreateDIBSection(0, &bmi, DIB_RGB_COLORS, (void**)&pData, 0, 0);
-		for (int i = 0; i < height; i++) {
-			memcpy(pData + memWidth * i, row_pointers[i], memWidth);
-		}
-
-		png_destroy_read_struct(&png_ptr, &info_ptr, 0);
-		fclose(fp);
-
-		return hbm;
+		return TypeLoadImage(&pData, &width, &height, &bpp, fp, 0);
 	} else {
-		return (HBITMAP)LoadImage(NULL, path + fn + _T(".bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+		fp = _tfopen(path + fn + _T(".bmp"), _T("rb"));
+		if (fp) {
+			fclose(fp);
+			return (HBITMAP)LoadImage(NULL, path + fn + _T(".bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+		} else {
+			if (AfxGetAppSettings().fDisableXPToolbars) {
+				return TypeLoadImage(&pData, &width, &height, &bpp, NULL, 200);
+			} else {
+				return NULL;
+			}
+		}
 	}
 }
 
 void CPngImage::LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop, int br, int rc, int gc, int bc)
 {
+	BYTE* pData;
+	int width, height, bpp;
+
 	FILE* fp = _tfopen(LoadCurrentPath() + fn + _T(".png"), _T("rb"));
 	if (fp) {
-		png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
-		png_infop info_ptr = png_create_info_struct(png_ptr);
-		png_init_io(png_ptr, fp);
-
-		png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_EXPAND | PNG_TRANSFORM_BGR | PNG_TRANSFORM_PACKING, 0);
-
-		png_bytep* row_pointers = png_get_rows(png_ptr, info_ptr);
-		int bpp = png_get_channels(png_ptr, info_ptr) * 8;
-		int width = png_get_image_width(png_ptr, info_ptr);
-		int memWidth = width * bpp / 8;
-		int height = png_get_image_height(png_ptr, info_ptr);
-		BYTE* pData;
-		BITMAPINFO bmi = {{sizeof(BITMAPINFOHEADER), width, -height, 1, bpp, BI_RGB, 0, 0, 0, 0, 0}};
-
-		HBITMAP hbm = CreateDIBSection(0, &bmi, DIB_RGB_COLORS, (void**)&pData, 0, 0);
-		for (int i = 0; i < height; i++) {
-			memcpy(pData + memWidth * i, row_pointers[i], memWidth);
-		}
-
-		png_destroy_read_struct(&png_ptr, &info_ptr, 0);
-		fclose(fp);
+		TypeLoadImage(&pData, &width, &height, &bpp, fp, 0);
 
 		GRADIENT_RECT gr[1] = {{0, 1}};
 

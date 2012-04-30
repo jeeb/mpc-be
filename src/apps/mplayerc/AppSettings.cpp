@@ -1234,12 +1234,11 @@ void CAppSettings::UpdateData(bool fSave)
 		nThemeGreen = pApp->GetProfileInt(IDS_R_SETTINGS, _T("ThemeGreen"), 256);
 		nThemeBlue = pApp->GetProfileInt(IDS_R_SETTINGS, _T("ThemeBlue"), 256);
 		fFileNameOnSeekBar = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("FileNameOnSeekBar"), TRUE);
-//INS:2451 bobdynlan: hijack XP Toolbars settings
-//-----------------------------------------------------------------------------
-		fToolbarRefresh = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TBREFRESH, FALSE);//ins:2452 bobdynlan:Toolbar refresh flag//
-		clrFaceABGR = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CLRFACEABGR, 0x00ff8080);//ins:2452 bobdynlan:Toolbar button color//
-		clrOutlineABGR = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CLROUTLINEABGR, 0x00ffffff);//ins:2452 bobdynlan:Toolbar button outline color//
-//--------------------------------------------------------------------------INS
+
+		fToolbarRefresh = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TBREFRESH, FALSE);
+		clrFaceABGR = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CLRFACEABGR, 0x00ffffff);
+		clrOutlineABGR = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CLROUTLINEABGR, 0x00868686);
+
 		nJumpDistS = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTS, DEFAULT_JUMPDISTANCE_1);
 		nJumpDistM = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTM, DEFAULT_JUMPDISTANCE_2);
 		nJumpDistL = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTL, DEFAULT_JUMPDISTANCE_3);

@@ -359,7 +359,7 @@ public:
 		return m_wndToolBar.m_volctrl.GetPos();
 	}
 
-	HWND m_hWnd_toolbar;//ins:2452 bobdynlan:used to force toolbar redraw from PPageTweaks when !fDisableXPToolbars //
+	HWND m_hWnd_toolbar;
 
 public:
 	CMainFrame();

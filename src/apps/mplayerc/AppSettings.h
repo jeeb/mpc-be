@@ -427,9 +427,9 @@ public:
 	int				nThemeBlue;
 	bool			fFileNameOnSeekBar;
 
-	bool			fToolbarRefresh;//ins:2452 bobdynlan:Toolbar refresh flag//
-	int				clrFaceABGR;//ins:2452 bobdynlan:Toolbar button color//
-	int				clrOutlineABGR;//ins:2452 bobdynlan:Toolbar button outline color//
+	bool			fToolbarRefresh;
+	int				clrFaceABGR;
+	int				clrOutlineABGR;
 	int				nJumpDistS;
 	int				nJumpDistM;
 	int				nJumpDistL;

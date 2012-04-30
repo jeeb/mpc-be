@@ -90,24 +90,20 @@ END_MESSAGE_MAP()
 
 BOOL CVolumeCtrl::OnEraseBkgnd(CDC* pDC)
 {
-	AppSettings& s = AfxGetAppSettings();
+	CDC *dc = GetDC();
+	CDC memdc;
+	memdc.CreateCompatibleDC(dc);
 
-	if (s.fDisableXPToolbars) {
-		CDC *dc = GetDC();
-		CDC memdc;
-		memdc.CreateCompatibleDC(dc);
+	CBitmap bmCtrl;
+	bmCtrl.CreateCompatibleBitmap(dc, 60, 30);
+	CBitmap *bmOld = memdc.SelectObject(&bmCtrl);
 
-		CBitmap bmCtrl;
-		bmCtrl.CreateCompatibleBitmap(dc, 60, 30);
-		CBitmap *bmOld = memdc.SelectObject(&bmCtrl);
+	memdc.BitBlt(0, 0, 60, 30, dc, 0, 0, SRCCOPY);
+	memdc.SetBkMode(TRANSPARENT);
 
-		memdc.BitBlt(0, 0, 60, 30, dc, 0, 0, SRCCOPY);
-		memdc.SetBkMode(TRANSPARENT);
-
-		DeleteObject(memdc.SelectObject(bmOld));
-		memdc.DeleteDC();
-		ReleaseDC(dc);
-	}
+	DeleteObject(memdc.SelectObject(bmOld));
+	memdc.DeleteDC();
+	ReleaseDC(dc);
 
 	return TRUE;
 }

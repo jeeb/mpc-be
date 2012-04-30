@@ -34,6 +34,7 @@ public:
 
 	CString LoadCurrentPath();
 	int FileExists(CString fn);
+	HBITMAP TypeLoadImage(BYTE** pData, int* width, int* height, int* bpp, FILE* fp, int resid);
 	HBITMAP LoadExternalImage(CString fn);
 	void LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop, int br, int rc, int gc, int bc);
 };
