@@ -311,23 +311,28 @@ void CPlayerSeekBar::OnPaint()
 		CPen penPlayed1(PS_SOLID,0,RGB((iThemeBrightness+110),(iThemeBrightness+115),(iThemeBrightness+120)));
 		memdc.SelectObject(&penPlayed1);
 		memdc.MoveTo(rc.left +1, rc.top +1);
-		memdc.LineTo(rc.right, rc.top +1);	
+		memdc.LineTo(rc.right, rc.top +1);
 		CPen penPlayed2(PS_SOLID,0,RGB((iThemeBrightness+80),(iThemeBrightness+85),(iThemeBrightness+90)));
 		memdc.SelectObject(&penPlayed2);
 		memdc.MoveTo(rc.left +1, rc.top +17);
-		memdc.LineTo(rc.right, rc.top +17);	
+		memdc.LineTo(rc.right, rc.top +17);
 
-		if (fEnabled) {	
-			CBrush b(RGB((iThemeRed-110<0?0:iThemeRed-110), (iThemeGreen-105<0?0:iThemeGreen-105), (iThemeBlue-100<0?0:iThemeBlue-100)/*145, 150, 155*/));
-			CRect rb(rc.left + 1,rc.top + 2,nposx, rc.bottom - 1);
-			memdc.FillRect(rb,&b);
+		if (fEnabled) {
 
-			AlphaBlend(memdc.m_hDC, rc.left,rc.top+10, r.Width() -2, 0.4*rc.Height(), memdc, 0, 0, rc.left,rc.top+10, bf);
+			iThemeBrightness = iThemeBrightness + 40;
+
+			for(int j = rc.left + 1; j < nposx; j++) {
+				TRIVERTEX tv[2] = {
+					{j, rc.top + 2, (iThemeBrightness+65)*iThemeRed, (iThemeBrightness+70)*iThemeGreen, (iThemeBrightness+75)*iThemeBlue, 255*256},
+					{j + 1, rc.bottom - 1, (iThemeBrightness+0)*iThemeRed, (iThemeBrightness+5)*iThemeGreen, (iThemeBrightness+10)*iThemeBlue, 255*256},
+				};
+				memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+			}
 
 			CPen penPlayed3(PS_SOLID,0,RGB(215,220,225));
 			memdc.SelectObject(&penPlayed3);
 			memdc.MoveTo(rc.left +1, rc.top +1);//active_top
-			memdc.LineTo(nposx, rc.top +1);		
+			memdc.LineTo(nposx, rc.top +1);
 
 			CPen penPlayed4(PS_SOLID,0,RGB(165,170,175));
 			memdc.SelectObject(&penPlayed4);
