@@ -38,8 +38,8 @@ CPPageTweaks::CPPageTweaks()
 	, m_nThemeGreen(256)
 	, m_nThemeBlue(256)
 	, m_fFileNameOnSeekBar(TRUE)
-	, m_clrFaceABGR(0x00ff8080)
-	, m_clrOutlineABGR(0x00ffffff)
+	, m_clrFaceABGR(0x00ffffff)
+	, m_clrOutlineABGR(0x00868686)
 	, m_nJumpDistS(0)
 	, m_nJumpDistM(0)
 	, m_nJumpDistL(0)
@@ -289,8 +289,8 @@ void CPPageTweaks::OnUpdateCheck3(CCmdUI* pCmdUI)
 
 void CPPageTweaks::OnClickClrDefault()
 {
-	m_clrFaceABGR = 0x00ff8080;
-	m_clrOutlineABGR = 0x00ffffff;
+	m_clrFaceABGR = 0x00ffffff;
+	m_clrOutlineABGR = 0x00868686;
 	GetDlgItem(IDC_BUTTON_CLRFACE)->Invalidate();
 	GetDlgItem(IDC_BUTTON_CLROUTLINE)->Invalidate();
 	PostMessage(WM_COMMAND, IDC_CHECK3);
