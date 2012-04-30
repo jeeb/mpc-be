@@ -158,14 +158,18 @@ Name: default;            Description: {cm:types_DefaultInstallation}
 Name: custom;             Description: {cm:types_CustomInstallation};                     Flags: iscustom
 
 [Components]
-Name: main;               Description: {#app_name} {#app_version}; Types: default custom; Flags: fixed
-Name: mpciconlib;         Description: {cm:comp_mpciconlib};       Types: default custom
+Name: "main"; Description: "{#app_name} {#app_version}"; Types: default custom; Flags: fixed
+Name: "mpciconlib"; Description: "{cm:comp_mpciconlib}"; Types: default custom
 
 #ifdef localize
-Name: mpcresources;       Description: {cm:comp_mpcresources};     Types: default custom; Flags: disablenouninstallwarning
+Name: "mpcresources"; Description: "{cm:comp_mpcresources}"; Types: default custom; Flags: disablenouninstallwarning
 #endif
 
-Name: mpcbeshellext;      Description: {cm:comp_mpcbeshellext};    Types: default custom
+Name: "mpcberegvid"; Description: "{cm:AssociationVideo}"; Types: default custom; Flags: disablenouninstallwarning
+Name: "mpcberegaud"; Description: "{cm:AssociationAudio}"; Types: default custom; Flags: disablenouninstallwarning
+Name: "mpcberegpl"; Description: "{cm:AssociationPlaylist}"; Types: default custom; Flags: disablenouninstallwarning
+
+Name: "mpcbeshellext"; Description: "{cm:comp_mpcbeshellext}"; Types: default custom; Flags: disablenouninstallwarning
 
 [Tasks]
 Name: desktopicon;              Description: {cm:CreateDesktopIcon};     GroupDescription: {cm:AdditionalIcons}
@@ -178,12 +182,12 @@ Name: reset_settings;             Description: {cm:tsk_ResetSettings};     Group
 
 
 [Files]
-Source: "{#bindir}\{#mpcbe_exe}";        DestDir: "{app}"; Flags: ignoreversion; Components: main
-Source: "{#bindir}\mpciconlib.dll";      DestDir: "{app}"; Flags: ignoreversion; Components: mpciconlib
+Source: "{#bindir}\{#mpcbe_exe}"; DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "{#bindir}\mpciconlib.dll"; DestDir: "{app}"; Flags: ignoreversion; Components: mpciconlib
 #ifdef x64Build
 Source: "{#bindir}\MPCBEShellExt64.dll"; DestDir: "{app}"; Flags: ignoreversion noregerror regserver restartreplace uninsrestartdelete; Components: mpcbeshellext
 #else
-Source: "{#bindir}\MPCBEShellExt.dll";   DestDir: "{app}"; Flags: ignoreversion noregerror regserver restartreplace uninsrestartdelete; Components: mpcbeshellext
+Source: "{#bindir}\MPCBEShellExt.dll"; DestDir: "{app}"; Flags: ignoreversion noregerror regserver restartreplace uninsrestartdelete; Components: mpcbeshellext
 #endif
 
 #ifdef localize
@@ -211,10 +215,10 @@ Source: "{#bindir}\Lang\mpcresources.tc.dll"; DestDir: "{app}\Lang"; Flags: igno
 Source: "{#bindir}\Lang\mpcresources.tr.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
 Source: "{#bindir}\Lang\mpcresources.ua.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
 #endif
-Source: "..\COPYING.txt";                     DestDir: "{app}";      Flags: ignoreversion; Components: main
-Source: "..\docs\Authors.txt";                DestDir: "{app}";      Flags: ignoreversion; Components: main
-Source: "..\docs\Changelog.txt";              DestDir: "{app}";      Flags: ignoreversion; Components: main
-Source: "..\docs\Readme.txt";                 DestDir: "{app}";      Flags: ignoreversion; Components: main
+Source: "..\COPYING.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "..\docs\Authors.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "..\docs\Changelog.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "..\docs\Readme.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
 
 [Icons]
 #ifdef x64Build
@@ -233,9 +237,11 @@ Name: {group}\{cm:ProgramOnTheWeb,{#app_name}};  Filename: https://sourceforge.n
 Name: {group}\{cm:UninstallProgram,{#app_name}}; Filename: {uninstallexe};      Comment: {cm:UninstallProgram,{#app_name}}; WorkingDir: {app}
 
 [Run]
-Filename: {app}\{#mpcbe_exe};                    Description: {cm:LaunchProgram,{#app_name}}; WorkingDir: {app}; Flags: nowait postinstall skipifsilent unchecked
-Filename: {app}\Changelog.txt;                   Description: {cm:ViewChangelog};             WorkingDir: {app}; Flags: nowait postinstall skipifsilent unchecked shellexec
-
+Filename: "{app}\{#mpcbe_exe}"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent unchecked; Description: "{cm:LaunchProgram,{#app_name}}"
+Filename: "{app}\Changelog.txt"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent unchecked shellexec; Description: "{cm:ViewChangelog}"
+Filename: "{app}\{#mpcbe_exe}"; Parameters: "/regvid"; WorkingDir: "{app}"; Flags: runasoriginaluser runhidden; Components: mpcberegvid
+Filename: "{app}\{#mpcbe_exe}"; Parameters: "/regaud"; WorkingDir: "{app}"; Flags: runasoriginaluser runhidden; Components: mpcberegaud
+Filename: "{app}\{#mpcbe_exe}"; Parameters: "/regpl"; WorkingDir: "{app}"; Flags: runasoriginaluser runhidden; Components: mpcberegpl
 
 [InstallDelete]
 Type: files; Name: {userdesktop}\{#app_name}.lnk;   Check: not IsTaskSelected('desktopicon\user')   and IsUpgrade()
@@ -248,6 +254,12 @@ Type: files; Name: {app}\COPYING
 ; remove the old language dlls when upgrading
 Type: files; Name: {app}\mpcresources.*.dll
 #endif
+
+[UninstallRun]
+Filename: "{app}\{#mpcbe_exe}"; Parameters: "/unregall"; WorkingDir: "{app}"; Flags: runhidden
+
+[Registry]
+Root: "HKCU"; Subkey: "Software\MPC-BE\ShellExt"; ValueType: string; ValueName: "MpcPath"; ValueData: "{app}\{#mpcbe_exe}"; Flags: uninsdeletekey; Components: mpcbeshellext
 
 [Code]
 #if defined(sse_required) || defined(sse2_required)
