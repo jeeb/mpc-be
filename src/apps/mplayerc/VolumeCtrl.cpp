@@ -51,13 +51,6 @@ bool CVolumeCtrl::Create(CWnd* pParentWnd)
 	SetPageSize(5);
 	SetLineSize(0);
 
-	iThemeBrightness = AfxGetAppSettings().nThemeBrightness;
-	iThemeRed = AfxGetAppSettings().nThemeRed;
-	iThemeGreen = AfxGetAppSettings().nThemeGreen;
-	iThemeBlue = AfxGetAppSettings().nThemeBlue;
-
-	Invalidate();
-
 	return true;
 }
 
@@ -90,21 +83,6 @@ END_MESSAGE_MAP()
 
 BOOL CVolumeCtrl::OnEraseBkgnd(CDC* pDC)
 {
-	CDC *dc = GetDC();
-	CDC memdc;
-	memdc.CreateCompatibleDC(dc);
-
-	CBitmap bmCtrl;
-	bmCtrl.CreateCompatibleBitmap(dc, 60, 30);
-	CBitmap *bmOld = memdc.SelectObject(&bmCtrl);
-
-	memdc.BitBlt(0, 0, 60, 30, dc, 0, 0, SRCCOPY);
-	memdc.SetBkMode(TRANSPARENT);
-
-	DeleteObject(memdc.SelectObject(bmOld));
-	memdc.DeleteDC();
-	ReleaseDC(dc);
-
 	return TRUE;
 }
 
@@ -119,12 +97,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 	if (m_fSelfDrawn) {
 		switch (pNMCD->dwDrawStage) {
 			case CDDS_PREPAINT:
-			//TRACE(" PREPAINT ");
-				if (s.fDisableXPToolbars && (m_bmUnderCtrl.GetSafeHandle() == NULL
-								|| iThemeBrightness != s.nThemeBrightness
-								|| iThemeRed != s.nThemeRed
-								|| iThemeGreen != s.nThemeGreen
-								|| iThemeBlue != s.nThemeBlue)) {
+				if (s.fDisableXPToolbars && (m_bmUnderCtrl.GetSafeHandle() == NULL || GetSafeHwnd())) {
 					CDC *dc = GetParent()->GetDC();
 					CDC memdc;
 					memdc.CreateCompatibleDC(dc);
@@ -138,15 +111,12 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 					CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
 					memdc.BitBlt(0, 0, wr.Width(), wr.Height(), dc, wr.left, wr.top, SRCCOPY);
-					memdc.SetBkMode(TRANSPARENT);
 
 					DeleteObject(memdc.SelectObject(bmOld));
 					GetParent()->ReleaseDC(dc);
 					memdc.DeleteDC();
-				} else {
-					CDC *dc = NULL;
-					OnEraseBkgnd(dc);
 				}
+
 				lr = CDRF_NOTIFYITEMDRAW;
 				break;
 
@@ -190,6 +160,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					}
 
 					int nVolume = GetPos();
+
 					if (nVolume <= GetPageSize()) {
 						nVolume = 0;
 					}
@@ -200,7 +171,6 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					CPen penLeft(p2 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p3);
 
 					dc.BitBlt(0, 0, r.Width(), r.Height(), &memdc, 0, 0, SRCCOPY);
-					dc.SetBkMode(TRANSPARENT);
 
 					//MemDC.SelectObject(bmOld);
 					DeleteObject(memdc.SelectObject(bmOld));
