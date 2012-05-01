@@ -319,12 +319,13 @@ void CPlayerSeekBar::OnPaint()
 
 		if (fEnabled) {
 
-			iThemeBrightness = iThemeBrightness + 40;
+			int ct = 20;
+			iThemeBrightness = iThemeBrightness + (ct * 2);
 
-			for(int j = rc.left + 1; j < nposx; j++) {
+			for (int j = rc.left + 1; j < nposx; j++) {
 				TRIVERTEX tv[2] = {
 					{j, rc.top + 2, (iThemeBrightness+65)*iThemeRed, (iThemeBrightness+70)*iThemeGreen, (iThemeBrightness+75)*iThemeBlue, 255*256},
-					{j + 1, rc.bottom - 1, (iThemeBrightness+0)*iThemeRed, (iThemeBrightness+5)*iThemeGreen, (iThemeBrightness+10)*iThemeBlue, 255*256},
+					{j + 1, rc.bottom - 1, (iThemeBrightness+0-ct)*iThemeRed, (iThemeBrightness+5-ct)*iThemeGreen, (iThemeBrightness+10-ct)*iThemeBlue, 255*256},
 				};
 				memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 			}

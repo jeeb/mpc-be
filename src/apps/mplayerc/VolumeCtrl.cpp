@@ -138,10 +138,14 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 					CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
 					memdc.BitBlt(0, 0, wr.Width(), wr.Height(), dc, wr.left, wr.top, SRCCOPY);
+					memdc.SetBkMode(TRANSPARENT);
 
 					DeleteObject(memdc.SelectObject(bmOld));
 					GetParent()->ReleaseDC(dc);
 					memdc.DeleteDC();
+				} else {
+					CDC *dc = NULL;
+					OnEraseBkgnd(dc);
 				}
 				lr = CDRF_NOTIFYITEMDRAW;
 				break;
@@ -196,6 +200,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					CPen penLeft(p2 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p3);
 
 					dc.BitBlt(0, 0, r.Width(), r.Height(), &memdc, 0, 0, SRCCOPY);
+					dc.SetBkMode(TRANSPARENT);
 
 					//MemDC.SelectObject(bmOld);
 					DeleteObject(memdc.SelectObject(bmOld));
@@ -229,9 +234,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					dc.SelectObject(penOld);
 					dc.Detach();
 					lr = CDRF_SKIPDEFAULT;
-				}
-
-				if (!s.fDisableXPToolbars && pNMCD->dwItemSpec == TBCD_CHANNEL) {
+				} else if (!s.fDisableXPToolbars && pNMCD->dwItemSpec == TBCD_CHANNEL) {
 					if (m_bmUnderCtrl.GetSafeHandle() != NULL) {
 						m_bmUnderCtrl.DeleteObject();
 					}
@@ -325,6 +328,7 @@ void CVolumeCtrl::HScroll(UINT nSBCode, UINT nPos)
 {
 	int nVolMin, nVolMax;
 	GetRange(nVolMin, nVolMax);
+
 	if ((UINT)nVolMin <= nSBCode && nSBCode <= (UINT)nVolMax) {
 		CRect r;
 		GetClientRect(&r);
