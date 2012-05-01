@@ -603,9 +603,9 @@ BOOL CPlayerToolBar::OnPlay(UINT nID)
 	
 	tb.GetButtonInfo(ID_PLAY_PLAY, &bi);
 	if ( fs == State_Paused || fs == State_Stopped) {
-		bi.iImage = 0;
-	} else {
 		bi.iImage = 1;
+	} else {
+		bi.iImage = 0;
 	}
 	tb.SetButtonInfo(ID_PLAY_PLAY, &bi);
 
@@ -639,9 +639,9 @@ BOOL CPlayerToolBar::OnPause(UINT nID)
 	bi.dwMask = TBIF_IMAGE;
 	tb.GetButtonInfo(ID_PLAY_PLAY, &bi);
 	if ( fs == State_Paused) {
-		bi.iImage = 0;
-	} else {
 		bi.iImage = 1;
+	} else {
+		bi.iImage = 0;
 	}
 	tb.SetButtonInfo(ID_PLAY_PLAY, &bi);
 	
