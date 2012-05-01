@@ -34,11 +34,6 @@
 
 #include <Version.h>
 
-#ifndef _WIN64
-#define VERSION_ARCH x86
-#else
-#define VERSION_ARCH x64
-#endif
 
 BOOL WINAPI MyGetDialogSize(int iResourceID, DLGPROC pDlgProc, LPARAM lParam, SIZE* pResult)
 {
@@ -734,7 +729,7 @@ void CDVSTimingPPage::UpdateControlData(bool fSave)
 		CString fpsstr;
 		m_fps.GetWindowText(fpsstr);
 		float fps;
-		if (_stscanf(fpsstr, _T("%f"), &fps) == 1) {
+		if (_stscanf_s(fpsstr, _T("%f"), &fps) == 1) {
 			m_MediaFPS = fps;
 		}
 		m_SubtitleDelay = m_subdelay.GetPos32();
@@ -767,7 +762,7 @@ bool CDVSAboutPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg) {
 		case WM_INITDIALOG: {
-			SetDlgItemTextA( m_Dlg, IDC_VERSION, "DirectVobSub 2.41."MAKE_STR(MPC_VERSION_PATCH)"."MAKE_STR(MPC_VERSION_REV)" "MAKE_STR(VERSION_ARCH)"\nCopyright 2001-2012 MPC-HC Team" );
+			SetDlgItemTextA(m_Dlg, IDC_VERSION, "DirectVobSub 2.41."MAKE_STR(MPC_VERSION_REV)" "MPC_VERSION_ARCH"\nCopyright 2001-2012 MPC-BE Team");
 		}
 		break;
 		case WM_COMMAND: {
