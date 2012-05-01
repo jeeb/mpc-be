@@ -66,13 +66,14 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 	GetToolBarCtrl().SetExtendedStyle(TBSTYLE_EX_DRAWDDARROWS);
 
 	CToolBarCtrl& tb = GetToolBarCtrl();
+	tb.DeleteButton(1);
 	tb.DeleteButton(tb.GetButtonCount()-1);
 	tb.DeleteButton(tb.GetButtonCount()-1);
 
 	SetMute(AfxGetAppSettings().fMute);
 
 	UINT styles[] = {
-		TBBS_CHECKGROUP, TBBS_CHECKGROUP, TBBS_CHECKGROUP,
+		TBBS_CHECKGROUP/*TBBS_CHECKGROUP, TBBS_CHECKGROUP*/, TBBS_CHECKGROUP,
 		TBBS_SEPARATOR,
 		TBBS_BUTTON, TBBS_BUTTON, TBBS_BUTTON, TBBS_BUTTON,
 		TBBS_SEPARATOR,
@@ -299,8 +300,8 @@ void CPlayerToolBar::ArrangeControls()
 
 	CRect br = GetBorders();
 
-	CRect r10;
-	GetItemRect(10, &r10);
+	CRect r9;
+	GetItemRect(9, &r9);
 
 	CRect vr;
 	m_volctrl.GetClientRect(&vr);
@@ -308,7 +309,7 @@ void CPlayerToolBar::ArrangeControls()
 
 	if (s.fDisableXPToolbars) {
 		int m_nBMedian = r.bottom - 3 - 0.5 * m_nButtonHeight;
-		vr2.SetRect(r.right + br.right - 60, m_nBMedian - 14, r.right +br.right + 6, m_nBMedian + 11);
+		vr2.SetRect(r.right + br.right - 60, m_nBMedian - 14, r.right +br.right + 6, m_nBMedian + 10);
 	}
 
 	m_volctrl.MoveWindow(vr2);
@@ -316,8 +317,8 @@ void CPlayerToolBar::ArrangeControls()
 	UINT nID;
 	UINT nStyle;
 	int iImage;
-	GetButtonInfo(12, nID, nStyle, iImage);
-	SetButtonInfo(11, GetItemID(11), TBBS_SEPARATOR, vr2.left - iImage - r10.right - (r10.bottom - r10.top) + 11);
+	GetButtonInfo(11, nID, nStyle, iImage);
+	SetButtonInfo(10, GetItemID(10), TBBS_SEPARATOR, vr2.left - iImage - r9.right - (r9.bottom - r9.top) + 10);
 }
 
 void CPlayerToolBar::SetMute(bool fMute)
@@ -370,6 +371,12 @@ BEGIN_MESSAGE_MAP(CPlayerToolBar, CToolBar)
 	ON_MESSAGE_VOID(WM_INITIALUPDATE, OnInitialUpdate)
 	ON_COMMAND_EX(ID_VOLUME_MUTE, OnVolumeMute)
 	ON_UPDATE_COMMAND_UI(ID_VOLUME_MUTE, OnUpdateVolumeMute)
+
+	ON_COMMAND_EX(ID_PLAY_PAUSE, OnPause)
+	ON_COMMAND_EX(ID_PLAY_PLAY, OnPlay)
+	ON_COMMAND_EX(ID_PLAY_STOP, OnStop)
+	ON_COMMAND_EX(ID_FILE_CLOSEMEDIA, OnStop)
+
 	ON_COMMAND_EX(ID_VOLUME_UP, OnVolumeUp)
 	ON_COMMAND_EX(ID_VOLUME_DOWN, OnVolumeDown)
 	ON_WM_LBUTTONDOWN()
@@ -500,7 +507,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			
 			GRADIENT_RECT gr[1] = {{0, 1}};
 
-			int sep[4] = {3, 8, 10, 11};
+			int sep[4] = {2, 7, 9, 10};
 			for (int j = 0; j < 4; j++) {
 				GetItemRect(sep[j], &r);
 
@@ -577,11 +584,68 @@ void CPlayerToolBar::OnMouseMove(UINT nFlags, CPoint point)
 	if ((i==-1) || (GetButtonStyle(i)&(TBBS_SEPARATOR|TBBS_DISABLED))) {
 		;
 	} else {
-		if ((i>11) || ((i<10) && ((CMainFrame*)GetParentFrame())->IsSomethingLoaded())) {
+		if ((i>10) || ((i<9) && ((CMainFrame*)GetParentFrame())->IsSomethingLoaded())) {
 			::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_HAND));
 		}
 	}
 	__super::OnMouseMove(nFlags, point);
+}
+
+BOOL CPlayerToolBar::OnPlay(UINT nID)
+{
+	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
+	OAFilterState fs = pFrame->GetMediaState();
+		
+	CToolBarCtrl& tb = GetToolBarCtrl();
+	TBBUTTONINFO bi;
+	bi.cbSize = sizeof(bi);
+	bi.dwMask = TBIF_IMAGE;
+	
+	tb.GetButtonInfo(ID_PLAY_PLAY, &bi);
+	if ( fs == State_Paused || fs == State_Stopped) {
+		bi.iImage = 0;
+	} else {
+		bi.iImage = 1;
+	}
+	tb.SetButtonInfo(ID_PLAY_PLAY, &bi);
+
+	return FALSE;
+}
+
+BOOL CPlayerToolBar::OnStop(UINT nID)
+{
+	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
+	OAFilterState fs = pFrame->GetMediaState();
+		
+	CToolBarCtrl& tb = GetToolBarCtrl();
+	TBBUTTONINFO bi;
+	bi.cbSize = sizeof(bi);
+	bi.dwMask = TBIF_IMAGE;
+	tb.GetButtonInfo(ID_PLAY_PLAY, &bi);
+	bi.iImage = 0;
+	tb.SetButtonInfo(ID_PLAY_PLAY, &bi);
+
+	return FALSE;
+}
+
+BOOL CPlayerToolBar::OnPause(UINT nID)
+{
+	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
+	OAFilterState fs = pFrame->GetMediaState();
+		
+	CToolBarCtrl& tb = GetToolBarCtrl();
+	TBBUTTONINFO bi;
+	bi.cbSize = sizeof(bi);
+	bi.dwMask = TBIF_IMAGE;
+	tb.GetButtonInfo(ID_PLAY_PLAY, &bi);
+	if ( fs == State_Paused) {
+		bi.iImage = 0;
+	} else {
+		bi.iImage = 1;
+	}
+	tb.SetButtonInfo(ID_PLAY_PLAY, &bi);
+	
+	return FALSE;
 }
 
 void CPlayerToolBar::OnLButtonDown(UINT nFlags, CPoint point)
@@ -589,13 +653,31 @@ void CPlayerToolBar::OnLButtonDown(UINT nFlags, CPoint point)
 	int i = getHitButtonIdx(point);
 	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
 
+	OAFilterState fs = pFrame->GetMediaState();
+	CToolBarCtrl& tb = GetToolBarCtrl();
+	TBBUTTONINFO bi;
+	bi.cbSize = sizeof(bi);
+	bi.dwMask = TBIF_IMAGE;
+	tb.GetButtonInfo(ID_PLAY_PLAY, &bi);
+
+	if (i == 0 && fs == State_Running) {
+		pFrame->PostMessage(WM_COMMAND, ID_PLAY_PLAYPAUSE);
+		return;
+	} else if (i == 0 && fs == State_Stopped) {
+		pFrame->PostMessage(WM_COMMAND, ID_PLAY_PLAYPAUSE);
+		return;
+	} else if (i== 0 && fs == State_Paused) {
+		pFrame->PostMessage(WM_COMMAND, ID_PLAY_PLAYPAUSE);
+		return;
+	}
+
 	if ((i==-1) || (GetButtonStyle(i)&(TBBS_SEPARATOR|TBBS_DISABLED))) {
 		if (!pFrame->m_fFullScreen) {
 			MapWindowPoints(pFrame, &point, 1);
 			pFrame->PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 		}
 	} else {
-		if ((i>11) || ((i<10) && pFrame->IsSomethingLoaded())) {
+		if ((i>10) || ((i<9) && pFrame->IsSomethingLoaded())) {
 			::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_HAND));
 		}
 

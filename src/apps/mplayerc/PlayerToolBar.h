@@ -82,6 +82,12 @@ protected:
 	afx_msg void OnInitialUpdate();
 	afx_msg BOOL OnVolumeMute(UINT nID);
 	afx_msg void OnUpdateVolumeMute(CCmdUI* pCmdUI);
+
+	afx_msg BOOL OnPause(UINT nID);
+	afx_msg BOOL OnPlay(UINT nID);
+	afx_msg BOOL OnStop(UINT nID);
+	afx_msg BOOL OnClose(UINT nID);
+
 	afx_msg BOOL OnVolumeUp(UINT nID);
 	afx_msg BOOL OnVolumeDown(UINT nID);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
