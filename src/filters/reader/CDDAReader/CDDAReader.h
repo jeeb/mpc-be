@@ -108,13 +108,14 @@ public:
 	DECLARE_IUNKNOWN;
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
-	// IFileSourceFilter
+	// CBaseFilter
+	STDMETHODIMP QueryFilterInfo(FILTER_INFO* pInfo);
 
+	// IFileSourceFilter
 	STDMETHODIMP Load(LPCOLESTR pszFileName, const AM_MEDIA_TYPE* pmt);
 	STDMETHODIMP GetCurFile(LPOLESTR* ppszFileName, AM_MEDIA_TYPE* pmt);
 
 	// IAMMediaContent
-
 	STDMETHODIMP GetTypeInfoCount(UINT* pctinfo);
 	STDMETHODIMP GetTypeInfo(UINT itinfo, LCID lcid, ITypeInfo** pptinfo);
 	STDMETHODIMP GetIDsOfNames(REFIID riid, OLECHAR** rgszNames, UINT cNames, LCID lcid, DISPID* rgdispid);

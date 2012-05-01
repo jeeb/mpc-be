@@ -94,6 +94,20 @@ STDMETHODIMP CUDPReader::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
 
+STDMETHODIMP CUDPReader::QueryFilterInfo(FILTER_INFO* pInfo)
+{
+	CheckPointer(pInfo, E_POINTER);
+	ValidateReadWritePtr(pInfo, sizeof(FILTER_INFO));
+
+	wcscpy_s(pInfo->achName, UDPReaderName);
+	pInfo->pGraph = m_pGraph;
+	if (m_pGraph) {
+		m_pGraph->AddRef();
+	}
+
+	return S_OK;
+}
+
 // IFileSourceFilter
 
 STDMETHODIMP CUDPReader::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYPE* pmt)

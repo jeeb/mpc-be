@@ -78,7 +78,6 @@ public:
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
 	// CBaseFilter
-
 	STDMETHODIMP QueryFilterInfo(FILTER_INFO* pInfo);
 
 	// IFileSourceFilter
@@ -86,7 +85,6 @@ public:
 	STDMETHODIMP GetCurFile(LPOLESTR* ppszFileName, AM_MEDIA_TYPE* pmt);
 
 	// ITrackInfo
-
 	STDMETHODIMP_(UINT) GetTrackCount();
 	STDMETHODIMP_(BOOL) GetTrackInfo(UINT aTrackIdx, struct TrackElement* pStructureToFill);
 	STDMETHODIMP_(BOOL) GetTrackExtendedInfo(UINT aTrackIdx, void* pStructureToFill);

@@ -91,6 +91,9 @@ public:
 	DECLARE_IUNKNOWN
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
+	// CBaseFilter
+	STDMETHODIMP QueryFilterInfo(FILTER_INFO* pInfo);
+
 	// IFileSourceFilter
 	STDMETHODIMP Load(LPCOLESTR pszFileName, const AM_MEDIA_TYPE* pmt);
 	STDMETHODIMP GetCurFile(LPOLESTR* ppszFileName, AM_MEDIA_TYPE* pmt);

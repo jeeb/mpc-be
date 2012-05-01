@@ -264,7 +264,9 @@ void CPlayerToolBar::ArrangeControls()
 		//kill default theme?!
 		if (HMODULE h = LoadLibrary(_T("uxtheme.dll"))) {
 			SetWindowThemeFunct f = (SetWindowThemeFunct)GetProcAddress(h, "SetWindowTheme");
-			if (f) f(m_hWnd, L" ", L" ");
+			if (f) {
+				f(m_hWnd, L" ", L" ");
+			}
 			FreeLibrary(h);
 		}
 	} else if (!s.fDisableXPToolbars && s.fToolbarRefresh) {//if switching from handsome to default :(
@@ -290,7 +292,9 @@ void CPlayerToolBar::ArrangeControls()
 		//restore default theme?!
 		if (HMODULE h = LoadLibrary(_T("uxtheme.dll"))) {
 			SetWindowThemeFunct f = (SetWindowThemeFunct)GetProcAddress(h, "SetWindowTheme");
-			if (f) f(m_hWnd, L"Explorer", NULL);
+			if (f) {
+				f(m_hWnd, L"Explorer", NULL);
+			}
 			FreeLibrary(h);
 		}
 	}
@@ -581,7 +585,7 @@ void CPlayerToolBar::OnMouseMove(UINT nFlags, CPoint point)
 {
 	int i = getHitButtonIdx(point);
 
-	if ((i==-1) || (GetButtonStyle(i)&(TBBS_SEPARATOR|TBBS_DISABLED))) {
+	if ((i == -1) || (GetButtonStyle(i)&(TBBS_SEPARATOR|TBBS_DISABLED))) {
 		;
 	} else {
 		if ((i>10) || ((i<9) && ((CMainFrame*)GetParentFrame())->IsSomethingLoaded())) {
@@ -593,20 +597,15 @@ void CPlayerToolBar::OnMouseMove(UINT nFlags, CPoint point)
 
 BOOL CPlayerToolBar::OnPlay(UINT nID)
 {
-	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
-	OAFilterState fs = pFrame->GetMediaState();
+	CMainFrame* pFrame	= ((CMainFrame*)GetParentFrame());
+	OAFilterState fs	= pFrame->GetMediaState();
 		
 	CToolBarCtrl& tb = GetToolBarCtrl();
 	TBBUTTONINFO bi;
 	bi.cbSize = sizeof(bi);
 	bi.dwMask = TBIF_IMAGE;
-	
 	tb.GetButtonInfo(ID_PLAY_PLAY, &bi);
-	if ( fs == State_Paused || fs == State_Stopped) {
-		bi.iImage = 1;
-	} else {
-		bi.iImage = 0;
-	}
+	bi.iImage = (fs == State_Paused || fs == State_Stopped) ? 1 : 0;
 	tb.SetButtonInfo(ID_PLAY_PLAY, &bi);
 
 	return FALSE;
@@ -614,8 +613,8 @@ BOOL CPlayerToolBar::OnPlay(UINT nID)
 
 BOOL CPlayerToolBar::OnStop(UINT nID)
 {
-	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
-	OAFilterState fs = pFrame->GetMediaState();
+	CMainFrame* pFrame	= ((CMainFrame*)GetParentFrame());
+	OAFilterState fs	= pFrame->GetMediaState();
 		
 	CToolBarCtrl& tb = GetToolBarCtrl();
 	TBBUTTONINFO bi;
@@ -630,19 +629,15 @@ BOOL CPlayerToolBar::OnStop(UINT nID)
 
 BOOL CPlayerToolBar::OnPause(UINT nID)
 {
-	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
-	OAFilterState fs = pFrame->GetMediaState();
+	CMainFrame* pFrame	= ((CMainFrame*)GetParentFrame());
+	OAFilterState fs	= pFrame->GetMediaState();
 		
 	CToolBarCtrl& tb = GetToolBarCtrl();
 	TBBUTTONINFO bi;
 	bi.cbSize = sizeof(bi);
 	bi.dwMask = TBIF_IMAGE;
 	tb.GetButtonInfo(ID_PLAY_PLAY, &bi);
-	if ( fs == State_Paused) {
-		bi.iImage = 1;
-	} else {
-		bi.iImage = 0;
-	}
+	bi.iImage = (fs == State_Paused) ? 1 : 0;
 	tb.SetButtonInfo(ID_PLAY_PLAY, &bi);
 	
 	return FALSE;
@@ -650,34 +645,19 @@ BOOL CPlayerToolBar::OnPause(UINT nID)
 
 void CPlayerToolBar::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	int i = getHitButtonIdx(point);
-	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
+	CMainFrame* pFrame	= ((CMainFrame*)GetParentFrame());
+	int Idx				= getHitButtonIdx(point);
+	OAFilterState fs	= pFrame->GetMediaState();
 
-	OAFilterState fs = pFrame->GetMediaState();
-	CToolBarCtrl& tb = GetToolBarCtrl();
-	TBBUTTONINFO bi;
-	bi.cbSize = sizeof(bi);
-	bi.dwMask = TBIF_IMAGE;
-	tb.GetButtonInfo(ID_PLAY_PLAY, &bi);
-
-	if (i == 0 && fs == State_Running) {
+	if (Idx == 0 && fs != -1) {
 		pFrame->PostMessage(WM_COMMAND, ID_PLAY_PLAYPAUSE);
-		return;
-	} else if (i == 0 && fs == State_Stopped) {
-		pFrame->PostMessage(WM_COMMAND, ID_PLAY_PLAYPAUSE);
-		return;
-	} else if (i== 0 && fs == State_Paused) {
-		pFrame->PostMessage(WM_COMMAND, ID_PLAY_PLAYPAUSE);
-		return;
-	}
-
-	if ((i==-1) || (GetButtonStyle(i)&(TBBS_SEPARATOR|TBBS_DISABLED))) {
+	} else if ((Idx == -1) || (GetButtonStyle(Idx)&(TBBS_SEPARATOR|TBBS_DISABLED))) {
 		if (!pFrame->m_fFullScreen) {
 			MapWindowPoints(pFrame, &point, 1);
 			pFrame->PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 		}
 	} else {
-		if ((i>10) || ((i<9) && pFrame->IsSomethingLoaded())) {
+		if ((Idx>10) || ((Idx<9) && pFrame->IsSomethingLoaded())) {
 			::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_HAND));
 		}
 
