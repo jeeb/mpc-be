@@ -273,14 +273,10 @@ int CDXVADecoderMpeg2::FindOldestFrame()
 
 void CDXVADecoderMpeg2::UpdateFrameTime (REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
 {
-	TRACE(_T("\n\nrtStart = [%10I64d - %10I64d] // "), rtStart, rtStop);
-
 	if (m_rtLastStart && (rtStart == _I64_MIN || (rtStart < m_rtLastStart))) {
 		rtStart = m_rtLastStart;
 	}
 
 	rtStop  = rtStart + m_pFilter->GetAvrTimePerFrame() / m_pFilter->GetRate();
 	m_rtLastStart = rtStop;
-
-	TRACE(_T("rtStart = [%10I64d - %10I64d]\n"), rtStart, rtStop);
 }
