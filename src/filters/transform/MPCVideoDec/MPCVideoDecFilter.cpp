@@ -957,8 +957,6 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn)
 					bCodecActivated = (m_nActiveCodecs & MPCVD_INDEO) != 0;
 					break;
 				case CODEC_ID_CSCD :
-					bCodecActivated = 1;
-					break;
 				case CODEC_ID_TSCC :
 					bCodecActivated = 1;
 					break;
