@@ -106,6 +106,7 @@ SRCS_C=\
     libavcodec/celp_filters.c \
     libavcodec/celp_math.c \
     libavcodec/cook.c \
+    libavcodec/cscd.c \
     libavcodec/dct.c \
     libavcodec/dct32.c \
     libavcodec/dct32_float.c \
@@ -264,6 +265,7 @@ SRCS_C=\
     libavutil/inverse.c \
     libavutil/lfg.c \
     libavutil/log.c \
+    libavutil/lzo.c \
     libavutil/mathematics.c \
     libavutil/md5.c \
     libavutil/mem.c \

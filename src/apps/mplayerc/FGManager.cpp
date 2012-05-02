@@ -1876,6 +1876,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 #if HAS_FFMPEG_VIDEO_DECODERS | HAS_DXVA_VIDEO_DECODERS
 	pFGF = DNew CFGFilterInternal<CMPCVideoDecFilter>(MPCVideoDecName, MERIT64_ABOVE_DSHOW);
 
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_CSCD);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_TSCC);
 
 #if INTERNAL_DECODER_FLV
@@ -2087,6 +2088,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 	// Low merit MPC Video Decoder
 	pFGF = DNew CFGFilterInternal<CMPCVideoDecFilter>(LowMerit(MPCVideoDecName), MERIT64_DO_USE);
 
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_CSCD);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_TSCC);
 
 #if INTERNAL_DECODER_FLV
