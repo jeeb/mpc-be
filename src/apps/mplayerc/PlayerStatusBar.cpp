@@ -36,7 +36,7 @@ CPlayerStatusBar::CPlayerStatusBar()
 	: m_status(false, false)
 	, m_time(true, false)
 	, m_bmid(0)
-	, m_hIcon(0)
+	, m_hIcon(NULL)
 	, m_time_rect(-1, -1, -1, -1)
 	, m_time_rect2(-1, -1, -1, -1)
 {

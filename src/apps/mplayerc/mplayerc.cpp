@@ -71,18 +71,18 @@ HICON LoadIcon(CString fn, bool fSmall)
 		}
 	}
 
-	WORD iconIndex;
-	TCHAR buff[256];
-	ULONG len;
+	TCHAR buff[MAX_PATH];
+	lstrcpy(buff, fn.GetBuffer());
 
-	lstrcpy(buff, fn);
-	HICON hIcon = ExtractAssociatedIcon(NULL, buff, &iconIndex);
-	UNUSED_ALWAYS(iconIndex);
-	if (hIcon) {
-		if (HICON _hIcon = (HICON)CopyImage(hIcon, IMAGE_ICON, size.cx, size.cy, LR_COPYFROMRESOURCE)) {
-			return _hIcon;
-		}
+	SHFILEINFO sfi;
+	ZeroMemory(&sfi, sizeof(sfi));
+	
+	if (SUCCEEDED(SHGetFileInfo(buff, 0, &sfi, sizeof(sfi), (fSmall ? SHGFI_SMALLICON : SHGFI_LARGEICON) |SHGFI_ICON)) && sfi.hIcon) {
+		return sfi.hIcon;
 	}
+
+	ULONG len;
+	HICON hIcon = NULL;
 
 	do {
 		CRegKey key;

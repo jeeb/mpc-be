@@ -11311,7 +11311,7 @@ void CMainFrame::OpenSetupStatusBar()
 	HICON hIcon = NULL;
 
 	if (GetPlaybackMode() == PM_FILE) {
-		hIcon = LoadIcon(m_wndPlaylistBar.GetCurFileName(), true);		
+		hIcon = LoadIcon(m_wndPlaylistBar.GetCurFileName(), true);
 	} else if (GetPlaybackMode() == PM_DVD) {
 		hIcon = LoadIcon(_T(".ifo"), true);
 	}
