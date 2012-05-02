@@ -901,7 +901,21 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					if (AP4_VisualSampleEntry* vse = dynamic_cast<AP4_VisualSampleEntry*>(atom)) {
 
-						if (type == AP4_ATOM_TYPE_MJPA || type == AP4_ATOM_TYPE_MJPB || type == AP4_ATOM_TYPE_MJPG) {
+						if (type == AP4_ATOM_TYPE_HDV1 || type == AP4_ATOM_TYPE_HDV2) {
+							SetTrackName(&TrackName, type == AP4_ATOM_TYPE_HDV1 ? _T("HDV 720p/MPEG2") : _T("HDV 1080i/MPEG2"));
+
+							BYTE* seqhdr = (BYTE*)db.GetData();
+							DWORD len = db.GetDataSize();
+							int w = vse->GetWidth();
+							int h = vse->GetHeight();
+
+							if (MakeMPEG2MediaType(mt, seqhdr, len, w, h)) {
+								mts.Add(mt);
+								//b_HasVideo = true;
+							}
+
+							break;
+						} else if (type == AP4_ATOM_TYPE_MJPA || type == AP4_ATOM_TYPE_MJPB || type == AP4_ATOM_TYPE_MJPG) {
 							SetTrackName(&TrackName, _T("M-Jpeg"));
 						}
 
