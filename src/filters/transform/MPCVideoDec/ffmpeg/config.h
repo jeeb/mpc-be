@@ -25,7 +25,6 @@
     #define HAVE_GETADDRINFO 0
   #endif
 
-  #define PTW32_STATIC_LIB 1
   #define restrict restrict
 #else
   #define HAVE_INLINE_ASM 0
