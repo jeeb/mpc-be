@@ -90,7 +90,6 @@ BOOL CSaveDlg::OnInitDialog()
 	CStringW fnw = m_in;
 	CComPtr<IFileSourceFilter> pReader;
 
-#if INTERNAL_SOURCEFILTER_CDDA
 	if (!pReader && m_in.Mid(m_in.ReverseFind('.')+1).MakeLower() == _T("cda")) {
 		hr = S_OK;
 		CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)DNew CCDDAReader(NULL, &hr);
@@ -98,9 +97,7 @@ BOOL CSaveDlg::OnInitDialog()
 			pReader.Release();
 		}
 	}
-#endif
 
-#if INTERNAL_SOURCEFILTER_CDXA
 	if (!pReader) {
 		hr = S_OK;
 		CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)DNew CCDXAReader(NULL, &hr);
@@ -108,9 +105,7 @@ BOOL CSaveDlg::OnInitDialog()
 			pReader.Release();
 		}
 	}
-#endif
 
-#if INTERNAL_SOURCEFILTER_VTS
 	if (!pReader /*&& ext == _T("ifo")*/) {
 		hr = S_OK;
 		CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)DNew CVTSReader(NULL, &hr);
@@ -122,7 +117,6 @@ BOOL CSaveDlg::OnInitDialog()
 			CopyFile(m_in, pout, FALSE);
 		}
 	}
-#endif
 
 	if (!pReader) {
 		hr = S_OK;

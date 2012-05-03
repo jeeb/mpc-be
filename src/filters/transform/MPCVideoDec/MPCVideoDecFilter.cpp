@@ -116,7 +116,6 @@ DXVA_PARAMS		DXVA_VC1 = {
 };
 
 FFMPEG_CODECS		ffCodecs[] = {
-#if HAS_FFMPEG_VIDEO_DECODERS
 	// Flash video
 	{ &MEDIASUBTYPE_FLV1, CODEC_ID_FLV1, NULL },
 	{ &MEDIASUBTYPE_flv1, CODEC_ID_FLV1, NULL },
@@ -231,7 +230,6 @@ FFMPEG_CODECS		ffCodecs[] = {
 	{ &MEDIASUBTYPE_IV32,   CODEC_ID_INDEO3, NULL },
 	{ &MEDIASUBTYPE_IV41,   CODEC_ID_INDEO4, NULL },
 	{ &MEDIASUBTYPE_IV50,   CODEC_ID_INDEO5, NULL },
-#endif /* HAS_FFMPEG_VIDEO_DECODERS */
 
 	// H264/AVC
 	{ &MEDIASUBTYPE_H264, CODEC_ID_H264,	 &DXVA_H264 },
@@ -248,7 +246,6 @@ FFMPEG_CODECS		ffCodecs[] = {
 	{ &MEDIASUBTYPE_avc1, CODEC_ID_H264,	 &DXVA_H264 },
 	{ &MEDIASUBTYPE_H264_bis, CODEC_ID_H264, &DXVA_H264 },
 
-#if HAS_FFMPEG_VIDEO_DECODERS
 	// SVQ3
 	{ &MEDIASUBTYPE_SVQ3, CODEC_ID_SVQ3, NULL },
 
@@ -271,13 +268,11 @@ FFMPEG_CODECS		ffCodecs[] = {
 	// Theora
 	{ &MEDIASUBTYPE_THEORA, CODEC_ID_THEORA, NULL },
 	{ &MEDIASUBTYPE_theora, CODEC_ID_THEORA, NULL },
-#endif /* HAS_FFMPEG_VIDEO_DECODERS */
 
 	// WVC1
 	{ &MEDIASUBTYPE_WVC1, CODEC_ID_VC1, &DXVA_VC1 },
 	{ &MEDIASUBTYPE_wvc1, CODEC_ID_VC1, &DXVA_VC1 },
 
-#if HAS_FFMPEG_VIDEO_DECODERS
 	// Other MPEG-4
 	{ &MEDIASUBTYPE_MP4V, CODEC_ID_MPEG4, NULL },
 	{ &MEDIASUBTYPE_mp4v, CODEC_ID_MPEG4, NULL },
@@ -319,12 +314,10 @@ FFMPEG_CODECS		ffCodecs[] = {
 	{ &MEDIASUBTYPE_ump4, CODEC_ID_MPEG4, NULL },
 	{ &MEDIASUBTYPE_WV1F, CODEC_ID_MPEG4, NULL },
 	{ &MEDIASUBTYPE_wv1f, CODEC_ID_MPEG4, NULL }
-#endif /* HAS_FFMPEG_VIDEO_DECODERS */
 };
 
 /* Important: the order should be exactly the same as in ffCodecs[] */
 const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesIn[] = {
-#if HAS_FFMPEG_VIDEO_DECODERS
 	// Flash video
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_FLV1   },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_flv1   },
@@ -439,7 +432,6 @@ const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_IV32   },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_IV41   },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_IV50   },
-#endif /* HAS_FFMPEG_VIDEO_DECODERS */
 
 	// H264/AVC
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_H264   },
@@ -456,7 +448,6 @@ const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_avc1   },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_H264_bis },
 
-#if HAS_FFMPEG_VIDEO_DECODERS
 	// SVQ3
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_SVQ3   },
 
@@ -479,13 +470,11 @@ const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesIn[] = {
 	// Theora
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_THEORA },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_theora },
-#endif /* HAS_FFMPEG_VIDEO_DECODERS */
 
 	// VC1
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_WVC1   },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_wvc1   },
 
-#if HAS_FFMPEG_VIDEO_DECODERS
 	// IMPORTANT : some of the last MediaTypes present in next group may be not available in
 	// the standalone filter (workaround to prevent GraphEdit crash).
 	// Other MPEG-4
@@ -529,7 +518,6 @@ const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_ump4   },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_WV1F   },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_wv1f   }
-#endif /* HAS_FFMPEG_VIDEO_DECODERS */
 };
 
 const int CMPCVideoDecFilter::sudPinTypesInCount = countof(CMPCVideoDecFilter::sudPinTypesIn);
@@ -659,15 +647,12 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\MPC-BE Filters\\MPC Video Decoder"), KEY_READ)) {
 		DWORD dw;
-#if HAS_FFMPEG_VIDEO_DECODERS
 		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("ThreadNumber"), dw)) {
 			m_nThreadNumber = dw;
 		}
-#if INTERNAL_DECODER_H264
 		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("DiscardMode"), dw)) {
 			m_nDiscardMode = dw;
 		}
-#endif
 		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("ErrorRecognition"), dw)) {
 			m_nErrorRecognition = dw;
 		}
@@ -680,7 +665,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("ARMode"), dw)) {
 			m_nARMode = dw;
 		}
-#endif
 		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("DXVACheckCompatibility"), dw)) {
 			m_nDXVACheckCompatibility = dw;
 		}
@@ -710,15 +694,11 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		//
 	}
 #else
-#if HAS_FFMPEG_VIDEO_DECODERS
 	m_nThreadNumber = AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("ThreadNumber"), m_nThreadNumber);
-#if INTERNAL_DECODER_H264
 	m_nDiscardMode = AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("DiscardMode"), m_nDiscardMode);
-#endif
 	m_nErrorRecognition = AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("ErrorRecognition"), m_nErrorRecognition);
 	m_nIDCTAlgo = AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("IDCTAlgo"), m_nIDCTAlgo);
 	m_nARMode = AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("ARMode"), m_nARMode);
-#endif
 	m_nDXVACheckCompatibility = AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("DXVACheckCompatibility"), m_nDXVACheckCompatibility);
 	m_nDXVA_SD = AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("DisableDXVA_SD"), m_nDXVA_SD);
 
@@ -860,45 +840,19 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn)
 #ifndef REGISTER_FILTER
 			switch (ffCodecs[i].nFFCodec) {
 				case CODEC_ID_H264 :
-#if INTERNAL_DECODER_H264_DXVA
 					m_bUseDXVA = DXVAFilters && DXVAFilters[TRA_DXVA_H264];
-#else
-					m_bUseDXVA = false;
-#endif
-#if INTERNAL_DECODER_H264
 					m_bUseFFmpeg = FFmpegFilters && FFmpegFilters[FFM_H264];
-#else
-					m_bUseFFmpeg = false;
-#endif
 					break;
 				case CODEC_ID_VC1 :
-#if INTERNAL_DECODER_VC1_DXVA
 					m_bUseDXVA = DXVAFilters && DXVAFilters[TRA_DXVA_VC1];
-#else
-					m_bUseDXVA = false;
-#endif
-#if INTERNAL_DECODER_VC1
 					m_bUseFFmpeg = FFmpegFilters && FFmpegFilters[FFM_VC1];
-#else
-					m_bUseFFmpeg = false;
-#endif
 					break;
 				case CODEC_ID_WMV3 :
-#if INTERNAL_DECODER_WMV3_DXVA
 					m_bUseDXVA = DXVAFilters && DXVAFilters[TRA_DXVA_WMV3];
-#else
-					m_bUseDXVA = false;
-#endif
-#if INTERNAL_DECODER_WMV
 					m_bUseFFmpeg = FFmpegFilters && FFmpegFilters[FFM_WMV];
-#else
-					m_bUseFFmpeg = false;
-#endif
 					break;
 				case CODEC_ID_MPEG2VIDEO :
-#if INTERNAL_DECODER_MPEG2_DXVA
 					m_bUseDXVA = true;
-#endif
 					m_bUseFFmpeg = false; // No Mpeg2 software support with ffmpeg!
 					break;
 				default :
@@ -1035,12 +989,10 @@ void CMPCVideoDecFilter::Cleanup()
 		av_freep(&m_pFrame);
 	}
 
-#if HAS_FFMPEG_VIDEO_DECODERS
 	if (m_pSwsContext) {
 		sws_freeContext(m_pSwsContext);
 		m_pSwsContext = NULL;
 	}
-#endif /* HAS_FFMPEG_VIDEO_DECODERS */
 
 	m_pAVCodec		= NULL;
 	m_pAVCtx		= NULL;
@@ -1599,7 +1551,7 @@ HRESULT CMPCVideoDecFilter::EndOfStream()
 {
 	CAutoLock cAutoLock(&m_csReceive);
 
-	if (HAS_FFMPEG_VIDEO_DECODERS && m_nDXVAMode == MODE_SOFTWARE) {
+	if (m_nDXVAMode == MODE_SOFTWARE) {
 		REFERENCE_TIME rtStart = 0, rtStop = 0;
 		SoftwareDecode(NULL, NULL, 0, rtStart, rtStop);
 	} else if (m_nDXVAMode == MODE_DXVA2) { // TODO - need check under WinXP on DXVA1
@@ -1655,7 +1607,6 @@ void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 	}
 }
 
-#if HAS_FFMPEG_VIDEO_DECODERS
 unsigned __int64 CMPCVideoDecFilter::GetCspFromMediaType(GUID& subtype)
 {
 	// === New swscaler options
@@ -2101,8 +2052,6 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 	return hr;
 }
 
-#endif /* HAS_FFMPEG_VIDEO_DECODERS */
-
 bool CMPCVideoDecFilter::FindPicture(int nIndex, int nStartCode)
 {
 	DWORD dw = 0;
@@ -2242,11 +2191,9 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 	}
 
 	switch (m_nDXVAMode) {
-#if HAS_FFMPEG_VIDEO_DECODERS
 		case MODE_SOFTWARE :
 			hr = SoftwareDecode (pIn, pDataIn, nSize, rtStart, rtStop);
 			break;
-#endif
 		case MODE_DXVA1 :
 		case MODE_DXVA2 :
 			CheckPointer (m_pDXVADecoder, E_UNEXPECTED);

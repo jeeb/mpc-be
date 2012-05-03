@@ -39,9 +39,7 @@
 
 #include <libflac/include/FLAC/stream_decoder.h>
 
-#if defined(REGISTER_FILTER)
 void *__imp__toupper = toupper;
-#endif
 
 #define INT8_PEAK       128
 #define INT16_PEAK      32768
@@ -54,58 +52,40 @@ void *__imp__toupper = toupper;
 #define AC3_HEADER_SIZE 7
 #define MAX_JITTER      1000000i64 // +-100ms jitter is allowed for now 
 
-#if HAS_FFMPEG_AUDIO_DECODERS
 typedef struct {
 	const CLSID*       clsMinorType;
 	const enum CodecID nFFCodec;
 } FFMPEG_AUDIO_CODECS;
 
 static const FFMPEG_AUDIO_CODECS ffAudioCodecs[] = {
-#if INTERNAL_DECODER_AMR
 	// AMR
 	{ &MEDIASUBTYPE_AMR,		CODEC_ID_AMR_NB },
 	{ &MEDIASUBTYPE_SAMR,		CODEC_ID_AMR_NB },
 	{ &MEDIASUBTYPE_SAWB,		CODEC_ID_AMR_WB },
-#endif
-#if INTERNAL_DECODER_AAC
 	// AAC
 	{ &MEDIASUBTYPE_AAC,		CODEC_ID_AAC },
 	{ &MEDIASUBTYPE_MP4A,		CODEC_ID_AAC },
 	{ &MEDIASUBTYPE_mp4a,		CODEC_ID_AAC },
 	{ &MEDIASUBTYPE_AAC_ADTS,	CODEC_ID_AAC },
 	{ &MEDIASUBTYPE_LATM_AAC,	CODEC_ID_AAC_LATM },
-#endif
-#if INTERNAL_DECODER_ALAC
 	// ALAC
 	{ &MEDIASUBTYPE_ALAC,		CODEC_ID_ALAC },
-#endif
-#if INTERNAL_DECODER_ALS
 	// ALAC
 	{ &MEDIASUBTYPE_ALS,		CODEC_ID_MP4ALS },
-#endif
-#if INTERNAL_DECODER_VORBIS
 	// Ogg Vorbis
 	{ &MEDIASUBTYPE_Vorbis2,	CODEC_ID_VORBIS },
-#endif
-#if INTERNAL_DECODER_NELLYMOSER
 	// NellyMoser
 	{ &MEDIASUBTYPE_NELLYMOSER,	CODEC_ID_NELLYMOSER },
-#endif
-#if INTERNAL_DECODER_ADPCM
 	// Qt ADPCM
 	{ &MEDIASUBTYPE_IMA4,		CODEC_ID_ADPCM_IMA_QT },
 	// FLV ADPCM
 	{ &MEDIASUBTYPE_ADPCM_SWF,	CODEC_ID_ADPCM_SWF	  },
-#endif
-#if INTERNAL_DECODER_MPEGAUDIO
 	// MPEG Audio
 	{ &MEDIASUBTYPE_MPEG1Packet,		CODEC_ID_MP2 },
 	{ &MEDIASUBTYPE_MPEG1Payload,		CODEC_ID_MP2 },
 	{ &MEDIASUBTYPE_MPEG1AudioPayload,	CODEC_ID_MP2 },
 	{ &MEDIASUBTYPE_MPEG2_AUDIO,		CODEC_ID_MP2 },
 	{ &MEDIASUBTYPE_MP3,				CODEC_ID_MP3 },
-#endif
-#if INTERNAL_DECODER_REALAUDIO
 	// RealMedia Audio
 	{ &MEDIASUBTYPE_14_4,		CODEC_ID_RA_144	},
 	{ &MEDIASUBTYPE_28_8,		CODEC_ID_RA_288	},
@@ -114,14 +94,10 @@ static const FFMPEG_AUDIO_CODECS ffAudioCodecs[] = {
 	{ &MEDIASUBTYPE_SIPR,		CODEC_ID_SIPR	},
 	{ &MEDIASUBTYPE_RAAC,		CODEC_ID_AAC	},
 	{ &MEDIASUBTYPE_RACP,		CODEC_ID_AAC	},
-#endif
-#if INTERNAL_DECODER_AC3
 	{ &MEDIASUBTYPE_DOLBY_DDPLUS, CODEC_ID_EAC3   },
 	{ &MEDIASUBTYPE_DOLBY_TRUEHD, CODEC_ID_TRUEHD },
-#endif
 	{ &MEDIASUBTYPE_None,		CODEC_ID_NONE },
 };
-#endif
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_MP3},
@@ -399,26 +375,18 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_fDynamicRangeControl[ac3] = false;
 	m_fDynamicRangeControl[dts] = false;
 	m_DolbyDigitalMode			= DD_Unknown;
-#if defined(REGISTER_FILTER) | HAS_FFMPEG_AUDIO_DECODERS
 	m_pAVCodec					= NULL;
 	m_pAVCtx					= NULL;
 	m_pParser					= NULL;
 	m_pFrame					= NULL;
 	m_pFFBuffer					= NULL;
 	m_nFFBufferSize				= 0;
-#endif
 
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_FLAC
 	memset (&m_flac, 0, sizeof(m_flac));
-#endif
 
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_AC3
 	m_a52_state = NULL;
-#endif
 
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_DTS
 	m_dts_state = NULL;
-#endif
 
 #ifdef REGISTER_FILTER
 	CRegKey key;
@@ -487,23 +455,18 @@ HRESULT CMpaDecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, d
 	m_buff.RemoveAll();
 	m_ps2_state.sync = false;
 	m_DolbyDigitalMode = DD_Unknown;
-#if defined(REGISTER_FILTER) | HAS_FFMPEG_AUDIO_DECODERS
 	if (m_pAVCtx) {
 		avcodec_flush_buffers (m_pAVCtx);
 	}
-#endif
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_FLAC
 	if (m_flac.pDecoder) {
 		FLAC__stream_decoder_flush((FLAC__StreamDecoder*) m_flac.pDecoder);
 	}
-#endif
 
 	m_bResync = true;
 
 	return __super::NewSegment(tStart, tStop, dRate);
 }
 
-#if defined(REGISTER_FILTER) | HAS_FFMPEG_AUDIO_DECODERS
 enum CodecID CMpaDecFilter::FindCodec(const GUID subtype)
 {
 	for (int i=0; i<countof(ffAudioCodecs); i++)
@@ -513,8 +476,6 @@ enum CodecID CMpaDecFilter::FindCodec(const GUID subtype)
 
 	return CODEC_ID_NONE;
 }
-#endif
-
 
 HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 {
@@ -584,45 +545,32 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	memcpy(m_buff.GetData() + bufflen, pDataIn, len);
 	len += bufflen;
 
-#if defined(REGISTER_FILTER) | HAS_FFMPEG_AUDIO_DECODERS
 	enum CodecID nCodecId = FindCodec(subtype);
 	if (nCodecId != CODEC_ID_NONE) {
 		return ProcessFFmpeg(nCodecId);
 	}
-#endif
 	if (0) {} // needed if decoders are disabled below
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_LPCM
 	else if (subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {
 		hr = ProcessLPCM();
 	} else if (subtype == MEDIASUBTYPE_HDMV_LPCM_AUDIO) {
 		hr = ProcessHdmvLPCM(!!pIn->IsSyncPoint());
 	}
-#endif
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_AC3
 	else if (subtype == MEDIASUBTYPE_DOLBY_AC3 ||
 			 subtype == MEDIASUBTYPE_WAVE_DOLBY_AC3 ||
 			 subtype == MEDIASUBTYPE_DNET) {
 		hr = ProcessAC3();
 	}
-#endif
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_DTS
 	else if (subtype == MEDIASUBTYPE_DTS || subtype == MEDIASUBTYPE_WAVE_DTS) {
 		hr = ProcessDTS();
 	}
-#endif
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_PS2AUDIO
 	else if (subtype == MEDIASUBTYPE_PS2_PCM) {
 		hr = ProcessPS2PCM();
 	} else if (subtype == MEDIASUBTYPE_PS2_ADPCM) {
 		hr = ProcessPS2ADPCM();
 	}
-#endif
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_FLAC
 	else if (subtype == MEDIASUBTYPE_FLAC_FRAMED) {
 		hr = ProcessFlac();
 	}
-#endif
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_PCM
 	else if (subtype == MEDIASUBTYPE_PCM_NONE ||
 			 subtype == MEDIASUBTYPE_PCM_RAW) {
 //		if (m_buff.GetCount() < 480) {
@@ -664,12 +612,10 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 //		}
 		hr = ProcessPCMfloatLE();
 	}
-#endif
 
 	return hr;
 }
 
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_LPCM
 HRESULT CMpaDecFilter::ProcessLPCM()
 {
 	WAVEFORMATEX* wfein = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
@@ -866,9 +812,7 @@ HRESULT CMpaDecFilter::ProcessHdmvLPCM(bool bAlignOldBuffer) // Blu ray LPCM
 
 	return Deliver(pBuff, wfein->nSamplesPerSec, wfein->nChannels, remap->dwChannelMask);
 }
-#endif /* INTERNAL_DECODER_LPCM */
 
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_AC3
 HRESULT CMpaDecFilter::ProcessA52(BYTE* p, int buffsize, int& size, bool& fEnoughData)
 {
 	int flags, sample_rate, bit_rate;
@@ -1008,9 +952,7 @@ HRESULT CMpaDecFilter::ProcessAC3()
 
 	return S_OK;
 }
-#endif /* INTERNAL_DECODER_AC3 */
 
-#if defined(REGISTER_FILTER) | HAS_FFMPEG_AUDIO_DECODERS
 HRESULT CMpaDecFilter::ProcessFFmpeg(enum CodecID nCodecId)
 {
 	HRESULT hr;
@@ -1042,9 +984,7 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum CodecID nCodecId)
 
 	return hr;
 }
-#endif /* HAS_FFMPEG_AUDIO_DECODERS */
 
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_DTS
 HRESULT CMpaDecFilter::ProcessDTS()
 {
 	BYTE* p = m_buff.GetData();
@@ -1130,9 +1070,7 @@ HRESULT CMpaDecFilter::ProcessDTS()
 
 	return S_OK;
 }
-#endif /* INTERNAL_DECODER_DTS */
 
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_PCM
 HRESULT CMpaDecFilter::ProcessPCMraw() //'raw '
 {
 	WAVEFORMATEX* wfe = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
@@ -1353,9 +1291,7 @@ HRESULT CMpaDecFilter::ProcessPCMfloatLE() //little-endian 'fl32' and 'fl64'
 	m_buff.RemoveAll();
 	return S_OK;
 }
-#endif /* INTERNAL_DECODER_PCM */
 
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_PS2AUDIO
 HRESULT CMpaDecFilter::ProcessPS2PCM()
 {
 	BYTE* p = m_buff.GetData();
@@ -1505,9 +1441,7 @@ HRESULT CMpaDecFilter::ProcessPS2ADPCM()
 
 	return S_OK;
 }
-#endif /* INTERNAL_DECODER_PS2AUDIO */
 
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_FLAC
 HRESULT CMpaDecFilter::ProcessFlac()
 {
 	WAVEFORMATEX* wfein = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
@@ -1516,7 +1450,6 @@ HRESULT CMpaDecFilter::ProcessFlac()
 	FLAC__stream_decoder_process_single ((FLAC__StreamDecoder*) m_flac.pDecoder);
 	return m_flac.hr;
 }
-#endif /* INTERNAL_DECODER_FLAC */
 
 HRESULT CMpaDecFilter::GetDeliveryBuffer(IMediaSample** pSample, BYTE** pData)
 {
@@ -1810,7 +1743,6 @@ CMediaType CMpaDecFilter::CreateMediaTypeSPDIF(DWORD nSamplesPerSec)
 
 HRESULT CMpaDecFilter::CheckInputType(const CMediaType* mtIn)
 {
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_LPCM
 	if (mtIn->subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {
 		WAVEFORMATEX* wfe = (WAVEFORMATEX*)mtIn->Format();
 		if (wfe->nChannels < 1 || wfe->nChannels > 8 || (wfe->wBitsPerSample != 16 && wfe->wBitsPerSample != 20 && wfe->wBitsPerSample != 24)) {
@@ -1821,10 +1753,6 @@ HRESULT CMpaDecFilter::CheckInputType(const CMediaType* mtIn)
 		UNUSED_ALWAYS(wfe);
 		return S_OK;
 	}
-#else
-	if (0) {}
-#endif
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_PS2AUD
 	else if (mtIn->subtype == MEDIASUBTYPE_PS2_ADPCM) {
 		WAVEFORMATEXPS2* wfe = (WAVEFORMATEXPS2*)mtIn->Format();
 		UNUSED_ALWAYS(wfe);
@@ -1832,12 +1760,9 @@ HRESULT CMpaDecFilter::CheckInputType(const CMediaType* mtIn)
 			return VFW_E_TYPE_NOT_ACCEPTED;
 		}
 	}
-#endif
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_FLAC
 	else if (mtIn->subtype == MEDIASUBTYPE_FLAC_FRAMED) {
 		return S_OK;
 	}
-#endif
 
 	for (int i = 0; i < countof(sudPinTypesIn); i++) {
 		if (*sudPinTypesIn[i].clsMajorType == mtIn->majortype
@@ -1905,7 +1830,6 @@ HRESULT CMpaDecFilter::GetMediaType(int iPosition, CMediaType* pmt)
 		return E_INVALIDARG;
 	}
 
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_AC3 | INTERNAL_DECODER_DTS
 	if (GetSpeakerConfig(ac3) < 0 && (subtype == MEDIASUBTYPE_DOLBY_AC3 ||
 									  subtype == MEDIASUBTYPE_WAVE_DOLBY_AC3 ||
 									  subtype == MEDIASUBTYPE_DOLBY_DDPLUS ||
@@ -1913,16 +1837,11 @@ HRESULT CMpaDecFilter::GetMediaType(int iPosition, CMediaType* pmt)
 			|| GetSpeakerConfig(dts) < 0 && (subtype == MEDIASUBTYPE_DTS || subtype == MEDIASUBTYPE_WAVE_DTS)) {
 		*pmt = CreateMediaTypeSPDIF();
 	}
-#else
-	if (0) {}
-#endif
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_VORBIS
 	else if (subtype == MEDIASUBTYPE_Vorbis2) {
 		VORBISFORMAT2 *vf2 = (VORBISFORMAT2 *)mt.Format();
 		scmap_t* scmap = &m_scmap_default[vf2->Channels-1];
 		*pmt = CreateMediaType(GetSampleFormat(), vf2->SamplesPerSec, vf2->Channels, scmap->dwChannelMask);
 	}
-#endif
 	else {
 		*pmt = CreateMediaType(GetSampleFormat(), wfe->nSamplesPerSec, min(2, wfe->nChannels));
 	}
@@ -1937,18 +1856,10 @@ HRESULT CMpaDecFilter::StartStreaming()
 		return hr;
 	}
 
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_AC3
 	m_a52_state = a52_init(0);
-#endif
-
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_DTS
 	m_dts_state = dts_init(0);
-#endif
-
 	m_ps2_state.reset();
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_FLAC
 	FlacInitDecoder();
-#endif
 
 	m_fDiscontinuity = false;
 
@@ -1957,41 +1868,29 @@ HRESULT CMpaDecFilter::StartStreaming()
 
 HRESULT CMpaDecFilter::StopStreaming()
 {
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_AC3
 	if (m_a52_state != NULL) {
 		a52_free(m_a52_state);
 		m_a52_state = NULL;
 	}
-#endif
 
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_DTS
 	if (m_dts_state != NULL) {
 		dts_free(m_dts_state);
 		m_dts_state = NULL;
 	}
-#endif
-
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_FLAC
 	flac_stream_finish();
-#endif
-
-#if defined(REGISTER_FILTER) | HAS_FFMPEG_AUDIO_DECODERS
 	ffmpeg_stream_finish();
-#endif
 
 	return __super::StopStreaming();
 }
 
 HRESULT	CMpaDecFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType *pmt)
 {
-#if defined(REGISTER_FILTER) | HAS_FFMPEG_AUDIO_DECODERS
 	if (dir == PINDIR_INPUT) {
 		enum CodecID nCodecId = FindCodec(pmt->subtype);
 		if (nCodecId != CODEC_ID_NONE && !InitFFmpeg(nCodecId)) {
 			return VFW_E_TYPE_NOT_ACCEPTED;
 		}
 	}
-#endif
 
 	return __super::SetMediaType(dir, pmt);
 }
@@ -2117,8 +2016,6 @@ CMpaDecInputPin::CMpaDecInputPin(CTransformFilter* pFilter, HRESULT* phr, LPWSTR
 {
 }
 
-#if defined(REGISTER_FILTER) | INTERNAL_DECODER_FLAC
-
 #pragma region Flac callback
 
 void CMpaDecFilter::FlacFillBuffer(BYTE buffer[], size_t *bytes)
@@ -2228,10 +2125,6 @@ void CMpaDecFilter::flac_stream_finish()
 }
 
 #pragma endregion
-
-#endif /* INTERNAL_DECODER_FLAC */
-
-#if defined(REGISTER_FILTER) | HAS_FFMPEG_AUDIO_DECODERS
 
 #pragma region FFmpeg decoder
 
@@ -2687,5 +2580,3 @@ HRESULT CMpaDecFilter::ParseRealAudioHeader(const BYTE *extra, const int extrale
 }
 
 #pragma endregion
-
-#endif /* HAS_FFMPEG_AUDIO_DECODERS */

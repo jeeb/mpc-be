@@ -32,7 +32,6 @@
 #include "SaveTextFileDialog.h"
 #include "PlayerPlaylistBar.h"
 #include "SettingsDefines.h"
-#include "InternalFiltersConfig.h"
 
 
 IMPLEMENT_DYNAMIC(CPlayerPlaylistBar, CPlayerBar)
@@ -298,12 +297,10 @@ void CPlayerPlaylistBar::ParsePlayList(CAtlList<CString>& fns, CAtlList<CString>
 		ParseMPCPlayList(fns.GetHead());
 		return;
 	} else {
-#if INTERNAL_SOURCEFILTER_MPEG
 		if (ct == "application/x-bdmv-playlist" && s.SrcFilters[SRC_MPEG]) {
 			ParseBDMVPlayList(fns.GetHead());
 			return;
 		}
-#endif
 	}
 
 	AddItem(fns, subs);

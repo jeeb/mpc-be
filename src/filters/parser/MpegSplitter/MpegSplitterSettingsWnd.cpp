@@ -24,7 +24,6 @@
 #include "MpegSplitterSettingsWnd.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "resource.h"
-#include "../../../apps/mplayerc/InternalFiltersConfig.h"
 
 #define ResStr(id) CString(MAKEINTRESOURCE(id))
 
