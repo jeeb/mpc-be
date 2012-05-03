@@ -848,7 +848,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	SendAPICommand (CMD_CONNECT, L"%d", GetSafeHwnd());
 
-	m_hWnd_toolbar = m_wndToolBar.GetSafeHwnd();//ins:2452 bobdynlan:used to force toolbar redraw from PPageTweaks when !fDisableXPToolbars//
+	m_hWnd_toolbar = m_wndToolBar.GetSafeHwnd();
 
 	WTSRegisterSessionNotification();
 
@@ -9256,7 +9256,7 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 		CSize logosize = m_wndView.GetLogoSize();
 		int _DEFCLIENTW = max(logosize.cx, DEFCLIENTW);
 		int _DEFCLIENTH = max(logosize.cy, DEFCLIENTH);
-		if (s.fDisableXPToolbars) _DEFCLIENTW = _DEFCLIENTH * 16/9;//ins:2233 bobdynlan: start window around a 16/9 area, good when no autozoom. side-effect title space increased :p//
+		if (s.fDisableXPToolbars) _DEFCLIENTW = _DEFCLIENTH * 16/9;
 
 		if (GetSystemMetrics(SM_REMOTESESSION)) {
 			_DEFCLIENTH = 0;

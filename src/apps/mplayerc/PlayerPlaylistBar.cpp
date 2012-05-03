@@ -54,7 +54,7 @@ BOOL CPlayerPlaylistBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 	}
 
 	m_list.CreateEx(
-		0,//rem:2280 bobdynlan:less margins//WS_EX_DLGMODALFRAME|WS_EX_CLIENTEDGE,
+		0,//less margins//WS_EX_DLGMODALFRAME|WS_EX_CLIENTEDGE,
 		WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|WS_CLIPCHILDREN|WS_TABSTOP
 		|LVS_OWNERDRAWFIXED
 		|LVS_NOCOLUMNHEADER
@@ -63,7 +63,7 @@ BOOL CPlayerPlaylistBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 		CRect(0,0,100,100), this, IDC_PLAYLIST);
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle()|LVS_EX_FULLROWSELECT|LVS_EX_DOUBLEBUFFER);
-	m_list.SetBkColor(0x0037322d);//ins:2452 bobdynlan://clr_csShadow =  RGB( 45, 50, 55)
+	m_list.SetBkColor(0x0037322d);
 	m_list.InsertColumn(COL_NAME, _T("Name"), LVCFMT_LEFT, 380);
 
 	CDC* pDC = m_list.GetDC();
@@ -988,7 +988,7 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 	if (nIDCtl != IDC_PLAYLIST) {
 		return;
 	}
-	AppSettings& s = AfxGetAppSettings();//ins:2452 bobdynlan://
+	AppSettings& s = AfxGetAppSettings();
 
 	int nItem = lpDrawItemStruct->itemID;
 	CRect rcItem = lpDrawItemStruct->rcItem;
@@ -999,19 +999,19 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 	CDC* pDC = CDC::FromHandle(lpDrawItemStruct->hDC);
 
 	if (!!m_list.GetItemState(nItem, LVIS_SELECTED)) {
-		//rem:2280 bobdynlan://FillRect(pDC->m_hDC, rcItem, CBrush(0xf1dacc));
-		//rem:2280 bobdynlan://FrameRect(pDC->m_hDC, rcItem, CBrush(0xc56a31));
-		FillRect(pDC->m_hDC, rcItem, CBrush(s.fDisableXPToolbars ? 0x00a08264 : 0x00f1dacc));//ins:2452 bobdynlan://clr_pbSelBack = RGB( 100, 130, 160)
-		FrameRect(pDC->m_hDC, rcItem, CBrush(s.fDisableXPToolbars ?  s.clrOutlineABGR : 0xc56a31));//ins:2452 bobdynlan://
+		//FillRect(pDC->m_hDC, rcItem, CBrush(0xf1dacc));
+		//FrameRect(pDC->m_hDC, rcItem, CBrush(0xc56a31));
+		FillRect(pDC->m_hDC, rcItem, CBrush(s.fDisableXPToolbars ? 0x00a08264 : 0x00f1dacc));
+		FrameRect(pDC->m_hDC, rcItem, CBrush(s.fDisableXPToolbars ?  s.clrOutlineABGR : 0xc56a31));
 
 	} else {
-		//rem:2280 bobdynlan://FillRect(pDC->m_hDC, rcItem, CBrush(GetSysColor(COLOR_WINDOW)));
-		FillRect(pDC->m_hDC, rcItem, CBrush(s.fDisableXPToolbars ? 0x0037322d : GetSysColor(COLOR_WINDOW)));//ins:2452 bobdynlan://clr_csShadow = RGB( 45, 50, 55)
+		//FillRect(pDC->m_hDC, rcItem, CBrush(GetSysColor(COLOR_WINDOW)));
+		FillRect(pDC->m_hDC, rcItem, CBrush(s.fDisableXPToolbars ? 0x0037322d : GetSysColor(COLOR_WINDOW)));
 
 	}
 
 	COLORREF textcolor = fSelected?0xff:0;
-	if (s.fDisableXPToolbars) textcolor = 0x00ffffff;//ins:2452 bobdynlan:s.clrFaceABGR//clr_resLight = RGB(255,255,255)
+	if (s.fDisableXPToolbars) textcolor = 0x00ffffff;
 	if (pli.m_fInvalid) {
 		textcolor |= 0xA0A0A0;
 	}

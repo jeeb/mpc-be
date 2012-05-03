@@ -394,6 +394,11 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 	NMTBCUSTOMDRAW* pTBCD = reinterpret_cast<NMTBCUSTOMDRAW*>( pNMHDR );
 	LRESULT lr = CDRF_DODEFAULT;
 	AppSettings& s = AfxGetAppSettings();
+
+	GRADIENT_RECT gr[1] = {{0, 1}};
+
+	int sep[4] = {2, 7, 9, 10};
+
 	if (s.fDisableXPToolbars) {
 		iThemeBrightness = AfxGetAppSettings().nThemeBrightness;
 		iThemeRed = AfxGetAppSettings().nThemeRed;
@@ -420,7 +425,6 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			dc.Attach(pTBCD->nmcd.hdc);
 			CRect r;
 
-			GRADIENT_RECT gr[1] = {{0, 1}};
 			GetClientRect(&r);
 
 			if (NULL != fp) {
@@ -509,9 +513,6 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 				dc.RoundRect(r.left +1,r.top +1,r.right -2,r.bottom -1, 6, 4);
 			}
 			
-			GRADIENT_RECT gr[1] = {{0, 1}};
-
-			int sep[4] = {2, 7, 9, 10};
 			for (int j = 0; j < 4; j++) {
 				GetItemRect(sep[j], &r);
 
@@ -531,6 +532,32 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			dc.Detach();
 			DeleteObject(memdc.SelectObject(bmOld));
 			memdc.DeleteDC();
+			lr |= CDRF_SKIPDEFAULT;
+			break;
+		}
+	} else {
+		switch(pTBCD->nmcd.dwDrawStage)
+		{
+		case CDDS_ITEMPOSTPAINT:
+			lr = CDRF_DODEFAULT;
+			CDC dc;
+			dc.Attach(pTBCD->nmcd.hdc);
+			CRect r;
+
+			int pa = 255 * 256;
+			unsigned p1 = GetSysColor(COLOR_WINDOW);
+
+			for (int j = 0; j < 4; j++) {
+				GetItemRect(sep[j], &r);
+
+				TRIVERTEX tv[2] = {
+					{r.left, r.top, p1 * 256, (p1 >> 8) * 256, (p1 >> 16) * 256, pa},
+					{r.right, r.bottom, p1 * 256, (p1 >> 8) * 256, (p1 >> 16) * 256, pa},
+				};
+				dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+			}
+
+			dc.Detach();
 			lr |= CDRF_SKIPDEFAULT;
 			break;
 		}
