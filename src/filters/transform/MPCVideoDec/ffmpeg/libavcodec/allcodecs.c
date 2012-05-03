@@ -63,7 +63,6 @@ void avcodec_register_all(void)
     REGISTER_DECODER (MSMPEG4V1, msmpeg4v1);
     REGISTER_DECODER (MSMPEG4V2, msmpeg4v2);
     REGISTER_DECODER (MSMPEG4V3, msmpeg4v3);
-    REGISTER_DECODER (QDM2, qdm2);
     REGISTER_DECODER (QTRLE, qtrle);
     REGISTER_DECODER (RV10, rv10);
     REGISTER_DECODER (RV20, rv20);
@@ -83,6 +82,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (WMV1, wmv1);
     REGISTER_DECODER (WMV2, wmv2);
     REGISTER_DECODER (WMV3, wmv3);
+    REGISTER_DECODER (UTVIDEO, utvideo);
 
     /* audio codecs */
     REGISTER_DECODER (AAC, aac);
@@ -105,6 +105,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (VORBIS, vorbis);
     REGISTER_DECODER (AMRNB, amrnb);
     REGISTER_DECODER (AMRWB, amrwb);
+    REGISTER_DECODER (QDM2, qdm2);    
 
     /* ADPCM codecs */
     REGISTER_DECODER (ADPCM_4XM, adpcm_4xm);

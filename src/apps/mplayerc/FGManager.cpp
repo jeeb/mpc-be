@@ -1787,15 +1787,24 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 	// High merit MPC Video Decoder
 	pFGF = DNew CFGFilterInternal<CMPCVideoDecFilter>(MPCVideoDecName, MERIT64_ABOVE_DSHOW);
 
+	// CSCD
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_CSCD);
+	// TSCC
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_TSCC);
+	// QTRle
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_QTRle);
+	// DV-family.
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvsl);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvsd);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvhd);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dv25);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dv50);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvh1);
+	// UtVideo.
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_UTVD_ULRG);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_UTVD_ULRA);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_UTVD_ULY0);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_UTVD_ULY2);
 
 	if (ffmpeg_filters[FFM_FLV4]) {
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_FLV1);

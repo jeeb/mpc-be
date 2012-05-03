@@ -222,8 +222,14 @@ FFMPEG_CODECS		ffCodecs[] = {
 	// TSCC
 	{ &MEDIASUBTYPE_TSCC,   CODEC_ID_TSCC, NULL },
 
-	//QTRLE
+	// QTRLE
 	{ &MEDIASUBTYPE_QTRle,  CODEC_ID_QTRLE, NULL },
+
+	// UtVideo
+	{ &MEDIASUBTYPE_UTVD_ULRG,   CODEC_ID_UTVIDEO, NULL },
+	{ &MEDIASUBTYPE_UTVD_ULRA,   CODEC_ID_UTVIDEO, NULL },
+	{ &MEDIASUBTYPE_UTVD_ULY0,   CODEC_ID_UTVIDEO, NULL },
+	{ &MEDIASUBTYPE_UTVD_ULY2,   CODEC_ID_UTVIDEO, NULL },
 
 	// Indeo 3/4/5
 	{ &MEDIASUBTYPE_IV31,   CODEC_ID_INDEO3, NULL },
@@ -426,6 +432,12 @@ const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesIn[] = {
 
 	// QTRLE
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_QTRle   },
+
+	// UtVideo
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_UTVD_ULRG   },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_UTVD_ULRA   },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_UTVD_ULY0   },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_UTVD_ULY2   },
 
 	// Indeo 3/4/5
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_IV31   },
@@ -935,6 +947,7 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn)
 				case CODEC_ID_CSCD     :
 				case CODEC_ID_DVVIDEO  :
 				case CODEC_ID_QTRLE    :
+				case CODEC_ID_UTVIDEO  :
 				case CODEC_ID_TSCC     :
 					bCodecActivated = 1;
 					break;
