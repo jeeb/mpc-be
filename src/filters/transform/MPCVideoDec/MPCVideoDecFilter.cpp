@@ -208,6 +208,14 @@ FFMPEG_CODECS		ffCodecs[] = {
 	{ &MEDIASUBTYPE_QTJpeg, CODEC_ID_MJPEG,  NULL },
 	{ &MEDIASUBTYPE_MJPA,   CODEC_ID_MJPEG,  NULL },
 	{ &MEDIASUBTYPE_MJPB,   CODEC_ID_MJPEGB, NULL },
+	
+	// DV VIDEO
+	{ &MEDIASUBTYPE_dvsl,   CODEC_ID_DVVIDEO,  NULL },
+	{ &MEDIASUBTYPE_dvsd,   CODEC_ID_DVVIDEO,  NULL },
+	{ &MEDIASUBTYPE_dvhd,   CODEC_ID_DVVIDEO,  NULL },
+	{ &MEDIASUBTYPE_dv25,   CODEC_ID_DVVIDEO,  NULL },
+	{ &MEDIASUBTYPE_dv50,   CODEC_ID_DVVIDEO,  NULL },
+	{ &MEDIASUBTYPE_dvh1,   CODEC_ID_DVVIDEO,  NULL },
 
 	// CSCD
 	{ &MEDIASUBTYPE_CSCD,   CODEC_ID_CSCD, NULL },
@@ -408,6 +416,14 @@ const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_QTJpeg },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_MJPA   },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_MJPB   },
+
+	// DV VIDEO
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_dvsl   },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_dvsd   },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_dvhd   },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_dv25   },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_dv50   },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_dvh1   },
 
 	// CSCD
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_CSCD   },
@@ -962,9 +978,10 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn)
 				case CODEC_ID_INDEO5 :
 					bCodecActivated = (m_nActiveCodecs & MPCVD_INDEO) != 0;
 					break;
-				case CODEC_ID_CSCD  :
-				case CODEC_ID_QTRLE :
-				case CODEC_ID_TSCC  :
+				case CODEC_ID_CSCD     :
+				case CODEC_ID_DVVIDEO  :
+				case CODEC_ID_QTRLE    :
+				case CODEC_ID_TSCC     :
 					bCodecActivated = 1;
 					break;
 				case CODEC_ID_RV10 :

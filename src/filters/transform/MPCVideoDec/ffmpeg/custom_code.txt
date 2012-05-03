@@ -8,6 +8,7 @@ The following files have MPC-BE specific custom code (compared to ffmpeg):
 * libavcodec/aacsbr.c
 * libavcodec/allcodecs.c
 * libavcodec/avcodec.h
+* libavcodec/dv_tablegen.c
 * libavcodec/h264.c
 * libavcodec/h264.h
 * libavcodec/mpeg12.c

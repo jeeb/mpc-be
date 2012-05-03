@@ -111,6 +111,10 @@ SRCS_C=\
     libavcodec/dct32.c \
     libavcodec/dct32_float.c \
     libavcodec/dsputil.c \
+    libavcodec/dv.c \
+    libavcodec/dv_tablegen.c \
+    libavcodec/dvdata.c \
+    libavcodec/dvdec.c \
     libavcodec/eac3_data.c \
     libavcodec/eac3dec.c \
     libavcodec/error_resilience.c \
