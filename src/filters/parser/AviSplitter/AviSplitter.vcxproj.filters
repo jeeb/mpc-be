@@ -18,9 +18,6 @@
     <ClCompile Include="AviFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AviReportWnd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AviSplitter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -44,9 +41,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AviFile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AviReportWnd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AviSplitter.h">
