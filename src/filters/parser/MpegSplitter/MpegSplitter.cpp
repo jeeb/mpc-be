@@ -32,6 +32,8 @@
 
 #include "../../../apps/mplayerc/SettingsDefines.h"
 
+#define MAXPACKETS_MPEG	MAXPACKETS*5
+
 TCHAR* MPEG2_Profile[]=
 {
 	L"0",
@@ -961,7 +963,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			}
 
-			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CMpegSplitterOutputPin(mts, str, this, this, &hr, m_pFile->m_type));
+			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CMpegSplitterOutputPin(mts, str, this, this, &hr, m_pFile->m_type, (i != CMpegSplitterFile::video) ? MAXPACKETS_MPEG : MAXPACKETS));
 			if (i == CMpegSplitterFile::subpic) {
 				(static_cast<CMpegSplitterOutputPin*>(pPinOut.m_p))->SetMaxShift (_I64_MAX);
 			}
@@ -1585,8 +1587,8 @@ CMpegSourceFilter::CMpegSourceFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLSID& 
 // CMpegSplitterOutputPin
 //
 
-CMpegSplitterOutputPin::CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int type)
-	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr)
+CMpegSplitterOutputPin::CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int type, int QueueMaxPackets)
+	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr, 0, QueueMaxPackets)
 	, m_fHasAccessUnitDelimiters(false)
 	, m_rtMaxShift(50000000)
 	, m_bFilterDTSMA(false)

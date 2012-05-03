@@ -115,7 +115,7 @@ CAviSplitterApp theApp;
 //
 
 CAviSplitterFilter::CAviSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
-	: CBaseSplitterFilter(NAME("CAviSplitterFilter"), pUnk, phr, __uuidof(this), MAXPACKETS_AVI)
+	: CBaseSplitterFilter(NAME("CAviSplitterFilter"), pUnk, phr, __uuidof(this))
 	, m_timeformat(TIME_FORMAT_MEDIA_TIME)
 	, m_maxTimeStamp(Packet::INVALID_TIME)
 {

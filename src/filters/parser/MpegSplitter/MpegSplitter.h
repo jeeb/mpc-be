@@ -166,7 +166,7 @@ protected:
 	HRESULT DeliverEndFlush();
 
 public:
-	CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int type);
+	CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int type, int QueueMaxPackets);
 	virtual ~CMpegSplitterOutputPin();
 	STDMETHODIMP	Connect(IPin* pReceivePin, const AM_MEDIA_TYPE* pmt);
 	void			SetMaxShift(REFERENCE_TIME rtMaxShift) {
