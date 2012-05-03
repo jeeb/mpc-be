@@ -51,6 +51,13 @@ bool CVolumeCtrl::Create(CWnd* pParentWnd)
 	SetPageSize(5);
 	SetLineSize(0);
 
+	AppSettings& s = AfxGetAppSettings();
+
+	iThemeBrightness = s.nThemeBrightness;
+	iThemeRed = s.nThemeRed;
+	iThemeGreen = s.nThemeGreen;
+	iThemeBlue = s.nThemeBlue;
+
 	return true;
 }
 
@@ -97,7 +104,11 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 	if (m_fSelfDrawn) {
 		switch (pNMCD->dwDrawStage) {
 			case CDDS_PREPAINT:
-				if (s.fDisableXPToolbars && (m_bmUnderCtrl.GetSafeHandle() == NULL || GetSafeHwnd())) {
+				if (s.fDisableXPToolbars && (m_bmUnderCtrl.GetSafeHandle() == NULL
+								|| iThemeBrightness != s.nThemeBrightness
+								|| iThemeRed != s.nThemeRed
+								|| iThemeGreen != s.nThemeGreen
+								|| iThemeBlue != s.nThemeBlue)) {
 					CDC *dc = GetParent()->GetDC();
 					CDC memdc;
 					memdc.CreateCompatibleDC(dc);
@@ -131,10 +142,10 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 					CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
 
-					iThemeBrightness = AfxGetAppSettings().nThemeBrightness;
-					iThemeRed = AfxGetAppSettings().nThemeRed;
-					iThemeGreen = AfxGetAppSettings().nThemeGreen;
-					iThemeBlue = AfxGetAppSettings().nThemeBlue;
+					iThemeBrightness = s.nThemeBrightness;
+					iThemeRed = s.nThemeRed;
+					iThemeGreen = s.nThemeGreen;
+					iThemeBlue = s.nThemeBlue;
 
 					GRADIENT_RECT gr[1] = {{0, 1}};
 					int pa = 255 * 256;
