@@ -209,11 +209,14 @@ FFMPEG_CODECS		ffCodecs[] = {
 	{ &MEDIASUBTYPE_MJPA,   CODEC_ID_MJPEG,  NULL },
 	{ &MEDIASUBTYPE_MJPB,   CODEC_ID_MJPEGB, NULL },
 
+	// CSCD
+	{ &MEDIASUBTYPE_CSCD,   CODEC_ID_CSCD, NULL },
+
 	// TSCC
 	{ &MEDIASUBTYPE_TSCC,   CODEC_ID_TSCC, NULL },
 
-	// CSCD
-	{ &MEDIASUBTYPE_CSCD,   CODEC_ID_CSCD, NULL },
+	//QTRLE
+	{ &MEDIASUBTYPE_QTRle,  CODEC_ID_QTRLE, NULL },
 
 	// Indeo 3/4/5
 	{ &MEDIASUBTYPE_IV31,   CODEC_ID_INDEO3, NULL },
@@ -406,11 +409,14 @@ const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_MJPA   },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_MJPB   },
 
+	// CSCD
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_CSCD   },
+
 	// TSCC
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_TSCC   },
 
-	// CSCD
-	{ &MEDIATYPE_Video, &MEDIASUBTYPE_CSCD   },
+	// QTRLE
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_QTRle   },
 
 	// Indeo 3/4/5
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_IV31   },
@@ -956,8 +962,9 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn)
 				case CODEC_ID_INDEO5 :
 					bCodecActivated = (m_nActiveCodecs & MPCVD_INDEO) != 0;
 					break;
-				case CODEC_ID_CSCD :
-				case CODEC_ID_TSCC :
+				case CODEC_ID_CSCD  :
+				case CODEC_ID_QTRLE :
+				case CODEC_ID_TSCC  :
 					bCodecActivated = 1;
 					break;
 				case CODEC_ID_RV10 :

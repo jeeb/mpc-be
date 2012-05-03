@@ -186,6 +186,7 @@ SRCS_C=\
     libavcodec/options.c \
     libavcodec/parser.c \
     libavcodec/pthread.c \
+    libavcodec/qtrle.c \
     libavcodec/ra144.c \
     libavcodec/ra144dec.c \
     libavcodec/ra288.c \

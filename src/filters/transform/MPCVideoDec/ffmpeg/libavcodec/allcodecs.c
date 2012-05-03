@@ -62,6 +62,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (MSMPEG4V1, msmpeg4v1);
     REGISTER_DECODER (MSMPEG4V2, msmpeg4v2);
     REGISTER_DECODER (MSMPEG4V3, msmpeg4v3);
+    REGISTER_DECODER (QTRLE, qtrle);
     REGISTER_DECODER (RV10, rv10);
     REGISTER_DECODER (RV20, rv20);
     REGISTER_DECODER (RV30, rv30);

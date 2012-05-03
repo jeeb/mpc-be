@@ -1878,6 +1878,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_CSCD);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_TSCC);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_QTRle);
 
 #if INTERNAL_DECODER_FLV
 	if (ffmpeg_filters[FFM_FLV4]) {
@@ -2090,6 +2091,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_CSCD);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_TSCC);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_QTRle);
 
 #if INTERNAL_DECODER_FLV
 	if (!(ffmpeg_filters[FFM_FLV4])) {
