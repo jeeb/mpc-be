@@ -191,7 +191,6 @@ SRCS_C=\
     libavcodec/parser.c \
     libavcodec/pthread.c \
     libavcodec/qdm2.c \
-    libavcodec/qdm2_tablegen.c \
     libavcodec/qtrle.c \
     libavcodec/ra144.c \
     libavcodec/ra144dec.c \
