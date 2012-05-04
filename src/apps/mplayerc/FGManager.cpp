@@ -1773,6 +1773,10 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 	pFGF = new CFGFilterInternal<CMpaDecFilter>(MPCAudioDecName, MERIT64_ABOVE_DSHOW);
 	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_QDM2);
 	m_transform.AddTail(pFGF);
+	
+	pFGF = new CFGFilterInternal<CMpaDecFilter>(MPCAudioDecName, MERIT64_ABOVE_DSHOW);
+	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_WAVPACK4);
+	m_transform.AddTail(pFGF);	
 
 	pFGF = DNew CFGFilterInternal<CNullTextRenderer>(L"NullTextRenderer", MERIT64_DO_USE);
 	pFGF->AddType(MEDIATYPE_Text, MEDIASUBTYPE_NULL);

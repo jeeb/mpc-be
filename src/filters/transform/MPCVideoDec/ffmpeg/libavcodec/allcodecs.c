@@ -106,6 +106,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (AMRNB, amrnb);
     REGISTER_DECODER (AMRWB, amrwb);
     REGISTER_DECODER (QDM2, qdm2);    
+    REGISTER_DECODER (WAVPACK, wavpack);
 
     /* ADPCM codecs */
     REGISTER_DECODER (ADPCM_4XM, adpcm_4xm);

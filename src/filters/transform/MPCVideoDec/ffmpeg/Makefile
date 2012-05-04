@@ -233,6 +233,7 @@ SRCS_C=\
     libavcodec/vp6dsp.c \
     libavcodec/vp8.c \
     libavcodec/vp8dsp.c \
+    libavcodec/wavpack.c \
     libavcodec/wmv2.c \
     libavcodec/wmv2dec.c \
     libavcodec/xiph.c \
