@@ -79,9 +79,7 @@ BOOL CAboutDlg::OnInitDialog()
 	m_MPCCompiler += _T(" Debug");
 #endif
 
-#if HAS_FFMPEG
 	m_FFmpegCompiler.Format(A2W(GetFFmpegCompiler()));
-#endif
 
 	// Build the path to Authors.txt
 	GetModuleFileName(AfxGetInstanceHandle(), m_AuthorsPath.GetBuffer(_MAX_PATH), _MAX_PATH);
