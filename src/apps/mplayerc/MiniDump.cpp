@@ -123,7 +123,7 @@ LONG WINAPI CMiniDump::UnhandledExceptionFilter( _EXCEPTION_POINTERS *lpTopLevel
 				}
 
 				strDumpPath.ReleaseBuffer();
-				strDumpPath.Append(_T("\\Media Player Classic\\"));
+				strDumpPath.Append(_T("\\MPC-BE\\"));
 				strDumpPath.Append(AfxGetApp()->m_pszExeName);
 				strDumpPath.Append(_T(".exe"));
 			} else {

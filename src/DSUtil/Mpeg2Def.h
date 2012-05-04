@@ -34,19 +34,19 @@ enum PES_STREAM_TYPE {
 	PES_07								= 0x07,	// ISO/IEC 13522 MHEG
 	PES_08								= 0x08,	// ITU-T Rec. H.222.0 | ISO/IEC 13818-1 Annex A DSM-CC
 	PES_09								= 0x09,	// ITU-T Rec. H.222.1
-	PES_0a								= 0x0a,	// ISO/IEC 13818-6 type A
-	PES_0b								= 0x0b,	// ISO/IEC 13818-6 type B
-	PES_0c								= 0x0c,	// ISO/IEC 13818-6 type C
-	PES_0d								= 0x0d,	// ISO/IEC 13818-6 type D
-	PES_0e								= 0x0e,	// ITU-T Rec. H.222.0 | ISO/IEC 13818-1 auxiliary
-	AUDIO_STREAM_AAC					= 0x0f,	// ISO/IEC 13818-7 Audio with ADTS transport syntax
+	PES_0a								= 0x0A,	// ISO/IEC 13818-6 type A
+	PES_0b								= 0x0B,	// ISO/IEC 13818-6 type B
+	PES_0c								= 0x0C,	// ISO/IEC 13818-6 type C
+	PES_0d								= 0x0D,	// ISO/IEC 13818-6 type D
+	PES_0e								= 0x0E,	// ITU-T Rec. H.222.0 | ISO/IEC 13818-1 auxiliary
+	AUDIO_STREAM_AAC					= 0x0F,	// ISO/IEC 13818-7 Audio with ADTS transport syntax
 	PES_10								= 0x10,	// ISO/IEC 14496-2 Visual
 	AUDIO_STREAM_AAC_LATM				= 0x11,	// ISO/IEC 14496-3 Audio with the LATM transport syntax as defined in ISO/IEC 14496-3 / AMD 1
 	PES_12								= 0x12,	// ISO/IEC 14496-1 SL-packetized stream or FlexMux stream carried in PES packets
 	PES_13								= 0x13,	// ISO/IEC 14496-1 SL-packetized stream or FlexMux stream carried in ISO/IEC14496_sections.
 	PES_14								= 0x14,	// ISO/IEC 13818-6 Synchronized Download Protocol
 	METADATA_PES_PACKETS				= 0x15,	// Metadata carried in PES packets
-	METADATA_SECTIONS					= 0X16,	// Metadata carried in metadata_sections
+	METADATA_SECTIONS					= 0x16,	// Metadata carried in metadata_sections
 	DATA_CAROUSEL						= 0x17,	// Metadata carried in ISO/IEC 13818-6 Data Carousel
 	OBJECT_CAROUSEL						= 0x18,	// Metadata carried in ISO/IEC 13818-6 Object Carousel
 	SYNCHRONIZED_DOWNLOAD				= 0x19,	// Metadata carried in ISO/IEC 13818-6 Synchronized Download Protocol
@@ -67,9 +67,10 @@ enum PES_STREAM_TYPE {
 	PRESENTATION_GRAPHICS_STREAM		= 0x90,
 	INTERACTIVE_GRAPHICS_STREAM			= 0x91,
 	SUBTITLE_STREAM						= 0x92,
-	SECONDARY_AUDIO_AC3_PLUS			= 0xa1,
-	SECONDARY_AUDIO_DTS_HD				= 0xa2,
-	VIDEO_STREAM_VC1					= 0xea
+	SECONDARY_AUDIO_AC3_PLUS			= 0xA1,
+	SECONDARY_AUDIO_DTS_HD				= 0xA2,
+	VIDEO_STREAM_DIRAC					= 0xD1,
+	VIDEO_STREAM_VC1					= 0xEA
 };
 
 enum MPEG2_PID {
