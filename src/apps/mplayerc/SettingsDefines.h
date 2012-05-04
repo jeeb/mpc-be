@@ -104,6 +104,7 @@
 #define IDS_RS_USEDEDYNAMIC					_T("UseDeDynamic")
 #define IDS_RS_DBLCLICKFULLSCREEN			_T("DblClickFullScreen")
 #define IDS_RS_EXITFULLSCREENATTHEEND		_T("ExitFullscreenAtTheEnd")
+#define IDS_RS_EXITFULLSCREENATFOCUSLOST	_T("ExitFullscreenAtFocusLost")
 #define IDS_RS_RESTORERESAFTEREXIT			_T("RestoreResAfterExit")
 #define IDS_RS_AUTOSPEAKERCONF				_T("AutoSpeakerConf")
 #define IDS_RS_CLOSEDCAPTIONS				_T("ClosedCaptions")

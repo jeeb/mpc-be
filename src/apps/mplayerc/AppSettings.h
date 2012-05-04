@@ -385,6 +385,7 @@ public:
 	int				nShowBarsWhenFullScreenTimeOut;
 	AChFR			AutoChangeFullscrRes;
 	bool			fExitFullScreenAtTheEnd;
+	bool			fExitFullScreenAtFocusLost;
 	bool			fRestoreResAfterExit;
 	bool			fRememberWindowPos;
 	bool			fRememberWindowSize;

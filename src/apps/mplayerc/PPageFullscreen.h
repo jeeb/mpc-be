@@ -55,7 +55,7 @@ public:
 
 	BOOL m_iShowBarsWhenFullScreen;
 	int m_nShowBarsWhenFullScreenTimeOut;
-	BOOL m_fExitFullScreenAtTheEnd;
+	BOOL m_fExitFullScreenAtTheEnd, m_fExitFullScreenAtFocusLost;
 	CSpinButtonCtrl m_nTimeOutCtrl;
 	BOOL m_fRestoreResAfterExit;
 

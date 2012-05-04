@@ -40,6 +40,7 @@ CPPageFullscreen::CPPageFullscreen()
 	, m_iShowBarsWhenFullScreen(FALSE)
 	, m_nShowBarsWhenFullScreenTimeOut(0)
 	, m_fExitFullScreenAtTheEnd(FALSE)
+	, m_fExitFullScreenAtFocusLost(FALSE)
 	, m_fRestoreResAfterExit(TRUE)
 	, m_list(0)
 	, m_iSel(-1)
@@ -63,6 +64,7 @@ void CPPageFullscreen::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK4, m_iShowBarsWhenFullScreen);
 	DDX_Text(pDX, IDC_EDIT1, m_nShowBarsWhenFullScreenTimeOut);
 	DDX_Check(pDX, IDC_CHECK5, m_fExitFullScreenAtTheEnd);
+	DDX_Check(pDX, IDC_CHECK6, m_fExitFullScreenAtFocusLost);
 	DDX_Control(pDX, IDC_SPIN1, m_nTimeOutCtrl);
 	DDX_Check(pDX, IDC_RESTORERESCHECK, m_fRestoreResAfterExit);
 }
@@ -101,15 +103,16 @@ BOOL CPPageFullscreen::OnInitDialog()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	m_launchfullscreen = s.fLaunchfullscreen;
-	m_AutoChangeFullscrRes = s.AutoChangeFullscrRes;
-	m_fSetDefault = s.AutoChangeFullscrRes.bApplyDefault;
-	m_f_hmonitor = s.strFullScreenMonitor;
-	m_iShowBarsWhenFullScreen = s.fShowBarsWhenFullScreen;
-	m_nShowBarsWhenFullScreenTimeOut = s.nShowBarsWhenFullScreenTimeOut;
+	m_launchfullscreen					= s.fLaunchfullscreen;
+	m_AutoChangeFullscrRes				= s.AutoChangeFullscrRes;
+	m_fSetDefault						= s.AutoChangeFullscrRes.bApplyDefault;
+	m_f_hmonitor						= s.strFullScreenMonitor;
+	m_iShowBarsWhenFullScreen			= s.fShowBarsWhenFullScreen;
+	m_nShowBarsWhenFullScreenTimeOut	= s.nShowBarsWhenFullScreenTimeOut;
 	m_nTimeOutCtrl.SetRange(-1, 10);
-	m_fExitFullScreenAtTheEnd = s.fExitFullScreenAtTheEnd;
-	m_fRestoreResAfterExit = s.fRestoreResAfterExit;
+	m_fExitFullScreenAtTheEnd			= s.fExitFullScreenAtTheEnd;
+	m_fExitFullScreenAtFocusLost		= s.fExitFullScreenAtFocusLost;
+	m_fRestoreResAfterExit				= s.fRestoreResAfterExit;
 
 	CString str;
 	m_iMonitorType = 0;
@@ -225,14 +228,15 @@ BOOL CPPageFullscreen::OnApply()
 		}
 	}
 
-	m_AutoChangeFullscrRes.bApplyDefault = !!m_fSetDefault;
-	s.AutoChangeFullscrRes = m_AutoChangeFullscrRes;
-	s.fLaunchfullscreen = !!m_launchfullscreen;
-	s.strFullScreenMonitor =  m_f_hmonitor;
-	s.fShowBarsWhenFullScreen = !!m_iShowBarsWhenFullScreen;
-	s.nShowBarsWhenFullScreenTimeOut = m_nShowBarsWhenFullScreenTimeOut;
-	s.fExitFullScreenAtTheEnd = !!m_fExitFullScreenAtTheEnd;
-	s.fRestoreResAfterExit = !!m_fRestoreResAfterExit;
+	m_AutoChangeFullscrRes.bApplyDefault	= !!m_fSetDefault;
+	s.AutoChangeFullscrRes					= m_AutoChangeFullscrRes;
+	s.fLaunchfullscreen						= !!m_launchfullscreen;
+	s.strFullScreenMonitor					= m_f_hmonitor;
+	s.fShowBarsWhenFullScreen				= !!m_iShowBarsWhenFullScreen;
+	s.nShowBarsWhenFullScreenTimeOut		= m_nShowBarsWhenFullScreenTimeOut;
+	s.fExitFullScreenAtTheEnd				= !!m_fExitFullScreenAtTheEnd;
+	s.fExitFullScreenAtFocusLost			= !!m_fExitFullScreenAtFocusLost;
+	s.fRestoreResAfterExit					= !!m_fRestoreResAfterExit;
 
 	return __super::OnApply();
 }

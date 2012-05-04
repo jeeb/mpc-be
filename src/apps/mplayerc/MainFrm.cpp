@@ -1534,7 +1534,7 @@ void CMainFrame::OnActivateApp(BOOL bActive, DWORD dwThreadID)
 {
 	__super::OnActivateApp(bActive, dwThreadID);
 
-	if (AfxGetAppSettings().iOnTop) {
+	if (AfxGetAppSettings().iOnTop || !AfxGetAppSettings().fExitFullScreenAtFocusLost) {
 		return;
 	}
 
