@@ -522,6 +522,7 @@ HRESULT CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, IAsyncRead
 #define IsMPEG2Video(stream_type)	(stream_type == VIDEO_STREAM_MPEG2)
 #define IsH264Video(stream_type)	(stream_type == VIDEO_STREAM_H264)
 #define IsVC1Video(stream_type)		(stream_type == VIDEO_STREAM_VC1)
+#define IsDiracVideo(stream_type)	(stream_type == VIDEO_STREAM_DIRAC)
 
 DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 {
@@ -656,6 +657,22 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 						PES_STREAM_TYPE stream_type = INVALID;
 						if (GetStreamType(s.pid, stream_type)) {
 							if (IsVC1Video(stream_type)) {
+								type = video;
+							}
+						} else {
+							type = video;
+						}
+					}
+				}
+
+				// DIRAC
+				if (type == unknown) {
+					Seek(pos);
+					CMpegSplitterFile::dirachdr h;
+					if (!m_streams[video].Find(s) && Read(h, len, &s.mt)) {
+						PES_STREAM_TYPE stream_type = INVALID;
+						if (GetStreamType(s.pid, stream_type)) {
+							if (IsDiracVideo(stream_type)) {
 								type = video;
 							}
 						} else {

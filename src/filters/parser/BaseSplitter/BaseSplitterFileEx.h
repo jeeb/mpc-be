@@ -409,6 +409,9 @@ public:
 		} sar;
 	};
 
+	struct dirachdr {
+	};
+
 	struct dvbsub {
 	};
 
@@ -436,6 +439,7 @@ public:
 	bool Read(pvahdr& h, bool fSync = true);
 	bool Read(avchdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(vc1hdr& h, int len, CMediaType* pmt = NULL, int guid_flag = 1);
+	bool Read(dirachdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(dvbsub& h, int len, CMediaType* pmt = NULL);
 	bool Read(avchdr& h, spsppsindex index);
 

@@ -2021,6 +2021,35 @@ bool CBaseSplitterFileEx::Read(vc1hdr& h, int len, CMediaType* pmt, int guid_fla
 	return true;
 }
 
+bool CBaseSplitterFileEx::Read(dirachdr& h, int len, CMediaType* pmt)
+{
+	memset(&h, 0, sizeof(h));
+
+/*
+	if (BitRead(32, true) == 'BBCD') {
+		pmt->majortype = MEDIATYPE_Video;
+		pmt->formattype = FORMAT_VideoInfo;
+
+		VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)pmt->AllocFormatBuffer(sizeof(VIDEOINFOHEADER));
+		memset(pmt->Format(), 0, pmt->FormatLength());
+
+		pmt->subtype = FOURCCMap('card');
+		pvih->AvgTimePerFrame = 400000;
+		pvih->bmiHeader.biSize = sizeof(pvih->bmiHeader);
+		pvih->bmiHeader.biWidth = 640;
+		pvih->bmiHeader.biHeight = 360;
+		pvih->bmiHeader.biPlanes = 1;
+		pvih->bmiHeader.biBitCount = 12;
+		pvih->bmiHeader.biCompression = 'card';
+		pvih->bmiHeader.biSizeImage = DIBSIZE(pvih->bmiHeader);
+	
+		return true;
+	}
+*/
+
+	return false;
+}
+
 bool CBaseSplitterFileEx::Read(dvbsub& h, int len, CMediaType* pmt)
 {
 	memset(&h, 0, sizeof(h));
