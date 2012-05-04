@@ -6,7 +6,7 @@
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng 1.5.10 [March 29, 2012]
+ * Last changed in libpng 1.5.10 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -1259,10 +1259,8 @@ PNG_EXTERN void png_handle_zTXt PNGARG((png_structp png_ptr, png_infop info_ptr,
     png_uint_32 length));
 #endif
 
-#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
 PNG_EXTERN void png_handle_unknown PNGARG((png_structp png_ptr,
     png_infop info_ptr, png_uint_32 length));
-#endif
 
 PNG_EXTERN void png_check_chunk_name PNGARG((png_structp png_ptr,
     png_uint_32 chunk_name));

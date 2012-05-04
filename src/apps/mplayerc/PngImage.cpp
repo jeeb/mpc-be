@@ -188,7 +188,6 @@ HBITMAP CPngImage::TypeLoadImage(BYTE** pData, int* width, int* height, int* bpp
 	}
 
 	png_infop info_ptr = png_create_info_struct(png_ptr);
-	png_infop end_info = png_create_info_struct(png_ptr);
 
 	png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_EXPAND | PNG_TRANSFORM_BGR | PNG_TRANSFORM_PACKING, 0);
 
@@ -205,7 +204,7 @@ HBITMAP CPngImage::TypeLoadImage(BYTE** pData, int* width, int* height, int* bpp
 		memcpy((*pData) + memWidth * i, row_pointers[i], memWidth);
 	}
 
-	png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+	png_destroy_read_struct(&png_ptr, &info_ptr, 0);
 
 	if (fp) {
 		fclose(fp);
