@@ -31,6 +31,7 @@ class CAboutDlg : public CDialog
 	CString m_strBuildNumber;
 	CString m_MPCCompiler;
 	CString m_FFmpegCompiler;
+	CString m_libavcodecVersion;
 	CString m_Credits;
 	CString m_AuthorsPath;
 

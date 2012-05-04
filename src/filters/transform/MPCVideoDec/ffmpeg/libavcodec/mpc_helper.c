@@ -104,9 +104,16 @@ int FFGetChannelMap(struct AVCodecContext *avctx)
 }
 
 static char g_Gcc_Compiler[31];
+static char g_libavcodec_Version[11];
 
 char* GetFFmpegCompiler()
 {
 	snprintf(g_Gcc_Compiler, sizeof(g_Gcc_Compiler), "MinGW-w64 GCC %d.%d.%d%s%s", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__, COMPILER, COMPILER_SSE);
 	return g_Gcc_Compiler;
+}
+
+char* GetlibavcodecVersion()
+{
+	snprintf(g_libavcodec_Version, sizeof(g_libavcodec_Version), "%d.%d.%d", LIBAVCODEC_VERSION_MAJOR, LIBAVCODEC_VERSION_MINOR, LIBAVCODEC_VERSION_MICRO);
+	return g_libavcodec_Version;
 }

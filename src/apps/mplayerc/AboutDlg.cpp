@@ -27,6 +27,7 @@
 // CAboutDlg dialog used for App About
 
 extern "C" char *GetFFmpegCompiler();
+extern "C" char *GetlibavcodecVersion();
 
 CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD), m_appname(_T(""))
 	, m_strBuildNumber(_T(""))
@@ -80,6 +81,7 @@ BOOL CAboutDlg::OnInitDialog()
 #endif
 
 	m_FFmpegCompiler.Format(A2W(GetFFmpegCompiler()));
+	m_libavcodecVersion.Format(A2W(GetlibavcodecVersion()));
 
 	// Build the path to Authors.txt
 	GetModuleFileName(AfxGetInstanceHandle(), m_AuthorsPath.GetBuffer(_MAX_PATH), _MAX_PATH);
@@ -108,6 +110,7 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_BUILD_NUMBER, m_strBuildNumber);
 	DDX_Text(pDX, IDC_MPC_COMPILER, m_MPCCompiler);
 	DDX_Text(pDX, IDC_FFMPEG_COMPILER, m_FFmpegCompiler);
+	DDX_Text(pDX, IDC_LIBAVCODEC_VERSION, m_libavcodecVersion);
 	DDX_Text(pDX, IDC_AUTHORS_LINK, m_Credits);
 }
 
