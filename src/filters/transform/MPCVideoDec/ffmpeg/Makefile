@@ -169,6 +169,9 @@ SRCS_C=\
     libavcodec/mlpdec.c \
     libavcodec/mlpdsp.c \
     libavcodec/mpc_helper.c \
+    libavcodec/mpc.c \
+    libavcodec/mpc7.c \
+    libavcodec/mpc8.c \
     libavcodec/mpeg12.c \
     libavcodec/mpeg12data.c \
     libavcodec/mpeg4audio.c \

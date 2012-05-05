@@ -94,6 +94,8 @@ void avcodec_register_all(void)
     REGISTER_DECODER (ATRAC3, atrac3);
     REGISTER_DECODER (COOK, cook);
     REGISTER_DECODER (EAC3, eac3);
+    REGISTER_DECODER (MPC7, mpc7);
+    REGISTER_DECODER (MPC8, mpc8);    
     REGISTER_DECODER (MLP, mlp);
     REGISTER_DECODER (MP1FLOAT, mp1float);
     REGISTER_DECODER (MP2FLOAT, mp2float);
