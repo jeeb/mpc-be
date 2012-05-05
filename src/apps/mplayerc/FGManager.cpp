@@ -41,7 +41,6 @@
 #include <evr9.h>
 #include <ksproxy.h>
 #include <moreuuids.h>
-#include "../filters/source/WavPackSource/WVSource.h"
 
 // {212690FB-83E5-4526-8FD7-74478B7939CD} from wmcodecdsp.h
 DEFINE_GUID      (CLSID_CMPEG2VidDecoderDS, 0x212690FB, 0x83E5, 0x4526, 0x8F, 0xD7, 0x74, 0x47, 0x8B, 0x79, 0x39, 0xCD);
