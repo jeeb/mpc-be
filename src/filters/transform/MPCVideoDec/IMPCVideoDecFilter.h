@@ -48,6 +48,7 @@ typedef enum {
 	MPCVD_DIRAC      = 1 << 21,
 	MPCVD_DV         = 1 << 22,
 	MPCVD_UTVD       = 1 << 23,
+	MPCVD_SCREC      = 1 << 24,
 } MPC_VIDEO_CODEC;
 
 interface __declspec(uuid("CDC3B5B3-A8B0-4c70-A805-9FC80CDEF262"))

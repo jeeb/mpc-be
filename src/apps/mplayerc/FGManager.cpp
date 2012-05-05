@@ -1791,13 +1791,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 	// High merit MPC Video Decoder
 	pFGF = DNew CFGFilterInternal<CMPCVideoDecFilter>(MPCVideoDecName, MERIT64_ABOVE_DSHOW);
 
-	// CSCD
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_CSCD);
-	// TSCC
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_TSCC);
-	// QTRle
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_QTRle);
-
 	if (ffmpeg_filters[FFM_FLV4]) {
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_FLV1);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_flv1);
@@ -1997,6 +1990,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_IV50);
 	}
 
+	if (ffmpeg_filters[FFM_SCREC]) {
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_CSCD);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_TSCC);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_QTRle);
+	}
+
 	if (ffmpeg_filters[FFM_UTVD]) {
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_UTVD_ULRG);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_UTVD_ULRA);
@@ -2008,10 +2007,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 
 	// Low merit MPC Video Decoder
 	pFGF = DNew CFGFilterInternal<CMPCVideoDecFilter>(LowMerit(MPCVideoDecName), MERIT64_DO_USE);
-
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_CSCD);
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_TSCC);
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_QTRle);
 
 	if (!(ffmpeg_filters[FFM_FLV4])) {
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_FLV1);
@@ -2208,6 +2203,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_IV32);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_IV41);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_IV50);
+	}
+
+	if (ffmpeg_filters[FFM_SCREC]) {
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_CSCD);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_TSCC);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_QTRle);
 	}
 
 	if (ffmpeg_filters[FFM_UTVD]) {
