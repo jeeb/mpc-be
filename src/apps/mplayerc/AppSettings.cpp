@@ -99,6 +99,7 @@ CAppSettings::CAppSettings()
 	FFMFiltersKeys[FFM_AMVV] = _T("FFM_AMVV");
 	FFMFiltersKeys[FFM_MJPEG] = _T("FFM_MJPEG");
 	FFMFiltersKeys[FFM_INDEO] = _T("FFM_INDEO");
+	FFMFiltersKeys[FFM_UTVD] = _T("FFM_UTVD");
 
 }
 
