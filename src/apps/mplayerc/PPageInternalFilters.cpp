@@ -89,6 +89,7 @@ static filter_t s_filters[] = {
 	{_T("H263"), FFMPEG_DECODER, VIDEO, FFM_H263, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
 	{_T("AMV video"), FFMPEG_DECODER, VIDEO, FFM_AMVV, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
 	{_T("Dirac"), FFMPEG_DECODER, VIDEO, FFM_DIRAC, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
+	{_T("DV video"), FFMPEG_DECODER, VIDEO, FFM_DV, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
 	{_T("Theora"), FFMPEG_DECODER, VIDEO, FFM_THEORA, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
 	{_T("MJPEG"), FFMPEG_DECODER, VIDEO, FFM_MJPEG, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
 	{_T("Indeo 3/4/5"), FFMPEG_DECODER, VIDEO, FFM_INDEO, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},

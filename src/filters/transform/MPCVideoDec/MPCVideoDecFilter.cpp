@@ -597,7 +597,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_nCodecId				= CODEC_ID_NONE;
 	m_bReorderBFrame		= true;
 	m_DXVADecoderGUID		= GUID_NULL;
-	m_nActiveCodecs			= MPCVD_H264|MPCVD_VC1|MPCVD_XVID|MPCVD_DIVX|MPCVD_MSMPEG4|MPCVD_FLASH|MPCVD_WMV|MPCVD_H263|MPCVD_SVQ3|MPCVD_AMVV|MPCVD_THEORA|MPCVD_H264_DXVA|MPCVD_VC1_DXVA|MPCVD_VP356|MPCVD_VP8|MPCVD_MJPEG|MPCVD_INDEO|MPCVD_RV|MPCVD_WMV3_DXVA|MPCVD_MPEG2_DXVA|MPCVD_DIRAC;
+	m_nActiveCodecs			= MPCVD_H264|MPCVD_VC1|MPCVD_XVID|MPCVD_DIVX|MPCVD_MSMPEG4|MPCVD_FLASH|MPCVD_WMV|MPCVD_H263|MPCVD_SVQ3|MPCVD_AMVV|MPCVD_THEORA|MPCVD_H264_DXVA|MPCVD_VC1_DXVA|MPCVD_VP356|MPCVD_VP8|MPCVD_MJPEG|MPCVD_INDEO|MPCVD_RV|MPCVD_WMV3_DXVA|MPCVD_MPEG2_DXVA|MPCVD_DIRAC|MPCVD_DV;
 
 	m_rtAvrTimePerFrame		= 0;
 	m_rtLastStart			= 0;
@@ -924,6 +924,9 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn)
 				case CODEC_ID_DIRAC  :
 					bCodecActivated = (m_nActiveCodecs & MPCVD_DIRAC) != 0;
 					break;
+				case CODEC_ID_DVVIDEO  :
+					bCodecActivated = (m_nActiveCodecs & MPCVD_DV) != 0;
+					break;
 				case CODEC_ID_THEORA :
 					bCodecActivated = (m_nActiveCodecs & MPCVD_THEORA) != 0;
 					break;
@@ -954,7 +957,6 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn)
 					bCodecActivated = (m_nActiveCodecs & MPCVD_INDEO) != 0;
 					break;
 				case CODEC_ID_CSCD     :
-				case CODEC_ID_DVVIDEO  :
 				case CODEC_ID_QTRLE    :
 				case CODEC_ID_UTVIDEO  :
 				case CODEC_ID_TSCC     :

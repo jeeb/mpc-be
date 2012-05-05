@@ -1797,13 +1797,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_TSCC);
 	// QTRle
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_QTRle);
-	// DV-family.
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvsl);
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvsd);
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvhd);
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dv25);
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dv50);
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvh1);
+
 	// UtVideo.
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_UTVD_ULRG);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_UTVD_ULRA);
@@ -1973,6 +1967,15 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DRAC);
 	}
 
+	if (ffmpeg_filters[FFM_DV]) {
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvsl);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvsd);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvhd);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dv25);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dv50);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvh1);
+	}
+
 	if (ffmpeg_filters[FFM_THEORA]) {
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_THEORA);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_theora);
@@ -2008,13 +2011,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_CSCD);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_TSCC);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_QTRle);
-
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvsl);
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvsd);
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvhd);
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dv25);
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dv50);
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvh1);
 
 	if (!(ffmpeg_filters[FFM_FLV4])) {
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_FLV1);
@@ -2175,6 +2171,15 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 
 	if (!(ffmpeg_filters[FFM_DIRAC])) {
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DRAC);
+	}
+
+	if (ffmpeg_filters[FFM_DV]) {
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvsl);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvsd);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvhd);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dv25);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dv50);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvh1);
 	}
 
 	if (!(ffmpeg_filters[FFM_THEORA])) {

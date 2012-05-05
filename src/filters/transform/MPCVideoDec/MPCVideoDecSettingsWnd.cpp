@@ -537,6 +537,8 @@ bool CMPCVideoDecCodecWnd::OnActivate()
 	m_lstCodecs.AddString (_T("AMV video"));
 	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_DIRAC) != 0);
 	m_lstCodecs.AddString (_T("Dirac"));
+	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_DV) != 0);
+	m_lstCodecs.AddString (_T("DV video"));
 	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_AMVV) != 0);
 	m_lstCodecs.AddString (_T("Theora"));
 	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_THEORA) != 0);
@@ -622,6 +624,9 @@ bool CMPCVideoDecCodecWnd::OnApply()
 		}
 		if (m_lstCodecs.GetCheck  (nPos++)) {
 			nActiveCodecs |= MPCVD_DIRAC;
+		}
+		if (m_lstCodecs.GetCheck  (nPos++)) {
+			nActiveCodecs |= MPCVD_DV;
 		}
 		if (m_lstCodecs.GetCheck  (nPos++)) {
 			nActiveCodecs |= MPCVD_THEORA;
