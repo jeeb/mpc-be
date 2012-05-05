@@ -36,8 +36,8 @@ typedef enum {
 	MPCVD_THEORA     = 1 <<  8,
 	MPCVD_AMVV       = 1 <<  9,
 	MPCVD_FLASH      = 1 << 10,
-	MPCVD_H264_DXVA	 = 1 << 11,
-	MPCVD_VC1_DXVA	 = 1 << 12,
+	MPCVD_H264_DXVA  = 1 << 11,
+	MPCVD_VC1_DXVA   = 1 << 12,
 	MPCVD_VP356      = 1 << 13,
 	MPCVD_VP8        = 1 << 14,
 	MPCVD_MJPEG      = 1 << 15,
@@ -45,6 +45,7 @@ typedef enum {
 	MPCVD_RV         = 1 << 17,
 	MPCVD_WMV3_DXVA  = 1 << 19,
 	MPCVD_MPEG2_DXVA = 1 << 20,
+	MPCVD_DIRAC      = 1 << 21,
 } MPC_VIDEO_CODEC;
 
 interface __declspec(uuid("CDC3B5B3-A8B0-4c70-A805-9FC80CDEF262"))

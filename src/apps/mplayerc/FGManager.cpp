@@ -1969,6 +1969,10 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_s263);
 	}
 
+	if (ffmpeg_filters[FFM_DIRAC]) {
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DRAC);
+	}
+
 	if (ffmpeg_filters[FFM_THEORA]) {
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_THEORA);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_theora);
@@ -2004,6 +2008,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_CSCD);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_TSCC);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_QTRle);
+
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvsl);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvsd);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvhd);
@@ -2166,6 +2171,10 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 	if (!(ffmpeg_filters[FFM_H263])) {
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_H263);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_h263);
+	}
+
+	if (!(ffmpeg_filters[FFM_DIRAC])) {
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DRAC);
 	}
 
 	if (!(ffmpeg_filters[FFM_THEORA])) {

@@ -93,6 +93,7 @@ CAppSettings::CAppSettings()
 	FFMFiltersKeys[FFM_WMV] = _T("FFM_WMV");
 	FFMFiltersKeys[FFM_SVQ3] = _T("FFM_SVQ3");
 	FFMFiltersKeys[FFM_H263] = _T("FFM_H263");
+	FFMFiltersKeys[FFM_DIRAC] = _T("FFM_DIRAC");
 	FFMFiltersKeys[FFM_THEORA] = _T("FFM_THEORA");
 	FFMFiltersKeys[FFM_AMVV] = _T("FFM_AMVV");
 	FFMFiltersKeys[FFM_MJPEG] = _T("FFM_MJPEG");

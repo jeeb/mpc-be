@@ -110,11 +110,16 @@ SRCS_C=\
     libavcodec/dct.c \
     libavcodec/dct32.c \
     libavcodec/dct32_float.c \
+    libavcodec/dirac.c \
+    libavcodec/dirac_arith.c \
+    libavcodec/diracdec.c \
+    libavcodec/diracdsp.c \
     libavcodec/dsputil.c \
     libavcodec/dv.c \
     libavcodec/dv_tablegen.c \
     libavcodec/dvdata.c \
     libavcodec/dvdec.c \
+    libavcodec/dwt.c \
     libavcodec/eac3_data.c \
     libavcodec/eac3dec.c \
     libavcodec/error_resilience.c \
@@ -195,6 +200,7 @@ SRCS_C=\
     libavcodec/ra144.c \
     libavcodec/ra144dec.c \
     libavcodec/ra288.c \
+    libavcodec/rangecoder.c \
     libavcodec/rdft.c \
     libavcodec/rv10.c \
     libavcodec/rv30.c \
@@ -208,6 +214,7 @@ SRCS_C=\
     libavcodec/sinewin.c \
     libavcodec/sipr.c \
     libavcodec/sipr16k.c \
+    libavcodec/snow.c \
     libavcodec/sp5xdec.c \
     libavcodec/svq1.c \
     libavcodec/svq1dec.c \
@@ -238,7 +245,9 @@ SRCS_C=\
     libavcodec/wmv2dec.c \
     libavcodec/xiph.c \
     libavcodec/x86/ac3dsp_mmx.c \
+    libavcodec/x86/diracdsp_mmx.c \
     libavcodec/x86/dsputil_mmx.c \
+    libavcodec/x86/dwt.c \
     libavcodec/x86/fdct_mmx.c \
     libavcodec/x86/fft.c \
     libavcodec/x86/fft_3dn.c \
@@ -258,6 +267,7 @@ SRCS_C=\
     libavcodec/x86/rv40dsp_init.c \
     libavcodec/x86/sbrdsp_init.c \
     libavcodec/x86/simple_idct_mmx.c \
+    libavcodec/x86/snowdsp_mmx.c \
     libavcodec/x86/vc1dsp_mmx.c \
     libavcodec/x86/vp56dsp_init.c \
     libavcodec/x86/vp8dsp-init.c \
@@ -305,7 +315,9 @@ SRCS_YASM=\
     libavcodec/x86/ac3dsp.asm \
     libavcodec/x86/dct32_sse.asm \
     libavcodec/x86/deinterlace.asm \
+    libavcodec/x86/diracdsp_yasm.asm \
     libavcodec/x86/dsputil_yasm.asm \
+    libavcodec/x86/dwt_yasm.asm \
     libavcodec/x86/fft_mmx.asm \
     libavcodec/x86/fmtconvert.asm \
     libavcodec/x86/h264_chromamc.asm \
