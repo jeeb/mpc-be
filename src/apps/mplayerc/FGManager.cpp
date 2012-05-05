@@ -41,7 +41,7 @@
 #include <evr9.h>
 #include <ksproxy.h>
 #include <moreuuids.h>
-
+#include "../filters/source/WavPackSource/WVSource.h"
 
 // {212690FB-83E5-4526-8FD7-74478B7939CD} from wmcodecdsp.h
 DEFINE_GUID      (CLSID_CMPEG2VidDecoderDS, 0x212690FB, 0x83E5, 0x4526, 0x8F, 0xD7, 0x74, 0x47, 0x8B, 0x79, 0x39, 0xCD);
@@ -1553,6 +1553,11 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 		pFGF = DNew CFGFilterInternal<CMpaSplitterFilter>(LowMerit(MpaSplitterName), MERIT64_DO_USE);
 	}
 	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MPEG1Audio);
+	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
+	m_transform.AddTail(pFGF);
+
+	pFGF = DNew CFGFilterInternal<CWavPackSplitterFilter>(WavPackSplitterName, MERIT64_ABOVE_DSHOW);
+	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_WAVPACK_Stream);
 	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
 	m_transform.AddTail(pFGF);
 
