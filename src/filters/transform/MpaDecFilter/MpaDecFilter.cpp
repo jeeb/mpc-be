@@ -1755,19 +1755,17 @@ CMediaType CMpaDecFilter::CreateMediaTypeSPDIF(DWORD nSamplesPerSec)
 
 HRESULT CMpaDecFilter::CheckInputType(const CMediaType* mtIn)
 {
-	else if (mtIn->subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {
+	if (mtIn->subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {
 		WAVEFORMATEX* wfe = (WAVEFORMATEX*)mtIn->Format();
 		if (wfe->nChannels < 1 || wfe->nChannels > 8 || (wfe->wBitsPerSample != 16 && wfe->wBitsPerSample != 20 && wfe->wBitsPerSample != 24)) {
 			return VFW_E_TYPE_NOT_ACCEPTED;
 		}
-	}
-	else if (mtIn->subtype == MEDIASUBTYPE_PS2_ADPCM) {
+	} else if (mtIn->subtype == MEDIASUBTYPE_PS2_ADPCM) {
 		WAVEFORMATEXPS2* wfe = (WAVEFORMATEXPS2*)mtIn->Format();
 		if (wfe->dwInterleave & 0xf) { // has to be a multiple of the block size (16 bytes)
 			return VFW_E_TYPE_NOT_ACCEPTED;
 		}
-	}
-	else if (mtIn->subtype == MEDIASUBTYPE_FLAC_FRAMED) {
+	} else if (mtIn->subtype == MEDIASUBTYPE_FLAC_FRAMED) {
 		return S_OK;
 	}
 
