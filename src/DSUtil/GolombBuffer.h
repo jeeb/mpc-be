@@ -29,6 +29,7 @@ public:
 
 	UINT64			BitRead(int nBits, bool fPeek = false);
 	UINT64			UExpGolombRead();
+	unsigned int	UintGolombRead();
 	INT64			SExpGolombRead();
 	void			BitByteAlign();
 

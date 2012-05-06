@@ -199,7 +199,14 @@ CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipInfo::Str
 		const VIDEOINFOHEADER *pVideoInfo = NULL;
 		const VIDEOINFOHEADER2 *pVideoInfo2 = NULL;
 
-		if (_pMediaType->formattype == FORMAT_MPEGVideo) {
+		if (_pMediaType->formattype == FORMAT_VideoInfo) {
+			pVideoInfo = GetFormatHelper(pVideoInfo, _pMediaType);
+
+			if (pVideoInfo->bmiHeader.biCompression == 'card') {
+				Infos.AddTail(L"DIRAC");
+			}
+
+		} else if (_pMediaType->formattype == FORMAT_MPEGVideo) {
 			Infos.AddTail(L"MPEG");
 
 			const MPEG1VIDEOINFO *pInfo = GetFormatHelper(pInfo, _pMediaType);
@@ -2093,6 +2100,58 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			p->bDiscontinuity = true;
 			DD_reset = false;
 		}
+	} else if (m_mt.subtype == MEDIASUBTYPE_DRAC) {
+		if (p->GetCount() < 4) {
+			return S_OK;    // Should be invalid packet
+		}
+
+		BYTE* start = p->GetData();
+		if (*(DWORD*)start != 0x44434242) { // not found Dirac SYNC 'BBCD'
+			if (!m_p) {
+				return S_OK;
+			}
+
+			start = m_p->GetData();
+			if (*(DWORD*)start != 0x44434242) { // not found Dirac SYNC 'BBCD'
+				return S_OK;
+			}
+
+			m_p->Append(*p);
+			return S_OK;
+		}
+
+		HRESULT hr = S_OK;
+
+		if (m_p) {
+			CAutoPtr<Packet> p2(DNew Packet());
+			p2->TrackNumber		= m_p->TrackNumber;
+			p2->bDiscontinuity	= m_p->bDiscontinuity;
+			p2->bSyncPoint		= m_p->bSyncPoint;
+			p2->rtStart			= m_p->rtStart;
+			p2->rtStop			= m_p->rtStop;
+			p2->pmt				= m_p->pmt;
+			p2->SetData(m_p->GetData(), m_p->GetCount());
+			m_p.Free();
+
+			if (!p2->pmt && m_bFlushed) {
+				p2->pmt = CreateMediaType(&m_mt);
+				m_bFlushed = false;
+			}
+		
+			hr = __super::DeliverPacket(p2);
+		}
+
+		m_p.Attach(DNew Packet());
+		m_p->TrackNumber	= p->TrackNumber;
+		m_p->bDiscontinuity	= p->bDiscontinuity;
+		m_p->bSyncPoint		= p->bSyncPoint;
+		m_p->rtStart		= p->rtStart;
+		m_p->rtStop			= p->rtStop;
+		m_p->pmt			= p->pmt;
+		m_p->Append(*p);
+
+		return hr;
+
 	} else {
 		m_p.Free();
 		m_pl.RemoveAll();

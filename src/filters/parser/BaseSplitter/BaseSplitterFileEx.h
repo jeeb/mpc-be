@@ -49,6 +49,11 @@ static const byte pixel_aspect[17][2]= {
 	{2, 1},
 };
 
+struct AV_Rational {
+	int num;
+	int den;
+};
+
 class CBaseSplitterFileEx : public CBaseSplitterFile
 {
 	int m_tslen; // transport stream packet length (188 or 192 bytes, auto-detected)
@@ -373,10 +378,7 @@ public:
 		UINT64 crop_left, crop_right, crop_top, crop_bottom;
 		__int64 AvgTimePerFrame;
 
-		struct sar {
-			BYTE num;
-			BYTE den;
-		} sar;
+		AV_Rational sar;
 
 		spsppsdata spspps[4];
 		BYTE lastid;
@@ -403,13 +405,34 @@ public:
 		BYTE		finterpflag;
 		BYTE		psf;
 		unsigned int width, height;
-		struct sar {
-			BYTE num;
-			BYTE den;
-		} sar;
+
+		AV_Rational sar;
+	};
+
+	struct dirac_source_params {
+		unsigned width;
+		unsigned height;
+		WORD chroma_format;          ///< 0: 444  1: 422  2: 420
+
+		BYTE interlaced;
+		BYTE top_field_first;
+
+		BYTE frame_rate_index;       ///< index into dirac_frame_rate[]
+		BYTE aspect_ratio_index;     ///< index into dirac_aspect_ratio[]
+
+		WORD clean_width;
+		WORD clean_height;
+		WORD clean_left_offset;
+		WORD clean_right_offset;
+
+		BYTE pixel_range_index;      ///< index into dirac_pixel_range_presets[]
+		BYTE color_spec_index;       ///< index into dirac_color_spec_presets[]
 	};
 
 	struct dirachdr {
+		dirac_source_params source;
+
+		AV_Rational frame_rate;
 	};
 
 	struct dvbsub {

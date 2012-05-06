@@ -1,4 +1,4 @@
-/*
+﻿/*
  * $Id$
  *
  * (C) 2006-2012 see Authors.txt
@@ -66,6 +66,18 @@ UINT64 CGolombBuffer::UExpGolombRead()
 		b = (BYTE)BitRead(1);
 	}
 	return (1ui64 << n) - 1 + BitRead(n);
+}
+
+unsigned int CGolombBuffer::UintGolombRead()
+{
+	unsigned int value = 0, count = 0;
+	while (!BitRead(1)) {
+		count++;
+		value <<= 1;
+		value |= BitRead(1);
+	}
+
+	return (1 << count) - 1 + value;
 }
 
 INT64 CGolombBuffer::SExpGolombRead()
