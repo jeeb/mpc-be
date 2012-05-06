@@ -1063,7 +1063,7 @@ void CMPCVideoDecFilter::CalcAvgTimePerFrame()
 	m_rtAvrTimePerFrame = max (1, m_rtAvrTimePerFrame);
 }
 
-void CMPCVideoDecFilter::LogLibAVCodec(void* par,int level,const char *fmt,va_list valist)
+void CMPCVideoDecFilter::LogLibAVCodec(void* par, int level, const char *fmt, va_list valist)
 {
 #if defined(_DEBUG) && 0
 	char		Msg [500];
@@ -1883,6 +1883,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			avpkt.data = NULL;
 			avpkt.size = 0;
 		}
+
 		used_bytes = avcodec_decode_video2 (m_pAVCtx, m_pFrame, &got_picture, &avpkt);
 
 		if (used_bytes < 0) {

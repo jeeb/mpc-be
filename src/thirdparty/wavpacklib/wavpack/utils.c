@@ -47,10 +47,10 @@ int copy_timestamp (const char *src_filename, const char *dst_filename)
     if (*src_filename == '-' || *dst_filename == '-')
         return res;
 
-    src = CreateFile (src_filename, GENERIC_READ, FILE_SHARE_READ, NULL,
+    src = CreateFile ((LPCWSTR)src_filename, GENERIC_READ, FILE_SHARE_READ, NULL,
          OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
 
-    dst = CreateFile (dst_filename, GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
+    dst = CreateFile ((LPCWSTR)dst_filename, GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
          OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
 
     if (src == INVALID_HANDLE_VALUE || dst == INVALID_HANDLE_VALUE ||
@@ -394,7 +394,7 @@ int get_app_path (char *app_path)
     }
 
     tried = TRUE;
-    hinstLib = LoadLibrary ("shell32.dll");
+    hinstLib = LoadLibrary (TEXT("shell32.dll"));
 
     if (hinstLib) {
         ProcAdd = GetProcAddress (hinstLib, "SHGetFolderPathA");
@@ -413,7 +413,7 @@ int get_app_path (char *app_path)
     }
 
     if (!result) {
-        hinstLib = LoadLibrary ("shfolder.dll");
+        hinstLib = LoadLibrary (TEXT("shfolder.dll"));
 
         if (hinstLib) {
             ProcAdd = GetProcAddress (hinstLib, "SHGetFolderPathA");
@@ -455,7 +455,7 @@ void error_line (char *error, ...)
                 get_app_path (file_path);
                 strcat (file_path, "\\WavPack");
 
-                if (CreateDirectory (file_path, NULL)) {
+                if (CreateDirectory ((LPCWSTR)file_path, NULL)) {
                     strcat (file_path, "\\wavpack.log");
                     error_log = fopen (file_path, "a+");
                 }
