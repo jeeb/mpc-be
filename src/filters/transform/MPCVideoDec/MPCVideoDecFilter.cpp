@@ -1351,7 +1351,7 @@ void CMPCVideoDecFilter::BuildDXVAOutputFormat()
 	int nSwCount = 0;
 	// get the output formats order from the DWORD nibbles extracting literal values [0x00543210] = 0,1,2,3,4,5
 	// get the output formats count from the DWORD nibbles extracting checked flag (8) [0x0054ba98] = 4
-	for (int i=0; i<6; i++){
+	for (int i=0; i<6; i++) {
 		nSwOF = ( m_nSwOutputFormats & (0x0000000F << (4*i)) ) >> (4*i);
 		if ((nSwOF & 8) !=0) {
 			nSwIndex[nSwCount]=nSwOF & ~8;
@@ -1360,6 +1360,8 @@ void CMPCVideoDecFilter::BuildDXVAOutputFormat()
 	}
 	m_nVideoOutputCount = (IsDXVASupported() ? ffCodecs[m_nCodecNb].DXVAModeCount() + countof (DXVAFormats) : 0) +
 						  (m_bUseFFmpeg   ? (nSwCount>0) ? nSwCount : countof(SoftwareFormats) : 0);
+
+	m_pVideoOutputFormat = DNew VIDEO_OUTPUT_FORMATS[m_nVideoOutputCount];
 
 	int nPos = 0;
 	if (IsDXVASupported()) {
@@ -1378,11 +1380,10 @@ void CMPCVideoDecFilter::BuildDXVAOutputFormat()
 	// Software rendering
 	if (m_bUseFFmpeg) {
 		if (nSwCount>0) {
-			for (int i=0; i<nSwCount; i++){
+			for (int i=0; i<nSwCount; i++) {
 				m_pVideoOutputFormat[nPos + i] = SoftwareFormats[nSwIndex[i]];
 			}
-		}
-		else {
+		} else {
 			memcpy (&m_pVideoOutputFormat[nPos], SoftwareFormats, sizeof(SoftwareFormats));
 		}
 	}
@@ -1495,6 +1496,11 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 
 		if (m_nDXVAMode != MODE_SOFTWARE) {
 			m_nOutCsp = FF_CSP_UNSUPPORTED;
+		}
+		
+		// Cannot use YUY2 if horizontal or vertical resolution is not even
+		if (((m_pOutput->CurrentMediaType().subtype == MEDIASUBTYPE_YUY2) && (m_pAVCtx->width&1 || m_pAVCtx->height&1))) {
+			return VFW_E_INVALIDMEDIATYPE;
 		}
 	}
 
