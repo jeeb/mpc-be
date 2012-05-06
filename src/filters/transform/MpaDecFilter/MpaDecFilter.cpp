@@ -72,7 +72,7 @@ static const FFMPEG_AUDIO_CODECS ffAudioCodecs[] = {
 	{ &MEDIASUBTYPE_LATM_AAC,	CODEC_ID_AAC_LATM },
 	// ALAC
 	{ &MEDIASUBTYPE_ALAC,		CODEC_ID_ALAC },
-	// ALAC
+	// MPEG-4 ALS
 	{ &MEDIASUBTYPE_ALS,		CODEC_ID_MP4ALS },
 	// Ogg Vorbis
 	{ &MEDIASUBTYPE_Vorbis2,	CODEC_ID_VORBIS },
@@ -109,6 +109,7 @@ static const FFMPEG_AUDIO_CODECS ffAudioCodecs[] = {
 };
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
+#if INTERNAL_DECODER_MPEGAUDIO
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_MP3},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_MPEG1AudioPayload},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_MPEG1Payload},
@@ -117,6 +118,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{&MEDIATYPE_MPEG2_PACK,			&MEDIASUBTYPE_MPEG2_AUDIO},
 	{&MEDIATYPE_MPEG2_PES,			&MEDIASUBTYPE_MPEG2_AUDIO},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_MPEG2_AUDIO},
+#endif
+#if INTERNAL_DECODER_AC3
 	{&MEDIATYPE_DVD_ENCRYPTED_PACK, &MEDIASUBTYPE_DOLBY_AC3},
 	{&MEDIATYPE_MPEG2_PACK,			&MEDIASUBTYPE_DOLBY_AC3},
 	{&MEDIATYPE_MPEG2_PES,			&MEDIASUBTYPE_DOLBY_AC3},
@@ -130,16 +133,22 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{&MEDIATYPE_MPEG2_PES,			&MEDIASUBTYPE_DOLBY_TRUEHD},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_DOLBY_TRUEHD},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_WAVE_DOLBY_AC3},
+#endif
+#if INTERNAL_DECODER_DTS
 	{&MEDIATYPE_DVD_ENCRYPTED_PACK, &MEDIASUBTYPE_DTS},
 	{&MEDIATYPE_MPEG2_PACK,			&MEDIASUBTYPE_DTS},
 	{&MEDIATYPE_MPEG2_PES,			&MEDIASUBTYPE_DTS},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_DTS},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_WAVE_DTS},
+#endif
+#if INTERNAL_DECODER_LPCM
 	{&MEDIATYPE_DVD_ENCRYPTED_PACK, &MEDIASUBTYPE_DVD_LPCM_AUDIO},
 	{&MEDIATYPE_MPEG2_PACK,			&MEDIASUBTYPE_DVD_LPCM_AUDIO},
 	{&MEDIATYPE_MPEG2_PES,			&MEDIASUBTYPE_DVD_LPCM_AUDIO},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_DVD_LPCM_AUDIO},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_HDMV_LPCM_AUDIO},
+#endif
+#if INTERNAL_DECODER_AAC
 	{&MEDIATYPE_DVD_ENCRYPTED_PACK, &MEDIASUBTYPE_AAC},
 	{&MEDIATYPE_MPEG2_PACK,			&MEDIASUBTYPE_AAC},
 	{&MEDIATYPE_MPEG2_PES,			&MEDIASUBTYPE_AAC},
@@ -154,9 +163,13 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{&MEDIATYPE_MPEG2_PACK,			&MEDIASUBTYPE_mp4a},
 	{&MEDIATYPE_MPEG2_PES,			&MEDIASUBTYPE_mp4a},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_mp4a},
+#endif
+#if INTERNAL_DECODER_AMR
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_AMR},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_SAMR},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_SAWB},
+#endif
+#if INTERNAL_DECODER_PS2AUDIO
 	{&MEDIATYPE_DVD_ENCRYPTED_PACK, &MEDIASUBTYPE_PS2_PCM},
 	{&MEDIATYPE_MPEG2_PACK,			&MEDIASUBTYPE_PS2_PCM},
 	{&MEDIATYPE_MPEG2_PES,			&MEDIASUBTYPE_PS2_PCM},
@@ -165,9 +178,17 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{&MEDIATYPE_MPEG2_PACK,			&MEDIASUBTYPE_PS2_ADPCM},
 	{&MEDIATYPE_MPEG2_PES,			&MEDIASUBTYPE_PS2_ADPCM},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_PS2_ADPCM},
+#endif
+#if INTERNAL_DECODER_VORBIS
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_Vorbis2},
+#endif
+#if INTERNAL_DECODER_FLAC
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_FLAC_FRAMED},
+#endif
+#if INTERNAL_DECODER_NELLYMOSER
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_NELLYMOSER},
+#endif
+#if INTERNAL_DECODER_PCM
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_PCM_NONE},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_PCM_RAW},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_PCM_TWOS},
@@ -176,12 +197,17 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_PCM_IN32},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_PCM_FL32},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_PCM_FL64},
-	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_PCM_IN24_le},
-	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_PCM_IN32_le},
-	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_PCM_FL32_le},
-	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_PCM_FL64_le},
+	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_PCM_IN24_le}, // remove it later
+	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_PCM_IN32_le}, // remove it later
+	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_PCM_FL32_le}, // remove it later
+	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_PCM_FL64_le}, // remove it later
+	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_IEEE_FLOAT}, // only for 64-bit float PCM
+#endif
+#if INTERNAL_DECODER_ADPCM
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_IMA4},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_ADPCM_SWF},
+#endif
+#if INTERNAL_DECODER_REALAUDIO
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_14_4},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_28_8},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_ATRC},
@@ -190,7 +216,11 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_SIPR},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_RAAC},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_RACP},
+#endif
+#if INTERNAL_DECODER_ALAC
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_ALAC},
+#endif
+#if INTERNAL_DECODER_ALS
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_ALS},
 	{&MEDIATYPE_Audio,              &MEDIASUBTYPE_QDM2},
 	{&MEDIATYPE_Audio,              &MEDIASUBTYPE_WAVPACK4},
@@ -586,43 +616,21 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	}
 	else if (subtype == MEDIASUBTYPE_PCM_NONE ||
 			 subtype == MEDIASUBTYPE_PCM_RAW) {
-//		if (m_buff.GetCount() < 480) {
-//			return S_OK;
-//		}
 		hr = ProcessPCMraw();
-	} else if (subtype == MEDIASUBTYPE_PCM_TWOS) {
-//		if (m_buff.GetCount() < 960) {
-//			return S_OK;
-//		}
-		hr = ProcessPCMintBE();
-	} else if (subtype == MEDIASUBTYPE_PCM_SOWT) {
-//		if (m_buff.GetCount() < 960) {
-//			return S_OK;
-//		}
-		hr = ProcessPCMintLE();
-	} else if (subtype == MEDIASUBTYPE_PCM_IN24 ||
+	} else if (subtype == MEDIASUBTYPE_PCM_TWOS ||
+			   subtype == MEDIASUBTYPE_PCM_IN24 ||
 			   subtype == MEDIASUBTYPE_PCM_IN32) {
-//		if (m_buff.GetCount() < 1920) {
-//			return S_OK;
-//		}
 		hr = ProcessPCMintBE();
-	} else if (subtype == MEDIASUBTYPE_PCM_IN24_le ||
-			   subtype == MEDIASUBTYPE_PCM_IN32_le) {
-//		if (m_buff.GetCount() < 1920) {
-//			return S_OK;
-//		}
+	} else if (subtype == MEDIASUBTYPE_PCM_SOWT    ||
+			   subtype == MEDIASUBTYPE_PCM_IN24_le || // remove it later
+			   subtype == MEDIASUBTYPE_PCM_IN32_le) { // remove it later
 		hr = ProcessPCMintLE();
 	} else if (subtype == MEDIASUBTYPE_PCM_FL32 ||
 			   subtype == MEDIASUBTYPE_PCM_FL64) {
-//		if (m_buff.GetCount() < 3840) {
-//			return S_OK;
-//		}
 		hr = ProcessPCMfloatBE();
-	} else if (subtype == MEDIASUBTYPE_PCM_FL32_le ||
-			   subtype == MEDIASUBTYPE_PCM_FL64_le) {
-//		if (m_buff.GetCount() < 3840) {
-//			return S_OK;
-//		}
+	} else if (subtype == MEDIASUBTYPE_PCM_FL32_le || // remove it later
+			   subtype == MEDIASUBTYPE_PCM_FL64_le || // remove it later
+			   subtype == MEDIASUBTYPE_IEEE_FLOAT) {
 		hr = ProcessPCMfloatLE();
 	}
 
@@ -1756,19 +1764,14 @@ CMediaType CMpaDecFilter::CreateMediaTypeSPDIF(DWORD nSamplesPerSec)
 
 HRESULT CMpaDecFilter::CheckInputType(const CMediaType* mtIn)
 {
-	if (mtIn->subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {
+	else if (mtIn->subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {
 		WAVEFORMATEX* wfe = (WAVEFORMATEX*)mtIn->Format();
 		if (wfe->nChannels < 1 || wfe->nChannels > 8 || (wfe->wBitsPerSample != 16 && wfe->wBitsPerSample != 20 && wfe->wBitsPerSample != 24)) {
 			return VFW_E_TYPE_NOT_ACCEPTED;
 		}
-	} else if (mtIn->subtype == MEDIASUBTYPE_HDMV_LPCM_AUDIO) {
-		WAVEFORMATEX* wfe = (WAVEFORMATEX*)mtIn->Format();
-		UNUSED_ALWAYS(wfe);
-		return S_OK;
 	}
 	else if (mtIn->subtype == MEDIASUBTYPE_PS2_ADPCM) {
 		WAVEFORMATEXPS2* wfe = (WAVEFORMATEXPS2*)mtIn->Format();
-		UNUSED_ALWAYS(wfe);
 		if (wfe->dwInterleave & 0xf) { // has to be a multiple of the block size (16 bytes)
 			return VFW_E_TYPE_NOT_ACCEPTED;
 		}

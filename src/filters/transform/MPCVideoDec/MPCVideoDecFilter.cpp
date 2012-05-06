@@ -1343,8 +1343,6 @@ bool CMPCVideoDecFilter::IsDXVASupported()
 
 void CMPCVideoDecFilter::BuildDXVAOutputFormat()
 {
-	int			nPos = 0;
-
 	SAFE_DELETE_ARRAY (m_pVideoOutputFormat);
 
 	// === New swscaler options
@@ -1363,8 +1361,7 @@ void CMPCVideoDecFilter::BuildDXVAOutputFormat()
 	m_nVideoOutputCount = (IsDXVASupported() ? ffCodecs[m_nCodecNb].DXVAModeCount() + countof (DXVAFormats) : 0) +
 						  (m_bUseFFmpeg   ? (nSwCount>0) ? nSwCount : countof(SoftwareFormats) : 0);
 
-	m_pVideoOutputFormat	= DNew VIDEO_OUTPUT_FORMATS[m_nVideoOutputCount];
-
+	int nPos = 0;
 	if (IsDXVASupported()) {
 		// Dynamic DXVA media types for DXVA1
 		for (nPos=0; nPos<ffCodecs[m_nCodecNb].DXVAModeCount(); nPos++) {
@@ -1378,7 +1375,6 @@ void CMPCVideoDecFilter::BuildDXVAOutputFormat()
 		memcpy (&m_pVideoOutputFormat[nPos], DXVAFormats, sizeof(DXVAFormats));
 		nPos += countof (DXVAFormats);
 	}
-
 	// Software rendering
 	if (m_bUseFFmpeg) {
 		if (nSwCount>0) {
@@ -1500,11 +1496,6 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 		if (m_nDXVAMode != MODE_SOFTWARE) {
 			m_nOutCsp = FF_CSP_UNSUPPORTED;
 		}
-	}
-
-	// Cannot use YUY2 if horizontal or vertical resolution is not even
-	if (((m_pOutput->CurrentMediaType().subtype == MEDIASUBTYPE_YUY2) && (m_pAVCtx->width&1 || m_pAVCtx->height&1))) {
-		return VFW_E_INVALIDMEDIATYPE;
 	}
 
 	return __super::CompleteConnect (direction, pReceivePin);
