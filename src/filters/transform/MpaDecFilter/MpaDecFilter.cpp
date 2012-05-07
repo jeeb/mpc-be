@@ -1760,6 +1760,12 @@ HRESULT CMpaDecFilter::CheckInputType(const CMediaType* mtIn)
 	} else if (mtIn->subtype == MEDIASUBTYPE_FLAC_FRAMED) {
 		return S_OK;
 	}
+	else if (mtIn->subtype == MEDIASUBTYPE_IEEE_FLOAT) {
+		WAVEFORMATEX* wfe = (WAVEFORMATEX*)mtIn->Format();
+		if (wfe->wBitsPerSample != 64) {    // only for 64-bit float PCM
+			return VFW_E_TYPE_NOT_ACCEPTED; // not needed any decoders for 32-bit float
+		}
+	}
 
 	for (int i = 0; i < countof(sudPinTypesIn); i++) {
 		if (*sudPinTypesIn[i].clsMajorType == mtIn->majortype
