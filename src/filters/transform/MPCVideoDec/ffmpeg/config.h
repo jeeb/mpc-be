@@ -241,6 +241,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_INDEO4_DECODER 1
 #define CONFIG_INDEO5_DECODER 1
 #define CONFIG_JPEGLS_DECODER 0
+#define CONFIG_LAGARITH_DECODER 1
 #define CONFIG_LOCO_DECODER 0
 #define CONFIG_MPC7_DECODER 1
 #define CONFIG_MPC8_DECODER 1

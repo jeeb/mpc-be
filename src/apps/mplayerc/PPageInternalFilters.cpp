@@ -95,6 +95,7 @@ static filter_t s_filters[] = {
 	{_T("Indeo 3/4/5"), FFMPEG_DECODER, VIDEO, FFM_INDEO, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
 	{_T("Screen Recorder (CSCD/TSCC/QTRle)"), FFMPEG_DECODER, VIDEO, FFM_SCREC, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
 	{_T("Ut video"), FFMPEG_DECODER, VIDEO, FFM_UTVD, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
+	{_T("Lagarith"), FFMPEG_DECODER, VIDEO, FFM_LAGARITH, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
 
 	{NULL, 0, 0, 0, NULL}
 };

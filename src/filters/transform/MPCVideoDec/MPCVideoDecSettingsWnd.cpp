@@ -552,6 +552,8 @@ bool CMPCVideoDecCodecWnd::OnActivate()
 	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_UTVD) != 0);
 	m_lstCodecs.AddString (_T("Real Video"));
 	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_RV) != 0);
+	m_lstCodecs.AddString (_T("Lagarith"));
+	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_LAGARITH) != 0);
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
 		pWnd->SetFont(&m_font, FALSE);
@@ -643,6 +645,9 @@ bool CMPCVideoDecCodecWnd::OnApply()
 		}
 		if (m_lstCodecs.GetCheck  (nPos++)) {
 			nActiveCodecs |= MPCVD_RV;
+		}
+		if (m_lstCodecs.GetCheck  (nPos++)) {
+			nActiveCodecs |= MPCVD_LAGARITH;
 		}
 
 		m_pMDF->SetActiveCodecs ((MPC_VIDEO_CODEC)nActiveCodecs);

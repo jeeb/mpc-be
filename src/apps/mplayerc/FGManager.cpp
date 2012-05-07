@@ -2009,6 +2009,10 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_UTVD_ULY2);
 	}
 
+	if (ffmpeg_filters[FFM_LAGARITH]) {
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_Lagarith);
+	}
+
 	m_transform.AddTail(pFGF);
 
 	// Low merit MPC Video Decoder
@@ -2222,6 +2226,10 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_UTVD_ULRA);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_UTVD_ULY0);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_UTVD_ULY2);
+	}
+
+	if (ffmpeg_filters[FFM_LAGARITH]) {
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_Lagarith);
 	}
 
 	m_transform.AddTail(pFGF);

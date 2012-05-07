@@ -57,6 +57,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (INDEO3, indeo3);
     REGISTER_DECODER (INDEO4, indeo4);
     REGISTER_DECODER (INDEO5, indeo5);
+    REGISTER_DECODER (LAGARITH, lagarith);
     REGISTER_DECODER (MJPEG, mjpeg);
     REGISTER_DECODER (MJPEGB, mjpegb);
     REGISTER_DECODER (MPEG2VIDEO, mpeg2video);

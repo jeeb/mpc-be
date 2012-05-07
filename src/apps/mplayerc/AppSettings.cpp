@@ -101,6 +101,7 @@ CAppSettings::CAppSettings()
 	FFMFiltersKeys[FFM_INDEO] = _T("FFM_INDEO");
 	FFMFiltersKeys[FFM_SCREC] = _T("FFM_SCREC");
 	FFMFiltersKeys[FFM_UTVD] = _T("FFM_UTVD");
+	FFMFiltersKeys[FFM_LAGARITH] = _T("FFM_LAGARITH");
 
 }
 
