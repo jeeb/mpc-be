@@ -114,6 +114,7 @@
     <ClCompile Include="text.cpp" />
     <ClCompile Include="vd.cpp" />
     <ClCompile Include="vd_asm.cpp" />
+    <ClCompile Include="VideoParser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AudioParser.h" />
@@ -133,6 +134,7 @@
     <ClInclude Include="text.h" />
     <ClInclude Include="vd.h" />
     <ClInclude Include="vd_asm.h" />
+    <ClInclude Include="VideoParser.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\thirdparty\VirtualDub\Kasumi\Kasumi.vcxproj">

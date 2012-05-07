@@ -253,3 +253,8 @@ inline int LNKO(int a, int b)
 	}
 	return(a);
 }
+
+struct AV_Rational {
+	int num;
+	int den;
+};

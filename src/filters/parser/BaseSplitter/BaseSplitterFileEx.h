@@ -25,6 +25,7 @@
 
 #include "BaseSplitterFile.h"
 #include "../../../DSUtil/Mpeg2Def.h"
+#include "../../../DSUtil/DSUtil.h"
 
 #define MAX_SPSPPS			256			// Max size for a SPS/PPS packet
 class CGolombBuffer;
@@ -47,11 +48,6 @@ static const byte pixel_aspect[17][2]= {
 	{4, 3},
 	{3, 2},
 	{2, 1},
-};
-
-struct AV_Rational {
-	int num;
-	int den;
 };
 
 class CBaseSplitterFileEx : public CBaseSplitterFile
@@ -409,30 +405,11 @@ public:
 		AV_Rational sar;
 	};
 
-	struct dirac_source_params {
+	struct dirachdr {
 		unsigned width;
 		unsigned height;
-		WORD chroma_format;          ///< 0: 444  1: 422  2: 420
 
-		BYTE interlaced;
-		BYTE top_field_first;
-
-		BYTE frame_rate_index;       ///< index into dirac_frame_rate[]
-		BYTE aspect_ratio_index;     ///< index into dirac_aspect_ratio[]
-
-		WORD clean_width;
-		WORD clean_height;
-		WORD clean_left_offset;
-		WORD clean_right_offset;
-
-		BYTE pixel_range_index;      ///< index into dirac_pixel_range_presets[]
-		BYTE color_spec_index;       ///< index into dirac_color_spec_presets[]
-	};
-
-	struct dirachdr {
-		dirac_source_params source;
-
-		AV_Rational frame_rate;
+		REFERENCE_TIME AvgTimePerFrame;
 	};
 
 	struct dvbsub {

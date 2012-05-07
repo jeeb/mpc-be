@@ -187,6 +187,17 @@ public:
 	}
 };
 
+class COggDiracOutputPin : public COggSplitterOutputPin
+{
+	REFERENCE_TIME m_rtAvgTimePerFrame;
+
+	virtual HRESULT UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, int len);
+	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
+
+public:
+	COggDiracOutputPin(BYTE* p, int nCount, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
+};
+
 class __declspec(uuid("9FF48807-E133-40AA-826F-9B2959E5232D"))
 	COggSplitterFilter : public CBaseSplitterFilter
 {

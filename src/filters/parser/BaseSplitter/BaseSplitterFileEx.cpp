@@ -24,9 +24,9 @@
 #include "stdafx.h"
 #include "BaseSplitterFileEx.h"
 #include <MMReg.h>
-#include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/GolombBuffer.h"
 #include "../../../DSUtil/AudioParser.h"
+#include "../../../DSUtil/VideoParser.h"
 #include <InitGuid.h>
 #include <moreuuids.h>
 
@@ -2022,58 +2022,8 @@ bool CBaseSplitterFileEx::Read(vc1hdr& h, int len, CMediaType* pmt, int guid_fla
 }
 
 #define pc_seq_header 0x00
-#define REF_SECOND_MULT 10000000LL
 bool CBaseSplitterFileEx::Read(dirachdr& h, int len, CMediaType* pmt)
 {
-	static const dirac_source_params dirac_source_parameters_defaults[] = {
-		{ 640,  480,  2, 0, 0, 1,  1, 640,  480,  0, 0, 1, 0 },
-		{ 176,  120,  2, 0, 0, 9,  2, 176,  120,  0, 0, 1, 1 },
-		{ 176,  144,  2, 0, 1, 10, 3, 176,  144,  0, 0, 1, 2 },
-		{ 352,  240,  2, 0, 0, 9,  2, 352,  240,  0, 0, 1, 1 },
-		{ 352,  288,  2, 0, 1, 10, 3, 352,  288,  0, 0, 1, 2 },
-		{ 704,  480,  2, 0, 0, 9,  2, 704,  480,  0, 0, 1, 1 },
-		{ 704,  576,  2, 0, 1, 10, 3, 704,  576,  0, 0, 1, 2 },
-		{ 720,  480,  1, 1, 0, 4,  2, 704,  480,  8, 0, 3, 1 },
-		{ 720,  576,  1, 1, 1, 3,  3, 704,  576,  8, 0, 3, 2 },
-		{ 1280, 720,  1, 0, 1, 7,  1, 1280, 720,  0, 0, 3, 3 },
-		{ 1280, 720,  1, 0, 1, 6,  1, 1280, 720,  0, 0, 3, 3 },
-		{ 1920, 1080, 1, 1, 1, 4,  1, 1920, 1080, 0, 0, 3, 3 },
-		{ 1920, 1080, 1, 1, 1, 3,  1, 1920, 1080, 0, 0, 3, 3 },
-		{ 1920, 1080, 1, 0, 1, 7,  1, 1920, 1080, 0, 0, 3, 3 },
-		{ 1920, 1080, 1, 0, 1, 6,  1, 1920, 1080, 0, 0, 3, 3 },
-		{ 2048, 1080, 0, 0, 1, 2,  1, 2048, 1080, 0, 0, 4, 4 },
-		{ 4096, 2160, 0, 0, 1, 2,  1, 4096, 2160, 0, 0, 4, 4 },
-		{ 3840, 2160, 1, 0, 1, 7,  1, 3840, 2160, 0, 0, 3, 3 },
-		{ 3840, 2160, 1, 0, 1, 6,  1, 3840, 2160, 0, 0, 3, 3 },
-		{ 7680, 4320, 1, 0, 1, 7,  1, 3840, 2160, 0, 0, 3, 3 },
-		{ 7680, 4320, 1, 0, 1, 6,  1, 3840, 2160, 0, 0, 3, 3 },
-	};
-
-	static const AV_Rational avpriv_frame_rate_tab[16] = {
-		{    0,    0},
-		{24000, 1001},
-		{   24,    1},
-		{   25,    1},
-		{30000, 1001},
-		{   30,    1},
-		{   50,    1},
-		{60000, 1001},
-		{   60,    1},
-		// Xing's 15fps: (9)
-		{   15,    1},
-		// libmpeg3's "Unofficial economy rates": (10-13)
-		{    5,    1},
-		{   10,    1},
-		{   12,    1},
-		{   15,    1},
-		{    0,    0},
-	};
-
-	static const AV_Rational dirac_frame_rate[] = {
-		{15000, 1001},
-		{25, 2},
-	};
-
 	memset(&h, 0, sizeof(h));
 
 	if (len < 13) {
@@ -2089,61 +2039,11 @@ bool CBaseSplitterFileEx::Read(dirachdr& h, int len, CMediaType* pmt)
 
 		CGolombBuffer gb(buffer+13, min(len - 13, 1024));
 		gb.BitByteAlign();
+
+		if (!ParseDiracHeader(gb, &h.width, &h.height, &h.AvgTimePerFrame)) {
+			return false;
+		}
 		
-		unsigned int version_major = gb.UintGolombRead();
-		if (version_major < 2) {
-			return false;
-		}
-		gb.UintGolombRead(); /* version_minor */
-		gb.UintGolombRead(); /* profile */
-		gb.UintGolombRead(); /* level */
-		unsigned int video_format = gb.UintGolombRead();
-
-		h.source = dirac_source_parameters_defaults[video_format];
-
-		if (gb.BitRead(1)) {
-			h.source.width	= gb.UintGolombRead();
-			h.source.height	= gb.UintGolombRead();
-		}
-		if (!h.source.width || !h.source.height) {
-			return false;
-		}
-
-		if (gb.BitRead(1)) {
-			h.source.chroma_format = gb.UintGolombRead();
-		}
-		if (h.source.chroma_format > 2) {
-			return false;
-		}
-
-		if (gb.BitRead(1)) {
-			h.source.interlaced = gb.UintGolombRead();
-		}
-		if (h.source.interlaced > 1) {
-			return false;
-		}
-
-		if (gb.BitRead(1)) {
-			h.source.frame_rate_index = gb.UintGolombRead();
-			if (h.source.frame_rate_index > 10) {
-				return false;
-			}
-			if (!h.source.frame_rate_index) {
-				h.frame_rate.num = gb.UintGolombRead();
-				h.frame_rate.den = gb.UintGolombRead();
-			}
-		}
-		if (h.source.frame_rate_index > 0) {
-			if (h.source.frame_rate_index <= 8) {
-				h.frame_rate = avpriv_frame_rate_tab[h.source.frame_rate_index];
-			} else {
-				h.frame_rate = dirac_frame_rate[h.source.frame_rate_index-9];
-			}
-		}
-		if (!h.frame_rate.num || !h.frame_rate.den) {
-			return false;
-		}
-
 		if (!pmt) {
 			return true;
 		}
@@ -2151,15 +2051,15 @@ bool CBaseSplitterFileEx::Read(dirachdr& h, int len, CMediaType* pmt)
 		{
 			pmt->majortype = MEDIATYPE_Video;
 			pmt->formattype = FORMAT_VideoInfo;
+			pmt->subtype = FOURCCMap('card');
 
 			VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)pmt->AllocFormatBuffer(sizeof(VIDEOINFOHEADER));
 			memset(pmt->Format(), 0, pmt->FormatLength());
 
-			pmt->subtype = FOURCCMap('card');
-			pvih->AvgTimePerFrame = REF_SECOND_MULT * h.frame_rate.den/h.frame_rate.num;
+			pvih->AvgTimePerFrame = h.AvgTimePerFrame;
 			pvih->bmiHeader.biSize = sizeof(pvih->bmiHeader);
-			pvih->bmiHeader.biWidth = h.source.width;
-			pvih->bmiHeader.biHeight = h.source.height;
+			pvih->bmiHeader.biWidth = h.width;
+			pvih->bmiHeader.biHeight = h.height;
 			pvih->bmiHeader.biPlanes = 1;
 			pvih->bmiHeader.biBitCount = 12;
 			pvih->bmiHeader.biCompression = 'card';

@@ -25,6 +25,7 @@
 #include "OggSplitter.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/GolombBuffer.h"
+#include "../../../DSUtil/VideoParser.h"
 
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
@@ -241,9 +242,8 @@ HRESULT COggSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 
 				AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
-			} else if (type == 3 && !memcmp(p, "vorbis", 6)) {
-				if (COggSplitterOutputPin* pOggPin =
-							dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
+			} else if (type == 3 && !memcmp(p, "vorbis", 6) && 0) { // disable by default;
+				if (COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
 					pOggPin->AddComment(p+6, page.GetCount()-6-1);
 				}
 			} else if (type == 0x7F && page.GetCount()>12 && *(long*)(p+8) == 0x43614C66) {	// Flac
@@ -262,6 +262,11 @@ HRESULT COggSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					pPinOut.Attach(DNew COggFlacOutputPin(p, page.GetCount(), name, this, this, &hr));
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 				}
+			} else if (*(long*)(p-1) == 0x44434242) {
+				name.Format(L"Dirac %d", i);
+				CAutoPtr<CBaseSplitterOutputPin> pPinOut;
+				pPinOut.Attach(DNew COggDiracOutputPin(page.GetData(), page.GetCount(), name, this, this, &hr));
+				AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 			} else if (!(type&1) && nWaitForMore == 0) {
 				break;
 			}
@@ -304,7 +309,6 @@ HRESULT COggSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStop = m_rtStop = m_rtDuration;
 
 	// comments
-
 	{
 		CAtlMap<CStringW, CStringW, CStringElementTraits<CStringW> > tagmap;
 		tagmap[L"TITLE"] = L"TITL";
@@ -456,7 +460,7 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		while (pos) {
 			COggSplitterOutputPin* pPin = dynamic_cast<COggSplitterOutputPin*>(static_cast<CBaseSplitterOutputPin*>(m_pOutputs.GetNext(pos)));
 
-			if (!dynamic_cast<COggVideoOutputPin*>(pPin) && !dynamic_cast<COggTheoraOutputPin*>(pPin)) {
+			if (!dynamic_cast<COggVideoOutputPin*>(pPin) && !dynamic_cast<COggTheoraOutputPin*>(pPin) && !dynamic_cast<COggDiracOutputPin*>(pPin)) {
 				continue;
 			}
 
@@ -545,7 +549,7 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 					}
 				}
 
-				ASSERT(fKeyFrameFound);
+				//ASSERT(fKeyFrameFound);
 
 				m_pFile->Seek(startpos);
 			}
@@ -563,7 +567,7 @@ bool COggSplitterFilter::DemuxLoop()
 	while (SUCCEEDED(hr) && !CheckRequest(NULL) && m_pFile->Read(page, true, GetRequestHandle())) {
 		COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
 		if (!pOggPin) {
-			ASSERT(0);
+			//ASSERT(0);
 			continue;
 		}
 		if (!pOggPin->IsConnected()) {
@@ -1224,7 +1228,9 @@ COggTextOutputPin::COggTextOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseFil
 	m_mts.Add(mt);
 }
 
+//
 // COggTheoraOutputPin
+//
 
 COggTheoraOutputPin::COggTheoraOutputPin(BYTE* p, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: COggSplitterOutputPin(pName, pFilter, pLock, phr)
@@ -1244,13 +1250,13 @@ COggTheoraOutputPin::COggTheoraOutputPin(BYTE* p, LPCWSTR pName, CBaseFilter* pF
 	m_nFpsNum	= (p[22]<<24)|(p[23]<<16)|(p[24]<<8)|p[25];
 	m_nFpsDenum	= (p[26]<<24)|(p[27]<<16)|(p[28]<<8)|p[29];
 	if (m_nFpsNum) {
-		m_rtAvgTimePerFrame = (REFERENCE_TIME)(10000000.0 * m_nFpsDenum / m_nFpsNum);
-		vih->hdr.AvgTimePerFrame = m_rtAvgTimePerFrame;
+		m_rtAvgTimePerFrame			= (REFERENCE_TIME)(10000000.0 * m_nFpsDenum / m_nFpsNum);
+		vih->hdr.AvgTimePerFrame	= m_rtAvgTimePerFrame;
 	}
 	vih->hdr.dwPictAspectRatioX = (p[14]<<16)|(p[15]<<8)|p[16];
 	vih->hdr.dwPictAspectRatioY = (p[17]<<16)|(p[18]<<8)|p[19];
 
-	m_KfgShift					= (((p[40]<<8)+p[41]) &0x3E0) >> 5;
+	m_KfgShift		= (((p[40]<<8)+p[41]) &0x3E0) >> 5;
 	m_nIndexOffset	= TH_VERSION_CHECK(p[7],p[8],p[9],3,2,1);
 
 	if (m_KfgShift == 0) {
@@ -1316,6 +1322,71 @@ HRESULT COggTheoraOutputPin::UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, i
 	if (!(*pData & 0x80) && m_mt.majortype == MEDIATYPE_Video) {
 		p->rtStop = p->rtStart + ((MPEG2VIDEOINFO*)m_mt.Format())->hdr.AvgTimePerFrame;
 	}
+
+	return S_OK;
+}
+
+//
+// COggDiracOutputPin
+//
+
+COggDiracOutputPin::COggDiracOutputPin(BYTE* p, int nCount, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
+	: COggSplitterOutputPin(pName, pFilter, pLock, phr)
+{
+	unsigned width;
+	unsigned height;
+
+	CGolombBuffer gb(p+13, nCount-13);
+	
+	if(!ParseDiracHeader(gb, &width, &height, &m_rtAvgTimePerFrame)) {
+		return;
+	}
+
+	CMediaType mt;
+
+	mt.majortype = MEDIATYPE_Video;
+	mt.formattype = FORMAT_VideoInfo;
+	mt.subtype = FOURCCMap('card');
+
+	VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER));
+	memset(mt.Format(), 0, mt.FormatLength());
+
+	pvih->AvgTimePerFrame = m_rtAvgTimePerFrame;
+	pvih->bmiHeader.biSize = sizeof(pvih->bmiHeader);
+	pvih->bmiHeader.biWidth = width;
+	pvih->bmiHeader.biHeight = height;
+	pvih->bmiHeader.biPlanes = 1;
+	pvih->bmiHeader.biBitCount = 12;
+	pvih->bmiHeader.biCompression = 'card';
+	pvih->bmiHeader.biSizeImage = DIBSIZE(pvih->bmiHeader);
+
+	mt.bFixedSizeSamples = 0;
+	m_mts.Add(mt);
+}
+
+REFERENCE_TIME COggDiracOutputPin::GetRefTime(__int64 granule_position)
+{
+	unsigned dist		= ((granule_position >> 14) & 0xff00) | (granule_position & 0xff);
+    REFERENCE_TIME dts	= (granule_position >> 31);
+    REFERENCE_TIME pts	= (dts + ((granule_position >> 9) & 0x1fff)) * m_rtAvgTimePerFrame / 2;
+
+	return pts;
+}
+
+HRESULT COggDiracOutputPin::UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, int len)
+{
+	if (!pData) {
+		return E_FAIL;
+	}
+
+	if (*(DWORD*)pData != 0x44434242) { // not found Dirac SYNC 'BBCD'
+		return E_FAIL;
+	}
+
+	p->bSyncPoint = TRUE;
+	p->rtStart = m_rtLast;
+	p->rtStop = m_rtLast+1;
+	p->SetData(pData, len);
 
 	return S_OK;
 }
