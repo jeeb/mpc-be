@@ -105,10 +105,10 @@ class COggFlacOutputPin : public COggSplitterOutputPin
 {
 	CAutoPtrList<OggPacket> m_initpackets;
 
-	int			m_nSamplesPerSec;
-	int			m_nChannels;
-	WORD		m_wBitsPerSample;
-	int			m_nAvgBytesPerSec;
+	int		m_nSamplesPerSec;
+	int		m_nChannels;
+	WORD	m_wBitsPerSample;
+	int		m_nAvgBytesPerSec;
 
 	DWORD m_blocksize[2], m_lastblocksize;
 	CAtlArray<bool> m_blockflags;
