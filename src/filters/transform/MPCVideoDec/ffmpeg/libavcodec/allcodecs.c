@@ -132,6 +132,7 @@ void avcodec_register_all(void)
 
     /* parsers */
     REGISTER_PARSER  (AC3, ac3);
+    REGISTER_PARSER  (AAC_LATM, aac_latm);
     REGISTER_PARSER  (MLP, mlp);
     REGISTER_PARSER  (MPEGAUDIO, mpegaudio);
     REGISTER_PARSER  (H264, h264);

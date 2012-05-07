@@ -967,7 +967,7 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum CodecID nCodecId)
 	int size = 0;
 	hr = DeliverFFmpeg(nCodecId, p, end-p, size);
 	if (FAILED(hr)) {
-		if (!(nCodecId == CODEC_ID_AAC || nCodecId == CODEC_ID_AAC_LATM)) {
+		if (nCodecId != CODEC_ID_AAC) {
 			m_buff.RemoveAll();
 			m_bResync = true;
 		}
@@ -2415,7 +2415,7 @@ bool CMpaDecFilter::InitFFmpeg(enum CodecID nCodecId)
 			m_pAVCtx->flags            |= CODEC_FLAG_TRUNCATED;
 		}
 
-		if (nCodecId != CODEC_ID_AAC && nCodecId != CODEC_ID_AAC_LATM) {
+		if (nCodecId != CODEC_ID_AAC) {
 			m_pParser = av_parser_init(nCodecId);
 		}
 

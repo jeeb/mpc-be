@@ -160,6 +160,7 @@ SRCS_C=\
     libavcodec/jpeglsdec.c \
     libavcodec/jrevdct.c \
     libavcodec/kbdwin.c \
+    libavcodec/latm_parser.c \
     libavcodec/lsp.c \
     libavcodec/mdct.c \
     libavcodec/mjpeg.c \
