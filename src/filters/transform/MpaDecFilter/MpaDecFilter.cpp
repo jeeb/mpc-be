@@ -1757,10 +1757,7 @@ HRESULT CMpaDecFilter::CheckInputType(const CMediaType* mtIn)
 		if (wfe->dwInterleave & 0xf) { // has to be a multiple of the block size (16 bytes)
 			return VFW_E_TYPE_NOT_ACCEPTED;
 		}
-	} else if (mtIn->subtype == MEDIASUBTYPE_FLAC_FRAMED) {
-		return S_OK;
-	}
-	else if (mtIn->subtype == MEDIASUBTYPE_IEEE_FLOAT) {
+	} else if (mtIn->subtype == MEDIASUBTYPE_IEEE_FLOAT) {
 		WAVEFORMATEX* wfe = (WAVEFORMATEX*)mtIn->Format();
 		if (wfe->wBitsPerSample != 64) {    // only for 64-bit float PCM
 			return VFW_E_TYPE_NOT_ACCEPTED; // not needed any decoders for 32-bit float
