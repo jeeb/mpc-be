@@ -1,4 +1,6 @@
-﻿; (C) 2009-2012 see Authors.txt
+﻿; $Id$
+;
+; (C) 2009-2012 see Authors.txt
 ;
 ; This file is part of MPC-BE.
 ;
@@ -15,7 +17,6 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;
-; $Id$
 
 ; Do NOT translate your language's name
 ; Do NOT translate [name]
@@ -39,6 +40,10 @@ br.WinVersionTooLowError=[name] requires Windows XP Service Pack 3 or newer to r
 ;Belarusian
 by.WelcomeLabel2=Зараз будзе ўстаноўлена [name].%n%nРэкамендуецца закрыць усе прыкладанні перад працягам.
 by.WinVersionTooLowError=[name] патрабуецца Windows XP Service Pack 3 або навей.
+
+;Basque
+eu.WelcomeLabel2=Honek [name] zure ordenagailuan ezarriko du.%n%nGomendatzen da beste aplikazio guztiak istea jarraitu aurretik.
+eu.WinVersionTooLowError=[name] Windows XP Service Pack 3 edo berriagoa behar du lan egiteko.
 
 ;Catalan
 ca.WelcomeLabel2=This will install [name] on your computer.%n%nIt is recommended that you close all other applications before continuing.

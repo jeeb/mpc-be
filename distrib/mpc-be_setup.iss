@@ -1,3 +1,5 @@
+; $Id$
+;
 ; (C) 2009-2012 see Authors.txt
 ;
 ; This file is part of MPC-BE.
@@ -14,9 +16,6 @@
 ;
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-;
-; $Id$
-
 
 ; Requirements:
 ; Inno Setup Unicode: http://www.jrsoftware.org/isdl.php
@@ -27,7 +26,7 @@
 #define sse_required
 ;#define x64Build
 
-; Don't forget to update the DirectX SDK number in include\Version.h (not updated so often)
+; Don't forget to update the DirectX SDK number in "include\Version.h" (not updated so often)
 
 
 ; From now on you shouldn't need to change anything
