@@ -101,7 +101,18 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 	}
 
 	m_nButtonHeight = 16; //reset m_nButtonHeight
-	HBITMAP hBmp = m_logobm.LoadExternalImage("toolbar");
+
+	AppSettings& s = AfxGetAppSettings();
+
+	int fp = m_logobm.FileExists("background");
+
+	HBITMAP hBmp;
+	if (s.fDisableXPToolbars && NULL != fp) {
+		hBmp = m_logobm.LoadExternalImage("toolbar", s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
+	} else {
+		hBmp = m_logobm.LoadExternalImage("toolbar", -1, -1, -1, -1);
+	}
+
 	if (NULL != hBmp) {
 		CBitmap *bmp = new CBitmap();
 		bmp->Attach(hBmp);
@@ -133,7 +144,6 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 		DeleteObject(hBmp);
 	}
 
-	AppSettings& s = AfxGetAppSettings();
 	if (s.fDisableXPToolbars) {
 		if (!fDisableImgListRemap) {
 			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 0);//nRemapState = 0 Remap Active
@@ -544,17 +554,10 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			dc.Attach(pTBCD->nmcd.hdc);
 			CRect r;
 
-			int pa = 255 * 256;
-			unsigned p1 = GetSysColor(COLOR_WINDOW);
-
 			for (int j = 0; j < 4; j++) {
 				GetItemRect(sep[j], &r);
 
-				TRIVERTEX tv[2] = {
-					{r.left, r.top, p1 * 256, (p1 >> 8) * 256, (p1 >> 16) * 256, pa},
-					{r.right, r.bottom, p1 * 256, (p1 >> 8) * 256, (p1 >> 16) * 256, pa},
-				};
-				dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+				dc.FillSolidRect(r, GetSysColor(COLOR_WINDOW));
 			}
 
 			dc.Detach();

@@ -157,54 +157,163 @@ CString CPngImage::LoadCurrentPath()
 
 int CPngImage::FileExists(CString fn)
 {
-	FILE* fp = _tfopen(LoadCurrentPath() + fn + _T(".png"), _T("rb"));
+	CString path = LoadCurrentPath();
+
+	FILE* fp = _tfopen(path + fn + _T(".png"), _T("rb"));
 	if (fp) {
 		fclose(fp);
 		return 1;
 	} else {
-		return NULL;
+		fp = _tfopen(path + fn + _T(".bmp"), _T("rb"));
+		if (fp) {
+			fclose(fp);
+			return 1;
+		} else {
+			return NULL;
+		}
 	}
 }
 
-HBITMAP CPngImage::TypeLoadImage(BYTE** pData, int* width, int* height, int* bpp, FILE* fp, int resid)
+BYTE* CPngImage::BrightnessRGB(BYTE* lpBits, int width, int height, int bpp, int br, int rc, int gc, int bc)
 {
-	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
+	if (br >= 0 && rc >= 0 && gc >= 0 && bc >= 0) {
 
-	if (fp) {
-		png_init_io(png_ptr, fp);
-	} else {
-		HRSRC hRes = FindResource(NULL, MAKEINTRESOURCE(resid), _T("PNG"));
-		HANDLE lRes = LoadResource(NULL, hRes);
+		if (br == 0) {
+			br = 1;
+		}
 
-		struct png_t png;
-		png.data = (unsigned char*)LockResource(lRes);
-		png.size = SizeofResource(NULL, hRes);
-		png.pos = 8;
-		png_set_read_fn(png_ptr, (png_voidp)&png, read_data_fn);
-		png_set_sig_bytes(png_ptr, 8);
+		if (rc == 0) {
+			rc = 1;
+		}
+		if (gc == 0) {
+			gc = 1;
+		}
+		if (bc == 0) {
+			bc = 1;
+		}
 
-		UnlockResource(lRes);
-		FreeResource(lRes);
+		if (rc > 255) {
+			rc = 255;
+		}
+		if (gc > 255) {
+			gc = 255;
+		}
+		if (bc > 255) {
+			bc = 255;
+		}
+
+		double R, G, B, brn = (br * 10) / (100 + (br * 4)) * 0.8;
+		int k = bpp / 8;
+		int size = width * height * k;
+		double rcn = (255 / rc) + brn, gcn = (255 / gc) + brn, bcn = (255 / bc) + brn;
+
+		for (int i = 0; i < size; i += k) {
+
+			R = lpBits[i];
+			G = lpBits[i + 1];
+			B = lpBits[i + 2];
+
+			R *= bcn;
+			G *= gcn;
+			B *= rcn;
+
+			if (R > 255) {
+				R = 255;
+			}
+			if (G > 255) {
+				G = 255;
+			}
+			if (B > 255) {
+				B = 255;
+			}
+
+			lpBits[i] = R;
+			lpBits[i + 1] = G;
+			lpBits[i + 2] = B;
+		}
+	}
+	return lpBits;
+}
+
+HBITMAP CPngImage::TypeLoadImage(int type, BYTE** pData, int* width, int* height, int* bpp, FILE* fp, int resid, int br, int rc, int gc, int bc)
+{
+	HBITMAP hbm;
+	BYTE* bmp;
+
+	png_structp png_ptr;
+	png_infop info_ptr;
+	png_bytep* row_pointers;
+
+	if (type == 0) {
+
+		fseek(fp, 0, SEEK_END);
+		int size = ftell(fp);
+		rewind(fp);
+		bmp = (BYTE*)malloc(size);
+		fread((void*)bmp, 1, size, fp);
+
+		BITMAPINFO& bi = (BITMAPINFO&)bmp[sizeof(BITMAPFILEHEADER)];
+		BITMAPINFOHEADER& bih = bi.bmiHeader;
+
+		*width = bih.biWidth;
+		*height = bih.biHeight;
+		*bpp = bih.biBitCount;
+
+		BITMAPINFO bmi = {{sizeof(BITMAPINFOHEADER), *width, *height, 1, *bpp, BI_RGB, 0, 0, 0, 0, 0}};
+
+		hbm = CreateDIBSection(0, &bmi, DIB_RGB_COLORS, (void**)&(*pData), 0, 0);
+
+	} else if (type == 1) {
+
+		png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
+
+		if (fp) {
+			png_init_io(png_ptr, fp);
+		} else {
+			HRSRC hRes = FindResource(NULL, MAKEINTRESOURCE(resid), _T("PNG"));
+			HANDLE lRes = LoadResource(NULL, hRes);
+
+			struct png_t png;
+			png.data = (unsigned char*)LockResource(lRes);
+			png.size = SizeofResource(NULL, hRes);
+			png.pos = 8;
+			png_set_read_fn(png_ptr, (png_voidp)&png, read_data_fn);
+			png_set_sig_bytes(png_ptr, 8);
+
+			UnlockResource(lRes);
+			FreeResource(lRes);
+		}
+
+		info_ptr = png_create_info_struct(png_ptr);
+
+		png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND | PNG_TRANSFORM_BGR, 0);
+
+		row_pointers = png_get_rows(png_ptr, info_ptr);
+
+		*width = png_get_image_width(png_ptr, info_ptr);
+		*height = png_get_image_height(png_ptr, info_ptr);
+		*bpp = png_get_channels(png_ptr, info_ptr) * 8;
+
+		BITMAPINFO bmi = {{sizeof(BITMAPINFOHEADER), *width, -(*height), 1, *bpp, BI_RGB, 0, 0, 0, 0, 0}};
+
+		hbm = CreateDIBSection(0, &bmi, DIB_RGB_COLORS, (void**)&(*pData), 0, 0);
 	}
 
-	png_infop info_ptr = png_create_info_struct(png_ptr);
-
-	png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_EXPAND | PNG_TRANSFORM_BGR | PNG_TRANSFORM_PACKING, 0);
-
-	png_bytep* row_pointers = png_get_rows(png_ptr, info_ptr);
-	*width = png_get_image_width(png_ptr, info_ptr);
-	*height = png_get_image_height(png_ptr, info_ptr);
-	*bpp = png_get_channels(png_ptr, info_ptr) * 8;
 	int memWidth = (*width) * (*bpp) / 8;
 
-	BITMAPINFO bmi = {{sizeof(BITMAPINFOHEADER), *width, -(*height), 1, *bpp, BI_RGB, 0, 0, 0, 0, 0}};
+	if (type == 0) {
 
-	HBITMAP hbm = CreateDIBSection(0, &bmi, DIB_RGB_COLORS, (void**)&(*pData), 0, 0);
-	for (int i = 0; i < *height; i++) {
-		memcpy((*pData) + memWidth * i, row_pointers[i], memWidth);
+		int hsize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+		memcpy(*pData, BrightnessRGB(bmp, *width, *height, *bpp, br, rc, gc, bc) + hsize, memWidth * (*height));
+		free(bmp);
+
+	} else if (type == 1) {
+
+		for (int i = 0; i < *height; i ++) {
+			memcpy((*pData) + memWidth * i, BrightnessRGB((BYTE*)row_pointers[i], *width, 1, *bpp, br, rc, gc, bc), memWidth);
+		}
+		png_destroy_read_struct(&png_ptr, &info_ptr, 0);
 	}
-
-	png_destroy_read_struct(&png_ptr, &info_ptr, 0);
 
 	if (fp) {
 		fclose(fp);
@@ -213,7 +322,7 @@ HBITMAP CPngImage::TypeLoadImage(BYTE** pData, int* width, int* height, int* bpp
 	return hbm;
 }
 
-HBITMAP CPngImage::LoadExternalImage(CString fn)
+HBITMAP CPngImage::LoadExternalImage(CString fn, int br, int rc, int gc, int bc)
 {
 	CString path = LoadCurrentPath();
 
@@ -222,15 +331,14 @@ HBITMAP CPngImage::LoadExternalImage(CString fn)
 
 	FILE* fp = _tfopen(path + fn + _T(".png"), _T("rb"));
 	if (fp) {
-		return TypeLoadImage(&pData, &width, &height, &bpp, fp, 0);
+		return TypeLoadImage(1, &pData, &width, &height, &bpp, fp, 0, br, rc, gc, bc);
 	} else {
 		fp = _tfopen(path + fn + _T(".bmp"), _T("rb"));
 		if (fp) {
-			fclose(fp);
-			return (HBITMAP)LoadImage(NULL, path + fn + _T(".bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+			return TypeLoadImage(0, &pData, &width, &height, &bpp, fp, 0, br, rc, gc, bc);
 		} else {
 			if (AfxGetAppSettings().fDisableXPToolbars) {
-				return TypeLoadImage(&pData, &width, &height, &bpp, NULL, 200);
+				return TypeLoadImage(1, &pData, &width, &height, &bpp, NULL, IDB_PLAYERTOOLBAR_PNG, br, rc, gc, bc);
 			} else {
 				return NULL;
 			}
@@ -240,12 +348,22 @@ HBITMAP CPngImage::LoadExternalImage(CString fn)
 
 void CPngImage::LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop, int br, int rc, int gc, int bc)
 {
+	CString path = LoadCurrentPath();
+
 	BYTE* pData;
 	int width, height, bpp;
 
-	FILE* fp = _tfopen(LoadCurrentPath() + fn + _T(".png"), _T("rb"));
+	FILE* fp = _tfopen(path + fn + _T(".png"), _T("rb"));
 	if (fp) {
-		TypeLoadImage(&pData, &width, &height, &bpp, fp, 0);
+		TypeLoadImage(1, &pData, &width, &height, &bpp, fp, 0, br, rc, gc, bc);
+	} else {
+		fp = _tfopen(path + fn + _T(".bmp"), _T("rb"));
+		if (fp) {
+			TypeLoadImage(0, &pData, &width, &height, &bpp, fp, 0, br, rc, gc, bc);
+		}
+	}
+
+	if (fp) {
 
 		GRADIENT_RECT gr[1] = {{0, 1}};
 
@@ -255,16 +373,16 @@ void CPngImage::LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop, int
 		if (width > height) {
 			for (int k = sp, t = 0; t < r.right; k += hs, t += st) {
 				TRIVERTEX tv[2] = {
-					{t, 0, (br + pData[k + 2]) * rc, (br + pData[k + 1]) * gc, (br + pData[k]) * bc, pa},
-					{t + st, 1, (br + pData[k + hs + 2]) * rc, (br + pData[k + hs + 1]) * gc, (br + pData[k + hs]) * bc, pa},
+					{t, 0, pData[k + 2] * 256, pData[k + 1] * 256, pData[k] * 256, pa},
+					{t + st, 1, pData[k + hs + 2] * 256, pData[k + hs + 1] * 256, pData[k + hs] * 256, pa},
 				};
 				dc->GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_H);
 			}
 		} else {
 			for (int k = sp, t = 0; t < r.bottom; k += hs, t += st) {
 				TRIVERTEX tv[2] = {
-					{r.left, t, (br + pData[k + 2]) * rc, (br + pData[k + 1]) * gc, (br + pData[k]) * bc, pa},
-					{r.right, t + st, (br + pData[k + hs + 2]) * rc, (br + pData[k + hs + 1]) * gc, (br + pData[k + hs]) * bc, pa},
+					{r.left, t, pData[k + 2] * 256, pData[k + 1] * 256, pData[k] * 256, pa},
+					{r.right, t + st, pData[k + hs + 2] * 256, pData[k + hs + 1] * 256, pData[k + hs] * 256, pa},
 				};
 				dc->GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 			}

@@ -278,7 +278,9 @@ void CPlayerSeekBar::OnPaint()
 		iThemeGreen = AfxGetAppSettings().nThemeGreen;
 		iThemeBlue = AfxGetAppSettings().nThemeBlue;
 		bFileNameOnSeekBar = AfxGetAppSettings().fFileNameOnSeekBar;
+
 		GRADIENT_RECT gr[1] = {{0, 1}};
+		int pa = 255 * 256;
 
 		int fp = m_logobm.FileExists("background");
 
@@ -286,8 +288,8 @@ void CPlayerSeekBar::OnPaint()
 			m_logobm.LoadExternalGradient("background", &memdc, r, 0, iThemeBrightness, iThemeRed, iThemeGreen, iThemeBlue);
 		} else {
 			TRIVERTEX tv[2] = {
-				{r.left, r.top, (iThemeBrightness+65)*iThemeRed, (iThemeBrightness+70)*iThemeGreen, (iThemeBrightness+75)*iThemeBlue, 255*256},
-				{r.right, r.bottom, (iThemeBrightness+0)*iThemeRed, (iThemeBrightness+5)*iThemeGreen, (iThemeBrightness+10)*iThemeBlue, 255*256},
+				{r.left, r.top, (iThemeBrightness+65)*iThemeRed, (iThemeBrightness+70)*iThemeGreen, (iThemeBrightness+75)*iThemeBlue, pa},
+				{r.right, r.bottom, (iThemeBrightness+0)*iThemeRed, (iThemeBrightness+5)*iThemeGreen, (iThemeBrightness+10)*iThemeBlue, pa},
 			};
 			memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 		}
@@ -320,12 +322,23 @@ void CPlayerSeekBar::OnPaint()
 		if (fEnabled) {
 
 			int ct = 20;
-			iThemeBrightness = iThemeBrightness + (ct * 2);
 
-			for (int j = rc.left + 1; j < nposx; j++) {
+			if (NULL != fp) {
+				int ThemeBrightness = iThemeBrightness + (ct * 2);
+				rc.right = nposx;
+				rc.left = rc.left + 1;
+				rc.top = rc.top + 2;
+				rc.bottom = rc.bottom - 1;
+
+				m_logobm.LoadExternalGradient("background", &memdc, rc, 0, ThemeBrightness, iThemeRed, iThemeGreen, iThemeBlue);
+
+				rc = GetChannelRect();
+			} else {
+				iThemeBrightness = iThemeBrightness + (ct * 2);
+
 				TRIVERTEX tv[2] = {
-					{j, rc.top + 2, (iThemeBrightness+65)*iThemeRed, (iThemeBrightness+70)*iThemeGreen, (iThemeBrightness+75)*iThemeBlue, 255*256},
-					{j + 1, rc.bottom - 1, (iThemeBrightness+0-ct)*iThemeRed, (iThemeBrightness+5-ct)*iThemeGreen, (iThemeBrightness+10-ct)*iThemeBlue, 255*256},
+					{rc.left + 1, rc.top + 2, (iThemeBrightness+65)*iThemeRed, (iThemeBrightness+70)*iThemeGreen, (iThemeBrightness+75)*iThemeBlue, pa},
+					{nposx, rc.bottom - 1, (iThemeBrightness+0-ct)*iThemeRed, (iThemeBrightness+5-ct)*iThemeGreen, (iThemeBrightness+10-ct)*iThemeBlue, pa},
 				};
 				memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 			}
