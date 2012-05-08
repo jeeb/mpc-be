@@ -5516,7 +5516,7 @@ void CMainFrame::OnViewResetStats()
 void CMainFrame::OnViewDisplayStatsSC()
 {
 	if (!AfxGetMyApp()->m_Renderers.m_fDisplayStats) {
-		AfxGetMyApp()->m_Renderers.m_bResetStats = true; // to Reset statictics on first call ...
+		AfxGetMyApp()->m_Renderers.m_bResetStats = true; // to Reset statistics on first call ...
 	}
 
 	++AfxGetMyApp()->m_Renderers.m_fDisplayStats;

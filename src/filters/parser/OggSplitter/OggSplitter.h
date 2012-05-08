@@ -189,13 +189,21 @@ public:
 
 class COggDiracOutputPin : public COggSplitterOutputPin
 {
-	REFERENCE_TIME m_rtAvgTimePerFrame;
+	REFERENCE_TIME	m_rtAvgTimePerFrame;
+	bool			m_bOldDirac;
+	bool			m_IsInitialized;
 
 	virtual HRESULT UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, int len);
 	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
 
 public:
 	COggDiracOutputPin(BYTE* p, int nCount, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
+
+	HRESULT UnpackInitPage(OggPage& page);
+	bool IsInitialized() {
+		return m_IsInitialized;
+	}
+	HRESULT InitDirac(BYTE* p, int nCount);
 };
 
 class __declspec(uuid("9FF48807-E133-40AA-826F-9B2959E5232D"))

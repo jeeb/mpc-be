@@ -262,13 +262,23 @@ HRESULT COggSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					pPinOut.Attach(DNew COggFlacOutputPin(p, page.GetCount(), name, this, this, &hr));
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 				}
-			} else if (*(long*)(p-1) == 0x44434242) {
+			} else if (!memcmp(page.GetData(), "BBCD\x00", 5) || !memcmp(page.GetData(), "KW-DIRAC\x00", 9)) {
 				name.Format(L"Dirac %d", i);
 				CAutoPtr<CBaseSplitterOutputPin> pPinOut;
 				pPinOut.Attach(DNew COggDiracOutputPin(page.GetData(), page.GetCount(), name, this, this, &hr));
 				AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
-			} else if (!(type&1) && nWaitForMore == 0) {
+				nWaitForMore++;
+			} else if (!(type&1) && nWaitForMore <= 0) {
 				break;
+			}
+		}
+
+		if (COggDiracOutputPin* p = dynamic_cast<COggDiracOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
+			if (!p->IsInitialized()) {
+				p->UnpackInitPage(page);
+				if (p->IsInitialized()) {
+					nWaitForMore--;
+				}
 			}
 		}
 
@@ -726,7 +736,7 @@ HRESULT COggSplitterOutputPin::UnpackPage(OggPage& page)
 					// but these seem to cancel eachother out nicely so we can just ignore them
 					// to make it play a bit more smooth.
 					if (abs(rtLast - m_rtLast) == GetRefTime(1)) {
-						m_rtLast = rtLast;    // FIXME
+						m_rtLast = rtLast;	// FIXME
 					}
 					m_fSkip = false;
 				}
@@ -1342,13 +1352,41 @@ HRESULT COggTheoraOutputPin::UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, i
 COggDiracOutputPin::COggDiracOutputPin(BYTE* p, int nCount, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: COggSplitterOutputPin(pName, pFilter, pLock, phr)
 {
+	m_bOldDirac		= false;
+	m_IsInitialized	= false;
+
+	m_bOldDirac = !memcmp(p, "KW-DIRAC\x00", 9);
+}
+
+HRESULT COggDiracOutputPin::UnpackInitPage(OggPage& page)
+{
+	HRESULT hr = __super::UnpackPage(page);
+
+	while (m_packets.GetCount() && !m_IsInitialized) {
+		Packet* p = m_packets.GetHead();
+		BYTE* buf = p->GetData();
+		
+		if (!memcmp(buf, "BBCD\x00", 5)) {
+			m_IsInitialized = SUCCEEDED(InitDirac(buf, p->GetCount()));
+		}
+
+		m_packets.RemoveHead();
+	}
+
+	return hr;
+}
+
+HRESULT COggDiracOutputPin::InitDirac(BYTE* p, int nCount)
+{
+	HRESULT hr = S_OK;
+
 	unsigned width;
 	unsigned height;
 
 	CGolombBuffer gb(p+13, nCount-13);
 	
 	if(!ParseDiracHeader(gb, &width, &height, &m_rtAvgTimePerFrame)) {
-		return;
+		return S_FALSE;
 	}
 
 	CMediaType mt;
@@ -1371,12 +1409,24 @@ COggDiracOutputPin::COggDiracOutputPin(BYTE* p, int nCount, LPCWSTR pName, CBase
 
 	mt.bFixedSizeSamples = 0;
 	m_mts.Add(mt);
+
+	m_IsInitialized = true;
+
+	return hr;
 }
 
 REFERENCE_TIME COggDiracOutputPin::GetRefTime(__int64 granule_position)
 {
-	REFERENCE_TIME dts = (granule_position >> 31);
-	REFERENCE_TIME pts = (dts + ((granule_position >> 9) & 0x1fff)) * m_rtAvgTimePerFrame / 2;
+	REFERENCE_TIME pts = 0;
+	
+	if (m_bOldDirac) {
+		__int64 iframe = granule_position >> 30;
+		__int64 pframe = granule_position & 0x3fffffff;
+		pts = (iframe + pframe) * m_rtAvgTimePerFrame;
+	} else {
+		REFERENCE_TIME dts = (granule_position >> 31);
+		pts = (dts + ((granule_position >> 9) & 0x1fff)) * m_rtAvgTimePerFrame / 2;
+	}
 
 	return pts;
 }
