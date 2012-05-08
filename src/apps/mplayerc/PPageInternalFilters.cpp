@@ -47,6 +47,7 @@ static filter_t s_filters[] = {
 	{_T("MPEG PS/TS/PVA"), SOURCE_FILTER, SOURCE, SRC_MPEG, 0, CreateInstance<CMpegSplitterFilter>},
 	{_T("Ogg"), SOURCE_FILTER, SOURCE, SRC_OGG, 0, NULL},
 	{_T("RealMedia"), SOURCE_FILTER, SOURCE, SRC_REALMEDIA, IDS_SRC_REALMEDIA, NULL},
+	{_T("RoQ"), SOURCE_FILTER, SOURCE, SRC_ROQ, IDS_SRC_ROQ, NULL},
 	{_T("SHOUTcast"), SOURCE_FILTER, SOURCE, SRC_SHOUTCAST, 0, NULL},
 
 // Audio decoder

@@ -1401,6 +1401,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 		m_source.AddTail(pFGF);
 	}
 
+	if (src[SRC_ROQ]) {
+		pFGF = DNew CFGFilterInternal<CRoQSourceFilter>();
+		pFGF->m_chkbytes.AddTail(_T("0,8,,8410FFFFFFFF1E00"));
+		m_source.AddTail(pFGF);
+	}
+
 	if (src[SRC_DSM]) {
 		pFGF = DNew CFGFilterInternal<CDSMSourceFilter>();
 		pFGF->m_chkbytes.AddTail(_T("0,4,,44534D53"));
@@ -1513,6 +1519,15 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 		pFGF = DNew CFGFilterInternal<CRealMediaSplitterFilter>(LowMerit(RMSplitterName), MERIT64_DO_USE);
 	}
 	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_RealMedia);
+	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
+	m_transform.AddTail(pFGF);
+
+	if (src[SRC_ROQ]) {
+		pFGF = DNew CFGFilterInternal<CRoQSplitterFilter>(L"RoQ Splitter", MERIT64_ABOVE_DSHOW);
+	} else {
+		pFGF = DNew CFGFilterInternal<CRoQSplitterFilter>(L"RoQ Splitter (low merit)", MERIT64_DO_USE);
+	}
+	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_RoQ);
 	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
 	m_transform.AddTail(pFGF);
 
@@ -1709,6 +1724,18 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_DNET);
 	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_SIPR);
 	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_RAAC);
+	m_transform.AddTail(pFGF);
+
+	pFGF = DNew CFGFilterInternal<CRoQVideoDecoder>(
+		(tra[TRA_RV]) ? ResStr(IDS_FGMANAGER_12) : L"RoQ Video Decoder (low merit)",
+		(tra[TRA_RV]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_RoQV);
+	m_transform.AddTail(pFGF);
+
+	pFGF = DNew CFGFilterInternal<CRoQAudioDecoder>(
+		(tra[TRA_RA]) ? ResStr(IDS_FGMANAGER_13) : L"RoQ Audio Decoder (low merit)",
+		(tra[TRA_RA]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_RoQA);
 	m_transform.AddTail(pFGF);
 
 	pFGF = DNew CFGFilterInternal<CMpaDecFilter>(

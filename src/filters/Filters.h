@@ -35,6 +35,7 @@
 #include "parser/MpegSplitter/MpegSplitter.h"
 #include "parser/OggSplitter/OggSplitter.h"
 #include "parser/RealMediaSplitter/RealMediaSplitter.h"
+#include "parser/RoQSplitter/RoQSplitter.h"
 #include "parser/StreamDriveThru/StreamDriveThru.h"
 #include "reader/CDDAReader/CDDAReader.h"
 #include "reader/CDXAReader/CDXAReader.h"
