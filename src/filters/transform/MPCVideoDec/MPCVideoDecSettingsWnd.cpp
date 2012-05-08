@@ -501,59 +501,78 @@ bool CMPCVideoDecCodecWnd::OnActivate()
 	m_lstCodecs.AddString (_T("H.264/AVC (DXVA)"));
 	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_H264_DXVA) != 0);
 
+	m_lstCodecs.AddString (_T("MPEG2 (DXVA)"));
+	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_MPEG2_DXVA) != 0);
+
 	m_lstCodecs.AddString (_T("VC1 (DXVA)"));
 	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_VC1_DXVA) != 0);
 
 	m_lstCodecs.AddString (_T("WMV3 (DXVA)"));
 	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_WMV3_DXVA) != 0);
 
-	m_lstCodecs.AddString (_T("MPEG2 (DXVA)"));
-	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_MPEG2_DXVA) != 0);
+
+	m_lstCodecs.AddString (_T("AMV video"));
+	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_AMVV) != 0);
+
+	m_lstCodecs.AddString (_T("Dirac"));
+	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_DIRAC) != 0);
+
+	m_lstCodecs.AddString (_T("DivX"));
+	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_DIVX) != 0);
+
+	m_lstCodecs.AddString (_T("DV video"));
+	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_DV) != 0);
+
+	m_lstCodecs.AddString (_T("FLV1/4"));
+	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_FLASH) != 0);
+
+	m_lstCodecs.AddString (_T("H.263"));
+	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_H263) != 0);
 
 	m_lstCodecs.AddString (_T("H.264/AVC (FFmpeg)"));
 	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_H264) != 0);
 
+	m_lstCodecs.AddString (_T("Indeo 3/4/5"));
+	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_INDEO) != 0);
+
+	m_lstCodecs.AddString (_T("Lagarith"));
+	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_LAGARITH) != 0);
+
+	m_lstCodecs.AddString (_T("MJPEG"));
+	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_MJPEG) != 0);
+
+	m_lstCodecs.AddString (_T("MS-MPEG4"));
+	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_MSMPEG4) != 0);
+
+	m_lstCodecs.AddString (_T("Screen Recorder (CSCD/TSCC/QTRle)"));
+	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_SCREC) != 0);
+
+	m_lstCodecs.AddString (_T("SVQ1/3"));
+	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_SVQ3) != 0);
+
+	m_lstCodecs.AddString (_T("Theora"));
+	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_THEORA) != 0);
+
+	m_lstCodecs.AddString (_T("Ut video"));
+	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_UTVD) != 0);
+
 	m_lstCodecs.AddString (_T("VC1 (FFmpeg)"));
 	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_VC1) != 0);
 
-	m_lstCodecs.AddString (_T("Xvid/MPEG-4"));
-	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_XVID) != 0);
-	m_lstCodecs.AddString (_T("DivX"));
-	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_DIVX) != 0);
-	m_lstCodecs.AddString (_T("MS-MPEG4"));
-	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_MSMPEG4) != 0);
-	m_lstCodecs.AddString (_T("FLV1/4"));
-	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_FLASH) != 0);
 	m_lstCodecs.AddString (_T("VP3/5/6"));
 	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_VP356) != 0);
+
 	m_lstCodecs.AddString (_T("VP8"));
 	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_VP8) != 0);
+
 	m_lstCodecs.AddString (_T("WMV1/2/3"));
 	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_WMV) != 0);
-	m_lstCodecs.AddString (_T("H.263"));
-	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_H263) != 0);
-	m_lstCodecs.AddString (_T("SVQ1/3"));
-	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_SVQ3) != 0);
-	m_lstCodecs.AddString (_T("AMV video"));
-	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_DIRAC) != 0);
-	m_lstCodecs.AddString (_T("Dirac"));
-	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_DV) != 0);
-	m_lstCodecs.AddString (_T("DV video"));
-	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_AMVV) != 0);
-	m_lstCodecs.AddString (_T("Theora"));
-	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_THEORA) != 0);
-	m_lstCodecs.AddString (_T("MJPEG"));
-	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_MJPEG) != 0);
-	m_lstCodecs.AddString (_T("Indeo 3/4/5"));
-	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_INDEO) != 0);
-	m_lstCodecs.AddString (_T("Screen Recorder (CSCD/TSCC/QTRle)"));
-	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_SCREC) != 0);
-	m_lstCodecs.AddString (_T("Ut video"));
-	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_UTVD) != 0);
+
+	m_lstCodecs.AddString (_T("Xvid/MPEG-4"));
+	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_XVID) != 0);
+
 	m_lstCodecs.AddString (_T("Real Video"));
 	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_RV) != 0);
-	m_lstCodecs.AddString (_T("Lagarith"));
-	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_LAGARITH) != 0);
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
 		pWnd->SetFont(&m_font, FALSE);
@@ -577,38 +596,63 @@ bool CMPCVideoDecCodecWnd::OnApply()
 		if (m_lstCodecs.GetCheck  (nPos++)) {
 			nActiveCodecs |= MPCVD_H264_DXVA;
 		}
-
+		if (m_lstCodecs.GetCheck  (nPos++)) {
+			nActiveCodecs |= MPCVD_MPEG2_DXVA;
+		}
 		if (m_lstCodecs.GetCheck  (nPos++)) {
 			nActiveCodecs |= MPCVD_VC1_DXVA;
 		}
-
 		if (m_lstCodecs.GetCheck  (nPos++)) {
 			nActiveCodecs |= MPCVD_WMV3_DXVA;
 		}
 
 		if (m_lstCodecs.GetCheck  (nPos++)) {
-			nActiveCodecs |= MPCVD_MPEG2_DXVA;
+			nActiveCodecs |= MPCVD_AMVV;
 		}
-
 		if (m_lstCodecs.GetCheck  (nPos++)) {
-			nActiveCodecs |= MPCVD_H264;
-		}
-
-		if (m_lstCodecs.GetCheck  (nPos++)) {
-			nActiveCodecs |= MPCVD_VC1;
-		}
-
-		if (m_lstCodecs.GetCheck  (nPos++)) {
-			nActiveCodecs |= MPCVD_XVID;
+			nActiveCodecs |= MPCVD_DIRAC;
 		}
 		if (m_lstCodecs.GetCheck  (nPos++)) {
 			nActiveCodecs |= MPCVD_DIVX;
 		}
 		if (m_lstCodecs.GetCheck  (nPos++)) {
-			nActiveCodecs |= MPCVD_MSMPEG4;
+			nActiveCodecs |= MPCVD_DV;
 		}
 		if (m_lstCodecs.GetCheck  (nPos++)) {
 			nActiveCodecs |= MPCVD_FLASH;
+		}
+		if (m_lstCodecs.GetCheck  (nPos++)) {
+			nActiveCodecs |= MPCVD_H263;
+		}
+		if (m_lstCodecs.GetCheck  (nPos++)) {
+			nActiveCodecs |= MPCVD_H264;
+		}
+		if (m_lstCodecs.GetCheck  (nPos++)) {
+			nActiveCodecs |= MPCVD_INDEO;
+		}
+		if (m_lstCodecs.GetCheck  (nPos++)) {
+			nActiveCodecs |= MPCVD_LAGARITH;
+		}
+		if (m_lstCodecs.GetCheck  (nPos++)) {
+			nActiveCodecs |= MPCVD_MJPEG;
+		}
+		if (m_lstCodecs.GetCheck  (nPos++)) {
+			nActiveCodecs |= MPCVD_MSMPEG4;
+		}
+		if (m_lstCodecs.GetCheck  (nPos++)) {
+			nActiveCodecs |= MPCVD_SCREC;
+		}
+		if (m_lstCodecs.GetCheck  (nPos++)) {
+			nActiveCodecs |= MPCVD_SVQ3;
+		}
+		if (m_lstCodecs.GetCheck  (nPos++)) {
+			nActiveCodecs |= MPCVD_THEORA;
+		}
+		if (m_lstCodecs.GetCheck  (nPos++)) {
+			nActiveCodecs |= MPCVD_UTVD;
+		}
+		if (m_lstCodecs.GetCheck  (nPos++)) {
+			nActiveCodecs |= MPCVD_VC1;
 		}
 		if (m_lstCodecs.GetCheck  (nPos++)) {
 			nActiveCodecs |= MPCVD_VP356;
@@ -618,36 +662,12 @@ bool CMPCVideoDecCodecWnd::OnApply()
 		}
 		if (m_lstCodecs.GetCheck  (nPos++)) {
 			nActiveCodecs |= MPCVD_WMV;
-		}
+		}		
 		if (m_lstCodecs.GetCheck  (nPos++)) {
-			nActiveCodecs |= MPCVD_H263;
-		}
-		if (m_lstCodecs.GetCheck  (nPos++)) {
-			nActiveCodecs |= MPCVD_SVQ3;
-		}
-		if (m_lstCodecs.GetCheck  (nPos++)) {
-			nActiveCodecs |= MPCVD_AMVV;
-		}
-		if (m_lstCodecs.GetCheck  (nPos++)) {
-			nActiveCodecs |= MPCVD_DIRAC;
-		}
-		if (m_lstCodecs.GetCheck  (nPos++)) {
-			nActiveCodecs |= MPCVD_DV;
-		}
-		if (m_lstCodecs.GetCheck  (nPos++)) {
-			nActiveCodecs |= MPCVD_THEORA;
-		}
-		if (m_lstCodecs.GetCheck  (nPos++)) {
-			nActiveCodecs |= MPCVD_MJPEG;
-		}
-		if (m_lstCodecs.GetCheck  (nPos++)) {
-			nActiveCodecs |= MPCVD_INDEO;
+			nActiveCodecs |= MPCVD_XVID;
 		}
 		if (m_lstCodecs.GetCheck  (nPos++)) {
 			nActiveCodecs |= MPCVD_RV;
-		}
-		if (m_lstCodecs.GetCheck  (nPos++)) {
-			nActiveCodecs |= MPCVD_LAGARITH;
 		}
 
 		m_pMDF->SetActiveCodecs ((MPC_VIDEO_CODEC)nActiveCodecs);
