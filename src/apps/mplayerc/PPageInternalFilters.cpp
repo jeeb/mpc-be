@@ -31,71 +31,71 @@
 static filter_t s_filters[] = {
 
 // Source filters
-	{_T("AVI"), SOURCE_FILTER, SOURCE, SRC_AVI, IDS_SRC_AVI, NULL},
-	{_T("CDDA (Audio CD)"), SOURCE_FILTER, SOURCE, SRC_CDDA, IDS_SRC_CDDA, NULL},
-	{_T("CDXA (VCD/SVCD/XCD)"), SOURCE_FILTER, SOURCE, SRC_CDXA, 0, NULL},
-	{_T("DirectShow Media"), SOURCE_FILTER, SOURCE, SRC_DSM, 0, NULL},
-	{_T("DTS/AC3"), SOURCE_FILTER, SOURCE, SRC_DTSAC3, 0, NULL},
-	{_T("DVD Video Title Set"), SOURCE_FILTER, SOURCE, SRC_VTS, IDS_SRC_VTS, NULL},
-	{_T("DVD2AVI Project File"), SOURCE_FILTER, SOURCE, SRC_D2V, 0, NULL},
-	{_T("FLI/FLC"), SOURCE_FILTER, SOURCE, SRC_FLIC, 0, NULL},
-	{_T("FLAC"), SOURCE_FILTER, SOURCE, SRC_FLAC, 0, NULL},
-	{_T("FLV"), SOURCE_FILTER, SOURCE, SRC_FLV, 0, NULL},
-	{_T("Matroska"), SOURCE_FILTER, SOURCE, SRC_MATROSKA, 0, NULL},
-	{_T("MP4/MOV"), SOURCE_FILTER, SOURCE, SRC_MP4, 0, NULL},
-	{_T("MPEG Audio"), SOURCE_FILTER, SOURCE, SRC_MPA, IDS_SRC_MPA, NULL},
-	{_T("MPEG PS/TS/PVA"), SOURCE_FILTER, SOURCE, SRC_MPEG, 0, CreateInstance<CMpegSplitterFilter>},
-	{_T("Ogg"), SOURCE_FILTER, SOURCE, SRC_OGG, 0, NULL},
-	{_T("RealMedia"), SOURCE_FILTER, SOURCE, SRC_REALMEDIA, IDS_SRC_REALMEDIA, NULL},
-	{_T("RoQ"), SOURCE_FILTER, SOURCE, SRC_ROQ, IDS_SRC_ROQ, NULL},
-	{_T("SHOUTcast"), SOURCE_FILTER, SOURCE, SRC_SHOUTCAST, 0, NULL},
+	{_T("AVI"),                   SOURCE_FILTER,  SOURCE, SRC_AVI,        IDS_SRC_AVI},
+	{_T("CDDA (Audio CD)"),       SOURCE_FILTER,  SOURCE, SRC_CDDA,       IDS_SRC_CDDA},
+	{_T("CDXA (VCD/SVCD/XCD)"),   SOURCE_FILTER,  SOURCE, SRC_CDXA,       0},
+	{_T("DirectShow Media"),      SOURCE_FILTER,  SOURCE, SRC_DSM,        0},
+	{_T("DTS/AC3"),               SOURCE_FILTER,  SOURCE, SRC_DTSAC3,     0},
+	{_T("DVD Video Title Set"),   SOURCE_FILTER,  SOURCE, SRC_VTS,        IDS_SRC_VTS},
+	{_T("DVD2AVI Project File"),  SOURCE_FILTER,  SOURCE, SRC_D2V,        0},
+	{_T("FLI/FLC"),               SOURCE_FILTER,  SOURCE, SRC_FLIC,       0},
+	{_T("FLAC"),                  SOURCE_FILTER,  SOURCE, SRC_FLAC,       0},
+	{_T("FLV"),                   SOURCE_FILTER,  SOURCE, SRC_FLV,        0},
+	{_T("Matroska"),              SOURCE_FILTER,  SOURCE, SRC_MATROSKA,   0},
+	{_T("MP4/MOV"),               SOURCE_FILTER,  SOURCE, SRC_MP4,        0},
+	{_T("MPEG Audio"),            SOURCE_FILTER,  SOURCE, SRC_MPA,        IDS_SRC_MPA},
+	{_T("MPEG PS/TS/PVA"),        SOURCE_FILTER,  SOURCE, SRC_MPEG,       0},
+	{_T("Ogg"),                   SOURCE_FILTER,  SOURCE, SRC_OGG,        0},
+	{_T("RealMedia"),             SOURCE_FILTER,  SOURCE, SRC_REALMEDIA,  IDS_SRC_REALMEDIA},
+	{_T("RoQ"),                   SOURCE_FILTER,  SOURCE, SRC_ROQ,        IDS_SRC_ROQ},
+	{_T("SHOUTcast"),             SOURCE_FILTER,  SOURCE, SRC_SHOUTCAST,  0},
 
 // Audio decoder
-	{_T("AAC"), FFMPEG_DECODER, AUDIO, FFM_AAC, IDS_TRA_FFMPEG, CreateInstance<CMpaDecFilter>},
-	{_T("AC3"), DECODER, AUDIO, TRA_AC3, IDS_TRA_AC3, CreateInstance<CMpaDecFilter>},
-	{_T("ALAC"), FFMPEG_DECODER, AUDIO, FFM_ALAC, IDS_TRA_FFMPEG, CreateInstance<CMpaDecFilter>},
-	{_T("ALS"), FFMPEG_DECODER, AUDIO, FFM_ALS, IDS_TRA_FFMPEG, CreateInstance<CMpaDecFilter>},
-	{_T("AMR"), FFMPEG_DECODER, AUDIO, FFM_AMR, IDS_TRA_FFMPEG, CreateInstance<CMpaDecFilter>},
-	{_T("DTS"), DECODER, AUDIO, TRA_DTS, IDS_TRA_DTS, CreateInstance<CMpaDecFilter>},
-	{_T("FLAC"), DECODER, AUDIO, TRA_FLAC, 0, NULL /* TODO: CreateInstance<CMpaDecFilter>*/},
-	{_T("LPCM"), DECODER, AUDIO, TRA_LPCM, IDS_TRA_LPCM, CreateInstance<CMpaDecFilter>},
-	{_T("MPEG Audio"), FFMPEG_DECODER, AUDIO, FFM_MPA, IDS_TRA_FFMPEG, CreateInstance<CMpaDecFilter>},
-	{_T("Nellymoser"), FFMPEG_DECODER, AUDIO, FFM_NELLY, IDS_TRA_FFMPEG, CreateInstance<CMpaDecFilter>},
-	{_T("PS2 Audio (PCM/ADPCM)"), DECODER, AUDIO, TRA_PS2AUD, IDS_TRA_PS2AUD, CreateInstance<CMpaDecFilter>},
-	{_T("RealAudio"), DECODER, AUDIO, TRA_RA, IDS_TRA_RA, NULL},
-	{_T("Vorbis"), FFMPEG_DECODER, AUDIO, FFM_VORBIS, IDS_TRA_FFMPEG, CreateInstance<CMpaDecFilter>},
-	{_T("Other PCM/ADPCM"), DECODER, AUDIO, TRA_PCM, IDS_TRA_FFMPEG, CreateInstance<CMpaDecFilter>},
+	{_T("AAC"),                   FFMPEG_DECODER, AUDIO,  FFM_AAC,        IDS_TRA_FFMPEG,},
+	{_T("AC3"),                   DECODER,        AUDIO,  TRA_AC3,        IDS_TRA_AC3,},
+	{_T("ALAC"),                  FFMPEG_DECODER, AUDIO,  FFM_ALAC,       IDS_TRA_FFMPEG,},
+	{_T("ALS"),                   FFMPEG_DECODER, AUDIO,  FFM_ALS,        IDS_TRA_FFMPEG,},
+	{_T("AMR"),                   FFMPEG_DECODER, AUDIO,  FFM_AMR,        IDS_TRA_FFMPEG,},
+	{_T("DTS"),                   DECODER,        AUDIO,  TRA_DTS,        IDS_TRA_DTS,},
+	{_T("FLAC"),                  DECODER,        AUDIO,  TRA_FLAC,       0},
+	{_T("LPCM"),                  DECODER,        AUDIO,  TRA_LPCM,       IDS_TRA_LPCM,},
+	{_T("MPEG Audio"),            FFMPEG_DECODER, AUDIO,  FFM_MPA,        IDS_TRA_FFMPEG,},
+	{_T("Nellymoser"),            FFMPEG_DECODER, AUDIO,  FFM_NELLY,      IDS_TRA_FFMPEG,},
+	{_T("PS2 Audio (PCM/ADPCM)"), DECODER,        AUDIO,  TRA_PS2AUD,     IDS_TRA_PS2AUD,},
+	{_T("RealAudio"),             DECODER,        AUDIO,  TRA_RA,         IDS_TRA_RA},
+	{_T("Vorbis"),                FFMPEG_DECODER, AUDIO,  FFM_VORBIS,     IDS_TRA_FFMPEG,},
+	{_T("Other PCM/ADPCM"),       DECODER,        AUDIO,  TRA_PCM,        IDS_TRA_FFMPEG,},
 
 // DXVA decoder
-	{_T("H264/AVC (DXVA)"), DXVA_DECODER, VIDEO, TRA_DXVA_H264, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
-	{_T("MPEG-2 Video (DXVA)"), DXVA_DECODER, VIDEO, TRA_DXVA_MPEG2, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
-	{_T("VC1 (DXVA)"), DXVA_DECODER, VIDEO, TRA_DXVA_VC1, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
-	{_T("WMV3 (DXVA)"), DXVA_DECODER, VIDEO, TRA_DXVA_WMV3, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
+	{_T("H264/AVC (DXVA)"),       DXVA_DECODER,   VIDEO,  TRA_DXVA_H264,  IDS_TRA_FFMPEG},
+	{_T("MPEG-2 Video (DXVA)"),   DXVA_DECODER,   VIDEO,  TRA_DXVA_MPEG2, IDS_TRA_FFMPEG},
+	{_T("VC1 (DXVA)"),            DXVA_DECODER,   VIDEO,  TRA_DXVA_VC1,   IDS_TRA_FFMPEG},
+	{_T("WMV3 (DXVA)"),           DXVA_DECODER,   VIDEO,  TRA_DXVA_WMV3,  IDS_TRA_FFMPEG},
 
 // Video Decoder
-	{_T("AMV video"), FFMPEG_DECODER, VIDEO, FFM_AMVV, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
-	{_T("Dirac"), FFMPEG_DECODER, VIDEO, FFM_DIRAC, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
-	{_T("DivX"), FFMPEG_DECODER, VIDEO, FFM_DIVX, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
-	{_T("DV video"), FFMPEG_DECODER, VIDEO, FFM_DV, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
-	{_T("FLV1/4"), FFMPEG_DECODER, VIDEO, FFM_FLV4, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
-	{_T("H263"), FFMPEG_DECODER, VIDEO, FFM_H263, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
-	{_T("H264/AVC (FFmpeg)"), FFMPEG_DECODER, VIDEO, FFM_H264, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
-	{_T("Indeo 3/4/5"), FFMPEG_DECODER, VIDEO, FFM_INDEO, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
-	{_T("Lagarith"), FFMPEG_DECODER, VIDEO, FFM_LAGARITH, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
-	{_T("MJPEG"), FFMPEG_DECODER, VIDEO, FFM_MJPEG, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
-	{_T("MPEG-1 Video"), DECODER, VIDEO, TRA_MPEG1, IDS_TRA_MPEG1, CreateInstance<CMpeg2DecFilter>},
-	{_T("MPEG-2 Video"), DECODER, VIDEO, TRA_MPEG2, IDS_TRA_MPEG2, CreateInstance<CMpeg2DecFilter>},
-	{_T("MS MPEG-4"), FFMPEG_DECODER, VIDEO, FFM_MSMPEG4, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
-	{_T("Screen Recorder (CSCD/TSCC/QTRle)"), FFMPEG_DECODER, VIDEO, FFM_SCREC, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
-	{_T("SVQ1/3"), FFMPEG_DECODER, VIDEO, FFM_SVQ3, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
-	{_T("Theora"), FFMPEG_DECODER, VIDEO, FFM_THEORA, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
-	{_T("Ut video"), FFMPEG_DECODER, VIDEO, FFM_UTVD, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
-	{_T("VC1 (FFmpeg)"), FFMPEG_DECODER, VIDEO, FFM_VC1, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
-	{_T("VP3/5/6"), FFMPEG_DECODER, VIDEO, FFM_VP356, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
-	{_T("VP8"), FFMPEG_DECODER, VIDEO, FFM_VP8, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
-	{_T("WMV1/2/3"), FFMPEG_DECODER, VIDEO, FFM_WMV, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
-	{_T("Xvid/MPEG-4"), FFMPEG_DECODER, VIDEO, FFM_XVID, IDS_TRA_FFMPEG, CreateInstance<CMPCVideoDecFilter>},
-	{_T("RealVideo"), DECODER, VIDEO, TRA_RV, IDS_TRA_RV, NULL},
+	{_T("AMV video"),             FFMPEG_DECODER, VIDEO,  FFM_AMVV,       IDS_TRA_FFMPEG},
+	{_T("Dirac"),                 FFMPEG_DECODER, VIDEO,  FFM_DIRAC,      IDS_TRA_FFMPEG},
+	{_T("DivX"),                  FFMPEG_DECODER, VIDEO,  FFM_DIVX,       IDS_TRA_FFMPEG},
+	{_T("DV video"),              FFMPEG_DECODER, VIDEO,  FFM_DV,         IDS_TRA_FFMPEG},
+	{_T("FLV1/4"),                FFMPEG_DECODER, VIDEO,  FFM_FLV4,       IDS_TRA_FFMPEG},
+	{_T("H263"),                  FFMPEG_DECODER, VIDEO,  FFM_H263,       IDS_TRA_FFMPEG},
+	{_T("H264/AVC (FFmpeg)"),     FFMPEG_DECODER, VIDEO,  FFM_H264,       IDS_TRA_FFMPEG},
+	{_T("Indeo 3/4/5"),           FFMPEG_DECODER, VIDEO,  FFM_INDEO,      IDS_TRA_FFMPEG},
+	{_T("Lagarith"),              FFMPEG_DECODER, VIDEO,  FFM_LAGARITH,   IDS_TRA_FFMPEG},
+	{_T("MJPEG"),                 FFMPEG_DECODER, VIDEO,  FFM_MJPEG,      IDS_TRA_FFMPEG},
+	{_T("MPEG-1 Video"),          DECODER,        VIDEO,  TRA_MPEG1,      IDS_TRA_MPEG1},
+	{_T("MPEG-2 Video"),          DECODER,        VIDEO,  TRA_MPEG2,      IDS_TRA_MPEG2},
+	{_T("MS MPEG-4"),             FFMPEG_DECODER, VIDEO,  FFM_MSMPEG4,    IDS_TRA_FFMPEG},
+	{_T("Screen Recorder (CSCD/TSCC/QTRle)"), FFMPEG_DECODER, VIDEO, FFM_SCREC, IDS_TRA_FFMPEG},
+	{_T("SVQ1/3"),                FFMPEG_DECODER, VIDEO,  FFM_SVQ3,       IDS_TRA_FFMPEG},
+	{_T("Theora"),                FFMPEG_DECODER, VIDEO,  FFM_THEORA,     IDS_TRA_FFMPEG},
+	{_T("Ut video"),              FFMPEG_DECODER, VIDEO,  FFM_UTVD,       IDS_TRA_FFMPEG},
+	{_T("VC1 (FFmpeg)"),          FFMPEG_DECODER, VIDEO,  FFM_VC1,        IDS_TRA_FFMPEG},
+	{_T("VP3/5/6"),               FFMPEG_DECODER, VIDEO,  FFM_VP356,      IDS_TRA_FFMPEG},
+	{_T("VP8"),                   FFMPEG_DECODER, VIDEO,  FFM_VP8,        IDS_TRA_FFMPEG},
+	{_T("WMV1/2/3"),              FFMPEG_DECODER, VIDEO,  FFM_WMV,        IDS_TRA_FFMPEG},
+	{_T("Xvid/MPEG-4"),           FFMPEG_DECODER, VIDEO,  FFM_XVID,       IDS_TRA_FFMPEG},
+	{_T("RealVideo"),             DECODER,        VIDEO,  TRA_RV,         IDS_TRA_RV},
 
 	{NULL, 0, 0, 0, NULL}
 };
@@ -160,35 +160,6 @@ BOOL CPPageInternalFiltersListBox::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESU
 	*pResult = 0;
 
 	return TRUE;    // message was handled
-}
-
-void CPPageInternalFiltersListBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
-{
-	CDC* pDC = CDC::FromHandle(lpDrawItemStruct->hDC);
-
-	CFont* pOldFont = NULL;
-
-	if ((lpDrawItemStruct->itemData != 0) && ((filter_t*)lpDrawItemStruct->itemData)->CreateInstance) {
-		if (!(HFONT)m_bold) {
-			CFont* pFont = pDC->GetCurrentFont();
-
-			LOGFONT lf;
-			pFont->GetLogFont(&lf);
-			lf.lfWeight = FW_BOLD;
-
-			m_bold.CreateFontIndirect(&lf);
-		}
-
-		if ((HFONT)m_bold) {
-			pOldFont = pDC->SelectObject(&m_bold);
-		}
-	}
-
-	__super::DrawItem(lpDrawItemStruct);
-
-	if (pOldFont) {
-		pDC->SelectObject(pOldFont);
-	}
 }
 
 int CPPageInternalFiltersListBox::AddFilter(filter_t* filter, bool checked)
@@ -361,12 +332,13 @@ void CPPageInternalFilters::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LIST2, m_listVideo);
 	DDX_Control(pDX, IDC_LIST3, m_listAudio);
 	DDX_Control(pDX, IDC_TAB1, m_Tab);
+	DDX_Control(pDX, IDC_BUTTON1, m_btnMpegCfg);
+	DDX_Control(pDX, IDC_BUTTON2, m_btnVideoCfg);
+	DDX_Control(pDX, IDC_BUTTON3, m_btnMPEG2Cfg);
+	DDX_Control(pDX, IDC_BUTTON4, m_btnAudioCfg);
 }
 
 BEGIN_MESSAGE_MAP(CPPageInternalFilters, CPPageBase)
-	ON_LBN_DBLCLK(IDC_LIST1, OnLbnDblclkList1)
-	ON_LBN_DBLCLK(IDC_LIST2, OnLbnDblclkList2)
-	ON_LBN_DBLCLK(IDC_LIST3, OnLbnDblclkList3)
 	ON_LBN_SELCHANGE(IDC_LIST1, OnSelChange)
 	ON_LBN_SELCHANGE(IDC_LIST2, OnSelChange)
 	ON_LBN_SELCHANGE(IDC_LIST3, OnSelChange)
@@ -374,6 +346,10 @@ BEGIN_MESSAGE_MAP(CPPageInternalFilters, CPPageBase)
 	ON_CLBN_CHKCHANGE(IDC_LIST2, OnCheckBoxChange)
 	ON_CLBN_CHKCHANGE(IDC_LIST3, OnCheckBoxChange)
 	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB1, &CPPageInternalFilters::OnTcnSelchangeTab1)
+	ON_BN_CLICKED(IDC_BUTTON1, OnMpegSplitterConfig)
+	ON_BN_CLICKED(IDC_BUTTON2, OnVideoDecConfig)
+	ON_BN_CLICKED(IDC_BUTTON3, OnMPEG2DecConfig)
+	ON_BN_CLICKED(IDC_BUTTON4, OnAudioDecConfig)
 END_MESSAGE_MAP()
 
 // CPPageInternalFilters message handlers
@@ -482,20 +458,14 @@ BOOL CPPageInternalFilters::OnApply()
 	return __super::OnApply();
 }
 
-void CPPageInternalFilters::ShowPPage(CPPageInternalFiltersListBox& l)
+void CPPageInternalFilters::ShowPPage(CUnknown* (WINAPI * CreateInstance)(LPUNKNOWN lpunk, HRESULT* phr))
 {
-	int i = l.GetCurSel();
-	if (i < 0) {
-		return;
-	}
-
-	filter_t* f = (filter_t*)l.GetItemDataPtr(i);
-	if (!f || !f->CreateInstance) {
+	if (!CreateInstance) {
 		return;
 	}
 
 	HRESULT hr;
-	CUnknown* pObj = f->CreateInstance(NULL, &hr);
+	CUnknown* pObj = CreateInstance(NULL, &hr);
 	if (!pObj) {
 		return;
 	}
@@ -509,21 +479,6 @@ void CPPageInternalFilters::ShowPPage(CPPageInternalFiltersListBox& l)
 			ps.DoModal();
 		}
 	}
-}
-
-void CPPageInternalFilters::OnLbnDblclkList1()
-{
-	ShowPPage(m_listSrc);
-}
-
-void CPPageInternalFilters::OnLbnDblclkList2()
-{
-	ShowPPage(m_listVideo);
-}
-
-void CPPageInternalFilters::OnLbnDblclkList3()
-{
-	ShowPPage(m_listAudio);
 }
 
 void CPPageInternalFilters::OnSelChange()
@@ -548,20 +503,55 @@ void CPPageInternalFilters::OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
 			m_listSrc.ShowWindow(SW_SHOW);
 			m_listVideo.ShowWindow(SW_HIDE);
 			m_listAudio.ShowWindow(SW_HIDE);
+
+			m_btnMpegCfg.ShowWindow(SW_SHOW);
+			m_btnVideoCfg.ShowWindow(SW_HIDE);
+			m_btnMPEG2Cfg.ShowWindow(SW_HIDE);
+			m_btnAudioCfg.ShowWindow(SW_HIDE);
 			break;
 		case VIDEO :
 			m_listSrc.ShowWindow(SW_HIDE);
 			m_listVideo.ShowWindow(SW_SHOW);
 			m_listAudio.ShowWindow(SW_HIDE);
+
+			m_btnMpegCfg.ShowWindow(SW_HIDE);
+			m_btnVideoCfg.ShowWindow(SW_SHOW);
+			m_btnMPEG2Cfg.ShowWindow(SW_SHOW);
+			m_btnAudioCfg.ShowWindow(SW_HIDE);
 			break;
 		case AUDIO :
 			m_listSrc.ShowWindow(SW_HIDE);
 			m_listVideo.ShowWindow(SW_HIDE);
 			m_listAudio.ShowWindow(SW_SHOW);
+
+			m_btnMpegCfg.ShowWindow(SW_HIDE);
+			m_btnVideoCfg.ShowWindow(SW_HIDE);
+			m_btnMPEG2Cfg.ShowWindow(SW_HIDE);
+			m_btnAudioCfg.ShowWindow(SW_SHOW);
 			break;
 		default:
 			break;
 	}
 
 	*pResult = 0;
+}
+
+void CPPageInternalFilters::OnMpegSplitterConfig()
+{
+	ShowPPage(CreateInstance<CMpegSplitterFilter>);
+}
+
+void CPPageInternalFilters::OnVideoDecConfig()
+{
+	ShowPPage(CreateInstance<CMPCVideoDecFilter>);
+}
+
+void CPPageInternalFilters::OnMPEG2DecConfig()
+{
+	ShowPPage(CreateInstance<CMpeg2DecFilter>);
+}
+
+void CPPageInternalFilters::OnAudioDecConfig()
+{
+	ShowPPage(CreateInstance<CMpaDecFilter>);
 }

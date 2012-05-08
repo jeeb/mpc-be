@@ -39,7 +39,6 @@ struct filter_t {
 	int filter_type;
 	int flag;
 	UINT nHintID;
-	CUnknown* (WINAPI * CreateInstance)(LPUNKNOWN lpunk, HRESULT* phr);
 };
 
 class CPPageInternalFiltersListBox : public CCheckListBox
@@ -62,7 +61,6 @@ protected:
 	unsigned int m_nbChecked[FILTER_TYPE_NB];
 
 public:
-	virtual void DrawItem(LPDRAWITEMSTRUCT /*lpDrawItemStruct*/);
 	virtual int AddFilter(filter_t* filter, bool checked);
 	virtual void UpdateCheckState();
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
@@ -84,9 +82,14 @@ public:
 	CPPageInternalFiltersListBox m_listVideo;
 	CPPageInternalFiltersListBox m_listAudio;
 
+	CButton m_btnMpegCfg;
+	CButton m_btnVideoCfg;
+	CButton m_btnMPEG2Cfg;
+	CButton m_btnAudioCfg;
+
 	CTabCtrl m_Tab;
 
-	void ShowPPage(CPPageInternalFiltersListBox& l);
+	void ShowPPage(CUnknown* (WINAPI * CreateInstance)(LPUNKNOWN lpunk, HRESULT* phr));
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
@@ -96,10 +99,11 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	afx_msg void OnLbnDblclkList1();
-	afx_msg void OnLbnDblclkList2();
-	afx_msg void OnLbnDblclkList3();
 	afx_msg void OnSelChange();
 	afx_msg void OnCheckBoxChange();
 	afx_msg void OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnMpegSplitterConfig();
+	afx_msg void OnVideoDecConfig();
+	afx_msg void OnMPEG2DecConfig();
+	afx_msg void OnAudioDecConfig();
 };
