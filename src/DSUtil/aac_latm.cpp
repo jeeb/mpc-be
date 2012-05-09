@@ -87,6 +87,8 @@ int CLATMReader::StreamMuxConfig(Bitstream &b)
 						// audio specific config.
 						cfg.Read(b);
 					} else {
+						return -1;
+#if 0
 						int ascLen = b.LatmGetValue();
 
 						ascLen -= cfg.Read(b);
@@ -100,7 +102,8 @@ int CLATMReader::StreamMuxConfig(Bitstream &b)
 						}
 						ascLen += 16;
 						b.NeedBits();
-						b.DumpBits(ascLen);					
+						b.DumpBits(ascLen);
+#endif
 					}
 
 					// store config
