@@ -401,6 +401,10 @@ CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipInfo::Str
 						Infos.AddTail(L"AAC");
 					}
 					break;
+					case WAVE_FORMAT_LATM_AAC: {
+						Infos.AddTail(L"AAC (LATM)");
+					}
+					break;
 					case WAVE_FORMAT_MP3: {
 						Infos.AddTail(L"MP3");
 					}

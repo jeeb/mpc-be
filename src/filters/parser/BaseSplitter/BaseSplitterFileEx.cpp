@@ -30,6 +30,8 @@
 #include <InitGuid.h>
 #include <moreuuids.h>
 
+#include "../../../DSUtil/aac_latm.h"
+
 //
 // CBaseSplitterFileEx
 //
@@ -606,7 +608,37 @@ bool CBaseSplitterFileEx::Read(latm_aachdr& h, int len, CMediaType* pmt)
 		return false;
 	}
 
-	// Disable AAC latm stream support until make correct header parsing ...
+	BYTE buffer[64];
+	ByteRead(buffer, min(len, 64));
+
+	CLATMReader *latm = DNew CLATMReader();
+	int	ret = latm->ReadConfig(buffer, len);
+	if (ret < 0 || !latm->config.GetCount()) {
+		delete latm;
+		return false;
+	}
+
+	if (!pmt) {
+		return true;
+	}
+
+	WAVEFORMATEX* wfe = (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX)];
+	memset(wfe, 0, sizeof(WAVEFORMATEX));
+	wfe->wFormatTag = WAVE_FORMAT_LATM_AAC;
+	wfe->nChannels = latm->config[0]->channelConfiguration;
+	wfe->nSamplesPerSec = latm->config[0]->samplingFrequency;
+	wfe->nBlockAlign = 1;
+	wfe->nAvgBytesPerSec = 0;
+	wfe->cbSize = 0;
+
+	pmt->majortype = MEDIATYPE_Audio;
+	pmt->subtype = MEDIASUBTYPE_LATM_AAC;
+	pmt->formattype = FORMAT_WaveFormatEx;
+	pmt->SetFormat((BYTE*)wfe, sizeof(WAVEFORMATEX)+wfe->cbSize);
+
+	delete [] wfe;
+	delete latm;
+
 	return true;
 }
 
