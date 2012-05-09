@@ -29,9 +29,9 @@
 #include <InitGuid.h>
 #endif
 #include <moreuuids.h>
+#include <stdint.h>
 
 #define MEGABYTE 1024*1024
-
 
 CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bool bIsHdmv, CHdmvClipInfo &ClipInfo, int guid_flag, bool ForcedSub, bool TrackPriority, int AC3CoreOnly, bool AlternativeDuration)
 	: CBaseSplitterFileEx(pAsyncReader, hr, DEFAULT_CACHE_LENGTH, false, true)
