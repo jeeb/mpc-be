@@ -117,6 +117,7 @@ SRCS_C=\
     libavcodec/diracdsp.c \
     libavcodec/dsputil.c \
     libavcodec/dv.c \
+    libavcodec/dv_profile.c \
     libavcodec/dv_tablegen.c \
     libavcodec/dvdata.c \
     libavcodec/dvdec.c \
