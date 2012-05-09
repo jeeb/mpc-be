@@ -159,12 +159,13 @@ int CPngImage::FileExists(CString fn)
 {
 	CString path = LoadCurrentPath();
 
-	FILE* fp = _tfopen(path + fn + _T(".png"), _T("rb"));
+	FILE* fp;
+	_tfopen_s(&fp, path + fn + _T(".png"), _T("rb"));
 	if (fp) {
 		fclose(fp);
 		return 1;
 	} else {
-		fp = _tfopen(path + fn + _T(".bmp"), _T("rb"));
+		_tfopen_s(&fp, path + fn + _T(".bmp"), _T("rb"));
 		if (fp) {
 			fclose(fp);
 			return 1;
@@ -329,11 +330,12 @@ HBITMAP CPngImage::LoadExternalImage(CString fn, int br, int rc, int gc, int bc)
 	BYTE* pData;
 	int width, height, bpp;
 
-	FILE* fp = _tfopen(path + fn + _T(".png"), _T("rb"));
+	FILE* fp;
+	_tfopen_s(&fp, path + fn + _T(".png"), _T("rb"));
 	if (fp) {
 		return TypeLoadImage(1, &pData, &width, &height, &bpp, fp, 0, br, rc, gc, bc);
 	} else {
-		fp = _tfopen(path + fn + _T(".bmp"), _T("rb"));
+		_tfopen_s(&fp, path + fn + _T(".bmp"), _T("rb"));
 		if (fp) {
 			return TypeLoadImage(0, &pData, &width, &height, &bpp, fp, 0, br, rc, gc, bc);
 		} else {
@@ -353,11 +355,12 @@ void CPngImage::LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop, int
 	BYTE* pData;
 	int width, height, bpp;
 
-	FILE* fp = _tfopen(path + fn + _T(".png"), _T("rb"));
+	FILE* fp;
+	_tfopen_s(&fp, path + fn + _T(".png"), _T("rb"));
 	if (fp) {
 		TypeLoadImage(1, &pData, &width, &height, &bpp, fp, 0, br, rc, gc, bc);
 	} else {
-		fp = _tfopen(path + fn + _T(".bmp"), _T("rb"));
+		_tfopen_s(&fp, path + fn + _T(".bmp"), _T("rb"));
 		if (fp) {
 			TypeLoadImage(0, &pData, &width, &height, &bpp, fp, 0, br, rc, gc, bc);
 		}
