@@ -86,9 +86,18 @@ extern "C" {
    typedef unsigned __int16  uint16_t;
    typedef unsigned __int32  uint32_t;
 #endif
-typedef signed __int64       int64_t;
-typedef unsigned __int64     uint64_t;
 
+typedef signed __int64    int64_t;
+typedef unsigned __int64  uint64_t;
+
+typedef int8_t    int8;
+typedef int16_t   int16;
+typedef int32_t   int32;
+typedef int64_t   int64;
+typedef uint8_t   uint8;
+typedef uint16_t  uint16;
+typedef uint32_t  uint32;
+typedef uint64_t  uint64;
 
 // 7.18.1.2 Minimum-width integer types
 typedef int8_t    int_least8_t;

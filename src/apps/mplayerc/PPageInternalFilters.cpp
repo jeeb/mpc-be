@@ -420,6 +420,11 @@ BOOL CPPageInternalFilters::OnInitDialog()
 
 	SendMessage (WM_NOTIFY, m_Tab.GetDlgCtrlID(), (LPARAM)&hdr);
 
+	SetClassLongPtr(GetDlgItem(IDC_BUTTON1)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
+	SetClassLongPtr(GetDlgItem(IDC_BUTTON2)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
+	SetClassLongPtr(GetDlgItem(IDC_BUTTON3)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
+	SetClassLongPtr(GetDlgItem(IDC_BUTTON4)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
+
 	UpdateData(FALSE);
 
 	return TRUE;  // return TRUE unless you set the focus to a control

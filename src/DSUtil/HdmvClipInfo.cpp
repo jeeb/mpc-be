@@ -23,6 +23,7 @@
 #include "stdafx.h"
 #include "HdmvClipInfo.h"
 #include "DSUtil.h"
+#include <stdint.h>
 
 extern LCID    ISO6392ToLcid(LPCSTR code);
 

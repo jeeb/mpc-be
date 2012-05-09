@@ -25,6 +25,7 @@
 #include "DX9AllocatorPresenter.h"
 #include <mfapi.h>	// API Media Foundation
 #include <evr9.h>
+#include <stdint.h>
 
 namespace DSObjects
 {
