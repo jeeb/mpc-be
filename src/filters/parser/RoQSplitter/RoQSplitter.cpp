@@ -72,10 +72,10 @@ const AMOVIESETUP_PIN sudpPins3[] =
 
 const AMOVIESETUP_FILTER sudFilter[] =
 {
-	{&__uuidof(CRoQSplitterFilter), L"MPC - RoQ Splitter", MERIT_NORMAL+1, countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
-	{&__uuidof(CRoQSourceFilter), L"MPC - RoQ Source", MERIT_NORMAL+1, 0, NULL, CLSID_LegacyAmFilterCategory},
-	{&__uuidof(CRoQVideoDecoder), L"MPC - RoQ Video Decoder", MERIT_NORMAL, countof(sudpPins2), sudpPins2, CLSID_LegacyAmFilterCategory},
-	{&__uuidof(CRoQAudioDecoder), L"MPC - RoQ Audio Decoder", MERIT_NORMAL, countof(sudpPins3), sudpPins3, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CRoQSplitterFilter), RoQSplitterName, MERIT_NORMAL+1, countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CRoQSourceFilter), RoQSourceName, MERIT_NORMAL+1, 0, NULL, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CRoQVideoDecoder), RoQVideoDecoderName, MERIT_NORMAL, countof(sudpPins2), sudpPins2, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CRoQAudioDecoder), RoQAudioDecoderName, MERIT_NORMAL, countof(sudpPins3), sudpPins3, CLSID_LegacyAmFilterCategory},
 };
 
 CFactoryTemplate g_Templates[] =
@@ -115,6 +115,21 @@ CFilterApp theApp;
 CRoQSplitterFilter::CRoQSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("CRoQSplitterFilter"), pUnk, phr, __uuidof(this))
 {
+}
+
+STDMETHODIMP CRoQSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
+{
+	CheckPointer(pInfo, E_POINTER);
+	ValidateReadWritePtr(pInfo, sizeof(FILTER_INFO));
+
+	wcscpy_s(pInfo->achName, RoQSplitterName);
+
+	pInfo->pGraph = m_pGraph;
+	if (m_pGraph) {
+		m_pGraph->AddRef();
+	}
+
+	return S_OK;
 }
 
 HRESULT CRoQSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
@@ -327,6 +342,21 @@ CRoQSourceFilter::CRoQSourceFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	m_pInput.Free();
 }
 
+STDMETHODIMP CRoQSourceFilter::QueryFilterInfo(FILTER_INFO* pInfo)
+{
+	CheckPointer(pInfo, E_POINTER);
+	ValidateReadWritePtr(pInfo, sizeof(FILTER_INFO));
+
+	wcscpy_s(pInfo->achName, RoQSourceName);
+
+	pInfo->pGraph = m_pGraph;
+	if (m_pGraph) {
+		m_pGraph->AddRef();
+	}
+
+	return S_OK;
+}
+
 //
 // CRoQVideoDecoder
 //
@@ -339,6 +369,21 @@ CRoQVideoDecoder::CRoQVideoDecoder(LPUNKNOWN lpunk, HRESULT* phr)
 
 CRoQVideoDecoder::~CRoQVideoDecoder()
 {
+}
+
+STDMETHODIMP CRoQVideoDecoder::QueryFilterInfo(FILTER_INFO* pInfo)
+{
+	CheckPointer(pInfo, E_POINTER);
+	ValidateReadWritePtr(pInfo, sizeof(FILTER_INFO));
+
+	wcscpy_s(pInfo->achName, RoQVideoDecoderName);
+
+	pInfo->pGraph = m_pGraph;
+	if (m_pGraph) {
+		m_pGraph->AddRef();
+	}
+
+	return S_OK;
 }
 
 void CRoQVideoDecoder::apply_vector_2x2(int x, int y, roq_cell* cell)
@@ -856,6 +901,21 @@ CRoQAudioDecoder::CRoQAudioDecoder(LPUNKNOWN lpunk, HRESULT* phr)
 
 CRoQAudioDecoder::~CRoQAudioDecoder()
 {
+}
+
+STDMETHODIMP CRoQAudioDecoder::QueryFilterInfo(FILTER_INFO* pInfo)
+{
+	CheckPointer(pInfo, E_POINTER);
+	ValidateReadWritePtr(pInfo, sizeof(FILTER_INFO));
+
+	wcscpy_s(pInfo->achName, RoQAudioDecoderName);
+
+	pInfo->pGraph = m_pGraph;
+	if (m_pGraph) {
+		m_pGraph->AddRef();
+	}
+
+	return S_OK;
 }
 
 HRESULT CRoQAudioDecoder::Transform(IMediaSample* pIn, IMediaSample* pOut)

@@ -23,6 +23,11 @@
 
 #include "../BaseSplitter/BaseSplitter.h"
 
+#define RoQSplitterName			L"MPC RoQ Splitter"
+#define RoQSourceName			L"MPC RoQ Source"
+#define RoQVideoDecoderName		L"MPC Roq Video Decoder"
+#define RoQAudioDecoderName		L"MPC Roq Audio Decoder"
+
 #pragma pack(push, 1)
 struct roq_chunk {WORD id; DWORD size; WORD arg;};
 struct roq_info {WORD w, h, unk1, unk2;};
@@ -46,6 +51,8 @@ protected:
 
 public:
 	CRoQSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr);
+
+	STDMETHODIMP_(HRESULT) QueryFilterInfo(FILTER_INFO* pInfo);
 };
 
 class __declspec(uuid("02B8E5C2-4E1F-45D3-9A8E-B8F1EDE6DE09"))
@@ -53,6 +60,8 @@ CRoQSourceFilter : public CRoQSplitterFilter
 {
 public:
 	CRoQSourceFilter(LPUNKNOWN pUnk, HRESULT* phr);
+
+	STDMETHODIMP_(HRESULT) QueryFilterInfo(FILTER_INFO* pInfo);
 };
 
 class __declspec(uuid("FBEFC5EC-ABA0-4E6C-ACA3-D05FDFEFB853"))
@@ -82,6 +91,8 @@ public:
 	CRoQVideoDecoder(LPUNKNOWN lpunk, HRESULT* phr);
 	virtual ~CRoQVideoDecoder();
 
+	STDMETHODIMP_(HRESULT) QueryFilterInfo(FILTER_INFO* pInfo);
+
     HRESULT NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
 
 	HRESULT Transform(IMediaSample* pIn, IMediaSample* pOut);
@@ -100,6 +111,8 @@ CRoQAudioDecoder : public CTransformFilter
 public:
 	CRoQAudioDecoder(LPUNKNOWN lpunk, HRESULT* phr);
 	virtual ~CRoQAudioDecoder();
+
+	STDMETHODIMP_(HRESULT) QueryFilterInfo(FILTER_INFO* pInfo);
 
 	HRESULT Transform(IMediaSample* pIn, IMediaSample* pOut);
 	HRESULT CheckInputType(const CMediaType* mtIn);
