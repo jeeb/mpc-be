@@ -19,9 +19,9 @@
 
 #include "stdafx.h"
 #include "PropPageFrameDefault.h"
-// <MPC-HC Custom Code>
+// <MPC-BE Custom Code>
 #include "../../../apps/mplayerc/WinAPIUtils.h"
-// </MPC-HC Custom Code>
+// </MPC-BE Custom Code>
 
 
 namespace TreePropSheet
@@ -319,10 +319,10 @@ void CPropPageFrameDefault::DrawCaption(CDC *pDc, CRect rect, LPCTSTR lpszCaptio
 	pSysFont->GetLogFont(&lf);
 	lf.lfHeight = rect.Height();
 	lf.lfWidth = 0;
-	// <MPC-HC Custom Code>
+	// <MPC-BE Custom Code>
 	CString face = IsWinVistaOrLater() ? _T("Segoe UI") : _T("Arial");
 	_tcscpy_s(lf.lfFaceName, face);
-	// <MPC-HC Custom Code>
+	// <MPC-BE Custom Code>
 	CFont f;
 	f.CreateFontIndirect(&lf);
 	pDc->SelectObject(&f);
