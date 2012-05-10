@@ -93,10 +93,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="aac_classes.cpp" />
-    <ClCompile Include="aac_latm.cpp" />
     <ClCompile Include="AudioParser.cpp" />
-    <ClCompile Include="bits.cpp" />
     <ClCompile Include="deinterlace.cpp" />
     <ClCompile Include="DSMPropertyBag.cpp" />
     <ClCompile Include="DSUtil.cpp" />
@@ -120,10 +117,7 @@
     <ClCompile Include="VideoParser.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="aac_classes.h" />
-    <ClInclude Include="aac_latm.h" />
     <ClInclude Include="AudioParser.h" />
-    <ClInclude Include="bits.h" />
     <ClInclude Include="DSMPropertyBag.h" />
     <ClInclude Include="DSUtil.h" />
     <ClInclude Include="FontInstaller.h" />

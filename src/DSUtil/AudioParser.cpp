@@ -22,6 +22,7 @@
 
 #include "stdafx.h"
 #include "AudioParser.h"
+#include "GolombBuffer.h"
 
 #define AC3_CHANNEL                  0
 #define AC3_MONO                     1
@@ -237,4 +238,124 @@ int ParseHdmvLPCMHeader(const BYTE *buf, int *samplerate, int *channels)
 	}
 
 	return frame_size;
+}
+
+inline UINT64 LatmGetValue(CGolombBuffer gb) {
+	int length = gb.BitRead(2);
+	UINT64 value = 0;
+
+	for (int i=0; i<=length; i++) {
+		value <<= 8;
+		value |= gb.BitRead(8);
+	}
+
+	return value;
+}
+
+bool ReadAudioConfig(CGolombBuffer gb, int* samplingFrequency, int* channelConfiguration)
+{
+	static int channels_layout[] = {0, 1, 2, 3, 4, 5, 6, 8};
+	static int freq[] = {96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350, 0, 0, 0};
+
+	int sbr_present = -1;
+
+	int audioObjectType = gb.BitRead(5);
+	if (audioObjectType == 31) {
+		audioObjectType = 32 + gb.BitRead(6);
+	}
+	int samplingFrequencyIndex = gb.BitRead(4);
+	*samplingFrequency = 0;
+	*samplingFrequency = freq[samplingFrequencyIndex];
+	if (samplingFrequencyIndex == 0x0f) {
+		*samplingFrequency = gb.BitRead(24);
+	}
+	*channelConfiguration = 0;
+	int channelconfig = gb.BitRead(4);
+	if (channelconfig < 8) {
+		*channelConfiguration = channels_layout[channelconfig];
+	}
+
+	if (audioObjectType == 5) {
+		sbr_present = 1;
+
+		samplingFrequencyIndex = gb.BitRead(4);
+		*samplingFrequency = freq[samplingFrequencyIndex];
+		if (samplingFrequencyIndex == 0x0f) {
+			*samplingFrequency = gb.BitRead(24);
+		}
+
+		audioObjectType = gb.BitRead(5);
+		if (audioObjectType == 31) {
+			audioObjectType = 32 + gb.BitRead(6);
+		}
+
+		if (audioObjectType == 22) {
+			gb.BitRead(4); // ext_chan_config
+		}
+	}
+
+	if (sbr_present == -1) {
+		if (*samplingFrequency <= 24000) {
+			*samplingFrequency *= 2;
+		}			
+	}
+
+	return true;
+}
+
+bool StreamMuxConfig(CGolombBuffer gb, int* samplingFrequency, int* channelConfiguration)
+{
+	BYTE audio_mux_version_A = 0;
+	BYTE audio_mux_version = gb.BitRead(1);
+	if (audio_mux_version == 1) {
+		audio_mux_version_A = gb.BitRead(1);
+	}
+
+	if (!audio_mux_version_A) {
+		if (audio_mux_version == 1) {
+			LatmGetValue(gb); // taraFullness
+		}
+		gb.BitRead(1); // all_same_framing
+		gb.BitRead(6); // numSubFrames
+		gb.BitRead(4); // numProgram
+		gb.BitRead(3); //int numLayer
+
+		if (!audio_mux_version) {
+			// audio specific config.
+			return ReadAudioConfig(gb, samplingFrequency, channelConfiguration);
+		}
+	} else {
+		return false;
+	}
+
+	return true;
+}
+
+bool ParseAACLatmHeader(const BYTE *buf, int len, int *samplerate, int *channels)
+{
+	CGolombBuffer gb((BYTE* )buf, len);
+
+	if (gb.BitRead(11) != 0x2b7) {
+		return false;
+	}
+
+	*samplerate	= 0;
+	*channels	= 0;
+
+	gb.BitRead(13); // muxlength
+	BYTE use_same_mux = gb.BitRead(1);
+	if (!use_same_mux) {
+		bool ret = StreamMuxConfig(gb, samplerate, channels);
+		if (!ret) {
+			return ret;
+		}
+	} else {
+		return false;
+	}
+
+	if (*samplerate > 96000 || (*channels < 1 || *channels > 7)) {
+		return false;
+	}
+
+	return true;
 }

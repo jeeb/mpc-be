@@ -30,8 +30,6 @@
 #include <InitGuid.h>
 #include <moreuuids.h>
 
-#include "../../../DSUtil/aac_latm.h"
-
 //
 // CBaseSplitterFileEx
 //
@@ -611,10 +609,8 @@ bool CBaseSplitterFileEx::Read(latm_aachdr& h, int len, CMediaType* pmt)
 	BYTE buffer[64];
 	ByteRead(buffer, min(len, 64));
 
-	CLATMReader *latm = DNew CLATMReader();
-	int	ret = latm->ReadConfig(buffer, len);
-	if (ret < 0 || !latm->config.GetCount()) {
-		delete latm;
+	int samplerate, channels;
+	if (!ParseAACLatmHeader(buffer, min(len, 64), &samplerate, &channels)) {
 		return false;
 	}
 
@@ -625,8 +621,8 @@ bool CBaseSplitterFileEx::Read(latm_aachdr& h, int len, CMediaType* pmt)
 	WAVEFORMATEX* wfe = (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX)];
 	memset(wfe, 0, sizeof(WAVEFORMATEX));
 	wfe->wFormatTag = WAVE_FORMAT_LATM_AAC;
-	wfe->nChannels = latm->config[0]->channelConfiguration;
-	wfe->nSamplesPerSec = latm->config[0]->samplingFrequency;
+	wfe->nChannels = channels;
+	wfe->nSamplesPerSec = samplerate;
 	wfe->nBlockAlign = 1;
 	wfe->nAvgBytesPerSec = 0;
 	wfe->cbSize = 0;
@@ -637,7 +633,6 @@ bool CBaseSplitterFileEx::Read(latm_aachdr& h, int len, CMediaType* pmt)
 	pmt->SetFormat((BYTE*)wfe, sizeof(WAVEFORMATEX)+wfe->cbSize);
 
 	delete [] wfe;
-	delete latm;
 
 	return true;
 }

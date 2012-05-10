@@ -27,6 +27,7 @@
 #define RIFF_DWORD          0x46464952
 
 #define AC3_SYNC_WORD           0x770b
+#define AAC_LATM_SYNC_WORD       0x2b7
 #define TRUEHD_SYNC_WORD    0xba6f72f8
 #define MLP_SYNC_WORD       0xbb6f72f8
 #define IEC61937_SYNC_WORD  0x4e1ff872
@@ -46,3 +47,4 @@ int ParseAC3Header     (const BYTE *buf, int *samplerate, int *channels, int *fr
 int ParseEAC3Header    (const BYTE *buf, int *samplerate, int *channels, int *framelength, int *frametype);
 int ParseTrueHDHeader  (const BYTE *buf, int *samplerate, int *channels, int *framelength);
 int ParseHdmvLPCMHeader(const BYTE *buf, int *samplerate, int *channels);
+bool ParseAACLatmHeader(const BYTE *buf, int len, int *samplerate, int *channels);
