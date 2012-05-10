@@ -234,6 +234,7 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 		return S_FALSE;
 	}
 
+#if (0) // Disabled by default, because requires a serious improvement ...
 	// Some magic code for detecting the incorrect decoding of interlaced frames ...
 	// TODO : necessary to make it better, and preferably on the side of ffmpeg ...
 	if (m_nfield_pic_flag && m_nfield_pic_flag == m_DXVAPicParams.field_pic_flag && m_nRefPicFlag == m_DXVAPicParams.RefPicFlag) {
@@ -259,6 +260,7 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 		}
 	}
 	//
+#endif
 
 	CHECK_HR (GetFreeSurfaceIndex (nSurfaceIndex, &pSampleToDeliver, rtStart, rtStop));
 	FFH264SetCurrentPicture (nSurfaceIndex, &m_DXVAPicParams, m_pFilter->GetAVCtx());
