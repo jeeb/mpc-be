@@ -175,7 +175,7 @@ int CPngImage::FileExists(CString fn)
 	}
 }
 
-BYTE* CPngImage::BrightnessRGB(BYTE* lpBits, int width, int height, int bpp, int br, int rc, int gc, int bc)
+BYTE* CPngImage::BrightnessRGB(int type, BYTE* lpBits, int width, int height, int bpp, int br, int rc, int gc, int bc)
 {
 	if (br >= 0 && rc >= 0 && gc >= 0 && bc >= 0) {
 
@@ -203,20 +203,40 @@ BYTE* CPngImage::BrightnessRGB(BYTE* lpBits, int width, int height, int bpp, int
 			bc = 255;
 		}
 
-		double R, G, B, brn = (br * 10) / (100 + (br * 4)) * 0.8;
-		int k = bpp / 8;
+		int k = bpp / 8, kbr = 100;
 		int size = width * height * k;
-		double rcn = (255 / rc) + brn, gcn = (255 / gc) + brn, bcn = (255 / bc) + brn;
+		double R, G, B, rcn, gcn, bcn, brn = (br * 10) / (kbr + (br * 4)) * 0.8;
+
+		int fp = FileExists("background");
+
+		if (NULL != fp) {
+			rcn = 255 / rc;
+			gcn = 255 / gc;
+			bcn = 255 / bc;
+		} else {
+			rcn = rc / (70 + kbr - br);
+			gcn = gc / (75 + kbr - br);
+			bcn = bc / (80 + kbr - br);
+		}
+		rcn += brn;
+		gcn += brn;
+		bcn += brn;
 
 		for (int i = 0; i < size; i += k) {
 
-			R = lpBits[i];
+			if (type == 0) {
+				R = lpBits[i];
+				R *= rcn;
+				B = lpBits[i + 2];
+				B *= bcn;
+			} else if (type == 1) {
+				R = lpBits[i + 2];
+				R *= bcn;
+				B = lpBits[i];
+				B *= rcn;
+			}
 			G = lpBits[i + 1];
-			B = lpBits[i + 2];
-
-			R *= bcn;
 			G *= gcn;
-			B *= rcn;
 
 			if (R > 255) {
 				R = 255;
@@ -305,13 +325,13 @@ HBITMAP CPngImage::TypeLoadImage(int type, BYTE** pData, int* width, int* height
 	if (type == 0) {
 
 		int hsize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
-		memcpy(*pData, BrightnessRGB(bmp, *width, *height, *bpp, br, rc, gc, bc) + hsize, memWidth * (*height));
+		memcpy(*pData, BrightnessRGB(0, bmp, *width, *height, *bpp, br, rc, gc, bc) + hsize, memWidth * (*height));
 		free(bmp);
 
 	} else if (type == 1) {
 
 		for (int i = 0; i < *height; i ++) {
-			memcpy((*pData) + memWidth * i, BrightnessRGB((BYTE*)row_pointers[i], *width, 1, *bpp, br, rc, gc, bc), memWidth);
+			memcpy((*pData) + memWidth * i, BrightnessRGB(1, (BYTE*)row_pointers[i], *width, 1, *bpp, br, rc, gc, bc), memWidth);
 		}
 		png_destroy_read_struct(&png_ptr, &info_ptr, 0);
 	}

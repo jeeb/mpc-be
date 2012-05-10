@@ -104,10 +104,10 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 
 	AppSettings& s = AfxGetAppSettings();
 
-	int fp = m_logobm.FileExists("background");
+	int fp = m_logobm.FileExists("toolbar");
 
 	HBITMAP hBmp;
-	if (s.fDisableXPToolbars && NULL != fp) {
+	if (s.fDisableXPToolbars && NULL == fp) {
 		hBmp = m_logobm.LoadExternalImage("toolbar", s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
 	} else {
 		hBmp = m_logobm.LoadExternalImage("toolbar", -1, -1, -1, -1);
