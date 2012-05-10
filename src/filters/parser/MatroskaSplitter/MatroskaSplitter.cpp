@@ -209,64 +209,71 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 					bHasVideo = true;
 				} else if (CodecID == "V_UNCOMPRESSED") {
-				} else if (CodecID.Find("V_MPEG4/ISO/AVC") == 0 && pTE->CodecPrivate.GetCount() >= 6) {
-					BYTE sps = pTE->CodecPrivate[5] & 0x1f;
-
-					std::vector<BYTE> avcC;
-					for (int i = 0, j = pTE->CodecPrivate.GetCount(); i < j; i++) {
-						avcC.push_back(pTE->CodecPrivate[i]);
-					}
+				} else if (CodecID == "V_MPEG4/ISO/AVC") {
+					bool b_spsPresent = false;
 
 					std::vector<BYTE> sh;
+					if (pTE->CodecPrivate.GetCount() >= 6) {
+						b_spsPresent = true;
+						BYTE sps = pTE->CodecPrivate[5] & 0x1f;
 
-					unsigned jj = 6;
-
-					while (sps--) {
-						if (jj + 2 > avcC.size()) {
-							goto avcfail;
+						std::vector<BYTE> avcC;
+						for (int i = 0, j = pTE->CodecPrivate.GetCount(); i < j; i++) {
+							avcC.push_back(pTE->CodecPrivate[i]);
 						}
-						unsigned spslen = ((unsigned)avcC[jj] << 8) | avcC[jj+1];
-						if (jj + 2 + spslen > avcC.size()) {
-							goto avcfail;
+
+						unsigned jj = 6;
+
+						while (sps--) {
+							if (jj + 2 > avcC.size()) {
+								goto avcfail;
+							}
+							unsigned spslen = ((unsigned)avcC[jj] << 8) | avcC[jj+1];
+							if (jj + 2 + spslen > avcC.size()) {
+								goto avcfail;
+							}
+							unsigned cur = sh.size();
+							sh.resize(cur + spslen + 2, 0);
+							std::copy(avcC.begin() + jj, avcC.begin() + jj + 2 + spslen,sh.begin() + cur);
+							jj += 2 + spslen;
 						}
-						unsigned cur = sh.size();
-						sh.resize(cur + spslen + 2, 0);
-						std::copy(avcC.begin() + jj, avcC.begin() + jj + 2 + spslen,sh.begin() + cur);
-						jj += 2 + spslen;
-					}
 
-					if (jj + 1 > avcC.size()) {
-						continue;
-					}
-
-					unsigned pps = avcC[jj++];
-
-					while (pps--) {
-						if (jj + 2 > avcC.size()) {
-							goto avcfail;
+						if (jj + 1 > avcC.size()) {
+							continue;
 						}
-						unsigned ppslen = ((unsigned)avcC[jj] << 8) | avcC[jj+1];
-						if (jj + 2 + ppslen > avcC.size()) {
-							goto avcfail;
-						}
-						unsigned cur = sh.size();
-						sh.resize(cur + ppslen + 2, 0);
-						std::copy(avcC.begin() + jj, avcC.begin() + jj + 2 + ppslen, sh.begin() + cur);
-						jj += 2 + ppslen;
-					}
 
-					goto avcsuccess;
+						unsigned pps = avcC[jj++];
+
+						while (pps--) {
+							if (jj + 2 > avcC.size()) {
+								goto avcfail;
+							}
+							unsigned ppslen = ((unsigned)avcC[jj] << 8) | avcC[jj+1];
+							if (jj + 2 + ppslen > avcC.size()) {
+								goto avcfail;
+							}
+							unsigned cur = sh.size();
+							sh.resize(cur + ppslen + 2, 0);
+							std::copy(avcC.begin() + jj, avcC.begin() + jj + 2 + ppslen, sh.begin() + cur);
+							jj += 2 + ppslen;
+						}
+
+						goto avcsuccess;
 avcfail:
-					continue;
+						continue;
 avcsuccess:
+						;
+					}
 
 					CAtlArray<BYTE> data;
 					data.SetCount(sh.size());
-					std::copy(sh.begin(), sh.end(), data.GetData());
+					if (b_spsPresent) {
+						std::copy(sh.begin(), sh.end(), data.GetData());
+					}
 
 					mt.subtype = FOURCCMap('1CVA');
 					mt.formattype = FORMAT_MPEG2Video;
-					MPEG2VIDEOINFO* pm2vi = (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + data.GetCount());
+					MPEG2VIDEOINFO* pm2vi = (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + (b_spsPresent ? data.GetCount() : 0));
 					memset(mt.Format(), 0, mt.FormatLength());
 					pm2vi->hdr.bmiHeader.biSize = sizeof(pm2vi->hdr.bmiHeader);
 					pm2vi->hdr.bmiHeader.biWidth = (LONG)pTE->v.PixelWidth;
@@ -274,12 +281,14 @@ avcsuccess:
 					pm2vi->hdr.bmiHeader.biCompression = '1CVA';
 					pm2vi->hdr.bmiHeader.biPlanes = 1;
 					pm2vi->hdr.bmiHeader.biBitCount = 24;
-					pm2vi->dwProfile = pTE->CodecPrivate[1];
-					pm2vi->dwLevel = pTE->CodecPrivate[3];
-					pm2vi->dwFlags = (pTE->CodecPrivate[4] & 3) + 1;
-					BYTE* pSequenceHeader = (BYTE*)pm2vi->dwSequenceHeader;
-					memcpy(pSequenceHeader, data.GetData(), data.GetCount());
-					pm2vi->cbSequenceHeader = data.GetCount();
+					if (b_spsPresent) {
+						pm2vi->dwProfile = pTE->CodecPrivate[1];
+						pm2vi->dwLevel = pTE->CodecPrivate[3];
+						pm2vi->dwFlags = (pTE->CodecPrivate[4] & 3) + 1;
+						BYTE* pSequenceHeader = (BYTE*)pm2vi->dwSequenceHeader;
+						memcpy(pSequenceHeader, data.GetData(), data.GetCount());
+						pm2vi->cbSequenceHeader = data.GetCount();
+					}
 					if (!bHasVideo)
 						mts.Add(mt);
 					bHasVideo = true;
