@@ -612,7 +612,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 		if (type == unknown) {
 			Seek(pos);
 			CMpegSplitterFile::aachdr h;
-			if (!m_streams[audio].Find(s) && Read(h, len, &s.mt, m_type)) {
+			if (!m_streams[audio].Find(s) && Read(h, len, &s.mt)) {
 				PES_STREAM_TYPE stream_type = INVALID;
 				if (GetStreamType(s.pid, stream_type)) {
 					if (IsAACAudio(stream_type)) {

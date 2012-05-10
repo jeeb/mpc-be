@@ -422,7 +422,7 @@ public:
 	bool Read(peshdr& h, BYTE code);
 	bool Read(seqhdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(mpahdr& h, int len, bool fAllowV25, CMediaType* pmt = NULL);
-	bool Read(aachdr& h, int len, CMediaType* pmt = NULL, MPEG_TYPES m_type = mpeg_es);
+	bool Read(aachdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true);
 	bool Read(latm_aachdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(ac3hdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true, bool AC3CoreOnly = true);
 	bool Read(dtshdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true);

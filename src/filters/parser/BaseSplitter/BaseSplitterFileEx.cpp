@@ -598,11 +598,14 @@ bool CBaseSplitterFileEx::Read(latm_aachdr& h, int len, CMediaType* pmt)
 {
 	memset(&h, 0, sizeof(h));
 
-	for (; len >= 3 && BitRead(11, true) != 0x2b7; len--) {
+	__int64 pos		= GetPos();
+	int len_start	= len;
+
+	for (; len >= 7 && BitRead(11, true) != 0x2b7; len--) {
 		BitRead(8);
 	}
 
-	if (len < 3) {
+	if (len < 7) {
 		return false;
 	}
 
@@ -615,6 +618,13 @@ bool CBaseSplitterFileEx::Read(latm_aachdr& h, int len, CMediaType* pmt)
 	}
 
 	if (!pmt) {
+		return true;
+	}
+
+	// try detect ADTS header
+	aachdr aac_h;
+	Seek(pos);
+	if (Read(aac_h, len_start, pmt, false)) {
 		return true;
 	}
 
@@ -637,81 +647,73 @@ bool CBaseSplitterFileEx::Read(latm_aachdr& h, int len, CMediaType* pmt)
 	return true;
 }
 
-bool CBaseSplitterFileEx::Read(aachdr& h, int len, CMediaType* pmt, MPEG_TYPES m_type)
+bool CBaseSplitterFileEx::Read(aachdr& h, int len, CMediaType* pmt, bool find_sync)
 {
 	memset(&h, 0, sizeof(h));
 
-	__int64 pos = 0;
-	int found_fake_sync = m_type == mpeg_ts ? 0 : 1;
+	if (!find_sync && (BitRead(12, true) != 0xfff)) {
+		return false;
+	}
 
-	for (;;) {
-		for (; len >= 7 && BitRead(12, true) != 0xfff; len--) {
-			BitRead(8);
-		}
+	for (; len >= 7 && BitRead(12, true) != 0xfff; len--) {
+		BitRead(8);
+	}
 
-		if (len < 7) {
-			return false;
-		}
+	if (len < 7) {
+		return false;
+	}
 
-		pos = GetPos();
+	h.sync = BitRead(12);
+	h.version = BitRead(1);
+	h.layer = BitRead(2);
+	h.fcrc = BitRead(1);
+	h.profile = BitRead(2);
+	h.freq = BitRead(4);
+	h.privatebit = BitRead(1);
+	h.channels = BitRead(3);
+	h.original = BitRead(1);
+	h.home = BitRead(1);
 
-		h.sync = BitRead(12);
-		h.version = BitRead(1);
-		h.layer = BitRead(2);
-		h.fcrc = BitRead(1);
-		h.profile = BitRead(2);
-		h.freq = BitRead(4);
-		h.privatebit = BitRead(1);
-		h.channels = BitRead(3);
-		h.original = BitRead(1);
-		h.home = BitRead(1);
+	h.copyright_id_bit = BitRead(1);
+	h.copyright_id_start = BitRead(1);
+	h.aac_frame_length = BitRead(13);
+	h.adts_buffer_fullness = BitRead(11);
+	h.no_raw_data_blocks_in_frame = BitRead(2);
 
-		h.copyright_id_bit = BitRead(1);
-		h.copyright_id_start = BitRead(1);
-		h.aac_frame_length = BitRead(13);
-		h.adts_buffer_fullness = BitRead(11);
-		h.no_raw_data_blocks_in_frame = BitRead(2);
+	if (h.fcrc == 0) {
+		h.crc = BitRead(16);
+	}
 
-		if (h.fcrc == 0) {
-			h.crc = BitRead(16);
-		}
+	if (h.layer != 0 || h.freq > 12 || h.aac_frame_length <= (h.fcrc == 0 ? 9 : 7)) {
+		return false;
+	}
 
-		if (h.layer != 0 || h.freq >= 12 || h.aac_frame_length <= (h.fcrc == 0 ? 9 : 7)) {
-			if (found_fake_sync) // skip only one "fake" sync. TODO - find better way to detect and skip "fake" sync
-				return false;
-			found_fake_sync++;
-			Seek(pos + 1);
-			len--;
-			continue;
-		}
+	h.FrameSize = h.aac_frame_length - (h.fcrc == 0 ? 9 : 7);
+	static int freq[] = {96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350};
+	h.nBytesPerSec = h.aac_frame_length * freq[h.freq] / 1024; // ok?
+	h.rtDuration = 10000000i64 * 1024 / freq[h.freq]; // ok?
 
-		h.FrameSize = h.aac_frame_length - (h.fcrc == 0 ? 9 : 7);
-		static int freq[] = {96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000};
-		h.nBytesPerSec = h.aac_frame_length * freq[h.freq] / 1024; // ok?
-		h.rtDuration = 10000000i64 * 1024 / freq[h.freq]; // ok?
-
-		if (!pmt) {
-			return true;
-		}
-
-		WAVEFORMATEX* wfe = (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX)+5];
-		memset(wfe, 0, sizeof(WAVEFORMATEX)+5);
-		wfe->wFormatTag = WAVE_FORMAT_AAC;
-		wfe->nChannels = h.channels <= 6 ? h.channels : 2;
-		wfe->nSamplesPerSec = freq[h.freq];
-		wfe->nBlockAlign = h.aac_frame_length;
-		wfe->nAvgBytesPerSec = h.nBytesPerSec;
-		wfe->cbSize = MakeAACInitData((BYTE*)(wfe+1), h.profile, wfe->nSamplesPerSec, wfe->nChannels);
-
-		pmt->majortype = MEDIATYPE_Audio;
-		pmt->subtype = MEDIASUBTYPE_AAC;
-		pmt->formattype = FORMAT_WaveFormatEx;
-		pmt->SetFormat((BYTE*)wfe, sizeof(WAVEFORMATEX)+wfe->cbSize);
-
-		delete [] wfe;
-
+	if (!pmt) {
 		return true;
 	}
+
+	WAVEFORMATEX* wfe = (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX)+5];
+	memset(wfe, 0, sizeof(WAVEFORMATEX)+5);
+	wfe->wFormatTag = WAVE_FORMAT_AAC;
+	wfe->nChannels = h.channels <= 6 ? h.channels : 2;
+	wfe->nSamplesPerSec = freq[h.freq];
+	wfe->nBlockAlign = h.aac_frame_length;
+	wfe->nAvgBytesPerSec = h.nBytesPerSec;
+	wfe->cbSize = MakeAACInitData((BYTE*)(wfe+1), h.profile, wfe->nSamplesPerSec, wfe->nChannels);
+
+	pmt->majortype = MEDIATYPE_Audio;
+	pmt->subtype = MEDIASUBTYPE_AAC;
+	pmt->formattype = FORMAT_WaveFormatEx;
+	pmt->SetFormat((BYTE*)wfe, sizeof(WAVEFORMATEX)+wfe->cbSize);
+
+	delete [] wfe;
+
+	return true;
 }
 
 bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sync, bool AC3CoreOnly)
