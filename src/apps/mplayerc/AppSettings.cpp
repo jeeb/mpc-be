@@ -56,6 +56,7 @@ CAppSettings::CAppSettings()
 	SrcFiltersKeys[SRC_MP4] = _T("SRC_MP4");
 	SrcFiltersKeys[SRC_FLV] = _T("SRC_FLV");
 	SrcFiltersKeys[SRC_FLAC] = _T("SRC_FLAC");
+	SrcFiltersKeys[SRC_WPAC] = _T("SRC_WPAC");
 
 	// Internal decoders
 	TraFiltersKeys[TRA_MPEG1] = _T("TRA_MPEG1");
@@ -103,6 +104,7 @@ CAppSettings::CAppSettings()
 	FFMFiltersKeys[FFM_SCREC] = _T("FFM_SCREC");
 	FFMFiltersKeys[FFM_UTVD] = _T("FFM_UTVD");
 	FFMFiltersKeys[FFM_LAGARITH] = _T("FFM_LAGARITH");
+	FFMFiltersKeys[FFM_WPAC] = _T("FFM_WPAC");
 
 }
 
