@@ -61,6 +61,8 @@ Rasterizer::Rasterizer() : mpPathTypes(NULL), mpPathPoints(NULL), mPathPoints(0)
 	mOverlayWidth = mOverlayHeight = 0;
 	mPathOffsetX = mPathOffsetY = 0;
 	mOffsetX = mOffsetY = 0;
+	// CPUID from VDub
+	fSSE2 = !!(g_cpuid.m_flags & CCpuID::sse2);
 }
 
 Rasterizer::~Rasterizer()
@@ -418,10 +420,128 @@ bool Rasterizer::ScanConvert()
 	maxx = (maxx + 7) >> 3;
 	maxy = (maxy + 7) >> 3;
 
-	for (i=0; i<mPathPoints; ++i) {
-		mpPathPoints[i].x -= minx*8;
-		mpPathPoints[i].y -= miny*8;
+	if (fSSE2)
+	{
+		__m128i x_sub = _mm_set1_epi32(minx * 8);
+		__m128i y_sub = _mm_set1_epi32(miny * 8);
+
+		size_t end = (mPathPoints / 16) * 16;
+
+		_MM_ALIGN16 int point_values_x[16];
+		_MM_ALIGN16 int point_values_y[16];
+
+		for(i=0; i<end; i+=16) {
+			point_values_x[0] = mpPathPoints[i].x;
+			point_values_x[1] = mpPathPoints[i+1].x;
+			point_values_x[2] = mpPathPoints[i+2].x;
+			point_values_x[3] = mpPathPoints[i+3].x;
+			point_values_x[4] = mpPathPoints[i+4].x;
+			point_values_x[5] = mpPathPoints[i+5].x;
+			point_values_x[6] = mpPathPoints[i+6].x;
+			point_values_x[7] = mpPathPoints[i+7].x;
+			point_values_x[8] = mpPathPoints[i+8].x;
+			point_values_x[9] = mpPathPoints[i+9].x;
+			point_values_x[10] = mpPathPoints[i+10].x;
+			point_values_x[11] = mpPathPoints[i+11].x;
+			point_values_x[12] = mpPathPoints[i+12].x;
+			point_values_x[13] = mpPathPoints[i+13].x;
+			point_values_x[14] = mpPathPoints[i+14].x;
+			point_values_x[15] = mpPathPoints[i+15].x;
+
+			point_values_y[0] = mpPathPoints[i].y;
+			point_values_y[1] = mpPathPoints[i+1].y;
+			point_values_y[2] = mpPathPoints[i+2].y;
+			point_values_y[3] = mpPathPoints[i+3].y;
+			point_values_y[4] = mpPathPoints[i+4].y;
+			point_values_y[5] = mpPathPoints[i+5].y;
+			point_values_y[6] = mpPathPoints[i+6].y;
+			point_values_y[7] = mpPathPoints[i+7].y;
+			point_values_y[8] = mpPathPoints[i+8].y;
+			point_values_y[9] = mpPathPoints[i+9].y;
+			point_values_y[10] = mpPathPoints[i+10].y;
+			point_values_y[11] = mpPathPoints[i+11].y;
+			point_values_y[12] = mpPathPoints[i+12].y;
+			point_values_y[13] = mpPathPoints[i+13].y;
+			point_values_y[14] = mpPathPoints[i+14].y;
+			point_values_y[15] = mpPathPoints[i+15].y;
+
+			__m128i points_x1 = _mm_load_si128((__m128i*)&point_values_x[0]);
+			__m128i points_x2 = _mm_load_si128((__m128i*)&point_values_x[4]);
+			__m128i points_x3 = _mm_load_si128((__m128i*)&point_values_x[8]);
+			__m128i points_x4 = _mm_load_si128((__m128i*)&point_values_x[12]);
+			__m128i points_y1 = _mm_load_si128((__m128i*)&point_values_y[0]);
+			__m128i points_y2 = _mm_load_si128((__m128i*)&point_values_y[4]);
+			__m128i points_y3 = _mm_load_si128((__m128i*)&point_values_y[8]);
+			__m128i points_y4 = _mm_load_si128((__m128i*)&point_values_y[12]);
+
+			points_x1 = _mm_sub_epi32(points_x1, x_sub);
+			points_x2 = _mm_sub_epi32(points_x2, x_sub);
+			points_x3 = _mm_sub_epi32(points_x3, x_sub);
+			points_x4 = _mm_sub_epi32(points_x4, x_sub);
+			points_y1 = _mm_sub_epi32(points_y1, y_sub);
+			points_y2 = _mm_sub_epi32(points_y2, y_sub);
+			points_y3 = _mm_sub_epi32(points_y3, y_sub);
+			points_y4 = _mm_sub_epi32(points_y4, y_sub);
+
+			_mm_store_si128((__m128i*)&point_values_x[0], points_x1);
+			_mm_store_si128((__m128i*)&point_values_x[4], points_x2);
+			_mm_store_si128((__m128i*)&point_values_x[8], points_x3);
+			_mm_store_si128((__m128i*)&point_values_x[12], points_x4);
+			_mm_store_si128((__m128i*)&point_values_y[0], points_y1);
+			_mm_store_si128((__m128i*)&point_values_y[4], points_y2);
+			_mm_store_si128((__m128i*)&point_values_y[8], points_y3);
+			_mm_store_si128((__m128i*)&point_values_y[12], points_y4);
+
+			mpPathPoints[i].x = point_values_x[0];
+			mpPathPoints[i+1].x = point_values_x[1];
+			mpPathPoints[i+2].x = point_values_x[2];
+			mpPathPoints[i+3].x = point_values_x[3];
+			mpPathPoints[i+4].x = point_values_x[4];
+			mpPathPoints[i+5].x = point_values_x[5];
+			mpPathPoints[i+6].x = point_values_x[6];
+			mpPathPoints[i+7].x = point_values_x[7];
+			mpPathPoints[i+8].x = point_values_x[8];
+			mpPathPoints[i+9].x = point_values_x[9];
+			mpPathPoints[i+10].x = point_values_x[10];
+			mpPathPoints[i+11].x = point_values_x[11];
+			mpPathPoints[i+12].x = point_values_x[12];
+			mpPathPoints[i+13].x = point_values_x[13];
+			mpPathPoints[i+14].x = point_values_x[14];
+			mpPathPoints[i+15].x = point_values_x[15];
+
+			mpPathPoints[i].y = point_values_y[0];
+			mpPathPoints[i+1].y = point_values_y[1];
+			mpPathPoints[i+2].y = point_values_y[2];
+			mpPathPoints[i+3].y = point_values_y[3];
+			mpPathPoints[i+4].y = point_values_y[4];
+			mpPathPoints[i+5].y = point_values_y[5];
+			mpPathPoints[i+6].y = point_values_y[6];
+			mpPathPoints[i+7].y = point_values_y[7];
+			mpPathPoints[i+8].y = point_values_y[8];
+			mpPathPoints[i+9].y = point_values_y[9];
+			mpPathPoints[i+10].y = point_values_y[10];
+			mpPathPoints[i+11].y = point_values_y[11];
+			mpPathPoints[i+12].y = point_values_y[12];
+			mpPathPoints[i+13].y = point_values_y[13];
+			mpPathPoints[i+14].y = point_values_y[14];
+			mpPathPoints[i+15].y = point_values_y[15];
+
+		}
+
+		// Don't add i=0 here!
+		for (; i<mPathPoints; ++i) {
+			mpPathPoints[i].x -= minx*8;
+			mpPathPoints[i].y -= miny*8;
+		}
 	}
+	else	
+	{
+		for (i=0; i<mPathPoints; ++i) {
+			mpPathPoints[i].x -= minx*8;
+			mpPathPoints[i].y -= miny*8;
+		}
+	}
+
 
 	if (minx > maxx || miny > maxy) {
 		mWidth = mHeight = 0;
@@ -1498,9 +1618,6 @@ CRect Rasterizer::Draw(SubPicDesc& spd, CRect& clipRect, byte* pAlphaMask, int x
 
 	bbox.SetRect(x, y, x+w, y+h);
 	bbox &= CRect(0, 0, spd.w, spd.h);
-
-	// CPUID from VDub
-	bool fSSE2 = !!(g_cpuid.m_flags & CCpuID::sse2);
 
 	// fill rasterize info
 	RasterizerNfo rnfo;
