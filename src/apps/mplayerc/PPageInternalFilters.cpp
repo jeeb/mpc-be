@@ -61,11 +61,13 @@ static filter_t s_filters[] = {
 	{_T("FLAC"),                  DECODER,        AUDIO,  TRA_FLAC,       0},
 	{_T("LPCM"),                  DECODER,        AUDIO,  TRA_LPCM,       IDS_TRA_LPCM,},
 	{_T("MPEG Audio"),            FFMPEG_DECODER, AUDIO,  FFM_MPA,        IDS_TRA_FFMPEG,},
+	{_T("MusePack SV7/SV8"),      FFMPEG_DECODER, AUDIO,  FFM_MPAC,       IDS_TRA_FFMPEG,},
 	{_T("Nellymoser"),            FFMPEG_DECODER, AUDIO,  FFM_NELLY,      IDS_TRA_FFMPEG,},
 	{_T("PS2 Audio (PCM/ADPCM)"), DECODER,        AUDIO,  TRA_PS2AUD,     IDS_TRA_PS2AUD,},
+	{_T("QDesign Music Codec 2"), FFMPEG_DECODER, AUDIO,  FFM_QDM2,       IDS_TRA_FFMPEG,},
 	{_T("RealAudio"),             DECODER,        AUDIO,  TRA_RA,         IDS_TRA_RA},
 	{_T("Vorbis"),                FFMPEG_DECODER, AUDIO,  FFM_VORBIS,     IDS_TRA_FFMPEG,},
-	{_T("WavPack"),               FFMPEG_DECODER, AUDIO,  FFM_WPAC,       IDS_TRA_FFMPEG,},
+	{_T("WavPack lossless audio"),FFMPEG_DECODER, AUDIO,  FFM_WPAC,       IDS_TRA_FFMPEG,},
 	{_T("Other PCM/ADPCM"),       DECODER,        AUDIO,  TRA_PCM,        IDS_TRA_FFMPEG,},
 
 // DXVA decoder
