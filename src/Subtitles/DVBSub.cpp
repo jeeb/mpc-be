@@ -501,7 +501,7 @@ HRESULT CDVBSub::ParseClut(CGolombBuffer& gb, WORD wSegLength)
 
 		pClut->Size = 0;
 		while (gb.GetPos() < wEnd) {
-			BYTE entry_id	= gb.ReadByte()+1;
+			BYTE entry_id	= gb.ReadByte();
 			BYTE _2_bit		= (BYTE)gb.BitRead(1);
 			BYTE _4_bit		= (BYTE)gb.BitRead(1);
 			BYTE _8_bit		= (BYTE)gb.BitRead(1);
@@ -523,10 +523,12 @@ HRESULT CDVBSub::ParseClut(CGolombBuffer& gb, WORD wSegLength)
 				pClut->Palette[entry_id].T	= 0xff-((BYTE)gb.BitRead(2)<<6);
 			}
 			if (!pClut->Palette[entry_id].Y) {
-				pClut->Palette[entry_id].Cr = pClut->Palette[entry_id].Cb = 0;
+				pClut->Palette[entry_id].Cr	= 0;
+				pClut->Palette[entry_id].Cb	= 0;
+				pClut->Palette[entry_id].T	= 0;
 			}
 
-			pClut->Size = max (pClut->Size, entry_id);
+			pClut->Size = max (pClut->Size, entry_id + 1);
 		}
 	}
 
