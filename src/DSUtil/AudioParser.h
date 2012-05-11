@@ -47,4 +47,4 @@ int ParseAC3Header     (const BYTE *buf, int *samplerate, int *channels, int *fr
 int ParseEAC3Header    (const BYTE *buf, int *samplerate, int *channels, int *framelength, int *frametype);
 int ParseTrueHDHeader  (const BYTE *buf, int *samplerate, int *channels, int *framelength);
 int ParseHdmvLPCMHeader(const BYTE *buf, int *samplerate, int *channels);
-bool ParseAACLatmHeader(const BYTE *buf, int len, int *samplerate, int *channels);
+bool ParseAACLatmHeader(const BYTE *buf, int len, int *samplerate, int *channels, BYTE *extra, unsigned int* extralen);

@@ -24,6 +24,8 @@
 #include "AudioParser.h"
 #include "GolombBuffer.h"
 
+#include "DSUtil.h"
+
 #define AC3_CHANNEL                  0
 #define AC3_MONO                     1
 #define AC3_STEREO                   2
@@ -303,8 +305,10 @@ bool ReadAudioConfig(CGolombBuffer gb, int* samplingFrequency, int* channelConfi
 	return true;
 }
 
-bool StreamMuxConfig(CGolombBuffer gb, int* samplingFrequency, int* channelConfiguration)
+bool StreamMuxConfig(CGolombBuffer gb, int* samplingFrequency, int* channelConfiguration, int* nExtraPos)
 {
+	*nExtraPos = 0;
+
 	BYTE audio_mux_version_A = 0;
 	BYTE audio_mux_version = gb.BitRead(1);
 	if (audio_mux_version == 1) {
@@ -322,6 +326,7 @@ bool StreamMuxConfig(CGolombBuffer gb, int* samplingFrequency, int* channelConfi
 
 		if (!audio_mux_version) {
 			// audio specific config.
+			*nExtraPos = gb.GetPos();
 			return ReadAudioConfig(gb, samplingFrequency, channelConfiguration);
 		}
 	} else {
@@ -331,7 +336,7 @@ bool StreamMuxConfig(CGolombBuffer gb, int* samplingFrequency, int* channelConfi
 	return true;
 }
 
-bool ParseAACLatmHeader(const BYTE *buf, int len, int *samplerate, int *channels)
+bool ParseAACLatmHeader(const BYTE *buf, int len, int *samplerate, int *channels, BYTE *extra, unsigned int* extralen)
 {
 	CGolombBuffer gb((BYTE* )buf, len);
 
@@ -341,11 +346,16 @@ bool ParseAACLatmHeader(const BYTE *buf, int len, int *samplerate, int *channels
 
 	*samplerate	= 0;
 	*channels	= 0;
+	if (extralen) {
+		*extralen	= 0;
+	}
+
+	int nExtraPos = 0;
 
 	gb.BitRead(13); // muxlength
 	BYTE use_same_mux = gb.BitRead(1);
 	if (!use_same_mux) {
-		bool ret = StreamMuxConfig(gb, samplerate, channels);
+		bool ret = StreamMuxConfig(gb, samplerate, channels, &nExtraPos);
 		if (!ret) {
 			return ret;
 		}
@@ -355,6 +365,13 @@ bool ParseAACLatmHeader(const BYTE *buf, int len, int *samplerate, int *channels
 
 	if (*samplerate > 96000 || (*channels < 1 || *channels > 7)) {
 		return false;
+	}
+
+	if (extralen && extra && nExtraPos) {
+		*extralen = 4; // max size of extradata ... TODO - calculate/detect right extralen.
+		gb.Reset();
+		gb.SkipBytes(nExtraPos);
+		gb.ReadBuffer(extra, 4);
 	}
 
 	return true;
