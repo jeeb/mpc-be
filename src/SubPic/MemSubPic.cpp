@@ -196,14 +196,18 @@ STDMETHODIMP CMemSubPic::Unlock(RECT* pDirtyRect)
 		return S_OK;
 	}
 
-	if (m_spd.type == MSP_YUY2 || m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV || m_spd.type == MSP_AYUV) {
+	if(m_spd.type == MSP_YUY2 || m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV || m_spd.type == MSP_AYUV
+		|| m_spd.type == MSP_P010 || m_spd.type == MSP_P016) {
 		ColorConvInit();
 
-		if (m_spd.type == MSP_YUY2 || m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV) {
+		if(m_spd.type == MSP_YUY2 || m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV 
+			|| m_spd.type == MSP_P010 || m_spd.type == MSP_P016) 
+		{
 			m_rcDirty.left &= ~1;
 			m_rcDirty.right = (m_rcDirty.right+1)&~1;
 
-			if (m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV) {
+			if(m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV 
+				|| m_spd.type == MSP_P010 || m_spd.type == MSP_P016) {
 				m_rcDirty.top &= ~1;
 				m_rcDirty.bottom = (m_rcDirty.bottom+1)&~1;
 			}
@@ -233,12 +237,15 @@ STDMETHODIMP CMemSubPic::Unlock(RECT* pDirtyRect)
 				//				*s = (*s&0xff000000)|((*s>>9)&0x7c00)|((*s>>6)&0x03e0)|((*s>>3)&0x001f);
 			}
 		}
-	} else if (m_spd.type == MSP_YUY2 || m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV) {
-		for (; top < bottom ; top += m_spd.pitch) {
+	} 
+	else if(m_spd.type == MSP_YUY2 || m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV
+		|| m_spd.type == MSP_P010 || m_spd.type == MSP_P016) 
+	{
+		for(; top < bottom ; top += m_spd.pitch) {
 			BYTE* s = top;
 			BYTE* e = s + w*4;
-			for (; s < e; s+=8) { // ARGB ARGB -> AxYU AxYV
-				if ((s[3]+s[7]) < 0x1fe) {
+			for(; s < e; s+=8) { // ARGB ARGB -> AxYU AxYV
+				if((s[3]+s[7]) < 0x1fe) {
 					s[1] = (c2y_yb[s[0]] + c2y_yg[s[1]] + c2y_yr[s[2]] + 0x108000) >> 16;
 					s[5] = (c2y_yb[s[4]] + c2y_yg[s[5]] + c2y_yr[s[6]] + 0x108000) >> 16;
 
@@ -428,6 +435,37 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	}
 
 	switch (dst.type) {
+		case MSP_P010:
+		case MSP_P016:
+			{
+				// Alpha blend the Y plane. Source is UYxAVYxA packed values (converted by Unlock())
+				// destination is P010/P016 surface.
+
+				int bitDepth = (dst.type == MSP_P016) ? 16 : 10;
+
+				for(ptrdiff_t j = 0; j < h; j++, s += src.pitch, d += dst.pitch) 
+				{
+					BYTE* s2 = s;
+					BYTE* s2end = s2 + w*4;
+					WORD* d2 = reinterpret_cast<WORD*>(d);
+					for(; s2 < s2end; s2 += 4, d2++) 
+					{
+						if(s2[3] < 0xff) 
+						{
+							// Convert current luminance to 8-bit value.
+							WORD dstLum = d2[0] >> 8;
+
+							// Perform calculation in 8-bit.
+							WORD result = (((dstLum-0x10)*s2[3])>>8) + s2[1];
+
+							// Convert to 10/16 bit value.
+							d2[0] = result << 8;
+						}
+					}
+				}
+
+				break;
+			}
 		case MSP_RGBA:
 				for (ptrdiff_t j = 0; j < h; j++, s += src.pitch, d += dst.pitch) {
 					BYTE* s2 = s;
@@ -540,7 +578,52 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 
 	dst.pitch = abs(dst.pitch);
 
-	if (dst.type == MSP_YV12 || dst.type == MSP_IYUV) {
+	if (dst.type == MSP_P010 || dst.type == MSP_P016)
+	{
+		// Alpha blend UV plane. UV is interleaved. Each UV represents a 2x2 block of pixels
+		// so we need to sample the current row and the row after for source color info.
+		// Source is UYxAVYxA.
+		int h2 = h/2;
+
+		BYTE* ss = (BYTE*)src.bits + src.pitch*rs.top + rs.left*4;
+		BYTE* dstUV = static_cast<BYTE*>(dst.bits) + dst.pitch*dst.h;
+
+		// Shift position to start of dirty rectangle. Need to divide dirty rectangle height
+		// by 2 because each row of UV values is 2 rows of pixels in the source.
+		dstUV = dstUV + dst.pitch*rd.top/2 + rd.left*2;
+
+		for(ptrdiff_t j = 0; j < h2; j++, ss += src.pitch*2, dstUV += dst.pitch) 
+		{
+			BYTE* srcData = ss;
+			BYTE* srcDataEnd = srcData + w*4;
+			WORD* dstData = reinterpret_cast<WORD*>(dstUV);
+			for (; srcData < srcDataEnd; srcData += 8, dstData += 2)
+			{
+				// Sample 2x2 block of alpha values
+				unsigned int ia = (srcData[3] + srcData[3+src.pitch] + srcData[7] + srcData[7+src.pitch]) >> 2;
+
+				if (ia < 255)
+				{
+					WORD result;
+
+					// Convert U to 8-bit
+					WORD dstUV = dstData[0] >> 8;
+
+					// Alpha blend U
+					result = (((dstUV-0x80)*ia)>>8) + ((srcData[0]+srcData[src.pitch])>>1);
+
+					// Convert U to 10/16 bit value;
+					dstData[0] = result << 8;
+
+					// Repeat for V
+					dstUV = dstData[1] >> 8;
+					result = (((dstUV-0x80)*ia)>>8) + ((srcData[4]+srcData[4+src.pitch])>>1);
+					dstData[1] = result << 8;
+				}
+			}
+		}
+	}
+	else if (dst.type == MSP_YV12 || dst.type == MSP_IYUV) {
 		int h2 = h/2;
 
 		if (!dst.pitchUV) {

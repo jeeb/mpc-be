@@ -24,6 +24,7 @@
 #include "stdafx.h"
 #include <mmintrin.h>
 #include "BaseVideoFilter.h"
+#include "BitBltFunction.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/MediaTypes.h"
 
@@ -334,7 +335,28 @@ HRESULT CBaseVideoFilter::CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, int 
 				}
 			}
 		}
-	} else if (subtype == MEDIASUBTYPE_YUY2) {
+	} 
+	else if (subtype == MEDIASUBTYPE_P010 || subtype == MEDIASUBTYPE_P016)
+	{
+		BYTE* pInY = ppIn[0];
+
+		// UV plane is packed
+		BYTE* pInUV = ppIn[1];
+
+		// We currently don't support outputting P010/P016 input to something other than P010/P016
+		if (bihOut.biCompression == '010P' || bihOut.biCompression == '610P')
+		{
+			BYTE* pOutUV = pOut + bihOut.biWidth*2*h; // 2 bytes per pixel
+
+			// P010 and P016 share the same memory layout
+			BitBltFromP016ToP016(w, h, pOut, pOutUV, bihOut.biWidth*2, pInY, pInUV, pitchIn);
+		}
+		else
+		{
+			return VFW_E_TYPE_NOT_ACCEPTED;
+		}
+	}
+    else if (subtype == MEDIASUBTYPE_YUY2) {
 		if (bihOut.biCompression == '2YUY') {
 			BitBltFromYUY2ToYUY2(w, h, pOut, bihOut.biWidth*2, ppIn[0], pitchIn);
 		} else if (bihOut.biCompression == BI_RGB || bihOut.biCompression == BI_BITFIELDS) {
@@ -373,7 +395,9 @@ HRESULT CBaseVideoFilter::CheckInputType(const CMediaType* mtIn)
 	ExtractBIH(mtIn, &bih);
 
 	return mtIn->majortype == MEDIATYPE_Video
-		   && (mtIn->subtype == MEDIASUBTYPE_YV12
+		&& (mtIn->subtype == MEDIASUBTYPE_P016
+		       || mtIn->subtype == MEDIASUBTYPE_P010
+		       || mtIn->subtype == MEDIASUBTYPE_YV12
 			   || mtIn->subtype == MEDIASUBTYPE_I420
 			   || mtIn->subtype == MEDIASUBTYPE_IYUV
 			   || mtIn->subtype == MEDIASUBTYPE_YUY2
@@ -408,7 +432,42 @@ HRESULT CBaseVideoFilter::CheckTransform(const CMediaType* mtIn, const CMediaTyp
 				&& mtOut->subtype != MEDIASUBTYPE_RGB565) {
 			return VFW_E_TYPE_NOT_ACCEPTED;
 		}
-	} else if (mtIn->majortype == MEDIATYPE_Video
+	} 
+	else if(mtIn->majortype == MEDIATYPE_Video
+		&& (mtIn->subtype == MEDIASUBTYPE_P016
+		|| mtIn->subtype == MEDIASUBTYPE_P010))
+	{
+		if( mtOut->subtype != mtIn->subtype)
+		{
+			// Our output doesn't support P010/P016, so force input to reconnect using YV12
+			// which we can then transform to an input more acceptable to the video renderer.
+			CMediaType desiredMt;
+			int position = 0;
+			HRESULT hr;
+			do
+			{
+				hr = GetMediaType(position, &desiredMt);
+				++position;
+			} while ( SUCCEEDED(hr) && desiredMt.subtype != MEDIASUBTYPE_YV12);
+
+			if (SUCCEEDED(m_pInput->QueryAccept(&desiredMt)))
+			{
+				if (SUCCEEDED(ReconnectPin(m_pInput, &desiredMt)))
+				{
+					m_pInput->SetMediaType(&desiredMt);
+				}
+				else
+				{
+					return VFW_E_TYPE_NOT_ACCEPTED;
+				}
+			}
+			else
+			{
+				return VFW_E_TYPE_NOT_ACCEPTED;
+			}
+		}
+	}
+    else if (mtIn->majortype == MEDIATYPE_Video
 			   && (mtIn->subtype == MEDIASUBTYPE_YUY2)) {
 		if (mtOut->subtype != MEDIASUBTYPE_YUY2
 				&& mtOut->subtype != MEDIASUBTYPE_ARGB32
@@ -472,6 +531,8 @@ HRESULT CBaseVideoFilter::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_
 }
 
 VIDEO_OUTPUT_FORMATS DefaultFormats[] = {
+	{&MEDIASUBTYPE_P010, 2, 24, '010P'},
+	{&MEDIASUBTYPE_P016, 2, 24, '610P'},
 	{&MEDIASUBTYPE_YV12,   3, 12, '21VY'},
 	{&MEDIASUBTYPE_I420,   3, 12, '024I'},
 	{&MEDIASUBTYPE_IYUV,   3, 12, 'VUYI'},

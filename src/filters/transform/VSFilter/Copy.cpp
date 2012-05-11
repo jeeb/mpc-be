@@ -48,7 +48,26 @@ void BltLineRGB32(DWORD* d, BYTE* sub, int w, const GUID& subtype)
 				*db = y; // w/o colors
 			}
 		}
-	} else if (subtype == MEDIASUBTYPE_YUY2) {
+	} 
+	else if (subtype == MEDIASUBTYPE_P010 || subtype == MEDIASUBTYPE_P016)
+	{
+		// Y plane is 16 bits
+		WORD* dstY = reinterpret_cast<WORD*>(d);
+		WORD* dstYEnd = dstY + w; // What units is w given in?
+
+		for (; dstY < dstYEnd; dstY++, sub+=4)
+		{
+			if (sub[3] < 0xff)
+			{
+				// Look up table generates a 32-bit luminance value which is then scaled to 16 bits.
+				int y = (c2y_yb[sub[0]] + c2y_yg[sub[1]] + c2y_yr[sub[2]] + 0x108000) >> 16;
+
+				// Do I need to perform any scaling as per SMPTE 274M?
+				*dstY = y;
+			}
+		}
+	}
+    else if (subtype == MEDIASUBTYPE_YUY2) {
 		WORD* ds = (WORD*)d;
 		WORD* dstend = ds + w;
 
