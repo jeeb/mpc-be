@@ -117,7 +117,7 @@ namespace Plugin
 			fs.m_mtime = 0;
 			CFileGetStatus(fn, fs);
 
-			while (1) {
+			for (;;) {
 				DWORD i = WaitForMultipleObjects(handles.GetCount(), handles.GetData(), FALSE, 1000);
 
 				if (WAIT_OBJECT_0 == i) {
@@ -313,7 +313,6 @@ namespace Plugin
 				const TCHAR formats[] = _T("TextSub files (*.sub;*.srt;*.smi;*.ssa;*.ass;*.xss;*.psb;*.txt)|*.sub;*.srt;*.smi;*.ssa;*.ass;*.xss;*.psb;*.txt||");
 				CFileDialog fd(TRUE, NULL, GetFileName(), OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_ENABLETEMPLATE|OFN_ENABLEHOOK,
 							   formats, CWnd::FromHandle(hwnd), sizeof(OPENFILENAME));
-				//OPENFILENAME_SIZE_VERSION_400 /*0* /);
 				UINT_PTR CALLBACK OpenHookProc(HWND hDlg, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 
 				fd.m_pOFN->hInstance = AfxGetResourceHandle();
@@ -588,7 +587,6 @@ namespace Plugin
 				const TCHAR formats[] = _T("TextSub files (*.sub;*.srt;*.smi;*.ssa;*.ass;*.xss;*.psb;*.txt)|*.sub;*.srt;*.smi;*.ssa;*.ass;*.xss;*.psb;*.txt||");
 				CFileDialog fd(TRUE, NULL, GetFileName(), OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_ENABLETEMPLATE|OFN_ENABLEHOOK,
 							   formats, CWnd::FromHandle((HWND)hwnd), sizeof(OPENFILENAME));
-				//OPENFILENAME_SIZE_VERSION_400 /*0*/);
 				UINT_PTR CALLBACK OpenHookProc(HWND hDlg, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 
 				fd.m_pOFN->hInstance = AfxGetResourceHandle();

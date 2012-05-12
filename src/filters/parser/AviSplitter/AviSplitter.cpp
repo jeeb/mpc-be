@@ -24,6 +24,7 @@
 #include "stdafx.h"
 #include <MMReg.h>
 #include "AviFile.h"
+#include "AviReportWnd.h"
 #include "AviSplitter.h"
 
 #define MAXPACKETS_AVI	MAXPACKETS*10
@@ -114,7 +115,7 @@ CAviSplitterApp theApp;
 //
 
 CAviSplitterFilter::CAviSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
-	: CBaseSplitterFilter(NAME("CAviSplitterFilter"), pUnk, phr, __uuidof(this))
+	: CBaseSplitterFilter(NAME("CAviSplitterFilter"), pUnk, phr, __uuidof(this), MAXPACKETS_AVI)
 	, m_timeformat(TIME_FORMAT_MEDIA_TIME)
 	, m_maxTimeStamp(Packet::INVALID_TIME)
 {
@@ -165,8 +166,22 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	bool fShiftDown = !!(::GetKeyState(VK_SHIFT)&0x8000);
 	bool fShowWarningText = !m_pFile->IsInterleaved(fShiftDown);
 
-	if (fShowWarningText)
-		hr = E_FAIL;
+	if (SUCCEEDED(hr) && (fShowWarningText || fShiftDown)) {
+#ifdef REGISTER_FILTER
+		AFX_MANAGE_STATE(AfxGetStaticModuleState());
+#endif
+		bool fHideWarning = !!AfxGetApp()->GetProfileInt(_T("Settings"), _T("HideAviSplitterWarning"), 0);
+
+		if (!fHideWarning && !dynamic_cast<CAviSourceFilter*>(this) || fShiftDown) {
+			CAviReportWnd wnd;
+			fHideWarning = wnd.DoModal(m_pFile, fHideWarning, fShowWarningText);
+			AfxGetApp()->WriteProfileInt(_T("Settings"), _T("HideAviSplitterWarning"), fHideWarning);
+		}
+
+		if (fShowWarningText) {
+			hr = E_FAIL;
+		}
+	}
 
 	if (FAILED(hr)) {
 		m_pFile.Free();
@@ -712,7 +727,7 @@ STDMETHODIMP CAviSplitterFilter::ConvertTimeFormat(LONGLONG* pTarget, const GUID
 		for (unsigned int i = 0; i < m_pFile->m_strms.GetCount(); ++i) {
 			CAviFile::strm_t* s = m_pFile->m_strms[i];
 			if (s->strh.fccType == FCC('vids')) {
-				if (Source < 0 || Source >= (LONG)s->cs.GetCount()) {
+				if (Source < 0 || Source >= (LONGLONG)s->cs.GetCount()) {
 					return E_FAIL;
 				}
 				CAviFile::strm_t::chunk& c = s->cs[(size_t)Source];

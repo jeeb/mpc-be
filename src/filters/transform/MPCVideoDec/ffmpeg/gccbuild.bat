@@ -47,6 +47,7 @@ IF "%~1" == "" (
   ECHO Unsupported commandline switch!
   ECHO Run "%~nx0 help" for details about the commandline switches.
   ENDLOCAL
+  SET "BUILDTYPE=Rebuild"
   EXIT /B
 )
 

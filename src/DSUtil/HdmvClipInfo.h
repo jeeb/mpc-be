@@ -69,6 +69,16 @@ enum BDVM_SampleRate {
 	BDVM_SampleRate_48_96 = 14
 };
 
+typedef unsigned char uint8;
+typedef signed char int8;
+
+typedef unsigned short uint16;
+typedef short int16;
+
+typedef unsigned long uint32;
+typedef long int32;
+
+
 class CHdmvClipInfo
 {
 public:
@@ -116,11 +126,11 @@ public:
 
 	struct PlaylistChapter
 	{
-		REFERENCE_TIME		m_rtTimestamp;
-		REFERENCE_TIME		m_rtDuration;
 		SHORT				m_nPlayItemId;
-		SHORT				m_nEntryPID;
 		PlaylistMarkType	m_nMarkType;
+		REFERENCE_TIME		m_rtTimestamp;
+		SHORT				m_nEntryPID;
+		REFERENCE_TIME		m_rtDuration;
 	};
 
 	CHdmvClipInfo(void);
@@ -128,15 +138,9 @@ public:
 
 	HRESULT		ReadInfo(LPCTSTR strFile);
 	Stream*		FindStream(SHORT wPID);
-	bool		IsHdmv()		const {
-		return m_bIsHdmv;
-	};
-	size_t		GetStreamNumber() {
-		return m_Streams.GetCount();
-	};
-	Stream*		GetStreamByIndex(size_t nIndex) {
-		return (nIndex < m_Streams.GetCount()) ? &m_Streams[nIndex] : NULL;
-	};
+	bool		IsHdmv() const { return m_bIsHdmv; };
+	size_t		GetStreamNumber() { return m_Streams.GetCount(); };
+	Stream*		GetStreamByIndex(size_t nIndex) {return (nIndex < m_Streams.GetCount()) ? &m_Streams[nIndex] : NULL; };
 
 	HRESULT		FindMainMovie(LPCTSTR strFolder, CString& strPlaylistFile, CAtlList<PlaylistItem>& MainPlaylist, CAtlList<PlaylistItem>& MPLSPlaylists);
 	HRESULT		ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtDuration, CAtlList<PlaylistItem>& Playlist);
@@ -147,7 +151,6 @@ private :
 	DWORD		ProgramInfo_start_address;
 
 	HANDLE		m_hFile;
-
 
 	CAtlArray<Stream>	m_Streams;
 	bool				m_bIsHdmv;

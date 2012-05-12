@@ -402,7 +402,7 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 		REFERENCE_TIME rtMinDiff = _I64_MAX;
 
-		while (1) {
+		for (;;) {
 			__int64 endpos = startpos;
 			REFERENCE_TIME rtPos = -1;
 
@@ -527,7 +527,7 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 				m_pFile->Seek(startpos);
 			}
 
-#ifdef DEBUG
+#ifdef _DEBUG
 			// verify kf
 			{
 				fKeyFrameFound = false;

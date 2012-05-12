@@ -884,8 +884,8 @@ avcsuccess:
 
 	m_rtNewStop = m_rtStop = m_rtDuration;
 
-#ifdef DEBUG
-	/*
+/*
+#ifdef _DEBUG
 	for(int i = 1, j = GetChapterCount(CHAPTER_ROOT_ID); i <= j; i++)
 	{
 		UINT id = GetChapterId(CHAPTER_ROOT_ID, i);
@@ -894,8 +894,8 @@ avcsuccess:
 		BSTR bstr = GetChapterStringInfo(id, "eng", "");
 		if(bstr) ::SysFreeString(bstr);
 	}
-	*/
 #endif
+*/
 
 	SetProperty(L"TITL", info.Title);
 	// TODO

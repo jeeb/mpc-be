@@ -29,7 +29,6 @@
 #include <InitGuid.h>
 #endif
 #include <moreuuids.h>
-#include <stdint.h>
 
 #define MEGABYTE 1024*1024
 

@@ -1754,7 +1754,7 @@ DWORD CDirectVobSubFilter::ThreadProc()
 
 	SetupFRD(paths, handles);
 
-	while (1) {
+	for (;;) {
 		DWORD idx = WaitForMultipleObjects(handles.GetCount(), handles.GetData(), FALSE, INFINITE);
 
 		if (idx == (WAIT_OBJECT_0 + 0)) { // m_frd.hEndThreadEvent

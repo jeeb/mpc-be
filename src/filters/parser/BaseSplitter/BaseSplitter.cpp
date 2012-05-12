@@ -400,7 +400,7 @@ HRESULT CBaseSplitterOutputPin::QueuePacket(CAutoPtr<Packet> p)
 
 	while (S_OK == m_hrDeliver
 			&& ((m_queue.GetCount() > (m_QueueMaxPackets*3/2) || m_queue.GetSize() > (MAXPACKETSIZE*3/2))
-				|| ((m_queue.GetCount() > m_QueueMaxPackets || m_queue.GetSize() > MAXPACKETSIZE) && !(static_cast<CBaseSplitterFilter*>(m_pFilter))->IsAnyPinDrying(m_QueueMaxPackets)))) {
+				|| ((m_queue.GetCount() > m_QueueMaxPackets || m_queue.GetSize() > MAXPACKETSIZE) && !(static_cast<CBaseSplitterFilter*>(m_pFilter))->IsAnyPinDrying()))) {
 		Sleep(10);
 	}
 
@@ -462,7 +462,7 @@ DWORD CBaseSplitterOutputPin::ThreadProc()
 		GetConnected()->EndFlush();
 	}
 
-	while (1) {
+	for (;;) {
 		Sleep(1);
 
 		DWORD cmd;
@@ -772,7 +772,7 @@ STDMETHODIMP CBaseSplitterOutputPin::GetPreroll(LONGLONG* pllPreroll)
 // CBaseSplitterFilter
 //
 
-CBaseSplitterFilter::CBaseSplitterFilter(LPCTSTR pName, LPUNKNOWN pUnk, HRESULT* phr, const CLSID& clsid)
+CBaseSplitterFilter::CBaseSplitterFilter(LPCTSTR pName, LPUNKNOWN pUnk, HRESULT* phr, const CLSID& clsid, int QueueMaxPackets)
 	: CBaseFilter(pName, pUnk, this, clsid)
 	, m_rtDuration(0), m_rtStart(0), m_rtStop(0), m_rtCurrent(0)
 	, m_dRate(1.0)
@@ -781,6 +781,7 @@ CBaseSplitterFilter::CBaseSplitterFilter(LPCTSTR pName, LPUNKNOWN pUnk, HRESULT*
 	, m_rtLastStart(_I64_MIN)
 	, m_rtLastStop(_I64_MIN)
 	, m_priority(THREAD_PRIORITY_NORMAL)
+	, m_QueueMaxPackets(QueueMaxPackets)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -951,7 +952,7 @@ DWORD CBaseSplitterFilter::ThreadProc()
 	}
 
 	if (!DemuxInit()) {
-		while (1) {
+		for (;;) {
 			DWORD cmd = GetRequest();
 			if (cmd == CMD_EXIT) {
 				CAMThread::m_hThread = NULL;
@@ -1076,7 +1077,7 @@ HRESULT CBaseSplitterFilter::DeliverPacket(CAutoPtr<Packet> p)
 	return hr;
 }
 
-bool CBaseSplitterFilter::IsAnyPinDrying(int QueueMaxPackets)
+bool CBaseSplitterFilter::IsAnyPinDrying()
 {
 	int totalcount = 0, totalsize = 0;
 
@@ -1101,7 +1102,7 @@ bool CBaseSplitterFilter::IsAnyPinDrying(int QueueMaxPackets)
 		totalsize += size;
 	}
 
-	if (m_priority != THREAD_PRIORITY_NORMAL && (totalcount > QueueMaxPackets*2/3 || totalsize > MAXPACKETSIZE*2/3)) {
+	if (m_priority != THREAD_PRIORITY_NORMAL && (totalcount > m_QueueMaxPackets*2/3 || totalsize > MAXPACKETSIZE*2/3)) {
 		//		SetThreadPriority(m_hThread, m_priority = THREAD_PRIORITY_NORMAL);
 		POSITION pos = m_pOutputs.GetHeadPosition();
 		while (pos) {

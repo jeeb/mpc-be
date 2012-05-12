@@ -535,6 +535,21 @@ void CPPageFormats::SetListItemState(int nItem)
 	SetChecked(nItem, cnt);
 }
 
+bool CPPageFormats::IsNeededIconsLib()
+{
+	bool needIconLib = false;
+	int i = 0;
+
+	while (!needIconLib && i < m_list.GetItemCount()) {
+		if (GetChecked(i) == 1) {
+			needIconLib = true;
+		}
+		i++;
+	}
+
+	return needIconLib;
+}
+
 BEGIN_MESSAGE_MAP(CPPageFormats, CPPageBase)
 	ON_NOTIFY(NM_CLICK, IDC_LIST1, OnNMClickList1)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST1, OnLvnItemchangedList1)
@@ -664,7 +679,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool f
 	memset(buff, 0, sizeof(buff));
 
 	if (m_pAAR == NULL) {
-		// Default manager (requiered at least Vista)
+		// Default manager (requires at least Vista)
 		HRESULT hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration,
 									  NULL,
 									  CLSCTX_INPROC,
@@ -808,7 +823,15 @@ BOOL CPPageFormats::OnApply()
 	f_setContextFiles = m_fContextFiles.GetCheck();
 	f_setAssociatedWithIcon = m_fAssociatedWithIcons.GetCheck();
 
+	if (f_setAssociatedWithIcon && !FileExists(GetProgramDir() + _T("\\mpciconlib.dll"))) {
+		AfxMessageBox(ResStr(IDS_MISSING_ICONS_LIB));
+	}
+
 	if (m_bFileExtChanged) {
+		if (f_setAssociatedWithIcon && !FileExists(GetProgramDir() + _T("\\mpciconlib.dll"))) {
+			AfxMessageBox(ResStr(IDS_MISSING_ICONS_LIB));
+		}
+
 		for (int i = 0; i < m_list.GetItemCount(); i++) {
 			int iChecked = GetChecked(i);
 			if (iChecked == 2) {
@@ -823,6 +846,8 @@ BOOL CPPageFormats::OnApply()
 				RegisterExt(exts.GetNext(pos), mf[(int)m_list.GetItemData(i)].GetDescription(), !!iChecked);
 			}
 		}
+
+		m_bFileExtChanged = false;
 	}
 	CRegKey key;
 	if (m_fContextDir.GetCheck()) {
