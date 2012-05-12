@@ -400,7 +400,7 @@ HRESULT CBaseSplitterOutputPin::QueuePacket(CAutoPtr<Packet> p)
 
 	while (S_OK == m_hrDeliver
 			&& ((m_queue.GetCount() > (m_QueueMaxPackets*3/2) || m_queue.GetSize() > (MAXPACKETSIZE*3/2))
-				|| ((m_queue.GetCount() > m_QueueMaxPackets || m_queue.GetSize() > MAXPACKETSIZE) && !(static_cast<CBaseSplitterFilter*>(m_pFilter))->IsAnyPinDrying()))) {
+				|| ((m_queue.GetCount() > m_QueueMaxPackets || m_queue.GetSize() > MAXPACKETSIZE) && !(static_cast<CBaseSplitterFilter*>(m_pFilter))->IsAnyPinDrying(m_QueueMaxPackets)))) {
 		Sleep(10);
 	}
 
@@ -772,7 +772,7 @@ STDMETHODIMP CBaseSplitterOutputPin::GetPreroll(LONGLONG* pllPreroll)
 // CBaseSplitterFilter
 //
 
-CBaseSplitterFilter::CBaseSplitterFilter(LPCTSTR pName, LPUNKNOWN pUnk, HRESULT* phr, const CLSID& clsid, int QueueMaxPackets)
+CBaseSplitterFilter::CBaseSplitterFilter(LPCTSTR pName, LPUNKNOWN pUnk, HRESULT* phr, const CLSID& clsid)
 	: CBaseFilter(pName, pUnk, this, clsid)
 	, m_rtDuration(0), m_rtStart(0), m_rtStop(0), m_rtCurrent(0)
 	, m_dRate(1.0)
@@ -781,7 +781,6 @@ CBaseSplitterFilter::CBaseSplitterFilter(LPCTSTR pName, LPUNKNOWN pUnk, HRESULT*
 	, m_rtLastStart(_I64_MIN)
 	, m_rtLastStop(_I64_MIN)
 	, m_priority(THREAD_PRIORITY_NORMAL)
-	, m_QueueMaxPackets(QueueMaxPackets)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -1077,7 +1076,7 @@ HRESULT CBaseSplitterFilter::DeliverPacket(CAutoPtr<Packet> p)
 	return hr;
 }
 
-bool CBaseSplitterFilter::IsAnyPinDrying()
+bool CBaseSplitterFilter::IsAnyPinDrying(int QueueMaxPackets)
 {
 	int totalcount = 0, totalsize = 0;
 
@@ -1102,7 +1101,7 @@ bool CBaseSplitterFilter::IsAnyPinDrying()
 		totalsize += size;
 	}
 
-	if (m_priority != THREAD_PRIORITY_NORMAL && (totalcount > m_QueueMaxPackets*2/3 || totalsize > MAXPACKETSIZE*2/3)) {
+	if (m_priority != THREAD_PRIORITY_NORMAL && (totalcount > QueueMaxPackets*2/3 || totalsize > MAXPACKETSIZE*2/3)) {
 		//		SetThreadPriority(m_hThread, m_priority = THREAD_PRIORITY_NORMAL);
 		POSITION pos = m_pOutputs.GetHeadPosition();
 		while (pos) {

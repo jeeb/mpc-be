@@ -214,7 +214,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="AviFile.cpp" />
-    <ClCompile Include="AviReportWnd.cpp" />
     <ClCompile Include="AviSplitter.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -225,7 +224,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AviFile.h" />
-    <ClInclude Include="AviReportWnd.h" />
     <ClInclude Include="AviSplitter.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>

@@ -356,8 +356,6 @@ protected:
 
 	CFontInstaller m_fontinst;
 
-	int m_QueueMaxPackets;
-
 protected:
 	enum {CMD_EXIT, CMD_SEEK};
 	DWORD ThreadProc();
@@ -372,13 +370,13 @@ protected:
 	virtual bool BuildChapters(LPCTSTR pszFileName, CAtlList<CHdmvClipInfo::PlaylistItem>& PlaylistItems, CAtlList<CHdmvClipInfo::PlaylistChapter>& Items) { return false; };
 
 public:
-	CBaseSplitterFilter(LPCTSTR pName, LPUNKNOWN pUnk, HRESULT* phr, const CLSID& clsid, int QueueMaxPackets = MAXPACKETS);
+	CBaseSplitterFilter(LPCTSTR pName, LPUNKNOWN pUnk, HRESULT* phr, const CLSID& clsid);
 	virtual ~CBaseSplitterFilter();
 
 	DECLARE_IUNKNOWN;
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
-	bool IsAnyPinDrying();
+	bool IsAnyPinDrying(int QueueMaxPackets = MAXPACKETS);
 
 	HRESULT BreakConnect(PIN_DIRECTION dir, CBasePin* pPin);
 	HRESULT CompleteConnect(PIN_DIRECTION dir, CBasePin* pPin);
