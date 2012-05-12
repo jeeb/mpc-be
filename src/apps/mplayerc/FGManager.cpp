@@ -1571,11 +1571,20 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 	m_transform.AddTail(pFGF);
 
 	if (src[SRC_WPAC]) {
-	pFGF = DNew CFGFilterInternal<CWavPackSplitterFilter>(WavPackSplitterName, MERIT64_ABOVE_DSHOW);
+		pFGF = DNew CFGFilterInternal<CWavPackSplitterFilter>(WavPackSplitterName, MERIT64_ABOVE_DSHOW);
 	} else {
-	pFGF = DNew CFGFilterInternal<CWavPackSplitterFilter>(LowMerit(WavPackSplitterName), MERIT64_DO_USE);
+		pFGF = DNew CFGFilterInternal<CWavPackSplitterFilter>(LowMerit(WavPackSplitterName), MERIT64_DO_USE);
 	}
 	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_WAVPACK_Stream);
+	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
+	m_transform.AddTail(pFGF);
+
+	if (src[SRC_MPAC]) {
+		pFGF = DNew CFGFilterInternal<CMusePackSplitter>(MusePackSplitterName, MERIT64_ABOVE_DSHOW);
+	} else {
+		pFGF = DNew CFGFilterInternal<CMusePackSplitter>(LowMerit(MusePackSplitterName), MERIT64_ABOVE_DSHOW);
+	}
+	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MUSEPACK_Stream);
 	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
 	m_transform.AddTail(pFGF);
 

@@ -57,6 +57,7 @@ CAppSettings::CAppSettings()
 	SrcFiltersKeys[SRC_FLV] = _T("SRC_FLV");
 	SrcFiltersKeys[SRC_FLAC] = _T("SRC_FLAC");
 	SrcFiltersKeys[SRC_WPAC] = _T("SRC_WPAC");
+	SrcFiltersKeys[SRC_MPAC] = _T("SRC_MPAC");
 
 	// Internal decoders
 	TraFiltersKeys[TRA_MPEG1] = _T("TRA_MPEG1");

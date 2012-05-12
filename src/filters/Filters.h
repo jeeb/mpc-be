@@ -50,6 +50,7 @@
 #include "source/ShoutcastSource/ShoutcastSource.h"
 #include "source/SubtitleSource/SubtitleSource.h"
 #include "source/WavPackSource/WVSource.h"
+#include "source/MusePackSource/MusePackSource.h"
 #include "switcher/AudioSwitcher/AudioSwitcher.h"
 #include "transform/AVI2AC3Filter/AVI2AC3Filter.h"
 #include "transform/BufferFilter/BufferFilter.h"
