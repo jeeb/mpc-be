@@ -462,6 +462,11 @@ STDMETHODIMP CMpaDecFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 HRESULT CMpaDecFilter::EndOfStream()
 {
 	CAutoLock cAutoLock(&m_csReceive);
+
+	if (m_pAVCtx) {
+		ProcessFFmpeg(m_pAVCtx->codec_id);
+	}
+
 	return __super::EndOfStream();
 }
 
