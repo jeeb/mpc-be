@@ -1,7 +1,7 @@
 #pragma once
 
 #include "stdafx.h"
-#include <stdint.h>
+#include "..\DSUtil\DSUtil.h"
 
 //-------------------------------------------------------------------------
 //

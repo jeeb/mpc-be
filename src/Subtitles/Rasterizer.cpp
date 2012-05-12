@@ -1638,7 +1638,7 @@ void Rasterizer::Draw_Alpha_sp_Body_sse2(RasterizerNfo& rnfo)
 	int color = rnfo.color;
 	int color2 = rnfo.sw[2];
 
-	int gran = min(rnfo.sw[3]+1-rnfo.xo,rnfo.w);
+	int gran = min(int(rnfo.sw[3]+1-rnfo.xo),rnfo.w);
 	int end_gran = ((gran-1)/8)*8;
 	int end_w = gran + ((rnfo.w-gran-1)/8)*8;
 
