@@ -24,6 +24,7 @@
 
 #include "../../InternalPropertyPage.h"
 #include "IMPCVideoDecFilter.h"
+#include "resource.h"
 #include <afxcmn.h>
 
 // === New swscaler options
@@ -113,7 +114,7 @@ public:
 	bool OnApply();
 
 	static LPCTSTR GetWindowTitle() {
-		return _T("Settings");
+		return MAKEINTRESOURCE(IDS_AG_SETTINGS);
 	}
 	static CSize GetWindowSize() {
 		return CSize(470, 365); // (470, 325)

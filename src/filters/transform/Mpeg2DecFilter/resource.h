@@ -15,6 +15,8 @@
 #define IDS_MPEG2DECSETTINGSWND_8       33160
 #define IDS_MPEG2DECSETTINGSWND_3       41108
 
+#define IDS_AG_SETTINGS                 33143
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

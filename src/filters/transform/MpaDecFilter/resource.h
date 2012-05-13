@@ -17,6 +17,8 @@
 #define IDS_MPA_3F_2R                   33155
 #define IDS_MPA_DYNRANGE                33156
 
+#define IDS_AG_SETTINGS                 33143
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

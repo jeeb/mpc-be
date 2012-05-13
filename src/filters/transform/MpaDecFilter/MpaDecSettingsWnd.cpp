@@ -22,7 +22,6 @@
  */
 
 #include "stdafx.h"
-#include "resource.h"
 #include "MpaDecSettingsWnd.h"
 #include "../../../DSUtil/DSUtil.h"
 

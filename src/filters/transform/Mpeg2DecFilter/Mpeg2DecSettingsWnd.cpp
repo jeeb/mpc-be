@@ -22,7 +22,6 @@
  */
 
 #include "stdafx.h"
-#include "resource.h"
 #include "Mpeg2DecSettingsWnd.h"
 #include "../../../DSUtil/DSUtil.h"
 

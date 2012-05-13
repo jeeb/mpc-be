@@ -23,7 +23,6 @@
 #include "stdafx.h"
 #include "MpegSplitterSettingsWnd.h"
 #include "../../../DSUtil/DSUtil.h"
-#include "resource.h"
 
 #define ResStr(id) CString(MAKEINTRESOURCE(id))
 

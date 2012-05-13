@@ -13,6 +13,8 @@
 #define IDS_MPEGSPLITTER_THD_NOSPLIT    41127
 #define IDS_MPEGSPLITTER_ALT_DUR_CALC   41128
 
+#define IDS_AG_SETTINGS                 33143
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

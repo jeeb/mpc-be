@@ -34,6 +34,8 @@
 
 #define IDS_VDF_DXVA_SD                 41106
 
+#define IDS_AG_SETTINGS                 33143
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
