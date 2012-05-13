@@ -718,12 +718,11 @@ void CAppSettings::UpdateData(bool fSave)
 		pApp->WriteProfileInt(IDS_R_SETTINGS, _T("ThemeGreen"), nThemeGreen);
 		pApp->WriteProfileInt(IDS_R_SETTINGS, _T("ThemeBlue"), nThemeBlue);
 		pApp->WriteProfileInt(IDS_R_SETTINGS, _T("FileNameOnSeekBar"), fFileNameOnSeekBar);
-//INS:2451 bobdynlan: hijack XP Toolbars settings
-//-----------------------------------------------------------------------------
-		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TBREFRESH, fToolbarRefresh);//ins:2452 bobdynlan:Toolbar refresh flag//
-		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CLRFACEABGR, clrFaceABGR);//ins:2452 bobdynlan:Toolbar button color//
-		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CLROUTLINEABGR, clrOutlineABGR);//ins:2452 bobdynlan:Toolbar button outline color//
-//--------------------------------------------------------------------------INS
+
+		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TBREFRESH, fToolbarRefresh);
+		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CLRFACEABGR, clrFaceABGR);
+		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CLROUTLINEABGR, clrOutlineABGR);
+
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTS, nJumpDistS);
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTM, nJumpDistM);
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTL, nJumpDistL);
@@ -1138,7 +1137,7 @@ void CAppSettings::UpdateData(bool fSave)
 		fGlobalMedia = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_GLOBALMEDIA, 0);
 
 		fDisableXPToolbars = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DISABLEXPTOOLBARS, 1);
-		nThemeBrightness = pApp->GetProfileInt(IDS_R_SETTINGS, _T("ThemeBrightness"), 25);
+		nThemeBrightness = pApp->GetProfileInt(IDS_R_SETTINGS, _T("ThemeBrightness"), 15);
 		nThemeRed = pApp->GetProfileInt(IDS_R_SETTINGS, _T("ThemeRed"), 256);
 		nThemeGreen = pApp->GetProfileInt(IDS_R_SETTINGS, _T("ThemeGreen"), 256);
 		nThemeBlue = pApp->GetProfileInt(IDS_R_SETTINGS, _T("ThemeBlue"), 256);
