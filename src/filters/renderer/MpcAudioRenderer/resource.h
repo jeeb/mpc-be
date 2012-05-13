@@ -6,6 +6,8 @@
 #define IDS_ARS_MUTE_FAST_FORWARD       33437
 #define IDS_ARS_SOUND_DEVICE            33438
 
+#define IDS_AG_SETTINGS                 33143
+
 // Next default values for new objects
 //
 #ifdef APSTUDIO_INVOKED

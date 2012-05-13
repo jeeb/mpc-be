@@ -32,7 +32,7 @@
 
 #define MEGABYTE 1024*1024
 
-CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bool bIsHdmv, CHdmvClipInfo &ClipInfo, int guid_flag, bool ForcedSub, bool TrackPriority, int AC3CoreOnly, bool AlternativeDuration)
+CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bool bIsHdmv, CHdmvClipInfo &ClipInfo, bool ForcedSub, bool TrackPriority, int AC3CoreOnly, bool AlternativeDuration)
 	: CBaseSplitterFileEx(pAsyncReader, hr, DEFAULT_CACHE_LENGTH, false, true)
 	, m_type(mpeg_us)
 	, m_rate(0)
@@ -40,7 +40,6 @@ CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bo
 	, m_posMin(0), m_posMax(0)
 	, m_bIsHdmv(bIsHdmv)
 	, m_ClipInfo(ClipInfo)
-	, m_nVC1_GuidFlag(guid_flag)
 	, m_ForcedSub(ForcedSub)
 	, m_TrackPriority(TrackPriority)
 	, m_AC3CoreOnly(AC3CoreOnly)
@@ -671,7 +670,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 				if (type == unknown) {
 					Seek(pos);
 					CMpegSplitterFile::vc1hdr h;
-					if (!m_streams[video].Find(s) && Read(h, len, &s.mt, m_nVC1_GuidFlag)) {
+					if (!m_streams[video].Find(s) && Read(h, len, &s.mt)) {
 						PES_STREAM_TYPE stream_type = INVALID;
 						if (GetStreamType(s.pid, stream_type)) {
 							if (IsVC1Video(stream_type)) {
@@ -751,7 +750,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 			}
 		} else if (pesid == 0xfd) {
 			CMpegSplitterFile::vc1hdr h;
-			if (!m_streams[video].Find(s) && Read(h, len, &s.mt, m_nVC1_GuidFlag)) {
+			if (!m_streams[video].Find(s) && Read(h, len, &s.mt)) {
 				type = video;
 			}
 		} else {

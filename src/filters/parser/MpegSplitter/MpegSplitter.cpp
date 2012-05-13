@@ -512,7 +512,6 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	, m_ForcedSub(false)
 	, m_TrackPriority(false)
 	, m_AC3CoreOnly(0)
-	, m_nVC1_GuidFlag(1)
 	, m_AlternativeDuration(false)
 {
 #ifdef REGISTER_FILTER
@@ -547,10 +546,6 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 			m_csSubtitlesLanguageOrder = CString(buff);
 		}
 
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("VC1_Decoder_Output"), dw)) {
-			m_nVC1_GuidFlag = dw;
-		}
-
 		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("AC3CoreOnly"), dw)) {
 			m_AC3CoreOnly = dw;
 		}
@@ -565,8 +560,6 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	m_TrackPriority = !!AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("TrackPriority"), m_TrackPriority);
 	m_csSubtitlesLanguageOrder = AfxGetApp()->GetProfileString(IDS_R_SETTINGS, IDS_RS_SUBTITLESLANGORDER, _T(""));
 	m_csAudioLanguageOrder = AfxGetApp()->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOSLANGORDER, _T(""));
-	m_nVC1_GuidFlag = AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("VC1_Decoder_Output"), m_nVC1_GuidFlag);
-	if (m_nVC1_GuidFlag<1 || m_nVC1_GuidFlag>3) m_nVC1_GuidFlag = 1;
 	m_AC3CoreOnly = AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("AC3CoreOnly"), m_AC3CoreOnly);
 	m_AlternativeDuration = !!AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("AlternativeDuration"), m_AlternativeDuration);
 #endif
@@ -804,7 +797,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_pFile.Free();
 
 	ReadClipInfo (GetPartFilename(pAsyncReader));
-	m_pFile.Attach(DNew CMpegSplitterFile(pAsyncReader, hr, m_ClipInfo.IsHdmv(), m_ClipInfo, m_nVC1_GuidFlag, m_ForcedSub, m_TrackPriority, m_AC3CoreOnly, m_AlternativeDuration));
+	m_pFile.Attach(DNew CMpegSplitterFile(pAsyncReader, hr, m_ClipInfo.IsHdmv(), m_ClipInfo, m_ForcedSub, m_TrackPriority, m_AC3CoreOnly, m_AlternativeDuration));
 
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
@@ -864,8 +857,6 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		POSITION pos = m_pFile->m_streams[i].GetHeadPosition();
 		while (pos) {
 			CMpegSplitterFile::stream& s = m_pFile->m_streams[i].GetNext(pos);
-			CAtlArray<CMediaType> mts;
-			mts.Add(s.mt);
 
 			CStringW name = CMpegSplitterFile::CStreamList::ToString(i);
 			CStringW str;
@@ -946,6 +937,15 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			CMpegSplitterFile::stream& s = m_pFile->m_streams[i].GetNext(pos);
 			CAtlArray<CMediaType> mts;
 			mts.Add(s.mt);
+			
+			// Add addition GUID for compatible with Cyberlink & Arcsoft VC1 Decoder
+			CMediaType mt = s.mt;
+			if (mt.subtype == MEDIASUBTYPE_WVC1) {
+				mt.subtype = MEDIASUBTYPE_WVC1_CYBERLINK;
+				mts.InsertAt(0, mt);
+				mt.subtype = MEDIASUBTYPE_WVC1_ARCSOFT;
+				mts.InsertAt(0, mt);
+			}
 
 			CStringW name = CMpegSplitterFile::CStreamList::ToString(i);
 			CStringW str;
@@ -1461,7 +1461,6 @@ STDMETHODIMP CMpegSplitterFilter::Apply()
 		key.SetDWORDValue(_T("TrackPriority"), m_TrackPriority);
 		key.SetStringValue(_T("AudioLanguageOrder"), m_csAudioLanguageOrder);
 		key.SetStringValue(_T("SubtitlesLanguageOrder"), m_csSubtitlesLanguageOrder);
-		key.SetDWORDValue(_T("VC1_Decoder_Output"), m_nVC1_GuidFlag);
 		key.SetDWORDValue(_T("AC3CoreOnly"), m_AC3CoreOnly);
 		key.SetDWORDValue(_T("AlternativeDuration"), m_AlternativeDuration);
 	}
@@ -1469,7 +1468,6 @@ STDMETHODIMP CMpegSplitterFilter::Apply()
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("UseFastStreamChange"), m_useFastStreamChange);
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("ForcedSub"), m_ForcedSub);
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("TrackPriority"), m_TrackPriority);
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("VC1_Decoder_Output"), m_nVC1_GuidFlag);
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("AC3CoreOnly"), m_AC3CoreOnly);
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("AlternativeDuration"), m_AlternativeDuration);
 #endif
@@ -1540,19 +1538,6 @@ STDMETHODIMP_(WCHAR *) CMpegSplitterFilter::GetSubtitlesLanguageOrder()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_csSubtitlesLanguageOrder.GetBuffer();
-}
-
-STDMETHODIMP CMpegSplitterFilter::SetVC1_GuidFlag(int nValue)
-{
-	CAutoLock cAutoLock(&m_csProps);
-	m_nVC1_GuidFlag = nValue;
-	return S_OK;
-}
-
-STDMETHODIMP_(int) CMpegSplitterFilter::GetVC1_GuidFlag()
-{
-	CAutoLock cAutoLock(&m_csProps);
-	return m_nVC1_GuidFlag;
 }
 
 STDMETHODIMP CMpegSplitterFilter::SetTrueHD(int nValue)

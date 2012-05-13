@@ -21,7 +21,6 @@
  */
 
 #include "stdafx.h"
-#include "resource.h"
 #include "MpcAudioRendererSettingsWnd.h"
 #include "../../../DSUtil/DSUtil.h"
 
@@ -82,9 +81,10 @@ bool CALLBACK DSEnumProc(LPGUID lpGUID,
 
 bool CMpcAudioRendererSettingsWnd::OnActivate()
 {
-	int		nPosY	= 10;
+	int nPosY	= 10;
+	CSize wsize	= GetWindowSize();
 
-	m_grpDefault.Create (_T(""), WS_VISIBLE|WS_CHILD | BS_GROUPBOX, CRect (10,  nPosY, 350, nPosY+300), this, (UINT)IDC_STATIC);
+	m_grpDefault.Create (_T(""), WS_VISIBLE|WS_CHILD | BS_GROUPBOX, CRect (10,  nPosY,  wsize.cx, nPosY+ wsize.cy), this, (UINT)IDC_STATIC);
 	nPosY += VERTICAL_SPACING;
 	m_cbWasapiMode.Create (ResStr (IDS_ARS_WASAPI_MODE), WS_VISIBLE|WS_CHILD|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect (LEFT_SPACING,  nPosY, 325, nPosY+15), this, IDC_PP_WASAPI_MODE);
 	nPosY += VERTICAL_SPACING;

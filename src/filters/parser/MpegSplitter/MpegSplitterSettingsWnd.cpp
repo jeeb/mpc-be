@@ -26,8 +26,8 @@
 
 #define ResStr(id) CString(MAKEINTRESOURCE(id))
 
-#define LEFT_SPACING					25
-#define VERTICAL_SPACING				25
+#define LEFT_SPACING		10
+#define VERTICAL_SPACING	25
 
 CMpegSplitterSettingsWnd::CMpegSplitterSettingsWnd(void)
 {
@@ -58,11 +58,8 @@ void CMpegSplitterSettingsWnd::OnDisconnect()
 
 bool CMpegSplitterSettingsWnd::OnActivate()
 {
-	int		nPosY	= 10;
+	int nPosY	= 10;
 
-	m_grpDefault.Create (ResStr(IDS_OPTIONS_CAPTION), WS_VISIBLE|WS_CHILD | BS_GROUPBOX, CRect (10,  nPosY, 320, nPosY+310), this, (UINT)IDC_STATIC);
-
-	nPosY += VERTICAL_SPACING;
 	m_cbFastStreamChange.Create (ResStr(IDS_MPEGSPLITTER_FSTREAM_CHANGE), WS_VISIBLE|WS_CHILD|WS_TABSTOP|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect (LEFT_SPACING,  nPosY, 305, nPosY+15), this, IDC_PP_FAST_STREAM_SELECT);
 
 	nPosY += VERTICAL_SPACING;
@@ -84,16 +81,6 @@ bool CMpegSplitterSettingsWnd::OnActivate()
 	nPosY += 15;
 	m_edtSubtitlesLanguageOrder.CreateEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""), WS_CHILD|WS_VISIBLE|WS_TABSTOP, CRect (LEFT_SPACING,  nPosY, 305, nPosY+20), this, IDC_PP_SUBTITLES_LANGUAGE_ORDER);
 
-	nPosY += VERTICAL_SPACING;
-	m_txtVC1_GuidFlag.Create (ResStr(IDS_MPEGSPLITTER_VC1_GUIDFLAG), WS_VISIBLE|WS_CHILD, CRect (LEFT_SPACING,  nPosY, 200, nPosY+15), this, (UINT)IDC_STATIC);
-	nPosY += 15;
-	m_cbVC1_GuidFlag.Create  (WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect (LEFT_SPACING,  nPosY, 305, nPosY+20), this, IDC_PP_VC1_GUIDFLAG);
-	m_cbVC1_GuidFlag.AddString (_T("Default"));
-	m_cbVC1_GuidFlag.AddString (_T("Cyberlink VC-1 Decoder"));
-	m_cbVC1_GuidFlag.AddString (_T("ArcSoft VC-1 Decoder"));
-
-	SetClassLongPtr(GetDlgItem(IDC_PP_VC1_GUIDFLAG)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
-
 	nPosY += VERTICAL_SPACING + 5;
 	m_grpTrueHD.Create (ResStr(IDS_MPEGSPLITTER_TRUEHD_OUTPUT), WS_VISIBLE|WS_CHILD | BS_GROUPBOX, CRect (LEFT_SPACING,  nPosY, 305, nPosY+50), this, (UINT)IDC_STATIC);
 
@@ -108,7 +95,6 @@ bool CMpegSplitterSettingsWnd::OnActivate()
 		m_cbTrackPriority.SetCheck(m_pMSF->GetTrackPriority());
 		m_edtAudioLanguageOrder.SetWindowText(m_pMSF->GetAudioLanguageOrder());
 		m_edtSubtitlesLanguageOrder.SetWindowText(m_pMSF->GetSubtitlesLanguageOrder());
-		m_cbVC1_GuidFlag.SetCurSel(m_pMSF->GetVC1_GuidFlag() - 1);
 		m_cbTrueHD.SetCheck	(m_pMSF->GetTrueHD() == 0);
 		m_cbAC3Core.SetCheck(m_pMSF->GetTrueHD() == 1);
 		m_cbAsIs.SetCheck		(!m_cbTrueHD.GetCheck() && !m_cbAC3Core.GetCheck());
@@ -140,7 +126,6 @@ bool CMpegSplitterSettingsWnd::OnApply()
 		m_pMSF->SetFastStreamChange(m_cbFastStreamChange.GetCheck());
 		m_pMSF->SetForcedSub(m_cbForcedSub.GetCheck());
 		m_pMSF->SetTrackPriority(m_cbTrackPriority.GetCheck());
-		m_pMSF->SetVC1_GuidFlag(m_cbVC1_GuidFlag.GetCurSel() + 1);
 		m_pMSF->SetTrueHD(m_cbTrueHD.GetCheck() ? 0 : m_cbAC3Core.GetCheck() ? 1 : 2);
 		m_pMSF->SetAlternativeDuration(m_cbAlternativeDuration.GetCheck());
 

@@ -81,7 +81,7 @@ protected:
 private:
 	CString m_csAudioLanguageOrder, m_csSubtitlesLanguageOrder;
 	bool m_useFastStreamChange, m_ForcedSub, m_TrackPriority, m_AlternativeDuration;
-	int m_nVC1_GuidFlag, m_AC3CoreOnly;
+	int m_AC3CoreOnly;
 	CCritSec m_csProps;
 
 public:

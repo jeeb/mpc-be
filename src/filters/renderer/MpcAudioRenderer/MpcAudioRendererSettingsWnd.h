@@ -24,6 +24,7 @@
 
 #include "../../InternalPropertyPage.h"
 #include "IMpcAudioRendererFilter.h"
+#include "resource.h"
 #include <afxcmn.h>
 
 class __declspec(uuid("1E53BA32-3BCC-4dff-9342-34E46BE3F5A5"))
@@ -60,7 +61,7 @@ public:
 	HRESULT GetAvailableAudioDevices();
 
 	static LPCTSTR GetWindowTitle() {
-		return _T("Settings");
+		return MAKEINTRESOURCE(IDS_AG_SETTINGS);
 	}
 	static CSize GetWindowSize() {
 		return CSize(350, 325);

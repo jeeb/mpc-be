@@ -33,7 +33,6 @@ class __declspec(uuid("44FCB62D-3AEB-401C-A7E1-8A984C017923"))
 private :
 	CComQIPtr<IMpegSplitterFilter> m_pMSF;
 
-	CButton		m_grpDefault;
 	CButton		m_cbFastStreamChange;
 	CButton		m_cbForcedSub;
 	CButton		m_cbTrackPriority;
@@ -42,8 +41,6 @@ private :
 	CEdit		m_edtAudioLanguageOrder;
 	CStatic		m_txtSubtitlesLanguageOrder;
 	CEdit		m_edtSubtitlesLanguageOrder;
-	CStatic		m_txtVC1_GuidFlag;
-	CComboBox	m_cbVC1_GuidFlag;
 
 	CButton		m_grpTrueHD;
 	CButton		m_cbTrueHD;
@@ -56,7 +53,6 @@ private :
 		IDC_PP_TRACK_PRIORITY,
 		IDC_PP_AUDIO_LANGUAGE_ORDER,
 		IDC_PP_SUBTITLES_LANGUAGE_ORDER,
-		IDC_PP_VC1_GUIDFLAG,
 		IDC_PP_TRUEHD,
 		IDC_PP_AC3CORE,
 		IDC_PP_ASIS,
@@ -76,7 +72,7 @@ public:
 		return MAKEINTRESOURCE(IDS_AG_SETTINGS);
 	}
 	static CSize GetWindowSize() {
-		return CSize(320, 310);
+		return CSize(320, 270);
 	}
 
 	DECLARE_MESSAGE_MAP()

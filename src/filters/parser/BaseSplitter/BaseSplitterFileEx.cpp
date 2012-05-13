@@ -1921,7 +1921,7 @@ bool CBaseSplitterFileEx::Read(avchdr& h, spsppsindex index)
 	return true;
 }
 
-bool CBaseSplitterFileEx::Read(vc1hdr& h, int len, CMediaType* pmt, int guid_flag)
+bool CBaseSplitterFileEx::Read(vc1hdr& h, int len, CMediaType* pmt)
 {
 	memset(&h, 0, sizeof(h));
 
@@ -2015,14 +2015,7 @@ bool CBaseSplitterFileEx::Read(vc1hdr& h, int len, CMediaType* pmt, int guid_fla
 
 	{
 		pmt->majortype = MEDIATYPE_Video;
-		switch (guid_flag) {
-			case 1: pmt->subtype = FOURCCMap('1CVW');
-				break;
-			case 2: pmt->subtype = MEDIASUBTYPE_WVC1_CYBERLINK;
-				break;
-			case 3: pmt->subtype = MEDIASUBTYPE_WVC1_ARCSOFT;
-				break;
-		}
+		pmt->subtype = FOURCCMap('1CVW');
 		pmt->formattype = FORMAT_VIDEOINFO2;
 		int vi_len = sizeof(VIDEOINFOHEADER2) + (int)extralen + 1;
 		VIDEOINFOHEADER2* vi = (VIDEOINFOHEADER2*)DNew BYTE[vi_len];

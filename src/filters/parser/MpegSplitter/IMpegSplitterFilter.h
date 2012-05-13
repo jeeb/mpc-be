@@ -42,9 +42,6 @@ public IUnknown {
 	STDMETHOD(SetSubtitlesLanguageOrder(WCHAR *nValue)) = 0;
 	STDMETHOD_(WCHAR *, GetSubtitlesLanguageOrder()) = 0;
 
-	STDMETHOD(SetVC1_GuidFlag(int nValue)) = 0;
-	STDMETHOD_(int, GetVC1_GuidFlag()) = 0;
-
 	STDMETHOD(SetTrueHD(int nValue)) = 0;
 	STDMETHOD_(int, GetTrueHD()) = 0;
 
