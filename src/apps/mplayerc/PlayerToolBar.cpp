@@ -70,7 +70,9 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 	tb.DeleteButton(tb.GetButtonCount()-1);
 	tb.DeleteButton(tb.GetButtonCount()-1);
 
-	SetMute(AfxGetAppSettings().fMute);
+	AppSettings& s = AfxGetAppSettings();
+
+	SetMute(s.fMute);
 
 	UINT styles[] = {
 		TBBS_CHECKGROUP/*TBBS_CHECKGROUP, TBBS_CHECKGROUP*/, TBBS_CHECKGROUP,
@@ -90,7 +92,7 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 	m_volctrl.Create(this);
 	m_volctrl.SetRange(0, 100);
 
-	if (AfxGetAppSettings().fDisableXPToolbars) {
+	if (s.fDisableXPToolbars) {
 		if (HMODULE h = LoadLibrary(_T("uxtheme.dll"))) {
 			SetWindowThemeFunct f = (SetWindowThemeFunct)GetProcAddress(h, "SetWindowTheme");
 			if (f) {
@@ -101,8 +103,6 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 	}
 
 	m_nButtonHeight = 16; //reset m_nButtonHeight
-
-	AppSettings& s = AfxGetAppSettings();
 
 	int fp = m_logobm.FileExists("toolbar");
 
@@ -149,7 +149,7 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 0);//nRemapState = 0 Remap Active
 			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 1);//nRemapState = 1 Remap Disabled
 		}
-		
+
 		COLORSCHEME cs;
 		cs.dwSize		= sizeof(COLORSCHEME);
 		cs.clrBtnHighlight	= 0x0046413c; //clr_csLight = RGB( 60, 65, 70)
@@ -284,7 +284,7 @@ void CPlayerToolBar::ArrangeControls()
 			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 2);//nRemapState = 2 Undo  Active
 			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 3);//nRemapState = 3 Undo  Disabled
 		}
-		
+
 		COLORSCHEME cs;
 		cs.dwSize		= sizeof(COLORSCHEME);
 		cs.clrBtnHighlight	= GetSysColor(COLOR_BTNFACE);
@@ -400,7 +400,7 @@ END_MESSAGE_MAP()
 // CPlayerToolBar message handlers
 
 void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
-{  
+{
 	NMTBCUSTOMDRAW* pTBCD = reinterpret_cast<NMTBCUSTOMDRAW*>( pNMHDR );
 	LRESULT lr = CDRF_DODEFAULT;
 	AppSettings& s = AfxGetAppSettings();
@@ -522,7 +522,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 				dc.SelectObject(&penFrChecked);
 				dc.RoundRect(r.left +1,r.top +1,r.right -2,r.bottom -1, 6, 4);
 			}
-			
+
 			for (int j = 0; j < 4; j++) {
 				GetItemRect(sep[j], &r);
 
@@ -629,7 +629,7 @@ BOOL CPlayerToolBar::OnPlay(UINT nID)
 {
 	CMainFrame* pFrame	= ((CMainFrame*)GetParentFrame());
 	OAFilterState fs	= pFrame->GetMediaState();
-		
+
 	CToolBarCtrl& tb = GetToolBarCtrl();
 	TBBUTTONINFO bi;
 	bi.cbSize = sizeof(bi);
@@ -645,7 +645,7 @@ BOOL CPlayerToolBar::OnStop(UINT nID)
 {
 	CMainFrame* pFrame	= ((CMainFrame*)GetParentFrame());
 	OAFilterState fs	= pFrame->GetMediaState();
-		
+
 	CToolBarCtrl& tb = GetToolBarCtrl();
 	TBBUTTONINFO bi;
 	bi.cbSize = sizeof(bi);
@@ -661,7 +661,7 @@ BOOL CPlayerToolBar::OnPause(UINT nID)
 {
 	CMainFrame* pFrame	= ((CMainFrame*)GetParentFrame());
 	OAFilterState fs	= pFrame->GetMediaState();
-		
+
 	CToolBarCtrl& tb = GetToolBarCtrl();
 	TBBUTTONINFO bi;
 	bi.cbSize = sizeof(bi);

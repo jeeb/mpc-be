@@ -207,20 +207,9 @@ BYTE* CPngImage::BrightnessRGB(int type, BYTE* lpBits, int width, int height, in
 		int size = width * height * k;
 		double R, G, B, rcn, gcn, bcn, brn = (br * 10) / (kbr + (br * 4)) * 0.8;
 
-		int fp = FileExists("background");
-
-		if (NULL != fp) {
-			rcn = 255 / rc;
-			gcn = 255 / gc;
-			bcn = 255 / bc;
-		} else {
-			rcn = rc / (70 + kbr - br);
-			gcn = gc / (75 + kbr - br);
-			bcn = bc / (80 + kbr - br);
-		}
-		rcn += brn;
-		gcn += brn;
-		bcn += brn;
+		rcn = rc / (70 + kbr - br) + brn;
+		gcn = gc / (75 + kbr - br) + brn;
+		bcn = bc / (80 + kbr - br) + brn;
 
 		for (int i = 0; i < size; i += k) {
 
