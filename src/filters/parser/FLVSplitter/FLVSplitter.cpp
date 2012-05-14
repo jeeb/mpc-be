@@ -197,7 +197,7 @@ bool CFLVSplitterFilter::Sync(__int64& pos)
 	while (m_pFile->GetRemaining() >= 15) {
 		__int64 limit = m_pFile->GetRemaining();
 		while (true) {
-			BYTE b = static_cast<BYTE>(m_pFile->BitRead(8));
+			BYTE b = (BYTE)m_pFile->BitRead(8);
 			if (b == FLV_AUDIODATA || b == FLV_VIDEODATA) {
 				break;
 			}
@@ -371,8 +371,8 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						// Might break depending on the AAC profile, see ff_mpeg4audio_get_config in ffmpeg's mpeg4audio.c
 						m_pFile->BitRead(5);
-						int iSampleRate = static_cast<int>(m_pFile->BitRead(4));
-						int iChannels = static_cast<int>(m_pFile->BitRead(4));
+						int iSampleRate = (int)m_pFile->BitRead(4);
+						int iChannels   = (int)m_pFile->BitRead(4);
 						if (iSampleRate > 12 || iChannels > 7) {
 							break;
 						}
@@ -381,8 +381,8 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						memset(wfe, 0, mt.FormatLength());
 						wfe->nSamplesPerSec = sampleRates[iSampleRate];
 						wfe->wBitsPerSample = 16;
-						wfe->nChannels = channels[iChannels];
-						wfe->cbSize = configSize;
+						wfe->nChannels      = channels[iChannels];
+						wfe->cbSize         = configSize;
 
 						m_pFile->Seek(configOffset);
 						m_pFile->ByteRead((BYTE*)(wfe+1), configSize);
@@ -448,9 +448,9 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						break;
 					case FLV_VIDEO_SCREEN: {
 						m_pFile->BitRead(4);
-						vih->bmiHeader.biWidth  = static_cast<LONG>(m_pFile->BitRead(12));
+						vih->bmiHeader.biWidth  = (LONG)m_pFile->BitRead(12);
 						m_pFile->BitRead(4);
-						vih->bmiHeader.biHeight = static_cast<LONG>(m_pFile->BitRead(12));
+						vih->bmiHeader.biHeight = (LONG)m_pFile->BitRead(12);
 
 						if (!vih->bmiHeader.biWidth || !vih->bmiHeader.biHeight) {
 							break;
@@ -484,17 +484,17 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						m_pFile->BitRead(6);
 						bool fSeparatedCoeff = !!m_pFile->BitRead(1);
 						m_pFile->BitRead(5);
-						int filterHeader = static_cast<int>(m_pFile->BitRead(2));
+						int filterHeader = (int)m_pFile->BitRead(2);
 						m_pFile->BitRead(1);
 						if (fSeparatedCoeff || !filterHeader) {
 							m_pFile->BitRead(16);
 						}
 
-						h = static_cast<int>(m_pFile->BitRead(8)) * 16;
-						w = static_cast<int>(m_pFile->BitRead(8)) * 16;
+						h = (int)m_pFile->BitRead(8) * 16;
+						w = (int)m_pFile->BitRead(8) * 16;
 
-						ary = static_cast<int>(m_pFile->BitRead(8)) * 16;
-						arx = static_cast<int>(m_pFile->BitRead(8)) * 16;
+						ary = (int)m_pFile->BitRead(8) * 16;
+						arx = (int)m_pFile->BitRead(8) * 16;
 
 						if (arx && arx != w || ary && ary != h) {
 							VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2));
@@ -583,29 +583,29 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							m_pFile->BitRead(1); // mb_adaptive_frame_field_flag
 						}
 						m_pFile->BitRead(1); // direct_8x8_inference_flag
-						BYTE crop = static_cast<BYTE>(m_pFile->BitRead(1)); // frame_cropping_flag
-						UINT64 crop_left = 0;
-						UINT64 crop_right = 0;
-						UINT64 crop_top = 0;
-						UINT64 crop_bottom = 0;
+						BYTE crop = (BYTE)m_pFile->BitRead(1); // frame_cropping_flag
+						unsigned int crop_left = 0;
+						unsigned int crop_right = 0;
+						unsigned int crop_top = 0;
+						unsigned int crop_bottom = 0;
 
 						if (crop) {
-							crop_left   = m_pFile->UExpGolombRead(); // frame_cropping_rect_left_offset
-							crop_right  = m_pFile->UExpGolombRead(); // frame_cropping_rect_right_offset
-							crop_top    = m_pFile->UExpGolombRead(); // frame_cropping_rect_top_offset
-							crop_bottom = m_pFile->UExpGolombRead(); // frame_cropping_rect_bottom_offset
+							crop_left   = (unsigned int)m_pFile->UExpGolombRead(); // frame_cropping_rect_left_offset
+							crop_right  = (unsigned int)m_pFile->UExpGolombRead(); // frame_cropping_rect_right_offset
+							crop_top    = (unsigned int)m_pFile->UExpGolombRead(); // frame_cropping_rect_top_offset
+							crop_bottom = (unsigned int)m_pFile->UExpGolombRead(); // frame_cropping_rect_bottom_offset
 						}
 						struct sar {
-							BYTE num;
-							BYTE den;
+							WORD num;
+							WORD den;
 						} sar;
 
 						if (m_pFile->BitRead(1)) {						// vui_parameters_present_flag
 							if (m_pFile->BitRead(1)) {					// aspect_ratio_info_present_flag
-								BYTE aspect_ratio_idc = static_cast<BYTE>(m_pFile->BitRead(8)); // aspect_ratio_idc
+								BYTE aspect_ratio_idc = (BYTE)m_pFile->BitRead(8); // aspect_ratio_idc
 								if (255 == aspect_ratio_idc) {
-									sar.num = m_pFile->BitRead(16);				// sar_width
-									sar.den = m_pFile->BitRead(16);				// sar_height
+									sar.num = (WORD)m_pFile->BitRead(16); // sar_width
+									sar.den = (WORD)m_pFile->BitRead(16); // sar_height
 								} else if (aspect_ratio_idc < 17) {
 									sar.num = pixel_aspect[aspect_ratio_idc][0];
 									sar.den = pixel_aspect[aspect_ratio_idc][1];
@@ -617,16 +617,16 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								sar.den = 1;
 							}
 						}
-						UINT64 mb_Width = pic_width_in_mbs_minus1 + 1;
-						UINT64 mb_Height = (pic_height_in_map_units_minus1 + 1) * (2 - frame_mbs_only_flag);
+						unsigned int mb_Width = (unsigned int)pic_width_in_mbs_minus1 + 1;
+						unsigned int mb_Height = ((unsigned int)pic_height_in_map_units_minus1 + 1) * (2 - frame_mbs_only_flag);
 						BYTE CHROMA444 = (chroma_format_idc == 3);
 
-						UINT64 Width, Height;
-						Width = 16 * mb_Width - (2>>CHROMA444) * min(crop_right, (8<<CHROMA444)-1);
+						unsigned int Width, Height;
+						Width = 16 * mb_Width - (2u>>CHROMA444) * min(crop_right, (8u<<CHROMA444)-1);
 						if (frame_mbs_only_flag) {
-							Height = 16 * mb_Height - (2>>CHROMA444) * min(crop_bottom, (8<<CHROMA444)-1);
+							Height = 16 * mb_Height - (2u>>CHROMA444) * min(crop_bottom, (8u<<CHROMA444)-1);
 						} else {
-							Height = 16 * mb_Height - (4>>CHROMA444) * min(crop_bottom, (8<<CHROMA444)-1);
+							Height = 16 * mb_Height - (4u>>CHROMA444) * min(crop_bottom, (8u<<CHROMA444)-1);
 						}
 						if (!sar.num) sar.num = 1;
 						if (!sar.den) sar.den = 1;
@@ -748,7 +748,7 @@ void CFLVSplitterFilter::NormalSeek(REFERENCE_TIME rt)
 	bool fAudio = !!GetOutputPin(FLV_AUDIODATA);
 	bool fVideo = !!GetOutputPin(FLV_VIDEODATA);
 
-	__int64 pos = m_DataOffset + 1.0 * rt / m_rtDuration * (m_pFile->GetLength() - m_DataOffset);
+	__int64 pos = m_DataOffset + (__int64)(double(m_pFile->GetLength() - m_DataOffset) * rt / m_rtDuration);
 
 	if (!Sync(pos)) {
 		ASSERT(0);
@@ -794,7 +794,7 @@ void CFLVSplitterFilter::AlternateSeek(REFERENCE_TIME rt)
 	bool hasAudio = !!GetOutputPin(FLV_AUDIODATA);
 	bool hasVideo = !!GetOutputPin(FLV_VIDEODATA);
 
-	__int64 estimPos = m_DataOffset + 1.0 * rt / m_rtDuration * (m_pFile->GetLength() - m_DataOffset);
+	__int64 estimPos = m_DataOffset + (__int64)(double(m_pFile->GetLength() - m_DataOffset) * rt / m_rtDuration);
 
 	while (true) {
 		estimPos -= 256 * 1024;
@@ -870,7 +870,7 @@ bool CFLVSplitterFilter::DemuxLoop()
 						goto NextTag;
 					}
 					// Tag timestamps specify decode time, this is the display time offset
-					tsOffset = static_cast<UINT32>(m_pFile->BitRead(24));
+					tsOffset = (UINT32)m_pFile->BitRead(24);
 					tsOffset = (tsOffset + 0xff800000) ^ 0xff800000; // sign extension
 				}
 			}
@@ -888,7 +888,7 @@ bool CFLVSplitterFilter::DemuxLoop()
 			p->rtStart = 10000i64 * (t.TimeStamp + tsOffset);
 			p->rtStop = p->rtStart + 1;
 			p->bSyncPoint = t.TagType == FLV_VIDEODATA ? vt.FrameType == 1 : true;
-			p->SetCount(dataSize);
+			p->SetCount((size_t)dataSize);
 			m_pFile->ByteRead(p->GetData(), p->GetCount());
 			hr = DeliverPacket(p);
 		}
