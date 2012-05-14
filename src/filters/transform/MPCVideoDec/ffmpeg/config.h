@@ -261,6 +261,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_QPEG_DECODER 0
 #define CONFIG_QDM2_DECODER 1
 #define CONFIG_QTRLE_DECODER 1
+#define CONFIG_PRORES_DECODER 1
 #define CONFIG_RPZA_DECODER 0
 #define CONFIG_RV10_DECODER 1
 #define CONFIG_RV20_DECODER 1

@@ -287,6 +287,13 @@ FFMPEG_CODECS		ffCodecs[] = {
 	{ &MEDIASUBTYPE_WVC1, CODEC_ID_VC1, &DXVA_VC1 },
 	{ &MEDIASUBTYPE_wvc1, CODEC_ID_VC1, &DXVA_VC1 },
 
+	// Apple ProRes
+	{ &MEDIASUBTYPE_apch, CODEC_ID_PRORES, NULL },
+	{ &MEDIASUBTYPE_apcn, CODEC_ID_PRORES, NULL },
+	{ &MEDIASUBTYPE_apcs, CODEC_ID_PRORES, NULL },
+	{ &MEDIASUBTYPE_apco, CODEC_ID_PRORES, NULL },
+	{ &MEDIASUBTYPE_ap4h, CODEC_ID_PRORES, NULL },
+
 	// Other MPEG-4
 	{ &MEDIASUBTYPE_MP4V, CODEC_ID_MPEG4, NULL },
 	{ &MEDIASUBTYPE_mp4v, CODEC_ID_MPEG4, NULL },
@@ -501,6 +508,13 @@ const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_WVC1   },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_wvc1   },
 
+	// Apple ProRes
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_apch },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_apcn },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_apcs },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_apco },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_ap4h },
+
 	// IMPORTANT : some of the last MediaTypes present in next group may be not available in
 	// the standalone filter (workaround to prevent GraphEdit crash).
 	// Other MPEG-4
@@ -605,7 +619,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_nCodecId				= CODEC_ID_NONE;
 	m_bReorderBFrame		= true;
 	m_DXVADecoderGUID		= GUID_NULL;
-	m_nActiveCodecs			= MPCVD_H264|MPCVD_VC1|MPCVD_XVID|MPCVD_DIVX|MPCVD_MSMPEG4|MPCVD_FLASH|MPCVD_WMV|MPCVD_H263|MPCVD_SVQ3|MPCVD_AMVV|MPCVD_THEORA|MPCVD_H264_DXVA|MPCVD_VC1_DXVA|MPCVD_VP356|MPCVD_VP8|MPCVD_MJPEG|MPCVD_INDEO|MPCVD_RV|MPCVD_WMV3_DXVA|MPCVD_MPEG2_DXVA|MPCVD_DIRAC|MPCVD_DV|MPCVD_UTVD|MPCVD_SCREC|MPCVD_LAGARITH;
+	m_nActiveCodecs			= MPCVD_H264|MPCVD_VC1|MPCVD_XVID|MPCVD_DIVX|MPCVD_MSMPEG4|MPCVD_FLASH|MPCVD_WMV|MPCVD_H263|MPCVD_SVQ3|MPCVD_AMVV|MPCVD_THEORA|MPCVD_H264_DXVA|MPCVD_VC1_DXVA|MPCVD_VP356|MPCVD_VP8|MPCVD_MJPEG|MPCVD_INDEO|MPCVD_RV|MPCVD_WMV3_DXVA|MPCVD_MPEG2_DXVA|MPCVD_DIRAC|MPCVD_DV|MPCVD_UTVD|MPCVD_SCREC|MPCVD_LAGARITH|MPCVD_PRORES;
 
 	m_rtAvrTimePerFrame		= 0;
 	m_rtLastStart			= 0;
@@ -986,6 +1000,9 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn)
 					m_bUseFFmpeg = false;
 					bCodecActivated = m_bUseDXVA;
 					break;
+				case CODEC_ID_PRORES :
+					bCodecActivated = (m_nActiveCodecs & MPCVD_PRORES) != 0;
+					break;
 			}
 			return (bCodecActivated ? i : -1);
 #endif
@@ -1122,6 +1139,7 @@ bool CMPCVideoDecFilter::IsMultiThreadSupported(enum CodecID nCodec)
 			nCodec==CODEC_ID_DVVIDEO ||
 			nCodec==CODEC_ID_VP3 ||
 			nCodec==CODEC_ID_VP8 ||
+			nCodec==CODEC_ID_PRORES ||
 			nCodec==CODEC_ID_THEORA ||
 			nCodec==CODEC_ID_RV30 ||
 			nCodec==CODEC_ID_RV40 ||

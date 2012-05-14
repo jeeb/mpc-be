@@ -325,6 +325,11 @@ const AP4_Atom::Type AP4_ATOM_TYPE_HDV1 = AP4_ATOM_TYPE('h','d','v','1');
 const AP4_Atom::Type AP4_ATOM_TYPE_HDV2 = AP4_ATOM_TYPE('h','d','v','2');
 
 const AP4_Atom::Type AP4_ATOM_TYPE_APCN = AP4_ATOM_TYPE('a','p','c','n');
+const AP4_Atom::Type AP4_ATOM_TYPE_APCH = AP4_ATOM_TYPE('a','p','c','h');
+const AP4_Atom::Type AP4_ATOM_TYPE_APCO = AP4_ATOM_TYPE('a','p','c','o');
+const AP4_Atom::Type AP4_ATOM_TYPE_APCS = AP4_ATOM_TYPE('a','p','c','s');
+const AP4_Atom::Type AP4_ATOM_TYPE_AP4H = AP4_ATOM_TYPE('a','p','4','h');
+
 /*----------------------------------------------------------------------
 |       AP4_AtomListInspector
 +---------------------------------------------------------------------*/

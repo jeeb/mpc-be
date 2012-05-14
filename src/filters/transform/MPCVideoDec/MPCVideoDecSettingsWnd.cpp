@@ -513,6 +513,9 @@ bool CMPCVideoDecCodecWnd::OnActivate()
 	m_lstCodecs.AddString (_T("AMV video"));
 	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_AMVV) != 0);
 
+	m_lstCodecs.AddString (_T("Apple ProRes"));
+	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_PRORES) != 0);
+
 	m_lstCodecs.AddString (_T("Dirac"));
 	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_DIRAC) != 0);
 
@@ -607,6 +610,9 @@ bool CMPCVideoDecCodecWnd::OnApply()
 
 		if (m_lstCodecs.GetCheck  (nPos++)) {
 			nActiveCodecs |= MPCVD_AMVV;
+		}
+		if (m_lstCodecs.GetCheck  (nPos++)) {
+			nActiveCodecs |= MPCVD_PRORES;
 		}
 		if (m_lstCodecs.GetCheck  (nPos++)) {
 			nActiveCodecs |= MPCVD_DIRAC;

@@ -755,6 +755,7 @@ int FFGetThreadType(enum CodecID nCodecId, int nThreadCount)
 		case CODEC_ID_MPEG1VIDEO :
 		case CODEC_ID_DVVIDEO :
 		case CODEC_ID_FFV1 :
+		case CODEC_ID_PRORES :
 			return FF_THREAD_SLICE;
 			break;
 		case CODEC_ID_VP3 :

@@ -922,7 +922,11 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							break;
 						} else if (type == AP4_ATOM_TYPE_MJPA || type == AP4_ATOM_TYPE_MJPB || type == AP4_ATOM_TYPE_MJPG) {
 							SetTrackName(&TrackName, _T("M-Jpeg"));
-						} else if (type == AP4_ATOM_TYPE_APCN) {
+						} else if (type == AP4_ATOM_TYPE_APCN ||
+								   type == AP4_ATOM_TYPE_APCH ||
+								   type == AP4_ATOM_TYPE_APCO ||
+								   type == AP4_ATOM_TYPE_APCS ||
+								   type == AP4_ATOM_TYPE_AP4H) {
 							SetTrackName(&TrackName, _T("Apple ProRes"));
 						}
 
@@ -1351,8 +1355,6 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	m_rtNewStop = m_rtStop = m_rtDuration;
 
-	TRACE(_T("CMP4SplitterFilter m_pOutputs.GetCount()  = %d") , m_pOutputs.GetCount());
-
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
 }
 
@@ -1494,7 +1496,6 @@ bool CMP4SplitterFilter::DemuxLoop()
 				}
 
 				p->rtStop = p->rtStart;
-				TRACE(_T("track->GetSampleCount() %d %d "), track->GetSampleCount(),pPairNext->m_value.index);
 				int fFirst = true;
 
 				while (AP4_SUCCEEDED(track->ReadSample(pPairNext->m_value.index, sample, data))) {

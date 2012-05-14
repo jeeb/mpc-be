@@ -2068,6 +2068,14 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_Lagarith);
 	}
 
+	if (ffmpeg_filters[FFM_PRORES]) {
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_apch);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_apcn);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_apcs);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_apco);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_ap4h);
+	}
+
 	m_transform.AddTail(pFGF);
 
 	// Low merit MPC Video Decoder
@@ -2285,6 +2293,14 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 
 	if (ffmpeg_filters[FFM_LAGARITH]) {
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_Lagarith);
+	}
+
+	if (ffmpeg_filters[FFM_PRORES]) {
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_apch);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_apcn);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_apcs);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_apco);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_ap4h);
 	}
 
 	m_transform.AddTail(pFGF);

@@ -242,8 +242,12 @@ CString CMediaTypeEx::GetVideoCodecName(const GUID& subtype, DWORD biCompression
 		if (!names.Lookup(MAKEFOURCC(b[3], b[2], b[1], b[0]), str)) {
 			if (subtype == MEDIASUBTYPE_DiracVideo) {
 				str = _T("Dirac Video");
-			} else if (subtype == MEDIASUBTYPE_ProRes) {
-				str = _T("ProRes Video");
+			} else if (subtype == MEDIASUBTYPE_apch ||
+					   subtype == MEDIASUBTYPE_apcn ||
+					   subtype == MEDIASUBTYPE_apcs ||
+					   subtype == MEDIASUBTYPE_apco ||
+					   subtype == MEDIASUBTYPE_ap4h) {
+				str.Format(_T("ProRes Video (%4.4hs)"), &biCompression);
 			} else if (biCompression < 256) {
 				str.Format(_T("%d"), biCompression);
 			} else {

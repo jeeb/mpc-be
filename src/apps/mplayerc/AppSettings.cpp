@@ -109,6 +109,7 @@ CAppSettings::CAppSettings()
 	FFMFiltersKeys[FFM_MPAC] = _T("FFM_MPAC");
 	FFMFiltersKeys[FFM_QDM2] = _T("FFM_QDM2");
 	FFMFiltersKeys[FFM_APE] = _T("FFM_APE");
+	FFMFiltersKeys[FFM_PRORES] = _T("FFM_PRORES");
 
 }
 
