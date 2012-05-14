@@ -922,6 +922,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							break;
 						} else if (type == AP4_ATOM_TYPE_MJPA || type == AP4_ATOM_TYPE_MJPB || type == AP4_ATOM_TYPE_MJPG) {
 							SetTrackName(&TrackName, _T("M-Jpeg"));
+						} else if (type == AP4_ATOM_TYPE_APCN) {
+							SetTrackName(&TrackName, _T("Apple ProRes"));
 						}
 
 						mt.majortype = MEDIATYPE_Video;
@@ -1000,6 +1002,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						} else if ((type == AP4_ATOM_TYPE_FL32 || type == AP4_ATOM_TYPE_FL64) && ase->GetEndian()==ENDIAN_LITTLE) {
 							fourcc = type = WAVE_FORMAT_IEEE_FLOAT;
 						} else if (type == AP4_ATOM_TYPE_LPCM) {
+							SetTrackName(&TrackName, _T("LPCM"));
 							DWORD flags = ase->GetFormatSpecificFlags();
 							if (flags & 2) { // big endian
 								if (flags & 1) { // floating point
@@ -1021,6 +1024,18 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									fourcc = type = WAVE_FORMAT_PCM;
 								}
 							}
+						}
+
+						if (type == AP4_ATOM_TYPE_NONE ||
+							type == AP4_ATOM_TYPE_TWOS ||
+							type == AP4_ATOM_TYPE_SOWT ||
+							type == AP4_ATOM_TYPE_IN24 ||
+							type == AP4_ATOM_TYPE_IN32 ||
+							type == AP4_ATOM_TYPE_FL32 ||
+							type == AP4_ATOM_TYPE_FL64 ||
+							type == WAVE_FORMAT_PCM    ||
+							type == WAVE_FORMAT_IEEE_FLOAT) {
+							SetTrackName(&TrackName, _T("PCM"));
 						}
 
 						DWORD nAvgBytesPerSec = 0;

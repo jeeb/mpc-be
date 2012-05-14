@@ -242,9 +242,9 @@ CString CMediaTypeEx::GetVideoCodecName(const GUID& subtype, DWORD biCompression
 		if (!names.Lookup(MAKEFOURCC(b[3], b[2], b[1], b[0]), str)) {
 			if (subtype == MEDIASUBTYPE_DiracVideo) {
 				str = _T("Dirac Video");
-			}
-			// else if(subtype == ) str = _T("");
-			else if (biCompression < 256) {
+			} else if (subtype == MEDIASUBTYPE_ProRes) {
+				str = _T("ProRes Video");
+			} else if (biCompression < 256) {
 				str.Format(_T("%d"), biCompression);
 			} else {
 				str.Format(_T("%4.4hs"), &biCompression);

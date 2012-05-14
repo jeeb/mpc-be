@@ -323,6 +323,8 @@ const AP4_Atom::Type AP4_ATOM_TYPE_DVPP = AP4_ATOM_TYPE('d','v','p','p');
 
 const AP4_Atom::Type AP4_ATOM_TYPE_HDV1 = AP4_ATOM_TYPE('h','d','v','1');
 const AP4_Atom::Type AP4_ATOM_TYPE_HDV2 = AP4_ATOM_TYPE('h','d','v','2');
+
+const AP4_Atom::Type AP4_ATOM_TYPE_APCN = AP4_ATOM_TYPE('a','p','c','n');
 /*----------------------------------------------------------------------
 |       AP4_AtomListInspector
 +---------------------------------------------------------------------*/
