@@ -108,6 +108,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (RA_288, ra_288);
     REGISTER_DECODER (SIPR, sipr);
     REGISTER_DECODER (TRUEHD, truehd);
+    REGISTER_DECODER (TRUESPEECH, truespeech);
     REGISTER_DECODER (VORBIS, vorbis);
     REGISTER_DECODER (AMRNB, amrnb);
     REGISTER_DECODER (AMRWB, amrwb);

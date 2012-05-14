@@ -231,6 +231,7 @@ SRCS_C=\
     libavcodec/svq1.c \
     libavcodec/svq1dec.c \
     libavcodec/svq3.c \
+    libavcodec/truespeech.c \
     libavcodec/tscc.c \
     libavcodec/utvideo.c \
     libavcodec/utils.c \
