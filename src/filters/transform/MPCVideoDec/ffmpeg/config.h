@@ -299,6 +299,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_AC3_DECODER 1
 #define CONFIG_ALAC_DECODER 1
 #define CONFIG_ALS_DECODER 1
+#define CONFIG_APE_DECODER 1
 #define CONFIG_ATRAC3_DECODER 1
 #define CONFIG_COOK_DECODER 1
 #define CONFIG_DCA_DECODER 0

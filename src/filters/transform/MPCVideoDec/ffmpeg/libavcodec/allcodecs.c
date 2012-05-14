@@ -92,6 +92,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (AC3, ac3);
     REGISTER_DECODER (ALAC, alac);
     REGISTER_DECODER (ALS, als);
+    REGISTER_DECODER (APE, ape);
     REGISTER_DECODER (ATRAC3, atrac3);
     REGISTER_DECODER (COOK, cook);
     REGISTER_DECODER (EAC3, eac3);

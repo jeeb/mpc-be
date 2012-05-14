@@ -97,6 +97,7 @@ SRCS_C=\
     libavcodec/alsdec.c \
     libavcodec/amrnbdec.c \
     libavcodec/amrwbdec.c \
+    libavcodec/apedec.c \
     libavcodec/atrac.c \
     libavcodec/atrac3.c \
     libavcodec/avfft.c \

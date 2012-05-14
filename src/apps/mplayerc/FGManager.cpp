@@ -1832,6 +1832,13 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_MPC8);
 	m_transform.AddTail(pFGF);	
 
+	// APE
+	pFGF = new CFGFilterInternal<CMpaDecFilter>(
+		(ffmpeg_filters[FFM_APE]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
+		(ffmpeg_filters[FFM_APE]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_APE);
+	m_transform.AddTail(pFGF);	
+
 	pFGF = DNew CFGFilterInternal<CNullTextRenderer>(L"NullTextRenderer", MERIT64_DO_USE);
 	pFGF->AddType(MEDIATYPE_Text, MEDIASUBTYPE_NULL);
 	pFGF->AddType(MEDIATYPE_ScriptCommand, MEDIASUBTYPE_NULL);

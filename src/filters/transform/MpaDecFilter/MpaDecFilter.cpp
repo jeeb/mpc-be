@@ -61,53 +61,55 @@ typedef struct {
 
 static const FFMPEG_AUDIO_CODECS ffAudioCodecs[] = {
 	// AMR
-	{ &MEDIASUBTYPE_AMR,		CODEC_ID_AMR_NB },
-	{ &MEDIASUBTYPE_SAMR,		CODEC_ID_AMR_NB },
-	{ &MEDIASUBTYPE_SAWB,		CODEC_ID_AMR_WB },
+	{ &MEDIASUBTYPE_AMR,				CODEC_ID_AMR_NB},
+	{ &MEDIASUBTYPE_SAMR,				CODEC_ID_AMR_NB},
+	{ &MEDIASUBTYPE_SAWB,				CODEC_ID_AMR_WB},
 	// AAC
-	{ &MEDIASUBTYPE_AAC,		CODEC_ID_AAC },
-	{ &MEDIASUBTYPE_MP4A,		CODEC_ID_AAC },
-	{ &MEDIASUBTYPE_mp4a,		CODEC_ID_AAC },
-	{ &MEDIASUBTYPE_AAC_ADTS,	CODEC_ID_AAC },
-	{ &MEDIASUBTYPE_LATM_AAC,	CODEC_ID_AAC_LATM },
+	{ &MEDIASUBTYPE_AAC,				CODEC_ID_AAC},
+	{ &MEDIASUBTYPE_MP4A,				CODEC_ID_AAC},
+	{ &MEDIASUBTYPE_mp4a,				CODEC_ID_AAC},
+	{ &MEDIASUBTYPE_AAC_ADTS,			CODEC_ID_AAC},
+	{ &MEDIASUBTYPE_LATM_AAC,			CODEC_ID_AAC_LATM},
 	// ALAC
-	{ &MEDIASUBTYPE_ALAC,		CODEC_ID_ALAC },
+	{ &MEDIASUBTYPE_ALAC,				CODEC_ID_ALAC},
 	// MPEG-4 ALS
-	{ &MEDIASUBTYPE_ALS,		CODEC_ID_MP4ALS },
+	{ &MEDIASUBTYPE_ALS,				CODEC_ID_MP4ALS},
 	// Ogg Vorbis
-	{ &MEDIASUBTYPE_Vorbis2,	CODEC_ID_VORBIS },
+	{ &MEDIASUBTYPE_Vorbis2,			CODEC_ID_VORBIS},
 	// NellyMoser
-	{ &MEDIASUBTYPE_NELLYMOSER,	CODEC_ID_NELLYMOSER },
+	{ &MEDIASUBTYPE_NELLYMOSER,			CODEC_ID_NELLYMOSER},
 	// Qt ADPCM
-	{ &MEDIASUBTYPE_IMA4,		CODEC_ID_ADPCM_IMA_QT },
+	{ &MEDIASUBTYPE_IMA4,				CODEC_ID_ADPCM_IMA_QT},
 	// QDM2
-	{ &MEDIASUBTYPE_QDM2,		CODEC_ID_QDM2 },
+	{ &MEDIASUBTYPE_QDM2,				CODEC_ID_QDM2},
 	// WavPack4
-	{ &MEDIASUBTYPE_WAVPACK4,	CODEC_ID_WAVPACK },
+	{ &MEDIASUBTYPE_WAVPACK4,			CODEC_ID_WAVPACK},
 	// MusePack v7/v8
-	{ &MEDIASUBTYPE_MPC7,		CODEC_ID_MUSEPACK7 },
-	{ &MEDIASUBTYPE_MPC8,		CODEC_ID_MUSEPACK8 },
+	{ &MEDIASUBTYPE_MPC7,				CODEC_ID_MUSEPACK7},
+	{ &MEDIASUBTYPE_MPC8,				CODEC_ID_MUSEPACK8},
 	// FLV ADPCM
-	{ &MEDIASUBTYPE_ADPCM_SWF,	CODEC_ID_ADPCM_SWF	  },
+	{ &MEDIASUBTYPE_ADPCM_SWF,			CODEC_ID_ADPCM_SWF},
 	// MPEG Audio
-	{ &MEDIASUBTYPE_MPEG1Packet,		CODEC_ID_MP2 },
-	{ &MEDIASUBTYPE_MPEG1Payload,		CODEC_ID_MP2 },
-	{ &MEDIASUBTYPE_MPEG1AudioPayload,	CODEC_ID_MP2 },
-	{ &MEDIASUBTYPE_MPEG2_AUDIO,		CODEC_ID_MP2 },
-	{ &MEDIASUBTYPE_MP3,				CODEC_ID_MP3 },
+	{ &MEDIASUBTYPE_MPEG1Packet,		CODEC_ID_MP2},
+	{ &MEDIASUBTYPE_MPEG1Payload,		CODEC_ID_MP2},
+	{ &MEDIASUBTYPE_MPEG1AudioPayload,	CODEC_ID_MP2},
+	{ &MEDIASUBTYPE_MPEG2_AUDIO,		CODEC_ID_MP2},
+	{ &MEDIASUBTYPE_MP3,				CODEC_ID_MP3},
 	// RealMedia Audio
-	{ &MEDIASUBTYPE_14_4,		CODEC_ID_RA_144	},
-	{ &MEDIASUBTYPE_28_8,		CODEC_ID_RA_288	},
-	{ &MEDIASUBTYPE_ATRC,		CODEC_ID_ATRAC3	},
-	{ &MEDIASUBTYPE_COOK,		CODEC_ID_COOK	},
-	{ &MEDIASUBTYPE_SIPR,		CODEC_ID_SIPR	},
-	{ &MEDIASUBTYPE_RAAC,		CODEC_ID_AAC	},
-	{ &MEDIASUBTYPE_RACP,		CODEC_ID_AAC	},
+	{ &MEDIASUBTYPE_14_4,				CODEC_ID_RA_144},
+	{ &MEDIASUBTYPE_28_8,				CODEC_ID_RA_288},
+	{ &MEDIASUBTYPE_ATRC,				CODEC_ID_ATRAC3},
+	{ &MEDIASUBTYPE_COOK,				CODEC_ID_COOK},
+	{ &MEDIASUBTYPE_SIPR,				CODEC_ID_SIPR},
+	{ &MEDIASUBTYPE_RAAC,				CODEC_ID_AAC},
+	{ &MEDIASUBTYPE_RACP,				CODEC_ID_AAC},
 	// E-AC3, TrueHD
-	{ &MEDIASUBTYPE_DOLBY_DDPLUS, CODEC_ID_EAC3   },
-	{ &MEDIASUBTYPE_DOLBY_TRUEHD, CODEC_ID_TRUEHD },
+	{ &MEDIASUBTYPE_DOLBY_DDPLUS,		CODEC_ID_EAC3},
+	{ &MEDIASUBTYPE_DOLBY_TRUEHD,		CODEC_ID_TRUEHD},
+	// APE
+	{ &MEDIASUBTYPE_APE,				CODEC_ID_APE},
 	
-	{ &MEDIASUBTYPE_None,		CODEC_ID_NONE },
+	{ &MEDIASUBTYPE_None,				CODEC_ID_NONE},
 };
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
@@ -211,6 +213,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	// MusePack
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_MPC7},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_MPC8},
+	// APE
+	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_APE},
 };
 
 #ifdef REGISTER_FILTER
@@ -2240,7 +2244,7 @@ HRESULT CMpaDecFilter::DeliverFFmpeg(enum CodecID nCodecId, BYTE* p, int buffsiz
 			if (used_bytes < 0) {
 				TRACE(_T("CMpaDecFilter::DeliverFFmpeg() - audio parsing failed (ret: %d)\n"), -used_bytes);
 				goto fail;
-			} else if (used_bytes == 0 && pOut_size == 0) {
+			} else if (!used_bytes && !pOut_size) {
 				TRACE(_T("CMpaDecFilter::DeliverFFmpeg() - could not process buffer while parsing\n"));
 				break;
 			}
@@ -2270,11 +2274,11 @@ HRESULT CMpaDecFilter::DeliverFFmpeg(enum CodecID nCodecId, BYTE* p, int buffsiz
 
 			int used_bytes = avcodec_decode_audio4(m_pAVCtx, m_pFrame, &got_frame, &avpkt);
 
-			if (used_bytes < 0 || (used_bytes == 0 && !got_frame)) {
+			if (used_bytes < 0 ) {
 				TRACE(_T("CMpaDecFilter::DeliverFFmpeg() - decoding failed\n"));
 				size = used_bytes;
 				goto fail;
-			} else if (used_bytes == 0) {
+			} else if(!used_bytes && !got_frame) {
 				TRACE(_T("CMpaDecFilter::DeliverFFmpeg() - could not process buffer while decoding\n"));
 				break;
 			} else if (m_pAVCtx->channels>8) {
@@ -2289,7 +2293,7 @@ HRESULT CMpaDecFilter::DeliverFFmpeg(enum CodecID nCodecId, BYTE* p, int buffsiz
 			pDataInBuff += used_bytes;
 		}
 
-		if (got_frame) {
+		if (got_frame && m_pFrame->nb_samples > 0) {
 			CAtlArray<float> pBuff;
 			int              nRemap;
 			float*           pDataOut;
