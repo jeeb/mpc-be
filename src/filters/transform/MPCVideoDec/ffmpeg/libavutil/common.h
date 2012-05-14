@@ -61,13 +61,18 @@
 #define FF_ARRAY_ELEMS(a) (sizeof(a) / sizeof((a)[0]))
 #define FFALIGN(x, a) (((x)+(a)-1)&~((a)-1))
 
-// ==> Start patch MPC
+// ==> Start patch MPC BE
 #ifdef __cplusplus
     #ifndef UINT64_C
         #define UINT64_C(x) (x ## ULL)
     #endif
 #endif
-// <== End patch MPC
+
+#ifdef _MSC_VER
+    #pragma warning(push)
+    #pragma warning(disable: 4244)
+#endif
+// <== End patch MPC BE
 
 /* misc math functions */
 extern const uint8_t ff_log2_tab[256];
@@ -362,6 +367,12 @@ static av_always_inline av_const int av_popcount64_c(uint64_t x)
 #ifdef HAVE_AV_CONFIG_H
 #    include "internal.h"
 #endif /* HAVE_AV_CONFIG_H */
+
+// ==> Start patch MPC BE
+#ifdef _MSC_VER
+    #pragma warning(pop)
+#endif
+// <== End patch MPC BE
 
 #endif /* AVUTIL_COMMON_H */
 
