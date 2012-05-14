@@ -12981,9 +12981,17 @@ void CMainFrame::SetupNavChaptersSubMenu()
 
 IBaseFilter* CMainFrame::FindSourceSelectableFilter()
 {
-	IBaseFilter*	pSF = NULL;
+	IBaseFilter* pSF = NULL;
 
-	pSF = FindFilter(CLSID_OggSplitter, pGB);
+	// splitters for video files (mpeg files with only audio track is very rare)
+	pSF = FindFilter(__uuidof(CMpegSplitterFilter), pGB);
+	if (!pSF) {
+		pSF = FindFilter(__uuidof(CMpegSourceFilter), pGB);
+	}
+	// universal splitters
+	if (!pSF) {
+		pSF = FindFilter(CLSID_OggSplitter, pGB);
+	}
 	if (!pSF) {
 		pSF = FindFilter(L"{171252A0-8820-4AFE-9DF8-5C92B2D66B04}", pGB); // LAV Splitter
 	}
@@ -13001,12 +13009,6 @@ IBaseFilter* CMainFrame::FindSourceSelectableFilter()
 	}
 	if (!pSF) {
 		pSF = FindFilter(L"{D8980E15-E1F6-4916-A10F-D7EB4E9E10B8}", pGB); // AV Source
-	}
-	if (!pSF) {
-		pSF = FindFilter(__uuidof(CMpegSplitterFilter), pGB);
-	}
-	if (!pSF) {
-		pSF = FindFilter(__uuidof(CMpegSourceFilter), pGB);
 	}
 
 	return pSF;
