@@ -254,6 +254,11 @@ SRCS_C=\
     libavcodec/vp8.c \
     libavcodec/vp8dsp.c \
     libavcodec/wavpack.c \
+    libavcodec/wma.c \
+    libavcodec/wma_common.c \
+    libavcodec/wmadec.c \
+    libavcodec/wmalosslessdec.c \
+    libavcodec/wmaprodec.c \
     libavcodec/wmv2.c \
     libavcodec/wmv2dec.c \
     libavcodec/xiph.c \

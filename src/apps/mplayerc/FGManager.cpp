@@ -1846,6 +1846,28 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_TRUESPEECH);
 	m_transform.AddTail(pFGF);
 
+	// Windows Media Audio 9 Professional
+	pFGF = new CFGFilterInternal<CMpaDecFilter>(
+		(ffmpeg_filters[FFM_WMAPRO]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
+		(ffmpeg_filters[FFM_WMAPRO]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+	pFGF->AddType(MEDIATYPE_Audio, WMMEDIASUBTYPE_WMAudioV9);
+	m_transform.AddTail(pFGF);
+
+	// Windows Media Audio Lossless
+	pFGF = new CFGFilterInternal<CMpaDecFilter>(
+		(ffmpeg_filters[FFM_WMALOSS]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
+		(ffmpeg_filters[FFM_WMALOSS]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+	pFGF->AddType(MEDIATYPE_Audio, WMMEDIASUBTYPE_WMAudio_Lossless);
+	m_transform.AddTail(pFGF);
+
+	// Windows Media Audio 1, 2
+	pFGF = new CFGFilterInternal<CMpaDecFilter>(
+		(ffmpeg_filters[FFM_WMA2]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
+		(ffmpeg_filters[FFM_WMA2]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+	pFGF->AddType(MEDIATYPE_Audio, WMMEDIASUBTYPE_WMAudioV1);
+	pFGF->AddType(MEDIATYPE_Audio, WMMEDIASUBTYPE_WMAudioV2);
+	m_transform.AddTail(pFGF);
+
 	pFGF = DNew CFGFilterInternal<CNullTextRenderer>(L"NullTextRenderer", MERIT64_DO_USE);
 	pFGF->AddType(MEDIATYPE_Text, MEDIASUBTYPE_NULL);
 	pFGF->AddType(MEDIATYPE_ScriptCommand, MEDIASUBTYPE_NULL);

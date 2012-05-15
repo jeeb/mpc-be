@@ -110,6 +110,13 @@ static const FFMPEG_AUDIO_CODECS ffAudioCodecs[] = {
 	{ &MEDIASUBTYPE_APE,				CODEC_ID_APE},
 	// TRUESPEECH
 	{ &MEDIASUBTYPE_TRUESPEECH,			CODEC_ID_TRUESPEECH},
+	// Windows Media Audio 9 Professional
+	{ &WMMEDIASUBTYPE_WMAudioV9,		CODEC_ID_WMAPRO},
+	// Windows Media Audio Lossless
+	{ &WMMEDIASUBTYPE_WMAudio_Lossless,	CODEC_ID_WMALOSSLESS},
+	// Windows Media Audio 1, 2
+	{ &WMMEDIASUBTYPE_WMAudioV1,		CODEC_ID_WMAV1},
+	{ &WMMEDIASUBTYPE_WMAudioV2,		CODEC_ID_WMAV2},
 
 	{ &MEDIASUBTYPE_None,				CODEC_ID_NONE},
 };
@@ -219,6 +226,13 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_APE},
 	// TRUESPEECH
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_TRUESPEECH},
+	// Windows Media Audio 9 Professional
+	{&MEDIATYPE_Audio,				&WMMEDIASUBTYPE_WMAudioV9},
+	// Windows Media Audio Lossless
+	{&MEDIATYPE_Audio,				&WMMEDIASUBTYPE_WMAudio_Lossless},
+	// Windows Media Audio 2
+	{&MEDIATYPE_Audio,				&WMMEDIASUBTYPE_WMAudioV1},
+	{&MEDIATYPE_Audio,				&WMMEDIASUBTYPE_WMAudioV2},
 };
 
 #ifdef REGISTER_FILTER
