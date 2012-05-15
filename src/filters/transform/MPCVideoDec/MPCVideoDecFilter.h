@@ -128,7 +128,6 @@ protected:
 	int										m_nWidth;				// Frame width give to input pin
 	int										m_nHeight;				// Frame height give to input pin
 
-	bool									m_bTheoraMTSupport;
 	bool									m_bIsEVO;
 
 	// Buffer management for truncated stream (store stream chunks & reference time sent by splitter)

@@ -658,7 +658,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_nDXVA_SD					= 0;
 	m_sar.SetSize(1,1);
 
-	m_bTheoraMTSupport		= true;
 	m_bWaitingForKeyFrame	= TRUE;
 	m_nPosB					= 1;
 	m_bFrame_repeat_pict	= false;
@@ -1185,9 +1184,7 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 			m_nCodecId	= ffCodecs[nNewCodec].nFFCodec;
 
 			CLSID ClsidSourceFilter = GetCLSID(m_pInput->GetConnected());
-			if ((ClsidSourceFilter == __uuidof(COggSourceFilter)) || (ClsidSourceFilter == __uuidof(COggSplitterFilter))) {
-				m_bTheoraMTSupport = false;
-			} else if ((ClsidSourceFilter == __uuidof(CMpegSourceFilter)) || (ClsidSourceFilter == __uuidof(CMpegSplitterFilter))) {
+			if ((ClsidSourceFilter == __uuidof(CMpegSourceFilter)) || (ClsidSourceFilter == __uuidof(CMpegSplitterFilter))) {
 				if (CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected()) ) {
 					if (CComQIPtr<IMpegSplitterFilter> MpegSplitterFilter = pFilter ) {
 						m_bIsEVO = (m_nCodecId == CODEC_ID_VC1 && mpeg_ps == MpegSplitterFilter->GetMPEGType());
@@ -1204,7 +1201,7 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 
 			int nThreadNumber = m_nThreadNumber ? m_nThreadNumber : m_pCpuId->GetProcessorNumber() * 3/2;
 			if ((nThreadNumber > 1) && IsMultiThreadSupported (m_nCodecId)) {
-				FFSetThreadNumber(m_pAVCtx, m_nCodecId, (IsDXVASupported() || (m_nCodecId == CODEC_ID_THEORA && !m_bTheoraMTSupport)) ? 1 : nThreadNumber);
+				FFSetThreadNumber(m_pAVCtx, m_nCodecId, IsDXVASupported() ? 1 : nThreadNumber);
 			}
 
 			m_pFrame = avcodec_alloc_frame();

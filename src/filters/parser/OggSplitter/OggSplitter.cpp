@@ -391,6 +391,8 @@ bool COggSplitterFilter::DemuxInit()
 
 void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
+	CAutoLock csAutoLock(&m_csDemux);
+
 	if (rt <= 0 ) {
 		m_pFile->Seek(0);
 	} else if (m_rtDuration > 0) {
@@ -573,7 +575,13 @@ bool COggSplitterFilter::DemuxLoop()
 	HRESULT hr = S_OK;
 
 	OggPage page;
-	while (SUCCEEDED(hr) && !CheckRequest(NULL) && m_pFile->Read(page, true, GetRequestHandle())) {
+	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
+		CAutoLock csAutoLock(&m_csDemux);
+
+		if(!m_pFile->Read(page, true, GetRequestHandle())) {
+			break;
+		}
+
 		COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
 		if (!pOggPin) {
 			//ASSERT(0);
@@ -1331,6 +1339,12 @@ HRESULT COggTheoraOutputPin::UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, i
 {
 	if (!pData) {
 		return E_FAIL;
+	}
+
+	if (len >= 7 && !memcmp(pData+1, "theora", 6)) {
+		if (IsInitialized()) {
+			return E_FAIL; // skip Theora header packets ...
+		}
 	}
 
 	p->bSyncPoint	= len > 0 ? !(*pData & 0x40) : TRUE;
