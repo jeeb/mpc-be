@@ -295,7 +295,7 @@ void CPPageTweaks::OnClickClrDefault()
 	GetDlgItem(IDC_BUTTON_CLROUTLINE)->Invalidate();
 	PostMessage(WM_COMMAND, IDC_CHECK3);
 
-	AfxGetAppSettings().nThemeBrightness	= m_nThemeBrightness	= 25;
+	AfxGetAppSettings().nThemeBrightness	= m_nThemeBrightness	= 15;
 	AfxGetAppSettings().nThemeRed			= m_nThemeRed			= 256;
 	AfxGetAppSettings().nThemeGreen			= m_nThemeGreen			= 256;
 	AfxGetAppSettings().nThemeBlue			= m_nThemeBlue			= 256;

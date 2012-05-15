@@ -80,8 +80,8 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 		TBBS_BUTTON, TBBS_BUTTON, TBBS_BUTTON, TBBS_BUTTON,
 		TBBS_SEPARATOR,
 		TBBS_BUTTON,
-		TBBS_SEPARATOR,
-		TBBS_SEPARATOR,
+		//TBBS_SEPARATOR,
+		//TBBS_SEPARATOR,
 		TBBS_CHECKBOX,
 	};
 
@@ -317,8 +317,6 @@ void CPlayerToolBar::ArrangeControls()
 	CRect r9;
 	GetItemRect(9, &r9);
 
-	CRect vr;
-	m_volctrl.GetClientRect(&vr);
 	CRect vr2(r.right + br.right - 60, r.bottom - 25, r.right +br.right + 6, r.bottom);
 
 	if (s.fDisableXPToolbars) {
@@ -328,11 +326,7 @@ void CPlayerToolBar::ArrangeControls()
 
 	m_volctrl.MoveWindow(vr2);
 
-	UINT nID;
-	UINT nStyle;
-	int iImage;
-	GetButtonInfo(11, nID, nStyle, iImage);
-	SetButtonInfo(10, GetItemID(10), TBBS_SEPARATOR, vr2.left - iImage - r9.right - (r9.bottom - r9.top) + 10);
+	SetButtonInfo(10, GetItemID(10), TBBS_SEPARATOR|TBBS_DISABLED, vr2.left - r9.right - r9.bottom - r9.top);
 }
 
 void CPlayerToolBar::SetMute(bool fMute)
