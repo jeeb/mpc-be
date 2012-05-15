@@ -145,6 +145,7 @@ public:
 
 COggSplitterFilter::COggSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("COggSplitterFilter"), pUnk, phr, __uuidof(this))
+	, m_bIsTheora(false)
 {
 }
 
@@ -286,6 +287,7 @@ HRESULT COggSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			p->UnpackInitPage(page);
 			if (p->IsInitialized()) {
 				nWaitForMore--;
+				m_bIsTheora = true;
 			}
 		}
 
@@ -391,8 +393,6 @@ bool COggSplitterFilter::DemuxInit()
 
 void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
-	CAutoLock csAutoLock(&m_csDemux);
-
 	if (rt <= 0 ) {
 		m_pFile->Seek(0);
 	} else if (m_rtDuration > 0) {
@@ -576,7 +576,6 @@ bool COggSplitterFilter::DemuxLoop()
 
 	OggPage page;
 	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
-		CAutoLock csAutoLock(&m_csDemux);
 
 		if(!m_pFile->Read(page, true, GetRequestHandle())) {
 			break;
@@ -597,7 +596,13 @@ bool COggSplitterFilter::DemuxLoop()
 		CAutoPtr<OggPacket> p;
 		while (!CheckRequest(NULL) && SUCCEEDED(hr) && (p = pOggPin->GetPacket())) {
 			if (!p->fSkip) {
-				hr = DeliverPacket(p);
+				if (m_bIsTheora) {
+					if ((m_rtStart - p->rtStart) < 30000000) {
+						hr = DeliverPacket(p);
+					}
+				} else {
+					hr = DeliverPacket(p);
+				}
 			}
 		}
 	}

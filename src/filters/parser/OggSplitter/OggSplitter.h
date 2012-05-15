@@ -217,7 +217,7 @@ protected:
 	void DemuxSeek(REFERENCE_TIME rt);
 	bool DemuxLoop();
 
-	CCritSec m_csDemux;
+	bool m_bIsTheora;
 
 public:
 	COggSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr);
