@@ -238,8 +238,9 @@ void CPlayerSubresyncBar::SaveSubtitle()
 		}
 
 		for (int i = 0, j = m_sts.GetCount(); i < j; i++) {
-			int vobid, cellid, forced, spnum, c;
-			if (_stscanf(m_sts.GetStr(i), _T("%d%c%d%c%d%c%d"), &vobid, &c, &cellid, &c, &forced, &c, &spnum) != 7) {
+			int vobid, cellid, forced, spnum;
+			TCHAR c;
+			if (_stscanf_s(m_sts.GetStr(i), _T("%d%c%d%c%d%c%d"), &vobid, &c, sizeof(TCHAR), &cellid, &c, sizeof(TCHAR), &forced, &c, sizeof(TCHAR), &spnum) != 7) {
 				continue;
 			}
 			sp[spnum].start = m_sts[i].start;
@@ -408,8 +409,9 @@ void CPlayerSubresyncBar::UpdateStrings()
 		}
 	} else if (m_mode == VOBSUB) {
 		for (int i = 0, j = m_sts.GetCount(); i < j; i++) {
-			int vobid, cellid, forced, c;
-			if (_stscanf(m_sts.GetStr(i), _T("%d%c%d%c%d"), &vobid, &c, &cellid, &c, &forced) != 5) {
+			int vobid, cellid, forced;
+			TCHAR c;
+			if (_stscanf_s(m_sts.GetStr(i), _T("%d%c%d%c%d"), &vobid, &c, sizeof(TCHAR), &cellid, &c, sizeof(TCHAR), &forced) != 5) {
 				continue;
 			}
 			if (vobid < 0) {
@@ -577,7 +579,8 @@ static bool ParseTime(CString str, int& ret, bool fWarn = true)
 		sign = -1;
 	}
 
-	int n = _stscanf(str, _T("%d%c%d%c%d%c%d"), &h, &c, &m, &c, &s, &c, &ms);
+	int n = _stscanf_s(str, _T("%d%c%d%c%d%c%d"), &h, &c, sizeof(TCHAR),
+					   &m, &c, sizeof(TCHAR), &s, &c, sizeof(TCHAR), &ms);
 
 	h = abs(h);
 

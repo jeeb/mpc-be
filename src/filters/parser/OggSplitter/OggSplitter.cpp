@@ -369,7 +369,9 @@ HRESULT COggSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 				int h, m, s, ms;
 				WCHAR c;
-				if (7 != swscanf(time, L"%d%c%d%c%d%c%d", &h, &c, &m, &c, &s, &c, &ms)) {
+//				if (7 != swscanf(time, L"%d%c%d%c%d%c%d", &h, &c, &m, &c, &s, &c, &ms)) {	// temp rem SZL - 4728
+				if (7 != swscanf_s(time, L"%d%c%d%c%d%c%d", &h, &c, sizeof(WCHAR),			// temp ins SZL - 4728
+								   &m, &c, sizeof(WCHAR), &s, &c, sizeof(WCHAR), &ms)) {	// temp ins SZL - 4728
 					break;
 				}
 				REFERENCE_TIME rt = ((((REFERENCE_TIME)h*60+m)*60+s)*1000+ms)*10000;
