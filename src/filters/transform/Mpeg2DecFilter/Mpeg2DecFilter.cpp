@@ -538,8 +538,22 @@ HRESULT CMpeg2DecFilter::Transform(IMediaSample* pIn)
 		rtStart = rtStop = _I64_MIN;
 	}
 
+	int nInvalidBufferCount = 0;
 	while (len >= 0) {
 		mpeg2_state_t state = m_dec->mpeg2_parse();
+
+		if (state == STATE_BUFFER) {
+			nInvalidBufferCount++;
+		} else {
+			nInvalidBufferCount = 0;
+		}
+
+		if (nInvalidBufferCount == 2 && m_dec->m_decoder.m_mpeg1) {
+			nInvalidBufferCount = 0;
+			InputTypeChanged();
+			return S_OK;
+		}
+
 #ifndef _WIN64
 		__asm emms; // this one is missing somewhere in the precompiled mmx obj files
 #endif
