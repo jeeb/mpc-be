@@ -1180,6 +1180,40 @@ static void quant_matrix_rebuild(uint16_t *matrix, const uint8_t *old_perm,
     }
 }
 
+static const enum PixelFormat mpeg1_hwaccel_pixfmt_list_420[] = {
+#if CONFIG_MPEG_XVMC_DECODER
+    PIX_FMT_XVMC_MPEG2_IDCT,
+    PIX_FMT_XVMC_MPEG2_MC,
+#endif
+#if CONFIG_MPEG1_VDPAU_HWACCEL
+    PIX_FMT_VDPAU_MPEG1,
+#endif
+    PIX_FMT_YUV420P,
+    PIX_FMT_NONE
+};
+
+static const enum PixelFormat mpeg2_hwaccel_pixfmt_list_420[] = {
+#if CONFIG_MPEG_XVMC_DECODER
+    PIX_FMT_XVMC_MPEG2_IDCT,
+    PIX_FMT_XVMC_MPEG2_MC,
+#endif
+#if CONFIG_MPEG2_VDPAU_HWACCEL
+    PIX_FMT_VDPAU_MPEG2,
+#endif
+#if CONFIG_MPEG2_DXVA2_HWACCEL
+    PIX_FMT_DXVA2_VLD,
+#endif
+#if CONFIG_MPEG2_VAAPI_HWACCEL
+    PIX_FMT_VAAPI_VLD,
+#endif
+    PIX_FMT_YUV420P,
+    PIX_FMT_NONE
+};
+
+static inline int uses_vdpau(AVCodecContext *avctx) {
+    return avctx->pix_fmt == PIX_FMT_VDPAU_MPEG1 || avctx->pix_fmt == PIX_FMT_VDPAU_MPEG2;
+}
+
 static enum PixelFormat mpeg_get_pixelformat(AVCodecContext *avctx)
 {
     Mpeg1Context *s1 = avctx->priv_data;
@@ -1187,8 +1221,21 @@ static enum PixelFormat mpeg_get_pixelformat(AVCodecContext *avctx)
 
     if (s->chroma_format < 2) {
         // ==> Start patch MPC
+        if (s->avctx->mpeg2_using_dxva)
         return PIX_FMT_YUV420P;
         // ==> End patch MPC
+        enum PixelFormat res;
+        res = avctx->get_format(avctx,
+                                avctx->codec_id == CODEC_ID_MPEG1VIDEO ?
+                                mpeg1_hwaccel_pixfmt_list_420 :
+                                mpeg2_hwaccel_pixfmt_list_420);
+        if (res != PIX_FMT_XVMC_MPEG2_IDCT && res != PIX_FMT_XVMC_MPEG2_MC) {
+            avctx->xvmc_acceleration = 0;
+        } else if (!avctx->xvmc_acceleration) {
+            avctx->xvmc_acceleration = 2;
+        }
+        return res;
+
     } else if(s->chroma_format == 2)
         return PIX_FMT_YUV422P;
     else
@@ -1702,7 +1749,7 @@ static int mpeg_decode_slice(MpegEncContext *s, int mb_y,
     }
 
     // ==> Start patch MPC
-    if (s->avctx->codec->capabilities&CODEC_CAP_HWACCEL_VDPAU) {
+    if (s->avctx->mpeg2_using_dxva) {
         Mpeg1Context *s1 = (Mpeg1Context*)s;
         const uint8_t *buf_end, *buf_start = *buf - 4; /* include start_code */
         const uint8_t *buffer;
@@ -1967,7 +2014,7 @@ static int slice_end(AVCodecContext *avctx, AVFrame *pict)
         s->current_picture_ptr->f.qscale_type = FF_QSCALE_TYPE_MPEG2;
 
         // ==> Start patch MPC
-        if (!s->avctx->codec->capabilities&CODEC_CAP_HWACCEL_VDPAU)
+        if (!s->avctx->mpeg2_using_dxva)
         // ==> End patch MPC
         ff_er_frame_end(s);
 
@@ -2513,12 +2560,12 @@ static int decode_chunks(AVCodecContext *avctx,
                 }
 
                 // ==> Start patch MPC
-                /*
+                if (!s2->avctx->mpeg2_using_dxva) {
                 if (uses_vdpau(avctx)) {
                     s->slice_count++;
                     break;
                 }
-                */
+                }
                 // <== End patch MPC
 
                 if (HAVE_THREADS && (avctx->active_thread_type & FF_THREAD_SLICE)) {
@@ -2548,10 +2595,10 @@ static int decode_chunks(AVCodecContext *avctx,
                             return ret;
                         if (s2->resync_mb_x >= 0 && s2->resync_mb_y >= 0)
                             ff_er_add_slice(s2, s2->resync_mb_x, s2->resync_mb_y, s2->mb_x, s2->mb_y, ER_AC_ERROR | ER_DC_ERROR | ER_MV_ERROR);
-                    // ==> Start patch MPC
-                    else if (!s2->avctx->codec->capabilities&CODEC_CAP_HWACCEL_VDPAU)
-                    //} else {
-                    // <== End patch MPC
+                    } else {
+                        // ==> Start patch MPC
+                        if (!s2->avctx->mpeg2_using_dxva)
+                        // <== End patch MPC
                         ff_er_add_slice(s2, s2->resync_mb_x, s2->resync_mb_y, s2->mb_x-1, s2->mb_y, ER_AC_END | ER_DC_END | ER_MV_END);
                     }
                 }
@@ -2616,11 +2663,9 @@ AVCodec ff_mpeg2video_decoder = {
     .init           = mpeg_decode_init,
     .close          = mpeg_decode_end,
     .decode         = mpeg_decode_frame,
-     // ==> Start patch MPC
     .capabilities   = CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1 |
                       CODEC_CAP_TRUNCATED | CODEC_CAP_DELAY |
-                      CODEC_CAP_HWACCEL_VDPAU,
-    // ==> End patch MPC
+                      CODEC_CAP_SLICE_THREADS,
     .flush          = flush,
     .long_name      = NULL_IF_CONFIG_SMALL("MPEG-2 video"),
     .profiles       = NULL_IF_CONFIG_SMALL(mpeg2_video_profiles),

@@ -594,7 +594,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 		// AAC_LATM
 		if (type == unknown) {
 			CMpegSplitterFile::latm_aachdr h;
-			if (!m_streams[audio].Find(s) && Read(h, len, &s.mt)) {
+			if (!m_streams[audio].Find(s) && Read(h, len, &s.mt) && m_type == mpeg_ts) {
 				PES_STREAM_TYPE stream_type = INVALID;
 				if (GetStreamType(s.pid, stream_type)) {
 					if (IsAACLATMAudio(stream_type)) {

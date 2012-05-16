@@ -1273,6 +1273,8 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 				m_pAVCtx->flags2			|= CODEC_FLAG2_SHOW_ALL;
 			}
 
+			m_pAVCtx->mpeg2_using_dxva		= (m_nCodecId == CODEC_ID_MPEG2VIDEO);
+
 			AllocExtradata (m_pAVCtx, pmt);
 			ConnectTo (m_pAVCtx);
 			CalcAvgTimePerFrame();
