@@ -8371,6 +8371,9 @@ void CMainFrame::OnNavigateAudio(UINT nID)
 
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
 		OnNavStreamSelectSubMenu(nID, 1);
+		if (m_iAudioStreams.GetCount() > 0) {
+            OnPlayAudio (ID_AUDIO_SUBITEM_START + 1);
+        }
 	} else if (GetPlaybackMode() == PM_DVD) {
 		pDVDC->SelectAudioStream(nID, DVD_CMD_FLAG_Block, NULL);
 	}
