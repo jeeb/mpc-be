@@ -125,7 +125,7 @@
 #define HAVE_GETPROCESSTIMES 1
 #define HAVE_GETRUSAGE 0
 #define HAVE_GETSYSTEMINFO 1
-#define HAVE_GNU_AS 1  //???
+#define HAVE_GNU_AS 1
 #define HAVE_FAST_UNALIGNED 1
 #define HAVE_ISATTY 0
 #define HAVE_LOCAL_ALIGNED_16 1
@@ -177,9 +177,8 @@
   #define cbrtf(x) pow((float)x, (float)1.0/3)
 #endif
 
-#define CONFIG_AC3ENC_FLOAT 0
-#define CONFIG_AUDIO_FLOAT 1
 #define CONFIG_DCT 1
+#define CONFIG_DOC 0
 #define CONFIG_DWT 0
 #define CONFIG_GPL 1
 #define CONFIG_GRAY 1
@@ -192,8 +191,8 @@
 #define CONFIG_LIBXVID 0
 #define CONFIG_LPC 0
 #define CONFIG_MDCT 1
-#define CONFIG_MLIB 0
-#define CONFIG_MPEGAUDIO_HP 1
+#define CONFIG_MEMALIGN_HACK 1
+#define CONFIG_MPEGAUDIODSP 1
 #define CONFIG_RDFT 1
 #define CONFIG_RUNTIME_CPUDETECT 1
 #define CONFIG_SMALL 0
