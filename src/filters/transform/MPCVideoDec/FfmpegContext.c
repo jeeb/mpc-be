@@ -613,7 +613,7 @@ int	MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx, struct AVFrame* pFram
 
 	avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
 
-	return (s->chroma_format<2);
+	return (s->chroma_format == CHROMA_420);
 }
 
 HRESULT FFMpeg2DecodeFrame (DXVA_PictureParameters* pPicParams, DXVA_QmatrixData* pQMatrixData, DXVA_SliceInfo* pSliceInfo, int* nSliceCount,
