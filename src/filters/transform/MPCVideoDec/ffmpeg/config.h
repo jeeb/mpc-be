@@ -220,7 +220,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_ASV2_DECODER 0
 #define CONFIG_AVS_DECODER 0
 #define CONFIG_CAVS_DECODER 0
-#define CONFIG_CINEPAK_DECODER 0
+#define CONFIG_CINEPAK_DECODER 1
 #define CONFIG_CSCD_DECODER 1
 #define CONFIG_CYUV_DECODER 0
 #define CONFIG_DIRAC_DECODER 1

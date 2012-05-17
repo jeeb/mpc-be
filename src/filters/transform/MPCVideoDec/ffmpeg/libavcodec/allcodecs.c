@@ -48,6 +48,7 @@ void avcodec_register_all(void)
 
     /* video codecs */
     REGISTER_DECODER (AMV, amv);
+    REGISTER_DECODER (CINEPAK, cinepak);
     REGISTER_DECODER (CSCD, cscd);
     REGISTER_DECODER (DIRAC, dirac);
     REGISTER_DECODER (DVVIDEO, dvvideo);
