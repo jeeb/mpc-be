@@ -1235,7 +1235,6 @@ static enum PixelFormat mpeg_get_pixelformat(AVCodecContext *avctx)
             avctx->xvmc_acceleration = 2;
         }
         return res;
-
     } else if(s->chroma_format == 2)
         return PIX_FMT_YUV422P;
     else
