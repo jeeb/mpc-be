@@ -39,7 +39,7 @@ class CPlayerStatusBar : public CDialogBar
 	UINT m_bmid;
 	HICON m_hIcon;
 
-	CPngImage m_logobm;
+	MPCPngImage m_logobm;
 	__int64 iThemeBrightness;
 	__int64 iThemeRed;
 	__int64 iThemeGreen;

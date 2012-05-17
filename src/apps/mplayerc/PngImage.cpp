@@ -123,7 +123,7 @@ static unsigned char* DecompressPNG(struct png_t* png, int* w, int* h)
 	return pic;
 }
 
-bool CPngImage::LoadFromResource(UINT id) {
+bool MPCPngImage::LoadFromResource(UINT id) {
 	bool ret = false;
 
 	CStringA str;
@@ -147,7 +147,7 @@ bool CPngImage::LoadFromResource(UINT id) {
 	return ret;
 }
 
-CString CPngImage::LoadCurrentPath()
+CString MPCPngImage::LoadCurrentPath()
 {
 	CString path;
 	GetModuleFileName(NULL, path.GetBuffer(_MAX_PATH), _MAX_PATH);
@@ -155,7 +155,7 @@ CString CPngImage::LoadCurrentPath()
 	return path.Left(path.ReverseFind('\\') + 1);
 }
 
-int CPngImage::FileExists(CString fn)
+int MPCPngImage::FileExists(CString fn)
 {
 	CString path = LoadCurrentPath();
 
@@ -175,7 +175,7 @@ int CPngImage::FileExists(CString fn)
 	}
 }
 
-BYTE* CPngImage::BrightnessRGB(int type, BYTE* lpBits, int width, int height, int bpp, int br, int rc, int gc, int bc)
+BYTE* MPCPngImage::BrightnessRGB(int type, BYTE* lpBits, int width, int height, int bpp, int br, int rc, int gc, int bc)
 {
 	if (br >= 0 && rc >= 0 && gc >= 0 && bc >= 0) {
 
@@ -245,7 +245,7 @@ BYTE* CPngImage::BrightnessRGB(int type, BYTE* lpBits, int width, int height, in
 	return lpBits;
 }
 
-HBITMAP CPngImage::TypeLoadImage(int type, BYTE** pData, int* width, int* height, int* bpp, FILE* fp, int resid, int br, int rc, int gc, int bc)
+HBITMAP MPCPngImage::TypeLoadImage(int type, BYTE** pData, int* width, int* height, int* bpp, FILE* fp, int resid, int br, int rc, int gc, int bc)
 {
 	HBITMAP hbm;
 	BYTE* bmp;
@@ -332,7 +332,7 @@ HBITMAP CPngImage::TypeLoadImage(int type, BYTE** pData, int* width, int* height
 	return hbm;
 }
 
-HBITMAP CPngImage::LoadExternalImage(CString fn, int br, int rc, int gc, int bc)
+HBITMAP MPCPngImage::LoadExternalImage(CString fn, int br, int rc, int gc, int bc)
 {
 	CString path = LoadCurrentPath();
 
@@ -357,7 +357,7 @@ HBITMAP CPngImage::LoadExternalImage(CString fn, int br, int rc, int gc, int bc)
 	}
 }
 
-void CPngImage::LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop, int br, int rc, int gc, int bc)
+void MPCPngImage::LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop, int br, int rc, int gc, int bc)
 {
 	CString path = LoadCurrentPath();
 

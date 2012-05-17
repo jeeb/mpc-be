@@ -38,7 +38,7 @@ private:
 	void SetMute(bool fMute = true);
 	int getHitButtonIdx(CPoint point);
 
-	CPngImage m_logobm;
+	MPCPngImage m_logobm;
 	__int64 iThemeBrightness;
 	__int64 iThemeRed;
 	__int64 iThemeGreen;
