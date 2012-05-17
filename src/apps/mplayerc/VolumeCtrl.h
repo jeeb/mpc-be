@@ -37,6 +37,7 @@ private:
 	CBitmap m_bmUnderCtrl;
 
 	CPngImage m_logobm;
+	__int64 iDisableXPToolbars;
 	__int64 iThemeBrightness;
 	__int64 iThemeRed;
 	__int64 iThemeGreen;
@@ -58,6 +59,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
+	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnNMCustomdraw(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);

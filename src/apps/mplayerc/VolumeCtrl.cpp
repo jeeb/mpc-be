@@ -46,13 +46,15 @@ bool CVolumeCtrl::Create(CWnd* pParentWnd)
 		return false;
 	}
 
+	AppSettings& s = AfxGetAppSettings();
+
+	EnableToolTips(TRUE);
 	SetRange(0, 100);
-	SetPosInternal(AfxGetAppSettings().nVolume);
+	SetPosInternal(s.nVolume);
 	SetPageSize(5);
 	SetLineSize(0);
 
-	AppSettings& s = AfxGetAppSettings();
-
+	iDisableXPToolbars = s.fDisableXPToolbars + 1;
 	iThemeBrightness = s.nThemeBrightness;
 	iThemeRed = s.nThemeRed;
 	iThemeGreen = s.nThemeGreen;
@@ -84,6 +86,7 @@ BEGIN_MESSAGE_MAP(CVolumeCtrl, CSliderCtrl)
 	ON_WM_SETFOCUS()
 	ON_WM_HSCROLL_REFLECT()
 	ON_WM_SETCURSOR()
+	ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
 END_MESSAGE_MAP()
 
 // CVolumeCtrl message handlers
@@ -105,6 +108,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 		switch (pNMCD->dwDrawStage) {
 			case CDDS_PREPAINT:
 				if (s.fDisableXPToolbars && (m_bmUnderCtrl.GetSafeHandle() == NULL
+								|| iDisableXPToolbars == 1
 								|| iThemeBrightness != s.nThemeBrightness
 								|| iThemeRed != s.nThemeRed
 								|| iThemeGreen != s.nThemeGreen
@@ -118,6 +122,9 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 					if (m_bmUnderCtrl.GetSafeHandle() == NULL) {
 						m_bmUnderCtrl.CreateCompatibleBitmap(dc, wr.Width(), wr.Height());
+					}
+					if (iDisableXPToolbars == 1) {
+						iDisableXPToolbars = 2;
 					}
 
 					CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
@@ -142,6 +149,9 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 					CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
 
+					if (iDisableXPToolbars == 0) {
+						iDisableXPToolbars = 1;
+					}
 					iThemeBrightness = s.nThemeBrightness;
 					iThemeRed = s.nThemeRed;
 					iThemeGreen = s.nThemeGreen;
@@ -258,6 +268,9 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					dc.Detach();
 					lr = CDRF_SKIPDEFAULT;
 				}
+				if (!s.fDisableXPToolbars) {
+					iDisableXPToolbars = 0;
+				}
 				break;
 			default:
 				break;
@@ -328,5 +341,18 @@ void CVolumeCtrl::HScroll(UINT nSBCode, UINT nPos)
 BOOL CVolumeCtrl::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 {
 	::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_HAND));
+	return TRUE;
+}
+
+BOOL CVolumeCtrl::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
+{
+	TOOLTIPTEXT *pTTT = reinterpret_cast<LPTOOLTIPTEXT>(pNMHDR);
+	CString str;
+	str.AppendFormat(_T("%d%%"), GetPos());
+	_tcscpy_s(pTTT->szText, str);
+	pTTT->hinst = NULL;
+
+	*pResult = 0;
+
 	return TRUE;
 }
