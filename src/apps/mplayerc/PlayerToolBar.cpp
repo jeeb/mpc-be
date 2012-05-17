@@ -401,13 +401,13 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 
 	GRADIENT_RECT gr[1] = {{0, 1}};
 
-	int sep[4] = {2, 7, 9, 10};
+	int sep[] = {2, 7, 9};
 
 	if (s.fDisableXPToolbars) {
-		iThemeBrightness = AfxGetAppSettings().nThemeBrightness;
-		iThemeRed = AfxGetAppSettings().nThemeRed;
-		iThemeGreen = AfxGetAppSettings().nThemeGreen;
-		iThemeBlue = AfxGetAppSettings().nThemeBlue;
+		iThemeBrightness = s.nThemeBrightness;
+		iThemeRed = s.nThemeRed;
+		iThemeGreen = s.nThemeGreen;
+		iThemeBlue = s.nThemeBlue;
 		int iRedRB, iGreenRB, iBlueRB, iRedLT, iGreenLT, iBlueLT, iAlphaLT, iAlphaRB;
 		iRedLT		= 50 + iThemeBrightness;
 		iGreenLT	= 55 + iThemeBrightness;
@@ -457,15 +457,14 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 		case CDDS_ITEMPREPAINT:
 			//TRACE(" TB-ITEMPREPAINT ");
 			lr = CDRF_DODEFAULT;
+
 			//Without XP-theming, buttons look bad over a dark background.
-			if (s.fDisableXPToolbars)
-			{
-				//lr |= TBCDRF_HILITEHOTTRACK;//made custom glass-like hover
-				lr |= TBCDRF_NOETCHEDEFFECT;
-				lr |= TBCDRF_NOBACKGROUND;
-				lr |= TBCDRF_NOEDGES;
-				lr |= TBCDRF_NOOFFSET;
-			}
+			//lr |= TBCDRF_HILITEHOTTRACK;//made custom glass-like hover
+			lr |= TBCDRF_NOETCHEDEFFECT;
+			lr |= TBCDRF_NOBACKGROUND;
+			lr |= TBCDRF_NOEDGES;
+			lr |= TBCDRF_NOOFFSET;
+
 			lr |= CDRF_NOTIFYPOSTPAINT;
 			lr |= CDRF_NOTIFYITEMDRAW;
 			break;
@@ -486,10 +485,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			CBitmap *bmOld;
 			bmGlassLike.CreateCompatibleBitmap(&dc, nW, nH);
 			bmOld = memdc.SelectObject(&bmGlassLike);
-			/*NOTE TO SELF: never ever do noob stuff like (CBrush*) (0x00ffffff)! AND debug release, too
-			could not see it in debug, but in release the custom toolbar was failing to repaint from time to time
-			I was blaming the PPageTweaks trigger at first, good thing that the detours library complained 
-			about an access violation wich lead me here to fix it. Why did I use FillRect anyway */
+
 			//CBrush brushGlassLike(0x00ffffff);
 			memdc.FillSolidRect(rGlassLike, 0x00ffffff);//clr_resLight/white RGB(255,255,255)
 
@@ -517,7 +513,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 				dc.RoundRect(r.left +1,r.top +1,r.right -2,r.bottom -1, 6, 4);
 			}
 
-			for (int j = 0; j < 4; j++) {
+			for (int j = 0; j < countof(sep); j++) {
 				GetItemRect(sep[j], &r);
 
 				if (NULL != fp) {
@@ -542,16 +538,30 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 	} else {
 		switch(pTBCD->nmcd.dwDrawStage)
 		{
+		case CDDS_PREPAINT:
+			lr |= CDRF_NOTIFYITEMDRAW;
+			break;
+		case CDDS_POSTPAINT:
+			lr = CDRF_DODEFAULT;
+			break;
+		case CDDS_PREERASE:
+			lr = CDRF_SKIPDEFAULT;
+			break;
+		case CDDS_ITEMPREPAINT:
+			lr = CDRF_DODEFAULT;
+			lr |= CDRF_NOTIFYPOSTPAINT;
+			lr |= CDRF_NOTIFYITEMDRAW;
+			break;
 		case CDDS_ITEMPOSTPAINT:
 			lr = CDRF_DODEFAULT;
 			CDC dc;
 			dc.Attach(pTBCD->nmcd.hdc);
 			CRect r;
 
-			for (int j = 0; j < 4; j++) {
+			for (int j = 0; j < countof(sep); j++) {
 				GetItemRect(sep[j], &r);
 
-				dc.FillSolidRect(r, GetSysColor(COLOR_WINDOW));
+				dc.FillSolidRect(r, RGB(245, 245, 245));
 			}
 
 			dc.Detach();
