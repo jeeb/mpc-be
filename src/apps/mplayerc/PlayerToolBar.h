@@ -63,6 +63,7 @@ public:
 	void SetVolume(int volume);
 	__declspec(property(get=GetVolume, put=SetVolume)) int Volume;
 
+	void SwitchTheme();
 	void ArrangeControls();
 
 	CVolumeCtrl m_volctrl;

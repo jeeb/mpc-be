@@ -48,55 +48,23 @@ CPlayerToolBar::~CPlayerToolBar()
 	}
 }
 
-BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
+void CPlayerToolBar::SwitchTheme()
 {
-	if (!__super::CreateEx(pParentWnd,
-						  TBSTYLE_FLAT|TBSTYLE_TRANSPARENT|TBSTYLE_AUTOSIZE|TBSTYLE_CUSTOMERASE,
-						  WS_CHILD|WS_VISIBLE|CBRS_ALIGN_BOTTOM|CBRS_TOOLTIPS)) {
-		return FALSE;
-	}
-
-	if (!LoadToolBar(IDB_PLAYERTOOLBAR)) {
-		return FALSE;
-	}
-
-	// Should never be RTLed
-	ModifyStyleEx(WS_EX_LAYOUTRTL, WS_EX_NOINHERITLAYOUT);
-
-	GetToolBarCtrl().SetExtendedStyle(TBSTYLE_EX_DRAWDDARROWS);
-
-	CToolBarCtrl& tb = GetToolBarCtrl();
-	tb.DeleteButton(1);
-	tb.DeleteButton(tb.GetButtonCount()-1);
-	tb.DeleteButton(tb.GetButtonCount()-1);
-
 	AppSettings& s = AfxGetAppSettings();
-
-	SetMute(s.fMute);
-
-	UINT styles[] = {
-		TBBS_CHECKGROUP/*TBBS_CHECKGROUP, TBBS_CHECKGROUP*/, TBBS_CHECKGROUP,
-		TBBS_SEPARATOR,
-		TBBS_BUTTON, TBBS_BUTTON, TBBS_BUTTON, TBBS_BUTTON,
-		TBBS_SEPARATOR,
-		TBBS_BUTTON,
-		//TBBS_SEPARATOR,
-		//TBBS_SEPARATOR,
-		TBBS_CHECKBOX,
-	};
-
-	for (int i = 0; i < countof(styles); i++) {
-		SetButtonStyle(i, styles[i]|TBBS_DISABLED);
-	}
-
-	m_volctrl.Create(this);
-	m_volctrl.SetRange(0, 100);
 
 	if (s.fDisableXPToolbars) {
 		if (HMODULE h = LoadLibrary(_T("uxtheme.dll"))) {
 			SetWindowThemeFunct f = (SetWindowThemeFunct)GetProcAddress(h, "SetWindowTheme");
 			if (f) {
 				f(m_hWnd, L" ", L" ");
+			}
+			FreeLibrary(h);
+		}
+	} else {
+		if (HMODULE h = LoadLibrary(_T("uxtheme.dll"))) {
+			SetWindowThemeFunct f = (SetWindowThemeFunct)GetProcAddress(h, "SetWindowTheme");
+			if (f) {
+				f(m_hWnd, L"Explorer", NULL);
 			}
 			FreeLibrary(h);
 		}
@@ -144,6 +112,10 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 		DeleteObject(hBmp);
 	}
 
+	if (!s.fDisableXPToolbars) {
+		fDisableImgListRemap = true;
+	}
+
 	if (s.fDisableXPToolbars) {
 		if (!fDisableImgListRemap) {
 			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 0);//nRemapState = 0 Remap Active
@@ -154,9 +126,75 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 		cs.dwSize		= sizeof(COLORSCHEME);
 		cs.clrBtnHighlight	= 0x0046413c; //clr_csLight = RGB( 60, 65, 70)
 		cs.clrBtnShadow		= 0x0037322d;//clr_csShadow = RGB( 45, 50, 55)
+
 		GetToolBarCtrl().SetColorScheme(&cs);
 		GetToolBarCtrl().SetIndent(5);
+	} else {
+		if (!fDisableImgListRemap) {
+			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 2);//nRemapState = 2 Undo  Active
+			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 3);//nRemapState = 3 Undo  Disabled
+		}
+
+		COLORSCHEME cs;
+		cs.dwSize		= sizeof(COLORSCHEME);
+		cs.clrBtnHighlight	= GetSysColor(COLOR_BTNFACE);
+		cs.clrBtnShadow		= GetSysColor(COLOR_BTNSHADOW);
+
+		GetToolBarCtrl().SetColorScheme(&cs);
+		GetToolBarCtrl().SetIndent(0);
 	}
+
+	if (::IsWindow(m_volctrl.GetSafeHwnd())) {
+		m_volctrl.EnableWindow(FALSE);
+		m_volctrl.EnableWindow(TRUE);
+	}
+}
+
+BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
+{
+	if (!__super::CreateEx(pParentWnd,
+						  TBSTYLE_FLAT|TBSTYLE_TRANSPARENT|TBSTYLE_AUTOSIZE|TBSTYLE_CUSTOMERASE,
+						  WS_CHILD|WS_VISIBLE|CBRS_ALIGN_BOTTOM|CBRS_TOOLTIPS)) {
+		return FALSE;
+	}
+
+	if (!LoadToolBar(IDB_PLAYERTOOLBAR)) {
+		return FALSE;
+	}
+
+	// Should never be RTLed
+	ModifyStyleEx(WS_EX_LAYOUTRTL, WS_EX_NOINHERITLAYOUT);
+
+	GetToolBarCtrl().SetExtendedStyle(TBSTYLE_EX_DRAWDDARROWS);
+
+	CToolBarCtrl& tb = GetToolBarCtrl();
+	tb.DeleteButton(1);
+	tb.DeleteButton(tb.GetButtonCount()-1);
+	tb.DeleteButton(tb.GetButtonCount()-1);
+
+	AppSettings& s = AfxGetAppSettings();
+
+	SetMute(s.fMute);
+
+	UINT styles[] = {
+		TBBS_CHECKGROUP/*TBBS_CHECKGROUP, TBBS_CHECKGROUP*/, TBBS_CHECKGROUP,
+		TBBS_SEPARATOR,
+		TBBS_BUTTON, TBBS_BUTTON, TBBS_BUTTON, TBBS_BUTTON,
+		TBBS_SEPARATOR,
+		TBBS_BUTTON,
+		//TBBS_SEPARATOR,
+		//TBBS_SEPARATOR,
+		TBBS_CHECKBOX,
+	};
+
+	for (int i = 0; i < countof(styles); i++) {
+		SetButtonStyle(i, styles[i]|TBBS_DISABLED);
+	}
+
+	m_volctrl.Create(this);
+	m_volctrl.SetRange(0, 100);
+
+	SwitchTheme();
 
 	return TRUE;
 }
@@ -251,63 +289,8 @@ void CPlayerToolBar::ArrangeControls()
 	}
 
 	AppSettings& s = AfxGetAppSettings();
-	if (s.fDisableXPToolbars && s.fToolbarRefresh) {//if switching from default to handsome :)
-		if (!fDisableImgListRemap) {		
-			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 0);//nRemapState = 0 Remap Active
-			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 1);//nRemapState = 1 Remap Disabled
-		}
 
-		COLORSCHEME cs;
-		cs.dwSize		= sizeof(COLORSCHEME);
-		cs.clrBtnHighlight	= 0x0046413c; //clr_csLight = RGB( 60, 65, 70)
-		cs.clrBtnShadow		= 0x0037322d;//clr_csShadow = RGB( 45, 50, 55)
-
-		GetToolBarCtrl().SetColorScheme(&cs);
-		GetToolBarCtrl().SetIndent(5);
-
-		if (::IsWindow(m_volctrl.GetSafeHwnd())) {
-			m_volctrl.EnableWindow(FALSE);
-			m_volctrl.EnableWindow(TRUE);
-		}
-		//reset flag from PPageTweaks
-		s.fToolbarRefresh=false;
-		//kill default theme?!
-		if (HMODULE h = LoadLibrary(_T("uxtheme.dll"))) {
-			SetWindowThemeFunct f = (SetWindowThemeFunct)GetProcAddress(h, "SetWindowTheme");
-			if (f) {
-				f(m_hWnd, L" ", L" ");
-			}
-			FreeLibrary(h);
-		}
-	} else if (!s.fDisableXPToolbars && s.fToolbarRefresh) {//if switching from handsome to default :(
-		if (!fDisableImgListRemap) {		
-			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 2);//nRemapState = 2 Undo  Active
-			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 3);//nRemapState = 3 Undo  Disabled
-		}
-
-		COLORSCHEME cs;
-		cs.dwSize		= sizeof(COLORSCHEME);
-		cs.clrBtnHighlight	= GetSysColor(COLOR_BTNFACE);
-		cs.clrBtnShadow		= GetSysColor(COLOR_BTNSHADOW);
-
-		GetToolBarCtrl().SetColorScheme(&cs);
-		GetToolBarCtrl().SetIndent(0);
-
-		if (::IsWindow(m_volctrl.GetSafeHwnd())) {
-			m_volctrl.EnableWindow(FALSE);
-			m_volctrl.EnableWindow(TRUE);
-		}
-		//reset flag from PPageTweaks
-		s.fToolbarRefresh=false;
-		//restore default theme?!
-		if (HMODULE h = LoadLibrary(_T("uxtheme.dll"))) {
-			SetWindowThemeFunct f = (SetWindowThemeFunct)GetProcAddress(h, "SetWindowTheme");
-			if (f) {
-				f(m_hWnd, L"Explorer", NULL);
-			}
-			FreeLibrary(h);
-		}
-	}
+	SwitchTheme();
 
 	CRect r;
 	GetClientRect(&r);
@@ -354,6 +337,7 @@ bool CPlayerToolBar::IsMuted()
 int CPlayerToolBar::GetVolume()
 {
 	int volume = m_volctrl.GetPos(); // [0..100]
+
 	if (IsMuted() || volume <= 0) {
 		volume = -10000;
 	} else {
