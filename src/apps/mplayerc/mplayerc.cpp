@@ -1728,7 +1728,7 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 			CStringA hdr;
 			hdr.Format(
 				"GET %s HTTP/1.0\r\n"
-				"User-Agent: MPC-BE\r\n"
+				"User-Agent: Media Player Classic\r\n"
 				"Host: %s\r\n"
 				"Accept: */*\r\n"
 				"\r\n", path, host);
