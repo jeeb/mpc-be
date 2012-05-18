@@ -179,6 +179,12 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 	CComQIPtr<IMPCDXVA2Sample>	pDXVA2Sample;
 	int							slice_step		= 1;
 
+	if (m_nWaitingPics >= (m_nPicEntryNumber - 1)) {
+		Flush();
+		m_bFlushed = false;
+		return S_FALSE;
+	}
+
 	if (FFH264DecodeBuffer (m_pFilter->GetAVCtx(), pDataIn, nSize, &nFramePOC, &nOutPOC, &rtOutStart) == -1) {
 		return S_FALSE;
 	}
