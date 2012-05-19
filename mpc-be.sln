@@ -32,39 +32,39 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DeCSS", "src\DeCSS\DeCSS.vc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DSUtil", "src\DSUtil\DSUtil.vcxproj", "{FC70988B-1AE5-4381-866D-4F405E28AC42}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpng", "src\thirdparty\libpng\libpng.vcxproj", "{FC8080D1-603C-45EC-BCFA-7172E2F3D989}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpng", "src\ExtLib\libpng\libpng.vcxproj", "{FC8080D1-603C-45EC-BCFA-7172E2F3D989}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SubPic", "src\SubPic\SubPic.vcxproj", "{D514EA4D-EAFB-47A9-A437-A582CA571251}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Subtitles", "src\Subtitles\Subtitles.vcxproj", "{5E56335F-0FB1-4EEA-B240-D8DC5E0608E4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Kasumi", "src\thirdparty\VirtualDub\Kasumi\Kasumi.vcxproj", "{0D252872-7542-4232-8D02-53F9182AEE15}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Kasumi", "src\ExtLib\VirtualDub\Kasumi\Kasumi.vcxproj", "{0D252872-7542-4232-8D02-53F9182AEE15}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "system", "src\thirdparty\VirtualDub\system\system.vcxproj", "{C2082189-3ECB-4079-91FA-89D3C8A305C0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "system", "src\ExtLib\VirtualDub\system\system.vcxproj", "{C2082189-3ECB-4079-91FA-89D3C8A305C0}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CmdUI", "src\CmdUI\CmdUI.vcxproj", "{03208025-D5C2-426A-B0FA-251D4338F30C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LCDUI", "src\thirdparty\ui\LCDUI\LCDUI.vcxproj", "{476B97B4-F079-4A44-AF89-52CA30C35E28}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LCDUI", "src\ExtLib\ui\LCDUI\LCDUI.vcxproj", "{476B97B4-F079-4A44-AF89-52CA30C35E28}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ResizableLib", "src\thirdparty\ui\ResizableLib\ResizableLib.vcxproj", "{4CC7AE86-3E0A-430A-BFF4-BF00204CAFB0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ResizableLib", "src\ExtLib\ui\ResizableLib\ResizableLib.vcxproj", "{4CC7AE86-3E0A-430A-BFF4-BF00204CAFB0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sizecbar", "src\thirdparty\ui\sizecbar\sizecbar.vcxproj", "{61E6EB4D-2F1A-443B-94B0-E8200B26E99F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sizecbar", "src\ExtLib\ui\sizecbar\sizecbar.vcxproj", "{61E6EB4D-2F1A-443B-94B0-E8200B26E99F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TreePropSheet", "src\thirdparty\ui\TreePropSheet\TreePropSheet.vcxproj", "{AB494732-EF6D-44D0-BCF8-80FF04858D10}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TreePropSheet", "src\ExtLib\ui\TreePropSheet\TreePropSheet.vcxproj", "{AB494732-EF6D-44D0-BCF8-80FF04858D10}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BaseClasses", "src\thirdparty\BaseClasses\BaseClasses.vcxproj", "{E8A3F6FA-AE1C-4C8E-A0B6-9C8480324EAA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BaseClasses", "src\ExtLib\BaseClasses\BaseClasses.vcxproj", "{E8A3F6FA-AE1C-4C8E-A0B6-9C8480324EAA}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Filters", "src\filters\Filters.vcxproj", "{273B3149-3192-4B75-A791-470320B90812}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "liba52", "src\thirdparty\a52dec\vc++\liba52.vcxproj", "{62FE6D94-E17C-4A8E-8D3C-7A589A70D865}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "liba52", "src\ExtLib\a52dec\vc++\liba52.vcxproj", "{62FE6D94-E17C-4A8E-8D3C-7A589A70D865}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ffmpeg", "src\thirdparty\ffmpeg\ffmpeg.vcxproj", "{438286B7-A9F4-411D-BCC5-948C40E37D8F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ffmpeg", "src\ExtLib\ffmpeg\ffmpeg.vcxproj", "{438286B7-A9F4-411D-BCC5-948C40E37D8F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libdca", "src\thirdparty\libdca\vc++\libdca.vcxproj", "{FAE14DBE-B508-4AB3-929D-75C68E4EBBC1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libdca", "src\ExtLib\libdca\vc++\libdca.vcxproj", "{FAE14DBE-B508-4AB3-929D-75C68E4EBBC1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libflac", "src\thirdparty\libflac\src\libFLAC\libflac.vcxproj", "{4CEFBC84-C215-11DB-8314-0800200C9A66}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libflac", "src\ExtLib\libflac\src\libFLAC\libflac.vcxproj", "{4CEFBC84-C215-11DB-8314-0800200C9A66}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "src\thirdparty\zlib\zlib.vcxproj", "{2FCD4B66-9CF9-4C8F-BC70-37CD20002D49}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "src\ExtLib\zlib\zlib.vcxproj", "{2FCD4B66-9CF9-4C8F-BC70-37CD20002D49}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BaseMuxer", "src\filters\muxer\BaseMuxer\BaseMuxer.vcxproj", "{DB5F93B2-54D0-4474-A588-D259BE36C832}"
 EndProject
@@ -98,7 +98,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RoQSplitter", "src\filters\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StreamDriveThru", "src\filters\parser\StreamDriveThru\StreamDriveThru.vcxproj", "{AE399B7E-2B2C-4A96-9016-C5C74B0A2FA0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AsyncReader", "src\thirdparty\AsyncReader\AsyncReader.vcxproj", "{9F31D122-E84D-485A-A58D-09DAD01A56CE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AsyncReader", "src\ExtLib\AsyncReader\AsyncReader.vcxproj", "{9F31D122-E84D-485A-A58D-09DAD01A56CE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CDDAReader", "src\filters\reader\CDDAReader\CDDAReader.vcxproj", "{543D40E9-8CA6-4E4B-9936-90CBA562B268}"
 EndProject
@@ -144,13 +144,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MPCVideoDec", "src\filters\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mpeg2DecFilter", "src\filters\transform\Mpeg2DecFilter\Mpeg2DecFilter.vcxproj", "{305BAB2D-0D75-4FBC-8BCD-A2917392B48C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lcms2", "src\thirdparty\lcms2\lcms2.vcxproj", "{ACF5C64B-78AA-4730-91A2-24F4910FBAD9}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lcms2", "src\ExtLib\lcms2\lcms2.vcxproj", "{ACF5C64B-78AA-4730-91A2-24F4910FBAD9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MediaInfoLib", "src\thirdparty\MediaInfo\MediaInfoLib.vcxproj", "{20E0F8D6-213C-460B-B361-9C725CB375C7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MediaInfoLib", "src\ExtLib\MediaInfo\MediaInfoLib.vcxproj", "{20E0F8D6-213C-460B-B361-9C725CB375C7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZenLib", "src\thirdparty\ZenLib\ZenLib.vcxproj", "{0DA1DA7D-F393-4E7C-A7CE-CB5C6A67BC94}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZenLib", "src\ExtLib\ZenLib\ZenLib.vcxproj", "{0DA1DA7D-F393-4E7C-A7CE-CB5C6A67BC94}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SoundTouch", "src\thirdparty\SoundTouch\source\SoundTouch.vcxproj", "{68A5DD20-7057-448B-8FE0-B6AC8D205509}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SoundTouch", "src\ExtLib\SoundTouch\source\SoundTouch.vcxproj", "{68A5DD20-7057-448B-8FE0-B6AC8D205509}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VSFilter", "src\filters\transform\VSFilter\VSFilter.vcxproj", "{F671100C-469F-4723-AAC4-B7FE4F5B8DC4}"
 EndProject
@@ -160,7 +160,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MPCBEShellExt", "src\apps\S
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WVSource", "src\filters\source\WavPackSource\WVSource.vcxproj", "{F22DE3B2-4DE9-4013-BBAB-1BB39F2B7DF7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wavpacklib", "src\thirdparty\wavpacklib\wavpacklib.vcxproj", "{99E59C6F-4E0E-40A1-9F16-F1302947516B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wavpacklib", "src\ExtLib\wavpacklib\wavpacklib.vcxproj", "{99E59C6F-4E0E-40A1-9F16-F1302947516B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MusePackSource", "src\filters\source\MusePackSource\MusePackSource.vcxproj", "{3FF8D24A-877C-4957-B377-F20A1527F423}"
 EndProject

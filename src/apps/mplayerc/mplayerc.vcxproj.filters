@@ -174,7 +174,7 @@
     <ClCompile Include="Playlist.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\thirdparty\pngdib\pngdib.c">
+    <ClCompile Include="..\..\ExtLib\pngdib\pngdib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PngImage.cpp">
@@ -333,16 +333,16 @@
     <ClCompile Include="WinAPIUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\thirdparty\mfc\afxctrlcontainer.cpp">
+    <ClCompile Include="..\..\ExtLib\mfc\afxctrlcontainer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\thirdparty\mfc\afxglobals.cpp">
+    <ClCompile Include="..\..\ExtLib\mfc\afxglobals.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\thirdparty\mfc\afxmaskededit.cpp">
+    <ClCompile Include="..\..\ExtLib\mfc\afxmaskededit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\thirdparty\mfc\winmdi.cpp">
+    <ClCompile Include="..\..\ExtLib\mfc\winmdi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="vkCodes.cpp">
@@ -539,7 +539,7 @@
     <ClInclude Include="Playlist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\thirdparty\pngdib\pngdib.h">
+    <ClInclude Include="..\..\ExtLib\pngdib\pngdib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PngImage.h">
@@ -731,7 +731,7 @@
     <ClInclude Include="AboutDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\thirdparty\mfc\afxmaskededit.h">
+    <ClInclude Include="..\..\ExtLib\mfc\afxmaskededit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
