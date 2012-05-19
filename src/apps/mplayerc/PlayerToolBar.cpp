@@ -96,6 +96,10 @@ void CPlayerToolBar::SwitchTheme()
 			DIBSECTION dib;
 			::GetObject(hBmp, sizeof(dib), &dib);
 			int fileDepth = dib.dsBmih.biBitCount;
+
+			if (NULL != m_pButtonsImages) {
+				delete m_pButtonsImages;
+			}
 			m_pButtonsImages = DNew CImageList();
 			if (32 == fileDepth) {
 				m_pButtonsImages->Create(bitmapBmp.bmHeight, bitmapBmp.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
@@ -193,6 +197,8 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 
 	m_volctrl.Create(this);
 	m_volctrl.SetRange(0, 100);
+
+	m_pButtonsImages = NULL;
 
 	SwitchTheme();
 
