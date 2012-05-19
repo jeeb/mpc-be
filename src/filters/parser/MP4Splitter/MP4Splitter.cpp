@@ -32,16 +32,16 @@
 #endif
 #include <moreuuids.h>
 
-#include "Ap4.h"
-#include "Ap4File.h"
-#include "Ap4StssAtom.h"
-#include "Ap4StsdAtom.h"
-#include "Ap4IsmaCryp.h"
-#include "Ap4AvcCAtom.h"
-#include "Ap4ChplAtom.h"
-#include "Ap4FtabAtom.h"
-#include "Ap4DataAtom.h"
-#include "Ap4PaspAtom.h"
+#include <Bento4/Core/Ap4.h>
+#include <Bento4/Core/Ap4File.h>
+#include <Bento4/Core/Ap4StssAtom.h>
+#include <Bento4/Core/Ap4StsdAtom.h>
+#include <Bento4/Core/Ap4IsmaCryp.h>
+#include <Bento4/Core/Ap4AvcCAtom.h>
+#include <Bento4/Core/Ap4ChplAtom.h>
+#include <Bento4/Core/Ap4FtabAtom.h>
+#include <Bento4/Core/Ap4DataAtom.h>
+#include <Bento4/Core/Ap4PaspAtom.h>
 
 #ifdef REGISTER_FILTER
 
