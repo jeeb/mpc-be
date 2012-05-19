@@ -113,6 +113,8 @@ CFilterApp theApp;
 
 CFLVSplitterFilter::CFLVSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("CFLVSplitterFilter"), pUnk, phr, __uuidof(this))
+	, m_TimeStampOffset(0)
+	, m_DetectWrongTimeStamp(true)
 {
 }
 
@@ -140,12 +142,25 @@ bool CFLVSplitterFilter::ReadTag(Tag& t)
 		return false;
 	}
 
-	t.PreviousTagSize = (UINT32)m_pFile->BitRead(32);
-	t.TagType = (BYTE)m_pFile->BitRead(8);
-	t.DataSize = (UINT32)m_pFile->BitRead(24);
-	t.TimeStamp = (UINT32)m_pFile->BitRead(24);
-	t.TimeStamp |= (UINT32)m_pFile->BitRead(8) << 24;
-	t.StreamID = (UINT32)m_pFile->BitRead(24);
+	t.PreviousTagSize	= (UINT32)m_pFile->BitRead(32);
+	t.TagType			= (BYTE)m_pFile->BitRead(8);
+	t.DataSize			= (UINT32)m_pFile->BitRead(24);
+	t.TimeStamp			= (UINT32)m_pFile->BitRead(24);
+	t.TimeStamp			|= (UINT32)m_pFile->BitRead(8) << 24;
+	t.StreamID			= (UINT32)m_pFile->BitRead(24);
+	
+	if (m_DetectWrongTimeStamp && (t.TagType == FLV_AUDIODATA || t.TagType == FLV_AUDIODATA)) {
+		if (t.TimeStamp > 0) {
+			m_TimeStampOffset = t.TimeStamp;
+		}
+		m_DetectWrongTimeStamp = false;
+	}
+
+	if (m_TimeStampOffset > 0) {
+		t.TimeStamp -= m_TimeStampOffset;
+
+		TRACE(_T("CFLVSplitterFilter::ReadTag() : Detect wrong TimeStamp offset, corrected [%d -> %d]\n"), (t.TimeStamp + m_TimeStampOffset), t.TimeStamp);
+	}
 
 	return m_pFile->GetRemaining() >= t.DataSize;
 }
@@ -883,6 +898,7 @@ bool CFLVSplitterFilter::DemuxLoop()
 			if (dataSize <= 0) {
 				goto NextTag;
 			}
+			
 			p.Attach(DNew Packet());
 			p->TrackNumber = t.TagType;
 			p->rtStart = 10000i64 * (t.TimeStamp + tsOffset);
