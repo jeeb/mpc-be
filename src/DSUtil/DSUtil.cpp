@@ -2158,7 +2158,7 @@ static struct {
 	{"Uighur", "uig", "ug",					MAKELCID( MAKELANGID(LANG_UIGHUR, SUBLANG_DEFAULT), SORT_DEFAULT)},
 	{"Ukrainian", "ukr", "uk",				MAKELCID( MAKELANGID(LANG_UKRAINIAN, SUBLANG_DEFAULT), SORT_DEFAULT)},
 	{"Umbundu", "umb", ""},
-	{"Undetermined", "und", ""},
+	{/*"Undetermined"*/"", "und", ""},
 	{"Urdu", "urd", "ur",					MAKELCID( MAKELANGID(LANG_URDU, SUBLANG_DEFAULT), SORT_DEFAULT)},
 	{"Uzbek", "uzb", "uz",					MAKELCID( MAKELANGID(LANG_UZBEK, SUBLANG_DEFAULT), SORT_DEFAULT)},
 	{"Vai", "vai", ""},

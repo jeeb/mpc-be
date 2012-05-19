@@ -149,7 +149,7 @@ bool CFLVSplitterFilter::ReadTag(Tag& t)
 	t.TimeStamp			|= (UINT32)m_pFile->BitRead(8) << 24;
 	t.StreamID			= (UINT32)m_pFile->BitRead(24);
 	
-	if (m_DetectWrongTimeStamp && (t.TagType == FLV_AUDIODATA || t.TagType == FLV_AUDIODATA)) {
+	if (m_DetectWrongTimeStamp && (t.TagType == FLV_AUDIODATA || t.TagType == FLV_VIDEODATA)) {
 		if (t.TimeStamp > 0) {
 			m_TimeStampOffset = t.TimeStamp;
 		}
