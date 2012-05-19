@@ -37,7 +37,7 @@
 
 CUnknown *CMusePackSplitter::CreateInstance(LPUNKNOWN pUnk, HRESULT *phr)
 {
-	return new CMusePackSplitter(pUnk, phr);
+	return DNew CMusePackSplitter(pUnk, phr);
 }
 
 CMusePackSplitter::CMusePackSplitter(LPUNKNOWN pUnk, HRESULT *phr) :
@@ -51,7 +51,7 @@ CMusePackSplitter::CMusePackSplitter(LPUNKNOWN pUnk, HRESULT *phr) :
 	rate(1.0),
 	ev_abort(TRUE)
 {
-	input = new CMusePackInputPin(NAME("MPC Input Pin"), this, phr, L"In");
+	input = DNew CMusePackInputPin(NAME("MPC Input Pin"), this, phr, L"In");
 	output.RemoveAll();
 	retired.RemoveAll();
 
@@ -166,8 +166,8 @@ HRESULT CMusePackSplitter::CompleteConnect(PIN_DIRECTION Dir, CBasePin *pCaller,
 		//---------------------------------------------------------------------
 		CAutoLock lck(&lock_filter);
 
-		reader	= new CMusePackReader(input->Reader());
-		file	= new CMPCFile();
+		reader	= DNew CMusePackReader(input->Reader());
+		file	= DNew CMPCFile();
 
 		// try to open the file
 		int ret = file->Open(reader);
@@ -180,7 +180,7 @@ HRESULT CMusePackSplitter::CompleteConnect(PIN_DIRECTION Dir, CBasePin *pCaller,
 		}
 
 		HRESULT hr = S_OK;
-		CMusePackOutputPin *opin = new CMusePackOutputPin(_T("Outpin"), this, &hr, L"Out", 5);
+		CMusePackOutputPin *opin = DNew CMusePackOutputPin(_T("Outpin"), this, &hr, L"Out", 5);
 		ConfigureMediaType(opin);
 		AddOutputPin(opin);
 
@@ -923,7 +923,7 @@ HRESULT CMusePackOutputPin::DoNewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME 
 	if (1) { // TODO - What is this ??? :)
 		return DeliverNewSegment(rtStart, rtStop, rate);
 	} else {
-		DataPacket	*packet = new DataPacket();
+		DataPacket	*packet = DNew DataPacket();
 		{
 			CAutoLock	lck(&lock_queue);
 			packet->type = DataPacket::PACKET_TYPE_NEW_SEGMENT;
@@ -977,7 +977,7 @@ int CMusePackOutputPin::GetDataPacket(DataPacket **packet)
 		ret = WaitForMultipleObjects(2, events, FALSE, 10);
 		if (ret == WAIT_OBJECT_0) {
 			// return new packet
-			*packet = new DataPacket();
+			*packet = DNew DataPacket();
 			return 0;
 		}
 
@@ -1031,7 +1031,7 @@ HRESULT CMusePackOutputPin::DeliverPacket(CMPCPacket &packet)
 
 HRESULT CMusePackOutputPin::DoEndOfStream()
 {
-	DataPacket	*packet = new DataPacket();
+	DataPacket	*packet = DNew DataPacket();
 
 	// naqueueujeme EOS
 	{

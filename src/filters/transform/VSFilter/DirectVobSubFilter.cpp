@@ -87,7 +87,7 @@ CDirectVobSubFilter::CDirectVobSubFilter(LPUNKNOWN punk, HRESULT* phr, const GUI
 	m_tbid.fShowIcon = (theApp.m_AppName.Find(_T("zplayer"), 0) < 0 || !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_ENABLEZPICON), 0));
 
 	HRESULT hr = S_OK;
-	m_pTextInput.Add(new CTextInputPin(this, m_pLock, &m_csSubLock, &hr));
+	m_pTextInput.Add(DNew CTextInputPin(this, m_pLock, &m_csSubLock, &hr));
 	ASSERT(SUCCEEDED(hr));
 
 	CAMThread::Create();
@@ -577,7 +577,7 @@ void CDirectVobSubFilter::InitSubPicQueue()
 	}
 	m_spd.bits = (void*)m_pTempPicBuff;
 
-	CComPtr<ISubPicAllocator> pSubPicAllocator = new CMemSubPicAllocator(m_spd.type, CSize(m_w, m_h));
+	CComPtr<ISubPicAllocator> pSubPicAllocator = DNew CMemSubPicAllocator(m_spd.type, CSize(m_w, m_h));
 
 	CSize video(bihIn.biWidth, bihIn.biHeight), window = video;
 	if (AdjustFrameSize(window)) {
@@ -591,8 +591,8 @@ void CDirectVobSubFilter::InitSubPicQueue()
 	HRESULT hr = S_OK;
 
 	m_pSubPicQueue = m_uSubPictToBuffer > 0
-					 ? (ISubPicQueue*)new CSubPicQueue(m_uSubPictToBuffer, !m_fAnimWhenBuffering, pSubPicAllocator, &hr)
-					 : (ISubPicQueue*)new CSubPicQueueNoThread(pSubPicAllocator, &hr);
+					 ? (ISubPicQueue*)DNew CSubPicQueue(m_uSubPictToBuffer, !m_fAnimWhenBuffering, pSubPicAllocator, &hr)
+					 : (ISubPicQueue*)DNew CSubPicQueueNoThread(pSubPicAllocator, &hr);
 
 	if (FAILED(hr)) {
 		m_pSubPicQueue = NULL;
@@ -1485,7 +1485,7 @@ bool CDirectVobSubFilter::Open()
 		CComPtr<ISubStream> pSubStream;
 
 		if (!pSubStream) {
-			CAutoPtr<CVobSubFile> pVSF(new CVobSubFile(&m_csSubLock));
+			CAutoPtr<CVobSubFile> pVSF(DNew CVobSubFile(&m_csSubLock));
 			if (pVSF && pVSF->Open(ret[i].fn) && pVSF->GetStreamCount() > 0) {
 				pSubStream = pVSF.Detach();
 				m_frd.files.AddTail(ret[i].fn.Left(ret[i].fn.GetLength()-4) + _T(".sub"));
@@ -1493,7 +1493,7 @@ bool CDirectVobSubFilter::Open()
 		}
 
 		if (!pSubStream) {
-			CAutoPtr<CRenderedTextSubtitle> pRTS(new CRenderedTextSubtitle(&m_csSubLock));
+			CAutoPtr<CRenderedTextSubtitle> pRTS(DNew CRenderedTextSubtitle(&m_csSubLock));
 			if (pRTS && pRTS->Open(ret[i].fn, DEFAULT_CHARSET) && pRTS->GetStreamCount() > 0) {
 				pSubStream = pRTS.Detach();
 				m_frd.files.AddTail(ret[i].fn + _T(".style"));
@@ -1661,7 +1661,7 @@ void CDirectVobSubFilter::AddSubStream(ISubStream* pSubStream)
 
 	if (len == 0) {
 		HRESULT hr = S_OK;
-		m_pTextInput.Add(new CTextInputPin(this, m_pLock, &m_csSubLock, &hr));
+		m_pTextInput.Add(DNew CTextInputPin(this, m_pLock, &m_csSubLock, &hr));
 	}
 }
 

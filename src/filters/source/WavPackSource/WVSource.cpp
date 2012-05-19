@@ -41,7 +41,7 @@
 // ----------------------------------------------------------------------------
 
 CUnknown *WINAPI CWavPackSplitterFilter::CreateInstance(LPUNKNOWN punk, HRESULT *phr) {
-	CWavPackSplitterFilter *pNewObject = new CWavPackSplitterFilter(punk, phr);
+	CWavPackSplitterFilter *pNewObject = DNew CWavPackSplitterFilter(punk, phr);
 	if (!pNewObject) {
 		*phr = E_OUTOFMEMORY;
 	}
@@ -65,7 +65,7 @@ CWavPackSplitterFilter::CWavPackSplitterFilter(LPUNKNOWN lpunk, HRESULT *phr) :
 		| AM_SEEKING_CanSeekBackwards
 		| AM_SEEKING_CanSeekAbsolute;
 
-	m_pInputPin = new CWavPackSplitterFilterInputPin(this, &m_Lock, phr);
+	m_pInputPin = DNew CWavPackSplitterFilterInputPin(this, &m_Lock, phr);
 	if (m_pInputPin == NULL) {
 		if (phr) {
 			*phr = E_OUTOFMEMORY;
@@ -73,7 +73,7 @@ CWavPackSplitterFilter::CWavPackSplitterFilter(LPUNKNOWN lpunk, HRESULT *phr) :
 		return;
 	}
 
-	m_pOutputPin = new CWavPackSplitterFilterOutputPin(this, &m_Lock, phr);
+	m_pOutputPin = DNew CWavPackSplitterFilterOutputPin(this, &m_Lock, phr);
 	if (m_pOutputPin == NULL) {
 		if (phr) {
 			*phr = E_OUTOFMEMORY;
@@ -982,7 +982,7 @@ int IAsyncCallBackWrapper_can_seek(void *id)
 
 IAsyncCallBackWrapper* IAsyncCallBackWrapper_new(IAsyncReader *pReader)
 {
-	IAsyncCallBackWrapper* iacbw = new IAsyncCallBackWrapper;
+	IAsyncCallBackWrapper* iacbw = DNew IAsyncCallBackWrapper;
 	if (!iacbw) {
 		return NULL;
 	}

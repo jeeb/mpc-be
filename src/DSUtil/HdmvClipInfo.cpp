@@ -341,7 +341,7 @@ HRESULT CHdmvClipInfo::ReadChapters(CString strPlaylistFile, CAtlList<CHdmvClipI
 
 	if (m_hFile != INVALID_HANDLE_VALUE)
 	{
-		REFERENCE_TIME*		rtOffset = new REFERENCE_TIME[PlaylistItems.GetCount()];
+		REFERENCE_TIME*		rtOffset = DNew REFERENCE_TIME[PlaylistItems.GetCount()];
 		REFERENCE_TIME		rtSum	 = 0;
 		int					nIndex   = 0;
 

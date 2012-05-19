@@ -82,7 +82,7 @@ void CPlayerToolBar::SwitchTheme()
 	}
 
 	if (NULL != hBmp) {
-		CBitmap *bmp = new CBitmap();
+		CBitmap *bmp = DNew CBitmap();
 		bmp->Attach(hBmp);
 		BITMAP bitmapBmp;
 		bmp->GetBitmap(&bitmapBmp);
@@ -96,7 +96,7 @@ void CPlayerToolBar::SwitchTheme()
 			DIBSECTION dib;
 			::GetObject(hBmp, sizeof(dib), &dib);
 			int fileDepth = dib.dsBmih.biBitCount;
-			m_pButtonsImages = new CImageList();
+			m_pButtonsImages = DNew CImageList();
 			if (32 == fileDepth) {
 				m_pButtonsImages->Create(bitmapBmp.bmHeight, bitmapBmp.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
 				m_pButtonsImages->Add(bmp, static_cast<CBitmap*>(0));	// alpha is the mask
