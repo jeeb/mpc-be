@@ -1148,9 +1148,11 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 			bool fEscapeNotAssigned = !AssignedToCmd(VK_ESCAPE, m_fFullScreen, false);
 
 			if (fEscapeNotAssigned) {
-				if (m_iMediaLoadState == MLS_LOADED && m_fFullScreen) {
+				if (m_fFullScreen) {
 					OnViewFullscreen();
-					PostMessage(WM_COMMAND, ID_PLAY_PAUSE);
+					if (m_iMediaLoadState == MLS_LOADED) {
+						PostMessage(WM_COMMAND, ID_PLAY_PAUSE);
+					}
 					return TRUE;
 				} else if (IsCaptionHidden()) {
 					PostMessage(WM_COMMAND, ID_VIEW_CAPTIONMENU);
@@ -10631,7 +10633,7 @@ void CMainFrame::SetupChapters()
 
 					int h, m, s, ms;
 					WCHAR wc;
-					if (7 != swscanf_s(CStringW(var), L"%d%c%d%c%d%c%d", &h, &wc, &m, &wc, &s, &wc, &ms)) {
+					if (7 != swscanf_s(CStringW(var), L"%d%c%d%c%d%c%d", &h, &wc, sizeof(WCHAR), &m, &wc, sizeof(WCHAR), &s, &wc, sizeof(WCHAR), &ms)) {
 						break;
 					}
 
