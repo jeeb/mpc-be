@@ -24,9 +24,9 @@
 #include "MPCVideoDecSettingsWnd.h"
 #include "../../../DSUtil/DSUtil.h"
 
-#include "PODtypes.h"
-#include "avcodec.h"
-#include "ffImgfmt.h"
+#include <ffmpeg/PODtypes.h>
+#include <ffmpeg/libavcodec/avcodec.h>
+#include <ffmpeg/ffImgfmt.h>
 
 // ==>>> Resource identifier from "resource.h" present in mplayerc project!
 #define ResStr(id) CString(MAKEINTRESOURCE(id))
