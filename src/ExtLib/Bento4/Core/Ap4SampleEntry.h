@@ -156,7 +156,7 @@ class AP4_AudioSampleEntry : public AP4_MpegSampleEntry
 	}
 	AP4_UI16 GetSampleSize()
 	{
-		if (m_QtVersion == 1 && m_SampleSize == 16) {
+		if (m_QtVersion == 1 && m_SampleSize == 16 && m_QtV1BytesPerPacket) {
 			//QuickTime File Format Specification->Sound Sample Description (Version 1)->Bytes per packet
 			return m_QtV1BytesPerPacket * 8;
 		} else if (m_QtVersion == 2) {
