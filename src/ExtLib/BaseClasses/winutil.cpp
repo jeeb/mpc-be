@@ -427,7 +427,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,         // Window handle
     // structure.  IF we get any messages before WM_NCCREATE we will
     // pass them to DefWindowProc.
 
-    CBaseWindow *pBaseWindow = _GetWindowLongPtr<CBaseWindow*>(hwnd,0);
+    CBaseWindow *pBaseWindow = (CBaseWindow *)GetWindowLongPtr(hwnd,0);
 
     if (pBaseWindow == NULL) {
 
@@ -458,7 +458,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,         // Window handle
 #ifdef _DEBUG
         LONG_PTR rc =
 #endif
-			_SetWindowLongPtr(hwnd, (DWORD) 0, pBaseWindow);
+			SetWindowLongPtr(hwnd, (DWORD) 0, (LONG_PTR)pBaseWindow);
 
 
 #ifdef _DEBUG
