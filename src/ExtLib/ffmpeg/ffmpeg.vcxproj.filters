@@ -942,6 +942,9 @@
     <ClCompile Include="libswscale\yuv2rgb.c">
       <Filter>libswscale</Filter>
     </ClCompile>
+    <ClCompile Include="libavutil\parseutils.c">
+      <Filter>libavutil</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libavcodec\x86\cabac.h">
@@ -1658,5 +1661,8 @@
     <ClInclude Include="ffcodecs.h" />
     <ClInclude Include="ffImgfmt.h" />
     <ClInclude Include="PODtypes.h" />
+    <ClInclude Include="libavutil\parseutils.h">
+      <Filter>libavutil</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
