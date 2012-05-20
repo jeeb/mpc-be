@@ -391,7 +391,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 
 	GRADIENT_RECT gr[1] = {{0, 1}};
 
-	int sep[] = {2, 7, 10};
+	int sep[] = {2, 7, 9, 10};
 
 	if (s.fDisableXPToolbars) {
 		iThemeBrightness = s.nThemeBrightness;
