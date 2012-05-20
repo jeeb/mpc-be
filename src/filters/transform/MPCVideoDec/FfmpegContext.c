@@ -41,6 +41,7 @@
 
 #if defined(REGISTER_FILTER)
 void *__imp_toupper = toupper;
+void __imp__time64  (int typ, const char *name, double a1, double a2, double rslt) {}
 #endif
 
 int av_h264_decode_frame(struct AVCodecContext* avctx, int* nOutPOC, int64_t* rtStartTime, uint8_t *buf, int buf_size);

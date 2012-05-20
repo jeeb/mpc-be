@@ -43,6 +43,10 @@
 
 void *__imp__toupper = toupper;
 
+#if defined(REGISTER_FILTER)
+void *__imp__time64 = _time64;
+#endif
+
 #define INT8_PEAK       128
 #define INT16_PEAK      32768
 #define INT24_PEAK      8388608
