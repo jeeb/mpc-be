@@ -98,7 +98,7 @@ HRESULT CMpaSplitterFile::Init()
 
 	Seek(0);
 
-	if ((BitRead(24, true) == 0x000001) || (BitRead(32, true) == 'RIFF')) { // sometimes AVI can be determined as Mpeg Audio
+	if ((BitRead(24, true) == 0x000001) || (BitRead(32, true) == 'RIFF') || (BitRead(24, true) == 'AMV')) {
 		return E_FAIL;
 	}
 
