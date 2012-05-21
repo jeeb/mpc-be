@@ -31,6 +31,9 @@ typedef float float32_t;
 #include <inttypes.h>
 #endif
 
+#pragma warning(disable:4996)
+#pragma warning(disable:4133)
+
 // RIFF / wav header formats (these occur at the beginning of both wav files
 // and pre-4.0 WavPack files that are not in the "raw" mode). Generally, an
 // application using the library to read or write WavPack files will not be

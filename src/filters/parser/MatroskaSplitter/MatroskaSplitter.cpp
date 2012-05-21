@@ -835,8 +835,10 @@ avcsuccess:
 				continue;
 			}
 
-			Name = CStringW(pTE->Language.IsEmpty() ? L"English" : CStringW(ISO6392ToLanguage(pTE->Language)))
-				   + (pTE->Name.IsEmpty() ? L"" : L", " + pTE->Name)
+			CStringW Language = CStringW(pTE->Language.IsEmpty() ? L"English" : CStringW(ISO6392ToLanguage(pTE->Language))).Trim();
+
+			Name = Language
+				   + (pTE->Name.IsEmpty() ? L"" : (Language.IsEmpty() ? L"" : L", ") + pTE->Name)
 				   + (L" (" + Name + L")");
 
 			if (pTE->FlagForced) { // "Forced" overrides "Default"

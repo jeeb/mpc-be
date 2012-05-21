@@ -64,9 +64,6 @@ static char *strdup (const char *s)
  { char *d = malloc (strlen (s) + 1); return strcpy (d, s); }
 #endif
 
-#pragma warning(disable:4996)
-#pragma warning(disable:4133)
-
 ///////////////////////////// local variable storage //////////////////////////
 
 static const char *sign_on = "\n"
