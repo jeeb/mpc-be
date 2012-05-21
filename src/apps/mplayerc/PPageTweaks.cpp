@@ -106,9 +106,9 @@ BOOL CPPageTweaks::OnInitDialog()
 	m_nThemeGreen			= m_nThemeGreen_Old			= s.nThemeGreen;
 	m_nThemeBlue			= m_nThemeBlue_Old			= s.nThemeBlue;
 	m_ThemeBrightnessCtrl.SetRange(0, 100);
-	m_ThemeRedCtrl.SetRange(0, 256);
-	m_ThemeGreenCtrl.SetRange(0, 256);
-	m_ThemeBlueCtrl.SetRange(0, 256);
+	m_ThemeRedCtrl.SetRange(0, 255);
+	m_ThemeGreenCtrl.SetRange(0, 255);
+	m_ThemeBlueCtrl.SetRange(0, 255);
 	m_fFileNameOnSeekBar	= s.fFileNameOnSeekBar;
 	m_clrFaceABGR			= s.clrFaceABGR;
 	m_clrOutlineABGR		= s.clrOutlineABGR;
@@ -294,9 +294,9 @@ void CPPageTweaks::OnClickClrDefault()
 	PostMessage(WM_COMMAND, IDC_CHECK3);
 
 	AfxGetAppSettings().nThemeBrightness	= m_nThemeBrightness	= 15;
-	AfxGetAppSettings().nThemeRed			= m_nThemeRed			= 256;
-	AfxGetAppSettings().nThemeGreen			= m_nThemeGreen			= 256;
-	AfxGetAppSettings().nThemeBlue			= m_nThemeBlue			= 256;
+	AfxGetAppSettings().nThemeRed			= m_nThemeRed			= 255;
+	AfxGetAppSettings().nThemeGreen			= m_nThemeGreen			= 255;
+	AfxGetAppSettings().nThemeBlue			= m_nThemeBlue			= 255;
 	OnThemeChange();
 
 	UpdateData(FALSE);
