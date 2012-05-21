@@ -1,6 +1,37 @@
+Based on the original version (C) 2002-2006 by Gabest (e-mail unknown)
+On the basis of the source code of the "Media Player Classic Home Cinema", Casimir666 (casimir666@users.sourceforge.net).
+The GUI on the basis of the original patch bobdynlan (bobdynlan@users.sourceforge.net), with the adaptation of Leo1000 (leothousan@users.sourceforge.net).
 
+Active: (with SVN commit rights)
+--------
+aleksoid
+arestarh1986
+exodus8
+judelaw
+kinjalka
+szl
+v0lt
+
+Inactive:
+----------
+leothousan
+
+Translators:
+-------------
+arestarh1986
+
+Official Beta testers:
+----------------------
+Amour
+DroneZ
+Gideon Vi
+Karinas
+kuh3h3
+NaNo3791
+pIv
+Shark007
+usalex
+z_mashine
 
 
 Many thanks to everyone who supported development without having svn write access.
-
-Based on the original version (C) 2002-2006 by Gabest (e-mail unknown)
