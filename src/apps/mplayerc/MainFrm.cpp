@@ -12989,7 +12989,6 @@ void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSe
 		}
 	}
 
-
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
 
 		UINT baseid = id;
@@ -13081,7 +13080,6 @@ void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSe
 				}
 				
 				CString name(pName);
-				name.Replace(_T("&"), _T("&&"));
 
 				UINT flags = MF_BYCOMMAND|MF_STRING|MF_ENABLED;
 				if (dwFlags) {
@@ -13116,6 +13114,7 @@ void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSe
 					sep = true;
 				}
 
+				name.Replace(_T("&"), _T("&&"));
 				pSub->AppendMenu(flags, id++, name);
 
 				CoTaskMemFree(pName);
