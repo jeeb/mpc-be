@@ -8400,6 +8400,12 @@ void CMainFrame::OnNavigateAudioMix(UINT nID)
 {
 	nID -= ID_NAVIGATE_AUDIO_SUBITEM_START;
 
+	if (nID == 0) {
+		ShowOptions(CPPageAudioSwitcher::IDD);
+		return;
+	}
+
+	nID--;
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
 		OnNavMixStreamSelectSubMenu(nID, 1);
 	} else if (GetPlaybackMode() == PM_DVD) {
@@ -12960,6 +12966,9 @@ void CMainFrame::OnNavStreamSelectSubMenu(UINT id, DWORD dwSelGroup)
 
 void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup)
 {
+	pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_SUBTITLES_OPTIONS));
+	pSub->AppendMenu(MF_SEPARATOR|MF_ENABLED);
+
 	bool bSetCheck = true;
 	CComQIPtr<IAMStreamSelect> pSSA = FindFilter(__uuidof(CAudioSwitcherFilter), pGB);
 	if (!pSSA) {
@@ -13060,7 +13069,7 @@ void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSe
 		if (SUCCEEDED(pSSA->Count(&cStreamsA)) && cStreamsA > 0) {
 			bool sep = false;
 			int i = 0;
-			if (pSub->GetMenuItemCount()>0) {
+			if (pSub->GetMenuItemCount()>2) {// do not include menu item "Options" and separator
 				i = 1;
 				sp = true;
 			}
