@@ -1,5 +1,6 @@
 @ECHO OFF
 SETLOCAL
+PUSHD %~dp0
 
 rem Check for the help switches
 IF /I "%~1"=="help"   GOTO SHOWHELP
