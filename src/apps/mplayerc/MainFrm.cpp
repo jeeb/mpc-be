@@ -12966,14 +12966,29 @@ void CMainFrame::OnNavStreamSelectSubMenu(UINT id, DWORD dwSelGroup)
 
 void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup)
 {
-	pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_SUBTITLES_OPTIONS));
-	pSub->AppendMenu(MF_SEPARATOR|MF_ENABLED);
-
 	bool bSetCheck = true;
 	CComQIPtr<IAMStreamSelect> pSSA = FindFilter(__uuidof(CAudioSwitcherFilter), pGB);
 	if (!pSSA) {
 		pSSA = FindFilter(L"{D3CD7858-971A-4838-ACEC-40CA5D529DC8}", pGB);
 	}
+
+	if (pSSA) {
+		DWORD cStreamsA = 0;
+		if (SUCCEEDED(pSSA->Count(&cStreamsA)) && cStreamsA > 1) {
+			for (int ii = 1; ii < (int)cStreamsA; ii++) {
+				int n = m_iAudioStreams.GetAt(m_iAudioStreams.FindIndex(ii));
+				DWORD flags = 0;
+				if (SUCCEEDED(pSSA->Info(n, NULL, &flags, NULL, NULL, NULL, NULL, NULL))) {
+					if (flags&AMSTREAMSELECTINFO_EXCLUSIVE/* ||flags&AMSTREAMSELECTINFO_ENABLED*/) {
+						bSetCheck = false;
+						break;
+					}
+
+				}
+			}
+		}
+	}
+
 
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
 
@@ -13030,23 +13045,6 @@ void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSe
 						str = CString(name) + _T(" (") + str + _T(")");
 					}
 					
-					if (pSSA) {
-						DWORD cStreamsA = 0;
-						if (SUCCEEDED(pSSA->Count(&cStreamsA)) && cStreamsA > 1) {
-							for (int ii = 1; ii < (int)cStreamsA; ii++) {
-								int n = m_iAudioStreams.GetAt(m_iAudioStreams.FindIndex(ii));
-								DWORD flags = 0;
-								if (SUCCEEDED(pSSA->Info(n, NULL, &flags, NULL, NULL, NULL, NULL, NULL))) {
-									if (flags&AMSTREAMSELECTINFO_EXCLUSIVE/* ||flags&AMSTREAMSELECTINFO_ENABLED*/) {
-										bSetCheck = false;
-										break;
-									}
-
-								}
-							}
-						}
-					}
-
 					UINT flags = MF_BYCOMMAND|MF_STRING|MF_ENABLED;
 					if (dwFlags) {
 						if (bSetCheck == true) {
@@ -13087,7 +13085,7 @@ void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSe
 
 				UINT flags = MF_BYCOMMAND|MF_STRING|MF_ENABLED;
 				if (dwFlags) {
-					flags |= MF_CHECKED|MFT_RADIOCHECK;					
+					flags |= MF_CHECKED|MFT_RADIOCHECK;
 				}
 				
 				CString str;
@@ -13143,6 +13141,9 @@ void CMainFrame::SetupNavMixAudioSubMenu()
 	}
 
 	UINT id = ID_NAVIGATE_AUDIO_SUBITEM_START;
+
+	pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_SUBTITLES_OPTIONS));
+	pSub->AppendMenu(MF_SEPARATOR|MF_ENABLED);
 
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
 		SetupNavMixStreamSelectSubMenu(pSub, id, 1);
