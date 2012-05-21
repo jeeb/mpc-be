@@ -257,7 +257,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	void SetupFiltersSubMenu();
 	void SetupAudioSwitcherSubMenu();
 	void SetupSubtitlesSubMenu();
-	void SetupNavAudioSubMenu();
+	void SetupNavMixAudioSubMenu();
 	void SetupNavSubtitleSubMenu();
 	void SetupNavAngleSubMenu();
 	void SetupNavChaptersSubMenu();
@@ -269,6 +269,9 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	IBaseFilter* FindSourceSelectableFilter();
 	void SetupNavStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup);
 	void OnNavStreamSelectSubMenu(UINT id, DWORD dwSelGroup);
+
+	void SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup);
+	void OnNavMixStreamSelectSubMenu(UINT id, DWORD dwSelGroup);
 
 	CMenu m_popupmain, m_popup;
 	CMenu m_opencds;
@@ -371,7 +374,7 @@ public:
 	bool m_fFullScreen;
 	bool m_fFirstFSAfterLaunchOnFS;
 	bool m_fHideCursor;
-	CMenu m_navaudio, m_navsubtitle;
+	CMenu m_navMixaudio, m_navsubtitle;
 
 	CComPtr<IBaseFilter> m_pRefClock; // Adjustable reference clock. GothSync
 	CComPtr<ISyncClock> m_pSyncClock;
@@ -481,7 +484,6 @@ public:
 	void SeekTo(REFERENCE_TIME rt, bool fSeekToKeyFrame = false);
 
 	// audio streams order functions
-	void InsertAudioStream(const CComQIPtr<IAMStreamSelect> &pSS, int i);
 	void SetupAudioStreams();
 	// subtitle streams order function
 	bool LoadSubtitle(CString fn, ISubStream **actualStream = NULL);
@@ -870,7 +872,7 @@ public:
 	afx_msg void OnUpdateNavigateSkipFile(CCmdUI* pCmdUI);
 	afx_msg void OnNavigateMenu(UINT nID);
 	afx_msg void OnUpdateNavigateMenu(CCmdUI* pCmdUI);
-	afx_msg void OnNavigateAudio(UINT nID);
+	afx_msg void OnNavigateAudioMix(UINT nID);
 	afx_msg void OnNavigateSubpic(UINT nID);
 	afx_msg void OnNavigateAngle(UINT nID);
 	afx_msg void OnNavigateChapters(UINT nID);
