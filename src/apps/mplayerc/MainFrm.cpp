@@ -3590,7 +3590,6 @@ void CMainFrame::OnStreamAudio(UINT nID)
 
 	DWORD cStreams = 0;
 	if (pSS && SUCCEEDED(pSS->Count(&cStreams)) && cStreams > 1) {
-		nID = m_iAudioStreams.GetAt(m_iAudioStreams.FindIndex(nID)); // remember that the audio streams are reordered according to user preference, so have to figure out which stream from the original order was clicked
 		for (int i = 0; i < (int)cStreams; i++) {
 			AM_MEDIA_TYPE* pmt = NULL;
 			DWORD dwFlags = 0;
@@ -7680,7 +7679,6 @@ void CMainFrame::OnPlayAudio(UINT nID)
 	if (i == -1) {
 		ShowOptions(CPPageAudioSwitcher::IDD);
 	} else if (i >= 0 && pSS) {
-		i = m_iAudioStreams.GetAt(m_iAudioStreams.FindIndex(i)); // don't forget that the audio streams are reordered, so have to figure which one from the initial order is used here
 		pSS->Enable(i, AMSTREAMSELECTENABLE_ENABLE);
 	}
 }
@@ -7701,7 +7699,6 @@ void CMainFrame::OnUpdatePlayAudio(CCmdUI* pCmdUI)
 	}
 	else*/
 	if (i >= 0 && pSS) {
-		i = m_iAudioStreams.GetAt(m_iAudioStreams.FindIndex(i)); // audio streams are reordered, so figure out which one from the initial order is used here
 		DWORD flags = 0;
 
 		if (SUCCEEDED(pSS->Info(i, NULL, &flags, NULL, NULL, NULL, NULL, NULL))) {
@@ -7867,8 +7864,7 @@ void CMainFrame::OnPlayLanguage(UINT nID)
 	if (pSSA) {
 		DWORD cStreamsA = 0;
 		if (SUCCEEDED(pSSA->Count(&cStreamsA)) && cStreamsA > 1) {
-			for (int ii = 1; ii < (int)cStreamsA; ii++) {
-				int n = m_iAudioStreams.GetAt(m_iAudioStreams.FindIndex(ii)); // audio streams are reordered, so figure out which one from the initial order is used here
+			for (DWORD n = 1; n < cStreamsA; n++) {
 				DWORD flags = 0;
 				if (SUCCEEDED(pSSA->Info(n, NULL, &flags, NULL, NULL, NULL, NULL, NULL))) {
 					if (flags&AMSTREAMSELECTINFO_EXCLUSIVE/* |flags&AMSTREAMSELECTINFO_ENABLED*/) {
@@ -11340,27 +11336,6 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 	//m_Lcd.SetMediaTitle(LPCTSTR(fn));
 }
 
-void CMainFrame::SetupAudioStreams()
-{
-	if (m_iMediaLoadState != MLS_LOADED) {
-		return;
-	}
-
-	m_iAudioStreams.RemoveAll();
-
-	CComQIPtr<IAMStreamSelect> pSS = FindFilter(__uuidof(CAudioSwitcherFilter), pGB);
-	if (!pSS) {
-		pSS = FindFilter(L"{D3CD7858-971A-4838-ACEC-40CA5D529DC8}", pGB);    // morgan's switcher
-	}
-
-	DWORD cStreams = 0;
-	if (pSS && SUCCEEDED(pSS->Count(&cStreams)) && cStreams > 0) {
-		for (int i = 0; i < (int)cStreams; i++) {
-			m_iAudioStreams.AddTail(i);
-		}
-	}
-}
-
 int SelectAudio(const CComPtr<IAMStreamSelect> &pSS)
 {
 	DWORD cStreams = 0;
@@ -11715,8 +11690,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			Sleep(50);
 		}
 
-		SetupAudioStreams(); // reorder audio streams so that they're according to user's options
-
 		// PostMessage instead of SendMessage because the user might call CloseMedia and then we would deadlock
 
 		PostMessage(WM_COMMAND, ID_PLAY_PAUSE);
@@ -11734,12 +11707,13 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 		// Casimir666 : audio selection should be done before running the graph to prevent an
 		// unnecessary seek when a file is opened (PostMessage ID_AUDIO_SUBITEM_START removed)
-		if (m_iAudioStreams.GetCount() > 0) {
-			//OnPlayAudio (ID_AUDIO_SUBITEM_START + 1);
-			CComQIPtr<IAMStreamSelect> pSS = FindFilter(__uuidof(CAudioSwitcherFilter), pGB);
-			if (!pSS) {
-				pSS = FindFilter(L"{D3CD7858-971A-4838-ACEC-40CA5D529DC8}", pGB);    // morgan's switcher
-			}
+		CComQIPtr<IAMStreamSelect> pSS = FindFilter(__uuidof(CAudioSwitcherFilter), pGB);
+		if (!pSS) {
+			pSS = FindFilter(L"{D3CD7858-971A-4838-ACEC-40CA5D529DC8}", pGB);    // morgan's switcher
+		}
+
+		DWORD cStreams = 0;
+		if (pSS && SUCCEEDED(pSS->Count(&cStreams)) && cStreams > 0) {
 			OnPlayAudio (ID_AUDIO_SUBITEM_START + 1 + SelectAudio(pSS));
 		}
 
@@ -12414,11 +12388,9 @@ void CMainFrame::SetupAudioSwitcherSubMenu()
 				pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_SUBTITLES_OPTIONS));
 				pSub->AppendMenu(MF_SEPARATOR|MF_ENABLED);
 
-				for (int i = 0; i < (int)cStreams; i++) {
+				for (DWORD i = 0; i < cStreams; i++) {
 					WCHAR* pName = NULL;
-					POSITION idx = m_iAudioStreams.FindIndex(i);
-					int iStream = m_iAudioStreams.GetAt(idx);
-					if (FAILED(pSS->Info(iStream, NULL, NULL, NULL, NULL, &pName, NULL, NULL))) { // audio streams are reordered, so find the index from the initial order
+					if (FAILED(pSS->Info(i, NULL, NULL, NULL, NULL, &pName, NULL, NULL))) {
 						break;
 					}
 
@@ -12975,8 +12947,7 @@ void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSe
 	if (pSSA) {
 		DWORD cStreamsA = 0;
 		if (SUCCEEDED(pSSA->Count(&cStreamsA)) && cStreamsA > 1) {
-			for (int ii = 1; ii < (int)cStreamsA; ii++) {
-				int n = m_iAudioStreams.GetAt(m_iAudioStreams.FindIndex(ii));
+			for (DWORD n = 1; n < cStreamsA; n++) {
 				DWORD flags = 0;
 				if (SUCCEEDED(pSSA->Info(n, NULL, &flags, NULL, NULL, NULL, NULL, NULL))) {
 					if (flags&AMSTREAMSELECTINFO_EXCLUSIVE/* ||flags&AMSTREAMSELECTINFO_ENABLED*/) {
@@ -13065,17 +13036,15 @@ void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSe
 		bool sp = false;
 		if (SUCCEEDED(pSSA->Count(&cStreamsA)) && cStreamsA > 0) {
 			bool sep = false;
-			int i = 0;
-			if (pSub->GetMenuItemCount()>2) {// do not include menu item "Options" and separator
+			DWORD i = 0;
+			if (pSub->GetMenuItemCount() > 2) {// do not include menu item "Options" and separator
 				i = 1;
 				sp = true;
 			}
-			for (i; i < (int)cStreamsA; i++) {
+			for (i; i < cStreamsA; i++) {
 				WCHAR* pName = NULL;
-				POSITION idx = m_iAudioStreams.FindIndex(i);
-				int iStream = m_iAudioStreams.GetAt(idx);
 				DWORD dwFlags;
-				if (FAILED(pSSA->Info(iStream, NULL, &dwFlags, NULL, NULL, &pName, NULL, NULL))) {
+				if (FAILED(pSSA->Info(i, NULL, &dwFlags, NULL, NULL, &pName, NULL, NULL))) {
 					break;
 				}
 				
@@ -13109,7 +13078,7 @@ void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSe
 					}
 				}
 
-				if (!sep && m_iAudioStreams.GetCount() > 1 && fnsame) {
+				if (!sep && (cStreamsA > 1) && fnsame) {
 					pSub->AppendMenu(MF_SEPARATOR|MF_ENABLED);
 					sep = true;
 				}
@@ -13218,6 +13187,10 @@ void CMainFrame::SetupNavMixAudioSubMenu()
 			pSub->AppendMenu(flags, id++, str);
 		}
 	}
+
+	if (pSub->GetMenuItemCount() == 2) {
+		pSub->RemoveMenu(1, MF_BYPOSITION);
+	}
 }
 
 void CMainFrame::OnNavMixStreamSelectSubMenu(UINT id, DWORD dwSelGroup)
@@ -13253,15 +13226,14 @@ void CMainFrame::OnNavMixStreamSelectSubMenu(UINT id, DWORD dwSelGroup)
 						continue;
 					}
 
-					bSplitterMenu = true;
+					bSplitterMenu = true; 
 					if (id == 0) {
 
 						bool bExternalTrack = false;
 						if (pSSA) {
 							DWORD cStreamsA = 0;
 							if (SUCCEEDED(pSSA->Count(&cStreamsA)) && cStreamsA > 1) {
-								for (int ii = 1; ii < (int)cStreamsA; ii++) {
-									int n = m_iAudioStreams.GetAt(m_iAudioStreams.FindIndex(ii));
+								for (DWORD n = 1; n < cStreamsA; n++) {
 									DWORD flags = 0;
 									if (SUCCEEDED(pSSA->Info(n, NULL, &flags, NULL, NULL, NULL, NULL, NULL))) {
 										if (flags&AMSTREAMSELECTINFO_EXCLUSIVE/* ||flags&AMSTREAMSELECTINFO_ENABLED*/) {
@@ -13293,14 +13265,16 @@ void CMainFrame::OnNavMixStreamSelectSubMenu(UINT id, DWORD dwSelGroup)
 	}
 
 	if (id >=0 && pSSA) {
-		UINT i = id;
+		DWORD cStreamsA = 0;
+		if (SUCCEEDED(pSSA->Count(&cStreamsA)) && cStreamsA > 0) {
+			UINT i = id;
 
-		if (bSplitterMenu && m_iAudioStreams.GetCount() > 1) {
-			i++;
+			if (bSplitterMenu && (cStreamsA > 1)) {
+				i++;
+			}
+
+			pSSA->Enable(i, AMSTREAMSELECTENABLE_ENABLE);
 		}
-
-		int iStream = m_iAudioStreams.GetAt(m_iAudioStreams.FindIndex(i));
-		pSSA->Enable(iStream, AMSTREAMSELECTENABLE_ENABLE);
 	}
 }
 
