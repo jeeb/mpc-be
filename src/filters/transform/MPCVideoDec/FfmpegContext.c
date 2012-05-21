@@ -29,19 +29,21 @@
 #include <vfwmsgs.h>
 #include <sys/timeb.h>
 #include "FfmpegContext.h"
+
 #include <ffmpeg/libavcodec/dsputil.h>
 #include <ffmpeg/libavcodec/avcodec.h>
 #include <ffmpeg/libavcodec/mpegvideo.h>
 #include <ffmpeg/libavcodec/golomb.h>
-
 #include <ffmpeg/libavcodec/h264.h>
 #include <ffmpeg/libavcodec/h264data.h>
 #include <ffmpeg/libavcodec/vc1.h>
 #include <ffmpeg/libavcodec/mpeg12.h>
 
+#include <time.h>
+
 #if defined(REGISTER_FILTER)
-void *__imp_toupper = toupper;
-void __imp__time64  (int typ, const char *name, double a1, double a2, double rslt) {}
+void *__imp_toupper	= toupper;
+void *__imp_time64	= _time64;
 #endif
 
 int av_h264_decode_frame(struct AVCodecContext* avctx, int* nOutPOC, int64_t* rtStartTime, uint8_t *buf, int buf_size);

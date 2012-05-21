@@ -41,10 +41,13 @@
 
 #include <libflac/include/FLAC/stream_decoder.h>
 
-void *__imp__toupper = toupper;
+void *__imp_toupper	= toupper;
 
 #if defined(REGISTER_FILTER)
-void *__imp__time64 = _time64;
+void *__imp_time64	= _time64;
+#if defined(_WIN64) && defined(_DEBUG)
+extern "C" int mingw_app_type = 1; /* 0:console, 1:windows.  */
+#endif
 #endif
 
 #define INT8_PEAK       128
@@ -243,13 +246,6 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 };
 
 #ifdef REGISTER_FILTER
-
-#ifdef _WIN64
-#ifdef _DEBUG
-extern "C" int mingw_app_type = 1; /* 0:console, 1:windows.  */
-#endif
-void *__imp_toupper = toupper;
-#endif
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 	{&MEDIATYPE_Audio, &MEDIASUBTYPE_PCM},
