@@ -26,7 +26,7 @@ int32_t dump_alloc (void);
 #endif
 
 #if !defined(NO_UNPACK) || defined(INFO_ONLY)
-
+/*
 int read_metadata_buff (WavpackMetadata *wpmd, unsigned char *blockbuff, unsigned char **buffptr)
 {
     WavpackHeader *wphdr = (WavpackHeader *) blockbuff;
@@ -134,7 +134,7 @@ int process_metadata (WavpackContext *wpc, WavpackMetadata *wpmd)
             return (wpmd->id & ID_OPTIONAL_DATA) ? TRUE : FALSE;
     }
 }
-
+*/
 #endif
 
 #ifndef NO_PACK

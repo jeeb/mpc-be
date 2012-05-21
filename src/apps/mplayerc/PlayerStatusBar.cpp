@@ -80,8 +80,6 @@ int CPlayerStatusBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_status.SetWindowPos(&m_time, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
 	m_time.Create(_T(""), WS_CHILD|WS_VISIBLE|SS_OWNERDRAW, r, this, IDC_PLAYERTIME);
 
-	iThemeBrightness = AfxGetAppSettings().nThemeBrightness;
-
 	Relayout();
 
 	return 0;
@@ -89,7 +87,9 @@ int CPlayerStatusBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CPlayerStatusBar::Relayout()
 {
-	if (!AfxGetAppSettings().fDisableXPToolbars) {
+	AppSettings& s = AfxGetAppSettings();
+
+	if (!s.fDisableXPToolbars) {
 		m_type.ShowWindow(SW_SHOW);
 		m_status.ShowWindow(SW_SHOW);
 		m_time.ShowWindow(SW_SHOW);
@@ -127,24 +127,28 @@ void CPlayerStatusBar::Relayout()
 		GetClientRect(r);
 		r.SetRect(6, r.top+4, 22, r.bottom-4);
 		m_type.MoveWindow(r);
-		iThemeBrightness = AfxGetAppSettings().nThemeBrightness;
 	} else {
+		iThemeBrightness = s.nThemeBrightness;
+		iThemeRed = s.nThemeRed;
+		iThemeGreen = s.nThemeGreen;
+		iThemeBlue = s.nThemeBlue;
+
 		m_type.ShowWindow(SW_HIDE);
 		m_status.ShowWindow(SW_HIDE);
 		m_time.ShowWindow(SW_HIDE);
 	}
-
-	Invalidate();
 }
 
 void CPlayerStatusBar::Clear()
 {
 	m_status.SetWindowText(_T(""));
 	m_time.SetWindowText(_T(""));
+
 	SetStatusBitmap(0);
 	SetStatusTypeIcon(0);
 
 	Relayout();
+	Invalidate();
 }
 
 void CPlayerStatusBar::SetStatusBitmap(UINT id)
@@ -160,9 +164,11 @@ void CPlayerStatusBar::SetStatusBitmap(UINT id)
 	if (id) {
 		m_bm.LoadBitmap(id);
 	}
+
 	m_bmid = id;
 
 	Relayout();
+	Invalidate();
 }
 
 void CPlayerStatusBar::SetStatusTypeIcon(HICON hIcon)
@@ -178,6 +184,7 @@ void CPlayerStatusBar::SetStatusTypeIcon(HICON hIcon)
 	m_type.SetIcon(m_hIcon = hIcon);
 
 	Relayout();
+	Invalidate();
 }
 
 void CPlayerStatusBar::SetStatusMessage(CString str)
@@ -185,7 +192,9 @@ void CPlayerStatusBar::SetStatusMessage(CString str)
 	str.Trim();
 
 	m_status.SetWindowText(str);
+
 	Relayout();
+	Invalidate();
 }
 
 CString CPlayerStatusBar::GetStatusTimer()
@@ -208,6 +217,7 @@ void CPlayerStatusBar::SetStatusTimer(CString str)
 {
 	CString tmp;
 	m_time.GetWindowText(tmp);
+
 	if (tmp == str) {
 		return;
 	}
@@ -216,6 +226,7 @@ void CPlayerStatusBar::SetStatusTimer(CString str)
 	m_time.SetWindowText(str);
 
 	Relayout();
+	Invalidate();
 }
 
 void CPlayerStatusBar::SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur, bool fHighPrecision, const GUID* pTimeFormat)
@@ -284,6 +295,7 @@ void CPlayerStatusBar::ShowTimer(bool fShow)
 	m_time.ShowWindow(fShow ? SW_SHOW : SW_HIDE);
 
 	Relayout();
+	Invalidate();
 }
 
 BEGIN_MESSAGE_MAP(CPlayerStatusBar, CDialogBar)
@@ -301,19 +313,22 @@ END_MESSAGE_MAP()
 
 BOOL CPlayerStatusBar::OnEraseBkgnd(CDC* pDC)
 {
-	if (!AfxGetAppSettings().fDisableXPToolbars) {
+	Relayout();
+
+	AppSettings& s = AfxGetAppSettings();
+	CRect r;
+
+	if (!s.fDisableXPToolbars) {
 		for (CWnd* pChild = GetWindow(GW_CHILD); pChild; pChild = pChild->GetNextWindow()) {
 			if (!pChild->IsWindowVisible()) {
 				continue;
 			}
 
-			CRect r;
 			pChild->GetClientRect(&r);
 			pChild->MapWindowPoints(this, &r);
 			pDC->ExcludeClipRect(&r);
 		}
 
-		CRect r;
 		GetClientRect(&r);
 
 		CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
@@ -326,18 +341,24 @@ BOOL CPlayerStatusBar::OnEraseBkgnd(CDC* pDC)
 			r.InflateRect(1, 0, 1, 0);
 		}
 
-		if(AfxGetAppSettings().fDisableXPToolbars) {
-			CPen penBlend (PS_SOLID,0,0x002d2823);
-			CPen *penSaved = pDC->SelectObject(&penBlend);
-			pDC->MoveTo(r.left,r.top);
-			pDC->LineTo(r.right,r.top);
-			pDC->SelectObject(&penSaved);
-			r.DeflateRect(0,1,0,0);
-			pDC->FillSolidRect(&r, 0);
+		pDC->Draw3dRect(&r, GetSysColor(COLOR_3DSHADOW), GetSysColor(COLOR_3DHILIGHT));
+		r.DeflateRect(1, 1);
+		pDC->FillSolidRect(&r, 0);
+	} else {
+		GetClientRect(&r);
+
+		GRADIENT_RECT gr[1] = {{0, 1}};
+
+		int fp = m_logobm.FileExists("background");
+
+		if (NULL != fp) {
+			m_logobm.LoadExternalGradient("background", pDC, r, 55, iThemeBrightness, iThemeRed, iThemeGreen, iThemeBlue);
 		} else {
-			pDC->Draw3dRect(&r, GetSysColor(COLOR_3DSHADOW), GetSysColor(COLOR_3DHILIGHT));
-			r.DeflateRect(1, 1);
-			pDC->FillSolidRect(&r, 0);
+			TRIVERTEX tv[2] = {
+				{r.left, r.top, (iThemeBrightness + 30)*iThemeRed, (iThemeBrightness + 35)*iThemeGreen, (iThemeBrightness + 40)*iThemeBlue, 255*256},
+				{r.right, r.bottom, (iThemeBrightness + 0)*iThemeRed, (iThemeBrightness + 5)*iThemeGreen, (iThemeBrightness + 10)*iThemeBlue, 255*256},
+			};
+			pDC->GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 		}
 	}
 
@@ -347,9 +368,13 @@ BOOL CPlayerStatusBar::OnEraseBkgnd(CDC* pDC)
 void CPlayerStatusBar::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-	
+
+	Relayout();
+
+	AppSettings& s = AfxGetAppSettings();
 	CRect r;
-	if (!AfxGetAppSettings().fDisableXPToolbars) {
+
+	if (!s.fDisableXPToolbars) {
 		if (m_bm.m_hObject) {
 			BITMAP bm;
 			m_bm.GetBitmap(&bm);
@@ -365,13 +390,9 @@ void CPlayerStatusBar::OnPaint()
 		CBitmap m_bmPaint;
 		memdc.CreateCompatibleDC(&dc);
 		m_bmPaint.CreateCompatibleBitmap(&dc, r.Width(), r.Height());
-		CBitmap *bmOld = memdc.SelectObject(&m_bmPaint);
+		memdc.SelectObject(&m_bmPaint);
 
 		//background
-		iThemeBrightness = AfxGetAppSettings().nThemeBrightness;
-		iThemeRed = AfxGetAppSettings().nThemeRed;
-		iThemeGreen = AfxGetAppSettings().nThemeGreen;
-		iThemeBlue = AfxGetAppSettings().nThemeBlue;
 
 		GRADIENT_RECT gr[1] = {{0, 1}};
 
@@ -421,7 +442,7 @@ void CPlayerStatusBar::OnPaint()
 						_T("Tahoma")              	// lpszFacename
 						);
 
-		CFont* oldfont2 = memdc.SelectObject(&font2);
+		memdc.SelectObject(&font2);
 		CString str;
 		str = GetStatusTimer();
 
@@ -443,6 +464,7 @@ void CPlayerStatusBar::OnPaint()
 		str2 = GetStatusMessage();
 		memdc.DrawText(str2, str2.GetLength(), &rs, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
 
+		dc.SetBkMode(TRANSPARENT);
 		dc.BitBlt(r.left, r.top, r.Width(), r.Height(), &memdc, 0, 0, SRCCOPY);
 	}
 
@@ -463,6 +485,7 @@ void CPlayerStatusBar::OnSize(UINT nType, int cx, int cy)
 	CDialogBar::OnSize(nType, cx, cy);
 
 	Relayout();
+	Invalidate();
 }
 
 void CPlayerStatusBar::OnLButtonDown(UINT nFlags, CPoint point)
@@ -525,6 +548,7 @@ BOOL CPlayerStatusBar::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 HBRUSH CPlayerStatusBar::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {
 	HBRUSH hbr = CDialogBar::OnCtlColor(pDC, pWnd, nCtlColor);
+
 	if (!AfxGetAppSettings().fDisableXPToolbars) {
 		if (*pWnd == m_type) {
 			hbr = GetStockBrush(BLACK_BRUSH);
