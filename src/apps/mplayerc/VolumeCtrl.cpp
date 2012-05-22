@@ -186,7 +186,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						nVolume = 0;
 					}
 
-					int m_nVolPos = r.left + nVolume * 0.5;
+					int m_nVolPos = r.left + nVolume * 0.45 + 4;
 
 					unsigned p3 = dc.GetPixel(m_nVolPos, 0) == 0x00000000 ? dc.GetPixel(m_nVolPos - 5, 0) : dc.GetPixel(m_nVolPos + 10, 0);
 					CPen penLeft(p2 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p3);
@@ -204,24 +204,24 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					CPen penRight(p1 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p1);
 					CPen *penOld = dc.SelectObject(&penRight);
 
-					int nposx,nposy;
-					for (int i = 5 ; i <= 50;)
-					{
-						nposy = (int)r.bottom - r.Height() *i / ( r.Width() +10 ) -1;
-						nposx = r.left -5 +i -1;
-						i <= m_nVolPos ? dc.SelectObject(penLeft) : dc.SelectObject(penRight);
-						dc.MoveTo(nposx, nposy);				//top_left
-						dc.LineTo(nposx +2, nposy);				//top_right
-						dc.LineTo(nposx +2, r.bottom);			//bottom_right
-						dc.LineTo(nposx, r.bottom);				//bottom_left
-						dc.LineTo(nposx, nposy);				//top_left
-						if (!s.fMute)
-						{
-							dc.MoveTo(nposx +1, nposy -1);		//top_middle
-							dc.LineTo(nposx +1, r.bottom +2);	//bottom_middle
+					for (int i = 4; i <= 48; i += 4) {
+
+						int nposx = r.left + i, nposy = r.bottom - (r.Height() * i) / (r.Width() + 8);
+
+						i < m_nVolPos ? dc.SelectObject(penLeft) : dc.SelectObject(penRight);
+
+						dc.MoveTo(nposx, nposy);			//top_left
+						dc.LineTo(nposx + 2, nposy);			//top_right
+						dc.LineTo(nposx + 2, r.bottom);			//bottom_right
+						dc.LineTo(nposx, r.bottom);			//bottom_left
+						dc.LineTo(nposx, nposy);			//top_left
+
+						if (!s.fMute) {
+							dc.MoveTo(nposx + 1, nposy - 1);	//top_middle
+							dc.LineTo(nposx + 1, r.bottom + 2);	//bottom_middle
 						}
-						i+=5;
 					}
+
 					dc.SelectObject(penOld);
 					dc.Detach();
 					lr = CDRF_SKIPDEFAULT;

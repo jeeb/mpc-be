@@ -415,14 +415,13 @@ void CPlayerStatusBar::OnPaint()
 		memdc.MoveTo(r.left +1, r.top +1);
 		memdc.LineTo(r.right, r.top +1);	
 		memdc.MoveTo(r.left +1, r.top +2);
-		memdc.LineTo(r.right, r.top +2);	
-		
+		memdc.LineTo(r.right, r.top +2);
+
 		CPen penPlayed2(PS_SOLID,0,RGB((iThemeBrightness+50),(iThemeBrightness+55),(iThemeBrightness+60)));
 		memdc.SelectObject(&penPlayed2);
 		memdc.MoveTo(r.left +1, r.top +3);
-		memdc.LineTo(r.right, r.top +3);	
-	
-		SetBkMode(memdc, TRANSPARENT);
+		memdc.LineTo(r.right, r.top +3);
+
 		CFont font2;
 		memdc.SetTextColor(RGB(165,170,175));
 		font2.CreateFont(
@@ -464,7 +463,6 @@ void CPlayerStatusBar::OnPaint()
 		str2 = GetStatusMessage();
 		memdc.DrawText(str2, str2.GetLength(), &rs, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
 
-		dc.SetBkMode(TRANSPARENT);
 		dc.BitBlt(r.left, r.top, r.Width(), r.Height(), &memdc, 0, 0, SRCCOPY);
 	}
 
