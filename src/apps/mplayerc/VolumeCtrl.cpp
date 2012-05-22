@@ -186,7 +186,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						nVolume = 0;
 					}
 
-					int m_nVolPos = r.left + nVolume * 0.45 + 2;
+					int m_nVolPos = r.left + (nVolume * 0.43) + 4;
 
 					unsigned p3 = dc.GetPixel(m_nVolPos, 0) == 0x00000000 ? dc.GetPixel(m_nVolPos - 5, 0) : dc.GetPixel(m_nVolPos + 10, 0);
 					CPen penLeft(p2 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p3);
@@ -204,9 +204,11 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					CPen penRight(p1 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p1);
 					CPen *penOld = dc.SelectObject(&penRight);
 
+					int nposx, nposy;
 					for (int i = 4; i <= 44; i += 4) {
 
-						int nposx = r.left + i, nposy = r.bottom - (r.Height() * i) / (r.Width() + 6);
+						nposx = r.left + i;
+						nposy = r.bottom - (r.Height() * i) / (r.Width() + 6);
 
 						i < m_nVolPos ? dc.SelectObject(penLeft) : dc.SelectObject(penRight);
 
@@ -302,7 +304,7 @@ void CVolumeCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 	} else if (point.x >= r.right) {
 		SetPos(stop);
 	} else {
-		int w = r.right - r.left - 6;
+		int w = r.right - r.left - 4;
 		if (start < stop) {
 			SetPosInternal(start + ((stop - start) * (point.x - r.left) + (w/2)) / w);
 		}
