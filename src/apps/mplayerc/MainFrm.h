@@ -427,10 +427,10 @@ protected:
 
 	CWnd *GetModalParent();
 
-	void OpenCreateGraphObject(OpenMediaData* pOMD);
-	void OpenFile(OpenFileData* pOFD);
-	void OpenDVD(OpenDVDData* pODD);
-	void OpenCapture(OpenDeviceData* pODD);
+	CString OpenCreateGraphObject(OpenMediaData* pOMD);
+	CString OpenFile(OpenFileData* pOFD);
+	CString OpenDVD(OpenDVDData* pODD);
+	CString OpenCapture(OpenDeviceData* pODD);
 	HRESULT OpenBDAGraph();
 	void OpenCustomizeGraph();
 	void OpenSetupVideo();
