@@ -206,7 +206,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 					for (int i = 4; i <= 44; i += 4) {
 
-						int nposx = r.left + i, nposy = r.bottom - (r.Height() * i) / (r.Width() + 8);
+						int nposx = r.left + i, nposy = r.bottom - (r.Height() * i) / (r.Width() + 6);
 
 						i < m_nVolPos ? dc.SelectObject(penLeft) : dc.SelectObject(penRight);
 
