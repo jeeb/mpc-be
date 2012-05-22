@@ -186,7 +186,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						nVolume = 0;
 					}
 
-					int m_nVolPos = r.left + nVolume * 0.45 + 4;
+					int m_nVolPos = r.left + nVolume * 0.45 + 2;
 
 					unsigned p3 = dc.GetPixel(m_nVolPos, 0) == 0x00000000 ? dc.GetPixel(m_nVolPos - 5, 0) : dc.GetPixel(m_nVolPos + 10, 0);
 					CPen penLeft(p2 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p3);
@@ -204,7 +204,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					CPen penRight(p1 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p1);
 					CPen *penOld = dc.SelectObject(&penRight);
 
-					for (int i = 4; i <= 48; i += 4) {
+					for (int i = 4; i <= 44; i += 4) {
 
 						int nposx = r.left + i, nposy = r.bottom - (r.Height() * i) / (r.Width() + 8);
 
