@@ -819,7 +819,7 @@ avcsuccess:
 						CodecID == "S_TEXT/ASS" || CodecID == "S_ASS" ? MEDIASUBTYPE_ASS :
 						CodecID == "S_TEXT/USF" || CodecID == "S_USF" ? MEDIASUBTYPE_USF :
 						CodecID == "S_HDMV/PGS" ? MEDIASUBTYPE_HDMVSUB :
-						//CodecID == "S_DVBSUB" ? MEDIASUBTYPE_DVB_SUBTITLES : // does not work
+						CodecID == "S_DVBSUB" ? MEDIASUBTYPE_DVB_SUBTITLES :
 						CodecID == "S_VOBSUB" ? MEDIASUBTYPE_VOBSUB :
 						MEDIASUBTYPE_NULL;
 
@@ -1528,7 +1528,17 @@ HRESULT CMatroskaSplitterOutputPin::DeliverBlock(MatroskaPacket* p)
 		tmp->bSyncPoint = p->bSyncPoint;
 		tmp->rtStart = rtStart;
 		tmp->rtStop = rtStop;
-		tmp->Copy(*p->bg->Block.BlockData.GetNext(pos));
+		if (m_mt.subtype == MEDIASUBTYPE_DVB_SUBTITLES) { // Add DBV subtitle missing start code - 0x20 0x00 (in Matroska DVB packets start with 0x0F ...)
+			CAutoPtr<CBinary> ptr(DNew CBinary());
+			ptr->SetCount(2);
+			BYTE *pData = ptr->GetData();
+			pData[0] = 0x20;
+			pData[1] = 0x00;
+			tmp->Copy(*ptr);
+			tmp->Append(*p->bg->Block.BlockData.GetNext(pos));
+		} else {
+			tmp->Copy(*p->bg->Block.BlockData.GetNext(pos));
+		}
 		if (S_OK != (hr = DeliverPacket(tmp))) {
 			break;
 		}
