@@ -497,12 +497,12 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 				dc.RoundRect(r.left +1,r.top +1,r.right -2,r.bottom -1, 6, 4);		
 				AlphaBlend(dc.m_hDC, r.left +2,r.top +2, r.Width() -4, 0.5* r.Height() -2, memdc, 0, 0, nW, nH, bf);
 			}
-
+/**
 			if (CDIS_CHECKED == pTBCD->nmcd.uItemState) {
 				dc.SelectObject(&penFrChecked);
 				dc.RoundRect(r.left +1,r.top +1,r.right -2,r.bottom -1, 6, 4);
 			}
-
+*/
 			for (int j = 0; j < countof(sep); j++) {
 				GetItemRect(sep[j], &r);
 
