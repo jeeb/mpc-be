@@ -332,7 +332,7 @@ void CDVBSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 	DVB_PAGE* pPage_old;
 	while (m_Pages.GetCount()>0) {
 		pPage_old = m_Pages.GetHead();
-		if (pPage_old->rtStop < rt) {
+		if (pPage_old->rtStop < (rt - 30*10000000i64)) {
 			if (!pPage_old->Rendered) {
 				TRACE_DVB ("DVB - remove unrendered object, %S => %S, (rt=%S)\n",
 							ReftimeToString(pPage_old->rtStart), ReftimeToString(pPage_old->rtStop),
