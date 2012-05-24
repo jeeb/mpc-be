@@ -97,7 +97,6 @@ static UINT WM_NOTIFYICON = RegisterWindowMessage(_T("MYWM_NOTIFYICON"));
 static UINT s_uTBBC = RegisterWindowMessage(_T("TaskbarButtonCreated"));
 
 #include "../../filters/transform/VSFilter/IDirectVobSub.h"
-#include "../../Subtitles/RenderedHdmvSubtitle.h"
 
 #include "Monitors.h"
 #include "MultiMonitor.h"
@@ -11505,8 +11504,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 {
 	AppSettings& s = AfxGetAppSettings();
 
-	m_pSubStream = NULL;
-
 	if (m_iMediaLoadState != MLS_CLOSED) {
 		ASSERT(0);
 		return false;
@@ -13920,12 +13917,6 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, bool fApplyDefStyle)
 			pRTS->SetOverride(s.fUseDefaultSubtitlesStyle, &s.subdefstyle);
 
 			pRTS->Deinit();
-		} else if (m_pSubStream && clsid == __uuidof(CRenderedHdmvSubtitle)) { // Dirty Hack for paint HDMV/DVB subtitle after switch from another
-			CLSID clsid_prev;
-			m_pSubStream->GetClassID(&clsid_prev);
-			if (clsid_prev != clsid) {
-				AfxGetApp()->m_pMainWnd->PostMessage(WM_DISPLAYCHANGE);
-			}
 		}
 	}
 
@@ -13947,12 +13938,10 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, bool fApplyDefStyle)
 
 				i += pSubStream2->GetStreamCount();
 			}
-
 		}
 	}
 
 	m_nSubtitleId	= (DWORD_PTR)pSubStream;
-	m_pSubStream	= pSubStream;
 
 	if (m_pCAP) {
 		m_pCAP->SetSubPicProvider(CComQIPtr<ISubPicProvider>(pSubStream));
@@ -14671,8 +14660,6 @@ void CMainFrame::CloseMedia()
 		TRACE(_T("WARNING: CMainFrame::CloseMedia() called twice or more\n"));
 		return;
 	}
-
-	m_pSubStream = NULL;
 
 	int nTimeWaited = 0;
 

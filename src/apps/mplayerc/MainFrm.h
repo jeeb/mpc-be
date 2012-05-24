@@ -230,7 +230,6 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	CInterfaceList<ISubStream> m_pSubStreams;
 	int m_iSubtitleSel; // if (m_iSubtitleSel&(1<<31)): disabled
 	DWORD_PTR m_nSubtitleId;
-	ISubStream* m_pSubStream;
 
 	friend class CTextPassThruFilter;
 

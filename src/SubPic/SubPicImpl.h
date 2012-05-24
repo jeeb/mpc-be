@@ -137,5 +137,7 @@ public:
 	STDMETHODIMP SetMaxTextureSize(SIZE MaxTextureSize) {
 		return E_NOTIMPL;
 	};
+
+	STDMETHODIMP Reset();
 };
 

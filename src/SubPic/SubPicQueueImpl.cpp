@@ -65,9 +65,10 @@ STDMETHODIMP CSubPicQueueImpl::SetSubPicProvider(ISubPicProvider* pSubPicProvide
 {
 	CAutoLock cAutoLock(&m_csSubPicProvider);
 
-	//	if(m_pSubPicProvider != pSubPicProvider)
 	{
 		m_pSubPicProvider = pSubPicProvider;
+
+		m_pAllocator->Reset();
 
 		Invalidate();
 	}

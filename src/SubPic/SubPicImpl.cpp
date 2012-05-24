@@ -256,3 +256,9 @@ STDMETHODIMP CSubPicAllocatorImpl::ChangeDevice(IUnknown* pDev)
 	m_pStatic = NULL;
 	return S_OK;
 }
+
+STDMETHODIMP CSubPicAllocatorImpl::Reset()
+{
+	m_pStatic = NULL;
+	return S_OK;
+}
