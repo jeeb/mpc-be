@@ -45,6 +45,6 @@ int GetMLPFrameSize(const BYTE *buf); // for TrueHD and MLP
 
 int ParseAC3Header     (const BYTE *buf, int *samplerate, int *channels, int *framelength, int *bitrate);
 int ParseEAC3Header    (const BYTE *buf, int *samplerate, int *channels, int *framelength, int *frametype);
-int ParseMLPHeader     (const BYTE *buf, int *samplerate, int *channels, int *framelength, bool *isTrueHD); // for TrueHD and MLP
+int ParseMLPHeader     (const BYTE *buf, int *samplerate, int *channels, int *framelength, WORD *bitdepth, bool *isTrueHD); // for TrueHD and MLP
 int ParseHdmvLPCMHeader(const BYTE *buf, int *samplerate, int *channels);
 bool ParseAACLatmHeader(const BYTE *buf, int len, int *samplerate, int *channels, BYTE *extra, unsigned int* extralen);

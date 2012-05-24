@@ -1485,6 +1485,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 		pFGF->m_chkbytes.AddTail(_T("0,4,,fE7f0180"));                      // DTS LE
 		pFGF->m_chkbytes.AddTail(_T("0,2,,0B77"));                          // AC3, E-AC3
 		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,8,,57415645666D7420"));// RIFFxxxxWAVEfmt_ for DTSWAV
+		pFGF->m_chkbytes.AddTail(_T("4,4,,F8726FBB"));                      // MLP
 		pFGF->m_extensions.AddTail(_T(".ac3"));
 		pFGF->m_extensions.AddTail(_T(".dts"));
 		pFGF->m_extensions.AddTail(_T(".eac3"));
@@ -1669,6 +1670,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_WAVE_DOLBY_AC3);
 	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_DOLBY_TRUEHD);
 	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_DOLBY_DDPLUS);
+	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_MLP);
 	m_transform.AddTail(pFGF);
 
 	pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
