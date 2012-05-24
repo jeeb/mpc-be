@@ -548,7 +548,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			for (int j = 0; j < countof(sep); j++) {
 				GetItemRect(sep[j], &r);
 
-				dc.FillSolidRect(r, RGB(245, 245, 245));
+				dc.FillSolidRect(r, GetSysColor(COLOR_WINDOW));
 			}
 
 			dc.Detach();
@@ -626,7 +626,13 @@ BOOL CPlayerToolBar::OnPlay(UINT nID)
 	bi.cbSize = sizeof(bi);
 	bi.dwMask = TBIF_IMAGE;
 	tb.GetButtonInfo(ID_PLAY_PLAY, &bi);
-	bi.iImage = (fs == State_Paused || fs == State_Stopped) ? 1 : 0;
+
+	int pos = (fs == State_Paused || fs == State_Stopped) ? 1 : 0;
+	if (bi.iImage != pos) {
+		bi.iImage = 1;
+	} else {
+		bi.iImage = pos;
+	}
 	tb.SetButtonInfo(ID_PLAY_PLAY, &bi);
 
 	return FALSE;
@@ -634,9 +640,6 @@ BOOL CPlayerToolBar::OnPlay(UINT nID)
 
 BOOL CPlayerToolBar::OnStop(UINT nID)
 {
-	CMainFrame* pFrame	= ((CMainFrame*)GetParentFrame());
-	OAFilterState fs	= pFrame->GetMediaState();
-
 	CToolBarCtrl& tb = GetToolBarCtrl();
 	TBBUTTONINFO bi;
 	bi.cbSize = sizeof(bi);
@@ -660,14 +663,14 @@ BOOL CPlayerToolBar::OnPause(UINT nID)
 	tb.GetButtonInfo(ID_PLAY_PLAY, &bi);
 	bi.iImage = (fs == State_Paused) ? 1 : 0;
 	tb.SetButtonInfo(ID_PLAY_PLAY, &bi);
-	
+
 	return FALSE;
 }
 
 void CPlayerToolBar::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	CMainFrame* pFrame	= ((CMainFrame*)GetParentFrame());
-	int Idx				= getHitButtonIdx(point);
+	int Idx			= getHitButtonIdx(point);
 	OAFilterState fs	= pFrame->GetMediaState();
 
 	if (Idx == 0 && fs != -1) {

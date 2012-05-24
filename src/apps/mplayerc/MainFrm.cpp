@@ -7011,6 +7011,7 @@ void CMainFrame::OnPlayPlay()
 		if (GetPlaybackMode() == PM_FILE) {
 			if (m_fEndOfStream) {
 				SendMessage(WM_COMMAND, ID_PLAY_STOP);
+				SendMessage(WM_COMMAND, ID_PLAY_PLAYPAUSE);
 			}
 			pMS->SetRate(m_dSpeedRate);
 			pMC->Run();
