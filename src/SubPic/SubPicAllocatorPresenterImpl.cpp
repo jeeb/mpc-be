@@ -133,10 +133,6 @@ STDMETHODIMP_(void) CSubPicAllocatorPresenterImpl::SetPosition(RECT w, RECT v)
 
 STDMETHODIMP_(void) CSubPicAllocatorPresenterImpl::SetTime(REFERENCE_TIME rtNow)
 {
-	/*
-		if(m_rtNow <= rtNow && rtNow <= m_rtNow + 1000000)
-			return;
-	*/
 	m_rtNow = rtNow - m_rtSubtitleDelay;
 
 	if (m_pSubPicQueue) {
@@ -156,12 +152,17 @@ STDMETHODIMP_(int) CSubPicAllocatorPresenterImpl::GetSubtitleDelay()
 
 STDMETHODIMP_(double) CSubPicAllocatorPresenterImpl::GetFPS()
 {
-	return(m_fps);
+	return m_fps;
 }
 
 STDMETHODIMP_(void) CSubPicAllocatorPresenterImpl::SetSubPicProvider(ISubPicProvider* pSubPicProvider)
 {
 	m_SubPicProvider = pSubPicProvider;
+
+	if (m_pAllocator) {
+		m_pAllocator->SetCurSize(m_WindowRect.Size());
+		m_pAllocator->SetCurVidRect(m_VideoRect);
+	}
 
 	if (m_pSubPicQueue) {
 		m_pSubPicQueue->SetSubPicProvider(pSubPicProvider);
@@ -202,5 +203,6 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::SetVideoAngle(Vector v, bool fRepain
 	if (fRepaint) {
 		Paint(true);
 	}
+
 	return S_OK;
 }

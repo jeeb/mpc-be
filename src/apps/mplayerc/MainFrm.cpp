@@ -97,6 +97,7 @@ static UINT WM_NOTIFYICON = RegisterWindowMessage(_T("MYWM_NOTIFYICON"));
 static UINT s_uTBBC = RegisterWindowMessage(_T("TaskbarButtonCreated"));
 
 #include "../../filters/transform/VSFilter/IDirectVobSub.h"
+#include "../../Subtitles/RenderedHdmvSubtitle.h"
 
 #include "Monitors.h"
 #include "MultiMonitor.h"
@@ -3583,37 +3584,40 @@ void CMainFrame::OnStreamAudio(UINT nID)
 		return;
 	}
 
-	CComQIPtr<IAMStreamSelect> pSS = FindFilter(__uuidof(CAudioSwitcherFilter), pGB);
-	if (!pSS) {
-		pSS = FindFilter(L"{D3CD7858-971A-4838-ACEC-40CA5D529DC8}", pGB);    // morgan's switcher
-	}
+	if (GetPlaybackMode() == PM_FILE) {
 
-	DWORD cStreams = 0;
-	if (pSS && SUCCEEDED(pSS->Count(&cStreams)) && cStreams > 1) {
-		for (int i = 0; i < (int)cStreams; i++) {
-			AM_MEDIA_TYPE* pmt = NULL;
-			DWORD dwFlags = 0;
-			LCID lcid = 0;
-			DWORD dwGroup = 0;
-			WCHAR* pszName = NULL;
-			if (FAILED(pSS->Info(i, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))) {
-				return;
-			}
+		AudStreams as;
+		CAtlArray<AudStreams> MixAS;
+		int iSel	= -1;
+		as.iNum		= -1;
 
-			if (pmt) {
-				DeleteMediaType(pmt);
-			}
-			if (pszName) {
-				CoTaskMemFree(pszName);
-			}
+		CComQIPtr<IAMStreamSelect> pSSs = FindSourceSelectableFilter();
+		if (pSSs) {
+			DWORD cStreamsS = 0;
+			if (SUCCEEDED(pSSs->Count(&cStreamsS)) && cStreamsS > 0) {
+				for (int i = 0; i < (int)cStreamsS; i++) {
+					//iSel = 0;
+					AM_MEDIA_TYPE* pmt	= NULL;
+					DWORD dwFlags		= 0;
+					LCID lcid			= 0;
+					DWORD dwGroup		= 0;
+					WCHAR* pszName		= NULL;
+					if (FAILED(pSSs->Info(i, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))) {
+						return;
+					}
 
-			if (dwFlags&(AMSTREAMSELECTINFO_ENABLED|AMSTREAMSELECTINFO_EXCLUSIVE)) {
-				long stream_index = (i+(nID==0?1:cStreams-1))%cStreams;
-				pSS->Enable(stream_index, AMSTREAMSELECTENABLE_ENABLE);
-				if (SUCCEEDED(pSS->Info(stream_index, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))) {
-					CString	strMessage;
-					strMessage.Format (ResStr(IDS_AUDIO_STREAM), pszName);
-					m_OSD.DisplayMessage (OSD_TOPLEFT, strMessage);
+					if (dwGroup == 1) {
+						if (dwFlags&(AMSTREAMSELECTINFO_ENABLED|AMSTREAMSELECTINFO_EXCLUSIVE)) {
+							iSel = MixAS.GetCount();
+							//iSel = 1;
+						}
+						as.iFilter	= 1;
+						as.iIndex	= i;
+						as.iNum++;
+						as.iSel		= iSel;
+						MixAS.Add(as);
+					}
+
 					if (pmt) {
 						DeleteMediaType(pmt);
 					}
@@ -3621,11 +3625,130 @@ void CMainFrame::OnStreamAudio(UINT nID)
 						CoTaskMemFree(pszName);
 					}
 				}
-				break;
 			}
 		}
-	} else if (GetPlaybackMode() == PM_FILE) {
-		SendMessage(WM_COMMAND, ID_OGM_AUDIO_NEXT+nID);
+
+
+		CComQIPtr<IAMStreamSelect> pSSa = FindFilter(__uuidof(CAudioSwitcherFilter), pGB);
+		if (!pSSa) {
+			pSSa = FindFilter(L"{D3CD7858-971A-4838-ACEC-40CA5D529DC8}", pGB);    // morgan's switcher
+		}
+
+		if (pSSa) {
+			DWORD cStreamsA = 0;
+			int i;
+			MixAS.GetCount() > 0 ? i = 1 : i = 0;
+			if (SUCCEEDED(pSSa->Count(&cStreamsA)) && cStreamsA > 0) {
+				for (i; i < (int)cStreamsA; i++) {
+					//iSel = 0;
+					AM_MEDIA_TYPE* pmt	= NULL;
+					DWORD dwFlags		= 0;
+					LCID lcid			= 0;
+					DWORD dwGroup		= 0;
+					WCHAR* pszName		= NULL;
+					if (FAILED(pSSa->Info(i, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))) {
+						return;
+					}
+
+					if (pmt) {
+						DeleteMediaType(pmt);
+					}
+					if (pszName) {
+						CoTaskMemFree(pszName);
+					}
+
+					if (dwFlags&(AMSTREAMSELECTINFO_ENABLED|AMSTREAMSELECTINFO_EXCLUSIVE)) {
+						//iSel = 1;
+						iSel = MixAS.GetCount();
+						for (size_t i = 0; i < MixAS.GetCount(); i++) {
+							if (MixAS[i].iSel == 1) {
+								MixAS[i].iSel = 0;
+							}
+						}
+					}
+
+					as.iFilter	= 2;
+					as.iIndex	= i;
+					as.iNum++;
+					as.iSel		= iSel;
+					MixAS.Add(as);
+				}
+			}
+		}
+
+
+		int cnt = MixAS.GetCount();
+		if (cnt > 1) {
+			int nNewStream2 = MixAS[(iSel+(nID==0?1:cnt-1))%cnt].iNum;
+			int iF;
+			int nNewStream;
+
+			for (size_t i = 0; i < MixAS.GetCount(); i++) {
+				if (MixAS[i].iNum == nNewStream2) {
+					iF			= MixAS[i].iFilter;
+					nNewStream	= MixAS[i].iIndex;
+					break;
+				}
+			}
+
+			AM_MEDIA_TYPE* pmt	= NULL;
+			DWORD dwFlags		= 0;
+			LCID lcid			= 0;
+			DWORD dwGroup		= 0;
+			WCHAR* pszName		= NULL;
+
+			bool ExtStream = false;
+			if (iF == 1) { // Splitter Audio Tracks
+
+				for (size_t i = 0; i < MixAS.GetCount(); i++) {
+					if (MixAS[i].iSel == iSel) {
+						if (MixAS[i].iFilter == 2) {
+							ExtStream = true;
+							break;
+						}
+					}
+				}
+
+				if (ExtStream) { // return from external audiotrack (of the AudioSwitcher) to internal audiotrack (of Splitter) without bug
+					pSSa->Enable(0, AMSTREAMSELECTENABLE_ENABLE); 
+				}
+				pSSs->Enable(nNewStream, AMSTREAMSELECTENABLE_ENABLE);
+				
+				if (SUCCEEDED(pSSs->Info(nNewStream, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))) {
+					CString	strMessage;
+					CString audio_stream = pszName;
+					int k = audio_stream.Find(_T("Audio - "));
+					if (k >= 0) {
+						audio_stream = audio_stream.Right(audio_stream.GetLength() - k - 8);
+					}
+					strMessage.Format (ResStr(IDS_AUDIO_STREAM), audio_stream);
+					m_OSD.DisplayMessage (OSD_TOPLEFT, strMessage);
+
+					if (pmt) {
+						DeleteMediaType(pmt);
+					}
+					if (pszName) {
+						CoTaskMemFree(pszName);
+					}
+				}
+			} else if (iF == 2) { // AudioSwitcher Audio Tracks
+
+				pSSa->Enable(nNewStream, AMSTREAMSELECTENABLE_ENABLE);
+				
+				if (SUCCEEDED(pSSa->Info(nNewStream, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))) {
+					CString	strMessage;
+					strMessage.Format (ResStr(IDS_AUDIO_STREAM), pszName);
+					m_OSD.DisplayMessage (OSD_TOPLEFT, strMessage);
+
+					if (pmt) {
+						DeleteMediaType(pmt);
+					}
+					if (pszName) {
+						CoTaskMemFree(pszName);
+					}
+				}
+			}
+		}
 	} else if (GetPlaybackMode() == PM_DVD) {
 		SendMessage(WM_COMMAND, ID_DVD_AUDIO_NEXT+nID);
 	}
@@ -11381,6 +11504,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 {
 	AppSettings& s = AfxGetAppSettings();
 
+	m_pSubStream = NULL;
+
 	if (m_iMediaLoadState != MLS_CLOSED) {
 		ASSERT(0);
 		return false;
@@ -13794,6 +13919,12 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, bool fApplyDefStyle)
 			pRTS->SetOverride(s.fUseDefaultSubtitlesStyle, &s.subdefstyle);
 
 			pRTS->Deinit();
+		} else if (m_pSubStream && clsid == __uuidof(CRenderedHdmvSubtitle)) { // Dirty Hack for paint HDMV/DVB subtitle after switch from another
+			CLSID clsid_prev;
+			m_pSubStream->GetClassID(&clsid_prev);
+			if (clsid_prev != clsid) {
+				AfxGetApp()->m_pMainWnd->PostMessage(WM_DISPLAYCHANGE);
+			}
 		}
 	}
 
@@ -13819,7 +13950,8 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, bool fApplyDefStyle)
 		}
 	}
 
-	m_nSubtitleId = (DWORD_PTR)pSubStream;
+	m_nSubtitleId	= (DWORD_PTR)pSubStream;
+	m_pSubStream	= pSubStream;
 
 	if (m_pCAP) {
 		m_pCAP->SetSubPicProvider(CComQIPtr<ISubPicProvider>(pSubStream));
@@ -14538,6 +14670,8 @@ void CMainFrame::CloseMedia()
 		TRACE(_T("WARNING: CMainFrame::CloseMedia() called twice or more\n"));
 		return;
 	}
+
+	m_pSubStream = NULL;
 
 	int nTimeWaited = 0;
 

@@ -49,28 +49,22 @@ STDMETHODIMP CSubPicImpl::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 
 STDMETHODIMP_(REFERENCE_TIME) CSubPicImpl::GetStart()
 {
-	return(m_rtStart);
+	return m_rtStart;
 }
 
 STDMETHODIMP_(REFERENCE_TIME) CSubPicImpl::GetStop()
 {
-	return(m_rtStop);
+	return m_rtStop;
 }
 
 STDMETHODIMP_(REFERENCE_TIME) CSubPicImpl::GetSegmentStart()
 {
-	if (m_rtSegmentStart) {
-		return(m_rtSegmentStart);
-	}
-	return(m_rtStart);
+	return m_rtSegmentStart ? m_rtSegmentStart : m_rtStart;
 }
 
 STDMETHODIMP_(REFERENCE_TIME) CSubPicImpl::GetSegmentStop()
 {
-	if (m_rtSegmentStop) {
-		return(m_rtSegmentStop);
-	}
-	return(m_rtStop);
+	return m_rtSegmentStop ? m_rtSegmentStop : m_rtStop;
 }
 
 STDMETHODIMP_(void) CSubPicImpl::SetSegmentStart(REFERENCE_TIME rtStart)
@@ -82,8 +76,6 @@ STDMETHODIMP_(void) CSubPicImpl::SetSegmentStop(REFERENCE_TIME rtStop)
 {
 	m_rtSegmentStop = rtStop;
 }
-
-
 
 STDMETHODIMP_(void) CSubPicImpl::SetStart(REFERENCE_TIME rtStart)
 {
@@ -123,7 +115,7 @@ STDMETHODIMP CSubPicImpl::GetSourceAndDest(SIZE* pSize, RECT* pRcSource, RECT* p
 	CheckPointer (pRcDest,	 E_POINTER);
 
 	if (m_size.cx > 0 && m_size.cy > 0) {
-		CRect		rcTemp = m_rcDirty;
+		CRect rcTemp = m_rcDirty;
 
 		// FIXME
 		rcTemp.DeflateRect(1, 1);
@@ -256,7 +248,7 @@ STDMETHODIMP CSubPicAllocatorImpl::AllocDynamic(ISubPic** ppSubPic)
 
 STDMETHODIMP_(bool) CSubPicAllocatorImpl::IsDynamicWriteOnly()
 {
-	return(m_fDynamicWriteOnly);
+	return m_fDynamicWriteOnly;
 }
 
 STDMETHODIMP CSubPicAllocatorImpl::ChangeDevice(IUnknown* pDev)

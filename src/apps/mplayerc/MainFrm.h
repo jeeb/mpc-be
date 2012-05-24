@@ -230,6 +230,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	CInterfaceList<ISubStream> m_pSubStreams;
 	int m_iSubtitleSel; // if (m_iSubtitleSel&(1<<31)): disabled
 	DWORD_PTR m_nSubtitleId;
+	ISubStream* m_pSubStream;
 
 	friend class CTextPassThruFilter;
 
@@ -285,6 +286,13 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 
 	CInterfaceArray<IUnknown, &IID_IUnknown> m_pparray;
 	CInterfaceArray<IAMStreamSelect> m_ssarray;
+
+	typedef struct {
+		int iFilter;
+		int iIndex;
+		int iNum;
+		int iSel;
+	} AudStreams;
 
 	// chapters (file mode)
 	CComPtr<IDSMChapterBag> m_pCB;
