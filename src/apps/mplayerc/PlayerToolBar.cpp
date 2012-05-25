@@ -477,16 +477,22 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			bmOld = memdc.SelectObject(&bmGlassLike);
 
 			//CBrush brushGlassLike(0x00ffffff);
-			memdc.FillSolidRect(rGlassLike, 0x00ffffff);//clr_resLight/white RGB(255,255,255)
+			//memdc.FillSolidRect(rGlassLike, 0x00ffffff);//clr_resLight/white RGB(255,255,255)
 
-			BLENDFUNCTION bf;  
-			bf.AlphaFormat	= 0;
+			TRIVERTEX tv[2] = {
+				{0, 0, 255*256, 255*256, 255*256, 255*256},
+				{nW, nH, 0, 0, 0, 0},
+			};
+			memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+
+			BLENDFUNCTION bf;
+			bf.AlphaFormat	= AC_SRC_ALPHA;
 			bf.BlendFlags	= 0;
 			bf.BlendOp	= AC_SRC_OVER;
-			bf.SourceConstantAlpha = 80;
+			bf.SourceConstantAlpha = 90;
 
 			CPen penFrHot (PS_SOLID,0,0x00e9e9e9);//clr_resFace	RGB(233,233,233)
-			CPen penFrChecked (PS_SOLID,0,0x00808080);//clr_resDark	RGB(128,128,128)
+			//CPen penFrChecked (PS_SOLID,0,0x00808080);//clr_resDark	RGB(128,128,128)
 
 			CPen *penSaved = dc.SelectObject(&penFrHot);
 			CBrush *brushSaved = (CBrush*)dc.SelectStockObject(NULL_BRUSH);
@@ -494,10 +500,10 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			//CDIS_SELECTED,CDIS_GRAYED,CDIS_DISABLED,CDIS_CHECKED,CDIS_FOCUS,CDIS_DEFAULT,CDIS_HOT,CDIS_MARKED,CDIS_INDETERMINATE
 			if (CDIS_HOT == pTBCD->nmcd.uItemState || CDIS_CHECKED + CDIS_HOT == pTBCD->nmcd.uItemState) {
 				dc.SelectObject(&penFrHot);
-				dc.RoundRect(r.left +1,r.top +1,r.right -2,r.bottom -1, 6, 4);		
-				AlphaBlend(dc.m_hDC, r.left +2,r.top +2, r.Width() -4, 0.5* r.Height() -2, memdc, 0, 0, nW, nH, bf);
+				dc.RoundRect(r.left +1,r.top +1,r.right -2,r.bottom -1, 6, 4);
+				AlphaBlend(dc.m_hDC, r.left +2,r.top +2, r.Width() -4, 0.7* r.Height() -2, memdc, 0, 0, nW, nH, bf);
 			}
-/**
+/*
 			if (CDIS_CHECKED == pTBCD->nmcd.uItemState) {
 				dc.SelectObject(&penFrChecked);
 				dc.RoundRect(r.left +1,r.top +1,r.right -2,r.bottom -1, 6, 4);
