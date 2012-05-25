@@ -216,6 +216,7 @@ Source: "{#bindir}\Lang\mpcresources.ua.dll"; DestDir: "{app}\Lang"; Flags: igno
 #endif
 Source: "..\COPYING.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
 Source: "..\docs\Authors.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "..\docs\Authors mpc-hc team.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
 Source: "..\docs\Changelog.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
 Source: "..\docs\Readme.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
 
