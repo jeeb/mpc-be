@@ -613,12 +613,12 @@ void CPlayerToolBar::OnMouseMove(UINT nFlags, CPoint point)
 	int i = getHitButtonIdx(point);
 
 	if ((i == -1) || (GetButtonStyle(i)&(TBBS_SEPARATOR|TBBS_DISABLED))) {
-		;
 	} else {
-		if ((i>10) || ((i<9) && ((CMainFrame*)GetParentFrame())->IsSomethingLoaded())) {
+		if ((i>10) || (i<2) || ((i<9) && ((CMainFrame*)GetParentFrame())->IsSomethingLoaded())) {
 			::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_HAND));
 		}
 	}
+
 	__super::OnMouseMove(nFlags, point);
 }
 
