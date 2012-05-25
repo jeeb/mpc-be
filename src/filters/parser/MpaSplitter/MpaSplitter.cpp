@@ -136,7 +136,7 @@ HRESULT CMpaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStop = m_rtStop = m_rtDuration = m_pFile->GetDuration();
 
 	CStringW str, title;
-	if (m_pFile->m_tags.Lookup('TIT2', str)) {
+	if (m_pFile->m_tags.Lookup('TIT2', str) || m_pFile->m_tags.Lookup('\0TT2', str)) {
 		title = str;
 	}
 	if (m_pFile->m_tags.Lookup('TYER', str) && !title.IsEmpty() && !str.IsEmpty()) {
@@ -145,7 +145,7 @@ HRESULT CMpaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	if (!title.IsEmpty()) {
 		SetProperty(L"TITL", title);
 	}
-	if (m_pFile->m_tags.Lookup('TPE1', str)) {
+	if (m_pFile->m_tags.Lookup('TPE1', str) || m_pFile->m_tags.Lookup('\0TP1', str)) {
 		SetProperty(L"AUTH", str);
 	}
 	if (m_pFile->m_tags.Lookup('TCOP', str)) {

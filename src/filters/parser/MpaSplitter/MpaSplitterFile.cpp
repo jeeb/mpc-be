@@ -183,23 +183,28 @@ HRESULT CMpaSplitterFile::Init()
 		m_startpos = GetPos() + size;
 
 		// TODO: read extended header
-
 		if (major <= 4) {
 			__int64 pos = GetPos();
 
 			while (pos < m_startpos) {
 				Seek(pos);
+				
+				DWORD tag	= 0;
+				DWORD size	= 0;
+				if (major == 2) {
+					tag		= (DWORD)BitRead(24);
+					size	= (DWORD)BitRead(24);
+				} else {
+					tag		= (DWORD)BitRead(32);
+					size	|= BitRead(8) << 24;
+					size	|= BitRead(8) << 16;
+					size	|= BitRead(8) << 8;
+					size	|= BitRead(8);
+					WORD flags = (WORD)BitRead(16);
+					UNUSED_ALWAYS(flags);
+				}
 
-				DWORD tag = (DWORD)BitRead(32);
-				DWORD size = 0;
-				size |= BitRead(8) << 24;
-				size |= BitRead(8) << 16;
-				size |= BitRead(8) << 8;
-				size |= BitRead(8);
-				WORD flags = (WORD)BitRead(16);
-				UNUSED_ALWAYS(flags);
-
-				pos += 4+4+2+size;
+				pos += ((major == 2) ? 3+3 : 4+4+2) + size;
 
 				if (!size || pos >= m_startpos) {
 					break;
@@ -210,7 +215,10 @@ HRESULT CMpaSplitterFile::Init()
 						|| tag == 'TALB'
 						|| tag == 'TYER'
 						|| tag == 'COMM'
-						|| tag == 'TRCK') {
+						|| tag == 'TRCK'
+						|| tag == 'TCOP'
+						|| tag == '\0TP1'
+						|| tag == '\0TT2') {
 					BYTE encoding = (BYTE)BitRead(8);
 					size--;
 
@@ -218,6 +226,12 @@ HRESULT CMpaSplitterFile::Init()
 
 					CStringA str;
 					CStringW wstr;
+
+					if (tag == 'COMM') {
+						DWORD lang = (WORD)BitRead(32); // skip 4 byte - it's lang identifier
+						UNUSED_ALWAYS(lang);
+						size -= 4;
+					}
 
 					if (encoding > 0 && size >= 2 && bom == 0xfffe) {
 						BitRead(16);
