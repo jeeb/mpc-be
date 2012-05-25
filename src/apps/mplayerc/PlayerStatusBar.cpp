@@ -313,8 +313,6 @@ END_MESSAGE_MAP()
 
 BOOL CPlayerStatusBar::OnEraseBkgnd(CDC* pDC)
 {
-	Relayout();
-
 	AppSettings& s = AfxGetAppSettings();
 	CRect r;
 
@@ -344,22 +342,6 @@ BOOL CPlayerStatusBar::OnEraseBkgnd(CDC* pDC)
 		pDC->Draw3dRect(&r, GetSysColor(COLOR_3DSHADOW), GetSysColor(COLOR_3DHILIGHT));
 		r.DeflateRect(1, 1);
 		pDC->FillSolidRect(&r, 0);
-	} else {
-		GetClientRect(&r);
-
-		GRADIENT_RECT gr[1] = {{0, 1}};
-
-		int fp = m_logobm.FileExists("background");
-
-		if (NULL != fp) {
-			m_logobm.LoadExternalGradient("background", pDC, r, 55, iThemeBrightness, iThemeRed, iThemeGreen, iThemeBlue);
-		} else {
-			TRIVERTEX tv[2] = {
-				{r.left, r.top, (iThemeBrightness + 30)*iThemeRed, (iThemeBrightness + 35)*iThemeGreen, (iThemeBrightness + 40)*iThemeBlue, 255*256},
-				{r.right, r.bottom, (iThemeBrightness + 0)*iThemeRed, (iThemeBrightness + 5)*iThemeGreen, (iThemeBrightness + 10)*iThemeBlue, 255*256},
-			};
-			pDC->GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
-		}
 	}
 
 	return TRUE;
@@ -369,7 +351,9 @@ void CPlayerStatusBar::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
 
-	Relayout();
+	if (GetSafeHwnd()) {
+		Relayout();
+	}
 
 	AppSettings& s = AfxGetAppSettings();
 	CRect r;
