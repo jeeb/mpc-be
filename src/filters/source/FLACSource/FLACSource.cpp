@@ -111,6 +111,60 @@ CFLACSource::~CFLACSource()
 {
 }
 
+STDMETHODIMP CFLACSource::NonDelegatingQueryInterface(REFIID riid, void** ppv)
+{
+	CheckPointer(ppv, E_POINTER);
+
+	return
+		QI2(IAMMediaContent)
+		__super::NonDelegatingQueryInterface(riid, ppv);
+}
+
+// IAMMediaContent
+
+STDMETHODIMP CFLACSource::get_AuthorName(BSTR* pbstrTitle)
+{
+	CheckPointer(pbstrTitle, E_POINTER);
+
+	file_info_struct file_info = (static_cast<CFLACStream*>(m_paStreams[0]))->GetInfo();
+	if (file_info.got_vorbis_comments) {
+		*pbstrTitle = file_info.artist.AllocSysString();
+		return S_OK;
+	}
+	return E_UNEXPECTED;
+}
+
+STDMETHODIMP CFLACSource::get_Title(BSTR* pbstrTitle)
+{
+	CheckPointer(pbstrTitle, E_POINTER);
+	
+	file_info_struct file_info = (static_cast<CFLACStream*>(m_paStreams[0]))->GetInfo();
+	if (file_info.got_vorbis_comments) {
+		CString Title	= file_info.title;
+		CString Year	= file_info.year;
+
+		if (!Title.IsEmpty() && !Year.IsEmpty()) {
+			Title += _T(" (") + Year + _T(")");
+		}
+
+		*pbstrTitle = Title.AllocSysString();
+		return S_OK;
+	}
+	return E_UNEXPECTED;
+}
+
+STDMETHODIMP CFLACSource::get_Description(BSTR* pbstrTitle)
+{
+	CheckPointer(pbstrTitle, E_POINTER);
+	
+	file_info_struct file_info = (static_cast<CFLACStream*>(m_paStreams[0]))->GetInfo();
+	if (file_info.got_vorbis_comments) {
+		*pbstrTitle = file_info.comment.AllocSysString();
+		return S_OK;
+	}
+	return E_UNEXPECTED;
+}
+
 STDMETHODIMP CFLACSource::QueryFilterInfo(FILTER_INFO* pInfo)
 {
 	CheckPointer(pInfo, E_POINTER);
@@ -136,6 +190,8 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 	CFileException	ex;
 	HRESULT			hr = E_FAIL;
 
+	file_info.got_vorbis_comments = false;
+
 	do {
 		if (!m_file.Open(fn, CFile::modeRead|CFile::shareDenyNone, &ex)) {
 			hr	= AmHresultFromWin32 (ex.m_lOsError);
@@ -146,6 +202,8 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 		if (!m_pDecoder) {
 			break;
 		}
+
+		FLAC__stream_decoder_set_metadata_respond(_DECODER_, FLAC__METADATA_TYPE_VORBIS_COMMENT); 
 
 		if (FLAC__STREAM_DECODER_INIT_STATUS_OK != FLAC__stream_decoder_init_stream (_DECODER_,
 				StreamDecoderRead,
@@ -159,7 +217,6 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 				this)) {
 			break;
 		}
-
 
 		if (!FLAC__stream_decoder_process_until_end_of_metadata (_DECODER_) ||
 				!FLAC__stream_decoder_seek_absolute (_DECODER_, 0)) {
@@ -268,32 +325,82 @@ HRESULT CFLACStream::GetMediaType(int iPosition, CMediaType* pmt)
 
 HRESULT CFLACStream::CheckMediaType(const CMediaType* pmt)
 {
-	if (   pmt->majortype  == MEDIATYPE_Audio
-			&& pmt->subtype    == MEDIASUBTYPE_FLAC_FRAMED
-			&& pmt->formattype == FORMAT_WaveFormatEx
-			&& ((WAVEFORMATEX*)pmt->pbFormat)->wFormatTag == WAVE_FORMAT_FLAC) {
+	if (pmt->majortype		== MEDIATYPE_Audio
+		&& pmt->subtype		== MEDIASUBTYPE_FLAC_FRAMED
+		&& pmt->formattype	== FORMAT_WaveFormatEx
+		&& ((WAVEFORMATEX*)pmt->pbFormat)->wFormatTag == WAVE_FORMAT_FLAC) {
 		return S_OK;
 	} else {
 		return E_INVALIDARG;
 	}
 }
 
+static bool ParseVorbisComment(const char *field_name, const FLAC__StreamMetadata_VorbisComment_Entry *entry, CString* TagValue){
+	CString TagValues[2] = {0, 0};
+	*TagValue = _T("");
+
+	CString vorvis_data(entry->entry);
+	
+	int tPos = 0, count = 0;
+	CString vorvis_data_field = vorvis_data.Tokenize(_T("="), tPos);
+	while (tPos != -1 && (count <= 2)) {
+		TagValues[count] = vorvis_data_field;
+		vorvis_data_field = vorvis_data.Tokenize(_T("="), tPos);
+		count++;
+	}
+
+	if (count == 2) {
+		CString TagId(field_name);
+		if(!TagId.CompareNoCase(TagValues[0])) {
+			*TagValue = TagValues[1];
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void CFLACStream::UpdateFromMetadata (void* pBuffer)
 {
 	const FLAC__StreamMetadata* pMetadata = (const FLAC__StreamMetadata*) pBuffer;
 
-	m_nMaxFrameSize			= pMetadata->data.stream_info.max_framesize;
-	m_nSamplesPerSec		= pMetadata->data.stream_info.sample_rate;
-	m_nChannels				= pMetadata->data.stream_info.channels;
-	m_wBitsPerSample		= pMetadata->data.stream_info.bits_per_sample;
-	m_i64TotalNumSamples	= pMetadata->data.stream_info.total_samples;
-	m_nAvgBytesPerSec		= (m_nChannels * (m_wBitsPerSample >> 3)) * m_nSamplesPerSec;
+	if (pMetadata->type == FLAC__METADATA_TYPE_STREAMINFO) {
+		m_nMaxFrameSize			= pMetadata->data.stream_info.max_framesize;
+		m_nSamplesPerSec		= pMetadata->data.stream_info.sample_rate;
+		m_nChannels				= pMetadata->data.stream_info.channels;
+		m_wBitsPerSample		= pMetadata->data.stream_info.bits_per_sample;
+		m_i64TotalNumSamples	= pMetadata->data.stream_info.total_samples;
+		m_nAvgBytesPerSec		= (m_nChannels * (m_wBitsPerSample >> 3)) * m_nSamplesPerSec;
 
-	// === Init members from base classes
-	GetFileSizeEx (m_file.m_hFile, (LARGE_INTEGER*)&m_llFileSize);
-	m_rtDuration			= (m_i64TotalNumSamples * UNITS) / m_nSamplesPerSec;
-	m_rtStop				= m_rtDuration;
-	m_AvgTimePerFrame		= (m_nMaxFrameSize + pMetadata->data.stream_info.min_framesize) * m_rtDuration / 2 / m_llFileSize;
+		// === Init members from base classes
+		GetFileSizeEx (m_file.m_hFile, (LARGE_INTEGER*)&m_llFileSize);
+		m_rtDuration			= (m_i64TotalNumSamples * UNITS) / m_nSamplesPerSec;
+		m_rtStop				= m_rtDuration;
+		m_AvgTimePerFrame		= (m_nMaxFrameSize + pMetadata->data.stream_info.min_framesize) * m_rtDuration / 2 / m_llFileSize;
+	} else if (pMetadata->type == FLAC__METADATA_TYPE_VORBIS_COMMENT) {
+		const FLAC__StreamMetadata_VorbisComment *vc = &pMetadata->data.vorbis_comment;
+		
+		file_info.got_vorbis_comments = (vc->num_comments > 0);
+		for(unsigned i = 0; i < vc->num_comments; i++) {
+			CString TagValue = _T("");
+			if (ParseVorbisComment("artist", &vc->comments[i], &TagValue)) {
+				file_info.artist	= TagValue;
+			} else  if (ParseVorbisComment("title", &vc->comments[i], &TagValue)) {
+				file_info.title		= TagValue;
+			} else  if (ParseVorbisComment("description", &vc->comments[i], &TagValue)) {
+				file_info.comment	= TagValue;
+			} else  if (ParseVorbisComment("comment", &vc->comments[i], &TagValue)) {
+				file_info.comment	= TagValue;
+			} else  if (ParseVorbisComment("date", &vc->comments[i], &TagValue)) {
+				file_info.year		= TagValue.GetAllocLength() > 4 ? TagValue.Right(4) : TagValue;
+			}
+		}
+	}
+}
+
+file_info_struct CFLACStream::GetInfo()
+{
+	return file_info;
 }
 
 FLAC__StreamDecoderReadStatus StreamDecoderRead(const FLAC__StreamDecoder *decoder, FLAC__byte buffer[], size_t *bytes, void *client_data)
@@ -301,9 +408,9 @@ FLAC__StreamDecoderReadStatus StreamDecoderRead(const FLAC__StreamDecoder *decod
 	CFLACStream*	pThis = static_cast<CFLACStream*> (client_data);
 	UINT			nRead;
 
-	nRead				= pThis->GetFile()->Read (buffer, *bytes);
+	nRead			= pThis->GetFile()->Read (buffer, *bytes);
 	pThis->m_bIsEOF	= (nRead != *bytes);
-	*bytes				= nRead;
+	*bytes			= nRead;
 
 	return (*bytes == 0) ?  FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM : FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
 }
