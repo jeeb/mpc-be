@@ -4,34 +4,36 @@ The GUI on the basis of the original patch bobdynlan (bobdynlan@users.sourceforg
 
 Active: (with SVN commit rights)
 --------
-aleksoid
-arestarh1986
-exodus8
-judelaw
-kinjalka
-szl
-v0lt
+aleksoid (Code) - Aleksoid1978@mail.ru, Russia
+arestarh1986 (Documentation) - Ukraine
+exodus8 (Code) - Russia
+judelaw (Code)
+kinjalka (Code) - Russia
+szl (The technologist of the software) - szl@narod.ru, icq:6531931, Russia
+v0lt (Code)
 
 Inactive:
 ----------
-leothousan
+leothousan (Code)
 
 Translators:
 -------------
-arestarh1986
+Ukrainian - arestarh1986, Ukraine
 
 Official Beta testers:
 ----------------------
-Amour
+Amour - France
 DroneZ
 Gideon Vi
 Karinas
 kuh3h3
 NaNo3791
 pIv
+realister12
+sid44sid
 Shark007
 usalex
+watcherhd
 z_mashine
-
 
 Many thanks to everyone who supported development without having svn write access.
