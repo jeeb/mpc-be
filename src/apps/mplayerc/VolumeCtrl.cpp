@@ -160,35 +160,33 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					GRADIENT_RECT gr[1] = {{0, 1}};
 					int pa = 255 * 256;
 					unsigned p1 = s.clrOutlineABGR, p2 = s.clrFaceABGR;
-
-					int fp = m_logobm.FileExists("volume");
-
-					if (NULL != fp) {
-						m_logobm.LoadExternalGradient("volume", &dc, r, 0, iThemeBrightness, iThemeRed, iThemeGreen, iThemeBlue);
-					} else {
-						int ir1 = p1 * iThemeRed;
-						int ig1 = (p1 >> 8) * iThemeGreen;
-						int ib1 = (p1 >> 16) * iThemeBlue;
-						int ir2 = p2 * iThemeRed;
-						int ig2 = (p2 >> 8) * iThemeGreen;
-						int ib2 = (p2 >> 16) * iThemeBlue;
-
-						TRIVERTEX tv[2] = {
-							{r.left, 0, ir1, ig1, ib1, pa},
-							{r.right, 1, ir2, ig2, ib2, pa},
-						};
-						dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_H);
-					}
-
 					int nVolume = GetPos();
 
 					if (nVolume <= GetPageSize()) {
 						nVolume = 0;
 					}
-
 					int m_nVolPos = r.left + (nVolume * 0.43) + 4;
 
-					unsigned p3 = dc.GetPixel(m_nVolPos, 0) == 0x00000000 ? dc.GetPixel(m_nVolPos - 5, 0) : dc.GetPixel(m_nVolPos + 10, 0);
+					int fp = m_logobm.FileExists("volume");
+
+					if (NULL != fp) {
+						m_logobm.LoadExternalGradient("volume", &dc, r, 0, -1, -1, -1, -1);
+					} else {
+						int ir1 = p1 * 256;
+						int ig1 = (p1 >> 8) * 256;
+						int ib1 = (p1 >> 16) * 256;
+						int ir2 = p2 * 256;
+						int ig2 = (p2 >> 8) * 256;
+						int ib2 = (p2 >> 16) * 256;
+
+						TRIVERTEX tv[2] = {
+							{0, 0, ir1, ig1, ib1, pa},
+							{50, 1, ir2, ig2, ib2, pa},
+						};
+						dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_H);
+					}
+
+					unsigned p3 = m_nVolPos > 30 ? dc.GetPixel(m_nVolPos, 0) : dc.GetPixel(30, 0);
 					CPen penLeft(p2 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p3);
 
 					dc.BitBlt(0, 0, r.Width(), r.Height(), &memdc, 0, 0, SRCCOPY);
