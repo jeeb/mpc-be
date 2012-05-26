@@ -19,10 +19,12 @@ leothousan (Code)
 Translators:
 -------------
 Ukrainian - arestarh1986, Ukraine
+Korean - kuh3h3
 
 Official Beta testers:
 ----------------------
 Amour - France
+Antonij72 - Russia
 DroneZ
 Gideon Vi
 Karinas
@@ -32,6 +34,7 @@ pIv
 realister12
 sid44sid
 Shark007
+SoulMasterTm
 usalex
 Venomsword
 watcherhd
