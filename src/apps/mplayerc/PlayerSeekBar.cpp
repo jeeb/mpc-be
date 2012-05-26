@@ -69,7 +69,12 @@ BOOL CPlayerSeekBar::Create(CWnd* pParentWnd)
 
 	m_tooltip.SendMessage(TTM_ADDTOOL, 0, (LPARAM)&m_ti);
 
-	iThemeBrightness = AfxGetAppSettings().nThemeBrightness;
+	AppSettings& s = AfxGetAppSettings();
+
+	iThemeBrightness = s.nThemeBrightness;
+	iThemeRed = s.nThemeRed;
+	iThemeGreen = s.nThemeGreen;
+	iThemeBlue = s.nThemeBlue;
 
 	return TRUE;
 }
@@ -133,8 +138,10 @@ void CPlayerSeekBar::SetPos(__int64 pos)
 
 void CPlayerSeekBar::SetPosInternal(__int64 pos)
 {
-	if(AfxGetAppSettings().fDisableXPToolbars) {
-		if(m_pos == pos || m_stop <= pos) return;
+	AppSettings& s = AfxGetAppSettings();
+
+	if (s.fDisableXPToolbars) {
+		if (m_pos == pos || m_stop <= pos) return;
 	} else {
 		if (m_pos == pos) {
 			return;
@@ -147,12 +154,12 @@ void CPlayerSeekBar::SetPosInternal(__int64 pos)
 	CRect after = GetThumbRect();
 
 	if (before != after) {
-		if(!AfxGetAppSettings().fDisableXPToolbars) {
+		if (!s.fDisableXPToolbars) {
 			InvalidateRect (before | after);
 		}
 
 		CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
-		if (pFrame && (AfxGetAppSettings().fUseWin7TaskBar && pFrame->m_pTaskbarList)) {
+		if (pFrame && (s.fUseWin7TaskBar && pFrame->m_pTaskbarList)) {
 			pFrame->m_pTaskbarList->SetProgressValue (pFrame->m_hWnd, pos, m_stop);
 		}
 	}
@@ -163,7 +170,7 @@ CRect CPlayerSeekBar::GetChannelRect()
 	CRect r;
 	GetClientRect(&r);
 	
-	if(AfxGetAppSettings().fDisableXPToolbars) {
+	if (AfxGetAppSettings().fDisableXPToolbars) {
 		r.DeflateRect(1,1,1,1); 
 	} else {
 		r.DeflateRect(8, 9, 9, 0);
@@ -180,7 +187,7 @@ CRect CPlayerSeekBar::GetThumbRect()
 	int x = r.left + (int)((m_start < m_stop) ? (__int64)r.Width() * (m_pos - m_start) / (m_stop - m_start) : 0);
 	int y = r.CenterPoint().y;
 
-	if(AfxGetAppSettings().fDisableXPToolbars) {
+	if (AfxGetAppSettings().fDisableXPToolbars) {
 		 r.SetRect(x, y-2, x+3, y+3);
 	} else {
 		r.SetRect(x, y, x, y);
@@ -207,8 +214,7 @@ __int64 CPlayerSeekBar::CalculatePosition(CPoint point)
 
 	if (r.left >= r.right) {
 		pos = -1;
-	}
-	else if (point.x < r.left) {
+	} else if (point.x < r.left) {
 		pos = m_start;
 	} else if (point.x >= r.right) {
 		pos = m_stop;
@@ -252,8 +258,10 @@ void CPlayerSeekBar::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
 
+	AppSettings& s = AfxGetAppSettings();
+
 	bool fEnabled = m_fEnabled && m_start < m_stop;
-	if (AfxGetAppSettings().fDisableXPToolbars) {
+	if (s.fDisableXPToolbars) {
 		CRect rt;
 		CString str;
 		str = ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strFn; 
@@ -273,11 +281,12 @@ void CPlayerSeekBar::OnPaint()
 		CBitmap *bmOld = memdc.SelectObject(&m_bmPaint);
 
 		//background
-		iThemeBrightness = AfxGetAppSettings().nThemeBrightness;
-		iThemeRed = AfxGetAppSettings().nThemeRed;
-		iThemeGreen = AfxGetAppSettings().nThemeGreen;
-		iThemeBlue = AfxGetAppSettings().nThemeBlue;
-		bFileNameOnSeekBar = AfxGetAppSettings().fFileNameOnSeekBar;
+		iThemeBrightness = s.nThemeBrightness;
+		iThemeRed = s.nThemeRed;
+		iThemeGreen = s.nThemeGreen;
+		iThemeBlue = s.nThemeBlue;
+
+		bFileNameOnSeekBar = s.fFileNameOnSeekBar;
 
 		GRADIENT_RECT gr[1] = {{0, 1}};
 		int pa = 255 * 256;
@@ -296,8 +305,8 @@ void CPlayerSeekBar::OnPaint()
 
 		memdc.SetBkMode(TRANSPARENT);
 
-		CPen penPlayed(AfxGetAppSettings().clrFaceABGR == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, AfxGetAppSettings().clrFaceABGR);
-		CPen penPlayedOutline(AfxGetAppSettings().clrOutlineABGR == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, AfxGetAppSettings().clrOutlineABGR);
+		CPen penPlayed(s.clrFaceABGR == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, s.clrFaceABGR);
+		CPen penPlayedOutline(s.clrOutlineABGR == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, s.clrOutlineABGR);
 		
    		//outer frame shadow
 		rf = GetChannelRect();
@@ -373,6 +382,7 @@ void CPlayerSeekBar::OnPaint()
 							VARIABLE_PITCH | FF_MODERN, 	// nPitchAndFamily
 							_T("Tahoma")                	// lpszFacename
 							);
+
 			CFont* oldfont2 = memdc.SelectObject(&font2);
 			SetBkMode(memdc, TRANSPARENT);
 			rt = rc;
@@ -396,7 +406,7 @@ void CPlayerSeekBar::OnPaint()
 		white	= GetSysColor(COLOR_WINDOW),
 		shadow	= GetSysColor(COLOR_3DSHADOW),
 		light	= GetSysColor(COLOR_3DHILIGHT),
-		bkg		= GetSysColor(COLOR_BTNFACE);
+		bkg	= GetSysColor(COLOR_BTNFACE);
 
 		// thumb
 		{
@@ -498,7 +508,8 @@ void CPlayerSeekBar::OnLButtonDown(UINT nFlags, CPoint point)
 void CPlayerSeekBar::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	ReleaseCapture();
-	if(AfxGetAppSettings().fDisableXPToolbars && m_fEnabled) {
+
+	if (AfxGetAppSettings().fDisableXPToolbars && m_fEnabled) {
 		GetParent()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
 	}
 
@@ -535,6 +546,7 @@ void CPlayerSeekBar::UpdateTooltip(CPoint point)
 void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 {
 	CWnd* w = GetCapture();
+
 	if (w && w->m_hWnd == m_hWnd && (nFlags & MK_LBUTTON)) {
 		MoveThumb(point);
 		if (!AfxGetAppSettings().fDisableXPToolbars) {
@@ -562,6 +574,7 @@ BOOL CPlayerSeekBar::PreTranslateMessage(MSG* pMsg)
 {
 	POINT ptWnd(pMsg->pt);
 	this->ScreenToClient(&ptWnd);
+
 	if (m_fEnabled && AfxGetAppSettings().fUseTimeTooltip && m_start < m_stop && (GetChannelRect() | GetThumbRect()).PtInRect(ptWnd)) {
 		m_tooltip.RelayEvent(pMsg);
 	}
