@@ -323,6 +323,7 @@ void CPlayerSeekBar::OnPaint()
 		memdc.SelectObject(&penPlayed1);
 		memdc.MoveTo(rc.left +1, rc.top +1);
 		memdc.LineTo(rc.right, rc.top +1);
+
 		CPen penPlayed2(PS_SOLID,0,RGB((iThemeBrightness+80),(iThemeBrightness+85),(iThemeBrightness+90)));
 		memdc.SelectObject(&penPlayed2);
 		memdc.MoveTo(rc.left +1, rc.top +17);
@@ -331,20 +332,18 @@ void CPlayerSeekBar::OnPaint()
 		if (fEnabled) {
 
 			int ct = 20;
+			iThemeBrightness += (ct * 2);
 
 			if (NULL != fp) {
-				int ThemeBrightness = iThemeBrightness + (ct * 2);
 				rc.right = nposx;
 				rc.left = rc.left + 1;
 				rc.top = rc.top + 2;
 				rc.bottom = rc.bottom - 1;
 
-				m_logobm.LoadExternalGradient("background", &memdc, rc, 0, ThemeBrightness, iThemeRed, iThemeGreen, iThemeBlue);
+				m_logobm.LoadExternalGradient("background", &memdc, rc, 0, iThemeBrightness, iThemeRed, iThemeGreen, iThemeBlue);
 
 				rc = GetChannelRect();
 			} else {
-				iThemeBrightness = iThemeBrightness + (ct * 2);
-
 				TRIVERTEX tv[2] = {
 					{rc.left + 1, rc.top + 2, (iThemeBrightness+65)*iThemeRed, (iThemeBrightness+70)*iThemeGreen, (iThemeBrightness+75)*iThemeBlue, pa},
 					{nposx, rc.bottom - 1, (iThemeBrightness+0-ct)*iThemeRed, (iThemeBrightness+5-ct)*iThemeGreen, (iThemeBrightness+10-ct)*iThemeBlue, pa},
@@ -352,15 +351,21 @@ void CPlayerSeekBar::OnPaint()
 				memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 			}
 
-			CPen penPlayed3(PS_SOLID,0,RGB(215,220,225));
+			iThemeBrightness -= (ct * 2);
+
+			CPen penPlayed3(PS_SOLID,0,RGB(iThemeBrightness+145,iThemeBrightness+150,iThemeBrightness+155));
 			memdc.SelectObject(&penPlayed3);
 			memdc.MoveTo(rc.left +1, rc.top +1);//active_top
 			memdc.LineTo(nposx, rc.top +1);
 
-			CPen penPlayed4(PS_SOLID,0,RGB(165,170,175));
+			CPen penPlayed4(PS_SOLID,0,RGB(iThemeBrightness+115,iThemeBrightness+120,iThemeBrightness+125));
 			memdc.SelectObject(&penPlayed4);
 			memdc.MoveTo(rc.left +1, rc.top +17);//active_top
 			memdc.LineTo(nposx, rc.top +17);
+
+			CPen penFrHot(PS_SOLID,0,RGB(iThemeBrightness+145,iThemeBrightness+150,iThemeBrightness+155));
+			memdc.SelectObject(&penFrHot);
+			memdc.RoundRect(nposx - 2, rc.top + 1, nposx + 2, rc.bottom, 6, 4);
 		}
 
 		if (bFileNameOnSeekBar) {

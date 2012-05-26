@@ -177,55 +177,29 @@ int MPCPngImage::FileExists(CString fn)
 
 BYTE* MPCPngImage::BrightnessRGB(int type, BYTE* lpBits, int width, int height, int bpp, int br, int rc, int gc, int bc)
 {
+	int k = bpp / 8, kbr = 100;
+	int size = width * height * k;
+	double R, G, B, brn, rcn, gcn, bcn;
+
 	if (br >= 0 && rc >= 0 && gc >= 0 && bc >= 0) {
 
-		if (br == 0) {
-			br = 1;
-		}
-
-		if (rc == 0) {
-			rc = 1;
-		}
-		if (gc == 0) {
-			gc = 1;
-		}
-		if (bc == 0) {
-			bc = 1;
-		}
-
-		if (rc > 255) {
-			rc = 255;
-		}
-		if (gc > 255) {
-			gc = 255;
-		}
-		if (bc > 255) {
-			bc = 255;
-		}
-
-		int k = bpp / 8, kbr = 100;
-		int size = width * height * k;
-		double R, G, B, rcn, gcn, bcn, brn = (br * 10) / (kbr + (br * 4)) * 0.8;
-
+		brn = (br * 10) / (kbr + (br * 4)) * 0.8;
 		rcn = rc / (70 + kbr - br) + brn;
 		gcn = gc / (75 + kbr - br) + brn;
 		bcn = bc / (80 + kbr - br) + brn;
+	}
 
-		for (int i = 0; i < size; i += k) {
+	for (int i = 0; i < size; i += k) {
 
-			if (type == 0) {
-				R = lpBits[i];
-				R *= rcn;
-				B = lpBits[i + 2];
-				B *= bcn;
-			} else if (type == 1) {
-				R = lpBits[i + 2];
-				R *= bcn;
-				B = lpBits[i];
-				B *= rcn;
-			}
-			G = lpBits[i + 1];
+		R = lpBits[i];
+		G = lpBits[i + 1];
+		B = lpBits[i + 2];
+
+		if (br >= 0 && rc >= 0 && gc >= 0 && bc >= 0) {
+
+			R *= rcn;
 			G *= gcn;
+			B *= bcn;
 
 			if (R > 255) {
 				R = 255;
@@ -236,12 +210,18 @@ BYTE* MPCPngImage::BrightnessRGB(int type, BYTE* lpBits, int width, int height, 
 			if (B > 255) {
 				B = 255;
 			}
-
-			lpBits[i] = R;
-			lpBits[i + 1] = G;
-			lpBits[i + 2] = B;
 		}
+
+		if (type == 0) {
+			lpBits[i] = R;
+			lpBits[i + 2] = B;
+		} else if (type == 1) {
+			lpBits[i] = B;
+			lpBits[i + 2] = R;
+		}
+		lpBits[i + 1] = G;
 	}
+
 	return lpBits;
 }
 
@@ -296,7 +276,7 @@ HBITMAP MPCPngImage::TypeLoadImage(int type, BYTE** pData, int* width, int* heig
 
 		info_ptr = png_create_info_struct(png_ptr);
 
-		png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND | PNG_TRANSFORM_BGR, 0);
+		png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND, 0);
 
 		row_pointers = png_get_rows(png_ptr, info_ptr);
 
