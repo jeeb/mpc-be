@@ -160,9 +160,9 @@ int ParseEAC3Header(const BYTE *buf, int *samplerate, int *channels, int *framel
 	if (buf[5] >> 3 <= 10)   // bsid
 		return 0;
 
-	static const int sample_rates[] = { 48000, 44100, 32000, 24000, 22050, 16000 };
-	static const int channels_tbl[]     = { 2, 1, 2, 3, 3, 4, 4, 5 };
-	static const int samples_tbl[]      = { 256, 512, 768, 1536 };
+	static const int sample_rates[]	= { 48000, 44100, 32000, 24000, 22050, 16000 };
+	static const int channels_tbl[]	= { 2, 1, 2, 3, 3, 4, 4, 5 };
+	static const int samples_tbl[]	= { 256, 512, 768, 1536 };
 
 	int frame_size = (((buf[2] & 0x03) << 8) + buf[3] + 1) * 2;
 
@@ -188,12 +188,17 @@ int ParseEAC3Header(const BYTE *buf, int *samplerate, int *channels, int *framel
 
 int ParseMLPHeader(const BYTE *buf, int *samplerate, int *channels, int *framelength, WORD *bitdepth, bool *isTrueHD)
 {
-	static const int sampling_rates[]           = { 48000, 96000, 192000, 0, 0, 0, 0, 0, 44100, 88200, 176400, 0, 0, 0, 0, 0 };
-	static const unsigned char mlp_quants[16]   = { 16, 20, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	static const unsigned char mlp_channels[32] = {     1,     2,      3, 4, 3, 4, 5, 3,     4,     5,      4, 5, 6, 4, 5, 4,
+	static const int sampling_rates[]			= { 48000, 96000, 192000, 0, 0, 0, 0, 0, 44100, 88200, 176400, 0, 0, 0, 0, 0 };
+	static const unsigned char mlp_quants[16]	= { 16, 20, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	static const unsigned char mlp_channels[32]	= {     1,     2,      3, 4, 3, 4, 5, 3,     4,     5,      4, 5, 6, 4, 5, 4,
 	                                                    5,     6,      5, 5, 6, 0, 0, 0,     0,     0,      0, 0, 0, 0, 0, 0 };
-	static const int channel_count[13] = {//   LR    C   LFE  LRs LRvh  LRc LRrs  Cs   Ts  LRsd  LRw  Cvh  LFE2
-	                                            2,   1,   1,   2,   2,   2,   2,   1,   1,   2,   2,   1,   1};
+	static const int channel_count[13]			= {//   LR    C   LFE  LRs LRvh  LRc LRrs  Cs   Ts  LRsd  LRw  Cvh  LFE2
+														2,   1,   1,   2,   2,   2,   2,   1,   1,   2,   2,   1,   1};
+
+	*samplerate		= 0;
+	*channels		= 0;
+	*framelength	= 0;
+	*bitdepth		= 0;
 
 	DWORD sync = *(DWORD*)(buf+4);
 	if (sync == TRUEHD_SYNC_WORD) {

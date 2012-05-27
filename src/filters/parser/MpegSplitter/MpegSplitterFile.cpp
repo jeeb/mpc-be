@@ -775,9 +775,23 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 			} else if (b >= 0xa0 && b < 0xa8) { // lpcm
 				s.ps1id = (b >= 0xa0 && b < 0xa8) ? (BYTE)(BitRead(32) >> 24) : 0xa0;
 
-				CMpegSplitterFile::lpcmhdr h;
-				if (Read(h, &s.mt) && !m_streams[audio].Find(s)) { // note the reversed order, the header should be stripped always even if it's not a new stream
-					type = audio;
+				if (b == 0xa1) {
+					// skip audio header - 3-byte
+					BitRead(8);
+					BitRead(8);
+					BitRead(8);
+					// TrueHD/MLP audio has a 4-byte header
+					BitRead(8);
+
+					CMpegSplitterFile::ac3hdr h;
+					if (Read(h, len, &s.mt, false, false) && !m_streams[audio].Find(s)) {
+						type = audio;
+					}
+				} else {
+					CMpegSplitterFile::lpcmhdr h;
+					if (Read(h, &s.mt) && !m_streams[audio].Find(s)) { // note the reversed order, the header should be stripped always even if it's not a new stream
+						type = audio;
+					}
 				}
 			} else if (b >= 0x20 && b < 0x40) { // DVD subpic
 				s.ps1id = (BYTE)BitRead(8);

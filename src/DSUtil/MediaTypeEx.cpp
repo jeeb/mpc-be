@@ -374,6 +374,10 @@ CString CMediaTypeEx::GetAudioCodecName(const GUID& subtype, WORD wFormatTag)
 			str += _T("ROQA");
 		} else if (subtype == MEDIASUBTYPE_APE) {
 			str += _T("APE");
+		} else if (subtype == MEDIASUBTYPE_MLP) {
+			str += _T("MLP");
+		} else if (subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {
+			str += _T("DVD LPCM");
 		} else {
 			str.Format(_T("0x%04x"), wFormatTag);
 		}

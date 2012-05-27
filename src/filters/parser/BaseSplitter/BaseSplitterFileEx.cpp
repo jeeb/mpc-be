@@ -744,7 +744,7 @@ bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sy
 		ByteRead(buf, 20);
 
 		fsize = ParseMLPHeader(buf, &samplerate, &channels, &framelength, &bitdepth, &isTrueHD);
-		if (fsize) {
+		if (fsize || (!isTrueHD && channels)) {
 
 			if (!pmt) {
 				return true;
