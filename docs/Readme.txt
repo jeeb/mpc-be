@@ -1,6 +1,5 @@
-MPC-BE is a free and open source audio
-and video player for Windows. MPC-BE is based on the original Guliverkli project
-and contains additional features and bug fixes.
+MPC-BE is a free and open source audio and video player for Windows.
+MPC-BE is based on the original Guliverkli project and contains additional features and bug fixes.
 
 
 Main Features:
@@ -14,7 +13,7 @@ Main Features:
 * Multi-Monitor support
 * Various pixel shaders
 * Color management
-* 22 translations available
+* 23 translations available
 
 
 Supported Operating Systems:
@@ -74,3 +73,5 @@ TreePropSheet       -                          -
 VirtualDub          GPLv2                      http://www.virtualdub.org/
 ZenLib              Simplified BSD License     http://sourceforge.net/projects/zenlib/
 zlib                zlib License               http://zlib.net/
+WavPack             BSD License                http://wavpack.com/
+MusePack            GPL                        http://musepack.net/
