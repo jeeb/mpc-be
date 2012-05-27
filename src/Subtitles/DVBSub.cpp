@@ -398,7 +398,7 @@ void CDVBSub::Reset()
 
 HRESULT CDVBSub::ParsePage(CGolombBuffer& gb, WORD wSegLength, CAutoPtr<DVB_PAGE>& pPage)
 {
-	WORD	wEnd	= (WORD)gb.GetPos() + wSegLength;
+	int		nEnd	= gb.GetPos() + wSegLength;
 	int		nPos	= 0;
 
 	pPage.Attach (DNew DVB_PAGE());
@@ -407,7 +407,7 @@ HRESULT CDVBSub::ParsePage(CGolombBuffer& gb, WORD wSegLength, CAutoPtr<DVB_PAGE
 	pPage->PageState			= (BYTE)gb.BitRead(2);
 	pPage->RegionCount			= 0;
 	gb.BitRead(2);	// Reserved
-	while (gb.GetPos() < wEnd) {
+	while (gb.GetPos() < nEnd) {
 		if (nPos < MAX_REGIONS) {
 			pPage->Regions[nPos].Id			= gb.ReadByte();
 			gb.ReadByte();	// Reserved
@@ -440,7 +440,7 @@ HRESULT CDVBSub::ParseDisplay(CGolombBuffer& gb, WORD wSegLength)
 
 HRESULT CDVBSub::ParseRegion(CGolombBuffer& gb, WORD wSegLength)
 {
-	WORD					wEnd	= (WORD)gb.GetPos() + wSegLength;
+	int						nEnd	= gb.GetPos() + wSegLength;
 	CDVBSub::DVB_REGION*	pRegion;
 	CDVBSub::DVB_REGION		DummyRegion;
 
@@ -466,7 +466,7 @@ HRESULT CDVBSub::ParseRegion(CGolombBuffer& gb, WORD wSegLength)
 		gb.BitRead(2);	// Reserved
 
 		pRegion->ObjectCount = 0;
-		while (gb.GetPos() < wEnd) {
+		while (gb.GetPos() < nEnd) {
 			DVB_OBJECT*		pObject = &pRegion->Objects[pRegion->ObjectCount];
 			pObject->object_id					= gb.ReadShort();
 			pObject->object_type				= (BYTE)gb.BitRead(2);
@@ -490,7 +490,7 @@ HRESULT CDVBSub::ParseRegion(CGolombBuffer& gb, WORD wSegLength)
 HRESULT CDVBSub::ParseClut(CGolombBuffer& gb, WORD wSegLength)
 {
 	HRESULT				hr		= S_OK;
-	WORD				wEnd	= (WORD)gb.GetPos() + wSegLength;
+	int					nEnd	= gb.GetPos() + wSegLength;
 	CDVBSub::DVB_CLUT*	pClut;
 
 	pClut = FindClut (m_pCurrentPage, gb.ReadByte());
@@ -500,7 +500,7 @@ HRESULT CDVBSub::ParseClut(CGolombBuffer& gb, WORD wSegLength)
 		gb.BitRead(4);	// Reserved
 
 		pClut->Size = 0;
-		while (gb.GetPos() < wEnd) {
+		while (gb.GetPos() < nEnd) {
 			BYTE entry_id	= gb.ReadByte();
 			BYTE _2_bit		= (BYTE)gb.BitRead(1);
 			BYTE _4_bit		= (BYTE)gb.BitRead(1);
