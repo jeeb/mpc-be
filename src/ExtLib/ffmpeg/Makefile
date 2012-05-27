@@ -130,6 +130,7 @@ SRCS_C=\
     libavcodec/faandct.c \
     libavcodec/faanidct.c \
     libavcodec/fft.c \
+    libavcodec/flashsv.c \
     libavcodec/flvdec.c \
     libavcodec/fmtconvert.c \
     libavcodec/golomb.c \

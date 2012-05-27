@@ -52,6 +52,8 @@ void avcodec_register_all(void)
     REGISTER_DECODER (CSCD, cscd);
     REGISTER_DECODER (DIRAC, dirac);
     REGISTER_DECODER (DVVIDEO, dvvideo);
+    REGISTER_DECODER (FLASHSV, flashsv);
+    REGISTER_DECODER (FLASHSV2, flashsv2);
     REGISTER_DECODER (FLV, flv);
     REGISTER_DECODER (H263, h263);
     REGISTER_DECODER (H264, h264);
