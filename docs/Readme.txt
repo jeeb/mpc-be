@@ -1,5 +1,5 @@
-Media Player Classic - Home Cinema (MPC-HC) is a free and open source audio
-and video player for Windows. MPC-HC is based on the original Guliverkli project
+MPC-BE is a free and open source audio
+and video player for Windows. MPC-BE is based on the original Guliverkli project
 and contains additional features and bug fixes.
 
 
@@ -33,21 +33,17 @@ System Requirements:
 
 Links:
 -------
-Website:          http://mpc-hc.sourceforge.net
-Project Page:     http://sourceforge.net/projects/mpc-hc/
-Mirror (faster):  http://code.google.com/p/mpc-hc/source/list
-Help and Support: http://sourceforge.net/apps/trac/mpc-hc/
-IRC Channel:      #mpc-hc / #mpc-hc-dev at Freenode
-Donations:        http://sourceforge.net/donate/index.php?group_id=170561
+Website:          http://mpcbe.sourceforge.net
+Project Page:     http://sourceforge.net/projects/mpcbe/
 
 
 For the people involved in the development, see Authors.txt.
-MPC-HC's code is licensed under GPL v3 (see COPYING.txt).
+MPC-BE's code is licensed under GPL v3 (see COPYING.txt).
 
 Translations are done by various translators (see Authors.txt).
 
 
-MPC-HC makes use of the following 3rd party code:
+MPC-BE makes use of the following 3rd party code:
 
 Project             License                    Website
 -------------------------------------------------------------------------------------

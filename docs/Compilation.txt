@@ -1,8 +1,3 @@
-For up to date instructions on how to compile mpc-hc visit the wiki page:
-
-http://sourceforge.net/apps/trac/mpc-hc/wiki/How_to_compile_the_MPC
-
-
 Part A: Preparing the Visual Studio environment
 
  Visual Studio 2010
@@ -34,30 +29,30 @@ Modify the "Path" environment variable by adding at the end: ;%MINGW32%\bin;%MSY
   b. Download and extract the new MinGW GCC version into C:\MSYS\mingw\ from: http://www.xvidvideo.ru/component/docman/cat_view/28-cross-mingwgcc-x86x64.html
 
 
-Part C: Downloading and compiling the MPC-HC source
+Part C: Downloading and compiling the MPC-BE source
 
-1. Use a subversion client to checkout MPC-HC's trunk to C:\mpc-hc (or anywhere else you like)
-    Repository URL: https://mpc-hc.svn.sourceforge.net/svnroot/mpc-hc/trunk
+1. Use a subversion client to checkout MPC-BE's trunk to C:\mpc-be (or anywhere else you like)
+    Repository URL: https://mpcbe.svn.sourceforge.net/svnroot/mpcbe/trunk
     The recommended SVN client is TortoiseSVN (grab it from http://tortoisesvn.net/downloads)
 2. When using TortoiseSVN
-    a) Create an empty directory where you want to store the source files. e.g: C:\mpc-hc
+    a) Create an empty directory where you want to store the source files. e.g: C:\mpc-be
     b) Right-click on that directory and choose "SVN checkout".
-    c) Put https://mpc-hc.svn.sourceforge.net/svnroot/mpc-hc/trunk in "URL of Repository" and press OK.
+    c) Put https://mpcbe.svn.sourceforge.net/svnroot/mpcbe/trunk in "URL of Repository" and press OK.
     d) Wait for the source tree to be downloaded.
 
-3. Open the solution file C:\mpc-hc\mpc-hc.sln
+3. Open the solution file C:\mpc-be\mpc-be.sln
     Change the solution's configuration to "Release" (in the toolbar).
-4. Right click the mpc-hc project, and open up its Properties.
+4. Right click the mpc-be project, and open up its Properties.
    There, go to Configuration Properties->Linker->General. Add the following directories to the "Additional Library Directories":
     For Win32 platform      $(MINGW32)\lib\gcc\i686-pc-mingw32\4.7.0;$(MINGW32)\i686-pc-mingw32\lib\
     For x64 platform        $(MINGW64)\lib\gcc\x86_64-w64-mingw32\4.7.0;$(MINGW64)\x86_64-w64-mingw32\lib\
 
 Note: If you update your GCC, make sure you change the version number in the above paths, e.g. 4.7.1
-Another way to do it, is by copying the needed MinGW libs (libgcc.a and libmingwex.a) into the C:\mpc-hc\lib and C:\mpc-hc\lib64 folders.
+Another way to do it, is by copying the needed MinGW libs (libgcc.a and libmingwex.a) into the C:\mpc-be\lib and C:\mpc-be\lib64 folders.
 
 
 @ECHO OFF
-REM Save this script to your mpc-hc source dir
+REM Save this script to your mpc-be source dir
 REM Get the GCC version
 FOR /f "tokens=1,2 delims= " %%K IN (
   'gcc -dumpversion'
@@ -84,13 +79,13 @@ EXIT /B
 
 5. Press OK to save the changes and close the Properties window.
 6. Press F7 to build the solution.
-7. You now have mpc-hc.exe under C:\mpc-hc\bin\mpc-hc_x86
-8. Open the solution file C:\mpc-hc\mpciconlib.sln
+7. You now have mpc-be.exe under C:\mpc-be\bin\mpc-be_x86
+8. Open the solution file C:\mpc-be\mpciconlib.sln
 9. Press F7 to build the solution.
-10. You now have mpciconlib.dll under C:\mpc-hc\bin\mpc-hc_x86
-11. Open the solution file C:\mpc-hc\mpcresources.sln
+10. You now have mpciconlib.dll under C:\mpc-be\bin\mpc-be_x86
+11. Open the solution file C:\mpc-be\mpcresources.sln
     In Visual Studio go to Build->Batch Build->Press Select All->Press Build
-12. You now have mpcresources.XX.dll under C:\mpc-hc\bin\mpc-hc_x86\Lang
+12. You now have mpcresources.XX.dll under C:\mpc-be\bin\mpc-be_x86\Lang
 
 Alternatively, you can use build.bat (run: build.bat help for more info)
 
@@ -99,7 +94,7 @@ Part D: Building FFmpeg x64 (libavcodec) with GCC
 
 When building FFmpeg (project libavcodec) in 32 bit mode, GCC is used and according to the makefile that is automatically invoked from the solution. Doing so for 64 bit, requires some additional steps:
  1. Run MSYS and cd to the trunk\src\filters\transform\MPCVideoDec\ffmpeg_x64 folder
-Example: cd /c/mpc-hc/src/filters/transform/MPCVideoDec/ffmpeg_x64/
+Example: cd /c/mpc-be/src/filters/transform/MPCVideoDec/ffmpeg_x64/
 (notice that the first part will most probably differ for the exact paths)
  2. checkout the MinGW64 files by running: buildmingwlibs.sh --update
  3. run the buildmingwlibs.sh script, only to compile:
@@ -107,12 +102,12 @@ Example: cd /c/mpc-hc/src/filters/transform/MPCVideoDec/ffmpeg_x64/
     or
       buildmingwlibs.sh --update --compile
 
-After the compilation is done, libgcc.a and libmingwex.a will be placed in C:\mpc-hc\lib64
+After the compilation is done, libgcc.a and libmingwex.a will be placed in C:\mpc-be\lib64
 
-Now libavcodec can be compiled from within the MPC-HC visual studio solution file, and it will be linked correctly with the other components.
+Now libavcodec can be compiled from within the MPC-BE visual studio solution file, and it will be linked correctly with the other components.
 
 Part E: Building the installer
 
 Download Inno Setup Unicode v5.4.3 or newer from: http://www.jrsoftware.org/isdl.php
-Install everything and then go to C:\mpc-hc\distrib, open mpc-hc_setup.iss with Inno Setup, read the first comments in the script and compile it.
+Install everything and then go to C:\mpc-be\distrib, open mpc-be_setup.iss with Inno Setup, read the first comments in the script and compile it.
 Note: Use Inno Setup's built-in IDE.

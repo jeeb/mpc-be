@@ -1,17 +1,18 @@
-Active: (with SVN commit rights)
+People with SVN commit rights:
 --------
 clsid                   <clsid2@users.sourceforge.net>          Code
+demi_alucard            <alysson87@gmail.com>                   Code, Portuguese (Brazil)
+janwillem32             <janwillem32@users.sourceforge.net>     Code
 nevcairiel              <nevcairiel@users.sourceforge.net>      Code
 tetsuo55                <tetsuo55@users.sourceforge.net>        Project Manager, Admin
 Underground78           <underground78@users.sourceforge.net>   Code, French
 v0lt                    <v0lt@users.sourceforge.net>            Code, Russian
-Vodyannikov Aleksandr   <aleksoid@users.sourceforge.net>        Code, Russian
 XhmikosR                <xhmikosr@users.sourceforge.net>        Various stuff, Admin
 
 
 Inactive:
 ----------
-_xxl                    <drevil_xxl@users.sourceforge.net>      FFMpeg
+_xxl                    <drevil_xxl@users.sourceforge.net>      FFmpeg
 Alexander Wild          <alexwild@users.sourceforge.net>        Code, German
 Arto Jarvinen           <ar-jar@users.sourceforge.net>          Code
 Attila T. Afra          <attila.afra@gmail.com>                 Code
@@ -24,6 +25,7 @@ Martin Panayotov        <mvpsoft@users.sourceforge.net>         Website
 MatMaul                 <matmaul@users.sourceforge.net>         Code
 spec-chum               <spec-chum@users.sourceforge.net>       Code
 Tomas Sen               <tomasen@users.sourceforge.net>         Code
+Vodyannikov Aleksandr   <aleksoid@users.sourceforge.net>        Code, Russian
 xpc1000                 <xpc1000@users.sourceforge.net>         Code
 
 
@@ -38,7 +40,7 @@ Chinese Traditional     Kene Lin                <kenelin@users.sourceforge.net>
 Czech                   khagaroth               <khagaroth@users.sourceforge.net>
 Dutch                   Paul Tjepkema           <pietpuk123@users.sourceforge.net>
 French                  Sebastiii               <sebastiii@users.sourceforge.net>
-German                  Markus Gaugg            <prinzeugen@users.sourceforge.net>
+German                  Markus Gaugg            <markusgaugg@users.sourceforge.net>
 Hebrew                  Superb                  <superbsubs@users.sourceforge.net>
 Hungarian               Tamas Kleiber           <klei@users.sourceforge.net>
 Italian                 SigiTM                  <sigitm@users.sourceforge.net>
@@ -59,8 +61,8 @@ Ukrainian               arestarh                <arestarh1986@users.sourceforge.
 
 Contributors:
 --------------
-Alexx999, foxx1337, heksesang, janwillem32, judelaw, madshi, mtrz,
-nielsm, skaarj1, VSFilterMod Team, X-Dron
+Alexx999, foxx1337, heksesang, judelaw, madshi, mtrz, nielsm,
+skaarj1, VSFilterMod Team, X-Dron
 
 
 Trac moderators:
@@ -68,6 +70,6 @@ Trac moderators:
 namaiki, thevbm
 
 
-Many thanks to everyone who supported development without having svn write access.
+Many thanks to everyone who supported development without having access to the source repository.
 
 Based on the original version (C) 2002-2006 by Gabest (e-mail unknown)
