@@ -365,7 +365,7 @@ void CPlayerSeekBar::OnPaint()
 
 			CPen penFrHot(PS_SOLID,0,RGB(iThemeBrightness+145,iThemeBrightness+150,iThemeBrightness+155));
 			memdc.SelectObject(&penFrHot);
-			memdc.RoundRect(nposx - 2, rc.top + 1, nposx + 2, rc.bottom, 6, 4);
+			memdc.RoundRect(nposx - 1, rc.top + 1, nposx + 1, rc.bottom, 6, 4);
 		}
 
 		if (bFileNameOnSeekBar) {
