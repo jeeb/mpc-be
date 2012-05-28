@@ -97,6 +97,7 @@ static UINT WM_NOTIFYICON = RegisterWindowMessage(_T("MYWM_NOTIFYICON"));
 static UINT s_uTBBC = RegisterWindowMessage(_T("TaskbarButtonCreated"));
 
 #include "../../filters/transform/VSFilter/IDirectVobSub.h"
+#include "../../Subtitles/RenderedHdmvSubtitle.h"
 
 #include "Monitors.h"
 #include "MultiMonitor.h"
@@ -13873,6 +13874,8 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, bool fApplyDefStyle)
 {
 	AppSettings& s = AfxGetAppSettings();
 
+	s.m_RenderersSettings.bPositionRelative	= 0;
+
 	if (pSubStream) {
 		CLSID clsid;
 		pSubStream->GetClassID(&clsid);
@@ -13883,12 +13886,16 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, bool fApplyDefStyle)
 			if (fApplyDefStyle) {
 				pVSF->SetAlignment(s.fOverridePlacement, s.nHorPos, s.nVerPos, 1, 1);
 			}
+
+			s.m_RenderersSettings.bPositionRelative = s.subdefstyle.relativeTo;
 		} else if (clsid == __uuidof(CVobSubStream)) {
 			CVobSubStream* pVSS = (CVobSubStream*)(ISubStream*)pSubStream;
 
 			if (fApplyDefStyle) {
 				pVSS->SetAlignment(s.fOverridePlacement, s.nHorPos, s.nVerPos, 1, 1);
 			}
+
+			s.m_RenderersSettings.bPositionRelative = s.subdefstyle.relativeTo;
 		} else if (clsid == __uuidof(CRenderedTextSubtitle)) {
 			CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)(ISubStream*)pSubStream;
 
@@ -13919,6 +13926,8 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, bool fApplyDefStyle)
 			pRTS->SetOverride(s.fUseDefaultSubtitlesStyle, &s.subdefstyle);
 
 			pRTS->Deinit();
+		} else if (clsid == __uuidof(CRenderedHdmvSubtitle)) {
+			s.m_RenderersSettings.bPositionRelative	= s.subdefstyle.relativeTo;
 		}
 	}
 

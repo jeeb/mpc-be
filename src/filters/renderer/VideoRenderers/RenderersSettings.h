@@ -74,6 +74,9 @@ class CRenderersSettings
 public:
 	bool fResetDevice;
 
+	// Subtitle position settings
+	int bPositionRelative;
+
 	class CRendererSettingsShared
 	{
 	public:
@@ -103,6 +106,7 @@ public:
 		double fCycleDelta;
 		double fTargetSyncOffset;
 		double fControlLimit;
+
 	protected:
 		void SetDefault();
 		void SetOptimal();

@@ -774,22 +774,20 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 				}
 			} else if (b >= 0xa0 && b < 0xa8) { // lpcm
 				s.ps1id = (b >= 0xa0 && b < 0xa8) ? (BYTE)(BitRead(32) >> 24) : 0xa0;
-
+				/*
 				if (b == 0xa1) {
-					// skip audio header - 3-byte
-					BitRead(8);
-					BitRead(8);
-					BitRead(8);
-					// TrueHD/MLP audio has a 4-byte header
-					BitRead(8);
+					// MLP audio has a 4-byte header
+					BitRead(32);
 
 					CMpegSplitterFile::ac3hdr h;
-					if (Read(h, len, &s.mt, false, false) && !m_streams[audio].Find(s)) {
+					if (!m_streams[audio].Find(s) && Read(h, len, &s.mt, false, false)) {
 						type = audio;
 					}
-				} else {
+				} else 
+				*/
+				{
 					CMpegSplitterFile::lpcmhdr h;
-					if (Read(h, &s.mt) && !m_streams[audio].Find(s)) { // note the reversed order, the header should be stripped always even if it's not a new stream
+					if (!m_streams[audio].Find(s) && Read(h, &s.mt)) {
 						type = audio;
 					}
 				}
@@ -842,21 +840,15 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 			} else if (b >= 0xc0 && b < 0xcf) { // dolby digital/dolby digital +
 				s.ps1id = (BYTE)BitRead(8);
 				// skip audio header - 3-byte
-				BitRead(8);
-				BitRead(8);
-				BitRead(8);
+				BitRead(24);
 				CMpegSplitterFile::ac3hdr h;
 				if (!m_streams[audio].Find(s) && Read(h, len, &s.mt)) {
 					type = audio;
 				}
 			} else if (b >= 0xb0 && b < 0xbf) { // truehd
 				s.ps1id = (BYTE)BitRead(8);
-				// skip audio header - 3-byte
-				BitRead(8);
-				BitRead(8);
-				BitRead(8);
 				// TrueHD audio has a 4-byte header
-				BitRead(8);
+				BitRead(32);
 				CMpegSplitterFile::ac3hdr h;
 				if (!m_streams[audio].Find(s) && Read(h, len, &s.mt, false, false)) {
 					type = audio;

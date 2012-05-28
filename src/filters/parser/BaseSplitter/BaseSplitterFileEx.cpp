@@ -1024,7 +1024,12 @@ bool CBaseSplitterFileEx::Read(lpcmhdr& h, CMediaType* pmt)
 	h.channels = BitRead(3);
 	h.drc = (BYTE)BitRead(8);
 
-	if (h.quantwordlen == 3 || h.reserved1 || h.reserved2) {
+	if (h.quantwordlen > 2 || h.reserved1 || h.reserved2 || h.freq > 3) {
+		return false;
+	}
+
+	// support 1,2,5,6,8 channels
+	if (!(h.channels == 0 || h.channels == 1 || h.channels == 4 || h.channels == 5 || h.channels == 7)) {
 		return false;
 	}
 
@@ -1034,23 +1039,14 @@ bool CBaseSplitterFileEx::Read(lpcmhdr& h, CMediaType* pmt)
 
 	WAVEFORMATEX wfe;
 	memset(&wfe, 0, sizeof(wfe));
-	wfe.wFormatTag = WAVE_FORMAT_PCM;
-	wfe.nChannels = h.channels+1;
-	static int freq[] = {48000, 96000, 44100, 32000};
-	wfe.nSamplesPerSec = freq[h.freq];
-	switch (h.quantwordlen) {
-		case 0:
-			wfe.wBitsPerSample = 16;
-			break;
-		case 1:
-			wfe.wBitsPerSample = 20;
-			break;
-		case 2:
-			wfe.wBitsPerSample = 24;
-			break;
-	}
-	wfe.nBlockAlign = (wfe.nChannels*2*wfe.wBitsPerSample) / 8;
-	wfe.nAvgBytesPerSec = (wfe.nBlockAlign*wfe.nSamplesPerSec) / 2;
+	wfe.wFormatTag				= WAVE_FORMAT_PCM;
+	wfe.nChannels				= h.channels+1;
+	static int freq[]			= {48000, 96000, 44100, 32000};
+	wfe.nSamplesPerSec			= freq[h.freq];
+	static int bitspersample[]	= {16, 20, 24};
+	wfe.wBitsPerSample			= bitspersample[h.quantwordlen];
+	wfe.nBlockAlign				= (wfe.nChannels*2*wfe.wBitsPerSample) / 8;
+	wfe.nAvgBytesPerSec			= (wfe.nBlockAlign*wfe.nSamplesPerSec) / 2;
 
 	pmt->majortype = MEDIATYPE_Audio;
 	pmt->subtype = MEDIASUBTYPE_DVD_LPCM_AUDIO;

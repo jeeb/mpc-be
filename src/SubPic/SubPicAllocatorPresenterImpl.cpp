@@ -24,6 +24,7 @@
 #include "stdafx.h"
 #include "SubPicAllocatorPresenterImpl.h"
 #include "../DSUtil/DSUtil.h"
+#include "../filters/renderer/VideoRenderers/RenderersSettings.h"
 
 CSubPicAllocatorPresenterImpl::CSubPicAllocatorPresenterImpl(HWND hWnd, HRESULT& hr, CString *_pError)
 	: CUnknown(NAME("CSubPicAllocatorPresenterImpl"), NULL)
@@ -62,32 +63,26 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::NonDelegatingQueryInterface(REFIID r
 
 void CSubPicAllocatorPresenterImpl::AlphaBltSubPic(CSize size, SubPicDesc* pTarget)
 {
+	CRenderersSettings& s = GetRenderersSettings();
+
 	CComPtr<ISubPic> pSubPic;
 	if (m_pSubPicQueue->LookupSubPic(m_rtNow, pSubPic)) {
 		CRect rcSource, rcDest;
 		if (SUCCEEDED (pSubPic->GetSourceAndDest(&size, rcSource, rcDest))) {
+
+			if (s.bPositionRelative) {
+				rcDest = CRect (rcDest.left		* m_VideoRect.Width()	/ m_WindowRect.Width(),
+								rcDest.top		* m_VideoRect.Height()	/ m_WindowRect.Height(),
+								rcDest.right	* m_VideoRect.Width()	/ m_WindowRect.Width(),
+								rcDest.bottom	* m_VideoRect.Height()	/ m_WindowRect.Height()
+				);
+				rcDest.left		+= m_VideoRect.left;
+				rcDest.right	+= m_VideoRect.left;
+				rcDest.top		+= m_VideoRect.top;
+				rcDest.bottom	+= m_VideoRect.top;
+			}
 			pSubPic->AlphaBlt(rcSource, rcDest, pTarget);
 		}
-		/*		SubPicDesc spd;
-				pSubPic->GetDesc(spd);
-
-				if(spd.w > 0 && spd.h > 0)
-				{
-					CRect r;
-					pSubPic->GetDirtyRect(r);
-
-					// FIXME
-					r.DeflateRect(1, 1);
-
-					CRect rDstText(
-						r.left * size.cx / spd.w,
-						r.top * size.cy / spd.h,
-						r.right * size.cx / spd.w,
-						r.bottom * size.cy / spd.h);
-
-					pSubPic->AlphaBlt(r, rDstText, pTarget);
-				}
-		*/
 	}
 }
 
