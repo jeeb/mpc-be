@@ -57,6 +57,8 @@ int get_icon_index(CString ext)
 		iconindex = IDI_AMR_ICON;
 	} else if (ext.CompareNoCase(_T(".amv")) == 0) {
 		iconindex = IDI_AMV_ICON;
+//	} else if (ext.CompareNoCase(_T(".aob")) == 0) {
+//		iconindex = IDI_DVDAUDIO_ICON;
 	} else if (ext.CompareNoCase(_T(".ape")) == 0) {
 		iconindex = IDI_APE_ICON;
 	} else if (ext.CompareNoCase(_T(".apl")) == 0) {
@@ -145,6 +147,8 @@ int get_icon_index(CString ext)
 		iconindex = IDI_MKA_ICON;
 	} else if (ext.CompareNoCase(_T(".mkv")) == 0) {
 		iconindex = IDI_MKV_ICON;
+	} else if (ext.CompareNoCase(_T(".mlp")) == 0) {
+		iconindex = IDI_MLP_ICON;
 	} else if (ext.CompareNoCase(_T(".mov")) == 0) {
 		iconindex = IDI_MOV_ICON;
 	} else if (ext.CompareNoCase(_T(".mp2")) == 0) {

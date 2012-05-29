@@ -101,6 +101,8 @@ IDI_OTHER_ICON            ICON                    "icons\\pl0004.ico"
 IDI_DVDA_ICON             ICON                    "icons\\mu016.ico"
 IDI_DVDF_ICON             ICON                    "icons\\m0008.ico"
 IDI_M2P_ICON              ICON                    "icons\\rpic.ico"
+//IDI_DVDAUDIO_ICON         ICON                    "icons\\mu016.ico"
+IDI_MLP_ICON              ICON                    "icons\\mu007.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -74,6 +74,8 @@
 #define IDI_TAK_ICON                    45
 #define IDI_TTA_ICON                    46
 #define IDI_APE_ICON                    47
+//#define IDI_DVDAUDIO_ICON               48
+#define IDI_MLP_ICON                    49
 #define IDI_NONE                        -1
 
 
