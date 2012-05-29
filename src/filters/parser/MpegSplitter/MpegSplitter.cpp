@@ -186,13 +186,15 @@ CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipInfo::Str
 
 		if (pClipInfo) {
 			CString name = ISO6392ToLanguage(pClipInfo->m_LanguageCode);
-
 			if (!name.IsEmpty()) {
 				Infos.AddTail(name);
 			}
 		} else {
 			if (!lang.IsEmpty()) {
-				Infos.AddTail(lang);
+				CString name = ISO6392ToLanguage(CStringA(lang.AllocSysString()));
+				if (!name.IsEmpty()) {
+					Infos.AddTail(name);
+				}
 			}
 		}
 
@@ -354,7 +356,10 @@ CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipInfo::Str
 			}
 		} else {
 			if (!lang.IsEmpty()) {
-				Infos.AddTail(lang);
+				CString name = ISO6392ToLanguage(CStringA(lang.AllocSysString()));
+				if (!name.IsEmpty()) {
+					Infos.AddTail(name);
+				}
 			}
 		}
 		if (_pMediaType->formattype == FORMAT_WaveFormatEx) {
@@ -456,14 +461,20 @@ CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipInfo::Str
 			if (!name.IsEmpty()) {
 				Infos.AddHead(name);
 			} else if (!lang.IsEmpty()) {
-				Infos.AddHead(lang);
+				CString name = ISO6392ToLanguage(CStringA(lang.AllocSysString()));
+				if (!name.IsEmpty()) {
+					Infos.AddHead(name);
+				}
 			}
 		} else if (_pMediaType->cbFormat == sizeof(SUBTITLEINFO)) {
 			const SUBTITLEINFO *pInfo = GetFormatHelper(pInfo, _pMediaType);
 			CString name = ISO6392ToLanguage(pInfo->IsoLang);
 
 			if (!lang.IsEmpty()) {
-				Infos.AddHead(lang);
+				CString name = ISO6392ToLanguage(CStringA(lang.AllocSysString()));
+				if (!name.IsEmpty()) {
+					Infos.AddHead(name);
+				}
 			} else if (!name.IsEmpty()) {
 				Infos.AddHead(name);
 			}
@@ -471,7 +482,10 @@ CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipInfo::Str
 				Infos.AddTail(pInfo->TrackName);
 			}
 		} else if (!lang.IsEmpty()) {
-			Infos.AddHead(lang);
+			CString name = ISO6392ToLanguage(CStringA(lang.AllocSysString()));
+			if (!name.IsEmpty()) {
+				Infos.AddHead(name);
+			}
 		}
 	}
 
@@ -1361,7 +1375,11 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 				*pdwFlags = GetOutputPin(s) ? (AMSTREAMSELECTINFO_ENABLED|AMSTREAMSELECTINFO_EXCLUSIVE) : 0;
 			}
 			if (plcid) {
-				*plcid = pStream ? pStream->m_LCID : 0;
+				CString lang_name = _T("");
+				m_pFile->m_pPMT_Lang.Lookup(s.pid, lang_name);
+				LCID lcid = !lang_name.IsEmpty() ? ISO6392ToLcid(CStringA(lang_name.AllocSysString())) : 0;
+
+				*plcid = pStream ? pStream->m_LCID : lcid;
 			}
 			if (pdwGroup) {
 				*pdwGroup = i;

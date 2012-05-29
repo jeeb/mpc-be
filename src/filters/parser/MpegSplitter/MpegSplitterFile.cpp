@@ -1044,7 +1044,7 @@ void CMpegSplitterFile::UpdatePrograms(CGolombBuffer gb, WORD pid, bool UpdateLa
 								gb.BitRead(8);
 							}
 							if (!(ch[0] == 'u' && ch[1] == 'n' && ch[2] == 'd')) {
-								m_pPMT_Lang[pid] = ISO6392ToLanguage(ch);
+								m_pPMT_Lang[pid] = CString(ch);
 							}
 							break;
 						default:
