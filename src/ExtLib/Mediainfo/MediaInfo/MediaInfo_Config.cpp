@@ -1,5 +1,5 @@
 // MediaInfo_Config - Configuration class
-// Copyright (C) 2005-2011 MediaArea.net SARL, Info@MediaArea.net
+// Copyright (C) 2005-2012 MediaArea.net SARL, Info@MediaArea.net
 //
 // This library is free software: you can redistribute it and/or modify it
 // under the terms of the GNU Lesser General Public License as published by
@@ -45,7 +45,7 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const Char*  MediaInfo_Version=_T("MediaInfoLib - v0.7.57");
+const Char*  MediaInfo_Version=_T("MediaInfoLib - v0.7.58");
 const Char*  MediaInfo_Url=_T("http://mediainfo.sourceforge.net");
       Ztring EmptyZtring;       //Use it when we can't return a reference to a true Ztring
 const Ztring EmptyZtring_Const; //Use it when we can't return a reference to a true Ztring, const version
@@ -1853,6 +1853,8 @@ Ztring MediaInfo_Config::Event_CallBackFunction_Set (const Ztring &Value)
         {
             if (List[Pos].find(_T("CallBack=memory://"))==0)
                 Event_CallBackFunction=(MediaInfo_Event_CallBackFunction*)Ztring(List[Pos].substr(18, std::string::npos)).To_int64u();
+            else if (List[Pos].find(_T("UserHandle=memory://"))==0)
+                Event_UserHandler=(void*)Ztring(List[Pos].substr(20, std::string::npos)).To_int64u();
             else if (List[Pos].find(_T("UserHandler=memory://"))==0)
                 Event_UserHandler=(void*)Ztring(List[Pos].substr(21, std::string::npos)).To_int64u();
             else

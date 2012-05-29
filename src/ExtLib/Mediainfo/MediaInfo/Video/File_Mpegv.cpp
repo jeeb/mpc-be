@@ -3018,7 +3018,7 @@ void File_Mpegv::user_data_start_3()
             size_t Pos=TemporalReference_Offset+temporal_reference;
             do
             {
-                if (TemporalReference[Pos]==NULL || !TemporalReference[Pos]->IsValid)
+                if (TemporalReference[Pos]==NULL || !TemporalReference[Pos]->IsValid || TemporalReference[Pos]->Scte.empty())
                     break;
                 Pos--;
             }
@@ -3192,7 +3192,7 @@ void File_Mpegv::user_data_start_GA94_03()
             size_t Pos=TemporalReference_Offset+temporal_reference;
             do
             {
-                if (TemporalReference[Pos]==NULL || !TemporalReference[Pos]->IsValid)
+                if (TemporalReference[Pos]==NULL || !TemporalReference[Pos]->IsValid || TemporalReference[Pos]->GA94_03==NULL)
                     break;
                 Pos--;
             }
@@ -3238,8 +3238,8 @@ void File_Mpegv::user_data_start_GA94_03()
                 if (GA94_03_Parser->PTS_DTS_Needed)
                 {
                     GA94_03_Parser->FrameInfo.PCR=FrameInfo.PCR;
-                    GA94_03_Parser->FrameInfo.PTS=FrameInfo.PTS-(TemporalReference.size()-1-GA94_03_Pos)*tc;
-                    GA94_03_Parser->FrameInfo.DTS=FrameInfo.DTS-(TemporalReference.size()-1-GA94_03_Pos)*tc;
+                    GA94_03_Parser->FrameInfo.PTS=FrameInfo.PTS-(FrameInfo.PTS!=(int64u)-1?((TemporalReference.size()-1-GA94_03_Pos)*tc):0);
+                    GA94_03_Parser->FrameInfo.DTS=FrameInfo.DTS-(FrameInfo.DTS!=(int64u)-1?((TemporalReference.size()-1-GA94_03_Pos)*tc):0);
                 }
                 Demux(TemporalReference[GA94_03_Pos]->GA94_03->Data, TemporalReference[GA94_03_Pos]->GA94_03->Size, ContentType_MainStream);
                 ((File_DtvccTransport*)GA94_03_Parser)->AspectRatio=MPEG_Version==1?Mpegv_aspect_ratio1[aspect_ratio_information]:Mpegv_aspect_ratio2[aspect_ratio_information];

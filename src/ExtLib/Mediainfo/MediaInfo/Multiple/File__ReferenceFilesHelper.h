@@ -46,6 +46,7 @@ public :
         Ztring              Source; //Source file name (relative path)
         stream_t            StreamKind;
         size_t              StreamPos;
+        size_t              MenuPos;
         int64u              StreamID;
         float64             FrameRate;
         int64u              Delay;
@@ -66,6 +67,7 @@ public :
             FileNames.Separator_Set(0, _T(","));
             StreamKind=Stream_Max;
             StreamPos=(size_t)-1;
+            MenuPos=(size_t)-1;
             StreamID=(int64u)-1;
             FrameRate=0;
             Delay=0;
@@ -80,6 +82,7 @@ public :
     };
     typedef std::vector<reference>  references;
     references                      References;
+    bool                            TestContinuousFileNames;
 
     //Streams management
     void ParseReferences();
@@ -105,7 +108,6 @@ private :
     File__Analyze*                  MI;
     MediaInfo_Config_MediaInfo*     Config;
     references::iterator            Reference;
-    int64u                          File_Size_Total;
     bool                            Init_Done;
     bool                            Demux_Interleave;
     size_t                          CountOfReferencesToParse;
@@ -117,6 +119,7 @@ private :
 
     //Helpers
     size_t Stream_Prepare(stream_t StreamKind, size_t StreamPos=(size_t)-1);
+    void   FileSize_Compute();
 };
 
 } //NameSpace

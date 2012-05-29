@@ -1431,6 +1431,10 @@ void File_Mpeg4::mdat()
     #if MEDIAINFO_TRACE
         Trace_Layers_Update(8); //Streams
     #endif //MEDIAINFO_TRACE
+    #if MEDIAINFO_DEMUX
+        if (Config->NextPacket_Get() && Config->Event_CallBackFunction_IsSet())
+            Config->Demux_EventWasSent=true;
+    #endif //MEDIAINFO_DEMUX
 
     if (!Status[IsAccepted])
     {
@@ -1475,6 +1479,8 @@ void File_Mpeg4::mdat()
 
         FirstMdatPos=File_Offset+Buffer_Offset-Header_Size;
     }
+    if (File_Offset+Buffer_Offset>LastMdatPos)
+        LastMdatPos=File_Offset+Buffer_Offset+Element_TotalSize_Get();
 
     //Parsing
     #if MEDIAINFO_TRACE
@@ -2047,10 +2053,16 @@ void File_Mpeg4::moov_meta_hdlr()
     //Parsing
     Skip_C4(                                                    "Type (Quicktime)"); //Filled if Quicktime
     Get_C4 (moov_meta_hdlr_Type,                                "Metadata type");
-    Skip_C4(                                                    "Manufacturer");
-    Skip_B4(                                                    "Component reserved flags"); //Filled if Quicktime
-    Skip_B4(                                                    "Component reserved flags mask"); //Filled if Quicktime
-    Skip_Local(Element_Size-Element_Offset,                     "Component type name");
+    if (Element_Offset+12<=Element_Size)
+    {
+        Skip_C4(                                                "Manufacturer");
+        Skip_B4(                                                "Component reserved flags"); //Filled if Quicktime
+        Skip_B4(                                                "Component reserved flags mask"); //Filled if Quicktime
+        if (Element_Offset<Element_Size)
+            Skip_Local(Element_Size-Element_Offset,             "Component type name");
+    }
+    else if (Element_Offset<Element_Size)
+        Skip_XX(Element_Size-Element_Offset,                    "Unknown");
 }
 
 //---------------------------------------------------------------------------
@@ -2104,6 +2116,20 @@ void File_Mpeg4::moov_meta_ilst_xxxx_data()
     int32u Kind, Language;
     Ztring Value;
     Get_B4(Kind,                                                  "Kind"); Param_Info1(Mpeg4_Meta_Kind(Kind));
+
+    //Error detection
+    switch (Element_Code_Get(Element_Level-1))
+    {
+        case Elements::moov_meta__disk :
+        case Elements::moov_meta__trkn :
+                                         if (Kind)
+                                         {
+                                             //Not normal
+                                             Kind=0x00;
+                                         }
+        default                        : ;
+    }
+
     switch (Kind)
     {
         case 0x00 : //Binary
@@ -2121,8 +2147,10 @@ void File_Mpeg4::moov_meta_ilst_xxxx_data()
                                 Skip_B2(                        "Reserved"); //Sometimes there are 2 more bytes, unknown
 
                             //Filling
-                            Fill(Stream_General, 0, General_Part_Position, Position, 10, true);
-                            Fill(Stream_General, 0, General_Part_Position_Total, Total, 10, true);
+                            if (Position)
+                                Fill(Stream_General, 0, General_Part_Position, Position, 10, true);
+                            if (Total)
+                                Fill(Stream_General, 0, General_Part_Position_Total, Total, 10, true);
                             }
                             return;
                         case Elements::moov_meta__trkn :
@@ -2136,8 +2164,10 @@ void File_Mpeg4::moov_meta_ilst_xxxx_data()
                                 Skip_B2(                        "Reserved"); //Sometimes there are 2 more bytes, unknown
 
                             //Filling
-                            Fill(Stream_General, 0, General_Track_Position, Position, 10, true);
-                            Fill(Stream_General, 0, General_Track_Position_Total, Total, 10, true);
+                            if (Position)
+                                Fill(Stream_General, 0, General_Track_Position, Position, 10, true);
+                            if (Total)
+                                Fill(Stream_General, 0, General_Track_Position_Total, Total, 10, true);
                             }
                             return;
                         case Elements::moov_meta__covr :
@@ -2194,6 +2224,24 @@ void File_Mpeg4::moov_meta_ilst_xxxx_data()
                     Get_Local(Element_Size-Element_Offset, Value, "Value");
                     break;
         case 0x0D : //JPEG
+                    Get_B4(Language,                            "Language");
+                    switch (Element_Code_Get(Element_Level-1))
+                    {
+                        case Elements::moov_meta__covr :
+                            {
+                            std::string Data_Raw((const char*)(Buffer+(size_t)(Buffer_Offset+Element_Offset)), (size_t)(Element_Size-Element_Offset));
+                            std::string Data_Base64(Base64::encode(Data_Raw));
+                            Skip_XX(Element_Size-Element_Offset, "Data");
+
+                            //Filling
+                            Fill(Stream_General, 0, General_Cover_Data, Data_Base64);
+                            Fill(Stream_General, 0, General_Cover, "Yes");
+                            }
+                            return;
+                        default:
+                            Value=_T("(Binary)");
+                    }
+                    break;
         case 0x0E : //PNG
                     Get_B4(Language,                            "Language");
                     switch (Element_Code_Get(Element_Level-1))
@@ -3456,6 +3504,19 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_tx3g()
     FILLING_BEGIN();
         CodecID_Fill(_T("tx3g"), Stream_Text, StreamPos_Last, InfoCodecID_Format_Mpeg4);
         Fill(StreamKind_Last, StreamPos_Last, Text_Codec, "tx3g", Unlimited, true, true);
+
+        #if MEDIAINFO_DEMUX
+            if (Streams[moov_trak_tkhd_TrackID].Parser==NULL && Config_Demux)
+            {
+                Streams[moov_trak_tkhd_TrackID].Parser=new File__Analyze; //Only for activating Demux
+
+                int64u Elemen_Code_Save=Element_Code;
+                Element_Code=moov_trak_tkhd_TrackID; //Element_Code is use for stream identifier
+                Open_Buffer_Init(Streams[moov_trak_tkhd_TrackID].Parser);
+                Element_Code=Elemen_Code_Save;
+                mdat_MustParse=true; //Data is in MDAT
+            }
+        #endif //MEDIAINFO_DEMUX
     FILLING_END();
 }
 
@@ -4160,10 +4221,8 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_chan()
         {
             Fill(Stream_Audio, StreamPos_Last, Audio_Channel_s_, NumberChannelDescriptions, 10, true);
             if (ChannelLabels_Valid)
-            {
                 Fill(Stream_Audio, StreamPos_Last, Audio_ChannelPositions, Mpeg4_chan_ChannelDescription(ChannelLabels), true, true);
-                Fill(Stream_Audio, StreamPos_Last, Audio_ChannelLayout, ChannelDescription_Layout.c_str(), Unlimited, true, true);
-            }
+            Fill(Stream_Audio, StreamPos_Last, Audio_ChannelLayout, ChannelDescription_Layout.c_str(), Unlimited, true, true);
         }
         else if (ChannelLayoutTag==0x10000) //UseChannelBitmap
         {
@@ -5077,7 +5136,7 @@ void File_Mpeg4::moov_trak_tapt_clef()
     NAME_VERSION_FLAG("Clean Aperture Dimensions");
 
     //Parsing
-   Skip_B4(                                                    "cleanApertureWidth"); //BFP4, but how many bits?
+    Skip_B4(                                                    "cleanApertureWidth"); //BFP4, but how many bits?
     Skip_B4(                                                    "cleanApertureHeight"); //BFP4, but how many bits?
 }
 
@@ -5160,6 +5219,11 @@ void File_Mpeg4::moov_trak_tkhd()
         moov_trak_tkhd_Rotation=(float32)(std::atan2(b, a)*180.0/3.14159);
         if (moov_trak_tkhd_Rotation<0)
             moov_trak_tkhd_Rotation+=360;
+
+        #if MEDIAINFO_EVENTS
+            if (StreamIDs_Size>1 && Config->File_ID_OnlyRoot_Get())
+                StreamIDs_Width[StreamIDs_Size-1]=Streams.size()<=1?0:8; //If referenced file and more than 1 stream, referenced ID is discarded, else referenced ID is used
+        #endif //MEDIAINFO_EVENTS
     FILLING_END();
 }
 

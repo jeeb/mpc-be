@@ -1010,6 +1010,7 @@ void File_Mpeg_Psi::Table_forbidden()
 void File_Mpeg_Psi::program_stream_map()
 {
     Element_Name("program_stream_map");
+    table_id=0x02; // program_map_section
 
     //Parsing
     int16u elementary_stream_map_length;
@@ -1048,7 +1049,11 @@ void File_Mpeg_Psi::program_stream_map()
                 Descriptors_Size-=3;
         }
         if (Descriptors_Size>0)
+        {
+            elementary_PID=elementary_stream_id;
+            elementary_PID_IsValid=true;
             Descriptors();
+        }
         Element_End0();
         elementary_stream_map_Pos+=4+ES_info_length;
 
@@ -1093,7 +1098,7 @@ void File_Mpeg_Psi::Table_00()
     //Parsing
     while (Element_Offset<Element_Size)
     {
-        Element_Begin0();
+        Element_Begin1("program");
         Get_B2 (    program_number,                             "program_number");
         BS_Begin();
         Skip_S1( 3,                                             "reserved");
@@ -1280,12 +1285,15 @@ void File_Mpeg_Psi::Table_02()
 
     FILLING_BEGIN();
         //Removing previous elementary_PIDs no more used
-        for (size_t Pos=0; Pos<elementary_PIDs_Previous.size(); Pos++)
+        if (Config->File_MpegTs_RealTime_Get())
         {
-            elementary_PID=elementary_PIDs_Previous[Pos];
-            elementary_PID_Remove();
+            for (size_t Pos=0; Pos<elementary_PIDs_Previous.size(); Pos++)
+            {
+                elementary_PID=elementary_PIDs_Previous[Pos];
+                elementary_PID_Remove();
 
-            Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[program_number].Update_Needed_StreamCount=true;
+                Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[program_number].Update_Needed_StreamCount=true;
+            }
         }
 
         #ifdef MEDIAINFO_MPEGTS_PCR_YES
