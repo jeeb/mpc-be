@@ -191,7 +191,7 @@ CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipInfo::Str
 			}
 		} else {
 			if (!lang.IsEmpty()) {
-				CString name = ISO6392ToLanguage(CStringA(lang.AllocSysString()));
+				CString name = ISO6392ToLanguage(CStringA(lang));
 				if (!name.IsEmpty()) {
 					Infos.AddTail(name);
 				}
@@ -356,7 +356,7 @@ CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipInfo::Str
 			}
 		} else {
 			if (!lang.IsEmpty()) {
-				CString name = ISO6392ToLanguage(CStringA(lang.AllocSysString()));
+				CString name = ISO6392ToLanguage(CStringA(lang));
 				if (!name.IsEmpty()) {
 					Infos.AddTail(name);
 				}
@@ -461,7 +461,7 @@ CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipInfo::Str
 			if (!name.IsEmpty()) {
 				Infos.AddHead(name);
 			} else if (!lang.IsEmpty()) {
-				CString name = ISO6392ToLanguage(CStringA(lang.AllocSysString()));
+				CString name = ISO6392ToLanguage(CStringA(lang));
 				if (!name.IsEmpty()) {
 					Infos.AddHead(name);
 				}
@@ -471,7 +471,7 @@ CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipInfo::Str
 			CString name = ISO6392ToLanguage(pInfo->IsoLang);
 
 			if (!lang.IsEmpty()) {
-				CString name = ISO6392ToLanguage(CStringA(lang.AllocSysString()));
+				CString name = ISO6392ToLanguage(CStringA(lang));
 				if (!name.IsEmpty()) {
 					Infos.AddHead(name);
 				}
@@ -482,7 +482,7 @@ CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipInfo::Str
 				Infos.AddTail(pInfo->TrackName);
 			}
 		} else if (!lang.IsEmpty()) {
-			CString name = ISO6392ToLanguage(CStringA(lang.AllocSysString()));
+			CString name = ISO6392ToLanguage(CStringA(lang));
 			if (!name.IsEmpty()) {
 				Infos.AddHead(name);
 			}
