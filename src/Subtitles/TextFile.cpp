@@ -214,7 +214,7 @@ void CTextFile::WriteString(LPCWSTR lpsz/*CStringW str*/)
 		str.Replace(L"\n", L"\r\n");
 		ptrdiff_t i = str.GetLength()-1;
 		while (i >= 0) {
-			wchar_t wCurr = _byteswap_ushort(str[i]);// assembly checked; intrinsic swap is used from intrin.h
+			wchar_t wCurr = _byteswap_ushort(str.GetAt(i));// assembly checked; intrinsic swap is used from intrin.h
 			str.SetAt(static_cast<int>(i), wCurr);
 			i--;
 		}
