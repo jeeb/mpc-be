@@ -590,7 +590,11 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 
 	const GUID& subtype = m_pInput->CurrentMediaType().subtype;
 
-	if ((subtype == MEDIASUBTYPE_COOK && (S_OK == pIn->IsSyncPoint())) || ((_abs64((m_rtStart - rtStart)) > MAX_JITTER) && ((subtype != MEDIASUBTYPE_COOK) && (subtype != MEDIASUBTYPE_ATRC) && (subtype != MEDIASUBTYPE_SIPR)))) {
+	if ((subtype == MEDIASUBTYPE_COOK && (S_OK == pIn->IsSyncPoint())) ||
+		((_abs64((m_rtStart - rtStart)) > MAX_JITTER) &&
+		((subtype != MEDIASUBTYPE_COOK) &&
+		(subtype != MEDIASUBTYPE_ATRC) &&
+		(subtype != MEDIASUBTYPE_SIPR)))) {
 		m_bResync = true;
 	}
 
@@ -609,30 +613,26 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	if (nCodecId != CODEC_ID_NONE) {
 		return ProcessFFmpeg(nCodecId);
 	}
-	if (0) {} // needed if decoders are disabled below
-	else if (subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {
+
+	if (subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {
 		hr = ProcessLPCM();
 	} else if (subtype == MEDIASUBTYPE_HDMV_LPCM_AUDIO) {
 		hr = ProcessHdmvLPCM(!!pIn->IsSyncPoint());
-	}
-	else if (subtype == MEDIASUBTYPE_DOLBY_AC3 ||
-			 subtype == MEDIASUBTYPE_WAVE_DOLBY_AC3 ||
-			 subtype == MEDIASUBTYPE_DNET) {
+	} else if (subtype == MEDIASUBTYPE_DOLBY_AC3 ||
+			   subtype == MEDIASUBTYPE_WAVE_DOLBY_AC3 ||
+			   subtype == MEDIASUBTYPE_DNET) {
 		hr = ProcessAC3();
-	}
-	else if (subtype == MEDIASUBTYPE_DTS || subtype == MEDIASUBTYPE_WAVE_DTS) {
+	} else if (subtype == MEDIASUBTYPE_DTS || 
+			   subtype == MEDIASUBTYPE_WAVE_DTS) {
 		hr = ProcessDTS();
-	}
-	else if (subtype == MEDIASUBTYPE_PS2_PCM) {
+	} else if (subtype == MEDIASUBTYPE_PS2_PCM) {
 		hr = ProcessPS2PCM();
 	} else if (subtype == MEDIASUBTYPE_PS2_ADPCM) {
 		hr = ProcessPS2ADPCM();
-	}
-	else if (subtype == MEDIASUBTYPE_FLAC_FRAMED) {
+	} else if (subtype == MEDIASUBTYPE_FLAC_FRAMED) {
 		hr = ProcessFlac();
-	}
-	else if (subtype == MEDIASUBTYPE_PCM_NONE ||
-			 subtype == MEDIASUBTYPE_PCM_RAW) {
+	} else if (subtype == MEDIASUBTYPE_PCM_NONE ||
+			   subtype == MEDIASUBTYPE_PCM_RAW) {
 		hr = ProcessPCMraw();
 	} else if (subtype == MEDIASUBTYPE_PCM_TWOS ||
 			   subtype == MEDIASUBTYPE_PCM_IN24 ||
