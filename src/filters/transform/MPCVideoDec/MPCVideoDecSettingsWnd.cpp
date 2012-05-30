@@ -49,7 +49,7 @@ int g_AVDiscard[] = {
 
 int FindDiscardIndex(int nValue)
 {
-	for (int i=0; i<countof (g_AVDiscard); i++)
+	for (int i=0; i<_countof (g_AVDiscard); i++)
 		if (g_AVDiscard[i] == nValue) {
 			return i;
 		}
@@ -64,7 +64,7 @@ int g_AVErrRecognition[] = {
 
 int FindErrRecognitionIndex(int nValue)
 {
-	for (int i=0; i<countof (g_AVErrRecognition); i++)
+	for (int i=0; i<_countof (g_AVErrRecognition); i++)
 		if (g_AVErrRecognition[i] == nValue) {
 			return i;
 		}

@@ -551,7 +551,7 @@ VIDEO_OUTPUT_FORMATS DefaultFormats[] = {
 
 void CBaseVideoFilter::GetOutputFormats (int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats)
 {
-	nNumber		= countof(DefaultFormats);
+	nNumber		= _countof(DefaultFormats);
 	*ppFormats	= DefaultFormats;
 }
 

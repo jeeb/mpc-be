@@ -191,7 +191,7 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 		TBBS_CHECKBOX,
 	};
 
-	for (int i = 0; i < countof(styles); i++) {
+	for (int i = 0; i < _countof(styles); i++) {
 		SetButtonStyle(i, styles[i]|TBBS_DISABLED);
 	}
 
@@ -509,7 +509,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 				dc.RoundRect(r.left +1,r.top +1,r.right -2,r.bottom -1, 6, 4);
 			}
 */
-			for (int j = 0; j < countof(sep); j++) {
+			for (int j = 0; j < _countof(sep); j++) {
 				GetItemRect(sep[j], &r);
 
 				if (NULL != fp) {
@@ -551,7 +551,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			dc.Attach(pTBCD->nmcd.hdc);
 			CRect r;
 
-			for (int j = 0; j < countof(sep); j++) {
+			for (int j = 0; j < _countof(sep); j++) {
 				GetItemRect(sep[j], &r);
 
 				dc.FillSolidRect(r, GetSysColor(COLOR_WINDOW));

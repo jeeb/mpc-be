@@ -578,7 +578,7 @@ const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_wv1f   }
 };
 
-const int CMPCVideoDecFilter::sudPinTypesInCount = countof(CMPCVideoDecFilter::sudPinTypesIn);
+const int CMPCVideoDecFilter::sudPinTypesInCount = _countof(CMPCVideoDecFilter::sudPinTypesIn);
 
 bool*		CMPCVideoDecFilter::FFmpegFilters = NULL;
 bool*		CMPCVideoDecFilter::DXVAFilters = NULL;
@@ -587,14 +587,14 @@ const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesOut[] = {
 	{&MEDIATYPE_Video, &MEDIASUBTYPE_NV12},
 	{&MEDIATYPE_Video, &MEDIASUBTYPE_NV24}
 };
-const int CMPCVideoDecFilter::sudPinTypesOutCount = countof(CMPCVideoDecFilter::sudPinTypesOut);
+const int CMPCVideoDecFilter::sudPinTypesOutCount = _countof(CMPCVideoDecFilter::sudPinTypesOut);
 
 BOOL CALLBACK EnumFindProcessWnd (HWND hwnd, LPARAM lParam)
 {
 	DWORD	procid = 0;
 	TCHAR	WindowClass [40];
 	GetWindowThreadProcessId (hwnd, &procid);
-	GetClassName (hwnd, WindowClass, countof(WindowClass));
+	GetClassName (hwnd, WindowClass, _countof(WindowClass));
 
 	if (procid == GetCurrentProcessId() && _tcscmp (WindowClass, _T("MediaPlayerClassicW")) == 0) {
 		HWND*		pWnd = (HWND*) lParam;
@@ -610,7 +610,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	HWND		hWnd = NULL;
 
 	if (IsVistaOrAbove()) {
-		for (int i=0; i<countof(ffCodecs); i++) {
+		for (int i=0; i<_countof(ffCodecs); i++) {
 			if (ffCodecs[i].nFFCodec == CODEC_ID_H264) {
 				ffCodecs[i].DXVAModes = &DXVA_H264_VISTA;
 			}
@@ -788,8 +788,8 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 #ifdef _DEBUG
 	// Check codec definition table
-	int nCodecs	  = countof(ffCodecs);
-	int nPinTypes = countof(sudPinTypesIn);
+	int nCodecs	  = _countof(ffCodecs);
+	int nPinTypes = _countof(sudPinTypesIn);
 	ASSERT (nCodecs == nPinTypes);
 	for (int i=0; i<nPinTypes; i++) {
 		ASSERT (ffCodecs[i].clsMinorType == sudPinTypesIn[i].clsMinorType);
@@ -892,7 +892,7 @@ int CMPCVideoDecFilter::PictHeightRounded()
 
 int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn)
 {
-	for (int i=0; i<countof(ffCodecs); i++)
+	for (int i=0; i<_countof(ffCodecs); i++)
 		if (mtIn->subtype == *ffCodecs[i].clsMinorType) {
 #ifndef REGISTER_FILTER
 			switch (ffCodecs[i].nFFCodec) {
@@ -1135,7 +1135,7 @@ STDMETHODIMP CMPCVideoDecFilter::NonDelegatingQueryInterface(REFIID riid, void**
 
 HRESULT CMPCVideoDecFilter::CheckInputType(const CMediaType* mtIn)
 {
-	for (int i=0; i<sizeof(sudPinTypesIn)/sizeof(AMOVIESETUP_MEDIATYPE); i++) {
+	for (int i=0; i<_countof(sudPinTypesIn); i++) {
 		if ((mtIn->majortype == *sudPinTypesIn[i].clsMajorType) &&
 				(mtIn->subtype == *sudPinTypesIn[i].clsMinorType)) {
 			return S_OK;
@@ -1406,8 +1406,8 @@ void CMPCVideoDecFilter::BuildDXVAOutputFormat()
 			nSwCount++;
 		}
 	}
-	m_nVideoOutputCount = (IsDXVASupported() ? ffCodecs[m_nCodecNb].DXVAModeCount() + countof (DXVAFormats) : 0) +
-						  (m_bUseFFmpeg   ? (nSwCount>0) ? nSwCount : countof(SoftwareFormats) : 0);
+	m_nVideoOutputCount = (IsDXVASupported() ? ffCodecs[m_nCodecNb].DXVAModeCount() + _countof (DXVAFormats) : 0) +
+						  (m_bUseFFmpeg   ? (nSwCount>0) ? nSwCount : _countof(SoftwareFormats) : 0);
 
 	m_pVideoOutputFormat = DNew VIDEO_OUTPUT_FORMATS[m_nVideoOutputCount];
 
@@ -1423,7 +1423,7 @@ void CMPCVideoDecFilter::BuildDXVAOutputFormat()
 
 		// Static list for DXVA2
 		memcpy (&m_pVideoOutputFormat[nPos], DXVAFormats, sizeof(DXVAFormats));
-		nPos += countof (DXVAFormats);
+		nPos += _countof (DXVAFormats);
 	}
 	// Software rendering
 	if (m_bUseFFmpeg) {

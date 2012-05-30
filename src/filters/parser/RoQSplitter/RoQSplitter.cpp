@@ -36,7 +36,7 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] =
 
 const AMOVIESETUP_PIN sudpPins[] =
 {
-    {L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, countof(sudPinTypesIn), sudPinTypesIn},
+    {L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn), sudPinTypesIn},
     {L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, 0, NULL}
 };
 
@@ -52,8 +52,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut2[] =
 
 const AMOVIESETUP_PIN sudpPins2[] =
 {
-    {L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, countof(sudPinTypesIn2), sudPinTypesIn2},
-    {L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, countof(sudPinTypesOut2), sudPinTypesOut2}
+    {L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn2), sudPinTypesIn2},
+    {L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut2), sudPinTypesOut2}
 };
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn3[] =
@@ -68,16 +68,16 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut3[] =
 
 const AMOVIESETUP_PIN sudpPins3[] =
 {
-    {L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, countof(sudPinTypesIn3), sudPinTypesIn3},
-    {L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, countof(sudPinTypesOut3), sudPinTypesOut3}
+    {L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn3), sudPinTypesIn3},
+    {L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut3), sudPinTypesOut3}
 };
 
 const AMOVIESETUP_FILTER sudFilter[] =
 {
-	{&__uuidof(CRoQSplitterFilter), RoQSplitterName, MERIT_NORMAL+1, countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CRoQSplitterFilter), RoQSplitterName, MERIT_NORMAL+1, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
 	{&__uuidof(CRoQSourceFilter), RoQSourceName, MERIT_NORMAL+1, 0, NULL, CLSID_LegacyAmFilterCategory},
-	{&__uuidof(CRoQVideoDecoder), RoQVideoDecoderName, MERIT_NORMAL, countof(sudpPins2), sudpPins2, CLSID_LegacyAmFilterCategory},
-	{&__uuidof(CRoQAudioDecoder), RoQAudioDecoderName, MERIT_NORMAL, countof(sudpPins3), sudpPins3, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CRoQVideoDecoder), RoQVideoDecoderName, MERIT_NORMAL, _countof(sudpPins2), sudpPins2, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CRoQAudioDecoder), RoQAudioDecoderName, MERIT_NORMAL, _countof(sudpPins3), sudpPins3, CLSID_LegacyAmFilterCategory},
 };
 
 CFactoryTemplate g_Templates[] =
@@ -88,7 +88,7 @@ CFactoryTemplate g_Templates[] =
     {sudFilter[3].strName, sudFilter[3].clsID, CreateInstance<CRoQAudioDecoder>, NULL, &sudFilter[3]},
 };
 
-int g_cTemplates = countof(g_Templates);
+int g_cTemplates = _countof(g_Templates);
 
 STDAPI DllRegisterServer()
 {
@@ -821,7 +821,7 @@ HRESULT CRoQVideoDecoder::GetMediaType(int iPosition, CMediaType* pmt)
 	};
 
 	if(iPosition < 0) return E_INVALIDARG;
-	if(iPosition >= countof(fmts)) return VFW_S_NO_MORE_ITEMS;
+	if(iPosition >= _countof(fmts)) return VFW_S_NO_MORE_ITEMS;
 
 	BITMAPINFOHEADER bih;
 	ExtractBIH(&m_pInput->CurrentMediaType(), &bih);

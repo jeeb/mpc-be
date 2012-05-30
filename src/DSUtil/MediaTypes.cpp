@@ -359,7 +359,7 @@ VIH2 vih2s[] = {
 	},
 };
 
-UINT VIHSIZE = countof(vihs);
+UINT VIHSIZE = _countof(vihs);
 
 CString VIH2String(int i)
 {
