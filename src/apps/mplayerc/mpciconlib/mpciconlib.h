@@ -1,5 +1,5 @@
 /*
- * $Id: mpciconlib.h 4345 2012-04-12 08:04:38Z Xhmikos $
+ * $Id$
  *
  * (C) 2008-2012 see Authors.txt
  *
