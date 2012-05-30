@@ -216,7 +216,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 	HANDLE hFile = INVALID_HANDLE_VALUE;
 
-	if (protocol.GetLength() <= 1 || protocol == L"file") {
+	if ((protocol.GetLength() <= 1 || protocol == L"file") && (ext.Compare(_T(".cda")) != 0)) {
 		hFile = CreateFile(CString(fn), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)NULL);
 
 		if (hFile == INVALID_HANDLE_VALUE) {
