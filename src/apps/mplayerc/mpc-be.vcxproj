@@ -554,6 +554,9 @@
       <Project>{40177920-a66c-4647-b119-332a10224c83}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="..\..\filters\parser\DTSSplitter\DTSSplitter.vcxproj">
+      <Project>{f68d02e9-32de-4eda-8691-b911dc5317dc}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\filters\source\MusePackSource\MusePackSource.vcxproj">
       <Project>{3ff8d24a-877c-4957-b377-f20a1527f423}</Project>
     </ProjectReference>

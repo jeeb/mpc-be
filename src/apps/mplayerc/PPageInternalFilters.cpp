@@ -30,11 +30,12 @@
 
 static filter_t s_filters[] = {
 
-// Source filters
+	// Source filters
 	{_T("AVI"),                   SOURCE_FILTER,  SOURCE, SRC_AVI,        IDS_SRC_AVI},
 	{_T("CDDA (Audio CD)"),       SOURCE_FILTER,  SOURCE, SRC_CDDA,       IDS_SRC_CDDA},
 	{_T("CDXA (VCD/SVCD/XCD)"),   SOURCE_FILTER,  SOURCE, SRC_CDXA,       0},
 	{_T("DirectShow Media"),      SOURCE_FILTER,  SOURCE, SRC_DSM,        0},
+	{_T("DTS AudioCD"),           SOURCE_FILTER,  SOURCE, SRC_DTS,        IDS_SRC_DTS},
 	{_T("DTS/AC3"),               SOURCE_FILTER,  SOURCE, SRC_DTSAC3,     0},
 	{_T("DVD Video Title Set"),   SOURCE_FILTER,  SOURCE, SRC_VTS,        IDS_SRC_VTS},
 	{_T("DVD2AVI Project File"),  SOURCE_FILTER,  SOURCE, SRC_D2V,        0},
@@ -52,7 +53,7 @@ static filter_t s_filters[] = {
 	{_T("SHOUTcast"),             SOURCE_FILTER,  SOURCE, SRC_SHOUTCAST,  0},
 	{_T("WavPack"),               SOURCE_FILTER,  SOURCE, SRC_WPAC,       0},
 
-// Audio decoder
+	// Audio decoder
 	{_T("AAC"),                   FFMPEG_DECODER, AUDIO,  FFM_AAC,        IDS_TRA_FFMPEG,},
 	{_T("AC3"),                   DECODER,        AUDIO,  TRA_AC3,        IDS_TRA_AC3,},
 	{_T("ALAC"),                  FFMPEG_DECODER, AUDIO,  FFM_ALAC,       IDS_TRA_FFMPEG,},
@@ -76,13 +77,13 @@ static filter_t s_filters[] = {
 	{_T("WMA Lossless"),          FFMPEG_DECODER, AUDIO,  FFM_WMALOSS,    IDS_TRA_FFMPEG,},
 	{_T("Other PCM/ADPCM"),       DECODER,        AUDIO,  TRA_PCM,        IDS_TRA_FFMPEG,},
 
-// DXVA decoder
+	// DXVA decoder
 	{_T("H264/AVC (DXVA)"),       DXVA_DECODER,   VIDEO,  TRA_DXVA_H264,  IDS_TRA_FFMPEG},
 	{_T("MPEG-2 Video (DXVA)"),   DXVA_DECODER,   VIDEO,  TRA_DXVA_MPEG2, IDS_TRA_FFMPEG},
 	{_T("VC1 (DXVA)"),            DXVA_DECODER,   VIDEO,  TRA_DXVA_VC1,   IDS_TRA_FFMPEG},
 	{_T("WMV3 (DXVA)"),           DXVA_DECODER,   VIDEO,  TRA_DXVA_WMV3,  IDS_TRA_FFMPEG},
 
-// Video Decoder
+	// Video Decoder
 	{_T("AMV video"),             FFMPEG_DECODER, VIDEO,  FFM_AMVV,       IDS_TRA_FFMPEG},
 	{_T("Apple ProRes"),          FFMPEG_DECODER, VIDEO,  FFM_PRORES,     IDS_TRA_FFMPEG},
 	{_T("Dirac"),                 FFMPEG_DECODER, VIDEO,  FFM_DIRAC,      IDS_TRA_FFMPEG},
@@ -108,6 +109,7 @@ static filter_t s_filters[] = {
 	{_T("Xvid/MPEG-4"),           FFMPEG_DECODER, VIDEO,  FFM_XVID,       IDS_TRA_FFMPEG},
 	{_T("RealVideo"),             DECODER,        VIDEO,  TRA_RV,         IDS_TRA_RV},
 
+	// End
 	{NULL, 0, 0, 0, NULL}
 };
 

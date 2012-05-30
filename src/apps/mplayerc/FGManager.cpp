@@ -1505,6 +1505,14 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_WAVE_DTS);
 	m_transform.AddTail(pFGF);
 
+	if (src[SRC_DTS]) {
+		pFGF = DNew CFGFilterInternal<CDTSSplitterFilter>(DTSSplitterName, MERIT64_ABOVE_DSHOW);
+	} else {
+		pFGF = DNew CFGFilterInternal<CDTSSplitterFilter>(LowMerit(DTSSplitterName), MERIT64_DO_USE);
+	}
+	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_WAVE);
+	m_transform.AddTail(pFGF);
+
 	if (src[SRC_MATROSKA]) {
 		pFGF = DNew CFGFilterInternal<CMatroskaSplitterFilter>(MatroskaSplitterName, MERIT64_ABOVE_DSHOW);
 	} else {
