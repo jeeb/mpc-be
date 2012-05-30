@@ -2098,6 +2098,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_CVID);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_FLASHSV1);
 //		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_FLASHSV2);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_FPS1);
 	}
 
 	if (ffmpeg_filters[FFM_UTVD]) {
@@ -2328,6 +2329,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_CVID);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_FLASHSV1);
 //		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_FLASHSV2);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_FPS1);
 	}
 
 	if (ffmpeg_filters[FFM_UTVD]) {

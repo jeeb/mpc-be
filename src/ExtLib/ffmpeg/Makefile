@@ -133,6 +133,7 @@ SRCS_C=\
     libavcodec/flashsv.c \
     libavcodec/flvdec.c \
     libavcodec/fmtconvert.c \
+    libavcodec/fraps.c \
     libavcodec/golomb.c \
     libavcodec/h263.c \
     libavcodec/h263_parser.c \

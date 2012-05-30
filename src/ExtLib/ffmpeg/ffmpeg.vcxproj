@@ -362,6 +362,7 @@
     <ClCompile Include="libavcodec\flashsv.c" />
     <ClCompile Include="libavcodec\flvdec.c" />
     <ClCompile Include="libavcodec\fmtconvert.c" />
+    <ClCompile Include="libavcodec\fraps.c" />
     <ClCompile Include="libavcodec\golomb.c" />
     <ClCompile Include="libavcodec\h261.c" />
     <ClCompile Include="libavcodec\h261data.c" />
