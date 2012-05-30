@@ -50,6 +50,25 @@ static bool isDTSSync(const DWORD sync)
 	}
 }
 
+static DWORD ParseWAVECDHeader(const BYTE wh[44])
+{
+	if (*(DWORD*)wh != 0x46464952 //"RIFF"
+			|| *(DWORDLONG*)(wh+8) != 0x20746d6645564157 //"WAVEfmt "
+			|| *(DWORD*)(wh+36) != 0x61746164) { //"data"
+		return 0;
+	}
+	PCMWAVEFORMAT pcmwf = *(PCMWAVEFORMAT*)(wh+20);
+	if (pcmwf.wf.wFormatTag != 1
+			|| pcmwf.wf.nChannels != 2
+			|| pcmwf.wf.nSamplesPerSec != 44100
+			|| pcmwf.wf.nAvgBytesPerSec != 176400
+			|| pcmwf.wf.nBlockAlign != 4
+			|| pcmwf.wBitsPerSample != 16) {
+		return 0;
+	}
+	return *(DWORD*)(wh+40); //return size of "data"
+}
+
 //
 
 CDTSSplitterFile::CDTSSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr)
@@ -68,14 +87,32 @@ CDTSSplitterFile::CDTSSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr)
 
 HRESULT CDTSSplitterFile::Init()
 {
+	Seek(0);
 	m_startpos = 0;
 	m_endpos = GetLength();
 
-	Seek(SYNC_OFFESET);
-	DWORD id;
-	DWORD remain = 0;
+	BYTE buf[44];
+	if(SUCCEEDED(ByteRead((BYTE*)buf, 44))) {
+		DWORD ret = ParseWAVECDHeader(buf);
+		if (!ret) {
+			return E_FAIL;
+		}
+	} else {
+		return E_FAIL;
+	}
+
+	DWORD id, dts_offset = 0;
 	if(SUCCEEDED(ByteRead((BYTE*)&id, sizeof(id))) && isDTSSync(id)) {
-		Seek(SYNC_OFFESET);
+		dts_offset = GetPos() - 4;
+	}
+
+	if (!dts_offset) {
+		dts_offset = SYNC_OFFESET;
+	}
+
+	Seek(dts_offset);
+	if(SUCCEEDED(ByteRead((BYTE*)&id, sizeof(id))) && isDTSSync(id)) {
+		Seek(dts_offset);
 		BYTE buf[16];
 		if(FAILED(ByteRead(buf, 16))) {
 			return E_FAIL;
@@ -90,7 +127,7 @@ HRESULT CDTSSplitterFile::Init()
 			return E_FAIL;
 		}
 
-		Seek(SYNC_OFFESET + m_framesize);
+		Seek(dts_offset + m_framesize);
 		if(SUCCEEDED(ByteRead((BYTE*)&id, sizeof(id))) && isDTSSync(id)) {
 
 			int m_bitrate = int ((m_framesize) * 8i64 * m_samplerate / m_framelength);
@@ -126,7 +163,7 @@ HRESULT CDTSSplitterFile::Init()
 			wfe->wBitsPerSample		= 0;
 			wfe->cbSize = 0;
 
-			Seek(SYNC_OFFESET);
+			Seek(dts_offset);
 
 			return S_OK;
 		}
