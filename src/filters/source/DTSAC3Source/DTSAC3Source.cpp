@@ -56,11 +56,11 @@ enum {
 
 bool isDTSSync(const DWORD sync)
 {
-	if (sync == 0x0180fe7f || //16 bits and big endian bitstream
-			sync == 0x80017ffe || //16 bits and little endian bitstream
-			sync == 0x00e8ff1f || //14 bits and big endian bitstream
-			sync == 0xe8001fff)   //14 bits and little endian bitstream
-		return true;
+	if (sync == 0x0180fe7f || // '7FFE8001' 16 bits and big endian bitstream
+		sync == 0x80017ffe || // 'FE7F0180' 16 bits and little endian bitstream
+		sync == 0x00e8ff1f || // '1FFFE800' 14 bits and big endian bitstream
+		sync == 0xe8001fff)   // 'FF1F00E8' 14 bits and little endian bitstream
+			return true;
 	else
 		return false;
 }
@@ -228,9 +228,11 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 	do {
 		if (!m_file.Open(fn, CFile::modeRead|CFile::shareDenyNone, &ex)) {
-			hr	= AmHresultFromWin32 (ex.m_lOsError);
+			hr = AmHresultFromWin32 (ex.m_lOsError);
 			break;
 		}
+		const CString path = m_file.GetFilePath();
+		const CString ext = CPath(m_file.GetFileName()).GetExtension().MakeLower();
 
 		DWORD id = 0;
 		DWORD id2 = 0;
@@ -239,7 +241,6 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			break;
 
 		// WAVE-CD header
-		CString ext = CPath(m_file.GetFileName()).GetExtension().MakeLower();
 		if (id == RIFF_DWORD) {
 			if (ext != _T(".dtswav") && ext != _T(".dts") && ext != _T(".wav")) //check only specific extensions
 				break;
@@ -254,16 +255,27 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 		m_dataOffset = m_file.GetPosition() - sizeof(id) - (!waveheader ? sizeof(id2) : 0);
 
+		bool isFound = isDTSSync(id) || (WORD)id==AC3_SYNC_WORD || id==IEC61937_SYNC_WORD || id2==MLP_SYNC_WORD /*|| id2!=TRUEHD_SYNC_WORD*/;
+
 		// search DTS and AC3 headers (skip garbage in the beginning)
-		if (!isDTSSync(id) && (WORD)id!=AC3_SYNC_WORD && id!=IEC61937_SYNC_WORD && id2!=MLP_SYNC_WORD /*&& id2!=TRUEHD_SYNC_WORD*/) {
-			if (ext != _T(".dtswav") && ext != _T(".dts") && ext != _T(".wav") && ext != _T(".ac3") && ext != _T(".eac3")) //check only specific extensions
-				break;
+		if (!isFound) {
+			UINT buflen = 0;
+			if (waveheader && ext == _T(".wav") && PathFileExists(path.Left(path.GetLength()-ext.GetLength()) + _T(".cue"))) {
+				buflen = 64 * 1024; // for .wav+.cue sometimes need to use a more deep search
+			}
+			else if (ext == _T(".dtswav") || ext == _T(".dts") || ext == _T(".wav") || ext == _T(".ac3") || ext == _T(".eac3")) { //check only specific extensions
+				buflen = 6 * 1024;
+			}
+			else break;
+
+			if (m_dataOffset < buflen) buflen -= m_dataOffset; // tiny optimization
 			m_file.Seek(m_dataOffset, CFile::begin);
-			BYTE buf[6*1024];
-			int len = m_file.Read(&buf, 6*1024); // 6 KB
-			if (len<100) break; //100=96+4
-			bool isFound = false;
-			for (int i=1; i<len-4; i++) { // looking for DTS or AC3 sync
+
+			BYTE* buf = new BYTE[buflen];
+			int len = m_file.Read(buf, buflen);
+			if (len<100) break; // file is very small
+
+			for (int i = 1; i < len - 4; i++) { // looking for DTS or AC3 sync
 				id = *(DWORD*)(buf+i);
 				if (isDTSSync(id) || (WORD)id==AC3_SYNC_WORD) {
 					isFound = true;
@@ -271,10 +283,12 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 					break;
 				}
 			}
-			if (!isFound) break;
+			delete buf;
 		}
+		if (!isFound) break;
 
 		m_file.Seek(m_dataOffset, CFile::begin);
+
 		// DTS & DTS-HD
 		if (isDTSSync(id)) {
 			BYTE buf[16];
@@ -353,9 +367,9 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 			m_wFormatTag = WAVE_FORMAT_DTS;
 			m_subtype = MEDIASUBTYPE_DTS;
-
-			// AC3 & E-AC3
-		} else if ((WORD)id == AC3_SYNC_WORD) {
+		}
+		// AC3 & E-AC3
+		else if ((WORD)id == AC3_SYNC_WORD) {
 			BYTE buf[20];
 			if (m_file.Read(&buf, 8) != 8)
 				break;
@@ -364,7 +378,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			int fsize   = 0;
 			int HD_size = 0;
 
-			//  AC3 header
+			// AC3 header
 			if (bsid < 12) {
 				fsize = ParseAC3Header(buf, &m_samplerate, &m_channels, &m_framelength, &m_bitrate);
 				if (fsize == 0) {
@@ -383,8 +397,9 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 					}
 				}
 				*/
-				// E-AC3 header
-			} else if (bsid == 16) {
+			}
+			// E-AC3 header
+			else if (bsid == 16) {
 				int frametype;
 				fsize = ParseEAC3Header(buf, &m_samplerate, &m_channels, &m_framelength, &frametype);
 				if (fsize == 0) {
@@ -414,9 +429,9 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 			m_wFormatTag = WAVE_FORMAT_UNKNOWN;
 			m_subtype = MEDIASUBTYPE_DOLBY_AC3;
-
-			// SPDIF AC3
-		} else if (waveheader && id == IEC61937_SYNC_WORD) {
+		}
+		// SPDIF AC3
+		else if (waveheader && id == IEC61937_SYNC_WORD) {
 			BYTE buf[16];
 			if (m_file.Read(&buf, 16) != 16)
 				break;
@@ -434,8 +449,9 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 			m_subtype = MEDIASUBTYPE_DOLBY_AC3_SPDIF;
 			m_streamtype = SPDIF_AC3;
+		}
 		// MLP
-		} else if (id2 == MLP_SYNC_WORD) {
+		else if (id2 == MLP_SYNC_WORD) {
 			BYTE buf[16];
 			if (m_file.Read(&buf, 16) != 16)
 				break;
@@ -445,7 +461,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			if (m_framesize == 0) {
 				break;
 			}
-			
+
 			m_streamtype = MLP;
 			m_fixedframesize = false;
 
@@ -456,9 +472,10 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 			m_wFormatTag = WAVE_FORMAT_UNKNOWN;
 			m_subtype    = MEDIASUBTYPE_MLP;
+		}
 		/*
 		// TrueHD
-		} else if (id2 == TRUEHD_SYNC_WORD) {
+		else if (id2 == TRUEHD_SYNC_WORD) {
 			BYTE buf[20];
 			if (m_file.Read(&buf, 20) != 20)
 				break;
@@ -492,7 +509,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			m_wFormatTag = WAVE_FORMAT_UNKNOWN;
 			m_subtype = MEDIASUBTYPE_DOLBY_TRUEHD;
 		*/
-		} else {
+		else {
 			break;
 		}
 
@@ -500,7 +517,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 		m_rtStop = m_rtDuration;
 
 		hr = S_OK;
-	}  while (false);
+	} while (false);
 
 	if (phr) {
 		*phr = hr;
