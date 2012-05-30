@@ -903,7 +903,7 @@ HRESULT CRoQAudioDecoder::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	}
 
 	WAVEFORMATEX* pwfe = (WAVEFORMATEX*)m_pOutput->CurrentMediaType().Format();
-	UNUSED_ALWAYS(pwfe);
+	UNREFERENCED_PARAMETER(pwfe);
 
 	BYTE* pDataIn = NULL;
 	if(FAILED(hr = pIn->GetPointer(&pDataIn)))

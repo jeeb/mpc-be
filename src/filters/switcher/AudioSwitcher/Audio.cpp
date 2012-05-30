@@ -318,7 +318,7 @@ long AudioStreamResampler::Downsample(void* input, long samplesin, void* output,
 	}
 
 	int Bytes = lActualSamples * bps;
-	UNUSED_ALWAYS(Bytes);
+	UNREFERENCED_PARAMETER(Bytes);
 
 	return lActualSamples;
 }
