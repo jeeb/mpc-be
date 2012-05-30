@@ -1,4 +1,4 @@
-; $Id$
+ï»¿; $Id$
 ;
 ; (C) 2009-2012 see Authors.txt
 ;
@@ -38,8 +38,8 @@ br.WelcomeLabel2=This will install [name] on your computer.%n%nIt is recommended
 br.WinVersionTooLowError=[name] requires Windows XP Service Pack 3 or newer to run.
 
 ;Belarusian
-by.WelcomeLabel2=¬©¬Ñ¬â¬Ñ¬Ù ¬Ò¬å¬Õ¬Ù¬Ö ?¬ã¬ä¬Ñ¬ß¬à?¬İ¬Ö¬ß¬Ñ [name].%n%n¬²¬ï¬Ü¬Ñ¬Ş¬Ö¬ß¬Õ¬å¬Ö¬è¬è¬Ñ ¬Ù¬Ñ¬Ü¬â¬í¬è¬î ¬å¬ã¬Ö ¬á¬â¬í¬Ü¬İ¬Ñ¬Õ¬Ñ¬ß¬ß? ¬á¬Ö¬â¬Ñ¬Õ ¬á¬â¬Ñ¬è¬ñ¬Ô¬Ñ¬Ş.
-by.WinVersionTooLowError=[name] ¬á¬Ñ¬ä¬â¬Ñ¬Ò¬å¬Ö¬è¬è¬Ñ Windows XP Service Pack 3 ¬Ñ¬Ò¬à ¬ß¬Ñ¬Ó¬Ö¬Û.
+by.WelcomeLabel2=Ğ—Ğ°Ñ€Ğ°Ğ· Ğ±ÑƒĞ´Ğ·Ğµ ÑÑÑ‚Ğ°Ğ½Ğ¾ÑĞ»ĞµĞ½Ğ° [name].%n%nĞ ÑĞºĞ°Ğ¼ĞµĞ½Ğ´ÑƒĞµÑ†Ñ†Ğ° Ğ·Ğ°ĞºÑ€Ñ‹Ñ†ÑŒ ÑƒÑĞµ Ğ¿Ñ€Ñ‹ĞºĞ»Ğ°Ğ´Ğ°Ğ½Ğ½Ñ– Ğ¿ĞµÑ€Ğ°Ğ´ Ğ¿Ñ€Ğ°Ñ†ÑĞ³Ğ°Ğ¼.
+by.WinVersionTooLowError=[name] Ğ¿Ğ°Ñ‚Ñ€Ğ°Ğ±ÑƒĞµÑ†Ñ†Ğ° Windows XP Service Pack 3 Ğ°Ğ±Ğ¾ Ğ½Ğ°Ğ²ĞµĞ¹.
 
 ;Basque
 eu.WelcomeLabel2=Honek [name] zure ordenagailuan ezarriko du.%n%nGomendatzen da beste aplikazio guztiak istea jarraitu aurretik.
@@ -50,20 +50,20 @@ ca.WelcomeLabel2=This will install [name] on your computer.%n%nIt is recommended
 ca.WinVersionTooLowError=[name] requires Windows XP Service Pack 3 or newer to run.
 
 ;Czech
-cz.WelcomeLabel2=Produkt [name] bude nainstalovan na Va? po?ita?.%n%nD?ive ne? budete pokra?ovat, doporu?uje se ukon?it ve?kere spu?t?ne aplikace.
-cz.WinVersionTooLowError=[name] vy?aduje Windows XP Service Pack 3 nebo nov?j?i.
+cz.WelcomeLabel2=Produkt [name] bude nainstalovÃ¡n na VÃ¡Å¡ poÄÃ­taÄ.%n%nDÅ™Ã­ve neÅ¾ budete pokraÄovat, doporuÄuje se ukonÄit veÅ¡kerÃ© spuÅ¡tÄ›nÃ© aplikace.
+cz.WinVersionTooLowError=[name] vyÅ¾aduje Windows XP Service Pack 3 nebo novÄ›jÅ¡Ã­.
 
 ;German
 de.WelcomeLabel2=Dieses Programm installiert [name] auf Ihrem Computer.%n%nEs wird empfohlen, alle laufenden Programme zu beenden, bevor Sie mit der Installation fortfahren.
-de.WinVersionTooLowError=[name] benotigt Windows XP Service Pack 3 oder hoher.
+de.WinVersionTooLowError=[name] benÃ¶tigt Windows XP Service Pack 3 oder hÃ¶her.
 
 ;Spanish
 es.WelcomeLabel2=Este programa instalara [name] en tu computadora.%n%nEs recomendable que cierres todas las aplicaciones antes de continuar.
 es.WinVersionTooLowError=[name] require Windows XP Service Pack 3 o superior para funcionar.
 
 ;French
-fr.WelcomeLabel2=Vous allez installer [name] sur votre ordinateur.%n%nIl est recommande de fermer toutes les autres applications avant de continuer.
-fr.WinVersionTooLowError=[name] necessite Windows XP Service Pack 3 ou plus recent pour fonctionner.
+fr.WelcomeLabel2=Vous allez installer [name] sur votre ordinateur.%n%nIl est recommandÃ© de fermer toutes les autres applications avant de continuer.
+fr.WinVersionTooLowError=[name] nÃ©cessite Windows XP Service Pack 3 ou plus rÃ©cent pour fonctionner.
 
 ;Hebrew
 he.WelcomeLabel2=This will install [name] on your computer.%n%nIt is recommended that you close all other applications before continuing.
@@ -74,56 +74,56 @@ hu.WelcomeLabel2=This will install [name] on your computer.%n%nIt is recommended
 hu.WinVersionTooLowError=[name] requires Windows XP Service Pack 3 or newer to run.
 
 ;Armenian
-hy.WelcomeLabel2=?? ????????? [name]-? ??? ?????????????%n%n???????? ??? ????? ????? ????? ????? ?????????
-hy.WinVersionTooLowError=[name]-? ????????? ? Windows XP Service Pack 3 ??? ????? ??????
+hy.WelcomeLabel2=ÕÕ¡ Õ¯Õ¿Õ¥Õ²Õ¡Õ¯Õ¡ÕµÕ« [name]-Õ¨ ÕÕ¥Ö€ Õ°Õ¡Õ´Õ¡Õ¯Õ¡Ö€Õ£Õ¹Õ¸Ö‚Õ´Ö‰%n%nÔ½Õ¸Ö€Õ°Õ¸Ö‚Ö€Õ¤ Õ¥Õ¶Ö„ Õ¿Õ¡Õ¬Õ«Õ½ ÖƒÕ¡Õ¯Õ¥Õ¬ Õ¢Õ¸Õ¬Õ¸Ö€ Õ´ÕµÕ¸Ö‚Õ½ Õ®Ö€Õ¡Õ£Ö€Õ¥Ö€Õ¨Ö‰
+hy.WinVersionTooLowError=[name]-Õ¨ ÕºÕ¡Õ°Õ¡Õ¶Õ»Õ¸Ö‚Õ´ Õ§ Windows XP Service Pack 3 Õ¯Õ¡Õ´ Õ¡Õ¾Õ¥Õ¬Õ« Õ¢Õ¡Ö€Õ±Ö€Ö‰
 
 ;Italian
 it.WelcomeLabel2=This will install [name] on your computer.%n%nIt is recommended that you close all other applications before continuing.
 it.WinVersionTooLowError=[name] requires Windows XP Service Pack 3 or newer to run.
 
 ;Japanese
-ja.WelcomeLabel2=ª³ªÎ«×«í«°«é«àªÏª¢ªÊª¿ªÎ«³«ó«Ô«å?«¿ªÎß¾ªË[name]ªò«¤«ó«¹«È?«ëª·ªŞª¹¡£%n%n«»«Ã«È«¢«Ã«×ªò?ª±ªëîñªËöâªÎª¹ªÙªÆªÎ«¢«×«êªòøÍª¸ªëª³ªÈªòõÏ?ª·ªŞª¹¡£
-ja.WinVersionTooLowError=[name] ªò?ú¼ª¹ªë?ªË Windows XP Service Pack 3 ì¤Ë½ª¬ù±é©ªÇª¹¡£
+ja.WelcomeLabel2=ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ã‚ãªãŸã®ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ã‚¿ã®ä¸Šã«[name]ã‚’ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã—ã¾ã™ã€‚%n%nã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—ã‚’ç¶šã‘ã‚‹å‰ã«ä»–ã®ã™ã¹ã¦ã®ã‚¢ãƒ—ãƒªã‚’é–‰ã˜ã‚‹ã“ã¨ã‚’æ¨å¥¨ã—ã¾ã™ã€‚
+ja.WinVersionTooLowError=[name] ã‚’å®Ÿè¡Œã™ã‚‹ç‚ºã« Windows XP Service Pack 3 ä»¥é™ãŒå¿…è¦ã§ã™ã€‚
 
 ;Korean
-kr.WelcomeLabel2=ÀÌ ¼³Ä¡ÇÁ·Î±×·¥Àº [name] ¸¦ ´ç½ÅÀÇ ÄÄÇ»ÅÍ¿¡ ¼³Ä¡ÇÕ´Ï´Ù.%n%n¼³Ä¡¸¦ °è¼ÓÇÏ±â Àü¿¡ ´Ù¸¥ ¸ğµç ÇÁ·Î±×·¥À» Á¾·áÇÏ½Ç °ÍÀ» ±ÇÀåÇÕ´Ï´Ù.
-kr.WinVersionTooLowError=[name] ´Â Windows XP Service Pack 3  ¶Ç´Â ±× ÀÌ»óÀÇ ¹öÀü¿¡¼­¸¸ ¼³Ä¡ÇÒ ¼ö ÀÖ½À´Ï´Ù.
+kr.WelcomeLabel2=ì´ ì„¤ì¹˜í”„ë¡œê·¸ë¨ì€ [name] ë¥¼(ì„) ë‹¹ì‹ ì˜ ì»´í“¨í„°ì— ì„¤ì¹˜í•©ë‹ˆë‹¤.%n%nì„¤ì¹˜ë¥¼ ê³„ì†í•˜ê¸° ì „ì— ë‹¤ë¥¸ ëª¨ë“  í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•˜ëŠ” ê²ƒì„ ê¶Œì¥í•©ë‹ˆë‹¤.
+kr.WinVersionTooLowError=[name] ëŠ”(ì€) Windows XP Service Pack 3  ë˜ëŠ” ê·¸ ì´ìƒì˜ ë²„ì „ì—ì„œë§Œ ì„¤ì¹˜í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.
 
 ;Dutch
 nl.WelcomeLabel2=This will install [name] on your computer.%n%nIt is recommended that you close all other applications before continuing.
 nl.WinVersionTooLowError=[name] requires Windows XP Service Pack 3 or newer to run.
 
 ;Polish
-pl.WelcomeLabel2=Ten instalator zainstaluje [name] na Twoim komputerze.%n%nZaleca si? zamkni?cie wszystkich innych aplikacji przed kontynuowaniem.
+pl.WelcomeLabel2=Ten instalator zainstaluje [name] na Twoim komputerze.%n%nZaleca siÄ™ zamkniÄ™cie wszystkich innych aplikacji przed kontynuowaniem.
 pl.WinVersionTooLowError=[name] wymaga systemu Windows XP Service Pack 3 lub nowszego do uruchomienia.
 
 ;Russian
-ru.WelcomeLabel2=¬±¬â¬à¬Ô¬â¬Ñ¬Ş¬Ş¬Ñ ¬å¬ã¬ä¬Ñ¬ß¬à¬Ó¬Ú¬ä [name] ¬ß¬Ñ ¬Ó¬Ñ¬ê ¬Ü¬à¬Ş¬á¬î¬ğ¬ä¬Ö¬â.%n%n¬²¬Ö¬Ü¬à¬Ş¬Ö¬ß¬Õ¬å¬Ö¬ä¬ã¬ñ ¬Ù¬Ñ¬Ü¬â¬í¬ä¬î ¬Ó¬ã¬Ö ¬á¬â¬à¬é¬Ú¬Ö ¬á¬â¬Ú¬İ¬à¬Ø¬Ö¬ß¬Ú¬ñ ¬á¬Ö¬â¬Ö¬Õ ¬ä¬Ö¬Ş, ¬Ü¬Ñ¬Ü ¬á¬â¬à¬Õ¬à¬İ¬Ø¬Ú¬ä¬î.
-ru.WinVersionTooLowError=[name] ¬¿¬ä¬Ñ ¬á¬â¬à¬Ô¬â¬Ñ¬Ş¬Ş¬Ñ ¬ä¬â¬Ö¬Ò¬å¬Ö¬ä Windows XP Service Pack 3 ¬Ú¬İ¬Ú ¬Ó¬í¬ê¬Ö.
+ru.WelcomeLabel2=ĞŸÑ€Ğ¾Ğ³Ñ€Ğ°Ğ¼Ğ¼Ğ° ÑƒÑÑ‚Ğ°Ğ½Ğ¾Ğ²Ğ¸Ñ‚ [name] Ğ½Ğ° Ğ²Ğ°Ñˆ ĞºĞ¾Ğ¼Ğ¿ÑŒÑÑ‚ĞµÑ€.%n%nĞ ĞµĞºĞ¾Ğ¼ĞµĞ½Ğ´ÑƒĞµÑ‚ÑÑ Ğ·Ğ°ĞºÑ€Ñ‹Ñ‚ÑŒ Ğ²ÑĞµ Ğ¿Ñ€Ğ¾Ñ‡Ğ¸Ğµ Ğ¿Ñ€Ğ¸Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ñ Ğ¿ĞµÑ€ĞµĞ´ Ñ‚ĞµĞ¼, ĞºĞ°Ğº Ğ¿Ñ€Ğ¾Ğ´Ğ¾Ğ»Ğ¶Ğ¸Ñ‚ÑŒ.
+ru.WinVersionTooLowError=[name] Ğ­Ñ‚Ğ° Ğ¿Ñ€Ğ¾Ğ³Ñ€Ğ°Ğ¼Ğ¼Ğ° Ñ‚Ñ€ĞµĞ±ÑƒĞµÑ‚ Windows XP Service Pack 3 Ğ¸Ğ»Ğ¸ Ğ²Ñ‹ÑˆĞµ.
 
 ;Chinese Simplified
 sc.WelcomeLabel2=This will install [name] on your computer.%n%nIt is recommended that you close all other applications before continuing.
 sc.WinVersionTooLowError=[name] requires Windows XP Service Pack 3 or newer to run.
 
 ;Swedish
-sv.WelcomeLabel2=Detta kommer att installera [name] pa din dator.%n%nDet rekommenderas att du stanger alla andra program innan du fortsatter.
-sv.WinVersionTooLowError=[name] kraver Windows XP Service Pack 3 eller senare.
+sv.WelcomeLabel2=Detta kommer att installera [name] pÃ¥ din dator.%n%nDet rekommenderas att du stÃ¤nger alla andra program innan du fortsÃ¤tter.
+sv.WinVersionTooLowError=[name] krÃ¤ver Windows XP Service Pack 3 eller senare.
 
 ;Slovakian
 sk.WelcomeLabel2=This will install [name] on your computer.%n%nIt is recommended that you close all other applications before continuing.
 sk.WinVersionTooLowError=[name] requires Windows XP Service Pack 3 or newer to run.
 
 ;Chinese Traditional
-tc.WelcomeLabel2=îÏíâüåäÌíû [name] î¤?îÜï³Òàñé¡£%n%nËïì¡?Î¼øÍá¶êóĞì?ëëéÄïïßíæÔı­î¢Í©áÙ¡£
-tc.WinVersionTooLowError=òûú¼ [name] âÍé© Windows XP Service Pack 3 ûäÌÚãæîÜ÷úÜâ¡£
+tc.WelcomeLabel2=é€™å°‡æœƒå®‰è£ [name] åœ¨ä½ çš„é›»è…¦ä¸­ã€‚%n%nå»ºè­°æ‚¨é—œé–‰æ‰€æœ‰å…¶å®ƒæ‡‰ç”¨ç¨‹åºç„¶å¾Œå†ç¹¼çºŒã€‚
+tc.WinVersionTooLowError=åŸ·è¡Œ [name] éœ€è¦ Windows XP Service Pack 3 æˆ–æ›´æ–°çš„ç‰ˆæœ¬ã€‚
 
 ;Turkish
-tr.WelcomeLabel2=[name] oynat©¥c©¥s©¥ bilgisayar©¥n©¥za kurulacakt©¥r.%n%nDevam etmeden once tum ac©¥k uygulamalar©¥ kapatman©¥z©¥ oneriyoruz.
-tr.WinVersionTooLowError=[name] oynat©¥c©¥s©¥ kurulumu, Windows XP Servis Paketi 3 veya daha yenisi ile cal©¥?abilir.
+tr.WelcomeLabel2=[name] oynatÄ±cÄ±sÄ± bilgisayarÄ±nÄ±za kurulacaktÄ±r.%n%nDevam etmeden Ã¶nce tÃ¼m aÃ§Ä±k uygulamalarÄ± kapatmanÄ±zÄ± Ã¶neriyoruz.
+tr.WinVersionTooLowError=[name] oynatÄ±cÄ±sÄ± kurulumu, Windows XP Servis Paketi 3 veya daha yenisi ile Ã§alÄ±ÅŸabilir.
 
 ;Ukrainian
-ua.WelcomeLabel2=¬¯¬Ñ ¬Ó¬Ñ¬ê ¬Ü¬à¬Ş¬á'¬ğ¬ä¬Ö¬â ¬Ò¬å¬Õ¬Ö ¬Ó¬ã¬ä¬Ñ¬ß¬à¬Ó¬İ¬Ö¬ß¬à [name].%n%n¬²¬Ö¬Ü¬à¬Ş¬Ö¬ß¬Õ¬å?¬ä¬î¬ã¬ñ ¬Ù¬Ñ¬Ó¬Ö¬â¬ê¬Ú¬ä¬Ú ¬â¬à¬Ò¬à¬ä¬å ?¬ß¬ê¬Ú¬ç ¬Õ¬à¬Õ¬Ñ¬ä¬Ü?¬Ó ¬á¬Ö¬â¬Ö¬Õ ¬á¬â¬à¬Õ¬à¬Ó¬Ø¬Ö¬ß¬ß¬ñ¬Ş.
-ua.WinVersionTooLowError=[name] ¬Ó¬Ú¬Ş¬Ñ¬Ô¬Ñ? ¬Ó¬Ú¬Ü¬à¬â¬Ú¬ã¬ä¬Ñ¬ß¬ß¬ñ ¬°¬³ Windows XP Service Pack 3 ¬Ñ¬Ò¬à ¬á?¬Ù¬ß?¬ê¬à? ¬Ó¬Ö¬â¬ã??.
+ua.WelcomeLabel2=ĞĞ° Ğ²Ğ°Ñˆ ĞºĞ¾Ğ¼Ğ¿'ÑÑ‚ĞµÑ€ Ğ±ÑƒĞ´Ğµ Ğ²ÑÑ‚Ğ°Ğ½Ğ¾Ğ²Ğ»ĞµĞ½Ğ¾ [name].%n%nĞ ĞµĞºĞ¾Ğ¼ĞµĞ½Ğ´ÑƒÑ”Ñ‚ÑŒÑÑ Ğ·Ğ°Ğ²ĞµÑ€ÑˆĞ¸Ñ‚Ğ¸ Ñ€Ğ¾Ğ±Ğ¾Ñ‚Ñƒ Ñ–Ğ½ÑˆĞ¸Ñ… Ğ´Ğ¾Ğ´Ğ°Ñ‚ĞºÑ–Ğ² Ğ¿ĞµÑ€ĞµĞ´ Ğ¿Ñ€Ğ¾Ğ´Ğ¾Ğ²Ğ¶ĞµĞ½Ğ½ÑĞ¼.
+ua.WinVersionTooLowError=[name] Ğ²Ğ¸Ğ¼Ğ°Ğ³Ğ°Ñ” Ğ²Ğ¸ĞºĞ¾Ñ€Ğ¸ÑÑ‚Ğ°Ğ½Ğ½Ñ ĞĞ¡ Windows XP Service Pack 3 Ğ°Ğ±Ğ¾ Ğ¿Ñ–Ğ·Ğ½Ñ–ÑˆĞ¾Ñ— Ğ²ĞµÑ€ÑÑ–Ñ—.
 
 #endif
 
@@ -172,24 +172,24 @@ en.AssociationMPCPlayVideoFilesS=Video Files
 
 ;Portuguese (Brasil)
 br.langid=00000017
-br.comp_mpciconlib=Biblioteca de icones
-br.comp_mpcresources=Traducoes
+br.comp_mpciconlib=Biblioteca de Ã­cones
+br.comp_mpcresources=TraduÃ§Ãµes
 br.comp_mpcbeshellext=Install the shell extension
-br.msg_DeleteSettings=Gostaria de excluir as configuracoes do MPC-BE?%n%nSe voce quiser instalar o MPC-BE novamente entao nao precisa exclui-las.
-br.msg_NoD3DX9DLL_found=A versao mais recente do DirectX nao esta instalada!%n%nPor favor baixe e instale a versao mais recente ({#DIRECTX_SDK_DATE}) adequado ao seu sistema operacional.
-br.msg_SetupIsRunningWarning=A instalacao do MPC-BE ja esta sendo executada!
+br.msg_DeleteSettings=Gostaria de excluir as configuraÃ§Ãµes do MPC-BE?%n%nSe vocÃª quiser instalar o MPC-BE novamente entÃ£o nÃ£o precisa excluÃ­-las.
+br.msg_NoD3DX9DLL_found=A versÃ£o mais recente do DirectX nÃ£o estÃ¡ instalada!%n%nPor favor baixe e instale a versÃ£o mais recente ({#DIRECTX_SDK_DATE}) adequado ao seu sistema operacional.
+br.msg_SetupIsRunningWarning=A instalaÃ§Ã£o do MPC-BE ja estÃ¡ sendo executada!
 #if defined(sse_required)
-br.msg_simd_sse=Esta versao do MPC-BE necessita uma CPU com suporte a extensoes SSE.%n%nSua CPU nao tem esse suporte.
+br.msg_simd_sse=Esta versÃ£o do MPC-BE necessita uma CPU com suporte a extensÃµes SSE.%n%nSua CPU nÃ£o tem esse suporte.
 #elif defined(sse2_required)
-br.msg_simd_sse2=Esta versao do MPC-BE necessita uma CPU com suporte a extensoes SSE2.%n%nSua CPU nao tem esse suporte.
+br.msg_simd_sse2=Esta versÃ£o do MPC-BE necessita uma CPU com suporte a extensÃµes SSE2.%n%nSua CPU nÃ£o tem esse suporte.
 #endif
-br.tsk_AllUsers=Para todos os usuarios
-br.tsk_CurrentUser=Para o usuario atual somente
+br.tsk_AllUsers=Para todos os usuÃ¡rios
+br.tsk_CurrentUser=Para o usuÃ¡rio atual somente
 br.tsk_Other=Outras tarefas:
-br.tsk_ResetSettings=Reiniciar as configuracoes
-br.types_DefaultInstallation=Instalacao padrao
-br.types_CustomInstallation=Instalacao personalizada
-br.ViewChangelog=Ver registro de alteracoes
+br.tsk_ResetSettings=Reiniciar as configuraÃ§Ãµes
+br.types_DefaultInstallation=InstalaÃ§Ã£o padrÃ£o
+br.types_CustomInstallation=InstalaÃ§Ã£o personalizada
+br.ViewChangelog=Ver registro de alteraÃ§Ãµes
 br.AssociationFormatsAV=Configuring associations with video and audio files:
 br.AssociationFormats=Association with video and audio files
 br.AssociationVideo=Association with video files
@@ -208,24 +208,24 @@ br.AssociationMPCPlayVideoFilesS=Video Files
 
 ;Belarusian
 by.langid=00000015
-by.comp_mpciconlib=¬¢?¬Ò¬İ?¬ñ¬ä¬ï¬Ü¬Ñ ¬Ù¬ß¬Ñ¬é¬Ü¬à?
-by.comp_mpcresources=¬±¬Ö¬â¬Ñ¬Ü¬İ¬Ñ¬Õ¬í
+by.comp_mpciconlib=Ğ‘Ñ–Ğ±Ğ»Ñ–ÑÑ‚ÑĞºĞ° Ğ·Ğ½Ğ°Ñ‡ĞºĞ¾Ñ
+by.comp_mpcresources=ĞŸĞµÑ€Ğ°ĞºĞ»Ğ°Ğ´Ñ‹
 by.comp_mpcbeshellext=Install the shell extension
-by.msg_DeleteSettings=¬¸? ¬ç¬à¬é¬Ñ¬è¬Ö ¬ä¬Ñ¬Ü¬ã¬Ñ¬Ş¬Ñ ¬Ó¬í¬Õ¬Ñ¬İ?¬è¬î ¬ß¬Ñ¬İ¬Ñ¬Õ¬í MPC-BE?%n%n¬¬¬Ñ¬İ? ¬Ó¬í ¬Ù¬Ò?¬â¬Ñ¬Ö¬è¬Ö¬ã¬ñ ¬Ù¬ß¬à? ¬å¬ã¬ä¬Ñ¬İ¬ñ¬Ó¬Ñ¬è¬î MPC-BE, ¬ä¬Ñ¬Õ¬í ?¬ç ¬Ş¬à¬Ø¬ß¬Ñ ¬á¬Ñ¬Ü?¬ß¬å¬è¬î.
-by.msg_NoD3DX9DLL_found=¬¯¬Ñ¬Û¬ß¬à?¬ê¬Ñ¬ñ ¬Ò?¬Ò¬İ?¬ñ¬ä¬ï¬Ü¬Ñ DirectX ¬ß¬Ö ?¬ã¬ä¬Ñ¬İ¬ñ¬Ó¬Ñ¬ß¬Ñ¬ñ!%n%n¬³¬è¬ñ¬Ô¬ß?¬è¬Ö ? ?¬ã¬ä¬Ñ¬İ¬ğ¬Û¬è¬Ö ¬ñ¬Ö (¬Ó¬Ö¬â¬ã?¬ñ {#DIRECTX_SDK_DATE}), ¬ß¬Ö¬Ù¬Ñ¬İ¬Ö¬Ø¬ß¬Ñ ¬Ñ¬Õ ¬ä¬Ñ¬Ô¬à, ¬ñ¬Ü¬Ñ¬ñ ? ¬Ó¬Ñ¬ã ¬Ñ¬á¬Ö¬â¬Ñ¬è¬í¬Û¬ß¬Ñ¬ñ ¬ã?¬ã¬ä¬ï¬Ş¬Ñ.
-by.msg_SetupIsRunningWarning=¬±¬â¬Ñ¬Ô¬â¬Ñ¬Ş¬Ñ ?¬ã¬ä¬Ñ¬İ¬ñ¬Ó¬Ñ¬ß¬ß¬ñ MPC-BE ¬å¬Ø¬à ¬á¬â¬Ñ¬è¬å¬Ö!
+by.msg_DeleteSettings=Ğ¦Ñ– Ñ…Ğ¾Ñ‡Ğ°Ñ†Ğµ Ñ‚Ğ°ĞºÑĞ°Ğ¼Ğ° Ğ²Ñ‹Ğ´Ğ°Ğ»Ñ–Ñ†ÑŒ Ğ½Ğ°Ğ»Ğ°Ğ´Ñ‹ MPC-BE?%n%nĞšĞ°Ğ»Ñ– Ğ²Ñ‹ Ğ·Ğ±Ñ–Ñ€Ğ°ĞµÑ†ĞµÑÑ Ğ·Ğ½Ğ¾Ñ ÑƒÑÑ‚Ğ°Ğ»ÑĞ²Ğ°Ñ†ÑŒ MPC-BE, Ñ‚Ğ°Ğ´Ñ‹ Ñ–Ñ… Ğ¼Ğ¾Ğ¶Ğ½Ğ° Ğ¿Ğ°ĞºÑ–Ğ½ÑƒÑ†ÑŒ.
+by.msg_NoD3DX9DLL_found=ĞĞ°Ğ¹Ğ½Ğ¾ÑÑˆĞ°Ñ Ğ±Ñ–Ğ±Ğ»Ñ–ÑÑ‚ÑĞºĞ° DirectX Ğ½Ğµ ÑÑÑ‚Ğ°Ğ»ÑĞ²Ğ°Ğ½Ğ°Ñ!%n%nĞ¡Ñ†ÑĞ³Ğ½Ñ–Ñ†Ğµ Ñ– ÑÑÑ‚Ğ°Ğ»ÑĞ¹Ñ†Ğµ ÑĞµ (Ğ²ĞµÑ€ÑÑ–Ñ {#DIRECTX_SDK_DATE}), Ğ½ĞµĞ·Ğ°Ğ»ĞµĞ¶Ğ½Ğ° Ğ°Ğ´ Ñ‚Ğ°Ğ³Ğ¾, ÑĞºĞ°Ñ Ñ Ğ²Ğ°Ñ Ğ°Ğ¿ĞµÑ€Ğ°Ñ†Ñ‹Ğ¹Ğ½Ğ°Ñ ÑÑ–ÑÑ‚ÑĞ¼Ğ°.
+by.msg_SetupIsRunningWarning=ĞŸÑ€Ğ°Ğ³Ñ€Ğ°Ğ¼Ğ° ÑÑÑ‚Ğ°Ğ»ÑĞ²Ğ°Ğ½Ğ½Ñ MPC-BE ÑƒĞ¶Ğ¾ Ğ¿Ñ€Ğ°Ñ†ÑƒĞµ!
 #if defined(sse_required)
-by.msg_simd_sse=¬¤¬ï¬ä¬Ñ¬ñ ¬Ò¬å¬Õ¬à¬Ó¬Ñ MPC-BE ¬Ó¬í¬Ş¬Ñ¬Ô¬Ñ¬Ö ¬á¬â¬Ñ¬è¬ï¬ã¬Ñ¬â, ¬Ù¬Õ¬à¬İ¬î¬ß¬í ¬Ó¬í¬Ü¬à¬ß¬Ó¬Ñ¬è¬î ?¬ß¬ã¬ä¬â¬å¬Ü¬è¬í? SSE.%n%n¬£¬Ñ¬ê ¬á¬â¬Ñ¬è¬ï¬ã¬Ñ¬â ¬Ô¬ï¬ä¬Ñ¬Ô¬Ñ ¬ß¬Ö ?¬Ş¬Ö¬Ö.
+by.msg_simd_sse=Ğ“ÑÑ‚Ğ°Ñ Ğ±ÑƒĞ´Ğ¾Ğ²Ğ° MPC-BE Ğ²Ñ‹Ğ¼Ğ°Ğ³Ğ°Ğµ Ğ¿Ñ€Ğ°Ñ†ÑÑĞ°Ñ€, Ğ·Ğ´Ğ¾Ğ»ÑŒĞ½Ñ‹ Ğ²Ñ‹ĞºĞ¾Ğ½Ğ²Ğ°Ñ†ÑŒ Ñ–Ğ½ÑÑ‚Ñ€ÑƒĞºÑ†Ñ‹Ñ– SSE.%n%nĞ’Ğ°Ñˆ Ğ¿Ñ€Ğ°Ñ†ÑÑĞ°Ñ€ Ğ³ÑÑ‚Ğ°Ğ³Ğ° Ğ½Ğµ ÑĞ¼ĞµĞµ.
 #elif defined(sse2_required)
-by.msg_simd_sse2=¬¤¬ï¬ä¬Ñ¬ñ ¬Ò¬å¬Õ¬à¬Ó¬Ñ MPC-BE ¬Ó¬í¬Ş¬Ñ¬Ô¬Ñ¬Ö ¬á¬â¬Ñ¬è¬ï¬ã¬Ñ¬â, ¬Ù¬Õ¬à¬İ¬î¬ß¬í ¬Ó¬í¬Ü¬à¬ß¬Ó¬Ñ¬è¬î ?¬ß¬ã¬ä¬â¬å¬Ü¬è¬í? SSE2.%n%n¬£¬Ñ¬ê ¬á¬â¬Ñ¬è¬ï¬ã¬Ñ¬â ¬Ô¬ï¬ä¬Ñ¬Ô¬Ñ ¬ß¬Ö ?¬Ş¬Ö¬Ö.
+by.msg_simd_sse2=Ğ“ÑÑ‚Ğ°Ñ Ğ±ÑƒĞ´Ğ¾Ğ²Ğ° MPC-BE Ğ²Ñ‹Ğ¼Ğ°Ğ³Ğ°Ğµ Ğ¿Ñ€Ğ°Ñ†ÑÑĞ°Ñ€, Ğ·Ğ´Ğ¾Ğ»ÑŒĞ½Ñ‹ Ğ²Ñ‹ĞºĞ¾Ğ½Ğ²Ğ°Ñ†ÑŒ Ñ–Ğ½ÑÑ‚Ñ€ÑƒĞºÑ†Ñ‹Ñ– SSE2.%n%nĞ’Ğ°Ñˆ Ğ¿Ñ€Ğ°Ñ†ÑÑĞ°Ñ€ Ğ³ÑÑ‚Ğ°Ğ³Ğ° Ğ½Ğµ ÑĞ¼ĞµĞµ.
 #endif
-by.tsk_AllUsers=¬¥¬İ¬ñ ?¬ã?¬ç ¬Ü¬Ñ¬â¬í¬ã¬ä¬Ñ¬İ¬î¬ß?¬Ü¬Ñ?
-by.tsk_CurrentUser=¬´¬à¬İ¬î¬Ü? ¬Õ¬İ¬ñ ¬Õ¬Ù¬Ö¬Û¬ß¬Ñ¬Ô¬Ñ ¬Ü¬Ñ¬â¬í¬ã¬ä¬Ñ¬İ¬î¬ß?¬Ü¬Ñ
-by.tsk_Other=?¬ß¬ê¬í¬ñ ¬Ù¬Ñ¬Õ¬Ñ¬ß¬ß?:
-by.tsk_ResetSettings=¬£¬ñ¬â¬ß¬å¬è¬î ¬ß¬Ñ¬İ¬Ñ¬Õ¬í
-by.types_DefaultInstallation=¬±¬Ö¬â¬Ñ¬Õ¬Ó¬í¬Ù¬ß¬Ñ¬é¬Ñ¬ß¬Ñ¬Ö ?¬ã¬ä¬Ñ¬İ¬ñ¬Ó¬Ñ¬ß¬ß¬Ö
-by.types_CustomInstallation=¬¡¬Õ¬Ş¬í¬ã¬İ¬à¬Ó¬Ñ¬Ö ?¬ã¬ä¬Ñ¬İ¬ñ¬Ó¬Ñ¬ß¬ß¬Ö
-by.ViewChangelog=¬³¬á?¬ã ¬Ù¬Ş¬Ö¬ß¬Ñ?
+by.tsk_AllUsers=Ğ”Ğ»Ñ ÑÑÑ–Ñ… ĞºĞ°Ñ€Ñ‹ÑÑ‚Ğ°Ğ»ÑŒĞ½Ñ–ĞºĞ°Ñ
+by.tsk_CurrentUser=Ğ¢Ğ¾Ğ»ÑŒĞºÑ– Ğ´Ğ»Ñ Ğ´Ğ·ĞµĞ¹Ğ½Ğ°Ğ³Ğ° ĞºĞ°Ñ€Ñ‹ÑÑ‚Ğ°Ğ»ÑŒĞ½Ñ–ĞºĞ°
+by.tsk_Other=Ğ†Ğ½ÑˆÑ‹Ñ Ğ·Ğ°Ğ´Ğ°Ğ½Ğ½Ñ–:
+by.tsk_ResetSettings=Ğ’ÑÑ€Ğ½ÑƒÑ†ÑŒ Ğ½Ğ°Ğ»Ğ°Ğ´Ñ‹
+by.types_DefaultInstallation=ĞŸĞµÑ€Ğ°Ğ´Ğ²Ñ‹Ğ·Ğ½Ğ°Ñ‡Ğ°Ğ½Ğ°Ğµ ÑÑÑ‚Ğ°Ğ»ÑĞ²Ğ°Ğ½Ğ½Ğµ
+by.types_CustomInstallation=ĞĞ´Ğ¼Ñ‹ÑĞ»Ğ¾Ğ²Ğ°Ğµ ÑÑÑ‚Ğ°Ğ»ÑĞ²Ğ°Ğ½Ğ½Ğµ
+by.ViewChangelog=Ğ¡Ğ¿Ñ–Ñ Ğ·Ğ¼ĞµĞ½Ğ°Ñ
 by.AssociationFormatsAV=Configuring associations with video and audio files:
 by.AssociationFormats=Association with video and audio files
 by.AssociationVideo=Association with video files
@@ -282,20 +282,20 @@ ca.langid=00000019
 ca.comp_mpciconlib=Llibreria d'icones
 ca.comp_mpcresources=Traduccions
 ca.comp_mpcbeshellext=Install the shell extension
-ca.msg_DeleteSettings=Vols eliminar les preferencies del MPC-BE?%n%nSi planeges instal.lar altre cop el MPC-BE no necessites eliminar-les.
-ca.msg_NoD3DX9DLL_found=No esta instal.lada la darrera versio de DirectX!%n%nSisplau instal.lar la darrera versio DirectX runtime ({#DIRECTX_SDK_DATE}) independentment del sistema operatiu.
-ca.msg_SetupIsRunningWarning=La instal.lacio del MPC-BE ja se esta executant!
+ca.msg_DeleteSettings=Vols eliminar les preferÃ¨ncies del MPC-BE?%n%nSi planeges instal.lar altre cop el MPC-BE no necessites eliminar-les.
+ca.msg_NoD3DX9DLL_found=No estÃ  instal.lada la darrera versiÃ³ de DirectX!%n%nSisplau instal.lar la darrera versiÃ³ DirectX runtime ({#DIRECTX_SDK_DATE}) independentment del sistema operatiu.
+ca.msg_SetupIsRunningWarning=La instal.laciÃ³ del MPC-BE ja se estÃ  executant!
 #if defined(sse_required)
-ca.msg_simd_sse=Aquesta versio de MPC-BE requereix una CPU amb suport d'extensions SSE.%n%nLa teva CPU no cumpleix aquestes caracteristiques.
+ca.msg_simd_sse=Aquesta versiÃ³ de MPC-BE requereix una CPU amb suport d'extensions SSE.%n%nLa teva CPU no cumpleix aquestes caracterÃ­stiques.
 #elif defined(sse2_required)
-ca.msg_simd_sse2=Aquesta versio de MPC-BE requereix una CPU amb suport d'extensions SSE2.%n%nLa teva CPU no cumpleix aquestes caracteristiques.
+ca.msg_simd_sse2=Aquesta versiÃ³ de MPC-BE requereix una CPU amb suport d'extensions SSE2.%n%nLa teva CPU no cumpleix aquestes caracterÃ­stiques.
 #endif
 ca.tsk_AllUsers=Per tots els usuaris
-ca.tsk_CurrentUser=Nomes per l'usuari actual
+ca.tsk_CurrentUser=NomÃ©s per l'usuari actual
 ca.tsk_Other=Altres tasques:
-ca.tsk_ResetSettings=Reiniciar preferencies
-ca.types_DefaultInstallation=Instal.lacio per defecte
-ca.types_CustomInstallation=Instal.lacio personalitzada
+ca.tsk_ResetSettings=Reiniciar preferÃ¨ncies
+ca.types_DefaultInstallation=Instal.laciÃ³ per defecte
+ca.types_CustomInstallation=Instal.laciÃ³ personalitzada
 ca.ViewChangelog=Veure registre de canvis
 ca.AssociationFormatsAV=Configuring associations with video and audio files:
 ca.AssociationFormats=Association with video and audio files
@@ -315,24 +315,24 @@ ca.AssociationMPCPlayVideoFilesS=Video Files
 
 ;Czech
 cz.langid=00000005
-cz.comp_mpciconlib=Ikony typ? soubor?
-cz.comp_mpcresources=Jazykove soubory
+cz.comp_mpciconlib=Ikony typÅ¯ souborÅ¯
+cz.comp_mpcresources=JazykovÃ© soubory
 cz.comp_mpcbeshellext=Install the shell extension
-cz.msg_DeleteSettings=Chcete smazat take nastaveni MPC-BE?%n%nPokud planujete MPC-BE znovu nainstalovat, mazat je nemusite.
-cz.msg_NoD3DX9DLL_found=Nainstalovana verze DirectX neni dostate?n? aktualni!%n%nStahn?te a nainstalujte nejnov?j?i aktualizaci DirectX ({#DIRECTX_SDK_DATE}).%n%nPozor, aktualizace je pro v?echny verze DirectX, nejen pro DirectX 9!
-cz.msg_SetupIsRunningWarning=Instalator MPC-BE je ji? spu?t?n!
+cz.msg_DeleteSettings=Chcete smazat takÃ© nastavenÃ­ MPC-BE?%n%nPokud plÃ¡nujete MPC-BE znovu nainstalovat, mazat je nemusÃ­te.
+cz.msg_NoD3DX9DLL_found=NainstalovanÃ¡ verze DirectX nenÃ­ dostateÄnÄ› aktuÃ¡lnÃ­!%n%nStÃ¡hnÄ›te a nainstalujte nejnovÄ›jÅ¡Ã­ aktualizaci DirectX ({#DIRECTX_SDK_DATE}).%n%nPozor, aktualizace je pro vÅ¡echny verze DirectX, nejen pro DirectX 9!
+cz.msg_SetupIsRunningWarning=InstalÃ¡tor MPC-BE je jiÅ¾ spuÅ¡tÄ›n!
 #if defined(sse_required)
-cz.msg_simd_sse=Toto sestaveni MPC-BE vy?aduje procesor s?podporou roz?i?eni SSE.%n%nVa? procesor tato roz?i?eni nepodporuje.
+cz.msg_simd_sse=Toto sestavenÃ­ MPC-BE vyÅ¾aduje procesor sÂ podporou rozÅ¡Ã­Å™enÃ­ SSE.%n%nVÃ¡Å¡ procesor tato rozÅ¡Ã­Å™enÃ­ nepodporuje.
 #elif defined(sse2_required)
-cz.msg_simd_sse2=Toto sestaveni MPC-BE vy?aduje procesor s?podporou roz?i?eni SSE2.%n%nVa? procesor tato roz?i?eni nepodporuje.
+cz.msg_simd_sse2=Toto sestavenÃ­ MPC-BE vyÅ¾aduje procesor sÂ podporou rozÅ¡Ã­Å™enÃ­ SSE2.%n%nVÃ¡Å¡ procesor tato rozÅ¡Ã­Å™enÃ­ nepodporuje.
 #endif
-cz.tsk_AllUsers=Pro v?echny u?ivatele
-cz.tsk_CurrentUser=Jen pro prav? p?ihla?eneho u?ivatele
-cz.tsk_Other=Ostatni ulohy:
-cz.tsk_ResetSettings=Obnovit vychozi nastaveni
-cz.types_DefaultInstallation=Standardni instalace
-cz.types_CustomInstallation=Volitelna instalace
-cz.ViewChangelog=Zobrazit seznam zm?n
+cz.tsk_AllUsers=Pro vÅ¡echny uÅ¾ivatele
+cz.tsk_CurrentUser=Jen pro prÃ¡vÄ› pÅ™ihlÃ¡Å¡enÃ©ho uÅ¾ivatele
+cz.tsk_Other=OstatnÃ­ Ãºlohy:
+cz.tsk_ResetSettings=Obnovit vÃ½chozÃ­ nastavenÃ­
+cz.types_DefaultInstallation=StandardnÃ­ instalace
+cz.types_CustomInstallation=VolitelnÃ¡ instalace
+cz.ViewChangelog=Zobrazit seznam zmÄ›n
 cz.AssociationFormatsAV=Configuring associations with video and audio files:
 cz.AssociationFormats=Association with video and audio files
 cz.AssociationVideo=Association with video files
@@ -351,24 +351,24 @@ cz.AssociationMPCPlayVideoFilesS=Video Files
 
 ;German
 de.langid=00000002
-de.comp_mpciconlib=Symbole fur Mediendateien
-de.comp_mpcresources=Ubersetzungen
+de.comp_mpciconlib=Symbole fÃ¼r Mediendateien
+de.comp_mpcresources=Ãœbersetzungen
 de.comp_mpcbeshellext=Install the shell extension
-de.msg_DeleteSettings=Wollen Sie auch die Einstellungen des MPC-BE loschen?%n%nWenn Sie den MPC-BE wieder installieren wollen, dann mussen Sie diese nicht unbedingt loschen.
-de.msg_NoD3DX9DLL_found=Die neueste DirectX-Runtime ist nicht installiert!%n%nBitte laden und installieren Sie die neueste DirectX-Runtime ({#DIRECTX_SDK_DATE}) unabhangig von Ihrem Betriebssystem.
-de.msg_SetupIsRunningWarning=MPC-BE Setup wird bereits ausgefuhrt!
+de.msg_DeleteSettings=Wollen Sie auch die Einstellungen des MPC-BE lÃ¶schen?%n%nWenn Sie den MPC-BE wieder installieren wollen, dann mÃ¼ssen Sie diese nicht unbedingt lÃ¶schen.
+de.msg_NoD3DX9DLL_found=Die neueste DirectX-Runtime ist nicht installiert!%n%nBitte laden und installieren Sie die neueste DirectX-Runtime ({#DIRECTX_SDK_DATE}) unabhÃ¤ngig von Ihrem Betriebssystem.
+de.msg_SetupIsRunningWarning=MPC-BE Setup wird bereits ausgefÃ¼hrt!
 #if defined(sse_required)
-de.msg_simd_sse=Dieses MPC-BE-Build benotigt einen Prozessor mit SSE-Unterstutzung.%n%nIhr Prozessor besitzt nicht diese Eigenschaft.
+de.msg_simd_sse=Dieses MPC-BE-Build benÃ¶tigt einen Prozessor mit SSE-UnterstÃ¼tzung.%n%nIhr Prozessor besitzt nicht diese Eigenschaft.
 #elif defined(sse2_required)
-de.msg_simd_sse2=Dieses MPC-BE-Build benotigt einen Prozessor mit SSE2-Unterstutzung.%n%nIhr Prozessor besitzt nicht diese Eigenschaft.
+de.msg_simd_sse2=Dieses MPC-BE-Build benÃ¶tigt einen Prozessor mit SSE2-UnterstÃ¼tzung.%n%nIhr Prozessor besitzt nicht diese Eigenschaft.
 #endif
-de.tsk_AllUsers=Fur alle Benutzer
-de.tsk_CurrentUser=Fur aktuellen Benutzer
+de.tsk_AllUsers=FÃ¼r alle Benutzer
+de.tsk_CurrentUser=FÃ¼r aktuellen Benutzer
 de.tsk_Other=Andere Aufgaben:
-de.tsk_ResetSettings=Einstellungen zurucksetzen
+de.tsk_ResetSettings=Einstellungen zurÃ¼cksetzen
 de.types_DefaultInstallation=Standard Installation
 de.types_CustomInstallation=Benutzerdefinierte Installation
-de.ViewChangelog=Zeige Anderungsprotokoll
+de.ViewChangelog=Zeige Ã„nderungsprotokoll
 de.AssociationFormatsAV=Configuring associations with video and audio files:
 de.AssociationFormats=Association with video and audio files
 de.AssociationVideo=Association with video files
@@ -387,23 +387,23 @@ de.AssociationMPCPlayVideoFilesS=Video Files
 
 ;Spanish
 es.langid=00000006
-es.comp_mpciconlib=Libreria de iconos
+es.comp_mpciconlib=LibrerÃ­a de iconos
 es.comp_mpcresources=Traducciones
 es.comp_mpcbeshellext=Install the shell extension
-es.msg_DeleteSettings=¢¯Quiere eliminar tambien las preferencias de MPC-BE?%n%nSi planea instalar de nuevo MPC-BE no necesita eliminarlas.
-es.msg_NoD3DX9DLL_found=¢®No esta instalada la ultima version de DirectX!%n%nPor favor descargue e instale DirectX runtime ({#DIRECTX_SDK_DATE}) independientemente de su sistema operativo.
-es.msg_SetupIsRunningWarning=La instalacion de MPC-BE ya se esta ejecutando!
+es.msg_DeleteSettings=Â¿Quiere eliminar tambiÃ©n las preferencias de MPC-BE?%n%nSi planea instalar de nuevo MPC-BE no necesita eliminarlas.
+es.msg_NoD3DX9DLL_found=Â¡No estÃ¡ instalada la Ãºltima versiÃ³n de DirectX!%n%nPor favor descargue e instale DirectX runtime ({#DIRECTX_SDK_DATE}) independientemente de su sistema operativo.
+es.msg_SetupIsRunningWarning=La instalaciÃ³n de MPC-BE ya se esta ejecutando!
 #if defined(sse_required)
-es.msg_simd_sse=Esta version de MPC-BE requiere una CPU con soporte de extensiones SSE.%n%nSu CPU carece de esta caracteristica.
+es.msg_simd_sse=Esta versiÃ³n de MPC-BE requiere una CPU con soporte de extensiones SSE.%n%nSu CPU carece de esta caracterÃ­stica.
 #elif defined(sse2_required)
-es.msg_simd_sse2=Esta version de MPC-BE requiere una CPU con soporte de extensiones SSE2.%n%nSu CPU carece de esta caracteristica.
+es.msg_simd_sse2=Esta versiÃ³n de MPC-BE requiere una CPU con soporte de extensiones SSE2.%n%nSu CPU carece de esta caracterÃ­stica.
 #endif
 es.tsk_AllUsers=Para todos los usuarios
 es.tsk_CurrentUser=Para el usuario actual solamente
 es.tsk_Other=Otras tareas:
 es.tsk_ResetSettings=Restaurar preferencias
-es.types_DefaultInstallation=Instalacion por defecto
-es.types_CustomInstallation=Instalacion personalizada
+es.types_DefaultInstallation=InstalaciÃ³n por defecto
+es.types_CustomInstallation=InstalaciÃ³n personalizada
 es.ViewChangelog=Ver registro de cambios
 es.AssociationFormatsAV=Configuring associations with video and audio files:
 es.AssociationFormats=Association with video and audio files
@@ -423,23 +423,23 @@ es.AssociationMPCPlayVideoFilesS=Video Files
 
 ;French
 fr.langid=00000001
-fr.comp_mpciconlib=Bibliotheque d'icone
+fr.comp_mpciconlib=BibliothÃ¨que d'icÃ´ne
 fr.comp_mpcresources=Traductions
 fr.comp_mpcbeshellext=Install the shell extension
-fr.msg_DeleteSettings=Souhaitez-vous supprimer egalement les parametres de MPC-BE?%n%nSi vous reinstallez MPC-BE, il est conseille de ne pas les supprimer.
-fr.msg_NoD3DX9DLL_found=La derniere version des composants d'execution DirectX n'est pas installee !%n%nCelle-ci est necessaire quelque soit votre systeme d'exploitation, veuillez la telecharger et l'installer ({#DIRECTX_SDK_DATE}).
-fr.msg_SetupIsRunningWarning=L'installation de MPC-BE est deja en cours d'execution!
+fr.msg_DeleteSettings=Souhaitez-vous supprimer Ã©galement les paramÃ¨tres de MPC-BE?%n%nSi vous rÃ©installez MPC-BE, il est conseillÃ© de ne pas les supprimer.
+fr.msg_NoD3DX9DLL_found=La derniÃ¨re version des composants d'exÃ©cution DirectX n'est pas installÃ©e !%n%nCelle-ci est nÃ©cessaire quelque soit votre systÃ¨me d'exploitation, veuillez la tÃ©lÃ©charger et l'installer ({#DIRECTX_SDK_DATE}).
+fr.msg_SetupIsRunningWarning=L'installation de MPC-BE est dÃ©jÃ  en cours d'exÃ©cution!
 #if defined(sse_required)
-fr.msg_simd_sse=Cette version de MPC-BE necessite un CPU avec support des instructions SSE.%n%nVotre CPU n'a pas cette capacite.
+fr.msg_simd_sse=Cette version de MPC-BE nÃ©cessite un CPU avec support des instructions SSE.%n%nVotre CPU n'a pas cette capacitÃ©.
 #elif defined(sse2_required)
-fr.msg_simd_sse2=Cette version de MPC-BE necessite un CPU avec support des instructions SSE2.%n%nVotre CPU n'a pas cette capacite.
+fr.msg_simd_sse2=Cette version de MPC-BE nÃ©cessite un CPU avec support des instructions SSE2.%n%nVotre CPU n'a pas cette capacitÃ©.
 #endif
 fr.tsk_AllUsers=Pour tous les utilisateurs
 fr.tsk_CurrentUser=Pour l'utilisateur courant seulement
-fr.tsk_Other=Autres taches:
-fr.tsk_ResetSettings=Reinitialisation des parametres
-fr.types_DefaultInstallation=Installation par defaut
-fr.types_CustomInstallation=Installation personnalisee
+fr.tsk_Other=Autres tÃ¢ches:
+fr.tsk_ResetSettings=RÃ©initialisation des paramÃ¨tres
+fr.types_DefaultInstallation=Installation par dÃ©faut
+fr.types_CustomInstallation=Installation personnalisÃ©e
 fr.ViewChangelog=Voir la liste des changements
 fr.AssociationFormatsAV=Configuring associations with video and audio files:
 fr.AssociationFormats=Association with video and audio files
@@ -459,24 +459,24 @@ fr.AssociationMPCPlayVideoFilesS=Video Files
 
 ;Hebrew
 he.langid=00000022
-he.comp_mpciconlib=?????? ????????
-he.comp_mpcresources=???????
+he.comp_mpciconlib=×¡×¤×¨×™×™×ª ××™×™×§×•× ×™×
+he.comp_mpcresources=×ª×¨×’×•××™×
 he.comp_mpcbeshellext=Install the shell extension
-he.msg_DeleteSettings=??? ?????? ?? ????? ?? ??????? ?? MPC-BE?%n%n?? ??? ????? ?????? ?? MPC-BE ?????, ???? ???? ??????.
-he.msg_NoD3DX9DLL_found=????? ????? ?? ?-DirectX ??? ??? ???? ??????.%n%n??? ???? ????? ?? ????? ????? ??? ???? ({#DIRECTX_SDK_DATE}) ??? ??? ?????? ?????? ???????.
-he.msg_SetupIsRunningWarning=?????? ?? MPC-BE ??? ???!
+he.msg_DeleteSettings=×”×× ×‘×¨×¦×•× ×š ×’× ×œ××—×•×§ ××ª ×”×”×’×“×¨×•×ª ×©×œ MPC-BE?%n%n×× ××ª×” ××ª×›× ×Ÿ ×œ×”×ª×§×™×Ÿ ××ª MPC-BE ×‘×©× ×™×ª, ××™× ×š ×—×™×™×‘ ×œ×”×¡×™×¨×Ÿ.
+he.msg_NoD3DX9DLL_found=×¡×‘×™×‘×ª ×”×¨×™×¦×” ×©×œ ×”-DirectX ×”×›×™ ×—×“×© ××™× ×” ××•×ª×§× ×ª.%n%n×× × ×”×•×¨×“ ×•×”×ª×§×Ÿ ××ª ×¡×‘×™×‘×ª ×”×¨×™×¦×” ×”×›×™ ×—×“×©×” ({#DIRECTX_SDK_DATE}) ×‘×œ×™ ×§×©×¨ ×œ××¢×¨×›×ª ×”×”×¤×¢×œ×” ×©×‘×¨×©×•×ª×š.
+he.msg_SetupIsRunningWarning=×”×”×ª×§× ×” ×©×œ MPC-BE ×›×‘×¨ ×¨×¦×”!
 #if defined(sse_required)
-he.msg_simd_sse=???? ?? ?? MPC-BE ????? ???? ?? ????? ?????? SSE.%n%n????? ??????? ???? ???? ???.
+he.msg_simd_sse=×’×¨×¡×” ×–×• ×©×œ MPC-BE ×“×•×¨×©×ª ××¢×‘×“ ×¢× ×ª××™×›×” ×‘×”×¨×—×‘×ª SSE.%n%n×”××¢×‘×“ ×©×‘×¨×©×•×ª×š ××™× ×• ×ª×•××š ×‘×›×š.
 #elif defined(sse2_required)
-he.msg_simd_sse2=???? ?? ?? MPC-BE ????? ???? ?? ????? ?????? SSE2.%n%n????? ??????? ???? ???? ???.
+he.msg_simd_sse2=×’×¨×¡×” ×–×• ×©×œ MPC-BE ×“×•×¨×©×ª ××¢×‘×“ ×¢× ×ª××™×›×” ×‘×”×¨×—×‘×ª SSE2.%n%n×”××¢×‘×“ ×©×‘×¨×©×•×ª×š ××™× ×• ×ª×•××š ×‘×›×š.
 #endif
-he.tsk_AllUsers=???? ?? ????????
-he.tsk_CurrentUser=???? ?????? ?????? ????
-he.tsk_Other=?????? ?????:
-he.tsk_ResetSettings=??? ??????
-he.types_DefaultInstallation=????? ????? ????
-he.types_CustomInstallation=????? ?????? ?????
-he.ViewChangelog=??? ????? ???????
+he.tsk_AllUsers=×¢×‘×•×¨ ×›×œ ×”××©×ª××©×™×
+he.tsk_CurrentUser=×¢×‘×•×¨ ×”××©×ª××© ×”× ×•×›×—×™ ×‘×œ×‘×“
+he.tsk_Other=×¤×¢×•×œ×•×ª ××—×¨×•×ª:
+he.tsk_ResetSettings=××¤×¡ ×”×’×“×¨×•×ª
+he.types_DefaultInstallation=×”×ª×§× ×ª ×‘×¨×™×¨×ª ××—×“×œ
+he.types_CustomInstallation=×”×ª×§× ×” ××•×ª×××ª ××™×©×™×ª
+he.ViewChangelog=×”×¦×’ ×¨×©×™××ª ×¢×“×›×•× ×™×
 he.AssociationFormatsAV=Configuring associations with video and audio files:
 he.AssociationFormats=Association with video and audio files
 he.AssociationVideo=Association with video files
@@ -495,24 +495,24 @@ he.AssociationMPCPlayVideoFilesS=Video Files
 
 ;Hungarian
 hu.langid=00000007
-hu.comp_mpciconlib=Ikon Gy?jtemeny
-hu.comp_mpcresources=Forditasok
+hu.comp_mpciconlib=Ikon GyÅ±jtemÃ©ny
+hu.comp_mpcresources=FordÃ­tÃ¡sok
 hu.comp_mpcbeshellext=Install the shell extension
-hu.msg_DeleteSettings=Az MPC-BE beallitasokat is torolni szeretne?%n%nHa azt tervezi, hogy ujratelepiti az MPC-BE-t, akkor nem kell torolnie ?ket.
-hu.msg_NoD3DX9DLL_found=A legujabb DirectX nincs telepitve!%n%nKerjuk toltse le es telepitse a legujabb DirectX runtime ({#DIRECTX_SDK_DATE}) verziot fuggetlenul az operacios rendszeret?l.
-hu.msg_SetupIsRunningWarning=Az MPC-BE telepit? mar fut!
+hu.msg_DeleteSettings=Az MPC-BE beÃ¡llÃ­tÃ¡sokat is tÃ¶rÃ¶lni szeretnÃ©?%n%nHa azt tervezi, hogy ÃºjratelepÃ­ti az MPC-BE-t, akkor nem kell tÃ¶rÃ¶lnie Å‘ket.
+hu.msg_NoD3DX9DLL_found=A legÃºjabb DirectX nincs telepÃ­tve!%n%nKÃ©rjÃ¼k tÃ¶ltse le Ã©s telepÃ­tse a legÃºjabb DirectX runtime ({#DIRECTX_SDK_DATE}) verziÃ³t fÃ¼ggetlenÃ¼l az operÃ¡ciÃ³s rendszerÃ©tÅ‘l.
+hu.msg_SetupIsRunningWarning=Az MPC-BE telepÃ­tÅ‘ mÃ¡r fut!
 #if defined(sse_required)
-hu.msg_simd_sse=Az MPC-BE jelen valtozatahoz SSE tamogatassal biro CPU-ra van szuksege.%n%nAz on CPU-ja nem rendelkezik ilyen tamogatassal.
+hu.msg_simd_sse=Az MPC-BE jelen vÃ¡ltozatÃ¡hoz SSE tÃ¡mogatÃ¡ssal bÃ­rÃ³ CPU-ra van szÃ¼ksÃ©ge.%n%nAz Ã¶n CPU-ja nem rendelkezik ilyen tÃ¡mogatÃ¡ssal.
 #elif defined(sse2_required)
-hu.msg_simd_sse2=Az MPC-BE jelen valtozatahoz SSE2 tamogatassal biro CPU-ra van szuksege.%n%nAz on CPU-ja nem rendelkezik ilyen tamogatassal.
+hu.msg_simd_sse2=Az MPC-BE jelen vÃ¡ltozatÃ¡hoz SSE2 tÃ¡mogatÃ¡ssal bÃ­rÃ³ CPU-ra van szÃ¼ksÃ©ge.%n%nAz Ã¶n CPU-ja nem rendelkezik ilyen tÃ¡mogatÃ¡ssal.
 #endif
-hu.tsk_AllUsers=Minden felhasznalonak
-hu.tsk_CurrentUser=Csak a jelenlegi felhasznalonak
-hu.tsk_Other=Egyeb feladatok:
-hu.tsk_ResetSettings=Beallitasok alaphelyzetbe allitasa
-hu.types_DefaultInstallation=Szokasos telepites
-hu.types_CustomInstallation=Egyedi telepites
-hu.ViewChangelog=Verziotortenet megtekintese
+hu.tsk_AllUsers=Minden felhasznÃ¡lÃ³nak
+hu.tsk_CurrentUser=Csak a jelenlegi felhasznÃ¡lÃ³nak
+hu.tsk_Other=EgyÃ©b feladatok:
+hu.tsk_ResetSettings=BeÃ¡llÃ­tÃ¡sok alaphelyzetbe Ã¡llÃ­tÃ¡sa
+hu.types_DefaultInstallation=SzokÃ¡sos telepÃ­tÃ©s
+hu.types_CustomInstallation=Egyedi telepÃ­tÃ©s
+hu.ViewChangelog=VerziÃ³tÃ¶rtÃ©net megtekintÃ©se
 hu.AssociationFormatsAV=Configuring associations with video and audio files:
 hu.AssociationFormats=Association with video and audio files
 hu.AssociationVideo=Association with video files
@@ -531,24 +531,24 @@ hu.AssociationMPCPlayVideoFilesS=Video Files
 
 ;Armenian
 hy.langid=00000021
-hy.comp_mpciconlib=?????????? ????????
-hy.comp_mpcresources=?????????????????
+hy.comp_mpciconlib=ÕŠÕ¡Õ¿Õ¯Õ¥Ö€Õ¶Õ¥Ö€Õ« Õ£Ö€Õ¡Õ¤Õ¡Ö€Õ¡Õ¶
+hy.comp_mpcresources=Ô¹Õ¡Ö€Õ£Õ´Õ¡Õ¶Õ¸Ö‚Õ©ÕµÕ¸Ö‚Õ¶Õ¶Õ¥Ö€
 hy.comp_mpcbeshellext=Install the shell extension
-hy.msg_DeleteSettings=?????? MPC-BE-? ????????????????%n%n??? ?????????? ?? ????????????? MPC-BE, ??? ???? ? ?? ????? ??????.
-hy.msg_NoD3DX9DLL_found=?????? DirectX-? ?????????? ??!%n%n??????? ??? ????????? ?????? DirectX-?({#DIRECTX_SDK_DATE})?
-hy.msg_SetupIsRunningWarning=MPC-BE-? ?????????? ????? ?????? ?!
+hy.msg_DeleteSettings=Õ‹Õ¶Õ»Õ¥ÕÕ¬ MPC-BE-Õ« Õ¯Õ¡Ö€Õ£Õ¡Õ¾Õ¸Ö€Õ¸Ö‚Õ´Õ¶Õ¥Ö€Õ¨Ö‰%n%nÔµÕ©Õ¥ Õ¶Õ¡Õ­Õ¡Õ¿Õ¥Õ½Õ¸Ö‚Õ´ Õ¥Ö„ Õ¾Õ¥Ö€Õ¡Õ¿Õ¥Õ²Õ¡Õ¯Õ¡ÕµÕ¥Õ¬ MPC-BE, Õ¡ÕºÕ¡ ÕºÕ¥Õ¿Ö„ Õ§ Õ¹Õ§ Õ¤Ö€Õ¡Õ¶Ö„ Õ»Õ¶Õ»Õ¥Õ¬Ö‰.
+hy.msg_NoD3DX9DLL_found=ÕÕ¥Ö€Õ»Õ«Õ¶ DirectX-Õ¨ Õ¿Õ¥Õ²Õ¡Õ¯Õ¡ÕµÕ¾Õ¡Õ® Õ¹Õ§!%n%nÔ½Õ¶Õ¤Ö€Õ¸Ö‚Õ´ Õ¥Õ¶Ö„ Õ¿Õ¥Õ²Õ¡Õ¯Õ¡ÕµÕ¥Õ¬ Õ¾Õ¥Ö€Õ»Õ«Õ¶ DirectX-Õ¨({#DIRECTX_SDK_DATE})Ö‰
+hy.msg_SetupIsRunningWarning=MPC-BE-Õ« Õ¿Õ¥Õ²Õ¡Õ¯Õ¡ÕµÕ«Õ¹Õ¨ Õ¡Ö€Õ¤Õ¥Õ¶ Õ¢Õ¡ÖÕ¾Õ¡Õ® Õ§!
 #if defined(sse_required)
-hy.msg_simd_sse=MPC-BE-? ??? ????????? ????????? ? CPU? SSE-? ??????????%n%n??? CPU-? ??? ?? ?????????
+hy.msg_simd_sse=MPC-BE-Õ« Õ¡ÕµÕ½ Õ¿Õ¡Ö€Õ¢Õ¥Ö€Õ¡Õ¯Õ¨ ÕºÕ¡Õ°Õ¡Õ¶Õ»Õ¸Ö‚Õ´ Õ§ CPUÕ SSE-Õ« Õ¡Õ»Õ¡Õ¯ÖÕ´Õ¡Õ´Õ¢Ö‰%n%nÕÕ¥Ö€ CPU-Õ¶ Õ¡ÕµÕ¶ Õ¹Õ« Õ¡Õ»Õ¡Õ¯ÖÕ¸Ö‚Õ´Ö‰
 #elif defined(sse2_required)
-hy.msg_simd_sse2=MPC-BE-? ??? ????????? ????????? ? CPU? SSE2-? ??????????%n%n??? CPU-? ??? ?? ?????????
+hy.msg_simd_sse2=MPC-BE-Õ« Õ¡ÕµÕ½ Õ¿Õ¡Ö€Õ¢Õ¥Ö€Õ¡Õ¯Õ¨ ÕºÕ¡Õ°Õ¡Õ¶Õ»Õ¸Ö‚Õ´ Õ§ CPUÕ SSE2-Õ« Õ¡Õ»Õ¡Õ¯ÖÕ´Õ¡Õ´Õ¢Ö‰%n%nÕÕ¥Ö€ CPU-Õ¶ Õ¡ÕµÕ¶ Õ¹Õ« Õ¡Õ»Õ¡Õ¯ÖÕ¸Ö‚Õ´Ö‰
 #endif
-hy.tsk_AllUsers=??? ?????????? ????? ?????????????? ?????
-hy.tsk_CurrentUser=????? ??? ?????
-hy.tsk_Other=?????????.
-hy.tsk_ResetSettings=??????? ???????????????
-hy.types_DefaultInstallation=????????? ??? ??????????
-hy.types_CustomInstallation=??????? ??????????
-hy.ViewChangelog=????? ???????????????? ?????
+hy.tsk_AllUsers=Ô±ÕµÕ½ Õ°Õ¡Õ´Õ¡Õ¯Õ¡Ö€Õ£Õ¹Õ« Õ¢Õ¸Õ¬Õ¸Ö€ Ö…Õ£Õ¿Õ¡Õ£Õ¸Ö€Õ®Õ¸Õ²Õ¶Õ¥Ö€Õ« Õ°Õ¡Õ´Õ¡Ö€
+hy.tsk_CurrentUser=Õ„Õ«Õ¡ÕµÕ¶ ÕÕ¥Ö€ Õ°Õ¡Õ´Õ¡Ö€
+hy.tsk_Other=Ô¼Ö€Õ¡ÖÕ¸Ö‚ÖÕ«Õ¹.
+hy.tsk_ResetSettings=ÔµÕ¿Õ¡Ö€Õ¯Õ¥Õ¬ Õ¯Õ¡Ö€Õ£Õ¡Õ¾Õ¸Ö€Õ¸Ö‚Õ´Õ¶Õ¥Ö€Õ¨
+hy.types_DefaultInstallation=ÕÕ¥Õ²Õ¡Õ¯Õ¡ÕµÕ¥Õ¬ Õ¨Õ½Õ¿ Õ®Ö€Õ¡Õ£Ö€Õ¡ÕµÕ«Õ¶Õ«
+hy.types_CustomInstallation=Ô¸Õ¶Õ¿Ö€Õ¸Õ¾Õ« Õ¿Õ¥Õ²Õ¡Õ¯Õ¡ÕµÕ¸Ö‚Õ´
+hy.ViewChangelog=Õ†Õ¡ÕµÕ¥Õ¬ ÖƒÕ¸ÖƒÕ¸Õ­Õ¸Ö‚Õ©ÕµÕ¸Ö‚Õ¶Õ¶Õ¥Ö€Õ« ÖÕ¡Õ¶Õ¯Õ¨
 hy.AssociationFormatsAV=Configuring associations with video and audio files:
 hy.AssociationFormats=Association with video and audio files
 hy.AssociationVideo=Association with video files
@@ -571,8 +571,8 @@ it.comp_mpciconlib=Libreria icone
 it.comp_mpcresources=Traduzioni
 it.comp_mpcbeshellext=Install the shell extension
 it.msg_DeleteSettings=Vou eliminare anche le impostazioni di MPC-BE?%n%nSe pensi di reinstallare MPC-BE in seguito non dovresti eliminarle.
-it.msg_NoD3DX9DLL_found=La libreria di runtime DirectX piu recente non e installata!%n%nScarica e installa la libreria di runtime DirectX piu recente ({#DIRECTX_SDK_DATE}) indipendentemente dal tuo sistema operativo.
-it.msg_SetupIsRunningWarning=L'installazione di MPC-BE e gia in corso!
+it.msg_NoD3DX9DLL_found=La libreria di runtime DirectX piÃ¹ recente non Ã¨ installata!%n%nScarica e installa la libreria di runtime DirectX piÃ¹ recente ({#DIRECTX_SDK_DATE}) indipendentemente dal tuo sistema operativo.
+it.msg_SetupIsRunningWarning=L'installazione di MPC-BE Ã¨ giÃ  in corso!
 #if defined(sse_required)
 it.msg_simd_sse=Questa build di MPC-BE richiede una CPU con il supporto alle estensioni SSE.%n%nLa tua CPU non dispone di questa caratteristica.
 #elif defined(sse2_required)
@@ -598,24 +598,24 @@ it.AssociationMPCPlayVideoFilesS=Video Files
 
 ;Japanese
 ja.langid=00000020
-ja.comp_mpciconlib=«¢«¤«³«ó «é«¤«Ö«é«ê?
-ja.comp_mpcresources=??
+ja.comp_mpciconlib=ã‚¢ã‚¤ã‚³ãƒ³ ãƒ©ã‚¤ãƒ–ãƒ©ãƒªãƒ¼
+ja.comp_mpcresources=ç¿»è¨³
 ja.comp_mpcbeshellext=Install the shell extension
-ja.msg_DeleteSettings=MPC-BE ªÎàâïÒªòŞûğ¶ª·ªÆªâªèªíª·ª¤ªÇª¹ª«£¿%n%nMPC-BE ªòî¢Óø«¤«ó«¹«È?«ëª¹ªëíŞùêªÏ¡¢àâïÒªòŞûğ¶ª¹ªëù±é©ªÏª¢ªêªŞª»ªó¡£
-ja.msg_NoD3DX9DLL_found=õÌãæªÎ DirectX «é«ó«¿«¤«àªÏ«¤«ó«¹«È?«ëªµªìªŞª»ªó£¡%n%n«ª«Ú«ì?«Æ«£«ó«°«·«¹«Æ«àªËª«ª«ªïªéªºõÌãæªÎ DirectX «é«ó«¿«¤«à ({#DIRECTX_SDK_DATE}) ªò«À«¦«ó«í?«Éª·ªÆ¡¢«¤«ó«¹«È?«ëª·ªÆª¯ªÀªµª¤¡£
-ja.msg_SetupIsRunningWarning=MPC-BE ªÎ«¤«ó«¹«È?«é?ªÏ?ªË?ú¼ªµªìªÆª¤ªŞª¹£¡
+ja.msg_DeleteSettings=MPC-BE ã®è¨­å®šã‚’å‰Šé™¤ã—ã¦ã‚‚ã‚ˆã‚ã—ã„ã§ã™ã‹ï¼Ÿ%n%nMPC-BE ã‚’å†åº¦ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã™ã‚‹å ´åˆã¯ã€è¨­å®šã‚’å‰Šé™¤ã™ã‚‹å¿…è¦ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚
+ja.msg_NoD3DX9DLL_found=æœ€æ–°ã® DirectX ãƒ©ãƒ³ã‚¿ã‚¤ãƒ ã¯ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã•ã‚Œã¾ã›ã‚“ï¼%n%nã‚ªãƒšãƒ¬ãƒ¼ãƒ†ã‚£ãƒ³ã‚°ã‚·ã‚¹ãƒ†ãƒ ã«ã‹ã‹ã‚ã‚‰ãšæœ€æ–°ã® DirectX ãƒ©ãƒ³ã‚¿ã‚¤ãƒ  ({#DIRECTX_SDK_DATE}) ã‚’ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã—ã¦ã€ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã—ã¦ãã ã•ã„ã€‚
+ja.msg_SetupIsRunningWarning=MPC-BE ã®ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ©ãƒ¼ã¯æ—¢ã«å®Ÿè¡Œã•ã‚Œã¦ã„ã¾ã™ï¼
 #if defined(sse_required)
-ja.msg_simd_sse=ª³ªÎ«Ğ?«¸«ç«óªÎ MPC-BE ªÏ CPU ªÎ SSE «µ«İ?«Èª¬ù±é©ªÇª¹¡£%n%nªªŞÅª¤ªÎ CPU ªÏª³ªÎ?Ëìªò?ª¿ª·ªŞª»ªó¡£
+ja.msg_simd_sse=ã“ã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã® MPC-BE ã¯ CPU ã® SSE ã‚µãƒãƒ¼ãƒˆãŒå¿…è¦ã§ã™ã€‚%n%nãŠä½¿ã„ã® CPU ã¯ã“ã®æ¡ä»¶ã‚’æº€ãŸã—ã¾ã›ã‚“ã€‚
 #elif defined(sse2_required)
-ja.msg_simd_sse2=ª³ªÎ«Ğ?«¸«ç«óªÎ MPC-BE ªÏ CPU ªÎ SSE2 «µ«İ?«Èª¬ù±é©ªÇª¹¡£%n%nªªŞÅª¤ªÎ CPU ªÏª³ªÎ?Ëìªò?ª¿ª·ªŞª»ªó¡£
+ja.msg_simd_sse2=ã“ã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã® MPC-BE ã¯ CPU ã® SSE2 ã‚µãƒãƒ¼ãƒˆãŒå¿…è¦ã§ã™ã€‚%n%nãŠä½¿ã„ã® CPU ã¯ã“ã®æ¡ä»¶ã‚’æº€ãŸã—ã¾ã›ã‚“ã€‚
 #endif
-ja.tsk_AllUsers=îïªÆªÎ«æ?«¶?ªË«¤«ó«¹«È?«ëª¹ªë¡£
-ja.tsk_CurrentUser=úŞî¤?ú¼ª·ªÆª¤ªë«æ?«¶?ªÀª±ªË«¤«ó«¹«È?«ëª¹ªë¡£
-ja.tsk_Other=öâªÎ«¿«¹«¯ :
-ja.tsk_ResetSettings=àâïÒªòôøÑ¢ûùª¹ªë
-ja.types_DefaultInstallation=«Ç«Õ«©«ë«È «¤«ó«¹«È?«ë
-ja.types_CustomInstallation=«««¹«¿«à «¤«ó«¹«È?«ë
-ja.ViewChangelog=?ÌÚ×Û?ªòÌ¸ªë
+ja.tsk_AllUsers=å…¨ã¦ã®ãƒ¦ãƒ¼ã‚¶ãƒ¼ã«ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã™ã‚‹ã€‚
+ja.tsk_CurrentUser=ç¾åœ¨å®Ÿè¡Œã—ã¦ã„ã‚‹ãƒ¦ãƒ¼ã‚¶ãƒ¼ã ã‘ã«ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã™ã‚‹ã€‚
+ja.tsk_Other=ä»–ã®ã‚¿ã‚¹ã‚¯ :
+ja.tsk_ResetSettings=è¨­å®šã‚’åˆæœŸåŒ–ã™ã‚‹
+ja.types_DefaultInstallation=ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«
+ja.types_CustomInstallation=ã‚«ã‚¹ã‚¿ãƒ  ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«
+ja.ViewChangelog=å¤‰æ›´å±¥æ­´ã‚’è¦‹ã‚‹
 ja.AssociationFormatsAV=Configuring associations with video and audio files:
 ja.AssociationFormats=Association with video and audio files
 ja.AssociationVideo=Association with video files
@@ -634,38 +634,39 @@ ja.AssociationMPCPlayVideoFilesS=Video Files
 
 ;Korean
 kr.langid=00000008
-kr.comp_mpciconlib=¾ÆÀÌÄÜ ¶óÀÌºê·¯¸®
-kr.comp_mpcresources=¹ø¿ª
-kr.comp_mpcbeshellext=½©È®Àå ¼³Ä¡
-kr.msg_DeleteSettings=MPC-BE ÀÇ ¼³Á¤µµ »èÁ¦ÇÏ½Ã°Ú½À´Ï±î?%n%nMPC-BE ¸¦ ´Ù½Ã ¼³Ä¡ÇÒ °èÈ¹ÀÌ¶ó¸é ¼³Á¤µéÀ» »èÁ¦ÇÒ ÇÊ¿ä°¡ ¾ø½À´Ï´Ù.
-kr.msg_NoD3DX9DLL_found=ÃÖ½Å DirectX ·±Å¸ÀÓÀÌ ¼³Ä¡µÇ¾îÀÖÁö¾Ê½À´Ï´Ù!%n%n»ç¿ëÇÏ´Â ¿î¿µÃ¼Á¦¿¡ ¸Â´Â ÃÖ½Å DirectX ·±Å¸ÀÓ ({#DIRECTX_SDK_DATE}) À» ´Ù¿î·ÎµåÇØ¼­ ¼³Ä¡ÇÏ¼¼¿ä.
-kr.msg_SetupIsRunningWarning=MPC-BE ¼³Ä¡ÇÁ·Î±×·¥ÀÌ ÀÌ¹Ì ½ÇÇàÁßÀÔ´Ï´Ù!
+kr.comp_mpciconlib=ì•„ì´ì½˜ ë¼ì´ë¸ŒëŸ¬ë¦¬
+kr.comp_mpcresources=ë²ˆì—­
+kr.comp_mpcbeshellext=ì‰˜í™•ì¥ ì„¤ì¹˜
+kr.msg_DeleteSettings=MPC-BE ì˜ ì„¤ì •ë„ ì‚­ì œí•˜ì‹œê² ìŠµë‹ˆê¹Œ?%n%nMPC-BE ë¥¼ ë‹¤ì‹œ ì„¤ì¹˜í•  ê³„íšì´ë¼ë©´ ì„¤ì •ë“¤ì„ ì‚­ì œí•  í•„ìš”ê°€ ì—†ìŠµë‹ˆë‹¤.
+kr.msg_NoD3DX9DLL_found=ìµœì‹  DirectX ëŸ°íƒ€ì„ì´ ì„¤ì¹˜ë˜ì–´ìˆì§€ì•ŠìŠµë‹ˆë‹¤!%n%nì‚¬ìš©í•˜ëŠ” ìš´ì˜ì²´ì œì— ë§ëŠ” ìµœì‹  DirectX ëŸ°íƒ€ì„ ({#DIRECTX_SDK_DATE}) ì„ ë‹¤ìš´ë¡œë“œí•´ì„œ ì„¤ì¹˜í•˜ì„¸ìš”.
+kr.msg_SetupIsRunningWarning=MPC-BE ì„¤ì¹˜í”„ë¡œê·¸ë¨ì´ ì´ë¯¸ ì‹¤í–‰ì¤‘ì…ë‹ˆë‹¤!
 #if defined(sse_required)
-kr.msg_simd_sse=ÀÌ ¹öÀüÀÇ MPC-BE ´Â SSE ±â¼úÀ» Áö¿øÇÏ´Â CPU°¡ ÇÊ¿äÇÕ´Ï´Ù.%n%nÀÌ ÄÄÇ»ÅÍÀÇ CPU´Â ÀÌ ±â¼úÀ» Áö¿øÇÏÁö¾Ê½À´Ï´Ù.
+kr.msg_simd_sse=ì´ ë²„ì „ì˜ MPC-BE ëŠ” SSE ê¸°ìˆ ì„ ì§€ì›í•˜ëŠ” CPUê°€ í•„ìš”í•©ë‹ˆë‹¤.%n%nì´ ì»´í“¨í„°ì˜ CPUëŠ” ì´ ê¸°ìˆ ì„ ì§€ì›í•˜ì§€ì•ŠìŠµë‹ˆë‹¤.
 #elif defined(sse2_required)
-kr.msg_simd_sse2=ÀÌ ¹öÀüÀÇ MPC-BE ´Â SSE2 ±â¼úÀ» Áö¿øÇÏ´Â CPU°¡ ÇÊ¿äÇÕ´Ï´Ù.%n%nÀÌ ÄÄÇ»ÅÍÀÇ CPU´Â ÀÌ ±â¼úÀ» Áö¿øÇÏÁö¾Ê½À´Ï´Ù.
+kr.msg_simd_sse2=ì´ ë²„ì „ì˜ MPC-BE ëŠ” SSE2 ê¸°ìˆ ì„ ì§€ì›í•˜ëŠ” CPUê°€ í•„ìš”í•©ë‹ˆë‹¤.%n%nì´ ì»´í“¨í„°ì˜ CPUëŠ” ì´ ê¸°ìˆ ì„ ì§€ì›í•˜ì§€ì•ŠìŠµë‹ˆë‹¤.
 #endif
-kr.tsk_AllUsers=¸ğµç »ç¿ëÀÚ
-kr.tsk_CurrentUser=ÇöÀç »ç¿ëÀÚ¸¸
-kr.tsk_Other=´Ù¸¥ ÀÛ¾÷:
-kr.tsk_ResetSettings=¼³Á¤ ÃÊ±âÈ­
-kr.types_DefaultInstallation=±âº» ¼³Ä¡
-kr.types_CustomInstallation=»ç¿ëÀÚÁ¤ÀÇ ¼³Ä¡
-kr.ViewChangelog=¹öÀü º¯°æ»çÇ× º¸±â
-kr.AssociationFormatsAV=ºñµğ¿À ¹×¿Àµğ¿À ÆÄÀÏ°ú ¿¬°á¼³Á¤:
-kr.AssociationFormats=ºñµğ¿À ¹×¿Àµğ¿À ÆÄÀÏ°ú ¿¬°á
-kr.AssociationVideo=ºñµğ¿À ÆÄÀÏ°ú ¿¬°á
-kr.AssociationAudio=¿Àµğ¿À ÆÄÀÏ°ú ¿¬°á
-kr.AssociationPlaylist=¸ñ·ÏÆÄÀÏ°ú ¿¬°á
-kr.AutoPlayType=ÀÚµ¿ Àç»ı:
-kr.AssociationMPCPlayCDAudioOnArrivalF=¿Àµğ¿À CD Àç»ı
-kr.AssociationMPCPlayCDAudioS=¿Àµğ¿À CD
-kr.AssociationMPCPlayDVDMovieArrivalF=DVD ¹«ºñ Àç»ı
-kr.AssociationMPCPlayDVDMovieS=DVD ¹«ºñ
-kr.AssociationMPCPlayMusicFilesF=À½¾Ç Àç»ı
-kr.AssociationMPCPlayMusicFilesS=À½¾Ç ÆÄÀÏ
-kr.AssociationMPCPlayVideoFilesF=ºñµğ¿À Àç»ı
-kr.AssociationMPCPlayVideoFilesS=ºñµğ¿À ÆÄÀÏ
+kr.tsk_AllUsers=ëª¨ë“  ì‚¬ìš©ì
+kr.tsk_CurrentUser=í˜„ì¬ ì‚¬ìš©ìë§Œ
+kr.tsk_Other=ë‹¤ë¥¸ ì‘ì—…:
+kr.tsk_ResetSettings=ì„¤ì • ì´ˆê¸°í™”
+kr.types_DefaultInstallation=ê¸°ë³¸ ì„¤ì¹˜
+kr.types_CustomInstallation=ì‚¬ìš©ìì •ì˜ ì„¤ì¹˜
+kr.ViewChangelog=ë²„ì „ ë³€ê²½ì‚¬í•­ ë³´ê¸°
+kr.AssociationFormatsAV=ë¹„ë””ì˜¤ ë°ì˜¤ë””ì˜¤ íŒŒì¼ê³¼ ì—°ê²°ì„¤ì •:
+kr.AssociationFormats=ë¹„ë””ì˜¤ ë°ì˜¤ë””ì˜¤ íŒŒì¼ê³¼ ì—°ê²°
+kr.AssociationVideo=ë¹„ë””ì˜¤ íŒŒì¼ê³¼ ì—°ê²°
+kr.AssociationAudio=ì˜¤ë””ì˜¤ íŒŒì¼ê³¼ ì—°ê²°
+kr.AssociationPlaylist=ëª©ë¡íŒŒì¼ê³¼ ì—°ê²°
+kr.AutoPlayType=ìë™ ì¬ìƒ:
+kr.AssociationMPCPlayCDAudioOnArrivalF=ì˜¤ë””ì˜¤ CD ì¬ìƒ
+kr.AssociationMPCPlayCDAudioS=ì˜¤ë””ì˜¤ CD
+kr.AssociationMPCPlayDVDMovieArrivalF=DVD ë¬´ë¹„ ì¬ìƒ
+kr.AssociationMPCPlayDVDMovieS=DVD ë¬´ë¹„
+kr.AssociationMPCPlayMusicFilesF=ìŒì•… ì¬ìƒ
+kr.AssociationMPCPlayMusicFilesS=ìŒì•… íŒŒì¼
+kr.AssociationMPCPlayVideoFilesF=ë¹„ë””ì˜¤ ì¬ìƒ
+kr.AssociationMPCPlayVideoFilesS=ë¹„ë””ì˜¤ íŒŒì¼
+
 
 
 ;Dutch
@@ -706,24 +707,24 @@ nl.AssociationMPCPlayVideoFilesS=Video Files
 
 ;Polish
 pl.langid=00000009
-pl.comp_mpciconlib=Ikony plikow multimedialnych
-pl.comp_mpcresources=T©©umaczenia
+pl.comp_mpciconlib=Ikony plikÃ³w multimedialnych
+pl.comp_mpcresources=TÅ‚umaczenia
 pl.comp_mpcbeshellext=Install the shell extension
-pl.msg_DeleteSettings=Czy chcesz usun?? ustawienia MPC-BE?%n%nJe?li planujesz ponownie zainstalowa? MPC-BE, wtedy nie trzeba ich usuwa?.
-pl.msg_NoD3DX9DLL_found=Najnowszy DirectX runtime nie zosta©© zainstalowany!%n%nProsz? pobra? i zainstalowa? najnowszy DirectX runtime ({#DIRECTX_SDK_DATE}) niezale?nie od systemu operacyjnego.
-pl.msg_SetupIsRunningWarning=Instalator MPC-BE jest ju? uruchomiony!
+pl.msg_DeleteSettings=Czy chcesz usunÄ…Ä‡ ustawienia MPC-BE?%n%nJeÅ›li planujesz ponownie zainstalowaÄ‡ MPC-BE, wtedy nie trzeba ich usuwaÄ‡.
+pl.msg_NoD3DX9DLL_found=Najnowszy DirectX runtime nie zostaÅ‚ zainstalowany!%n%nProszÄ™ pobraÄ‡ i zainstalowaÄ‡ najnowszy DirectX runtime ({#DIRECTX_SDK_DATE}) niezaleÅ¼nie od systemu operacyjnego.
+pl.msg_SetupIsRunningWarning=Instalator MPC-BE jest juÅ¼ uruchomiony!
 #if defined(sse_required)
-pl.msg_simd_sse=Ta kompilacja MPC-BE wymaga procesora z obs©©ug? zestawu instrukcji SSE.%n%nTwoj procesor ich nie obs©©uguje.
+pl.msg_simd_sse=Ta kompilacja MPC-BE wymaga procesora z obsÅ‚ugÄ… zestawu instrukcji SSE.%n%nTwÃ³j procesor ich nie obsÅ‚uguje.
 #elif defined(sse2_required)
-pl.msg_simd_sse2=Ta kompilacja MPC-BE wymaga procesora z obs©©ug? zestawu instrukcji SSE2.%n%nTwoj procesor ich nie obs©©uguje.
+pl.msg_simd_sse2=Ta kompilacja MPC-BE wymaga procesora z obsÅ‚ugÄ… zestawu instrukcji SSE2.%n%nTwÃ³j procesor ich nie obsÅ‚uguje.
 #endif
-pl.tsk_AllUsers=Dla wszystkich u?ytkownikow
-pl.tsk_CurrentUser=Tylko dla bie??cego u?ytkownika
+pl.tsk_AllUsers=Dla wszystkich uÅ¼ytkownikÃ³w
+pl.tsk_CurrentUser=Tylko dla bieÅ¼Ä…cego uÅ¼ytkownika
 pl.tsk_Other=Inne zadania:
 pl.tsk_ResetSettings=Resetuj ustawienia
-pl.types_DefaultInstallation=Instalacja domy?lna
-pl.types_CustomInstallation=Instalacja cz??ciowa
-pl.ViewChangelog=Poka? zmiany
+pl.types_DefaultInstallation=Instalacja domyÅ›lna
+pl.types_CustomInstallation=Instalacja czÄ™Å›ciowa
+pl.ViewChangelog=PokaÅ¼ zmiany
 pl.AssociationFormatsAV=Configuring associations with video and audio files:
 pl.AssociationFormats=Association with video and audio files
 pl.AssociationVideo=Association with video files
@@ -742,61 +743,61 @@ pl.AssociationMPCPlayVideoFilesS=Video Files
 
 ;Russian
 ru.langid=00000003
-ru.comp_mpciconlib=¬¢¬Ú¬Ò¬İ¬Ú¬à¬ä¬Ö¬Ü¬Ñ ¬Ù¬ß¬Ñ¬é¬Ü¬à¬Ó
-ru.comp_mpcresources=¬­¬à¬Ü¬Ñ¬İ¬Ú¬Ù¬Ñ¬è¬Ú¬Ú
-ru.comp_mpcbeshellext=¬µ¬ã¬ä¬Ñ¬ß¬à¬Ó¬Ú¬ä¬î ¬â¬Ñ¬ã¬ê¬Ú¬â¬Ö¬ß¬Ú¬Ö ¬à¬Ò¬à¬İ¬à¬é¬Ü¬Ú
-ru.msg_DeleteSettings=¬µ¬Õ¬Ñ¬İ¬Ú¬ä¬î ¬ä¬Ñ¬Ü¬Ø¬Ö ¬ß¬Ñ¬ã¬ä¬â¬à¬Ö¬ß¬ß¬í¬Ö ¬á¬Ñ¬â¬Ñ¬Ş¬Ö¬ä¬â¬í MPC-BE?%n%n¬¦¬ã¬İ¬Ú ¬Ù¬Ñ¬á¬İ¬Ñ¬ß¬Ú¬â¬à¬Ó¬Ñ¬ß¬Ñ ¬á¬Ö¬â¬Ö¬å¬ã¬ä¬Ñ¬ß¬à¬Ó¬Ü¬Ñ MPC-BE, ¬ï¬ä¬Ú ¬á¬Ñ¬â¬Ñ¬Ş¬Ö¬ä¬â¬í ¬ß¬Ö ¬ß¬å¬Ø¬ß¬à ¬å¬Õ¬Ñ¬İ¬ñ¬ä¬î.
-ru.msg_NoD3DX9DLL_found=¬¯¬Ö ¬å¬ã¬ä¬Ñ¬ß¬à¬Ó¬İ¬Ö¬ß¬Ñ ¬á¬à¬ã¬İ¬Ö¬Õ¬ß¬ñ¬ñ ¬Ó¬Ö¬â¬ã¬Ú¬ñ ¬ã¬Ú¬ã¬ä¬Ö¬Ş¬í DirectX!%n%n¬©¬Ñ¬Ô¬â¬å¬Ù¬Ú¬ä¬Ö ¬Ú ¬å¬ã¬ä¬Ñ¬ß¬à¬Ó¬Ú¬ä¬Ö ¬á¬à¬ã¬İ¬Ö¬Õ¬ß¬ğ¬ğ ¬Ó¬Ö¬â¬ã¬Ú¬ğ DirectX ({#DIRECTX_SDK_DATE}) ¬ß¬Ö¬Ù¬Ñ¬Ó¬Ú¬ã¬Ú¬Ş¬à ¬à¬ä ¬Ó¬Ö¬â¬ã¬Ú¬Ú ¬å¬ã¬ä¬Ñ¬ß¬à¬Ó¬İ¬Ö¬ß¬ß¬à¬Û ¬à¬á¬Ö¬â¬Ñ¬è¬Ú¬à¬ß¬ß¬à¬Û ¬ã¬Ú¬ã¬ä¬Ö¬Ş¬í.
-ru.msg_SetupIsRunningWarning=¬±¬â¬à¬Ô¬â¬Ñ¬Ş¬Ş¬Ñ ¬å¬ã¬ä¬Ñ¬ß¬à¬Ó¬Ü¬Ú MPC-BE ¬å¬Ø¬Ö ¬Ù¬Ñ¬á¬å¬ë¬Ö¬ß¬Ñ!
+ru.comp_mpciconlib=Ğ‘Ğ¸Ğ±Ğ»Ğ¸Ğ¾Ñ‚ĞµĞºĞ° Ğ·Ğ½Ğ°Ñ‡ĞºĞ¾Ğ²
+ru.comp_mpcresources=Ğ›Ğ¾ĞºĞ°Ğ»Ğ¸Ğ·Ğ°Ñ†Ğ¸Ğ¸
+ru.comp_mpcbeshellext=Ğ£ÑÑ‚Ğ°Ğ½Ğ¾Ğ²Ğ¸Ñ‚ÑŒ Ñ€Ğ°ÑÑˆĞ¸Ñ€ĞµĞ½Ğ¸Ğµ Ğ¾Ğ±Ğ¾Ğ»Ğ¾Ñ‡ĞºĞ¸
+ru.msg_DeleteSettings=Ğ£Ğ´Ğ°Ğ»Ğ¸Ñ‚ÑŒ Ñ‚Ğ°ĞºĞ¶Ğµ Ğ½Ğ°ÑÑ‚Ñ€Ğ¾ĞµĞ½Ğ½Ñ‹Ğµ Ğ¿Ğ°Ñ€Ğ°Ğ¼ĞµÑ‚Ñ€Ñ‹ MPC-BE?%n%nĞ•ÑĞ»Ğ¸ Ğ·Ğ°Ğ¿Ğ»Ğ°Ğ½Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ½Ğ° Ğ¿ĞµÑ€ĞµÑƒÑÑ‚Ğ°Ğ½Ğ¾Ğ²ĞºĞ° MPC-BE, ÑÑ‚Ğ¸ Ğ¿Ğ°Ñ€Ğ°Ğ¼ĞµÑ‚Ñ€Ñ‹ Ğ½Ğµ Ğ½ÑƒĞ¶Ğ½Ğ¾ ÑƒĞ´Ğ°Ğ»ÑÑ‚ÑŒ.
+ru.msg_NoD3DX9DLL_found=ĞĞµ ÑƒÑÑ‚Ğ°Ğ½Ğ¾Ğ²Ğ»ĞµĞ½Ğ° Ğ¿Ğ¾ÑĞ»ĞµĞ´Ğ½ÑÑ Ğ²ĞµÑ€ÑĞ¸Ñ ÑĞ¸ÑÑ‚ĞµĞ¼Ñ‹ DirectX!%n%nĞ—Ğ°Ğ³Ñ€ÑƒĞ·Ğ¸Ñ‚Ğµ Ğ¸ ÑƒÑÑ‚Ğ°Ğ½Ğ¾Ğ²Ğ¸Ñ‚Ğµ Ğ¿Ğ¾ÑĞ»ĞµĞ´Ğ½ÑÑ Ğ²ĞµÑ€ÑĞ¸Ñ DirectX ({#DIRECTX_SDK_DATE}) Ğ½ĞµĞ·Ğ°Ğ²Ğ¸ÑĞ¸Ğ¼Ğ¾ Ğ¾Ñ‚ Ğ²ĞµÑ€ÑĞ¸Ğ¸ ÑƒÑÑ‚Ğ°Ğ½Ğ¾Ğ²Ğ»ĞµĞ½Ğ½Ğ¾Ğ¹ Ğ¾Ğ¿ĞµÑ€Ğ°Ñ†Ğ¸Ğ¾Ğ½Ğ½Ğ¾Ğ¹ ÑĞ¸ÑÑ‚ĞµĞ¼Ñ‹.
+ru.msg_SetupIsRunningWarning=ĞŸÑ€Ğ¾Ğ³Ñ€Ğ°Ğ¼Ğ¼Ğ° ÑƒÑÑ‚Ğ°Ğ½Ğ¾Ğ²ĞºĞ¸ MPC-BE ÑƒĞ¶Ğµ Ğ·Ğ°Ğ¿ÑƒÑ‰ĞµĞ½Ğ°!
 #if defined(sse_required)
-ru.msg_simd_sse=¬¥¬İ¬ñ ¬ï¬ä¬à¬Û ¬ã¬Ò¬à¬â¬Ü¬Ú MPC-BE ¬ä¬â¬Ö¬Ò¬å¬Ö¬ä¬ã¬ñ ¬á¬â¬à¬è¬Ö¬ã¬ã¬à¬â ¬ã ¬á¬à¬Õ¬Õ¬Ö¬â¬Ø¬Ü¬à¬Û SSE-¬Ú¬ß¬ã¬ä¬â¬å¬Ü¬è¬Ú¬Û.%n%n¬£ ¬Õ¬Ñ¬ß¬ß¬à¬Ş ¬á¬â¬à¬è¬Ö¬ã¬ã¬à¬â¬Ö ¬à¬ß¬Ú ¬ß¬Ö ¬á¬à¬Õ¬Õ¬Ö¬â¬Ø¬Ú¬Ó¬Ñ¬ğ¬ä¬ã¬ñ.
+ru.msg_simd_sse=Ğ”Ğ»Ñ ÑÑ‚Ğ¾Ğ¹ ÑĞ±Ğ¾Ñ€ĞºĞ¸ MPC-BE Ñ‚Ñ€ĞµĞ±ÑƒĞµÑ‚ÑÑ Ğ¿Ñ€Ğ¾Ñ†ĞµÑÑĞ¾Ñ€ Ñ Ğ¿Ğ¾Ğ´Ğ´ĞµÑ€Ğ¶ĞºĞ¾Ğ¹ SSE-Ğ¸Ğ½ÑÑ‚Ñ€ÑƒĞºÑ†Ğ¸Ğ¹.%n%nĞ’ Ğ´Ğ°Ğ½Ğ½Ğ¾Ğ¼ Ğ¿Ñ€Ğ¾Ñ†ĞµÑÑĞ¾Ñ€Ğµ Ğ¾Ğ½Ğ¸ Ğ½Ğµ Ğ¿Ğ¾Ğ´Ğ´ĞµÑ€Ğ¶Ğ¸Ğ²Ğ°ÑÑ‚ÑÑ.
 #elif defined(sse2_required)
-ru.msg_simd_sse2=¬¥¬İ¬ñ ¬ï¬ä¬à¬Û ¬ã¬Ò¬à¬â¬Ü¬Ú MPC-BE ¬ä¬â¬Ö¬Ò¬å¬Ö¬ä¬ã¬ñ ¬á¬â¬à¬è¬Ö¬ã¬ã¬à¬â ¬ã ¬á¬à¬Õ¬Õ¬Ö¬â¬Ø¬Ü¬à¬Û SSE2-¬Ú¬ß¬ã¬ä¬â¬å¬Ü¬è¬Ú¬Û.%n%n¬£ ¬Õ¬Ñ¬ß¬ß¬à¬Ş ¬á¬â¬à¬è¬Ö¬ã¬ã¬à¬â¬Ö ¬à¬ß¬Ú ¬ß¬Ö ¬á¬à¬Õ¬Õ¬Ö¬â¬Ø¬Ú¬Ó¬Ñ¬ğ¬ä¬ã¬ñ.
+ru.msg_simd_sse2=Ğ”Ğ»Ñ ÑÑ‚Ğ¾Ğ¹ ÑĞ±Ğ¾Ñ€ĞºĞ¸ MPC-BE Ñ‚Ñ€ĞµĞ±ÑƒĞµÑ‚ÑÑ Ğ¿Ñ€Ğ¾Ñ†ĞµÑÑĞ¾Ñ€ Ñ Ğ¿Ğ¾Ğ´Ğ´ĞµÑ€Ğ¶ĞºĞ¾Ğ¹ SSE2-Ğ¸Ğ½ÑÑ‚Ñ€ÑƒĞºÑ†Ğ¸Ğ¹.%n%nĞ’ Ğ´Ğ°Ğ½Ğ½Ğ¾Ğ¼ Ğ¿Ñ€Ğ¾Ñ†ĞµÑÑĞ¾Ñ€Ğµ Ğ¾Ğ½Ğ¸ Ğ½Ğµ Ğ¿Ğ¾Ğ´Ğ´ĞµÑ€Ğ¶Ğ¸Ğ²Ğ°ÑÑ‚ÑÑ.
 #endif
-ru.tsk_AllUsers=¬¥¬İ¬ñ ¬Ó¬ã¬Ö¬ç ¬á¬à¬İ¬î¬Ù¬à¬Ó¬Ñ¬ä¬Ö¬İ¬Ö¬Û ¬Õ¬Ñ¬ß¬ß¬à¬Ô¬à ¬Ü¬à¬Ş¬á¬î¬ğ¬ä¬Ö¬â¬Ñ
-ru.tsk_CurrentUser=¬´¬à¬İ¬î¬Ü¬à ¬Õ¬İ¬ñ ¬ä¬Ö¬Ü¬å¬ë¬Ö¬Ô¬à ¬á¬à¬İ¬î¬Ù¬à¬Ó¬Ñ¬ä¬Ö¬İ¬ñ
-ru.tsk_Other=¬¥¬â¬å¬Ô¬Ú¬Ö ¬Ù¬Ñ¬Õ¬Ñ¬é¬Ú:
-ru.tsk_ResetSettings=¬£¬à¬ã¬ã¬ä¬Ñ¬ß¬à¬Ó¬Ú¬ä¬î ¬á¬Ñ¬â¬Ñ¬Ş¬Ö¬ä¬â¬í ¬á¬à ¬å¬Ş¬à¬İ¬é¬Ñ¬ß¬Ú¬ğ
-ru.types_DefaultInstallation=¬µ¬ã¬ä¬Ñ¬ß¬à¬Ó¬Ü¬Ñ ¬á¬à ¬å¬Ş¬à¬İ¬é¬Ñ¬ß¬Ú¬ğ
-ru.types_CustomInstallation=¬£¬í¬Ò¬à¬â¬à¬é¬ß¬Ñ¬ñ ¬å¬ã¬ä¬Ñ¬ß¬à¬Ó¬Ü¬Ñ
-ru.ViewChangelog=¬±¬â¬à¬ã¬Ş¬à¬ä¬â¬Ö¬ä¬î ¬Ø¬å¬â¬ß¬Ñ¬İ ¬Ú¬Ù¬Ş¬Ö¬ß¬Ö¬ß¬Ú¬Û
-ru.AssociationFormatsAV=¬¯¬Ñ¬ã¬ä¬â¬à¬Û¬Ü¬Ñ ¬Ñ¬ã¬ã¬à¬è¬Ú¬Ñ¬è¬Ú¬Û ¬ã ¬Ó¬Ú¬Õ¬Ö¬à ¬Ú ¬Ñ¬å¬Õ¬Ú¬à ¬æ¬Ñ¬Û¬İ¬Ñ¬Ş¬Ú:
-ru.AssociationFormats=¬¡¬ã¬ã¬à¬è¬Ú¬Ñ¬è¬Ú¬ñ ¬ã ¬Ó¬Ú¬Õ¬Ö¬à ¬Ú ¬Ñ¬å¬Õ¬Ú¬à ¬æ¬Ñ¬Û¬İ¬Ñ¬Ş¬Ú
-ru.AssociationVideo=¬¡¬ã¬ã¬à¬è¬Ú¬Ú¬â¬à¬Ó¬Ñ¬ä¬î ¬ã ¬Ó¬Ú¬Õ¬Ö¬à¬æ¬Ñ¬Û¬İ¬Ñ¬Ş¬Ú
-ru.AssociationAudio=¬¡¬ã¬ã¬à¬è¬Ú¬Ú¬â¬à¬Ó¬Ñ¬ä¬î ¬ã ¬Ñ¬å¬Õ¬Ú¬à¬æ¬Ñ¬Û¬İ¬Ñ¬Ş¬Ú
-ru.AssociationPlaylist=¬¡¬ã¬ã¬à¬è¬Ú¬Ú¬â¬à¬Ó¬Ñ¬ä¬î ¬ã ¬á¬İ¬Ö¬Û¬İ¬Ú¬ã¬ä¬Ñ¬Ş¬Ú
-ru.AutoPlayType=¬¡¬Ó¬ä¬à¬Ş¬Ñ¬ä¬Ú¬é¬Ö¬ã¬Ü¬à¬Ö ¬Ó¬à¬ã¬á¬â¬à¬Ú¬Ù¬Ó¬Ö¬Õ¬Ö¬ß¬Ú¬Ö:
-ru.AssociationMPCPlayCDAudioOnArrivalF=¬£¬à¬ã¬á¬â¬à¬Ú¬Ù¬Ó¬Ö¬Õ¬Ö¬ß¬Ú¬Ö Audio CD
+ru.tsk_AllUsers=Ğ”Ğ»Ñ Ğ²ÑĞµÑ… Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ĞµĞ¹ Ğ´Ğ°Ğ½Ğ½Ğ¾Ğ³Ğ¾ ĞºĞ¾Ğ¼Ğ¿ÑŒÑÑ‚ĞµÑ€Ğ°
+ru.tsk_CurrentUser=Ğ¢Ğ¾Ğ»ÑŒĞºĞ¾ Ğ´Ğ»Ñ Ñ‚ĞµĞºÑƒÑ‰ĞµĞ³Ğ¾ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ñ
+ru.tsk_Other=Ğ”Ñ€ÑƒĞ³Ğ¸Ğµ Ğ·Ğ°Ğ´Ğ°Ñ‡Ğ¸:
+ru.tsk_ResetSettings=Ğ’Ğ¾ÑÑÑ‚Ğ°Ğ½Ğ¾Ğ²Ğ¸Ñ‚ÑŒ Ğ¿Ğ°Ñ€Ğ°Ğ¼ĞµÑ‚Ñ€Ñ‹ Ğ¿Ğ¾ ÑƒĞ¼Ğ¾Ğ»Ñ‡Ğ°Ğ½Ğ¸Ñ
+ru.types_DefaultInstallation=Ğ£ÑÑ‚Ğ°Ğ½Ğ¾Ğ²ĞºĞ° Ğ¿Ğ¾ ÑƒĞ¼Ğ¾Ğ»Ñ‡Ğ°Ğ½Ğ¸Ñ
+ru.types_CustomInstallation=Ğ’Ñ‹Ğ±Ğ¾Ñ€Ğ¾Ñ‡Ğ½Ğ°Ñ ÑƒÑÑ‚Ğ°Ğ½Ğ¾Ğ²ĞºĞ°
+ru.ViewChangelog=ĞŸÑ€Ğ¾ÑĞ¼Ğ¾Ñ‚Ñ€ĞµÑ‚ÑŒ Ğ¶ÑƒÑ€Ğ½Ğ°Ğ» Ğ¸Ğ·Ğ¼ĞµĞ½ĞµĞ½Ğ¸Ğ¹
+ru.AssociationFormatsAV=ĞĞ°ÑÑ‚Ñ€Ğ¾Ğ¹ĞºĞ° Ğ°ÑÑĞ¾Ñ†Ğ¸Ğ°Ñ†Ğ¸Ğ¹ Ñ Ğ²Ğ¸Ğ´ĞµĞ¾ Ğ¸ Ğ°ÑƒĞ´Ğ¸Ğ¾ Ñ„Ğ°Ğ¹Ğ»Ğ°Ğ¼Ğ¸:
+ru.AssociationFormats=ĞÑÑĞ¾Ñ†Ğ¸Ğ°Ñ†Ğ¸Ñ Ñ Ğ²Ğ¸Ğ´ĞµĞ¾ Ğ¸ Ğ°ÑƒĞ´Ğ¸Ğ¾ Ñ„Ğ°Ğ¹Ğ»Ğ°Ğ¼Ğ¸
+ru.AssociationVideo=ĞÑÑĞ¾Ñ†Ğ¸Ğ¸Ñ€Ğ¾Ğ²Ğ°Ñ‚ÑŒ Ñ Ğ²Ğ¸Ğ´ĞµĞ¾Ñ„Ğ°Ğ¹Ğ»Ğ°Ğ¼Ğ¸
+ru.AssociationAudio=ĞÑÑĞ¾Ñ†Ğ¸Ğ¸Ñ€Ğ¾Ğ²Ğ°Ñ‚ÑŒ Ñ Ğ°ÑƒĞ´Ğ¸Ğ¾Ñ„Ğ°Ğ¹Ğ»Ğ°Ğ¼Ğ¸
+ru.AssociationPlaylist=ĞÑÑĞ¾Ñ†Ğ¸Ğ¸Ñ€Ğ¾Ğ²Ğ°Ñ‚ÑŒ Ñ Ğ¿Ğ»ĞµĞ¹Ğ»Ğ¸ÑÑ‚Ğ°Ğ¼Ğ¸
+ru.AutoPlayType=ĞĞ²Ñ‚Ğ¾Ğ¼Ğ°Ñ‚Ğ¸Ñ‡ĞµÑĞºĞ¾Ğµ Ğ²Ğ¾ÑĞ¿Ñ€Ğ¾Ğ¸Ğ·Ğ²ĞµĞ´ĞµĞ½Ğ¸Ğµ:
+ru.AssociationMPCPlayCDAudioOnArrivalF=Ğ’Ğ¾ÑĞ¿Ñ€Ğ¾Ğ¸Ğ·Ğ²ĞµĞ´ĞµĞ½Ğ¸Ğµ Audio CD
 ru.AssociationMPCPlayCDAudioS=Audio CD
-ru.AssociationMPCPlayDVDMovieArrivalF=¬£¬à¬ã¬á¬â¬à¬Ú¬Ù¬Ó¬Ö¬Õ¬Ö¬ß¬Ú¬Ö DVD
-ru.AssociationMPCPlayDVDMovieS=DVD ¬£¬Ú¬Õ¬Ö¬à
-ru.AssociationMPCPlayMusicFilesF=¬£¬à¬ã¬á¬â¬à¬Ú¬Ù¬Ó¬Ö¬Õ¬Ö¬ß¬Ú¬Ö ¬Ş¬å¬Ù¬í¬Ü¬Ú
-ru.AssociationMPCPlayMusicFilesS=¬®¬å¬Ù¬í¬Ü¬Ñ¬İ¬î¬ß¬í¬Ö ¬æ¬Ñ¬Û¬İ¬í
-ru.AssociationMPCPlayVideoFilesF=¬£¬à¬ã¬á¬â¬à¬Ú¬Ù¬Ó¬Ö¬Õ¬Ö¬ß¬Ú¬Ö ¬Ó¬Ú¬Õ¬Ö¬à
-ru.AssociationMPCPlayVideoFilesS=¬£¬Ú¬Õ¬Ö¬à ¬æ¬Ñ¬Û¬İ¬í
+ru.AssociationMPCPlayDVDMovieArrivalF=Ğ’Ğ¾ÑĞ¿Ñ€Ğ¾Ğ¸Ğ·Ğ²ĞµĞ´ĞµĞ½Ğ¸Ğµ DVD
+ru.AssociationMPCPlayDVDMovieS=DVD Ğ’Ğ¸Ğ´ĞµĞ¾
+ru.AssociationMPCPlayMusicFilesF=Ğ’Ğ¾ÑĞ¿Ñ€Ğ¾Ğ¸Ğ·Ğ²ĞµĞ´ĞµĞ½Ğ¸Ğµ Ğ¼ÑƒĞ·Ñ‹ĞºĞ¸
+ru.AssociationMPCPlayMusicFilesS=ĞœÑƒĞ·Ñ‹ĞºĞ°Ğ»ÑŒĞ½Ñ‹Ğµ Ñ„Ğ°Ğ¹Ğ»Ñ‹
+ru.AssociationMPCPlayVideoFilesF=Ğ’Ğ¾ÑĞ¿Ñ€Ğ¾Ğ¸Ğ·Ğ²ĞµĞ´ĞµĞ½Ğ¸Ğµ Ğ²Ğ¸Ğ´ĞµĞ¾
+ru.AssociationMPCPlayVideoFilesS=Ğ’Ğ¸Ğ´ĞµĞ¾ Ñ„Ğ°Ğ¹Ğ»Ñ‹
 
 
 
 ;Chinese Simplified
 sc.langid=00000013
-sc.comp_mpciconlib=???
-sc.comp_mpcresources=??
+sc.comp_mpciconlib=å›¾æ ‡åº“
+sc.comp_mpcresources=ç¿»è¯‘
 sc.comp_mpcbeshellext=Install the shell extension
-sc.msg_DeleteSettings=ãÀÜúÔÒ??ğ¶ MPC-BE ?öÇ?%n%nåıÍı?öèß©î¢ó­äÌ? MPC-BE ?ÙéâÍ?ğ¶¡£
-sc.msg_NoD3DX9DLL_found=??äÌ?õÌãæ÷úÜâîÜ DirectX ?ú¼?!%n%nÜô??á¶ŞÅéÄîÜíÂ?Í§??ù»?ĞàÌÚãæò¸õÌãæ÷úÜâîÜ DirectX ?ú¼? ({#DIRECTX_SDK_DATE})¡£
-sc.msg_SetupIsRunningWarning=MPC-BE äÌ?ïïßíì«î¤?ú¼ñé£¡
+sc.msg_DeleteSettings=æ˜¯å¦åŒæ—¶åˆ é™¤ MPC-BE è®¾ç½®?%n%nå¦‚æœæ‚¨æ‰“ç®—å†æ¬¡å®‰è£… MPC-BE åˆ™æ— éœ€åˆ é™¤ã€‚
+sc.msg_NoD3DX9DLL_found=è¿˜æ²¡å®‰è£…æœ€æ–°ç‰ˆæœ¬çš„ DirectX è¿è¡Œåº“!%n%nä¸è®ºæ‚¨æ‰€ä½¿ç”¨çš„ä½œä¸šç³»ç»Ÿè¯·ä¸‹è½½åŠæ›´æ–°è‡³æœ€æ–°ç‰ˆæœ¬çš„ DirectX è¿è¡Œåº“ ({#DIRECTX_SDK_DATE})ã€‚
+sc.msg_SetupIsRunningWarning=MPC-BE å®‰è£…ç¨‹åºå·²åœ¨è¿è¡Œä¸­ï¼
 #if defined(sse_required)
-sc.msg_simd_sse=????÷úîÜ MPC-BE âÍé©ìé?ò¨ò¥ SSE ò¦Öµó¢îÜ CPU¡£%n%nÓ£ãÀ?îÜ CPU ?Üôò¨ò¥??ÍíÒö¡£
+sc.msg_simd_sse=è¿™ä¸ªç¼–è¯‘ç‰ˆçš„ MPC-BE éœ€è¦ä¸€ä¸ªæ”¯æŒ SSE æŒ‡ä»¤é›†çš„ CPUã€‚%n%nä½†æ˜¯æ‚¨çš„ CPU å¹¶ä¸æ”¯æŒè¿™ä¸ªåŠŸèƒ½ã€‚
 #elif defined(sse2_required)
-sc.msg_simd_sse2=????÷úîÜ MPC-BE âÍé©ìé?ò¨ò¥ SSE2 ò¦Öµó¢îÜ CPU¡£%n%nÓ£ãÀ?îÜ CPU ?Üôò¨ò¥??ÍíÒö¡£
+sc.msg_simd_sse2=è¿™ä¸ªç¼–è¯‘ç‰ˆçš„ MPC-BE éœ€è¦ä¸€ä¸ªæ”¯æŒ SSE2 æŒ‡ä»¤é›†çš„ CPUã€‚%n%nä½†æ˜¯æ‚¨çš„ CPU å¹¶ä¸æ”¯æŒè¿™ä¸ªåŠŸèƒ½ã€‚
 #endif
-sc.tsk_AllUsers=?á¶êóéÄ?äÌ?
-sc.tsk_CurrentUser=???îñéÄ?äÌ?
-sc.tsk_Other=Ğìöâìò?:
-sc.tsk_ResetSettings=ñìöÇ?öÇ
-sc.types_DefaultInstallation=Ùù?äÌ?
-sc.types_CustomInstallation=í»ïÒ?äÌ?
-sc.ViewChangelog=?Ê×ÌÚãæìíò¤
+sc.tsk_AllUsers=ä¸ºæ‰€æœ‰ç”¨æˆ·å®‰è£…
+sc.tsk_CurrentUser=ä»…ä¸ºå½“å‰ç”¨æˆ·å®‰è£…
+sc.tsk_Other=å…¶ä»–ä»»åŠ¡:
+sc.tsk_ResetSettings=é‡ç½®è®¾ç½®
+sc.types_DefaultInstallation=é»˜è®¤å®‰è£…
+sc.types_CustomInstallation=è‡ªå®šä¹‰å®‰è£…
+sc.ViewChangelog=æŸ¥çœ‹æ›´æ–°æ—¥å¿—
 sc.AssociationFormatsAV=Configuring associations with video and audio files:
 sc.AssociationFormats=Association with video and audio files
 sc.AssociationVideo=Association with video files
@@ -817,22 +818,22 @@ sc.AssociationMPCPlayVideoFilesS=Video Files
 sv.langid=00000016
 sv.comp_mpciconlib=Ikonbibliotek
 sv.comp_mpcbeshellext=Install the shell extension
-sv.comp_mpcresources=Oversattningar
-sv.msg_DeleteSettings=Vill du ocksa ta bort installningarna for MPC-BE?%n%nOm du planerar att installera MPC-BE igen sa behover du inte ta bort dem.
-sv.msg_NoD3DX9DLL_found=Senaste DirectX har inte installerats!%n%nHamta ner och installera senaste DirectX ({#DIRECTX_SDK_DATE}) oavsett ditt operativsystem.
-sv.msg_SetupIsRunningWarning=Konfigurering av MPC-BE pagar redan!
+sv.comp_mpcresources=Ã–versÃ¤ttningar
+sv.msg_DeleteSettings=Vill du ocksÃ¥ ta bort instÃ¤llningarna fÃ¶r MPC-BE?%n%nOm du planerar att installera MPC-BE igen sÃ¥ behÃ¶ver du inte ta bort dem.
+sv.msg_NoD3DX9DLL_found=Senaste DirectX har inte installerats!%n%nHÃ¤mta ner och installera senaste DirectX ({#DIRECTX_SDK_DATE}) oavsett ditt operativsystem.
+sv.msg_SetupIsRunningWarning=Konfigurering av MPC-BE pÃ¥gÃ¥r redan!
 #if defined(sse_required)
-sv.msg_simd_sse=Detta bygge av MPC-BE kraver en processor med stod for SSE-tillagget.%n%nDin processor saknar detta stod.
+sv.msg_simd_sse=Detta bygge av MPC-BE krÃ¤ver en processor med stÃ¶d fÃ¶r SSE-tillÃ¤gget.%n%nDin processor saknar detta stÃ¶d.
 #elif defined(sse2_required)
-sv.msg_simd_sse2=Detta bygge av MPC-BE kraver en processor med stod for SSE2-tillagget.%n%nDin processor saknar detta stod.
+sv.msg_simd_sse2=Detta bygge av MPC-BE krÃ¤ver en processor med stÃ¶d fÃ¶r SSE2-tillÃ¤gget.%n%nDin processor saknar detta stÃ¶d.
 #endif
-sv.tsk_AllUsers=For alla anvandare
-sv.tsk_CurrentUser=Endast for den aktuella anvandaren
+sv.tsk_AllUsers=FÃ¶r alla anvÃ¤ndare
+sv.tsk_CurrentUser=Endast fÃ¶r den aktuella anvÃ¤ndaren
 sv.tsk_Other=Andra uppgifter:
-sv.tsk_ResetSettings=Aterstall installningar
+sv.tsk_ResetSettings=Ã…terstÃ¤ll instÃ¤llningar
 sv.types_DefaultInstallation=Standardinstallation
 sv.types_CustomInstallation=Anpassad installation
-sv.ViewChangelog=Visa andringslogg
+sv.ViewChangelog=Visa Ã¤ndringslogg
 sv.AssociationFormatsAV=Configuring associations with video and audio files:
 sv.AssociationFormats=Association with video and audio files
 sv.AssociationVideo=Association with video files
@@ -851,24 +852,24 @@ sv.AssociationMPCPlayVideoFilesS=Video Files
 
 ;Slovakian
 sk.langid=00000012
-sk.comp_mpciconlib=Kni?nica ikon
+sk.comp_mpciconlib=KniÅ¾nica ikon
 sk.comp_mpcresources=Preklady
 sk.comp_mpcbeshellext=Install the shell extension
-sk.msg_DeleteSettings=Chcete vymaza? aj nastavenia programu MPC-BE?%n%nAk planujete opatovnu in?talaciu programu MPC-BE, tak nie je potrebne ich vymazava?.
-sk.msg_NoD3DX9DLL_found=Najnov?ie rozhranie DirectX nie je nain?talovane!%n%nProsim stiahnite a nain?talujte si ho ({#DIRECTX_SDK_DATE}) bez oh?adu na verziu opera?neho systemu.
-sk.msg_SetupIsRunningWarning=In?talacia programu MPC-BE je u? spustena!
+sk.msg_DeleteSettings=Chcete vymazaÅ¥ aj nastavenia programu MPC-BE?%n%nAk plÃ¡nujete opÃ¤tovnÃº inÅ¡talÃ¡ciu programu MPC-BE, tak nie je potrebnÃ© ich vymazÃ¡vaÅ¥.
+sk.msg_NoD3DX9DLL_found=NajnovÅ¡ie rozhranie DirectX nie je nainÅ¡talovanÃ©!%n%nProsÃ­m stiahnite a nainÅ¡talujte si ho ({#DIRECTX_SDK_DATE}) bez ohÄ¾adu na verziu operaÄnÃ©ho systÃ©mu.
+sk.msg_SetupIsRunningWarning=InÅ¡talÃ¡cia programu MPC-BE je uÅ¾ spustenÃ¡!
 #if defined(sse_required)
-sk.msg_simd_sse=Toto zostavenie MPC-BE vy?aduje procesor s podporou in?trukcii SSE.%n%nVa? procesor ich nepodporuje.
+sk.msg_simd_sse=Toto zostavenie MPC-BE vyÅ¾aduje procesor s podporou inÅ¡trukciÃ­ SSE.%n%nVÃ¡Å¡ procesor ich nepodporuje.
 #elif defined(sse2_required)
-sk.msg_simd_sse2=Toto zostavenie MPC-BE vy?aduje procesor s podporou in?trukcii SSE2.%n%nVa? procesor ich nepodporuje.
+sk.msg_simd_sse2=Toto zostavenie MPC-BE vyÅ¾aduje procesor s podporou inÅ¡trukciÃ­ SSE2.%n%nVÃ¡Å¡ procesor ich nepodporuje.
 #endif
-sk.tsk_AllUsers=Pre v?etkych pou?ivate?ov
-sk.tsk_CurrentUser=Len pre aktualneho pou?ivate?a
-sk.tsk_Other=Ine ulohy:
-sk.tsk_ResetSettings=Obnovi? povodne nastavenia
-sk.types_DefaultInstallation=Predvolena in?talacia
-sk.types_CustomInstallation=Vlastna in?talacia
-sk.ViewChangelog=Zobrazi? zoznam zmien
+sk.tsk_AllUsers=Pre vÅ¡etkÃ½ch pouÅ¾Ã­vateÄ¾ov
+sk.tsk_CurrentUser=Len pre aktuÃ¡lneho pouÅ¾Ã­vateÄ¾a
+sk.tsk_Other=InÃ© Ãºlohy:
+sk.tsk_ResetSettings=ObnoviÅ¥ pÃ´vodnÃ© nastavenia
+sk.types_DefaultInstallation=PredvolenÃ¡ inÅ¡talÃ¡cia
+sk.types_CustomInstallation=VlastnÃ¡ inÅ¡talÃ¡cia
+sk.ViewChangelog=ZobraziÅ¥ zoznam zmien
 sk.AssociationFormatsAV=Configuring associations with video and audio files:
 sk.AssociationFormats=Association with video and audio files
 sk.AssociationVideo=Association with video files
@@ -887,24 +888,24 @@ sk.AssociationMPCPlayVideoFilesS=Video Files
 
 ;Chinese Traditional
 tc.langid=00000014
-tc.comp_mpciconlib=ÓñãÆÍ·
-tc.comp_mpcresources=?æ»
+tc.comp_mpciconlib=åœ–ç¤ºåº«
+tc.comp_mpcresources=ç¿»è­¯
 tc.comp_mpcbeshellext=Install the shell extension
-tc.msg_DeleteSettings=?ãÀÜúå¥é©ß¢ğ¶ MPC-BE àâïÒ£¿%n%nåıÍı?öèß©î¢ó­äÌíû MPC-BE öÎÙíâÍß¢ğ¶¡£
-tc.msg_NoD3DX9DLL_found=Ú±äÌíûõÌãæ÷úÜâîÜ DirectX Runtime£¡%n%nÜôÖå?ŞÅéÄîÜíÂåöÍ§÷Ö?ù¼£¬ôëù»î°?ÌÚãæò¸õÌãæ÷úÜâîÜ DirectX Runtime ({#DIRECTX_SDK_DATE})¡£
-tc.msg_SetupIsRunningWarning=ì«î¤òûú¼ MPC-BE äÌíûïïãÒ£¡
+tc.msg_DeleteSettings=æ‚¨æ˜¯å¦ä¹Ÿè¦åˆªé™¤ MPC-BE è¨­å®šï¼Ÿ%n%nå¦‚æœæ‚¨æ‰“ç®—å†æ¬¡å®‰è£ MPC-BE å‰‡ç„¡éœ€åˆªé™¤ã€‚
+tc.msg_NoD3DX9DLL_found=æœªå®‰è£æœ€æ–°ç‰ˆæœ¬çš„ DirectX Runtimeï¼%n%nä¸è«–æ‚¨ä½¿ç”¨çš„ä½œæ¥­ç³»çµ±ç‚ºä½•ï¼Œè«‹ä¸‹è¼‰ä¸¦æ›´æ–°è‡³æœ€æ–°ç‰ˆæœ¬çš„ DirectX Runtime ({#DIRECTX_SDK_DATE})ã€‚
+tc.msg_SetupIsRunningWarning=å·²åœ¨åŸ·è¡Œ MPC-BE å®‰è£ç¨‹å¼ï¼
 #if defined(sse_required)
-tc.msg_simd_sse=ó®÷úîÜ MPC-BE âÍé©êóò¨êµ SSE æÅãßò¦Öµó¢îÜ CPU¡£%n%n?îÜ CPU ?Ú±ßÓé»îÏŞÁÍíÒö¡£
+tc.msg_simd_sse=æ­¤ç‰ˆçš„ MPC-BE éœ€è¦æœ‰æ”¯æ´ SSE å»¶ä¼¸æŒ‡ä»¤é›†çš„ CPUã€‚%n%næ‚¨çš„ CPU ä¸¦æœªç›¸å®¹é€™äº›åŠŸèƒ½ã€‚
 #elif defined(sse2_required)
-tc.msg_simd_sse2=ó®÷úîÜ MPC-BE âÎé©êóò¨êµ SSE2 æÅãßò¦Öµó¢îÜ CPU¡£%n%n?îÜ CPU ?Ú±ßÓé»îÏŞÁÍíÒö¡£
+tc.msg_simd_sse2=æ­¤ç‰ˆçš„ MPC-BE é ˆè¦æœ‰æ”¯æ´ SSE2 å»¶ä¼¸æŒ‡ä»¤é›†çš„ CPUã€‚%n%næ‚¨çš„ CPU ä¸¦æœªç›¸å®¹é€™äº›åŠŸèƒ½ã€‚
 #endif
-tc.tsk_AllUsers=äÌíûĞåá¶êóŞÅéÄíº
-tc.tsk_CurrentUser=ĞÁäÌíûĞåÙÍîñŞÅéÄíº
-tc.tsk_Other=Ğì?ÍïíÂ£º
-tc.tsk_ResetSettings=ñìàâàâïÒ
-tc.types_DefaultInstallation=çèàâäÌíû
-tc.types_CustomInstallation=í»ïôäÌíû
-tc.ViewChangelog=ËşãÊÌÚãæìíò¼
+tc.tsk_AllUsers=å®‰è£çµ¦æ‰€æœ‰ä½¿ç”¨è€…
+tc.tsk_CurrentUser=åƒ…å®‰è£çµ¦ç›®å‰ä½¿ç”¨è€…
+tc.tsk_Other=å…¶å®ƒå·¥ä½œï¼š
+tc.tsk_ResetSettings=é‡è¨­è¨­å®š
+tc.types_DefaultInstallation=é è¨­å®‰è£
+tc.types_CustomInstallation=è‡ªè¨‚å®‰è£
+tc.ViewChangelog=æª¢è¦–æ›´æ–°æ—¥èªŒ
 tc.AssociationFormatsAV=Configuring associations with video and audio files:
 tc.AssociationFormats=Association with video and audio files
 tc.AssociationVideo=Association with video files
@@ -923,24 +924,24 @@ tc.AssociationMPCPlayVideoFilesS=Video Files
 
 ;Turkish
 tr.langid=00000004
-tr.comp_mpciconlib=Simge Kutuphanesi
-tr.comp_mpcresources=Ceviriler
+tr.comp_mpciconlib=Simge KÃ¼tÃ¼phanesi
+tr.comp_mpcresources=Ã‡eviriler
 tr.comp_mpcbeshellext=Install the shell extension
-tr.msg_DeleteSettings=MPC-BE ayarlar©¥n©¥ silmek istiyor musunuz?%n%nMPC-BE 'yi tekrar yuklemeyi planl©¥yorsan©¥z, bu ayarlar©¥ silmemeniz onerilir.
-tr.msg_NoD3DX9DLL_found=En son DirectX cal©¥?t©¥r©¥labilir paketi yuklu de?il!%n%nLutfen en son DirectX paketini ({#DIRECTX_SDK_DATE}) innDirip kurunuz. ??letim sistemi surumunuz, bu a?amada onemli de?ildir.
-tr.msg_SetupIsRunningWarning=MPC-BE kurulumu zaten cal©¥?©¥yor.
+tr.msg_DeleteSettings=MPC-BE ayarlarÄ±nÄ± silmek istiyor musunuz?%n%nMPC-BE 'yi tekrar yÃ¼klemeyi planlÄ±yorsanÄ±z, bu ayarlarÄ± silmemeniz Ã¶nerilir.
+tr.msg_NoD3DX9DLL_found=En son DirectX Ã§alÄ±ÅŸtÄ±rÄ±labilir paketi yÃ¼klÃ¼ deÄŸil!%n%nLÃ¼tfen en son DirectX paketini ({#DIRECTX_SDK_DATE}) innDirip kurunuz. Ä°ÅŸletim sistemi sÃ¼rÃ¼mÃ¼nÃ¼z, bu aÅŸamada Ã¶nemli deÄŸildir.
+tr.msg_SetupIsRunningWarning=MPC-BE kurulumu zaten Ã§alÄ±ÅŸÄ±yor.
 #if defined(sse_required)
-tr.msg_simd_sse=Bu MPC-BE surumu, SSE eklentisi destekleyen bir i?lemci gerektirmektedir.%n%n??lemciniz bu ozelli?i desteklemiyor.
+tr.msg_simd_sse=Bu MPC-BE sÃ¼rÃ¼mÃ¼, SSE eklentisi destekleyen bir iÅŸlemci gerektirmektedir.%n%nÄ°ÅŸlemciniz bu Ã¶zelliÄŸi desteklemiyor.
 #elif defined(sse2_required)
-tr.msg_simd_sse2=Bu MPC-BE surumu, SSE2 eklentisi destekleyen bir i?lemci gerektirmektedir.%n%n??lemciniz bu ozelli?i desteklemiyor.
+tr.msg_simd_sse2=Bu MPC-BE sÃ¼rÃ¼mÃ¼, SSE2 eklentisi destekleyen bir iÅŸlemci gerektirmektedir.%n%nÄ°ÅŸlemciniz bu Ã¶zelliÄŸi desteklemiyor.
 #endif
-tr.tsk_AllUsers=Tum kullan©¥c©¥lar icin
-tr.tsk_CurrentUser=Sadece mevcut kullan©¥c©¥ icin
-tr.tsk_Other=Di?er gorevler:
-tr.tsk_ResetSettings=Ayarlar©¥ s©¥f©¥rla
-tr.types_DefaultInstallation=Varsay©¥lan yukleme
-tr.types_CustomInstallation=Ozel yukleme
-tr.ViewChangelog=Surum Notlar©¥
+tr.tsk_AllUsers=TÃ¼m kullanÄ±cÄ±lar iÃ§in
+tr.tsk_CurrentUser=Sadece mevcut kullanÄ±cÄ± iÃ§in
+tr.tsk_Other=DiÄŸer gÃ¶revler:
+tr.tsk_ResetSettings=AyarlarÄ± sÄ±fÄ±rla
+tr.types_DefaultInstallation=VarsayÄ±lan yÃ¼kleme
+tr.types_CustomInstallation=Ã–zel yÃ¼kleme
+tr.ViewChangelog=SÃ¼rÃ¼m NotlarÄ±
 tr.AssociationFormatsAV=Configuring associations with video and audio files:
 tr.AssociationFormats=Association with video and audio files
 tr.AssociationVideo=Association with video files
@@ -959,24 +960,24 @@ tr.AssociationMPCPlayVideoFilesS=Video Files
 
 ;Ukrainian
 ua.langid=00000010
-ua.comp_mpciconlib=¬¢?¬Ò¬İ?¬à¬ä¬Ö¬Ü¬Ñ ?¬Ü¬à¬ß¬à¬Ü
-ua.comp_mpcresources=¬­¬à¬Ü¬Ñ¬İ?¬Ù¬Ñ¬è??
+ua.comp_mpciconlib=Ğ‘Ñ–Ğ±Ğ»Ñ–Ğ¾Ñ‚ĞµĞºĞ° Ñ–ĞºĞ¾Ğ½Ğ¾Ğº
+ua.comp_mpcresources=Ğ›Ğ¾ĞºĞ°Ğ»Ñ–Ğ·Ğ°Ñ†Ñ–Ñ—
 ua.comp_mpcbeshellext=Install the shell extension
-ua.msg_DeleteSettings=¬¹¬Ú ¬ç¬à¬é¬Ö¬ä¬Ö ¬Ó¬Ú ¬Ó¬Ú¬Õ¬Ñ¬İ¬Ú¬ä¬Ú ¬ß¬Ñ¬İ¬Ñ¬ê¬ä¬å¬Ó¬Ñ¬ß¬ß¬ñ MPC-BE?%n%n¬Á¬Ü¬ë¬à ¬Ó¬Ú ¬á¬İ¬Ñ¬ß¬å?¬ä¬Ö ¬á¬â¬à¬ã¬ä¬à ¬á¬à¬Ó¬ä¬à¬â¬ß¬à ¬Ó¬ã¬ä¬Ñ¬ß¬à¬Ó¬Ú¬ä¬Ú MPC-BE, ¬ä¬à ¬Ó¬Ñ¬Ş ¬ß¬Ö ¬á¬à¬ä¬â?¬Ò¬ß¬à ?¬ç ¬Ó¬Ú¬Õ¬Ñ¬İ¬ñ¬ä¬Ú.
-ua.msg_NoD3DX9DLL_found=¬°¬ã¬ä¬Ñ¬ß¬ß¬ğ ¬Ó¬Ö¬â¬ã?¬ğ DirectX ¬ß¬Ö ¬Ó¬ã¬ä¬Ñ¬ß¬à¬Ó¬İ¬Ö¬ß¬à!%n%n¬¢¬å¬Õ¬î ¬İ¬Ñ¬ã¬Ü¬Ñ, ¬Ù¬Ñ¬Ó¬Ñ¬ß¬ä¬Ñ¬Ø¬ä¬Ö ? ¬Ó¬ã¬ä¬Ñ¬ß¬à¬Ó?¬ä¬î ¬à¬ã¬ä¬Ñ¬ß¬ß¬ğ ¬Ó¬Ö¬â¬ã?¬ğ DirectX ({#DIRECTX_SDK_DATE}) ¬Ó?¬Õ¬á¬à¬Ó?¬Õ¬ß¬à ¬Õ¬à ¬à¬á¬Ö¬â¬Ñ¬è?¬Û¬ß¬à? ¬ã¬Ú¬ã¬ä¬Ö¬Ş¬Ú, ¬ñ¬Ü¬å ¬Ó¬Ú ¬Ó¬Ú¬Ü¬à¬â¬Ú¬ã¬ä¬à¬Ó¬å?¬ä¬Ö.
-ua.msg_SetupIsRunningWarning=¬£¬ã¬ä¬Ñ¬ß¬à¬Ó¬İ¬Ö¬ß¬ß¬ñ MPC-BE ¬Ó¬Ø¬Ö ¬Ù¬Ñ¬á¬å¬ë¬Ö¬ß¬à!
+ua.msg_DeleteSettings=Ğ§Ğ¸ Ñ…Ğ¾Ñ‡ĞµÑ‚Ğµ Ğ²Ğ¸ Ğ²Ğ¸Ğ´Ğ°Ğ»Ğ¸Ñ‚Ğ¸ Ğ½Ğ°Ğ»Ğ°ÑˆÑ‚ÑƒĞ²Ğ°Ğ½Ğ½Ñ MPC-BE?%n%nĞ¯ĞºÑ‰Ğ¾ Ğ²Ğ¸ Ğ¿Ğ»Ğ°Ğ½ÑƒÑ”Ñ‚Ğµ Ğ¿Ñ€Ğ¾ÑÑ‚Ğ¾ Ğ¿Ğ¾Ğ²Ñ‚Ğ¾Ñ€Ğ½Ğ¾ Ğ²ÑÑ‚Ğ°Ğ½Ğ¾Ğ²Ğ¸Ñ‚Ğ¸ MPC-BE, Ñ‚Ğ¾ Ğ²Ğ°Ğ¼ Ğ½Ğµ Ğ¿Ğ¾Ñ‚Ñ€Ñ–Ğ±Ğ½Ğ¾ Ñ—Ñ… Ğ²Ğ¸Ğ´Ğ°Ğ»ÑÑ‚Ğ¸.
+ua.msg_NoD3DX9DLL_found=ĞÑÑ‚Ğ°Ğ½Ğ½Ñ Ğ²ĞµÑ€ÑÑ–Ñ DirectX Ğ½Ğµ Ğ²ÑÑ‚Ğ°Ğ½Ğ¾Ğ²Ğ»ĞµĞ½Ğ¾!%n%nĞ‘ÑƒĞ´ÑŒ Ğ»Ğ°ÑĞºĞ°, Ğ·Ğ°Ğ²Ğ°Ğ½Ñ‚Ğ°Ğ¶Ñ‚Ğµ Ñ– Ğ²ÑÑ‚Ğ°Ğ½Ğ¾Ğ²Ñ–Ñ‚ÑŒ Ğ¾ÑÑ‚Ğ°Ğ½Ğ½Ñ Ğ²ĞµÑ€ÑÑ–Ñ DirectX ({#DIRECTX_SDK_DATE}) Ğ²Ñ–Ğ´Ğ¿Ğ¾Ğ²Ñ–Ğ´Ğ½Ğ¾ Ğ´Ğ¾ Ğ¾Ğ¿ĞµÑ€Ğ°Ñ†Ñ–Ğ¹Ğ½Ğ¾Ñ— ÑĞ¸ÑÑ‚ĞµĞ¼Ğ¸, ÑĞºÑƒ Ğ²Ğ¸ Ğ²Ğ¸ĞºĞ¾Ñ€Ğ¸ÑÑ‚Ğ¾Ğ²ÑƒÑ”Ñ‚Ğµ.
+ua.msg_SetupIsRunningWarning=Ğ’ÑÑ‚Ğ°Ğ½Ğ¾Ğ²Ğ»ĞµĞ½Ğ½Ñ MPC-BE Ğ²Ğ¶Ğµ Ğ·Ğ°Ğ¿ÑƒÑ‰ĞµĞ½Ğ¾!
 #if defined(sse_required)
-ua.msg_simd_sse=¬¥¬İ¬ñ ¬Ó¬Ú¬Ü¬à¬â¬Ú¬ã¬ä¬Ñ¬ß¬ß¬ñ ¬Õ¬Ñ¬ß¬à? ¬Ó¬Ö¬â¬ã?? MPC-BE ¬ß¬Ö¬à¬Ò¬ç?¬Õ¬ß¬à, ¬ë¬à¬Ò ¬Ó¬Ñ¬ê ¬á¬â¬à¬è¬Ö¬ã¬à¬â ¬á?¬Õ¬ä¬â¬Ú¬Ş¬å¬Ó¬Ñ¬Ó SSE ¬â¬à¬Ù¬ê¬Ú¬â¬Ö¬ß¬ß¬ñ.%n%n¬¡¬İ¬Ö ¬Ó¬Ñ¬ê ¬á¬â¬à¬è¬Ö¬ã¬à¬â ¬ß¬Ö ¬á?¬Õ¬ä¬â¬Ú¬Ş¬å? ?¬ç.
+ua.msg_simd_sse=Ğ”Ğ»Ñ Ğ²Ğ¸ĞºĞ¾Ñ€Ğ¸ÑÑ‚Ğ°Ğ½Ğ½Ñ Ğ´Ğ°Ğ½Ğ¾Ñ— Ğ²ĞµÑ€ÑÑ–Ñ— MPC-BE Ğ½ĞµĞ¾Ğ±Ñ…Ñ–Ğ´Ğ½Ğ¾, Ñ‰Ğ¾Ğ± Ğ²Ğ°Ñˆ Ğ¿Ñ€Ğ¾Ñ†ĞµÑĞ¾Ñ€ Ğ¿Ñ–Ğ´Ñ‚Ñ€Ğ¸Ğ¼ÑƒĞ²Ğ°Ğ² SSE Ñ€Ğ¾Ğ·ÑˆĞ¸Ñ€ĞµĞ½Ğ½Ñ.%n%nĞĞ»Ğµ Ğ²Ğ°Ñˆ Ğ¿Ñ€Ğ¾Ñ†ĞµÑĞ¾Ñ€ Ğ½Ğµ Ğ¿Ñ–Ğ´Ñ‚Ñ€Ğ¸Ğ¼ÑƒÑ” Ñ—Ñ….
 #elif defined(sse2_required)
-ua.msg_simd_sse2=¬¥¬İ¬ñ ¬Ó¬Ú¬Ü¬à¬â¬Ú¬ã¬ä¬Ñ¬ß¬ß¬ñ ¬Õ¬Ñ¬ß¬à? ¬Ó¬Ö¬â¬ã?? MPC-BE ¬ß¬Ö¬à¬Ò¬ç?¬Õ¬ß¬à, ¬ë¬à¬Ò ¬Ó¬Ñ¬ê ¬á¬â¬à¬è¬Ö¬ã¬à¬â ¬á?¬Õ¬ä¬â¬Ú¬Ş¬å¬Ó¬Ñ¬Ó SSE2 ¬â¬à¬Ù¬ê¬Ú¬â¬Ö¬ß¬ß¬ñ.%n%n¬¡¬İ¬Ö ¬Ó¬Ñ¬ê ¬á¬â¬à¬è¬Ö¬ã¬à¬â ¬ß¬Ö ¬á?¬Õ¬ä¬â¬Ú¬Ş¬å? ?¬ç.
+ua.msg_simd_sse2=Ğ”Ğ»Ñ Ğ²Ğ¸ĞºĞ¾Ñ€Ğ¸ÑÑ‚Ğ°Ğ½Ğ½Ñ Ğ´Ğ°Ğ½Ğ¾Ñ— Ğ²ĞµÑ€ÑÑ–Ñ— MPC-BE Ğ½ĞµĞ¾Ğ±Ñ…Ñ–Ğ´Ğ½Ğ¾, Ñ‰Ğ¾Ğ± Ğ²Ğ°Ñˆ Ğ¿Ñ€Ğ¾Ñ†ĞµÑĞ¾Ñ€ Ğ¿Ñ–Ğ´Ñ‚Ñ€Ğ¸Ğ¼ÑƒĞ²Ğ°Ğ² SSE2 Ñ€Ğ¾Ğ·ÑˆĞ¸Ñ€ĞµĞ½Ğ½Ñ.%n%nĞĞ»Ğµ Ğ²Ğ°Ñˆ Ğ¿Ñ€Ğ¾Ñ†ĞµÑĞ¾Ñ€ Ğ½Ğµ Ğ¿Ñ–Ğ´Ñ‚Ñ€Ğ¸Ğ¼ÑƒÑ” Ñ—Ñ….
 #endif
-ua.tsk_AllUsers=¬¥¬İ¬ñ ¬Ó¬ã?¬ç ¬Ü¬à¬â¬Ú¬ã¬ä¬å¬Ó¬Ñ¬é?¬Ó
-ua.tsk_CurrentUser=¬­¬Ú¬ê¬Ö ¬Õ¬İ¬ñ ¬á¬à¬ä¬à¬é¬ß¬à¬Ô¬à ¬Ü¬à¬â¬Ú¬ã¬ä¬å¬Ó¬Ñ¬é¬Ñ
-ua.tsk_Other=?¬ß¬ê? ¬Ù¬Ñ¬Ó¬Õ¬Ñ¬ß¬ß¬ñ:
-ua.tsk_ResetSettings=¬³¬Ü¬Ú¬ß¬å¬ä¬Ú ¬ß¬Ñ¬İ¬Ñ¬ê¬ä¬å¬Ó¬Ñ¬ß¬ß¬ñ
-ua.types_DefaultInstallation=¬´¬Ú¬á¬à¬Ó¬Ö ¬Ó¬ã¬ä¬Ñ¬ß¬à¬Ó¬İ¬Ö¬ß¬ß¬ñ
-ua.types_CustomInstallation=¬£¬Ú¬Ò?¬â¬Ü¬à¬Ó¬Ö ¬Ó¬ã¬ä¬Ñ¬ß¬à¬Ó¬İ¬Ö¬ß¬ß¬ñ
-ua.ViewChangelog=¬±¬à¬Ü¬Ñ¬Ù¬Ñ¬ä¬Ú ¬Ø¬å¬â¬ß¬Ñ¬İ ¬Ù¬Ş?¬ß
+ua.tsk_AllUsers=Ğ”Ğ»Ñ Ğ²ÑÑ–Ñ… ĞºĞ¾Ñ€Ğ¸ÑÑ‚ÑƒĞ²Ğ°Ñ‡Ñ–Ğ²
+ua.tsk_CurrentUser=Ğ›Ğ¸ÑˆĞµ Ğ´Ğ»Ñ Ğ¿Ğ¾Ñ‚Ğ¾Ñ‡Ğ½Ğ¾Ğ³Ğ¾ ĞºĞ¾Ñ€Ğ¸ÑÑ‚ÑƒĞ²Ğ°Ñ‡Ğ°
+ua.tsk_Other=Ğ†Ğ½ÑˆÑ– Ğ·Ğ°Ğ²Ğ´Ğ°Ğ½Ğ½Ñ:
+ua.tsk_ResetSettings=Ğ¡ĞºĞ¸Ğ½ÑƒÑ‚Ğ¸ Ğ½Ğ°Ğ»Ğ°ÑˆÑ‚ÑƒĞ²Ğ°Ğ½Ğ½Ñ
+ua.types_DefaultInstallation=Ğ¢Ğ¸Ğ¿Ğ¾Ğ²Ğµ Ğ²ÑÑ‚Ğ°Ğ½Ğ¾Ğ²Ğ»ĞµĞ½Ğ½Ñ
+ua.types_CustomInstallation=Ğ’Ğ¸Ğ±Ñ–Ñ€ĞºĞ¾Ğ²Ğµ Ğ²ÑÑ‚Ğ°Ğ½Ğ¾Ğ²Ğ»ĞµĞ½Ğ½Ñ
+ua.ViewChangelog=ĞŸĞ¾ĞºĞ°Ğ·Ğ°Ñ‚Ğ¸ Ğ¶ÑƒÑ€Ğ½Ğ°Ğ» Ğ·Ğ¼Ñ–Ğ½
 ua.AssociationFormatsAV=Configuring associations with video and audio files:
 ua.AssociationFormats=Association with video and audio files
 ua.AssociationVideo=Association with video files
