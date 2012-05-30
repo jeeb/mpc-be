@@ -1,5 +1,5 @@
 /*
- * $Id: mpciconlib.cpp 4345 2012-04-12 08:04:38Z XhmikosR $
+ * $Id: mpciconlib.cpp 4345 2012-04-12 08:04:38Z Xhmikos $
  *
  * (C) 2008-2012 see Authors.txt
  *
@@ -24,9 +24,35 @@
 #include "mpciconlib.h"
 #include <afx.h>
 
-int main()
+HICON get_hicon(CString path, CString fn)
 {
-	return 0;
+	HINSTANCE hDll = LoadLibrary(path + _T("mpciconlib.dll"));
+
+	if (!hDll) {
+		return NULL;
+	}
+
+	CString ext;
+	int pos = fn.ReverseFind(_T('.'));
+
+	if (pos != -1) {
+		ext = fn.Right(fn.GetLength() - pos);
+	} else {
+		ext = fn;
+	}
+
+	HICON hicon;
+	int iconindex = get_icon_index(ext);
+
+	if (iconindex != -1) {
+		hicon = LoadIcon(hDll, MAKEINTRESOURCE(iconindex));
+	} else {
+		hicon = LoadIcon(hDll, MAKEINTRESOURCE(IDI_DEFAULT_ICON));
+	}
+
+	FreeLibrary(hDll);
+
+	return hicon;
 }
 
 int get_icon_index(CString ext)
@@ -57,8 +83,8 @@ int get_icon_index(CString ext)
 		iconindex = IDI_AMR_ICON;
 	} else if (ext.CompareNoCase(_T(".amv")) == 0) {
 		iconindex = IDI_AMV_ICON;
-//	} else if (ext.CompareNoCase(_T(".aob")) == 0) {
-//		iconindex = IDI_DVDAUDIO_ICON;
+	} else if (ext.CompareNoCase(_T(".aob")) == 0) {
+		iconindex = IDI_DVDAUDIO_ICON;
 	} else if (ext.CompareNoCase(_T(".ape")) == 0) {
 		iconindex = IDI_APE_ICON;
 	} else if (ext.CompareNoCase(_T(".apl")) == 0) {

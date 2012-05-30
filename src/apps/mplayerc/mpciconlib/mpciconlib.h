@@ -1,5 +1,5 @@
 /*
- * $Id: mpciconlib.h 4345 2012-04-12 08:04:38Z XhmikosR $
+ * $Id: mpciconlib.h 4345 2012-04-12 08:04:38Z Xhmikos $
  *
  * (C) 2008-2012 see Authors.txt
  *
@@ -26,7 +26,6 @@
  * when adding/removing icons.
  */
 
-#define IDI_AVI_ICON                    0
 #define IDI_MPG_ICON                    1
 #define IDI_MP4_ICON                    2
 #define IDI_MKV_ICON                    3
@@ -74,10 +73,11 @@
 #define IDI_TAK_ICON                    45
 #define IDI_TTA_ICON                    46
 #define IDI_APE_ICON                    47
-//#define IDI_DVDAUDIO_ICON               48
+#define IDI_DVDAUDIO_ICON               48
 #define IDI_MLP_ICON                    49
+#define IDI_AVI_ICON                    50
+#define IDI_DEFAULT_ICON                51
 #define IDI_NONE                        -1
-
 
 // Next default values for new objects
 //
@@ -89,3 +89,6 @@
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
+
+HICON get_hicon(CString path, CString fn);
+int get_icon_index(CString ext);

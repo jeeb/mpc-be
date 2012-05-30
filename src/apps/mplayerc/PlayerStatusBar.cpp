@@ -26,6 +26,7 @@
 #include "PlayerStatusBar.h"
 #include "MainFrm.h"
 #include "../../DSUtil/DSUtil.h"
+#include "mpciconlib/mpciconlib.h"
 
 
 // CPlayerStatusBar
@@ -181,7 +182,13 @@ void CPlayerStatusBar::SetStatusTypeIcon(HICON hIcon)
 		DestroyIcon(m_hIcon);
 	}
 
-	m_type.SetIcon(m_hIcon = hIcon);
+	HICON hico = get_hicon(m_logobm.LoadCurrentPath(), ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strFn);
+
+	if (hico) {
+		m_type.SetIcon(hico);
+	} else {
+		m_type.SetIcon(m_hIcon = hIcon);
+	}
 
 	Relayout();
 	Invalidate();
@@ -440,24 +447,32 @@ void CPlayerStatusBar::OnPaint()
 		rt.top		= r.top + 4;
 		memdc.DrawText(str, str.GetLength(), &rt, DT_RIGHT|DT_VCENTER|DT_SINGLELINE);
 
-		CRect rs	= r;
-		rs.left		= r.left + 6;
-		rs.top		= r.top + 3;
 		CString str2;
 		str2 = GetStatusMessage();
+
+		if (str2.GetLength()) {
+			m_hIcon = get_hicon(m_logobm.LoadCurrentPath(), ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strFn);
+		}
+
+		CRect rs	= r;
+		rs.top		= r.top + 3;
+
+		if (m_hIcon) {
+			rs.left		= r.left + 6 + 22;
+		} else {
+			rs.left		= r.left + 6;
+		}
+
 		memdc.DrawText(str2, str2.GetLength(), &rs, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
 
 		dc.BitBlt(r.left, r.top, r.Width(), r.Height(), &memdc, 0, 0, SRCCOPY);
-	}
 
-#if 0
-	if (m_hIcon)
-	{
-		GetClientRect(&r);
-		r.SetRect(6, r.top+4, 22-1, r.bottom-4-1);
-		DrawIconEx(dc, r.left, r.top, m_hIcon, r.Width(), r.Height(), 0, NULL, DI_NORMAL|DI_COMPAT);
+		if (m_hIcon) {
+			GetClientRect(&r);
+			r.SetRect(6, r.top+6, 22-1, r.bottom-2-1);
+			DrawIconEx(dc, r.left, r.top, m_hIcon, r.Width(), r.Height(), 0, NULL, DI_NORMAL|DI_COMPAT);
+		}
 	}
-#endif
 
 	// Do not call CDialogBar::OnPaint() for painting messages
 }

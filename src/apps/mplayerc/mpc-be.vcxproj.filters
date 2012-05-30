@@ -21,6 +21,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="mpciconlib\mpciconlib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="AppSettings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -368,6 +371,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="mpciconlib\mpciconlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="AppSettings.h">
       <Filter>Header Files</Filter>
     </ClInclude>

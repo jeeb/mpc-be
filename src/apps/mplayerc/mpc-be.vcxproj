@@ -157,6 +157,7 @@
     <ClCompile Include="..\..\ExtLib\mfc\afxglobals.cpp" />
     <ClCompile Include="..\..\ExtLib\mfc\afxmaskededit.cpp" />
     <ClCompile Include="..\..\ExtLib\mfc\winmdi.cpp" />
+    <ClCompile Include="mpciconlib\mpciconlib.cpp" />
     <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="AppSettings.cpp" />
     <ClCompile Include="AuthDlg.cpp" />
@@ -278,6 +279,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ExtLib\mfc\afxmaskededit.h" />
+    <ClInclude Include="mpciconlib\mpciconlib.h" />
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="AppSettings.h" />
     <ClInclude Include="AuthDlg.h" />

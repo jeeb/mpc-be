@@ -1,5 +1,5 @@
 /*
- * $Id: stdafx.cpp 4345 2012-04-12 08:04:38Z XhmikosR $
+ * $Id: stdafx.cpp 4345 2012-04-12 08:04:38Z Xhmikos $
  *
  * (C) 2011-2012 see Authors.txt
  *
@@ -21,3 +21,8 @@
  */
 
 #include "stdafx.h"
+
+int main()
+{
+	return 0;
+}
