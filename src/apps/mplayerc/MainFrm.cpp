@@ -3176,7 +3176,7 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 		}
 		CMenu* pSubMenu = NULL;
 
-		if (itemID == ID_FILE_OPENDISC32774) {
+		if (itemID == ID_FILE_OPENDISC) {
 			SetupOpenCDSubMenu();
 			pSubMenu = &m_opencds;
 		} else if (itemID == ID_FILTERS) {
