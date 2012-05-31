@@ -147,6 +147,40 @@ bool MPCPngImage::LoadFromResource(UINT id) {
 	return ret;
 }
 
+bool MPCPngImage::LoadFromFile(CString fn) {
+	bool ret = false;
+
+	FILE* fp;
+	_tfopen_s(&fp, LoadCurrentPath() + fn + _T(".png"), _T("rb"));
+	if (fp) {
+		fseek(fp, 0, SEEK_END);
+		int size = ftell(fp);
+		rewind(fp);
+		char* str = (char*)malloc(size);
+		fread((void*)str, 1, size, fp);
+		fclose(fp);
+
+		struct png_t png;
+		png.data = (unsigned char*)str;
+		png.size = size;
+		int w, h;
+		if (BYTE* p = DecompressPNG(&png, &w, &h)) {
+			if (Create(w, -h, 32)) {
+				for (int y = 0; y < h; y++) {
+					memcpy(GetPixelAddress(0, y), &p[w*4*y], w*4);
+				}
+				ret = true;
+			}
+
+			free(p);
+		}
+
+		free(str);
+	}
+
+	return ret;
+}
+
 CString MPCPngImage::LoadCurrentPath()
 {
 	CString path;

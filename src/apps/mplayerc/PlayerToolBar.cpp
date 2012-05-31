@@ -551,10 +551,33 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			dc.Attach(pTBCD->nmcd.hdc);
 			CRect r;
 
+			CDC memdc;
+			CBitmap bmGlassLike;
+			CBitmap *bmOld;
+
+			BLENDFUNCTION bf;
+			bf.AlphaFormat	= AC_SRC_ALPHA;
+			bf.BlendFlags	= 0;
+			bf.BlendOp	= AC_SRC_OVER;
+			bf.SourceConstantAlpha = 0;
+
 			for (int j = 0; j < _countof(sep); j++) {
 				GetItemRect(sep[j], &r);
 
-				dc.FillSolidRect(r, GetSysColor(COLOR_WINDOW));
+				memdc.CreateCompatibleDC(&dc);
+				bmGlassLike.CreateCompatibleBitmap(&dc, r.right, r.bottom);
+				bmOld = memdc.SelectObject(&bmGlassLike);
+
+				TRIVERTEX tv[2] = {
+					{0, 0, 0, 0, 0, 0},
+					{r.right, r.bottom, 0, 0, 0, 0},
+				};
+				memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+
+				AlphaBlend(dc.m_hDC, r.left, r.top, r.right, r.bottom, memdc, 0, 0, r.right, r.bottom, bf);
+
+				DeleteObject(memdc.SelectObject(bmOld));
+				memdc.DeleteDC();
 			}
 
 			dc.Detach();

@@ -126,16 +126,20 @@ void CChildView::LoadLogo()
 
 	m_logo.Destroy();
 
-	if (s.fLogoExternal) {
-		bHaveLogo = SUCCEEDED(m_logo.Load(s.strLogoFileName));
-	}
+	if (m_logo.FileExists("logo")) {
+		m_logo.LoadFromFile("logo");
+	} else {
+		if (s.fLogoExternal) {
+			bHaveLogo = SUCCEEDED(m_logo.Load(s.strLogoFileName));
+		}
 
-	if (!bHaveLogo) {
-		s.fLogoExternal = false; // use the built-in logo instead
-		s.strLogoFileName = ""; // clear logo file name
+		if (!bHaveLogo) {
+			s.fLogoExternal = false; // use the built-in logo instead
+			s.strLogoFileName = ""; // clear logo file name
 
-		if (!m_logo.LoadFromResource(s.nLogoId)) { // try the latest selected build-in logo
-			m_logo.LoadFromResource(s.nLogoId=DEF_LOGO);    // if fail then use the default logo, should never fail
+			if (!m_logo.LoadFromResource(s.nLogoId)) { // try the latest selected build-in logo
+				m_logo.LoadFromResource(s.nLogoId=DEF_LOGO);    // if fail then use the default logo, should never fail
+			}
 		}
 	}
 

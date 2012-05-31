@@ -31,6 +31,7 @@ class MPCPngImage : public CImage
 {
 public:
 	bool LoadFromResource(UINT id);
+	bool LoadFromFile(CString fn);
 
 	CString LoadCurrentPath();
 	int FileExists(CString fn);
