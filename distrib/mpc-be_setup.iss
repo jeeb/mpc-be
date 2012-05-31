@@ -31,8 +31,8 @@
 
 ; From now on you shouldn't need to change anything
 
-#if VER < EncodeVer(5,4,3)
-  #error Update your Inno Setup version (5.4.3 or newer)
+#if VER < EncodeVer(5,5,0)
+  #error Update your Inno Setup version (5.5.0 or newer)
 #endif
 
 #ifndef UNICODE
@@ -40,7 +40,7 @@
 #endif
 
 
-#define ISPP_IS_BUGGY
+#define ISPP_INVOKED
 #include "..\include\Version.h"
 
 #define copyright_year "2002-2012"

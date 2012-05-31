@@ -51,7 +51,7 @@
 #define MPC_VERSION_PATCH 0
 
 
-#ifndef ISPP_IS_BUGGY
+#ifndef ISPP_INVOKED
 
 #define MPC_COMP_NAME_STR    L"MPC-BE Team"
 #define MPC_COPYRIGHT_STR    L"Copyright © 2002-2012 all contributors, see Authors.txt"
@@ -64,7 +64,7 @@
 #define MPC_VERSION_STR      MAKE_STR(MPC_VERSION_MAJOR) ", " MAKE_STR(MPC_VERSION_MINOR) ", " MAKE_STR(MPC_VERSION_PATCH) ", " MAKE_STR(MPC_VERSION_REV)
 #endif // NO_VERSION_REV_NEEDED
 
-#endif // ISPP_IS_BUGGY
+#endif // ISPP_INVOKED
 
 #define MPC_VERSION_COMMENTS "http://sourceforge.net/projects/mpc-be/"
 
