@@ -103,6 +103,9 @@ SRCS_C=\
     libavcodec/avfft.c \
     libavcodec/avpacket.c \
     libavcodec/bgmc.c \
+    libavcodec/bink.c \
+    libavcodec/binkaudio.c \
+    libavcodec/binkdsp.c \
     libavcodec/bitstream.c \
     libavcodec/cabac.c \
     libavcodec/celp_filters.c \

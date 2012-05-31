@@ -306,6 +306,10 @@ FFMPEG_CODECS		ffCodecs[] = {
 	{ &MEDIASUBTYPE_apco, CODEC_ID_PRORES, NULL },
 	{ &MEDIASUBTYPE_ap4h, CODEC_ID_PRORES, NULL },
 
+	// Bink Video
+	{ &MEDIASUBTYPE_BINKVI, CODEC_ID_BINKVIDEO, NULL },
+	{ &MEDIASUBTYPE_BINKVB, CODEC_ID_BINKVIDEO, NULL },
+
 	// Other MPEG-4
 	{ &MEDIASUBTYPE_MP4V, CODEC_ID_MPEG4, NULL },
 	{ &MEDIASUBTYPE_mp4v, CODEC_ID_MPEG4, NULL },
@@ -539,6 +543,10 @@ const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_apco },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_ap4h },
 
+	// Bink Video
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_BINKVI },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_BINKVB },
+
 	// IMPORTANT : some of the last MediaTypes present in next group may be not available in
 	// the standalone filter (workaround to prevent GraphEdit crash).
 	// Other MPEG-4
@@ -643,7 +651,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_nCodecId				= CODEC_ID_NONE;
 	m_bReorderBFrame		= true;
 	m_DXVADecoderGUID		= GUID_NULL;
-	m_nActiveCodecs			= MPCVD_H264|MPCVD_VC1|MPCVD_XVID|MPCVD_DIVX|MPCVD_MSMPEG4|MPCVD_FLASH|MPCVD_WMV|MPCVD_H263|MPCVD_SVQ3|MPCVD_AMVV|MPCVD_THEORA|MPCVD_H264_DXVA|MPCVD_VC1_DXVA|MPCVD_VP356|MPCVD_VP8|MPCVD_MJPEG|MPCVD_INDEO|MPCVD_RV|MPCVD_WMV3_DXVA|MPCVD_MPEG2_DXVA|MPCVD_DIRAC|MPCVD_DV|MPCVD_UTVD|MPCVD_SCREC|MPCVD_LAGARITH|MPCVD_PRORES;
+	m_nActiveCodecs			= MPCVD_H264|MPCVD_VC1|MPCVD_XVID|MPCVD_DIVX|MPCVD_MSMPEG4|MPCVD_FLASH|MPCVD_WMV|MPCVD_H263|MPCVD_SVQ3|MPCVD_AMVV|MPCVD_THEORA|MPCVD_H264_DXVA|MPCVD_VC1_DXVA|MPCVD_VP356|MPCVD_VP8|MPCVD_MJPEG|MPCVD_INDEO|MPCVD_RV|MPCVD_WMV3_DXVA|MPCVD_MPEG2_DXVA|MPCVD_DIRAC|MPCVD_DV|MPCVD_UTVD|MPCVD_SCREC|MPCVD_LAGARITH|MPCVD_PRORES|MPCVD_BINKV;
 
 	m_rtAvrTimePerFrame		= 0;
 	m_rtLastStart			= 0;
@@ -1026,6 +1034,9 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn)
 				case CODEC_ID_PRORES :
 					bCodecActivated = (m_nActiveCodecs & MPCVD_PRORES) != 0;
 					break;
+				case CODEC_ID_BINKVIDEO :
+					bCodecActivated = (m_nActiveCodecs & MPCVD_BINKV) != 0;
+					break;
 			}
 			return (bCodecActivated ? i : -1);
 #endif
@@ -1167,7 +1178,8 @@ bool CMPCVideoDecFilter::IsMultiThreadSupported(enum CodecID nCodec)
 			nCodec==CODEC_ID_RV30 ||
 			nCodec==CODEC_ID_RV40 ||
 			nCodec==CODEC_ID_UTVIDEO ||
-			nCodec==CODEC_ID_LAGARITH
+			nCodec==CODEC_ID_LAGARITH ||
+			nCodec==CODEC_ID_BINKVIDEO
 		);
 }
 

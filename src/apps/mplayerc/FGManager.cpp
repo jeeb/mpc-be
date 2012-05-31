@@ -1857,6 +1857,14 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_TRUESPEECH);
 	m_transform.AddTail(pFGF);
 
+	// Bink Audio
+	pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
+		(ffmpeg_filters[FFM_BINKA]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
+		(ffmpeg_filters[FFM_BINKA]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_BINKA_DCT);
+	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_BINKA_RDFT);
+	m_transform.AddTail(pFGF);
+
 	// Windows Media Audio 9 Professional
 	pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 		(ffmpeg_filters[FFM_WMAPRO]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
@@ -2120,6 +2128,11 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_ap4h);
 	}
 
+	if (ffmpeg_filters[FFM_BINKV]) {
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_BINKVI);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_BINKVB);
+	}
+
 	m_transform.AddTail(pFGF);
 
 	// Low merit MPC Video Decoder
@@ -2350,6 +2363,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_apco);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_ap4h);
 	}
+
+	if (ffmpeg_filters[FFM_BINKV]) {
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_BINKVI);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_BINKVB);
+	}
+
 
 	m_transform.AddTail(pFGF);
 

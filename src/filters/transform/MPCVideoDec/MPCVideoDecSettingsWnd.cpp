@@ -510,6 +510,9 @@ bool CMPCVideoDecCodecWnd::OnActivate()
 	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_WMV3_DXVA) != 0);
 
 
+	m_lstCodecs.AddString (_T("Bink video"));
+	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_BINKV) != 0);
+
 	m_lstCodecs.AddString (_T("AMV video"));
 	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_AMVV) != 0);
 
@@ -610,6 +613,9 @@ bool CMPCVideoDecCodecWnd::OnApply()
 
 		if (m_lstCodecs.GetCheck  (nPos++)) {
 			nActiveCodecs |= MPCVD_AMVV;
+		}
+		if (m_lstCodecs.GetCheck  (nPos++)) {
+			nActiveCodecs |= MPCVD_BINKV;
 		}
 		if (m_lstCodecs.GetCheck  (nPos++)) {
 			nActiveCodecs |= MPCVD_PRORES;

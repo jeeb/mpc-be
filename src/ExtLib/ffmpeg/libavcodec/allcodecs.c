@@ -48,6 +48,7 @@ void avcodec_register_all(void)
 
     /* video codecs */
     REGISTER_DECODER (AMV, amv);
+    REGISTER_DECODER (BINK, bink);
     REGISTER_DECODER (CINEPAK, cinepak);
     REGISTER_DECODER (CSCD, cscd);
     REGISTER_DECODER (DIRAC, dirac);
@@ -99,6 +100,8 @@ void avcodec_register_all(void)
     REGISTER_DECODER (ALS, als);
     REGISTER_DECODER (APE, ape);
     REGISTER_DECODER (ATRAC3, atrac3);
+    REGISTER_DECODER (BINKAUDIO_DCT, binkaudio_dct);
+    REGISTER_DECODER (BINKAUDIO_RDFT, binkaudio_rdft);
     REGISTER_DECODER (COOK, cook);
     REGISTER_DECODER (EAC3, eac3);
     REGISTER_DECODER (MPC7, mpc7);

@@ -115,6 +115,8 @@ CAppSettings::CAppSettings()
 	FFMFiltersKeys[FFM_WMAPRO] = _T("FFM_WMAPRO");
 	FFMFiltersKeys[FFM_WMA2] = _T("FFM_WMA2");
 	FFMFiltersKeys[FFM_WMALOSS] = _T("FFM_WMALOSS");
+	FFMFiltersKeys[FFM_BINKV] = _T("FFM_BINKV");
+	FFMFiltersKeys[FFM_BINKA] = _T("FFM_BINKA");
 
 }
 

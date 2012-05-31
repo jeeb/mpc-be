@@ -219,6 +219,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_ASV1_DECODER 0
 #define CONFIG_ASV2_DECODER 0
 #define CONFIG_AVS_DECODER 0
+#define CONFIG_BINK_DECODER 1
 #define CONFIG_CAVS_DECODER 0
 #define CONFIG_CINEPAK_DECODER 1
 #define CONFIG_CSCD_DECODER 1
@@ -303,6 +304,8 @@ Note: when adding a new codec, you have to:
 #define CONFIG_ALS_DECODER 1
 #define CONFIG_APE_DECODER 1
 #define CONFIG_ATRAC3_DECODER 1
+#define CONFIG_BINKAUDIO_DCT_DECODER 1
+#define CONFIG_BINKAUDIO_RDFT_DECODER 1
 #define CONFIG_COOK_DECODER 1
 #define CONFIG_DCA_DECODER 0
 #define CONFIG_EAC3_DECODER 1
