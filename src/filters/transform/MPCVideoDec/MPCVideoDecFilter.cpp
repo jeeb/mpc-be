@@ -469,6 +469,9 @@ const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesIn[] = {
 	// FLASHSV2
 //	{ &MEDIATYPE_Video, &MEDIASUBTYPE_FLASHSV2   },
 
+	// Fraps
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_FPS1       },
+
 	// UtVideo
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_UTVD_ULRG   },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_UTVD_ULRA   },
