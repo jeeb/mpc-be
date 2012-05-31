@@ -156,8 +156,8 @@ bool MPCPngImage::LoadFromFile(CString fn) {
 		fseek(fp, 0, SEEK_END);
 		int size = ftell(fp);
 		rewind(fp);
-		char* str = (char*)malloc(size);
-		fread((void*)str, 1, size, fp);
+		void* str = malloc(size);
+		fread(str, 1, size, fp);
 		fclose(fp);
 
 		struct png_t png;
