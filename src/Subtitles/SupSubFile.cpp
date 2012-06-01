@@ -128,40 +128,25 @@ UINT CSupSubFile::ThreadProc()
 		m_sub.Write(buff, len);
 	}
 	f.Close();
-	m_sub.Seek(SUP_HEADER_SIZE, CFile::begin); // Skip first block
+	m_sub.SeekToBegin();
 
-	CAtlList<UINT64> m_idx;
+	WORD sync				= 0;
+	USHORT size				= 0;
+	REFERENCE_TIME rtStart	= 0;
 
-	WORD sync	= 0;
-	UINT64 pos	= 0;
 	while (m_sub.GetPosition() < (m_sub.GetLength() - 10)) {
-		pos = m_sub.GetPosition();
 		sync = (WORD)ReadByte(&m_sub, 2);
 		if (sync == 'PG') {
-			m_idx.AddTail(pos);
-			m_sub.Seek(8, CFile::current);
+			rtStart = UINT64(ReadByte(&m_sub, 4) * 1000 / 9);
+			m_sub.Seek(4, CFile::current);	// rtStop
+			m_sub.Seek(1, CFile::current);	// Segment type
+			size = ReadByte(&m_sub, 2) + 3;	// Segment size
+			m_sub.Seek(-3, CFile::current);
+			m_sub.Read(buff, size);
+			m_pSub->ParseSample(buff, size, rtStart, 0);
 		} else {
-			m_sub.Seek(-1, CFile::current);
+			break;
 		}
-	}
-	m_idx.AddTail(m_sub.GetLength());
-
-	REFERENCE_TIME rtStart = 0;
-	UINT64 pos_start	= 0;
-	UINT64 pos_stop		= 0;
-	POSITION POS		= m_idx.GetHeadPosition();
-	m_sub.SeekToBegin();
-	while (POS) {
-		pos_stop	= m_idx.GetNext(POS);
-		UINT64 size	= pos_stop - pos_start - SUP_HEADER_SIZE;
-
-		m_sub.Seek(pos_start + 2, CFile::begin);
-		rtStart = UINT64(ReadByte(&m_sub, 4) * 1000 / 9);
-		m_sub.Seek(4, CFile::current);
-		m_sub.Read(buff, size);
-		m_pSub->ParseSample(buff, size, rtStart, 0);
-
-		pos_start = pos_stop;
 	}
 
 	m_sub.Close();
