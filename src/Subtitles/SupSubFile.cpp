@@ -29,12 +29,20 @@
 CSupSubFile::CSupSubFile(CCritSec* pLock)
 	: CSubPicProviderImpl(pLock)
 {
-	m_name = _T("");
-	m_pSub = DNew CHdmvSub();
+	m_name		= _T("");
+	m_pSub		= DNew CHdmvSub();
+	fThreadRun	= false;
 }
 
 CSupSubFile::~CSupSubFile()
 {
+	if (m_Thread) {
+		WaitForSingleObject(m_Thread->m_hThread, (DWORD)5000); // main maximum 5 sec before terminate;
+		if (fThreadRun) {
+			TerminateThread(m_Thread->m_hThread, (DWORD)-1 );
+		}
+	}
+
 	if (m_pSub) {
 		m_pSub->Reset();
 		delete m_pSub;
@@ -43,7 +51,7 @@ CSupSubFile::~CSupSubFile()
 
 static UINT64 ReadByte(CFile* mfile, size_t count = 1)
 {
-	if (count <= 0 || count >=64) {
+	if (count <= 0 || count >= 64) {
 		return 0;
 	}
 	UINT64 ret = 0;
@@ -66,6 +74,11 @@ static CString StripPath(CString path)
 	return (p.IsEmpty() ? path : p);
 }
 
+static UINT ThreadProc(LPVOID pParam)
+{
+	return (static_cast<CSupSubFile*>(pParam))->ThreadProc();
+}
+
 bool CSupSubFile::Open(CString fn)
 {
 	CFile f;
@@ -79,6 +92,30 @@ bool CSupSubFile::Open(CString fn)
 		f.Close();
 		return false;
 	}
+	f.Close();
+	m_name = fn;
+
+	m_Thread = AfxBeginThread(::ThreadProc, static_cast<LPVOID>(this));
+
+	return (m_Thread) ? true : false;
+}
+
+UINT CSupSubFile::ThreadProc()
+{
+	CFile f;
+	if (!f.Open(m_name, CFile::modeRead|CFile::typeBinary|CFile::shareDenyNone)) {
+		f.Close();
+		return 1;
+	}
+
+	fThreadRun = true;
+	
+	m_name	= StripPath(m_name);
+	m_name	= m_name.Left(m_name.GetLength() - 4);
+	m_name	= _T("SUP - ") + m_name;
+
+	CAutoLock cAutoLock(&m_csCritSec);
+
 	f.SeekToBegin();
 
 	CMemFile m_sub;
@@ -95,7 +132,8 @@ bool CSupSubFile::Open(CString fn)
 
 	CAtlList<UINT64> m_idx;
 
-	UINT64 pos = 0;
+	WORD sync	= 0;
+	UINT64 pos	= 0;
 	while (m_sub.GetPosition() < (m_sub.GetLength() - 10)) {
 		pos = m_sub.GetPosition();
 		sync = (WORD)ReadByte(&m_sub, 2);
@@ -108,7 +146,7 @@ bool CSupSubFile::Open(CString fn)
 	}
 	m_idx.AddTail(m_sub.GetLength());
 
-	REFERENCE_TIME rtStart = 0, rtStop = 0;
+	REFERENCE_TIME rtStart = 0;
 	UINT64 pos_start	= 0;
 	UINT64 pos_stop		= 0;
 	POSITION POS		= m_idx.GetHeadPosition();
@@ -119,21 +157,17 @@ bool CSupSubFile::Open(CString fn)
 
 		m_sub.Seek(pos_start + 2, CFile::begin);
 		rtStart = UINT64(ReadByte(&m_sub, 4) * 1000 / 9);
-		//rtStop = UINT64(ReadByte(&m_sub, 4) * 1000 / 9); don't use in HDMV subtitle
 		m_sub.Seek(4, CFile::current);
 		m_sub.Read(buff, size);
-		m_pSub->ParseSample(buff, size, rtStart, rtStop);
+		m_pSub->ParseSample(buff, size, rtStart, 0);
 
 		pos_start = pos_stop;
 	}
 
 	m_sub.Close();
 
-	m_name = StripPath(fn);
-	m_name = m_name.Left(m_name.GetLength() - 4);
-	m_name = _T("SUP - ") + m_name;
-
-	return true;
+	fThreadRun = false;
+	return 0;
 }
 
 STDMETHODIMP CSupSubFile::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -237,7 +271,8 @@ STDMETHODIMP_(int) CSupSubFile::GetStream()
 
 STDMETHODIMP CSupSubFile::SetStream(int iStream)
 {
-	return iStream == 0 ? S_OK : E_FAIL;}
+	return iStream == 0 ? S_OK : E_FAIL;
+}
 
 STDMETHODIMP CSupSubFile::Reload()
 {

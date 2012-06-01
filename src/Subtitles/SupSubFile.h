@@ -58,8 +58,12 @@ public:
 	STDMETHODIMP SetStream(int iStream);
 	STDMETHODIMP Reload();
 
+	UINT		ThreadProc();
 private:
 	CString		m_name;
 	CHdmvSub*	m_pSub;
 	CCritSec	m_csCritSec;
+
+	CWinThread*	m_Thread;
+	bool		fThreadRun;
 };
