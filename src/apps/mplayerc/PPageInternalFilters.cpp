@@ -55,7 +55,7 @@ static filter_t s_filters[] = {
 
 	// Audio decoder
 	{_T("AAC"),                   FFMPEG_DECODER, AUDIO,  FFM_AAC,        IDS_TRA_FFMPEG,},
-	{_T("AC3"),                   DECODER,        AUDIO,  TRA_AC3,        IDS_TRA_AC3,},
+	{_T("AC3/E-AC3/TrueHD/MLP"),  DECODER,        AUDIO,  TRA_AC3,        IDS_TRA_AC3,},
 	{_T("ALAC"),                  FFMPEG_DECODER, AUDIO,  FFM_ALAC,       IDS_TRA_FFMPEG,},
 	{_T("ALS"),                   FFMPEG_DECODER, AUDIO,  FFM_ALS,        IDS_TRA_FFMPEG,},
 	{_T("AMR"),                   FFMPEG_DECODER, AUDIO,  FFM_AMR,        IDS_TRA_FFMPEG,},

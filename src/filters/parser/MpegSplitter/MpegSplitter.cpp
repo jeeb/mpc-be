@@ -2084,13 +2084,6 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 		}
 		p->SetData(start + 4, m_p->GetCount() - 4);
 		m_p.Free();
-	// DVD PCM
-	} else if (m_mt.subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {
-		if (p->GetCount() < 3) {
-			return S_OK;    // Should be invalid packet
-		}
-		BYTE* start = p->GetData();
-		p->SetData(start + 3, p->GetCount() - 3);
 	// Dolby_AC3
 	} else if ((m_type == mpeg_ts) &&
 			   (m_mt.subtype == MEDIASUBTYPE_DOLBY_AC3) &&
