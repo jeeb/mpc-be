@@ -24,8 +24,6 @@
 #include "stdafx.h"
 #include "SupSubFile.h"
 
-#define SUP_HEADER_SIZE	10
-
 CSupSubFile::CSupSubFile(CCritSec* pLock)
 	: CSubPicProviderImpl(pLock)
 {
@@ -137,9 +135,8 @@ UINT CSupSubFile::ThreadProc()
 	while (m_sub.GetPosition() < (m_sub.GetLength() - 10)) {
 		sync = (WORD)ReadByte(&m_sub, 2);
 		if (sync == 'PG') {
-			rtStart = UINT64(ReadByte(&m_sub, 4) * 1000 / 9);
-			m_sub.Seek(4, CFile::current);	// rtStop
-			m_sub.Seek(1, CFile::current);	// Segment type
+			rtStart = UINT64(ReadByte(&m_sub, 4) * (1000 / 9));
+			m_sub.Seek(4 + 1, CFile::current);	// rtStop + Segment type
 			size = ReadByte(&m_sub, 2) + 3;	// Segment size
 			m_sub.Seek(-3, CFile::current);
 			m_sub.Read(buff, size);
