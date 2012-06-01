@@ -327,23 +327,6 @@ void CDVBSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 		bbox.right	= m_Display.width;
 		bbox.bottom	= m_Display.height;
 	}
-
-	// Cleanup old PG
-	DVB_PAGE* pPage_old;
-	while (m_Pages.GetCount()>0) {
-		pPage_old = m_Pages.GetHead();
-		if (pPage_old->rtStop < (rt - 30*10000000i64)) {
-			if (!pPage_old->Rendered) {
-				TRACE_DVB ("DVB - remove unrendered object, %S => %S, (rt=%S)\n",
-							ReftimeToString(pPage_old->rtStart), ReftimeToString(pPage_old->rtStop),
-							ReftimeToString(rt));
-			}
-			m_Pages.RemoveHead();
-			delete pPage_old;
-		} else {
-			break;
-		}
-	}
 }
 
 HRESULT CDVBSub::GetTextureSize(POSITION pos, SIZE& MaxTextureSize, SIZE& VideoSize, POINT& VideoTopLeft)
@@ -579,4 +562,24 @@ HRESULT CDVBSub::UpdateTimeStamp(REFERENCE_TIME rtStop)
 	}
 
 	return hr;
+}
+
+void CDVBSub::CleanOld(REFERENCE_TIME rt)
+{
+	// Cleanup old PG
+	DVB_PAGE* pPage_old;
+	while (m_Pages.GetCount()>0) {
+		pPage_old = m_Pages.GetHead();
+		if (pPage_old->rtStop < (rt - 30*10000000i64)) {
+			if (!pPage_old->Rendered) {
+				TRACE_DVB ("DVB - remove unrendered object, %S => %S, (rt=%S)\n",
+							ReftimeToString(pPage_old->rtStart), ReftimeToString(pPage_old->rtStop),
+							ReftimeToString(rt));
+			}
+			m_Pages.RemoveHead();
+			delete pPage_old;
+		} else {
+			break;
+		}
+	}
 }

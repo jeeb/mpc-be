@@ -47,6 +47,7 @@ public:
 	virtual REFERENCE_TIME	GetStop(POSITION nPos)  = NULL;
 	virtual void			Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox) = NULL;
 	virtual HRESULT			GetTextureSize (POSITION pos, SIZE& MaxTextureSize, SIZE& VideoSize, POINT& VideoTopLeft) = NULL;
+	virtual void			CleanOld(REFERENCE_TIME rt) = NULL;
 
 protected :
 	SUBTITLE_TYPE			m_nType;

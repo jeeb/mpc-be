@@ -66,6 +66,7 @@ public:
 	~CHdmvSub();
 
 	HRESULT			ParseSample (IMediaSample* pSample);
+	HRESULT			ParseSample (BYTE* pData, int lSampleLen, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 
 
 	POSITION		GetStartPosition(REFERENCE_TIME rt, double fps);
@@ -87,6 +88,8 @@ public:
 	void			Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox);
 	HRESULT			GetTextureSize (POSITION pos, SIZE& MaxTextureSize, SIZE& VideoSize, POINT& VideoTopLeft);
 	void			Reset();
+
+	void			CleanOld(REFERENCE_TIME rt);
 
 private :
 

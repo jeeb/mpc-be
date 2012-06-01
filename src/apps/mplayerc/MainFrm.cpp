@@ -98,6 +98,7 @@ static UINT s_uTBBC = RegisterWindowMessage(_T("TaskbarButtonCreated"));
 
 #include "../../filters/transform/VSFilter/IDirectVobSub.h"
 #include "../../Subtitles/RenderedHdmvSubtitle.h"
+#include "../../Subtitles/SupSubFile.h"
 
 #include "Monitors.h"
 #include "MultiMonitor.h"
@@ -5361,8 +5362,8 @@ void CMainFrame::OnFileLoadsubtitle()
 	}
 
 	static TCHAR BASED_CODE szFilter[] =
-		_T(".srt .sub .ssa .ass .smi .psb .txt .idx .usf .xss|")
-		_T("*.srt;*.sub;*.ssa;*.ass;*smi;*.psb;*.txt;*.idx;*.usf;*.xss||");
+		_T(".srt .sub .ssa .ass .smi .psb .txt .idx .usf .xss .sup|")
+		_T("*.srt;*.sub;*.ssa;*.ass;*smi;*.psb;*.txt;*.idx;*.usf;*.xss;*.sup||");
 
 	CFileDialog fd(TRUE, NULL, NULL,
 				   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY|OFN_NOCHANGEDIR,
@@ -13790,6 +13791,13 @@ bool CMainFrame::LoadSubtitle(CString fn, ISubStream **actualStream)
 	// TMP: maybe this will catch something for those who get a runtime error dialog when opening subtitles from cds
 	try {
 		if (!pSubStream) {
+			CAutoPtr<CSupSubFile> pSSF(DNew CSupSubFile(&m_csSubLock));
+			if (CString(CPath(fn).GetExtension()).MakeLower() == _T(".sup") && pSSF && pSSF->Open(fn)) {
+				pSubStream = pSSF.Detach();
+			}
+		}
+
+		if (!pSubStream) {
 			CAutoPtr<CVobSubFile> pVSF(DNew CVobSubFile(&m_csSubLock));
 			if (CString(CPath(fn).GetExtension()).MakeLower() == _T(".idx") && pVSF && pVSF->Open(fn) && pVSF->GetStreamCount() > 0) {
 				pSubStream = pVSF.Detach();
@@ -13926,7 +13934,7 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, bool fApplyDefStyle)
 			pRTS->SetOverride(s.fUseDefaultSubtitlesStyle, &s.subdefstyle);
 
 			pRTS->Deinit();
-		} else if (clsid == __uuidof(CRenderedHdmvSubtitle)) {
+		} else if (clsid == __uuidof(CRenderedHdmvSubtitle) || clsid == __uuidof(CSupSubFile)) {
 			s.m_RenderersSettings.bPositionRelative	= s.subdefstyle.relativeTo;
 		}
 	}

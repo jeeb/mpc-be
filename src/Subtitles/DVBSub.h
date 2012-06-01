@@ -44,6 +44,7 @@ public:
 	virtual REFERENCE_TIME	GetStart(POSITION nPos);
 	virtual REFERENCE_TIME	GetStop(POSITION nPos);
 	virtual void			Reset();
+	virtual	void			CleanOld(REFERENCE_TIME rt);
 
 	// EN 300-743, table 2
 	enum DVB_SEGMENT_TYPE {
@@ -212,5 +213,4 @@ private:
 	HRESULT				ParseObject(CGolombBuffer& gb, WORD wSegLength);
 
 	HRESULT				UpdateTimeStamp(REFERENCE_TIME rtStop);
-
 };

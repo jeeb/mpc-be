@@ -98,6 +98,7 @@ STDMETHODIMP CRenderedHdmvSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, d
 {
 	CAutoLock cAutoLock(&m_csCritSec);
 	m_pSub->Render (spd, rt - m_rtStart, bbox);
+	m_pSub->CleanOld(rt - m_rtStart);
 
 	return S_OK;
 }
