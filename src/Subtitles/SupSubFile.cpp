@@ -28,8 +28,10 @@ CSupSubFile::CSupSubFile(CCritSec* pLock)
 	: CSubPicProviderImpl(pLock)
 {
 	m_name		= _T("");
-	m_pSub		= DNew CHdmvSub();
 	fThreadRun	= false;
+	m_Thread	= NULL;
+
+	m_pSub		= DNew CHdmvSub();
 }
 
 CSupSubFile::~CSupSubFile()
@@ -106,7 +108,7 @@ UINT CSupSubFile::ThreadProc()
 		return 1;
 	}
 
-	fThreadRun = true;
+	fThreadRun	= true;
 	
 	m_name	= StripPath(m_name);
 	m_name	= m_name.Left(m_name.GetLength() - 4);
