@@ -38,8 +38,11 @@ private:
 	CStringArray m_AudioRendererDisplayNames;
 	CStringArray m_D3D9GUIDNames;
 
-	void DisableRadioButton(UINT nID, UINT nDefID);
-
+	CComboBox m_iDSVideoRendererTypeCtrl;
+	CComboBox m_iAudioRendererTypeCtrl;
+	CComboBox m_iRMVideoRendererTypeCtrl;
+	CComboBox m_iQTVideoRendererTypeCtrl;
+	CComboBox m_iD3D9RenderDeviceCtrl;
 public:
 	CPPageOutput();
 	virtual ~CPPageOutput();
@@ -51,7 +54,6 @@ public:
 	int m_iQTVideoRendererType;
 	int m_iAPSurfaceUsage;
 	int m_iAudioRendererType;
-	CComboBox m_iAudioRendererTypeCtrl;
 	int m_iDX9Resizer;
 	BOOL m_fVMR9MixerMode;
 	BOOL m_fVMR9MixerYUV;
@@ -62,7 +64,6 @@ public:
 
 	BOOL m_fD3D9RenderDevice;
 	int m_iD3D9RenderDevice;
-	CComboBox m_iD3D9RenderDeviceCtrl;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
@@ -74,7 +75,7 @@ protected:
 public:
 	afx_msg void OnUpdateMixerYUV(CCmdUI* pCmdUI);
 	afx_msg void OnSurfaceChange();
-	afx_msg void OnDSRendererChange(UINT nIDbutton);
+	afx_msg void OnDSRendererChange();
 	afx_msg void OnFullscreenCheck();
 	afx_msg void OnD3D9DeviceCheck();
 };
