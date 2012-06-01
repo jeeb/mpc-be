@@ -279,8 +279,8 @@ BOOL CPPageOutput::OnInitDialog()
 	}
 
 	CheckDlgButton(IDC_D3D9DEVICE, BST_UNCHECKED);
-	GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(TRUE);
-	GetDlgItem(IDC_D3D9DEVICE_COMBO)->EnableWindow(TRUE);
+	GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(FALSE);
+	GetDlgItem(IDC_D3D9DEVICE_COMBO)->EnableWindow(FALSE);
 
 	switch (m_iDSVideoRendererType) {
 		case VIDRNDT_DS_VMR9RENDERLESS:
