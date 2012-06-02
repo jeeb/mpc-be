@@ -30,8 +30,7 @@ CSupSubFile::CSupSubFile(CCritSec* pLock)
 	m_name		= _T("");
 	fThreadRun	= false;
 	m_Thread	= NULL;
-
-	m_pSub		= DNew CHdmvSub();
+	m_pSub		= NULL;
 }
 
 CSupSubFile::~CSupSubFile()
@@ -93,7 +92,9 @@ bool CSupSubFile::Open(CString fn)
 		return false;
 	}
 	f.Close();
-	m_name = fn;
+
+	m_name	= fn;
+	m_pSub	= DNew CHdmvSub();
 
 	m_Thread = AfxBeginThread(::ThreadProc, static_cast<LPVOID>(this));
 
@@ -108,11 +109,11 @@ UINT CSupSubFile::ThreadProc()
 		return 1;
 	}
 
-	fThreadRun	= true;
+	fThreadRun = true;
 	
-	m_name	= StripPath(m_name);
-	m_name	= m_name.Left(m_name.GetLength() - 4);
-	m_name	= _T("SUP - ") + m_name;
+	m_name = StripPath(m_name);
+	m_name = m_name.Left(m_name.GetLength() - 4);
+	m_name = _T("SUP - ") + m_name;
 
 	CAutoLock cAutoLock(&m_csCritSec);
 
