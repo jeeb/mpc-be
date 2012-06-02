@@ -56,7 +56,7 @@ HRESULT CAviFile::Init()
 	}
 
 	if (m_avih.dwStreams == 0 && m_strms.GetCount() > 0) {
-		m_avih.dwStreams = m_strms.GetCount();
+		m_avih.dwStreams = (DWORD)m_strms.GetCount();
 	}
 
 	if (m_avih.dwStreams != m_strms.GetCount()) {
@@ -285,7 +285,7 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 					}
 					break;
 				case FCC('vprp'):
-					//if(S_OK != Read(m_vprp)) return E_FAIL;
+					//if (S_OK != Read(m_vprp)) return E_FAIL;
 					break;
 				case FCC('idx1'):
 					ASSERT(m_idx1 == NULL);
@@ -324,7 +324,7 @@ REFERENCE_TIME CAviFile::GetTotalTime()
 
 	for (DWORD i = 0; i < m_avih.dwStreams; ++i) {
 		strm_t* s = m_strms[i];
-		REFERENCE_TIME t2 = s->GetRefTime(s->cs.GetCount(), s->totalsize);
+		REFERENCE_TIME t2 = s->GetRefTime((DWORD)s->cs.GetCount(), s->totalsize);
 		t = max(t, t2);
 	}
 
@@ -332,7 +332,7 @@ REFERENCE_TIME CAviFile::GetTotalTime()
 		t = 10i64*m_avih.dwMicroSecPerFrame*m_avih.dwTotalFrames;
 	}
 
-	return(t);
+	return t;
 }
 
 HRESULT CAviFile::BuildIndex()
@@ -477,7 +477,7 @@ bool CAviFile::IsInterleaved(bool fKeepInfo)
 		return true;
 	}
 	/*
-		if(m_avih.dwFlags&AVIF_ISINTERLEAVED) // not reliable, nandub can write f*cked up files and still sets it
+		if (m_avih.dwFlags&AVIF_ISINTERLEAVED) // not reliable, nandub can write f*cked up files and still sets it
 			return true;
 	*/
 	for (DWORD i = 0; i < m_avih.dwStreams; ++i) {
@@ -571,7 +571,7 @@ bool CAviFile::IsInterleaved(bool fKeepInfo)
 		}
 	}
 
-	return(fInterleaved);
+	return fInterleaved;
 }
 
 REFERENCE_TIME CAviFile::strm_t::GetRefTime(DWORD frame, UINT64 size)
@@ -615,7 +615,7 @@ DWORD CAviFile::strm_t::GetFrame(REFERENCE_TIME rt)
 		frame = (DWORD)(double(rt) * strh.dwRate / (strh.dwScale * 10000000.0));
 		// need calculate in double, because the (rt * strh.dwRate) can give overflow (verified in practice)
 		if (frame >= cs.GetCount()) {
-			frame = cs.GetCount() - 1;
+			frame = (DWORD)cs.GetCount() - 1;
 		}
 	}
 
@@ -630,7 +630,7 @@ DWORD CAviFile::strm_t::GetKeyFrame(REFERENCE_TIME rt)
 			break;
 		}
 	}
-	return(i);
+	return i;
 }
 
 DWORD CAviFile::strm_t::GetChunkSize(DWORD size)
