@@ -1,9 +1,10 @@
 /*
  * $Id$
  *
- * (C) 2012 see Authors.txt
+ * Copyright (C) 2012 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
  *
  * This file is part of MPC-BE.
+ * YOU CANNOT USE THIS FILE WITHOUT AUTHOR PERMISSION!
  *
  * MPC-BE is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

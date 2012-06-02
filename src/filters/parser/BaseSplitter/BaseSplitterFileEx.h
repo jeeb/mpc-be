@@ -173,7 +173,8 @@ public:
 
 	struct latm_aachdr
 	{
-		// nothing ;)
+		int samplerate;
+		int channels;
 	};
 
 	struct ac3hdr

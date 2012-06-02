@@ -612,10 +612,9 @@ bool CBaseSplitterFileEx::Read(latm_aachdr& h, int len, CMediaType* pmt)
 	BYTE buffer[64];
 	ByteRead(buffer, min(len, 64));
 
-	int samplerate, channels;
 	BYTE extra[64];
 	unsigned int extralen;
-	if (!ParseAACLatmHeader(buffer, min(len, 64), &samplerate, &channels, extra, &extralen)) {
+	if (!ParseAACLatmHeader(buffer, min(len, 64), &h.samplerate, &h.channels, extra, &extralen)) {
 		return false;
 	}
 
@@ -633,8 +632,8 @@ bool CBaseSplitterFileEx::Read(latm_aachdr& h, int len, CMediaType* pmt)
 	WAVEFORMATEX* wfe = (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + extralen];
 	memset(wfe, 0, sizeof(WAVEFORMATEX));
 	wfe->wFormatTag = WAVE_FORMAT_LATM_AAC;
-	wfe->nChannels = channels;
-	wfe->nSamplesPerSec = samplerate;
+	wfe->nChannels = h.channels;
+	wfe->nSamplesPerSec = h.samplerate;
 	wfe->nBlockAlign = 1;
 	wfe->nAvgBytesPerSec = 0;
 	wfe->cbSize = extralen;
