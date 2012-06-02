@@ -443,7 +443,7 @@ void CPlayerStatusBar::OnPaint()
 		m_time_rect2.left	= rt.right - 120;
 		m_time_rect2.bottom	= rt.bottom;
 
-		rt.right	= r.right -6;
+		rt.right	= r.right - 6;
 		rt.top		= r.top + 4;
 		memdc.DrawText(str, str.GetLength(), &rt, DT_RIGHT|DT_VCENTER|DT_SINGLELINE);
 
@@ -455,12 +455,11 @@ void CPlayerStatusBar::OnPaint()
 		}
 
 		CRect rs	= r;
+		rs.left		= r.left + 6;
 		rs.top		= r.top + 3;
 
 		if (m_hIcon) {
-			rs.left		= r.left + 6 + 22;
-		} else {
-			rs.left		= r.left + 6;
+			rs.left += 22-1;
 		}
 
 		memdc.DrawText(str2, str2.GetLength(), &rs, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
@@ -470,7 +469,7 @@ void CPlayerStatusBar::OnPaint()
 		if (m_hIcon) {
 			GetClientRect(&r);
 			r.SetRect(6, r.top+6, 22-1, r.bottom-2-1);
-			DrawIconEx(dc, r.left, r.top, m_hIcon, r.Width(), r.Height(), 0, NULL, DI_NORMAL|DI_COMPAT);
+			DrawIconEx(dc, r.left, r.top, m_hIcon, r.Width(), r.Height(), 0, NULL, DI_NORMAL | DI_COMPAT);
 		}
 	}
 
