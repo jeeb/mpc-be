@@ -22,33 +22,45 @@
 
 
 #define HAVE_AV_CONFIG_H
-#define H264_MERGE_TESTING
 
 #include <Windows.h>
 #include <WinNT.h>
 #include <vfwmsgs.h>
 #include <sys/timeb.h>
+#include <time.h> // for the _time64 workaround
+
 #include "FfmpegContext.h"
 
-#include <ffmpeg/libavcodec/dsputil.h>
-#include <ffmpeg/libavcodec/avcodec.h>
-#include <ffmpeg/libavcodec/mpegvideo.h>
-#include <ffmpeg/libavcodec/golomb.h>
-#include <ffmpeg/libavcodec/h264.h>
-#include <ffmpeg/libavcodec/h264data.h>
-#include <ffmpeg/libavcodec/vc1.h>
-#include <ffmpeg/libavcodec/mpeg12.h>
+extern BOOL IsWinVistaOrLater(); // requires linking with DSUtils which is always the case
 
-#include <time.h>
+extern "C" {
+	#include <ffmpeg/libavcodec/dsputil.h>
+	#include <ffmpeg/libavcodec/avcodec.h>
+// This is kind of an hack but it avoids using a C++ keyword as a struct member name
+#define class classFFMPEG
+	#include <ffmpeg/libavcodec/mpegvideo.h>
+#undef class
+	#include <ffmpeg/libavcodec/golomb.h>
 
-#if defined(REGISTER_FILTER)
-void *__imp_toupper	= toupper;
-void *__imp_time64	= _time64;
+	#include <ffmpeg/libavcodec/h264.h>
+	#include <ffmpeg/libavcodec/h264data.h>
+	#include <ffmpeg/libavcodec/vc1.h>
+	#include <ffmpeg/libavcodec/mpeg12.h>
+
+	int av_h264_decode_frame(struct AVCodecContext* avctx, int* nOutPOC, int64_t* rtStartTime, uint8_t *buf, int buf_size);
+	int av_vc1_decode_frame(AVCodecContext *avctx, uint8_t *buf, int buf_size, int *nFrameSize);
+	void av_init_packet(AVPacket *pkt);
+
+	#ifdef _WIN64
+	// Hack to use MinGW64 from 2.x branch
+	void __mingw_raise_matherr(int typ, const char *name, double a1, double a2, double rslt) {}
+	#endif
+}
+
+#if defined(REGISTER_FILTER) && _WIN64
+void *__imp_toupper = toupper;
+void *__imp_time64 = _time64;
 #endif
-
-int av_h264_decode_frame(struct AVCodecContext* avctx, int* nOutPOC, int64_t* rtStartTime, uint8_t *buf, int buf_size);
-int av_vc1_decode_frame(AVCodecContext *avctx, uint8_t *buf, int buf_size, int *nFrameSize);
-void av_init_packet(AVPacket *pkt);
 
 const byte ZZ_SCAN[16]  = {
 	0,  1,  4,  8,
@@ -67,28 +79,6 @@ const byte ZZ_SCAN8[64] = {
 	58, 59, 52, 45, 38, 31, 39, 46,
 	53, 60, 61, 54, 47, 55, 62, 63
 };
-
-BOOL IsVistaOrAbove()
-{
-	//only check once then cache the result
-	static BOOL checked = FALSE;
-	static BOOL result  = FALSE;
-	OSVERSIONINFO osver;
-
-	if (!checked) {
-		checked = TRUE;
-
-		osver.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
-
-		if (GetVersionEx( &osver ) &&
-				osver.dwPlatformId == VER_PLATFORM_WIN32_NT &&
-				(osver.dwMajorVersion >= 6 ) ) {
-			result = TRUE;
-		}
-	}
-
-	return result;
-}
 
 inline MpegEncContext* GetMpegEncContext(struct AVCodecContext* pAVCtx)
 {
@@ -175,7 +165,7 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 
 		if (nPCIVendor == PCIV_nVidia) {
 			// nVidia cards support level 5.1 since drivers v6.14.11.7800 for XP and drivers v7.15.11.7800 for Vista/7
-			if (IsVistaOrAbove()) {
+			if (IsWinVistaOrLater()) {
 				if (DriverVersionCheck(VideoDriverVersion, 7, 15, 11, 7800)) {
 					no_level51_support = 0;
 
@@ -616,7 +606,7 @@ int	MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx, struct AVFrame* pFram
 
 	avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
 
-	return (s->chroma_format == CHROMA_420);
+	return (s->chroma_format<2);
 }
 
 HRESULT FFMpeg2DecodeFrame (DXVA_PictureParameters* pPicParams, DXVA_QmatrixData* pQMatrixData, DXVA_SliceInfo* pSliceInfo, int* nSliceCount,
@@ -758,7 +748,6 @@ int FFGetThreadType(enum CodecID nCodecId, int nThreadCount)
 		case CODEC_ID_MPEG1VIDEO :
 		case CODEC_ID_DVVIDEO :
 		case CODEC_ID_FFV1 :
-		case CODEC_ID_PRORES :
 			return FF_THREAD_SLICE;
 			break;
 		case CODEC_ID_VP3 :
@@ -821,6 +810,3 @@ BOOL DXVACheckFramesize(int width, int height, DWORD nPCIVendor/*, DWORD nPCIDev
 
 	return FALSE;
 }
-
-// Hack to use MinGW64 from 2.x branch
-void __mingw_raise_matherr (int typ, const char *name, double a1, double a2, double rslt) {}

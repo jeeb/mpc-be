@@ -36,9 +36,9 @@
 #include "CpuId.h"
 
 #include <ffmpeg/ffImgfmt.h>
+#include "FfmpegContext.h"
 extern "C"
 {
-#include "FfmpegContext.h"
 #include <ffmpeg/libswscale/swscale.h>
 
 // === New swscaler options
@@ -623,7 +623,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 {
 	HWND		hWnd = NULL;
 
-	if (IsVistaOrAbove()) {
+	if (IsWinVistaOrLater()) {
 		for (int i=0; i<_countof(ffCodecs); i++) {
 			if (ffCodecs[i].nFFCodec == CODEC_ID_H264) {
 				ffCodecs[i].DXVAModes = &DXVA_H264_VISTA;
