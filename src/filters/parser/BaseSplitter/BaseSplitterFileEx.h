@@ -96,6 +96,10 @@ public:
 		BYTE hdrlen;
 
 		BYTE id_ext;
+
+		struct peshdr() {
+			memset(this, 0, sizeof(*this));
+		}
 	};
 
 	struct seqhdr {
