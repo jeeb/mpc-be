@@ -82,10 +82,10 @@ void CCDecoder::SaveDisp(__int64 time)
 {
 	CStringW str;
 
-	for (ptrdiff_t row = 0; row < 16; row++) {
+	for (size_t row = 0; row < 16; row++) {
 		bool fNonEmptyRow = false;
 
-		for (ptrdiff_t col = 0; col < 32; col++) {
+		for (size_t col = 0; col < 32; col++) {
 			if (m_disp[row][col]) {
 				CStringW str2(&m_disp[row][col]);
 				if (fNonEmptyRow) {
@@ -115,10 +115,10 @@ void CCDecoder::DecodeCC(BYTE* buff, int len, __int64 time)
 		FILE* f = NULL;
 		if (!_tfopen_s(&f, m_rawfn, _T("at"))) {
 			_ftprintf_s(f, _T("%02d:%02d:%02d.%03d\n"),
-					  (int)(time/1000/60/60),
-					  (int)((time/1000/60)%60),
-					  (int)((time/1000)%60),
-					  (int)(time%1000));
+						(int)(time/1000/60/60),
+						(int)((time/1000/60)%60),
+						(int)((time/1000)%60),
+						(int)(time%1000));
 
 			for (ptrdiff_t i = 0; i < len; i++) {
 				_ftprintf_s(f, _T("%02x"), buff[i]);

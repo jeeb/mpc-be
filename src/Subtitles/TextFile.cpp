@@ -125,12 +125,12 @@ CString CTextFile::GetFilePath() const
 
 ULONGLONG CTextFile::GetPosition() const
 {
-	return(CStdioFile::GetPosition() - m_offset);
+	return (CStdioFile::GetPosition() - m_offset);
 }
 
 ULONGLONG CTextFile::GetLength() const
 {
-	return(CStdioFile::GetLength() - m_offset);
+	return (CStdioFile::GetLength() - m_offset);
 }
 
 ULONGLONG CTextFile::Seek(LONGLONG lOff, UINT nFrom)
@@ -154,7 +154,7 @@ ULONGLONG CTextFile::Seek(LONGLONG lOff, UINT nFrom)
 
 	pos = CStdioFile::Seek(lOff, begin) - m_offset;
 
-	return(pos);
+	return pos;
 }
 
 void CTextFile::WriteString(LPCSTR lpsz/*CStringA str*/)
@@ -305,7 +305,7 @@ BOOL CTextFile::ReadString(CStringA& str)
 		}
 	}
 
-	return(!fEOF);
+	return !fEOF;
 }
 
 BOOL CTextFile::ReadString(CStringW& str)
@@ -391,7 +391,7 @@ BOOL CTextFile::ReadString(CStringW& str)
 		}
 	}
 
-	return(!fEOF);
+	return !fEOF;
 }
 
 //
@@ -420,7 +420,7 @@ bool CWebTextFile::Open(LPCTSTR lpszFileName)
 		}
 
 		TCHAR path[_MAX_PATH];
-		GetTempPath(MAX_PATH, path);
+		GetTempPath(_MAX_PATH, path);
 
 		fn = path + fn.Mid(fn.ReverseFind('/')+1);
 		int i = fn.Find(_T("?"));
@@ -475,50 +475,50 @@ void CWebTextFile::Close()
 CStringW AToW(CStringA str)
 {
 	CStringW ret;
-	for (size_t i = 0, j = str.GetLength(); i < j; i++) {
+	for (int i = 0, j = str.GetLength(); i < j; i++) {
 		ret += (WCHAR)(BYTE)str[i];
 	}
-	return(ret);
+	return ret;
 }
 
 CStringA WToA(CStringW str)
 {
 	CStringA ret;
-	for (size_t i = 0, j = str.GetLength(); i < j; i++) {
+	for (int i = 0, j = str.GetLength(); i < j; i++) {
 		ret += (CHAR)(WORD)str[i];
 	}
-	return(ret);
+	return ret;
 }
 
 CString AToT(CStringA str)
 {
 	CString ret;
-	for (size_t i = 0, j = str.GetLength(); i < j; i++) {
+	for (int i = 0, j = str.GetLength(); i < j; i++) {
 		ret += (TCHAR)(BYTE)str[i];
 	}
-	return(ret);
+	return ret;
 }
 
 CString WToT(CStringW str)
 {
 	CString ret;
-	for (size_t i = 0, j = str.GetLength(); i < j; i++) {
+	for (int i = 0, j = str.GetLength(); i < j; i++) {
 		ret += (TCHAR)(WORD)str[i];
 	}
-	return(ret);
+	return ret;
 }
 
 CStringA TToA(CString str)
 {
 	CStringA ret;
 #ifdef UNICODE
-	for (size_t i = 0, j = str.GetLength(); i < j; i++) {
+	for (int i = 0, j = str.GetLength(); i < j; i++) {
 		ret += (CHAR)(BYTE)str[i];
 	}
 #else
 	ret = str;
 #endif
-	return(ret);
+	return ret;
 }
 
 CStringW TToW(CString str)
@@ -531,5 +531,5 @@ CStringW TToW(CString str)
 		ret += (WCHAR)(BYTE)str[i];
 	}
 #endif
-	return(ret);
+	return ret;
 }

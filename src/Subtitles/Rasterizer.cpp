@@ -28,8 +28,10 @@
 #include <algorithm>
 #include <xmmintrin.h>
 #include <emmintrin.h>
+#include <mmintrin.h>
 #include "Rasterizer.h"
 #include "SeparableFilter.h"
+#include "../DSUtil/vd.h" // For CPUID usage in Rasterizer::Draw
 
 #ifndef _MAX		/* avoid collision with common (nonconforming) macros */
 #define _MAX	(max)
@@ -300,7 +302,7 @@ bool Rasterizer::EndPath(HDC hdc)
 		mpPathTypes = (BYTE*)malloc(sizeof(BYTE) * mPathPoints);
 		mpPathPoints = (POINT*)malloc(sizeof(POINT) * mPathPoints);
 
-		if (mPathPoints == (size_t)GetPath(hdc, mpPathPoints, mpPathTypes, mPathPoints)) {
+		if (mPathPoints == GetPath(hdc, mpPathPoints, mpPathTypes, mPathPoints)) {
 			return true;
 		}
 	}
@@ -375,8 +377,8 @@ bool Rasterizer::PartialEndPath(HDC hdc, long dx, long dy)
 
 bool Rasterizer::ScanConvert()
 {
-	size_t lastmoveto = (size_t)-1;
-	size_t i;
+	int lastmoveto = INT_MAX;
+	int i;
 
 	// Drop any outlines we may have.
 
@@ -392,14 +394,14 @@ bool Rasterizer::ScanConvert()
 		return 0;
 	}
 
-	ptrdiff_t minx = INT_MAX;
-	ptrdiff_t miny = INT_MAX;
-	ptrdiff_t maxx = INT_MIN;
-	ptrdiff_t maxy = INT_MIN;
+	int minx = INT_MAX;
+	int miny = INT_MAX;
+	int maxx = INT_MIN;
+	int maxy = INT_MIN;
 
 	for (i=0; i<mPathPoints; ++i) {
-		ptrdiff_t ix = mpPathPoints[i].x;
-		ptrdiff_t iy = mpPathPoints[i].y;
+		int ix = mpPathPoints[i].x;
+		int iy = mpPathPoints[i].y;
 
 		if (ix < minx) {
 			minx = ix;
@@ -425,7 +427,7 @@ bool Rasterizer::ScanConvert()
 		__m128i x_sub = _mm_set1_epi32(minx * 8);
 		__m128i y_sub = _mm_set1_epi32(miny * 8);
 
-		size_t end = (mPathPoints / 16) * 16;
+		int end = (mPathPoints / 16) * 16;
 
 		_MM_ALIGN16 int point_values_x[16];
 		_MM_ALIGN16 int point_values_y[16];
@@ -564,8 +566,8 @@ bool Rasterizer::ScanConvert()
 
 	// Initialize scanline list.
 
-	mpScanBuffer = DNew size_t[mHeight];
-	memset(mpScanBuffer, 0, mHeight*sizeof(size_t));
+	mpScanBuffer = DNew unsigned int[mHeight];
+	memset(mpScanBuffer, 0, mHeight*sizeof(unsigned int));
 
 	// Scan convert the outline.  Yuck, Bezier curves....
 
@@ -641,7 +643,7 @@ bool Rasterizer::ScanConvert()
 
 		// Detangle scanline into edge heap.
 
-		for (size_t ptr = (mpScanBuffer[y]&size_t(-1)); ptr; ptr = mpEdgeBuffer[ptr].next) {
+		for (size_t ptr = (mpScanBuffer[y]&(unsigned int)(-1)); ptr; ptr = mpEdgeBuffer[ptr].next) {
 			heap.push_back(mpEdgeBuffer[ptr].posandflag);
 		}
 
@@ -823,7 +825,7 @@ bool Rasterizer::CreateWidenedRegion(int rx, int ry)
 	if (ry > 0) {
 		// Do a half circle.
 		// _OverlapRegion mirrors this so both halves are done.
-		for (ptrdiff_t y = -ry; y <= ry; ++y) {
+		for (int y = -ry; y <= ry; ++y) {
 			int x = (int)(0.5 + sqrt(float(ry*ry - y*y)) * float(rx)/float(ry));
 
 			_OverlapRegion(mWideOutline, mOutline, x, y);
@@ -906,15 +908,15 @@ bool Rasterizer::Rasterize(int xsub, int ysub, int fBlur, double fGaussianBlur)
 
 		for (; it!=itEnd; ++it) {
 			unsigned __int64 f = (*it).first;
-			size_t y = (f >> 32) - 0x40000000 + ysub;
-			size_t x1 = (f & 0xffffffff) - 0x40000000 + xsub;
+			unsigned int y = (f >> 32) - 0x40000000 + ysub;
+			unsigned int x1 = (f & 0xffffffff) - 0x40000000 + xsub;
 
 			unsigned __int64 s = (*it).second;
-			size_t x2 = (s & 0xffffffff) - 0x40000000 + xsub;
+			unsigned int x2 = (s & 0xffffffff) - 0x40000000 + xsub;
 
 			if (x2 > x1) {
-				size_t first = x1>>3;
-				size_t last = (x2-1)>>3;
+				unsigned int first = x1>>3;
+				unsigned int last = (x2-1)>>3;
 				byte* dst = mpOverlayBuffer + 2*(mOverlayWidth*(y>>3) + first) + i;
 
 				if (first == last) {
@@ -1256,8 +1258,6 @@ static __forceinline void pixmix2_sse2(DWORD* dst, DWORD color, DWORD shapealpha
 	*dst = (DWORD)_mm_cvtsi128_si32(r);
 }
 
-#include <mmintrin.h>
-
 // Calculate a - b clamping to 0 instead of underflowing
 static __forceinline DWORD safe_subtract(DWORD a, DWORD b)
 {
@@ -1282,9 +1282,6 @@ static __forceinline DWORD safe_subtract_sse2(DWORD a, DWORD b)
 
 	return (DWORD)_mm_cvtsi128_si32(rp);
 }
-
-// For CPUID usage in Rasterizer::Draw
-#include "../DSUtil/vd.h"
 
 static const __int64 _00ff00ff00ff00ff = 0x00ff00ff00ff00ffi64;
 
@@ -1658,7 +1655,6 @@ void Rasterizer::Draw_Alpha_sp_Body_sse2(RasterizerNfo& rnfo)
 		for(int wt=end_w; wt<rnfo.w; ++wt) {
 			pixmix2_sse2(&dst[wt], color2, s[wt*2], am[wt]);
 		}
-
 		am += rnfo.spdw;
 		s += 2*rnfo.overlayp;
 		dst = (DWORD*)((char *)dst + rnfo.pitch);
@@ -1707,7 +1703,7 @@ CRect Rasterizer::Draw(SubPicDesc& spd, CRect& clipRect, byte* pAlphaMask, int x
 	CRect bbox(0, 0, 0, 0);
 
 	if (!switchpts || !fBody && !fBorder) {
-		return(bbox);
+		return bbox;
 	}
 
 	// Limit drawn area to intersection of rendering surface and rectangular clip area
@@ -1743,7 +1739,7 @@ CRect Rasterizer::Draw(SubPicDesc& spd, CRect& clipRect, byte* pAlphaMask, int x
 
 	// Check if there's actually anything to render
 	if (w <= 0 || h <= 0) {
-		return(bbox);
+		return bbox;
 	}
 
 	bbox.SetRect(x, y, x+w, y+h);
@@ -1774,84 +1770,84 @@ CRect Rasterizer::Draw(SubPicDesc& spd, CRect& clipRect, byte* pAlphaMask, int x
 	rnfo.am = pAlphaMask + spd.w * y + x;
 	// Every remaining line in the bitmap to be rendered...
 	// Basic case of no complex clipping mask
-		if (!pAlphaMask) {
-			// If the first colour switching coordinate is at "infinite" we're
-			// never switching and can use some simpler code.
-			// ??? Is this optimisation really worth the extra readability issues it adds?
-			if (switchpts[1] == 0xFFFFFFFF) {
-				// fBody is true if we're rendering a fill or a shadow.
-				if (fBody) {
-					if (fSSE2) {
-						Draw_noAlpha_spFF_Body_sse2(rnfo);
-					} else {
-						Draw_noAlpha_spFF_Body_0(rnfo);
-					}
-				}
-				// Not painting body, ie. painting border without fill in it
-				else {
-					if (fSSE2) {
-						Draw_noAlpha_spFF_noBody_sse2(rnfo);
-					} else {
-						Draw_noAlpha_spFF_noBody_0(rnfo);
-					}
+	if (!pAlphaMask) {
+		// If the first colour switching coordinate is at "infinite" we're
+		// never switching and can use some simpler code.
+		// ??? Is this optimisation really worth the extra readability issues it adds?
+		if (switchpts[1] == 0xFFFFFFFF) {
+			// fBody is true if we're rendering a fill or a shadow.
+			if (fBody) {
+				if (fSSE2) {
+					Draw_noAlpha_spFF_Body_sse2(rnfo);
+				} else {
+					Draw_noAlpha_spFF_Body_0(rnfo);
 				}
 			}
-			// not (switchpts[1] == 0xFFFFFFFF)
+			// Not painting body, ie. painting border without fill in it
 			else {
-				// switchpts plays an important rule here
-				//const long *sw = switchpts;
-
-				if (fBody) {
-					if (fSSE2) {
-						Draw_noAlpha_sp_Body_sse2(rnfo);
-					} else {
-						Draw_noAlpha_sp_Body_0(rnfo);
-					}
-				}
-				// Not body
-				else {
-					if (fSSE2) {
-						Draw_noAlpha_sp_noBody_sse2(rnfo);
-					} else {
-						Draw_noAlpha_sp_noBody_0(rnfo);
-					}
+				if (fSSE2) {
+					Draw_noAlpha_spFF_noBody_sse2(rnfo);
+				} else {
+					Draw_noAlpha_spFF_noBody_0(rnfo);
 				}
 			}
 		}
-	// Here we *do* have an alpha mask
+		// not (switchpts[1] == 0xFFFFFFFF)
 		else {
-			if (switchpts[1] == 0xFFFFFFFF) {
-				if (fBody) {
-					if (fSSE2) {
-						Draw_Alpha_spFF_Body_sse2(rnfo);
-					} else {
-						Draw_Alpha_spFF_Body_0(rnfo);
-					}
+			// switchpts plays an important rule here
+			//const long *sw = switchpts;
+
+			if (fBody) {
+				if (fSSE2) {
+					Draw_noAlpha_sp_Body_sse2(rnfo);
 				} else {
-					if (fSSE2) {
-						Draw_Alpha_spFF_noBody_sse2(rnfo);
-					} else {
-						Draw_Alpha_spFF_noBody_0(rnfo);
-					}
+					Draw_noAlpha_sp_Body_0(rnfo);
+				}
+			}
+			// Not body
+			else {
+				if (fSSE2) {
+					Draw_noAlpha_sp_noBody_sse2(rnfo);
+				} else {
+					Draw_noAlpha_sp_noBody_0(rnfo);
+				}
+			}
+		}
+	}
+	// Here we *do* have an alpha mask
+	else {
+		if (switchpts[1] == 0xFFFFFFFF) {
+			if (fBody) {
+				if (fSSE2) {
+					Draw_Alpha_spFF_Body_sse2(rnfo);
+				} else {
+					Draw_Alpha_spFF_Body_0(rnfo);
 				}
 			} else {
-				//const long *sw = switchpts;
-
-				if (fBody) {
-					if (fSSE2) {
-						Draw_Alpha_sp_Body_sse2(rnfo);
-					} else {
-						Draw_Alpha_sp_Body_0(rnfo);
-					}
+				if (fSSE2) {
+					Draw_Alpha_spFF_noBody_sse2(rnfo);
 				} else {
-					if (fSSE2) {
-						Draw_Alpha_sp_noBody_sse2(rnfo);
-					} else {
-						Draw_Alpha_sp_noBody_0(rnfo);
-					}
+					Draw_Alpha_spFF_noBody_0(rnfo);
+				}
+			}
+		} else {
+			//const long *sw = switchpts;
+
+			if (fBody) {
+				if (fSSE2) {
+					Draw_Alpha_sp_Body_sse2(rnfo);
+				} else {
+					Draw_Alpha_sp_Body_0(rnfo);
+				}
+			} else {
+				if (fSSE2) {
+					Draw_Alpha_sp_noBody_sse2(rnfo);
+				} else {
+					Draw_Alpha_sp_noBody_0(rnfo);
 				}
 			}
 		}
+	}
 	// Remember to EMMS!
 	// Rendering fails in funny ways if we don't do this.
 	_mm_empty();

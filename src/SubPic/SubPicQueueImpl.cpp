@@ -274,14 +274,14 @@ STDMETHODIMP_(bool) CSubPicQueue::LookupSubPic(REFERENCE_TIME rtNow, CComPtr<ISu
 #endif
 	}
 
-	return(!!ppSubPic);
+	return !!ppSubPic;
 }
 
 STDMETHODIMP CSubPicQueue::GetStats(int& nSubPics, REFERENCE_TIME& rtNow, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
 {
 	CAutoLock cQueueLock(&m_csQueueLock);
 
-	nSubPics = m_Queue.GetCount();
+	nSubPics = (int)m_Queue.GetCount();
 	rtNow = m_rtNow;
 	rtStart = m_rtQueueMin;
 	if (rtStart == 0x7fffffffffffffffi64) {
@@ -384,14 +384,14 @@ REFERENCE_TIME CSubPicQueue::UpdateQueue()
 		}
 	}
 
-	return(rtNow);
+	return rtNow;
 }
 
 int CSubPicQueue::GetQueueCount()
 {
 	CAutoLock cQueueLock(&m_csQueueLock);
 
-	return m_Queue.GetCount();
+	return (int)m_Queue.GetCount();
 }
 
 void CSubPicQueue::AppendQueue(ISubPic* pSubPic)
@@ -419,7 +419,7 @@ DWORD CSubPicQueue::ThreadProc()
 			break;
 		}
 		double fps = m_fps;
-		REFERENCE_TIME rtTimePerFrame = 10000000.0/fps;
+		REFERENCE_TIME rtTimePerFrame = (REFERENCE_TIME)(10000000.0/fps);
 		REFERENCE_TIME rtNow = UpdateQueue();
 
 		int nMaxSubPic = m_nMaxSubPic;
@@ -544,9 +544,9 @@ DWORD CSubPicQueue::ThreadProc()
 			}
 
 			/*
-						while(GetCount() && GetTail()->GetStop() > rtInvalidate)
+						while (GetCount() && GetTail()->GetStop() > rtInvalidate)
 						{
-							if(GetTail()->GetStart() < rtInvalidate) GetTail()->SetStop(rtInvalidate);
+							if (GetTail()->GetStart() < rtInvalidate) GetTail()->SetStop(rtInvalidate);
 							else
 							{
 								RemoveTail();
@@ -558,7 +558,7 @@ DWORD CSubPicQueue::ThreadProc()
 		}
 	}
 
-	return(0);
+	return 0;
 }
 
 //
@@ -658,7 +658,7 @@ STDMETHODIMP_(bool) CSubPicQueueNoThread::LookupSubPic(REFERENCE_TIME rtNow, CCo
 		}
 	}
 
-	return(!!ppSubPic);
+	return !!ppSubPic;
 }
 
 STDMETHODIMP CSubPicQueueNoThread::GetStats(int& nSubPics, REFERENCE_TIME& rtNow, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)

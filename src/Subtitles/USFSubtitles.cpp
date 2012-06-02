@@ -34,17 +34,17 @@
  
 #define BeginEnumAttribs(pNode, pChild) \
 	{CComPtr<IXMLDOMNamedNodeMap> pAttribs; \
-	if(SUCCEEDED(pNode->get_attributes(&pAttribs)) && pAttribs != NULL) \
+	if (SUCCEEDED(pNode->get_attributes(&pAttribs)) && pAttribs != NULL) \
 	{ \
 		CComPtr<IXMLDOMNode> pChild; \
-		for(pAttribs->nextNode(&pChild); pChild; pChild = NULL, pAttribs->nextNode(&pChild)) \
+		for (pAttribs->nextNode(&pChild); pChild; pChild = NULL, pAttribs->nextNode(&pChild)) \
 		{ \
  
 #define EndEnumAttribs }}}
 
 #define BeginEnumChildren(pNode, pChild) \
 	{CComPtr<IXMLDOMNode> pChild, pNext; \
-	for(pNode->get_firstChild(&pChild); pChild; pNext = NULL, pChild->get_nextSibling(&pNext), pChild = pNext) \
+	for (pNode->get_firstChild(&pChild); pChild; pNext = NULL, pChild->get_nextSibling(&pNext), pChild = pNext) \
 	{ \
  
 #define EndEnumChildren }}
@@ -54,7 +54,7 @@ static CStringW GetText(CComPtr<IXMLDOMNode> pNode)
 	CComBSTR bstr;
 	pNode->get_text(&bstr);
 
-	return(CStringW(bstr));
+	return CStringW(bstr);
 }
 
 static CStringW GetXML(CComPtr<IXMLDOMNode> pNode)
@@ -69,7 +69,7 @@ static CStringW GetXML(CComPtr<IXMLDOMNode> pNode)
 			str.Delete(i);
 		}
 	}
-	return(str);
+	return str;
 }
 
 static CStringW GetAttrib(CStringW attrib, CComPtr<IXMLDOMNode> pNode)
@@ -86,7 +86,7 @@ static CStringW GetAttrib(CStringW attrib, CComPtr<IXMLDOMNode> pNode)
 	}
 	EndEnumAttribs
 
-	return(ret);
+	return ret;
 }
 
 static int TimeToInt(CStringW str)
@@ -98,7 +98,7 @@ static int TimeToInt(CStringW str)
 	}
 
 	if (sl.GetCount() > 4) {
-		return(-1);
+		return -1;
 	}
 
 	int time = 0;
@@ -110,30 +110,30 @@ static int TimeToInt(CStringW str)
 		WCHAR* tmp = NULL;
 		int t = wcstol(s, &tmp, 10);
 		if (s >= tmp) {
-			return(-1);
+			return -1;
 		}
 		time += t * mul[i];
 	}
 
-	return(time);
+	return time;
 }
 
 static DWORD StringToDWORD(CStringW str)
 {
 	if (str.IsEmpty()) {
-		return(0);
+		return 0;
 	}
 	if (str[0] == '#') {
-		return((DWORD)wcstol(str, NULL, 16));
+		return (DWORD)wcstol(str, NULL, 16);
 	} else {
-		return((DWORD)wcstol(str, NULL, 10));
+		return (DWORD)wcstol(str, NULL, 10);
 	}
 }
 
 static DWORD ColorToDWORD(CStringW str)
 {
 	if (str.IsEmpty()) {
-		return(0);
+		return 0;
 	}
 
 	DWORD ret = 0;
@@ -146,7 +146,7 @@ static DWORD ColorToDWORD(CStringW str)
 
 	ret = ((ret&0xff)<<16)|(ret&0xff00ff00)|((ret>>16)&0xff);
 
-	return(ret);
+	return ret;
 }
 
 static int TranslateAlignment(CStringW alignment)
@@ -175,7 +175,7 @@ static int TranslateMargin(CStringW margin, int wndsize)
 		}
 	}
 
-	return(ret);
+	return ret;
 }
 
 ////////////////
@@ -347,7 +347,7 @@ bool CUSFSubtitles::ConvertToSTS(CSimpleTextSubtitle& sts)
 			stss->shadowDepthX = stss->shadowDepthY = wcstol(s->fontstyle.shadow, NULL, 10);
 		}
 
-		for (ptrdiff_t i = 0; i < 4; i++) {
+		for (size_t i = 0; i < 4; i++) {
 			DWORD color = ColorToDWORD(s->fontstyle.color[i]);
 			int alpha = (BYTE)wcstol(s->fontstyle.alpha, NULL, 10);
 
@@ -414,7 +414,7 @@ bool CUSFSubtitles::ConvertToSTS(CSimpleTextSubtitle& sts)
 		}
 
 		WCHAR rtags[3][8] = {L"{\\rz%d}", L"{\\rx%d}", L"{\\ry%d}"};
-		for (ptrdiff_t i = 0; i < 3; i++) {
+		for (size_t i = 0; i < 3; i++) {
 			if (int angle = wcstol(t->pal.rotate[i], NULL, 10)) {
 				CStringW str;
 				str.Format(rtags[i], angle);
@@ -745,7 +745,7 @@ void CUSFSubtitles::ParseText(CComPtr<IXMLDOMNode> pNode, CStringW& str)
 			postfix += L"{\\shad}";
 		}
 
-		for (ptrdiff_t i = 0; i < 4; i++) {
+		for (size_t i = 0; i < 4; i++) {
 			if (!fs.color[i].IsEmpty()) {
 				CStringW s;
 				s.Format(L"{\\%dc&H%06x&}", i+1, ColorToDWORD(fs.color[i]));
