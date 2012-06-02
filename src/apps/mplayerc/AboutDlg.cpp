@@ -44,16 +44,17 @@ BOOL CAboutDlg::OnInitDialog()
 	UpdateData();
 
 #ifdef _WIN64
-	m_appname += _T(" x64");
+	m_appname += _T(" (64-bit)");
 #endif
 
 	m_strBuildNumber = AfxGetMyApp()->m_strVersion;
 
 #if defined(__INTEL_COMPILER)
-#if (__INTEL_COMPILER >= 1200)
-	m_MPCCompiler = _T("ICL 12.x");
+#if (__INTEL_COMPILER >= 1210)
+	m_MPCCompiler = _T("ICL ");
+	m_MPCCompiler += MAKE_STR(__INTEL_COMPILER);
 #else
-	#error Compiler is not supported!
+	m_MPCCompiler = _T("ICL 12");
 #endif
 #elif defined(_MSC_VER)
 #if (_MSC_VER == 1700)
@@ -126,7 +127,7 @@ END_MESSAGE_MAP()
 
 void CAboutDlg::OnHomepage(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	ShellExecute(m_hWnd, _T("open"), _T("https://sourceforge.net/p/mpcbe/"), NULL, NULL, SW_SHOWDEFAULT);
+	ShellExecute(m_hWnd, _T("open"), _T("http://sourceforge.net/p/mpcbe/"), NULL, NULL, SW_SHOWDEFAULT);
 	*pResult = 0;
 }
 
