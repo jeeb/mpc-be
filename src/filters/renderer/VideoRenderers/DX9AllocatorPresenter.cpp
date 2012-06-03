@@ -2005,7 +2005,7 @@ void CDX9AllocatorPresenter::DrawStats()
 		}
 
 		if (bDetailedStats > 1) {
-			strText.Format(L"Settings     : ");
+			strText = L"Settings     : ";
 
 			if (m_bIsEVR) {
 				strText += "EVR ";

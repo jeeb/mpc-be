@@ -34,7 +34,7 @@ UpdateCheckerDlg::UpdateCheckerDlg(Update_Status updateStatus, const Version& la
 			m_text.Format(IDS_NEW_UPDATE_AVAILABLE, latestVersion.major, latestVersion.minor, latestVersion.patch, latestVersion.revision);
 			break;
 		case UPDATER_LATEST_STABLE:
-			m_text.Format(IDS_USING_LATEST_STABLE);
+			m_text.LoadString(IDS_USING_LATEST_STABLE);
 			break;
 		case UPDATER_NEWER_VERSION:
 			m_text.Format(IDS_USING_NEWER_VERSION,
@@ -42,7 +42,7 @@ UpdateCheckerDlg::UpdateCheckerDlg(Update_Status updateStatus, const Version& la
 						  latestVersion.major, latestVersion.minor, latestVersion.patch, latestVersion.revision);
 			break;
 		case UPDATER_ERROR:
-			m_text.Format(IDS_UPDATE_ERROR);
+			m_text.LoadString(IDS_UPDATE_ERROR);
 			break;
 		default:
 			ASSERT(0); // should never happen
