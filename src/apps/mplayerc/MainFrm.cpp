@@ -2677,7 +2677,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 			}
 			break;
 			case EC_LENGTH_CHANGED: {
-				__int64 rtDur = 0;
+				REFERENCE_TIME rtDur = 0;
 				pMS->GetDuration(&rtDur);
 				m_wndPlaylistBar.SetCurTime(rtDur);
 			}
@@ -3432,7 +3432,7 @@ void CMainFrame::OnFilePostOpenmedia()
 
 	OpenSetupCaptureBar();
 
-	__int64 rtDur = 0;
+	REFERENCE_TIME rtDur = 0;
 	pMS->GetDuration(&rtDur);
 	m_wndPlaylistBar.SetCurTime(rtDur);
 
