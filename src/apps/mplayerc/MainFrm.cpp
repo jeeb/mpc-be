@@ -5361,7 +5361,7 @@ void CMainFrame::OnFileLoadsubtitle()
 		return;
 	}
 
-	static TCHAR BASED_CODE szFilter[] =
+	static TCHAR szFilter[] =
 		_T(".srt .sub .ssa .ass .smi .psb .txt .idx .usf .xss .sup|")
 		_T("*.srt;*.sub;*.ssa;*.ass;*smi;*.psb;*.txt;*.idx;*.usf;*.xss;*.sup||");
 
