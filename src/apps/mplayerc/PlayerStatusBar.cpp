@@ -57,9 +57,7 @@ BOOL CPlayerStatusBar::Create(CWnd* pParentWnd)
 
 BOOL CPlayerStatusBar::PreCreateWindow(CREATESTRUCT& cs)
 {
-	if (!CDialogBar::PreCreateWindow(cs)) {
-		return FALSE;
-	}
+	VERIFY(CDialogBar::PreCreateWindow(cs));
 
 	m_dwStyle &= ~CBRS_BORDER_TOP;
 	m_dwStyle &= ~CBRS_BORDER_BOTTOM;
@@ -315,7 +313,6 @@ BEGIN_MESSAGE_MAP(CPlayerStatusBar, CDialogBar)
 	ON_WM_CTLCOLOR()
 END_MESSAGE_MAP()
 
-
 // CPlayerStatusBar message handlers
 
 BOOL CPlayerStatusBar::OnEraseBkgnd(CDC* pDC)
@@ -356,7 +353,7 @@ BOOL CPlayerStatusBar::OnEraseBkgnd(CDC* pDC)
 
 void CPlayerStatusBar::OnPaint()
 {
-	CPaintDC dc(this); // device context for painting
+	CPaintDC dc(this);
 
 	if (GetSafeHwnd()) {
 		Relayout();
@@ -472,8 +469,6 @@ void CPlayerStatusBar::OnPaint()
 			DrawIconEx(dc, r.left, r.top, m_hIcon, r.Width(), r.Height(), 0, NULL, DI_NORMAL | DI_COMPAT);
 		}
 	}
-
-	// Do not call CDialogBar::OnPaint() for painting messages
 }
 
 void CPlayerStatusBar::OnSize(UINT nType, int cx, int cy)
@@ -551,6 +546,5 @@ HBRUSH CPlayerStatusBar::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 		}
 	}
 
-	// TODO:  Return a different brush if the default is not desired
 	return hbr;
 }

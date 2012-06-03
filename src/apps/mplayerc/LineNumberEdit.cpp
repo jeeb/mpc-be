@@ -1,96 +1,29 @@
-/* ==========================================================================
-	CLineNumberEdit
-	Author :		Johan Rosengren, Abstrakt Mekanik AB
-	Date :			2004-03-09
-	Purpose :		CLineNumberEdit is a CEdit-derived class that displays
-					line numbers to the left of the text.
-	Description :	The class uses the edit rect to make space for the line
-					numbers. The line numbers are relized through a special
-					CStatic-derived class, CLineNumberStatic. As soon as the
-					text is updated, the CLineNumberStatic is updated as
-					well.
-	Usage :			The control can be dynamically created, or created from
-					a dialog template. The formatting string for the line
-					numbers can be set by calling SetLineNumberFormat (the
-					same format string as for CString::Format). By calling
-					SetMarginForegroundColor or SetMarginBackgroundColor
-					the fore- and background colors for the line number
-					display is set.
-   ========================================================================
-	Update :        Keith Bowes
-	Date :          2004-04-13
-	Purpose :       1. To allow CLineNumberEdit to properly change colour when
-                       Enabled/Disabled or when system colours change.
-                       Changing system colours only has a noticable effect when
-                       a scheme such as Marine or Plum is chosen.
-                    2. To allow a line number delta to be applied to the first
-                       line number so the index does not have to start at zero.
-                    3. To allow a max value to be specified to stop the line
-                       count and to allow smarter size formatting.
-	Description :   1. Added OnEnable and OnSysColorChange to detect when
-                       a colour change is required. This allows the line number
-                       area and CEdit area to update colours properly.
-                       Added colour ref variables to hold enabled/disabled states
-                       of the background/foreground colours.
-                       In an attempt to allow previous functionality to take
-                       precedence, if the colours are changed explicitly, the
-                       system colours are no longer queried.
-                    2. Added m_LineDelta, applied when line numbers are formatted.
-                    3. Using m_maxval when > 0 to limit the max values and when
-                       formatting colomn width.
-						JRO: Added m_lineDelta as well.
-    Usage :         1. Default behaviour is to change colours to reflect CEdit.
-                       manually changing the colour will cause the colours to
-                       only change to the specified colours.
-                    2. SetLineNumberRange sets both min and max values.
-                    3. SetLineNumberRange sets both min and max values.
-
-    Comments :      - Perhaps line values should be stored as UINT's as negative
-                      values may have unexpected results.
-                    - CLineNumberEdit::m_format creates a duplicate of
-                      CLineNumberStatic::m_format, is this needed?
-						  JRO: Even though the the two classes are thightly coupled,
-						  this duplication of data makes it easier to decouple them.
-						  A small matter, but code reuse is Politically Correct,
-						  and as such A Desirable Feature.
-                    - Added options could allow different system colours to be
-                      chosen and updated as system attributes are changed.
-                    - if m_maxval is exceeded in the edit box, new lines
-                      are added without line numbers. This might not be the
-                      desired behaviour.
-						JRO: I think this is rather nifty, actually. If I, as a
-						developer, sets the max number of lines to be numbered,
-						I also expect this to be the case :-)))
-                    - It's not spelled wrong, just differently. ;0)
-   ========================================================================
-	Update :        Johan Rosengren
-	Date :          2004-04-14
-	Purpose		:	1. Allow deriving of CLineNumberEdit.
-	Description	:	1. Made the message handlers virtual.
-	Usage :			1. Declare message handlers as virtual in derived
-					   classes. Note that CLineNumberEdit is not built to
-					   be derived from, however.
-   ========================================================================
-	Update :		Keith Bowes
-	Date :			2004-04-22
-	Purpose :		To allow processing of WM_LINESCROLL messages.
-	Description :	Added OnLineScroll to handle the message.
-	Usage :			Now will call UpdateTopAndBottom if the message is
-					received.
-   ========================================================================
-	Update :		Johan Rosengren
-	Date :			2004-05-02
-	Purpose :		Select complete line when a line-number is clicked
-	Description :	Added registered user message, sent when the line-
-					number static is clicked.
-	Usage :			See urm_SELECTLINE in the code.
-   ========================================================================*/
+/*
+ * $Id$
+ *
+ * (C) 2003-2006 Gabest
+ * (C) 2006-2012 see Authors.txt
+ *
+ * This file is part of MPC-BE.
+ *
+ * MPC-BE is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MPC-BE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 #include "stdafx.h"
 #include "LineNumberEdit.h"
 
-// Registered message to allow selection of complete
-// lines by clicking the line number
 UINT urm_SELECTLINE = ::RegisterWindowMessage( _T("_LINE_NUMBER_EDIT_SELECTLINE_") );
 
 /////////////////////////////////////////////////////////////////////////////

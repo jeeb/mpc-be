@@ -20,7 +20,6 @@
  *
  */
 
-
 #include "stdafx.h"
 #include "Version.h"
 #include "UpdateChecker.h"

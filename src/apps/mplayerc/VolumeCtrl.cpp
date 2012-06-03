@@ -42,9 +42,7 @@ CVolumeCtrl::~CVolumeCtrl()
 
 bool CVolumeCtrl::Create(CWnd* pParentWnd)
 {
-	if (!CSliderCtrl::Create(WS_CHILD|WS_VISIBLE|TBS_NOTICKS|TBS_HORZ|TBS_TOOLTIPS, CRect(0,0,0,0), pParentWnd, IDC_SLIDER1)) {
-		return false;
-	}
+	VERIFY(CSliderCtrl::Create(WS_CHILD|WS_VISIBLE|TBS_NOTICKS|TBS_HORZ|TBS_TOOLTIPS, CRect(0,0,0,0), pParentWnd, IDC_SLIDER1));
 
 	AppSettings& s = AfxGetAppSettings();
 
@@ -66,7 +64,7 @@ bool CVolumeCtrl::Create(CWnd* pParentWnd)
 void CVolumeCtrl::SetPosInternal(int pos)
 {
 	SetPos(pos);
-	GetParent()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)pos, SB_THUMBPOSITION), (LPARAM)m_hWnd); // this will be reflected back on us
+	GetParent()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
 }
 
 void CVolumeCtrl::IncreaseVolume()
@@ -191,13 +189,11 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 					dc.BitBlt(0, 0, r.Width(), r.Height(), &memdc, 0, 0, SRCCOPY);
 
-					//MemDC.SelectObject(bmOld);
 					DeleteObject(memdc.SelectObject(bmOld));
 					memdc.DeleteDC();
 
 					r.DeflateRect(4, 2, 9, 6);
 					CopyRect(&pNMCD->rc, &r);
-					//TRACE("VOLUME RECT=(%d,%d,%d,%d) state=%d",r.left,r.top,r.right,r.bottom,pNMCD->uItemState);
 
 					CPen penRight(p1 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p1);
 					CPen *penOld = dc.SelectObject(&penRight);
@@ -315,7 +311,7 @@ void CVolumeCtrl::OnSetFocus(CWnd* pOldWnd)
 {
 	CSliderCtrl::OnSetFocus(pOldWnd);
 
-	AfxGetMainWnd()->SetFocus(); // don't focus on us, parents will take care of our positioning
+	AfxGetMainWnd()->SetFocus();
 }
 
 void CVolumeCtrl::HScroll(UINT nSBCode, UINT nPos)

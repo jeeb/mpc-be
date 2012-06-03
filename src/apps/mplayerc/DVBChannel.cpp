@@ -20,7 +20,6 @@
  *
  */
 
-
 #include "stdafx.h"
 #include "DVBChannel.h"
 

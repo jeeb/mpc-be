@@ -20,7 +20,6 @@
  *
  */
 
-
 #include "stdafx.h"
 #include "WinHotkeyCtrl.h"
 #include "vkCodes.h"

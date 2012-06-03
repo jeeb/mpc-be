@@ -44,17 +44,14 @@ CPlayerSeekBar::~CPlayerSeekBar()
 
 BOOL CPlayerSeekBar::Create(CWnd* pParentWnd)
 {
-	if (!CDialogBar::Create(pParentWnd, IDD_PLAYERSEEKBAR, WS_CHILD|WS_VISIBLE|CBRS_ALIGN_BOTTOM, IDD_PLAYERSEEKBAR)) {
-		return FALSE;
-	}
+	VERIFY(CDialogBar::Create(pParentWnd, IDD_PLAYERSEEKBAR, WS_CHILD|WS_VISIBLE|CBRS_ALIGN_BOTTOM, IDD_PLAYERSEEKBAR));
 
-	// Should never be RTLed
 	ModifyStyleEx(WS_EX_LAYOUTRTL, WS_EX_NOINHERITLAYOUT);
 
 	m_tooltip.Create(this, TTS_NOPREFIX | TTS_ALWAYSTIP);
 
 	m_tooltip.SetMaxTipWidth(SHRT_MAX);
-	// SetDelayTime seems to be ignored but we set it anyway for safety.
+
 	m_tooltip.SetDelayTime(TTDT_AUTOPOP, SHRT_MAX);
 	m_tooltip.SetDelayTime(TTDT_INITIAL, 0);
 	m_tooltip.SetDelayTime(TTDT_RESHOW, 0);
@@ -81,9 +78,7 @@ BOOL CPlayerSeekBar::Create(CWnd* pParentWnd)
 
 BOOL CPlayerSeekBar::PreCreateWindow(CREATESTRUCT& cs)
 {
-	if (!CDialogBar::PreCreateWindow(cs)) {
-		return FALSE;
-	}
+	VERIFY(CDialogBar::PreCreateWindow(cs));
 
 	m_dwStyle &= ~CBRS_BORDER_TOP;
 	m_dwStyle &= ~CBRS_BORDER_BOTTOM;
@@ -251,12 +246,11 @@ BEGIN_MESSAGE_MAP(CPlayerSeekBar, CDialogBar)
 	ON_COMMAND_EX(ID_PLAY_STOP, OnPlayStop)
 END_MESSAGE_MAP()
 
-
 // CPlayerSeekBar message handlers
 
 void CPlayerSeekBar::OnPaint()
 {
-	CPaintDC dc(this); // device context for painting
+	CPaintDC dc(this);
 
 	AppSettings& s = AfxGetAppSettings();
 
@@ -474,8 +468,6 @@ void CPlayerSeekBar::OnPaint()
 		}
 
 	}
-	
-	// Do not call CDialogBar::OnPaint() for painting messages
 }
 
 void CPlayerSeekBar::OnSize(UINT nType, int cx, int cy)
@@ -526,7 +518,7 @@ void CPlayerSeekBar::UpdateTooltip(CPoint point)
 
 	if (m_fEnabled && m_start < m_stop && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
 		if (m_tooltipState == TOOLTIP_HIDDEN && m_tooltipPos != m_tooltipLastPos) {
-			// Request notification when the mouse leaves.
+
 			TRACKMOUSEEVENT tme = { sizeof(TRACKMOUSEEVENT) };
 			tme.hwndTrack = m_hWnd;
 			tme.dwFlags = TME_LEAVE;
@@ -542,7 +534,7 @@ void CPlayerSeekBar::UpdateTooltip(CPoint point)
 	if (m_tooltipState == TOOLTIP_VISIBLE && m_tooltipPos != m_tooltipLastPos) {
 		UpdateToolTipText();
 		UpdateToolTipPosition(point);
-		// Reset the timer
+
 		m_tooltipTimer = SetTimer(m_tooltipTimer, AUTOPOP_DELAY, NULL);
 	}
 }

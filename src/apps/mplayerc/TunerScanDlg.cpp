@@ -20,9 +20,6 @@
  *
  */
 
-// TunerScanDlg.cpp : implementation file
-//
-
 #include "stdafx.h"
 #include "mplayerc.h"
 #include "MainFrm.h"

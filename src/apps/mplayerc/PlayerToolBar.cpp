@@ -30,13 +30,15 @@
 #include "MainFrm.h"
 
 
-typedef HRESULT (__stdcall * SetWindowThemeFunct)(HWND hwnd, LPCWSTR pszSubAppName, LPCWSTR pszSubIdList);
-
-
 // CPlayerToolBar
 
+typedef HRESULT (__stdcall * SetWindowThemeFunct)(HWND hwnd, LPCWSTR pszSubAppName, LPCWSTR pszSubIdList);
+
 IMPLEMENT_DYNAMIC(CPlayerToolBar, CToolBar)
-CPlayerToolBar::CPlayerToolBar() : fDisableImgListRemap(false)
+CPlayerToolBar::CPlayerToolBar()
+	: fDisableImgListRemap(false)
+	, m_nButtonHeight(16)
+	, m_pButtonsImages(NULL)
 {
 }
 
@@ -70,14 +72,14 @@ void CPlayerToolBar::SwitchTheme()
 		}
 	}
 
-	m_nButtonHeight = 16; //reset m_nButtonHeight
+	m_nButtonHeight = 16;//reset m_nButtonHeight
 
 	int fp = m_logobm.FileExists("toolbar");
 
 	HBITMAP hBmp;
 	if (s.fDisableXPToolbars && NULL == fp) {
 		hBmp = m_logobm.LoadExternalImage("toolbar", s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
-	} else {
+	} else if (fp) {
 		hBmp = m_logobm.LoadExternalImage("toolbar", -1, -1, -1, -1);
 	}
 
@@ -87,7 +89,7 @@ void CPlayerToolBar::SwitchTheme()
 		BITMAP bitmapBmp;
 		bmp->GetBitmap(&bitmapBmp);
 		if (bitmapBmp.bmWidth == bitmapBmp.bmHeight * 15) {
-			// the manual specifies that sizeButton should be sizeImage inflated by (7, 6)
+
 			SetSizes(CSize(bitmapBmp.bmHeight + 7, bitmapBmp.bmHeight + 6), CSize(bitmapBmp.bmHeight, bitmapBmp.bmHeight));
 
 			CDC dc;
@@ -128,8 +130,8 @@ void CPlayerToolBar::SwitchTheme()
 
 		COLORSCHEME cs;
 		cs.dwSize		= sizeof(COLORSCHEME);
-		cs.clrBtnHighlight	= 0x0046413c; //clr_csLight = RGB( 60, 65, 70)
-		cs.clrBtnShadow		= 0x0037322d;//clr_csShadow = RGB( 45, 50, 55)
+		cs.clrBtnHighlight	= 0x0046413c;
+		cs.clrBtnShadow		= 0x0037322d;
 
 		GetToolBarCtrl().SetColorScheme(&cs);
 		GetToolBarCtrl().SetIndent(5);
@@ -156,17 +158,14 @@ void CPlayerToolBar::SwitchTheme()
 
 BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 {
-	if (!__super::CreateEx(pParentWnd,
-						  TBSTYLE_FLAT|TBSTYLE_TRANSPARENT|TBSTYLE_AUTOSIZE|TBSTYLE_CUSTOMERASE,
-						  WS_CHILD|WS_VISIBLE|CBRS_ALIGN_BOTTOM|CBRS_TOOLTIPS)) {
-		return FALSE;
-	}
+	AppSettings& s = AfxGetAppSettings();
 
-	if (!LoadToolBar(IDB_PLAYERTOOLBAR)) {
-		return FALSE;
-	}
+	VERIFY(__super::CreateEx(pParentWnd,
+			TBSTYLE_FLAT|TBSTYLE_TRANSPARENT|TBSTYLE_AUTOSIZE|TBSTYLE_CUSTOMERASE,
+			WS_CHILD|WS_VISIBLE|CBRS_ALIGN_BOTTOM|CBRS_TOOLTIPS));
 
-	// Should never be RTLed
+	VERIFY(LoadToolBar(IDB_PLAYERTOOLBAR));
+
 	ModifyStyleEx(WS_EX_LAYOUTRTL, WS_EX_NOINHERITLAYOUT);
 
 	GetToolBarCtrl().SetExtendedStyle(TBSTYLE_EX_DRAWDDARROWS);
@@ -176,29 +175,23 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 	tb.DeleteButton(tb.GetButtonCount()-1);
 	tb.DeleteButton(tb.GetButtonCount()-1);
 
-	AppSettings& s = AfxGetAppSettings();
-
 	SetMute(s.fMute);
 
 	UINT styles[] = {
-		TBBS_CHECKGROUP/*TBBS_CHECKGROUP, TBBS_CHECKGROUP*/, TBBS_CHECKGROUP,
+		TBBS_CHECKGROUP, TBBS_CHECKGROUP,
 		TBBS_SEPARATOR,
 		TBBS_BUTTON, TBBS_BUTTON, TBBS_BUTTON, TBBS_BUTTON,
 		TBBS_SEPARATOR,
 		TBBS_BUTTON,
-		//TBBS_SEPARATOR,
-		//TBBS_SEPARATOR,
 		TBBS_CHECKBOX,
 	};
 
 	for (int i = 0; i < _countof(styles); i++) {
-		SetButtonStyle(i, styles[i]|TBBS_DISABLED);
+		SetButtonStyle(i, styles[i] | TBBS_DISABLED);
 	}
 
 	m_volctrl.Create(this);
 	m_volctrl.SetRange(0, 100);
-
-	m_pButtonsImages = NULL;
 
 	SwitchTheme();
 
@@ -207,9 +200,7 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 
 BOOL CPlayerToolBar::PreCreateWindow(CREATESTRUCT& cs)
 {
-	if (!__super::PreCreateWindow(cs)) {
-		return FALSE;
-	}
+	VERIFY(__super::PreCreateWindow(cs));
 
 	m_dwStyle &= ~CBRS_BORDER_TOP;
 	m_dwStyle &= ~CBRS_BORDER_BOTTOM;
@@ -223,26 +214,27 @@ void CPlayerToolBar::CreateRemappedImgList(UINT bmID, int nRemapState, CImageLis
 	//nRemapState = 1 Remap Disabled
 	//nRemapState = 2 Undo  Active
 	//nRemapState = 3 Undo  Disabled
+
 	AppSettings& s = AfxGetAppSettings();
 	COLORMAP cmActive[] =
-	{ 
-		0x00000000, s.clrFaceABGR,//0x00ffffff, //button_face in toolbar.bmp rc RGB(  0,  0,  0) to clr_resLight = RGB(255,255,255)
-		0x00808080, s.clrOutlineABGR,//0x00c0c0c0,//button_outline in toolbar.bmp rc RGB(128,128,128) to clr_resShadow = RGB(192,192,192)
-		0x00c0c0c0, 0x00ff00ff//background = transparency mask// toolbar.bmp rc RGB(192,192,192) to clr_resMask = RGB(255,  0,255)
+	{
+		0x00000000, s.clrFaceABGR,//0x00ffffff, //button_face
+		0x00808080, s.clrOutlineABGR,//0x00c0c0c0, //button_outline
+		0x00c0c0c0, 0x00ff00ff//background = transparency mask
 	};
 	COLORMAP cmDisabled[] =
-	{ 
+	{
 		0x00000000, 0x00ff00ff,//button_face -> transparency mask
-		0x00808080, s.clrOutlineABGR,//0x00c0c0c0,//button_outline same as Active
+		0x00808080, s.clrOutlineABGR,//0x00c0c0c0, //button_outline
 		0x00c0c0c0, 0x00ff00ff//background = transparency mask
 	};
 	COLORMAP cmUndoActive[] =
-	{ 
-		0x00c0c0c0, 0x00ff00ff//background = transparency mask// toolbar.bmp rc RGB(192,192,192) to clr_resMask = RGB(255,  0,255)
+	{
+		0x00c0c0c0, 0x00ff00ff//background = transparency mask
 	};
 	COLORMAP cmUndoDisabled[] =
-	{ 
-		0x00000000, 0x00A0A0A0,//button_face -> black to gray?!	
+	{
+		0x00000000, 0x00A0A0A0,//button_face -> black to gray
 		0x00c0c0c0, 0x00ff00ff//background = transparency mask
 	};
 	CBitmap bm;
@@ -250,16 +242,16 @@ void CPlayerToolBar::CreateRemappedImgList(UINT bmID, int nRemapState, CImageLis
 	{
 		default:
 		case 0:
-			bm.LoadMappedBitmap(bmID,CMB_MASKED,cmActive,3);
+			bm.LoadMappedBitmap(bmID, CMB_MASKED, cmActive, 3);
 			break;
 		case 1:
-			bm.LoadMappedBitmap(bmID,CMB_MASKED,cmDisabled,3);
-			break;				
+			bm.LoadMappedBitmap(bmID, CMB_MASKED, cmDisabled, 3);
+			break;
 		case 2:
-			bm.LoadMappedBitmap(bmID,CMB_MASKED,cmUndoActive,1);
-			break;				
+			bm.LoadMappedBitmap(bmID, CMB_MASKED, cmUndoActive, 1);
+			break;
 		case 3:
-			bm.LoadMappedBitmap(bmID,CMB_MASKED,cmUndoDisabled,2);
+			bm.LoadMappedBitmap(bmID, CMB_MASKED, cmUndoDisabled, 2);
 			break;
 	}
 	BITMAP bmInfo;
@@ -274,14 +266,19 @@ void CPlayerToolBar::SwitchRemmapedImgList(UINT bmID, int nRemapState)
 	//nRemapState = 1 Remap Disabled
 	//nRemapState = 2 Undo  Active
 	//nRemapState = 3 Undo  Disabled
+
 	CToolBarCtrl& ctrl = GetToolBarCtrl();
 	if (nRemapState == 0 || nRemapState == 2) {
-		if (m_reImgListActive.GetSafeHandle()) m_reImgListActive.DeleteImageList();//cleanup
+		if (m_reImgListActive.GetSafeHandle()) {
+			m_reImgListActive.DeleteImageList();//cleanup
+		}
 		CreateRemappedImgList(bmID, nRemapState, m_reImgListActive);//remap
 		ASSERT(m_reImgListActive.GetSafeHandle());
 		ctrl.SetImageList(&m_reImgListActive);//switch to
 	} else {
-		if (m_reImgListDisabled.GetSafeHandle()) m_reImgListDisabled.DeleteImageList();//cleanup
+		if (m_reImgListDisabled.GetSafeHandle()) {
+			m_reImgListDisabled.DeleteImageList();//cleanup
+		}
 		CreateRemappedImgList(bmID, nRemapState, m_reImgListDisabled);//remap
 		ASSERT(m_reImgListDisabled.GetSafeHandle());
 		ctrl.SetDisabledImageList(&m_reImgListDisabled);//switch to
@@ -315,7 +312,7 @@ void CPlayerToolBar::ArrangeControls()
 
 	m_volctrl.MoveWindow(vr2);
 
-	SetButtonInfo(10, GetItemID(10), TBBS_SEPARATOR|TBBS_DISABLED, vr2.left - r9.right - r9.bottom - r9.top);
+	SetButtonInfo(10, GetItemID(10), TBBS_SEPARATOR | TBBS_DISABLED, vr2.left - r9.right - r9.bottom - r9.top);
 }
 
 void CPlayerToolBar::SetMute(bool fMute)
@@ -324,7 +321,7 @@ void CPlayerToolBar::SetMute(bool fMute)
 	TBBUTTONINFO bi;
 	bi.cbSize = sizeof(bi);
 	bi.dwMask = TBIF_IMAGE;
-	bi.iImage = fMute?13:12;
+	bi.iImage = fMute ? 13 : 12;
 	tb.SetButtonInfo(ID_VOLUME_MUTE, &bi);
 
 	AfxGetAppSettings().fMute = fMute;
@@ -337,17 +334,17 @@ bool CPlayerToolBar::IsMuted()
 	bi.cbSize = sizeof(bi);
 	bi.dwMask = TBIF_IMAGE;
 	tb.GetButtonInfo(ID_VOLUME_MUTE, &bi);
-	return(bi.iImage==13);
+	return(bi.iImage == 13);
 }
 
 int CPlayerToolBar::GetVolume()
 {
-	int volume = m_volctrl.GetPos(); // [0..100]
+	int volume = m_volctrl.GetPos();// [0..100]
 
 	if (IsMuted() || volume <= 0) {
 		volume = -10000;
 	} else {
-		volume = min((int)(4000*log10(volume/100.0f)), 0); // 4000=2.0*100*20, where 2.0 is a special factor
+		volume = min((int)(4000 * log10(volume / 100.0f)), 0);// 4000=2.0*100*20, where 2.0 is a special factor
 	}
 
 	return volume;
@@ -377,6 +374,8 @@ BEGIN_MESSAGE_MAP(CPlayerToolBar, CToolBar)
 
 	ON_COMMAND_EX(ID_VOLUME_UP, OnVolumeUp)
 	ON_COMMAND_EX(ID_VOLUME_DOWN, OnVolumeDown)
+
+	ON_WM_NCPAINT()
 	ON_WM_LBUTTONDOWN()
 	ON_WM_MOUSEMOVE()
 END_MESSAGE_MAP()
@@ -385,7 +384,7 @@ END_MESSAGE_MAP()
 
 void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	NMTBCUSTOMDRAW* pTBCD = reinterpret_cast<NMTBCUSTOMDRAW*>( pNMHDR );
+	LPNMTBCUSTOMDRAW pTBCD = reinterpret_cast<LPNMTBCUSTOMDRAW>(pNMHDR);
 	LRESULT lr = CDRF_DODEFAULT;
 	AppSettings& s = AfxGetAppSettings();
 
@@ -414,7 +413,6 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 		{
 		case CDDS_PREPAINT:
 			{
-			//TRACE(" TB-PREPAINT ");
 			CDC dc;
 			dc.Attach(pTBCD->nmcd.hdc);
 			CRect r;
@@ -435,21 +433,10 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			}
 			lr |= CDRF_NOTIFYITEMDRAW;
 			break;
-		case CDDS_POSTPAINT:
-			//TRACE(" TB-POSTPAINT ");
-			lr = CDRF_DODEFAULT;
-			break;
 		case CDDS_PREERASE:
-			//same thing as onerasebkg return true?!
-			//TRACE(" TB-PREERASE ");
 			lr = CDRF_SKIPDEFAULT;
 			break;
 		case CDDS_ITEMPREPAINT:
-			//TRACE(" TB-ITEMPREPAINT ");
-			lr = CDRF_DODEFAULT;
-
-			//Without XP-theming, buttons look bad over a dark background.
-			//lr |= TBCDRF_HILITEHOTTRACK;//made custom glass-like hover
 			lr |= TBCDRF_NOETCHEDEFFECT;
 			lr |= TBCDRF_NOBACKGROUND;
 			lr |= TBCDRF_NOEDGES;
@@ -459,25 +446,18 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			lr |= CDRF_NOTIFYITEMDRAW;
 			break;
 		case CDDS_ITEMPOSTPAINT:
-			//TRACE(" TB-ITEMPOSTPAINT ");
-			lr = CDRF_DODEFAULT;
 			CDC dc;
 			dc.Attach(pTBCD->nmcd.hdc);
 			CRect r;
 			CopyRect(&r,&pTBCD->nmcd.rc);
 
-			CRect rGlassLike (0,0,8,8);
-			int nW = rGlassLike.Width();
-			int nH = rGlassLike.Height();
+			CRect rGlassLike(0,0,8,8);
+			int nW = rGlassLike.Width(), nH = rGlassLike.Height();
 			CDC memdc;
 			memdc.CreateCompatibleDC(&dc);
-			CBitmap bmGlassLike;
-			CBitmap *bmOld;
+			CBitmap *bmOld, bmGlassLike;
 			bmGlassLike.CreateCompatibleBitmap(&dc, nW, nH);
 			bmOld = memdc.SelectObject(&bmGlassLike);
-
-			//CBrush brushGlassLike(0x00ffffff);
-			//memdc.FillSolidRect(rGlassLike, 0x00ffffff);//clr_resLight/white RGB(255,255,255)
 
 			TRIVERTEX tv[2] = {
 				{0, 0, 255*256, 255*256, 255*256, 255*256},
@@ -491,13 +471,12 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			bf.BlendOp	= AC_SRC_OVER;
 			bf.SourceConstantAlpha = 90;
 
-			CPen penFrHot (PS_SOLID,0,0x00e9e9e9);//clr_resFace	RGB(233,233,233)
-			//CPen penFrChecked (PS_SOLID,0,0x00808080);//clr_resDark	RGB(128,128,128)
-
+			CPen penFrHot(PS_SOLID,0,0x00e9e9e9);//clr_resFace
 			CPen *penSaved = dc.SelectObject(&penFrHot);
 			CBrush *brushSaved = (CBrush*)dc.SelectStockObject(NULL_BRUSH);
 
 			//CDIS_SELECTED,CDIS_GRAYED,CDIS_DISABLED,CDIS_CHECKED,CDIS_FOCUS,CDIS_DEFAULT,CDIS_HOT,CDIS_MARKED,CDIS_INDETERMINATE
+
 			if (CDIS_HOT == pTBCD->nmcd.uItemState || CDIS_CHECKED + CDIS_HOT == pTBCD->nmcd.uItemState) {
 				dc.SelectObject(&penFrHot);
 				dc.RoundRect(r.left +1,r.top +1,r.right -2,r.bottom -1, 6, 4);
@@ -505,6 +484,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			}
 /*
 			if (CDIS_CHECKED == pTBCD->nmcd.uItemState) {
+				CPen penFrChecked(PS_SOLID,0,0x00808080);//clr_resDark
 				dc.SelectObject(&penFrChecked);
 				dc.RoundRect(r.left +1,r.top +1,r.right -2,r.bottom -1, 6, 4);
 			}
@@ -535,18 +515,21 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 		switch(pTBCD->nmcd.dwDrawStage)
 		{
 		case CDDS_PREPAINT:
+			{
+			CDC dc;
+			dc.Attach(pTBCD->nmcd.hdc);
+			CRect r;
+			GetClientRect(&r);
+			dc.FillSolidRect(r, GetSysColor(COLOR_BTNFACE));
+			dc.Detach();
+			}
 			lr |= CDRF_NOTIFYITEMDRAW;
 			break;
-		case CDDS_POSTPAINT:
-			lr = CDRF_DODEFAULT;
-			break;
 		case CDDS_ITEMPREPAINT:
-			lr = CDRF_DODEFAULT;
 			lr |= CDRF_NOTIFYPOSTPAINT;
 			lr |= CDRF_NOTIFYITEMDRAW;
 			break;
 		case CDDS_ITEMPOSTPAINT:
-			lr = CDRF_DODEFAULT;
 			CDC dc;
 			dc.Attach(pTBCD->nmcd.hdc);
 			CRect r;
@@ -554,7 +537,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			for (int j = 0; j < _countof(sep); j++) {
 				GetItemRect(sep[j], &r);
 
-				dc.FillSolidRect(r, dc.GetPixel(1, 1));
+				dc.FillSolidRect(r, GetSysColor(COLOR_BTNFACE));
 			}
 
 			dc.Detach();
@@ -608,13 +591,33 @@ BOOL CPlayerToolBar::OnVolumeDown(UINT nID)
 	return FALSE;
 }
 
+void CPlayerToolBar::OnNcPaint()
+{
+	CRect wr, cr;
+	CWindowDC dc(this);
+	GetClientRect(&cr);
+	ClientToScreen(&cr);
+	GetWindowRect(&wr);
+	cr.OffsetRect(-wr.left, -wr.top);
+	wr.OffsetRect(-wr.left, -wr.top);
+	dc.ExcludeClipRect(&cr);
+
+	AppSettings& s = AfxGetAppSettings();
+
+	if (!s.fDisableXPToolbars) {
+		dc.FillSolidRect(wr, GetSysColor(COLOR_BTNFACE));
+	}
+}
+
 void CPlayerToolBar::OnMouseMove(UINT nFlags, CPoint point)
 {
+	CMainFrame* pFrame	= (CMainFrame*)GetParentFrame();
+
 	int i = getHitButtonIdx(point);
 
-	if ((i == -1) || (GetButtonStyle(i)&(TBBS_SEPARATOR|TBBS_DISABLED))) {
+	if (i == -1 || (GetButtonStyle(i) & (TBBS_SEPARATOR | TBBS_DISABLED))) {
 	} else {
-		if ((i>10) || (i<2) || ((i<9) && ((CMainFrame*)GetParentFrame())->IsSomethingLoaded())) {
+		if (i > 10 || i < 2 || (i < 9 && pFrame->IsSomethingLoaded())) {
 			::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_HAND));
 		}
 	}
@@ -624,7 +627,7 @@ void CPlayerToolBar::OnMouseMove(UINT nFlags, CPoint point)
 
 BOOL CPlayerToolBar::OnPlay(UINT nID)
 {
-	CMainFrame* pFrame	= ((CMainFrame*)GetParentFrame());
+	CMainFrame* pFrame	= (CMainFrame*)GetParentFrame();
 	OAFilterState fs	= pFrame->GetMediaState();
 
 	CToolBarCtrl& tb = GetToolBarCtrl();
@@ -634,7 +637,7 @@ BOOL CPlayerToolBar::OnPlay(UINT nID)
 	tb.GetButtonInfo(ID_PLAY_PLAY, &bi);
 
 	int pos = (fs == State_Paused || fs == State_Stopped) ? 1 : 0;
-	if (bi.iImage != pos) {
+	if (!bi.iImage) {
 		bi.iImage = 1;
 	} else {
 		bi.iImage = pos;
@@ -659,7 +662,7 @@ BOOL CPlayerToolBar::OnStop(UINT nID)
 
 BOOL CPlayerToolBar::OnPause(UINT nID)
 {
-	CMainFrame* pFrame	= ((CMainFrame*)GetParentFrame());
+	CMainFrame* pFrame	= (CMainFrame*)GetParentFrame();
 	OAFilterState fs	= pFrame->GetMediaState();
 
 	CToolBarCtrl& tb = GetToolBarCtrl();
@@ -675,19 +678,20 @@ BOOL CPlayerToolBar::OnPause(UINT nID)
 
 void CPlayerToolBar::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	CMainFrame* pFrame	= ((CMainFrame*)GetParentFrame());
-	int Idx			= getHitButtonIdx(point);
+	CMainFrame* pFrame	= (CMainFrame*)GetParentFrame();
 	OAFilterState fs	= pFrame->GetMediaState();
 
-	if (Idx == 0 && fs != -1) {
+	int i = getHitButtonIdx(point);
+
+	if (i == 0 && fs != -1) {
 		pFrame->PostMessage(WM_COMMAND, ID_PLAY_PLAYPAUSE);
-	} else if ((Idx == -1) || (GetButtonStyle(Idx)&(TBBS_SEPARATOR|TBBS_DISABLED))) {
+	} else if (i == -1 || (GetButtonStyle(i) & (TBBS_SEPARATOR | TBBS_DISABLED))) {
 		if (!pFrame->m_fFullScreen) {
 			MapWindowPoints(pFrame, &point, 1);
 			pFrame->PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 		}
 	} else {
-		if ((Idx>10) || ((Idx<9) && pFrame->IsSomethingLoaded())) {
+		if (i > 10 || (i < 9 && pFrame->IsSomethingLoaded())) {
 			::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_HAND));
 		}
 
@@ -697,7 +701,7 @@ void CPlayerToolBar::OnLButtonDown(UINT nFlags, CPoint point)
 
 int CPlayerToolBar::getHitButtonIdx(CPoint point)
 {
-	int hit = -1; // -1 means not on any buttons, mute button is 12/13, others < 10, 11 is empty space between
+	int hit = -1;// -1 means not on any buttons
 	CRect r;
 
 	for (int i = 0, j = GetToolBarCtrl().GetButtonCount(); i < j; i++) {

@@ -23,9 +23,6 @@
 #include "stdafx.h"
 #include "AboutDlg.h"
 
-/////////////////////////////////////////////////////////////////////////////
-// CAboutDlg dialog used for App About
-
 extern "C" char *GetFFmpegCompiler();
 extern "C" char *GetlibavcodecVersion();
 

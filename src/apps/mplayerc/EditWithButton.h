@@ -1,28 +1,29 @@
 /*
-	Edit With Button
+ * $Id$
+ *
+ * (C) 2006-2012 see Authors.txt
+ *
+ * This file is part of MPC-BE.
+ *
+ * MPC-BE is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MPC-BE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
-	This class acts mostly like a normal Edit Box except that it provides a button to the right
-	side of the control. Clicking the button invokes the virutal OnLeftClick method. If that
-	has not been overridden in a derived classes then it sends the EDIT_BUTTON_LEFTCLICKED
-	message to the parent window.
-
-	CEditWithButton_Base contains most of the code to make this work but cannot be instantiated
-	itself. A derived class must override DrawButtonContent and CalculateButtonWidth to determine
-	what is actually drawn for the button.
-
-	CEditWithButton is a derived class that handles the simplest form of a button where a plain
-	text string is displayed on the button.
-
-	Other classes could be derived to draw other kinds of buttons.
-*/
 #pragma once
 
 #include <afxwin.h>
-#include "UxTheme.h"
 
-
-// May be sent to the parent window when the edit control's button is clicked.
-// wParam will be set to the ID of the control that sent the message.
 #define EDIT_BUTTON_LEFTCLICKED		(WM_APP + 842)					// arbitrary number, change if necessary
 
 

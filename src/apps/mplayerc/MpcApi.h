@@ -20,32 +20,6 @@
  *
  */
 
-
-
-// This file define commands used for "MPC-BE" API. To send commands
-// to mpc-be, and receive playback notifications, first launch process with the /slave command line
-// argument follow by an HWnd handle use to receive notification :
-//
-// ..\bin\mplayerc /slave 125421
-//
-// After startup, MPC-BE send a WM_COPYDATA message to host with COPYDATASTRUCT struct filled with :
-//		- dwData	: CMD_CONNECT
-//		- lpData	: Unicode string containing MPC-BE main window Handle
-//
-// To pilot mpc-be, send WM_COPYDATA messages to Hwnd provided on connection. All messages should be
-// formatted as Unicode strings. For commands or notifications with multiple parameters, values are
-// separated by |
-// If a string contains a |, it will be escaped with a \ so a \| is not a separator
-//
-// Ex : When a file is opened, MPC-BE send to host the "now playing" notification :
-//		- dwData	: CMD_NOWPLAYING
-//		- lpData	: title|author|description|filename|duration
-//
-// Ex : When a DVD is playing, use CMD_GETNOWPLAYING to get:
-//		- dwData	: CMD_NOWPLAYING
-//		- lpData	: dvddomain|titlenumber|numberofchapters|currentchapter|titleduration
-//								dvddomains : DVD - Stopped, DVD - FirstPlay, DVD - RootMenu, DVD - TitleMenu, DVD - Title
-
 #pragma once
 
 
