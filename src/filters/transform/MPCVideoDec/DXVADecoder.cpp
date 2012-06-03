@@ -716,10 +716,10 @@ BYTE CDXVADecoder::GetConfigIntraResidUnsigned()
 
 void CDXVADecoder::EndOfStream()
 {
-	CComPtr<IMediaSample>	pSampleToDeliver;
+	CComPtr<IMediaSample> pSampleToDeliver;
 
 	for (int nPicIndex=0; nPicIndex<m_nPicEntryNumber; nPicIndex++) {
-		if (m_pPictureStore[nPicIndex].bInUse && !m_pPictureStore[nPicIndex].bDisplayed) {
+		if (m_pPictureStore[nPicIndex].bInUse && !m_pPictureStore[nPicIndex].bDisplayed && m_pPictureStore[nPicIndex].rtStart != _I64_MIN) {
 			switch (m_nEngine) {
 				// TODO - need check under WinXP on DXVA1
 				/*
@@ -730,8 +730,11 @@ void CDXVADecoder::EndOfStream()
 					break;
 				*/
 				case ENGINE_DXVA2 :
+					m_pPictureStore[nPicIndex].pSample->SetTime (&m_pPictureStore[nPicIndex].rtStart, &m_pPictureStore[nPicIndex].rtStop);
 					SetTypeSpecificFlags(&m_pPictureStore[nPicIndex], m_pPictureStore[nPicIndex].pSample);
-					m_pFilter->GetOutputPin()->Deliver(m_pPictureStore[nPicIndex].pSample);
+					if (FAILED(m_pFilter->GetOutputPin()->Deliver(m_pPictureStore[nPicIndex].pSample))) {
+						return;
+					}
 					break;
 			}
 		}
