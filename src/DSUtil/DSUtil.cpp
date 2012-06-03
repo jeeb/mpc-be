@@ -49,21 +49,17 @@ void DumpStreamConfig(TCHAR* fn, IAMStreamConfig* pAMVSCCap)
 		return;
 	}
 
-	s.Empty();
 	s.Format(_T("cnt %d, size %d\n"), cnt, size);
 	f.WriteString(s);
 
 	if (size == sizeof(VIDEO_STREAM_CONFIG_CAPS)) {
-		CString ss;
-		for (ptrdiff_t i = 0; i < cnt; i++) {
+		for (int i = 0; i < cnt; i++) {
 			AM_MEDIA_TYPE* pmt = NULL;
 
 			VIDEO_STREAM_CONFIG_CAPS caps;
 			memset(&caps, 0, sizeof(caps));
 
-			s.Empty();
-			ss.Format(_T("%d\n"), i);
-			s += ss;
+			s.Format(_T("%d\n"), i);
 			f.WriteString(s);
 
 			if (FAILED(pAMVSCCap->GetStreamCaps(i, &pmt, (BYTE*)&caps))) {
@@ -71,33 +67,20 @@ void DumpStreamConfig(TCHAR* fn, IAMStreamConfig* pAMVSCCap)
 			}
 
 			{
-				s.Empty();
-				ss.Format(_T("VIDEO_STREAM_CONFIG_CAPS\n"));
-				s += ss;
-				ss.Format(_T("\tVideoStandard 0x%08x\n"), caps.VideoStandard);
-				s += ss;
-				ss.Format(_T("\tInputSize %dx%d\n"), caps.InputSize);
-				s += ss;
-				ss.Format(_T("\tCroppingSize %dx%d - %dx%d\n"), caps.MinCroppingSize, caps.MaxCroppingSize);
-				s += ss;
-				ss.Format(_T("\tCropGranularity %d, %d\n"), caps.CropGranularityX, caps.CropGranularityY);
-				s += ss;
-				ss.Format(_T("\tCropAlign %d, %d\n"), caps.CropAlignX, caps.CropAlignY);
-				s += ss;
-				ss.Format(_T("\tOutputSize %dx%d - %dx%d\n"), caps.MinOutputSize, caps.MaxOutputSize);
-				s += ss;
-				ss.Format(_T("\tOutputGranularity %d, %d\n"), caps.OutputGranularityX, caps.OutputGranularityY);
-				s += ss;
-				ss.Format(_T("\tStretchTaps %d, %d\n"), caps.StretchTapsX, caps.StretchTapsY);
-				s += ss;
-				ss.Format(_T("\tShrinkTaps %d, %d\n"), caps.ShrinkTapsX, caps.ShrinkTapsY);
-				s += ss;
-				ss.Format(_T("\tFrameInterval %I64d, %I64d (%.4f, %.4f)\n"),
-						  caps.MinFrameInterval, caps.MaxFrameInterval,
-						  (float)10000000/caps.MinFrameInterval, (float)10000000/caps.MaxFrameInterval);
-				s += ss;
-				ss.Format(_T("\tBitsPerSecond %d - %d\n"), caps.MinBitsPerSecond, caps.MaxBitsPerSecond);
-				s += ss;
+				s = _T("VIDEO_STREAM_CONFIG_CAPS\n");
+				s.AppendFormat(_T("\tVideoStandard 0x%08x\n"), caps.VideoStandard);
+				s.AppendFormat(_T("\tInputSize %dx%d\n"), caps.InputSize);
+				s.AppendFormat(_T("\tCroppingSize %dx%d - %dx%d\n"), caps.MinCroppingSize, caps.MaxCroppingSize);
+				s.AppendFormat(_T("\tCropGranularity %d, %d\n"), caps.CropGranularityX, caps.CropGranularityY);
+				s.AppendFormat(_T("\tCropAlign %d, %d\n"), caps.CropAlignX, caps.CropAlignY);
+				s.AppendFormat(_T("\tOutputSize %dx%d - %dx%d\n"), caps.MinOutputSize, caps.MaxOutputSize);
+				s.AppendFormat(_T("\tOutputGranularity %d, %d\n"), caps.OutputGranularityX, caps.OutputGranularityY);
+				s.AppendFormat(_T("\tStretchTaps %d, %d\n"), caps.StretchTapsX, caps.StretchTapsY);
+				s.AppendFormat(_T("\tShrinkTaps %d, %d\n"), caps.ShrinkTapsX, caps.ShrinkTapsY);
+				s.AppendFormat(_T("\tFrameInterval %I64d, %I64d (%.4f, %.4f)\n"),
+							   caps.MinFrameInterval, caps.MaxFrameInterval,
+							   (float)10000000/caps.MinFrameInterval, (float)10000000/caps.MaxFrameInterval);
+				s.AppendFormat(_T("\tBitsPerSecond %d - %d\n"), caps.MinBitsPerSecond, caps.MaxBitsPerSecond);
 				f.WriteString(s);
 			}
 
@@ -106,54 +89,34 @@ void DumpStreamConfig(TCHAR* fn, IAMStreamConfig* pAMVSCCap)
 				VIDEOINFOHEADER* vih = (VIDEOINFOHEADER*)pmt->pbFormat;
 				pbh = &vih->bmiHeader;
 
-				s.Empty();
-				ss.Format(_T("FORMAT_VideoInfo\n"));
-				s += ss;
-				ss.Format(_T("\tAvgTimePerFrame %I64d, %.4f\n"), vih->AvgTimePerFrame, (float)10000000/vih->AvgTimePerFrame);
-				s += ss;
-				ss.Format(_T("\trcSource %d,%d,%d,%d\n"), vih->rcSource);
-				s += ss;
-				ss.Format(_T("\trcTarget %d,%d,%d,%d\n"), vih->rcTarget);
-				s += ss;
+				s = _T("FORMAT_VideoInfo\n");
+				s.AppendFormat(_T("\tAvgTimePerFrame %I64d, %.4f\n"), vih->AvgTimePerFrame, (float)10000000/vih->AvgTimePerFrame);
+				s.AppendFormat(_T("\trcSource %d,%d,%d,%d\n"), vih->rcSource);
+				s.AppendFormat(_T("\trcTarget %d,%d,%d,%d\n"), vih->rcTarget);
 				f.WriteString(s);
 			} else if (pmt->formattype == FORMAT_VideoInfo2) {
 				VIDEOINFOHEADER2* vih = (VIDEOINFOHEADER2*)pmt->pbFormat;
 				pbh = &vih->bmiHeader;
 
-				s.Empty();
-				ss.Format(_T("FORMAT_VideoInfo2\n"));
-				s += ss;
-				ss.Format(_T("\tAvgTimePerFrame %I64d, %.4f\n"), vih->AvgTimePerFrame, (float)10000000/vih->AvgTimePerFrame);
-				s += ss;
-				ss.Format(_T("\trcSource %d,%d,%d,%d\n"), vih->rcSource);
-				s += ss;
-				ss.Format(_T("\trcTarget %d,%d,%d,%d\n"), vih->rcTarget);
-				s += ss;
-				ss.Format(_T("\tdwInterlaceFlags 0x%x\n"), vih->dwInterlaceFlags);
-				s += ss;
-				ss.Format(_T("\tdwPictAspectRatio %d:%d\n"), vih->dwPictAspectRatioX, vih->dwPictAspectRatioY);
-				s += ss;
+				s  = _T("FORMAT_VideoInfo2\n");
+				s.AppendFormat(_T("\tAvgTimePerFrame %I64d, %.4f\n"), vih->AvgTimePerFrame, (float)10000000/vih->AvgTimePerFrame);
+				s.AppendFormat(_T("\trcSource %d,%d,%d,%d\n"), vih->rcSource);
+				s.AppendFormat(_T("\trcTarget %d,%d,%d,%d\n"), vih->rcTarget);
+				s.AppendFormat(_T("\tdwInterlaceFlags 0x%x\n"), vih->dwInterlaceFlags);
+				s.AppendFormat(_T("\tdwPictAspectRatio %d:%d\n"), vih->dwPictAspectRatioX, vih->dwPictAspectRatioY);
 				f.WriteString(s);
 			} else {
 				DeleteMediaType(pmt);
 				continue;
 			}
 
-			s.Empty();
-			ss.Format(_T("BITMAPINFOHEADER\n"));
-			s += ss;
-			ss.Format(_T("\tbiCompression %x\n"), pbh->biCompression);
-			s += ss;
-			ss.Format(_T("\tbiWidth %d\n"), pbh->biWidth);
-			s += ss;
-			ss.Format(_T("\tbiHeight %d\n"), pbh->biHeight);
-			s += ss;
-			ss.Format(_T("\tbiBitCount %d\n"), pbh->biBitCount);
-			s += ss;
-			ss.Format(_T("\tbiPlanes %d\n"), pbh->biPlanes);
-			s += ss;
-			ss.Format(_T("\tbiSizeImage %d\n"), pbh->biSizeImage);
-			s += ss;
+			s = _T("BITMAPINFOHEADER\n");
+			s.AppendFormat(_T("\tbiCompression %x\n"), pbh->biCompression);
+			s.AppendFormat(_T("\tbiWidth %d\n"), pbh->biWidth);
+			s.AppendFormat(_T("\tbiHeight %d\n"), pbh->biHeight);
+			s.AppendFormat(_T("\tbiBitCount %d\n"), pbh->biBitCount);
+			s.AppendFormat(_T("\tbiPlanes %d\n"), pbh->biPlanes);
+			s.AppendFormat(_T("\tbiSizeImage %d\n"), pbh->biSizeImage);
 			f.WriteString(s);
 
 			DeleteMediaType(pmt);
@@ -189,21 +152,21 @@ int CountPins(IBaseFilter* pBF, int& nIn, int& nOut, int& nInC, int& nOutC)
 	}
 	EndEnumPins
 
-	return(nIn+nOut);
+	return (nIn + nOut);
 }
 
 bool IsSplitter(IBaseFilter* pBF, bool fCountConnectedOnly)
 {
 	int nIn, nOut, nInC, nOutC;
 	CountPins(pBF, nIn, nOut, nInC, nOutC);
-	return(fCountConnectedOnly ? nOutC > 1 : nOut > 1);
+	return (fCountConnectedOnly ? nOutC > 1 : nOut > 1);
 }
 
 bool IsMultiplexer(IBaseFilter* pBF, bool fCountConnectedOnly)
 {
 	int nIn, nOut, nInC, nOutC;
 	CountPins(pBF, nIn, nOut, nInC, nOutC);
-	return(fCountConnectedOnly ? nInC > 1 : nIn > 1);
+	return (fCountConnectedOnly ? nInC > 1 : nIn > 1);
 }
 
 bool IsStreamStart(IBaseFilter* pBF)
@@ -217,7 +180,7 @@ bool IsStreamStart(IBaseFilter* pBF)
 	CountPins(pBF, nIn, nOut, nInC, nOutC);
 	AM_MEDIA_TYPE mt;
 	CComPtr<IPin> pIn = GetFirstPin(pBF);
-	return((nOut > 1)
+	return ((nOut > 1)
 		   || (nOut > 0 && nIn == 1 && pIn && SUCCEEDED(pIn->ConnectionMediaType(&mt)) && mt.majortype == MEDIATYPE_Stream));
 }
 
@@ -225,7 +188,7 @@ bool IsStreamEnd(IBaseFilter* pBF)
 {
 	int nIn, nOut, nInC, nOutC;
 	CountPins(pBF, nIn, nOut, nInC, nOutC);
-	return(nOut == 0);
+	return (nOut == 0);
 }
 
 bool IsVideoRenderer(IBaseFilter* pBF)
@@ -242,7 +205,7 @@ bool IsVideoRenderer(IBaseFilter* pBF)
 
 			FreeMediaType(mt);
 
-			return(!!(mt.majortype == MEDIATYPE_Video));
+			return !!(mt.majortype == MEDIATYPE_Video);
 			/*&& (mt.formattype == FORMAT_VideoInfo || mt.formattype == FORMAT_VideoInfo2));*/
 		}
 		EndEnumPins
@@ -252,7 +215,7 @@ bool IsVideoRenderer(IBaseFilter* pBF)
 	memcpy(&clsid, &GUID_NULL, sizeof(clsid));
 	pBF->GetClassID(&clsid);
 
-	return(clsid == CLSID_VideoRenderer || clsid == CLSID_VideoRendererDefault);
+	return (clsid == CLSID_VideoRenderer || clsid == CLSID_VideoRendererDefault);
 }
 
 DEFINE_GUID(CLSID_ReClock,
@@ -272,8 +235,8 @@ bool IsAudioWaveRenderer(IBaseFilter* pBF)
 
 			FreeMediaType(mt);
 
-			return(!!(mt.majortype == MEDIATYPE_Audio)
-				   /*&& mt.formattype == FORMAT_WaveFormatEx*/);
+			return !!(mt.majortype == MEDIATYPE_Audio);
+				   /*&& mt.formattype == FORMAT_WaveFormatEx);*/
 		}
 		EndEnumPins
 	}
@@ -282,7 +245,7 @@ bool IsAudioWaveRenderer(IBaseFilter* pBF)
 	memcpy(&clsid, &GUID_NULL, sizeof(clsid));
 	pBF->GetClassID(&clsid);
 
-	return(clsid == CLSID_DSoundRender || clsid == CLSID_AudioRender || clsid == CLSID_ReClock
+	return (clsid == CLSID_DSoundRender || clsid == CLSID_AudioRender || clsid == CLSID_ReClock
 		   || clsid == __uuidof(CNullAudioRenderer) || clsid == __uuidof(CNullUAudioRenderer));
 }
 
@@ -304,18 +267,18 @@ IPin* GetUpStreamPin(IBaseFilter* pBF, IPin* pInputPin)
 				&& SUCCEEDED(pPin->ConnectedTo(&pPinConnectedTo))) {
 			IPin* pRet = pPinConnectedTo.Detach();
 			pRet->Release();
-			return(pRet);
+			return pRet;
 		}
 	}
 	EndEnumPins
 
-	return(NULL);
+	return NULL;
 }
 
 IPin* GetFirstPin(IBaseFilter* pBF, PIN_DIRECTION dir)
 {
 	if (!pBF) {
-		return(NULL);
+		return NULL;
 	}
 
 	BeginEnumPins(pBF, pEP, pPin) {
@@ -324,18 +287,18 @@ IPin* GetFirstPin(IBaseFilter* pBF, PIN_DIRECTION dir)
 		if (dir == dir2) {
 			IPin* pRet = pPin.Detach();
 			pRet->Release();
-			return(pRet);
+			return pRet;
 		}
 	}
 	EndEnumPins
 
-	return(NULL);
+	return NULL;
 }
 
 IPin* GetFirstDisconnectedPin(IBaseFilter* pBF, PIN_DIRECTION dir)
 {
 	if (!pBF) {
-		return(NULL);
+		return NULL;
 	}
 
 	BeginEnumPins(pBF, pEP, pPin) {
@@ -345,19 +308,19 @@ IPin* GetFirstDisconnectedPin(IBaseFilter* pBF, PIN_DIRECTION dir)
 		if (dir == dir2 && (S_OK != pPin->ConnectedTo(&pPinTo))) {
 			IPin* pRet = pPin.Detach();
 			pRet->Release();
-			return(pRet);
+			return pRet;
 		}
 	}
 	EndEnumPins
 
-	return(NULL);
+	return NULL;
 }
 
 IBaseFilter* FindFilter(LPCWSTR clsid, IFilterGraph* pFG)
 {
 	CLSID clsid2;
 	CLSIDFromString(CComBSTR(clsid), &clsid2);
-	return(FindFilter(clsid2, pFG));
+	return FindFilter(clsid2, pFG);
 }
 
 IBaseFilter* FindFilter(const CLSID& clsid, IFilterGraph* pFG)
@@ -365,7 +328,7 @@ IBaseFilter* FindFilter(const CLSID& clsid, IFilterGraph* pFG)
 	BeginEnumFilters(pFG, pEF, pBF) {
 		CLSID clsid2;
 		if (SUCCEEDED(pBF->GetClassID(&clsid2)) && clsid == clsid2) {
-			return(pBF);
+			return pBF;
 		}
 	}
 	EndEnumFilters
@@ -420,7 +383,7 @@ CStringW GetFilterName(IBaseFilter* pBF)
 		}
 	}
 
-	return(name);
+	return name;
 }
 
 CStringW GetPinName(IPin* pPin)
@@ -431,7 +394,7 @@ CStringW GetPinName(IPin* pPin)
 		name = pi.achName;
 	}
 
-	return(name);
+	return name;
 }
 
 IFilterGraph* GetGraphFromFilter(IBaseFilter* pBF)
@@ -444,7 +407,7 @@ IFilterGraph* GetGraphFromFilter(IBaseFilter* pBF)
 	if (pBF && SUCCEEDED(pBF->QueryFilterInfo(&fi))) {
 		pGraph = fi.pGraph;
 	}
-	return(pGraph);
+	return pGraph;
 }
 
 IBaseFilter* GetFilterFromPin(IPin* pPin)
@@ -457,7 +420,7 @@ IBaseFilter* GetFilterFromPin(IPin* pPin)
 	if (pPin && SUCCEEDED(pPin->QueryPinInfo(&pi))) {
 		pBF = pi.pFilter;
 	}
-	return(pBF);
+	return pBF;
 }
 
 IPin* AppendFilter(IPin* pPin, CString DisplayName, IGraphBuilder* pGB)
@@ -543,7 +506,7 @@ IPin* AppendFilter(IPin* pPin, CString DisplayName, IGraphBuilder* pGB)
 		}
 	} while (false);
 
-	return(pRet);
+	return pRet;
 }
 
 IPin* InsertFilter(IPin* pPin, CString DisplayName, IGraphBuilder* pGB)
@@ -635,7 +598,7 @@ IPin* InsertFilter(IPin* pPin, CString DisplayName, IGraphBuilder* pGB)
 		pPin = pToFrom;
 	} while (false);
 
-	return(pPin);
+	return pPin;
 }
 
 void ExtractMediaTypes(IPin* pPin, CAtlArray<GUID>& types)
@@ -762,12 +725,12 @@ CLSID GetCLSID(IBaseFilter* pBF)
 	if (pBF) {
 		pBF->GetClassID(&clsid);
 	}
-	return(clsid);
+	return clsid;
 }
 
 CLSID GetCLSID(IPin* pPin)
 {
-	return(GetCLSID(GetFilterFromPin(pPin)));
+	return GetCLSID(GetFilterFromPin(pPin));
 }
 
 bool IsCLSIDRegistered(LPCTSTR clsid)
@@ -789,7 +752,7 @@ bool IsCLSIDRegistered(const CLSID& clsid)
 		CoTaskMemFree(pStr);
 	}
 
-	return(fRet);
+	return fRet;
 }
 
 void CStringToBin(CString str, CAtlArray<BYTE>& data)
@@ -801,7 +764,7 @@ void CStringToBin(CString str, CAtlArray<BYTE>& data)
 	BYTE b = 0;
 
 	str.MakeUpper();
-	for (size_t i = 0, j = str.GetLength(); i < j; i++) {
+	for (int i = 0, j = str.GetLength(); i < j; i++) {
 		TCHAR c = str[i];
 		if (c >= '0' && c <= '9') {
 			if (!(i&1)) {
@@ -826,23 +789,21 @@ void CStringToBin(CString str, CAtlArray<BYTE>& data)
 	}
 }
 
-CString BinToCString(BYTE* ptr, int len)
+CString BinToCString(const BYTE* ptr, size_t len)
 {
 	CString ret;
+	TCHAR high, low;
 
 	while (len-- > 0) {
-		TCHAR high, low;
 		high = (*ptr>>4) >= 10 ? (*ptr>>4)-10 + 'A' : (*ptr>>4) + '0';
 		low = (*ptr&0xf) >= 10 ? (*ptr&0xf)-10 + 'A' : (*ptr&0xf) + '0';
 
-		CString str;
-		str.Format(_T("%c%c"), high, low);
-		ret += str;
+		ret.AppendFormat(_T("%c%c"), high, low);
 
 		ptr++;
 	}
 
-	return(ret);
+	return ret;
 }
 
 static void FindFiles(CString fn, CAtlList<CString>& files)
@@ -926,15 +887,15 @@ CString GetDriveLabel(TCHAR drive)
 
 	CString path;
 	path.Format(_T("%c:\\"), drive);
-	TCHAR VolumeNameBuffer[MAX_PATH], FileSystemNameBuffer[MAX_PATH];
+	TCHAR VolumeNameBuffer[_MAX_PATH], FileSystemNameBuffer[_MAX_PATH];
 	DWORD VolumeSerialNumber, MaximumComponentLength, FileSystemFlags;
 	if (GetVolumeInformation(path,
-							 VolumeNameBuffer, MAX_PATH, &VolumeSerialNumber, &MaximumComponentLength,
-							 &FileSystemFlags, FileSystemNameBuffer, MAX_PATH)) {
+							 VolumeNameBuffer, _MAX_PATH, &VolumeSerialNumber, &MaximumComponentLength,
+							 &FileSystemFlags, FileSystemNameBuffer, _MAX_PATH)) {
 		label = VolumeNameBuffer;
 	}
 
-	return(label);
+	return label;
 }
 
 bool GetKeyFrames(CString fn, CUIntArray& kfs)
@@ -958,11 +919,11 @@ bool GetKeyFrames(CString fn, CUIntArray& kfs)
 
 				if (afi.dwCaps&AVIFILECAPS_ALLKEYFRAMES) {
 					kfs.SetSize(si.dwLength);
-					for (ptrdiff_t kf = 0; kf < (int)si.dwLength; kf++) {
+					for (DWORD kf = 0; kf < si.dwLength; kf++) {
 						kfs[kf] = kf;
 					}
 				} else {
-					for (ptrdiff_t kf = 0; ; kf++) {
+					for (LONG kf = 0; ; kf++) {
 						kf = pavi->FindSample(kf, FIND_KEY|FIND_NEXT);
 						if (kf < 0 || kfs.GetCount() > 0 && kfs[kfs.GetCount()-1] >= (UINT)kf) {
 							break;
@@ -982,7 +943,7 @@ bool GetKeyFrames(CString fn, CUIntArray& kfs)
 		AVIFileExit();
 	}
 
-	return(kfs.GetCount() > 0);
+	return (kfs.GetCount() > 0);
 }
 
 DVD_HMSF_TIMECODE RT2HMSF(REFERENCE_TIME rt, double fps) // use to remember the current position
@@ -1124,7 +1085,7 @@ bool ExtractBIH(IMediaSample* pMS, BITMAPINFOHEADER* bih)
 	if (pmt) {
 		bool fRet = ExtractBIH(pmt, bih);
 		DeleteMediaType(pmt);
-		return(fRet);
+		return fRet;
 	}
 
 	return false;
@@ -1233,7 +1194,7 @@ bool MakeMPEG2MediaType(CMediaType& mt, BYTE* seqhdr, DWORD len, int w, int h)
 		if (*(DWORD*)seqhdr_end == 0xb5010000) {
 			seqhdr_ext = seqhdr_end;
 			seqhdr_end += 10;
-			len = seqhdr_end - seqhdr;
+			len = (DWORD)(seqhdr_end - seqhdr);
 			break;
 		}
 		seqhdr_end++;
@@ -1373,7 +1334,7 @@ IBaseFilter* AppendFilter(IPin* pPin, IMoniker* pMoniker, IGraphBuilder* pGB)
 			}
 
 			if (SUCCEEDED(pGB->ConnectDirect(pPin, pPinTo, NULL))) {
-				return(pBF);
+				return pBF;
 			}
 		}
 		EndEnumFilters
@@ -1381,7 +1342,7 @@ IBaseFilter* AppendFilter(IPin* pPin, IMoniker* pMoniker, IGraphBuilder* pGB)
 		pGB->RemoveFilter(pBF);
 	} while (false);
 
-	return(NULL);
+	return NULL;
 }
 
 CStringW GetFriendlyName(CStringW DisplayName)
@@ -1506,7 +1467,7 @@ CString MakeFullPath(LPCTSTR path)
 	full.Replace('/', '\\');
 
 	CString fn;
-	fn.ReleaseBuffer(GetModuleFileName(AfxGetInstanceHandle(), fn.GetBuffer(MAX_PATH), MAX_PATH));
+	fn.ReleaseBuffer(GetModuleFileName(AfxGetInstanceHandle(), fn.GetBuffer(_MAX_PATH), _MAX_PATH));
 	CPath p(fn);
 
 	if (full.GetLength() >= 2 && full[0] == '\\' && full[1] != '\\') {
@@ -2224,7 +2185,7 @@ CString ISO6391ToLanguage(LPCSTR code)
 			}
 			return ret;
 		}
-	return(_T(""));
+	return _T("");
 }
 
 CString ISO6392ToLanguage(LPCSTR code)
@@ -2388,7 +2349,7 @@ int MakeAACInitData(BYTE* pData, int profile, int freq, int channels)
 		ret = 5;
 	}
 
-	return(ret);
+	return ret;
 }
 
 BOOL CFileGetStatus(LPCTSTR lpszFileName, CFileStatus& status)
@@ -2440,7 +2401,7 @@ bool SetRegKeyValue(LPCTSTR pszKey, LPCTSTR pszSubkey, LPCTSTR pszValueName, LPC
 		if (pszValue != 0) {
 			ec = ::RegSetValueEx(hKey, pszValueName, 0, REG_SZ,
 								 reinterpret_cast<BYTE*>(const_cast<LPTSTR>(pszValue)),
-								 (_tcslen(pszValue) + 1) * sizeof(TCHAR));
+								 (DWORD)(_tcslen(pszValue) + 1) * sizeof(TCHAR));
 		}
 
 		bOK = (ec == ERROR_SUCCESS);
@@ -2600,11 +2561,11 @@ void DumpBuffer(BYTE* pBuffer, int nSize)
 		if (nPos >= nSize) {
 			break;
 		}
-		strMsg.AppendFormat (L"\n");
+		strMsg.Append(L"\n");
 	}
 
 	if (nSize > 32*3) {
-		strMsg.AppendFormat (L".../...\n");
+		strMsg.Append(L".../...\n");
 		for (int j=32; j>0; j--) {
 			strMsg.AppendFormat (L"%02x ", pBuffer[nSize - j]);
 		}
@@ -2799,22 +2760,22 @@ const wchar_t *StreamTypeToName(PES_STREAM_TYPE _Type)
 // Usage: SetThreadName (-1, "MainThread");
 //
 typedef struct tagTHREADNAME_INFO {
-	DWORD dwType; // must be 0x1000
+	DWORD  dwType; // must be 0x1000
 	LPCSTR szName; // pointer to name (in user addr space)
-	DWORD dwThreadID; // thread ID (-1=caller thread)
-	DWORD dwFlags; // reserved for future use, must be zero
+	DWORD  dwThreadID; // thread ID (-1 caller thread)
+	DWORD  dwFlags; // reserved for future use, must be zero
 } THREADNAME_INFO;
 
-void SetThreadName( DWORD dwThreadID, LPCSTR szThreadName)
+void SetThreadName(DWORD dwThreadID, LPCSTR szThreadName)
 {
 	THREADNAME_INFO info;
-	info.dwType = 0x1000;
-	info.szName = szThreadName;
+	info.dwType     = 0x1000;
+	info.szName     = szThreadName;
 	info.dwThreadID = dwThreadID;
-	info.dwFlags = 0;
+	info.dwFlags    = 0;
 
 	__try {
-		RaiseException( 0x406D1388, 0, sizeof(info)/sizeof(DWORD), (ULONG_PTR*)&info );
+		RaiseException(0x406D1388, 0, sizeof(info)/sizeof(DWORD), (ULONG_PTR*)&info);
 	}
 	__except (EXCEPTION_CONTINUE_EXECUTION) {
 	}
@@ -2841,7 +2802,7 @@ void HexDump(CString fileName, BYTE* buf, int size)
 				dump_str.AppendFormat(_T(" %02x"), buf[i+j]);
 			}
 			else {
-				dump_str.AppendFormat(_T("   "));
+				dump_str.Append(_T("   "));
 			}
 		}
 		dump_str.Append(_T(" "));
@@ -2940,7 +2901,7 @@ void CorrectComboListWidth(CComboBox& m_pComboBox)
 	// Get the scrollbar width if it exists
 	int min_visible = m_pComboBox.GetMinVisible();
 	int scroll_width = (m_pComboBox.GetCount() > min_visible) ?
-		::GetSystemMetrics(SM_CXVSCROLL) : 0;
+					   ::GetSystemMetrics(SM_CXVSCROLL) : 0;
 
 	// Adjust the width for the vertical scroll bar and the left and right border.
 	dx += scroll_width + 2*::GetSystemMetrics(SM_CXEDGE);
@@ -2967,7 +2928,7 @@ void getExtraData(const BYTE *format, const GUID *formattype, const size_t forma
 {
 	// code from LAV ...
 	const BYTE *extraposition = NULL;
-	unsigned extralength = 0;
+	size_t extralength = 0;
 	if (*formattype == FORMAT_WaveFormatEx) {
 		WAVEFORMATEX *wfex = (WAVEFORMATEX *)format;
 		extraposition = format + sizeof(WAVEFORMATEX);
@@ -2992,7 +2953,7 @@ void getExtraData(const BYTE *format, const GUID *formattype, const size_t forma
 		if (extra && extralength)
 			memcpy(extra, format + sizeof(VORBISFORMAT2), extralength);
 		if (extralen)
-			*extralen = extralength + offset;
+			*extralen = (unsigned int)extralength + offset;
 
 		return;
 	} else if (*formattype == FORMAT_VideoInfo) {
@@ -3014,7 +2975,7 @@ void getExtraData(const BYTE *format, const GUID *formattype, const size_t forma
 	if (extra && extralength)
 		memcpy(extra, extraposition, extralength);
 	if (extralen)
-		*extralen = extralength;
+		*extralen = (unsigned int)extralength;
 }
 
 void audioFormatTypeHandler(const BYTE *format, const GUID *formattype, DWORD *pnSamples, WORD *pnChannels, WORD *pnBitsPerSample, WORD *pnBlockAlign, DWORD *pnBytesPerSec)
