@@ -930,12 +930,12 @@ HRESULT CMpaDecFilter::ProcessAC3()
 		if (m_DolbyDigitalMode != DD_TRUEHD && m_DolbyDigitalMode != DD_MLP && (*((__int16*)p) == 0x770b)) { /* AC3-EAC3 syncword */
 			BYTE bsid = p[5] >> 3;
 			if (bsid <= 10) {
-				if (FAILED (hr = ProcessA52 (p, end-p, size, fEnoughData))) {
+				if (FAILED (hr = ProcessA52 (p, int(end-p), size, fEnoughData))) {
 					return hr;
 				}
 				m_DolbyDigitalMode = DD_AC3;
 			} else if (bsid <= 16) {
-				DeliverFFmpeg(CODEC_ID_EAC3, p, end-p, size);
+				DeliverFFmpeg(CODEC_ID_EAC3, p, int(end-p), size);
 				if (size > 0) {
 					m_DolbyDigitalMode = DD_EAC3;
 				}
@@ -950,9 +950,9 @@ HRESULT CMpaDecFilter::ProcessAC3()
 			m_DolbyDigitalMode = DD_TRUEHD;
 
 			if (nLenght >= 4) {
-				DeliverFFmpeg(CODEC_ID_TRUEHD, p, end-p, size);
+				DeliverFFmpeg(CODEC_ID_TRUEHD, p, int(end-p), size);
 				if (size<0) {
-					size = end-p;
+					size = (int)(end-p);
 				}
 			}
 		} else if ( (*((__int32*)(p+4)) == 0xbb6f72f8) || // MLP major sync frame
@@ -962,9 +962,9 @@ HRESULT CMpaDecFilter::ProcessAC3()
 			m_DolbyDigitalMode = DD_MLP;
 
 			if (nLenght >= 4) {
-				DeliverFFmpeg(CODEC_ID_MLP, p, end-p, size);
+				DeliverFFmpeg(CODEC_ID_MLP, p, int(end-p), size);
 				if (size<0) {
-					size = end-p;
+					size = (int)(end-p);
 				}
 			}
 		} else {
@@ -1001,7 +1001,7 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum CodecID nCodecId)
 	BYTE* end = p + m_buff.GetCount();
 
 	int size = 0;
-	hr = DeliverFFmpeg(nCodecId, p, end-p, size);
+	hr = DeliverFFmpeg(nCodecId, p, int(end-p), size);
 	if (FAILED(hr)) {
 		if (nCodecId != CODEC_ID_AAC) {
 			m_buff.RemoveAll();
@@ -1398,7 +1398,7 @@ static void decodeps2adpcm(ps2_state_t& s, int channel, BYTE* pin, double* pout)
 		ASSERT(0);
 		return;
 	}
-	// if(unk == 7) {ASSERT(0); return;} // ???
+	// if (unk == 7) {ASSERT(0); return;} // ???
 
 	static double s_tbl[] = {
 		0.0, 0.0, 0.9375, 0.0, 1.796875, -0.8125, 1.53125, -0.859375, 1.90625, -0.9375,
