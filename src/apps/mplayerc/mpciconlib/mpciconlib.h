@@ -20,11 +20,7 @@
  *
  */
 
-/* The values below correspond to the icon indexes.
- * The order should be exactly the same as in the mpciconlib.rc file.
- * There should be no gaps in the numbering. So be careful
- * when adding/removing icons.
- */
+#pragma once
 
 #define IDI_MPG_ICON                    1
 #define IDI_MP4_ICON                    2

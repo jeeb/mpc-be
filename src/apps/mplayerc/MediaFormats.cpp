@@ -233,7 +233,7 @@ void CMediaFormats::UpdateData(bool fSave)
 		ADDFMT((_T("ape"),      ResStr(IDS_MFMT_APE),      _T("ape apl"), true));
 		ADDFMT((_T("au"),       ResStr(IDS_MFMT_AU),       _T("au snd"), true));
 		ADDFMT((_T("audiocd"),  ResStr(IDS_MFMT_CDA),      _T("cda"), true));
-//		ADDFMT((_T("dvdaudio"), ResStr(IDS_MFMT_DVDAUDIO), _T("aob"), true));
+		ADDFMT((_T("dvdaudio"), ResStr(IDS_MFMT_DVDAUDIO), _T("aob"), true));
 		ADDFMT((_T("flac"),     ResStr(IDS_MFMT_FLAC),     _T("flac"), true));
 		ADDFMT((_T("m4a"),      ResStr(IDS_MFMT_M4A),      _T("m4a m4b aac"), true));
 		ADDFMT((_T("midi"),     ResStr(IDS_MFMT_MIDI),     _T("mid midi rmi"), true));
