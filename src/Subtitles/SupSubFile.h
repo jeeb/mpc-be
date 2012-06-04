@@ -34,7 +34,7 @@ public:
 	CSupSubFile(CCritSec* pLock);
 	virtual ~CSupSubFile();
 
-	bool Open(CString fn);
+	bool Open(CString fn, CString SubName);
 
 	DECLARE_IUNKNOWN
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
@@ -60,7 +60,7 @@ public:
 
 	UINT		ThreadProc();
 private:
-	CString		m_name;
+	CString		m_fname, m_Subname;
 	CHdmvSub*	m_pSub;
 	CCritSec	m_csCritSec;
 

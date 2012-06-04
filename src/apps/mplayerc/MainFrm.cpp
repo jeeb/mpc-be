@@ -13784,6 +13784,30 @@ void CMainFrame::AddTextPassThruFilter()
 	EndEnumFilters;
 }
 
+static CString GetSubName(CString fn, CString f_videoName)
+{
+	// The filename of the video file with extension
+	CString videoName = f_videoName.Mid(f_videoName.ReverseFind('\\') + 1);
+
+	// The filename of the subtitle file
+	CString subName = fn.Left(fn.ReverseFind('.')).Mid(fn.ReverseFind('\\') + 1);
+
+	CString name = _T("");
+	if (subName.Find(videoName) != -1 && videoName.CompareNoCase(subName) != 0 && subName.Replace(videoName, _T("")) == 1) {
+		name = subName.TrimLeft('.');
+	} else {
+		// The filename of the video file without extension
+		videoName = f_videoName.Left(f_videoName.ReverseFind('.')).Mid(f_videoName.ReverseFind('\\') + 1);
+		if (subName.Find(videoName) != -1 && videoName.CompareNoCase(subName) != 0 && subName.Replace(videoName, _T("")) == 1) {
+			name = subName.TrimLeft('.');
+		} else {
+			name = ResStr(IDS_UNDETERMINED);
+		}
+	}
+
+	return name;
+}
+
 bool CMainFrame::LoadSubtitle(CString fn, ISubStream **actualStream)
 {
 	CComPtr<ISubStream> pSubStream;
@@ -13792,8 +13816,11 @@ bool CMainFrame::LoadSubtitle(CString fn, ISubStream **actualStream)
 	try {
 		if (!pSubStream) {
 			CAutoPtr<CSupSubFile> pSSF(DNew CSupSubFile(&m_csSubLock));
-			if (CString(CPath(fn).GetExtension()).MakeLower() == _T(".sup") && pSSF && pSSF->Open(fn)) {
-				pSubStream = pSSF.Detach();
+			if (pSSF && CString(CPath(fn).GetExtension()).MakeLower() == _T(".sup")) {
+
+				if (pSSF->Open(fn, GetSubName(fn, m_wndPlaylistBar.GetCurFileName()))) {
+					pSubStream = pSSF.Detach();
+				}
 			}
 		}
 
@@ -13806,22 +13833,8 @@ bool CMainFrame::LoadSubtitle(CString fn, ISubStream **actualStream)
 
 		if (!pSubStream) {
 			CAutoPtr<CRenderedTextSubtitle> pRTS(DNew CRenderedTextSubtitle(&m_csSubLock, &AfxGetAppSettings().subdefstyle, AfxGetAppSettings().fUseDefaultSubtitlesStyle));
-
-			// The filename of the video file
-			CString videoName = m_wndPlaylistBar.GetCurFileName();
-			videoName = videoName.Left(videoName.ReverseFind('.')).Mid(videoName.ReverseFind('\\') + 1);
-
-			// The filename of the subtitle file
-			CString subName = fn.Left(fn.ReverseFind('.')).Mid(fn.ReverseFind('\\') + 1);
-
-			CString name;
-			if (subName.Find(videoName) != -1 && videoName.CompareNoCase(subName) != 0 && subName.Replace(videoName, _T("")) == 1) {
-				name = subName.TrimLeft('.');
-			} else {
-				name = ResStr(IDS_UNDETERMINED);
-			}
-
-			if (pRTS && pRTS->Open(fn, DEFAULT_CHARSET, name) && pRTS->GetStreamCount() > 0) {
+			
+			if (pRTS && pRTS->Open(fn, DEFAULT_CHARSET, GetSubName(fn, m_wndPlaylistBar.GetCurFileName())) && pRTS->GetStreamCount() > 0) {
 				pSubStream = pRTS.Detach();
 			}
 		}

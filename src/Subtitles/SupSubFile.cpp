@@ -27,7 +27,8 @@
 CSupSubFile::CSupSubFile(CCritSec* pLock)
 	: CSubPicProviderImpl(pLock)
 {
-	m_name		= _T("");
+	m_fname		= _T("");
+	m_Subname	= _T("");
 	fThreadRun	= false;
 	m_Thread	= NULL;
 	m_pSub		= NULL;
@@ -36,7 +37,7 @@ CSupSubFile::CSupSubFile(CCritSec* pLock)
 CSupSubFile::~CSupSubFile()
 {
 	if (m_Thread) {
-		WaitForSingleObject(m_Thread->m_hThread, (DWORD)5000); // main maximum 5 sec before terminate;
+		WaitForSingleObject(m_Thread->m_hThread, (DWORD)5000); // wait maximum 5 sec before terminate;
 		if (fThreadRun) {
 			TerminateThread(m_Thread->m_hThread, (DWORD)-1 );
 		}
@@ -78,7 +79,7 @@ static UINT ThreadProc(LPVOID pParam)
 	return (static_cast<CSupSubFile*>(pParam))->ThreadProc();
 }
 
-bool CSupSubFile::Open(CString fn)
+bool CSupSubFile::Open(CString fn, CString SubName)
 {
 	CFile f;
 	if (!f.Open(fn, CFile::modeRead|CFile::typeBinary|CFile::shareDenyNone)) {
@@ -93,8 +94,9 @@ bool CSupSubFile::Open(CString fn)
 	}
 	f.Close();
 
-	m_name	= fn;
-	m_pSub	= DNew CHdmvSub();
+	m_fname		= fn;
+	m_Subname	= SubName;
+	m_pSub		= DNew CHdmvSub();
 
 	m_Thread = AfxBeginThread(::ThreadProc, static_cast<LPVOID>(this));
 
@@ -104,16 +106,12 @@ bool CSupSubFile::Open(CString fn)
 UINT CSupSubFile::ThreadProc()
 {
 	CFile f;
-	if (!f.Open(m_name, CFile::modeRead|CFile::typeBinary|CFile::shareDenyNone)) {
+	if (!f.Open(m_fname, CFile::modeRead|CFile::typeBinary|CFile::shareDenyNone)) {
 		f.Close();
 		return 1;
 	}
 
 	fThreadRun = true;
-	
-	m_name = StripPath(m_name);
-	m_name = m_name.Left(m_name.GetLength() - 4);
-	m_name = _T("SUP - ") + m_name;
 
 	CAutoLock cAutoLock(&m_csCritSec);
 
@@ -234,12 +232,12 @@ STDMETHODIMP CSupSubFile::GetStreamInfo(int iStream, WCHAR** ppName, LCID* pLCID
 	}
 
 	if (ppName) {
-		*ppName = (WCHAR*)CoTaskMemAlloc((m_name.GetLength()+1)*sizeof(WCHAR));
+		*ppName = (WCHAR*)CoTaskMemAlloc((m_Subname.GetLength()+1)*sizeof(WCHAR));
 		if (!(*ppName)) {
 			return E_OUTOFMEMORY;
 		}
 
-		wcscpy_s (*ppName, m_name.GetLength()+1, CStringW(m_name));
+		wcscpy_s (*ppName, m_Subname.GetLength()+1, CStringW(m_Subname));
 	}
 
 	if (pLCID) {
