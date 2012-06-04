@@ -241,6 +241,8 @@ int get_icon_index(CString ext)
 		iconindex = IDI_RM_ICON;
 	} else if (ext.CompareNoCase(_T(".rmvb")) == 0) {
 		iconindex = IDI_RM_ICON;
+	} else if (ext.CompareNoCase(_T(".roq")) == 0) {
+		iconindex = IDI_ROQ_ICON;
 	} else if (ext.CompareNoCase(_T(".rp")) == 0) {
 		iconindex = IDI_RT_ICON;
 	} else if (ext.CompareNoCase(_T(".rpm")) == 0) {

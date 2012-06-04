@@ -73,13 +73,14 @@
 #define IDI_MLP_ICON                    49
 #define IDI_AVI_ICON                    50
 #define IDI_DEFAULT_ICON                51
+#define IDI_ROQ_ICON                    52
 #define IDI_NONE                        -1
 
 // Next default values for new objects
 //
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        51
+#define _APS_NEXT_RESOURCE_VALUE        52
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           101

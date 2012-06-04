@@ -213,6 +213,7 @@ void CMediaFormats::UpdateData(bool fSave)
 		ADDFMT((_T("flv"),      ResStr(IDS_MFMT_FLV),      _T("flv f4v")));
 		ADDFMT((_T("ogm"),      ResStr(IDS_MFMT_OGM),      _T("ogm ogv")));
 		ADDFMT((_T("rm"),       ResStr(IDS_MFMT_RM),       _T("rm ram rpm rmm")));
+		ADDFMT((_T("roq"),      ResStr(IDS_MFMT_ROQ),      _T("roq")));
 		ADDFMT((_T("rt"),       ResStr(IDS_MFMT_RT),       _T("rt rp smi smil")));
 		ADDFMT((_T("wmv"),      ResStr(IDS_MFMT_WMV),      _T("wmv wmp wm asf")));
 		ADDFMT((_T("videocd"),  ResStr(IDS_MFMT_VIDEOCD),  _T("dat")));
