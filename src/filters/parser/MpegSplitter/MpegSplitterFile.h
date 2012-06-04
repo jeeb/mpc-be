@@ -28,12 +28,12 @@
 #include "../BaseSplitter/BaseSplitter.h"
 #include "../../../DSUtil/GolombBuffer.h"
 
-#define NO_SUBTITLE_PID			1		// Fake PID use for the "No subtitle" entry
-#define NO_SUBTITLE_NAME		_T("No subtitle")
+#define NO_SUBTITLE_PID		1 // Fake PID use for the "No subtitle" entry
+#define NO_SUBTITLE_NAME	_T("No subtitle")
 
-#define ISVALIDPID(pid) (pid >= 0x10 && pid < 0x1fff)
+#define ISVALIDPID(pid)		(pid >= 0x10 && pid < 0x1fff)
 
-//#define MVC_SUPPORT
+#define MVC_SUPPORT			0 // set 1 to enable MVC splitting support
 
 class CMpegSplitterFile : public CBaseSplitterFileEx
 {
@@ -68,9 +68,12 @@ public:
 		CMediaType mt;
 		WORD pid;
 		BYTE pesid, ps1id;
+		char lang[4];
+		bool lang_set;
+
 		bool operator < (const stream &_Other) const;
 		struct stream() {
-			pid = pesid = ps1id = 0;
+			memset(this, 0, sizeof(*this));
 		}
 		operator DWORD() const {
 			return pid ? pid : ((pesid<<8)|ps1id);
@@ -81,7 +84,7 @@ public:
 	};
 
 	enum {video, audio, subpic,
-#if defined(MVC_SUPPORT)
+#if MVC_SUPPORT
 		  stereo,
 #endif
 		  unknown
@@ -129,11 +132,11 @@ public:
 
 		static CStringW ToString(int type) {
 			return
-				type == video ? L"Video" :
-				type == audio ? L"Audio" :
-				type == subpic ? L"Subtitle" :
-#if defined(MVC_SUPPORT)
-				type == stereo ? L"Stereo" :
+				type == video	? L"Video" :
+				type == audio	? L"Audio" :
+				type == subpic	? L"Subtitle" :
+#if MVC_SUPPORT
+				type == stereo	? L"Stereo" :
 #endif
 				L"Unknown";
 		}
@@ -160,19 +163,20 @@ public:
 	};
 
 	struct program {
-		WORD					program_number;
+		WORD program_number;
 		struct stream {
-			WORD				pid;
-			PES_STREAM_TYPE		type;
+			WORD			pid;
+			PES_STREAM_TYPE	type;
 
 		};
 		stream streams[64];
+
+		BYTE ts_buffer[1024];
+		WORD ts_len_cur, ts_len_packet;
+
 		struct program() {
 			memset(this, 0, sizeof(*this));
 		}
-
-		BYTE	ts_buffer[1024];
-		WORD	ts_len_cur, ts_len_packet;
 	};
 
 	CAtlMap<WORD, program> m_programs;
@@ -182,7 +186,7 @@ public:
 	void UpdatePrograms(CGolombBuffer gb, WORD pid, bool UpdateLang = true);
 	const program* FindProgram(WORD pid, int &iStream, const CHdmvClipInfo::Stream * &_pClipInfo);
 
-	CAtlMap<DWORD, CString> m_pPMT_Lang;
+	CAtlMap<DWORD, CStringA> m_pPMT_Lang;
 
 	bool GetStreamType(WORD pid, PES_STREAM_TYPE &stream_type);
 };

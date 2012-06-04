@@ -567,7 +567,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 			// and can also be split into multiple packets
 			if (!avch.Lookup(pid))
 				memset(&avch[pid], 0, sizeof(CMpegSplitterFile::avchdr));
-#if defined(MVC_SUPPORT)
+#if MVC_SUPPORT
 			if (!m_streams[video].Find(s) && !m_streams[stereo].Find(s) && Read(avch[pid], len, &s.mt))
 			{
 				if (avch[pid].spspps[index_subsetsps].complete)
@@ -888,6 +888,15 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 
 	if (type != unknown && !m_streams[type].Find(s)) {
 		if (s.pid) {
+			if (!s.lang_set) {
+				CStringA lang_name;
+				m_pPMT_Lang.Lookup(s.pid, lang_name);
+				if (!lang_name.IsEmpty()) {
+					memcpy(s.lang, lang_name, 4);
+					s.lang_set = true;
+				}
+			}
+
 			for (int i = 0; i < unknown; i++) {
 				if (m_streams[i].Find(s)) {
 					return s;
@@ -917,11 +926,11 @@ void CMpegSplitterFile::AddHdmvPGStream(WORD pid, const char* language_code)
 CAtlList<CMpegSplitterFile::stream>* CMpegSplitterFile::GetMasterStream()
 {
 	return
-		!m_streams[video].IsEmpty() ? &m_streams[video] :
-		!m_streams[audio].IsEmpty() ? &m_streams[audio] :
-		!m_streams[subpic].IsEmpty() ? &m_streams[subpic] :
-#if defined(MVC_SUPPORT)
-		!m_streams[stereo].IsEmpty() ? &m_streams[stereo] :
+		!m_streams[video].IsEmpty()		? &m_streams[video] :
+		!m_streams[audio].IsEmpty()		? &m_streams[audio] :
+		!m_streams[subpic].IsEmpty()	? &m_streams[subpic] :
+#if MVC_SUPPORT
+		!m_streams[stereo].IsEmpty()	? &m_streams[stereo] :
 #endif
 		NULL;
 }
@@ -1033,19 +1042,6 @@ void CMpegSplitterFile::UpdatePrograms(CGolombBuffer gb, WORD pid, bool UpdateLa
 			pPair->m_value.streams[i].pid	= pid;
 			pPair->m_value.streams[i].type	= (PES_STREAM_TYPE)stream_type;
 
-			if (m_ForcedSub) {
-				if (stream_type == PRESENTATION_GRAPHICS_STREAM) {
-					stream s;
-					s.pid = pid;
-					CMpegSplitterFile::hdmvsubhdr hdr;
-					if (Read(hdr, &s.mt, NULL)) {
-						if (!m_streams[subpic].Find(s)) {
-							m_streams[subpic].Insert(s, this);
-						}
-					}
-				}
-			}
-
 			len -= (5 + ES_info_length);
 			if (len < 0)
 				break;
@@ -1085,6 +1081,27 @@ void CMpegSplitterFile::UpdatePrograms(CGolombBuffer gb, WORD pid, bool UpdateLa
 			} else {
 				while (ES_info_length-- > 0) {
 					gb.BitRead(8);
+				}
+			}
+
+			if (m_ForcedSub) {
+				if (stream_type == PRESENTATION_GRAPHICS_STREAM) {
+					stream s;
+					s.pid = pid;
+					
+					CStringA lang_name;
+					m_pPMT_Lang.Lookup(s.pid, lang_name);
+					if (!lang_name.IsEmpty()) {
+						memcpy(s.lang, lang_name, 4);
+						s.lang_set = true;
+					}
+
+					CMpegSplitterFile::hdmvsubhdr hdr;
+					if (Read(hdr, &s.mt, NULL)) {
+						if (!m_streams[subpic].Find(s)) {
+							m_streams[subpic].Insert(s, this);
+						}
+					}
 				}
 			}
 		}
