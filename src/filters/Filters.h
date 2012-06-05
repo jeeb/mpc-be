@@ -26,6 +26,7 @@
 #include "muxer/DSMMuxer/DSMMuxer.h"
 #include "muxer/MatroskaMuxer/MatroskaMuxer.h"
 #include "muxer/WavDest/WavDest.h"
+
 #include "parser/AviSplitter/AviSplitter.h"
 #include "parser/DSMSplitter/DSMSplitter.h"
 #include "parser/DTSSplitter/DTSSplitter.h"
@@ -38,12 +39,16 @@
 #include "parser/RealMediaSplitter/RealMediaSplitter.h"
 #include "parser/RoQSplitter/RoQSplitter.h"
 #include "parser/StreamDriveThru/StreamDriveThru.h"
+
 #include "reader/CDDAReader/CDDAReader.h"
 #include "reader/CDXAReader/CDXAReader.h"
 #include "reader/UDPReader/UDPReader.h"
 #include "reader/VTSReader/VTSReader.h"
+
 #include "renderer/MpcAudioRenderer/MpcAudioRenderer.h"
 #include "renderer/SyncClock/SyncClock.h"
+
+#include "source/AMRSource/AMRSource.h"
 #include "source/D2VSource/D2VSource.h"
 #include "source/DTSAC3Source/DTSAC3Source.h"
 #include "source/FLACSource/FLACSource.h"
@@ -52,7 +57,9 @@
 #include "source/SubtitleSource/SubtitleSource.h"
 #include "source/WavPackSource/WVSource.h"
 #include "source/MusePackSource/MusePackSource.h"
+
 #include "switcher/AudioSwitcher/AudioSwitcher.h"
+
 #include "transform/AVI2AC3Filter/AVI2AC3Filter.h"
 #include "transform/BufferFilter/BufferFilter.h"
 #include "transform/DeCSSFilter/DeCSSFilter.h"

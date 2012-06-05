@@ -923,10 +923,10 @@ HRESULT CMusePackOutputPin::DoNewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME 
 	if (1) { // TODO - What is this ??? :)
 		return DeliverNewSegment(rtStart, rtStop, rate);
 	} else {
-		DataPacket	*packet = DNew DataPacket();
+		DataPacketMPC	*packet = DNew DataPacketMPC();
 		{
 			CAutoLock	lck(&lock_queue);
-			packet->type = DataPacket::PACKET_TYPE_NEW_SEGMENT;
+			packet->type = DataPacketMPC::PACKET_TYPE_NEW_SEGMENT;
 			packet->rtStart = rtStart;
 			packet->rtStop = rtStop;
 			packet->rate = rate;
@@ -962,7 +962,7 @@ STDMETHODIMP CMusePackOutputPin::SetPositions(LONGLONG* pCurrent, DWORD dwCurren
 	return demux->SetPositionsInternal(0, pCurrent, dwCurrentFlags, pStop, dwStopFlags);
 }
 
-int CMusePackOutputPin::GetDataPacket(DataPacket **packet)
+int CMusePackOutputPin::GetDataPacketMPC(DataPacketMPC **packet)
 {
 	// this method may blokc
 	HANDLE	events[] = { ev_can_write, ev_abort };
@@ -977,7 +977,7 @@ int CMusePackOutputPin::GetDataPacket(DataPacket **packet)
 		ret = WaitForMultipleObjects(2, events, FALSE, 10);
 		if (ret == WAIT_OBJECT_0) {
 			// return new packet
-			*packet = DNew DataPacket();
+			*packet = DNew DataPacketMPC();
 			return 0;
 		}
 
@@ -995,13 +995,13 @@ HRESULT CMusePackOutputPin::DeliverPacket(CMPCPacket &packet)
 	}
 
 	// ziskame novy packet na vystup
-	DataPacket	*outp = NULL;
-	int ret = GetDataPacket(&outp);
+	DataPacketMPC	*outp = NULL;
+	int ret = GetDataPacketMPC(&outp);
 	if (ret < 0 || !outp) {
 		return E_FAIL;
 	}
 
-	outp->type	  = DataPacket::PACKET_TYPE_DATA;
+	outp->type	  = DataPacketMPC::PACKET_TYPE_DATA;
 
 	// spocitame casy
 	outp->rtStart = packet.tStart;
@@ -1031,13 +1031,13 @@ HRESULT CMusePackOutputPin::DeliverPacket(CMPCPacket &packet)
 
 HRESULT CMusePackOutputPin::DoEndOfStream()
 {
-	DataPacket	*packet = DNew DataPacket();
+	DataPacketMPC	*packet = DNew DataPacketMPC();
 
 	// naqueueujeme EOS
 	{
 		CAutoLock lck(&lock_queue);
 
-		packet->type = DataPacket::PACKET_TYPE_EOS;
+		packet->type = DataPacketMPC::PACKET_TYPE_EOS;
 		queue.AddTail(packet);
 		ev_can_read.Set();
 	}
@@ -1051,14 +1051,14 @@ void CMusePackOutputPin::FlushQueue()
 	CAutoLock lck(&lock_queue);
 
 	while (queue.GetCount() > 0) {
-		DataPacket *packet = queue.RemoveHead();
+		DataPacketMPC *packet = queue.RemoveHead();
 		if (packet) delete packet;
 	}
 	ev_can_read.Reset();
 	ev_can_write.Set();
 }
 
-HRESULT CMusePackOutputPin::DeliverDataPacket(DataPacket &packet)
+HRESULT CMusePackOutputPin::DeliverDataPacketMPC(DataPacketMPC &packet)
 {
 	IMediaSample	*sample;
 	HRESULT hr = GetDeliveryBuffer(&sample, NULL, NULL, 0);
@@ -1111,8 +1111,8 @@ __int64 CMusePackOutputPin::GetBufferTime_MS()
 	CAutoLock	lck(&lock_queue);
 	if (queue.IsEmpty()) return 0;
 
-	DataPacket	*pfirst;
-	DataPacket	*plast;
+	DataPacketMPC	*pfirst;
+	DataPacketMPC	*plast;
 	__int64		tstart, tstop;
 	POSITION	posf, posl;
 
@@ -1122,7 +1122,7 @@ __int64 CMusePackOutputPin::GetBufferTime_MS()
 	posf = queue.GetHeadPosition();
 	while (posf) {
 		pfirst = queue.GetNext(posf);
-		if (pfirst->type == DataPacket::PACKET_TYPE_DATA && pfirst->rtStart != -1) {
+		if (pfirst->type == DataPacketMPC::PACKET_TYPE_DATA && pfirst->rtStart != -1) {
 			tstart = pfirst->rtStart;
 			break;
 		}
@@ -1131,7 +1131,7 @@ __int64 CMusePackOutputPin::GetBufferTime_MS()
 	posl = queue.GetTailPosition();
 	while (posl) {
 		plast = queue.GetPrev(posl);
-		if (plast->type == DataPacket::PACKET_TYPE_DATA && plast->rtStart != -1) {
+		if (plast->type == DataPacketMPC::PACKET_TYPE_DATA && plast->rtStart != -1) {
 			tstop = plast->rtStart;
 			break;
 		}
@@ -1166,7 +1166,7 @@ DWORD CMusePackOutputPin::ThreadProc()
 					// deliver packets
 					DWORD		cmd2;
 					BOOL		is_first = true;
-					DataPacket	*packet;
+					DataPacketMPC	*packet;
 					HRESULT		hr;
 
 					// first packet is a discontinuity
@@ -1194,12 +1194,12 @@ DWORD CMusePackOutputPin::ThreadProc()
 							}
 
 							// bud dorucime End Of Stream, alebo packet
-							if (packet->type == DataPacket::PACKET_TYPE_EOS) {
+							if (packet->type == DataPacketMPC::PACKET_TYPE_EOS) {
 								DeliverEndOfStream();
-							} else if (packet->type == DataPacket::PACKET_TYPE_NEW_SEGMENT) {
+							} else if (packet->type == DataPacketMPC::PACKET_TYPE_NEW_SEGMENT) {
 								hr = DeliverNewSegment(packet->rtStart, packet->rtStop, packet->rate);
-							} else if (packet->type == DataPacket::PACKET_TYPE_DATA) {
-								hr = DeliverDataPacket(*packet);
+							} else if (packet->type == DataPacketMPC::PACKET_TYPE_DATA) {
+								hr = DeliverDataPacketMPC(*packet);
 							}					
 
 							delete packet;
@@ -1410,7 +1410,7 @@ bool CMusePackReader::KeyValid(uint16 key)
 }
 
 
-DataPacket::DataPacket() :
+DataPacketMPC::DataPacketMPC() :
 	type(PACKET_TYPE_EOS),
 	rtStart(0),
 	rtStop(0),
@@ -1421,7 +1421,7 @@ DataPacket::DataPacket() :
 {
 }
 
-DataPacket::~DataPacket()
+DataPacketMPC::~DataPacketMPC()
 {
 	if (buf) {
 		free(buf);

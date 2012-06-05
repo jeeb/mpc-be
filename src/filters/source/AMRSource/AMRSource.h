@@ -1,9 +1,9 @@
 /*
- * $Id$
+ * $Id: AMRSource.h 251 2012-05-12 01:26:49Z aleksoid $
  *
- * Adaptation for MPC-BE (C) 2012 Dmitry "Vortex" Koteroff (vortex@light-alloy.ru, http://light-alloy.ru)
+ * Adaptation for MPC-BE (C) 2012 Sergey "Exodus8" (rusguy6@gmail.com)
  *
- * This file is part of MPC-BE and Light Alloy.
+ * This file is part of MPC-BE.
  * YOU CANNOT USE THIS FILE WITHOUT AUTHOR PERMISSION!
  *
  * MPC-BE is free software; you can redistribute it and/or modify
@@ -29,32 +29,32 @@
 #include <moreuuids.h>
 #include <mmreg.h>
 
-#include "mpc_file.h"
-#include "bits.h"
+#include "amr_file.h"
 
-#define MusePackSplitterName	L"Light Alloy/MPC MusePack Splitter"
+#define AMRSplitterName	L"MPC AMR Splitter"
 
-// {47A759C8-CCD7-471A-81D3-A92870431979}
-static const GUID CLSID_MusePackSplitter = 
-	{ 0x47A759C8, 0xCCD7, 0x471A, { 0x81, 0xD3, 0xA9, 0x28, 0x70, 0x43, 0x19, 0x79 } };
+// {24FA7933-FE18-46a9-914A-C2AA0DBACE93}
+static const GUID CLSID_AMRSplitter = 
+	{ 0x24fa7933, 0xfe18, 0x46a9, { 0x91, 0x4a, 0xc2, 0xaa, 0xd, 0xba, 0xce, 0x93 } };
 
-class CMusePackSplitter;
+class CAMRSplitter;
 
 //-----------------------------------------------------------------------------
 //
-//	CMusePackInputPin class
+//	CAMRInputPin class
 //
 //-----------------------------------------------------------------------------
-class CMusePackInputPin : public CBaseInputPin
+class CAMRInputPin : public CBaseInputPin
 {
 public:
+
 	// parent splitter
-	CMusePackSplitter	*demux;
-	IAsyncReader		*reader;
+	CAMRSplitter		*demux;
+	IAsyncReader	*reader;
 
 public:
-	CMusePackInputPin(TCHAR *pObjectName, CMusePackSplitter *pDemux, HRESULT *phr, LPCWSTR pName);
-	virtual ~CMusePackInputPin();
+	CAMRInputPin(TCHAR *pObjectName, CAMRSplitter *pDemux, HRESULT *phr, LPCWSTR pName);
+	virtual ~CAMRInputPin();
 
 	// Get hold of IAsyncReader interface
 	HRESULT CompleteConnect(IPin *pReceivePin);
@@ -79,10 +79,10 @@ public:
 
 //-----------------------------------------------------------------------------
 //
-//	DataPacketMPC class
+//	DataPacketAMR class
 //
 //-----------------------------------------------------------------------------
-class DataPacketMPC
+class DataPacketAMR
 {
 public:
 	int		type;
@@ -102,8 +102,8 @@ public:
 	int				size;
 
 public:
-	DataPacketMPC();
-	virtual ~DataPacketMPC();
+	DataPacketAMR();
+	virtual ~DataPacketAMR();
 
 };
 
@@ -111,10 +111,10 @@ typedef CArray<CMediaType> CMediaTypes;
 
 //-----------------------------------------------------------------------------
 //
-//	CMusePackOutputPin class
+//	CAMROutputPin class
 //
 //-----------------------------------------------------------------------------
-class CMusePackOutputPin : 
+class CAMROutputPin : 
 	public CBaseOutputPin, 
 	public IMediaSeeking, 
 	public CAMThread
@@ -123,13 +123,13 @@ public:
 	enum {CMD_EXIT, CMD_STOP, CMD_RUN};
 
 	// parser
-	CMusePackSplitter	*demux;
+	CAMRSplitter			*demux;
 	int					stream_index;
 	CMediaTypes			mt_types;
 
 	// buffer queue
 	int					buffers;
-	CList<DataPacketMPC*>	queue;
+	CList<DataPacketAMR*>	queue;
 	CCritSec			lock_queue;
 	CAMEvent			ev_can_read;
 	CAMEvent			ev_can_write;
@@ -145,8 +145,8 @@ public:
 	bool				eos_delivered;
 
 public:
-	CMusePackOutputPin(TCHAR *pObjectName, CMusePackSplitter *pDemux, HRESULT *phr, LPCWSTR pName, int iBuffers);
-	virtual ~CMusePackOutputPin();
+	CAMROutputPin(TCHAR *pObjectName, CAMRSplitter *pDemux, HRESULT *phr, LPCWSTR pName, int iBuffers);
+	virtual ~CAMROutputPin();
 
 	// IUNKNOWN
 	DECLARE_IUNKNOWN;
@@ -168,14 +168,14 @@ public:
 	STDMETHODIMP Notify(IBaseFilter *pSender, Quality q);
 
 	// packet delivery mechanism
-	HRESULT DeliverPacket(CMPCPacket &packet);
-	HRESULT DeliverDataPacketMPC(DataPacketMPC &packet);
+	HRESULT DeliverPacket(CAMRPacket &packet);
+	HRESULT DeliverDataPacketAMR(DataPacketAMR &packet);
 	HRESULT DoEndOfStream();
 
 	// delivery thread
 	virtual DWORD ThreadProc();
 	void FlushQueue();
-	int GetDataPacketMPC(DataPacketMPC **packet);
+	int GetDataPacketAMR(DataPacketAMR **packet);
 
 	// IMediaSeeking
 	STDMETHODIMP GetCapabilities(DWORD* pCapabilities);
@@ -207,46 +207,37 @@ public:
 
 //-----------------------------------------------------------------------------
 //
-//	CMusePackReader class
-//
-//	Todo: caching...
+//	CAMRReader class
 //
 //-----------------------------------------------------------------------------
 
-class CMusePackReader
+class CAMRReader
 {
 protected:
 	IAsyncReader	*reader;
 	__int64			position;
 
 public:
-	CMusePackReader(IAsyncReader *rd);
-	virtual ~CMusePackReader();
+	CAMRReader(IAsyncReader *rd);
+	virtual ~CAMRReader();
 
 	virtual int GetSize(__int64 *avail, __int64 *total);
 	virtual int GetPosition(__int64 *pos, __int64 *avail);
 	virtual int Seek(__int64 pos);
 	virtual int Read(void *buf, int size);
-	virtual int ReadSwapped(void *buf, int size);
 
 	void BeginFlush() { if (reader) reader->BeginFlush(); }
 	void EndFlush() { if (reader) reader->EndFlush(); }
-
-	// reading syntax elements - in network byte order
-	int GetMagick(uint32 &elm);
-	int GetKey(uint16 &key);
-	int GetSizeElm(int64 &size, int32 &size_len);
-	bool KeyValid(uint16 key);
 };
 
 
 //-----------------------------------------------------------------------------
 //
-//	CMusePackSplitter class
+//	CAMRSplitter class
 //
 //-----------------------------------------------------------------------------
-class __declspec(uuid("47A759C8-CCD7-471A-81D3-A92870431979"))
-    CMusePackSplitter : 
+class __declspec(uuid("24FA7933-FE18-46a9-914A-C2AA0DBACE93"))
+    CAMRSplitter : 
 	public CBaseFilter,
 	public CAMThread,
 	public IMediaSeeking
@@ -254,14 +245,13 @@ class __declspec(uuid("47A759C8-CCD7-471A-81D3-A92870431979"))
 public:
 	enum {CMD_EXIT, CMD_STOP, CMD_RUN};
 
-	CCritSec						lock_filter;
-	CMusePackInputPin				*input;
-	CArray<CMusePackOutputPin*>		output;
-	CArray<CMusePackOutputPin*>		retired;
-	CMusePackReader					*reader;
-	CMPCFile						*file;
+	CCritSec					lock_filter;
+	CAMRInputPin				*input;
+	CArray<CAMROutputPin*>		output;
+	CArray<CAMROutputPin*>		retired;
+	CAMRReader					*reader;
+	CAMRFile					*file;
 
-	HWND						wnd_prop;
 	CAMEvent					ev_abort;
 
 	// times
@@ -269,14 +259,15 @@ public:
 	REFERENCE_TIME				rtStop;
 	double						rate;
 
+
 public:
 	// constructor
-	CMusePackSplitter(LPUNKNOWN pUnk, HRESULT *phr);
-	virtual ~CMusePackSplitter();
+	CAMRSplitter(LPUNKNOWN pUnk, HRESULT *phr);
+	virtual ~CAMRSplitter();
 	static CUnknown * WINAPI CreateInstance(LPUNKNOWN pUnk, HRESULT *phr);
 
 	// override this to publicise our interfaces
-	DECLARE_IUNKNOWN 
+	DECLARE_IUNKNOWN;
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void **ppv);
 
 	// CBaseFilter
@@ -284,16 +275,16 @@ public:
     virtual CBasePin *GetPin(int n);
 
 	// Output pins
-	HRESULT AddOutputPin(CMusePackOutputPin *pPin);
+	HRESULT AddOutputPin(CAMROutputPin *pPin);
 	virtual HRESULT RemoveOutputPins();
-	CMusePackOutputPin *FindStream(int stream_no);
+	CAMROutputPin *FindStream(int stream_no);
 
-	// check that we can support this input type
-	virtual HRESULT CheckInputType(const CMediaType* mtIn);
+    // check that we can support this input type
+    virtual HRESULT CheckInputType(const CMediaType* mtIn);
 	virtual HRESULT CheckConnect(PIN_DIRECTION Dir, IPin *pPin);
 	virtual HRESULT BreakConnect(PIN_DIRECTION Dir, CBasePin *pCaller);
 	virtual HRESULT CompleteConnect(PIN_DIRECTION Dir, CBasePin *pCaller, IPin *pReceivePin);
-	virtual HRESULT ConfigureMediaType(CMusePackOutputPin *pin);
+	virtual HRESULT ConfigureMediaType(CAMROutputPin *pin);
 
 	// Demuxing thread
 	virtual DWORD ThreadProc();
@@ -324,4 +315,5 @@ public:
 	STDMETHODIMP SetPositionsInternal(int iD, LONGLONG* pCurrent, DWORD dwCurrentFlags, LONGLONG* pStop, DWORD dwStopFlags);
 
 	virtual HRESULT DoNewSeek();
+
 };

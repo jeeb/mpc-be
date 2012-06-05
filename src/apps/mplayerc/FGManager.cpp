@@ -1597,6 +1597,15 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
 	m_transform.AddTail(pFGF);
 
+	if (src[SRC_AMR]) {
+		pFGF = DNew CFGFilterInternal<CAMRSplitter>(AMRSplitterName, MERIT64_ABOVE_DSHOW);
+	} else {
+		pFGF = DNew CFGFilterInternal<CAMRSplitter>(LowMerit(AMRSplitterName), MERIT64_DO_USE);
+	}
+	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_AMR_Stream);
+	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
+	m_transform.AddTail(pFGF);
+
 	if (src[SRC_DSM]) {
 		pFGF = DNew CFGFilterInternal<CDSMSplitterFilter>(DSMSplitterName, MERIT64_ABOVE_DSHOW);
 	} else {

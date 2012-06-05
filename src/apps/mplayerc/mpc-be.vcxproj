@@ -669,6 +669,10 @@
       <Project>{fb565a7a-50dc-4a0d-852d-5e7f74dab82c}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="..\..\filters\source\AMRSource\AMRSource.vcxproj">
+      <Project>{7FF3D24A-879C-4987-B377-F20A6527F426}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
     <ProjectReference Include="..\..\filters\source\BaseSource\BaseSource.vcxproj">
       <Project>{f50e74c2-5be7-4c9b-b1e7-6ca19cfad34e}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
