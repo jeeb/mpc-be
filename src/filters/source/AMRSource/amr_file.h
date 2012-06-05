@@ -1,5 +1,5 @@
 /*
- * $Id: amr_file.h 251 2012-05-12 01:26:49Z aleksoid $
+ * $Id$
  *
  * Adaptation for MPC-BE (C) 2012 Sergey "Exodus8" (rusguy6@gmail.com)
  *
@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include "..\DSUtil\DSUtil.h"
 #include "stdafx.h"
 
 class CAMRReader;

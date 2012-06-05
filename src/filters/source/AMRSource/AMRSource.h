@@ -1,5 +1,5 @@
 /*
- * $Id: AMRSource.h 251 2012-05-12 01:26:49Z aleksoid $
+ * $Id$
  *
  * Adaptation for MPC-BE (C) 2012 Sergey "Exodus8" (rusguy6@gmail.com)
  *
@@ -49,7 +49,7 @@ class CAMRInputPin : public CBaseInputPin
 public:
 
 	// parent splitter
-	CAMRSplitter		*demux;
+	CAMRSplitter	*demux;
 	IAsyncReader	*reader;
 
 public:
@@ -85,12 +85,12 @@ public:
 class DataPacketAMR
 {
 public:
-	int		type;
+	int type;
 
 	enum {
-		PACKET_TYPE_EOS	= 0,
-		PACKET_TYPE_DATA = 1,
-		PACKET_TYPE_NEW_SEGMENT = 2
+		PACKET_TYPE_EOS			= 0,
+		PACKET_TYPE_DATA		= 1,
+		PACKET_TYPE_NEW_SEGMENT	= 2
 	};
 
 	REFERENCE_TIME	rtStart, rtStop;
@@ -123,7 +123,7 @@ public:
 	enum {CMD_EXIT, CMD_STOP, CMD_RUN};
 
 	// parser
-	CAMRSplitter			*demux;
+	CAMRSplitter		*demux;
 	int					stream_index;
 	CMediaTypes			mt_types;
 
@@ -226,8 +226,8 @@ public:
 	virtual int Seek(__int64 pos);
 	virtual int Read(void *buf, int size);
 
-	void BeginFlush() { if (reader) reader->BeginFlush(); }
-	void EndFlush() { if (reader) reader->EndFlush(); }
+	void BeginFlush()	{ if (reader) reader->BeginFlush(); }
+	void EndFlush()		{ if (reader) reader->EndFlush(); }
 };
 
 

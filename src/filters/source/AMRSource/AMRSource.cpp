@@ -1,5 +1,5 @@
 /*
- * $Id: AMRSource.cpp 251 2012-05-12 01:26:49Z aleksoid $
+ * $Id$
  *
  * Adaptation for MPC-BE (C) 2012 Sergey "Exodus8" (rusguy6@gmail.com)
  *
@@ -29,9 +29,6 @@
 
 #include "AMRSource.h"
 
-typedef signed int		int32;
-typedef signed __int64		int64;
-
 //-----------------------------------------------------------------------------
 //
 //	CAMRSplitter class
@@ -40,11 +37,11 @@ typedef signed __int64		int64;
 
 CUnknown *CAMRSplitter::CreateInstance(LPUNKNOWN pUnk, HRESULT *phr)
 {
-	return new CAMRSplitter(pUnk, phr);
+	return DNew CAMRSplitter(pUnk, phr);
 }
 
 CAMRSplitter::CAMRSplitter(LPUNKNOWN pUnk, HRESULT *phr) :
-	CBaseFilter(_T("MPC AMR Splitter"), pUnk, &lock_filter, CLSID_AMRSplitter, phr),
+	CBaseFilter(AMRSplitterName, pUnk, &lock_filter, CLSID_AMRSplitter, phr),
 	CAMThread(),
 	reader(NULL),
 	file(NULL),
@@ -63,18 +60,27 @@ CAMRSplitter::CAMRSplitter(LPUNKNOWN pUnk, HRESULT *phr) :
 CAMRSplitter::~CAMRSplitter()
 {
 	// just to be sure
-	if (reader) { delete reader; reader = NULL; }
+	if (reader) {
+		delete reader;
+		reader = NULL;
+	}
 	for (int i=0; i<output.GetCount(); i++) {
-		CAMROutputPin	*pin = output[i];
-		if (pin) delete pin;
+		CAMROutputPin *pin = output[i];
+		if (pin) {
+			delete pin;
+		}
 	}
 	output.RemoveAll();
 	for (int i=0; i<retired.GetCount(); i++) {
-		CAMROutputPin	*pin = retired[i];
-		if (pin) delete pin;
+		CAMROutputPin *pin = retired[i];
+		if (pin) {
+			delete pin;
+		}
 	}
 	retired.RemoveAll();
-	if (input) { delete input; input = NULL; }
+	if (input) {
+		delete input; input = NULL;
+	}
 }
 
 STDMETHODIMP CAMRSplitter::NonDelegatingQueryInterface(REFIID riid, void **ppv)
@@ -91,19 +97,23 @@ STDMETHODIMP CAMRSplitter::NonDelegatingQueryInterface(REFIID riid, void **ppv)
 int CAMRSplitter::GetPinCount()
 {
 	// return pin count
-	CAutoLock	Lock(&lock_filter);
+	CAutoLock Lock(&lock_filter);
 	return ((input ? 1 : 0) + output.GetCount());
 }
 
 CBasePin *CAMRSplitter::GetPin(int n)
 {
-	CAutoLock	Lock(&lock_filter);
-	if (n == 0) return input;
+	CAutoLock Lock(&lock_filter);
+	if (n == 0) {
+		return input;
+	}
 	n -= 1;
 	int l = output.GetCount();
 
 	// return the requested output pin
-	if (n >= l) return NULL;
+	if (n >= l) {
+		return NULL;
+	}
 	return output[n];
 }
 
@@ -123,8 +133,7 @@ HRESULT CAMRSplitter::CheckInputType(const CMediaType* mtIn)
 			mtIn->subtype == MEDIASUBTYPE_NULL ||
 			mtIn->subtype == GUID_NULL
 			) return NOERROR;
-	} else
-	if (mtIn->majortype == GUID_NULL) {
+	} else if (mtIn->majortype == GUID_NULL) {
 		return NOERROR;
 	}
 
@@ -146,19 +155,23 @@ HRESULT CAMRSplitter::CompleteConnect(PIN_DIRECTION Dir, CBasePin *pCaller, IPin
 		//	Analyse the source file
 		//
 		//---------------------------------------------------------------------
-		reader = new CAMRReader(input->Reader());
-		file = new CAMRFile();
+		reader	= new CAMRReader(input->Reader());
+		file	= new CAMRFile();
 
 		// try to open the file
-		int ret = file->Open(reader);
+		int ret	= file->Open(reader);
 		if (ret < 0) {
-			delete file;	file = NULL;
-			delete reader;	reader = NULL;
+			delete file;
+			file = NULL;
+			delete reader;
+			reader = NULL;
+
 			return E_FAIL;
 		}
 
-		HRESULT			hr = NOERROR;
-		CAMROutputPin	*opin = new CAMROutputPin(_T("Outpin"), this, &hr, L"Out", 5);
+		HRESULT hr = NOERROR;
+		
+		CAMROutputPin *opin = new CAMROutputPin(_T("Outpin"), this, &hr, L"Out", 5);
 		ConfigureMediaType(opin);
 		AddOutputPin(opin);
 	} else {
@@ -169,8 +182,10 @@ HRESULT CAMRSplitter::CompleteConnect(PIN_DIRECTION Dir, CBasePin *pCaller, IPin
 
 HRESULT CAMRSplitter::RemoveOutputPins()
 {
-	CAutoLock	Lck(&lock_filter);
-	if (m_State != State_Stopped) return VFW_E_NOT_STOPPED;
+	CAutoLock Lck(&lock_filter);
+	if (m_State != State_Stopped) {
+		return VFW_E_NOT_STOPPED;
+	}
 
 	// we retire all current output pins
 	for (int i=0; i<output.GetCount(); i++) {
@@ -188,23 +203,23 @@ HRESULT CAMRSplitter::RemoveOutputPins()
 
 HRESULT CAMRSplitter::ConfigureMediaType(CAMROutputPin *pin)
 {
-	CMediaType		mt;
-	mt.majortype = MEDIATYPE_Audio;
-	mt.subtype = MEDIASUBTYPE_AMR;
-	mt.formattype = FORMAT_WaveFormatEx;
-	mt.lSampleSize = 1*1024;				// should be way enough
+	CMediaType mt;
+	mt.majortype	= MEDIATYPE_Audio;
+	mt.subtype		= MEDIASUBTYPE_AMR;
+	mt.formattype	= FORMAT_WaveFormatEx;
+	mt.lSampleSize	= 1*1024;				// should be way enough
 
 	ASSERT(file);
 
 	// let us fill the waveformatex structure
-	WAVEFORMATEX *wfx = (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX));
+	WAVEFORMATEX *wfx		= (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX));
 	memset(wfx, 0, sizeof(*wfx));
-	wfx->wBitsPerSample = 0;
-	wfx->nChannels = 1;
-	wfx->nSamplesPerSec = 8000;
-	wfx->nBlockAlign = 1;
-	wfx->nAvgBytesPerSec = 0;
-	wfx->wFormatTag = 0;
+	wfx->wBitsPerSample		= 0;
+	wfx->nChannels			= 1;
+	wfx->nSamplesPerSec		= 8000;
+	wfx->nBlockAlign		= 1;
+	wfx->nAvgBytesPerSec	= 0;
+	wfx->wFormatTag			= 0;
 
 	// the one and only type
 	pin->mt_types.Add(mt);
@@ -221,15 +236,22 @@ HRESULT CAMRSplitter::BreakConnect(PIN_DIRECTION Dir, CBasePin *pCaller)
 		//ev_ready.Set();
 
 		HRESULT hr = RemoveOutputPins();
-		if (FAILED(hr)) return hr;
+		if (FAILED(hr)) {
+			return hr;
+		}
 
 		// destroy input file, reader and update property page
-		if (file) { delete file; file = NULL; }
-		if (reader) { delete reader; reader = NULL;	}
+		if (file) {
+			delete file;
+			file = NULL;
+		}
+		if (reader) {
+			delete reader;
+			reader = NULL;
+		}
 
 		ev_abort.Reset();
-	} else 
-	if (Dir == PINDIR_OUTPUT) {
+	} else if (Dir == PINDIR_OUTPUT) {
 		// nothing yet
 	}
 	return NOERROR;
@@ -239,7 +261,7 @@ HRESULT CAMRSplitter::BreakConnect(PIN_DIRECTION Dir, CBasePin *pCaller)
 // Output pins
 HRESULT CAMRSplitter::AddOutputPin(CAMROutputPin *pPin)
 {
-	CAutoLock	lck(&lock_filter);
+	CAutoLock lck(&lock_filter);
 	output.Add(pPin);
 	return NOERROR;
 }
@@ -256,24 +278,32 @@ STDMETHODIMP CAMRSplitter::GetCapabilities(DWORD* pCapabilities)
 STDMETHODIMP CAMRSplitter::CheckCapabilities(DWORD* pCapabilities)
 {
 	CheckPointer(pCapabilities, E_POINTER);
-	if (*pCapabilities == 0) return S_OK;
+	if (*pCapabilities == 0) {
+		return S_OK;
+	}
+
 	DWORD caps;
 	GetCapabilities(&caps);
-	if ((caps&*pCapabilities) == 0) return E_FAIL;
-	if (caps == *pCapabilities) return S_OK;
-	return S_FALSE;
+	if ((caps&*pCapabilities) == 0) {
+		return E_FAIL;
+	}
+	
+	return caps == *pCapabilities ? S_OK : S_FALSE;
 }
-STDMETHODIMP CAMRSplitter::IsFormatSupported(const GUID* pFormat) {return !pFormat ? E_POINTER : *pFormat == TIME_FORMAT_MEDIA_TIME ? S_OK : S_FALSE;}
-STDMETHODIMP CAMRSplitter::QueryPreferredFormat(GUID* pFormat) {return GetTimeFormat(pFormat);}
-STDMETHODIMP CAMRSplitter::GetTimeFormat(GUID* pFormat) {return pFormat ? *pFormat = TIME_FORMAT_MEDIA_TIME, S_OK : E_POINTER;}
-STDMETHODIMP CAMRSplitter::IsUsingTimeFormat(const GUID* pFormat) {return IsFormatSupported(pFormat);}
-STDMETHODIMP CAMRSplitter::SetTimeFormat(const GUID* pFormat) {return S_OK == IsFormatSupported(pFormat) ? S_OK : E_INVALIDARG;}
+
+STDMETHODIMP CAMRSplitter::IsFormatSupported(const GUID* pFormat)	{return !pFormat ? E_POINTER : *pFormat == TIME_FORMAT_MEDIA_TIME ? S_OK : S_FALSE;}
+STDMETHODIMP CAMRSplitter::QueryPreferredFormat(GUID* pFormat)		{return GetTimeFormat(pFormat);}
+STDMETHODIMP CAMRSplitter::GetTimeFormat(GUID* pFormat)				{return pFormat ? *pFormat = TIME_FORMAT_MEDIA_TIME, S_OK : E_POINTER;}
+STDMETHODIMP CAMRSplitter::IsUsingTimeFormat(const GUID* pFormat)	{return IsFormatSupported(pFormat);}
+STDMETHODIMP CAMRSplitter::SetTimeFormat(const GUID* pFormat)		{return S_OK == IsFormatSupported(pFormat) ? S_OK : E_INVALIDARG;}
 STDMETHODIMP CAMRSplitter::GetStopPosition(LONGLONG* pStop) 
 {
-	if (pStop) *pStop = this->rtStop;
+	if (pStop) {
+		*pStop = this->rtStop;
+	}
 	return NOERROR; 
 }
-STDMETHODIMP CAMRSplitter::GetCurrentPosition(LONGLONG* pCurrent) {return E_NOTIMPL;}
+STDMETHODIMP CAMRSplitter::GetCurrentPosition(LONGLONG* pCurrent)	{return E_NOTIMPL;}
 STDMETHODIMP CAMRSplitter::ConvertTimeFormat(LONGLONG* pTarget, const GUID* pTargetFormat, LONGLONG Source, const GUID* pSourceFormat) {return E_NOTIMPL;}
 
 STDMETHODIMP CAMRSplitter::SetPositions(LONGLONG* pCurrent, DWORD dwCurrentFlags, LONGLONG* pStop, DWORD dwStopFlags)
@@ -283,26 +313,32 @@ STDMETHODIMP CAMRSplitter::SetPositions(LONGLONG* pCurrent, DWORD dwCurrentFlags
 
 STDMETHODIMP CAMRSplitter::GetPositions(LONGLONG* pCurrent, LONGLONG* pStop)
 {
-	if(pCurrent) *pCurrent = rtCurrent;
-	if(pStop) *pStop = rtStop;
+	if(pCurrent) {
+		*pCurrent = rtCurrent;
+	}
+	if(pStop) {
+		*pStop = rtStop;
+	}
 	return S_OK;
 }
 STDMETHODIMP CAMRSplitter::GetAvailable(LONGLONG* pEarliest, LONGLONG* pLatest)
 {
-	if(pEarliest) *pEarliest = 0;
+	if(pEarliest) {
+		*pEarliest = 0;
+	}
 	return GetDuration(pLatest);
 }
-STDMETHODIMP CAMRSplitter::SetRate(double dRate) {return dRate > 0 ? rate = dRate, S_OK : E_INVALIDARG;}
-STDMETHODIMP CAMRSplitter::GetRate(double* pdRate) {return pdRate ? *pdRate = rate, S_OK : E_POINTER;}
-STDMETHODIMP CAMRSplitter::GetPreroll(LONGLONG* pllPreroll) {return pllPreroll ? *pllPreroll = 0, S_OK : E_POINTER;}
+STDMETHODIMP CAMRSplitter::SetRate(double dRate)			{return dRate > 0 ? rate = dRate, S_OK : E_INVALIDARG;}
+STDMETHODIMP CAMRSplitter::GetRate(double* pdRate)			{return pdRate ? *pdRate = rate, S_OK : E_POINTER;}
+STDMETHODIMP CAMRSplitter::GetPreroll(LONGLONG* pllPreroll)	{return pllPreroll ? *pllPreroll = 0, S_OK : E_POINTER;}
 
 STDMETHODIMP CAMRSplitter::GetDuration(LONGLONG* pDuration) 
 {	
 	CheckPointer(pDuration, E_POINTER); 
 	*pDuration = 0;
 
-	if (file) {
-		if (pDuration) *pDuration = file->duration_10mhz;
+	if (file && pDuration) {
+		*pDuration = file->duration_10mhz;
 	}
 	return S_OK;
 }
@@ -310,32 +346,34 @@ STDMETHODIMP CAMRSplitter::GetDuration(LONGLONG* pDuration)
 STDMETHODIMP CAMRSplitter::SetPositionsInternal(int iD, LONGLONG* pCurrent, DWORD dwCurrentFlags, LONGLONG* pStop, DWORD dwStopFlags)
 {
 	// only our first pin can seek
-	if (iD != 0) return NOERROR;
-
+	if (iD != 0) {
+		return NOERROR;
+	}
 
 	CAutoLock cAutoLock(&lock_filter);
 
 	if (!pCurrent && !pStop || (dwCurrentFlags&AM_SEEKING_PositioningBitsMask) == AM_SEEKING_NoPositioning 
-		&& (dwStopFlags&AM_SEEKING_PositioningBitsMask) == AM_SEEKING_NoPositioning)
+		&& (dwStopFlags&AM_SEEKING_PositioningBitsMask) == AM_SEEKING_NoPositioning) {
 		return S_OK;
+	}
 
 	REFERENCE_TIME rtCurrent = this->rtCurrent, rtStop = this->rtStop;
 
 	if (pCurrent) {
 		switch(dwCurrentFlags&AM_SEEKING_PositioningBitsMask) {
-		case AM_SEEKING_NoPositioning: break;
-		case AM_SEEKING_AbsolutePositioning: rtCurrent = *pCurrent; break;
-		case AM_SEEKING_RelativePositioning: rtCurrent = rtCurrent + *pCurrent; break;
-		case AM_SEEKING_IncrementalPositioning: rtCurrent = rtCurrent + *pCurrent; break;
+			case AM_SEEKING_NoPositioning: break;
+			case AM_SEEKING_AbsolutePositioning: rtCurrent = *pCurrent; break;
+			case AM_SEEKING_RelativePositioning: rtCurrent = rtCurrent + *pCurrent; break;
+			case AM_SEEKING_IncrementalPositioning: rtCurrent = rtCurrent + *pCurrent; break;
 		}
 	}
 
 	if (pStop) {
 		switch(dwStopFlags&AM_SEEKING_PositioningBitsMask) {
-		case AM_SEEKING_NoPositioning: break;
-		case AM_SEEKING_AbsolutePositioning: rtStop = *pStop; break;
-		case AM_SEEKING_RelativePositioning: rtStop += *pStop; break;
-		case AM_SEEKING_IncrementalPositioning: rtStop = rtCurrent + *pStop; break;
+			case AM_SEEKING_NoPositioning: break;
+			case AM_SEEKING_AbsolutePositioning: rtStop = *pStop; break;
+			case AM_SEEKING_RelativePositioning: rtStop += *pStop; break;
+			case AM_SEEKING_IncrementalPositioning: rtStop = rtCurrent + *pStop; break;
 		}
 	}
 
@@ -343,8 +381,8 @@ STDMETHODIMP CAMRSplitter::SetPositionsInternal(int iD, LONGLONG* pCurrent, DWOR
 		//return S_OK;
 	}
 
-	this->rtCurrent = rtCurrent;
-	this->rtStop = rtStop;
+	this->rtCurrent	= rtCurrent;
+	this->rtStop	= rtStop;
 
 	// now there are new valid Current and Stop positions
 	HRESULT hr = DoNewSeek();
@@ -354,15 +392,20 @@ STDMETHODIMP CAMRSplitter::SetPositionsInternal(int iD, LONGLONG* pCurrent, DWOR
 
 STDMETHODIMP CAMRSplitter::Pause()
 {
-	CAutoLock	lck(&lock_filter);
+	CAutoLock lck(&lock_filter);
 
 	if (m_State == State_Stopped) {
 
 		ev_abort.Reset();
 
 		// activate pins
-		for (int i=0; i<output.GetCount(); i++) output[i]->Active();
-		if (input) input->Active();
+		for (int i=0; i<output.GetCount(); i++) {
+			output[i]->Active();
+		}
+
+		if (input) {
+			input->Active();
+		}
 
 		// seekneme na danu poziciu
 		DoNewSeek();
@@ -387,11 +430,17 @@ STDMETHODIMP CAMRSplitter::Stop()
 
 		// set abort
 		ev_abort.Set();
-		if (reader) reader->BeginFlush();
+		if (reader) {
+			reader->BeginFlush();
+		}
 
 		// deaktivujeme piny
-		if (input) input->Inactive();
-		for (int i=0; i<output.GetCount(); i++) output[i]->Inactive();
+		if (input) {
+			input->Inactive();
+		}
+		for (int i=0; i<output.GetCount(); i++) {
+			output[i]->Inactive();
+		}
 
 		// zrusime parser thread
 		if (ThreadExists()) {
@@ -399,7 +448,10 @@ STDMETHODIMP CAMRSplitter::Stop()
 			Close();
 		}
 
-		if (reader) reader->EndFlush();
+		if (reader) {
+			reader->EndFlush();
+		}
+
 		ev_abort.Reset();
 	}
 
@@ -414,13 +466,17 @@ HRESULT CAMRSplitter::DoNewSeek()
 	CAMROutputPin	*pin = output[0];
 	HRESULT			hr;
 
-	if (!pin->IsConnected()) return NOERROR;
+	if (!pin->IsConnected()) {
+		return NOERROR;
+	}
 
 	// stop first
 	ev_abort.Set();
-	if (reader) reader->BeginFlush();
+	if (reader) {
+		reader->BeginFlush();
+	}
 
-	FILTER_STATE	state = m_State;
+	FILTER_STATE state = m_State;
 
 	// abort
 	if (state != State_Stopped) {
@@ -444,7 +500,9 @@ HRESULT CAMRSplitter::DoNewSeek()
 	}
 
 	pin->DoNewSegment(rtCurrent, rtStop, rate);
-	if (reader) reader->EndFlush();
+	if (reader) {
+		reader->EndFlush();
+	}
 
 	// seek the file
 	if (file) {
@@ -471,77 +529,79 @@ HRESULT CAMRSplitter::DoNewSeek()
 
 DWORD CAMRSplitter::ThreadProc()
 {
-	DWORD	cmd, cmd2;
+	DWORD cmd, cmd2;
 	while (true) {
 		cmd = GetRequest();
 		switch (cmd) {
-		case CMD_EXIT:	Reply(NOERROR); return 0;
-		case CMD_STOP:	
-			{
-				Reply(NOERROR); 
-			}
-			break;
-		case CMD_RUN:
-			{
-				Reply(NOERROR);
-				if (!file) break;
-
-				CAMRPacket		packet;
-				int32			ret=0;
-				bool			eos=false;
-				HRESULT			hr;
-				int64			current_sample=0;
-
-				/*
-					With a more complex demultiplexer we would need a mechanism
-					to identify streams. Now we have only one output stream
-					so it's easy.
-				*/
-
-				if (output.GetCount() <= 0) break;
-				if (output[0]->IsConnected() == FALSE) break;
-				int	delivered = 0;
-
-				do {
-
-					// are we supposed to abort ?
-					if (ev_abort.Check()) {
-						break; 
+			case CMD_EXIT:	Reply(NOERROR); return 0;
+			case CMD_STOP:	
+				{
+					Reply(NOERROR); 
+				}
+				break;
+			case CMD_RUN:
+				{
+					Reply(NOERROR);
+					if (!file) {
+						break;
 					}
 
-					ret = file->ReadAudioPacket(&packet, &current_sample);
-					if (ret == -2) {
-						// end of stream
-						if (!ev_abort.Check()) {
-							output[0]->DoEndOfStream();
+					CAMRPacket	packet;
+					int32		ret = 0;
+					bool		eos = false;
+					HRESULT		hr;
+					int64		current_sample = 0;
+
+					/*
+						With a more complex demultiplexer we would need a mechanism
+						to identify streams. Now we have only one output stream
+						so it's easy.
+					*/
+
+					if ((output.GetCount() <= 0) || (output[0]->IsConnected() == FALSE)) {
+						break;
+					}
+					int	delivered = 0;
+
+					do {
+
+						// are we supposed to abort ?
+						if (ev_abort.Check()) {
+							break; 
 						}
-						break;
-					} else
-					if (ret < 0) {
-						break;
-					} else {
-						// compute time stamp
-						REFERENCE_TIME	tStart = (current_sample * 10000000) / 8000;
-						REFERENCE_TIME	tStop  = ((current_sample + 160) * 10000000) / 8000;
 
-						packet.tStart = tStart - rtCurrent;
-						packet.tStop  = tStop  - rtCurrent;
-
-						// deliver packet
-						hr = output[0]->DeliverPacket(packet);
-						if (FAILED(hr)) {
+						ret = file->ReadAudioPacket(&packet, &current_sample);
+						if (ret == -2) {
+							// end of stream
+							if (!ev_abort.Check()) {
+								output[0]->DoEndOfStream();
+							}
 							break;
+						} else if (ret < 0) {
+							break;
+						} else {
+							// compute time stamp
+							REFERENCE_TIME	tStart = (current_sample * 10000000) / 8000;
+							REFERENCE_TIME	tStop  = ((current_sample + 160) * 10000000) / 8000;
+
+							packet.tStart = tStart - rtCurrent;
+							packet.tStop  = tStop  - rtCurrent;
+
+							// deliver packet
+							hr = output[0]->DeliverPacket(packet);
+							if (FAILED(hr)) {
+								break;
+							}
+	
+							delivered++;
 						}
 
-						delivered++;
-					}
-
-				} while (!CheckRequest(&cmd2));
-			}
-			break;
-		default:
-			Reply(E_UNEXPECTED);
-			break;
+					} while (!CheckRequest(&cmd2));
+				}
+				break;
+			default:
+				Reply(E_UNEXPECTED);
+				break;
 		}
 	}
 	return 0;
@@ -563,7 +623,10 @@ CAMRInputPin::CAMRInputPin(TCHAR *pObjectName, CAMRSplitter *pDemux, HRESULT *ph
 
 CAMRInputPin::~CAMRInputPin()
 {
-	if (reader) { reader->Release(); reader = NULL; }
+	if (reader) {
+		reader->Release();
+		reader = NULL;
+	}
 }
 
 // this is a pull mode pin - these can not happen
@@ -580,7 +643,9 @@ STDMETHODIMP CAMRInputPin::Receive(IMediaSample * pSample) { return E_UNEXPECTED
 HRESULT CAMRInputPin::CheckConnect(IPin *pPin)
 {
 	HRESULT hr = demux->CheckConnect(PINDIR_INPUT, pPin);
-	if (FAILED(hr)) return hr;
+	if (FAILED(hr)) {
+		return hr;
+	}
 
 	return CBaseInputPin::CheckConnect(pPin);
 }
@@ -593,7 +658,11 @@ HRESULT CAMRInputPin::BreakConnect()
 	demux->BreakConnect(PINDIR_INPUT, this);
 
 	// release the reader
-	if (reader) reader->Release(); reader = NULL;
+	if (reader) {
+		reader->Release();
+		reader = NULL;
+	}
+
 	return CBaseInputPin::BreakConnect();
 }
 
@@ -602,15 +671,22 @@ HRESULT CAMRInputPin::CompleteConnect(IPin *pReceivePin)
 	// make sure there is a pin
 	ASSERT(pReceivePin);
 
-	if (reader) reader->Release(); reader = NULL;
+	if (reader) {
+		reader->Release();
+		reader = NULL;
+	}
 
 	// and make sure it supports IAsyncReader
 	HRESULT hr = pReceivePin->QueryInterface(IID_IAsyncReader, (void **)&reader);
-	if (FAILED(hr)) return hr;
+	if (FAILED(hr)) {
+		return hr;
+	}
 
 	// we're done here
 	hr = demux->CompleteConnect(PINDIR_INPUT, this, pReceivePin);
-	if (FAILED(hr)) return hr;
+	if (FAILED(hr)) {
+		return hr;
+	}
 
 	return CBaseInputPin::CompleteConnect(pReceivePin);
 }
@@ -627,10 +703,14 @@ HRESULT CAMRInputPin::CheckMediaType(const CMediaType* pmt)
 HRESULT CAMRInputPin::SetMediaType(const CMediaType* pmt)
 {
 	// let the baseclass know
-	if (FAILED(CheckMediaType(pmt))) return E_FAIL;
+	if (FAILED(CheckMediaType(pmt))) {
+		return E_FAIL;
+	}
 
 	HRESULT hr = CBasePin::SetMediaType(pmt);
-	if (FAILED(hr)) return hr;
+	if (FAILED(hr)) {
+		return hr;
+	}
 
 	return NOERROR;
 }
@@ -638,8 +718,12 @@ HRESULT CAMRInputPin::SetMediaType(const CMediaType* pmt)
 HRESULT CAMRInputPin::Inactive()
 {
 	HRESULT hr = CBaseInputPin::Inactive();
-	if (hr == VFW_E_NO_ALLOCATOR) hr = NOERROR;
-	if (FAILED(hr)) return hr;
+	if (hr == VFW_E_NO_ALLOCATOR) {
+		hr = NOERROR;
+	}
+	if (FAILED(hr)) {
+		return hr;
+	}
 
 	return hr;
 }
@@ -663,8 +747,8 @@ CAMROutputPin::CAMROutputPin(TCHAR *pObjectName, CAMRSplitter *pDemux, HRESULT *
 	ev_can_write(TRUE),
 	ev_abort(TRUE)
 {
-	discontinuity = true;
-	eos_delivered = false;
+	discontinuity	= true;
+	eos_delivered	= false;
 
 	ev_can_read.Reset();
 	ev_can_write.Set();
@@ -692,7 +776,9 @@ STDMETHODIMP CAMROutputPin::NonDelegatingQueryInterface(REFIID riid, void **ppv)
 HRESULT CAMROutputPin::CheckMediaType(const CMediaType *mtOut)
 {
 	for (int i=0; i<mt_types.GetCount(); i++) {
-		if (mt_types[i] == *mtOut) return NOERROR;
+		if (mt_types[i] == *mtOut) {
+			return NOERROR;
+		}
 	}
 
 	// reject type if it's not among ours
@@ -702,15 +788,21 @@ HRESULT CAMROutputPin::CheckMediaType(const CMediaType *mtOut)
 HRESULT CAMROutputPin::SetMediaType(const CMediaType *pmt)
 {
 	// just set internal media type
-	if (FAILED(CheckMediaType(pmt))) return E_FAIL;
+	if (FAILED(CheckMediaType(pmt))) {
+		return E_FAIL;
+	}
 	return CBaseOutputPin::SetMediaType(pmt);
 }
 
 HRESULT CAMROutputPin::GetMediaType(int iPosition, CMediaType *pmt)
 {
 	// enumerate the list
-	if (iPosition < 0) return E_INVALIDARG;
-	if (iPosition >= mt_types.GetCount()) return VFW_S_NO_MORE_ITEMS;
+	if (iPosition < 0) {
+		return E_INVALIDARG;
+	}
+	if (iPosition >= mt_types.GetCount()) {
+		return VFW_S_NO_MORE_ITEMS;
+	}
 
 	*pmt = mt_types[iPosition];
 	return NOERROR;
@@ -724,9 +816,12 @@ HRESULT CAMROutputPin::DecideBufferSize(IMemAllocator *pAlloc, ALLOCATOR_PROPERT
 
 	pProp->cBuffers = max(buffers, 1);
 	pProp->cbBuffer = max(m_mt.lSampleSize, 1);
-	ALLOCATOR_PROPERTIES	Actual;
+
+	ALLOCATOR_PROPERTIES Actual;
 	hr = pAlloc->SetProperties(pProp, &Actual);
-	if (FAILED(hr)) return hr;
+	if (FAILED(hr)) {
+		return hr;
+	}
 
 	ASSERT(Actual.cBuffers >= pProp->cBuffers);
 	return NOERROR;
@@ -744,7 +839,9 @@ HRESULT CAMROutputPin::CompleteConnect(IPin *pReceivePin)
 {
 	// let the parent know
 	HRESULT hr = demux->CompleteConnect(PINDIR_OUTPUT, this, pReceivePin);
-	if (FAILED(hr)) return hr;
+	if (FAILED(hr)) {
+		return hr;
+	}
 
 	discontinuity = true;
 	// okey
@@ -758,7 +855,9 @@ STDMETHODIMP CAMROutputPin::Notify(IBaseFilter *pSender, Quality q)
 
 HRESULT CAMROutputPin::Inactive()
 {
-	if (!active) return NOERROR;
+	if (!active) {
+		return NOERROR;
+	}
 	active = FALSE;
 
 	// destroy everything
@@ -779,10 +878,14 @@ HRESULT CAMROutputPin::Inactive()
 
 HRESULT CAMROutputPin::Active()
 {
-	if (active) return NOERROR;
+	if (active) {
+		return NOERROR;
+	}
 	
 	FlushQueue();
-	if (!IsConnected()) return VFW_E_NOT_CONNECTED;
+	if (!IsConnected()) {
+		return VFW_E_NOT_CONNECTED;
+	}
 
 	ev_abort.Reset();
 
@@ -809,11 +912,15 @@ HRESULT CAMROutputPin::Active()
 HRESULT CAMROutputPin::DoNewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rtStop, double dRate)
 {
 	// queue the EOS packet
-	this->rtStart = rtStart;
-	this->rtStop = rtStop;
-	this->rate = dRate;
-	eos_delivered = false;
+	this->rtStart	= rtStart;
+	this->rtStop	= rtStop;
+	this->rate		= dRate;
+	eos_delivered	= false;
 
+	discontinuity = true;
+	return DeliverNewSegment(rtStart, rtStop, rate);
+
+	/* TODO - What is this ???
 	if (1) {
 		discontinuity = true;
 		return DeliverNewSegment(rtStart, rtStop, rate);
@@ -831,6 +938,7 @@ HRESULT CAMROutputPin::DoNewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rtSto
 		}
 	}
 	return NOERROR;
+	*/
 }
 
 // IMediaSeeking
@@ -866,7 +974,9 @@ int CAMROutputPin::GetDataPacketAMR(DataPacketAMR **packet)
 
 	do {
 		// if the abort event is set, quit
-		if (ev_abort.Check()) return -1;
+		if (ev_abort.Check()) {
+			return -1;
+		}
 
 		ret = WaitForMultipleObjects(2, events, FALSE, 10);
 		if (ret == WAIT_OBJECT_0) {
@@ -889,19 +999,21 @@ HRESULT CAMROutputPin::DeliverPacket(CAMRPacket &packet)
 	}
 
 	// ziskame novy packet na vystup
-	DataPacketAMR	*outp = NULL;
+	DataPacketAMR *outp = NULL;
 	int ret = GetDataPacketAMR(&outp);
-	if (ret < 0 || !outp) return E_FAIL;
+	if (ret < 0 || !outp) {
+		return E_FAIL;
+	}
 
-	outp->type	  = DataPacketAMR::PACKET_TYPE_DATA;
+	outp->type = DataPacketAMR::PACKET_TYPE_DATA;
 
 	// spocitame casy
-	outp->rtStart = packet.tStart;
-	outp->rtStop  = packet.tStop;
-	outp->has_time = true;
+	outp->rtStart	= packet.tStart;
+	outp->rtStop	= packet.tStop;
+	outp->has_time	= true;
 	
-	outp->size	  = packet.packet_size;
-	outp->buf	  = (BYTE*)malloc(outp->size);
+	outp->size	= packet.packet_size;
+	outp->buf	= (BYTE*)malloc(outp->size);
 	memcpy(outp->buf, packet.packet, packet.packet_size);
 
 	// each packet is sync point
@@ -909,15 +1021,15 @@ HRESULT CAMROutputPin::DeliverPacket(CAMRPacket &packet)
 
 	// discontinuity ?
 	if (discontinuity) {
-		outp->discontinuity = TRUE;
-		discontinuity = false;
+		outp->discontinuity	= TRUE;
+		discontinuity		= false;
 	} else {
-		outp->discontinuity = FALSE;
+		outp->discontinuity	= FALSE;
 	}
 
 	{
 		// insert into queue
-		CAutoLock		lck(&lock_queue);
+		CAutoLock lck(&lock_queue);
 		queue.AddTail(outp);
 		ev_can_read.Set();
 
@@ -932,11 +1044,11 @@ HRESULT CAMROutputPin::DeliverPacket(CAMRPacket &packet)
 
 HRESULT CAMROutputPin::DoEndOfStream()
 {
-	DataPacketAMR	*packet = new DataPacketAMR();
+	DataPacketAMR *packet = new DataPacketAMR();
 
 	// naqueueujeme EOS
 	{
-		CAutoLock	lck(&lock_queue);
+		CAutoLock lck(&lock_queue);
 		packet->type = DataPacketAMR::PACKET_TYPE_EOS;
 		queue.AddTail(packet);
 		ev_can_read.Set();
@@ -948,10 +1060,12 @@ HRESULT CAMROutputPin::DoEndOfStream()
 
 void CAMROutputPin::FlushQueue()
 {
-	CAutoLock	lck(&lock_queue);
+	CAutoLock lck(&lock_queue);
 	while (queue.GetCount() > 0) {
 		DataPacketAMR *packet = queue.RemoveHead();
-		if (packet) delete packet;
+		if (packet) {
+			delete packet;
+		}
 	}
 	ev_can_read.Reset();
 	ev_can_write.Set();
@@ -959,7 +1073,7 @@ void CAMROutputPin::FlushQueue()
 
 HRESULT CAMROutputPin::DeliverDataPacketAMR(DataPacketAMR &packet)
 {
-	IMediaSample	*sample;
+	IMediaSample *sample;
 	HRESULT hr = GetDeliveryBuffer(&sample, NULL, NULL, 0);
 	if (FAILED(hr)) {
 		return E_FAIL;
@@ -969,20 +1083,23 @@ HRESULT CAMROutputPin::DeliverDataPacketAMR(DataPacketAMR &packet)
 	long lsize = sample->GetSize();
 	ASSERT(lsize >= packet.size);
 
-	BYTE			*buf;
+	BYTE *buf;
 	sample->GetPointer(&buf);
 
 	//*************************************************************************
-	//
 	//	data
-	//
 	//*************************************************************************
 
 	memcpy(buf, packet.buf, packet.size);
 	sample->SetActualDataLength(packet.size);
 
 	// sync point, discontinuity ?
-	if (packet.sync_point) { sample->SetSyncPoint(TRUE); } else { sample->SetSyncPoint(FALSE); }
+	if (packet.sync_point) {
+		sample->SetSyncPoint(TRUE);
+	} else {
+		sample->SetSyncPoint(FALSE);
+	}
+
 	if (packet.discontinuity) { 
 		sample->SetDiscontinuity(TRUE); 
 	} else { 
@@ -1002,16 +1119,18 @@ HRESULT CAMROutputPin::DeliverDataPacketAMR(DataPacketAMR &packet)
 
 __int64 CAMROutputPin::GetBufferTime_MS()
 {
-	CAutoLock	lck(&lock_queue);
-	if (queue.IsEmpty()) return 0;
+	CAutoLock lck(&lock_queue);
+	if (queue.IsEmpty()) {
+		return 0;
+	}
 
 	DataPacketAMR	*pfirst;
 	DataPacketAMR	*plast;
 	__int64		tstart, tstop;
 	POSITION	posf, posl;
 
-	tstart = -1;
-	tstop = -1;
+	tstart	= -1;
+	tstop	= -1;
 
 	posf = queue.GetHeadPosition();
 	while (posf) {
@@ -1031,10 +1150,12 @@ __int64 CAMROutputPin::GetBufferTime_MS()
 		}
 	}
 
-	if (tstart == -1 || tstop == -1) return 0;
+	if (tstart == -1 || tstop == -1) {
+		return 0;
+	}
 
 	// calculate time in milliseconds
-	return (tstop - tstart) / 10000;
+	return __int64((tstop - tstart) / 10000);
 }
 
 // vlakno na output
@@ -1043,65 +1164,71 @@ DWORD CAMROutputPin::ThreadProc()
 	while (true) {
 		DWORD cmd = GetRequest();
 		switch (cmd) {
-		case CMD_EXIT:		Reply(0); return 0; break;
-		case CMD_STOP:
-			{
-				Reply(0); 
-			}
-			break;
-		case CMD_RUN:
-			{
-				Reply(0);
-				if (!IsConnected()) break;
+			case CMD_EXIT:		Reply(0); return 0; break;
+			case CMD_STOP:
+				{
+					Reply(0); 
+				}
+				break;
+			case CMD_RUN:
+				{
+					Reply(0);
+					if (!IsConnected()) {
+						break;
+					}
 
-				// deliver packets
-				DWORD		cmd2;
-				BOOL		is_first = true;
-				DataPacketAMR	*packet;
-				HRESULT		hr;
+					// deliver packets
+					DWORD	cmd2;
+					BOOL	is_first = true;
+					DataPacketAMR	*packet;
+					HRESULT	hr;
 
-				do {
-					if (ev_abort.Check()) break;
-					hr = NOERROR;
-					
-					HANDLE	events[] = { ev_can_read, ev_abort};
-					DWORD	ret = WaitForMultipleObjects(2, events, FALSE, 10);
-
-					if (ret == WAIT_OBJECT_0) {
-						// look for new packet in queue
-						{
-							CAutoLock	lck(&lock_queue);
-							packet = queue.RemoveHead();
-							if (queue.IsEmpty()) ev_can_read.Reset();
-
-							// allow buffering
-							if (GetBufferTime_MS() < buffer_time_ms) ev_can_write.Set();
-						}
-
-						// bud dorucime End Of Stream, alebo packet
-						if (packet->type == DataPacketAMR::PACKET_TYPE_EOS) {
-							DeliverEndOfStream();
-						} else 
-						if (packet->type == DataPacketAMR::PACKET_TYPE_NEW_SEGMENT) {
-							hr = DeliverNewSegment(packet->rtStart, packet->rtStop, packet->rate);
-						} else
-						if (packet->type == DataPacketAMR::PACKET_TYPE_DATA) {
-							hr = DeliverDataPacketAMR(*packet);
-						}					
-
-						delete packet;
-
-						if (FAILED(hr)) {
+					do {
+						if (ev_abort.Check()) {
 							break;
 						}
-					}
-				} while (!CheckRequest(&cmd2));
+						hr = NOERROR;
+					
+						HANDLE	events[] = { ev_can_read, ev_abort};
+						DWORD	ret = WaitForMultipleObjects(2, events, FALSE, 10);
 
-			}
-			break;
-		default:
-			Reply(E_UNEXPECTED); 
-			break;
+						if (ret == WAIT_OBJECT_0) {
+							// look for new packet in queue
+							{
+								CAutoLock	lck(&lock_queue);
+								packet = queue.RemoveHead();
+								if (queue.IsEmpty()) {
+									ev_can_read.Reset();
+								}
+
+								// allow buffering
+								if (GetBufferTime_MS() < buffer_time_ms) {
+									ev_can_write.Set();
+								}
+							}
+
+							// bud dorucime End Of Stream, alebo packet
+							if (packet->type == DataPacketAMR::PACKET_TYPE_EOS) {
+								DeliverEndOfStream();
+							} else if (packet->type == DataPacketAMR::PACKET_TYPE_NEW_SEGMENT) {
+								hr = DeliverNewSegment(packet->rtStart, packet->rtStop, packet->rate);
+							} else if (packet->type == DataPacketAMR::PACKET_TYPE_DATA) {
+								hr = DeliverDataPacketAMR(*packet);
+							}					
+
+							delete packet;
+
+							if (FAILED(hr)) {
+								break;
+							}
+						}
+					} while (!CheckRequest(&cmd2));
+
+				}
+				break;
+			default:
+				Reply(E_UNEXPECTED); 
+				break;
 		}
 	}
 	return 0;
@@ -1134,7 +1261,9 @@ int CAMRReader::GetSize(__int64 *avail, __int64 *total)
 {
 	// vraciame velkost
 	HRESULT hr = reader->Length(total, avail);
-	if (FAILED(hr)) return -1;
+	if (FAILED(hr)) {
+		return -1;
+	}
 	return 0;
 }
 
@@ -1143,10 +1272,14 @@ int CAMRReader::GetPosition(__int64 *pos, __int64 *avail)
 	HRESULT hr;
 	__int64	total;
 	hr = reader->Length(&total, avail);
-	if (FAILED(hr)) return -1;
+	if (FAILED(hr)) {
+		return -1;
+	}
 
 	// aktualna pozicia
-	if (pos) *pos = position;
+	if (pos) {
+		*pos = position;
+	}
 	return 0;
 }
 
@@ -1154,7 +1287,9 @@ int CAMRReader::Seek(__int64 pos)
 {
 	__int64	avail, total;
 	GetSize(&avail, &total);
-	if (pos < 0 || pos >= total) return -1;
+	if (pos < 0 || pos >= total) {
+		return -1;
+	}
 
 	// seekneme
 	position = pos;
