@@ -713,6 +713,8 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_nSwOutputLevels		= 2;
 	//
 
+	m_PixFmt				= PIX_FMT_NB;
+
 	m_nDialogHWND			= 0;
 #ifdef REGISTER_FILTER
 	CRegKey key;
@@ -1079,7 +1081,8 @@ void CMPCVideoDecFilter::Cleanup()
 
 	if (m_pSwsContext) {
 		sws_freeContext(m_pSwsContext);
-		m_pSwsContext = NULL;
+		m_pSwsContext	= NULL;
+		m_PixFmt		= PIX_FMT_NB;
 	}
 
 	m_pAVCodec		= NULL;
@@ -1789,16 +1792,16 @@ void CMPCVideoDecFilter::InitSwscale()
 			EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWOUTPUTLEVELS), (m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp)));
 		}
 
-		PixelFormat pix_fmt = csp_ffdshow2lavc(csp_lavc2ffdshow(m_pAVCtx->pix_fmt));
-		if (pix_fmt == PIX_FMT_NB) {
-			pix_fmt = m_pAVCtx->pix_fmt;
+		m_PixFmt = csp_ffdshow2lavc(csp_lavc2ffdshow(m_pAVCtx->pix_fmt));
+		if (m_PixFmt == PIX_FMT_NB) {
+			m_PixFmt = m_pAVCtx->pix_fmt;
 		}
 
 		m_pSwsContext = sws_getCachedContext(
 							NULL,
 							m_pAVCtx->width,
 							m_pAVCtx->height,
-							pix_fmt,
+							m_PixFmt,
 							m_pAVCtx->width,
 							m_pAVCtx->height,
 							csp_ffdshow2lavc(m_nOutCsp),
@@ -1806,6 +1809,11 @@ void CMPCVideoDecFilter::InitSwscale()
 							NULL,
 							NULL,
 							NULL);
+
+		if (m_pSwsContext == NULL) {
+			m_PixFmt = PIX_FMT_NB;
+			return;
+		}
 
 		m_nSwOutBpp		= bihOut.biBitCount;
 		m_pOutSize.cx	= bihOut.biWidth;
@@ -2024,7 +2032,8 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			m_nSwRefresh--;
 			if (m_pSwsContext) {
 				sws_freeContext(m_pSwsContext);
-				m_pSwsContext = NULL;
+				m_pSwsContext	= NULL;
+				m_PixFmt		= PIX_FMT_NB;
 			}
 		}
 
@@ -2075,6 +2084,17 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			return hr;
 		}
 		//
+
+		PixelFormat PixFmt = csp_ffdshow2lavc(csp_lavc2ffdshow(m_pAVCtx->pix_fmt));
+		if (PixFmt == PIX_FMT_NB) {
+			PixFmt = m_pAVCtx->pix_fmt;
+		}
+
+		if ((m_PixFmt != PIX_FMT_NB) && (PixFmt != m_PixFmt)) {
+			sws_freeContext(m_pSwsContext);
+			m_pSwsContext	= NULL;
+			m_PixFmt		= PIX_FMT_NB;
+		}
 
 		if (m_pSwsContext == NULL) {
 			InitSwscale();
