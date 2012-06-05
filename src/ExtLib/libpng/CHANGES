@@ -3875,7 +3875,12 @@ Version 1.5.11rc02 [May 29, 2012]
     and renamed three whose names were inconsistent with those in
     pngsuite/README.txt.
 
-Version 1.5.11rc03 [May 29, 2012]
+Version 1.5.11rc03 [June 4, 2012]
+  Do not depend upon a GCC feature macro being available for use in generating
+    the linker mapfile symbol prefix.
+  Made fixes for new optimization warnings from gcc 4.7.0. The compiler
+    performs an optimization which is safe; however it then warns about it.
+    Changing the type of 'palette_number' in pngvalid.c removes the warning.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
