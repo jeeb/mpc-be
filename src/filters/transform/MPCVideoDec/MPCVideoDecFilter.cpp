@@ -1322,8 +1322,6 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 				return VFW_E_INVALIDMEDIATYPE;
 			}
 
-			// if DXVA is supported in theory the file can still be incompatible
-			bool bDXVAAvailableButUnused = IsDXVASupported();
 			if (IsDXVASupported()) {
 				do {
 					m_bDXVACompatible = false;
@@ -1354,19 +1352,19 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 					}
 
 					m_bDXVACompatible = true;
-					bDXVAAvailableButUnused = false;
 				} while (false);
-			}
 
-			if (bDXVAAvailableButUnused) { // reset the threads count
-				m_bUseDXVA = false;
-				avcodec_close (m_pAVCtx);
-				if ((nThreadNumber > 1) && IsMultiThreadSupported (m_nCodecId)) {
-					FFSetThreadNumber(m_pAVCtx, m_nCodecId, nThreadNumber);
+				if (!m_bDXVACompatible) { // reset the threads count
+					m_bUseDXVA = false;
+					if ((nThreadNumber > 1) && IsMultiThreadSupported (m_nCodecId)) {
+						avcodec_close (m_pAVCtx);
+						FFSetThreadNumber(m_pAVCtx, m_nCodecId, nThreadNumber);
+						if (avcodec_open2(m_pAVCtx, m_pAVCodec, NULL)<0) {
+							return VFW_E_INVALIDMEDIATYPE;
+						}
+					}
 				}
-				if (avcodec_open2(m_pAVCtx, m_pAVCodec, NULL)<0) {
-					return VFW_E_INVALIDMEDIATYPE;
-				}
+
 			}
 
 			BuildDXVAOutputFormat();
@@ -1558,7 +1556,19 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 			return VFW_E_INVALIDMEDIATYPE;
 		}
 
-		CLSID	ClsidSourceFilter = GetCLSID(m_pInput->GetConnected());
+		if (m_nDXVAMode == MODE_SOFTWARE && IsDXVASupported()) { // reset the threads count
+			int nThreadNumber = m_nThreadNumber ? m_nThreadNumber : m_pCpuId->GetProcessorNumber() * 3/2;
+			m_bUseDXVA = false;
+			if ((nThreadNumber > 1) && IsMultiThreadSupported (m_nCodecId)) {
+				avcodec_close (m_pAVCtx);
+				FFSetThreadNumber(m_pAVCtx, m_nCodecId, nThreadNumber);
+				if (avcodec_open2(m_pAVCtx, m_pAVCodec, NULL)<0) {
+					return VFW_E_INVALIDMEDIATYPE;
+				}
+			}
+		}
+
+		CLSID ClsidSourceFilter = GetCLSID(m_pInput->GetConnected());
 		if ((ClsidSourceFilter == __uuidof(CMpegSourceFilter)) || (ClsidSourceFilter == __uuidof(CMpegSplitterFilter))) {
 			m_bReorderBFrame = false;
 		}
