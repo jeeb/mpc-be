@@ -24,37 +24,6 @@
 #include "mpciconlib.h"
 #include <afx.h>
 
-HICON get_hicon(CString path, CString fn)
-{
-	HINSTANCE hDll = LoadLibrary(path + _T("mpciconlib.dll"));
-
-	if (!hDll) {
-		return NULL;
-	}
-
-	CString ext;
-	int pos = fn.ReverseFind(_T('.'));
-
-	if (pos != -1) {
-		ext = fn.Right(fn.GetLength() - pos);
-	} else {
-		ext = fn;
-	}
-
-	HICON hicon;
-	int iconindex = get_icon_index(ext);
-
-	if (iconindex != -1) {
-		hicon = LoadIcon(hDll, MAKEINTRESOURCE(iconindex));
-	} else {
-		hicon = LoadIcon(hDll, MAKEINTRESOURCE(IDI_DEFAULT_ICON));
-	}
-
-	FreeLibrary(hDll);
-
-	return hicon;
-}
-
 int get_icon_index(CString ext)
 {
 	int iconindex = -1;

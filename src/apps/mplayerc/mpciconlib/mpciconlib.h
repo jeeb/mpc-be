@@ -86,6 +86,3 @@
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
-
-HICON get_hicon(CString path, CString fn);
-int get_icon_index(CString ext);

@@ -28,6 +28,42 @@
 #include "../../DSUtil/DSUtil.h"
 #include "mpciconlib/mpciconlib.h"
 
+static HICON get_hicon(CString path, CString fn)
+{
+	HINSTANCE mpciconlib = LoadLibrary(path + _T("\\mpciconlib.dll"));
+
+	if (!mpciconlib) {
+		return NULL;
+	}
+
+	CString ext;
+	int pos = fn.ReverseFind(_T('.'));
+
+	if (pos != -1) {
+		ext = fn.Right(fn.GetLength() - pos);
+	} else {
+		ext = fn;
+	}
+
+	HICON hicon = NULL;
+	typedef int (*GetIconIndexFunc)(CString);
+	GetIconIndexFunc _getIconIndexFunc;
+	int iconindex = -1;
+	_getIconIndexFunc = (GetIconIndexFunc) GetProcAddress(mpciconlib, "get_icon_index");
+	if (_getIconIndexFunc) {
+		iconindex = _getIconIndexFunc(ext);
+	}
+
+	if (iconindex != -1) {
+		hicon = LoadIcon(mpciconlib, MAKEINTRESOURCE(iconindex));
+	} else {
+		hicon = LoadIcon(mpciconlib, MAKEINTRESOURCE(IDI_DEFAULT_ICON));
+	}
+
+	FreeLibrary(mpciconlib);
+
+	return hicon;
+}
 
 // CPlayerStatusBar
 
