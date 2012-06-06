@@ -28,7 +28,7 @@ extern "C" char *GetFFmpegCompiler();
 extern "C" char *GetlibavcodecVersion();
 
 CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD), m_appname(_T(""))
-	, m_strBuildNumber(_T(""))
+	, m_strVersionNumber(_T(""))
 	, m_MPCCompiler(_T(""))
 	, m_FFmpegCompiler(_T(""))
 {
@@ -45,7 +45,7 @@ BOOL CAboutDlg::OnInitDialog()
 	m_appname += _T(" (64-bit)");
 #endif
 
-	m_strBuildNumber = AfxGetMyApp()->m_strVersion;
+	m_strVersionNumber = AfxGetMyApp()->m_strVersion;
 
 #if defined(__INTEL_COMPILER)
 #if (__INTEL_COMPILER >= 1210)
@@ -80,7 +80,7 @@ BOOL CAboutDlg::OnInitDialog()
 #ifdef _DEBUG
 	m_MPCCompiler += _T(" Debug");
 #endif
-
+	m_strSVNNumber.Format(_T("%d"),MPC_VERSION_REV);
 	m_FFmpegCompiler.Format(A2W(GetFFmpegCompiler()));
 	m_libavcodecVersion.Format(A2W(GetlibavcodecVersion()));
 
@@ -108,7 +108,8 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 	//{{AFX_DATA_MAP(CAboutDlg)
 	//}}AFX_DATA_MAP
 	DDX_Text(pDX, IDC_STATIC1, m_appname);
-	DDX_Text(pDX, IDC_BUILD_NUMBER, m_strBuildNumber);
+	DDX_Text(pDX, IDC_VERSION_NUMBER, m_strVersionNumber);
+	DDX_Text(pDX, IDC_SVN_NUMBER, m_strSVNNumber);
 	DDX_Text(pDX, IDC_MPC_COMPILER, m_MPCCompiler);
 	DDX_Text(pDX, IDC_FFMPEG_COMPILER, m_FFmpegCompiler);
 	DDX_Text(pDX, IDC_LIBAVCODEC_VERSION, m_libavcodecVersion);

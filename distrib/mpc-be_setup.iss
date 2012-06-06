@@ -45,7 +45,8 @@
 
 #define copyright_year "2002-2012"
 #define app_name       "MPC-BE"
-#define app_version    str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_PATCH) + "." + str(MPC_VERSION_REV)
+#define app_version    str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_STATUS) + "." + str(MPC_VERSION_PATCH)
+#define app_version_out    str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_STATUS) + "." + str(MPC_VERSION_PATCH)+ "." + str(MPC_VERSION_REV)
 #define quick_launch   "{userappdata}\Microsoft\Internet Explorer\Quick Launch"
 
 
@@ -65,14 +66,14 @@
 #ifdef x64Build
 AppId={{FE09AF6D-78B2-4093-B012-FCDAF78693CE}
 DefaultGroupName={#app_name} x64
-OutputBaseFilename=MPC-BE.{#app_version}.x64
+OutputBaseFilename=MPC-BE.{#app_version_out}.x64
 UninstallDisplayName={#app_name} {#app_version} x64
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 #else
 AppId={{903D098F-DD50-4342-AD23-DA868FCA3126}
 DefaultGroupName={#app_name}
-OutputBaseFilename=MPC-BE.{#app_version}.x86
+OutputBaseFilename=MPC-BE.{#app_version_out}.x86
 UninstallDisplayName={#app_name} {#app_version}
 #endif
 

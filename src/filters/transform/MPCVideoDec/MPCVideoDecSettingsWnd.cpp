@@ -111,7 +111,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	int nPosX   = 10;
 	int nSizeX  = 80;
 	int nSizeY  = 16;
-	m_strSwVersion.Format(_T("v%d.%d.%d.%d"),MPC_VERSION_MAJOR,MPC_VERSION_MINOR,MPC_VERSION_PATCH,MPC_VERSION_REV);
+	m_strSwVersion.Format(_T("v%d.%d.%d.%d"),MPC_VERSION_MAJOR,MPC_VERSION_MINOR,MPC_VERSION_STATUS,MPC_VERSION_PATCH);
 	static	wchar_t *SwOutputFormatNames[] = {_T("NV12 (default)"), _T("YV12"), _T("YUY2"), _T("RGB32"), _T("RGB16"), _T("RGB15")};
 	int nSwOF = m_pMDF ? m_pMDF->GetSwOutputFormats() : 0;
 	// get the output formats order from the DWORD nibbles extracting literal values [0x00543210] = 0,1,2,3,4,5

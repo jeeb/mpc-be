@@ -26,11 +26,7 @@
 
 #include <afxinet.h>
 
-#ifdef NO_VERSION_REV_NEEDED
-const Version UpdateChecker::MPC_VERSION = { MPC_VERSION_MAJOR, MPC_VERSION_MINOR, MPC_VERSION_PATCH, 0 };
-#else
-const Version UpdateChecker::MPC_VERSION = { MPC_VERSION_MAJOR, MPC_VERSION_MINOR, MPC_VERSION_PATCH, MPC_VERSION_REV };
-#endif // NO_VERSION_REV_NEEDED
+const Version UpdateChecker::MPC_VERSION = { MPC_VERSION_MAJOR, MPC_VERSION_MINOR, MPC_VERSION_STATUS,MPC_VERSION_PATCH };
 
 UpdateChecker::UpdateChecker(CString versionFileURL)
 	: versionFileURL(versionFileURL)
@@ -118,8 +114,8 @@ bool UpdateChecker::parseVersion(const CString& versionStr)
 		if (success) {
 			latestVersion.major = v[0];
 			latestVersion.minor = v[1];
-			latestVersion.patch = v[2];
-			latestVersion.revision = v[3];
+			latestVersion.status = v[2];
+			latestVersion.patch = v[3];
 		}
 	}
 
@@ -136,13 +132,13 @@ int UpdateChecker::compareVersion(const Version& v1, const Version& v2) const
 		return 1;
 	} else if (v1.minor < v2.minor) {
 		return -1;
+	} else if (v1.status > v2.status) {
+		return 1;
+	} else if (v1.status < v2.status) {
+		return -1;
 	} else if (v1.patch > v2.patch) {
 		return 1;
 	} else if (v1.patch < v2.patch) {
-		return -1;
-	} else if (v1.revision > v2.revision) {
-		return 1;
-	} else if (v1.revision < v2.revision) {
 		return -1;
 	} else {
 		return 0;

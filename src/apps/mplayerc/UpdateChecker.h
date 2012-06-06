@@ -28,8 +28,8 @@ struct Version
 {
 	UINT major;
 	UINT minor;
+	UINT status;
 	UINT patch;
-	UINT revision;
 };
 
 enum Update_Status

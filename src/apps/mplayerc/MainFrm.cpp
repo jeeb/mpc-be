@@ -9296,7 +9296,7 @@ void CMainFrame::OnHelpHomepage()
 UINT CMainFrame::CheckForUpdate(LPVOID pParam)
 {
 //	UpdateChecker updateChecker(_T("http://sourceforge.net/p/mpcbe/version.txt"));
-	UpdateChecker updateChecker(_T("http://www.xvidvideo.ru/updates/be_version.txt"));
+	UpdateChecker updateChecker(_T("http://www.xvidvideo.ru/updates/mpc_be.txt"));
 	UpdateCheckerDlg dlg(updateChecker.isUpdateAvailable(), updateChecker.getLatestVersion());
 	dlg.DoModal();
 

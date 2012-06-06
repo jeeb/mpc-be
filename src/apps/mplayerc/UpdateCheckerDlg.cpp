@@ -31,15 +31,15 @@ UpdateCheckerDlg::UpdateCheckerDlg(Update_Status updateStatus, const Version& la
 {
 	switch (updateStatus) {
 		case UPDATER_UPDATE_AVAILABLE:
-			m_text.Format(IDS_NEW_UPDATE_AVAILABLE, latestVersion.major, latestVersion.minor, latestVersion.patch, latestVersion.revision);
+			m_text.Format(IDS_NEW_UPDATE_AVAILABLE, latestVersion.major, latestVersion.minor, latestVersion.status, latestVersion.patch);
 			break;
 		case UPDATER_LATEST_STABLE:
 			m_text.LoadString(IDS_USING_LATEST_STABLE);
 			break;
 		case UPDATER_NEWER_VERSION:
 			m_text.Format(IDS_USING_NEWER_VERSION,
-						  UpdateChecker::MPC_VERSION.major, UpdateChecker::MPC_VERSION.minor, UpdateChecker::MPC_VERSION.patch, UpdateChecker::MPC_VERSION.revision,
-						  latestVersion.major, latestVersion.minor, latestVersion.patch, latestVersion.revision);
+						  UpdateChecker::MPC_VERSION.major, UpdateChecker::MPC_VERSION.minor, UpdateChecker::MPC_VERSION.status, UpdateChecker::MPC_VERSION.patch,
+						  latestVersion.major, latestVersion.minor, latestVersion.status, latestVersion.patch);
 			break;
 		case UPDATER_ERROR:
 			m_text.LoadString(IDS_UPDATE_ERROR);
