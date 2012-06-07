@@ -1,7 +1,7 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * Last changed in libpng 1.5.10 [March 8, 2012]
+ * Last changed in libpng 1.5.11 [(PENDING RELEASE)]
  * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -708,7 +708,7 @@ png_do_check_palette_indexes(png_structp png_ptr, png_row_infop row_info)
          {
             for (; rp > png_ptr->row_buf; rp--)
             {
-               if (*rp >= png_ptr->num_palette_max)
+               if (*rp > png_ptr->num_palette_max)
                   png_ptr->num_palette_max = (int) *rp;
             }
 
