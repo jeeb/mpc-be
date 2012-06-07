@@ -411,6 +411,10 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 
 		switch(pTBCD->nmcd.dwDrawStage)
 		{
+		case CDDS_PREERASE:
+			m_volctrl.Invalidate();
+			lr = CDRF_SKIPDEFAULT;
+			break;
 		case CDDS_PREPAINT:
 			{
 			CDC dc;
@@ -432,9 +436,6 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			dc.Detach();
 			}
 			lr |= CDRF_NOTIFYITEMDRAW;
-			break;
-		case CDDS_PREERASE:
-			lr = CDRF_SKIPDEFAULT;
 			break;
 		case CDDS_ITEMPREPAINT:
 			lr |= TBCDRF_NOETCHEDEFFECT;
@@ -514,6 +515,10 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 	} else {
 		switch(pTBCD->nmcd.dwDrawStage)
 		{
+		case CDDS_PREERASE:
+			m_volctrl.Invalidate();
+			lr = CDRF_SKIPDEFAULT;
+			break;
 		case CDDS_PREPAINT:
 			{
 			CDC dc;

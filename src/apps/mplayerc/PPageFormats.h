@@ -93,6 +93,7 @@ public:
 	afx_msg void OnBnClickedButton12();
 	afx_msg void OnBnClickedButton11();
 	afx_msg void OnBnVistaModify();
+	afx_msg void OnFilesAssocModified();
 	afx_msg void OnUpdateButtonDefault(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateButtonSet(CCmdUI* pCmdUI);
 	CButton m_fContextDir;
