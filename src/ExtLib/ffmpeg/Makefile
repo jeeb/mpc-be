@@ -154,6 +154,7 @@ SRCS_C=\
     libavcodec/h264idct.c \
     libavcodec/h264pred.c \
     libavcodec/huffman.c \
+    libavcodec/imc.c \
     libavcodec/imgconvert.c \
     libavcodec/indeo3.c \
     libavcodec/indeo4.c \

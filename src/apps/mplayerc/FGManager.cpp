@@ -1896,6 +1896,13 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 	pFGF->AddType(MEDIATYPE_Audio, WMMEDIASUBTYPE_WMAudioV2);
 	m_transform.AddTail(pFGF);
 
+	// Indeo Audio Coder
+	pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
+		(ffmpeg_filters[FFM_IAC]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
+		(ffmpeg_filters[FFM_IAC]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_IAC);
+	m_transform.AddTail(pFGF);
+
 	pFGF = DNew CFGFilterInternal<CNullTextRenderer>(L"NullTextRenderer", MERIT64_DO_USE);
 	pFGF->AddType(MEDIATYPE_Text, MEDIASUBTYPE_NULL);
 	pFGF->AddType(MEDIATYPE_ScriptCommand, MEDIASUBTYPE_NULL);
