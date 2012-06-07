@@ -453,6 +453,10 @@ CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipInfo::Str
 	} else if (_pMediaType->majortype == MEDIATYPE_Subtitle) {
 		MajorType = "Subtitle";
 
+		if ((pPresentationDesc == NULL) && ((PES_STREAM_TYPE)_PresentationType == PES_PRIVATE)) {
+			pPresentationDesc = L"DVB";
+		}
+
 		if (pPresentationDesc) {
 			Infos.AddTail(pPresentationDesc);
 		}

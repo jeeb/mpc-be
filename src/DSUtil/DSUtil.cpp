@@ -2741,7 +2741,7 @@ const wchar_t *StreamTypeToName(PES_STREAM_TYPE _Type)
 		case AUDIO_STREAM_DTS_HD_MASTER_AUDIO:
 				return L"DTS-HD Master Audio";
 		case PRESENTATION_GRAPHICS_STREAM:
-				return L"Presentation Graphics Stream";
+				return L"PGS";
 		case INTERACTIVE_GRAPHICS_STREAM:
 				return L"Interactive Graphics Stream";
 		case SUBTITLE_STREAM:
