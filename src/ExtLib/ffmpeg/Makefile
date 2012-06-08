@@ -300,6 +300,7 @@ SRCS_C=\
 \
     libavutil/audioconvert.c \
     libavutil/avstring.c \
+    libavutil/bprint.c \
     libavutil/cpu.c \
     libavutil/crc.c \
     libavutil/dict.c \
