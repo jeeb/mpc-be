@@ -78,7 +78,7 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	}
 
 	m_pD3DXLoadSurfaceFromMemory	= NULL;
-	m_pD3DXLoadSurfaceFromSurface = NULL;
+	m_pD3DXLoadSurfaceFromSurface	= NULL;
 	m_pD3DXCreateLine				= NULL;
 	m_pD3DXCreateFont				= NULL;
 	m_pD3DXCreateSprite				= NULL;
@@ -1004,8 +1004,8 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		double Scale = double(CurrentSize) / double(MinSize);
 		m_TextScale = Scale;
 		m_pD3DXCreateFont( m_pD3DDev,					// D3D device
-						   -24.0*Scale,					// Height
-						   -11.0*Scale,					// Width
+						   (int)(-24.0*Scale),			// Height
+						   (UINT)(-11.0*Scale),					// Width
 						   CurrentSize < 800 ? FW_NORMAL : FW_BOLD,		// Weight
 						   0,							// MipLevels, 0 = autogen mipmaps
 						   FALSE,						// Italic
@@ -1148,8 +1148,8 @@ void CDX9AllocatorPresenter::CalculateJitter(LONGLONG PerfCounter)
 		m_fJitterMean = FrameTimeMean;
 		double DeviationSum = 0;
 		for (int i=0; i<NB_JITTER; i++) {
-			LONGLONG DevInt = m_pllJitter[i] - FrameTimeMean;
-			double Deviation = DevInt;
+			LONGLONG DevInt = m_pllJitter[i] - (LONGLONG)FrameTimeMean;
+			double Deviation = (double)DevInt;
 			DeviationSum += Deviation*Deviation;
 			m_MaxJitter = max(m_MaxJitter, DevInt);
 			m_MinJitter = min(m_MinJitter, DevInt);
@@ -1755,7 +1755,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 			fResetDevice = true;
 		}
 
-		//if(hr == S_PRESENT_MODE_CHANGED)
+		//if (hr == S_PRESENT_MODE_CHANGED)
 		//{
 		//	TRACE("Reset Device: D3D Device mode changed\n");
 		//	fResetDevice = true;
@@ -1933,7 +1933,7 @@ void CDX9AllocatorPresenter::DrawText(const RECT &rc, const CString &strText, in
 
 void CDX9AllocatorPresenter::ResetStats()
 {
-	CRenderersData * pApp = GetRenderersData();
+	CRenderersData *pApp = GetRenderersData();
 	LONGLONG Time = pApp->GetPerfCounter();
 
 	m_PaintTime = 0;
@@ -1977,7 +1977,7 @@ void CDX9AllocatorPresenter::DrawStats()
 	if (m_pFont && m_pSprite) {
 		m_pSprite->Begin(D3DXSPRITE_ALPHABLEND);
 		CString		strText;
-		int TextHeight = 25.0*m_TextScale + 0.5;
+		int TextHeight = int(25.0*m_TextScale + 0.5);
 		//strText.Format(L"Frame rate   : %7.03f   (%7.3f ms = %.03f, %s)   (%7.3f ms = %.03f%s)    Clock: %7.3f ms %+1.4f %%  %+1.9f  %+1.9f", m_fAvrFps, double(m_rtTimePerFrame) / 10000.0, 10000000.0 / (double)(m_rtTimePerFrame), m_bInterlaced ? L"I" : L"P", GetFrameTime() * 1000.0, GetFrameRate(), m_DetectedLock ? L" L" : L"", m_ClockDiff/10000.0, m_ModeratedTimeSpeed*100.0 - 100.0, m_ModeratedTimeSpeedDiff, m_ClockDiffCalc/10000.0);
 		if (bDetailedStats > 1) {
 			if (m_bIsEVR) {
@@ -2221,7 +2221,7 @@ void CDX9AllocatorPresenter::DrawStats()
 			DrawText(rc, strText, 1);
 			OffsetRect (&rc, 0, TextHeight);
 
-			strText.Format(L"DirectX SDK  : %d", GetRenderersData()->GetDXSdkRelease());
+			strText.Format(L"DirectX SDK  : %u", GetRenderersData()->GetDXSdkRelease());
 			DrawText(rc, strText, 1);
 			OffsetRect (&rc, 0, TextHeight);
 

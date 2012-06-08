@@ -202,15 +202,15 @@ CBaseAP::~CBaseAP()
 template<int texcoords>
 void CBaseAP::AdjustQuad(MYD3DVERTEX<texcoords>* v, double dx, double dy)
 {
-	double offset = 0.5;
+	float offset = 0.5;
 
 	for (int i = 0; i < 4; i++) {
 		v[i].x -= offset;
 		v[i].y -= offset;
 
 		for (int j = 0; j < max(texcoords-1, 1); j++) {
-			v[i].t[j].u -= offset*dx;
-			v[i].t[j].v -= offset*dy;
+			v[i].t[j].u -= (float)(offset*dx);
+			v[i].t[j].v -= (float)(offset*dy);
 		}
 
 		if (texcoords > 1) {
@@ -446,7 +446,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		pp.BackBufferWidth = d3ddm.Width;
 		pp.BackBufferHeight = d3ddm.Height;
 		pp.hDeviceWindow = m_hWnd;
-		DEBUG_ONLY(_tprintf_s(_T("Wnd in CreateDXDevice: %d\n"), m_hWnd));
+		DEBUG_ONLY(_tprintf_s(_T("Wnd in CreateDXDevice: %p\n"), m_hWnd));
 		pp.BackBufferCount = 3;
 		pp.SwapEffect = D3DSWAPEFFECT_DISCARD;
 		pp.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
@@ -641,7 +641,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		int CurrentSize = min(m_ScreenSize.cx, MinSize);
 		double Scale = double(CurrentSize) / double(MinSize);
 		m_TextScale = Scale;
-		m_pD3DXCreateFont(m_pD3DDev, -24.0*Scale, -11.0*Scale, CurrentSize < 800 ? FW_NORMAL : FW_BOLD, 0, FALSE,
+		m_pD3DXCreateFont(m_pD3DDev, (int)(-24.0*Scale), (UINT)(-11.0*Scale), CurrentSize < 800 ? FW_NORMAL : FW_BOLD, 0, FALSE,
 						  DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, FIXED_PITCH | FF_DONTCARE, L"Lucida Console", &m_pFont);
 	}
 	if (m_pD3DXCreateSprite) {
@@ -906,7 +906,7 @@ HRESULT CBaseAP::ResetDXDevice(CString &_Error)
 		int CurrentSize = min(m_ScreenSize.cx, MinSize);
 		double Scale = double(CurrentSize) / double(MinSize);
 		m_TextScale = Scale;
-		m_pD3DXCreateFont(m_pD3DDev, -24.0*Scale, -11.0*Scale, CurrentSize < 800 ? FW_NORMAL : FW_BOLD, 0, FALSE,
+		m_pD3DXCreateFont(m_pD3DDev, (int)(-24.0*Scale), (UINT)(-11.0*Scale), CurrentSize < 800 ? FW_NORMAL : FW_BOLD, 0, FALSE,
 						  DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, FIXED_PITCH | FF_DONTCARE, L"Lucida Console", &m_pFont);
 	}
 	m_pSprite = NULL;
@@ -1192,8 +1192,8 @@ HRESULT CBaseAP::TextureResize(IDirect3DTexture9* pTexture, Vector dst[4], D3DTE
 	float w = (float)desc.Width;
 	float h = (float)desc.Height;
 
-	float dx2 = 1.0/w;
-	float dy2 = 1.0/h;
+	float dx2 = 1.0f/w;
+	float dy2 = 1.0f/h;
 
 	MYD3DVERTEX<1> v[] = {
 		{dst[0].x, dst[0].y, dst[0].z, 1.0f/dst[0].z,  SrcRect.left * dx2, SrcRect.top * dy2},
@@ -1220,10 +1220,10 @@ HRESULT CBaseAP::TextureResizeBilinear(IDirect3DTexture9* pTexture, Vector dst[4
 	float w = (float)desc.Width;
 	float h = (float)desc.Height;
 
-	float tx0 = SrcRect.left;
-	float tx1 = SrcRect.right;
-	float ty0 = SrcRect.top;
-	float ty1 = SrcRect.bottom;
+	float tx0 = (float)SrcRect.left;
+	float tx1 = (float)SrcRect.right;
+	float ty0 = (float)SrcRect.top;
+	float ty1 = (float)SrcRect.bottom;
 
 	MYD3DVERTEX<1> v[] = {
 		{dst[0].x, dst[0].y, dst[0].z, 1.0f/dst[0].z,  tx0, ty0},
@@ -1250,13 +1250,13 @@ HRESULT CBaseAP::TextureResizeBicubic1pass(IDirect3DTexture9* pTexture, Vector d
 		return E_FAIL;
 	}
 
-	double w = (double)desc.Width;
-	double h = (double)desc.Height;
+	float w = (float)desc.Width;
+	float h = (float)desc.Height;
 
-	float tx0 = SrcRect.left;
-	float tx1 = SrcRect.right;
-	float ty0 = SrcRect.top;
-	float ty1 = SrcRect.bottom;
+	float tx0 = (float)SrcRect.left;
+	float tx1 = (float)SrcRect.right;
+	float ty0 = (float)SrcRect.top;
+	float ty1 = (float)SrcRect.bottom;
 
 	MYD3DVERTEX<1> v[] = {
 		{dst[0].x, dst[0].y, dst[0].z, 1.0f/dst[0].z,  tx0, ty0},
@@ -1282,12 +1282,12 @@ HRESULT CBaseAP::TextureResizeBicubic2pass(IDirect3DTexture9* pTexture, Vector d
 	/*HRESULT hr;
 
 	// rotated?
-	if(dst[0].z != dst[1].z || dst[2].z != dst[3].z || dst[0].z != dst[3].z
+	if (dst[0].z != dst[1].z || dst[2].z != dst[3].z || dst[0].z != dst[3].z
 	|| dst[0].y != dst[1].y || dst[0].x != dst[2].x || dst[2].y != dst[3].y || dst[1].x != dst[3].x)
 	    return TextureResizeBicubic1pass(pTexture, dst, SrcRect);
 
 	D3DSURFACE_DESC desc;
-	if(!pTexture || FAILED(pTexture->GetLevelDesc(0, &desc)))
+	if (!pTexture || FAILED(pTexture->GetLevelDesc(0, &desc)))
 	    return E_FAIL;
 
 	float Tex0_Width = desc.Width;
@@ -1300,7 +1300,7 @@ HRESULT CBaseAP::TextureResizeBicubic2pass(IDirect3DTexture9* pTexture, Vector d
 
 	CRect dst1(0, 0, (int)(dst[3].x - dst[0].x), (int)h);
 
-	if(!m_pScreenSizeTemporaryTexture[0] || FAILED(m_pScreenSizeTemporaryTexture[0]->GetLevelDesc(0, &desc)))
+	if (!m_pScreenSizeTemporaryTexture[0] || FAILED(m_pScreenSizeTemporaryTexture[0]->GetLevelDesc(0, &desc)))
 	    return TextureResizeBicubic1pass(pTexture, dst, SrcRect);
 
 	float Tex1_Width = desc.Width;
@@ -1316,7 +1316,7 @@ HRESULT CBaseAP::TextureResizeBicubic2pass(IDirect3DTexture9* pTexture, Vector d
 	float ty0_2 = 0;
 	float ty1_2 = h;
 
-	if(dst1.Width() > (int)desc.Width || dst1.Height() > (int)desc.Height)
+	if (dst1.Width() > (int)desc.Width || dst1.Height() > (int)desc.Height)
 	    return TextureResizeBicubic1pass(pTexture, dst, SrcRect);
 
 	MYD3DVERTEX<1> vx[] =
@@ -1458,8 +1458,8 @@ void CBaseAP::SyncStats(LONGLONG syncTime)
 	double DeviationSum = 0;
 
 	for (int i=0; i<NB_JITTER; i++) {
-		LONGLONG DevInt = m_pllJitter[i] - m_fJitterMean;
-		double Deviation = DevInt;
+		LONGLONG DevInt = m_pllJitter[i] - (LONGLONG)m_fJitterMean;
+		double Deviation = (double)DevInt;
 		DeviationSum += Deviation*Deviation;
 		m_MaxJitter = max(m_MaxJitter, DevInt);
 		m_MinJitter = min(m_MinJitter, DevInt);
@@ -1527,7 +1527,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 	}
 
 	CRenderersSettings& s = GetRenderersSettings();
-	CRenderersData * pApp = GetRenderersData();
+	CRenderersData *pApp = GetRenderersData();
 	D3DRASTER_STATUS rasterStatus;
 	REFERENCE_TIME llCurRefTime = 0;
 	REFERENCE_TIME llSyncOffset = 0;
@@ -1969,8 +1969,8 @@ void CBaseAP::DrawStats()
 	// pApp->m_fDisplayStats = 1 for full stats, 2 for little less, 3 for basic, 0 for no stats
 	if (m_pFont && m_pSprite) {
 		m_pSprite->Begin(D3DXSPRITE_ALPHABLEND);
-		CString	strText;
-		int TextHeight = 25.0*m_TextScale + 0.5;
+		CString strText;
+		int TextHeight = (int)(25.0*m_TextScale + 0.5);
 
 		strText.Format(L"Frames drawn from stream start: %d | Sample time stamp: %d ms", m_pcFramesDrawn, (LONG)(m_llSampleTime / 10000));
 		DrawText(rc, strText, 1);
@@ -2117,7 +2117,7 @@ void CBaseAP::DrawStats()
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 
-			strText.Format(L"DirectX SDK  : %d", GetRenderersData()->GetDXSdkRelease());
+			strText.Format(L"DirectX SDK  : %u", GetRenderersData()->GetDXSdkRelease());
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 
@@ -2150,7 +2150,7 @@ void CBaseAP::DrawStats()
 		for (int i = 0; i <= DrawHeight; i += 5) {
 			Points[0].x = (FLOAT)StartX;
 			Points[0].y = (FLOAT)(StartY + i);
-			Points[1].x = (FLOAT)(StartX + ((i + 25) % 25 ? 50 : 625));
+			Points[1].x = (FLOAT)(StartX + (((i + 25) % 25) ? 50 : 625));
 			Points[1].y = (FLOAT)(StartY + i);
 			m_pLine->Draw(Points, 2, D3DCOLOR_XRGB(100, 100, 255));
 		}
@@ -2883,7 +2883,7 @@ STDMETHODIMP CSyncAP::ProcessMessage(MFVP_MESSAGE_TYPE eMessage, ULONG_PTR ulPar
 			break;
 
 		case MFVP_MESSAGE_STEP:
-			m_nStepCount = ulParam;
+			m_nStepCount = (int)ulParam;
 			m_bStepping = true;
 			break;
 
@@ -3078,9 +3078,9 @@ HRESULT CSyncAP::RenegotiateMediaType()
 		if (SUCCEEDED(hr)) {
 			LONGLONG Merit = GetMediaTypeMerit(pType);
 
-			int nTypes = ValidMixerTypes.GetCount();
-			int iInsertPos = 0;
-			for (int i = 0; i < nTypes; ++i) {
+			size_t nTypes = ValidMixerTypes.GetCount();
+			size_t iInsertPos = 0;
+			for (size_t i = 0; i < nTypes; ++i) {
 				LONGLONG ThisMerit = GetMediaTypeMerit(ValidMixerTypes[i]);
 				if (Merit > ThisMerit) {
 					iInsertPos = i;
@@ -3093,12 +3093,12 @@ HRESULT CSyncAP::RenegotiateMediaType()
 		}
 	}
 
-	int nValidTypes = ValidMixerTypes.GetCount();
-	for (int i = 0; i < nValidTypes; ++i) {
+	size_t nValidTypes = ValidMixerTypes.GetCount();
+	for (size_t i = 0; i < nValidTypes; ++i) {
 		pType = ValidMixerTypes[i];
 	}
 
-	for (int i = 0; i < nValidTypes; ++i) {
+	for (size_t i = 0; i < nValidTypes; ++i) {
 		pType = ValidMixerTypes[i];
 		hr = SetMediaType(pType);
 		if (SUCCEEDED(hr)) {
@@ -3825,7 +3825,7 @@ HRESULT CSyncAP::GetScheduledSample(IMFSample** ppSample, int &_Count)
 	CAutoLock lock(&m_SampleQueueLock);
 	HRESULT		hr = S_OK;
 
-	_Count = m_ScheduledSamples.GetCount();
+	_Count = (int)m_ScheduledSamples.GetCount();
 	if (_Count > 0) {
 		*ppSample = m_ScheduledSamples.RemoveHead().Detach();
 		--_Count;

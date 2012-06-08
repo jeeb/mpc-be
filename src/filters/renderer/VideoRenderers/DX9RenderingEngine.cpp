@@ -46,15 +46,15 @@ struct MYD3DVERTEX<0> {
 template<int texcoords>
 static void AdjustQuad(MYD3DVERTEX<texcoords>* v, double dx, double dy)
 {
-	double offset = 0.5;
+	float offset = 0.5;
 
 	for (int i = 0; i < 4; i++) {
 		v[i].x -= offset;
 		v[i].y -= offset;
 
 		for (int j = 0; j < max(texcoords-1, 1); j++) {
-			v[i].t[j].u -= offset*dx;
-			v[i].t[j].v -= offset*dy;
+			v[i].t[j].u -= (float)(offset*dx);
+			v[i].t[j].v -= (float)(offset*dy);
 		}
 
 		if (texcoords > 1) {
@@ -327,13 +327,13 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		bCustomScreenSpacePixelShaders = !m_pCustomScreenSpacePixelShaders.IsEmpty();
 
 		if (bCustomScreenSpacePixelShaders) {
-			screenSpacePassCount += m_pCustomScreenSpacePixelShaders.GetCount();
+			screenSpacePassCount += (int)m_pCustomScreenSpacePixelShaders.GetCount();
 		}
 
 		// Custom pixel shaders
 		bCustomPixelShaders = !m_pCustomPixelShaders.IsEmpty();
 
-		hr = InitTemporaryVideoTextures(min(m_pCustomPixelShaders.GetCount(), 2));
+		hr = InitTemporaryVideoTextures(min((int)m_pCustomPixelShaders.GetCount(), 2));
 		if (FAILED(hr)) {
 			bCustomPixelShaders = false;
 		}
@@ -698,8 +698,8 @@ HRESULT CDX9RenderingEngine::TextureResize(IDirect3DTexture9* pTexture, Vector d
 	float w = (float)desc.Width;
 	float h = (float)desc.Height;
 
-	float dx2 = 1.0/w;
-	float dy2 = 1.0/h;
+	float dx2 = 1.0f/w;
+	float dy2 = 1.0f/h;
 
 	MYD3DVERTEX<1> v[] = {
 		{dst[0].x, dst[0].y, dst[0].z, 1.0f/dst[0].z,  srcRect.left * dx2, srcRect.top * dy2},
@@ -729,10 +729,10 @@ HRESULT CDX9RenderingEngine::TextureResizeBilinear(IDirect3DTexture9* pTexture, 
 	// make const to give compiler a chance of optimising, also float faster than double and converted to float to sent to PS anyway
 	const float dx = 1.0f/(float)desc.Width;
 	const float dy = 1.0f/(float)desc.Height;
-	const float tx0 = srcRect.left;
-	const float tx1 = srcRect.right;
-	const float ty0 = srcRect.top;
-	const float ty1 = srcRect.bottom;
+	const float tx0 = (float)srcRect.left;
+	const float tx1 = (float)srcRect.right;
+	const float ty0 = (float)srcRect.top;
+	const float ty1 = (float)srcRect.bottom;
 
 	MYD3DVERTEX<1> v[] = {
 		{dst[0].x, dst[0].y, dst[0].z, 1.0f/dst[0].z,  tx0, ty0},
@@ -767,10 +767,10 @@ HRESULT CDX9RenderingEngine::TextureResizeBicubic1pass(IDirect3DTexture9* pTextu
 	// make const to give compiler a chance of optimising, also float faster than double and converted to float to sent to PS anyway
 	const float dx = 1.0f/(float)desc.Width;
 	const float dy = 1.0f/(float)desc.Height;
-	const float tx0 = srcRect.left;
-	const float tx1 = srcRect.right;
-	const float ty0 = srcRect.top;
-	const float ty1 = srcRect.bottom;
+	const float tx0 = (float)srcRect.left;
+	const float tx1 = (float)srcRect.right;
+	const float ty0 = (float)srcRect.top;
+	const float ty1 = (float)srcRect.bottom;
 
 	MYD3DVERTEX<1> v[] = {
 		{dst[0].x, dst[0].y, dst[0].z, 1.0f/dst[0].z,  tx0, ty0},
@@ -799,12 +799,12 @@ HRESULT CDX9RenderingEngine::TextureResizeBicubic2pass(IDirect3DTexture9* pTextu
 	HRESULT hr;
 
 	// rotated?
-	if(dst[0].z != dst[1].z || dst[2].z != dst[3].z || dst[0].z != dst[3].z
+	if (dst[0].z != dst[1].z || dst[2].z != dst[3].z || dst[0].z != dst[3].z
 	|| dst[0].y != dst[1].y || dst[0].x != dst[2].x || dst[2].y != dst[3].y || dst[1].x != dst[3].x)
 	    return TextureResizeBicubic1pass(pTexture, dst, srcRect);
 
 	D3DSURFACE_DESC desc;
-	if(!pTexture || FAILED(pTexture->GetLevelDesc(0, &desc)))
+	if (!pTexture || FAILED(pTexture->GetLevelDesc(0, &desc)))
 	    return E_FAIL;
 
 	float Tex0_Width = desc.Width;
@@ -822,7 +822,7 @@ HRESULT CDX9RenderingEngine::TextureResizeBicubic2pass(IDirect3DTexture9* pTextu
 
 	CRect dst1(0, 0, (int)(dst[3].x - dst[0].x), (int)h);
 
-	if(!m_pTemporaryScreenSpaceTextures[0] || FAILED(m_pTemporaryScreenSpaceTextures[0]->GetLevelDesc(0, &desc)))
+	if (!m_pTemporaryScreenSpaceTextures[0] || FAILED(m_pTemporaryScreenSpaceTextures[0]->GetLevelDesc(0, &desc)))
 	    return TextureResizeBicubic1pass(pTexture, dst, srcRect);
 
 	float Tex1_Width = desc.Width;
@@ -855,8 +855,8 @@ HRESULT CDX9RenderingEngine::TextureResizeBicubic2pass(IDirect3DTexture9* pTextu
 
 	//	ASSERT(dst1.Height() == desc.Height);
 
-	if(dst1.Width() > (int)desc.Width || dst1.Height() > (int)desc.Height)
-	    // if(dst1.Width() != desc.Width || dst1.Height() != desc.Height)
+	if (dst1.Width() > (int)desc.Width || dst1.Height() > (int)desc.Height)
+	    // if (dst1.Width() != desc.Width || dst1.Height() != desc.Height)
 	    return TextureResizeBicubic1pass(pTexture, dst, srcRect);
 
 	MYD3DVERTEX<1> vx[] =
@@ -1616,7 +1616,7 @@ HRESULT CDX9RenderingEngine::AlphaBlt(RECT* pSrc, RECT* pDst, IDirect3DTexture9*
 
 	D3DCAPS9 d3dcaps9;
 	hr = m_pD3DDev->GetDeviceCaps(&d3dcaps9);
-	if(d3dcaps9.AlphaCmpCaps & D3DPCMPCAPS_LESS)
+	if (d3dcaps9.AlphaCmpCaps & D3DPCMPCAPS_LESS)
 	{
 	hr = m_pD3DDev->SetRenderState(D3DRS_ALPHAREF, (DWORD)0x000000FE);
 	hr = m_pD3DDev->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);

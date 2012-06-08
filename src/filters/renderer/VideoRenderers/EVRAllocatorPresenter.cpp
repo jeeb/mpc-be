@@ -45,7 +45,7 @@ static const GUID GUID_SURFACE_INDEX = { 0x30c8e9f6, 0x415, 0x4b81, { 0xa3, 0x15
 
 
 // === Helper functions
-#define CheckHR(exp) {if(FAILED(hr = exp)) return hr;}
+#define CheckHR(exp) {if (FAILED(hr = exp)) return hr;}
 
 MFOffset MakeOffset(float v)
 {
@@ -629,7 +629,7 @@ STDMETHODIMP CEVRAllocatorPresenter::ProcessMessage(MFVP_MESSAGE_TYPE eMessage, 
 
 		case MFVP_MESSAGE_STEP :					// Requests a frame step.
 			TRACE_EVR ("EVR: MFVP_MESSAGE_STEP\n");
-			m_nStepCount = ulParam;
+			m_nStepCount = (int)ulParam;
 			hr = S_OK;
 			break;
 
@@ -1012,9 +1012,9 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 		}
 
 		if (SUCCEEDED(hr)) {
-			int nTypes = ValidMixerTypes.GetCount();
-			int iInsertPos = 0;
-			for (int i = 0; i < nTypes; ++i) {
+			size_t nTypes = ValidMixerTypes.GetCount();
+			size_t iInsertPos = 0;
+			for (size_t i = 0; i < nTypes; ++i) {
 				int ThisMerit;
 				GetMediaTypeMerit(ValidMixerTypes[i], &ThisMerit);
 
@@ -1031,15 +1031,15 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 	}
 
 
-	int nValidTypes = ValidMixerTypes.GetCount();
+	size_t nValidTypes = ValidMixerTypes.GetCount();
 #ifdef _DEBUG
-	for (int i = 0; i < nValidTypes; ++i) {
+	for (size_t i = 0; i < nValidTypes; ++i) {
 		// Step 3. Adjust the mixer's type to match our requirements.
 		pType = ValidMixerTypes[i];
 		TRACE_EVR("EVR: Valid mixer output type: %ws\n", GetMediaTypeFormatDesc(pType));
 	}
 #endif
-	for (int i = 0; i < nValidTypes; ++i) {
+	for (size_t i = 0; i < nValidTypes; ++i) {
 		// Step 3. Adjust the mixer's type to match our requirements.
 		pType = ValidMixerTypes[i];
 
@@ -1660,9 +1660,9 @@ LONGLONG CEVRAllocatorPresenter::GetClockTime(LONGLONG PerformanceCounter)
 
 	m_LastClockState = State;
 
-	double TimeChange = llPerf - m_ModeratedTimeLast;
-	double ClockChange = llClockTime - m_ModeratedClockLast;
-	UNREFERENCED_PARAMETER(ClockChange);
+	LONGLONG TimeChangeM = llPerf - m_ModeratedTimeLast;
+	LONGLONG ClockChangeM = llClockTime - m_ModeratedClockLast;
+	UNREFERENCED_PARAMETER(ClockChangeM);
 
 	m_ModeratedTimeLast = llPerf;
 	m_ModeratedClockLast = llClockTime;
@@ -1676,7 +1676,7 @@ LONGLONG CEVRAllocatorPresenter::GetClockTime(LONGLONG PerformanceCounter)
 		ZeroMemory(m_ClockChangeHistory, sizeof(m_ClockChangeHistory));
 		m_ClockTimeChangeHistoryPos = 0;
 	}
-	if (TimeChange) {
+	if (TimeChangeM) {
 		int Pos = m_ClockTimeChangeHistoryPos % 100;
 		int nHistory = min(m_ClockTimeChangeHistoryPos, 100);
 		++m_ClockTimeChangeHistoryPos;
@@ -1707,11 +1707,11 @@ LONGLONG CEVRAllocatorPresenter::GetClockTime(LONGLONG PerformanceCounter)
 			ModerateFloat(m_ModeratedTimeSpeed, ClockSpeedTarget, m_ModeratedTimeSpeedPrim, ChangeSpeed);
 			//			m_ModeratedTimeSpeed = TimeChange / ClockChange;
 		}
-		m_TimeChangeHistory[Pos] = llPerf;
-		m_ClockChangeHistory[Pos] = llClockTime;
+		m_TimeChangeHistory[Pos] = (double)llPerf;
+		m_ClockChangeHistory[Pos] = (double)llClockTime;
 	}
 
-	return Target;
+	return (LONGLONG)Target;
 #else
 	double EstimateTime = m_ModeratedTime + TimeChange * m_ModeratedTimeSpeed + m_ClockDiffCalc;
 	double Diff = Target - EstimateTime;
@@ -2058,8 +2058,8 @@ void CEVRAllocatorPresenter::RenderThread()
 								}
 								Paint(true);
 							} else {
-								LONGLONG TimePerFrame = GetFrameTime() * 10000000.0;
-								LONGLONG DrawTime = (m_PaintTime) * 0.9 - 20000.0; // 2 ms offset
+								LONGLONG TimePerFrame = (LONGLONG)(GetFrameTime() * 10000000.0);
+								LONGLONG DrawTime = m_PaintTime * 9 / 10 - 20000; // 2 ms offset (= m_PaintTime * 0.9 - 20000)
 								//if (!s.iVMR9VSync)
 								DrawTime = 0;
 
@@ -2104,10 +2104,10 @@ void CEVRAllocatorPresenter::RenderThread()
 										LinesUntilVSync = (RefreshLines - CurrentVSyncPos) + TargetVSyncPos;
 									}
 									double TimeUntilVSync = LinesUntilVSync * DetectedScanlineTime;
-									TimeToNextVSync = TimeUntilVSync * 10000000.0;
-									VSyncTime = DetectedRefreshTime * 10000000.0;
+									TimeToNextVSync = (LONGLONG)(TimeUntilVSync * 10000000.0);
+									VSyncTime = (LONGLONG)(DetectedRefreshTime * 10000000.0);
 
-									LONGLONG ClockTimeAtNextVSync = llClockTime + (TimeUntilVSync * 10000000.0) * m_ModeratedTimeSpeed;
+									LONGLONG ClockTimeAtNextVSync = llClockTime + (LONGLONG)(TimeUntilVSync * 10000000.0 * m_ModeratedTimeSpeed);
 
 									SyncOffset = (nsSampleTime - ClockTimeAtNextVSync);
 
@@ -2125,11 +2125,11 @@ void CEVRAllocatorPresenter::RenderThread()
 
 								LONGLONG MinMargin;
 								if (m_FrameTimeCorrection && 0) {
-									MinMargin = 15000.0;
+									MinMargin = 15000;
 								} else {
-									MinMargin = 15000.0 + min(m_DetectedFrameTimeStdDev, 20000.0);
+									MinMargin = 15000 + min(LONGLONG(m_DetectedFrameTimeStdDev), 20000);
 								}
-								LONGLONG TimePerFrameMargin = min(double(TimePerFrame)*0.11, max(double(TimePerFrame)*0.02, MinMargin));
+								LONGLONG TimePerFrameMargin = min(max(TimePerFrame*2/100, MinMargin), TimePerFrame*11/100); // (0.02..0.11)TimePerFrame
 								LONGLONG TimePerFrameMargin0 = TimePerFrameMargin/2;
 								LONGLONG TimePerFrameMargin1 = 0;
 
@@ -2190,9 +2190,9 @@ void CEVRAllocatorPresenter::RenderThread()
 									m_pcFramesDrawn++;
 								} else {
 									if (TimeToNextVSync >= 0 && SyncOffset > 0) {
-										NextSleepTime = ((TimeToNextVSync)/10000) - 2;
+										NextSleepTime = (int)(TimeToNextVSync/10000 - 2);
 									} else {
-										NextSleepTime = ((SyncOffset)/10000) - 2;
+										NextSleepTime = (int)(SyncOffset/10000 - 2);
 									}
 
 									if (NextSleepTime > TimePerFrame) {
@@ -2323,7 +2323,7 @@ HRESULT CEVRAllocatorPresenter::GetScheduledSample(IMFSample** ppSample, int &_C
 	CAutoLock lock(&m_SampleQueueLock);
 	HRESULT		hr = S_OK;
 
-	_Count = m_ScheduledSamples.GetCount();
+	_Count = (int)m_ScheduledSamples.GetCount();
 	if (_Count > 0) {
 		*ppSample = m_ScheduledSamples.RemoveHead().Detach();
 		--_Count;
@@ -2383,7 +2383,7 @@ void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, bool _bSort
 		//		double ForceFPS = 59.94;
 		//		double ForceFPS = 23.976;
 		if (ForceFPS != 0.0) {
-			m_rtTimePerFrame = 10000000.0 / ForceFPS;
+			m_rtTimePerFrame = (REFERENCE_TIME)(10000000.0 / ForceFPS);
 		}
 		LONGLONG Duration = m_rtTimePerFrame;
 		UNREFERENCED_PARAMETER(Duration);
@@ -2396,7 +2396,7 @@ void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, bool _bSort
 
 		m_bCorrectedFrameTime = false;
 
-		LONGLONG Diff2 = PrevTime - m_LastScheduledSampleTimeFP*10000000.0;
+		LONGLONG Diff2 = PrevTime - (LONGLONG)(m_LastScheduledSampleTimeFP * 10000000.0);
 		LONGLONG Diff = Time - PrevTime;
 		if (PrevTime == -1) {
 			Diff = 0;
@@ -2519,9 +2519,9 @@ void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, bool _bSort
 				double PredictedTime = LastTime + m_DetectedFrameTime;
 				if (fabs(PredictedTime - CurrentTime) > 0.0015) { // 1.5 ms wrong, lets correct
 					CurrentTime = PredictedTime;
-					Time = CurrentTime * 10000000.0;
+					Time = (LONGLONG)(CurrentTime * 10000000.0);
 					pSample->SetSampleTime(Time);
-					pSample->SetSampleDuration(m_DetectedFrameTime * 10000000.0);
+					pSample->SetSampleDuration(LONGLONG(m_DetectedFrameTime * 10000000.0));
 					m_bCorrectedFrameTime = true;
 					m_FrameTimeCorrection = 30;
 				}
