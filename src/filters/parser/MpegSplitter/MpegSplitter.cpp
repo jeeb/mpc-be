@@ -1064,71 +1064,63 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		return;
 	}
 
-	REFERENCE_TIME rtPreroll = 10000000i64;
+	REFERENCE_TIME rtPreroll = 10000000;
 
 	if (rt <= rtPreroll || m_rtDuration <= 0) {
 		m_pFile->Seek(0);
 	} else {
-		__int64 len			= m_pFile->GetLength();
-		__int64 seekpos		= (__int64)(1.0*rt/m_rtDuration*len);
-		__int64 minseekpos	= _I64_MAX;
+		__int64 len = m_pFile->GetLength();
+		__int64 seekpos = (__int64)(1.0*rt/m_rtDuration*len);
+		__int64 minseekpos = _I64_MAX;
 
 		REFERENCE_TIME rtmax = rt - rtPreroll;
 		REFERENCE_TIME rtmin = rtmax - 5000000;
 
-		bool found_PTS = false;
+		if (m_rtStartOffset == 0)
+			for (int i = 0; i < _countof(m_pFile->m_streams)-1; i++) {
+				POSITION pos = m_pFile->m_streams[i].GetHeadPosition();
+				while (pos) {
+					DWORD TrackNum = m_pFile->m_streams[i].GetNext(pos);
 
-		for (int i = 0; i < _countof(m_pFile->m_streams)-1 && !found_PTS; i++) {
-			POSITION pos = m_pFile->m_streams[i].GetHeadPosition();
-			while (pos) {
-				DWORD TrackNum = m_pFile->m_streams[i].GetNext(pos);
+					CBaseSplitterOutputPin* pPin = GetOutputPin(TrackNum);
+					if (pPin && pPin->IsConnected()) {
+						m_pFile->Seek(seekpos);
 
-				CBaseSplitterOutputPin* pPin = GetOutputPin(TrackNum);
-				if (pPin && pPin->IsConnected()) {
-					m_pFile->Seek(seekpos);
+						__int64 curpos = seekpos;
+						REFERENCE_TIME pdt = _I64_MIN;
 
-					__int64 curpos = seekpos;
-					REFERENCE_TIME pdt = _I64_MIN;
+						for (int j = 0; j < 10; j++) {
+							REFERENCE_TIME rt = m_pFile->NextPTS(TrackNum);
 
-					int pdtfactor		= 1;	// Factor for dt if dt > 0
-					double ampfactor	= 1.0;	// Amplication factor
+							if (rt < 0) {
+								break;
+							}
 
-					for (int j = 0; j < 20; j++) {
-						REFERENCE_TIME rt = m_pFile->NextPTS(TrackNum);
+							REFERENCE_TIME dt = rt - rtmax;
+							if (dt > 0 && dt == pdt) {
+								dt = 10000000i64;
+							}
 
-						if (rt < 0) {
-							continue;
+
+							if (rtmin <= rt && rt <= rtmax || pdt > 0 && dt < 0) {
+								minseekpos = min(minseekpos, curpos);
+								break;
+							}
+
+							curpos -= (__int64)(1.0*dt/m_rtDuration*len);
+							m_pFile->Seek(curpos);
+
+							//pdt = dt;
 						}
-
-						REFERENCE_TIME dt = rt - rtmax;
-						if (dt > 0) {
-							dt = pdt << pdtfactor;
-							pdtfactor++;
-							ampfactor = 1.0;
-						} else {
-							pdt			= dt;
-							pdtfactor	= 1;
-							ampfactor	= max(1.0 - 0.075 * j, 0.2);  // 1.0 down to 0.2
-						}
-
-						if (rtmin <= rt && rt <= rtmax) {
-							minseekpos	= min(minseekpos, curpos);
-							found_PTS	= (m_pFile->m_type == mpeg_ts);
-							break;
-						}
-
-						curpos -= (__int64)(ampfactor*dt/m_rtDuration*len);
-						m_pFile->Seek(curpos);
 					}
 				}
 			}
-		}
 
 		if (minseekpos != _I64_MAX) {
 			seekpos = minseekpos;
 		} else {
 			// this file is probably screwed up, try plan B, seek simply by bitrate
-			
+
 			rt		-= rtPreroll;
 			seekpos	= (__int64)(1.0*rt/m_rtDuration*len);
 			m_pFile->Seek(seekpos);
