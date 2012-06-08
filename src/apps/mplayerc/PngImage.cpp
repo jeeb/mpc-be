@@ -222,14 +222,14 @@ BYTE* MPCPngImage::BrightnessRGB(int type, BYTE* lpBits, int width, int height, 
 		gcn = gc / (75 + kbr - br) + brn;
 		bcn = bc / (80 + kbr - br) + brn;
 
-		if (rcn < 1) {
-			rcn = 1;
+		if (rcn < 0.5) {
+			rcn = 0.5;
 		}
-		if (gcn < 1) {
-			gcn = 1;
+		if (gcn < 0.5) {
+			gcn = 0.5;
 		}
-		if (bcn < 1) {
-			bcn = 1;
+		if (bcn < 0.5) {
+			bcn = 0.5;
 		}
 	}
 
