@@ -305,6 +305,7 @@ SRCS_C=\
     libavutil/crc.c \
     libavutil/dict.c \
     libavutil/eval.c \
+    libavutil/float_dsp.c \
     libavutil/imgutils.c \
     libavutil/intfloat_readwrite.c \
     libavutil/inverse.c \
@@ -323,6 +324,7 @@ SRCS_C=\
     libavutil/timecode.c \
     libavutil/utils.c \
     libavutil/x86/cpu.c \
+    libavutil/x86/float_dsp_init.c \
 \
     libswscale/input.c \
     libswscale/options.c \
@@ -368,6 +370,7 @@ SRCS_YASM=\
     libavcodec/x86/vp3dsp.asm \
     libavcodec/x86/vp56dsp.asm \
     libavcodec/x86/vp8dsp.asm \
+    libavutil/x86/float_dsp.asm \
     libswscale/x86/input.asm \
     libswscale/x86/output.asm \
     libswscale/x86/scale.asm
