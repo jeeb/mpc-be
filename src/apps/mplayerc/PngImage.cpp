@@ -287,15 +287,12 @@ HBITMAP MPCPngImage::TypeLoadImage(int type, BYTE** pData, int* width, int* heig
 		fread((void*)bmp, 1, size, fp);
 
 		BITMAPINFO& bi = (BITMAPINFO&)bmp[sizeof(BITMAPFILEHEADER)];
-		BITMAPINFOHEADER& bih = bi.bmiHeader;
 
-		*width = bih.biWidth;
-		*height = bih.biHeight;
-		*bpp = bih.biBitCount;
+		*width = bi.bmiHeader.biWidth;
+		*height = bi.bmiHeader.biHeight;
+		*bpp = bi.bmiHeader.biBitCount;
 
-		BITMAPINFO bmi = {{sizeof(BITMAPINFOHEADER), *width, *height, 1, *bpp, BI_RGB, 0, 0, 0, 0, 0}};
-
-		hbm = CreateDIBSection(0, &bmi, DIB_RGB_COLORS, (void**)&(*pData), 0, 0);
+		hbm = CreateDIBSection(0, &bi, DIB_RGB_COLORS, (void**)&(*pData), 0, 0);
 
 	} else if (type == 1) {
 

@@ -54,6 +54,8 @@ void CPlayerToolBar::SwitchTheme()
 {
 	AppSettings& s = AfxGetAppSettings();
 
+	m_nButtonHeight = 16;//reset m_nButtonHeight
+
 	if (s.fDisableXPToolbars) {
 		if (HMODULE h = LoadLibrary(_T("uxtheme.dll"))) {
 			SetWindowThemeFunct f = (SetWindowThemeFunct)GetProcAddress(h, "SetWindowTheme");
@@ -62,6 +64,16 @@ void CPlayerToolBar::SwitchTheme()
 			}
 			FreeLibrary(h);
 		}
+
+		SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 0);//nRemapState = 0 Remap Active
+
+		COLORSCHEME cs;
+		cs.dwSize		= sizeof(COLORSCHEME);
+		cs.clrBtnHighlight	= 0x0046413c;
+		cs.clrBtnShadow		= 0x0037322d;
+
+		GetToolBarCtrl().SetColorScheme(&cs);
+		GetToolBarCtrl().SetIndent(5);
 	} else {
 		if (HMODULE h = LoadLibrary(_T("uxtheme.dll"))) {
 			SetWindowThemeFunct f = (SetWindowThemeFunct)GetProcAddress(h, "SetWindowTheme");
@@ -70,9 +82,17 @@ void CPlayerToolBar::SwitchTheme()
 			}
 			FreeLibrary(h);
 		}
-	}
 
-	m_nButtonHeight = 16;//reset m_nButtonHeight
+		SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 2);//nRemapState = 2 Undo  Active
+
+		COLORSCHEME cs;
+		cs.dwSize		= sizeof(COLORSCHEME);
+		cs.clrBtnHighlight	= GetSysColor(COLOR_BTNFACE);
+		cs.clrBtnShadow		= GetSysColor(COLOR_BTNSHADOW);
+
+		GetToolBarCtrl().SetColorScheme(&cs);
+		GetToolBarCtrl().SetIndent(0);
+	}
 
 	int fp = m_logobm.FileExists("toolbar");
 
@@ -127,27 +147,14 @@ void CPlayerToolBar::SwitchTheme()
 			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 0);//nRemapState = 0 Remap Active
 			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 1);//nRemapState = 1 Remap Disabled
 		}
-
-		COLORSCHEME cs;
-		cs.dwSize		= sizeof(COLORSCHEME);
-		cs.clrBtnHighlight	= 0x0046413c;
-		cs.clrBtnShadow		= 0x0037322d;
-
-		GetToolBarCtrl().SetColorScheme(&cs);
-		GetToolBarCtrl().SetIndent(5);
 	} else {
-		if (!fDisableImgListRemap) {
+		if (NULL == fp) {
 			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 2);//nRemapState = 2 Undo  Active
-			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 3);//nRemapState = 3 Undo  Disabled
+
+			if (!fDisableImgListRemap) {
+				SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 3);//nRemapState = 3 Undo  Disabled
+			}
 		}
-
-		COLORSCHEME cs;
-		cs.dwSize		= sizeof(COLORSCHEME);
-		cs.clrBtnHighlight	= GetSysColor(COLOR_BTNFACE);
-		cs.clrBtnShadow		= GetSysColor(COLOR_BTNSHADOW);
-
-		GetToolBarCtrl().SetColorScheme(&cs);
-		GetToolBarCtrl().SetIndent(0);
 	}
 
 	if (::IsWindow(m_volctrl.GetSafeHwnd())) {
