@@ -74,7 +74,7 @@ typedef struct {
 		channels = s_channels[(buff[3]>>6)&3];
 		framesize = freq ? ((((version&1)?144:72) * bitrate / freq) + ((buff[2]>>1)&1)) : 0;
 
-		return(sync == 0xfff && layer == 3 && bitrate != 0 && freq != 0);
+		return (sync == 0xfff && layer == 3 && bitrate != 0 && freq != 0);
 	}
 
 } mp3hdr;
@@ -119,7 +119,7 @@ public:
 			return FALSE;
 		}
 		/*
-				if(!AfxWinInit(::GetModuleHandle(NULL), NULL, ::GetCommandLine(), 0))
+				if (!AfxWinInit(::GetModuleHandle(NULL), NULL, ::GetCommandLine(), 0))
 				{
 					AfxMessageBox(_T("AfxWinInit failed!"));
 					return FALSE;
@@ -330,13 +330,13 @@ LONGLONG CShoutcastStream::GetBufferFullness()
 		return 0;
 	}
 	LONGLONG ret = 100i64*(m_queue.GetTail().rtStart - m_queue.GetHead().rtStart) / AVGBUFFERLENGTH;
-	return(min(ret, 100));
+	return min(ret, 100);
 }
 
 CString CShoutcastStream::GetTitle()
 {
 	CAutoLock cAutoLock(&m_queue);
-	return(m_title);
+	return m_title;
 }
 
 HRESULT CShoutcastStream::DecideBufferSize(IMemAllocator* pAlloc, ALLOCATOR_PROPERTIES* pProperties)
@@ -607,7 +607,7 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 
 				TRACE(_T("found possible length byte: %d, skipping %d bytes\n"), *p, 1 + *p*16);
 				p += 1 + *p*16;
-				len = (p0 + len) - p;
+				len = (int)(p0 + len - p);
 				TRACE(_T("returning the remaining bytes in the packet: %d\n"), len);
 				if (len <= 0) {
 					TRACE(_T("nothing to return, reading a bit more in\n"));
@@ -710,7 +710,7 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url)
 	m_metaint = metaint;
 	m_nBytesRead = 0;
 
-	return(FindSync());
+	return FindSync();
 }
 
 bool CShoutcastStream::CShoutcastSocket::FindSync()

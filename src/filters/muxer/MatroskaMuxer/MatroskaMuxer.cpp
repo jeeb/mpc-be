@@ -434,21 +434,21 @@ DWORD CMatroskaMuxerFilter::ThreadProc()
 		CNode<Track> Tracks;
 		CAutoPtr<Track> pT(DNew Track());
 		POSITION pos = m_pInputs.GetHeadPosition();
-		for(int i = 1; pos; i++)
+		for (int i = 1; pos; i++)
 		{
 			CMatroskaMuxerInputPin* pPin = m_pInputs.GetNext(pos);
-			if(!pPin->IsConnected()) continue;
+			if (!pPin->IsConnected()) continue;
 
 			CAutoPtr<TrackEntry> pTE(DNew TrackEntry());
 			*pTE = *pPin->GetTrackEntry();
-			if(TrackNumber == 0 && pTE->TrackType == TrackEntry::TypeVideo)
+			if (TrackNumber == 0 && pTE->TrackType == TrackEntry::TypeVideo)
 				TrackNumber = pTE->TrackNumber;
 			pT->TrackEntries.AddTail(pTE);
 		}
 		Tracks.AddTail(pT);
 		Tracks.Write(pStream);
 
-		if(TrackNumber == 0) TrackNumber = 1;
+		if (TrackNumber == 0) TrackNumber = 1;
 	*/
 	bool fTracksWritten = false;
 
@@ -882,7 +882,7 @@ HRESULT CMatroskaMuxerInputPin::CompleteConnect(IPin* pPin)
 			hr = S_OK;
 		}
 		/*
-				else if(m_mt.formattype == FORMAT_MPEGVideo)
+				else if (m_mt.formattype == FORMAT_MPEGVideo)
 				{
 					m_pTE->CodecID.Set("V_DSHOW/MPEG1VIDEO"); // V_MPEG1
 
@@ -893,12 +893,12 @@ HRESULT CMatroskaMuxerInputPin::CompleteConnect(IPin* pPin)
 					m_pTE->DescType = TrackEntry::DescVideo;
 					m_pTE->v.PixelWidth.Set(pm1vi->hdr.bmiHeader.biWidth);
 					m_pTE->v.PixelHeight.Set(abs(pm1vi->hdr.bmiHeader.biHeight));
-					if(pm1vi->hdr.AvgTimePerFrame > 0)
+					if (pm1vi->hdr.AvgTimePerFrame > 0)
 						m_pTE->v.FramePerSec.Set((float)(10000000.0 / pm1vi->hdr.AvgTimePerFrame));
 
 					hr = S_OK;
 				}
-				else if(m_mt.formattype == FORMAT_MPEG2_VIDEO)
+				else if (m_mt.formattype == FORMAT_MPEG2_VIDEO)
 				{
 					m_pTE->CodecID.Set("V_DSHOW/MPEG2VIDEO"); // V_MPEG2
 
@@ -909,7 +909,7 @@ HRESULT CMatroskaMuxerInputPin::CompleteConnect(IPin* pPin)
 					m_pTE->DescType = TrackEntry::DescVideo;
 					m_pTE->v.PixelWidth.Set(pm2vi->hdr.bmiHeader.biWidth);
 					m_pTE->v.PixelHeight.Set(abs(pm2vi->hdr.bmiHeader.biHeight));
-					if(pm2vi->hdr.AvgTimePerFrame > 0)
+					if (pm2vi->hdr.AvgTimePerFrame > 0)
 						m_pTE->v.FramePerSec.Set((float)(10000000.0 / pm2vi->hdr.AvgTimePerFrame));
 
 					hr = S_OK;
@@ -927,7 +927,7 @@ HRESULT CMatroskaMuxerInputPin::CompleteConnect(IPin* pPin)
 			DWORD nSamplesPerSec = wfe->nSamplesPerSec;
 
 			int profile = (p[0]>>3)-1;
-			int	rate1 = ((p[0]&7)<<1)|(p[1]>>7);
+			int rate1 = ((p[0]&7)<<1)|(p[1]>>7);
 			int channels = ((p[1]>>3)&15);
 			int exttype = 0;
 			int rate2 = rate1;
@@ -1262,7 +1262,7 @@ STDMETHODIMP CMatroskaMuxerInputPin::Receive(IMediaSample* pSample)
 			*dst++ = 2;
 			for (int i = 0; i < 2; i++)
 				for (int len = m_pVorbisHdrs[i]->GetCount(); len >= 0; len -= 255) {
-					*dst++ = min(len, 255);
+					*dst++ = (BYTE)min(len, 255);
 				}
 
 			for (int i = 0; i < 3; i++) {
@@ -1283,7 +1283,7 @@ STDMETHODIMP CMatroskaMuxerInputPin::Receive(IMediaSample* pSample)
 	CAutoPtr<BlockGroup> b(DNew BlockGroup());
 	/*
 			// TODO: test this with a longer capture (pcm, mp3)
-			if(S_OK == pSample->IsSyncPoint() && rtStart < m_rtLastStart)
+			if (S_OK == pSample->IsSyncPoint() && rtStart < m_rtLastStart)
 			{
 				TRACE(_T("!!! timestamp went backwards, dropping this frame !!! rtStart (%I64) < m_rtLastStart (%I64)"), rtStart, m_rtLastStart);
 				return S_OK;
