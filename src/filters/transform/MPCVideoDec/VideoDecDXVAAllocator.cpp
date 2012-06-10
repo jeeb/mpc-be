@@ -20,7 +20,6 @@
  *
  */
 
-
 #include "stdafx.h"
 #include "VideoDecDXVAAllocator.h"
 #include "MPCVideoDecFilter.h"

@@ -20,7 +20,6 @@
  *
  */
 
-
 #pragma once
 
 #ifndef uint8_t

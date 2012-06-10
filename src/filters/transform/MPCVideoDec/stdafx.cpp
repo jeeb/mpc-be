@@ -20,7 +20,6 @@
  *
  */
 
-
 #include "stdafx.h"
 
 //#define DXVA_LOGFILE_B

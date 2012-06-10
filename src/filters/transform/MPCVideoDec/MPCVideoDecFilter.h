@@ -3,14 +3,14 @@
  *
  * (C) 2006-2012 see Authors.txt
  *
- * This file is part of mplayerc.
+ * This file is part of MPC-BE.
  *
- * Mplayerc is free software; you can redistribute it and/or modify
+ * MPC-BE is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
- * Mplayerc is distributed in the hope that it will be useful,
+ * MPC-BE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -40,6 +40,8 @@
 #define MPCVideoDecName L"MPC Video Decoder"
 
 #define MAX_BUFF_TIME   20
+
+#define CHECK_HR(x) hr = ##x; if (FAILED(hr)) { TRACE("Error : 0x%08x\n", hr); ASSERT(hr == VFW_E_NOT_COMMITTED); return hr; }
 
 struct AVCodec;
 struct AVCodecContext;
