@@ -1,0 +1,1 @@
+CALL build.bat clean All
