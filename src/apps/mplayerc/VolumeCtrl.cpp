@@ -35,9 +35,6 @@ CVolumeCtrl::CVolumeCtrl(bool fSelfDrawn) : m_fSelfDrawn(fSelfDrawn)
 
 CVolumeCtrl::~CVolumeCtrl()
 {
-	if (m_bmUnderCtrl.GetSafeHandle() != NULL) {
-		m_bmUnderCtrl.DeleteObject();
-	}
 }
 
 bool CVolumeCtrl::Create(CWnd* pParentWnd)
@@ -53,6 +50,7 @@ bool CVolumeCtrl::Create(CWnd* pParentWnd)
 	SetLineSize(0);
 
 	iDisableXPToolbars = s.fDisableXPToolbars + 1;
+
 	iThemeBrightness = s.nThemeBrightness;
 	iThemeRed = s.nThemeRed;
 	iThemeGreen = s.nThemeGreen;
@@ -112,24 +110,26 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 								|| iThemeGreen != s.nThemeGreen
 								|| iThemeBlue != s.nThemeBlue)) {
 					CDC *dc = GetParent()->GetDC();
+					CRect r;
+					GetWindowRect(&r);
+					GetParent()->ScreenToClient(&r);
 					CDC memdc;
 					memdc.CreateCompatibleDC(dc);
-					CRect wr;
-					GetWindowRect(&wr);
-					GetParent()->ScreenToClient(&wr);
 
-					if (m_bmUnderCtrl.GetSafeHandle() == NULL) {
-						m_bmUnderCtrl.CreateCompatibleBitmap(dc, wr.Width(), wr.Height());
+					if (m_bmUnderCtrl.GetSafeHandle() != NULL) {
+						m_bmUnderCtrl.DeleteObject();
 					}
+					m_bmUnderCtrl.CreateCompatibleBitmap(dc, r.Width(), r.Height());
+
 					if (iDisableXPToolbars == 1) {
 						iDisableXPToolbars = 2;
 					}
 
 					CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
-					memdc.BitBlt(0, 0, wr.Width(), wr.Height(), dc, wr.left, wr.top, SRCCOPY);
+					memdc.BitBlt(0, 0, r.Width(), r.Height(), dc, r.left, r.top, SRCCOPY);
 
-					DeleteObject(memdc.SelectObject(bmOld));
 					GetParent()->ReleaseDC(dc);
+					DeleteObject(memdc.SelectObject(bmOld));
 					memdc.DeleteDC();
 				}
 
@@ -150,6 +150,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					if (iDisableXPToolbars == 0) {
 						iDisableXPToolbars = 1;
 					}
+
 					iThemeBrightness = s.nThemeBrightness;
 					iThemeRed = s.nThemeRed;
 					iThemeGreen = s.nThemeGreen;
@@ -157,6 +158,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 					GRADIENT_RECT gr[1] = {{0, 1}};
 					int pa = 255 * 256;
+
 					unsigned p1 = s.clrOutlineABGR, p2 = s.clrFaceABGR;
 					int nVolume = GetPos();
 

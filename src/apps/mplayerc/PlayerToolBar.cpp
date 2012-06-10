@@ -37,17 +37,12 @@ typedef HRESULT (__stdcall * SetWindowThemeFunct)(HWND hwnd, LPCWSTR pszSubAppNa
 IMPLEMENT_DYNAMIC(CPlayerToolBar, CToolBar)
 CPlayerToolBar::CPlayerToolBar()
 	: fDisableImgListRemap(false)
-	, m_nButtonHeight(16)
 	, m_pButtonsImages(NULL)
 {
 }
 
 CPlayerToolBar::~CPlayerToolBar()
 {
-	if (NULL != m_pButtonsImages) {
-		delete m_pButtonsImages;
-		m_pButtonsImages = NULL;
-	}
 }
 
 void CPlayerToolBar::SwitchTheme()
@@ -121,6 +116,7 @@ void CPlayerToolBar::SwitchTheme()
 
 			if (NULL != m_pButtonsImages) {
 				delete m_pButtonsImages;
+				m_pButtonsImages = NULL;
 			}
 			m_pButtonsImages = DNew CImageList();
 			if (32 == fileDepth) {
@@ -445,6 +441,8 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			lr |= CDRF_NOTIFYITEMDRAW;
 			break;
 		case CDDS_ITEMPREPAINT:
+			lr = CDRF_DODEFAULT;
+
 			lr |= TBCDRF_NOETCHEDEFFECT;
 			lr |= TBCDRF_NOBACKGROUND;
 			lr |= TBCDRF_NOEDGES;
@@ -454,6 +452,8 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			lr |= CDRF_NOTIFYITEMDRAW;
 			break;
 		case CDDS_ITEMPOSTPAINT:
+			lr = CDRF_DODEFAULT;
+
 			CDC dc;
 			dc.Attach(pTBCD->nmcd.hdc);
 			CRect r;
@@ -538,10 +538,14 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			lr |= CDRF_NOTIFYITEMDRAW;
 			break;
 		case CDDS_ITEMPREPAINT:
+			lr = CDRF_DODEFAULT;
+
 			lr |= CDRF_NOTIFYPOSTPAINT;
 			lr |= CDRF_NOTIFYITEMDRAW;
 			break;
 		case CDDS_ITEMPOSTPAINT:
+			lr = CDRF_DODEFAULT;
+
 			CDC dc;
 			dc.Attach(pTBCD->nmcd.hdc);
 			CRect r;

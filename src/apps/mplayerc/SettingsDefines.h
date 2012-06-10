@@ -22,7 +22,6 @@
 
 #pragma once
 
-
 #define IDS_R_SETTINGS						_T("Settings")
 #define IDS_R_FILTERS						_T("Filters")
 #define IDS_R_INTERNAL_FILTERS				_T("Internal Filters")
@@ -33,7 +32,6 @@
 #define IDS_R_LOGINS						_T("Logins")
 #define IDS_R_FAVORITES						_T("Favorites")
 #define IDS_R_SHADERS						_T("Shaders")
-
 
 #define IDS_RS_FAV_REMEMBERPOS				_T("RememberPosition")
 #define IDS_RS_FAV_RELATIVEDRIVE			_T("RelativeDrive")
@@ -95,12 +93,11 @@
 #define IDS_RS_SPCMAXRES					_T("SPCMaxRes")
 #define IDS_RS_INTREALMEDIA					_T("IntRealMedia")
 #define IDS_RS_DISABLEXPTOOLBARS			_T("DisableXPToolbars")
-//INS:2451 bobdynlan: hijack XP Toolbars settings
-//-----------------------------------------------------------------------------
-#define IDS_RS_TBREFRESH					_T("Toolbar Refresh")			//ins:2452 bobdynlan:Toolbar Refresh//
-#define IDS_RS_CLRFACEABGR					_T("Toolbar clrFace(ABGR)")		//ins:2452 bobdynlan:Toolbar button color//
-#define IDS_RS_CLROUTLINEABGR				_T("Toolbar clrOutline(ABGR)")	//ins:2452 bobdynlan:Toolbar button outline color//
-//--------------------------------------------------------------------------INS
+
+#define IDS_RS_TBREFRESH					_T("Toolbar Refresh")
+#define IDS_RS_CLRFACEABGR					_T("Toolbar clrFace(ABGR)")
+#define IDS_RS_CLROUTLINEABGR				_T("Toolbar clrOutline(ABGR)")
+
 #define IDS_RS_USEDEDYNAMIC					_T("UseDeDynamic")
 #define IDS_RS_DBLCLICKFULLSCREEN			_T("DblClickFullScreen")
 #define IDS_RS_EXITFULLSCREENATTHEEND		_T("ExitFullscreenAtTheEnd")
