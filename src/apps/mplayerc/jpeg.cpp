@@ -24,7 +24,6 @@
 #include "stdafx.h"
 #include <math.h>
 #include "jpeg.h"
-#include "jpeg_tables.h"
 
 
 bool CJpegEncoder::PutBit(int b, int n)

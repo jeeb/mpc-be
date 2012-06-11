@@ -458,9 +458,6 @@
     <ClInclude Include="jpeg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="jpeg_tables.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="KeyProvider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
