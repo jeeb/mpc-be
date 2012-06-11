@@ -43,6 +43,9 @@ CPlayerToolBar::CPlayerToolBar()
 
 CPlayerToolBar::~CPlayerToolBar()
 {
+	if (m_pButtonsImages) {
+		delete m_pButtonsImages;
+	}
 }
 
 void CPlayerToolBar::SwitchTheme()
@@ -114,7 +117,7 @@ void CPlayerToolBar::SwitchTheme()
 			::GetObject(hBmp, sizeof(dib), &dib);
 			int fileDepth = dib.dsBmih.biBitCount;
 
-			if (NULL != m_pButtonsImages) {
+			if (m_pButtonsImages) {
 				delete m_pButtonsImages;
 				m_pButtonsImages = NULL;
 			}
