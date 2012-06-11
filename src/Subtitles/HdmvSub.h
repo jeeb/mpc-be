@@ -69,7 +69,7 @@ public:
 	HRESULT			ParseSample (BYTE* pData, int lSampleLen, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 
 
-	POSITION		GetStartPosition(REFERENCE_TIME rt, double fps);
+	POSITION		GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld = false);
 	POSITION		GetNext(POSITION pos) {
 		m_pObjects.GetNext(pos);
 		return pos;

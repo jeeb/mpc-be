@@ -42,7 +42,7 @@ public:
 	STDMETHODIMP Lock();
 	STDMETHODIMP Unlock();
 
-	STDMETHODIMP_(POSITION) GetStartPosition(REFERENCE_TIME rt, double fps) = 0;
+	STDMETHODIMP_(POSITION) GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld = false) = 0;
 	STDMETHODIMP_(POSITION) GetNext(POSITION pos) = 0;
 
 	STDMETHODIMP_(REFERENCE_TIME) GetStart(POSITION pos, double fps) = 0;

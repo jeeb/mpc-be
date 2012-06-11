@@ -167,7 +167,7 @@ STDMETHODIMP CSupSubFile::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 
 // ISubPicProvider
 
-STDMETHODIMP_(POSITION) CSupSubFile::GetStartPosition(REFERENCE_TIME rt, double fps)
+STDMETHODIMP_(POSITION) CSupSubFile::GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld)
 {
 	CAutoLock cAutoLock(&m_csCritSec);
 	return m_pSub->GetStartPosition(rt, fps);

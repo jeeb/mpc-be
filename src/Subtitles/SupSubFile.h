@@ -40,7 +40,7 @@ public:
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
 	// ISubPicProvider
-	STDMETHODIMP_(POSITION) GetStartPosition(REFERENCE_TIME rt, double fps);
+	STDMETHODIMP_(POSITION) GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld = false);
 	STDMETHODIMP_(POSITION) GetNext(POSITION pos);
 	STDMETHODIMP_(REFERENCE_TIME) GetStart(POSITION pos, double fps);
 	STDMETHODIMP_(REFERENCE_TIME) GetStop(POSITION pos, double fps);

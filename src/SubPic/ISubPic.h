@@ -115,7 +115,7 @@ public IUnknown {
 	STDMETHOD (Lock) () PURE;
 	STDMETHOD (Unlock) () PURE;
 
-	STDMETHOD_(POSITION, GetStartPosition) (REFERENCE_TIME rt, double fps) PURE;
+	STDMETHOD_(POSITION, GetStartPosition) (REFERENCE_TIME rt, double fps, bool CleanOld = false) PURE;
 	STDMETHOD_(POSITION, GetNext) (POSITION pos) PURE;
 
 	STDMETHOD_(REFERENCE_TIME, GetStart) (POSITION pos, double fps) PURE;

@@ -69,8 +69,12 @@ void CHdmvSub::AllocSegment(int nSize)
 	m_nSegSize       = nSize;
 }
 
-POSITION CHdmvSub::GetStartPosition(REFERENCE_TIME rt, double fps)
+POSITION CHdmvSub::GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld)
 {
+	if (CleanOld) {
+		CHdmvSub::CleanOld(rt);
+	}
+
 	return m_pObjects.GetHeadPosition();
 }
 
@@ -371,7 +375,7 @@ void CHdmvSub::CleanOld(REFERENCE_TIME rt)
 	CompositionObject*	pObject_old;
 	while (m_pObjects.GetCount()>0) {
 		pObject_old = m_pObjects.GetHead();
-		if (pObject_old->m_rtStop < (rt - 30*10000000i64)) {
+		if (pObject_old->m_rtStop < rt) {
 			TRACE_HDMVSUB ("CHdmvSub:HDMV remove object %d  %S => %S (rt=%S)\n", pObject_old->GetRLEDataSize(),
 						   ReftimeToString (pObject_old->m_rtStart), ReftimeToString(pObject_old->m_rtStop),
 						   ReftimeToString(rt));

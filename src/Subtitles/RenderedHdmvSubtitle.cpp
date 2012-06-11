@@ -65,10 +65,10 @@ STDMETHODIMP CRenderedHdmvSubtitle::NonDelegatingQueryInterface(REFIID riid, voi
 
 // ISubPicProvider
 
-STDMETHODIMP_(POSITION) CRenderedHdmvSubtitle::GetStartPosition(REFERENCE_TIME rt, double fps)
+STDMETHODIMP_(POSITION) CRenderedHdmvSubtitle::GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld)
 {
 	CAutoLock cAutoLock(&m_csCritSec);
-	return	m_pSub->GetStartPosition(rt - m_rtStart, fps);
+	return m_pSub->GetStartPosition(rt - m_rtStart, fps, CleanOld);
 }
 
 STDMETHODIMP_(POSITION) CRenderedHdmvSubtitle::GetNext(POSITION pos)
@@ -98,7 +98,7 @@ STDMETHODIMP CRenderedHdmvSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, d
 {
 	CAutoLock cAutoLock(&m_csCritSec);
 	m_pSub->Render (spd, rt - m_rtStart, bbox);
-	m_pSub->CleanOld(rt - m_rtStart);
+	m_pSub->CleanOld(rt - m_rtStart - 60*10000000i64); // Cleanup subtitles older than 1 minute ...
 
 	return S_OK;
 }

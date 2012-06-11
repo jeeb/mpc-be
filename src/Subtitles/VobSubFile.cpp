@@ -1247,7 +1247,7 @@ STDMETHODIMP CVobSubFile::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 
 // TODO: return segments for the fade-in/out time (with animated set to "true" of course)
 
-STDMETHODIMP_(POSITION) CVobSubFile::GetStartPosition(REFERENCE_TIME rt, double fps)
+STDMETHODIMP_(POSITION) CVobSubFile::GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld)
 {
 	rt /= 10000;
 
@@ -2414,7 +2414,7 @@ STDMETHODIMP CVobSubStream::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 
 // ISubPicProvider
 
-STDMETHODIMP_(POSITION) CVobSubStream::GetStartPosition(REFERENCE_TIME rt, double fps)
+STDMETHODIMP_(POSITION) CVobSubStream::GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld)
 {
 	CAutoLock cAutoLock(&m_csSubPics);
 	POSITION pos = m_subpics.GetTailPosition();

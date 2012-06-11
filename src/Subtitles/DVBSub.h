@@ -39,7 +39,7 @@ public:
 	virtual HRESULT			ParseSample (IMediaSample* pSample);
 	virtual void			Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox);
 	virtual HRESULT			GetTextureSize (POSITION pos, SIZE& MaxTextureSize, SIZE& VideoSize, POINT& VideoTopLeft);
-	virtual POSITION		GetStartPosition(REFERENCE_TIME rt, double fps);
+	virtual POSITION		GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld = false);
 	virtual POSITION		GetNext(POSITION pos);
 	virtual REFERENCE_TIME	GetStart(POSITION nPos);
 	virtual REFERENCE_TIME	GetStop(POSITION nPos);

@@ -340,8 +340,12 @@ HRESULT CDVBSub::GetTextureSize(POSITION pos, SIZE& MaxTextureSize, SIZE& VideoS
 	return S_OK;
 }
 
-POSITION CDVBSub::GetStartPosition(REFERENCE_TIME rt, double fps)
+POSITION CDVBSub::GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld)
 {
+	if (CleanOld) {
+		CDVBSub::CleanOld(rt);
+	}
+
 	return m_Pages.GetHeadPosition();
 }
 
@@ -570,7 +574,7 @@ void CDVBSub::CleanOld(REFERENCE_TIME rt)
 	DVB_PAGE* pPage_old;
 	while (m_Pages.GetCount()>0) {
 		pPage_old = m_Pages.GetHead();
-		if (pPage_old->rtStop < (rt - 30*10000000i64)) {
+		if (pPage_old->rtStop < rt) {
 			if (!pPage_old->Rendered) {
 				TRACE_DVB ("DVB - remove unrendered object, %S => %S, (rt=%S)\n",
 							ReftimeToString(pPage_old->rtStart), ReftimeToString(pPage_old->rtStop),

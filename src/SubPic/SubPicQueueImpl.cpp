@@ -609,7 +609,7 @@ STDMETHODIMP_(bool) CSubPicQueueNoThread::LookupSubPic(REFERENCE_TIME rtNow, CCo
 		if (pSubPicProvider) {
 			double fps = m_fps;
 
-			POSITION pos = pSubPicProvider->GetStartPosition(rtNow, fps);
+			POSITION pos = pSubPicProvider->GetStartPosition(rtNow, fps, true);
 			if (pos != 0) {
 				REFERENCE_TIME rtStart = pSubPicProvider->GetStart(pos, fps);
 				REFERENCE_TIME rtStop = pSubPicProvider->GetStop(pos, fps);
