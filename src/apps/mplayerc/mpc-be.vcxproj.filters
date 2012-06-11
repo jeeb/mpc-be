@@ -177,7 +177,7 @@
     <ClCompile Include="Playlist.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\ExtLib\pngdib\pngdib.c">
+    <ClCompile Include="..\..\ExtLib\libpng\pngdib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PngImage.cpp">
@@ -545,7 +545,7 @@
     <ClInclude Include="Playlist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ExtLib\pngdib\pngdib.h">
+    <ClInclude Include="..\..\ExtLib\libpng\pngdib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PngImage.h">

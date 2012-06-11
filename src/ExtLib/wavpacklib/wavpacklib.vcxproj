@@ -267,7 +267,6 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="targetver.h" />
     <ClInclude Include="wavpack\filters.h" />
     <ClInclude Include="wavpack\md5.h" />
     <ClInclude Include="wavpack\unpack3.h" />

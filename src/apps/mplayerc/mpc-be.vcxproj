@@ -212,7 +212,7 @@
     <ClCompile Include="PlayerSubresyncBar.cpp" />
     <ClCompile Include="PlayerToolBar.cpp" />
     <ClCompile Include="Playlist.cpp" />
-    <ClCompile Include="..\..\ExtLib\pngdib\pngdib.c">
+    <ClCompile Include="..\..\ExtLib\libpng\pngdib.c">
       <PrecompiledHeader>
       </PrecompiledHeader>
     </ClCompile>
@@ -340,7 +340,7 @@
     <ClInclude Include="PlayerSubresyncBar.h" />
     <ClInclude Include="PlayerToolBar.h" />
     <ClInclude Include="Playlist.h" />
-    <ClInclude Include="..\..\ExtLib\pngdib\pngdib.h" />
+    <ClInclude Include="..\..\ExtLib\libpng\pngdib.h" />
     <ClInclude Include="PngImage.h" />
     <ClInclude Include="PnSPresetsDlg.h" />
     <ClInclude Include="PPageAccelTbl.h" />
