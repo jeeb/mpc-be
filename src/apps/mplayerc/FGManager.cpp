@@ -1792,8 +1792,8 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 	m_transform.AddTail(pFGF);
 
 	pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
-			   (tra[TRA_FLAC]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
-			   (tra[TRA_FLAC]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+			   (ffmpeg_filters[FFM_FLAC]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
+			   (ffmpeg_filters[FFM_FLAC]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
 	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_FLAC_FRAMED);
 	m_transform.AddTail(pFGF);
 

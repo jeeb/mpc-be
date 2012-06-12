@@ -64,7 +64,7 @@ static filter_t s_filters[] = {
 	{_T("Bink Audio"),            FFMPEG_DECODER, AUDIO,  FFM_BINKA,      IDS_TRA_FFMPEG,},
 	{_T("DSP Group TrueSpeech"),  FFMPEG_DECODER, AUDIO,  FFM_TRUESPEECH, IDS_TRA_FFMPEG,},
 	{_T("DTS"),                   DECODER,        AUDIO,  TRA_DTS,        IDS_TRA_DTS,},
-	{_T("FLAC"),                  DECODER,        AUDIO,  TRA_FLAC,       0},
+	{_T("FLAC"),                  FFMPEG_DECODER, AUDIO,  FFM_FLAC,       IDS_TRA_FFMPEG},
 	{_T("Indeo Audio"),           FFMPEG_DECODER, AUDIO,  FFM_IAC,        IDS_TRA_FFMPEG,},
 	{_T("LPCM"),                  DECODER,        AUDIO,  TRA_LPCM,       IDS_TRA_LPCM,},
 	{_T("MPEG Audio"),            FFMPEG_DECODER, AUDIO,  FFM_MPA,        IDS_TRA_FFMPEG,},

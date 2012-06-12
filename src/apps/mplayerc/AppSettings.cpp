@@ -69,7 +69,6 @@ CAppSettings::CAppSettings()
 	TraFiltersKeys[TRA_LPCM] = _T("TRA_LPCM");
 	TraFiltersKeys[TRA_AC3] = _T("TRA_AC3");
 	TraFiltersKeys[TRA_PS2AUD] = _T("TRA_PS2AUD");
-	TraFiltersKeys[TRA_FLAC] = _T("TRA_FLAC");
 	TraFiltersKeys[TRA_PCM] = _T("TRA_PCM");
 
 	// Internal DXVA decoders
@@ -88,6 +87,7 @@ CAppSettings::CAppSettings()
 	FFMFiltersKeys[FFM_AMR] = _T("FFM_AMR");
 	FFMFiltersKeys[FFM_H264] = _T("FFM_H264");
 	FFMFiltersKeys[FFM_VC1] = _T("FFM_VC1");
+	FFMFiltersKeys[FFM_FLAC] = _T("FFM_FLAC");
 	FFMFiltersKeys[FFM_FLV4] = _T("FFM_FLV4");
 	FFMFiltersKeys[FFM_VP356] = _T("FFM_VP356");
 	FFMFiltersKeys[FFM_VP8] = _T("FFM_VP8");
