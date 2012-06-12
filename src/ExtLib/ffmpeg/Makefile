@@ -321,6 +321,7 @@ SRCS_C=\
     libavutil/random_seed.c \
     libavutil/rational.c \
     libavutil/samplefmt.c \
+    libavutil/sha.c \
     libavutil/timecode.c \
     libavutil/utils.c \
     libavutil/x86/cpu.c \
