@@ -29,6 +29,7 @@
 #include "MpaDecFilter.h"
 
 #include "../../../DSUtil/DSUtil.h"
+#include "../../../DSUtil/AudioParser.h"
 
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
@@ -38,8 +39,6 @@
 #include <vector>
 #include <ffmpeg/PODtypes.h>
 #include <ffmpeg/libavcodec/avcodec.h>
-
-#include <libflac/include/FLAC/stream_decoder.h>
 
 void *__imp_toupper	= toupper;
 
@@ -132,6 +131,8 @@ static const FFMPEG_AUDIO_CODECS ffAudioCodecs[] = {
 	{ &MEDIASUBTYPE_BINKA_RDFT,			CODEC_ID_BINKAUDIO_RDFT},
 	// Indeo Audio
 	{ &MEDIASUBTYPE_IAC,				CODEC_ID_IAC},
+	// FLAC
+	{ &MEDIASUBTYPE_FLAC_FRAMED,		CODEC_ID_FLAC},
 
 	{ &MEDIASUBTYPE_None,				CODEC_ID_NONE},
 };
@@ -297,20 +298,19 @@ CFilterApp theApp;
 
 #endif
 
-// dshow: left, right, center, LFE, left surround, right surround
-// ac3: LFE, left, center, right, left surround, right surround
-// dts: center, left, right, left surround, right surround, LFE
-
-// lets see how we can map these things to dshow (oh the joy!)
-
 #pragma warning(disable : 4245)
 static struct scmap_t {
 	WORD nChannels;
 	BYTE ch[8];
 	DWORD dwChannelMask;
 }
+// dshow: left, right, center, LFE, left surround, right surround
+// a52dec: LFE, left, center, right, left surround, right surround
+// libdca: center, left, right, left surround, right surround, LFE
 
-s_scmap_ac3[2*11] = {
+// lets see how we can map these things to dshow (oh the joy!)
+
+s_scmap_a52dec[2*11] = {
 	{2, {0, 1,-1,-1,-1,-1,-1,-1}, 0}, // A52_CHANNEL
 	{1, {0,-1,-1,-1,-1,-1,-1,-1}, 0}, // A52_MONO
 	{2, {0, 1,-1,-1,-1,-1,-1,-1}, 0}, // A52_STEREO
@@ -336,7 +336,7 @@ s_scmap_ac3[2*11] = {
 	{3, {1, 2, 0,-1,-1,-1,-1,-1}, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_LOW_FREQUENCY}, // A52_DOLBY|A52_LFE
 },
 
-s_scmap_dts[2*10] = {
+s_scmap_libdca[2*10] = {
 	{1, {0,-1,-1,-1,-1,-1,-1,-1}, 0}, // DTS_MONO
 	{2, {0, 1,-1,-1,-1,-1,-1,-1}, 0}, // DTS_CHANNEL
 	{2, {0, 1,-1,-1,-1,-1,-1,-1}, 0}, // DTS_STEREO
@@ -374,40 +374,25 @@ s_scmap_hdmv[] = {
 	{6, { 0, 1, 2, 5, 3, 4,-1,-1 }, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_LOW_FREQUENCY|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT},// 3/2+LFe  FL, FR, FC, BL, BR, LFe
 	{8, { 0, 1, 2, 3, 6, 4, 5,-1 }, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT|SPEAKER_SIDE_LEFT|SPEAKER_SIDE_RIGHT},// 3/4  FL, FR, FC, BL, Bls, Brs, BR
 	{8, { 0, 1, 2, 7, 4, 5, 3, 6 }, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_LOW_FREQUENCY|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT|SPEAKER_SIDE_LEFT|SPEAKER_SIDE_RIGHT},// 3/4+LFe  FL, FR, FC, BL, Bls, Brs, BR, LFe
-},
-
-m_scmap_default[] = {
-	//   FL FR FC LFe BL BR FLC FRC
-	{1, { 0,-1,-1,-1,-1,-1,-1,-1 }, 0}, // Mono    M1, 0
-	{2, { 0, 1,-1,-1,-1,-1,-1,-1 }, 0}, // Stereo  FL, FR
-	{3, { 0, 1, 2,-1,-1,-1,-1,-1 }, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER},															// 3/0      FL, FR, FC
-	{4, { 0, 1, 2, 3,-1,-1,-1,-1 }, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_LOW_FREQUENCY},										// 3/1      FL, FR, FC, Surround
-	{5, { 0, 1, 2, 3, 4,-1,-1,-1 }, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT},						// 3/2      FL, FR, FC, BL, BR
-	{6, { 0, 1, 2, 3, 4, 5,-1,-1 }, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_LOW_FREQUENCY|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT},// 3/2+LFe  FL, FR, FC, BL, BR, LFe
-	{7, { 0, 1, 2, 3, 4, 5, 6,-1 }, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_LOW_FREQUENCY|SPEAKER_SIDE_LEFT|SPEAKER_SIDE_RIGHT|SPEAKER_BACK_CENTER},// 3/4  FL, FR, FC, BL, Bls, Brs, BR
-	{8, { 0, 1, 2, 3, 6, 7, 4, 5 }, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_LOW_FREQUENCY|SPEAKER_SIDE_LEFT|SPEAKER_SIDE_RIGHT|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT},// 3/4+LFe  FL, FR, FC, BL, Bls, Brs, BR, LFe
-},
-
-m_scmap_truehd_51 =
-{6, { 0, 1, 2, 3, 4, 5,-1,-1 }, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_LOW_FREQUENCY|SPEAKER_SIDE_LEFT|SPEAKER_SIDE_RIGHT},
-m_scmap_truehd_71 =
-{8, { 0, 1, 2, 3, 4, 5, 6, 7 }, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_LOW_FREQUENCY|SPEAKER_SIDE_LEFT|SPEAKER_SIDE_RIGHT|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT},
-
-m_ffmpeg_ac3[] = {
-	//  FL FR FC LFe BL BR FLC FRC
-	{2, {0, 1,-1,-1,-1,-1,-1,-1}, 0}, // AC3_CHMODE_DUALMONO
-	{1, {0,-1,-1,-1,-1,-1,-1,-1}, 0}, // AC3_CHMODE_MONO
-	{2, {0, 1,-1,-1,-1,-1,-1,-1}, 0}, // AC3_CHMODE_STEREO
-	{3, {0, 2, 1,-1,-1,-1,-1,-1}, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER}, // AC3_CHMODE_3F
-	{3, {0, 1, 2,-1,-1,-1,-1,-1}, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_BACK_CENTER},  // AC3_CHMODE_2F1R
-	{4, {0, 2, 1, 3,-1,-1,-1,-1}, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_BACK_CENTER}, // AC3_CHMODE_3F1R
-	{4, {0, 1, 2, 3,-1,-1,-1,-1}, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT},     // AC3_CHMODE_2F2R
-	{5, {0, 2, 1, 3, 4,-1,-1,-1}, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT},// AC3_CHMODE_3F2R
-
-	// LFe
-	{6, {0, 1, 2, 3, 4, 5,-1,-1}, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_LOW_FREQUENCY|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT},// AC3_CHMODE_3F2R
 };
 #pragma warning(default : 4245)
+
+static DWORD get_lav_channel_layout(uint64_t layout)
+{
+	if (layout > UINT32_MAX) {
+		if (layout & AV_CH_WIDE_LEFT)
+			layout = (layout & ~AV_CH_WIDE_LEFT) | AV_CH_FRONT_LEFT_OF_CENTER;
+		if (layout & AV_CH_WIDE_RIGHT)
+			layout = (layout & ~AV_CH_WIDE_RIGHT) | AV_CH_FRONT_RIGHT_OF_CENTER;
+
+		if (layout & AV_CH_SURROUND_DIRECT_LEFT)
+			layout = (layout & ~AV_CH_SURROUND_DIRECT_LEFT) | AV_CH_SIDE_LEFT;
+		if (layout & AV_CH_SURROUND_DIRECT_RIGHT)
+			layout = (layout & ~AV_CH_SURROUND_DIRECT_RIGHT) | AV_CH_SIDE_RIGHT;
+	}
+
+	return (DWORD)layout;
+}
 
 CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CTransformFilter(NAME("CMpaDecFilter"), lpunk, __uuidof(this))
@@ -446,8 +431,6 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_pFrame					= NULL;
 	m_pFFBuffer					= NULL;
 	m_nFFBufferSize				= 0;
-
-	memset (&m_flac, 0, sizeof(m_flac));
 
 	m_a52_state = NULL;
 
@@ -527,9 +510,6 @@ HRESULT CMpaDecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, d
 	m_DolbyDigitalMode = DD_Unknown;
 	if (m_pAVCtx) {
 		avcodec_flush_buffers (m_pAVCtx);
-	}
-	if (m_flac.pDecoder) {
-		FLAC__stream_decoder_flush((FLAC__StreamDecoder*) m_flac.pDecoder);
 	}
 
 	m_bResync = true;
@@ -639,8 +619,6 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 		hr = ProcessPS2PCM();
 	} else if (subtype == MEDIASUBTYPE_PS2_ADPCM) {
 		hr = ProcessPS2ADPCM();
-	} else if (subtype == MEDIASUBTYPE_FLAC_FRAMED) {
-		hr = ProcessFlac();
 	} else if (subtype == MEDIASUBTYPE_PCM_NONE ||
 			   subtype == MEDIASUBTYPE_PCM_RAW) {
 		hr = ProcessPCMraw();
@@ -668,7 +646,6 @@ HRESULT CMpaDecFilter::ProcessLPCM()
 		return ERROR_NOT_SUPPORTED;
 	}
 
-	scmap_t* remap     = &m_scmap_default [wfein->nChannels-1];
 	int      nChannels = wfein->nChannels;
 
 	BYTE*    pDataIn   = m_buff.GetData();
@@ -701,13 +678,11 @@ HRESULT CMpaDecFilter::ProcessLPCM()
 				}
 
 				for (int j = 0; j < nChannels; j++) {
-					BYTE nRemap = remap->ch[j];
-					*pDataOut = float(Temp[0][nRemap]) / INT16_PEAK;
+					*pDataOut = float(Temp[0][j]) / INT16_PEAK;
 					++pDataOut;
 				}
 				for (int j = 0; j < nChannels; j++) {
-					BYTE nRemap = remap->ch[j];
-					*pDataOut = float(Temp[1][nRemap]) / INT16_PEAK;
+					*pDataOut = float(Temp[1][j]) / INT16_PEAK;
 					++pDataOut;
 				}
 			}
@@ -746,13 +721,11 @@ HRESULT CMpaDecFilter::ProcessLPCM()
 
 				// Convert into float
 				for (int j = 0; j < nChannels; j++) {
-					BYTE nRemap = remap->ch[j];
-					*pDataOut = float(Temp[0][nRemap]) / INT24_PEAK;
+					*pDataOut = float(Temp[0][j]) / INT24_PEAK;
 					++pDataOut;
 				}
 				for (int j = 0; j < nChannels; j++) {
-					BYTE nRemap = remap->ch[j];
-					*pDataOut = float(Temp[1][nRemap]) / INT24_PEAK;
+					*pDataOut = float(Temp[1][j]) / INT24_PEAK;
 					++pDataOut;
 				}
 			}
@@ -786,13 +759,11 @@ HRESULT CMpaDecFilter::ProcessLPCM()
 
 				// Convert into float
 				for (int j = 0; j < nChannels; j++) {
-					BYTE nRemap = remap->ch[j];
-					*pDataOut = float(Temp[0][nRemap]) / INT24_PEAK;
+					*pDataOut = float(Temp[0][j]) / INT24_PEAK;
 					++pDataOut;
 				}
 				for (int j = 0; j < nChannels; j++) {
-					BYTE nRemap = remap->ch[j];
-					*pDataOut = float(Temp[1][nRemap]) / INT24_PEAK;
+					*pDataOut = float(Temp[1][j]) / INT24_PEAK;
 					++pDataOut;
 				}
 			}
@@ -803,7 +774,7 @@ HRESULT CMpaDecFilter::ProcessLPCM()
 	memmove(m_buff.GetData(), pDataIn, m_buff.GetCount() - len );
 	m_buff.SetCount(m_buff.GetCount() - len);
 
-	return Deliver(pBuff, wfein->nSamplesPerSec, wfein->nChannels, remap->dwChannelMask);
+	return Deliver(pBuff, wfein->nSamplesPerSec, wfein->nChannels, GetDefChannelMask(wfein->nChannels));
 }
 
 
@@ -826,7 +797,7 @@ HRESULT CMpaDecFilter::ProcessHdmvLPCM(bool bAlignOldBuffer) // Blu ray LPCM
 
 	CAtlArray<float> pBuff;
 	pBuff.SetCount(nFrames*nChannels); //nSamples
-	float*	pDataOut = pBuff.GetData();
+	float* pDataOut = pBuff.GetData();
 
 	switch (wfein->wBitsPerSample) {
 		case 16 :
@@ -886,8 +857,8 @@ HRESULT CMpaDecFilter::ProcessA52(BYTE* p, int buffsize, int& size, bool& fEnoug
 						a52_dynrng(m_a52_state, NULL, NULL);
 					}
 
-					int scmapidx = min(flags&A52_CHANNEL_MASK, _countof(s_scmap_ac3)/2);
-					scmap_t& scmap = s_scmap_ac3[scmapidx + ((flags&A52_LFE)?(_countof(s_scmap_ac3)/2):0)];
+					int scmapidx = min(flags&A52_CHANNEL_MASK, _countof(s_scmap_a52dec)/2);
+					scmap_t& scmap = s_scmap_a52dec[scmapidx + ((flags&A52_LFE)?(_countof(s_scmap_a52dec)/2):0)];
 
 					CAtlArray<float> pBuff;
 					pBuff.SetCount(6*256*scmap.nChannels);
@@ -1064,8 +1035,8 @@ HRESULT CMpaDecFilter::ProcessDTS()
 							dts_dynrng(m_dts_state, NULL, NULL);
 						}
 
-						int scmapidx = min(flags&DTS_CHANNEL_MASK, _countof(s_scmap_dts)/2);
-						scmap_t& scmap = s_scmap_dts[scmapidx + ((flags&DTS_LFE)?(_countof(s_scmap_dts)/2):0)];
+						int scmapidx = min(flags&DTS_CHANNEL_MASK, _countof(s_scmap_libdca)/2);
+						scmap_t& scmap = s_scmap_libdca[scmapidx + ((flags&DTS_LFE)?(_countof(s_scmap_libdca)/2):0)];
 
 						int blocks = dts_blocks_num(m_dts_state);
 
@@ -1486,15 +1457,6 @@ HRESULT CMpaDecFilter::ProcessPS2ADPCM()
 	return S_OK;
 }
 
-HRESULT CMpaDecFilter::ProcessFlac()
-{
-	WAVEFORMATEX* wfein = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
-	UNREFERENCED_PARAMETER(wfein);
-
-	FLAC__stream_decoder_process_single ((FLAC__StreamDecoder*) m_flac.pDecoder);
-	return m_flac.hr;
-}
-
 HRESULT CMpaDecFilter::GetDeliveryBuffer(IMediaSample** pSample, BYTE** pData)
 {
 	HRESULT hr;
@@ -1882,8 +1844,8 @@ HRESULT CMpaDecFilter::GetMediaType(int iPosition, CMediaType* pmt)
 	}
 	else if (subtype == MEDIASUBTYPE_Vorbis2) {
 		VORBISFORMAT2 *vf2 = (VORBISFORMAT2 *)mt.Format();
-		scmap_t* scmap = &m_scmap_default[vf2->Channels-1];
-		*pmt = CreateMediaType(GetSampleFormat(), vf2->SamplesPerSec, (WORD)vf2->Channels, scmap->dwChannelMask);
+		WORD nChannels = (WORD)vf2->Channels;
+		*pmt = CreateMediaType(GetSampleFormat(), vf2->SamplesPerSec, nChannels, GetVorbisChannelMask(nChannels));
 	}
 	else {
 		*pmt = CreateMediaType(GetSampleFormat(), wfe->nSamplesPerSec, min(2, wfe->nChannels));
@@ -1902,7 +1864,6 @@ HRESULT CMpaDecFilter::StartStreaming()
 	m_a52_state = a52_init(0);
 	m_dts_state = dts_init(0);
 	m_ps2_state.reset();
-	FlacInitDecoder();
 
 	m_fDiscontinuity = false;
 
@@ -1920,7 +1881,6 @@ HRESULT CMpaDecFilter::StopStreaming()
 		dts_free(m_dts_state);
 		m_dts_state = NULL;
 	}
-	flac_stream_finish();
 	ffmpeg_stream_finish();
 
 	return __super::StopStreaming();
@@ -2059,116 +2019,6 @@ CMpaDecInputPin::CMpaDecInputPin(CTransformFilter* pFilter, HRESULT* phr, LPWSTR
 {
 }
 
-#pragma region Flac callback
-
-void CMpaDecFilter::FlacFillBuffer(BYTE buffer[], size_t *bytes)
-{
-	UINT nSize = min (*bytes, m_buff.GetCount());
-
-	if (nSize > 0) {
-		memcpy_s (buffer, *bytes, m_buff.GetData(), nSize);
-		memmove(m_buff.GetData(), m_buff.GetData() + nSize, m_buff.GetCount() - nSize);
-		m_buff.SetCount(m_buff.GetCount() - nSize);
-
-	}
-	*bytes = nSize;
-}
-
-void CMpaDecFilter::FlacDeliverBuffer  (unsigned blocksize, const __int32 * const buffer[])
-{
-	WAVEFORMATEX*    wfein = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
-	CAtlArray<float> pBuff;
-
-	pBuff.SetCount (blocksize * wfein->nChannels);
-	float*	pDataOut = pBuff.GetData();
-
-	scmap_t& scmap = m_scmap_default[wfein->nChannels-1];
-
-	switch (wfein->wBitsPerSample) {
-		case 16 :
-			for (unsigned i = 0; i < blocksize; i++) {
-				for (int nChannel = 0; nChannel < wfein->nChannels; nChannel++) {
-					FLAC__int16 nVal = (FLAC__int16)buffer[nChannel][i];
-					*pDataOut = (float)nVal / INT16_PEAK;
-					pDataOut++;
-				}
-			}
-			break;
-		case 20 :
-		case 24 :
-			for (unsigned i = 0; i < blocksize; i++) {
-				for (int nChannel = 0; nChannel < wfein->nChannels; nChannel++) {
-					FLAC__int32		nVal = (FLAC__int32)buffer[nChannel][i];
-					*pDataOut = (float)nVal / INT24_PEAK;
-					pDataOut++;
-				}
-			}
-			break;
-	}
-
-	m_flac.hr = Deliver(pBuff, wfein->nSamplesPerSec, wfein->nChannels, scmap.dwChannelMask);
-}
-
-
-static FLAC__StreamDecoderReadStatus StreamDecoderRead(const FLAC__StreamDecoder *decoder, FLAC__byte buffer[], size_t *bytes, void *client_data)
-{
-	CMpaDecFilter* pThis = static_cast<CMpaDecFilter*> (client_data);
-
-	pThis->FlacFillBuffer (buffer, bytes);
-
-	return (*bytes == 0) ?  FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM : FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
-}
-
-static FLAC__StreamDecoderWriteStatus StreamDecoderWrite(const FLAC__StreamDecoder *decoder, const FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data)
-{
-	CMpaDecFilter* pThis = static_cast<CMpaDecFilter*> (client_data);
-
-	pThis->FlacDeliverBuffer (frame->header.blocksize, buffer);
-
-	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
-}
-
-static void StreamDecoderError(const FLAC__StreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data)
-{
-}
-
-
-static void StreamDecoderMetadata(const FLAC__StreamDecoder *decoder, const FLAC__StreamMetadata *metadata, void *client_data)
-{
-}
-
-void CMpaDecFilter::FlacInitDecoder()
-{
-	if (!m_flac.pDecoder) {
-		m_flac.pDecoder = FLAC__stream_decoder_new();
-		if (m_flac.pDecoder) {
-			FLAC__stream_decoder_init_stream ((FLAC__StreamDecoder*)m_flac.pDecoder,
-											  StreamDecoderRead,
-											  NULL,
-											  NULL,
-											  NULL,
-											  NULL,
-											  StreamDecoderWrite,
-											  StreamDecoderMetadata,
-											  StreamDecoderError,
-											  this);
-		}
-	} else {
-		FLAC__stream_decoder_reset ((FLAC__StreamDecoder*)m_flac.pDecoder);
-	}
-}
-
-
-void CMpaDecFilter::flac_stream_finish()
-{
-	if (m_flac.pDecoder) {
-		FLAC__stream_decoder_delete ((FLAC__StreamDecoder*)m_flac.pDecoder);
-		m_flac.pDecoder = NULL;
-	}
-}
-
-#pragma endregion
-
 #pragma region FFmpeg decoder
 
 #define INT64_C(x)		((x) + (INT64_MAX - INT64_MAX))
@@ -2202,7 +2052,9 @@ HRESULT CMpaDecFilter::DeliverFFmpeg(enum CodecID nCodecId, BYTE* p, int buffsiz
 
 	BYTE* pDataInBuff = p;
 	CAtlArray<float> pBuffOut;
-	scmap_t* scmap = NULL;
+
+	WORD  nChannels     = 0;
+	DWORD dwChannelMask = 0;
 
 	BYTE *tmpProcessBuf = NULL;
 
@@ -2331,40 +2183,25 @@ HRESULT CMpaDecFilter::DeliverFFmpeg(enum CodecID nCodecId, BYTE* p, int buffsiz
 
 		if (got_frame && m_pFrame->nb_samples > 0) {
 			CAtlArray<float> pBuff;
-			int              nRemap;
 			float*           pDataOut;
 
-			nRemap = FFGetChannelMap (m_pAVCtx);
-			if (nRemap >=0) {
+			nChannels = m_pAVCtx->channels;
+			if (m_pAVCtx->channel_layout)
+				dwChannelMask = get_lav_channel_layout(m_pAVCtx->channel_layout);
+			else
+				dwChannelMask = GetDefChannelMask(nChannels);
 
-				switch (nCodecId) {
-					case CODEC_ID_EAC3:
-						scmap = &m_ffmpeg_ac3[FFGetChannelMap(m_pAVCtx)];
-						break;
-					case CODEC_ID_TRUEHD:
-						if (m_pAVCtx->channels== 6) {
-							scmap = &m_scmap_truehd_51;
-							break;
-						} else if (m_pAVCtx->channels== 8) {
-							scmap = &m_scmap_truehd_71;
-							break;
-						}
-					default:
-						scmap = &m_scmap_default[m_pAVCtx->channels-1];
-						break;
-				}
+			if (nChannels && dwChannelMask) {
 
-				DWORD dwPCMSize = m_pFrame->nb_samples * scmap->nChannels * av_get_bytes_per_sample(m_pAVCtx->sample_fmt);
+				DWORD dwPCMSize = m_pFrame->nb_samples * nChannels * av_get_bytes_per_sample(m_pAVCtx->sample_fmt);
 				switch (m_pAVCtx->sample_fmt) {
 					case AV_SAMPLE_FMT_S16 :
 						pBuff.SetCount (dwPCMSize / 2);
 						pDataOut = pBuff.GetData();
 
-						for (size_t i=0; i<pBuff.GetCount()/m_pAVCtx->channels; i++) {
-							for (int ch=0; ch<m_pAVCtx->channels; ch++) {
-								*pDataOut = (float)((int16_t*)m_pFrame->data[0]) [scmap->ch[ch]+i*m_pAVCtx->channels] / INT16_PEAK;
-								pDataOut++;
-							}
+						for (size_t i = 0; i < pBuff.GetCount(); ++i) {
+							*pDataOut = (float)((int16_t*)m_pFrame->data[0])[i] / INT16_PEAK;
+							pDataOut++;
 						}
 						break;
 
@@ -2372,11 +2209,9 @@ HRESULT CMpaDecFilter::DeliverFFmpeg(enum CodecID nCodecId, BYTE* p, int buffsiz
 						pBuff.SetCount (dwPCMSize / 4);
 						pDataOut = pBuff.GetData();
 
-						for (size_t i=0; i<pBuff.GetCount()/m_pAVCtx->channels; i++) {
-							for (int ch=0; ch<m_pAVCtx->channels; ch++) {
-								*pDataOut = (float)((int32_t*)m_pFrame->data[0]) [scmap->ch[ch]+i*m_pAVCtx->channels] / INT32_PEAK;
-								pDataOut++;
-							}
+						for (size_t i = 0; i < pBuff.GetCount(); ++i) {
+							*pDataOut = (float)((int32_t*)m_pFrame->data[0])[i] / INT32_PEAK;
+							pDataOut++;
 						}
 						break;
 					case AV_SAMPLE_FMT_FLT:
@@ -2390,7 +2225,7 @@ HRESULT CMpaDecFilter::DeliverFFmpeg(enum CodecID nCodecId, BYTE* p, int buffsiz
 				}
 
 				if (pBuff.GetCount() > 0) {
-					hr = Deliver(pBuff, m_pAVCtx->sample_rate, scmap->nChannels, scmap->dwChannelMask);
+					hr = Deliver(pBuff, m_pAVCtx->sample_rate, nChannels, dwChannelMask);
 					if (FAILED(hr)) {
 						TRACE(_T("CMpaDecFilter::DeliverFFmpeg() - Deliver failed\n"));
 						goto fail;

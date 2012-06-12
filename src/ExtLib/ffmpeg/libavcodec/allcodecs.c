@@ -104,6 +104,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (BINKAUDIO_RDFT, binkaudio_rdft);
     REGISTER_DECODER (COOK, cook);
     REGISTER_DECODER (EAC3, eac3);
+    REGISTER_DECODER (FLAC, flac);
     REGISTER_DECODER (IAC, iac);
     REGISTER_DECODER (MPC7, mpc7);
     REGISTER_DECODER (MPC8, mpc8);    

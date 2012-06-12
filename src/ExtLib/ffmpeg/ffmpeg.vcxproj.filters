@@ -327,6 +327,12 @@
     <ClInclude Include="libavcodec\fft-internal.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
+    <ClInclude Include="libavcodec\flac.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="libavcodec\flacdata.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
     <ClInclude Include="libavcodec\flv.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
@@ -1116,6 +1122,15 @@
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\fft.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\flac.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\flacdata.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\flacdec.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\flashsv.c">

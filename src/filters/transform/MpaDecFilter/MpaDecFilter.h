@@ -50,11 +50,6 @@ struct ps2_state_t {
 	}
 };
 
-struct flac_state_t {
-	void*   pDecoder;
-	HRESULT hr;
-};
-
 struct AVCodec;
 struct AVCodecContext;
 struct AVFrame;
@@ -72,7 +67,7 @@ protected:
 	a52_state_t*			m_a52_state;
 	dts_state_t*			m_dts_state;
 	ps2_state_t				m_ps2_state;
-	flac_state_t			m_flac;
+
 	DolbyDigitalMode		m_DolbyDigitalMode;
 
 	// === FFMpeg variables
@@ -92,7 +87,6 @@ protected:
 	HRESULT ProcessDTS();
 	HRESULT ProcessPS2PCM();
 	HRESULT ProcessPS2ADPCM();
-	HRESULT ProcessFlac();
 	HRESULT ProcessPCMraw();
 	HRESULT ProcessPCMintBE();
 	HRESULT ProcessPCMintLE();
@@ -105,9 +99,6 @@ protected:
 	HRESULT ReconnectOutput(int nSamples, CMediaType& mt);
 	CMediaType CreateMediaType(MPCSampleFormat sf, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask = 0);
 	CMediaType CreateMediaTypeSPDIF(DWORD nSamplesPerSec = 48000);
-
-	void    FlacInitDecoder();
-	void    flac_stream_finish();
 
 	bool    InitFFmpeg(enum CodecID nCodecId);
 	void    ffmpeg_stream_finish();
@@ -177,9 +168,6 @@ public:
 	STDMETHODIMP_(DolbyDigitalMode) GetDolbyDigitalMode();
 
 	STDMETHODIMP SaveSettings();
-
-	void    FlacFillBuffer(BYTE buffer[], size_t *bytes);
-	void    FlacDeliverBuffer (unsigned blocksize, const __int32 * const buffer[]);
 };
 
 class CMpaDecInputPin : public CDeCSSInputPin

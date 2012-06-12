@@ -48,3 +48,6 @@ int ParseEAC3Header    (const BYTE *buf, int *samplerate, int *channels, int *fr
 int ParseMLPHeader     (const BYTE *buf, int *samplerate, int *channels, int *framelength, WORD *bitdepth, bool *isTrueHD); // for TrueHD and MLP
 int ParseHdmvLPCMHeader(const BYTE *buf, int *samplerate, int *channels);
 bool ParseAACLatmHeader(const BYTE *buf, int len, int *samplerate, int *channels, BYTE *extra, unsigned int* extralen);
+
+DWORD GetDefChannelMask(WORD nChannels);
+DWORD GetVorbisChannelMask(WORD nChannels);

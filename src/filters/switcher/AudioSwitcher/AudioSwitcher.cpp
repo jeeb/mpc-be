@@ -438,7 +438,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 				}
 			}
 
-			delete buff;
+			delete [] buff;
 		}
 	}
 
