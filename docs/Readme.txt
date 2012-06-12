@@ -18,7 +18,7 @@ Main Features:
 
 Supported Operating Systems:
 -----------------------------
-* Windows XP SP3, Vista, 7 32bit/64bit
+* Windows XP SP2, Vista, 7 32bit/64bit
 
 
 System Requirements:

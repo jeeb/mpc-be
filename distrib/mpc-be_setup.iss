@@ -76,7 +76,6 @@ DefaultGroupName={#app_name}
 OutputBaseFilename=MPC-BE.{#app_version_out}.x86
 UninstallDisplayName={#app_name} {#app_version}
 #endif
-
 AppName={#app_name}
 AppVersion={#app_version}
 AppVerName={#app_name} {#app_version}
@@ -108,10 +107,9 @@ AllowNoIcons=yes
 ShowTasksTreeLines=yes
 DisableDirPage=auto
 DisableProgramGroupPage=auto
-MinVersion=0,5.01.2600
+MinVersion=0,5.01.2600sp2
 AppMutex=MediaPlayerClassicW
 ChangesAssociations=true
-
 
 [Languages]
 Name: en; MessagesFile: compiler:Default.isl
@@ -165,11 +163,11 @@ Name: "mpciconlib"; Description: "{cm:comp_mpciconlib}"; Types: default custom
 Name: "mpcresources"; Description: "{cm:comp_mpcresources}"; Types: default custom; Flags: disablenouninstallwarning
 #endif
 
-Name: "mpcberegvid"; Description: "{cm:AssociationVideo}"; Types: default custom; Flags: disablenouninstallwarning
-Name: "mpcberegaud"; Description: "{cm:AssociationAudio}"; Types: default custom; Flags: disablenouninstallwarning
-Name: "mpcberegpl"; Description: "{cm:AssociationPlaylist}"; Types: default custom; Flags: disablenouninstallwarning
+Name: "mpcberegvid"; Description: "{cm:AssociationVideo}"; Types: custom; Flags: disablenouninstallwarning
+Name: "mpcberegaud"; Description: "{cm:AssociationAudio}"; Types: custom; Flags: disablenouninstallwarning
+Name: "mpcberegpl"; Description: "{cm:AssociationPlaylist}"; Types: custom; Flags: disablenouninstallwarning
 
-Name: "mpcbeshellext"; Description: "{cm:comp_mpcbeshellext}"; Types: default custom; Flags: disablenouninstallwarning
+Name: "mpcbeshellext"; Description: "{cm:comp_mpcbeshellext}"; Types: custom; Flags: disablenouninstallwarning
 
 [Tasks]
 Name: desktopicon;              Description: {cm:CreateDesktopIcon};     GroupDescription: {cm:AdditionalIcons}
@@ -219,6 +217,7 @@ Source: "..\COPYING.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: ma
 Source: "..\docs\Authors.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
 Source: "..\docs\Authors mpc-hc team.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
 Source: "..\docs\Changelog.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "..\docs\Changelog.Rus.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
 Source: "..\docs\Readme.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
 
 [Icons]
