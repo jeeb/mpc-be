@@ -4842,7 +4842,7 @@ void CMainFrame::SaveDIB(LPCTSTR fn, BYTE* pData, long size)
 	} else if (ext == _T(".jpg")) {
 		CJpegEncoderFile(fn).Encode(pData);
 	} else if (ext == _T(".webp")) {
-		WebPDIB(fn, pData, 90);
+		WebPDIB(fn, pData, 85);
 	}
 
 	CString fName(fn);
