@@ -62,7 +62,7 @@
 #endif
 
 static char g_Gcc_Compiler[31];
-static char g_libavcodec_Version[11];
+static char g_libavcodec_Version[31];
 
 char* GetFFmpegCompiler()
 {
@@ -72,6 +72,6 @@ char* GetFFmpegCompiler()
 
 char* GetlibavcodecVersion()
 {
-	snprintf(g_libavcodec_Version, sizeof(g_libavcodec_Version), "%d.%d.%d", LIBAVCODEC_VERSION_MAJOR, LIBAVCODEC_VERSION_MINOR, LIBAVCODEC_VERSION_MICRO);
+	snprintf(g_libavcodec_Version, sizeof(g_libavcodec_Version), "%d.%d.%d / %d.%d.%d", LIBAVCODEC_VERSION_MAJOR, LIBAVCODEC_VERSION_MINOR, LIBAVCODEC_VERSION_MICRO, LIBAVUTIL_VERSION_MAJOR, LIBAVUTIL_VERSION_MINOR, LIBAVUTIL_VERSION_MICRO);
 	return g_libavcodec_Version;
 }
