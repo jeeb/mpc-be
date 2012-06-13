@@ -89,10 +89,8 @@ bool CSupSubFile::Open(CString fn, CString SubName)
 	WORD sync = 0;
 	sync = (WORD)ReadByte(&f, 2);
 	if (sync != 'PG') {
-		f.Close();
 		return false;
 	}
-	f.Close();
 
 	m_fname		= fn;
 	m_Subname	= SubName;
@@ -107,7 +105,6 @@ UINT CSupSubFile::ThreadProc()
 {
 	CFile f;
 	if (!f.Open(m_fname, CFile::modeRead|CFile::typeBinary|CFile::shareDenyNone)) {
-		f.Close();
 		return 1;
 	}
 
@@ -126,7 +123,6 @@ UINT CSupSubFile::ThreadProc()
 	while ((len = f.Read(buff, sizeof(buff))) > 0) {
 		m_sub.Write(buff, len);
 	}
-	f.Close();
 	m_sub.SeekToBegin();
 
 	WORD sync				= 0;
@@ -138,7 +134,7 @@ UINT CSupSubFile::ThreadProc()
 		if (sync == 'PG') {
 			rtStart = UINT64(ReadByte(&m_sub, 4) * (1000 / 9));
 			m_sub.Seek(4 + 1, CFile::current);	// rtStop + Segment type
-			size = ReadByte(&m_sub, 2) + 3;	// Segment size
+			size = ReadByte(&m_sub, 2) + 3;		// Segment size
 			m_sub.Seek(-3, CFile::current);
 			m_sub.Read(buff, size);
 			m_pSub->ParseSample(buff, size, rtStart, 0);

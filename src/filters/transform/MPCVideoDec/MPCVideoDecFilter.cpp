@@ -1186,9 +1186,9 @@ bool CMPCVideoDecFilter::IsMultiThreadSupported(enum CodecID nCodec)
 		);
 }
 
-CString CMPCVideoDecFilter::GetFileExtension()
+bool CMPCVideoDecFilter::IsAVI()
 {
-	CString ext = _T("");
+	CString ext, fname;
 
 	BeginEnumFilters(m_pGraph, pEF, pBF) {
 		CComQIPtr<IFileSourceFilter> pFSF = pBF;
@@ -1196,8 +1196,8 @@ CString CMPCVideoDecFilter::GetFileExtension()
 			LPOLESTR pFN = NULL;
 			AM_MEDIA_TYPE mt;
 			if (SUCCEEDED(pFSF->GetCurFile(&pFN, &mt)) && pFN && *pFN) {
-				ext = CPath(CStringW(pFN)).GetExtension();
-				ext.MakeLower();
+				fname	= CString(pFN);
+				ext		= CPath(fname).GetExtension().MakeLower();
 				CoTaskMemFree(pFN);
 			}
 			break;
@@ -1205,7 +1205,25 @@ CString CMPCVideoDecFilter::GetFileExtension()
 	}
 	EndEnumFilters
 
-	return ext;
+	if (ext == _T(".avi")) {
+		CFile f;
+		CFileException fileException;
+		if (!f.Open(fname, CFile::modeRead|CFile::typeBinary|CFile::shareDenyNone, &fileException)) {
+			TRACE(_T("CMPCVideoDecFilter::IsAVI() : Can't open file %ws, error = %u\n"), fname, fileException.m_cause);
+			return false;
+		}
+
+		DWORD SYNC = 0;
+		if (f.Read(&SYNC, sizeof(SYNC)) != sizeof(SYNC)) {
+			return false;
+		}
+
+		if (SYNC == MAKEFOURCC('R','I','F','F')) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaType *pmt)
@@ -1249,37 +1267,37 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 			m_h264RandomAccess.flush(m_pAVCtx->thread_count);
 
 			if (pmt->formattype == FORMAT_VideoInfo) {
-				VIDEOINFOHEADER*	vih			= (VIDEOINFOHEADER*)pmt->pbFormat;
+				VIDEOINFOHEADER* vih			= (VIDEOINFOHEADER*)pmt->pbFormat;
 				m_pAVCtx->width					= vih->bmiHeader.biWidth;
 				m_pAVCtx->height				= abs(vih->bmiHeader.biHeight);
 				m_pAVCtx->codec_tag				= vih->bmiHeader.biCompression;
 				m_pAVCtx->bits_per_coded_sample = vih->bmiHeader.biBitCount;
 			} else if (pmt->formattype == FORMAT_VideoInfo2) {
-				VIDEOINFOHEADER2*	vih2		= (VIDEOINFOHEADER2*)pmt->pbFormat;
+				VIDEOINFOHEADER2* vih2			= (VIDEOINFOHEADER2*)pmt->pbFormat;
 				m_pAVCtx->width					= vih2->bmiHeader.biWidth;
 				m_pAVCtx->height				= abs(vih2->bmiHeader.biHeight);
 				m_pAVCtx->codec_tag				= vih2->bmiHeader.biCompression;
 				m_pAVCtx->bits_per_coded_sample = vih2->bmiHeader.biBitCount;
 			} else if (pmt->formattype == FORMAT_MPEGVideo) {
-				MPEG1VIDEOINFO*		mpgv		= (MPEG1VIDEOINFO*)pmt->pbFormat;
+				MPEG1VIDEOINFO* mpgv			= (MPEG1VIDEOINFO*)pmt->pbFormat;
 				m_pAVCtx->width					= mpgv->hdr.bmiHeader.biWidth;
 				m_pAVCtx->height				= abs(mpgv->hdr.bmiHeader.biHeight);
 				m_pAVCtx->codec_tag				= mpgv->hdr.bmiHeader.biCompression;
 				m_pAVCtx->bits_per_coded_sample = mpgv->hdr.bmiHeader.biBitCount;
 			} else if (pmt->formattype == FORMAT_MPEG2Video) {
-				MPEG2VIDEOINFO*		mpg2v		= (MPEG2VIDEOINFO*)pmt->pbFormat;
+				MPEG2VIDEOINFO* mpg2v			= (MPEG2VIDEOINFO*)pmt->pbFormat;
 				m_pAVCtx->width					= mpg2v->hdr.bmiHeader.biWidth;
 				m_pAVCtx->height				= abs(mpg2v->hdr.bmiHeader.biHeight);
 				m_pAVCtx->codec_tag				= mpg2v->hdr.bmiHeader.biCompression;
 				m_pAVCtx->bits_per_coded_sample = mpg2v->hdr.bmiHeader.biBitCount;
 
 				if (mpg2v->hdr.bmiHeader.biCompression == NULL) {
-					m_pAVCtx->codec_tag = pmt->subtype.Data1;
+					m_pAVCtx->codec_tag			= pmt->subtype.Data1;
 				} else if ( (m_pAVCtx->codec_tag == MAKEFOURCC('a','v','c','1')) || (m_pAVCtx->codec_tag == MAKEFOURCC('A','V','C','1'))) {
-					m_pAVCtx->nal_length_size = mpg2v->dwFlags;
-					m_bReorderBFrame = (GetFileExtension() == _T(".avi")) ? true : false;
+					m_pAVCtx->nal_length_size	= mpg2v->dwFlags;
+					m_bReorderBFrame			= IsAVI() ? true : false;
 				} else if ( (m_pAVCtx->codec_tag == MAKEFOURCC('m','p','4','v')) || (m_pAVCtx->codec_tag == MAKEFOURCC('M','P','4','V'))) {
-					m_bReorderBFrame = false;
+					m_bReorderBFrame			= false;
 				}
 			} else {
 				return VFW_E_INVALIDMEDIATYPE;

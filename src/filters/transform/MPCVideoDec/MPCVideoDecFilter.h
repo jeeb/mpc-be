@@ -232,7 +232,7 @@ public:
 	}
 
 	void			UpdateFrameTime (REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop, bool b_repeat_pict = false);
-	CString			GetFileExtension();
+	bool			IsAVI();
 
 	// === Overriden DirectShow functions
 	HRESULT			SetMediaType(PIN_DIRECTION direction,const CMediaType *pmt);
