@@ -18,12 +18,11 @@
 
 #include "stdafx.h"
 #include <vector>
-#include <ffmpeg/PODtypes.h>
 #include <ffmpeg/libavcodec/avcodec.h>
 #include <uuids.h>
 #include <moreuuids.h>
-#include <ffmpeg/char_t.h>
-#include <ffmpeg/ffImgfmt.h>
+#include "char_t.h"
+#include "ffImgfmt.h"
 
 const TcspInfo cspInfos[]= {
     {

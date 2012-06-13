@@ -123,12 +123,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="array_allocator.h" />
-    <ClInclude Include="char_t.h" />
     <ClInclude Include="config.h" />
-    <ClInclude Include="ffcodecs.h" />
-    <ClInclude Include="ffImgfmt.h" />
-    <ClInclude Include="PODtypes.h" />
     <ClInclude Include="libavcodec\x86\cabac.h">
       <Filter>libavcodec\x86</Filter>
     </ClInclude>

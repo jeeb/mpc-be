@@ -63,9 +63,6 @@
     <ClCompile Include="..\..\..\ExtLib\mfc\afxglobals.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\apps\mplayerc\WinAPIUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="H264RandomAccess.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -95,9 +92,6 @@
     <ClInclude Include="IMPCVideoDecFilter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="intrin_fixed.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MPCVideoDecFilter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -119,10 +113,19 @@
     <ClInclude Include="VideoDecOutputPin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\apps\mplayerc\WinAPIUtils.h">
+    <ClInclude Include="H264RandomAccess.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="H264RandomAccess.h">
+    <ClInclude Include="char_t.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ffImgfmt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="array_allocator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\ExtLib\ffmpeg\PODtypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

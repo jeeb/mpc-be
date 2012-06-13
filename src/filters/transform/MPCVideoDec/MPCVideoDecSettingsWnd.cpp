@@ -26,7 +26,7 @@
 
 #include <ffmpeg/PODtypes.h>
 #include <ffmpeg/libavcodec/avcodec.h>
-#include <ffmpeg/ffImgfmt.h>
+#include "ffImgfmt.h"
 
 // ==>>> Resource identifier from "resource.h" present in mplayerc project!
 #define ResStr(id) CString(MAKEINTRESOURCE(id))
