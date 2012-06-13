@@ -4807,42 +4807,7 @@ void CMainFrame::SaveDIB(LPCTSTR fn, BYTE* pData, long size)
 			AfxMessageBox(ResStr(IDS_MAINFRM_53), MB_OK);
 		}
 	} else if (ext == _T(".png")) {
-		DWORD bmpsize = size;
-		LPBITMAPINFOHEADER pdib;
-		LPBITMAPFILEHEADER pbmfh;
-		void *pbits;
-		PNGDIB *pngdib;
-		int ret;
-
-		BITMAPINFO* bi = (BITMAPINFO*)pData;
-
-		BITMAPFILEHEADER bfh;
-		bfh.bfType = 'MB';
-		bfh.bfOffBits = sizeof(bfh) + sizeof(bi->bmiHeader);
-		bfh.bfSize = sizeof(bfh) + size;
-		bfh.bfReserved1 = bfh.bfReserved2 = 0;
-
-		if (bi->bmiHeader.biBitCount <= 8) {
-			if (bi->bmiHeader.biClrUsed) {
-				bfh.bfOffBits += bi->bmiHeader.biClrUsed * sizeof(bi->bmiColors[0]);
-			} else {
-				bfh.bfOffBits += (1 << bi->bmiHeader.biBitCount) * DWORD(sizeof(bi->bmiColors[0]));
-			}
-		}
-		pbmfh = (LPBITMAPFILEHEADER)&bfh;
-		pbits = &pData[pbmfh->bfOffBits-sizeof(bfh)];
-		pdib = (LPBITMAPINFOHEADER)pData;
-		pngdib = pngdib_d2p_init();
-		pngdib_d2p_set_dib(pngdib,pdib,bmpsize,pbits,0);
-		pngdib_d2p_set_png_filename(pngdib, fn);
-		pngdib_d2p_set_gamma_label(pngdib, 1, PNGDIB_DEFAULT_FILE_GAMMA);
-		ret = pngdib_d2p_run(pngdib);
-		pngdib_done(pngdib);
-		if (ret) {
-			CString err_str;
-			err_str.Format(_T("%s\n%s (%d)"), IDS_MAINFRM_53, pngdib_get_error_msg(pngdib), ret);
-			AfxMessageBox(err_str, MB_OK);
-		}
+		PNGDIB(fn, pData, 9);
 	} else if (ext == _T(".jpg")) {
 		CJpegEncoderFile(fn).Encode(pData);
 	} else if (ext == _T(".webp")) {
