@@ -89,7 +89,7 @@ namespace soundtouch
      
     #endif
 
-    #ifndef _M_X64 // MPC-BE custom code: disable optimizations for x64; it fails when linking
+    #if (_M_IX86 || __i386__ || __x86_64__ ) // MPC-BE custom code
         /// Define this to allow X86-specific assembler/intrinsic optimizations. 
         /// Notice that library contains also usual C++ versions of each of these
         /// these routines, so if you're having difficulties getting the optimized 
