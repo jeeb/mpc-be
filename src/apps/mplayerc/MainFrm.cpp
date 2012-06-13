@@ -456,6 +456,12 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_PLAY_PAUSE, OnUpdatePlayPauseStop)
 	ON_UPDATE_COMMAND_UI(ID_PLAY_PLAYPAUSE, OnUpdatePlayPauseStop)
 	ON_UPDATE_COMMAND_UI(ID_PLAY_STOP, OnUpdatePlayPauseStop)
+
+	ON_COMMAND(ID_NAVIGATE_SUBTITLES, OnMenuNavSubtitle)
+	ON_COMMAND(ID_NAVIGATE_AUDIO, OnMenuNavAudio)
+	ON_UPDATE_COMMAND_UI(ID_NAVIGATE_SUBTITLES, OnUpdateMenuNavSubtitle)
+	ON_UPDATE_COMMAND_UI(ID_NAVIGATE_AUDIO, OnUpdateMenuNavAudio)
+
 	ON_COMMAND_RANGE(ID_PLAY_FRAMESTEP, ID_PLAY_FRAMESTEPCANCEL, OnPlayFramestep)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_PLAY_FRAMESTEP, ID_PLAY_FRAMESTEPCANCEL, OnUpdatePlayFramestep)
 	ON_COMMAND_RANGE(ID_PLAY_SEEKBACKWARDSMALL, ID_PLAY_SEEKFORWARDLARGE, OnPlaySeek)
@@ -473,10 +479,19 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND_RANGE(ID_FILTERS_SUBITEM_START, ID_FILTERS_SUBITEM_END, OnPlayFilters)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_FILTERS_SUBITEM_START, ID_FILTERS_SUBITEM_END, OnUpdatePlayFilters)
 	ON_COMMAND_RANGE(ID_SHADERS_START, ID_SHADERS_END, OnPlayShaders)
+	ON_COMMAND_RANGE(ID_AUDIO_SUBITEM_START, ID_AUDIO_SUBITEM_END, OnPlayAudioOption)
 	ON_COMMAND_RANGE(ID_AUDIO_SUBITEM_START, ID_AUDIO_SUBITEM_END, OnPlayAudio)
+
+	ON_COMMAND(ID_MENU_NAVIGATE_AUDIO, OnMenuNavAudio)
+	ON_COMMAND(ID_MENU_NAVIGATE_SUBTITLES, OnMenuNavSubtitle)
+	ON_COMMAND(ID_MENU_NAVIGATE_JUMPTO, OnMenuNavJumpTo)
+
 	ON_UPDATE_COMMAND_UI_RANGE(ID_AUDIO_SUBITEM_START, ID_AUDIO_SUBITEM_END, OnUpdatePlayAudio)
 	ON_COMMAND_RANGE(ID_SUBTITLES_SUBITEM_START, ID_SUBTITLES_SUBITEM_END, OnPlaySubtitles)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_SUBTITLES_SUBITEM_START, ID_SUBTITLES_SUBITEM_END, OnUpdatePlaySubtitles)
+
+	ON_UPDATE_COMMAND_UI_RANGE(ID_NAVIGATE_SUBP_SUBITEM_START, ID_NAVIGATE_SUBP_SUBITEM_END, OnUpdateNavMixSubtitles)
+
 	ON_COMMAND_RANGE(ID_FILTERSTREAMS_SUBITEM_START, ID_FILTERSTREAMS_SUBITEM_END, OnPlayLanguage)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_FILTERSTREAMS_SUBITEM_START, ID_FILTERSTREAMS_SUBITEM_END, OnUpdatePlayLanguage)
 	ON_COMMAND_RANGE(ID_VOLUME_UP, ID_VOLUME_MUTE, OnPlayVolume)
@@ -3187,10 +3202,8 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 			SetupLanguageMenu();
 			pSubMenu = &m_language;
 		} else if (itemID == ID_AUDIOS) {
-			//SetupAudioSwitcherSubMenu();
-			//pSubMenu = &m_audios;
-			SetupNavMixAudioSubMenu();
-			pSubMenu = &m_navMixaudio;
+			SetupAudioOptionSubMenu();
+			pSubMenu = &m_audios;
 		} else if (itemID == ID_SUBTITLES) {
 			SetupSubtitlesSubMenu();
 			pSubMenu = &m_subtitles;
@@ -3198,8 +3211,8 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 			SetupNavMixAudioSubMenu();
 			pSubMenu = &m_navMixaudio;
 		} else if (itemID == ID_SUBTITLELANGUAGE) {
-			SetupNavSubtitleSubMenu();
-			pSubMenu = &m_navsubtitle;
+			SetupNavMixSubtitleSubMenu();
+			pSubMenu = &m_navMixsubtitle;
 		} else if (itemID == ID_VIDEOANGLE) {
 
 			CString menu_str;
@@ -3539,10 +3552,9 @@ void CMainFrame::OnFilePostClosemedia()
 
 	// this will prevent any further UI updates on the dynamically added menu items
 	SetupFiltersSubMenu();
-	//SetupAudioSwitcherSubMenu();
 	SetupSubtitlesSubMenu();
 	SetupNavMixAudioSubMenu();
-	SetupNavSubtitleSubMenu();
+	SetupNavMixSubtitleSubMenu();
 	SetupNavAngleSubMenu();
 	SetupNavChaptersSubMenu();
 	SetupFavoritesSubMenu();
@@ -3758,26 +3770,141 @@ void CMainFrame::OnStreamAudio(UINT nID)
 void CMainFrame::OnStreamSub(UINT nID)
 {
 	nID -= ID_STREAM_SUB_NEXT;
+
 	if (m_iMediaLoadState != MLS_LOADED) {
 		return;
 	}
 
-	int cnt = 0;
-	POSITION pos = m_pSubStreams.GetHeadPosition();
-	while (pos) {
-		cnt += m_pSubStreams.GetNext(pos)->GetStreamCount();
-	}
+	if (GetPlaybackMode() == PM_FILE && AfxGetAppSettings().fEnableSubtitles) {
 
-	if (cnt > 1) {
-		int i = ((m_iSubtitleSel&0x7fffffff)+(nID==0?1:cnt-1))%cnt;
-		m_iSubtitleSel = i | (m_iSubtitleSel&0x80000000);
-		UpdateSubtitle(true);
-		SetFocus();
-	} else if (GetPlaybackMode() == PM_FILE) {
-		SendMessage(WM_COMMAND, ID_OGM_SUB_NEXT+nID);
+		int splcnt	= 0;
+		SubStreams ss;
+		CAtlArray<SubStreams> MixSS;
+		int iSel	= -1;
+		ss.iNum		= -1;
+
+		CComQIPtr<IAMStreamSelect> pSSs = FindSourceSelectableFilter();
+		if (pSSs && !AfxGetAppSettings().fDisableInternalSubtitles) {
+			DWORD cStreamsS = 0;
+			if (SUCCEEDED(pSSs->Count(&cStreamsS)) && cStreamsS > 0) {
+				for (int i = 0; i < (int)cStreamsS; i++) {
+					AM_MEDIA_TYPE* pmt	= NULL;
+					DWORD dwFlags		= 0;
+					LCID lcid			= 0;
+					DWORD dwGroup		= 0;
+					WCHAR* pszName		= NULL;
+					if (FAILED(pSSs->Info(i, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))) {
+						return;
+					}
+
+					if (dwGroup == 2) {
+						if (dwFlags&(AMSTREAMSELECTINFO_ENABLED|AMSTREAMSELECTINFO_EXCLUSIVE)) {
+							iSel = MixSS.GetCount();
+						}
+						ss.iFilter	= 1;
+						ss.iIndex	= i;
+						ss.iNum++;
+						ss.iSel		= iSel;
+						MixSS.Add(ss);
+					}
+
+					if (pmt) {
+						DeleteMediaType(pmt);
+					}
+					if (pszName) {
+						CoTaskMemFree(pszName);
+					}
+				}
+			}
+		}
+		splcnt = MixSS.GetCount();
+
+		int subcnt = -1;
+		POSITION pos = m_pSubStreams.GetHeadPosition();
+		if (splcnt > 0) {
+			m_pSubStreams.GetNext(pos);
+			subcnt++;
+		}
+		while (pos) {
+			subcnt += m_pSubStreams.GetNext(pos)->GetStreamCount();
+			ss.iFilter	= 2;
+			ss.iIndex	= subcnt;
+			ss.iNum++;
+			if (m_iSubtitleSel == subcnt) iSel = MixSS.GetCount();
+			ss.iSel		= iSel;
+			MixSS.Add(ss);
+		}
+
+		int cnt = MixSS.GetCount();
+		if (cnt > 1) {
+			int nNewStream2 = MixSS[(iSel+(nID==0?1:cnt-1))%cnt].iNum;
+			int iF;
+			int nNewStream;
+
+			for (size_t i = 0; i < MixSS.GetCount(); i++) {
+				if (MixSS[i].iNum == nNewStream2) {
+					iF			= MixSS[i].iFilter;
+					nNewStream	= MixSS[i].iIndex;
+					break;
+				}
+			}
+
+			AM_MEDIA_TYPE* pmt	= NULL;
+			DWORD dwFlags		= 0;
+			LCID lcid			= 0;
+			DWORD dwGroup		= 0;
+			WCHAR* pszName		= NULL;
+
+			bool ExtStream = false;
+			if (iF == 1) { // Splitter Subtitle Tracks
+
+				for (size_t i = 0; i < MixSS.GetCount(); i++) {
+					if (MixSS[i].iSel == iSel) {
+						if (MixSS[i].iFilter == 2) {
+							ExtStream = true;
+							break;
+						}
+					}
+				}
+
+				if (ExtStream) { 
+					m_iSubtitleSel = 0;
+					UpdateSubtitle();
+				}
+				pSSs->Enable(nNewStream, AMSTREAMSELECTENABLE_ENABLE);
+				
+				if (SUCCEEDED(pSSs->Info(nNewStream, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))) {
+					CString	strMessage;
+					CString sub_stream = pszName;
+					int k = sub_stream.Find(_T("Subtitle - "));
+					if (k >= 0) {
+						sub_stream = sub_stream.Right(sub_stream.GetLength() - k - 8);
+					}
+					strMessage.Format (ResStr(IDS_SUBTITLE_STREAM), sub_stream);
+					m_OSD.DisplayMessage (OSD_TOPLEFT, strMessage);
+
+					if (pmt) {
+						DeleteMediaType(pmt);
+					}
+					if (pszName) {
+						CoTaskMemFree(pszName);
+					}
+				}
+
+				if (m_pCAP) {
+					m_pCAP->Invalidate();
+				}
+
+			} else if (iF == 2) { 
+				m_iSubtitleSel = nNewStream;
+				UpdateSubtitle(true);
+				SetFocus();
+			}
+		}
 	} else if (GetPlaybackMode() == PM_DVD) {
 		SendMessage(WM_COMMAND, ID_DVD_SUB_NEXT+nID);
 	}
+	
 }
 
 void CMainFrame::OnStreamSubOnOff()
@@ -7771,7 +7898,7 @@ void CMainFrame::OnPlayShaders(UINT nID)
 
 void CMainFrame::OnPlayAudio(UINT nID)
 {
-	int i = (int)nID - (1 + ID_AUDIO_SUBITEM_START);
+	int i = (int)nID - (ID_AUDIO_SUBITEM_START);
 
 	CComQIPtr<IAMStreamSelect> pSS = FindFilter(__uuidof(CAudioSwitcherFilter), pGB);
 	if (!pSS) {
@@ -7785,10 +7912,18 @@ void CMainFrame::OnPlayAudio(UINT nID)
 	}
 }
 
+void CMainFrame::OnPlayAudioOption(UINT nID)
+{
+	int i = (int)nID - (ID_AUDIO_SUBITEM_START);
+	if (i == 0) {
+		ShowOptions(CPPageAudioSwitcher::IDD);
+	}
+}
+
 void CMainFrame::OnUpdatePlayAudio(CCmdUI* pCmdUI)
 {
 	UINT nID = pCmdUI->m_nID;
-	int i = (int)nID - (1 + ID_AUDIO_SUBITEM_START);
+	int i = (int)nID - (ID_AUDIO_SUBITEM_START);
 
 	CComQIPtr<IAMStreamSelect> pSS = FindFilter(__uuidof(CAudioSwitcherFilter), pGB);
 	if (!pSS) {
@@ -7805,7 +7940,7 @@ void CMainFrame::OnUpdatePlayAudio(CCmdUI* pCmdUI)
 
 		if (SUCCEEDED(pSS->Info(i, NULL, &flags, NULL, NULL, NULL, NULL, NULL))) {
 			if (flags&AMSTREAMSELECTINFO_EXCLUSIVE) {
-				pCmdUI->SetRadio(TRUE);
+				//pCmdUI->SetRadio(TRUE);
 			} else if (flags&AMSTREAMSELECTINFO_ENABLED) {
 				pCmdUI->SetCheck(TRUE);
 			} else {
@@ -7883,25 +8018,31 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 		// reload
 		ReloadSubtitle();
 	} else if (i == -2) {
-		// enable
-		if (m_iSubtitleSel == -1) {
-			m_iSubtitleSel = 0;
-		} else {
-			m_iSubtitleSel ^= (1<<31);
-		}
-		UpdateSubtitle();
+
+		OnNavMixStreamSubtitleSelectSubMenu(-1, 2);
+
 	} else if (i == -1) {
 		// override default style
 		// TODO: default subtitles style toggle here
 		AfxGetAppSettings().fUseDefaultSubtitlesStyle = !AfxGetAppSettings().fUseDefaultSubtitlesStyle;
 		UpdateSubtitle();
-	} else if (i >= 0) {
-		// this is an actual item from the subtitles list
-		m_iSubtitleSel = i;
-		UpdateSubtitle();
 	}
+}
 
-	AfxGetAppSettings().fEnableSubtitles = !(m_iSubtitleSel & 0x80000000);
+void CMainFrame::OnUpdateNavMixSubtitles(CCmdUI* pCmdUI)
+{
+	UINT nID = pCmdUI->m_nID;
+	int i = (int)nID - (1 + ID_NAVIGATE_SUBP_SUBITEM_START);
+
+	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
+		pCmdUI->Enable(m_pCAP && !m_fAudioOnly);
+
+		if (i == -1) {	// enabled
+			pCmdUI->SetCheck(AfxGetAppSettings().fEnableSubtitles);
+		} else if (i >= 0) {
+			pCmdUI->Enable(AfxGetAppSettings().fEnableSubtitles);
+		}
+	}
 }
 
 void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
@@ -7910,8 +8051,10 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 	int i = (int)nID - (5 + ID_SUBTITLES_SUBITEM_START); // again, 5 pre-set subtitles options before the actual list
 
 	pCmdUI->Enable(m_pCAP && !m_fAudioOnly);
-
-	if (i == -4) {
+	
+	if (i == -5) {
+		pCmdUI->Enable(TRUE);
+	} else if (i == -4) {
 		// styles
 		pCmdUI->Enable(FALSE);
 
@@ -7942,9 +8085,7 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 		// override
 		// TODO: foxX - default subtitles style toggle here; still wip
 		pCmdUI->SetCheck(AfxGetAppSettings().fUseDefaultSubtitlesStyle);
-		pCmdUI->Enable(AfxGetAppSettings().fEnableSubtitles);
-	} else if (i >= 0) {
-		pCmdUI->SetRadio(i == abs(m_iSubtitleSel));
+		pCmdUI->Enable(AfxGetAppSettings().fEnableSubtitles && m_pCAP && !m_fAudioOnly);
 	}
 }
 
@@ -7957,29 +8098,47 @@ void CMainFrame::OnPlayLanguage(UINT nID)
 		i--;
 	}
 
-
-	bool bExternalTrack = false;
-	CComQIPtr<IAMStreamSelect> pSSA = FindFilter(__uuidof(CAudioSwitcherFilter), pGB);
-	if (!pSSA) {
-		pSSA = FindFilter(L"{D3CD7858-971A-4838-ACEC-40CA5D529DC8}", pGB);
+	DWORD iGr;
+	DWORD cStreams;
+	if (!FAILED(pAMSS->Count(&cStreams))) {
+		DWORD dwGroup;
+		if (!FAILED(pAMSS->Info(nID-i, NULL, NULL, NULL, &dwGroup, NULL, NULL, NULL))) {
+			iGr = dwGroup;	
+		}
 	}
-	if (pSSA) {
-		DWORD cStreamsA = 0;
-		if (SUCCEEDED(pSSA->Count(&cStreamsA)) && cStreamsA > 1) {
-			for (DWORD n = 1; n < cStreamsA; n++) {
-				DWORD flags = 0;
-				if (SUCCEEDED(pSSA->Info(n, NULL, &flags, NULL, NULL, NULL, NULL, NULL))) {
-					if (flags&AMSTREAMSELECTINFO_EXCLUSIVE/* |flags&AMSTREAMSELECTINFO_ENABLED*/) {
-						bExternalTrack = true;
-						break;
+
+	if (iGr == 1) { // Audio Stream
+		bool bExternalTrack = false;
+		CComQIPtr<IAMStreamSelect> pSSA = FindFilter(__uuidof(CAudioSwitcherFilter), pGB);
+		if (!pSSA) {
+			pSSA = FindFilter(L"{D3CD7858-971A-4838-ACEC-40CA5D529DC8}", pGB);
+		}
+		if (pSSA) {
+			DWORD cStreamsA = 0;
+			if (SUCCEEDED(pSSA->Count(&cStreamsA)) && cStreamsA > 1) {
+				for (DWORD n = 1; n < cStreamsA; n++) {
+					DWORD flags = 0;
+					if (SUCCEEDED(pSSA->Info(n, NULL, &flags, NULL, NULL, NULL, NULL, NULL))) {
+						if (flags&AMSTREAMSELECTINFO_EXCLUSIVE/* |flags&AMSTREAMSELECTINFO_ENABLED*/) {
+							bExternalTrack = true;
+							break;
+						}
 					}
 				}
 			}
 		}
-	}
 
-	if (bExternalTrack) {
-		pSSA->Enable(0, AMSTREAMSELECTENABLE_ENABLE);
+		if (bExternalTrack) {
+			pSSA->Enable(0, AMSTREAMSELECTENABLE_ENABLE);
+		}
+	} else if (iGr == 2) { // Subtitle Stream
+		if (!AfxGetAppSettings().fEnableSubtitles || AfxGetAppSettings().fDisableInternalSubtitles) {
+			return;
+		}
+		if (m_iSubtitleSel > 0) {
+			m_iSubtitleSel = 0;
+			UpdateSubtitle();
+		}
 	}
 
 	if (FAILED(pAMSS->Enable(nID-i, AMSTREAMSELECTENABLE_ENABLE))) {
@@ -8007,6 +8166,59 @@ void CMainFrame::OnUpdatePlayLanguage(CCmdUI* pCmdUI)
 	} else {
 		pCmdUI->SetCheck(FALSE);
 	}
+}
+
+void CMainFrame::OnMenuNavAudio()
+{
+	SetupNavMixAudioSubMenu();
+	OnMenu(&m_navMixaudio);
+}
+
+void CMainFrame::OnMenuNavSubtitle()
+{
+	SetupNavMixSubtitleSubMenu();
+	OnMenu(&m_navMixsubtitle);
+}
+
+void CMainFrame::OnMenuNavAudioOptions()
+{
+	SetupAudioOptionSubMenu();
+	OnMenu(&m_audios);
+}
+
+void CMainFrame::OnMenuNavSubtitleOptions()
+{
+	SetupSubtitlesSubMenu();
+	OnMenu(&m_subtitles);
+}
+
+void CMainFrame::OnMenuNavJumpTo()
+{
+	SetupNavChaptersSubMenu();
+	OnMenu(&m_navchapters);
+}
+
+
+void CMainFrame::OnUpdateMenuNavSubtitle(CCmdUI* pCmdUI)
+{
+	bool fEnable = false;
+
+	if (IsSomethingLoaded() && m_iMediaLoadState == MLS_LOADED && !m_fAudioOnly) {
+		fEnable = true;
+	}
+	
+	pCmdUI->Enable(fEnable);
+}
+
+void CMainFrame::OnUpdateMenuNavAudio(CCmdUI* pCmdUI)
+{
+	bool fEnable = false;
+
+	if (IsSomethingLoaded() && m_iMediaLoadState == MLS_LOADED && !m_fAudioOnly) {
+		fEnable = true;
+	}
+	
+	pCmdUI->Enable(fEnable);
 }
 
 void CMainFrame::OnPlayVolume(UINT nID)
@@ -8515,7 +8727,7 @@ void CMainFrame::OnNavigateAudioMix(UINT nID)
 void CMainFrame::OnNavigateSubpic(UINT nID)
 {
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
-		OnNavStreamSelectSubMenu(nID - ID_NAVIGATE_SUBP_SUBITEM_START, 2);
+		OnNavMixStreamSubtitleSelectSubMenu(nID - (ID_NAVIGATE_SUBP_SUBITEM_START+1), 2);
 	} else if (GetPlaybackMode() == PM_DVD) {
 		int i = (int)nID - (1 + ID_NAVIGATE_SUBP_SUBITEM_START);
 
@@ -8529,6 +8741,97 @@ void CMainFrame::OnNavigateSubpic(UINT nID)
 			pDVDC->SelectSubpictureStream(i, DVD_CMD_FLAG_Block, NULL);
 			pDVDC->SetSubpictureState(TRUE, DVD_CMD_FLAG_Block, NULL);
 		}
+	}
+}
+
+void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
+{
+
+	bool bSplitterMenu = false;
+	int splsubcnt = 0;
+	int i = (int)id;
+	//SelSub2 = m_iSubtitleSel;
+	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1) && i>=0) {
+		
+		
+		CComQIPtr<IAMStreamSelect> pSS = FindSourceSelectableFilter();
+		if (pSS) {
+			DWORD cStreams = 0;
+			if (!FAILED(pSS->Count(&cStreams))) {
+				for (int m = 0, j = cStreams; m < j; m++) {
+					DWORD dwFlags, dwGroup;
+					LCID lcid;
+					WCHAR* pszName = NULL;
+
+					if (FAILED(pSS->Info(m, NULL, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))
+							|| !pszName) {
+						continue;
+					}
+
+					if (pszName) {
+						CoTaskMemFree(pszName);
+					}
+
+					if (dwGroup != 2) {
+						continue;
+					}
+					splsubcnt++;
+
+					bSplitterMenu = true; 
+					if (id == 0) {
+
+						if (m_iSubtitleSel != 0) {
+							m_iSubtitleSel = 0;
+							UpdateSubtitle();
+					    }
+						pSS->Enable(m, AMSTREAMSELECTENABLE_ENABLE);
+						SelSub2 = m_iSubtitleSel;
+						
+						if (!AfxGetAppSettings().fEnableSubtitles) {
+							m_iSubtitleSel = -1;
+							UpdateSubtitle();
+						}// else {
+							//OnStreamSubOnOff();
+							//OnStreamSubOnOff();
+						//}
+						if (m_pCAP) {
+							m_pCAP->Invalidate();
+						}
+						return;
+					}
+						
+					id--;
+				}
+			}
+		}
+	} else if (GetPlaybackMode() == PM_DVD) {
+		pDVDC->SelectSubpictureStream(id, DVD_CMD_FLAG_Block, NULL);
+		return;
+	}
+
+
+	if (i == -1) {
+		AfxGetAppSettings().fEnableSubtitles = !AfxGetAppSettings().fEnableSubtitles;
+		// enable
+
+		if (!AfxGetAppSettings().fEnableSubtitles) {
+			m_iSubtitleSel = -1;
+		} else {
+			m_iSubtitleSel = SelSub2;
+		}
+
+		UpdateSubtitle();
+	
+	} else if (i >= 0) {
+		int m = splsubcnt - (splsubcnt > 0 ? 1 : 0);
+		m = i - m;
+		
+		m_iSubtitleSel = m;
+		SelSub2 = m_iSubtitleSel;
+		if (!AfxGetAppSettings().fEnableSubtitles) {
+			m_iSubtitleSel = -1;
+		}
+		UpdateSubtitle();
 	}
 }
 
@@ -11480,6 +11783,272 @@ int SelectAudio(const CComPtr<IAMStreamSelect> &pSS)
 
 #define BREAK(msg) {err = msg; break;}
 
+
+void CMainFrame::SubFlags(CString strname, bool &forced, bool &def)
+{
+
+	if (strname.Right(16).MakeLower() == _T("[default,forced]")) {
+		def		= 1;
+		forced	= 1;
+	} else if (strname.Right(9).MakeLower() == _T("[default]")) {
+		def		= 1;
+		forced	= 0;
+	} else if (strname.Right(8).MakeLower() == _T("[forced]")) {
+		def		= 0;
+		forced	= 1;
+	} else {
+		def		= 0;
+		forced	= 0;
+	}
+
+}
+
+void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
+{
+	if (m_pCAP && (!m_fAudioOnly || m_fRealMediaGraph)) {
+
+		SubStreams substream;
+		subarray.RemoveAll();
+		int defsub			= 0;
+		int checkedsplsub	= -1;
+		int iNum			= 0;
+		cntintsub			= 0;
+
+		CComQIPtr<IAMStreamSelect> pSSs = FindSourceSelectableFilter();
+		if (!pSSs) pSSs = pGB;
+		if (pSSs && !AfxGetAppSettings().fDisableInternalSubtitles) {
+
+			DWORD cStreams;
+			if (!FAILED(pSSs->Count(&cStreams))) {
+				DWORD dwPrevGroup = (DWORD)-1;
+
+				for (int i = 0, j = cStreams; i < j; i++) {
+					DWORD dwFlags, dwGroup;
+					LCID lcid;
+					WCHAR* pszName = NULL;
+
+					if (FAILED(pSSs->Info(i, NULL, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))	|| !pszName) {
+						continue;
+					}
+
+					if (dwGroup == 2) {
+
+						CString lang;
+						if (lcid == 0) {
+							lang = pszName;
+						} else {
+							int len = GetLocaleInfo(lcid, LOCALE_SENGLANGUAGE, lang.GetBuffer(64), 64);
+							lang.ReleaseBufferSetLength(max(len-1, 0));
+						}
+
+						CString name(pszName);
+						name = name.Trim();
+						name.Replace(_T("&"), _T("&&"));
+						if (pszName) CoTaskMemFree(pszName);
+
+						UINT flags = MF_BYCOMMAND|MF_STRING|MF_ENABLED;
+						if (dwFlags) {
+							checkedsplsub = i;
+						}
+						cntintsub++;
+						substream.Extsub	= false;
+						substream.iFilter	= 1;
+						substream.iNum		= iNum++;
+						substream.iIndex	= i;
+
+						bool Forced, Def;
+						SubFlags(name, Forced, Def);
+
+						substream.lang		= lang;
+						substream.forced	= Forced;
+						substream.def		= Def;
+
+						subarray.Add(substream);
+					}
+				}
+			}
+		}
+
+		if (AfxGetAppSettings().fDisableInternalSubtitles) {
+			m_pSubStreams.RemoveAll();
+		}
+
+		
+		int splsubcnt	= subarray.GetCount();
+
+		if (splsubcnt < 1) {
+			POSITION pos = m_pSubStreams.GetHeadPosition();
+			int tPos = -1;
+			while (pos) {
+				tPos++;
+				CComPtr<ISubStream> pSubStream = m_pSubStreams.GetNext(pos);
+				int i = pSubStream->GetStream();
+				WCHAR* pName = NULL;
+				LCID lcid;
+				if (SUCCEEDED(pSubStream->GetStreamInfo(i, &pName, &lcid))) {
+					cntintsub++;
+
+					CString lang;
+					if (lcid == 0) {
+						lang = pName;
+					} else {
+						int len = GetLocaleInfo(lcid, LOCALE_SENGLANGUAGE, lang.GetBuffer(64), 64);
+						lang.ReleaseBufferSetLength(max(len-1, 0));
+					}
+
+					CString name(pName);
+					name = name.Trim();
+					name.Replace(_T("&"), _T("&&"));
+					if (pName) CoTaskMemFree(pName);
+
+					substream.Extsub	= false;
+					substream.iFilter	= 2;
+					substream.iNum		= iNum++;
+					substream.iIndex	= tPos;
+
+					bool Forced, Def;
+					SubFlags(name, Forced, Def);
+
+					substream.lang		= lang;
+					substream.forced	= Forced;
+					substream.def		= Def;
+
+					subarray.Add(substream);
+				}
+			}
+		}
+
+		ATL::CInterfaceList<ISubStream, &__uuidof(ISubStream)> subs;	
+		while (!m_pSubStreams.IsEmpty()) {
+			subs.AddTail(m_pSubStreams.RemoveHead());
+		}
+
+		int iInternalSub = subs.GetCount();
+
+
+		POSITION pos = pOMD->subs.GetHeadPosition();
+		while (pos) {
+			LoadSubtitle(pOMD->subs.GetNext(pos));
+		}
+
+
+
+		pos = m_pSubStreams.GetHeadPosition();
+		CComPtr<ISubStream> pSubStream;
+		int tPos = -1;
+		int extcnt = -1;
+		for (size_t i = 0; i < subarray.GetCount(); i++) {
+			if (subarray[i].iFilter == 2) extcnt++;
+		}
+
+		int intsub = 0;
+		
+		while (pos) {
+			pSubStream = m_pSubStreams.GetNext(pos);
+			tPos++;
+			if (!pSubStream) continue;
+		
+			for (int i=0; i<pSubStream->GetStreamCount(); i++) {
+				WCHAR* pName = NULL;
+				LCID lcid;
+				if (SUCCEEDED(pSubStream->GetStreamInfo(i, &pName, &lcid))) {
+					CString name(pName);
+					name.Replace(_T("&"), _T("&&"));
+					if (pName) CoTaskMemFree(pName);
+
+					substream.Extsub	= true;
+					substream.iFilter	= 2;
+					substream.iNum		= iNum++;
+					substream.iIndex	= tPos+ (extcnt<0?0:extcnt+1);
+
+					bool Forced, Def;
+					SubFlags(name, Forced, Def);
+
+					substream.lang		= name;
+					substream.forced	= 0;
+					substream.def		= 0;
+
+					subarray.Add(substream);
+				}
+			}
+		}	
+
+		
+		m_pSubStreams.RemoveAll();
+
+		while (!subs.IsEmpty()) {
+			m_pSubStreams.AddTail(subs.RemoveHead());
+		}
+
+		pos = pOMD->subs.GetHeadPosition();
+		while (pos) {
+			LoadSubtitle(pOMD->subs.GetNext(pos));
+		}
+			
+		int cnt = subarray.GetCount();
+		defsub = GetSubSelIdx();
+
+		if (FindSourceSelectableFilter() && AfxGetAppSettings().fDisableInternalSubtitles) {
+			defsub++;
+		}
+
+		if (AfxGetAppSettings().fEnableSubtitles && m_pSubStreams.GetCount() > 0) {
+			CComPtr<ISubStream> pSub = m_pSubStreams.GetHead();
+			SetSubtitle(pSub);
+		}
+
+		if (cnt > 0) {
+			UINT udefsub = defsub;
+			OnNavMixStreamSubtitleSelectSubMenu(udefsub, 2);
+		}
+	}
+
+}
+
+int CMainFrame::GetSubSelIdx()
+{
+	bool extsubpri	= AfxGetAppSettings().fPrioritizeExternalSubtitles;
+	int selsub		= 0;
+	int maxrating	= 0;
+	int cnt			= subarray.GetCount();
+	bool bLangFound = false;
+	CStringW slo = AfxGetAppSettings().strSubtitlesLanguageOrder;
+	int tPos = 0;
+	CStringW langN = slo.Tokenize(_T(",; "), tPos);
+
+	while (tPos != -1) {
+
+		for (int i = 0, j = cnt; i < j; i++) {
+
+			int rating	= 0;
+			int ll		= langN.GetLength();
+			if (subarray[i].lang.Left(ll).CompareNoCase(langN) == 0) {
+				rating += 8;
+				bLangFound = true;
+			}
+
+			if (extsubpri && rating == 8 && subarray[i].Extsub)	rating += 16;
+			if (subarray[i].forced == 1)	rating += 4;
+			if (subarray[i].def == 1)	rating += 2;
+			if (i==0)	rating += 1;
+
+			if (rating > maxrating) {
+				maxrating	= rating;
+				selsub		= i;
+			}
+		}
+
+		if (bLangFound) {
+			return selsub;
+		} 
+
+		langN = slo.Tokenize(_T(",; "), tPos);
+
+	}
+
+	return selsub;
+}
+
 bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 {
 	AppSettings& s = AfxGetAppSettings();
@@ -11746,46 +12315,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			BREAK(aborted)
 		}
 
-		if (m_pCAP && (!m_fAudioOnly || m_fRealMediaGraph)) {
-
-			if (s.fDisableInternalSubtitles) {
-				m_pSubStreams.RemoveAll(); // Needs to be replaced with code that checks for forced subtitles.
-			}
-
-			if (s.fPrioritizeExternalSubtitles) {
-				ATL::CInterfaceList<ISubStream, &__uuidof(ISubStream)> subs;
-
-				while (!m_pSubStreams.IsEmpty()) {
-					subs.AddTail(m_pSubStreams.RemoveHead());
-				}
-
-				POSITION pos = pOMD->subs.GetHeadPosition();
-				while (pos) {
-					LoadSubtitle(pOMD->subs.GetNext(pos));
-				}
-
-				extern ISubStream *InsertSubStream(CInterfaceList<ISubStream> *subStreams, const CComPtr<ISubStream> &theSubStream);
-
-				CInterfaceList<ISubStream> pSubStreams;
-				while (!subs.IsEmpty()) {
-					InsertSubStream(&pSubStreams, subs.RemoveHead());
-				}
-
-				while (!pSubStreams.IsEmpty()) {
-					m_pSubStreams.AddTail(pSubStreams.RemoveHead());
-				}
-			} else {
-				POSITION pos = pOMD->subs.GetHeadPosition();
-				while (pos) {
-					LoadSubtitle(pOMD->subs.GetNext(pos));
-				}
-			}
-
-			if (AfxGetAppSettings().fEnableSubtitles && m_pSubStreams.GetCount() > 0) {
-				CComPtr<ISubStream> pSub = m_pSubStreams.GetHead();
-				SetSubtitle(pSub);
-			}
-		}
+		OpenSetupSubStream(pOMD);
 
 		if (m_fOpeningAborted) {
 			BREAK(aborted)
@@ -11837,7 +12367,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 		DWORD cStreams = 0;
 		if (pSS && SUCCEEDED(pSS->Count(&cStreams)) && cStreams > 0) {
-			OnPlayAudio (ID_AUDIO_SUBITEM_START + 1 + SelectAudio(pSS));
+			OnPlayAudio (ID_AUDIO_SUBITEM_START + SelectAudio(pSS));
 		}
 
 		AfxGetAppSettings().nCLSwitches &= ~CLSW_OPEN;
@@ -12527,6 +13057,20 @@ void CMainFrame::SetupAudioSwitcherSubMenu()
 	}
 }
 
+void CMainFrame::SetupAudioOptionSubMenu()
+{
+	CMenu* pSub = &m_audios;
+
+	if (!IsMenu(pSub->m_hMenu)) {
+		pSub->CreatePopupMenu();
+	} else while (pSub->RemoveMenu(0, MF_BYPOSITION)) {
+			;
+		}
+	UINT id = ID_AUDIO_SUBITEM_START;
+	pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id, ResStr(IDS_SUBTITLES_OPTIONS));
+
+}
+
 void CMainFrame::SetupSubtitlesSubMenu()
 {
 	CMenu* pSub = &m_subtitles;
@@ -12537,60 +13081,21 @@ void CMainFrame::SetupSubtitlesSubMenu()
 			;
 		}
 
-	if (m_iMediaLoadState != MLS_LOADED || m_fAudioOnly || !m_pCAP) {
-		return;
-	}
-
 	UINT id = ID_SUBTITLES_SUBITEM_START;
 
-	POSITION pos = m_pSubStreams.GetHeadPosition();
+	pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_SUBTITLES_OPTIONS));
+	pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_SUBTITLES_STYLES));
+	pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_SUBTITLES_RELOAD));
+	pSub->AppendMenu(MF_SEPARATOR);
 
-	if (pos) {
-		pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_SUBTITLES_OPTIONS));
-		pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_SUBTITLES_STYLES));
-		pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_SUBTITLES_RELOAD));
-		pSub->AppendMenu(MF_SEPARATOR);
+	pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_SUBTITLES_ENABLE));
+	pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_SUBTITLES_DEFAULT_STYLE));
 
-		pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_SUBTITLES_ENABLE));
-		pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_SUBTITLES_DEFAULT_STYLE));
-		pSub->AppendMenu(MF_SEPARATOR);
-	}
-
-	while (pos) {
-		CComPtr<ISubStream> pSubStream = m_pSubStreams.GetNext(pos);
-		if (!pSubStream) {
-			continue;
-		}
-
-		for (int i = 0, j = pSubStream->GetStreamCount(); i < j; i++) {
-			WCHAR* pName = NULL;
-			if (SUCCEEDED(pSubStream->GetStreamInfo(i, &pName, NULL))) {
-				CString name(pName);
-				name.Replace(_T("&"), _T("&&"));
-
-				pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, name);
-				CoTaskMemFree(pName);
-			} else {
-				pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_AG_UNKNOWN));
-			}
-		}
-
-		// TODO: find a better way to group these entries
-		if (pos && m_pSubStreams.GetAt(pos)) {
-			CLSID cur, next;
-			pSubStream->GetClassID(&cur);
-			m_pSubStreams.GetAt(pos)->GetClassID(&next);
-
-			if (cur != next) {
-				pSub->AppendMenu(MF_SEPARATOR);
-			}
-		}
-	}
 }
 
-void CMainFrame::SetupNavSubtitleSubMenu()
+void CMainFrame::SetupNavMixSubtitleSubMenu()
 {
-	CMenu* pSub = &m_navsubtitle;
+	CMenu* pSub = &m_navMixsubtitle;
 
 	if (!IsMenu(pSub->m_hMenu)) {
 		pSub->CreatePopupMenu();
@@ -12605,7 +13110,7 @@ void CMainFrame::SetupNavSubtitleSubMenu()
 	UINT id = ID_NAVIGATE_SUBP_SUBITEM_START;
 
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
-		SetupNavStreamSelectSubMenu(pSub, id, 2);
+		SetupNavMixStreamSubtitleSelectSubMenu(pSub, id, 2);
 	} else if (GetPlaybackMode() == PM_DVD) {
 		ULONG ulStreamsAvailable, ulCurrentStream;
 		BOOL bIsDisabled;
@@ -12687,6 +13192,151 @@ void CMainFrame::SetupNavSubtitleSubMenu()
 			str.Replace(_T("&"), _T("&&"));
 
 			pSub->AppendMenu(flags, id++, str);
+		}
+	}
+}
+
+
+void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup)
+{
+
+	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
+
+		POSITION pos = m_pSubStreams.GetHeadPosition();
+
+		if (pos) {
+			pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_SUBTITLES_ENABLE));
+			pSub->AppendMenu(MF_SEPARATOR);
+
+		}
+
+		bool sep = false;
+		int splcnt = 0;
+		UINT baseid = id;
+		int intsub = 0;
+
+		CComQIPtr<IAMStreamSelect> pSSS = FindSourceSelectableFilter();
+		if (pSSS && !AfxGetAppSettings().fDisableInternalSubtitles) {
+			DWORD cStreams;
+			if (!FAILED(pSSS->Count(&cStreams))) {
+				DWORD dwPrevGroup = (DWORD)-1;
+
+				for (int i = 0, j = cStreams; i < j; i++) {
+					DWORD dwFlags, dwGroup;
+					LCID lcid;
+					WCHAR* pszName = NULL;
+
+					if (FAILED(pSSS->Info(i, NULL, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))
+							|| !pszName) {
+						continue;
+					}
+
+					CString name(pszName);
+					CString lcname = CString(name).MakeLower();
+
+					if (pszName) {
+						CoTaskMemFree(pszName);
+					}
+
+					if (dwGroup != dwSelGroup) {
+						continue;
+					}
+
+					if (dwPrevGroup != -1 && dwPrevGroup != dwGroup) {
+						pSub->AppendMenu(MF_SEPARATOR);
+					}
+
+					dwPrevGroup = dwGroup;
+					CString str = _T("");
+
+					if (lcname.Find(_T(" off")) >= 0) {
+						str = ResStr(IDS_AG_DISABLED);
+					} else if (lcid == 0) {
+						str.Format(ResStr(IDS_AG_UNKNOWN), id - baseid);
+					} else {
+						int len = GetLocaleInfo(lcid, LOCALE_SENGLANGUAGE, str.GetBuffer(64), 64);
+						str.ReleaseBufferSetLength(max(len-1, 0));
+					}
+
+					CString lcstr = CString(str).MakeLower();
+
+					if (str.IsEmpty() || lcname.Find(lcstr) >= 0) {
+						str = name;
+					} else if (!name.IsEmpty()) {
+						str = CString(name) + _T(" (") + str + _T(")");
+					}
+					
+					UINT flags = MF_BYCOMMAND|MF_STRING|MF_ENABLED;
+					if (dwFlags) {
+						if (m_iSubtitleSel == 0) {
+							flags |= MF_CHECKED|MFT_RADIOCHECK;
+						}
+
+					}
+
+					str.Replace(_T("&"), _T("&&"));
+					intsub++;
+					pSub->AppendMenu(flags, id++, str);
+					splcnt++;
+				}
+			}
+		}
+
+
+
+		pos = m_pSubStreams.GetHeadPosition();
+		CComPtr<ISubStream> pSubStream;
+		int tPos = -1;
+		if (splcnt>0 && pos) {
+			pSubStream = m_pSubStreams.GetNext(pos);
+			tPos++;
+		}
+
+		
+		
+		while (pos) {
+			pSubStream = m_pSubStreams.GetNext(pos);
+			tPos++;
+			if (!pSubStream) continue;
+			//bool sep = false;
+		
+			for (int i = 0; i< pSubStream->GetStreamCount(); i++) {
+				WCHAR* pName = NULL;
+				if (SUCCEEDED(pSubStream->GetStreamInfo(i, &pName, NULL))) {
+					CString name(pName);
+					name.Replace(_T("&"), _T("&&"));
+
+					if ((splcnt>0 || cntintsub == intsub && cntintsub !=0) && !sep) {
+						pSub->AppendMenu(MF_SEPARATOR);
+						sep = true;
+					}
+
+					UINT flags = MF_BYCOMMAND|MF_STRING|MF_ENABLED;
+					
+					if (m_iSubtitleSel == tPos) {
+						flags |= MF_CHECKED|MFT_RADIOCHECK;
+					}
+					if (cntintsub <= intsub) name = _T("* ") + name;
+					pSub->AppendMenu(flags, id++, name);
+					intsub++;
+					CoTaskMemFree(pName);
+				} else {
+					UINT flags = MF_BYCOMMAND|MF_STRING|MF_ENABLED;
+					
+					if (m_iSubtitleSel == tPos) {
+						flags |= MF_CHECKED|MFT_RADIOCHECK;
+					}
+					CString sname;
+					if (cntintsub <= intsub) sname = _T("* ") + ResStr(IDS_AG_UNKNOWN);
+					pSub->AppendMenu(flags, id++, sname);
+					intsub++;
+				}
+			}
+		}	
+		if (pSub->GetMenuItemCount()<2) {
+			while (pSub->RemoveMenu(0, MF_BYPOSITION)) {
+				;
+			}
 		}
 	}
 }
@@ -13164,7 +13814,7 @@ void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSe
 		if (SUCCEEDED(pSSA->Count(&cStreamsA)) && cStreamsA > 0) {
 			bool sep = false;
 			DWORD i = 0;
-			if (pSub->GetMenuItemCount() > 2) {// do not include menu item "Options" and separator
+			if (pSub->GetMenuItemCount() > 0) {// do not include menu item "Options" and separator
 				i = 1;
 				sp = true;
 			}
@@ -13236,9 +13886,6 @@ void CMainFrame::SetupNavMixAudioSubMenu()
 	}
 
 	UINT id = ID_NAVIGATE_AUDIO_SUBITEM_START;
-
-	pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_SUBTITLES_OPTIONS));
-	pSub->AppendMenu(MF_SEPARATOR|MF_ENABLED);
 
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
 		SetupNavMixStreamSelectSubMenu(pSub, id, 1);
@@ -13705,28 +14352,8 @@ ISubStream *InsertSubStream(CInterfaceList<ISubStream> *subStreams, const CComPt
 {
 	POSITION pos = subStreams->GetHeadPosition();
 	POSITION newPos = NULL;
-	bool processed = false;
-	while (!processed && pos) {
-		POSITION prevPos = pos;
-		CComPtr<ISubStream> pSubStream = subStreams->GetNext(pos);
-		if (DoesSubPrecede(theSubStream, pSubStream)) {
-			if (prevPos == subStreams->GetHeadPosition()) {
-				newPos = subStreams->AddHead(theSubStream);
-			} else {
-				newPos = subStreams->InsertBefore(prevPos, theSubStream);
-			}
-			processed = true;
-		}
-	}
-	if (!processed) {
-		newPos = subStreams->AddTail(theSubStream);
-	}
-	if (newPos == NULL) {
-		newPos = subStreams->GetTailPosition();
-	}
-	if (newPos == NULL) {
-		return NULL;
-	}
+	newPos = subStreams->AddTail(theSubStream);
+
 	return subStreams->GetAt(newPos);
 }
 
@@ -13777,17 +14404,17 @@ static CString GetSubName(CString fn, CString f_videoName)
 
 	// The filename of the subtitle file
 	CString subName = fn.Left(fn.ReverseFind('.')).Mid(fn.ReverseFind('\\') + 1);
-
+	CString subext = _T(" (") + fn.Right(3).MakeUpper() + _T(")");
 	CString name = _T("");
 	if (subName.Find(videoName) != -1 && videoName.CompareNoCase(subName) != 0 && subName.Replace(videoName, _T("")) == 1) {
 		name = subName.TrimLeft('.');
 	} else {
 		// The filename of the video file without extension
 		videoName = f_videoName.Left(f_videoName.ReverseFind('.')).Mid(f_videoName.ReverseFind('\\') + 1);
-		if (subName.Find(videoName) != -1 && videoName.CompareNoCase(subName) != 0 && subName.Replace(videoName, _T("")) == 1) {
-			name = subName.TrimLeft('.');
+		if (subName.Find(videoName) == 0 && videoName.CompareNoCase(subName) != 0 && subName.Replace(videoName, _T("")) == 1) {
+			name = subName.TrimLeft('.') + subext;
 		} else {
-			name = ResStr(IDS_UNDETERMINED);
+			name = ResStr(IDS_UNDETERMINED).MakeLower() +  _T(" (") + subName + fn.Right(4) + _T(")");
 		}
 	}
 

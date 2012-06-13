@@ -255,9 +255,10 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	void SetupOpenCDSubMenu();
 	void SetupFiltersSubMenu();
 	void SetupAudioSwitcherSubMenu();
+	void SetupAudioOptionSubMenu();
 	void SetupSubtitlesSubMenu();
 	void SetupNavMixAudioSubMenu();
-	void SetupNavSubtitleSubMenu();
+	void SetupNavMixSubtitleSubMenu();
 	void SetupNavAngleSubMenu();
 	void SetupNavChaptersSubMenu();
 	void SetupFavoritesSubMenu();
@@ -271,6 +272,9 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 
 	void SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup);
 	void OnNavMixStreamSelectSubMenu(UINT id, DWORD dwSelGroup);
+
+	void SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup);
+	void OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup);
 
 	CMenu m_popupmain, m_popup;
 	CMenu m_opencds;
@@ -293,6 +297,23 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 		int iSel;
 	} AudStreams;
 
+	typedef struct {
+		int iFilter;
+		int iIndex;
+		int iNum;
+		int iSel;
+		bool Extsub;
+		bool forced;
+		bool def;
+		CString lang;
+	} SubStreams;
+
+	
+	CAtlArray<SubStreams> subarray;
+	void SubFlags(CString strname, bool &forced, bool &def);
+	int GetSubSelIdx();
+	int cntintsub;
+	int SelSub2;
 	// chapters (file mode)
 	CComPtr<IDSMChapterBag> m_pCB;
 	void SetupChapters();
@@ -380,7 +401,7 @@ public:
 	bool m_fFullScreen;
 	bool m_fFirstFSAfterLaunchOnFS;
 	bool m_fHideCursor;
-	CMenu m_navMixaudio, m_navsubtitle;
+	CMenu m_navMixaudio, m_navsubtitle, m_navMixsubtitle;
 
 	CComPtr<IBaseFilter> m_pRefClock; // Adjustable reference clock. GothSync
 	CComPtr<ISyncClock> m_pSyncClock;
@@ -442,6 +463,7 @@ protected:
 	void OpenCustomizeGraph();
 	void OpenSetupVideo();
 	void OpenSetupAudio();
+	void OpenSetupSubStream(OpenMediaData* pOMD);
 	void OpenSetupInfoBar();
 	void OpenSetupStatsBar();
 	void OpenSetupStatusBar();
@@ -636,6 +658,14 @@ public:
 	afx_msg void OnMenuPlayerShort();
 	afx_msg void OnMenuPlayerLong();
 	afx_msg void OnMenuFilters();
+
+	afx_msg void OnMenuNavAudio();
+	afx_msg void OnMenuNavSubtitle();
+	afx_msg void OnMenuNavAudioOptions();
+	afx_msg void OnMenuNavSubtitleOptions();
+	afx_msg void OnMenuNavJumpTo();
+	afx_msg void OnUpdateMenuNavSubtitle(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateMenuNavAudio(CCmdUI* pCmdUI);
 
 	afx_msg void OnUpdatePlayerStatus(CCmdUI* pCmdUI);
 
@@ -854,9 +884,15 @@ public:
 	afx_msg void OnUpdatePlayFilters(CCmdUI* pCmdUI);
 	afx_msg void OnPlayShaders(UINT nID);
 	afx_msg void OnPlayAudio(UINT nID);
+
+	afx_msg void OnPlayAudioOption(UINT nID);
+
 	afx_msg void OnUpdatePlayAudio(CCmdUI* pCmdUI);
 	afx_msg void OnPlaySubtitles(UINT nID);
 	afx_msg void OnUpdatePlaySubtitles(CCmdUI* pCmdUI);
+
+	afx_msg void OnUpdateNavMixSubtitles(CCmdUI* pCmdUI);
+
 	afx_msg void OnPlayLanguage(UINT nID);
 	afx_msg void OnUpdatePlayLanguage(CCmdUI* pCmdUI);
 	afx_msg void OnPlayVolume(UINT nID);

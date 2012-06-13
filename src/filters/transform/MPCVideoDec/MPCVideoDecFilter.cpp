@@ -1226,6 +1226,10 @@ bool CMPCVideoDecFilter::IsAVI()
 	return false;
 }
 
+#define ATI_IDENTIFY		_T("ATI ")
+#define AMD_IDENTIFY		_T("AMD ")
+#define RADEON_HD_IDENTIFY	_T("Radeon HD ")
+
 HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaType *pmt)
 {
 	if (direction == PINDIR_INPUT) {
@@ -1352,14 +1356,25 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 						if (m_nDXVA_SD && PictWidthRounded() < 1280) { // check "Disable DXVA for SD" option
 							break;
 						}
-						int nCompat = FFH264CheckCompatibility (PictWidthRounded(), PictHeightRounded(), m_pAVCtx, (BYTE*)m_pAVCtx->extradata, m_pAVCtx->extradata_size, m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion);
-						if (nCompat) {
-							if ( nCompat == DXVA_HIGH_BIT       ||
-									m_nDXVACheckCompatibility == 0 || // full check
-									m_nDXVACheckCompatibility == 1 && nCompat != DXVA_UNSUPPORTED_LEVEL ||   // skip level check
-									m_nDXVACheckCompatibility == 2 && nCompat != DXVA_TOO_MANY_REF_FRAMES) { // skip reference frame check
-								break;
+
+						bool IsAtiDXVACompatible = false;
+						if (m_nPCIVendor == PCIV_ATI) {
+							if (!m_strDeviceDescription.Find(ATI_IDENTIFY) || !m_strDeviceDescription.Find(AMD_IDENTIFY)) {
+								m_strDeviceDescription.Delete(0, 4);
+								if (!m_strDeviceDescription.Find(RADEON_HD_IDENTIFY)) {
+									TCHAR ati_version = m_strDeviceDescription.GetAt(CString(RADEON_HD_IDENTIFY).GetLength());
+									IsAtiDXVACompatible = (atoi(&ati_version) >= 4); // HD4xxx and above AMD/ATI cards support level 5.1 and ref = 16
+								}
 							}
+						}
+						int nCompat = FFH264CheckCompatibility (PictWidthRounded(), PictHeightRounded(), m_pAVCtx, (BYTE*)m_pAVCtx->extradata, m_pAVCtx->extradata_size, m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion, IsAtiDXVACompatible);
+						if (nCompat && (
+								nCompat == DXVA_HIGH_BIT ||												// unsupported video
+								m_nDXVACheckCompatibility == 0 ||										// full check
+								m_nDXVACheckCompatibility == 1 && nCompat != DXVA_UNSUPPORTED_LEVEL ||	// skip level check
+								m_nDXVACheckCompatibility == 2 && nCompat != DXVA_TOO_MANY_REF_FRAMES)	// skip reference frame check
+							) {
+							break;
 						}
 					} else if (m_nCodecId == CODEC_ID_MPEG2VIDEO) {
 						// DSP is disable for DXVA decoding (to keep default idct_permutation)

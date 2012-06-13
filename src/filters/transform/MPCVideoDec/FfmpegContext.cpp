@@ -31,6 +31,7 @@
 #include "FfmpegContext.h"
 
 extern BOOL IsWinVistaOrLater(); // requires linking with DSUtils which is always the case
+extern unsigned __int64 GetFileVersion(LPCTSTR fn);
 
 extern "C" {
 	#include <ffmpeg/libavcodec/dsputil.h>
@@ -130,7 +131,7 @@ BOOL DriverVersionCheck(LARGE_INTEGER VideoDriverVersion, int A, int B, int C, i
 	return FALSE;
 }
 
-int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx, BYTE* pBuffer, UINT nSize, DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion)
+int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx, BYTE* pBuffer, UINT nSize, DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion, bool nIsAtiDXVACompatible)
 {
 	H264Context*	pContext = (H264Context*) pAVCtx->priv_data;
 	SPS*			cur_sps;
@@ -150,15 +151,15 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 	cur_pps = pContext->pps_buffers[0];
 
 	if (cur_sps != NULL) {
-		int max_ref_frames = 0;
-
 		if (cur_sps->bit_depth_luma > 8 || cur_sps->chroma_format_idc > 1) {
 			return DXVA_HIGH_BIT;
 		}
 
-		video_is_level51 = cur_sps->level_idc >= 51 ? 1 : 0;
-		profile_higher_than_high = (cur_sps->profile_idc > 100);
-		max_ref_frames = max_ref_frames_dpb41; // default value is calculate
+		int max_ref_frames = 0;
+
+		video_is_level51			= cur_sps->level_idc >= 51 ? 1 : 0;
+		profile_higher_than_high	= (cur_sps->profile_idc > 100);
+		max_ref_frames				= max_ref_frames_dpb41; // default value is calculate
 
 		if (nPCIVendor == PCIV_nVidia) {
 			// nVidia cards support level 5.1 since drivers v6.14.11.7800 for XP and drivers v7.15.11.7800 for Vista/7
@@ -167,11 +168,7 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 					no_level51_support = 0;
 
 					// max ref frames is 16 for HD and 11 otherwise
-					if (nWidth >= 1280) {
-						max_ref_frames = 16;
-					} else {
-						max_ref_frames = 11;
-					}
+					max_ref_frames = (nWidth >= 1280) ? 16 : 11;
 				}
 			} else {
 				if (DriverVersionCheck(VideoDriverVersion, 6, 14, 11, 7800)) {
@@ -183,9 +180,28 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 			}
 		} else if (nPCIVendor == PCIV_S3_Graphics) {
 			no_level51_support = 0;
-		} else if (nPCIVendor == PCIV_ATI) {
-			// HD4xxx, HD5xxx, and HD6xxx AMD/ATI cards support level 5.1 since drivers v8.14.1.6105 (Catalyst 10.4)
-			if (nPCIDevice > 0x6700) {
+		} else if (nPCIVendor == PCIV_ATI && nIsAtiDXVACompatible) {
+			TCHAR path[MAX_PATH];
+			GetSystemDirectory(path, MAX_PATH);
+			wcscat(path, L"\\drivers\\atikmdag.sys\0");
+			unsigned __int64 f_version = GetFileVersion(path);
+
+			if (f_version) {
+				LARGE_INTEGER VideoDriverVersion;
+				VideoDriverVersion.QuadPart = f_version;
+
+				if (IsWinVistaOrLater()) {
+					// file version 8.1.1.1016 - Catalyst 10.4, WinVista & Win7
+					if (DriverVersionCheck(VideoDriverVersion, 8, 1, 1, 1016)) {
+						no_level51_support = 0;
+						max_ref_frames = 16;
+					}				
+				} else {
+					// TODO - need file version for Catalyst 10.4 under WinXP
+				}
+			
+			} else {
+				// driver version 8.14.1.6105 - Catalyst 10.4; TODO - verify this information
 				if (DriverVersionCheck(VideoDriverVersion, 8, 14, 1, 6105)) {
 					no_level51_support = 0;
 					max_ref_frames = 16;
