@@ -3957,6 +3957,10 @@ void CMainFrame::OnOgmSub(UINT nID)
 			}
 		}
 	}
+
+	if (m_pCAP) {
+		m_pCAP->Invalidate();
+	}
 }
 
 void CMainFrame::OnDvdAngle(UINT nID)
@@ -13081,6 +13085,12 @@ void CMainFrame::OnNavStreamSelectSubMenu(UINT id, DWORD dwSelGroup)
 
 		if (id == 0) {
 			pSS->Enable(i, AMSTREAMSELECTENABLE_ENABLE);
+
+			if (dwSelGroup == 2) {
+				if (m_pCAP) {
+					m_pCAP->Invalidate();
+				}
+			}
 			break;
 		}
 
