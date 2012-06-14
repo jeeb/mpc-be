@@ -44,6 +44,7 @@ void *__imp_toupper	= toupper;
 
 #if defined(REGISTER_FILTER)
 void *__imp_time64	= _time64;
+void *__imp_vscprintf = _vscprintf;
 #if defined(_WIN64) && defined(_DEBUG)
 extern "C" int mingw_app_type = 1; /* 0:console, 1:windows.  */
 #endif
