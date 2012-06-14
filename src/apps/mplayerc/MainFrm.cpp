@@ -8711,12 +8711,6 @@ void CMainFrame::OnNavigateAudioMix(UINT nID)
 {
 	nID -= ID_NAVIGATE_AUDIO_SUBITEM_START;
 
-	if (nID == 0) {
-		ShowOptions(CPPageAudioSwitcher::IDD);
-		return;
-	}
-
-	nID--;
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
 		OnNavMixStreamSelectSubMenu(nID, 1);
 	} else if (GetPlaybackMode() == PM_DVD) {
@@ -13962,9 +13956,6 @@ void CMainFrame::SetupNavMixAudioSubMenu()
 		}
 	}
 
-	if (pSub->GetMenuItemCount() == 2) {
-		pSub->RemoveMenu(1, MF_BYPOSITION);
-	}
 }
 
 void CMainFrame::OnNavMixStreamSelectSubMenu(UINT id, DWORD dwSelGroup)
