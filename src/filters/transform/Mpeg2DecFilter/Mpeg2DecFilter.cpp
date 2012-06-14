@@ -542,14 +542,14 @@ HRESULT CMpeg2DecFilter::Transform(IMediaSample* pIn)
 	while (len >= 0) {
 		mpeg2_state_t state = m_dec->mpeg2_parse();
 
-		if (state == STATE_BUFFER) {
+		if (state == STATE_BUFFER || state == STATE_INVALID) {
 			nInvalidBufferCount++;
 		} else {
 			nInvalidBufferCount = 0;
 		}
 
-		if (nInvalidBufferCount == 2 && m_dec->m_decoder.m_mpeg1) {
-			nInvalidBufferCount = 0;
+		if (nInvalidBufferCount == 3 && m_dec->m_decoder.m_mpeg1) {
+			TRACE(_T("CMpeg2DecFilter::Transform() : flush decoder\n"));
 			InputTypeChanged();
 			return S_OK;
 		}
