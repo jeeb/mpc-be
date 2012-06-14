@@ -2149,6 +2149,10 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_BINKVB);
 	}
 
+	if (ffmpeg_filters[FFM_PNG]) {
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_PNG);
+	}
+
 	m_transform.AddTail(pFGF);
 
 	// Low merit MPC Video Decoder
@@ -2385,6 +2389,9 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_BINKVB);
 	}
 
+	if (ffmpeg_filters[FFM_PNG]) {
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_PNG);
+	}
 
 	m_transform.AddTail(pFGF);
 

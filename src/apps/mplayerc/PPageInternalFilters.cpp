@@ -102,6 +102,7 @@ static filter_t s_filters[] = {
 	{_T("MPEG-1 Video"),          DECODER,        VIDEO,  TRA_MPEG1,      IDS_TRA_MPEG1},
 	{_T("MPEG-2 Video"),          DECODER,        VIDEO,  TRA_MPEG2,      IDS_TRA_MPEG2},
 	{_T("MS MPEG-4"),             FFMPEG_DECODER, VIDEO,  FFM_MSMPEG4,    IDS_TRA_FFMPEG},
+	{_T("PNG"),                   FFMPEG_DECODER, VIDEO,  FFM_PNG,        IDS_TRA_FFMPEG},
 	{_T("Screen Recorder (Cinepak/CSCD/TSCC/QTRle)"), FFMPEG_DECODER, VIDEO, FFM_SCREC, IDS_TRA_FFMPEG},
 	{_T("SVQ1/3"),                FFMPEG_DECODER, VIDEO,  FFM_SVQ3,       IDS_TRA_FFMPEG},
 	{_T("Theora"),                FFMPEG_DECODER, VIDEO,  FFM_THEORA,     IDS_TRA_FFMPEG},

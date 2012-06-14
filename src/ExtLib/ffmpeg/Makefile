@@ -213,6 +213,9 @@ SRCS_C=\
     libavcodec/nellymoserdec.c \
     libavcodec/options.c \
     libavcodec/parser.c \
+    libavcodec/png.c \
+    libavcodec/pngdec.c \
+    libavcodec/pngdsp.c \
     libavcodec/pthread.c \
     libavcodec/qdm2.c \
     libavcodec/qtrle.c \
@@ -291,6 +294,7 @@ SRCS_C=\
     libavcodec/x86/motion_est_mmx.c \
     libavcodec/x86/mpegaudiodec_mmx.c \
     libavcodec/x86/mpegvideo_mmx.c \
+    libavcodec/x86/pngdsp-init.c \
     libavcodec/x86/proresdsp-init.c \
     libavcodec/x86/rv34dsp_init.c \
     libavcodec/x86/rv40dsp_init.c \
@@ -366,6 +370,7 @@ SRCS_YASM=\
     libavcodec/x86/h264_weight.asm \
     libavcodec/x86/h264_weight_10bit.asm \
     libavcodec/x86/imdct36_sse.asm \
+    libavcodec/x86/pngdsp.asm \
     libavcodec/x86/proresdsp.asm \
     libavcodec/x86/rv34dsp.asm \
     libavcodec/x86/rv40dsp.asm \

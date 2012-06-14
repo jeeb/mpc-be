@@ -549,6 +549,9 @@ bool CMPCVideoDecCodecWnd::OnActivate()
 	m_lstCodecs.AddString (_T("MS-MPEG4"));
 	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_MSMPEG4) != 0);
 
+	m_lstCodecs.AddString (_T("PNG"));
+	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_PNG) != 0);
+
 	m_lstCodecs.AddString (_T("Screen Recorder (CSCD/TSCC/QTRle)"));
 	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_SCREC) != 0);
 
@@ -649,6 +652,9 @@ bool CMPCVideoDecCodecWnd::OnApply()
 		}
 		if (m_lstCodecs.GetCheck  (nPos++)) {
 			nActiveCodecs |= MPCVD_MSMPEG4;
+		}
+		if (m_lstCodecs.GetCheck  (nPos++)) {
+			nActiveCodecs |= MPCVD_PNG;
 		}
 		if (m_lstCodecs.GetCheck  (nPos++)) {
 			nActiveCodecs |= MPCVD_SCREC;

@@ -51,6 +51,7 @@ typedef enum {
 	MPCVD_LAGARITH   = 1 << 25,
 	MPCVD_PRORES     = 1 << 26,
 	MPCVD_BINKV      = 1 << 27,
+	MPCVD_PNG        = 1 << 28,
 } MPC_VIDEO_CODEC;
 
 interface __declspec(uuid("CDC3B5B3-A8B0-4c70-A805-9FC80CDEF262"))
