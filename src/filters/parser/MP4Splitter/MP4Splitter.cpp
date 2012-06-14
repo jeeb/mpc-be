@@ -702,9 +702,11 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 							mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_AAC);
 							if (wfe->cbSize >= 2) {
-								WORD Channels		= (((BYTE*)(wfe+1))[1]>>3) & 0xf;
-								wfe->nChannels		= Channels ? Channels : 1;
-								wfe->nBlockAlign	= (WORD)((wfe->nChannels * wfe->wBitsPerSample) / 8);
+								WORD Channels = (((BYTE*)(wfe+1))[1]>>3) & 0xf;
+								if (Channels) {
+									wfe->nChannels		= Channels;
+									wfe->nBlockAlign	= (WORD)((wfe->nChannels * wfe->wBitsPerSample) / 8);
+								}
 							}
 							mts.Add(mt);
 							break;
