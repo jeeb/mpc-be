@@ -666,6 +666,9 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					wfe = (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX) + di->GetDataSize());
 					memset(wfe, 0, mt.FormatLength());
 					wfe->nSamplesPerSec = audio_desc->GetSampleRate();
+					if (!wfe->nSamplesPerSec) {
+						wfe->nSamplesPerSec = track->GetMediaTimeScale();
+					}
 					wfe->nAvgBytesPerSec = audio_desc->GetAvgBitrate()/8;
 					wfe->nChannels = audio_desc->GetChannelCount();
 					wfe->wBitsPerSample = audio_desc->GetSampleSize();

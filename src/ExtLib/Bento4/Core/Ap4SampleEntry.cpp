@@ -472,6 +472,12 @@ AP4_AudioSampleEntry::ReadFields(AP4_ByteStream& stream)
     stream.ReadUI16(m_QtPacketSize);
     stream.ReadUI32(m_SampleRate);
 
+    // MPC-BE custom code start
+    if (!(m_SampleRate >> 16)) {
+        m_SampleRate <<= 16;
+    }
+    // MPC-BE custom code end
+
     // if this is a QT V1 entry, read the extension
     if (m_QtVersion == 1) {
         stream.ReadUI32(m_QtV1SamplesPerPacket);
