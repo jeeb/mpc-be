@@ -513,7 +513,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			if (TrackName.IsEmpty()) {
 				TrackName = LocalToStringW(track->GetTrackName().c_str()); //Trying Local...
 			}
-			TrackName.TrimLeft(_T("\x0010\x0013\x0015\x0017\x0018\x0019\x001A\x001B"));
+			TrackName.TrimLeft(_T("\x0010\x0013\x0015\x0016\x0017\x0018\x0019\x001A\x001B"));
 			TrackName.Trim();
 
 			CStringA TrackLanguage = track->GetTrackLanguage().c_str();
