@@ -753,21 +753,25 @@ int FFGetThreadType(enum CodecID nCodecId, int nThreadCount)
 	if (!nThreadCount) {
 		return 0;
 	}
+
 	switch (nCodecId)
 	{
-		case CODEC_ID_H264 :
+		case CODEC_ID_H264			:
 			return FF_THREAD_FRAME|FF_THREAD_SLICE;
 			break;
-		case CODEC_ID_MPEG1VIDEO :
-		case CODEC_ID_DVVIDEO :
-		case CODEC_ID_FFV1 :
+		case CODEC_ID_MPEG1VIDEO	:
+		case CODEC_ID_DVVIDEO		:
+		case CODEC_ID_FFV1			:
+		case CODEC_ID_PRORES		:
 			return FF_THREAD_SLICE;
 			break;
-		case CODEC_ID_VP3 :
-		case CODEC_ID_VP8 :
-		case CODEC_ID_THEORA :
-		case CODEC_ID_RV30 :
-		case CODEC_ID_RV40 :
+		case CODEC_ID_VP3			:
+		case CODEC_ID_VP8			:
+		case CODEC_ID_THEORA		:
+		case CODEC_ID_RV30			:
+		case CODEC_ID_RV40			:
+		case CODEC_ID_UTVIDEO		:
+		case CODEC_ID_LAGARITH		:
 			return FF_THREAD_FRAME;
 			break;
 		default :

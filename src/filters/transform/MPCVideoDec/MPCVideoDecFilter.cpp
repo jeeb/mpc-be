@@ -1178,21 +1178,18 @@ bool CMPCVideoDecFilter::IsMultiThreadSupported(enum CodecID nCodec)
 {
 	return
 		(
-			nCodec==CODEC_ID_H264 ||
-			nCodec==CODEC_ID_MPEG1VIDEO ||
-			nCodec==CODEC_ID_FFV1 ||
-			nCodec==CODEC_ID_DIRAC ||
-			nCodec==CODEC_ID_DVVIDEO ||
-			nCodec==CODEC_ID_VP3 ||
-			nCodec==CODEC_ID_VP8 ||
-			nCodec==CODEC_ID_PRORES ||
-			nCodec==CODEC_ID_THEORA ||
-			nCodec==CODEC_ID_RV30 ||
-			nCodec==CODEC_ID_RV40 ||
-			nCodec==CODEC_ID_UTVIDEO ||
-			nCodec==CODEC_ID_LAGARITH ||
-			nCodec==CODEC_ID_BINKVIDEO ||
-			nCodec==CODEC_ID_PNG
+			nCodec==CODEC_ID_H264		||
+			nCodec==CODEC_ID_MPEG1VIDEO	||
+			nCodec==CODEC_ID_FFV1		||
+			nCodec==CODEC_ID_DVVIDEO	||
+			nCodec==CODEC_ID_VP3		||
+			nCodec==CODEC_ID_VP8		||
+			nCodec==CODEC_ID_PRORES		||
+			nCodec==CODEC_ID_THEORA		||
+			nCodec==CODEC_ID_RV30		||
+			nCodec==CODEC_ID_RV40		||
+			nCodec==CODEC_ID_UTVIDEO	||
+			nCodec==CODEC_ID_LAGARITH
 		);
 }
 
