@@ -748,12 +748,8 @@ int FFIsSkipped(struct AVCodecContext* pAVCtx)
 	return vc1->p_frame_skipped;
 }
 
-int FFGetThreadType(enum CodecID nCodecId, int nThreadCount)
+int FFGetThreadType(enum CodecID nCodecId)
 {
-	if (!nThreadCount) {
-		return 0;
-	}
-
 	switch (nCodecId)
 	{
 		case CODEC_ID_H264			:
@@ -782,7 +778,7 @@ int FFGetThreadType(enum CodecID nCodecId, int nThreadCount)
 void FFSetThreadNumber(struct AVCodecContext* pAVCtx, enum CodecID nCodecId, int nThreadCount)
 {
 	pAVCtx->thread_count	= nThreadCount;
-	pAVCtx->thread_type		= FFGetThreadType (nCodecId, nThreadCount);
+	pAVCtx->thread_type		= nThreadCount ? FFGetThreadType(nCodecId) : 0;
 }
 
 BOOL FFSoftwareCheckCompatibility(struct AVCodecContext* pAVCtx)

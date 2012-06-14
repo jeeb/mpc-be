@@ -1174,25 +1174,6 @@ HRESULT CMPCVideoDecFilter::CheckInputType(const CMediaType* mtIn)
 	return VFW_E_TYPE_NOT_ACCEPTED;
 }
 
-bool CMPCVideoDecFilter::IsMultiThreadSupported(enum CodecID nCodec)
-{
-	return
-		(
-			nCodec==CODEC_ID_H264		||
-			nCodec==CODEC_ID_MPEG1VIDEO	||
-			nCodec==CODEC_ID_FFV1		||
-			nCodec==CODEC_ID_DVVIDEO	||
-			nCodec==CODEC_ID_VP3		||
-			nCodec==CODEC_ID_VP8		||
-			nCodec==CODEC_ID_PRORES		||
-			nCodec==CODEC_ID_THEORA		||
-			nCodec==CODEC_ID_RV30		||
-			nCodec==CODEC_ID_RV40		||
-			nCodec==CODEC_ID_UTVIDEO	||
-			nCodec==CODEC_ID_LAGARITH
-		);
-}
-
 bool CMPCVideoDecFilter::IsAVI()
 {
 	CString ext, fname;
@@ -1268,7 +1249,7 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 			CheckPointer (m_pAVCtx, E_POINTER);
 
 			int nThreadNumber = m_nThreadNumber ? m_nThreadNumber : m_pCpuId->GetProcessorNumber() * 3/2;
-			if ((nThreadNumber > 1) && IsMultiThreadSupported (m_nCodecId)) {
+			if ((nThreadNumber > 1) && FFGetThreadType(m_nCodecId)) {
 				FFSetThreadNumber(m_pAVCtx, m_nCodecId, IsDXVASupported() ? 1 : nThreadNumber);
 			}
 
@@ -1396,7 +1377,7 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 
 				if (!m_bDXVACompatible) { // reset the threads count
 					m_bUseDXVA = false;
-					if ((nThreadNumber > 1) && IsMultiThreadSupported (m_nCodecId)) {
+					if ((nThreadNumber > 1) && FFGetThreadType(m_nCodecId)) {
 						avcodec_close (m_pAVCtx);
 						FFSetThreadNumber(m_pAVCtx, m_nCodecId, nThreadNumber);
 						if (avcodec_open2(m_pAVCtx, m_pAVCodec, NULL)<0) {
@@ -1599,7 +1580,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 		if (m_nDXVAMode == MODE_SOFTWARE && IsDXVASupported()) { // reset the threads count
 			int nThreadNumber = m_nThreadNumber ? m_nThreadNumber : m_pCpuId->GetProcessorNumber() * 3/2;
 			m_bUseDXVA = false;
-			if ((nThreadNumber > 1) && IsMultiThreadSupported (m_nCodecId)) {
+			if ((nThreadNumber > 1) && FFGetThreadType(m_nCodecId)) {
 				avcodec_close (m_pAVCtx);
 				FFSetThreadNumber(m_pAVCtx, m_nCodecId, nThreadNumber);
 				if (avcodec_open2(m_pAVCtx, m_pAVCodec, NULL)<0) {

@@ -194,7 +194,6 @@ protected:
 	void				Cleanup();
 	int					FindCodec(const CMediaType* mtIn);
 	void				AllocExtradata(AVCodecContext* pAVCtx, const CMediaType* mt);
-	bool				IsMultiThreadSupported(enum CodecID nCodec);
 	void				GetOutputFormats (int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats);
 	void				CalcAvgTimePerFrame();
 	void				DetectVideoCard(HWND hWnd);

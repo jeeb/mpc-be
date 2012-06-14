@@ -66,4 +66,5 @@ void			FFSetThreadNumber(struct AVCodecContext* pAVCtx, enum CodecID nCodecId, i
 BOOL			FFSoftwareCheckCompatibility(struct AVCodecContext* pAVCtx);
 int				FFGetCodedPicture(struct AVCodecContext* pAVCtx);
 BOOL			FFGetAlternateScan(struct AVCodecContext* pAVCtx);
+int				FFGetThreadType(enum CodecID nCodecId);
 BOOL			DXVACheckFramesize(int width, int height, DWORD nPCIVendor/*, DWORD nPCIDevice*/);
