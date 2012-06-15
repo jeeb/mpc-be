@@ -4909,29 +4909,40 @@ void CMainFrame::SaveDIB(LPCTSTR fn, BYTE* pData, long size)
 	CString ext = CString(CPath(fn).GetExtension()).MakeLower();
 
 	if (ext == _T(".bmp")) {
-		if (FILE* f = _tfopen(fn, _T("wb"))) {
-			BITMAPINFO* bi = (BITMAPINFO*)pData;
+		FILE* fp;
+		_tfopen_s(&fp, fn, _T("wb"));
+		if (fp) {
+			BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
+			bih->biBitCount = 24;
 
-			BITMAPFILEHEADER bfh;
-			bfh.bfType = 'MB';
-			bfh.bfOffBits = sizeof(bfh) + sizeof(bi->bmiHeader);
-			bfh.bfSize = sizeof(bfh) + size;
-			bfh.bfReserved1 = bfh.bfReserved2 = 0;
+			int width = bih->biWidth, height = abs(bih->biHeight), sih = sizeof(BITMAPINFOHEADER);
+			int line, stride = width * 3 * sizeof(BYTE), len = width * height * 3;
 
-			if (bi->bmiHeader.biBitCount <= 8) {
-				if (bi->bmiHeader.biClrUsed) {
-					bfh.bfOffBits += bi->bmiHeader.biClrUsed * sizeof(bi->bmiColors[0]);
-				} else {
-					bfh.bfOffBits += (1 << bi->bmiHeader.biBitCount) * DWORD(sizeof(bi->bmiColors[0]));
+			BYTE* rgb = (BYTE*)malloc(stride * height);
+			BYTE *p, *src = pData + sih;
+
+			for(int y = 0; y < height; y++) {
+				for(int x = 0; x < width; x++) {
+					line = (3 * x) + (stride * y);
+					p = src + (width * 4 * y) + (4 * x);
+					rgb[line] = p[0];
+					rgb[line + 1] = p[1];
+					rgb[line + 2] = p[2];
 				}
 			}
 
-			fwrite(&bfh, 1, sizeof(bfh), f);
-			fwrite(pData, 1, size, f);
+			BITMAPFILEHEADER bfh;
+			bfh.bfType = 0x4d42;
+			bfh.bfOffBits = sizeof(bfh) + sih;
+			bfh.bfSize = bfh.bfOffBits + len;
+			bfh.bfReserved1 = bfh.bfReserved2 = 0;
 
-			fclose(f);
-		} else {
-			AfxMessageBox(ResStr(IDS_MAINFRM_53), MB_OK);
+			fwrite(&bfh, 1, sizeof(bfh), fp);
+			fwrite(bih, 1, sih, fp);
+			fwrite(rgb, 1, len, fp);
+
+			fclose(fp);
+			free(rgb);
 		}
 	} else if (ext == _T(".png")) {
 		PNGDIB(fn, pData, 9);
