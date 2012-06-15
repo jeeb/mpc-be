@@ -5087,7 +5087,9 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 		m_VolumeBeforeFrameStepping = m_wndToolBar.Volume;
 		pBA->put_Volume(-10000);
 
-		HRESULT hr = pFS ? pFS->Step(1, NULL) : E_FAIL;
+		// Number of steps you need to do more than one for some decoders.
+		// TODO - maybe need to find another way to get correct frame ???
+		HRESULT hr = pFS ? pFS->Step(2, NULL) : E_FAIL;
 
 		if (FAILED(hr)) {
 			pBA->put_Volume(m_VolumeBeforeFrameStepping);
