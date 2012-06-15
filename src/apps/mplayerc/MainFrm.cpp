@@ -12023,12 +12023,34 @@ int CMainFrame::GetSubSelIdx()
 	int tPos = 0;
 	CStringW langN = slo.Tokenize(_T(",; "), tPos);
 
+	if (tPos == -1) {
+		for (int i = 0, j = cnt; i < j; i++) {
+
+			int rating	= 0;
+
+			if (extsubpri && subarray[i].Extsub)	return i;
+			if (subarray[i].forced == 1)	rating += 4;
+			if (subarray[i].def == 1)	rating += 2;
+			if (i==0)	rating += 1;
+
+			if (rating > maxrating) {
+				maxrating	= rating;
+				selsub		= i;
+			}
+		}
+	}
+
 	while (tPos != -1) {
 
 		for (int i = 0, j = cnt; i < j; i++) {
 
 			int rating	= 0;
 			int ll		= langN.GetLength();
+
+			if (subarray[i].lang.Left(ll).CompareNoCase(langN) == 0 && extsubpri && subarray[i].Extsub) {
+				return i;
+			}
+
 			if (subarray[i].lang.Left(ll).CompareNoCase(langN) == 0) {
 				rating += 8;
 				bLangFound = true;
