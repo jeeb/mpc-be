@@ -84,8 +84,7 @@
 #include <IPinHook.h>
 
 #include "jpeg.h"
-#include <libpng/pngdib.h>
-#include <libwebp/webpdib.h>
+#include "DIB.h"
 
 #include <comdef.h>
 
@@ -104,7 +103,7 @@ static UINT s_uTBBC = RegisterWindowMessage(_T("TaskbarButtonCreated"));
 
 #include "Monitors.h"
 #include "MultiMonitor.h"
-#include "CGdiPlusBitmap.h"
+#include "GdiPlusBitmap.h"
 
 #ifdef USE_MEDIAINFO_STATIC
 #include <MediaInfo/MediaInfo.h>
@@ -4909,41 +4908,7 @@ void CMainFrame::SaveDIB(LPCTSTR fn, BYTE* pData, long size)
 	CString ext = CString(CPath(fn).GetExtension()).MakeLower();
 
 	if (ext == _T(".bmp")) {
-		FILE* fp;
-		_tfopen_s(&fp, fn, _T("wb"));
-		if (fp) {
-			BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
-			bih->biBitCount = 24;
-
-			int width = bih->biWidth, height = abs(bih->biHeight), sih = sizeof(BITMAPINFOHEADER);
-			int line, stride = width * 3 * sizeof(BYTE), len = width * height * 3;
-
-			BYTE* rgb = (BYTE*)malloc(stride * height);
-			BYTE *p, *src = pData + sih;
-
-			for(int y = 0; y < height; y++) {
-				for(int x = 0; x < width; x++) {
-					line = (3 * x) + (stride * y);
-					p = src + (width * 4 * y) + (4 * x);
-					rgb[line] = p[0];
-					rgb[line + 1] = p[1];
-					rgb[line + 2] = p[2];
-				}
-			}
-
-			BITMAPFILEHEADER bfh;
-			bfh.bfType = 0x4d42;
-			bfh.bfOffBits = sizeof(bfh) + sih;
-			bfh.bfSize = bfh.bfOffBits + len;
-			bfh.bfReserved1 = bfh.bfReserved2 = 0;
-
-			fwrite(&bfh, 1, sizeof(bfh), fp);
-			fwrite(bih, 1, sih, fp);
-			fwrite(rgb, 1, len, fp);
-
-			fclose(fp);
-			free(rgb);
-		}
+		BMPDIB(fn, pData);
 	} else if (ext == _T(".png")) {
 		PNGDIB(fn, pData, 9);
 	} else if (ext == _T(".jpg")) {

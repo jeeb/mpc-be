@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: CGdiPlusBitmap.h 466 2012-06-02 12:53:19Z exodus8 $
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt
