@@ -212,6 +212,7 @@
     <ClCompile Include="PlayerSubresyncBar.cpp" />
     <ClCompile Include="PlayerToolBar.cpp" />
     <ClCompile Include="PlayerPlaylist.cpp" />
+    <ClCompile Include="PlayerVolumeCtrl.cpp" />
     <ClCompile Include="PngImage.cpp" />
     <ClCompile Include="PnSPresetsDlg.cpp" />
     <ClCompile Include="PPageAccelTbl.cpp" />
@@ -266,11 +267,9 @@
     <ClCompile Include="UpdateCheckerDlg.cpp" />
     <ClCompile Include="vkCodes.cpp" />
     <ClCompile Include="VMROSD.cpp" />
-    <ClCompile Include="PlayerVolumeCtrl.cpp" />
     <ClCompile Include="WebClientSocket.cpp" />
     <ClCompile Include="WebServer.cpp" />
     <ClCompile Include="WebServerSocket.cpp" />
-    <ClCompile Include="WinAPIUtils.cpp" />
     <ClCompile Include="WinHotkeyCtrl.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -335,6 +334,7 @@
     <ClInclude Include="PlayerSubresyncBar.h" />
     <ClInclude Include="PlayerToolBar.h" />
     <ClInclude Include="PlayerPlaylist.h" />
+    <ClInclude Include="PlayerVolumeCtrl.h" />
     <ClInclude Include="PngImage.h" />
     <ClInclude Include="PnSPresetsDlg.h" />
     <ClInclude Include="PPageAccelTbl.h" />
@@ -391,11 +391,9 @@
     <ClInclude Include="UpdateCheckerDlg.h" />
     <ClInclude Include="vkCodes.h" />
     <ClInclude Include="VMROSD.h" />
-    <ClInclude Include="PlayerVolumeCtrl.h" />
     <ClInclude Include="WebClientSocket.h" />
     <ClInclude Include="WebServer.h" />
     <ClInclude Include="WebServerSocket.h" />
-    <ClInclude Include="WinAPIUtils.h" />
     <ClInclude Include="WinHotkeyCtrl.h" />
   </ItemGroup>
   <ItemGroup>

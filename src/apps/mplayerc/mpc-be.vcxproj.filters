@@ -177,6 +177,9 @@
     <ClCompile Include="PlayerPlaylist.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerVolumeCtrl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="PngImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -318,9 +321,6 @@
     <ClCompile Include="VMROSD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PlayerVolumeCtrl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="WebClientSocket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -328,9 +328,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WebServerSocket.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="WinAPIUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\ExtLib\mfc\afxctrlcontainer.cpp">
@@ -539,6 +536,9 @@
     <ClInclude Include="PlayerPlaylist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PlayerVolumeCtrl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="PngImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -692,9 +692,6 @@
     <ClInclude Include="VMROSD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PlayerVolumeCtrl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="WebClientSocket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -702,9 +699,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WebServerSocket.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="WinAPIUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vkCodes.h">

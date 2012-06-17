@@ -34,7 +34,7 @@
 #include "Monitors.h"
 #define NO_VERSION_REV_NEEDED
 #include "Version.h"
-#include "WinAPIUtils.h"
+#include "../../DSUtil/WinAPIUtils.h"
 #include <winddk/ntddcdvd.h>
 #include <detours/detours.h>
 #include <afxsock.h>

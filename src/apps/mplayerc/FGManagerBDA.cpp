@@ -39,7 +39,7 @@
 #include "DVBChannel.h"
 #include "Mpeg2SectionData.h"
 #include "MainFrm.h"
-#include "WinAPIUtils.h"
+#include "../../DSUtil/WinAPIUtils.h"
 
 
 /// Format, Video MPEG2

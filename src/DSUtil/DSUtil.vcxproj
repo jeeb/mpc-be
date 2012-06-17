@@ -132,6 +132,7 @@
       <ExcludedFromBuild Condition="'$(Platform)'=='x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="VideoParser.cpp" />
+    <ClCompile Include="WinAPIUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AudioParser.h" />
@@ -152,6 +153,7 @@
     <ClInclude Include="vd.h" />
     <ClInclude Include="vd_asm.h" />
     <ClInclude Include="VideoParser.h" />
+    <ClInclude Include="WinAPIUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ExtLib\VirtualDub\Kasumi\Kasumi.vcxproj">
