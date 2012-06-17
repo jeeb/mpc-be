@@ -24,7 +24,7 @@
 #pragma once
 
 #include "PngImage.h"
-#include "VolumeCtrl.h"
+#include "PlayerVolumeCtrl.h"
 
 
 // CPlayerToolBar

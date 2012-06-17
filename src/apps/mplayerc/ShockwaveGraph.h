@@ -24,7 +24,7 @@
 #pragma once
 
 #include "BaseGraph.h"
-#include "CShockwaveFlash.h"
+#include "ShockwaveFlash.h"
 
 
 namespace DSObjects

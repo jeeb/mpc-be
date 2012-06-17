@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: Playlist.h 20 2012-04-20 01:42:55Z aleksoid $
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt

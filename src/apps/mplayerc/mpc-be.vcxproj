@@ -165,7 +165,7 @@
     <ClCompile Include="ChildView.cpp" />
     <ClCompile Include="ComPropertyPage.cpp" />
     <ClCompile Include="ComPropertySheet.cpp" />
-    <ClCompile Include="CShockwaveFlash.cpp" />
+    <ClCompile Include="ShockwaveFlash.cpp" />
     <ClCompile Include="DeinterlacerFilter.cpp" />
     <ClCompile Include="DVBChannel.cpp" />
     <ClCompile Include="EditListEditor.cpp" />
@@ -211,7 +211,7 @@
     <ClCompile Include="PlayerStatusBar.cpp" />
     <ClCompile Include="PlayerSubresyncBar.cpp" />
     <ClCompile Include="PlayerToolBar.cpp" />
-    <ClCompile Include="Playlist.cpp" />
+    <ClCompile Include="PlayerPlaylist.cpp" />
     <ClCompile Include="PngImage.cpp" />
     <ClCompile Include="PnSPresetsDlg.cpp" />
     <ClCompile Include="PPageAccelTbl.cpp" />
@@ -266,7 +266,7 @@
     <ClCompile Include="UpdateCheckerDlg.cpp" />
     <ClCompile Include="vkCodes.cpp" />
     <ClCompile Include="VMROSD.cpp" />
-    <ClCompile Include="VolumeCtrl.cpp" />
+    <ClCompile Include="PlayerVolumeCtrl.cpp" />
     <ClCompile Include="WebClientSocket.cpp" />
     <ClCompile Include="WebServer.cpp" />
     <ClCompile Include="WebServerSocket.cpp" />
@@ -284,7 +284,7 @@
     <ClInclude Include="ChildView.h" />
     <ClInclude Include="ComPropertyPage.h" />
     <ClInclude Include="ComPropertySheet.h" />
-    <ClInclude Include="CShockwaveFlash.h" />
+    <ClInclude Include="ShockwaveFlash.h" />
     <ClInclude Include="DeinterlacerFilter.h" />
     <ClInclude Include="DVBChannel.h" />
     <ClInclude Include="EditListEditor.h" />
@@ -334,7 +334,7 @@
     <ClInclude Include="PlayerStatusBar.h" />
     <ClInclude Include="PlayerSubresyncBar.h" />
     <ClInclude Include="PlayerToolBar.h" />
-    <ClInclude Include="Playlist.h" />
+    <ClInclude Include="PlayerPlaylist.h" />
     <ClInclude Include="PngImage.h" />
     <ClInclude Include="PnSPresetsDlg.h" />
     <ClInclude Include="PPageAccelTbl.h" />
@@ -391,7 +391,7 @@
     <ClInclude Include="UpdateCheckerDlg.h" />
     <ClInclude Include="vkCodes.h" />
     <ClInclude Include="VMROSD.h" />
-    <ClInclude Include="VolumeCtrl.h" />
+    <ClInclude Include="PlayerVolumeCtrl.h" />
     <ClInclude Include="WebClientSocket.h" />
     <ClInclude Include="WebServer.h" />
     <ClInclude Include="WebServerSocket.h" />

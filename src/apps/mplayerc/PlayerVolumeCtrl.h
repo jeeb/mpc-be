@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: VolumeCtrl.h 300 2012-05-17 18:38:23Z alexins $
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt

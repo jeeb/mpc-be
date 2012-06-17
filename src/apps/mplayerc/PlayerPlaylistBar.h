@@ -26,7 +26,7 @@
 #include <afxcoll.h>
 #include "PlayerBar.h"
 #include "PlayerListCtrl.h"
-#include "Playlist.h"
+#include "PlayerPlaylist.h"
 
 
 class OpenMediaData;

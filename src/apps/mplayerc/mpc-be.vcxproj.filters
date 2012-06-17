@@ -42,7 +42,7 @@
     <ClCompile Include="ComPropertySheet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CShockwaveFlash.cpp">
+    <ClCompile Include="ShockwaveFlash.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DeinterlacerFilter.cpp">
@@ -174,7 +174,7 @@
     <ClCompile Include="PlayerToolBar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Playlist.cpp">
+    <ClCompile Include="PlayerPlaylist.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PngImage.cpp">
@@ -318,7 +318,7 @@
     <ClCompile Include="VMROSD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VolumeCtrl.cpp">
+    <ClCompile Include="PlayerVolumeCtrl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WebClientSocket.cpp">
@@ -392,7 +392,7 @@
     <ClInclude Include="ComPropertySheet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CShockwaveFlash.h">
+    <ClInclude Include="ShockwaveFlash.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DeinterlacerFilter.h">
@@ -536,7 +536,7 @@
     <ClInclude Include="PlayerToolBar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Playlist.h">
+    <ClInclude Include="PlayerPlaylist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PngImage.h">
@@ -692,7 +692,7 @@
     <ClInclude Include="VMROSD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VolumeCtrl.h">
+    <ClInclude Include="PlayerVolumeCtrl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WebClientSocket.h">
