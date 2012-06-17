@@ -1,3 +1,3 @@
 CALL build.bat clean All
-CALL build.bat build All Packages
+CALL build.bat All Packages
 pause

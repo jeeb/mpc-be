@@ -24,7 +24,7 @@ TARGET_LIB     = $(TARGET_LIB_DIR)/ffmpeg.lib
 # Compiler and yasm flags
 CFLAGS    = -I. -I.. -Ilibavcodec -Ilibavutil -I$(ZLIB_DIR) -DHAVE_AV_CONFIG_H \
             -D_ISOC99_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 \
-            -std=gnu99 -mdll -mthreads -pipe
+            -std=gnu99 -mthreads -pipe
 OPTFLAGS  = -O2 -fno-common -fomit-frame-pointer -ffast-math
 YASMFLAGS = -I. -Ilibavutil/x86 -Pconfig.asm
 

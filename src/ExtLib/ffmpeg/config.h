@@ -25,7 +25,7 @@
     #define HAVE_GETADDRINFO 0
   #endif
 
-  #define restrict restrict
+  #define av_restrict restrict
 #else
   #define HAVE_INLINE_ASM 0
   #define HAVE_AMD3DNOW 0
@@ -40,7 +40,7 @@
   #define ARCH_X86_64 0
   #define HAVE_FAST_64BIT 0
 
-  #define restrict
+  #define av_restrict
   #define __asm__ __asm
   #define inline __inline
 #endif
