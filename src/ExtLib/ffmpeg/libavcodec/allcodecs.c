@@ -128,6 +128,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (WMAPRO, wmapro);
     REGISTER_DECODER (WMAV1, wmav1);
     REGISTER_DECODER (WMAV2, wmav2);
+    REGISTER_DECODER (TTA, tta);
 
     /* ADPCM codecs */
     REGISTER_DECODER (ADPCM_4XM, adpcm_4xm);

@@ -49,10 +49,10 @@ typedef struct {
 	IAsyncReader *pReader;
 	LONGLONG StreamPos;
 	LONGLONG StreamLen;
-} IAsyncCallBackWrapper;
+} IAsyncCallBackWrapper_wv;
 
-IAsyncCallBackWrapper* IAsyncCallBackWrapper_new(IAsyncReader *pReader);
-void IAsyncCallBackWrapper_free(IAsyncCallBackWrapper* iacw);
+IAsyncCallBackWrapper_wv* IAsyncCallBackWrapper_wv_new(IAsyncReader *pReader);
+void IAsyncCallBackWrapper_wv_free(IAsyncCallBackWrapper_wv* iacw);
 
 //-----------------------------------------------------------------------------
 
@@ -91,7 +91,7 @@ protected:
 
 	CWavPackSplitterFilter *m_pParentFilter;
 	IAsyncReader *m_pReader;
-	IAsyncCallBackWrapper *m_pIACBW;
+	IAsyncCallBackWrapper_wv *m_pIACBW;
 	WavPack_parser *m_pWavPackParser;
 
 	BOOL m_bAbort;

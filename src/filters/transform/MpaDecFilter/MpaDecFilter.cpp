@@ -118,6 +118,8 @@ static const FFMPEG_AUDIO_CODECS ffAudioCodecs[] = {
 	{ &MEDIASUBTYPE_MLP,				CODEC_ID_MLP},
 	// APE
 	{ &MEDIASUBTYPE_APE,				CODEC_ID_APE},
+	// TTA
+	{ &MEDIASUBTYPE_TTA1,				CODEC_ID_TTA},
 	// TRUESPEECH
 	{ &MEDIASUBTYPE_TRUESPEECH,			CODEC_ID_TRUESPEECH},
 	// Windows Media Audio 9 Professional
@@ -243,6 +245,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_MPC8},
 	// APE
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_APE},
+	// TTA
+	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_TTA1},
 	// TRUESPEECH
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_TRUESPEECH},
 	// Windows Media Audio 9 Professional

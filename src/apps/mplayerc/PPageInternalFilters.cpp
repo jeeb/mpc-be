@@ -52,6 +52,7 @@ static filter_t s_filters[] = {
 	{_T("RealMedia"),             SOURCE_FILTER,  SOURCE, SRC_REALMEDIA,  IDS_SRC_REALMEDIA},
 	{_T("RoQ"),                   SOURCE_FILTER,  SOURCE, SRC_ROQ,        IDS_SRC_ROQ},
 	{_T("SHOUTcast"),             SOURCE_FILTER,  SOURCE, SRC_SHOUTCAST,  0},
+	{_T("TTA"),                   SOURCE_FILTER,  SOURCE, SRC_TTA,        0},
 	{_T("WavPack"),               SOURCE_FILTER,  SOURCE, SRC_WPAC,       0},
 
 	// Audio decoder
@@ -73,6 +74,7 @@ static filter_t s_filters[] = {
 	{_T("PS2 Audio (PCM/ADPCM)"), DECODER,        AUDIO,  TRA_PS2AUD,     IDS_TRA_PS2AUD,},
 	{_T("QDesign Music Codec 2"), FFMPEG_DECODER, AUDIO,  FFM_QDM2,       IDS_TRA_FFMPEG,},
 	{_T("RealAudio"),             DECODER,        AUDIO,  TRA_RA,         IDS_TRA_RA},
+	{_T("TTA"),                   FFMPEG_DECODER, AUDIO,  FFM_TTA,        IDS_TRA_FFMPEG,},
 	{_T("Vorbis"),                FFMPEG_DECODER, AUDIO,  FFM_VORBIS,     IDS_TRA_FFMPEG,},
 	{_T("WavPack lossless audio"),FFMPEG_DECODER, AUDIO,  FFM_WPAC,       IDS_TRA_FFMPEG,},
 	{_T("WMA v.1/v.2"),           FFMPEG_DECODER, AUDIO,  FFM_WMA2,       IDS_TRA_FFMPEG,},

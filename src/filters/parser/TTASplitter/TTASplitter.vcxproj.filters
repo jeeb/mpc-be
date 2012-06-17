@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\ExtLib\mfc\afxctrlcontainer.cpp">
+      <Filter>Splitter Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ExtLib\mfc\winmdi.cpp">
+      <Filter>Splitter Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ExtLib\mfc\afxglobals.cpp">
+      <Filter>Splitter Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tta_file.cpp">
+      <Filter>Splitter Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TTASplitter.cpp">
+      <Filter>Splitter Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Splitter Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="tta_file.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TTASplitter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="reSplitter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{c49ba909-14b3-4e80-b9fd-75fb2f12c146}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ReSplitter Files">
+      <UniqueIdentifier>{b61da54a-9e8b-43cf-bc9c-9da19202c0b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Splitter Files">
+      <UniqueIdentifier>{eadcb632-1b6d-4682-a986-9380b886cf52}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ReSplitterCompile Include="TTASplitter.rc">
+      <Filter>ReSplitter Files</Filter>
+    </ReSplitterCompile>
+  </ItemGroup>
+</Project>

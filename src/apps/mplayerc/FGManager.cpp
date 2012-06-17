@@ -1597,6 +1597,15 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
 	m_transform.AddTail(pFGF);
 
+	if (src[SRC_TTA]) {
+		pFGF = DNew CFGFilterInternal<CTTASplitter>(TTASplitterName, MERIT64_ABOVE_DSHOW);
+	} else {
+		pFGF = DNew CFGFilterInternal<CTTASplitter>(LowMerit(TTASplitterName), MERIT64_DO_USE);
+	}
+	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_TTA1_Stream);
+	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
+	m_transform.AddTail(pFGF);
+
 	if (src[SRC_AMR]) {
 		pFGF = DNew CFGFilterInternal<CAMRSplitter>(AMRSplitterName, MERIT64_ABOVE_DSHOW);
 	} else {
@@ -1857,6 +1866,13 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 		(ffmpeg_filters[FFM_APE]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 		(ffmpeg_filters[FFM_APE]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
 	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_APE);
+	m_transform.AddTail(pFGF);
+
+	// TTA
+	pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
+		(ffmpeg_filters[FFM_TTA]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
+		(ffmpeg_filters[FFM_TTA]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_TTA1);
 	m_transform.AddTail(pFGF);
 
 	// TRUESPEECH

@@ -39,6 +39,7 @@
 #include "parser/RealMediaSplitter/RealMediaSplitter.h"
 #include "parser/RoQSplitter/RoQSplitter.h"
 #include "parser/StreamDriveThru/StreamDriveThru.h"
+#include "parser/TTASplitter/TTASplitter.h"
 
 #include "reader/CDDAReader/CDDAReader.h"
 #include "reader/CDXAReader/CDXAReader.h"
@@ -53,10 +54,10 @@
 #include "source/DTSAC3Source/DTSAC3Source.h"
 #include "source/FLACSource/FLACSource.h"
 #include "source/FLICSource/FLICSource.h"
+#include "source/MusePackSource/MusePackSource.h"
 #include "source/ShoutcastSource/ShoutcastSource.h"
 #include "source/SubtitleSource/SubtitleSource.h"
 #include "source/WavPackSource/WVSource.h"
-#include "source/MusePackSource/MusePackSource.h"
 
 #include "switcher/AudioSwitcher/AudioSwitcher.h"
 

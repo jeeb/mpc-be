@@ -275,10 +275,10 @@ HRESULT CWavPackSplitterFilterInputPin::CheckConnect(IPin* pPin)
 	}
 
 	if (m_pIACBW) {
-		IAsyncCallBackWrapper_free(m_pIACBW);
+		IAsyncCallBackWrapper_wv_free(m_pIACBW);
 		m_pIACBW = NULL;
 	}
-	m_pIACBW = IAsyncCallBackWrapper_new(m_pReader);        
+	m_pIACBW = IAsyncCallBackWrapper_wv_new(m_pReader);        
 
 	return S_OK;
 }
@@ -293,7 +293,7 @@ HRESULT CWavPackSplitterFilterInputPin::BreakConnect(void)
 	}
 
 	if (m_pIACBW) {
-		IAsyncCallBackWrapper_free(m_pIACBW);
+		IAsyncCallBackWrapper_wv_free(m_pIACBW);
 		m_pIACBW = NULL;
 	}
 
@@ -890,12 +890,12 @@ HRESULT CWavPackSplitterFilterOutputPin::GetPreroll(LONGLONG *pPreroll)
 }
 
 // ============================================================================
-// IAsyncCallBackWrapper
+// IAsyncCallBackWrapper_wv
 // ============================================================================
 
-int32_t IAsyncCallBackWrapper_read_bytes(void *id, void *data, int32_t bcount)
+int32_t IAsyncCallBackWrapper_wv_read_bytes(void *id, void *data, int32_t bcount)
 {
-	IAsyncCallBackWrapper* iacbw = (IAsyncCallBackWrapper*)id;
+	IAsyncCallBackWrapper_wv* iacbw = (IAsyncCallBackWrapper_wv*)id;
 	HRESULT hr = iacbw->pReader->SyncRead(iacbw->StreamPos, bcount, (BYTE*)data);
 	
 	if (hr == S_OK) {
@@ -908,17 +908,17 @@ int32_t IAsyncCallBackWrapper_read_bytes(void *id, void *data, int32_t bcount)
 
 // ----------------------------------------------------------------------------
 
-uint32_t IAsyncCallBackWrapper_get_pos(void *id)
+uint32_t IAsyncCallBackWrapper_wv_get_pos(void *id)
 {
-	IAsyncCallBackWrapper* iacbw = (IAsyncCallBackWrapper*)id;
+	IAsyncCallBackWrapper_wv* iacbw = (IAsyncCallBackWrapper_wv*)id;
 	return (uint32_t)iacbw->StreamPos;
 }
 
 // ----------------------------------------------------------------------------
 
-int IAsyncCallBackWrapper_set_pos_abs(void *id, uint32_t pos)
+int IAsyncCallBackWrapper_wv_set_pos_abs(void *id, uint32_t pos)
 {
-	IAsyncCallBackWrapper* iacbw = (IAsyncCallBackWrapper*)id;
+	IAsyncCallBackWrapper_wv* iacbw = (IAsyncCallBackWrapper_wv*)id;
 	iacbw->StreamPos = min(pos, iacbw->StreamLen);
 	if (pos > iacbw->StreamLen) {
 		return -1;
@@ -929,9 +929,9 @@ int IAsyncCallBackWrapper_set_pos_abs(void *id, uint32_t pos)
 
 // ----------------------------------------------------------------------------
 
-int IAsyncCallBackWrapper_set_pos_rel(void *id, int32_t delta, int mode)
+int IAsyncCallBackWrapper_wv_set_pos_rel(void *id, int32_t delta, int mode)
 {
-	IAsyncCallBackWrapper* iacbw = (IAsyncCallBackWrapper*)id;
+	IAsyncCallBackWrapper_wv* iacbw = (IAsyncCallBackWrapper_wv*)id;
 	LONGLONG newPos = 0;
 	switch (mode) {
 		case SEEK_SET:
@@ -955,9 +955,9 @@ int IAsyncCallBackWrapper_set_pos_rel(void *id, int32_t delta, int mode)
 
 // ----------------------------------------------------------------------------
 
-int IAsyncCallBackWrapper_push_back_byte(void *id, int c)
+int IAsyncCallBackWrapper_wv_push_back_byte(void *id, int c)
 {
-	IAsyncCallBackWrapper* iacbw = (IAsyncCallBackWrapper*)id;
+	IAsyncCallBackWrapper_wv* iacbw = (IAsyncCallBackWrapper_wv*)id;
 	iacbw->StreamPos = constrain(0, iacbw->StreamPos - 1, iacbw->StreamLen);
 	
 	return c;
@@ -965,35 +965,35 @@ int IAsyncCallBackWrapper_push_back_byte(void *id, int c)
 
 // ----------------------------------------------------------------------------
 
-uint32_t IAsyncCallBackWrapper_get_length(void *id)
+uint32_t IAsyncCallBackWrapper_wv_get_length(void *id)
 {
-	IAsyncCallBackWrapper* iacbw = (IAsyncCallBackWrapper*)id;
+	IAsyncCallBackWrapper_wv* iacbw = (IAsyncCallBackWrapper_wv*)id;
 	return (uint32_t)iacbw->StreamLen;
 }
 
 // ----------------------------------------------------------------------------
 
-int IAsyncCallBackWrapper_can_seek(void *id)
+int IAsyncCallBackWrapper_wv_can_seek(void *id)
 {
 	return 1;
 }
 
 // ----------------------------------------------------------------------------
 
-IAsyncCallBackWrapper* IAsyncCallBackWrapper_new(IAsyncReader *pReader)
+IAsyncCallBackWrapper_wv* IAsyncCallBackWrapper_wv_new(IAsyncReader *pReader)
 {
-	IAsyncCallBackWrapper* iacbw = DNew IAsyncCallBackWrapper;
+	IAsyncCallBackWrapper_wv* iacbw = DNew IAsyncCallBackWrapper_wv;
 	if (!iacbw) {
 		return NULL;
 	}
 
-	iacbw->iocallback.read_bytes = IAsyncCallBackWrapper_read_bytes;
-	iacbw->iocallback.get_pos = IAsyncCallBackWrapper_get_pos;
-	iacbw->iocallback.set_pos_abs = IAsyncCallBackWrapper_set_pos_abs;
-	iacbw->iocallback.set_pos_rel = IAsyncCallBackWrapper_set_pos_rel;
-	iacbw->iocallback.push_back_byte = IAsyncCallBackWrapper_push_back_byte;
-	iacbw->iocallback.get_length = IAsyncCallBackWrapper_get_length;
-	iacbw->iocallback.can_seek = IAsyncCallBackWrapper_can_seek;
+	iacbw->iocallback.read_bytes = IAsyncCallBackWrapper_wv_read_bytes;
+	iacbw->iocallback.get_pos = IAsyncCallBackWrapper_wv_get_pos;
+	iacbw->iocallback.set_pos_abs = IAsyncCallBackWrapper_wv_set_pos_abs;
+	iacbw->iocallback.set_pos_rel = IAsyncCallBackWrapper_wv_set_pos_rel;
+	iacbw->iocallback.push_back_byte = IAsyncCallBackWrapper_wv_push_back_byte;
+	iacbw->iocallback.get_length = IAsyncCallBackWrapper_wv_get_length;
+	iacbw->iocallback.can_seek = IAsyncCallBackWrapper_wv_can_seek;
 	iacbw->pReader = pReader;
 	iacbw->StreamPos = 0;
 
@@ -1006,7 +1006,7 @@ IAsyncCallBackWrapper* IAsyncCallBackWrapper_new(IAsyncReader *pReader)
 
 // ----------------------------------------------------------------------------
 
-void IAsyncCallBackWrapper_free(IAsyncCallBackWrapper* iacbw)
+void IAsyncCallBackWrapper_wv_free(IAsyncCallBackWrapper_wv* iacbw)
 {
 	delete iacbw;
 }
