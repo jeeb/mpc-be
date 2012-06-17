@@ -1,5 +1,5 @@
 /*
- * $Id: TTASplitter.cpp 498 2012-06-05 23:09:29Z Aleksoid $
+ * $Id$
  *
  * Adaptation for MPC-BE (C) 2012 Sergey "Exodus8" (rusguy6@gmail.com)
  *
