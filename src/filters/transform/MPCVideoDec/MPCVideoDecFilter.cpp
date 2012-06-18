@@ -55,7 +55,7 @@ extern "C"
 #include "DXVADecoderH264.h"
 #include "../../../apps/mplayerc/FilterEnum.h"
 
-#include "../../../apps/mplayerc/WinAPIUtils.h"
+#include "../../../DSUtil/WinAPIUtils.h"
 
 #define MAX_SUPPORTED_MODE			5
 #define ROUND_FRAMERATE(var,FrameRate)	if (labs ((long)(var - FrameRate)) < FrameRate*1/100) var = FrameRate;

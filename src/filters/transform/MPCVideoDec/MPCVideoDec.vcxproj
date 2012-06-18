@@ -250,7 +250,7 @@ update_version.bat</Command>
     <ClCompile Include="..\..\..\ExtLib\mfc\winmdi.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\..\apps\mplayerc\WinAPIUtils.cpp">
+    <ClCompile Include="..\..\..\DSUtil\WinAPIUtils.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="CpuId.cpp" />
