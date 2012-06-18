@@ -26,20 +26,14 @@
 #include "..\DSUtil\DSUtil.h"
 #include "stdafx.h"
 
-#ifndef TTACODEC_H
-#define TTACODEC_H
-
 #define TTA_COPYRIGHT		""
+#define TTA_MYNAME		""
+#define TTA_VERSION		"3.0"
+#define TTA_BUILD		""
 
-#define TTA_MYNAME			""
-#define TTA_VERSION			"3.0"
-#define TTA_BUILD			""
-
-#define TTA_MAX_BPS			32
+#define TTA_MAX_BPS		32
 #define TTA_FRAME_TIME		1.04489795918367346939
-
 #define TTA1_SIGN		0x31415454
-
 #define TTA_MAX_ORDER		16
 
 #ifdef _WIN32
@@ -49,7 +43,6 @@ typedef unsigned __int64 uint64;
 #define __ATTRIBUTE_PACKED__	__attribute__((packed))
 typedef unsigned long long uint64;
 #endif
-
 
 #ifdef _WIN32
 
@@ -69,7 +62,6 @@ typedef unsigned __int64 uint64;
 typedef unsigned long long uint64;
 
 #endif
-
 
 typedef struct {
 	unsigned long k0;
@@ -106,13 +98,12 @@ typedef struct {
 } TTA_bit_buffer;
 
 typedef struct {
-	TTA_channel_codec* enc;   // Encoders (1 per channel)
-	TTA_channel_codec* tta;   // Always the first channel encoder
-	TTA_bit_buffer *fbuf;     // Bit buffer containing 1 frame max
+	TTA_channel_codec* enc;
+	TTA_channel_codec* tta;
+	TTA_bit_buffer *fbuf;
 	long* data;
 	unsigned long data_len;
 
-	// Constant data during encoding
 	unsigned long framelen;
 	unsigned long srate;
 	unsigned short num_chan;
@@ -123,7 +114,6 @@ typedef struct {
 	unsigned short codec_num_chan;
 
 } TTA_codec;
-
 
 #ifdef _WIN32
 #pragma pack(push,1)
@@ -176,57 +166,31 @@ typedef struct {
 #pragma pack(pop)
 #endif
 
-// ----------------------------------------------------------------------------
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// ----------------------------------------------------------------------------
+TTA_codec* tta_codec_encoder_new(long srate, short num_chan, short bps, short format);
 
-TTA_codec* tta_codec_encoder_new(long srate,
-								 short num_chan,
-								 short bps,
-								 short format);
-
-TTA_codec* tta_codec_decoder_new(long srate,
-								 short num_chan,
-								 short bps);
+TTA_codec* tta_codec_decoder_new(long srate, short num_chan, short bps);
 
 void tta_codec_free(TTA_codec* ttaenc);
 
-unsigned long tta_codec_encoder_compress(TTA_codec* ttaenc,
-										 unsigned char *src,
-										 unsigned long len,
-										 unsigned long *bytes_to_write);
+unsigned long tta_codec_encoder_compress(TTA_codec* ttaenc, unsigned char *src, unsigned long len, unsigned long *bytes_to_write);
 
-unsigned char* tta_codec_encoder_get_frame(TTA_codec* ttaenc,
-										   unsigned long *num_frames);
+unsigned char* tta_codec_encoder_get_frame(TTA_codec* ttaenc, unsigned long *num_frames);
 
 unsigned long tta_codec_encoder_finalize(TTA_codec* ttaenc);
 
-unsigned long tta_codec_decoder_decompress(TTA_codec* ttadec,
-										   unsigned char *src,
-										   unsigned long len,
-										   unsigned char *dst,
-										   unsigned long dstlen);
+unsigned long tta_codec_decoder_decompress(TTA_codec* ttadec, unsigned char *src, unsigned long len, unsigned char *dst, unsigned long dstlen);
 
-void tta_codec_fill_header(TTA_codec* ttacodec,
-						   TTA_header *hdr,
-						   unsigned long data_len);
-
-// ----------------------------------------------------------------------------
+void tta_codec_fill_header(TTA_codec* ttacodec, TTA_header *hdr, unsigned long data_len);
 
 unsigned long tta_codec_get_frame_len(long srate);
 
-// ----------------------------------------------------------------------------
-
 TTA_parser* tta_parser_new(TTA_io_callback* io);
 
-unsigned long tta_parser_read_frame(TTA_parser* ttaparser,
-									unsigned char* dst,
-									unsigned long* FrameIndex,
-									unsigned long* FrameLen);
+unsigned long tta_parser_read_frame(TTA_parser* ttaparser, unsigned char* dst, unsigned long* FrameIndex, unsigned long* FrameLen);
 
 void tta_parser_seek(TTA_parser* ttaparser, uint64 seek_pos_100ns);
 
@@ -234,26 +198,16 @@ int tta_parser_eof(TTA_parser* ttaparser);
 
 void tta_parser_free(TTA_parser** ttaparser);
 
-// ----------------------------------------------------------------------------
-
 #ifdef __cplusplus
 }
 #endif	
 
-// ----------------------------------------------------------------------------
-
-#endif	/* TTACODEC_H */
-
-#ifndef FILTERS_H
-#define FILTERS_H
-
-///////// Filter Settings //////////
 static long flt_set [4][2] = {
 	{10,1}, {9,1}, {10,1}, {12,0}
 };
 
-__inline void
-memshl (register long *pA, register long *pB) {
+__inline void memshl (register long *pA, register long *pB)
+{
 	*pA++ = *pB++;
 	*pA++ = *pB++;
 	*pA++ = *pB++;
@@ -264,8 +218,8 @@ memshl (register long *pA, register long *pB) {
 	*pA   = *pB;
 }
 
-__inline void
-hybrid_filter (TTA_fltst *fs, long *in, long mode) {
+__inline void hybrid_filter (TTA_fltst *fs, long *in, long mode)
+{
 	register long *pA = fs->dl;
 	register long *pB = fs->qm;
 	register long *pM = fs->dx;
@@ -325,18 +279,13 @@ hybrid_filter (TTA_fltst *fs, long *in, long mode) {
 	memshl (fs->dx, fs->dx + 1);
 }
 
-__inline void
-filter_init (TTA_fltst *fs, long shift, long mode) {
+__inline void filter_init (TTA_fltst *fs, long shift, long mode)
+{
 	tta_memclear(fs, sizeof(TTA_fltst));
 	fs->shift = shift;
 	fs->round = 1 << (shift - 1);
 	fs->mutex = mode;
 }
-
-#endif	/* FILTERS_H */
-
-#ifndef CRC32_H
-#define CRC32_H
 
 const unsigned long crc32_table[256] = {
 	0x00000000, 0x77073096, 0xee0e612c, 0x990951ba,
@@ -408,8 +357,8 @@ const unsigned long crc32_table[256] = {
 #define UPDATE_CRC32(x, crc) crc = \
 	(((crc>>8) & 0x00FFFFFF) ^ crc32_table[(crc^x) & 0xFF])
 
-static unsigned long 
-crc32 (unsigned char *buffer, unsigned long len) {
+static unsigned long crc32 (unsigned char *buffer, unsigned long len)
+{
 	unsigned long	i;
 	unsigned long	crc = 0xFFFFFFFF;
 
@@ -417,5 +366,3 @@ crc32 (unsigned char *buffer, unsigned long len) {
 
 	return (crc ^ 0xFFFFFFFF);
 }
-
-#endif	/* CRC32_H */

@@ -32,8 +32,6 @@
 static const GUID CLSID_TTASplitter = 
 	{ 0xf60bad6d, 0x2101, 0x491a, { 0x92, 0x65, 0x9f, 0x7c, 0xb6, 0x7c, 0x6b, 0xbb } };
 
-//-----------------------------------------------------------------------------
-
 typedef struct {
 	TTA_io_callback iocallback;
 	IAsyncReader *pReader;
@@ -42,25 +40,23 @@ typedef struct {
 } IAsyncCallBackWrapper_tta;
 
 IAsyncCallBackWrapper_tta* IAsyncCallBackWrapper_tta_new(IAsyncReader *pReader);
-void IAsyncCallBackWrapper_tta_free(IAsyncCallBackWrapper_tta** iacw);
-
-//-----------------------------------------------------------------------------
+void IAsyncCallBackWrapper_tta_free(IAsyncCallBackWrapper_tta **iacw);
 
 class CTTASplitter;
 
 class CTTASplitterInputPin : public CBaseInputPin,
-							public CAMThread                             
+	public CAMThread                             
 {
 	friend class CTTASplitter;
 
 	public:
-	CTTASplitterInputPin(CTTASplitter *pParentFilter, CCritSec *pLock, HRESULT * phr);
+	CTTASplitterInputPin(CTTASplitter *pParentFilter, CCritSec *pLock, HRESULT *phr);
 	virtual ~CTTASplitterInputPin();
 
 	HRESULT CheckMediaType(const CMediaType *pmt);
 	CMediaType& CurrentMediaType() { return m_mt; };
 
-	HRESULT CheckConnect(IPin* pPin);
+	HRESULT CheckConnect(IPin *pPin);
 	HRESULT BreakConnect(void);
 	HRESULT CompleteConnect(IPin *pReceivePin); 
 
@@ -82,78 +78,68 @@ class CTTASplitterInputPin : public CBaseInputPin,
 	IAsyncReader *m_pReader;
 	IAsyncCallBackWrapper_tta *m_pIACBW;
 	TTA_parser *m_pTTAParser;
-    
+
 	BOOL m_bAbort;
 	BOOL m_bDiscontinuity;
 };
 
-//-----------------------------------------------------------------------------
-
 class CTTASplitterOutputPin : public CBaseOutputPin,
-							public IMediaSeeking
+	public IMediaSeeking
 {
 	friend class CTTASplitter;
 
 	public:
-	CTTASplitterOutputPin(CTTASplitter *pParentFilter, CCritSec *pLock,
-		HRESULT * phr);
+	CTTASplitterOutputPin(CTTASplitter *pParentFilter, CCritSec *pLock, HRESULT *phr);
 
 	DECLARE_IUNKNOWN
         
-	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void **ppv)
-	{
+	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void **ppv) {
+
 		if (riid == IID_IMediaSeeking) {
-			return GetInterface((IMediaSeeking *)this, ppv);
+			return GetInterface((IMediaSeeking*)this, ppv);
 		}
+
 		return CBaseOutputPin::NonDelegatingQueryInterface(riid, ppv);
 	}
 
 	HRESULT CheckMediaType(const CMediaType *pmt);
 	CMediaType& CurrentMediaType() { return m_mt; }
 	HRESULT GetMediaType(int iPosition, CMediaType *pMediaType);
-	HRESULT DecideBufferSize(IMemAllocator * pAlloc, ALLOCATOR_PROPERTIES *pProp);
-
-
-	// --- IMediaSeeking ---    
-	STDMETHODIMP IsFormatSupported(const GUID * pFormat);
+	HRESULT DecideBufferSize(IMemAllocator *pAlloc, ALLOCATOR_PROPERTIES *pProp);
+    
+	STDMETHODIMP IsFormatSupported(const GUID *pFormat);
 	STDMETHODIMP QueryPreferredFormat(GUID *pFormat);
-	STDMETHODIMP SetTimeFormat(const GUID * pFormat);
-	STDMETHODIMP IsUsingTimeFormat(const GUID * pFormat);
+	STDMETHODIMP SetTimeFormat(const GUID *pFormat);
+	STDMETHODIMP IsUsingTimeFormat(const GUID *pFormat);
 	STDMETHODIMP GetTimeFormat(GUID *pFormat);
 	STDMETHODIMP GetDuration(LONGLONG *pDuration);
 	STDMETHODIMP GetStopPosition(LONGLONG *pStop);
 	STDMETHODIMP GetCurrentPosition(LONGLONG *pCurrent);
-	STDMETHODIMP GetCapabilities(DWORD * pCapabilities);
-	STDMETHODIMP CheckCapabilities(DWORD * pCapabilities);
-	STDMETHODIMP ConvertTimeFormat(LONGLONG * pTarget, const GUID * pTargetFormat,
-		LONGLONG Source, const GUID * pSourceFormat);   
-	STDMETHODIMP SetPositions( LONGLONG * pCurrent, DWORD CurrentFlags,
-		LONGLONG * pStop, DWORD StopFlags);
-	STDMETHODIMP GetPositions(LONGLONG * pCurrent, LONGLONG * pStop);
-	STDMETHODIMP GetAvailable(LONGLONG * pEarliest, LONGLONG * pLatest);
+	STDMETHODIMP GetCapabilities(DWORD *pCapabilities);
+	STDMETHODIMP CheckCapabilities(DWORD *pCapabilities);
+	STDMETHODIMP ConvertTimeFormat(LONGLONG *pTarget, const GUID *pTargetFormat, LONGLONG Source, const GUID *pSourceFormat);   
+	STDMETHODIMP SetPositions( LONGLONG *pCurrent, DWORD CurrentFlags, LONGLONG *pStop, DWORD StopFlags);
+	STDMETHODIMP GetPositions(LONGLONG *pCurrent, LONGLONG *pStop);
+	STDMETHODIMP GetAvailable(LONGLONG *pEarliest, LONGLONG *pLatest);
 	STDMETHODIMP SetRate(double dRate);
-	STDMETHODIMP GetRate(double * pdRate);
+	STDMETHODIMP GetRate(double *pdRate);
 	STDMETHODIMP GetPreroll(LONGLONG *pPreroll);
 
 	protected:
 	CTTASplitter *m_pParentFilter;    
 };
 
-//-----------------------------------------------------------------------------
-
 class __declspec(uuid("F60BAD6D-2101-491a-9265-9F7CB67C6BBB"))
-CTTASplitter : 
-public CBaseFilter
+	CTTASplitter :
+	public CBaseFilter
 {
-
 	public :
 	DECLARE_IUNKNOWN
 	static CUnknown *WINAPI CreateInstance(LPUNKNOWN punk, HRESULT *phr); 
 
 	CTTASplitter(LPUNKNOWN lpunk, HRESULT *phr);
 	virtual ~CTTASplitter();
- 
-	// ----- CBaseFilter -----
+
 	int GetPinCount();
 	CBasePin *GetPin(int n);
 	STDMETHODIMP Stop(void);
@@ -169,8 +155,8 @@ public CBaseFilter
 
 	friend class CTTASplitterInputPin;
 	friend class CTTASplitterOutputPin;
-	CTTASplitterInputPin* m_pInputPin;
-	CTTASplitterOutputPin* m_pOutputPin;
+	CTTASplitterInputPin *m_pInputPin;
+	CTTASplitterOutputPin *m_pOutputPin;
 
 	REFERENCE_TIME m_rtStart, m_rtDuration, m_rtStop;
 	DWORD m_dwSeekingCaps;
@@ -178,6 +164,7 @@ public CBaseFilter
 
 	void SetDuration(REFERENCE_TIME rtDuration);
 	HRESULT DoSeeking();
+
 	TTA_header *GetTTAHeader() {
 		return m_pInputPin->m_pTTAParser ? &m_pInputPin->m_pTTAParser->TTAHeader : NULL;
 	}

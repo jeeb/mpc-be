@@ -22,7 +22,6 @@
  */
 
 #include "stdafx.h"
-#include <windows.h>
 #ifdef REGISTER_FILTER
 #include <initguid.h>
 #endif
@@ -30,8 +29,6 @@
 
 #include "TTASplitter.h"
 #include "tta_file.h"
-
-// ----------------------------------------------------------------------------
 
 #ifdef REGISTER_FILTER
 
@@ -70,552 +67,451 @@ CFilterApp theApp;
 
 #endif
 
-// ----------------------------------------------------------------------------
-
 CUnknown *WINAPI CTTASplitter::CreateInstance(LPUNKNOWN punk, HRESULT *phr)
 {
-    //DbgSetModuleLevel(LOG_ERROR,5);
-    //DbgSetModuleLevel(LOG_TRACE,5);
-    //DbgSetModuleLevel(LOG_MEMORY,2);
-    //DbgSetModuleLevel(LOG_LOCKING,2);
-    //DbgSetModuleLevel(LOG_TIMING,5);
+	CTTASplitter *pNewObject = DNew CTTASplitter(punk, phr);
 
-    CTTASplitter *pNewObject = DNew CTTASplitter(punk, phr);
-    if (!pNewObject)
-    {
-        *phr = E_OUTOFMEMORY;
-    }
-    return pNewObject;
+	if (!pNewObject) {
+		*phr = E_OUTOFMEMORY;
+	}
+
+	return pNewObject;
 }
-
-// ----------------------------------------------------------------------------
 
 CTTASplitter::CTTASplitter(LPUNKNOWN lpunk, HRESULT *phr) :
-    CBaseFilter(TTASplitterName, lpunk, &m_Lock, CLSID_TTASplitter),
-    m_pInputPin(NULL),
-    m_pOutputPin(NULL),
-    m_rtStart(0),
-    m_rtStop(0),
-    m_rtDuration(0),
-    m_dRateSeeking(1.0)
+	CBaseFilter(TTASplitterName, lpunk, &m_Lock, CLSID_TTASplitter),
+	m_pInputPin(NULL),
+	m_pOutputPin(NULL),
+	m_rtStart(0),
+	m_rtStop(0),
+	m_rtDuration(0),
+	m_dRateSeeking(1.0)
 {
-    m_dwSeekingCaps = AM_SEEKING_CanGetDuration     
-        | AM_SEEKING_CanGetStopPos
-        | AM_SEEKING_CanSeekForwards
-        | AM_SEEKING_CanSeekBackwards
-        | AM_SEEKING_CanSeekAbsolute;
+	m_dwSeekingCaps = AM_SEEKING_CanGetDuration | AM_SEEKING_CanGetStopPos | AM_SEEKING_CanSeekForwards | AM_SEEKING_CanSeekBackwards | AM_SEEKING_CanSeekAbsolute;
 
-    m_pInputPin = DNew CTTASplitterInputPin(this, &m_Lock, phr);
-    if(m_pInputPin == NULL)
-    {
-        if (phr)
-            *phr = E_OUTOFMEMORY;
-        return;
-    }
+	m_pInputPin = DNew CTTASplitterInputPin(this, &m_Lock, phr);
+	if (m_pInputPin == NULL) {
+		if (phr) {
+			*phr = E_OUTOFMEMORY;
+		}
+		return;
+	}
 
-    m_pOutputPin = DNew CTTASplitterOutputPin(this, &m_Lock, phr);
-    if(m_pOutputPin == NULL)
-    {
-        if (phr)
-            *phr = E_OUTOFMEMORY;
-        return;
-    }
+	m_pOutputPin = DNew CTTASplitterOutputPin(this, &m_Lock, phr);
+	if (m_pOutputPin == NULL) {
+		if (phr) {
+			*phr = E_OUTOFMEMORY;
+		}
+		return;
+	}
 }
-
-// ----------------------------------------------------------------------------
 
 CTTASplitter::~CTTASplitter()
 {
-    delete m_pInputPin;
-    m_pInputPin = NULL;
-    delete m_pOutputPin;
-    m_pOutputPin = NULL;
+	delete m_pInputPin;
+	m_pInputPin = NULL;
+	delete m_pOutputPin;
+	m_pOutputPin = NULL;
 }
-
-// ----------------------------------------------------------------------------
 
 STDMETHODIMP CTTASplitter::NonDelegatingQueryInterface(REFIID riid, void **ppv)
 {
-    CheckPointer(ppv,E_POINTER);
+	CheckPointer(ppv,E_POINTER);
 
-    if (riid == IID_IMediaSeeking) {
-        return GetInterface((IMediaSeeking*)this, ppv);
+	if (riid == IID_IMediaSeeking) {
+		return GetInterface((IMediaSeeking*)this, ppv);
 	}
 
 	return CBaseFilter::NonDelegatingQueryInterface(riid,ppv);
 }
 
-// ----------------------------------------------------------------------------
-
 int CTTASplitter::GetPinCount()
 {
-    CAutoLock lock(m_pLock);
-    return 2;
+	CAutoLock lock(m_pLock);
+	return 2;
 }
-
-// ----------------------------------------------------------------------------
 
 CBasePin* CTTASplitter::GetPin(int n)
 {
-    CAutoLock lock(m_pLock);
-    if(n == 0)
-        return m_pInputPin;
-    else if(n == 1)
-        return m_pOutputPin;
-    return NULL;
-}
+	CAutoLock lock(m_pLock);
 
-// ----------------------------------------------------------------------------
+	if (n == 0) {
+		return m_pInputPin;
+	} else if (n == 1) {
+		return m_pOutputPin;
+	}
+
+	return NULL;
+}
 
 STDMETHODIMP CTTASplitter::Stop(void)
 {
-    //DebugLog("CTTASplitter::Stop 0x%08X", GetCurrentThreadId());
-    return CBaseFilter::Stop();
+	return CBaseFilter::Stop();
 }
-
-// ----------------------------------------------------------------------------
 
 STDMETHODIMP CTTASplitter::Pause(void)
 {
-    //DebugLog("CTTASplitter::Pause 0x%08X", GetCurrentThreadId());
-
-    CAutoLock cObjectLock(m_pLock); 
+	CAutoLock cObjectLock(m_pLock); 
     
-    // notify all pins of the change to active state
+	if (m_State == State_Stopped) {
 
-    if (m_State == State_Stopped) {
-        // Order is important, the output pin allocator need to be commited
-        // when we activate the input pin
+		if (m_pOutputPin->IsConnected()) {
+			HRESULT hr = m_pOutputPin->Active();
 
-        // First the output pin
-        if (m_pOutputPin->IsConnected()) {
-            HRESULT hr = m_pOutputPin->Active();
-            if (FAILED(hr)) {
-                return hr;
-            }
-        }
-        // Then the input pin
-        if (m_pInputPin->IsConnected()) {
-            HRESULT hr = m_pInputPin->Active();
-            if (FAILED(hr)) {
-                return hr;
-            }
-        }
-    }
+			if (FAILED(hr)) {
+				return hr;
+			}
+		}
+
+		if (m_pInputPin->IsConnected()) {
+			HRESULT hr = m_pInputPin->Active();
+
+			if (FAILED(hr)) {
+				return hr;
+			}
+		}
+	}
     
-    m_State = State_Paused;
-    return S_OK;
+	m_State = State_Paused;
+
+	return S_OK;
 }
-
-// ----------------------------------------------------------------------------
 
 STDMETHODIMP CTTASplitter::Run(REFERENCE_TIME tStart)
 {
-    //DebugLog("CTTASplitter::Run 0x%08X", GetCurrentThreadId());
-    return CBaseFilter::Run(tStart);
+	return CBaseFilter::Run(tStart);
 }
-
-// ----------------------------------------------------------------------------
 
 void CTTASplitter::SetDuration(REFERENCE_TIME rtDuration)
 {
-    m_rtStart = 0; 
-    m_rtStop = rtDuration; 
-    m_rtDuration = rtDuration;
+	m_rtStart = 0; 
+	m_rtStop = rtDuration; 
+	m_rtDuration = rtDuration;
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CTTASplitter::BeginFlush()
 {
-    CAutoLock lock(m_pLock);
-    // Call DeliverBeginFlush on output pin first so GetDeliveryBuffer doesn't lock
-    // in input pin DoProcessingLoop
-    m_pOutputPin->DeliverBeginFlush();
-    // Suspend DoProcessingLoop
-    m_pInputPin->BeginFlush();
-    return NOERROR;
-}
+	CAutoLock lock(m_pLock);
 
-// ----------------------------------------------------------------------------
+	m_pOutputPin->DeliverBeginFlush();
+	m_pInputPin->BeginFlush();
+
+	return NOERROR;
+}
 
 HRESULT CTTASplitter::EndFlush()
 {
-    CAutoLock lock(m_pLock);
-    m_pOutputPin->DeliverEndFlush();
-    m_pInputPin->EndFlush(); 
-    return NOERROR;
-}
+	CAutoLock lock(m_pLock);
 
-// ----------------------------------------------------------------------------
+	m_pOutputPin->DeliverEndFlush();
+	m_pInputPin->EndFlush();
+
+	return NOERROR;
+}
 
 HRESULT CTTASplitter::DoSeeking()
 {
-    return m_pInputPin->DoSeeking(m_rtStart);
+	return m_pInputPin->DoSeeking(m_rtStart);
 }
 
-// ============================================================================
-
-CTTASplitterInputPin::CTTASplitterInputPin(
-    CTTASplitter *pParentFilter, CCritSec *pLock, HRESULT * phr) :
-    CBaseInputPin(NAME("CTTASplitterInputPin"),
-        (CBaseFilter *) pParentFilter,
-        pLock,
-        phr,
-        L"Input"),      
-    m_pParentFilter(pParentFilter),
-    m_pReader(NULL),
-    m_bDiscontinuity(FALSE),
-    m_pIACBW(NULL),
-    m_pTTAParser(NULL)
+CTTASplitterInputPin::CTTASplitterInputPin(CTTASplitter *pParentFilter, CCritSec *pLock, HRESULT *phr) :
+	CBaseInputPin(NAME("CTTASplitterInputPin"), (CBaseFilter*)pParentFilter, pLock, phr, L"Input"),      
+	m_pParentFilter(pParentFilter),
+	m_pReader(NULL),
+	m_bDiscontinuity(FALSE),
+	m_pIACBW(NULL),
+	m_pTTAParser(NULL)
 {
-    
 }
-
-// ----------------------------------------------------------------------------
 
 CTTASplitterInputPin::~CTTASplitterInputPin()
 {
-    if(m_pTTAParser)
-        tta_parser_free(&m_pTTAParser);
+	if (m_pTTAParser) {
+		tta_parser_free(&m_pTTAParser);
+	}
 }
-    
-// ----------------------------------------------------------------------------
 
 HRESULT CTTASplitterInputPin::CheckMediaType(const CMediaType *pmt)
 {
-    if (*pmt->Type() != MEDIATYPE_Stream) {
-        return VFW_E_TYPE_NOT_ACCEPTED;
-    }
-    
-    return S_OK;
+	if (*pmt->Type() != MEDIATYPE_Stream) {
+		return VFW_E_TYPE_NOT_ACCEPTED;
+	}
+
+	return S_OK;
 }
 
-// ----------------------------------------------------------------------------
-
-HRESULT CTTASplitterInputPin::CheckConnect(IPin* pPin)
+HRESULT CTTASplitterInputPin::CheckConnect(IPin *pPin)
 {
-    HRESULT hr = CBaseInputPin::CheckConnect(pPin);
-    if (FAILED(hr))
-        return hr;
+	HRESULT hr = CBaseInputPin::CheckConnect(pPin);
+	if (FAILED(hr)) {
+		return hr;
+	}
 
-    hr = pPin->QueryInterface(IID_IAsyncReader, (void**)&m_pReader); 
-    if (FAILED(hr))
-        return S_FALSE;
+	hr = pPin->QueryInterface(IID_IAsyncReader, (void**)&m_pReader); 
+	if (FAILED(hr)) {
+		return S_FALSE;
+	}
 
-    if(m_pIACBW)
-        IAsyncCallBackWrapper_tta_free(&m_pIACBW);
-    m_pIACBW = IAsyncCallBackWrapper_tta_new(m_pReader);        
+	if (m_pIACBW) {
+		IAsyncCallBackWrapper_tta_free(&m_pIACBW);
+	}
 
-    return S_OK;    
+	m_pIACBW = IAsyncCallBackWrapper_tta_new(m_pReader);        
+
+	return S_OK;    
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CTTASplitterInputPin::BreakConnect(void)
 {
-    HRESULT hr = CBaseInputPin::BreakConnect();
-    if (FAILED(hr))
-        return hr;
-    
-    if(m_pIACBW)
-        IAsyncCallBackWrapper_tta_free(&m_pIACBW);
+	HRESULT hr = CBaseInputPin::BreakConnect();
+	if (FAILED(hr)) {
+        	return hr;
+	}
+	
+	if(m_pIACBW) {
+		IAsyncCallBackWrapper_tta_free(&m_pIACBW);
+	}
 
-    if (m_pReader) 
-    { 
-        m_pReader->Release(); 
-        m_pReader = NULL; 
-    }
-    
-    return S_OK;
+	if (m_pReader) {
+		m_pReader->Release(); 
+		m_pReader = NULL; 
+	}
+
+	return S_OK;
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CTTASplitterInputPin::CompleteConnect(IPin *pReceivePin)
 {
-    HRESULT hr = CBaseInputPin::CompleteConnect(pReceivePin);
-    if (FAILED(hr))
-        return hr;
-    
-    if(m_pTTAParser)
-        tta_parser_free(&m_pTTAParser);
-    m_pTTAParser = tta_parser_new((TTA_io_callback*)m_pIACBW);
-    if(!m_pTTAParser)
-    {
-        return E_FAIL;
-    }
-    
-    // Compute total duration
-    REFERENCE_TIME rtDuration;
-    rtDuration = ((m_pTTAParser->FrameTotal - 1) * m_pTTAParser->FrameLen + m_pTTAParser->LastFrameLen);
-    rtDuration = (rtDuration * 10000000) / m_pTTAParser->TTAHeader.SampleRate;
-    m_pParentFilter->SetDuration(rtDuration);
+	HRESULT hr = CBaseInputPin::CompleteConnect(pReceivePin);
+	if (FAILED(hr)) {
+		return hr;
+	}
 
-    return S_OK;
+	if(m_pTTAParser) {
+		tta_parser_free(&m_pTTAParser);
+	}
+
+	m_pTTAParser = tta_parser_new((TTA_io_callback*)m_pIACBW);
+	if (!m_pTTAParser) {
+		return E_FAIL;
+	}
+
+	REFERENCE_TIME rtDuration;
+	rtDuration = ((m_pTTAParser->FrameTotal - 1) * m_pTTAParser->FrameLen + m_pTTAParser->LastFrameLen);
+	rtDuration = (rtDuration * 10000000) / m_pTTAParser->TTAHeader.SampleRate;
+	m_pParentFilter->SetDuration(rtDuration);
+
+	return S_OK;
 }
-
-// ----------------------------------------------------------------------------
 
 DWORD CTTASplitterInputPin::ThreadProc()
 {
-    DWORD com; 
-    
-    //DebugLog("===> Entering CTTASplitterInputPin::ThreadProc... 0x%08X", GetCurrentThreadId());
+	DWORD com;
 
-    do 
-    { 
-        //DebugLog("===> ThreadProc waiting command... 0x%08X", GetCurrentThreadId());
-        com = GetRequest();
-        switch (com) 
-        { 
-        case CMD_EXIT:
-            //DebugLog("===> ThreadProc CMD_EXIT 0x%08X", GetCurrentThreadId());
-            Reply(NOERROR); 
-            break; 
-            
-        case CMD_STOP: 
-            //DebugLog("===> ThreadProc CMD_STOP 0x%08X", GetCurrentThreadId());
-            Reply(NOERROR); 
-            break; 
-            
-        case CMD_RUN:
-            //DebugLog("===> ThreadProc CMD_RUN 0x%08X", GetCurrentThreadId());
-            //DebugLog("===> Entering DoProcessingLoop... 0x%08X", GetCurrentThreadId());
-            DoProcessingLoop(); 
-            //DebugLog("<=== Leaving DoProcessingLoop 0x%08X", GetCurrentThreadId());
-            break; 
-        } 
-    } while (com != CMD_EXIT);
+	do {
+        	com = GetRequest();
 
-    //DebugLog("<=== Leaving CTTASplitterInputPin::ThreadProc 0x%08X", GetCurrentThreadId());
-    
-    return NOERROR; 
+		switch (com) {
+			case CMD_EXIT:
+				Reply(NOERROR); 
+				break; 
+
+			case CMD_STOP:
+				Reply(NOERROR); 
+				break; 
+			case CMD_RUN:
+				DoProcessingLoop();
+				break; 
+		}
+
+	} while (com != CMD_EXIT);
+
+	return NOERROR; 
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CTTASplitterInputPin::DoProcessingLoop(void)
 {
-    DWORD com;
-    IMediaSample *pSample;
-    BYTE *Buffer;
-    HRESULT hr;
-    unsigned long FrameLenBytes, FrameLenSamples, FrameIndex;
+	DWORD com;
+	IMediaSample *pSample;
+	BYTE *Buffer;
+	HRESULT hr;
+	unsigned long FrameLenBytes, FrameLenSamples, FrameIndex;
 
-    Reply(NOERROR);
-    m_bAbort = FALSE;
+	Reply(NOERROR);
+	m_bAbort = FALSE;
     
-    m_pParentFilter->m_pOutputPin->DeliverNewSegment(0,
-        m_pParentFilter->m_rtStop - m_pParentFilter->m_rtStart,
-        m_pParentFilter->m_dRateSeeking);
+	m_pParentFilter->m_pOutputPin->DeliverNewSegment(0,
+	m_pParentFilter->m_rtStop - m_pParentFilter->m_rtStart,
+	m_pParentFilter->m_dRateSeeking);
 
-    do
-    {
-        if(m_pIACBW->StreamPos >= m_pIACBW->StreamLen || tta_parser_eof(m_pTTAParser))
-        { 
-            // EOF
-            m_pParentFilter->m_pOutputPin->DeliverEndOfStream();
-            // TODO : check if we need to stop the thread
-            return NOERROR;
-        }
-        
-        // Get a DNew media sample
-        hr = m_pParentFilter->m_pOutputPin->GetDeliveryBuffer(&pSample, NULL, NULL, 0); 
-        if (FAILED(hr))
-        {
-            //DebugLog("CTTASplitterInputPin::DoProcessingLoop GetDeliveryBuffer failed 0x%08X",hr);
-            return hr;
-        }
+	do {
+		if (m_pIACBW->StreamPos >= m_pIACBW->StreamLen || tta_parser_eof(m_pTTAParser)) {
+			m_pParentFilter->m_pOutputPin->DeliverEndOfStream();
+			return NOERROR;
+		}
 
-        hr = pSample->GetPointer(&Buffer);
-        if (FAILED(hr))
-        {
-            //DebugLog("CTTASplitterInputPin::DoProcessingLoop GetPointer failed 0x%08X",hr);
-            pSample->Release();
-            return hr;
-        }
+		hr = m_pParentFilter->m_pOutputPin->GetDeliveryBuffer(&pSample, NULL, NULL, 0); 
+		if (FAILED(hr)) {
+			return hr;
+		}
 
-        FrameLenBytes = tta_parser_read_frame(m_pTTAParser, Buffer,
-            &FrameIndex, &FrameLenSamples);
-        if(!FrameLenBytes)
-        {
-            // Something bad happened, let's end here
-            pSample->Release();
-            m_pParentFilter->m_pOutputPin->DeliverEndOfStream();
-            // TODO : check if we need to stop the thread
-            //DebugLog("CTTASplitterInputPin::DoProcessingLoop tta_parser_read_frame error");
-            return hr;
-        }
-        pSample->SetActualDataLength(FrameLenBytes);
+		hr = pSample->GetPointer(&Buffer);
+		if (FAILED(hr)) {
+			pSample->Release();
+			return hr;
+		}
 
+		FrameLenBytes = tta_parser_read_frame(m_pTTAParser, Buffer, &FrameIndex, &FrameLenSamples);
+		if (!FrameLenBytes) {
+			pSample->Release();
+			m_pParentFilter->m_pOutputPin->DeliverEndOfStream();
+			return hr;
+		}
 
-        REFERENCE_TIME rtStart, rtStop;
-        rtStart = (FrameIndex * m_pTTAParser->FrameLen);
-        rtStop = rtStart + FrameLenSamples;
-        rtStart = (rtStart * 10000000) / m_pTTAParser->TTAHeader.SampleRate;
-        rtStop = (rtStop * 10000000) / m_pTTAParser->TTAHeader.SampleRate;
-        
-        rtStart -= m_pParentFilter->m_rtStart;
-        rtStop  -= m_pParentFilter->m_rtStart;
-        
-        pSample->SetTime(&rtStart, &rtStop);
-        pSample->SetPreroll(FALSE);
-        pSample->SetDiscontinuity(m_bDiscontinuity);
-        if(m_bDiscontinuity)
-            m_bDiscontinuity = FALSE;
-        pSample->SetSyncPoint(TRUE);
+		pSample->SetActualDataLength(FrameLenBytes);
 
-        // Deliver the sample
-        hr = m_pParentFilter->m_pOutputPin->Deliver(pSample);
-        pSample->Release();
-        pSample = NULL;
-        if (FAILED(hr))
-        {
-            //DebugLog("CTTASplitterInputPin::DoProcessingLoop Deliver failed 0x%08X",hr);
-            return hr;
-        }
-        
-    } while (!CheckRequest((DWORD*)&com) && !m_bAbort);
+		REFERENCE_TIME rtStart, rtStop;
+		rtStart = (FrameIndex * m_pTTAParser->FrameLen);
+		rtStop = rtStart + FrameLenSamples;
+		rtStart = (rtStart * 10000000) / m_pTTAParser->TTAHeader.SampleRate;
+		rtStop = (rtStop * 10000000) / m_pTTAParser->TTAHeader.SampleRate;
 
-    return NOERROR;
+		rtStart -= m_pParentFilter->m_rtStart;
+		rtStop  -= m_pParentFilter->m_rtStart;
+
+		pSample->SetTime(&rtStart, &rtStop);
+		pSample->SetPreroll(FALSE);
+		pSample->SetDiscontinuity(m_bDiscontinuity);
+
+		if (m_bDiscontinuity) {
+			m_bDiscontinuity = FALSE;
+		}
+		pSample->SetSyncPoint(TRUE);
+
+		hr = m_pParentFilter->m_pOutputPin->Deliver(pSample);
+		pSample->Release();
+		pSample = NULL;
+
+		if (FAILED(hr)) {
+			return hr;
+		}
+
+	} while (!CheckRequest((DWORD*)&com) && !m_bAbort);
+
+	return NOERROR;
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CTTASplitterInputPin::Active()
 {
-    HRESULT hr;
+	HRESULT hr;
 
-    //DebugLog("CTTASplitterInputPin::Active 0x%08X", GetCurrentThreadId());
-    
-    if(m_pParentFilter->IsActive())
-        return S_FALSE;
-    if (!IsConnected())
-        return NOERROR;
-    hr = CBaseInputPin::Active();
-    if (FAILED(hr))
-        return hr;  
-    
-    // Create and start the thread
+	if (m_pParentFilter->IsActive()) {
+		return S_FALSE;
+	}
 
-    if (!Create())
-        return E_FAIL;
-    CallWorker(CMD_RUN);
+	if (!IsConnected()) {
+		return NOERROR;
+	}
 
-    return NOERROR;
+	hr = CBaseInputPin::Active();
+	if (FAILED(hr)) {
+		return hr;
+	}
+
+	if (!Create()) {
+		return E_FAIL;
+	}
+
+	CallWorker(CMD_RUN);
+
+	return NOERROR;
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CTTASplitterInputPin::Inactive()
 {
-    //DebugLog("CTTASplitterInputPin::Inactive 0x%08X", GetCurrentThreadId());
+	if (ThreadExists()) {
+		m_bAbort = TRUE;
+		CallWorker(CMD_EXIT);
+		Close();
+	}
 
-    // Stop the thread
-    if (ThreadExists())
-    { 
-        m_bAbort = TRUE;
-        CallWorker(CMD_EXIT);
-        Close();
-    }
-        
-    return CBasePin::Inactive();
+	return CBasePin::Inactive();
 }
-
-// ----------------------------------------------------------------------------
 
 STDMETHODIMP CTTASplitterInputPin::BeginFlush()
 {
-    HRESULT hr = CBaseInputPin::BeginFlush();
-    if (FAILED(hr))
-        return hr;
+	HRESULT hr = CBaseInputPin::BeginFlush();
+	if (FAILED(hr)) {
+		return hr;
+	}
 
-    //DebugLog("CTTASplitterInputPin::BeginFlush 0x%08X", GetCurrentThreadId());
+	if (!ThreadExists()) {
+		return NOERROR;
+	}
 
-    if (!ThreadExists())
-        return NOERROR;     
-    m_bAbort = TRUE;
-    CallWorker(CMD_STOP);
-    return  NOERROR;
+	m_bAbort = TRUE;
+	CallWorker(CMD_STOP);
+
+	return  NOERROR;
 }
-
-// ----------------------------------------------------------------------------
 
 STDMETHODIMP CTTASplitterInputPin::EndFlush()
 {
-    HRESULT hr = CBaseInputPin::EndFlush();
-    if (FAILED(hr))
-        return hr;
+	HRESULT hr = CBaseInputPin::EndFlush();
+	if (FAILED(hr)) {
+		return hr;
+	}
 
-    //DebugLog("CTTASplitterInputPin::EndFlush 0x%08X", GetCurrentThreadId());
+	if (ThreadExists()) {
+		CallWorker(CMD_RUN);
+	}
 
-    if (ThreadExists())
-        CallWorker(CMD_RUN);
-
-    return NOERROR; 
+	return NOERROR; 
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CTTASplitterInputPin::DoSeeking(REFERENCE_TIME rtStart)
 {
-    //DebugLog("CTTASplitterInputPin::DoSeeking to %I64d ms, 0x%08X", rtStart/10000, GetCurrentThreadId());
-    tta_parser_seek(m_pTTAParser, rtStart);
-    m_bDiscontinuity = TRUE;
-    return S_OK;
+	tta_parser_seek(m_pTTAParser, rtStart);
+	m_bDiscontinuity = TRUE;
+
+	return S_OK;
 }
 
-// ============================================================================
-
-CTTASplitterOutputPin::CTTASplitterOutputPin(
-    CTTASplitter *pParentFilter, CCritSec *pLock, HRESULT * phr) :
-    CBaseOutputPin(NAME("CTTASplitterOutputPin"),
-              (CBaseFilter *) pParentFilter,
-              pLock,
-              phr,
-              L"Output"),
-    m_pParentFilter(pParentFilter)
+CTTASplitterOutputPin::CTTASplitterOutputPin(CTTASplitter *pParentFilter, CCritSec *pLock, HRESULT *phr) :
+	CBaseOutputPin(NAME("CTTASplitterOutputPin"), (CBaseFilter*)pParentFilter, pLock, phr, L"Output"),
+	m_pParentFilter(pParentFilter)
 {
-    
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CTTASplitterOutputPin::CheckMediaType(const CMediaType *pmt)
 {
-    // must have selected input first
-    ASSERT(m_pParentFilter->m_pInputPin != NULL);
-    if ((m_pParentFilter->m_pInputPin->IsConnected() == FALSE)) {
-        return E_INVALIDARG;
-    }
+	ASSERT(m_pParentFilter->m_pInputPin != NULL);
 
-    if ((*pmt->Type() != MEDIATYPE_Audio) ||
-        (*pmt->Subtype() != MEDIASUBTYPE_TTA1) ||
-        (*pmt->FormatType() != FORMAT_WaveFormatEx))
-    {
-        return VFW_E_TYPE_NOT_ACCEPTED;
-    }
+	if ((m_pParentFilter->m_pInputPin->IsConnected() == FALSE)) {
+		return E_INVALIDARG;
+	}
 
-    return m_pParentFilter->m_pInputPin->CheckMediaType(&m_pParentFilter->m_pInputPin->CurrentMediaType());
+	if ((*pmt->Type() != MEDIATYPE_Audio) || (*pmt->Subtype() != MEDIASUBTYPE_TTA1) || (*pmt->FormatType() != FORMAT_WaveFormatEx)) {
+		return VFW_E_TYPE_NOT_ACCEPTED;
+	}
+
+	return m_pParentFilter->m_pInputPin->CheckMediaType(&m_pParentFilter->m_pInputPin->CurrentMediaType());
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CTTASplitterOutputPin::GetMediaType(int iPosition, CMediaType *pMediaType)
 {
-    if (!m_pParentFilter->m_pInputPin->IsConnected()) {
-        return E_UNEXPECTED;
-    }
-    
-    if (iPosition < 0) {
-        return E_INVALIDARG;
-    }
-    
-    if (iPosition > 0) {
-        return VFW_S_NO_MORE_ITEMS;
-    }
-	
+	if (!m_pParentFilter->m_pInputPin->IsConnected()) {
+		return E_UNEXPECTED;
+	}
+
+	if (iPosition < 0) {
+		return E_INVALIDARG;
+	}
+
+	if (iPosition > 0) {
+		return VFW_S_NO_MORE_ITEMS;
+	}
+
 	TTA_header *ttahdr = m_pParentFilter->GetTTAHeader();
 	if (ttahdr == NULL) {
 		return E_UNEXPECTED;
@@ -626,11 +522,11 @@ HRESULT CTTASplitterOutputPin::GetMediaType(int iPosition, CMediaType *pMediaTyp
 		return E_UNEXPECTED;
 	}
 
-    pMediaType->InitMediaType();
-    pMediaType->SetType(&MEDIATYPE_Audio);
-    pMediaType->SetSubtype(&MEDIASUBTYPE_TTA1);
-    pMediaType->SetFormatType(&FORMAT_WaveFormatEx);
-    pMediaType->SetVariableSize();
+	pMediaType->InitMediaType();
+	pMediaType->SetType(&MEDIATYPE_Audio);
+	pMediaType->SetSubtype(&MEDIASUBTYPE_TTA1);
+	pMediaType->SetFormatType(&FORMAT_WaveFormatEx);
+	pMediaType->SetVariableSize();
 
 	WAVEFORMATEX* wfe	= (WAVEFORMATEX*)pMediaType->AllocFormatBuffer(sizeof(WAVEFORMATEX) + ttaparser->extradata_size);
 	memset(wfe, 0, sizeof(WAVEFORMATEX));
@@ -639,346 +535,291 @@ HRESULT CTTASplitterOutputPin::GetMediaType(int iPosition, CMediaType *pMediaTyp
 	wfe->nChannels		= ttahdr->NumChannels;
 	wfe->nSamplesPerSec	= ttahdr->SampleRate;
 	wfe->cbSize			= ttaparser->extradata_size;
+
 	if (wfe->cbSize) {
 		memcpy((BYTE*)(wfe+1), ttaparser->extradata, ttaparser->extradata_size);
 	}
-    
-    return S_OK;
+
+	return S_OK;
 }
 
-// ----------------------------------------------------------------------------
-
-HRESULT CTTASplitterOutputPin::DecideBufferSize(IMemAllocator * pAlloc, ALLOCATOR_PROPERTIES *pProp)
+HRESULT CTTASplitterOutputPin::DecideBufferSize(IMemAllocator *pAlloc, ALLOCATOR_PROPERTIES *pProp)
 {
-    if(!m_pParentFilter->m_pInputPin->IsConnected())
-    {
-        return E_UNEXPECTED;
-    }
+	if (!m_pParentFilter->m_pInputPin->IsConnected()) {
+		return E_UNEXPECTED;
+	}
+     
+	TTA_header* ttahdr = m_pParentFilter->GetTTAHeader();
+	pProp->cBuffers = 1;
+	pProp->cbBuffer = m_pParentFilter->GetMaxFrameLenBytes();
 
-    // Make place for 1 TTA frame + CRC32       
-    TTA_header* ttahdr = m_pParentFilter->GetTTAHeader();
-    pProp->cBuffers = 1;
-    pProp->cbBuffer = m_pParentFilter->GetMaxFrameLenBytes();
-    if(pProp->cbBuffer == 0)
-    {
-		
-        pProp->cbBuffer = tta_codec_get_frame_len(ttahdr->SampleRate) *
-            ttahdr->NumChannels * (ttahdr->BitsPerSample / 8) +
-            sizeof(ttahdr->CRC32);
-    }
+	if (pProp->cbBuffer == 0) {
+        	pProp->cbBuffer = tta_codec_get_frame_len(ttahdr->SampleRate) * ttahdr->NumChannels * (ttahdr->BitsPerSample / 8) + sizeof(ttahdr->CRC32);
+	}
 
-    ALLOCATOR_PROPERTIES Actual;
-    HRESULT hr = pAlloc->SetProperties(pProp, &Actual);
-    if(FAILED(hr))
-    {
-        return hr;
-    }
-    
-    if (Actual.cbBuffer < pProp->cbBuffer ||
-        Actual.cBuffers < pProp->cBuffers)
-    {
-        return E_INVALIDARG;
-    }   
-    
-    return S_OK;
+	ALLOCATOR_PROPERTIES Actual;
+	HRESULT hr = pAlloc->SetProperties(pProp, &Actual);
+	if (FAILED(hr)) {
+		return hr;
+	}
+
+	if (Actual.cbBuffer < pProp->cbBuffer || Actual.cBuffers < pProp->cBuffers) {
+		return E_INVALIDARG;
+	}
+
+	return S_OK;
 }
 
-// ----------------------------------------------------------------------------
-// IMediaSeeking
-// ----------------------------------------------------------------------------
-
-HRESULT CTTASplitterOutputPin::IsFormatSupported(const GUID * pFormat)
+HRESULT CTTASplitterOutputPin::IsFormatSupported(const GUID *pFormat)
 {
-    CheckPointer(pFormat, E_POINTER);
-    // only seeking in time (REFERENCE_TIME units) is supported
-    return *pFormat == TIME_FORMAT_MEDIA_TIME ? S_OK : S_FALSE;
-}
+	CheckPointer(pFormat, E_POINTER);
 
-// ----------------------------------------------------------------------------
+	return *pFormat == TIME_FORMAT_MEDIA_TIME ? S_OK : S_FALSE;
+}
 
 HRESULT CTTASplitterOutputPin::QueryPreferredFormat(GUID *pFormat)
 {
-    CheckPointer(pFormat, E_POINTER);
-    *pFormat = TIME_FORMAT_MEDIA_TIME;
-    return S_OK;
+	CheckPointer(pFormat, E_POINTER);
+	*pFormat = TIME_FORMAT_MEDIA_TIME;
+
+	return S_OK;
 }
 
-// ----------------------------------------------------------------------------
-
-HRESULT CTTASplitterOutputPin::SetTimeFormat(const GUID * pFormat)
+HRESULT CTTASplitterOutputPin::SetTimeFormat(const GUID *pFormat)
 {
-    CheckPointer(pFormat, E_POINTER);
-    // nothing to set; just check that it's TIME_FORMAT_TIME
-    return *pFormat == TIME_FORMAT_MEDIA_TIME ? S_OK : E_INVALIDARG;
+	CheckPointer(pFormat, E_POINTER);
+
+	return *pFormat == TIME_FORMAT_MEDIA_TIME ? S_OK : E_INVALIDARG;
 }
 
-// ----------------------------------------------------------------------------
-
-HRESULT CTTASplitterOutputPin::IsUsingTimeFormat(const GUID * pFormat)
+HRESULT CTTASplitterOutputPin::IsUsingTimeFormat(const GUID *pFormat)
 {
-    CheckPointer(pFormat, E_POINTER);
-    return *pFormat == TIME_FORMAT_MEDIA_TIME ? S_OK : S_FALSE;
-}
+	CheckPointer(pFormat, E_POINTER);
 
-// ----------------------------------------------------------------------------
+	return *pFormat == TIME_FORMAT_MEDIA_TIME ? S_OK : S_FALSE;
+}
 
 HRESULT CTTASplitterOutputPin::GetTimeFormat(GUID *pFormat)
 {
-    CheckPointer(pFormat, E_POINTER);
-    *pFormat = TIME_FORMAT_MEDIA_TIME;
-    return S_OK;
-}
+	CheckPointer(pFormat, E_POINTER);
+	*pFormat = TIME_FORMAT_MEDIA_TIME;
 
-// ----------------------------------------------------------------------------
+	return S_OK;
+}
 
 HRESULT CTTASplitterOutputPin::GetDuration(LONGLONG *pDuration)
 {
-    CheckPointer(pDuration, E_POINTER);
-    CAutoLock lock(m_pParentFilter->m_pLock);
-    *pDuration = m_pParentFilter->m_rtDuration;
-    return S_OK;
-}
+	CheckPointer(pDuration, E_POINTER);
 
-// ----------------------------------------------------------------------------
+	CAutoLock lock(m_pParentFilter->m_pLock);
+	*pDuration = m_pParentFilter->m_rtDuration;
+
+	return S_OK;
+}
 
 HRESULT CTTASplitterOutputPin::GetStopPosition(LONGLONG *pStop)
 {
-    CheckPointer(pStop, E_POINTER);
-    CAutoLock lock(m_pParentFilter->m_pLock);
-    *pStop = m_pParentFilter->m_rtStop;
-    return S_OK;
-}
+	CheckPointer(pStop, E_POINTER);
 
-// ----------------------------------------------------------------------------
+	CAutoLock lock(m_pParentFilter->m_pLock);
+	*pStop = m_pParentFilter->m_rtStop;
+
+	return S_OK;
+}
 
 HRESULT CTTASplitterOutputPin::GetCurrentPosition(LONGLONG *pCurrent)
 {
-    // GetCurrentPosition is typically supported only in renderers and
-    // not in source filters.
-    return E_NOTIMPL;
+	return E_NOTIMPL;
 }
 
-// ----------------------------------------------------------------------------
-
-HRESULT CTTASplitterOutputPin::GetCapabilities(DWORD * pCapabilities)
+HRESULT CTTASplitterOutputPin::GetCapabilities(DWORD *pCapabilities)
 {
-    CheckPointer(pCapabilities, E_POINTER);
-    *pCapabilities = m_pParentFilter->m_dwSeekingCaps;
-    return S_OK;
+	CheckPointer(pCapabilities, E_POINTER);
+	*pCapabilities = m_pParentFilter->m_dwSeekingCaps;
+
+	return S_OK;
 }
 
-// ----------------------------------------------------------------------------
-
-HRESULT CTTASplitterOutputPin::CheckCapabilities(DWORD * pCapabilities)
+HRESULT CTTASplitterOutputPin::CheckCapabilities(DWORD *pCapabilities)
 {
-    CheckPointer(pCapabilities, E_POINTER);
-    // make sure all requested capabilities are in our mask
-    return (~m_pParentFilter->m_dwSeekingCaps & *pCapabilities) ? S_FALSE : S_OK;
+	CheckPointer(pCapabilities, E_POINTER);
+
+	return (~m_pParentFilter->m_dwSeekingCaps & *pCapabilities) ? S_FALSE : S_OK;
 }
 
-// ----------------------------------------------------------------------------
-
-HRESULT CTTASplitterOutputPin::ConvertTimeFormat(LONGLONG * pTarget,
-    const GUID * pTargetFormat, LONGLONG Source, const GUID * pSourceFormat)
+HRESULT CTTASplitterOutputPin::ConvertTimeFormat(LONGLONG *pTarget, const GUID *pTargetFormat, LONGLONG Source, const GUID *pSourceFormat)
 {
-    CheckPointer(pTarget, E_POINTER);
-    // format guids can be null to indicate current format
+	CheckPointer(pTarget, E_POINTER);
 
-    // since we only support TIME_FORMAT_MEDIA_TIME, we don't really
-    // offer any conversions.
-    if(pTargetFormat == 0 || *pTargetFormat == TIME_FORMAT_MEDIA_TIME)
-    {
-        if(pSourceFormat == 0 || *pSourceFormat == TIME_FORMAT_MEDIA_TIME)
-        {
-            *pTarget = Source;
-            return S_OK;
-        }
-    }
+	if (pTargetFormat == 0 || *pTargetFormat == TIME_FORMAT_MEDIA_TIME) {
+		if (pSourceFormat == 0 || *pSourceFormat == TIME_FORMAT_MEDIA_TIME) {
+			*pTarget = Source;
+			return S_OK;
+		}
+	}
 
-    return E_INVALIDARG;
+	return E_INVALIDARG;
 }
 
-// ----------------------------------------------------------------------------
-
-HRESULT CTTASplitterOutputPin::SetPositions(LONGLONG * pCurrent,
-    DWORD CurrentFlags, LONGLONG * pStop, DWORD StopFlags)
+HRESULT CTTASplitterOutputPin::SetPositions(LONGLONG *pCurrent, DWORD CurrentFlags, LONGLONG *pStop, DWORD StopFlags)
 {
+	DWORD StopPosBits = StopFlags & AM_SEEKING_PositioningBitsMask;
+	DWORD StartPosBits = CurrentFlags & AM_SEEKING_PositioningBitsMask;
 
-    DWORD StopPosBits = StopFlags & AM_SEEKING_PositioningBitsMask;
-    DWORD StartPosBits = CurrentFlags & AM_SEEKING_PositioningBitsMask;
+	if (StopFlags) {
+		CheckPointer(pStop, E_POINTER);
 
-    if(StopFlags) {
-        CheckPointer(pStop, E_POINTER);
-        // accept only relative, incremental, or absolute positioning
-        if(StopPosBits != StopFlags) {
-            return E_INVALIDARG;
-        }
-    }
+		if (StopPosBits != StopFlags) {
+			return E_INVALIDARG;
+		}
+	}
 
-    if(CurrentFlags) {
-        CheckPointer(pCurrent, E_POINTER);
-        if(StartPosBits != AM_SEEKING_AbsolutePositioning &&
-           StartPosBits != AM_SEEKING_RelativePositioning) {
-            return E_INVALIDARG;
-        }
-    }
+	if (CurrentFlags) {
+		CheckPointer(pCurrent, E_POINTER);
 
+		if (StartPosBits != AM_SEEKING_AbsolutePositioning && StartPosBits != AM_SEEKING_RelativePositioning) {
+			return E_INVALIDARG;
+		}
+	}
 
-    // scope for autolock
-    {
-        CAutoLock lock(m_pParentFilter->m_pLock);
+	CAutoLock lock(m_pParentFilter->m_pLock);
 
-        // set start position
-        if(StartPosBits == AM_SEEKING_AbsolutePositioning)
-        {
-            m_pParentFilter->m_rtStart = *pCurrent;
-        }
-        else if(StartPosBits == AM_SEEKING_RelativePositioning)
-        {
-            m_pParentFilter->m_rtStart += *pCurrent;
-        }
+	if (StartPosBits == AM_SEEKING_AbsolutePositioning) {
+		m_pParentFilter->m_rtStart = *pCurrent;
+	} else if (StartPosBits == AM_SEEKING_RelativePositioning) {
+		m_pParentFilter->m_rtStart += *pCurrent;
+	}
 
-        // set stop position
-        if(StopPosBits == AM_SEEKING_AbsolutePositioning)
-        {
-            m_pParentFilter->m_rtStop = *pStop;
-        }
-        else if(StopPosBits == AM_SEEKING_IncrementalPositioning)
-        {
-            m_pParentFilter->m_rtStop = m_pParentFilter->m_rtStart + *pStop;
-        }
-        else if(StopPosBits == AM_SEEKING_RelativePositioning)
-        {
-            m_pParentFilter->m_rtStop = m_pParentFilter->m_rtStop + *pStop;
-        }
-    }
+        if (StopPosBits == AM_SEEKING_AbsolutePositioning) {
+		m_pParentFilter->m_rtStop = *pStop;
+	} else if (StopPosBits == AM_SEEKING_IncrementalPositioning) {
+		m_pParentFilter->m_rtStop = m_pParentFilter->m_rtStart + *pStop;
+	} else if (StopPosBits == AM_SEEKING_RelativePositioning) {
+		m_pParentFilter->m_rtStop = m_pParentFilter->m_rtStop + *pStop;
+	}
 
-    HRESULT hr = S_OK;
-    if(StartPosBits) {      
-        m_pParentFilter->BeginFlush();
-        m_pParentFilter->DoSeeking();
-        m_pParentFilter->EndFlush();
-    } else if(StopPosBits) {
-        // Output a DNew segment
-        m_pParentFilter->BeginFlush();
-        m_pParentFilter->EndFlush();
-    }
-    
-    return hr;
+	HRESULT hr = S_OK;
+
+	if (StartPosBits) {      
+		m_pParentFilter->BeginFlush();
+		m_pParentFilter->DoSeeking();
+		m_pParentFilter->EndFlush();
+	} else if (StopPosBits) {
+		m_pParentFilter->BeginFlush();
+		m_pParentFilter->EndFlush();
+	}
+
+	return hr;
 }
 
-// ----------------------------------------------------------------------------
-
-HRESULT CTTASplitterOutputPin::GetPositions(LONGLONG * pCurrent, LONGLONG * pStop)
+HRESULT CTTASplitterOutputPin::GetPositions(LONGLONG *pCurrent, LONGLONG *pStop)
 {
-    if(pCurrent) {
-        *pCurrent = m_pParentFilter->m_rtStart;
-    }
-    if(pStop) {
-        *pStop = m_pParentFilter->m_rtStop;
-    }
-    return S_OK;
+	if (pCurrent) {
+		*pCurrent = m_pParentFilter->m_rtStart;
+	}
+
+	if (pStop) {
+		*pStop = m_pParentFilter->m_rtStop;
+	}
+
+	return S_OK;
 }
 
-// ----------------------------------------------------------------------------
-
-HRESULT CTTASplitterOutputPin::GetAvailable(LONGLONG * pEarliest, LONGLONG * pLatest)
+HRESULT CTTASplitterOutputPin::GetAvailable(LONGLONG *pEarliest, LONGLONG *pLatest)
 {
-    if(pEarliest) {
-        *pEarliest = 0;
-    }
-    if(pLatest) {
-        CAutoLock lock(m_pParentFilter->m_pLock);
-        *pLatest = m_pParentFilter->m_rtDuration;
-    }
-    return S_OK;
-}
+	if (pEarliest) {
+		*pEarliest = 0;
+	}
 
-// ----------------------------------------------------------------------------
+	if (pLatest) {
+		CAutoLock lock(m_pParentFilter->m_pLock);
+		*pLatest = m_pParentFilter->m_rtDuration;
+	}
+
+	return S_OK;
+}
 
 HRESULT CTTASplitterOutputPin::SetRate(double dRate)
 {
-    {
-        CAutoLock lock(m_pParentFilter->m_pLock);
-        m_pParentFilter->m_dRateSeeking = dRate;
-    }
-    // Output a DNew segment
-    m_pParentFilter->BeginFlush();
-    m_pParentFilter->EndFlush();
-    return S_OK;
+	CAutoLock lock(m_pParentFilter->m_pLock);
+
+	m_pParentFilter->m_dRateSeeking = dRate;
+	m_pParentFilter->BeginFlush();
+	m_pParentFilter->EndFlush();
+
+	return S_OK;
 }
 
-// ----------------------------------------------------------------------------
-
-HRESULT CTTASplitterOutputPin::GetRate(double * pdRate)
+HRESULT CTTASplitterOutputPin::GetRate(double *pdRate)
 {
-    CheckPointer(pdRate, E_POINTER);
-    CAutoLock lock(m_pParentFilter->m_pLock);
-    *pdRate = m_pParentFilter->m_dRateSeeking;
-    return S_OK;
-}
+	CheckPointer(pdRate, E_POINTER);
 
-// ----------------------------------------------------------------------------
+	CAutoLock lock(m_pParentFilter->m_pLock);
+	*pdRate = m_pParentFilter->m_dRateSeeking;
+
+	return S_OK;
+}
 
 HRESULT CTTASplitterOutputPin::GetPreroll(LONGLONG *pPreroll)
 {
-    CheckPointer(pPreroll, E_POINTER);
-    *pPreroll = 0;
-    return S_OK;
+	CheckPointer(pPreroll, E_POINTER);
+	*pPreroll = 0;
+
+	return S_OK;
 }
 
-// ============================================================================
-// IAsyncCallBackWrapper_tta
-// ============================================================================
-
-int IAsyncCallBackWrapper_tta_read(TTA_io_callback *io, void* buff, int size)
+int IAsyncCallBackWrapper_tta_read(TTA_io_callback *io, void *buff, int size)
 {
-    
-    IAsyncCallBackWrapper_tta* iacbw = (IAsyncCallBackWrapper_tta*)io;
-    HRESULT hr = iacbw->pReader->SyncRead(iacbw->StreamPos, size, (BYTE*)buff);
-    if(hr == S_OK)
-        iacbw->StreamPos += size;
-    return (hr == S_OK);
+	IAsyncCallBackWrapper_tta* iacbw = (IAsyncCallBackWrapper_tta*)io;
+
+	HRESULT hr = iacbw->pReader->SyncRead(iacbw->StreamPos, size, (BYTE*)buff);
+	if (hr == S_OK) {
+		iacbw->StreamPos += size;
+	}
+
+	return (hr == S_OK);
 }
 
 int IAsyncCallBackWrapper_tta_seek(TTA_io_callback *io, int offset, int origin)
 {
-    IAsyncCallBackWrapper_tta* iacbw = (IAsyncCallBackWrapper_tta*)io;
-    switch(origin)
-    {
-    case SEEK_SET:
-        iacbw->StreamPos = offset;
-        break;
-    case SEEK_CUR:
-        iacbw->StreamPos += offset;
-        break;
-    case SEEK_END:
-        iacbw->StreamPos = iacbw->StreamLen - offset;
-        break;
-    }
-    return 1;
+	IAsyncCallBackWrapper_tta* iacbw = (IAsyncCallBackWrapper_tta*)io;
+
+	switch (origin) {
+		case SEEK_SET:
+			iacbw->StreamPos = offset;
+			break;
+		case SEEK_CUR:
+			iacbw->StreamPos += offset;
+			break;
+		case SEEK_END:
+			iacbw->StreamPos = iacbw->StreamLen - offset;
+			break;
+	}
+
+	return 1;
 }
 
 IAsyncCallBackWrapper_tta* IAsyncCallBackWrapper_tta_new(IAsyncReader *pReader)
 {
-    IAsyncCallBackWrapper_tta* iacbw = DNew IAsyncCallBackWrapper_tta;
-    if(!iacbw)
-        return NULL;
+	IAsyncCallBackWrapper_tta* iacbw = DNew IAsyncCallBackWrapper_tta;
 
-    iacbw->iocallback.read = IAsyncCallBackWrapper_tta_read;
-    iacbw->iocallback.seek = IAsyncCallBackWrapper_tta_seek;
-    iacbw->pReader = pReader;
-    iacbw->StreamPos = 0;
+	if (!iacbw) {
+		return NULL;
+	}
 
-    // Get total size
-    LONGLONG Available;
-    pReader->Length(&iacbw->StreamLen, &Available);
+	iacbw->iocallback.read = IAsyncCallBackWrapper_tta_read;
+	iacbw->iocallback.seek = IAsyncCallBackWrapper_tta_seek;
+	iacbw->pReader = pReader;
+	iacbw->StreamPos = 0;
 
-    return iacbw;
+	LONGLONG Available;
+	pReader->Length(&iacbw->StreamLen, &Available);
+
+	return iacbw;
 }
 
-void IAsyncCallBackWrapper_tta_free(IAsyncCallBackWrapper_tta** iacbw)
+void IAsyncCallBackWrapper_tta_free(IAsyncCallBackWrapper_tta **iacbw)
 {
-    delete (*iacbw);
-    *iacbw = NULL;
+	delete (*iacbw);
+	*iacbw = NULL;
 }
