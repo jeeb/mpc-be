@@ -130,13 +130,13 @@ typedef struct {
 #endif
 
 typedef struct {
-    unsigned long TTAid;
-    unsigned short AudioFormat;
-    unsigned short NumChannels;
-    unsigned short BitsPerSample;
-    unsigned long SampleRate;
-    unsigned long DataLength;
-    unsigned long CRC32;
+    unsigned long	TTAid;
+    unsigned short	AudioFormat;
+    unsigned short	NumChannels;
+    unsigned short	BitsPerSample;
+    unsigned long	SampleRate;
+    unsigned long	DataLength;
+    unsigned long	CRC32;
 } __ATTRIBUTE_PACKED__ TTA_header;
 
 typedef struct {
@@ -152,21 +152,24 @@ typedef struct _tag_TTA_io_callback {
 } __ATTRIBUTE_PACKED__ TTA_io_callback;
 
 typedef struct {
-	TTA_io_callback* io;
-	TTA_id3v2_header id3v2;
-	TTA_header TTAHeader;
-	unsigned long ID3v2Len;
+	TTA_io_callback*	io;
+	TTA_id3v2_header	id3v2;
+	TTA_header		TTAHeader;
+	unsigned long	ID3v2Len;
 
-	unsigned long FrameTotal;
-	unsigned long FrameLen;
-	unsigned long LastFrameLen;
-	unsigned long DataOffset;
+	unsigned long	FrameTotal;
+	unsigned long	FrameLen;
+	unsigned long	LastFrameLen;
+	unsigned long	DataOffset;
 
-	unsigned long* SeekTable;
-	unsigned long* SeekOffsetTable;
+	unsigned long*	SeekTable;
+	unsigned long*	SeekOffsetTable;
 
-	unsigned long FrameIndex;
-	unsigned long MaxFrameLenBytes;
+	unsigned long	FrameIndex;
+	unsigned long	MaxFrameLenBytes;
+
+	unsigned long	extradata_size;
+	BYTE			extradata[65535];
 } __ATTRIBUTE_PACKED__ TTA_parser;
 
 #ifdef _WIN32

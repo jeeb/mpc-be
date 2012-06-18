@@ -772,6 +772,10 @@ TTA_parser* tta_parser_new(TTA_io_callback* io)
 		return NULL;
 	}
 	ttaparser->DataOffset += (st_size * sizeof(long));
+
+	io->seek(io, 0, SEEK_SET);
+	ttaparser->extradata_size = ttaparser->DataOffset;
+	io->read(io, ttaparser->extradata, ttaparser->extradata_size);
 	
 	// Check seek table crc32
 	checksum = crc32((unsigned char *) ttaparser->SeekTable, ((st_size - 1) * sizeof(long)));

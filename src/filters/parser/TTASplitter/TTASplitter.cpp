@@ -27,10 +27,8 @@
 #include <initguid.h>
 #endif
 #include <moreuuids.h>
-#include <mmreg.h>
 
 #include "TTASplitter.h"
-
 #include "tta_file.h"
 
 // ----------------------------------------------------------------------------
@@ -286,9 +284,7 @@ CTTASplitterInputPin::~CTTASplitterInputPin()
 
 HRESULT CTTASplitterInputPin::CheckMediaType(const CMediaType *pmt)
 {
-    if ((*pmt->Type() != MEDIATYPE_Stream) ||
-        (*pmt->Subtype() != MEDIASUBTYPE_TTA1_Stream))
-    {
+    if (*pmt->Type() != MEDIATYPE_Stream) {
         return VFW_E_TYPE_NOT_ACCEPTED;
     }
     
@@ -608,39 +604,44 @@ HRESULT CTTASplitterOutputPin::CheckMediaType(const CMediaType *pmt)
 
 HRESULT CTTASplitterOutputPin::GetMediaType(int iPosition, CMediaType *pMediaType)
 {
-    if(!m_pParentFilter->m_pInputPin->IsConnected())
-    {
+    if (!m_pParentFilter->m_pInputPin->IsConnected()) {
         return E_UNEXPECTED;
     }
     
-    if (iPosition < 0)
-    {
+    if (iPosition < 0) {
         return E_INVALIDARG;
     }
     
-    if (iPosition > 0)
-    {
+    if (iPosition > 0) {
         return VFW_S_NO_MORE_ITEMS;
     }
-    
+	
+	TTA_header *ttahdr = m_pParentFilter->GetTTAHeader();
+	if (ttahdr == NULL) {
+		return E_UNEXPECTED;
+	}
+
+	TTA_parser *ttaparser = m_pParentFilter->GetTTAParser();
+	if (ttaparser == NULL) {
+		return E_UNEXPECTED;
+	}
+
     pMediaType->InitMediaType();
     pMediaType->SetType(&MEDIATYPE_Audio);
     pMediaType->SetSubtype(&MEDIASUBTYPE_TTA1);
     pMediaType->SetFormatType(&FORMAT_WaveFormatEx);
     pMediaType->SetVariableSize();
-    
-    WAVEFORMATEX *pwfxout = (WAVEFORMATEX*)pMediaType->AllocFormatBuffer(sizeof(WAVEFORMATEX));
-    ZeroMemory(pwfxout,sizeof(WAVEFORMATEX));
-    pwfxout->wFormatTag = WAVE_FORMAT_TTA1;
 
-    TTA_header *ttahdr = m_pParentFilter->GetTTAHeader();
-	if(ttahdr == NULL)
-	{
-		return E_UNEXPECTED;
+	WAVEFORMATEX* wfe	= (WAVEFORMATEX*)pMediaType->AllocFormatBuffer(sizeof(WAVEFORMATEX) + ttaparser->extradata_size);
+	memset(wfe, 0, sizeof(WAVEFORMATEX));
+	wfe->wFormatTag		= WAVE_FORMAT_TTA1;
+	wfe->wBitsPerSample	= ttahdr->BitsPerSample;
+	wfe->nChannels		= ttahdr->NumChannels;
+	wfe->nSamplesPerSec	= ttahdr->SampleRate;
+	wfe->cbSize			= ttaparser->extradata_size;
+	if (wfe->cbSize) {
+		memcpy((BYTE*)(wfe+1), ttaparser->extradata, ttaparser->extradata_size);
 	}
-    pwfxout->wBitsPerSample = ttahdr->BitsPerSample;
-    pwfxout->nChannels = ttahdr->NumChannels;
-    pwfxout->nSamplesPerSec = ttahdr->SampleRate;
     
     return S_OK;
 }
@@ -649,7 +650,6 @@ HRESULT CTTASplitterOutputPin::GetMediaType(int iPosition, CMediaType *pMediaTyp
 
 HRESULT CTTASplitterOutputPin::DecideBufferSize(IMemAllocator * pAlloc, ALLOCATOR_PROPERTIES *pProp)
 {
-
     if(!m_pParentFilter->m_pInputPin->IsConnected())
     {
         return E_UNEXPECTED;
