@@ -184,9 +184,9 @@ STDMETHODIMP CTTASplitter::Run(REFERENCE_TIME tStart)
 
 void CTTASplitter::SetDuration(REFERENCE_TIME rtDuration)
 {
-	m_rtStart = 0; 
-	m_rtStop = rtDuration; 
-	m_rtDuration = rtDuration;
+	m_rtStart		= 0; 
+	m_rtStop		= rtDuration; 
+	m_rtDuration	= rtDuration;
 }
 
 HRESULT CTTASplitter::BeginFlush()
@@ -309,13 +309,12 @@ DWORD CTTASplitterInputPin::ThreadProc()
 	DWORD com;
 
 	do {
-        	com = GetRequest();
+		com = GetRequest();
 
 		switch (com) {
 			case CMD_EXIT:
 				Reply(NOERROR); 
 				break; 
-
 			case CMD_STOP:
 				Reply(NOERROR); 
 				break; 
@@ -371,13 +370,13 @@ HRESULT CTTASplitterInputPin::DoProcessingLoop(void)
 		pSample->SetActualDataLength(FrameLenBytes);
 
 		REFERENCE_TIME rtStart, rtStop;
-		rtStart = (FrameIndex * m_pTTAParser->FrameLen);
-		rtStop = rtStart + FrameLenSamples;
-		rtStart = (rtStart * 10000000) / m_pTTAParser->TTAHeader.SampleRate;
-		rtStop = (rtStop * 10000000) / m_pTTAParser->TTAHeader.SampleRate;
+		rtStart	= (FrameIndex * m_pTTAParser->FrameLen);
+		rtStop	= rtStart + FrameLenSamples;
+		rtStart	= (rtStart * 10000000) / m_pTTAParser->TTAHeader.SampleRate;
+		rtStop	= (rtStop * 10000000) / m_pTTAParser->TTAHeader.SampleRate;
 
-		rtStart -= m_pParentFilter->m_rtStart;
-		rtStop  -= m_pParentFilter->m_rtStart;
+		rtStart	-= m_pParentFilter->m_rtStart;
+		rtStop	-= m_pParentFilter->m_rtStart;
 
 		pSample->SetTime(&rtStart, &rtStop);
 		pSample->SetPreroll(FALSE);
@@ -549,12 +548,12 @@ HRESULT CTTASplitterOutputPin::DecideBufferSize(IMemAllocator *pAlloc, ALLOCATOR
 		return E_UNEXPECTED;
 	}
      
-	TTA_header* ttahdr = m_pParentFilter->GetTTAHeader();
-	pProp->cBuffers = 1;
-	pProp->cbBuffer = m_pParentFilter->GetMaxFrameLenBytes();
+	TTA_header* ttahdr	= m_pParentFilter->GetTTAHeader();
+	pProp->cBuffers		= 1;
+	pProp->cbBuffer		= m_pParentFilter->GetMaxFrameLenBytes();
 
 	if (pProp->cbBuffer == 0) {
-        	pProp->cbBuffer = tta_codec_get_frame_len(ttahdr->SampleRate) * ttahdr->NumChannels * (ttahdr->BitsPerSample / 8) + sizeof(ttahdr->CRC32);
+		pProp->cbBuffer = tta_codec_get_frame_len(ttahdr->SampleRate) * ttahdr->NumChannels * (ttahdr->BitsPerSample / 8) + sizeof(ttahdr->CRC32);
 	}
 
 	ALLOCATOR_PROPERTIES Actual;
@@ -663,8 +662,8 @@ HRESULT CTTASplitterOutputPin::ConvertTimeFormat(LONGLONG *pTarget, const GUID *
 
 HRESULT CTTASplitterOutputPin::SetPositions(LONGLONG *pCurrent, DWORD CurrentFlags, LONGLONG *pStop, DWORD StopFlags)
 {
-	DWORD StopPosBits = StopFlags & AM_SEEKING_PositioningBitsMask;
-	DWORD StartPosBits = CurrentFlags & AM_SEEKING_PositioningBitsMask;
+	DWORD StopPosBits	= StopFlags & AM_SEEKING_PositioningBitsMask;
+	DWORD StartPosBits	= CurrentFlags & AM_SEEKING_PositioningBitsMask;
 
 	if (StopFlags) {
 		CheckPointer(pStop, E_POINTER);
@@ -689,8 +688,8 @@ HRESULT CTTASplitterOutputPin::SetPositions(LONGLONG *pCurrent, DWORD CurrentFla
 	} else if (StartPosBits == AM_SEEKING_RelativePositioning) {
 		m_pParentFilter->m_rtStart += *pCurrent;
 	}
-
-        if (StopPosBits == AM_SEEKING_AbsolutePositioning) {
+	
+	if (StopPosBits == AM_SEEKING_AbsolutePositioning) {
 		m_pParentFilter->m_rtStop = *pStop;
 	} else if (StopPosBits == AM_SEEKING_IncrementalPositioning) {
 		m_pParentFilter->m_rtStop = m_pParentFilter->m_rtStart + *pStop;
