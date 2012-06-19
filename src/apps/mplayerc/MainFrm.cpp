@@ -679,6 +679,7 @@ CMainFrame::CMainFrame() :
 	m_nMenuHideTick(0),
 	m_bWasSnapped(false),
 	m_nSeekDirection(SEEK_DIRECTION_NONE),
+	m_nWasSetDispMode(0),
 	m_bIsBDPlay(false),
 	m_LastOpenBDPath(_T("")),
 	m_fClosingState(false),
@@ -868,6 +869,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	WTSRegisterSessionNotification();
 
+	CStringW strFS = s.strFullScreenMonitor;
+	GetCurDispMode(s.dm_def, strFS);
+
 	return 0;
 }
 
@@ -943,6 +947,10 @@ void CMainFrame::OnClose()
 
 	s.WinLircClient.DisConnect();
 	s.UIceClient.DisConnect();
+
+	if (s.AutoChangeFullscrRes.bSetGlobal && s.AutoChangeFullscrRes.bEnabled == 2) {
+		SetDispMode(s.dm_def, s.strFullScreenMonitor);
+	}
 
 	__super::OnClose();
 }
@@ -2714,7 +2722,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 				}
 				break;
 			case EC_DVD_PLAYBACK_RATE_CHANGE:
-				if (m_fCustomGraph && s.AutoChangeFullscrRes.bEnabled &&
+				if (m_fCustomGraph && s.AutoChangeFullscrRes.bEnabled == 1 &&
 						m_fFullScreen && m_iDVDDomain == DVD_DOMAIN_Title) {
 					AutoChangeMonitorMode();
 				}
@@ -9907,7 +9915,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 		if (!m_fFirstFSAfterLaunchOnFS) {
 			GetWindowRect(&m_lastWindowRect);
 		}
-		if (s.AutoChangeFullscrRes.bEnabled && fSwitchScreenResWhenHasTo && (GetPlaybackMode() != PM_NONE)) {
+		if (s.AutoChangeFullscrRes.bEnabled == 1 && fSwitchScreenResWhenHasTo && (GetPlaybackMode() != PM_NONE)) {
 			AutoChangeMonitorMode();
 		}
 		m_LastWindow_HM = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
@@ -9939,7 +9947,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 		}
 		hMenu = NULL;
 	} else {
-		if (s.AutoChangeFullscrRes.bEnabled && s.AutoChangeFullscrRes.bApplyDefault && s.AutoChangeFullscrRes.dmFullscreenRes[0].fChecked == 1) {
+		if (s.AutoChangeFullscrRes.bEnabled == 1 && s.AutoChangeFullscrRes.bApplyDefault && s.AutoChangeFullscrRes.dmFullscreenRes[0].fChecked == 1) {
 			SetDispMode(s.AutoChangeFullscrRes.dmFullscreenRes[0].dmFSRes, s.strFullScreenMonitor);
 		}
 
@@ -10081,56 +10089,133 @@ void CMainFrame::AutoChangeMonitorMode()
 {
 	AppSettings& s = AfxGetAppSettings();
 	CStringW mf_hmonitor = s.strFullScreenMonitor;
-	double MediaFPS = 0.0;
 
-	if (s.IsD3DFullscreen() && miFPS > 0.9) {
-		MediaFPS = miFPS;
-	}
-	else if (GetPlaybackMode() == PM_FILE) {
-		LONGLONG m_rtTimePerFrame = 1;
-		// if ExtractAvgTimePerFrame isn't executed then MediaFPS=10000000.0,
-		// (int)(MediaFPS + 0.5)=10000000 and SetDispMode is executed to Default.
-		BeginEnumFilters(pGB, pEF, pBF) {
-			BeginEnumPins(pBF, pEP, pPin) {
-				CMediaTypeEx mt;
-				PIN_DIRECTION dir;
-				if (FAILED(pPin->QueryDirection(&dir)) || dir != PINDIR_OUTPUT
-						|| FAILED(pPin->ConnectionMediaType(&mt))) {
-					continue;
-				}
-				ExtractAvgTimePerFrame (&mt, m_rtTimePerFrame);
-				if (m_rtTimePerFrame == 0) {
-					m_rtTimePerFrame=1;
+	// EnumDisplayDevice... s.strFullScreenMonitorID == sDeviceID ???
+	bool bHasRule = 0;
+	DISPLAY_DEVICE dd; 
+	dd.cb = sizeof(dd); 
+	DWORD dev = 0; // device index 
+	int iMonValid = 0;
+	CString sDeviceID, strMonName;
+	while (EnumDisplayDevices(0, dev, &dd, 0)) {
+		DISPLAY_DEVICE ddMon;
+		ZeroMemory(&ddMon, sizeof(ddMon));
+		ddMon.cb = sizeof(ddMon);
+		DWORD devMon = 0;
+		while (EnumDisplayDevices(dd.DeviceName, devMon, &ddMon, 0)) {
+			if (ddMon.StateFlags & DISPLAY_DEVICE_ACTIVE && !(ddMon.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)) {
+				sDeviceID.Format (L"%s", ddMon.DeviceID);
+				sDeviceID = sDeviceID.Mid (8, sDeviceID.Find (L"\\", 9) - 8);
+				if (s.strFullScreenMonitorID == sDeviceID) {
+					strMonName.Format(L"%s", ddMon.DeviceName);
+					strMonName = strMonName.Left(12);
+					mf_hmonitor = /*s.strFullScreenMonitor = */strMonName;
+					iMonValid = 1;
+					break;
 				}
 			}
-			EndEnumPins;
+			devMon++;
+			ZeroMemory(&ddMon, sizeof(ddMon));
+			ddMon.cb = sizeof(ddMon);
+ 		}
+		ZeroMemory(&dd, sizeof(dd));
+		dd.cb = sizeof(dd);
+		dev++; 
+ 	}
+
+	CStringW strCurFS = mf_hmonitor;
+	dispmode dmCur;
+	GetCurDispMode(dmCur, strCurFS);
+
+	// Set Display Mode
+
+	if (s.AutoChangeFullscrRes.bEnabled == 1 && iMonValid == 1) {
+		double MediaFPS = 0.0;
+		if (s.IsD3DFullscreen() && miFPS > 0.9) {
+			MediaFPS = miFPS;
 		}
-		EndEnumFilters;
-		MediaFPS = 10000000.0 / m_rtTimePerFrame;
-	}
-	else if (GetPlaybackMode() == PM_DVD) {
-		DVD_PLAYBACK_LOCATION2 Location;
-		if (pDVDI->GetCurrentLocation(&Location) == S_OK) {
-			MediaFPS  = Location.TimeCodeFlags == DVD_TC_FLAG_25fps ? 25.0
-						: Location.TimeCodeFlags == DVD_TC_FLAG_30fps ? 30.0
-						: Location.TimeCodeFlags == DVD_TC_FLAG_DropFrame ? 29.97
-						: 25.0;
+		else if (GetPlaybackMode() == PM_FILE) {
+			LONGLONG m_rtTimePerFrame = 1;
+			// if ExtractAvgTimePerFrame isn't executed then MediaFPS=10000000.0,
+			// (int)(MediaFPS + 0.5)=10000000 and SetDispMode is executed to Default.
+			BeginEnumFilters(pGB, pEF, pBF) {
+				BeginEnumPins(pBF, pEP, pPin) {
+					CMediaTypeEx mt;
+					PIN_DIRECTION dir;
+					if (FAILED(pPin->QueryDirection(&dir)) || dir != PINDIR_OUTPUT
+							|| FAILED(pPin->ConnectionMediaType(&mt))) {
+						continue;
+					}
+					ExtractAvgTimePerFrame (&mt, m_rtTimePerFrame);
+					if (m_rtTimePerFrame == 0) {
+						m_rtTimePerFrame=1;
+					}
+				}
+				EndEnumPins;
+			}
+			EndEnumFilters;
+			MediaFPS = 10000000.0 / m_rtTimePerFrame;
+		}
+		else if (GetPlaybackMode() == PM_DVD) {
+			DVD_PLAYBACK_LOCATION2 Location;
+			if (pDVDI->GetCurrentLocation(&Location) == S_OK) {
+				MediaFPS  = Location.TimeCodeFlags == DVD_TC_FLAG_25fps ? 25.0
+							: Location.TimeCodeFlags == DVD_TC_FLAG_30fps ? 30.0
+							: Location.TimeCodeFlags == DVD_TC_FLAG_DropFrame ? 29.97
+							: 25.0;
+			}
+		}
+
+		for (int rs = 0; rs < 30 ; rs++) {
+			if (s.AutoChangeFullscrRes.dmFullscreenRes[rs].fIsData == true
+					&& s.AutoChangeFullscrRes.dmFullscreenRes[rs].fChecked == 1
+					&& MediaFPS >= s.AutoChangeFullscrRes.dmFullscreenRes[rs].vfr_from
+					&& MediaFPS <= s.AutoChangeFullscrRes.dmFullscreenRes[rs].vfr_to) {
+
+				SetDispMode(s.AutoChangeFullscrRes.dmFullscreenRes[rs].dmFSRes, mf_hmonitor);
+				return;
+			}
+		}
+
+	} else if (s.AutoChangeFullscrRes.bEnabled == 2) {
+
+		if (iMonValid == 1 && s.dFPS >= 1){
+			for (int rs = 0; rs < 30 ; rs++) {
+				if (s.AutoChangeFullscrRes.dmFullscreenRes[rs].fIsData == true 
+					&& s.AutoChangeFullscrRes.dmFullscreenRes[rs].fChecked == 1 
+					&& s.dFPS >= s.AutoChangeFullscrRes.dmFullscreenRes[rs].vfr_from
+					&& s.dFPS <= s.AutoChangeFullscrRes.dmFullscreenRes[rs].vfr_to) {
+				
+					if ((s.AutoChangeFullscrRes.dmFullscreenRes[rs].dmFSRes.size != dmCur.size) 
+						|| (s.AutoChangeFullscrRes.dmFullscreenRes[rs].dmFSRes.bpp != dmCur.bpp) 
+						|| (s.AutoChangeFullscrRes.dmFullscreenRes[rs].dmFSRes.freq != dmCur.freq)) {
+							SetDispMode(s.AutoChangeFullscrRes.dmFullscreenRes[rs].dmFSRes, mf_hmonitor);
+							m_nWasSetDispMode = 1;	
+
+					} else if ((s.AutoChangeFullscrRes.dmFullscreenRes[rs].dmFSRes.size == s.dm_def.size) 
+						&& (s.AutoChangeFullscrRes.dmFullscreenRes[rs].dmFSRes.bpp == s.dm_def.bpp) 
+						&& (s.AutoChangeFullscrRes.dmFullscreenRes[rs].dmFSRes.freq == s.dm_def.freq)) {
+
+						if (m_nWasSetDispMode == 1) {
+							ChangeDisplaySettingsEx (mf_hmonitor, NULL, NULL, 0, NULL);
+							m_nWasSetDispMode = 0;
+						}
+					}
+					bHasRule = 1;
+ 					break;
+				}	
+			}
+			if (bHasRule == 0) {
+			
+				if ((dmCur.size == s.dm_def.size) && (dmCur.bpp == s.dm_def.bpp) && (dmCur.freq == s.dm_def.freq)) {
+					ChangeDisplaySettingsEx (mf_hmonitor, NULL, NULL, 0, NULL);
+				} else {
+					SetDispMode(dmCur, mf_hmonitor);
+				}
+			}
 		}
 	}
 
-	for (int rs = 1; rs < 100 ; rs++) {
-		if (s.AutoChangeFullscrRes.dmFullscreenRes[rs].fIsData == true
-				&& s.AutoChangeFullscrRes.dmFullscreenRes[rs].fChecked == 1
-				&& MediaFPS >= s.AutoChangeFullscrRes.dmFullscreenRes[rs].vfr_from
-				&& MediaFPS <= s.AutoChangeFullscrRes.dmFullscreenRes[rs].vfr_to) {
-
-			SetDispMode(s.AutoChangeFullscrRes.dmFullscreenRes[rs].dmFSRes, mf_hmonitor);
-			return;
-		}
-	}
-	if (s.AutoChangeFullscrRes.dmFullscreenRes[0].fChecked == 1) {
-		SetDispMode(s.AutoChangeFullscrRes.dmFullscreenRes[0].dmFSRes, mf_hmonitor);
-	}
 }
 
 void CMainFrame::MoveVideoWindow(bool fShowStats)
@@ -12116,7 +12201,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		}
 	}
 
-	if (s.AutoChangeFullscrRes.bEnabled && s.IsD3DFullscreen()) {
+	if ((s.AutoChangeFullscrRes.bEnabled == 1 && s.IsD3DFullscreen()) || s.AutoChangeFullscrRes.bEnabled == 2) {
 		// DVD
 		if (pDVDData) {
 			mi_fn = pDVDData->path;
@@ -12150,6 +12235,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 		// Get FPS
 		miFPS = 0.0;
+		s.dFPS = 0.0;
 
 #ifdef USE_MEDIAINFO_STATIC
 		MediaInfoLib::MediaInfo MI;
@@ -12169,8 +12255,14 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 				strFPS = _T("23.976");
 			}
 			miFPS = wcstod(strFPS, NULL);
-
+			s.dFPS = wcstod(strFPS, NULL);
 			AutoChangeMonitorMode();
+
+			if (s.fLaunchfullscreen && !s.IsD3DFullscreen() ) {
+				if (!m_fFullScreen) { 
+					ToggleFullscreen(true, true); 
+				}
+			}
 		}
 	}
 
@@ -12427,7 +12519,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 	flast_nID = 0;
 
-	if (AfxGetAppSettings().AutoChangeFullscrRes.bEnabled && m_fFullScreen) {
+	if (AfxGetAppSettings().AutoChangeFullscrRes.bEnabled == 1 && m_fFullScreen) {
 		AutoChangeMonitorMode();
 	}
 	if (m_fFullScreen && AfxGetAppSettings().fRememberZoomLevel) {

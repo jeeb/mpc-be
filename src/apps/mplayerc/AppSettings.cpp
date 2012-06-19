@@ -546,6 +546,9 @@ void CAppSettings::UpdateData(bool fSave)
 
 		// Multi-monitor code
 		pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITOR, CString(strFullScreenMonitor));
+		// DeviceID
+		pApp->WriteProfileString(IDS_R_SETTINGS, _T("FullScreenMonitorID"), CString(strFullScreenMonitorID));
+
 		// Prevent Minimize when in Fullscreen mode on non default monitor
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_PREVENT_MINIMIZE, fPreventMinimize);
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_WIN7TASKBAR, fUseWin7TaskBar);
@@ -880,6 +883,9 @@ void CAppSettings::UpdateData(bool fSave)
 
 		//Multi-monitor code
 		strFullScreenMonitor = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITOR, _T(""));
+		// DeviceID
+		strFullScreenMonitorID = pApp->GetProfileString(IDS_R_SETTINGS, _T("FullScreenMonitorID"), _T(""));
+
 		// Prevent Minimize when in Fullscreen mode on non default monitor
 		fPreventMinimize = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_PREVENT_MINIMIZE, 0);
 		fUseWin7TaskBar = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_WIN7TASKBAR, 1);
@@ -900,11 +906,11 @@ void CAppSettings::UpdateData(bool fSave)
 			if ( len == sizeof(AChFR) ) {
 				memcpy( &AutoChangeFullscrRes, ptr, sizeof(AChFR) );
 			} else {
-				AutoChangeFullscrRes.bEnabled = false;
+				AutoChangeFullscrRes.bEnabled = 0;
 			}
 			delete [] ptr;
 		} else {
-			AutoChangeFullscrRes.bEnabled = false;
+			AutoChangeFullscrRes.bEnabled = 0;
 		}
 
 		fExitFullScreenAtTheEnd = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATTHEEND, 1);
@@ -1395,7 +1401,7 @@ void CAppSettings::UpdateData(bool fSave)
 
 		fRemainingTime = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_REMAINING_TIME, FALSE);
 
-		if (fLaunchfullscreen) {
+		if (fLaunchfullscreen && !IsD3DFullscreen()) {
 			nCLSwitches |= CLSW_FULLSCREEN;
 		}
 

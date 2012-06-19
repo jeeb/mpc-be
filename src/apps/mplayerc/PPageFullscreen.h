@@ -44,12 +44,16 @@ public:
 	BOOL m_launchfullscreen;
 	BOOL m_fSetFullscreenRes;
 	BOOL m_fSetDefault;
+	BOOL m_fSetGlobal;
 
 	CPlayerListCtrl m_list;
 	enum {COL_Z, COL_VFR_F, COL_VFR_T, COL_SRR};
 
 	AChFR m_AutoChangeFullscrRes;
 	CStringW m_f_hmonitor;
+	CStringW m_f_hmonitorID;
+	int iCurMon;
+
 	int m_iMonitorType;
 	CComboBox m_iMonitorTypeCtrl;
 
@@ -82,6 +86,18 @@ public:
 	afx_msg void OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnCheckChangeList();
 	afx_msg void OnUpdateApplyDefault(CCmdUI* pCmdUI);
+
+	afx_msg void OnUpdateSetGlobal(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateFullScrComboCtrl(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateSetFullscreenRes();
+	afx_msg void OnUpdateLaunchfullscreen(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateShowBarsWhenFullScreen(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateExitFullScreenAtTheEnd(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateShowBarsWhenFullScreenTimeOut(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateStatic1(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateStatic2(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateExitFullScreenAtFocusLost(CCmdUI* pCmdUI);
+
 	afx_msg void OnUpdateFullScrCombo();
 	afx_msg void OnUpdateTimeout(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateRestoreRes(CCmdUI* pCmdUI);

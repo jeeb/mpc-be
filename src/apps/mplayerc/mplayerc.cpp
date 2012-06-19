@@ -1506,6 +1506,7 @@ void SetDispMode(dispmode& dm, CString& DisplayName)
 {
 	dispmode dm1;
 	GetCurDispMode(dm1, DisplayName);
+	AppSettings& s = AfxGetAppSettings();
 	if ((dm.size == dm1.size) && (dm.bpp == dm1.bpp) && (dm.freq == dm1.freq)) {
 		return;
 	}
@@ -1529,10 +1530,19 @@ void SetDispMode(dispmode& dm, CString& DisplayName)
 		monitor = monitors.GetNearestMonitor(AfxGetApp()->m_pMainWnd);
 		monitor.GetName(DisplayName1);
 	}
-	if (AfxGetAppSettings().fRestoreResAfterExit) {
-		ChangeDisplaySettingsEx(DisplayName1, &dmScreenSettings, NULL, CDS_FULLSCREEN, NULL);
-	} else {
-		ChangeDisplaySettingsEx(DisplayName1, &dmScreenSettings, NULL, NULL, NULL);
+
+	if (s.AutoChangeFullscrRes.bEnabled == 1) {
+		if (AfxGetAppSettings().fRestoreResAfterExit) {
+			ChangeDisplaySettingsEx(DisplayName1, &dmScreenSettings, NULL, CDS_FULLSCREEN, NULL);
+		} else {
+			ChangeDisplaySettingsEx(DisplayName1, &dmScreenSettings, NULL, NULL, NULL);
+		}
+	} else if (s.AutoChangeFullscrRes.bEnabled == 2){
+		if (s.AutoChangeFullscrRes.bSetGlobal) {
+			ChangeDisplaySettingsEx(DisplayName1, &dmScreenSettings, NULL, (CDS_UPDATEREGISTRY/* | CDS_GLOBAL*/), NULL);
+		} else if (!s.AutoChangeFullscrRes.bSetGlobal) {
+ 			ChangeDisplaySettingsEx(DisplayName1, &dmScreenSettings, NULL, CDS_FULLSCREEN, NULL);
+		}
 	}
 }
 

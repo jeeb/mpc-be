@@ -189,9 +189,10 @@ typedef struct {
 
 #define MaxFpsCount 30
 typedef struct {
-	bool bEnabled;
+	int bEnabled;
 	fpsmode dmFullscreenRes[MaxFpsCount];
 	bool bApplyDefault;
+	bool bSetGlobal;
 }	AChFR; //AutoChangeFullscrRes
 #pragma pack(pop)
 
@@ -368,6 +369,10 @@ public:
 	bool			fReportFailedPins;
 
 	CStringW		strFullScreenMonitor;
+	CStringW		strFullScreenMonitorID;
+	dispmode		dm_def;
+	double			dFPS;
+
 	bool			fAssociatedWithIcons;
 	CStringW		strLastOpenDir;
 
