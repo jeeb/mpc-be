@@ -166,7 +166,7 @@ CRect CPlayerSeekBar::GetChannelRect()
 	GetClientRect(&r);
 	
 	if (AfxGetAppSettings().fDisableXPToolbars) {
-		r.DeflateRect(1,1,1,1); 
+		//r.DeflateRect(1,1,1,1); 
 	} else {
 		r.DeflateRect(8, 9, 9, 0);
 		r.bottom = r.top + 5;
@@ -290,8 +290,10 @@ void CPlayerSeekBar::OnPaint()
 			m_logobm.LoadExternalGradient("background", &memdc, r, 0, iThemeBrightness, iThemeRed, iThemeGreen, iThemeBlue);
 		} else {
 			TRIVERTEX tv[2] = {
-				{r.left, r.top, (iThemeBrightness+65)*iThemeRed, (iThemeBrightness+70)*iThemeGreen, (iThemeBrightness+75)*iThemeBlue, pa},
-				{r.right, r.bottom, (iThemeBrightness+0)*iThemeRed, (iThemeBrightness+5)*iThemeGreen, (iThemeBrightness+10)*iThemeBlue, pa},
+				//{r.left, r.top, (iThemeBrightness+65)*iThemeRed, (iThemeBrightness+70)*iThemeGreen, (iThemeBrightness+75)*iThemeBlue, pa},
+				//{r.right, r.bottom, (iThemeBrightness+0)*iThemeRed, (iThemeBrightness+5)*iThemeGreen, (iThemeBrightness+10)*iThemeBlue, pa},
+				{r.left, r.top, (iThemeBrightness+0)*iThemeRed, (iThemeBrightness+5)*iThemeGreen, (iThemeBrightness+10)*iThemeBlue, pa},
+				{r.right, r.bottom, (iThemeBrightness+15)*iThemeRed, (iThemeBrightness+20)*iThemeGreen, (iThemeBrightness+25)*iThemeBlue, pa},
 			};
 			memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 		}
@@ -302,25 +304,25 @@ void CPlayerSeekBar::OnPaint()
 		CPen penPlayedOutline(s.clrOutlineABGR == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, s.clrOutlineABGR);
 		
    		//outer frame shadow
-		rf = GetChannelRect();
+/*		rf = GetChannelRect();
 		rf.InflateRect(1, 0, GetThumbRect().Width()-2, 1);
 		COLORREF col = RGB(15,20,25);
 		memdc.Draw3dRect(rf,col,col);
 		rf.InflateRect(1,1,1,1);
 		memdc.Draw3dRect(rf,col,col);
-		rc = GetChannelRect();
+*/		rc = GetChannelRect();
 		int nposx = GetThumbRect().right-2;
 		int nposy = r.top;
 		
-		CPen penPlayed1(PS_SOLID,0,RGB((iThemeBrightness+110),(iThemeBrightness+115),(iThemeBrightness+120)));
+		CPen penPlayed1(PS_SOLID,0,RGB((iThemeBrightness+30),(iThemeBrightness+35),(iThemeBrightness+40)));
 		memdc.SelectObject(&penPlayed1);
-		memdc.MoveTo(rc.left +1, rc.top +1);
-		memdc.LineTo(rc.right, rc.top +1);
+		memdc.MoveTo(rc.left, rc.top);
+		memdc.LineTo(rc.right, rc.top);
 
 		CPen penPlayed2(PS_SOLID,0,RGB((iThemeBrightness+80),(iThemeBrightness+85),(iThemeBrightness+90)));
 		memdc.SelectObject(&penPlayed2);
-		memdc.MoveTo(rc.left +1, rc.top +17);
-		memdc.LineTo(rc.right, rc.top +17);
+		memdc.MoveTo(rc.left -1, rc.top +19);
+		memdc.LineTo(rc.right+2, rc.top +19);
 
 		if (fEnabled) {
 
@@ -330,35 +332,40 @@ void CPlayerSeekBar::OnPaint()
 			if (NULL != fp) {
 				rc.right = nposx;
 				rc.left = rc.left + 1;
-				rc.top = rc.top + 2;
-				rc.bottom = rc.bottom - 1;
+				rc.top = rc.top + 1;
+				rc.bottom = rc.bottom - 2;
 
 				m_logobm.LoadExternalGradient("background", &memdc, rc, 0, iThemeBrightness, iThemeRed, iThemeGreen, iThemeBlue);
 
 				rc = GetChannelRect();
 			} else {
 				TRIVERTEX tv[2] = {
-					{rc.left + 1, rc.top + 2, (iThemeBrightness+65)*iThemeRed, (iThemeBrightness+70)*iThemeGreen, (iThemeBrightness+75)*iThemeBlue, pa},
-					{nposx, rc.bottom - 1, (iThemeBrightness+0-ct)*iThemeRed, (iThemeBrightness+5-ct)*iThemeGreen, (iThemeBrightness+10-ct)*iThemeBlue, pa},
+					{rc.left, rc.top, (iThemeBrightness+0)*iThemeRed, (iThemeBrightness+5)*iThemeGreen, (iThemeBrightness+10)*iThemeBlue, pa},
+					{nposx, rc.bottom-3, (iThemeBrightness+65-ct)*iThemeRed, (iThemeBrightness+70-ct)*iThemeGreen, (iThemeBrightness+75-ct)*iThemeBlue, pa},
 				};
 				memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+
+				CRect rc2;
+				rc2.left = nposx - 5;
+				rc2.right = nposx;
+				rc2.top = rc.top;
+				rc2.bottom = rc.bottom;
+				TRIVERTEX tv2[2] = {
+					{rc2.left, rc2.top, (iThemeBrightness+0)*iThemeRed, (iThemeBrightness+5)*iThemeGreen, (iThemeBrightness+10)*iThemeBlue, pa},
+					{rc2.right, rc.bottom-3, (iThemeBrightness+165-ct)*iThemeRed, (iThemeBrightness+170-ct)*iThemeGreen, (iThemeBrightness+175-ct)*iThemeBlue, pa},
+				};
+				memdc.GradientFill(tv2, 2, gr, 1, GRADIENT_FILL_RECT_V);
 			}
 
 			iThemeBrightness -= (ct * 2);
 
 			CPen penPlayed3(PS_SOLID,0,RGB(iThemeBrightness+145,iThemeBrightness+150,iThemeBrightness+155));
 			memdc.SelectObject(&penPlayed3);
-			memdc.MoveTo(rc.left +1, rc.top +1);//active_top
-			memdc.LineTo(nposx, rc.top +1);
+			memdc.MoveTo(rc.left, rc.top);//active_top
+			memdc.LineTo(nposx, rc.top);
 
 			CPen penPlayed4(PS_SOLID,0,RGB(iThemeBrightness+115,iThemeBrightness+120,iThemeBrightness+125));
-			memdc.SelectObject(&penPlayed4);
-			memdc.MoveTo(rc.left +1, rc.top +17);//active_top
-			memdc.LineTo(nposx, rc.top +17);
 
-			CPen penFrHot(PS_SOLID,0,RGB(iThemeBrightness+145,iThemeBrightness+150,iThemeBrightness+155));
-			memdc.SelectObject(&penFrHot);
-			memdc.RoundRect(nposx - 1, rc.top + 1, nposx + 1, rc.bottom, 6, 4);
 		}
 
 		if (bFileNameOnSeekBar) {
@@ -385,6 +392,7 @@ void CPlayerSeekBar::OnPaint()
 			SetBkMode(memdc, TRANSPARENT);
 			rt = rc;
 			rt.left = rc.left+6;
+			rt.top = rc.top - 2;
 			memdc.DrawText(str, str.GetLength(), &rt, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
 
 			memdc.SetTextColor(RGB(235,240,245));
@@ -392,6 +400,7 @@ void CPlayerSeekBar::OnPaint()
 			rt2 = rc;
 			rt2.left = rc.left+6;
 			rt2.right = nposx;
+			rt2.top = rc.top - 2;
 			memdc.DrawText(str, str.GetLength(), &rt2, DT_LEFT|DT_VCENTER|DT_SINGLELINE);
 		}
 

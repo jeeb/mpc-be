@@ -189,6 +189,9 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 		TBBS_BUTTON, TBBS_BUTTON, TBBS_BUTTON, TBBS_BUTTON,
 		TBBS_SEPARATOR,
 		TBBS_BUTTON,
+		TBBS_BUTTON,
+		TBBS_SEPARATOR,
+		TBBS_SEPARATOR,
 		TBBS_CHECKBOX,
 	};
 
@@ -306,8 +309,11 @@ void CPlayerToolBar::ArrangeControls()
 
 	CRect br = GetBorders();
 
-	CRect r9;
-	GetItemRect(9, &r9);
+	//CRect r9;
+	//GetItemRect(9, &r9);
+
+	CRect r10;
+	GetItemRect(10, &r10);
 
 	CRect vr2(r.right + br.right - 60, r.bottom - 25, r.right +br.right + 6, r.bottom);
 
@@ -318,7 +324,9 @@ void CPlayerToolBar::ArrangeControls()
 
 	m_volctrl.MoveWindow(vr2);
 
-	SetButtonInfo(10, GetItemID(10), TBBS_SEPARATOR | TBBS_DISABLED, vr2.left - r9.right - r9.bottom - r9.top);
+	//SetButtonInfo(2, GetItemID(2), TBBS_SEPARATOR | TBBS_DISABLED, 16);
+	SetButtonInfo(7, GetItemID(7), TBBS_SEPARATOR | TBBS_DISABLED, 48);
+	SetButtonInfo(11, GetItemID(11), TBBS_SEPARATOR | TBBS_DISABLED, vr2.left - r10.right - r10.bottom - r10.top);
 }
 
 void CPlayerToolBar::SetMute(bool fMute)
@@ -358,7 +366,7 @@ int CPlayerToolBar::GetVolume()
 
 int CPlayerToolBar::GetMinWidth()
 {
-	return m_nButtonHeight * 9 + 155;
+	return m_nButtonHeight * 12 + 155;
 }
 
 void CPlayerToolBar::SetVolume(int volume)
@@ -383,6 +391,8 @@ BEGIN_MESSAGE_MAP(CPlayerToolBar, CToolBar)
 
 	ON_WM_NCPAINT()
 	ON_WM_LBUTTONDOWN()
+	ON_WM_RBUTTONDOWN()
+	ON_NOTIFY_EX_RANGE(TTN_NEEDTEXTW, 0, 0xFFFFFFFF, OnToolTipNotify)
 	ON_WM_MOUSEMOVE()
 END_MESSAGE_MAP()
 
@@ -396,7 +406,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 
 	GRADIENT_RECT gr[1] = {{0, 1}};
 
-	int sep[] = {2, 7, 9, 10};
+	int sep[] = {2, 7, 10, 11};
 
 	if (s.fDisableXPToolbars) {
 		iThemeBrightness = s.nThemeBrightness;
@@ -636,7 +646,7 @@ void CPlayerToolBar::OnMouseMove(UINT nFlags, CPoint point)
 
 	if (i == -1 || (GetButtonStyle(i) & (TBBS_SEPARATOR | TBBS_DISABLED))) {
 	} else {
-		if (i > 10 || i < 2 || (i < 9 && pFrame->IsSomethingLoaded())) {
+		if (i > 10 || i < 2 || i == 6 || (i < 10 && pFrame->IsSomethingLoaded())) {
 			::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_HAND));
 		}
 	}
@@ -733,4 +743,69 @@ int CPlayerToolBar::getHitButtonIdx(CPoint point)
 	}
 
 	return hit;
+}
+
+
+BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
+{
+	TOOLTIPTEXT* pTTT = (TOOLTIPTEXT*)pNMHDR;
+	CMainFrame* pFrame	= ((CMainFrame*)GetParentFrame());
+	OAFilterState fs	= pFrame->GetMediaState();
+
+	::SendMessage(pNMHDR->hwndFrom, TTM_SETMAXTIPWIDTH, 0, (LPARAM)(INT)1000);
+
+	static CString m_strTipText;
+
+	if (pNMHDR->idFrom == ID_PLAY_PLAY) {
+		(fs == State_Running) ?  m_strTipText = ResStr(IDS_AG_PAUSE) : m_strTipText = ResStr(IDS_AG_PLAY);
+	
+	} else if (pNMHDR->idFrom == ID_PLAY_STOP) {
+		m_strTipText = ResStr(IDS_AG_STOP) + _T(" | ") + ResStr(IDS_AG_CLOSE);
+
+	} else if (pNMHDR->idFrom == ID_PLAY_FRAMESTEP) {
+		m_strTipText = ResStr(IDS_AG_STEP) +  _T(" | ") + ResStr(IDS_AG_JUMP_TO);
+
+	} else if (pNMHDR->idFrom == ID_VOLUME_MUTE) {
+		m_strTipText = ResStr(IDS_AG_VOLUME_MUTE);
+
+	} else if (pNMHDR->idFrom == ID_FILE_OPENQUICK) {
+		m_strTipText = ResStr(IDS_MPLAYERC_0);
+
+	} else if (pNMHDR->idFrom == ID_NAVIGATE_SKIPFORWARD) {
+		m_strTipText = ResStr(IDS_AG_FRAMESTEP);
+
+	} else if (pNMHDR->idFrom == ID_NAVIGATE_SKIPBACK) {
+		m_strTipText = ResStr(IDS_MPLAYERC_16);
+
+	} else if (pNMHDR->idFrom == ID_NAVIGATE_SUBTITLES) {
+		m_strTipText = ResStr(IDS_AG_SUBTITLELANG)  + _T(" | ") +  ResStr(IDS_AG_OPTIONS);
+
+	} else if (pNMHDR->idFrom == ID_NAVIGATE_AUDIO) {
+		m_strTipText = ResStr(IDS_AG_AUDIOLANG)   + _T(" | ") +  ResStr(IDS_AG_OPTIONS);
+
+	}
+	pTTT->lpszText = m_strTipText.GetBuffer();
+
+	*pResult = 0;
+
+	return TRUE;    // message was handled
+}
+
+void CPlayerToolBar::OnRButtonDown(UINT nFlags, CPoint point)
+{
+	CMainFrame* pFrame	= ((CMainFrame*)GetParentFrame());
+	int Idx				= getHitButtonIdx(point);
+	OAFilterState fs	= pFrame->GetMediaState();
+
+	if (Idx == 1) {
+		pFrame->PostMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+	} else if (Idx == 5) {
+		pFrame->OnMenuNavJumpTo();
+	} else if (Idx == 8) {
+		pFrame->OnMenuNavAudioOptions();
+	} else if (Idx == 9) {
+		pFrame->OnMenuNavSubtitleOptions();
+	}
+
+	__super::OnRButtonDown(nFlags, point);
 }
