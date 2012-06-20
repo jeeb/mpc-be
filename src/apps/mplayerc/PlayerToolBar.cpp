@@ -219,10 +219,10 @@ BOOL CPlayerToolBar::PreCreateWindow(CREATESTRUCT& cs)
 
 void CPlayerToolBar::CreateRemappedImgList(UINT bmID, int nRemapState, CImageList& reImgList)
 {
-	//nRemapState = 0 Remap Active
-	//nRemapState = 1 Remap Disabled
-	//nRemapState = 2 Undo  Active
-	//nRemapState = 3 Undo  Disabled
+	// 0 Remap Active
+	// 1 Remap Disabled
+	// 2 Undo  Active
+	// 3 Undo  Disabled
 
 	AppSettings& s = AfxGetAppSettings();
 	COLORMAP cmActive[] =
@@ -265,32 +265,32 @@ void CPlayerToolBar::CreateRemappedImgList(UINT bmID, int nRemapState, CImageLis
 	}
 	BITMAP bmInfo;
 	VERIFY(bm.GetBitmap(&bmInfo));
-	VERIFY(reImgList.Create(bmInfo.bmHeight, bmInfo.bmHeight, bmInfo.bmBitsPixel | ILC_MASK, 1, 0));//ILC_COLOR8
+	VERIFY(reImgList.Create(bmInfo.bmHeight, bmInfo.bmHeight, bmInfo.bmBitsPixel | ILC_MASK, 1, 0));
 	VERIFY(reImgList.Add(&bm, 0x00ff00ff) != -1);
 }
 
 void CPlayerToolBar::SwitchRemmapedImgList(UINT bmID, int nRemapState)
 {
-	//nRemapState = 0 Remap Active
-	//nRemapState = 1 Remap Disabled
-	//nRemapState = 2 Undo  Active
-	//nRemapState = 3 Undo  Disabled
+	// 0 Remap Active
+	// 1 Remap Disabled
+	// 2 Undo  Active
+	// 3 Undo  Disabled
 
 	CToolBarCtrl& ctrl = GetToolBarCtrl();
 	if (nRemapState == 0 || nRemapState == 2) {
 		if (m_reImgListActive.GetSafeHandle()) {
-			m_reImgListActive.DeleteImageList();//cleanup
+			m_reImgListActive.DeleteImageList();
 		}
-		CreateRemappedImgList(bmID, nRemapState, m_reImgListActive);//remap
+		CreateRemappedImgList(bmID, nRemapState, m_reImgListActive);
 		ASSERT(m_reImgListActive.GetSafeHandle());
-		ctrl.SetImageList(&m_reImgListActive);//switch to
+		ctrl.SetImageList(&m_reImgListActive);
 	} else {
 		if (m_reImgListDisabled.GetSafeHandle()) {
-			m_reImgListDisabled.DeleteImageList();//cleanup
+			m_reImgListDisabled.DeleteImageList();
 		}
-		CreateRemappedImgList(bmID, nRemapState, m_reImgListDisabled);//remap
+		CreateRemappedImgList(bmID, nRemapState, m_reImgListDisabled);
 		ASSERT(m_reImgListDisabled.GetSafeHandle());
-		ctrl.SetDisabledImageList(&m_reImgListDisabled);//switch to
+		ctrl.SetDisabledImageList(&m_reImgListDisabled);
 	}
 }
 
@@ -309,9 +309,6 @@ void CPlayerToolBar::ArrangeControls()
 
 	CRect br = GetBorders();
 
-	//CRect r9;
-	//GetItemRect(9, &r9);
-
 	CRect r10;
 	GetItemRect(10, &r10);
 
@@ -324,7 +321,6 @@ void CPlayerToolBar::ArrangeControls()
 
 	m_volctrl.MoveWindow(vr2);
 
-	//SetButtonInfo(2, GetItemID(2), TBBS_SEPARATOR | TBBS_DISABLED, 16);
 	SetButtonInfo(7, GetItemID(7), TBBS_SEPARATOR | TBBS_DISABLED, 48);
 	SetButtonInfo(11, GetItemID(11), TBBS_SEPARATOR | TBBS_DISABLED, vr2.left - r10.right - r10.bottom - r10.top);
 }
@@ -583,6 +579,8 @@ void CPlayerToolBar::OnSize(UINT nType, int cx, int cy)
 	__super::OnSize(nType, cx, cy);
 
 	ArrangeControls();
+
+	::PostMessage(((CMainFrame*)AfxGetMainWnd())->m_hWnd, WM_SIZE, SIZE_RESTORED, MAKELPARAM(0, 0));
 }
 
 void CPlayerToolBar::OnInitialUpdate()
@@ -730,7 +728,7 @@ void CPlayerToolBar::OnLButtonDown(UINT nFlags, CPoint point)
 
 int CPlayerToolBar::getHitButtonIdx(CPoint point)
 {
-	int hit = -1;// -1 means not on any buttons
+	int hit = -1;
 	CRect r;
 
 	for (int i = 0, j = GetToolBarCtrl().GetButtonCount(); i < j; i++) {
@@ -745,10 +743,9 @@ int CPlayerToolBar::getHitButtonIdx(CPoint point)
 	return hit;
 }
 
-
 BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 {
-	TOOLTIPTEXT* pTTT = (TOOLTIPTEXT*)pNMHDR;
+	TOOLTIPTEXT* pTTT	= (TOOLTIPTEXT*)pNMHDR;
 	CMainFrame* pFrame	= ((CMainFrame*)GetParentFrame());
 	OAFilterState fs	= pFrame->GetMediaState();
 
@@ -757,13 +754,13 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 	static CString m_strTipText;
 
 	if (pNMHDR->idFrom == ID_PLAY_PLAY) {
-		(fs == State_Running) ?  m_strTipText = ResStr(IDS_AG_PAUSE) : m_strTipText = ResStr(IDS_AG_PLAY);
-	
+		(fs == State_Running) ? m_strTipText = ResStr(IDS_AG_PAUSE) : m_strTipText = ResStr(IDS_AG_PLAY);
+
 	} else if (pNMHDR->idFrom == ID_PLAY_STOP) {
 		m_strTipText = ResStr(IDS_AG_STOP) + _T(" | ") + ResStr(IDS_AG_CLOSE);
 
 	} else if (pNMHDR->idFrom == ID_PLAY_FRAMESTEP) {
-		m_strTipText = ResStr(IDS_AG_STEP) +  _T(" | ") + ResStr(IDS_AG_JUMP_TO);
+		m_strTipText = ResStr(IDS_AG_STEP) + _T(" | ") + ResStr(IDS_AG_JUMP_TO);
 
 	} else if (pNMHDR->idFrom == ID_VOLUME_MUTE) {
 		m_strTipText = ResStr(IDS_AG_VOLUME_MUTE);
@@ -778,17 +775,17 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 		m_strTipText = ResStr(IDS_MPLAYERC_16);
 
 	} else if (pNMHDR->idFrom == ID_NAVIGATE_SUBTITLES) {
-		m_strTipText = ResStr(IDS_AG_SUBTITLELANG)  + _T(" | ") +  ResStr(IDS_AG_OPTIONS);
+		m_strTipText = ResStr(IDS_AG_SUBTITLELANG) + _T(" | ") + ResStr(IDS_AG_OPTIONS);
 
 	} else if (pNMHDR->idFrom == ID_NAVIGATE_AUDIO) {
-		m_strTipText = ResStr(IDS_AG_AUDIOLANG)   + _T(" | ") +  ResStr(IDS_AG_OPTIONS);
+		m_strTipText = ResStr(IDS_AG_AUDIOLANG) + _T(" | ") + ResStr(IDS_AG_OPTIONS);
 
 	}
 	pTTT->lpszText = m_strTipText.GetBuffer();
 
 	*pResult = 0;
 
-	return TRUE;    // message was handled
+	return TRUE;
 }
 
 void CPlayerToolBar::OnRButtonDown(UINT nFlags, CPoint point)

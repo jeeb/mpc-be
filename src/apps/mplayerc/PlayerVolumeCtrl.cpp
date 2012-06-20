@@ -56,7 +56,7 @@ bool CVolumeCtrl::Create(CWnd* pParentWnd)
 	iThemeGreen = s.nThemeGreen;
 	iThemeBlue = s.nThemeBlue;
 
-	return true;
+	return TRUE;
 }
 
 void CVolumeCtrl::SetPosInternal(int pos)
@@ -339,6 +339,7 @@ void CVolumeCtrl::HScroll(UINT nSBCode, UINT nPos)
 BOOL CVolumeCtrl::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 {
 	::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_HAND));
+
 	return TRUE;
 }
 
