@@ -98,6 +98,7 @@
 #define HAVE_VFPV3 0
 #define HAVE_VIS 0
 
+#define HAVE_ALIGNED_MALLOC 0
 #define HAVE_ALIGNED_STACK 1
 #define HAVE_ALSA_ASOUNDLIB_H 0
 #define HAVE_ALTIVEC_H 0
