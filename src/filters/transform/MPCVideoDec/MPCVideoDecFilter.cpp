@@ -88,7 +88,7 @@ typedef struct {
 
 // DXVA modes supported for Mpeg2
 DXVA_PARAMS		DXVA_Mpeg2 = {
-	9,		// PicEntryNumber
+	10,		// PicEntryNumber
 	1,		// PreferedConfigBitstream
 	{ &DXVA2_ModeMPEG2_VLD, &GUID_NULL },
 	{ DXVA_RESTRICTED_MODE_UNRESTRICTED, 0 } // Restricted mode for DXVA1?
@@ -103,7 +103,7 @@ DXVA_PARAMS		DXVA_H264 = {
 };
 
 DXVA_PARAMS		DXVA_H264_VISTA = {
-	22,		// PicEntryNumber
+	24,		// PicEntryNumber
 	2,		// PreferedConfigBitstream
 	{ &DXVA2_ModeH264_E, &DXVA2_ModeH264_F, &DXVA_Intel_H264_ClearVideo, &GUID_NULL },
 	{ DXVA_RESTRICTED_MODE_H264_E, 0}
@@ -111,7 +111,7 @@ DXVA_PARAMS		DXVA_H264_VISTA = {
 
 // DXVA modes supported for VC1
 DXVA_PARAMS		DXVA_VC1 = {
-	14,		// PicEntryNumber
+	10,		// PicEntryNumber
 	1,		// PreferedConfigBitstream
 	{ &DXVA2_ModeVC1_D,				&GUID_NULL },
 	{ DXVA_RESTRICTED_MODE_VC1_D, 0}
@@ -1563,9 +1563,9 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 {
 	LOG(_T("CMPCVideoDecFilter::CompleteConnect"));
 
-	if (direction==PINDIR_INPUT && m_pOutput->IsConnected()) {
+	if (direction == PINDIR_INPUT && m_pOutput->IsConnected()) {
 		ReconnectOutput (m_nWidth, m_nHeight);
-	} else if (direction==PINDIR_OUTPUT) {
+	} else if (direction == PINDIR_OUTPUT) {
 		DetectVideoCard_EVR(pReceivePin);
 
 		if (IsDXVASupported()) {
@@ -2790,8 +2790,8 @@ void CMPCVideoDecFilter::SetFrameType(FF_FIELD_TYPE nFrameType)
 // EVR functions
 HRESULT CMPCVideoDecFilter::DetectVideoCard_EVR(IPin *pPin)
 {
-    IMFGetService* pGetService;
-    HRESULT hr = pPin->QueryInterface(__uuidof(IMFGetService), reinterpret_cast<void**>(&pGetService));
+	IMFGetService* pGetService;
+	HRESULT hr = pPin->QueryInterface(__uuidof(IMFGetService), reinterpret_cast<void**>(&pGetService));
 	if (SUCCEEDED(hr)) {
 		// Try to get the adapter description of the active DirectX 9 device.
 		IDirect3DDeviceManager9* pDevMan9;
@@ -2840,6 +2840,7 @@ HRESULT CMPCVideoDecFilter::DetectVideoCard_EVR(IPin *pPin)
 			}
 			pDevMan9->Release();
 		}
+		pGetService->Release();
 	}
 	return hr;
 }
