@@ -25,7 +25,9 @@
     #define HAVE_GETADDRINFO 0
   #endif
 
+  #ifndef av_restrict
   #define av_restrict restrict
+  #endif
 #else
   #define HAVE_INLINE_ASM 0
   #define HAVE_AMD3DNOW 0

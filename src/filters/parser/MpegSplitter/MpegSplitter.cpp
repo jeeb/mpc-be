@@ -1609,6 +1609,8 @@ CMpegSplitterOutputPin::CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWS
 	, m_type(type)
 	, DD_reset(false)
 	, m_bFlushed(false)
+	, m_AC3_size(0)
+	, m_AC3_count(0)
 {
 }
 
@@ -1642,7 +1644,8 @@ HRESULT CMpegSplitterOutputPin::DeliverEndFlush()
 	return __super::DeliverEndFlush();
 }
 
-#define MOVE_TO_H264_START_CODE(b, e) while(b <= e-4 && !((*(DWORD *)b == 0x01000000) || ((*(DWORD *)b & 0x00FFFFFF) == 0x00010000))) b++; if((b <= e-4) && *(DWORD *)b == 0x01000000) b++;
+#define MOVE_TO_H264_START_CODE(b, e)	while(b <= e-4 && !((*(DWORD *)b == 0x01000000) || ((*(DWORD *)b & 0x00FFFFFF) == 0x00010000))) b++; if((b <= e-4) && *(DWORD *)b == 0x01000000) b++;
+#define MOVE_TO_AC3_START_CODE(b, e)	while(b <= e-8 && (*(WORD*)b != 0x770b)) b++;
 
 HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 {
@@ -1669,8 +1672,9 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 		}
 	}
 
+	// AAC
 	if (m_mt.subtype == MEDIASUBTYPE_AAC) { // special code for aac, the currently available decoders only like whole frame samples
-		if (m_p && m_p->GetCount() == 1 && m_p->GetAt(0) == 0xff	&& !(!p->IsEmpty() && (p->GetAt(0) & 0xf6) == 0xf0)) {
+		if (m_p && m_p->GetCount() == 1 && m_p->GetAt(0) == 0xff && !(!p->IsEmpty() && (p->GetAt(0) & 0xf6) == 0xf0)) {
 			m_p.Free();
 		}
 
@@ -1761,7 +1765,9 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 		}
 
 		return S_OK;
-	} else if (m_mt.subtype == FOURCCMap('1CVA') || m_mt.subtype == FOURCCMap('1cva') || m_mt.subtype == FOURCCMap('CVMA') || m_mt.subtype == FOURCCMap('CVME')) {
+	}
+	// H.264/AVC/CVMA/CVME
+	else if (m_mt.subtype == FOURCCMap('1CVA') || m_mt.subtype == FOURCCMap('1cva') || m_mt.subtype == FOURCCMap('CVMA') || m_mt.subtype == FOURCCMap('CVME')) {
 		if (!m_p) {
 			m_p.Attach(DNew Packet());
 			m_p->TrackNumber	= p->TrackNumber;
@@ -1905,7 +1911,9 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 		}
 
 		return S_OK;
-	} else if (m_mt.subtype == FOURCCMap('1CVW') || m_mt.subtype == FOURCCMap('1cvw') || m_mt.subtype == MEDIASUBTYPE_WVC1_CYBERLINK || m_mt.subtype == MEDIASUBTYPE_WVC1_ARCSOFT) { // just like aac, this has to be starting nalus, more can be packed together
+	}
+	// VC1
+	else if (m_mt.subtype == FOURCCMap('1CVW') || m_mt.subtype == FOURCCMap('1cvw') || m_mt.subtype == MEDIASUBTYPE_WVC1_CYBERLINK || m_mt.subtype == MEDIASUBTYPE_WVC1_ARCSOFT) { // just like aac, this has to be starting nalus, more can be packed together
 		if (!m_p) {
 			m_p.Attach(DNew Packet());
 			m_p->TrackNumber	= p->TrackNumber;
@@ -2052,8 +2060,9 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 		else if (!p->pmt) {
 			return S_OK;
 		}
+	}
 	// HDMV LPCM
-	} else if (m_mt.subtype == MEDIASUBTYPE_HDMV_LPCM_AUDIO) {
+	else if (m_mt.subtype == MEDIASUBTYPE_HDMV_LPCM_AUDIO) {
 		if (!m_p) {
 			m_p.Attach(DNew Packet());
 		}
@@ -2080,20 +2089,121 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 		}
 		p->SetData(start + 4, m_p->GetCount() - 4);
 		m_p.Free();
-	// Dolby_AC3
-	} else if ((m_type == mpeg_ts) &&
-			   (m_mt.subtype == MEDIASUBTYPE_DOLBY_AC3) &&
-			   (static_cast<CMpegSplitterFilter*>(m_pFilter))->StreamIsTrueHD(p->TrackNumber) &&
-			   (static_cast<CMpegSplitterFilter*>(m_pFilter))->GetTrueHD() != 2) {
-		if (p->GetCount() < 8) {
-			return S_OK;    // Should be invalid packet
+	}
+	// Dolby AC3	
+	else if (m_mt.subtype == MEDIASUBTYPE_DOLBY_AC3) {
+		if (!m_p) {
+			m_p.Attach(DNew Packet());
+			m_p->TrackNumber	= p->TrackNumber;
+			m_p->bDiscontinuity	= p->bDiscontinuity;
+			p->bDiscontinuity	= FALSE;
+
+			m_p->bSyncPoint	= p->bSyncPoint;
+			p->bSyncPoint	= FALSE;
+
+			m_p->rtStart	= p->rtStart;
+			p->rtStart		= Packet::INVALID_TIME;
+
+			m_p->rtStop	= p->rtStop;
+			p->rtStop	= Packet::INVALID_TIME;
 		}
-		BYTE* start = p->GetData();
-		if (*(WORD*)start != 0x770b) { // skip none AC3
-			return S_OK;
+
+		m_p->Append(*p);
+
+		if (m_p->GetCount() < 8) {
+			return S_OK;	// Should be invalid packet
 		}
+
+		BYTE* start	= m_p->GetData();
+		BYTE* end	= start + m_p->GetCount();
+
+		for(;;) {
+			MOVE_TO_AC3_START_CODE(start, end);
+
+			if (start <= end-8) {
+				int size, sample_rate, channels, framelength, bitrate;
+				if ((size = ParseAC3Header(start, &sample_rate, &channels, &framelength, &bitrate)) > 0) {
+					
+					if (size <= (end-start)) {
+
+						// TODO - found better way to detect valid AC3 frame(core) in TrueHD stream ...
+						if (size == m_AC3_size) {
+							m_AC3_count++;
+						} else if (m_AC3_count < 10) {
+							m_AC3_size	= size;
+							m_AC3_count	= 0;
+						}
+
+						if (m_AC3_count >= 10 && size != m_AC3_size) {
+							start++;
+							continue;
+						}
+
+						CAutoPtr<Packet> p2(DNew Packet());
+						p2->TrackNumber		= m_p->TrackNumber;
+						p2->bDiscontinuity	= m_p->bDiscontinuity;
+						m_p->bDiscontinuity	= FALSE;
+
+						p2->bSyncPoint	= m_p->bSyncPoint;
+						m_p->bSyncPoint	= FALSE;
+
+						p2->rtStart		= m_p->rtStart;
+						m_p->rtStart	= Packet::INVALID_TIME;
+
+						p2->rtStop		= m_p->rtStop;
+						m_p->rtStop		= Packet::INVALID_TIME;
+
+						p2->pmt		= m_p->pmt;
+						m_p->pmt	= NULL;
+
+						p2->SetData(start, size);
+
+						HRESULT hr = __super::DeliverPacket(p2);
+						if (hr != S_OK) {
+							return hr;
+						}
+
+						if (p->rtStart != Packet::INVALID_TIME) {
+							m_p->rtStart	= p->rtStart;
+							m_p->rtStop		= p->rtStop;
+							p->rtStart		= Packet::INVALID_TIME;
+						}
+						if (p->bDiscontinuity) {
+							m_p->bDiscontinuity	= p->bDiscontinuity;
+							p->bDiscontinuity	= FALSE;
+						}
+						if (p->bSyncPoint) {
+							m_p->bSyncPoint	= p->bSyncPoint;
+							p->bSyncPoint	= FALSE;
+						}
+						if (m_p->pmt) {
+							DeleteMediaType(m_p->pmt);
+						}
+
+						m_p->pmt	= p->pmt;
+						p->pmt		= NULL;
+							
+						start += size;
+					} else {
+						break;
+					}
+				} else {
+					start++;
+				}
+			} else {
+				break;
+			}
+		}
+
+		if (start > m_p->GetData()) {
+			m_p->RemoveAt(0, start - m_p->GetData());
+		}
+
+		return S_OK;
+	}
 	// TrueHD
-	} else if (m_mt.subtype == MEDIASUBTYPE_DOLBY_TRUEHD && (static_cast<CMpegSplitterFilter*>(m_pFilter))->GetTrueHD() != 2) {
+	// TODO - need found better way to skip AC3 core
+	else if (m_mt.subtype == MEDIASUBTYPE_DOLBY_TRUEHD && (static_cast<CMpegSplitterFilter*>(m_pFilter))->GetTrueHD() != 2) {
 		if (p->GetCount() < 8) {
 			return S_OK;    // Should be invalid packet
 		}
@@ -2105,8 +2215,9 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			p->bDiscontinuity = true;
 			DD_reset = false;
 		}
-	// Dirac
-	} else if (m_mt.subtype == MEDIASUBTYPE_DRAC) {
+	}
+	// Dirac	
+	else if (m_mt.subtype == MEDIASUBTYPE_DRAC) {
 		if (p->GetCount() < 4) {
 			return S_OK;    // Should be invalid packet
 		}

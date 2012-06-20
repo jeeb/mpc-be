@@ -160,6 +160,9 @@ class CMpegSplitterOutputPin : public CBaseSplitterOutputPin, protected CCritSec
 	bool	m_bFlushed;
 	int		m_type;
 
+	int				m_AC3_size;
+	unsigned int	m_AC3_count;
+
 protected:
 	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
 	HRESULT DeliverPacket(CAutoPtr<Packet> p);
