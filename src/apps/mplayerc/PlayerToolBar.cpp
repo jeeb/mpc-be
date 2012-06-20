@@ -644,7 +644,7 @@ void CPlayerToolBar::OnMouseMove(UINT nFlags, CPoint point)
 
 	if (i == -1 || (GetButtonStyle(i) & (TBBS_SEPARATOR | TBBS_DISABLED))) {
 	} else {
-		if (i > 10 || i < 2 || i == 6 || (i < 10 && pFrame->IsSomethingLoaded())) {
+		if (i > 10 || i < 2 || i == 6 || (i < 10 && (pFrame->IsSomethingLoaded() || pFrame->IsD3DFullScreenMode()))) {
 			::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_HAND));
 		}
 	}
@@ -718,7 +718,7 @@ void CPlayerToolBar::OnLButtonDown(UINT nFlags, CPoint point)
 			pFrame->PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 		}
 	} else {
-		if (i > 10 || (i < 9 && pFrame->IsSomethingLoaded())) {
+		if (i > 10 || (i < 10 && (pFrame->IsSomethingLoaded() || pFrame->IsD3DFullScreenMode()))) {
 			::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_HAND));
 		}
 

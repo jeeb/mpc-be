@@ -561,6 +561,9 @@ public:
 	void			DeserializeHex (LPCTSTR strVal, BYTE* pBuffer, int nBufSize) const;
 	CString			SerializeHex (BYTE* pBuffer, int nBufSize) const;
 
+	CString			strTimeOnSeekBar;
+	bool			bStatusBarIsVisible;
+
 private :
 	DVD_POSITION	DvdPosition[MAX_DVD_POSITION];
 	int				nCurrentDvdPosition;

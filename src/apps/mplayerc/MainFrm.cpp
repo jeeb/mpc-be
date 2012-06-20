@@ -1812,7 +1812,11 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 				__int64 start, stop, pos;
 				m_wndSeekBar.GetRange(start, stop);
 				pos = m_wndSeekBar.GetPosReal();
-
+				if (m_wndStatusBar.IsVisible()) {
+					AfxGetAppSettings().bStatusBarIsVisible = true;
+				} else {
+					AfxGetAppSettings().bStatusBarIsVisible = false;
+				}
 				GUID tf;
 				pMS->GetTimeFormat(&tf);
 
@@ -1828,7 +1832,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 						str += ch;
 					}
 
-					m_wndStatusBar.SetStatusTimer(str);
+					m_wndStatusBar.SetStatusTimer(str);					
 				} else {
 					m_wndStatusBar.SetStatusTimer(pos, stop, !!m_wndSubresyncBar.IsWindowVisible(), &tf);
 					if (m_bRemainingTime) {
@@ -8189,7 +8193,7 @@ void CMainFrame::OnUpdateMenuNavSubtitle(CCmdUI* pCmdUI)
 {
 	bool fEnable = false;
 
-	if (IsSomethingLoaded() && m_iMediaLoadState == MLS_LOADED && !m_fAudioOnly) {
+	if (/*IsSomethingLoaded() && */m_iMediaLoadState == MLS_LOADED && !m_fAudioOnly) {
 		fEnable = true;
 	}
 	
@@ -8200,7 +8204,7 @@ void CMainFrame::OnUpdateMenuNavAudio(CCmdUI* pCmdUI)
 {
 	bool fEnable = false;
 
-	if (IsSomethingLoaded() && m_iMediaLoadState == MLS_LOADED && !m_fAudioOnly) {
+	if (/*IsSomethingLoaded() && */m_iMediaLoadState == MLS_LOADED && !m_fAudioOnly) {
 		fEnable = true;
 	}
 	

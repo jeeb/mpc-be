@@ -171,6 +171,7 @@ void CPlayerStatusBar::Relayout()
 		m_type.ShowWindow(SW_HIDE);
 		m_status.ShowWindow(SW_HIDE);
 		m_time.ShowWindow(SW_HIDE);
+		AfxGetAppSettings().strTimeOnSeekBar = GetStatusTimer();
 	}
 }
 
@@ -468,6 +469,7 @@ void CPlayerStatusBar::OnPaint()
 		memdc.SelectObject(&font2);
 		CString str;
 		str = GetStatusTimer();
+		AfxGetAppSettings().strTimeOnSeekBar = str;
 
 		CRect rt = r;
 		m_time_rect2		= rt;

@@ -242,6 +242,7 @@ BEGIN_MESSAGE_MAP(CPlayerSeekBar, CDialogBar)
 	ON_WM_ERASEBKGND()
 	ON_WM_SETCURSOR()
 	ON_WM_TIMER()
+	ON_WM_RBUTTONDOWN()
 	//}}AFX_MSG_MAP
 	ON_COMMAND_EX(ID_PLAY_STOP, OnPlayStop)
 END_MESSAGE_MAP()
@@ -393,15 +394,32 @@ void CPlayerSeekBar::OnPaint()
 			rt = rc;
 			rt.left = rc.left+6;
 			rt.top = rc.top - 2;
+			if (!AfxGetAppSettings().bStatusBarIsVisible) rt.right = rc.right - 150;
 			memdc.DrawText(str, str.GetLength(), &rt, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
 
 			memdc.SetTextColor(RGB(235,240,245));
 			CRect rt2;
 			rt2 = rc;
 			rt2.left = rc.left+6;
-			rt2.right = nposx;
+			rt2.right = (nposx > rc.right - 150 && !AfxGetAppSettings().bStatusBarIsVisible ? rc.right - 150 : nposx);
 			rt2.top = rc.top - 2;
-			memdc.DrawText(str, str.GetLength(), &rt2, DT_LEFT|DT_VCENTER|DT_SINGLELINE);
+
+			if (nposx > rt.right-15) {
+				rt2.right = rt.right;
+				memdc.DrawText(str, str.GetLength(), &rt2, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
+			} else {
+				rt2.right = nposx;
+				memdc.DrawText(str, str.GetLength(), &rt2, DT_LEFT|DT_VCENTER|DT_SINGLELINE);
+			}
+
+			if (!AfxGetAppSettings().bStatusBarIsVisible) {
+				CString strT = AfxGetAppSettings().strTimeOnSeekBar;
+				CRect rT = rc;
+				rT.left = rc.right - 140;
+				rT.right = rc.right - 6;
+				memdc.SetTextColor(RGB(200,205,210));
+				memdc.DrawText(strT, strT.GetLength(), &rT, DT_RIGHT|DT_VCENTER|DT_SINGLELINE);
+			}
 		}
 
 		dc.BitBlt(r.left, r.top, r.Width(), r.Height(), &memdc, 0, 0, SRCCOPY);
@@ -520,6 +538,26 @@ void CPlayerSeekBar::OnLButtonUp(UINT nFlags, CPoint point)
 
 	CDialogBar::OnLButtonUp(nFlags, point);
 }
+
+void CPlayerSeekBar::OnRButtonDown(UINT nFlags, CPoint point)
+{
+	if (!AfxGetAppSettings().bStatusBarIsVisible) {
+
+		CRect rc = GetChannelRect();
+		CRect rT = rc;
+		rT.left = rc.right - 140;
+		rT.right = rc.right - 6;
+		CPoint p;
+		GetCursorPos(&p);
+		ScreenToClient(&p);
+
+		if (rT.PtInRect(p)) {
+			AfxGetAppSettings().fRemainingTime = !AfxGetAppSettings().fRemainingTime;
+		}
+	}
+	CDialogBar::OnRButtonDown(nFlags, point);
+}
+
 
 void CPlayerSeekBar::UpdateTooltip(CPoint point)
 {
