@@ -1566,6 +1566,8 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 	if (direction==PINDIR_INPUT && m_pOutput->IsConnected()) {
 		ReconnectOutput (m_nWidth, m_nHeight);
 	} else if (direction==PINDIR_OUTPUT) {
+		DetectVideoCard_EVR(pReceivePin);
+
 		if (IsDXVASupported()) {
 			if (m_nDXVAMode == MODE_DXVA1) {
 				m_pDXVADecoder->ConfigureDXVA1();
@@ -2604,48 +2606,30 @@ HRESULT CMPCVideoDecFilter::ConfigureDXVA2(IPin *pPin)
 
 HRESULT CMPCVideoDecFilter::SetEVRForDXVA2(IPin *pPin)
 {
-	HRESULT hr = S_OK;
-
-	CComPtr<IMFGetService>						pGetService;
-	CComPtr<IDirectXVideoMemoryConfiguration>	pVideoConfig;
-	CComPtr<IMFVideoDisplayControl>				pVdc;
-
-	// Query the pin for IMFGetService.
-	hr = pPin->QueryInterface(__uuidof(IMFGetService), (void**)&pGetService);
-
-	// Get the IDirectXVideoMemoryConfiguration interface.
+    IMFGetService* pGetService;
+    HRESULT hr = pPin->QueryInterface(__uuidof(IMFGetService), reinterpret_cast<void**>(&pGetService));
 	if (SUCCEEDED(hr)) {
-		hr = pGetService->GetService(
-				 MR_VIDEO_ACCELERATION_SERVICE,
-				 __uuidof(IDirectXVideoMemoryConfiguration),
-				 (void**)&pVideoConfig);
-
-		if (SUCCEEDED (pGetService->GetService(MR_VIDEO_RENDER_SERVICE, __uuidof(IMFVideoDisplayControl), (void**)&pVdc))) {
-			HWND	hWnd;
-			if (SUCCEEDED (pVdc->GetVideoWindow(&hWnd))) {
-				DetectVideoCard(hWnd);
+		IDirectXVideoMemoryConfiguration* pVideoConfig;
+		hr = pGetService->GetService(MR_VIDEO_ACCELERATION_SERVICE, IID_IDirectXVideoMemoryConfiguration, reinterpret_cast<void**>(&pVideoConfig));
+		if (SUCCEEDED(hr)) {
+			// Notify the EVR.
+			DXVA2_SurfaceType surfaceType;
+			DWORD dwTypeIndex = 0;
+			for (;;) {
+				hr = pVideoConfig->GetAvailableSurfaceTypeByIndex(dwTypeIndex, &surfaceType);
+				if (FAILED(hr)) {
+					break;
+				}
+				if (surfaceType == DXVA2_SurfaceType_DecoderRenderTarget) {
+					hr = pVideoConfig->SetSurfaceType(DXVA2_SurfaceType_DecoderRenderTarget);
+					break;
+				}
+				++dwTypeIndex;
 			}
+			pVideoConfig->Release();
 		}
-	}
-
-	// Notify the EVR.
-	if (SUCCEEDED(hr)) {
-		DXVA2_SurfaceType surfaceType;
-
-		for (DWORD iTypeIndex = 0; ; iTypeIndex++) {
-			hr = pVideoConfig->GetAvailableSurfaceTypeByIndex(iTypeIndex, &surfaceType);
-
-			if (FAILED(hr)) {
-				break;
-			}
-
-			if (surfaceType == DXVA2_SurfaceType_DecoderRenderTarget) {
-				hr = pVideoConfig->SetSurfaceType(DXVA2_SurfaceType_DecoderRenderTarget);
-				break;
-			}
-		}
-	}
-
+		pGetService->Release();
+    }
 	return hr;
 }
 
@@ -2801,6 +2785,63 @@ STDMETHODIMP CMPCVideoDecFilter::CreatePage(const GUID& guid, IPropertyPage** pp
 void CMPCVideoDecFilter::SetFrameType(FF_FIELD_TYPE nFrameType)
 {
 	m_nFrameType = nFrameType;
+}
+
+// EVR functions
+HRESULT CMPCVideoDecFilter::DetectVideoCard_EVR(IPin *pPin)
+{
+    IMFGetService* pGetService;
+    HRESULT hr = pPin->QueryInterface(__uuidof(IMFGetService), reinterpret_cast<void**>(&pGetService));
+	if (SUCCEEDED(hr)) {
+		// Try to get the adapter description of the active DirectX 9 device.
+		IDirect3DDeviceManager9* pDevMan9;
+		hr = pGetService->GetService(MR_VIDEO_ACCELERATION_SERVICE, IID_IDirect3DDeviceManager9, reinterpret_cast<void**>(&pDevMan9));
+		if (SUCCEEDED(hr)) {
+			HANDLE hDevice;
+			hr = pDevMan9->OpenDeviceHandle(&hDevice);
+			if (SUCCEEDED(hr)) {
+				IDirect3DDevice9* pD3DDev9;
+				hr = pDevMan9->LockDevice(hDevice, &pD3DDev9, TRUE);
+				if (hr == DXVA2_E_NEW_VIDEO_DEVICE) {
+					// Invalid device handle. Try to open a new device handle.
+					hr = pDevMan9->CloseDeviceHandle(hDevice);
+					if (SUCCEEDED(hr)) {
+						hr = pDevMan9->OpenDeviceHandle(&hDevice);
+						// Try to lock the device again.
+						if (SUCCEEDED(hr)) {
+							hr = pDevMan9->LockDevice(hDevice, &pD3DDev9, TRUE);
+						}
+					}
+				}
+				if (SUCCEEDED(hr)) {
+					D3DDEVICE_CREATION_PARAMETERS DevPar9;
+					hr = pD3DDev9->GetCreationParameters(&DevPar9);
+					if (SUCCEEDED(hr)) {
+						IDirect3D9* pD3D9;
+						hr = pD3DDev9->GetDirect3D(&pD3D9);
+						if (SUCCEEDED(hr)) {
+							D3DADAPTER_IDENTIFIER9 AdapID9;
+							hr = pD3D9->GetAdapterIdentifier(DevPar9.AdapterOrdinal, 0, &AdapID9);
+							if (SUCCEEDED(hr)) {
+								// copy adapter description
+								m_nPCIVendor = AdapID9.VendorId;
+								m_nPCIDevice = AdapID9.DeviceId;
+								m_VideoDriverVersion.QuadPart = AdapID9.DriverVersion.QuadPart;
+								m_strDeviceDescription = AdapID9.Description;
+								m_strDeviceDescription.AppendFormat(_T(" (%04hX:%04hX)"), m_nPCIVendor, m_nPCIDevice);
+								}
+						}
+						pD3D9->Release();
+					}
+					pD3DDev9->Release();
+					pDevMan9->UnlockDevice(hDevice, FALSE);
+				}
+				pDevMan9->CloseDeviceHandle(hDevice);
+			}
+			pDevMan9->Release();
+		}
+	}
+	return hr;
 }
 
 // IFFmpegDecFilter

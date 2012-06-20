@@ -347,4 +347,7 @@ public:
 															  DXVA2_ConfigPictureDecode *pSelectedConfig,
 															  BOOL *pbFoundDXVA2Configuration);
 	HRESULT						CreateDXVA2Decoder(UINT nNumRenderTargets, IDirect3DSurface9** pDecoderRenderTargets);
+
+	// === EVR functions
+	HRESULT						DetectVideoCard_EVR(IPin *pPin);
 };
