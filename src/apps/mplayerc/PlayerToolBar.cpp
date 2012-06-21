@@ -52,7 +52,40 @@ void CPlayerToolBar::SwitchTheme()
 {
 	AppSettings& s = AfxGetAppSettings();
 
-	m_nButtonHeight = 16;//reset m_nButtonHeight
+	m_nButtonHeight = 16;
+
+	if (iDisableXPToolbars != (__int64)s.fDisableXPToolbars) {
+		VERIFY(LoadToolBar(IDB_PLAYERTOOLBAR));
+
+		ModifyStyleEx(WS_EX_LAYOUTRTL, WS_EX_NOINHERITLAYOUT);
+
+		GetToolBarCtrl().SetExtendedStyle(TBSTYLE_EX_DRAWDDARROWS);
+
+		CToolBarCtrl& tb = GetToolBarCtrl();
+		tb.DeleteButton(1);
+		tb.DeleteButton(tb.GetButtonCount()-1);
+		tb.DeleteButton(tb.GetButtonCount()-1);
+
+		SetMute(s.fMute);
+
+		UINT styles[] = {
+			TBBS_CHECKGROUP, TBBS_CHECKGROUP,
+			TBBS_SEPARATOR,
+			TBBS_BUTTON, TBBS_BUTTON, TBBS_BUTTON, TBBS_BUTTON,
+			TBBS_SEPARATOR,
+			TBBS_BUTTON,
+			TBBS_BUTTON,
+			TBBS_SEPARATOR,
+			TBBS_SEPARATOR,
+			TBBS_CHECKBOX,
+		};
+
+		for (int i = 0; i < _countof(styles); i++) {
+			SetButtonStyle(i, styles[i] | TBBS_DISABLED);
+		}
+
+		iDisableXPToolbars = s.fDisableXPToolbars;
+	}
 
 	if (s.fDisableXPToolbars) {
 		if (HMODULE h = LoadLibrary(_T("uxtheme.dll"))) {
@@ -63,7 +96,7 @@ void CPlayerToolBar::SwitchTheme()
 			FreeLibrary(h);
 		}
 
-		SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 0);//nRemapState = 0 Remap Active
+		SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 0);// 0 Remap Active
 
 		COLORSCHEME cs;
 		cs.dwSize		= sizeof(COLORSCHEME);
@@ -81,7 +114,7 @@ void CPlayerToolBar::SwitchTheme()
 			FreeLibrary(h);
 		}
 
-		SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 2);//nRemapState = 2 Undo  Active
+		SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 2);// 2 Undo  Active
 
 		COLORSCHEME cs;
 		cs.dwSize		= sizeof(COLORSCHEME);
@@ -124,7 +157,7 @@ void CPlayerToolBar::SwitchTheme()
 			m_pButtonsImages = DNew CImageList();
 			if (32 == fileDepth) {
 				m_pButtonsImages->Create(bitmapBmp.bmHeight, bitmapBmp.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
-				m_pButtonsImages->Add(bmp, static_cast<CBitmap*>(0));	// alpha is the mask
+				m_pButtonsImages->Add(bmp, static_cast<CBitmap*>(0));
 			} else {
 				m_pButtonsImages->Create(bitmapBmp.bmHeight, bitmapBmp.bmHeight, ILC_COLOR24 | ILC_MASK, 1, 0);
 				m_pButtonsImages->Add(bmp, RGB(255, 0, 255));
@@ -143,15 +176,15 @@ void CPlayerToolBar::SwitchTheme()
 
 	if (s.fDisableXPToolbars) {
 		if (!fDisableImgListRemap) {
-			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 0);//nRemapState = 0 Remap Active
-			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 1);//nRemapState = 1 Remap Disabled
+			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 0);// 0 Remap Active
+			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 1);// 1 Remap Disabled
 		}
 	} else {
 		if (NULL == fp) {
-			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 2);//nRemapState = 2 Undo  Active
+			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 2);// 2 Undo  Active
 
 			if (!fDisableImgListRemap) {
-				SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 3);//nRemapState = 3 Undo  Disabled
+				SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 3);// 3 Undo  Disabled
 			}
 		}
 	}
@@ -164,43 +197,14 @@ void CPlayerToolBar::SwitchTheme()
 
 BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 {
-	AppSettings& s = AfxGetAppSettings();
-
 	VERIFY(__super::CreateEx(pParentWnd,
 			TBSTYLE_FLAT|TBSTYLE_TRANSPARENT|TBSTYLE_AUTOSIZE|TBSTYLE_CUSTOMERASE,
 			WS_CHILD|WS_VISIBLE|CBRS_ALIGN_BOTTOM|CBRS_TOOLTIPS));
 
-	VERIFY(LoadToolBar(IDB_PLAYERTOOLBAR));
-
-	ModifyStyleEx(WS_EX_LAYOUTRTL, WS_EX_NOINHERITLAYOUT);
-
-	GetToolBarCtrl().SetExtendedStyle(TBSTYLE_EX_DRAWDDARROWS);
-
-	CToolBarCtrl& tb = GetToolBarCtrl();
-	tb.DeleteButton(1);
-	tb.DeleteButton(tb.GetButtonCount()-1);
-	tb.DeleteButton(tb.GetButtonCount()-1);
-
-	SetMute(s.fMute);
-
-	UINT styles[] = {
-		TBBS_CHECKGROUP, TBBS_CHECKGROUP,
-		TBBS_SEPARATOR,
-		TBBS_BUTTON, TBBS_BUTTON, TBBS_BUTTON, TBBS_BUTTON,
-		TBBS_SEPARATOR,
-		TBBS_BUTTON,
-		TBBS_BUTTON,
-		TBBS_SEPARATOR,
-		TBBS_SEPARATOR,
-		TBBS_CHECKBOX,
-	};
-
-	for (int i = 0; i < _countof(styles); i++) {
-		SetButtonStyle(i, styles[i] | TBBS_DISABLED);
-	}
-
 	m_volctrl.Create(this);
 	m_volctrl.SetRange(0, 100);
+
+	iDisableXPToolbars = 2;
 
 	SwitchTheme();
 
@@ -227,14 +231,14 @@ void CPlayerToolBar::CreateRemappedImgList(UINT bmID, int nRemapState, CImageLis
 	AppSettings& s = AfxGetAppSettings();
 	COLORMAP cmActive[] =
 	{
-		0x00000000, s.clrFaceABGR,//0x00ffffff, //button_face
-		0x00808080, s.clrOutlineABGR,//0x00c0c0c0, //button_outline
+		0x00000000, s.clrFaceABGR,
+		0x00808080, s.clrOutlineABGR,
 		0x00c0c0c0, 0x00ff00ff//background = transparency mask
 	};
 	COLORMAP cmDisabled[] =
 	{
 		0x00000000, 0x00ff00ff,//button_face -> transparency mask
-		0x00808080, s.clrOutlineABGR,//0x00c0c0c0, //button_outline
+		0x00808080, s.clrOutlineABGR,
 		0x00c0c0c0, 0x00ff00ff//background = transparency mask
 	};
 	COLORMAP cmUndoActive[] =
