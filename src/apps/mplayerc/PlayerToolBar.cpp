@@ -773,10 +773,10 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 		m_strTipText = ResStr(IDS_MPLAYERC_0);
 
 	} else if (pNMHDR->idFrom == ID_NAVIGATE_SKIPFORWARD) {
-		m_strTipText = ResStr(IDS_AG_FRAMESTEP);
+		m_strTipText = ResStr(IDS_AG_NEXT);
 
 	} else if (pNMHDR->idFrom == ID_NAVIGATE_SKIPBACK) {
-		m_strTipText = ResStr(IDS_MPLAYERC_16);
+		m_strTipText = ResStr(IDS_AG_PREVIOUS);
 
 	} else if (pNMHDR->idFrom == ID_NAVIGATE_SUBTITLES) {
 		m_strTipText = ResStr(IDS_AG_SUBTITLELANG) + _T(" | ") + ResStr(IDS_AG_OPTIONS);
