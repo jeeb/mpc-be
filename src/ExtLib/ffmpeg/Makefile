@@ -22,8 +22,9 @@ TARGET_LIB     = $(TARGET_LIB_DIR)/ffmpeg.lib
 
 
 # Compiler and yasm flags
-CFLAGS    = -I. -I.. -Ilibavcodec -Ilibavutil -I$(ZLIB_DIR) -DHAVE_AV_CONFIG_H \
-            -D_ISOC99_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 \
+CFLAGS    = -I. -I.. -Ilibavcodec -Ilibavutil -I$(ZLIB_DIR) \
+            -DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_XOPEN_SOURCE=600 \
+            -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 \
             -std=gnu99 -mthreads -pipe
 OPTFLAGS  = -O2 -fno-common -fomit-frame-pointer -ffast-math
 YASMFLAGS = -I. -Ilibavutil/x86 -Pconfig.asm
@@ -139,6 +140,7 @@ SRCS_C=\
     libavcodec/flashsv.c \
     libavcodec/flvdec.c \
     libavcodec/fmtconvert.c \
+    libavcodec/frame_thread_encoder.c \
     libavcodec/fraps.c \
     libavcodec/golomb.c \
     libavcodec/h263.c \
@@ -313,6 +315,7 @@ SRCS_C=\
     libavutil/crc.c \
     libavutil/dict.c \
     libavutil/eval.c \
+    libavutil/fifo.c \
     libavutil/float_dsp.c \
     libavutil/imgutils.c \
     libavutil/intfloat_readwrite.c \
