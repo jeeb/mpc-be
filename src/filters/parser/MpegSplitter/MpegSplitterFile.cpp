@@ -976,7 +976,6 @@ void CMpegSplitterFile::UpdatePrograms(const trhdr& h, bool UpdateLang)
 
 				BYTE buffer[1024];
 				ByteRead(buffer, len);
-				CGolombBuffer gb(buffer, len);
 
 				int max_len = h.bytes - 9;
 

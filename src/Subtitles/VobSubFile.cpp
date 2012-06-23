@@ -506,10 +506,12 @@ bool CVobSubFile::ReadIdx(CString fn, int& ver)
 		} else if (entry == _T("align")) {
 			str.MakeLower();
 
-			int i = 0, j = 0;
-			for (CString token = str.Tokenize(_T(" "), i);
-					j < 3 && !fError && !token.IsEmpty();
-					token = str.Tokenize(_T(" "), i), j++) {
+			int k = 0;
+			CString token;
+			for (int j = 0; j < 3; j++) {
+				token = str.Tokenize(_T(" "), k);
+				if (token.IsEmpty()) break;
+
 				if (j == 0) {
 					if (token == _T("on") || token == _T("1")) {
 						m_fAlign = true;
@@ -517,6 +519,7 @@ bool CVobSubFile::ReadIdx(CString fn, int& ver)
 						m_fAlign = false;
 					} else {
 						fError = true;
+						break;
 					}
 				} else if (j == 1) {
 					if (token == _T("at")) {
@@ -532,6 +535,7 @@ bool CVobSubFile::ReadIdx(CString fn, int& ver)
 						m_alignhor = 2;
 					} else {
 						fError = true;
+						break;
 					}
 				} else if (j == 2) {
 					if (token == _T("top")) {
@@ -542,6 +546,7 @@ bool CVobSubFile::ReadIdx(CString fn, int& ver)
 						m_alignver = 2;
 					} else {
 						fError = true;
+						break;
 					}
 				}
 			}
