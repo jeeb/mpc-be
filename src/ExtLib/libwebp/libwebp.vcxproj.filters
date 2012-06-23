@@ -40,10 +40,16 @@
     <ClCompile Include="dsp\enc_sse2.c">
       <Filter>Source Files\dsp</Filter>
     </ClCompile>
+    <ClCompile Include="dsp\lossless.c">
+      <Filter>Source Files\dsp</Filter>
+    </ClCompile>
     <ClCompile Include="enc\alpha.c">
       <Filter>Source Files\enc</Filter>
     </ClCompile>
     <ClCompile Include="enc\analysis.c">
+      <Filter>Source Files\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\backward_references.c">
       <Filter>Source Files\enc</Filter>
     </ClCompile>
     <ClCompile Include="enc\config.c">
@@ -56,6 +62,9 @@
       <Filter>Source Files\enc</Filter>
     </ClCompile>
     <ClCompile Include="enc\frame.c">
+      <Filter>Source Files\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="enc\histogram.c">
       <Filter>Source Files\enc</Filter>
     </ClCompile>
     <ClCompile Include="enc\iterator.c">
@@ -76,13 +85,22 @@
     <ClCompile Include="enc\tree.c">
       <Filter>Source Files\enc</Filter>
     </ClCompile>
+    <ClCompile Include="enc\vp8l.c">
+      <Filter>Source Files\enc</Filter>
+    </ClCompile>
     <ClCompile Include="enc\webpenc.c">
       <Filter>Source Files\enc</Filter>
     </ClCompile>
     <ClCompile Include="utils\bit_writer.c">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
+    <ClCompile Include="utils\color_cache.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
     <ClCompile Include="utils\filters.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\huffman_encode.c">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="utils\quant_levels.c">

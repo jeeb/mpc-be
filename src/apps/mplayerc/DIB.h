@@ -133,10 +133,16 @@ void WebPDIB(LPCTSTR fn, BYTE* pData, float quality)
 
 		WebPConfig config;
 		WebPConfigInit(&config);
-		config.quality = quality;
 
 		WebPPicture picture;
 		WebPPictureInit(&picture);
+
+		if (quality) {
+			config.quality = quality;
+		} else {
+			config.lossless = 1;
+			picture.use_argb_input = 1;
+		}
 
 		picture.width = width;
 		picture.height = height;

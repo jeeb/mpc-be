@@ -116,21 +116,27 @@
     <ClCompile Include="dsp\cpu.c" />
     <ClCompile Include="dsp\enc.c" />
     <ClCompile Include="dsp\enc_sse2.c" />
+    <ClCompile Include="dsp\lossless.c" />
     <ClCompile Include="enc\alpha.c" />
     <ClCompile Include="enc\analysis.c" />
+    <ClCompile Include="enc\backward_references.c" />
     <ClCompile Include="enc\config.c" />
     <ClCompile Include="enc\cost.c" />
     <ClCompile Include="enc\filter.c" />
     <ClCompile Include="enc\frame.c" />
+    <ClCompile Include="enc\histogram.c" />
     <ClCompile Include="enc\iterator.c" />
     <ClCompile Include="enc\layer.c" />
     <ClCompile Include="enc\picture.c" />
     <ClCompile Include="enc\quant.c" />
     <ClCompile Include="enc\syntax.c" />
     <ClCompile Include="enc\tree.c" />
+    <ClCompile Include="enc\vp8l.c" />
     <ClCompile Include="enc\webpenc.c" />
     <ClCompile Include="utils\bit_writer.c" />
+    <ClCompile Include="utils\color_cache.c" />
     <ClCompile Include="utils\filters.c" />
+    <ClCompile Include="utils\huffman_encode.c" />
     <ClCompile Include="utils\quant_levels.c" />
     <ClCompile Include="utils\rescaler.c" />
   </ItemGroup>

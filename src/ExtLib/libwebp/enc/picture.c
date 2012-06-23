@@ -21,6 +21,7 @@ extern "C" {
 #endif
 
 #define HALVE(x) (((x) + 1) >> 1)
+#define IS_YUV_CSP(csp, YUV_CSP) (((csp) & WEBP_CSP_UV_MASK) == (YUV_CSP))
 
 //------------------------------------------------------------------------------
 // WebPPicture
@@ -86,6 +87,9 @@ int WebPPictureAlloc(WebPPicture* const picture) {
       mem = (uint8_t*)malloc((size_t)total_size);
       if (mem == NULL) return 0;
 
+      picture->memory_ = (void*)mem;
+
+      // TODO(skal): we could align the y/u/v planes and adjust stride.
       picture->y = mem;
       mem += y_size;
 
@@ -105,7 +109,7 @@ int WebPPictureAlloc(WebPPicture* const picture) {
         mem += uv0_size;
       }
     } else {
-#ifdef USE_LOSSLESS_ENCODER
+      void* memory;
       const uint64_t argb_size = (uint64_t)width * height;
       const uint64_t total_size = argb_size * sizeof(*picture->argb);
       if (width <= 0 || height <= 0 ||
@@ -114,12 +118,13 @@ int WebPPictureAlloc(WebPPicture* const picture) {
         return 0;
       }
       WebPPictureFree(picture);   // erase previous buffer
-      picture->argb = (uint32_t*)malloc(total_size);
-      if (picture->argb == NULL) return 0;
+      memory = malloc((size_t)total_size);
+      if (memory == NULL) return 0;
+      picture->memory_argb_ = memory;
+
+      // TODO(skal): align plane to cache line?
+      picture->argb = (uint32_t*)memory;
       picture->argb_stride = width;
-#else
-      return 0;
-#endif
     }
   }
   return 1;
@@ -129,22 +134,21 @@ int WebPPictureAlloc(WebPPicture* const picture) {
 // into 'dst'. Mark 'dst' as not owning any memory. 'src' can be NULL.
 static void WebPPictureGrabSpecs(const WebPPicture* const src,
                                  WebPPicture* const dst) {
+  assert(dst != NULL);
   if (src != NULL) *dst = *src;
   dst->y = dst->u = dst->v = NULL;
   dst->u0 = dst->v0 = NULL;
   dst->a = NULL;
-#ifdef USE_LOSSLESS_ENCODER
   dst->argb = NULL;
-#endif
+  dst->memory_ = NULL;
+  dst->memory_argb_ = NULL;
 }
 
 // Release memory owned by 'picture'.
 void WebPPictureFree(WebPPicture* const picture) {
   if (picture != NULL) {
-    free(picture->y);
-#ifdef USE_LOSSLESS_ENCODER
-    free(picture->argb);
-#endif
+    free(picture->memory_);
+    free(picture->memory_argb_);
     WebPPictureGrabSpecs(NULL, picture);
   }
 }
@@ -160,6 +164,30 @@ static void CopyPlane(const uint8_t* src, int src_stride,
     src += src_stride;
     dst += dst_stride;
   }
+}
+
+// Adjust top-left corner to chroma sample position.
+static void SnapTopLeftPosition(const WebPPicture* const pic,
+                                int* const left, int* const top) {
+  if (!pic->use_argb_input) {
+    const int is_yuv422 = IS_YUV_CSP(pic->colorspace, WEBP_YUV422);
+    if (IS_YUV_CSP(pic->colorspace, WEBP_YUV420) || is_yuv422) {
+      *left &= ~1;
+      if (!is_yuv422) *top &= ~1;
+    }
+  }
+}
+
+// Adjust top-left corner and verify that the sub-rectangle is valid.
+static int AdjustAndCheckRectangle(const WebPPicture* const pic,
+                                   int* const left, int* const top,
+                                   int width, int height) {
+  SnapTopLeftPosition(pic, left, top);
+  if ((*left) < 0 || (*top) < 0) return 0;
+  if (width <= 0 || height <= 0) return 0;
+  if ((*left) + width > pic->width) return 0;
+  if ((*top) + height > pic->height) return 0;
+  return 1;
 }
 
 int WebPPictureCopy(const WebPPicture* const src, WebPPicture* const dst) {
@@ -183,7 +211,7 @@ int WebPPictureCopy(const WebPPicture* const src, WebPPicture* const dst) {
 #ifdef WEBP_EXPERIMENTAL_FEATURES
     if (dst->u0 != NULL)  {
       int uv0_width = src->width;
-      if ((dst->colorspace & WEBP_CSP_UV_MASK) == WEBP_YUV422) {
+      if (IS_YUV_CSP(dst->colorspace, WEBP_YUV422)) {
         uv0_width = HALVE(uv0_width);
       }
       CopyPlane(src->u0, src->uv0_stride,
@@ -193,13 +221,51 @@ int WebPPictureCopy(const WebPPicture* const src, WebPPicture* const dst) {
     }
 #endif
   } else {
-#ifdef USE_LOSSLESS_ENCODER
-    CopyPlane((uint8_t*)src->argb, 4 * src->argb_stride,
+    CopyPlane((const uint8_t*)src->argb, 4 * src->argb_stride,
               (uint8_t*)dst->argb, 4 * dst->argb_stride,
               4 * dst->width, dst->height);
-#else
-    return 0;
+  }
+  return 1;
+}
+
+int WebPPictureIsView(const WebPPicture* const picture) {
+  if (picture == NULL) return 0;
+  if (picture->use_argb_input) {
+    return (picture->memory_argb_ == NULL);
+  }
+  return (picture->memory_ == NULL);
+}
+
+int WebPPictureView(const WebPPicture* const src,
+                    int left, int top, int width, int height,
+                    WebPPicture* const dst) {
+  if (src == NULL || dst == NULL) return 0;
+
+  // verify rectangle position.
+  if (!AdjustAndCheckRectangle(src, &left, &top, width, height)) return 0;
+
+  if (src != dst) {  // beware of aliasing! We don't want to leak 'memory_'.
+    WebPPictureGrabSpecs(src, dst);
+  }
+  dst->width = width;
+  dst->height = height;
+  if (!src->use_argb_input) {
+    dst->y = src->y + top * src->y_stride + left;
+    dst->u = src->u + (top >> 1) * src->uv_stride + (left >> 1);
+    dst->v = src->v + (top >> 1) * src->uv_stride + (left >> 1);
+    if (src->a != NULL) {
+      dst->a = src->a + top * src->a_stride + left;
+    }
+#ifdef WEBP_EXPERIMENTAL_FEATURES
+    if (src->u0 != NULL) {
+      const int left_pos =
+          IS_YUV_CSP(dst->colorspace, WEBP_YUV422) ? (left >> 1) : left;
+      dst->u0 = src->u0 + top * src->uv0_stride + left_pos;
+      dst->v0 = src->v0 + top * src->uv0_stride + left_pos;
+    }
 #endif
+  } else {
+    dst->argb = src->argb + top * src->argb_stride + left;
   }
   return 1;
 }
@@ -212,16 +278,14 @@ int WebPPictureCrop(WebPPicture* const pic,
   WebPPicture tmp;
 
   if (pic == NULL) return 0;
-  if (width <= 0 || height <= 0) return 0;
-  if (left < 0 || ((left + width + 1) & ~1) > pic->width) return 0;
-  if (top < 0 || ((top + height + 1) & ~1) > pic->height) return 0;
+  if (!AdjustAndCheckRectangle(pic, &left, &top, width, height)) return 0;
 
   WebPPictureGrabSpecs(pic, &tmp);
   tmp.width = width;
   tmp.height = height;
   if (!WebPPictureAlloc(&tmp)) return 0;
 
-  {
+  if (!pic->use_argb_input) {
     const int y_offset = top * pic->y_stride + left;
     const int uv_offset = (top / 2) * pic->uv_stride + left / 2;
     CopyPlane(pic->y + y_offset, pic->y_stride,
@@ -230,28 +294,33 @@ int WebPPictureCrop(WebPPicture* const pic,
               tmp.u, tmp.uv_stride, HALVE(width), HALVE(height));
     CopyPlane(pic->v + uv_offset, pic->uv_stride,
               tmp.v, tmp.uv_stride, HALVE(width), HALVE(height));
-  }
 
-  if (tmp.a != NULL) {
-    const int a_offset = top * pic->a_stride + left;
-    CopyPlane(pic->a + a_offset, pic->a_stride,
-              tmp.a, tmp.a_stride, width, height);
-  }
-#ifdef WEBP_EXPERIMENTAL_FEATURES
-  if (tmp.u0 != NULL) {
-    int w = width;
-    int l = left;
-    if (tmp.colorspace == WEBP_YUV422) {
-      w = HALVE(w);
-      l = HALVE(l);
+    if (tmp.a != NULL) {
+      const int a_offset = top * pic->a_stride + left;
+      CopyPlane(pic->a + a_offset, pic->a_stride,
+                tmp.a, tmp.a_stride, width, height);
     }
-    CopyPlane(pic->u0 + top * pic->uv0_stride + l, pic->uv0_stride,
-              tmp.u0, tmp.uv0_stride, w, l);
-    CopyPlane(pic->v0 + top * pic->uv0_stride + l, pic->uv0_stride,
-              tmp.v0, tmp.uv0_stride, w, l);
-  }
+#ifdef WEBP_EXPERIMENTAL_FEATURES
+    if (tmp.u0 != NULL) {
+      int w = width;
+      int left_pos = left;
+      if (IS_YUV_CSP(tmp.colorspace, WEBP_YUV422)) {
+        w = HALVE(w);
+        left_pos = HALVE(left_pos);
+      }
+      CopyPlane(pic->u0 + top * pic->uv0_stride + left_pos, pic->uv0_stride,
+                tmp.u0, tmp.uv0_stride, w, height);
+      CopyPlane(pic->v0 + top * pic->uv0_stride + left_pos, pic->uv0_stride,
+                tmp.v0, tmp.uv0_stride, w, height);
+    }
 #endif
-
+  } else {
+    const uint8_t* const src =
+        (const uint8_t*)(pic->argb + top * pic->argb_stride + left);
+    CopyPlane(src, pic->argb_stride * 4,
+              (uint8_t*)tmp.argb, tmp.argb_stride * 4,
+              width * 4, height);
+  }
   WebPPictureFree(pic);
   *pic = tmp;
   return 1;
@@ -264,22 +333,20 @@ static void RescalePlane(const uint8_t* src,
                          int src_width, int src_height, int src_stride,
                          uint8_t* dst,
                          int dst_width, int dst_height, int dst_stride,
-                         int32_t* const work) {
+                         int32_t* const work,
+                         int num_channels) {
   WebPRescaler rescaler;
   int y = 0;
-
   WebPRescalerInit(&rescaler, src_width, src_height,
                    dst, dst_width, dst_height, dst_stride,
-                   1,
+                   num_channels,
                    src_width, dst_width,
                    src_height, dst_height,
                    work);
-  memset(work, 0, 2 * dst_width * sizeof(*work));
+  memset(work, 0, 2 * dst_width * num_channels * sizeof(*work));
   while (y < src_height) {
-    const int num_lines_in =
-        WebPRescalerImport(&rescaler, src_height - y, src, src_stride);
-    y += num_lines_in;
-    src += num_lines_in * src_stride;
+    y += WebPRescalerImport(&rescaler, src_height - y,
+                            src + y * src_stride, src_stride);
     WebPRescalerExport(&rescaler);
   }
 }
@@ -308,42 +375,53 @@ int WebPPictureRescale(WebPPicture* const pic, int width, int height) {
   tmp.height = height;
   if (!WebPPictureAlloc(&tmp)) return 0;
 
-  work = (int32_t*)malloc(2 * width * sizeof(*work));
-  if (work == NULL) {
-    WebPPictureFree(&tmp);
-    return 0;
-  }
-
-  RescalePlane(pic->y, prev_width, prev_height, pic->y_stride,
-               tmp.y, width, height, tmp.y_stride, work);
-  RescalePlane(pic->u,
-               HALVE(prev_width), HALVE(prev_height), pic->uv_stride,
-               tmp.u,
-               HALVE(width), HALVE(height), tmp.uv_stride, work);
-  RescalePlane(pic->v,
-               HALVE(prev_width), HALVE(prev_height), pic->uv_stride,
-               tmp.v,
-               HALVE(width), HALVE(height), tmp.uv_stride, work);
-
-  if (tmp.a != NULL) {
-    RescalePlane(pic->a, prev_width, prev_height, pic->a_stride,
-                 tmp.a, width, height, tmp.a_stride, work);
-  }
-#ifdef WEBP_EXPERIMENTAL_FEATURES
-  if (tmp.u0 != NULL) {
-    int s = 1;
-    if ((tmp.colorspace & WEBP_CSP_UV_MASK) == WEBP_YUV422) {
-      s = 2;
+  if (!pic->use_argb_input) {
+    work = (int32_t*)malloc(2 * width * sizeof(*work));
+    if (work == NULL) {
+      WebPPictureFree(&tmp);
+      return 0;
     }
-    RescalePlane(
-        pic->u0, (prev_width + s / 2) / s, prev_height, pic->uv0_stride,
-        tmp.u0, (width + s / 2) / s, height, tmp.uv0_stride, work);
-    RescalePlane(
-        pic->v0, (prev_width + s / 2) / s, prev_height, pic->uv0_stride,
-        tmp.v0, (width + s / 2) / s, height, tmp.uv0_stride, work);
-  }
-#endif
 
+    RescalePlane(pic->y, prev_width, prev_height, pic->y_stride,
+                 tmp.y, width, height, tmp.y_stride, work, 1);
+    RescalePlane(pic->u,
+                 HALVE(prev_width), HALVE(prev_height), pic->uv_stride,
+                 tmp.u,
+                 HALVE(width), HALVE(height), tmp.uv_stride, work, 1);
+    RescalePlane(pic->v,
+                 HALVE(prev_width), HALVE(prev_height), pic->uv_stride,
+                 tmp.v,
+                 HALVE(width), HALVE(height), tmp.uv_stride, work, 1);
+
+    if (tmp.a != NULL) {
+      RescalePlane(pic->a, prev_width, prev_height, pic->a_stride,
+                   tmp.a, width, height, tmp.a_stride, work, 1);
+    }
+#ifdef WEBP_EXPERIMENTAL_FEATURES
+    if (tmp.u0 != NULL) {
+      const int s = IS_YUV_CSP(tmp.colorspace, WEBP_YUV422) ? 2 : 1;
+      RescalePlane(
+          pic->u0, (prev_width + s / 2) / s, prev_height, pic->uv0_stride,
+          tmp.u0, (width + s / 2) / s, height, tmp.uv0_stride, work, 1);
+      RescalePlane(
+          pic->v0, (prev_width + s / 2) / s, prev_height, pic->uv0_stride,
+          tmp.v0, (width + s / 2) / s, height, tmp.uv0_stride, work, 1);
+    }
+#endif
+  } else {
+    work = (int32_t*)malloc(2 * width * 4 * sizeof(*work));
+    if (work == NULL) {
+      WebPPictureFree(&tmp);
+      return 0;
+    }
+
+    RescalePlane((const uint8_t*)pic->argb, prev_width, prev_height,
+                 pic->argb_stride * 4,
+                 (uint8_t*)tmp.argb, width, height,
+                 tmp.argb_stride * 4,
+                 work, 4);
+
+  }
   WebPPictureFree(pic);
   free(work);
   *pic = tmp;
@@ -351,28 +429,22 @@ int WebPPictureRescale(WebPPicture* const pic, int width, int height) {
 }
 
 //------------------------------------------------------------------------------
-// Write-to-memory
+// WebPMemoryWriter: Write-to-memory
 
-typedef struct {
-  uint8_t** mem;
-  size_t    max_size;
-  size_t*   size;
-} WebPMemoryWriter;
-
-static void WebPMemoryWriterInit(WebPMemoryWriter* const writer) {
-  *writer->mem = NULL;
-  *writer->size = 0;
+void WebPMemoryWriterInit(WebPMemoryWriter* const writer) {
+  writer->mem = NULL;
+  writer->size = 0;
   writer->max_size = 0;
 }
 
-static int WebPMemoryWrite(const uint8_t* data, size_t data_size,
-                           const WebPPicture* const picture) {
+int WebPMemoryWrite(const uint8_t* data, size_t data_size,
+                    const WebPPicture* const picture) {
   WebPMemoryWriter* const w = (WebPMemoryWriter*)picture->custom_ptr;
   size_t next_size;
   if (w == NULL) {
     return 1;
   }
-  next_size = (*w->size) + data_size;
+  next_size = w->size + data_size;
   if (next_size > w->max_size) {
     uint8_t* new_mem;
     size_t next_max_size = w->max_size * 2;
@@ -382,16 +454,16 @@ static int WebPMemoryWrite(const uint8_t* data, size_t data_size,
     if (new_mem == NULL) {
       return 0;
     }
-    if ((*w->size) > 0) {
-      memcpy(new_mem, *w->mem, *w->size);
+    if (w->size > 0) {
+      memcpy(new_mem, w->mem, w->size);
     }
-    free(*w->mem);
-    *w->mem = new_mem;
+    free(w->mem);
+    w->mem = new_mem;
     w->max_size = next_max_size;
   }
   if (data_size > 0) {
-    memcpy((*w->mem) + (*w->size), data, data_size);
-    *w->size += data_size;
+    memcpy(w->mem + w->size, data, data_size);
+    w->size += data_size;
   }
   return 1;
 }
@@ -543,7 +615,6 @@ static int Import(WebPPicture* const picture,
       }
     }
   } else {
-#ifdef USE_LOSSLESS_ENCODER
     if (!import_alpha) {
       for (y = 0; y < height; ++y) {
         for (x = 0; x < width; ++x) {
@@ -571,9 +642,6 @@ static int Import(WebPPicture* const picture,
         }
       }
     }
-#else
-    return 0;
-#endif
   }
   return 1;
 }
@@ -773,7 +841,6 @@ typedef int (*Importer)(WebPPicture* const, const uint8_t* const, int);
 
 static size_t Encode(const uint8_t* rgba, int width, int height, int stride,
                      Importer import, float quality_factor, uint8_t** output) {
-  size_t output_size = 0;
   WebPPicture pic;
   WebPConfig config;
   WebPMemoryWriter wrt;
@@ -788,19 +855,17 @@ static size_t Encode(const uint8_t* rgba, int width, int height, int stride,
   pic.height = height;
   pic.writer = WebPMemoryWrite;
   pic.custom_ptr = &wrt;
-
-  wrt.mem = output;
-  wrt.size = &output_size;
   WebPMemoryWriterInit(&wrt);
 
   ok = import(&pic, rgba, stride) && WebPEncode(&config, &pic);
   WebPPictureFree(&pic);
   if (!ok) {
-    free(*output);
+    free(wrt.mem);
     *output = NULL;
     return 0;
   }
-  return output_size;
+  *output = wrt.mem;
+  return wrt.size;
 }
 
 #define ENCODE_FUNC(NAME, IMPORTER) \
