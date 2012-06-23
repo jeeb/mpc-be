@@ -239,7 +239,8 @@ BYTE* MPCPngImage::BrightnessRGB(int type, BYTE* lpBits, int width, int height, 
 		G = lpBits[i + 1];
 		B = lpBits[i + 2];
 
-		if (br >= 0 && rc >= 0 && gc >= 0 && bc >= 0) {
+// временно заблокировал
+/*		if (br >= 0 && rc >= 0 && gc >= 0 && bc >= 0) {
 
 			R *= rcn;
 			G *= gcn;
@@ -255,7 +256,7 @@ BYTE* MPCPngImage::BrightnessRGB(int type, BYTE* lpBits, int width, int height, 
 				B = 255;
 			}
 		}
-
+*/		
 		if (type == 0) {
 			lpBits[i] = R;
 			lpBits[i + 2] = B;

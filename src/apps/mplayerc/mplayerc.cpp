@@ -2385,3 +2385,14 @@ CRenderersSettings& GetRenderersSettings()
 {
 	return AfxGetAppSettings().m_RenderersSettings;
 }
+
+void ThemeRGB(int iR, int iG, int iB, int& iRed, int& iGreen, int& iBlue)
+{
+	int iThemeBrightness = AfxGetAppSettings().nThemeBrightness;
+	int iThemeRed = AfxGetAppSettings().nThemeRed;
+	int iThemeGreen = AfxGetAppSettings().nThemeGreen;
+	int iThemeBlue = AfxGetAppSettings().nThemeBlue;
+	(iThemeBrightness+iR)*iThemeRed/256 >= 255 ? iRed = 255 : iRed = (iThemeBrightness+iR)*iThemeRed/256;
+	(iThemeBrightness+iG)*iThemeGreen/256 >= 255 ? iGreen = 255 : iGreen = (iThemeBrightness+iG)*iThemeGreen/256;
+	(iThemeBrightness+iB)*iThemeBlue/256 >= 255 ? iBlue = 255 : iBlue = (iThemeBrightness+iB)*iThemeBlue/256;
+}

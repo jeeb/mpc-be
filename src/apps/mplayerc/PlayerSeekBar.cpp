@@ -68,11 +68,6 @@ BOOL CPlayerSeekBar::Create(CWnd* pParentWnd)
 
 	AppSettings& s = AfxGetAppSettings();
 
-	iThemeBrightness = s.nThemeBrightness;
-	iThemeRed = s.nThemeRed;
-	iThemeGreen = s.nThemeGreen;
-	iThemeBlue = s.nThemeBlue;
-
 	return TRUE;
 }
 
@@ -255,6 +250,8 @@ void CPlayerSeekBar::OnPaint()
 
 	AppSettings& s = AfxGetAppSettings();
 
+	int R, G, B, R2, G2, B2;
+
 	bool fEnabled = m_fEnabled && m_start < m_stop;
 	if (s.fDisableXPToolbars) {
 		CRect rt;
@@ -274,12 +271,6 @@ void CPlayerSeekBar::OnPaint()
 		m_bmPaint.CreateCompatibleBitmap(&dc, r.Width(), r.Height());
 		CBitmap *bmOld = memdc.SelectObject(&m_bmPaint);
 
-		//background
-		iThemeBrightness = s.nThemeBrightness;
-		iThemeRed = s.nThemeRed;
-		iThemeGreen = s.nThemeGreen;
-		iThemeBlue = s.nThemeBlue;
-
 		bFileNameOnSeekBar = s.fFileNameOnSeekBar;
 
 		GRADIENT_RECT gr[1] = {{0, 1}};
@@ -288,13 +279,14 @@ void CPlayerSeekBar::OnPaint()
 		int fp = m_logobm.FileExists("background");
 
 		if (NULL != fp) {
-			m_logobm.LoadExternalGradient("background", &memdc, r, 0, iThemeBrightness, iThemeRed, iThemeGreen, iThemeBlue);
+			ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);
+			m_logobm.LoadExternalGradient("background", &memdc, r, 0, s.nThemeBrightness, R, G, B);
 		} else {
+			ThemeRGB(0, 5, 10, R, G, B);
+			ThemeRGB(15, 20, 25, R2, G2, B2);
 			TRIVERTEX tv[2] = {
-				//{r.left, r.top, (iThemeBrightness+65)*iThemeRed, (iThemeBrightness+70)*iThemeGreen, (iThemeBrightness+75)*iThemeBlue, pa},
-				//{r.right, r.bottom, (iThemeBrightness+0)*iThemeRed, (iThemeBrightness+5)*iThemeGreen, (iThemeBrightness+10)*iThemeBlue, pa},
-				{r.left, r.top, (iThemeBrightness+0)*iThemeRed, (iThemeBrightness+5)*iThemeGreen, (iThemeBrightness+10)*iThemeBlue, pa},
-				{r.right, r.bottom, (iThemeBrightness+15)*iThemeRed, (iThemeBrightness+20)*iThemeGreen, (iThemeBrightness+25)*iThemeBlue, pa},
+				{r.left, r.top, R*256, G*256, B*256, pa},
+				{r.right, r.bottom, R2*256, G2*256, B2*256, pa},
 			};
 			memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 		}
@@ -304,31 +296,23 @@ void CPlayerSeekBar::OnPaint()
 		CPen penPlayed(s.clrFaceABGR == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, s.clrFaceABGR);
 		CPen penPlayedOutline(s.clrOutlineABGR == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, s.clrOutlineABGR);
 		
-   		//outer frame shadow
-/*		rf = GetChannelRect();
-		rf.InflateRect(1, 0, GetThumbRect().Width()-2, 1);
-		COLORREF col = RGB(15,20,25);
-		memdc.Draw3dRect(rf,col,col);
-		rf.InflateRect(1,1,1,1);
-		memdc.Draw3dRect(rf,col,col);
-*/		rc = GetChannelRect();
+		rc = GetChannelRect();
 		int nposx = GetThumbRect().right-2;
 		int nposy = r.top;
 		
-		CPen penPlayed1(PS_SOLID,0,RGB((iThemeBrightness+30),(iThemeBrightness+35),(iThemeBrightness+40)));
+		ThemeRGB(30, 35, 40, R, G, B);
+		CPen penPlayed1(PS_SOLID,0,RGB(R,G,B));
 		memdc.SelectObject(&penPlayed1);
 		memdc.MoveTo(rc.left, rc.top);
 		memdc.LineTo(rc.right, rc.top);
 
-		CPen penPlayed2(PS_SOLID,0,RGB((iThemeBrightness+80),(iThemeBrightness+85),(iThemeBrightness+90)));
+		ThemeRGB(80, 85, 90, R, G, B);
+		CPen penPlayed2(PS_SOLID,0,RGB(R,G,B));
 		memdc.SelectObject(&penPlayed2);
 		memdc.MoveTo(rc.left -1, rc.top +19);
 		memdc.LineTo(rc.right+2, rc.top +19);
 
 		if (fEnabled) {
-
-			int ct = 20;
-			iThemeBrightness += (ct * 2);
 
 			if (NULL != fp) {
 				rc.right = nposx;
@@ -336,13 +320,16 @@ void CPlayerSeekBar::OnPaint()
 				rc.top = rc.top + 1;
 				rc.bottom = rc.bottom - 2;
 
-				m_logobm.LoadExternalGradient("background", &memdc, rc, 0, iThemeBrightness, iThemeRed, iThemeGreen, iThemeBlue);
+				ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);
+				m_logobm.LoadExternalGradient("background", &memdc, rc, 0, s.nThemeBrightness, R, G, B);
 
 				rc = GetChannelRect();
 			} else {
+				ThemeRGB(0, 5, 10, R, G, B);
+				ThemeRGB(105, 110, 115, R2, G2, B2);
 				TRIVERTEX tv[2] = {
-					{rc.left, rc.top, (iThemeBrightness+0)*iThemeRed, (iThemeBrightness+5)*iThemeGreen, (iThemeBrightness+10)*iThemeBlue, pa},
-					{nposx, rc.bottom-3, (iThemeBrightness+65-ct)*iThemeRed, (iThemeBrightness+70-ct)*iThemeGreen, (iThemeBrightness+75-ct)*iThemeBlue, pa},
+					{rc.left, rc.top, R*256, G*256, B*256, pa},
+					{nposx, rc.bottom-3, R2*256, G2*256, B2*256, pa},
 				};
 				memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 
@@ -351,27 +338,30 @@ void CPlayerSeekBar::OnPaint()
 				rc2.right = nposx;
 				rc2.top = rc.top;
 				rc2.bottom = rc.bottom;
+
+				ThemeRGB(0, 5, 10, R, G, B);
+				ThemeRGB(205, 210, 215, R2, G2, B2);
 				TRIVERTEX tv2[2] = {
-					{rc2.left, rc2.top, (iThemeBrightness+0)*iThemeRed, (iThemeBrightness+5)*iThemeGreen, (iThemeBrightness+10)*iThemeBlue, pa},
-					{rc2.right, rc.bottom-3, (iThemeBrightness+165-ct)*iThemeRed, (iThemeBrightness+170-ct)*iThemeGreen, (iThemeBrightness+175-ct)*iThemeBlue, pa},
+					{rc2.left, rc2.top, R*256, G*256, B*256, pa},
+					{rc2.right, rc.bottom-3, R2*256, G2*256, B2*256, pa},
 				};
 				memdc.GradientFill(tv2, 2, gr, 1, GRADIENT_FILL_RECT_V);
 			}
 
-			iThemeBrightness -= (ct * 2);
-
-			CPen penPlayed3(PS_SOLID,0,RGB(iThemeBrightness+145,iThemeBrightness+150,iThemeBrightness+155));
+			ThemeRGB(80, 85, 90, R, G, B);
+			CPen penPlayed3(PS_SOLID,0,RGB(R,G,B));
 			memdc.SelectObject(&penPlayed3);
 			memdc.MoveTo(rc.left, rc.top);//active_top
 			memdc.LineTo(nposx, rc.top);
 
-			CPen penPlayed4(PS_SOLID,0,RGB(iThemeBrightness+115,iThemeBrightness+120,iThemeBrightness+125));
+			//CPen penPlayed4(PS_SOLID,0,RGB(iThemeBrightness+115,iThemeBrightness+120,iThemeBrightness+125));
 
 		}
 
 		if (bFileNameOnSeekBar) {
 			CFont font2;
-			memdc.SetTextColor(RGB(165,170,175));
+			ThemeRGB(135, 140, 145, R, G, B);
+			memdc.SetTextColor(RGB(R,G,B));
 			font2.CreateFont(
 							13,				// nHeight
 							0,				// nWidth
@@ -397,7 +387,8 @@ void CPlayerSeekBar::OnPaint()
 			if (!AfxGetAppSettings().bStatusBarIsVisible) rt.right = rc.right - 150;
 			memdc.DrawText(str, str.GetLength(), &rt, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
 
-			memdc.SetTextColor(RGB(235,240,245));
+			ThemeRGB(205, 210, 215, R, G, B);
+			memdc.SetTextColor(RGB(R,G,B));
 			CRect rt2;
 			rt2 = rc;
 			rt2.left = rc.left+6;
@@ -417,7 +408,8 @@ void CPlayerSeekBar::OnPaint()
 				CRect rT = rc;
 				rT.left = rc.right - 140;
 				rT.right = rc.right - 6;
-				memdc.SetTextColor(RGB(200,205,210));
+				ThemeRGB(200, 205, 210, R, G, B);
+				memdc.SetTextColor(RGB(R,G,B));
 				memdc.DrawText(strT, strT.GetLength(), &rT, DT_RIGHT|DT_VCENTER|DT_SINGLELINE);
 			}
 		}

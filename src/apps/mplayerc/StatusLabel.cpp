@@ -39,11 +39,20 @@ CStatusLabel::CStatusLabel(bool fRightAlign, bool fAddEllipses)
 	::ReleaseDC(0, hdc);
 
 	m_font.m_hObject = NULL;
-	int size = IsWinVistaOrLater() ? 16 : 14;
-	CString face = IsWinVistaOrLater() ? _T("Segoe UI") : _T("Microsoft Sans Serif");
-	m_font.CreateFont(int(size * scale), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
-					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH|FF_DONTCARE,
+	if (AfxGetAppSettings().fDisableXPToolbars) {
+		int size = IsWinVistaOrLater() ? 13 : 14;
+		CString face = IsWinVistaOrLater() ? _T("Tahoma") : _T("Microsoft Sans Serif");
+		m_font.CreateFont(int(size * scale), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
+ 					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH|FF_DONTCARE,
 					  face);
+	} else {
+		int size = IsWinVistaOrLater() ? 16 : 14;
+		CString face = IsWinVistaOrLater() ? _T("Segoe UI") : _T("Microsoft Sans Serif");
+		m_font.CreateFont(int(size * scale), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
+ 					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH|FF_DONTCARE,
+ 					  face);
+	}
+
 }
 
 CStatusLabel::~CStatusLabel()
@@ -63,10 +72,19 @@ void CStatusLabel::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	CString str;
 	GetWindowText(str);
 	CRect r;
+	int R, G, B;
 	GetClientRect(&r);
 	CFont* old = dc.SelectObject(&m_font);
-	dc.SetTextColor(0xffffff);
-	dc.SetBkColor(0);
+	if (AfxGetAppSettings().fDisableXPToolbars) {
+		ThemeRGB(165, 170, 175, R, G, B);
+		dc.SetTextColor(RGB(R,G,B));
+		ThemeRGB(5, 10, 15, R, G, B);
+		dc.SetBkColor(RGB(R,G,B));
+	} else {
+		dc.SetTextColor(0xffffff);
+		dc.SetBkColor(0);
+	}
+
 	CSize size = dc.GetTextExtent(str);
 	CPoint p = CPoint(m_fRightAlign ? r.Width() - size.cx : 0, (r.Height()-size.cy)/2);
 
@@ -76,10 +94,17 @@ void CStatusLabel::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			size = dc.GetTextExtent(str);
 		}
 
-	dc.TextOut(p.x, p.y, str);
-	dc.ExcludeClipRect(CRect(p, size));
-	dc.SelectObject(&old);
-	dc.FillSolidRect(&r, 0);
+	if (AfxGetAppSettings().fDisableXPToolbars) {
+			dc.SelectObject(&old);
+			ThemeRGB(5, 10, 15, R, G, B);
+			dc.FillSolidRect(&r, RGB(R, G, B));
+			dc.TextOut(p.x, p.y, str);
+		} else {
+			dc.TextOut(p.x, p.y, str);
+			dc.ExcludeClipRect(CRect(p, size));
+			dc.SelectObject(&old);
+			dc.FillSolidRect(&r, 0);
+		}
 	dc.Detach();
 }
 
@@ -87,6 +112,13 @@ BOOL CStatusLabel::OnEraseBkgnd(CDC* pDC)
 {
 	CRect r;
 	GetClientRect(&r);
-	pDC->FillSolidRect(&r, 0);
+	int R, G, B;
+	if (AfxGetAppSettings().fDisableXPToolbars) {
+		ThemeRGB(5, 10, 15, R, G, B);
+		pDC->FillSolidRect(&r, RGB(R,G,B));
+		pDC->FillSolidRect(&r, 0);
+	} else {
+		pDC->FillSolidRect(&r, 0);
+	}
 	return TRUE;
 }

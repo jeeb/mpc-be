@@ -184,14 +184,18 @@ BOOL CPlayerInfoBar::OnEraseBkgnd(CDC* pDC)
 		r.InflateRect(1, 0, 1, 0);
 	}
 
+	int R, G, B;
+
 	if (AfxGetAppSettings().fDisableXPToolbars) {
-		CPen penBlend (PS_SOLID,0,0x002d2823);//clr_ibBlend = RGB(35,40,45)
+		CPen penBlend(PS_SOLID,0,RGB(0,0,0));
 		CPen *penSaved = pDC->SelectObject(&penBlend);
 		pDC->MoveTo(r.left,r.top);
 		pDC->LineTo(r.right,r.top);
 		pDC->SelectObject(&penSaved);
 		r.DeflateRect(0,1,0,0);
-		pDC->FillSolidRect(&r, 0);
+
+		ThemeRGB(5, 10, 15, R, G, B);
+		pDC->FillSolidRect(&r, RGB(R,G,B));
 	} else {
 		pDC->Draw3dRect(&r, GetSysColor(COLOR_3DSHADOW), GetSysColor(COLOR_3DHILIGHT));
 

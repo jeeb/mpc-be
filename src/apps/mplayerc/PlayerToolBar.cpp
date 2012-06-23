@@ -129,6 +129,11 @@ void CPlayerToolBar::SwitchTheme()
 
 	HBITMAP hBmp;
 	if (s.fDisableXPToolbars && NULL == fp) {
+		//int col = AfxGetAppSettings().clrFaceABGR;
+		//int r, g, b, R, G, B;
+		//r = col & 0xFF;
+		//g = (col >> 8) & 0xFF;
+		//b = col >> 16;
 		hBmp = m_logobm.LoadExternalImage("toolbar", s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
 	} else if (fp) {
 		hBmp = m_logobm.LoadExternalImage("toolbar", -1, -1, -1, -1);
@@ -404,24 +409,13 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 	LRESULT lr = CDRF_DODEFAULT;
 	AppSettings& s = AfxGetAppSettings();
 
+	int R, G, B, R2, G2, B2;
+
 	GRADIENT_RECT gr[1] = {{0, 1}};
 
 	int sep[] = {2, 7, 10, 11};
 
 	if (s.fDisableXPToolbars) {
-		iThemeBrightness = s.nThemeBrightness;
-		iThemeRed = s.nThemeRed;
-		iThemeGreen = s.nThemeGreen;
-		iThemeBlue = s.nThemeBlue;
-		int iRedRB, iGreenRB, iBlueRB, iRedLT, iGreenLT, iBlueLT, iAlphaLT, iAlphaRB;
-		iRedLT		= 50 + iThemeBrightness;
-		iGreenLT	= 55 + iThemeBrightness;
-		iBlueLT		= 60 + iThemeBrightness;
-		iAlphaLT	= 255;
-		iRedRB		= 20 + iThemeBrightness;
-		iGreenRB	= 25 + iThemeBrightness;
-		iBlueRB		= 30 + iThemeBrightness;
-		iAlphaRB	= 255;
 
 		int fp = m_logobm.FileExists("background");
 
@@ -440,11 +434,14 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			GetClientRect(&r);
 
 			if (NULL != fp) {
-				m_logobm.LoadExternalGradient("background", &dc, r, 21, iThemeBrightness, iThemeRed, iThemeGreen, iThemeBlue);
+				ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);
+				m_logobm.LoadExternalGradient("background", &dc, r, 21, s.nThemeBrightness, R, G, B);
 			} else {
+				ThemeRGB(50, 55, 60, R, G, B);
+				ThemeRGB(20, 25, 30, R2, G2, B2);
 				TRIVERTEX tv[2] = {
-					{r.left, r.top, iRedLT*iThemeRed, iGreenLT*iThemeGreen, iBlueLT*iThemeBlue, iAlphaLT*256},
-					{r.right, r.bottom, iRedRB*iThemeRed, iGreenRB*iThemeGreen, iBlueRB*iThemeBlue, iAlphaRB*256},
+					{r.left, r.top, R*256, G*256, B*256, 255*256},
+					{r.right, r.bottom, R2*256, G2*256, B2*256, 255*256},
 				};
 				dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 			}
@@ -514,11 +511,14 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 				GetItemRect(sep[j], &r);
 
 				if (NULL != fp) {
-					m_logobm.LoadExternalGradient("background", &dc, r, 21, iThemeBrightness, iThemeRed, iThemeGreen, iThemeBlue);
+					ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);
+					m_logobm.LoadExternalGradient("background", &dc, r, 21, s.nThemeBrightness, R, G, B);
 				} else {
+					ThemeRGB(50, 55, 60, R, G, B);
+					ThemeRGB(20, 25, 30, R2, G2, B2);
 					TRIVERTEX tv[2] = {
-						{r.left, r.top, iRedLT*iThemeRed, iGreenLT*iThemeGreen, iBlueLT*iThemeBlue, iAlphaLT*256},
-						{r.right, r.bottom, iRedRB*iThemeRed, iGreenRB*iThemeGreen, iBlueRB*iThemeBlue, iAlphaRB*256},
+						{r.left, r.top, R*256, G*256, B*256, 255*256},
+						{r.right, r.bottom, R2*256, G2*256, B2*256, 255*256},
 					};
 					dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 				}

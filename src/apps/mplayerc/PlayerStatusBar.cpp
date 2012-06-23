@@ -163,10 +163,6 @@ void CPlayerStatusBar::Relayout()
 		r.SetRect(6, r.top+4, 22, r.bottom-4);
 		m_type.MoveWindow(r);
 	} else {
-		iThemeBrightness = s.nThemeBrightness;
-		iThemeRed = s.nThemeRed;
-		iThemeGreen = s.nThemeGreen;
-		iThemeBlue = s.nThemeBlue;
 
 		m_type.ShowWindow(SW_HIDE);
 		m_status.ShowWindow(SW_HIDE);
@@ -391,6 +387,7 @@ BOOL CPlayerStatusBar::OnEraseBkgnd(CDC* pDC)
 void CPlayerStatusBar::OnPaint()
 {
 	CPaintDC dc(this);
+	int R, G, B, R2, G2, B2;
 
 	if (GetSafeHwnd()) {
 		Relayout();
@@ -424,11 +421,14 @@ void CPlayerStatusBar::OnPaint()
 		int fp = m_logobm.FileExists("background");
 
 		if (NULL != fp) {
-			m_logobm.LoadExternalGradient("background", &memdc, r, 55, iThemeBrightness, iThemeRed, iThemeGreen, iThemeBlue);
+			ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);
+			m_logobm.LoadExternalGradient("background", &memdc, r, 55, s.nThemeBrightness, R, G, B);
 		} else {
+			ThemeRGB(30, 35, 40, R, G, B);
+			ThemeRGB(0, 5, 10, R2, G2, B2);
 			TRIVERTEX tv[2] = {
-				{r.left, r.top, (iThemeBrightness + 30)*iThemeRed, (iThemeBrightness + 35)*iThemeGreen, (iThemeBrightness + 40)*iThemeBlue, 255*256},
-				{r.right, r.bottom, (iThemeBrightness + 0)*iThemeRed, (iThemeBrightness + 5)*iThemeGreen, (iThemeBrightness + 10)*iThemeBlue, 255*256},
+				{r.left, r.top, R*256, G*256, B*256, 255*256},
+				{r.right, r.bottom, R2*256, G2*256, B2*256, 255*256},
 			};
 			memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 		}
@@ -442,13 +442,15 @@ void CPlayerStatusBar::OnPaint()
 		memdc.MoveTo(r.left +1, r.top +2);
 		memdc.LineTo(r.right, r.top +2);
 
-		CPen penPlayed2(PS_SOLID,0,RGB((iThemeBrightness+50),(iThemeBrightness+55),(iThemeBrightness+60)));
+		ThemeRGB(50, 55, 60, R, G, B);
+		CPen penPlayed2(PS_SOLID,0,RGB(R,G,B));
 		memdc.SelectObject(&penPlayed2);
 		memdc.MoveTo(r.left +1, r.top +3);
 		memdc.LineTo(r.right, r.top +3);
 
 		CFont font2;
-		memdc.SetTextColor(RGB(165,170,175));
+		ThemeRGB(165, 170, 175, R, G, B);
+		memdc.SetTextColor(RGB(R,G,B));
 		font2.CreateFont(
 						13,				// nHeight
 						0,				// nWidth
