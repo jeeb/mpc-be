@@ -287,6 +287,10 @@ HRESULT CTTASplitterInputPin::CompleteConnect(IPin *pReceivePin)
 		return hr;
 	}
 
+	if(!m_pIACBW) {
+		return E_FAIL;
+	}
+
 	if(m_pTTAParser) {
 		tta_parser_free(&m_pTTAParser);
 	}
