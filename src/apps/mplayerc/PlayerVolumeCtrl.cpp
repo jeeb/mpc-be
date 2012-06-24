@@ -62,6 +62,7 @@ bool CVolumeCtrl::Create(CWnd* pParentWnd)
 void CVolumeCtrl::SetPosInternal(int pos)
 {
 	SetPos(pos);
+
 	GetParent()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
 }
 
@@ -95,7 +96,6 @@ BOOL CVolumeCtrl::OnEraseBkgnd(CDC* pDC)
 void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
-
 	LRESULT lr = CDRF_DODEFAULT;
 
 	AppSettings& s = AfxGetAppSettings();
@@ -165,6 +165,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					if (nVolume <= GetPageSize()) {
 						nVolume = 0;
 					}
+
 					int m_nVolPos = r.left + (nVolume * 0.43) + 4;
 
 					int fp = m_logobm.FileExists("volume");
@@ -347,7 +348,13 @@ BOOL CVolumeCtrl::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 {
 	TOOLTIPTEXT *pTTT = reinterpret_cast<LPTOOLTIPTEXT>(pNMHDR);
 	CString str;
-	str.AppendFormat(_T("%d%%"), GetPos());
+	int nVolume = GetPos();
+
+	if (AfxGetAppSettings().fMute) {
+		nVolume = 0;
+	}
+
+	str.AppendFormat(_T("%d%%"), nVolume);
 	_tcscpy_s(pTTT->szText, str);
 	pTTT->hinst = NULL;
 
