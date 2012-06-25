@@ -286,7 +286,6 @@ SRCS_C=\
     libavcodec/x86/fft.c \
     libavcodec/x86/fft_3dn.c \
     libavcodec/x86/fft_3dn2.c \
-    libavcodec/x86/fft_sse.c \
     libavcodec/x86/fmtconvert_mmx.c \
     libavcodec/x86/h264_intrapred_init.c \
     libavcodec/x86/h264dsp_mmx.c \
