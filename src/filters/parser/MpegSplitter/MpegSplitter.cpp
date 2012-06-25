@@ -717,9 +717,6 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 				p->bSyncPoint	= !!h.fpts;
 				p->bAppendable	= !h.fpts;
 				p->rtStart		= h.fpts ? (h.pts - rtStartOffset) : Packet::INVALID_TIME;
-				if (p->rtStart < 0) {
-					p->rtStart	= Packet::INVALID_TIME;
-				}
 				p->rtStop		= p->rtStart+1;
 				p->SetCount(h.len - (size_t)(m_pFile->GetPos() - pos));
 
@@ -767,9 +764,6 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 				p->bSyncPoint	= !!h2.fpts;
 				p->bAppendable	= !h2.fpts;
 				p->rtStart		= h2.fpts ? (h2.pts - rtStartOffset) : Packet::INVALID_TIME;
-				if (p->rtStart < 0) {
-					p->rtStart	= Packet::INVALID_TIME;
-				}
 				p->rtStop		= p->rtStart+1;
 				p->SetCount(h.bytes - (size_t)(m_pFile->GetPos() - pos));
 
@@ -798,9 +792,6 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 			p->bSyncPoint	= !!h.fpts;
 			p->bAppendable	= !h.fpts;
 			p->rtStart		= h.fpts ? (h.pts - rtStartOffset) : Packet::INVALID_TIME;
-			if (p->rtStart < 0) {
-				p->rtStart	= Packet::INVALID_TIME;
-			}
 			p->rtStop		= p->rtStart+1;
 			p->SetCount(h.length);
 
@@ -1081,56 +1072,56 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	if (rt <= rtPreroll || m_rtDuration <= 0) {
 		m_pFile->Seek(0);
 	} else {
-		__int64 len = m_pFile->GetLength();
-		__int64 seekpos = (__int64)(1.0*rt/m_rtDuration*len);
-		__int64 minseekpos = _I64_MAX;
+		__int64 len			= m_pFile->GetLength();
+		__int64 seekpos		= (__int64)(1.0*rt/m_rtDuration*len);
+		__int64 minseekpos	= _I64_MAX;
 
 		REFERENCE_TIME rtmax = rt - rtPreroll;
 		REFERENCE_TIME rtmin = rtmax - 5000000;
 
-		if (m_rtStartOffset == 0) {
-			for (int i = 0; i < _countof(m_pFile->m_streams)-1; i++) {
-				POSITION pos = m_pFile->m_streams[i].GetHeadPosition();
-				while (pos) {
-					DWORD TrackNum = m_pFile->m_streams[i].GetNext(pos);
+		for (int i = 0; i < _countof(m_pFile->m_streams)-1; i++) {
+			POSITION pos = m_pFile->m_streams[i].GetHeadPosition();
+			while (pos) {
+				DWORD TrackNum = m_pFile->m_streams[i].GetNext(pos);
 
-					CBaseSplitterOutputPin* pPin = GetOutputPin(TrackNum);
-					if (pPin && pPin->IsConnected()) {
-						m_pFile->Seek(seekpos);
+				CBaseSplitterOutputPin* pPin = GetOutputPin(TrackNum);
+				if (pPin && pPin->IsConnected()) {
+					m_pFile->Seek(seekpos);
 
-						__int64 curpos = seekpos;
-						REFERENCE_TIME pdt = _I64_MIN;
+					__int64 curpos = seekpos;
+					REFERENCE_TIME pdt = _I64_MIN;
 
-						for (int j = 0; j < 10; j++) {
-							REFERENCE_TIME rt = m_pFile->NextPTS(TrackNum);
+					for (int j = 0; j < 10; j++) {
+						REFERENCE_TIME rt2 = m_pFile->NextPTS(TrackNum);
 
-							if (rt < 0) {
-								break;
-							}
-
-							REFERENCE_TIME dt = rt - rtmax;
-							if (dt > 0 && dt == pdt) {
-								dt = 10000000i64;
-							}
-
-
-							if (rtmin <= rt && rt <= rtmax || pdt > 0 && dt < 0) {
-								minseekpos = min(minseekpos, curpos);
-								break;
-							}
-
-							curpos -= (__int64)(1.0*dt/m_rtDuration*len);
-							m_pFile->Seek(curpos);
-
-							//pdt = dt;
+						if (rt2 < 0) {
+							break;
 						}
+
+						REFERENCE_TIME dt = rt2 - rtmax;
+						if (dt > 0 && dt == pdt) {
+							dt = 10000000i64;
+						}
+
+
+						if (rtmin <= rt2 && rt2 <= rtmax || pdt > 0 && dt < 0) {
+							minseekpos = min(minseekpos, curpos);
+							//m_rtStartOffset = m_pFile->m_rtMin + rt2 - rt;
+							break;
+						}
+
+						curpos -= (__int64)(1.0*dt/m_rtDuration*len);
+						m_pFile->Seek(curpos);
+
+						//pdt = dt;
 					}
 				}
 			}
 		}
 
 		if (minseekpos != _I64_MAX) {
-			seekpos = minseekpos;
+			seekpos			= minseekpos;
+			m_rtStartOffset	= 0;
 		} else {
 			// this file is probably screwed up, try plan B, seek simply by bitrate
 
@@ -2173,6 +2164,11 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 						m_p->pmt	= NULL;
 
 						p2->SetData(start, size);
+
+						if (!p2->pmt && m_bFlushed) {
+							p2->pmt = CreateMediaType(&m_mt);
+							m_bFlushed = false;
+						}
 
 						HRESULT hr = __super::DeliverPacket(p2);
 						if (hr != S_OK) {

@@ -518,6 +518,7 @@ HRESULT CMpaDecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, d
 	}
 
 	m_bResync = true;
+	m_rtStart = 0;
 
 	return __super::NewSegment(tStart, tStop, dRate);
 }
@@ -575,11 +576,9 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	if (pIn->IsDiscontinuity() == S_OK) {
 		m_fDiscontinuity = true;
 		m_buff.RemoveAll();
-		m_rtStart = rtStart;
 		m_bResync = true;
 		if (FAILED(hr)) {
 			TRACE(_T("CMpaDecFilter::Receive() : Discontinuity without timestamp\n"));
-			return S_OK;
 		}
 	}
 
@@ -595,7 +594,9 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 
 	if (SUCCEEDED(hr) && m_bResync) {
 		m_buff.RemoveAll();
-		m_rtStart = rtStart;
+		if (rtStart != _I64_MIN) {
+			m_rtStart = rtStart;
+		}
 		m_bResync = false;
 	}
 
@@ -1507,7 +1508,9 @@ HRESULT CMpaDecFilter::Deliver(CAtlArray<float>& pBuff, DWORD nSamplesPerSec, WO
 	REFERENCE_TIME rtDur = 10000000i64*nSamples/wfe->nSamplesPerSec;
 	REFERENCE_TIME rtStart = m_rtStart, rtStop = m_rtStart + rtDur;
 	m_rtStart += rtDur;
+	
 	//TRACE(_T("CMpaDecFilter: %I64d - %I64d\n"), rtStart/10000, rtStop/10000);
+	
 	if (rtStart < 0 /*200000*/ /* < 0, FIXME: 0 makes strange noises */) {
 		return S_OK;
 	}
