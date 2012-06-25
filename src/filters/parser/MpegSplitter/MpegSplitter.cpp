@@ -717,6 +717,9 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 				p->bSyncPoint	= !!h.fpts;
 				p->bAppendable	= !h.fpts;
 				p->rtStart		= h.fpts ? (h.pts - rtStartOffset) : Packet::INVALID_TIME;
+				if (p->rtStart < 0) {
+					p->rtStart	= Packet::INVALID_TIME;
+				}
 				p->rtStop		= p->rtStart+1;
 				p->SetCount(h.len - (size_t)(m_pFile->GetPos() - pos));
 
@@ -764,6 +767,9 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 				p->bSyncPoint	= !!h2.fpts;
 				p->bAppendable	= !h2.fpts;
 				p->rtStart		= h2.fpts ? (h2.pts - rtStartOffset) : Packet::INVALID_TIME;
+				if (p->rtStart < 0) {
+					p->rtStart	= Packet::INVALID_TIME;
+				}
 				p->rtStop		= p->rtStart+1;
 				p->SetCount(h.bytes - (size_t)(m_pFile->GetPos() - pos));
 
@@ -792,6 +798,9 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 			p->bSyncPoint	= !!h.fpts;
 			p->bAppendable	= !h.fpts;
 			p->rtStart		= h.fpts ? (h.pts - rtStartOffset) : Packet::INVALID_TIME;
+			if (p->rtStart < 0) {
+				p->rtStart	= Packet::INVALID_TIME;
+			}
 			p->rtStop		= p->rtStart+1;
 			p->SetCount(h.length);
 
@@ -843,6 +852,10 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			if (stream->m_Type == PRESENTATION_GRAPHICS_STREAM) {
 				m_pFile->AddHdmvPGStream (stream->m_PID, stream->m_LanguageCode);
 			}
+		}
+
+		if (m_pFile->m_streams[CMpegSplitterFile::subpic].GetCount()) {
+			m_pFile->AddHdmvPGStream(NO_SUBTITLE_PID, "---");
 		}
 	}
 
@@ -1124,6 +1137,9 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 			seekpos	= (__int64)(1.0*rt/m_rtDuration*len);
 			m_pFile->Seek(seekpos);
 			m_rtStartOffset = m_pFile->m_rtMin + m_pFile->NextPTS(pMasterStream->GetHead()) - rt;
+			if (m_rtStartOffset > m_pFile->m_rtMax)  {
+				m_rtStartOffset = 0;
+			}
 		}
 
 		m_pFile->Seek(seekpos);

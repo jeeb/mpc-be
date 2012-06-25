@@ -51,8 +51,6 @@ private:
 
 	int							m_nNextCodecIndex;
 
-	int							m_nSurfaceIndex;
-	CComPtr<IMediaSample>		m_pSampleToDeliver;
 	bool						m_bSecondField;
 	REFERENCE_TIME				m_rtStart, m_rtStop;
 

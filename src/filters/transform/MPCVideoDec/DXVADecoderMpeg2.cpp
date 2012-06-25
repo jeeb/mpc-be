@@ -73,8 +73,11 @@ void CDXVADecoderMpeg2::Init()
 HRESULT CDXVADecoderMpeg2::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
 	HRESULT						hr;
-	int							nFieldType;
-	int							nSliceType;
+	int							nSurfaceIndex	= -1;
+	int							nFieldType		= -1;
+	int							nSliceType		= -1;
+
+	CComPtr<IMediaSample>		pSampleToDeliver;
 
 	FFMpeg2DecodeFrame (&m_PictureParams, &m_QMatrixData, m_SliceInfo, &m_nSliceCount, m_pFilter->GetAVCtx(),
 						m_pFilter->GetFrame(), &m_nNextCodecIndex, &nFieldType, &nSliceType, pDataIn, nSize);
@@ -89,43 +92,17 @@ HRESULT CDXVADecoderMpeg2::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIM
 		return S_FALSE;
 	}
 
-	if (m_bSecondField) {
-		if(!m_PictureParams.bSecondField) {
-			m_rtStart			= rtStart;
-			m_rtStop			= rtStop;
-			m_pSampleToDeliver	= NULL;
-			hr = GetFreeSurfaceIndex (m_nSurfaceIndex, &m_pSampleToDeliver, rtStart, rtStop);
-			if (FAILED (hr)) {
-				ASSERT (hr == VFW_E_NOT_COMMITTED);		// Normal when stop playing
-				return hr;
-			}
-		}
-	} else {
-		m_rtStart			= rtStart;
-		m_rtStop			= rtStop;
-		m_pSampleToDeliver	= NULL;
-		hr = GetFreeSurfaceIndex (m_nSurfaceIndex, &m_pSampleToDeliver, rtStart, rtStop);
-		if (FAILED (hr)) {
-			ASSERT (hr == VFW_E_NOT_COMMITTED);		// Normal when stop playing
-			return hr;
-		}
+	CHECK_HR (GetFreeSurfaceIndex (nSurfaceIndex, &pSampleToDeliver, rtStart, rtStop));
+
+	CHECK_HR (BeginFrame(nSurfaceIndex, pSampleToDeliver));
+
+	if (!m_PictureParams.bSecondField) {
+		m_rtStart	= rtStart;
+		m_rtStop	= rtStop;
+		UpdatePictureParams(nSurfaceIndex);
 	}
 
-	if (m_pSampleToDeliver == NULL) {
-		return S_FALSE;
-	}
-
-	CHECK_HR (BeginFrame(m_nSurfaceIndex, m_pSampleToDeliver));
-
-	if (m_bSecondField) {
-		if(!m_PictureParams.bSecondField) {
-			UpdatePictureParams(m_nSurfaceIndex);
-		}
-	} else {
-		UpdatePictureParams(m_nSurfaceIndex);	
-	}
-
-	TRACE_MPEG2 ("CDXVADecoderMpeg2::DecodeFrame() : Surf = %d, PictureType = %d, SecondField = %d, m_nNextCodecIndex = %d, rtStart = [%I64d]\n", m_nSurfaceIndex, nSliceType, m_PictureParams.bSecondField, m_nNextCodecIndex, rtStart);
+	TRACE_MPEG2 ("CDXVADecoderMpeg2::DecodeFrame() : Surf = %d, PictureType = %d, SecondField = %d, m_nNextCodecIndex = %d, rtStart = [%I64d]\n", nSurfaceIndex, nSliceType, m_PictureParams.bSecondField, m_nNextCodecIndex, rtStart);
 
 	CHECK_HR (AddExecuteBuffer (DXVA2_PictureParametersBufferType, sizeof(m_PictureParams), &m_PictureParams));
 
@@ -137,22 +114,17 @@ HRESULT CDXVADecoderMpeg2::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIM
 
 	// Decode frame
 	CHECK_HR (Execute());
-	CHECK_HR (EndFrame(m_nSurfaceIndex));
+	CHECK_HR (EndFrame(nSurfaceIndex));
 
-	if (m_bSecondField) {
-		if(m_PictureParams.bSecondField) {
-			AddToStore (m_nSurfaceIndex, m_pSampleToDeliver, (m_PictureParams.bPicBackwardPrediction != 1), m_rtStart, m_rtStop,
-						false, (FF_FIELD_TYPE)nFieldType, (FF_SLICE_TYPE)nSliceType, FFGetCodedPicture(m_pFilter->GetAVCtx()));
-			hr = DisplayNextFrame();
-		}
-	} else {
-		AddToStore (m_nSurfaceIndex, m_pSampleToDeliver, (m_PictureParams.bPicBackwardPrediction != 1), m_rtStart, m_rtStop,
-					false, (FF_FIELD_TYPE)nFieldType, (FF_SLICE_TYPE)nSliceType, FFGetCodedPicture(m_pFilter->GetAVCtx()));
+	bool bAdded = AddToStore (nSurfaceIndex, pSampleToDeliver, (m_PictureParams.bPicBackwardPrediction != 1), m_rtStart, m_rtStop,
+							  m_bSecondField ? !(!!m_PictureParams.bSecondField) : false,
+							  (FF_FIELD_TYPE)nFieldType, (FF_SLICE_TYPE)nSliceType, FFGetCodedPicture(m_pFilter->GetAVCtx()));
+
+	if (bAdded) {
 		hr = DisplayNextFrame();
 	}
 		
 	m_bFlushed = false;
-
 	return hr;
 }
 
@@ -236,10 +208,7 @@ void CDXVADecoderMpeg2::Flush()
 	m_wRefPictureIndex[0] = NO_REF_FRAME;
 	m_wRefPictureIndex[1] = NO_REF_FRAME;
 
-	m_nSurfaceIndex		= 0;
-	m_pSampleToDeliver	= NULL;
 	m_bSecondField		= false;
-
 	m_rtStart			= _I64_MIN;
 	m_rtStop			= _I64_MIN;
 

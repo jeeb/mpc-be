@@ -226,9 +226,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 				s.mt.majortype = m_streams[subpic].GetHead().mt.majortype;
 				s.mt.subtype = m_streams[subpic].GetHead().mt.subtype;
 				s.mt.formattype = m_streams[subpic].GetHead().mt.formattype;
-				m_streams[subpic].Insert(s, this);
-			} else {
-				AddHdmvPGStream(NO_SUBTITLE_PID, "---");
+				m_streams[subpic].AddTail(s);
 			}
 		}
 	} else {
@@ -238,7 +236,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 			s.mt.majortype = m_streams[subpic].GetHead().mt.majortype;
 			s.mt.subtype = m_streams[subpic].GetHead().mt.subtype;
 			s.mt.formattype = m_streams[subpic].GetHead().mt.formattype;
-			m_streams[subpic].Insert(s, this);
+			m_streams[subpic].AddTail(s);
 		}
 	}
 
@@ -919,7 +917,7 @@ void CMpegSplitterFile::AddHdmvPGStream(WORD pid, const char* language_code)
 
 	CMpegSplitterFile::hdmvsubhdr h;
 	if (!m_streams[subpic].Find(s) && Read(h, &s.mt, language_code)) {
-		m_streams[subpic].Insert(s, this);
+		m_streams[subpic].AddTail(s);
 	}
 }
 
