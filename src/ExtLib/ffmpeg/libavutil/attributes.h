@@ -73,7 +73,7 @@
 #endif
 
 #ifndef av_restrict
-#define av_restrict restrict
+//#define av_restrict restrict
 #endif
 
 #ifndef av_const

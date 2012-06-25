@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: stdafx.cpp 20 2012-04-20 01:42:55Z aleksoid $
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt
@@ -21,14 +21,4 @@
  *
  */
 
-#pragma once
-
-#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
-#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS	// some CString constructors will be explicit
-
-#ifndef VC_EXTRALEAN
-#define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
-#endif
-
-#include <afx.h>
-#include <afxwin.h>			// MFC core and standard components
+#include "stdafx.h"
