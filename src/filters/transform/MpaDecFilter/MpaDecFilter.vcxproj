@@ -234,7 +234,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\DeCSS\DeCSS.vcxproj">
+    <ProjectReference Include="..\DeCSSFilter\DeCSSFilter.vcxproj">
       <Project>{1a2dfd1a-3c6c-44d1-909d-294af646b575}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

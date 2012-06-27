@@ -14,11 +14,29 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CSSauth.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CSSscramble.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DeCSSInputPin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="DeCSSFilter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VobDec.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VobFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="udf.cpp">
+      <Filter>vstrip</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\ExtLib\mfc\winmdi.cpp">
       <Filter>Source Files</Filter>
@@ -36,6 +54,15 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CSSauth.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CSSscramble.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DeCSSInputPin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="DeCSSFilter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -44,6 +71,15 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VobDec.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VobFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="udf.h">
+      <Filter>vstrip</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

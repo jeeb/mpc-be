@@ -32,7 +32,7 @@
 #include <SyncAllocatorPresenter.h>
 #include "DeinterlacerFilter.h"
 #include "../../DSUtil/WinAPIUtils.h"
-#include "../../DeCSS/VobFile.h"
+#include "../../filters/transform/DeCSSFilter/VobFile.h"
 #include <InitGuid.h>
 #include <dmodshow.h>
 #include <d3d9.h>

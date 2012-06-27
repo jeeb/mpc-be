@@ -32,7 +32,7 @@
 #pragma warning(pop)
 #include <a52dec/include/a52.h>
 #include <libdca/include/dts.h>
-#include "../../../DeCSS/DeCSSInputPin.h"
+#include "../DeCSSFilter/DeCSSInputPin.h"
 #include "IMpaDecFilter.h"
 #include "MpaDecSettingsWnd.h"
 

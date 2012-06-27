@@ -22,7 +22,7 @@
  */
 
 #include "stdafx.h"
-#include "../../../DeCSS/VobFile.h"
+#include "../../transform/DeCSSFilter/VobFile.h"
 #include "VTSReader.h"
 #include "../../../DSUtil/DSUtil.h"
 

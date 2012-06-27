@@ -25,7 +25,7 @@
 
 #include <atlcoll.h>
 #include <videoacc.h>
-#include "../../../DeCSS/DeCSSInputPin.h"
+#include "../DeCSSFilter/DeCSSInputPin.h"
 #include "../BaseVideoFilter/BaseVideoFilter.h"
 #include "IMpeg2DecFilter.h"
 #include "Mpeg2DecSettingsWnd.h"

@@ -209,20 +209,32 @@
     <ClCompile Include="..\..\..\ExtLib\mfc\winmdi.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="CSSauth.cpp" />
+    <ClCompile Include="CSSscramble.cpp" />
+    <ClCompile Include="DeCSSInputPin.cpp" />
     <ClCompile Include="DeCSSFilter.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="VobDec.cpp" />
+    <ClCompile Include="VobFile.cpp" />
+    <ClCompile Include="udf.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="DeCSSFilter.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CSSauth.h" />
+    <ClInclude Include="CSSscramble.h" />
+    <ClInclude Include="DeCSSInputPin.h" />
     <ClInclude Include="DeCSSFilter.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="VobDec.h" />
+    <ClInclude Include="VobFile.h" />
+    <ClInclude Include="udf.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DeCSSFilter.rc">
@@ -230,10 +242,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\DeCSS\DeCSS.vcxproj">
-      <Project>{1a2dfd1a-3c6c-44d1-909d-294af646b575}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\ExtLib\BaseClasses\BaseClasses.vcxproj">
       <Project>{e8a3f6fa-ae1c-4c8e-a0b6-9c8480324eaa}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
