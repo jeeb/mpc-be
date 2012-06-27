@@ -23,7 +23,7 @@
 
 #include "stdafx.h"
 #include "VobSubFileRipper.h"
-#include "../DeCSS/VobDec.h"
+#include "../filters/transform/DeCSSFilter/VobDec.h"
 #include "CCDecoder.h"
 
 //

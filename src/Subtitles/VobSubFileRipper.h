@@ -24,7 +24,7 @@
 #pragma once
 
 #include <atlcoll.h>
-#include "../DeCSS/VobFile.h"
+#include "../filters/transform/DeCSSFilter/VobFile.h"
 #include "VobSubFile.h"
 
 #pragma pack(push)
