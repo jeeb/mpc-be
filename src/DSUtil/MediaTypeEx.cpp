@@ -374,6 +374,8 @@ CString CMediaTypeEx::GetAudioCodecName(const GUID& subtype, WORD wFormatTag)
 			str += _T("ROQA");
 		} else if (subtype == MEDIASUBTYPE_APE) {
 			str += _T("APE");
+		} else if (subtype == MEDIASUBTYPE_DOLBY_TRUEHD) {
+			str += _T("TrueHD");
 		} else if (subtype == MEDIASUBTYPE_MLP) {
 			str += _T("MLP");
 		} else if (subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {

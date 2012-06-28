@@ -995,7 +995,23 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum CodecID nCodecId)
 		return hr;
 	}
 
-	m_DolbyDigitalMode = (nCodecId == CODEC_ID_TRUEHD) ? DD_TRUEHD : (nCodecId == CODEC_ID_EAC3) ? DD_EAC3 : DD_Unknown;
+	switch (m_pAVCtx->codec_id) {
+		case CODEC_ID_AC3:
+			m_DolbyDigitalMode = DD_AC3;
+			break;
+		case CODEC_ID_EAC3:
+			m_DolbyDigitalMode = DD_EAC3;
+			break;
+		case CODEC_ID_TRUEHD:
+			m_DolbyDigitalMode = DD_TRUEHD;
+			break;
+		case CODEC_ID_MLP:
+			m_DolbyDigitalMode = DD_MLP;
+			break;
+		default :
+			m_DolbyDigitalMode = DD_Unknown;
+			break;
+	}
 
 	p += size;
 	memmove(base, p, end - p);
@@ -2047,11 +2063,11 @@ CMpaDecInputPin::CMpaDecInputPin(CTransformFilter* pFilter, HRESULT* phr, LPWSTR
 
 HRESULT CMpaDecFilter::DeliverFFmpeg(enum CodecID nCodecId, BYTE* p, int buffsize, int& size)
 {
-	HRESULT hr = S_OK;
-	int got_frame = 0;
-	if (!m_pAVCtx || nCodecId != m_pAVCtx->codec_id) {
+	HRESULT hr		= S_OK;
+	size			= 0;
+	int got_frame	= 0;
+	if (!m_pAVCtx || (nCodecId != m_pAVCtx->codec_id && (nCodecId != CODEC_ID_AC3 && nCodecId != CODEC_ID_EAC3))) {
 		if (!InitFFmpeg (nCodecId)) {
-			size = 0;
 			return E_FAIL;
 		}
 	}
@@ -2124,7 +2140,6 @@ HRESULT CMpaDecFilter::DeliverFFmpeg(enum CodecID nCodecId, BYTE* p, int buffsiz
 			pDataInBuff = tmpProcessBuf;
 			buffsize = len;
 		} else {
-			size = 0;
 			return S_OK;
 		}
 	}
