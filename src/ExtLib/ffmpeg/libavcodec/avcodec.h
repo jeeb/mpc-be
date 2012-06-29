@@ -437,6 +437,8 @@ enum CodecID {
     CODEC_ID_MICRODVD   = MKBETAG('m','D','V','D'),
     CODEC_ID_EIA_608    = MKBETAG('c','6','0','8'),
     CODEC_ID_JACOSUB    = MKBETAG('J','S','U','B'),
+    CODEC_ID_SAMI       = MKBETAG('S','A','M','I'),
+    CODEC_ID_REALTEXT   = MKBETAG('R','T','X','T'),
 
     /* other specific kind of codecs (generally used for attachments) */
     CODEC_ID_FIRST_UNKNOWN = 0x18000,           ///< A dummy ID pointing at the start of various fake codecs.
@@ -1545,7 +1547,7 @@ typedef struct AVCodecContext {
     /**
      * Pixel format, see PIX_FMT_xxx.
      * May be set by the demuxer if known from headers.
-     * May be overriden by the decoder if it knows better.
+     * May be overridden by the decoder if it knows better.
      * - encoding: Set by user.
      * - decoding: Set by user if known, overridden by libavcodec if known
      */
@@ -2309,7 +2311,7 @@ typedef struct AVCodecContext {
 
     /**
      * ratecontrol qmin qmax limiting method
-     * 0-> clipping, 1-> use a nice continous function to limit qscale wthin qmin/qmax.
+     * 0-> clipping, 1-> use a nice continuous function to limit qscale wthin qmin/qmax.
      * - encoding: Set by user.
      * - decoding: unused
      */
@@ -3216,7 +3218,7 @@ typedef struct AVSubtitleRect {
 
     /**
      * 0 terminated ASS/SSA compatible event line.
-     * The pressentation of this is unaffected by the other values in this
+     * The presentation of this is unaffected by the other values in this
      * struct.
      */
     char *ass;
