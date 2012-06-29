@@ -91,6 +91,7 @@
 #define HAVE_ARMV6 0
 #define HAVE_ARMV6T2 0
 #define HAVE_ARMVFP 0
+#define HAVE_CBRTF 1
 #define HAVE_IWMMXT 0
 #define HAVE_MMI 0
 #define HAVE_NEON 0
@@ -133,6 +134,8 @@
 #define HAVE_GNU_AS 1
 #define HAVE_FAST_UNALIGNED 1
 #define HAVE_ISATTY 0
+#define HAVE_ISINF 1
+#define HAVE_ISNAN 1
 #define HAVE_LOCAL_ALIGNED_16 1
 #define HAVE_LOCAL_ALIGNED_8 1
 #define HAVE_LOG2 1

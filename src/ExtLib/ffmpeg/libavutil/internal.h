@@ -179,7 +179,11 @@ struct AVDictionary {
     }\
 }
 
+// ==> Start patch MPC
+#ifdef __GNUC__
 #include "libm.h"
+#endif
+// <== End patch MPC
 
 /**
  * Return NULL if CONFIG_SMALL is true, otherwise the argument

@@ -1808,7 +1808,7 @@ void CMPCVideoDecFilter::InitSwscale()
 			case 8  :										// GUI 'Spline'
 				sws_FlagsR = SWS_SPLINE;
 				break;
-			case 9  :										// GUI 'Spline'
+			case 9  :										// GUI 'X'
 				sws_FlagsR = SWS_X;
 				break;
 		}

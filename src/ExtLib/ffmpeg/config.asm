@@ -57,6 +57,7 @@
 %define HAVE_ARPA_INET_H 0
 %define HAVE_BIGENDIAN 0
 %define HAVE_BSWAP 1
+%define HAVE_CBRTF 1
 %define HAVE_CLOSESOCKET 0
 %define HAVE_CMOV 1
 %define HAVE_DCBZL 0
@@ -85,6 +86,8 @@
 %define HAVE_GNU_AS 1
 %define HAVE_FAST_UNALIGNED 1
 %define HAVE_ISATTY 0
+%define HAVE_ISINF 1
+%define HAVE_ISNAN 1
 %define HAVE_LOCAL_ALIGNED_16 1
 %define HAVE_LOCAL_ALIGNED_8 1
 %define HAVE_LOG2 1
