@@ -97,11 +97,9 @@ HRESULT CDXVADecoderVC1::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 		return S_FALSE;
 	}
 
-	hr = GetFreeSurfaceIndex (nSurfaceIndex, &pSampleToDeliver, rtStart, rtStop);
-	if (FAILED (hr)) {
-		ASSERT (hr == VFW_E_NOT_COMMITTED);		// Normal when stop playing
-		return hr;
-	}
+	BYTE bPicBackwardPrediction = m_PictureParams.bPicBackwardPrediction;
+
+	CHECK_HR (GetFreeSurfaceIndex (nSurfaceIndex, &pSampleToDeliver, rtStart, rtStop));
 
 	CHECK_HR (BeginFrame(nSurfaceIndex, pSampleToDeliver));
 
@@ -175,7 +173,7 @@ HRESULT CDXVADecoderVC1::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 			m_pFilter->UpdateFrameTime(rtStart, rtStop, !!m_bFrame_repeat_pict);
 		}
 		if (m_pFilter->IsReorderBFrame() || m_pFilter->IsEvo()) {
-			if (m_PictureParams.bPicBackwardPrediction == 1) {
+			if (bPicBackwardPrediction == 1) {
 				SwapRT (rtStart, m_rtStartDelayed);
 				SwapRT (rtStop,  m_rtStopDelayed);
 			} else {
@@ -193,7 +191,7 @@ HRESULT CDXVADecoderVC1::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 		}
 	}
 
-	AddToStore (nSurfaceIndex, pSampleToDeliver, (m_PictureParams.bPicBackwardPrediction != 1), rtStart, rtStop,
+	AddToStore (nSurfaceIndex, pSampleToDeliver, (bPicBackwardPrediction != 1), rtStart, rtStop,
 				false,(FF_FIELD_TYPE)nFieldType, (FF_SLICE_TYPE)nSliceType, 0);
 	m_bFlushed = false;
 
