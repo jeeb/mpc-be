@@ -13,7 +13,7 @@
 #include <strsafe.h>
 #include "checkbmi.h"
 
-#define UNREFERENCED_PARAMETER(x) x
+//#define UNREFERENCED_PARAMETER(x) x
 
 static UINT MsgDestroy;
 
