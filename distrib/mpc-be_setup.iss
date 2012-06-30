@@ -95,7 +95,7 @@ VersionInfoTextVersion={#app_version}
 VersionInfoVersion={#app_version}
 UninstallDisplayIcon={app}\{#mpcbe_exe}
 DefaultDirName={code:GetInstallFolder}
-LicenseFile=..\COPYING.txt
+LicenseFile=..\docs\COPYING.txt
 OutputDir=.
 SetupIconFile=..\src\apps\mplayerc\res\icon.ico
 AppReadmeFile={app}\Readme.txt
@@ -213,7 +213,7 @@ Source: "{#bindir}\Lang\mpcresources.tc.dll"; DestDir: "{app}\Lang"; Flags: igno
 Source: "{#bindir}\Lang\mpcresources.tr.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
 Source: "{#bindir}\Lang\mpcresources.ua.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
 #endif
-Source: "..\COPYING.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "..\docs\COPYING.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
 Source: "..\docs\Authors.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
 Source: "..\docs\Authors mpc-hc team.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
 Source: "..\docs\Changelog.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
