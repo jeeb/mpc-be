@@ -1812,11 +1812,13 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 				__int64 start, stop, pos;
 				m_wndSeekBar.GetRange(start, stop);
 				pos = m_wndSeekBar.GetPosReal();
-				if (m_wndStatusBar.IsVisible()) {
-					AfxGetAppSettings().bStatusBarIsVisible = true;
-				} else {
+
+				if (AfxGetAppSettings().nCS < CS_STATUSBAR) {
 					AfxGetAppSettings().bStatusBarIsVisible = false;
+				} else {
+					AfxGetAppSettings().bStatusBarIsVisible = true;
 				}
+
 				GUID tf;
 				pMS->GetTimeFormat(&tf);
 
