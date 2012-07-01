@@ -743,12 +743,6 @@ unsigned long FFGetMBNumber(struct AVCodecContext* pAVCtx)
 	return (s != NULL) ? s->mb_num : 0;
 }
 
-int FFIsSkipped(struct AVCodecContext* pAVCtx)
-{
-	VC1Context* vc1 = (VC1Context*) pAVCtx->priv_data;
-	return vc1->p_frame_skipped;
-}
-
 int FFGetThreadType(enum CodecID nCodecId)
 {
 	switch (nCodecId)
