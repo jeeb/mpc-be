@@ -245,6 +245,9 @@
 
 #define IDS_REMAINING_TIME					_T("RemainingTime")
 
+#define IDS_RS_GOTO_LAST_USED				_T("gotoluf")
+#define IDS_RS_GOTO_FPS						_T("fps")
+
 #define IDS_R_SHADERS_INITIALIZED			_T("Initialized")
 #define IDS_R_SHADERS_COMBINE				_T("Combine")
 #define IDS_R_SHADERS_COMBINESCREENSPACE	_T("CombineScreenSpace")

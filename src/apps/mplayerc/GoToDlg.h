@@ -25,6 +25,7 @@
 
 #include <afxwin.h>
 #include "afxmaskededit.h"
+#include "resource.h"
 
 
 // CGoToDlg dialog
@@ -32,6 +33,8 @@
 class CGoToDlg : public CDialog
 {
 	DECLARE_DYNAMIC(CGoToDlg)
+
+	enum { TYPE_TIME, TYPE_FRAME };
 
 public:
 	CGoToDlg(REFERENCE_TIME time = -1, REFERENCE_TIME maxTime = -1, double fps = 0, CWnd* pParent = NULL);   // standard constructor
