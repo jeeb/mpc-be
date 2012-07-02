@@ -97,8 +97,11 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
 	LRESULT lr = CDRF_DODEFAULT;
-
 	AppSettings& s = AfxGetAppSettings();
+
+	int R, G, B, R2, G2, B2;
+
+	GRADIENT_RECT gr[1] = {{0, 1}};
 
 	if (m_fSelfDrawn) {
 		switch (pNMCD->dwDrawStage) {
@@ -109,26 +112,45 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 								|| iThemeRed != s.nThemeRed
 								|| iThemeGreen != s.nThemeGreen
 								|| iThemeBlue != s.nThemeBlue)) {
-					CDC *dc = GetParent()->GetDC();
+					CDC dc;
+					dc.Attach(pNMCD->hdc);
 					CRect r;
-					GetWindowRect(&r);
-					GetParent()->ScreenToClient(&r);
+					GetClientRect(&r);
 					CDC memdc;
-					memdc.CreateCompatibleDC(dc);
+
+					int height = 28;
+
+					int fp = m_logobm.FileExists("background");
+
+					if (NULL != fp) {
+						ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);
+						m_logobm.LoadExternalGradient("background", &dc, r, 22, s.nThemeBrightness, R, G, B);
+					} else {
+						ThemeRGB(50, 55, 60, R, G, B);
+						ThemeRGB(20, 25, 30, R2, G2, B2);
+						TRIVERTEX tv[2] = {
+							{r.left, r.top, R*256, G*256, B*256, 255*256},
+							{r.Width(), height, R2*256, G2*256, B2*256, 255*256},
+						};
+						dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+					}
+
+					memdc.CreateCompatibleDC(&dc);
 
 					if (m_bmUnderCtrl.GetSafeHandle() != NULL) {
 						m_bmUnderCtrl.DeleteObject();
 					}
-					m_bmUnderCtrl.CreateCompatibleBitmap(dc, r.Width(), r.Height());
+
+					m_bmUnderCtrl.CreateCompatibleBitmap(&dc, r.Width(), height);
+					CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
 
 					if (iDisableXPToolbars == 1) {
 						iDisableXPToolbars = 2;
 					}
 
-					CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
-					memdc.BitBlt(0, 0, r.Width(), r.Height(), dc, r.left, r.top, SRCCOPY);
+					memdc.BitBlt(r.left, r.top, r.Width(), height, &dc, r.left, r.top, SRCCOPY);
 
-					GetParent()->ReleaseDC(dc);
+					dc.Detach();
 					DeleteObject(memdc.SelectObject(bmOld));
 					memdc.DeleteDC();
 				}
@@ -156,9 +178,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					iThemeGreen = s.nThemeGreen;
 					iThemeBlue = s.nThemeBlue;
 
-					GRADIENT_RECT gr[1] = {{0, 1}};
 					int pa = 255 * 256;
-
 					unsigned p1 = s.clrOutlineABGR, p2 = s.clrFaceABGR;
 					int nVolume = GetPos();
 

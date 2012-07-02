@@ -253,15 +253,10 @@ void CPlayerSeekBar::OnPaint()
 	int R, G, B, R2, G2, B2;
 
 	bool fEnabled = m_fEnabled && m_start < m_stop;
+
 	if (s.fDisableXPToolbars) {
 		CRect rt;
 		CString str = ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strFn;
-
-		BLENDFUNCTION bf;
-		bf.AlphaFormat	= 0;
-		bf.BlendFlags	= 0;
-		bf.BlendOp	= AC_SRC_OVER;
-		bf.SourceConstantAlpha = 100;
 
 		CDC memdc;
 		CBitmap m_bmPaint;

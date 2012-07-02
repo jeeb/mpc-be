@@ -497,14 +497,14 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 
 			if (CDIS_HOT == pTBCD->nmcd.uItemState || CDIS_CHECKED + CDIS_HOT == pTBCD->nmcd.uItemState) {
 				dc.SelectObject(&penFrHot);
-				dc.RoundRect(r.left +1,r.top +1,r.right -2,r.bottom -1, 6, 4);
-				AlphaBlend(dc.m_hDC, r.left +2,r.top +2, r.Width() -4, 0.7* r.Height() -2, memdc, 0, 0, nW, nH, bf);
+				dc.RoundRect(r.left + 1, r.top + 1, r.right - 2, r.bottom - 1, 6, 4);
+				AlphaBlend(dc.m_hDC, r.left + 2, r.top + 2, r.Width() - 4, 0.7 * r.Height() - 2, memdc, 0, 0, nW, nH, bf);
 			}
 /*
 			if (CDIS_CHECKED == pTBCD->nmcd.uItemState) {
 				CPen penFrChecked(PS_SOLID,0,0x00808080);//clr_resDark
 				dc.SelectObject(&penFrChecked);
-				dc.RoundRect(r.left +1,r.top +1,r.right -2,r.bottom -1, 6, 4);
+				dc.RoundRect(r.left + 1, r.top + 1, r.right - 2, r.bottom - 1, 6, 4);
 			}
 */
 			for (int j = 0; j < _countof(sep); j++) {
