@@ -58,7 +58,6 @@ extern "C"
 #include "../../../DSUtil/WinAPIUtils.h"
 
 #define MAX_SUPPORTED_MODE			5
-#define ROUND_FRAMERATE(var,FrameRate)	if (labs ((long)(var - FrameRate)) < FrameRate*1/100) var = FrameRate;
 #define AVRTIMEPERFRAME_VC1_EVO 417083
 
 typedef struct {
@@ -1354,6 +1353,8 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 									IsAtiDXVACompatible = (atoi(&ati_version) >= 4); // HD4xxx and above AMD/ATI cards support level 5.1 and ref = 16
 								}
 							}
+						} else if (m_nPCIVendor == PCIV_Intel && !IsWinVistaOrLater() && m_nPCIDevice == 0x8108) {
+							break; // Disable support H.264 DXVA on Intel GMA500 in WinXP
 						}
 						int nCompat = FFH264CheckCompatibility (PictWidthRounded(), PictHeightRounded(), m_pAVCtx, (BYTE*)m_pAVCtx->extradata, m_pAVCtx->extradata_size, m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion, IsAtiDXVACompatible);
 						if (nCompat && (
@@ -1946,7 +1947,6 @@ void copyPlane(BYTE *dstp, stride_t dst_pitch, const BYTE *srcp, stride_t src_pi
 	}
 }
 
-#define FFALIGN(x, a) (((x)+(a)-1)&~((a)-1))
 HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
 {
 	HRESULT			hr = S_OK;
