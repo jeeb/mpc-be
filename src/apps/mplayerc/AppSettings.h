@@ -525,6 +525,8 @@ public:
 	int				iLanguage;
 	bool			fFastSeek;
 
+	bool			fLCDSupport;
+
 	// BDA configuration
 	int				iDefaultCaptureDevice;		// Default capture device (analog=0, 1=digital)
 	CString			strAnalogVideo;

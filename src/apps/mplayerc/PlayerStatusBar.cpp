@@ -30,7 +30,7 @@
 
 static HICON get_hicon(CString path, CString fn)
 {
-	HINSTANCE mpciconlib = LoadLibrary(path + _T("\\mpciconlib.dll"));
+	HINSTANCE mpciconlib = LoadLibrary(path + _T("mpciconlib.dll"));
 
 	if (!mpciconlib) {
 		return NULL;

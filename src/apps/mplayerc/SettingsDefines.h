@@ -243,6 +243,8 @@
 
 #define IDS_FASTSEEK_KEYFRAME				_T("FastSeek")
 
+#define IDS_LCD_SUPPORT						_T("LcdSupport")
+
 #define IDS_REMAINING_TIME					_T("RemainingTime")
 
 #define IDS_RS_GOTO_LAST_USED				_T("gotoluf")
