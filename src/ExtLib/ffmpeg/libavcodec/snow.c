@@ -447,24 +447,40 @@ av_cold int ff_snow_common_init(AVCodecContext *avctx){
     width= s->avctx->width;
     height= s->avctx->height;
 
-    s->spatial_idwt_buffer= av_mallocz(width*height*sizeof(IDWTELEM));
-    s->spatial_dwt_buffer= av_mallocz(width*height*sizeof(DWTELEM)); //FIXME this does not belong here
-    s->temp_dwt_buffer = av_mallocz(width * sizeof(DWTELEM));
-    s->temp_idwt_buffer = av_mallocz(width * sizeof(IDWTELEM));
+    FF_ALLOCZ_OR_GOTO(avctx, s->spatial_idwt_buffer, width * height * sizeof(IDWTELEM), fail);
+    FF_ALLOCZ_OR_GOTO(avctx, s->spatial_dwt_buffer,  width * height * sizeof(DWTELEM),  fail); //FIXME this does not belong here
+    FF_ALLOCZ_OR_GOTO(avctx, s->temp_dwt_buffer,     width * sizeof(DWTELEM),  fail);
+    FF_ALLOCZ_OR_GOTO(avctx, s->temp_idwt_buffer,    width * sizeof(IDWTELEM), fail);
+    FF_ALLOC_OR_GOTO(avctx,  s->run_buffer,          ((width + 1) >> 1) * ((height + 1) >> 1) * sizeof(*s->run_buffer), fail);
 
     for(i=0; i<MAX_REF_FRAMES; i++)
         for(j=0; j<MAX_REF_FRAMES; j++)
             ff_scale_mv_ref[i][j] = 256*(i+1)/(j+1);
 
-    s->avctx->get_buffer(s->avctx, &s->mconly_picture);
-    s->scratchbuf = av_mallocz(s->mconly_picture.linesize[0]*7*MB_SIZE);
-
     return 0;
+fail:
+    return AVERROR(ENOMEM);
 }
 
 int ff_snow_common_init_after_header(AVCodecContext *avctx) {
     SnowContext *s = avctx->priv_data;
     int plane_index, level, orientation;
+    int ret, emu_buf_size;
+
+    if(!s->scratchbuf) {
+        if ((ret = s->avctx->get_buffer(s->avctx, &s->mconly_picture)) < 0) {
+            av_log(s->avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+            return ret;
+        }
+        FF_ALLOCZ_OR_GOTO(avctx, s->scratchbuf, FFMAX(s->mconly_picture.linesize[0], 2*avctx->width+256)*7*MB_SIZE, fail);
+        emu_buf_size = FFMAX(s->mconly_picture.linesize[0], 2*avctx->width+256) * (2 * MB_SIZE + HTAPS_MAX - 1);
+        FF_ALLOC_OR_GOTO(avctx, s->emu_edge_buffer, emu_buf_size, fail);
+    }
+
+    if(s->mconly_picture.format != avctx->pix_fmt) {
+        av_log(avctx, AV_LOG_ERROR, "pixel format changed\n");
+        return AVERROR_INVALIDDATA;
+    }
 
     for(plane_index=0; plane_index<3; plane_index++){
         int w= s->avctx->width;
@@ -513,6 +529,8 @@ int ff_snow_common_init_after_header(AVCodecContext *avctx) {
     }
 
     return 0;
+fail:
+    return AVERROR(ENOMEM);
 }
 
 #define USE_HALFPEL_PLANE 0
@@ -632,6 +650,7 @@ av_cold void ff_snow_common_end(SnowContext *s)
     av_freep(&s->temp_dwt_buffer);
     av_freep(&s->spatial_idwt_buffer);
     av_freep(&s->temp_idwt_buffer);
+    av_freep(&s->run_buffer);
 
     s->m.me.temp= NULL;
     av_freep(&s->m.me.scratchpad);
@@ -641,6 +660,7 @@ av_cold void ff_snow_common_end(SnowContext *s)
 
     av_freep(&s->block);
     av_freep(&s->scratchbuf);
+    av_freep(&s->emu_edge_buffer);
 
     for(i=0; i<MAX_REF_FRAMES; i++){
         av_freep(&s->ref_mvs[i]);
