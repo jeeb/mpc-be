@@ -137,6 +137,8 @@ SRCS_C=\
     libavcodec/flac.c \
     libavcodec/flacdata.c \
     libavcodec/flacdec.c \
+    libavcodec/flacdsp.c \
+    libavcodec/flacdsp_template.c \
     libavcodec/flashsv.c \
     libavcodec/flvdec.c \
     libavcodec/fmtconvert.c \
