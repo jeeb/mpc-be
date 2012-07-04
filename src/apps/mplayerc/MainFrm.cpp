@@ -1710,6 +1710,12 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 	switch (nIDEvent) {
 		case TIMER_STREAMPOSPOLLER:
 			if (m_iMediaLoadState == MLS_LOADED) {
+				
+				// Get the position of the cursor outside the window
+				POINT m_pos;
+				GetCursorPos(&m_pos);
+				OnMouseMove(0, m_pos);
+
 				REFERENCE_TIME rtNow = 0, rtDur = 0;
 
 				if (GetPlaybackMode() == PM_FILE) {
