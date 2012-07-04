@@ -1310,9 +1310,6 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 			m_pAVCtx->err_recognition		= m_nErrorRecognition;
 			m_pAVCtx->idct_algo				= m_nIDCTAlgo;
 			m_pAVCtx->skip_loop_filter		= (AVDiscard)m_nDiscardMode;
-			m_pAVCtx->dsp_mask				= AV_CPU_FLAG_FORCE | m_pCpuId->GetFeatures();
-
-			m_pAVCtx->debug_mv				= 0;
 
 			m_pAVCtx->opaque				= this;
 			m_pAVCtx->get_buffer			= get_buffer;
@@ -1366,8 +1363,6 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 							break;
 						}
 					} else if (m_nCodecId == CODEC_ID_MPEG2VIDEO) {
-						// DSP is disable for DXVA decoding (to keep default idct_permutation)
-						m_pAVCtx->dsp_mask ^= AV_CPU_FLAG_FORCE;
 						if (!MPEG2CheckCompatibility(m_pAVCtx, m_pFrame)) {
 							break;
 						}

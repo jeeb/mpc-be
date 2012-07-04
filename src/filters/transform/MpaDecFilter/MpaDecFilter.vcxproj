@@ -234,10 +234,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DeCSSFilter\DeCSSFilter.vcxproj">
-      <Project>{1a2dfd1a-3c6c-44d1-909d-294af646b575}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\DSUtil\DSUtil.vcxproj">
       <Project>{fc70988b-1ae5-4381-866d-4f405e28ac42}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
@@ -272,6 +268,10 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\ExtLib\ffmpeg\ffmpeg.vcxproj">
       <Project>{438286b7-a9f4-411d-bcc5-948c40e37d8f}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\DeCSSFilter\DeCSSFilterStatic.vcxproj">
+      <Project>{4b065c3d-054e-4f95-9a74-4e53e9df7144}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>

@@ -709,8 +709,8 @@
       <Project>{9dcfd02a-16a0-4766-bc18-66163e21929d}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\filters\transform\DeCSSFilter\DeCSSFilter.vcxproj">
-      <Project>{f6b06383-3ffd-403b-9867-4aa82a20aa83}</Project>
+    <ProjectReference Include="..\..\filters\transform\DeCSSFilter\DeCSSFilterStatic.vcxproj">
+      <Project>{4b065c3d-054e-4f95-9a74-4e53e9df7144}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="..\..\filters\transform\MpaDecFilter\MpaDecFilter.vcxproj">
