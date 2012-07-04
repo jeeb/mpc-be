@@ -646,6 +646,7 @@ CMainFrame::CMainFrame() :
 	m_fFirstFSAfterLaunchOnFS(false),
 	m_fHideCursor(false),
 	m_lastMouseMove(-1, -1),
+	m_lastMouseMoveFullScreen(-1, -1),
 	m_pLastBar(NULL),
 	m_nLoops(0),
 	m_iSubtitleSel(-1),
@@ -1711,10 +1712,17 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 		case TIMER_STREAMPOSPOLLER:
 			if (m_iMediaLoadState == MLS_LOADED) {
 				
-				// Get the position of the cursor outside the window
-				POINT m_pos;
-				GetCursorPos(&m_pos);
-				OnMouseMove(0, m_pos);
+				if (m_fFullScreen) {
+					// Get the position of the cursor outside the window in fullscreen mode
+					POINT m_pos;
+					GetCursorPos(&m_pos);
+					ScreenToClient(&m_pos);
+					if (m_lastMouseMoveFullScreen.x != m_pos.x || m_lastMouseMoveFullScreen.y != m_pos.y) {
+						m_lastMouseMoveFullScreen.x = m_pos.x;
+						m_lastMouseMoveFullScreen.y = m_pos.y;
+						OnMouseMove(0, m_pos);
+					}
+				}
 
 				REFERENCE_TIME rtNow = 0, rtDur = 0;
 

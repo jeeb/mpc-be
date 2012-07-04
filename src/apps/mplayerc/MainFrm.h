@@ -236,7 +236,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	// windowing
 
 	CRect m_lastWindowRect;
-	CPoint m_lastMouseMove;
+	CPoint m_lastMouseMove, m_lastMouseMoveFullScreen;
 
 	CRect m_rcDesktop;
 
