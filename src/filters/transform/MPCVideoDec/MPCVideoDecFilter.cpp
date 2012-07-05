@@ -908,7 +908,12 @@ int CMPCVideoDecFilter::PictWidthRounded()
 int CMPCVideoDecFilter::PictHeightRounded()
 {
 	// Picture height should be rounded to 16 for DXVA
-	return ((m_nHeight + 15) / 16) * 16;
+	// It is necessary that the result of division by 16 was an even number, for Ati it's very critical ...
+	int _height = int(((m_nHeight + 15) / 16) * 16);
+	if ((_height/16)&1) {
+		_height += 16;
+	}
+	return _height;
 }
 
 int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn)
