@@ -95,6 +95,7 @@
 %define HAVE_MALLOC_H 1
 %define HAVE_MEMALIGN 1
 %define HAVE_MIPSFPU 0
+%define HAVE_MIPSDSPR1 0
 %define HAVE_NANOSLEEP 0
 %define HAVE_SLEEP 1
 %define HAVE_SYMVER 1
