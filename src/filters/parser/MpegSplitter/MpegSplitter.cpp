@@ -2099,7 +2099,7 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 		m_p.Free();
 	}
 	// Dolby AC3	
-	else if (m_mt.subtype == MEDIASUBTYPE_DOLBY_AC3) {
+	else if (m_type == mpeg_ts && m_mt.subtype == MEDIASUBTYPE_DOLBY_AC3) {
 		if (!m_p) {
 			m_p.Attach(DNew Packet());
 			m_p->TrackNumber	= p->TrackNumber;
