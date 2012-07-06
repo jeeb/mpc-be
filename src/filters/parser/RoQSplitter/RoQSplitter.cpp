@@ -36,8 +36,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] =
 
 const AMOVIESETUP_PIN sudpPins[] =
 {
-    {L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn), sudPinTypesIn},
-    {L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, 0, NULL}
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn), sudPinTypesIn},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, 0, NULL}
 };
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn2[] =
@@ -52,8 +52,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut2[] =
 
 const AMOVIESETUP_PIN sudpPins2[] =
 {
-    {L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn2), sudPinTypesIn2},
-    {L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut2), sudPinTypesOut2}
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn2), sudPinTypesIn2},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut2), sudPinTypesOut2}
 };
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn3[] =
@@ -68,8 +68,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut3[] =
 
 const AMOVIESETUP_PIN sudpPins3[] =
 {
-    {L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn3), sudPinTypesIn3},
-    {L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut3), sudPinTypesOut3}
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn3), sudPinTypesIn3},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut3), sudPinTypesOut3}
 };
 
 const AMOVIESETUP_FILTER sudFilter[] =
@@ -84,8 +84,8 @@ CFactoryTemplate g_Templates[] =
 {
 	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CRoQSplitterFilter>, NULL, &sudFilter[0]},
 	{sudFilter[1].strName, sudFilter[1].clsID, CreateInstance<CRoQSourceFilter>, NULL, &sudFilter[1]},
-    {sudFilter[2].strName, sudFilter[2].clsID, CreateInstance<CRoQVideoDecoder>, NULL, &sudFilter[2]},
-    {sudFilter[3].strName, sudFilter[3].clsID, CreateInstance<CRoQAudioDecoder>, NULL, &sudFilter[3]},
+	{sudFilter[2].strName, sudFilter[2].clsID, CreateInstance<CRoQVideoDecoder>, NULL, &sudFilter[2]},
+	{sudFilter[3].strName, sudFilter[3].clsID, CreateInstance<CRoQAudioDecoder>, NULL, &sudFilter[3]},
 };
 
 int g_cTemplates = _countof(g_Templates);
@@ -790,17 +790,18 @@ HRESULT CRoQVideoDecoder::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_
 
 	HRESULT hr;
 	ALLOCATOR_PROPERTIES Actual;
-    if(FAILED(hr = pAllocator->SetProperties(pProperties, &Actual))) 
+
+	if(FAILED(hr = pAllocator->SetProperties(pProperties, &Actual))) 
 		return hr;
 
-    return(pProperties->cBuffers > Actual.cBuffers || pProperties->cbBuffer > Actual.cbBuffer
+	return(pProperties->cBuffers > Actual.cBuffers || pProperties->cbBuffer > Actual.cbBuffer
 		? E_FAIL
 		: NOERROR);
 }
 
 HRESULT CRoQVideoDecoder::GetMediaType(int iPosition, CMediaType* pmt)
 {
-    if(m_pInput->IsConnected() == FALSE) return E_UNEXPECTED;
+	if(m_pInput->IsConnected() == FALSE) return E_UNEXPECTED;
 
 	struct {const GUID* subtype; WORD biPlanes, biBitCount; DWORD biCompression;} fmts[] =
 	{
@@ -1011,17 +1012,18 @@ HRESULT CRoQAudioDecoder::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_
 
 	HRESULT hr;
 	ALLOCATOR_PROPERTIES Actual;
-    if(FAILED(hr = pAllocator->SetProperties(pProperties, &Actual))) 
+
+	if(FAILED(hr = pAllocator->SetProperties(pProperties, &Actual))) 
 		return hr;
 
-    return pProperties->cBuffers > Actual.cBuffers || pProperties->cbBuffer > Actual.cbBuffer
+	return pProperties->cBuffers > Actual.cBuffers || pProperties->cbBuffer > Actual.cbBuffer
 		? E_FAIL
 		: NOERROR;
 }
 
 HRESULT CRoQAudioDecoder::GetMediaType(int iPosition, CMediaType* pmt)
 {
-    if(m_pInput->IsConnected() == FALSE) return E_UNEXPECTED;
+	if(m_pInput->IsConnected() == FALSE) return E_UNEXPECTED;
 
 	if(iPosition < 0) return E_INVALIDARG;
 	if(iPosition > 0) return VFW_S_NO_MORE_ITEMS;
