@@ -48,7 +48,6 @@ static filter_t s_filters[] = {
 	{_T("MPEG Audio"),            SOURCE_FILTER,  SOURCE, SRC_MPA,        IDS_SRC_MPA},
 	{_T("MPEG PS/TS/PVA"),        SOURCE_FILTER,  SOURCE, SRC_MPEG,       0},
 	{_T("MusePack"),              SOURCE_FILTER,  SOURCE, SRC_MPAC,       0},
-	{_T("Nut"),                   SOURCE_FILTER,  SOURCE, SRC_NUT,        0},
 	{_T("Ogg"),                   SOURCE_FILTER,  SOURCE, SRC_OGG,        0},
 	{_T("RealMedia"),             SOURCE_FILTER,  SOURCE, SRC_REALMEDIA,  IDS_SRC_REALMEDIA},
 	{_T("RoQ"),                   SOURCE_FILTER,  SOURCE, SRC_ROQ,        IDS_SRC_ROQ},

@@ -1459,12 +1459,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 	}
 #endif
 
-	if (src[SRC_NUT]) {
-		pFGF = DNew CFGFilterInternal<CNutSourceFilter>();
-		pFGF->m_chkbytes.AddTail(_T("0,8,,F9526A624E55544D"));
-		m_source.AddTail(pFGF);
-	}
-
 	if (src[SRC_OGG]) {
 		pFGF = DNew CFGFilterInternal<COggSourceFilter>();
 		pFGF->m_chkbytes.AddTail(_T("0,4,,4F676753"));
@@ -1552,15 +1546,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 		pFGF = DNew CFGFilterInternal<CAviSplitterFilter>(LowMerit(AviSplitterName), MERIT64_DO_USE);
 	}
 	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_Avi);
-	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
-	m_transform.AddTail(pFGF);
-
-	if (src[SRC_NUT]) {
-		pFGF = DNew CFGFilterInternal<CNutSplitterFilter>(NutSplitterName, MERIT64_ABOVE_DSHOW);
-	} else {
-		pFGF = DNew CFGFilterInternal<CNutSplitterFilter>(LowMerit(NutSplitterName), MERIT64_DO_USE);
-	}
-	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_Nut);
 	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
 	m_transform.AddTail(pFGF);
 

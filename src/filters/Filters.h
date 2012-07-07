@@ -35,7 +35,6 @@
 #include "parser/MP4Splitter/MP4Splitter.h"
 #include "parser/MpaSplitter/MpaSplitter.h"
 #include "parser/MpegSplitter/MpegSplitter.h"
-#include "parser/NutSplitter/NutSplitter.h"
 #include "parser/OggSplitter/OggSplitter.h"
 #include "parser/RealMediaSplitter/RealMediaSplitter.h"
 #include "parser/RoQSplitter/RoQSplitter.h"

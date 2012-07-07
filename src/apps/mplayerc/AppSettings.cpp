@@ -49,7 +49,6 @@ CAppSettings::CAppSettings()
 	SrcFiltersKeys[SRC_REALMEDIA] = _T("SRC_REALMEDIA");
 	SrcFiltersKeys[SRC_ROQ] = _T("SRC_ROQ");
 	SrcFiltersKeys[SRC_AVI] = _T("SRC_AVI");
-	SrcFiltersKeys[SRC_NUT] = _T("SRC_NUT");
 	SrcFiltersKeys[SRC_OGG] = _T("SRC_OGG");
 	SrcFiltersKeys[SRC_MPEG] = _T("SRC_MPEG");
 	SrcFiltersKeys[SRC_MPA] = _T("SRC_MPA");

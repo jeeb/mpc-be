@@ -103,6 +103,8 @@ BOOL CPPageWebServer::OnInitDialog()
 	m_WebDefIndex = s.strWebDefIndex;
 	m_WebServerCGI = s.strWebServerCGI;
 
+	m_launch.EnableWindow(m_fEnableWebServer);
+
 	UpdateData(FALSE);
 
 	OnEnChangeEdit1();
@@ -144,6 +146,8 @@ BOOL CPPageWebServer::OnApply()
 			pWnd->StopWebServer();
 		}
 	}
+
+	m_launch.EnableWindow(m_fEnableWebServer);
 
 	return __super::OnApply();
 }

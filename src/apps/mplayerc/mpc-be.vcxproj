@@ -607,10 +607,6 @@
       <Project>{4628c665-ede4-40d2-b525-32be8b8551c8}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\filters\parser\NutSplitter\NutSplitter.vcxproj">
-      <Project>{E776D3C2-5BFA-41B9-B998-A35B549AF737}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
     <ProjectReference Include="..\..\filters\parser\OggSplitter\OggSplitter.vcxproj">
       <Project>{7fe0a205-3f39-4ac3-bc3c-c2d9e4d02475}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
