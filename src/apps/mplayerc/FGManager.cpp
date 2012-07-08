@@ -1894,22 +1894,22 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
 	pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 		(ffmpeg_filters[FFM_WMAPRO]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 		(ffmpeg_filters[FFM_WMAPRO]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
-	pFGF->AddType(MEDIATYPE_Audio, WMMEDIASUBTYPE_WMAudioV9);
+	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_WMAUDIO3);
 	m_transform.AddTail(pFGF);
 
 	// Windows Media Audio Lossless
 	pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 		(ffmpeg_filters[FFM_WMALOSS]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 		(ffmpeg_filters[FFM_WMALOSS]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
-	pFGF->AddType(MEDIATYPE_Audio, WMMEDIASUBTYPE_WMAudio_Lossless);
+	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_WMAUDIO_LOSSLESS);
 	m_transform.AddTail(pFGF);
 
 	// Windows Media Audio 1, 2
 	pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 		(ffmpeg_filters[FFM_WMA2]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 		(ffmpeg_filters[FFM_WMA2]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
-	pFGF->AddType(MEDIATYPE_Audio, WMMEDIASUBTYPE_WMAudioV1);
-	pFGF->AddType(MEDIATYPE_Audio, WMMEDIASUBTYPE_WMAudioV2);
+	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_MSAUDIO1);
+	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_WMAUDIO2);
 	m_transform.AddTail(pFGF);
 
 	// Indeo Audio Coder
