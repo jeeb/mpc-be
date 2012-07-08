@@ -26,7 +26,7 @@
 #include <libpng/png.h>
 #include <libwebp/webp/encode.h>
 
-void BMPDIB(LPCTSTR fn, BYTE* pData)
+static void BMPDIB(LPCTSTR fn, BYTE* pData)
 {
 	FILE* fp;
 	_tfopen_s(&fp, fn, _T("wb"));
@@ -65,7 +65,7 @@ void BMPDIB(LPCTSTR fn, BYTE* pData)
 	}
 }
 
-void PNGDIB(LPCTSTR fn, BYTE* pData, int level)
+static void PNGDIB(LPCTSTR fn, BYTE* pData, int level)
 {
 	FILE* fp;
 	_tfopen_s(&fp, fn, _T("wb"));
@@ -103,12 +103,12 @@ void PNGDIB(LPCTSTR fn, BYTE* pData, int level)
 	}
 }
 
-int WebPWriter(const uint8_t* data, size_t size, const WebPPicture* const pic)
+static int WebPWriter(const uint8_t* data, size_t size, const WebPPicture* const pic)
 {
 	return fwrite(data, size, 1, (FILE*)pic->custom_ptr);
 }
 
-void WebPDIB(LPCTSTR fn, BYTE* pData, float quality)
+static void WebPDIB(LPCTSTR fn, BYTE* pData, float quality)
 {
 	FILE* fp;
 	_tfopen_s(&fp, fn, _T("wb"));

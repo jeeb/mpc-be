@@ -23,6 +23,9 @@
 
 #pragma once
 
+#pragma warning(disable:4049)
+#pragma warning(disable:4217)
+
 #include "../../DSUtil/SharedInclude.h"
 #include "../../../include/stdafx_common.h"
 #undef _ATL_CSTRING_EXPLICIT_CONSTRUCTORS
