@@ -23,9 +23,6 @@
 
 #pragma once
 
-#pragma warning(disable:4049)
-#pragma warning(disable:4217)
-
 #include "../../DSUtil/SharedInclude.h"
 #include "../../../include/stdafx_common.h"
 #undef _ATL_CSTRING_EXPLICIT_CONSTRUCTORS
@@ -46,5 +43,4 @@ class CAtlStringMap : public CAtlMap<S, T, CStringElementTraits<S> > {};
 #define USE_MEDIAINFO_STATIC
 #endif
 
-//TODO: find a way to include MainFrm.h
 #include "mplayerc.h"
