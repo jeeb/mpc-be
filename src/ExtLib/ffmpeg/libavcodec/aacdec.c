@@ -2529,7 +2529,8 @@ static int aac_decode_frame_int(AVCodecContext *avctx, void *data,
 
         if (avctx->sample_fmt == AV_SAMPLE_FMT_FLT)
             // ==> Start patch MPC
-            float_interleave((float *)ac->frame.data[0], (const float **)ac->output_data,
+            float_interleave((float *)ac->frame.data[0],
+                             (const float **)ac->output_data,
             // ==> End patch MPC
                                           samples, avctx->channels);
         else
@@ -2691,7 +2692,11 @@ static int latm_decode_audio_specific_config(struct LATMContext *latmctx,
         ac->oc[1].m4ac.sample_rate != m4ac.sample_rate ||
         ac->oc[1].m4ac.chan_config != m4ac.chan_config) {
 
-        av_log(avctx, AV_LOG_INFO, "audio config changed\n");
+        if(latmctx->initialized) {
+            av_log(avctx, AV_LOG_INFO, "audio config changed\n");
+        } else {
+            av_log(avctx, AV_LOG_INFO, "initializing latmctx\n");
+        }
         latmctx->initialized = 0;
 
         esize = (bits_consumed+7) / 8;
