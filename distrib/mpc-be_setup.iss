@@ -121,7 +121,7 @@ Name: ca; MessagesFile: compiler:Languages\Catalan.isl
 Name: cz; MessagesFile: compiler:Languages\Czech.isl
 Name: de; MessagesFile: compiler:Languages\German.isl
 Name: es; MessagesFile: compiler:Languages\Spanish.isl
-Name: eu; MessagesFile: compiler:Languages\Basque.isl
+Name: eu; MessagesFile: Languages\Basque.isl
 Name: fr; MessagesFile: compiler:Languages\French.isl
 Name: he; MessagesFile: compiler:Languages\Hebrew.isl
 Name: hu; MessagesFile: compiler:Languages\Hungarian.isl
@@ -134,7 +134,7 @@ Name: pl; MessagesFile: compiler:Languages\Polish.isl
 Name: ru; MessagesFile: compiler:Languages\Russian.isl
 Name: sc; MessagesFile: Languages\ChineseSimp.isl
 Name: sv; MessagesFile: Languages\Swedish.isl
-Name: sk; MessagesFile: compiler:Languages\Slovak.isl
+Name: sk; MessagesFile: Languages\Slovak.isl
 Name: tc; MessagesFile: Languages\ChineseTrad.isl
 Name: tr; MessagesFile: Languages\Turkish.isl
 Name: ua; MessagesFile: compiler:Languages\Ukrainian.isl
