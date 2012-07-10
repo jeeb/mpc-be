@@ -60,6 +60,7 @@
 %define HAVE_CBRTF 1
 %define HAVE_CLOSESOCKET 0
 %define HAVE_CMOV 1
+%define HAVE_CPUID 1
 %define HAVE_DCBZL 0
 %define HAVE_DEV_BKTR_IOCTL_BT848_H 0
 %define HAVE_DEV_BKTR_IOCTL_METEOR_H 0
@@ -96,6 +97,7 @@
 %define HAVE_MEMALIGN 1
 %define HAVE_MIPSFPU 0
 %define HAVE_MIPSDSPR1 0
+%define HAVE_MM_EMPTY 0
 %define HAVE_NANOSLEEP 0
 %define HAVE_SLEEP 1
 %define HAVE_SYMVER 1
@@ -108,6 +110,7 @@
 %define HAVE_WINDOWS_H 1
 %define HAVE_PTHREADS 0
 %define HAVE_VIRTUALALLOC 1
+%define HAVE_XGETBV 0
 %define HAVE_XMM_CLOBBERS 1
 %define HAVE_YASM 1
 %define HAVE_ATTRIBUTE_PACKED 1
@@ -120,6 +123,7 @@
 %define HAVE_RDTSC 1
 %define HAVE_ROUND 1
 %define HAVE_ROUNDF 1
+%define HAVE_RWEFLAGS 0
 %define HAVE_TRUNC 1
 %define HAVE_TRUNCF 1
 %define CONFIG_DCT 1
