@@ -148,8 +148,8 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 		av_h264_decode_frame (pAVCtx, NULL, NULL, pBuffer, nSize);
 	}
 
-	cur_sps = pContext->sps_buffers[0];
-	cur_pps = pContext->pps_buffers[0];
+	cur_sps	= &pContext->sps;
+	cur_pps = &pContext->pps;
 
 	if (cur_sps != NULL) {
 		if (cur_sps->bit_depth_luma > 8 || cur_sps->chroma_format_idc > 1) {
@@ -798,6 +798,53 @@ BOOL FFGetAlternateScan(struct AVCodecContext* pAVCtx)
 	MpegEncContext* s = GetMpegEncContext(pAVCtx);
 
 	return (s != NULL) ? s->alternate_scan : 0;
+}
+
+void FFGetOutputSize(struct AVCodecContext* pAVCtx, AVFrame* pFrame, int* OutWidth, int* OutHeight)
+{
+	if (pAVCtx->codec_id == CODEC_ID_H264) {
+		H264Context*	h = (H264Context*) pAVCtx->priv_data;
+		SPS*			cur_sps;
+		if (pAVCtx->extradata_size) {
+			av_h264_decode_frame (pAVCtx, NULL, NULL, pAVCtx->extradata, pAVCtx->extradata_size);
+		}
+
+		cur_sps	= &h->sps;
+
+		if (cur_sps) {
+			if (OutWidth) {
+				*OutWidth	= cur_sps->mb_width * 16;
+			}
+			if (OutHeight) {
+				*OutHeight	= cur_sps->mb_height * (2 - cur_sps->frame_mbs_only_flag) * 16;
+			}
+		}
+		return;
+	}
+
+	if (pAVCtx->codec_id == CODEC_ID_MPEG2VIDEO) {
+		int				got_picture	= 0;
+		Mpeg1Context*	s1			= (Mpeg1Context*)pAVCtx->priv_data;
+		MpegEncContext*	s			= (MpegEncContext*)&s1->mpeg_enc_ctx;
+		AVPacket		avpkt;
+
+		av_init_packet(&avpkt);
+		avpkt.data	= (BYTE*)pAVCtx->extradata;
+		avpkt.size	= pAVCtx->extradata_size;
+		avpkt.flags = AV_PKT_FLAG_KEY;
+
+		avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
+
+		if (OutWidth) {
+			*OutWidth	= s->width;
+		}
+		if (OutHeight) {
+			*OutHeight	= s->height;
+			if (!s->progressive_sequence) {
+				*OutHeight = int((s->height + 31) / 32 * 2) * 16;
+			}
+		}
+	}
 }
 
 BOOL DXVACheckFramesize(int width, int height, DWORD nPCIVendor/*, DWORD nPCIDevice*/)

@@ -66,4 +66,5 @@ BOOL			FFSoftwareCheckCompatibility(struct AVCodecContext* pAVCtx);
 int				FFGetCodedPicture(struct AVCodecContext* pAVCtx);
 BOOL			FFGetAlternateScan(struct AVCodecContext* pAVCtx);
 int				FFGetThreadType(enum CodecID nCodecId);
+void			FFGetOutputSize(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int* OutWidth, int* OutHeight);
 BOOL			DXVACheckFramesize(int width, int height, DWORD nPCIVendor/*, DWORD nPCIDevice*/);

@@ -679,6 +679,8 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 	m_nWidth				= 0;
 	m_nHeight				= 0;
+	m_nOutputWidth			= 0;
+	m_nOutputHeight			= 0;
 	m_pSwsContext			= NULL;
 
 	m_bUseDXVA				= true;
@@ -902,18 +904,13 @@ int CMPCVideoDecFilter::PictHeight()
 int CMPCVideoDecFilter::PictWidthRounded()
 {
 	// Picture height should be rounded to 16 for DXVA
-	return ((m_nWidth + 15) / 16) * 16;
+	return m_nOutputWidth ? m_nOutputWidth : ((m_nWidth + 15) / 16) * 16;
 }
 
 int CMPCVideoDecFilter::PictHeightRounded()
 {
 	// Picture height should be rounded to 16 for DXVA
-	// It is necessary that the result of division by 16 was an even number, for Ati it's very critical ...
-	int _height = int(((m_nHeight + 15) / 16) * 16);
-	if ((_height/16)&1) {
-		_height += 16;
-	}
-	return _height;
+	return m_nOutputHeight ? m_nOutputHeight : ((m_nHeight + 15) / 16) * 16;
 }
 
 int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn)
@@ -1332,6 +1329,8 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 			if (avcodec_open2(m_pAVCtx, m_pAVCodec, NULL)<0) {
 				return VFW_E_INVALIDMEDIATYPE;
 			}
+
+			FFGetOutputSize(m_pAVCtx, m_pFrame, &m_nOutputWidth, &m_nOutputHeight);
 
 			if (IsDXVASupported()) {
 				do {

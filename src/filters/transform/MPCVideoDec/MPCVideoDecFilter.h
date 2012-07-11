@@ -131,6 +131,8 @@ protected:
 	int										m_nPosB;
 	int										m_nWidth;				// Frame width give to input pin
 	int										m_nHeight;				// Frame height give to input pin
+	int										m_nOutputWidth;
+	int										m_nOutputHeight;
 
 	bool									m_bIsEVO;
 
