@@ -147,6 +147,7 @@
 #define HAVE_MIPSDSPR1 0
 #define HAVE_MM_EMPTY 0
 #define HAVE_NANOSLEEP 0
+#define HAVE_RINT 1
 #define HAVE_RWEFLAGS 0
 #define HAVE_SLEEP 1
 #define HAVE_SYMVER 1
