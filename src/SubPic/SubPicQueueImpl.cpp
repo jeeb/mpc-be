@@ -587,6 +587,8 @@ STDMETHODIMP CSubPicQueueNoThread::Invalidate(REFERENCE_TIME rtInvalidate)
 
 STDMETHODIMP_(bool) CSubPicQueueNoThread::LookupSubPic(REFERENCE_TIME rtNow, CComPtr<ISubPic> &ppSubPic)
 {
+	Invalidate();
+
 	CComPtr<ISubPic> pSubPic;
 
 	{
