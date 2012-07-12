@@ -226,6 +226,18 @@ FOR %%A IN ("Armenian" "Basque" "Belarusian" "Catalan" "Chinese Simplified"
  /target:%BUILDTYPE% /property:Configuration="Release %%~A";Platform=%1
  IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Compilation failed!"
 )
+
+FOR %%A IN ("be" "ca" "cs" "de" "es" "eu"
+ "fr" "hu" "hy" "it" "ja" "ko" "nl" "pl" "pt-BR"
+ "ru" "sk" "sv" "tr" "uk" "zh-CN" "zh-TW"
+) DO (
+ TITLE Copying MediaInfo language - %%~A^|%1...
+ IF /I "%1" == "x64" (
+  COPY /Y /V "src\ExtLib\MediaInfo\Language\%%~A.csv" "bin\mpc-be_x64\Lang\" >NUL
+ ) ELSE (
+  COPY /Y /V "src\ExtLib\MediaInfo\Language\%%~A.csv" "bin\mpc-be_x86\Lang\" >NUL
+ )
+)
 EXIT /B
 
 
@@ -280,24 +292,25 @@ IF NOT EXIST "%PCKG_NAME%" MD "%PCKG_NAME%"
 IF /I "%NAME%" == "MPC-BE" (
   IF NOT EXIST "%PCKG_NAME%\Lang" MD "%PCKG_NAME%\Lang"
   IF /I "%ARCH%" == "x64" (
-    COPY /Y /V "%~1_%ARCH%\mpc-be64.exe" "%PCKG_NAME%\mpc-be64.exe" >NUL
+    COPY /Y /V "%~1_%ARCH%\mpc-be64.exe"        "%PCKG_NAME%\mpc-be64.exe" >NUL
     COPY /Y /V "%~1_%ARCH%\MPCBEShellExt64.dll" "%PCKG_NAME%\MPCBEShellExt64.dll" >NUL
   ) ELSE (
-    COPY /Y /V "%~1_%ARCH%\mpc-be.exe"   "%PCKG_NAME%\mpc-be.exe" >NUL
+    COPY /Y /V "%~1_%ARCH%\mpc-be.exe"          "%PCKG_NAME%\mpc-be.exe" >NUL
     COPY /Y /V "%~1_%ARCH%\MPCBEShellExt.dll"   "%PCKG_NAME%\MPCBEShellExt.dll" >NUL
   )
   COPY /Y /V "%~1_%ARCH%\mpciconlib.dll"           "%PCKG_NAME%\*.dll" >NUL
   COPY /Y /V "%~1_%ARCH%\Lang\mpcresources.??.dll" "%PCKG_NAME%\Lang\mpcresources.??.dll" >NUL
+  COPY /Y /V "%~1_%ARCH%\Lang\*.csv"               "%PCKG_NAME%\Lang\*.csv" >NUL
 ) ELSE (
   COPY /Y /V "%~1_%ARCH%\*.ax"           "%PCKG_NAME%\*.ax" >NUL
   COPY /Y /V "%~1_%ARCH%\VSFilter.dll"   "%PCKG_NAME%\VSFilter.dll" >NUL
 )
 
-COPY /Y /V "..\COPYING.txt"              "%PCKG_NAME%" >NUL
+COPY /Y /V "..\docs\COPYING.txt"         "%PCKG_NAME%" >NUL
 COPY /Y /V "..\docs\Authors.txt"         "%PCKG_NAME%" >NUL
 COPY /Y /V "..\docs\Authors mpc-hc team.txt"         "%PCKG_NAME%" >NUL
 COPY /Y /V "..\docs\Changelog.txt"       "%PCKG_NAME%" >NUL
-COPY /Y /V "..\docs\Changelog.Rus.txt"       "%PCKG_NAME%" >NUL
+COPY /Y /V "..\docs\Changelog.Rus.txt"   "%PCKG_NAME%" >NUL
 COPY /Y /V "..\docs\Readme.txt"          "%PCKG_NAME%" >NUL
 
 IF /I "%NAME%" == "MPC-BE" (
@@ -310,7 +323,7 @@ CALL :SubMsg "INFO" "%PCKG_NAME%-installer.zip successfully created"
 
 TITLE Creating archive %PCKG_NAME%.7z...
 START "7z" /B /WAIT "%SEVENZIP%" a -t7z "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.7z" "%PCKG_NAME%"^
- -m0=LZMA -mx9 -ms=on
+ -m0=lzma2:d128m -mx9 -mmt -ms=on
 IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Unable to create %PCKG_NAME%.7z!"
 CALL :SubMsg "INFO" "%PCKG_NAME%.7z successfully created"
 
