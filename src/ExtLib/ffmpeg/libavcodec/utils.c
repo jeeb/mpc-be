@@ -732,6 +732,8 @@ MAKE_ACCESSORS(AVFrame, frame, int64_t, pkt_pos)
 MAKE_ACCESSORS(AVFrame, frame, int64_t, channel_layout)
 MAKE_ACCESSORS(AVFrame, frame, int,     sample_rate)
 
+MAKE_ACCESSORS(AVCodecContext, codec, AVRational, pkt_timebase)
+
 static void avcodec_get_subtitle_defaults(AVSubtitle *sub)
 {
     memset(sub, 0, sizeof(*sub));
@@ -1023,12 +1025,14 @@ int ff_alloc_packet2(AVCodecContext *avctx, AVPacket *avpkt, int size)
         return AVERROR(EINVAL);
     }
 
+    if (avctx) {
     av_assert0(!avpkt->data || avpkt->data != avctx->internal->byte_buffer);
     if (!avpkt->data || avpkt->size < size) {
         av_fast_padded_malloc(&avctx->internal->byte_buffer, &avctx->internal->byte_buffer_size, size);
         avpkt->data = avctx->internal->byte_buffer;
         avpkt->size = avctx->internal->byte_buffer_size;
         avpkt->destruct = NULL;
+    }
     }
 
     if (avpkt->data) {

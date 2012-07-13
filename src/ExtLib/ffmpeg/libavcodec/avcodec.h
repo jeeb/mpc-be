@@ -267,6 +267,7 @@ enum CodecID {
     CODEC_ID_MSS1,
     CODEC_ID_MSA1,
     CODEC_ID_TSCC2,
+    CODEC_ID_MTS2,
     CODEC_ID_Y41P       = MKBETAG('Y','4','1','P'),
     CODEC_ID_ESCAPE130  = MKBETAG('E','1','3','0'),
     CODEC_ID_EXR        = MKBETAG('0','E','X','R'),
@@ -2850,6 +2851,10 @@ typedef struct AVCodecContext {
 #define FF_PROFILE_AAC_LOW  1
 #define FF_PROFILE_AAC_SSR  2
 #define FF_PROFILE_AAC_LTP  3
+#define FF_PROFILE_AAC_HE   4
+#define FF_PROFILE_AAC_HE_V2 28
+#define FF_PROFILE_AAC_LD   22
+#define FF_PROFILE_AAC_ELD  38
 
 #define FF_PROFILE_DTS         20
 #define FF_PROFILE_DTS_ES      30
@@ -2968,6 +2973,15 @@ typedef struct AVCodecContext {
     uint64_t vbv_delay;
 
     /**
+     * Timebase in which pkt_dts/pts and AVPacket.dts/pts are.
+     * Code outside libavcodec should access this field using:
+     * avcodec_set_pkt_timebase(avctx)
+     * - encoding unused.
+     * - decodimg set by user
+     */
+    AVRational pkt_timebase;
+
+    /**
      * Current statistics for PTS correction.
      * - decoding: maintained and used by libavcodec, not intended to be used by user apps
      * - encoding: unused
@@ -2982,6 +2996,9 @@ typedef struct AVCodecContext {
     int mpeg2_using_dxva;
     // ==> End patch MPC
 } AVCodecContext;
+
+AVRational av_codec_get_pkt_timebase         (const AVCodecContext *avctx);
+void       av_codec_set_pkt_timebase         (AVCodecContext *avctx, AVRational val);
 
 /**
  * AVProfile.
