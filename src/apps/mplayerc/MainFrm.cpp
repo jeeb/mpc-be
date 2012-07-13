@@ -1717,7 +1717,10 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 					POINT m_pos;
 					GetCursorPos(&m_pos);
 					ScreenToClient(&m_pos);
-					if (m_lastMouseMoveFullScreen.x != m_pos.x || m_lastMouseMoveFullScreen.y != m_pos.y) {
+					CRect r;
+					GetClientRect(r);
+
+					if (!r.PtInRect(m_pos) && (m_lastMouseMoveFullScreen.x != m_pos.x || m_lastMouseMoveFullScreen.y != m_pos.y)) {
 						m_lastMouseMoveFullScreen.x = m_pos.x;
 						m_lastMouseMoveFullScreen.y = m_pos.y;
 						OnMouseMove(0, m_pos);
