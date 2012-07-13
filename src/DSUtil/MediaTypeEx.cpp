@@ -392,6 +392,8 @@ CString CMediaTypeEx::GetAudioCodecName(const GUID& subtype, WORD wFormatTag)
 			str += _T("ROQA");
 		} else if (subtype == MEDIASUBTYPE_APE) {
 			str += _T("APE");
+		} else if (subtype == MEDIASUBTYPE_SAMR) {
+			str += _T("SAMR");
 		} else {
 			str.Format(_T("0x%04x"), wFormatTag);
 		}
