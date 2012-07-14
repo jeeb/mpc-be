@@ -1,6 +1,6 @@
 #/bin/perl
 #
-# $Id: rcstrings.pl 4361 2012-04-13 09:43:58Z XhmikosR $
+# $Id$
 #
 # (C) 2010-2012 see Authors.txt
 #
