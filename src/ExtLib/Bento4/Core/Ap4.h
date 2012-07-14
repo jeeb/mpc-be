@@ -32,7 +32,6 @@
 /*----------------------------------------------------------------------
 |       includes
 +---------------------------------------------------------------------*/
-#include "../../../filters/parser/MP4Splitter/stdafx.h"
 #include "Ap4Config.h"
 #include "Ap4Types.h"
 #include "Ap4Constants.h"

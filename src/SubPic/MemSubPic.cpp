@@ -145,7 +145,6 @@ STDMETHODIMP CMemSubPic::CopyTo(ISubPic* pSubPic)
 	}
 
 	int w = m_rcDirty.Width(), h = m_rcDirty.Height();
-
 	BYTE* s = (BYTE*)src.bits + src.pitch*m_rcDirty.top + m_rcDirty.left*4;
 	BYTE* d = (BYTE*)dst.bits + dst.pitch*m_rcDirty.top + m_rcDirty.left*4;
 
@@ -215,7 +214,6 @@ STDMETHODIMP CMemSubPic::Unlock(RECT* pDirtyRect)
 	}
 
 	int w = m_rcDirty.Width(), h = m_rcDirty.Height();
-
 	BYTE* top = (BYTE*)m_spd.bits + m_spd.pitch*m_rcDirty.top + m_rcDirty.left*4;
 	BYTE* bottom = top + m_spd.pitch*h;
 
@@ -286,7 +284,6 @@ void AlphaBlt_YUY2_SSE2(int w, int h, BYTE* d, int dstpitch, BYTE* s, int srcpit
 {
 	unsigned int ia;
 	DWORD* d2 = (DWORD*)d;
-
 	BYTE* s2 = s;
 	BYTE* s2end = s2 + w*4;
 	static const __int64 _8181 = 0x0080001000800010i64;
@@ -325,11 +322,9 @@ void AlphaBlt_YUY2_MMX(int w, int h, BYTE* d, int dstpitch, BYTE* s, int srcpitc
 {
 	unsigned int ia;
 	DWORD* d2 = (DWORD*)d;
-
 	BYTE* s2 = s;
 	BYTE* s2end = s2 + w*4;
 	static const __int64 _8181 = 0x0080001000800010i64;
-
 
 	for (ptrdiff_t j = 0; j < h; j++, s += srcpitch, d += dstpitch) {
 		for (; s2 < s2end; s2 += 8, d2++) {
@@ -366,7 +361,6 @@ void AlphaBlt_YUY2_C(int w, int h, BYTE* d, int dstpitch, BYTE* s, int srcpitch)
 {
 	unsigned int ia;
 	DWORD* d2 = (DWORD*)d;
-
 	BYTE* s2 = s;
 	BYTE* s2end = s2 + w*4;
 	static const __int64 _8181 = 0x0080001000800010i64;
@@ -416,7 +410,6 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	}
 
 	int w = rs.Width(), h = rs.Height();
-
 	BYTE* s = (BYTE*)src.bits + src.pitch*rs.top + rs.left*4;
 	BYTE* d = (BYTE*)dst.bits + dst.pitch*rd.top + ((rd.left*dst.bpp)>>3);
 
@@ -440,7 +433,6 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 			{
 				// Alpha blend the Y plane. Source is UYxAVYxA packed values (converted by Unlock())
 				// destination is P010/P016 surface.
-
 				int bitDepth = (dst.type == MSP_P016) ? 16 : 10;
 
 				for(ptrdiff_t j = 0; j < h; j++, s += src.pitch, d += dst.pitch) 
@@ -527,7 +519,6 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 					WORD* d2 = (WORD*)d;
 					for (; s2 < s2end; s2 += 4, d2++) {
 						if (s2[3] < 0x1f) {
-
 							*d2 = (WORD)((((((*d2&0xf81f)*s2[3])>>5) + (*(DWORD*)s2&0xf81f))&0xf81f)
 										 | (((((*d2&0x07e0)*s2[3])>>5) + (*(DWORD*)s2&0x07e0))&0x07e0));
 						}
