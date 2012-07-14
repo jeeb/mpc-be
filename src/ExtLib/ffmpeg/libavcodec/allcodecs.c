@@ -67,9 +67,12 @@ void avcodec_register_all(void)
     REGISTER_DECODER (MJPEGB, mjpegb);
     REGISTER_DECODER (MPEG2VIDEO, mpeg2video);
     REGISTER_DECODER (MPEG4, mpeg4);
+    REGISTER_DECODER (MSA1, msa1);
     REGISTER_DECODER (MSMPEG4V1, msmpeg4v1);
     REGISTER_DECODER (MSMPEG4V2, msmpeg4v2);
     REGISTER_DECODER (MSMPEG4V3, msmpeg4v3);
+    REGISTER_DECODER (MSS1, mss1);
+    REGISTER_DECODER (MTS2, mts2);
     REGISTER_DECODER (QTRLE, qtrle);
     REGISTER_DECODER (PNG, png);
     REGISTER_DECODER (PRORES, prores);
@@ -81,6 +84,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (SVQ3, svq3);
     REGISTER_DECODER (THEORA, theora);
     REGISTER_DECODER (TSCC, tscc);
+    REGISTER_DECODER (TSCC2, tscc2);
     REGISTER_DECODER (VC1, vc1);
     REGISTER_DECODER (VP3, vp3);
     REGISTER_DECODER (VP5, vp5);

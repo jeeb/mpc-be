@@ -213,6 +213,10 @@ SRCS_C=\
     libavcodec/msmpeg4data.c \
     libavcodec/msrle.c \
     libavcodec/msrledec.c \
+    libavcodec/mss1.c \
+    libavcodec/mss3.c \
+    libavcodec/mss34dsp.c \
+    libavcodec/mss4.c \
     libavcodec/nellymoser.c \
     libavcodec/nellymoserdec.c \
     libavcodec/options.c \
@@ -250,6 +254,7 @@ SRCS_C=\
     libavcodec/svq3.c \
     libavcodec/truespeech.c \
     libavcodec/tscc.c \
+    libavcodec/tscc2.c \
     libavcodec/tta.c \
     libavcodec/utvideo.c \
     libavcodec/utils.c \
