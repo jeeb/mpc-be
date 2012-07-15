@@ -364,6 +364,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						name += L" Nellimoser";
 						break;
 					case FLV_AUDIO_AAC: {
+						mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_AAC);
 						if (dataSize < 1 || m_pFile->BitRead(8) != 0) { // packet type 0 == aac header
 							fTypeFlagsAudio = true;
 							break;
@@ -401,8 +402,6 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						m_pFile->Seek(configOffset);
 						m_pFile->ByteRead((BYTE*)(wfe+1), configSize);
-
-						mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_AAC);
 					}
 
 				}
