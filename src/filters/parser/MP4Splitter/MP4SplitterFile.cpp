@@ -18,7 +18,7 @@ CMP4SplitterFile::~CMP4SplitterFile()
 	delete (AP4_File*)m_pAp4File;
 }
 
-void* /* AP4_Movie* */ CMP4SplitterFile::GetMovie()
+void* CMP4SplitterFile::GetMovie()
 {
 	ASSERT(m_pAp4File);
 	return m_pAp4File ? ((AP4_File*)m_pAp4File)->GetMovie() : NULL;

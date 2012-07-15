@@ -646,7 +646,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 							mts.Add(mt);
 							break;
-						case AP4_MPEG1_VISUAL_OTI: // ???
+						case AP4_MPEG1_VISUAL_OTI:
 							mt.subtype = MEDIASUBTYPE_MPEG1Payload;
 							{
 								m_pFile->Seek(sample.GetOffset());
@@ -689,9 +689,9 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					switch (audio_desc->GetObjectTypeId()) {
 						case AP4_MPEG4_AUDIO_OTI:
-						case AP4_MPEG2_AAC_AUDIO_MAIN_OTI: // ???
-						case AP4_MPEG2_AAC_AUDIO_LC_OTI: // ???
-						case AP4_MPEG2_AAC_AUDIO_SSRP_OTI: // ???
+						case AP4_MPEG2_AAC_AUDIO_MAIN_OTI:
+						case AP4_MPEG2_AAC_AUDIO_LC_OTI:
+						case AP4_MPEG2_AAC_AUDIO_SSRP_OTI:
 							if (di->GetDataSize() > 10) {
 								if (*(DWORD*)(di->GetData()+6) == 0x00534c41) { // 'ALS\0' sync word
 									wfe->wFormatTag = WAVE_FORMAT_UNKNOWN;
@@ -710,7 +710,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 							mts.Add(mt);
 							break;
-						case AP4_MPEG2_PART3_AUDIO_OTI: // ???
+						case AP4_MPEG2_PART3_AUDIO_OTI:
 						case AP4_MPEG1_AUDIO_OTI:
 							mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_MP3);
 							{
