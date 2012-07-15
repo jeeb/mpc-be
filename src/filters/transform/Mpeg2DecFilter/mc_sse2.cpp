@@ -21,7 +21,6 @@
  *
  */
 
-
 //  Based on Intel's AP-942
 
 #include "stdafx.h"

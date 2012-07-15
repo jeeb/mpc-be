@@ -22,6 +22,7 @@
  */
 
 #pragma once
+
 #include "afxwin.h"
 
 // CConfigDlg dialog

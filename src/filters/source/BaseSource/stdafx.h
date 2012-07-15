@@ -22,6 +22,7 @@
  */
 
 #pragma once
+
 #include "../../../DSUtil/SharedInclude.h"
 
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
@@ -35,5 +36,4 @@
 #include <afxwin.h>			// MFC core and standard components
 
 #include <dshow.h>
-#include <BaseClasses/streams.h>
-#include <dvdmedia.h>
+#include "stdafx_common.h"

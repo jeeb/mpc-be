@@ -1,25 +1,33 @@
+/*
+ * $Id$
+ *
+ * (C) 2003-2006 Gabest
+ * (C) 2006-2012 see Authors.txt
+ *
+ * This file is part of MPC-BE.
+ *
+ * MPC-BE is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MPC-BE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #ifndef _FFIMGFMT_H_
 #define _FFIMGFMT_H_
 
 #include <ffmpeg/libavutil/pixfmt.h>
 
 //================================ ffdshow ==================================
-// the RGB related values in this enum refers to the "memory byte order" (byte order as stored in memory).
-// under x86 architecture (little endians), the byte order is stored reversed (comparing to the write order),
-// this means RGB will be stored in the memory as BGR.
-// When working with DirectShow in the Red-Green-Blue colorspace, DirectShow always
-// expects RGB at the "memory byte order", so RGB should be selected.
-// When working with files, we are interested in the "write order", which is the opposite
-// of the "memory byte order" (under x86), so you should select the opposite from the
-// destination byte order for the file.
-// (e.g. PNG images uses RGB order, so select BGR order
-// BMP image uses BGR order, so select RGB order)
 
-/* ffdshow colorspace ids, values should be unique including flag values, and must fit inside a uint64_t
- * (an enum should be used instead of defines, but GCC does not support an enum with type uint64_t ?)
- */
-
-// Do not reorder or renumber! Values are stored in user's registry.
 #define FF_CSP_NULL  (0ULL)
 
 #define FF_CSP_420P  (1ULL << 0)    // 0x0000001

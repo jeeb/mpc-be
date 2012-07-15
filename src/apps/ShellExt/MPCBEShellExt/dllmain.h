@@ -21,6 +21,8 @@
  *
  */
 
+#pragma once
+
 class CMPCBEShellExtModule : public CAtlDllModuleT< CMPCBEShellExtModule >
 {
 public :

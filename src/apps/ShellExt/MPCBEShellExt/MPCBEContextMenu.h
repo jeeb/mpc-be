@@ -22,6 +22,7 @@
  */
 
 #pragma once
+
 #include "resource.h"       // main symbols
 #include <atlcoll.h>
 

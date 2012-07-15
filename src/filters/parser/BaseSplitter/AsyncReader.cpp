@@ -21,7 +21,6 @@
  *
  */
 
-
 #include "stdafx.h"
 #include "AsyncReader.h"
 #include <afxsock.h>

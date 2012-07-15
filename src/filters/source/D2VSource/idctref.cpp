@@ -1,29 +1,29 @@
+/*
+ * $Id$
+ *
+ * (C) 2003-2006 Gabest
+ * (C) 2006-2012 see Authors.txt
+ *
+ * This file is part of MPC-BE.
+ *
+ * MPC-BE is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MPC-BE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "stdafx.h"
 
-/* idctref_miha.c, Inverse Discrete Fourier Transform, double precision */
-
-/*************************************************************/
-/*                                                           */
-/* x87 hand-optimized assembly by Miha Peternel              */
-/*                                     27.11. - 20.1.2001    */
-/*                                                           */
-/* You are free to use this code in your project if:         */
-/* - no changes are made to this message                     */
-/* - any changes to this code are publicly available         */
-/* - your project documentation contains the following text: */
-/*   "This software contains fast high-quality IDCT decoder  */
-/*    by Miha Peternel."                                     */
-/*                                                           */
-/*************************************************************/
-
-/*  Perform IEEE 1180 reference (64-bit floating point, separable 8x1
- *  direct matrix multiply) Inverse Discrete Cosine Transform
-*/
-
 #define ModelX 123 // enable C-level optimizations by Miha Peternel
-
-/* Here we use math.h to generate constants.  Compiler results may
-   vary a little */
 
 #include <math.h>
 
