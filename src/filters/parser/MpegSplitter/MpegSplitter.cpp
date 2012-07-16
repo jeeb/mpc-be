@@ -844,10 +844,6 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				m_pFile->AddHdmvPGStream (stream->m_PID, stream->m_LanguageCode);
 			}
 		}
-
-		if (m_pFile->m_streams[CMpegSplitterFile::subpic].GetCount()) {
-			m_pFile->AddHdmvPGStream(NO_SUBTITLE_PID, "---");
-		}
 	}
 
 	CString lang = _T("");

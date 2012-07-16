@@ -227,6 +227,8 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 				s.mt.subtype = m_streams[subpic].GetHead().mt.subtype;
 				s.mt.formattype = m_streams[subpic].GetHead().mt.formattype;
 				m_streams[subpic].AddTail(s);
+			} else {
+				AddHdmvPGStream(NO_SUBTITLE_PID, "---");
 			}
 		}
 	} else {
