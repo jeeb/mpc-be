@@ -38,7 +38,6 @@
 #pragma warning(disable: 4005)
 #include <stdint.h>
 #pragma warning(pop)
-#include <libdca/include/dts.h>
 
 enum {
 	unknown,
