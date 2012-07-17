@@ -259,6 +259,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_H261_DECODER 0
 #define CONFIG_H263_DECODER 1
 #define CONFIG_H263I_DECODER 1
+#define CONFIG_H263P_DECODER 1
 #define CONFIG_H264_DECODER 1
 #define CONFIG_HUFFYUV_DECODER 0
 #define CONFIG_IAC_DECODER 1

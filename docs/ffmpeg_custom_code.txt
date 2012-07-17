@@ -4,8 +4,6 @@ The following files have MPC-BE specific custom code (compared to ffmpeg):
 * config.asm
 * makefile
 
-* libavcodec/aacdec.c
-* libavcodec/aacsbr.c
 * libavcodec/allcodecs.c
 * libavcodec/avcodec.h
 * libavcodec/dv_tablegen.c
@@ -18,6 +16,7 @@ The following files have MPC-BE specific custom code (compared to ffmpeg):
 * libavcodec/utils.c
 * libavcodec/vc1dec.c
 
+* libavutil/attributes.h
 * libavutil/common.h
 * libavutil/internal.h
 * libavutil/log.h

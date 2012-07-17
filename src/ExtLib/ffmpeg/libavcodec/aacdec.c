@@ -79,7 +79,7 @@
            Parametric Stereo.
  */
 
-
+#include "libavutil/float_dsp.h"
 #include "avcodec.h"
 #include "internal.h"
 #include "get_bits.h"
@@ -575,6 +575,8 @@ static void decode_channel_map(uint8_t layout_map[][3],
         case AAC_CHANNEL_LFE:
             syn_ele = TYPE_LFE;
             break;
+        default:
+            av_assert0(0);
         }
         layout_map[0][0] = syn_ele;
         layout_map[0][1] = get_bits(gb, 4);
@@ -840,6 +842,14 @@ static av_cold int aac_decode_init(AVCodecContext *avctx)
     ac->avctx = avctx;
     ac->oc[1].m4ac.sample_rate = avctx->sample_rate;
 
+    if (avctx->request_sample_fmt == AV_SAMPLE_FMT_FLT) {
+        avctx->sample_fmt = AV_SAMPLE_FMT_FLT;
+        output_scale_factor = 1.0 / 32768.0;
+    } else {
+        avctx->sample_fmt = AV_SAMPLE_FMT_S16;
+        output_scale_factor = 1.0;
+    }
+
     if (avctx->extradata_size > 0) {
         if (decode_audio_specific_config(ac, ac->avctx, &ac->oc[1].m4ac,
                                          avctx->extradata,
@@ -875,14 +885,6 @@ static av_cold int aac_decode_init(AVCodecContext *avctx)
         }
     }
 
-    if (avctx->request_sample_fmt == AV_SAMPLE_FMT_FLT) {
-        avctx->sample_fmt = AV_SAMPLE_FMT_FLT;
-        output_scale_factor = 1.0 / 32768.0;
-    } else {
-        avctx->sample_fmt = AV_SAMPLE_FMT_S16;
-        output_scale_factor = 1.0;
-    }
-
     AAC_INIT_VLC_STATIC( 0, 304);
     AAC_INIT_VLC_STATIC( 1, 270);
     AAC_INIT_VLC_STATIC( 2, 550);
@@ -899,6 +901,7 @@ static av_cold int aac_decode_init(AVCodecContext *avctx)
 
     ff_dsputil_init(&ac->dsp, avctx);
     ff_fmt_convert_init(&ac->fmt_conv, avctx);
+    avpriv_float_dsp_init(&ac->fdsp, avctx->flags & CODEC_FLAG_BITEXACT);
 
     ac->random_state = 0x1f2e3d4c;
 
@@ -1305,7 +1308,7 @@ static inline float *VMUL4S(float *dst, const float *v, unsigned idx,
     t.i = s.i ^ (sign & 1U<<31);
     *dst++ = v[idx>>4 & 3] * t.f;
 
-    sign <<= nz & 1; nz >>= 1;
+    sign <<= nz & 1;
     t.i = s.i ^ (sign & 1U<<31);
     *dst++ = v[idx>>6 & 3] * t.f;
 
@@ -2613,7 +2616,7 @@ static av_cold int aac_decode_close(AVCodecContext *avctx)
 
 struct LATMContext {
     AACContext      aac_ctx;             ///< containing AACContext
-    int             initialized;         ///< initilized after a valid extradata was seen
+    int             initialized;         ///< initialized after a valid extradata was seen
 
     // parser data
     int             audio_mux_version_A; ///< LATM syntax version
@@ -2658,10 +2661,15 @@ static int latm_decode_audio_specific_config(struct LATMContext *latmctx,
     if (bits_consumed < 0)
         return AVERROR_INVALIDDATA;
 
-    if (ac->oc[1].m4ac.sample_rate != m4ac.sample_rate ||
+    if (!latmctx->initialized ||
+        ac->oc[1].m4ac.sample_rate != m4ac.sample_rate ||
         ac->oc[1].m4ac.chan_config != m4ac.chan_config) {
 
-        av_log(avctx, AV_LOG_INFO, "audio config changed\n");
+        if(latmctx->initialized) {
+            av_log(avctx, AV_LOG_INFO, "audio config changed\n");
+        } else {
+            av_log(avctx, AV_LOG_INFO, "initializing latmctx\n");
+        }
         latmctx->initialized = 0;
 
         esize = (bits_consumed+7) / 8;

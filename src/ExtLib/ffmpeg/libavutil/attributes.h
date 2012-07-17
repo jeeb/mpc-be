@@ -62,9 +62,11 @@
 #    define av_pure
 #endif
 
-#ifndef av_restrict
+// ==> Start patch MPC
+//#ifndef av_restrict
 //#define av_restrict restrict
-#endif
+//#endif
+// <== End patch MPC
 
 #if AV_GCC_VERSION_AT_LEAST(2,6)
 #    define av_const __attribute__((const))
@@ -131,7 +133,7 @@
 #   define av_alias
 #endif
 
-#if defined(__GNUC__) && !defined(__INTEL_COMPILER)
+#if defined(__GNUC__) && !defined(__INTEL_COMPILER) && !defined(__clang__)
 #    define av_uninit(x) x=x
 #else
 #    define av_uninit(x) x
