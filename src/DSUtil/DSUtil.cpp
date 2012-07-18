@@ -370,6 +370,8 @@ CStringW GetFilterName(IBaseFilter* pBF)
 			name = _T("File Source (URL)");
 		} else if (clsid == CLSID_WMAsfReader) {
 			name = _T("WM ASF Reader");
+		} else if (clsid == CLSID_StreamBufferSource) {
+			name = _T("StreamBufferSource");
 		// third-party actual filters
 		} else if (clsid == GUIDFromCString(_T("{D8980E15-E1F6-4916-A10F-D7EB4E9E10B8}"))) {
 			name = _T("AV Source");
