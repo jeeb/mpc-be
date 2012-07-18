@@ -2345,6 +2345,11 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 	}
 
 	nSize = pIn->GetActualDataLength();
+	// Skip empty packet
+	if (nSize == 0) {
+		return S_OK;
+	}
+
 	hr = pIn->GetTime(&rtStart, &rtStop);
 
 	if (FAILED(hr)) {
