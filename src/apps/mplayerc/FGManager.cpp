@@ -58,9 +58,10 @@ DEFINE_GUID      (CLSID_SonicCinemasterVideoDecoder, 0xD7D50E8D, 0xDD72, 0x43C2,
 // CFGManager
 //
 
-CFGManager::CFGManager(LPCTSTR pName, LPUNKNOWN pUnk)
+CFGManager::CFGManager(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview)
 	: CUnknown(pName, pUnk)
 	, m_dwRegister(0)
+	, m_IsPreview(IsPreview)
 {
 	m_pUnkInner.CoCreateInstance(CLSID_FilterGraph, GetOwner());
 	m_pFM.CoCreateInstance(CLSID_FilterMapper2);
@@ -600,6 +601,22 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 	if (S_OK == IsPinConnected(pPinOut)
 			|| pPinIn && S_OK == IsPinConnected(pPinIn)) {
 		return VFW_E_ALREADY_CONNECTED;
+	}
+
+	// skip Audio output Pin for preview mode;
+	if (m_IsPreview) {
+		BeginEnumMediaTypes(pPinOut, pEM, pmt) {
+			// Allow only video
+			if (pmt->majortype == MEDIATYPE_Audio ||
+				pmt->majortype == MEDIATYPE_Subtitle ||
+				pmt->majortype == MEDIATYPE_AUXLine21Data ||
+				pmt->majortype == MEDIATYPE_Midi ||
+				pmt->majortype == MEDIATYPE_Text ||
+				pmt->majortype == MEDIASUBTYPE_DVD_SUBPICTURE) {
+					return S_FALSE;
+			}
+		}
+		EndEnumMediaTypes(pmt)
 	}
 
 	bool fDeadEnd = true;
@@ -1336,8 +1353,8 @@ STDMETHODIMP CFGManager::GetDeadEnd(int iIndex, CAtlList<CStringW>& path, CAtlLi
 // 	CFGManagerCustom
 //
 
-CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk)
-	: CFGManager(pName, pUnk)
+CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview)
+	: CFGManager(pName, pUnk, IsPreview)
 {
 	AppSettings& s = AfxGetAppSettings();
 
@@ -2595,11 +2612,12 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 // 	CFGManagerPlayer
 //
 
-CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd)
-	: CFGManagerCustom(pName, pUnk)
+CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview)
+	: CFGManagerCustom(pName, pUnk, IsPreview)
 	, m_hWnd(hWnd)
 	, m_vrmerit(MERIT64(MERIT_PREFERRED))
 	, m_armerit(MERIT64(MERIT_PREFERRED))
+	, m_IsPreview(IsPreview)
 {
 	TRACE("--> CFGManagerPlayer::CFGManagerPlayer on thread: %d\n", GetCurrentThreadId());
 	CFGFilter* pFGF;
@@ -2645,8 +2663,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd)
 	}
 
 	// Switchers
-
-	if (s.fEnableAudioSwitcher) {
+	if (s.fEnableAudioSwitcher && !m_IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSwitcherFilter>(L"Audio Switcher", m_armerit + 0x100);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
 		m_transform.AddTail(pFGF);
@@ -2656,70 +2673,76 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd)
 	}
 
 	// Renderers
-
-	switch (s.iDSVideoRendererType) {
-		case VIDRNDT_DS_OLDRENDERER:
-			m_transform.AddTail(DNew CFGFilterRegistry(CLSID_VideoRenderer, m_vrmerit));
-			break;
-		case VIDRNDT_DS_OVERLAYMIXER:
-			m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_OverlayMixer, L"Overlay Mixer", m_vrmerit));
-			break;
-		case VIDRNDT_DS_VMR7WINDOWED:
-			m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer, L"Video Mixing Renderer 7", m_vrmerit));
-			break;
-		case VIDRNDT_DS_VMR9WINDOWED:
-			m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer9, L"Video Mixing Renderer 9", m_vrmerit));
-			break;
-		case VIDRNDT_DS_VMR7RENDERLESS:
-			m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VMR7AllocatorPresenter, L"Video Mixing Renderer 7 (Renderless)", m_vrmerit));
-			break;
-		case VIDRNDT_DS_VMR9RENDERLESS:
-			m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VMR9AllocatorPresenter, L"Video Mixing Renderer 9 (Renderless)", m_vrmerit));
-			break;
-		case VIDRNDT_DS_EVR:
-			m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EnhancedVideoRenderer, L"Enhanced Video Renderer", m_vrmerit));
-			break;
-		case VIDRNDT_DS_EVR_CUSTOM:
-			m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EVRAllocatorPresenter, L"Enhanced Video Renderer (custom presenter)", m_vrmerit));
-			break;
-		case VIDRNDT_DS_DXR:
-			m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_DXRAllocatorPresenter, L"Haali's Video Renderer", m_vrmerit));
-			break;
-		case VIDRNDT_DS_MADVR:
-			m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_madVRAllocatorPresenter, L"madVR Renderer", m_vrmerit));
-			break;
-		case VIDRNDT_DS_SYNC:
-			m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_SyncAllocatorPresenter, L"EVR Sync", m_vrmerit));
-			break;
-		case VIDRNDT_DS_NULL_COMP:
-			pFGF = DNew CFGFilterInternal<CNullVideoRenderer>(L"Null Video Renderer (Any)", MERIT64_ABOVE_DSHOW+2);
-			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_NULL);
-			m_transform.AddTail(pFGF);
-			break;
-		case VIDRNDT_DS_NULL_UNCOMP:
-			pFGF = DNew CFGFilterInternal<CNullUVideoRenderer>(L"Null Video Renderer (Uncompressed)", MERIT64_ABOVE_DSHOW+2);
-			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_NULL);
-			m_transform.AddTail(pFGF);
-			break;
+	if (!m_IsPreview) {
+		switch (s.iDSVideoRendererType) {
+			case VIDRNDT_DS_OLDRENDERER:
+				m_transform.AddTail(DNew CFGFilterRegistry(CLSID_VideoRenderer, m_vrmerit));
+				break;
+			case VIDRNDT_DS_OVERLAYMIXER:
+				m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_OverlayMixer, L"Overlay Mixer", m_vrmerit));
+				break;
+			case VIDRNDT_DS_VMR7WINDOWED:
+				m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer, L"Video Mixing Renderer 7", m_vrmerit));
+				break;
+			case VIDRNDT_DS_VMR9WINDOWED:
+				m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer9, L"Video Mixing Renderer 9", m_vrmerit));
+				break;
+			case VIDRNDT_DS_VMR7RENDERLESS:
+				m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VMR7AllocatorPresenter, L"Video Mixing Renderer 7 (Renderless)", m_vrmerit));
+				break;
+			case VIDRNDT_DS_VMR9RENDERLESS:
+				m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VMR9AllocatorPresenter, L"Video Mixing Renderer 9 (Renderless)", m_vrmerit));
+				break;
+			case VIDRNDT_DS_EVR:
+				m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EnhancedVideoRenderer, L"Enhanced Video Renderer", m_vrmerit));
+				break;
+			case VIDRNDT_DS_EVR_CUSTOM:
+				m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EVRAllocatorPresenter, L"Enhanced Video Renderer (custom presenter)", m_vrmerit));
+				break;
+			case VIDRNDT_DS_DXR:
+				m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_DXRAllocatorPresenter, L"Haali's Video Renderer", m_vrmerit));
+				break;
+			case VIDRNDT_DS_MADVR:
+				m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_madVRAllocatorPresenter, L"madVR Renderer", m_vrmerit));
+				break;
+			case VIDRNDT_DS_SYNC:
+				m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_SyncAllocatorPresenter, L"EVR Sync", m_vrmerit));
+				break;
+			case VIDRNDT_DS_NULL_COMP:
+				pFGF = DNew CFGFilterInternal<CNullVideoRenderer>(L"Null Video Renderer (Any)", MERIT64_ABOVE_DSHOW+2);
+				pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_NULL);
+				m_transform.AddTail(pFGF);
+				break;
+			case VIDRNDT_DS_NULL_UNCOMP:
+				pFGF = DNew CFGFilterInternal<CNullUVideoRenderer>(L"Null Video Renderer (Uncompressed)", MERIT64_ABOVE_DSHOW+2);
+				pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_NULL);
+				m_transform.AddTail(pFGF);
+				break;
+		}
+	} else {
+		m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer, L"Video Mixing Renderer 7", MERIT64_ABOVE_DSHOW+2));
+		//m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EnhancedVideoRenderer, L"Enhanced Video Renderer", MERIT64_ABOVE_DSHOW+2));
 	}
 
-	CString SelAudioRenderer = s.SelectedAudioRenderer();
-	if (SelAudioRenderer == AUDRNDT_NULL_COMP) {
-		pFGF = DNew CFGFilterInternal<CNullAudioRenderer>(AUDRNDT_NULL_COMP, MERIT64_ABOVE_DSHOW+2);
-		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
-		m_transform.AddTail(pFGF);
-	} else if (SelAudioRenderer == AUDRNDT_NULL_UNCOMP) {
-		pFGF = DNew CFGFilterInternal<CNullUAudioRenderer>(AUDRNDT_NULL_UNCOMP, MERIT64_ABOVE_DSHOW+2);
-		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
-		m_transform.AddTail(pFGF);
-	} else if (SelAudioRenderer == AUDRNDT_MPC) {
-		pFGF = DNew CFGFilterInternal<CMpcAudioRenderer>(AUDRNDT_MPC, MERIT64_ABOVE_DSHOW+2);
-		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
-		m_transform.AddTail(pFGF);
-	} else if (SelAudioRenderer!="") {
-		pFGF = DNew CFGFilterRegistry(SelAudioRenderer, m_armerit);
-		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
-		m_transform.AddTail(pFGF);
+	if (!m_IsPreview) {
+		CString SelAudioRenderer = s.SelectedAudioRenderer();
+		if (SelAudioRenderer == AUDRNDT_NULL_COMP) {
+			pFGF = DNew CFGFilterInternal<CNullAudioRenderer>(AUDRNDT_NULL_COMP, MERIT64_ABOVE_DSHOW+2);
+			pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
+			m_transform.AddTail(pFGF);
+		} else if (SelAudioRenderer == AUDRNDT_NULL_UNCOMP) {
+			pFGF = DNew CFGFilterInternal<CNullUAudioRenderer>(AUDRNDT_NULL_UNCOMP, MERIT64_ABOVE_DSHOW+2);
+			pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
+			m_transform.AddTail(pFGF);
+		} else if (SelAudioRenderer == AUDRNDT_MPC) {
+			pFGF = DNew CFGFilterInternal<CMpcAudioRenderer>(AUDRNDT_MPC, MERIT64_ABOVE_DSHOW+2);
+			pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
+			m_transform.AddTail(pFGF);
+		} else if (SelAudioRenderer!="") {
+			pFGF = DNew CFGFilterRegistry(SelAudioRenderer, m_armerit);
+			pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
+			m_transform.AddTail(pFGF);
+		}
 	}
 }
 

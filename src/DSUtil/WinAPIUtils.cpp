@@ -95,6 +95,27 @@ BOOL IsWinEight()
 	return VerifyVersionInfo(&osvi, VER_MAJORVERSION|VER_MINORVERSION, dwlConditionMask);
 }
 
+BOOL IsCompositionEnabled()
+{
+	// check Composition is Enabled
+	BOOL bCompositionEnabled = false;
+
+	if (IsWinVistaOrLater()) {
+		HRESULT (__stdcall * pDwmIsCompositionEnabled)(__out BOOL* pfEnabled);
+		pDwmIsCompositionEnabled = NULL;
+		HMODULE hDWMAPI = LoadLibrary(L"dwmapi.dll");
+		if (hDWMAPI) {
+			(FARPROC &)pDwmIsCompositionEnabled = GetProcAddress(hDWMAPI, "DwmIsCompositionEnabled");
+			if (pDwmIsCompositionEnabled) {
+				pDwmIsCompositionEnabled(&bCompositionEnabled);
+			}
+			FreeLibrary(hDWMAPI);
+		}
+	}
+
+	return bCompositionEnabled;
+}
+
 bool SetPrivilege(LPCTSTR privilege, bool bEnable)
 {
 	HANDLE hToken;

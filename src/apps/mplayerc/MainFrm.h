@@ -197,6 +197,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	CComPtr<IGraphBuilder2> pGB;
 	CComQIPtr<IMediaControl> pMC;
 	CComQIPtr<IMediaEventEx> pME;
+
 	CComQIPtr<IVideoWindow> pVW;
 	CComQIPtr<IBasicVideo> pBV;
 	CComQIPtr<IBasicAudio> pBA;
@@ -208,6 +209,16 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 
 	CComQIPtr<IDvdControl2> pDVDC;
 	CComQIPtr<IDvdInfo2> pDVDI;
+
+	// SmarkSeek
+	CComPtr<IGraphBuilder2> pGB2;
+	CComQIPtr<IMediaControl> pMC2;
+	CComQIPtr<IMediaEventEx> pME2;
+	CComQIPtr<IMediaSeeking> pMS2;
+	CComQIPtr<IVideoWindow> pVW2;
+	CComQIPtr<IBasicVideo> pBV2;
+	CComQIPtr<IVideoFrameStep> pFS2;
+	//
 
 	CComPtr<ICaptureGraphBuilder2> pCGB;
 	CStringW m_VidDispName, m_AudDispName;
@@ -937,6 +948,8 @@ public:
 	afx_msg void OnRecentFile(UINT nID);
 	afx_msg void OnUpdateRecentFile(CCmdUI* pCmdUI);
 
+	afx_msg HRESULT PreviewWindowHide();
+	afx_msg HRESULT PreviewWindowShow(REFERENCE_TIME rtCur2);
 
 	afx_msg void OnHelpHomepage();
 	static UINT CheckForUpdate(LPVOID pParam);
@@ -954,11 +967,20 @@ public:
 
 	// ==== Added by CASIMIR666
 	CWnd*			m_pVideoWnd;			// Current Video (main display screen or 2nd)
+
+	// SmartSeek
+	CChildView		m_wndView2;
+	CWnd*			m_pVideoWnd2;
+	bool			b_UserSmarkSeek;
+	//
+
 	SIZE			m_fullWndSize;
 	CFullscreenWnd*	m_pFullscreenWnd;
 	CComPtr<IVMRMixerControl9>		m_pMC;
 	CComPtr<IMFVideoDisplayControl>	m_pMFVDC;
 	CComPtr<IMFVideoProcessor>		m_pMFVP;
+	CComPtr<IMFVideoDisplayControl>	m_pMFVDC2;
+	CComPtr<IMFVideoProcessor>		m_pMFVP2;
 	CComPtr<IAMLine21Decoder_2>		m_pLN21;
 	CVMROSD		m_OSD;
 	bool		m_OpenFile;

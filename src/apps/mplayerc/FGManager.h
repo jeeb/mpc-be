@@ -61,6 +61,8 @@ private:
 	CStreamPath m_streampath;
 	CAutoPtrArray<CStreamDeadEnd> m_deadends;
 
+	bool m_IsPreview;
+
 protected:
 	CComPtr<IFilterMapper2> m_pFM;
 	CInterfaceList<IUnknown, &IID_IUnknown> m_pUnks;
@@ -117,7 +119,7 @@ protected:
 	STDMETHODIMP GetDeadEnd(int iIndex, CAtlList<CStringW>& path, CAtlList<CMediaType>& mts);
 
 public:
-	CFGManager(LPCTSTR pName, LPUNKNOWN pUnk);
+	CFGManager(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview = false);
 	virtual ~CFGManager();
 
 	DECLARE_IUNKNOWN;
@@ -132,7 +134,7 @@ public:
 	STDMETHODIMP AddFilter(IBaseFilter* pFilter, LPCWSTR pName);
 
 public:
-	CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk);
+	CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview = false);
 };
 
 class CFGManagerPlayer : public CFGManagerCustom
@@ -141,12 +143,14 @@ protected:
 	HWND m_hWnd;
 	UINT64 m_vrmerit, m_armerit;
 
+	bool m_IsPreview;
+
 	// IFilterGraph
 
 	STDMETHODIMP ConnectDirect(IPin* pPinOut, IPin* pPinIn, const AM_MEDIA_TYPE* pmt);
 
 public:
-	CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd);
+	CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview = false);
 };
 
 class CFGManagerDVD : public CFGManagerPlayer
