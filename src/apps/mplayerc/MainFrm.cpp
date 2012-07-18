@@ -10831,6 +10831,8 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 
 	AppSettings& s = AfxGetAppSettings();
 
+	pGB2 = NULL;
+
 	// CASIMIR666 todo
 	if (s.IsD3DFullscreen() &&
 			((s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS) ||
@@ -10928,7 +10930,6 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 			pGB = DNew CFGManagerPlayer(_T("CFGManagerPlayer"), NULL, m_pVideoWnd->m_hWnd);
 
 			// Graph for preview
-			pGB2 = NULL;
 			if (b_UserSmarkSeek) {
 				pGB2 = DNew CFGManagerPlayer(_T("CFGManagerPlayer"), NULL, m_pVideoWnd2->m_hWnd, true);
 			}
@@ -10947,6 +10948,10 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 		return ResStr(IDS_MAINFRM_80);
 	}
 
+	if (!pGB2) {
+		b_UserSmarkSeek = false;
+	}
+
 	pGB->AddToROT();
 
 	pMC = pGB;
@@ -10957,7 +10962,7 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 	pBA = pGB; // audio
 	pFS = pGB;
 
-	if (b_UserSmarkSeek && pGB2) {
+	if (b_UserSmarkSeek) {
 		pGB2->AddToROT();
 
 		pMC2 = pGB2;
@@ -11012,7 +11017,7 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 
 	HRESULT hr = S_OK;
 
-	if (!b_UserSmarkSeek || !pGB2 || m_fAudioOnly || m_pFullscreenWnd->IsWindow()) {
+	if (!b_UserSmarkSeek || m_fAudioOnly || m_pFullscreenWnd->IsWindow()) {
 		return E_FAIL;
 	}
 
@@ -11070,7 +11075,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			break;
 		}
 
-		if (b_UserSmarkSeek && pGB2) {
+		if (b_UserSmarkSeek) {
 			if (FAILED(pGB2->RenderFile(CStringW(fn), NULL))) {
 				b_UserSmarkSeek = false;
 			}
@@ -12546,7 +12551,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		pGB->FindInterface(__uuidof(IMFVideoDisplayControl),	(void**)&m_pMFVDC,	TRUE);
 		pGB->FindInterface(__uuidof(IMFVideoProcessor),			(void**)&m_pMFVP,	TRUE);
 
-		if (b_UserSmarkSeek && pGB2) {
+		if (b_UserSmarkSeek) {
 			pGB2->FindInterface(__uuidof(IMFVideoDisplayControl),	(void**)&m_pMFVDC2,	TRUE);
 			pGB2->FindInterface(__uuidof(IMFVideoProcessor),		(void**)&m_pMFVP2,	TRUE);
 
@@ -12678,7 +12683,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 	EndWaitCursor();
 
-	if (b_UserSmarkSeek && pGB2) {
+	if (b_UserSmarkSeek) {
 		pMC2->Pause();
 	}
 
