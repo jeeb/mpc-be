@@ -292,6 +292,8 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	m_pFile->Seek(m_DataOffset);
 
+	REFERENCE_TIME AvgTimePerFrame = 0;
+
 	for (int i = 0; ReadTag(t) && (fTypeFlagsVideo || fTypeFlagsAudio); i++) {
 		if (!t.DataSize) continue; // skip empty Tag
 
@@ -424,6 +426,44 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 				int w, h, arx, ary;
 
+				// calculate video fps
+				if (!AvgTimePerFrame) {
+					__int64 pos = m_pFile->GetPos();
+					__int64 sync_pos = m_DataOffset;
+					if (Sync(sync_pos)) {
+						Tag tag;
+						VideoTag vtag;
+						UINT32 first_ts, current_ts;
+						first_ts = current_ts = 0;
+						int frame_cnt = 0;
+
+						while ((frame_cnt < 30) && ReadTag(tag) && !CheckRequest(NULL) && m_pFile->GetRemaining()) {
+							__int64 _next = m_pFile->GetPos() + tag.DataSize;
+
+							if ((tag.DataSize > 0) && (tag.TagType == FLV_VIDEODATA && ReadTag(vtag))) {
+
+								if (tag.TimeStamp != current_ts) {
+									frame_cnt++;
+								}
+
+								current_ts = tag.TimeStamp;
+
+								if (!frame_cnt) {
+									first_ts = current_ts;
+								}
+							}
+							m_pFile->Seek(_next);
+
+						}
+
+						AvgTimePerFrame = 10000 * (current_ts - first_ts)/frame_cnt;
+					}
+
+					m_pFile->Seek(pos);
+				}
+
+				vih->AvgTimePerFrame = AvgTimePerFrame;
+
 				switch (vt.CodecID) {
 					case FLV_VIDEO_H263:   // H.263
 						if (m_pFile->BitRead(17) != 1) {
@@ -511,10 +551,11 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						arx = (int)m_pFile->BitRead(8) * 16;
 
 						if (arx && arx != w || ary && ary != h) {
-							VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2));
+							VIDEOINFOHEADER2* vih2		= (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2));
 							memset(vih2, 0, sizeof(VIDEOINFOHEADER2));
-							vih2->dwPictAspectRatioX = arx;
-							vih2->dwPictAspectRatioY = ary;
+							vih2->dwPictAspectRatioX	= arx;
+							vih2->dwPictAspectRatioY	= ary;
+							vih2->AvgTimePerFrame		= AvgTimePerFrame;
 							bih = &vih2->bmiHeader;
 							mt.formattype = FORMAT_VideoInfo2;
 							vih = (VIDEOINFOHEADER *)vih2;
@@ -547,12 +588,13 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						m_pFile->Seek(headerOffset + 9);
 
-						mt.formattype = FORMAT_MPEG2Video;
-						MPEG2VIDEOINFO* vih = (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + headerSize);
+						mt.formattype		= FORMAT_MPEG2Video;
+						MPEG2VIDEOINFO* vih	= (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + headerSize);
 						memset(vih, 0, mt.FormatLength());
-						vih->hdr.bmiHeader.biSize = sizeof(vih->hdr.bmiHeader);
-						vih->hdr.bmiHeader.biPlanes = 1;
-						vih->hdr.bmiHeader.biBitCount = 24;
+						vih->hdr.bmiHeader.biSize		= sizeof(vih->hdr.bmiHeader);
+						vih->hdr.bmiHeader.biPlanes		= 1;
+						vih->hdr.bmiHeader.biBitCount	= 24;
+						vih->hdr.AvgTimePerFrame		= AvgTimePerFrame;
 						vih->dwFlags = (headerData[4] & 0x03) + 1; // nal length size
 
 						vih->dwProfile = (BYTE)m_pFile->BitRead(8);
@@ -631,6 +673,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								sar.den = 1;
 							}
 						}
+
 						unsigned int mb_Width = (unsigned int)pic_width_in_mbs_minus1 + 1;
 						unsigned int mb_Height = ((unsigned int)pic_height_in_map_units_minus1 + 1) * (2 - frame_mbs_only_flag);
 						BYTE CHROMA444 = (chroma_format_idc == 3);
