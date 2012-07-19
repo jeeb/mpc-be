@@ -24,7 +24,7 @@
 #include "mpciconlib.h"
 #include <afx.h>
 
-int get_icon_index(CString ext)
+extern "C" __declspec(dllexport) int get_icon_index(CString ext)
 {
 	int iconindex = -1;
 
