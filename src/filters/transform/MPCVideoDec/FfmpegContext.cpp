@@ -836,10 +836,10 @@ void FFGetOutputSize(struct AVCodecContext* pAVCtx, AVFrame* pFrame, int* OutWid
 		avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
 
 		if (OutWidth) {
-			*OutWidth	= s->width;
+			*OutWidth	= FFALIGN(s->width, 16);
 		}
 		if (OutHeight) {
-			*OutHeight	= s->height;
+			*OutHeight	= FFALIGN(s->height, 16);
 			if (!s->progressive_sequence) {
 				*OutHeight = int((s->height + 31) / 32 * 2) * 16;
 			}
