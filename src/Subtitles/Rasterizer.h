@@ -62,10 +62,10 @@ protected:
 	BYTE* mpPathTypes;
 	POINT* mpPathPoints;
 	int mPathPoints;
+	bool fSSE2;
 
 private:
 	int mWidth, mHeight;
-	bool fSSE2;
 
 	typedef std::pair<unsigned __int64, unsigned __int64> tSpan;
 	typedef std::vector<tSpan> tSpanBuffer;
