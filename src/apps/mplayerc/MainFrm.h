@@ -972,6 +972,11 @@ public:
 	CChildView		m_wndView2;
 	CWnd*			m_pVideoWnd2;
 	bool			b_UserSmarkSeek;
+
+	// Vortex start
+	int previous_renderer; // MadVR + DVD fix.
+    // Vortex end
+
 	//
 
 	SIZE			m_fullWndSize;

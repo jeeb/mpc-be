@@ -685,7 +685,8 @@ CMainFrame::CMainFrame() :
 	m_LastOpenBDPath(_T("")),
 	m_fClosingState(false),
 	m_OldMessage(_T("")),
-	b_UserSmarkSeek(false)
+	b_UserSmarkSeek(false),
+	previous_renderer(-1)
 {
 	m_Lcd.SetVolumeRange(0, 100);
 	m_LastSaveTime.QuadPart = 0;
@@ -930,6 +931,7 @@ void CMainFrame::OnClose()
 	m_fClosingState = true;
 
 	AppSettings& s = AfxGetAppSettings();
+
 	// Casimir666 : save shaders list
 	{
 		POSITION	pos;
@@ -12477,6 +12479,18 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			BREAK(aborted)
 		}
 
+		// Vortex start
+		if (pDVDData && s.iDSVideoRendererType == VIDRNDT_DS_MADVR)
+		{
+			previous_renderer = s.iDSVideoRendererType;
+
+			if (IsWinVistaOrLater())
+				s.iDSVideoRendererType = VIDRNDT_DS_EVR;
+			else
+				s.iDSVideoRendererType = VIDRNDT_DS_VMR7WINDOWED;
+		}
+		// Vortex end
+
 		err = OpenCreateGraphObject(pOMD);
 		if (!err.IsEmpty()) {
 			break;
@@ -12491,16 +12505,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		if (m_fOpeningAborted) {
 			BREAK(aborted)
 		}
-
-		// Vortex start
-		if (pDVDData && s.iDSVideoRendererType == VIDRNDT_DS_MADVR)
-		{
-			if (IsWinVistaOrLater())
-				s.iDSVideoRendererType = VIDRNDT_DS_EVR;
-			else
-				s.iDSVideoRendererType = VIDRNDT_DS_VMR7WINDOWED;
-		}
-		// Vortex end
 
 		if (pFileData) {
 			err = OpenFile(pFileData);
@@ -15572,7 +15576,7 @@ void CMainFrame::OpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	}
 
 	if (m_iMediaLoadState != MLS_CLOSED) {
-		CloseMedia();
+		CloseMedia();		
 	}
 
 	//m_iMediaLoadState = MLS_LOADING; // HACK: hides the logo
@@ -15670,6 +15674,15 @@ void CMainFrame::CloseMedia()
 	if (m_pFullscreenWnd->IsWindow()) {
 		m_pFullscreenWnd->ShowWindow (SW_HIDE);
 	}
+
+	// Vortex start
+	if (previous_renderer >= 0)
+	{
+		AppSettings& s = AfxGetAppSettings();
+		s.iDSVideoRendererType = previous_renderer;
+		previous_renderer = -1;
+	}
+	// Vortex end
 }
 
 void CMainFrame::StartTunerScan(CAutoPtr<TunerScanData> pTSD)
