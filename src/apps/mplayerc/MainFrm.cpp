@@ -12492,6 +12492,16 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			BREAK(aborted)
 		}
 
+		// Vortex start
+		if (pDVDData && s.iDSVideoRendererType == VIDRNDT_DS_MADVR)
+		{
+			if (IsWinVistaOrLater())
+				s.iDSVideoRendererType = VIDRNDT_DS_EVR;
+			else
+				s.iDSVideoRendererType = VIDRNDT_DS_VMR7WINDOWED;
+		}
+		// Vortex end
+
 		if (pFileData) {
 			err = OpenFile(pFileData);
 			if (!err.IsEmpty()) {
