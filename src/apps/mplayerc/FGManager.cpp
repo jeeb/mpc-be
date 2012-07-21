@@ -1363,7 +1363,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview
 
 	bool *src = s.SrcFilters;
 	bool *tra = s.TraFilters;
-	bool *dxva_filters = !IsPreview ? s.DXVAFilters : NULL;
+	bool *dxva_filters = s.DXVAFilters;
 	bool *ffmpeg_filters = s.FFmpegFilters;
 
 	// Source filters
@@ -1970,7 +1970,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_vp6a);
 	}
 
-	if ((ffmpeg_filters[FFM_H264] || IsPreview) || (!IsPreview && dxva_filters[TRA_DXVA_H264])) {
+	if (IsPreview || ffmpeg_filters[FFM_H264] || dxva_filters[TRA_DXVA_H264]) {
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_H264);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_h264);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_X264);
@@ -1995,7 +1995,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_MPG2);
 	}
 
-	if ((ffmpeg_filters[FFM_VC1] || IsPreview) || (!IsPreview && dxva_filters[TRA_DXVA_VC1])) {
+	if (IsPreview || ffmpeg_filters[FFM_VC1] || dxva_filters[TRA_DXVA_VC1]) {
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_WVC1);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_wvc1);
 	}
@@ -2057,7 +2057,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_wmv2);
 	}
 
-	if ((ffmpeg_filters[FFM_WMV] || IsPreview) || (!IsPreview && dxva_filters[TRA_DXVA_WMV3])) {
+	if (IsPreview || ffmpeg_filters[FFM_WMV] || dxva_filters[TRA_DXVA_WMV3]) {
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_WMV3);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_wmv3);
 	}
