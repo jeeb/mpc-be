@@ -750,7 +750,7 @@ int CPlayerToolBar::getHitButtonIdx(CPoint point)
 BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 {
 	TOOLTIPTEXT* pTTT	= (TOOLTIPTEXT*)pNMHDR;
-	CMainFrame* pFrame	= ((CMainFrame*)GetParentFrame());
+	CMainFrame* pFrame	= (CMainFrame*)GetParentFrame();
 	OAFilterState fs	= pFrame->GetMediaState();
 
 	::SendMessage(pNMHDR->hwndFrom, TTM_SETMAXTIPWIDTH, 0, (LPARAM)(INT)1000);
@@ -785,6 +785,7 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 		m_strTipText = ResStr(IDS_AG_AUDIOLANG) + _T(" | ") + ResStr(IDS_AG_OPTIONS);
 
 	}
+
 	pTTT->lpszText = m_strTipText.GetBuffer();
 
 	*pResult = 0;
@@ -794,7 +795,7 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 
 void CPlayerToolBar::OnRButtonDown(UINT nFlags, CPoint point)
 {
-	CMainFrame* pFrame	= ((CMainFrame*)GetParentFrame());
+	CMainFrame* pFrame	= (CMainFrame*)GetParentFrame();
 	int Idx				= getHitButtonIdx(point);
 	OAFilterState fs	= pFrame->GetMediaState();
 
