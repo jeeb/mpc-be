@@ -43,20 +43,25 @@ protected :
 
 	virtual int		FindOldestFrame();
 private:
-	DXVA_PictureParameters		m_PictureParams;
-	DXVA_QmatrixData			m_QMatrixData;
-	WORD						m_wRefPictureIndex[2];
-	DXVA_SliceInfo				m_SliceInfo[MAX_SLICE];
-	int							m_nSliceCount;
+	DXVA_PictureParameters	m_PictureParams;
+	DXVA_QmatrixData		m_QMatrixData;
+	WORD					m_wRefPictureIndex[2];
+	DXVA_SliceInfo			m_SliceInfo[MAX_SLICE];
+	int						m_nSliceCount;
 
-	int							m_nNextCodecIndex;
+	int						m_nNextCodecIndex;
 
-	REFERENCE_TIME				m_rtLastStart;
+	REFERENCE_TIME			m_rtLastStart;
 
-	int							m_nSurfaceIndex;
-	CComPtr<IMediaSample>		m_pSampleToDeliver;
-	bool						m_bSecondField;
-	REFERENCE_TIME				m_rtStart, m_rtStop;
+	int						m_nSurfaceIndex;
+	CComPtr<IMediaSample>	m_pSampleToDeliver;
+	bool					m_bSecondField;
+	REFERENCE_TIME			m_rtStart, m_rtStop;
+
+	// calculate Average FrameRate
+	REFERENCE_TIME			m_rtAvrTimePerFrame;
+	REFERENCE_TIME			m_rtLastValidStart;
+	unsigned				m_FrameCount;
 
 	// Private functions
 	void					Init();

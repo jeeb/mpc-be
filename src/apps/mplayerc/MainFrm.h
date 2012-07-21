@@ -973,12 +973,6 @@ public:
 	CWnd*			m_pVideoWnd2;
 	bool			b_UserSmartSeek;
 
-	// Vortex start
-	int previous_renderer; // MadVR + DVD fix.
-    // Vortex end
-
-	//
-
 	SIZE			m_fullWndSize;
 	CFullscreenWnd*	m_pFullscreenWnd;
 	CComPtr<IVMRMixerControl9>		m_pMC;
@@ -1044,8 +1038,15 @@ protected:
 	void WTSRegisterSessionNotification();
 	void WTSUnRegisterSessionNotification();
 
+	CString m_OldMessage;
+	void SetStatusMessage(CString m_msg);
+	CString FillMessage();
+
 	DWORD m_nMenuHideTick;
 	UINT m_nSeekDirection;
+
+	int				previous_renderer; // MadVR + DVD fix.
+
 public:
 	afx_msg UINT OnPowerBroadcast(UINT nPowerEvent, UINT nEventData);
 	afx_msg void OnSessionChange(UINT nSessionState, UINT nId);
@@ -1056,10 +1057,4 @@ public:
 	CAtlList<CHdmvClipInfo::PlaylistItem> m_MPLSPlaylist;
 	bool m_bIsBDPlay;
 	bool OpenBD(CString Path);
-
-protected:
-	CString m_OldMessage;
-	void SetStatusMessage(CString m_msg);
-
-	CString FillMessage();
 };

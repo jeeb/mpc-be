@@ -12491,17 +12491,15 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			BREAK(aborted)
 		}
 
-		// Vortex start
-		if (pDVDData && s.iDSVideoRendererType == VIDRNDT_DS_MADVR)
-		{
+		if (pDVDData && s.iDSVideoRendererType == VIDRNDT_DS_MADVR) {
 			previous_renderer = s.iDSVideoRendererType;
 
-			if (IsWinVistaOrLater())
+			if (IsWinVistaOrLater()) {
 				s.iDSVideoRendererType = VIDRNDT_DS_EVR;
-			else
+			} else {
 				s.iDSVideoRendererType = VIDRNDT_DS_VMR7WINDOWED;
+			}
 		}
-		// Vortex end
 
 		err = OpenCreateGraphObject(pOMD);
 		if (!err.IsEmpty()) {
@@ -15687,14 +15685,10 @@ void CMainFrame::CloseMedia()
 		m_pFullscreenWnd->ShowWindow (SW_HIDE);
 	}
 
-	// Vortex start
-	if (previous_renderer >= 0)
-	{
-		AppSettings& s = AfxGetAppSettings();
-		s.iDSVideoRendererType = previous_renderer;
+	if (previous_renderer != -1) {
+		AfxGetAppSettings().iDSVideoRendererType = previous_renderer;
 		previous_renderer = -1;
 	}
-	// Vortex end
 }
 
 void CMainFrame::StartTunerScan(CAutoPtr<TunerScanData> pTSD)

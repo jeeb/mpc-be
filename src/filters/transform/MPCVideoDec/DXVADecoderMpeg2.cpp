@@ -215,6 +215,10 @@ void CDXVADecoderMpeg2::Flush()
 
 	m_rtLastStart		= 0;
 
+	m_FrameCount		= 0;
+	m_rtLastValidStart	= 0;
+	m_rtAvrTimePerFrame	= 0;
+
 	__super::Flush();
 }
 
@@ -240,10 +244,24 @@ int CDXVADecoderMpeg2::FindOldestFrame()
 
 void CDXVADecoderMpeg2::UpdateFrameTime (REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
 {
+	m_FrameCount++;
+	if (rtStart != _I64_MIN) {
+		if (m_FrameCount > 5) { // TODO - possible minimal count of frame without timestamp is different ... i think 5 is optimal
+			m_rtAvrTimePerFrame = abs(rtStart - m_rtLastValidStart)/m_FrameCount;
+		}
+
+		m_rtLastValidStart = rtStart;
+		m_FrameCount = 0;
+	}
+
 	if (m_rtLastStart && (rtStart == _I64_MIN || (rtStart < m_rtLastStart))) {
 		rtStart = m_rtLastStart;
 	}
 
-	rtStop  = rtStart + m_pFilter->GetAvrTimePerFrame() / m_pFilter->GetRate();
+	TRACE_MPEG2 ("UpdateFrameTime() : {AvrTimePerFrame = %10I64d, Calculated AvrTimePerFrame = %10I64d}\n", m_pFilter->GetAvrTimePerFrame(), m_rtAvrTimePerFrame);
+
+	REFERENCE_TIME Duration = m_rtAvrTimePerFrame ? m_rtAvrTimePerFrame : m_pFilter->GetAvrTimePerFrame();
+	rtStop  = rtStart + Duration / m_pFilter->GetRate();
+
 	m_rtLastStart = rtStop;
 }
