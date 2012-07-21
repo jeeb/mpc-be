@@ -358,7 +358,19 @@ bool CPlayerToolBar::IsMuted()
 
 int CPlayerToolBar::GetVolume()
 {
-	int volume = m_volctrl.GetPos();// [0..100]
+	AppSettings& s = AfxGetAppSettings();
+
+	int volume = m_volctrl.GetPos(), size = m_volctrl.GetPageSize();
+
+	if (!s.fMute || s.nVolume >= volume + size || s.nVolume <= volume - size) {
+		if (!IsMuted() && !volume) {
+			OnVolumeMute(0);
+			SendMessage(WM_COMMAND, ID_VOLUME_MUTE);
+		} else if (IsMuted() && volume) {
+			OnVolumeMute(0);
+			SendMessage(WM_COMMAND, ID_VOLUME_MUTE);
+		}
+	}
 
 	if (IsMuted() || volume <= 0) {
 		volume = -10000;
