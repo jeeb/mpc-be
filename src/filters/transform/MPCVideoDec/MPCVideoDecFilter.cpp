@@ -623,9 +623,6 @@ const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesIn[] = {
 
 const int CMPCVideoDecFilter::sudPinTypesInCount = _countof(CMPCVideoDecFilter::sudPinTypesIn);
 
-bool*		CMPCVideoDecFilter::FFmpegFilters = NULL;
-bool*		CMPCVideoDecFilter::DXVAFilters = NULL;
-
 const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesOut[] = {
 	{&MEDIATYPE_Video, &MEDIASUBTYPE_NV12},
 	{&MEDIATYPE_Video, &MEDIASUBTYPE_NV24}
@@ -671,6 +668,9 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	if (!m_pOutput) {
 		*phr = E_OUTOFMEMORY;
 	}
+
+	FFmpegFilters = NULL;
+	DXVAFilters = NULL;
 
 	m_pCpuId				= DNew CCpuId();
 	m_pAVCodec				= NULL;
@@ -944,23 +944,23 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn)
 #ifndef REGISTER_FILTER
 			switch (ffCodecs[i].nFFCodec) {
 				case CODEC_ID_H264 :
-					m_bUseDXVA = DXVAFilters && DXVAFilters[TRA_DXVA_H264];
-					m_bUseFFmpeg = FFmpegFilters && FFmpegFilters[FFM_H264];
+					m_bUseDXVA		= DXVAFilters && DXVAFilters[TRA_DXVA_H264];
+					m_bUseFFmpeg	= FFmpegFilters && FFmpegFilters[FFM_H264];
 					break;
 				case CODEC_ID_VC1 :
-					m_bUseDXVA = DXVAFilters && DXVAFilters[TRA_DXVA_VC1];
-					m_bUseFFmpeg = FFmpegFilters && FFmpegFilters[FFM_VC1];
+					m_bUseDXVA		= DXVAFilters && DXVAFilters[TRA_DXVA_VC1];
+					m_bUseFFmpeg	= FFmpegFilters && FFmpegFilters[FFM_VC1];
 					break;
 				case CODEC_ID_WMV3 :
-					m_bUseDXVA = DXVAFilters && DXVAFilters[TRA_DXVA_WMV3];
-					m_bUseFFmpeg = FFmpegFilters && FFmpegFilters[FFM_WMV];
+					m_bUseDXVA		= DXVAFilters && DXVAFilters[TRA_DXVA_WMV3];
+					m_bUseFFmpeg	= FFmpegFilters && FFmpegFilters[FFM_WMV];
 					break;
 				case CODEC_ID_MPEG2VIDEO :
-					m_bUseDXVA = true;
-					m_bUseFFmpeg = false; // No Mpeg2 software support with ffmpeg!
+					m_bUseDXVA		= true;
+					m_bUseFFmpeg	= false; // No Mpeg2 software support with ffmpeg!
 					break;
 				default :
-					m_bUseDXVA = false;
+					m_bUseDXVA		= false;
 			}
 
 			return ((m_bUseDXVA || m_bUseFFmpeg) ? i : -1);
@@ -1180,6 +1180,7 @@ STDMETHODIMP CMPCVideoDecFilter::NonDelegatingQueryInterface(REFIID riid, void**
 	return
 		QI(IMPCVideoDecFilter)
 		QI(IMPCVideoDecFilter2)
+		QI(IMPCVideoDecFilterCodec)
 		QI(ISpecifyPropertyPages)
 		QI(ISpecifyPropertyPages2)
 		__super::NonDelegatingQueryInterface(riid, ppv);
@@ -3150,4 +3151,19 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetFrameType()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_nFrameType;
+}
+
+// === IMPCVideoDecFilterCodec
+STDMETHODIMP CMPCVideoDecFilter::SetFFMpegCodec(bool* bValue)
+{
+	CAutoLock cAutoLock(&m_csProps);
+	FFmpegFilters = bValue;
+	return S_OK;
+}
+
+STDMETHODIMP CMPCVideoDecFilter::SetDXVACodec(bool* bValue)
+{
+	CAutoLock cAutoLock(&m_csProps);
+	DXVAFilters = bValue;
+	return S_OK;
 }

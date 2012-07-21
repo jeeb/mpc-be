@@ -61,8 +61,6 @@ private:
 	CStreamPath m_streampath;
 	CAutoPtrArray<CStreamDeadEnd> m_deadends;
 
-	bool m_IsPreview;
-
 protected:
 	CComPtr<IFilterMapper2> m_pFM;
 	CInterfaceList<IUnknown, &IID_IUnknown> m_pUnks;
@@ -122,6 +120,8 @@ public:
 	CFGManager(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview = false);
 	virtual ~CFGManager();
 
+	bool m_IsPreview;
+
 	DECLARE_IUNKNOWN;
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 };
@@ -142,8 +142,6 @@ class CFGManagerPlayer : public CFGManagerCustom
 protected:
 	HWND m_hWnd;
 	UINT64 m_vrmerit, m_armerit;
-
-	bool m_IsPreview;
 
 	// IFilterGraph
 

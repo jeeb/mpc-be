@@ -624,7 +624,7 @@ void CPlayerSeekBar::UpdateTooltip(CPoint point)
 		UpdateToolTipText();
 		UpdateToolTipPosition(point);
 
-		m_tooltipTimer = SetTimer(m_tooltipTimer, ((CMainFrame*)GetParentFrame())->b_UserSmarkSeek ? 0 : AUTOPOP_DELAY, NULL);
+		m_tooltipTimer = SetTimer(m_tooltipTimer, ((CMainFrame*)GetParentFrame())->b_UserSmartSeek ? 0 : AUTOPOP_DELAY, NULL);
 	}
 }
 
@@ -715,7 +715,7 @@ void CPlayerSeekBar::OnTimer(UINT_PTR nIDEvent)
 				ScreenToClient(&point);
 
 				if (m_fEnabled && m_start < m_stop && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
-					m_tooltipTimer = SetTimer(m_tooltipTimer, ((CMainFrame*)GetParentFrame())->b_UserSmarkSeek ? 0 : AUTOPOP_DELAY, NULL);
+					m_tooltipTimer = SetTimer(m_tooltipTimer, ((CMainFrame*)GetParentFrame())->b_UserSmartSeek ? 0 : AUTOPOP_DELAY, NULL);
 					m_tooltipPos = CalculatePosition(point);
 					UpdateToolTipText();
 					m_tooltip.SendMessage(TTM_TRACKACTIVATE, TRUE, (LPARAM)&m_ti);
@@ -767,7 +767,7 @@ void CPlayerSeekBar::UpdateToolTipPosition(CPoint& point)
 	m_tooltipLastPos = m_tooltipPos;
 
 	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
-	if (pFrame->b_UserSmarkSeek) {
+	if (pFrame->b_UserSmartSeek) {
 		CPoint p;
 		GetCursorPos(&p);
 		p.x = point.x - 80;
@@ -790,7 +790,7 @@ void CPlayerSeekBar::UpdateToolTipText()
 
 	m_ti.lpszText = (LPTSTR)(LPCTSTR)m_tooltipText;
 	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
-	if (!pFrame->b_UserSmarkSeek) {
+	if (!pFrame->b_UserSmartSeek) {
 		m_tooltip.SendMessage(TTM_SETTOOLINFO, 0, (LPARAM)&m_ti);
 	} else {
 		CString str = m_ti.lpszText;

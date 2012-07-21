@@ -80,6 +80,7 @@ class __declspec(uuid("008BAC12-FBAF-497b-9670-BC6F6FBAE2C4"))
 	, public ISpecifyPropertyPages2
 	, public IMPCVideoDecFilter
 	, public IMPCVideoDecFilter2
+	, public IMPCVideoDecFilterCodec
 {
 protected:
 
@@ -91,6 +92,9 @@ protected:
 
 	CCpuId*									m_pCpuId;
 	CCritSec								m_csProps;
+
+	bool*									FFmpegFilters;
+	bool*									DXVAFilters;
 
 	// === Persistants parameters (registry)
 	int										m_nThreadNumber;
@@ -218,9 +222,6 @@ public:
 	const static AMOVIESETUP_MEDIATYPE		sudPinTypesOut[];
 	const static int						sudPinTypesOutCount;
 
-	static bool*							FFmpegFilters;
-	static bool*							DXVAFilters;
-
 	CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr);
 	virtual ~CMPCVideoDecFilter();
 
@@ -299,6 +300,10 @@ public:
 
 	// === IMPCVideoDecFilter2
 	STDMETHOD_(int, GetFrameType());
+
+	// === IMPCVideoDecFilterCodec
+	STDMETHOD(SetFFMpegCodec(bool* bValue));
+	STDMETHOD(SetDXVACodec(bool* bValue));
 
 	// === DXVA common functions
 	BOOL						IsSupportedDecoderConfig(const D3DFORMAT nD3DFormat, const DXVA2_ConfigPictureDecode& config, bool& bIsPrefered);

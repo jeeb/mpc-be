@@ -971,7 +971,7 @@ public:
 	// SmartSeek
 	CChildView		m_wndView2;
 	CWnd*			m_pVideoWnd2;
-	bool			b_UserSmarkSeek;
+	bool			b_UserSmartSeek;
 
 	// Vortex start
 	int previous_renderer; // MadVR + DVD fix.

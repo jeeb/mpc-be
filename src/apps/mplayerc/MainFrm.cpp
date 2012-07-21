@@ -685,7 +685,7 @@ CMainFrame::CMainFrame() :
 	m_LastOpenBDPath(_T("")),
 	m_fClosingState(false),
 	m_OldMessage(_T("")),
-	b_UserSmarkSeek(false),
+	b_UserSmartSeek(false),
 	previous_renderer(-1)
 {
 	m_Lcd.SetVolumeRange(0, 100);
@@ -707,15 +707,15 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_popup.LoadMenu(IDR_POPUP);
 	m_popupmain.LoadMenu(IDR_POPUPMAIN);
 
-	b_UserSmarkSeek = false;//IsWinVistaOrLater() && IsCompositionEnabled() && !AfxGetAppSettings().fD3DFullscreen; // –аскомментировать чтобы заработало :)
+	//b_UserSmartSeek = IsCompositionEnabled() && !AfxGetAppSettings().fD3DFullscreen; // –аскомментировать чтобы заработало :)
 
-	if (b_UserSmarkSeek) {
+	if (b_UserSmartSeek) {
 		if (!m_wndView2.CreateEx(WS_EX_NOPARENTNOTIFY|WS_EX_TRANSPARENT|WS_EX_WINDOWEDGE|WS_EX_TOPMOST, NULL, NULL, WS_BORDER, CRect(0, 0, 160, 96 + 20), this, 0, NULL)) {
 			TRACE0("Failed to create view window\n");
-			b_UserSmarkSeek = false;
+			b_UserSmartSeek = false;
 		}
 
-		if (b_UserSmarkSeek) {
+		if (b_UserSmartSeek) {
 			// ѕрозрачность окна-превью
 			//SetWindowLong(m_wndView2.m_hWnd, GWL_EXSTYLE, GetWindowLong(m_wndView2.m_hWnd, GWL_EXSTYLE) | WS_EX_LAYERED);
 			//m_wndView2.SetLayeredWindowAttributes(0, 210, LWA_ALPHA); //255 - полностью не прозрачное, 0 - полностью прозрачное
@@ -1365,7 +1365,7 @@ void CMainFrame::OnMove(int x, int y)
 		GetWindowRect(AfxGetAppSettings().rcLastWindowPos);
 	}
 
-	if (b_UserSmarkSeek && m_wndView2.IsWindowVisible()) {
+	if (b_UserSmartSeek && m_wndView2.IsWindowVisible()) {
 		m_wndView2.Invalidate();
 	}
 }
@@ -3577,7 +3577,7 @@ void CMainFrame::OnFilePostClosemedia()
 	}
 	m_wndView.SetVideoRect();
 
-	if (b_UserSmarkSeek) {
+	if (b_UserSmartSeek) {
 		m_wndView2.SetVideoRect();
 	}
 
@@ -10379,7 +10379,7 @@ void CMainFrame::MoveVideoWindow(bool fShowStats)
 
 		m_wndView.SetVideoRect(wr);
 
-		if (b_UserSmarkSeek) {
+		if (b_UserSmartSeek) {
 			m_wndView2.GetClientRect(&wr2);
 			CRect vr2 = CRect(0,0,0,0);
 
@@ -10843,12 +10843,12 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 			 (s.iDSVideoRendererType == VIDRNDT_DS_SYNC))) {
 		CreateFullScreenWindow();
 		m_pVideoWnd		= m_pFullscreenWnd;
-		b_UserSmarkSeek	= false;
+		b_UserSmartSeek	= false;
 	} else {
 		m_pVideoWnd		= &m_wndView;
 
-		b_UserSmarkSeek = b_UserSmarkSeek && !!IsCompositionEnabled();
-		if (b_UserSmarkSeek) {
+		b_UserSmartSeek = b_UserSmartSeek && !!IsCompositionEnabled();
+		if (b_UserSmartSeek) {
 			m_pVideoWnd2 = &m_wndView2; //наше второе окошко
 		}
 	}
@@ -10932,7 +10932,7 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 			pGB = DNew CFGManagerPlayer(_T("CFGManagerPlayer"), NULL, m_pVideoWnd->m_hWnd);
 
 			// Graph for preview
-			if (b_UserSmarkSeek) {
+			if (b_UserSmartSeek) {
 				pGB2 = DNew CFGManagerPlayer(_T("CFGManagerPlayer"), NULL, m_pVideoWnd2->m_hWnd, true);
 			}
 		}
@@ -10951,7 +10951,7 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 	}
 
 	if (!pGB2) {
-		b_UserSmarkSeek = false;
+		b_UserSmartSeek = false;
 	}
 
 	pGB->AddToROT();
@@ -10964,7 +10964,7 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 	pBA = pGB; // audio
 	pFS = pGB;
 
-	if (b_UserSmarkSeek) {
+	if (b_UserSmartSeek) {
 		pGB2->AddToROT();
 
 		pMC2 = pGB2;
@@ -11002,12 +11002,24 @@ HRESULT CMainFrame::PreviewWindowHide()
 {
 	HRESULT hr = S_OK;
 
-	if (!b_UserSmarkSeek) {
+	if (!b_UserSmartSeek) {
 		return E_FAIL;
 	}
 
 	if (m_wndView2.IsWindowVisible()) {
+		// Disable animation
+		ANIMATIONINFO AnimationInfo;
+		AnimationInfo.cbSize = sizeof(ANIMATIONINFO);
+		::SystemParametersInfo(SPI_GETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
+		int m_WindowAnimationType = AnimationInfo.iMinAnimate;
+		AnimationInfo.iMinAnimate = 0;
+		::SystemParametersInfo(SPI_SETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
+
 		m_wndView2.ShowWindow(SW_HIDE);
+
+		// Enable animation
+		AnimationInfo.iMinAnimate = m_WindowAnimationType;
+		::SystemParametersInfo(SPI_SETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
 	}
 
 	return hr;
@@ -11019,7 +11031,7 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 
 	HRESULT hr = S_OK;
 
-	if (!b_UserSmarkSeek || m_fAudioOnly || m_pFullscreenWnd->IsWindow()) {
+	if (!b_UserSmartSeek || m_fAudioOnly || m_pFullscreenWnd->IsWindow()) {
 		return E_FAIL;
 	}
 
@@ -11077,9 +11089,9 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			break;
 		}
 
-		if (b_UserSmarkSeek) {
+		if (b_UserSmartSeek) {
 			if (FAILED(pGB2->RenderFile(CStringW(fn), NULL))) {
-				b_UserSmarkSeek = false;
+				b_UserSmartSeek = false;
 			}
 		}
 		HRESULT hr = pGB->RenderFile(CStringW(fn), NULL);
@@ -11746,7 +11758,7 @@ void CMainFrame::OpenSetupVideo()
 			pWnd->EnableWindow(FALSE);    // little trick to let WM_SETCURSOR thru
 		}
 
-		if (b_UserSmarkSeek) {
+		if (b_UserSmartSeek) {
 			pVW2->put_Owner((OAHWND)m_pVideoWnd2->m_hWnd);
 			pVW2->put_WindowStyle(WS_CHILD|WS_CLIPSIBLINGS|WS_CLIPCHILDREN);
 		}
@@ -12565,7 +12577,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		pGB->FindInterface(__uuidof(IMFVideoDisplayControl),	(void**)&m_pMFVDC,	TRUE);
 		pGB->FindInterface(__uuidof(IMFVideoProcessor),			(void**)&m_pMFVP,	TRUE);
 
-		if (b_UserSmarkSeek) {
+		if (b_UserSmartSeek) {
 			pGB2->FindInterface(__uuidof(IMFVideoDisplayControl),	(void**)&m_pMFVDC2,	TRUE);
 			pGB2->FindInterface(__uuidof(IMFVideoProcessor),		(void**)&m_pMFVP2,	TRUE);
 
@@ -12697,7 +12709,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 	EndWaitCursor();
 
-	if (b_UserSmarkSeek) {
+	if (b_UserSmartSeek) {
 		pMC2->Pause();
 	}
 
