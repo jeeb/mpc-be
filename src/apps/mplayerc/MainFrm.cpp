@@ -11048,7 +11048,7 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 		return hr;
 	}
 
-	hr = pFS2 ? pFS2->Step(2, NULL) : E_FAIL;
+	hr = pFS2 ? pFS2->Step(1, NULL) : E_FAIL;
 	if (SUCCEEDED(hr)) {
 		Sleep(10);
 	}
