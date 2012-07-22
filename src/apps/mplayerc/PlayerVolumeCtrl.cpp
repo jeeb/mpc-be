@@ -24,6 +24,7 @@
 #include "stdafx.h"
 #include "mplayerc.h"
 #include "PlayerVolumeCtrl.h"
+#include "MainFrm.h"
 
 
 // CVolumeCtrl
@@ -99,8 +100,6 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 	LRESULT lr = CDRF_DODEFAULT;
 	AppSettings& s = AfxGetAppSettings();
 
-	int R, G, B, R2, G2, B2;
-
 	GRADIENT_RECT gr[1] = {{0, 1}};
 
 	if (m_fSelfDrawn) {
@@ -113,27 +112,10 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 								|| iThemeGreen != s.nThemeGreen
 								|| iThemeBlue != s.nThemeBlue)) {
 					CDC dc;
-					dc.Attach(pNMCD->hdc);
+					dc.Attach(::GetDC(((CMainFrame*)AfxGetMainWnd())->m_hWnd_toolbar));
 					CRect r;
 					GetClientRect(&r);
 					CDC memdc;
-
-					int height = 28;
-
-					int fp = m_logobm.FileExists("background");
-
-					if (NULL != fp) {
-						ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);
-						m_logobm.LoadExternalGradient("background", &dc, r, 22, s.nThemeBrightness, R, G, B);
-					} else {
-						ThemeRGB(50, 55, 60, R, G, B);
-						ThemeRGB(20, 25, 30, R2, G2, B2);
-						TRIVERTEX tv[2] = {
-							{r.left, r.top, R*256, G*256, B*256, 255*256},
-							{r.Width(), height, R2*256, G2*256, B2*256, 255*256},
-						};
-						dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
-					}
 
 					memdc.CreateCompatibleDC(&dc);
 
@@ -141,14 +123,14 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						m_bmUnderCtrl.DeleteObject();
 					}
 
-					m_bmUnderCtrl.CreateCompatibleBitmap(&dc, r.Width(), height);
+					m_bmUnderCtrl.CreateCompatibleBitmap(&dc, r.Width(), r.Height());
 					CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
 
 					if (iDisableXPToolbars == 1) {
 						iDisableXPToolbars = 2;
 					}
 
-					memdc.BitBlt(r.left, r.top, r.Width(), height, &dc, r.left, r.top, SRCCOPY);
+					memdc.StretchBlt(r.left, r.top, r.Width(), r.Height(), &dc, r.left, r.top, 1, r.Height(), SRCCOPY);
 
 					dc.Detach();
 					DeleteObject(memdc.SelectObject(bmOld));
