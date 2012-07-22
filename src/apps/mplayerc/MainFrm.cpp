@@ -11089,14 +11089,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			break;
 		}
 
-		if (b_UserSmartSeek) {
-			if (FAILED(pGB2->RenderFile(CStringW(fn), NULL))) {
-				b_UserSmartSeek = false;
-			}
-		}
 		HRESULT hr = pGB->RenderFile(CStringW(fn), NULL);
 		
-
 		if (s.fKeepHistory && s.fRememberFilePos && !s.NewFile(fn)) {
 			REFERENCE_TIME	rtPos = s.CurrentFilePosition()->llPosition;
 			if (pMS) {
@@ -11155,6 +11149,12 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				}
 
 				return err;
+			}
+		}
+
+		if (b_UserSmartSeek) {
+			if (FAILED(pGB2->RenderFile(CStringW(fn), NULL))) {
+				b_UserSmartSeek = false;
 			}
 		}
 
