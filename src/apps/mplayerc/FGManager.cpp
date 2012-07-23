@@ -615,6 +615,11 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 				pmt->majortype == MEDIASUBTYPE_DVD_SUBPICTURE) {
 					return S_FALSE;
 			}
+
+			// DVD
+			if (pmt->majortype == MEDIATYPE_DVD_ENCRYPTED_PACK && pmt->subtype != MEDIASUBTYPE_MPEG2_VIDEO) {
+				return S_FALSE;
+			}
 		}
 		EndEnumMediaTypes(pmt)
 	}

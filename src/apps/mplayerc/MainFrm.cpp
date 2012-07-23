@@ -2510,8 +2510,9 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 								// Set command line position
 								hr = pDVDC->PlayTitle(s.lDVDTitle, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 
-								if (b_UserSmartSeek)
+								if (b_UserSmartSeek) {
 									pDVDC2->PlayTitle(s.lDVDTitle, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+								}
 
 								if ( s.fShowDebugInfo ) {
 									m_OSD.DebugMessage(_T("PlayTitle: 0x%08X"), hr);
@@ -2521,8 +2522,9 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 								if (s.lDVDChapter > 1) {
 									hr = pDVDC->PlayChapterInTitle(s.lDVDTitle, s.lDVDChapter, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 
-									if (b_UserSmartSeek)
+									if (b_UserSmartSeek) {
 										pDVDC2->PlayChapterInTitle(s.lDVDTitle, s.lDVDChapter, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+									}
 
 									if ( s.fShowDebugInfo ) {
 										m_OSD.DebugMessage(_T("PlayChapterInTitle: 0x%08X"), hr);
@@ -2531,8 +2533,9 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 									// Trick: skip trailers with some DVDs
 									hr = pDVDC->Resume(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 
-									if (b_UserSmartSeek)
+									if (b_UserSmartSeek) {
 										pDVDC2->Resume(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+									}
 
 									if ( s.fShowDebugInfo ) {
 										m_OSD.DebugMessage(_T("Resume: 0x%08X"), hr);
@@ -2545,9 +2548,10 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 										hr = pDVDC->PlayAtTime(&s.DVDPosition,
 															   DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 
-										if (b_UserSmartSeek)
+										if (b_UserSmartSeek) {
 											pDVDC2->PlayAtTime(&s.DVDPosition,
 															   DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+										}
 
 										if ( s.fShowDebugInfo ) {
 											m_OSD.DebugMessage(_T("PlayAtTime: 0x%08X"), hr);
@@ -2562,9 +2566,10 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 										hr = pDVDC->PlayChapterInTitle(s.lDVDTitle, 1,
 																	   DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 
-										if (b_UserSmartSeek)
+										if (b_UserSmartSeek) {
 											pDVDC2->PlayChapterInTitle(s.lDVDTitle, 1,
 											                           DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+										}
 
 										if ( s.fShowDebugInfo ) {
 											m_OSD.DebugMessage(_T("PlayChapterInTitle: 0x%08X"), hr);
@@ -2574,9 +2579,10 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 										hr = pDVDC->PlayAtTime(&s.DVDPosition,
 															   DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 
-										if (b_UserSmartSeek)
+										if (b_UserSmartSeek) {
 											pDVDC2->PlayAtTime(&s.DVDPosition,
 											                   DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+										}
 
 										if ( s.fShowDebugInfo ) {
 											m_OSD.DebugMessage(_T("PlayAtTime: 0x%08X"), hr);
@@ -2599,9 +2605,10 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 									hr = pDVDC->PlayAtTime(&s.DVDPosition,
 														   DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 
-									if (b_UserSmartSeek)
+									if (b_UserSmartSeek) {
 										pDVDC2->PlayAtTime(&s.DVDPosition,
 										                  DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+									}
 
 									if ( s.fShowDebugInfo ) {
 										m_OSD.DebugMessage(_T("PlayAtTime: %d"), hr);
@@ -7241,11 +7248,11 @@ void CMainFrame::OnPlayPlay()
 			pDVDC->Pause(FALSE);
 			pMC->Run();
 
-			if (b_UserSmartSeek && pDVDC2)
-			{
+			if (b_UserSmartSeek && pDVDC2) {
 				pDVDC2->PlayForwards(dRate, DVD_CMD_FLAG_Block, NULL);
 				pDVDC2->Pause(FALSE);
 				pMC2->Run();
+				pMC2->Pause();
 			}
 		} else if (GetPlaybackMode() == PM_CAPTURE) {
 			pMC->Stop(); // audio preview won't be in sync if we run it from paused state
@@ -8675,8 +8682,7 @@ void CMainFrame::OnNavigateSkip(UINT nID)
 				pDVDI->GetNumberOfChapters(Location.TitleNum-1, &ulNumOfChapters);
 				pDVDC->PlayChapterInTitle(Location.TitleNum-1, ulNumOfChapters, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 
-				if (b_UserSmartSeek && pDVDC2)
-				{
+				if (b_UserSmartSeek && pDVDC2) {
 					pDVDC2->PlayChapterInTitle(Location.TitleNum-1, ulNumOfChapters, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 				}
 			} else {
@@ -11164,6 +11170,8 @@ HRESULT CMainFrame::PreviewWindowHide()
 		// Enable animation
 		AnimationInfo.iMinAnimate = m_WindowAnimationType;
 		::SystemParametersInfo(SPI_SETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
+
+		pMC2->Pause();
 	}
 
 	return hr;
@@ -11186,52 +11194,62 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 		}
 	}
 
-	if (GetPlaybackMode() == PM_DVD && pDVDC2)
-	{
-		DVD_PLAYBACK_LOCATION2 Loc;
-		REFERENCE_TIME Stop = 0;
-		REFERENCE_TIME To = 0;
+	if (GetPlaybackMode() == PM_DVD && pDVDC2) {
+		DVD_PLAYBACK_LOCATION2 Loc, Loc2;
 		double fps = 0;
 
-		if (pDVDI->GetCurrentLocation(&Loc) == S_OK)
-		{
-			fps = Loc.TimeCodeFlags == DVD_TC_FLAG_25fps ? 25.0
-				: Loc.TimeCodeFlags == DVD_TC_FLAG_30fps ? 30.0
-				: Loc.TimeCodeFlags == DVD_TC_FLAG_DropFrame ? 29.97
-				: 25.0;
+		hr = pDVDI->GetCurrentLocation(&Loc);
+		if (FAILED(hr)) {
+			return hr;
 		}
 
-		DVD_HMSF_TIMECODE duration;
+		hr = pDVDI2->GetCurrentLocation(&Loc2);
 
-		hr = pDVDI->GetTotalTitleTime(&duration, NULL);
+		fps = Loc.TimeCodeFlags == DVD_TC_FLAG_25fps ? 25.0
+			: Loc.TimeCodeFlags == DVD_TC_FLAG_30fps ? 30.0
+			: Loc.TimeCodeFlags == DVD_TC_FLAG_DropFrame ? 29.97
+			: 25.0;
 
-		if (SUCCEEDED(hr))
-		{
-			Stop = HMSF2RT(duration, fps);
+		DVD_HMSF_TIMECODE dvdTo = RT2HMSF(rtCur2, fps);
+
+		if (FAILED(hr) || Loc.TitleNum != Loc2.TitleNum) {
+			hr = pDVDC2->PlayTitle(Loc.TitleNum, DVD_CMD_FLAG_Flush, NULL);
+			if (FAILED(hr)) {
+				return hr;
+			}
+			
+			pDVDC2->Resume(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+
+			hr = pDVDC2->PlayAtTimeInTitle(Loc.TitleNum, &dvdTo, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+			if (FAILED(hr)) {
+				return hr;
+			}
+
+			Sleep(50);
+		} else {
+			hr = pDVDC2->PlayAtTime(&dvdTo, DVD_CMD_FLAG_Flush, NULL);
+			if (FAILED(hr)) {
+				return hr;
+			}
 		}
 
-		To = rtCur2;
-
-		DVD_HMSF_TIMECODE dvdTo = RT2HMSF(To, fps);
-
-		pDVDC2->PlayTitle(Loc.TitleNum, DVD_CMD_FLAG_Flush, NULL);
-		pDVDC2->Resume(DVD_CMD_FLAG_Flush, NULL);
-
-		hr = pDVDC2->PlayAtTime(&dvdTo, DVD_CMD_FLAG_Flush, NULL);
-		//hr = pDVDC2->PlayAtTimeInTitle(Loc.TitleNum, &dvdTo, DVD_CMD_FLAG_Flush, NULL);
-	}
-	else if (GetPlaybackMode() == PM_FILE)
-	{
+		pDVDC2->Pause(FALSE);
+		pMC2->Run();
+		//Sleep(100);
+		//pMC2->Pause();
+	} else if (GetPlaybackMode() == PM_FILE) {
 		hr = pMS2->SetPositions(&rtCur2, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
 	}
-	
+
 	if (FAILED(hr)) {
 		return hr;
 	}
 
-	hr = pFS2 ? pFS2->Step(1, NULL) : E_FAIL;
-	if (SUCCEEDED(hr)) {
-		Sleep(10);
+	if (GetPlaybackMode() == PM_FILE) {
+		hr = pFS2 ? pFS2->Step(1, NULL) : E_FAIL;
+		if (SUCCEEDED(hr)) {
+			Sleep(10);
+		}
 	}
 
 	if (!m_wndView2.IsWindowVisible()) {
@@ -13046,8 +13064,10 @@ void CMainFrame::CloseMediaPrivate()
 		pBV2.Release();
 		pFS2.Release();
 
-		if (pDVDC2)
+		if (pDVDC2) {
 			pDVDC2.Release();
+			pDVDI2.Release();
+		}
 
 		pGB2->RemoveFromROT();
 		pGB2.Release();
@@ -15248,15 +15268,14 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool fSeekToKeyFrame)
 
 		hr = pMS->SetPositions(&rtPos, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
 	} else if (GetPlaybackMode() == PM_DVD && m_iDVDDomain == DVD_DOMAIN_Title) {
-		if (fs != State_Running) {
-			SendMessage(WM_COMMAND, ID_PLAY_PLAY);
-		}
-
 		DVD_HMSF_TIMECODE tc = RT2HMSF(rtPos);
 		pDVDC->PlayAtTime(&tc, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 
-		if (b_UserSmartSeek && pDVDC2)
-			pDVDC2->PlayAtTime(&tc, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+		if (fs == State_Paused) {
+			SendMessage(WM_COMMAND, ID_PLAY_PLAY);
+			Sleep(100);
+			SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
+		}
 	} else if (GetPlaybackMode() == PM_CAPTURE) {
 		TRACE(_T("Warning (CMainFrame::SeekTo): Trying to seek in capture mode"));
 	}
