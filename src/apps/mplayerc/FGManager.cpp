@@ -2757,8 +2757,8 @@ STDMETHODIMP CFGManagerPlayer::ConnectDirect(IPin* pPinOut, IPin* pPinIn, const 
 // CFGManagerDVD
 //
 
-CFGManagerDVD::CFGManagerDVD(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd)
-	: CFGManagerPlayer(pName, pUnk, hWnd)
+CFGManagerDVD::CFGManagerDVD(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview)
+	: CFGManagerPlayer(pName, pUnk, hWnd, IsPreview)
 {
 	AppSettings& s = AfxGetAppSettings();
 

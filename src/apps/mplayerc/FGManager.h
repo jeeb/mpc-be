@@ -160,7 +160,7 @@ protected:
 	STDMETHODIMP AddSourceFilter(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrFilterName, IBaseFilter** ppFilter);
 
 public:
-	CFGManagerDVD(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd);
+	CFGManagerDVD(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview = false);
 };
 
 class CFGManagerCapture : public CFGManagerPlayer
