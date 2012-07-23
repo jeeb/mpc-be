@@ -2510,10 +2510,6 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 								// Set command line position
 								hr = pDVDC->PlayTitle(s.lDVDTitle, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 
-								if (b_UserSmartSeek) {
-									pDVDC2->PlayTitle(s.lDVDTitle, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-								}
-
 								if ( s.fShowDebugInfo ) {
 									m_OSD.DebugMessage(_T("PlayTitle: 0x%08X"), hr);
 									m_OSD.DebugMessage(_T("DVD Chapter: %d"), s.lDVDChapter);
@@ -2522,20 +2518,12 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 								if (s.lDVDChapter > 1) {
 									hr = pDVDC->PlayChapterInTitle(s.lDVDTitle, s.lDVDChapter, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 
-									if (b_UserSmartSeek) {
-										pDVDC2->PlayChapterInTitle(s.lDVDTitle, s.lDVDChapter, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-									}
-
 									if ( s.fShowDebugInfo ) {
 										m_OSD.DebugMessage(_T("PlayChapterInTitle: 0x%08X"), hr);
 									}
 								} else {
 									// Trick: skip trailers with some DVDs
 									hr = pDVDC->Resume(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-
-									if (b_UserSmartSeek) {
-										pDVDC2->Resume(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-									}
 
 									if ( s.fShowDebugInfo ) {
 										m_OSD.DebugMessage(_T("Resume: 0x%08X"), hr);
@@ -2547,11 +2535,6 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 										// This might fail if the Title is not available yet?
 										hr = pDVDC->PlayAtTime(&s.DVDPosition,
 															   DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-
-										if (b_UserSmartSeek) {
-											pDVDC2->PlayAtTime(&s.DVDPosition,
-															   DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-										}
 
 										if ( s.fShowDebugInfo ) {
 											m_OSD.DebugMessage(_T("PlayAtTime: 0x%08X"), hr);
@@ -2566,11 +2549,6 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 										hr = pDVDC->PlayChapterInTitle(s.lDVDTitle, 1,
 																	   DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 
-										if (b_UserSmartSeek) {
-											pDVDC2->PlayChapterInTitle(s.lDVDTitle, 1,
-											                           DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-										}
-
 										if ( s.fShowDebugInfo ) {
 											m_OSD.DebugMessage(_T("PlayChapterInTitle: 0x%08X"), hr);
 										}
@@ -2578,11 +2556,6 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 										// This might fail if the Title is not available yet?
 										hr = pDVDC->PlayAtTime(&s.DVDPosition,
 															   DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-
-										if (b_UserSmartSeek) {
-											pDVDC2->PlayAtTime(&s.DVDPosition,
-											                   DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-										}
 
 										if ( s.fShowDebugInfo ) {
 											m_OSD.DebugMessage(_T("PlayAtTime: 0x%08X"), hr);
@@ -2592,10 +2565,6 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 											hr = pDVDC->PlayAtTimeInTitle(s.lDVDTitle, &s.DVDPosition,
 																		  DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 
-											if (b_UserSmartSeek)
-												pDVDC2->PlayAtTimeInTitle(s.lDVDTitle, &s.DVDPosition,
-												                         DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-
 											if ( s.fShowDebugInfo ) {
 												m_OSD.DebugMessage(_T("PlayAtTimeInTitle: 0x%08X"), hr);
 											}
@@ -2604,11 +2573,6 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 
 									hr = pDVDC->PlayAtTime(&s.DVDPosition,
 														   DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-
-									if (b_UserSmartSeek) {
-										pDVDC2->PlayAtTime(&s.DVDPosition,
-										                  DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-									}
 
 									if ( s.fShowDebugInfo ) {
 										m_OSD.DebugMessage(_T("PlayAtTime: %d"), hr);
@@ -2625,12 +2589,6 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 								pDVDC->PlayTitle(DvdPos->lTitle, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 								pDVDC->Resume(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 
-								if (b_UserSmartSeek)
-								{
-									pDVDC2->PlayTitle(DvdPos->lTitle, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-									pDVDC2->Resume(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-								}
-
 #if 1
 								if (SUCCEEDED (hr = pDVDC->PlayAtTimeInTitle(
 														DvdPos->lTitle, &DvdPos->Timecode,
@@ -2640,11 +2598,6 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 																	   DVD_CMD_FLAG_Flush, NULL)))
 #endif
 								{
-									if (b_UserSmartSeek)
-										pDVDC2->PlayAtTimeInTitle(
-											DvdPos->lTitle, &DvdPos->Timecode,
-											DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-
 									m_iDVDTitle = DvdPos->lTitle;
 								}
 							}
@@ -2884,10 +2837,6 @@ LRESULT CMainFrame::OnResumeFromState(WPARAM wParam, LPARAM lParam)
 		if (pDVDC) {
 			pDVDC->SetState(pDvdState, DVD_CMD_FLAG_Block, NULL);
 		}
-
-		if (b_UserSmartSeek && pDVDC2)
-			pDVDC2->SetState(pDvdState, DVD_CMD_FLAG_Block, NULL);
-
 	} else if (iPlaybackMode == PM_CAPTURE) {
 		// not implemented
 	} else {
@@ -2941,14 +2890,6 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 					|| m_iDVDDomain == DVD_DOMAIN_VideoManagerMenu
 					|| m_iDVDDomain == DVD_DOMAIN_VideoTitleSetMenu) {
 				fClicked = true;
-
-				if (b_UserSmartSeek && pDVDC2)
-				{
-					ULONG curbtn, stub;
-					pDVDI->GetCurrentButton(&stub, &curbtn);
-
-					pDVDC2->SelectAndActivateButton(curbtn);
-				}
 			}
 		}
 
@@ -8681,10 +8622,6 @@ void CMainFrame::OnNavigateSkip(UINT nID)
 			if (Location.ChapterNum == 1 && Location.TitleNum > 1) {
 				pDVDI->GetNumberOfChapters(Location.TitleNum-1, &ulNumOfChapters);
 				pDVDC->PlayChapterInTitle(Location.TitleNum-1, ulNumOfChapters, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-
-				if (b_UserSmartSeek && pDVDC2) {
-					pDVDC2->PlayChapterInTitle(Location.TitleNum-1, ulNumOfChapters, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-				}
 			} else {
 				ULONG tsec = (Location.TimeCode.bHours * 3600)
 							 + (Location.TimeCode.bMinutes * 60)
@@ -8699,30 +8636,12 @@ void CMainFrame::OnNavigateSkip(UINT nID)
 				} else {
 					pDVDC->ReplayChapter(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 				}
-
-				if (b_UserSmartSeek && pDVDC2)
-				{
-					if ( diff <= 7 ) {
-						pDVDC2->PlayPrevChapter(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-					} else {
-						pDVDC2->ReplayChapter(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-					}
-				}
 			}
 		} else if (nID == ID_NAVIGATE_SKIPFORWARD) {
 			if (Location.ChapterNum == ulNumOfChapters && Location.TitleNum < ulNumOfTitles) {
 				pDVDC->PlayChapterInTitle(Location.TitleNum+1, 1, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 			} else {
 				pDVDC->PlayNextChapter(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-			}
-
-			if (b_UserSmartSeek && pDVDC2)
-			{
-				if (Location.ChapterNum == ulNumOfChapters && Location.TitleNum < ulNumOfTitles) {
-					pDVDC2->PlayChapterInTitle(Location.TitleNum+1, 1, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-				} else {
-					pDVDC2->PlayNextChapter(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-				}
 			}
 		}
 
@@ -8848,9 +8767,6 @@ void CMainFrame::OnNavigateMenu(UINT nID)
 	}
 
 	pDVDC->ShowMenu((DVD_MENU_ID)(nID+2), DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-
-	if (b_UserSmartSeek && pDVDC2)
-		pDVDC2->ShowMenu((DVD_MENU_ID)(nID+2), DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 }
 
 void CMainFrame::OnUpdateNavigateMenu(CCmdUI* pCmdUI)
@@ -9076,20 +8992,11 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 		if (nID <= ulNumOfTitles) {
 			pDVDC->PlayTitle(nID, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL); // sometimes this does not do anything ...
 			pDVDC->PlayChapterInTitle(nID, 1, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL); // ... but this does!
-
-			if (b_UserSmartSeek && pDVDC2)
-			{
-				pDVDC2->PlayTitle(nID, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL); // sometimes this does not do anything ...
-				pDVDC2->PlayChapterInTitle(nID, 1, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL); // ... but this does!
-			}
 		} else {
 			nID -= ulNumOfTitles;
 
 			if (nID <= ulNumOfChapters) {
 				pDVDC->PlayChapter(nID, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-
-				if (b_UserSmartSeek && pDVDC2)
-					pDVDC2->PlayChapter(nID, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 			}
 		}
 
@@ -9139,55 +9046,28 @@ void CMainFrame::OnNavigateMenuItem(UINT nID)
 		switch (nID) {
 			case 0:
 				pDVDC->SelectRelativeButton(DVD_Relative_Left);
-
-				if (b_UserSmartSeek && pDVDC2)
-					pDVDC2->SelectRelativeButton(DVD_Relative_Left);
-
 				break;
 			case 1:
 				pDVDC->SelectRelativeButton(DVD_Relative_Right);
-
-				if (b_UserSmartSeek && pDVDC2)
-					pDVDC2->SelectRelativeButton(DVD_Relative_Right);
-
 				break;
 			case 2:
 				pDVDC->SelectRelativeButton(DVD_Relative_Upper);
-
-				if (b_UserSmartSeek && pDVDC2)
-					pDVDC2->SelectRelativeButton(DVD_Relative_Upper);
-
 				break;
 			case 3:
 				pDVDC->SelectRelativeButton(DVD_Relative_Lower);
-
-				if (b_UserSmartSeek && pDVDC2)
-					pDVDC2->SelectRelativeButton(DVD_Relative_Lower);
-
 				break;
 			case 4:
 				if (m_iDVDDomain != DVD_DOMAIN_Title) {	// Casimir666 : for the remote control
 					pDVDC->ActivateButton();
-
-					if (b_UserSmartSeek && pDVDC2)
-						pDVDC2->ActivateButton();
 				} else {
 					OnPlayPlay();
 				}
 				break;
 			case 5:
 				pDVDC->ReturnFromSubmenu(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-
-				if (b_UserSmartSeek && pDVDC2)
-					pDVDC2->ReturnFromSubmenu(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-
 				break;
 			case 6:
 				pDVDC->Resume(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-
-				if (b_UserSmartSeek && pDVDC2)
-					pDVDC->Resume(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-
 				break;
 			default:
 				break;
@@ -11212,19 +11092,17 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 
 		DVD_HMSF_TIMECODE dvdTo = RT2HMSF(rtCur2, fps);
 
-		if (FAILED(hr) || Loc.TitleNum != Loc2.TitleNum) {
+		if (FAILED(hr) || (Loc.TitleNum != Loc2.TitleNum)) {
 			hr = pDVDC2->PlayTitle(Loc.TitleNum, DVD_CMD_FLAG_Flush, NULL);
 			if (FAILED(hr)) {
 				return hr;
 			}
-			
 			pDVDC2->Resume(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 
 			hr = pDVDC2->PlayAtTimeInTitle(Loc.TitleNum, &dvdTo, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 			if (FAILED(hr)) {
 				return hr;
 			}
-
 			Sleep(50);
 		} else {
 			hr = pDVDC2->PlayAtTime(&dvdTo, DVD_CMD_FLAG_Flush, NULL);
@@ -11612,8 +11490,7 @@ CString CMainFrame::OpenDVD(OpenDVDData* pODD)
 	pDVDC->SetOption(DVD_ResetOnStop, FALSE);
 	pDVDC->SetOption(DVD_HMSF_TimeCodeEvents, TRUE);
 
-	if (b_UserSmartSeek && pDVDC2)
-	{
+	if (b_UserSmartSeek && pDVDC2) {
 		pDVDC2->SetOption(DVD_ResetOnStop, FALSE);
 		pDVDC2->SetOption(DVD_HMSF_TimeCodeEvents, TRUE);
 	}
