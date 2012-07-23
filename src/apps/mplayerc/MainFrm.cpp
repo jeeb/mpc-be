@@ -710,8 +710,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	b_UserSmartSeek = IsCompositionEnabled() && !AfxGetAppSettings().fD3DFullscreen; // Раскомментировать чтобы заработало :)
 
 	if (b_UserSmartSeek) {
-		if (!m_wndView2.CreateEx(WS_EX_NOPARENTNOTIFY|WS_EX_TRANSPARENT|WS_EX_WINDOWEDGE|WS_EX_TOPMOST, NULL, NULL, WS_BORDER, CRect(0, 0, 160, 96 + 20), this, 0, NULL)) {
-			TRACE0("Failed to create view window\n");
+		if (!m_wndView2.CreateEx(WS_EX_NOPARENTNOTIFY|WS_EX_TRANSPARENT|WS_EX_WINDOWEDGE|WS_EX_TOPMOST, 
+								 AfxRegisterWndClass(0), NULL, WS_BORDER, CRect(0, 0, 160, 96 + 20), this, 0, NULL)) {
+			TRACE0("Failed to create Preview Window\n");
 			b_UserSmartSeek = false;
 		}
 
@@ -730,7 +731,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// create a preview-window
 	if (!m_wndView.Create(NULL, NULL, AFX_WS_DEFAULT_VIEW|WS_CLIPCHILDREN|WS_CLIPSIBLINGS,
 						  CRect(0, 0, 0, 0), this, AFX_IDW_PANE_FIRST, NULL)) {
-		TRACE0("Failed to create view window\n");
+		TRACE0("Failed to create Main View Window\n");
 		return -1;
 	}
 
@@ -1181,7 +1182,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 
 	cs.dwExStyle &= ~WS_EX_CLIENTEDGE;
 
-	cs.lpszClass = MPC_WND_CLASS_NAME; //AfxRegisterWndClass(0);
+	cs.lpszClass = MPC_WND_CLASS_NAME;
 
 	return TRUE;
 }
