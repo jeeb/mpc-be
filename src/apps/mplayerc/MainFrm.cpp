@@ -707,7 +707,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_popup.LoadMenu(IDR_POPUP);
 	m_popupmain.LoadMenu(IDR_POPUPMAIN);
 
-	//b_UserSmartSeek = IsCompositionEnabled() && !AfxGetAppSettings().fD3DFullscreen; // Раскомментировать чтобы заработало :)
+	b_UserSmartSeek = false;//IsCompositionEnabled() && !AfxGetAppSettings().fD3DFullscreen; // Раскомментировать чтобы заработало :)
 
 	if (b_UserSmartSeek) {
 		if (!m_wndView2.CreateEx(WS_EX_NOPARENTNOTIFY|WS_EX_TRANSPARENT|WS_EX_WINDOWEDGE|WS_EX_TOPMOST, NULL, NULL, WS_BORDER, CRect(0, 0, 160, 96 + 20), this, 0, NULL)) {
@@ -10287,6 +10287,7 @@ void CMainFrame::MoveVideoWindow(bool fShowStats)
 {
 	if (m_iMediaLoadState == MLS_LOADED && !m_fAudioOnly && IsWindowVisible()) {
 		CRect wr, wr2;
+
 		if (m_pFullscreenWnd->IsWindow()) {
 			m_pFullscreenWnd->GetClientRect(&wr);
 		} else if (!m_fFullScreen) {
@@ -10379,7 +10380,7 @@ void CMainFrame::MoveVideoWindow(bool fShowStats)
 
 		m_wndView.SetVideoRect(wr);
 
-		if (b_UserSmartSeek) {
+		if (b_UserSmartSeek && m_wndView2) {
 			m_wndView2.GetClientRect(&wr2);
 			CRect vr2 = CRect(0,0,0,0);
 
@@ -10846,8 +10847,8 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 		b_UserSmartSeek	= false;
 	} else {
 		m_pVideoWnd		= &m_wndView;
-
 		b_UserSmartSeek = b_UserSmartSeek && !!IsCompositionEnabled();
+
 		if (b_UserSmartSeek) {
 			m_pVideoWnd2 = &m_wndView2; //наше второе окошко
 		}
