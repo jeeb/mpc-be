@@ -2,7 +2,7 @@
 #define _RMAVSRC_H
 /****************************************************************************
  * 
- *  $Id: rmavsrc.h 7 2003-05-30 02:18:02Z gabest $
+ *  $Id$
  *
  *  Copyright (C) 1999 RealNetworks, Inc. All rights reserved..
  *  

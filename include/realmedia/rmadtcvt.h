@@ -1,6 +1,6 @@
 /****************************************************************************
  * 
- *  $Id: rmadtcvt.h 7 2003-05-30 02:18:02Z gabest $
+ *  $Id$
  *
  *  Copyright (C) 1995-2000 RealNetworks, Inc. All rights reserved..
  *  
