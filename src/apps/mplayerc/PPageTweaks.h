@@ -73,8 +73,8 @@ public:
 	CString	m_OSD_Font;
 
 	BOOL m_fFastSeek;
-
 	BOOL m_fLCDSupport;
+	BOOL m_fSmartSeek;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support

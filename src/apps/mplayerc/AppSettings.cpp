@@ -567,7 +567,6 @@ void CAppSettings::UpdateData(bool fSave)
 		// Last Open Dir
 		pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_DIR, strLastOpenDir);
 
-		// CASIMIR666 : new settings
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_D3DFULLSCREEN, fD3DFullscreen);
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MONITOR_AUTOREFRESHRATE, fMonitorAutoRefreshRate);
 
@@ -587,6 +586,7 @@ void CAppSettings::UpdateData(bool fSave)
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_FASTSEEK_KEYFRAME, (int)fFastSeek);
 
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_LCD_SUPPORT, (int)fLCDSupport);
+		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_SMARTSEEK, (int)fSmartSeek);
 
 		// Save analog capture settings
 		pApp->WriteProfileInt   (IDS_R_SETTINGS, IDS_RS_DEFAULT_CAPTURE, iDefaultCaptureDevice);
@@ -645,7 +645,6 @@ void CAppSettings::UpdateData(bool fSave)
 		}
 
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LASTFULLSCREEN, (int)fLastFullScreen);
-		// CASIMIR666 : end of new settings
 
 		{
 			for (unsigned int i = 0; ; i++) {
@@ -1317,7 +1316,6 @@ void CAppSettings::UpdateData(bool fSave)
 			}
 		}
 
-		// CASIMIR666 : new settings
 		fD3DFullscreen			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_D3DFULLSCREEN, FALSE);
 		fMonitorAutoRefreshRate	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MONITOR_AUTOREFRESHRATE, FALSE);
 
@@ -1336,6 +1334,7 @@ void CAppSettings::UpdateData(bool fSave)
 		fFastSeek = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_FASTSEEK_KEYFRAME, TRUE);
 
 		fLCDSupport = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_LCD_SUPPORT, FALSE);
+		fSmartSeek	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_SMARTSEEK, FALSE);
 
 		// Save analog capture settings
 		iDefaultCaptureDevice = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DEFAULT_CAPTURE, 0);

@@ -526,6 +526,7 @@ public:
 	bool			fFastSeek;
 
 	bool			fLCDSupport;
+	bool			fSmartSeek;
 
 	// BDA configuration
 	int				iDefaultCaptureDevice;		// Default capture device (analog=0, 1=digital)

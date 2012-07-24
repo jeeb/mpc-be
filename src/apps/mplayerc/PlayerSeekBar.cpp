@@ -623,7 +623,7 @@ void CPlayerSeekBar::UpdateTooltip(CPoint point)
 		UpdateToolTipText();
 		UpdateToolTipPosition(point);
 
-		m_tooltipTimer = SetTimer(m_tooltipTimer, ((CMainFrame*)GetParentFrame())->b_UserSmartSeek ? 0 : AUTOPOP_DELAY, NULL);
+		m_tooltipTimer = SetTimer(m_tooltipTimer, ((CMainFrame*)GetParentFrame())->b_UseSmartSeek ? 10 : AUTOPOP_DELAY, NULL);
 	}
 }
 
@@ -714,10 +714,12 @@ void CPlayerSeekBar::OnTimer(UINT_PTR nIDEvent)
 				ScreenToClient(&point);
 
 				if (m_fEnabled && m_start < m_stop && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
-					m_tooltipTimer = SetTimer(m_tooltipTimer, ((CMainFrame*)GetParentFrame())->b_UserSmartSeek ? 0 : AUTOPOP_DELAY, NULL);
+					m_tooltipTimer = SetTimer(m_tooltipTimer, ((CMainFrame*)GetParentFrame())->b_UseSmartSeek ? 10 : AUTOPOP_DELAY, NULL);
 					m_tooltipPos = CalculatePosition(point);
 					UpdateToolTipText();
-					m_tooltip.SendMessage(TTM_TRACKACTIVATE, TRUE, (LPARAM)&m_ti);
+					if (!((CMainFrame*)GetParentFrame())->b_UseSmartSeek) {
+						m_tooltip.SendMessage(TTM_TRACKACTIVATE, TRUE, (LPARAM)&m_ti);
+					}
 					UpdateToolTipPosition(point);
 					m_tooltipState = TOOLTIP_VISIBLE;
 				}
@@ -747,27 +749,8 @@ void CPlayerSeekBar::HideToolTip()
 
 void CPlayerSeekBar::UpdateToolTipPosition(CPoint& point)
 {
-	CSize size;
-	CRect r;
-	CPoint p = point;
-	size = m_tooltip.GetBubbleSize(&m_ti);
-	GetWindowRect(r);
-
-	if (AfxGetAppSettings().nTimeTooltipPosition == TIME_TOOLTIP_ABOVE_SEEKBAR) {
-		point.x -= size.cx / 2 - 2;
-		point.y = GetChannelRect().TopLeft().y - (size.cy + 13);
-	} else {
-		point.x += 10;
-		point.y += 20;
-	}
-	point.x = max(0, min(point.x, r.Width() - size.cx));
-	ClientToScreen(&point);
-
-	m_tooltip.SendMessage(TTM_TRACKPOSITION, 0, MAKELPARAM(point.x, point.y));
-	m_tooltipLastPos = m_tooltipPos;
-
 	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
-	if (pFrame->b_UserSmartSeek) {
+	if (pFrame->b_UseSmartSeek) {
 		CRect Rect;
 		pFrame->m_wndView2.GetWindowRect(Rect);
 		int r_width		= Rect.Width();
@@ -777,18 +760,35 @@ void CPlayerSeekBar::UpdateToolTipPosition(CPoint& point)
 		mi.cbSize = sizeof(MONITORINFO);
 		GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
 
-		CPoint p1(p);
-		p.x -= r_width / 2 - 2;
-		p.y = GetChannelRect().TopLeft().y - (r_height + 13);
-		ClientToScreen(&p);
-		p.x = max(5, min(p.x, (mi.rcWork.right - mi.rcWork.left) - r_width - 5));
-		if (p.y <= 5) {
+		CPoint p1(point);
+		point.x -= r_width / 2 - 2;
+		point.y = GetChannelRect().TopLeft().y - (r_height + 13);
+		ClientToScreen(&point);
+		point.x = max(5, min(point.x, (mi.rcWork.right - mi.rcWork.left) - r_width - 5));
+		if (point.y <= 5) {
 			p1.y = GetChannelRect().TopLeft().y + 30;
 			ClientToScreen(&p1);
 
-			p.y = p1.y;
+			point.y = p1.y;
 		}
-		pFrame->m_wndView2.MoveWindow(p.x, p.y, r_width, r_height);
+		pFrame->m_wndView2.MoveWindow(point.x, point.y, r_width, r_height);
+	} else {
+		CSize size = m_tooltip.GetBubbleSize(&m_ti);
+		CRect r;
+		GetWindowRect(r);
+
+		if (AfxGetAppSettings().nTimeTooltipPosition == TIME_TOOLTIP_ABOVE_SEEKBAR) {
+			point.x -= size.cx / 2 - 2;
+			point.y = GetChannelRect().TopLeft().y - (size.cy + 13);
+		} else {
+			point.x += 10;
+			point.y += 20;
+		}
+		point.x = max(0, min(point.x, r.Width() - size.cx));
+		ClientToScreen(&point);
+
+		m_tooltip.SendMessage(TTM_TRACKPOSITION, 0, MAKELPARAM(point.x, point.y));
+		m_tooltipLastPos = m_tooltipPos;
 	}
 }
 
@@ -803,16 +803,15 @@ void CPlayerSeekBar::UpdateToolTipText()
 		m_tooltipText.Format(_T("%02d:%02d"), tcNow.bMinutes, tcNow.bSeconds);
 	}
 	*/
-	m_tooltipText.Format(_T("%02d:%02d:%02d"), tcNow.bHours, tcNow.bMinutes, tcNow.bSeconds);
-
-	m_ti.lpszText = (LPTSTR)(LPCTSTR)m_tooltipText;
+	CString tooltipText;
+	tooltipText.Format(_T("%02d:%02d:%02d"), tcNow.bHours, tcNow.bMinutes, tcNow.bSeconds);
 	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
-	if (!pFrame->b_UserSmartSeek) {
+	if (!pFrame->b_UseSmartSeek) {
+		m_ti.lpszText = (LPTSTR)(LPCTSTR)tooltipText;
 		m_tooltip.SendMessage(TTM_SETTOOLINFO, 0, (LPARAM)&m_ti);
 	} else {
 		// TODO - Center Caption ...
-		CString str = m_ti.lpszText;
-		str = _T("               ") + str + _T("               ");
+		CString str = _T("               ") + tooltipText + _T("               ");
 		pFrame->m_wndView2.SetWindowText(str);
 	}
 }

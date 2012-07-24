@@ -83,6 +83,7 @@ void CPPageTweaks::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO2, m_FontSize);
 	DDX_Check(pDX, IDC_CHECK1, m_fFastSeek);
 	DDX_Check(pDX, IDC_CHECK_LCD, m_fLCDSupport);
+	DDX_Check(pDX, IDC_CHECK_PRV, m_fSmartSeek);
 }
 
 int CALLBACK EnumFontProc(ENUMLOGFONT FAR* lf, NEWTEXTMETRIC FAR* tm, int FontType, LPARAM dwData)
@@ -132,9 +133,9 @@ BOOL CPPageTweaks::OnInitDialog()
 	m_OSD_Size	= s.nOSDSize;
 	m_OSD_Font	= s.strOSDFont;
 
-	m_fFastSeek	= s.fFastSeek;
-
+	m_fFastSeek		= s.fFastSeek;
 	m_fLCDSupport	= s.fLCDSupport;
+	m_fSmartSeek	= s.fSmartSeek;
 
 	m_FontType.Clear();
 	m_FontSize.Clear();
@@ -227,9 +228,9 @@ BOOL CPPageTweaks::OnApply()
 	s.fDontUseSearchInFolder	= !!m_fDontUseSearchInFolder;
 	m_FontType.GetLBText(m_FontType.GetCurSel(),s.strOSDFont);
 
-	s.fFastSeek = !!m_fFastSeek;
-
-	s.fLCDSupport = !!m_fLCDSupport;
+	s.fFastSeek		= !!m_fFastSeek;
+	s.fLCDSupport	= !!m_fLCDSupport;
+	s.fSmartSeek	= !!m_fSmartSeek;
 
 	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
 	if (m_fUseWin7TaskBar) {

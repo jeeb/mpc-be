@@ -973,7 +973,7 @@ public:
 	// SmartSeek
 	CChildView		m_wndView2;
 	CWnd*			m_pVideoWnd2;
-	bool			b_UserSmartSeek;
+	bool			b_UseSmartSeek;
 
 	SIZE			m_fullWndSize;
 	CFullscreenWnd*	m_pFullscreenWnd;

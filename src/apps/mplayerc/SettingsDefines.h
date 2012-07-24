@@ -244,6 +244,7 @@
 #define IDS_FASTSEEK_KEYFRAME				_T("FastSeek")
 
 #define IDS_LCD_SUPPORT						_T("LcdSupport")
+#define IDS_SMARTSEEK						_T("UseSmartSeek")
 
 #define IDS_REMAINING_TIME					_T("RemainingTime")
 

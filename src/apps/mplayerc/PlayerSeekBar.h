@@ -45,7 +45,6 @@ private:
 	TOOLINFO m_ti;
 	tooltip_state_t m_tooltipState;
 	__int64 m_tooltipPos, m_tooltipLastPos;
-	CString m_tooltipText;
 	UINT_PTR m_tooltipTimer;
 
 	MPCPngImage m_logobm;
