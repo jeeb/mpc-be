@@ -747,8 +747,9 @@ void CPlayerSeekBar::HideToolTip()
 
 void CPlayerSeekBar::UpdateToolTipPosition(CPoint& point)
 {
-	static CSize size;
-	static CRect r;
+	CSize size;
+	CRect r;
+	CPoint p = point;
 	size = m_tooltip.GetBubbleSize(&m_ti);
 	GetWindowRect(r);
 
@@ -772,12 +773,22 @@ void CPlayerSeekBar::UpdateToolTipPosition(CPoint& point)
 		int r_width		= Rect.Width();
 		int r_height	= Rect.Height();
 
-		CPoint p;
-		GetCursorPos(&p);
-		p.x = point.x - r_width/2;
-		p.y = GetChannelRect().TopLeft().y - r_height - 10;
+		MONITORINFO mi;
+		mi.cbSize = sizeof(MONITORINFO);
+		GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
+
+		CPoint p1(p);
+		p.x -= r_width / 2 - 2;
+		p.y = GetChannelRect().TopLeft().y - (r_height + 13);
 		ClientToScreen(&p);
-		pFrame->m_wndView2.MoveWindow(point.x - r_width/2 + 4, p.y, r_width, r_height);
+		p.x = max(5, min(p.x, (mi.rcWork.right - mi.rcWork.left) - r_width - 5));
+		if (p.y <= 5) {
+			p1.y = GetChannelRect().TopLeft().y + 30;
+			ClientToScreen(&p1);
+
+			p.y = p1.y;
+		}
+		pFrame->m_wndView2.MoveWindow(p.x, p.y, r_width, r_height);
 	}
 }
 
@@ -785,11 +796,14 @@ void CPlayerSeekBar::UpdateToolTipText()
 {
 	DVD_HMSF_TIMECODE tcNow = RT2HMS_r(m_tooltipPos);
 
-	//if (tcNow.bHours > 0) {
+	/*
+	if (tcNow.bHours > 0) {
 		m_tooltipText.Format(_T("%02d:%02d:%02d"), tcNow.bHours, tcNow.bMinutes, tcNow.bSeconds);
-	//} else {
-	//	m_tooltipText.Format(_T("%02d:%02d"), tcNow.bMinutes, tcNow.bSeconds);
-	//}
+	} else {
+		m_tooltipText.Format(_T("%02d:%02d"), tcNow.bMinutes, tcNow.bSeconds);
+	}
+	*/
+	m_tooltipText.Format(_T("%02d:%02d:%02d"), tcNow.bHours, tcNow.bMinutes, tcNow.bSeconds);
 
 	m_ti.lpszText = (LPTSTR)(LPCTSTR)m_tooltipText;
 	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
@@ -800,6 +814,5 @@ void CPlayerSeekBar::UpdateToolTipText()
 		CString str = m_ti.lpszText;
 		str = _T("               ") + str + _T("               ");
 		pFrame->m_wndView2.SetWindowText(str);
-		//pFrame->SetFocus();
 	}
 }

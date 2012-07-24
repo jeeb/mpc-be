@@ -11104,7 +11104,7 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 					return hr;
 				}
 			} else {
-				hr = pDVDC->PlayChapterInTitle(Loc.TitleNum, 1, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+				hr = pDVDC2->PlayChapterInTitle(Loc.TitleNum, 1, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 				hr = pDVDC2->PlayAtTime(&dvdTo, DVD_CMD_FLAG_Flush, NULL);
 				if (FAILED(hr)) {
 					hr = pDVDC2->PlayAtTimeInTitle(Loc.TitleNum, &dvdTo, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
