@@ -711,7 +711,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	if (b_UserSmartSeek) {
 		if (!m_wndView2.CreateEx(WS_EX_NOPARENTNOTIFY|WS_EX_TRANSPARENT|WS_EX_WINDOWEDGE|WS_EX_TOPMOST, 
-								 AfxRegisterWndClass(0), NULL, WS_BORDER, CRect(0, 0, 160, 96 + 20), this, 0, NULL)) {
+								 AfxRegisterWndClass(0), NULL, WS_BORDER, CRect(0, 0, 160, 115), this, 0, NULL)) {
 			TRACE0("Failed to create Preview Window\n");
 			b_UserSmartSeek = false;
 		}
@@ -7189,13 +7189,6 @@ void CMainFrame::OnPlayPlay()
 			pDVDC->PlayForwards(dRate, DVD_CMD_FLAG_Block, NULL);
 			pDVDC->Pause(FALSE);
 			pMC->Run();
-
-			if (b_UserSmartSeek && pDVDC2) {
-				pDVDC2->PlayForwards(dRate, DVD_CMD_FLAG_Block, NULL);
-				pDVDC2->Pause(FALSE);
-				pMC2->Run();
-				pMC2->Pause();
-			}
 		} else if (GetPlaybackMode() == PM_CAPTURE) {
 			pMC->Stop(); // audio preview won't be in sync if we run it from paused state
 			pMC->Run();
@@ -7334,8 +7327,7 @@ void CMainFrame::OnPlayStop()
 			pMC->Stop();
 			pDVDC->SetOption(DVD_ResetOnStop, FALSE);
 
-			if (b_UserSmartSeek && pDVDC2)
-			{
+			if (b_UserSmartSeek && pDVDC2) {
 				pDVDC2->SetOption(DVD_ResetOnStop, TRUE);
 				pMC2->Stop();
 				pDVDC2->SetOption(DVD_ResetOnStop, FALSE);
@@ -11094,15 +11086,32 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 		DVD_HMSF_TIMECODE dvdTo = RT2HMSF(rtCur2, fps);
 
 		if (FAILED(hr) || (Loc.TitleNum != Loc2.TitleNum)) {
+
+			if (FAILED(hr)) {
+				LOG2FILE(_T("DVD - GetCurrentLocation() failed [%d : %d]"), Loc.TitleNum, Loc.ChapterNum);
+			} else {
+				LOG2FILE(_T("DVD - TitleNum changed : Main :%d, Preview :%d"), Loc.TitleNum, Loc2.TitleNum);
+			}
+
 			hr = pDVDC2->PlayTitle(Loc.TitleNum, DVD_CMD_FLAG_Flush, NULL);
 			if (FAILED(hr)) {
 				return hr;
 			}
 			pDVDC2->Resume(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-
-			hr = pDVDC2->PlayAtTimeInTitle(Loc.TitleNum, &dvdTo, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-			if (FAILED(hr)) {
-				return hr;
+			if (SUCCEEDED(hr)) {
+				hr = pDVDC2->PlayAtTime(&dvdTo, DVD_CMD_FLAG_Flush, NULL);
+				if (FAILED(hr)) {
+					return hr;
+				}
+			} else {
+				hr = pDVDC->PlayChapterInTitle(Loc.TitleNum, 1, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+				hr = pDVDC2->PlayAtTime(&dvdTo, DVD_CMD_FLAG_Flush, NULL);
+				if (FAILED(hr)) {
+					hr = pDVDC2->PlayAtTimeInTitle(Loc.TitleNum, &dvdTo, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+					if (FAILED(hr)) {
+						return hr;
+					}
+				}
 			}
 			Sleep(50);
 		} else {
@@ -11111,6 +11120,9 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 				return hr;
 			}
 		}
+
+		pDVDI2->GetCurrentLocation(&Loc2);
+		LOG2FILE(_T("DVD - Текущее воспроизведение : Main [%d : %d], Preview [%d : %d]"), Loc.TitleNum, Loc.ChapterNum, Loc2.TitleNum, Loc2.ChapterNum);
 
 		pDVDC2->Pause(FALSE);
 		pMC2->Run();
@@ -11125,7 +11137,7 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 	}
 
 	if (GetPlaybackMode() == PM_FILE) {
-		hr = pFS2 ? pFS2->Step(1, NULL) : E_FAIL;
+		hr = pFS2 ? pFS2->Step(2, NULL) : E_FAIL;
 		if (SUCCEEDED(hr)) {
 			Sleep(10);
 		}

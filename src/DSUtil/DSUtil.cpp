@@ -2552,36 +2552,6 @@ LPCTSTR GetDXVAMode(const GUID* guidDecoder)
 	return DXVA2Decoder[nPos].Description;
 }
 
-void DumpBuffer(BYTE* pBuffer, int nSize)
-{
-	CString	strMsg;
-	int		nPos = 0;
-	strMsg.AppendFormat (L"Size : %d\n", nSize);
-	for (int i=0; i<3; i++) {
-		for (int j=0; j<32; j++) {
-			nPos = i*32 + j;
-			if (nPos >= nSize) {
-				break;
-			}
-			strMsg.AppendFormat (L"%02x ", pBuffer[nPos]);
-		}
-		if (nPos >= nSize) {
-			break;
-		}
-		strMsg.Append(L"\n");
-	}
-
-	if (nSize > 32*3) {
-		strMsg.Append(L".../...\n");
-		for (int j=32; j>0; j--) {
-			strMsg.AppendFormat (L"%02x ", pBuffer[nSize - j]);
-		}
-	}
-	strMsg.AppendFormat(L"\n");
-
-	TRACE (strMsg);
-}
-
 // hour, minute, second, millisec
 CString ReftimeToString(const REFERENCE_TIME& rtVal)
 {
@@ -2788,54 +2758,6 @@ void SetThreadName(DWORD dwThreadID, LPCSTR szThreadName)
 	}
 }
 
-void HexDump(CString fileName, BYTE* buf, int size)
-{
-	if (size<=0) {
-		return;
-	}
-
-	CString dump_str;
-	dump_str.Format(_T("Dump size = %d\n"), size);
-	int len, i, j, c;
-
-	for (i=0; i<size; i+=16) {
-		len = size - i;
-		if (len > 16) {
-			len = 16;
-		}
-		dump_str.AppendFormat(_T("%08x "), i);
-		for (j=0; j<16; j++) {
-			if (j < len) {
-				dump_str.AppendFormat(_T(" %02x"), buf[i+j]);
-			}
-			else {
-				dump_str.Append(_T("   "));
-			}
-		}
-		dump_str.Append(_T(" "));
-		for (j=0; j<len; j++) {
-			c = buf[i+j];
-			if (c < ' ' || c > '~') {
-				c = '.';
-			}
-			dump_str.AppendFormat(_T("%c"), c);
-		}
-		dump_str.Append(_T("\n"));
-	}
-	dump_str.Append(_T("\n"));
-
-	if (!fileName.IsEmpty()) {
-		CStdioFile file;
-		if (file.Open(fileName, CFile::modeCreate|CFile::modeWrite)) {
-			file.WriteString(dump_str);
-			file.Close();
-		}
-	}
-	else {
-		TRACE(dump_str);
-	}
-}
-
 void CorrectComboListWidth(CComboBox& m_pComboBox)
 {
 	// Find the longest string in the combo box.
@@ -2980,4 +2902,103 @@ void audioFormatTypeHandler(const BYTE *format, const GUID *formattype, DWORD *p
 		*pnBlockAlign = nBlockAlign;
 	if (pnBytesPerSec)
 		*pnBytesPerSec = nBytesPerSec;
+}
+
+// log function
+void DumpBuffer(BYTE* pBuffer, int nSize)
+{
+	CString	strMsg;
+	int		nPos = 0;
+	strMsg.AppendFormat (L"Size : %d\n", nSize);
+	for (int i=0; i<3; i++) {
+		for (int j=0; j<32; j++) {
+			nPos = i*32 + j;
+			if (nPos >= nSize) {
+				break;
+			}
+			strMsg.AppendFormat (L"%02x ", pBuffer[nPos]);
+		}
+		if (nPos >= nSize) {
+			break;
+		}
+		strMsg.Append(L"\n");
+	}
+
+	if (nSize > 32*3) {
+		strMsg.Append(L".../...\n");
+		for (int j=32; j>0; j--) {
+			strMsg.AppendFormat (L"%02x ", pBuffer[nSize - j]);
+		}
+	}
+	strMsg.AppendFormat(L"\n");
+
+	TRACE (strMsg);
+}
+
+void HexDump(CString fileName, BYTE* buf, int size)
+{
+	if (size<=0) {
+		return;
+	}
+
+	CString dump_str;
+	dump_str.Format(_T("Dump size = %d\n"), size);
+	int len, i, j, c;
+
+	for (i=0; i<size; i+=16) {
+		len = size - i;
+		if (len > 16) {
+			len = 16;
+		}
+		dump_str.AppendFormat(_T("%08x "), i);
+		for (j=0; j<16; j++) {
+			if (j < len) {
+				dump_str.AppendFormat(_T(" %02x"), buf[i+j]);
+			}
+			else {
+				dump_str.Append(_T("   "));
+			}
+		}
+		dump_str.Append(_T(" "));
+		for (j=0; j<len; j++) {
+			c = buf[i+j];
+			if (c < ' ' || c > '~') {
+				c = '.';
+			}
+			dump_str.AppendFormat(_T("%c"), c);
+		}
+		dump_str.Append(_T("\n"));
+	}
+	dump_str.Append(_T("\n"));
+
+	if (!fileName.IsEmpty()) {
+		CStdioFile file;
+		if (file.Open(fileName, CFile::modeCreate|CFile::modeWrite)) {
+			file.WriteString(dump_str);
+			file.Close();
+		}
+	}
+	else {
+		TRACE(dump_str);
+	}
+}
+
+//#define	MPC_BE_LOG
+void LOG2FILE(LPCTSTR fmt, ...)
+{
+#if defined(MPC_BE_LOG)
+	va_list args;
+	va_start(args, fmt);
+	size_t len = _vsctprintf(fmt, args) + 1;
+	if (TCHAR* buff = DNew TCHAR[len]) {
+		_vstprintf(buff, len, fmt, args);
+		if (FILE* f = _tfopen(_T("mpc-be.log"), _T("at, ccs=UTF-8"))) {
+			fseek(f, 0, 2);
+			_ftprintf_s(f, _T("%s\n"), buff);
+			fclose(f);
+		}
+		delete [] buff;
+	}
+	va_end(args);
+#endif
 }

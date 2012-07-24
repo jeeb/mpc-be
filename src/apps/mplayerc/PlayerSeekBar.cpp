@@ -26,7 +26,6 @@
 #include "PlayerSeekBar.h"
 #include "MainFrm.h"
 
-
 // CPlayerSeekBar
 
 IMPLEMENT_DYNAMIC(CPlayerSeekBar, CDialogBar)
@@ -768,13 +767,17 @@ void CPlayerSeekBar::UpdateToolTipPosition(CPoint& point)
 
 	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
 	if (pFrame->b_UserSmartSeek) {
+		CRect Rect;
+		pFrame->m_wndView2.GetWindowRect(Rect);
+		int r_width		= Rect.Width();
+		int r_height	= Rect.Height();
+
 		CPoint p;
 		GetCursorPos(&p);
-		p.x = point.x - 80;
-		p.y = GetChannelRect().TopLeft().y - 125;
+		p.x = point.x - r_width/2;
+		p.y = GetChannelRect().TopLeft().y - r_height - 10;
 		ClientToScreen(&p);
-		pFrame->m_wndView2.MoveWindow(point.x-75, p.y, 160, 96 + 20);
-		//pFrame->SetFocus();
+		pFrame->m_wndView2.MoveWindow(point.x - r_width/2 + 4, p.y, r_width, r_height);
 	}
 }
 
@@ -793,9 +796,10 @@ void CPlayerSeekBar::UpdateToolTipText()
 	if (!pFrame->b_UserSmartSeek) {
 		m_tooltip.SendMessage(TTM_SETTOOLINFO, 0, (LPARAM)&m_ti);
 	} else {
+		// TODO - Center Caption ...
 		CString str = m_ti.lpszText;
 		str = _T("               ") + str + _T("               ");
-		pFrame->m_wndView2.SetWindowTextW(str);
+		pFrame->m_wndView2.SetWindowText(str);
 		//pFrame->SetFocus();
 	}
 }
