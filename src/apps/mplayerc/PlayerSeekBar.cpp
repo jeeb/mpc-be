@@ -638,11 +638,12 @@ void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 		}
 	}
 
-	if (AfxGetAppSettings().fUseTimeTooltip) {
+	CMainFrame* pFrame	= ((CMainFrame*)GetParentFrame());
+
+	if (AfxGetAppSettings().fUseTimeTooltip || pFrame->CanPreviewUse()) {
 		UpdateTooltip(point);
 	}
 
-	CMainFrame* pFrame	= ((CMainFrame*)GetParentFrame());
 	OAFilterState fs	= pFrame->GetMediaState();
 	if (fs != -1) {
 		pt2 = point;
