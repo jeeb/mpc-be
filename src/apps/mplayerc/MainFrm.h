@@ -442,11 +442,11 @@ public:
 	CControlBar* m_pLastBar;
 
 protected:
-	int m_iMediaLoadState;
+	bool	b_UseSmartSeek;
+	int		m_iMediaLoadState;
+	bool	m_fClosingState;
+	bool	m_fAudioOnly;
 
-	bool m_fClosingState;
-
-	bool m_fAudioOnly;
 	dispmode m_dmBeforeFullscreen;
 	CString m_LastOpenFile, m_LastOpenBDPath;
 	HMONITOR m_LastWindow_HM;
@@ -973,7 +973,6 @@ public:
 	// SmartSeek
 	CChildView		m_wndView2;
 	CWnd*			m_pVideoWnd2;
-	bool			b_UseSmartSeek;
 
 	SIZE			m_fullWndSize;
 	CFullscreenWnd*	m_pFullscreenWnd;
@@ -1059,4 +1058,5 @@ public:
 	CAtlList<CHdmvClipInfo::PlaylistItem> m_MPLSPlaylist;
 	bool m_bIsBDPlay;
 	bool OpenBD(CString Path);
+	bool CanPreviewUse();
 };

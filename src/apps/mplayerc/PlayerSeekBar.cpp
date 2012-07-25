@@ -623,7 +623,7 @@ void CPlayerSeekBar::UpdateTooltip(CPoint point)
 		UpdateToolTipText();
 		UpdateToolTipPosition(point);
 
-		m_tooltipTimer = SetTimer(m_tooltipTimer, ((CMainFrame*)GetParentFrame())->b_UseSmartSeek ? 10 : AUTOPOP_DELAY, NULL);
+		m_tooltipTimer = SetTimer(m_tooltipTimer, ((CMainFrame*)GetParentFrame())->CanPreviewUse() ? 10 : AUTOPOP_DELAY, NULL);
 	}
 }
 
@@ -714,10 +714,10 @@ void CPlayerSeekBar::OnTimer(UINT_PTR nIDEvent)
 				ScreenToClient(&point);
 
 				if (m_fEnabled && m_start < m_stop && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
-					m_tooltipTimer = SetTimer(m_tooltipTimer, ((CMainFrame*)GetParentFrame())->b_UseSmartSeek ? 10 : AUTOPOP_DELAY, NULL);
+					m_tooltipTimer = SetTimer(m_tooltipTimer, ((CMainFrame*)GetParentFrame())->CanPreviewUse() ? 10 : AUTOPOP_DELAY, NULL);
 					m_tooltipPos = CalculatePosition(point);
 					UpdateToolTipText();
-					if (!((CMainFrame*)GetParentFrame())->b_UseSmartSeek) {
+					if (!((CMainFrame*)GetParentFrame())->CanPreviewUse()) {
 						m_tooltip.SendMessage(TTM_TRACKACTIVATE, TRUE, (LPARAM)&m_ti);
 					}
 					UpdateToolTipPosition(point);
@@ -750,7 +750,7 @@ void CPlayerSeekBar::HideToolTip()
 void CPlayerSeekBar::UpdateToolTipPosition(CPoint& point)
 {
 	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
-	if (pFrame->b_UseSmartSeek) {
+	if (pFrame->CanPreviewUse()) {
 		CRect Rect;
 		pFrame->m_wndView2.GetWindowRect(Rect);
 		int r_width		= Rect.Width();
@@ -806,7 +806,7 @@ void CPlayerSeekBar::UpdateToolTipText()
 	CString tooltipText;
 	tooltipText.Format(_T("%02d:%02d:%02d"), tcNow.bHours, tcNow.bMinutes, tcNow.bSeconds);
 	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
-	if (!pFrame->b_UseSmartSeek) {
+	if (!pFrame->CanPreviewUse()) {
 		m_ti.lpszText = (LPTSTR)(LPCTSTR)tooltipText;
 		m_tooltip.SendMessage(TTM_SETTOOLINFO, 0, (LPARAM)&m_ti);
 	} else {

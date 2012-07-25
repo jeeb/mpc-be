@@ -17419,3 +17419,8 @@ CString CMainFrame::FillMessage()
 
 	return msg;
 }
+
+bool CMainFrame::CanPreviewUse()
+{
+	return (!m_fAudioOnly && b_UseSmartSeek && m_wndView2 && (GetPlaybackMode() == PM_DVD || GetPlaybackMode() == PM_FILE));
+}
