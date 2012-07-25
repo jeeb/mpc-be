@@ -36,6 +36,8 @@
 #include "IMpaDecFilter.h"
 #include "MpaDecSettingsWnd.h"
 
+#include "MatrixMixer\mixer.h"
+
 #define MPCAudioDecName	L"MPC Audio Decoder"
 
 struct ps2_state_t {
