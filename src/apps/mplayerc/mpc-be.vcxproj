@@ -546,6 +546,9 @@
       <Project>{40177920-a66c-4647-b119-332a10224c83}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="..\..\ExtLib\MatrixMixer\MatrixMixer.vcxproj">
+      <Project>{d49b956a-d9ff-1f71-50ad-6f9fc5d79a0e}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\filters\parser\DTSSplitter\DTSSplitter.vcxproj">
       <Project>{f68d02e9-32de-4eda-8691-b911dc5317dc}</Project>
     </ProjectReference>
