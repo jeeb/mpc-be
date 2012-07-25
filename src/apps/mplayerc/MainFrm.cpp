@@ -11142,8 +11142,6 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 
 		pDVDC2->Pause(FALSE);
 		pMC2->Run();
-		Sleep(100);
-		pMC2->Pause();
 	} else if (GetPlaybackMode() == PM_FILE) {
 		hr = pMS2->SetPositions(&rtCur2, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
 	}
