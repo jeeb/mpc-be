@@ -971,7 +971,7 @@ public:
 	CWnd*			m_pVideoWnd;			// Current Video (main display screen or 2nd)
 
 	// SmartSeek
-	CChildView		m_wndView2;
+	CWnd			m_wndView2;
 	CWnd*			m_pVideoWnd2;
 
 	SIZE			m_fullWndSize;

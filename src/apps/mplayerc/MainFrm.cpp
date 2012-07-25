@@ -3587,10 +3587,6 @@ void CMainFrame::OnFilePostClosemedia()
 	}
 	m_wndView.SetVideoRect();
 
-	if (b_UseSmartSeek) {
-		m_wndView2.SetVideoRect();
-	}
-
 	m_wndSeekBar.Enable(false);
 	m_wndSeekBar.SetPos(0);
 	m_wndInfoBar.RemoveAllLines();
@@ -10442,8 +10438,6 @@ void CMainFrame::MoveVideoWindow(bool fShowStats)
 			pBV2->SetDefaultSourcePosition();
 			pBV2->SetDestinationPosition(vr2.left, vr2.top, vr2.Width(), vr2.Height());
 			pVW2->SetWindowPosition(wr2.left, wr2.top, wr2.Width(), wr2.Height());
-
-			m_wndView2.SetVideoRect(wr2);
 		}
 
 		if (fShowStats && vr.Height() > 0) {
