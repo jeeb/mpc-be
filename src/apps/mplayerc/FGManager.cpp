@@ -607,12 +607,13 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 	if (m_IsPreview) {
 		BeginEnumMediaTypes(pPinOut, pEM, pmt) {
 			// Allow only video
-			if (pmt->majortype == MEDIATYPE_Audio ||
-				pmt->majortype == MEDIATYPE_Subtitle ||
-				pmt->majortype == MEDIATYPE_AUXLine21Data ||
-				pmt->majortype == MEDIATYPE_Midi ||
-				pmt->majortype == MEDIATYPE_Text ||
-				pmt->majortype == MEDIASUBTYPE_DVD_SUBPICTURE) {
+			if (pmt->majortype	== MEDIATYPE_Audio ||
+				pmt->majortype	== MEDIATYPE_Subtitle ||
+				pmt->majortype	== MEDIATYPE_AUXLine21Data ||
+				pmt->majortype	== MEDIATYPE_Midi ||
+				pmt->majortype	== MEDIATYPE_Text ||
+				pmt->majortype	== MEDIASUBTYPE_DVD_SUBPICTURE ||
+				pmt->subtype	== MEDIASUBTYPE_DVD_SUBPICTURE) {
 					return S_FALSE;
 			}
 
