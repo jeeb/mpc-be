@@ -47,7 +47,7 @@ bool CVolumeCtrl::Create(CWnd* pParentWnd)
 	EnableToolTips(TRUE);
 	SetRange(0, 100);
 	SetPosInternal(s.nVolume);
-	SetPageSize(5);
+	SetPageSize(2);
 	SetLineSize(0);
 
 	iDisableXPToolbars = s.fDisableXPToolbars + 1;
