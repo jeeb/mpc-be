@@ -709,31 +709,23 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	AppSettings& s = AfxGetAppSettings();
 
-	b_UseSmartSeek = s.fSmartSeek && !s.fD3DFullscreen && !!IsCompositionEnabled();
+	b_UseSmartSeek = s.fSmartSeek && !s.fD3DFullscreen && !!IsWinVistaOrLater();
 
 	if (b_UseSmartSeek) {
-		if (!m_wndView2.CreateEx(WS_EX_NOPARENTNOTIFY|WS_EX_TRANSPARENT|WS_EX_WINDOWEDGE|WS_EX_TOPMOST, 
-								 AfxRegisterWndClass(0), NULL, WS_BORDER, CRect(0, 0, 160, 115), this, 0, NULL)) {
-			TRACE0("Failed to create Preview Window\n");
-			b_UseSmartSeek = false;
-		}
-
-		if (b_UseSmartSeek) {
-			// ѕрозрачность окна-превью
-			//SetWindowLong(m_wndView2.m_hWnd, GWL_EXSTYLE, GetWindowLong(m_wndView2.m_hWnd, GWL_EXSTYLE) | WS_EX_LAYERED);
-			//m_wndView2.SetLayeredWindowAttributes(0, 210, LWA_ALPHA); //255 - полностью не прозрачное, 0 - полностью прозрачное
-		
-			// m_wndView2.ModifyStyle( WS_CAPTION, 0, 0);
-			m_wndView2.ModifyStyle( 0, WS_THICKFRAME|WS_CLIPCHILDREN|WS_CLIPSIBLINGS, 0);
+		if (!m_wndView2.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL,
+			WS_CAPTION|WS_THICKFRAME|WS_CLIPCHILDREN|WS_CLIPSIBLINGS,
+			CRect(0, 0, 160, 115), this, 0, NULL)) {
+				TRACE(_T("Failed to create Preview Window\n"));
+				b_UseSmartSeek = false;
+		} else {
 			m_wndView2.ShowWindow(SW_HIDE);
-			//какой правильный стиль окна использовать и флаги - хз, надо игратьс€
 		}
 	}
 
 	// create a preview-window
 	if (!m_wndView.Create(NULL, NULL, AFX_WS_DEFAULT_VIEW|WS_CLIPCHILDREN|WS_CLIPSIBLINGS,
 						  CRect(0, 0, 0, 0), this, AFX_IDW_PANE_FIRST, NULL)) {
-		TRACE0("Failed to create Main View Window\n");
+		TRACE(_T("Failed to create Main View Window\n"));
 		return -1;
 	}
 
@@ -10859,22 +10851,20 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 	} else {
 		m_pVideoWnd		= &m_wndView;
 		if (!m_wndView2) {
-			b_UseSmartSeek = s.fSmartSeek && !s.fD3DFullscreen && !!IsCompositionEnabled();
+			b_UseSmartSeek = s.fSmartSeek && !s.fD3DFullscreen && !!IsWinVistaOrLater();
 
 			if (b_UseSmartSeek) {
-				if (!m_wndView2.CreateEx(WS_EX_NOPARENTNOTIFY|WS_EX_TRANSPARENT|WS_EX_WINDOWEDGE|WS_EX_TOPMOST, 
-										 AfxRegisterWndClass(0), NULL, WS_BORDER, CRect(0, 0, 160, 115), this, 0, NULL)) {
-					TRACE0("Failed to create Preview Window\n");
-					b_UseSmartSeek = false;
-				}
-
-				if (b_UseSmartSeek) {
-					m_wndView2.ModifyStyle( 0, WS_THICKFRAME|WS_CLIPCHILDREN|WS_CLIPSIBLINGS, 0);
+				if (!m_wndView2.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL,
+					WS_CAPTION|WS_THICKFRAME|WS_CLIPCHILDREN|WS_CLIPSIBLINGS,
+					CRect(0, 0, 160, 115), this, 0, NULL)) {
+						TRACE(_T("Failed to create Preview Window\n"));
+						b_UseSmartSeek = false;
+				} else {
 					m_wndView2.ShowWindow(SW_HIDE);
 				}
 			}
 		} else {
-			b_UseSmartSeek = s.fSmartSeek && !s.fD3DFullscreen && !!IsCompositionEnabled() && m_wndView2;
+			b_UseSmartSeek = s.fSmartSeek && !s.fD3DFullscreen && !!IsWinVistaOrLater() && m_wndView2;
 		}
 
 		if (b_UseSmartSeek && m_wndView2) {
@@ -11872,7 +11862,7 @@ void CMainFrame::OpenSetupVideo()
 		pVW->put_MessageDrain((OAHWND)m_hWnd);
 
 		for (CWnd* pWnd = m_wndView.GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
-			pWnd->EnableWindow(FALSE);    // little trick to let WM_SETCURSOR thru
+			pWnd->EnableWindow(FALSE); // little trick to let WM_SETCURSOR thru
 		}
 
 		if (b_UseSmartSeek) {
