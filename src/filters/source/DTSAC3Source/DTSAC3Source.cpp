@@ -57,26 +57,27 @@ bool isDTSSync(const DWORD sync)
 	if (sync == 0x0180fe7f || // '7FFE8001' 16 bits and big endian bitstream
 		sync == 0x80017ffe || // 'FE7F0180' 16 bits and little endian bitstream
 		sync == 0x00e8ff1f || // '1FFFE800' 14 bits and big endian bitstream
-		sync == 0xe8001fff)   // 'FF1F00E8' 14 bits and little endian bitstream
+		sync == 0xe8001fff) { // 'FF1F00E8' 14 bits and little endian bitstream
 			return true;
-	else
+	} else {
 		return false;
+}
 }
 
 DWORD ParseWAVECDHeader(const BYTE wh[44])
 {
 	if (*(DWORD*)wh != 0x46464952 //"RIFF"
-			|| *(DWORDLONG*)(wh+8) != 0x20746d6645564157 //"WAVEfmt "
-			|| *(DWORD*)(wh+36) != 0x61746164) { //"data"
+	 || *(DWORDLONG*)(wh+8) != 0x20746d6645564157 //"WAVEfmt "
+	 || *(DWORD*)(wh+36) != 0x61746164) { //"data"
 		return 0;
 	}
 	PCMWAVEFORMAT pcmwf = *(PCMWAVEFORMAT*)(wh+20);
 	if (pcmwf.wf.wFormatTag != 1
-			|| pcmwf.wf.nChannels != 2
-			|| pcmwf.wf.nSamplesPerSec != 44100 && pcmwf.wf.nSamplesPerSec != 48000
-			|| pcmwf.wf.nBlockAlign != 4
-			|| pcmwf.wf.nAvgBytesPerSec != pcmwf.wf.nSamplesPerSec * pcmwf.wf.nBlockAlign
-			|| pcmwf.wBitsPerSample != 16) {
+	 || pcmwf.wf.nChannels != 2
+	 || pcmwf.wf.nSamplesPerSec != 44100 && pcmwf.wf.nSamplesPerSec != 48000
+	 || pcmwf.wf.nBlockAlign != 4
+	 || pcmwf.wf.nAvgBytesPerSec != pcmwf.wf.nSamplesPerSec * pcmwf.wf.nBlockAlign
+	 || pcmwf.wBitsPerSample != 16) {
 		return 0;
 	}
 	return *(DWORD*)(wh+40); //return size of "data"
@@ -86,9 +87,9 @@ int ParseAC3IEC61937Header(const BYTE *buf)
 {
 	WORD* wbuf = (WORD*)buf;
 	if (*(DWORD*)buf == IEC61937_SYNC_WORD
-			&& wbuf[2] ==  0x0001
-			&& wbuf[3] > 0 && wbuf[3] < (6144-8)*8
-			&& wbuf[4] == 0x0B77 ) {
+	   && wbuf[2] ==  0x0001
+	   && wbuf[3] > 0 && wbuf[3] < (6144-8)*8
+	   && wbuf[4] == 0x0B77 ) {
 		return 6144;
 	}
 	return 0;
@@ -235,19 +236,22 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 		DWORD id = 0;
 		DWORD id2 = 0;
 		if (m_file.Read(&id, sizeof(id)) != sizeof(id) ||
-				m_file.Read(&id2, sizeof(id2)) != sizeof(id2))
+			m_file.Read(&id2, sizeof(id2)) != sizeof(id2)) {
 			break;
+		}
 
 		// WAVE-CD header
 		if (id == RIFF_DWORD) {
-			if (ext != _T(".dtswav") && ext != _T(".dts") && ext != _T(".wav")) //check only specific extensions
+			if (ext != _T(".dtswav") && ext != _T(".dts") && ext != _T(".wav")) { //check only specific extensions
 				break;
+			}
 			BYTE buf[44];
 			m_file.SeekToBegin();
 			if (m_file.Read(&buf, 44) != 44
-					|| ParseWAVECDHeader(buf) == 0
-					|| m_file.Read(&id, sizeof(id)) != sizeof(id))
+			 || ParseWAVECDHeader(buf) == 0
+			 || m_file.Read(&id, sizeof(id)) != sizeof(id)) {
 				break;
+			}
 			waveheader = true;
 		}
 
@@ -260,18 +264,22 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			UINT buflen = 0;
 			if (waveheader && ext == _T(".wav") && PathFileExists(path.Left(path.GetLength()-ext.GetLength()) + _T(".cue"))) {
 				buflen = 64 * 1024; // for .wav+.cue sometimes need to use a more deep search
-			}
-			else if (ext == _T(".dtswav") || ext == _T(".dts") || ext == _T(".wav") || ext == _T(".ac3") || ext == _T(".eac3")) { //check only specific extensions
+			} else if (ext == _T(".dtswav") || ext == _T(".dts") || ext == _T(".wav") || ext == _T(".ac3") || ext == _T(".eac3")) { //check only specific extensions
 				buflen = 6 * 1024;
+			} else {
+				break;
 			}
-			else break;
 
-			if (m_dataOffset < buflen) buflen -= (UINT)m_dataOffset; // tiny optimization
+			if (m_dataOffset < buflen) {
+				buflen -= (UINT)m_dataOffset;    // tiny optimization
+			}
 			m_file.Seek(m_dataOffset, CFile::begin);
 
 			BYTE* buf = new BYTE[buflen];
 			int len = m_file.Read(buf, buflen);
-			if (len<100) break; // file is very small
+			if (len < 100) {
+				break;    // file is very small
+			}
 
 			for (int i = 1; i < len - 4; i++) { // looking for DTS or AC3 sync
 				id = *(DWORD*)(buf+i);
@@ -283,15 +291,18 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			}
 			delete [] buf;
 		}
-		if (!isFound) break;
+		if (!isFound) {
+			break;
+		}
 
 		m_file.Seek(m_dataOffset, CFile::begin);
 
 		// DTS & DTS-HD
 		if (isDTSSync(id)) {
 			BYTE buf[16];
-			if (m_file.Read(&buf, 16) != 16)
+			if (m_file.Read(&buf, 16) != 16) {
 				break;
+			}
 
 			// DTS header
 			int fsize = 0, targeted_bitrate;
@@ -310,10 +321,11 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			m_file.Read(&sync, sizeof(sync));
 			if (id == DTS_SYNC_WORD && sync == DTSHD_SYNC_WORD && m_file.Read(&buf, 8)==8) {
 				unsigned char isBlownUpHeader = (buf[1]>>5)&1;
-				if (isBlownUpHeader)
+				if (isBlownUpHeader) {
 					HD_size = ((buf[2]&1)<<19 | buf[3]<<11 | buf[4]<<3 | buf[5]>>5) + 1;
-				else
+				} else {
 					HD_size = ((buf[2]&31)<<11 | buf[3]<<3 | buf[4]>>5) + 1;
+				}
 				//TODO: get more information about DTS-HD
 				m_streamtype = DTSHD;
 				m_fixedframesize = false;
@@ -326,25 +338,9 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 				}
 			}
 
-			/*const int bitratetbl[32] = {
-				  32000,   56000,   64000,   96000,
-				 112000,  128000,  192000,  224000,
-				 256000,  320000,  384000,  448000,
-				 512000,  576000,  640000,  768000,
-				 960000, 1024000, 1152000, 1280000,
-				1344000, 1408000, 1411200, 1472000,
-				1536000, 1920000, 2048000, 3072000,
-				3840000, 0, 0, 0 //open, variable, lossless
-			// [15]  768000 is actually 754500 for DVD
-			// [24] 1536000 is actually 1509000 for ???
-			// [24] 1536000 is actually 1509750 for DVD
-			// [22] 1411200 is actually 1234800 for 14-bit DTS-CD audio
-			};*/
-			const int channels[16] = {1, 2, 2, 2, 2, 3, 3, 4, 4, 5, 6, 6, 6, 7, 8, 8};
-
 			// calculate actual bitrate
 			m_framesize = fsize + HD_size + zero_bytes;
-			m_bitrate   = int ((m_framesize) * 8i64 * m_samplerate / m_framelength);
+			m_bitrate   = int ((m_framesize) * 8i64 * m_samplerate / m_framelength); // inaccurate, because HD_size is not constant
 
 			// calculate framesize to support a sonic audio decoder 4.3 (TODO: make otherwise)
 			// sonicDTSminsize = fsize + HD_size + 4096
@@ -352,18 +348,15 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			m_framesize   *= k;
 			m_framelength *= k;
 
-			if (m_bitrate != 0) {
-				m_AvgTimePerFrame = 10000000i64 * m_framesize * 8 / m_bitrate;
-			}
-
 			m_wFormatTag = WAVE_FORMAT_DTS;
 			m_subtype = MEDIASUBTYPE_DTS;
 		}
 		// AC3 & E-AC3
 		else if ((WORD)id == AC3_SYNC_WORD) {
 			BYTE buf[20];
-			if (m_file.Read(&buf, 8) != 8)
+			if (m_file.Read(&buf, 8) != 8) {
 				break;
+			}
 
 			BYTE bsid = (buf[5] >> 3);
 			int fsize   = 0;
@@ -376,6 +369,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 					break;
 				}
 				m_streamtype = AC3;
+				m_subtype = MEDIASUBTYPE_DOLBY_AC3;
 				/*
 				// TrueHD+AC3
 				m_file.Seek(m_dataOffset+fsize, CFile::begin);
@@ -401,11 +395,13 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 				if (m_file.Read(&buf, 8) == 8) {
 					int samplerate2, channels2, samples2, frametype2;
 					int fsize2 = ParseEAC3Header(buf, &samplerate2, &channels2, &samples2, &frametype2);
-					if (fsize2 > 0 && frametype2 == EAC3_FRAME_TYPE_DEPENDENT)
+					if (fsize2 > 0 && frametype2 == EAC3_FRAME_TYPE_DEPENDENT) {
 						fsize += fsize2;
+					}
 				}
 				m_bitrate = int (fsize * 8i64 * m_samplerate / m_framelength);
 				m_streamtype = EAC3;
+				m_subtype = MEDIASUBTYPE_DOLBY_DDPLUS;
 			} else { //unknown bsid
 				break;
 			}
@@ -415,28 +411,25 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			m_framesize = fsize * 2;
 			m_framelength *= 2;
 
-			if (m_bitrate!=0)
-				m_AvgTimePerFrame = 10000000i64 * m_framesize * 8 / m_bitrate;
-
 			m_wFormatTag = WAVE_FORMAT_UNKNOWN;
-			m_subtype = MEDIASUBTYPE_DOLBY_AC3;
 		}
 		// SPDIF AC3
 		else if (waveheader && id == IEC61937_SYNC_WORD) {
 			BYTE buf[16];
-			if (m_file.Read(&buf, 16) != 16)
+			if (m_file.Read(&buf, 16) != 16) {
 				break;
+			}
 			m_framesize = ParseAC3IEC61937Header(buf);
-			if (m_framesize == 0)
+			if (m_framesize == 0) {
 				break;
+			}
 
 			m_wFormatTag  = WAVE_FORMAT_DOLBY_AC3_SPDIF;
 			m_channels    = 2;
 			m_samplerate  = 44100;
 			m_bitrate     = 1411200;
 			m_bitdepth    = 16;
-
-			m_AvgTimePerFrame = 10000000i64 * 1536 / 44100;
+			m_framelength = 1536;
 
 			m_subtype = MEDIASUBTYPE_DOLBY_AC3_SPDIF;
 			m_streamtype = SPDIF_AC3;
@@ -444,8 +437,9 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 		// MLP
 		else if (id2 == MLP_SYNC_WORD) {
 			BYTE buf[20];
-			if (m_file.Read(&buf, 20) != 20)
+			if (m_file.Read(&buf, 20) != 20) {
 				break;
+			}
 
 			bool istruehd;
 			m_framesize = ParseMLPHeader(buf, &m_samplerate, &m_channels, &m_framelength, &m_bitdepth, &istruehd);
@@ -455,9 +449,6 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 			m_streamtype = MLP;
 			m_fixedframesize = false;
-
-			if (m_samplerate!=0)
-				m_AvgTimePerFrame = 10000000i64 * m_framelength / m_samplerate;
 
 			m_bitrate = (int)(m_framesize * 8i64 * m_samplerate / m_framelength); // inaccurate, because framesize is not constant
 
@@ -478,9 +469,6 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			m_streamtype = TrueHD;
 			m_fixedframesize = false;
 
-			if (m_samplerate!=0)
-				m_AvgTimePerFrame = 10000000i64 * m_framelength / m_samplerate;
-
 			// TrueHD+AC3
 			if (m_file.Read(&buf, 8) == 8) {
 				int samplerate2, channels2, framelength2, bitrate2;
@@ -488,8 +476,10 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 				if (fsize2 > 0) {
 					m_streamtype = TrueHDAC3;
 
-					if (samplerate2!=0)
-						m_AvgTimePerFrame = 10000000i64 * framelength2 / samplerate2;
+					if (samplerate2 > 0) {
+						m_samplerate  = samplerate2;
+						m_framelength = framelength2;
+					}
 				}
 			}
 
@@ -504,6 +494,9 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			break;
 		}
 
+		if (m_samplerate > 0) {
+			m_AvgTimePerFrame = 10000000i64 * m_framelength / m_samplerate;
+		}
 		m_rtDuration = m_AvgTimePerFrame * (m_file.GetLength() - m_dataOffset) / m_framesize;
 		m_rtStop = m_rtDuration;
 
@@ -563,57 +556,6 @@ HRESULT CDTSAC3Stream::FillBuffer(IMediaSample* pSample, int nFrame, BYTE* pOut,
 	return S_OK;
 }
 
-bool CDTSAC3Stream::CheckDTS(const CMediaType* pmt)
-{
-	return pmt->majortype == MEDIATYPE_Audio
-		   && pmt->subtype == MEDIASUBTYPE_DTS
-		   && pmt->formattype == FORMAT_WaveFormatEx
-		   && ((WAVEFORMATEX*)pmt->pbFormat)->wFormatTag == WAVE_FORMAT_DTS;
-}
-
-bool CDTSAC3Stream::CheckDTS2(const CMediaType* pmt)
-{
-	return pmt->majortype == MEDIATYPE_Audio
-		   && pmt->subtype == MEDIASUBTYPE_WAVE_DTS
-		   && pmt->formattype == FORMAT_WaveFormatEx
-		   && ((WAVEFORMATEX*)pmt->pbFormat)->wFormatTag == WAVE_FORMAT_DVD_DTS;
-}
-
-bool CDTSAC3Stream::CheckAC3(const CMediaType* pmt)
-{
-	return pmt->majortype == MEDIATYPE_Audio
-		   && pmt->subtype == MEDIASUBTYPE_DOLBY_AC3
-		   && pmt->formattype == FORMAT_WaveFormatEx
-		   && (((WAVEFORMATEX*)pmt->pbFormat)->wFormatTag == WAVE_FORMAT_UNKNOWN
-			   || ((WAVEFORMATEX*)pmt->pbFormat)->wFormatTag == WAVE_FORMAT_DOLBY_AC3);
-}
-
-bool CDTSAC3Stream::CheckSPDIFAC3(const CMediaType* pmt)
-{
-	return pmt->majortype == MEDIATYPE_Audio
-		   && pmt->subtype == MEDIASUBTYPE_DOLBY_AC3_SPDIF
-		   && pmt->formattype == FORMAT_WaveFormatEx
-		   && ((WAVEFORMATEX*)pmt->pbFormat)->wFormatTag == WAVE_FORMAT_DOLBY_AC3_SPDIF;
-}
-
-bool CDTSAC3Stream::CheckMLP(const CMediaType* pmt)
-{
-	return pmt->majortype == MEDIATYPE_Audio
-		   && pmt->subtype == MEDIASUBTYPE_MLP
-		   && pmt->formattype == FORMAT_WaveFormatEx
-		   && ((WAVEFORMATEX*)pmt->pbFormat)->wFormatTag == WAVE_FORMAT_UNKNOWN;
-}
-
-/*
-bool CDTSAC3Stream::CheckTrueHD(const CMediaType* pmt)
-{
-	return pmt->majortype == MEDIATYPE_Audio
-		   && pmt->subtype == MEDIASUBTYPE_DOLBY_TRUEHD
-		   && pmt->formattype == FORMAT_WaveFormatEx
-		   && ((WAVEFORMATEX*)pmt->pbFormat)->wFormatTag == WAVE_FORMAT_UNKNOWN;
-}
-*/
-
 HRESULT CDTSAC3Stream::GetMediaType(int iPosition, CMediaType* pmt)
 {
 	CAutoLock cAutoLock(m_pFilter->pStateLock());
@@ -650,12 +592,25 @@ HRESULT CDTSAC3Stream::GetMediaType(int iPosition, CMediaType* pmt)
 
 HRESULT CDTSAC3Stream::CheckMediaType(const CMediaType* pmt)
 {
-	return CheckDTS(pmt)
-		|| CheckDTS2(pmt)
-		|| CheckAC3(pmt)
-		|| CheckSPDIFAC3(pmt)
-		|| CheckMLP(pmt)
-		//|| CheckTrueHD(pmt)
-		   ? S_OK
-		   : E_INVALIDARG;
+	if (pmt->majortype == MEDIATYPE_Audio && pmt->formattype == FORMAT_WaveFormatEx) {
+		WORD& wFmtTag = ((WAVEFORMATEX*)pmt->pbFormat)->wFormatTag;
+
+		if (pmt->subtype == MEDIASUBTYPE_DTS && wFmtTag == WAVE_FORMAT_DTS) {
+			return S_OK;
+		} else if (pmt->subtype == MEDIASUBTYPE_WAVE_DTS && wFmtTag == WAVE_FORMAT_DVD_DTS) {
+			return S_OK;
+		} else if (pmt->subtype == MEDIASUBTYPE_DOLBY_AC3 && (wFmtTag == WAVE_FORMAT_UNKNOWN || wFmtTag == WAVE_FORMAT_DOLBY_AC3)) {
+			return S_OK;
+		} else if (pmt->subtype == MEDIASUBTYPE_DOLBY_DDPLUS && wFmtTag == WAVE_FORMAT_UNKNOWN) {
+			return S_OK;
+		} else if (pmt->subtype == MEDIASUBTYPE_DOLBY_AC3_SPDIF && wFmtTag == WAVE_FORMAT_DOLBY_AC3_SPDIF) {
+			return S_OK;
+		} else if (pmt->subtype == MEDIASUBTYPE_MLP && wFmtTag == WAVE_FORMAT_UNKNOWN) {
+			return S_OK;
+		}
+		//else if (pmt->subtype == MEDIASUBTYPE_DOLBY_TRUEHD && wFmtTag == WAVE_FORMAT_UNKNOWN) {
+		//    return S_OK;
+		//}
+	}
+	return E_INVALIDARG;
 }
