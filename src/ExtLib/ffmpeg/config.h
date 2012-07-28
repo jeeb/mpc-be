@@ -189,7 +189,6 @@
 #define HAVE_POLL_H 0
 #define HAVE_POSIX_MEMALIGN 0
 #define HAVE_PTHREAD_CANCEL 0
-#define HAVE_RDTSC 1
 #define HAVE_RINT 1
 #define HAVE_ROUNDF 1
 #define HAVE_RWEFLAGS 0
