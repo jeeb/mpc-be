@@ -226,18 +226,6 @@ FOR %%A IN ("Armenian" "Basque" "Belarusian" "Catalan" "Chinese Simplified"
  /target:%BUILDTYPE% /property:Configuration="Release %%~A";Platform=%1
  IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Compilation failed!"
 )
-
-FOR %%A IN ("be" "ca" "cs" "de" "es" "eu"
- "fr" "hu" "hy" "it" "ja" "ko" "nl" "pl" "pt-BR"
- "ru" "sk" "sv" "tr" "uk" "zh-CN" "zh-TW"
-) DO (
- TITLE Copying MediaInfo language - %%~A^|%1...
- IF /I "%1" == "x64" (
-  COPY /Y /V "src\ExtLib\MediaInfo\Language\%%~A.csv" "bin\mpc-be_x64\Lang\" >NUL
- ) ELSE (
-  COPY /Y /V "src\ExtLib\MediaInfo\Language\%%~A.csv" "bin\mpc-be_x86\Lang\" >NUL
- )
-)
 EXIT /B
 
 

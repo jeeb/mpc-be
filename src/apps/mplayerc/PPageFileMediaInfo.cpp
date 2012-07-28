@@ -36,60 +36,6 @@ using namespace MediaInfoLib;
 using namespace MediaInfoDLL;
 #endif
 
-LPCTSTR mi_select_lang(int nLanguage)
-{
-	switch (nLanguage) {
-		case 1:		// French
-			return _T("fr");
-		case 2:		// German
-			return _T("de");
-		case 3:		// Russian
-			return _T("ru");
-		case 4:		// Turkish
-			return _T("tr");
-		case 5:		// Czech
-			return _T("cs");
-		case 6:		// Spanish
-			return _T("es");
-		case 7:		// Hungarian
-			return _T("hu");
-		case 8:		// Korean
-			return _T("ko");
-		case 9:		// Polish
-			return _T("pl");
-		case 10:	// Ukrainian
-			return _T("uk");
-		case 11:	// Italian
-			return _T("it");
-		case 12 :	// Slovak
-			return _T("sk");
-		case 13 :	// Chinese (Simplified)
-			return _T("zh-CN");
-		case 14 :	// Chinese (Traditional)
-			return _T("zh-TW");
-		case 15 :	// Belarusian
-			return _T("be");
-		case 16 :	// Swedish
-			return _T("sv");
-		case 17 :	// Portuguese (Brasil)
-			return _T("pt-BR");
-		case 18 :	// Dutch
-			return _T("nl");
-		case 19 :	// Catalan
-			return _T("ca");
-		case 20 :	// Japanese
-			return _T("ja");
-		case 21 :	// Armenian
-			return _T("hy");
-		case 22 :	// Hebrew
-			return _T("he");
-		case 23 :	// Basque
-			return _T("eu");
-	}
-
-	return NULL;
-}
-
 MediaInfoLib::String mi_get_lang_file()
 {
 	CString path;
@@ -97,31 +43,24 @@ MediaInfoLib::String mi_get_lang_file()
 	path.ReleaseBuffer();
 	path = path.Left(path.ReverseFind('\\') + 1);
 
-	AppSettings& s = AfxGetAppSettings();
-	FILE* fp = NULL;
+	HINSTANCE mpcres = LoadLibrary(path + CMPlayerCApp::GetSatelliteDll(AfxGetAppSettings().iLanguage));
 
-	if (s.iLanguage) {
-		_tfopen_s(&fp, path + _T("Lang\\") + mi_select_lang(s.iLanguage) + _T(".csv"), _T("rb,ccs=UTF-8"));
-	}
+	if (mpcres) {
+		HRSRC hRes = FindResource(mpcres, MAKEINTRESOURCE(IDB_MEDIAINFO_LANGUAGE), _T("FILE"));
 
-	if (fp) {
-		fseek(fp, 0, SEEK_END);
-		int size = ftell(fp);
-
-		if (size) {
-			rewind(fp);
-			void* str = malloc(size);
-			fread(str, 1, size, fp);
-			fclose(fp);
+		if (hRes) {
+			HANDLE lRes = LoadResource(mpcres, hRes);
+			int size = SizeofResource(mpcres, hRes);
 
 			wchar_t* wstr = new wchar_t[size];
-			MultiByteToWideChar(CP_UTF8, 0, (char*)str, size, wstr, size);
-			free(str);
+			MultiByteToWideChar(CP_UTF8, 0, (char*)LockResource(lRes), size, wstr, size);
+
+			UnlockResource(lRes);
+			FreeResource(lRes);
+			FreeLibrary(mpcres);
 
 			return (MediaInfoLib::String)wstr;
 		}
-
-		fclose(fp);
 	}
 
 	return (MediaInfoLib::String)_T("  Config_Text_ColumnSize;30");
