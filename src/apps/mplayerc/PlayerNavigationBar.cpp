@@ -97,9 +97,11 @@ void CPlayerNavigationBar::OnSize(UINT nType, int cx, int cy)
 		sizeButtonScan = rectButtonScan.right - rectButtonScan.left;
 		totalsize = r.right - r.left;
 		separation = (totalsize - sizeComboAudio - sizeButtonInfo - sizeButtonScan) / 2;
+
 		if (separation < 0) {
 			separation = 0;
 		}
+
 		m_navdlg.m_ComboAudio.SetWindowPos(NULL, r.left, r.bottom+6, 0,0, SWP_NOSIZE | SWP_NOZORDER);
 		m_navdlg.m_ButtonInfo.SetWindowPos(NULL, r.left + sizeComboAudio + separation, r.bottom +5, 0,0, SWP_NOSIZE | SWP_NOZORDER);
 		m_navdlg.m_ButtonScan.SetWindowPos(NULL, r.left + sizeComboAudio + sizeButtonInfo + 2 * separation, r.bottom +5, 0,0, SWP_NOSIZE | SWP_NOZORDER);
@@ -113,7 +115,7 @@ void CPlayerNavigationBar::OnNcLButtonUp(UINT nHitTest, CPoint point)
 	__super::OnNcLButtonUp(nHitTest, point);
 
 	if (nHitTest == HTCLOSE) {
-		AfxGetAppSettings().fHideNavigation = true;
+		AfxGetAppSettings().fHideNavigation = 1;
 	}
 }
 
@@ -121,11 +123,11 @@ void CPlayerNavigationBar::OnNcLButtonUp(UINT nHitTest, CPoint point)
 void CPlayerNavigationBar::ShowControls(CWnd* pMainfrm, bool bShow)
 {
 	CSize s = this->CalcFixedLayout(FALSE, TRUE);
-	((CMainFrame*) pMainfrm) ->ShowControlBar(this, bShow, TRUE);
+	((CMainFrame*)pMainfrm)->ShowControlBar(this, bShow, TRUE);
 
 	WINDOWPLACEMENT wp;
 	wp.length = sizeof(wp);
 	GetWindowPlacement(&wp);
 
-	((CMainFrame*) pMainfrm)->RecalcLayout();
+	((CMainFrame*)pMainfrm)->RecalcLayout();
 }

@@ -53,6 +53,7 @@ CPPageWebServer::~CPPageWebServer()
 void CPPageWebServer::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Check(pDX, IDC_CHECK1, m_fEnableWebServer);
 	DDX_Text(pDX, IDC_EDIT1, m_nWebServerPort);
 	DDX_Control(pDX, IDC_EDIT1, m_nWebServerPortCtrl);
@@ -77,6 +78,7 @@ BOOL CPPageWebServer::PreTranslateMessage(MSG* pMsg)
 			if (m_fEnableWebServer) {
 				if (s.nWebServerPort != m_nWebServerPort) {
 					AfxMessageBox(ResStr(IDS_WEBSERVER_ERROR_TEST), MB_ICONEXCLAMATION | MB_OK);
+
 					return TRUE;
 				}
 			}
@@ -109,8 +111,7 @@ BOOL CPPageWebServer::OnInitDialog()
 
 	OnEnChangeEdit1();
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 BOOL CPPageWebServer::OnApply()
@@ -120,6 +121,7 @@ BOOL CPPageWebServer::OnApply()
 	AppSettings& s = AfxGetAppSettings();
 
 	CString NewWebRoot = m_WebRoot;
+
 	if (!m_fWebRoot) {
 		NewWebRoot = _T("*") + NewWebRoot;
 	}
@@ -141,6 +143,7 @@ BOOL CPPageWebServer::OnApply()
 			if (fRestart) {
 				pWnd->StopWebServer();
 			}
+
 			pWnd->StartWebServer(m_nWebServerPort);
 		} else {
 			pWnd->StopWebServer();
@@ -159,6 +162,7 @@ CString CPPageWebServer::GetMPCDir()
 	dir.ReleaseBuffer();
 	CPath path(dir);
 	path.RemoveFileSpec();
+
 	return (LPCTSTR)path;
 }
 
@@ -178,6 +182,7 @@ static int __stdcall BrowseCtrlCallback(HWND hwnd, UINT uMsg, LPARAM lParam, LPA
 	if (uMsg == BFFM_INITIALIZED && lpData) {
 		::SendMessage(hwnd, BFFM_SETSELECTION, TRUE, lpData);
 	}
+
 	return 0;
 }
 
@@ -200,10 +205,12 @@ bool CPPageWebServer::PickDir(CString& dir)
 			// Load SHELL32.DLL to get pointer to aforementioned function
 			HINSTANCE hDllShell = ::LoadLibrary(_T("Shell32.dll"));
 			PFN_TYPE_SHCreateItemFromParsingName pfnSHCreateItemFromParsingName = NULL;
+
 			if (hDllShell != NULL) {
 				// Try to get the pointer to that function
 				pfnSHCreateItemFromParsingName = reinterpret_cast<PFN_TYPE_SHCreateItemFromParsingName>(::GetProcAddress(hDllShell, "SHCreateItemFromParsingName"));
 			}
+
 			if (pfnSHCreateItemFromParsingName != NULL) {
 				CComPtr<IShellItem> psiFolder;
 				if (SUCCEEDED(pfnSHCreateItemFromParsingName(dir, NULL, IID_PPV_ARGS(&psiFolder)))) {
@@ -232,6 +239,7 @@ bool CPPageWebServer::PickDir(CString& dir)
 		bi.iImage = 0;
 
 		LPITEMIDLIST iil = SHBrowseForFolder(&bi);
+
 		if (iil) {
 			SHGetPathFromIDList(iil, buff);
 			dir = buff;
@@ -249,7 +257,6 @@ BEGIN_MESSAGE_MAP(CPPageWebServer, CPPageBase)
 	ON_UPDATE_COMMAND_UI(IDC_BUTTON1, OnUpdateButton2)
 END_MESSAGE_MAP()
 
-
 // CPPageWebServer message handlers
 
 void CPPageWebServer::OnEnChangeEdit1()
@@ -266,11 +273,14 @@ void CPPageWebServer::OnEnChangeEdit1()
 void CPPageWebServer::OnBnClickedButton1()
 {
 	CString dir = GetCurWebRoot();
+
 	if (PickDir(dir)) {
 		CPath path;
+
 		if (path.RelativePathTo(GetMPCDir(), FILE_ATTRIBUTE_DIRECTORY, dir, FILE_ATTRIBUTE_DIRECTORY)) {
 			dir = (LPCTSTR)path;
 		}
+
 		m_WebRoot = dir;
 
 		UpdateData(FALSE);
@@ -281,6 +291,7 @@ void CPPageWebServer::OnBnClickedButton1()
 void CPPageWebServer::OnBnClickedButton2()
 {
 	CString dir;
+
 	if (PickDir(dir)) {
 		dir += _T("\\");
 		CWebServer::Deploy(dir);

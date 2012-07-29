@@ -27,7 +27,6 @@
 #include "MainFrm.h"
 
 
-/////////////////////////////////////////////////////////////////////////////
 // CChildView
 
 CChildView::CChildView() : m_vrect(0,0,0,0)
@@ -49,8 +48,7 @@ BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs)
 	}
 
 	cs.style &= ~WS_BORDER;
-	cs.lpszClass = AfxRegisterWndClass(CS_HREDRAW|CS_VREDRAW|CS_DBLCLKS,
-									   ::LoadCursor(NULL, IDC_ARROW), HBRUSH(COLOR_WINDOW+1), NULL);
+	cs.lpszClass = AfxRegisterWndClass(CS_HREDRAW|CS_VREDRAW|CS_DBLCLKS, ::LoadCursor(NULL, IDC_ARROW), HBRUSH(COLOR_WINDOW+1), NULL);
 
 	return TRUE;
 }
@@ -134,11 +132,11 @@ void CChildView::LoadLogo()
 		}
 
 		if (!bHaveLogo) {
-			s.fLogoExternal = false; // use the built-in logo instead
-			s.strLogoFileName = ""; // clear logo file name
+			s.fLogoExternal = false;
+			s.strLogoFileName = "";
 
-			if (!m_logo.LoadFromResource(s.nLogoId)) { // try the latest selected build-in logo
-				m_logo.LoadFromResource(s.nLogoId=DEF_LOGO);    // if fail then use the default logo, should never fail
+			if (!m_logo.LoadFromResource(s.nLogoId)) {
+				m_logo.LoadFromResource(s.nLogoId=DEF_LOGO);
 			}
 		}
 	}
@@ -151,9 +149,11 @@ void CChildView::LoadLogo()
 CSize CChildView::GetLogoSize() const
 {
 	CSize ret(0,0);
+
 	if (!m_logo.IsNull()) {
 		ret.SetSize(m_logo.GetWidth(), m_logo.GetHeight());
 	}
+
 	return ret;
 }
 
@@ -175,17 +175,13 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_WM_NCLBUTTONDOWN()
 END_MESSAGE_MAP()
 
-
-/////////////////////////////////////////////////////////////////////////////
 // CChildView message handlers
 
 void CChildView::OnPaint()
 {
-	CPaintDC dc(this); // device context for painting
+	CPaintDC dc(this);
 
 	((CMainFrame*)GetParentFrame())->RepaintVideo();
-
-	// Do not call CWnd::OnPaint() for painting messages
 }
 
 BOOL CChildView::OnEraseBkgnd(CDC* pDC)
@@ -235,14 +231,17 @@ BOOL CChildView::OnPlayPlayPauseStop(UINT nID)
 	if (nID == ID_PLAY_STOP) {
 		SetVideoRect();
 	}
+
 	CString osd = ResStr(nID);
 	int i = osd.Find(_T("\n"));
+
 	if (i > 0) {
 		osd.Delete(i, osd.GetLength()-i);
 	}
 
 	CRect r1;
 	((CMainFrame*)AfxGetMainWnd())->GetClientRect(&r1);
+
 	if ((!r1.Width()) || (!r1.Height())) {
 		return FALSE;
 	}
@@ -250,6 +249,7 @@ BOOL CChildView::OnPlayPlayPauseStop(UINT nID)
 	if (!(((CMainFrame*)AfxGetMainWnd())->m_OpenFile)) {
 		((CMainFrame*)AfxGetMainWnd())->m_OSD.DisplayMessage(OSD_TOPLEFT, osd, 1500);
 	}
+
 	return FALSE;
 }
 
@@ -259,13 +259,17 @@ BOOL CChildView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 		SetCursor(NULL);
 		return TRUE;
 	}
+
 	if (((CMainFrame*)GetParentFrame())->IsSomethingLoaded() && (nHitTest == HTCLIENT)) {
 		if (((CMainFrame*)GetParentFrame())->GetPlaybackMode() == PM_DVD) {
 			return FALSE;
 		}
+
 		::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_ARROW));
+
 		return TRUE;
 	}
+
 	return CWnd::OnSetCursor(pWnd, nHitTest, message);
 }
 
@@ -275,6 +279,7 @@ LRESULT CChildView::OnNcHitTest(CPoint point)
 
 	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
 	bool fLeftMouseBtnUnassigned = !AssignedToCmd(wmcmd::LDOWN);
+
 	if (!pFrame->m_fFullScreen && (pFrame->IsCaptionHidden() || fLeftMouseBtnUnassigned)) {
 		CRect rcClient, rcFrame;
 		GetWindowRect(&rcFrame);
@@ -309,6 +314,7 @@ LRESULT CChildView::OnNcHitTest(CPoint point)
 			}
 		}
 	}
+
 	return nHitTest;
 }
 
@@ -316,6 +322,7 @@ void CChildView::OnNcLButtonDown(UINT nHitTest, CPoint point)
 {
 	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
 	bool fLeftMouseBtnUnassigned = !AssignedToCmd(wmcmd::LDOWN);
+
 	if (!pFrame->m_fFullScreen && (pFrame->IsCaptionHidden() || fLeftMouseBtnUnassigned)) {
 		BYTE bFlag = 0;
 		switch (nHitTest) {
@@ -344,6 +351,7 @@ void CChildView::OnNcLButtonDown(UINT nHitTest, CPoint point)
 				bFlag = WMSZ_BOTTOMRIGHT;
 				break;
 		}
+
 		if (bFlag) {
 			pFrame->PostMessage(WM_SYSCOMMAND, (SC_SIZE | bFlag), (LPARAM)POINTTOPOINTS(point));
 		} else {

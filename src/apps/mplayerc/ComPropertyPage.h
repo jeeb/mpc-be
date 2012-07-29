@@ -36,11 +36,10 @@ public:
 	CComPropertyPage(IPropertyPage* pPage);
 	virtual ~CComPropertyPage();
 
-	// Dialog Data
 	enum { IDD = IDD_COMPROPERTYPAGE };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnSetActive();
 	virtual BOOL OnKillActive();
 

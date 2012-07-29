@@ -39,6 +39,7 @@ CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD), m_appname(_T(""))
 BOOL CAboutDlg::OnInitDialog()
 {
 	USES_CONVERSION;
+
 	UpdateData();
 
 #ifdef _WIN64
@@ -80,6 +81,7 @@ BOOL CAboutDlg::OnInitDialog()
 #ifdef _DEBUG
 	m_MPCCompiler += _T(" Debug");
 #endif
+
 	m_strSVNNumber.Format(_T("%d"),MPC_VERSION_REV);
 	m_FFmpegCompiler.Format(A2W(GetFFmpegCompiler()));
 	m_libavcodecVersion.Format(A2W(GetlibavcodecVersion()));
@@ -90,6 +92,7 @@ BOOL CAboutDlg::OnInitDialog()
 	m_AuthorsPath = m_AuthorsPath.Left(m_AuthorsPath.ReverseFind('\\') + 1) + _T("Authors.txt");
 	// Check if the file exists
 	CFileStatus fs;
+
 	if (CFile::GetStatus(m_AuthorsPath, fs)) {
 		// If it does, we make the filename clickable
 		m_Credits.Replace(_T("Authors.txt"), _T("<a>Authors.txt</a>"));
@@ -107,6 +110,7 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CAboutDlg)
 	//}}AFX_DATA_MAP
+
 	DDX_Text(pDX, IDC_STATIC1, m_appname);
 	DDX_Text(pDX, IDC_VERSION_NUMBER, m_strVersionNumber);
 	DDX_Text(pDX, IDC_SVN_NUMBER, m_strSVNNumber);
@@ -127,11 +131,13 @@ END_MESSAGE_MAP()
 void CAboutDlg::OnHomepage(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	ShellExecute(m_hWnd, _T("open"), _T("http://sourceforge.net/p/mpcbe/"), NULL, NULL, SW_SHOWDEFAULT);
+
 	*pResult = 0;
 }
 
 void CAboutDlg::OnAuthors(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	ShellExecute(m_hWnd, _T("open"), m_AuthorsPath, NULL, NULL, SW_SHOWDEFAULT);
+
 	*pResult = 0;
 }

@@ -59,8 +59,7 @@ BOOL CComPropertyPage::OnInitDialog()
 	m_pPage->Activate(m_hWnd, r, FALSE);
 	m_pPage->Show(SW_SHOW);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 void CComPropertyPage::OnDestroy()
@@ -75,6 +74,7 @@ BOOL CComPropertyPage::OnSetActive()
 	SetModified(S_OK == m_pPage->IsPageDirty());
 
 	CWnd* pParent = GetParent();
+
 	if (pParent->IsKindOf(RUNTIME_CLASS(CComPropertySheet))) {
 		CComPropertySheet* pSheet = static_cast<CComPropertySheet*>(pParent);
 		pSheet->OnActivated(this);
@@ -90,11 +90,9 @@ BOOL CComPropertyPage::OnKillActive()
 	return CPropertyPage::OnKillActive();
 }
 
-
 BEGIN_MESSAGE_MAP(CComPropertyPage, CPropertyPage)
 	ON_WM_DESTROY()
 END_MESSAGE_MAP()
-
 
 // CComPropertyPage message handlers
 
@@ -103,6 +101,7 @@ void CComPropertyPage::OnOK()
 	if (S_OK == m_pPage->IsPageDirty()) {
 		m_pPage->Apply();
 	}
+
 	SetModified(FALSE);
 
 	CPropertyPage::OnOK();

@@ -29,7 +29,6 @@
 #include "../../Subtitles/STS.h"
 #include "MediaFormats.h"
 #include "DVBChannel.h"
-
 #include <afxsock.h>
 
 // flags for AppSettings::nCS

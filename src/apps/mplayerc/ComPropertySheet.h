@@ -51,7 +51,6 @@ public:
 
 	void OnActivated(CPropertyPage* pPage);
 
-	// IComPropertyPageDirty
 	void OnSetDirty(bool fDirty) {
 		if (CPropertyPage* p = GetActivePage()) {
 			p->SetModified(fDirty);

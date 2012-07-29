@@ -59,6 +59,7 @@ CPPageTweaks::~CPPageTweaks()
 void CPPageTweaks::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Check(pDX, IDC_CHECK3, m_fDisableXPToolbars);
 	DDX_Control(pDX, IDC_CHECK3, m_fDisableXPToolbarsCtrl);
 	DDX_Slider(pDX, IDC_SLIDER1, m_nThemeBrightness);
@@ -89,9 +90,11 @@ void CPPageTweaks::DoDataExchange(CDataExchange* pDX)
 int CALLBACK EnumFontProc(ENUMLOGFONT FAR* lf, NEWTEXTMETRIC FAR* tm, int FontType, LPARAM dwData)
 {
 	CAtlArray<CString>* fntl = (CAtlArray<CString>*)dwData;
+
 	if (FontType == TRUETYPE_FONTTYPE) {
 		fntl->Add(lf->elfFullName);
 	}
+
 	return true;
 }
 
@@ -143,33 +146,38 @@ BOOL CPPageTweaks::OnInitDialog()
 	CAtlArray<CString> fntl;
 	EnumFontFamilies(dc, NULL,(FONTENUMPROC)EnumFontProc, (LPARAM)&fntl);
 	DeleteDC(dc);
+
 	for (size_t i = 0; i < fntl.GetCount(); ++i) {
 		if (i > 0 && fntl[i-1] == fntl[i]) {
 			continue;
 		}
+
 		m_FontType.AddString(fntl[i]);
 	}
+
 	CorrectComboListWidth(m_FontType);
 	int iSel = m_FontType.FindStringExact(0, m_OSD_Font);
 	if (iSel == CB_ERR) iSel = 0;
 	m_FontType.SetCurSel(iSel);
 
 	CString str;
+
 	for (int i = 10; i < 26; ++i) {
 		str.Format(_T("%d"), i);
 		m_FontSize.AddString(str);
+
 		if (m_OSD_Size == i) {
 			iSel = i;
 		}
 	}
+
 	m_FontSize.SetCurSel(iSel - 10);
 
 	EnableToolTips(TRUE);
 
 	UpdateData(FALSE);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 BOOL CPPageTweaks::OnApply()
@@ -177,16 +185,21 @@ BOOL CPPageTweaks::OnApply()
 	UpdateData();
 
 	AppSettings& s = AfxGetAppSettings();
+
 	bool m_fToolbarRefresh = false;
+
 	if (s.fDisableXPToolbars == true && m_fDisableXPToolbars == FALSE) {
 		m_fToolbarRefresh = true;
 	}
+
 	if (s.fDisableXPToolbars == false && m_fDisableXPToolbars == TRUE) {
 		m_fToolbarRefresh = true;
 	}
+
 	if (s.clrFaceABGR != m_clrFaceABGR || s.clrOutlineABGR != m_clrOutlineABGR) {
 		m_fToolbarRefresh = true;
 	}
+
 	if (s.nThemeBrightness != m_nThemeBrightness 
 		|| s.nThemeRed != m_nThemeRed
 		|| s.nThemeGreen != m_nThemeGreen
@@ -195,8 +208,7 @@ BOOL CPPageTweaks::OnApply()
 		m_fToolbarRefresh=true;
 	}
 
-	if (m_fToolbarRefresh)
-	{
+	if (m_fToolbarRefresh) {
 		s.clrFaceABGR		= m_clrFaceABGR;
 		s.clrOutlineABGR	= m_clrOutlineABGR;
 		s.nThemeBrightness	= m_nThemeBrightness;
@@ -206,10 +218,11 @@ BOOL CPPageTweaks::OnApply()
 		s.fFileNameOnSeekBar = !!m_fFileNameOnSeekBar;
 
 		HWND WndToolBar = ((CMainFrame*)AfxGetMainWnd())->m_hWnd_toolbar;
-	    if (::IsWindow(WndToolBar)) {
-			s.fToolbarRefresh = true;//set refresh flag
-			//triggers PlayerToolBar::ArrangeControls() at OnSize
-			::PostMessage(WndToolBar, WM_SIZE, SIZE_RESTORED, MAKELPARAM(320, 240));//w,h ignored(good) by SIZE_RESTORED?!
+
+		if (::IsWindow(WndToolBar)) {
+			s.fToolbarRefresh = true;
+
+			::PostMessage(WndToolBar, WM_SIZE, SIZE_RESTORED, MAKELPARAM(320, 240));
 		}
 	}
 
@@ -233,32 +246,41 @@ BOOL CPPageTweaks::OnApply()
 	s.fSmartSeek	= !!m_fSmartSeek;
 
 	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
+
 	if (m_fUseWin7TaskBar) {
 		pFrame->CreateThumbnailToolbar();
 	}
+
 	pFrame->UpdateThumbarButton();
 	pFrame->Invalidate();
+
 	return __super::OnApply();
 }
 
 void CPPageTweaks::OnCancel()
 {
-	AfxGetAppSettings().nThemeBrightness	= m_nThemeBrightness_Old;
-	AfxGetAppSettings().nThemeRed			= m_nThemeRed_Old;
-	AfxGetAppSettings().nThemeGreen			= m_nThemeGreen_Old;
-	AfxGetAppSettings().nThemeBlue			= m_nThemeBlue_Old;
+	AppSettings& s = AfxGetAppSettings();
+
+	s.nThemeBrightness	= m_nThemeBrightness_Old;
+	s.nThemeRed			= m_nThemeRed_Old;
+	s.nThemeGreen			= m_nThemeGreen_Old;
+	s.nThemeBlue			= m_nThemeBlue_Old;
+
 	OnThemeChange();
 }
 
 void CPPageTweaks::OnThemeChange()
 {
 	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
+
 	HWND WndToolBar = ((CMainFrame*)AfxGetMainWnd())->m_hWnd_toolbar;
+
 	if (::IsWindow(WndToolBar)) {
-		AfxGetAppSettings().fToolbarRefresh = true;//set refresh flag
-		//triggers PlayerToolBar::ArrangeControls() at OnSize
-		::PostMessage(WndToolBar, WM_SIZE, SIZE_RESTORED, MAKELPARAM(320, 240));//w,h ignored(good) by SIZE_RESTORED?!
+		AfxGetAppSettings().fToolbarRefresh = true;
+
+		::PostMessage(WndToolBar, WM_SIZE, SIZE_RESTORED, MAKELPARAM(320, 240));
 	}
+
 	pFrame->Invalidate();
 }
 
@@ -281,8 +303,8 @@ BEGIN_MESSAGE_MAP(CPPageTweaks, CPPageBase)
 	ON_WM_HSCROLL()
 END_MESSAGE_MAP()
 
-
 // CPPageTweaks message handlers
+
 void CPPageTweaks::OnUpdateCheck3(CCmdUI* pCmdUI)
 {
 	GetDlgItem(IDC_BUTTON_CLRFACE)->EnableWindow(m_fDisableXPToolbars);
@@ -294,44 +316,55 @@ void CPPageTweaks::OnUpdateCheck3(CCmdUI* pCmdUI)
 
 void CPPageTweaks::OnClickClrDefault()
 {
+	AppSettings& s = AfxGetAppSettings();
+
 	m_clrFaceABGR = 0x00ffffff;
 	m_clrOutlineABGR = 0x00868686;
 	GetDlgItem(IDC_BUTTON_CLRFACE)->Invalidate();
 	GetDlgItem(IDC_BUTTON_CLROUTLINE)->Invalidate();
+
 	PostMessage(WM_COMMAND, IDC_CHECK3);
 
-	AfxGetAppSettings().nThemeBrightness	= m_nThemeBrightness	= 15;
-	AfxGetAppSettings().nThemeRed			= m_nThemeRed			= 255;
-	AfxGetAppSettings().nThemeGreen			= m_nThemeGreen			= 255;
-	AfxGetAppSettings().nThemeBlue			= m_nThemeBlue			= 255;
+	s.nThemeBrightness	= m_nThemeBrightness	= 15;
+	s.nThemeRed			= m_nThemeRed			= 255;
+	s.nThemeGreen			= m_nThemeGreen			= 255;
+	s.nThemeBlue			= m_nThemeBlue			= 255;
+
 	OnThemeChange();
 
 	UpdateData(FALSE);
 }
+
 void CPPageTweaks::OnClickClrFace()
 {
 	CColorDialog clrpicker;	
 	clrpicker.m_cc.Flags |= CC_SOLIDCOLOR|CC_RGBINIT;
 	clrpicker.m_cc.rgbResult = m_clrFaceABGR;
+
 	if (clrpicker.DoModal() == IDOK) {
 		m_clrFaceABGR = clrpicker.GetColor();
 	}
-	PostMessage(WM_COMMAND, IDC_CHECK3);//hack to enable the apply button
+
+	PostMessage(WM_COMMAND, IDC_CHECK3);
 
 	UpdateData(FALSE);
 }
+
 void CPPageTweaks::OnClickClrOutline()
 {
 	CColorDialog clrpicker;	
 	clrpicker.m_cc.Flags |= CC_SOLIDCOLOR|CC_RGBINIT;
 	clrpicker.m_cc.rgbResult = m_clrOutlineABGR;
+
 	if (clrpicker.DoModal() == IDOK) {
 		m_clrOutlineABGR = clrpicker.GetColor();
 	}
-	PostMessage(WM_COMMAND, IDC_CHECK3);//hack to enable the apply button
+
+	PostMessage(WM_COMMAND, IDC_CHECK3);
 
 	UpdateData(FALSE);
 }
+
 void CPPageTweaks::OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
@@ -346,9 +379,11 @@ void CPPageTweaks::OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult)
 			CPen penFrEnabled (PS_SOLID, 0, GetSysColor(COLOR_BTNTEXT));
 			CPen penFrDisabled (PS_SOLID, 0, GetSysColor(COLOR_BTNSHADOW));
 			CPen *penOld = dc.SelectObject(&penFrEnabled);
+
 			if (CDIS_HOT == pNMCD->uItemState || CDIS_HOT + CDIS_FOCUS == pNMCD->uItemState || CDIS_DISABLED == pNMCD->uItemState) { 
 				dc.SelectObject(&penFrDisabled);
 			}
+
 			dc.RoundRect(r.left, r.top, r.right, r.bottom, 6, 4);		
 			r.DeflateRect(2,2,2,2);
 			dc.FillSolidRect(&r, pNMCD->dwItemSpec == IDC_BUTTON_CLRFACE ? m_clrFaceABGR : m_clrOutlineABGR);
@@ -367,6 +402,7 @@ void CPPageTweaks::OnBnClickedButton1()
 	m_nJumpDistL = DEFAULT_JUMPDISTANCE_3;
 
 	UpdateData(FALSE);
+
 	SetModified();
 }
 
@@ -375,7 +411,9 @@ void CPPageTweaks::OnChngOSDCombo()
 	CString str;
 	m_OSD_Size = m_FontSize.GetCurSel()+10;
 	m_FontType.GetLBText(m_FontType.GetCurSel(),str);
+
 	((CMainFrame*)AfxGetMainWnd())->m_OSD.DisplayMessage(OSD_TOPLEFT, _T("OSD test"), 2000, m_OSD_Size, str);
+
 	SetModified();
 }
 
@@ -388,50 +426,61 @@ void CPPageTweaks::OnUseTimeTooltipClicked()
 
 void CPPageTweaks::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
+	AppSettings& s = AfxGetAppSettings();
+
 	if (*pScrollBar == m_ThemeBrightnessCtrl) {
 		UpdateData();
-		AfxGetAppSettings().nThemeBrightness	= m_nThemeBrightness;
+		s.nThemeBrightness	= m_nThemeBrightness;
 		OnThemeChange();
 	}
+
 	if (*pScrollBar == m_ThemeRedCtrl) {
 		UpdateData();
-		AfxGetAppSettings().nThemeRed			= m_nThemeRed;
+		s.nThemeRed			= m_nThemeRed;
 		OnThemeChange();
 	}
+
 	if (*pScrollBar == m_ThemeGreenCtrl) {
 		UpdateData();
-		AfxGetAppSettings().nThemeGreen			= m_nThemeGreen;
+		s.nThemeGreen			= m_nThemeGreen;
 		OnThemeChange();
 	}
+
 	if (*pScrollBar == m_ThemeBlueCtrl) {
 		UpdateData();
-		AfxGetAppSettings().nThemeBlue			= m_nThemeBlue;
+		s.nThemeBlue			= m_nThemeBlue;
 		OnThemeChange();
 	}
+
 	SetModified();
+
 	__super::OnHScroll(nSBCode, nPos, pScrollBar);
 }
 
 void CPPageTweaks::OnUpdateThemeBrightness(CCmdUI* pCmdUI)
 {
 	UpdateData();
-	pCmdUI->Enable(IsDlgButtonChecked(IDC_CHECK3)/*m_fEnableAudioSwitcher*/);
- }
+
+	pCmdUI->Enable(IsDlgButtonChecked(IDC_CHECK3));
+}
 
 void CPPageTweaks::OnUpdateThemeRed(CCmdUI* pCmdUI)
 {
 	UpdateData();
-	pCmdUI->Enable(IsDlgButtonChecked(IDC_CHECK3)/*m_fEnableAudioSwitcher*/);
- }
+
+	pCmdUI->Enable(IsDlgButtonChecked(IDC_CHECK3));
+}
 
 void CPPageTweaks::OnUpdateThemeGreen(CCmdUI* pCmdUI)
 {
 	UpdateData();
-	pCmdUI->Enable(IsDlgButtonChecked(IDC_CHECK3)/*m_fEnableAudioSwitcher*/);
- }
+
+	pCmdUI->Enable(IsDlgButtonChecked(IDC_CHECK3));
+}
 
 void CPPageTweaks::OnUpdateThemeBlue(CCmdUI* pCmdUI)
 {
 	UpdateData();
-	pCmdUI->Enable(IsDlgButtonChecked(IDC_CHECK3)/*m_fEnableAudioSwitcher*/);
- }
+
+	pCmdUI->Enable(IsDlgButtonChecked(IDC_CHECK3));
+}

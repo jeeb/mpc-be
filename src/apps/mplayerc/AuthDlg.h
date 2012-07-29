@@ -37,10 +37,9 @@ private:
 	CMapStringToString m_logins;
 
 public:
-	CAuthDlg(CWnd* pParent = NULL);   // standard constructor
+	CAuthDlg(CWnd* pParent = NULL);
 	virtual ~CAuthDlg();
 
-	// Dialog Data
 	enum { IDD = IDD_AUTH_DLG };
 	CComboBox m_usernamectrl;
 	CString m_username;
@@ -48,7 +47,7 @@ public:
 	BOOL m_remember;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 
 	DECLARE_MESSAGE_MAP()

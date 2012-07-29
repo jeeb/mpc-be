@@ -40,7 +40,6 @@ public:
 	BOOL m_fDisableXPToolbars;
 	CButton m_fDisableXPToolbarsCtrl;
 
-	// Dialog Data
 	enum { IDD = IDD_PPAGETWEAKS };
 	int m_nThemeBrightness;
 	int m_nThemeBrightness_Old;
@@ -77,7 +76,7 @@ public:
 	BOOL m_fSmartSeek;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
 	void OnCancel();

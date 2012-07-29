@@ -50,20 +50,26 @@ public:
 			if (flags&PROPPAGESTATUS_DIRTY) {
 				m_pPPD->OnSetDirty(true);
 			}
+
 			if (flags&PROPPAGESTATUS_CLEAN) {
 				m_pPPD->OnSetDirty(false);
 			}
 		}
+
 		return S_OK;
 	}
+
 	STDMETHODIMP GetLocaleID(LCID* pLocaleID) {
 		CheckPointer(pLocaleID, E_POINTER);
 		*pLocaleID = ::GetUserDefaultLCID();
+
 		return S_OK;
 	}
+
 	STDMETHODIMP GetPageContainer(IUnknown** ppUnk) {
 		return E_NOTIMPL;
 	}
+
 	STDMETHODIMP TranslateAccelerator(LPMSG pMsg) {
 		return E_NOTIMPL;
 	}
@@ -98,11 +104,13 @@ int CComPropertySheet::AddPages(ISpecifyPropertyPages* pSPP)
 
 	CAUUID caGUID;
 	caGUID.pElems = NULL;
+
 	if (FAILED(pSPP->GetPages(&caGUID)) || caGUID.pElems == NULL) {
 		return(0);
 	}
 
 	IUnknown* lpUnk = NULL;
+
 	if (FAILED(pSPP->QueryInterface(&lpUnk))) {
 		return(0);
 	}
@@ -113,6 +121,7 @@ int CComPropertySheet::AddPages(ISpecifyPropertyPages* pSPP)
 	CComQIPtr<IPersist> pPersist = pSPP;
 
 	ULONG nPages = 0;
+
 	for (ULONG i = 0; i < caGUID.cElems; i++) {
 		CComPtr<IPropertyPage> pPage;
 
@@ -140,6 +149,7 @@ int CComPropertySheet::AddPages(ISpecifyPropertyPages* pSPP)
 	if (caGUID.pElems) {
 		CoTaskMemFree(caGUID.pElems);
 	}
+
 	lpUnk->Release();
 
 	return(nPages);
@@ -216,6 +226,7 @@ void CComPropertySheet::OnActivated(CPropertyPage* pPage)
 		if (CWnd* pChild = pPage->GetWindow(GW_CHILD)) {
 			pChild->MoveWindow(bounds);
 		}
+
 		CRect r = twr;
 		pTC->AdjustRect(FALSE, r);
 		ScreenToClient(r);
@@ -223,6 +234,7 @@ void CComPropertySheet::OnActivated(CPropertyPage* pPage)
 	}
 
 	int _afxPropSheetButtons[] = { IDOK, IDCANCEL, ID_APPLY_NOW, IDHELP };
+
 	for (int i = 0; i < _countof(_afxPropSheetButtons); i++) {
 		if (CWnd* pWnd = GetDlgItem(_afxPropSheetButtons[i])) {
 			pWnd->GetWindowRect(r);
@@ -236,10 +248,8 @@ void CComPropertySheet::OnActivated(CPropertyPage* pPage)
 	Invalidate();
 }
 
-
 BEGIN_MESSAGE_MAP(CComPropertySheet, CPropertySheet)
 END_MESSAGE_MAP()
-
 
 // CComPropertySheet message handlers
 

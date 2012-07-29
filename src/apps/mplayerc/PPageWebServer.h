@@ -43,7 +43,6 @@ public:
 	CPPageWebServer();
 	virtual ~CPPageWebServer();
 
-	// Dialog Data
 	enum { IDD = IDD_PPAGEWEBSERVER };
 	BOOL m_fEnableWebServer;
 	int m_nWebServerPort;
@@ -58,7 +57,7 @@ public:
 	CString m_WebDefIndex;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);

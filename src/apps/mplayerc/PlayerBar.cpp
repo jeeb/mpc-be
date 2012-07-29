@@ -64,18 +64,23 @@ void CPlayerBar::LoadState(CFrameWnd *pParent)
 		CPoint p;
 		p.x = pApp->GetProfileInt(section, _T("DockPosX"), r.right);
 		p.y = pApp->GetProfileInt(section, _T("DockPosY"), r.top);
+
 		if (p.x < rDesktop.left) {
 			p.x = rDesktop.left;
 		}
+
 		if (p.y < rDesktop.top) {
 			p.y = rDesktop.top;
 		}
+
 		if (p.x >= rDesktop.right) {
 			p.x = rDesktop.right-1;
 		}
+
 		if (p.y >= rDesktop.bottom) {
 			p.y = rDesktop.bottom-1;
 		}
+
 		pParent->FloatControlBar(this, p);
 	} else {
 		pParent->DockControlBar(this, dockBarID);

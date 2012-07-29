@@ -48,11 +48,14 @@ void CPlayerInfoBar::SetLine(CString label, CString info)
 	for (size_t idx = 0; idx < m_label.GetCount(); idx++) {
 		CString tmp;
 		m_label[idx]->GetWindowText(tmp);
+
 		if (label == tmp) {
 			m_info[idx]->GetWindowText(tmp);
+
 			if (info != tmp) {
 				m_info[idx]->SetWindowText(info);
 			}
+
 			return;
 		}
 	}
@@ -75,9 +78,11 @@ void CPlayerInfoBar::GetLine(CString label, CString& info)
 	for (size_t idx = 0; idx < m_label.GetCount(); idx++) {
 		CString tmp;
 		m_label[idx]->GetWindowText(tmp);
+
 		if (label == tmp) {
 			m_info[idx]->GetWindowText(tmp);
 			info = tmp;
+
 			return;
 		}
 	}
@@ -88,9 +93,11 @@ void CPlayerInfoBar::RemoveLine(CString label)
 	for (size_t i = 0; i < m_label.GetCount(); i++) {
 		CString tmp;
 		m_label[i]->GetWindowText(tmp);
+
 		if (label == tmp) {
 			m_label.RemoveAt(i);
 			m_info.RemoveAt(i);
+
 			break;
 		}
 	}
@@ -127,7 +134,9 @@ CSize CPlayerInfoBar::CalcFixedLayout(BOOL bStretch, BOOL bHorz)
 {
 	CRect r;
 	GetParent()->GetClientRect(&r);
+
 	r.bottom = r.top + m_label.GetCount() * 17 + (m_label.GetCount() ? 4 : 0);
+
 	return r.Size();
 }
 
@@ -157,8 +166,6 @@ BEGIN_MESSAGE_MAP(CPlayerInfoBar, CDialogBar)
 	ON_WM_SIZE()
 	ON_WM_LBUTTONDOWN()
 END_MESSAGE_MAP()
-
-
 
 // CPlayerInfoBar message handlers
 
@@ -219,6 +226,7 @@ void CPlayerInfoBar::OnSize(UINT nType, int cx, int cy)
 void CPlayerInfoBar::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
+
 	if (!pFrame->m_fFullScreen) {
 		MapWindowPoints(pFrame, &point, 1);
 		pFrame->PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
