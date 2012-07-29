@@ -90,9 +90,11 @@ void CPlayerToolBar::SwitchTheme()
 	if (s.fDisableXPToolbars) {
 		if (HMODULE h = LoadLibrary(_T("uxtheme.dll"))) {
 			SetWindowThemeFunct f = (SetWindowThemeFunct)GetProcAddress(h, "SetWindowTheme");
+
 			if (f) {
 				f(m_hWnd, L" ", L" ");
 			}
+
 			FreeLibrary(h);
 		}
 
@@ -108,9 +110,11 @@ void CPlayerToolBar::SwitchTheme()
 	} else {
 		if (HMODULE h = LoadLibrary(_T("uxtheme.dll"))) {
 			SetWindowThemeFunct f = (SetWindowThemeFunct)GetProcAddress(h, "SetWindowTheme");
+
 			if (f) {
 				f(m_hWnd, L"Explorer", NULL);
 			}
+
 			FreeLibrary(h);
 		}
 
@@ -129,7 +133,7 @@ void CPlayerToolBar::SwitchTheme()
 
 	HBITMAP hBmp;
 	if (s.fDisableXPToolbars && NULL == fp) {
-		//int col = AfxGetAppSettings().clrFaceABGR;
+		//int col = s.clrFaceABGR;
 		//int r, g, b, R, G, B;
 		//r = col & 0xFF;
 		//g = (col >> 8) & 0xFF;
@@ -144,6 +148,7 @@ void CPlayerToolBar::SwitchTheme()
 		bmp->Attach(hBmp);
 		BITMAP bitmapBmp;
 		bmp->GetBitmap(&bitmapBmp);
+
 		if (bitmapBmp.bmWidth == bitmapBmp.bmHeight * 15) {
 
 			SetSizes(CSize(bitmapBmp.bmHeight + 7, bitmapBmp.bmHeight + 6), CSize(bitmapBmp.bmHeight, bitmapBmp.bmHeight));
@@ -159,7 +164,9 @@ void CPlayerToolBar::SwitchTheme()
 				delete m_pButtonsImages;
 				m_pButtonsImages = NULL;
 			}
+
 			m_pButtonsImages = DNew CImageList();
+
 			if (32 == fileDepth) {
 				m_pButtonsImages->Create(bitmapBmp.bmHeight, bitmapBmp.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
 				m_pButtonsImages->Add(bmp, static_cast<CBitmap*>(0));
@@ -167,10 +174,12 @@ void CPlayerToolBar::SwitchTheme()
 				m_pButtonsImages->Create(bitmapBmp.bmHeight, bitmapBmp.bmHeight, ILC_COLOR24 | ILC_MASK, 1, 0);
 				m_pButtonsImages->Add(bmp, RGB(255, 0, 255));
 			}
+
 			m_nButtonHeight = bitmapBmp.bmHeight;
 			GetToolBarCtrl().SetImageList(m_pButtonsImages);
 			fDisableImgListRemap = true;
 		}
+
 		delete bmp;
 		DeleteObject(hBmp);
 	}
@@ -234,28 +243,34 @@ void CPlayerToolBar::CreateRemappedImgList(UINT bmID, int nRemapState, CImageLis
 	// 3 Undo  Disabled
 
 	AppSettings& s = AfxGetAppSettings();
+
 	COLORMAP cmActive[] =
 	{
 		0x00000000, s.clrFaceABGR,
 		0x00808080, s.clrOutlineABGR,
 		0x00c0c0c0, 0x00ff00ff//background = transparency mask
 	};
+
 	COLORMAP cmDisabled[] =
 	{
 		0x00000000, 0x00ff00ff,//button_face -> transparency mask
 		0x00808080, s.clrOutlineABGR,
 		0x00c0c0c0, 0x00ff00ff//background = transparency mask
 	};
+
 	COLORMAP cmUndoActive[] =
 	{
 		0x00c0c0c0, 0x00ff00ff//background = transparency mask
 	};
+
 	COLORMAP cmUndoDisabled[] =
 	{
 		0x00000000, 0x00A0A0A0,//button_face -> black to gray
 		0x00c0c0c0, 0x00ff00ff//background = transparency mask
 	};
+
 	CBitmap bm;
+
 	switch (nRemapState)
 	{
 		default:
@@ -272,6 +287,7 @@ void CPlayerToolBar::CreateRemappedImgList(UINT bmID, int nRemapState, CImageLis
 			bm.LoadMappedBitmap(bmID, CMB_MASKED, cmUndoDisabled, 2);
 			break;
 	}
+
 	BITMAP bmInfo;
 	VERIFY(bm.GetBitmap(&bmInfo));
 	VERIFY(reImgList.Create(bmInfo.bmHeight, bmInfo.bmHeight, bmInfo.bmBitsPixel | ILC_MASK, 1, 0));
@@ -286,10 +302,12 @@ void CPlayerToolBar::SwitchRemmapedImgList(UINT bmID, int nRemapState)
 	// 3 Undo  Disabled
 
 	CToolBarCtrl& ctrl = GetToolBarCtrl();
+
 	if (nRemapState == 0 || nRemapState == 2) {
 		if (m_reImgListActive.GetSafeHandle()) {
 			m_reImgListActive.DeleteImageList();
 		}
+
 		CreateRemappedImgList(bmID, nRemapState, m_reImgListActive);
 		ASSERT(m_reImgListActive.GetSafeHandle());
 		ctrl.SetImageList(&m_reImgListActive);
@@ -297,6 +315,7 @@ void CPlayerToolBar::SwitchRemmapedImgList(UINT bmID, int nRemapState)
 		if (m_reImgListDisabled.GetSafeHandle()) {
 			m_reImgListDisabled.DeleteImageList();
 		}
+
 		CreateRemappedImgList(bmID, nRemapState, m_reImgListDisabled);
 		ASSERT(m_reImgListDisabled.GetSafeHandle());
 		ctrl.SetDisabledImageList(&m_reImgListDisabled);
@@ -308,8 +327,6 @@ void CPlayerToolBar::ArrangeControls()
 	if (!::IsWindow(m_volctrl.m_hWnd)) {
 		return;
 	}
-
-	AppSettings& s = AfxGetAppSettings();
 
 	SwitchTheme();
 
@@ -323,7 +340,7 @@ void CPlayerToolBar::ArrangeControls()
 
 	CRect vr2(r.right + br.right - 60, r.bottom - 25, r.right +br.right + 6, r.bottom);
 
-	if (s.fDisableXPToolbars) {
+	if (AfxGetAppSettings().fDisableXPToolbars) {
 		int m_nBMedian = r.bottom - 3 - 0.5 * m_nButtonHeight;
 		vr2.SetRect(r.right + br.right - 60, m_nBMedian - 14, r.right +br.right + 6, m_nBMedian + 10);
 	}
@@ -622,12 +639,14 @@ void CPlayerToolBar::OnUpdateVolumeMute(CCmdUI* pCmdUI)
 BOOL CPlayerToolBar::OnVolumeUp(UINT nID)
 {
 	m_volctrl.IncreaseVolume();
+
 	return FALSE;
 }
 
 BOOL CPlayerToolBar::OnVolumeDown(UINT nID)
 {
 	m_volctrl.DecreaseVolume();
+
 	return FALSE;
 }
 
@@ -642,9 +661,7 @@ void CPlayerToolBar::OnNcPaint()
 	wr.OffsetRect(-wr.left, -wr.top);
 	dc.ExcludeClipRect(&cr);
 
-	AppSettings& s = AfxGetAppSettings();
-
-	if (!s.fDisableXPToolbars) {
+	if (!AfxGetAppSettings().fDisableXPToolbars) {
 		dc.FillSolidRect(wr, GetSysColor(COLOR_BTNFACE));
 	}
 }
@@ -677,11 +694,13 @@ BOOL CPlayerToolBar::OnPlay(UINT nID)
 	tb.GetButtonInfo(ID_PLAY_PLAY, &bi);
 
 	int pos = (fs == State_Paused || fs == State_Stopped) ? 1 : 0;
+
 	if (!bi.iImage) {
 		bi.iImage = 1;
 	} else {
 		bi.iImage = pos;
 	}
+
 	tb.SetButtonInfo(ID_PLAY_PLAY, &bi);
 
 	return FALSE;

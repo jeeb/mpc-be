@@ -163,11 +163,10 @@ void CPlayerStatusBar::Relayout()
 		r.SetRect(6, r.top+4, 22, r.bottom-4);
 		m_type.MoveWindow(r);
 	} else {
-
 		m_type.ShowWindow(SW_HIDE);
 		m_status.ShowWindow(SW_HIDE);
 		m_time.ShowWindow(SW_HIDE);
-		AfxGetAppSettings().strTimeOnSeekBar = GetStatusTimer();
+		s.strTimeOnSeekBar = GetStatusTimer();
 	}
 }
 
@@ -180,6 +179,7 @@ void CPlayerStatusBar::Clear()
 	SetStatusTypeIcon(0);
 
 	Relayout();
+
 	Invalidate();
 }
 
@@ -200,6 +200,7 @@ void CPlayerStatusBar::SetStatusBitmap(UINT id)
 	m_bmid = id;
 
 	Relayout();
+
 	Invalidate();
 }
 
@@ -222,6 +223,7 @@ void CPlayerStatusBar::SetStatusTypeIcon(HICON hIcon)
 	}
 
 	Relayout();
+
 	Invalidate();
 }
 
@@ -232,6 +234,7 @@ void CPlayerStatusBar::SetStatusMessage(CString str)
 	m_status.SetWindowText(str);
 
 	Relayout();
+
 	Invalidate();
 }
 
@@ -264,6 +267,7 @@ void CPlayerStatusBar::SetStatusTimer(CString str)
 	m_time.SetWindowText(str);
 
 	Relayout();
+
 	Invalidate();
 }
 
@@ -333,6 +337,7 @@ void CPlayerStatusBar::ShowTimer(bool fShow)
 	m_time.ShowWindow(fShow ? SW_SHOW : SW_HIDE);
 
 	Relayout();
+
 	Invalidate();
 }
 
@@ -471,7 +476,7 @@ void CPlayerStatusBar::OnPaint()
 		memdc.SelectObject(&font2);
 		CString str;
 		str = GetStatusTimer();
-		AfxGetAppSettings().strTimeOnSeekBar = str;
+		s.strTimeOnSeekBar = str;
 
 		CRect rt = r;
 		m_time_rect2		= rt;
@@ -516,11 +521,14 @@ void CPlayerStatusBar::OnSize(UINT nType, int cx, int cy)
 	CDialogBar::OnSize(nType, cx, cy);
 
 	Relayout();
+
 	Invalidate();
 }
 
 void CPlayerStatusBar::OnLButtonDown(UINT nFlags, CPoint point)
 {
+	AppSettings& s = AfxGetAppSettings();
+
 	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
 
 	WINDOWPLACEMENT wp;
@@ -528,7 +536,7 @@ void CPlayerStatusBar::OnLButtonDown(UINT nFlags, CPoint point)
 	pFrame->GetWindowPlacement(&wp);
 
 	if (m_time_rect.PtInRect(point) || m_time_rect2.PtInRect(point)) {
-		AfxGetAppSettings().fRemainingTime = !AfxGetAppSettings().fRemainingTime;
+		s.fRemainingTime = !s.fRemainingTime;
 		pFrame->OnTimer(2);
 		return;
 	}

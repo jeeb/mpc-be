@@ -26,6 +26,7 @@
 #include "PlayerSeekBar.h"
 #include "MainFrm.h"
 
+
 // CPlayerSeekBar
 
 IMPLEMENT_DYNAMIC(CPlayerSeekBar, CDialogBar)
@@ -65,8 +66,6 @@ BOOL CPlayerSeekBar::Create(CWnd* pParentWnd)
 
 	m_tooltip.SendMessage(TTM_ADDTOOL, 0, (LPARAM)&m_ti);
 
-	AppSettings& s = AfxGetAppSettings();
-
 	return TRUE;
 }
 
@@ -84,6 +83,7 @@ BOOL CPlayerSeekBar::PreCreateWindow(CREATESTRUCT& cs)
 void CPlayerSeekBar::Enable(bool fEnable)
 {
 	m_fEnabled = fEnable;
+
 	Invalidate();
 }
 
@@ -98,8 +98,10 @@ void CPlayerSeekBar::SetRange(__int64 start, __int64 stop)
 	if (start > stop) {
 		start ^= stop, stop ^= start, start ^= stop;
 	}
+
 	m_start = start;
 	m_stop = stop;
+
 	if (m_pos < m_start || m_pos >= m_stop) {
 		SetPos(m_start);
 	}
@@ -118,6 +120,7 @@ __int64 CPlayerSeekBar::GetPosReal()
 void CPlayerSeekBar::SetPos(__int64 pos)
 {
 	CWnd* w = GetCapture();
+
 	if (w && w->m_hWnd == m_hWnd) {
 		return;
 	}
@@ -148,6 +151,7 @@ void CPlayerSeekBar::SetPosInternal(__int64 pos)
 		}
 
 		CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
+
 		if (pFrame && (s.fUseWin7TaskBar && pFrame->m_pTaskbarList)) {
 			pFrame->m_pTaskbarList->SetProgressValue (pFrame->m_hWnd, pos, m_stop);
 		}
@@ -433,7 +437,7 @@ void CPlayerSeekBar::OnPaint()
 			rt = rc;
 			rt.left = rc.left+6;
 			rt.top = rc.top - 2;
-			if (!AfxGetAppSettings().bStatusBarIsVisible) rt.right = rc.right - 150;
+			if (!s.bStatusBarIsVisible) rt.right = rc.right - 150;
 			memdc.DrawText(str, str.GetLength(), &rt, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
 
 			ThemeRGB(205, 210, 215, R, G, B);
@@ -441,7 +445,7 @@ void CPlayerSeekBar::OnPaint()
 			CRect rt2;
 			rt2 = rc;
 			rt2.left = rc.left+6;
-			rt2.right = (nposx > rc.right - 150 && !AfxGetAppSettings().bStatusBarIsVisible ? rc.right - 150 : nposx);
+			rt2.right = (nposx > rc.right - 150 && !s.bStatusBarIsVisible ? rc.right - 150 : nposx);
 			rt2.top = rc.top - 2;
 
 			if (nposx > rt.right-15) {
@@ -452,8 +456,8 @@ void CPlayerSeekBar::OnPaint()
 				memdc.DrawText(str, str.GetLength(), &rt2, DT_LEFT|DT_VCENTER|DT_SINGLELINE);
 			}
 
-			if (!AfxGetAppSettings().bStatusBarIsVisible) {
-				CString strT = AfxGetAppSettings().strTimeOnSeekBar;
+			if (!s.bStatusBarIsVisible) {
+				CString strT = s.strTimeOnSeekBar;
 				CRect rT = rc;
 				rT.left = rc.right - 140;
 				rT.right = rc.right - 6;
@@ -559,6 +563,7 @@ void CPlayerSeekBar::OnLButtonDown(UINT nFlags, CPoint point)
 			GetParent()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
 		} else {
 			CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
+
 			if (!pFrame->m_fFullScreen) {
 				MapWindowPoints(pFrame, &point, 1);
 				pFrame->PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
@@ -582,7 +587,9 @@ void CPlayerSeekBar::OnLButtonUp(UINT nFlags, CPoint point)
 
 void CPlayerSeekBar::OnRButtonDown(UINT nFlags, CPoint point)
 {
-	if (!AfxGetAppSettings().bStatusBarIsVisible) {
+	AppSettings& s = AfxGetAppSettings();
+
+	if (!s.bStatusBarIsVisible) {
 
 		CRect rc = GetChannelRect();
 		CRect rT = rc;
@@ -593,9 +600,10 @@ void CPlayerSeekBar::OnRButtonDown(UINT nFlags, CPoint point)
 		ScreenToClient(&p);
 
 		if (rT.PtInRect(p)) {
-			AfxGetAppSettings().fRemainingTime = !AfxGetAppSettings().fRemainingTime;
+			s.fRemainingTime = !s.fRemainingTime;
 		}
 	}
+
 	CDialogBar::OnRButtonDown(nFlags, point);
 }
 
@@ -629,24 +637,28 @@ void CPlayerSeekBar::UpdateTooltip(CPoint point)
 
 void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 {
+	AppSettings& s = AfxGetAppSettings();
+
 	CWnd* w = GetCapture();
 
 	if (w && w->m_hWnd == m_hWnd && (nFlags & MK_LBUTTON)) {
 		MoveThumb(point);
-		if (!AfxGetAppSettings().fDisableXPToolbars) {
+		if (!s.fDisableXPToolbars) {
 			GetParent()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBTRACK), (LPARAM)m_hWnd);
 		}
 	}
 
 	CMainFrame* pFrame	= ((CMainFrame*)GetParentFrame());
 
-	if (AfxGetAppSettings().fUseTimeTooltip || pFrame->CanPreviewUse()) {
+	if (s.fUseTimeTooltip || pFrame->CanPreviewUse()) {
 		UpdateTooltip(point);
 	}
 
 	OAFilterState fs	= pFrame->GetMediaState();
+
 	if (fs != -1) {
 		pt2 = point;
+
 		//MoveThumb2(point);
 		//pFrame->ChangeVideoWindow2(m_pos2);
 		//pFrame->m_wndView2.Invalidate();
@@ -718,22 +730,24 @@ void CPlayerSeekBar::OnTimer(UINT_PTR nIDEvent)
 					m_tooltipTimer = SetTimer(m_tooltipTimer, ((CMainFrame*)GetParentFrame())->CanPreviewUse() ? 10 : AUTOPOP_DELAY, NULL);
 					m_tooltipPos = CalculatePosition(point);
 					UpdateToolTipText();
+
 					if (!((CMainFrame*)GetParentFrame())->CanPreviewUse()) {
 						m_tooltip.SendMessage(TTM_TRACKACTIVATE, TRUE, (LPARAM)&m_ti);
 					}
+
 					UpdateToolTipPosition(point);
 					m_tooltipState = TOOLTIP_VISIBLE;
 				}
 			}
 			break;
 			case TOOLTIP_VISIBLE:
+			{
 				HideToolTip();
 				MoveThumb2(pt2);
 				((CMainFrame*)GetParentFrame())->PreviewWindowShow(m_pos2);
-
-				break;
+			}
+			break;
 		}
-
 	}
 
 	CWnd::OnTimer(nIDEvent);
@@ -751,6 +765,7 @@ void CPlayerSeekBar::HideToolTip()
 void CPlayerSeekBar::UpdateToolTipPosition(CPoint& point)
 {
 	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
+
 	if (pFrame->CanPreviewUse()) {
 		CRect Rect;
 		pFrame->m_wndView2.GetWindowRect(Rect);
@@ -766,12 +781,14 @@ void CPlayerSeekBar::UpdateToolTipPosition(CPoint& point)
 		point.y = GetChannelRect().TopLeft().y - (r_height + 13);
 		ClientToScreen(&point);
 		point.x = max(mi.rcWork.left + 5, min(point.x, mi.rcWork.right - r_width - 5));
+
 		if (point.y <= 5) {
 			p1.y = GetChannelRect().TopLeft().y + 30;
 			ClientToScreen(&p1);
 
 			point.y = p1.y;
 		}
+
 		pFrame->m_wndView2.MoveWindow(point.x, point.y, r_width, r_height);
 	} else {
 		CSize size = m_tooltip.GetBubbleSize(&m_ti);
@@ -785,11 +802,13 @@ void CPlayerSeekBar::UpdateToolTipPosition(CPoint& point)
 			point.x += 10;
 			point.y += 20;
 		}
+
 		point.x = max(0, min(point.x, r.Width() - size.cx));
 		ClientToScreen(&point);
 
 		m_tooltip.SendMessage(TTM_TRACKPOSITION, 0, MAKELPARAM(point.x, point.y));
 	}
+
 	m_tooltipLastPos = m_tooltipPos;
 }
 
@@ -804,9 +823,11 @@ void CPlayerSeekBar::UpdateToolTipText()
 		m_tooltipText.Format(_T("%02d:%02d"), tcNow.bMinutes, tcNow.bSeconds);
 	}
 	*/
+
 	CString tooltipText;
 	tooltipText.Format(_T("%02d:%02d:%02d"), tcNow.bHours, tcNow.bMinutes, tcNow.bSeconds);
 	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
+
 	if (!pFrame->CanPreviewUse()) {
 		m_ti.lpszText = (LPTSTR)(LPCTSTR)tooltipText;
 		m_tooltip.SendMessage(TTM_SETTOOLINFO, 0, (LPARAM)&m_ti);
