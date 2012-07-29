@@ -37,18 +37,17 @@ private:
 	CAtlArray<GUID>& m_guids;
 
 public:
-	CSelectMediaType(CAtlArray<GUID>& guids, GUID guid, CWnd* pParent = NULL);   // standard constructor
+	CSelectMediaType(CAtlArray<GUID>& guids, GUID guid, CWnd* pParent = NULL);
 	virtual ~CSelectMediaType();
 
 	GUID m_guid;
 
-	// Dialog Data
 	enum { IDD = IDD_SELECTMEDIATYPE };
 	CString m_guidstr;
 	CComboBox m_guidsctrl;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
 

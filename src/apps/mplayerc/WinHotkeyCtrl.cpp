@@ -63,6 +63,7 @@ END_MESSAGE_MAP()
 void CWinHotkeyCtrl::PreSubclassWindow()
 {
 	CEditWithButton::PreSubclassWindow();
+
 	UpdateText();
 }
 
@@ -74,6 +75,7 @@ LRESULT CALLBACK CWinHotkeyCtrl::LowLevelKeyboardProc(int nCode, WPARAM wParam, 
 							   wParam == WM_KEYUP || wParam == WM_SYSKEYUP) && sm_pwhcFocus) {
 		sm_pwhcFocus->PostMessage(WM_KEY, ((PKBDLLHOOKSTRUCT)lParam)->vkCode, (wParam & 1));
 	}
+
 	return(lResult);
 }
 
@@ -82,6 +84,7 @@ BOOL CWinHotkeyCtrl::InstallKbHook()
 	if (sm_pwhcFocus && sm_hhookKb) {
 		sm_pwhcFocus->UninstallKbHook();
 	}
+
 	sm_pwhcFocus = this;
 
 	sm_hhookKb = ::SetWindowsHookEx(WH_KEYBOARD_LL, (HOOKPROC)LowLevelKeyboardProc, GetModuleHandle(NULL), NULL);
@@ -92,11 +95,14 @@ BOOL CWinHotkeyCtrl::InstallKbHook()
 BOOL CWinHotkeyCtrl::UninstallKbHook()
 {
 	BOOL fOk = FALSE;
+
 	if (sm_hhookKb) {
 		fOk = ::UnhookWindowsHookEx(sm_hhookKb);
 		sm_hhookKb = NULL;
 	}
+
 	sm_pwhcFocus = NULL;
+
 	return(fOk);
 }
 
@@ -203,6 +209,7 @@ LRESULT CWinHotkeyCtrl::OnKey(WPARAM wParam, LPARAM lParam)
 			}
 		}
 	}
+
 	if (fRedraw) {
 		UpdateText();
 	}
@@ -219,6 +226,7 @@ LRESULT CWinHotkeyCtrl::OnLeftClick(WPARAM wParam, LPARAM lParam)
 	pt = rectButton.BottomRight();
 	pt.x = pt.x-(rectButton.Width());
 	OnContextMenu(this, pt);
+
 	return 0;
 }
 
@@ -236,12 +244,14 @@ BOOL CWinHotkeyCtrl::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 void CWinHotkeyCtrl::OnSetFocus(CWnd* pOldWnd)
 {
 	InstallKbHook();
+
 	CEditWithButton::OnSetFocus(pOldWnd);
 }
 
 void CWinHotkeyCtrl::OnKillFocus(CWnd* pNewWnd)
 {
 	UninstallKbHook();
+
 	CEditWithButton::OnKillFocus(pNewWnd);
 }
 
@@ -290,5 +300,6 @@ void CWinHotkeyCtrl::OnDestroy()
 	if (sm_pwhcFocus == this) {
 		sm_pwhcFocus->UninstallKbHook();
 	}
+
 	CEditWithButton::OnDestroy();
 }

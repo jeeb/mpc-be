@@ -56,11 +56,10 @@ public:
 	CString m_subtitlesLanguageOrder;
 	CString m_audiosLanguageOrder;
 
-	// Dialog Data
 	enum { IDD = IDD_PPAGEPLAYBACK };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
 

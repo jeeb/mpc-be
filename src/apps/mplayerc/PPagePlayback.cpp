@@ -57,6 +57,7 @@ CPPagePlayback::~CPPagePlayback()
 void CPPagePlayback::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Control(pDX, IDC_SLIDER1, m_volumectrl);
 	DDX_Control(pDX, IDC_SLIDER2, m_balancectrl);
 	DDX_Slider(pDX, IDC_SLIDER1, m_nVolume);
@@ -85,7 +86,6 @@ BEGIN_MESSAGE_MAP(CPPagePlayback, CPPageBase)
 	ON_STN_DBLCLK(IDC_STATIC_BALANCE, OnBalanceTextDblClk)
 	ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
 END_MESSAGE_MAP()
-
 
 // CPPagePlayback message handlers
 
@@ -119,8 +119,7 @@ BOOL CPPagePlayback::OnInitDialog()
 
 	UpdateData(FALSE);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 BOOL CPPagePlayback::OnApply()
@@ -150,10 +149,10 @@ void CPPagePlayback::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	if (*pScrollBar == m_volumectrl) {
 		UpdateData();
-		((CMainFrame*)GetParentFrame())->m_wndToolBar.Volume = m_nVolume; // nice shortcut...
+		((CMainFrame*)GetParentFrame())->m_wndToolBar.Volume = m_nVolume;
 	} else if (*pScrollBar == m_balancectrl) {
 		UpdateData();
-		((CMainFrame*)GetParentFrame())->SetBalance(m_nBalance); // see prev note...
+		((CMainFrame*)GetParentFrame())->SetBalance(m_nBalance);
 	}
 
 	SetModified();
@@ -180,7 +179,9 @@ void CPPagePlayback::OnBalanceTextDblClk()
 {
 	// double click on text "Balance" resets the balance to zero
 	m_balancectrl.SetPos(0);
+
 	((CMainFrame*)GetParentFrame())->SetBalance(0);
+
 	SetModified();
 }
 
@@ -197,7 +198,7 @@ BOOL CPPagePlayback::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
 		return FALSE;
 	}
 
-	static CString strTipText; // static string
+	static CString strTipText;
 
 	if (nID == IDC_SLIDER1) {
 		strTipText.Format(_T("%d%%"), m_nVolume);
@@ -217,7 +218,7 @@ BOOL CPPagePlayback::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
 
 	*pResult = 0;
 
-	return TRUE;    // message was handled
+	return TRUE;
 }
 
 void CPPagePlayback::OnCancel()

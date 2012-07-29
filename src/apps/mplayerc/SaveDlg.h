@@ -43,10 +43,9 @@ private:
 	UINT_PTR m_nIDTimerEvent;
 
 public:
-	CSaveDlg(CString in, CString out, CWnd* pParent = NULL);   // standard constructor
+	CSaveDlg(CString in, CString out, CWnd* pParent = NULL);
 	virtual ~CSaveDlg();
 
-	// Dialog Data
 	enum { IDD = IDD_SAVE_DLG };
 	CAnimateCtrl m_anim;
 	CProgressCtrl m_progress;
@@ -54,7 +53,7 @@ public:
 	CStatic m_fromto;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 
 	DECLARE_MESSAGE_MAP()

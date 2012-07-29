@@ -59,6 +59,7 @@ CPPagePlayer::~CPPagePlayer()
 void CPPagePlayer::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Radio(pDX, IDC_RADIO1, m_iAllowMultipleInst);
 	DDX_Radio(pDX, IDC_RADIO3, m_iTitleBarTextStyle);
 	DDX_Check(pDX, IDC_CHECK13, m_bTitleBarTextTitle);
@@ -117,8 +118,7 @@ BOOL CPPagePlayer::OnInitDialog()
 	GetDlgItem(IDC_FILE_POS)->EnableWindow(s.fKeepHistory);
 	GetDlgItem(IDC_DVD_POS)->EnableWindow(s.fKeepHistory);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 BOOL CPPagePlayer::OnApply()
@@ -149,9 +149,11 @@ BOOL CPPagePlayer::OnApply()
 		for (int i = 0; i < s.MRU.GetSize(); i++) {
 			s.MRU.Remove(i);
 		}
+
 		for (int i = 0; i < s.MRUDub.GetSize(); i++) {
 			s.MRUDub.Remove(i);
 		}
+
 		s.MRU.WriteList();
 		s.MRUDub.WriteList();
 

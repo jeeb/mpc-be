@@ -50,6 +50,7 @@ void CSaveThumbnailsDialog::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SPIN1, m_rowsctrl);
 	DDX_Control(pDX, IDC_SPIN2, m_colsctrl);
 	DDX_Control(pDX, IDC_SPIN3, m_widthctrl);
+
 	__super::DoDataExchange(pDX);
 }
 
@@ -64,8 +65,7 @@ BOOL CSaveThumbnailsDialog::OnInitDialog()
 	m_colsctrl.SetPos(m_cols);
 	m_widthctrl.SetPos(m_width);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 BEGIN_MESSAGE_MAP(CSaveThumbnailsDialog, CFileDialog)

@@ -77,5 +77,4 @@ namespace DSObjects
 		// IGraphEngine
 		STDMETHODIMP_(engine_t) GetEngine();
 	};
-
 }

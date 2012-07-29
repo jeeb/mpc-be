@@ -25,7 +25,6 @@
 #include "ShockwaveFlash.h"
 
 
-/////////////////////////////////////////////////////////////////////////////
 // CShockwaveFlash
 
 IMPLEMENT_DYNCREATE(CShockwaveFlash, CWnd)

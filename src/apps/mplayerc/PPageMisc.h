@@ -46,11 +46,10 @@ public:
 	CPPageMisc();
 	virtual ~CPPageMisc();
 
-	// Dialog Data
 	enum { IDD = IDD_PPAGEMISC };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
 

@@ -46,6 +46,7 @@ CPPageSubMisc::~CPPageSubMisc()
 void CPPageSubMisc::DoDataExchange(CDataExchange* pDX)
 {
 	CPPageBase::DoDataExchange(pDX);
+
 	DDX_Check(pDX, IDC_CHECK1, m_fPrioritizeExternalSubtitles);
 	DDX_Check(pDX, IDC_CHECK2, m_fDisableInternalSubtitles);
 	DDX_Text(pDX, IDC_EDIT1, m_szAutoloadPaths);
@@ -65,6 +66,7 @@ BOOL CPPageSubMisc::OnInitDialog()
 
 	m_ISDb = s.strISDb;
 	m_ISDbCombo.AddString(m_ISDb);
+
 	if (m_ISDb.CompareNoCase(_T("www.opensubtitles.org/isdb"))) {
 		m_ISDbCombo.AddString(_T("www.opensubtitles.org/isdb"));
 	}
@@ -90,7 +92,6 @@ BOOL CPPageSubMisc::OnApply()
 	return __super::OnApply();
 }
 
-
 BEGIN_MESSAGE_MAP(CPPageSubMisc, CPPageBase)
 	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedButton1)
 	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedButton2)
@@ -103,6 +104,7 @@ void CPPageSubMisc::OnBnClickedButton1()
 	m_szAutoloadPaths = DEFAULT_SUBTITLE_PATHS;
 
 	UpdateData(FALSE);
+
 	SetModified();
 }
 

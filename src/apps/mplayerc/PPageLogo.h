@@ -42,14 +42,13 @@ public:
 	CPPageLogo();
 	virtual ~CPPageLogo();
 
-	// Dialog Data
 	enum { IDD = IDD_PPAGELOGO };
 	int m_intext;
 	CString m_logofn;
 	CStatic m_logopreview;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
 

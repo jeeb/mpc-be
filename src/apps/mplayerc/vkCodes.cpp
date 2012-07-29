@@ -290,17 +290,18 @@ PCTSTR GetKeyName(UINT vkCode)
 	return(s_pszKeys[vkCode]);
 }
 
-//-----------------------------------------------------------------
-
 BOOL HotkeyToString(UINT vkCode, UINT fModifiers, CString& s) {
 
 	s.Empty();
+
 	if (fModifiers & MOD_CONTROL) {
 		s += _T("Ctrl + ");
 	}
+
 	if (fModifiers & MOD_ALT) {
 		s += _T("Alt + ");
 	}
+
 	if (fModifiers & MOD_SHIFT) {
 		s += _T("Shift + ");
 	}
@@ -319,12 +320,15 @@ BOOL HotkeyModToString(UINT vkCode, BYTE fModifiers, CString& s)
 	if (fModifiers & FCONTROL) {
 		s += _T("Ctrl + ");
 	}
+
 	if (fModifiers & FALT) {
 		s += _T("Alt + ");
 	}
+
 	if (fModifiers & FSHIFT) {
 		s += _T("Shift + ");
 	}
+
 	if (vkCode) {
 		s.Format(_T("%s%s"), (LPCTSTR)s, GetKeyName(vkCode));
 	}
@@ -332,6 +336,7 @@ BOOL HotkeyModToString(UINT vkCode, BYTE fModifiers, CString& s)
 	return(!s.IsEmpty());
 }
 
-BOOL HotkeyToString(DWORD dwHk, CString& s) {
+BOOL HotkeyToString(DWORD dwHk, CString& s)
+{
 	return(HotkeyToString(LOBYTE(LOWORD(dwHk)), HIBYTE(LOWORD(dwHk)), s));
 }

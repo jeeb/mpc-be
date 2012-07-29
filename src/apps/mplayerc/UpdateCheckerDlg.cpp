@@ -56,12 +56,12 @@ UpdateCheckerDlg::~UpdateCheckerDlg()
 void UpdateCheckerDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
+
 	DDX_Text(pDX, IDC_UPDATE_DLG_TEXT, m_text);
 	DDX_Control(pDX, IDC_UPDATE_ICON, m_icon);
 	DDX_Control(pDX, IDOK, m_okButton);
 	DDX_Control(pDX, IDCANCEL, m_cancelButton);
 }
-
 
 BEGIN_MESSAGE_MAP(UpdateCheckerDlg, CDialog)
 END_MESSAGE_MAP()
@@ -92,7 +92,7 @@ BOOL UpdateCheckerDlg::OnInitDialog()
 void UpdateCheckerDlg::OnOK()
 {
 	if (m_updateStatus == UPDATER_UPDATE_AVAILABLE) {
-//		ShellExecute(NULL, _T("open"), _T("https://sourceforge.net/p/mpcbe/download-media-player-classic-hc.html"), NULL, NULL, SW_SHOWNORMAL);
+//		ShellExecute(NULL, _T("open"), _T("http://sourceforge.net/p/mpcbe/download-media-player-classic-hc.html"), NULL, NULL, SW_SHOWNORMAL);
 		ShellExecute(NULL, _T("open"), _T("http://www.xvidvideo.ru/media-player-classic-home-cinema-x86-x64/"), NULL, NULL, SW_SHOWNORMAL);
 	}
 

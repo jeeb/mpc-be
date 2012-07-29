@@ -48,6 +48,7 @@ CSaveTextFileDialog::~CSaveTextFileDialog()
 void CSaveTextFileDialog::DoDataExchange(CDataExchange* pDX)
 {
 	DDX_Control(pDX, IDC_COMBO1, m_encoding);
+
 	__super::DoDataExchange(pDX);
 }
 
@@ -76,8 +77,7 @@ BOOL CSaveTextFileDialog::OnInitDialog()
 			break;
 	}
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 BEGIN_MESSAGE_MAP(CSaveTextFileDialog, CFileDialog)
@@ -88,5 +88,6 @@ END_MESSAGE_MAP()
 BOOL CSaveTextFileDialog::OnFileNameOK()
 {
 	m_e = (CTextFile::enc)m_encoding.GetItemData(m_encoding.GetCurSel());
+
 	return __super::OnFileNameOK();
 }

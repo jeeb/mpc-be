@@ -24,7 +24,6 @@
 #pragma once
 
 
-/////////////////////////////////////////////////////////////////////////////
 // CShockwaveFlash
 
 class CShockwaveFlash : public CWnd
@@ -382,5 +381,4 @@ public:
 		static BYTE parms[] = VTS_BSTR ;
 		InvokeHelper(0xab, DISPATCH_PROPERTYPUT, VT_EMPTY, NULL, parms, newValue);
 	}
-
 };

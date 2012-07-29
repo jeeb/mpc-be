@@ -23,7 +23,6 @@
 #include "stdafx.h"
 #include "Version.h"
 #include "UpdateChecker.h"
-
 #include <afxinet.h>
 
 const Version UpdateChecker::MPC_VERSION = { MPC_VERSION_MAJOR, MPC_VERSION_MINOR, MPC_VERSION_STATUS,MPC_VERSION_PATCH };

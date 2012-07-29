@@ -44,6 +44,7 @@ CPPageMisc::~CPPageMisc()
 void CPPageMisc::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Control(pDX, IDC_SLI_BRIGHTNESS, m_SliBrightness);
 	DDX_Control(pDX, IDC_SLI_CONTRAST, m_SliContrast);
 	DDX_Control(pDX, IDC_SLI_HUE, m_SliHue);
@@ -54,14 +55,12 @@ void CPPageMisc::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_STATIC4, m_sSaturation);
 }
 
-
 BEGIN_MESSAGE_MAP(CPPageMisc, CPPageBase)
 	ON_WM_HSCROLL()
 	ON_BN_CLICKED(IDC_RESET, OnBnClickedReset)
 	ON_BN_CLICKED(IDC_RESET_SETTINGS, OnResetSettings)
 	ON_BN_CLICKED(IDC_EXPORT_SETTINGS, OnExportSettings)
 END_MESSAGE_MAP()
-
 
 // CPPageMisc message handlers
 
@@ -125,6 +124,7 @@ BOOL CPPageMisc::OnApply()
 void CPPageMisc::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	UpdateData();
+
 	if (*pScrollBar == m_SliBrightness) {
 		m_iBrightness = m_SliBrightness.GetPos();
 		((CMainFrame*)AfxGetMyApp()->GetMainWnd())->SetColorControl(ProcAmp_Brightness, m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
@@ -208,5 +208,6 @@ void CPPageMisc::OnCancel()
 	AppSettings& s = AfxGetAppSettings();
 
 	((CMainFrame*)AfxGetMyApp()->GetMainWnd())->SetColorControl(ProcAmp_All, s.iBrightness, s.iContrast, s.iHue, s.iSaturation);
+
 	__super::OnCancel();
 }

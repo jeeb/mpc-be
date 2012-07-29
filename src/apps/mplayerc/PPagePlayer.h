@@ -55,11 +55,10 @@ public:
 	BOOL m_fRememberFilePos;
 	BOOL m_bRememberPlaylistItems;
 
-	// Dialog Data
 	enum { IDD = IDD_PPAGEPLAYER };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
 

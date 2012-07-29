@@ -47,7 +47,6 @@ public:
 	CPPageOutput();
 	virtual ~CPPageOutput();
 
-	// Dialog Data
 	enum { IDD = IDD_PPAGEOUTPUT };
 	int m_iDSVideoRendererType;
 	int m_iRMVideoRendererType;
@@ -66,7 +65,7 @@ public:
 	int m_iD3D9RenderDevice;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
 

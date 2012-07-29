@@ -49,12 +49,12 @@ CPPageLogo::~CPPageLogo()
 void CPPageLogo::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Radio(pDX, IDC_RADIO1, m_intext);
 	DDX_Text(pDX, IDC_LOGOFILENAME, m_logofn);
 	DDX_Control(pDX, IDC_LOGOPREVIEW, m_logopreview);
 	DDX_Text(pDX, IDC_AUTHOR, m_author);
 }
-
 
 BEGIN_MESSAGE_MAP(CPPageLogo, CPPageBase)
 	ON_BN_CLICKED(IDC_RADIO1, OnBnClickedRadio1)
@@ -62,7 +62,6 @@ BEGIN_MESSAGE_MAP(CPPageLogo, CPPageBase)
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN1, OnDeltaposSpin1)
 	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedButton2)
 END_MESSAGE_MAP()
-
 
 // CPPageLogo message handlers
 
@@ -81,6 +80,7 @@ BOOL CPPageLogo::OnInitDialog()
 	for (POSITION pos = m_logoids.GetHeadPosition(); pos; m_logoids.GetNext(pos)) {
 		if (m_logoids.GetAt(pos) == s.nLogoId) {
 			m_logoidpos = pos;
+
 			break;
 		}
 	}
@@ -91,8 +91,7 @@ BOOL CPPageLogo::OnInitDialog()
 		OnBnClickedRadio2();
 	}
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 BOOL CPPageLogo::OnApply()
@@ -146,11 +145,13 @@ void CPPageLogo::OnDeltaposSpin1(NMHDR *pNMHDR, LRESULT *pResult)
 
 	if (pNMUpDown->iDelta < 0) {
 		m_logoids.GetNext(m_logoidpos);
+
 		if (!m_logoidpos) {
 			m_logoidpos = m_logoids.GetHeadPosition();
 		}
 	} else {
 		m_logoids.GetPrev(m_logoidpos);
+
 		if (!m_logoidpos) {
 			m_logoidpos = m_logoids.GetTailPosition();
 		}
@@ -159,7 +160,9 @@ void CPPageLogo::OnDeltaposSpin1(NMHDR *pNMHDR, LRESULT *pResult)
 	GetDataFromRes();
 
 	UpdateData(FALSE);
+
 	SetModified();
+
 	*pResult = 0;
 }
 
@@ -183,11 +186,13 @@ void CPPageLogo::GetDataFromRes()
 
 	m_logobm.Destroy();
 	UINT id = m_logoids.GetAt(m_logoidpos);
+
 	if (IDF_LOGO0 != id) {
 		m_logobm.LoadFromResource(id);
 		if (!m_author.LoadString(id)) {
 			m_author = ResStr(IDS_LOGO_AUTHOR);
 		}
 	}
+
 	m_logopreview.SetBitmap(m_logobm);
 }

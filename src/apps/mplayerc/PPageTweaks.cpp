@@ -284,7 +284,6 @@ void CPPageTweaks::OnThemeChange()
 	pFrame->Invalidate();
 }
 
-
 BEGIN_MESSAGE_MAP(CPPageTweaks, CPPageBase)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK3, OnUpdateCheck3)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_BUTTON_CLRFACE, OnCustomDrawBtns)

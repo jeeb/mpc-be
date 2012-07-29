@@ -48,6 +48,7 @@ CPPageSync::~CPPageSync()
 void CPPageSync::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Check(pDX, IDC_SYNCVIDEO, m_bSynchronizeVideo);
 	DDX_Check(pDX, IDC_SYNCDISPLAY, m_bSynchronizeDisplay);
 	DDX_Check(pDX, IDC_SYNCNEAREST, m_bSynchronizeNearest);
@@ -64,8 +65,7 @@ BOOL CPPageSync::OnInitDialog()
 
 	InitDialogPrivate();
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 BOOL CPPageSync::OnSetActive()
@@ -78,8 +78,10 @@ BOOL CPPageSync::OnSetActive()
 void CPPageSync::InitDialogPrivate()
 {
 	AppSettings& s = AfxGetAppSettings();
+
 	CMainFrame * pFrame;
 	pFrame = (CMainFrame *)(AfxGetApp()->m_pMainWnd);
+
 	if ((s.iDSVideoRendererType == VIDRNDT_DS_SYNC) && (pFrame->GetPlaybackMode() == PM_NONE)) {
 		GetDlgItem(IDC_SYNCVIDEO)->EnableWindow(TRUE);
 		GetDlgItem(IDC_SYNCDISPLAY)->EnableWindow(TRUE);
@@ -118,6 +120,7 @@ BOOL CPPageSync::OnApply()
 	rendererSettings.fCycleDelta = m_fCycleDelta;
 	rendererSettings.fTargetSyncOffset = m_fTargetSyncOffset;
 	rendererSettings.fControlLimit = m_fControlLimit;
+
 	return __super::OnApply();
 }
 
@@ -130,32 +133,41 @@ END_MESSAGE_MAP()
 void CPPageSync::OnBnClickedSyncVideo()
 {
 	m_bSynchronizeVideo = !m_bSynchronizeVideo;
+
 	if (m_bSynchronizeVideo) {
 		m_bSynchronizeDisplay = FALSE;
 		m_bSynchronizeNearest = FALSE;
 	}
+
 	UpdateData(FALSE);
+
 	SetModified();
 }
 
 void CPPageSync::OnBnClickedSyncDisplay()
 {
 	m_bSynchronizeDisplay = !m_bSynchronizeDisplay;
+
 	if (m_bSynchronizeDisplay) {
 		m_bSynchronizeVideo = FALSE;
 		m_bSynchronizeNearest = FALSE;
 	}
+
 	UpdateData(FALSE);
+
 	SetModified();
 }
 
 void CPPageSync::OnBnClickedSyncNearest()
 {
 	m_bSynchronizeNearest = !m_bSynchronizeNearest;
+
 	if (m_bSynchronizeNearest) {
 		m_bSynchronizeVideo = FALSE;
 		m_bSynchronizeDisplay = FALSE;
 	}
+
 	UpdateData(FALSE);
+
 	SetModified();
 }

@@ -63,10 +63,12 @@ CPPageSheet::CPPageSheet(LPCTSTR pszCaption, IFilterGraph* pFG, CWnd* pParentWnd
 	if (!idPage) {
 		idPage = AfxGetAppSettings().nLastUsedPage;
 	}
+
 	if (idPage) {
 		for (int i = 0; i < GetPageCount(); i++) {
 			if (GetPage(i)->m_pPSP->pszTemplate == MAKEINTRESOURCE(idPage)) {
 				SetActivePage(i);
+
 				break;
 			}
 		}
@@ -118,7 +120,6 @@ CTreePropSheetTreeCtrl::CTreePropSheetTreeCtrl()
 CTreePropSheetTreeCtrl::~CTreePropSheetTreeCtrl()
 {
 }
-
 
 BEGIN_MESSAGE_MAP(CTreePropSheetTreeCtrl, CTreeCtrl)
 END_MESSAGE_MAP()
