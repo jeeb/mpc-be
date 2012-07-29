@@ -789,8 +789,8 @@ void CPlayerSeekBar::UpdateToolTipPosition(CPoint& point)
 		ClientToScreen(&point);
 
 		m_tooltip.SendMessage(TTM_TRACKPOSITION, 0, MAKELPARAM(point.x, point.y));
-		m_tooltipLastPos = m_tooltipPos;
 	}
+	m_tooltipLastPos = m_tooltipPos;
 }
 
 void CPlayerSeekBar::UpdateToolTipText()

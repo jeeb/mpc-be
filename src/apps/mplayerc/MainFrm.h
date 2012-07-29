@@ -950,9 +950,6 @@ public:
 	afx_msg void OnRecentFile(UINT nID);
 	afx_msg void OnUpdateRecentFile(CCmdUI* pCmdUI);
 
-	afx_msg HRESULT PreviewWindowHide();
-	afx_msg HRESULT PreviewWindowShow(REFERENCE_TIME rtCur2);
-
 	afx_msg void OnHelpHomepage();
 	static UINT CheckForUpdate(LPVOID pParam);
 	afx_msg void OnHelpCheckForUpdate();
@@ -973,6 +970,8 @@ public:
 	// SmartSeek
 	CWnd			m_wndView2;
 	CWnd*			m_pVideoWnd2;
+	HRESULT PreviewWindowHide();
+	HRESULT PreviewWindowShow(REFERENCE_TIME rtCur2);
 
 	SIZE			m_fullWndSize;
 	CFullscreenWnd*	m_pFullscreenWnd;

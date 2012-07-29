@@ -51,6 +51,9 @@ int					g_nDXVAVersion		= 0;
 IPinCVtbl*			g_pPinCVtbl			= NULL;
 IMemInputPinCVtbl*	g_pMemInputPinCVtbl = NULL;
 
+// Aleksoid : validate Pin
+IPinC*				g_pPin				= NULL;
+
 typedef struct {
 	const int     Format;
 	const LPCTSTR Description;
@@ -146,7 +149,10 @@ static HRESULT (STDMETHODCALLTYPE * NewSegmentOrg)(IPinC * This, /* [in] */ REFE
 
 static HRESULT STDMETHODCALLTYPE NewSegmentMine(IPinC * This, /* [in] */ REFERENCE_TIME tStart, /* [in] */ REFERENCE_TIME tStop, /* [in] */ double dRate)
 {
-	g_tSegmentStart = tStart;
+	if (g_pPin == This) { // Aleksoid : validate Pin
+		g_tSegmentStart = tStart;
+	}
+
 	return NewSegmentOrg(This, tStart, tStop, dRate);
 }
 
@@ -158,6 +164,7 @@ static HRESULT STDMETHODCALLTYPE ReceiveMineI(IMemInputPinC * This, IMediaSample
 	if (pSample && SUCCEEDED(pSample->GetTime(&rtStart, &rtStop))) {
 		g_tSampleStart = rtStart;
 	}
+
 	return ReceiveOrg(This, pSample);
 }
 
@@ -167,9 +174,9 @@ static HRESULT STDMETHODCALLTYPE ReceiveMine(IMemInputPinC * This, IMediaSample 
 	// To avoid black out on pause, we have to lock g_ffdshowReceive to synchronize with CMainFrame::OnPlayPause.
 	if (queue_ffdshow_support) {
 		CAutoLock lck(&g_ffdshowReceive);
-		return ReceiveMineI(This,pSample);
+		return ReceiveMineI(This, pSample);
 	}
-	return ReceiveMineI(This,pSample);
+	return ReceiveMineI(This, pSample);
 }
 
 void UnhookNewSegmentAndReceive()
@@ -195,6 +202,9 @@ void UnhookNewSegmentAndReceive()
 		g_pMemInputPinCVtbl = NULL;
 		NewSegmentOrg		= NULL;
 		ReceiveOrg			= NULL;
+
+		// Aleksoid : validate Pin
+		g_pPin				= NULL;
 	}
 }
 
@@ -230,6 +240,9 @@ bool HookNewSegmentAndReceive(IPinC* pPinC, IMemInputPinC* pMemInputPinC)
 
 	g_pPinCVtbl			= pPinC->lpVtbl;
 	g_pMemInputPinCVtbl = pMemInputPinC->lpVtbl;
+
+	// Aleksoid : validate Pin
+	g_pPin			= pPinC;
 
 	return true;
 }
