@@ -2718,8 +2718,11 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 				break;
 		}
 	} else {
-		m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer9, L"VMR9 - Preview window", MERIT64_ABOVE_DSHOW+2));
-		//m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EnhancedVideoRenderer, L"Enhanced Video Renderer", MERIT64_ABOVE_DSHOW+2));
+		if (IsWinVistaOrLater()) {
+			m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EnhancedVideoRenderer, L"Enhanced Video Renderer", MERIT64_ABOVE_DSHOW+2));
+		} else {
+			m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer9, L"VMR9 - Preview window", MERIT64_ABOVE_DSHOW+2));
+		}
 	}
 
 	if (!m_IsPreview) {

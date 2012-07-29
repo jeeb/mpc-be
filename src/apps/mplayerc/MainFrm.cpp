@@ -709,7 +709,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	AppSettings& s = AfxGetAppSettings();
 
-	b_UseSmartSeek = s.fSmartSeek && !s.fD3DFullscreen && !!IsWinVistaOrLater();
+	b_UseSmartSeek = s.fSmartSeek && !s.fD3DFullscreen;
 
 	if (b_UseSmartSeek) {
 		if (!m_wndView2.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL,
@@ -10851,7 +10851,7 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 	} else {
 		m_pVideoWnd		= &m_wndView;
 		if (!m_wndView2) {
-			b_UseSmartSeek = s.fSmartSeek && !s.fD3DFullscreen && !!IsWinVistaOrLater();
+			b_UseSmartSeek = s.fSmartSeek && !s.fD3DFullscreen;
 
 			if (b_UseSmartSeek) {
 				if (!m_wndView2.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL,
@@ -10864,7 +10864,7 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 				}
 			}
 		} else {
-			b_UseSmartSeek = s.fSmartSeek && !s.fD3DFullscreen && !!IsWinVistaOrLater() && m_wndView2;
+			b_UseSmartSeek = s.fSmartSeek && !s.fD3DFullscreen && m_wndView2;
 		}
 
 		if (b_UseSmartSeek && m_wndView2) {
