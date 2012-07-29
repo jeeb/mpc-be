@@ -62,7 +62,7 @@ static int EncodeLossless(const uint8_t* data, int width, int height,
   WebPPictureInit(&picture);
   picture.width = width;
   picture.height = height;
-  picture.use_argb_input = 1;
+  picture.use_argb = 1;
   if (!WebPPictureAlloc(&picture)) return 0;
 
   // Transfer the alpha values to the green channel.
@@ -82,9 +82,10 @@ static int EncodeLossless(const uint8_t* data, int width, int height,
   WebPConfigInit(&config);
   config.lossless = 1;
   config.method = effort_level;  // impact is very small
-  // quality below 50 doesn't change things much (in speed and size).
-  // quality above 80 can be very very slow.
-  config.quality = 40 + 10.f * effort_level;
+  // Set moderate default quality setting for alpha. Higher qualities (80 and
+  // above) could be very slow.
+  config.quality = 10.f + 15.f * effort_level;
+  if (config.quality > 100.f) config.quality = 100.f;
 
   VP8LBitWriterInit(&tmp_bw, (width * height) >> 3);
   ok = (VP8LEncodeStream(&config, &picture, &tmp_bw) == VP8_ENC_OK);

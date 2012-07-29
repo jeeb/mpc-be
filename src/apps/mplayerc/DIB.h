@@ -141,7 +141,7 @@ static void WebPDIB(LPCTSTR fn, BYTE* pData, float quality)
 			config.quality = quality;
 		} else {
 			config.lossless = 1;
-			picture.use_argb_input = 1;
+			picture.use_argb = 1;
 		}
 
 		picture.width = width;

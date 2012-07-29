@@ -20,21 +20,13 @@
  *
  */
 
-// PPageFileMediaInfo.cpp : implementation file
-
-
 #include "stdafx.h"
 #include "mplayerc.h"
 #include "PPageFileMediaInfo.h"
 #include "../../DSUtil/WinAPIUtils.h"
-
-#ifdef USE_MEDIAINFO_STATIC
 #include <MediaInfo/MediaInfo.h>
+
 using namespace MediaInfoLib;
-#else
-#include <MediaInfoDLL.h>
-using namespace MediaInfoDLL;
-#endif
 
 MediaInfoLib::String mi_get_lang_file()
 {
@@ -43,7 +35,12 @@ MediaInfoLib::String mi_get_lang_file()
 	path.ReleaseBuffer();
 	path = path.Left(path.ReverseFind('\\') + 1);
 
-	HINSTANCE mpcres = LoadLibrary(path + CMPlayerCApp::GetSatelliteDll(AfxGetAppSettings().iLanguage));
+	HINSTANCE mpcres = NULL;
+	int lang = AfxGetAppSettings().iLanguage;
+
+	if (lang) {
+		mpcres = LoadLibrary(path + CMPlayerCApp::GetSatelliteDll(lang));
+	}
 
 	if (mpcres) {
 		HRSRC hRes = FindResource(mpcres, MAKEINTRESOURCE(IDB_MEDIAINFO_LANGUAGE), _T("FILE"));
@@ -86,6 +83,7 @@ CPPageFileMediaInfo::~CPPageFileMediaInfo()
 void CPPageFileMediaInfo::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Control(pDX, IDC_MIEDIT, m_mediainfo);
 }
 
@@ -95,20 +93,20 @@ BEGIN_MESSAGE_MAP(CPPageFileMediaInfo, CPropertyPage)
 END_MESSAGE_MAP()
 
 // CPPageFileMediaInfo message handlers
+
 static WNDPROC OldControlProc;
 
 static LRESULT CALLBACK ControlProc(HWND control, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	if (message == WM_KEYDOWN) {
-		if ((LOWORD(wParam)== 'A' || LOWORD(wParam) == 'a')
-				&&(GetKeyState(VK_CONTROL) < 0)) {
+		if ((LOWORD(wParam)== 'A' || LOWORD(wParam) == 'a') && GetKeyState(VK_CONTROL) < 0) {
 			CEdit *pEdit = (CEdit*)CWnd::FromHandle(control);
 			pEdit->SetSel(0, pEdit->GetWindowTextLength(), TRUE);
 			return 0;
 		}
 	}
 
-	return CallWindowProc(OldControlProc, control, message, wParam, lParam); // call edit control's own windowproc
+	return CallWindowProc(OldControlProc, control, message, wParam, lParam);
 }
 
 BOOL CPPageFileMediaInfo::OnInitDialog()
@@ -118,6 +116,7 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 	if (!m_pCFont) {
 		m_pCFont = DNew CFont;
 	}
+
 	if (!m_pCFont) {
 		return TRUE;
 	}
@@ -138,19 +137,15 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 		EndEnumFilters
 	}
 
-#ifdef USE_MEDIAINFO_STATIC
 	MediaInfoLib::String f_name = m_fn;
 	MediaInfoLib::MediaInfo MI;
-#else
-	MediaInfoDLL::String f_name = m_fn;
-	MediaInfo MI;
-#endif
 
 	MI.Open(f_name);
 	MI.Option(_T("Complete"));
 	MI.Option(_T("Language"), mi_get_lang_file());
 	MI_Text = MI.Inform().c_str();
 	MI.Close();
+
 	if (!MI_Text.Find(_T("Unable to load"))) {
 		MI_Text = _T("");
 	}
@@ -158,42 +153,35 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 	LOGFONT lf;
 	memset(&lf, 0, sizeof(lf));
 	lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
-	// The empty string will fallback to the first font that matches the other specified attributes.
+
 	LPCTSTR fonts[] = { _T("Lucida Console"), _T("Courier New"), _T("") };
-	// Use a negative value to match the character height instead of the cell height.
 	int fonts_size[] = { -10, -11, -11 };
+
 	UINT i = 0;
 	BOOL success;
+
 	do {
 		_tcscpy_s(lf.lfFaceName, fonts[i]);
 		lf.lfHeight = fonts_size[i];
 		success = IsFontInstalled(fonts[i]) && m_pCFont->CreateFontIndirect(&lf);
 		i++;
 	} while (!success && i < _countof(fonts));
+
 	m_mediainfo.SetFont(m_pCFont);
 	m_mediainfo.SetWindowText(MI_Text);
 
-	// subclass the edit control
 	OldControlProc = (WNDPROC)SetWindowLongPtr(m_mediainfo.m_hWnd, GWLP_WNDPROC, (LONG_PTR)ControlProc);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 void CPPageFileMediaInfo::OnShowWindow(BOOL bShow, UINT nStatus)
 {
 	__super::OnShowWindow(bShow, nStatus);
+
 	if (bShow) {
 		GetParent()->GetDlgItem(IDC_BUTTON_MI)->ShowWindow(SW_SHOW);
 	} else {
 		GetParent()->GetDlgItem(IDC_BUTTON_MI)->ShowWindow(SW_HIDE);
 	}
 }
-
-#ifndef USE_MEDIAINFO_STATIC
-bool CPPageFileMediaInfo::HasMediaInfo()
-{
-	MediaInfo MI;
-	return MI.IsReady();
-}
-#endif

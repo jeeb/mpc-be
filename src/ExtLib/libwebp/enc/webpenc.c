@@ -46,8 +46,8 @@ static int DummyWriter(const uint8_t* data, size_t data_size,
   return 1;
 }
 
-int WebPPictureInitInternal(WebPPicture* const picture, int version) {
-  if (version != WEBP_ENCODER_ABI_VERSION) {
+int WebPPictureInitInternal(WebPPicture* picture, int version) {
+  if (WEBP_ABI_IS_INCOMPATIBLE(version, WEBP_ENCODER_ABI_VERSION)) {
     return 0;   // caller/system version mismatch!
   }
   if (picture != NULL) {
@@ -328,7 +328,7 @@ int WebPReportProgress(const WebPPicture* const pic,
 }
 //------------------------------------------------------------------------------
 
-int WebPEncode(const WebPConfig* const config, WebPPicture* const pic) {
+int WebPEncode(const WebPConfig* config, WebPPicture* pic) {
   int ok;
 
   if (pic == NULL)
@@ -345,8 +345,13 @@ int WebPEncode(const WebPConfig* const config, WebPPicture* const pic) {
 
   if (!config->lossless) {
     VP8Encoder* enc = NULL;
-    if (pic->y == NULL || pic->u == NULL || pic->v == NULL)
-      return WebPEncodingSetError(pic, VP8_ENC_ERROR_NULL_PARAMETER);
+    if (pic->y == NULL || pic->u == NULL || pic->v == NULL) {
+      if (pic->argb != NULL) {
+        if (!WebPPictureARGBToYUVA(pic, WEBP_YUV420)) return 0;
+      } else {
+        return WebPEncodingSetError(pic, VP8_ENC_ERROR_NULL_PARAMETER);
+      }
+    }
 
     enc = InitVP8Encoder(config, pic);
     if (enc == NULL) return 0;  // pic->error is already set.

@@ -35,20 +35,15 @@ public:
 	CPPageFileMediaInfo(CString fn, IFilterGraph* pFG);
 	virtual ~CPPageFileMediaInfo();
 
-	// Dialog Data
 	enum { IDD = IDD_FILEMEDIAINFO };
 
 	CEdit m_mediainfo;
 	CString m_fn;
 	CFont* m_pCFont;
-
 	CString MI_Text;
 
-#ifndef USE_MEDIAINFO_STATIC
-	static bool HasMediaInfo();
-#endif
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 
 	DECLARE_MESSAGE_MAP()

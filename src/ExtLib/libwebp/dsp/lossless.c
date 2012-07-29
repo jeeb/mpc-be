@@ -8,7 +8,7 @@
 // Image transforms and color space conversion methods for lossless decoder.
 //
 // Authors: Vikas Arora (vikaas.arora@gmail.com)
-//          jyrki@google.com (Jyrki Alakuijala)
+//          Jyrki Alakuijala (jyrki@google.com)
 //          Urvang Joshi (urvang@google.com)
 
 #if defined(__cplusplus) || defined(c_plusplus)
@@ -1041,7 +1041,7 @@ void VP8LConvertFromBGRA(const uint32_t* const in_data, int num_pixels,
       break;
     case MODE_rgbA:
       ConvertBGRAToRGBA(in_data, num_pixels, rgba);
-      //WebPApplyAlphaMultiply(rgba, 0, num_pixels, 1, 0);
+      WebPApplyAlphaMultiply(rgba, 0, num_pixels, 1, 0);
       break;
     case MODE_BGR:
       ConvertBGRAToBGR(in_data, num_pixels, rgba);
@@ -1051,21 +1051,21 @@ void VP8LConvertFromBGRA(const uint32_t* const in_data, int num_pixels,
       break;
     case MODE_bgrA:
       CopyOrSwap(in_data, num_pixels, rgba, 1);
-      //WebPApplyAlphaMultiply(rgba, 0, num_pixels, 1, 0);
+      WebPApplyAlphaMultiply(rgba, 0, num_pixels, 1, 0);
       break;
     case MODE_ARGB:
       CopyOrSwap(in_data, num_pixels, rgba, 0);
       break;
     case MODE_Argb:
       CopyOrSwap(in_data, num_pixels, rgba, 0);
-      //WebPApplyAlphaMultiply(rgba, 1, num_pixels, 1, 0);
+      WebPApplyAlphaMultiply(rgba, 1, num_pixels, 1, 0);
       break;
     case MODE_RGBA_4444:
       ConvertBGRAToRGBA4444(in_data, num_pixels, rgba);
       break;
     case MODE_rgbA_4444:
       ConvertBGRAToRGBA4444(in_data, num_pixels, rgba);
-      //WebPApplyAlphaMultiply4444(rgba, num_pixels, 1, 0);
+      WebPApplyAlphaMultiply4444(rgba, num_pixels, 1, 0);
       break;
     case MODE_RGB_565:
       ConvertBGRAToRGB565(in_data, num_pixels, rgba);

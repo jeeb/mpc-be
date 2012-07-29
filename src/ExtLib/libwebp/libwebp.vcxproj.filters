@@ -43,6 +43,15 @@
     <ClCompile Include="dsp\lossless.c">
       <Filter>Source Files\dsp</Filter>
     </ClCompile>
+    <ClCompile Include="dsp\upsampling.c">
+      <Filter>Source Files\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="dsp\upsampling_sse2.c">
+      <Filter>Source Files\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="dsp\yuv.c">
+      <Filter>Source Files\dsp</Filter>
+    </ClCompile>
     <ClCompile Include="enc\alpha.c">
       <Filter>Source Files\enc</Filter>
     </ClCompile>
