@@ -12513,8 +12513,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 					return false;
 				}
 			}
-			mi_fn = fn;
 		}
+		mi_fn = fn;
 	}
 
 	if ((s.AutoChangeFullscrRes.bEnabled == 1 && s.IsD3DFullscreen()) || s.AutoChangeFullscrRes.bEnabled == 2) {
