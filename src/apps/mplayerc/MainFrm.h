@@ -964,14 +964,19 @@ public:
 
 	CMPC_Lcd m_Lcd;
 
-	// ==== Added by CASIMIR666
-	CWnd*			m_pVideoWnd;			// Current Video (main display screen or 2nd)
+	// Main Window
+	CWnd*			m_pVideoWnd;
 
 	// SmartSeek
 	CWnd			m_wndView2;
 	CWnd*			m_pVideoWnd2;
+
 	HRESULT PreviewWindowHide();
 	HRESULT PreviewWindowShow(REFERENCE_TIME rtCur2);
+	bool CanPreviewUse();
+
+	CAtlArray<REFERENCE_TIME> chaptersarray;
+	void CreateChapterTimeArray();
 
 	SIZE			m_fullWndSize;
 	CFullscreenWnd*	m_pFullscreenWnd;
@@ -1057,5 +1062,4 @@ public:
 	CAtlList<CHdmvClipInfo::PlaylistItem> m_MPLSPlaylist;
 	bool m_bIsBDPlay;
 	bool OpenBD(CString Path);
-	bool CanPreviewUse();
 };

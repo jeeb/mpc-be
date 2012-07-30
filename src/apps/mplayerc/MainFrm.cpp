@@ -3563,6 +3563,8 @@ void CMainFrame::OnFilePostOpenmedia()
 	}
 	SendNowPlayingToMSN();
 	SendNowPlayingToApi();
+
+	CreateChapterTimeArray();
 }
 
 void CMainFrame::OnUpdateFilePostOpenmedia(CCmdUI* pCmdUI)
@@ -17431,4 +17433,37 @@ CString CMainFrame::FillMessage()
 bool CMainFrame::CanPreviewUse()
 {
 	return (!m_fAudioOnly && b_UseSmartSeek && m_wndView2 && (GetPlaybackMode() == PM_DVD || GetPlaybackMode() == PM_FILE));
+}
+
+void CMainFrame::CreateChapterTimeArray()
+{
+	chaptersarray.RemoveAll();
+	/*
+	if (GetPlaybackMode() == PM_FILE) {
+		__int64 rtDur = 0;
+		if (pMS) {
+			pMS->GetDuration(&rtDur);
+		}
+
+		if (m_pCB->ChapGetCount() > 1) {
+			REFERENCE_TIME rt;
+			
+			for (size_t idx = 0; idx < m_pCB->ChapGetCount(); idx++) {
+				rt = 0;
+				CComBSTR bstr = NULL;
+				if (FAILED(m_pCB->ChapGet(idx, &rt, &bstr))) {
+					continue;
+				}
+
+				if (rt <= 0 || (rtDur && rt >= rtDur)) {
+					continue;
+				}
+
+				chaptersarray.Add(rt);
+			}
+		}
+	} else if (GetPlaybackMode() == PM_DVD) {
+		// TODO - support for DVD mode ...
+	}
+	*/
 }
