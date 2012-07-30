@@ -12885,7 +12885,15 @@ void CMainFrame::CloseMediaPrivate()
 {
 	SetLoadState (MLS_CLOSING);
 
-	OnPlayStop(); // SendMessage(WM_COMMAND, ID_PLAY_STOP);
+	OnPlayStop();
+
+	if (pMC) {
+		OAFilterState fs;
+		pMC->GetState(0, &fs);
+		if (fs != State_Stopped) {
+			pMC->Stop(); // Some filters, such as Microsoft StreamBufferSource, need to call IMediaControl::Stop() before close the graph;
+		}
+	}
 
 	SetPlaybackMode(PM_NONE);
 
@@ -15949,11 +15957,27 @@ void CGraphThread::OnDisplayChange(WPARAM wParam, LPARAM lParam)
 	}
 }
 
-// ==== Added by CASIMIR666
 void CMainFrame::SetLoadState(MPC_LOADSTATE iState)
 {
-	m_iMediaLoadState	= iState;
+	m_iMediaLoadState = iState;
 	SendAPICommand (CMD_STATE, L"%d", m_iMediaLoadState);
+
+	switch (m_iMediaLoadState) {
+		case MLS_CLOSED:
+			TRACE(_T("CMainFrame::SetLoadState() : CLOSED\n"));
+			break;
+		case MLS_LOADING:
+			TRACE(_T("CMainFrame::SetLoadState() : LOADING\n"));
+			break;
+		case MLS_LOADED:
+			TRACE(_T("CMainFrame::SetLoadState() : LOADED\n"));
+			break;
+		case MLS_CLOSING:
+			TRACE(_T("CMainFrame::SetLoadState() : CLOSING\n"));
+			break;
+		default:
+			break;
+	}
 }
 
 void CMainFrame::SetPlayState(MPC_PLAYSTATE iState)

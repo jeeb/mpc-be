@@ -605,9 +605,11 @@ avcsuccess:
 						   CodecID == "A_MPEG/L1") {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_MPEG);
 					mts.Add(mt);
-				} else if (CodecID == "A_AC3" ||
-						   CodecID == "A_EAC3") {
+				} else if (CodecID == "A_AC3") {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_DOLBY_AC3);
+					mts.Add(mt);
+				} else if (CodecID == "A_EAC3") {
+					mt.subtype = MEDIASUBTYPE_DOLBY_DDPLUS;
 					mts.Add(mt);
 				} else if (CodecID == "A_TRUEHD" ||
 						   CodecID == "A_MLP") {

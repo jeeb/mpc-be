@@ -442,10 +442,10 @@ public:
 	CControlBar* m_pLastBar;
 
 protected:
-	bool	b_UseSmartSeek;
-	int		m_iMediaLoadState;
-	bool	m_fClosingState;
-	bool	m_fAudioOnly;
+	bool			b_UseSmartSeek;
+	MPC_LOADSTATE	m_iMediaLoadState;
+	bool			m_fClosingState;
+	bool			m_fAudioOnly;
 
 	dispmode m_dmBeforeFullscreen;
 	CString m_LastOpenFile, m_LastOpenBDPath;
