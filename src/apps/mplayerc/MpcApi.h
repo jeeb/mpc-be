@@ -22,7 +22,6 @@
 
 #pragma once
 
-
 typedef enum MPC_LOADSTATE {
 	MLS_CLOSED,
 	MLS_LOADING,
@@ -30,14 +29,12 @@ typedef enum MPC_LOADSTATE {
 	MLS_CLOSING
 };
 
-
 typedef enum MPC_PLAYSTATE {
 	PS_PLAY   = 0,
 	PS_PAUSE  = 1,
 	PS_STOP   = 2,
 	PS_UNUSED = 3
 };
-
 
 struct MPC_OSDDATA {
 	int nMsgPos;       // screen position constant (see OSD_MESSAGEPOS constants)
@@ -51,7 +48,6 @@ struct MPC_OSDDATA {
 //    OSD_TOPLEFT,
 //    OSD_TOPRIGHT,
 //} OSD_MESSAGEPOS;
-
 
 typedef enum MPCAPI_COMMAND {
 	// ==== Commands from MPC to host
@@ -117,7 +113,6 @@ typedef enum MPCAPI_COMMAND {
 	// ...
 	// Par n : active file, -1 if no active file
 	CMD_PLAYLIST			= 0x50000006,
-
 
 	// ==== Commands from host to MPC
 
@@ -219,5 +214,4 @@ typedef enum MPCAPI_COMMAND {
 
 	// show host defined OSD message string
 	CMD_OSDSHOWMESSAGE		= 0xA0005000,
-
 };

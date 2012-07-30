@@ -47,6 +47,7 @@ COpenDlg::~COpenDlg()
 void COpenDlg::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Control(pDX, IDC_COMBO1, m_mrucombo);
 	DDX_CBString(pDX, IDC_COMBO1, m_path);
 	DDX_Control(pDX, IDC_COMBO2, m_mrucombo2);
@@ -54,7 +55,6 @@ void COpenDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STATIC1, m_label2);
 	DDX_Check(pDX, IDC_CHECK1, m_fAppendPlaylist);
 }
-
 
 BEGIN_MESSAGE_MAP(COpenDlg, CResizableDialog)
 	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedBrowsebutton)
@@ -66,7 +66,6 @@ BEGIN_MESSAGE_MAP(COpenDlg, CResizableDialog)
 	ON_UPDATE_COMMAND_UI(IDOK, OnUpdateOk)
 END_MESSAGE_MAP()
 
-
 // COpenDlg message handlers
 
 BOOL COpenDlg::OnInitDialog()
@@ -76,19 +75,23 @@ BOOL COpenDlg::OnInitDialog()
 	CRecentFileList& MRU = AfxGetAppSettings().MRU;
 	MRU.ReadList();
 	m_mrucombo.ResetContent();
+
 	for (int i = 0; i < MRU.GetSize(); i++)
 		if (!MRU[i].IsEmpty()) {
 			m_mrucombo.AddString(MRU[i]);
 		}
+
 	CorrectComboListWidth(m_mrucombo);
 
 	CRecentFileList& MRUDub = AfxGetAppSettings().MRUDub;
 	MRUDub.ReadList();
 	m_mrucombo2.ResetContent();
+
 	for (int i = 0; i < MRUDub.GetSize(); i++)
 		if (!MRUDub[i].IsEmpty()) {
 			m_mrucombo2.AddString(MRUDub[i]);
 		}
+
 	CorrectComboListWidth(m_mrucombo2);
 
 	if (m_mrucombo.GetCount() > 0) {
@@ -116,14 +119,14 @@ BOOL COpenDlg::OnInitDialog()
 	s.cx = 1000;
 	SetMaxTrackSize(s);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 static CString GetFileName(CString str)
 {
 	CPath p = str;
 	p.StripPath();
+
 	return (LPCTSTR)p;
 }
 
@@ -138,11 +141,13 @@ void COpenDlg::OnBnClickedBrowsebutton()
 	s.m_Formats.GetFilter(filter, mask);
 
 	DWORD dwFlags = OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_ALLOWMULTISELECT|OFN_ENABLEINCLUDENOTIFY|OFN_NOCHANGEDIR;
+
 	if (!s.fKeepHistory) {
 		dwFlags |= OFN_DONTADDTORECENT;
 	}
 
 	COpenFileDlg fd(mask, true, NULL, m_path, dwFlags, filter, this);
+
 	if (fd.DoModal() != IDOK) {
 		return;
 	}
@@ -185,6 +190,7 @@ void COpenDlg::OnBnClickedBrowsebutton2()
 	s.m_Formats.GetAudioFilter(filter, mask);
 
 	DWORD dwFlags = OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_ENABLEINCLUDENOTIFY|OFN_NOCHANGEDIR;
+
 	if (!s.fKeepHistory) {
 		dwFlags |= OFN_DONTADDTORECENT;
 	}
@@ -204,6 +210,7 @@ void COpenDlg::OnBnClickedOk()
 
 	m_fns.RemoveAll();
 	m_fns.AddTail(m_path);
+
 	if (m_mrucombo2.IsWindowEnabled()) {
 		m_fns.AddTail(m_path2);
 	}
@@ -216,11 +223,13 @@ void COpenDlg::OnBnClickedOk()
 void COpenDlg::OnUpdateDub(CCmdUI* pCmdUI)
 {
 	UpdateData();
+
 	pCmdUI->Enable(AfxGetAppSettings().m_Formats.GetEngine(m_path) == DirectShow);
 }
 
 void COpenDlg::OnUpdateOk(CCmdUI* pCmdUI)
 {
 	UpdateData();
+
 	pCmdUI->Enable(!m_path.IsEmpty() || !m_path2.IsEmpty());
 }

@@ -34,13 +34,12 @@ class COpenDlg : public CResizableDialog
 	//	DECLARE_DYNAMIC(COpenDlg)
 
 public:
-	COpenDlg(CWnd* pParent = NULL);   // standard constructor
+	COpenDlg(CWnd* pParent = NULL);
 	virtual ~COpenDlg();
 
 	bool m_fMultipleFiles;
 	CAtlList<CString> m_fns;
 
-	// Dialog Data
 	enum { IDD = IDD_OPEN_DLG };
 	CComboBox m_mrucombo;
 	CString m_path;
@@ -50,7 +49,7 @@ public:
 	BOOL m_fAppendPlaylist;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 
 	DECLARE_MESSAGE_MAP()

@@ -43,16 +43,15 @@ private:
 	void AddMediaType(AM_MEDIA_TYPE* pmt);
 
 public:
-	CMediaTypesDlg(IGraphBuilderDeadEnd* pGBDE, CWnd* pParent = NULL);   // standard constructor
+	CMediaTypesDlg(IGraphBuilderDeadEnd* pGBDE, CWnd* pParent = NULL);
 	virtual ~CMediaTypesDlg();
 
-	// Dialog Data
 	enum { IDD = IDD_MEDIATYPES_DLG };
 	CComboBox m_pins;
 	CEdit m_report;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 
 	DECLARE_MESSAGE_MAP()

@@ -24,20 +24,19 @@
 #include "stdafx.h"
 #include "FileVersionInfo.h"
 
-
 CFileVersionInfo::CFileVersionInfo()
 {
 	Reset();
 }
 
-
 CFileVersionInfo::~CFileVersionInfo()
-{}
-
+{
+}
 
 BOOL CFileVersionInfo::GetTranslationId(LPVOID lpData, UINT unBlockSize, WORD wLangId, DWORD &dwId, BOOL bPrimaryEnough/*= FALSE*/)
 {
 	LPWORD lpwData;
+
 	for (lpwData = (LPWORD)lpData; (LPBYTE)lpwData < ((LPBYTE)lpData)+unBlockSize; lpwData+=2)
 	{
 		if (*lpwData == wLangId)
@@ -79,10 +78,12 @@ BOOL CFileVersionInfo::Create(LPCTSTR lpszFileName)
 
 	DWORD	dwHandle;
 	DWORD	dwFileVersionInfoSize = GetFileVersionInfoSize((LPTSTR)lpszFileName, &dwHandle);
+
 	if (!dwFileVersionInfoSize)
 		return FALSE;
 
 	LPVOID	lpData = (LPVOID)DNew BYTE[dwFileVersionInfoSize];
+
 	if (!lpData)
 		return FALSE;
 
@@ -117,7 +118,6 @@ BOOL CFileVersionInfo::Create(LPCTSTR lpszFileName)
 				}
 			}
 		}
-
 
 		CString	strSubBlock;
 		strSubBlock.Format(_T("\\StringFileInfo\\%04X%04X\\"), dwLangCode&0x0000FFFF, (dwLangCode&0xFFFF0000)>>16);
@@ -159,7 +159,6 @@ BOOL CFileVersionInfo::Create(LPCTSTR lpszFileName)
 	return TRUE;
 }
 
-
 WORD CFileVersionInfo::GetFileVersion(int nIndex) const
 {
 	switch(nIndex)
@@ -189,7 +188,6 @@ CString CFileVersionInfo::GetFileVersionEx() const
 	return strTemp;
 }
 
-
 WORD CFileVersionInfo::GetProductVersion(int nIndex) const
 {
 	switch(nIndex)
@@ -207,36 +205,30 @@ WORD CFileVersionInfo::GetProductVersion(int nIndex) const
 	}
 }
 
-
 DWORD CFileVersionInfo::GetFileFlagsMask() const
 {
 	return m_FileInfo.dwFileFlagsMask;
 }
-
 
 DWORD CFileVersionInfo::GetFileFlags() const
 {
 	return m_FileInfo.dwFileFlags;
 }
 
-
 DWORD CFileVersionInfo::GetFileOs() const
 {
 	return m_FileInfo.dwFileOS;
 }
-
 
 DWORD CFileVersionInfo::GetFileType() const
 {
 	return m_FileInfo.dwFileType;
 }
 
-
 DWORD CFileVersionInfo::GetFileSubtype() const
 {
 	return m_FileInfo.dwFileSubtype;
 }
-
 
 CTime CFileVersionInfo::GetFileDate() const
 {
@@ -246,78 +238,65 @@ CTime CFileVersionInfo::GetFileDate() const
 	return CTime(ft);
 }
 
-
 CString CFileVersionInfo::GetCompanyName() const
 {
 	return m_strCompanyName;
 }
-
 
 CString CFileVersionInfo::GetFileDescription() const
 {
 	return m_strFileDescription;
 }
 
-
 CString CFileVersionInfo::GetFileVersion() const
 {
 	return m_strFileVersion;
 }
-
 
 CString CFileVersionInfo::GetInternalName() const
 {
 	return m_strInternalName;
 }
 
-
 CString CFileVersionInfo::GetLegalCopyright() const
 {
 	return m_strLegalCopyright;
 }
-
 
 CString CFileVersionInfo::GetOriginalFileName() const
 {
 	return m_strOriginalFileName;
 }
 
-
 CString CFileVersionInfo::GetProductName() const
 {
 	return m_strProductName;
 }
-
 
 CString CFileVersionInfo::GetProductVersion() const
 {
 	return m_strProductVersion;
 }
 
-
 CString CFileVersionInfo::GetComments() const
 {
 	return m_strComments;
 }
-
 
 CString CFileVersionInfo::GetLegalTrademarks() const
 {
 	return m_strLegalTrademarks;
 }
 
-
 CString CFileVersionInfo::GetPrivateBuild() const
 {
 	return m_strPrivateBuild;
 }
 
-
 CString CFileVersionInfo::GetSpecialBuild() const
 {
 	return m_strSpecialBuild;
 }
-
 
 void CFileVersionInfo::Reset()
 {

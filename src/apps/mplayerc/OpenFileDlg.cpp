@@ -31,7 +31,6 @@
 bool COpenFileDlg::m_fAllowDirSelection = false;
 WNDPROC COpenFileDlg::m_wndProc = NULL;
 
-
 // COpenFileDlg
 
 IMPLEMENT_DYNAMIC(COpenFileDlg, CFileDialog)
@@ -58,7 +57,6 @@ BEGIN_MESSAGE_MAP(COpenFileDlg, CFileDialog)
 	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
-
 // COpenFileDlg message handlers
 
 LRESULT CALLBACK COpenFileDlg::WindowProcNew(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -82,13 +80,13 @@ BOOL COpenFileDlg::OnInitDialog()
 
 	m_wndProc = (WNDPROC)SetWindowLongPtr(GetParent()->m_hWnd, GWLP_WNDPROC , (LONG_PTR)WindowProcNew);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 void COpenFileDlg::OnDestroy()
 {
 	int i = GetPathName().Find(__DUMMY__);
+
 	if (i >= 0) {
 		m_pOFN->lpstrFile[i] = m_pOFN->lpstrFile[i+1] = 0;
 	}
@@ -101,6 +99,7 @@ BOOL COpenFileDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 	ASSERT(pResult != NULL);
 
 	OFNOTIFY* pNotify = (OFNOTIFY*)lParam;
+
 	// allow message map to override
 	if (__super::OnNotify(wParam, lParam, pResult)) {
 		ASSERT(pNotify->hdr.code != CDN_INCLUDEITEM);
@@ -112,21 +111,25 @@ BOOL COpenFileDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 			if (OnIncludeItem((OFNOTIFYEX*)lParam, pResult)) {
 				return TRUE;
 			}
+
 			break;
 	}
 
-	return FALSE;   // not handled
+	return FALSE;
 }
 
 BOOL COpenFileDlg::OnIncludeItem(OFNOTIFYEX* pOFNEx, LRESULT* pResult)
 {
 	TCHAR buff[_MAX_PATH];
+
 	if (!SHGetPathFromIDList((LPCITEMIDLIST)pOFNEx->pidl, buff)) {
 		STRRET s;
 		HRESULT hr = ((IShellFolder*)pOFNEx->psf)->GetDisplayNameOf((LPCITEMIDLIST)pOFNEx->pidl, SHGDN_NORMAL|SHGDN_FORPARSING, &s);
+
 		if (S_OK != hr) {
 			return FALSE;
 		}
+
 		switch (s.uType) {
 			case STRRET_CSTR:
 				_tcscpy_s(buff, CString(s.cStr));
@@ -147,7 +150,9 @@ BOOL COpenFileDlg::OnIncludeItem(OFNOTIFYEX* pOFNEx, LRESULT* pResult)
 		&& (fad.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY))
 			return FALSE;
 	*/
+
 	int i = fn.ReverseFind('.'), j = fn.ReverseFind('\\');
+
 	if (i < 0 || i < j) {
 		return FALSE;
 	}

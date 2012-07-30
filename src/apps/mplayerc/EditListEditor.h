@@ -39,6 +39,7 @@ public :
 	bool		HaveIn() {
 		return m_rtIn  != _I64_MIN;
 	};
+
 	bool		HaveOut() {
 		return m_rtOut != _I64_MIN;
 	};

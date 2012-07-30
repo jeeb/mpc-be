@@ -45,6 +45,7 @@ void CClip::SetOut(LPCTSTR strVal)
 void CClip::SetIn  (REFERENCE_TIME rtVal)
 {
 	m_rtIn  = rtVal;
+
 	if (m_rtIn > m_rtOut) {
 		m_rtOut = _I64_MIN;
 	}
@@ -53,6 +54,7 @@ void CClip::SetIn  (REFERENCE_TIME rtVal)
 void CClip::SetOut (REFERENCE_TIME rtVal)
 {
 	m_rtOut = rtVal;
+
 	if (m_rtIn > m_rtOut) {
 		m_rtIn = _I64_MIN;
 	}
@@ -165,6 +167,7 @@ void CEditListEditor::SaveEditListToFile()
 {
 	if ((m_bFileOpen || m_EditList.GetCount() >0) && !m_strFileName.IsEmpty()) {
 		CStdioFile		EditListFile;
+
 		if (EditListFile.Open (m_strFileName, CFile::modeCreate|CFile::modeWrite)) {
 			CString			strLine;
 			int				nIndex;
@@ -182,6 +185,7 @@ void CEditListEditor::SaveEditListToFile()
 			}
 
 			POSITION pos = m_EditList.GetHeadPosition();
+
 			for (int i = 0; pos; i++, m_EditList.GetNext(pos)) {
 				CClip&	CurClip = m_EditList.GetAt(pos);
 
@@ -219,6 +223,7 @@ void CEditListEditor::OpenFile(LPCTSTR lpFileName)
 
 	if (EditListFile.Open (m_strFileName, CFile::modeRead)) {
 		m_bFileOpen = true;
+
 		while (EditListFile.ReadString(strLine)) {
 			//int		nPos = 0;
 			CString		strIn;		//	= strLine.Tokenize(_T(" \t"), nPos);
@@ -232,6 +237,7 @@ void CEditListEditor::OpenFile(LPCTSTR lpFileName)
 				AfxExtractSubString (strUser,		 strLine, 3, _T('\t'));
 				SelectCombo(strUser, m_cbUsers);
 			}
+
 			if (strHotFolders.IsEmpty()) {
 				AfxExtractSubString (strHotFolders, strLine, 4, _T('\t'));
 				SelectCombo(strHotFolders, m_cbHotFolders);
@@ -255,10 +261,12 @@ void CEditListEditor::OpenFile(LPCTSTR lpFileName)
 	if (m_NameList.GetCount() == 0) {
 		CStdioFile 	NameFile;
 		CString		str;
+
 		if (NameFile.Open (_T("EditListNames.txt"), CFile::modeRead)) {
 			while (NameFile.ReadString(str)) {
 				m_NameList.Add(str);
 			}
+
 			NameFile.Close();
 		}
 	}
@@ -297,6 +305,7 @@ void CEditListEditor::NewClip(REFERENCE_TIME rtVal)
 			}
 		}
 	}
+
 	m_CurPos = InsertClip (m_CurPos, NewClip);
 	m_list.Invalidate();
 }
@@ -306,14 +315,16 @@ void CEditListEditor::Save()
 	SaveEditListToFile();
 }
 
-int	CEditListEditor::FindIndex(POSITION pos)
+int CEditListEditor::FindIndex(POSITION pos)
 {
 	int			iItem	= 0;
 	POSITION	CurPos	= m_EditList.GetHeadPosition();
+
 	while (CurPos && CurPos != pos) {
 		m_EditList.GetNext (CurPos);
 		iItem++;
 	}
+
 	return iItem;
 }
 
@@ -364,6 +375,7 @@ void CEditListEditor::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 		}
 
 		COLORREF	textcolor = RGB(0,0,0);
+
 		if (!CurClip.HaveIn() || !CurClip.HaveOut()) {
 			textcolor = RGB(255,0,0);
 		}
@@ -409,17 +421,22 @@ void CEditListEditor::OnLvnKeyDown(NMHDR* pNMHDR, LRESULT* pResult)
 		POSITION	pos = m_list.GetFirstSelectedItemPosition();
 		POSITION	ClipPos;
 		int			nItem = -1;
+
 		while (pos) {
 			nItem	= m_list.GetNextSelectedItem(pos);
 			ClipPos = m_EditList.FindIndex (nItem);
+
 			if (ClipPos) {
 				m_EditList.RemoveAt (ClipPos);
 			}
+
 			m_list.DeleteItem (nItem);
 		}
+
 		if (nItem != -1) {
 			m_list.SetItemState (min (nItem, m_list.GetItemCount()-1), LVIS_SELECTED, LVIS_SELECTED);
 		}
+
 		m_list.Invalidate();
 	}
 }
@@ -490,12 +507,14 @@ void CEditListEditor::OnTimer(UINT_PTR nIDEvent)
 		if (nIDEvent == 1) {
 			m_list.EnsureVisible(iTopItem - 1, false);
 			m_list.UpdateWindow();
+
 			if (m_list.GetTopIndex() == 0) {
 				KillTimer(1);
 			}
 		} else if (nIDEvent == 2) {
 			m_list.EnsureVisible(iBottomItem + 1, false);
 			m_list.UpdateWindow();
+
 			if (m_list.GetBottomIndex() == (m_list.GetItemCount() - 1)) {
 				KillTimer(2);
 			}
@@ -537,13 +556,14 @@ void CEditListEditor::OnLButtonUp(UINT nFlags, CPoint point)
 
 void CEditListEditor::DropItemOnList()
 {
-	m_ptDropPoint.y -= 10; //
+	m_ptDropPoint.y -= 10;
 	m_nDropIndex = m_list.HitTest(CPoint(10, m_ptDropPoint.y));
 
 	POSITION	DragPos		= m_EditList.FindIndex (m_nDragIndex);
 	POSITION	DropPos		= m_EditList.FindIndex (m_nDropIndex);
+
 	if ((DragPos!=NULL) && (DropPos!=NULL)) {
-		CClip&		DragClip	= m_EditList.GetAt(DragPos);
+		CClip& DragClip	= m_EditList.GetAt(DragPos);
 		m_EditList.InsertAfter (DropPos, DragClip);
 		m_EditList.RemoveAt (DragPos);
 		m_list.Invalidate();
@@ -578,13 +598,15 @@ void CEditListEditor::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 	}
 
 	if (m_CurPos != NULL && pItem->iSubItem == COL_NAME) {
-		CClip&		CurClip = m_EditList.GetAt (m_CurPos);
+		CClip& CurClip = m_EditList.GetAt (m_CurPos);
 		int nSel = FindNameIndex (CurClip.GetName());
 
-		CAtlList<CString>	sl;
+		CAtlList<CString> sl;
+
 		for (int i=0; i<m_NameList.GetCount(); i++) {
 			sl.AddTail(m_NameList.GetAt(i));
 		}
+
 		m_list.ShowInPlaceComboBox(pItem->iItem, pItem->iSubItem, sl, nSel, true);
 
 		*pResult = TRUE;
@@ -609,7 +631,7 @@ void CEditListEditor::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 	CString& CurName = m_NameList.GetAt(pItem->lParam);
 
 	if (m_CurPos != NULL && pItem->iSubItem == COL_NAME) {
-		CClip&		CurClip = m_EditList.GetAt (m_CurPos);
+		CClip& CurClip = m_EditList.GetAt (m_CurPos);
 		CurClip.SetName(CurName);
 
 		*pResult = TRUE;
@@ -618,13 +640,14 @@ void CEditListEditor::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 
 int CEditListEditor::FindNameIndex(LPCTSTR strName)
 {
-	int		nResult = -1;
+	int nResult = -1;
 
 	for (int i = 0; i<m_NameList.GetCount(); i++) {
-		CString&	CurName = m_NameList.GetAt(i);
+		CString& CurName = m_NameList.GetAt(i);
 
 		if (CurName == strName) {
 			nResult = i;
+
 			break;
 		}
 	}
@@ -634,8 +657,8 @@ int CEditListEditor::FindNameIndex(LPCTSTR strName)
 
 void CEditListEditor::FillCombo(LPCTSTR strFileName, CComboBox& Combo, bool bAllowNull)
 {
-	CStdioFile 	NameFile;
-	CString		str;
+	CStdioFile NameFile;
+	CString	str;
 	if (NameFile.Open (strFileName, CFile::modeRead)) {
 		if (bAllowNull) {
 			Combo.AddString(_T(""));
@@ -644,6 +667,7 @@ void CEditListEditor::FillCombo(LPCTSTR strFileName, CComboBox& Combo, bool bAll
 		while (NameFile.ReadString(str)) {
 			Combo.AddString(str);
 		}
+
 		NameFile.Close();
 	}
 }
@@ -653,8 +677,10 @@ void CEditListEditor::SelectCombo(LPCTSTR strValue, CComboBox& Combo)
 	for (int i=0; i<Combo.GetCount(); i++) {
 		CString		strTemp;
 		Combo.GetLBText(i, strTemp);
+
 		if (strTemp == strValue) {
 			Combo.SetCurSel(i);
+
 			break;
 		}
 	}

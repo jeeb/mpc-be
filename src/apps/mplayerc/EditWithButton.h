@@ -24,10 +24,11 @@
 
 #include <afxwin.h>
 
-#define EDIT_BUTTON_LEFTCLICKED		(WM_APP + 842)					// arbitrary number, change if necessary
+#define EDIT_BUTTON_LEFTCLICKED		(WM_APP + 842)
 
 
-// CEditWithButton_Base ---------------------------------------------------------------------------
+// CEditWithButton_Base
+
 // This is the base class from which others derive to implement specific kinds of buttons.
 class CEditWithButton_Base : public CEdit
 {
@@ -83,7 +84,7 @@ private:
 	int m_LeftBorder;
 	int m_RightBorder;
 
-	int m_ButtonWidth;					// stores the button's width in pixels (so that we don't have to re-calculate it)
+	int m_ButtonWidth;
 
 	bool m_IsButtonPressed;
 	bool m_IsMouseActive;
@@ -92,7 +93,8 @@ private:
 };
 
 
-// CEditWithButton --------------------------------------------------------------------------------
+// CEditWithButton
+
 // This implements a button containing plain text.
 class CEditWithButton : public CEditWithButton_Base
 {

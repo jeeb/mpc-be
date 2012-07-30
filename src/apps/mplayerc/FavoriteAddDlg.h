@@ -36,10 +36,9 @@ private:
 	CString m_shortname, m_fullname;
 
 public:
-	CFavoriteAddDlg(CString shortname, CString fullname, CWnd* pParent = NULL);   // standard constructor
+	CFavoriteAddDlg(CString shortname, CString fullname, CWnd* pParent = NULL);
 	virtual ~CFavoriteAddDlg();
 
-	// Dialog Data
 	enum { IDD = IDD_FAVADD };
 
 	CComboBox m_namectrl;
@@ -48,7 +47,7 @@ public:
 	BOOL m_bRelativeDrive;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 
 	DECLARE_MESSAGE_MAP()

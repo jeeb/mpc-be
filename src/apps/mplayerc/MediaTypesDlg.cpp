@@ -46,6 +46,7 @@ CMediaTypesDlg::~CMediaTypesDlg()
 void CMediaTypesDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CResizableDialog::DoDataExchange(pDX);
+
 	DDX_Control(pDX, IDC_COMBO1, m_pins);
 	DDX_Control(pDX, IDC_EDIT1, m_report);
 }
@@ -61,6 +62,7 @@ void CMediaTypesDlg::AddLine(CString str)
 void CMediaTypesDlg::AddMediaType(AM_MEDIA_TYPE* pmt)
 {
 	m_subtype = pmt->subtype;
+
 	if (pmt->majortype == MEDIATYPE_Video) {
 		m_type = VIDEO;
 	} else if (pmt->majortype == MEDIATYPE_Audio) {
@@ -72,6 +74,7 @@ void CMediaTypesDlg::AddMediaType(AM_MEDIA_TYPE* pmt)
 	CAtlList<CString> sl;
 	CMediaTypeEx(*pmt).Dump(sl);
 	POSITION pos = sl.GetHeadPosition();
+
 	while (pos) {
 		AddLine(sl.GetNext(pos) + '\n');
 	}
@@ -80,7 +83,6 @@ void CMediaTypesDlg::AddMediaType(AM_MEDIA_TYPE* pmt)
 BEGIN_MESSAGE_MAP(CMediaTypesDlg, CResizableDialog)
 	ON_CBN_SELCHANGE(IDC_COMBO1, OnCbnSelchangeCombo1)
 END_MESSAGE_MAP()
-
 
 // CMediaTypesDlg message handlers
 
@@ -95,6 +97,7 @@ BOOL CMediaTypesDlg::OnInitDialog()
 		if (!path.GetCount()) {
 			continue;
 		}
+
 		m_pins.SetItemData(m_pins.AddString(CString(path.GetTail())), (DWORD_PTR)i);
 	}
 
@@ -109,8 +112,7 @@ BOOL CMediaTypesDlg::OnInitDialog()
 
 	SetMinTrackSize(CSize(300, 200));
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 void CMediaTypesDlg::OnCbnSelchangeCombo1()
@@ -118,6 +120,7 @@ void CMediaTypesDlg::OnCbnSelchangeCombo1()
 	m_report.SetWindowText(_T(""));
 
 	int i = m_pins.GetCurSel();
+
 	if (i < 0) {
 		return;
 	}
@@ -130,6 +133,7 @@ void CMediaTypesDlg::OnCbnSelchangeCombo1()
 	}
 
 	POSITION pos = path.GetHeadPosition();
+
 	while (pos) {
 		AddLine(CString(path.GetNext(pos)) + _T("\n"));
 		if (!pos) {
@@ -138,6 +142,7 @@ void CMediaTypesDlg::OnCbnSelchangeCombo1()
 	}
 
 	pos = mts.GetHeadPosition();
+
 	for (int j = 0; pos; j++) {
 		CString str;
 		str.Format(_T("Media Type %d:\n"), j);

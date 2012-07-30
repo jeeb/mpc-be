@@ -26,7 +26,6 @@
 #if !defined(AFX_LINENUMBEREDIT_H__CAB7A465_709C_42B8_80D0_2B0AF6D25AD4__INCLUDED_)
 #define AFX_LINENUMBEREDIT_H__CAB7A465_709C_42B8_80D0_2B0AF6D25AD4__INCLUDED_
 
-/////////////////////////////////////////////////////////////////////////////
 // CLineNumberStatic window
 
 class CLineNumberStatic : public CStatic
@@ -61,8 +60,6 @@ private:
 	int m_bottomline;	// Current bottom line number
 };
 
-
-/////////////////////////////////////////////////////////////////////////////
 // CLineNumberEdit window
 
 class CLineNumberEdit : public CEdit
@@ -120,8 +117,7 @@ private:
 	CSize				m_zero;
 	int					m_maxval;
 	CString				m_format;
-	int                 m_LineDelta; // Introduced to provide an offset to the first line number
-
+	int                 m_LineDelta;
 };
 
 #endif // !defined(AFX_LINENUMBEREDIT_H__CAB7A465_709C_42B8_80D0_2B0AF6D25AD4__INCLUDED_)

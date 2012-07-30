@@ -57,12 +57,15 @@ void CDVBChannel::FromString(CString strValue)
 	m_ulFrequency	= _tstol(strValue.Tokenize(_T("|"), i));
 	m_nPrefNumber	= _tstol(strValue.Tokenize(_T("|"), i));
 	m_nOriginNumber	= _tstol(strValue.Tokenize(_T("|"), i));
+
 	if (nVersion > FORMAT_VERSION_0) {
 		m_bEncrypted	= !!_tstol(strValue.Tokenize(_T("|"), i));
 	}
+
 	if (nVersion > FORMAT_VERSION_1) {
 		m_bNowNextFlag	= !!_tstol(strValue.Tokenize(_T("|"), i));
 	}
+
 	m_ulONID		= _tstol(strValue.Tokenize(_T("|"), i));
 	m_ulTSID		= _tstol(strValue.Tokenize(_T("|"), i));
 	m_ulSID			= _tstol(strValue.Tokenize(_T("|"), i));
@@ -71,9 +74,11 @@ void CDVBChannel::FromString(CString strValue)
 	m_ulVideoPID	= _tstol(strValue.Tokenize(_T("|"), i));
 	m_nVideoType	= (DVB_STREAM_TYPE)_tstol(strValue.Tokenize(_T("|"), i));
 	m_nAudioCount	= _tstol(strValue.Tokenize(_T("|"), i));
+
 	if (nVersion > FORMAT_VERSION_1) {
 		m_nDefaultAudio	= _tstol(strValue.Tokenize(_T("|"), i));
 	}
+
 	m_nSubtitleCount = _tstol(strValue.Tokenize(_T("|"), i));
 
 	for (int j=0; j<m_nAudioCount; j++) {
@@ -94,6 +99,7 @@ void CDVBChannel::FromString(CString strValue)
 CString CDVBChannel::ToString()
 {
 	CString		strValue;
+
 	strValue.AppendFormat (_T("%d|%s|%ld|%d|%d|%d|%d|%ld|%ld|%ld|%ld|%ld|%ld|%d|%ld|%d|%ld"),
 						   FORMAT_VERSION_CURRENT,
 						   m_strName,
@@ -127,6 +133,7 @@ CString CDVBChannel::ToString()
 void CDVBChannel::SetName(BYTE* Value)
 {
 	USES_CONVERSION;
+
 	m_strName = A2W ((LPCSTR)Value);
 }
 

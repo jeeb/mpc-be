@@ -41,12 +41,10 @@ CFullscreenWnd::~CFullscreenWnd()
 {
 }
 
-
 BEGIN_MESSAGE_MAP(CFullscreenWnd, CWnd)
 	ON_WM_ERASEBKGND()
 	ON_WM_SETCURSOR()
 END_MESSAGE_MAP()
-
 
 LRESULT CFullscreenWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -55,6 +53,7 @@ LRESULT CFullscreenWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			m_pMainFrame->PostMessage(message, wParam, lParam);
 			break;
 	}
+
 	return CWnd::WindowProc(message, wParam, lParam);
 }
 
@@ -116,6 +115,7 @@ BOOL CFullscreenWnd::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	} else {
 		::SetCursor(NULL);
 	}
+
 	return FALSE;
 }
 

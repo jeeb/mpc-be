@@ -23,10 +23,10 @@
 #include "stdafx.h"
 #include "EditWithButton.h"
 
-#define WM_EDITWITHBUTTON_RECALCNCSIZE		(WM_USER + 200)		// arbitrary number. hopefully no conflicts
+#define WM_EDITWITHBUTTON_RECALCNCSIZE		(WM_USER + 200)
 
 
-// CEditWithButton_Base ---------------------------------------------------------------------------
+// CEditWithButton_Base
 
 CEditWithButton_Base::CEditWithButton_Base()
 	: m_TopBorder(0), m_BottomBorder(0), m_LeftBorder(0), m_RightBorder(0), m_ButtonWidth(1)
@@ -81,6 +81,7 @@ void CEditWithButton_Base::DrawButton(CRect rectButton)
 	CWindowDC dc(this);
 
 	HTHEME hButtonTheme = OpenThemeData(m_hWnd, _T("Button"));
+
 	if (hButtonTheme)
 	{
 		int ButtonState = GetButtonThemeState();
@@ -207,6 +208,7 @@ void CEditWithButton_Base::OnNcMouseMove(UINT nHitTest, CPoint point)
 
 	bool OldState = m_IsButtonHot;
 	m_IsButtonHot = rectButton.PtInRect(point) != FALSE;
+
 	// If the button state has changed, redraw it to reflect the change
 	if (OldState != m_IsButtonHot)
 	{
@@ -331,8 +333,7 @@ void CEditWithButton_Base::OnLeftClick()
 }
 
 
-
-// CEditWithButton --------------------------------------------------------------------------------
+// CEditWithButton
 
 CEditWithButton::CEditWithButton(LPCTSTR pszButtonText)
 	: m_ButtonText(pszButtonText)
@@ -379,6 +380,7 @@ void CEditWithButton::DrawButtonContent(CDC& dc, CRect rectButton, HTHEME hButto
 int CEditWithButton::CalculateButtonWidth()
 {
 	CWindowDC dc(this);
+
 	return dc.GetTextExtent(' ' + m_ButtonText + ' ').cx;
 	// Note: For readability, we need some space between the text and the side borders of the button.
 	//	A simple way to accomplish this is to pad the string with spaces when calculating the width.

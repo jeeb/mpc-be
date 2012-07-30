@@ -34,7 +34,6 @@ typedef struct {
 	CString	cFollowing;
 } PresentFollowing;
 
-
 interface __declspec(uuid("165BE9D6-0929-4363-9BA3-580D735AA0F6"))
 IGraphBuilder2 :
 public IFilterGraph2 {
@@ -56,7 +55,6 @@ public IUnknown {
 	STDMETHOD_(size_t, GetCount)() = 0;
 	STDMETHOD(GetDeadEnd) (int iIndex, CAtlList<CStringW>& path, CAtlList<CMediaType>& mts) = 0;
 };
-
 
 // private use only
 interface __declspec(uuid("43CDA93D-6A4E-4A07-BD3E-49D161073EE7"))

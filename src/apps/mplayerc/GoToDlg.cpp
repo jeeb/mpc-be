@@ -24,10 +24,10 @@
 #include "stdafx.h"
 #include "mplayerc.h"
 #include "GoToDlg.h"
-
 #include <atlrx.h>
 #include "SettingsDefines.h"
 #include <math.h>
+
 
 // CGoToDlg dialog
 
@@ -43,6 +43,7 @@ CGoToDlg::CGoToDlg(REFERENCE_TIME time, REFERENCE_TIME maxTime, double fps, CWnd
 	if (m_fps == 0) {
 		CString str = AfxGetApp()->GetProfileString(IDS_R_SETTINGS, IDS_RS_GOTO_FPS, _T("0"));
 		float fps;
+
 		if (_stscanf_s(str, _T("%f"), &fps) == 1) {
 			m_fps = fps;
 		}
@@ -56,6 +57,7 @@ CGoToDlg::~CGoToDlg()
 void CGoToDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
+
 	DDX_Text(pDX, IDC_EDIT1, m_timestr);
 	DDX_Text(pDX, IDC_EDIT2, m_framestr);
 	DDX_Control(pDX, IDC_EDIT1, m_timeedit);
@@ -73,10 +75,12 @@ BOOL CGoToDlg::OnInitDialog()
 	} else {
 		m_timeedit.EnableMask(_T("DD DD DDD"), _T("__:__.___"), L'0', _T("0123456789"));
 	}
+
 	m_timeedit.EnableGetMaskedCharsOnly(false);
 	m_timeedit.EnableSelectByGroup(false);
 
 	int time = (int) (m_time / 10000);
+
 	if (time >= 0) {
 		if (showHours) {
 			m_timestr.Format(_T("%02d:%02d:%02d.%03d"),
@@ -103,21 +107,15 @@ BOOL CGoToDlg::OnInitDialog()
 				m_frameedit.SetSel(0, m_framestr.Find(','));
 				break;
 		}
-
 	}
 
 	return FALSE;
-
-	//	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
 }
-
 
 BEGIN_MESSAGE_MAP(CGoToDlg, CDialog)
 	ON_BN_CLICKED(IDC_OK1, OnBnClickedOk1)
 	ON_BN_CLICKED(IDC_OK2, OnBnClickedOk2)
 END_MESSAGE_MAP()
-
 
 // CGoToDlg message handlers
 
@@ -160,6 +158,7 @@ void CGoToDlg::OnBnClickedOk2()
 	wchar_t c2[2]; // unnecessary character
 
 	int result = swscanf_s(m_framestr, L"%u%1s%f%1s", &frame, &c1, _countof(c1), &fps, &c2, _countof(c2));
+
 	if (result == 1) {
 		m_time = (REFERENCE_TIME)ceil(10000000.0*frame/m_fps);
 		OnOK();

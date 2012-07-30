@@ -87,7 +87,6 @@ void CPPageFileMediaInfo::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_MIEDIT, m_mediainfo);
 }
 
-
 BEGIN_MESSAGE_MAP(CPPageFileMediaInfo, CPropertyPage)
 	ON_WM_SHOWWINDOW()
 END_MESSAGE_MAP()

@@ -33,6 +33,7 @@ bool CFloatEdit::GetFloat(float& f)
 {
 	CString s;
 	GetWindowText(s);
+
 	return(_stscanf_s(s, _T("%f"), &f) == 1);
 }
 
@@ -41,6 +42,7 @@ double CFloatEdit::operator = (double d)
 	CString s;
 	s.Format(_T("%.4f"), d);
 	SetWindowText(s);
+
 	return(d);
 }
 
@@ -49,6 +51,7 @@ CFloatEdit::operator double()
 	CString s;
 	GetWindowText(s);
 	float f = 0;
+
 	return(_stscanf_s(s, _T("%f"), &f) == 1 ? f : 0);
 }
 
@@ -122,6 +125,7 @@ bool CHexEdit::GetDWORD(DWORD& dw)
 {
 	CString s;
 	GetWindowText(s);
+
 	return(_stscanf_s(s, _T("%x"), &dw) == 1);
 }
 
@@ -130,6 +134,7 @@ DWORD CHexEdit::operator = (DWORD dw)
 	CString s;
 	s.Format(_T("%08x"), dw);
 	SetWindowText(s);
+
 	return(dw);
 }
 
@@ -138,6 +143,7 @@ CHexEdit::operator DWORD()
 	CString s;
 	GetWindowText(s);
 	DWORD dw;
+
 	return(_stscanf_s(s, _T("%x"), &dw) == 1 ? dw : 0);
 }
 

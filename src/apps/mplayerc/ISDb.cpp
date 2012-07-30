@@ -26,11 +26,11 @@
 #include "ISDb.h"
 #include "mplayerc.h"
 
-
 bool mpc_filehash(LPCTSTR fn, filehash& fh)
 {
 	CFile f;
 	CFileException fe;
+
 	if (!f.Open(fn, CFile::modeRead|CFile::osSequentialScan|CFile::shareDenyNone, &fe)) {
 		return false;
 	}
@@ -42,10 +42,13 @@ bool mpc_filehash(LPCTSTR fn, filehash& fh)
 	fh.size = f.GetLength();
 
 	fh.mpc_filehash = fh.size;
+
 	for (UINT64 tmp = 0, i = 0; i < 65536/sizeof(tmp) && f.Read(&tmp, sizeof(tmp)); fh.mpc_filehash += tmp, i++) {
 		;
 	}
+
 	f.Seek(max(0, (INT64)fh.size - 65536), CFile::begin);
+
 	for (UINT64 tmp = 0, i = 0; i < 65536/sizeof(tmp) && f.Read(&tmp, sizeof(tmp)); fh.mpc_filehash += tmp, i++) {
 		;
 	}
@@ -58,13 +61,16 @@ void mpc_filehash(CPlaylist& pl, CList<filehash>& fhs)
 	fhs.RemoveAll();
 
 	POSITION pos = pl.GetHeadPosition();
+
 	while (pos) {
 		CString fn = pl.GetNext(pos).m_fns.GetHead();
+
 		if (AfxGetAppSettings().m_Formats.FindExt(CPath(fn).GetExtension().MakeLower(), true)) {
 			continue;
 		}
 
 		filehash fh;
+
 		if (!mpc_filehash(fn, fh)) {
 			continue;
 		}
@@ -81,6 +87,7 @@ CStringA makeargs(CPlaylist& pl)
 	CAtlList<CStringA> args;
 
 	POSITION pos = fhs.GetHeadPosition();
+
 	for (int i = 0; pos; i++) {
 		filehash& fh = fhs.GetNext(pos);
 
@@ -108,9 +115,10 @@ bool OpenUrl(CInternetSession& is, CString url, CStringA& str)
 			;
 		}
 
-		f->Close(); // must close it because the destructor doesn't seem to do it and we will get an exception when "is" is destroying
+		f->Close();
 	} catch (CInternetException* ie) {
 		ie->Delete();
+
 		return false;
 	}
 

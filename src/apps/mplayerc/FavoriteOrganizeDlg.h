@@ -38,19 +38,18 @@ private:
 	CAtlList<CString> m_sl[3];
 
 public:
-	CFavoriteOrganizeDlg(CWnd* pParent = NULL);   // standard constructor
+	CFavoriteOrganizeDlg(CWnd* pParent = NULL);
 	virtual ~CFavoriteOrganizeDlg();
 
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 
-	// Dialog Data
 	enum { IDD = IDD_FAVORGANIZE };
 
 	CTabCtrl m_tab;
 	CListCtrl m_list;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 
 	void SetupList(bool fSave);

@@ -48,8 +48,9 @@ void COpenDirHelper::SetFont(HWND hwnd, LPTSTR FontName, int FontSize)
 	SendMessage(hwnd, WM_SETFONT, (WPARAM)hf, TRUE);           // set new font
 
 	if (!hfOld && (hfOld != hf)) {
-		DeleteObject(hfOld);    // if the old font is not system font or the same as newfont, release it.
+		DeleteObject(hfOld);
 	}
+
 	ReleaseDC(hwnd, hdc);
 }
 
@@ -63,6 +64,7 @@ LRESULT APIENTRY COpenDirHelper::CheckBoxSubclassProc(HWND hwnd,UINT uMsg,WPARAM
 			m_incl_subdir = TRUE;
 		}
 	}
+
 	return CallWindowProc(CBProc, hwnd, uMsg, wParam, lParam);
 }
 
@@ -119,20 +121,25 @@ void COpenDirHelper::RecurseAddDir(CString path, CAtlList<CString>* sl)
 	WIN32_FIND_DATA fd = {0};
 
 	HANDLE hFind = FindFirstFile(path + _T("*.*"), &fd);
+
 	if (hFind != INVALID_HANDLE_VALUE) {
 		do {
 			CString f_name = fd.cFileName;
+
 			if ((fd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) && (f_name!=_T(".")) && (f_name!=_T(".."))) {
 				CString fullpath = path + f_name;
+
 				if (fullpath[fullpath.GetLength()-1] != '\\') {
 					fullpath += '\\';
 				}
+
 				sl->AddTail(fullpath);
 				RecurseAddDir(fullpath, sl);
 			} else {
 				continue;
 			}
 		} while (FindNextFile(hFind, &fd));
+
 		FindClose(hFind);
 	}
 }

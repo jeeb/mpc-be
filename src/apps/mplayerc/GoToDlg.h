@@ -37,7 +37,7 @@ class CGoToDlg : public CDialog
 	enum { TYPE_TIME, TYPE_FRAME };
 
 public:
-	CGoToDlg(REFERENCE_TIME time = -1, REFERENCE_TIME maxTime = -1, double fps = 0, CWnd* pParent = NULL);   // standard constructor
+	CGoToDlg(REFERENCE_TIME time = -1, REFERENCE_TIME maxTime = -1, double fps = 0, CWnd* pParent = NULL);
 	virtual ~CGoToDlg();
 
 	CString m_timestr;
@@ -49,11 +49,10 @@ public:
 	REFERENCE_TIME m_maxTime;
 	double m_fps;
 
-	// Dialog Data
 	enum { IDD = IDD_GOTO_DLG };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 

@@ -60,9 +60,11 @@ CMediaFormatCategory::CMediaFormatCategory(
 	m_engine		= engine;
 	ExplodeMin(exts, m_exts, ' ');
 	POSITION pos = m_exts.GetHeadPosition();
+
 	while (pos) {
 		m_exts.GetNext(pos).TrimLeft('.');
 	}
+
 	m_backupexts.AddTailList(&m_exts);
 }
 
@@ -97,6 +99,7 @@ CMediaFormatCategory& CMediaFormatCategory::operator = (const CMediaFormatCatego
 		m_backupexts.RemoveAll();
 		m_backupexts.AddTailList(&mfc.m_backupexts);
 	}
+
 	return *this;
 }
 
@@ -117,9 +120,11 @@ void CMediaFormatCategory::SetExts(CString exts)
 	m_exts.RemoveAll();
 	ExplodeMin(exts, m_exts, ' ');
 	POSITION pos = m_exts.GetHeadPosition();
+
 	while (pos) {
 		POSITION cur = pos;
 		CString& ext = m_exts.GetNext(pos);
+
 		if (ext[0] == '\\') {
 			m_engine = (engine_t)_tcstol(ext.TrimLeft('\\'), NULL, 10);
 			m_exts.RemoveAt(cur);
@@ -133,9 +138,11 @@ CString CMediaFormatCategory::GetFilter()
 {
 	CString filter;
 	POSITION pos = m_exts.GetHeadPosition();
+
 	while (pos) {
 		filter += _T("*.") + m_exts.GetNext(pos) + _T(";");
 	}
+
 	filter.TrimRight(_T(';')); // cheap...
 	return(filter);
 }
@@ -143,9 +150,11 @@ CString CMediaFormatCategory::GetFilter()
 CString CMediaFormatCategory::GetExts(bool fAppendEngine)
 {
 	CString exts = Implode(m_exts, ' ');
+
 	if (fAppendEngine) {
 		exts += CString(_T(" \\")) + (TCHAR)(0x30 + (int)m_engine);
 	}
+
 	return(exts);
 }
 
@@ -153,13 +162,17 @@ CString CMediaFormatCategory::GetExtsWithPeriod(bool fAppendEngine)
 {
 	CString exts;
 	POSITION pos = m_exts.GetHeadPosition();
+
 	while (pos) {
 		exts += _T(".") + m_exts.GetNext(pos) + _T(" ");
 	}
-	exts.TrimRight(_T(' ')); // cheap...
+
+	exts.TrimRight(_T(' '));
+
 	if (fAppendEngine) {
 		exts += CString(_T(" \\")) + (TCHAR)(0x30 + (int)m_engine);
 	}
+
 	return(exts);
 }
 
@@ -167,13 +180,17 @@ CString CMediaFormatCategory::GetBackupExtsWithPeriod(bool fAppendEngine)
 {
 	CString exts;
 	POSITION pos = m_backupexts.GetHeadPosition();
+
 	while (pos) {
 		exts += _T(".") + m_backupexts.GetNext(pos) + _T(" ");
 	}
-	exts.TrimRight(_T(' ')); // cheap...
+
+	exts.TrimRight(_T(' '));
+
 	if (fAppendEngine) {
 		exts += CString(_T(" \\")) + (TCHAR)(0x30 + (int)m_engine);
 	}
+
 	return(exts);
 }
 
@@ -289,6 +306,7 @@ engine_t CMediaFormats::GetEngine(CString path)
 
 	CString ext = CPath(path).GetExtension();
 	ext.MakeLower();
+
 	if (!ext.IsEmpty()) {
 		if (path.Find(_T("rtsp://")) == 0) {
 			if (ext == _T(".ram") || ext == _T(".rm") || ext == _T(".ra")) {
@@ -347,6 +365,7 @@ void CMediaFormats::GetFilter(CString& filter, CAtlArray<CString>& mask)
 		mask[0]	+= strTemp;
 		filter	+= strTemp;
 	}
+
 	mask[0].TrimRight(_T(';'));
 	filter.TrimRight(_T(';'));
 	filter += _T("|");
@@ -385,9 +404,11 @@ void CMediaFormats::GetAudioFilter(CString& filter, CAtlArray<CString>& mask)
 
 	for (size_t i = 0; i < GetCount(); i++) {
 		CMediaFormatCategory& mfc = GetAt(i);
+
 		if (!mfc.IsAudioOnly() || mfc.GetEngineType() != DirectShow) {
 			continue;
 		}
+
 		filter += mfc.GetDescription() + _T("|") + GetAt(i).GetFilter() + _T("|");
 		mask.Add(mfc.GetFilter());
 	}

@@ -70,6 +70,7 @@ void CFavoriteOrganizeDlg::SetupList(bool fSave)
 
 			if (!sl.IsEmpty()) {
 				REFERENCE_TIME rt = 0;
+
 				if (1 == _stscanf_s(sl.GetHead(), _T("%I64d"), &rt) && rt > 0) {
 					DVD_HMSF_TIMECODE hmsf = RT2HMSF(rt);
 
@@ -96,10 +97,10 @@ void CFavoriteOrganizeDlg::UpdateColumnsSizes()
 void CFavoriteOrganizeDlg::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Control(pDX, IDC_TAB1, m_tab);
 	DDX_Control(pDX, IDC_LIST2, m_list);
 }
-
 
 BEGIN_MESSAGE_MAP(CFavoriteOrganizeDlg, CResizableDialog)
 	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB1, OnTcnSelchangeTab1)
@@ -121,12 +122,13 @@ BEGIN_MESSAGE_MAP(CFavoriteOrganizeDlg, CResizableDialog)
 	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
-
 // CFavoriteOrganizeDlg message handlers
 
 BOOL CFavoriteOrganizeDlg::OnInitDialog()
 {
 	__super::OnInitDialog();
+
+	AppSettings& s = AfxGetAppSettings();
 
 	m_tab.InsertItem(0, ResStr(IDS_FAVFILES));
 	m_tab.InsertItem(1, ResStr(IDS_FAVDVDS));
@@ -137,9 +139,9 @@ BOOL CFavoriteOrganizeDlg::OnInitDialog()
 	m_list.InsertColumn(1, _T(""));
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle()|LVS_EX_FULLROWSELECT);
 
-	AfxGetAppSettings().GetFav(FAV_FILE, m_sl[0]);
-	AfxGetAppSettings().GetFav(FAV_DVD, m_sl[1]);
-	AfxGetAppSettings().GetFav(FAV_DEVICE, m_sl[2]);
+	s.GetFav(FAV_FILE, m_sl[0]);
+	s.GetFav(FAV_DVD, m_sl[1]);
+	s.GetFav(FAV_DEVICE, m_sl[2]);
 
 	SetupList(false);
 
@@ -153,8 +155,7 @@ BOOL CFavoriteOrganizeDlg::OnInitDialog()
 
 	EnableSaveRestore(IDS_R_DLG_ORGANIZE_FAV);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 BOOL CFavoriteOrganizeDlg::PreTranslateMessage(MSG* pMsg)
@@ -205,6 +206,7 @@ void CFavoriteOrganizeDlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStr
 	str = m_list.GetItemText(nItem, 0);
 	pDC->TextOut(rcItem.left + 3, (rcItem.top+rcItem.bottom - pDC->GetTextExtent(str).cy) / 2, str);
 	str = m_list.GetItemText(nItem, 1);
+
 	if (!str.IsEmpty()) {
 		pDC->TextOut(rcItem.right - pDC->GetTextExtent(str).cx - 3, (rcItem.top+rcItem.bottom - pDC->GetTextExtent(str).cy) / 2, str);
 	}
@@ -226,9 +228,11 @@ void CFavoriteOrganizeDlg::OnUpdateRenameBn(CCmdUI* pCmdUI)
 void CFavoriteOrganizeDlg::OnLvnEndlabeleditList2(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NMLVDISPINFO* pDispInfo = reinterpret_cast<NMLVDISPINFO*>(pNMHDR);
+
 	if (pDispInfo->item.iItem >= 0 && pDispInfo->item.pszText) {
 		m_list.SetItemText(pDispInfo->item.iItem, 0, pDispInfo->item.pszText);
 	}
+
 	UpdateColumnsSizes();
 
 	*pResult = 0;
@@ -302,6 +306,7 @@ void CFavoriteOrganizeDlg::OnDeleteBnClicked()
 
 	while ((pos = m_list.GetFirstSelectedItemPosition()) != NULL) {
 		nItem = m_list.GetNextSelectedItem(pos);
+
 		if (nItem < 0 || nItem >= m_list.GetItemCount()) {
 			return;
 		}
@@ -341,6 +346,7 @@ void CFavoriteOrganizeDlg::OnUpBnClicked()
 
 	while (pos) {
 		nItem = m_list.GetNextSelectedItem(pos);
+
 		if (nItem <= 0 || nItem >= m_list.GetItemCount()) {
 			return;
 		}
@@ -362,6 +368,7 @@ void CFavoriteOrganizeDlg::OnDownBnClicked()
 
 	while (pos) {
 		nItem = m_list.GetNextSelectedItem(pos);
+
 		if (nItem < 0 || nItem >= m_list.GetItemCount() - 1) {
 			return;
 		}
@@ -390,9 +397,11 @@ void CFavoriteOrganizeDlg::OnBnClickedOk()
 {
 	SetupList(true);
 
-	AfxGetAppSettings().SetFav(FAV_FILE, m_sl[0]);
-	AfxGetAppSettings().SetFav(FAV_DVD, m_sl[1]);
-	AfxGetAppSettings().SetFav(FAV_DEVICE, m_sl[2]);
+	AppSettings& s = AfxGetAppSettings();
+
+	s.SetFav(FAV_FILE, m_sl[0]);
+	s.SetFav(FAV_DVD, m_sl[1]);
+	s.SetFav(FAV_DEVICE, m_sl[2]);
 
 	OnOK();
 }

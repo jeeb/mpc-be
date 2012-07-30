@@ -46,6 +46,7 @@ CFavoriteAddDlg::~CFavoriteAddDlg()
 void CFavoriteAddDlg::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Control(pDX, IDC_COMBO1, m_namectrl);
 	DDX_CBString(pDX, IDC_COMBO1, m_name);
 	DDX_Check(pDX, IDC_CHECK1, m_bRememberPos);
@@ -55,6 +56,8 @@ void CFavoriteAddDlg::DoDataExchange(CDataExchange* pDX)
 BOOL CFavoriteAddDlg::OnInitDialog()
 {
 	__super::OnInitDialog();
+
+	AppSettings& s = AfxGetAppSettings();
 
 	if ( !m_shortname.IsEmpty() ) {
 		m_namectrl.AddString( m_shortname );
@@ -66,39 +69,37 @@ BOOL CFavoriteAddDlg::OnInitDialog()
 
 	::CorrectComboListWidth(m_namectrl);
 
-	m_bRememberPos = AfxGetAppSettings().bFavRememberPos;
-	m_bRelativeDrive = AfxGetAppSettings().bFavRelativeDrive;
+	m_bRememberPos = s.bFavRememberPos;
+	m_bRelativeDrive = s.bFavRelativeDrive;
 
-	UpdateData(FALSE); // Update UI
+	UpdateData(FALSE);
 
 	m_namectrl.SetCurSel( 0 );
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
-
 
 BEGIN_MESSAGE_MAP(CFavoriteAddDlg, CCmdUIDialog)
 	ON_UPDATE_COMMAND_UI(IDOK, OnUpdateOk)
 END_MESSAGE_MAP()
 
-
 // CFavoriteAddDlg message handlers
 
 void CFavoriteAddDlg::OnUpdateOk(CCmdUI *pCmdUI)
 {
-	UpdateData(); // Retrieve UI values
+	UpdateData();
 
 	pCmdUI->Enable( !m_name.IsEmpty() );
 }
 
 void CFavoriteAddDlg::OnOK()
 {
-	UpdateData(); // Retrieve UI values
+	UpdateData();
 
-	// Remember settings
-	AfxGetAppSettings().bFavRememberPos = !!m_bRememberPos;
-	AfxGetAppSettings().bFavRelativeDrive = !!m_bRelativeDrive;
+	AppSettings& s = AfxGetAppSettings();
+
+	s.bFavRememberPos = !!m_bRememberPos;
+	s.bFavRelativeDrive = !!m_bRelativeDrive;
 
 	CCmdUIDialog::OnOK();
 }
