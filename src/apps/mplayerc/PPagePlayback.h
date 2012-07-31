@@ -55,6 +55,8 @@ public:
 	BOOL m_fReportFailedPins;
 	CString m_subtitlesLanguageOrder;
 	CString m_audiosLanguageOrder;
+	int m_nVolumeStep;
+	CComboBox m_nVolumeStepCtrl;
 
 	enum { IDD = IDD_PPAGEPLAYBACK };
 

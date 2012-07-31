@@ -47,7 +47,7 @@ bool CVolumeCtrl::Create(CWnd* pParentWnd)
 	EnableToolTips(TRUE);
 	SetRange(0, 100);
 	SetPosInternal(s.nVolume);
-	SetPageSize(2);
+	SetPageSize(s.nVolumeStep);
 	SetLineSize(0);
 
 	iDisableXPToolbars = s.fDisableXPToolbars + 1;
@@ -69,11 +69,21 @@ void CVolumeCtrl::SetPosInternal(int pos)
 
 void CVolumeCtrl::IncreaseVolume()
 {
+	AppSettings& s = AfxGetAppSettings();
+	if (s.nVolumeStep != GetPageSize()) {
+		SetPageSize(s.nVolumeStep);
+	}
+
 	SetPosInternal(GetPos() + GetPageSize());
 }
 
 void CVolumeCtrl::DecreaseVolume()
 {
+	AppSettings& s = AfxGetAppSettings();
+	if (s.nVolumeStep != GetPageSize()) {
+		SetPageSize(s.nVolumeStep);
+	}
+
 	SetPosInternal(GetPos() - GetPageSize());
 }
 

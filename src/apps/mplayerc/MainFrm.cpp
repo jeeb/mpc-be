@@ -663,7 +663,6 @@ CMainFrame::CMainFrame() :
 	m_fTrayIcon(false),
 	m_pFullscreenWnd(NULL),
 	m_pVideoWnd(NULL),
-	m_pVideoWnd2(NULL),
 	m_bRemainingTime(false),
 	m_nCurSubtitle(-1),
 	m_lSubtitleShift(0),
@@ -3147,7 +3146,7 @@ void CMainFrame::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 		OnPlayVolume(0);
 	} else if (pScrollBar->IsKindOf(RUNTIME_CLASS(CPlayerSeekBar)) && m_iMediaLoadState == MLS_LOADED) {
 		SeekTo(m_wndSeekBar.GetPos(), Shift_State);
-	} else if (m_pVideoWnd == m_pVideoWnd) {
+	} else {
 		SeekTo(m_OSD.GetPos(), Shift_State);
 	}
 
@@ -10868,10 +10867,6 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 		} else {
 			b_UseSmartSeek = s.fSmartSeek && !s.fD3DFullscreen && m_wndView2;
 		}
-
-		if (b_UseSmartSeek && m_wndView2) {
-			m_pVideoWnd2 = &m_wndView2; // SmartSeek preview window
-		}
 	}
 
 	if (OpenFileData* p = dynamic_cast<OpenFileData*>(pOMD)) {
@@ -10953,15 +10948,16 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 			pGB = DNew CFGManagerPlayer(_T("CFGManagerPlayer"), NULL, m_pVideoWnd->m_hWnd);
 
 			// Graph for preview
-			if (b_UseSmartSeek) {
-				pGB2 = DNew CFGManagerPlayer(_T("CFGManagerPlayer"), NULL, m_pVideoWnd2->m_hWnd, true);
+			if (b_UseSmartSeek && m_wndView2) {
+				pGB2 = DNew CFGManagerPlayer(_T("CFGManagerPlayer"), NULL, m_wndView2.m_hWnd, true);
 			}
 		}
 	} else if (OpenDVDData* p = dynamic_cast<OpenDVDData*>(pOMD)) {
 		pGB = DNew CFGManagerDVD(_T("CFGManagerDVD"), NULL, m_pVideoWnd->m_hWnd);
 
-		if (b_UseSmartSeek)
-			pGB2 = DNew CFGManagerDVD(_T("CFGManagerDVD"), NULL, m_pVideoWnd2->m_hWnd, true);
+		if (b_UseSmartSeek && m_wndView2) {
+			pGB2 = DNew CFGManagerDVD(_T("CFGManagerDVD"), NULL, m_wndView2.m_hWnd, true);
+		}
 	} else if (OpenDeviceData* p = dynamic_cast<OpenDeviceData*>(pOMD)) {
 		if (s.iDefaultCaptureDevice == 1) {
 			pGB = DNew CFGManagerBDA(_T("CFGManagerBDA"), NULL, m_pVideoWnd->m_hWnd);
@@ -11867,8 +11863,8 @@ void CMainFrame::OpenSetupVideo()
 			pWnd->EnableWindow(FALSE); // little trick to let WM_SETCURSOR thru
 		}
 
-		if (b_UseSmartSeek) {
-			pVW2->put_Owner((OAHWND)m_pVideoWnd2->m_hWnd);
+		if (b_UseSmartSeek && m_wndView2) {
+			pVW2->put_Owner((OAHWND)m_wndView2.m_hWnd);
 			pVW2->put_WindowStyle(WS_CHILD|WS_CLIPSIBLINGS|WS_CLIPCHILDREN);
 		}
 	}
@@ -12684,14 +12680,14 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		pGB->FindInterface(__uuidof(IMFVideoDisplayControl),	(void**)&m_pMFVDC,	TRUE);
 		pGB->FindInterface(__uuidof(IMFVideoProcessor),			(void**)&m_pMFVP,	TRUE);
 
-		if (b_UseSmartSeek) {
+		if (b_UseSmartSeek && m_wndView2) {
 			pGB2->FindInterface(__uuidof(IMFVideoDisplayControl),	(void**)&m_pMFVDC2,	TRUE);
 			pGB2->FindInterface(__uuidof(IMFVideoProcessor),		(void**)&m_pMFVP2,	TRUE);
 
 			if (m_pMFVDC2) {
 				RECT Rect2;
-				::GetClientRect (m_pVideoWnd2->m_hWnd, &Rect2);
-				m_pMFVDC2->SetVideoWindow (m_pVideoWnd2->m_hWnd);
+				::GetClientRect (m_wndView2.m_hWnd, &Rect2);
+				m_pMFVDC2->SetVideoWindow (m_wndView2.m_hWnd);
 				m_pMFVDC2->SetVideoPosition(NULL, &Rect2);	
 			}
 		}

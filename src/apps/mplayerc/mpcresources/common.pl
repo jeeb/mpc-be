@@ -31,7 +31,7 @@ use Data::Dumper;
 use vars qw(@InTags @TextTags $AdjustedDir);
 
 @InTags = qw(DIALOGEX MENU STRINGTABLE VERSIONINFO DIALOG DLGINIT TOOLBAR);
-@TextTags = qw(BITMAP AVI ICON);
+@TextTags = qw(BITMAP AVI ICON PNG);
 $AdjustedDir = q(..\\\\);
 
 1;

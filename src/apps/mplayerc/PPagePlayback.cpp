@@ -47,6 +47,7 @@ CPPagePlayback::CPPagePlayback()
 	, m_fReportFailedPins(FALSE)
 	, m_subtitlesLanguageOrder(_T(""))
 	, m_audiosLanguageOrder(_T(""))
+	, m_nVolumeStep(1)
 {
 }
 
@@ -74,6 +75,8 @@ void CPPagePlayback::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK6, m_fReportFailedPins);
 	DDX_Text(pDX, IDC_EDIT2, m_subtitlesLanguageOrder);
 	DDX_Text(pDX, IDC_EDIT3, m_audiosLanguageOrder);
+	DDX_CBIndex(pDX, IDC_COMBOVOLUME, m_nVolumeStep);
+	DDX_Control(pDX, IDC_COMBOVOLUME, m_nVolumeStepCtrl);
 }
 
 BEGIN_MESSAGE_MAP(CPPagePlayback, CPPageBase)
@@ -117,6 +120,12 @@ BOOL CPPagePlayback::OnInitDialog()
 	m_subtitlesLanguageOrder = s.strSubtitlesLanguageOrder;
 	m_audiosLanguageOrder = s.strAudiosLanguageOrder;
 
+	for (int idx = 1; idx <= 10; idx++) {
+		CString str; str.Format(_T("%d"), idx);
+		m_nVolumeStepCtrl.AddString(str);
+	}
+	m_nVolumeStep = s.nVolumeStep - 1;
+
 	UpdateData(FALSE);
 
 	return TRUE;
@@ -141,6 +150,7 @@ BOOL CPPagePlayback::OnApply()
 	s.fReportFailedPins = !!m_fReportFailedPins;
 	s.strSubtitlesLanguageOrder = m_subtitlesLanguageOrder;
 	s.strAudiosLanguageOrder = m_audiosLanguageOrder;
+	s.nVolumeStep = m_nVolumeStep + 1;
 
 	return __super::OnApply();
 }

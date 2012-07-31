@@ -466,6 +466,7 @@ void CAppSettings::UpdateData(bool fSave)
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LOOP, fLoopForever);
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REWIND, fRewind);
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ZOOM, iZoomLevel);
+		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VOLUME_STEP, nVolumeStep);
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, fAllowMultipleInst);
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXTSTYLE, iTitleBarTextStyle);
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXTTITLE, fTitleBarTextTitle);
@@ -861,6 +862,7 @@ void CAppSettings::UpdateData(bool fSave)
 		fLoopForever = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LOOP, 0);
 		fRewind = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_REWIND, FALSE);
 		iZoomLevel = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ZOOM, 1);
+		nVolumeStep = max(1, min(10, pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VOLUME_STEP, 5)));
 		iDSVideoRendererType = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DSVIDEORENDERERTYPE, (IsWinVistaOrLater() ? (CMPlayerCApp::HasEVR() ? VIDRNDT_DS_EVR_CUSTOM : VIDRNDT_DS_DEFAULT) : VIDRNDT_DS_VMR7WINDOWED) );
 		iRMVideoRendererType = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_RMVIDEORENDERERTYPE, VIDRNDT_RM_DEFAULT);
 		iQTVideoRendererType = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_QTVIDEORENDERERTYPE, VIDRNDT_QT_DEFAULT);

@@ -359,6 +359,7 @@ public:
 	bool			fLoopForever;
 	bool			fRewind;
 	int				iZoomLevel;
+	int				nVolumeStep;
 	//int			iVideoRendererType;
 	CStringW		strAudioRendererDisplayName;
 	bool			fAutoloadAudio;

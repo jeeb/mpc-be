@@ -32,11 +32,37 @@ use vars qw(@InTags @TextTags $AdjustedDir);
 use File::Basename;
 use File::Spec;
 use File::Glob qw(:globally :nocase);
+
 require "common.pl";
 
 my $BaseFileName = "../mplayerc.rc";
 my $NewFileName = "../mplayerc.rc";
 my $help;
+
+my %LANG_EXEPTIONS = (
+	'br' => 'pt-BR',
+	'by' => 'be',
+	'ca' => 'ca',
+	'cz' => 'cs',
+	'de' => 'de',
+	'es' => 'es',
+	'eu' => 'eu',
+	'fr' => 'fr',
+	'hy' => 'hy',
+	'it' => 'it',
+	'ja' => 'ja',
+	'kr' => 'ko',
+	'nl' => 'nl',
+	'pl' => 'pl',
+	'ru' => 'ru',
+	'sc' => 'zh-CN',
+	'sk' => 'sk',
+	'sv' => 'sv',
+	'tc' => 'zh-TW',
+	'tr' => 'tr',
+	'ua' => 'uk',
+);
+my $MEDIA_INFO_LANG_FILE = 'IDB_MEDIAINFO_LANGUAGE  FILE                    "..\\\\..\\\\..\\\\ExtLib\\\\MediaInfo\\\\Language\\\\%s.csv"';
 
 my $result = GetOptions("base|b=s" =>\$BaseFileName, "new|n=s" =>\$NewFileName, "help|h"=>\$help);
 
@@ -114,6 +140,19 @@ foreach my $filename(@FileLists) {
 	my @patches = ();
 
 	writeData(\@newrc, \@patches, \@curOutline, $curDialogs, $curMenus, $curStrings, \@curVersionInfo, $curDesignInfos);
+	if ($newrcfile =~ m/\.(\w{2,3})\.rc$/ and $LANG_EXEPTIONS{$1}) #Some lang file;
+	{
+        my $pos = 0;
+        for (my $i = 0; $i < @newrc; $i++)
+        {
+            if ($newrc[$i] eq '// Bitmap') {$pos = $i; last;}
+        }
+        if ($pos)
+        {
+            my $lang = $LANG_EXEPTIONS{$1};
+            splice @newrc, $pos-2, 0, (sprintf($MEDIA_INFO_LANG_FILE, $lang), '');
+        }
+	}
 
 	print "Generating new locale file: $newrcfile...\n\n";
 	writeFile($newrcfile, \@newrc, 2);

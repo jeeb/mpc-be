@@ -74,6 +74,7 @@
 #define IDS_RS_LOOPNUM						_T("LoopNum")
 #define IDS_RS_REWIND						_T("Rewind")
 #define IDS_RS_ZOOM							_T("Zoom")
+#define IDS_RS_VOLUME_STEP					_T("VolumeStep")
 #define IDS_RS_MULTIINST					_T("AllowMultipleInstances")
 #define IDS_RS_ALWAYSONTOP					_T("AlwaysOnTop")
 #define IDS_RS_AUTOZOOM						_T("AutoZoom")

@@ -969,7 +969,6 @@ public:
 
 	// SmartSeek
 	CWnd			m_wndView2;
-	CWnd*			m_pVideoWnd2;
 
 	HRESULT PreviewWindowHide();
 	HRESULT PreviewWindowShow(REFERENCE_TIME rtCur2);
