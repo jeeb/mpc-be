@@ -70,6 +70,7 @@ void CVolumeCtrl::SetPosInternal(int pos)
 void CVolumeCtrl::IncreaseVolume()
 {
 	AppSettings& s = AfxGetAppSettings();
+
 	if (s.nVolumeStep != GetPageSize()) {
 		SetPageSize(s.nVolumeStep);
 	}
@@ -80,6 +81,7 @@ void CVolumeCtrl::IncreaseVolume()
 void CVolumeCtrl::DecreaseVolume()
 {
 	AppSettings& s = AfxGetAppSettings();
+
 	if (s.nVolumeStep != GetPageSize()) {
 		SetPageSize(s.nVolumeStep);
 	}

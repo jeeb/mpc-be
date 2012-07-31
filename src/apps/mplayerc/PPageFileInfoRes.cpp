@@ -47,6 +47,7 @@ CPPageFileInfoRes::~CPPageFileInfoRes()
 void CPPageFileInfoRes::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Control(pDX, IDC_DEFAULTICON, m_icon);
 	DDX_Text(pDX, IDC_EDIT1, m_fn);
 	DDX_Control(pDX, IDC_LIST1, m_list);
@@ -71,6 +72,7 @@ BOOL CPPageFileInfoRes::OnInitDialog()
 
 	m_fn.TrimRight('/');
 	int i = max(m_fn.ReverseFind('\\'), m_fn.ReverseFind('/'));
+
 	if (i >= 0 && i < m_fn.GetLength()-1) {
 		m_fn = m_fn.Mid(i+1);
 	}
@@ -107,13 +109,13 @@ BOOL CPPageFileInfoRes::OnInitDialog()
 
 	UpdateData(FALSE);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 void CPPageFileInfoRes::OnSaveAs()
 {
 	int i = m_list.GetSelectionMark();
+
 	if (i < 0) {
 		return;
 	}
@@ -140,6 +142,7 @@ void CPPageFileInfoRes::OnUpdateSaveAs(CCmdUI* pCmdUI)
 void CPPageFileInfoRes::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	int i = m_list.GetSelectionMark();
+
 	if (i < 0) {
 		return;
 	}

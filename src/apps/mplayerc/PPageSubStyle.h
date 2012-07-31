@@ -73,7 +73,6 @@ public:
 		stss = m_stss;
 	}
 
-	// Dialog Data
 	enum { IDD = IDD_PPAGESUBSTYLE };
 	CButton m_font;
 	int m_iCharset;
@@ -104,7 +103,7 @@ public:
 	BOOL m_relativeTo;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
 

@@ -35,7 +35,6 @@ public:
 	CPPageSubMisc();
 	virtual ~CPPageSubMisc();
 
-	// Dialog Data
 	enum { IDD = IDD_PPAGESUBMISC };
 	BOOL m_fPrioritizeExternalSubtitles;
 	BOOL m_fDisableInternalSubtitles;
@@ -44,7 +43,7 @@ public:
 	CString m_ISDb;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
 

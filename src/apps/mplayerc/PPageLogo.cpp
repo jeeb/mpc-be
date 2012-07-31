@@ -77,6 +77,7 @@ BOOL CPPageLogo::OnInitDialog()
 	UpdateData(FALSE);
 
 	m_logoidpos = m_logoids.GetHeadPosition();
+
 	for (POSITION pos = m_logoids.GetHeadPosition(); pos; m_logoids.GetNext(pos)) {
 		if (m_logoids.GetAt(pos) == s.nLogoId) {
 			m_logoidpos = pos;

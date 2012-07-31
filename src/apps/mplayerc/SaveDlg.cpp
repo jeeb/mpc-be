@@ -44,6 +44,7 @@ CSaveDlg::~CSaveDlg()
 void CSaveDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CCmdUIDialog::DoDataExchange(pDX);
+
 	DDX_Control(pDX, IDC_ANIMATE1, m_anim);
 	DDX_Control(pDX, IDC_PROGRESS1, m_progress);
 	DDX_Control(pDX, IDC_REPORT, m_report);

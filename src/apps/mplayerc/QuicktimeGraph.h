@@ -31,10 +31,8 @@
 #include <qt/qt.h>
 #endif
 
-
 namespace DSObjects
 {
-
 	class CQuicktimeGraph;
 
 	class CQuicktimeWindow : public CPlayerWindow
@@ -128,5 +126,4 @@ namespace DSObjects
 		// IGraphEngine
 		STDMETHODIMP_(engine_t) GetEngine();
 	};
-
 }

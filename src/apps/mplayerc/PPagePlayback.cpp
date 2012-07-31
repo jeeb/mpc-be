@@ -124,6 +124,7 @@ BOOL CPPagePlayback::OnInitDialog()
 		CString str; str.Format(_T("%d"), idx);
 		m_nVolumeStepCtrl.AddString(str);
 	}
+
 	m_nVolumeStep = s.nVolumeStep - 1;
 
 	UpdateData(FALSE);
@@ -200,6 +201,7 @@ BOOL CPPagePlayback::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
 	TOOLTIPTEXT* pTTT = (TOOLTIPTEXT*)pNMHDR;
 
 	UINT_PTR nID = pNMHDR->idFrom;
+
 	if (pTTT->uFlags & TTF_IDISHWND) {
 		nID = ::GetDlgCtrlID((HWND)nID);
 	}
@@ -238,6 +240,7 @@ void CPPagePlayback::OnCancel()
 	if (m_nVolume != m_oldVolume) {
 		((CMainFrame*)GetParentFrame())->m_wndToolBar.Volume = m_oldVolume;    //not very nice solution
 	}
+
 	if (m_nBalance != s.nBalance) {
 		((CMainFrame*)GetParentFrame())->SetBalance(s.nBalance);
 	}

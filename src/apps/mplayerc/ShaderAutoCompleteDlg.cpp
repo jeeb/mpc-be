@@ -121,16 +121,15 @@ CShaderAutoCompleteDlg::~CShaderAutoCompleteDlg()
 void CShaderAutoCompleteDlg::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Control(pDX, IDC_LIST1, m_list);
 }
-
 
 BEGIN_MESSAGE_MAP(CShaderAutoCompleteDlg, CResizableDialog)
 	ON_WM_SETFOCUS()
 	ON_LBN_SELCHANGE(IDC_LIST1, OnLbnSelchangeList1)
 	ON_WM_SHOWWINDOW()
 END_MESSAGE_MAP()
-
 
 // CShaderAutoCompleteDlg message handlers
 
@@ -154,8 +153,7 @@ BOOL CShaderAutoCompleteDlg::OnInitDialog()
 	::SendMessage(m_hToolTipWnd, TTM_ADDTOOL, 0, (LPARAM)&m_ti);
 	::SendMessage(m_hToolTipWnd, TTM_SETMAXTIPWIDTH, 0, (LPARAM)400);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 void CShaderAutoCompleteDlg::OnSetFocus(CWnd* pOldWnd)
@@ -170,6 +168,7 @@ void CShaderAutoCompleteDlg::OnLbnSelchangeList1()
 	::SendMessage(m_hToolTipWnd, TTM_TRACKACTIVATE, FALSE, (LPARAM)&m_ti);
 
 	int i = m_list.GetCurSel();
+
 	if (i < 0) {
 		return;
 	}
@@ -179,9 +178,11 @@ void CShaderAutoCompleteDlg::OnLbnSelchangeList1()
 		m_inst.GetNextAssoc(pos, str, desc);
 		CAtlList<CString> sl;
 		Explode(desc, sl, '|', 2);
+
 		if (sl.GetCount() != 2) {
 			return;
 		}
+
 		_tcscpy_s(m_ti.lpszText, _countof(m_text), sl.RemoveTail());
 		CRect r;
 		GetWindowRect(r);

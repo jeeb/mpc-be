@@ -107,7 +107,6 @@ BOOL CPPageSheet::OnInitDialog()
 
 void CPPageSheet::OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/)
 {
-	// display your own context menu handler or do nothing
 }
 
 // CTreePropSheetTreeCtrl

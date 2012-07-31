@@ -43,7 +43,6 @@ public:
 	CPPageAudioSwitcher(IFilterGraph* pFG);
 	virtual ~CPPageAudioSwitcher();
 
-	// Dialog Data
 	enum { IDD = IDD_PPAGEAUDIOSWITCHER };
 
 	BOOL m_fEnableAudioSwitcher;
@@ -65,11 +64,10 @@ public:
 	CSpinButtonCtrl m_tAudioTimeShiftSpin;
 	BOOL m_fAudioTimeShift;
 
-	// tooltip for slidercontrol
 	CToolTipCtrl m_tooltip;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
 

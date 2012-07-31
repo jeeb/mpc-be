@@ -41,10 +41,9 @@ private:
 	CAtlList<CDSMResource> m_res;
 
 public:
-	CPPageFileInfoRes(CString fn, IFilterGraph* pFG);   // standard constructor
+	CPPageFileInfoRes(CString fn, IFilterGraph* pFG);
 	virtual ~CPPageFileInfoRes();
 
-	// Dialog Data
 	enum { IDD = IDD_FILEPROPRES };
 
 	CStatic m_icon;
@@ -52,7 +51,7 @@ public:
 	CListCtrl m_list;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 
 	DECLARE_MESSAGE_MAP()

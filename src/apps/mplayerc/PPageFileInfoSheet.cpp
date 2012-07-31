@@ -61,7 +61,6 @@ CPPageFileInfoSheet::~CPPageFileInfoSheet()
 {
 }
 
-
 BEGIN_MESSAGE_MAP(CPPageFileInfoSheet, CPropertySheet)
 	ON_BN_CLICKED(IDC_BUTTON_MI, OnSaveAs)
 END_MESSAGE_MAP()
@@ -74,9 +73,11 @@ BOOL CPPageFileInfoSheet::OnInitDialog()
 
 	m_fn.TrimRight('/');
 	int i = max(m_fn.ReverseFind('\\'), m_fn.ReverseFind('/'));
+
 	if (i >= 0 && i < m_fn.GetLength()-1) {
 		m_fn = m_fn.Mid(i+1);
 	}
+
 	m_fn = m_fn + _T(".MediaInfo.txt");
 
 	GetDlgItem(IDCANCEL)->ShowWindow(SW_HIDE);
@@ -96,7 +97,7 @@ BOOL CPPageFileInfoSheet::OnInitDialog()
 
 	GetTabControl()->SetFocus();
 
-	return FALSE;  // return TRUE unless you set the focus to a control
+	return FALSE;
 }
 
 void CPPageFileInfoSheet::OnSaveAs()
@@ -105,9 +106,10 @@ void CPPageFileInfoSheet::OnSaveAs()
 						 OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_PATHMUSTEXIST|OFN_NOCHANGEDIR,
 						 _T("Text Files (*.txt)|*.txt|All Files (*.*)|*.*||"), NULL);
 
-	if (filedlg.DoModal() == IDOK) { // user has chosen a file, so
+	if (filedlg.DoModal() == IDOK) {
 		TCHAR bom = (TCHAR)0xFEFF;
 		CFile mFile;
+
 		if (mFile.Open(filedlg.GetPathName(), CFile::modeCreate | CFile::modeWrite)) {
 			mFile.Write(&bom, sizeof(TCHAR));
 			mFile.Write(LPCTSTR(m_mi.MI_Text), m_mi.MI_Text.GetLength()*sizeof(TCHAR));

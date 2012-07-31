@@ -58,6 +58,7 @@ CPPageFileInfoDetails::~CPPageFileInfoDetails()
 void CPPageFileInfoDetails::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Control(pDX, IDC_DEFAULTICON, m_icon);
 	DDX_Text(pDX, IDC_EDIT1, m_fn);
 	DDX_Text(pDX, IDC_EDIT4, m_type);
@@ -122,11 +123,13 @@ BOOL CPPageFileInfoDetails::OnInitDialog()
 	}
 
 	CString ext = m_fn.Left(m_fn.Find(_T("://"))+1).TrimRight(':');
+
 	if (ext.IsEmpty() || !ext.CompareNoCase(_T("file"))) {
 		ext = _T(".") + m_fn.Mid(m_fn.ReverseFind('.')+1);
 	}
 
 	m_hIcon = LoadIcon(m_fn, false);
+
 	if (m_hIcon) {
 		m_icon.SetIcon(m_hIcon);
 	}
@@ -136,6 +139,7 @@ BOOL CPPageFileInfoDetails::OnInitDialog()
 	}
 
 	CComVariant vt;
+
 	if (::GetProperty(m_pFG, L"CurFile.TimeCreated", &vt)) {
 		if (V_VT(&vt) == VT_UI8) {
 			ULARGE_INTEGER uli;
@@ -151,6 +155,7 @@ BOOL CPPageFileInfoDetails::OnInitDialog()
 
 	WIN32_FIND_DATA wfd;
 	HANDLE hFind = FindFirstFile(m_fn, &wfd);
+
 	if (hFind != INVALID_HANDLE_VALUE) {
 		FindClose(hFind);
 
@@ -167,6 +172,7 @@ BOOL CPPageFileInfoDetails::OnInitDialog()
 
 	REFERENCE_TIME rtDur = 0;
 	CComQIPtr<IMediaSeeking> pMS = m_pFG;
+
 	if (pMS && SUCCEEDED(pMS->GetDuration(&rtDur)) && rtDur > 0) {
 		m_time = ReftimeToString2(rtDur);
 	}
@@ -211,6 +217,7 @@ BOOL CPPageFileInfoDetails::OnInitDialog()
 		m_res.Format(_T("%dx%d"), wh.cx, wh.cy);
 
 		int lnko = LNKO(arxy.cx, arxy.cy);
+
 		if (lnko > 1) {
 			arxy.cx /= lnko, arxy.cy /= lnko;
 		}
@@ -233,14 +240,14 @@ BOOL CPPageFileInfoDetails::OnInitDialog()
 	m_pFG = NULL;
 	m_pCAP = NULL;
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 BOOL CPPageFileInfoDetails::OnSetActive()
 {
 	BOOL ret = __super::OnSetActive();
 	PostMessage(SETPAGEFOCUS, 0, 0L);
+
 	return ret;
 }
 
@@ -248,6 +255,7 @@ LRESULT CPPageFileInfoDetails::OnSetPageFocus(WPARAM wParam, LPARAM lParam)
 {
 	CPropertySheet* psheet = (CPropertySheet*) GetParent();
 	psheet->GetTabControl()->SetFocus();
+
 	return 0;
 }
 

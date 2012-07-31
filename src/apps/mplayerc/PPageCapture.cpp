@@ -285,7 +285,6 @@ static struct cc_t {
 	{995, AnalogVideo_SECAM_D,_T("Georgia")},
 };
 
-
 // CPPageCapture dialog
 
 IMPLEMENT_DYNAMIC(CPPageCapture, CPPageBase)
@@ -304,6 +303,7 @@ CPPageCapture::~CPPageCapture()
 void CPPageCapture::DoDataExchange(CDataExchange* pDX)
 {
 	CPPageBase::DoDataExchange(pDX);
+
 	DDX_Control(pDX, IDC_COMBO1, m_cbAnalogVideo);
 	DDX_Control(pDX, IDC_COMBO2, m_cbAnalogAudio);
 	DDX_Control(pDX, IDC_COMBO9, m_cbAnalogCountry);
@@ -313,10 +313,8 @@ void CPPageCapture::DoDataExchange(CDataExchange* pDX)
 	DDX_Radio(pDX, IDC_RADIO1, m_iDefaultDevice);
 }
 
-
 BEGIN_MESSAGE_MAP(CPPageCapture, CPPageBase)
 END_MESSAGE_MAP()
-
 
 // CPPageCapture message handlers
 
@@ -353,11 +351,14 @@ void CPPageCapture::FindAnalogDevices()
 		int i = m_cbAnalogVideo.AddString(CString(var.bstrVal));
 
 		LPOLESTR strName = NULL;
+
 		if (SUCCEEDED(pMoniker->GetDisplayName(NULL, NULL, &strName))) {
 			m_vidnames.Add(CString(strName));
+
 			if (s.strAnalogVideo == CString(strName)) {
 				iSel = i;
 			}
+
 			CoTaskMemFree(strName);
 		}
 	}
@@ -366,6 +367,7 @@ void CPPageCapture::FindAnalogDevices()
 	{
 		int i = m_cbAnalogAudio.AddString(_T("<Video Capture Device>"));
 		m_audnames.Add(_T(""));
+
 		if (s.strAnalogAudio.IsEmpty()) {
 			iSel = i;
 		}
@@ -386,15 +388,19 @@ void CPPageCapture::FindAnalogDevices()
 		int i = m_cbAnalogAudio.AddString(CString(var.bstrVal));
 
 		LPOLESTR strName = NULL;
+
 		if (SUCCEEDED(pMoniker->GetDisplayName(NULL, NULL, &strName))) {
 			m_audnames.Add(CString(strName));
+
 			if (s.strAnalogAudio == CString(strName)) {
 				iSel = i;
 			}
+
 			CoTaskMemFree(strName);
 		}
 	}
 	EndEnumSysDev
+
 	if (m_cbAnalogAudio.GetCount()) {
 		m_cbAnalogAudio.SetCurSel(iSel);
 	}
@@ -471,6 +477,7 @@ void CPPageCapture::FindAnalogDevices()
 
 		int i = m_cbAnalogCountry.AddString(str);
 		m_cbAnalogCountry.SetItemDataPtr(i, &s_countrycodes[j]);
+
 		if (s.iAnalogCountry == s_countrycodes[j].code) {
 			iSel = i;
 		}
@@ -495,19 +502,22 @@ void CPPageCapture::FindDigitalDevices()
 		int i = m_cbDigitalNetworkProvider.AddString(CString(var.bstrVal));
 
 		LPOLESTR strName = NULL;
+
 		if (SUCCEEDED(pMoniker->GetDisplayName(NULL, NULL, &strName))) {
 			m_providernames.Add(CString(strName));
+
 			if (s.strBDANetworkProvider == CString(strName)) {
 				iSel = i;
 			}
+
 			CoTaskMemFree(strName);
 		}
 	}
 	EndEnumSysDev
+
 	if (m_cbDigitalNetworkProvider.GetCount()) {
 		m_cbDigitalNetworkProvider.SetCurSel(iSel);
 	}
-
 
 	iSel = 0;
 	BeginEnumSysDev(KSCATEGORY_BDA_NETWORK_TUNER, pMoniker) {
@@ -519,15 +529,19 @@ void CPPageCapture::FindDigitalDevices()
 		int i = m_cbDigitalTuner.AddString(CString(var.bstrVal));
 
 		LPOLESTR strName = NULL;
+
 		if (SUCCEEDED(pMoniker->GetDisplayName(NULL, NULL, &strName))) {
 			m_tunernames.Add(CString(strName));
+
 			if (s.strBDATuner == CString(strName)) {
 				iSel = i;
 			}
+
 			CoTaskMemFree(strName);
 		}
 	}
 	EndEnumSysDev
+
 	if (m_cbDigitalTuner.GetCount()) {
 		m_cbDigitalTuner.SetCurSel(iSel);
 	}
@@ -542,15 +556,19 @@ void CPPageCapture::FindDigitalDevices()
 		int i = m_cbDigitalReceiver.AddString(CString(var.bstrVal));
 
 		LPOLESTR strName = NULL;
+
 		if (SUCCEEDED(pMoniker->GetDisplayName(NULL, NULL, &strName))) {
 			m_receivernames.Add(CString(strName));
+
 			if (s.strBDAReceiver == CString(strName)) {
 				iSel = i;
 			}
+
 			CoTaskMemFree(strName);
 		}
 	}
 	EndEnumSysDev
+
 	if (m_cbDigitalReceiver.GetCount()) {
 		m_cbDigitalReceiver.SetCurSel(iSel);
 	}
@@ -567,9 +585,11 @@ BOOL CPPageCapture::OnApply()
 	if (m_cbAnalogVideo.GetCurSel()>=0) {
 		s.strAnalogVideo		= m_vidnames[m_cbAnalogVideo.GetCurSel()];
 	}
+
 	if (m_cbAnalogAudio.GetCurSel()>=0) {
 		s.strAnalogAudio		= m_audnames[m_cbAnalogAudio.GetCurSel()];
 	}
+
 	if (m_cbAnalogCountry.GetCurSel()>=0) {
 		s.iAnalogCountry		= ((cc_t*)m_cbAnalogCountry.GetItemDataPtr(m_cbAnalogCountry.GetCurSel()))->code;
 	}
@@ -577,9 +597,11 @@ BOOL CPPageCapture::OnApply()
 	if (m_cbDigitalNetworkProvider.GetCurSel()>=0) {
 		s.strBDANetworkProvider = m_providernames[m_cbDigitalNetworkProvider.GetCurSel()];
 	}
+
 	if (m_cbDigitalTuner.GetCurSel()>=0) {
 		s.strBDATuner = m_tunernames[m_cbDigitalTuner.GetCurSel()];
 	}
+
 	if (m_cbDigitalReceiver.GetCurSel()>=0) {
 		s.strBDAReceiver = m_receivernames[m_cbDigitalReceiver.GetCurSel()];
 	}

@@ -175,7 +175,6 @@ LCIDNameList[] = {
 	{0x042a, "Vietnamese"}
 };
 
-
 // CPPageDVD dialog
 
 IMPLEMENT_DYNAMIC(CPPageDVD, CPPageBase)
@@ -196,6 +195,7 @@ CPPageDVD::~CPPageDVD()
 void CPPageDVD::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Radio(pDX, IDC_RADIO1, m_iDVDLocation);
 	DDX_Radio(pDX, IDC_RADIO3, m_iDVDLangType);
 	DDX_Control(pDX, IDC_LIST1, m_lcids);
@@ -231,7 +231,6 @@ BEGIN_MESSAGE_MAP(CPPageDVD, CPPageBase)
 	ON_UPDATE_COMMAND_UI(IDC_BUTTON1, OnUpdateDVDPath)
 END_MESSAGE_MAP()
 
-
 // CPPageDVD message handlers
 
 BOOL CPPageDVD::OnInitDialog()
@@ -259,8 +258,7 @@ BOOL CPPageDVD::OnInitDialog()
 
 	UpdateLCIDList();
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 BOOL CPPageDVD::OnApply()
@@ -294,10 +292,12 @@ void CPPageDVD::OnBnClickedButton1()
 		if (openDlgPtr != NULL) {
 			openDlgPtr->SetTitle(strTitle);
 			openDlgPtr->SetOptions(FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST);
+
 			if (FAILED(openDlgPtr->Show(m_hWnd))) {
 				openDlgPtr->Release();
 				return;
 			}
+
 			openDlgPtr->Release();
 
 			path = dlg.GetFolderPath();
@@ -316,6 +316,7 @@ void CPPageDVD::OnBnClickedButton1()
 		bi.iImage = 0;
 
 		LPITEMIDLIST iil = SHBrowseForFolder(&bi);
+
 		if (iil) {
 			SHGetPathFromIDList(iil, _path);
 			path = _path;

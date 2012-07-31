@@ -54,6 +54,7 @@ CPPageAudioSwitcher::~CPPageAudioSwitcher()
 void CPPageAudioSwitcher::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Check(pDX, IDC_CHECK5, m_fAudioNormalize);
 	DDX_Check(pDX, IDC_CHECK6, m_fAudioNormalizeRecover);
 	DDX_Slider(pDX, IDC_SLIDER1, m_AudioBoostPos);
@@ -95,7 +96,6 @@ BEGIN_MESSAGE_MAP(CPPageAudioSwitcher, CPPageBase)
 	ON_WM_HSCROLL()
 	ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
 END_MESSAGE_MAP()
-
 
 // CPPageAudioSwitcher message handlers
 
@@ -164,8 +164,7 @@ BOOL CPPageAudioSwitcher::OnInitDialog()
 
 	UpdateData(FALSE);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 BOOL CPPageAudioSwitcher::OnApply()
@@ -313,21 +312,23 @@ void CPPageAudioSwitcher::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStru
 void CPPageAudioSwitcher::OnUpdateAudioSwitcher(CCmdUI* pCmdUI)
 {
 	//	UpdateData();
-	pCmdUI->Enable(IsDlgButtonChecked(IDC_CHECK2)/*m_fEnableAudioSwitcher*/);
+
+	pCmdUI->Enable(IsDlgButtonChecked(IDC_CHECK2));
 }
 
 void CPPageAudioSwitcher::OnUpdateChannelMapping(CCmdUI* pCmdUI)
 {
 	//	UpdateData();
-	pCmdUI->Enable(IsDlgButtonChecked(IDC_CHECK2)/*m_fEnableAudioSwitcher*/
-				   && IsDlgButtonChecked(IDC_CHECK1)/*m_fCustomChannelMapping*/);
+
+	pCmdUI->Enable(IsDlgButtonChecked(IDC_CHECK2)
+				   && IsDlgButtonChecked(IDC_CHECK1));
 }
 
 void CPPageAudioSwitcher::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	if (*pScrollBar == m_AudioBoostCtrl) {
 		UpdateData();
-		((CMainFrame*)GetParentFrame())->SetVolumeBoost((float)m_AudioBoostPos/10); // nice shortcut...
+		((CMainFrame*)GetParentFrame())->SetVolumeBoost((float)m_AudioBoostPos/10);
 	}
 
 	SetModified();
@@ -348,7 +349,7 @@ BOOL CPPageAudioSwitcher::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pRe
 		return FALSE;
 	}
 
-	static CString strTipText; // static string
+	static CString strTipText;
 
 	strTipText.Format(_T("+%.1f dB"), m_AudioBoostCtrl.GetPos()/10.0);
 
@@ -356,7 +357,7 @@ BOOL CPPageAudioSwitcher::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pRe
 
 	*pResult = 0;
 
-	return TRUE;    // message was handled
+	return TRUE;
 }
 
 void CPPageAudioSwitcher::OnCancel()

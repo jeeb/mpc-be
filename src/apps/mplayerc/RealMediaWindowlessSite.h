@@ -41,10 +41,8 @@
 #include <realmedia/rmavsurf.h>
 #include <realmedia/rmaevent.h>
 
-
 namespace DSObjects
 {
-
 	struct REGION {
 		REGION() : rects(0), pOSRegion(0) {}
 		long size;
@@ -215,5 +213,4 @@ namespace DSObjects
 		STDMETHODIMP GetOptimizedFormat(REF(RMA_COMPRESSION_TYPE) /*OUT*/ ulType);
 		STDMETHODIMP GetPreferredFormat(REF(RMA_COMPRESSION_TYPE) /*OUT*/ ulType);
 	};
-
 }

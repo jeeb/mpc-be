@@ -50,8 +50,10 @@ void CPPageBase::CreateToolTip()
 	m_wndToolTip.Activate(TRUE);
 	m_wndToolTip.SetMaxTipWidth(300);
 	m_wndToolTip.SetDelayTime(TTDT_AUTOPOP, 10000);
+
 	for (CWnd* pChild = GetWindow(GW_CHILD); pChild; pChild = pChild->GetWindow(GW_HWNDNEXT)) {
 		CString strToolTip;
+
 		if (strToolTip.LoadString(pChild->GetDlgCtrlID())) {
 			m_wndToolTip.AddTool(pChild, strToolTip);
 		}
@@ -64,6 +66,7 @@ BOOL CPPageBase::PreTranslateMessage(MSG* pMsg)
 		if (pMsg->message >= WM_MOUSEFIRST && pMsg->message <= WM_MOUSELAST) {
 			MSG msg;
 			memcpy(&msg, pMsg, sizeof(MSG));
+
 			for (HWND hWndParent = ::GetParent(msg.hwnd);
 					hWndParent && hWndParent != m_hWnd;
 					hWndParent = ::GetParent(hWndParent)) {
@@ -82,12 +85,12 @@ BEGIN_MESSAGE_MAP(CPPageBase, CCmdUIPropertyPage)
 	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
-
 // CPPageBase message handlers
 
 BOOL CPPageBase::OnSetActive()
 {
 	AfxGetAppSettings().nLastUsedPage = (UINT)m_pPSP->pszTemplate;
+
 	return __super::OnSetActive();
 }
 

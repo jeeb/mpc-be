@@ -44,6 +44,7 @@ CShaderCombineDlg::~CShaderCombineDlg()
 void CShaderCombineDlg::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Check(pDX, IDC_CHECK1, m_fcheck1);
 	DDX_Control(pDX, IDC_LIST1, m_list1);
 
@@ -86,19 +87,24 @@ BOOL CShaderCombineDlg::OnInitDialog()
 	POSITION pos;
 
 	pos = m_labels1.GetHeadPosition();
+
 	while (pos) {
 		m_list1.AddString(m_labels1.GetNext(pos));
 	}
+
 	m_list1.AddString(_T(""));
 
 	pos = m_labels2.GetHeadPosition();
+
 	while (pos) {
 		m_list2.AddString(m_labels2.GetNext(pos));
 	}
+
 	m_list2.AddString(_T(""));
 
 	pos = s.m_shaders.GetHeadPosition();
 	CString str;
+
 	while (pos) {
 		str = s.m_shaders.GetNext(pos).label;
 		m_combo.AddString(str);
@@ -111,8 +117,7 @@ BOOL CShaderCombineDlg::OnInitDialog()
 
 	UpdateData(FALSE);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 void CShaderCombineDlg::OnOK()
@@ -150,6 +155,7 @@ void CShaderCombineDlg::OnUpdateCheck2()
 void CShaderCombineDlg::OnSetFocusList1()
 {
 	m_list2.SetCurSel(-1);
+
 	if (m_list1.GetCurSel() < 0) {
 		m_list1.SetCurSel(m_list1.GetCount()-1);
 	}
@@ -158,6 +164,7 @@ void CShaderCombineDlg::OnSetFocusList1()
 void CShaderCombineDlg::OnSetFocusList2()
 {
 	m_list1.SetCurSel(-1);
+
 	if (m_list2.GetCurSel() < 0) {
 		m_list2.SetCurSel(m_list2.GetCount()-1);
 	}
@@ -166,13 +173,16 @@ void CShaderCombineDlg::OnSetFocusList2()
 void CShaderCombineDlg::OnBnClickedAdd()
 {
 	int i = m_combo.GetCurSel();
+
 	if (i < 0) {
 		return;
 	}
+
 	CString label;
 	m_combo.GetLBText(i, label);
 
 	i = m_list1.GetCurSel();
+
 	if (i >= 0) {
 		m_list1.InsertString(i, label);
 		UpdateShaders(SHADER1);
@@ -180,6 +190,7 @@ void CShaderCombineDlg::OnBnClickedAdd()
 	}
 
 	i = m_list2.GetCurSel();
+
 	if (i >= 0) {
 		m_list2.InsertString(i, label);
 		UpdateShaders(SHADER2);
@@ -190,11 +201,14 @@ void CShaderCombineDlg::OnBnClickedAdd()
 void CShaderCombineDlg::OnBnClickedDel()
 {
 	int i = m_list1.GetCurSel();
+
 	if (i >= 0 && i < m_list1.GetCount()-1) {
 		m_list1.DeleteString(i);
+
 		if (i == m_list1.GetCount()-1 && i > 0) {
 			i--;
 		}
+
 		m_list1.SetCurSel(i);
 
 		UpdateShaders(SHADER1);
@@ -202,11 +216,14 @@ void CShaderCombineDlg::OnBnClickedDel()
 	}
 
 	i = m_list2.GetCurSel();
+
 	if (i >= 0 && i < m_list2.GetCount()-1) {
 		m_list2.DeleteString(i);
+
 		if (i == m_list2.GetCount()-1 && i > 0) {
 			i--;
 		}
+
 		m_list2.SetCurSel(i);
 
 		UpdateShaders(SHADER2);
@@ -217,6 +234,7 @@ void CShaderCombineDlg::OnBnClickedDel()
 void CShaderCombineDlg::OnBnClickedUp()
 {
 	int i = m_list1.GetCurSel();
+
 	if (i >= 1 && i < m_list1.GetCount()-1) {
 		CString label;
 		m_list1.GetText(i, label);
@@ -230,6 +248,7 @@ void CShaderCombineDlg::OnBnClickedUp()
 	}
 
 	i = m_list2.GetCurSel();
+
 	if (i >= 1 && i < m_list2.GetCount()-1) {
 		CString label;
 		m_list2.GetText(i, label);
@@ -246,6 +265,7 @@ void CShaderCombineDlg::OnBnClickedUp()
 void CShaderCombineDlg::OnBnClickedDown()
 {
 	int i = m_list1.GetCurSel();
+
 	if (i >= 0 && i < m_list1.GetCount()-2) {
 		CString label;
 		m_list1.GetText(i, label);
@@ -259,6 +279,7 @@ void CShaderCombineDlg::OnBnClickedDown()
 	}
 
 	i = m_list2.GetCurSel();
+
 	if (i >= 0 && i < m_list2.GetCount()-2) {
 		CString label;
 		m_list2.GetText(i, label);
@@ -278,6 +299,7 @@ void CShaderCombineDlg::UpdateShaders(unsigned char type)
 {
 	if (type & SHADER1) {
 		m_labels1.RemoveAll();
+
 		for (int i = 0, j = m_list1.GetCount()-1; i < j; i++) {
 			CString label;
 			m_list1.GetText(i, label);
@@ -289,6 +311,7 @@ void CShaderCombineDlg::UpdateShaders(unsigned char type)
 
 	if (type & SHADER2) {
 		m_labels2.RemoveAll();
+
 		for (int m = 0, n = m_list2.GetCount()-1; m < n; m++) {
 			CString label;
 			m_list2.GetText(m, label);

@@ -140,6 +140,7 @@ INT_PTR CPPageInternalFiltersListBox::OnToolHitTest(CPoint point, TOOLINFO* pTI)
 {
 	BOOL b = FALSE;
 	int row = ItemFromPoint(point, b);
+
 	if (row < 0) {
 		return -1;
 	}
@@ -165,13 +166,14 @@ BOOL CPPageInternalFiltersListBox::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESU
 	TOOLTIPTEXT* pTTT = (TOOLTIPTEXT*)pNMHDR;
 
 	filter_t* f = (filter_t*)GetItemDataPtr(static_cast<int>(pNMHDR->idFrom));
+
 	if (f->nHintID == 0) {
 		return FALSE;
 	}
 
 	::SendMessage(pNMHDR->hwndFrom, TTM_SETMAXTIPWIDTH, 0, (LPARAM)(INT)1000);
 
-	static CString m_strTipText; // static string
+	static CString m_strTipText;
 
 	m_strTipText = ResStr(f->nHintID);
 
@@ -179,7 +181,7 @@ BOOL CPPageInternalFiltersListBox::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESU
 
 	*pResult = 0;
 
-	return TRUE;    // message was handled
+	return TRUE;
 }
 
 int CPPageInternalFiltersListBox::AddFilter(filter_t* filter, bool checked)
@@ -226,6 +228,7 @@ void CPPageInternalFiltersListBox::OnRButtonDown(UINT nFlags, CPoint point)
 	};
 
 	int totalFilters = 0, totalChecked = 0;
+
 	for (int i = 0; i < FILTER_TYPE_NB; i++) {
 		totalFilters += m_nbFiltersPerType[i];
 		totalChecked += m_nbChecked[i];
@@ -262,6 +265,7 @@ void CPPageInternalFiltersListBox::OnRButtonDown(UINT nFlags, CPoint point)
 	}
 
 	int index = 0;
+
 	for (int i = 0; i < _countof(s_filters); i++) {
 		switch (s_filters[i].type) {
 			case SOURCE_FILTER:
@@ -324,6 +328,7 @@ void CPPageInternalFiltersListBox::OnRButtonDown(UINT nFlags, CPoint point)
 				}
 				break;
 		}
+
 		index++;
 	}
 
@@ -348,6 +353,7 @@ CPPageInternalFilters::~CPPageInternalFilters()
 void CPPageInternalFilters::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Control(pDX, IDC_LIST1, m_listSrc);
 	DDX_Control(pDX, IDC_LIST2, m_listVideo);
 	DDX_Control(pDX, IDC_LIST3, m_listAudio);
@@ -447,8 +453,7 @@ BOOL CPPageInternalFilters::OnInitDialog()
 
 	UpdateData(FALSE);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 BOOL CPPageInternalFilters::OnApply()
@@ -477,6 +482,7 @@ BOOL CPPageInternalFilters::OnApply()
 					break;
 			}
 		}
+
 		list = (l == 1) ? &m_listVideo : &m_listAudio;
 	}
 
@@ -491,6 +497,7 @@ void CPPageInternalFilters::ShowPPage(CUnknown* (WINAPI * CreateInstance)(LPUNKN
 
 	HRESULT hr;
 	CUnknown* pObj = CreateInstance(NULL, &hr);
+
 	if (!pObj) {
 		return;
 	}
@@ -508,7 +515,6 @@ void CPPageInternalFilters::ShowPPage(CUnknown* (WINAPI * CreateInstance)(LPUNKN
 
 void CPPageInternalFilters::OnSelChange()
 {
-	// We only catch the message so that the page is not marked as modified.
 }
 
 void CPPageInternalFilters::OnCheckBoxChange()

@@ -39,6 +39,7 @@ CStatusLabel::CStatusLabel(bool fRightAlign, bool fAddEllipses)
 	::ReleaseDC(0, hdc);
 
 	m_font.m_hObject = NULL;
+
 	if (AfxGetAppSettings().fDisableXPToolbars) {
 		int size = IsWinVistaOrLater() ? 13 : 14;
 		CString face = IsWinVistaOrLater() ? _T("Tahoma") : _T("Microsoft Sans Serif");
@@ -52,7 +53,6 @@ CStatusLabel::CStatusLabel(bool fRightAlign, bool fAddEllipses)
  					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH|FF_DONTCARE,
  					  face);
 	}
-
 }
 
 CStatusLabel::~CStatusLabel()
@@ -75,6 +75,7 @@ void CStatusLabel::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	int R, G, B;
 	GetClientRect(&r);
 	CFont* old = dc.SelectObject(&m_font);
+
 	if (AfxGetAppSettings().fDisableXPToolbars) {
 		ThemeRGB(165, 170, 175, R, G, B);
 		dc.SetTextColor(RGB(R,G,B));
@@ -105,6 +106,7 @@ void CStatusLabel::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			dc.SelectObject(&old);
 			dc.FillSolidRect(&r, 0);
 		}
+
 	dc.Detach();
 }
 
@@ -113,6 +115,7 @@ BOOL CStatusLabel::OnEraseBkgnd(CDC* pDC)
 	CRect r;
 	GetClientRect(&r);
 	int R, G, B;
+
 	if (AfxGetAppSettings().fDisableXPToolbars) {
 		ThemeRGB(5, 10, 15, R, G, B);
 		pDC->FillSolidRect(&r, RGB(R,G,B));
@@ -120,5 +123,6 @@ BOOL CStatusLabel::OnEraseBkgnd(CDC* pDC)
 	} else {
 		pDC->FillSolidRect(&r, 0);
 	}
+
 	return TRUE;
 }

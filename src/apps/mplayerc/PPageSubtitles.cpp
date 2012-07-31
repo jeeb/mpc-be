@@ -49,6 +49,7 @@ CPPageSubtitles::~CPPageSubtitles()
 void CPPageSubtitles::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Check(pDX, IDC_CHECK3, m_fOverridePlacement);
 	DDX_Text(pDX, IDC_EDIT2, m_nHorPos);
 	DDX_Control(pDX, IDC_SPIN2, m_nHorPosCtrl);
@@ -64,7 +65,6 @@ void CPPageSubtitles::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT4, m_nSubDelayInterval);
 }
 
-
 BEGIN_MESSAGE_MAP(CPPageSubtitles, CPPageBase)
 	ON_UPDATE_COMMAND_UI(IDC_EDIT2, OnUpdatePosOverride)
 	ON_UPDATE_COMMAND_UI(IDC_SPIN2, OnUpdatePosOverride)
@@ -76,7 +76,6 @@ BEGIN_MESSAGE_MAP(CPPageSubtitles, CPPageBase)
 	ON_UPDATE_COMMAND_UI(IDC_STATIC4, OnUpdatePosOverride)
 	ON_EN_CHANGE(IDC_EDIT4, OnSubDelayInterval)
 END_MESSAGE_MAP()
-
 
 // CPPageSubtitles message handlers
 
@@ -97,6 +96,7 @@ int TranslateResIn(int _In)
 		case 9:
 			return _In - 5;
 	}
+
 	return _In;
 }
 
@@ -117,6 +117,7 @@ int TranslateResOut(int _In)
 		case 9:
 			return _In - 4;
 	}
+
 	return _In;
 }
 
@@ -154,8 +155,7 @@ BOOL CPPageSubtitles::OnInitDialog()
 
 	CreateToolTip();
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 BOOL CPPageSubtitles::OnApply()
@@ -192,12 +192,14 @@ BOOL CPPageSubtitles::OnApply()
 void CPPageSubtitles::OnUpdatePosOverride(CCmdUI* pCmdUI)
 {
 	UpdateData();
+
 	pCmdUI->Enable(m_fOverridePlacement);
 }
 
 void CPPageSubtitles::OnSubDelayInterval()
 {
 	// If incorrect number, revert modifications
+
 	if (!UpdateData()) {
 		UpdateData(FALSE);
 	}

@@ -40,7 +40,6 @@ public:
 	CPPageFileInfoClip(CString fn, IFilterGraph* pFG);
 	virtual ~CPPageFileInfoClip();
 
-	// Dialog Data
 	enum { IDD = IDD_FILEPROPCLIP };
 
 	CStatic m_icon;
@@ -54,7 +53,7 @@ public:
 	CEdit   m_desc;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual BOOL OnSetActive();

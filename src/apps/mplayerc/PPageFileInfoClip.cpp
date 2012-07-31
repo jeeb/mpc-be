@@ -57,9 +57,11 @@ BOOL CPPageFileInfoClip::PreTranslateMessage(MSG* pMsg)
 {
 	if (pMsg->message == WM_LBUTTONDBLCLK && pMsg->hwnd == m_location.m_hWnd && !m_location_str.IsEmpty()) {
 		CString path = m_location_str;
+
 		if (path[path.GetLength() - 1] != '\\') {
 			path += _T("\\");
 		}
+
 		path += m_fn;
 
 		if (ExploreToFile(path)) {
@@ -70,10 +72,10 @@ BOOL CPPageFileInfoClip::PreTranslateMessage(MSG* pMsg)
 	return __super::PreTranslateMessage(pMsg);
 }
 
-
 void CPPageFileInfoClip::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Control(pDX, IDC_DEFAULTICON, m_icon);
 	DDX_Text(pDX, IDC_EDIT1, m_fn);
 	DDX_Text(pDX, IDC_EDIT4, m_clip);
@@ -89,7 +91,6 @@ BEGIN_MESSAGE_MAP(CPPageFileInfoClip, CPropertyPage)
 	ON_MESSAGE(SETPAGEFOCUS, OnSetPageFocus)
 END_MESSAGE_MAP()
 
-
 // CPPageFileInfoClip message handlers
 
 BOOL CPPageFileInfoClip::OnInitDialog()
@@ -102,10 +103,12 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 			if (pFSF) {
 				LPOLESTR pFN = NULL;
 				AM_MEDIA_TYPE mt;
+
 				if (SUCCEEDED(pFSF->GetCurFile(&pFN, &mt)) && pFN && *pFN) {
 					m_fn = CStringW(pFN);
 					CoTaskMemFree(pFN);
 				}
+
 				break;
 			}
 		}
@@ -119,6 +122,7 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 
 	m_fn.TrimRight('/');
 	int i = max(m_fn.ReverseFind('\\'), m_fn.ReverseFind('/'));
+
 	if (i >= 0 && i < m_fn.GetLength()-1) {
 		m_location_str = m_fn.Left(i);
 		m_fn = m_fn.Mid(i+1);
@@ -127,6 +131,7 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 			m_location_str += '\\';
 		}
 	}
+
 	m_location.SetWindowText(m_location_str);
 
 	bool fEmpty = true;
@@ -162,8 +167,7 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 
 	UpdateData(FALSE);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 BOOL CPPageFileInfoClip::OnSetActive()

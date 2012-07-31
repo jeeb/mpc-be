@@ -49,7 +49,6 @@ public:
 	CPPageExternalFilters();
 	virtual ~CPPageExternalFilters();
 
-	// Dialog Data
 	enum { IDD = IDD_PPAGEEXTERNALFILTERS };
 
 	CCheckListBox m_filters;
@@ -58,7 +57,7 @@ public:
 	CTreeCtrl m_tree;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
 

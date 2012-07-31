@@ -45,7 +45,6 @@ public:
 	CPPageFileInfoDetails(CString fn, IFilterGraph* pFG, ISubPicAllocatorPresenter* pCAP);
 	virtual ~CPPageFileInfoDetails();
 
-	// Dialog Data
 	enum { IDD = IDD_FILEPROPDETAILS };
 
 	CStatic m_icon;
@@ -58,7 +57,7 @@ public:
 	CEdit   m_encoding;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnSetActive();
 	virtual LRESULT OnSetPageFocus(WPARAM wParam, LPARAM lParam);

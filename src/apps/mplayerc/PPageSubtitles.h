@@ -50,11 +50,10 @@ public:
 	BOOL m_fSPCAllowAnimationWhenBuffering;
 	int m_nSubDelayInterval;
 
-	// Dialog Data
 	enum { IDD = IDD_PPAGESUBTITLES };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
 	void	OnSubDelayInterval();

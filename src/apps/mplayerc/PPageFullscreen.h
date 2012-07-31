@@ -66,11 +66,10 @@ public:
 	int m_iSel;
 	int m_iSeldm[MaxFpsCount];
 
-	// Dialog Data
 	enum { IDD = IDD_PPAGEFULLSCREEN };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
 

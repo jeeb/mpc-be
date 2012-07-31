@@ -44,12 +44,14 @@ CSubtitleDlDlg::~CSubtitleDlDlg()
 void CSubtitleDlDlg::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Control(pDX, IDC_LIST1, m_list);
 }
 
 void CSubtitleDlDlg::LoadList()
 {
 	m_list.SetRedraw(FALSE);
+
 	for (int i = 0; i < m_parsed_movies.GetCount(); ++i) {
 		isdb_movie_parsed& m = m_parsed_movies[i];
 
@@ -79,6 +81,7 @@ bool CSubtitleDlDlg::Parse()
 	CString str;
 
 	POSITION pos = sl.GetHeadPosition();
+
 	while (pos) {
 		str = sl.GetNext(pos);
 
@@ -120,6 +123,7 @@ bool CSubtitleDlDlg::Parse()
 
 	// Parse movies
 	pos = m_pTA->raw_movies.GetHeadPosition();
+
 	while (pos) {
 		isdb_movie& m = m_pTA->raw_movies.GetNext(pos);
 		isdb_movie_parsed p;
@@ -194,6 +198,7 @@ BOOL CSubtitleDlDlg::OnInitDialog()
 
 	CString strColumnWidth = AfxGetApp()->GetProfileString(IDS_R_DLG_SUBTITLEDL, IDS_RS_DLG_SUBTITLEDL_COLWIDTH, _T(""));
 	CString token = strColumnWidth.Tokenize(_T(","), curPos);
+
 	while (!token.IsEmpty()) {
 		if (_stscanf_s(token, L"%i", &n) == 1) {
 			columnWidth.Add(n);
@@ -264,6 +269,7 @@ void CSubtitleDlDlg::OnOK()
 	CComPtr<ISubStream> pSubStreamToSet;
 
 	POSITION pos = m_selsubs.GetHeadPosition();
+
 	while (pos) {
 		const isdb_subtitle& sub = m_selsubs.GetNext(pos);
 		AppSettings& s = AfxGetAppSettings();
@@ -278,6 +284,7 @@ void CSubtitleDlDlg::OnOK()
 			if (pRTS && pRTS->Open((BYTE*)(LPCSTR)str, str.GetLength(), DEFAULT_CHARSET, CString(sub.name)) && pRTS->GetStreamCount() > 0) {
 				CComPtr<ISubStream> pSubStream = pRTS.Detach();
 				pMF->m_pSubStreams.AddTail(pSubStream);
+
 				if (!pSubStreamToSet) {
 					pSubStreamToSet = pSubStream;
 				}
@@ -295,6 +302,7 @@ void CSubtitleDlDlg::OnOK()
 void CSubtitleDlDlg::OnUpdateOk(CCmdUI* pCmdUI)
 {
 	bool fEnable = false;
+
 	for (int i = 0; !fEnable && i < m_list.GetItemCount(); ++i) {
 		fEnable = !!m_list.GetCheck(i);
 	}
@@ -310,6 +318,7 @@ void CSubtitleDlDlg::OnFailedConnection()
 void CSubtitleDlDlg::OnParse()
 {
 	SetStatus(ResStr(IDS_SUBDL_DLG_PARSING));
+
 	if (Parse()) {
 		LoadList();
 		CString msg;
@@ -331,6 +340,7 @@ void CSubtitleDlDlg::OnColumnClick(NMHDR *pNMHDR, LRESULT *pResult)
 	} else {
 		ps.m_ascending = TRUE;
 	}
+
 	ps.m_colIndex = phdr->iItem;
 	ps.m_hWnd = m_list.GetSafeHwnd();
 
@@ -360,6 +370,7 @@ void CSubtitleDlDlg::OnDestroy()
 		w = m_list.GetColumnWidth(i);
 		strColumnWidth.AppendFormat(L"%d,", w);
 	}
+
 	AfxGetApp()->WriteProfileString(IDS_R_DLG_SUBTITLEDL, IDS_RS_DLG_SUBTITLEDL_COLWIDTH, strColumnWidth);
 
 	__super::OnDestroy();

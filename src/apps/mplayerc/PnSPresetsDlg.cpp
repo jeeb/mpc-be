@@ -42,6 +42,7 @@ CPnSPresetsDlg::~CPnSPresetsDlg()
 void CPnSPresetsDlg::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Control(pDX, IDC_EDIT2, m_PosX);
 	DDX_Control(pDX, IDC_EDIT3, m_PosY);
 	DDX_Control(pDX, IDC_EDIT4, m_ZoomX);
@@ -67,8 +68,7 @@ BOOL CPnSPresetsDlg::OnInitDialog()
 		}
 	}
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 void CPnSPresetsDlg::StringToParams(CString str, CString& label, double& PosX, double& PosY, double& ZoomX, double& ZoomY)
@@ -80,6 +80,7 @@ void CPnSPresetsDlg::StringToParams(CString str, CString& label, double& PosX, d
 			label = token;
 		} else {
 			float f = 0;
+
 			if (_stscanf_s(token, _T("%f"), &f) != 1) {
 				continue;
 			}
@@ -108,6 +109,7 @@ CString CPnSPresetsDlg::ParamsToString(CString label, double PosX, double PosY, 
 {
 	CString str;
 	str.Format(_T("%s,%.3f,%.3f,%.3f,%.3f"), label, PosX, PosY, ZoomX, ZoomY);
+
 	return(str);
 }
 
@@ -125,11 +127,12 @@ BEGIN_MESSAGE_MAP(CPnSPresetsDlg, CCmdUIDialog)
 	ON_UPDATE_COMMAND_UI(IDC_BUTTON1, OnUpdateButton1)
 END_MESSAGE_MAP()
 
-
 // CPnSPresetsDlg message handlers
+
 void CPnSPresetsDlg::OnLbnSelchangeList1()
 {
 	int i = m_list.GetCurSel();
+
 	if (i >= 0 && i < m_pnspresets.GetCount()) {
 		double PosX, PosY, ZoomX, ZoomY;
 		StringToParams(m_pnspresets[i], m_label, PosX, PosY, ZoomX, ZoomY);
@@ -152,6 +155,7 @@ void CPnSPresetsDlg::OnBnClickedButton2() // new
 {
 	m_pnspresets.Add(_T("New,0.5,0.5,1.0,1.0"));
 	m_list.SetCurSel(m_list.AddString(_T("New")));
+
 	OnLbnSelchangeList1();
 }
 
@@ -159,9 +163,11 @@ void CPnSPresetsDlg::OnUpdateButton2(CCmdUI* pCmdUI)
 {
 	CString str;
 	int len = m_list.GetCount();
+
 	if (len > 0) {
 		m_list.GetText(len-1, str);
 	}
+
 	pCmdUI->Enable(str != _T("New"));
 }
 
@@ -170,10 +176,13 @@ void CPnSPresetsDlg::OnBnClickedButton6() // del
 	int i = m_list.GetCurSel();
 	m_list.DeleteString(i);
 	m_pnspresets.RemoveAt(i);
+
 	if (i ==  m_list.GetCount()) {
 		i--;
 	}
+
 	m_list.SetCurSel(i);
+
 	OnLbnSelchangeList1();
 }
 
@@ -188,9 +197,11 @@ void CPnSPresetsDlg::OnBnClickedButton9() // up
 	CString str, str2;
 	m_list.GetText(i, str);
 	str2 = m_pnspresets.GetAt(i);
+
 	m_list.DeleteString(i);
 	m_pnspresets.RemoveAt(i);
 	i--;
+
 	m_list.InsertString(i, str);
 	m_pnspresets.InsertAt(i, str2);
 	m_list.SetCurSel(i);
@@ -207,9 +218,11 @@ void CPnSPresetsDlg::OnBnClickedButton10() // down
 	CString str, str2;
 	m_list.GetText(i, str);
 	str2 = m_pnspresets.GetAt(i);
+
 	m_list.DeleteString(i);
 	m_pnspresets.RemoveAt(i);
 	i++;
+
 	m_list.InsertString(i, str);
 	m_pnspresets.InsertAt(i, str2);
 	m_list.SetCurSel(i);
@@ -224,8 +237,10 @@ void CPnSPresetsDlg::OnBnClickedButton1() // set
 {
 	int i = m_list.GetCurSel();
 	UpdateData();
+
 	/*if (m_label.Remove(',') > 0)
 		UpdateData(FALSE);*/
+
 	m_label.Replace(',', '.');	// Replace any ',' with '.' as ',' is used as tokeniser
 	m_pnspresets[i] = ParamsToString(m_label, m_PosX, m_PosY, m_ZoomX, m_ZoomY);
 	m_list.DeleteString(i);
@@ -236,6 +251,7 @@ void CPnSPresetsDlg::OnBnClickedButton1() // set
 void CPnSPresetsDlg::OnUpdateButton1(CCmdUI* pCmdUI)
 {
 	UpdateData();
+
 	pCmdUI->Enable(m_list.GetCurSel() >= 0
 				   && !m_label.IsEmpty() // && m_label.Find(',') < 0
 				   && m_PosX >= 0 && m_PosX <= 1

@@ -75,12 +75,11 @@ private:
 	AppSettings::Shader* m_pShader;
 
 public:
-	CShaderEditorDlg();   // standard constructor
+	CShaderEditorDlg();
 	virtual ~CShaderEditorDlg();
 
 	BOOL Create(CWnd* pParent = NULL);
 
-	// Dialog Data
 	enum { IDD = IDD_SHADEREDITOR_DLG };
 	CShaderLabelComboBox m_labels;
 	CComboBox m_targets;
@@ -88,7 +87,7 @@ public:
 	CEdit m_output;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual void OnOK() {}
 	virtual void OnCancel() {}

@@ -57,7 +57,6 @@ public:
 
 	enum {APPCOMMAND_LAST=APPCOMMAND_DWM_FLIP3D};
 
-	// Dialog Data
 	enum { IDD = IDD_PPAGEACCELTBL };
 	CPlayerListCtrl m_list;
 	BOOL m_fWinLirc;
@@ -71,7 +70,7 @@ public:
 	BOOL m_fGlobalMedia;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);

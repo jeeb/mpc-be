@@ -71,11 +71,10 @@ public:
 	int m_iRtspHandler;
 	BOOL m_fRtspFileExtFirst;
 
-	// Dialog Data
 	enum { IDD = IDD_PPAGEFORMATS };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
 

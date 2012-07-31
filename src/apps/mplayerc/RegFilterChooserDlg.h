@@ -37,17 +37,16 @@ class CRegFilterChooserDlg : public CResizableDialog
 	void AddToList(IMoniker* pMoniker);
 
 public:
-	CRegFilterChooserDlg(CWnd* pParent = NULL);   // standard constructor
+	CRegFilterChooserDlg(CWnd* pParent = NULL);
 	virtual ~CRegFilterChooserDlg();
 
 	CList<FilterOverride*> m_filters;
 
-	// Dialog Data
 	enum { IDD = IDD_ADDREGFILTER };
 	CListCtrl m_list;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 
 	DECLARE_MESSAGE_MAP()

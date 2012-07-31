@@ -76,7 +76,6 @@ public:
 	CPPageInternalFilters();
 	virtual ~CPPageInternalFilters();
 
-	// Dialog Data
 	enum { IDD = IDD_PPAGEINTERNALFILTERS };
 	CPPageInternalFiltersListBox m_listSrc;
 	CPPageInternalFiltersListBox m_listVideo;
@@ -92,7 +91,7 @@ public:
 	void ShowPPage(CUnknown* (WINAPI * CreateInstance)(LPUNKNOWN lpunk, HRESULT* phr));
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
 

@@ -36,14 +36,13 @@ class CPPageCapture : public CPPageBase
 	CAtlArray<CString> m_vidnames, m_audnames, m_providernames, m_tunernames, m_receivernames;
 
 public:
-	CPPageCapture();   // standard constructor
+	CPPageCapture();
 	virtual ~CPPageCapture();
 
-	// Dialog Data
 	enum { IDD = IDD_PPAGECAPTURE };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
 

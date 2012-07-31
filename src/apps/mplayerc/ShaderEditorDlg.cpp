@@ -145,6 +145,7 @@ void CShaderEdit::OnUpdate()
 
 		CString key, value;
 		POSITION pos = m_acdlg.m_inst.GetStartPosition();
+
 		while (pos) {
 			POSITION cur = pos;
 			m_acdlg.m_inst.GetNextAssoc(pos, key, value);
@@ -198,6 +199,7 @@ void CShaderEdit::OnTimer(UINT_PTR nIDEvent)
 	if (m_nIDEvent == nIDEvent) {
 		int nStartChar = 0, nEndChar = -1;
 		GetSel(nStartChar, nEndChar);
+
 		if (nStartChar != nEndChar || m_nEndChar != nEndChar) {
 			m_acdlg.ShowWindow(SW_HIDE);
 		}
@@ -244,10 +246,12 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 	m_targets.AddString(_T("ps_3_sw"));
 
 	POSITION pos = AfxGetAppSettings().m_shaders.GetHeadPosition();
+
 	while (pos) {
 		const AppSettings::Shader& s = AfxGetAppSettings().m_shaders.GetNext(pos);
 		m_labels.SetItemDataPtr(m_labels.AddString(s.label), (void*)&s);
 	}
+
 	CorrectComboListWidth(m_labels);
 
 	m_nIDEventShader = SetTimer(1, 1000, NULL);
@@ -258,6 +262,7 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 void CShaderEditorDlg::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Control(pDX, IDC_COMBO1, m_labels);
 	DDX_Control(pDX, IDC_COMBO2, m_targets);
 	DDX_Control(pDX, IDC_EDIT1, m_srcdata);
@@ -369,9 +374,11 @@ void CShaderEditorDlg::OnBnClickedButton2()
 			m_pShader = NULL;
 			s.m_shaders.RemoveAt(pos);
 			int i = m_labels.GetCurSel();
+
 			if (i >= 0) {
 				m_labels.DeleteString(i);
 			}
+
 			m_labels.SetWindowText(_T(""));
 			m_targets.SetWindowText(_T(""));
 			m_srcdata.SetWindowText(_T(""));
@@ -482,6 +489,7 @@ BOOL CShaderEditorDlg::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	CPoint p;
 	GetCursorPos(&p);
 	ScreenToClient(&p);
+
 	if (HitTestSplitter(p)) {
 		::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_SIZENS));
 		return TRUE;

@@ -49,14 +49,13 @@ class CShaderCombineDlg : public CCmdUIDialog
 	void UpdateShaders(unsigned char type = SHADERS);
 
 public:
-	CShaderCombineDlg(CAtlList<CString>& labels1, CAtlList<CString>& labels2, CWnd* pParent);   // standard constructor
+	CShaderCombineDlg(CAtlList<CString>& labels1, CAtlList<CString>& labels2, CWnd* pParent);
 	virtual ~CShaderCombineDlg();
 
-	// Dialog Data
 	enum { IDD = IDD_SHADERCOMBINE_DLG };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 
 	DECLARE_MESSAGE_MAP()

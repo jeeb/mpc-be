@@ -26,10 +26,8 @@
 #include "BaseGraph.h"
 #include "ShockwaveFlash.h"
 
-
 namespace DSObjects
 {
-
 	class CShockwaveGraph : public CBaseGraph
 	{
 		CPlayerWindow m_wndWindowFrame;

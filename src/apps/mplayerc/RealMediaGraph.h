@@ -44,10 +44,8 @@
 #include <realmedia/rmaausvc.h>
 #include <realmedia/rmavsurf.h>
 
-
 namespace DSObjects
 {
-
 	class CRealMediaGraph;
 
 	class CRealMediaPlayer
@@ -228,5 +226,4 @@ namespace DSObjects
 		// IGraphEngine
 		STDMETHODIMP_(engine_t) GetEngine();
 	};
-
 }

@@ -36,16 +36,15 @@ class CShaderAutoCompleteDlg : public CResizableDialog
 	TCHAR m_text[1024];
 
 public:
-	CShaderAutoCompleteDlg(CWnd* pParent = NULL);   // standard constructor
+	CShaderAutoCompleteDlg(CWnd* pParent = NULL);
 	virtual ~CShaderAutoCompleteDlg();
 
 	CMap<CString, LPCTSTR, CString, CString> m_inst;
 
-	// Dialog Data
 	enum { IDD = IDD_SHADERAUTOCOMPLETE_DLG };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 
 	DECLARE_MESSAGE_MAP()
 

@@ -38,12 +38,11 @@ private:
 	CString ParamsToString(CString label, double PosX, double PosY, double ZoomX, double ZoomY);
 
 public:
-	CPnSPresetsDlg(CWnd* pParent = NULL);   // standard constructor
+	CPnSPresetsDlg(CWnd* pParent = NULL);
 	virtual ~CPnSPresetsDlg();
 
 	CStringArray m_pnspresets;
 
-	// Dialog Data
 	enum { IDD = IDD_PNSPRESET_DLG };
 	CFloatEdit m_PosX;
 	CFloatEdit m_PosY;
@@ -53,7 +52,7 @@ public:
 	CListBox m_list;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
 
