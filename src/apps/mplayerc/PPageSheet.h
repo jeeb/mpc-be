@@ -40,6 +40,7 @@
 #include "PPageSubStyle.h"
 #include "PPageSubMisc.h"
 #include "PPageTweaks.h"
+#include "PPageInterface.h"
 #include "PPageMisc.h"
 #include "PPageCapture.h"
 #include <TreePropSheet/TreePropSheet.h>
@@ -87,6 +88,7 @@ private:
 	CPPageSubStyle m_substyle;
 	CPPageSubMisc m_subMisc;
 	CPPageTweaks m_tweaks;
+	CPPageInterface m_interface;
 	CPPageMisc m_misc;
 
 	CTreeCtrl* CreatePageTreeObject();

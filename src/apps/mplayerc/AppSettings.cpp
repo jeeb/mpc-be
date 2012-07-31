@@ -588,6 +588,7 @@ void CAppSettings::UpdateData(bool fSave)
 
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_LCD_SUPPORT, (int)fLCDSupport);
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_SMARTSEEK, (int)fSmartSeek);
+		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_CHAPTER_MARKER, (int)fChapterMarker);
 
 		// Save analog capture settings
 		pApp->WriteProfileInt   (IDS_R_SETTINGS, IDS_RS_DEFAULT_CAPTURE, iDefaultCaptureDevice);
@@ -1335,8 +1336,9 @@ void CAppSettings::UpdateData(bool fSave)
 		fEnableEDLEditor= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEEDLEDITOR, FALSE);
 		fFastSeek = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_FASTSEEK_KEYFRAME, TRUE);
 
-		fLCDSupport = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_LCD_SUPPORT, FALSE);
-		fSmartSeek	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_SMARTSEEK, FALSE);
+		fLCDSupport		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_LCD_SUPPORT, FALSE);
+		fSmartSeek		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_CHAPTER_MARKER, FALSE);
+		fChapterMarker	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_SMARTSEEK, FALSE);
 
 		// Save analog capture settings
 		iDefaultCaptureDevice = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DEFAULT_CAPTURE, 0);

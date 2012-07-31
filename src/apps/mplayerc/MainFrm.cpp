@@ -17434,7 +17434,6 @@ bool CMainFrame::CanPreviewUse()
 void CMainFrame::CreateChapterTimeArray()
 {
 	chaptersarray.RemoveAll();
-	/*
 	if (GetPlaybackMode() == PM_FILE) {
 		__int64 rtDur = 0;
 		if (pMS) {
@@ -17461,5 +17460,4 @@ void CMainFrame::CreateChapterTimeArray()
 	} else if (GetPlaybackMode() == PM_DVD) {
 		// TODO - support for DVD mode ...
 	}
-	*/
 }

@@ -408,28 +408,31 @@ void CPlayerSeekBar::OnPaint()
 			memdc.LineTo(nposx, rc.top);
 
 			// рисуем маркеры глав
-			CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
-			if (pFrame->chaptersarray.GetCount() > 1) {
-				CRect rc2 = rc;
-				for (size_t idx = 0; idx < pFrame->chaptersarray.GetCount(); idx++) {
-					CRect r = GetChannelRect();
 
-					int x = r.left + (int)((m_start < m_stop) ? (__int64)r.Width() * (pFrame->chaptersarray[idx]/*.rtChapter*/ - m_start) / (m_stop - m_start) : 0);
+			if (s.fChapterMarker) {
+				CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
+				if (pFrame->chaptersarray.GetCount() > 1) {
+					CRect rc2 = rc;
+					for (size_t idx = 0; idx < pFrame->chaptersarray.GetCount(); idx++) {
+						CRect r = GetChannelRect();
+
+						int x = r.left + (int)((m_start < m_stop) ? (__int64)r.Width() * (pFrame->chaptersarray[idx]/*.rtChapter*/ - m_start) / (m_stop - m_start) : 0);
 			
-					//	можно вместо рисования руками иконку как маркер подтянуть
-					//	HICON appIcon = (HICON)::LoadImage(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MARKERS), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
-					//	::DrawIconEx(memdc, x, rc2.top + 10, appIcon, 0,0, 0, NULL, DI_NORMAL);
-					//	::DestroyIcon(appIcon);
+						//	можно вместо рисования руками иконку как маркер подтянуть
+						//	HICON appIcon = (HICON)::LoadImage(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MARKERS), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
+						//	::DrawIconEx(memdc, x, rc2.top + 10, appIcon, 0,0, 0, NULL, DI_NORMAL);
+						//	::DestroyIcon(appIcon);
 
-					ThemeRGB(255, 255, 255, R, G, B);
-					CPen penPlayed2(PS_SOLID, 0, RGB(R,G,B));
-					memdc.SelectObject(&penPlayed2);
+						ThemeRGB(255, 255, 255, R, G, B);
+						CPen penPlayed2(PS_SOLID, 0, RGB(R,G,B));
+						memdc.SelectObject(&penPlayed2);
 
-					memdc.MoveTo(x, rc2.top + 14);
-					memdc.LineTo(x, rc2.bottom - 2);
-					memdc.MoveTo(x - 1, rc2.bottom - 2);
-					memdc.LineTo(x + 2, rc2.bottom - 2);	
- 				}
+						memdc.MoveTo(x, rc2.top + 14);
+						memdc.LineTo(x, rc2.bottom - 2);
+						memdc.MoveTo(x - 1, rc2.bottom - 2);
+						memdc.LineTo(x + 2, rc2.bottom - 2);	
+ 					}
+				}
 			}
 		}
 

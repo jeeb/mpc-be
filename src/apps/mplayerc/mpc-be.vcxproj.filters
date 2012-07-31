@@ -360,6 +360,9 @@
     <ClCompile Include="AboutDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PPageInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSettings.h">
@@ -717,6 +720,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ExtLib\mfc\afxmaskededit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PPageInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

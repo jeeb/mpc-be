@@ -53,6 +53,7 @@ CPPageSheet::CPPageSheet(LPCTSTR pszCaption, IFilterGraph* pFG, CWnd* pParentWnd
 	AddPage(&m_subtitles);
 	AddPage(&m_substyle);
 	AddPage(&m_subMisc);
+	AddPage(&m_interface);
 	AddPage(&m_tweaks);
 	AddPage(&m_misc);
 
@@ -128,7 +129,7 @@ END_MESSAGE_MAP()
 BOOL CTreePropSheetTreeCtrl::PreCreateWindow(CREATESTRUCT& cs)
 {
 	cs.dwExStyle |= WS_EX_CLIENTEDGE;
-	//	cs.style &= ~TVS_LINESATROOT;
+	//cs.style &= ~TVS_LINESATROOT;
 
 	return __super::PreCreateWindow(cs);
 }

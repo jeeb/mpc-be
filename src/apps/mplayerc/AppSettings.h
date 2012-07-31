@@ -527,6 +527,7 @@ public:
 
 	bool			fLCDSupport;
 	bool			fSmartSeek;
+	bool			fChapterMarker;
 
 	// BDA configuration
 	int				iDefaultCaptureDevice;		// Default capture device (analog=0, 1=digital)
