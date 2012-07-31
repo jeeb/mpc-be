@@ -37,43 +37,43 @@ public:
 	CPPageTweaks();
 	virtual ~CPPageTweaks();
 
-	BOOL m_fDisableXPToolbars;
-	CButton m_fDisableXPToolbarsCtrl;
+//	BOOL m_fDisableXPToolbars;
+//	CButton m_fDisableXPToolbarsCtrl;
 
 	enum { IDD = IDD_PPAGETWEAKS };
-	int m_nThemeBrightness;
-	int m_nThemeBrightness_Old;
-	int m_nThemeRed;
-	int m_nThemeGreen;
-	int m_nThemeBlue;
-	int m_nThemeRed_Old;
-	int m_nThemeGreen_Old;
-	int m_nThemeBlue_Old;
-	BOOL m_fFileNameOnSeekBar;
-	CSliderCtrl m_ThemeBrightnessCtrl;
-	CSliderCtrl m_ThemeRedCtrl;
-	CSliderCtrl m_ThemeGreenCtrl;
-	CSliderCtrl m_ThemeBlueCtrl;
-	int m_clrFaceABGR;
-	int m_clrOutlineABGR;
+//	int m_nThemeBrightness;
+//	int m_nThemeBrightness_Old;
+//	int m_nThemeRed;
+//	int m_nThemeGreen;
+//	int m_nThemeBlue;
+//	int m_nThemeRed_Old;
+//	int m_nThemeGreen_Old;
+//	int m_nThemeBlue_Old;
+//	BOOL m_fFileNameOnSeekBar;
+//	CSliderCtrl m_ThemeBrightnessCtrl;
+//	CSliderCtrl m_ThemeRedCtrl;
+//	CSliderCtrl m_ThemeGreenCtrl;
+//	CSliderCtrl m_ThemeBlueCtrl;
+//	int m_clrFaceABGR;
+//	int m_clrOutlineABGR;
 	int m_nJumpDistS;
 	int m_nJumpDistM;
 	int m_nJumpDistL;
 	BOOL m_fNotifyMSN;
 
 	BOOL m_fPreventMinimize;
-	BOOL m_fUseWin7TaskBar;
+//	BOOL m_fUseWin7TaskBar;
 	BOOL m_fDontUseSearchInFolder;
-	BOOL m_fUseTimeTooltip;
-	CComboBox m_TimeTooltipPosition;
+//	BOOL m_fUseTimeTooltip;
+//	CComboBox m_TimeTooltipPosition;
 	CComboBox m_FontSize;
 	CComboBox m_FontType;
-	int m_OSD_Size;
-	CString	m_OSD_Font;
+//	int m_OSD_Size;
+//	CString	m_OSD_Font;
 
-	BOOL m_fFastSeek;
+//	BOOL m_fFastSeek;
 	BOOL m_fLCDSupport;
-	BOOL m_fSmartSeek;
+//	BOOL m_fSmartSeek;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
@@ -84,19 +84,19 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR* pNMH, LRESULT* pResult);
+//	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR* pNMH, LRESULT* pResult);
 	afx_msg void OnUpdateCheck3(CCmdUI* pCmdUI);
 	afx_msg void OnClickClrDefault();
 	afx_msg void OnClickClrFace();
 	afx_msg void OnClickClrOutline();
 	afx_msg void OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnBnClickedButton1();
-	afx_msg void OnUseTimeTooltipClicked();
-	afx_msg void OnChngOSDCombo();
-	afx_msg void OnUpdateThemeBrightness(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateThemeRed(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateThemeGreen(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateThemeBlue(CCmdUI* pCmdUI);
+//	afx_msg void OnUseTimeTooltipClicked();
+//	afx_msg void OnChngOSDCombo();
+//	afx_msg void OnUpdateThemeBrightness(CCmdUI* pCmdUI);
+//	afx_msg void OnUpdateThemeRed(CCmdUI* pCmdUI);
+//	afx_msg void OnUpdateThemeGreen(CCmdUI* pCmdUI);
+//	afx_msg void OnUpdateThemeBlue(CCmdUI* pCmdUI);
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
-	afx_msg void OnThemeChange();
+//	afx_msg void OnThemeChange();
 };
