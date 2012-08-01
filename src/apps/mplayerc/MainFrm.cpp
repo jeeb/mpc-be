@@ -13659,11 +13659,8 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 
 		POSITION pos = m_pSubStreams.GetHeadPosition();
 
-		if (pos) {
-			pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_SUBTITLES_ENABLE));
-			pSub->AppendMenu(MF_SEPARATOR);
-
-		}
+		pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|(pos ? MF_ENABLED : MF_DISABLED), id++, ResStr(IDS_SUBTITLES_ENABLE));
+		pSub->AppendMenu(MF_SEPARATOR);
 
 		bool sep = false;
 		int splcnt = 0;
@@ -13737,8 +13734,6 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 			}
 		}
 
-
-
 		pos = m_pSubStreams.GetHeadPosition();
 		CComPtr<ISubStream> pSubStream;
 		int tPos = -1;
@@ -13746,8 +13741,6 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 			pSubStream = m_pSubStreams.GetNext(pos);
 			tPos++;
 		}
-
-		
 		
 		while (pos) {
 			pSubStream = m_pSubStreams.GetNext(pos);
@@ -13788,7 +13781,7 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 				}
 			}
 		}	
-		if (pSub->GetMenuItemCount()<2) {
+		if ((pSub->GetMenuItemCount() < 2) || (!m_pSubStreams.GetHeadPosition() && pSub->GetMenuItemCount() <= 3)) {
 			while (pSub->RemoveMenu(0, MF_BYPOSITION)) {
 				;
 			}
