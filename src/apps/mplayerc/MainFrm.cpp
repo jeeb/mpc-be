@@ -2888,11 +2888,12 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 		if (!fClicked) {
 			bool fLeftMouseBtnUnassigned = !AssignedToCmd(wmcmd::LDOWN, m_fFullScreen);
 
-			if (!m_fFullScreen && ((IsCaptionHidden() && AfxGetAppSettings().nCS<=CS_SEEKBAR) || fLeftMouseBtnUnassigned || ((GetTickCount()-m_nMenuHideTick)<100))) {
+			if (!m_fFullScreen && ((IsCaptionHidden() && AfxGetAppSettings().nCS<=CS_SEEKBAR) || !IsSomethingLoaded() || fLeftMouseBtnUnassigned || ((GetTickCount()-m_nMenuHideTick)<100))) {
 				PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 			} else {
 				s_fLDown = true;
 				if (OnButton(wmcmd::LDOWN, nFlags, point)) {
+					PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 					return;
 				}
 			}
