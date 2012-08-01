@@ -38,10 +38,14 @@ COpenDlg::COpenDlg(CWnd* pParent /*=NULL*/)
 	, m_fMultipleFiles(false)
 	, m_fAppendPlaylist(FALSE)
 {
+	m_hIcon = (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
 }
 
 COpenDlg::~COpenDlg()
 {
+	if (m_hIcon) {
+		DestroyIcon(m_hIcon);
+	}
 }
 
 void COpenDlg::DoDataExchange(CDataExchange* pDX)
@@ -118,6 +122,11 @@ BOOL COpenDlg::OnInitDialog()
 	SetMinTrackSize(s);
 	s.cx = 1000;
 	SetMaxTrackSize(s);
+
+	if ( m_hIcon != NULL ) {
+		CStatic *pStat=(CStatic *)GetDlgItem(IDC_MAINFRAME_ICON);
+		pStat->SetIcon(m_hIcon);
+	}
 
 	return TRUE;
 }

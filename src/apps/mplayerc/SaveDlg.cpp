@@ -63,7 +63,7 @@ BOOL CSaveDlg::OnInitDialog()
 {
 	CCmdUIDialog::OnInitDialog();
 
-	m_anim.Open(IDR_AVI_FILECOPY);
+	m_anim.SendMessage(ACM_OPEN, (WPARAM)AfxGetInstanceHandle(), (LPARAM)IDR_AVI_FILECOPY);
 	m_anim.Play(0, (UINT)-1, (UINT)-1);
 
 	CString str, in = m_in, out = m_out;

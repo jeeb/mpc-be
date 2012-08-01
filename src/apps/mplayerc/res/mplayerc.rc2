@@ -124,6 +124,37 @@ IDR_HTML_INFO                    HTML                    "res\\web\\info.html"
 IDR_HTML_PLAYER                  HTML                    "res\\web\\player.html"
 IDR_HTML_VARIABLES               HTML                    "res\\web\\variables.html"
 
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+IDR_MAINFRAME                    ICON                    "res\\icon.ico"
+IDI_AUDIOCD                      ICON                    "res\\Icon_41.ico"
+IDI_DVD                          ICON                    "res\\Icon_114.ico"
+IDI_UNKNOWN                      ICON                    "res\\Icon_116.ico"
+IDR_TB_PLAY                      ICON                    "res\\tb_play_16.ico"
+IDR_TB_PAUSE                     ICON                    "res\\tb_pause_16.ico"
+IDR_TB_STOP                      ICON                    "res\\tb_stop_16.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_ONOFF                        BITMAP                  "res\\onoff.bmp"
+IDB_MONO                         BITMAP                  "res\\mono.bmp"
+IDB_STEREO                       BITMAP                  "res\\stereo.bmp"
+IDB_NOAUDIO                      BITMAP                  "res\\noaudio.bmp"
+IDB_STREAMTYPES                  BITMAP                  "res\\streamtypes.bmp"
+IDB_PLAYERTOOLBAR_PNG            PNG                     "res\\toolbar.png"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AVI
+//
+
+IDR_AVI_FILECOPY                 AVI                     "res\\ani.avi"
 
 /////////////////////////////////////////////////////////////////////////////
 //

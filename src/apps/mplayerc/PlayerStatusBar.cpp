@@ -194,7 +194,9 @@ void CPlayerStatusBar::SetStatusBitmap(UINT id)
 	}
 
 	if (id) {
-		m_bm.LoadBitmap(id);
+		CImage img;
+		img.LoadFromResource(AfxGetInstanceHandle(), id);
+		m_bm.Attach(img.Detach());
 	}
 
 	m_bmid = id;

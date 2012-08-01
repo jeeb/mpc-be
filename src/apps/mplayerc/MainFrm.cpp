@@ -17026,21 +17026,21 @@ HRESULT CMainFrame::UpdateThumbarButton()
 			buttons[2].dwFlags = THBF_ENABLED;
 			buttons[2].iBitmap = 2;
 
-			hIcon = AfxGetApp()->LoadIcon( IDR_TB_PLAY );
+			hIcon = (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_TB_PLAY), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
 			m_pTaskbarList->SetProgressState( m_hWnd, TBPF_NORMAL );
 		} else if ( fs == State_Stopped ) {
 			buttons[1].dwFlags = THBF_DISABLED;
 			buttons[2].dwFlags = THBF_ENABLED;
 			buttons[2].iBitmap = 3;
 
-			hIcon = AfxGetApp()->LoadIcon( IDR_TB_STOP );
+			hIcon = (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_TB_STOP), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
 			m_pTaskbarList->SetProgressState( m_hWnd, TBPF_NOPROGRESS );
 		} else if ( fs == State_Paused ) {
 			buttons[1].dwFlags = THBF_ENABLED;
 			buttons[2].dwFlags = THBF_ENABLED;
 			buttons[2].iBitmap = 3;
 
-			hIcon = AfxGetApp()->LoadIcon( IDR_TB_PAUSE );
+			hIcon = (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_TB_PAUSE), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
 			m_pTaskbarList->SetProgressState( m_hWnd, TBPF_PAUSED );
 		}
 

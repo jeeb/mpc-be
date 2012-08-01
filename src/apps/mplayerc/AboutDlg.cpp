@@ -32,8 +32,14 @@ CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD), m_appname(_T(""))
 	, m_MPCCompiler(_T(""))
 	, m_FFmpegCompiler(_T(""))
 {
-	//{{AFX_DATA_INIT(CAboutDlg)
-	//}}AFX_DATA_INIT
+	m_hIcon = (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
+}
+
+CAboutDlg::~CAboutDlg()
+{
+	if (m_hIcon) {
+		DestroyIcon(m_hIcon);
+	}
 }
 
 BOOL CAboutDlg::OnInitDialog()
@@ -96,6 +102,11 @@ BOOL CAboutDlg::OnInitDialog()
 	if (CFile::GetStatus(m_AuthorsPath, fs)) {
 		// If it does, we make the filename clickable
 		m_Credits.Replace(_T("Authors.txt"), _T("<a>Authors.txt</a>"));
+	}
+
+	if ( m_hIcon != NULL ) {
+		CStatic *pStat=(CStatic *)GetDlgItem(IDC_MAINFRAME_ICON);
+		pStat->SetIcon(m_hIcon);
 	}
 
 	UpdateData(FALSE);

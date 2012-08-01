@@ -36,8 +36,11 @@ class CAboutDlg : public CDialog
 	CString m_Credits;
 	CString m_AuthorsPath;
 
+	HICON	m_hIcon;
+
 public:
 	CAboutDlg();
+	virtual ~CAboutDlg();
 
 	virtual BOOL OnInitDialog();
 

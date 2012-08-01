@@ -145,7 +145,7 @@ foreach my $filename(@FileLists) {
         my $pos = 0;
         for (my $i = 0; $i < @newrc; $i++)
         {
-            if ($newrc[$i] eq '// Bitmap') {$pos = $i; last;}
+            if ($newrc[$i] eq '// Toolbar') {$pos = $i; last;}
         }
         if ($pos)
         {

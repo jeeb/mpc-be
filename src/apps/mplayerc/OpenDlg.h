@@ -48,6 +48,8 @@ public:
 	CStatic m_label2;
 	BOOL m_fAppendPlaylist;
 
+	HICON	m_hIcon;
+
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
