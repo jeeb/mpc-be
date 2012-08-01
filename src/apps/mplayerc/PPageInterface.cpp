@@ -24,6 +24,7 @@
 #include "stdafx.h"
 #include "mplayerc.h"
 #include "PPageInterface.h"
+#include "../../DSUtil/WinAPIUtils.h"
 #include "MainFrm.h"
 
 
@@ -107,6 +108,7 @@ BOOL CPPageInterface::OnInitDialog()
 	m_clrFaceABGR			= s.clrFaceABGR;
 	m_clrOutlineABGR		= s.clrOutlineABGR;
 	m_fUseWin7TaskBar		= s.fUseWin7TaskBar;
+	GetDlgItem(IDC_CHECK_WIN7)->EnableWindow(IsWinSevenOrLater());
 
 	m_fUseTimeTooltip = s.fUseTimeTooltip;
 	m_TimeTooltipPosition.AddString(ResStr(IDS_TIME_TOOLTIP_ABOVE));
