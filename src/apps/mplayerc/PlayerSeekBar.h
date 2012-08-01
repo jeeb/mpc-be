@@ -48,7 +48,6 @@ private:
 	UINT_PTR m_tooltipTimer;
 
 	MPCPngImage m_logobm;
-	bool bFileNameOnSeekBar;
 
 	void MoveThumb(CPoint point);
 	__int64 CalculatePosition(CPoint point);

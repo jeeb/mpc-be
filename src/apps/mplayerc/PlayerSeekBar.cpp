@@ -324,8 +324,6 @@ void CPlayerSeekBar::OnPaint()
 		m_bmPaint.CreateCompatibleBitmap(&dc, r.Width(), r.Height());
 		CBitmap *bmOld = memdc.SelectObject(&m_bmPaint);
 
-		bFileNameOnSeekBar = s.fFileNameOnSeekBar;
-
 		GRADIENT_RECT gr[1] = {{0, 1}};
 		int pa = 255 * 256;
 
@@ -436,7 +434,7 @@ void CPlayerSeekBar::OnPaint()
 			}
 		}
 
-		if (bFileNameOnSeekBar) {
+		if (s.fFileNameOnSeekBar || !s.bStatusBarIsVisible) {
 			CFont font2;
 			ThemeRGB(135, 140, 145, R, G, B);
 			memdc.SetTextColor(RGB(R,G,B));
@@ -459,26 +457,28 @@ void CPlayerSeekBar::OnPaint()
 
 			CFont* oldfont2 = memdc.SelectObject(&font2);
 			SetBkMode(memdc, TRANSPARENT);
-			rt = rc;
-			rt.left = rc.left+6;
-			rt.top = rc.top - 2;
-			if (!s.bStatusBarIsVisible) rt.right = rc.right - 150;
-			memdc.DrawText(str, str.GetLength(), &rt, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
+			if (s.fFileNameOnSeekBar) {
+				rt = rc;
+				rt.left = rc.left+6;
+				rt.top = rc.top - 2;
+				if (!s.bStatusBarIsVisible) rt.right = rc.right - 150;
+				memdc.DrawText(str, str.GetLength(), &rt, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
+	
+				ThemeRGB(205, 210, 215, R, G, B);
+				memdc.SetTextColor(RGB(R,G,B));
+				CRect rt2;
+				rt2 = rc;
+				rt2.left = rc.left+6;
+				rt2.right = (nposx > rc.right - 150 && !s.bStatusBarIsVisible ? rc.right - 150 : nposx);
+				rt2.top = rc.top - 2;
 
-			ThemeRGB(205, 210, 215, R, G, B);
-			memdc.SetTextColor(RGB(R,G,B));
-			CRect rt2;
-			rt2 = rc;
-			rt2.left = rc.left+6;
-			rt2.right = (nposx > rc.right - 150 && !s.bStatusBarIsVisible ? rc.right - 150 : nposx);
-			rt2.top = rc.top - 2;
-
-			if (nposx > rt.right-15) {
-				rt2.right = rt.right;
-				memdc.DrawText(str, str.GetLength(), &rt2, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
-			} else {
-				rt2.right = nposx;
-				memdc.DrawText(str, str.GetLength(), &rt2, DT_LEFT|DT_VCENTER|DT_SINGLELINE);
+				if (nposx > rt.right-15) {
+					rt2.right = rt.right;
+					memdc.DrawText(str, str.GetLength(), &rt2, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
+				} else {
+					rt2.right = nposx;
+					memdc.DrawText(str, str.GetLength(), &rt2, DT_LEFT|DT_VCENTER|DT_SINGLELINE);
+				}
 			}
 
 			if (!s.bStatusBarIsVisible) {
