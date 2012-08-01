@@ -1337,8 +1337,8 @@ void CAppSettings::UpdateData(bool fSave)
 		fFastSeek = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_FASTSEEK_KEYFRAME, TRUE);
 
 		fLCDSupport		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_LCD_SUPPORT, FALSE);
-		fSmartSeek		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_CHAPTER_MARKER, FALSE);
-		fChapterMarker	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_SMARTSEEK, FALSE);
+		fSmartSeek		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_SMARTSEEK, FALSE);
+		fChapterMarker	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_CHAPTER_MARKER, FALSE);
 
 		// Save analog capture settings
 		iDefaultCaptureDevice = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DEFAULT_CAPTURE, 0);
