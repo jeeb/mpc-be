@@ -12080,67 +12080,44 @@ void CMainFrame::OpenSetupStatusBar()
 void CMainFrame::OpenSetupWindowTitle(CString fn)
 {
 	CString title(MAKEINTRESOURCE(IDR_MAINFRAME));
-
-	CString fn_sb = fn; // for seekbar
+	CString fname = fn;
 
 	AppSettings& s = AfxGetAppSettings();
 
 	int i = s.iTitleBarTextStyle;
 
-	if (!fn.IsEmpty() && (i == 0 || i == 1)) {
-		if (i == 1) {
-			if (GetPlaybackMode() == PM_FILE) {
-				fn.Replace('\\', '/');
-				CString fn2 = fn.Mid(fn.ReverseFind('/')+1);
-				if (!fn2.IsEmpty()) {
-					fn = fn2;
-				}
-				if (s.fTitleBarTextTitle) {
-					BeginEnumFilters(pGB, pEF, pBF) {
-						if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
-							CComBSTR bstr;
-							if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
-								fn = CString(bstr.m_str);
-								break;
-							}
-						}
+	if (!fn.IsEmpty()) {
+		if (GetPlaybackMode() == PM_FILE) {
+			fn.Replace('\\', '/');
+			CString fn2 = fn.Mid(fn.ReverseFind('/')+1);
+			if (!fn2.IsEmpty()) {
+				fn = fn2;
+			}
+		} else if (GetPlaybackMode() == PM_DVD) {
+			fn = _T("DVD");
+		} else if (GetPlaybackMode() == PM_CAPTURE) {
+			fn = ResStr(IDS_CAPTURE_LIVE);
+		}
+	}
+	m_strFn = fn;
+
+	if (i == 1) {
+		if (s.fTitleBarTextTitle) {
+			BeginEnumFilters(pGB, pEF, pBF) {
+				if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
+					CComBSTR bstr;
+					if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
+						fn = CString(bstr.m_str);
+						break;
 					}
-					EndEnumFilters;
-				}
-			} else if (GetPlaybackMode() == PM_DVD) {
-				fn = _T("DVD");
-			} else if (GetPlaybackMode() == PM_CAPTURE) {
-				fn = ResStr(IDS_CAPTURE_LIVE);
-			}
-		}
-
-		title = fn + _T(" - ") + m_strTitle;
-	}
-
-// for seekbar
-	if (GetPlaybackMode() == PM_FILE) {
-		fn_sb.Replace('\\', '/');
-		CString fn2 = fn_sb.Mid(fn_sb.ReverseFind('/')+1);
-		if (!fn2.IsEmpty()) {
-			fn_sb = fn2;
-		}
-		BeginEnumFilters(pGB, pEF, pBF) {
-			if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
-				CComBSTR bstr;
-				if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
-					fn_sb = CString(bstr.m_str);
-					break;
 				}
 			}
+			EndEnumFilters;
 		}
-		EndEnumFilters;
-	} else if (GetPlaybackMode() == PM_DVD) {
-		fn_sb = _T("DVD");
-	} else if (GetPlaybackMode() == PM_CAPTURE) {
-		fn_sb = ResStr(IDS_CAPTURE_LIVE);
+    title = fn + _T(" - ") + m_strTitle;
+	} else if (i == 0) {
+    title = fname + _T(" - ") + m_strTitle;
 	}
-	m_strFn = fn_sb;
-//--------------
 
 	SetWindowText(title);
 	m_Lcd.SetMediaTitle(LPCTSTR(fn));
