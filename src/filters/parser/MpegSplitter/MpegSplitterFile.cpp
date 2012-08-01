@@ -724,8 +724,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 						break;
 						case PRESENTATION_GRAPHICS_STREAM : {
 							CMpegSplitterFile::hdmvsubhdr h;
-							if (!m_streams[subpic].Find(s) && Read(h, &s.mt, pClipInfo ? pClipInfo->m_LanguageCode : NULL)) {
-								m_bIsHdmv = true;
+							if (!m_bIsHdmv && !m_streams[subpic].Find(s) && Read(h, &s.mt, pClipInfo ? pClipInfo->m_LanguageCode : NULL)) {
 								type = subpic;
 							}
 						}
@@ -904,7 +903,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 			}
 		}
 
-		m_streams[type].Insert(s, this);
+		m_streams[type].Insert(s, this, type);
 	}
 
 	return s;
@@ -919,7 +918,7 @@ void CMpegSplitterFile::AddHdmvPGStream(WORD pid, const char* language_code)
 
 	CMpegSplitterFile::hdmvsubhdr h;
 	if (!m_streams[subpic].Find(s) && Read(h, &s.mt, language_code)) {
-		m_streams[subpic].AddTail(s);
+		m_streams[subpic].Insert(s, this, subpic);
 	}
 }
 
@@ -1098,7 +1097,7 @@ void CMpegSplitterFile::UpdatePrograms(CGolombBuffer gb, WORD pid, bool UpdateLa
 					CMpegSplitterFile::hdmvsubhdr hdr;
 					if (Read(hdr, &s.mt, NULL)) {
 						if (!m_streams[subpic].Find(s)) {
-							m_streams[subpic].Insert(s, this);
+							m_streams[subpic].Insert(s, this, subpic);
 						}
 					}
 				}

@@ -93,6 +93,25 @@ public:
 	class CStreamList : public CAtlList<stream>
 	{
 	public:
+		void Insert(stream& s, CMpegSplitterFile *_pFile, int type) {
+			if (type == subpic) {
+				if (s.pid == NO_SUBTITLE_PID) {
+					AddTail(s);
+					return;
+				}
+				for (POSITION pos = GetHeadPosition(); pos; GetNext(pos)) {
+					stream& s2 = GetAt(pos);
+					if (s.pid < s2.pid || s2.pid == NO_SUBTITLE_PID) {
+						InsertBefore(pos, s);
+						return;
+					}
+				}
+				AddTail(s);
+			} else {
+				Insert(s, _pFile);
+			}
+		}
+
 		void Insert(stream& s, CMpegSplitterFile *_pFile) {
 			s.m_pFile = _pFile;
 			if (_pFile->m_TrackPriority) {
