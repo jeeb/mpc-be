@@ -429,9 +429,9 @@ public:
 	int				nThemeBlue;
 	bool			fFileNameOnSeekBar;
 
-	bool			fToolbarRefresh;
 	int				clrFaceABGR;
 	int				clrOutlineABGR;
+
 	int				nJumpDistS;
 	int				nJumpDistM;
 	int				nJumpDistL;

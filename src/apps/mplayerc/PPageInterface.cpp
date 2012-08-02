@@ -168,43 +168,18 @@ BOOL CPPageInterface::OnApply()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	bool m_fToolbarRefresh = false;
+	s.clrFaceABGR		= m_clrFaceABGR;
+	s.clrOutlineABGR	= m_clrOutlineABGR;
+	s.nThemeBrightness	= m_nThemeBrightness;
+	s.nThemeRed			= m_nThemeRed;
+	s.nThemeGreen		= m_nThemeGreen;
+	s.nThemeBlue		= m_nThemeBlue;
+	s.fFileNameOnSeekBar = !!m_fFileNameOnSeekBar;
 
-	if (s.fDisableXPToolbars == true && m_fDisableXPToolbars == FALSE) {
-		m_fToolbarRefresh = true;
-	}
+	HWND WndToolBar = ((CMainFrame*)AfxGetMainWnd())->m_hWnd_toolbar;
 
-	if (s.fDisableXPToolbars == false && m_fDisableXPToolbars == TRUE) {
-		m_fToolbarRefresh = true;
-	}
-
-	if (s.clrFaceABGR != m_clrFaceABGR || s.clrOutlineABGR != m_clrOutlineABGR) {
-		m_fToolbarRefresh = true;
-	}
-
-	if (s.nThemeBrightness != m_nThemeBrightness 
-		|| s.nThemeRed != m_nThemeRed
-		|| s.nThemeGreen != m_nThemeGreen
-		|| s.nThemeBlue != m_nThemeBlue
-		|| s.fFileNameOnSeekBar != !!m_fFileNameOnSeekBar) {
-		m_fToolbarRefresh=true;
-	}
-
-	if (m_fToolbarRefresh) {
-		s.clrFaceABGR		= m_clrFaceABGR;
-		s.clrOutlineABGR	= m_clrOutlineABGR;
-		s.nThemeBrightness	= m_nThemeBrightness;
-		s.nThemeRed			= m_nThemeRed;
-		s.nThemeGreen		= m_nThemeGreen;
-		s.nThemeBlue		= m_nThemeBlue;
-		s.fFileNameOnSeekBar = !!m_fFileNameOnSeekBar;
-
-		HWND WndToolBar = ((CMainFrame*)AfxGetMainWnd())->m_hWnd_toolbar;
-
-		if (::IsWindow(WndToolBar)) {
-			s.fToolbarRefresh = true;
-			::PostMessage(WndToolBar, WM_SIZE, SIZE_RESTORED, MAKELPARAM(320, 240));
-		}
+	if (::IsWindow(WndToolBar)) {
+		::PostMessage(WndToolBar, WM_SIZE, SIZE_RESTORED, MAKELPARAM(320, 240));
 	}
 
 	s.fDisableXPToolbars	= !!m_fDisableXPToolbars;
@@ -225,6 +200,7 @@ BOOL CPPageInterface::OnApply()
 	}
 
 	pFrame->UpdateThumbarButton();
+
 	pFrame->Invalidate();
 
 	return __super::OnApply();
@@ -249,8 +225,6 @@ void CPPageInterface::OnThemeChange()
 	HWND WndToolBar = ((CMainFrame*)AfxGetMainWnd())->m_hWnd_toolbar;
 
 	if (::IsWindow(WndToolBar)) {
-		AfxGetAppSettings().fToolbarRefresh = true;
-
 		::PostMessage(WndToolBar, WM_SIZE, SIZE_RESTORED, MAKELPARAM(320, 240));
 	}
 
