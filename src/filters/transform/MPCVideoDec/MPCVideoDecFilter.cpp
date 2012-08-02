@@ -882,8 +882,15 @@ bool CMPCVideoDecFilter::IsVideoInterlaced()
 
 void CMPCVideoDecFilter::UpdateFrameTime (REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop, bool b_repeat_pict)
 {
-	bool m_PullDownFlag = (m_nCodecId == CODEC_ID_VC1 && b_repeat_pict && m_rtAvrTimePerFrame == 333666);
-	REFERENCE_TIME m_rtFrameDuration = m_PullDownFlag ? AVRTIMEPERFRAME_VC1_EVO : m_rtAvrTimePerFrame;
+	REFERENCE_TIME AvgTimePerFrame = m_rtAvrTimePerFrame;
+	if (m_rtAvrTimePerFrame == 1 || m_rtAvrTimePerFrame < 166666) { // fps > 60 ... try to get fps value from ffmpeg
+		if (m_pAVCtx->time_base.den && m_pAVCtx->time_base.num) {
+			AvgTimePerFrame = (10000000I64 * m_pAVCtx->time_base.num / m_pAVCtx->time_base.den) * m_pAVCtx->ticks_per_frame;
+		}
+	}
+
+	bool m_PullDownFlag = (m_nCodecId == CODEC_ID_VC1 && b_repeat_pict && AvgTimePerFrame == 333666);
+	REFERENCE_TIME m_rtFrameDuration = m_PullDownFlag ? AVRTIMEPERFRAME_VC1_EVO : AvgTimePerFrame;
 
 	if ((rtStart == _I64_MIN) || (m_PullDownFlag && m_rtPrevStop && (rtStart <= m_rtPrevStop))) {
 		rtStart = m_rtLastStart + (m_rtFrameDuration / m_dRate) * m_nCountEstimated;
