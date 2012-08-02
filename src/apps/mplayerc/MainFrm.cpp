@@ -31,11 +31,13 @@
 #include <atlconv.h>
 #include <atlrx.h>
 #include <atlsync.h>
+#include <afxtaskdialog.h>
 
 #include "../../DSUtil/WinAPIUtils.h"
 #include "OpenFileDlg.h"
 #include "OpenDlg.h"
 #include "SaveDlg.h"
+#include "SaveTaskDlg.h"
 #include "GoToDlg.h"
 #include "PnSPresetsDlg.h"
 #include "MediaTypesDlg.h"
@@ -4822,8 +4824,13 @@ void CMainFrame::OnFileSaveAs()
 		pMC->Pause();
 	}
 
-	CSaveDlg dlg(in, p);
-	dlg.DoModal();
+	if (CTaskDialog::IsSupported()) {
+		CSaveTaskDlg dlg(in, p);
+		dlg.DoModal();
+	} else {
+		CSaveDlg dlg(in, p);
+		dlg.DoModal();
+	}
 
 	if (fs == State_Running) {
 		pMC->Run();

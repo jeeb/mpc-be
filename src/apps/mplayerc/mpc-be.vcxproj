@@ -169,6 +169,7 @@
     <ClCompile Include="ComPropertyPage.cpp" />
     <ClCompile Include="ComPropertySheet.cpp" />
     <ClCompile Include="PPageInterface.cpp" />
+    <ClCompile Include="SaveTaskDlg.cpp" />
     <ClCompile Include="ShockwaveFlash.cpp" />
     <ClCompile Include="DeinterlacerFilter.cpp" />
     <ClCompile Include="DVBChannel.cpp" />
@@ -286,6 +287,7 @@
     <ClInclude Include="ComPropertyPage.h" />
     <ClInclude Include="ComPropertySheet.h" />
     <ClInclude Include="PPageInterface.h" />
+    <ClInclude Include="SaveTaskDlg.h" />
     <ClInclude Include="ShockwaveFlash.h" />
     <ClInclude Include="DeinterlacerFilter.h" />
     <ClInclude Include="DVBChannel.h" />
