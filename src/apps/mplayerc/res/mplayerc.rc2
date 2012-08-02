@@ -52,7 +52,6 @@ IDF_LOGO1                        FILE                    "res\\logo.1.png"
 IDF_LOGO2                        FILE                    "res\\logo.2.png"
 IDF_LOGO3                        FILE                    "res\\logo.3.png"
 #endif
-W7_TOOLBAR                       PNG                     "res\\Toolbarw7.png"
 IDF_SHADER_BT601_BT709           FILE                    "res\\shaders\\BT601BT709.psh"
 IDF_SHADER_CONTOUR               FILE                    "res\\shaders\\contour.psh"
 IDF_SHADER_DEINTERLACE           FILE                    "res\\shaders\\deinterlace (blend).psh"
@@ -148,6 +147,7 @@ IDB_STEREO                       BITMAP                  "res\\stereo.bmp"
 IDB_NOAUDIO                      BITMAP                  "res\\noaudio.bmp"
 IDB_STREAMTYPES                  BITMAP                  "res\\streamtypes.bmp"
 IDB_PLAYERTOOLBAR_PNG            PNG                     "res\\toolbar.png"
+IDB_W7_TOOLBAR                   PNG                     "res\\Toolbarw7.png"
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -103,7 +103,6 @@ static UINT s_uTBBC = RegisterWindowMessage(_T("TaskbarButtonCreated"));
 
 #include "Monitors.h"
 #include "MultiMonitor.h"
-#include "GdiPlusBitmap.h"
 
 #ifdef USE_MEDIAINFO_STATIC
 #include <MediaInfo/MediaInfo.h>
@@ -16855,50 +16854,32 @@ HRESULT CMainFrame::CreateThumbnailToolbar()
 
 	HRESULT hr = CoCreateInstance(CLSID_TaskbarList, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_pTaskbarList));
 	if (SUCCEEDED(hr)) {
-		Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-		Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, NULL);
+		MPCPngImage mpc_png;
+		BYTE* pData;
+		int width, height, bpp;
 
-		CGdiPlusBitmapResource* pBitmap = DNew CGdiPlusBitmapResource;
-		if (!pBitmap->Load(_T("W7_TOOLBAR"), _T("PNG"), AfxGetInstanceHandle())) {
-			delete pBitmap;
-			Gdiplus::GdiplusShutdown(m_gdiplusToken);
-			m_pTaskbarList->Release();
-			return E_FAIL;
-		}
-		unsigned long Color = 0xFFFFFFFF;
-		unsigned int A = GetAValue(Color);
-		unsigned int R = GetRValue(Color);
-		unsigned int G = GetGValue(Color);
-		unsigned int B = GetBValue(Color);
-		Gdiplus::Color co(A,R,G,B);
-		HBITMAP hB = 0;
-		pBitmap->m_pBitmap->GetHBITMAP(co,&hB);
-
+		HBITMAP hB = mpc_png.TypeLoadImage(1, &pData, &width, &height, &bpp, NULL, IDB_W7_TOOLBAR, 0, 0, 0, 0);
 		if (!hB) {
 			m_pTaskbarList->Release();
-			delete pBitmap;
-			Gdiplus::GdiplusShutdown(m_gdiplusToken);
 			return E_FAIL;
 		}
 
 		// Check dimensions
 		BITMAP bi = {0};
-		GetObject((HANDLE)hB,sizeof(bi),&bi);
+		GetObject((HANDLE)hB, sizeof(bi), &bi);
 		if (bi.bmHeight == 0) {
 			DeleteObject(hB);
 			m_pTaskbarList->Release();
-			delete pBitmap;
-			Gdiplus::GdiplusShutdown(m_gdiplusToken);
 			return E_FAIL;
 		}
 
 		int nI = bi.bmWidth/bi.bmHeight;
-		HIMAGELIST himl = ImageList_Create(bi.bmHeight,bi.bmHeight,ILC_COLOR32,nI,0);
+		HIMAGELIST himl = ImageList_Create(bi.bmHeight, bi.bmHeight, ILC_COLOR32, nI, 0);
 
 		// Add the bitmap
-		ImageList_Add(himl,hB,0);
-		hr = m_pTaskbarList->ThumbBarSetImageList(m_hWnd,himl);
+		ImageList_Add(himl, hB, 0);
 		DeleteObject(hB);
+		hr = m_pTaskbarList->ThumbBarSetImageList(m_hWnd, himl);
 
 		if (SUCCEEDED(hr)) {
 			THUMBBUTTON buttons[5] = {};
@@ -16941,8 +16922,6 @@ HRESULT CMainFrame::CreateThumbnailToolbar()
 			hr = m_pTaskbarList->ThumbBarAddButtons(m_hWnd, ARRAYSIZE(buttons), buttons);
 		}
 		ImageList_Destroy(himl);
-		delete pBitmap;
-		Gdiplus::GdiplusShutdown(m_gdiplusToken);
 	}
 
 	return hr;

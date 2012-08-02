@@ -282,7 +282,6 @@
     <ClInclude Include="AppSettings.h" />
     <ClInclude Include="AuthDlg.h" />
     <ClInclude Include="BaseGraph.h" />
-    <ClInclude Include="CGdiPlusBitmap.h" />
     <ClInclude Include="ChildView.h" />
     <ClInclude Include="ComPropertyPage.h" />
     <ClInclude Include="ComPropertySheet.h" />
