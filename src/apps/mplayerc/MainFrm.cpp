@@ -713,7 +713,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	if (b_UseSmartSeek) {
 		DWORD style;
-		style = s.fDisableXPToolbars ? WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS : style = WS_CAPTION|WS_CLIPCHILDREN|WS_CLIPSIBLINGS;
+		style = s.fDisableXPToolbars ? WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS : WS_CAPTION|WS_CLIPCHILDREN|WS_CLIPSIBLINGS;
 		if (!m_wndView2.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL,
 			style, CRect(0, 0, 160, 109), this, 0, NULL)) {
 				TRACE(_T("Failed to create Preview Window\n"));
@@ -10864,7 +10864,7 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 
 			if (b_UseSmartSeek) {
 				DWORD style;
-				style = s.fDisableXPToolbars ? WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS : style = WS_CAPTION|WS_CLIPCHILDREN|WS_CLIPSIBLINGS;
+				style = s.fDisableXPToolbars ? WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS : WS_CAPTION|WS_CLIPCHILDREN|WS_CLIPSIBLINGS;
 				if (!m_wndView2.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL,
 					style, CRect(0, 0, 160, 109), this, 0, NULL)) {
 						TRACE(_T("Failed to create Preview Window\n"));
