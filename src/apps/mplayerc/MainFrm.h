@@ -26,6 +26,7 @@
 #include <atlbase.h>
 
 #include "ChildView.h"
+#include "PreView.h"
 #include "PlayerSeekBar.h"
 #include "PlayerToolBar.h"
 #include "PlayerInfoBar.h"
@@ -968,7 +969,7 @@ public:
 	CWnd*			m_pVideoWnd;
 
 	// SmartSeek
-	CWnd			m_wndView2;
+	CPreView		m_wndView2;
 
 	HRESULT PreviewWindowHide();
 	HRESULT PreviewWindowShow(REFERENCE_TIME rtCur2);

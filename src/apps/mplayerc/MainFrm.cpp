@@ -712,9 +712,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	b_UseSmartSeek = s.fSmartSeek && !s.fD3DFullscreen;
 
 	if (b_UseSmartSeek) {
+		DWORD style;
+		style = s.fDisableXPToolbars ? WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS : style = WS_CAPTION|WS_CLIPCHILDREN|WS_CLIPSIBLINGS;
 		if (!m_wndView2.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL,
-			WS_CAPTION|WS_THICKFRAME|WS_CLIPCHILDREN|WS_CLIPSIBLINGS,
-			CRect(0, 0, 160, 115), this, 0, NULL)) {
+			style, CRect(0, 0, 160, 109), this, 0, NULL)) {
 				TRACE(_T("Failed to create Preview Window\n"));
 				b_UseSmartSeek = false;
 		} else {
@@ -10395,7 +10396,7 @@ void CMainFrame::MoveVideoWindow(bool fShowStats)
 		m_wndView.SetVideoRect(wr);
 
 		if (b_UseSmartSeek && m_wndView2) {
-			m_wndView2.GetClientRect(&wr2);
+			m_wndView2.GetVideoRect(&wr2);
 			CRect vr2 = CRect(0,0,0,0);
 
 			CSize ws2 = wr2.Size();
@@ -10862,9 +10863,10 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 			b_UseSmartSeek = s.fSmartSeek && !s.fD3DFullscreen;
 
 			if (b_UseSmartSeek) {
+				DWORD style;
+				style = s.fDisableXPToolbars ? WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS : style = WS_CAPTION|WS_CLIPCHILDREN|WS_CLIPSIBLINGS;
 				if (!m_wndView2.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL,
-					WS_CAPTION|WS_THICKFRAME|WS_CLIPCHILDREN|WS_CLIPSIBLINGS,
-					CRect(0, 0, 160, 115), this, 0, NULL)) {
+					style, CRect(0, 0, 160, 109), this, 0, NULL)) {
 						TRACE(_T("Failed to create Preview Window\n"));
 						b_UseSmartSeek = false;
 				} else {
@@ -10956,14 +10958,14 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 
 			// Graph for preview
 			if (b_UseSmartSeek && m_wndView2) {
-				pGB2 = DNew CFGManagerPlayer(_T("CFGManagerPlayer"), NULL, m_wndView2.m_hWnd, true);
+				pGB2 = DNew CFGManagerPlayer(_T("CFGManagerPlayer"), NULL, m_wndView2.GetVideoHWND(), true);
 			}
 		}
 	} else if (OpenDVDData* p = dynamic_cast<OpenDVDData*>(pOMD)) {
 		pGB = DNew CFGManagerDVD(_T("CFGManagerDVD"), NULL, m_pVideoWnd->m_hWnd);
 
 		if (b_UseSmartSeek && m_wndView2) {
-			pGB2 = DNew CFGManagerDVD(_T("CFGManagerDVD"), NULL, m_wndView2.m_hWnd, true);
+			pGB2 = DNew CFGManagerDVD(_T("CFGManagerDVD"), NULL, m_wndView2.GetVideoHWND(), true);
 		}
 	} else if (OpenDeviceData* p = dynamic_cast<OpenDeviceData*>(pOMD)) {
 		if (s.iDefaultCaptureDevice == 1) {
@@ -11064,7 +11066,7 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 	if (!b_UseSmartSeek || !m_wndView2 || m_fAudioOnly || m_pFullscreenWnd->IsWindow()) {
 		return E_FAIL;
 	}
-	
+
 	if (!m_kfs.IsEmpty()) {
 		int i = rangebsearch(rtCur2, m_kfs);
 		if (i >= 1 && i < (int)m_kfs.GetCount() - 1) {
@@ -11871,7 +11873,7 @@ void CMainFrame::OpenSetupVideo()
 		}
 
 		if (b_UseSmartSeek && m_wndView2) {
-			pVW2->put_Owner((OAHWND)m_wndView2.m_hWnd);
+			pVW2->put_Owner((OAHWND)m_wndView2.GetVideoHWND());
 			pVW2->put_WindowStyle(WS_CHILD|WS_CLIPSIBLINGS|WS_CLIPCHILDREN);
 		}
 	}
@@ -12696,8 +12698,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 			if (m_pMFVDC2) {
 				RECT Rect2;
-				::GetClientRect (m_wndView2.m_hWnd, &Rect2);
-				m_pMFVDC2->SetVideoWindow (m_wndView2.m_hWnd);
+				::GetClientRect (m_wndView2.GetVideoHWND(), &Rect2);
+				m_pMFVDC2->SetVideoWindow (m_wndView2.GetVideoHWND());
 				m_pMFVDC2->SetVideoPosition(NULL, &Rect2);	
 			}
 		}

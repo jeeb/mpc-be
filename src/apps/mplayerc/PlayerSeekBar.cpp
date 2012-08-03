@@ -26,7 +26,6 @@
 #include "PlayerSeekBar.h"
 #include "MainFrm.h"
 
-
 // CPlayerSeekBar
 
 IMPLEMENT_DYNAMIC(CPlayerSeekBar, CDialogBar)
@@ -679,15 +678,12 @@ void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 		UpdateTooltip(point);
 	}
 
-	OAFilterState fs	= pFrame->GetMediaState();
+	OAFilterState fs = pFrame->GetMediaState();
 
 	if (fs != -1) {
-		pt2 = point;
-
-		//MoveThumb2(point);
-		//pFrame->ChangeVideoWindow2(m_pos2);
-		//pFrame->m_wndView2.Invalidate();
-		//pFrame->m_wndView2.ShowWindow(SW_SHOW);
+		if (abs(point.x - pt2.x) > 2) { // To prevent false mouse move events, such as hand jerked
+			pt2 = point;
+		}
 	} else {
 		pFrame->PreviewWindowHide();
 	}
@@ -857,8 +853,12 @@ void CPlayerSeekBar::UpdateToolTipText()
 		m_ti.lpszText = (LPTSTR)(LPCTSTR)tooltipText;
 		m_tooltip.SendMessage(TTM_SETTOOLINFO, 0, (LPARAM)&m_ti);
 	} else {
-		// TODO - Center Caption ...
-		CString str = _T("               ") + tooltipText + _T("               ");
-		pFrame->m_wndView2.SetWindowText(str);
+		if (AfxGetAppSettings().fDisableXPToolbars) {
+			pFrame->m_wndView2.SetWindowText(tooltipText);
+		} else {
+			// TODO - Center Caption ...
+			CString str = _T("               ") + tooltipText + _T("               ");
+			pFrame->m_wndView2.SetWindowText(str);
+		}
 	}
 }
