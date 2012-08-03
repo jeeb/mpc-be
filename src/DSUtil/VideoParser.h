@@ -97,4 +97,38 @@ static const AV_Rational dirac_frame_rate[] = {
 	{25, 2},
 };
 
-boolean ParseDiracHeader(CGolombBuffer gb, unsigned* width, unsigned* height, REFERENCE_TIME* AvgTimePerFrame);
+static const byte pixel_aspect[17][2]= {
+	{0, 1},
+	{1, 1},
+	{12, 11},
+	{10, 11},
+	{16, 11},
+	{40, 33},
+	{24, 11},
+	{20, 11},
+	{32, 11},
+	{80, 33},
+	{18, 11},
+	{15, 11},
+	{64, 33},
+	{160,99},
+	{4, 3},
+	{3, 2},
+	{2, 1},
+};
+
+struct avc_hdr
+{
+	BYTE profile, level;
+	unsigned int width, height;
+	unsigned int crop_left, crop_right, crop_top, crop_bottom;
+	UINT64 chroma_format_idc;
+	BYTE interlaced;
+	__int64 AvgTimePerFrame;
+
+	AV_Rational sar;
+};
+
+
+bool ParseDiracHeader(CGolombBuffer gb, unsigned* width, unsigned* height, REFERENCE_TIME* AvgTimePerFrame);
+bool ParseAVCHeader(CGolombBuffer gb, avc_hdr& h, bool fullscan = false);

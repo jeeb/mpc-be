@@ -25,6 +25,7 @@
 #include <MMReg.h>
 #include "MatroskaSplitter.h"
 #include "../../../DSUtil/AudioParser.h"
+#include "../../../DSUtil/VideoParser.h"
 
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
@@ -177,6 +178,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			if (pTE->TrackType == TrackEntry::TypeVideo) {
 				Name.Format(L"Video %d", iVideo++);
 
+				bool interlaced = false;
+
 				mt.majortype = MEDIATYPE_Video;
 
 				if (CodecID == "V_MS/VFW/FOURCC") {
@@ -210,6 +213,13 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					bHasVideo = true;
 				} else if (CodecID == "V_UNCOMPRESSED") {
 				} else if (CodecID == "V_MPEG4/ISO/AVC") {
+					if (pTE->CodecPrivate.GetCount() > 9) {
+						CGolombBuffer gb((BYTE*)pTE->CodecPrivate.GetData() + 9, pTE->CodecPrivate.GetCount() - 9);
+						avc_hdr h;
+						ParseAVCHeader(gb, h);
+						interlaced = !!h.interlaced;
+					}
+
 					bool b_spsPresent = false;
 
 					std::vector<BYTE> sh;
@@ -438,9 +448,10 @@ avcsuccess:
 
 				if (pTE->v.FramePerSec > 0) {
 					AvgTimePerFrame = (REFERENCE_TIME)(10000000i64 / pTE->v.FramePerSec);
-				} else if (pTE->DefaultDuration > 0 && pTE->DefaultDuration != 1000000) {
+				} else if (pTE->DefaultDuration > 0) {
 					AvgTimePerFrame = (REFERENCE_TIME)pTE->DefaultDuration / 100;
-				} else { // pTE->DefaultDuration == 1000000 or < 0
+				} 
+				if (!AvgTimePerFrame || AvgTimePerFrame < 166666) { // fps > 60 ... need to make additional checks
 					CMatroskaNode Root(m_pFile);
 					m_pSegment = Root.Child(0x18538067);
 					m_pCluster = m_pSegment->Child(0x1F43B675);
@@ -522,6 +533,9 @@ avcsuccess:
 					}
 					if (framecount) {
 						AvgTimePerFrame = m_pFile->m_segment.SegmentInfo.TimeCodeScale*(timecode2 - timecode1) / (100*framecount);
+						if (interlaced) {
+							AvgTimePerFrame *= 2;
+						}
 					}
 
 					m_pCluster.Free();

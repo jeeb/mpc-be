@@ -26,29 +26,10 @@
 #include "BaseSplitterFile.h"
 #include "../../../DSUtil/Mpeg2Def.h"
 #include "../../../DSUtil/DSUtil.h"
+#include "../../../DSUtil/VideoParser.h"
 
 #define MAX_SPSPPS			256			// Max size for a SPS/PPS packet
 class CGolombBuffer;
-
-static const byte pixel_aspect[17][2]= {
-	{0, 1},
-	{1, 1},
-	{12, 11},
-	{10, 11},
-	{16, 11},
-	{40, 33},
-	{24, 11},
-	{20, 11},
-	{32, 11},
-	{80, 33},
-	{18, 11},
-	{15, 11},
-	{64, 33},
-	{160,99},
-	{4, 3},
-	{3, 2},
-	{2, 1},
-};
 
 class CBaseSplitterFileEx : public CBaseSplitterFile
 {
@@ -379,23 +360,16 @@ public:
 
 	struct avchdr
 	{
-		BYTE profile, level;
-		unsigned int width, height;
+		avc_hdr hdr;
 		unsigned int views;
-		unsigned int crop_left, crop_right, crop_top, crop_bottom;
-		__int64 AvgTimePerFrame;
-
-		AV_Rational sar;
 
 		spsppsdata spspps[4];
 		BYTE lastid;
 
 		avchdr()
 		{
-			memset(spspps, 0, sizeof(spspps));
-			lastid = 0;
+			memset(this, 0, sizeof(*this));
 			views = 1;
-			AvgTimePerFrame = 0;
 		}
 	};
 

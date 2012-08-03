@@ -24,6 +24,7 @@
 #include "stdafx.h"
 #include "FLVSplitter.h"
 #include "../../../DSUtil/DSUtil.h"
+#include "../../../DSUtil/VideoParser.h"
 
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
@@ -586,7 +587,17 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						m_pFile->ByteRead(headerData, headerSize);
 
-						m_pFile->Seek(headerOffset + 9);
+						CGolombBuffer gb(headerData + 9, headerSize - 9);
+						avc_hdr h;
+						if (!ParseAVCHeader(gb, h)) {
+							break;
+						}
+
+						CSize aspect(h.width * h.sar.num, h.height * h.sar.den);
+						int lnko = LNKO(aspect.cx, aspect.cy);
+						if (lnko > 1) {
+							aspect.cx /= lnko, aspect.cy /= lnko;
+						}
 
 						mt.formattype		= FORMAT_MPEG2Video;
 						MPEG2VIDEOINFO* vih	= (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + headerSize);
@@ -595,108 +606,14 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						vih->hdr.bmiHeader.biPlanes		= 1;
 						vih->hdr.bmiHeader.biBitCount	= 24;
 						vih->hdr.AvgTimePerFrame		= AvgTimePerFrame;
-						vih->dwFlags = (headerData[4] & 0x03) + 1; // nal length size
-
-						vih->dwProfile = (BYTE)m_pFile->BitRead(8);
-						m_pFile->BitRead(8);
-						vih->dwLevel = (BYTE)m_pFile->BitRead(8);
-						m_pFile->UExpGolombRead(); // seq_parameter_set_id
-						UINT64 chroma_format_idc = 0;
-						if (vih->dwProfile >= 100) { // high profile
-							chroma_format_idc = m_pFile->UExpGolombRead();
-							if (chroma_format_idc == 3) { // chroma_format_idc
-								m_pFile->BitRead(1);    // residue_transform_flag
-							}
-							m_pFile->UExpGolombRead(); // bit_depth_luma_minus8
-							m_pFile->UExpGolombRead(); // bit_depth_chroma_minus8
-							m_pFile->BitRead(1); // qpprime_y_zero_transform_bypass_flag
-							if (m_pFile->BitRead(1)) // seq_scaling_matrix_present_flag
-								for (int i = 0; i < 8; i++)
-									if (m_pFile->BitRead(1)) // seq_scaling_list_present_flag
-										for (int j = 0, size = i < 6 ? 16 : 64, next = 8; j < size && next != 0; ++j) {
-											next = (next + m_pFile->SExpGolombRead() + 256) & 255;
-										}
-						}
-						m_pFile->UExpGolombRead(); // log2_max_frame_num_minus4
-						UINT64 pic_order_cnt_type = m_pFile->UExpGolombRead();
-						if (pic_order_cnt_type == 0) {
-							m_pFile->UExpGolombRead(); // log2_max_pic_order_cnt_lsb_minus4
-						} else if (pic_order_cnt_type == 1) {
-							m_pFile->BitRead(1); // delta_pic_order_always_zero_flag
-							m_pFile->SExpGolombRead(); // offset_for_non_ref_pic
-							m_pFile->SExpGolombRead(); // offset_for_top_to_bottom_field
-							UINT64 num_ref_frames_in_pic_order_cnt_cycle = m_pFile->UExpGolombRead();
-							for (int i = 0; i < num_ref_frames_in_pic_order_cnt_cycle; i++) {
-								m_pFile->SExpGolombRead();    // offset_for_ref_frame[i]
-							}
-						}
-						m_pFile->UExpGolombRead(); // num_ref_frames
-						m_pFile->BitRead(1); // gaps_in_frame_num_value_allowed_flag
-						UINT64 pic_width_in_mbs_minus1 = m_pFile->UExpGolombRead();
-						UINT64 pic_height_in_map_units_minus1 = m_pFile->UExpGolombRead();
-						BYTE frame_mbs_only_flag = (BYTE)m_pFile->BitRead(1);
-						if (!frame_mbs_only_flag) {
-							m_pFile->BitRead(1); // mb_adaptive_frame_field_flag
-						}
-						m_pFile->BitRead(1); // direct_8x8_inference_flag
-						BYTE crop = (BYTE)m_pFile->BitRead(1); // frame_cropping_flag
-						unsigned int crop_left = 0;
-						unsigned int crop_right = 0;
-						unsigned int crop_top = 0;
-						unsigned int crop_bottom = 0;
-
-						if (crop) {
-							crop_left   = (unsigned int)m_pFile->UExpGolombRead(); // frame_cropping_rect_left_offset
-							crop_right  = (unsigned int)m_pFile->UExpGolombRead(); // frame_cropping_rect_right_offset
-							crop_top    = (unsigned int)m_pFile->UExpGolombRead(); // frame_cropping_rect_top_offset
-							crop_bottom = (unsigned int)m_pFile->UExpGolombRead(); // frame_cropping_rect_bottom_offset
-						}
-						struct sar {
-							WORD num;
-							WORD den;
-						} sar;
-
-						if (m_pFile->BitRead(1)) {						// vui_parameters_present_flag
-							if (m_pFile->BitRead(1)) {					// aspect_ratio_info_present_flag
-								BYTE aspect_ratio_idc = (BYTE)m_pFile->BitRead(8); // aspect_ratio_idc
-								if (255 == aspect_ratio_idc) {
-									sar.num = (WORD)m_pFile->BitRead(16); // sar_width
-									sar.den = (WORD)m_pFile->BitRead(16); // sar_height
-								} else if (aspect_ratio_idc < 17) {
-									sar.num = pixel_aspect[aspect_ratio_idc][0];
-									sar.den = pixel_aspect[aspect_ratio_idc][1];
-								} else {
-									return false;
-								}
-							} else {
-								sar.num = 1;
-								sar.den = 1;
-							}
-						}
-
-						unsigned int mb_Width = (unsigned int)pic_width_in_mbs_minus1 + 1;
-						unsigned int mb_Height = ((unsigned int)pic_height_in_map_units_minus1 + 1) * (2 - frame_mbs_only_flag);
-						BYTE CHROMA444 = (chroma_format_idc == 3);
-
-						unsigned int Width, Height;
-						Width = 16 * mb_Width - (2u>>CHROMA444) * min(crop_right, (8u<<CHROMA444)-1);
-						if (frame_mbs_only_flag) {
-							Height = 16 * mb_Height - (2u>>CHROMA444) * min(crop_bottom, (8u<<CHROMA444)-1);
-						} else {
-							Height = 16 * mb_Height - (4u>>CHROMA444) * min(crop_bottom, (8u<<CHROMA444)-1);
-						}
-						if (!sar.num) sar.num = 1;
-						if (!sar.den) sar.den = 1;
-						CSize aspect(Width * sar.num, Height * sar.den);
-						int lnko = LNKO(aspect.cx, aspect.cy);
-						if (lnko > 1) {
-							aspect.cx /= lnko, aspect.cy /= lnko;
-						}
-
 						vih->hdr.dwPictAspectRatioX = aspect.cx;
 						vih->hdr.dwPictAspectRatioY = aspect.cy;
-						vih->hdr.bmiHeader.biWidth = Width;
-						vih->hdr.bmiHeader.biHeight = Height;
+						vih->hdr.bmiHeader.biWidth = h.width;
+						vih->hdr.bmiHeader.biHeight = h.height;
+
+						vih->dwFlags	= (headerData[4] & 0x03) + 1; // nal length size
+						vih->dwProfile	= h.profile;
+						vih->dwLevel	= h.level;
 
 						BYTE* src = (BYTE*)headerData + 5;
 						BYTE* dst = (BYTE*)vih->dwSequenceHeader;

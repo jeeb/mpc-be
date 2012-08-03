@@ -24,9 +24,7 @@
 #include "stdafx.h"
 #include "BaseSplitterFileEx.h"
 #include <MMReg.h>
-#include "../../../DSUtil/GolombBuffer.h"
 #include "../../../DSUtil/AudioParser.h"
-#include "../../../DSUtil/VideoParser.h"
 #include <InitGuid.h>
 #include <moreuuids.h>
 
@@ -1516,28 +1514,6 @@ bool CBaseSplitterFileEx::Read(pvahdr& h, bool fSync)
 	return true;
 }
 
-int CBaseSplitterFileEx::HrdParameters(CGolombBuffer& gb)
-{
-	UINT64 cnt = gb.UExpGolombRead();	// cpb_cnt_minus1
-	if (cnt > 32U)
-		return -1;
-	gb.BitRead(4);							// bit_rate_scale
-	gb.BitRead(4);							// cpb_size_scale
-
-	for (unsigned int i = 0; i <= cnt; i++ ) {
-		gb.UExpGolombRead();				// bit_rate_value_minus1
-		gb.UExpGolombRead();				// cpb_size_value_minus1
-		gb.BitRead(1);						// cbr_flag
-	}
-
-	gb.BitRead(5);							// initial_cpb_removal_delay_length_minus1
-	gb.BitRead(5);							// cpb_removal_delay_length_minus1
-	gb.BitRead(5);							// dpb_output_delay_length_minus1
-	gb.BitRead(5);							// time_offset_length
-
-	return 0;
-}
-
 void CBaseSplitterFileEx::RemoveMpegEscapeCode(BYTE* dst, BYTE* src, int length)
 {
 	int		si=0;
@@ -1692,10 +1668,9 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt)
 		MPEG2VIDEOINFO* vi = (MPEG2VIDEOINFO*)DNew BYTE[len];
 		memset(vi, 0, len);
 		// vi->hdr.dwBitRate = ;
-		vi->hdr.AvgTimePerFrame = h.AvgTimePerFrame;
-		if (!h.sar.num) h.sar.num = 1;
-		if (!h.sar.den) h.sar.den = 1;
-		CSize aspect(h.width * h.sar.num, h.height * h.sar.den);
+		vi->hdr.AvgTimePerFrame = h.hdr.AvgTimePerFrame;
+		
+		CSize aspect(h.hdr.width * h.hdr.sar.num, h.hdr.height * h.hdr.sar.den);
 		int lnko = LNKO(aspect.cx, aspect.cy);
 		if (lnko > 1) {
 			aspect.cx /= lnko, aspect.cy /= lnko;
@@ -1709,8 +1684,8 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt)
 		vi->hdr.dwPictAspectRatioX = aspect.cx;
 		vi->hdr.dwPictAspectRatioY = aspect.cy;
 		vi->hdr.bmiHeader.biSize = sizeof(vi->hdr.bmiHeader);
-		vi->hdr.bmiHeader.biWidth = h.width;
-		vi->hdr.bmiHeader.biHeight = h.height;
+		vi->hdr.bmiHeader.biWidth = h.hdr.width;
+		vi->hdr.bmiHeader.biHeight = h.hdr.height;
 		if (h.spspps[index_subsetsps].complete && !h.spspps[index_sps].complete) {
 			vi->hdr.bmiHeader.biCompression = 'CVME';
 		} else if (h.spspps[index_subsetsps].complete && h.spspps[index_sps].complete) {
@@ -1718,9 +1693,9 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt)
 		} else {
 			vi->hdr.bmiHeader.biCompression = '1CVA';
 		}
-		vi->dwProfile = h.profile;
+		vi->dwProfile = h.hdr.profile;
 		vi->dwFlags = 4; // ?
-		vi->dwLevel = h.level;
+		vi->dwLevel = h.hdr.level;
 		vi->cbSequenceHeader = extra;
 
 		// Copy extra data
@@ -1755,281 +1730,21 @@ bool CBaseSplitterFileEx::Read(avchdr& h, spsppsindex index)
 	RemoveMpegEscapeCode(buffer, h.spspps[index].buffer, MAX_SPSPPS);
 	CGolombBuffer gb(buffer, MAX_SPSPPS);
 
-	gb.BitRead(8);							// nal_unit_type
-	h.profile = (BYTE)gb.BitRead(8);
-	bool b_ident = false;
-	for (int i = 0; i<sizeof(profiles); i++) {
-		if (h.profile == profiles[i]) {
-			b_ident = true;
-			break;
-		}
-	}
-	if (!b_ident)
+	gb.BitRead(8);	// nal_unit_type
+	if (!ParseAVCHeader(gb, h.hdr, true)) {
 		return false;
-
-	gb.BitRead(8);
-	h.level = (BYTE)gb.BitRead(8);
-	b_ident = false;
-	for (int i = 0; i<sizeof(levels); i++) {
-		if (h.level == levels[i]) {
-			b_ident = true;
-			break;
-		}
-	}
-	if (!b_ident)
-		return false;
-
-	UINT64 sps_id = gb.UExpGolombRead();	// seq_parameter_set_id
-	if (sps_id >= 32)
-		return false;
-
-	UINT64 chroma_format_idc = 0;
-	if (h.profile >= 100) {					// high profile
-		chroma_format_idc = gb.UExpGolombRead();
-		if (chroma_format_idc == 3) {		// chroma_format_idc
-			gb.BitRead(1);					// residue_transform_flag
-		}
-
-		gb.UExpGolombRead();				// bit_depth_luma_minus8
-		gb.UExpGolombRead();				// bit_depth_chroma_minus8
-
-		gb.BitRead(1);						// qpprime_y_zero_transform_bypass_flag
-
-		if (gb.BitRead(1)) {				// seq_scaling_matrix_present_flag
-			for (int i = 0; i < 8; i++) {
-				if (gb.BitRead(1)) {		// seq_scaling_list_present_flag
-					for (int j = 0, size = i < 6 ? 16 : 64, next = 8; j < size && next != 0; ++j) {
-						next = (next + gb.SExpGolombRead() + 256) & 255;
-					}
-				}
-			}
-		}
-	}
-
-	gb.UExpGolombRead();					// log2_max_frame_num_minus4
-
-	UINT64 pic_order_cnt_type = gb.UExpGolombRead();
-
-	if (pic_order_cnt_type == 0) {
-		gb.UExpGolombRead();				// log2_max_pic_order_cnt_lsb_minus4
-	} else if (pic_order_cnt_type == 1) {
-		gb.BitRead(1);						// delta_pic_order_always_zero_flag
-		gb.SExpGolombRead();				// offset_for_non_ref_pic
-		gb.SExpGolombRead();				// offset_for_top_to_bottom_field
-		UINT64 num_ref_frames_in_pic_order_cnt_cycle = gb.UExpGolombRead();
-		if (num_ref_frames_in_pic_order_cnt_cycle >= 256)
-			return false;
-		for (int i = 0; i < num_ref_frames_in_pic_order_cnt_cycle; i++) {
-			gb.SExpGolombRead();			// offset_for_ref_frame[i]
-		}
-	} else if (pic_order_cnt_type != 2) {
-		return false;
-	}
-
-	UINT64 ref_frame_count = gb.UExpGolombRead();	// num_ref_frames
-	if (ref_frame_count > 30)
-		return false;
-	gb.BitRead(1);									// gaps_in_frame_num_value_allowed_flag
-
-	UINT64 pic_width_in_mbs_minus1 = gb.UExpGolombRead();
-	UINT64 pic_height_in_map_units_minus1 = gb.UExpGolombRead();
-	BYTE frame_mbs_only_flag = (BYTE)gb.BitRead(1);
-
-	if (!frame_mbs_only_flag) {
-		gb.BitRead(1);								// mb_adaptive_frame_field_flag
-	}
-
-	BYTE direct_8x8_inference_flag = (BYTE)gb.BitRead(1); // direct_8x8_inference_flag
-	if (!frame_mbs_only_flag && !direct_8x8_inference_flag) {
-		return false;
-	}
-
-	if (gb.BitRead(1)) {									// frame_cropping_flag
-		h.crop_left   = (unsigned int)gb.UExpGolombRead();	// frame_cropping_rect_left_offset
-		h.crop_right  = (unsigned int)gb.UExpGolombRead();	// frame_cropping_rect_right_offset
-		h.crop_top    = (unsigned int)gb.UExpGolombRead();	// frame_cropping_rect_top_offset
-		h.crop_bottom = (unsigned int)gb.UExpGolombRead();	// frame_cropping_rect_bottom_offset
-	}
-
-	if (gb.BitRead(1)) {							// vui_parameters_present_flag
-		if (gb.BitRead(1)) {						// aspect_ratio_info_present_flag
-			BYTE aspect_ratio_idc = (BYTE)gb.BitRead(8); // aspect_ratio_idc
-			if (255 == aspect_ratio_idc) {
-				h.sar.num = (WORD)gb.BitRead(16);	// sar_width
-				h.sar.den = (WORD)gb.BitRead(16);	// sar_height
-			} else if (aspect_ratio_idc < 17) {
-				h.sar.num = pixel_aspect[aspect_ratio_idc][0];
-				h.sar.den = pixel_aspect[aspect_ratio_idc][1];
-			} else {
-				return false;
-			}
-		} else {
-			h.sar.num = 1;
-			h.sar.den = 1;
-		}
-
-		if (gb.BitRead(1)) {				// overscan_info_present_flag
-			gb.BitRead(1);					// overscan_appropriate_flag
-		}
-
-		if (gb.BitRead(1)) {				// video_signal_type_present_flag
-			gb.BitRead(3);					// video_format
-			gb.BitRead(1);					// video_full_range_flag
-			if (gb.BitRead(1)) {			// colour_description_present_flag
-				gb.BitRead(8);				// colour_primaries
-				gb.BitRead(8);				// transfer_characteristics
-				gb.BitRead(8);				// matrix_coefficients
-			}
-		}
-		if (gb.BitRead(1)) {				// chroma_location_info_present_flag
-			gb.UExpGolombRead();			// chroma_sample_loc_type_top_field
-			gb.UExpGolombRead();			// chroma_sample_loc_type_bottom_field
-		}
-		if (gb.BitRead(1)) {				// timing_info_present_flag
-			__int64 num_units_in_tick	= gb.BitRead(32);
-			__int64 time_scale			= gb.BitRead(32);
-			/*long fixed_frame_rate_flag	= */gb.BitRead(1);
-
-			// Trick for weird parameters
-			if ((num_units_in_tick < 1000) || (num_units_in_tick > 1001)) {
-				if ((time_scale % num_units_in_tick != 0) && ((time_scale*1001) % num_units_in_tick == 0)) {
-					time_scale			= (time_scale * 1001) / num_units_in_tick;
-					num_units_in_tick	= 1001;
-				} else {
-					time_scale			= (time_scale * 1000) / num_units_in_tick;
-					num_units_in_tick	= 1000;
-				}
-			}
-			time_scale = time_scale / 2;	// VUI consider fields even for progressive stream : divide by 2!
-
-			if (time_scale) {
-				h.AvgTimePerFrame = (10000000I64*num_units_in_tick)/time_scale;
-			}
-		}
-
-		bool nalflag = !!gb.BitRead(1);		// nal_hrd_parameters_present_flag
-		if (nalflag) {
-			if (HrdParameters(gb)<0)
-				return false;
-		}
-		bool vlcflag = !!gb.BitRead(1);		// vlc_hrd_parameters_present_flag
-		if (vlcflag) {
-			if (HrdParameters(gb)<0)
-				return false;
-		}
-		if (nalflag || vlcflag) {
-			gb.BitRead(1);					// low_delay_hrd_flag
-		}
-
-		gb.BitRead(1);						// pic_struct_present_flag
-		if (gb.BitRead(1)) {				// bitstream_restriction_flag
-			gb.BitRead(1);					// motion_vectors_over_pic_boundaries_flag
-			gb.UExpGolombRead();			// max_bytes_per_pic_denom
-			gb.UExpGolombRead();			// max_bits_per_mb_denom
-			gb.UExpGolombRead();			// log2_max_mv_length_horizontal
-			gb.UExpGolombRead();			// log2_max_mv_length_vertical
-			UINT64 num_reorder_frames = gb.UExpGolombRead(); // num_reorder_frames
-			gb.UExpGolombRead();			// max_dec_frame_buffering
-
-			if (gb.GetSize() < gb.GetPos()) {
-				num_reorder_frames = 0;
-			}
-			if (num_reorder_frames > 16U)
-				return false;
-		}
 	}
 
 	if (index == index_subsetsps) {
-		if (h.profile == 83 || h.profile == 86) {
+		if (h.hdr.profile == 83 || h.hdr.profile == 86) {
 			// TODO: SVC extensions
 			return false;
-		} else if (h.profile == 118 || h.profile == 128) {
-			gb.BitRead(1);					 // bit_equal_to_one
+		} else if (h.hdr.profile == 118 || h.hdr.profile == 128) {
+			gb.BitRead(1); // bit_equal_to_one
 
 			// seq_parameter_set_mvc_extension
 			h.views = (unsigned int) gb.UExpGolombRead()+1;
-
-			/*
-			for (unsigned int i = 0; i < h.views; i++) {
-				gb.UExpGolombRead();		// view_id
-			}
-
-			for (unsigned int i = 1; i < h.views; i++) {
-				for (int j = 0; j < gb.UExpGolombRead(); j++) {				// num_anchor_refs_l0
-					gb.UExpGolombRead();									// anchor_refs_l0
-				}
-				for (int j = 0; j < gb.UExpGolombRead(); j++) {				// num_anchor_refs_l1
-					gb.UExpGolombRead();									// anchor_refs_l1
-				}
-			}
-
-			for (unsigned int i = 1; i < h.views; i++) {
-				for (int j = 0; j < gb.UExpGolombRead(); j++) {				// num_non_anchor_refs_l0
-					gb.UExpGolombRead();									// non_anchor_refs_l0
-				}
-				for (int j = 0; j < gb.UExpGolombRead(); j++) {				// num_non_anchor_refs_l1
-					gb.UExpGolombRead();									// non_anchor_refs_l1
-				}
-			}
-
-			for (unsigned int i = 0; i <= gb.UExpGolombRead(); i++) {		// num_level_values_signalled_minus1
-				gb.BitRead(8);												// level_idc
-				for (int j = 0; j <= gb.UExpGolombRead(); j++) {			// num_applicable_ops_minus1
-					gb.BitRead(3);											// applicable_op_temporal_id
-					for (int k = 0; k <= gb.UExpGolombRead(); k++) {		// applicable_op_num_target_views_minus1
-						gb.UExpGolombRead();								// applicable_op_traget_view_id
-					}
-					gb.UExpGolombRead();									// applicable_op_num_views_minus1
-				}
-			}
-
-			if (gb.BitRead(1)) {												// mvc_vui_parameters_present_flag
-				// mvc_vui_parameters_extension
-				for (unsigned int i = 0; i <= gb.UExpGolombRead(); i++) {		// vui_mvc_num_ops_minus1
-					gb.BitRead(3);
-					for (unsigned int j = 0; j <= gb.UExpGolombRead(); j++) {	// vui_mvc_num_target_output_views_minus1
-						gb.UExpGolombRead();									// vui_mvc_view_id
-					}
-					if (gb.BitRead(1)) {										// vui_mvc_timing_info_present_flag
-						gb.BitRead(32);											// vui_mvc_num_units_in_tick
-						gb.BitRead(32);											// vui_mvc_time_scale
-						gb.BitRead(1);											// vui_mvc_fixed_frame_rate_flag
-					}
-					bool nalflag = gb.BitRead(1);								// vui_mvc_nal_hrd_parameters_present_flag
-					if (nalflag) {
-						HrdParameters(gb);
-					}
-					bool vclflag = gb.BitRead(1);								// vui_mvc_vcl_hrd_parameters_present_flag
-					if (vclflag) {
-						HrdParameters(gb);
-					}
-					if (nalflag || vclflag) {
-						gb.BitRead(1);											// vui_mvc_low_delay_hrd_flag
-					}
-					gb.BitRead(1);												// vui_mvc_pic_struct_present_flag
-				}
-			}
-			*/
 		}
-	}
-
-	unsigned int mb_Width = (unsigned int)pic_width_in_mbs_minus1 + 1;
-	unsigned int mb_Height = ((unsigned int)pic_height_in_map_units_minus1 + 1) * (2 - frame_mbs_only_flag);
-	BYTE CHROMA444 = (chroma_format_idc == 3);
-
-	h.width = 16 * mb_Width - (2u>>CHROMA444) * min(h.crop_right, (8u<<CHROMA444)-1);
-	if (frame_mbs_only_flag) {
-		h.height = 16 * mb_Height - (2u>>CHROMA444) * min(h.crop_bottom, (8u<<CHROMA444)-1);
-	} else {
-		h.height = 16 * mb_Height - (4u>>CHROMA444) * min(h.crop_bottom, (8u<<CHROMA444)-1);
-	}
-
-	if (h.height<100 || h.width<100) {
-		return false;
-	}
-
-	if (h.height == 1088) {
-		h.height = 1080;	// Prevent blur lines
 	}
 
 	return true;
