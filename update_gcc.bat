@@ -1,5 +1,5 @@
 @ECHO OFF
-REM Id: $
+REM $Id$
 SETLOCAL
 
 FOR /f "tokens=1,2 delims=" %%K IN (
