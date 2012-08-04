@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: PreView.cpp 807 2012-08-03 02:32:56Z Aleksoid $
  *
  * Copyright (C) 2012 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
  *
@@ -23,11 +23,11 @@
 
 #include "stdafx.h"
 #include "mplayerc.h"
-#include "PreView.h"
+#include "PlayerPreView.h"
 #include "PngImage.h"
 #include "MainFrm.h"
 
-/////////////////////////////////////////////////////////////////////////////
+
 // CPrevView
 
 CPreView::CPreView() : tooltipstr(_T(""))
@@ -41,7 +41,9 @@ CPreView::~CPreView()
 BOOL CPreView::SetWindowText(LPCWSTR lpString)
 {
 	tooltipstr = lpString;
+
 	Invalidate();
+
 	return ::SetWindowText(m_hWnd, lpString);
 }
 
@@ -56,9 +58,10 @@ void CPreView::GetVideoRect(LPRECT lpRect)
 		r.right		-= 5;
 		r.bottom	-= 5;
 	}
+
 	m_view.MoveWindow(r);
 
-	m_view.GetClientRect(lpRect);	
+	m_view.GetClientRect(lpRect);
 }
 
 HWND CPreView::GetVideoHWND()
@@ -73,7 +76,6 @@ BEGIN_MESSAGE_MAP(CPreView, CWnd)
 	ON_WM_PAINT()
 END_MESSAGE_MAP()
 
-/////////////////////////////////////////////////////////////////////////////
 // CPreView message handlers
 
 BOOL CPreView::PreCreateWindow(CREATESTRUCT& cs)
@@ -81,6 +83,7 @@ BOOL CPreView::PreCreateWindow(CREATESTRUCT& cs)
 	if (!CWnd::PreCreateWindow(cs)) {
 		return FALSE;
 	}
+
 	cs.style &= ~WS_BORDER;
 
 	return TRUE;
@@ -104,10 +107,12 @@ int CPreView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CPreView::OnPaint()
 {
-	CPaintDC dc(this); // device context for painting
+	CPaintDC dc(this);
 
 	AppSettings& s = AfxGetAppSettings();
+
 	if (s.fDisableXPToolbars) {
+
 		CDC memdc;
 		CBitmap m_bmPaint;
 		CRect r,rf,rc;
@@ -118,7 +123,7 @@ void CPreView::OnPaint()
 		memdc.SetBkMode(TRANSPARENT);
 
 		GRADIENT_RECT gr[1] = {{0, 1}};
-				int pa = 255 * 256;
+		int pa = 255 * 256;
 
 		CRect rtTop, rtLeft, rtRight, rtBottom;
 		rtTop = rtLeft = rtRight = rtBottom = r;
@@ -126,10 +131,11 @@ void CPreView::OnPaint()
 		rtTop.bottom = rtTop.top + 20;
 		ThemeRGB(125, 130, 135, R, G, B);
 		ThemeRGB(95, 100, 105, R2, G2, B2);
+
 		TRIVERTEX tv[2] = {
-					{rtTop.left, rtTop.top, R*256, G*256, B*256, pa},
-					{rtTop.right, rtTop.bottom, R2*256, G2*256, B2*256, pa},
-				};
+			{rtTop.left, rtTop.top, R*256, G*256, B*256, pa},
+			{rtTop.right, rtTop.bottom, R2*256, G2*256, B2*256, pa},
+		};
 		memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 
 		ThemeRGB(165, 170, 175, R, G, B);
@@ -138,47 +144,48 @@ void CPreView::OnPaint()
 		memdc.MoveTo(rtTop.left, rtTop.top);
 		memdc.LineTo(rtTop.right, rtTop.top);
 
-
-
 		rtLeft.right = rtLeft.left + 5;
 		rtLeft.top = rtLeft.top + 19;
 		ThemeRGB(95, 100, 105, R, G, B);
 		ThemeRGB(35, 40, 45, R2, G2, B2);
+
 		TRIVERTEX tv2[2] = {
-					{rtLeft.left, rtLeft.top, R*256, G*256, B*256, pa},
-					{rtLeft.right, rtLeft.bottom, R2*256, G2*256, B2*256, pa},
-				};
+			{rtLeft.left, rtLeft.top, R*256, G*256, B*256, pa},
+			{rtLeft.right, rtLeft.bottom, R2*256, G2*256, B2*256, pa},
+		};
 		memdc.GradientFill(tv2, 2, gr, 1, GRADIENT_FILL_RECT_V);
+
 		ThemeRGB(105, 110, 115, R, G, B);
 		CPen penPlayed4(PS_SOLID,0,RGB(R,G,B));
 		memdc.SelectObject(&penPlayed4);
 		memdc.MoveTo(rtLeft.left, rtTop.top);
 		memdc.LineTo(rtLeft.left, r.bottom);
 
-
 		rtRight.left = rtRight.right - 5;
 		rtRight.top = rtRight.top + 19;
 		ThemeRGB(95, 100, 105, R, G, B);
 		ThemeRGB(35, 40, 45, R2, G2, B2);
+
 		TRIVERTEX tv3[2] = {
-					{rtRight.left, rtRight.top, R*256, G*256, B*256, pa},
-					{rtRight.right, rtRight.bottom, R2*256, G2*256, B2*256, pa},
-				};
+			{rtRight.left, rtRight.top, R*256, G*256, B*256, pa},
+			{rtRight.right, rtRight.bottom, R2*256, G2*256, B2*256, pa},
+		};
 		memdc.GradientFill(tv3, 2, gr, 1, GRADIENT_FILL_RECT_V);
 		
 		memdc.SelectObject(&penPlayed4);
 		memdc.MoveTo(rtRight.left, rtRight.top+1);
 		memdc.LineTo(rtRight.left, rtRight.bottom);
 
-
 		rtBottom.top = rtBottom.bottom - 5;
 		ThemeRGB(35, 40, 45, R, G, B);
 		ThemeRGB(15, 20, 25, R2, G2, B2);
+
 		TRIVERTEX tv4[2] = {
-					{rtBottom.left, rtBottom.top, R*256, G*256, B*256, pa},
-					{rtBottom.right, rtBottom.bottom, R2*256, G2*256, B2*256, pa},
-				};
+			{rtBottom.left, rtBottom.top, R*256, G*256, B*256, pa},
+			{rtBottom.right, rtBottom.bottom, R2*256, G2*256, B2*256, pa},
+		};
 		memdc.GradientFill(tv4, 2, gr, 1, GRADIENT_FILL_RECT_V);
+
 		ThemeRGB(65, 70, 75, R, G, B);
 		CPen penPlayed3(PS_SOLID,0,RGB(R,G,B));
 		memdc.SelectObject(&penPlayed3);
@@ -187,7 +194,6 @@ void CPreView::OnPaint()
 		memdc.SelectObject(&penPlayed4);
 		memdc.MoveTo(rtBottom.left, rtBottom.top);
 		memdc.LineTo(rtBottom.left, rtBottom.bottom-1);
-
 
 		CFont font2;
 		ThemeRGB(255, 255, 255, R, G, B);

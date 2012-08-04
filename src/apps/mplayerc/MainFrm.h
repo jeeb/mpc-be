@@ -26,7 +26,7 @@
 #include <atlbase.h>
 
 #include "ChildView.h"
-#include "PreView.h"
+#include "PlayerPreView.h"
 #include "PlayerSeekBar.h"
 #include "PlayerToolBar.h"
 #include "PlayerInfoBar.h"

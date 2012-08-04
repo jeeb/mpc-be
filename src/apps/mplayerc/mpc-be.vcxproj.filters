@@ -366,7 +366,7 @@
     <ClCompile Include="SaveTaskDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PreView.cpp">
+    <ClCompile Include="PlayerPreView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -731,7 +731,7 @@
     <ClInclude Include="SaveTaskDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PreView.h">
+    <ClInclude Include="PlayerPreView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

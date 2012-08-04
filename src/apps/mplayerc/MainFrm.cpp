@@ -17408,7 +17408,7 @@ CString CMainFrame::FillMessage()
 
 bool CMainFrame::CanPreviewUse()
 {
-	return (!m_fAudioOnly && b_UseSmartSeek && m_wndView2 && (GetPlaybackMode() == PM_DVD || GetPlaybackMode() == PM_FILE));
+	return (!m_fAudioOnly && AfxGetAppSettings().fSmartSeek && m_wndView2 && (GetPlaybackMode() == PM_DVD || GetPlaybackMode() == PM_FILE)) ? 1 : 0;
 }
 
 void CMainFrame::CreateChapterTimeArray()

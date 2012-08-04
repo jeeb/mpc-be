@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: PreView.h 807 2012-08-03 02:32:56Z Aleksoid $
  *
  * Copyright (C) 2012 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
  *
@@ -28,7 +28,6 @@ class CPreView : public CWnd
 public:
 	CPreView();
 	virtual ~CPreView();
-
 
 	DECLARE_DYNAMIC(CPreView)
 
