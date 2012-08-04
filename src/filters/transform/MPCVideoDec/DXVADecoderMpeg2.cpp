@@ -23,7 +23,6 @@
 #include "stdafx.h"
 #include "DXVADecoderMpeg2.h"
 #include "MPCVideoDecFilter.h"
-
 #include "FfmpegContext.h"
 
 #if 0

@@ -21,10 +21,8 @@
  */
 
 #include "stdafx.h"
-
-#include <ffmpeg/PODtypes.h>
+#include "../../../DSUtil/PODtypes.h"
 #include <ffmpeg/libavcodec/avcodec.h>
-
 #include "TlibavcodecExt.h"
 
 void TlibavcodecExt::ConnectTo(AVCodecContext *pAVCtx)

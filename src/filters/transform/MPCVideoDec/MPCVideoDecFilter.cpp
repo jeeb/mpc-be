@@ -24,8 +24,7 @@
 #include <math.h>
 #include <atlbase.h>
 #include <MMReg.h>
-
-#include <ffmpeg/PODtypes.h>
+#include "../../../DSUtil/PODtypes.h"
 #include <ffmpeg/libavcodec/avcodec.h>
 
 #ifdef REGISTER_FILTER

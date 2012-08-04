@@ -28,7 +28,6 @@
 #include "DXVADecoderMpeg2.h"
 #include "MPCVideoDecFilter.h"
 #include "VideoDecDXVAAllocator.h"
-
 #include "FfmpegContext.h"
 
 #define MAX_RETRY_ON_PENDING		50

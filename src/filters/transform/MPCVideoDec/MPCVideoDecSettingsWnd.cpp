@@ -23,8 +23,7 @@
 #include "stdafx.h"
 #include "MPCVideoDecSettingsWnd.h"
 #include "../../../DSUtil/DSUtil.h"
-
-#include <ffmpeg/PODtypes.h>
+#include "../../../DSUtil/PODtypes.h"
 #include <ffmpeg/libavcodec/avcodec.h>
 #include "ffImgfmt.h"
 

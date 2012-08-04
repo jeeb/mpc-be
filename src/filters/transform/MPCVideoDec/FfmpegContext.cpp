@@ -27,7 +27,6 @@
 #include <vfwmsgs.h>
 #include <sys/timeb.h>
 #include <time.h> // for the _time64 workaround
-
 #include "FfmpegContext.h"
 
 extern BOOL IsWinVistaOrLater(); // requires linking with DSUtils which is always the case

@@ -18,7 +18,7 @@
  */
 
 #include "stdafx.h"
-#include <ffmpeg/PODtypes.h>
+#include "../../../DSUtil/PODtypes.h"
 #include <ffmpeg/libavcodec/avcodec.h>
 #include "H264RandomAccess.h"
 

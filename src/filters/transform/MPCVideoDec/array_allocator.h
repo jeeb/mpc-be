@@ -24,7 +24,7 @@
 #ifndef _ARRAY_ALLOCATOR_H_
 #define _ARRAY_ALLOCATOR_H_
 
-#include <ffmpeg/PODtypes.h>
+#include "../../../DSUtil/PODtypes.h"
 
 template <class T,size_t size> class array_allocator
 {

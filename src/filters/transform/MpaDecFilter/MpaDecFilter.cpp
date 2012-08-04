@@ -27,7 +27,6 @@
 #include <MMReg.h>
 #include <sys/timeb.h>
 #include "MpaDecFilter.h"
-
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioParser.h"
 
@@ -37,7 +36,7 @@
 #include <moreuuids.h>
 
 #include <vector>
-#include <ffmpeg/PODtypes.h>
+#include "../../../DSUtil/PODtypes.h"
 #include <ffmpeg/libavcodec/avcodec.h>
 
 void *__imp_toupper	= toupper;
