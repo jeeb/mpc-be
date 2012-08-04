@@ -1,8 +1,9 @@
 @ECHO OFF
+REM Id: $
 SETLOCAL
 
 FOR /f "tokens=1,2 delims=" %%K IN (
-  'gcc -dumpversion'
+  '%MINGW32%\bin\gcc -dumpversion'
 ) DO (
   SET "gccver=%%K" & Call :SubGCCVer %%gccver:*Z=%%
 )
@@ -18,4 +19,5 @@ EXIT /B
 
 :SubGCCVer
 SET gccver=%*
+@ECHO gccver=%*
 EXIT /B
