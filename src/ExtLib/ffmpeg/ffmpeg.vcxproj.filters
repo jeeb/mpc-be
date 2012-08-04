@@ -157,7 +157,6 @@
     <ClInclude Include="libswscale\version.h">
       <Filter>libswscale</Filter>
     </ClInclude>
-    <ClInclude Include="PODtypes.h" />
     <ClInclude Include="libavcodec\x86\cabac.h">
       <Filter>libavcodec\x86</Filter>
     </ClInclude>

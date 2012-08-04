@@ -323,7 +323,6 @@
     <ClInclude Include="libswscale\swscale.h" />
     <ClInclude Include="libswscale\swscale_internal.h" />
     <ClInclude Include="libswscale\version.h" />
-    <ClInclude Include="PODtypes.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="libavcodec\aacadtsdec.c" />
