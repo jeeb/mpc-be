@@ -19,9 +19,24 @@
     <Filter Include="libavcodec\x86">
       <UniqueIdentifier>{927d8398-e10f-483b-8cb6-9698fad28e24}</UniqueIdentifier>
     </Filter>
+    <Filter Include="libavresample">
+      <UniqueIdentifier>{616c530e-ecc8-4edb-86d1-35c6421cc973}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libavresample\x86">
+      <UniqueIdentifier>{fd07c506-80d3-453f-8f7e-5b51f6a6b951}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="config.asm" />
+    <None Include="libswscale\x86\input.asm">
+      <Filter>libswscale\x86</Filter>
+    </None>
+    <None Include="libswscale\x86\output.asm">
+      <Filter>libswscale\x86</Filter>
+    </None>
+    <None Include="libswscale\x86\scale.asm">
+      <Filter>libswscale\x86</Filter>
+    </None>
     <None Include="libavcodec\x86\ac3dsp.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
@@ -118,18 +133,31 @@
     <None Include="libavutil\x86\x86util.asm">
       <Filter>libavutil\x86</Filter>
     </None>
-    <None Include="libswscale\x86\input.asm">
-      <Filter>libswscale\x86</Filter>
+    <None Include="libavresample\x86\audio_convert.asm">
+      <Filter>libavresample\x86</Filter>
     </None>
-    <None Include="libswscale\x86\output.asm">
-      <Filter>libswscale\x86</Filter>
+    <None Include="libavresample\x86\audio_mix.asm">
+      <Filter>libavresample\x86</Filter>
     </None>
-    <None Include="libswscale\x86\scale.asm">
-      <Filter>libswscale\x86</Filter>
+    <None Include="libavresample\x86\util.asm">
+      <Filter>libavresample\x86</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
+    <ClInclude Include="libswscale\rgb2rgb.h">
+      <Filter>libswscale</Filter>
+    </ClInclude>
+    <ClInclude Include="libswscale\swscale.h">
+      <Filter>libswscale</Filter>
+    </ClInclude>
+    <ClInclude Include="libswscale\swscale_internal.h">
+      <Filter>libswscale</Filter>
+    </ClInclude>
+    <ClInclude Include="libswscale\version.h">
+      <Filter>libswscale</Filter>
+    </ClInclude>
+    <ClInclude Include="PODtypes.h" />
     <ClInclude Include="libavcodec\x86\cabac.h">
       <Filter>libavcodec\x86</Filter>
     </ClInclude>
@@ -751,6 +779,9 @@
     <ClInclude Include="libavutil\attributes.h">
       <Filter>libavutil</Filter>
     </ClInclude>
+    <ClInclude Include="libavutil\audio_fifo.h">
+      <Filter>libavutil</Filter>
+    </ClInclude>
     <ClInclude Include="libavutil\audioconvert.h">
       <Filter>libavutil</Filter>
     </ClInclude>
@@ -880,21 +911,74 @@
     <ClInclude Include="libavutil\x86_cpu.h">
       <Filter>libavutil</Filter>
     </ClInclude>
-    <ClInclude Include="libswscale\rgb2rgb.h">
-      <Filter>libswscale</Filter>
+    <ClInclude Include="libavresample\audio_convert.h">
+      <Filter>libavresample</Filter>
     </ClInclude>
-    <ClInclude Include="libswscale\swscale.h">
-      <Filter>libswscale</Filter>
+    <ClInclude Include="libavresample\audio_data.h">
+      <Filter>libavresample</Filter>
     </ClInclude>
-    <ClInclude Include="libswscale\swscale_internal.h">
-      <Filter>libswscale</Filter>
+    <ClInclude Include="libavresample\audio_mix.h">
+      <Filter>libavresample</Filter>
     </ClInclude>
-    <ClInclude Include="libswscale\version.h">
-      <Filter>libswscale</Filter>
+    <ClInclude Include="libavresample\avresample.h">
+      <Filter>libavresample</Filter>
     </ClInclude>
-    <ClInclude Include="PODtypes.h" />
+    <ClInclude Include="libavresample\internal.h">
+      <Filter>libavresample</Filter>
+    </ClInclude>
+    <ClInclude Include="libavresample\resample.h">
+      <Filter>libavresample</Filter>
+    </ClInclude>
+    <ClInclude Include="libavresample\version.h">
+      <Filter>libavresample</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="libswscale\x86\rgb2rgb.c">
+      <Filter>libswscale\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="libswscale\x86\rgb2rgb_template.c">
+      <Filter>libswscale\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="libswscale\x86\swscale.c">
+      <Filter>libswscale\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="libswscale\x86\swscale_template.c">
+      <Filter>libswscale\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="libswscale\x86\yuv2rgb.c">
+      <Filter>libswscale\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="libswscale\x86\yuv2rgb_template.c">
+      <Filter>libswscale\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="libswscale\input.c">
+      <Filter>libswscale</Filter>
+    </ClCompile>
+    <ClCompile Include="libswscale\options.c">
+      <Filter>libswscale</Filter>
+    </ClCompile>
+    <ClCompile Include="libswscale\output.c">
+      <Filter>libswscale</Filter>
+    </ClCompile>
+    <ClCompile Include="libswscale\rgb2rgb.c">
+      <Filter>libswscale</Filter>
+    </ClCompile>
+    <ClCompile Include="libswscale\rgb2rgb_template.c">
+      <Filter>libswscale</Filter>
+    </ClCompile>
+    <ClCompile Include="libswscale\swscale.c">
+      <Filter>libswscale</Filter>
+    </ClCompile>
+    <ClCompile Include="libswscale\swscale_unscaled.c">
+      <Filter>libswscale</Filter>
+    </ClCompile>
+    <ClCompile Include="libswscale\utils.c">
+      <Filter>libswscale</Filter>
+    </ClCompile>
+    <ClCompile Include="libswscale\yuv2rgb.c">
+      <Filter>libswscale</Filter>
+    </ClCompile>
     <ClCompile Include="libavcodec\x86\ac3dsp_mmx.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
@@ -920,12 +1004,6 @@
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\fft.c">
-      <Filter>libavcodec\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="libavcodec\x86\fft_3dn.c">
-      <Filter>libavcodec\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="libavcodec\x86\fft_3dn2.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\fmtconvert_mmx.c">
@@ -1678,6 +1756,9 @@
     <ClCompile Include="libavutil\x86\float_dsp_init.c">
       <Filter>libavutil\x86</Filter>
     </ClCompile>
+    <ClCompile Include="libavutil\audio_fifo.c">
+      <Filter>libavutil</Filter>
+    </ClCompile>
     <ClCompile Include="libavutil\audioconvert.c">
       <Filter>libavutil</Filter>
     </ClCompile>
@@ -1762,50 +1843,35 @@
     <ClCompile Include="libavutil\utils.c">
       <Filter>libavutil</Filter>
     </ClCompile>
-    <ClCompile Include="libswscale\x86\rgb2rgb.c">
-      <Filter>libswscale\x86</Filter>
+    <ClCompile Include="libavresample\x86\audio_convert_init.c">
+      <Filter>libavresample\x86</Filter>
     </ClCompile>
-    <ClCompile Include="libswscale\x86\rgb2rgb_template.c">
-      <Filter>libswscale\x86</Filter>
+    <ClCompile Include="libavresample\x86\audio_mix_init.c">
+      <Filter>libavresample\x86</Filter>
     </ClCompile>
-    <ClCompile Include="libswscale\x86\swscale.c">
-      <Filter>libswscale\x86</Filter>
+    <ClCompile Include="libavresample\audio_convert.c">
+      <Filter>libavresample</Filter>
     </ClCompile>
-    <ClCompile Include="libswscale\x86\swscale_template.c">
-      <Filter>libswscale\x86</Filter>
+    <ClCompile Include="libavresample\audio_data.c">
+      <Filter>libavresample</Filter>
     </ClCompile>
-    <ClCompile Include="libswscale\x86\yuv2rgb.c">
-      <Filter>libswscale\x86</Filter>
+    <ClCompile Include="libavresample\audio_mix.c">
+      <Filter>libavresample</Filter>
     </ClCompile>
-    <ClCompile Include="libswscale\x86\yuv2rgb_template.c">
-      <Filter>libswscale\x86</Filter>
+    <ClCompile Include="libavresample\audio_mix_matrix.c">
+      <Filter>libavresample</Filter>
     </ClCompile>
-    <ClCompile Include="libswscale\input.c">
-      <Filter>libswscale</Filter>
+    <ClCompile Include="libavresample\options.c">
+      <Filter>libavresample</Filter>
     </ClCompile>
-    <ClCompile Include="libswscale\options.c">
-      <Filter>libswscale</Filter>
+    <ClCompile Include="libavresample\resample.c">
+      <Filter>libavresample</Filter>
     </ClCompile>
-    <ClCompile Include="libswscale\output.c">
-      <Filter>libswscale</Filter>
+    <ClCompile Include="libavresample\resample_template.c">
+      <Filter>libavresample</Filter>
     </ClCompile>
-    <ClCompile Include="libswscale\rgb2rgb.c">
-      <Filter>libswscale</Filter>
-    </ClCompile>
-    <ClCompile Include="libswscale\rgb2rgb_template.c">
-      <Filter>libswscale</Filter>
-    </ClCompile>
-    <ClCompile Include="libswscale\swscale.c">
-      <Filter>libswscale</Filter>
-    </ClCompile>
-    <ClCompile Include="libswscale\swscale_unscaled.c">
-      <Filter>libswscale</Filter>
-    </ClCompile>
-    <ClCompile Include="libswscale\utils.c">
-      <Filter>libswscale</Filter>
-    </ClCompile>
-    <ClCompile Include="libswscale\yuv2rgb.c">
-      <Filter>libswscale</Filter>
+    <ClCompile Include="libavresample\utils.c">
+      <Filter>libavresample</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -53,6 +53,8 @@ endif
 OBJ_DIRS = $(OBJ_DIR) \
     $(OBJ_DIR)libavcodec \
     $(OBJ_DIR)libavcodec/x86 \
+    $(OBJ_DIR)libavresample \
+    $(OBJ_DIR)libavresample/x86 \
     $(OBJ_DIR)libavutil \
     $(OBJ_DIR)libavutil/x86 \
     $(OBJ_DIR)libswscale \
@@ -313,7 +315,18 @@ SRCS_C=\
     libavcodec/x86/vp56dsp_init.c \
     libavcodec/x86/vp8dsp-init.c \
 \
+    libavresample/audio_convert.c \
+    libavresample/audio_data.c \
+    libavresample/audio_mix.c \
+    libavresample/audio_mix_matrix.c \
+    libavresample/options.c \
+    libavresample/resample.c \
+    libavresample/utils.c \
+    libavresample/x86/audio_convert_init.c \
+    libavresample/x86/audio_mix_init.c \
+\
     libavutil/audioconvert.c \
+    libavutil/audio_fifo.c \
     libavutil/avstring.c \
     libavutil/bprint.c \
     libavutil/cpu.c \
@@ -388,6 +401,8 @@ SRCS_YASM=\
     libavcodec/x86/vp3dsp.asm \
     libavcodec/x86/vp56dsp.asm \
     libavcodec/x86/vp8dsp.asm \
+    libavresample/x86/audio_convert.asm \
+    libavresample/x86/audio_mix.asm \
     libavutil/x86/float_dsp.asm \
     libswscale/x86/input.asm \
     libswscale/x86/output.asm \
