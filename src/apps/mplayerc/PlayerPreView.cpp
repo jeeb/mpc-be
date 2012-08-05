@@ -41,26 +41,20 @@ CPreView::~CPreView()
 BOOL CPreView::SetWindowText(LPCWSTR lpString)
 {
 	tooltipstr = lpString;
+	CRect r;
+	GetClientRect(r);
+	CRect rt = r;
+	rt.bottom = hc; 
+	rt.left += 10;
+	rt.right -= 10;
 
-	Invalidate();
+	InvalidateRect(rt);
 
 	return ::SetWindowText(m_hWnd, lpString);
 }
 
 void CPreView::GetVideoRect(LPRECT lpRect)
 {
-	CRect r;
-	GetClientRect(&r);
-
-	if (AfxGetAppSettings().fDisableXPToolbars) {
-		r.left		= 5;
-		r.top		= 20;
-		r.right		-= 5;
-		r.bottom	-= 5;
-	}
-
-	m_view.MoveWindow(r);
-
 	m_view.GetClientRect(lpRect);
 }
 
@@ -95,10 +89,17 @@ int CPreView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 	}
 
-	CRect r;
-	GetClientRect(r);
+	wb = 5;
+	hc = 20;
+	CRect rc;
+	GetClientRect(rc);
+	v_rect = rc;
+	v_rect.left		= (wb+1);
+	v_rect.top		= (hc+1);
+	v_rect.right	-= (wb+1);
+	v_rect.bottom	-= (wb+1);
 
-	if (!m_view.Create(_T(""), WS_CHILD|WS_VISIBLE, r, this)) {
+	if (!m_view.Create(NULL,_T(""), WS_CHILD|WS_VISIBLE, v_rect, this, NULL)) {
 		return -1;
 	}
 
@@ -109,121 +110,197 @@ void CPreView::OnPaint()
 {
 	CPaintDC dc(this);
 
+	CRect rcClient, rcBar;
+	GetClientRect(rcBar);
+
+	CDC mdc;
+	mdc.CreateCompatibleDC(&dc);
+
+	CBitmap bm;
+	bm.CreateCompatibleBitmap(&dc, rcBar.Width(), rcBar.Height());
+	CBitmap* pOldBm = mdc.SelectObject(&bm);
+	mdc.SetBkMode(TRANSPARENT);
+
+	int r1, g1, b1, r2, g2, b2;
+	COLORREF bg = GetSysColor(COLOR_BTNFACE);
+	COLORREF light = RGB(255,255,255);
+	COLORREF shadow = GetSysColor(COLOR_BTNSHADOW);
+
 	AppSettings& s = AfxGetAppSettings();
 
+// TODO: optimize this code ...
 	if (s.fDisableXPToolbars) {
-
-		CDC memdc;
-		CBitmap m_bmPaint;
-		CRect r,rf,rc;
-		GetClientRect(&r);
-		memdc.CreateCompatibleDC(&dc);
-		m_bmPaint.CreateCompatibleBitmap(&dc, r.Width(), r.Height());
-		CBitmap *bmOld = memdc.SelectObject(&m_bmPaint);
-		memdc.SetBkMode(TRANSPARENT);
-
-		GRADIENT_RECT gr[1] = {{0, 1}};
-		int pa = 255 * 256;
-
-		CRect rtTop, rtLeft, rtRight, rtBottom;
-		rtTop = rtLeft = rtRight = rtBottom = r;
-		int R, G, B, R2, G2, B2;
-		rtTop.bottom = rtTop.top + 20;
-		ThemeRGB(125, 130, 135, R, G, B);
-		ThemeRGB(95, 100, 105, R2, G2, B2);
-
-		TRIVERTEX tv[2] = {
-			{rtTop.left, rtTop.top, R*256, G*256, B*256, pa},
-			{rtTop.right, rtTop.bottom, R2*256, G2*256, B2*256, pa},
-		};
-		memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
-
-		ThemeRGB(165, 170, 175, R, G, B);
-		CPen penPlayed2(PS_SOLID,0,RGB(R,G,B));
-		memdc.SelectObject(&penPlayed2);
-		memdc.MoveTo(rtTop.left, rtTop.top);
-		memdc.LineTo(rtTop.right, rtTop.top);
-
-		rtLeft.right = rtLeft.left + 5;
-		rtLeft.top = rtLeft.top + 19;
-		ThemeRGB(95, 100, 105, R, G, B);
-		ThemeRGB(35, 40, 45, R2, G2, B2);
-
-		TRIVERTEX tv2[2] = {
-			{rtLeft.left, rtLeft.top, R*256, G*256, B*256, pa},
-			{rtLeft.right, rtLeft.bottom, R2*256, G2*256, B2*256, pa},
-		};
-		memdc.GradientFill(tv2, 2, gr, 1, GRADIENT_FILL_RECT_V);
-
-		ThemeRGB(105, 110, 115, R, G, B);
-		CPen penPlayed4(PS_SOLID,0,RGB(R,G,B));
-		memdc.SelectObject(&penPlayed4);
-		memdc.MoveTo(rtLeft.left, rtTop.top);
-		memdc.LineTo(rtLeft.left, r.bottom);
-
-		rtRight.left = rtRight.right - 5;
-		rtRight.top = rtRight.top + 19;
-		ThemeRGB(95, 100, 105, R, G, B);
-		ThemeRGB(35, 40, 45, R2, G2, B2);
-
-		TRIVERTEX tv3[2] = {
-			{rtRight.left, rtRight.top, R*256, G*256, B*256, pa},
-			{rtRight.right, rtRight.bottom, R2*256, G2*256, B2*256, pa},
-		};
-		memdc.GradientFill(tv3, 2, gr, 1, GRADIENT_FILL_RECT_V);
-		
-		memdc.SelectObject(&penPlayed4);
-		memdc.MoveTo(rtRight.left, rtRight.top+1);
-		memdc.LineTo(rtRight.left, rtRight.bottom);
-
-		rtBottom.top = rtBottom.bottom - 5;
-		ThemeRGB(35, 40, 45, R, G, B);
-		ThemeRGB(15, 20, 25, R2, G2, B2);
-
-		TRIVERTEX tv4[2] = {
-			{rtBottom.left, rtBottom.top, R*256, G*256, B*256, pa},
-			{rtBottom.right, rtBottom.bottom, R2*256, G2*256, B2*256, pa},
-		};
-		memdc.GradientFill(tv4, 2, gr, 1, GRADIENT_FILL_RECT_V);
-
-		ThemeRGB(65, 70, 75, R, G, B);
-		CPen penPlayed3(PS_SOLID,0,RGB(R,G,B));
-		memdc.SelectObject(&penPlayed3);
-		memdc.MoveTo(rtBottom.left+4, rtBottom.top);
-		memdc.LineTo(rtBottom.right-4, rtBottom.top);
-		memdc.SelectObject(&penPlayed4);
-		memdc.MoveTo(rtBottom.left, rtBottom.top);
-		memdc.LineTo(rtBottom.left, rtBottom.bottom-1);
-
-		CFont font2;
-		ThemeRGB(255, 255, 255, R, G, B);
-		memdc.SetTextColor(RGB(R,G,B));
-		font2.CreateFont(
-						13,				// nHeight
-						0,				// nWidth
-						0,				// nEscapement
-						0,				// nOrientation
-						FW_BOLD,			// nWeight
-						FALSE,				// bItalic
-						FALSE,				// bUnderline
-						0,				// cStrikeOut
-						ANSI_CHARSET,			// nCharSet
-						OUT_RASTER_PRECIS,		// nOutPrecision
-						CLIP_DEFAULT_PRECIS,		// nClipPrecision
-						ANTIALIASED_QUALITY,        	// nQuality
-						VARIABLE_PITCH | FF_MODERN, 	// nPitchAndFamily
-						_T("Tahoma")              	// lpszFacename
-						);
-
-		memdc.SelectObject(&font2);
-		CRect rtime = r;
-		rtime.top = r.top +4;
-		rtime.left = r.left;
-		memdc.DrawText(tooltipstr, tooltipstr.GetLength(), &rtime, DT_CENTER|DT_TOP);
-
-		dc.BitBlt(r.left, r.top, r.Width(), r.Height(), &memdc, 0, 0, SRCCOPY);
-		DeleteObject(memdc.SelectObject(bmOld));
-		memdc.DeleteDC();
-		m_bmPaint.DeleteObject();
+		ThemeRGB(95, 100, 105, r1, g1, b1);
+		ThemeRGB(25, 30, 35, r2, g2, b2);
+	} else {
+		r1 = r2 = GetRValue(bg);
+		g1 = g2 = GetGValue(bg);
+		b1 = b2 = GetBValue(bg);
 	}
+	for(int i=0;i<rcBar.Height();i++) { 
+		int r,g,b;
+		r = r1 + (i * (r2-r1) / rcBar.Height());
+		g = g1 + (i * (g2-g1) / rcBar.Height());
+		b = b1 + (i * (b2-b1) / rcBar.Height());
+		mdc.FillSolidRect(0,i,rcBar.Width(),1,RGB(r,g,b));
+	}
+
+	if (s.fDisableXPToolbars) {
+		ThemeRGB(145, 140, 145, r1, g1, b1);
+		ThemeRGB(115, 120, 125, r2, g2, b2);
+	} else {
+		r1 = r2 = GetRValue(light);
+		g1 = g2 = GetGValue(light);
+		b1 = b2 = GetBValue(light);
+	}
+	for(int i=0;i<rcBar.Width();i++) { 
+		int r,g,b;
+		r = r1 + (i * (r2-r1) / rcBar.Width());
+		g = g1 + (i * (g2-g1) / rcBar.Width());
+		b = b1 + (i * (b2-b1) / rcBar.Width());
+		mdc.FillSolidRect(i,0,1,1,RGB(r,g,b));
+	}
+
+	if (s.fDisableXPToolbars) {
+		ThemeRGB(15, 20, 25, r1, g1, b1);
+		ThemeRGB(55, 60, 65, r2, g2, b2);
+	} else {
+		r1 = r2 = GetRValue(shadow);
+		g1 = g2 = GetGValue(shadow);
+		b1 = b2 = GetBValue(shadow);
+	}
+	for(int i=rcBar.left+wb;i<rcBar.Width()-wb;i++) { 
+		int r,g,b;
+		r = r1 + (i * (r2-r1) / rcBar.Width());
+		g = g1 + (i * (g2-g1) / rcBar.Width());
+		b = b1 + (i * (b2-b1) / rcBar.Width());
+		mdc.FillSolidRect(i,hc,1,1,RGB(r,g,b));
+	}
+
+	if (s.fDisableXPToolbars) {
+		ThemeRGB(35, 40, 45, r1, g1, b1);
+		ThemeRGB(55, 60, 65, r2, g2, b2);
+	} else {
+		r1 = r2 = GetRValue(light);
+		g1 = g2 = GetGValue(light);
+		b1 = b2 = GetBValue(light);
+	}
+	for(int i=rcBar.left+wb;i<rcBar.Width()-wb;i++) { 
+		int r,g,b;
+		r = r1 + (i * (r2-r1) / rcBar.Width());
+		g = g1 + (i * (g2-g1) / rcBar.Width());
+		b = b1 + (i * (b2-b1) / rcBar.Width());
+		mdc.FillSolidRect(i,rcBar.bottom-wb-1,1,1,RGB(r,g,b));
+	}
+
+	if (s.fDisableXPToolbars) {
+		ThemeRGB(0, 5, 10, r1, g1, b1);
+		ThemeRGB(10, 15, 20, r2, g2, b2);
+	} else {
+		r1 = r2 = GetRValue(shadow);
+		g1 = g2 = GetGValue(shadow);
+		b1 = b2 = GetBValue(shadow);
+	}
+	for(int i=0;i<rcBar.Width();i++) { 
+		int r,g,b;
+		r = r1 + (i * (r2-r1) / rcBar.Width());
+		g = g1 + (i * (g2-g1) / rcBar.Width());
+		b = b1 + (i * (b2-b1) / rcBar.Width());
+		mdc.FillSolidRect(i,rcBar.bottom-1,1,1,RGB(r,g,b));
+	}
+
+	if (s.fDisableXPToolbars) {
+		ThemeRGB(145, 150, 155, r1, g1, b1);
+		ThemeRGB(45, 50, 55, r2, g2, b2);
+	} else {
+		r1 = r2 = GetRValue(light);
+		g1 = g2 = GetGValue(light);
+		b1 = b2 = GetBValue(light);
+	}
+	for(int i=0;i<rcBar.Height()-1;i++) { 
+		int r,g,b;
+		r = r1 + (i * (r2-r1) / rcBar.Height());
+		g = g1 + (i * (g2-g1) / rcBar.Height());
+		b = b1 + (i * (b2-b1) / rcBar.Height());
+		mdc.FillSolidRect(0,i,1,1,RGB(r,g,b));
+	}
+
+	if (s.fDisableXPToolbars) {
+		ThemeRGB(55, 60, 65, r1, g1, b1);
+		ThemeRGB(15, 20, 25, r2, g2, b2);
+	} else {
+		r1 = r2 = GetRValue(shadow);
+		g1 = g2 = GetGValue(shadow);
+		b1 = b2 = GetBValue(shadow);
+	}
+	for(int i=hc;i<rcBar.Height()-wb;i++) { 
+		int r,g,b;
+		r = r1 + (i * (r2-r1) / rcBar.Height());
+		g = g1 + (i * (g2-g1) / rcBar.Height());
+		b = b1 + (i * (b2-b1) / rcBar.Height());
+		mdc.FillSolidRect(wb,i,1,1,RGB(r,g,b));
+	}
+
+	if (s.fDisableXPToolbars) {
+		ThemeRGB(105, 110, 115, r1, g1, b1);
+		ThemeRGB(55, 60, 65, r2, g2, b2);
+	} else {
+		r1 = r2 = GetRValue(light);
+		g1 = g2 = GetGValue(light);
+		b1 = b2 = GetBValue(light);
+	}
+	for(int i=hc;i<rcBar.Height()-wb;i++) { 
+		int r,g,b;
+		r = r1 + (i * (r2-r1) / rcBar.Height());
+		g = g1 + (i * (g2-g1) / rcBar.Height());
+		b = b1 + (i * (b2-b1) / rcBar.Height());
+		mdc.FillSolidRect(rcBar.right-wb-1,i,1,1,RGB(r,g,b));
+	}
+
+	if (s.fDisableXPToolbars) {
+		ThemeRGB(65, 70, 75, r1, g1, b1);
+		ThemeRGB(5, 10, 15, r2, g2, b2);
+	} else {
+		r1 = r2 = GetRValue(shadow);
+		g1 = g2 = GetGValue(shadow);
+		b1 = b2 = GetBValue(shadow);
+	}
+	for(int i=0;i<rcBar.Height();i++) { 
+		int r,g,b;
+		r = r1 + (i * (r2-r1) / rcBar.Height());
+		g = g1 + (i * (g2-g1) / rcBar.Height());
+		b = b1 + (i * (b2-b1) / rcBar.Height());
+		mdc.FillSolidRect(rcBar.right-1,i,1,1,RGB(r,g,b));
+	}
+
+	// text (time)
+	CFont font;
+
+	if (s.fDisableXPToolbars) {
+		ThemeRGB(255, 255, 255, r1, g1, b1);
+	} else {
+		r1 = GetRValue(0);
+		g1 = GetGValue(0);
+		b1 = GetBValue(0);
+	}
+
+	mdc.SetTextColor(RGB(r1,g1,b1));
+	
+	font.CreateFont(13, 0, 0, 0, FW_SEMIBOLD, 0, 0, 0, DEFAULT_CHARSET,
+									OUT_RASTER_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, VARIABLE_PITCH | FF_MODERN,
+									_T("Tahoma"));
+
+	mdc.SelectObject(&font);
+	CRect rtime = rcBar;
+	rtime.top = 0;
+	rtime.bottom = hc;
+	mdc.DrawText(tooltipstr, tooltipstr.GetLength(), &rtime, DT_CENTER|DT_VCENTER|DT_SINGLELINE);
+
+	dc.ExcludeClipRect(v_rect);
+
+	dc.BitBlt(0, 0, rcBar.Width(), rcBar.Height(), &mdc, 0, 0, SRCCOPY);
+
+	mdc.SelectObject(pOldBm);
+	bm.DeleteObject();
+	mdc.DeleteDC();
 }

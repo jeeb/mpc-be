@@ -10852,12 +10852,10 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 
 		b_UseSmartSeek = s.fSmartSeek && !s.fD3DFullscreen;
 		if (b_UseSmartSeek) {
-			DWORD style;
-			style = s.fDisableXPToolbars ? WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS : WS_CAPTION|WS_CLIPCHILDREN|WS_CLIPSIBLINGS;
-			if (!m_wndView2.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL,
-				style, CRect(0, 0, 160, 109), this, 0, NULL)) {
-					TRACE(_T("Failed to create Preview Window\n"));
-					b_UseSmartSeek = false;
+			DWORD style = WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS;
+			if (!m_wndView2.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL, style, CRect(0, 0, 160, 109), this, 0, NULL)) {
+				TRACE(_T("Failed to create Preview Window\n"));
+				b_UseSmartSeek = false;
 			} else {
 				m_wndView2.ShowWindow(SW_HIDE);
 			}

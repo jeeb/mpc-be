@@ -199,10 +199,6 @@ BOOL CPPageInterface::OnApply()
 		pFrame->CreateThumbnailToolbar();
 	}
 
-	if (pFrame->m_wndView2) {
-		m_fDisableXPToolbars ? pFrame->m_wndView2.ModifyStyle(WS_CAPTION, WS_POPUP) : pFrame->m_wndView2.ModifyStyle(WS_POPUP, WS_CAPTION);
-	}
-
 	pFrame->UpdateThumbarButton();
 
 	pFrame->Invalidate();

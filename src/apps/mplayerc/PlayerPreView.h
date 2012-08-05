@@ -38,8 +38,10 @@ public:
 
 protected:
 	CString tooltipstr;
-	CStatic	m_view;
-
+	CWnd	m_view;
+	int wb;
+	int hc;
+	CRect v_rect;
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
