@@ -2,6 +2,7 @@
 #define FFMPEG_CONFIG_H
 
 #ifdef __GNUC__
+  #define HAVE_MMX2 HAVE_MMXEXT
   #define ARCH_X86 1
   #define HAVE_INLINE_ASM 1
   #define HAVE_AMD3DNOW 1
@@ -9,7 +10,7 @@
   #define HAVE_AVX 1
   #define HAVE_FMA4 1
   #define HAVE_MMX 1
-  #define HAVE_MMX2 1
+  #define HAVE_MMXEXT 1
   #define HAVE_SSE 1
   #define HAVE_SSSE3 1
 
@@ -44,7 +45,7 @@
   #define HAVE_FMA4 0
   #define HAVE_AVX 0
   #define HAVE_MMX 0
-  #define HAVE_MMX2 0
+  #define HAVE_MMXEXT 0
   #define HAVE_SSE 0
   #define HAVE_SSSE3 0
   #define ARCH_X86 0
