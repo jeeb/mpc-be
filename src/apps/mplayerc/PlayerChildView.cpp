@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: ChildView.cpp 766 2012-07-29 21:53:48Z exodus8 $
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt
@@ -23,7 +23,7 @@
 
 #include "stdafx.h"
 #include "mplayerc.h"
-#include "ChildView.h"
+#include "PlayerChildView.h"
 #include "MainFrm.h"
 
 

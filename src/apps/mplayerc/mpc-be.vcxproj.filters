@@ -30,9 +30,6 @@
     <ClCompile Include="BaseGraph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ChildView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ComPropertyPage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -139,6 +136,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PlayerCaptureDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerChildView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerPreView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PlayerInfoBar.cpp">
@@ -366,9 +369,6 @@
     <ClCompile Include="SaveTaskDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PlayerPreView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSettings.h">
@@ -378,9 +378,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BaseGraph.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ChildView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ComPropertyPage.h">
@@ -501,6 +498,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PlayerCaptureDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerChildView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerPreView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PlayerInfoBar.h">
@@ -729,9 +732,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SaveTaskDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerPreView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

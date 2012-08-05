@@ -26,7 +26,6 @@
 #include "MainFrm.h"
 
 #include <math.h>
-
 #include <afxpriv.h>
 #include <atlconv.h>
 #include <atlrx.h>
@@ -82,17 +81,14 @@
 #include "ComPropertySheet.h"
 #include "LcdSupport.h"
 #include "SettingsDefines.h"
-
 #include <IPinHook.h>
+#include <comdef.h>
 
 #include "jpeg.h"
 #include "DIB.h"
 
-#include <comdef.h>
-
 #define DEFCLIENTW 292
 #define DEFCLIENTH 200
-
 #define MENUBARBREAK 30
 
 static UINT s_uTaskbarRestart = RegisterWindowMessage(_T("TaskbarCreated"));
@@ -106,13 +102,8 @@ static UINT s_uTBBC = RegisterWindowMessage(_T("TaskbarButtonCreated"));
 #include "Monitors.h"
 #include "MultiMonitor.h"
 
-#ifdef USE_MEDIAINFO_STATIC
 #include <MediaInfo/MediaInfo.h>
 using namespace MediaInfoLib;
-#else
-#include <MediaInfoDLL.h>
-using namespace MediaInfoDLL;
-#endif
 
 #define DEV_BUILD 1 // set to 1 only for the DEV builds
 

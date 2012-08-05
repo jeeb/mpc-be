@@ -25,7 +25,7 @@
 
 #include <atlbase.h>
 
-#include "ChildView.h"
+#include "PlayerChildView.h"
 #include "PlayerPreView.h"
 #include "PlayerSeekBar.h"
 #include "PlayerToolBar.h"
@@ -43,7 +43,6 @@
 #include "KeyProvider.h"
 
 #include "../../SubPic/ISubPic.h"
-
 #include "IGraphBuilder2.h"
 
 #include "RealMediaGraph.h"
@@ -68,7 +67,6 @@
 #include "MpcApi.h"
 #include "../../filters/renderer/SyncClock/SyncClock.h"
 #include <sizecbar/scbarg.h>
-
 
 class CFullscreenWnd;
 
@@ -873,7 +871,6 @@ public:
 	afx_msg void OnGotoSubtitle(UINT nID);
 	afx_msg void OnShiftSubtitle(UINT nID);
 	afx_msg void OnSubtitleDelay(UINT nID);
-
 
 	afx_msg void OnPlayPlay();
 	afx_msg void OnPlayPause();

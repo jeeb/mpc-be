@@ -165,11 +165,9 @@
     <ClCompile Include="AppSettings.cpp" />
     <ClCompile Include="AuthDlg.cpp" />
     <ClCompile Include="BaseGraph.cpp" />
-    <ClCompile Include="ChildView.cpp" />
     <ClCompile Include="ComPropertyPage.cpp" />
     <ClCompile Include="ComPropertySheet.cpp" />
     <ClCompile Include="PPageInterface.cpp" />
-    <ClCompile Include="PlayerPreView.cpp" />
     <ClCompile Include="SaveTaskDlg.cpp" />
     <ClCompile Include="ShockwaveFlash.cpp" />
     <ClCompile Include="DeinterlacerFilter.cpp" />
@@ -207,6 +205,8 @@
     <ClCompile Include="PlayerBar.cpp" />
     <ClCompile Include="PlayerCaptureBar.cpp" />
     <ClCompile Include="PlayerCaptureDialog.cpp" />
+    <ClCompile Include="PlayerChildView.cpp" />
+    <ClCompile Include="PlayerPreView.cpp" />
     <ClCompile Include="PlayerInfoBar.cpp" />
     <ClCompile Include="PlayerListCtrl.cpp" />
     <ClCompile Include="PlayerNavigationBar.cpp" />
@@ -284,11 +284,9 @@
     <ClInclude Include="AppSettings.h" />
     <ClInclude Include="AuthDlg.h" />
     <ClInclude Include="BaseGraph.h" />
-    <ClInclude Include="ChildView.h" />
     <ClInclude Include="ComPropertyPage.h" />
     <ClInclude Include="ComPropertySheet.h" />
     <ClInclude Include="PPageInterface.h" />
-    <ClInclude Include="PlayerPreView.h" />
     <ClInclude Include="SaveTaskDlg.h" />
     <ClInclude Include="ShockwaveFlash.h" />
     <ClInclude Include="DeinterlacerFilter.h" />
@@ -330,6 +328,8 @@
     <ClInclude Include="PlayerBar.h" />
     <ClInclude Include="PlayerCaptureBar.h" />
     <ClInclude Include="PlayerCaptureDialog.h" />
+    <ClInclude Include="PlayerChildView.h" />
+    <ClInclude Include="PlayerPreView.h" />
     <ClInclude Include="PlayerInfoBar.h" />
     <ClInclude Include="PlayerListCtrl.h" />
     <ClInclude Include="PlayerNavigationBar.h" />
