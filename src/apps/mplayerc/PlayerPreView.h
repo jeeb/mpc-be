@@ -35,6 +35,7 @@ public:
 
 	void GetVideoRect(LPRECT lpRect);
 	HWND GetVideoHWND();
+	COLORREF RGBFill(int r1, int g1, int b1, int r2, int g2, int b2, int i, int k);
 
 protected:
 	CString tooltipstr;

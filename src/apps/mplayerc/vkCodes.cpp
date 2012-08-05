@@ -307,7 +307,7 @@ BOOL HotkeyToString(UINT vkCode, UINT fModifiers, CString& s) {
 	}
 
 	if (vkCode) {
-		s.Format(_T("%s%s"), (LPCTSTR)s, GetKeyName(vkCode));
+		s += GetKeyName(vkCode);
 	}
 
 	return(!s.IsEmpty());
@@ -330,7 +330,7 @@ BOOL HotkeyModToString(UINT vkCode, BYTE fModifiers, CString& s)
 	}
 
 	if (vkCode) {
-		s.Format(_T("%s%s"), (LPCTSTR)s, GetKeyName(vkCode));
+		s += GetKeyName(vkCode);
 	}
 
 	return(!s.IsEmpty());

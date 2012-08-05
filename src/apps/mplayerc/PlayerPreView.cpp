@@ -24,7 +24,6 @@
 #include "stdafx.h"
 #include "mplayerc.h"
 #include "PlayerPreView.h"
-#include "PngImage.h"
 #include "MainFrm.h"
 
 
@@ -41,8 +40,10 @@ CPreView::~CPreView()
 BOOL CPreView::SetWindowText(LPCWSTR lpString)
 {
 	tooltipstr = lpString;
+
 	CRect r;
 	GetClientRect(r);
+
 	CRect rt = r;
 	rt.bottom = hc; 
 	rt.left += 10;
@@ -61,6 +62,17 @@ void CPreView::GetVideoRect(LPRECT lpRect)
 HWND CPreView::GetVideoHWND()
 {
 	return m_view.GetSafeHwnd();
+}
+
+COLORREF CPreView::RGBFill(int r1, int g1, int b1, int r2, int g2, int b2, int i, int k)
+{
+	int r, g, b;
+
+	r = r1 + (i * (r2 - r1) / k);
+	g = g1 + (i * (g2 - g1) / k);
+	b = b1 + (i * (b2 - b1) / k);
+
+	return RGB(r, g, b);
 }
 
 IMPLEMENT_DYNAMIC(CPreView, CWnd)
@@ -91,8 +103,10 @@ int CPreView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	wb = 5;
 	hc = 20;
+
 	CRect rc;
 	GetClientRect(rc);
+
 	v_rect = rc;
 	v_rect.left		= (wb+1);
 	v_rect.top		= (hc+1);
@@ -121,14 +135,13 @@ void CPreView::OnPaint()
 	CBitmap* pOldBm = mdc.SelectObject(&bm);
 	mdc.SetBkMode(TRANSPARENT);
 
-	int r1, g1, b1, r2, g2, b2;
+	int r1, g1, b1, r2, g2, b2, i, k;
 	COLORREF bg = GetSysColor(COLOR_BTNFACE);
 	COLORREF light = RGB(255,255,255);
 	COLORREF shadow = GetSysColor(COLOR_BTNSHADOW);
 
 	AppSettings& s = AfxGetAppSettings();
 
-// TODO: optimize this code ...
 	if (s.fDisableXPToolbars) {
 		ThemeRGB(95, 100, 105, r1, g1, b1);
 		ThemeRGB(25, 30, 35, r2, g2, b2);
@@ -137,12 +150,9 @@ void CPreView::OnPaint()
 		g1 = g2 = GetGValue(bg);
 		b1 = b2 = GetBValue(bg);
 	}
-	for(int i=0;i<rcBar.Height();i++) { 
-		int r,g,b;
-		r = r1 + (i * (r2-r1) / rcBar.Height());
-		g = g1 + (i * (g2-g1) / rcBar.Height());
-		b = b1 + (i * (b2-b1) / rcBar.Height());
-		mdc.FillSolidRect(0,i,rcBar.Width(),1,RGB(r,g,b));
+	k = rcBar.Height();
+	for(i=0;i<k;i++) {
+		mdc.FillSolidRect(0,i,rcBar.Width(),1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
 	if (s.fDisableXPToolbars) {
@@ -153,12 +163,9 @@ void CPreView::OnPaint()
 		g1 = g2 = GetGValue(light);
 		b1 = b2 = GetBValue(light);
 	}
-	for(int i=0;i<rcBar.Width();i++) { 
-		int r,g,b;
-		r = r1 + (i * (r2-r1) / rcBar.Width());
-		g = g1 + (i * (g2-g1) / rcBar.Width());
-		b = b1 + (i * (b2-b1) / rcBar.Width());
-		mdc.FillSolidRect(i,0,1,1,RGB(r,g,b));
+	k = rcBar.Width();
+	for(i=0;i<k;i++) {
+		mdc.FillSolidRect(i,0,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
 	if (s.fDisableXPToolbars) {
@@ -169,12 +176,9 @@ void CPreView::OnPaint()
 		g1 = g2 = GetGValue(shadow);
 		b1 = b2 = GetBValue(shadow);
 	}
-	for(int i=rcBar.left+wb;i<rcBar.Width()-wb;i++) { 
-		int r,g,b;
-		r = r1 + (i * (r2-r1) / rcBar.Width());
-		g = g1 + (i * (g2-g1) / rcBar.Width());
-		b = b1 + (i * (b2-b1) / rcBar.Width());
-		mdc.FillSolidRect(i,hc,1,1,RGB(r,g,b));
+	k = rcBar.Width();
+	for(i=rcBar.left+wb;i<k-wb;i++) {
+		mdc.FillSolidRect(i,hc,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
 	if (s.fDisableXPToolbars) {
@@ -185,12 +189,9 @@ void CPreView::OnPaint()
 		g1 = g2 = GetGValue(light);
 		b1 = b2 = GetBValue(light);
 	}
-	for(int i=rcBar.left+wb;i<rcBar.Width()-wb;i++) { 
-		int r,g,b;
-		r = r1 + (i * (r2-r1) / rcBar.Width());
-		g = g1 + (i * (g2-g1) / rcBar.Width());
-		b = b1 + (i * (b2-b1) / rcBar.Width());
-		mdc.FillSolidRect(i,rcBar.bottom-wb-1,1,1,RGB(r,g,b));
+	k = rcBar.Width();
+	for(i=rcBar.left+wb;i<k-wb;i++) {
+		mdc.FillSolidRect(i,rcBar.bottom-wb-1,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
 	if (s.fDisableXPToolbars) {
@@ -201,12 +202,9 @@ void CPreView::OnPaint()
 		g1 = g2 = GetGValue(shadow);
 		b1 = b2 = GetBValue(shadow);
 	}
-	for(int i=0;i<rcBar.Width();i++) { 
-		int r,g,b;
-		r = r1 + (i * (r2-r1) / rcBar.Width());
-		g = g1 + (i * (g2-g1) / rcBar.Width());
-		b = b1 + (i * (b2-b1) / rcBar.Width());
-		mdc.FillSolidRect(i,rcBar.bottom-1,1,1,RGB(r,g,b));
+	k = rcBar.Width();
+	for(i=0;i<k;i++) {
+		mdc.FillSolidRect(i,rcBar.bottom-1,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
 	if (s.fDisableXPToolbars) {
@@ -217,12 +215,9 @@ void CPreView::OnPaint()
 		g1 = g2 = GetGValue(light);
 		b1 = b2 = GetBValue(light);
 	}
-	for(int i=0;i<rcBar.Height()-1;i++) { 
-		int r,g,b;
-		r = r1 + (i * (r2-r1) / rcBar.Height());
-		g = g1 + (i * (g2-g1) / rcBar.Height());
-		b = b1 + (i * (b2-b1) / rcBar.Height());
-		mdc.FillSolidRect(0,i,1,1,RGB(r,g,b));
+	k = rcBar.Height();
+	for(i=0;i<k-1;i++) {
+		mdc.FillSolidRect(0,i,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
 	if (s.fDisableXPToolbars) {
@@ -233,12 +228,9 @@ void CPreView::OnPaint()
 		g1 = g2 = GetGValue(shadow);
 		b1 = b2 = GetBValue(shadow);
 	}
-	for(int i=hc;i<rcBar.Height()-wb;i++) { 
-		int r,g,b;
-		r = r1 + (i * (r2-r1) / rcBar.Height());
-		g = g1 + (i * (g2-g1) / rcBar.Height());
-		b = b1 + (i * (b2-b1) / rcBar.Height());
-		mdc.FillSolidRect(wb,i,1,1,RGB(r,g,b));
+	k = rcBar.Height();
+	for(i=hc;i<k-wb;i++) {
+		mdc.FillSolidRect(wb,i,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
 	if (s.fDisableXPToolbars) {
@@ -249,12 +241,9 @@ void CPreView::OnPaint()
 		g1 = g2 = GetGValue(light);
 		b1 = b2 = GetBValue(light);
 	}
-	for(int i=hc;i<rcBar.Height()-wb;i++) { 
-		int r,g,b;
-		r = r1 + (i * (r2-r1) / rcBar.Height());
-		g = g1 + (i * (g2-g1) / rcBar.Height());
-		b = b1 + (i * (b2-b1) / rcBar.Height());
-		mdc.FillSolidRect(rcBar.right-wb-1,i,1,1,RGB(r,g,b));
+	k = rcBar.Height();
+	for(i=hc;i<k-wb;i++) {
+		mdc.FillSolidRect(rcBar.right-wb-1,i,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
 	if (s.fDisableXPToolbars) {
@@ -265,12 +254,9 @@ void CPreView::OnPaint()
 		g1 = g2 = GetGValue(shadow);
 		b1 = b2 = GetBValue(shadow);
 	}
-	for(int i=0;i<rcBar.Height();i++) { 
-		int r,g,b;
-		r = r1 + (i * (r2-r1) / rcBar.Height());
-		g = g1 + (i * (g2-g1) / rcBar.Height());
-		b = b1 + (i * (b2-b1) / rcBar.Height());
-		mdc.FillSolidRect(rcBar.right-1,i,1,1,RGB(r,g,b));
+	k = rcBar.Height();
+	for(i=0;i<k;i++) {
+		mdc.FillSolidRect(rcBar.right-1,i,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
 	// text (time)
@@ -297,7 +283,6 @@ void CPreView::OnPaint()
 	mdc.DrawText(tooltipstr, tooltipstr.GetLength(), &rtime, DT_CENTER|DT_VCENTER|DT_SINGLELINE);
 
 	dc.ExcludeClipRect(v_rect);
-
 	dc.BitBlt(0, 0, rcBar.Width(), rcBar.Height(), &mdc, 0, 0, SRCCOPY);
 
 	mdc.SelectObject(pOldBm);
