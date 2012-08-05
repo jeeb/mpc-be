@@ -709,20 +709,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	AppSettings& s = AfxGetAppSettings();
 
-	b_UseSmartSeek = s.fSmartSeek && !s.fD3DFullscreen;
-
-	if (b_UseSmartSeek) {
-		DWORD style;
-		style = s.fDisableXPToolbars ? WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS : WS_CAPTION|WS_CLIPCHILDREN|WS_CLIPSIBLINGS;
-		if (!m_wndView2.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL,
-			style, CRect(0, 0, 160, 109), this, 0, NULL)) {
-				TRACE(_T("Failed to create Preview Window\n"));
-				b_UseSmartSeek = false;
-		} else {
-			m_wndView2.ShowWindow(SW_HIDE);
-		}
-	}
-
 	// create a preview-window
 	if (!m_wndView.Create(NULL, NULL, AFX_WS_DEFAULT_VIEW|WS_CLIPCHILDREN|WS_CLIPSIBLINGS,
 						  CRect(0, 0, 0, 0), this, AFX_IDW_PANE_FIRST, NULL)) {
@@ -10849,6 +10835,10 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 
 	pGB2 = NULL;
 
+	if (m_wndView2) {
+		m_wndView2.DestroyWindow();
+	}
+
 	if (s.IsD3DFullscreen() &&
 			((s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS) ||
 			 (s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM) ||
@@ -10859,22 +10849,18 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 		b_UseSmartSeek	= false;
 	} else {
 		m_pVideoWnd		= &m_wndView;
-		if (!m_wndView2) {
-			b_UseSmartSeek = s.fSmartSeek && !s.fD3DFullscreen;
 
-			if (b_UseSmartSeek) {
-				DWORD style;
-				style = s.fDisableXPToolbars ? WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS : WS_CAPTION|WS_CLIPCHILDREN|WS_CLIPSIBLINGS;
-				if (!m_wndView2.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL,
-					style, CRect(0, 0, 160, 109), this, 0, NULL)) {
-						TRACE(_T("Failed to create Preview Window\n"));
-						b_UseSmartSeek = false;
-				} else {
-					m_wndView2.ShowWindow(SW_HIDE);
-				}
+		b_UseSmartSeek = s.fSmartSeek && !s.fD3DFullscreen;
+		if (b_UseSmartSeek) {
+			DWORD style;
+			style = s.fDisableXPToolbars ? WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS : WS_CAPTION|WS_CLIPCHILDREN|WS_CLIPSIBLINGS;
+			if (!m_wndView2.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL,
+				style, CRect(0, 0, 160, 109), this, 0, NULL)) {
+					TRACE(_T("Failed to create Preview Window\n"));
+					b_UseSmartSeek = false;
+			} else {
+				m_wndView2.ShowWindow(SW_HIDE);
 			}
-		} else {
-			b_UseSmartSeek = s.fSmartSeek && !s.fD3DFullscreen && m_wndView2;
 		}
 	}
 
