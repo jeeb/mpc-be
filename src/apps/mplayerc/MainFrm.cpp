@@ -11063,7 +11063,7 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 {
 	HRESULT hr = S_OK;
 
-	if (!b_UseSmartSeek || !m_wndView2 || m_fAudioOnly || m_pFullscreenWnd->IsWindow()) {
+	if (!AfxGetAppSettings().fSmartSeek || !m_wndView2 || m_fAudioOnly || m_pFullscreenWnd->IsWindow()) {
 		return E_FAIL;
 	}
 
