@@ -69,7 +69,8 @@ BOOL CFullscreenWnd::PreTranslateMessage(MSG* pMsg)
 		case WM_KEYDOWN :
 		case WM_KEYUP :
 		case WM_CHAR :
-
+			m_pMainFrame->SendMessage(pMsg->message, pMsg->wParam, pMsg->lParam);
+			break;
 		case WM_LBUTTONDOWN :
 		case WM_LBUTTONUP :
 		case WM_LBUTTONDBLCLK :
