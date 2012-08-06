@@ -82,7 +82,7 @@ BOOL CFullscreenWnd::PreTranslateMessage(MSG* pMsg)
 
 		case WM_MOUSEWHEEL :
 
-			m_pMainFrame->SendMessage(pMsg->message, pMsg->wParam, pMsg->lParam);
+			m_pMainFrame->PostMessage(pMsg->message, pMsg->wParam, pMsg->lParam);
 			break;
 	}
 
