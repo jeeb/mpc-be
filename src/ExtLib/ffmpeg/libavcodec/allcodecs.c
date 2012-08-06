@@ -108,6 +108,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (BINKAUDIO_DCT, binkaudio_dct);
     REGISTER_DECODER (BINKAUDIO_RDFT, binkaudio_rdft);
     REGISTER_DECODER (COOK, cook);
+    REGISTER_DECODER (DCA, dca);
     REGISTER_DECODER (EAC3, eac3);
     REGISTER_DECODER (FLAC, flac);
     REGISTER_DECODER (IAC, iac);
@@ -156,6 +157,7 @@ void avcodec_register_all(void)
     /* parsers */
     REGISTER_PARSER  (AC3, ac3);
     REGISTER_PARSER  (AAC_LATM, aac_latm);
+    REGISTER_PARSER  (DCA, dca);
     REGISTER_PARSER  (MLP, mlp);
     REGISTER_PARSER  (MPEGAUDIO, mpegaudio);
     REGISTER_PARSER  (H264, h264);

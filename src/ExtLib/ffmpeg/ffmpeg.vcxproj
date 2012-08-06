@@ -103,6 +103,11 @@
     <ClInclude Include="libavcodec\celp_filters.h" />
     <ClInclude Include="libavcodec\celp_math.h" />
     <ClInclude Include="libavcodec\cookdata.h" />
+    <ClInclude Include="libavcodec\dca.h" />
+    <ClInclude Include="libavcodec\dcadata.h" />
+    <ClInclude Include="libavcodec\dcadsp.h" />
+    <ClInclude Include="libavcodec\dcahuff.h" />
+    <ClInclude Include="libavcodec\dca_parser.h" />
     <ClInclude Include="libavcodec\dct.h" />
     <ClInclude Include="libavcodec\dct32.h" />
     <ClInclude Include="libavcodec\dirac.h" />
@@ -224,6 +229,7 @@
     <ClInclude Include="libavcodec\svq1.h" />
     <ClInclude Include="libavcodec\svq1_cb.h" />
     <ClInclude Include="libavcodec\svq1_vlc.h" />
+    <ClInclude Include="libavcodec\synth_filter.h" />
     <ClInclude Include="libavcodec\tableprint.h" />
     <ClInclude Include="libavcodec\thread.h" />
     <ClInclude Include="libavcodec\truespeech_data.h" />
@@ -366,6 +372,10 @@
     <ClCompile Include="libavcodec\cinepak.c" />
     <ClCompile Include="libavcodec\cook.c" />
     <ClCompile Include="libavcodec\cscd.c" />
+    <ClCompile Include="libavcodec\dca.c" />
+    <ClCompile Include="libavcodec\dcadec.c" />
+    <ClCompile Include="libavcodec\dcadsp.c" />
+    <ClCompile Include="libavcodec\dca_parser.c" />
     <ClCompile Include="libavcodec\dct.c" />
     <ClCompile Include="libavcodec\dct32.c" />
     <ClCompile Include="libavcodec\dct32_float.c" />
@@ -516,6 +526,7 @@
     <ClCompile Include="libavcodec\svq1.c" />
     <ClCompile Include="libavcodec\svq1dec.c" />
     <ClCompile Include="libavcodec\svq3.c" />
+    <ClCompile Include="libavcodec\synth_filter.c" />
     <ClCompile Include="libavcodec\truespeech.c" />
     <ClCompile Include="libavcodec\tscc.c" />
     <ClCompile Include="libavcodec\tscc2.c" />

@@ -406,7 +406,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_BINKAUDIO_DCT_DECODER 1
 #define CONFIG_BINKAUDIO_RDFT_DECODER 1
 #define CONFIG_COOK_DECODER 1
-#define CONFIG_DCA_DECODER 0
+#define CONFIG_DCA_DECODER 1
 #define CONFIG_EAC3_DECODER 1
 #define CONFIG_FLAC_DECODER 1
 #define CONFIG_GSM_DECODER 0
@@ -487,7 +487,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_AAC_PARSER 0
 #define CONFIG_AAC_LATM_PARSER 1
 #define CONFIG_AC3_PARSER 1
-#define CONFIG_DCA_PARSER 0
+#define CONFIG_DCA_PARSER 1
 #define CONFIG_H263_PARSER 0
 #define CONFIG_H264_PARSER 0
 #define CONFIG_MJPEG_PARSER 0
