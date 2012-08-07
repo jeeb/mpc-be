@@ -142,6 +142,7 @@
     <ClCompile Include="utils\huffman_encode.c" />
     <ClCompile Include="utils\quant_levels.c" />
     <ClCompile Include="utils\rescaler.c" />
+    <ClCompile Include="utils\utils.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

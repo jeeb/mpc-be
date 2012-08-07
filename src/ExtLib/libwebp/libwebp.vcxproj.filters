@@ -118,5 +118,8 @@
     <ClCompile Include="utils\rescaler.c">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
+    <ClCompile Include="utils\utils.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

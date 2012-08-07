@@ -20,6 +20,7 @@
 #include "../dsp/lossless.h"
 #include "../utils/bit_writer.h"
 #include "../utils/huffman_encode.h"
+#include "../utils/utils.h"
 #include "../webp/format_constants.h"
 
 #if defined(__cplusplus) || defined(c_plusplus)
@@ -106,7 +107,8 @@ static int AnalyzeEntropy(const WebPPicture* const pic,
   uint32_t last_pix = argb[0];    // so we're sure that pix_diff == 0
 
   VP8LHistogram* nonpredicted = NULL;
-  VP8LHistogram* predicted = (VP8LHistogram*)malloc(2 * sizeof(*predicted));
+  VP8LHistogram* predicted =
+      (VP8LHistogram*)malloc(2 * sizeof(*predicted));
   if (predicted == NULL) return 0;
   nonpredicted = predicted + 1;
 
@@ -141,7 +143,7 @@ static int VP8LEncAnalyze(VP8LEncoder* const enc, WebPImageHint image_hint) {
   const WebPPicture* const pic = enc->pic_;
   assert(pic != NULL && pic->argb != NULL);
 
-  enc->use_palette_ =
+  enc->use_palette_ = (image_hint == WEBP_HINT_GRAPH) ? 0 :
       AnalyzeAndCreatePalette(pic, enc->palette_, &enc->palette_size_);
   if (!enc->use_palette_) {
     if (image_hint == WEBP_HINT_DEFAULT) {
@@ -162,13 +164,12 @@ static int VP8LEncAnalyze(VP8LEncoder* const enc, WebPImageHint image_hint) {
   return 1;
 }
 
-
 static int GetHuffBitLengthsAndCodes(
     const VP8LHistogramSet* const histogram_image,
     HuffmanTreeCode* const huffman_codes) {
   int i, k;
   int ok = 1;
-  int total_length_size = 0;
+  uint64_t total_length_size = 0;
   uint8_t* mem_buf = NULL;
   const int histogram_image_size = histogram_image->size;
 
@@ -189,9 +190,8 @@ static int GetHuffBitLengthsAndCodes(
   {
     uint16_t* codes;
     uint8_t* lengths;
-    const size_t total_buf_size = total_length_size * sizeof(*lengths)
-                                + total_length_size * sizeof(*codes);
-    mem_buf = (uint8_t*)calloc(total_buf_size, 1);
+    mem_buf = (uint8_t*)WebPSafeCalloc(total_length_size,
+                                       sizeof(*lengths) + sizeof(*codes));
     if (mem_buf == NULL) {
       ok = 0;
       goto End;
@@ -293,7 +293,7 @@ static int StoreFullHuffmanCode(VP8LBitWriter* const bw,
   int num_tokens;
   HuffmanTreeCode huffman_code;
   HuffmanTreeToken* const tokens =
-      (HuffmanTreeToken*)malloc(max_tokens * sizeof(*tokens));
+      (HuffmanTreeToken*)WebPSafeMalloc((uint64_t)max_tokens, sizeof(*tokens));
   if (tokens == NULL) return 0;
 
   huffman_code.num_symbols = CODE_LENGTH_CODES;
@@ -500,21 +500,21 @@ static int EncodeImageInternal(VP8LBitWriter* const bw,
                                const uint32_t* const argb,
                                int width, int height, int quality,
                                int cache_bits, int histogram_bits) {
-  int i;
   int ok = 0;
   const int use_2d_locality = 1;
   const int use_color_cache = (cache_bits > 0);
-  const int histogram_image_xysize =
+  const uint32_t histogram_image_xysize =
       VP8LSubSampleSize(width, histogram_bits) *
       VP8LSubSampleSize(height, histogram_bits);
   VP8LHistogramSet* histogram_image =
       VP8LAllocateHistogramSet(histogram_image_xysize, 0);
   int histogram_image_size = 0;
-  int bit_array_size = 0;
+  size_t bit_array_size = 0;
   HuffmanTreeCode* huffman_codes = NULL;
   VP8LBackwardRefs refs;
   uint16_t* const histogram_symbols =
-      (uint16_t*)malloc(histogram_image_xysize * sizeof(*histogram_symbols));
+      (uint16_t*)WebPSafeMalloc((uint64_t)histogram_image_xysize,
+                                sizeof(*histogram_symbols));
   assert(histogram_bits >= MIN_HUFFMAN_BITS);
   assert(histogram_bits <= MAX_HUFFMAN_BITS);
   if (histogram_image == NULL || histogram_symbols == NULL) goto Error;
@@ -534,8 +534,8 @@ static int EncodeImageInternal(VP8LBitWriter* const bw,
   // Create Huffman bit lengths and codes for each histogram image.
   histogram_image_size = histogram_image->size;
   bit_array_size = 5 * histogram_image_size;
-  huffman_codes = (HuffmanTreeCode*)calloc(bit_array_size,
-                                           sizeof(*huffman_codes));
+  huffman_codes = (HuffmanTreeCode*)WebPSafeCalloc(bit_array_size,
+                                                   sizeof(*huffman_codes));
   if (huffman_codes == NULL ||
       !GetHuffBitLengthsAndCodes(histogram_image, huffman_codes)) {
     goto Error;
@@ -553,8 +553,10 @@ static int EncodeImageInternal(VP8LBitWriter* const bw,
     VP8LWriteBits(bw, 1, write_histogram_image);
     if (write_histogram_image) {
       uint32_t* const histogram_argb =
-          (uint32_t*)malloc(histogram_image_xysize * sizeof(*histogram_argb));
+          (uint32_t*)WebPSafeMalloc((uint64_t)histogram_image_xysize,
+                                    sizeof(*histogram_argb));
       int max_index = 0;
+      uint32_t i;
       if (histogram_argb == NULL) goto Error;
       for (i = 0; i < histogram_image_xysize; ++i) {
         const int index = histogram_symbols[i] & 0xffff;
@@ -576,14 +578,14 @@ static int EncodeImageInternal(VP8LBitWriter* const bw,
   }
 
   // Store Huffman codes.
-  for (i = 0; i < 5 * histogram_image_size; ++i) {
-    HuffmanTreeCode* const codes = &huffman_codes[i];
-    if (!StoreHuffmanCode(bw, codes)) {
-      goto Error;
+  {
+    int i;
+    for (i = 0; i < 5 * histogram_image_size; ++i) {
+      HuffmanTreeCode* const codes = &huffman_codes[i];
+      if (!StoreHuffmanCode(bw, codes)) goto Error;
+      ClearHuffmanTreeIfOnlyOneSymbol(codes);
     }
-    ClearHuffmanTreeIfOnlyOneSymbol(codes);
   }
-
   // Free combined histograms.
   free(histogram_image);
   histogram_image = NULL;
@@ -610,7 +612,7 @@ static int EncodeImageInternal(VP8LBitWriter* const bw,
 
 // Check if it would be a good idea to subtract green from red and blue. We
 // only impact entropy in red/blue components, don't bother to look at others.
-static int EvalAndApplySubtractGreen(const VP8LEncoder* const enc,
+static int EvalAndApplySubtractGreen(VP8LEncoder* const enc,
                                      int width, int height,
                                      VP8LBitWriter* const bw) {
   if (!enc->use_palette_) {
@@ -639,7 +641,8 @@ static int EvalAndApplySubtractGreen(const VP8LEncoder* const enc,
     free(histo);
 
     // Check if subtracting green yields low entropy.
-    if (bit_cost_after < bit_cost_before) {
+    enc->use_subtract_green_ = (bit_cost_after < bit_cost_before);
+    if (enc->use_subtract_green_) {
       VP8LWriteBits(bw, 1, TRANSFORM_PRESENT);
       VP8LWriteBits(bw, 2, SUBTRACT_GREEN);
       VP8LSubtractGreenFromBlueAndRed(enc->argb_, width * height);
@@ -754,7 +757,7 @@ static WebPEncodingError WriteImage(const WebPPicture* const pic,
       goto Error;
     }
   }
-  *coded_size = vp8l_size;
+  *coded_size = CHUNK_HEADER_SIZE + riff_size;
   return VP8_ENC_OK;
 
  Error:
@@ -769,14 +772,14 @@ static WebPEncodingError AllocateTransformBuffer(VP8LEncoder* const enc,
                                                  int width, int height) {
   WebPEncodingError err = VP8_ENC_OK;
   const int tile_size = 1 << enc->transform_bits_;
-  const size_t image_size = width * height;
-  const size_t argb_scratch_size = tile_size * width + width;
-  const size_t transform_data_size =
-      VP8LSubSampleSize(width, enc->transform_bits_) *
-      VP8LSubSampleSize(height, enc->transform_bits_);
-  const size_t total_size =
+  const uint64_t image_size = width * height;
+  const uint64_t argb_scratch_size = tile_size * width + width;
+  const uint64_t transform_data_size =
+      (uint64_t)VP8LSubSampleSize(width, enc->transform_bits_) *
+      (uint64_t)VP8LSubSampleSize(height, enc->transform_bits_);
+  const uint64_t total_size =
       image_size + argb_scratch_size + transform_data_size;
-  uint32_t* mem = (uint32_t*)malloc(total_size * sizeof(*mem));
+  uint32_t* mem = (uint32_t*)WebPSafeMalloc(total_size, sizeof(*mem));
   if (mem == NULL) {
     err = VP8_ENC_ERROR_OUT_OF_MEMORY;
     goto Error;
@@ -938,6 +941,7 @@ WebPEncodingError VP8LEncodeStream(const WebPConfig* const config,
   const int width = picture->width;
   const int height = picture->height;
   VP8LEncoder* const enc = VP8LEncoderNew(config, picture);
+  const size_t byte_position = VP8LBitWriterNumBytes(bw);
 
   if (enc == NULL) {
     err = VP8_ENC_ERROR_OUT_OF_MEMORY;
@@ -1017,6 +1021,20 @@ WebPEncodingError VP8LEncodeStream(const WebPConfig* const config,
     goto Error;
   }
 
+  if (picture->stats != NULL) {
+    WebPAuxStats* const stats = picture->stats;
+    stats->lossless_features = 0;
+    if (enc->use_predict_) stats->lossless_features |= 1;
+    if (enc->use_cross_color_) stats->lossless_features |= 2;
+    if (enc->use_subtract_green_) stats->lossless_features |= 4;
+    if (enc->use_palette_) stats->lossless_features |= 8;
+    stats->histogram_bits = enc->histo_bits_;
+    stats->transform_bits = enc->transform_bits_;
+    stats->cache_bits = enc->cache_bits_;
+    stats->palette_size = enc->palette_size_;
+    stats->lossless_size = (int)(VP8LBitWriterNumBytes(bw) - byte_position);
+  }
+
  Error:
   VP8LEncoderDelete(enc);
   return err;
@@ -1035,19 +1053,34 @@ int VP8LEncodeImage(const WebPConfig* const config,
 
   if (config == NULL || picture->argb == NULL) {
     err = VP8_ENC_ERROR_NULL_PARAMETER;
-    goto Error;
+    WebPEncodingSetError(picture, err);
+    return 0;
   }
 
   width = picture->width;
   height = picture->height;
+  if (!VP8LBitWriterInit(&bw, (width * height) >> 1)) {
+    err = VP8_ENC_ERROR_OUT_OF_MEMORY;
+    goto Error;
+  }
+
   if (!WebPReportProgress(picture, 1, &percent)) {
  UserAbort:
     err = VP8_ENC_ERROR_USER_ABORT;
     goto Error;
   }
+  // Reset stats (for pure lossless coding)
+  if (picture->stats != NULL) {
+    WebPAuxStats* const stats = picture->stats;
+    memset(stats, 0, sizeof(*stats));
+    stats->PSNR[0] = 99.f;
+    stats->PSNR[1] = 99.f;
+    stats->PSNR[2] = 99.f;
+    stats->PSNR[3] = 99.f;
+    stats->PSNR[4] = 99.f;
+  }
 
   // Write image size.
-  VP8LBitWriterInit(&bw, (width * height) >> 1);
   if (!WriteImageSize(picture, &bw)) {
     err = VP8_ENC_ERROR_OUT_OF_MEMORY;
     goto Error;
@@ -1075,15 +1108,10 @@ int VP8LEncodeImage(const WebPConfig* const config,
 
   if (!WebPReportProgress(picture, 100, &percent)) goto UserAbort;
 
-  // Collect some stats if needed.
+  // Save size.
   if (picture->stats != NULL) {
-    WebPAuxStats* const stats = picture->stats;
-    memset(stats, 0, sizeof(*stats));
-    stats->PSNR[0] = 99.;
-    stats->PSNR[1] = 99.;
-    stats->PSNR[2] = 99.;
-    stats->PSNR[3] = 99.;
-    stats->coded_size = (int)coded_size;
+    picture->stats->coded_size += (int)coded_size;
+    picture->stats->lossless_size = (int)coded_size;
   }
 
   if (picture->extra_info != NULL) {
