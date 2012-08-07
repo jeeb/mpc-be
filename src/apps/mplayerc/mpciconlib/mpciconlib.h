@@ -22,6 +22,7 @@
 
 #pragma once
 
+#define IDI_AVI_ICON                    0
 #define IDI_MPG_ICON                    1
 #define IDI_MP4_ICON                    2
 #define IDI_MKV_ICON                    3
@@ -71,9 +72,8 @@
 #define IDI_APE_ICON                    47
 #define IDI_DVDAUDIO_ICON               48
 #define IDI_MLP_ICON                    49
-#define IDI_AVI_ICON                    50
-#define IDI_DEFAULT_ICON                51
-#define IDI_ROQ_ICON                    52
+#define IDI_DEFAULT_ICON                50
+#define IDI_ROQ_ICON                    51
 #define IDI_NONE                        -1
 
 // Next default values for new objects
