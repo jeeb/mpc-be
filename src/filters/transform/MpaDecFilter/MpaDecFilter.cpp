@@ -32,9 +32,9 @@
 #include "../../../DSUtil/AudioParser.h"
 
 #ifdef REGISTER_FILTER
-void* __imp_toupper = toupper;
-void* __imp_time64 = _time64;
-void* __imp_vscprintf = _vscprintf;
+void* __imp_toupper		= toupper;
+void* __imp_time64		= _time64;
+void* __imp_vscprintf	= _vscprintf;
 
 #include <InitGuid.h>
 
@@ -840,9 +840,9 @@ HRESULT CMpaDecFilter::ProcessHdmvLPCM(bool bAlignOldBuffer) // Blu ray LPCM
 HRESULT CMpaDecFilter::ProcessAC3_SPDIF()
 {
 	HRESULT hr;
-	BYTE* base = m_buff.GetData();
-	BYTE* p = base;
-	BYTE* end = base + m_buff.GetCount();
+	BYTE* base	= m_buff.GetData();
+	BYTE* p		= base;
+	BYTE* end	= base + m_buff.GetCount();
 
 	while (p + AC3_HEADER_SIZE <= end) {
 		int size = 0;
@@ -874,9 +874,9 @@ HRESULT CMpaDecFilter::ProcessAC3_SPDIF()
 HRESULT CMpaDecFilter::ProcessFFmpeg(enum CodecID nCodecId)
 {
 	HRESULT hr;
-	BYTE* p = m_buff.GetData();
-	BYTE* base = p;
-	BYTE* end = p + m_buff.GetCount();
+	BYTE* p		= m_buff.GetData();
+	BYTE* base	= p;
+	BYTE* end	= p + m_buff.GetCount();
 
 	int size = 0;
 	hr = DeliverFFmpeg(nCodecId, p, int(end-p), size);
@@ -902,9 +902,9 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum CodecID nCodecId)
 HRESULT CMpaDecFilter::ProcessDTS_SPDIF()
 {
 	HRESULT hr;
-	BYTE* base = m_buff.GetData();
-	BYTE* p = base;
-	BYTE* end = base + m_buff.GetCount();
+	BYTE* base	= m_buff.GetData();
+	BYTE* p		= base;
+	BYTE* end	= base + m_buff.GetCount();
 
 	while (p + 16 <= end) {
 		int size = 0;
@@ -935,8 +935,8 @@ HRESULT CMpaDecFilter::ProcessDTS_SPDIF()
 
 HRESULT CMpaDecFilter::ProcessPCMraw() //'raw '
 {
-	WAVEFORMATEX* wfe = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
-	unsigned int nSamples = m_buff.GetCount() * 8 / wfe->wBitsPerSample;
+	WAVEFORMATEX* wfe		= (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
+	unsigned int nSamples	= m_buff.GetCount() * 8 / wfe->wBitsPerSample;
 
 	CAtlArray<float> pBuff;
 	pBuff.SetCount(nSamples);
@@ -970,8 +970,8 @@ HRESULT CMpaDecFilter::ProcessPCMraw() //'raw '
 
 HRESULT CMpaDecFilter::ProcessPCMintBE() //'twos', big-endian 'in24' and 'in32'
 {
-	WAVEFORMATEX* wfe = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
-	unsigned int nSamples = m_buff.GetCount() * 8 / wfe->wBitsPerSample;
+	WAVEFORMATEX* wfe		= (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
+	unsigned int nSamples	= m_buff.GetCount() * 8 / wfe->wBitsPerSample;
 
 	CAtlArray<float> pBuff;
 	pBuff.SetCount(nSamples);
@@ -1024,8 +1024,8 @@ HRESULT CMpaDecFilter::ProcessPCMintBE() //'twos', big-endian 'in24' and 'in32'
 
 HRESULT CMpaDecFilter::ProcessPCMintLE() //'sowt', little-endian 'in24' and 'in32'
 {
-	WAVEFORMATEX* wfe = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
-	unsigned int nSamples = m_buff.GetCount() * 8 / wfe->wBitsPerSample;
+	WAVEFORMATEX* wfe		= (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
+	unsigned int nSamples	= m_buff.GetCount() * 8 / wfe->wBitsPerSample;
 
 	CAtlArray<float> pBuff;
 	pBuff.SetCount(nSamples);
@@ -1075,8 +1075,8 @@ HRESULT CMpaDecFilter::ProcessPCMintLE() //'sowt', little-endian 'in24' and 'in3
 
 HRESULT CMpaDecFilter::ProcessPCMfloatBE() //big-endian 'fl32' and 'fl64'
 {
-	WAVEFORMATEX* wfe = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
-	unsigned int nSamples = m_buff.GetCount() * 8 / wfe->wBitsPerSample;
+	WAVEFORMATEX* wfe		= (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
+	unsigned int nSamples	= m_buff.GetCount() * 8 / wfe->wBitsPerSample;
 
 	CAtlArray<float> pBuff;
 	pBuff.SetCount(nSamples);
@@ -1123,8 +1123,8 @@ HRESULT CMpaDecFilter::ProcessPCMfloatBE() //big-endian 'fl32' and 'fl64'
 
 HRESULT CMpaDecFilter::ProcessPCMfloatLE() //little-endian 'fl32' and 'fl64'
 {
-	WAVEFORMATEX* wfe = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
-	unsigned int nSamples = m_buff.GetCount() * 8 / wfe->wBitsPerSample;
+	WAVEFORMATEX* wfe		= (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
+	unsigned int nSamples	= m_buff.GetCount() * 8 / wfe->wBitsPerSample;
 
 	CAtlArray<float> pBuff;
 	pBuff.SetCount(nSamples);
@@ -1156,14 +1156,14 @@ HRESULT CMpaDecFilter::ProcessPCMfloatLE() //little-endian 'fl32' and 'fl64'
 
 HRESULT CMpaDecFilter::ProcessPS2PCM()
 {
-	BYTE* p = m_buff.GetData();
-	BYTE* base = p;
-	BYTE* end = p + m_buff.GetCount();
+	BYTE* p		= m_buff.GetData();
+	BYTE* base	= p;
+	BYTE* end	= p + m_buff.GetCount();
 
 	WAVEFORMATEXPS2* wfe = (WAVEFORMATEXPS2*)m_pInput->CurrentMediaType().Format();
-	int size = wfe->dwInterleave*wfe->nChannels;
-	int samples = wfe->dwInterleave/(wfe->wBitsPerSample>>3);
-	int channels = wfe->nChannels;
+	int size		= wfe->dwInterleave*wfe->nChannels;
+	int samples		= wfe->dwInterleave/(wfe->wBitsPerSample>>3);
+	int channels	= wfe->nChannels;
 
 	CAtlArray<float> pBuff;
 	pBuff.SetCount(samples*channels);
@@ -1211,9 +1211,9 @@ HRESULT CMpaDecFilter::ProcessPS2PCM()
 
 static void decodeps2adpcm(ps2_state_t& s, int channel, BYTE* pin, double* pout)
 {
-	int tbl_index = pin[0]>>4;
-	int shift = pin[0]&0xf;
-	int unk = pin[1]; // ?
+	int tbl_index	= pin[0]>>4;
+	int shift		= pin[0]&0xf;
+	int unk			= pin[1]; // ?
 	UNREFERENCED_PARAMETER(unk);
 
 	if (tbl_index >= 10) {
@@ -1244,9 +1244,9 @@ static void decodeps2adpcm(ps2_state_t& s, int channel, BYTE* pin, double* pout)
 
 HRESULT CMpaDecFilter::ProcessPS2ADPCM()
 {
-	BYTE* p = m_buff.GetData();
-	BYTE* base = p;
-	BYTE* end = p + m_buff.GetCount();
+	BYTE* p		= m_buff.GetData();
+	BYTE* base	= p;
+	BYTE* end	= p + m_buff.GetCount();
 
 	WAVEFORMATEXPS2* wfe = (WAVEFORMATEXPS2*)m_pInput->CurrentMediaType().Format();
 	int size = wfe->dwInterleave*wfe->nChannels;
@@ -1331,8 +1331,8 @@ HRESULT CMpaDecFilter::Deliver(CAtlArray<float>& pBuff, DWORD nSamplesPerSec, WO
 	MPCSampleFormat sf = GetSampleFormat();
 	int nSamples = (int)pBuff.GetCount() / nChannels;
 
-	REFERENCE_TIME rtDur = 10000000i64 * nSamples / nSamplesPerSec;
-	REFERENCE_TIME rtStart = m_rtStart, rtStop = m_rtStart + rtDur;
+	REFERENCE_TIME rtDur	= 10000000i64 * nSamples / nSamplesPerSec;
+	REFERENCE_TIME rtStart	= m_rtStart, rtStop = m_rtStart + rtDur;
 	m_rtStart += rtDur;
 	//TRACE(_T("CMpaDecFilter: %I64d - %I64d\n"), rtStart/10000, rtStop/10000);
 	if (rtStart < 0 /*200000*/ /* < 0, FIXME: 0 makes strange noises */) {
@@ -1344,8 +1344,8 @@ HRESULT CMpaDecFilter::Deliver(CAtlArray<float>& pBuff, DWORD nSamplesPerSec, WO
 	}
 	//ASSERT(nChannels == av_get_channel_layout_nb_channels(dwChannelMask));
 
-	float* pDataIn = pBuff.GetData();
-	float* pDataMix = NULL;
+	float* pDataIn	= pBuff.GetData();
+	float* pDataMix	= NULL;
 
 	if (GetMixer()) {
 		int sc = GetMixerLayout();
@@ -1366,8 +1366,8 @@ HRESULT CMpaDecFilter::Deliver(CAtlArray<float>& pBuff, DWORD nSamplesPerSec, WO
 		}
 	}
 
-	CMediaType mt = CreateMediaType(sf, nSamplesPerSec, nChannels, dwChannelMask);
-	WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.Format();
+	CMediaType mt		= CreateMediaType(sf, nSamplesPerSec, nChannels, dwChannelMask);
+	WAVEFORMATEX* wfe	= (WAVEFORMATEX*)mt.Format();
 
 	if (FAILED(hr = ReconnectOutput(nSamples, mt))) {
 		return hr;
@@ -1581,16 +1581,16 @@ CMediaType CMpaDecFilter::CreateMediaType(MPCSampleFormat sf, DWORD nSamplesPerS
 {
 	CMediaType mt;
 
-	mt.majortype = MEDIATYPE_Audio;
-	mt.subtype = sf == SF_FLOAT32 ? MEDIASUBTYPE_IEEE_FLOAT : MEDIASUBTYPE_PCM;
-	mt.formattype = FORMAT_WaveFormatEx;
+	mt.majortype	= MEDIATYPE_Audio;
+	mt.subtype		= sf == SF_FLOAT32 ? MEDIASUBTYPE_IEEE_FLOAT : MEDIASUBTYPE_PCM;
+	mt.formattype	= FORMAT_WaveFormatEx;
 
 	WAVEFORMATEXTENSIBLE wfex;
 	//memset(&wfex, 0, sizeof(wfex));
 
-	WAVEFORMATEX& wfe = wfex.Format;
-	wfe.nChannels      = nChannels;
-	wfe.nSamplesPerSec = nSamplesPerSec;
+	WAVEFORMATEX& wfe	= wfex.Format;
+	wfe.nChannels		= nChannels;
+	wfe.nSamplesPerSec	= nSamplesPerSec;
 	switch (sf) {
 		default:
 		case SF_PCM16:
@@ -1604,8 +1604,8 @@ CMediaType CMpaDecFilter::CreateMediaType(MPCSampleFormat sf, DWORD nSamplesPerS
 			wfe.wBitsPerSample = 32;
 			break;
 	}
-	wfe.nBlockAlign     = nChannels * wfe.wBitsPerSample / 8;
-	wfe.nAvgBytesPerSec = nSamplesPerSec * wfe.nBlockAlign;
+	wfe.nBlockAlign		= nChannels * wfe.wBitsPerSample / 8;
+	wfe.nAvgBytesPerSec	= nSamplesPerSec * wfe.nBlockAlign;
 
 	if (nChannels <= 2 && dwChannelMask <= 0x4 && (sf == SF_PCM16 || sf == SF_FLOAT32)) {
 		// WAVEFORMATEX
@@ -1682,8 +1682,8 @@ HRESULT CMpaDecFilter::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_PRO
 		return E_UNEXPECTED;
 	}
 
-	CMediaType& mt = m_pInput->CurrentMediaType();
-	WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.Format();
+	CMediaType& mt		= m_pInput->CurrentMediaType();
+	WAVEFORMATEX* wfe	= (WAVEFORMATEX*)mt.Format();
 	UNREFERENCED_PARAMETER(wfe);
 
 	pProperties->cBuffers = 4;
@@ -1837,8 +1837,7 @@ STDMETHODIMP CMpaDecFilter::SetDynamicRangeControl(bool fDRC)
 	m_fDRC = fDRC;
 
 	if (m_pAVCtx) {
-		CodecID codec_id = m_pAVCtx->codec_id;
-		if (codec_id == CODEC_ID_AC3 || codec_id == CODEC_ID_EAC3) {
+		if (m_pAVCtx->codec_id == CODEC_ID_AC3 || m_pAVCtx->codec_id == CODEC_ID_EAC3) {
 			av_opt_set_double(m_pAVCtx, "drc_scale", fDRC ? 1.0f : 0.0f, AV_OPT_SEARCH_CHILDREN);
 		}
 	}
@@ -1965,11 +1964,10 @@ HRESULT CMpaDecFilter::DeliverFFmpeg(enum CodecID nCodecId, BYTE* p, int buffsiz
 		}
 	}
 
-	bool b_use_parse = m_pParser && ((nCodecId == CODEC_ID_TRUEHD) ? ((buffsize > 2000) ? true : false) : true); // Dirty hack for use with MPC MPEGSplitter
+	bool b_use_parse	= m_pParser && ((nCodecId == CODEC_ID_TRUEHD) ? ((buffsize > 2000) ? true : false) : true); // Dirty hack for use with MPC MPEGSplitter
 
-	BYTE* pDataBuff = NULL;
-
-	BYTE *tmpProcessBuf = NULL;
+	BYTE* pDataBuff		= NULL;
+	BYTE *tmpProcessBuf	= NULL;
 
 	AVPacket avpkt;
 	av_init_packet(&avpkt);
@@ -2042,9 +2040,9 @@ HRESULT CMpaDecFilter::DeliverFFmpeg(enum CodecID nCodecId, BYTE* p, int buffsiz
 		int got_frame = 0;
 
 		if (b_use_parse) {
-			BYTE *pOut = NULL;
-			int pOut_size = 0;
-			int used_bytes = av_parser_parse2(m_pParser, m_pAVCtx, &pOut, &pOut_size, pDataBuff, buffsize, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
+			BYTE *pOut		= NULL;
+			int pOut_size	= 0;
+			int used_bytes	= av_parser_parse2(m_pParser, m_pAVCtx, &pOut, &pOut_size, pDataBuff, buffsize, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
 			if (used_bytes < 0) {
 				TRACE(_T("CMpaDecFilter::DeliverFFmpeg() - audio parsing failed (ret: %d)\n"), -used_bytes);
 				goto fail;
@@ -2105,9 +2103,9 @@ HRESULT CMpaDecFilter::DeliverFFmpeg(enum CodecID nCodecId, BYTE* p, int buffsiz
 			if (nSamples) {
 				DWORD dwChannelMask;
 				if (m_pAVCtx->channel_layout) {
-				dwChannelMask = get_lav_channel_layout(m_pAVCtx->channel_layout);
+					dwChannelMask = get_lav_channel_layout(m_pAVCtx->channel_layout);
 				} else {
-				dwChannelMask = GetDefChannelMask(nChannels);
+					dwChannelMask = GetDefChannelMask(nChannels);
 				}
 
 				CAtlArray<float> pBuffOut;
@@ -2138,11 +2136,11 @@ HRESULT CMpaDecFilter::DeliverFFmpeg(enum CodecID nCodecId, BYTE* p, int buffsiz
 				}
 
 				hr = Deliver(pBuffOut, m_pAVCtx->sample_rate, nChannels, dwChannelMask);
-					if (FAILED(hr)) {
-						TRACE(_T("CMpaDecFilter::DeliverFFmpeg() - Deliver failed\n"));
-						goto fail;
-					}
+				if (FAILED(hr)) {
+					TRACE(_T("CMpaDecFilter::DeliverFFmpeg() - Deliver failed\n"));
+					goto fail;
 				}
+			}
 		}
 	}
 
@@ -2266,7 +2264,7 @@ bool CMpaDecFilter::InitFFmpeg(enum CodecID nCodecId)
 void CMpaDecFilter::LogLibavcodec(void* par, int level, const char* fmt, va_list valist)
 {
 #if defined(_DEBUG) && 0
-	char		Msg [500];
+	char Msg [500];
 	vsnprintf_s (Msg, sizeof(Msg), _TRUNCATE, fmt, valist);
 	TRACE("AVLIB : %s", Msg);
 #endif
