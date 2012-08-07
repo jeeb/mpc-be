@@ -744,16 +744,8 @@
       <Project>{5e56335f-0fb1-4eea-b240-d8dc5e0608e4}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\ExtLib\a52dec\vc++\liba52.vcxproj">
-      <Project>{62fe6d94-e17c-4a8e-8d3c-7a589a70d865}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
     <ProjectReference Include="..\..\ExtLib\lcms2\lcms2.vcxproj">
       <Project>{acf5c64b-78aa-4730-91a2-24f4910fbad9}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\ExtLib\libdca\vc++\libdca.vcxproj">
-      <Project>{fae14dbe-b508-4ab3-929d-75c68e4ebbc1}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="..\..\ExtLib\libflac\src\libFLAC\libflac.vcxproj">

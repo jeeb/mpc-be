@@ -24,6 +24,7 @@
 #include "stdafx.h"
 #include <MMReg.h>
 #include "DTSSplitterFile.h"
+#include "../../../DSUtil/AudioParser.h"
 
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
@@ -34,7 +35,6 @@
 #pragma warning(disable: 4005)
 #include <stdint.h>
 #pragma warning(pop)
-#include <libdca/include/dts.h>
 
 #define SYNC_OFFESET 0x122c
 
@@ -119,31 +119,19 @@ HRESULT CDTSSplitterFile::Init()
 		}
 
 		// DTS header
-		dts_state_t* m_dts_state;
-		m_dts_state = dts_init(0);
-		int flags, targeted_bitrate;
-		int m_samplerate = 0;
-		if ((m_framesize = dts_syncinfo(m_dts_state, buf, &flags, &m_samplerate, &targeted_bitrate, &m_framelength)) < 96) { //minimal valid fsize = 96
+		int channels, targeted_bitrate;
+		int samplerate = 0;
+		m_framesize = ParseDTSHeader(buf, &samplerate, &channels, &m_framelength, &targeted_bitrate);
+		if (m_framesize == 0) {
 			return E_FAIL;
 		}
 
 		Seek(dts_offset + m_framesize);
 		if(SUCCEEDED(ByteRead((BYTE*)&id, sizeof(id))) && isDTSSync(id)) {
 
-			int m_bitrate = int ((m_framesize) * 8i64 * m_samplerate / m_framelength);
+			int bitrate = int ((m_framesize) * 8i64 * samplerate / m_framelength);
 
-			const int channels[16] = {1, 2, 2, 2, 2, 3, 3, 4, 4, 5, 6, 6, 6, 7, 8, 8};
-			int m_channels = 0;
-			if (flags & 0x70) {//unknown number of channels
-				m_channels = 6;
-			} else {
-				m_channels = channels[flags & 0x0f];
-				if (flags & DCA_LFE) {
-					m_channels += 1; //+LFE
-				}
-			}
-
-			m_AvgTimePerFrame = m_bitrate ? (10000000i64 * m_framesize * 8 / m_bitrate) : 0;
+			m_AvgTimePerFrame = bitrate ? (10000000i64 * m_framesize * 8 / bitrate) : 0;
 
 			m_rtDuration = m_AvgTimePerFrame * (GetLength() - SYNC_OFFESET) / m_framesize;
 
@@ -156,9 +144,9 @@ HRESULT CDTSSplitterFile::Init()
 			m_mt.formattype			= FORMAT_WaveFormatEx;
 			WAVEFORMATEX* wfe		= (WAVEFORMATEX*)m_mt.AllocFormatBuffer(sizeof(WAVEFORMATEX));
 			wfe->wFormatTag			= WAVE_FORMAT_DTS;
-			wfe->nChannels			= m_channels;
-			wfe->nSamplesPerSec		= m_samplerate;
-			wfe->nAvgBytesPerSec	= (m_bitrate + 4) /8;
+			wfe->nChannels			= channels;
+			wfe->nSamplesPerSec		= samplerate;
+			wfe->nAvgBytesPerSec	= (bitrate + 4) /8;
 			wfe->nBlockAlign		= m_framesize < WORD_MAX ? m_framesize : WORD_MAX;
 			wfe->wBitsPerSample		= 0;
 			wfe->cbSize = 0;
@@ -174,8 +162,8 @@ HRESULT CDTSSplitterFile::Init()
 
 bool CDTSSplitterFile::GetInfo(int& FrameSize, REFERENCE_TIME& rtDuration)
 {
-	FrameSize	= m_framesize;
-	rtDuration	= m_AvgTimePerFrame;
+	FrameSize  = m_framesize;
+	rtDuration = m_AvgTimePerFrame;
 
 	return false;
 }

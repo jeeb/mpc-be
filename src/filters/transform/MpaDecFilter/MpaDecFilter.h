@@ -30,13 +30,19 @@
 #pragma warning(disable: 4005)
 #include <stdint.h>
 #pragma warning(pop)
-#include <a52dec/include/a52.h>
-#include <libdca/include/dts.h>
 #include "../DeCSSFilter/DeCSSInputPin.h"
 #include "IMpaDecFilter.h"
 #include "MpaDecSettingsWnd.h"
 
 #define MPCAudioDecName	L"MPC Audio Decoder"
+
+enum {
+	SPK_MONO = 0,
+	SPK_STEREO,
+	SPK_4_0,
+	SPK_5_1,
+	SPK_7_1,
+};
 
 struct ps2_state_t {
 	bool sync;
@@ -50,10 +56,28 @@ struct ps2_state_t {
 	}
 };
 
+struct audio_params_t {
+	DWORD layout;
+	WORD  channels;
+	void Reset() {
+		layout   = 0;
+		channels = 0;
+	}
+	bool LayoutUpdate(WORD channels_new, DWORD layout_new) {
+		if (layout == layout_new && channels == channels_new) {
+			return false;
+		}
+		layout   = layout_new;
+		channels = channels_new;
+		return true;
+	}
+};
+
 struct AVCodec;
 struct AVCodecContext;
 struct AVFrame;
 struct AVCodecParserContext;
+struct AVAudioResampleContext;
 
 class __declspec(uuid("3D446B6F-71DE-4437-BE15-8CE47174340F"))
 	CMpaDecFilter
@@ -64,17 +88,17 @@ class __declspec(uuid("3D446B6F-71DE-4437-BE15-8CE47174340F"))
 protected:
 	CCritSec m_csReceive;
 
-	a52_state_t*			m_a52_state;
-	dts_state_t*			m_dts_state;
-	ps2_state_t				m_ps2_state;
+	audio_params_t          m_InputParams;
+	// Mixer
+	AVAudioResampleContext* m_pAVRCxt;
 
-	DolbyDigitalMode		m_DolbyDigitalMode;
+	ps2_state_t             m_ps2_state;
 
 	// === FFMpeg variables
-	AVCodec*				m_pAVCodec;
-	AVCodecContext*			m_pAVCtx;
-	AVCodecParserContext*	m_pParser;
-	AVFrame*				m_pFrame;
+	AVCodec*                m_pAVCodec;
+	AVCodecContext*         m_pAVCtx;
+	AVCodecParserContext*   m_pParser;
+	AVFrame*                m_pFrame;
 
 	CAtlArray<BYTE> m_buff;
 	REFERENCE_TIME m_rtStart;
@@ -82,9 +106,8 @@ protected:
 
 	HRESULT ProcessLPCM();
 	HRESULT ProcessHdmvLPCM(bool bAlignOldBuffer);
-	HRESULT ProcessAC3();
-	HRESULT ProcessA52(BYTE* p, int buffsize, int& size, bool& fEnoughData);
-	HRESULT ProcessDTS();
+	HRESULT ProcessAC3_SPDIF();
+	HRESULT ProcessDTS_SPDIF();
 	HRESULT ProcessPS2PCM();
 	HRESULT ProcessPS2ADPCM();
 	HRESULT ProcessPCMraw();
@@ -99,17 +122,18 @@ protected:
 	HRESULT ReconnectOutput(int nSamples, CMediaType& mt);
 	CMediaType CreateMediaType(MPCSampleFormat sf, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask = 0);
 	CMediaType CreateMediaTypeSPDIF(DWORD nSamplesPerSec = 48000);
+	HRESULT Mixing(float* pOutput, WORD out_ch, DWORD out_layout, float* pInput, int samples, WORD in_ch, DWORD in_layout);
 
 	bool    InitFFmpeg(enum CodecID nCodecId);
 	void    ffmpeg_stream_finish();
 	HRESULT DeliverFFmpeg(enum CodecID nCodecId, BYTE* p, int samples, int& size);
 	HRESULT ProcessFFmpeg(enum CodecID nCodecId);
-	static void LogLibAVCodec(void* par,int level,const char *fmt,va_list valist);
+	static void LogLibavcodec(void* par, int level, const char* fmt, va_list valist);
 
 	BYTE*   m_pFFBuffer;
 	int     m_nFFBufferSize;
 
-	enum CodecID	FindCodec(const GUID subtype);
+	enum CodecID FindCodec(const GUID subtype);
 
 	struct {
 		int flavor;
@@ -124,8 +148,10 @@ protected:
 protected:
 	CCritSec m_csProps;
 	MPCSampleFormat m_iSampleFormat;
-	int  m_iSpeakerConfig[etlast];
-	bool m_fDynamicRangeControl[etlast];
+	bool m_fMixer;
+	int  m_iMixerLayout;
+	bool m_fDRC;
+	bool m_fSPDIF[etlast];
 
 	bool m_bResync;
 
@@ -161,11 +187,14 @@ public:
 
 	STDMETHODIMP SetSampleFormat(MPCSampleFormat sf);
 	STDMETHODIMP_(MPCSampleFormat) GetSampleFormat();
-	STDMETHODIMP SetSpeakerConfig(enctype et, int sc);
-	STDMETHODIMP_(int) GetSpeakerConfig(enctype et);
-	STDMETHODIMP SetDynamicRangeControl(enctype et, bool fDRC);
-	STDMETHODIMP_(bool) GetDynamicRangeControl(enctype et);
-	STDMETHODIMP_(DolbyDigitalMode) GetDolbyDigitalMode();
+	STDMETHODIMP SetMixer(bool fMixer);
+	STDMETHODIMP_(bool) GetMixer();
+	STDMETHODIMP SetMixerLayout(int sc);
+	STDMETHODIMP_(int) GetMixerLayout();
+	STDMETHODIMP SetDynamicRangeControl(bool fDRC);
+	STDMETHODIMP_(bool) GetDynamicRangeControl();
+	STDMETHODIMP SetSPDIF(enctype et, bool fSPDIF);
+	STDMETHODIMP_(bool) GetSPDIF(enctype et);
 
 	STDMETHODIMP SaveSettings();
 };

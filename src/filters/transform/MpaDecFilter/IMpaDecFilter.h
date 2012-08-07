@@ -25,15 +25,6 @@
 
 enum MPCSampleFormat {SF_PCM16, SF_PCM24, SF_PCM32, SF_FLOAT32};
 
-enum DolbyDigitalMode {
-	DD_Unknown,
-	DD_AC3,			// Standard AC3
-	DD_EAC3,		// Dolby Digital +
-	DD_TRUEHD,		// Dolby True HD
-	DD_MLP			// Meridian Lossless Packing
-};
-
-
 interface __declspec(uuid("2067C60F-752F-4EBD-B0B1-4CBC5E00741C"))
 IMpaDecFilter :
 public IUnknown {
@@ -41,11 +32,14 @@ public IUnknown {
 
 	STDMETHOD(SetSampleFormat(MPCSampleFormat sf)) = 0;
 	STDMETHOD_(MPCSampleFormat, GetSampleFormat()) = 0;
-	STDMETHOD(SetSpeakerConfig(enctype et, int sc)) = 0; // sign of sc tells if spdif is active
-	STDMETHOD_(int, GetSpeakerConfig(enctype et)) = 0;
-	STDMETHOD(SetDynamicRangeControl(enctype et, bool fDRC)) = 0;
-	STDMETHOD_(bool, GetDynamicRangeControl(enctype et)) = 0;
-	STDMETHOD_(DolbyDigitalMode, GetDolbyDigitalMode()) = 0;
+	STDMETHOD(SetMixer(bool fMixer)) = 0;
+	STDMETHOD_(bool, GetMixer()) = 0;
+	STDMETHOD(SetMixerLayout(int sc)) = 0;
+	STDMETHOD_(int, GetMixerLayout()) = 0;
+	STDMETHOD(SetDynamicRangeControl(bool fDRC)) = 0;
+	STDMETHOD_(bool, GetDynamicRangeControl()) = 0;
+	STDMETHOD(SetSPDIF(enctype et, bool fSPDIF)) = 0;
+	STDMETHOD_(bool, GetSPDIF(enctype et)) = 0;
 
 	STDMETHOD(SaveSettings()) = 0;
 };
