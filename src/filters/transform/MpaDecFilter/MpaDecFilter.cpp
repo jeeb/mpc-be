@@ -2065,7 +2065,7 @@ HRESULT CMpaDecFilter::DeliverFFmpeg(enum CodecID nCodecId, BYTE* p, int buffsiz
 	size			= 0;
 	int got_frame	= 0;
 	if (!m_pAVCtx || (nCodecId != m_pAVCtx->codec_id && (nCodecId != CODEC_ID_AC3 && nCodecId != CODEC_ID_EAC3))) {
-		if (!InitFFmpeg (nCodecId)) {
+		if (!InitFFmpeg(nCodecId)) {
 			return E_FAIL;
 		}
 	}
@@ -2185,6 +2185,7 @@ HRESULT CMpaDecFilter::DeliverFFmpeg(enum CodecID nCodecId, BYTE* p, int buffsiz
 
 			if (used_bytes < 0 ) {
 				TRACE(_T("CMpaDecFilter::DeliverFFmpeg() - decoding failed\n"));
+				InitFFmpeg(nCodecId);
 				size = used_bytes;
 				goto fail;
 			} else if(!used_bytes && !got_frame) {
