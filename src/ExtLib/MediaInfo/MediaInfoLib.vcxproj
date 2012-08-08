@@ -96,6 +96,10 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="MediaInfo\Audio\File_Opus.h" />
+    <ClInclude Include="MediaInfo\Image\File_Pcx.h" />
+    <ClInclude Include="MediaInfo\Image\File_Psd.h" />
+    <ClInclude Include="MediaInfo\Video\File_ProRes.h" />
     <ClInclude Include="ThirdParty\base64\base64.h" />
     <ClInclude Include="ThirdParty\tinyxml2\tinyxml2.h" />
     <ClInclude Include="MediaInfo\Archive\File_7z.h" />
@@ -300,6 +304,7 @@
     <ClCompile Include="MediaInfo\Audio\File_Mpc.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_MpcSv8.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Mpega.cpp" />
+    <ClCompile Include="MediaInfo\Audio\File_Opus.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Pcm.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Ps2Audio.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Rkau.cpp" />
@@ -333,7 +338,9 @@
     <ClCompile Include="MediaInfo\Image\File_Gif.cpp" />
     <ClCompile Include="MediaInfo\Image\File_Ico.cpp" />
     <ClCompile Include="MediaInfo\Image\File_Jpeg.cpp" />
+    <ClCompile Include="MediaInfo\Image\File_Pcx.cpp" />
     <ClCompile Include="MediaInfo\Image\File_Png.cpp" />
+    <ClCompile Include="MediaInfo\Image\File_Psd.cpp" />
     <ClCompile Include="MediaInfo\Image\File_Rle.cpp" />
     <ClCompile Include="MediaInfo\Image\File_Tga.cpp" />
     <ClCompile Include="MediaInfo\Image\File_Tiff.cpp" />
@@ -429,6 +436,7 @@
     <ClCompile Include="MediaInfo\Video\File_Lagarith.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Mpeg4v.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Mpegv.cpp" />
+    <ClCompile Include="MediaInfo\Video\File_ProRes.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Theora.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Vc1.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Vc3.cpp" />

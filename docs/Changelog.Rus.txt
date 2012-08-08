@@ -289,8 +289,8 @@
 * zlib до версии 1.2.7
 * libpng 1.5.12 (stable)
 * Little-CMS git-493aac0
-* MediaInfoLib v0.7.58.
-* ZenLib v0.4.27
+* MediaInfoLib v0.7.59.
+* ZenLib v0.4.28
 * SoundTouch svn rev.143
 * Logitech SDK v3.01
 * libwebp 0.2.0 rc1
