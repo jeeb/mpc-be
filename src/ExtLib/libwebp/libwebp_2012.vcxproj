@@ -22,6 +22,7 @@
     <ProjectGuid>{46068841-6391-408F-9573-988ADD619379}</ProjectGuid>
     <RootNamespace>libwebp</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <ProjectName>libwebp</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">

@@ -38,6 +38,7 @@
     <ProjectGuid>{4B065C3D-054E-4F95-9A74-4E53E9DF7144}</ProjectGuid>
     <RootNamespace>DeCSSFilter</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <ProjectName>DeCSSFilterStatic</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">

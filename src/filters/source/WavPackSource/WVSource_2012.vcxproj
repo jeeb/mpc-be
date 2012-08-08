@@ -38,6 +38,7 @@
     <ProjectGuid>{F22DE3B2-4DE9-4013-BBAB-1BB39F2B7DF7}</ProjectGuid>
     <RootNamespace>WVSource</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <ProjectName>WVSource</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">

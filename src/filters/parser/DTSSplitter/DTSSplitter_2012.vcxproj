@@ -38,6 +38,7 @@
     <ProjectGuid>{F68D02E9-32DE-4EDA-8691-B911DC5317DC}</ProjectGuid>
     <RootNamespace>DTSSplitter</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <ProjectName>DTSSplitter</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Filter|Win32'" Label="Configuration">

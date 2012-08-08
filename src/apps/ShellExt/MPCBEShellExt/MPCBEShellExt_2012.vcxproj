@@ -22,6 +22,7 @@
     <ProjectGuid>{BF167235-4EEA-43E5-91E6-7B143B26C56B}</ProjectGuid>
     <RootNamespace>MPCBEShellExt</RootNamespace>
     <Keyword>AtlProj</Keyword>
+    <ProjectName>MPCBEShellExt</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -83,14 +84,14 @@
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)bin\mpc-be_x64\</OutDir>
     <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</IgnoreImportLibrary>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MPCBEShellExt64</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MPCBEShellExt64</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectName)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <TargetName>MPCBEShellExt</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <TargetName>MPCBEShellExt</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>

@@ -21,6 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0D252872-7542-4232-8D02-53F9182AEE15}</ProjectGuid>
     <RootNamespace>Kasumi</RootNamespace>
+    <ProjectName>Kasumi</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

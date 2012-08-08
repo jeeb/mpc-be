@@ -38,6 +38,7 @@
     <ProjectGuid>{9ED4B036-7399-4128-868D-6E71188E0277}</ProjectGuid>
     <RootNamespace>MP4Splitter</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <ProjectName>MP4Splitter</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Filter|Win32'" Label="Configuration">

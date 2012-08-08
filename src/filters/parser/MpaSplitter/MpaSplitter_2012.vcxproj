@@ -38,6 +38,7 @@
     <ProjectGuid>{C0F7A036-FC2D-40DF-9852-C37518DB6B3E}</ProjectGuid>
     <RootNamespace>MpaSplitter</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <ProjectName>MpaSplitter</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Filter|Win32'" Label="Configuration">

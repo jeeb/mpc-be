@@ -654,6 +654,7 @@
     <ProjectGuid>{438286B7-A9F4-411D-BCC5-948C40E37D8F}</ProjectGuid>
     <RootNamespace>ffmpeg</RootNamespace>
     <Keyword>MakeFileProj</Keyword>
+    <ProjectName>ffmpeg</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">

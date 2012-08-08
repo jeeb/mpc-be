@@ -38,6 +38,7 @@
     <ProjectGuid>{67827491-8162-4039-9132-F934ABC836A0}</ProjectGuid>
     <RootNamespace>MatroskaMuxer</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <ProjectName>MatroskaMuxer</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Filter|Win32'" Label="Configuration">

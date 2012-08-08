@@ -38,6 +38,7 @@
     <ProjectGuid>{30D48874-899F-41C6-9B26-A40C96C91102}</ProjectGuid>
     <RootNamespace>DTSAC3Source</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <ProjectName>DTSAC3Source</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Filter|Win32'" Label="Configuration">

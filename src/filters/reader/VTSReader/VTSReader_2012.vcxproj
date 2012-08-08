@@ -38,6 +38,7 @@
     <ProjectGuid>{664E726B-EEEE-403A-AC15-345D9C9E1375}</ProjectGuid>
     <RootNamespace>VTSReader</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <ProjectName>VTSReader</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Filter|Win32'" Label="Configuration">

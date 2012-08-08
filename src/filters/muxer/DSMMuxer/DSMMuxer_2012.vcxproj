@@ -38,6 +38,7 @@
     <ProjectGuid>{65361C7C-83D6-42E4-870C-4DC85AE641FE}</ProjectGuid>
     <RootNamespace>DSMMuxer</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <ProjectName>DSMMuxer</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Filter|Win32'" Label="Configuration">

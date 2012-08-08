@@ -38,6 +38,7 @@
     <ProjectGuid>{AE399B7E-2B2C-4A96-9016-C5C74B0A2FA0}</ProjectGuid>
     <RootNamespace>streamdrivethru</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <ProjectName>StreamDriveThru</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Filter|Win32'" Label="Configuration">

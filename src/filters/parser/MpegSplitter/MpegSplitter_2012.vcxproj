@@ -38,6 +38,7 @@
     <ProjectGuid>{4628C665-EDE4-40D2-B525-32BE8B8551C8}</ProjectGuid>
     <RootNamespace>MpegSplitter</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <ProjectName>MpegSplitter</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Filter|Win32'" Label="Configuration">
