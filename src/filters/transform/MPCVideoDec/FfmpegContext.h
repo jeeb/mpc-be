@@ -61,10 +61,10 @@ HRESULT			FFMpeg2DecodeFrame (DXVA_PictureParameters* pPicParams, DXVA_QmatrixDa
 
 // === Common functions
 unsigned long	FFGetMBNumber(struct AVCodecContext* pAVCtx);
-void			FFSetThreadNumber(struct AVCodecContext* pAVCtx, enum CodecID nCodecId, int nThreadCount);
+void			FFSetThreadNumber(struct AVCodecContext* pAVCtx, enum AVCodecID nCodecId, int nThreadCount);
 BOOL			FFSoftwareCheckCompatibility(struct AVCodecContext* pAVCtx);
 int				FFGetCodedPicture(struct AVCodecContext* pAVCtx);
 BOOL			FFGetAlternateScan(struct AVCodecContext* pAVCtx);
-int				FFGetThreadType(enum CodecID nCodecId);
+int				FFGetThreadType(enum AVCodecID nCodecId);
 void			FFGetOutputSize(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int* OutWidth, int* OutHeight);
 BOOL			DXVACheckFramesize(int width, int height, DWORD nPCIVendor/*, DWORD nPCIDevice*/);

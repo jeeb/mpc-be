@@ -80,87 +80,87 @@ extern "C" {
 
 typedef struct {
 	const CLSID*       clsMinorType;
-	const enum CodecID nFFCodec;
+	const enum AVCodecID nFFCodec;
 } FFMPEG_AUDIO_CODECS;
 
 static const FFMPEG_AUDIO_CODECS ffAudioCodecs[] = {
 	// AMR
-	{ &MEDIASUBTYPE_AMR,				CODEC_ID_AMR_NB},
-	{ &MEDIASUBTYPE_SAMR,				CODEC_ID_AMR_NB},
-	{ &MEDIASUBTYPE_SAWB,				CODEC_ID_AMR_WB},
+	{ &MEDIASUBTYPE_AMR,				AV_CODEC_ID_AMR_NB},
+	{ &MEDIASUBTYPE_SAMR,				AV_CODEC_ID_AMR_NB},
+	{ &MEDIASUBTYPE_SAWB,				AV_CODEC_ID_AMR_WB},
 	// AAC
-	{ &MEDIASUBTYPE_AAC,				CODEC_ID_AAC},
-	{ &MEDIASUBTYPE_MP4A,				CODEC_ID_AAC},
-	{ &MEDIASUBTYPE_mp4a,				CODEC_ID_AAC},
-	{ &MEDIASUBTYPE_AAC_ADTS,			CODEC_ID_AAC},
-	{ &MEDIASUBTYPE_LATM_AAC,			CODEC_ID_AAC_LATM},
+	{ &MEDIASUBTYPE_AAC,				AV_CODEC_ID_AAC},
+	{ &MEDIASUBTYPE_MP4A,				AV_CODEC_ID_AAC},
+	{ &MEDIASUBTYPE_mp4a,				AV_CODEC_ID_AAC},
+	{ &MEDIASUBTYPE_AAC_ADTS,			AV_CODEC_ID_AAC},
+	{ &MEDIASUBTYPE_LATM_AAC,			AV_CODEC_ID_AAC_LATM},
 	// ALAC
-	{ &MEDIASUBTYPE_ALAC,				CODEC_ID_ALAC},
+	{ &MEDIASUBTYPE_ALAC,				AV_CODEC_ID_ALAC},
 	// MPEG-4 ALS
-	{ &MEDIASUBTYPE_ALS,				CODEC_ID_MP4ALS},
+	{ &MEDIASUBTYPE_ALS,				AV_CODEC_ID_MP4ALS},
 	// Ogg Vorbis
-	{ &MEDIASUBTYPE_Vorbis2,			CODEC_ID_VORBIS},
+	{ &MEDIASUBTYPE_Vorbis2,			AV_CODEC_ID_VORBIS},
 	// NellyMoser
-	{ &MEDIASUBTYPE_NELLYMOSER,			CODEC_ID_NELLYMOSER},
+	{ &MEDIASUBTYPE_NELLYMOSER,			AV_CODEC_ID_NELLYMOSER},
 	// Qt ADPCM
-	{ &MEDIASUBTYPE_IMA4,				CODEC_ID_ADPCM_IMA_QT},
+	{ &MEDIASUBTYPE_IMA4,				AV_CODEC_ID_ADPCM_IMA_QT},
 	// FLV ADPCM
-	{ &MEDIASUBTYPE_ADPCM_SWF,			CODEC_ID_ADPCM_SWF},
+	{ &MEDIASUBTYPE_ADPCM_SWF,			AV_CODEC_ID_ADPCM_SWF},
 	// AMV IMA ADPCM
-	{ &MEDIASUBTYPE_ADPCM_AMV,			CODEC_ID_ADPCM_IMA_AMV},
+	{ &MEDIASUBTYPE_ADPCM_AMV,			AV_CODEC_ID_ADPCM_IMA_AMV},
 	// MPEG Audio
-	{ &MEDIASUBTYPE_MPEG1Packet,		CODEC_ID_MP2},
-	{ &MEDIASUBTYPE_MPEG1Payload,		CODEC_ID_MP2},
-	{ &MEDIASUBTYPE_MPEG1AudioPayload,	CODEC_ID_MP2},
-	{ &MEDIASUBTYPE_MPEG2_AUDIO,		CODEC_ID_MP2},
-	{ &MEDIASUBTYPE_MP3,				CODEC_ID_MP3},
+	{ &MEDIASUBTYPE_MPEG1Packet,		AV_CODEC_ID_MP2},
+	{ &MEDIASUBTYPE_MPEG1Payload,		AV_CODEC_ID_MP2},
+	{ &MEDIASUBTYPE_MPEG1AudioPayload,	AV_CODEC_ID_MP2},
+	{ &MEDIASUBTYPE_MPEG2_AUDIO,		AV_CODEC_ID_MP2},
+	{ &MEDIASUBTYPE_MP3,				AV_CODEC_ID_MP3},
 	// RealMedia Audio
-	{ &MEDIASUBTYPE_14_4,				CODEC_ID_RA_144},
-	{ &MEDIASUBTYPE_28_8,				CODEC_ID_RA_288},
-	{ &MEDIASUBTYPE_ATRC,				CODEC_ID_ATRAC3},
-	{ &MEDIASUBTYPE_COOK,				CODEC_ID_COOK},
-	{ &MEDIASUBTYPE_SIPR,				CODEC_ID_SIPR},
-	{ &MEDIASUBTYPE_RAAC,				CODEC_ID_AAC},
-	{ &MEDIASUBTYPE_RACP,				CODEC_ID_AAC},
-	{ &MEDIASUBTYPE_DNET,				CODEC_ID_AC3},
+	{ &MEDIASUBTYPE_14_4,				AV_CODEC_ID_RA_144},
+	{ &MEDIASUBTYPE_28_8,				AV_CODEC_ID_RA_288},
+	{ &MEDIASUBTYPE_ATRC,				AV_CODEC_ID_ATRAC3},
+	{ &MEDIASUBTYPE_COOK,				AV_CODEC_ID_COOK},
+	{ &MEDIASUBTYPE_SIPR,				AV_CODEC_ID_SIPR},
+	{ &MEDIASUBTYPE_RAAC,				AV_CODEC_ID_AAC},
+	{ &MEDIASUBTYPE_RACP,				AV_CODEC_ID_AAC},
+	{ &MEDIASUBTYPE_DNET,				AV_CODEC_ID_AC3},
 	// AC3, E-AC3, TrueHD, MLP
-	{ &MEDIASUBTYPE_DOLBY_AC3,			CODEC_ID_AC3},
-	{ &MEDIASUBTYPE_WAVE_DOLBY_AC3,		CODEC_ID_AC3},
-	{ &MEDIASUBTYPE_DOLBY_DDPLUS,		CODEC_ID_EAC3},
-	{ &MEDIASUBTYPE_DOLBY_TRUEHD,		CODEC_ID_TRUEHD},
-	{ &MEDIASUBTYPE_MLP,				CODEC_ID_MLP},
+	{ &MEDIASUBTYPE_DOLBY_AC3,			AV_CODEC_ID_AC3},
+	{ &MEDIASUBTYPE_WAVE_DOLBY_AC3,		AV_CODEC_ID_AC3},
+	{ &MEDIASUBTYPE_DOLBY_DDPLUS,		AV_CODEC_ID_EAC3},
+	{ &MEDIASUBTYPE_DOLBY_TRUEHD,		AV_CODEC_ID_TRUEHD},
+	{ &MEDIASUBTYPE_MLP,				AV_CODEC_ID_MLP},
 	// DTS
-	{ &MEDIASUBTYPE_DTS,            CODEC_ID_DTS },
-	{ &MEDIASUBTYPE_WAVE_DTS,       CODEC_ID_DTS },
+	{ &MEDIASUBTYPE_DTS,				AV_CODEC_ID_DTS },
+	{ &MEDIASUBTYPE_WAVE_DTS,			AV_CODEC_ID_DTS },
 	// FLAC
-	{ &MEDIASUBTYPE_FLAC_FRAMED,		CODEC_ID_FLAC},
+	{ &MEDIASUBTYPE_FLAC_FRAMED,		AV_CODEC_ID_FLAC},
 	// QDM2
-	{ &MEDIASUBTYPE_QDM2,				CODEC_ID_QDM2},
+	{ &MEDIASUBTYPE_QDM2,				AV_CODEC_ID_QDM2},
 	// WavPack4
-	{ &MEDIASUBTYPE_WAVPACK4,			CODEC_ID_WAVPACK},
+	{ &MEDIASUBTYPE_WAVPACK4,			AV_CODEC_ID_WAVPACK},
 	// MusePack v7/v8
-	{ &MEDIASUBTYPE_MPC7,				CODEC_ID_MUSEPACK7},
-	{ &MEDIASUBTYPE_MPC8,				CODEC_ID_MUSEPACK8},
+	{ &MEDIASUBTYPE_MPC7,				AV_CODEC_ID_MUSEPACK7},
+	{ &MEDIASUBTYPE_MPC8,				AV_CODEC_ID_MUSEPACK8},
 	// APE
-	{ &MEDIASUBTYPE_APE,				CODEC_ID_APE},
+	{ &MEDIASUBTYPE_APE,				AV_CODEC_ID_APE},
 	// TTA
-	{ &MEDIASUBTYPE_TTA1,				CODEC_ID_TTA},
+	{ &MEDIASUBTYPE_TTA1,				AV_CODEC_ID_TTA},
 	// TRUESPEECH
-	{ &MEDIASUBTYPE_TRUESPEECH,			CODEC_ID_TRUESPEECH},
+	{ &MEDIASUBTYPE_TRUESPEECH,			AV_CODEC_ID_TRUESPEECH},
 	// Windows Media Audio 9 Professional
-	{ &MEDIASUBTYPE_WMAUDIO3,			CODEC_ID_WMAPRO},
+	{ &MEDIASUBTYPE_WMAUDIO3,			AV_CODEC_ID_WMAPRO},
 	// Windows Media Audio Lossless
-	{ &MEDIASUBTYPE_WMAUDIO_LOSSLESS,	CODEC_ID_WMALOSSLESS},
+	{ &MEDIASUBTYPE_WMAUDIO_LOSSLESS,	AV_CODEC_ID_WMALOSSLESS},
 	// Windows Media Audio 1, 2
-	{ &MEDIASUBTYPE_MSAUDIO1,			CODEC_ID_WMAV1},
-	{ &MEDIASUBTYPE_WMAUDIO2,			CODEC_ID_WMAV2},
+	{ &MEDIASUBTYPE_MSAUDIO1,			AV_CODEC_ID_WMAV1},
+	{ &MEDIASUBTYPE_WMAUDIO2,			AV_CODEC_ID_WMAV2},
 	// Bink Audio
-	{ &MEDIASUBTYPE_BINKA_DCT,			CODEC_ID_BINKAUDIO_DCT},
-	{ &MEDIASUBTYPE_BINKA_RDFT,			CODEC_ID_BINKAUDIO_RDFT},
+	{ &MEDIASUBTYPE_BINKA_DCT,			AV_CODEC_ID_BINKAUDIO_DCT},
+	{ &MEDIASUBTYPE_BINKA_RDFT,			AV_CODEC_ID_BINKAUDIO_RDFT},
 	// Indeo Audio
-	{ &MEDIASUBTYPE_IAC,				CODEC_ID_IAC},
+	{ &MEDIASUBTYPE_IAC,				AV_CODEC_ID_IAC},
 
-	{ &MEDIASUBTYPE_None,				CODEC_ID_NONE},
+	{ &MEDIASUBTYPE_None,				AV_CODEC_ID_NONE},
 };
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
@@ -520,14 +520,14 @@ HRESULT CMpaDecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, d
 	return __super::NewSegment(tStart, tStop, dRate);
 }
 
-enum CodecID CMpaDecFilter::FindCodec(const GUID subtype)
+enum AVCodecID CMpaDecFilter::FindCodec(const GUID subtype)
 {
 	for (int i=0; i<_countof(ffAudioCodecs); i++)
 		if (subtype == *ffAudioCodecs[i].clsMinorType) {
 			return ffAudioCodecs[i].nFFCodec;
 		}
 
-	return CODEC_ID_NONE;
+	return AV_CODEC_ID_NONE;
 }
 
 HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
@@ -613,8 +613,8 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	else if (GetSPDIF(dts) && (subtype == MEDIASUBTYPE_DTS || subtype == MEDIASUBTYPE_WAVE_DTS)) {
 		return ProcessDTS_SPDIF();
 	}
-	enum CodecID nCodecId = FindCodec(subtype);
-	if (nCodecId != CODEC_ID_NONE) {
+	enum AVCodecID nCodecId = FindCodec(subtype);
+	if (nCodecId != AV_CODEC_ID_NONE) {
 		return ProcessFFmpeg(nCodecId);
 	}
 
@@ -871,7 +871,7 @@ HRESULT CMpaDecFilter::ProcessAC3_SPDIF()
 	return S_OK;
 }
 
-HRESULT CMpaDecFilter::ProcessFFmpeg(enum CodecID nCodecId)
+HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId)
 {
 	HRESULT hr;
 	BYTE* p		= m_buff.GetData();
@@ -881,7 +881,7 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum CodecID nCodecId)
 	int size = 0;
 	hr = DeliverFFmpeg(nCodecId, p, int(end-p), size);
 	if (FAILED(hr)) {
-		if (nCodecId != CODEC_ID_AAC) { // LOOKATTHIS
+		if (nCodecId != AV_CODEC_ID_AAC) { // LOOKATTHIS
 			m_buff.RemoveAll();
 			m_bResync = true;
 		}
@@ -1771,8 +1771,8 @@ HRESULT CMpaDecFilter::StopStreaming()
 HRESULT	CMpaDecFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType *pmt)
 {
 	if (dir == PINDIR_INPUT) {
-		enum CodecID nCodecId = FindCodec(pmt->subtype);
-		if (nCodecId != CODEC_ID_NONE && !InitFFmpeg(nCodecId)) {
+		enum AVCodecID nCodecId = FindCodec(pmt->subtype);
+		if (nCodecId != AV_CODEC_ID_NONE && !InitFFmpeg(nCodecId)) {
 			return VFW_E_TYPE_NOT_ACCEPTED;
 		}
 	}
@@ -1837,7 +1837,7 @@ STDMETHODIMP CMpaDecFilter::SetDynamicRangeControl(bool fDRC)
 	m_fDRC = fDRC;
 
 	if (m_pAVCtx) {
-		if (m_pAVCtx->codec_id == CODEC_ID_AC3 || m_pAVCtx->codec_id == CODEC_ID_EAC3) {
+		if (m_pAVCtx->codec_id == AV_CODEC_ID_AC3 || m_pAVCtx->codec_id == AV_CODEC_ID_EAC3) {
 			av_opt_set_double(m_pAVCtx, "drc_scale", fDRC ? 1.0f : 0.0f, AV_OPT_SEARCH_CHILDREN);
 		}
 	}
@@ -1954,17 +1954,17 @@ CMpaDecInputPin::CMpaDecInputPin(CTransformFilter* pFilter, HRESULT* phr, LPWSTR
 	memset(m_pFFBuffer+size, 0, FF_INPUT_BUFFER_PADDING_SIZE); \
 }
 
-HRESULT CMpaDecFilter::DeliverFFmpeg(enum CodecID nCodecId, BYTE* p, int buffsize, int& size)
+HRESULT CMpaDecFilter::DeliverFFmpeg(enum AVCodecID nCodecId, BYTE* p, int buffsize, int& size)
 {
 	size = 0;
 	HRESULT hr = S_OK;
-	if (!m_pAVCtx || (nCodecId != m_pAVCtx->codec_id && (nCodecId != CODEC_ID_AC3 && nCodecId != CODEC_ID_EAC3))) { // LOOKATTHIS
+	if (!m_pAVCtx || (nCodecId != m_pAVCtx->codec_id && (nCodecId != AV_CODEC_ID_AC3 && nCodecId != AV_CODEC_ID_EAC3))) { // LOOKATTHIS
 		if (!InitFFmpeg(nCodecId)) {
 			return E_FAIL;
 		}
 	}
 
-	bool b_use_parse	= m_pParser && ((nCodecId == CODEC_ID_TRUEHD) ? ((buffsize > 2000) ? true : false) : true); // Dirty hack for use with MPC MPEGSplitter
+	bool b_use_parse	= m_pParser && ((nCodecId == AV_CODEC_ID_TRUEHD) ? ((buffsize > 2000) ? true : false) : true); // Dirty hack for use with MPC MPEGSplitter
 
 	BYTE* pDataBuff		= NULL;
 	BYTE *tmpProcessBuf	= NULL;
@@ -2151,9 +2151,9 @@ fail:
 	return E_FAIL;
 }
 
-bool CMpaDecFilter::InitFFmpeg(enum CodecID nCodecId)
+bool CMpaDecFilter::InitFFmpeg(enum AVCodecID nCodecId)
 {
-	if (nCodecId == CODEC_ID_NONE) {
+	if (nCodecId == AV_CODEC_ID_NONE) {
 		return false;
 	}
 
@@ -2166,11 +2166,11 @@ bool CMpaDecFilter::InitFFmpeg(enum CodecID nCodecId)
 		ffmpeg_stream_finish();
 	}
 	switch (nCodecId) {
-		case CODEC_ID_MP1 :
+		case AV_CODEC_ID_MP1 :
 			m_pAVCodec = avcodec_find_decoder_by_name("mp1float");
-		case CODEC_ID_MP2 :
+		case AV_CODEC_ID_MP2 :
 			m_pAVCodec = avcodec_find_decoder_by_name("mp2float");
-		case CODEC_ID_MP3 :
+		case AV_CODEC_ID_MP3 :
 			m_pAVCodec = avcodec_find_decoder_by_name("mp3float");
 		default :
 			m_pAVCodec = avcodec_find_decoder(nCodecId);
@@ -2181,7 +2181,7 @@ bool CMpaDecFilter::InitFFmpeg(enum CodecID nCodecId)
 		WORD nChannels, nBitsPerSample, nBlockAlign;
 		audioFormatTypeHandler((BYTE *)m_pInput->CurrentMediaType().Format(), m_pInput->CurrentMediaType().FormatType(), &nSamples, &nChannels, &nBitsPerSample, &nBlockAlign, &nBytesPerSec);
 
-		if (nCodecId == CODEC_ID_AMR_NB || nCodecId == CODEC_ID_AMR_WB) {
+		if (nCodecId == AV_CODEC_ID_AMR_NB || nCodecId == AV_CODEC_ID_AMR_WB) {
 			nChannels = 1;
 			nSamples  = 8000;
 		}
@@ -2201,11 +2201,11 @@ bool CMpaDecFilter::InitFFmpeg(enum CodecID nCodecId)
 			m_pAVCtx->flags            |= CODEC_FLAG_TRUNCATED;
 		}
 
-		if (nCodecId == CODEC_ID_AC3 || nCodecId == CODEC_ID_EAC3) {
+		if (nCodecId == AV_CODEC_ID_AC3 || nCodecId == AV_CODEC_ID_EAC3) {
 			av_opt_set_double(m_pAVCtx, "drc_scale", GetDynamicRangeControl() ? 1.0f : 0.0f, AV_OPT_SEARCH_CHILDREN);
 		}
 
-		if (nCodecId != CODEC_ID_AAC) { // LOOKATTHIS
+		if (nCodecId != AV_CODEC_ID_AAC) { // LOOKATTHIS
 			m_pParser = av_parser_init(nCodecId);
 		}
 
@@ -2218,7 +2218,7 @@ bool CMpaDecFilter::InitFFmpeg(enum CodecID nCodecId)
 		memset(&m_raData, 0, sizeof(m_raData));
 
 		if (extralen) {
-			if (nCodecId == CODEC_ID_COOK || nCodecId == CODEC_ID_ATRAC3 || nCodecId == CODEC_ID_SIPR) {
+			if (nCodecId == AV_CODEC_ID_COOK || nCodecId == AV_CODEC_ID_ATRAC3 || nCodecId == AV_CODEC_ID_SIPR) {
 				uint8_t *extra = (uint8_t *)av_mallocz(extralen + FF_INPUT_BUFFER_PADDING_SIZE);
 				getExtraData((BYTE *)format, &format_type, formatlen, extra, NULL);
 
@@ -2228,7 +2228,7 @@ bool CMpaDecFilter::InitFFmpeg(enum CodecID nCodecId)
 					if (FAILED(hr)) {
 						return false;
 					}
-					if (nCodecId == CODEC_ID_SIPR) {
+					if (nCodecId == AV_CODEC_ID_SIPR) {
 						if (m_raData.flavor > 3) {
 							TRACE(_T("CMpaDecFilter::InitFFmpeg() : Invalid SIPR flavor (%d)"), m_raData.flavor);
 							return false;
@@ -2366,7 +2366,7 @@ HRESULT CMpaDecFilter::ParseRealAudioHeader(const BYTE *extra, const int extrale
 #pragma region Mixer
 
 /*
-static DWORD SanitizeMask(DWORD mask, CodecID codec)
+static DWORD SanitizeMask(DWORD mask, AVCodecID codec)
 {
 	DWORD newmask = mask;
 	//...
