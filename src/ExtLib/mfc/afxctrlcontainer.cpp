@@ -31,7 +31,11 @@
 
 ////////////////////////////////////////////////////////////////////////////
 
+#if (_MSC_VER == 1700)
+void AfxDoRegisterMFCControlClass(LPCTSTR lpszClassName, LPCTSTR lpszBaseClassName)
+#else
 static void DoRegisterWindowClass(LPCTSTR lpszClassName, LPCTSTR lpszBaseClassName)
+#endif
 {
 	ASSERT(lpszClassName != NULL);
 	ASSERT(lpszBaseClassName != NULL);
@@ -39,7 +43,11 @@ static void DoRegisterWindowClass(LPCTSTR lpszClassName, LPCTSTR lpszBaseClassNa
 	WNDCLASS wnd = {0};
 
 	HINSTANCE hInst = AfxGetInstanceHandle();
+#if (_MSC_VER == 1700)
+	if (!GetClassInfo(hInst, lpszBaseClassName, &wnd))
+#else
 	if (!AfxCtxGetClassInfo(hInst, lpszBaseClassName, &wnd))
+#endif
 	{
 		wnd.style = CS_DBLCLKS;
 		wnd.hInstance = hInst;
@@ -50,6 +58,7 @@ static void DoRegisterWindowClass(LPCTSTR lpszClassName, LPCTSTR lpszBaseClassNa
 	AfxRegisterClass(&wnd);
 }
 
+#if (_MSC_VER == 1600)
 void AfxRegisterMFCCtrlClasses()
 {
 	DoRegisterWindowClass(_T("MFCButton"), WC_BUTTON);
@@ -64,6 +73,7 @@ void AfxRegisterMFCCtrlClasses()
 	DoRegisterWindowClass(_T("MFCShellTree"), WC_TREEVIEW);
 	DoRegisterWindowClass(_T("MFCVSListBox"), WC_STATIC);
 }
+#endif
 
 ////////////////////////////////////////////////////////////////////////////
 // CMFCControlContainer
@@ -78,6 +88,7 @@ CMFCControlContainer::~CMFCControlContainer()
 	ClearControlData();
 }
 
+#if (_MSC_VER == 1600)
 BOOL CMFCControlContainer::SubclassDlgControls()
 {
 	if (m_pWnd->GetSafeHwnd() != NULL)
@@ -107,6 +118,7 @@ BOOL CMFCControlContainer::SubclassDlgControls()
 
 	return FALSE;
 }
+#endif
 
 void CMFCControlContainer::FreeSubclassedControls()
 {
@@ -200,6 +212,7 @@ BOOL CMFCControlContainer::IsSubclassedFeaturePackControl(HWND hWndCtrl)
 	return FALSE;
 }
 
+#if (_MSC_VER == 1600)
 void CMFCControlContainer::PreUnsubclassControl(CWnd* pControl)
 {
 	UNREFERENCED_PARAMETER(pControl);
@@ -210,6 +223,7 @@ void CMFCControlContainer::PreUnsubclassControl(CWnd* pControl)
 //		pListCtrl->GetHeaderCtrl().UnsubclassWindow();
 //	}
 }
+#endif
 
 BOOL CMFCControlContainer::ReSubclassControl(HWND hWndCtrl, WORD nIDC, CWnd& control)
 {
@@ -316,6 +330,8 @@ void CMFCControlContainer::ClearControlData()
 	m_mapControlData.RemoveAll();
 }
 
+#if (_MSC_VER == 1600)
+
 ////////////////////////////////////////////////////////////////////////////
 // Accessing dialog DLGINIT helpers
 
@@ -372,3 +388,4 @@ BOOL __stdcall CMFCControlContainer::ReadBoolProp(CTagManager& /*tagManager*/, L
 	bMember = (str.CompareNoCase(PS_True) == 0);
 	return TRUE;
 }
+#endif

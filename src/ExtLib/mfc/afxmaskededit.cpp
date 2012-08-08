@@ -27,7 +27,6 @@
 
 IMPLEMENT_DYNAMIC(CMFCMaskedEdit, CEdit)
 
-//{{AFX_MSG_MAP(CMFCMaskedEdit)
 BEGIN_MESSAGE_MAP(CMFCMaskedEdit, CEdit)
 	ON_WM_CHAR()
 	ON_WM_KEYDOWN()
@@ -42,7 +41,6 @@ BEGIN_MESSAGE_MAP(CMFCMaskedEdit, CEdit)
 	ON_MESSAGE(WM_GETTEXTLENGTH, &CMFCMaskedEdit::OnGetTextLength)
 	ON_MESSAGE(WM_MFC_INITCTRL, &CMFCMaskedEdit::OnInitControl)
 END_MESSAGE_MAP()
-//}}AFX_MSG_MAP
 
 CMFCMaskedEdit::CMFCMaskedEdit()
 {
@@ -339,6 +337,17 @@ void CMFCMaskedEdit::SetWindowText(LPCTSTR lpszString)
 	CEdit::SetWindowText(lpszString);
 }
 
+#if (_MSC_VER == 1700)
+int CMFCMaskedEdit::GetWindowText(_Out_writes_to_(nMaxCount, return + 1) LPTSTR lpszStringBuf, _In_ int nMaxCount) const
+{
+	return CEdit::GetWindowText(lpszStringBuf, nMaxCount);
+}
+
+void CMFCMaskedEdit::GetWindowText(CString& strString) const
+{
+	CEdit::GetWindowText(strString);
+}
+#else
 int CMFCMaskedEdit::GetWindowText(_Out_z_cap_post_count_(nMaxCount, return + 1) LPTSTR lpszStringBuf, _In_ int nMaxCount) const
 {
 	return CEdit::GetWindowText(lpszStringBuf, nMaxCount);
@@ -348,6 +357,7 @@ void CMFCMaskedEdit::GetWindowText(CString& strString) const
 {
 	CEdit::GetWindowText(strString);
 }
+#endif
 
 ///////////////////////////////////
 // Handlers
@@ -1731,7 +1741,11 @@ LRESULT CMFCMaskedEdit::OnInitControl(WPARAM wParam, LPARAM lParam)
 	CTagManager tagManager(strDst);
 
 	BOOL bSelectByGroup = TRUE;
+#if (_MSC_VER == 1700)
+	if (ReadBoolProp(tagManager, PS_MFCMaskedEdit_SelectByGroup, bSelectByGroup))
+#else
 	if (CMFCControlContainer::ReadBoolProp(tagManager, PS_MFCMaskedEdit_SelectByGroup, bSelectByGroup))
+#endif
 	{
 		EnableSelectByGroup(bSelectByGroup);
 	}

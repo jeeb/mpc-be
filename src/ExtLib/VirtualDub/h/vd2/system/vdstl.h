@@ -1377,7 +1377,7 @@ protected:
 		kBlockSizeBits = Block::kBlockSizeBits
 	};
 
-	struct M1 : public A::rebind<Block *>::other {
+	struct M1 : public A::template rebind<Block *>::other {
 		Block **mapStartAlloc;		// start of map
 		Block **mapStartCommit;		// start of range of allocated blocks
 		Block **mapStart;			// start of range of active blocks
@@ -1386,7 +1386,7 @@ protected:
 		Block **mapEndAlloc;		// end of map
 	} m;
 
-	struct M2 : public A::rebind<Block>::other {
+	struct M2 : public A::template rebind<Block>::other {
 		int startIndex;
 		int endIndex;
 	} mTails;

@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{86251DC4-9298-424C-AE6C-07844F79C0B5}</ProjectGuid>
+    <RootNamespace>mpciconlib</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\common.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)bin\mpc-be_x86\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)bin\mpc-be_x64\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <Link>
+      <NoEntryPoint>true</NoEntryPoint>
+      <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
+    </Link>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NO_VERSION_REV_NEEDED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\..\..\include</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <Link>
+      <NoEntryPoint>true</NoEntryPoint>
+      <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
+    </Link>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NO_VERSION_REV_NEEDED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\..\..\include</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="mpciconlib.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="mpciconlib.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="mpciconlib.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="icons\bmov.ico" />
+    <None Include="icons\bmusic.ico" />
+    <None Include="icons\bmusic2.ico" />
+    <None Include="icons\bpic.ico" />
+    <None Include="icons\bpl.ico" />
+    <None Include="icons\bstar.ico" />
+    <None Include="icons\cmov.ico" />
+    <None Include="icons\cmusic.ico" />
+    <None Include="icons\cmusic2.ico" />
+    <None Include="icons\cpic.ico" />
+    <None Include="icons\cpl.ico" />
+    <None Include="icons\cstar.ico" />
+    <None Include="icons\gmov.ico" />
+    <None Include="icons\gmusic.ico" />
+    <None Include="icons\gmusic2.ico" />
+    <None Include="icons\gpic.ico" />
+    <None Include="icons\gpl.ico" />
+    <None Include="icons\gstar.ico" />
+    <None Include="icons\m0001.ico" />
+    <None Include="icons\m0002.ico" />
+    <None Include="icons\m0003.ico" />
+    <None Include="icons\m0004.ico" />
+    <None Include="icons\m0005.ico" />
+    <None Include="icons\m0006.ico" />
+    <None Include="icons\m0007.ico" />
+    <None Include="icons\m0008.ico" />
+    <None Include="icons\m0009.ico" />
+    <None Include="icons\m0010.ico" />
+    <None Include="icons\m0011.ico" />
+    <None Include="icons\m0012.ico" />
+    <None Include="icons\m0013.ico" />
+    <None Include="icons\m0014.ico" />
+    <None Include="icons\m0015.ico" />
+    <None Include="icons\m0016.ico" />
+    <None Include="icons\mu001.ico" />
+    <None Include="icons\mu002.ico" />
+    <None Include="icons\mu003.ico" />
+    <None Include="icons\mu004.ico" />
+    <None Include="icons\mu005.ico" />
+    <None Include="icons\mu006.ico" />
+    <None Include="icons\mu007.ico" />
+    <None Include="icons\mu008.ico" />
+    <None Include="icons\mu009.ico" />
+    <None Include="icons\mu010.ico" />
+    <None Include="icons\mu011.ico" />
+    <None Include="icons\mu012.ico" />
+    <None Include="icons\mu013.ico" />
+    <None Include="icons\mu014.ico" />
+    <None Include="icons\mu015.ico" />
+    <None Include="icons\mu016.ico" />
+    <None Include="icons\pl0001.ico" />
+    <None Include="icons\pl0002.ico" />
+    <None Include="icons\pl0004.ico" />
+    <None Include="icons\pl0005.ico" />
+    <None Include="icons\rmov.ico" />
+    <None Include="icons\rmusic.ico" />
+    <None Include="icons\rmusic2.ico" />
+    <None Include="icons\rpic.ico" />
+    <None Include="icons\rpl.ico" />
+    <None Include="icons\rstar.ico" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
