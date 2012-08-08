@@ -36,7 +36,7 @@
 CComPtr<IApplicationAssociationRegistration> CPPageFormats::m_pAAR;
 
 // TODO: change this along with the root key for settings and the mutex name to
-//       avoid possible risks of conflict with the old MPC (non HC version).
+//       avoid possible risks of conflict with the old MPC (non BE version).
 #ifdef _WIN64
 	#define PROGID _T("mpc-be64")
 #else
@@ -208,8 +208,8 @@ bool CPPageFormats::IsRegistered(CString ext)
 
 CString GetProgramDir()
 {
-	CString RtnVal;
-	TCHAR    FileName[_MAX_PATH];
+	CString	RtnVal;
+	TCHAR	FileName[_MAX_PATH];
 	::GetModuleFileName(AfxGetInstanceHandle(), FileName, _MAX_PATH);
 	RtnVal = FileName;
 	RtnVal = RtnVal.Left(RtnVal.ReverseFind('\\'));
@@ -218,16 +218,13 @@ CString GetProgramDir()
 
 int FileExists(const TCHAR *fileName)
 {
-	DWORD fileAttr;
-	fileAttr = ::GetFileAttributes(fileName);
-	if (0xFFFFFFFF == fileAttr) {
+	if (0xFFFFFFFF == ::GetFileAttributes(fileName)) {
 		return false;
 	}
 	return true;
 }
 
 typedef int (*GetIconIndexFunc)(CString);
-
 int GetIconIndex(CString ext)
 {
 	int iconindex = -1;
@@ -360,19 +357,24 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, bool fRegister)
 	}
 
 	if (f_setAssociatedWithIcon) {
-		CString AppIcon = _T("");
+		CString AppIcon;
 		TCHAR buff[_MAX_PATH];
 
-		CString mpciconlib = GetProgramDir() + _T("\\mpciconlib.dll");
+		// first look for the icon
+		CString ext_icon = GetProgramDir();
+		ext_icon.AppendFormat(_T("\\icons\\%s.ico"), CString(ext).TrimLeft(_T(".")));
+		if (FileExists(ext_icon)) {
+			AppIcon.Format(_T("\"%s\",0"), ext_icon);
+		} else {
+			// then look for the iconlib
+			CString mpciconlib = GetProgramDir() + _T("\\mpciconlib.dll");
+			if (FileExists(mpciconlib)) {
+				int icon_index = GetIconIndex(ext);
 
-		if (FileExists(mpciconlib)) {
-			int icon_index = GetIconIndex(ext);
-			CString m_typeicon = mpciconlib;
-
-			/* icon_index value -1 means no icon was found in the iconlib for the file extension */
-			if ((icon_index >= 0) && ExtractIcon(AfxGetApp()->m_hInstance,(LPCWSTR)m_typeicon, icon_index)) {
-				m_typeicon = "\""+mpciconlib+"\"";
-				AppIcon.Format(_T("%s,%d"), m_typeicon, icon_index);
+				/* icon_index value -1 means no icon was found in the iconlib for the file extension */
+				if ((icon_index >= 0) && ExtractIcon(AfxGetApp()->m_hInstance,(LPCWSTR)mpciconlib, icon_index)) {
+					AppIcon.Format(_T("\"%s\",%d"), mpciconlib, icon_index);
+				}
 			}
 		}
 
@@ -405,10 +407,10 @@ static struct {
 	LPCSTR verb, cmd;
 	UINT action;
 } handlers[] = {
-	{"VideoFiles", " %1", IDS_AUTOPLAY_PLAYVIDEO},
-	{"MusicFiles", " %1", IDS_AUTOPLAY_PLAYMUSIC},
-	{"CDAudio", " %1 /cd", IDS_AUTOPLAY_PLAYAUDIOCD},
-	{"DVDMovie", " %1 /dvd", IDS_AUTOPLAY_PLAYDVDMOVIE},
+	{"VideoFiles",	" %1",		IDS_AUTOPLAY_PLAYVIDEO},
+	{"MusicFiles",	" %1",		IDS_AUTOPLAY_PLAYMUSIC},
+	{"CDAudio",		" %1 /cd",	IDS_AUTOPLAY_PLAYAUDIOCD},
+	{"DVDMovie",	" %1 /dvd",	IDS_AUTOPLAY_PLAYDVDMOVIE},
 };
 
 void CPPageFormats::AddAutoPlayToRegistry(autoplay_t ap, bool fRegister)

@@ -90,6 +90,7 @@
 + Превью на SeekBar, включая DVD режим;
 + DTSAC3Source: added support for DTS-WAVE 48kHz 16LE;
 + Вывод чаптеров в виде маркеров на таймлайне;
++ Добавлена возможность задавать пользовательские иконки для разных форматов(расширений) файлов - для этого надо в подпаку Icons положить иконку в ввиде <ext>.ico, например avi.ico/mkv.ico и т.д.
 
 Исправления (!):
 ! Small fix H.264 DXVA decoder to improve detect broken interlaced frame;
