@@ -10501,8 +10501,13 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 		h = r1.Height() - r2.Height() + lHeight;
 
 		if (style & WS_THICKFRAME) {
+#if (_MSC_VER == 1700) // TODO - keep this until not fix in VS2012 return value of GetSystemMetrics() ...
+			w += GetSystemMetrics(SM_CXSIZEFRAME) * 4;
+			h += GetSystemMetrics(SM_CYSIZEFRAME) * 4;
+#else
 			w += GetSystemMetrics(SM_CXSIZEFRAME) * 2;
 			h += GetSystemMetrics(SM_CYSIZEFRAME) * 2;
+#endif
 			if ( (style & WS_CAPTION) == 0 ) {
 				w -= 2;
 				h -= 2;
