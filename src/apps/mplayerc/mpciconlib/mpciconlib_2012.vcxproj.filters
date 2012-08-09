@@ -1,0 +1,217 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Resource Files\icons">
+      <UniqueIdentifier>{a30fae36-ef1d-4888-83c4-6ef86520877d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="mpciconlib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="mpciconlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="mpciconlib.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="icons\bmov.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\bmusic.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\bmusic2.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\bpic.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\bpl.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\bstar.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\cmov.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\cmusic.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\cmusic2.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\cpic.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\cpl.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\cstar.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\gmov.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\gmusic.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\gmusic2.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\gpic.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\gpl.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\gstar.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\m0001.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\m0002.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\m0003.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\m0004.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\m0005.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\m0006.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\m0007.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\m0008.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\m0009.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\m0010.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\m0011.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\m0012.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\m0013.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\m0014.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\m0015.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\m0016.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\mu001.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\mu002.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\mu003.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\mu004.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\mu005.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\mu006.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\mu007.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\mu008.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\mu009.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\mu010.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\mu011.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\mu012.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\mu013.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\mu014.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\mu015.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\mu016.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\pl0001.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\pl0002.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\pl0004.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\pl0005.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\rmov.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\rmusic.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\rmusic2.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\rpic.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\rpl.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\rstar.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+  </ItemGroup>
+</Project>
