@@ -570,7 +570,6 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 		key.SetDWORDValue(_T("UseWasapi"), m_useWASAPIAfterRestart);
 		key.SetDWORDValue(_T("MuteFastForward"), m_bMuteFastForward);
 		key.SetStringValue(_T("SoundDevice"), m_csSound_Device);
-		key.SetDWORDValue(_T("WasapiMode"), m_WasapiMode);
 	}
 #else
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Audio Renderer"), _T("UseWasapi"), m_useWASAPIAfterRestart);
