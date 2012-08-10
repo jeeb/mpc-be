@@ -102,6 +102,8 @@ public:
 	STDMETHODIMP_(BOOL)			GetMuteFastForward();
 	STDMETHODIMP				SetSoundDevice(CString nValue);
 	STDMETHODIMP_(CString)		GetSoundDevice();
+	STDMETHODIMP				SetWasapiModeType(INT nValue);
+	STDMETHODIMP_(INT)			GetWasapiModeType();
 
 	// CMpcAudioRenderer
 private:
@@ -141,6 +143,8 @@ private:
 	bool					m_useWASAPIAfterRestart;
 	bool					m_bMuteFastForward;
 	CString					m_csSound_Device;
+	int						m_WasapiMode;
+	int						m_WasapiModeAfterRestart;
 	IMMDevice				*pMMDevice;
 	IAudioClient			*pAudioClient;
 	IAudioRenderClient		*pRenderClient;

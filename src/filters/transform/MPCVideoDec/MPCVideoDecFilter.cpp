@@ -818,9 +818,8 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	if (m_nErrorRecognition != AV_EF_CAREFUL && m_nErrorRecognition != AV_EF_COMPLIANT && m_nErrorRecognition != AV_EF_AGGRESSIVE) {
 		m_nErrorRecognition = AV_EF_CAREFUL;
 	}
-	if (m_nDXVACheckCompatibility > 3) {
-		m_nDXVACheckCompatibility = 1;    // skip level check by default
-	}
+
+	m_nDXVACheckCompatibility = max(0, min(m_nDXVACheckCompatibility, 3));
 
 	ff_avcodec_default_get_buffer		= avcodec_default_get_buffer;
 	ff_avcodec_default_release_buffer	= avcodec_default_release_buffer;
