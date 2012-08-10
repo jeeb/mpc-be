@@ -36,10 +36,7 @@ private :
 	CButton		m_grpDefault;
 
 	CStatic		m_txtWasapiMode;
-	CButton		m_cbWasapiMode;
-
-	CStatic		m_txtWasapiModeType;
-	CComboBox	m_cbWasapiModeType;
+	CComboBox	m_cbWasapiMode;
 
 	CButton		m_cbMuteFastForward;
 
@@ -48,7 +45,6 @@ private :
 
 	enum {
 		IDC_PP_WASAPI_MODE = 10000,
-		IDC_PP_WASAPI_MODE_TYPE,
 		IDC_PP_MUTE_FAST_FORWARD,
 		IDC_PP_SOUND_DEVICE,
 	};

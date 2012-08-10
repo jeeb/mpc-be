@@ -86,14 +86,11 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 
 	m_grpDefault.Create (_T(""), WS_VISIBLE|WS_CHILD | BS_GROUPBOX, CRect (10,  nPosY,  wsize.cx, nPosY+ wsize.cy), this, (UINT)IDC_STATIC);
 	nPosY += VERTICAL_SPACING;
-	m_cbWasapiMode.Create (ResStr (IDS_ARS_WASAPI_MODE), WS_VISIBLE|WS_CHILD|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect (LEFT_SPACING,  nPosY, 325, nPosY+15), this, IDC_PP_WASAPI_MODE);
-
-	nPosY += VERTICAL_SPACING;
-	m_txtWasapiModeType.Create (_T("Wasapi mode"), WS_VISIBLE|WS_CHILD, CRect (LEFT_SPACING,  nPosY, 100, nPosY+15), this, (UINT)IDC_STATIC);
-	m_cbWasapiModeType.Create (WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect (110,  nPosY-4, 325, nPosY+90), this, IDC_PP_WASAPI_MODE_TYPE);
-	m_cbWasapiModeType.AddString(_T("Exclusive Mode"));
-	m_cbWasapiModeType.AddString(_T("Shared Mode"));
-	// TODO - translate ...
+	m_txtWasapiMode.Create (ResStr (IDS_ARS_WASAPI_MODE), WS_VISIBLE|WS_CHILD, CRect (LEFT_SPACING,  nPosY, 200, nPosY+15), this, (UINT)IDC_STATIC);
+	m_cbWasapiMode.Create (WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect (210,  nPosY-4, 325, nPosY+90), this, IDC_PP_WASAPI_MODE);
+	m_cbWasapiMode.AddString(_T("Do not use WASAPI"));
+	m_cbWasapiMode.AddString(_T("Exclusive Mode"));
+	m_cbWasapiMode.AddString(_T("Shared Mode"));
 
 	nPosY += VERTICAL_SPACING + 10;
 	m_cbMuteFastForward.Create (ResStr (IDS_ARS_MUTE_FAST_FORWARD), WS_VISIBLE|WS_CHILD|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect (LEFT_SPACING,  nPosY, 325, nPosY+15), this, IDC_PP_MUTE_FAST_FORWARD);
@@ -118,12 +115,8 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 
 		CorrectComboListWidth(m_cbSoundDevice);
 
-		m_cbWasapiMode.SetCheck(m_pMAR->GetWasapiMode());
+		m_cbWasapiMode.SetCurSel(m_pMAR->GetWasapiMode());
 		m_cbMuteFastForward.SetCheck(m_pMAR->GetMuteFastForward());
-
-		m_cbWasapiModeType.SetCurSel(m_pMAR->GetWasapiModeType());
-		// m_txtWasapiModeType.EnableWindow(m_cbWasapiMode.GetCheck());
-		// m_cbWasapiModeType.EnableWindow(m_cbWasapiMode.GetCheck());
 	}
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
@@ -142,9 +135,8 @@ bool CMpcAudioRendererSettingsWnd::OnApply()
 	OnDeactivate();
 
 	if (m_pMAR) {
-		m_pMAR->SetWasapiMode(m_cbWasapiMode.GetCheck());
+		m_pMAR->SetWasapiMode(m_cbWasapiMode.GetCurSel());
 		m_pMAR->SetMuteFastForward(m_cbMuteFastForward.GetCheck());
-		m_pMAR->SetWasapiModeType(m_cbWasapiModeType.GetCurSel());
 		CString str;
 		int idx = m_cbSoundDevice.GetCurSel();
 		if ( !(idx < 0) ) {

@@ -27,12 +27,10 @@ IMpcAudioRendererFilter :
 public IUnknown {
 	STDMETHOD(Apply()) = 0;
 
-	STDMETHOD(SetWasapiMode(BOOL nValue)) = 0;
-	STDMETHOD_(BOOL, GetWasapiMode()) = 0;
+	STDMETHOD(SetWasapiMode(INT nValue)) = 0;
+	STDMETHOD_(INT, GetWasapiMode()) = 0;
 	STDMETHOD(SetMuteFastForward(BOOL nValue)) = 0;
 	STDMETHOD_(BOOL, GetMuteFastForward()) = 0;
 	STDMETHOD(SetSoundDevice(CString nValue)) = 0;
 	STDMETHOD_(CString, GetSoundDevice()) = 0;
-	STDMETHOD(SetWasapiModeType(INT nValue)) = 0;
-	STDMETHOD_(BOOL, GetWasapiModeType()) = 0;
 };

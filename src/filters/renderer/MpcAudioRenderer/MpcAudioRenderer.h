@@ -96,14 +96,12 @@ public:
 
 	// === IMpcAudioRendererFilter
 	STDMETHODIMP				Apply();
-	STDMETHODIMP				SetWasapiMode(BOOL nValue);
-	STDMETHODIMP_(BOOL)			GetWasapiMode();
+	STDMETHODIMP				SetWasapiMode(INT nValue);
+	STDMETHODIMP_(INT)			GetWasapiMode();
 	STDMETHODIMP				SetMuteFastForward(BOOL nValue);
 	STDMETHODIMP_(BOOL)			GetMuteFastForward();
 	STDMETHODIMP				SetSoundDevice(CString nValue);
 	STDMETHODIMP_(CString)		GetSoundDevice();
-	STDMETHODIMP				SetWasapiModeType(INT nValue);
-	STDMETHODIMP_(INT)			GetWasapiModeType();
 
 	// CMpcAudioRenderer
 private:
@@ -139,12 +137,10 @@ private:
 
 
 	// WASAPI variables
-	bool					m_useWASAPI;
-	bool					m_useWASAPIAfterRestart;
+	int						m_useWASAPI;
+	int						m_useWASAPIAfterRestart;
 	bool					m_bMuteFastForward;
 	CString					m_csSound_Device;
-	int						m_WasapiMode;
-	int						m_WasapiModeAfterRestart;
 	IMMDevice				*pMMDevice;
 	IAudioClient			*pAudioClient;
 	IAudioRenderClient		*pRenderClient;

@@ -104,7 +104,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, pMMDevice			(NULL)
 	, pAudioClient		(NULL )
 	, pRenderClient		(NULL )
-	, m_useWASAPI		(true )
+	, m_useWASAPI		(1 )
 	, m_bMuteFastForward(false)
 	, m_csSound_Device	(_T(""))
 	, nFramesInBuffer	(0 )
@@ -115,7 +115,6 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, lastBufferTime	(0)
 	, hnsActualDuration	(0)
 	, m_lVolume			(DSBVOLUME_MIN)
-	, m_WasapiMode		(0)
 {
 	HMODULE		hLib;
 
@@ -127,7 +126,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\MPC-BE Filters\\MPC Audio Renderer"), KEY_READ)) {
 		DWORD dw;
 		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("UseWasapi"), dw)) {
-			m_useWASAPI = !!dw;
+			m_useWASAPI = dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("MuteFastForward"), dw)) {
 			m_bMuteFastForward = !!dw;
@@ -137,21 +136,15 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		if (ERROR_SUCCESS == key.QueryStringValue(_T("SoundDevice"), buff, &len)) {
 			m_csSound_Device = CString(buff);
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("WasapiMode"), dw)) {
-			m_WasapiMode = dw;
-		}
 	}
 #else
-	m_useWASAPI			= !!AfxGetApp()->GetProfileInt(_T("Filters\\MPC Audio Renderer"), _T("UseWasapi"), m_useWASAPI);
+	m_useWASAPI			= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Audio Renderer"), _T("UseWasapi"), m_useWASAPI);
 	m_bMuteFastForward	= !!AfxGetApp()->GetProfileInt(_T("Filters\\MPC Audio Renderer"), _T("MuteFastForward"), m_bMuteFastForward);
 	m_csSound_Device	= AfxGetApp()->GetProfileString(_T("Filters\\MPC Audio Renderer"), _T("SoundDevice"), _T(""));
-	m_WasapiMode		= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Audio Renderer"), _T("WasapiMode"), m_WasapiMode);
 #endif
 
-	m_WasapiMode = (max(0, min(m_WasapiMode, 1)));
+	m_useWASAPI = (max(0, min(m_useWASAPI, 2)));
 	m_useWASAPIAfterRestart		= m_useWASAPI;
-	m_WasapiModeAfterRestart	= m_WasapiMode;
-
 
 	// Load Vista specifics DLLs
 	hLib = LoadLibrary (L"AVRT.dll");
@@ -233,9 +226,9 @@ HRESULT	CMpcAudioRenderer::CheckMediaType(const CMediaType *pmt)
 		}
 
 		HRESULT hr = VFW_E_TYPE_NOT_ACCEPTED;
-		if (m_WasapiModeAfterRestart == 0) { // EXCLUSIVE
+		if (m_useWASAPIAfterRestart == 1) { // EXCLUSIVE
 			hr = pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, pwfx, NULL);
-		} else if (m_WasapiModeAfterRestart == 1) { // SHARED
+		} else if (m_useWASAPIAfterRestart == 2) { // SHARED
 			WAVEFORMATEX *sharedClosestMatch = 0;
 			hr = pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_SHARED, pwfx, &sharedClosestMatch);
 		}
@@ -574,16 +567,15 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 #ifdef REGISTER_FILTER
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, _T("Software\\MPC-BE Filters\\MPC Audio Renderer"))) {
-		key.SetDWORDValue(_T("UseWasapi"), m_useWASAPI);
+		key.SetDWORDValue(_T("UseWasapi"), m_useWASAPIAfterRestart);
 		key.SetDWORDValue(_T("MuteFastForward"), m_bMuteFastForward);
 		key.SetStringValue(_T("SoundDevice"), m_csSound_Device);
 		key.SetDWORDValue(_T("WasapiMode"), m_WasapiMode);
 	}
 #else
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Audio Renderer"), _T("UseWasapi"), m_useWASAPI);
+	AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Audio Renderer"), _T("UseWasapi"), m_useWASAPIAfterRestart);
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Audio Renderer"), _T("MuteFastForward"), m_bMuteFastForward);
 	AfxGetApp()->WriteProfileString(_T("Filters\\MPC Audio Renderer"), _T("SoundDevice"), m_csSound_Device);
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Audio Renderer"), _T("WasapiMode"), m_WasapiMode);
 #endif
 
 	return S_OK;
@@ -592,7 +584,7 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 STDMETHODIMP CMpcAudioRenderer::SetWasapiMode(BOOL nValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
-	m_useWASAPIAfterRestart = !!nValue;
+	m_useWASAPIAfterRestart = nValue;
 	return S_OK;
 }
 STDMETHODIMP_(BOOL) CMpcAudioRenderer::GetWasapiMode()
@@ -623,18 +615,6 @@ STDMETHODIMP_(CString) CMpcAudioRenderer::GetSoundDevice()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_csSound_Device;
-}
-
-STDMETHODIMP CMpcAudioRenderer::SetWasapiModeType(INT nValue)
-{
-	CAutoLock cAutoLock(&m_csProps);
-	m_WasapiMode = nValue;
-	return S_OK;
-}
-STDMETHODIMP_(INT) CMpcAudioRenderer::GetWasapiModeType()
-{
-	CAutoLock cAutoLock(&m_csProps);
-	return m_WasapiMode;
 }
 
 HRESULT CMpcAudioRenderer::GetReferenceClockInterface(REFIID riid, void **ppv)
@@ -1047,9 +1027,9 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx)
 		}
 		m_pWaveFileFormat = pNewWaveFormatEx;
 
-		if (m_WasapiModeAfterRestart == 0) { // EXCLUSIVE
+		if (m_useWASAPIAfterRestart == 1) { // EXCLUSIVE
 			hr = pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, pWaveFormatEx, NULL);
-		} else if (m_WasapiModeAfterRestart == 1) { // SHARED
+		} else if (m_useWASAPIAfterRestart == 2) { // SHARED
 			WAVEFORMATEX *sharedClosestMatch = 0;
 			hr = pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_SHARED, pWaveFormatEx, &sharedClosestMatch);
 		}
@@ -1245,9 +1225,9 @@ HRESULT CMpcAudioRenderer::InitAudioClient(WAVEFORMATEX *pWaveFormatEx, IAudioCl
 	//if (SUCCEEDED (hr)) hr = pAudioClient->GetDevicePeriod(NULL, &hnsPeriod);
 	hnsPeriod=500000; //50 ms is the best according to James @Slysoft
 
-	if (m_WasapiModeAfterRestart == 0) { // EXCLUSIVE
+	if (m_useWASAPIAfterRestart == 1) { // EXCLUSIVE
 		hr = pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, pWaveFormatEx, NULL);
-	} else if (m_WasapiModeAfterRestart == 1) { // SHARED
+	} else if (m_useWASAPIAfterRestart == 2) { // SHARED
 		WAVEFORMATEX *sharedClosestMatch = 0;
 		hr = pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_SHARED, pWaveFormatEx, &sharedClosestMatch);
 	}
@@ -1260,7 +1240,7 @@ HRESULT CMpcAudioRenderer::InitAudioClient(WAVEFORMATEX *pWaveFormatEx, IAudioCl
 	GetBufferSize(pWaveFormatEx, &hnsPeriod);
 
 	if (SUCCEEDED (hr)) {
-		hr = pAudioClient->Initialize(m_WasapiModeAfterRestart == 0 ? AUDCLNT_SHAREMODE_EXCLUSIVE : AUDCLNT_SHAREMODE_SHARED,
+		hr = pAudioClient->Initialize(m_useWASAPIAfterRestart == 1 ? AUDCLNT_SHAREMODE_EXCLUSIVE : AUDCLNT_SHAREMODE_SHARED,
 									  0/*AUDCLNT_STREAMFLAGS_EVENTCALLBACK*/,
 									  hnsPeriod,hnsPeriod,pWaveFormatEx,NULL);
 	}
@@ -1295,9 +1275,12 @@ HRESULT CMpcAudioRenderer::InitAudioClient(WAVEFORMATEX *pWaveFormatEx, IAudioCl
 			hr = CreateAudioClient(pMMDevice, &pAudioClient);
 		}
 		TRACE(_T("CMpcAudioRenderer::InitAudioClient Trying again with periodicity of %I64u hundred-nanoseconds, or %u frames.\n"), hnsPeriod, nFramesInBuffer);
-		if (SUCCEEDED (hr))
-			hr = pAudioClient->Initialize(AUDCLNT_SHAREMODE_EXCLUSIVE,0/*AUDCLNT_STREAMFLAGS_EVENTCALLBACK*/,
-										  hnsPeriod, hnsPeriod, pWaveFormatEx, NULL);
+		if (SUCCEEDED (hr)) {
+			hr = pAudioClient->Initialize(m_useWASAPIAfterRestart == 1 ? AUDCLNT_SHAREMODE_EXCLUSIVE : AUDCLNT_SHAREMODE_SHARED,
+										  0/*AUDCLNT_STREAMFLAGS_EVENTCALLBACK*/,
+										  hnsPeriod,hnsPeriod,pWaveFormatEx,NULL);
+		}
+
 		if (FAILED(hr)) {
 			TRACE(_T("CMpcAudioRenderer::InitAudioClient Failed to reinitialize the audio client\n"));
 			return hr;
