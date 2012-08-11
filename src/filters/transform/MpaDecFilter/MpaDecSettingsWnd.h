@@ -42,10 +42,10 @@ class __declspec(uuid("24103041-884B-4772-B0D3-A600E7CBFEC7"))
 	enum {
 		IDC_PP_COMBO1 = 10000,
 		IDC_PP_COMBO2,
-		IDC_PP_CHECK1,
-		IDC_PP_CHECK2,
-		IDC_PP_CHECK3,
-		IDC_PP_CHECK4,
+		IDC_PP_CHECK_MIXER,
+		IDC_PP_CHECK_DRC,
+		IDC_PP_CHECK_AC3_CPDIF,
+		IDC_PP_CHECK_DTS_CPDIF,
 	};
 
 	CStatic m_outputformat_static;
@@ -75,4 +75,6 @@ public:
 	static CSize GetWindowSize() { return CSize(320, 305); }
 
 	DECLARE_MESSAGE_MAP()
+
+	afx_msg void OnMixerCheck();
 };

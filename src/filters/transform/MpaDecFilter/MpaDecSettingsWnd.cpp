@@ -88,12 +88,12 @@ bool CMpaDecSettingsWnd::OnActivate()
 	}
 	p.y += 25;
 
-	m_drc_check.Create(ResStr(IDS_MPADEC_DRC), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(205, m_fontheight)), this, IDC_PP_CHECK2);
+	m_drc_check.Create(ResStr(IDS_MPADEC_DRC), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(205, m_fontheight)), this, IDC_PP_CHECK_DRC);
 	m_drc_check.SetCheck(m_drc);
 	p.y += 30;
 
 	m_mixer_group.Create(_T(""), dwStyle | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(215, 45)), this, (UINT)IDC_STATIC);
-	m_mixer_check.Create(ResStr(IDS_MPADEC_MIXER), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(60, m_fontheight)), this, IDC_PP_CHECK1);
+	m_mixer_check.Create(ResStr(IDS_MPADEC_MIXER), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(55, m_fontheight)), this, IDC_PP_CHECK_MIXER);
 	m_mixer_check.SetCheck(m_mixer);
 	p.y += 20;
 	m_mixer_layout_static.Create(ResStr(IDS_MPADEC_MIX_SPEAKERS), dwStyle, CRect(p, CSize(120, m_fontheight)), this);
@@ -115,9 +115,9 @@ bool CMpaDecSettingsWnd::OnActivate()
 
 	m_spdif_group.Create(ResStr(IDS_MPADEC_SPDIF),dwStyle | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(215, 40)), this, (UINT)IDC_STATIC);
 	p.y += 20;
-	m_spdif_ac3_check.Create(_T("AC-3"), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(45, m_fontheight)), this, IDC_PP_CHECK3);
+	m_spdif_ac3_check.Create(_T("AC-3"), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(45, m_fontheight)), this, IDC_PP_CHECK_AC3_CPDIF);
 	m_spdif_ac3_check.SetCheck(m_spdif_ac3);
-	m_spdif_dts_check.Create(_T("DTS"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(50, 0), CSize(45, m_fontheight)), this, IDC_PP_CHECK4);
+	m_spdif_dts_check.Create(_T("DTS"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(50, 0), CSize(45, m_fontheight)), this, IDC_PP_CHECK_DTS_CPDIF);
 	m_spdif_dts_check.SetCheck(m_spdif_dts);
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
@@ -156,4 +156,10 @@ bool CMpaDecSettingsWnd::OnApply()
 }
 
 BEGIN_MESSAGE_MAP(CMpaDecSettingsWnd, CInternalPropertyPageWnd)
+	ON_BN_CLICKED(IDC_PP_CHECK_MIXER, OnMixerCheck)
 END_MESSAGE_MAP()
+
+void CMpaDecSettingsWnd::OnMixerCheck()
+{
+	m_mixer_layout_combo.EnableWindow(!!m_mixer_check.GetCheck());
+}
