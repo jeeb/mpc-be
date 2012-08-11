@@ -86,17 +86,21 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 
 	m_grpDefault.Create (_T(""), WS_VISIBLE|WS_CHILD | BS_GROUPBOX, CRect (10,  nPosY,  wsize.cx, nPosY+ wsize.cy), this, (UINT)IDC_STATIC);
 	nPosY += VERTICAL_SPACING;
-	m_txtWasapiMode.Create (ResStr (IDS_ARS_WASAPI_MODE), WS_VISIBLE|WS_CHILD, CRect (LEFT_SPACING,  nPosY, 200, nPosY+15), this, (UINT)IDC_STATIC);
-	m_cbWasapiMode.Create (WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect (210,  nPosY-4, 325, nPosY+90), this, IDC_PP_WASAPI_MODE);
+
+	m_txtWasapiMode.Create (ResStr (IDS_ARS_WASAPI_MODE), WS_VISIBLE|WS_CHILD, CRect (LEFT_SPACING,  nPosY, 325, nPosY+15), this, (UINT)IDC_STATIC);
+	nPosY += VERTICAL_SPACING - 5;
+	m_cbWasapiMode.Create (WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect (LEFT_SPACING,  nPosY-4, 325, nPosY+90), this, IDC_PP_WASAPI_MODE);
 	m_cbWasapiMode.AddString(_T("Do not use WASAPI"));
 	m_cbWasapiMode.AddString(_T("Exclusive Mode"));
 	m_cbWasapiMode.AddString(_T("Shared Mode"));
 
 	nPosY += VERTICAL_SPACING + 10;
+	m_txtSoundDevice.Create (ResStr (IDS_ARS_SOUND_DEVICE), WS_VISIBLE|WS_CHILD, CRect (LEFT_SPACING,  nPosY, 325, nPosY+15), this, (UINT)IDC_STATIC);
+	nPosY += VERTICAL_SPACING - 5;
+	m_cbSoundDevice.Create (WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect (LEFT_SPACING,  nPosY-4, 325, nPosY+90), this, IDC_PP_SOUND_DEVICE);
+
+	nPosY += VERTICAL_SPACING + 10;
 	m_cbMuteFastForward.Create (ResStr (IDS_ARS_MUTE_FAST_FORWARD), WS_VISIBLE|WS_CHILD|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect (LEFT_SPACING,  nPosY, 325, nPosY+15), this, IDC_PP_MUTE_FAST_FORWARD);
-	nPosY += VERTICAL_SPACING;
-	m_txtSoundDevice.Create (ResStr (IDS_ARS_SOUND_DEVICE), WS_VISIBLE|WS_CHILD, CRect (LEFT_SPACING,  nPosY, 100, nPosY+15), this, (UINT)IDC_STATIC);
-	m_cbSoundDevice.Create (WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect (110,  nPosY-4, 325, nPosY+90), this, IDC_PP_SOUND_DEVICE);
 
 	SetClassLongPtr(GetDlgItem(IDC_PP_SOUND_DEVICE)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
 

@@ -201,6 +201,12 @@ HRESULT	CMpcAudioRenderer::CheckMediaType(const CMediaType *pmt)
 	if (pmt == NULL) {
 		return E_INVALIDARG;
 	}
+
+	if (pmt->subtype != MEDIASUBTYPE_PCM) {
+		TRACE(_T("CMpcAudioRenderer::CheckMediaType - allow only PCM input\n"));
+		return VFW_E_TYPE_NOT_ACCEPTED;
+	}
+
 	TRACE(_T("CMpcAudioRenderer::CheckMediaType\n"));
 	WAVEFORMATEX *pwfx = (WAVEFORMATEX *) pmt->Format();
 
@@ -208,8 +214,7 @@ HRESULT	CMpcAudioRenderer::CheckMediaType(const CMediaType *pmt)
 		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
 
-	if ((pmt->majortype		!= MEDIATYPE_Audio		) ||
-			(pmt->formattype	!= FORMAT_WaveFormatEx	)) {
+	if ((pmt->majortype != MEDIATYPE_Audio) || (pmt->formattype != FORMAT_WaveFormatEx)) {
 		TRACE(_T("CMpcAudioRenderer::CheckMediaType Not supported\n"));
 		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
