@@ -958,10 +958,11 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							SetTrackName(&TrackName, _T("Sorenson"));
 						} else if (type == AP4_ATOM_TYPE_CVID) {
 							SetTrackName(&TrackName, _T("Cinepack"));
+						} else if (type == AP4_ATOM_TYPE_RAW) {
+							fourcc = BI_RGB;
 						}
 
 						mt.majortype	= MEDIATYPE_Video;
-						mt.subtype		= FOURCCMap(fourcc);
 						mt.formattype	= FORMAT_VideoInfo;
 
 						vih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER)+db.GetDataSize());
@@ -975,6 +976,22 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							vih->AvgTimePerFrame		= item->GetData()->GetDurationMs()*10000 / (item->GetData()->GetSampleCount());
 						}
 						memcpy(vih+1, db.GetData(), db.GetDataSize());
+
+						if (fourcc == BI_RGB) {
+							WORD &bitcount = vih->bmiHeader.biBitCount;
+							if (bitcount == 16) {
+								mt.subtype = MEDIASUBTYPE_RGB555;
+							} else if (bitcount == 24) {
+								mt.subtype = MEDIASUBTYPE_RGB24;
+							} else if (bitcount == 32) {
+								mt.subtype = MEDIASUBTYPE_ARGB32;
+							} else {
+								break;
+							}
+							mts.Add(mt);
+							break;
+						}
+						mt.subtype = FOURCCMap(fourcc);
 						mts.Add(mt);
 
 						char buff[5];
