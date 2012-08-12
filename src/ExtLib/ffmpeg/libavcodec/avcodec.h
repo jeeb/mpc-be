@@ -84,9 +84,6 @@
  * @{
  */
 
-#if FF_API_CODEC_ID
-#include "old_codec_ids.h"
-#endif
 
 /**
  * Identify the syntax and semantics of the bitstream.
@@ -466,7 +463,45 @@ enum AVCodecID {
     AV_CODEC_ID_MPEG4SYSTEMS = 0x20001, /**< _FAKE_ codec to indicate a MPEG-4 Systems
                                 * stream (only used by libavformat) */
     AV_CODEC_ID_FFMETADATA = 0x21000,   ///< Dummy codec for streams containing only metadata information.
+
+#if FF_API_CODEC_ID
+#include "old_codec_ids.h"
+#endif
 };
+
+#if FF_API_CODEC_ID
+#define CodecID AVCodecID
+#endif
+
+/**
+ * This struct describes the properties of a single codec described by an
+ * AVCodecID.
+ * @see avcodec_get_descriptor()
+ */
+typedef struct AVCodecDescriptor {
+    enum AVCodecID     id;
+    enum AVMediaType type;
+    /**
+     * Name of the codec described by this descriptor. It is non-empty and
+     * unique for each codec descriptor. It should contain alphanumeric
+     * characters and '_' only.
+     */
+    const char      *name;
+    /**
+     * A more descriptive name for this codec. May be NULL.
+     */
+    const char *long_name;
+    /**
+     * Codec properties, a combination of AV_CODEC_PROP_* flags.
+     */
+    int             props;
+} AVCodecDescriptor;
+
+/**
+ * Codec uses only intra compression.
+ * Video codecs only.
+ */
+#define AV_CODEC_PROP_INTRA_ONLY    (1 << 0)
 
 #if FF_API_OLD_DECODE_AUDIO
 /* in bytes */
@@ -3026,6 +3061,15 @@ typedef struct AVCodecContext {
     AVRational pkt_timebase;
 
     /**
+     * AVCodecDescriptor
+     * Code outside libavcodec should access this field using:
+     * avcodec_get_codec_descriptior(avctx)
+     * - encoding: unused.
+     * - decoding: set by libavcodec.
+     */
+    AVCodecDescriptor *codec_descriptor;
+
+    /**
      * Current statistics for PTS correction.
      * - decoding: maintained and used by libavcodec, not intended to be used by user apps
      * - encoding: unused
@@ -3043,6 +3087,9 @@ typedef struct AVCodecContext {
 
 AVRational av_codec_get_pkt_timebase         (const AVCodecContext *avctx);
 void       av_codec_set_pkt_timebase         (AVCodecContext *avctx, AVRational val);
+
+AVCodecDescriptor *av_codec_get_codec_descriptor(const AVCodecContext *avctx);
+void               av_codec_set_codec_descriptor(AVCodecContext *avctx, AVCodecDescriptor *desc);
 
 /**
  * AVProfile.
@@ -4824,15 +4871,23 @@ int av_codec_is_encoder(AVCodec *codec);
 int av_codec_is_decoder(AVCodec *codec);
 
 /**
+ * @return descriptor for given codec ID or NULL if no descriptor exists.
+ */
+const AVCodecDescriptor *avcodec_descriptor_get(enum AVCodecID id);
+
+/**
+ * Iterate over all codec descriptors known to libavcodec.
+ *
+ * @param prev previous descriptor. NULL to get the first descriptor.
+ *
+ * @return next descriptor or NULL after the last descriptor
+ */
+const AVCodecDescriptor *avcodec_descriptor_next(const AVCodecDescriptor *prev);
+
+/**
  * @}
  */
 
-/**
- * ffdshow custom stuff
- *
- * @param[out] recovery_frame_cnt. Valid only if GDR.
- * @return   0: no recovery point, 1:I-frame 2:Recovery Point SEI (GDR), 3:IDR, -1:error
- */
 FF_EXPORT int avcodec_h264_search_recovery_point(AVCodecContext *avctx,
                          const uint8_t *buf, int buf_size, int *recovery_frame_cnt);
 

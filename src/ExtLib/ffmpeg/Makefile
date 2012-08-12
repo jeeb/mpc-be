@@ -114,6 +114,7 @@ SRCS_C=\
     libavcodec/celp_filters.c \
     libavcodec/celp_math.c \
     libavcodec/cinepak.c \
+    libavcodec/codec_desc.c \
     libavcodec/cook.c \
     libavcodec/cscd.c \
     libavcodec/dca.c \
