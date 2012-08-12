@@ -30,7 +30,7 @@
 
 using namespace MediaInfoLib;
 
-MediaInfoLib::String mi_get_lang_file()
+String mi_get_lang_file()
 {
 	CString path;
 	GetModuleFileName(NULL, path.GetBuffer(_MAX_PATH), _MAX_PATH);
@@ -58,11 +58,11 @@ MediaInfoLib::String mi_get_lang_file()
 			FreeResource(lRes);
 			FreeLibrary(mpcres);
 
-			return (MediaInfoLib::String)wstr;
+			return (String)wstr;
 		}
 	}
 
-	return (MediaInfoLib::String)_T("  Config_Text_ColumnSize;30");
+	return (String)_T("  Config_Text_ColumnSize;30");
 }
 
 // CPPageFileMediaInfo dialog
