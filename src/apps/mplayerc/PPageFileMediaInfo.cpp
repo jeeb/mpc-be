@@ -1,9 +1,10 @@
 /*
  * $Id$
  *
- * (C) 2006-2012 see Authors.txt
+ * Copyright (C) 2012 Sergey "Exodus8" (rusguy6@gmail.com)
  *
  * This file is part of MPC-BE.
+ * YOU CANNOT USE THIS FILE WITHOUT AUTHOR PERMISSION!
  *
  * MPC-BE is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +23,7 @@
 
 #include "stdafx.h"
 #include "mplayerc.h"
+#include "MainFrm.h"
 #include "PPageFileMediaInfo.h"
 #include "../../DSUtil/WinAPIUtils.h"
 #include <MediaInfo/MediaInfo.h>
@@ -120,26 +122,9 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 		return TRUE;
 	}
 
-	if (m_fn == _T("")) {
-		BeginEnumFilters(m_pFG, pEF, pBF) {
-			CComQIPtr<IFileSourceFilter> pFSF = pBF;
-			if (pFSF) {
-				LPOLESTR pFN = NULL;
-				AM_MEDIA_TYPE mt;
-				if (SUCCEEDED(pFSF->GetCurFile(&pFN, &mt)) && pFN && *pFN) {
-					m_fn = CStringW(pFN);
-					CoTaskMemFree(pFN);
-				}
-				break;
-			}
-		}
-		EndEnumFilters
-	}
+	MediaInfo MI;
 
-	MediaInfoLib::String f_name = m_fn;
-	MediaInfoLib::MediaInfo MI;
-
-	MI.Open(f_name);
+	MI.Open(((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strFnFull.GetString());
 	MI.Option(_T("Complete"));
 	MI.Option(_T("Language"), mi_get_lang_file());
 	MI_Text = MI.Inform().c_str();

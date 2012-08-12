@@ -103,6 +103,7 @@ static UINT s_uTBBC = RegisterWindowMessage(_T("TaskbarButtonCreated"));
 #include "MultiMonitor.h"
 
 #include <MediaInfo/MediaInfo.h>
+
 using namespace MediaInfoLib;
 
 #define DEV_BUILD 1 // set to 1 only for the DEV builds
@@ -3567,6 +3568,7 @@ void CMainFrame::OnFilePostClosemedia()
 	m_wndStatusBar.Clear();
 	m_wndStatusBar.ShowTimer(false);
 	m_strFn = _T("");
+	m_strFnFull = _T("");
 	m_wndStatusBar.Relayout();
 
 	if (AfxGetAppSettings().fEnableEDLEditor) {
@@ -12070,6 +12072,8 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 	CString title(MAKEINTRESOURCE(IDR_MAINFRAME));
 	CString fname = fn;
 
+	m_strFnFull = fn;
+
 	AppSettings& s = AfxGetAppSettings();
 
 	int i = s.iTitleBarTextStyle;
@@ -12087,6 +12091,7 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 			fn = ResStr(IDS_CAPTURE_LIVE);
 		}
 	}
+
 	m_strFn = fn;
 
 	if (i == 1) {
@@ -12541,16 +12546,12 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		miFPS = 0.0;
 		s.dFPS = 0.0;
 
-#ifdef USE_MEDIAINFO_STATIC
-		MediaInfoLib::MediaInfo MI;
-#else
 		MediaInfo MI;
-#endif
 
 		if (MI.Open(mi_fn.GetString())) {
 			CString strFPS =  MI.Get(Stream_Video, 0, _T("FrameRate"), Info_Text, Info_Name).c_str();
 
-			// 3:2 pulldown ???
+			// 3:2 pulldown
 			CString strST = MI.Get(Stream_Video, 0, _T("ScanType"), Info_Text, Info_Name).c_str();
 			CString strSO = MI.Get(Stream_Video, 0, _T("ScanOrder"), Info_Text, Info_Name).c_str();
 
