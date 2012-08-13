@@ -28,20 +28,20 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 1 TEXTINCLUDE 
 BEGIN
-    "mpciconlib.h\0"
-    "Version.h\0"
+	"mpciconlib.h\0"
+	"Version.h\0"
 END
 
 2 TEXTINCLUDE 
 BEGIN
-    "#include ""afxres.h""\r\n"
-    "\0"
+	"#include ""afxres.h""\r\n"
+	"\0"
 END
 
 3 TEXTINCLUDE 
 BEGIN
-    "\r\n"
-    "\0"
+	"\r\n"
+	"\0"
 END
 
 #endif    // APSTUDIO_INVOKED
@@ -54,58 +54,114 @@ END
 
 // The icons should have the exact same order as in "mpciconlib.h" !
 
-IDI_AVI_ICON              ICON                    "icons\\m0001.ico"
-IDI_MPG_ICON              ICON                    "icons\\m0002.ico"
-IDI_MP4_ICON              ICON                    "icons\\m0003.ico"
-IDI_MKV_ICON              ICON                    "icons\\m0004.ico"
-IDI_OGM_ICON              ICON                    "icons\\m0005.ico"
-IDI_FLV_ICON              ICON                    "icons\\m0006.ico"
-IDI_DAT_ICON              ICON                    "icons\\m0006.ico"
-IDI_WMV_ICON              ICON                    "icons\\m0007.ico"
-IDI_MOV_ICON              ICON                    "icons\\m0008.ico"
-IDI_RM_ICON               ICON                    "icons\\m0009.ico"
-IDI_MP3_ICON              ICON                    "icons\\mu001.ico"
-IDI_OGG_ICON              ICON                    "icons\\mu002.ico"
-IDI_AAC_ICON              ICON                    "icons\\mu003.ico"
-IDI_APE_ICON              ICON                    "icons\\mu003.ico"
-IDI_MKA_ICON              ICON                    "icons\\mu004.ico"
-IDI_WV_ICON               ICON                    "icons\\mu004.ico"
-IDI_WMA_ICON              ICON                    "icons\\mu005.ico"
-IDI_RA_ICON               ICON                    "icons\\mu006.ico"
-IDI_WAV_ICON              ICON                    "icons\\mu007.ico"
-IDI_MPA_ICON              ICON                    "icons\\mu008.ico"
-IDI_CDA_ICON              ICON                    "icons\\mu009.ico"
-IDI_MPC_ICON              ICON                    "icons\\mu010.ico"
-IDI_FLAC_ICON             ICON                    "icons\\mu011.ico"
-IDI_TTA_ICON              ICON                    "icons\\mu011.ico"
-IDI_ALAC_ICON             ICON                    "icons\\mu012.ico"
-IDI_PLAYLIST_ICON         ICON                    "icons\\pl0005.ico"
-IDI_D2V_ICON              ICON                    "icons\\m0010.ico"
-IDI_MID_ICON              ICON                    "icons\\mu013.ico"
-IDI_TAK_ICON              ICON                    "icons\\mu013.ico"
-IDI_AIFF_ICON             ICON                    "icons\\mu014.ico"
-IDI_AMR_ICON              ICON                    "icons\\mu014.ico"
-IDI_AMV_ICON              ICON                    "icons\\m0014.ico"
-IDI_SMK_ICON              ICON                    "icons\\m0014.ico"
-IDI_AU_ICON               ICON                    "icons\\mu015.ico"
-IDI_OFR_ICON              ICON                    "icons\\mu015.ico"
-IDI_IVF_ICON              ICON                    "icons\\m0011.ico"
-IDI_VP6_ICON              ICON                    "icons\\m0011.ico"
-IDI_FLIC_ICON             ICON                    "icons\\m0012.ico"
-IDI_BIK_ICON              ICON                    "icons\\m0013.ico"
-IDI_RATDVD_ICON           ICON                    "icons\\m0013.ico"
-IDI_RT_ICON               ICON                    "icons\\m0016.ico"
-IDI_DSM_ICON              ICON                    "icons\\m0016.ico"
-IDI_SWF_ICON              ICON                    "icons\\m0015.ico"
-IDI_WEBM_ICON             ICON                    "icons\\m0015.ico"
-IDI_OTHER_ICON            ICON                    "icons\\pl0004.ico"
-IDI_DVDA_ICON             ICON                    "icons\\mu016.ico"
-IDI_DVDF_ICON             ICON                    "icons\\m0008.ico"
-IDI_M2P_ICON              ICON                    "icons\\rpic.ico"
-IDI_DVDAUDIO_ICON         ICON                    "icons\\mu016.ico"
-IDI_MLP_ICON              ICON                    "icons\\mu007.ico"
-IDI_ROQ_ICON              ICON                    "icons\\m0011.ico"
-IDI_DEFAULT_ICON          ICON                    "icons\\bmov.ico"
+IDI_3G2_ICON			ICON				"icons\\3g2.ico"
+IDI_3GP_ICON			ICON				"icons\\3gp.ico"
+IDI_3GP2_ICON			ICON				"icons\\3gp2.ico"
+IDI_3GPP_ICON			ICON				"icons\\3gpp.ico"
+IDI_AAC_ICON			ICON				"icons\\aac.ico"
+IDI_AC3_ICON			ICON				"icons\\ac3.ico"
+IDI_AIF_ICON			ICON				"icons\\aif.ico"
+IDI_AIFC_ICON			ICON				"icons\\aifc.ico"
+IDI_AIFF_ICON			ICON				"icons\\aiff.ico"
+IDI_ALAC_ICON			ICON				"icons\\alac.ico"
+IDI_AMR_ICON			ICON				"icons\\amr.ico"
+IDI_AMV_ICON			ICON				"icons\\amv.ico"
+IDI_AOB_ICON			ICON				"icons\\aob.ico"
+IDI_APE_ICON			ICON				"icons\\ape.ico"
+IDI_APL_ICON			ICON				"icons\\apl.ico"
+IDI_ASF_ICON			ICON				"icons\\asf.ico"
+IDI_AU_ICON				ICON				"icons\\au.ico"
+IDI_AVI_ICON			ICON				"icons\\avi.ico"
+IDI_BIK_ICON			ICON				"icons\\bik.ico"
+IDI_CDA_ICON			ICON				"icons\\cda.ico"
+IDI_D2V_ICON			ICON				"icons\\d2v.ico"
+IDI_DAT_ICON			ICON				"icons\\dat.ico"
+IDI_DIVX_ICON			ICON				"icons\\divx.ico"
+IDI_DSA_ICON			ICON				"icons\\dsa.ico"
+IDI_DSM_ICON			ICON				"icons\\dsm.ico"
+IDI_DSS_ICON			ICON				"icons\\dss.ico"
+IDI_DSV_ICON			ICON				"icons\\dsv.ico"
+IDI_DTS_ICON			ICON				"icons\\dts.ico"
+IDI_EVO_ICON			ICON				"icons\\evo.ico"
+IDI_F4V_ICON			ICON				"icons\\f4v.ico"
+IDI_FLAC_ICON			ICON				"icons\\flac.ico"
+IDI_FLC_ICON			ICON				"icons\\flc.ico"
+IDI_FLI_ICON			ICON				"icons\\fli.ico"
+IDI_FLIC_ICON			ICON				"icons\\flic.ico"
+IDI_FLV_ICON			ICON				"icons\\flv.ico"
+IDI_HDMOV_ICON			ICON				"icons\\hdmov.ico"
+IDI_IFO_ICON			ICON				"icons\\ifo.ico"
+IDI_IVF_ICON			ICON				"icons\\ivf.ico"
+IDI_M1A_ICON			ICON				"icons\\m1a.ico"
+IDI_M1V_ICON			ICON				"icons\\m1v.ico"
+IDI_M2A_ICON			ICON				"icons\\m2a.ico"
+IDI_M2P_ICON			ICON				"icons\\m2p.ico"
+IDI_M2T_ICON			ICON				"icons\\m2t.ico"
+IDI_M2TS_ICON			ICON				"icons\\m2ts.ico"
+IDI_M2V_ICON			ICON				"icons\\m2v.ico"
+IDI_M4A_ICON			ICON				"icons\\m4a.ico"
+IDI_M4B_ICON			ICON				"icons\\m4b.ico"
+IDI_M4V_ICON			ICON				"icons\\m4v.ico"
+IDI_MID_ICON			ICON				"icons\\mid.ico"
+IDI_MIDI_ICON			ICON				"icons\\midi.ico"
+IDI_MKA_ICON			ICON				"icons\\mka.ico"
+IDI_MKV_ICON			ICON				"icons\\mkv.ico"
+IDI_MLP_ICON			ICON				"icons\\mlp.ico"
+IDI_MOV_ICON			ICON				"icons\\mov.ico"
+IDI_MP2_ICON			ICON				"icons\\mp2.ico"
+IDI_MP2V_ICON			ICON				"icons\\mp2v.ico"
+IDI_MP3_ICON			ICON				"icons\\mp3.ico"
+IDI_MP4_ICON			ICON				"icons\\mp4.ico"
+IDI_MP4V_ICON			ICON				"icons\\mp4v.ico"
+IDI_MPA_ICON			ICON				"icons\\mpa.ico"
+IDI_MPC_ICON			ICON				"icons\\mpc.ico"
+IDI_MPE_ICON			ICON				"icons\\mpe.ico"
+IDI_MPEG_ICON			ICON				"icons\\mpeg.ico"
+IDI_MPG_ICON			ICON				"icons\\mpg.ico"
+IDI_MPV2_ICON			ICON				"icons\\mpv2.ico"
+IDI_MPV4_ICON			ICON				"icons\\mpv4.ico"
+IDI_MTS_ICON			ICON				"icons\\mts.ico"
+IDI_OFR_ICON			ICON				"icons\\ofr.ico"
+IDI_OFS_ICON			ICON				"icons\\ofs.ico"
+IDI_OGA_ICON			ICON				"icons\\oga.ico"
+IDI_OGG_ICON			ICON				"icons\\ogg.ico"
+IDI_OGM_ICON			ICON				"icons\\ogm.ico"
+IDI_OGV_ICON			ICON				"icons\\ogv.ico"
+IDI_PLAYLIST_ICON		ICON				"icons\\playlist.ico"
+IDI_PLC_ICON			ICON				"icons\\plc.ico"
+IDI_PVA_ICON			ICON				"icons\\pva.ico"
+IDI_RA_ICON				ICON				"icons\\ra.ico"
+IDI_RAM_ICON			ICON				"icons\\ram.ico"
+IDI_RAT_ICON			ICON				"icons\\rat.ico"
+IDI_RATDVD_ICON			ICON				"icons\\ratdvd.ico"
+IDI_REC_ICON			ICON				"icons\\rec.ico"
+IDI_RM_ICON				ICON				"icons\\rm.ico"
+IDI_RMI_ICON			ICON				"icons\\rmi.ico"
+IDI_RMM_ICON			ICON				"icons\\rmm.ico"
+IDI_ROQ_ICON			ICON				"icons\\roq.ico"
+IDI_RP_ICON				ICON				"icons\\rp.ico"
+IDI_RPM_ICON			ICON				"icons\\rpm.ico"
+IDI_RT_ICON				ICON				"icons\\rt.ico"
+IDI_SMI_ICON			ICON				"icons\\smi.ico"
+IDI_SMIL_ICON			ICON				"icons\\smil.ico"
+IDI_SMK_ICON			ICON				"icons\\smk.ico"
+IDI_SND_ICON			ICON				"icons\\snd.ico"
+IDI_SWF_ICON			ICON				"icons\\swf.ico"
+IDI_TAK_ICON			ICON				"icons\\tak.ico"
+IDI_TP_ICON				ICON				"icons\\tp.ico"
+IDI_TRP_ICON			ICON				"icons\\trp.ico"
+IDI_TS_ICON				ICON				"icons\\ts.ico"
+IDI_TTA_ICON			ICON				"icons\\tta.ico"
+IDI_VOB_ICON			ICON				"icons\\vob.ico"
+IDI_WAV_ICON			ICON				"icons\\wav.ico"
+IDI_WBM_ICON			ICON				"icons\\wbm.ico"
+IDI_WEBM_ICON			ICON				"icons\\webm.ico"
+IDI_WM_ICON				ICON				"icons\\wm.ico"
+IDI_WMA_ICON			ICON				"icons\\wma.ico"
+IDI_WMP_ICON			ICON				"icons\\wmp.ico"
+IDI_WMV_ICON			ICON				"icons\\wmv.ico"
+IDI_WV_ICON				ICON				"icons\\wv.ico"
+IDI_DEFAULT_ICON		ICON				"icons\\0-Logo-MPC-BE.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -125,25 +181,25 @@ VS_VERSION_INFO VERSIONINFO
  FILETYPE 0x2L
  FILESUBTYPE 0x0L
 BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "040904b0"
-        BEGIN
-            VALUE "Comments", "MPC-BE Icon Library"
-            VALUE "CompanyName", MPC_COMP_NAME_STR
-            VALUE "FileDescription", "MPC-BE Icon Library"
-            VALUE "FileVersion", MPC_VERSION_STR
-            VALUE "InternalName", "mpciconlib"
-            VALUE "LegalCopyright", MPC_COPYRIGHT_STR
-            VALUE "OriginalFilename", "mpciconlib.dll"
-            VALUE "ProductName", "MPC-BE Icon Library"
-            VALUE "ProductVersion", MPC_VERSION_STR
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x409, 1200
-    END
+	BLOCK "StringFileInfo"
+	BEGIN
+		BLOCK "040904b0"
+		BEGIN
+			VALUE "Comments", "MPC-BE Icon Library"
+			VALUE "CompanyName", MPC_COMP_NAME_STR
+			VALUE "FileDescription", "MPC-BE Icon Library"
+			VALUE "FileVersion", MPC_VERSION_STR
+			VALUE "InternalName", "mpciconlib"
+			VALUE "LegalCopyright", MPC_COPYRIGHT_STR
+			VALUE "OriginalFilename", "mpciconlib.dll"
+			VALUE "ProductName", "MPC-BE Icon Library"
+			VALUE "ProductVersion", MPC_VERSION_STR
+		END
+	END
+	BLOCK "VarFileInfo"
+	BEGIN
+		VALUE "Translation", 0x409, 1200
+	END
 END
 
 #endif    // English (United States) resources

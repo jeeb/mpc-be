@@ -6,6 +6,7 @@ Active: (with SVN commit rights)
 --------
 aleksoid (Admin, Forum moderator, Code) - Aleksoid1978@mail.ru, Russia
 arestarh1986 (Documentation) - Ukraine
+Dimbat (Design) - zingerus@mail.ru, Russia
 exodus8 (Code) - Russia
 judelaw (Code)
 kinjalka (Code) - Russia
