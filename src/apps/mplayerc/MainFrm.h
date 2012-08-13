@@ -619,6 +619,8 @@ public:
 	afx_msg LRESULT OnTaskBarRestart(WPARAM, LPARAM);
 	afx_msg LRESULT OnNotifyIcon(WPARAM, LPARAM);
 	afx_msg LRESULT OnTaskBarThumbnailsCreate(WPARAM, LPARAM);
+	afx_msg LRESULT OnDwmSendIconicThumbnail(WPARAM, LPARAM);
+	afx_msg LRESULT OnDwmSendIconicLivePreviewBitmap(WPARAM, LPARAM);
 
 	afx_msg void OnSetFocus(CWnd* pOldWnd);
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
@@ -1029,10 +1031,16 @@ public:
 
 	CString GetVidPos();
 
+	// Win 7 TaskBar/Thumbnail support
 	ITaskbarList3* m_pTaskbarList;
 	HRESULT CreateThumbnailToolbar();
 	HRESULT UpdateThumbarButton();
 	HRESULT UpdateThumbnailClip();
+
+	HMODULE m_hDWMAPI;
+	HRESULT (__stdcall * m_DwmSetWindowAttributeFnc)(HWND hwnd, DWORD dwAttribute, __in  LPCVOID pvAttribute, DWORD cbAttribute);
+	HRESULT (__stdcall * m_DwmSetIconicThumbnailFnc)( __in  HWND hwnd, __in  HBITMAP hbmp, __in  DWORD dwSITFlags);
+	HRESULT (__stdcall * m_DwmSetIconicLivePreviewBitmapFnc)(HWND hwnd, HBITMAP hbmp, __in_opt  POINT *pptClient, DWORD dwSITFlags);
 
 protected:
 	// GDI+

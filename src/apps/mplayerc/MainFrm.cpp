@@ -103,14 +103,13 @@ static UINT s_uTBBC = RegisterWindowMessage(_T("TaskbarButtonCreated"));
 #include "MultiMonitor.h"
 
 #include <MediaInfo/MediaInfo.h>
-
 using namespace MediaInfoLib;
 
 #define DEV_BUILD 1 // set to 1 only for the DEV builds
 
-DWORD last_run = 0;
-UINT flast_nID = 0;
-bool b_firstPlay = false;
+DWORD last_run		= 0;
+UINT flast_nID		= 0;
+bool b_firstPlay	= false;
 
 class CSubClock : public CUnknown, public ISubClock
 {
@@ -176,8 +175,10 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_REGISTERED_MESSAGE(s_uTaskbarRestart, OnTaskBarRestart)
 	ON_REGISTERED_MESSAGE(WM_NOTIFYICON, OnNotifyIcon)
-
 	ON_REGISTERED_MESSAGE(s_uTBBC, OnTaskBarThumbnailsCreate)
+
+	ON_MESSAGE(WM_DWMSENDICONICTHUMBNAIL, OnDwmSendIconicThumbnail)
+	ON_MESSAGE(WM_DWMSENDICONICLIVEPREVIEWBITMAP, OnDwmSendIconicLivePreviewBitmap)
 
 	ON_WM_SETFOCUS()
 	ON_WM_GETMINMAXINFO()
@@ -868,6 +869,13 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CStringW strFS = s.strFullScreenMonitor;
 	GetCurDispMode(s.dm_def, strFS);
 
+	m_hDWMAPI = LoadLibrary(L"dwmapi.dll");
+	if (m_hDWMAPI) {
+		(FARPROC &)m_DwmSetWindowAttributeFnc			= GetProcAddress(m_hDWMAPI, "DwmSetWindowAttribute");
+		(FARPROC &)m_DwmSetIconicThumbnailFnc			= GetProcAddress(m_hDWMAPI, "DwmSetIconicThumbnail");
+		(FARPROC &)m_DwmSetIconicLivePreviewBitmapFnc	= GetProcAddress(m_hDWMAPI, "DwmSetIconicLivePreviewBitmap");
+	}
+
 	return 0;
 }
 
@@ -947,6 +955,10 @@ void CMainFrame::OnClose()
 
 	if (s.AutoChangeFullscrRes.bSetGlobal && s.AutoChangeFullscrRes.bEnabled == 2) {
 		SetDispMode(s.dm_def, s.strFullScreenMonitor);
+	}
+
+	if (m_hDWMAPI) {
+		FreeLibrary(m_hDWMAPI);
 	}
 
 	__super::OnClose();
@@ -12064,7 +12076,7 @@ void CMainFrame::OpenSetupStatusBar()
 		hIcon = LoadIcon(_T(".ifo"), true);
 	}
 
-	m_wndStatusBar.SetStatusTypeIcon(hIcon);
+	//m_wndStatusBar.SetStatusTypeIcon(hIcon); TODO - black icons look bad, maybe add text with file type ???
 }
 
 void CMainFrame::OpenSetupWindowTitle(CString fn)
@@ -12445,6 +12457,14 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		ASSERT(0);
 		return false;
 	}
+
+	/* this is for custom draw in windows 7 preview ... TODO - disable custom draw for live preview
+	if (m_DwmSetWindowAttributeFnc && m_DwmSetIconicThumbnailFnc) {
+		BOOL truth = FALSE;
+		m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_HAS_ICONIC_BITMAP, &truth, sizeof(truth));
+		m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_FORCE_ICONIC_REPRESENTATION, &truth, sizeof(truth));
+	}
+	*/
 
 	OpenFileData *pFileData = dynamic_cast<OpenFileData *>(pOMD.m_p);
 	OpenDVDData* pDVDData = dynamic_cast<OpenDVDData*>(pOMD.m_p);
@@ -12868,6 +12888,20 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		m_LastOpenBDPath = _T("");
 	}
 	m_bIsBDPlay = false;
+
+
+	HRESULT hr = S_OK;
+	if (err.IsEmpty()) {
+		if (IsWinSevenOrLater() || AfxGetAppSettings().fUseWin7TaskBar) {
+			/* this is for custom draw in windows 7 preview ... TODO - disable custom draw for live preview
+			if (m_DwmSetWindowAttributeFnc && m_DwmSetIconicThumbnailFnc) {
+				BOOL truth = m_fAudioOnly;
+				m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_HAS_ICONIC_BITMAP, &truth, sizeof(truth));
+				m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_FORCE_ICONIC_REPRESENTATION, &truth, sizeof(truth));
+			}
+			*/
+		}
+	}
 
 	return(err.IsEmpty());
 }
@@ -17050,7 +17084,7 @@ HRESULT CMainFrame::UpdateThumbnailClip()
 		return E_FAIL;
 	}
 
-	if ( (!AfxGetAppSettings().fUseWin7TaskBar) || (m_iMediaLoadState != MLS_LOADED) || (m_fAudioOnly) || m_fFullScreen ) {
+	if ( (!AfxGetAppSettings().fUseWin7TaskBar) || (m_iMediaLoadState != MLS_LOADED) || m_fAudioOnly || m_fFullScreen ) {
 		return m_pTaskbarList->SetThumbnailClip( m_hWnd, NULL );
 	}
 
@@ -17421,4 +17455,42 @@ void CMainFrame::CreateChapterTimeArray()
 	} else if (GetPlaybackMode() == PM_DVD) {
 		// TODO - support for DVD mode ...
 	}
+}
+
+LRESULT CMainFrame::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
+{
+	if (!m_fAudioOnly || !m_DwmSetIconicThumbnailFnc) {
+		return 0;
+	}
+
+	/*
+	HBITMAP hbm = CreateDIB(HIWORD(lParam), LOWORD(lParam)); 
+	if (hbm) {
+		HRESULT hr = m_DwmSetIconicThumbnailFnc(m_hWnd, hbm, 0);
+		DeleteObject(hbm);
+	}
+	*/
+
+	return 0;
+}
+
+LRESULT CMainFrame::OnDwmSendIconicLivePreviewBitmap(WPARAM wParam, LPARAM lParam)
+{
+	if (!m_fAudioOnly || !m_DwmSetIconicLivePreviewBitmapFnc) {
+		return 0;
+	}
+
+	/*
+	CRect rectWindow;
+	GetClientRect(rectWindow);
+
+	HBITMAP hbm = CreateDIB(rectWindow.Width(), rectWindow.Height());
+
+	if (hbm) {
+		HRESULT hr = m_DwmSetIconicLivePreviewBitmapFnc(m_hWnd, hbm, NULL, DWM_SIT_DISPLAYFRAME);
+		DeleteObject(hbm);
+	}
+	*/
+
+	return 0;
 }
