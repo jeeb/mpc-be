@@ -494,27 +494,33 @@ void CPlayerStatusBar::OnPaint()
 		CString str2;
 		str2 = GetStatusMessage();
 
+		/*
 		if (str2.GetLength()) {
 			m_hIcon = get_hicon(m_logobm.LoadCurrentPath(), ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strFn);
 		}
+		*/
 
 		CRect rs	= r;
 		rs.left		= r.left + 6;
 		rs.top		= r.top + 3;
 
+		/*
 		if (m_hIcon) {
 			rs.left += 22-1;
 		}
+		*/
 
 		memdc.DrawText(str2, str2.GetLength(), &rs, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
 
 		dc.BitBlt(r.left, r.top, r.Width(), r.Height(), &memdc, 0, 0, SRCCOPY);
 
+		/*
 		if (m_hIcon) {
 			GetClientRect(&r);
 			r.SetRect(6, r.top+6, 22-1, r.bottom-2-1);
 			DrawIconEx(dc, r.left, r.top, m_hIcon, r.Width(), r.Height(), 0, NULL, DI_NORMAL | DI_COMPAT);
 		}
+		*/
 	}
 }
 
