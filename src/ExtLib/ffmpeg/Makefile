@@ -383,7 +383,7 @@ SRCS_YASM=\
     libavcodec/x86/dct32_sse.asm \
     libavcodec/x86/deinterlace.asm \
     libavcodec/x86/diracdsp_yasm.asm \
-    libavcodec/x86/dsputil_yasm.asm \
+    libavcodec/x86/dsputil.asm \
     libavcodec/x86/dwt_yasm.asm \
     libavcodec/x86/fft_mmx.asm \
     libavcodec/x86/fmtconvert.asm \
@@ -404,7 +404,7 @@ SRCS_YASM=\
     libavcodec/x86/rv34dsp.asm \
     libavcodec/x86/rv40dsp.asm \
     libavcodec/x86/sbrdsp.asm \
-    libavcodec/x86/vc1dsp_yasm.asm \
+    libavcodec/x86/vc1dsp.asm \
     libavcodec/x86/vp3dsp.asm \
     libavcodec/x86/vp56dsp.asm \
     libavcodec/x86/vp8dsp.asm \
