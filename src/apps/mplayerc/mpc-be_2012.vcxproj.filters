@@ -210,9 +210,6 @@
     <ClCompile Include="PPageFileInfoDetails.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PPageFileInfoRes.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PPageFileInfoSheet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -570,9 +567,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PPageFileInfoDetails.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PPageFileInfoRes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PPageFileInfoSheet.h">

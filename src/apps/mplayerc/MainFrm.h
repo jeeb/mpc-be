@@ -42,6 +42,7 @@
 #include "FileDropTarget.h"
 #include "KeyProvider.h"
 
+#include "../../DSUtil/DSMPropertyBag.h"
 #include "../../SubPic/ISubPic.h"
 #include "IGraphBuilder2.h"
 
