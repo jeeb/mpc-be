@@ -28,9 +28,6 @@ class CPPageFileMediaInfo : public CPropertyPage
 {
 	DECLARE_DYNAMIC(CPPageFileMediaInfo)
 
-private:
-	CComPtr<IFilterGraph> m_pFG;
-
 public:
 	CPPageFileMediaInfo(CString fn, IFilterGraph* pFG);
 	virtual ~CPPageFileMediaInfo();
@@ -38,7 +35,6 @@ public:
 	enum { IDD = IDD_FILEMEDIAINFO };
 
 	CEdit m_mediainfo;
-	CString m_fn;
 	CFont* m_pCFont;
 	CString MI_Text;
 

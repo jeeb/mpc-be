@@ -51,10 +51,7 @@ CPPageFileInfoSheet::CPPageFileInfoSheet(CString fn, CMainFrame* pMainFrame, CWn
 	}
 	EndEnumFilters;
 
-#ifndef USE_MEDIAINFO_STATIC
-	if (CPPageFileMediaInfo::HasMediaInfo())
-#endif
-		AddPage(&m_mi);
+	AddPage(&m_mi);
 }
 
 CPPageFileInfoSheet::~CPPageFileInfoSheet()

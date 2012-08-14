@@ -24,7 +24,6 @@
 #include "stdafx.h"
 #include "mplayerc.h"
 #include "PlayerPreView.h"
-#include "MainFrm.h"
 
 
 // CPrevView

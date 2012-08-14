@@ -70,8 +70,6 @@ String mi_get_lang_file()
 IMPLEMENT_DYNAMIC(CPPageFileMediaInfo, CPropertyPage)
 CPPageFileMediaInfo::CPPageFileMediaInfo(CString fn, IFilterGraph* pFG)
 	: CPropertyPage(CPPageFileMediaInfo::IDD, CPPageFileMediaInfo::IDD)
-	, m_fn(fn)
-	, m_pFG(pFG)
 	, m_pCFont(NULL)
 {
 }
