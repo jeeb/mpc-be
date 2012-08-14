@@ -1030,22 +1030,21 @@ public:
 	void		ShowOSDCustomMessageApi(MPC_OSDDATA *osdData);
 	void		JumpOfNSeconds(int seconds);
 
-	CString GetVidPos();
+	CString		GetVidPos();
 
 	// Win 7 TaskBar/Thumbnail support
 	ITaskbarList3* m_pTaskbarList;
-	HRESULT CreateThumbnailToolbar();
-	HRESULT UpdateThumbarButton();
-	HRESULT UpdateThumbnailClip();
+	HRESULT		CreateThumbnailToolbar();
+	HRESULT		UpdateThumbarButton();
+	HRESULT		UpdateThumbnailClip();
 
-	HMODULE m_hDWMAPI;
-	HRESULT (__stdcall * m_DwmSetWindowAttributeFnc)(HWND hwnd, DWORD dwAttribute, __in  LPCVOID pvAttribute, DWORD cbAttribute);
-	HRESULT (__stdcall * m_DwmSetIconicThumbnailFnc)( __in  HWND hwnd, __in  HBITMAP hbmp, __in  DWORD dwSITFlags);
-	HRESULT (__stdcall * m_DwmSetIconicLivePreviewBitmapFnc)(HWND hwnd, HBITMAP hbmp, __in_opt  POINT *pptClient, DWORD dwSITFlags);
+	HMODULE		m_hDWMAPI;
+	HRESULT		(__stdcall * m_DwmSetWindowAttributeFnc)(HWND hwnd, DWORD dwAttribute, __in  LPCVOID pvAttribute, DWORD cbAttribute);
+	HRESULT		(__stdcall * m_DwmSetIconicThumbnailFnc)( __in  HWND hwnd, __in  HBITMAP hbmp, __in  DWORD dwSITFlags);
+	HRESULT		(__stdcall * m_DwmSetIconicLivePreviewBitmapFnc)(HWND hwnd, HBITMAP hbmp, __in_opt  POINT *pptClient, DWORD dwSITFlags);
+	HRESULT		SetDwmPreview();
 
 protected:
-	// GDI+
-	ULONG_PTR m_gdiplusToken;
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	void WTSRegisterSessionNotification();
 	void WTSUnRegisterSessionNotification();

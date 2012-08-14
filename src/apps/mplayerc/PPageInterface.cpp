@@ -195,11 +195,9 @@ BOOL CPPageInterface::OnApply()
 
 	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
 
-	if (m_fUseWin7TaskBar) {
-		pFrame->CreateThumbnailToolbar();
-	}
-
+	pFrame->CreateThumbnailToolbar();
 	pFrame->UpdateThumbarButton();
+	pFrame->SetDwmPreview();
 
 	pFrame->Invalidate();
 

@@ -127,7 +127,7 @@ bool MPCPngImage::LoadFromResource(UINT id) {
 	bool ret = false;
 
 	CStringA str;
-	if (LoadResource(id, str, _T("FILE"))) {
+	if (LoadResource(id, str, _T("FILE")) || LoadResource(id, str, _T("PNG"))) {
 		struct png_t png;
 		png.data = (unsigned char*)(LPCSTR)str;
 		png.size = str.GetLength();
