@@ -27,6 +27,9 @@
 #include <atlcoll.h>
 #include "CoordGeom.h"
 
+// flag for display only forced subtitles (PGS/VOBSUB)
+extern bool g_bForcedSubtitle;
+
 #pragma pack(push, 1)
 struct SubPicDesc {
 	int type;

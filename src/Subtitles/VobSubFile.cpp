@@ -1310,6 +1310,10 @@ STDMETHODIMP CVobSubFile::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fps,
 		return E_FAIL;
 	}
 
+	if (g_bForcedSubtitle && !m_img.fForced) {
+		return E_FAIL;
+	}
+
 	return __super::Render(spd, bbox);
 }
 
@@ -2470,11 +2474,16 @@ STDMETHODIMP CVobSubStream::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fp
 		SubPic* sp = m_subpics.GetAt(pos);
 		if (sp->tStart <= rt && rt < sp->tStop) {
 			if (m_img.iIdx != (int)pos) {
+				
 				BYTE* pData = sp->pData.GetData();
 				m_img.Decode(
 					pData, (pData[0]<<8)|pData[1], (pData[2]<<8)|pData[3],
 					m_fCustomPal, m_tridx, m_orgpal, m_cuspal, true);
 				m_img.iIdx = (int)pos;
+			}
+
+			if (g_bForcedSubtitle && !m_img.fForced) {
+				return E_FAIL;
 			}
 
 			return __super::Render(spd, bbox);

@@ -36,6 +36,9 @@
 #include <dxva.h>
 #include <dxva2api.h>
 
+// flag for display only forced subtitles (PGS/VOBSUB)
+bool g_bForcedSubtitle = false;
+
 void DumpStreamConfig(TCHAR* fn, IAMStreamConfig* pAMVSCCap)
 {
 	CString s;

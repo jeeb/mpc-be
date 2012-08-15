@@ -1729,7 +1729,6 @@ LRESULT CMainFrame::OnHotKey(WPARAM wParam, LPARAM lParam)
 
 bool g_bNoDuration				= false;
 bool g_bExternalSubtitleTime	= false;
-bool g_bForcedSubtitle			= false;
 
 void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 {
