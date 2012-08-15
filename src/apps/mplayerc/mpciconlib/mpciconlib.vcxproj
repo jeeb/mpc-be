@@ -77,9 +77,6 @@
     <ResourceCompile Include="mpciconlib.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="icons\0-Logo-MPC-BE.ico" />
-    <None Include="icons\0-reserve-audio.ico" />
-    <None Include="icons\0-reserve-video.ico" />
     <None Include="icons\3g2.ico" />
     <None Include="icons\3gp.ico" />
     <None Include="icons\3gp2.ico" />
@@ -116,6 +113,7 @@
     <None Include="icons\flic.ico" />
     <None Include="icons\flv.ico" />
     <None Include="icons\hdmov.ico" />
+    <None Include="icons\icon.ico" />
     <None Include="icons\ifo.ico" />
     <None Include="icons\ivf.ico" />
     <None Include="icons\m1a.ico" />
@@ -154,16 +152,15 @@
     <None Include="icons\ogm.ico" />
     <None Include="icons\ogv.ico" />
     <None Include="icons\playlist.ico" />
-    <None Include="icons\plc.ico" />
     <None Include="icons\pva.ico" />
     <None Include="icons\ra.ico" />
     <None Include="icons\ram.ico" />
-    <None Include="icons\rat.ico" />
     <None Include="icons\ratdvd.ico" />
     <None Include="icons\rec.ico" />
     <None Include="icons\rm.ico" />
     <None Include="icons\rmi.ico" />
     <None Include="icons\rmm.ico" />
+    <None Include="icons\rmvb.ico" />
     <None Include="icons\roq.ico" />
     <None Include="icons\rp.ico" />
     <None Include="icons\rpm.ico" />
@@ -180,7 +177,6 @@
     <None Include="icons\tta.ico" />
     <None Include="icons\vob.ico" />
     <None Include="icons\wav.ico" />
-    <None Include="icons\wbm.ico" />
     <None Include="icons\webm.ico" />
     <None Include="icons\wm.ico" />
     <None Include="icons\wma.ico" />

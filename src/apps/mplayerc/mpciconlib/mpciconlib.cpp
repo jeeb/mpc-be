@@ -176,8 +176,8 @@ extern "C" __declspec(dllexport) int get_icon_index(LPCTSTR ext)
 		iconindex = IDI_OGM_ICON;
 	} else if (_tcsicmp(ext, _T(".ogv")) == 0) {
 		iconindex = IDI_OGV_ICON;
-	} else if (_tcsicmp(ext, _T(".plc")) == 0) {
-		iconindex = IDI_PLC_ICON;
+//	} else if (_tcsicmp(ext, _T(".plc")) == 0) {
+//		iconindex = IDI_PLC_ICON;
 	} else if (_tcsicmp(ext, _T(".pss")) == 0) {
 		iconindex = IDI_MPG_ICON;
 	} else if (_tcsicmp(ext, _T(".pva")) == 0) {
@@ -189,7 +189,7 @@ extern "C" __declspec(dllexport) int get_icon_index(LPCTSTR ext)
 	} else if (_tcsicmp(ext, _T(".ram")) == 0) {
 		iconindex = IDI_RAM_ICON;
 	} else if (_tcsicmp(ext, _T(".rat")) == 0) {
-		iconindex = IDI_RAT_ICON;
+		iconindex = IDI_RATDVD_ICON;
 	} else if (_tcsicmp(ext, _T(".ratdvd")) == 0) {
 		iconindex = IDI_RATDVD_ICON;
 	} else if (_tcsicmp(ext, _T(".rec")) == 0) {
@@ -236,8 +236,8 @@ extern "C" __declspec(dllexport) int get_icon_index(LPCTSTR ext)
 //		iconindex = IDI_VP6_ICON;
 	} else if (_tcsicmp(ext, _T(".wav")) == 0) {
 		iconindex = IDI_WAV_ICON;
-	} else if (_tcsicmp(ext, _T(".wbm")) == 0) {
-		iconindex = IDI_WBM_ICON;
+//	} else if (_tcsicmp(ext, _T(".wbm")) == 0) {
+//		iconindex = IDI_WBM_ICON;
 	} else if (_tcsicmp(ext, _T(".webm")) == 0) {
 		iconindex = IDI_WEBM_ICON;
 	} else if (_tcsicmp(ext, _T(".wm")) == 0) {

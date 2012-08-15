@@ -33,15 +33,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="icons\0-Logo-MPC-BE.ico">
-      <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\0-reserve-audio.ico">
-      <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\0-reserve-video.ico">
-      <Filter>Resource Files\icons</Filter>
-    </None>
     <None Include="icons\3g2.ico">
       <Filter>Resource Files\icons</Filter>
     </None>
@@ -264,9 +255,6 @@
     <None Include="icons\playlist.ico">
       <Filter>Resource Files\icons</Filter>
     </None>
-    <None Include="icons\plc.ico">
-      <Filter>Resource Files\icons</Filter>
-    </None>
     <None Include="icons\pva.ico">
       <Filter>Resource Files\icons</Filter>
     </None>
@@ -274,9 +262,6 @@
       <Filter>Resource Files\icons</Filter>
     </None>
     <None Include="icons\ram.ico">
-      <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\rat.ico">
       <Filter>Resource Files\icons</Filter>
     </None>
     <None Include="icons\ratdvd.ico">
@@ -292,6 +277,9 @@
       <Filter>Resource Files\icons</Filter>
     </None>
     <None Include="icons\rmm.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\rmvb.ico">
       <Filter>Resource Files\icons</Filter>
     </None>
     <None Include="icons\roq.ico">
@@ -342,9 +330,6 @@
     <None Include="icons\wav.ico">
       <Filter>Resource Files\icons</Filter>
     </None>
-    <None Include="icons\wbm.ico">
-      <Filter>Resource Files\icons</Filter>
-    </None>
     <None Include="icons\webm.ico">
       <Filter>Resource Files\icons</Filter>
     </None>
@@ -361,6 +346,9 @@
       <Filter>Resource Files\icons</Filter>
     </None>
     <None Include="icons\wv.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\icon.ico">
       <Filter>Resource Files\icons</Filter>
     </None>
   </ItemGroup>
