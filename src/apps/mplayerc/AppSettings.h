@@ -418,6 +418,7 @@ public:
 	int				nHorPos, nVerPos;
 	int				nSubDelayInterval;
 	bool			fEnableSubtitles;
+	bool			fForcedSubtitles;
 	bool			fUseDefaultSubtitlesStyle;
 	bool			fPrioritizeExternalSubtitles;
 	bool			fDisableInternalSubtitles;

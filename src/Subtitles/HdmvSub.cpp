@@ -308,6 +308,12 @@ void CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 	if (pObject && pObject->GetRLEDataSize() && pObject->m_width > 0 && pObject->m_height > 0 &&
 			spd.w >= (pObject->m_horizontal_position + pObject->m_width) &&
 			spd.h >= (pObject->m_vertical_position + pObject->m_height)) {
+
+		if (g_bForcedSubtitle && !pObject->m_forced_on_flag) {
+			TRACE(_T("CHdmvSub::Render() : skip non forced subtitle - forced = %d, %I64d = %ws"), pObject->m_forced_on_flag, rt, ReftimeToString(rt));
+			return;
+		}
+
 		if (!pObject->HavePalette()) {
 			pObject->SetPalette (m_nDefaultPaletteNbEntry, m_pDefaultPalette, m_VideoDescriptor.nVideoWidth>720);
 		}

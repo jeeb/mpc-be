@@ -54,6 +54,7 @@
 #define IDS_RS_LOOP							_T("Loop")
 #define IDS_RS_SNAPTODESKTOPEDGES			_T("SnapToDesktopEdges")
 #define IDS_RS_ENABLESUBTITLES				_T("EnableSubtitles")
+#define IDS_RS_FORCEDSUBTITLES				_T("ForcedSubtitles")
 #define IDS_RS_PRIORITIZEEXTERNALSUBTITLES	_T("PrioritizeExternalSubtitles")
 #define IDS_RS_DISABLEINTERNALSUBTITLES		_T("DisableInternalSubtitles")
 #define IDS_RS_SUBTITLEPATHS				_T("SubtitlePaths")

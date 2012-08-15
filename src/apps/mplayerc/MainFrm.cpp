@@ -1727,8 +1727,9 @@ LRESULT CMainFrame::OnHotKey(WPARAM wParam, LPARAM lParam)
 	return fRet;
 }
 
-bool g_bNoDuration = false;
-bool g_bExternalSubtitleTime = false;
+bool g_bNoDuration				= false;
+bool g_bExternalSubtitleTime	= false;
+bool g_bForcedSubtitle			= false;
 
 void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 {
@@ -1750,6 +1751,8 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 						OnMouseMove(0, m_pos);
 					}
 				}
+
+				g_bForcedSubtitle = AfxGetAppSettings().fForcedSubtitles;
 
 				REFERENCE_TIME rtNow = 0, rtDur = 0;
 
@@ -8035,12 +8038,12 @@ void CMainFrame::OnUpdatePlayAudio(CCmdUI* pCmdUI)
 
 void CMainFrame::OnPlaySubtitles(UINT nID)
 {
-	int i = (int)nID - (5 + ID_SUBTITLES_SUBITEM_START); // currently the subtitles submenu contains 5 items, apart from the actual subtitles list
+	int i = (int)nID - (6 + ID_SUBTITLES_SUBITEM_START); // currently the subtitles submenu contains 5 items, apart from the actual subtitles list
 
-	if (i == -5) {
+	if (i == -6) {
 		// options
 		ShowOptions(CPPageSubtitles::IDD);
-	} else if (i == -4) {
+	} else if (i == -5) {
 		// styles
 		int i = m_iSubtitleSel;
 
@@ -8095,18 +8098,24 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 
 			i -= pSubStream->GetStreamCount();
 		}
-	} else if (i == -3) {
+	} else if (i == -4) {
 		// reload
 		ReloadSubtitle();
-	} else if (i == -2) {
+	} else if (i == -3) {
 
 		OnNavMixStreamSubtitleSelectSubMenu(-1, 2);
 
-	} else if (i == -1) {
+	} else if (i == -2) {
 		// override default style
 		// TODO: default subtitles style toggle here
 		AfxGetAppSettings().fUseDefaultSubtitlesStyle = !AfxGetAppSettings().fUseDefaultSubtitlesStyle;
 		UpdateSubtitle();
+	} else if (i == -1) {
+		AfxGetAppSettings().fForcedSubtitles = !AfxGetAppSettings().fForcedSubtitles;
+		g_bForcedSubtitle = AfxGetAppSettings().fForcedSubtitles;
+		if (m_pCAP) {
+			m_pCAP->Invalidate();
+		}
 	}
 }
 
@@ -8129,13 +8138,13 @@ void CMainFrame::OnUpdateNavMixSubtitles(CCmdUI* pCmdUI)
 void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 {
 	UINT nID = pCmdUI->m_nID;
-	int i = (int)nID - (5 + ID_SUBTITLES_SUBITEM_START); // again, 5 pre-set subtitles options before the actual list
+	int i = (int)nID - (6 + ID_SUBTITLES_SUBITEM_START); // again, 5 pre-set subtitles options before the actual list
 
 	pCmdUI->Enable(m_pCAP && !m_fAudioOnly);
 	
-	if (i == -5) {
+	if (i == -6) {
 		pCmdUI->Enable(TRUE);
-	} else if (i == -4) {
+	} else if (i == -5) {
 		// styles
 		pCmdUI->Enable(FALSE);
 
@@ -8159,13 +8168,16 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 
 			i -= pSubStream->GetStreamCount();
 		}
-	} else if (i == -2) {
+	} else if (i == -3) {
 		// enabled
 		pCmdUI->SetCheck(AfxGetAppSettings().fEnableSubtitles);
-	} else if (i == -1) {
+	} else if (i == -2) {
 		// override
 		// TODO: foxX - default subtitles style toggle here; still wip
 		pCmdUI->SetCheck(AfxGetAppSettings().fUseDefaultSubtitlesStyle);
+		pCmdUI->Enable(AfxGetAppSettings().fEnableSubtitles && m_pCAP && !m_fAudioOnly);
+	} else if (i == -1) {
+		pCmdUI->SetCheck(AfxGetAppSettings().fForcedSubtitles);
 		pCmdUI->Enable(AfxGetAppSettings().fEnableSubtitles && m_pCAP && !m_fAudioOnly);
 	}
 }
@@ -13593,7 +13605,7 @@ void CMainFrame::SetupSubtitlesSubMenu()
 
 	pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_SUBTITLES_ENABLE));
 	pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_SUBTITLES_DEFAULT_STYLE));
-
+	pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_SUBTITLES_FORCED));
 }
 
 void CMainFrame::SetupNavMixSubtitleSubMenu()

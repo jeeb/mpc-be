@@ -26,6 +26,8 @@
 
 class CGolombBuffer;
 
+extern bool g_bForcedSubtitle;
+
 class CHdmvSub : public CBaseSub
 {
 public:
