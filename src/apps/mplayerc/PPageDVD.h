@@ -52,6 +52,7 @@ public:
 
 	BOOL m_fAutoSpeakerConf;
 	BOOL m_fClosedCaptions;
+	BOOL m_fStartMainTitle;
 
 	enum { IDD = IDD_PPAGEDVD};
 

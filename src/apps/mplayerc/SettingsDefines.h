@@ -36,6 +36,7 @@
 #define IDS_RS_FAV_REMEMBERPOS				_T("RememberPosition")
 #define IDS_RS_FAV_RELATIVEDRIVE			_T("RelativeDrive")
 #define IDS_RS_DVDPOS						_T("Remember DVD Pos")
+#define IDS_RS_DVD_START_MAIN_TITLE			_T("Start Main Title DVD")
 #define IDS_RS_FILEPOS						_T("Remember File Pos")
 #define IDS_RS_LASTFULLSCREEN				_T("LastFullScreen")
 #define IDS_RS_EVR_BUFFERS					_T("EVRBuffers")

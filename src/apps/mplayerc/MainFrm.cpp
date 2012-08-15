@@ -2597,6 +2597,8 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 								{
 									m_iDVDTitle = DvdPos->lTitle;
 								}
+							} else if (s.fStartMainTitle){
+								pDVDC->ShowMenu((DVD_MENU_ID)2, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 							}
 							AppSettings& s = AfxGetAppSettings();
 							if (s.fRememberZoomLevel && !m_fFullScreen && !s.IsD3DFullscreen()) { // Hack to the normal initial zoom for DVD + DXVA ...
@@ -12847,6 +12849,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			m_wndCaptureBar.m_capdlg.SetVideoChannel(pDeviceData->vchannel);
 			m_wndCaptureBar.m_capdlg.SetAudioInput(pDeviceData->ainput);
 		}
+
 		break;
 	}
 

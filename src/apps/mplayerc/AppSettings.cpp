@@ -646,6 +646,8 @@ void CAppSettings::UpdateData(bool fSave)
 			}
 		}
 
+		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DVD_START_MAIN_TITLE, (int)fStartMainTitle);
+
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LASTFULLSCREEN, (int)fLastFullScreen);
 
 		{
@@ -1399,6 +1401,7 @@ void CAppSettings::UpdateData(bool fSave)
 			FilePosition[i].llPosition = _tstoi64 (strValue);
 		}
 
+		fStartMainTitle		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DVD_START_MAIN_TITLE, 0);
 		fLastFullScreen		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LASTFULLSCREEN, 0);
 
 		// TODO: sort shaders by label
@@ -1680,7 +1683,7 @@ void CAppSettings::ParseCommandLine(CAtlList<CString>& cmdln)
 	lDVDTitle = 0;
 	lDVDChapter = 0;
 	memset (&DVDPosition, 0, sizeof(DVDPosition));
-	iAdminOption=0;
+	iAdminOption = 0;
 	sizeFixedWindow.SetSize(0, 0);
 	iMonitor = 0;
 	hMasterWnd = 0;
