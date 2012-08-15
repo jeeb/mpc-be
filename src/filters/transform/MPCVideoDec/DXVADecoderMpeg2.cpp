@@ -82,6 +82,12 @@ HRESULT CDXVADecoderMpeg2::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIM
 		m_bSecondField = true;
 	}
 
+	if (!m_bSecondFieldPrev && !m_PictureParams.bSecondField) {
+		m_bSecondField = false;	
+	}
+
+	m_bSecondFieldPrev = m_PictureParams.bSecondField;
+
 	// Wait I frame after a flush
 	if (m_bFlushed && (!m_PictureParams.bPicIntra || (m_bSecondField && m_PictureParams.bSecondField))) {
 		TRACE_MPEG2 ("CDXVADecoderMpeg2::DecodeFrame() : Flush - wait I frame, SecondField = %d\n", m_PictureParams.bSecondField);
@@ -209,6 +215,7 @@ void CDXVADecoderMpeg2::Flush()
 	m_nSurfaceIndex		= 0;
 	m_pSampleToDeliver	= NULL;
 	m_bSecondField		= false;
+	m_bSecondFieldPrev	= false;
 	m_rtStart			= _I64_MIN;
 	m_rtStop			= _I64_MIN;
 

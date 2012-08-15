@@ -1042,7 +1042,7 @@ public:
 	HRESULT		(__stdcall * m_DwmSetWindowAttributeFnc)(HWND hwnd, DWORD dwAttribute, __in  LPCVOID pvAttribute, DWORD cbAttribute);
 	HRESULT		(__stdcall * m_DwmSetIconicThumbnailFnc)( __in  HWND hwnd, __in  HBITMAP hbmp, __in  DWORD dwSITFlags);
 	HRESULT		(__stdcall * m_DwmSetIconicLivePreviewBitmapFnc)(HWND hwnd, HBITMAP hbmp, __in_opt  POINT *pptClient, DWORD dwSITFlags);
-	HRESULT		SetDwmPreview();
+	HRESULT		SetDwmPreview(BOOL hide = FALSE);
 
 protected:
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
@@ -1056,7 +1056,7 @@ protected:
 	DWORD m_nMenuHideTick;
 	UINT m_nSeekDirection;
 
-	int				previous_renderer; // MadVR + DVD fix.
+	int previous_renderer; // MadVR + DVD fix.
 
 public:
 	afx_msg UINT OnPowerBroadcast(UINT nPowerEvent, UINT nEventData);

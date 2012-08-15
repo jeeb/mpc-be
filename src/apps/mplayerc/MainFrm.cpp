@@ -12504,7 +12504,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		return false;
 	}
 
-	SetDwmPreview();
+	SetDwmPreview(TRUE);
 
 	OpenFileData *pFileData = dynamic_cast<OpenFileData *>(pOMD.m_p);
 	OpenDVDData* pDVDData = dynamic_cast<OpenDVDData*>(pOMD.m_p);
@@ -17490,7 +17490,7 @@ void CMainFrame::CreateChapterTimeArray()
 }
 
 /* this is for custom draw in windows 7 preview ... TODO - disable custom draw for live preview */
-HRESULT CMainFrame::SetDwmPreview()
+HRESULT CMainFrame::SetDwmPreview(BOOL hide)
 {
 	if (!IsWinSevenOrLater()) {
 		return S_FALSE;
@@ -17498,6 +17498,9 @@ HRESULT CMainFrame::SetDwmPreview()
 
 	/*
 	BOOL set = AfxGetAppSettings().fUseWin7TaskBar && m_fAudioOnly;
+	if (hide) { // forcing off custom preview bitmap ...
+		set = hide;
+	}
 
 	if (m_DwmSetWindowAttributeFnc && m_DwmSetIconicThumbnailFnc) {
 		m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_HAS_ICONIC_BITMAP, &set, sizeof(set));
@@ -17572,10 +17575,11 @@ LRESULT CMainFrame::OnDwmSendIconicLivePreviewBitmap(WPARAM, LPARAM)
 	if (!m_fAudioOnly || !m_DwmSetIconicLivePreviewBitmapFnc) {
 		return 0;
 	}
+
 	CWindowDC hDC(this);
 
 	HBITMAP hBitmap = NULL;
-    HDC hMemDC = CreateCompatibleDC(hDC);
+	HDC hMemDC = CreateCompatibleDC(hDC);
 
 	if (hMemDC) {
 		CRect rect; GetWindowRect(&rect);
