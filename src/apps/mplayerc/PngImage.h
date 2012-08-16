@@ -1,10 +1,10 @@
 /*
  * $Id$
  *
- * (C) 2003-2006 Gabest
- * (C) 2006-2012 see Authors.txt
+ * Copyright (C) 2012 Sergey "Exodus8" (rusguy6@gmail.com)
  *
  * This file is part of MPC-BE.
+ * YOU CANNOT USE THIS FILE WITHOUT AUTHOR PERMISSION!
  *
  * MPC-BE is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,11 +30,13 @@
 class MPCPngImage : public CImage
 {
 public:
+	bool DecompressPNG(struct png_t* png);
 	bool LoadFromResource(UINT id);
 	bool LoadFromFile(CString fn);
 
 	CString LoadCurrentPath();
 	int FileExists(CString fn);
+
 	BYTE* BrightnessRGB(int type, BYTE* lpBits, int width, int height, int bpp, int br, int rc, int gc, int bc);
 	HBITMAP TypeLoadImage(int type, BYTE** pData, int* width, int* height, int* bpp, FILE* fp, int resid, int br, int rc, int gc, int bc);
 	HBITMAP LoadExternalImage(CString fn, int br, int rc, int gc, int bc);

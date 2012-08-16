@@ -42,19 +42,13 @@ static void read_data_fn(png_structp png_ptr, png_bytep data, png_size_t length)
 	png->pos += length;
 }
 
-static unsigned char* DecompressPNG(struct png_t* png, int* w, int* h)
+bool MPCPngImage::DecompressPNG(struct png_t* png)
 {
-	png_structp png_ptr;
-	png_infop info_ptr;
-
-	unsigned char *pic, *row;
-	unsigned int x, y, c;
-
 	if (png_sig_cmp(png->data, 0, 8) == 0) {
 		png->pos = 8;
 	}
 
-	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 
 	if (!png_ptr) {
 		return NULL;
@@ -62,7 +56,7 @@ static unsigned char* DecompressPNG(struct png_t* png, int* w, int* h)
 
 	png_set_read_fn(png_ptr, (png_voidp)png, read_data_fn);
 
-	info_ptr = png_create_info_struct(png_ptr);
+	png_infop info_ptr = png_create_info_struct(png_ptr);
 
 	if (!info_ptr) {
 		png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
@@ -73,26 +67,37 @@ static unsigned char* DecompressPNG(struct png_t* png, int* w, int* h)
 
 	png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND | PNG_TRANSFORM_BGR, NULL);
 
-	pic = (unsigned char*)calloc(info_ptr->width * info_ptr->height, 4);
+	unsigned int w = info_ptr->width, h = info_ptr->height, b = info_ptr->channels;
+	unsigned int x, y, c, len = w * b;
+	unsigned char *row, *pic = (unsigned char*)malloc(len * h);
 
-	*w = info_ptr->width;
-	*h = info_ptr->height;
+	bool ret = false;
 
-	for (y = 0; y < info_ptr->height; y++) {
+	if (Create(w, -(int)h, b * 8)) {
 
-		row = &pic[y * info_ptr->width * 4];
+		for (y = 0; y < h; y++) {
 
-		for (x = 0; x < info_ptr->width * info_ptr->channels; row += 4) {
+			row = &pic[len * y];
 
-			for (c = 0; c < info_ptr->channels; c++) {
-				row[c] = info_ptr->row_pointers[y][x++];
+			for (x = 0; x < len; row += b) {
+
+				for (c = 0; c < b; c++) {
+
+					row[c] = info_ptr->row_pointers[y][x++];
+				}
 			}
+
+			memcpy(GetPixelAddress(0, y), &pic[len * y], len);
 		}
+
+		ret = true;
 	}
 
 	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 
-	return pic;
+	free(pic);
+
+	return ret;
 }
 
 bool MPCPngImage::LoadFromResource(UINT id) {
@@ -104,21 +109,8 @@ bool MPCPngImage::LoadFromResource(UINT id) {
 		struct png_t png;
 		png.data = (unsigned char*)(LPCSTR)str;
 		png.size = str.GetLength();
-		int w, h;
 
-		if (BYTE* p = DecompressPNG(&png, &w, &h)) {
-
-			if (Create(w, -h, 32)) {
-
-				for (int y = 0; y < h; y++) {
-					memcpy(GetPixelAddress(0, y), &p[w * 4 * y], w * 4);
-				}
-
-				ret = true;
-			}
-
-			free(p);
-		}
+		ret = DecompressPNG(&png);
 	}
 
 	return ret;
@@ -140,21 +132,8 @@ bool MPCPngImage::LoadFromFile(CString fn) {
 		struct png_t png;
 		png.data = (unsigned char*)str;
 		png.size = size;
-		int w, h;
 
-		if (BYTE* p = DecompressPNG(&png, &w, &h)) {
-
-			if (Create(w, -h, 32)) {
-
-				for (int y = 0; y < h; y++) {
-					memcpy(GetPixelAddress(0, y), &p[w * 4 * y], w * 4);
-				}
-
-				ret = true;
-			}
-
-			free(p);
-		}
+		ret = DecompressPNG(&png);
 
 		free(str);
 	}
