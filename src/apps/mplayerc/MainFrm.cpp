@@ -10002,7 +10002,7 @@ CSize CMainFrame::GetVideoSize()
 
 void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasTo)
 {
-	if (m_pFullscreenWnd->IsWindow()) {
+	if (m_pFullscreenWnd->IsWindow() || !IsSomethingLoaded() || m_fAudioOnly) {
 		return;
 	}
 
