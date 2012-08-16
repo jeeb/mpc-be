@@ -310,8 +310,8 @@ SRCS_C=\
     libavcodec/x86/motion_est_mmx.c \
     libavcodec/x86/mpegaudiodec_mmx.c \
     libavcodec/x86/mpegvideo_mmx.c \
-    libavcodec/x86/pngdsp-init.c \
-    libavcodec/x86/proresdsp-init.c \
+    libavcodec/x86/pngdsp_init.c \
+    libavcodec/x86/proresdsp_init.c \
     libavcodec/x86/rv34dsp_init.c \
     libavcodec/x86/rv40dsp_init.c \
     libavcodec/x86/sbrdsp_init.c \
@@ -320,7 +320,7 @@ SRCS_C=\
     libavcodec/x86/vc1dsp_mmx.c \
     libavcodec/x86/vp3dsp_init.c \
     libavcodec/x86/vp56dsp_init.c \
-    libavcodec/x86/vp8dsp-init.c \
+    libavcodec/x86/vp8dsp_init.c \
 \
     libavresample/audio_convert.c \
     libavresample/audio_data.c \
