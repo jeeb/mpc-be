@@ -108,6 +108,14 @@ static UINT WM_NOTIFYICON		= RegisterWindowMessage(_T("MYWM_NOTIFYICON"));
 
 #define DEV_BUILD 1 // set to 1 only for the DEV builds
 
+#if (_MSC_VER == 1700) // TODO - keep this until not fix in VS2012 return value of GetSystemMetrics() ...
+	#define _SM_CXSIZEFRAME GetSystemMetrics(SM_CXSIZEFRAME) * 2
+	#define _SM_CYSIZEFRAME GetSystemMetrics(SM_CYSIZEFRAME) * 2
+#else
+	#define _SM_CXSIZEFRAME GetSystemMetrics(SM_CXSIZEFRAME)
+	#define _SM_CYSIZEFRAME GetSystemMetrics(SM_CYSIZEFRAME)
+#endif
+
 DWORD last_run		= 0;
 UINT flast_nID		= 0;
 bool b_firstPlay	= false;
@@ -175,8 +183,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_CLOSE()
 
 	ON_REGISTERED_MESSAGE(s_uTaskbarRestart, OnTaskBarRestart)
-	ON_REGISTERED_MESSAGE(WM_NOTIFYICON, OnNotifyIcon)
 	ON_REGISTERED_MESSAGE(s_uTBBC, OnTaskBarThumbnailsCreate)
+	ON_REGISTERED_MESSAGE(WM_NOTIFYICON, OnNotifyIcon)
 
 	ON_MESSAGE(WM_DWMSENDICONICTHUMBNAIL, OnDwmSendIconicThumbnail)
 	ON_MESSAGE(WM_DWMSENDICONICLIVEPREVIEWBITMAP, OnDwmSendIconicLivePreviewBitmap)
@@ -876,8 +884,12 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 			(FARPROC &)m_DwmSetWindowAttributeFnc			= GetProcAddress(m_hDWMAPI, "DwmSetWindowAttribute");
 			(FARPROC &)m_DwmSetIconicThumbnailFnc			= GetProcAddress(m_hDWMAPI, "DwmSetIconicThumbnail");
 			(FARPROC &)m_DwmSetIconicLivePreviewBitmapFnc	= GetProcAddress(m_hDWMAPI, "DwmSetIconicLivePreviewBitmap");
+			(FARPROC &)m_DwmInvalidateIconicBitmapsFnc		= GetProcAddress(m_hDWMAPI, "DwmInvalidateIconicBitmaps");
 		}
 	}
+
+	m_CaptureWndBitmap = NULL;
+	mpc_dwm_image.LoadFromResource(IDB_W7_AUDIO);
 
 	return 0;
 }
@@ -963,6 +975,8 @@ void CMainFrame::OnClose()
 	if (m_hDWMAPI) {
 		FreeLibrary(m_hDWMAPI);
 	}
+
+	mpc_dwm_image.Destroy();
 
 	__super::OnClose();
 }
@@ -1309,13 +1323,8 @@ void CMainFrame::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 	}
 
 	if (style & WS_THICKFRAME) {
-#if (_MSC_VER == 1700) // TODO - keep this until not fix in VS2012 return value of GetSystemMetrics() ...
-		lpMMI->ptMinTrackSize.x += GetSystemMetrics(SM_CXSIZEFRAME) * 4;
-		lpMMI->ptMinTrackSize.y += GetSystemMetrics(SM_CYSIZEFRAME) * 4;
-#else
-		lpMMI->ptMinTrackSize.x += GetSystemMetrics(SM_CXSIZEFRAME) * 2;
-		lpMMI->ptMinTrackSize.y += GetSystemMetrics(SM_CYSIZEFRAME) * 2;
-#endif
+		lpMMI->ptMinTrackSize.x += _SM_CXSIZEFRAME * 2;
+		lpMMI->ptMinTrackSize.y += _SM_CYSIZEFRAME * 2;
 		if ( (style & WS_CAPTION) == 0 ) {
 			lpMMI->ptMinTrackSize.x -= 2;
 			lpMMI->ptMinTrackSize.y -= 2;
@@ -1451,13 +1460,8 @@ void CMainFrame::OnSizing(UINT fwSide, LPRECT pRect)
 		//::GetMenuBarInfo(m_hWnd, OBJID_MENU, 0, &mbi);
 
 		if (style & WS_THICKFRAME) {
-#if (_MSC_VER == 1700) // TODO - keep this until not fix in VS2012 return value of GetSystemMetrics() ...
-			fsize.cx += GetSystemMetrics( SM_CXSIZEFRAME ) * 4;
-			fsize.cy += GetSystemMetrics( SM_CYSIZEFRAME ) * 4;
-#else
-			fsize.cx += GetSystemMetrics( SM_CXSIZEFRAME ) * 2;
-			fsize.cy += GetSystemMetrics( SM_CYSIZEFRAME ) * 2;
-#endif
+			fsize.cx += _SM_CXSIZEFRAME * 2;
+			fsize.cy += _SM_CYSIZEFRAME * 2;
 			if ( (style & WS_CAPTION) == 0 ) {
 				fsize.cx -= 2;
 				fsize.cy -= 2;
@@ -1576,6 +1580,15 @@ void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
 	} else if ((nID & 0xFFF0) == SC_MINIMIZE && m_fTrayIcon) {
 		ShowWindow(SW_HIDE);
 		return;
+	} else if ((nID & 0xFFF0) == SC_MINIMIZE) {
+		if (m_fAudioOnly && m_DwmSetIconicLivePreviewBitmapFnc) {
+			isWindowMinimized = true;
+			CreateCaptureWindow();
+		}
+	} else if ((nID & 0xFFF0) == SC_RESTORE) {
+		if (m_fAudioOnly && m_DwmSetIconicLivePreviewBitmapFnc) {
+			isWindowMinimized = false;
+		}
 	}
 
 	__super::OnSysCommand(nID, lParam);
@@ -1890,6 +1903,9 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 				if (m_pCAP && GetMediaState() == State_Paused) {
 					m_pCAP->Paint(false);
 				}
+			}
+			if (m_DwmInvalidateIconicBitmapsFnc) {
+				m_DwmInvalidateIconicBitmapsFnc(m_hWnd);
 			}
 			break;
 		case TIMER_FULLSCREENCONTROLBARHIDER: {
@@ -6557,13 +6573,8 @@ void CMainFrame::OnViewCaptionmenu()
 		case MODE_SHOWCAPTIONMENU:	// borderless -> normal
 			dwAdd = WS_CAPTION | WS_THICKFRAME;
 			hMenu = m_hMenuDefault;
-#if (_MSC_VER == 1700) // TODO - keep this until not fix in VS2012 return value of GetSystemMetrics() ...
-			wr.right  += GetSystemMetrics(SM_CXSIZEFRAME) * 4;
-			wr.bottom += GetSystemMetrics(SM_CYSIZEFRAME) * 4;
-#else
-			wr.right  += GetSystemMetrics(SM_CXSIZEFRAME) * 2;
-			wr.bottom += GetSystemMetrics(SM_CYSIZEFRAME) * 2;
-#endif
+			wr.right  += _SM_CXSIZEFRAME * 2;
+			wr.bottom += _SM_CYSIZEFRAME * 2;
 			wr.bottom += GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYMENU);
 			break;
 
@@ -6580,13 +6591,8 @@ void CMainFrame::OnViewCaptionmenu()
 
 		case MODE_BORDERLESS:		// frameonly -> borderless
 			dwRemove = WS_THICKFRAME;
-#if (_MSC_VER == 1700) // TODO - keep this until not fix in VS2012 return value of GetSystemMetrics() ...
-			wr.right  -= GetSystemMetrics(SM_CXSIZEFRAME) * 4 - 2;
-			wr.bottom -= GetSystemMetrics(SM_CYSIZEFRAME) * 4 - 2;
-#else
-			wr.right  -= GetSystemMetrics(SM_CXSIZEFRAME) * 2 - 2;
-			wr.bottom -= GetSystemMetrics(SM_CYSIZEFRAME) * 2 - 2;
-#endif
+			wr.right  -= _SM_CXSIZEFRAME * 2 - 2;
+			wr.bottom -= _SM_CYSIZEFRAME * 2 - 2;
 			break;
 	}
 
@@ -9735,13 +9741,8 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 		h = _DEFCLIENTH + r1.Height() - r2.Height();
 
 		if (style & WS_THICKFRAME) {
-#if (_MSC_VER == 1700) // TODO - keep this until not fix in VS2012 return value of GetSystemMetrics() ...
-			w += GetSystemMetrics(SM_CXSIZEFRAME) * 4;
-			h += GetSystemMetrics(SM_CYSIZEFRAME) * 4;
-#else
-			w += GetSystemMetrics(SM_CXSIZEFRAME) * 2;
-			h += GetSystemMetrics(SM_CYSIZEFRAME) * 2;
-#endif
+			w += _SM_CXSIZEFRAME * 2;
+			h += _SM_CYSIZEFRAME * 2;
 			if ( (style & WS_CAPTION) == 0 ) {
 				w -= 2;
 				h -= 2;
@@ -9874,13 +9875,8 @@ void CMainFrame::RestoreDefaultWindowRect()
 			h = _DEFCLIENTH + r1.Height() - r2.Height();
 
 			if (style & WS_THICKFRAME) {
-#if (_MSC_VER == 1700) // TODO - keep this until not fix in VS2012 return value of GetSystemMetrics() ...
-				w += GetSystemMetrics(SM_CXSIZEFRAME) * 4;
-				h += GetSystemMetrics(SM_CYSIZEFRAME) * 4;
-#else
-				w += GetSystemMetrics(SM_CXSIZEFRAME) * 2;
-				h += GetSystemMetrics(SM_CYSIZEFRAME) * 2;
-#endif
+				w += _SM_CXSIZEFRAME * 2;
+				h += _SM_CYSIZEFRAME * 2;
 				if ( (style & WS_CAPTION) == 0 ) {
 					w -= 2;
 					h -= 2;
@@ -10561,13 +10557,8 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 		h = r1.Height() - r2.Height() + lHeight;
 
 		if (style & WS_THICKFRAME) {
-#if (_MSC_VER == 1700) // TODO - keep this until not fix in VS2012 return value of GetSystemMetrics() ...
-			w += GetSystemMetrics(SM_CXSIZEFRAME) * 4;
-			h += GetSystemMetrics(SM_CYSIZEFRAME) * 4;
-#else
-			w += GetSystemMetrics(SM_CXSIZEFRAME) * 2;
-			h += GetSystemMetrics(SM_CYSIZEFRAME) * 2;
-#endif
+			w += _SM_CXSIZEFRAME * 2;
+			h += _SM_CYSIZEFRAME * 2;
 			if ( (style & WS_CAPTION) == 0 ) {
 				w -= 2;
 				h -= 2;
@@ -12916,10 +12907,9 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 	}
 	m_bIsBDPlay = false;
 
+	SetDwmPreview();
 
-	if (err.IsEmpty()) {
-		SetDwmPreview();
-	}
+	UpdateThumbarButton();
 
 	return(err.IsEmpty());
 }
@@ -15794,6 +15784,7 @@ bool CMainFrame::DisplayChange()
 void CMainFrame::CloseMedia()
 {
 	if (m_iMediaLoadState == MLS_CLOSING) {
+		
 		TRACE(_T("WARNING: CMainFrame::CloseMedia() called twice or more\n"));
 		return;
 	}
@@ -15847,6 +15838,8 @@ void CMainFrame::CloseMedia()
 		AfxGetAppSettings().iDSVideoRendererType = previous_renderer;
 		previous_renderer = -1;
 	}
+
+	SetDwmPreview();
 }
 
 void CMainFrame::StartTunerScan(CAutoPtr<TunerScanData> pTSD)
@@ -17495,24 +17488,23 @@ HRESULT CMainFrame::SetDwmPreview(BOOL hide)
 		return S_FALSE;
 	}
 
-	/*
-	BOOL set = AfxGetAppSettings().fUseWin7TaskBar && m_fAudioOnly;
+	BOOL set = AfxGetAppSettings().fUseWin7TaskBar && m_fAudioOnly && IsSomethingLoaded();
 	if (hide) { // forcing off custom preview bitmap ...
-		set = hide;
+		set = !hide;
 	}
 
 	if (m_DwmSetWindowAttributeFnc && m_DwmSetIconicThumbnailFnc) {
 		m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_HAS_ICONIC_BITMAP, &set, sizeof(set));
 		m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_FORCE_ICONIC_REPRESENTATION, &set, sizeof(set));
 	}
-	*/
+	
 
 	return S_OK;
 }
 
 LRESULT CMainFrame::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
 {
-	if (!m_fAudioOnly || !m_DwmSetIconicThumbnailFnc) {
+	if (!IsSomethingLoaded() || !m_fAudioOnly || !m_DwmSetIconicThumbnailFnc) {
 		return 0;
 	}
 
@@ -17534,18 +17526,13 @@ LRESULT CMainFrame::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
 		PBYTE pbDS = NULL;
 		hbm = CreateDIBSection(hdcMem, &bmi, DIB_RGB_COLORS, (VOID**)&pbDS, NULL, NULL);
 		if (hbm) {
-			//HBITMAP hOldMem = (HBITMAP)SelectObject(hdcMem, hbm);
-			//
 			// RECT rc = {0, 0, nWidth,nHeight};
 			// FillRect(hdcMem, &rc, (HBRUSH)GetSysColorBrush(COLOR_WINDOW));
 
 			SelectObject(hdcMem, hbm);
 
-			MPCPngImage mpc_image;
-			mpc_image.LoadFromResource(IDB_W7_AUDIO);
-
 			BITMAP bm;
-			GetObject(mpc_image, sizeof(bm), &bm);
+			GetObject(mpc_dwm_image, sizeof(bm), &bm);
 
 			int w = min(bm.bmWidth, nWidth);
 			int h = min(abs(bm.bmHeight), nHeight);
@@ -17554,16 +17541,20 @@ LRESULT CMainFrame::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
 			CRect r = CRect(CPoint(x, y), CSize(w, h));
 
 			SetStretchBltMode(hdcMem, STRETCH_HALFTONE);
-			BOOL work = mpc_image.StretchBlt(hdcMem, r, CRect(0, 0, bm.bmWidth, abs(bm.bmHeight)));
-			//
-			//SelectObject(hdcMem, hOldMem);
+			BOOL work = mpc_dwm_image.StretchBlt(hdcMem, r, CRect(0, 0, bm.bmWidth, abs(bm.bmHeight)));
 		}
 		DeleteDC(hdcMem);
 	}
 
+	HRESULT hr = E_FAIL;
+
 	if (hbm) {
-		HRESULT hr = m_DwmSetIconicThumbnailFnc(m_hWnd, hbm, 0);
+		hr = m_DwmSetIconicThumbnailFnc(m_hWnd, hbm, 0);
 		::DeleteObject(hbm);
+	}
+
+	if (FAILED(hr)) {
+		// TODO ...
 	}
 
 	return 0;
@@ -17571,43 +17562,131 @@ LRESULT CMainFrame::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
 
 LRESULT CMainFrame::OnDwmSendIconicLivePreviewBitmap(WPARAM, LPARAM)
 {
-	if (!m_fAudioOnly || !m_DwmSetIconicLivePreviewBitmapFnc) {
+	if (!IsSomethingLoaded() || !m_fAudioOnly || !m_DwmSetIconicLivePreviewBitmapFnc) {
 		return 0;
 	}
+	
+	AppSettings& s = AfxGetAppSettings();
 
-	CWindowDC hDC(this);
+	CRect rectClient(0, 0, 0, 0);
+	if (s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU) {
+		GetWindowRect(&rectClient);
+	} else {
+		GetClientRect(&rectClient);
+	}
 
-	HBITMAP hBitmap = NULL;
-	HDC hMemDC = CreateCompatibleDC(hDC);
+	POINT offset = {0, 0};
+	DWORD style = GetStyle();
+	if ( style & WS_CAPTION ) {
+		offset.x = (rectClient.left) - _SM_CXSIZEFRAME;
+		offset.y = (rectClient.top)  - (GetSystemMetrics(SM_CYCAPTION) + SM_CYSIZEFRAME);
+	} else if (style & WS_THICKFRAME) {
+		offset.x = (rectClient.left) - _SM_CXSIZEFRAME;
+		offset.y = (rectClient.top)  - _SM_CYSIZEFRAME;
+	}
 
-	if (hMemDC) {
-		CRect rect; GetWindowRect(&rect);
+	HBITMAP hBitmap = CreateCaptureDIB(rectClient.Width(), rectClient.Height());
 
-		int nWidth	= rect.Width();
-		int nHeight	= rect.Height();
-
-		BITMAPINFO bmi;
-		ZeroMemory(&bmi.bmiHeader, sizeof(BITMAPINFOHEADER));
-		bmi.bmiHeader.biSize		= sizeof(BITMAPINFOHEADER);
-		bmi.bmiHeader.biWidth		= nWidth;
-		bmi.bmiHeader.biHeight		= -nHeight;
-		bmi.bmiHeader.biPlanes		= 1;
-		bmi.bmiHeader.biBitCount	= 32;
-
-		PBYTE pbDS = NULL;
-		hBitmap = CreateDIBSection(hMemDC, &bmi, DIB_RGB_COLORS, (VOID**)&pbDS, NULL, NULL);
-
+	HRESULT hr = E_FAIL;
+	
+	if (isWindowMinimized && m_CaptureWndBitmap) {
+		hr = m_DwmSetIconicLivePreviewBitmapFnc(m_hWnd, m_CaptureWndBitmap, NULL, (style & WS_CAPTION || style & WS_THICKFRAME) ? DWM_SIT_DISPLAYFRAME : 0);	
+	} else {
 		if (hBitmap) {
-			SelectObject(hMemDC, hBitmap);
-			BitBlt(hMemDC, 0, 0, nWidth, nHeight, hDC, 0, 0, SRCCOPY);
+			if (style & WS_CAPTION || style & WS_THICKFRAME) {
+				hr = m_DwmSetIconicLivePreviewBitmapFnc(m_hWnd, hBitmap, NULL, DWM_SIT_DISPLAYFRAME);
+			} else {
+				hr = m_DwmSetIconicLivePreviewBitmapFnc(m_hWnd, hBitmap, &offset, 0);
+			}
 		}
-		DeleteDC(hDC);
+	}
+
+	if (FAILED(hr)) {
+		// TODO ...
 	}
 
 	if (hBitmap) {
-		HRESULT hr = m_DwmSetIconicLivePreviewBitmapFnc(m_hWnd, hBitmap, NULL, /*DWM_SIT_DISPLAYFRAME*/0);
 		::DeleteObject(hBitmap);
 	}
 
 	return 0;
+}
+
+
+HBITMAP CMainFrame::CreateCaptureDIB(int nWidth, int nHeight)
+{
+	AppSettings& s = AfxGetAppSettings();
+
+	HBITMAP hbm = NULL;
+	CWindowDC hDCw(this), hDCc(this);
+	HDC hdcMem = CreateCompatibleDC(hDCc);
+
+	bool bCaptionWithMenu = (s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU) ? true : false;
+	DWORD style = GetStyle();
+	
+	if (hdcMem != NULL) {
+    
+		BITMAPINFO bmi;
+		ZeroMemory(&bmi.bmiHeader, sizeof(BITMAPINFOHEADER));
+		bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+		if (bCaptionWithMenu) {
+			bmi.bmiHeader.biWidth	= nWidth - (_SM_CXSIZEFRAME * 2);
+			bmi.bmiHeader.biHeight	= -(nHeight - GetSystemMetrics(SM_CYCAPTION) - (_SM_CYSIZEFRAME * 2));
+		} else {
+			bmi.bmiHeader.biWidth	= nWidth;
+			bmi.bmiHeader.biHeight	= -nHeight;
+		}
+		bmi.bmiHeader.biPlanes		= 1;
+		bmi.bmiHeader.biBitCount	= 32;
+
+		LPBYTE pbDS = NULL;
+		hbm = CreateDIBSection(hdcMem, &bmi, DIB_RGB_COLORS, (LPVOID *)&pbDS, NULL, NULL);
+
+		if (hbm) {
+			SelectObject(hdcMem, hbm);
+			if (bCaptionWithMenu) {
+				BitBlt(
+					hdcMem,
+					0,
+					0,
+					nWidth + (_SM_CXSIZEFRAME * 2),
+					nHeight + (GetSystemMetrics(SM_CYCAPTION) + _SM_CYSIZEFRAME),
+					hDCw,
+					_SM_CXSIZEFRAME,
+					GetSystemMetrics(SM_CYCAPTION) + _SM_CYSIZEFRAME,
+					MERGECOPY
+				);
+			} else {
+				BitBlt(
+					hdcMem,
+					0,
+					0,
+					nWidth,
+					nHeight,
+					hDCc,
+					0,
+					0,
+					MERGECOPY
+				);
+			}
+		}
+		DeleteDC(hdcMem);
+	}
+
+	return hbm;
+}
+
+void CMainFrame::CreateCaptureWindow() 
+{
+	
+	AppSettings& s = AfxGetAppSettings();
+	CRect rectClient(0, 0, 0, 0);
+	
+	if (s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU) {
+		GetWindowRect(&rectClient);
+	} else {
+		GetClientRect(&rectClient);
+	}
+
+	m_CaptureWndBitmap = CreateCaptureDIB(rectClient.Width(), rectClient.Height());
 }

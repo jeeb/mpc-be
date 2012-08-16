@@ -1043,7 +1043,14 @@ public:
 	HRESULT		(__stdcall * m_DwmSetWindowAttributeFnc)(HWND hwnd, DWORD dwAttribute, __in  LPCVOID pvAttribute, DWORD cbAttribute);
 	HRESULT		(__stdcall * m_DwmSetIconicThumbnailFnc)( __in  HWND hwnd, __in  HBITMAP hbmp, __in  DWORD dwSITFlags);
 	HRESULT		(__stdcall * m_DwmSetIconicLivePreviewBitmapFnc)(HWND hwnd, HBITMAP hbmp, __in_opt  POINT *pptClient, DWORD dwSITFlags);
+	HRESULT		(__stdcall * m_DwmInvalidateIconicBitmapsFnc)( __in  HWND hwnd);
+
 	HRESULT		SetDwmPreview(BOOL hide = FALSE);
+	HBITMAP		m_CaptureWndBitmap;
+	bool		isWindowMinimized;
+	HBITMAP		CreateCaptureDIB(int nWidth, int nHeight);
+	void		CreateCaptureWindow();
+	MPCPngImage	mpc_dwm_image;
 
 protected:
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
