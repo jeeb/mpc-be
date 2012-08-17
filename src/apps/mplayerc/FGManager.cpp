@@ -2127,6 +2127,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvc);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvhq);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvh5);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvh6);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvcp);
 	}
 
@@ -2378,6 +2379,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview
 			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvc);
 			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvhq);
 			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvh5);
+			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvh6);
 			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvcp);
 		}
 
