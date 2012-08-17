@@ -423,6 +423,8 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
 		case AP4_ATOM_TYPE_DV5P:
 		case AP4_ATOM_TYPE_DVCP:
 		case AP4_ATOM_TYPE_DVPP:
+		case AP4_ATOM_TYPE_DVH5:
+		case AP4_ATOM_TYPE_DVHQ:
 		case AP4_ATOM_TYPE_HDV1:
 		case AP4_ATOM_TYPE_HDV2:
 		case AP4_ATOM_TYPE_APCN:
