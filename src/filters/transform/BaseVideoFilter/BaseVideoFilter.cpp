@@ -191,29 +191,33 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, int re
 			return E_FAIL;
 		}
 
-		BITMAPINFOHEADER* bmi = NULL;
+		CRect vih_rect(0, 0, 0, 0);
+		if (realWidth > 0 && realHeight > 0) {
+			vih_rect = CRect(0, 0, realWidth, realHeight);
+		} else {
+			vih_rect = CRect(0, 0, m_w, m_h);
+		}
 
+		BITMAPINFOHEADER* bmi = NULL;
 		if (mt.formattype == FORMAT_VideoInfo) {
 			VIDEOINFOHEADER* vih = (VIDEOINFOHEADER*)mt.Format();
-			if (realWidth > 0 && realHeight > 0) {
-				SetRect(&vih->rcSource, 0, 0, realWidth, realHeight);
-				SetRect(&vih->rcTarget, 0, 0, realWidth, realHeight);
-			} else {
-				SetRect(&vih->rcSource, 0, 0, m_w, m_h);
-				SetRect(&vih->rcTarget, 0, 0, m_w, m_h);
+			int w = vih->rcSource.left - vih->rcSource.right;
+			int h = vih->rcSource.bottom - vih->rcSource.top;
+			if (w && h && (w > vih_rect.Width() || h > vih_rect.Height())) {
+				vih->rcSource = vih->rcTarget = vih_rect;
 			}
+
 			bmi = &vih->bmiHeader;
 			bmi->biXPelsPerMeter = m_w * m_ary;
 			bmi->biYPelsPerMeter = m_h * m_arx;
 		} else if (mt.formattype == FORMAT_VideoInfo2) {
 			VIDEOINFOHEADER2* vih = (VIDEOINFOHEADER2*)mt.Format();
-			if (realWidth > 0 && realHeight > 0) {
-				SetRect(&vih->rcSource, 0, 0, realWidth, realHeight);
-				SetRect(&vih->rcTarget, 0, 0, realWidth, realHeight);
-			} else {
-				SetRect(&vih->rcSource, 0, 0, m_w, m_h);
-				SetRect(&vih->rcTarget, 0, 0, m_w, m_h);
+			int w = vih->rcSource.left - vih->rcSource.right;
+			int h = vih->rcSource.bottom - vih->rcSource.top;
+			if (w & h & (w > vih_rect.Width() || h > vih_rect.Height())) {
+				vih->rcSource = vih->rcTarget = vih_rect;
 			}
+
 			bmi = &vih->bmiHeader;
 			vih->dwPictAspectRatioX = m_arx;
 			vih->dwPictAspectRatioY = m_ary;
@@ -221,9 +225,9 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, int re
 			return E_FAIL;	//should never be here? prevent null pointer refs for bmi
 		}
 
-		bmi->biWidth = m_w;
-		bmi->biHeight = m_h;
-		bmi->biSizeImage = m_w*m_h*bmi->biBitCount>>3;
+		bmi->biWidth		= m_w;
+		bmi->biHeight		= m_h;
+		bmi->biSizeImage	= m_w*m_h*bmi->biBitCount>>3;
 
 		hr = m_pOutput->GetConnected()->QueryAccept(&mt);
 		ASSERT(SUCCEEDED(hr)); // should better not fail, after all "mt" is the current media type, just with a different resolution

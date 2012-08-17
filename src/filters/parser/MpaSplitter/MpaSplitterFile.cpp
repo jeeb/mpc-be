@@ -85,6 +85,7 @@ CMpaSplitterFile::CMpaSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr)
 	, m_endpos(0)
 	, m_totalbps(0)
 	, m_bIsVBR(false)
+	, m_CoverMime(_T(""))
 {
 	if (SUCCEEDED(hr)) {
 		hr = Init();
@@ -218,37 +219,89 @@ HRESULT CMpaSplitterFile::Init()
 						|| tag == 'TRCK'
 						|| tag == 'TCOP'
 						|| tag == '\0TP1'
-						|| tag == '\0TT2') {
-					BYTE encoding = (BYTE)BitRead(8);
-					size--;
+						|| tag == '\0TT2'
+						|| tag == '\0PIC' || tag == 'APIC') {
 
-					WORD bom = (WORD)BitRead(16, true);
+					if (tag == 'APIC' || tag == '\0PIC') {
+						if (!m_Cover.GetCount()) {
+							TCHAR mime[64];
+							memset(&mime, 0 ,64);
+							BYTE encoding = (BYTE)BitRead(8);
+							size--;
 
-					CStringA str;
-					CStringW wstr;
+							int mime_len = 0;
+							while (size-- && (mime[mime_len++] = BitRead(8)) != 0) {
+							}
 
-					if (tag == 'COMM') {
-						DWORD lang = (WORD)BitRead(32); // skip 4 byte - it's lang identifier
-						UNREFERENCED_PARAMETER(lang);
-						size -= 4;
-					}
+							BYTE pic_type = (BYTE)BitRead(8);
+							size--;
 
-					if (encoding > 0 && size >= 2 && bom == 0xfffe) {
-						BitRead(16);
-						size = (size - 2) / 2;
-						ByteRead((BYTE*)wstr.GetBufferSetLength(size), size*2);
-						m_tags[tag] = wstr.Trim();
-					} else if (encoding > 0 && size >= 2 && bom == 0xfeff) {
-						BitRead(16);
-						size = (size - 2) / 2;
-						ByteRead((BYTE*)wstr.GetBufferSetLength(size), size*2);
-						for (int i = 0, j = wstr.GetLength(); i < j; i++) {
-							wstr.SetAt(i, (wstr[i]<<8)|(wstr[i]>>8));
+							if (tag == 'APIC') {
+								while (size-- && BitRead(8) != 0) {
+								}
+							}
+
+							m_CoverMime = mime;
+
+							if (tag == '\0PIC') {
+								if (CString(m_CoverMime).MakeUpper() == _T("JPG")) {
+									m_CoverMime = _T("image/jpeg");
+								} else if (CString(m_CoverMime).MakeUpper() == _T("PNG")) {
+									m_CoverMime = _T("image/png");
+								} else {
+									m_CoverMime.Format(_T("image/%ws"), mime);
+								}
+							}
+
+							m_Cover.SetCount(size);
+							ByteRead(m_Cover.GetData(), size);
 						}
-						m_tags[tag] = wstr.Trim();
 					} else {
-						ByteRead((BYTE*)str.GetBufferSetLength(size), size);
-						m_tags[tag] = (encoding > 0 ? UTF8To16(str) : CStringW(str)).Trim();
+
+						BYTE encoding = (BYTE)BitRead(8);
+						size--;
+
+						if (tag == 'COMM') {
+							CHAR lang[3];
+							memset(&lang, 0 ,3);
+							ByteRead((BYTE*)lang, 3);
+							UNREFERENCED_PARAMETER(lang);
+							size -= 3;
+
+							if (BitRead(8, true) == 0) {
+								BitRead(8);
+								size--;
+							}
+	
+							DWORD bom_big = (DWORD)BitRead(32, true);
+							if (bom_big == 0xfffe0000 || bom_big == 0xfeff0000) {
+								BitRead(32);
+								size -= 4;
+							}
+						}
+
+						WORD bom = (WORD)BitRead(16, true);
+
+						CStringA str;
+						CStringW wstr;
+
+						if (encoding > 0 && size >= 2 && bom == 0xfffe) {
+							BitRead(16);
+							size = (size - 2) / 2;
+							ByteRead((BYTE*)wstr.GetBufferSetLength(size), size*2);
+							m_tags[tag] = wstr.Trim();
+						} else if (encoding > 0 && size >= 2 && bom == 0xfeff) {
+							BitRead(16);
+							size = (size - 2) / 2;
+							ByteRead((BYTE*)wstr.GetBufferSetLength(size), size*2);
+							for (int i = 0, j = wstr.GetLength(); i < j; i++) {
+								wstr.SetAt(i, (wstr[i]<<8)|(wstr[i]>>8));
+							}
+							m_tags[tag] = wstr.Trim();
+						} else {
+							ByteRead((BYTE*)str.GetBufferSetLength(size), size);
+							m_tags[tag] = (encoding > 0 ? UTF8To16(str) : CStringW(str)).Trim();
+						}
 					}
 				}
 			}

@@ -48,6 +48,8 @@ public:
 	CMpaSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr);
 
 	CAtlMap<DWORD, CStringW> m_tags;
+	CAtlArray<BYTE> m_Cover;
+	CString m_CoverMime;
 
 	const CMediaType& GetMediaType() {
 		return m_mt;

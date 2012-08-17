@@ -59,5 +59,4 @@ protected:
 public:
 	afx_msg void OnSaveAs();
 	afx_msg void OnUpdateSaveAs(CCmdUI* pCmdUI);
-	afx_msg void OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult);
 };
