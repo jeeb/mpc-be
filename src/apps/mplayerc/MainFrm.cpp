@@ -17534,8 +17534,8 @@ LRESULT CMainFrame::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
 			BITMAP bm;
 			GetObject(mpc_dwm_image, sizeof(bm), &bm);
 
-			int w = min(bm.bmWidth, nWidth);
 			int h = min(abs(bm.bmHeight), nHeight);
+			int w = MulDiv(h, bm.bmWidth, abs(bm.bmHeight));
 			int x = (nWidth - w) / 2;
 			int y = (nHeight - h) / 2;
 			CRect r = CRect(CPoint(x, y), CSize(w, h));

@@ -197,17 +197,14 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 		GetObject(m_logo, sizeof(bm), &bm);
 
 		GetClientRect(r);
-		int w = min(bm.bmWidth, r.Width());
 		int h = min(abs(bm.bmHeight), r.Height());
-		//		int w = min(m_logo.GetWidth(), r.Width());
-		//		int h = min(m_logo.GetHeight(), r.Height());
+		int w = MulDiv(h, bm.bmWidth, abs(bm.bmHeight));
 		int x = (r.Width() - w) / 2;
 		int y = (r.Height() - h) / 2;
 		r = CRect(CPoint(x, y), CSize(w, h));
 
 		int oldmode = pDC->SetStretchBltMode(STRETCH_HALFTONE);
 		m_logo.StretchBlt(*pDC, r, CRect(0,0,bm.bmWidth,abs(bm.bmHeight)));
-		//		m_logo.Draw(*pDC, r);
 		pDC->SetStretchBltMode(oldmode);
 
 		pDC->ExcludeClipRect(r);
