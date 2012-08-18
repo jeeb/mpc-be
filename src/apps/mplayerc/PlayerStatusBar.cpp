@@ -125,7 +125,7 @@ void CPlayerStatusBar::Relayout()
 	AppSettings& s = AfxGetAppSettings();
 
 	if (!s.fDisableXPToolbars) {
-		m_type.ShowWindow(SW_SHOW);
+		m_type.ShowWindow(/*SW_SHOW*/SW_HIDE);
 		m_status.ShowWindow(SW_SHOW);
 		m_time.ShowWindow(SW_SHOW);
 
@@ -138,7 +138,7 @@ void CPlayerStatusBar::Relayout()
 		CRect r, r2;
 		GetClientRect(r);
 
-		r.DeflateRect(27, 5, bm.bmWidth + 8, 4);
+		r.DeflateRect(/*2*/7, 5, bm.bmWidth + 8, 4);
 		int div = r.right - (m_time.IsWindowVisible() ? 140 : 0);
 
 		CString str;
@@ -159,9 +159,11 @@ void CPlayerStatusBar::Relayout()
 		m_time.MoveWindow(&r2);
 		m_time_rect = r2;
 
+		/*
 		GetClientRect(r);
 		r.SetRect(6, r.top+4, 22, r.bottom-4);
 		m_type.MoveWindow(r);
+		*/
 	} else {
 		m_type.ShowWindow(SW_HIDE);
 		m_status.ShowWindow(SW_HIDE);
@@ -501,12 +503,12 @@ void CPlayerStatusBar::OnPaint()
 		*/
 
 		CRect rs	= r;
-		rs.left		= r.left + 6;
+		rs.left		= r.left + 7;
 		rs.top		= r.top + 3;
 
 		/*
 		if (m_hIcon) {
-			rs.left += 22-1;
+			rs.left += 22-2;
 		}
 		*/
 
