@@ -229,11 +229,11 @@ void CMediaFormats::UpdateData(bool fSave)
 		ADDFMT((_T("3g2"),      ResStr(IDS_MFMT_3G2),      _T("3g2 3gp2")));
 		ADDFMT((_T("flv"),      ResStr(IDS_MFMT_FLV),      _T("flv f4v")));
 		ADDFMT((_T("ogm"),      ResStr(IDS_MFMT_OGM),      _T("ogm ogv")));
-		ADDFMT((_T("rm"),       ResStr(IDS_MFMT_RM),       _T("rm ram rpm rmm")));
+		ADDFMT((_T("rm"),       ResStr(IDS_MFMT_RM),       _T("rm ram rmm")));
 		ADDFMT((_T("roq"),      ResStr(IDS_MFMT_ROQ),      _T("roq")));
 		ADDFMT((_T("rt"),       ResStr(IDS_MFMT_RT),       _T("rt rp smi smil")));
 		ADDFMT((_T("wmv"),      ResStr(IDS_MFMT_WMV),      _T("wmv wmp wm asf")));
-		ADDFMT((_T("videocd"),  ResStr(IDS_MFMT_VIDEOCD),  _T("dat")));
+//		ADDFMT((_T("videocd"),  ResStr(IDS_MFMT_VIDEOCD),  _T("dat")));
 		ADDFMT((_T("ratdvd"),   ResStr(IDS_MFMT_RATDVD),   _T("ratdvd"), false, _T("ratdvd media file")));
 		ADDFMT((_T("bink"),     ResStr(IDS_MFMT_BINK),     _T("smk bik"), false, _T("smackw32/binkw32.dll in dll path")));
 		ADDFMT((_T("flic"),     ResStr(IDS_MFMT_FLIC),     _T("fli flc flic")));

@@ -101,7 +101,8 @@
     <Image Include="icons\bik.ico" />
     <Image Include="icons\cda.ico" />
     <Image Include="icons\d2v.ico" />
-    <Image Include="icons\dat.ico" />
+    <Image Include="icons\default_audio.ico" />
+    <Image Include="icons\default_video.ico" />
     <Image Include="icons\divx.ico" />
     <Image Include="icons\dsa.ico" />
     <Image Include="icons\dsm.ico" />
@@ -166,7 +167,6 @@
     <Image Include="icons\rmvb.ico" />
     <Image Include="icons\roq.ico" />
     <Image Include="icons\rp.ico" />
-    <Image Include="icons\rpm.ico" />
     <Image Include="icons\rt.ico" />
     <Image Include="icons\smi.ico" />
     <Image Include="icons\smil.ico" />

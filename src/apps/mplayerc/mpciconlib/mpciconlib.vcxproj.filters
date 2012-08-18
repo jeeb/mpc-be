@@ -96,9 +96,6 @@
     <None Include="icons\d2v.ico">
       <Filter>Resource Files\icons</Filter>
     </None>
-    <None Include="icons\dat.ico">
-      <Filter>Resource Files\icons</Filter>
-    </None>
     <None Include="icons\divx.ico">
       <Filter>Resource Files\icons</Filter>
     </None>
@@ -288,9 +285,6 @@
     <None Include="icons\rp.ico">
       <Filter>Resource Files\icons</Filter>
     </None>
-    <None Include="icons\rpm.ico">
-      <Filter>Resource Files\icons</Filter>
-    </None>
     <None Include="icons\rt.ico">
       <Filter>Resource Files\icons</Filter>
     </None>
@@ -349,6 +343,12 @@
       <Filter>Resource Files\icons</Filter>
     </None>
     <None Include="icons\icon.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\default_audio.ico">
+      <Filter>Resource Files\icons</Filter>
+    </None>
+    <None Include="icons\default_video.ico">
       <Filter>Resource Files\icons</Filter>
     </None>
   </ItemGroup>

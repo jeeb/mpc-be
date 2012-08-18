@@ -94,11 +94,11 @@
     <None Include="icons\apl.ico" />
     <None Include="icons\asf.ico" />
     <None Include="icons\au.ico" />
+    <None Include="icons\default_audio.ico" />
     <None Include="icons\avi.ico" />
     <None Include="icons\bik.ico" />
     <None Include="icons\cda.ico" />
     <None Include="icons\d2v.ico" />
-    <None Include="icons\dat.ico" />
     <None Include="icons\divx.ico" />
     <None Include="icons\dsa.ico" />
     <None Include="icons\dsm.ico" />
@@ -163,7 +163,6 @@
     <None Include="icons\rmvb.ico" />
     <None Include="icons\roq.ico" />
     <None Include="icons\rp.ico" />
-    <None Include="icons\rpm.ico" />
     <None Include="icons\rt.ico" />
     <None Include="icons\smi.ico" />
     <None Include="icons\smil.ico" />
@@ -175,6 +174,7 @@
     <None Include="icons\trp.ico" />
     <None Include="icons\ts.ico" />
     <None Include="icons\tta.ico" />
+    <None Include="icons\default_video.ico" />
     <None Include="icons\vob.ico" />
     <None Include="icons\wav.ico" />
     <None Include="icons\webm.ico" />

@@ -70,8 +70,6 @@ extern "C" __declspec(dllexport) int get_icon_index(LPCTSTR ext)
 		iconindex = IDI_CDA_ICON;
 	} else if (_tcsicmp(ext, _T(".d2v")) == 0) {
 		iconindex = IDI_D2V_ICON;
-	} else if (_tcsicmp(ext, _T(".dat")) == 0) {
-		iconindex = IDI_DAT_ICON;
 	} else if (_tcsicmp(ext, _T(".divx")) == 0) {
 		iconindex = IDI_DIVX_ICON;
 	} else if (_tcsicmp(ext, _T(".dsa")) == 0) {
@@ -206,8 +204,6 @@ extern "C" __declspec(dllexport) int get_icon_index(LPCTSTR ext)
 		iconindex = IDI_ROQ_ICON;
 	} else if (_tcsicmp(ext, _T(".rp")) == 0) {
 		iconindex = IDI_RP_ICON;
-	} else if (_tcsicmp(ext, _T(".rpm")) == 0) {
-		iconindex = IDI_RPM_ICON;
 	} else if (_tcsicmp(ext, _T(".rt")) == 0) {
 		iconindex = IDI_RT_ICON;
 	} else if (_tcsicmp(ext, _T(".smi")) == 0) {
