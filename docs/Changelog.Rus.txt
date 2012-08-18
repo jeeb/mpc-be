@@ -289,14 +289,14 @@
 * Удалили a52dec и libdca. Теперь для декодированее AC3 и DTS используется ffmpeg;
 * Добавлены проектные файлы для построения плеера в VS2012;
 * zlib до версии 1.2.7
-* libpng 1.5.13 git-c86cf4b
-* Little-CMS git-493aac0
-* MediaInfoLib v0.7.59.
+* libpng 1.5.13 git-95ea04f
+* Little-CMS git-3a69c0c
+* MediaInfoLib v0.7.59
 * ZenLib v0.4.28
 * SoundTouch svn rev.143
 * Logitech SDK v3.01
-* libwebp 0.2.0 rc1
-* ffmpeg git-9f088a1
+* libwebp 0.2.0
+* ffmpeg git-7e49474
  ... и многое другое.
 
 Частично использованы фрагменты исходного кода из MPC-HC из следующих ревизий:
