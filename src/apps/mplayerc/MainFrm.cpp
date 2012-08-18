@@ -17509,7 +17509,9 @@ HRESULT CMainFrame::SetDwmPreview(BOOL show)
 						BYTE* pData = NULL;
 						DWORD len = 0;
 						if (SUCCEEDED(pRB->ResGet(i, &name, &desc, &mime, &pData, &len, NULL))) {
-							if (CString(mime).Trim() == _T("image/jpeg") || CString(mime).Trim() == _T("image/png")) {
+							if (CString(mime).Trim() == _T("image/jpeg")
+								|| CString(mime).Trim() == _T("image/jpg")
+								|| CString(mime).Trim() == _T("image/png")) {
 								
 								HGLOBAL hBlock = ::GlobalAlloc(GMEM_MOVEABLE, len);
 								if (hBlock != NULL) {
