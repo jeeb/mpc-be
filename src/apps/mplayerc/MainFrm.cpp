@@ -889,7 +889,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	}
 
 	m_CaptureWndBitmap = NULL;
-	mpc_dwm_image.LoadFromResource(IDB_W7_AUDIO);
 
 	return 0;
 }
@@ -12495,7 +12494,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		return false;
 	}
 
-	SetDwmPreview(TRUE);
+	SetDwmPreview(FALSE);
 
 	OpenFileData *pFileData = dynamic_cast<OpenFileData *>(pOMD.m_p);
 	OpenDVDData* pDVDData = dynamic_cast<OpenDVDData*>(pOMD.m_p);
@@ -15839,7 +15838,7 @@ void CMainFrame::CloseMedia()
 		previous_renderer = -1;
 	}
 
-	SetDwmPreview();
+	SetDwmPreview(FALSE);
 }
 
 void CMainFrame::StartTunerScan(CAutoPtr<TunerScanData> pTSD)
@@ -17482,20 +17481,64 @@ void CMainFrame::CreateChapterTimeArray()
 }
 
 /* this is for custom draw in windows 7 preview ... TODO - disable custom draw for live preview */
-HRESULT CMainFrame::SetDwmPreview(BOOL hide)
+HRESULT CMainFrame::SetDwmPreview(BOOL show)
 {
 	if (!IsWinSevenOrLater()) {
 		return S_FALSE;
 	}
 
 	BOOL set = AfxGetAppSettings().fUseWin7TaskBar && m_fAudioOnly && IsSomethingLoaded();
-	if (hide) { // forcing off custom preview bitmap ...
-		set = !hide;
+	if (!show) { // forcing off custom preview bitmap ...
+		set = show;
 	}
 
 	if (m_DwmSetWindowAttributeFnc && m_DwmSetIconicThumbnailFnc) {
 		m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_HAS_ICONIC_BITMAP, &set, sizeof(set));
 		m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_FORCE_ICONIC_REPRESENTATION, &set, sizeof(set));
+	}
+
+	// load image from DSMResource to show in preview & logo;
+	bool bLoadRes = false;
+	mpc_dwm_image.Destroy();
+	if (set) {
+		BeginEnumFilters(pGB, pEF, pBF) {
+			if (CComQIPtr<IDSMResourceBag> pRB = pBF)
+				if (pRB && pRB->ResGetCount() > 0) {
+					for (DWORD i = 0; i < pRB->ResGetCount(); i++) {
+						CComBSTR name, desc, mime;
+						BYTE* pData = NULL;
+						DWORD len = 0;
+						if (SUCCEEDED(pRB->ResGet(i, &name, &desc, &mime, &pData, &len, NULL))) {
+							if (CString(mime).Trim() == _T("image/jpeg") || CString(mime).Trim() == _T("image/png")) {
+								
+								HGLOBAL hBlock = ::GlobalAlloc(GMEM_MOVEABLE, len);
+								if (hBlock != NULL) {
+									IStream* pStream = NULL;
+									LPVOID lpResBuffer = ::GlobalLock(hBlock);
+									ASSERT (lpResBuffer != NULL);
+									memcpy(lpResBuffer, pData, len);
+
+									if (SUCCEEDED(::CreateStreamOnHGlobal(hBlock, TRUE, &pStream))) {
+										mpc_dwm_image.Load(pStream);
+										pStream->Release();
+										bLoadRes = true;
+									}
+
+									::GlobalUnlock(hBlock);
+									::GlobalFree(hBlock);
+								}
+
+								break;
+							}
+						}
+					}
+				}
+		}
+		EndEnumFilters;
+		
+		if (!bLoadRes) {
+			mpc_dwm_image.LoadFromResource(IDB_W7_AUDIO);	
+		}
 	}
 	
 

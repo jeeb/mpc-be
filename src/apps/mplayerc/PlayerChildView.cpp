@@ -186,28 +186,44 @@ void CChildView::OnPaint()
 
 BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 {
+	CAutoLock cAutoLock(&m_csLogo);
 	CRect r;
 
-	CAutoLock cAutoLock(&m_csLogo);
-
 	if (((CMainFrame*)GetParentFrame())->IsSomethingLoaded()) {
-		pDC->ExcludeClipRect(m_vrect);
+		BITMAP bm;
+		if (GetObject(((CMainFrame*)GetParentFrame())->mpc_dwm_image, sizeof(bm), &bm)) {
+			GetClientRect(r);
+			int h = min(abs(bm.bmHeight), r.Height());
+			int w = MulDiv(h, bm.bmWidth, abs(bm.bmHeight));
+			int x = (r.Width() - w) / 2;
+			int y = (r.Height() - h) / 2;
+			r = CRect(CPoint(x, y), CSize(w, h));
+
+			int oldmode = pDC->SetStretchBltMode(STRETCH_HALFTONE);
+			((CMainFrame*)GetParentFrame())->mpc_dwm_image.StretchBlt(*pDC, r, CRect(0, 0, bm.bmWidth, abs(bm.bmHeight)));
+			pDC->SetStretchBltMode(oldmode);
+
+			pDC->ExcludeClipRect(r);
+		} else {
+			pDC->ExcludeClipRect(m_vrect);
+		}
+		UNREFERENCED_PARAMETER(bm);
 	} else if (!m_logo.IsNull() /*&& ((CMainFrame*)GetParentFrame())->IsPlaylistEmpty()*/) {
 		BITMAP bm;
-		GetObject(m_logo, sizeof(bm), &bm);
+		if (GetObject(m_logo, sizeof(bm), &bm)) {
+			GetClientRect(r);
+			int h = min(abs(bm.bmHeight), r.Height());
+			int w = MulDiv(h, bm.bmWidth, abs(bm.bmHeight));
+			int x = (r.Width() - w) / 2;
+			int y = (r.Height() - h) / 2;
+			r = CRect(CPoint(x, y), CSize(w, h));
 
-		GetClientRect(r);
-		int h = min(abs(bm.bmHeight), r.Height());
-		int w = MulDiv(h, bm.bmWidth, abs(bm.bmHeight));
-		int x = (r.Width() - w) / 2;
-		int y = (r.Height() - h) / 2;
-		r = CRect(CPoint(x, y), CSize(w, h));
+			int oldmode = pDC->SetStretchBltMode(STRETCH_HALFTONE);
+			m_logo.StretchBlt(*pDC, r, CRect(0, 0, bm.bmWidth, abs(bm.bmHeight)));
+			pDC->SetStretchBltMode(oldmode);
 
-		int oldmode = pDC->SetStretchBltMode(STRETCH_HALFTONE);
-		m_logo.StretchBlt(*pDC, r, CRect(0,0,bm.bmWidth,abs(bm.bmHeight)));
-		pDC->SetStretchBltMode(oldmode);
-
-		pDC->ExcludeClipRect(r);
+			pDC->ExcludeClipRect(r);
+		}
 	}
 
 	GetClientRect(r);

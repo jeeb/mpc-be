@@ -1045,7 +1045,7 @@ public:
 	HRESULT		(__stdcall * m_DwmSetIconicLivePreviewBitmapFnc)(HWND hwnd, HBITMAP hbmp, __in_opt  POINT *pptClient, DWORD dwSITFlags);
 	HRESULT		(__stdcall * m_DwmInvalidateIconicBitmapsFnc)( __in  HWND hwnd);
 
-	HRESULT		SetDwmPreview(BOOL hide = FALSE);
+	HRESULT		SetDwmPreview(BOOL show = TRUE);
 	HBITMAP		m_CaptureWndBitmap;
 	bool		isWindowMinimized;
 	HBITMAP		CreateCaptureDIB(int nWidth, int nHeight);
