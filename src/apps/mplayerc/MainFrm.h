@@ -1050,7 +1050,8 @@ public:
 	bool		isWindowMinimized;
 	HBITMAP		CreateCaptureDIB(int nWidth, int nHeight);
 	void		CreateCaptureWindow();
-	MPCPngImage	mpc_dwm_image;
+	MPCPngImage	m_InternalImage;
+	bool		m_bInternalImageRes;
 
 protected:
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);

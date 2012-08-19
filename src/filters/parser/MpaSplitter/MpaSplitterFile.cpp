@@ -207,7 +207,7 @@ HRESULT CMpaSplitterFile::Init()
 
 				pos += ((major == 2) ? 3+3 : 4+4+2) + size;
 
-				if (!size || pos >= m_startpos) {
+				if (!size || pos > m_startpos) {
 					break;
 				}
 

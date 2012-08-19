@@ -975,7 +975,7 @@ void CMainFrame::OnClose()
 		FreeLibrary(m_hDWMAPI);
 	}
 
-	mpc_dwm_image.Destroy();
+	m_InternalImage.Destroy();
 
 	__super::OnClose();
 }
@@ -1860,6 +1860,10 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 				} else {
 					g_bExternalSubtitleTime = false;
 				}
+
+				if (m_DwmInvalidateIconicBitmapsFnc) {
+					m_DwmInvalidateIconicBitmapsFnc(m_hWnd);
+				}
 			}
 			break;
 		case TIMER_STREAMPOSPOLLER2:
@@ -1902,9 +1906,6 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 				if (m_pCAP && GetMediaState() == State_Paused) {
 					m_pCAP->Paint(false);
 				}
-			}
-			if (m_DwmInvalidateIconicBitmapsFnc) {
-				m_DwmInvalidateIconicBitmapsFnc(m_hWnd);
 			}
 			break;
 		case TIMER_FULLSCREENCONTROLBARHIDER: {
@@ -17480,27 +17481,58 @@ void CMainFrame::CreateChapterTimeArray()
 	}
 }
 
-/* this is for custom draw in windows 7 preview ... TODO - disable custom draw for live preview */
-HRESULT CMainFrame::SetDwmPreview(BOOL show)
+CString GetCoverImgFromPath(CString path, CString mask)
 {
-	if (!IsWinSevenOrLater()) {
-		return S_FALSE;
+	CString bFoundFName;
+	CString dir = path.Mid(0, path.ReverseFind('\\')+1);
+	CString dir_mask = dir + _T("*.*");
+	WIN32_FIND_DATA fd;
+	HANDLE h = FindFirstFile(dir_mask, &fd);
+	if (h != INVALID_HANDLE_VALUE) {
+		do {
+			if (fd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) {
+				continue;
+			}
+
+			CString fn = CString(fd.cFileName).MakeLower();
+			CString ext = fn.Mid(fn.ReverseFind('.')).MakeLower();
+			CString path = dir + fd.cFileName;
+
+			if (ext == _T(".jpg") || ext == _T(".jpeg") || ext == _T(".png")) {
+				if (!mask.IsEmpty() && (fn.Find(mask) >= 0)) {
+					bFoundFName = path;
+					break;
+				} else {
+					bFoundFName = path;
+					break;
+				}
+			}
+		} while (FindNextFile(h, &fd));
+		FindClose(h);
 	}
 
+	return bFoundFName;
+}
+
+/* this is for custom draw in windows 7 preview */
+HRESULT CMainFrame::SetDwmPreview(BOOL show)
+{
 	BOOL set = AfxGetAppSettings().fUseWin7TaskBar && m_fAudioOnly && IsSomethingLoaded();
 	if (!show) { // forcing off custom preview bitmap ...
 		set = show;
 	}
 
-	if (m_DwmSetWindowAttributeFnc && m_DwmSetIconicThumbnailFnc) {
+	if (IsWinSevenOrLater() && m_DwmSetWindowAttributeFnc && m_DwmSetIconicThumbnailFnc) {
 		m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_HAS_ICONIC_BITMAP, &set, sizeof(set));
 		m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_FORCE_ICONIC_REPRESENTATION, &set, sizeof(set));
 	}
 
-	// load image from DSMResource to show in preview & logo;
-	bool bLoadRes = false;
-	mpc_dwm_image.Destroy();
-	if (set) {
+	bool bLoadRes		= false;
+	m_bInternalImageRes	= false;
+	m_InternalImage.Destroy();
+	if (m_fAudioOnly && IsSomethingLoaded() && show) {
+
+		// load image from DSMResource to show in preview & logo;
 		BeginEnumFilters(pGB, pEF, pBF) {
 			if (CComQIPtr<IDSMResourceBag> pRB = pBF)
 				if (pRB && pRB->ResGetCount() > 0) {
@@ -17521,7 +17553,7 @@ HRESULT CMainFrame::SetDwmPreview(BOOL show)
 									memcpy(lpResBuffer, pData, len);
 
 									if (SUCCEEDED(::CreateStreamOnHGlobal(hBlock, TRUE, &pStream))) {
-										mpc_dwm_image.Load(pStream);
+										m_InternalImage.Load(pStream);
 										pStream->Release();
 										bLoadRes = true;
 									}
@@ -17539,10 +17571,29 @@ HRESULT CMainFrame::SetDwmPreview(BOOL show)
 		EndEnumFilters;
 		
 		if (!bLoadRes) {
-			mpc_dwm_image.LoadFromResource(IDB_W7_AUDIO);	
+			// try to load image from file in the same dir that media file to show in preview & logo;
+			CString dir = m_strFnFull.Mid(0, m_strFnFull.ReverseFind('\\')+1);
+			CString img_fname = GetCoverImgFromPath(dir, _T("cover"));
+			if (img_fname.IsEmpty()) {
+				img_fname = GetCoverImgFromPath(dir, _T("art"));
+			}
+			if (img_fname.IsEmpty()) {
+				img_fname = GetCoverImgFromPath(dir, _T(""));
+			}
+
+			if (!img_fname.IsEmpty()) {
+				if(SUCCEEDED(m_InternalImage.Load(img_fname))) {
+					bLoadRes = true;
+				}
+			}
+
+		}
+
+		if (!bLoadRes) {
+			m_InternalImage.LoadFromResource(IDB_W7_AUDIO);
+			m_bInternalImageRes = true;
 		}
 	}
-	
 
 	return S_OK;
 }
@@ -17560,10 +17611,16 @@ LRESULT CMainFrame::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
 		int nWidth	= HIWORD(lParam);
 		int nHeight	= LOWORD(lParam);
 
+		BITMAP bm;
+		GetObject(m_InternalImage, sizeof(bm), &bm);
+
+		int h = min(abs(bm.bmHeight), nHeight);
+		int w = MulDiv(h, bm.bmWidth, abs(bm.bmHeight));
+
 		BITMAPINFO bmi;
 		ZeroMemory(&bmi.bmiHeader, sizeof(BITMAPINFOHEADER));
 		bmi.bmiHeader.biSize		= sizeof(BITMAPINFOHEADER);
-		bmi.bmiHeader.biWidth		= nWidth;
+		bmi.bmiHeader.biWidth		= m_bInternalImageRes ? nWidth : w;
 		bmi.bmiHeader.biHeight		= -nHeight;
 		bmi.bmiHeader.biPlanes		= 1;
 		bmi.bmiHeader.biBitCount	= 32;
@@ -17571,22 +17628,14 @@ LRESULT CMainFrame::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
 		PBYTE pbDS = NULL;
 		hbm = CreateDIBSection(hdcMem, &bmi, DIB_RGB_COLORS, (VOID**)&pbDS, NULL, NULL);
 		if (hbm) {
-			// RECT rc = {0, 0, nWidth,nHeight};
-			// FillRect(hdcMem, &rc, (HBRUSH)GetSysColorBrush(COLOR_WINDOW));
-
 			SelectObject(hdcMem, hbm);
 
-			BITMAP bm;
-			GetObject(mpc_dwm_image, sizeof(bm), &bm);
-
-			int h = min(abs(bm.bmHeight), nHeight);
-			int w = MulDiv(h, bm.bmWidth, abs(bm.bmHeight));
-			int x = (nWidth - w) / 2;
+			int x = m_bInternalImageRes ? ((nWidth - w) / 2) : 0;
 			int y = (nHeight - h) / 2;
 			CRect r = CRect(CPoint(x, y), CSize(w, h));
 
 			SetStretchBltMode(hdcMem, STRETCH_HALFTONE);
-			BOOL work = mpc_dwm_image.StretchBlt(hdcMem, r, CRect(0, 0, bm.bmWidth, abs(bm.bmHeight)));
+			BOOL work = m_InternalImage.StretchBlt(hdcMem, r, CRect(0, 0, bm.bmWidth, abs(bm.bmHeight)));
 		}
 		DeleteDC(hdcMem);
 	}
@@ -17684,9 +17733,8 @@ HBITMAP CMainFrame::CreateCaptureDIB(int nWidth, int nHeight)
 		bmi.bmiHeader.biPlanes		= 1;
 		bmi.bmiHeader.biBitCount	= 32;
 
-		LPBYTE pbDS = NULL;
-		hbm = CreateDIBSection(hdcMem, &bmi, DIB_RGB_COLORS, (LPVOID *)&pbDS, NULL, NULL);
-
+		PBYTE pbDS = NULL;
+		hbm = CreateDIBSection(hdcMem, &bmi, DIB_RGB_COLORS, (VOID**)&pbDS, NULL, NULL);
 		if (hbm) {
 			SelectObject(hdcMem, hbm);
 			if (bCaptionWithMenu) {
