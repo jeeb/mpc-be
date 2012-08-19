@@ -151,7 +151,7 @@ protected:
 	bool m_fMixer;
 	int  m_iMixerLayout;
 	bool m_fDRC;
-	bool m_fSPDIF[etlast];
+	bool m_fSPDIF[etcount];
 
 	bool m_bResync;
 
