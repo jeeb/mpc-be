@@ -1337,6 +1337,14 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									track.Format(L"%d", n);
 								}
 							}
+						} else if (atom->GetType() == AP4_ATOM_TYPE_COVR) {
+							if (db->GetDataSize() > 10) {
+								DWORD sync = *(DWORD*)(db->GetData()+6);
+								// check for JFIF(0x4649464a) or Exif(0x66697845) sync ...
+								if (sync == 0x4649464a || sync == 0x66697845) {
+									ResAppend(_T("cover.jpg"), _T("cover"), _T("image/jpeg"), (BYTE*)db->GetData(), (DWORD)db->GetDataSize());
+								}
+							}
 						} else {
 							CStringW str = UTF8To16(CStringA((LPCSTR)db->GetData(), db->GetDataSize()));
 

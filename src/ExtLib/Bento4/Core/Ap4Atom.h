@@ -272,6 +272,7 @@ const AP4_Atom::Type AP4_ATOM_TYPE_DAY  = AP4_ATOM_TYPE(169,'d','a','y');
 const AP4_Atom::Type AP4_ATOM_TYPE_TOO  = AP4_ATOM_TYPE(169,'t','o','o');
 const AP4_Atom::Type AP4_ATOM_TYPE_CMT  = AP4_ATOM_TYPE(169,'c','m','t');
 const AP4_Atom::Type AP4_ATOM_TYPE_GEN  = AP4_ATOM_TYPE(169,'g','e','n');
+const AP4_Atom::Type AP4_ATOM_TYPE_COVR = AP4_ATOM_TYPE('c','o','v','r');
 const AP4_Atom::Type AP4_ATOM_TYPE_TRKN = AP4_ATOM_TYPE('t','r','k','n');
 const AP4_Atom::Type AP4_ATOM_TYPE_DATA = AP4_ATOM_TYPE('d','a','t','a');
 const AP4_Atom::Type AP4_ATOM_TYPE_WAVE = AP4_ATOM_TYPE('w','a','v','e');

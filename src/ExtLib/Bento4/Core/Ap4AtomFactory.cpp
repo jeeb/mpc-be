@@ -349,7 +349,8 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
 		case AP4_ATOM_TYPE_TRKN:
 		case AP4_ATOM_TYPE_EDTS:
 		case AP4_ATOM_TYPE_WAVE: 
-		case AP4_ATOM_TYPE_CMOV: {
+		case AP4_ATOM_TYPE_CMOV:
+		case AP4_ATOM_TYPE_COVR: {
 			AP4_UI32 context = m_Context;
 			m_Context = type; // set the context for the children
 			atom = new AP4_ContainerAtom(type, size, false, stream, *this);
