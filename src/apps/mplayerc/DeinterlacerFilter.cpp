@@ -26,7 +26,6 @@
 #include "../../DSUtil/MediaTypes.h"
 #include <moreuuids.h>
 
-
 CDeinterlacerFilter::CDeinterlacerFilter(LPUNKNOWN punk, HRESULT* phr)
 	: CTransformFilter(NAME("CDeinterlacerFilter"), punk, __uuidof(CDeinterlacerFilter))
 {

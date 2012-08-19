@@ -92,15 +92,13 @@ BOOL CAboutDlg::OnInitDialog()
 	m_FFmpegCompiler.Format(A2W(GetFFmpegCompiler()));
 	m_libavcodecVersion.Format(A2W(GetlibavcodecVersion()));
 
-	// Build the path to Authors.txt
 	GetModuleFileName(AfxGetInstanceHandle(), m_AuthorsPath.GetBuffer(_MAX_PATH), _MAX_PATH);
 	m_AuthorsPath.ReleaseBuffer();
 	m_AuthorsPath = m_AuthorsPath.Left(m_AuthorsPath.ReverseFind('\\') + 1) + _T("Authors.txt");
-	// Check if the file exists
+
 	CFileStatus fs;
 
 	if (CFile::GetStatus(m_AuthorsPath, fs)) {
-		// If it does, we make the filename clickable
 		m_Credits.Replace(_T("Authors.txt"), _T("<a>Authors.txt</a>"));
 	}
 

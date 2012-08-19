@@ -27,7 +27,6 @@
 #include "../../DSUtil/DSUtil.h"
 #include "../../filters/InternalPropertyPage.h"
 
-
 // CComPropertyPageSite
 
 class CComPropertyPageSite : public CUnknown, public IPropertyPageSite

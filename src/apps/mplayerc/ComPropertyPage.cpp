@@ -26,7 +26,6 @@
 #include "ComPropertyPage.h"
 #include "ComPropertySheet.h"
 
-
 // CComPropertyPage dialog
 
 IMPLEMENT_DYNAMIC(CComPropertyPage, CPropertyPage)

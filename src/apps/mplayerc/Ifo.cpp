@@ -24,7 +24,6 @@
 #include "stdafx.h"
 #include "Ifo.h"
 
-
 #ifdef WORDS_BIGENDIAN
 #define bswap_16(x) (x)
 #define bswap_32(x) (x)
@@ -72,12 +71,10 @@
 
 extern HANDLE (__stdcall * Real_CreateFileW)(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile);
 
-
 unsigned __int32 get4bytes (const BYTE* buf)
 {
 	return be2me_32 (*((unsigned __int32 *)buf));
 }
-
 
 // VMG files
 #define OFF_VMGM_PGCI_UT(buf)        get4bytes (buf + 200)
@@ -85,7 +82,6 @@ unsigned __int32 get4bytes (const BYTE* buf)
 // VTS files
 #define OFF_VTSM_PGCI_UT(buf)        get4bytes (buf + 208)
 #define OFF_VTS_PGCIT(buf)           get4bytes (buf + 204)
-
 
 CIfo::CIfo()
 {

@@ -26,7 +26,6 @@
 #include "TunerScanDlg.h"
 #include "DVBChannel.h"
 
-
 enum TSC_COLUMN {
 	TSCC_NUMBER,
 	TSCC_NAME,
@@ -96,7 +95,6 @@ void CTunerScanDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_OFFSET, m_OffsetEditBox);
 }
 
-
 BEGIN_MESSAGE_MAP(CTunerScanDlg, CDialog)
 	ON_MESSAGE(WM_TUNER_SCAN_PROGRESS, OnScanProgress)
 	ON_MESSAGE(WM_TUNER_SCAN_END, OnScanEnd)
@@ -107,7 +105,6 @@ BEGIN_MESSAGE_MAP(CTunerScanDlg, CDialog)
 	ON_BN_CLICKED(IDCANCEL, &CTunerScanDlg::OnBnClickedCancel)
 	ON_BN_CLICKED(IDC_CHECK_OFFSET, &CTunerScanDlg::OnBnClickedCheckOffset)
 END_MESSAGE_MAP()
-
 
 // CTunerScanDlg message handlers
 

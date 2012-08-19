@@ -32,7 +32,6 @@
 #include "WebClientSocket.h"
 #include "WebServer.h"
 
-
 CAtlStringMap<CWebServer::RequestHandler> CWebServer::m_internalpages;
 CAtlStringMap<UINT> CWebServer::m_downloads;
 CAtlStringMap<CStringA, CStringA> CWebServer::m_mimes;

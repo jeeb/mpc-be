@@ -26,7 +26,6 @@
 #include "AuthDlg.h"
 #include "SettingsDefines.h"
 
-
 // CAuthDlg dialog
 
 IMPLEMENT_DYNAMIC(CAuthDlg, CDialog)

@@ -25,7 +25,6 @@
 #include <afxcmn.h>
 #include <afxwin.h>
 
-
 // CTunerScanDlg dialog
 
 class CTunerScanDlg : public CDialog
@@ -33,14 +32,13 @@ class CTunerScanDlg : public CDialog
 	DECLARE_DYNAMIC(CTunerScanDlg)
 
 public:
-	CTunerScanDlg(CWnd* pParent = NULL);   // standard constructor
+	CTunerScanDlg(CWnd* pParent = NULL);
 	virtual ~CTunerScanDlg();
 
-	// Dialog Data
 	enum { IDD = IDD_TUNER_SCAN };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	void		 SetProgress (bool bState);
 	void SaveScanSettings();
 

@@ -27,17 +27,13 @@
 #include "Version.h"
 #include "../../DSUtil/WinAPIUtils.h"
 
-
 CMiniDump	_Singleton;
 bool		CMiniDump::m_bMiniDumpEnabled = true;
 
-
-typedef BOOL (WINAPI *MINIDUMPWRITEDUMP)( HANDLE hProcess, DWORD dwPid, HANDLE hFile, MINIDUMP_TYPE DumpType,
+typedef BOOL (WINAPI *MINIDUMPWRITEDUMP)(HANDLE hProcess, DWORD dwPid, HANDLE hFile, MINIDUMP_TYPE DumpType,
 		CONST PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
 		CONST PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
-		CONST PMINIDUMP_CALLBACK_INFORMATION CallbackParam
-										);
-
+		CONST PMINIDUMP_CALLBACK_INFORMATION CallbackParam);
 
 CMiniDump::CMiniDump()
 {
@@ -47,7 +43,7 @@ CMiniDump::CMiniDump()
 
 #ifndef _WIN64
 	// Enable catching in CRT (http://blog.kalmbachnet.de/?postid=75)
-	//	PreventSetUnhandledExceptionFilter();
+	// PreventSetUnhandledExceptionFilter();
 #endif
 #endif
 }
@@ -81,6 +77,7 @@ BOOL CMiniDump::PreventSetUnhandledExceptionFilter()
 	SIZE_T bytesWritten;
 	BOOL bRet = WriteProcessMemory( GetCurrentProcess(), pOrgEntry, newJump, sizeof(pNewFunc) + 1, &bytesWritten );
 	FreeLibrary( hKernel32 );
+
 	return bRet;
 }
 
@@ -96,10 +93,6 @@ LONG WINAPI CMiniDump::UnhandledExceptionFilter( _EXCEPTION_POINTERS *lpTopLevel
 		return retval;
 	}
 
-	// firstly see if dbghelp.dll is around and has the function we need
-	// look next to the EXE first, as the one in System32 might be old
-	// (e.g. Windows 2000)
-
 	if ( GetModuleFileName(NULL, szDbgHelpPath, _MAX_PATH) ) {
 		TCHAR *pSlash = _tcsrchr( szDbgHelpPath, _T('\\') );
 		if ( pSlash != NULL ) {
@@ -109,7 +102,6 @@ LONG WINAPI CMiniDump::UnhandledExceptionFilter( _EXCEPTION_POINTERS *lpTopLevel
 	}
 
 	if ( hDll == NULL ) {
-		// load any version we can
 		hDll = ::LoadLibrary( _T("DBGHELP.DLL") );
 	}
 
@@ -132,7 +124,6 @@ LONG WINAPI CMiniDump::UnhandledExceptionFilter( _EXCEPTION_POINTERS *lpTopLevel
 			}
 			strDumpPath.AppendFormat(_T(".%d.%d.%d.%d.dmp"), MPC_VERSION_NUM);
 
-			// create the file
 			HANDLE hFile = ::CreateFile(strDumpPath, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS,
 										FILE_ATTRIBUTE_NORMAL, NULL);
 
@@ -143,7 +134,6 @@ LONG WINAPI CMiniDump::UnhandledExceptionFilter( _EXCEPTION_POINTERS *lpTopLevel
 				ExInfo.ExceptionPointers = lpTopLevelExceptionFilter;
 				ExInfo.ClientPointers = NULL;
 
-				// write the dump
 				BOOL bOK = pMiniDumpWriteDump( GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpNormal, &ExInfo, NULL, NULL );
 				if ( bOK ) {
 					_stprintf_s( szResult, _countof(szResult), ResStr(IDS_MPC_CRASH), strDumpPath );

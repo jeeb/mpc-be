@@ -28,7 +28,6 @@
 #include <vmr9.h>
 #include <madVRAllocatorPresenter.h>
 
-
 typedef enum {
 	OSD_TRANSPARENT,
 	OSD_BACKGROUND,
@@ -46,7 +45,6 @@ typedef enum {
 	OSD_TOPRIGHT,
 	OSD_DEBUG,
 } OSD_MESSAGEPOS;
-
 
 class CVMROSD
 {
@@ -101,7 +99,6 @@ private :
 	CRect		m_rectWnd;
 	COLORREF	m_Color[OSD_LAST];
 
-	// Curseur de calage
 	CRect	m_rectSeekBar;
 	CRect	m_rectCursor;
 	CRect	m_rectBar;
@@ -113,7 +110,6 @@ private :
 
 	bool	m_bShowMessage;
 
-	// Messages
 	CString			m_strMessage;
 	OSD_MESSAGEPOS	m_nMessagePos;
 	CList<CString>	m_debugMessages;
@@ -128,5 +124,4 @@ private :
 	void DrawDebug();
 
 	static void CALLBACK TimerFunc(HWND hWnd, UINT nMsg, UINT nIDEvent, DWORD dwTime);
-
 };

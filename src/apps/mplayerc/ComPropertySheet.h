@@ -25,7 +25,6 @@
 
 #include "ComPropertyPage.h"
 
-
 interface IComPropertyPageDirty {
 	virtual void OnSetDirty(bool fDirty) = 0;
 };

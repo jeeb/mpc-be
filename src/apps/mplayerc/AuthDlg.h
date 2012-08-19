@@ -25,7 +25,6 @@
 
 #include <afxwin.h>
 
-
 // CAuthDlg dialog
 
 class CAuthDlg : public CDialog

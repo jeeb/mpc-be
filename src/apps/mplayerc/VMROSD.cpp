@@ -29,7 +29,6 @@
 #define SLIDER_CURSOR_HEIGHT	30
 #define SLIDER_CURSOR_WIDTH		15
 
-
 CVMROSD::CVMROSD(void)
 {
 	m_Color[OSD_TRANSPARENT]	= RGB(  0,   0,   0);

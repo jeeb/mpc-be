@@ -33,7 +33,6 @@
 #define CMD_SETPOS "-1"
 #define CMD_SETVOLUME "-2"
 
-
 class CWebServerSocket;
 class CWebClientSocket;
 class CMainFrame;

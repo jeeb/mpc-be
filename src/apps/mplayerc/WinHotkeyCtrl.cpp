@@ -31,7 +31,6 @@
 HHOOK CWinHotkeyCtrl::sm_hhookKb = NULL;
 CWinHotkeyCtrl* CWinHotkeyCtrl::sm_pwhcFocus = NULL;
 
-
 IMPLEMENT_DYNAMIC(CWinHotkeyCtrl, CEdit)
 CWinHotkeyCtrl::CWinHotkeyCtrl():
 	m_vkCode(0),
@@ -105,7 +104,6 @@ BOOL CWinHotkeyCtrl::UninstallKbHook()
 
 	return(fOk);
 }
-
 
 void CWinHotkeyCtrl::UpdateText()
 {

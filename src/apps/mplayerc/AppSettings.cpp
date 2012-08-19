@@ -27,7 +27,6 @@
 #include "MiniDump.h"
 #include "../../DSUtil/WinAPIUtils.h"
 
-
 CAppSettings::CAppSettings()
 	: fInitialized(false)
 	, MRU(0, _T("Recent File List"), _T("File%d"), 20)

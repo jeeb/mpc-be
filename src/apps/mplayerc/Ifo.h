@@ -25,11 +25,9 @@
 
 #pragma pack(1)
 
-
 typedef unsigned __int8   uint8_t;
 typedef unsigned __int16  uint16_t;
 typedef unsigned __int32  uint32_t;
-
 
 class CIfo
 {
@@ -43,7 +41,6 @@ public:
 	~CIfo(void);
 
 private :
-
 	typedef struct {
 		uint16_t id		: 16;	// Language
 		uint16_t		: 16;	// don't know
@@ -114,7 +111,6 @@ private :
 		uint8_t foo		: 8; // UNKNOWN
 	} audio_status_t;
 
-
 	typedef struct {		// Subpicture status
 #if BYTE_ORDER == BIG_ENDIAN
 		uint8_t available	: 1;
@@ -127,7 +123,6 @@ private :
 		uint8_t letter		: 8;
 		uint8_t pan			: 8;
 	} subp_status_t;
-
 
 	typedef struct {		// Program Chain Information
 		uint16_t zero_1;
@@ -174,7 +169,6 @@ private :
 		uint16_t bar		: 16;	// don't know
 		uint32_t start		: 32;	// Start of unit
 	} lu_sub_t;
-
 
 	BYTE*       m_pBuffer;
 	DWORD       m_dwSize;

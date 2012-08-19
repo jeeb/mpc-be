@@ -23,7 +23,6 @@
 #include "stdafx.h"
 #include "DVBChannel.h"
 
-
 CDVBChannel::CDVBChannel(void)
 {
 	m_ulFrequency		= 0;
