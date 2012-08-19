@@ -22,7 +22,6 @@ The following files have MPC-BE specific custom code (compared to ffmpeg):
 * libavutil/log.h
 * libavutil/mathematics.h
 * libavutil/mem.h
-* libavutil/samplefmt.h
 
 ======
 The following files are available only in MPC-BE (compared with ffmpeg):
