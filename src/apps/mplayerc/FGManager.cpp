@@ -2122,13 +2122,14 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dv25);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dv50);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvh1);
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvpp);
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dv5p);
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvc);
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvhq);
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvh5);
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvh6);
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvcp);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_CDVH);
+		// Quicktime DV sybtypes (used in LAV Splitter)
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DV25);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DV50);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DVCP);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DVPP);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DV5P);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DVC);
 	}
 
 	if (ffmpeg_filters[FFM_THEORA] || IsPreview) {
@@ -2374,13 +2375,14 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview
 			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dv25);
 			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dv50);
 			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvh1);
-			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvpp);
-			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dv5p);
-			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvc);
-			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvhq);
-			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvh5);
-			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvh6);
-			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvcp);
+			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_CDVH);
+			// Quicktime DV sybtypes (used in LAV Splitter)
+			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DV25);
+			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DV50);
+			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DVCP);
+			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DVPP);
+			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DV5P);
+			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DVC);
 		}
 
 		if (!(ffmpeg_filters[FFM_THEORA])) {
