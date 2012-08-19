@@ -2124,8 +2124,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvh1);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_CDVH);
 		// Quicktime DV sybtypes (used in LAV Splitter)
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DV25);
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DV50);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DVCP);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DVPP);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DV5P);
@@ -2377,8 +2375,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview
 			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dvh1);
 			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_CDVH);
 			// Quicktime DV sybtypes (used in LAV Splitter)
-			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DV25);
-			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DV50);
 			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DVCP);
 			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DVPP);
 			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DV5P);
