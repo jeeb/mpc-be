@@ -129,6 +129,5 @@ struct avc_hdr
 	AV_Rational sar;
 };
 
-
 bool ParseDiracHeader(CGolombBuffer gb, unsigned* width, unsigned* height, REFERENCE_TIME* AvgTimePerFrame);
 bool ParseAVCHeader(CGolombBuffer gb, avc_hdr& h, bool fullscan = false);

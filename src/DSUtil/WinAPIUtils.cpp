@@ -24,7 +24,6 @@
 #include <d3dx9.h>
 #include "WinAPIUtils.h"
 
-
 BOOL IsWinXPOrLater()
 {
 	OSVERSIONINFOEX osvi = {0};

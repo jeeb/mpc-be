@@ -23,7 +23,6 @@
 #include "stdafx.h"
 #include "AudioParser.h"
 #include <MMReg.h>
-
 #include "GolombBuffer.h"
 
 #define AC3_CHANNEL                  0

@@ -61,7 +61,6 @@ BOOL CFileVersionInfo::GetTranslationId(LPVOID lpData, UINT unBlockSize, WORD wL
 	return FALSE;
 }
 
-
 BOOL CFileVersionInfo::Create(HMODULE hModule /*= NULL*/)
 {
 	CString	strPath;
@@ -70,7 +69,6 @@ BOOL CFileVersionInfo::Create(HMODULE hModule /*= NULL*/)
 	strPath.ReleaseBuffer();
 	return Create(strPath);
 }
-
 
 BOOL CFileVersionInfo::Create(LPCTSTR lpszFileName)
 {

@@ -40,7 +40,6 @@
 typedef HRESULT (__stdcall *PTR_DXVA2CreateDirect3DDeviceManager9)(UINT* pResetToken, IDirect3DDeviceManager9** ppDeviceManager);
 typedef HRESULT (__stdcall *PTR_DXVA2CreateVideoService)(IDirect3DDevice9* pDD, REFIID riid, void** ppService);
 
-
 class CNullVideoRendererInputPin : public CRendererInputPin,
 	public IMFGetService,
 	public IDirectXVideoMemoryConfiguration,
@@ -79,14 +78,12 @@ public :
 		return S_OK;
 	}
 
-
 	// IMFGetService
 	STDMETHODIMP	GetService(REFGUID guidService, REFIID riid, LPVOID *ppvObject);
 
 	// IDirectXVideoMemoryConfiguration
 	STDMETHODIMP	GetAvailableSurfaceTypeByIndex(DWORD dwTypeIndex, DXVA2_SurfaceType *pdwType);
 	STDMETHODIMP	SetSurfaceType(DXVA2_SurfaceType dwType);
-
 
 	// IMFVideoDisplayControl
 	STDMETHODIMP	GetNativeVideoSize(SIZE *pszVideo, SIZE *pszARVideo) {
@@ -151,8 +148,6 @@ private :
 	void		CreateSurface();
 };
 
-
-
 CNullVideoRendererInputPin::CNullVideoRendererInputPin(CBaseRenderer *pRenderer, HRESULT *phr, LPCWSTR Name)
 	: CRendererInputPin(pRenderer, phr, Name)
 	, m_hDXVA2Lib(NULL)
@@ -176,7 +171,6 @@ CNullVideoRendererInputPin::CNullVideoRendererInputPin(CBaseRenderer *pRenderer,
 		hr = m_pD3DDeviceManager->OpenDeviceHandle(&m_hDevice);
 	}
 }
-
 
 void CNullVideoRendererInputPin::CreateSurface()
 {
@@ -250,7 +244,6 @@ STDMETHODIMP CNullVideoRendererInputPin::GetService(REFGUID guidService, REFIID 
 	return E_NOINTERFACE;
 }
 
-
 STDMETHODIMP CNullVideoRendererInputPin::GetAvailableSurfaceTypeByIndex(DWORD dwTypeIndex, DXVA2_SurfaceType *pdwType)
 {
 	if (dwTypeIndex == 0) {
@@ -266,14 +259,12 @@ STDMETHODIMP CNullVideoRendererInputPin::SetSurfaceType(DXVA2_SurfaceType dwType
 	return S_OK;
 }
 
-
 STDMETHODIMP CNullVideoRendererInputPin::GetVideoWindow(HWND *phwndVideo)
 {
 	CheckPointer(phwndVideo, E_POINTER);
 	*phwndVideo = m_hWnd;	// Important to implement this method (used by mpc)
 	return S_OK;
 }
-
 
 #endif
 
