@@ -446,15 +446,15 @@ void CPlayerStatusBar::OnPaint()
 
 		CPen penPlayed1(PS_SOLID,0,RGB(0,0,0));
 		memdc.SelectObject(&penPlayed1);
-		memdc.MoveTo(r.left +1, r.top +1);
+		memdc.MoveTo(r.left, r.top +1);
 		memdc.LineTo(r.right, r.top +1);	
-		memdc.MoveTo(r.left +1, r.top +2);
+		memdc.MoveTo(r.left, r.top +2);
 		memdc.LineTo(r.right, r.top +2);
 
 		ThemeRGB(50, 55, 60, R, G, B);
 		CPen penPlayed2(PS_SOLID,0,RGB(R,G,B));
 		memdc.SelectObject(&penPlayed2);
-		memdc.MoveTo(r.left +1, r.top +3);
+		memdc.MoveTo(r.left, r.top +3);
 		memdc.LineTo(r.right, r.top +3);
 
 		CFont font2;
