@@ -17595,6 +17595,8 @@ HRESULT CMainFrame::SetDwmPreview(BOOL show)
 		}
 	}
 
+	m_wndView.Invalidate();
+
 	return S_OK;
 }
 
