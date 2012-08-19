@@ -196,7 +196,11 @@ STDMETHODIMP CFLACSource::ResGet(DWORD iIndex, BSTR* ppName, BSTR* ppDesc, BSTR*
 	}
 
 	CFLACStream* stream = (static_cast<CFLACStream*>(m_paStreams[0]));
-	CheckPointer(stream, E_POINTER);
+	CheckPointer(stream, E_NOTIMPL);
+
+	if (stream->m_Cover.IsEmpty()) {
+		return E_NOTIMPL;
+	}
 
 	if (ppName) {
 		CString str = _T("cover.jpg");
