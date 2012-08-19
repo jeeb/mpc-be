@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: moreuuids.h 947 2012-08-19 08:36:16Z alexins $
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt

@@ -54,7 +54,6 @@ void COpenDirHelper::SetFont(HWND hwnd, LPTSTR FontName, int FontSize)
 	ReleaseDC(hwnd, hdc);
 }
 
-// Subclass procedure
 LRESULT APIENTRY COpenDirHelper::CheckBoxSubclassProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	if (uMsg == WM_LBUTTONUP) {
@@ -72,7 +71,6 @@ int CALLBACK COpenDirHelper::BrowseCallbackProcDIR(HWND hwnd, UINT uMsg, LPARAM 
 {
 	HWND checkbox;
 
-	// Initialization callback message
 	if (uMsg == BFFM_INITIALIZED) {
 		SendMessage(hwnd, BFFM_SETSELECTION, TRUE, (LPARAM)(LPCTSTR)strLastOpenDir);
 

@@ -28,12 +28,10 @@
 
 // CMonitor
 
-// constucts a monitor class not attached to any handle
 CMonitor::CMonitor() : m_hMonitor( NULL )
 {
 }
 
-// copy constructor
 CMonitor::CMonitor( const CMonitor& monitor  )
 {
 	m_hMonitor = (HMONITOR)monitor;
@@ -57,14 +55,6 @@ HMONITOR CMonitor::Detach()
 	return hMonitor;
 }
 
-// creates an HDC for the monitor
-// it is up to the client to call DeleteDC
-//
-// for normal multimonitor drawing it is not necessary to get a
-// dc for each monitor. Windows takes care of drawing correctly
-// on all monitors
-//
-// Only very exacting applications would need a DC for each monitor
 HDC CMonitor::CreateDC() const
 {
 	ASSERT( IsMonitor() );
@@ -72,11 +62,9 @@ HDC CMonitor::CreateDC() const
 	CString name;
 	GetName( name );
 
-	//create a dc for this display
 	HDC hdc = ::CreateDC( name, name, NULL, NULL );
 	ASSERT( hdc != NULL );
 
-	//set the viewport based on the monitor rect's relation to the primary monitor
 	CRect rect;
 	GetMonitorRect( &rect );
 
@@ -106,8 +94,6 @@ void CMonitor::GetName( CString& string ) const
 	string = mi.szDevice;
 }
 
-//
-// these methods return true if any part of the item intersects the monitor rect
 BOOL CMonitor::IsOnMonitor( const POINT pt ) const
 {
 	CRect rect;
@@ -150,8 +136,6 @@ void CMonitor::GetMonitorRect( LPRECT lprc ) const
 	::SetRect( lprc, rc.left, rc.top, rc.right, rc.bottom );
 }
 
-//
-// the work area does not include the start bar
 void CMonitor::GetWorkAreaRect( LPRECT lprc ) const
 {
 	ASSERT( IsMonitor() );
@@ -166,8 +150,6 @@ void CMonitor::GetWorkAreaRect( LPRECT lprc ) const
 	::SetRect( lprc, rc.left, rc.top, rc.right, rc.bottom );
 }
 
-//these two center methods are adapted from David Campbell's
-//MSJ article (see comment at the top of the header file)
 void CMonitor::CenterRectToMonitor( LPRECT lprc, const BOOL UseWorkAreaRect ) const
 {
 	int  w = lprc->right - lprc->left;
@@ -216,8 +198,6 @@ void CMonitor::ClipRectToMonitor( LPRECT lprc, const BOOL UseWorkAreaRect ) cons
 	lprc->bottom = lprc->top  + h;
 }
 
-//
-// is the instance the primary monitor
 BOOL CMonitor::IsPrimaryMonitor() const
 {
 	ASSERT( IsMonitor() );
@@ -230,8 +210,6 @@ BOOL CMonitor::IsPrimaryMonitor() const
 	return mi.dwFlags == MONITORINFOF_PRIMARY;
 }
 
-//
-// is the instance currently attached to a valid monitor handle
 BOOL CMonitor::IsMonitor() const
 {
 	return CMonitors::IsMonitor( m_hMonitor );

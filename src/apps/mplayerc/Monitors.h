@@ -36,12 +36,10 @@ public:
 
 	CMonitor GetMonitor( const int index ) const;
 
-
 	int GetCount() const {
 		return (int)m_MonitorArray.GetCount();
 	}
 
-	//static members
 	static CMonitor GetNearestMonitor( const LPRECT lprc );
 	static CMonitor GetNearestMonitor( const POINT pt );
 	static CMonitor GetNearestMonitor( const CWnd* pWnd );
@@ -68,12 +66,11 @@ private:
 	} MATCHMONITOR, *LPMATCHMONITOR;
 
 	static BOOL CALLBACK FindMatchingMonitorHandle(
-		HMONITOR hMonitor,  // handle to display monitor
-		HDC hdcMonitor,     // handle to monitor DC
-		LPRECT lprcMonitor, // monitor intersection rectangle
-		LPARAM dwData       // data
+		HMONITOR hMonitor,
+		HDC hdcMonitor,
+		LPRECT lprcMonitor,
+		LPARAM dwData
 	);
-
 
 	typedef struct tagADDMONITOR {
 		CObArray* pMonitors;
@@ -81,10 +78,9 @@ private:
 	} ADDMONITOR, *LPADDMONITOR;
 
 	static BOOL CALLBACK AddMonitorsCallBack(
-		HMONITOR hMonitor,	// handle to display monitor
-		HDC hdcMonitor,		// handle to monitor DC
-		LPRECT lprcMonitor,	// monitor intersection rectangle
-		LPARAM dwData		// data
+		HMONITOR hMonitor,
+		HDC hdcMonitor,
+		LPRECT lprcMonitor,
+		LPARAM dwData
 	);
-
 };

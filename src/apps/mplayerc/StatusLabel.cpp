@@ -76,7 +76,9 @@ void CStatusLabel::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	GetClientRect(&r);
 	CFont* old = dc.SelectObject(&m_font);
 
-	if (AfxGetAppSettings().fDisableXPToolbars) {
+	AppSettings& s = AfxGetAppSettings();
+
+	if (s.fDisableXPToolbars) {
 		ThemeRGB(165, 170, 175, R, G, B);
 		dc.SetTextColor(RGB(R,G,B));
 		ThemeRGB(5, 10, 15, R, G, B);
@@ -95,7 +97,7 @@ void CStatusLabel::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			size = dc.GetTextExtent(str);
 		}
 
-	if (AfxGetAppSettings().fDisableXPToolbars) {
+	if (s.fDisableXPToolbars) {
 			dc.SelectObject(&old);
 			ThemeRGB(5, 10, 15, R, G, B);
 			dc.FillSolidRect(&r, RGB(R, G, B));

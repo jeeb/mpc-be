@@ -23,4 +23,4 @@
 
 #pragma once
 
-#include "../src/DSUtil/moreuuids.h"
+#include "../src/apps/mplayerc/moreuuids.h"

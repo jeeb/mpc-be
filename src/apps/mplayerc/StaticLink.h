@@ -53,23 +53,18 @@ public:
 	CStaticLink(LPCTSTR lpText = NULL, bool bDeleteOnDestroy = false);
 	~CStaticLink() { }
 
-	// Hyperlink contains URL/filename. If NULL, I will use the window text.
-	// (GetWindowText) to get the target.
 	CHyperlink	m_link;
 	COLORREF	m_color;
 
-	// Default colors you can change
-	// These are global, so they're the same for all links.
 	static COLORREF g_colorUnvisited;
 	static COLORREF g_colorVisited;
 
 protected:
-	CFont	m_font;				// underline font for text control
-	bool	m_bDeleteOnDestroy;	// delete object when window destroyed?
+	CFont	m_font;
+	bool	m_bDeleteOnDestroy;
 
 	virtual void PostNcDestroy();
 
-	// message handlers
 	DECLARE_MESSAGE_MAP()
 	afx_msg LRESULT	OnNcHitTest(CPoint point);
 	afx_msg HBRUSH	CtlColor(CDC* pDC, UINT nCtlColor);

@@ -31,7 +31,7 @@ public:
 	static CString strLastOpenDir;
 
 	static void SetFont(HWND hwnd,LPTSTR FontName,int FontSize);
-	// Subclass procedure
+
 	static LRESULT APIENTRY CheckBoxSubclassProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
 	static int CALLBACK BrowseCallbackProcDIR(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData);

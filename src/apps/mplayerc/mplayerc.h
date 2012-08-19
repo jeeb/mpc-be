@@ -27,7 +27,7 @@
 #error include 'stdafx.h' before including this file for PCH
 #endif
 
-#include "resource.h"       // main symbols
+#include "resource.h"
 #include <afxadv.h>
 #include <atlsync.h>
 #include "FakeFilterMapper2.h"
@@ -36,12 +36,9 @@
 #include <vmr9.h>
 #include <dxva2api.h> //#include <evr9.h>
 
-
 #define MPC_WND_CLASS_NAME L"MediaPlayerClassicW"
 
-//define the default logo we use
 #define DEF_LOGO IDF_LOGO3
-
 
 enum {
 	WM_GRAPHNOTIFY = WM_RESET_DEVICE+1,
@@ -54,17 +51,12 @@ enum {
 
 #define WM_MYMOUSELAST WM_XBUTTONDBLCLK
 
-///////////////
-
 extern HICON LoadIcon(CString fn, bool fSmall);
 extern bool LoadType(CString fn, CString& type);
 extern bool LoadResource(UINT resid, CStringA& str, LPCTSTR restype);
 extern CStringA GetContentType(CString fn, CAtlList<CString>* redir = NULL);
 extern WORD AssignedToCmd(UINT keyOrMouseValue, bool bIsFullScreen = false, bool bCheckMouse = true);
 
-/////////////////////////////////////////////////////////////////////////////
-// Casimir666
-//
 typedef enum {
 	ProcAmp_Brightness = 0x1,
 	ProcAmp_Contrast   = 0x2,
@@ -82,7 +74,7 @@ typedef struct {
 } COLORPROPERTY_RANGE;
 
 __inline DXVA2_Fixed32 IntToFixed(__in const int _int_, __in const SHORT divisor = 1)
-{	// special converter that is resistant to MS bugs
+{
 	DXVA2_Fixed32 _fixed_;
 	_fixed_.Value = _int_ / divisor;
 	_fixed_.Fraction = (_int_ % divisor * 0x10000 + divisor/2) / divisor;
@@ -90,15 +82,9 @@ __inline DXVA2_Fixed32 IntToFixed(__in const int _int_, __in const SHORT divisor
 }
 
 __inline int FixedToInt(__in const DXVA2_Fixed32 _fixed_, __in const SHORT factor = 1)
-{	// special converter that is resistant to MS bugs
+{
 	return (int)_fixed_.Value * factor + ((int)_fixed_.Fraction * factor + 0x8000) / 0x10000;
 }
-
-/////////////////////////////////////////////////////////////////////////////
-// CMPlayerCApp:
-// See mplayerc.cpp for the implementation of this class
-//
-
 
 extern void GetCurDispMode(dispmode& dm, CString& DisplayName);
 extern bool GetDispMode(int i, dispmode& dm, CString& DisplayName);
@@ -117,7 +103,6 @@ class CMPlayerCApp : public CWinApp
 	BOOL SendCommandLine(HWND hWnd);
 	UINT GetVKFromAppCommand(UINT nAppCommand);
 
-	// Casimir666 : new in CMPlayerCApp
 	COLORPROPERTY_RANGE		m_ColorControl[4];
 	VMR9ProcAmpControlRange	m_VMR9ColorControl[4];
 	DXVA2_ValueRange		m_EVRColorControl[4];
@@ -140,7 +125,6 @@ public:
 
 	bool GetAppSavePath(CString& path);
 
-	// Casimir666 : new in CMPlayerCApp
 	CRenderersData m_Renderers;
 	CString		m_strVersion;
 	CString		m_AudioRendererDisplayName_CL;
