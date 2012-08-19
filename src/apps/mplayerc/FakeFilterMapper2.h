@@ -25,7 +25,6 @@
 
 #include <atlbase.h>
 
-
 class FilterOverride
 {
 public:
@@ -59,6 +58,7 @@ public:
 		dwMerit = f->dwMerit;
 	}
 };
+
 /*
 class CFilterMapper2 : protected CUnknown, protected IFilterMapper2
 {

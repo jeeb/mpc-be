@@ -25,7 +25,6 @@
 
 #include <afxole.h>
 
-
 class CDropTarget
 {
 public:

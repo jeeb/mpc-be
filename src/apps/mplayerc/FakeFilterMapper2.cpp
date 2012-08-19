@@ -25,10 +25,8 @@
 #include "FakeFilterMapper2.h"
 #include <MacrovisionKicker.h>
 #include "../../DSUtil/DSUtil.h"
-
 #include <InitGuid.h>
 #include <detours/detours.h>
-
 
 HRESULT (__stdcall * Real_CoCreateInstance)(CONST IID& a0,
 		LPUNKNOWN a1,
@@ -190,7 +188,6 @@ LONG (WINAPI * Real_RegSetValueExW)(HKEY a0,
 									DWORD a5)
 	= RegSetValueExW;
 
-
 LONG (WINAPI * Real_RegCloseKey)(HKEY a0)
 	= RegCloseKey;
 
@@ -220,8 +217,6 @@ LONG (WINAPI * Real_RegSetValueW)(HKEY a0, LPCWSTR a1, DWORD a2, LPCWSTR a3, DWO
 
 LONG (WINAPI * Real_RegSetValueA)(HKEY a0, LPCSTR a1, DWORD a2, LPCSTR a3, DWORD a4)
 	= RegSetValueA;
-
-
 
 HRESULT WINAPI Mine_CoCreateInstance(IN REFCLSID rclsid, IN LPUNKNOWN pUnkOuter,
 									 IN DWORD dwClsContext, IN REFIID riid, OUT LPVOID FAR* ppv)

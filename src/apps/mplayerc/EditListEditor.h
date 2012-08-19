@@ -25,15 +25,14 @@
 #include "PlayerBar.h"
 #include "PlayerListCtrl.h"
 
-
 class CClip
 {
 private :
 	REFERENCE_TIME		m_rtIn;
 	REFERENCE_TIME		m_rtOut;
 	CString				m_strName;
-public :
 
+public :
 	CClip();
 
 	bool		HaveIn() {

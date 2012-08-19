@@ -25,7 +25,6 @@
 
 #define WM_EDITWITHBUTTON_RECALCNCSIZE		(WM_USER + 200)
 
-
 // CEditWithButton_Base
 
 CEditWithButton_Base::CEditWithButton_Base()
@@ -331,7 +330,6 @@ void CEditWithButton_Base::OnLeftClick()
 {
 	PostMessage(EDIT_BUTTON_LEFTCLICKED);
 }
-
 
 // CEditWithButton
 

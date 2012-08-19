@@ -25,7 +25,6 @@
 #include "EditListEditor.h"
 #include "../../DSUtil/DSUtil.h"
 
-
 CClip::CClip()
 {
 	m_rtIn	= _I64_MIN;

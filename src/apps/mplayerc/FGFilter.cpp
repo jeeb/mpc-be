@@ -31,7 +31,6 @@
 #include <SyncAllocatorPresenter.h>
 #include <moreuuids.h>
 
-
 //
 // CFGFilter
 //
