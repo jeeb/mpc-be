@@ -59,7 +59,6 @@ CDX9SubPic::~CDX9SubPic()
 	}
 }
 
-
 // ISubPic
 
 STDMETHODIMP_(void*) CDX9SubPic::GetObject()

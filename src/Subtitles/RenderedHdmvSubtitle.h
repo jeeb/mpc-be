@@ -20,14 +20,12 @@
  *
  */
 
-
 #pragma once
 
 #include "Rasterizer.h"
 #include "../SubPic/SubPicProviderImpl.h"
 #include "HdmvSub.h"
 #include "BaseSub.h"
-
 
 class __declspec(uuid("FCA68599-C83E-4ea5-94A3-C2E1B0E326B9"))
 	CRenderedHdmvSubtitle : public CSubPicProviderImpl, public ISubStream

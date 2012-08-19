@@ -25,7 +25,6 @@
 #include "../DSUtil/GolombBuffer.h"
 
 
-
 CompositionObject::CompositionObject()
 {
 	m_rtStart		= 0;
@@ -54,7 +53,6 @@ void CompositionObject::SetPalette (int nNbEntry, HDMV_PALETTE* pPalette, bool b
 	}
 }
 
-
 void CompositionObject::SetRLEData(BYTE* pBuffer, int nSize, int nTotalSize)
 {
 	delete[] m_pRLEData;
@@ -73,7 +71,6 @@ void CompositionObject::AppendRLEData(BYTE* pBuffer, int nSize)
 		m_nRLEPos += nSize;
 	}
 }
-
 
 void CompositionObject::RenderHdmv(SubPicDesc& spd)
 {
@@ -130,7 +127,6 @@ void CompositionObject::RenderHdmv(SubPicDesc& spd)
 	}
 }
 
-
 void CompositionObject::RenderDvb(SubPicDesc& spd, SHORT nX, SHORT nY)
 {
 	if (!m_pRLEData) {
@@ -147,7 +143,6 @@ void CompositionObject::RenderDvb(SubPicDesc& spd, SHORT nX, SHORT nY)
 	DvbRenderField (spd, gb, nX, nY,   sTopFieldLength);
 	DvbRenderField (spd, gb, nX, nY+1, sBottomFieldLength);
 }
-
 
 void CompositionObject::DvbRenderField(SubPicDesc& spd, CGolombBuffer& gb, SHORT nXStart, SHORT nYStart, SHORT nLength)
 {
@@ -189,7 +184,6 @@ void CompositionObject::DvbRenderField(SubPicDesc& spd, CGolombBuffer& gb, SHORT
 		}
 	}
 }
-
 
 void CompositionObject::Dvb2PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb, SHORT& nX, SHORT& nY)
 {

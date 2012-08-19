@@ -368,7 +368,6 @@ REFERENCE_TIME CDVBSub::GetStop(POSITION nPos)
 	return pPage!=NULL ? pPage->rtStop : INVALID_TIME;
 }
 
-
 void CDVBSub::Reset()
 {
 	m_nBufferReadPos	= 0;

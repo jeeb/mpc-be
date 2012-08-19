@@ -29,7 +29,6 @@ class CGolombBuffer;
 class CHdmvSub : public CBaseSub
 {
 public:
-
 	static const REFERENCE_TIME INVALID_TIME = _I64_MIN;
 
 	enum HDMV_SEGMENT_TYPE {
@@ -92,7 +91,6 @@ public:
 	void			CleanOld(REFERENCE_TIME rt);
 
 private :
-
 	HDMV_SEGMENT_TYPE				m_nCurSegment;
 	BYTE*							m_pSegBuffer;
 	int								m_nTotalSegBuffer;

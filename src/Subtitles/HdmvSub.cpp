@@ -30,7 +30,6 @@
 #define TRACE_HDMVSUB
 #endif
 
-
 CHdmvSub::CHdmvSub(void)
 	: CBaseSub(ST_HDMV)
 {
@@ -56,7 +55,6 @@ CHdmvSub::~CHdmvSub()
 	delete[] m_pDefaultPalette;
 	delete m_pCurrentObject;
 }
-
 
 void CHdmvSub::AllocSegment(int nSize)
 {
@@ -347,7 +345,6 @@ HRESULT CHdmvSub::GetTextureSize(POSITION pos, SIZE& MaxTextureSize, SIZE& Video
 	ASSERT (FALSE);
 	return E_INVALIDARG;
 }
-
 
 void CHdmvSub::Reset()
 {
