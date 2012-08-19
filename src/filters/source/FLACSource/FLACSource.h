@@ -26,6 +26,7 @@
 #include <atlbase.h>
 #include "../BaseSource/BaseSource.h"
 #include <qnetwork.h>
+#include "../../../DSUtil/DSMPropertyBag.h"
 
 #define FlacSourceName   L"MPC FLAC Source"
 
@@ -43,6 +44,7 @@ class __declspec(uuid("1930D8FF-4739-4e42-9199-3B2EDEAA3BF2"))
 	CFLACSource
 	: public CBaseSource<CFLACStream>
 	, public IAMMediaContent
+	, public IDSMResourceBagImpl
 {
 public:
 	CFLACSource(LPUNKNOWN lpunk, HRESULT* phr);
@@ -52,54 +54,30 @@ public:
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
 	// IAMMediaContent
-	STDMETHODIMP GetTypeInfoCount(UINT* pctinfo) {
-		return E_NOTIMPL;
-	}
-	STDMETHODIMP GetTypeInfo(UINT itinfo, LCID lcid, ITypeInfo** pptinfo) {
-		return E_NOTIMPL;
-	}
-	STDMETHODIMP GetIDsOfNames(REFIID riid, OLECHAR** rgszNames, UINT cNames, LCID lcid, DISPID* rgdispid) {
-		return E_NOTIMPL;
-	}
-	STDMETHODIMP Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS* pdispparams, VARIANT* pvarResult, EXCEPINFO* pexcepinfo, UINT* puArgErr) {
-		return E_NOTIMPL;
-	}
+	STDMETHODIMP GetTypeInfoCount(UINT* pctinfo) {return E_NOTIMPL;}
+	STDMETHODIMP GetTypeInfo(UINT itinfo, LCID lcid, ITypeInfo** pptinfo) {return E_NOTIMPL;}
+	STDMETHODIMP GetIDsOfNames(REFIID riid, OLECHAR** rgszNames, UINT cNames, LCID lcid, DISPID* rgdispid) {return E_NOTIMPL;}
+	STDMETHODIMP Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS* pdispparams, VARIANT* pvarResult, EXCEPINFO* pexcepinfo, UINT* puArgErr) {return E_NOTIMPL;}
 	STDMETHODIMP get_AuthorName(BSTR* pbstrAuthorName);
 	STDMETHODIMP get_Title(BSTR* pbstrTitle);
-	STDMETHODIMP get_Rating(BSTR* pbstrRating) {
-		return E_NOTIMPL;
-	}
+	STDMETHODIMP get_Rating(BSTR* pbstrRating) {return E_NOTIMPL;}
 	STDMETHODIMP get_Description(BSTR* pbstrDescription);
-	STDMETHODIMP get_Copyright(BSTR* pbstrCopyright) {
-		return E_NOTIMPL;
-	}
-	STDMETHODIMP get_BaseURL(BSTR* pbstrBaseURL) {
-		return E_NOTIMPL;
-	}
-	STDMETHODIMP get_LogoURL(BSTR* pbstrLogoURL) {
-		return E_NOTIMPL;
-	}
-	STDMETHODIMP get_LogoIconURL(BSTR* pbstrLogoURL) {
-		return E_NOTIMPL;
-	}
-	STDMETHODIMP get_WatermarkURL(BSTR* pbstrWatermarkURL) {
-		return E_NOTIMPL;
-	}
-	STDMETHODIMP get_MoreInfoURL(BSTR* pbstrMoreInfoURL) {
-		return E_NOTIMPL;
-	}
-	STDMETHODIMP get_MoreInfoBannerImage(BSTR* pbstrMoreInfoBannerImage) {
-		return E_NOTIMPL;
-	}
-	STDMETHODIMP get_MoreInfoBannerURL(BSTR* pbstrMoreInfoBannerURL) {
-		return E_NOTIMPL;
-	}
-	STDMETHODIMP get_MoreInfoText(BSTR* pbstrMoreInfoText) {
-		return E_NOTIMPL;
-	}
+	STDMETHODIMP get_Copyright(BSTR* pbstrCopyright) {return E_NOTIMPL;}
+	STDMETHODIMP get_BaseURL(BSTR* pbstrBaseURL) {return E_NOTIMPL;}
+	STDMETHODIMP get_LogoURL(BSTR* pbstrLogoURL) {return E_NOTIMPL;}
+	STDMETHODIMP get_LogoIconURL(BSTR* pbstrLogoURL) {return E_NOTIMPL;}
+	STDMETHODIMP get_WatermarkURL(BSTR* pbstrWatermarkURL) {return E_NOTIMPL;}
+	STDMETHODIMP get_MoreInfoURL(BSTR* pbstrMoreInfoURL) {return E_NOTIMPL;}
+	STDMETHODIMP get_MoreInfoBannerImage(BSTR* pbstrMoreInfoBannerImage) {return E_NOTIMPL;}
+	STDMETHODIMP get_MoreInfoBannerURL(BSTR* pbstrMoreInfoBannerURL) {return E_NOTIMPL;}
+	STDMETHODIMP get_MoreInfoText(BSTR* pbstrMoreInfoText) {return E_NOTIMPL;}
 
 	// CBaseFilter
 	STDMETHODIMP QueryFilterInfo(FILTER_INFO* pInfo);
+
+	// IDSMResourceBag
+	STDMETHODIMP_(DWORD) ResGetCount();
+	STDMETHODIMP ResGet(DWORD iIndex, BSTR* ppName, BSTR* ppDesc, BSTR* ppMime, BYTE** ppData, DWORD* pDataLen, DWORD_PTR* pTag);
 };
 
 class CGolombBuffer;
@@ -132,12 +110,13 @@ public:
 	HRESULT			GetMediaType(int iPosition, CMediaType* pmt);
 
 	void			UpdateFromMetadata (void* pBuffer);
-	inline CFile*	GetFile() {
-		return &m_file;
-	};
+	inline CFile*	GetFile() {return &m_file;};
 
 	file_info_struct	GetInfo();
 
 	bool				m_bIsEOF;
+
+	CAtlArray<BYTE>		m_Cover;
+	CString				m_CoverMime;
 };
 

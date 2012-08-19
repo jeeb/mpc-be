@@ -117,6 +117,7 @@ STDMETHODIMP CFLACSource::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 
 	return
 		QI2(IAMMediaContent)
+		QI(IDSMResourceBag)
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
 
@@ -178,6 +179,48 @@ STDMETHODIMP CFLACSource::QueryFilterInfo(FILTER_INFO* pInfo)
 	return S_OK;
 }
 
+// IDSMResourceBag
+STDMETHODIMP_(DWORD) CFLACSource::ResGetCount()
+{
+	return (static_cast<CFLACStream*>(m_paStreams[0]))->m_Cover.IsEmpty() ? 0 : 1;
+}
+
+STDMETHODIMP CFLACSource::ResGet(DWORD iIndex, BSTR* ppName, BSTR* ppDesc, BSTR* ppMime, BYTE** ppData, DWORD* pDataLen, DWORD_PTR* pTag)
+{
+	if (ppData) {
+		CheckPointer(pDataLen, E_POINTER);
+	}
+
+	if (iIndex) {
+		return E_INVALIDARG;
+	}
+
+	CFLACStream* stream = (static_cast<CFLACStream*>(m_paStreams[0]));
+	CheckPointer(stream, E_POINTER);
+
+	if (ppName) {
+		CString str = _T("cover.jpg");
+		*ppName = str.AllocSysString();
+	}
+	if (ppDesc) {
+		CString str = _T("cover");
+		*ppDesc = str.AllocSysString();
+	}
+	if (ppMime) {
+		CString str = stream->m_CoverMime;
+		*ppMime = str.AllocSysString();
+	}
+	if (ppData) {
+		*pDataLen = (DWORD)stream->m_Cover.GetCount();
+		memcpy(*ppData = (BYTE*)CoTaskMemAlloc(*pDataLen), stream->m_Cover.GetData(), *pDataLen);
+	}
+	if (pTag) {
+		*pTag = 0;
+	}
+
+	return S_OK;
+}
+
 // CFLACStream
 
 CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
@@ -203,7 +246,8 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			break;
 		}
 
-		FLAC__stream_decoder_set_metadata_respond(_DECODER_, FLAC__METADATA_TYPE_VORBIS_COMMENT); 
+		FLAC__stream_decoder_set_metadata_respond(_DECODER_, FLAC__METADATA_TYPE_VORBIS_COMMENT);
+		FLAC__stream_decoder_set_metadata_respond(_DECODER_, FLAC__METADATA_TYPE_PICTURE); 
 
 		if (FLAC__STREAM_DECODER_INIT_STATUS_OK != FLAC__stream_decoder_init_stream (_DECODER_,
 				StreamDecoderRead,
@@ -394,6 +438,12 @@ void CFLACStream::UpdateFromMetadata (void* pBuffer)
 			} else  if (ParseVorbisComment("date", &vc->comments[i], &TagValue)) {
 				file_info.year		= TagValue.GetAllocLength() > 4 ? TagValue.Right(4) : TagValue;
 			}
+		}
+	} else if (pMetadata->type == FLAC__METADATA_TYPE_PICTURE) {
+		if (!m_Cover.GetCount() && pMetadata->data.picture.data_length) {
+			m_CoverMime = pMetadata->data.picture.mime_type;
+			m_Cover.SetCount(pMetadata->data.picture.data_length);
+			memcpy(m_Cover.GetData(), pMetadata->data.picture.data, pMetadata->data.picture.data_length);
 		}
 	}
 }
