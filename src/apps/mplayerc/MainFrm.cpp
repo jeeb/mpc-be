@@ -10515,7 +10515,7 @@ void CMainFrame::HideVideoWindow(bool fHide)
 
 void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 {
-	if (m_iMediaLoadState != MLS_LOADED) {
+	if (m_iMediaLoadState != MLS_LOADED || m_fAudioOnly) {
 		return;
 	}
 
