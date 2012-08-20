@@ -1378,7 +1378,7 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 				do {
 					m_bDXVACompatible = false;
 
-					if (!DXVACheckFramesize(PictWidth(), PictHeight(), m_nPCIVendor)) { // check frame size
+					if (!DXVACheckFramesize(PictWidth(), PictHeight(), m_nPCIVendor, m_nPCIDevice)) { // check frame size
 						break;
 					}
 
