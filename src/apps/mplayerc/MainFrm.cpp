@@ -24,7 +24,6 @@
 #include "stdafx.h"
 #include "mplayerc.h"
 #include "MainFrm.h"
-
 #include <math.h>
 #include <afxpriv.h>
 #include <atlconv.h>
@@ -59,7 +58,6 @@
 #include <ksmedia.h>
 #include <dvdevcod.h>
 #include <dsound.h>
-
 #include <InitGuid.h>
 #include <uuids.h>
 #include <moreuuids.h>
@@ -69,11 +67,9 @@
 #include "../../DSUtil/DSUtil.h"
 #include "FGManager.h"
 #include "FGManagerBDA.h"
-
 #include "TextPassThruFilter.h"
 #include "../../filters/Filters.h"
 #include "../../filters/PinInfoWnd.h"
-
 #include <AllocatorCommon7.h>
 #include <AllocatorCommon.h>
 #include <SyncAllocatorPresenter.h>
@@ -17707,7 +17703,6 @@ LRESULT CMainFrame::OnDwmSendIconicLivePreviewBitmap(WPARAM, LPARAM)
 
 	return 0;
 }
-
 
 HBITMAP CMainFrame::CreateCaptureDIB(int nWidth, int nHeight)
 {

@@ -50,7 +50,7 @@
 #ifndef _WIN64
 // TODO: add QuickTime support for x64 when available!
 #include "QuicktimeGraph.h"
-#endif /* _WIN64 */
+#endif
 #include "ShockwaveGraph.h"
 
 #include <IChapterInfo.h>
@@ -149,6 +149,7 @@ public:
 	afx_msg void OnTunerScan(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnDisplayChange(WPARAM wParam, LPARAM lParam);
 };
+
 /*
 class CKeyFrameFinderThread : public CWinThread, public CCritSec
 {
@@ -169,6 +170,7 @@ public:
 	afx_msg void OnBreak(WPARAM wParam, LPARAM lParam);
 };
 */
+
 interface ISubClock;
 
 class CMainFrame : public CFrameWnd, public CDropTarget
@@ -321,7 +323,6 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 		CString lang;
 	} SubStreams;
 
-	
 	CAtlArray<SubStreams> subarray;
 	void SubFlags(CString strname, bool &forced, bool &def);
 	int GetSubSelIdx();
@@ -701,7 +702,6 @@ public:
 	afx_msg void OnDvdSub(UINT nID);
 	afx_msg void OnDvdSubOnOff();
 
-
 	// menu item handlers
 
 	afx_msg void OnFileOpenQuick();
@@ -1016,7 +1016,6 @@ public:
 	bool		IsRealEngineCompatible(CString strFilename) const;
 	void		SetTimersPlay();
 	void		KillTimersStop();
-
 
 	// MPC API functions
 	void		ProcessAPICommand(COPYDATASTRUCT* pCDS);
