@@ -63,7 +63,6 @@ public:
 
 	void ShowTimer(bool fShow);
 
-	// Overrides
 	virtual BOOL Create(CWnd* pParentWnd);
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 
@@ -76,6 +75,7 @@ protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
+
 public:
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 };

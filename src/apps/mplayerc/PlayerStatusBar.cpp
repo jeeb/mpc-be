@@ -49,7 +49,7 @@ static HICON get_hicon(CString path, CString fn)
 	typedef int (*GetIconIndexFunc)(CString);
 	GetIconIndexFunc _getIconIndexFunc;
 	int iconindex = -1;
-	_getIconIndexFunc = (GetIconIndexFunc) GetProcAddress(mpciconlib, "get_icon_index");
+	_getIconIndexFunc = (GetIconIndexFunc)GetProcAddress(mpciconlib, "get_icon_index");
 	if (_getIconIndexFunc) {
 		iconindex = _getIconIndexFunc(ext);
 	}
