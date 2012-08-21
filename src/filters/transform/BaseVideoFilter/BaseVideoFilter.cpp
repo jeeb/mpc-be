@@ -198,12 +198,14 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, int re
 			vih_rect = CRect(0, 0, m_w, m_h);
 		}
 
-		BITMAPINFOHEADER* bmi = NULL;
+		CMediaType& pmtInput	= m_pInput->CurrentMediaType();
+		BITMAPINFOHEADER* bmi	= NULL;
+
 		if (mt.formattype == FORMAT_VideoInfo) {
 			VIDEOINFOHEADER* vih = (VIDEOINFOHEADER*)mt.Format();
-			int w = vih->rcSource.left - vih->rcSource.right;
+			int w = vih->rcSource.right - vih->rcSource.left;
 			int h = vih->rcSource.bottom - vih->rcSource.top;
-			if (w && h && (w > vih_rect.Width() || h > vih_rect.Height())) {
+			if ((w && h && (w > vih_rect.Width() || h > vih_rect.Height())) || (pmtInput.majortype == MEDIATYPE_DVD_ENCRYPTED_PACK)) {
 				vih->rcSource = vih->rcTarget = vih_rect;
 			}
 
@@ -212,9 +214,9 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, int re
 			bmi->biYPelsPerMeter = m_h * m_arx;
 		} else if (mt.formattype == FORMAT_VideoInfo2) {
 			VIDEOINFOHEADER2* vih = (VIDEOINFOHEADER2*)mt.Format();
-			int w = vih->rcSource.left - vih->rcSource.right;
+			int w = vih->rcSource.right - vih->rcSource.left;
 			int h = vih->rcSource.bottom - vih->rcSource.top;
-			if (w & h & (w > vih_rect.Width() || h > vih_rect.Height())) {
+			if ((w & h & (w > vih_rect.Width() || h > vih_rect.Height())) || (pmtInput.majortype == MEDIATYPE_DVD_ENCRYPTED_PACK)) {
 				vih->rcSource = vih->rcTarget = vih_rect;
 			}
 
