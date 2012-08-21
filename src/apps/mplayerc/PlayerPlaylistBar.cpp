@@ -221,7 +221,9 @@ static bool SearchFiles(CString mask, CAtlList<CString>& sl)
 			FindClose(h);
 
 			if (sl.GetCount() == 0 && mask.Find(_T(":\\")) == 1) {
-				GetCDROMType(mask[0], sl);
+				if (CDROM_VideoCD == GetCDROMType(mask[0], sl)) {
+					sl.RemoveAll();
+				}
 			}
 		}
 	}
