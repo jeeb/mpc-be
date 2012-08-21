@@ -884,7 +884,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		}
 	}
 
-	m_CaptureWndBitmap = NULL;
+	m_CaptureWndBitmap	= NULL;
+	m_ThumbCashedBitmap	= NULL;
+	m_ThumbCashedSize.SetSize(0, 0);
 
 	return 0;
 }
@@ -972,6 +974,9 @@ void CMainFrame::OnClose()
 	}
 
 	m_InternalImage.Destroy();
+	if (m_ThumbCashedBitmap) {
+		::DeleteObject(m_ThumbCashedBitmap);
+	}
 
 	__super::OnClose();
 }
@@ -17518,6 +17523,12 @@ HRESULT CMainFrame::SetDwmPreview(BOOL show)
 		set = show;
 	}
 
+	if (m_ThumbCashedBitmap) {
+		::DeleteObject(m_ThumbCashedBitmap);
+		m_ThumbCashedBitmap = NULL;
+	}
+	m_ThumbCashedSize.SetSize(0, 0);
+
 	if (IsWinSevenOrLater() && m_DwmSetWindowAttributeFnc && m_DwmSetIconicThumbnailFnc) {
 		m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_HAS_ICONIC_BITMAP, &set, sizeof(set));
 		m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_FORCE_ICONIC_REPRESENTATION, &set, sizeof(set));
@@ -17602,47 +17613,55 @@ LRESULT CMainFrame::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
 		return 0;
 	}
 
-	HBITMAP hbm = NULL;
-	HDC hdcMem = CreateCompatibleDC(NULL);
+	int nWidth	= HIWORD(lParam);
+	int nHeight	= LOWORD(lParam);
 
-	if (hdcMem) {
-		int nWidth	= HIWORD(lParam);
-		int nHeight	= LOWORD(lParam);
+	if (m_ThumbCashedBitmap && m_ThumbCashedSize != CSize(nWidth, nHeight)) {
+		::DeleteObject(m_ThumbCashedBitmap);
+		m_ThumbCashedBitmap = NULL;
+	}
 
-		BITMAP bm;
-		GetObject(m_InternalImage, sizeof(bm), &bm);
+	if (!m_ThumbCashedBitmap) {
+		HDC hdcMem = CreateCompatibleDC(NULL);
 
-		int h = min(abs(bm.bmHeight), nHeight);
-		int w = MulDiv(h, bm.bmWidth, abs(bm.bmHeight));
+		if (hdcMem) {
+			BITMAP bm;
+			GetObject(m_InternalImage, sizeof(bm), &bm);
 
-		BITMAPINFO bmi;
-		ZeroMemory(&bmi.bmiHeader, sizeof(BITMAPINFOHEADER));
-		bmi.bmiHeader.biSize		= sizeof(BITMAPINFOHEADER);
-		bmi.bmiHeader.biWidth		= m_bInternalImageRes ? nWidth : w;
-		bmi.bmiHeader.biHeight		= -nHeight;
-		bmi.bmiHeader.biPlanes		= 1;
-		bmi.bmiHeader.biBitCount	= 32;
+			int h = min(abs(bm.bmHeight), nHeight);
+			int w = MulDiv(h, bm.bmWidth, abs(bm.bmHeight));
 
-		PBYTE pbDS = NULL;
-		hbm = CreateDIBSection(hdcMem, &bmi, DIB_RGB_COLORS, (VOID**)&pbDS, NULL, NULL);
-		if (hbm) {
-			SelectObject(hdcMem, hbm);
+			BITMAPINFO bmi;
+			ZeroMemory(&bmi.bmiHeader, sizeof(BITMAPINFOHEADER));
+			bmi.bmiHeader.biSize		= sizeof(BITMAPINFOHEADER);
+			bmi.bmiHeader.biWidth		= m_bInternalImageRes ? nWidth : w;
+			bmi.bmiHeader.biHeight		= -nHeight;
+			bmi.bmiHeader.biPlanes		= 1;
+			bmi.bmiHeader.biBitCount	= 32;
 
-			int x = m_bInternalImageRes ? ((nWidth - w) / 2) : 0;
-			int y = (nHeight - h) / 2;
-			CRect r = CRect(CPoint(x, y), CSize(w, h));
+			PBYTE pbDS = NULL;
+			m_ThumbCashedBitmap = CreateDIBSection(hdcMem, &bmi, DIB_RGB_COLORS, (VOID**)&pbDS, NULL, NULL);
+			if (m_ThumbCashedBitmap) {
+				SelectObject(hdcMem, m_ThumbCashedBitmap);
 
-			SetStretchBltMode(hdcMem, STRETCH_HALFTONE);
-			BOOL work = m_InternalImage.StretchBlt(hdcMem, r, CRect(0, 0, bm.bmWidth, abs(bm.bmHeight)));
+				int x = m_bInternalImageRes ? ((nWidth - w) / 2) : 0;
+				int y = (nHeight - h) / 2;
+				CRect r = CRect(CPoint(x, y), CSize(w, h));
+
+				SetStretchBltMode(hdcMem, STRETCH_HALFTONE);
+				BOOL work = m_InternalImage.StretchBlt(hdcMem, r, CRect(0, 0, bm.bmWidth, abs(bm.bmHeight)));
+			}
+			DeleteDC(hdcMem);
 		}
-		DeleteDC(hdcMem);
 	}
 
 	HRESULT hr = E_FAIL;
 
-	if (hbm) {
-		hr = m_DwmSetIconicThumbnailFnc(m_hWnd, hbm, 0);
-		::DeleteObject(hbm);
+	if (m_ThumbCashedBitmap) {
+		hr = m_DwmSetIconicThumbnailFnc(m_hWnd, m_ThumbCashedBitmap, 0);
+		if (SUCCEEDED(hr)) {
+			m_ThumbCashedSize.SetSize(nWidth, nHeight);
+		}
 	}
 
 	if (FAILED(hr)) {

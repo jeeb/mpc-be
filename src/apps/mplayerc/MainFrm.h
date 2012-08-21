@@ -1051,6 +1051,9 @@ public:
 	void		CreateCaptureWindow();
 	MPCPngImage	m_InternalImage;
 	bool		m_bInternalImageRes;
+	
+	HBITMAP		m_ThumbCashedBitmap;
+	CSize		m_ThumbCashedSize;
 
 protected:
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
