@@ -438,42 +438,29 @@ HRESULT CBaseVideoFilter::CheckTransform(const CMediaType* mtIn, const CMediaTyp
 				&& mtOut->subtype != MEDIASUBTYPE_RGB565) {
 			return VFW_E_TYPE_NOT_ACCEPTED;
 		}
-	} 
-	else if(mtIn->majortype == MEDIATYPE_Video
-		&& (mtIn->subtype == MEDIASUBTYPE_P016
-		|| mtIn->subtype == MEDIASUBTYPE_P010))
-	{
-		if( mtOut->subtype != mtIn->subtype)
-		{
+	} else if (mtOut->majortype == MEDIATYPE_Video
+				&& (mtOut->subtype == MEDIASUBTYPE_P016 || mtOut->subtype == MEDIASUBTYPE_P010)) {
+		if (mtOut->subtype != mtIn->subtype) {
+			/*
 			// Our output doesn't support P010/P016, so force input to reconnect using YV12
 			// which we can then transform to an input more acceptable to the video renderer.
 			CMediaType desiredMt;
 			int position = 0;
 			HRESULT hr;
-			do
-			{
+			do {
 				hr = GetMediaType(position, &desiredMt);
 				++position;
-			} while ( SUCCEEDED(hr) && desiredMt.subtype != MEDIASUBTYPE_YV12);
+			} while (SUCCEEDED(hr) && desiredMt.subtype != MEDIASUBTYPE_YV12);
 
-			if (SUCCEEDED(m_pInput->QueryAccept(&desiredMt)))
-			{
-				if (SUCCEEDED(ReconnectPin(m_pInput, &desiredMt)))
-				{
-					m_pInput->SetMediaType(&desiredMt);
-				}
-				else
-				{
-					return VFW_E_TYPE_NOT_ACCEPTED;
-				}
-			}
-			else
-			{
+			if (SUCCEEDED(m_pOutput->QueryAccept(&desiredMt)) && SUCCEEDED(ReconnectPin(m_pOutput, &desiredMt))) {
+				m_pOutput->SetMediaType(&desiredMt);
+			} else {
 				return VFW_E_TYPE_NOT_ACCEPTED;
 			}
+			*/
+			return VFW_E_TYPE_NOT_ACCEPTED;
 		}
-	}
-    else if (mtIn->majortype == MEDIATYPE_Video
+	} else if (mtIn->majortype == MEDIATYPE_Video
 			   && (mtIn->subtype == MEDIASUBTYPE_YUY2)) {
 		if (mtOut->subtype != MEDIASUBTYPE_YUY2
 				&& mtOut->subtype != MEDIASUBTYPE_ARGB32
