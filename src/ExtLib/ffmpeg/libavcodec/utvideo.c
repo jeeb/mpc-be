@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2007  Aurelien Jacobs <aurel@gnuage.org>
+ * Common Ut Video code
+ * Copyright (c) 2011 Konstantin Shishkov
  *
  * This file is part of FFmpeg.
  *
@@ -20,28 +21,19 @@
 
 /**
  * @file
- * huffman tree builder and VLC generator
+ * Common Ut Video code
  */
 
-#ifndef AVCODEC_HUFFMAN_H
-#define AVCODEC_HUFFMAN_H
+#include "utvideo.h"
 
-#include "avcodec.h"
-#include "get_bits.h"
+const int ff_ut_pred_order[5] = {
+    PRED_LEFT, PRED_MEDIAN, PRED_MEDIAN, PRED_NONE, PRED_GRADIENT
+};
 
-typedef struct {
-    int16_t  sym;
-    int16_t  n0;
-    uint32_t count;
-} Node;
+const int ff_ut_rgb_order[4]  = { 1, 2, 0, 3 }; // G, B, R, A
 
-#define FF_HUFFMAN_FLAG_HNODE_FIRST 0x01
-#define FF_HUFFMAN_FLAG_ZERO_COUNT  0x02
-
-typedef int (*HuffCmp)(const void *va, const void *vb);
-int ff_huff_build_tree(AVCodecContext *avctx, VLC *vlc, int nb_codes,
-                       Node *nodes, HuffCmp cmp, int flags);
-
-void ff_generate_len_table(uint8_t *dst, const uint64_t *stats);
-
-#endif /* AVCODEC_HUFFMAN_H */
+int ff_ut_huff_cmp_len(const void *a, const void *b)
+{
+    const HuffEntry *aa = a, *bb = b;
+    return (aa->len - bb->len)*256 + aa->sym - bb->sym;
+}

@@ -1175,6 +1175,12 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .name      = "paf_video",
         .long_name = NULL_IF_CONFIG_SMALL("Amazing Studio Packed Animation File Video"),
     },
+    {
+        .id        = AV_CODEC_ID_AVRN,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "avrn",
+        .long_name = NULL_IF_CONFIG_SMALL("Avid AVI Codec"),
+    },
 
     /* various PCM "codecs" */
     {

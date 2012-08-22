@@ -134,9 +134,7 @@ int av_get_bits_per_sample_fmt(enum AVSampleFormat sample_fmt);
  * @return number of bytes per sample or zero if unknown for the given
  * sample format
  */
-
 int av_get_bytes_per_sample(enum AVSampleFormat sample_fmt);
-
 
 /**
  * Check if the sample format is planar.
