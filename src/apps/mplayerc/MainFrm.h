@@ -1049,7 +1049,7 @@ public:
 	bool		isWindowMinimized;
 	HBITMAP		CreateCaptureDIB(int nWidth, int nHeight);
 	void		CreateCaptureWindow();
-	MPCPngImage	m_InternalImage;
+	MPCPngImage	m_InternalImage, m_InternalImageSmall;
 	bool		m_bInternalImageRes;
 	
 	HBITMAP		m_ThumbCashedBitmap;

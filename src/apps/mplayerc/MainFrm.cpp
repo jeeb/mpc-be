@@ -974,6 +974,7 @@ void CMainFrame::OnClose()
 	}
 
 	m_InternalImage.Destroy();
+	m_InternalImageSmall.Destroy();
 	if (m_ThumbCashedBitmap) {
 		::DeleteObject(m_ThumbCashedBitmap);
 	}
@@ -17537,6 +17538,9 @@ HRESULT CMainFrame::SetDwmPreview(BOOL show)
 	bool bLoadRes		= false;
 	m_bInternalImageRes	= false;
 	m_InternalImage.Destroy();
+	if (m_InternalImageSmall) {
+		m_InternalImageSmall.Detach();
+	}
 	if (m_fAudioOnly && IsSomethingLoaded() && show) {
 
 		// load image from DSMResource to show in preview & logo;
@@ -17599,6 +17603,37 @@ HRESULT CMainFrame::SetDwmPreview(BOOL show)
 		if (!bLoadRes) {
 			m_InternalImage.LoadFromResource(IDB_W7_AUDIO);
 			m_bInternalImageRes = true;
+			m_InternalImageSmall.Attach(m_InternalImage);
+		} else {
+			BITMAP bm;
+			if (GetObject(m_InternalImage, sizeof(bm), &bm) && bm.bmWidth) {
+#define small_Width 256
+				if ((abs(bm.bmHeight) <= small_Width) && (bm.bmWidth <= small_Width)) {
+					m_InternalImageSmall.Attach(m_InternalImage);
+				} else {
+					// Resize image to improve speed of show TaskBar preview 
+
+					int h	= min(abs(bm.bmHeight), small_Width);
+					int w	= MulDiv(h, bm.bmWidth, abs(bm.bmHeight));
+					h		= MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
+
+					CDC *screenDC = GetDC();
+					CDC *pMDC = new CDC;
+					pMDC->CreateCompatibleDC(screenDC);
+
+					CBitmap *pb = new CBitmap;
+					pb->CreateCompatibleBitmap(screenDC, w, h);
+
+					CBitmap *pob = pMDC->SelectObject(pb);
+					SetStretchBltMode(pMDC->m_hDC, STRETCH_HALFTONE);
+					m_InternalImage.StretchBlt(pMDC->m_hDC, 0, 0, w, h, 0, 0, bm.bmWidth, abs(bm.bmHeight), SRCCOPY);
+					pMDC->SelectObject(pob);
+	
+					m_InternalImageSmall.Attach((HBITMAP)(pb->Detach()));
+					pb->DeleteObject();
+					ReleaseDC(screenDC);
+				}
+			}
 		}
 	}
 
@@ -17609,7 +17644,7 @@ HRESULT CMainFrame::SetDwmPreview(BOOL show)
 
 LRESULT CMainFrame::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
 {
-	if (!IsSomethingLoaded() || !m_fAudioOnly || !m_DwmSetIconicThumbnailFnc) {
+	if (!IsSomethingLoaded() || !m_fAudioOnly || !m_DwmSetIconicThumbnailFnc || !m_InternalImageSmall) {
 		return 0;
 	}
 
@@ -17626,10 +17661,11 @@ LRESULT CMainFrame::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
 
 		if (hdcMem) {
 			BITMAP bm;
-			GetObject(m_InternalImage, sizeof(bm), &bm);
+			GetObject(m_InternalImageSmall, sizeof(bm), &bm);
 
-			int h = min(abs(bm.bmHeight), nHeight);
-			int w = MulDiv(h, bm.bmWidth, abs(bm.bmHeight));
+			int h	= min(abs(bm.bmHeight), nHeight);
+			int w	= MulDiv(h, bm.bmWidth, abs(bm.bmHeight));
+			h		= MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
 
 			BITMAPINFO bmi;
 			ZeroMemory(&bmi.bmiHeader, sizeof(BITMAPINFOHEADER));
@@ -17649,7 +17685,7 @@ LRESULT CMainFrame::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
 				CRect r = CRect(CPoint(x, y), CSize(w, h));
 
 				SetStretchBltMode(hdcMem, STRETCH_HALFTONE);
-				BOOL work = m_InternalImage.StretchBlt(hdcMem, r, CRect(0, 0, bm.bmWidth, abs(bm.bmHeight)));
+				m_InternalImageSmall.StretchBlt(hdcMem, r, CRect(0, 0, bm.bmWidth, abs(bm.bmHeight)));
 			}
 			DeleteDC(hdcMem);
 		}
