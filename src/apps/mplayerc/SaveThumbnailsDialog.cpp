@@ -25,7 +25,6 @@
 #include "mplayerc.h"
 #include "SaveThumbnailsDialog.h"
 
-
 // CSaveThumbnailsDialog
 
 IMPLEMENT_DYNAMIC(CSaveThumbnailsDialog, CFileDialog)

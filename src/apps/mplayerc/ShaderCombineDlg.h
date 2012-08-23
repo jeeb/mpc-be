@@ -26,7 +26,6 @@
 #include <afxwin.h>
 #include <ResizableLib/ResizableDialog.h>
 
-
 // CShaderCombineDlg dialog
 
 class CShaderCombineDlg : public CCmdUIDialog

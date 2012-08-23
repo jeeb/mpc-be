@@ -26,7 +26,6 @@
 #include "StatusLabel.h"
 #include "../../DSUtil/WinAPIUtils.h"
 
-
 // CStatusLabel
 
 IMPLEMENT_DYNAMIC(CStatusLabel, CStatic)

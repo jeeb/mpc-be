@@ -26,7 +26,6 @@
 #include "SubtitleDlDlg.h"
 #include "MainFrm.h"
 
-// User Defined Window Messages
 #define UWM_PARSE (WM_USER + 100)
 #define UWM_FAILED (WM_USER + 101)
 
@@ -72,7 +71,6 @@ void CSubtitleDlDlg::LoadList()
 
 bool CSubtitleDlDlg::Parse()
 {
-	// Parse raw list
 	isdb_movie m;
 	isdb_subtitle sub;
 
@@ -121,7 +119,6 @@ bool CSubtitleDlDlg::Parse()
 		}
 	}
 
-	// Parse movies
 	pos = m_pTA->raw_movies.GetHeadPosition();
 
 	while (pos) {
@@ -213,7 +210,6 @@ BOOL CSubtitleDlDlg::OnInitDialog()
 							| LVS_EX_CHECKBOXES   | LVS_EX_LABELTIP);
 
 	if (columnWidth.GetCount() != 5) {
-		// default sizes
 		columnWidth.RemoveAll();
 		columnWidth.Add(290);
 		columnWidth.Add(70);
@@ -237,7 +233,6 @@ BOOL CSubtitleDlDlg::OnInitDialog()
 	SetMinTrackSize(s);
 	EnableSaveRestore(IDS_R_DLG_SUBTITLEDL);
 
-	// start new worker thread to download the list of subtitles
 	m_pTA = DNew THREADSTRUCT;
 	m_pTA->url = m_url;
 	m_pTA->hWND = GetSafeHwnd();

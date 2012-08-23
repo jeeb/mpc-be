@@ -26,7 +26,6 @@
 #include "resource.h"
 #include <ResizableLib/ResizableDialog.h>
 
-
 // CShaderAutoCompleteDlg dialog
 
 class CShaderAutoCompleteDlg : public CResizableDialog

@@ -28,7 +28,6 @@
 #include "mplayerc.h"
 #include <ResizableLib/ResizableDialog.h>
 
-
 // Q174667
 
 class CShaderLabelComboBox : public CComboBox

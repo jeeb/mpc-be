@@ -29,7 +29,6 @@
 
 using namespace DSObjects;
 
-
 CShockwaveGraph::CShockwaveGraph(HWND hParent, HRESULT& hr)
 	: m_fs(State_Stopped)
 {

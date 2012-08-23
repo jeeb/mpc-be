@@ -547,6 +547,7 @@ void CRealMediaPlayerWindowed::DestroySite(IRMASite* pSite)
 		pRMASiteWindowed->Destroy();
 	}
 }
+
 //
 // CRealMediaPlayerWindowless
 //
@@ -623,9 +624,6 @@ STDMETHODIMP CRealMediaPlayerWindowless::SizeChanged(PNxSize* size)
 
 	return __super::SizeChanged(size);
 }
-
-
-////////////////
 
 CRealMediaGraph::CRealMediaGraph(HWND hWndParent, HRESULT& hr)
 	: CBaseGraph()

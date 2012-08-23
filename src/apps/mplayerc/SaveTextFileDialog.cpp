@@ -26,7 +26,6 @@
 #include "SaveTextFileDialog.h"
 #include "../../DSUtil/WinAPIUtils.h"
 
-
 // CSaveTextFileDialog
 
 IMPLEMENT_DYNAMIC(CSaveTextFileDialog, CFileDialog)
@@ -40,7 +39,7 @@ CSaveTextFileDialog::CSaveTextFileDialog(
 	m_e(e)
 {
 	if (IsWinVistaOrLater()) {
-        // customization has to be done before OnInitDialog
+
         IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
 
         pfdc->StartVisualGroup(IDS_TEXTFILE_ENC, ResStr(IDS_TEXTFILE_ENC));

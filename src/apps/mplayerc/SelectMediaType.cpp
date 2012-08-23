@@ -26,11 +26,10 @@
 #include "SelectMediaType.h"
 #include "../../DSUtil/DSUtil.h"
 
-
 // CSelectMediaType dialog
 
 IMPLEMENT_DYNAMIC(CSelectMediaType, CCmdUIDialog)
-CSelectMediaType::CSelectMediaType(CAtlArray<GUID>& guids, GUID guid, CWnd* pParent /*=NULL*/)
+CSelectMediaType::CSelectMediaType(CAtlArray<GUID>& guids, GUID guid, CWnd* pParent)
 	: CCmdUIDialog(CSelectMediaType::IDD, pParent)
 	, m_guids(guids), m_guid(guid)
 {

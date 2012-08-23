@@ -25,7 +25,6 @@
 
 #include "../../Subtitles/TextFile.h"
 
-
 // CSaveTextFileDialog
 
 class CSaveTextFileDialog : public CFileDialog

@@ -29,7 +29,6 @@
 
 #undef SubclassWindow
 
-
 // CShaderLabelComboBox
 
 BEGIN_MESSAGE_MAP(CShaderLabelComboBox, CComboBox)

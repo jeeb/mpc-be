@@ -26,7 +26,6 @@
 #include <afxwin.h>
 #include <ResizableLib/ResizableDialog.h>
 
-
 // CRegFilterChooserDlg dialog
 
 class CRegFilterChooserDlg : public CResizableDialog

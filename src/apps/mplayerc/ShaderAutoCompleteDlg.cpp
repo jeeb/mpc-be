@@ -25,10 +25,9 @@
 #include "mplayerc.h"
 #include "ShaderAutoCompleteDlg.h"
 
-
 // CShaderAutoCompleteDlg dialog
 
-CShaderAutoCompleteDlg::CShaderAutoCompleteDlg(CWnd* pParent /*=NULL*/)
+CShaderAutoCompleteDlg::CShaderAutoCompleteDlg(CWnd* pParent)
 	: CResizableDialog(CShaderAutoCompleteDlg::IDD, pParent)
 {
 	m_text[0] = 0;

@@ -31,7 +31,6 @@
 
 using namespace DSObjects;
 
-
 //
 // CQuicktimeGraph
 //
@@ -153,7 +152,6 @@ STDMETHODIMP CQuicktimeGraph::Stop()
 
 STDMETHODIMP CQuicktimeGraph::GetState(LONG msTimeout, OAFilterState* pfs)
 {
-	// TODO: this seems to deadlock when opening from the net
 	return pfs ? *pfs = m_wndDestFrame.GetState(), S_OK : E_POINTER;
 }
 
@@ -397,8 +395,7 @@ void CQuicktimeWindow::ProcessMovieEvent(unsigned int message, unsigned int wPar
 		return;
 	}
 
-	// Convert the Windows event to a QTML event
-	MSG				theMsg;
+	MSG			theMsg;
 	EventRecord		macEvent;
 	LONG			thePoints = GetMessagePos();
 
@@ -410,10 +407,8 @@ void CQuicktimeWindow::ProcessMovieEvent(unsigned int message, unsigned int wPar
 	theMsg.pt.x = LOWORD(thePoints);
 	theMsg.pt.y = HIWORD(thePoints);
 
-	// tranlate a windows event to a mac event
 	WinEventToMacEvent(&theMsg, &macEvent);
 
-	// Pump messages as mac event
 	MCIsPlayerEvent(theMC, (const EventRecord*)&macEvent);
 }
 
@@ -463,7 +458,6 @@ bool CQuicktimeWindow::OpenMovie(CString fn)
 	CComQIPtr<IQTVideoSurface> pQTVS = (IUnknown*)(INonDelegatingUnknown*)m_pGraph;
 
 	if (!pQTVS) {
-		// Set the port
 		SetGWorld((CGrafPtr)GetHWNDPort(m_hWnd), NULL);
 	}
 
@@ -493,11 +487,9 @@ bool CQuicktimeWindow::OpenMovie(CString fn)
 		WideCharToMultiByte(GetACP(), 0, fn, -1, buff+1, _MAX_PATH-1, 0, 0);
 		buff[0] = strlen(buff+1);
 
-		// Make a FSSpec with a pascal string filename
 		FSSpec sfFile;
 		FSMakeFSSpec(0, 0L, (BYTE*)buff, &sfFile);
 
-		// Open the movie file
 		short movieResFile;
 		OSErr err = OpenMovieFile(&sfFile, &movieResFile, fsRdPerm);
 		if (err == noErr) {
@@ -643,7 +635,6 @@ int CQuicktimeWindow::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CComQIPtr<IQTVideoSurface> pQTVS = (IUnknown*)(INonDelegatingUnknown*)m_pGraph;
 
 	if (!pQTVS) {
-		// Create GrafPort <-> HWND association
 		CreatePortAssociation(m_hWnd, NULL, 0);
 	}
 
@@ -654,13 +645,11 @@ void CQuicktimeWindow::OnDestroy()
 {
 	CPlayerWindow::OnDestroy();
 
-	// close any movies	before destroying PortAssocation
 	CloseMovie();
 
 	CComQIPtr<IQTVideoSurface> pQTVS = (IUnknown*)(INonDelegatingUnknown*)m_pGraph;
 
 	if (!pQTVS) {
-		// Destroy the view's GrafPort <-> HWND association
 		if (m_hWnd)
 			if (CGrafPtr windowPort = (CGrafPtr)GetHWNDPort(m_hWnd)) {
 				DestroyPortAssociation(windowPort);
@@ -685,7 +674,6 @@ void CQuicktimeWindow::OnTimer(UINT_PTR nIDEvent)
 						long duration = 0, scale = 1000;
 						OSErr err = QTGetTimeUntilNextTask(&duration, scale);
 
-						// err is 0 but still doesn't seem to work... returns duration=0 always
 						TRACE(_T("%d\n"), duration);
 						KillTimer(m_idEndPoller);
 						m_idEndPoller = SetTimer(m_idEndPoller, duration, NULL);

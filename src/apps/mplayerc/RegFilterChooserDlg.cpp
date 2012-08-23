@@ -28,11 +28,9 @@
 #include "FGFilter.h"
 #include "../../DSUtil/DSUtil.h"
 
-
 // CRegFilterChooserDlg dialog
 
-//IMPLEMENT_DYNAMIC(CRegFilterChooserDlg, CResizableDialog)
-CRegFilterChooserDlg::CRegFilterChooserDlg(CWnd* pParent /*=NULL*/)
+CRegFilterChooserDlg::CRegFilterChooserDlg(CWnd* pParent)
 	: CResizableDialog(CRegFilterChooserDlg::IDD, pParent)
 {
 }
@@ -40,6 +38,7 @@ CRegFilterChooserDlg::CRegFilterChooserDlg(CWnd* pParent /*=NULL*/)
 CRegFilterChooserDlg::~CRegFilterChooserDlg()
 {
 	POSITION pos = m_filters.GetHeadPosition();
+
 	while (pos) {
 		delete m_filters.GetNext(pos);
 	}
@@ -48,6 +47,7 @@ CRegFilterChooserDlg::~CRegFilterChooserDlg()
 void CRegFilterChooserDlg::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Control(pDX, IDC_LIST2, m_list);
 }
 
@@ -65,7 +65,6 @@ void CRegFilterChooserDlg::AddToList(IMoniker* pMoniker)
 
 }
 
-
 BEGIN_MESSAGE_MAP(CRegFilterChooserDlg, CResizableDialog)
 	ON_LBN_DBLCLK(IDC_LIST1, OnLbnDblclkList1)
 	ON_UPDATE_COMMAND_UI(IDOK, OnUpdateOK)
@@ -73,7 +72,6 @@ BEGIN_MESSAGE_MAP(CRegFilterChooserDlg, CResizableDialog)
 	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedButton1)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST2, OnNMDblclkList2)
 END_MESSAGE_MAP()
-
 
 // CRegFilterChooserDlg message handlers
 
@@ -103,8 +101,7 @@ BOOL CRegFilterChooserDlg::OnInitDialog()
 
 	SetMinTrackSize(CSize(300,100));
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 void CRegFilterChooserDlg::OnLbnDblclkList1()

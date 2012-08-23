@@ -31,7 +31,6 @@
 
 using namespace DSObjects;
 
-
 void DSObjects::ExtractRects(REGION* pRegion)
 {
 	LPRGNDATA lpRgnData;
@@ -44,7 +43,7 @@ void DSObjects::ExtractRects(REGION* pRegion)
 
 	PN_VECTOR_DELETE(pRegion->rects);
 
-	pRegion->numRects		= lpRgnData->rdh.nCount;
+	pRegion->numRects	= lpRgnData->rdh.nCount;
 	pRegion->extents.left	= lpRgnData->rdh.rcBound.left;
 	pRegion->extents.top	= lpRgnData->rdh.rcBound.top;
 	pRegion->extents.right	= lpRgnData->rdh.rcBound.right;
@@ -52,8 +51,6 @@ void DSObjects::ExtractRects(REGION* pRegion)
 
 	if (lpRgnData->rdh.nCount) {
 		pRegion->rects = DNew PNxRect[lpRgnData->rdh.nCount];
-
-		// now extract the information.
 
 		for (int j = 0; j < (int) lpRgnData->rdh.nCount; j++) {
 			RECT* pRect = (RECT*)lpRgnData->Buffer;
@@ -307,7 +304,7 @@ void CRealMediaWindowlessSite::SetInternalZOrder(INT32 lZOrder)
 
 STDMETHODIMP CRealMediaWindowlessSite::EventOccurred(PNxEvent* /*IN*/ pEvent)
 {
-	return PNR_NOTIMPL;  /* not necessary within our implementation */
+	return PNR_NOTIMPL;
 }
 
 STDMETHODIMP_(PNxWindow*) CRealMediaWindowlessSite::GetParentWindow()
@@ -489,7 +486,6 @@ STDMETHODIMP CRealMediaWindowlessSite::DamageRegion(PNxRegion region)
 
 STDMETHODIMP CRealMediaWindowlessSite::ForceRedraw()
 {
-	// make sure we have a visible window and are not re-entering and we have damage
 	if (!m_fInRedraw && m_fDamaged && m_fIsVisible) {
 		m_fInRedraw = TRUE;
 
@@ -639,9 +635,6 @@ STDMETHODIMP CRealMediaWindowlessSite::BeginOptimizedBlt(RMABitmapInfoHeader* /*
 {
 	if (memcmp(&m_bitmapInfo, pBitmapInfo, sizeof(RMABitmapInfoHeader))) {
 		memcpy(&m_bitmapInfo, pBitmapInfo, sizeof(RMABitmapInfoHeader));
-
-		// format of image has changed somehow.
-		// do something here if this affects you.
 	}
 
 	/*
@@ -682,12 +675,9 @@ STDMETHODIMP CRealMediaWindowlessSite::OptimizedBlt(UCHAR* /*IN*/ pImageBits, RE
 	for (int i = 0; i < pRegion->numRects; i++) {
 		PNxRect* pRect = pRegion->rects+i;
 
-		// intersect the dest rect with the rect from the
-		// region to get the final dest rect.
 		PNxRect finalDestRect;
 		IntersectRect(&adjustedDestRect, pRect, &finalDestRect);
 
-		// now compute the src rect for this blt.
 		double xStretch = (double) (rDestRect.right - rDestRect.left) / (double) (rSrcRect.right - rSrcRect.left);
 		double yStretch = (double) (rDestRect.bottom - rDestRect.top) / (double) (rSrcRect.bottom - rSrcRect.top);
 

@@ -27,7 +27,6 @@
 #include <afxwin.h>
 #include <ResizableLib/ResizableDialog.h>
 
-
 // CSaveDlg dialog
 
 class CSaveDlg : public CCmdUIDialog

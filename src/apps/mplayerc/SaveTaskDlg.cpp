@@ -124,7 +124,7 @@ HRESULT CSaveTaskDlg::InitFileCopy()
 		CComPtr<IUnknown> pUnk;
 		pUnk.CoCreateInstance(CLSID_URLReader);
 
-		if (CComQIPtr<IBaseFilter> pSrc = pUnk) { // url reader has to be in the graph to load the file
+		if (CComQIPtr<IBaseFilter> pSrc = pUnk) {
 			pGB->AddFilter(pSrc, fnw);
 
 			if (FAILED(hr) || !(pReader = pUnk) || FAILED(hr = pReader->Load(fnw, NULL))) {

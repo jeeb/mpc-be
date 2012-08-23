@@ -25,7 +25,6 @@
 #include "mplayerc.h"
 #include "StaticLink.h"
 
-
 // CStaticLink
 
 COLORREF CStaticLink::g_colorUnvisited = RGB(0,0,255);

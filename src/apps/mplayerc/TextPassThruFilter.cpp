@@ -88,8 +88,6 @@ public:
 	}
 };
 
-///////////
-
 CTextPassThruInputPin::CTextPassThruInputPin(CTextPassThruFilter* pTPTFilter, CCritSec* pLock, CCritSec* pSubLock, HRESULT* phr)
 	: CSubtitleInputPin(pTPTFilter, pLock, pSubLock, phr)
 	, m_pTPTFilter(pTPTFilter)
@@ -149,8 +147,6 @@ HRESULT CTextPassThruInputPin::CompleteConnect(IPin* pReceivePin)
 	}
 	return m_pTPTFilter->ReconnectPin(m_pTPTFilter->m_pOutput, &m_mt);
 }
-
-//
 
 CTextPassThruOutputPin::CTextPassThruOutputPin(CTextPassThruFilter* pTPTFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseOutputPin(NAME(""), pTPTFilter, pLock, phr, L"Out")

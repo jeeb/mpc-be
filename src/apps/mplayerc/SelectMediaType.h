@@ -26,7 +26,6 @@
 #include <afxwin.h>
 #include <ResizableLib/ResizableDialog.h>
 
-
 // CSelectMediaType dialog
 
 class CSelectMediaType : public CCmdUIDialog
