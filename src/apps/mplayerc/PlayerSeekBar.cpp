@@ -418,10 +418,10 @@ void CPlayerSeekBar::OnPaint()
 
 						int x = r.left + (int)((m_start < m_stop) ? (__int64)r.Width() * (pFrame->chaptersarray[idx]/*.rtChapter*/ - m_start) / (m_stop - m_start) : 0);
 			
-						//	можно вместо рисования руками иконку как маркер подтянуть
-						//	HICON appIcon = (HICON)::LoadImage(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MARKERS), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
-						//	::DrawIconEx(memdc, x, rc2.top + 10, appIcon, 0,0, 0, NULL, DI_NORMAL);
-						//	::DestroyIcon(appIcon);
+						// можно вместо рисования руками иконку как маркер подтянуть
+						// HICON appIcon = (HICON)::LoadImage(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MARKERS), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
+						// ::DrawIconEx(memdc, x, rc2.top + 10, appIcon, 0,0, 0, NULL, DI_NORMAL);
+						// ::DestroyIcon(appIcon);
 
 						ThemeRGB(255, 255, 255, R, G, B);
 						CPen penPlayed2(PS_SOLID, 0, RGB(R,G,B));
@@ -430,7 +430,7 @@ void CPlayerSeekBar::OnPaint()
 						memdc.MoveTo(x, rc2.top + 14);
 						memdc.LineTo(x, rc2.bottom - 2);
 						memdc.MoveTo(x - 1, rc2.bottom - 2);
-						memdc.LineTo(x + 2, rc2.bottom - 2);	
+						memdc.LineTo(x + 2, rc2.bottom - 2);
  					}
 				}
 			}
@@ -441,20 +441,20 @@ void CPlayerSeekBar::OnPaint()
 			ThemeRGB(135, 140, 145, R, G, B);
 			memdc.SetTextColor(RGB(R,G,B));
 			font2.CreateFont(
-							13,				// nHeight
-							0,				// nWidth
-							0,				// nEscapement
-							0,				// nOrientation
-							FW_NORMAL,			// nWeight
-							FALSE,				// bItalic
-							FALSE,				// bUnderline
-							0,				// cStrikeOut
-							ANSI_CHARSET,			// nCharSet
-							OUT_RASTER_PRECIS,		// nOutPrecision
-							CLIP_DEFAULT_PRECIS,		// nClipPrecision
-							ANTIALIASED_QUALITY,        	// nQuality
-							VARIABLE_PITCH | FF_MODERN, 	// nPitchAndFamily
-							_T("Tahoma")                	// lpszFacename
+							13,           // nHeight
+							0,            // nWidth
+							0,            // nEscapement
+							0,            // nOrientation
+							FW_NORMAL,    // nWeight
+							FALSE,        // bItalic
+							FALSE,        // bUnderline
+							0,            // cStrikeOut
+							ANSI_CHARSET, // nCharSet
+							OUT_RASTER_PRECIS,          // nOutPrecision
+							CLIP_DEFAULT_PRECIS,        // nClipPrecision
+							ANTIALIASED_QUALITY,        // nQuality
+							VARIABLE_PITCH | FF_MODERN, // nPitchAndFamily
+							_T("Tahoma")                // lpszFacename
 							);
 
 			CFont* oldfont2 = memdc.SelectObject(&font2);
@@ -464,7 +464,7 @@ void CPlayerSeekBar::OnPaint()
 				rt.left = rc.left+6;
 				rt.top = rc.top - 2;
 				if (!s.bStatusBarIsVisible) rt.right = rc.right - 150;
-				memdc.DrawText(str, str.GetLength(), &rt, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
+				memdc.DrawText(str, str.GetLength(), &rt, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS|DT_NOPREFIX);
 	
 				ThemeRGB(205, 210, 215, R, G, B);
 				memdc.SetTextColor(RGB(R,G,B));
@@ -476,17 +476,17 @@ void CPlayerSeekBar::OnPaint()
 
 				if (nposx > rt.right-15) {
 					rt2.right = rt.right;
-					memdc.DrawText(str, str.GetLength(), &rt2, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
+					memdc.DrawText(str, str.GetLength(), &rt2, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS|DT_NOPREFIX);
 				} else {
 					rt2.right = nposx;
-					memdc.DrawText(str, str.GetLength(), &rt2, DT_LEFT|DT_VCENTER|DT_SINGLELINE);
+					memdc.DrawText(str, str.GetLength(), &rt2, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX);
 				}
 			}
 
 			if (!s.bStatusBarIsVisible) {
 				CString strT = s.strTimeOnSeekBar;
 				CRect rT = rc;
-				rT.left = rc.right - 140;
+				rT.left  = rc.right - 140;
 				rT.right = rc.right - 6;
 				ThemeRGB(200, 205, 210, R, G, B);
 				memdc.SetTextColor(RGB(R,G,B));
@@ -500,10 +500,10 @@ void CPlayerSeekBar::OnPaint()
 		m_bmPaint.DeleteObject();
 	} else {
 		COLORREF
-		white	= GetSysColor(COLOR_WINDOW),
-		shadow	= GetSysColor(COLOR_3DSHADOW),
-		light	= GetSysColor(COLOR_3DHILIGHT),
-		bkg	= GetSysColor(COLOR_BTNFACE);
+		white  = GetSysColor(COLOR_WINDOW),
+		shadow = GetSysColor(COLOR_3DSHADOW),
+		light  = GetSysColor(COLOR_3DHILIGHT),
+		bkg    = GetSysColor(COLOR_BTNFACE);
 
 		// thumb
 		{
@@ -620,7 +620,7 @@ void CPlayerSeekBar::OnRButtonDown(UINT nFlags, CPoint point)
 
 		CRect rc = GetChannelRect();
 		CRect rT = rc;
-		rT.left = rc.right - 140;
+		rT.left  = rc.right - 140;
 		rT.right = rc.right - 6;
 		CPoint p;
 		GetCursorPos(&p);
@@ -798,8 +798,8 @@ void CPlayerSeekBar::UpdateToolTipPosition(CPoint& point)
 	if (pFrame->CanPreviewUse()) {
 		CRect Rect;
 		pFrame->m_wndView2.GetWindowRect(Rect);
-		int r_width		= Rect.Width();
-		int r_height	= Rect.Height();
+		int r_width  = Rect.Width();
+		int r_height = Rect.Height();
 
 		MONITORINFO mi;
 		mi.cbSize = sizeof(MONITORINFO);
