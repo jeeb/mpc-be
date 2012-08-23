@@ -25,7 +25,6 @@
 
 #include <ResizableLib/ResizableDialog.h>
 
-
 // CFavoriteAddDlg dialog
 
 class CFavoriteAddDlg : public CCmdUIDialog

@@ -25,7 +25,6 @@
 #include "BaseGraph.h"
 #include "../../DSUtil/DSUtil.h"
 
-
 //
 // CPlayerWindow
 //
@@ -37,8 +36,7 @@ BOOL CPlayerWindow::PreCreateWindow(CREATESTRUCT& cs)
 	}
 
 	cs.style &= ~WS_BORDER;
-	cs.lpszClass = AfxRegisterWndClass(CS_HREDRAW|CS_VREDRAW|CS_DBLCLKS,
-									   ::LoadCursor(NULL, IDC_HAND), NULL, NULL);
+	cs.lpszClass = AfxRegisterWndClass(CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS, ::LoadCursor(NULL, IDC_HAND), NULL, NULL);
 
 	return TRUE;
 }
@@ -50,6 +48,7 @@ END_MESSAGE_MAP()
 BOOL CPlayerWindow::OnEraseBkgnd(CDC* pDC)
 {
 	for (CWnd* pChild = GetWindow(GW_CHILD); pChild; pChild = pChild->GetNextWindow()) {
+
 		if (!pChild->IsWindowVisible()) {
 			continue;
 		}

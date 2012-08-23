@@ -20,17 +20,9 @@
  *
  */
 
-// MPCTestAPI.h : main header file for the MPCTestAPI application
-//
-
 #pragma once
 
-#include "resource.h" // main symbols
-
-/////////////////////////////////////////////////////////////////////////////
-// CRegisterCopyDataApp:
-// See MPCTestAPI.cpp for the implementation of this class
-//
+#include "resource.h"
 
 class CRegisterCopyDataApp : public CWinApp
 {

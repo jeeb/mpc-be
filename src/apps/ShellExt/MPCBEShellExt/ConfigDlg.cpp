@@ -44,7 +44,6 @@ void CConfigDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_MPCCOMBO, m_MPCPath);
 }
 
-
 BEGIN_MESSAGE_MAP(CConfigDlg, CDialog)
 	ON_BN_CLICKED(IDOK, &CConfigDlg::OnBnClickedOk)
 	ON_BN_CLICKED(IDCANCEL, &CConfigDlg::OnBnClickedCancel)
@@ -66,7 +65,6 @@ void CConfigDlg::OnBnClickedOk()
 
 void CConfigDlg::OnBnClickedCancel()
 {
-	// TODO: Add your control notification handler code here
 	OnCancel();
 }
 

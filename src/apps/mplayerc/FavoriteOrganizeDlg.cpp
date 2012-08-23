@@ -26,11 +26,10 @@
 #include "MainFrm.h"
 #include "FavoriteOrganizeDlg.h"
 
-
 // CFavoriteOrganizeDlg dialog
 
 //IMPLEMENT_DYNAMIC(CFavoriteOrganizeDlg, CResizableDialog)
-CFavoriteOrganizeDlg::CFavoriteOrganizeDlg(CWnd* pParent /*=NULL*/)
+CFavoriteOrganizeDlg::CFavoriteOrganizeDlg(CWnd* pParent)
 	: CResizableDialog(CFavoriteOrganizeDlg::IDD, pParent)
 {
 }
@@ -132,7 +131,7 @@ BOOL CFavoriteOrganizeDlg::OnInitDialog()
 
 	m_tab.InsertItem(0, ResStr(IDS_FAVFILES));
 	m_tab.InsertItem(1, ResStr(IDS_FAVDVDS));
-	//	m_tab.InsertItem(2, ResStr(IDS_FAVDEVICES));
+	// m_tab.InsertItem(2, ResStr(IDS_FAVDEVICES));
 	m_tab.SetCurSel(0);
 
 	m_list.InsertColumn(0, _T(""));
@@ -160,9 +159,7 @@ BOOL CFavoriteOrganizeDlg::OnInitDialog()
 
 BOOL CFavoriteOrganizeDlg::PreTranslateMessage(MSG* pMsg)
 {
-	// Inhibit default handling for the Enter key when the list has the focus and an item is selected.
-	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN
-			&& pMsg->hwnd == m_list.GetSafeHwnd() && m_list.GetSelectedCount() > 0) {
+	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN && pMsg->hwnd == m_list.GetSafeHwnd() && m_list.GetSelectedCount() > 0) {
 		return FALSE;
 	}
 

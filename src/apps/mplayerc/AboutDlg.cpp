@@ -32,7 +32,7 @@ CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD), m_appname(_T(""))
 	, m_MPCCompiler(_T(""))
 	, m_FFmpegCompiler(_T(""))
 {
-	m_hIcon = (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
+	m_hIcon = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
 }
 
 CAboutDlg::~CAboutDlg()
@@ -103,7 +103,7 @@ BOOL CAboutDlg::OnInitDialog()
 	}
 
 	if ( m_hIcon != NULL ) {
-		CStatic *pStat=(CStatic *)GetDlgItem(IDC_MAINFRAME_ICON);
+		CStatic *pStat=(CStatic*)GetDlgItem(IDC_MAINFRAME_ICON);
 		pStat->SetIcon(m_hIcon);
 	}
 
@@ -139,7 +139,7 @@ END_MESSAGE_MAP()
 
 void CAboutDlg::OnHomepage(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	ShellExecute(m_hWnd, _T("open"), _T("http://sourceforge.net/p/mpcbe/"), NULL, NULL, SW_SHOWDEFAULT);
+	ShellExecute(m_hWnd, _T("open"), _T(MPC_VERSION_COMMENTS), NULL, NULL, SW_SHOWDEFAULT);
 
 	*pResult = 0;
 }

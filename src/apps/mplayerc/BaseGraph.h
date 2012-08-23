@@ -25,7 +25,6 @@
 
 #include "IGraphBuilder2.h"
 
-
 class CPlayerWindow : public CWnd
 {
 public:

@@ -25,7 +25,6 @@
 #include <math.h>
 #include "jpeg.h"
 
-
 bool CJpegEncoder::PutBit(int b, int n)
 {
 	if (n > 24 || n <= 0) {
@@ -61,8 +60,6 @@ void CJpegEncoder::Flush()
 	m_bbuff = m_bwidth = 0;
 }
 
-///////
-
 int CJpegEncoder::GetBitWidth(short q)
 {
 	if (q == 0) {
@@ -78,8 +75,6 @@ int CJpegEncoder::GetBitWidth(short q)
 	}
 	return(width);
 }
-
-///////
 
 void CJpegEncoder::WriteSOI()
 {
@@ -111,26 +106,26 @@ void CJpegEncoder::WriteSOF0()
 	PutByte(size>>8);
 	PutByte(size&0xff);
 
-	PutByte(8); // precision
+	PutByte(8);
 
 	PutByte(m_h>>8);
 	PutByte(m_h&0xff);
 	PutByte(m_w>>8);
 	PutByte(m_w&0xff);
 
-	PutByte(ColorComponents); // color components
+	PutByte(ColorComponents);
 
-	PutByte(1); // component id
-	PutByte(0x11); // hor | ver sampling factor
-	PutByte(0); // quant. tbl. id
+	PutByte(1);
+	PutByte(0x11);
+	PutByte(0);
 
-	PutByte(2); // component id
-	PutByte(0x11); // hor | ver sampling factor
-	PutByte(1); // quant. tbl. id
+	PutByte(2);
+	PutByte(0x11);
+	PutByte(1);
 
-	PutByte(3); // component id
-	PutByte(0x11); // hor | ver sampling factor
-	PutByte(1); // quant. tbl. id
+	PutByte(3);
+	PutByte(0x11);
+	PutByte(1);
 }
 
 void CJpegEncoder::WriteDHT()
@@ -142,23 +137,23 @@ void CJpegEncoder::WriteDHT()
 	PutByte(size>>8);
 	PutByte(size&0xff);
 
-	PutByte(0x00); // tbl class (DC) | tbl id
+	PutByte(0x00);
 	PutBytes(DCVLC_NumByLength[0], 16);
 	for (int i = 0; i < 12; i++) {
 		PutByte(i);
 	}
 
-	PutByte(0x01); // tbl class (DC) | tbl id
+	PutByte(0x01);
 	PutBytes(DCVLC_NumByLength[1], 16);
 	for (int i = 0; i < 12; i++) {
 		PutByte(i);
 	}
 
-	PutByte(0x10); // tbl class (AC) | tbl id
+	PutByte(0x10);
 	PutBytes(ACVLC_NumByLength[0], 16);
 	PutBytes(ACVLC_Data[0], sizeof(ACVLC_Data[0]));
 
-	PutByte(0x11); // tbl class (AC) | tbl id
+	PutByte(0x11);
 	PutBytes(ACVLC_NumByLength[1], 16);
 	PutBytes(ACVLC_Data[1], sizeof(ACVLC_Data[1]));
 }
@@ -172,25 +167,24 @@ void CJpegEncoder::WriteSOS()
 	PutByte(size>>8);
 	PutByte(size&0xff);
 
-	PutByte(ColorComponents); // color components: 3
+	PutByte(ColorComponents);
 
-	PutByte(1); // component id
-	PutByte(0x00); // DC | AC huff tbl
+	PutByte(1);
+	PutByte(0x00);
 
-	PutByte(2); // component id
-	PutByte(0x11); // DC | AC huff tbl
+	PutByte(2);
+	PutByte(0x11);
 
-	PutByte(3); // component id
-	PutByte(0x11); // DC | AC huff tbl
+	PutByte(3);
+	PutByte(0x11);
 
-	PutByte(0); // ss, first AC
-	PutByte(63); // se, last AC
+	PutByte(0);
+	PutByte(63);
 
-	PutByte(0); // ah | al
+	PutByte(0);
 
 	static float cosuv[8][8][8][8];
 
-	// oh yeah, we don't need no fast dct :)
 	for (int v = 0; v < 8; v++)
 		for (int u = 0; u < 8; u++)
 			for (int j = 0; j < 8; j++)
@@ -218,11 +212,7 @@ void CJpegEncoder::WriteSOS()
 					BYTE v = zigzagV[zigzag];
 
 					float F = 0;
-					/*
-										for (int j = 0; j < jj; j++)
-											for (int i = 0; i < ii; i++)
-												F += (signed char)m_p[((y+j)*m_w + (x+i))*4 + c] * cosuv[v][u][j][i];
-					*/
+
 					for (int j = 0; j < jj; j++) {
 						signed char* p = (signed char*)&m_p[((y+j)*m_w + x)*4 + c];
 						for (int i = 0; i < ii; i++, p += 4) {
@@ -289,8 +279,6 @@ void CJpegEncoder::WriteEOI()
 	PutByte(0xd9);
 }
 
-//
-
 CJpegEncoder::CJpegEncoder()
 {
 }
@@ -303,7 +291,7 @@ bool CJpegEncoder::Encode(const BYTE* dib)
 
 	int bpp = bi->bmiHeader.biBitCount;
 
-	if (bpp != 16 && bpp != 24 && bpp != 32) { // 16 & 24 not tested!!! there may be some alignment problems when the row size is not 4*something in bytes
+	if (bpp != 16 && bpp != 24 && bpp != 32) { // 16 & 24 not tested
 		return false;
 	}
 
@@ -340,7 +328,7 @@ bool CJpegEncoder::Encode(const BYTE* dib)
 	if (quanttbl[0][0] == 16) {
 		for (int i = 0; i < _countof(quanttbl); i++)
 			for (int j = 0; j < _countof(quanttbl[0]); j++) {
-				quanttbl[i][j] >>= 2;    // the default quantization table contains a little too large values
+				quanttbl[i][j] >>= 2;
 			}
 	}
 
@@ -355,8 +343,6 @@ bool CJpegEncoder::Encode(const BYTE* dib)
 
 	return true;
 }
-
-//////////
 
 CJpegEncoderFile::CJpegEncoderFile(LPCTSTR fn)
 {
@@ -385,15 +371,13 @@ bool CJpegEncoderFile::Encode(const BYTE* dib)
 	return ret;
 }
 
-//////////
-
 CJpegEncoderMem::CJpegEncoderMem()
 {
 }
 
 bool CJpegEncoderMem::PutByte(BYTE b)
 {
-	m_pdata->Add(b); // yeah... a bit unbuffered, for now
+	m_pdata->Add(b);
 	return true;
 }
 

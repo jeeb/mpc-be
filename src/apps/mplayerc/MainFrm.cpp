@@ -345,7 +345,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_ONTOP_NEVER, ID_ONTOP_WHILEPLAYINGVIDEO, OnUpdateViewOntop)
 	ON_COMMAND(ID_VIEW_OPTIONS, OnViewOptions)
 
-	// Casimir666
 	ON_UPDATE_COMMAND_UI(ID_VIEW_TEARING_TEST, OnUpdateViewTearingTest)
 	ON_COMMAND(ID_VIEW_TEARING_TEST, OnViewTearingTest)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_DISPLAYSTATS, OnUpdateViewDisplayStats)
@@ -819,7 +818,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		}
 	}
 
-	// Casimir666 : reload Shaders
+	// reload Shaders
 	{
 		CString		strList = s.strShaderList;
 		CString		strRes;
@@ -924,7 +923,7 @@ void CMainFrame::OnClose()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	// Casimir666 : save shaders list
+	// save shaders list
 	{
 		POSITION	pos;
 		CString		strList = "";
@@ -1773,7 +1772,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 					pMS->GetCurrentPosition(&rtNow);
 					pMS->GetDuration(&rtDur);
 
-					// Casimir666 : autosave subtitle sync after play
+					// autosave subtitle sync after play
 					if ((m_nCurSubtitle >= 0) && (m_rtCurSubPos != rtNow)) {
 						if (m_lSubtitleShift != 0) {
 							if (m_wndSubresyncBar.SaveToDisk()) {
@@ -2483,7 +2482,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 				}
 				break;
 			case EC_DVD_TITLE_CHANGE: {
-				// Casimir666 : Save current chapter
+				// Save current chapter
 				DVD_POSITION*	DvdPos = s.CurrentDVDPosition();
 				if (DvdPos) {
 					DvdPos->lTitle = (DWORD)evParam1;
@@ -2702,7 +2701,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 
 				REFERENCE_TIME rtNow = HMSF2RT(*((DVD_HMSF_TIMECODE*)&evParam1), fps);
 
-				// Casimir666 : Save current position in the chapter
+				// Save current position in the chapter
 				DVD_POSITION*	DvdPos = s.CurrentDVDPosition();
 				if (DvdPos) {
 					memcpy (&DvdPos->Timecode, (void*)&evParam1, sizeof(DVD_HMSF_TIMECODE));
@@ -3079,7 +3078,7 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 			//TRACE ("==> SHOW!\n");
 			m_pFullscreenWnd->ShowCursor(true);
 
-			// Casimir666 : hide the cursor if we are not in the DVD menu
+			// hide the cursor if we are not in the DVD menu
 			if ((GetPlaybackMode() == PM_FILE) || (GetPlaybackMode() == PM_DVD)) {
 				KillTimer(TIMER_FULLSCREENMOUSEHIDER);
 				SetTimer(TIMER_FULLSCREENMOUSEHIDER, 2000, NULL);
@@ -9098,7 +9097,7 @@ void CMainFrame::OnNavigateMenuItem(UINT nID)
 				pDVDC->SelectRelativeButton(DVD_Relative_Lower);
 				break;
 			case 4:
-				if (m_iDVDDomain != DVD_DOMAIN_Title) {	// Casimir666 : for the remote control
+				if (m_iDVDDomain != DVD_DOMAIN_Title) {	// for the remote control
 					pDVDC->ActivateButton();
 				} else {
 					OnPlayPlay();
@@ -9860,7 +9859,7 @@ void CMainFrame::SetDefaultFullscreenState()
 		AfxGetAppSettings().nCLSwitches &= ~CLSW_FULLSCREEN;
 		m_fFirstFSAfterLaunchOnFS = true;
 	} else if (s.fRememberWindowSize && s.fRememberWindowPos && !m_fFullScreen && s.fLastFullScreen) {
-		// Casimir666 : if fullscreen was on, put it on back
+		// if fullscreen was on, put it on back
 		ToggleFullscreen(true, true);
 	}
 }
@@ -12828,7 +12827,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			OnTimer(TIMER_STREAMPOSPOLLER2);
 		}
 
-		// Casimir666 : audio selection should be done before running the graph to prevent an
+		// audio selection should be done before running the graph to prevent an
 		// unnecessary seek when a file is opened (PostMessage ID_AUDIO_SUBITEM_START removed)
 		CComQIPtr<IAMStreamSelect> pSS = FindFilter(__uuidof(CAudioSwitcherFilter), pGB);
 		if (!pSS) {

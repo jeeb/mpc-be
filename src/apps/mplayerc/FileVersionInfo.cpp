@@ -61,7 +61,7 @@ BOOL CFileVersionInfo::GetTranslationId(LPVOID lpData, UINT unBlockSize, WORD wL
 	return FALSE;
 }
 
-BOOL CFileVersionInfo::Create(HMODULE hModule /*= NULL*/)
+BOOL CFileVersionInfo::Create(HMODULE hModule)
 {
 	CString	strPath;
 
@@ -90,7 +90,6 @@ BOOL CFileVersionInfo::Create(LPCTSTR lpszFileName)
 		if (!GetFileVersionInfo((LPTSTR)lpszFileName, dwHandle, dwFileVersionInfoSize, lpData))
 			throw FALSE;
 
-		// catch default information
 		LPVOID	lpInfo;
 		UINT		unInfoLen;
 		if (VerQueryValue(lpData, _T("\\"), &lpInfo, &unInfoLen))
@@ -100,7 +99,6 @@ BOOL CFileVersionInfo::Create(LPCTSTR lpszFileName)
 				memcpy(&m_FileInfo, lpInfo, unInfoLen);
 		}
 
-		// find best matching language and codepage
 		VerQueryValue(lpData, _T("\\VarFileInfo\\Translation"), &lpInfo, &unInfoLen);
 
 		DWORD	dwLangCode = 0;
@@ -120,7 +118,6 @@ BOOL CFileVersionInfo::Create(LPCTSTR lpszFileName)
 		CString	strSubBlock;
 		strSubBlock.Format(_T("\\StringFileInfo\\%04X%04X\\"), dwLangCode&0x0000FFFF, (dwLangCode&0xFFFF0000)>>16);
 
-		// catch string table
 		if (VerQueryValue(lpData, (LPTSTR)(LPCTSTR)(strSubBlock+_T("CompanyName")), &lpInfo, &unInfoLen))
 			m_strCompanyName = CString((LPCTSTR)lpInfo);
 		if (VerQueryValue(lpData, (LPTSTR)(LPCTSTR)(strSubBlock+_T("FileDescription")), &lpInfo, &unInfoLen))
@@ -230,7 +227,7 @@ DWORD CFileVersionInfo::GetFileSubtype() const
 
 CTime CFileVersionInfo::GetFileDate() const
 {
-	FILETIME	ft;
+	FILETIME ft;
 	ft.dwLowDateTime = m_FileInfo.dwFileDateLS;
 	ft.dwHighDateTime = m_FileInfo.dwFileDateMS;
 	return CTime(ft);

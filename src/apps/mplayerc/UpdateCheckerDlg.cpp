@@ -26,7 +26,7 @@
 
 IMPLEMENT_DYNAMIC(UpdateCheckerDlg, CDialog)
 
-UpdateCheckerDlg::UpdateCheckerDlg(Update_Status updateStatus, const Version& latestVersion, CWnd* pParent /*=NULL*/)
+UpdateCheckerDlg::UpdateCheckerDlg(Update_Status updateStatus, const Version& latestVersion, CWnd* pParent)
 	: CDialog(UpdateCheckerDlg::IDD, pParent), m_updateStatus(updateStatus)
 {
 	switch (updateStatus) {
@@ -37,15 +37,14 @@ UpdateCheckerDlg::UpdateCheckerDlg(Update_Status updateStatus, const Version& la
 			m_text.LoadString(IDS_USING_LATEST_STABLE);
 			break;
 		case UPDATER_NEWER_VERSION:
-			m_text.Format(IDS_USING_NEWER_VERSION,
-						  UpdateChecker::MPC_VERSION.major, UpdateChecker::MPC_VERSION.minor, UpdateChecker::MPC_VERSION.status, UpdateChecker::MPC_VERSION.patch,
-						  latestVersion.major, latestVersion.minor, latestVersion.status, latestVersion.patch);
+			m_text.Format(IDS_USING_NEWER_VERSION, UpdateChecker::MPC_VERSION.major, UpdateChecker::MPC_VERSION.minor, UpdateChecker::MPC_VERSION.status, UpdateChecker::MPC_VERSION.patch,
+						latestVersion.major, latestVersion.minor, latestVersion.status, latestVersion.patch);
 			break;
 		case UPDATER_ERROR:
 			m_text.LoadString(IDS_UPDATE_ERROR);
 			break;
 		default:
-			ASSERT(0); // should never happen
+			ASSERT(0);
 	}
 }
 
@@ -83,7 +82,7 @@ BOOL UpdateCheckerDlg::OnInitDialog()
 			m_cancelButton.SetFocus();
 			break;
 		default:
-			ASSERT(0); // should never happen
+			ASSERT(0);
 	}
 
 	return TRUE;

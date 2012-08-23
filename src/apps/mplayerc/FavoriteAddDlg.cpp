@@ -26,11 +26,10 @@
 #include "FavoriteAddDlg.h"
 #include "SettingsDefines.h"
 
-
 // CFavoriteAddDlg dialog
 
 IMPLEMENT_DYNAMIC(CFavoriteAddDlg, CCmdUIDialog)
-CFavoriteAddDlg::CFavoriteAddDlg(CString shortname, CString fullname, CWnd* pParent /*=NULL*/)
+CFavoriteAddDlg::CFavoriteAddDlg(CString shortname, CString fullname, CWnd* pParent)
 	: CCmdUIDialog(CFavoriteAddDlg::IDD, pParent)
 	, m_shortname(shortname)
 	, m_fullname(fullname)

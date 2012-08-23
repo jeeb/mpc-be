@@ -20,15 +20,10 @@
  *
  */
 
-// MPCTestAPI.cpp : Defines the class behaviors for the application.
-//
-
 #include "stdafx.h"
 #include "MPCTestAPI.h"
 #include "MPCTestAPIDlg.h"
 
-
-/////////////////////////////////////////////////////////////////////////////
 // CRegisterCopyDataApp
 
 BEGIN_MESSAGE_MAP(CRegisterCopyDataApp, CWinApp)
@@ -39,7 +34,6 @@ BEGIN_MESSAGE_MAP(CRegisterCopyDataApp, CWinApp)
 	ON_COMMAND(ID_HELP, CWinApp::OnHelp)
 END_MESSAGE_MAP()
 
-/////////////////////////////////////////////////////////////////////////////
 // CRegisterCopyDataApp construction
 
 CRegisterCopyDataApp::CRegisterCopyDataApp()
@@ -48,12 +42,10 @@ CRegisterCopyDataApp::CRegisterCopyDataApp()
 	// Place all significant initialization in InitInstance
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // The one and only CRegisterCopyDataApp object
 
 CRegisterCopyDataApp theApp;
 
-/////////////////////////////////////////////////////////////////////////////
 // CRegisterCopyDataApp initialization
 
 BOOL CRegisterCopyDataApp::InitInstance()
@@ -79,5 +71,6 @@ BOOL CRegisterCopyDataApp::InitInstance()
 
 	// Since the dialog has been closed, return FALSE so that we exit the
 	//  application, rather than start the application's message pump.
+
 	return FALSE;
 }

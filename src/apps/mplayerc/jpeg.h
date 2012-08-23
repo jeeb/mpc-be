@@ -23,7 +23,6 @@
 
 #pragma once
 
-
 class CJpegEncoder
 {
 	static const int ColorComponents = 3;
@@ -80,8 +79,6 @@ public:
 
 	bool Encode(const BYTE* dib, CAtlArray<BYTE>& data);
 };
-
-/* Tables */
 
 static unsigned char quanttbl[2][64] = {
 	{

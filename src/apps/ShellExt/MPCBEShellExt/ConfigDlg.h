@@ -32,14 +32,14 @@ class CConfigDlg : public CDialog
 	DECLARE_DYNAMIC(CConfigDlg)
 
 public:
-	CConfigDlg(CWnd* pParent = NULL);   // standard constructor
+	CConfigDlg(CWnd* pParent = NULL);
 	virtual ~CConfigDlg();
 
 // Dialog Data
 	enum { IDD = IDD_CONFIGDLG };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 
 	DECLARE_MESSAGE_MAP()

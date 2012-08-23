@@ -27,7 +27,6 @@
 #include <afxwin.h>
 #include <ResizableLib/ResizableDialog.h>
 
-
 // CFavoriteOrganizeDlg dialog
 
 class CFavoriteOrganizeDlg : public CResizableDialog

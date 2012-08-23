@@ -20,14 +20,10 @@
  *
  */
 
-// MPCTestAPIDlg.cpp : implementation file
-//
-
 #include "stdafx.h"
 #include "MPCTestAPI.h"
 #include "MPCTestAPIDlg.h"
 #include <psapi.h>
-
 
 LPCTSTR GetMPCCommandName(MPCAPI_COMMAND nCmd)
 {
@@ -51,7 +47,6 @@ LPCTSTR GetMPCCommandName(MPCAPI_COMMAND nCmd)
 	}
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // CAboutDlg dialog used for App About
 
 class CAboutDlg : public CDialog
@@ -67,7 +62,7 @@ public:
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CAboutDlg)
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	//}}AFX_VIRTUAL
 
 	// Implementation
@@ -98,17 +93,15 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
-
-
-/////////////////////////////////////////////////////////////////////////////
 // CRegisterCopyDataDlg dialog
 
-CRegisterCopyDataDlg::CRegisterCopyDataDlg(CWnd* pParent /*=NULL*/)
+CRegisterCopyDataDlg::CRegisterCopyDataDlg(CWnd* pParent)
 	: CDialog(CRegisterCopyDataDlg::IDD, pParent)
 	, m_strMPCPath(_T(""))
 	, m_txtCommand(_T(""))
 	, m_nCommandType(0)
 	, m_hWndMPC(NULL)
+	, m_RemoteWindow(NULL)
 {
 	//{{AFX_DATA_INIT(CRegisterCopyDataDlg)
 	// NOTE: the ClassWizard will add member initialization here
@@ -141,8 +134,6 @@ BEGIN_MESSAGE_MAP(CRegisterCopyDataDlg, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON_SENDCOMMAND, &CRegisterCopyDataDlg::OnBnClickedButtonSendcommand)
 END_MESSAGE_MAP()
 
-
-/////////////////////////////////////////////////////////////////////////////
 // CRegisterCopyDataDlg message handlers
 
 BOOL CRegisterCopyDataDlg::OnInitDialog()
@@ -196,7 +187,6 @@ BOOL CRegisterCopyDataDlg::OnInitDialog()
 	return TRUE;  // return TRUE unless you set the focus to a control
 }
 
-
 void CRegisterCopyDataDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	if ((nID & 0xFFF0) == IDM_ABOUTBOX) {
@@ -233,14 +223,13 @@ void CRegisterCopyDataDlg::OnPaint()
 	}
 }
 
-
 // The system calls this to obtain the cursor to display while the user drags
 //  the minimized window.
+
 HCURSOR CRegisterCopyDataDlg::OnQueryDragIcon()
 {
 	return (HCURSOR) m_hIcon;
 }
-
 
 void CRegisterCopyDataDlg::OnButtonFindwindow()
 {
@@ -257,7 +246,6 @@ void CRegisterCopyDataDlg::OnButtonFindwindow()
 	CreateProcess(NULL, (LPTSTR)(LPCTSTR)strExec, NULL, NULL, FALSE, 0, NULL, NULL, &StartupInfo, &ProcessInfo);
 }
 
-
 void CRegisterCopyDataDlg::Senddata(MPCAPI_COMMAND nCmd, LPCTSTR strCommand)
 {
 	if (m_hWndMPC) {
@@ -271,7 +259,6 @@ void CRegisterCopyDataDlg::Senddata(MPCAPI_COMMAND nCmd, LPCTSTR strCommand)
 	}
 }
 
-
 BOOL CRegisterCopyDataDlg::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 {
 	CString strMsg;
@@ -284,7 +271,6 @@ BOOL CRegisterCopyDataDlg::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruc
 	m_listBox.InsertString(0, strMsg);
 	return CDialog::OnCopyData(pWnd, pCopyDataStruct);
 }
-
 
 void CRegisterCopyDataDlg::OnBnClickedButtonSendcommand()
 {

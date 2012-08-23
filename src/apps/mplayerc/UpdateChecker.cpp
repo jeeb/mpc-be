@@ -25,7 +25,7 @@
 #include "UpdateChecker.h"
 #include <afxinet.h>
 
-const Version UpdateChecker::MPC_VERSION = { MPC_VERSION_MAJOR, MPC_VERSION_MINOR, MPC_VERSION_STATUS,MPC_VERSION_PATCH };
+const Version UpdateChecker::MPC_VERSION = {MPC_VERSION_MAJOR, MPC_VERSION_MINOR, MPC_VERSION_STATUS, MPC_VERSION_PATCH};
 
 UpdateChecker::UpdateChecker(CString versionFileURL)
 	: versionFileURL(versionFileURL)
@@ -42,11 +42,7 @@ Update_Status UpdateChecker::isUpdateAvailable(const Version& currentVersion)
 
 	try {
 		CInternetSession internet;
-		CHttpFile* versionFile = (CHttpFile*) internet.OpenURL(versionFileURL,
-															   1,
-															   INTERNET_FLAG_TRANSFER_ASCII | INTERNET_FLAG_DONT_CACHE | INTERNET_FLAG_RELOAD,
-															   NULL,
-															   0);
+		CHttpFile* versionFile = (CHttpFile*)internet.OpenURL(versionFileURL, 1, INTERNET_FLAG_TRANSFER_ASCII | INTERNET_FLAG_DONT_CACHE | INTERNET_FLAG_RELOAD, NULL, 0);
 
 		if (versionFile) {
 			CString latestVersionStr;

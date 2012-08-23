@@ -20,16 +20,11 @@
  *
  */
 
-// MPCTestAPIDlg.h : header file
-//
-
 #pragma once
 
 #include "../mplayerc/MpcApi.h"
 #include "HScrollListBox.h"
 
-
-/////////////////////////////////////////////////////////////////////////////
 // CRegisterCopyDataDlg dialog
 
 class CRegisterCopyDataDlg : public CDialog
@@ -37,7 +32,7 @@ class CRegisterCopyDataDlg : public CDialog
 	// Construction
 public:
 	HWND m_RemoteWindow;
-	CRegisterCopyDataDlg(CWnd* pParent = NULL);	// standard constructor
+	CRegisterCopyDataDlg(CWnd* pParent = NULL);
 
 	// Dialog Data
 	//{{AFX_DATA(CRegisterCopyDataDlg)
@@ -48,7 +43,7 @@ public:
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CRegisterCopyDataDlg)
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	//}}AFX_VIRTUAL
 
 	// Implementation
@@ -71,6 +66,6 @@ public:
 	CHScrollListBox m_listBox;
 	CString		m_txtCommand;
 	int			m_nCommandType;
-	afx_msg void OnBnClickedButtonSendcommand();
+	afx_msg		void OnBnClickedButtonSendcommand();
 	void		Senddata(MPCAPI_COMMAND nCmd, LPCTSTR strCommand);
 };

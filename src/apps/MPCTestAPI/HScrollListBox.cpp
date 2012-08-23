@@ -1,21 +1,28 @@
-/////////////////////////////////////////////////////////////////////////////
-// HScrollListBox.cpp : implementation file
-//
-// Copyright (c) 2002, Nebula Technologies, Inc.
-// www.nebutech.com
-//
-// Nebula Technologies, Inc. grants you a royalty free
-// license to use, modify and distribute this code
-// provided that this copyright notice appears on all
-// copies. This code is provided "AS IS," without a
-// warranty of any kind.
-//
-/////////////////////////////////////////////////////////////////////////////
+/*
+ * $Id$
+ *
+ * (C) 2008-2012 see Authors.txt
+ *
+ * This file is part of MPC-BE.
+ *
+ * MPC-BE is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MPC-BE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 #include "stdafx.h"
 #include "HScrollListBox.h"
 
-/////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CHScrollListBox, CListBox)
 	//{{AFX_MSG_MAP(CHScrollListBox)
 	// NOTE - the ClassWizard will add and remove mapping macros here.
@@ -27,19 +34,16 @@ BEGIN_MESSAGE_MAP(CHScrollListBox, CListBox)
 	ON_MESSAGE(LB_RESETCONTENT, OnResetContent)
 END_MESSAGE_MAP()
 
-/////////////////////////////////////////////////////////////////////////////
 // CHScrollListBox
-/////////////////////////////////////////////////////////////////////////////
+
 CHScrollListBox::CHScrollListBox()
 {
 }
 
-/////////////////////////////////////////////////////////////////////////////
 CHScrollListBox::~CHScrollListBox()
 {
 }
 
-/////////////////////////////////////////////////////////////////////////////
 void CHScrollListBox::PreSubclassWindow()
 {
 	CListBox::PreSubclassWindow();
@@ -54,9 +58,8 @@ void CHScrollListBox::PreSubclassWindow()
 #endif
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // CHScrollListBox message handlers
-///////////////////////////////////////////////////////////////////////////////
+
 int CHScrollListBox::GetTextLen(LPCTSTR lpszText)
 {
 	ASSERT(AfxIsValidString(lpszText));
@@ -80,7 +83,6 @@ int CHScrollListBox::GetTextLen(LPCTSTR lpszText)
 	return size.cx;
 }
 
-///////////////////////////////////////////////////////////////////////////////
 void CHScrollListBox::ResetHExtent()
 {
 	if (GetCount() == 0) {
@@ -101,7 +103,6 @@ void CHScrollListBox::ResetHExtent()
 	SetHorizontalExtent(iMaxHExtent);
 }
 
-///////////////////////////////////////////////////////////////////////////////
 void CHScrollListBox::SetNewHExtent(LPCTSTR lpszNewString)
 {
 	int iExt = GetTextLen(lpszNewString);
@@ -110,9 +111,8 @@ void CHScrollListBox::SetNewHExtent(LPCTSTR lpszNewString)
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////////
 // OnAddString: wParam - none, lParam - string, returns - int
-///////////////////////////////////////////////////////////////////////////////
+
 LRESULT CHScrollListBox::OnAddString(WPARAM /*wParam*/, LPARAM lParam)
 {
 	LRESULT lResult = Default();
@@ -122,9 +122,8 @@ LRESULT CHScrollListBox::OnAddString(WPARAM /*wParam*/, LPARAM lParam)
 	return lResult;
 }
 
-///////////////////////////////////////////////////////////////////////////////
 // OnInsertString: wParam - index, lParam - string, returns - int
-///////////////////////////////////////////////////////////////////////////////
+
 LRESULT CHScrollListBox::OnInsertString(WPARAM /*wParam*/, LPARAM lParam)
 {
 	LRESULT lResult = Default();
@@ -134,9 +133,8 @@ LRESULT CHScrollListBox::OnInsertString(WPARAM /*wParam*/, LPARAM lParam)
 	return lResult;
 }
 
-///////////////////////////////////////////////////////////////////////////////
 // OnDeleteString: wParam - index, lParam - none, returns - int
-///////////////////////////////////////////////////////////////////////////////
+
 LRESULT CHScrollListBox::OnDeleteString(WPARAM /*wParam*/, LPARAM /*lParam*/)
 {
 	LRESULT lResult = Default();
@@ -146,9 +144,8 @@ LRESULT CHScrollListBox::OnDeleteString(WPARAM /*wParam*/, LPARAM /*lParam*/)
 	return lResult;
 }
 
-///////////////////////////////////////////////////////////////////////////////
 // OnDir: wParam - attr, lParam - wildcard, returns - int
-///////////////////////////////////////////////////////////////////////////////
+
 LRESULT CHScrollListBox::OnDir(WPARAM /*wParam*/, LPARAM /*lParam*/)
 {
 	LRESULT lResult = Default();
@@ -158,13 +155,11 @@ LRESULT CHScrollListBox::OnDir(WPARAM /*wParam*/, LPARAM /*lParam*/)
 	return lResult;
 }
 
-///////////////////////////////////////////////////////////////////////////////
 // OnResetContent: wParam - none, lParam - none, returns - int
-///////////////////////////////////////////////////////////////////////////////
+
 LRESULT CHScrollListBox::OnResetContent(WPARAM /*wParam*/, LPARAM /*lParam*/)
 {
 	LRESULT lResult = Default();
 	SetHorizontalExtent(0);
 	return lResult;
 }
-

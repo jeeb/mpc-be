@@ -135,7 +135,6 @@ CMPCBEContextMenu::~CMPCBEContextMenu()
 	}
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // CMPCBEShellContextMenu IContextMenu methods
 
 STDMETHODIMP CMPCBEContextMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst, UINT idCmdLast, UINT uFlags)
@@ -164,7 +163,6 @@ STDMETHODIMP CMPCBEContextMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UI
 	else return 0;
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // CMPCBEShellContextMenu IShellExtInit methods
 
 typedef int (__stdcall *StrCmpLogicalWPtr)(LPCWSTR arg1, LPCWSTR arg2);

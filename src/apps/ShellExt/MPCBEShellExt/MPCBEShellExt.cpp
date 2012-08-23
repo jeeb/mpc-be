@@ -45,13 +45,11 @@ STDAPI DllCanUnloadNow(void)
 	return (AfxDllCanUnloadNow()==S_OK && _AtlModule.GetLockCount()==0) ? S_OK : S_FALSE;
 }
 
-
 // Returns a class factory to create an object of the requested type
 STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 {
 	return _AtlModule.DllGetClassObject(rclsid, riid, ppv);
 }
-
 
 // DllRegisterServer - Adds entries to the system registry
 #define	IS_KEY_LEN	256
