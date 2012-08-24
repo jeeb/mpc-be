@@ -83,7 +83,7 @@ BOOL CAboutDlg::OnInitDialog()
 #elif (_M_IX86_FP == 2) // /arch:SSE2 was used
 	m_MPCCompiler += _T(" (SSE2)");
 #endif
-#endif // _M_IX86_FP
+#endif
 #ifdef _DEBUG
 	m_MPCCompiler += _T(" Debug");
 #endif

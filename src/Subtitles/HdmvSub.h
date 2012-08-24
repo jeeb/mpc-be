@@ -43,11 +43,10 @@ public:
 		HDMV_SUB2			= 0x82
 	};
 
-
 	struct VIDEO_DESCRIPTOR {
 		SHORT		nVideoWidth;
 		SHORT		nVideoHeight;
-		BYTE		bFrameRate;		// <= Frame rate here!
+		BYTE		bFrameRate;
 	};
 
 	struct COMPOSITION_DESCRIPTOR {
@@ -67,18 +66,17 @@ public:
 	HRESULT			ParseSample (IMediaSample* pSample);
 	HRESULT			ParseSample (BYTE* pData, int lSampleLen, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 
-
 	POSITION		GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld = false);
 	POSITION		GetNext(POSITION pos) {
 		m_pObjects.GetNext(pos);
 		return pos;
 	};
 
-
 	virtual REFERENCE_TIME	GetStart(POSITION nPos) {
 		CompositionObject*	pObject = m_pObjects.GetAt(nPos);
 		return pObject!=NULL ? pObject->m_rtStart : INVALID_TIME;
 	};
+
 	virtual REFERENCE_TIME	GetStop(POSITION nPos) {
 		CompositionObject*	pObject = m_pObjects.GetAt(nPos);
 		return pObject!=NULL ? pObject->m_rtStop : INVALID_TIME;
@@ -106,7 +104,6 @@ private :
 	int								m_nDefaultPaletteNbEntry;
 
 	int								m_nColorNumber;
-
 
 	int					ParsePresentationSegment(CGolombBuffer* pGBuffer);
 	void				ParsePalette(CGolombBuffer* pGBuffer, USHORT nSize);

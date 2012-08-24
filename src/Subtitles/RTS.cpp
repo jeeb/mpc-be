@@ -27,7 +27,6 @@
 #include <emmintrin.h>
 #include "RTS.h"
 
-// WARNING: this isn't very thread safe, use only one RTS a time. We should use TLS in future.
 static HDC g_hDC;
 static int g_hDC_refcnt = 0;
 
@@ -35,8 +34,6 @@ static long revcolor(long c)
 {
 	return ((c&0xff0000)>>16) + (c&0xff00) + ((c&0xff)<<16);
 }
-
-//////////////////////////////////////////////////////////////////////////////////////////////
 
 // CMyFont
 
@@ -867,7 +864,7 @@ CRect CLine::PaintShadow(SubPicDesc& spd, CRect& clipRect, BYTE* pAlphaMask, CPo
 		CWord* w = GetNext(pos);
 
 		if (w->m_fLineBreak) {
-			return bbox;    // should not happen since this class is just a line of text without any breaks
+			return bbox;
 		}
 
 		if (w->m_style.shadowDepthX != 0 || w->m_style.shadowDepthY != 0) {
@@ -907,7 +904,7 @@ CRect CLine::PaintOutline(SubPicDesc& spd, CRect& clipRect, BYTE* pAlphaMask, CP
 		CWord* w = GetNext(pos);
 
 		if (w->m_fLineBreak) {
-			return bbox;    // should not happen since this class is just a line of text without any breaks
+			return bbox;
 		}
 
 		if (w->m_style.outlineWidthX+w->m_style.outlineWidthY > 0 && !(w->m_ktype == 2 && time < w->m_kstart)) {
@@ -944,7 +941,7 @@ CRect CLine::PaintBody(SubPicDesc& spd, CRect& clipRect, BYTE* pAlphaMask, CPoin
 		CWord* w = GetNext(pos);
 
 		if (w->m_fLineBreak) {
-			return bbox;    // should not happen since this class is just a line of text without any breaks
+			return bbox;
 		}
 
 		int x = p.x;
@@ -964,7 +961,7 @@ CRect CLine::PaintBody(SubPicDesc& spd, CRect& clipRect, BYTE* pAlphaMask, CPoin
 
 		// karaoke
 
-		double t;
+		double t = 0;
 
 		if (w->m_ktype == 0 || w->m_ktype == 2) {
 			t = time < w->m_kstart ? 0 : 1;
@@ -1013,7 +1010,6 @@ CRect CLine::PaintBody(SubPicDesc& spd, CRect& clipRect, BYTE* pAlphaMask, CPoin
 
 	return bbox;
 }
-
 
 // CSubtitle
 
@@ -2143,7 +2139,7 @@ bool CRenderedTextSubtitle::ParseSSATag(CSubtitle* sub, CStringW str, STSStyle& 
 	}
 
 	//	return (nUnrecognizedTags < nTags);
-	return true; // there are ppl keeping coments inside {}, lets make them happy now
+	return true;
 }
 
 bool CRenderedTextSubtitle::ParseHtmlTag(CSubtitle* sub, CStringW str, STSStyle& style, STSStyle& org)
@@ -2294,7 +2290,6 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 		// this RTS has been signaled to ignore embedded styles, use the built-in one
 		stss = *m_pStyleOverride;
 	} else {
-		// find the appropriate embedded style
 		GetStyle(entry, stss);
 	}
 	if (m_ePARCompensationType == EPCTUpscale) {
@@ -2444,8 +2439,6 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 
 	return sub;
 }
-
-//
 
 STDMETHODIMP CRenderedTextSubtitle::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {

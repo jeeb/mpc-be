@@ -95,7 +95,7 @@ HRESULT CHdmvSub::ParseSample(IMediaSample* pSample)
 	return ParseSample(pData, lSampleLen, rtStart, rtStop);
 }
 
-HRESULT CHdmvSub::ParseSample (BYTE* pData, int lSampleLen, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
+HRESULT CHdmvSub::ParseSample(BYTE* pData, int lSampleLen, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
 	HRESULT			hr = S_OK;
 
@@ -214,7 +214,7 @@ int CHdmvSub::ParsePresentationSegment(CGolombBuffer* pGBuffer)
 	return nObjectNumber;
 }
 
-void CHdmvSub::ParsePalette(CGolombBuffer* pGBuffer, USHORT nSize)		// #497
+void CHdmvSub::ParsePalette(CGolombBuffer* pGBuffer, USHORT nSize)
 {
 	int		nNbEntry;
 	BYTE	palette_id				= pGBuffer->ReadByte();
@@ -238,16 +238,15 @@ void CHdmvSub::ParsePalette(CGolombBuffer* pGBuffer, USHORT nSize)		// #497
 	}
 }
 
-void CHdmvSub::ParseObject(CGolombBuffer* pGBuffer, USHORT nUnitSize)	// #498
+void CHdmvSub::ParseObject(CGolombBuffer* pGBuffer, USHORT nUnitSize)
 {
 	SHORT	object_id	= pGBuffer->ReadShort();
 	UNREFERENCED_PARAMETER(object_id);
-	BYTE	m_sequence_desc;
 
 	//ASSERT (m_pCurrentObject != NULL);
 	if (m_pCurrentObject) { // && m_pCurrentObject->m_object_id_ref == object_id)
 		m_pCurrentObject->m_version_number	= pGBuffer->ReadByte();
-		m_sequence_desc						= pGBuffer->ReadByte();
+		BYTE m_sequence_desc				= pGBuffer->ReadByte();
 
 		if (m_sequence_desc & 0x80) {
 			DWORD	object_data_length  = (DWORD)pGBuffer->BitRead(24);
@@ -331,6 +330,7 @@ void CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 HRESULT CHdmvSub::GetTextureSize(POSITION pos, SIZE& MaxTextureSize, SIZE& VideoSize, POINT& VideoTopLeft)
 {
 	CompositionObject* pObject = m_pObjects.GetAt (pos);
+
 	if (pObject) {
 		MaxTextureSize.cx = VideoSize.cx = m_VideoDescriptor.nVideoWidth;
 		MaxTextureSize.cy = VideoSize.cy = m_VideoDescriptor.nVideoHeight;
@@ -355,7 +355,7 @@ void CHdmvSub::Reset()
 	}
 }
 
-CompositionObject*	CHdmvSub::FindObject(REFERENCE_TIME rt)
+CompositionObject* CHdmvSub::FindObject(REFERENCE_TIME rt)
 {
 	POSITION pos = m_pObjects.GetHeadPosition();
 
@@ -374,8 +374,8 @@ CompositionObject*	CHdmvSub::FindObject(REFERENCE_TIME rt)
 
 void CHdmvSub::CleanOld(REFERENCE_TIME rt)
 {
-	// Cleanup old PG
-	CompositionObject*	pObject_old;
+	CompositionObject* pObject_old;
+
 	while (m_pObjects.GetCount()>0) {
 		pObject_old = m_pObjects.GetHead();
 		if (pObject_old->m_rtStop < rt) {

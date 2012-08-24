@@ -165,7 +165,7 @@ STDMETHODIMP CMemSubPic::ClearDirtyRect(DWORD color)
 	for (ptrdiff_t j = 0, h = m_rcDirty.Height(); j < h; j++, p += m_spd.pitch) {
 		int w = m_rcDirty.Width();
 #ifdef _WIN64
-		memsetd(p, color, w*4); // nya
+		memsetd(p, color, w*4);
 #else
 		__asm {
 			mov eax, color
@@ -363,7 +363,6 @@ void AlphaBlt_YUY2_C(int w, int h, BYTE* d, int dstpitch, BYTE* s, int srcpitch)
 	DWORD* d2 = (DWORD*)d;
 	BYTE* s2 = s;
 	BYTE* s2end = s2 + w*4;
-	static const __int64 _8181 = 0x0080001000800010i64;
 
 	for (ptrdiff_t j = 0; j < h; j++, s += srcpitch, d += dstpitch) {
 		for (; s2 < s2end; s2 += 8, d2++) {
@@ -391,7 +390,7 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	}
 
 	const SubPicDesc& src = m_spd;
-	SubPicDesc dst = *pTarget; // copy, because we might modify it
+	SubPicDesc dst = *pTarget;
 
 	if (src.type != dst.type) {
 		return E_INVALIDARG;
@@ -664,7 +663,6 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 			}
 		}
 	}
-
 
 #ifndef _WIN64
 	__asm emms;
