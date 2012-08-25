@@ -26,6 +26,7 @@
 
 inline void* memcpy_sse2(void* dst, const void* src, size_t nBytes)
 {
+#ifndef _WIN64
         __asm
         {
                 // optimized on Intel Core 2 Duo
@@ -333,6 +334,9 @@ end:
         }
 
         return dst;
+#else
+        return memcpy(dst, src, nBytes);
+#endif
 }
 
 inline void* gpu_memcpy(void* d, const void* s, size_t size)
