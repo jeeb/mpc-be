@@ -580,7 +580,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					if (item->GetData()->GetSampleCount()) {
 						vih->AvgTimePerFrame = item->GetData()->GetDurationMs()*10000 / (item->GetData()->GetSampleCount()); 
 					}
-					memcpy(vih + 1, di->GetData(), di->GetDataSize());
+					gpu_memcpy(vih + 1, di->GetData(), di->GetDataSize());
 
 					switch (video_desc->GetObjectTypeId()) {
 						case AP4_MPEG4_VISUAL_OTI:
@@ -601,7 +601,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									mvih->hdr.AvgTimePerFrame	= item->GetData()->GetDurationMs()*10000 / (item->GetData()->GetSampleCount()); 
 								}
 								mvih->cbSequenceHeader			= di->GetDataSize();
-								memcpy(mvih->dwSequenceHeader, di->GetData(), di->GetDataSize());
+								gpu_memcpy(mvih->dwSequenceHeader, di->GetData(), di->GetDataSize());
 								mts.Add(mt);
 								mt.subtype						= FOURCCMap(mvih->hdr.bmiHeader.biCompression = 'V4PM');
 								mts.Add(mt);
@@ -626,7 +626,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									mvih->hdr.AvgTimePerFrame	= item->GetData()->GetDurationMs()*10000 / (item->GetData()->GetSampleCount()); 
 								}
 								mvih->cbSequenceHeader			= di->GetDataSize();
-								memcpy(mvih->dwSequenceHeader, di->GetData(), di->GetDataSize());
+								gpu_memcpy(mvih->dwSequenceHeader, di->GetData(), di->GetDataSize());
 								mts.Add(mt);
 								//b_HasVideo = true;
 							}
@@ -687,7 +687,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					wfe->cbSize				= (WORD)di->GetDataSize();
 					wfe->nBlockAlign		= (WORD)((wfe->nChannels * wfe->wBitsPerSample) / 8);
 
-					memcpy(wfe + 1, di->GetData(), di->GetDataSize());
+					gpu_memcpy(wfe + 1, di->GetData(), di->GetDataSize());
 
 					switch (audio_desc->GetObjectTypeId()) {
 						case AP4_MPEG4_AUDIO_OTI:
@@ -791,7 +791,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								si->dwOffset		= sizeof(SUBTITLEINFO);
 								strcpy_s(si->IsoLang, _countof(si->IsoLang), CStringA(TrackLanguage));
 								wcscpy_s(si->TrackName, _countof(si->TrackName), TrackName);
-								memcpy(si + 1, (LPCSTR)hdr, hdr.GetLength());
+								gpu_memcpy(si + 1, (LPCSTR)hdr, hdr.GetLength());
 								mts.Add(mt);
 							}
 							break;
@@ -826,7 +826,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						si->dwOffset = sizeof(SUBTITLEINFO);
 						strcpy_s(si->IsoLang, _countof(si->IsoLang), CStringA(TrackLanguage));
 						wcscpy_s(si->TrackName, _countof(si->TrackName), TrackName);
-						memcpy(si + 1, (LPCSTR)hdr, hdr.GetLength());
+						gpu_memcpy(si + 1, (LPCSTR)hdr, hdr.GetLength());
 						mts.Add(mt);
 					}
 				}
@@ -894,7 +894,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								ASSERT(0);
 								break;
 							}
-							memcpy(dst, src, len);
+							gpu_memcpy(dst, src, len);
 							src += len;
 							dst += len;
 							mvih->cbSequenceHeader += len;
@@ -975,7 +975,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						if (item->GetData()->GetSampleCount()) {
 							vih->AvgTimePerFrame		= item->GetData()->GetDurationMs()*10000 / (item->GetData()->GetSampleCount());
 						}
-						memcpy(vih+1, db.GetData(), db.GetDataSize());
+						gpu_memcpy(vih+1, db.GetData(), db.GetDataSize());
 
 						if (fourcc == BI_RGB) {
 							WORD &bitcount = vih->bmiHeader.biBitCount;
@@ -995,7 +995,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						mts.Add(mt);
 
 						char buff[5];
-						memcpy(buff, &fourcc, 4);
+						gpu_memcpy(buff, &fourcc, 4);
 						buff[4] = 0;
 
 						_strlwr_s(buff);
@@ -1164,7 +1164,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								format->wfx.cbSize = (WORD)(size - sizeof(WAVEFORMATEX));
 								format->wSamplesPerBlock = format->wfx.nBlockAlign * 2 / format->wfx.nChannels - 12;
 								format->wNumCoef = numcoef;
-								memcpy( format->aCoef, coef, sizeof(coef) );
+								gpu_memcpy( format->aCoef, coef, sizeof(coef) );
 							}
 						} else if (type == AP4_ATOM_TYPE('m', 's', 0x00, 0x11)) {
 							IMAADPCMWAVEFORMAT* format = (IMAADPCMWAVEFORMAT*)mt.ReallocFormatBuffer(sizeof(IMAADPCMWAVEFORMAT));
@@ -1191,7 +1191,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							if (size >= 36) {
 								wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 36);
 								wfe->cbSize = 36;
-								memcpy(wfe+1, data, 36);
+								gpu_memcpy(wfe+1, data, 36);
 							}
 						} else if (type == WAVE_FORMAT_PCM) {
 							mt.SetSampleSize(wfe->nBlockAlign);
@@ -1226,7 +1226,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							//always needed extra data for QDM2
 							wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + db.GetDataSize());
 							wfe->cbSize = db.GetDataSize();
-							memcpy(wfe+1, db.GetData(), db.GetDataSize());
+							gpu_memcpy(wfe+1, db.GetData(), db.GetDataSize());
 						}
 
 						mts.Add(mt);

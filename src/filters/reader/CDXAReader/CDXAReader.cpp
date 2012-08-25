@@ -341,7 +341,7 @@ HRESULT CCDXAStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDW
 		}
 
 		DWORD l = (DWORD)min(dwBytesToRead, min(RAW_DATA_SIZE - offset, m_llLength - pos));
-		memcpy(pbBuffer, &m_sector[RAW_SYNC_SIZE + RAW_HEADER_SIZE + RAW_SUBHEADER_SIZE + offset], l);
+		gpu_memcpy(pbBuffer, &m_sector[RAW_SYNC_SIZE + RAW_HEADER_SIZE + RAW_SUBHEADER_SIZE + offset], l);
 
 		pbBuffer += l;
 		pos += l;

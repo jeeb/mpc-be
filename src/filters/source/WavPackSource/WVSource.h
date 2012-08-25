@@ -25,10 +25,10 @@
 
 #include "../../parser/BaseSplitter/BaseSplitter.h"
 
-#include <wavpacklib\wavpack\wputils.h>
-#include <wavpacklib\wavpack_common.h>
-#include <wavpacklib\wavpack_frame.h>
-#include <wavpacklib\wavpack_parser.h>
+#include <wavpacklib/wavpack/wputils.h>
+#include <wavpacklib/wavpack_common.h>
+#include <wavpacklib/wavpack_frame.h>
+#include <wavpacklib/wavpack_parser.h>
 
 #define WavPackSplitterName   L"Light Alloy/MPC WavPack Source"
 

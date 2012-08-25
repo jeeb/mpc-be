@@ -348,7 +348,7 @@ int ParseDTSHeader(const BYTE* buf, int* samplerate, int* channels, int* framele
 	bool isDTS14 = false;
 	switch (sync) {
 		case 0x0180fe7f: // '7FFE8001' 16 bits and big endian bitstream
-			memcpy(hdr, buf, 14);
+			gpu_memcpy(hdr, buf, 14);
 			break;
 		case 0x80017ffe: // 'FE7F0180' 16 bits and little endian bitstream
 			_swab((char*)buf, (char*)hdr, 14);

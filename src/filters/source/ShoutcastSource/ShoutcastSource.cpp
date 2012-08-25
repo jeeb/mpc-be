@@ -413,7 +413,7 @@ HRESULT CShoutcastStream::FillBuffer(IMediaSample* pSample)
 		if (!m_queue.IsEmpty()) {
 			mp3frame f = m_queue.RemoveHead();
 			DWORD len = min((DWORD)pSample->GetSize(), f.len);
-			memcpy(pData, f.pData, len);
+			gpu_memcpy(pData, f.pData, len);
 			pSample->SetActualDataLength(len);
 			pSample->SetTime(&f.rtStart, &f.rtStop);
 			m_title = f.title;
@@ -493,7 +493,7 @@ UINT CShoutcastStream::SocketThreadProc()
 		}
 
 		mp3frame f(len);
-		memcpy(f.pData, pData, len);
+		gpu_memcpy(f.pData, pData, len);
 		f.rtStop = (f.rtStart = m_rtSampleTime) + (10000000i64 * len * 8/m_socket.m_bitrate);
 		m_rtSampleTime = f.rtStop;
 		f.title = m_socket.m_title;
@@ -622,7 +622,7 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 				}
 
 				m_nBytesRead = len;
-				memcpy(lpBuf, p, len);
+				gpu_memcpy(lpBuf, p, len);
 
 				break;
 			}

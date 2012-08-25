@@ -108,7 +108,7 @@ void AvgLines8(BYTE* dst, DWORD h, DWORD pitch)
 
 	if (!(h&1) && h >= 2) {
 		dst += (h-2)*pitch;
-		memcpy(dst + pitch, dst, pitch);
+		gpu_memcpy(dst + pitch, dst, pitch);
 	}
 
 #ifndef _WIN64
@@ -195,7 +195,7 @@ void AvgLines555(BYTE* dst, DWORD h, DWORD pitch)
 
 	if (!(h&1) && h >= 2) {
 		dst += (h-2)*pitch;
-		memcpy(dst + pitch, dst, pitch);
+		gpu_memcpy(dst + pitch, dst, pitch);
 	}
 
 #ifndef _WIN64
@@ -289,7 +289,7 @@ void AvgLines565(BYTE* dst, DWORD h, DWORD pitch)
 
 	if (!(h&1) && h >= 2) {
 		dst += (h-2)*pitch;
-		memcpy(dst + pitch, dst, pitch);
+		gpu_memcpy(dst + pitch, dst, pitch);
 	}
 
 #ifndef _WIN64

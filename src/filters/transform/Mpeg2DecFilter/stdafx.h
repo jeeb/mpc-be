@@ -28,4 +28,4 @@
 #include "../../../../include/stdafx_common_afx.h"
 #include "../../../../include/stdafx_common_dshow.h"
 
-#include "../../../DSUtil/gpu_memcpy_sse4.h"
+#include "../../../DSUtil/gpu_memcpy.h"

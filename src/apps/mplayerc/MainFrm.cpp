@@ -2704,7 +2704,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 				// Save current position in the chapter
 				DVD_POSITION*	DvdPos = s.CurrentDVDPosition();
 				if (DvdPos) {
-					memcpy (&DvdPos->Timecode, (void*)&evParam1, sizeof(DVD_HMSF_TIMECODE));
+					gpu_memcpy(&DvdPos->Timecode, (void*)&evParam1, sizeof(DVD_HMSF_TIMECODE));
 				}
 
 				m_wndSeekBar.SetPos(rtNow);
@@ -9160,7 +9160,7 @@ public:
 	STDMETHODIMP Read(void* pv, ULONG cb, ULONG* pcbRead) {
 		__int64 cbRead = min((__int64)(m_data.GetCount() - m_pos), (__int64)cb);
 		cbRead = max(cbRead, 0);
-		memcpy(pv, &m_data[(INT_PTR)m_pos], (int)cbRead);
+		gpu_memcpy(pv, &m_data[(INT_PTR)m_pos], (int)cbRead);
 		if (pcbRead) {
 			*pcbRead = (ULONG)cbRead;
 		}
@@ -17576,7 +17576,7 @@ HRESULT CMainFrame::SetDwmPreview(BOOL show)
 									IStream* pStream = NULL;
 									LPVOID lpResBuffer = ::GlobalLock(hBlock);
 									ASSERT (lpResBuffer != NULL);
-									memcpy(lpResBuffer, pData, len);
+									gpu_memcpy(lpResBuffer, pData, len);
 
 									if (SUCCEEDED(::CreateStreamOnHGlobal(hBlock, TRUE, &pStream))) {
 										m_InternalImage.Load(pStream);

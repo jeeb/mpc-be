@@ -84,7 +84,7 @@ bool CALLBACK DSEnumProc2(LPGUID lpGUID,
 	if (lpGUID != NULL) // NULL only for "Primary Sound Driver".
 	{
 		if (strGUID == lpszDesc) {
-			memcpy((VOID *)&lpSoundGUID, lpGUID, sizeof(GUID));
+			gpu_memcpy((VOID *)&lpSoundGUID, lpGUID, sizeof(GUID));
 		}
 	}
 
@@ -362,7 +362,7 @@ HRESULT CMpcAudioRenderer::SetMediaType(const CMediaType *pmt)
 			return E_OUTOFMEMORY;
 		}
 
-		memcpy(m_pWaveFileFormat, pwf, size);
+		gpu_memcpy(m_pWaveFileFormat, pwf, size);
 
 		if (!m_useWASAPI && m_pSoundTouch && (pwf->nChannels <= 2)) {
 			m_pSoundTouch->setSampleRate (pwf->nSamplesPerSec);
@@ -865,12 +865,12 @@ HRESULT CMpcAudioRenderer::WriteSampleToDSBuffer(IMediaSample *pMediaSample, boo
 	}
 	if (SUCCEEDED (hr)) {
 		if (pDSLockedBuffers [0] != NULL) {
-			memcpy(pDSLockedBuffers[0], pMediaBuffer, dwDSLockedSize[0]);
+			gpu_memcpy(pDSLockedBuffers[0], pMediaBuffer, dwDSLockedSize[0]);
 			m_dwDSWriteOff += dwDSLockedSize[0];
 		}
 
 		if (pDSLockedBuffers [1] != NULL) {
-			memcpy(pDSLockedBuffers[1], &pMediaBuffer[dwDSLockedSize[0]], dwDSLockedSize[1]);
+			gpu_memcpy(pDSLockedBuffers[1], &pMediaBuffer[dwDSLockedSize[0]], dwDSLockedSize[1]);
 			m_dwDSWriteOff = dwDSLockedSize[1];
 			loop = true;
 		}
@@ -961,7 +961,7 @@ HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 		// Load the buffer with data from the audio source.
 		if (pData != NULL) {
 
-			memcpy(&pData[0], pInputBufferPointer, nBytesToWrite);
+			gpu_memcpy(&pData[0], pInputBufferPointer, nBytesToWrite);
 			pInputBufferPointer += nBytesToWrite;
 		} else {
 			TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi Output buffer is NULL\n"));
@@ -1184,7 +1184,7 @@ bool CMpcAudioRenderer::CheckFormatChanged(WAVEFORMATEX *pWaveFormatEx, WAVEFORM
 	if (! *ppNewWaveFormatEx) {
 		return false;
 	}
-	memcpy(*ppNewWaveFormatEx, pWaveFormatEx, size);
+	gpu_memcpy(*ppNewWaveFormatEx, pWaveFormatEx, size);
 	return true;
 }
 

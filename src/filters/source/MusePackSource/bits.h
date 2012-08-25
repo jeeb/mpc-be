@@ -23,8 +23,7 @@
 
 #pragma once
 
-#include "stdafx.h"
-#include "..\DSUtil\DSUtil.h"
+#include "../../../DSUtil/DSUtil.h"
 
 //-------------------------------------------------------------------------
 //

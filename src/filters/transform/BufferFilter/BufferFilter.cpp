@@ -230,7 +230,7 @@ HRESULT CBufferFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		return S_FALSE;
 	}
 
-	memcpy(pDataOut, pDataIn, min(len, size));
+	gpu_memcpy(pDataOut, pDataIn, min(len, size));
 
 	pOut->SetActualDataLength(min(len, size));
 

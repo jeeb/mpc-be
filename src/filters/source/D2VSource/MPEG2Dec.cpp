@@ -4518,7 +4518,7 @@ void CMPEG2Dec::Copyodd(unsigned char *src, unsigned char *dst, int pitch, int f
 
 	for (i=0; i<(Clip_Height>>1); i++)
 	{
-		memcpy (dst, src, DSTBYTES);
+		gpu_memcpy(dst, src, DSTBYTES);
 		src += PWIDTH;
 		dst += QWIDTH;
 	}
@@ -4534,7 +4534,7 @@ void CMPEG2Dec::Copyeven(unsigned char *src, unsigned char *dst, int pitch, int 
 
 	for (i=0; i<(Clip_Height>>1); i++)
 	{
-		memcpy (dst, src, DSTBYTES);
+		gpu_memcpy(dst, src, DSTBYTES);
 		src += PWIDTH;
 		dst += QWIDTH;
 	}

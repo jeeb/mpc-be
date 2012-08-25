@@ -33,7 +33,7 @@
 #include <Mferror.h>
 #include <atlcoll.h>
 #include <vector>
-#include "../../../DSUtil/gpu_memcpy_sse4.h"
+#include "../../../DSUtil/gpu_memcpy.h"
 
 #pragma warning(disable:4005)
 

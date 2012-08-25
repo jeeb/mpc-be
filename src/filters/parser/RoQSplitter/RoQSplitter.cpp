@@ -298,7 +298,7 @@ bool CRoQSplitterFilter::DemuxLoop()
 		if(rc.id == 0x1002 || rc.id == 0x1011 || rc.id == 0x1020 || rc.id == 0x1021)
 		{
 			p->SetCount(sizeof(rc) + rc.size);
-			memcpy(p->GetData(), &rc, sizeof(rc));
+			gpu_memcpy(p->GetData(), &rc, sizeof(rc));
 			if(S_OK != (hr = m_pAsyncReader->SyncRead(pos, rc.size, p->GetData() + sizeof(rc))))
 				break;
 		}
@@ -583,7 +583,7 @@ HRESULT CRoQVideoDecoder::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		DWORD nv2 = rc->arg&0xff;
 		if(nv2 == 0 && nv1 * 6 < rc->size) nv2 = 256;
 
-		memcpy(m_cells, pDataIn, sizeof(m_cells[0])*nv1);
+		gpu_memcpy(m_cells, pDataIn, sizeof(m_cells[0])*nv1);
 		pDataIn += sizeof(m_cells[0])*nv1;
 
 		for(int i = 0; i < (int)nv2; i++)
@@ -680,7 +680,7 @@ HRESULT CRoQVideoDecoder::Transform(IMediaSample* pIn, IMediaSample* pOut)
 
 		if(m_rtStart+rtStart == 0)
 		{
-			memcpy(m_y[1], m_y[0], w*h*3/2);
+			gpu_memcpy(m_y[1], m_y[0], w*h*3/2);
 		}
 		else
 		{

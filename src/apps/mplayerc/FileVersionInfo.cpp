@@ -96,7 +96,7 @@ BOOL CFileVersionInfo::Create(LPCTSTR lpszFileName)
 		{
 			ASSERT(unInfoLen == sizeof(m_FileInfo));
 			if (unInfoLen == sizeof(m_FileInfo))
-				memcpy(&m_FileInfo, lpInfo, unInfoLen);
+				gpu_memcpy(&m_FileInfo, lpInfo, unInfoLen);
 		}
 
 		VerQueryValue(lpData, _T("\\VarFileInfo\\Translation"), &lpInfo, &unInfoLen);

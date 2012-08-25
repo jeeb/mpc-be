@@ -228,7 +228,7 @@ bool LoadResource(UINT resid, CStringA& str, LPCTSTR restype)
 	if (!size) {
 		return false;
 	}
-	memcpy(str.GetBufferSetLength(size), LockResource(hGlobal), size);
+	gpu_memcpy(str.GetBufferSetLength(size), LockResource(hGlobal), size);
 	return true;
 }
 
@@ -533,7 +533,7 @@ BOOL CMPlayerCApp::SendCommandLine(HWND hWnd)
 	while (pos) {
 		CString s = m_cmdln.GetNext(pos);
 		int len = (s.GetLength()+1)*sizeof(TCHAR);
-		memcpy(p, s, len);
+		gpu_memcpy(p, s, len);
 		p += len;
 	}
 

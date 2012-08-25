@@ -255,7 +255,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + pmp->typeSpecData.GetCount());
 			memset(mt.Format(), 0, mt.FormatLength());
-			memcpy(pvih + 1, pmp->typeSpecData.GetData(), pmp->typeSpecData.GetCount());
+			gpu_memcpy(pvih + 1, pmp->typeSpecData.GetData(), pmp->typeSpecData.GetCount());
 
 			rvinfo rvi = *(rvinfo*)pmp->typeSpecData.GetData();
 			rvi.bswap();
@@ -284,7 +284,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				extra		+= 26;
 				extralen	-= 26;
 				VIDEOINFOHEADER* pvih2 = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + extralen);
-				memcpy(pvih2 + 1, extra, extralen);
+				gpu_memcpy(pvih2 + 1, extra, extralen);
 				mts.InsertAt(0, mt);
 			}
 
@@ -293,7 +293,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				mt.formattype = FORMAT_VideoInfo2;
 				VIDEOINFOHEADER2* pvih2 = (VIDEOINFOHEADER2*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER2) + pmp->typeSpecData.GetCount());
 				memset(mt.Format() + FIELD_OFFSET(VIDEOINFOHEADER2, dwInterlaceFlags), 0, mt.FormatLength() - FIELD_OFFSET(VIDEOINFOHEADER2, dwInterlaceFlags));
-				memcpy(pvih2 + 1, pmp->typeSpecData.GetData(), pmp->typeSpecData.GetCount());
+				gpu_memcpy(pvih2 + 1, pmp->typeSpecData.GetData(), pmp->typeSpecData.GetCount());
 				pvih2->bmiHeader = bmi;
 				pvih2->bmiHeader.biWidth = (DWORD)pmp->width;
 				pvih2->bmiHeader.biHeight = (DWORD)pmp->height;
@@ -309,7 +309,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			WAVEFORMATEX* pwfe = (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX) + pmp->typeSpecData.GetCount());
 			memset(mt.Format(), 0, mt.FormatLength());
-			memcpy(pwfe + 1, pmp->typeSpecData.GetData(), pmp->typeSpecData.GetCount());
+			gpu_memcpy(pwfe + 1, pmp->typeSpecData.GetData(), pmp->typeSpecData.GetCount());
 
 			union {
 				DWORD fcc;
@@ -410,7 +410,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						extralen--;
 						WAVEFORMATEX* pwfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + extralen);
 						pwfe->cbSize = extralen;
-						memcpy(pwfe + 1, extra, extralen);
+						gpu_memcpy(pwfe + 1, extra, extralen);
 					} else {
 						WAVEFORMATEX* pwfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 5);
 						pwfe->cbSize = MakeAACInitData((BYTE*)(pwfe+1), 0, pwfe->nSamplesPerSec, pwfe->nChannels);
@@ -450,14 +450,14 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				WORD keylen = *(WORD*)p;
 				bswap(keylen);
 				p += 2;
-				memcpy(key.GetBufferSetLength(keylen), p, keylen);
+				gpu_memcpy(key.GetBufferSetLength(keylen), p, keylen);
 				p += keylen;
 
 				p+=4;
 				WORD valuelen = *(WORD*)p;
 				bswap(valuelen);
 				p += 2;
-				memcpy(value.GetBufferSetLength(valuelen), p, valuelen);
+				gpu_memcpy(value.GetBufferSetLength(valuelen), p, valuelen);
 				p += valuelen;
 
 				ASSERT(p == base + len);
@@ -730,7 +730,7 @@ bool CRealMediaSplitterFilter::DemuxLoop()
 		ptr += 2;
 		*(DWORD*)ptr = s.data.GetLength();
 		ptr += 4;
-		memcpy((char*)ptr, s.data, s.data.GetLength());
+		gpu_memcpy((char*)ptr, s.data, s.data.GetLength());
 		ptr += s.name.GetLength();
 
 		hr = DeliverPacket(p);
@@ -871,7 +871,7 @@ HRESULT CRealMediaSplitterOutputPin::DeliverSegments()
 	pos = m_segments.GetHeadPosition();
 	while (pos) {
 		segment* s = m_segments.GetNext(pos);
-		memcpy(pData + s->offset, s->data.GetData(), s->data.GetCount());
+		gpu_memcpy(pData + s->offset, s->data.GetData(), s->data.GetCount());
 	}
 
 	hr = __super::DeliverPacket(p);
@@ -967,7 +967,7 @@ HRESULT CRealMediaSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			CAutoPtr<segment> s(DNew segment);
 			s->offset = packetoffset;
 			s->data.SetCount(len2);
-			memcpy(s->data.GetData(), pIn, len2);
+			gpu_memcpy(s->data.GetData(), pIn, len2);
 			m_segments.AddTail(s);
 
 			pIn += len2;
@@ -1851,7 +1851,7 @@ void CRealVideoDecoder::ResizeWidth(BYTE* pIn, DWORD wi, DWORD hi, BYTE* pOut, D
 {
 	for (DWORD y = 0; y < hi; y++, pIn += wi, pOut += wo) {
 		if (wi == wo) {
-			memcpy(pOut, pIn, wo);
+			gpu_memcpy(pOut, pIn, wo);
 		} else {
 			ResizeRow(pIn, wi, 1, pOut, wo, 1);
 		}
@@ -1861,7 +1861,7 @@ void CRealVideoDecoder::ResizeWidth(BYTE* pIn, DWORD wi, DWORD hi, BYTE* pOut, D
 void CRealVideoDecoder::ResizeHeight(BYTE* pIn, DWORD wi, DWORD hi, BYTE* pOut, DWORD wo, DWORD ho)
 {
 	if (hi == ho) {
-		memcpy(pOut, pIn, wo*ho);
+		gpu_memcpy(pOut, pIn, wo*ho);
 	} else {
 		for (DWORD x = 0; x < wo; x++, pIn++, pOut++) {
 			ResizeRow(pIn, hi, wo, pOut, ho, wo);
@@ -2148,7 +2148,7 @@ HRESULT CRealAudioDecoder::InitRA(const CMediaType* pmt)
 	if (pmt->subtype == MEDIASUBTYPE_AAC) {
 		pBuff.Allocate(cbSize+1);
 		pBuff[0] = 0x02;
-		memcpy(pBuff+1, pwfe+1, cbSize);
+		gpu_memcpy(pBuff+1, pwfe+1, cbSize);
 		initdata.extralen = cbSize+1;
 		initdata.extra = pBuff;
 	} else {
@@ -2267,7 +2267,7 @@ HRESULT CRealAudioDecoder::Receive(IMediaSample* pIn)
 		dst = pDataIn + len;
 		w = len;
 	} else {
-		memcpy(&m_buff[m_bufflen], pDataIn, len);
+		gpu_memcpy(&m_buff[m_bufflen], pDataIn, len);
 		m_bufflen += len;
 
 		len = w*h;
@@ -2284,7 +2284,7 @@ HRESULT CRealAudioDecoder::Receive(IMediaSample* pIn)
 				for (int y = 0; y < h; y++) {
 					for (int x = 0, w2 = w / sps; x < w2; x++) {
 						// TRACE(_T("--- %d, %d\n"), (h*x+((h+1)/2)*(y&1)+(y>>1)), sps*(h*x+((h+1)/2)*(y&1)+(y>>1)));
-						memcpy(dst + sps*(h*x+((h+1)/2)*(y&1)+(y>>1)), src, sps);
+						gpu_memcpy(dst + sps*(h*x+((h+1)/2)*(y&1)+(y>>1)), src, sps);
 						src += sps;
 					}
 				}

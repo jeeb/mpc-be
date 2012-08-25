@@ -33,7 +33,7 @@ bool BitBltFromP016ToP016(size_t w, size_t h, BYTE* dstY, BYTE* dstUV, int dstPi
 		BYTE* src = srcY + row * srcPitch;
 		BYTE* dst = dstY + row * dstPitch;
 		
-		memcpy(dst, src, dstPitch);
+		gpu_memcpy(dst, src, dstPitch);
 	}
 
 	// Copy UV plane. UV plane is half height.
@@ -42,7 +42,7 @@ bool BitBltFromP016ToP016(size_t w, size_t h, BYTE* dstY, BYTE* dstUV, int dstPi
 		BYTE* src = srcUV + row * srcPitch;
 		BYTE* dst = dstUV + row * dstPitch;
 
-		memcpy(dst, src, dstPitch);
+		gpu_memcpy(dst, src, dstPitch);
 	}
 
 	return true;

@@ -40,3 +40,4 @@
 
 #include "stdafx_common.h"
 #include "../../../DSUtil/DSUtil.h"
+#include "../../../DSUtil/gpu_memcpy.h"

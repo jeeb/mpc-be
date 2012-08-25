@@ -386,7 +386,7 @@ void CFGFilterRegistry::ExtractFilterData(BYTE* p, UINT len)
 				}
 
 				GUID majortype, subtype;
-				memcpy(&majortype, &base[*(DWORD*)p], sizeof(GUID));
+				gpu_memcpy(&majortype, &base[*(DWORD*)p], sizeof(GUID));
 				p += 4;
 				if (!fOutput) {
 					AddType(majortype, subtype);

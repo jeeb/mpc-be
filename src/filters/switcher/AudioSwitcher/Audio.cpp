@@ -266,7 +266,7 @@ long AudioStreamResampler::Downsample(void* input, long samplesin, void* output,
 			break;
 		}
 
-		memcpy((char*)cbuffer + holdover*bps, (char*)input, srcSamples*bps);
+		gpu_memcpy((char*)cbuffer + holdover*bps, (char*)input, srcSamples*bps);
 		input = (void *)((char *)input + srcSamples*bps);
 
 		// Figure out how many destination samples we'll get out of what we

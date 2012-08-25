@@ -885,7 +885,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 				CStringA lang_name;
 				m_pPMT_Lang.Lookup(s.pid, lang_name);
 				if (!lang_name.IsEmpty()) {
-					memcpy(s.lang, lang_name, 4);
+					gpu_memcpy(s.lang, lang_name, 4);
 					s.lang_set = true;
 				}
 			}
@@ -976,7 +976,7 @@ void CMpegSplitterFile::UpdatePrograms(const trhdr& h, bool UpdateLang)
 					memset(pPair->m_value.ts_buffer, 0, sizeof(pPair->m_value.ts_buffer));
 					pPair->m_value.ts_len_cur = max_len;
 					pPair->m_value.ts_len_packet = len;
-					memcpy(pPair->m_value.ts_buffer, buffer, max_len);
+					gpu_memcpy(pPair->m_value.ts_buffer, buffer, max_len);
 				} else {
 					CGolombBuffer gb(buffer, len);
 					UpdatePrograms(gb, h.pid, UpdateLang);
@@ -1084,7 +1084,7 @@ void CMpegSplitterFile::UpdatePrograms(CGolombBuffer gb, WORD pid, bool UpdateLa
 					CStringA lang_name;
 					m_pPMT_Lang.Lookup(s.pid, lang_name);
 					if (!lang_name.IsEmpty()) {
-						memcpy(s.lang, lang_name, 4);
+						gpu_memcpy(s.lang, lang_name, 4);
 						s.lang_set = true;
 					}
 

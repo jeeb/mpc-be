@@ -440,7 +440,7 @@ HRESULT CCDDAStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDW
 
 	if (pos < sizeof(m_header) && len > 0) {
 		size_t l = (size_t)min(len, sizeof(m_header) - pos);
-		memcpy(pbBuffer, &((BYTE*)&m_header)[pos], l);
+		gpu_memcpy(pbBuffer, &((BYTE*)&m_header)[pos], l);
 		pbBuffer += l;
 		pos += l;
 		len -= l;
@@ -466,7 +466,7 @@ HRESULT CCDDAStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDW
 		UNREFERENCED_PARAMETER(b);
 
 		size_t l = (size_t)min(min(len, size_t(RAW_SECTOR_SIZE - offset)), size_t(m_llLength - pos));
-		memcpy(pbBuffer, &buff[offset], l);
+		gpu_memcpy(pbBuffer, &buff[offset], l);
 
 		pbBuffer += l;
 		pos += l;

@@ -73,7 +73,7 @@ BOOL CMiniDump::PreventSetUnhandledExceptionFilter()
 	DWORD dwRelativeAddr = dwNewEntryAddr - dwOrgEntryAddr;
 
 	newJump[ 0 ] = 0xE9;  // JMP absolute
-	memcpy( &newJump[ 1 ], &dwRelativeAddr, sizeof(pNewFunc) );
+	gpu_memcpy( &newJump[ 1 ], &dwRelativeAddr, sizeof(pNewFunc) );
 	SIZE_T bytesWritten;
 	BOOL bRet = WriteProcessMemory( GetCurrentProcess(), pOrgEntry, newJump, sizeof(pNewFunc) + 1, &bytesWritten );
 	FreeLibrary( hKernel32 );

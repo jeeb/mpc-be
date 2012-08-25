@@ -469,7 +469,7 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 				while (pos) {
 					CString& str = cmdln.GetNext(pos);
 					len = (str.GetLength()+1)*sizeof(TCHAR);
-					memcpy(p, (LPCTSTR)str, len);
+					gpu_memcpy(p, (LPCTSTR)str, len);
 					p += len;
 				}
 

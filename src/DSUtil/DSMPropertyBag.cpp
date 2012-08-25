@@ -184,7 +184,7 @@ CDSMResource::CDSMResource(LPCWSTR name, LPCWSTR desc, LPCWSTR mime, BYTE* pData
 	this->desc = desc;
 	this->mime = mime;
 	data.SetCount(len);
-	memcpy(data.GetData(), pData, data.GetCount());
+	gpu_memcpy(data.GetData(), pData, data.GetCount());
 	this->tag = tag;
 
 	CAutoLock cAutoLock(&m_csResources);
@@ -247,7 +247,7 @@ STDMETHODIMP IDSMResourceBagImpl::ResGet(DWORD iIndex, BSTR* ppName, BSTR* ppDes
 	}
 	if (ppData) {
 		*pDataLen = (DWORD)r.data.GetCount();
-		memcpy(*ppData = (BYTE*)CoTaskMemAlloc(*pDataLen), r.data.GetData(), *pDataLen);
+		gpu_memcpy(*ppData = (BYTE*)CoTaskMemAlloc(*pDataLen), r.data.GetData(), *pDataLen);
 	}
 	if (pTag) {
 		*pTag = r.tag;
@@ -276,7 +276,7 @@ STDMETHODIMP IDSMResourceBagImpl::ResSet(DWORD iIndex, LPCWSTR pName, LPCWSTR pD
 	if (pData || len == 0) {
 		r.data.SetCount(len);
 		if (pData) {
-			memcpy(r.data.GetData(), pData, r.data.GetCount());
+			gpu_memcpy(r.data.GetData(), pData, r.data.GetCount());
 		}
 	}
 	r.tag = tag;

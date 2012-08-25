@@ -115,7 +115,7 @@ BOOL CPPageAudioSwitcher::OnInitDialog()
 	m_tAudioTimeShift = s.iAudioTimeShift;
 	m_tAudioTimeShiftSpin.SetRange32(-1000*60*60*24, 1000*60*60*24);
 	m_fCustomChannelMapping = s.fCustomChannelMapping;
-	memcpy(m_pSpeakerToChannelMap, s.pSpeakerToChannelMap, sizeof(s.pSpeakerToChannelMap));
+	gpu_memcpy(m_pSpeakerToChannelMap, s.pSpeakerToChannelMap, sizeof(s.pSpeakerToChannelMap));
 
 	if (m_pASF) {
 		m_pASF->GetInputSpeakerConfig(&m_dwChannelMask);
@@ -181,7 +181,7 @@ BOOL CPPageAudioSwitcher::OnApply()
 	s.fAudioTimeShift = !!m_fAudioTimeShift;
 	s.iAudioTimeShift = m_tAudioTimeShift;
 	s.fCustomChannelMapping = !!m_fCustomChannelMapping;
-	memcpy(s.pSpeakerToChannelMap, m_pSpeakerToChannelMap, sizeof(m_pSpeakerToChannelMap));
+	gpu_memcpy(s.pSpeakerToChannelMap, m_pSpeakerToChannelMap, sizeof(m_pSpeakerToChannelMap));
 
 	if (m_pASF) {
 		m_pASF->SetSpeakerConfig(s.fCustomChannelMapping, s.pSpeakerToChannelMap);

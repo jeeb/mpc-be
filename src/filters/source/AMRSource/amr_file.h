@@ -23,8 +23,7 @@
 
 #pragma once
 
-#include "..\DSUtil\DSUtil.h"
-#include "stdafx.h"
+#include "../../../DSUtil/DSUtil.h"
 
 class CAMRReader;
 

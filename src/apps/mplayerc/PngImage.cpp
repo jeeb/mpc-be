@@ -37,7 +37,7 @@ static void read_data_fn(png_structp png_ptr, png_bytep data, png_size_t length)
 {
 	struct png_t* png = (struct png_t*)png_get_progressive_ptr(png_ptr);
 
-	memcpy(data, &png->data[png->pos], length);
+	gpu_memcpy(data, &png->data[png->pos], length);
 
 	png->pos += length;
 }
@@ -87,7 +87,7 @@ bool MPCPngImage::DecompressPNG(struct png_t* png)
 				}
 			}
 
-			memcpy(GetPixelAddress(0, y), &pic[len * y], len);
+			gpu_memcpy(GetPixelAddress(0, y), &pic[len * y], len);
 		}
 
 		ret = true;
@@ -296,13 +296,13 @@ HBITMAP MPCPngImage::TypeLoadImage(int type, BYTE** pData, int* width, int* heig
 	if (type == 0) {
 
 		int hsize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
-		memcpy(*pData, BrightnessRGB(0, bmp, *width, *height, *bpp, br, rc, gc, bc) + hsize, memWidth * (*height));
+		gpu_memcpy(*pData, BrightnessRGB(0, bmp, *width, *height, *bpp, br, rc, gc, bc) + hsize, memWidth * (*height));
 		free(bmp);
 
 	} else if (type == 1) {
 
 		for (int i = 0; i < *height; i++) {
-			memcpy((*pData) + memWidth * i, BrightnessRGB(1, (BYTE*)row_pointers[i], *width, 1, *bpp, br, rc, gc, bc), memWidth);
+			gpu_memcpy((*pData) + memWidth * i, BrightnessRGB(1, (BYTE*)row_pointers[i], *width, 1, *bpp, br, rc, gc, bc), memWidth);
 		}
 		png_destroy_read_struct(&png_ptr, &info_ptr, 0);
 	}

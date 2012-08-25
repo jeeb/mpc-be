@@ -164,7 +164,7 @@ HRESULT CDirectVobSubFilter::Copy(BYTE* pSub, BYTE* pIn, CSize sub, CSize in, in
 		} else {
 			for (ptrdiff_t k = min(j, hSub); i < k; i++, pIn += pitchIn, pSub += pitchSub) {
 				memsetd(pSub, black, dpLeft);
-				memcpy(pSub + dpLeft, pIn, dpMid);
+				gpu_memcpy(pSub + dpLeft, pIn, dpMid);
 				memsetd(pSub + dpLeft+dpMid, black, dpRight);
 			}
 		}

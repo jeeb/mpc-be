@@ -385,7 +385,7 @@ bool CJpegEncoderMem::PutBytes(const void* pData, size_t len)
 {
 	CAtlArray<BYTE> moredata;
 	moredata.SetCount(len);
-	memcpy(moredata.GetData(), pData, len);
+	gpu_memcpy(moredata.GetData(), pData, len);
 	m_pdata->Append(moredata);
 	return true;
 }

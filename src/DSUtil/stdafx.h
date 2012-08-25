@@ -30,3 +30,4 @@
 
 #include <atlcoll.h>
 #include <atlpath.h>
+#include "gpu_memcpy.h"

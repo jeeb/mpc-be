@@ -29,11 +29,6 @@
 
 #include "WVSource.h"
 
-#include <wavpacklib\wavpack\wputils.h>
-#include <wavpacklib\wavpack_common.h>
-#include <wavpacklib\wavpack_frame.h>
-#include <wavpacklib\wavpack_parser.h>
-
 // ----------------------------------------------------------------------------
 
 #define constrain(x,y,z) (((y) < (x)) ? (x) : ((y) > (z)) ? (z) : (y))

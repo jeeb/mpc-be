@@ -279,7 +279,7 @@ void CMPCBEContextMenu::SendData(bool add_pl)
 	while(pos) {
 		CString s = m_listFileNames.GetNext(pos); 
 		int len = (s.GetLength()+1)*sizeof(TCHAR);
-		memcpy(p, s, len);
+		gpu_memcpy(p, s, len);
 		p += len;
 	}
 

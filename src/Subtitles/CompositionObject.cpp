@@ -60,14 +60,14 @@ void CompositionObject::SetRLEData(BYTE* pBuffer, int nSize, int nTotalSize)
 	m_nRLEDataSize	= nTotalSize;
 	m_nRLEPos		= nSize;
 
-	memcpy (m_pRLEData, pBuffer, nSize);
+	gpu_memcpy(m_pRLEData, pBuffer, nSize);
 }
 
 void CompositionObject::AppendRLEData(BYTE* pBuffer, int nSize)
 {
 	ASSERT (m_nRLEPos+nSize <= m_nRLEDataSize);
 	if (m_nRLEPos+nSize <= m_nRLEDataSize) {
-		memcpy (m_pRLEData+m_nRLEPos, pBuffer, nSize);
+		gpu_memcpy(m_pRLEData+m_nRLEPos, pBuffer, nSize);
 		m_nRLEPos += nSize;
 	}
 }

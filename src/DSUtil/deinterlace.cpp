@@ -1644,7 +1644,7 @@ xloop:
 		void *elabuf = tempbuf.data();
 
 		if (!interpField2)
-			memcpy(dst, src, w16 << 4);
+			gpu_memcpy(dst, src, w16 << 4);
 
 		int y0 = interpField2 ? 1 : 2;
 		for(uint32 y = y0; y < h - 1; y += 2) {
@@ -1660,7 +1660,7 @@ xloop:
 		}
 
 		if (interpField2)
-			memcpy((char *)dst + dstpitch*(h - 1), (const char *)src + srcpitch*(h - 1), w16 << 4);
+			gpu_memcpy((char *)dst + dstpitch*(h - 1), (const char *)src + srcpitch*(h - 1), w16 << 4);
 	}
 
 	void InterpPlane_NELA(void *dst, ptrdiff_t dstpitch, const void *src, ptrdiff_t srcpitch, uint32 w, uint32 h, bool interpField2) {
@@ -1669,7 +1669,7 @@ xloop:
 		void *elabuf = tempbuf.data();
 
 		if (!interpField2)
-			memcpy(dst, src, w16 << 4);
+			gpu_memcpy(dst, src, w16 << 4);
 
 		int y0 = interpField2 ? 1 : 2;
 		if (SSE2_enabled) {
@@ -1700,7 +1700,7 @@ xloop:
 		}
 
 		if (interpField2)
-			memcpy((char *)dst + dstpitch*(h - 1), (const char *)src + srcpitch*(h - 1), w16 << 4);
+			gpu_memcpy((char *)dst + dstpitch*(h - 1), (const char *)src + srcpitch*(h - 1), w16 << 4);
 	}
 
 	void Average_scalar(void *dst, ptrdiff_t dstPitch, const void *src1, const void *src2, ptrdiff_t srcPitch, uint32 w16, uint32 h) {
@@ -1884,7 +1884,7 @@ mainRowLoop:
 		uint32 y0 = interpField2 ? 1 : 2;
 
 		if (!interpField2)
-			memcpy(dst, src, w * 4);
+			gpu_memcpy(dst, src, w * 4);
 
 		if (h > y0) {
 			ASSERT(((UINT_PTR)dst & 0xF) == 0);
@@ -1901,7 +1901,7 @@ mainRowLoop:
 		}
 
 		if (interpField2)
-			memcpy((char *)dst + dstpitch*(h - 1), (const char *)src + srcpitch*(h - 1), w*4);
+			gpu_memcpy((char *)dst + dstpitch*(h - 1), (const char *)src + srcpitch*(h - 1), w*4);
 
 #ifdef _M_IX86
 		if (MMX_enabled)

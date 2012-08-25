@@ -101,7 +101,7 @@ void CGolombBuffer::ReadBuffer(BYTE* pDest, int nSize)
 	ASSERT (m_bitlen == 0);
 	nSize = min (nSize, m_nSize - m_nBitPos);
 
-	memcpy (pDest, m_pBuffer+m_nBitPos, nSize);
+	gpu_memcpy(pDest, m_pBuffer+m_nBitPos, nSize);
 	m_nBitPos += nSize;
 }
 

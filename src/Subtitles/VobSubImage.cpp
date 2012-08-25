@@ -343,7 +343,7 @@ void CVobSubImage::TrimSubImage()
 
 	for (int height = h; height; height--, src += rect.Width()) {
 		*dst++ = 0;
-		memcpy(dst, src, w*sizeof(RGBQUAD));
+		gpu_memcpy(dst, src, w*sizeof(RGBQUAD));
 		dst += w;
 		*dst++ = 0;
 	}
@@ -1318,7 +1318,7 @@ void CVobSubImage::Scale2x()
 	src -= w*h;
 	dst -= w*h;
 
-	memcpy(src, dst, w*h*4);
+	gpu_memcpy(src, dst, w*h*4);
 
 	delete [] dst;
 }

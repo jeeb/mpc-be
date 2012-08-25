@@ -29,3 +29,4 @@
 #include "../../../../include/stdafx_common_dshow.h"
 
 #include "../../../DSUtil/MediaTypes.h"
+#include "../../../DSUtil/gpu_memcpy.h"

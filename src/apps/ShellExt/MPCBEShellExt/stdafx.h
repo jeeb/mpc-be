@@ -51,11 +51,12 @@
 #include <afxwin.h>
 #ifndef _AFX_NO_OLE_SUPPORT
 #include <afxdisp.h>        // MFC Automation classes
-#endif // _AFX_NO_OLE_SUPPORT
+#endif
 
 #include "resource.h"
 #include <atlbase.h>
 #include <atlcom.h>
 #include <atlctl.h>
+#include "../../../DSUtil/gpu_memcpy.h"
 
 using namespace ATL;

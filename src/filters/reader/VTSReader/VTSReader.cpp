@@ -236,7 +236,7 @@ HRESULT CVTSStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 
 		int size = min(2048 - m_off, (int)min(len, 2048));
 
-		memcpy(ptr, &buff[m_off], size);
+		gpu_memcpy(ptr, &buff[m_off], size);
 
 		m_off = (m_off + size)&2047;
 

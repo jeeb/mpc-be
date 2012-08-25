@@ -37,3 +37,4 @@
 
 #include "stdafx_common_dshow.h"
 #include "../DSUtil/DSUtil.h"
+#include "../DSUtil/gpu_memcpy.h"

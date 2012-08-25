@@ -23,8 +23,7 @@
 
 #pragma once
 
-#include "..\DSUtil\DSUtil.h"
-#include "stdafx.h"
+#include "../../../DSUtil/DSUtil.h"
 
 #define TTA_COPYRIGHT		""
 #define TTA_MYNAME		""
@@ -48,9 +47,7 @@ typedef unsigned long long uint64;
 
 #define tta_alloc(__length) GlobalAlloc(GMEM_ZEROINIT, __length)
 #define tta_free(__dest) GlobalFree(__dest)
-#define tta_memcpy(__buff1,__buff2,__length) CopyMemory(__buff1,__buff2,__length)
 #define tta_memclear(__dest,__length) ZeroMemory(__dest,__length)
-#define tta_memcmp(__buff1,__buff2,__length) memcmp(__buff1,__buff2,__length)
 
 typedef unsigned __int64 uint64;
 

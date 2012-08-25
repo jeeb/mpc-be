@@ -29,6 +29,7 @@
 #include "../../../../include/stdafx_common.h"
 #include "../../../../include/stdafx_common_afx2.h"
 #include "../../../../include/stdafx_common_dshow.h"
-#include "../../../DSUtil/DSUtil.h"
 
+#include "../../../DSUtil/DSUtil.h"
+#include "../../../DSUtil/gpu_memcpy.h"
 #include "DirectVobSubFilter.h"

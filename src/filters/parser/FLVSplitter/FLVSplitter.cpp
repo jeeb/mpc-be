@@ -643,7 +643,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								ASSERT(0);
 								break;
 							}
-							memcpy(dst, src, len);
+							gpu_memcpy(dst, src, len);
 							src += len;
 							dst += len;
 							vih->cbSequenceHeader += len;

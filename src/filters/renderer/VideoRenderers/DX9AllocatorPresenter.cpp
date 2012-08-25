@@ -1475,7 +1475,7 @@ void CDX9AllocatorPresenter::UpdateAlphaBitmap()
 		m_VMR9AlphaBitmapWidthBytes = info.dsBm.bmWidthBytes;
 
 		if (m_VMR9AlphaBitmapData.Allocate(info.dsBm.bmWidthBytes * info.dsBm.bmHeight)) {
-			memcpy((BYTE *)m_VMR9AlphaBitmapData, info.dsBm.bmBits, info.dsBm.bmWidthBytes * info.dsBm.bmHeight);
+			gpu_memcpy((BYTE *)m_VMR9AlphaBitmapData, info.dsBm.bmBits, info.dsBm.bmWidthBytes * info.dsBm.bmHeight);
 		}
 	}
 }

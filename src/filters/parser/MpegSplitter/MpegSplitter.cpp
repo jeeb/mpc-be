@@ -611,7 +611,7 @@ STDMETHODIMP CMpegSplitterFilter::GetClassID(CLSID* pClsID)
 	CheckPointer (pClsID, E_POINTER);
 
 	if (m_pPipoBimbo) {
-		memcpy (pClsID, &CLSID_WMAsfReader, sizeof (GUID));
+		gpu_memcpy(pClsID, &CLSID_WMAsfReader, sizeof (GUID));
 		return S_OK;
 	} else {
 		return __super::GetClassID(pClsID);
@@ -1821,8 +1821,8 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 				CAutoPtr<Packet> p3(DNew Packet());
 
 				p3->SetCount (Nalu.GetDataLength()+sizeof(dwNalLength));
-				memcpy (p3->GetData(), &dwNalLength, sizeof(dwNalLength));
-				memcpy (p3->GetData()+sizeof(dwNalLength), Nalu.GetDataBuffer(), Nalu.GetDataLength());
+				gpu_memcpy(p3->GetData(), &dwNalLength, sizeof(dwNalLength));
+				gpu_memcpy(p3->GetData()+sizeof(dwNalLength), Nalu.GetDataBuffer(), Nalu.GetDataLength());
 
 				if (p2 == NULL) {
 					p2 = p3;

@@ -231,7 +231,7 @@ STDMETHODIMP CBaseMuxerInputPin::Receive(IMediaSample* pSample)
 	}
 
 	pPacket->pData.SetCount(len);
-	memcpy(pPacket->pData.GetData(), pData, len);
+	gpu_memcpy(pPacket->pData.GetData(), pData, len);
 
 	if (S_OK == pSample->IsSyncPoint() || m_mt.majortype == MEDIATYPE_Audio && !m_mt.bTemporalCompression) {
 		pPacket->flags |= MuxerPacket::syncpoint;

@@ -209,9 +209,7 @@ bool CVobSubFileRipper::LoadIfo(CString fn)
 			ReadBEb(nProgs);
 			ReadBEb(nCells);
 
-			//
-
-			memcpy(pgc.ids, ids, sizeof(ids));
+			gpu_memcpy(pgc.ids, ids, sizeof(ids));
 
 			struct splanginfo {
 				BYTE res1, id1, id2, res2;
@@ -554,7 +552,7 @@ bool CVobSubFileRipper::Create()
 	m_title = m_outfn;
 	m_size = m_rd.vidsize;
 	TrimExtension(m_title);
-	memcpy(m_orgpal, pgc.pal, sizeof(m_orgpal));
+	gpu_memcpy(m_orgpal, pgc.pal, sizeof(m_orgpal));
 	m_sub.SetLength(0);
 
 	CCDecoder ccdec(m_title + _T(".cc.srt"), m_title + _T(".cc.raw"));
@@ -1222,8 +1220,8 @@ void VSFRipperData::Copy(VSFRipperData& rd)
 				dst.angles[j].Copy(src.angles[j]);
 			}
 			dst.iSelAngle = src.iSelAngle;
-			memcpy(dst.pal, src.pal, sizeof(src.pal));
-			memcpy(dst.ids, src.ids, sizeof(src.ids));
+			gpu_memcpy(dst.pal, src.pal, sizeof(src.pal));
+			gpu_memcpy(dst.ids, src.ids, sizeof(src.ids));
 		}
 	}
 	iSelPGC = rd.iSelPGC;

@@ -733,7 +733,7 @@ HRESULT COggSplitterOutputPin::UnpackPage(OggPage& page)
 				if (m_lastpacket) {
 					int size = m_lastpacket->GetCount();
 					m_lastpacket->SetCount(size + j-i);
-					memcpy(m_lastpacket->GetData() + size, pData + i, j-i);
+					gpu_memcpy(m_lastpacket->GetData() + size, pData + i, j-i);
 
 					CAutoLock csAutoLock(&m_csPackets);
 
@@ -893,7 +893,7 @@ HRESULT COggVorbisOutputPin::UnpackInitPage(OggPage& page)
 			VORBISFORMAT2* vf2		= (VORBISFORMAT2*)m_mts[0].Format();
 			vf2->HeaderSize[cnt]	= p->GetCount();
 			int len					= m_mts[0].FormatLength();
-			memcpy(m_mts[0].ReallocFormatBuffer(len + p->GetCount()) + len, p->GetData(), p->GetCount());
+			gpu_memcpy(m_mts[0].ReallocFormatBuffer(len + p->GetCount()) + len, p->GetData(), p->GetCount());
 		}
 
 		m_initpackets.AddTail(m_packets.RemoveHead());
@@ -1071,7 +1071,7 @@ COggDirectShowOutputPin::COggDirectShowOutputPin(AM_MEDIA_TYPE* pmt, LPCWSTR pNa
 	: COggSplitterOutputPin(pName, pFilter, pLock, phr)
 {
 	CMediaType mt;
-	memcpy((AM_MEDIA_TYPE*)&mt, pmt, FIELD_OFFSET(AM_MEDIA_TYPE, pUnk));
+	gpu_memcpy((AM_MEDIA_TYPE*)&mt, pmt, FIELD_OFFSET(AM_MEDIA_TYPE, pUnk));
 	mt.SetFormat((BYTE*)(pmt+1), pmt->cbFormat);
 	mt.SetSampleSize(1);
 	if (mt.majortype == MEDIATYPE_Video) { // TODO: find samples for audio and find out what to return in GetRefTime...
@@ -1185,7 +1185,7 @@ COggVideoOutputPin::COggVideoOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseF
 	
 	VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + extra);
 	memset(mt.Format(), 0, mt.FormatLength());
-	memcpy(mt.Format() + sizeof(VIDEOINFOHEADER), h+1, extra);
+	gpu_memcpy(mt.Format() + sizeof(VIDEOINFOHEADER), h+1, extra);
 	
 	pvih->AvgTimePerFrame			= h->time_unit / h->samples_per_unit;
 	pvih->bmiHeader.biWidth			= h->v.w;
@@ -1232,7 +1232,7 @@ COggAudioOutputPin::COggAudioOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseF
 	
 	WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX) + extra);
 	memset(mt.Format(), 0, mt.FormatLength());
-	memcpy(mt.Format() + sizeof(WAVEFORMATEX), h+1, extra);
+	gpu_memcpy(mt.Format() + sizeof(WAVEFORMATEX), h+1, extra);
 	
 	wfe->cbSize				= extra;
 	wfe->wFormatTag			= (WORD)mt.subtype.Data1;
@@ -1317,7 +1317,7 @@ HRESULT COggTheoraOutputPin::UnpackInitPage(OggPage& page)
 							   ((MPEG2VIDEOINFO*)mt.Format())->cbSequenceHeader +
 							   2 + size);
 		*(WORD*)((BYTE*)vih->dwSequenceHeader + vih->cbSequenceHeader) = (size>>8)|(size<<8);
-		memcpy((BYTE*)vih->dwSequenceHeader + vih->cbSequenceHeader + 2, p->GetData(), size);
+		gpu_memcpy((BYTE*)vih->dwSequenceHeader + vih->cbSequenceHeader + 2, p->GetData(), size);
 		vih->cbSequenceHeader += 2 + size;
 
 		m_initpackets.AddTail(m_packets.RemoveHead());
