@@ -604,7 +604,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 
 	size_t bufflen = m_buff.GetCount();
 	m_buff.SetCount(bufflen + len, 4096);
-	memcpy(m_buff.GetData() + bufflen, pDataIn, len);
+	gpu_memcpy(m_buff.GetData() + bufflen, pDataIn, len);
 	len += (long)bufflen;
 
 	if (GetSPDIF(ac3) && (subtype == MEDIASUBTYPE_DOLBY_AC3 || subtype == MEDIASUBTYPE_WAVE_DOLBY_AC3 || subtype == MEDIASUBTYPE_DNET)) {
@@ -1065,7 +1065,7 @@ HRESULT CMpaDecFilter::ProcessPCMfloatLE() //little-endian 'fl32' and 'fl64'
 	switch (wfe->wBitsPerSample) {
 		case 32: {
 			float* q = (float*)m_buff.GetData();
-			memcpy(f, q, nSamples * 4);
+			gpu_memcpy(f, q, nSamples * 4);
 		}
 		break;
 		case 64: {
@@ -1425,7 +1425,7 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, int size, int sample_rate, 
 	}
 
 	if (isDTSWAV) {
-		memcpy(pDataOut, pBuff, size);
+		gpu_memcpy(pDataOut, pBuff, size);
 	} else {
 		WORD* pDataOutW = (WORD*)pDataOut;
 		pDataOutW[0] = 0xf872;
@@ -1882,7 +1882,7 @@ CMpaDecInputPin::CMpaDecInputPin(CTransformFilter* pFilter, HRESULT* phr, LPWSTR
 		} \
 		m_nFFBufferSize = size;                                                            \
 	}\
-	memcpy(m_pFFBuffer, data, size); \
+	gpu_memcpy(m_pFFBuffer, data, size); \
 	memset(m_pFFBuffer+size, 0, FF_INPUT_BUFFER_PADDING_SIZE); \
 }
 
@@ -1917,12 +1917,12 @@ HRESULT CMpaDecFilter::DeliverFFmpeg(enum AVCodecID nCodecId, BYTE* p, int buffs
 				const BYTE* srcBuf = p;
 				for (int y = 0; y < h; y++) {
 					for (int x = 0, w2 = w / sps; x < w2; x++) {
-						memcpy(tmpProcessBuf + sps*(h*x+((h+1)/2)*(y&1)+(y>>1)), srcBuf, sps);
+						gpu_memcpy(tmpProcessBuf + sps*(h*x+((h+1)/2)*(y&1)+(y>>1)), srcBuf, sps);
 						srcBuf += sps;
 					}
 				}
 			} else if (m_raData.deint_id == MAKEFOURCC('r','p','i','s')) { // SIPR codec
-				memcpy(tmpProcessBuf, p, len);
+				gpu_memcpy(tmpProcessBuf, p, len);
 
 				// http://mplayerhq.hu/pipermail/mplayer-dev-eng/2002-August/010569.html
 				static BYTE sipr_swaps[38][2]= {
@@ -2060,7 +2060,7 @@ HRESULT CMpaDecFilter::DeliverFFmpeg(enum AVCodecID nCodecId, BYTE* p, int buffs
 						}
 						break;
 					case AV_SAMPLE_FMT_FLT:
-						memcpy(pDataOut, m_pFrame->data[0], nSamples * 4);
+						gpu_memcpy(pDataOut, m_pFrame->data[0], nSamples * 4);
 						break;
 					default :
 						ASSERT(FALSE);
@@ -2283,7 +2283,7 @@ HRESULT CMpaDecFilter::ParseRealAudioHeader(const BYTE *extra, const int extrale
 		if (ra_extralen > 0)  {
 			m_pAVCtx->extradata_size = ra_extralen;
 			m_pAVCtx->extradata      = (uint8_t *)av_mallocz(ra_extralen + FF_INPUT_BUFFER_PADDING_SIZE);
-			memcpy((void *)m_pAVCtx->extradata, fmt+4, ra_extralen);
+			gpu_memcpy((void *)m_pAVCtx->extradata, fmt+4, ra_extralen);
 		}
 	} else {
 		TRACE(_T("Unknown RealAudio Header version: %d\n"), version);

@@ -195,7 +195,7 @@ void CDXVADecoderMpeg2::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nS
 		}
 	}
 
-	memcpy (pDXVABuffer, pBuffer, nSize);
+	gpu_memcpy (pDXVABuffer, pBuffer, nSize);
 }
 
 void CDXVADecoderMpeg2::Flush()

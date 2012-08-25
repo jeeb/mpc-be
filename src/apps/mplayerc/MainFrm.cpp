@@ -2916,7 +2916,7 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 
 		CRect r;
 		m_pFullscreenWnd->GetWindowRect(r);
-		bool fCursorInsideFS = r.PtInRect(p);
+		int fCursorInsideFS = r.PtInRect(p);
 
 		CWnd* pWnd = WindowFromPoint(p);
 		bool bFSWnd = false;

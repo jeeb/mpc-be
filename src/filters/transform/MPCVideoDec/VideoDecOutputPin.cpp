@@ -81,7 +81,7 @@ STDMETHODIMP CVideoDecOutputPin::GetUncompSurfacesInfo(const GUID *pGuid, LPAMVA
 
 			hr = m_pVideoDecFilter->FindDXVA1DecoderConfiguration (pAMVideoAccelerator, pGuid, &pUncompBufferInfo->ddUncompPixelFormat);
 			if (SUCCEEDED (hr)) {
-				memcpy (&m_ddUncompPixelFormat, &pUncompBufferInfo->ddUncompPixelFormat, sizeof(DDPIXELFORMAT));
+				gpu_memcpy (&m_ddUncompPixelFormat, &pUncompBufferInfo->ddUncompPixelFormat, sizeof(DDPIXELFORMAT));
 				m_GuidDecoderDXVA1 = *pGuid;
 			}
 		}
@@ -105,7 +105,7 @@ STDMETHODIMP CVideoDecOutputPin::GetCreateVideoAcceleratorData(const GUID *pGuid
 	DXVA_ConnectMode*					pConnectMode;
 
 	if (pAMVideoAccelerator) {
-		memcpy (&UncompInfo.ddUncompPixelFormat, &m_ddUncompPixelFormat, sizeof (DDPIXELFORMAT));
+		gpu_memcpy (&UncompInfo.ddUncompPixelFormat, &m_ddUncompPixelFormat, sizeof (DDPIXELFORMAT));
 		UncompInfo.dwUncompWidth		= m_pVideoDecFilter->PictWidthRounded();
 		UncompInfo.dwUncompHeight		= m_pVideoDecFilter->PictHeightRounded();
 		hr = pAMVideoAccelerator->GetCompBufferInfo(&m_GuidDecoderDXVA1, &UncompInfo, &dwNumTypesCompBuffers, CompInfo);

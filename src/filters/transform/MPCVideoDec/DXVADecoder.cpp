@@ -53,7 +53,7 @@ CDXVADecoder::CDXVADecoder (CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* p
 {
 	m_nEngine			= ENGINE_DXVA2;
 	m_pDirectXVideoDec	= pDirectXVideoDec;
-	memcpy (&m_DXVA2Config, pDXVA2Config, sizeof(DXVA2_ConfigPictureDecode));
+	gpu_memcpy (&m_DXVA2Config, pDXVA2Config, sizeof(DXVA2_ConfigPictureDecode));
 
 	Init (pFilter, nMode, nPicEntryNumber);
 };
@@ -104,7 +104,7 @@ void CDXVADecoder::SetExtraData (BYTE* pDataIn, UINT nSize)
 
 void CDXVADecoder::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize)
 {
-	memcpy (pDXVABuffer, (BYTE*)pBuffer, nSize);
+	gpu_memcpy (pDXVABuffer, (BYTE*)pBuffer, nSize);
 }
 
 void CDXVADecoder::Flush()
@@ -169,7 +169,7 @@ HRESULT CDXVADecoder::ConfigureDXVA1()
 			DWORD					dwNum = COMP_BUFFER_COUNT;
 			DataInfo.dwUncompWidth	= m_pFilter->PictWidthRounded();
 			DataInfo.dwUncompHeight	= m_pFilter->PictHeightRounded();
-			memcpy (&DataInfo.ddUncompPixelFormat, m_pFilter->GetPixelFormat(), sizeof (DDPIXELFORMAT));
+			gpu_memcpy (&DataInfo.ddUncompPixelFormat, m_pFilter->GetPixelFormat(), sizeof (DDPIXELFORMAT));
 			hr = m_pAMVideoAccelerator->GetCompBufferInfo (m_pFilter->GetDXVADecoderGuid(), &DataInfo, &dwNum, m_ComBufferInfo);
 		}
 	}
@@ -235,7 +235,7 @@ HRESULT CDXVADecoder::AddExecuteBuffer (DWORD CompressedBufferType, UINT nSize, 
 				if (CompressedBufferType == DXVA2_BitStreamDateBufferType) {
 					CopyBitstream (pDXVABuffer, (BYTE*)pBuffer, nSize);
 				} else {
-					memcpy (pDXVABuffer, (BYTE*)pBuffer, nSize);
+					gpu_memcpy (pDXVABuffer, (BYTE*)pBuffer, nSize);
 				}
 				m_DXVA1BufferInfo[m_dwNumBuffersInfo].dwTypeIndex		= dwTypeIndex;
 				m_DXVA1BufferInfo[m_dwNumBuffersInfo].dwBufferIndex		= m_dwBufferIndex;
@@ -259,7 +259,7 @@ HRESULT CDXVADecoder::AddExecuteBuffer (DWORD CompressedBufferType, UINT nSize, 
 				if (CompressedBufferType == DXVA2_BitStreamDateBufferType) {
 					CopyBitstream (pDXVABuffer, (BYTE*)pBuffer, nSize);
 				} else {
-					memcpy (pDXVABuffer, (BYTE*)pBuffer, nSize);
+					gpu_memcpy (pDXVABuffer, (BYTE*)pBuffer, nSize);
 				}
 
 				m_ExecuteParams.pCompressedBuffers[m_ExecuteParams.NumCompBuffers].CompressedBufferType = CompressedBufferType;

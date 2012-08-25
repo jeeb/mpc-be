@@ -1114,10 +1114,10 @@ int CMpeg2Dec::mpeg2_header_user_data()
 void CMpeg2Dec::mpeg2_header_matrix_finalize()
 {
     if(m_copy_matrix & 1)
-		memcpy(m_decoder.m_intra_quantizer_matrix, m_intra_quantizer_matrix, 64);
+		gpu_memcpy(m_decoder.m_intra_quantizer_matrix, m_intra_quantizer_matrix, 64);
 
     if(m_copy_matrix & 2)
-		memcpy(m_decoder.m_non_intra_quantizer_matrix, m_non_intra_quantizer_matrix, 64);
+		gpu_memcpy(m_decoder.m_non_intra_quantizer_matrix, m_non_intra_quantizer_matrix, 64);
 }
 
 void mpeg2_sequence_t::finalize()
