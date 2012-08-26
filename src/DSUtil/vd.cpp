@@ -1,3 +1,4 @@
+// $Id$
 //	VirtualDub - Video processing and capture application
 //	Graphics support library
 //	Copyright (C) 1998-2007 Avery Lee
