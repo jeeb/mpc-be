@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id$
  *      Copyright (C) 2011 Hendrik Leppkes
  *      http://www.1f0.de
  *
