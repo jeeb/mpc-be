@@ -157,7 +157,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
 
 					if (iDisableXPToolbars == 1) {
-						iDisableXPToolbars = 2;
+						iDisableXPToolbars++;
 					}
 
 					memdc.BitBlt(r.left, r.top, r.Width(), height, &dc, r.left, r.top, SRCCOPY);
@@ -182,7 +182,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
 
 					if (iDisableXPToolbars == 0) {
-						iDisableXPToolbars = 1;
+						iDisableXPToolbars++;
 					}
 
 					iThemeBrightness = s.nThemeBrightness;
