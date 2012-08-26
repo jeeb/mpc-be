@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "../../InternalPropertyPage.h"
+#include "../../core/InternalPropertyPage.h"
 #include "MpaDecFilter.h"
 #include <afxcmn.h>
 

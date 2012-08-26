@@ -115,7 +115,7 @@ STDAPI DllUnregisterServer()
 	return AMovieDllRegisterServer2(FALSE);
 }
 
-#include "../../FilterApp.h"
+#include "../../core/FilterApp.h"
 
 class CSubtitleSourceApp : public CFilterApp
 {

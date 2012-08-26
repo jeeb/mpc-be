@@ -148,7 +148,7 @@ LONG WINAPI Mine_ChangeDisplaySettingsExW(LPCWSTR lpszDeviceName, LPDEVMODEW lpD
 
 //
 
-#include "../../FilterApp.h"
+#include "../../core/FilterApp.h"
 
 class CMpeg2DecFilterApp : public CFilterApp
 {

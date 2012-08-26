@@ -315,7 +315,7 @@ STDAPI DllUnregisterServer()
 
 //
 
-#include "../../FilterApp.h"
+#include "../../core/FilterApp.h"
 
 CFilterApp theApp;
 
