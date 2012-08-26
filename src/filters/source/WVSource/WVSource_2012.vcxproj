@@ -256,7 +256,7 @@
     <ProjectReference Include="..\..\..\ExtLib\wavpacklib\wavpacklib_2012.vcxproj">
       <Project>{99e59c6f-4e0e-40a1-9f16-f1302947516b}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\Filters_2012.vcxproj">
+    <ProjectReference Include="..\..\core\Filters_2012.vcxproj">
       <Project>{273b3149-3192-4b75-a791-470320b90812}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

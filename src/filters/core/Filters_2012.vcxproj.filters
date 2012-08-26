@@ -28,9 +28,6 @@
     <ClInclude Include="FilterApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Filters.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="InternalPropertyPage.h">
       <Filter>Header Files</Filter>
     </ClInclude>

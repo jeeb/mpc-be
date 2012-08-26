@@ -263,7 +263,7 @@
     <ProjectReference Include="..\..\..\ExtLib\VirtualDub\system\system.vcxproj">
       <Project>{c2082189-3ecb-4079-91fa-89d3c8a305c0}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\Filters.vcxproj">
+    <ProjectReference Include="..\..\core\Filters.vcxproj">
       <Project>{273b3149-3192-4b75-a791-470320b90812}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

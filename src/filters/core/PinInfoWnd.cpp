@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: PinInfoWnd.cpp 953 2012-08-19 21:20:50Z exodus8 $
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt
@@ -23,7 +23,7 @@
 
 #include "stdafx.h"
 #include "PinInfoWnd.h"
-#include "../DSUtil/DSUtil.h"
+#include "../../DSUtil/DSUtil.h"
 
 //
 // CPinInfoWnd
@@ -57,6 +57,7 @@ void CPinInfoWnd::OnDisconnect()
 }
 
 static WNDPROC OldControlProc;
+
 static LRESULT CALLBACK ControlProc(HWND control, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	if (message == WM_KEYDOWN) {

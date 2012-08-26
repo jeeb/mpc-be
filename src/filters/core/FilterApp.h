@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: FilterApp.h 20 2012-04-20 01:42:55Z aleksoid $
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt
@@ -23,7 +23,13 @@
 
 #pragma once
 
-#include "../DSUtil/SharedInclude.h"
-#include "../../include/stdafx_common.h"
-#include "../../include/stdafx_common_afx.h"
-#include "../../include/stdafx_common_dshow.h"
+class CFilterApp : public CWinApp
+{
+public:
+	CFilterApp();
+
+	BOOL InitInstance();
+	BOOL ExitInstance();
+
+	DECLARE_MESSAGE_MAP()
+};

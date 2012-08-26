@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: InternalPropertyPage.cpp 53 2012-04-23 13:34:44Z alexins $
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt
@@ -23,7 +23,7 @@
 
 #include "stdafx.h"
 #include "InternalPropertyPage.h"
-#include "../DSUtil/DSUtil.h"
+#include "../../DSUtil/DSUtil.h"
 
 //
 // CInternalPropertyPageWnd

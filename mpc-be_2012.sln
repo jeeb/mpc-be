@@ -56,7 +56,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TreePropSheet", "src\ExtLib
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BaseClasses", "src\ExtLib\BaseClasses\BaseClasses_2012.vcxproj", "{E8A3F6FA-AE1C-4C8E-A0B6-9C8480324EAA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Filters", "src\filters\Filters_2012.vcxproj", "{273B3149-3192-4B75-A791-470320B90812}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Filters", "src\filters\core\Filters_2012.vcxproj", "{273B3149-3192-4B75-A791-470320B90812}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ffmpeg", "src\ExtLib\ffmpeg\ffmpeg_2012.vcxproj", "{438286B7-A9F4-411D-BCC5-948C40E37D8F}"
 EndProject
@@ -156,7 +156,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bento4", "src\ExtLib\Bento4
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MPCBEShellExt", "src\apps\ShellExt\MPCBEShellExt\MPCBEShellExt_2012.vcxproj", "{BF167235-4EEA-43E5-91E6-7B143B26C56B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WVSource", "src\filters\source\WavPackSource\WVSource_2012.vcxproj", "{F22DE3B2-4DE9-4013-BBAB-1BB39F2B7DF7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WVSource", "src\filters\source\WVSource\WVSource_2012.vcxproj", "{F22DE3B2-4DE9-4013-BBAB-1BB39F2B7DF7}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wavpacklib", "src\ExtLib\wavpacklib\wavpacklib_2012.vcxproj", "{99E59C6F-4E0E-40A1-9F16-F1302947516B}"
 EndProject
