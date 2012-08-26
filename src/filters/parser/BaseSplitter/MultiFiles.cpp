@@ -23,6 +23,7 @@
 #include "stdafx.h"
 #include "MultiFiles.h"
 
+
 IMPLEMENT_DYNAMIC(CMultiFiles, CObject)
 
 CMultiFiles::CMultiFiles()

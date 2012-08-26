@@ -72,7 +72,7 @@ bool CALLBACK DSEnumProc(LPGUID lpGUID,
 		{
 			return TRUE;
 		}
-		gpu_memcpy(lpTemp, lpGUID, sizeof(GUID));
+		memcpy(lpTemp, lpGUID, sizeof(GUID));
 	}
 	pCombo->AddString ( lpszDesc );
 	free(lpTemp);

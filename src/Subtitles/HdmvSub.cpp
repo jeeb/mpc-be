@@ -231,7 +231,7 @@ void CHdmvSub::ParsePalette(CGolombBuffer* pGBuffer, USHORT nSize)
 		m_pDefaultPalette		 = DNew HDMV_PALETTE[nNbEntry];
 		m_nDefaultPaletteNbEntry = nNbEntry;
 	}
-	gpu_memcpy(m_pDefaultPalette, pPalette, nNbEntry*sizeof(HDMV_PALETTE));
+	memcpy (m_pDefaultPalette, pPalette, nNbEntry*sizeof(HDMV_PALETTE));
 
 	if (m_pCurrentObject) {
 		m_pCurrentObject->SetPalette (nNbEntry, pPalette, m_VideoDescriptor.nVideoWidth > 720);

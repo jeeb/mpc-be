@@ -228,7 +228,7 @@ HRESULT CMusePackSplitter::ConfigureMediaType(CMusePackOutputPin *pin)
 	wfe->nAvgBytesPerSec	= (wfe->nBlockAlign * wfe->nSamplesPerSec);
 	wfe->cbSize = extrasize;
 	if(extrasize) {
-		gpu_memcpy((BYTE*)(wfe+1), file->extradata, extrasize);
+		memcpy((BYTE*)(wfe+1), file->extradata, extrasize);
 	}
 
 	CMediaType mt;
@@ -1009,7 +1009,7 @@ HRESULT CMusePackOutputPin::DeliverPacket(CMPCPacket &packet)
 	
 	outp->size	  = packet.payload_size;
 	outp->buf	  = (BYTE*)malloc(outp->size);
-	gpu_memcpy(outp->buf, packet.payload, packet.payload_size);
+	memcpy(outp->buf, packet.payload, packet.payload_size);
 
 	// each packet is sync point
 	outp->sync_point = TRUE;
@@ -1079,7 +1079,7 @@ HRESULT CMusePackOutputPin::DeliverDataPacketMPC(DataPacketMPC &packet)
 	//
 	//*************************************************************************
 
-	gpu_memcpy(buf, packet.buf, packet.size);
+	memcpy(buf, packet.buf, packet.size);
 	sample->SetActualDataLength(packet.size);
 
 	// sync point, discontinuity ?
@@ -1334,7 +1334,7 @@ int CMusePackReader::ReadSwapped(void *buf, int size)
 
 	// copy data
 	bcur = temp + preroll;
-	gpu_memcpy(buf, bcur, size);
+	memcpy(buf, bcur, size);
 
 	// advance
 	Seek(cur + size);

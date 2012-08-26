@@ -166,14 +166,14 @@ __forceinline void mix<int, INT64, INT24_MIN, INT24_MAX>(DWORD mask, int ch, int
 	for (int i = 0, j = ch; i < j; i++) {
 		if (mask & (1<<i)) {
 			int tmp;
-			gpu_memcpy((BYTE*)&tmp+1, &src[bps*i], 3);
+			memcpy((BYTE*)&tmp+1, &src[bps*i], 3);
 			sum += tmp >> 8;
 		}
 	}
 
 	sum = min(max(sum, INT24_MIN), INT24_MAX);
 
-	gpu_memcpy(dst, (BYTE*)&sum, 3);
+	memcpy(dst, (BYTE*)&sum, 3);
 }
 
 template<class T, class U, int Umin, int Umax>
@@ -353,13 +353,13 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 				memset(buff, 0, len*bps);
 
 				for (int i = 0; i < len; i++) {
-					gpu_memcpy(buff + i*bps, (char*)pDataOut + (ch + i*wfeout->nChannels)*bps, bps);
+					memcpy(buff + i*bps, (char*)pDataOut + (ch + i*wfeout->nChannels)*bps, bps);
 				}
 
 				m_pResamplers[ch]->Downsample(buff, len, buff, lenout);
 
 				for (int i = 0; i < lenout; i++) {
-					gpu_memcpy((char*)pDataOut + (ch + i*wfeout->nChannels)*bps, buff + i*bps, bps);
+					memcpy((char*)pDataOut + (ch + i*wfeout->nChannels)*bps, buff + i*bps, bps);
 				}
 			}
 
@@ -378,7 +378,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 					buff[i] = (double)((short*)pDataOut)[i] / SHRT_MAX;
 				} else if (fPCM && wfe->wBitsPerSample == 24) {
 					int tmp;
-					gpu_memcpy(((BYTE*)&tmp)+1, &pDataOut[i*3], 3);
+					memcpy(((BYTE*)&tmp)+1, &pDataOut[i*3], 3);
 					buff[i] = (float)(tmp >> 8) / ((1<<23)-1);
 				} else if (fPCM && wfe->wBitsPerSample == 32) {
 					buff[i] = (double)((int*)pDataOut)[i] / INT_MAX;
@@ -428,7 +428,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 					((short*)pDataOut)[i] = clamp<short>(s, SHRT_MIN, SHRT_MAX);
 				} else if (fPCM && wfe->wBitsPerSample == 24)  {
 					int tmp = clamp<int>(s, -1<<23, (1<<23)-1);
-					gpu_memcpy(&pDataOut[i*3], &tmp, 3);
+					memcpy(&pDataOut[i*3], &tmp, 3);
 				} else if (fPCM && wfe->wBitsPerSample == 32) {
 					((int*)pDataOut)[i] = clamp<int>(s, INT_MIN, INT_MAX);
 				} else if (fFloat && wfe->wBitsPerSample == 32) {
@@ -573,7 +573,7 @@ STDMETHODIMP CAudioSwitcherFilter::GetSpeakerConfig(bool* pfCustomChannelMapping
 	if (pfCustomChannelMapping) {
 		*pfCustomChannelMapping = m_fCustomChannelMapping;
 	}
-	gpu_memcpy(pSpeakerToChannelMap, m_pSpeakerToChannelMap, sizeof(m_pSpeakerToChannelMap));
+	memcpy(pSpeakerToChannelMap, m_pSpeakerToChannelMap, sizeof(m_pSpeakerToChannelMap));
 
 	return S_OK;
 }
@@ -589,7 +589,7 @@ STDMETHODIMP CAudioSwitcherFilter::SetSpeakerConfig(bool fCustomChannelMapping, 
 		SelectInput(NULL);
 
 		m_fCustomChannelMapping = fCustomChannelMapping;
-		gpu_memcpy(m_pSpeakerToChannelMap, pSpeakerToChannelMap, sizeof(m_pSpeakerToChannelMap));
+		memcpy(m_pSpeakerToChannelMap, pSpeakerToChannelMap, sizeof(m_pSpeakerToChannelMap));
 
 		SelectInput(pInput);
 

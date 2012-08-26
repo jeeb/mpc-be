@@ -634,7 +634,7 @@ STDMETHODIMP CRealMediaWindowlessSite::Blt(UCHAR*	/*IN*/ pImageData, RMABitmapIn
 STDMETHODIMP CRealMediaWindowlessSite::BeginOptimizedBlt(RMABitmapInfoHeader* /*IN*/ pBitmapInfo)
 {
 	if (memcmp(&m_bitmapInfo, pBitmapInfo, sizeof(RMABitmapInfoHeader))) {
-		gpu_memcpy(&m_bitmapInfo, pBitmapInfo, sizeof(RMABitmapInfoHeader));
+		memcpy(&m_bitmapInfo, pBitmapInfo, sizeof(RMABitmapInfoHeader));
 	}
 
 	/*

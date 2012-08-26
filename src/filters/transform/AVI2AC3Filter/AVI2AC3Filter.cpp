@@ -128,7 +128,7 @@ HRESULT CAVI2AC3Filter::Transform(IMediaSample* pSample, IMediaSample* pOutSampl
 			return E_FAIL;
 		}
 
-		gpu_memcpy(pOut, pIn, len);
+		memcpy(pOut, pIn, len);
 		pOut += len;
 	} else if ((CheckWAVEAC3(&m_pInput->CurrentMediaType()) || CheckWAVEDTS(&m_pInput->CurrentMediaType()))
 			   && (CheckAC3(&m_pOutput->CurrentMediaType()) || CheckDTS(&m_pOutput->CurrentMediaType()))) {
@@ -182,7 +182,7 @@ HRESULT CAVI2AC3Filter::Transform(IMediaSample* pSample, IMediaSample* pOutSampl
 						0x01,0x89,0xC3,0xF8,			// mux rate (1260000 bytes/sec, 22bits), marker (2bits), reserved (~0, 5bits), stuffing (0, 3bits)
 					};
 
-					gpu_memcpy(pOut, &PESHeader, sizeof(PESHeader));
+					memcpy(pOut, &PESHeader, sizeof(PESHeader));
 					pOut += sizeof(PESHeader);
 
 					majortype = &MEDIATYPE_MPEG2_PES;
@@ -233,7 +233,7 @@ HRESULT CAVI2AC3Filter::Transform(IMediaSample* pSample, IMediaSample* pOutSampl
 						}
 					}
 
-					gpu_memcpy(pOut, &Private1Header, sizeof(Private1Header));
+					memcpy(pOut, &Private1Header, sizeof(Private1Header));
 					pOut += sizeof(Private1Header);
 
 					majortype = &MEDIATYPE_Audio;
@@ -243,7 +243,7 @@ HRESULT CAVI2AC3Filter::Transform(IMediaSample* pSample, IMediaSample* pOutSampl
 					if (size < curlen) {
 						return E_FAIL;
 					}
-					gpu_memcpy(pOut, pIn, curlen);
+					memcpy(pOut, pIn, curlen);
 					pIn += curlen;
 					pOut += curlen;
 				}
@@ -269,7 +269,7 @@ HRESULT CAVI2AC3Filter::Transform(IMediaSample* pSample, IMediaSample* pOutSampl
 					0x01,0x89,0xC3,0xF8,			// mux rate (1260000 bytes/sec, 22bits), marker (2bits), reserved (~0, 5bits), stuffing (0, 3bits)
 				};
 
-				gpu_memcpy(pOut, &PESHeader, sizeof(PESHeader));
+				memcpy(pOut, &PESHeader, sizeof(PESHeader));
 				pOut += sizeof(PESHeader);
 
 				majortype = &MEDIATYPE_MPEG2_PES;
@@ -300,7 +300,7 @@ HRESULT CAVI2AC3Filter::Transform(IMediaSample* pSample, IMediaSample* pOutSampl
 					Private1Header[17] += 8;
 				}
 
-				gpu_memcpy(pOut, &Private1Header, sizeof(Private1Header));
+				memcpy(pOut, &Private1Header, sizeof(Private1Header));
 				pOut += sizeof(Private1Header);
 
 				majortype = &MEDIATYPE_Audio;
@@ -311,7 +311,7 @@ HRESULT CAVI2AC3Filter::Transform(IMediaSample* pSample, IMediaSample* pOutSampl
 					return E_FAIL;
 				}
 
-				gpu_memcpy(pOut, pIn, len);
+				memcpy(pOut, pIn, len);
 				pIn += len;
 				pOut += len;
 			}

@@ -137,14 +137,14 @@ STDMETHODIMP COuterVMR9::GetPreferredAspectRatio(long* plAspectX, long* plAspect
 STDMETHODIMP COuterVMR9::GetAlphaBitmapParameters(VMR9AlphaBitmap* pBmpParms) {
 	CheckPointer(pBmpParms, E_POINTER);
 	CAutoLock BitMapLock(&m_pAllocatorPresenter->m_VMR9AlphaBitmapLock);
-	gpu_memcpy(pBmpParms, m_pVMR9AlphaBitmap, sizeof(VMR9AlphaBitmap));
+	memcpy (pBmpParms, m_pVMR9AlphaBitmap, sizeof(VMR9AlphaBitmap));
 	return S_OK;
 }
 
 STDMETHODIMP COuterVMR9::SetAlphaBitmap(const VMR9AlphaBitmap*  pBmpParms) {
 	CheckPointer(pBmpParms, E_POINTER);
 	CAutoLock BitMapLock(&m_pAllocatorPresenter->m_VMR9AlphaBitmapLock);
-	gpu_memcpy(m_pVMR9AlphaBitmap, pBmpParms, sizeof(VMR9AlphaBitmap));
+	memcpy (m_pVMR9AlphaBitmap, pBmpParms, sizeof(VMR9AlphaBitmap));
 	m_pVMR9AlphaBitmap->dwFlags |= VMRBITMAP_UPDATE;
 	m_pAllocatorPresenter->UpdateAlphaBitmap();
 	return S_OK;
@@ -153,7 +153,7 @@ STDMETHODIMP COuterVMR9::SetAlphaBitmap(const VMR9AlphaBitmap*  pBmpParms) {
 STDMETHODIMP COuterVMR9::UpdateAlphaBitmapParameters(const VMR9AlphaBitmap* pBmpParms) {
 	CheckPointer(pBmpParms, E_POINTER);
 	CAutoLock BitMapLock(&m_pAllocatorPresenter->m_VMR9AlphaBitmapLock);
-	gpu_memcpy(m_pVMR9AlphaBitmap, pBmpParms, sizeof(VMR9AlphaBitmap));
+	memcpy (m_pVMR9AlphaBitmap, pBmpParms, sizeof(VMR9AlphaBitmap));
 	m_pVMR9AlphaBitmap->dwFlags |= VMRBITMAP_UPDATE;
 	m_pAllocatorPresenter->UpdateAlphaBitmap();
 	return S_OK;

@@ -24,6 +24,7 @@
 #include "stdafx.h"
 #include "STS.h"
 #include <atlbase.h>
+
 #include "RealTextParser.h"
 #include <fstream>
 #include "USFSubtitles.h"

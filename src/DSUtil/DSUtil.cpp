@@ -215,7 +215,7 @@ bool IsVideoRenderer(IBaseFilter* pBF)
 	}
 
 	CLSID clsid;
-	gpu_memcpy(&clsid, &GUID_NULL, sizeof(clsid));
+	memcpy(&clsid, &GUID_NULL, sizeof(clsid));
 	pBF->GetClassID(&clsid);
 
 	return (clsid == CLSID_VideoRenderer || clsid == CLSID_VideoRendererDefault);
@@ -245,7 +245,7 @@ bool IsAudioWaveRenderer(IBaseFilter* pBF)
 	}
 
 	CLSID clsid;
-	gpu_memcpy(&clsid, &GUID_NULL, sizeof(clsid));
+	memcpy(&clsid, &GUID_NULL, sizeof(clsid));
 	pBF->GetClassID(&clsid);
 
 	return (clsid == CLSID_DSoundRender || clsid == CLSID_AudioRender || clsid == CLSID_ReClock
@@ -1047,23 +1047,23 @@ bool ExtractBIH(const AM_MEDIA_TYPE* pmt, BITMAPINFOHEADER* bih)
 
 		if (pmt->formattype == FORMAT_VideoInfo) {
 			VIDEOINFOHEADER* vih = (VIDEOINFOHEADER*)pmt->pbFormat;
-			gpu_memcpy(bih, &vih->bmiHeader, sizeof(BITMAPINFOHEADER));
+			memcpy(bih, &vih->bmiHeader, sizeof(BITMAPINFOHEADER));
 			return true;
 		} else if (pmt->formattype == FORMAT_VideoInfo2) {
 			VIDEOINFOHEADER2* vih = (VIDEOINFOHEADER2*)pmt->pbFormat;
-			gpu_memcpy(bih, &vih->bmiHeader, sizeof(BITMAPINFOHEADER));
+			memcpy(bih, &vih->bmiHeader, sizeof(BITMAPINFOHEADER));
 			return true;
 		} else if (pmt->formattype == FORMAT_MPEGVideo) {
 			VIDEOINFOHEADER* vih = &((MPEG1VIDEOINFO*)pmt->pbFormat)->hdr;
-			gpu_memcpy(bih, &vih->bmiHeader, sizeof(BITMAPINFOHEADER));
+			memcpy(bih, &vih->bmiHeader, sizeof(BITMAPINFOHEADER));
 			return true;
 		} else if (pmt->formattype == FORMAT_MPEG2_VIDEO) {
 			VIDEOINFOHEADER2* vih = &((MPEG2VIDEOINFO*)pmt->pbFormat)->hdr;
-			gpu_memcpy(bih, &vih->bmiHeader, sizeof(BITMAPINFOHEADER));
+			memcpy(bih, &vih->bmiHeader, sizeof(BITMAPINFOHEADER));
 			return true;
 		} else if (pmt->formattype == FORMAT_DiracVideoInfo) {
 			VIDEOINFOHEADER2* vih = &((DIRACINFOHEADER*)pmt->pbFormat)->hdr;
-			gpu_memcpy(bih, &vih->bmiHeader, sizeof(BITMAPINFOHEADER));
+			memcpy(bih, &vih->bmiHeader, sizeof(BITMAPINFOHEADER));
 			return true;
 		}
 	}
@@ -1223,7 +1223,7 @@ bool MakeMPEG2MediaType(CMediaType& mt, BYTE* seqhdr, DWORD len, int w, int h)
 	vih->hdr.bmiHeader.biHeight = h;
 
 	BYTE* pSequenceHeader = (BYTE*)vih->dwSequenceHeader;
-	gpu_memcpy(pSequenceHeader, seqhdr, len);
+	memcpy(pSequenceHeader, seqhdr, len);
 	vih->cbSequenceHeader = len;
 
 	static char profile[8] = {
@@ -2846,7 +2846,7 @@ void getExtraData(const BYTE *format, const GUID *formattype, const size_t forma
 		extralength = min(extralength, formatlen - sizeof(VORBISFORMAT2));
 
 		if (extra && extralength)
-			gpu_memcpy(extra, format + sizeof(VORBISFORMAT2), extralength);
+			memcpy(extra, format + sizeof(VORBISFORMAT2), extralength);
 		if (extralen)
 			*extralen = (unsigned int)extralength + offset;
 
@@ -2868,7 +2868,7 @@ void getExtraData(const BYTE *format, const GUID *formattype, const size_t forma
 	}
 
 	if (extra && extralength)
-		gpu_memcpy(extra, extraposition, extralength);
+		memcpy(extra, extraposition, extralength);
 	if (extralen)
 		*extralen = (unsigned int)extralength;
 }

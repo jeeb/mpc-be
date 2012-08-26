@@ -27,6 +27,7 @@
 #include "PPageDVD.h"
 #include "../../DSUtil/WinAPIUtils.h"
 
+
 struct {
 	LCID lcid;
 	LPCSTR name;

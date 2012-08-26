@@ -30,4 +30,3 @@
 
 #include <afxsock.h>
 #include <atlcoll.h>
-#include "../../../DSUtil/gpu_memcpy.h"

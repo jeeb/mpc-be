@@ -1508,7 +1508,7 @@ void CMPCVideoDecFilter::BuildDXVAOutputFormat()
 		}
 
 		// Static list for DXVA2
-		gpu_memcpy (&m_pVideoOutputFormat[nPos], DXVAFormats, sizeof(DXVAFormats));
+		memcpy (&m_pVideoOutputFormat[nPos], DXVAFormats, sizeof(DXVAFormats));
 		nPos += _countof (DXVAFormats);
 	}
 	// Software rendering
@@ -1518,7 +1518,7 @@ void CMPCVideoDecFilter::BuildDXVAOutputFormat()
 				m_pVideoOutputFormat[nPos + i] = SoftwareFormats[nSwIndex[i]];
 			}
 		} else {
-			gpu_memcpy (&m_pVideoOutputFormat[nPos], SoftwareFormats, sizeof(SoftwareFormats));
+			memcpy (&m_pVideoOutputFormat[nPos], SoftwareFormats, sizeof(SoftwareFormats));
 		}
 	}
 }
@@ -1974,14 +1974,14 @@ void copyPlane(BYTE *dstp, stride_t dst_pitch, const BYTE *srcp, stride_t src_pi
 {
 	if (!flip) {
 		for (int y=height; y>0; --y) {
-			gpu_memcpy(dstp, srcp, row_size);
+			memcpy(dstp, srcp, row_size);
 			dstp += dst_pitch;
 			srcp += src_pitch;
 		}
 	} else {
 		dstp += dst_pitch * (height - 1);
 		for (int y=height; y>0; --y) {
-			gpu_memcpy(dstp, srcp, row_size);
+			memcpy(dstp, srcp, row_size);
 			dstp -= dst_pitch;
 			srcp += src_pitch;
 		}
@@ -2020,7 +2020,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			// 32 or 64 bit at once and could read over the end.
 			// Note: If the first 23 bits of the additional bytes are not 0, then damaged
 			// MPEG bitstreams could cause overread and segfault.
-			gpu_memcpy(m_pFFBuffer, pDataIn, nSize);
+			memcpy(m_pFFBuffer, pDataIn, nSize);
 			memset(m_pFFBuffer+nSize,0,FF_INPUT_BUFFER_PADDING_SIZE);
 
 			avpkt.data = m_pFFBuffer;
@@ -2329,7 +2329,7 @@ bool CMPCVideoDecFilter::AppendBuffer (BYTE* pDataIn, int nSize, REFERENCE_TIME 
 		m_pFFBuffer		= (BYTE*)av_realloc(m_pFFBuffer, m_nFFBufferSize);
 	}
 
-	gpu_memcpy(m_pFFBuffer+m_nFFBufferPos, pDataIn, nSize);
+	memcpy(m_pFFBuffer+m_nFFBufferPos, pDataIn, nSize);
 
 	m_nFFBufferPos += nSize;
 
@@ -2343,7 +2343,7 @@ void CMPCVideoDecFilter::ShrinkBuffer()
 	ASSERT (m_nFFPicEnd != INT_MIN);
 
 	PopBufferTime (m_nFFPicEnd);
-	gpu_memcpy (m_pFFBuffer, m_pFFBuffer+m_nFFPicEnd, nRemaining);
+	memcpy (m_pFFBuffer, m_pFFBuffer+m_nFFPicEnd, nRemaining);
 	m_nFFBufferPos	= nRemaining;
 
 	m_nFFPicEnd = (m_pFFBuffer[3] == 0x00) ?  0 : INT_MIN;
@@ -2727,7 +2727,7 @@ HRESULT CMPCVideoDecFilter::FindDXVA1DecoderConfiguration(IAMVideoAccelerator* p
 			// Look for a format that matches our output format.
 			for (DWORD iFormat = 0; iFormat < dwFormats; iFormat++) {
 				if (pPixelFormats[iFormat].dwFourCC == MAKEFOURCC ('N', 'V', '1', '2')) {
-					gpu_memcpy (pPixelFormat, &pPixelFormats[iFormat], sizeof(DDPIXELFORMAT));
+					memcpy (pPixelFormat, &pPixelFormats[iFormat], sizeof(DDPIXELFORMAT));
 					SAFE_DELETE_ARRAY(pPixelFormats)
 					return S_OK;
 				}
@@ -2756,7 +2756,7 @@ HRESULT CMPCVideoDecFilter::CheckDXVA1Decoder(const GUID *pGuid)
 void CMPCVideoDecFilter::SetDXVA1Params(const GUID* pGuid, DDPIXELFORMAT* pPixelFormat)
 {
 	m_DXVADecoderGUID		= *pGuid;
-	gpu_memcpy (&m_PixelFormat, pPixelFormat, sizeof (DDPIXELFORMAT));
+	memcpy (&m_PixelFormat, pPixelFormat, sizeof (DDPIXELFORMAT));
 }
 
 WORD CMPCVideoDecFilter::GetDXVA1RestrictedMode()

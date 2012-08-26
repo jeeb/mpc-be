@@ -77,7 +77,7 @@ HRESULT CPixelShaderCompiler::CompileShader(
 
 			if (pErrorMsgs) {
 				int len = pErrorMsgs->GetBufferSize();
-				gpu_memcpy(msg.GetBufferSetLength(len), pErrorMsgs->GetBufferPointer(), len);
+				memcpy(msg.GetBufferSetLength(len), pErrorMsgs->GetBufferPointer(), len);
 			}
 
 			*errmsg = msg;

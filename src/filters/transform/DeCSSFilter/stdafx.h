@@ -37,4 +37,3 @@
 
 #include <afx.h>
 #include <afxwin.h>			// MFC core and standard components
-#include "../../../DSUtil/gpu_memcpy.h"

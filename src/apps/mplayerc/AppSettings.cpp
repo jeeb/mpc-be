@@ -379,7 +379,7 @@ bool CAppSettings::NewDvd(ULONGLONG llDVDGuid)
 
 	// If DVD is unknown, we put it first
 	for (int i=MAX_DVD_POSITION-1; i>0; i--) {
-		gpu_memcpy(&DvdPosition[i], &DvdPosition[i-1], sizeof(DVD_POSITION));
+		memcpy (&DvdPosition[i], &DvdPosition[i-1], sizeof(DVD_POSITION));
 	}
 	DvdPosition[0].llDVDGuid	= llDVDGuid;
 	nCurrentDvdPosition			= 0;
@@ -911,7 +911,7 @@ void CAppSettings::UpdateData(bool fSave)
 
 		if ( pApp->GetProfileBinary(IDS_R_SETTINGS, IDS_RS_FULLSCREENRES, &ptr, &len) ) {
 			if ( len == sizeof(AChFR) ) {
-				gpu_memcpy( &AutoChangeFullscrRes, ptr, sizeof(AChFR) );
+				memcpy( &AutoChangeFullscrRes, ptr, sizeof(AChFR) );
 			} else {
 				AutoChangeFullscrRes.bEnabled = 0;
 			}
@@ -941,7 +941,7 @@ void CAppSettings::UpdateData(bool fSave)
 		fKeepHistory = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_KEEPHISTORY, 1);
 		if ( pApp->GetProfileBinary(IDS_R_SETTINGS, IDS_RS_LASTWINDOWRECT, &ptr, &len) ) {
 			if ( len == sizeof(CRect) ) {
-				gpu_memcpy( &rcLastWindowPos, ptr, sizeof(CRect) );
+				memcpy( &rcLastWindowPos, ptr, sizeof(CRect) );
 			} else {
 				fRememberWindowPos = false;
 			}
@@ -991,7 +991,7 @@ void CAppSettings::UpdateData(bool fSave)
 
 		BOOL bResult = pApp->GetProfileBinary( IDS_R_SETTINGS, IDS_RS_SPEAKERTOCHANNELMAPPING, &ptr, &len );
 		if ( bResult && len == sizeof(pSpeakerToChannelMap) ) {
-			gpu_memcpy( pSpeakerToChannelMap, ptr, sizeof(pSpeakerToChannelMap) );
+			memcpy( pSpeakerToChannelMap, ptr, sizeof(pSpeakerToChannelMap) );
 		} else {
 			memset(pSpeakerToChannelMap, 0, sizeof(pSpeakerToChannelMap));
 			for (int j = 0; j < 18; j++)

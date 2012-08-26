@@ -391,7 +391,7 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 		if (mime.IsEmpty()) {
 			mime = "application/octet-stream";
 		}
-		gpu_memcpy(body.GetBufferSetLength(res.GetLength()), res.GetBuffer(), res.GetLength());
+		memcpy(body.GetBufferSetLength(res.GetLength()), res.GetBuffer(), res.GetLength());
 		fHandled = true;
 	}
 

@@ -1513,7 +1513,7 @@ void CBaseAP::UpdateAlphaBitmap()
 		m_VMR9AlphaBitmapWidthBytes = info.dsBm.bmWidthBytes;
 
 		if (m_VMR9AlphaBitmapData.Allocate(info.dsBm.bmWidthBytes * info.dsBm.bmHeight)) {
-			gpu_memcpy((BYTE *)m_VMR9AlphaBitmapData, info.dsBm.bmBits, info.dsBm.bmWidthBytes * info.dsBm.bmHeight);
+			memcpy((BYTE *)m_VMR9AlphaBitmapData, info.dsBm.bmBits, info.dsBm.bmWidthBytes * info.dsBm.bmHeight);
 		}
 	}
 }
@@ -3289,7 +3289,7 @@ STDMETHODIMP CSyncAP::GetVideoPosition(MFVideoNormalizedRect *pnrcSource, LPRECT
 		pnrcSource->bottom	= 1.0;
 	}
 	if (prcDest) {
-		gpu_memcpy(prcDest, &m_VideoRect, sizeof(m_VideoRect));    //GetClientRect (m_hWnd, prcDest);
+		memcpy (prcDest, &m_VideoRect, sizeof(m_VideoRect));    //GetClientRect (m_hWnd, prcDest);
 	}
 	return S_OK;
 }
@@ -4096,7 +4096,7 @@ STDMETHODIMP CSyncRenderer::GetAlphaBitmapParameters(VMR9AlphaBitmap* pBmpParms)
 {
 	CheckPointer(pBmpParms, E_POINTER);
 	CAutoLock BitMapLock(&m_pAllocatorPresenter->m_VMR9AlphaBitmapLock);
-	gpu_memcpy(pBmpParms, m_pVMR9AlphaBitmap, sizeof(VMR9AlphaBitmap));
+	memcpy (pBmpParms, m_pVMR9AlphaBitmap, sizeof(VMR9AlphaBitmap));
 	return S_OK;
 }
 
@@ -4104,7 +4104,7 @@ STDMETHODIMP CSyncRenderer::SetAlphaBitmap(const VMR9AlphaBitmap*  pBmpParms)
 {
 	CheckPointer(pBmpParms, E_POINTER);
 	CAutoLock BitMapLock(&m_pAllocatorPresenter->m_VMR9AlphaBitmapLock);
-	gpu_memcpy(m_pVMR9AlphaBitmap, pBmpParms, sizeof(VMR9AlphaBitmap));
+	memcpy (m_pVMR9AlphaBitmap, pBmpParms, sizeof(VMR9AlphaBitmap));
 	m_pVMR9AlphaBitmap->dwFlags |= VMRBITMAP_UPDATE;
 	m_pAllocatorPresenter->UpdateAlphaBitmap();
 	return S_OK;
@@ -4114,7 +4114,7 @@ STDMETHODIMP CSyncRenderer::UpdateAlphaBitmapParameters(const VMR9AlphaBitmap* p
 {
 	CheckPointer(pBmpParms, E_POINTER);
 	CAutoLock BitMapLock(&m_pAllocatorPresenter->m_VMR9AlphaBitmapLock);
-	gpu_memcpy(m_pVMR9AlphaBitmap, pBmpParms, sizeof(VMR9AlphaBitmap));
+	memcpy (m_pVMR9AlphaBitmap, pBmpParms, sizeof(VMR9AlphaBitmap));
 	m_pVMR9AlphaBitmap->dwFlags |= VMRBITMAP_UPDATE;
 	m_pAllocatorPresenter->UpdateAlphaBitmap();
 	return S_OK;

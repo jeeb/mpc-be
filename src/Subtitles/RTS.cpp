@@ -684,8 +684,8 @@ bool CPolygon::CreatePath()
 		mPathPoints = (int)len;
 	}
 
-	gpu_memcpy(mpPathTypes, m_pathTypesOrg.GetData(), len*sizeof(BYTE));
-	gpu_memcpy(mpPathPoints, m_pathPointsOrg.GetData(), len*sizeof(POINT));
+	memcpy(mpPathTypes, m_pathTypesOrg.GetData(), len*sizeof(BYTE));
+	memcpy(mpPathPoints, m_pathPointsOrg.GetData(), len*sizeof(POINT));
 
 	return true;
 }
@@ -2235,7 +2235,7 @@ bool CRenderedTextSubtitle::ParseHtmlTag(CSubtitle* sub, CStringW str, STSStyle&
 		} else {
 			style.fontName = org.fontName;
 			style.fontSize = org.fontSize;
-			gpu_memcpy(style.colors, org.colors, sizeof(style.colors));
+			memcpy(style.colors, org.colors, sizeof(style.colors));
 		}
 	} else if (tag == L"k" && attribs.GetCount() == 1 && attribs[0] == L"t") {
 		m_ktype = 1;

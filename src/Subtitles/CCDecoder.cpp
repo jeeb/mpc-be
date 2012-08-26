@@ -268,7 +268,7 @@ void CCDecoder::DecodeCC(BYTE* buff, int len, __int64 time)
 					}
 
 					m_fEndOfCaption = true;
-					gpu_memcpy(m_disp, m_buff, sizeof(m_disp));
+					memcpy(m_disp, m_buff, sizeof(m_disp));
 					m_time = time + (i/2)*1000/30;
 				}
 			} else if (buff[i] == 0x94 && buff[i+1] == 0x2c) { // Erase Displayed Memory

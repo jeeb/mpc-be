@@ -152,7 +152,7 @@ STDMETHODIMP CTTASplitter::Stop(void)
 STDMETHODIMP CTTASplitter::Pause(void)
 {
 	CAutoLock cObjectLock(m_pLock); 
-
+    
 	if (m_State == State_Stopped) {
 
 		if (m_pOutputPin->IsConnected()) {
@@ -171,7 +171,7 @@ STDMETHODIMP CTTASplitter::Pause(void)
 			}
 		}
 	}
-
+    
 	m_State = State_Paused;
 
 	return S_OK;
@@ -265,9 +265,9 @@ HRESULT CTTASplitterInputPin::BreakConnect(void)
 {
 	HRESULT hr = CBaseInputPin::BreakConnect();
 	if (FAILED(hr)) {
-		return hr;
+        	return hr;
 	}
-
+	
 	if(m_pIACBW) {
 		IAsyncCallBackWrapper_tta_free(&m_pIACBW);
 	}
@@ -540,7 +540,7 @@ HRESULT CTTASplitterOutputPin::GetMediaType(int iPosition, CMediaType *pMediaTyp
 	wfe->cbSize			= ttaparser->extradata_size;
 
 	if (wfe->cbSize) {
-		gpu_memcpy((BYTE*)(wfe+1), ttaparser->extradata, ttaparser->extradata_size);
+		memcpy((BYTE*)(wfe+1), ttaparser->extradata, ttaparser->extradata_size);
 	}
 
 	return S_OK;

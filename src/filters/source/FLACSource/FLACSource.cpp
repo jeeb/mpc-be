@@ -216,7 +216,7 @@ STDMETHODIMP CFLACSource::ResGet(DWORD iIndex, BSTR* ppName, BSTR* ppDesc, BSTR*
 	}
 	if (ppData) {
 		*pDataLen = (DWORD)stream->m_Cover.GetCount();
-		gpu_memcpy(*ppData = (BYTE*)CoTaskMemAlloc(*pDataLen), stream->m_Cover.GetData(), *pDataLen);
+		memcpy(*ppData = (BYTE*)CoTaskMemAlloc(*pDataLen), stream->m_Cover.GetData(), *pDataLen);
 	}
 	if (pTag) {
 		*pTag = 0;
@@ -447,7 +447,7 @@ void CFLACStream::UpdateFromMetadata (void* pBuffer)
 		if (!m_Cover.GetCount() && pMetadata->data.picture.data_length) {
 			m_CoverMime = pMetadata->data.picture.mime_type;
 			m_Cover.SetCount(pMetadata->data.picture.data_length);
-			gpu_memcpy(m_Cover.GetData(), pMetadata->data.picture.data, pMetadata->data.picture.data_length);
+			memcpy(m_Cover.GetData(), pMetadata->data.picture.data, pMetadata->data.picture.data_length);
 		}
 	}
 }

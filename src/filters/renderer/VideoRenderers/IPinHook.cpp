@@ -1487,7 +1487,7 @@ static HRESULT STDMETHODCALLTYPE GetDecoderConfigurationsMine (IDirectXVideoDeco
 	HRESULT hr = GetDecoderConfigurationsOrg(pThis, Guid, pVideoDesc, pReserved, pCount, ppConfigs);
 
 	// Force LongSlice decoding !
-	//	gpu_memcpy(&(*ppConfigs)[1], &(*ppConfigs)[0], sizeof(DXVA2_ConfigPictureDecode));
+	//	memcpy (&(*ppConfigs)[1], &(*ppConfigs)[0], sizeof(DXVA2_ConfigPictureDecode));
 
 	return hr;
 }

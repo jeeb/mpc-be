@@ -37,5 +37,5 @@
 #include <crtdefs.h>
 
 #include <BaseClasses/streams.h>
+
 #include "../DSUtil/DSUtil.h"
-#include "../DSUtil/gpu_memcpy.h"

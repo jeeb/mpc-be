@@ -281,7 +281,7 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 					memset(ptr, 0, size);
 				} else {
 					size = (DWORD)min(len, p->m_end - m_pos);
-					gpu_memcpy(ptr, &p->m_buff[m_pos - p->m_start], size);
+					memcpy(ptr, &p->m_buff[m_pos - p->m_start], size);
 				}
 
 				m_pos += size;
@@ -476,5 +476,5 @@ CUDPStream::packet_t::packet_t(BYTE* p, __int64 start, __int64 end)
 {
 	size_t size = (size_t)(end - start);
 	m_buff = DNew BYTE[size];
-	gpu_memcpy(m_buff, p, size);
+	memcpy(m_buff, p, size);
 }

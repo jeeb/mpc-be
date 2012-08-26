@@ -51,7 +51,7 @@ void CPacketQueue::Add(CAutoPtr<Packet> p)
 			size_t oldsize = tail->GetCount();
 			size_t newsize = tail->GetCount() + p->GetCount();
 			tail->SetCount(newsize, max(1024, (int)newsize)); // doubles the reserved buffer size
-			gpu_memcpy(tail->GetData() + oldsize, p->GetData(), p->GetCount());
+			memcpy(tail->GetData() + oldsize, p->GetData(), p->GetCount());
 			/*
 			GetTail()->Append(*p); // too slow
 			*/
@@ -621,7 +621,7 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 		if (S_OK != (hr = pSample->GetPointer(&pData)) || !pData) {
 			break;
 		}
-		gpu_memcpy(pData, p->GetData(), nBytes);
+		memcpy(pData, p->GetData(), nBytes);
 		if (S_OK != (hr = pSample->SetActualDataLength(nBytes))) {
 			break;
 		}

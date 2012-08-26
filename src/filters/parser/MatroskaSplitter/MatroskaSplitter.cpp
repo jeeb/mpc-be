@@ -186,7 +186,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mt.formattype = FORMAT_VideoInfo;
 					VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + pTE->CodecPrivate.GetCount() - sizeof(BITMAPINFOHEADER));
 					memset(mt.Format(), 0, mt.FormatLength());
-					gpu_memcpy(&pvih->bmiHeader, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					memcpy(&pvih->bmiHeader, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 					mt.subtype = FOURCCMap(pvih->bmiHeader.biCompression);
 					switch (pvih->bmiHeader.biCompression) {
 						case BI_RGB:
@@ -296,7 +296,7 @@ avcsuccess:
 						pm2vi->dwLevel = pTE->CodecPrivate[3];
 						pm2vi->dwFlags = (pTE->CodecPrivate[4] & 3) + 1;
 						BYTE* pSequenceHeader = (BYTE*)pm2vi->dwSequenceHeader;
-						gpu_memcpy(pSequenceHeader, data.GetData(), data.GetCount());
+						memcpy(pSequenceHeader, data.GetData(), data.GetCount());
 						pm2vi->cbSequenceHeader = (DWORD)data.GetCount();
 					}
 					if (!bHasVideo)
@@ -314,7 +314,7 @@ avcsuccess:
 					pm2vi->hdr.bmiHeader.biPlanes = 1;
 					pm2vi->hdr.bmiHeader.biBitCount = 24;
 					BYTE* pSequenceHeader = (BYTE*)pm2vi->dwSequenceHeader;
-					gpu_memcpy(pSequenceHeader, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					memcpy(pSequenceHeader, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 					pm2vi->cbSequenceHeader = (DWORD)pTE->CodecPrivate.GetCount();
 					if (!bHasVideo)
 						mts.Add(mt);
@@ -324,7 +324,7 @@ avcsuccess:
 					mt.formattype = FORMAT_VideoInfo;
 					VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + pTE->CodecPrivate.GetCount());
 					memset(mt.Format(), 0, mt.FormatLength());
-					gpu_memcpy(mt.Format() + sizeof(VIDEOINFOHEADER), pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					memcpy(mt.Format() + sizeof(VIDEOINFOHEADER), pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 					pvih->bmiHeader.biSize = sizeof(pvih->bmiHeader);
 					pvih->bmiHeader.biWidth = (LONG)pTE->v.PixelWidth;
 					pvih->bmiHeader.biHeight = (LONG)pTE->v.PixelHeight;
@@ -344,7 +344,7 @@ avcsuccess:
 					dvih->hdr.dwPictAspectRatioY = dvih->hdr.bmiHeader.biHeight;
 
 					BYTE* pSequenceHeader = (BYTE*)dvih->dwSequenceHeader;
-					gpu_memcpy(pSequenceHeader, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					memcpy(pSequenceHeader, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 					dvih->cbSequenceHeader = (DWORD)pTE->CodecPrivate.GetCount();
 
 					if (!bHasVideo)
@@ -385,7 +385,7 @@ avcsuccess:
 					mt.bFixedSizeSamples = 0;
 
 					vih->cbSequenceHeader = (DWORD)pTE->CodecPrivate.GetCount();
-					gpu_memcpy(&vih->dwSequenceHeader, pTE->CodecPrivate.GetData(), vih->cbSequenceHeader);
+					memcpy (&vih->dwSequenceHeader, pTE->CodecPrivate.GetData(), vih->cbSequenceHeader);
 
 					if (!bHasVideo)
 						mts.Add(mt);
@@ -395,7 +395,7 @@ avcsuccess:
 					mt.formattype = FORMAT_VideoInfo;
 					VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + pTE->CodecPrivate.GetCount());
 					memset(mt.Format(), 0, mt.FormatLength());
-					gpu_memcpy(mt.Format() + sizeof(VIDEOINFOHEADER), pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					memcpy(mt.Format() + sizeof(VIDEOINFOHEADER), pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 					pvih->bmiHeader.biSize = sizeof(pvih->bmiHeader);
 					pvih->bmiHeader.biWidth = (LONG)pTE->v.PixelWidth;
 					pvih->bmiHeader.biHeight = (LONG)pTE->v.PixelHeight;
@@ -415,7 +415,7 @@ avcsuccess:
 						mt.formattype = FORMAT_VideoInfo;
 						VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + pTE->CodecPrivate.GetCount());
 						memset(mt.Format(), 0, mt.FormatLength());
-						gpu_memcpy(mt.Format() + sizeof(VIDEOINFOHEADER), pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+						memcpy(mt.Format() + sizeof(VIDEOINFOHEADER), pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 						pvih->bmiHeader.biSize = sizeof(pvih->bmiHeader);
 						pvih->bmiHeader.biWidth = (LONG)pTE->v.PixelWidth;
 						pvih->bmiHeader.biHeight = (LONG)pTE->v.PixelHeight;
@@ -431,7 +431,7 @@ avcsuccess:
 
 					MPEG1VIDEOINFO* pm1vi = (MPEG1VIDEOINFO*)mt.AllocFormatBuffer(sizeof(MPEG1VIDEOINFO) + pTE->CodecPrivate.GetCount());
 					memset(mt.Format(), 0, mt.FormatLength());
-					gpu_memcpy(mt.Format() + sizeof(MPEG1VIDEOINFO), pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					memcpy(mt.Format() + sizeof(MPEG1VIDEOINFO), pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 
 					pm1vi->hdr.bmiHeader.biSize			= sizeof(pm1vi->hdr.bmiHeader);
 					pm1vi->hdr.bmiHeader.biWidth		= (LONG)pTE->v.PixelWidth;
@@ -575,9 +575,9 @@ avcsuccess:
 							DWORD bmi = mts[i].FormatLength() - FIELD_OFFSET(VIDEOINFOHEADER, bmiHeader);
 							mt.formattype = FORMAT_VideoInfo2;
 							mt.AllocFormatBuffer(vih2 + bmi);
-							gpu_memcpy(mt.Format(), mts[i].Format(), vih1);
+							memcpy(mt.Format(), mts[i].Format(), vih1);
 							memset(mt.Format() + vih1, 0, vih2 - vih1);
-							gpu_memcpy(mt.Format() + vih2, mts[i].Format() + vih1, bmi);
+							memcpy(mt.Format() + vih2, mts[i].Format() + vih1, bmi);
 
 							CSize aspect((int)pTE->v.DisplayWidth, (int)pTE->v.DisplayHeight);
 							int lnko = LNKO(aspect.cx, aspect.cy);
@@ -638,29 +638,29 @@ avcsuccess:
 					wfe->cbSize = 30;
 					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 30);
 					BYTE *p = (BYTE *)(wfe + 1);
-					gpu_memcpy(p, (const unsigned char *)"TTA1\x01\x00", 6);
-					gpu_memcpy(p + 6,  &wfe->nChannels, 2);
-					gpu_memcpy(p + 8,  &wfe->wBitsPerSample, 2);
-					gpu_memcpy(p + 10, &wfe->nSamplesPerSec, 4);
+					memcpy(p, (const unsigned char *)"TTA1\x01\x00", 6);
+					memcpy(p + 6,  &wfe->nChannels, 2);
+					memcpy(p + 8,  &wfe->wBitsPerSample, 2);
+					memcpy(p + 10, &wfe->nSamplesPerSec, 4);
 					memset(p + 14, 0, 30 - 14);
 					mts.Add(mt);
 				} else if (CodecID == "A_AAC") {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_AAC);
 					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
 					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
-					gpu_memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 					mts.Add(mt);
 				} else if (CodecID == "A_WAVPACK4") {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_WAVPACK4);
 					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
 					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
-					gpu_memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 					mts.Add(mt);
 				} else if (CodecID == "A_FLAC") {
 					wfe->wFormatTag = WAVE_FORMAT_FLAC;
 					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
 					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
-					gpu_memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 
 					mt.subtype = MEDIASUBTYPE_FLAC_FRAMED;
 					mts.Add(mt);
@@ -702,7 +702,7 @@ avcsuccess:
 					mts.Add(mt);
 				} else if (CodecID == "A_MS/ACM") {
 					wfe = (WAVEFORMATEX*)mt.AllocFormatBuffer(pTE->CodecPrivate.GetCount());
-					gpu_memcpy(wfe, (WAVEFORMATEX*)pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					memcpy(wfe, (WAVEFORMATEX*)pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 					if (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfe->cbSize == 22) {
 						mt.subtype = ((WAVEFORMATEXTENSIBLE*)wfe)->SubFormat;
 					}
@@ -733,7 +733,7 @@ avcsuccess:
 						pvf2->BitsPerSample = (DWORD)pTE->a.BitDepth;
 						BYTE* p2 = mt.Format() + sizeof(VORBISFORMAT2);
 						for (size_t i = 0; i < sizes.GetCount(); p += sizes[i], p2 += sizes[i], i++) {
-							gpu_memcpy(p2, p, pvf2->HeaderSize[i] = sizes[i]);
+							memcpy(p2, p, pvf2->HeaderSize[i] = sizes[i]);
 						}
 
 						mts.Add(mt);
@@ -784,7 +784,7 @@ avcsuccess:
 					mt.bTemporalCompression = TRUE;
 					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
 					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
-					gpu_memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 					wfe->cbSize = 0; // IMPORTANT: this is screwed, but cbSize has to be 0 and the extra data from codec priv must be after WAVEFORMATEX
 					mts.Add(mt);
 				} else if (CodecID == "A_QUICKTIME" && pTE->CodecPrivate.GetCount() >= 8) {
@@ -793,7 +793,7 @@ avcsuccess:
 						mt.subtype = FOURCCMap(*type);
 						wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
 						wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
-						gpu_memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+						memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 						mts.Add(mt);
 					}
 				}
@@ -827,7 +827,7 @@ avcsuccess:
 					subtitle_Name = subtitle_Name.Trim();
 
 					wcsncpy_s(psi->TrackName, subtitle_Name, _countof(psi->TrackName)-1);
-					gpu_memcpy(mt.pbFormat + (psi->dwOffset = sizeof(SUBTITLEINFO)), pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					memcpy(mt.pbFormat + (psi->dwOffset = sizeof(SUBTITLEINFO)), pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 
 					mt.subtype =
 						CodecID == "S_TEXT/UTF8" ? MEDIASUBTYPE_UTF8 :

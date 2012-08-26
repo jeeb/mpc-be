@@ -1046,7 +1046,7 @@ bool CBinary::Compress(ContentCompression& cc)
 		deflateEnd(&c_stream);
 
 		SetCount(c_stream.total_out);
-		gpu_memcpy(GetData(), dst, GetCount());
+		memcpy(GetData(), dst, GetCount());
 
 		free(dst);
 
@@ -1088,7 +1088,7 @@ bool CBinary::Decompress(ContentCompression& cc)
 		inflateEnd(&d_stream);
 
 		SetCount(d_stream.total_out);
-		gpu_memcpy(GetData(), dst, GetCount());
+		memcpy(GetData(), dst, GetCount());
 
 		free(dst);
 

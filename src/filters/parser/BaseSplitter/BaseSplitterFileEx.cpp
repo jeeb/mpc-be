@@ -636,7 +636,7 @@ bool CBaseSplitterFileEx::Read(latm_aachdr& h, int len, CMediaType* pmt)
 	wfe->nAvgBytesPerSec = 0;
 	wfe->cbSize = extralen;
 	if(extralen) {
-		gpu_memcpy((BYTE*)(wfe+1), extra, extralen);
+		memcpy((BYTE*)(wfe+1), extra, extralen);
 	}
 
 	pmt->majortype = MEDIATYPE_Audio;
@@ -1704,7 +1704,7 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt)
 			if (h.spspps[i].complete) {
 				*p++ = (h.spspps[i].size) >> 8;
 				*p++ = (h.spspps[i].size) & 0xff;
-				gpu_memcpy(p, h.spspps[i].buffer, h.spspps[i].size);
+				memcpy(p, h.spspps[i].buffer, h.spspps[i].size);
 				p += h.spspps[i].size;
 			}
 		}

@@ -216,7 +216,7 @@ int bit_buffer_done_write(TTA_bit_buffer* bbuf)
 
 	bbuf->crc32 ^= 0xFFFFFFFFUL;
 	bbuf->crc32 = ENDSWAP_INT32(bbuf->crc32);
-	gpu_memcpy(bbuf->bitpos, &bbuf->crc32, 4);
+	tta_memcpy(bbuf->bitpos, &bbuf->crc32, 4);
 	bytes_to_write = bbuf->bitpos + sizeof(long) - bbuf->bit_buffer;
 
 	bbuf->bitpos = bbuf->bit_buffer;
@@ -490,7 +490,7 @@ unsigned long decompress_one_frame(TTA_codec* ttacodec, long *data, unsigned lon
 
 	channels_codec_init(ttacodec->tta, ttacodec->codec_num_chan, ttacodec->byte_size);
 
-	gpu_memcpy(ttacodec->fbuf->bit_buffer, data, len);
+	tta_memcpy(ttacodec->fbuf->bit_buffer, data, len);
 	ttacodec->fbuf->bitpos = ttacodec->fbuf->bit_buffer;
 	ttacodec->fbuf->BIT_BUFFER_END = ttacodec->fbuf->bit_buffer + len - sizeof(ttacodec->fbuf->crc32);
 	
@@ -675,7 +675,7 @@ TTA_parser* tta_parser_new(TTA_io_callback* io)
 		return NULL;
 	}
 	
-	if (!memcmp(ttaparser->id3v2.id, "ID3", 3)) {	
+	if (!tta_memcmp(ttaparser->id3v2.id, "ID3", 3)) {	
 		if ((ttaparser->id3v2.size[0] |
 			 ttaparser->id3v2.size[1] |
 			 ttaparser->id3v2.size[2] |

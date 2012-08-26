@@ -961,7 +961,7 @@ bool Rasterizer::Rasterize(int xsub, int ysub, int fBlur, double fGaussianBlur)
 				return false;
 			}
 
-			gpu_memcpy(tmp, mpOverlayBuffer, pitch*mOverlayHeight);
+			memcpy(tmp, mpOverlayBuffer, pitch*mOverlayHeight);
 
 			int border = !mWideOutline.empty() ? 1 : 0;
 

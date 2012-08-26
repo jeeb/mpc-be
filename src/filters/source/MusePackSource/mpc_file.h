@@ -23,8 +23,9 @@
 
 #pragma once
 
-#include <vector>
+#include "stdafx.h"
 #include "bits.h"
+#include <vector>
 
 class CMusePackReader;
 

@@ -58,7 +58,7 @@ CDirectVobSub::CDirectVobSub()
 		if (nSize != sizeof(m_MediaFPS)) {
 			m_MediaFPS = 25.0;
 		} else {
-			gpu_memcpy(&m_MediaFPS, pData, sizeof(m_MediaFPS));
+			memcpy(&m_MediaFPS, pData, sizeof(m_MediaFPS));
 		}
 		delete [] pData;
 	}

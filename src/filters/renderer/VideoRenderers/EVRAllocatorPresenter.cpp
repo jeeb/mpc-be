@@ -1271,7 +1271,7 @@ STDMETHODIMP CEVRAllocatorPresenter::GetVideoPosition(MFVideoNormalizedRect *pnr
 	}
 
 	if (prcDest) {
-		gpu_memcpy(prcDest, &m_VideoRect, sizeof(m_VideoRect));    //GetClientRect (m_hWnd, prcDest);
+		memcpy (prcDest, &m_VideoRect, sizeof(m_VideoRect));    //GetClientRect (m_hWnd, prcDest);
 	}
 
 	return S_OK;

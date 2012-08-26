@@ -229,7 +229,7 @@ STDMETHODIMP CDeCSSInputPin::Set(REFGUID PropSet, ULONG Id, LPVOID pInstanceData
 					CSSdisckey(Hash, DiscKey);
 
 					if(!memcmp(Hash, DiscKey, 6)) {
-						gpu_memcpy(m_DiscKey, DiscKey, 6);
+						memcpy(m_DiscKey, DiscKey, 6);
 						j = g_nPlayerKeys;
 						fSuccess = true;
 						break;

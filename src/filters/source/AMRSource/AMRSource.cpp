@@ -1014,7 +1014,7 @@ HRESULT CAMROutputPin::DeliverPacket(CAMRPacket &packet)
 	
 	outp->size	= packet.packet_size;
 	outp->buf	= (BYTE*)malloc(outp->size);
-	gpu_memcpy(outp->buf, packet.packet, packet.packet_size);
+	memcpy(outp->buf, packet.packet, packet.packet_size);
 
 	// each packet is sync point
 	outp->sync_point = TRUE;
@@ -1090,7 +1090,7 @@ HRESULT CAMROutputPin::DeliverDataPacketAMR(DataPacketAMR &packet)
 	//	data
 	//*************************************************************************
 
-	gpu_memcpy(buf, packet.buf, packet.size);
+	memcpy(buf, packet.buf, packet.size);
 	sample->SetActualDataLength(packet.size);
 
 	// sync point, discontinuity ?

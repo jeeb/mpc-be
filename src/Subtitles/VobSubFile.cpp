@@ -752,7 +752,7 @@ static int PASCAL MyProcessDataProc(unsigned char* Addr, int Size)
 {
 	ASSERT(RARbuff);
 
-	gpu_memcpy(&RARbuff[RARpos], Addr, Size);
+	memcpy(&RARbuff[RARpos], Addr, Size);
 	RARpos += Size;
 
 	return 1;
@@ -1130,7 +1130,7 @@ BYTE* CVobSubFile::GetPacket(int idx, int& packetsize, int& datasize, int iLang)
 		for (int size; i < packetsize; i += size, sizeleft -= size) {
 			int hsize = 0x18 + buff[0x16];
 			size = min(sizeleft, 0x800 - hsize);
-			gpu_memcpy(&ret[i], &buff[hsize], size);
+			memcpy(&ret[i], &buff[hsize], size);
 
 			if (size != sizeleft) {
 				while (m_sub.Read(buff, sizeof(buff))) {
@@ -1532,14 +1532,14 @@ void CVobSubSettings::InitSettings()
 
 bool CVobSubSettings::GetCustomPal(RGBQUAD* cuspal, int& tridx)
 {
-	gpu_memcpy(cuspal, m_cuspal, sizeof(RGBQUAD)*4);
+	memcpy(cuspal, m_cuspal, sizeof(RGBQUAD)*4);
 	tridx = m_tridx;
 	return m_fCustomPal;
 }
 
 void CVobSubSettings::SetCustomPal(RGBQUAD* cuspal, int tridx)
 {
-	gpu_memcpy(m_cuspal, cuspal, sizeof(RGBQUAD)*4);
+	memcpy(m_cuspal, cuspal, sizeof(RGBQUAD)*4);
 	m_tridx = tridx & 0xf;
 	for (int i = 0; i < 4; i++) {
 		m_cuspal[i].rgbReserved = (tridx&(1<<i)) ? 0 : 0xff;
@@ -1892,8 +1892,8 @@ bool CVobSubFile::SaveScenarist(CString fn)
 	bool fCustomPal = m_fCustomPal;
 	m_fCustomPal = true;
 	RGBQUAD tempCusPal[4], newCusPal[4+12] = {{255, 0, 0, 0}, {0, 0, 255, 0}, {0, 0, 0, 0}, {255, 255, 255, 0}};
-	gpu_memcpy(tempCusPal, m_cuspal, sizeof(tempCusPal));
-	gpu_memcpy(m_cuspal, newCusPal, sizeof(m_cuspal));
+	memcpy(tempCusPal, m_cuspal, sizeof(tempCusPal));
+	memcpy(m_cuspal, newCusPal, sizeof(m_cuspal));
 
 	CAutoVectorPtr<BYTE> p4bpp;
 	if (!p4bpp.Allocate((m_size.cy-2)*360)) {
@@ -1961,7 +1961,7 @@ bool CVobSubFile::SaveScenarist(CString fn)
 		c[0]^=c[1], c[1]^=c[0], c[0]^=c[1];
 
 		if (memcmp(pc, c, sizeof(c))) {
-			gpu_memcpy(pc, c, sizeof(c));
+			memcpy(pc, c, sizeof(c));
 			str.Format(_T("Color\t (%d %d %d %d)\n"), c[0], c[1], c[2], c[3]);
 			f.WriteString(str);
 		}
@@ -1971,7 +1971,7 @@ bool CVobSubFile::SaveScenarist(CString fn)
 		a[0]^=a[1], a[1]^=a[0], a[0]^=a[1];
 
 		if (memcmp(pa, a, sizeof(a))) {
-			gpu_memcpy(pa, a, sizeof(a));
+			memcpy(pa, a, sizeof(a));
 			str.Format(_T("Contrast (%d %d %d %d)\n"), a[0], a[1], a[2], a[3]);
 			f.WriteString(str);
 		}
@@ -2055,7 +2055,7 @@ bool CVobSubFile::SaveScenarist(CString fn)
 	}
 
 	m_fCustomPal = fCustomPal;
-	gpu_memcpy(m_cuspal, tempCusPal, sizeof(m_cuspal));
+	memcpy(m_cuspal, tempCusPal, sizeof(m_cuspal));
 
 	return true;
 }
@@ -2127,8 +2127,8 @@ bool CVobSubFile::SaveMaestro(CString fn)
 	bool fCustomPal = m_fCustomPal;
 	m_fCustomPal = true;
 	RGBQUAD tempCusPal[4], newCusPal[4+12] = {{255, 0, 0, 0}, {0, 0, 255, 0}, {0, 0, 0, 0}, {255, 255, 255, 0}};
-	gpu_memcpy(tempCusPal, m_cuspal, sizeof(tempCusPal));
-	gpu_memcpy(m_cuspal, newCusPal, sizeof(m_cuspal));
+	memcpy(tempCusPal, m_cuspal, sizeof(tempCusPal));
+	memcpy(m_cuspal, newCusPal, sizeof(m_cuspal));
 
 	CAutoVectorPtr<BYTE> p4bpp;
 	if (!p4bpp.Allocate((m_size.cy-2)*360)) {
@@ -2190,7 +2190,7 @@ bool CVobSubFile::SaveMaestro(CString fn)
 		int c[4] = {colormap[m_img.pal[1].pal], colormap[m_img.pal[2].pal], colormap[m_img.pal[0].pal], colormap[m_img.pal[3].pal]};
 
 		if (memcmp(pc, c, sizeof(c))) {
-			gpu_memcpy(pc, c, sizeof(c));
+			memcpy(pc, c, sizeof(c));
 			str.Format(_T("Color\t (%d %d %d %d)\n"), c[0], c[1], c[2], c[3]);
 			f.WriteString(str);
 		}
@@ -2199,7 +2199,7 @@ bool CVobSubFile::SaveMaestro(CString fn)
 		int a[4] = {m_img.pal[1].tr, m_img.pal[2].tr, m_img.pal[0].tr, m_img.pal[3].tr};
 
 		if (memcmp(pa, a, sizeof(a))) {
-			gpu_memcpy(pa, a, sizeof(a));
+			memcpy(pa, a, sizeof(a));
 			str.Format(_T("Contrast (%d %d %d %d)\n"), a[0], a[1], a[2], a[3]);
 			f.WriteString(str);
 		}
@@ -2283,7 +2283,7 @@ bool CVobSubFile::SaveMaestro(CString fn)
 	}
 
 	m_fCustomPal = fCustomPal;
-	gpu_memcpy(m_cuspal, tempCusPal, sizeof(m_cuspal));
+	memcpy(m_cuspal, tempCusPal, sizeof(m_cuspal));
 
 	return true;
 }
@@ -2392,7 +2392,7 @@ void CVobSubStream::Add(REFERENCE_TIME tStart, REFERENCE_TIME tStop, BYTE* pData
 	p->tStart = tStart;
 	p->tStop = vsi.delay > 0 ? (tStart + 10000i64*vsi.delay) : tStop;
 	p->pData.SetCount(len);
-	gpu_memcpy(p->pData.GetData(), pData, p->pData.GetCount());
+	memcpy(p->pData.GetData(), pData, p->pData.GetCount());
 
 	CAutoLock cAutoLock(&m_csSubPics);
 	while (m_subpics.GetCount() && m_subpics.GetTail()->tStart >= tStart) {

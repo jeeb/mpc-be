@@ -29,4 +29,3 @@
 #include "../../../../include/stdafx_common_dshow.h"
 
 #include <crtdefs.h>
-#include "../../../DSUtil/gpu_memcpy.h"

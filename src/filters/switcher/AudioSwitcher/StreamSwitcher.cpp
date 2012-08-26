@@ -1366,7 +1366,7 @@ HRESULT CStreamSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		return S_FALSE;    // FIXME
 	}
 
-	gpu_memcpy(pDataOut, pDataIn, min(len, size));
+	memcpy(pDataOut, pDataIn, min(len, size));
 	pOut->SetActualDataLength(min(len, size));
 
 	return S_OK;

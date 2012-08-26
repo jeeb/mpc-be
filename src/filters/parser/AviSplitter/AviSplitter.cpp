@@ -230,7 +230,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			mt.formattype = FORMAT_VideoInfo;
 			VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + (ULONG)s->strf.GetCount() - sizeof(BITMAPINFOHEADER));
 			memset(mt.Format(), 0, mt.FormatLength());
-			gpu_memcpy(&pvih->bmiHeader, s->strf.GetData(), s->strf.GetCount());
+			memcpy(&pvih->bmiHeader, s->strf.GetData(), s->strf.GetCount());
 			if (s->strh.dwRate > 0) {
 				pvih->AvgTimePerFrame = 10000000ui64 * s->strh.dwScale / s->strh.dwRate;
 			}

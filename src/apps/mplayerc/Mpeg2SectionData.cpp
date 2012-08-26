@@ -27,6 +27,7 @@
 #include "../../DSUtil/GolombBuffer.h"
 #include "Mpeg2SectionData.h"
 
+
 #define BeginEnumDescriptors(gb, nType, nLength)								\
 	{																			\
 		BYTE	DescBuffer[256];												\
@@ -42,6 +43,7 @@
 			UNREFERENCED_PARAMETER(nType);
 
 #define EndEnumDescriptors	}}
+
 
 CMpeg2DataParser::CMpeg2DataParser(IBaseFilter* pFilter)
 {

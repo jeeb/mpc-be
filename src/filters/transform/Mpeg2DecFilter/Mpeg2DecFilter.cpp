@@ -1724,7 +1724,7 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 		if (!m_sps.IsEmpty()) {
 			spu* sp = m_sps.GetTail();
 			sp->SetCount(sp->GetCount() + len);
-			gpu_memcpy(sp->GetData() + sp->GetCount() - len, pDataIn, len);
+			memcpy(sp->GetData() + sp->GetCount() - len, pDataIn, len);
 		}
 	} else {
 		POSITION pos = m_sps.GetTailPosition();
@@ -1752,7 +1752,7 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 		p->m_rtStop = _I64_MAX;
 
 		p->SetCount(len);
-		gpu_memcpy(p->GetData(), pDataIn, len);
+		memcpy(p->GetData(), pDataIn, len);
 
 		if (m_sphli && p->m_rtStart == PTS2RT(m_sphli->StartPTM)) {
 			p->m_psphli = m_sphli;
@@ -1795,7 +1795,7 @@ STDMETHODIMP CSubpicInputPin::Set(REFGUID PropSet, ULONG Id, LPVOID pInstanceDat
 			CAutoLock cAutoLock(&m_csReceive);
 
 			AM_PROPERTY_SPPAL* pSPPAL = (AM_PROPERTY_SPPAL*)pPropertyData;
-			gpu_memcpy(m_sppal, pSPPAL->sppal, sizeof(AM_PROPERTY_SPPAL));
+			memcpy(m_sppal, pSPPAL->sppal, sizeof(AM_PROPERTY_SPPAL));
 			m_fsppal = true;
 
 			DbgLog((LOG_TRACE, 0, _T("new palette")));
@@ -1816,13 +1816,13 @@ STDMETHODIMP CSubpicInputPin::Set(REFGUID PropSet, ULONG Id, LPVOID pInstanceDat
 						fRefresh = true;
 						sp->m_psphli.Free();
 						sp->m_psphli.Attach(DNew AM_PROPERTY_SPHLI);
-						gpu_memcpy((AM_PROPERTY_SPHLI*)sp->m_psphli, pSPHLI, sizeof(AM_PROPERTY_SPHLI));
+						memcpy((AM_PROPERTY_SPHLI*)sp->m_psphli, pSPHLI, sizeof(AM_PROPERTY_SPHLI));
 					}
 				}
 
 				if (!fRefresh) { // save it for later, a subpic might be late for this hli
 					m_sphli.Attach(DNew AM_PROPERTY_SPHLI);
-					gpu_memcpy((AM_PROPERTY_SPHLI*)m_sphli, pSPHLI, sizeof(AM_PROPERTY_SPHLI));
+					memcpy((AM_PROPERTY_SPHLI*)m_sphli, pSPHLI, sizeof(AM_PROPERTY_SPHLI));
 				}
 			} else {
 				POSITION pos = m_sps.GetHeadPosition();
@@ -2427,7 +2427,7 @@ HRESULT CClosedCaptionOutputPin::Deliver(const void* ptr, int len)
 		BYTE* pData = NULL;
 		pSample->GetPointer(&pData);
 		*(DWORD*)pData = 0xb2010000;
-		gpu_memcpy(pData + 4, ptr, len);
+		memcpy(pData + 4, ptr, len);
 		pSample->SetActualDataLength(len + 4);
 		hr = __super::Deliver(pSample);
 	}

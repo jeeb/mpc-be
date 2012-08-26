@@ -403,8 +403,8 @@ void CorrectMediaType(AM_MEDIA_TYPE* pmt)
 			if (mt.subtype == *vihs[i].subtype
 					&& vih->bmiHeader.biCompression == vihs[i].vih.bmiHeader.biCompression) {
 				mt.AllocFormatBuffer(vihs[i].size);
-				gpu_memcpy(mt.pbFormat, &vihs[i], vihs[i].size);
-				gpu_memcpy(mt.pbFormat, pmt->pbFormat, sizeof(VIDEOINFOHEADER));
+				memcpy(mt.pbFormat, &vihs[i], vihs[i].size);
+				memcpy(mt.pbFormat, pmt->pbFormat, sizeof(VIDEOINFOHEADER));
 				break;
 			}
 		}
@@ -415,8 +415,8 @@ void CorrectMediaType(AM_MEDIA_TYPE* pmt)
 			if (mt.subtype == *vih2s[i].subtype
 					&& vih2->bmiHeader.biCompression == vih2s[i].vih.bmiHeader.biCompression) {
 				mt.AllocFormatBuffer(vih2s[i].size);
-				gpu_memcpy(mt.pbFormat, &vih2s[i], vih2s[i].size);
-				gpu_memcpy(mt.pbFormat, pmt->pbFormat, sizeof(VIDEOINFOHEADER2));
+				memcpy(mt.pbFormat, &vih2s[i], vih2s[i].size);
+				memcpy(mt.pbFormat, pmt->pbFormat, sizeof(VIDEOINFOHEADER2));
 				break;
 			}
 		}

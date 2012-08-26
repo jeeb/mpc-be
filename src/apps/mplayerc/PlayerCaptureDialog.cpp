@@ -54,7 +54,7 @@ static bool LoadMediaType(CStringW DisplayName, AM_MEDIA_TYPE** ppmt)
 			delete [] pData;
 			return(fRet);
 		}
-		gpu_memcpy(*ppmt, pData, len);
+		memcpy(*ppmt, pData, len);
 		delete [] pData;
 
 		(*ppmt)->cbFormat = 0;
@@ -69,7 +69,7 @@ static bool LoadMediaType(CStringW DisplayName, AM_MEDIA_TYPE** ppmt)
 			}
 			(*ppmt)->cbFormat = len;
 			(*ppmt)->pbFormat = (BYTE*)CoTaskMemAlloc(len);
-			gpu_memcpy((*ppmt)->pbFormat, pData, len);
+			memcpy((*ppmt)->pbFormat, pData, len);
 			delete [] pData;
 
 		}
@@ -289,10 +289,10 @@ static void SetupMediaTypes(IAMStreamConfig* pAMSC, CFormatArray<T>& tfa, CCombo
 							int extra = mt.cbFormat - sizeof(VIDEOINFOHEADER);
 							int bmiHeaderSize = sizeof(vih->bmiHeader) + extra;
 							BYTE* pbmiHeader = DNew BYTE[bmiHeaderSize];
-							gpu_memcpy(pbmiHeader, &vih->bmiHeader, bmiHeaderSize);
+							memcpy(pbmiHeader, &vih->bmiHeader, bmiHeaderSize);
 							mt.ReallocFormatBuffer(FIELD_OFFSET(VIDEOINFOHEADER2, bmiHeader) + bmiHeaderSize);
 							VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.pbFormat;
-							gpu_memcpy(&vih2->bmiHeader, pbmiHeader, bmiHeaderSize);
+							memcpy(&vih2->bmiHeader, pbmiHeader, bmiHeaderSize);
 							delete [] pbmiHeader;
 							vih2->dwInterlaceFlags = vih2->dwCopyProtectFlags = 0;
 							vih2->dwReserved1 = vih2->dwReserved2 = 0;

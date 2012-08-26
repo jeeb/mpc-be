@@ -212,7 +212,7 @@ HRESULT CD2VStream::FillBuffer(IMediaSample* pSample, int nFrame, BYTE* pOut, lo
 	for (int y = 0, p = min(pitchIn, pitchOut);
 			y < h;
 			y++, pIn += pitchIn, pOut += pitchOut) {
-		gpu_memcpy(pOut, pIn, p);
+		memcpy(pOut, pIn, p);
 	}
 
 	len = pitchOut*h;
