@@ -1,5 +1,5 @@
 /*
- * $Id: InternalPropertyPage.cpp 53 2012-04-23 13:34:44Z alexins $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt

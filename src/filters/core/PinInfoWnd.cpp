@@ -1,5 +1,5 @@
 /*
- * $Id: PinInfoWnd.cpp 953 2012-08-19 21:20:50Z exodus8 $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt

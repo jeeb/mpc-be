@@ -1,5 +1,5 @@
 /*
- * $Id: WVSource.h 1 2012-05-05 01:42:55Z kinjalka $
+ * $Id$
  *
  * Adaptation for MPC-BE (C) 2012 Dmitry "Vortex" Koteroff (vortex@light-alloy.ru, http://light-alloy.ru)
  *
