@@ -338,11 +338,13 @@ void CPlayerToolBar::ArrangeControls()
 	CRect r10;
 	GetItemRect(10, &r10);
 
-	CRect vr2(r.right + br.right - 60, r.bottom - 25, r.right +br.right + 6, r.bottom);
+	CRect vr2;
 
 	if (AfxGetAppSettings().fDisableXPToolbars) {
 		int m_nBMedian = r.bottom - 3 - 0.5 * m_nButtonHeight;
 		vr2.SetRect(r.right + br.right - 60, m_nBMedian - 14, r.right +br.right + 6, m_nBMedian + 10);
+	} else {
+		vr2.SetRect(r.right + br.right - 60, r.bottom - 25, r.right +br.right + 6, r.bottom);
 	}
 
 	m_volctrl.MoveWindow(vr2);

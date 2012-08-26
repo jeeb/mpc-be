@@ -1,24 +1,22 @@
 /*
- * $Id$
+ *      Copyright (C) 2011 Hendrik Leppkes
+ *      http://www.1f0.de
  *
- * Adaptation for MPC-BE (C) 2012 Sergey "Exodus8" (rusguy6@gmail.com)
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
  *
- * This file is part of MPC-BE.
- * YOU CANNOT USE THIS FILE WITHOUT AUTHOR PERMISSION!
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- * MPC-BE is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * MPC-BE is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
+ *  Taken from the QuickSync decoder by Eric Gur
  */
 
 #include <intrin.h>
@@ -339,6 +337,27 @@ end:
 #endif
 }
 
+static int SSE = 0, SSE2 = 0, SSE41 = 0;
+
+inline void check_sse()
+{
+	if (!SSE && !SSE2 && !SSE41)
+	{
+		int info[4];
+		__cpuid(info, 0);
+
+		// Detect Instruction Set
+		if (info[0] >= 1)
+		{
+			__cpuid(info, 0x00000001);
+
+			SSE   = (info[3] & ((int)1 << 25)) != 0;
+			SSE2  = (info[3] & ((int)1 << 26)) != 0;
+			SSE41 = (info[2] & ((int)1 << 19)) != 0;
+		}
+	}
+}
+
 inline void* gpu_memcpy(void* d, const void* s, size_t size)
 {
 	if (d == NULL || s == NULL)
@@ -346,19 +365,7 @@ inline void* gpu_memcpy(void* d, const void* s, size_t size)
 		return NULL;
 	}
 
-	int SSE2 = 0, SSE41 = 0;
-
-	int info[4];
-	__cpuid(info, 0);
-
-	// Detect Instruction Set
-	if (info[0] >= 1)
-	{
-		__cpuid(info, 0x00000001);
-
-		SSE2  = (info[3] & ((int)1 << 26)) != 0;
-		SSE41 = (info[2] & ((int)1 << 19)) != 0;
-	}
+	check_sse();
 
 	if (!SSE41)
 	{
