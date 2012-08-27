@@ -482,6 +482,8 @@ static CStringW SubRipper2SSA(CStringW str, int CharSet)
 static bool OpenSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 {
 	CStringW buff;
+	bool first_line_success = false;
+	
 	while (file->ReadString(buff)) {
 		buff.Trim();
 		if (buff.IsEmpty()) {
@@ -524,7 +526,11 @@ static bool OpenSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
 				file->IsUnicode(),
 				(((hh1*60 + mm1)*60) + ss1)*1000 + ms1,
 				(((hh2*60 + mm2)*60) + ss2)*1000 + ms2);
+			first_line_success = true;
 		} else if (c != EOF) { // might be another format
+            if (first_line_success) // may be just a syntax error, try next lines...
+                continue;
+                
 			return false;
 		}
 	}
