@@ -2,6 +2,8 @@
 // Microsoft Visual C++ generated include file.
 // Used by AviSplitter.rc
 
+#define IDS_AG_SETTINGS                 33143
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

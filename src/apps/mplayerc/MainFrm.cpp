@@ -2914,28 +2914,30 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 		CPoint p;
 		GetCursorPos(&p);
 
-		CRect r;
-		m_pFullscreenWnd->GetWindowRect(r);
-		bool fCursorInsideFS = r.PtInRect(p);
+		CRect r(0,0,0,0);
+		if (m_pFullscreenWnd && ::IsWindow(m_pFullscreenWnd->m_hWnd)) {
+			m_pFullscreenWnd->GetWindowRect(r);
+		}
 
 		CWnd* pWnd = WindowFromPoint(p);
 		bool bFSWnd = false;
-		if (pWnd && m_pFullscreenWnd == pWnd && fCursorInsideFS) {
+		if (pWnd && m_pFullscreenWnd == pWnd && r.PtInRect(p)) {
 			bFSWnd = true;
 		}
-
 
 		if (!fClicked) {
 			bool fLeftMouseBtnUnassigned = !AssignedToCmd(wmcmd::LDOWN, m_fFullScreen);
 
 			//if (!m_fFullScreen && ((IsCaptionHidden() && AfxGetAppSettings().nCS<=CS_SEEKBAR) || !IsSomethingLoaded() || fLeftMouseBtnUnassigned || ((GetTickCount()-m_nMenuHideTick)<100))) {
-			if (!m_fFullScreen && !bFSWnd && !IsSomethingLoaded() && ((IsCaptionHidden() && AfxGetAppSettings().nCS<=CS_SEEKBAR) || fLeftMouseBtnUnassigned || ((GetTickCount()-m_nMenuHideTick)<100))) {
+			if (!m_fFullScreen && !bFSWnd && !IsSomethingLoaded() && ((IsCaptionHidden() && (AfxGetAppSettings().nCS <= CS_SEEKBAR)) || fLeftMouseBtnUnassigned || ((GetTickCount()-m_nMenuHideTick)<100))) {
 				PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 			} else {
 				s_fLDown = true;
 				if (OnButton(wmcmd::LDOWN, nFlags, point)) {
 					//PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
-					if (!bFSWnd && !m_fFullScreen) PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
+					if (!bFSWnd && !m_fFullScreen) {
+						PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
+					}
 					return;
 				}
 			}
@@ -17622,13 +17624,13 @@ HRESULT CMainFrame::SetDwmPreview(BOOL show)
 		} else {
 			BITMAP bm;
 			if (GetObject(m_InternalImage, sizeof(bm), &bm) && bm.bmWidth) {
-#define small_Width 256
-				if ((abs(bm.bmHeight) <= small_Width) && (bm.bmWidth <= small_Width)) {
+				const int nWidth = 256;
+				if ((abs(bm.bmHeight) <= nWidth) && (bm.bmWidth <= nWidth)) {
 					m_InternalImageSmall.Attach(m_InternalImage);
 				} else {
 					// Resize image to improve speed of show TaskBar preview 
 
-					int h	= min(abs(bm.bmHeight), small_Width);
+					int h	= min(abs(bm.bmHeight), nWidth);
 					int w	= MulDiv(h, bm.bmWidth, abs(bm.bmHeight));
 					h		= MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
 

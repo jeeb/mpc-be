@@ -33,6 +33,9 @@
     <ClCompile Include="..\..\..\ExtLib\mfc\winmdi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AviSplitterSettingsWnd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="AviSplitter.def">
@@ -50,6 +53,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AviSplitterSettingsWnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IAviSplitterFilter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

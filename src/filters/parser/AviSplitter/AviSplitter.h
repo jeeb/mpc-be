@@ -25,6 +25,7 @@
 
 #include <atlbase.h>
 #include <atlcoll.h>
+#include "AviSplitterSettingsWnd.h"
 #include "../BaseSplitter/BaseSplitter.h"
 
 #define AviSplitterName L"MPC AVI Splitter"
@@ -41,11 +42,18 @@ public:
 };
 
 class __declspec(uuid("9736D831-9D6C-4E72-B6E7-560EF9181001"))
-	CAviSplitterFilter : public CBaseSplitterFilter
+	CAviSplitterFilter
+	: public CBaseSplitterFilter
+	, public ISpecifyPropertyPages2
+	, public IAviSplitterFilter
 {
 	CAutoVectorPtr<DWORD> m_tFrame;
 
+private:
+	bool m_bBadInterleavedSuport, m_bSetReindex;
+
 protected:
+	CCritSec m_csProps;
 	CAutoPtr<CAviFile> m_pFile;
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
 
@@ -86,6 +94,20 @@ public:
 
 	STDMETHODIMP GetKeyFrameCount(UINT& nKFs);
 	STDMETHODIMP GetKeyFrames(const GUID* pFormat, REFERENCE_TIME* pKFs, UINT& nKFs);
+
+	// ISpecifyPropertyPages2
+
+	STDMETHODIMP GetPages(CAUUID* pPages);
+	STDMETHODIMP CreatePage(const GUID& guid, IPropertyPage** ppPage);
+
+	// IMpegSplitterFilter
+	STDMETHODIMP Apply();
+
+	STDMETHODIMP SetBadInterleavedSuport(BOOL nValue);
+	STDMETHODIMP_(BOOL) GetBadInterleavedSuport();
+
+	STDMETHODIMP SetReindex(BOOL nValue);
+	STDMETHODIMP_(BOOL) GetReindex();
 };
 
 class __declspec(uuid("CEA8DEFF-0AF7-4DB9-9A38-FB3C3AEFC0DE"))

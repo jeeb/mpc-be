@@ -81,6 +81,7 @@ public:
 	CPPageInternalFiltersListBox m_listVideo;
 	CPPageInternalFiltersListBox m_listAudio;
 
+	CButton m_btnAviCfg;
 	CButton m_btnMpegCfg;
 	CButton m_btnVideoCfg;
 	CButton m_btnMPEG2Cfg;
@@ -101,6 +102,7 @@ public:
 	afx_msg void OnSelChange();
 	afx_msg void OnCheckBoxChange();
 	afx_msg void OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnAviSplitterConfig();
 	afx_msg void OnMpegSplitterConfig();
 	afx_msg void OnVideoDecConfig();
 	afx_msg void OnMPEG2DecConfig();

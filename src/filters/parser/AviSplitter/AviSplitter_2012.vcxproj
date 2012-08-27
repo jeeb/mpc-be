@@ -220,6 +220,7 @@
     </ClCompile>
     <ClCompile Include="AviFile.cpp" />
     <ClCompile Include="AviSplitter.cpp" />
+    <ClCompile Include="AviSplitterSettingsWnd.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -230,6 +231,8 @@
   <ItemGroup>
     <ClInclude Include="AviFile.h" />
     <ClInclude Include="AviSplitter.h" />
+    <ClInclude Include="AviSplitterSettingsWnd.h" />
+    <ClInclude Include="IAviSplitterFilter.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>
@@ -256,6 +259,9 @@
     <ProjectReference Include="..\..\..\ExtLib\BaseClasses\BaseClasses_2012.vcxproj">
       <Project>{e8a3f6fa-ae1c-4c8e-a0b6-9c8480324eaa}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\core\Filters_2012.vcxproj">
+      <Project>{273b3149-3192-4b75-a791-470320b90812}</Project>
     </ProjectReference>
     <ProjectReference Include="..\BaseSplitter\BaseSplitter_2012.vcxproj">
       <Project>{37768b3f-89bc-4c16-b2a8-767c5da84c3f}</Project>
