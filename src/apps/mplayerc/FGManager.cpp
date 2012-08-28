@@ -1812,6 +1812,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview
 	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_SIPR);
 	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_RAAC);
 	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_RACP);
+	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_RALF);
 	m_transform.AddTail(pFGF);
 
 	pFGF = DNew CFGFilterInternal<CMpaDecFilter>(

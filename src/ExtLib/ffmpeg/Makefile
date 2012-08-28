@@ -242,6 +242,7 @@ SRCS_C=\
     libavcodec/ra144.c \
     libavcodec/ra144dec.c \
     libavcodec/ra288.c \
+    libavcodec/ralf.c \
     libavcodec/rangecoder.c \
     libavcodec/rdft.c \
     libavcodec/rv10.c \

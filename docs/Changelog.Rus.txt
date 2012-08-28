@@ -39,6 +39,7 @@
 + Декодер MS Screen 1 (Windows Media Video V7 Screen);
 + Декодер Microsoft Screen 3 (Microsoft ATC Screen);
 + Декодер Microsoft Screen 4 (MS Expression Encoder Screen;
++ Декодер RealAudio Lossless;
 + Расширение оболочки MPCBEShellExt;
 + Поддержка MPEG1 в Matroska, автор идеи и начального патча Vortex (автор Light Alloy);
 + В EVR статистике со встроенным видео декодером теперь отображается реальный тип кадра - интерлейс или прогрессив;

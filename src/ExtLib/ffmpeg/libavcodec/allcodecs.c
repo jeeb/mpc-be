@@ -122,6 +122,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (NELLYMOSER, nellymoser);
     REGISTER_DECODER (RA_144, ra_144);
     REGISTER_DECODER (RA_288, ra_288);
+    REGISTER_DECODER (RALF, ralf);
     REGISTER_DECODER (SIPR, sipr);
     REGISTER_DECODER (TRUEHD, truehd);
     REGISTER_DECODER (TRUESPEECH, truespeech);
