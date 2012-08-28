@@ -223,6 +223,7 @@ SRCS_C=\
     libavcodec/msrle.c \
     libavcodec/msrledec.c \
     libavcodec/mss1.c \
+    libavcodec/mss12.c \
     libavcodec/mss3.c \
     libavcodec/mss34dsp.c \
     libavcodec/mss4.c \
