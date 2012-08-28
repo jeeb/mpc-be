@@ -267,7 +267,7 @@ void CWord::Transform_SSE2( CPoint &org )
 	int mPathPointsM4 = mPathPoints % 4;
 
 	for (ptrdiff_t i = 0; i < mPathPointsD4 + 1; i++) {
-		__m128 __pointx, __pointy, __tmpx, __tmpy;
+		__m128 __pointx, __pointy;
 		// we can't use load .-.
 		if (i != mPathPointsD4) {
 			__pointx = _mm_set_ps((float)mpPathPoints[4 * i + 0].x, (float)mpPathPoints[4 * i + 1].x, (float)mpPathPoints[4 * i + 2].x, (float)mpPathPoints[4 * i + 3].x);
@@ -292,83 +292,71 @@ void CWord::Transform_SSE2( CPoint &org )
 			}
 		}
 
+		__m128 __pointz = _mm_set_ps1(0);
+
 		// scale and shift
+		__m128 __tmpx;
 		if (m_style.fontShiftX!=0) {
 			__tmpx = _mm_mul_ps(__xshift, __pointy);
-            __pointx = _mm_add_ps(__pointx, __tmpx);
+			__tmpx = _mm_add_ps(__tmpx, __pointx);
+		} else {
+			__tmpx = __pointx;
 		}
-        __pointx = _mm_mul_ps(__pointx, __xscale);
-        __pointx = _mm_sub_ps(__pointx, __xorg);
+		__tmpx = _mm_mul_ps(__tmpx, __xscale);
+		__tmpx = _mm_sub_ps(__tmpx, __xorg);
 
+		__m128 __tmpy;
 		if (m_style.fontShiftY!=0) {
 			__tmpy = _mm_mul_ps(__yshift, __pointx);
-            __pointy = _mm_add_ps(__pointy, __tmpy);
+			__tmpy = _mm_add_ps(__tmpy, __pointy);
+		} else {
+			__tmpy = __pointy;
 		}
-        __pointy = _mm_mul_ps(__pointy, __yscale);
-        __pointy = _mm_sub_ps(__pointy, __yorg);
+		__tmpy = _mm_mul_ps(__tmpy, __yscale);
+		__tmpy = _mm_sub_ps(__tmpy, __yorg);
 
 		// rotate
+		__m128 __xx = _mm_mul_ps(__tmpx, __caz);
+		__m128 __yy = _mm_mul_ps(__tmpy, __saz);
+		__pointx = _mm_add_ps(__xx, __yy);
+		__xx = _mm_mul_ps(__tmpx, __saz);
+		__yy = _mm_mul_ps(__tmpy, __caz);
+		__pointy = _mm_sub_ps(__yy, __xx);
 
-        __m128 __xx, __yy;
-        __m128 __zz = _mm_setzero_ps();
+		__m128 __zz = _mm_mul_ps(__pointz, __sax);
+		__yy = _mm_mul_ps(__pointy, __cax);
+		__pointy = _mm_add_ps(__yy, __zz);
+		__zz = _mm_mul_ps(__pointz, __cax);
+		__yy = _mm_mul_ps(__pointy, __sax);
+		__pointz = _mm_sub_ps(__zz, __yy);
 
-        // xx = x * caz + y * saz
-        __tmpx   = _mm_mul_ps(__pointx, __caz);      // x * caz
-        __tmpy   = _mm_mul_ps(__pointy, __saz);      // y * saz
-        __xx     = _mm_add_ps(__tmpx, __tmpy);       // xx = x * caz + y * saz;
+		__xx = _mm_mul_ps(__pointx, __cay);
+		__zz = _mm_mul_ps(__pointz, __say);
+		__pointx = _mm_add_ps(__xx, __zz);
+		__xx = _mm_mul_ps(__pointx, __say);
+		__zz = _mm_mul_ps(__pointz, __cay);
+		__pointz = _mm_sub_ps(__xx, __zz);
 
-        // yy = -(x * saz - y * caz)
-        __tmpx   = _mm_mul_ps(__pointx, __saz);      // x * saz
-        __tmpy   = _mm_mul_ps(__pointy, __caz);      // y * caz
-        __yy     = _mm_sub_ps(__tmpy, __tmpx);       // yy = -(x * saz - y * caz) = y * caz - x * saz
+		__zz = _mm_set_ps1(-19000);
+		__pointz = _mm_max_ps(__pointz, __zz);
 
-        __pointx = __xx;                             // x = xx
+		__m128 __20000 = _mm_set_ps1(20000);
+		__zz = _mm_add_ps(__pointz, __20000);
+		__zz = _mm_rcp_ps(__zz);
 
-        // y = yy * cax + zz * sax
-        __tmpx   = _mm_mul_ps(__zz, __sax);          // zz * sax
-        __tmpy   = _mm_mul_ps(__yy, __cax);          // yy * cax
-        __pointy = _mm_add_ps(__tmpy, __tmpx);       // y = yy * cax + zz * sax
+		__pointx = _mm_mul_ps(__pointx, __20000);
+		__pointx = _mm_mul_ps(__pointx, __zz);
 
-        // z = yy * sax - zz * cax
-        __tmpx   = _mm_mul_ps(__zz, __cax);          // zz * cax
-        __tmpy   = _mm_mul_ps(__yy, __sax);          // yy * sax
-        __zz     = _mm_sub_ps(__tmpy, __tmpx);       // z = yy * sax - zz * cax
+		__pointy = _mm_mul_ps(__pointy, __20000);
+		__pointy = _mm_mul_ps(__pointy, __zz);
 
-        // xx = x * cay + z * say
-        __tmpx   = _mm_mul_ps(__pointx, __cay);      // x * cay
-        __tmpy   = _mm_mul_ps(__zz, __say);          // z * say
-        __xx     = _mm_add_ps(__tmpx, __tmpy);       // xx = x * cay + z * say
+		__pointx = _mm_add_ps(__pointx, __xorg);
+		__pointy = _mm_add_ps(__pointy, __yorg);
 
-        __yy     = __pointy;                         // yy = y
+		__m128 __05 = _mm_set_ps1(0.5);
 
-        // zz = x * say - z * cay
-        __tmpx   = _mm_mul_ps(__pointx, __say);      // x * say
-        __zz     = _mm_mul_ps(__zz, __cay);          // z * cay
-        __zz     = _mm_sub_ps(__tmpx, __zz);         // zz = x * say - z * cay
-
-        __tmpy   = _mm_set_ps1(-19000);
-        __zz     = _mm_max_ps(__zz, __tmpy);         // zz = max(zz, -19000)
-
-        // x = (xx * 20000) / (zz + 20000);
-        // y = (yy * 20000) / (zz + 20000);
-        __m128 __20000 = _mm_set_ps1(20000);
-        __zz     = _mm_add_ps(__zz, __20000);        // zz + 20000
-
-        __xx     = _mm_mul_ps(__xx, __20000);        // xx * 20000
-        __pointx = _mm_div_ps(__xx, __zz);           // x = (xx * 20000) / (zz + 20000)
-
-        __yy     = _mm_mul_ps(__yy, __20000);        // yy * 20000
-        __pointy = _mm_div_ps(__yy, __zz);           // y = (yy * 20000) / (zz + 20000);
-
-        // mpPathPoints[i].x = (LONG)(x + org.x + 0.5);
-        // mpPathPoints[i].y = (LONG)(y + org.y + 0.5);
-        __pointx = _mm_add_ps(__pointx, __xorg);      // x = x + org.x
-        __pointy = _mm_add_ps(__pointy, __yorg);      // y = y + org.y
-
-        __m128 __05 = _mm_set_ps1(0.5);
-
-        __pointx = _mm_add_ps(__pointx, __05);        // x = x + 0.5
-        __pointy = _mm_add_ps(__pointy, __05);        // y = y + 0.5
+		__pointx = _mm_add_ps(__pointx, __05);
+		__pointy = _mm_add_ps(__pointy, __05);
 
 		if (i == mPathPointsD4) { // last cycle
 			for (int k=0; k<mPathPointsM4; k++) {
@@ -397,7 +385,7 @@ CText::CText(STSStyle& style, CStringW str, int ktype, int kstart, int kend)
 
 	HFONT hOldFont = SelectFont(g_hDC, font);
 
-	if (m_style.fontSpacing) {
+	if (m_style.fontSpacing || (long)GetVersion() < 0) {
 		for (LPCWSTR s = m_str; *s; s++) {
 			CSize extent;
 			if (!GetTextExtentPoint32W(g_hDC, s, 1, &extent)) {
@@ -439,7 +427,7 @@ bool CText::CreatePath()
 
 	HFONT hOldFont = SelectFont(g_hDC, font);
 
-	if (m_style.fontSpacing) {
+	if (m_style.fontSpacing || (long)GetVersion() < 0) {
 		int width = 0;
 		bool bFirstPath = true;
 
