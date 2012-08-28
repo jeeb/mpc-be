@@ -488,8 +488,8 @@ HRESULT CMpaDecFilter::EndOfStream()
 {
 	CAutoLock cAutoLock(&m_csReceive);
 
-	if (m_pAVCtx) { // LOOKATTHIS
-		ProcessFFmpeg(m_pAVCtx->codec_id);
+	if (m_pAVCtx) {
+		ProcessFFmpeg(m_pAVCtx->codec_id); // process the remaining data in the buffer.
 	}
 
 	return __super::EndOfStream();
@@ -1898,10 +1898,10 @@ HRESULT CMpaDecFilter::DeliverFFmpeg(enum AVCodecID nCodecId, BYTE* p, int buffs
 		}
 	}
 
-	bool b_use_parse	= m_pParser && ((nCodecId == AV_CODEC_ID_TRUEHD) ? ((buffsize > 2000) ? true : false) : true); // Dirty hack for use with MPC MPEGSplitter
+	bool b_use_parse    = m_pParser && ((nCodecId == AV_CODEC_ID_TRUEHD) ? ((buffsize > 2000) ? true : false) : true); // Dirty hack for use with MPC MPEGSplitter
 
-	BYTE* pDataBuff		= NULL;
-	BYTE *tmpProcessBuf	= NULL;
+	BYTE* pDataBuff     = NULL;
+	BYTE *tmpProcessBuf = NULL;
 
 	AVPacket avpkt;
 	av_init_packet(&avpkt);
@@ -1974,9 +1974,9 @@ HRESULT CMpaDecFilter::DeliverFFmpeg(enum AVCodecID nCodecId, BYTE* p, int buffs
 		int got_frame = 0;
 
 		if (b_use_parse) {
-			BYTE *pOut		= NULL;
-			int pOut_size	= 0;
-			int used_bytes	= av_parser_parse2(m_pParser, m_pAVCtx, &pOut, &pOut_size, pDataBuff, buffsize, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
+			BYTE *pOut     = NULL;
+			int pOut_size  = 0;
+			int used_bytes = av_parser_parse2(m_pParser, m_pAVCtx, &pOut, &pOut_size, pDataBuff, buffsize, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
 			if (used_bytes < 0) {
 				TRACE(_T("CMpaDecFilter::DeliverFFmpeg() - audio parsing failed (ret: %d)\n"), -used_bytes);
 				goto fail;
@@ -2009,12 +2009,11 @@ HRESULT CMpaDecFilter::DeliverFFmpeg(enum AVCodecID nCodecId, BYTE* p, int buffs
 
 			int used_bytes = avcodec_decode_audio4(m_pAVCtx, m_pFrame, &got_frame, &avpkt);
 
-			if (used_bytes < 0 || (used_bytes == 0 && !got_frame)) { // LOOKATTHIS
+			if (used_bytes < 0) {
 				TRACE(_T("CMpaDecFilter::DeliverFFmpeg() - decoding failed\n"));
-				InitFFmpeg(nCodecId); // LOOKATTHIS
-				size = used_bytes;
+				InitFFmpeg(nCodecId); // need for some AAC
 				goto fail;
-			} else if (used_bytes == 0) { // LOOKATTHIS
+			} else if (used_bytes == 0 && !got_frame) {
 				TRACE(_T("CMpaDecFilter::DeliverFFmpeg() - could not process buffer while decoding\n"));
 				break;
 			} else if (m_pAVCtx->channels>8) {
