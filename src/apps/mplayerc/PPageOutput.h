@@ -43,6 +43,8 @@ private:
 	CComboBox m_iRMVideoRendererTypeCtrl;
 	CComboBox m_iQTVideoRendererTypeCtrl;
 	CComboBox m_iD3D9RenderDeviceCtrl;
+
+	CButton m_audRendPropButton;
 public:
 	CPPageOutput();
 	virtual ~CPPageOutput();
@@ -64,6 +66,8 @@ public:
 	BOOL m_fD3D9RenderDevice;
 	int m_iD3D9RenderDevice;
 
+	void ShowPPage(CUnknown* (WINAPI * CreateInstance)(LPUNKNOWN lpunk, HRESULT* phr));
+
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
@@ -77,4 +81,6 @@ public:
 	afx_msg void OnDSRendererChange();
 	afx_msg void OnFullscreenCheck();
 	afx_msg void OnD3D9DeviceCheck();
+	afx_msg void OnAudioRendererChange();
+	afx_msg void OnAudioRenderPropClick();
 };

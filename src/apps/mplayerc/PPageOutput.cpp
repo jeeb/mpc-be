@@ -28,6 +28,8 @@
 #include <moreuuids.h>
 #include "Monitors.h"
 #include "AppSettings.h"
+#include "ComPropertySheet.h"
+#include "../../filters/Filters.h"
 
 // CPPageOutput dialog
 
@@ -77,14 +79,17 @@ void CPPageOutput::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_DSVMR9YUVMIXER, m_fVMR9MixerYUV);
 
 	DDX_CBString(pDX, IDC_EVR_BUFFERS, m_iEvrBuffers);
+	DDX_Control(pDX, IDC_BUTTON1, m_audRendPropButton);
 }
 
 BEGIN_MESSAGE_MAP(CPPageOutput, CPPageBase)
-	ON_CBN_SELCHANGE(IDC_VIDRND_COMBO, &CPPageOutput::OnDSRendererChange)
-	ON_CBN_SELCHANGE(IDC_DX_SURFACE, &CPPageOutput::OnSurfaceChange)
+	ON_CBN_SELCHANGE(IDC_VIDRND_COMBO, OnDSRendererChange)
+	ON_CBN_SELCHANGE(IDC_DX_SURFACE, OnSurfaceChange)
 	ON_BN_CLICKED(IDC_D3D9DEVICE, OnD3D9DeviceCheck)
 	ON_BN_CLICKED(IDC_FULLSCREEN_MONITOR_CHECK, OnFullscreenCheck)
 	ON_UPDATE_COMMAND_UI(IDC_DSVMR9YUVMIXER, OnUpdateMixerYUV)
+	ON_CBN_SELCHANGE(IDC_AUDRND_COMBO, OnAudioRendererChange)
+	ON_BN_CLICKED(IDC_BUTTON1, OnAudioRenderPropClick)
 END_MESSAGE_MAP()
 
 // CPPageOutput message handlers
@@ -94,6 +99,7 @@ BOOL CPPageOutput::OnInitDialog()
 	__super::OnInitDialog();
 
 	SetHandCursor(m_hWnd, IDC_AUDRND_COMBO);
+	SetHandCursor(m_hWnd, IDC_BUTTON1);
 
 	AppSettings& s = AfxGetAppSettings();
 
@@ -275,6 +281,7 @@ BOOL CPPageOutput::OnInitDialog()
 	UpdateData(FALSE);
 
 	OnDSRendererChange();
+	OnAudioRendererChange();
 
 	// YUV mixing is incompatible with Vista+
 	if (IsWinVistaOrLater()) {
@@ -434,4 +441,130 @@ void CPPageOutput::OnD3D9DeviceCheck()
 	UpdateData();
 	GetDlgItem(IDC_D3D9DEVICE_COMBO)->EnableWindow(m_fD3D9RenderDevice);
 	SetModified();
+}
+
+void CPPageOutput::OnAudioRendererChange()
+{
+	UpdateData();
+
+	BOOL flag = FALSE;
+	CString str_audio = m_AudioRendererDisplayNames[m_iAudioRendererType];
+	if (str_audio == AUDRNDT_MPC) {
+		flag = TRUE;
+	} else {
+		BeginEnumSysDev(CLSID_AudioRendererCategory, pMoniker) {
+			LPOLESTR olestr = NULL;
+			if (FAILED(pMoniker->GetDisplayName(0, 0, &olestr))) {
+				continue;
+			}
+
+			CStringW str(olestr);
+			CoTaskMemFree(olestr);
+
+			if (str == m_AudioRendererDisplayNames[m_iAudioRendererType]) {
+				CComPtr<IBaseFilter> pBF;
+				HRESULT hr = pMoniker->BindToObject(NULL, NULL, __uuidof(IBaseFilter), (void**)&pBF);
+				if (SUCCEEDED(hr)) {
+					if (CComQIPtr<ISpecifyPropertyPages> pSPP = pBF) {
+						flag = TRUE;
+						break;
+					}
+				}
+			}
+		}
+		EndEnumSysDev
+	}
+
+	m_audRendPropButton.EnableWindow(flag);
+
+	SetModified();
+}
+
+void CPPageOutput::OnAudioRenderPropClick()
+{
+	CString str_audio = m_AudioRendererDisplayNames[m_iAudioRendererType];
+
+	if (str_audio == AUDRNDT_MPC) {
+		ShowPPage(CreateInstance<CMpcAudioRenderer>);
+	} else {
+		BeginEnumSysDev(CLSID_AudioRendererCategory, pMoniker) {
+			LPOLESTR olestr = NULL;
+			if (FAILED(pMoniker->GetDisplayName(0, 0, &olestr))) {
+				continue;
+			}
+
+			CStringW str(olestr);
+			CoTaskMemFree(olestr);
+
+			if (str == str_audio) {
+				CComPtr<IBaseFilter> pBF;
+				HRESULT hr = pMoniker->BindToObject(NULL, NULL, __uuidof(IBaseFilter), (void**)&pBF);
+				if (SUCCEEDED(hr)) {
+					ISpecifyPropertyPages *pProp = NULL;
+					hr = pBF->QueryInterface(IID_ISpecifyPropertyPages, (void **)&pProp);
+					if (SUCCEEDED(hr)) {
+						// Get the filter's name and IUnknown pointer.
+						FILTER_INFO FilterInfo;
+						hr = pBF->QueryFilterInfo(&FilterInfo); 
+						if (SUCCEEDED(hr)) {
+							IUnknown *pFilterUnk;
+							hr = pBF->QueryInterface(IID_IUnknown, (void **)&pFilterUnk);
+							if (SUCCEEDED(hr)) {
+
+								// Show the page. 
+								CAUUID caGUID;
+								pProp->GetPages(&caGUID);
+								pProp->Release();
+
+								OleCreatePropertyFrame(
+									this->m_hWnd,			// Parent window
+									0, 0,					// Reserved
+									FilterInfo.achName,		// Caption for the dialog box
+									1,						// Number of objects (just the filter)
+									&pFilterUnk,			// Array of object pointers. 
+									caGUID.cElems,			// Number of property pages
+									caGUID.pElems,			// Array of property page CLSIDs
+									0,						// Locale identifier
+									0, NULL					// Reserved
+								);
+
+								// Clean up.
+								CoTaskMemFree(caGUID.pElems);
+								pFilterUnk->Release();
+							}
+							if (FilterInfo.pGraph) {
+								FilterInfo.pGraph->Release();
+							}
+						}
+					}
+				}
+				break;
+			}
+		}
+		EndEnumSysDev
+	}
+}
+
+void CPPageOutput::ShowPPage(CUnknown* (WINAPI * CreateInstance)(LPUNKNOWN lpunk, HRESULT* phr))
+{
+	if (!CreateInstance) {
+		return;
+	}
+
+	HRESULT hr;
+	CUnknown* pObj = CreateInstance(NULL, &hr);
+
+	if (!pObj) {
+		return;
+	}
+
+	CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)pObj;
+
+	if (SUCCEEDED(hr)) {
+		if (CComQIPtr<ISpecifyPropertyPages> pSPP = pUnk) {
+			CComPropertySheet ps(ResStr(IDS_PROPSHEET_PROPERTIES), this);
+			ps.AddPages(pSPP);
+			ps.DoModal();
+		}
+	}
 }
