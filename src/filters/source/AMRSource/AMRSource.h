@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include "stdafx.h"
 #include <windows.h>
 #include <initguid.h>
 #include <moreuuids.h>
@@ -47,7 +46,6 @@ class CAMRSplitter;
 class CAMRInputPin : public CBaseInputPin
 {
 public:
-
 	// parent splitter
 	CAMRSplitter	*demux;
 	IAsyncReader	*reader;
@@ -104,7 +102,6 @@ public:
 public:
 	DataPacketAMR();
 	virtual ~DataPacketAMR();
-
 };
 
 typedef CArray<CMediaType> CMediaTypes;
@@ -230,7 +227,6 @@ public:
 	void EndFlush()		{ if (reader) reader->EndFlush(); }
 };
 
-
 //-----------------------------------------------------------------------------
 //
 //	CAMRSplitter class
@@ -259,7 +255,6 @@ public:
 	REFERENCE_TIME				rtStop;
 	double						rate;
 
-
 public:
 	// constructor
 	CAMRSplitter(LPUNKNOWN pUnk, HRESULT *phr);
@@ -272,15 +267,15 @@ public:
 
 	// CBaseFilter
 	virtual int GetPinCount();
-    virtual CBasePin *GetPin(int n);
+	virtual CBasePin *GetPin(int n);
 
 	// Output pins
 	HRESULT AddOutputPin(CAMROutputPin *pPin);
 	virtual HRESULT RemoveOutputPins();
 	CAMROutputPin *FindStream(int stream_no);
 
-    // check that we can support this input type
-    virtual HRESULT CheckInputType(const CMediaType* mtIn);
+	// check that we can support this input type
+	virtual HRESULT CheckInputType(const CMediaType* mtIn);
 	virtual HRESULT CheckConnect(PIN_DIRECTION Dir, IPin *pPin);
 	virtual HRESULT BreakConnect(PIN_DIRECTION Dir, CBasePin *pCaller);
 	virtual HRESULT CompleteConnect(PIN_DIRECTION Dir, CBasePin *pCaller, IPin *pReceivePin);
@@ -315,5 +310,4 @@ public:
 	STDMETHODIMP SetPositionsInternal(int iD, LONGLONG* pCurrent, DWORD dwCurrentFlags, LONGLONG* pStop, DWORD dwStopFlags);
 
 	virtual HRESULT DoNewSeek();
-
 };

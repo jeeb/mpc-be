@@ -23,8 +23,7 @@
 
 #pragma once
 
-#include "..\DSUtil\DSUtil.h"
-#include "stdafx.h"
+#include "../../../DSUtil/DSUtil.h"
 
 #define TTA_COPYRIGHT		""
 #define TTA_MYNAME		""
@@ -47,10 +46,6 @@ typedef unsigned long long uint64;
 #ifdef _WIN32
 
 #define tta_alloc(__length) GlobalAlloc(GMEM_ZEROINIT, __length)
-#define tta_free(__dest) GlobalFree(__dest)
-#define tta_memcpy(__buff1,__buff2,__length) CopyMemory(__buff1,__buff2,__length)
-#define tta_memclear(__dest,__length) ZeroMemory(__dest,__length)
-#define tta_memcmp(__buff1,__buff2,__length) memcmp(__buff1,__buff2,__length)
 
 typedef unsigned __int64 uint64;
 
@@ -112,7 +107,6 @@ typedef struct {
 	unsigned long is_float;
 	unsigned short wavformat;
 	unsigned short codec_num_chan;
-
 } TTA_codec;
 
 #ifdef _WIN32
@@ -281,7 +275,7 @@ __inline void hybrid_filter (TTA_fltst *fs, long *in, long mode)
 
 __inline void filter_init (TTA_fltst *fs, long shift, long mode)
 {
-	tta_memclear(fs, sizeof(TTA_fltst));
+	ZeroMemory(fs, sizeof(TTA_fltst));
 	fs->shift = shift;
 	fs->round = 1 << (shift - 1);
 	fs->mutex = mode;

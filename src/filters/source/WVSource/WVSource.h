@@ -52,9 +52,8 @@ typedef struct {
 } IAsyncCallBackWrapper_wv;
 
 IAsyncCallBackWrapper_wv* IAsyncCallBackWrapper_wv_new(IAsyncReader *pReader);
-void IAsyncCallBackWrapper_wv_free(IAsyncCallBackWrapper_wv* iacw);
 
-//-----------------------------------------------------------------------------
+void IAsyncCallBackWrapper_wv_free(IAsyncCallBackWrapper_wv* iacw);
 
 class CWavPackSplitterFilter;
 
@@ -98,8 +97,6 @@ protected:
 	BOOL m_bDiscontinuity;
 };
 
-//-----------------------------------------------------------------------------
-
 class CWavPackSplitterFilterOutputPin : public CBaseOutputPin,
 										public IMediaSeeking
 {
@@ -109,7 +106,7 @@ public:
 	CWavPackSplitterFilterOutputPin(CWavPackSplitterFilter *pParentFilter, CCritSec *pLock, HRESULT * phr);
 
 	DECLARE_IUNKNOWN
-        
+
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void **ppv) {
 		if (riid == IID_IMediaSeeking) {
 			return GetInterface((IMediaSeeking *)this, ppv);
@@ -122,7 +119,7 @@ public:
 	HRESULT GetMediaType(int iPosition, CMediaType *pMediaType);
 	HRESULT DecideBufferSize(IMemAllocator * pAlloc, ALLOCATOR_PROPERTIES *pProp);
 
-	// --- IMediaSeeking ---    
+	// --- IMediaSeeking ---
 	STDMETHODIMP IsFormatSupported(const GUID * pFormat);
 	STDMETHODIMP QueryPreferredFormat(GUID *pFormat);
 	STDMETHODIMP SetTimeFormat(const GUID * pFormat);
@@ -134,9 +131,9 @@ public:
 	STDMETHODIMP GetCapabilities(DWORD * pCapabilities);
 	STDMETHODIMP CheckCapabilities(DWORD * pCapabilities);
 	STDMETHODIMP ConvertTimeFormat(LONGLONG * pTarget, const GUID * pTargetFormat,
-		LONGLONG Source, const GUID * pSourceFormat);   
+	LONGLONG Source, const GUID * pSourceFormat);
 	STDMETHODIMP SetPositions( LONGLONG * pCurrent, DWORD CurrentFlags,
-		LONGLONG * pStop, DWORD StopFlags);
+	LONGLONG * pStop, DWORD StopFlags);
 	STDMETHODIMP GetPositions(LONGLONG * pCurrent, LONGLONG * pStop);
 	STDMETHODIMP GetAvailable(LONGLONG * pEarliest, LONGLONG * pLatest);
 	STDMETHODIMP SetRate(double dRate);
@@ -144,18 +141,15 @@ public:
 	STDMETHODIMP GetPreroll(LONGLONG *pPreroll);
 
 protected:
-    CWavPackSplitterFilter *m_pParentFilter;    
+	CWavPackSplitterFilter *m_pParentFilter;
 };
-
-//-----------------------------------------------------------------------------
 
 class __declspec(uuid("B5554304-3C9A-40A1-8E82-8C8CFBED56C0"))
 		CWavPackSplitterFilter : public CBaseFilter
 {
-
 public :
 	DECLARE_IUNKNOWN
-	static CUnknown *WINAPI CreateInstance(LPUNKNOWN punk, HRESULT *phr); 
+	static CUnknown *WINAPI CreateInstance(LPUNKNOWN punk, HRESULT *phr);
 
 	CWavPackSplitterFilter(LPUNKNOWN lpunk, HRESULT *phr);
 	virtual ~CWavPackSplitterFilter();
@@ -192,4 +186,3 @@ protected:
 		return m_pInputPin->m_pWavPackParser;
 	}
 };
-

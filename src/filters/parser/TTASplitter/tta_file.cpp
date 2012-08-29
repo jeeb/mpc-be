@@ -91,10 +91,10 @@ void bit_buffer_free(TTA_bit_buffer* bbuf)
 		{
 			bbuf->bitpos = NULL;
 			bbuf->BIT_BUFFER_END = NULL;
-			tta_free(bbuf->bit_buffer);
+			GlobalFree(bbuf->bit_buffer);
 			bbuf->bit_buffer = NULL;
 		}
-		tta_free(bbuf);
+		GlobalFree(bbuf);
 	}
 }
 
@@ -118,7 +118,7 @@ void bit_buffer_init_write(TTA_bit_buffer* bbuf)
 {
 	bbuf->crc32 = 0xFFFFFFFFUL;
 	bbuf->bit_count = bbuf->bit_cache = 0;
-	bbuf->bitpos = bbuf->bit_buffer;	
+	bbuf->bitpos = bbuf->bit_buffer;
 }
 
 void bit_buffer_init_read(TTA_bit_buffer* bbuf)
@@ -144,7 +144,7 @@ __inline void bit_buffer_put_binary(TTA_bit_buffer* bbuf, unsigned long value, u
 
 __inline void bit_buffer_get_binary(TTA_bit_buffer* bbuf, unsigned long *value, unsigned long bits)
 {
-	while (bbuf->bit_count < bits) {		
+	while (bbuf->bit_count < bits) {
 		UPDATE_CRC32(*bbuf->bitpos, bbuf->crc32);
 		bbuf->bit_cache |= *bbuf->bitpos << bbuf->bit_count;
 		bbuf->bit_count += 8;
@@ -185,7 +185,7 @@ __inline void bit_buffer_get_unary(TTA_bit_buffer* bbuf, unsigned long *value)
 {
 	*value = 0;
 
-	while (!(bbuf->bit_cache ^ bit_mask[bbuf->bit_count])) {	
+	while (!(bbuf->bit_cache ^ bit_mask[bbuf->bit_count])) {
 		*value += bbuf->bit_count;
 		bbuf->bit_cache = *bbuf->bitpos++;
 		UPDATE_CRC32(bbuf->bit_cache, bbuf->crc32);
@@ -216,7 +216,7 @@ int bit_buffer_done_write(TTA_bit_buffer* bbuf)
 
 	bbuf->crc32 ^= 0xFFFFFFFFUL;
 	bbuf->crc32 = ENDSWAP_INT32(bbuf->crc32);
-	tta_memcpy(bbuf->bitpos, &bbuf->crc32, 4);
+	memcpy(bbuf->bitpos, &bbuf->crc32, 4);
 	bytes_to_write = bbuf->bitpos + sizeof(long) - bbuf->bit_buffer;
 
 	bbuf->bitpos = bbuf->bit_buffer;
@@ -295,7 +295,7 @@ long convert_output_buffer(unsigned char *dst, long *data, long byte_size, long 
 		*dst++ = (unsigned char) (*src >> 24);
 			}
 		break;
-    	}
+	}
 
 	return byte_size * len * num_chan;
 }
@@ -365,7 +365,7 @@ void compress_data(TTA_codec* ttacodec, long *data, unsigned long len)
 			rice->k0--;
 		else if (rice->sum0 > shift_16[rice->k0 + 1])
 			rice->k0++;
-		
+
 		if (value >= bit_shift[k]) {
 			value -= bit_shift[k];
 			k = rice->k1;
@@ -472,6 +472,7 @@ unsigned long decompress_data(TTA_codec* ttacodec, long *data)
 			}
 		}
 	}
+
 	return decoded_pcm_frames;
 }
 
@@ -490,15 +491,15 @@ unsigned long decompress_one_frame(TTA_codec* ttacodec, long *data, unsigned lon
 
 	channels_codec_init(ttacodec->tta, ttacodec->codec_num_chan, ttacodec->byte_size);
 
-	tta_memcpy(ttacodec->fbuf->bit_buffer, data, len);
+	memcpy(ttacodec->fbuf->bit_buffer, data, len);
 	ttacodec->fbuf->bitpos = ttacodec->fbuf->bit_buffer;
 	ttacodec->fbuf->BIT_BUFFER_END = ttacodec->fbuf->bit_buffer + len - sizeof(ttacodec->fbuf->crc32);
-	
+
 	decoded_pcm_frames = decompress_data(ttacodec, ttacodec->data);
 
 	if (bit_buffer_done_read(ttacodec->fbuf)) {
 
-		tta_memclear(ttacodec->data, len);
+		ZeroMemory(ttacodec->data, len);
 		bit_buffer_init_read(ttacodec->fbuf);
 		return 0;
 	}
@@ -512,7 +513,7 @@ TTA_codec* tta_codec_new(long srate, short num_chan, short bps, short format)
 
 	if(!ttacodec)
 		return NULL;
-	
+
 	ttacodec->framelen = (long)(TTA_FRAME_TIME * srate);
 	ttacodec->srate = srate;
 	ttacodec->num_chan = num_chan;
@@ -521,14 +522,14 @@ TTA_codec* tta_codec_new(long srate, short num_chan, short bps, short format)
 	ttacodec->is_float = (bps == 32) || (format == WAVE_FORMAT_IEEE_FLOAT);
 	ttacodec->wavformat = format;
 	ttacodec->codec_num_chan = (ttacodec->num_chan << ttacodec->is_float);
-	
+
 	ttacodec->fbuf = bit_buffer_new(ttacodec->framelen * ttacodec->byte_size * ttacodec->codec_num_chan * (ttacodec->is_float ? 2 : 1) + sizeof(long));
 	if(!ttacodec->fbuf)
 	{
 		tta_codec_free(ttacodec);
 		return NULL;
 	}
-	
+
 	ttacodec->data_len = 0;
 	ttacodec->data = (long *) tta_alloc(ttacodec->codec_num_chan * ttacodec->framelen * sizeof(long) * (ttacodec->is_float ? 2 : 1));
 	if(!ttacodec->data)
@@ -536,14 +537,14 @@ TTA_codec* tta_codec_new(long srate, short num_chan, short bps, short format)
 		tta_codec_free(ttacodec);
 		return NULL;
 	}
-	
+
 	ttacodec->enc = ttacodec->tta = (TTA_channel_codec*)tta_alloc(ttacodec->codec_num_chan * sizeof(TTA_channel_codec));
 	if(!ttacodec->tta)
 	{
 		tta_codec_free(ttacodec);
 		return NULL;
 	}
-	
+
 	return ttacodec;
 }
 
@@ -554,15 +555,15 @@ void tta_codec_free(TTA_codec* ttacodec)
 		bit_buffer_free(ttacodec->fbuf);
 		ttacodec->fbuf = NULL;
 		if (ttacodec->data) {
-			tta_free(ttacodec->data);
+			GlobalFree(ttacodec->data);
 			ttacodec->data = NULL;
 		}
 		if (ttacodec->tta) {
-			tta_free(ttacodec->tta = ttacodec->enc);
+			GlobalFree(ttacodec->tta = ttacodec->enc);
 			ttacodec->enc = NULL;
 			ttacodec->tta = NULL;
 		}
-		tta_free(ttacodec);
+		GlobalFree(ttacodec);
 	}
 }
 
@@ -590,7 +591,7 @@ TTA_codec* tta_codec_encoder_new(long srate, short num_chan, short bps, short fo
 	if(ttaenc) {
 		bit_buffer_init_write(ttaenc->fbuf);
 	}
-	
+
 	return ttaenc;
 }
 
@@ -599,16 +600,16 @@ unsigned long tta_codec_encoder_compress(TTA_codec* ttaenc, unsigned char *src, 
 	long needed_data = (ttaenc->framelen - ttaenc->data_len);
 	long data_available = (len / ttaenc->num_chan / (ttaenc->bps / 8));
 	long consume_data = min(needed_data, data_available);
-	
+
 	convert_input_buffer(ttaenc->data + (ttaenc->data_len * ttaenc->num_chan), src, ttaenc->byte_size, consume_data * ttaenc->num_chan);
-	
+
 	ttaenc->data_len += consume_data;
-	
+
 	if(ttaenc->data_len == ttaenc->framelen)
 	{
 		*bytes_to_write = compress_one_frame(ttaenc, ttaenc->data, ttaenc->framelen);
 	}
-	
+
 	return (consume_data * ttaenc->num_chan * (ttaenc->bps / 8));
 }
 
@@ -638,7 +639,7 @@ TTA_codec* tta_codec_decoder_new(long srate, short num_chan, short bps)
 	if(ttadec) {
 		bit_buffer_init_read(ttadec->fbuf);
 	}
-	
+
 	return ttadec;
 }
 
@@ -654,7 +655,7 @@ unsigned long tta_codec_decoder_decompress(TTA_codec* ttadec, unsigned char *src
 
 	convert_output_buffer(dst, ttadec->data, ttadec->byte_size,
 		ttadec->num_chan, decoded_pcm_frames);
-	
+
 	return (decoded_pcm_frames_bytes);
 }
 
@@ -674,15 +675,15 @@ TTA_parser* tta_parser_new(TTA_io_callback* io)
 	{
 		return NULL;
 	}
-	
-	if (!tta_memcmp(ttaparser->id3v2.id, "ID3", 3)) {	
+
+	if (!memcmp(ttaparser->id3v2.id, "ID3", 3)) {	
 		if ((ttaparser->id3v2.size[0] |
 			 ttaparser->id3v2.size[1] |
 			 ttaparser->id3v2.size[2] |
 			 ttaparser->id3v2.size[3]) & 0x80) {
 			return NULL;
 		}
-		
+
 		ttaparser->ID3v2Len = (ttaparser->id3v2.size[0] << 21) |
 			(ttaparser->id3v2.size[1] << 14) |
 			(ttaparser->id3v2.size[2] << 7) |
@@ -717,7 +718,7 @@ TTA_parser* tta_parser_new(TTA_io_callback* io)
 	if (checksum != ttaparser->TTAHeader.CRC32) {
 		return NULL;
 	}
-	
+
 	ttaparser->FrameLen = tta_codec_get_frame_len(ttaparser->TTAHeader.SampleRate);
 	ttaparser->LastFrameLen = ttaparser->TTAHeader.DataLength % ttaparser->FrameLen;
 	ttaparser->FrameTotal = ttaparser->TTAHeader.DataLength / ttaparser->FrameLen + (ttaparser->LastFrameLen ? 1 : 0);
@@ -726,7 +727,7 @@ TTA_parser* tta_parser_new(TTA_io_callback* io)
 	ttaparser->SeekTable = (unsigned long*)tta_alloc(st_size * sizeof(long));
 
 	ttaparser->SeekOffsetTable = (unsigned long*)tta_alloc(st_size * sizeof(long));
-		
+
 	if(!io->read(io, ttaparser->SeekTable, st_size * sizeof(long)))
 	{
 		return NULL;
@@ -760,7 +761,7 @@ TTA_parser* tta_parser_new(TTA_io_callback* io)
 	}
 
 	ttaparser->FrameIndex = 0;
-		
+
 	return ttaparser;
 }
 
@@ -813,17 +814,17 @@ void tta_parser_free(TTA_parser** ttaparser)
 
 	if((*ttaparser)->SeekOffsetTable)
 	{
-		tta_free((*ttaparser)->SeekOffsetTable);
+		GlobalFree((*ttaparser)->SeekOffsetTable);
 		(*ttaparser)->SeekOffsetTable = NULL;
 	}
 
 	if((*ttaparser)->SeekTable)
 	{
-		tta_free((*ttaparser)->SeekTable);
+		GlobalFree((*ttaparser)->SeekTable);
 		(*ttaparser)->SeekTable = NULL;
 	}
 
-	tta_free(*ttaparser);
+	GlobalFree(*ttaparser);
 
 	*ttaparser = NULL;
 }

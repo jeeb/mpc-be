@@ -64,7 +64,6 @@ const int32 Bitstream::EXP_GOLOMB_MAP_INV[2][48] =
 	}
 };
 
-
 // Exp-Golomb Codes
 
 const int32 Bitstream::EXP_GOLOMB_SIZE[255] =
@@ -134,4 +133,3 @@ int32 Bitstream::Get_Golomb(int k)
 	NeedBits();
 	return (l << k) | UGetBits(k);
 }
-

@@ -23,8 +23,7 @@
 
 #pragma once
 
-#include "..\DSUtil\DSUtil.h"
-#include "stdafx.h"
+#include "../../../DSUtil/DSUtil.h"
 
 class CAMRReader;
 
@@ -50,7 +49,6 @@ public:
 	int Load(CAMRReader *reader);
 };
 
-
 //-----------------------------------------------------------------------------
 //
 //	CAMRFile class
@@ -60,7 +58,6 @@ public:
 class CAMRFile
 {
 public:
-
 	int64			duration_10mhz;			// total file duration
 	int64			total_frames;			// total number of AMR frames
 
@@ -82,5 +79,4 @@ public:
 	// parsing out packets
 	int ReadAudioPacket(CAMRPacket *packet, int64 *cur_sample);
 	int Seek(int64 seek_sample);
-
 };

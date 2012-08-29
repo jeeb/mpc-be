@@ -495,24 +495,6 @@ int CMPCFile::ReadAudioPacket(CMPCPacket *packet, int64 *cur_sample)
 
 int CMPCFile::Seek(int64 seek_sample)
 {
-	/*
-		This will be a little tricky. I would like to support also 
-		less precise seeking with files that don't have seeking table. 
-		But if there is one, we	would use that one.
-
-		Original implementation also deals with introductory silence.
-		But since I don't know of any dshow filters capable of
-		gapless playback we would ignore this. Of course it can
-		be implemented later.
-
-		It is absolutely okay to do AP-level seeking. The caller
-		knows the exact time it wants to seek to and we will provide
-		the nearest AP. If the requested time is in the middle of AP,
-		the (current_time - requested_time) expression would be negative
-		and decoder will skip samples until positive time values are encountered.
-		This way we can do sample-precise seeking.
-	*/
-
 	// cannot seek
 	if (seek_table == NULL || seek_table_size == 0) {
 		return -1;
@@ -546,7 +528,6 @@ int CMPCFile::Seek(int64 seek_sample)
 
 	return S_OK;
 }
-
 
 //-----------------------------------------------------------------------------
 //
@@ -682,12 +663,12 @@ int CMPCPacket::Load(CMusePackReader *reader)
 	}
 	file_position *= 8;
 
-	ret = reader->GetKey(key_val);					
+	ret = reader->GetKey(key_val);
 	if (ret < 0) {
 		return ret;
 	}
 
-	ret = reader->GetSizeElm(size_val, size_len);	
+	ret = reader->GetSizeElm(size_val, size_len);
 	if (ret < 0) {
 		return ret;
 	}
@@ -706,11 +687,10 @@ int CMPCPacket::Load(CMusePackReader *reader)
 
 	// roll back the bytes
 	reader->Seek(file_position/8);
-	ret = reader->Read(packet, packet_size);		
+	ret = reader->Read(packet, packet_size);
 	if (ret < 0) {
 		return ret;
 	}
 
 	return S_OK;
 }
-

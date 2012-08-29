@@ -29,11 +29,7 @@
 
 #include "WVSource.h"
 
-// ----------------------------------------------------------------------------
-
 #define constrain(x,y,z) (((y) < (x)) ? (x) : ((y) > (z)) ? (z) : (y))
-
-// ----------------------------------------------------------------------------
 
 CUnknown *WINAPI CWavPackSplitterFilter::CreateInstance(LPUNKNOWN punk, HRESULT *phr) {
 	CWavPackSplitterFilter *pNewObject = DNew CWavPackSplitterFilter(punk, phr);
@@ -42,8 +38,6 @@ CUnknown *WINAPI CWavPackSplitterFilter::CreateInstance(LPUNKNOWN punk, HRESULT 
 	}
 	return pNewObject;
 }
-
-// ----------------------------------------------------------------------------
 
 CWavPackSplitterFilter::CWavPackSplitterFilter(LPUNKNOWN lpunk, HRESULT *phr) :
 	CBaseFilter(NAME("Light Alloy/MPC WavPack Splitter"), lpunk, &m_Lock, CLSID_WavPackSplitter),
@@ -77,8 +71,6 @@ CWavPackSplitterFilter::CWavPackSplitterFilter(LPUNKNOWN lpunk, HRESULT *phr) :
 	}
 }
 
-// ----------------------------------------------------------------------------
-
 CWavPackSplitterFilter::~CWavPackSplitterFilter()
 {
 	delete m_pInputPin;
@@ -87,16 +79,12 @@ CWavPackSplitterFilter::~CWavPackSplitterFilter()
 	m_pOutputPin = NULL;
 }
 
-// ----------------------------------------------------------------------------
-
 int CWavPackSplitterFilter::GetPinCount()
 {
 	CAutoLock lock(m_pLock);
 
 	return 2;
 }
-
-// ----------------------------------------------------------------------------
 
 CBasePin* CWavPackSplitterFilter::GetPin(int n)
 {
@@ -111,19 +99,15 @@ CBasePin* CWavPackSplitterFilter::GetPin(int n)
 	return NULL;
 }
 
-// ----------------------------------------------------------------------------
-
 STDMETHODIMP CWavPackSplitterFilter::Stop(void)
 {
 	return CBaseFilter::Stop();
 }
 
-// ----------------------------------------------------------------------------
-
 STDMETHODIMP CWavPackSplitterFilter::Pause(void)
 {
-	CAutoLock cObjectLock(m_pLock); 
-    
+	CAutoLock cObjectLock(m_pLock);
+
 	// notify all pins of the change to active state
 	if (m_State == State_Stopped) {
 		// Order is important, the output pin allocator need to be commited
@@ -144,19 +128,15 @@ STDMETHODIMP CWavPackSplitterFilter::Pause(void)
 			}
 		}
 	}
-    
+
 	m_State = State_Paused;
 	return S_OK;
 }
-
-// ----------------------------------------------------------------------------
 
 STDMETHODIMP CWavPackSplitterFilter::Run(REFERENCE_TIME tStart)
 {
 	return CBaseFilter::Run(tStart);
 }
-
-// ----------------------------------------------------------------------------
 
 void CWavPackSplitterFilter::SetDuration(REFERENCE_TIME rtDuration)
 {
@@ -164,8 +144,6 @@ void CWavPackSplitterFilter::SetDuration(REFERENCE_TIME rtDuration)
 	m_rtStop = rtDuration; 
 	m_rtDuration = rtDuration;
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CWavPackSplitterFilter::BeginFlush()
 {
@@ -180,8 +158,6 @@ HRESULT CWavPackSplitterFilter::BeginFlush()
 	return NOERROR;
 }
 
-// ----------------------------------------------------------------------------
-
 HRESULT CWavPackSplitterFilter::EndFlush()
 {
 	CAutoLock lock(m_pLock);
@@ -191,14 +167,10 @@ HRESULT CWavPackSplitterFilter::EndFlush()
 	return NOERROR;
 }
 
-// ----------------------------------------------------------------------------
-
 HRESULT CWavPackSplitterFilter::DoSeeking()
 {
 	return m_pInputPin->DoSeeking(m_rtStart);
 }
-
-// ----------------------------------------------------------------------------
 
 STDMETHODIMP CWavPackSplitterFilter::JoinFilterGraph(IFilterGraph *pGraph, LPCWSTR pName)
 {
@@ -213,17 +185,14 @@ CWavPackSplitterFilterInputPin::CWavPackSplitterFilterInputPin(
 		(CBaseFilter *) pParentFilter,
 		pLock,
 		phr,
-		L"Input"),      
+		L"Input"),
 	m_pParentFilter(pParentFilter),
 	m_pReader(NULL),
 	m_bDiscontinuity(TRUE),
 	m_pIACBW(NULL),
 	m_pWavPackParser(NULL)
 {
-   
 }
-
-// ----------------------------------------------------------------------------
 
 CWavPackSplitterFilterInputPin::~CWavPackSplitterFilterInputPin()
 {
@@ -232,8 +201,6 @@ CWavPackSplitterFilterInputPin::~CWavPackSplitterFilterInputPin()
 		m_pWavPackParser = NULL;
 	}
 }
-    
-// ----------------------------------------------------------------------------
 
 HRESULT CWavPackSplitterFilterInputPin::CheckMediaType(const CMediaType *pmt)
 {
@@ -254,8 +221,6 @@ HRESULT CWavPackSplitterFilterInputPin::CheckMediaType(const CMediaType *pmt)
 		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CWavPackSplitterFilterInputPin::CheckConnect(IPin* pPin)
 {
@@ -278,8 +243,6 @@ HRESULT CWavPackSplitterFilterInputPin::CheckConnect(IPin* pPin)
 	return S_OK;
 }
 
-// ----------------------------------------------------------------------------
-
 HRESULT CWavPackSplitterFilterInputPin::BreakConnect(void)
 {
 	HRESULT hr = CBaseInputPin::BreakConnect();
@@ -300,8 +263,6 @@ HRESULT CWavPackSplitterFilterInputPin::BreakConnect(void)
 	return S_OK;
 }
 
-// ----------------------------------------------------------------------------
-
 HRESULT CWavPackSplitterFilterInputPin::CompleteConnect(IPin *pReceivePin)
 {
 	HRESULT hr = CBaseInputPin::CompleteConnect(pReceivePin);
@@ -313,7 +274,7 @@ HRESULT CWavPackSplitterFilterInputPin::CompleteConnect(IPin *pReceivePin)
 		wavpack_parser_free(m_pWavPackParser);
 		m_pWavPackParser = NULL;
 	}
-	
+
 	m_pWavPackParser = wavpack_parser_new((stream_reader*)m_pIACBW, FALSE);
 	if (!m_pWavPackParser) {
 		return E_FAIL;
@@ -327,8 +288,6 @@ HRESULT CWavPackSplitterFilterInputPin::CompleteConnect(IPin *pReceivePin)
 
 	return S_OK;
 }
-
-// ----------------------------------------------------------------------------
 
 DWORD CWavPackSplitterFilterInputPin::ThreadProc()
 {
@@ -354,8 +313,6 @@ DWORD CWavPackSplitterFilterInputPin::ThreadProc()
 
 	return NOERROR; 
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CWavPackSplitterFilterInputPin::DeliverOneFrame(WavPack_parser* wpp)
 {
@@ -415,8 +372,6 @@ HRESULT CWavPackSplitterFilterInputPin::DeliverOneFrame(WavPack_parser* wpp)
 	return S_OK;
 }
 
-// ----------------------------------------------------------------------------
-
 HRESULT CWavPackSplitterFilterInputPin::DoProcessingLoop(void)
 {
 	DWORD cmd;
@@ -448,8 +403,6 @@ HRESULT CWavPackSplitterFilterInputPin::DoProcessingLoop(void)
 	return NOERROR;
 }
 
-// ----------------------------------------------------------------------------
-
 HRESULT CWavPackSplitterFilterInputPin::Active()
 {
 	HRESULT hr;
@@ -475,8 +428,6 @@ HRESULT CWavPackSplitterFilterInputPin::Active()
 	return NOERROR;
 }
 
-// ----------------------------------------------------------------------------
-
 HRESULT CWavPackSplitterFilterInputPin::Inactive()
 {
 	// Stop the thread
@@ -489,8 +440,6 @@ HRESULT CWavPackSplitterFilterInputPin::Inactive()
 	return CBasePin::Inactive();
 }
 
-// ----------------------------------------------------------------------------
-
 STDMETHODIMP CWavPackSplitterFilterInputPin::BeginFlush()
 {
 	HRESULT hr = CBaseInputPin::BeginFlush();
@@ -501,14 +450,12 @@ STDMETHODIMP CWavPackSplitterFilterInputPin::BeginFlush()
 	if (!ThreadExists()) {
 		return NOERROR;
 	}
-	
+
 	m_bAbort = TRUE;
 	CallWorker(CMD_STOP);
-	
+
 	return  NOERROR;
 }
-
-// ----------------------------------------------------------------------------
 
 STDMETHODIMP CWavPackSplitterFilterInputPin::EndFlush()
 {
@@ -524,13 +471,11 @@ STDMETHODIMP CWavPackSplitterFilterInputPin::EndFlush()
 	return NOERROR; 
 }
 
-// ----------------------------------------------------------------------------
-
 HRESULT CWavPackSplitterFilterInputPin::DoSeeking(REFERENCE_TIME rtStart)
 {
 	wavpack_parser_seek(m_pWavPackParser, rtStart);
 	m_bDiscontinuity = TRUE;
-	
+
 	return S_OK;
 }
 
@@ -546,8 +491,6 @@ CWavPackSplitterFilterOutputPin::CWavPackSplitterFilterOutputPin(
 	m_pParentFilter(pParentFilter)
 {
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CWavPackSplitterFilterOutputPin::CheckMediaType(const CMediaType *pmt)
 {
@@ -566,8 +509,6 @@ HRESULT CWavPackSplitterFilterOutputPin::CheckMediaType(const CMediaType *pmt)
 
 	return m_pParentFilter->m_pInputPin->CheckMediaType(&m_pParentFilter->m_pInputPin->CurrentMediaType());
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CWavPackSplitterFilterOutputPin::GetMediaType(int iPosition, CMediaType *pMediaType)
 {
@@ -610,8 +551,6 @@ HRESULT CWavPackSplitterFilterOutputPin::GetMediaType(int iPosition, CMediaType 
 	return S_OK;
 }
 
-// ----------------------------------------------------------------------------
-
 HRESULT CWavPackSplitterFilterOutputPin::DecideBufferSize(IMemAllocator * pAlloc, ALLOCATOR_PROPERTIES *pProp)
 {
 	if (!m_pParentFilter->m_pInputPin->IsConnected()) {
@@ -630,63 +569,51 @@ HRESULT CWavPackSplitterFilterOutputPin::DecideBufferSize(IMemAllocator * pAlloc
 
 	if (Actual.cbBuffer < pProp->cbBuffer || Actual.cBuffers < pProp->cBuffers) {
 		return E_INVALIDARG;
-	}   
+	}
 
 	return S_OK;
 }
 
-// ----------------------------------------------------------------------------
 // IMediaSeeking
-// ----------------------------------------------------------------------------
 
 HRESULT CWavPackSplitterFilterOutputPin::IsFormatSupported(const GUID * pFormat)
 {
 	CheckPointer(pFormat, E_POINTER);
 	// only seeking in time (REFERENCE_TIME units) is supported
-	
+
 	return *pFormat == TIME_FORMAT_MEDIA_TIME ? S_OK : S_FALSE;
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CWavPackSplitterFilterOutputPin::QueryPreferredFormat(GUID *pFormat)
 {
 	CheckPointer(pFormat, E_POINTER);
 	*pFormat = TIME_FORMAT_MEDIA_TIME;
-	
+
 	return S_OK;
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CWavPackSplitterFilterOutputPin::SetTimeFormat(const GUID * pFormat)
 {
 	CheckPointer(pFormat, E_POINTER);
 	// nothing to set; just check that it's TIME_FORMAT_TIME
-	
+
 	return *pFormat == TIME_FORMAT_MEDIA_TIME ? S_OK : E_INVALIDARG;
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CWavPackSplitterFilterOutputPin::IsUsingTimeFormat(const GUID * pFormat)
 {
 	CheckPointer(pFormat, E_POINTER);
-	
+
 	return *pFormat == TIME_FORMAT_MEDIA_TIME ? S_OK : S_FALSE;
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CWavPackSplitterFilterOutputPin::GetTimeFormat(GUID *pFormat)
 {
 	CheckPointer(pFormat, E_POINTER);
 	*pFormat = TIME_FORMAT_MEDIA_TIME;
-	
+
 	return S_OK;
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CWavPackSplitterFilterOutputPin::GetDuration(LONGLONG *pDuration)
 {
@@ -694,11 +621,9 @@ HRESULT CWavPackSplitterFilterOutputPin::GetDuration(LONGLONG *pDuration)
 	CAutoLock lock(m_pParentFilter->m_pLock);
 
 	*pDuration = m_pParentFilter->m_rtDuration;
-	
+
 	return S_OK;
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CWavPackSplitterFilterOutputPin::GetStopPosition(LONGLONG *pStop)
 {
@@ -706,11 +631,9 @@ HRESULT CWavPackSplitterFilterOutputPin::GetStopPosition(LONGLONG *pStop)
 	CAutoLock lock(m_pParentFilter->m_pLock);
 
 	*pStop = m_pParentFilter->m_rtStop;
-	
+
 	return S_OK;
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CWavPackSplitterFilterOutputPin::GetCurrentPosition(LONGLONG *pCurrent)
 {
@@ -719,27 +642,21 @@ HRESULT CWavPackSplitterFilterOutputPin::GetCurrentPosition(LONGLONG *pCurrent)
 	return E_NOTIMPL;
 }
 
-// ----------------------------------------------------------------------------
-
 HRESULT CWavPackSplitterFilterOutputPin::GetCapabilities(DWORD * pCapabilities)
 {
 	CheckPointer(pCapabilities, E_POINTER);
 	*pCapabilities = m_pParentFilter->m_dwSeekingCaps;
-	
+
 	return S_OK;
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CWavPackSplitterFilterOutputPin::CheckCapabilities(DWORD * pCapabilities)
 {
 	CheckPointer(pCapabilities, E_POINTER);
 	// make sure all requested capabilities are in our mask
-	
+
 	return (~m_pParentFilter->m_dwSeekingCaps & *pCapabilities) ? S_FALSE : S_OK;
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CWavPackSplitterFilterOutputPin::ConvertTimeFormat(LONGLONG * pTarget,
     const GUID * pTargetFormat, LONGLONG Source, const GUID * pSourceFormat)
@@ -758,8 +675,6 @@ HRESULT CWavPackSplitterFilterOutputPin::ConvertTimeFormat(LONGLONG * pTarget,
 
 	return E_INVALIDARG;
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CWavPackSplitterFilterOutputPin::SetPositions(LONGLONG * pCurrent,
 	DWORD CurrentFlags, LONGLONG * pStop, DWORD StopFlags)
@@ -804,7 +719,7 @@ HRESULT CWavPackSplitterFilterOutputPin::SetPositions(LONGLONG * pCurrent,
 	}
 
 	HRESULT hr = S_OK;
-	if (StartPosBits) {      
+	if (StartPosBits) {
 		m_pParentFilter->BeginFlush();
 		m_pParentFilter->DoSeeking();
 		m_pParentFilter->EndFlush();
@@ -817,8 +732,6 @@ HRESULT CWavPackSplitterFilterOutputPin::SetPositions(LONGLONG * pCurrent,
 	return hr;
 }
 
-// ----------------------------------------------------------------------------
-
 HRESULT CWavPackSplitterFilterOutputPin::GetPositions(LONGLONG * pCurrent, LONGLONG * pStop)
 {
 	if (pCurrent) {
@@ -827,11 +740,9 @@ HRESULT CWavPackSplitterFilterOutputPin::GetPositions(LONGLONG * pCurrent, LONGL
 	if (pStop) {
 		*pStop = m_pParentFilter->m_rtStop;
 	}
-	
+
 	return S_OK;
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CWavPackSplitterFilterOutputPin::GetAvailable(LONGLONG * pEarliest, LONGLONG * pLatest)
 {
@@ -843,26 +754,22 @@ HRESULT CWavPackSplitterFilterOutputPin::GetAvailable(LONGLONG * pEarliest, LONG
 
 		*pLatest = m_pParentFilter->m_rtDuration;
 	}
-	
+
 	return S_OK;
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CWavPackSplitterFilterOutputPin::SetRate(double dRate)
 {
 	CAutoLock lock(m_pParentFilter->m_pLock);
 
 	m_pParentFilter->m_dRateSeeking = dRate;
-	
+
 	// Output a new segment
 	m_pParentFilter->BeginFlush();
 	m_pParentFilter->EndFlush();
-	
+
 	return S_OK;
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CWavPackSplitterFilterOutputPin::GetRate(double * pdRate)
 {
@@ -870,17 +777,15 @@ HRESULT CWavPackSplitterFilterOutputPin::GetRate(double * pdRate)
 	CAutoLock lock(m_pParentFilter->m_pLock);
 
 	*pdRate = m_pParentFilter->m_dRateSeeking;
-	
+
 	return S_OK;
 }
-
-// ----------------------------------------------------------------------------
 
 HRESULT CWavPackSplitterFilterOutputPin::GetPreroll(LONGLONG *pPreroll)
 {
 	CheckPointer(pPreroll, E_POINTER);
 	*pPreroll = 0;
-	
+
 	return S_OK;
 }
 
@@ -892,7 +797,7 @@ int32_t IAsyncCallBackWrapper_wv_read_bytes(void *id, void *data, int32_t bcount
 {
 	IAsyncCallBackWrapper_wv* iacbw = (IAsyncCallBackWrapper_wv*)id;
 	HRESULT hr = iacbw->pReader->SyncRead(iacbw->StreamPos, bcount, (BYTE*)data);
-	
+
 	if (hr == S_OK) {
 		iacbw->StreamPos += bcount;
 		return bcount;
@@ -901,15 +806,11 @@ int32_t IAsyncCallBackWrapper_wv_read_bytes(void *id, void *data, int32_t bcount
 	}
 }
 
-// ----------------------------------------------------------------------------
-
 uint32_t IAsyncCallBackWrapper_wv_get_pos(void *id)
 {
 	IAsyncCallBackWrapper_wv* iacbw = (IAsyncCallBackWrapper_wv*)id;
 	return (uint32_t)iacbw->StreamPos;
 }
-
-// ----------------------------------------------------------------------------
 
 int IAsyncCallBackWrapper_wv_set_pos_abs(void *id, uint32_t pos)
 {
@@ -921,8 +822,6 @@ int IAsyncCallBackWrapper_wv_set_pos_abs(void *id, uint32_t pos)
 		return 0;
 	}
 }
-
-// ----------------------------------------------------------------------------
 
 int IAsyncCallBackWrapper_wv_set_pos_rel(void *id, int32_t delta, int mode)
 {
@@ -948,17 +847,13 @@ int IAsyncCallBackWrapper_wv_set_pos_rel(void *id, int32_t delta, int mode)
 	}
 }
 
-// ----------------------------------------------------------------------------
-
 int IAsyncCallBackWrapper_wv_push_back_byte(void *id, int c)
 {
 	IAsyncCallBackWrapper_wv* iacbw = (IAsyncCallBackWrapper_wv*)id;
 	iacbw->StreamPos = constrain(0, iacbw->StreamPos - 1, iacbw->StreamLen);
-	
+
 	return c;
 }
-
-// ----------------------------------------------------------------------------
 
 uint32_t IAsyncCallBackWrapper_wv_get_length(void *id)
 {
@@ -966,14 +861,10 @@ uint32_t IAsyncCallBackWrapper_wv_get_length(void *id)
 	return (uint32_t)iacbw->StreamLen;
 }
 
-// ----------------------------------------------------------------------------
-
 int IAsyncCallBackWrapper_wv_can_seek(void *id)
 {
 	return 1;
 }
-
-// ----------------------------------------------------------------------------
 
 IAsyncCallBackWrapper_wv* IAsyncCallBackWrapper_wv_new(IAsyncReader *pReader)
 {
@@ -998,8 +889,6 @@ IAsyncCallBackWrapper_wv* IAsyncCallBackWrapper_wv_new(IAsyncReader *pReader)
 
 	return iacbw;
 }
-
-// ----------------------------------------------------------------------------
 
 void IAsyncCallBackWrapper_wv_free(IAsyncCallBackWrapper_wv* iacbw)
 {

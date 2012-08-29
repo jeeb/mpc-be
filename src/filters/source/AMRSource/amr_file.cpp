@@ -148,7 +148,6 @@ int CAMRFile::Seek(int64 seek_sample)
 	return 0;
 }
 
-
 //-----------------------------------------------------------------------------
 //
 //	CAMRPacket
@@ -171,7 +170,7 @@ int CAMRPacket::Load(CAMRReader *reader)
 	int		ret;
 	packet_size		= 0;
 	file_position	= 0;
-	
+
 	tStart	= 0;
 	tStop	= 0;
 
@@ -194,7 +193,7 @@ int CAMRPacket::Load(CAMRReader *reader)
 	if (packet_size == 0) {
 		return -2;		// nejaka blbost
 	}
-	
+
 	// seekneme na koniec framu
 	reader->Seek(file_position + packet_size);
 	return 0;

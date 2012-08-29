@@ -28,7 +28,6 @@
 #include <moreuuids.h>
 
 #include "TTASplitter.h"
-#include "tta_file.h"
 
 #ifdef REGISTER_FILTER
 
@@ -152,7 +151,7 @@ STDMETHODIMP CTTASplitter::Stop(void)
 STDMETHODIMP CTTASplitter::Pause(void)
 {
 	CAutoLock cObjectLock(m_pLock); 
-    
+
 	if (m_State == State_Stopped) {
 
 		if (m_pOutputPin->IsConnected()) {
@@ -171,7 +170,7 @@ STDMETHODIMP CTTASplitter::Pause(void)
 			}
 		}
 	}
-    
+
 	m_State = State_Paused;
 
 	return S_OK;
@@ -247,7 +246,7 @@ HRESULT CTTASplitterInputPin::CheckConnect(IPin *pPin)
 		return hr;
 	}
 
-	hr = pPin->QueryInterface(IID_IAsyncReader, (void**)&m_pReader); 
+	hr = pPin->QueryInterface(IID_IAsyncReader, (void**)&m_pReader);
 	if (FAILED(hr)) {
 		return S_FALSE;
 	}
@@ -256,18 +255,18 @@ HRESULT CTTASplitterInputPin::CheckConnect(IPin *pPin)
 		IAsyncCallBackWrapper_tta_free(&m_pIACBW);
 	}
 
-	m_pIACBW = IAsyncCallBackWrapper_tta_new(m_pReader);        
+	m_pIACBW = IAsyncCallBackWrapper_tta_new(m_pReader);
 
-	return S_OK;    
+	return S_OK;
 }
 
 HRESULT CTTASplitterInputPin::BreakConnect(void)
 {
 	HRESULT hr = CBaseInputPin::BreakConnect();
 	if (FAILED(hr)) {
-        	return hr;
+		return hr;
 	}
-	
+
 	if(m_pIACBW) {
 		IAsyncCallBackWrapper_tta_free(&m_pIACBW);
 	}
@@ -342,7 +341,7 @@ HRESULT CTTASplitterInputPin::DoProcessingLoop(void)
 
 	Reply(NOERROR);
 	m_bAbort = FALSE;
-    
+
 	m_pParentFilter->m_pOutputPin->DeliverNewSegment(0,
 	m_pParentFilter->m_rtStop - m_pParentFilter->m_rtStart,
 	m_pParentFilter->m_dRateSeeking);
@@ -551,7 +550,7 @@ HRESULT CTTASplitterOutputPin::DecideBufferSize(IMemAllocator *pAlloc, ALLOCATOR
 	if (!m_pParentFilter->m_pInputPin->IsConnected()) {
 		return E_UNEXPECTED;
 	}
-     
+
 	TTA_header* ttahdr	= m_pParentFilter->GetTTAHeader();
 	pProp->cBuffers		= 1;
 	pProp->cbBuffer		= m_pParentFilter->GetMaxFrameLenBytes();

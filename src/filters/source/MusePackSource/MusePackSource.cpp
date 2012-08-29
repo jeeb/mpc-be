@@ -189,7 +189,6 @@ HRESULT CMusePackSplitter::CompleteConnect(PIN_DIRECTION Dir, CBasePin *pCaller,
 	return S_OK;
 }
 
-
 HRESULT CMusePackSplitter::RemoveOutputPins()
 {
 	CAutoLock Lck(&lock_filter);
@@ -210,7 +209,6 @@ HRESULT CMusePackSplitter::RemoveOutputPins()
 	output.RemoveAll();
 	return S_OK;
 }
-
 
 HRESULT CMusePackSplitter::ConfigureMediaType(CMusePackOutputPin *pin)
 {
@@ -279,7 +277,6 @@ HRESULT CMusePackSplitter::BreakConnect(PIN_DIRECTION Dir, CBasePin *pCaller)
 	return S_OK;
 }
 
-
 // Output pins
 HRESULT CMusePackSplitter::AddOutputPin(CMusePackOutputPin *pPin)
 {
@@ -314,6 +311,7 @@ STDMETHODIMP CMusePackSplitter::CheckCapabilities(DWORD* pCapabilities)
 	}
 	return S_FALSE;
 }
+
 STDMETHODIMP CMusePackSplitter::IsFormatSupported(const GUID* pFormat) {return !pFormat ? E_POINTER : *pFormat == TIME_FORMAT_MEDIA_TIME ? S_OK : S_FALSE;}
 STDMETHODIMP CMusePackSplitter::QueryPreferredFormat(GUID* pFormat) {return GetTimeFormat(pFormat);}
 STDMETHODIMP CMusePackSplitter::GetTimeFormat(GUID* pFormat) {return pFormat ? *pFormat = TIME_FORMAT_MEDIA_TIME, S_OK : E_POINTER;}
@@ -408,7 +406,6 @@ STDMETHODIMP CMusePackSplitter::SetPositionsInternal(int iD, LONGLONG* pCurrent,
 	return hr;
 }
 
-
 STDMETHODIMP CMusePackSplitter::Pause()
 {
 	CAutoLock lck(&lock_filter);
@@ -475,7 +472,6 @@ STDMETHODIMP CMusePackSplitter::Stop()
 	m_State = State_Stopped;
 	return hr;
 }
-
 
 HRESULT CMusePackSplitter::DoNewSeek()
 {
@@ -881,7 +877,6 @@ HRESULT CMusePackOutputPin::Inactive()
 	return S_OK;
 }
 
-
 HRESULT CMusePackOutputPin::Active()
 {
 	if (active) return S_OK;
@@ -910,7 +905,6 @@ HRESULT CMusePackOutputPin::Active()
 	active = TRUE;
 	return hr;
 }
-
 
 HRESULT CMusePackOutputPin::DoNewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rtStop, double dRate)
 {
@@ -953,10 +947,12 @@ STDMETHODIMP CMusePackOutputPin::GetAvailable(LONGLONG* pEarliest, LONGLONG* pLa
 STDMETHODIMP CMusePackOutputPin::SetRate(double dRate)									{ return demux->SetRate(dRate); }
 STDMETHODIMP CMusePackOutputPin::GetRate(double* pdRate)								{ return demux->GetRate(pdRate); }
 STDMETHODIMP CMusePackOutputPin::GetPreroll(LONGLONG* pllPreroll)						{ return demux->GetPreroll(pllPreroll); }
+
 STDMETHODIMP CMusePackOutputPin::ConvertTimeFormat(LONGLONG* pTarget, const GUID* pTargetFormat, LONGLONG Source, const GUID* pSourceFormat)
 {
 	return demux->ConvertTimeFormat(pTarget, pTargetFormat, Source, pSourceFormat);
 }
+
 STDMETHODIMP CMusePackOutputPin::SetPositions(LONGLONG* pCurrent, DWORD dwCurrentFlags, LONGLONG* pStop, DWORD dwStopFlags)
 {
 	return demux->SetPositionsInternal(0, pCurrent, dwCurrentFlags, pStop, dwStopFlags);
@@ -1220,7 +1216,6 @@ DWORD CMusePackOutputPin::ThreadProc()
 	return S_OK;
 }
 
-
 //-----------------------------------------------------------------------------
 //
 //	CMusePackReader class
@@ -1342,7 +1337,6 @@ int CMusePackReader::ReadSwapped(void *buf, int size)
 	return 0;
 }
 
-
 // reading syntax elements
 int CMusePackReader::GetMagick(uint32 &elm)
 {
@@ -1408,7 +1402,6 @@ bool CMusePackReader::KeyValid(uint16 key)
 	}
 	return true;
 }
-
 
 DataPacketMPC::DataPacketMPC() :
 	type(PACKET_TYPE_EOS),

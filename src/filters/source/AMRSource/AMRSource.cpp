@@ -179,7 +179,6 @@ HRESULT CAMRSplitter::CompleteConnect(PIN_DIRECTION Dir, CBasePin *pCaller, IPin
 	return NOERROR;
 }
 
-
 HRESULT CAMRSplitter::RemoveOutputPins()
 {
 	CAutoLock Lck(&lock_filter);
@@ -199,7 +198,6 @@ HRESULT CAMRSplitter::RemoveOutputPins()
 	output.RemoveAll();
 	return NOERROR;
 }
-
 
 HRESULT CAMRSplitter::ConfigureMediaType(CAMROutputPin *pin)
 {
@@ -257,7 +255,6 @@ HRESULT CAMRSplitter::BreakConnect(PIN_DIRECTION Dir, CBasePin *pCaller)
 	return NOERROR;
 }
 
-
 // Output pins
 HRESULT CAMRSplitter::AddOutputPin(CAMROutputPin *pPin)
 {
@@ -265,7 +262,6 @@ HRESULT CAMRSplitter::AddOutputPin(CAMROutputPin *pPin)
 	output.Add(pPin);
 	return NOERROR;
 }
-
 
 // IMediaSeeking
 
@@ -275,6 +271,7 @@ STDMETHODIMP CAMRSplitter::GetCapabilities(DWORD* pCapabilities)
 			AM_SEEKING_CanGetStopPos|AM_SEEKING_CanGetDuration|AM_SEEKING_CanSeekAbsolute|AM_SEEKING_CanSeekForwards|AM_SEEKING_CanSeekBackwards, 
 			S_OK : E_POINTER;
 }
+
 STDMETHODIMP CAMRSplitter::CheckCapabilities(DWORD* pCapabilities)
 {
 	CheckPointer(pCapabilities, E_POINTER);
@@ -296,6 +293,7 @@ STDMETHODIMP CAMRSplitter::QueryPreferredFormat(GUID* pFormat)		{return GetTimeF
 STDMETHODIMP CAMRSplitter::GetTimeFormat(GUID* pFormat)				{return pFormat ? *pFormat = TIME_FORMAT_MEDIA_TIME, S_OK : E_POINTER;}
 STDMETHODIMP CAMRSplitter::IsUsingTimeFormat(const GUID* pFormat)	{return IsFormatSupported(pFormat);}
 STDMETHODIMP CAMRSplitter::SetTimeFormat(const GUID* pFormat)		{return S_OK == IsFormatSupported(pFormat) ? S_OK : E_INVALIDARG;}
+
 STDMETHODIMP CAMRSplitter::GetStopPosition(LONGLONG* pStop) 
 {
 	if (pStop) {
@@ -303,6 +301,7 @@ STDMETHODIMP CAMRSplitter::GetStopPosition(LONGLONG* pStop)
 	}
 	return NOERROR; 
 }
+
 STDMETHODIMP CAMRSplitter::GetCurrentPosition(LONGLONG* pCurrent)	{return E_NOTIMPL;}
 STDMETHODIMP CAMRSplitter::ConvertTimeFormat(LONGLONG* pTarget, const GUID* pTargetFormat, LONGLONG Source, const GUID* pSourceFormat) {return E_NOTIMPL;}
 
@@ -321,6 +320,7 @@ STDMETHODIMP CAMRSplitter::GetPositions(LONGLONG* pCurrent, LONGLONG* pStop)
 	}
 	return S_OK;
 }
+
 STDMETHODIMP CAMRSplitter::GetAvailable(LONGLONG* pEarliest, LONGLONG* pLatest)
 {
 	if(pEarliest) {
@@ -328,6 +328,7 @@ STDMETHODIMP CAMRSplitter::GetAvailable(LONGLONG* pEarliest, LONGLONG* pLatest)
 	}
 	return GetDuration(pLatest);
 }
+
 STDMETHODIMP CAMRSplitter::SetRate(double dRate)			{return dRate > 0 ? rate = dRate, S_OK : E_INVALIDARG;}
 STDMETHODIMP CAMRSplitter::GetRate(double* pdRate)			{return pdRate ? *pdRate = rate, S_OK : E_POINTER;}
 STDMETHODIMP CAMRSplitter::GetPreroll(LONGLONG* pllPreroll)	{return pllPreroll ? *pllPreroll = 0, S_OK : E_POINTER;}
@@ -388,7 +389,6 @@ STDMETHODIMP CAMRSplitter::SetPositionsInternal(int iD, LONGLONG* pCurrent, DWOR
 	HRESULT hr = DoNewSeek();
 	return hr;
 }
-
 
 STDMETHODIMP CAMRSplitter::Pause()
 {
@@ -459,7 +459,6 @@ STDMETHODIMP CAMRSplitter::Stop()
 	m_State = State_Stopped;
 	return hr;
 }
-
 
 HRESULT CAMRSplitter::DoNewSeek()
 {
@@ -875,7 +874,6 @@ HRESULT CAMROutputPin::Inactive()
 	return NOERROR;
 }
 
-
 HRESULT CAMROutputPin::Active()
 {
 	if (active) {
@@ -908,7 +906,6 @@ HRESULT CAMROutputPin::Active()
 	return hr;
 }
 
-
 HRESULT CAMROutputPin::DoNewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rtStop, double dRate)
 {
 	// queue the EOS packet
@@ -919,26 +916,6 @@ HRESULT CAMROutputPin::DoNewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rtSto
 
 	discontinuity = true;
 	return DeliverNewSegment(rtStart, rtStop, rate);
-
-	/* TODO - What is this ???
-	if (1) {
-		discontinuity = true;
-		return DeliverNewSegment(rtStart, rtStop, rate);
-	} else {
-		DataPacketAMR	*packet = new DataPacketAMR();
-		{
-			CAutoLock	lck(&lock_queue);
-			packet->type = DataPacketAMR::PACKET_TYPE_NEW_SEGMENT;
-			packet->rtStart = rtStart;
-			packet->rtStop = rtStop;
-			packet->rate = rate;
-			queue.AddTail(packet);
-			ev_can_read.Set();
-			discontinuity = true;
-		}
-	}
-	return NOERROR;
-	*/
 }
 
 // IMediaSeeking
@@ -957,10 +934,12 @@ STDMETHODIMP CAMROutputPin::GetAvailable(LONGLONG* pEarliest, LONGLONG* pLatest)
 STDMETHODIMP CAMROutputPin::SetRate(double dRate)									{ return demux->SetRate(dRate); }
 STDMETHODIMP CAMROutputPin::GetRate(double* pdRate)									{ return demux->GetRate(pdRate); }
 STDMETHODIMP CAMROutputPin::GetPreroll(LONGLONG* pllPreroll)						{ return demux->GetPreroll(pllPreroll); }
+
 STDMETHODIMP CAMROutputPin::ConvertTimeFormat(LONGLONG* pTarget, const GUID* pTargetFormat, LONGLONG Source, const GUID* pSourceFormat)
 {
 	return demux->ConvertTimeFormat(pTarget, pTargetFormat, Source, pSourceFormat);
 }
+
 STDMETHODIMP CAMROutputPin::SetPositions(LONGLONG* pCurrent, DWORD dwCurrentFlags, LONGLONG* pStop, DWORD dwStopFlags)
 {
 	return demux->SetPositionsInternal(0, pCurrent, dwCurrentFlags, pStop, dwStopFlags);
@@ -1234,7 +1213,6 @@ DWORD CAMROutputPin::ThreadProc()
 	return 0;
 }
 
-
 //-----------------------------------------------------------------------------
 //
 //	CAMRReader class
@@ -1316,7 +1294,6 @@ int CAMRReader::Read(void *buf, int size)
 	position += size;
 	return 0;
 }
-
 
 DataPacketAMR::DataPacketAMR() :
 	type(PACKET_TYPE_EOS),

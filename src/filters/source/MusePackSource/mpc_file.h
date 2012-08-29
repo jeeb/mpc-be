@@ -23,9 +23,8 @@
 
 #pragma once
 
-#include "stdafx.h"
-#include "bits.h"
 #include <vector>
+#include "bits.h"
 
 class CMusePackReader;
 
@@ -68,7 +67,6 @@ public:
 class CMPCFile
 {
 public:
-
 	// stream header
 	__int64		duration_10mhz;			// total file duration
 	int			stream_version;			// 7, 8 are supported
@@ -107,6 +105,7 @@ public:
 
 	int Open_SV8();
 	int Open_SV7();
+
 public:
 	CMPCFile();
 	virtual ~CMPCFile();
@@ -123,5 +122,4 @@ public:
 	// parsing out packets
 	int ReadAudioPacket(CMPCPacket *packet, int64 *cur_sample);
 	int Seek(int64 seek_sample);
-
 };

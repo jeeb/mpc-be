@@ -40,6 +40,7 @@ typedef struct {
 } IAsyncCallBackWrapper_tta;
 
 IAsyncCallBackWrapper_tta* IAsyncCallBackWrapper_tta_new(IAsyncReader *pReader);
+
 void IAsyncCallBackWrapper_tta_free(IAsyncCallBackWrapper_tta **iacw);
 
 class CTTASplitter;
@@ -49,7 +50,7 @@ class CTTASplitterInputPin : public CBaseInputPin,
 {
 	friend class CTTASplitter;
 
-	public:
+public:
 	CTTASplitterInputPin(CTTASplitter *pParentFilter, CCritSec *pLock, HRESULT *phr);
 	virtual ~CTTASplitterInputPin();
 
@@ -68,7 +69,7 @@ class CTTASplitterInputPin : public CBaseInputPin,
 
 	HRESULT DoSeeking(REFERENCE_TIME rtStart);
 
-	protected:
+protected:
 	enum {CMD_PAUSE, CMD_RUN, CMD_STOP, CMD_EXIT};
 
 	DWORD ThreadProc();
@@ -88,11 +89,11 @@ class CTTASplitterOutputPin : public CBaseOutputPin,
 {
 	friend class CTTASplitter;
 
-	public:
+public:
 	CTTASplitterOutputPin(CTTASplitter *pParentFilter, CCritSec *pLock, HRESULT *phr);
 
 	DECLARE_IUNKNOWN
-        
+
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void **ppv) {
 
 		if (riid == IID_IMediaSeeking) {
@@ -106,7 +107,7 @@ class CTTASplitterOutputPin : public CBaseOutputPin,
 	CMediaType& CurrentMediaType() { return m_mt; }
 	HRESULT GetMediaType(int iPosition, CMediaType *pMediaType);
 	HRESULT DecideBufferSize(IMemAllocator *pAlloc, ALLOCATOR_PROPERTIES *pProp);
-    
+
 	STDMETHODIMP IsFormatSupported(const GUID *pFormat);
 	STDMETHODIMP QueryPreferredFormat(GUID *pFormat);
 	STDMETHODIMP SetTimeFormat(const GUID *pFormat);
@@ -125,7 +126,7 @@ class CTTASplitterOutputPin : public CBaseOutputPin,
 	STDMETHODIMP GetRate(double *pdRate);
 	STDMETHODIMP GetPreroll(LONGLONG *pPreroll);
 
-	protected:
+protected:
 	CTTASplitter *m_pParentFilter;    
 };
 
@@ -133,7 +134,7 @@ class __declspec(uuid("F60BAD6D-2101-491a-9265-9F7CB67C6BBB"))
 	CTTASplitter :
 	public CBaseFilter
 {
-	public :
+public :
 	DECLARE_IUNKNOWN
 	static CUnknown *WINAPI CreateInstance(LPUNKNOWN punk, HRESULT *phr); 
 
@@ -150,7 +151,7 @@ class __declspec(uuid("F60BAD6D-2101-491a-9265-9F7CB67C6BBB"))
 	HRESULT BeginFlush();
 	HRESULT EndFlush();
 
-	protected:
+protected:
 	CCritSec m_Lock;
 
 	friend class CTTASplitterInputPin;

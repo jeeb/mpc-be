@@ -23,8 +23,7 @@
 
 #pragma once
 
-#include "stdafx.h"
-#include "..\DSUtil\DSUtil.h"
+#include "../../../DSUtil/DSUtil.h"
 
 //-------------------------------------------------------------------------
 //
@@ -42,10 +41,9 @@ public:
 public:
 	static const int32 EXP_GOLOMB_MAP[2][48];
 	static const int32 EXP_GOLOMB_MAP_INV[2][48];
-    static const int32 EXP_GOLOMB_SIZE[255];
+	static const int32 EXP_GOLOMB_SIZE[255];
 
 public:
-
 	Bitstream() : bitbuf(0), buf(NULL), bits(0) { };
 	Bitstream(uint8 *b) : bitbuf(0), buf(b), bits(0) { };
 	Bitstream(const Bitstream &b) : bitbuf(b.bitbuf), buf(b.buf), bits(b.bits) { };
@@ -141,5 +139,4 @@ public:
 	}
 	inline void Put_ByteAlign_Zero() { int32 bl=(bits)&0x07; if (bl<8) { PutBits(0,8-bl); } WriteBits(); }
 	inline void Put_ByteAlign_One() { int32 bl=(bits)&0x07; if (bl<8) {	PutBits(0xffffff,8-bl); } WriteBits(); }
-
 };

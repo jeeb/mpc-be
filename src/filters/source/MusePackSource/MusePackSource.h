@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include "stdafx.h"
 #include <windows.h>
 #include <initguid.h>
 #include <moreuuids.h>
@@ -104,7 +103,6 @@ public:
 public:
 	DataPacketMPC();
 	virtual ~DataPacketMPC();
-
 };
 
 typedef CArray<CMediaType> CMediaTypes;
@@ -239,7 +237,6 @@ public:
 	bool KeyValid(uint16 key);
 };
 
-
 //-----------------------------------------------------------------------------
 //
 //	CMusePackSplitter class
@@ -281,7 +278,7 @@ public:
 
 	// CBaseFilter
 	virtual int GetPinCount();
-    virtual CBasePin *GetPin(int n);
+	virtual CBasePin *GetPin(int n);
 
 	// Output pins
 	HRESULT AddOutputPin(CMusePackOutputPin *pPin);
