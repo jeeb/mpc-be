@@ -411,7 +411,7 @@ void CPlayerSeekBar::OnPaint()
 
 			if (s.fChapterMarker) {
 				CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
-				if (pFrame->chaptersarray.GetCount() > 1) {
+				if (pFrame->chaptersarray.GetCount()) {
 					CRect rc2 = rc;
 					for (size_t idx = 0; idx < pFrame->chaptersarray.GetCount(); idx++) {
 						CRect r = GetChannelRect();

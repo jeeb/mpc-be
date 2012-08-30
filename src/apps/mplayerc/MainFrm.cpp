@@ -17478,7 +17478,7 @@ void CMainFrame::CreateChapterTimeArray()
 			pMS->GetDuration(&rtDur);
 		}
 
-		if (m_pCB->ChapGetCount() > 1) {
+		if (m_pCB->ChapGetCount()) {
 			REFERENCE_TIME rt;
 			
 			for (size_t idx = 0; idx < m_pCB->ChapGetCount(); idx++) {
