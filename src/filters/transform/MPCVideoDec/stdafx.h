@@ -33,6 +33,7 @@
 #include <Mferror.h>
 #include <atlcoll.h>
 #include <vector>
+#include "memcpy_sse.h"
 
 #pragma warning(disable:4005)
 

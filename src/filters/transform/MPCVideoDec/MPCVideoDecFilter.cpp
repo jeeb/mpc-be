@@ -1974,14 +1974,14 @@ void copyPlane(BYTE *dstp, stride_t dst_pitch, const BYTE *srcp, stride_t src_pi
 {
 	if (!flip) {
 		for (int y=height; y>0; --y) {
-			memcpy(dstp, srcp, row_size);
+			memcpy_sse(dstp, srcp, row_size);
 			dstp += dst_pitch;
 			srcp += src_pitch;
 		}
 	} else {
 		dstp += dst_pitch * (height - 1);
 		for (int y=height; y>0; --y) {
-			memcpy(dstp, srcp, row_size);
+			memcpy_sse(dstp, srcp, row_size);
 			dstp -= dst_pitch;
 			srcp += src_pitch;
 		}
@@ -2020,7 +2020,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			// 32 or 64 bit at once and could read over the end.
 			// Note: If the first 23 bits of the additional bytes are not 0, then damaged
 			// MPEG bitstreams could cause overread and segfault.
-			memcpy(m_pFFBuffer, pDataIn, nSize);
+			memcpy_sse(m_pFFBuffer, pDataIn, nSize);
 			memset(m_pFFBuffer+nSize,0,FF_INPUT_BUFFER_PADDING_SIZE);
 
 			avpkt.data = m_pFFBuffer;
@@ -2329,7 +2329,7 @@ bool CMPCVideoDecFilter::AppendBuffer (BYTE* pDataIn, int nSize, REFERENCE_TIME 
 		m_pFFBuffer		= (BYTE*)av_realloc(m_pFFBuffer, m_nFFBufferSize);
 	}
 
-	memcpy(m_pFFBuffer+m_nFFBufferPos, pDataIn, nSize);
+	memcpy_sse(m_pFFBuffer+m_nFFBufferPos, pDataIn, nSize);
 
 	m_nFFBufferPos += nSize;
 
@@ -2343,7 +2343,7 @@ void CMPCVideoDecFilter::ShrinkBuffer()
 	ASSERT (m_nFFPicEnd != INT_MIN);
 
 	PopBufferTime (m_nFFPicEnd);
-	memcpy (m_pFFBuffer, m_pFFBuffer+m_nFFPicEnd, nRemaining);
+	memcpy_sse (m_pFFBuffer, m_pFFBuffer+m_nFFPicEnd, nRemaining);
 	m_nFFBufferPos	= nRemaining;
 
 	m_nFFPicEnd = (m_pFFBuffer[3] == 0x00) ?  0 : INT_MIN;

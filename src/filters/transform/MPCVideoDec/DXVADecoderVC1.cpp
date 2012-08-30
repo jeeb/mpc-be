@@ -253,17 +253,17 @@ void CDXVADecoderVC1::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSiz
 	int		nDummy;
 
 	if (m_PictureParams.bSecondField) {
-		memcpy (pDXVABuffer, (BYTE*)pBuffer, nSize);
+		memcpy_sse (pDXVABuffer, (BYTE*)pBuffer, nSize);
 	} else {
 		if ( (*((DWORD*)pBuffer) & 0x00FFFFFF) != 0x00010000) {
 			if (m_pFilter->GetCodec() == AV_CODEC_ID_WMV3) {
-				memcpy (pDXVABuffer, (BYTE*)pBuffer, nSize);
+				memcpy_sse (pDXVABuffer, (BYTE*)pBuffer, nSize);
 			} else {
 				pDXVABuffer[0]=pDXVABuffer[1]=0;
 				pDXVABuffer[2]=1;
 				pDXVABuffer[3]=0x0D;
 				pDXVABuffer	+=4;
-				memcpy (pDXVABuffer, (BYTE*)pBuffer, nSize);
+				memcpy_sse (pDXVABuffer, (BYTE*)pBuffer, nSize);
 				nSize  +=4;
 			}
 		} else {
@@ -273,7 +273,7 @@ void CDXVADecoderVC1::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSiz
 			pStart = FindNextStartCode (pBuffer, nSize, nPacketSize);
 			if (pStart) {
 				// Startcode already present
-				memcpy (pDXVABuffer, (BYTE*)pStart, nPacketSize);
+				memcpy_sse (pDXVABuffer, (BYTE*)pStart, nPacketSize);
 				nSize = nPacketSize;
 			}
 		}

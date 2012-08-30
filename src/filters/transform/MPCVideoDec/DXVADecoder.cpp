@@ -104,7 +104,7 @@ void CDXVADecoder::SetExtraData (BYTE* pDataIn, UINT nSize)
 
 void CDXVADecoder::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize)
 {
-	memcpy (pDXVABuffer, (BYTE*)pBuffer, nSize);
+	memcpy_sse (pDXVABuffer, (BYTE*)pBuffer, nSize);
 }
 
 void CDXVADecoder::Flush()
@@ -235,7 +235,7 @@ HRESULT CDXVADecoder::AddExecuteBuffer (DWORD CompressedBufferType, UINT nSize, 
 				if (CompressedBufferType == DXVA2_BitStreamDateBufferType) {
 					CopyBitstream (pDXVABuffer, (BYTE*)pBuffer, nSize);
 				} else {
-					memcpy (pDXVABuffer, (BYTE*)pBuffer, nSize);
+					memcpy_sse (pDXVABuffer, (BYTE*)pBuffer, nSize);
 				}
 				m_DXVA1BufferInfo[m_dwNumBuffersInfo].dwTypeIndex		= dwTypeIndex;
 				m_DXVA1BufferInfo[m_dwNumBuffersInfo].dwBufferIndex		= m_dwBufferIndex;
@@ -259,7 +259,7 @@ HRESULT CDXVADecoder::AddExecuteBuffer (DWORD CompressedBufferType, UINT nSize, 
 				if (CompressedBufferType == DXVA2_BitStreamDateBufferType) {
 					CopyBitstream (pDXVABuffer, (BYTE*)pBuffer, nSize);
 				} else {
-					memcpy (pDXVABuffer, (BYTE*)pBuffer, nSize);
+					memcpy_sse (pDXVABuffer, (BYTE*)pBuffer, nSize);
 				}
 
 				m_ExecuteParams.pCompressedBuffers[m_ExecuteParams.NumCompBuffers].CompressedBufferType = CompressedBufferType;
