@@ -78,6 +78,7 @@ clean:
 # Objects
 SRCS_C=\
     libavcodec/aac_ac3_parser.c \
+    libavcodec/aac_parser.c \
     libavcodec/aacadtsdec.c \
     libavcodec/aacdec.c \
     libavcodec/aacps.c \
