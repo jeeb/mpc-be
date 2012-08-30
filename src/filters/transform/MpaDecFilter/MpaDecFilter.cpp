@@ -1889,17 +1889,20 @@ CMpaDecInputPin::CMpaDecInputPin(CTransformFilter* pFilter, HRESULT* phr, LPWSTR
 HRESULT CMpaDecFilter::DeliverFFmpeg(enum AVCodecID nCodecId, BYTE* p, int buffsize, int& size)
 {
 	size = 0;
-	HRESULT hr = S_OK;
+
 	if (!m_pAVCtx || (nCodecId != m_pAVCtx->codec_id && (nCodecId != AV_CODEC_ID_AC3 && nCodecId != AV_CODEC_ID_EAC3))) { // LOOKATTHIS
 		if (!InitFFmpeg(nCodecId)) {
 			return E_FAIL;
 		}
 	}
 
-	bool b_use_parse    = m_pParser && ((nCodecId == AV_CODEC_ID_TRUEHD) ? ((buffsize > 2000) ? true : false) : true); // Dirty hack for use with MPC MPEGSplitter
+	HRESULT hr	= S_OK;
+	BOOL bFlush	= (p == NULL);
 
 	BYTE* pDataBuff     = NULL;
 	BYTE *tmpProcessBuf = NULL;
+
+	bool b_use_parse    = m_pParser && ((nCodecId == AV_CODEC_ID_TRUEHD) ? ((buffsize > 2000) ? true : false) : true); // Dirty hack for use with MPC MPEGSplitter
 
 	AVPacket avpkt;
 	av_init_packet(&avpkt);
@@ -1961,15 +1964,18 @@ HRESULT CMpaDecFilter::DeliverFFmpeg(enum AVCodecID nCodecId, BYTE* p, int buffs
 		} else {
 			return S_OK;
 		}
-	}
-	//
-	else {
-		COPY_TO_BUFFER(p, buffsize);
+	} else {
+		if (p && buffsize) {
+			COPY_TO_BUFFER(p, buffsize);
+		}
 		pDataBuff = m_pFFBuffer;
 	}
 
-	while (buffsize > 0) {
+	while (buffsize > 0 || bFlush) {
 		int got_frame = 0;
+		if (bFlush) {
+			buffsize = 0;
+		}
 
 		if (b_use_parse) {
 			BYTE *pOut     = NULL;
@@ -1983,7 +1989,7 @@ HRESULT CMpaDecFilter::DeliverFFmpeg(enum AVCodecID nCodecId, BYTE* p, int buffs
 				break;
 			}
 
-			if (used_bytes > 0) {
+			if (!bFlush && used_bytes > 0) {
 				buffsize  -= used_bytes;
 				pDataBuff += used_bytes;
 				size      += used_bytes;
@@ -2001,6 +2007,9 @@ HRESULT CMpaDecFilter::DeliverFFmpeg(enum AVCodecID nCodecId, BYTE* p, int buffs
 			} else {
 				continue;
 			}
+		} else if (bFlush) {
+			hr = S_FALSE;
+			break;
 		} else {
 			avpkt.data = pDataBuff;
 			avpkt.size = buffsize;
@@ -2027,7 +2036,7 @@ HRESULT CMpaDecFilter::DeliverFFmpeg(enum AVCodecID nCodecId, BYTE* p, int buffs
 			size      += used_bytes;
 		}
 
-		if (got_frame) {
+		if (got_frame && (m_pFrame->nb_samples > 0)) {
 			WORD   nChannels = m_pAVCtx->channels;
 			size_t nSamples  = m_pFrame->nb_samples * nChannels;
 
