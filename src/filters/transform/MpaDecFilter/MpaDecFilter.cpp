@@ -2145,7 +2145,9 @@ bool CMpaDecFilter::InitFFmpeg(enum AVCodecID nCodecId)
 			av_opt_set_double(m_pAVCtx, "drc_scale", GetDynamicRangeControl() ? 1.0f : 0.0f, AV_OPT_SEARCH_CHILDREN);
 		}
 
-		m_pParser = av_parser_init(nCodecId);
+		if (nCodecId != AV_CODEC_ID_AAC) { // AAC parser does not work
+			m_pParser = av_parser_init(nCodecId);
+		}
 
 		const void *format = m_pInput->CurrentMediaType().Format();
 		GUID format_type = m_pInput->CurrentMediaType().formattype;

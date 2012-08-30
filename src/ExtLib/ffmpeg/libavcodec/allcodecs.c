@@ -157,7 +157,6 @@ void avcodec_register_all(void)
     REGISTER_DECODER (ADPCM_YAMAHA, adpcm_yamaha);
 
     /* parsers */
-    REGISTER_PARSER  (AAC, aac);
     REGISTER_PARSER  (AAC_LATM, aac_latm);
     REGISTER_PARSER  (AC3, ac3);
     REGISTER_PARSER  (DCA, dca);
