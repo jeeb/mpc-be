@@ -34,7 +34,7 @@ ifeq ($(64BIT),yes)
     TARGET_OS     = x86_64-w64-mingw32
     CFLAGS       += -DWIN64 -D_WIN64 -DARCH_X86_64 -DPIC
     OPTFLAGS     += -m64 -fno-leading-underscore
-    YASMFLAGS    += -f win64 -m amd64 -DWIN64=1 -DARCH_X86_32=0 -DARCH_X86_64=1 -DPIC
+    YASMFLAGS    += -f win32 -m amd64 -DWIN64=1 -DARCH_X86_32=0 -DARCH_X86_64=1 -DPIC
 else
     TARGET_OS     = i686-w64-mingw32
     CFLAGS       += -DWIN32 -D_WIN32 -DARCH_X86_32
