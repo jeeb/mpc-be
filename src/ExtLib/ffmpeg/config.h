@@ -12,7 +12,35 @@
   #define HAVE_MMX 1
   #define HAVE_MMXEXT 1
   #define HAVE_SSE 1
+  #define HAVE_SSE2 1
+  #define HAVE_SSE3 1
+  #define HAVE_SSE4 1
+  #define HAVE_SSE42 1
   #define HAVE_SSSE3 1
+  #define HAVE_AMD3DNOW_EXTERNAL 1
+  #define HAVE_AMD3DNOWEXT_EXTERNAL 1
+  #define HAVE_AVX_EXTERNAL 1
+  #define HAVE_FMA4_EXTERNAL 1
+  #define HAVE_MMX_EXTERNAL 1
+  #define HAVE_MMXEXT_EXTERNAL 1
+  #define HAVE_SSE_EXTERNAL 1
+  #define HAVE_SSE2_EXTERNAL 1
+  #define HAVE_SSE3_EXTERNAL 1
+  #define HAVE_SSE4_EXTERNAL 1
+  #define HAVE_SSE42_EXTERNAL 1
+  #define HAVE_SSSE3_EXTERNAL 1
+  #define HAVE_AMD3DNOW_INLINE 1
+  #define HAVE_AMD3DNOWEXT_INLINE 1
+  #define HAVE_AVX_INLINE 1
+  #define HAVE_FMA4_INLINE 1
+  #define HAVE_MMX_INLINE 1
+  #define HAVE_MMXEXT_INLINE 1
+  #define HAVE_SSE_INLINE 1
+  #define HAVE_SSE2_INLINE 1
+  #define HAVE_SSE3_INLINE 1
+  #define HAVE_SSE4_INLINE 1
+  #define HAVE_SSE42_INLINE 1
+  #define HAVE_SSSE3_INLINE 1
 
   #ifdef ARCH_X86_64
     #define BROKEN_RELOCATIONS 1
@@ -42,12 +70,40 @@
   #define HAVE_INLINE_ASM 0
   #define HAVE_AMD3DNOW 0
   #define HAVE_AMD3DNOWEXT 0
-  #define HAVE_FMA4 0
   #define HAVE_AVX 0
+  #define HAVE_FMA4 0
   #define HAVE_MMX 0
   #define HAVE_MMXEXT 0
   #define HAVE_SSE 0
+  #define HAVE_SSE2 0
+  #define HAVE_SSE3 0
+  #define HAVE_SSE4 0
+  #define HAVE_SSE42 0
   #define HAVE_SSSE3 0
+  #define HAVE_AMD3DNOW_EXTERNAL 0
+  #define HAVE_AMD3DNOWEXT_EXTERNAL 0
+  #define HAVE_AVX_EXTERNAL 0
+  #define HAVE_FMA4_EXTERNAL 0
+  #define HAVE_MMX_EXTERNAL 0
+  #define HAVE_MMXEXT_EXTERNAL 0
+  #define HAVE_SSE_EXTERNAL 0
+  #define HAVE_SSE2_EXTERNAL 0
+  #define HAVE_SSE3_EXTERNAL 0
+  #define HAVE_SSE4_EXTERNAL 0
+  #define HAVE_SSE42_EXTERNAL 0
+  #define HAVE_SSSE3_EXTERNAL 0
+  #define HAVE_AMD3DNOW_INLINE 0
+  #define HAVE_AMD3DNOWEXT_INLINE 0
+  #define HAVE_AVX_INLINE 0
+  #define HAVE_FMA4_INLINE 0
+  #define HAVE_MMX_INLINE 0
+  #define HAVE_MMXEXT_INLINE 0
+  #define HAVE_SSE_INLINE 0
+  #define HAVE_SSE2_INLINE 0
+  #define HAVE_SSE3_INLINE 0
+  #define HAVE_SSE4_INLINE 0
+  #define HAVE_SSE42_INLINE 0
+  #define HAVE_SSSE3_INLINE 0
   #define ARCH_X86 0
   #define ARCH_X86_32 0
   #define ARCH_X86_64 0
