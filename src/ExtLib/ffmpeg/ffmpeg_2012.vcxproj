@@ -189,6 +189,7 @@
     <ClInclude Include="libavcodec\msmpeg4data.h" />
     <ClInclude Include="libavcodec\msrledec.h" />
     <ClInclude Include="libavcodec\mss12.h" />
+    <ClInclude Include="libavcodec\mss2dsp.h" />
     <ClInclude Include="libavcodec\mss34dsp.h" />
     <ClInclude Include="libavcodec\nellymoser.h" />
     <ClInclude Include="libavcodec\old_codec_ids.h" />
@@ -496,6 +497,8 @@
     <ClCompile Include="libavcodec\msrledec.c" />
     <ClCompile Include="libavcodec\mss1.c" />
     <ClCompile Include="libavcodec\mss12.c" />
+    <ClCompile Include="libavcodec\mss2.c" />
+    <ClCompile Include="libavcodec\mss2dsp.c" />
     <ClCompile Include="libavcodec\mss3.c" />
     <ClCompile Include="libavcodec\mss34dsp.c" />
     <ClCompile Include="libavcodec\mss4.c" />
