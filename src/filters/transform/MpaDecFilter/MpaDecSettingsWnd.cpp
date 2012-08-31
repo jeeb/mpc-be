@@ -93,7 +93,7 @@ bool CMpaDecSettingsWnd::OnActivate()
 	p.y += 30;
 
 	m_mixer_group.Create(_T(""), dwStyle | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(215, 45)), this, (UINT)IDC_STATIC);
-	m_mixer_check.Create(ResStr(IDS_MPADEC_MIXER), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(55, m_fontheight)), this, IDC_PP_CHECK_MIXER);
+	m_mixer_check.Create(ResStr(IDS_MPADEC_MIXER), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(60, m_fontheight)), this, IDC_PP_CHECK_MIXER);
 	m_mixer_check.SetCheck(m_mixer);
 	p.y += 20;
 	m_mixer_layout_static.Create(ResStr(IDS_MPADEC_MIX_SPEAKERS), dwStyle, CRect(p, CSize(120, m_fontheight)), this);
