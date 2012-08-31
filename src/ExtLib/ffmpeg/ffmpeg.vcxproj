@@ -21,12 +21,12 @@
   <ItemGroup>
     <None Include="config.asm" />
     <None Include="libavcodec\x86\ac3dsp.asm" />
-    <None Include="libavcodec\x86\dct32_sse.asm" />
+    <None Include="libavcodec\x86\dct32.asm" />
     <None Include="libavcodec\x86\deinterlace.asm" />
     <None Include="libavcodec\x86\diracdsp_yasm.asm" />
     <None Include="libavcodec\x86\dsputil.asm" />
     <None Include="libavcodec\x86\dwt_yasm.asm" />
-    <None Include="libavcodec\x86\fft_mmx.asm" />
+    <None Include="libavcodec\x86\fft.asm" />
     <None Include="libavcodec\x86\fmtconvert.asm" />
     <None Include="libavcodec\x86\h264_chromamc.asm" />
     <None Include="libavcodec\x86\h264_chromamc_10bit.asm" />
@@ -39,7 +39,7 @@
     <None Include="libavcodec\x86\h264_qpel_10bit.asm" />
     <None Include="libavcodec\x86\h264_weight.asm" />
     <None Include="libavcodec\x86\h264_weight_10bit.asm" />
-    <None Include="libavcodec\x86\imdct36_sse.asm" />
+    <None Include="libavcodec\x86\imdct36.asm" />
     <None Include="libavcodec\x86\pngdsp.asm" />
     <None Include="libavcodec\x86\proresdsp.asm" />
     <None Include="libavcodec\x86\rv34dsp.asm" />
@@ -113,6 +113,7 @@
     <ClInclude Include="libavcodec\dirac.h" />
     <ClInclude Include="libavcodec\diracdsp.h" />
     <ClInclude Include="libavcodec\dirac_arith.h" />
+    <ClInclude Include="libavcodec\dsputil.h" />
     <ClInclude Include="libavcodec\dvdata.h" />
     <ClInclude Include="libavcodec\dv_profile.h" />
     <ClInclude Include="libavcodec\dv_tablegen.h" />
@@ -342,6 +343,7 @@
     <ClCompile Include="libavcodec\aacsbr.c" />
     <ClCompile Include="libavcodec\aactab.c" />
     <ClCompile Include="libavcodec\aac_ac3_parser.c" />
+    <ClCompile Include="libavcodec\aac_parser.c" />
     <ClCompile Include="libavcodec\ac3.c" />
     <ClCompile Include="libavcodec\ac3dec.c" />
     <ClCompile Include="libavcodec\ac3dec_data.c" />
@@ -577,18 +579,18 @@
     <ClCompile Include="libavcodec\x86\dsputil_mmx_qns_template.c" />
     <ClCompile Include="libavcodec\x86\dsputil_mmx_rnd_template.c" />
     <ClCompile Include="libavcodec\x86\dwt.c" />
-    <ClCompile Include="libavcodec\x86\fdct_mmx.c" />
+    <ClCompile Include="libavcodec\x86\fdct.c" />
     <ClCompile Include="libavcodec\x86\fft_init.c" />
     <ClCompile Include="libavcodec\x86\fmtconvert_init.c" />
     <ClCompile Include="libavcodec\x86\h264dsp_init.c" />
     <ClCompile Include="libavcodec\x86\h264_intrapred_init.c" />
-    <ClCompile Include="libavcodec\x86\h264_qpel_mmx.c" />
+    <ClCompile Include="libavcodec\x86\h264_qpel.c" />
     <ClCompile Include="libavcodec\x86\idct_mmx.c" />
     <ClCompile Include="libavcodec\x86\idct_mmx_xvid.c" />
     <ClCompile Include="libavcodec\x86\idct_sse2_xvid.c" />
     <ClCompile Include="libavcodec\x86\mlpdsp.c" />
-    <ClCompile Include="libavcodec\x86\motion_est_mmx.c" />
-    <ClCompile Include="libavcodec\x86\mpegaudiodec_mmx.c" />
+    <ClCompile Include="libavcodec\x86\motion_est.c" />
+    <ClCompile Include="libavcodec\x86\mpegaudiodec.c" />
     <ClCompile Include="libavcodec\x86\mpegvideo.c" />
     <ClCompile Include="libavcodec\x86\mpegvideoenc_template.c" />
     <ClCompile Include="libavcodec\x86\pngdsp_init.c" />
@@ -596,8 +598,8 @@
     <ClCompile Include="libavcodec\x86\rv34dsp_init.c" />
     <ClCompile Include="libavcodec\x86\rv40dsp_init.c" />
     <ClCompile Include="libavcodec\x86\sbrdsp_init.c" />
-    <ClCompile Include="libavcodec\x86\simple_idct_mmx.c" />
-    <ClCompile Include="libavcodec\x86\snowdsp_mmx.c" />
+    <ClCompile Include="libavcodec\x86\simple_idct.c" />
+    <ClCompile Include="libavcodec\x86\snowdsp.c" />
     <ClCompile Include="libavcodec\x86\vc1dsp_mmx.c" />
     <ClCompile Include="libavcodec\x86\vp3dsp_init.c" />
     <ClCompile Include="libavcodec\x86\vp56dsp_init.c" />
