@@ -73,6 +73,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (MSMPEG4V2, msmpeg4v2);
     REGISTER_DECODER (MSMPEG4V3, msmpeg4v3);
     REGISTER_DECODER (MSS1, mss1);
+    REGISTER_DECODER (MSS2, mss2);
     REGISTER_DECODER (MTS2, mts2);
     REGISTER_DECODER (QTRLE, qtrle);
     REGISTER_DECODER (PNG, png);
