@@ -191,7 +191,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	}
 
 	// === New swscaler options
-	p = CPoint(360, 10);
+	p = CPoint(IPP_SCALE(360), 10);
 	int width_s  = IPP_SCALE(88);
 
 	// Software output formats
