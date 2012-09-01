@@ -83,6 +83,7 @@
 
 #include "jpeg.h"
 #include "DIB.h"
+#include "PlayerYouTube.h"
 
 #include "../../filters/transform/VSFilter/IDirectVobSub.h"
 #include "../../Subtitles/RenderedHdmvSubtitle.h"
@@ -11234,7 +11235,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			break;
 		}
 
-		HRESULT hr = pGB->RenderFile(CStringW(fn), NULL);
+		HRESULT hr = pGB->RenderFile(PlayerYouTube(fn), NULL);
 		
 		if (s.fKeepHistory && s.fRememberFilePos && !s.NewFile(fn)) {
 			REFERENCE_TIME	rtPos = s.CurrentFilePosition()->llPosition;

@@ -1,5 +1,5 @@
 /*
- * $Id: gpu_memcpy.h 990 2012-08-26 21:11:51Z alexins $
+ * $Id$
  *
  *      Copyright (C) 2011 Hendrik Leppkes
  *      http://www.1f0.de
@@ -23,6 +23,8 @@
  *  Adaptation for MPC-BE (C) 2012 Sergey "Exodus8" (rusguy6@gmail.com)
  *
  */
+
+#pragma once
 
 #include <intrin.h>
 #include <emmintrin.h>
