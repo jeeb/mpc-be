@@ -84,11 +84,11 @@ bool CMpegSplitterSettingsWnd::OnActivate()
 	m_edtSubtitlesLanguageOrder.CreateEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""), WS_CHILD | WS_VISIBLE | WS_TABSTOP, CRect(p, CSize(IPP_SCALE(305), m_fontheight + 6)), this, IDC_PP_SUBTITLES_LANGUAGE_ORDER);
 	p.y += h25;
 
-	m_grpTrueHD.Create(ResStr(IDS_MPEGSPLITTER_TRUEHD_OUTPUT), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p+ CPoint(-5, 0), CSize(IPP_SCALE(305), h20 + h20)), this, (UINT)IDC_STATIC);
-	p.y += h20;
-	m_cbTrueHD.Create(_T("TrueHD"), dwStyle | BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE | WS_GROUP, CRect(p, CSize(IPP_SCALE(95), m_fontheight + 2)), this, IDC_PP_TRUEHD);
-	m_cbAC3Core.Create(_T("AC-3 core"), dwStyle | BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE, CRect(p + CPoint(IPP_SCALE(100), 0), CSize(IPP_SCALE(95), m_fontheight + 2)), this, IDC_PP_AC3CORE);
-	m_cbAsIs.Create(ResStr(IDS_MPEGSPLITTER_THD_NOSPLIT), dwStyle | BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE, CRect(p + CPoint(IPP_SCALE(200), 0), CSize(IPP_SCALE(95), m_fontheight + 2)), this, IDC_PP_ASIS);
+	m_grpTrueHD.Create(ResStr(IDS_MPEGSPLITTER_TRUEHD_OUTPUT), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p, CSize(IPP_SCALE(305), h20 + h20)), this, (UINT)IDC_STATIC);
+	p.y += IPP_SCALE(15);
+	m_cbTrueHD.Create(_T("TrueHD"), dwStyle | BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE | WS_GROUP, CRect(p + CPoint(IPP_SCALE(30), 0),  CSize(IPP_SCALE(95), m_fontheight + 2)), this, IDC_PP_TRUEHD);
+	m_cbAC3Core.Create(_T("AC-3 core"), dwStyle | BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE, CRect(p + CPoint(IPP_SCALE(130), 0), CSize(IPP_SCALE(95), m_fontheight + 2)), this, IDC_PP_AC3CORE);
+	m_cbAsIs.Create(ResStr(IDS_MPEGSPLITTER_THD_NOSPLIT), dwStyle | BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE, CRect(p + CPoint(IPP_SCALE(230), 0), CSize(IPP_SCALE(70), m_fontheight + 2)), this, IDC_PP_ASIS);
 
 	if (m_pMSF) {
 		m_cbFastStreamChange.SetCheck(m_pMSF->GetFastStreamChange());
