@@ -212,7 +212,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	}
 	m_txtSwOutputFormats.Create(_T("Output formats:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h16;
-	m_lstSwOutputFormats.Create(WS_VISIBLE|WS_CHILD|WS_BORDER|LBS_OWNERDRAWFIXED|LBS_HASSTRINGS, CRect(p, CSize(width_s, IPP_SCALE(82))), this, 0);
+	m_lstSwOutputFormats.Create(dwStyle|WS_BORDER|LBS_OWNERDRAWFIXED|LBS_HASSTRINGS, CRect(p, CSize(width_s, IPP_SCALE(82))), this, 0);
 	for (int i = 0; i < _countof(m_nSwIndex); i++) {
 		m_lstSwOutputFormats.AddString(SwOutputFormatNames[m_nSwIndex[i]]);
 	}
@@ -220,14 +220,14 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 	// Software Output formats order
 	int btn_size = m_fontheight + 4;
-	m_cbSwOutputFormatUp.Create(_T("<"), WS_VISIBLE|WS_CHILD|BS_PUSHBUTTON, CRect(p + CPoint(width_s - btn_size * 2, 0), CSize(btn_size, btn_size)), this, IDC_PP_SWOUTPUTFORMATUP);
-	m_cbSwOutputFormatDown.Create(_T(">"), WS_VISIBLE|WS_CHILD|BS_PUSHBUTTON, CRect(p + CPoint(width_s - btn_size, 0), CSize(btn_size, btn_size)), this, IDC_PP_SWOUTPUTFORMATDOWN);
+	m_cbSwOutputFormatUp.Create(_T("<"), dwStyle|BS_PUSHBUTTON, CRect(p + CPoint(width_s - btn_size * 2, 0), CSize(btn_size, btn_size)), this, IDC_PP_SWOUTPUTFORMATUP);
+	m_cbSwOutputFormatDown.Create(_T(">"), dwStyle|BS_PUSHBUTTON, CRect(p + CPoint(width_s - btn_size, 0), CSize(btn_size, btn_size)), this, IDC_PP_SWOUTPUTFORMATDOWN);
 	p.y += h20;
 
 	// Resize Method
 	m_txtSwResizeMethodBE.Create(_T("Resize Method:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h16;
-	m_cbSwResizeMethodBE.Create(WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(width_s, 200)), this, IDC_PP_RESIZEMETHODBE);
+	m_cbSwResizeMethodBE.Create(dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(width_s, 200)), this, IDC_PP_RESIZEMETHODBE);
 	m_cbSwResizeMethodBE.AddString(_T("Area"));          // ResStr(IDS_VDF_CHR_AREA)
 	m_cbSwResizeMethodBE.AddString(_T("Bicubic"));       // ResStr(IDS_VDF_CHR_BICUBIC)
 //	m_cbSwResizeMethodBE.AddString(_T("Bicublin"));      // ResStr(IDS_VDF_CHR_BICUBLIN) //temp rem
@@ -244,7 +244,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	// Chroma options
 	m_txtSwChromaToRGB.Create(_T("Chroma to RGB:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h16;
-	m_cbSwChromaToRGB.Create (WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(width_s, 200)), this, IDC_PP_SWCHROMATORGB);
+	m_cbSwChromaToRGB.Create (dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(width_s, 200)), this, IDC_PP_SWCHROMATORGB);
 	m_cbSwChromaToRGB.AddString(_T("Fast"));   // ResStr(IDS_VDF_CHR_FAST)
 	m_cbSwChromaToRGB.AddString(_T("Normal")); // ResStr(IDS_VDF_CHR_NORMAL)
 //	m_cbSwChromaToRGB.AddString(_T("High"));   // ResStr(IDS_VDF_CHR_HIGH) //temp rem
@@ -254,7 +254,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	// Software Colorspace
 	m_txtSwColorspace.Create(_T("Colorspace:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h16;
-	m_cbSwColorspace.Create(WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(width_s, 200)), this, IDC_PP_SWCOLORSPACE);
+	m_cbSwColorspace.Create(dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(width_s, 200)), this, IDC_PP_SWCOLORSPACE);
 	m_cbSwColorspace.AddString(_T("SD (BT.601)")); // ResStr(IDS_VDF_COLOR_HD)
 	m_cbSwColorspace.AddString(_T("HD (BT.709)")); // ResStr(IDS_VDF_COLOR_SD)
 	m_cbSwColorspace.AddString(_T("Auto"));        // ResStr(IDS_VDF_COLOR_AUTO)
@@ -263,7 +263,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	// Input levels
 	m_txtSwInputLevels.Create(_T("Input levels:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h16;
-	m_cbSwInputLevels.Create(WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(width_s, 200)), this, IDC_PP_SWINPUTLEVELS);
+	m_cbSwInputLevels.Create(dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(width_s, 200)), this, IDC_PP_SWINPUTLEVELS);
 	m_cbSwInputLevels.AddString(_T("TV (16-235)")); // ResStr(IDS_VDF_RANGE_TV)
 	m_cbSwInputLevels.AddString(_T("PC (0-255)"));  // ResStr(IDS_VDF_RANGE_PC)
 	m_cbSwInputLevels.AddString(_T("Auto"));        // ResStr(IDS_VDF_RANGE_AUTO)
@@ -272,7 +272,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	// Output levels
 	m_txtSwOutputLevels.Create(_T("Output levels:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h16;
-	m_cbSwOutputLevels.Create(WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(width_s, 200)), this, IDC_PP_SWOUTPUTLEVELS);
+	m_cbSwOutputLevels.Create(dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(width_s, 200)), this, IDC_PP_SWOUTPUTLEVELS);
 	m_cbSwOutputLevels.AddString(_T("TV (16-235)")); // ResStr(IDS_VDF_RANGE_TV)
 	m_cbSwOutputLevels.AddString(_T("PC (0-255)"));  // ResStr(IDS_VDF_RANGE_PC)
 	m_cbSwOutputLevels.AddString(_T("Auto"));        // ResStr(IDS_VDF_RANGE_AUTO)
