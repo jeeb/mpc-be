@@ -70,12 +70,16 @@ void CMpaDecSettingsWnd::OnDisconnect()
 
 bool CMpaDecSettingsWnd::OnActivate()
 {
+	ASSERT(IPP_FONTSIZE == 13);
+	const int h20 = IPP_SCALE(20);
+	const int h25 = IPP_SCALE(25);
+	const int h30 = IPP_SCALE(30);
 	DWORD dwStyle = WS_VISIBLE|WS_CHILD|WS_TABSTOP;
-	CRect r;
 	CPoint p(10, 10);
+	CRect r;
 
-	m_outputformat_static.Create(ResStr(IDS_MPADEC_SAMPLE_FMT), dwStyle, CRect(p, CSize(120, m_fontheight)), this);
-	m_outputformat_combo.Create(dwStyle | CBS_DROPDOWNLIST, CRect(p + CPoint(125, -4), CSize(80, 200)), this, IDC_PP_COMBO1);
+	m_outputformat_static.Create(ResStr(IDS_MPADEC_SAMPLE_FMT), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(120), m_fontheight)), this);
+	m_outputformat_combo.Create(dwStyle | CBS_DROPDOWNLIST, CRect(p + CPoint(IPP_SCALE(125), -4), CSize(IPP_SCALE(80), 200)), this, IDC_PP_COMBO1);
 	m_outputformat_combo.SetItemData(m_outputformat_combo.AddString(_T("PCM 16 Bit")), SF_PCM16);
 	m_outputformat_combo.SetItemData(m_outputformat_combo.AddString(_T("PCM 24 Bit")), SF_PCM24);
 	m_outputformat_combo.SetItemData(m_outputformat_combo.AddString(_T("PCM 32 Bit")), SF_PCM32);
@@ -86,18 +90,18 @@ bool CMpaDecSettingsWnd::OnActivate()
 			m_outputformat_combo.SetCurSel(i);
 		}
 	}
-	p.y += 25;
+	p.y += h25;
 
-	m_drc_check.Create(ResStr(IDS_MPADEC_DRC), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(205, m_fontheight)), this, IDC_PP_CHECK_DRC);
+	m_drc_check.Create(ResStr(IDS_MPADEC_DRC), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(205), m_fontheight)), this, IDC_PP_CHECK_DRC);
 	m_drc_check.SetCheck(m_drc);
-	p.y += 30;
+	p.y += h25;
 
-	m_mixer_group.Create(_T(""), dwStyle | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(215, 45)), this, (UINT)IDC_STATIC);
-	m_mixer_check.Create(ResStr(IDS_MPADEC_MIXER), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(60, m_fontheight)), this, IDC_PP_CHECK_MIXER);
+	m_mixer_group.Create(_T(""), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(215), h20 + h25)), this, (UINT)IDC_STATIC);
+	m_mixer_check.Create(ResStr(IDS_MPADEC_MIXER), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(60), m_fontheight)), this, IDC_PP_CHECK_MIXER);
 	m_mixer_check.SetCheck(m_mixer);
-	p.y += 20;
-	m_mixer_layout_static.Create(ResStr(IDS_MPADEC_MIX_SPEAKERS), dwStyle, CRect(p, CSize(120, m_fontheight)), this);
-	m_mixer_layout_combo.Create(dwStyle | CBS_DROPDOWNLIST, CRect(p + CPoint(125, -4), CSize(80, 200)), this, IDC_PP_COMBO2);
+	p.y += h20;
+	m_mixer_layout_static.Create(ResStr(IDS_MPADEC_MIX_SPEAKERS), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(120), m_fontheight)), this);
+	m_mixer_layout_combo.Create(dwStyle | CBS_DROPDOWNLIST, CRect(p + CPoint(IPP_SCALE(125), -4), CSize(IPP_SCALE(80), 200)), this, IDC_PP_COMBO2);
 	m_mixer_layout_combo.SetItemData(m_mixer_layout_combo.AddString(ResStr(IDS_MPADEC_MONO)),   SPK_MONO);
 	m_mixer_layout_combo.SetItemData(m_mixer_layout_combo.AddString(ResStr(IDS_MPADEC_STEREO)), SPK_STEREO);
 	m_mixer_layout_combo.SetItemData(m_mixer_layout_combo.AddString(_T("4.0")), SPK_4_0);
@@ -111,13 +115,13 @@ bool CMpaDecSettingsWnd::OnActivate()
 	}
 	m_mixer_layout_combo.GetWindowRect(r);
 	ScreenToClient(r);
-	p.y += 35;
+	p.y += h30;
 
-	m_spdif_group.Create(ResStr(IDS_MPADEC_SPDIF),dwStyle | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(215, 40)), this, (UINT)IDC_STATIC);
-	p.y += 20;
-	m_spdif_ac3_check.Create(_T("AC-3"), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(45, m_fontheight)), this, IDC_PP_CHECK_AC3_CPDIF);
+	m_spdif_group.Create(ResStr(IDS_MPADEC_SPDIF), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(215), h20 + h20)), this, (UINT)IDC_STATIC);
+	p.y += h20;
+	m_spdif_ac3_check.Create(_T("AC-3"), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_CHECK_AC3_CPDIF);
 	m_spdif_ac3_check.SetCheck(m_spdif_ac3);
-	m_spdif_dts_check.Create(_T("DTS"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(50, 0), CSize(45, m_fontheight)), this, IDC_PP_CHECK_DTS_CPDIF);
+	m_spdif_dts_check.Create(_T("DTS"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(IPP_SCALE(50), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_CHECK_DTS_CPDIF);
 	m_spdif_dts_check.SetCheck(m_spdif_dts);
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {

@@ -31,7 +31,7 @@
 
 CInternalPropertyPageWnd::CInternalPropertyPageWnd()
 	: m_fDirty(false)
-	, m_fontheight(13)
+	, m_fontheight(IPP_FONTSIZE)
 {
 }
 

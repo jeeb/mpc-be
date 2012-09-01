@@ -25,6 +25,9 @@
 
 #include <atlcoll.h>
 
+#define IPP_FONTSIZE 13
+#define IPP_SCALE(size) ((size) * m_fontheight / IPP_FONTSIZE)
+
 interface __declspec(uuid("03481710-D73E-4674-839F-03EDE2D60ED8"))
 ISpecifyPropertyPages2 :
 public ISpecifyPropertyPages {
@@ -55,23 +58,15 @@ public:
 			}
 		}
 	}
-	bool GetDirty() {
-		return m_fDirty;
-	}
+	bool GetDirty() { return m_fDirty; }
 
 	virtual BOOL Create(IPropertyPageSite* pPageSite, LPCRECT pRect, CWnd* pParentWnd);
 
-	virtual bool OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks) {
-		return true;
-	}
+	virtual bool OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks) { return true; }
 	virtual void OnDisconnect() {}
-	virtual bool OnActivate() {
-		return true;
-	}
+	virtual bool OnActivate() { return true; }
 	virtual void OnDeactivate() {}
-	virtual bool OnApply() {
-		return true;
-	}
+	virtual bool OnApply() { return true; }
 
 	DECLARE_MESSAGE_MAP()
 };
@@ -115,17 +110,9 @@ public:
 template<class WndClass>
 class CInternalPropertyPageTempl : public CInternalPropertyPage
 {
-	virtual CInternalPropertyPageWnd* GetWindow() {
-		return DNew WndClass();
-	}
-
-	virtual LPCTSTR GetWindowTitle() {
-		return WndClass::GetWindowTitle();
-	}
-
-	virtual CSize GetWindowSize() {
-		return WndClass::GetWindowSize();
-	}
+	virtual CInternalPropertyPageWnd* GetWindow() { return DNew WndClass(); }
+	virtual LPCTSTR GetWindowTitle() { return WndClass::GetWindowTitle(); }
+	virtual CSize GetWindowSize() { return WndClass::GetWindowSize(); }
 
 public:
 	CInternalPropertyPageTempl(LPUNKNOWN lpunk, HRESULT* phr)
