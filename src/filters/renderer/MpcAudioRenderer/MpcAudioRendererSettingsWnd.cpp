@@ -27,9 +27,6 @@
 // ==>>> Resource identifier from "resource.h" present in mplayerc project!
 #define ResStr(id) CString(MAKEINTRESOURCE(id))
 
-#define LEFT_SPACING					25
-#define VERTICAL_SPACING				25
-
 CMpcAudioRendererSettingsWnd::CMpcAudioRendererSettingsWnd(void)
 {
 }
@@ -81,26 +78,26 @@ bool CALLBACK DSEnumProc(LPGUID lpGUID,
 
 bool CMpcAudioRendererSettingsWnd::OnActivate()
 {
-	int nPosY	= 10;
-	CSize wsize	= GetWindowSize();
+	ASSERT(IPP_FONTSIZE == 13);
+	const int h20 = IPP_SCALE(20);
+	const int h30 = IPP_SCALE(30);
+	DWORD dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP;
+	CPoint p(10, 10);
 
-	m_grpDefault.Create (_T(""), WS_VISIBLE|WS_CHILD | BS_GROUPBOX, CRect (10,  nPosY,  wsize.cx, nPosY+ wsize.cy), this, (UINT)IDC_STATIC);
-	nPosY += VERTICAL_SPACING;
-
-	m_txtWasapiMode.Create (ResStr (IDS_ARS_WASAPI_MODE), WS_VISIBLE|WS_CHILD, CRect (LEFT_SPACING,  nPosY, 325, nPosY+15), this, (UINT)IDC_STATIC);
-	nPosY += VERTICAL_SPACING - 5;
-	m_cbWasapiMode.Create (WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect (LEFT_SPACING,  nPosY-4, 325, nPosY+90), this, IDC_PP_WASAPI_MODE);
+	m_txtWasapiMode.Create (ResStr (IDS_ARS_WASAPI_MODE), WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, (UINT)IDC_STATIC);
+	p.y += h20;
+	m_cbWasapiMode.Create (WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(IPP_SCALE(320), 200)), this, IDC_PP_WASAPI_MODE);
 	m_cbWasapiMode.AddString(_T("Do not use WASAPI"));
 	m_cbWasapiMode.AddString(_T("Exclusive Mode"));
 	m_cbWasapiMode.AddString(_T("Shared Mode"));
+	p.y += h30;
 
-	nPosY += VERTICAL_SPACING + 10;
-	m_txtSoundDevice.Create (ResStr (IDS_ARS_SOUND_DEVICE), WS_VISIBLE|WS_CHILD, CRect (LEFT_SPACING,  nPosY, 325, nPosY+15), this, (UINT)IDC_STATIC);
-	nPosY += VERTICAL_SPACING - 5;
-	m_cbSoundDevice.Create (WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect (LEFT_SPACING,  nPosY-4, 325, nPosY+90), this, IDC_PP_SOUND_DEVICE);
+	m_txtSoundDevice.Create (ResStr (IDS_ARS_SOUND_DEVICE), WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, (UINT)IDC_STATIC);
+	p.y += h20;
+	m_cbSoundDevice.Create (WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(IPP_SCALE(320), 200)), this, IDC_PP_SOUND_DEVICE);
+	p.y += h30;
 
-	nPosY += VERTICAL_SPACING + 10;
-	m_cbMuteFastForward.Create (ResStr (IDS_ARS_MUTE_FAST_FORWARD), WS_VISIBLE|WS_CHILD|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect (LEFT_SPACING,  nPosY, 325, nPosY+15), this, IDC_PP_MUTE_FAST_FORWARD);
+	m_cbMuteFastForward.Create (ResStr (IDS_ARS_MUTE_FAST_FORWARD), WS_VISIBLE|WS_CHILD|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, IDC_PP_MUTE_FAST_FORWARD);
 
 	SetClassLongPtr(GetDlgItem(IDC_PP_SOUND_DEVICE)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
 
