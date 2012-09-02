@@ -2220,6 +2220,12 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 		if (*(WORD*)start == 0x770b) { // skip AC3
 			return S_OK;
 		}
+
+		if (!p->pmt && m_bFlushed) {
+			p->pmt = CreateMediaType(&m_mt);
+			m_bFlushed = false;
+		}
+
 		if (DD_reset || p->rtStart == 0) {
 			p->bDiscontinuity = true;
 			DD_reset = false;
