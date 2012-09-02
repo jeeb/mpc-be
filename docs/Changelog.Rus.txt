@@ -293,12 +293,12 @@
 * zlib до версии 1.2.7
 * libpng 1.5.13 git-95ea04f
 * Little-CMS git-3a69c0c
-* MediaInfoLib v0.7.59
+* MediaInfoLib v0.7.60
 * ZenLib v0.4.28
-* SoundTouch svn rev.143
+* SoundTouch svn rev.152
 * Logitech SDK v3.01
 * libwebp 0.2.0
-* ffmpeg git-bfb3902
+* ffmpeg git-c0daa73
  ... и многое другое.
 
 Частично использованы фрагменты исходного кода из MPC-HC из следующих ревизий:
