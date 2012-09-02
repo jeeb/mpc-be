@@ -372,6 +372,13 @@ inline void* memcpy_sse(void* d, const void* s, size_t size)
 		return NULL;
 	}
 
+	// If memory is not aligned, use memcpy
+	bool isAligned = (((size_t)(s) | (size_t)(d)) & 0xF) == 0;
+	if (!isAligned)
+	{
+		return memcpy(d, s, size);
+	}
+
 	check_sse();
 
 	if (!SSE41)
@@ -381,14 +388,6 @@ inline void* memcpy_sse(void* d, const void* s, size_t size)
 			return memcpy_sse2(d, s, size);
 		}
 
-		return memcpy(d, s, size);
-	}
-
-	// If memory is not aligned, use memcpy
-	bool isAligned = (((size_t)(s) | (size_t)(d)) & 0xF) == 0;
-
-	if (!isAligned)
-	{
 		return memcpy(d, s, size);
 	}
 
