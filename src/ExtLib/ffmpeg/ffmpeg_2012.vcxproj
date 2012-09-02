@@ -260,6 +260,7 @@
     <ClInclude Include="libavcodec\wma.h" />
     <ClInclude Include="libavcodec\wmadata.h" />
     <ClInclude Include="libavcodec\wmaprodata.h" />
+    <ClInclude Include="libavcodec\wmavoice_data.h" />
     <ClInclude Include="libavcodec\wma_common.h" />
     <ClInclude Include="libavcodec\wmv2.h" />
     <ClInclude Include="libavcodec\x86\cabac.h" />
@@ -572,6 +573,7 @@
     <ClCompile Include="libavcodec\wmadec.c" />
     <ClCompile Include="libavcodec\wmalosslessdec.c" />
     <ClCompile Include="libavcodec\wmaprodec.c" />
+    <ClCompile Include="libavcodec\wmavoice.c" />
     <ClCompile Include="libavcodec\wma_common.c" />
     <ClCompile Include="libavcodec\wmv2.c" />
     <ClCompile Include="libavcodec\wmv2dec.c" />

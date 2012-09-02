@@ -1933,6 +1933,13 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview
 	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_WMAUDIO2);
 	m_transform.AddTail(pFGF);
 
+	// Windows Media Audio Voice
+	pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
+		(ffmpeg_filters[FFM_WMAVOICE] || IsPreview) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
+		(ffmpeg_filters[FFM_WMAVOICE] || IsPreview) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_WMSP1);
+	m_transform.AddTail(pFGF);
+
 	// Indeo Audio Coder
 	pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 		(ffmpeg_filters[FFM_IAC] || IsPreview) ? MPCAudioDecName : LowMerit(MPCAudioDecName),

@@ -28,6 +28,7 @@
 + Декодеры "Windows Media Audio 1" и "Windows Media Audio 2";
 + Декодер "Windows Media Audio 9 Professional";
 + Декодер "Windows Media Audio Lossless";
++ Декодер "Windows Media Audio Voice"
 + Декодер "Flash Screen Video 1";
 + Декодер CINEPAK;
 + Декодер FPS1 (Fraps);

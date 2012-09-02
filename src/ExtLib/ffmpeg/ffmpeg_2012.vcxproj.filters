@@ -964,6 +964,9 @@
     <ClInclude Include="libavcodec\xvmc_internal.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
+    <ClInclude Include="libavcodec\wmavoice_data.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="libavresample\x86\audio_convert_init.c">
@@ -1948,6 +1951,9 @@
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\xiph.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\wmavoice.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
   </ItemGroup>

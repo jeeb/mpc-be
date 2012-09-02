@@ -299,6 +299,7 @@ SRCS_C=\
     libavcodec/wmadec.c \
     libavcodec/wmalosslessdec.c \
     libavcodec/wmaprodec.c \
+    libavcodec/wmavoice.c \
     libavcodec/wmv2.c \
     libavcodec/wmv2dec.c \
     libavcodec/xiph.c \
@@ -423,7 +424,7 @@ SRCS_YASM=\
     libswscale/x86/output.asm \
     libswscale/x86/scale.asm
 
-OBJS += \
+OBJS = \
     $(SRCS_C:%.c=$(OBJ_DIR)%.o) \
     $(SRCS_YASM:%.asm=$(OBJ_DIR)%.o)
 
@@ -441,5 +442,6 @@ $(TARGET_LIB): $(OBJS)
 	@echo AR $@
 	@$(FFMPEG_PREFIX)ar rc $@ $(OBJS)
 
+-include $(SRCS_C:%.c=$(OBJ_DIR)%.d)
 
 .PHONY: clean make_objdirs $(OBJ_DIRS)

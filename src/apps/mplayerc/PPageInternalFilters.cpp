@@ -80,6 +80,7 @@ static filter_t s_filters[] = {
 	{_T("WMA v.1/v.2"),           FFMPEG_DECODER, AUDIO,  FFM_WMA2,       IDS_TRA_FFMPEG,},
 	{_T("WMA v.9 Professional"),  FFMPEG_DECODER, AUDIO,  FFM_WMAPRO,     IDS_TRA_FFMPEG,},
 	{_T("WMA Lossless"),          FFMPEG_DECODER, AUDIO,  FFM_WMALOSS,    IDS_TRA_FFMPEG,},
+	{_T("WMA Voice"),             FFMPEG_DECODER, AUDIO,  FFM_WMAVOICE,   IDS_TRA_FFMPEG,},
 	{_T("Other PCM/ADPCM"),       DECODER,        AUDIO,  TRA_PCM,        IDS_TRA_FFMPEG,},
 
 	// DXVA decoder
