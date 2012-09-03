@@ -1619,30 +1619,36 @@ CMpegSplitterOutputPin::CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWS
 
 CMpegSplitterOutputPin::~CMpegSplitterOutputPin()
 {
+	Flush();
+}
+
+HRESULT CMpegSplitterOutputPin::Flush()
+{
+	CAutoLock cAutoLock(this);
+
+	m_p.Free();
+	m_pl.RemoveAll();
+	DD_reset	= true;
+	m_bFlushed	= true;
+
+	return S_OK;
 }
 
 HRESULT CMpegSplitterOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
 {
-	{
-		CAutoLock cAutoLock(this);
+	CAutoLock cAutoLock(this);
 
-		m_rtPrev	= Packet::INVALID_TIME;
-		m_rtOffset	= 0;
-	}
+	m_rtPrev	= Packet::INVALID_TIME;
+	m_rtOffset	= 0;
 
 	return __super::DeliverNewSegment(tStart, tStop, dRate);
 }
 
 HRESULT CMpegSplitterOutputPin::DeliverEndFlush()
 {
-	{
-		CAutoLock cAutoLock(this);
+	CAutoLock cAutoLock(this);
 
-		m_p.Free();
-		m_pl.RemoveAll();
-		DD_reset	= true;
-		m_bFlushed	= true;
-	}
+	Flush();
 
 	return __super::DeliverEndFlush();
 }
@@ -1673,6 +1679,7 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 		if (*((CMediaType *)p->pmt) != m_mt) {
 			SetMediaType ((CMediaType*)p->pmt);
 			m_AC3_size = m_AC3_count = 0;
+			Flush();
 		}
 	}
 

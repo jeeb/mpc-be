@@ -168,6 +168,8 @@ protected:
 	HRESULT DeliverPacket(CAutoPtr<Packet> p);
 	HRESULT DeliverEndFlush();
 
+	HRESULT Flush();
+
 public:
 	CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int type, int QueueMaxPackets);
 	virtual ~CMpegSplitterOutputPin();
