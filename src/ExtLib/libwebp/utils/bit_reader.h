@@ -93,6 +93,8 @@ static WEBP_INLINE void VP8LoadNewBytes(VP8BitReader* const br) {
 #elif (BITS == 16)
     // gcc will recognize a 'rorw $8, ...' here:
     bits = (bit_t)(in_bits >> 8) | ((in_bits & 0xff) << 8);
+#else   // BITS == 8
+    bits = (bit_t)in_bits;
 #endif
 #else    // LITTLE_ENDIAN
     bits = (bit_t)in_bits;
@@ -121,7 +123,7 @@ static WEBP_INLINE int VP8BitUpdate(VP8BitReader* const br, bit_t split) {
 
 static WEBP_INLINE void VP8Shift(VP8BitReader* const br) {
   // range_ is in [0..127] interval here.
-  const int idx = br->range_ >> (BITS);
+  const bit_t idx = br->range_ >> (BITS);
   const int shift = kVP8Log2Range[idx];
   br->range_ = kVP8NewRange[idx];
   br->value_ <<= shift;
@@ -182,7 +184,7 @@ uint32_t VP8LReadOneBit(VP8LBitReader* const br);
 // 32 times after the last VP8LFillBitWindow. Any subsequent calls
 // (without VP8LFillBitWindow) will return invalid data.
 static WEBP_INLINE uint32_t VP8LReadOneBitUnsafe(VP8LBitReader* const br) {
-  const uint32_t val = (br->val_ >> br->bit_pos_) & 1;
+  const uint32_t val = (uint32_t)((br->val_ >> br->bit_pos_) & 1);
   ++br->bit_pos_;
   return val;
 }

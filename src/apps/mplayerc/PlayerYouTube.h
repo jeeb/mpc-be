@@ -96,16 +96,14 @@ CString PlayerYouTube(CString fname)
 {
 	if (wcsstr(fname, L"youtube.com/watch?")) {
 
-		char buf[4096], str1[1024], str2[1024];
-		DWORD size = 0, len;
-		HINTERNET s, f;
-		char out[sizeof(buf) * 10];
+		char *out, buf[4096], str1[1024], str2[1024];
+		DWORD len, size = 0, fs = sizeof(buf) * 10;
 
-		s = InternetOpen(0, 0, 0, 0, 0);
+		HINTERNET f, s = InternetOpen(0, 0, 0, 0, 0);
 
 		if (s) {
 
-			f = InternetOpenUrlW(s, fname, 0, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE, 0);
+			f = InternetOpenUrlW(s, fname, 0, 0, INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE, 0);
 
 			if (f) {
 
@@ -115,14 +113,14 @@ CString PlayerYouTube(CString fname)
 				GetTempFileNameW(path, _T("mpc_youtube"), 0, fn);
 
 				FILE* fp;
-				_wfopen_s(&fp, fn, _T("rb+"));
+				_wfopen_s(&fp, fn, _T("wt+"));
 
 				for (;;) {
 
 					InternetReadFile(f, buf, sizeof(buf), &len);
 					size += len;
 
-					if (!len || size > sizeof(out)) {
+					if (!len || size > fs) {
 						break;
 					}
 
@@ -130,7 +128,8 @@ CString PlayerYouTube(CString fname)
 				}
 
 				rewind(fp);
-				fread(out, sizeof(out), 1, fp);
+				out = (char*)malloc(fs);
+				fread(out, fs, 1, fp);
 				fclose(fp);
 
 				_wunlink(fn);
@@ -147,22 +146,21 @@ CString PlayerYouTube(CString fname)
 
 			k += 9;
 
-			for (;;) {
+			for (; i < sizeof(str1); i++, k++) {
 
 				if (out[k] == '%' && out[k + 1] == '2' && out[k + 2] == '6' && out[k + 3] == 'q') {
 					break;
 				}
 
 				str1[i] = out[k];
-
-				i++;
-				k++;
 			}
 
 			str1[i] = '\0';
 
 			_UrlDecode(str1, str2);
 			_UrlDecode(str2, str1);
+
+			free(out);
 
 			CString str(str1);
 			return str;
