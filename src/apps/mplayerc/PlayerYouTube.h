@@ -89,15 +89,21 @@ static int _strpos(char* h, char* n)
 {
 	char* p = strstr(h, n);
 
-	return p - h;
+	if(p) {
+		return p - h;
+	} else {
+		return 0;
+	}
 }
 
 CString PlayerYouTube(CString fname)
 {
 	if (wcsstr(fname, L"youtube.com/watch?")) {
 
+		return _T(""); // TODO - disable playback from youtube unlike fix parser;
+
 		char *out, buf[4096], str1[1024], str2[1024];
-		DWORD len, size = 0, fs = sizeof(buf) * 10;
+		DWORD len, size = 0, fs = 10 * sizeof(buf);
 
 		HINTERNET f, s = InternetOpen(0, 0, 0, 0, 0);
 
@@ -128,8 +134,8 @@ CString PlayerYouTube(CString fname)
 				}
 
 				rewind(fp);
-				out = (char*)malloc(fs);
-				fread(out, fs, 1, fp);
+				out = (char*)malloc(size);
+				fread(out, size, 1, fp);
 				fclose(fp);
 
 				_wunlink(fn);
@@ -140,34 +146,43 @@ CString PlayerYouTube(CString fname)
 			InternetCloseHandle(s);
 		}
 
-		DWORD i = 0, k = _strpos(out, "%2Curl%3Dhttp%253A%252F%252F");
+		char *start		= out;
+		DWORD start_pos	= 0;
+		DWORD stop_pos	= 0;
 
-		if (k) {
+		for(;;) {
+			start_pos = _strpos(start, "url%3Dhttp%253A%252F%252F");
+			if (!start_pos) {
+				free(out);
+				return fname;
+			}
+			start += (start_pos + 6);
 
-			k += 9;
-
-			for (; i < sizeof(str1); i++, k++) {
-
-				if (out[k] == '%' && out[k + 1] == '2' && out[k + 2] == '6' && out[k + 3] == 'q') {
-					break;
-				}
-
-				str1[i] = out[k];
+			stop_pos = _strpos(start, "%26quality");
+			if (!stop_pos) {
+				free(out);
+				return fname;
 			}
 
-			str1[i] = '\0';
+			DWORD webm_pos = _strpos(start, "video%252Fwebm"); // skip webm video;
+			if (webm_pos && webm_pos < stop_pos) {
+				continue;
+			}
 
-			_UrlDecode(str1, str2);
-			_UrlDecode(str2, str1);
-
-			free(out);
-
-			CString str(str1);
-			return str;
-
-		} else {
-			return fname;
+			break;
 		}
+
+		memset(str1, 0, sizeof(str1));
+		memset(str2, 0, sizeof(str2));
+
+		memcpy(str1, start, stop_pos);
+
+		_UrlDecode(str1, str2);
+		_UrlDecode(str2, str1);
+
+		free(out);
+
+		return CString(str1);
 	} else {
 		return fname;
 	}

@@ -294,6 +294,7 @@
     <ClInclude Include="BaseGraph.h" />
     <ClInclude Include="ComPropertyPage.h" />
     <ClInclude Include="ComPropertySheet.h" />
+    <ClInclude Include="PlayerYouTube.h" />
     <ClInclude Include="PPageInterface.h" />
     <ClInclude Include="SaveTaskDlg.h" />
     <ClInclude Include="ShockwaveFlash.h" />
