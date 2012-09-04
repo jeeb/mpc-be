@@ -163,23 +163,12 @@ HRESULT CMpaSplitterFile::Init()
 
 		BYTE flags = (BYTE)BitRead(8);
 		UNREFERENCED_PARAMETER(flags);
-		DWORD size = 0;
-		if (BitRead(1) != 0) {
-			return E_FAIL;
-		}
-		size |= BitRead(7) << 21;
-		if (BitRead(1) != 0) {
-			return E_FAIL;
-		}
-		size |= BitRead(7) << 14;
-		if (BitRead(1) != 0) {
-			return E_FAIL;
-		}
-		size |= BitRead(7) << 7;
-		if (BitRead(1) != 0) {
-			return E_FAIL;
-		}
-		size |= BitRead(7);
+
+		DWORD size = BitRead(32);
+		size = (((size & 0x7F000000) >> 0x03) |
+				((size & 0x007F0000) >> 0x02) |
+				((size & 0x00007F00) >> 0x01) |
+				((size & 0x0000007F)		));
 
 		m_startpos = GetPos() + size;
 
@@ -207,8 +196,12 @@ HRESULT CMpaSplitterFile::Init()
 
 				pos += ((major == 2) ? 3+3 : 4+4+2) + size;
 
-				if (!size || pos > m_startpos) {
+				if (pos > m_startpos || tag == 0) {
 					break;
+				}
+
+				if (!size) {
+					continue;
 				}
 
 				if (tag == 'TIT2'
@@ -224,6 +217,7 @@ HRESULT CMpaSplitterFile::Init()
 
 					if (tag == 'APIC' || tag == '\0PIC') {
 						if (!m_Cover.GetCount()) {
+
 							TCHAR mime[64];
 							memset(&mime, 0 ,64);
 							BYTE encoding = (BYTE)BitRead(8);
