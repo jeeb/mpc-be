@@ -516,7 +516,7 @@ public:
 	void SetTrayTip(CString str);
 
 	CSize GetVideoSize();
-	void ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasTo);
+	void ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasTo, bool check = true);
 	void MoveVideoWindow(bool fShowStats = false);
 	void RepaintVideo();
 	void HideVideoWindow(bool fHide);
