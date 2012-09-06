@@ -89,7 +89,7 @@ static int _strpos(char* h, char* n)
 {
 	char* p = strstr(h, n);
 
-	if(p) {
+	if (p) {
 		return p - h;
 	} else {
 		return 0;
@@ -100,10 +100,8 @@ CString PlayerYouTube(CString fname)
 {
 	if (wcsstr(fname, L"youtube.com/watch?")) {
 
-		return _T(""); // TODO - disable playback from youtube unlike fix parser;
-
-		char *out, buf[4096], str1[1024], str2[1024];
-		DWORD len, size = 0, fs = 10 * sizeof(buf);
+		char *out, buf[4096];
+		DWORD len, size = 0, fs = 12 * sizeof(buf);
 
 		HINTERNET f, s = InternetOpen(0, 0, 0, 0, 0);
 
@@ -127,6 +125,8 @@ CString PlayerYouTube(CString fname)
 					size += len;
 
 					if (!len || size > fs) {
+
+						size -= len;
 						break;
 					}
 
@@ -146,43 +146,48 @@ CString PlayerYouTube(CString fname)
 			InternetCloseHandle(s);
 		}
 
-		char *start		= out;
-		DWORD start_pos	= 0;
-		DWORD stop_pos	= 0;
+		DWORD i = 0, k = _strpos(out, "%2Curl%3Dhttp%253A%252F%252F");
 
-		for(;;) {
-			start_pos = _strpos(start, "url%3Dhttp%253A%252F%252F");
-			if (!start_pos) {
-				free(out);
-				return fname;
-			}
-			start += (start_pos + 6);
+		if (k) {
 
-			stop_pos = _strpos(start, "%26quality");
-			if (!stop_pos) {
-				free(out);
-				return fname;
+			k += 9;
+
+			for (; i < sizeof(buf) / 4; i++, k++) {
+
+				if (out[k] == '%' && out[k + 1] == '2' && out[k + 2] == '6' && out[k + 3] == 'q') {
+					break;
+				}
 			}
 
-			DWORD webm_pos = _strpos(start, "video%252Fwebm"); // skip webm video;
-			if (webm_pos && webm_pos < stop_pos) {
-				continue;
-			}
+			k -= i;
 
-			break;
+			char *str1, *str2;
+
+			str1 = (char*)malloc(i);
+			str2 = (char*)malloc(i);
+
+			memset(str1, 0, i);
+			memset(str2, 0, i);
+
+			memcpy(str1, out + k, i);
+
+			_UrlDecode(str1, str2);
+			_UrlDecode(str2, str1);
+
+			CString str(str1);
+
+			free(str1);
+			free(str2);
+
+			free(out);
+
+			return str;
+
+		} else {
+			free(out);
+
+			return fname;
 		}
-
-		memset(str1, 0, sizeof(str1));
-		memset(str2, 0, sizeof(str2));
-
-		memcpy(str1, start, stop_pos);
-
-		_UrlDecode(str1, str2);
-		_UrlDecode(str2, str1);
-
-		free(out);
-
-		return CString(str1);
 	} else {
 		return fname;
 	}
