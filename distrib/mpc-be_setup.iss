@@ -39,7 +39,6 @@
   #error Use the Unicode Inno Setup
 #endif
 
-
 #define ISPP_INVOKED
 #include "..\include\Version.h"
 
@@ -48,7 +47,6 @@
 #define app_version    str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_STATUS) + "." + str(MPC_VERSION_PATCH)
 #define app_version_out    str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_STATUS) + "." + str(MPC_VERSION_PATCH)+ "." + str(MPC_VERSION_REV)
 #define quick_launch   "{userappdata}\Microsoft\Internet Explorer\Quick Launch"
-
 
 #ifdef x64Build
   #define bindir       = "..\bin\mpc-be_x64"
@@ -175,10 +173,10 @@ Name: desktopicon;              Description: {cm:CreateDesktopIcon};     GroupDe
 Name: desktopicon\user;         Description: {cm:tsk_CurrentUser};       GroupDescription: {cm:AdditionalIcons}; Flags: exclusive
 Name: desktopicon\common;       Description: {cm:tsk_AllUsers};          GroupDescription: {cm:AdditionalIcons}; Flags: unchecked exclusive
 Name: quicklaunchicon;          Description: {cm:CreateQuickLaunchIcon}; GroupDescription: {cm:AdditionalIcons}; Flags: unchecked;             OnlyBelowVersion: 0,6.01
+Name: pintotaskbar;             Description: {cm:PinToTaskBar};          GroupDescription: {cm:AdditionalIcons}; MinVersion: 0,6.01
 
 ;;ResetSettings
 Name: reset_settings;             Description: {cm:tsk_ResetSettings};     GroupDescription: {cm:tsk_Other};       Flags: checkedonce unchecked; Check: SettingsExistCheck()
-
 
 [Files]
 Source: "{#bindir}\{#mpcbe_exe}"; DestDir: "{app}"; Flags: ignoreversion; Components: main
@@ -236,6 +234,7 @@ Name: {#quick_launch}\{#app_name};               Filename: {app}\{#mpcbe_exe}; C
 Name: {group}\Changelog;                         Filename: {app}\Changelog.txt; Comment: {cm:ViewChangelog};                WorkingDir: {app}
 Name: {group}\{cm:ProgramOnTheWeb,{#app_name}};  Filename: https://sourceforge.net/p/mpcbe/
 Name: {group}\{cm:UninstallProgram,{#app_name}}; Filename: {uninstallexe};      Comment: {cm:UninstallProgram,{#app_name}}; WorkingDir: {app}
+Name: {group}\{#app_name};                       Filename: {app}\{#mpcbe_exe};  Comment: {#app_name};                       WorkingDir: {app}; BeforeInstall: PinToTaskbar(ExpandConstant('{app}\{#mpcbe_exe}'), True); MinVersion: 0,6.01; Tasks: pintotaskbar
 
 [Run]
 Filename: "{app}\{#mpcbe_exe}"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent unchecked; Description: "{cm:LaunchProgram,{#app_name}}"
@@ -268,8 +267,46 @@ function IsProcessorFeaturePresent(Feature: Integer): Boolean;
 external 'IsProcessorFeaturePresent@kernel32.dll stdcall';
 #endif
 
-const installer_mutex = 'mpcbe_setup_mutex';
+const
+  installer_mutex = 'mpcbe_setup_mutex';
+  LOAD_LIBRARY_AS_DATAFILE = 2;
 
+function LoadLibraryEx(lpFileName: String; hFile: THandle; dwFlags: DWORD): THandle; external 'LoadLibraryExW@kernel32.dll stdcall';
+function LoadString(hInstance: THandle; uID: SmallInt; var lpBuffer: Char; nBufferMax: Integer): Integer; external 'LoadStringW@user32.dll stdcall';
+
+// thank for code to "El Sanchez" from forum.oszone.net
+procedure PinToTaskbar(Filename: String; IsPin: Boolean);
+var
+	hInst: THandle;
+  buf: array [0..255] of char;
+  i, Res: Integer;
+  strVerb: String;
+  objShell, colVerbs: Variant;
+begin
+  if not FileExists(Filename) then Exit;
+  if IsPin then Res := 5386 else Res := 5387;
+  begin
+    hInst := LoadLibraryEx(ExpandConstant('{sys}\shell32.dll'), 0, LOAD_LIBRARY_AS_DATAFILE);
+    if hInst <> 0 then
+    try
+      for i := 0 to LoadString(hInst, Res, buf[0], 255)-1 do strVerb := strVerb + Buf[i];
+      try
+        objShell := CreateOleObject('Shell.Application');
+      except
+        ShowExceptionMessage;
+        Exit;
+      end;
+      colVerbs := objShell.Namespace(ExtractFileDir(Filename)).ParseName(ExtractFileName(Filename)).Verbs;
+      for i := colVerbs.Count downto 1 do if colVerbs.Item[i].Name = strVerb then
+      begin
+        colVerbs.Item[i].DoIt;
+        Break;
+      end;
+    finally
+      FreeDLL(hInst);
+    end;
+  end;
+end;
 
 function GetInstallFolder(Default: String): String;
 var
@@ -287,7 +324,6 @@ begin
   end;
 end;
 
-
 function D3DX9DLLExists(): Boolean;
 begin
   if FileExists(ExpandConstant('{sys}\D3DX9_{#DIRECTX_SDK_NUMBER}.dll')) then
@@ -295,7 +331,6 @@ begin
   else
     Result := False;
 end;
-
 
 #if defined(sse_required)
 function Is_SSE_Supported(): Boolean;
@@ -314,7 +349,6 @@ end;
 
 #endif
 
-
 function IsUpgrade(): Boolean;
 var
   sPrevPath: String;
@@ -322,7 +356,6 @@ begin
   sPrevPath := WizardForm.PrevAppDir;
   Result := (sPrevPath <> '');
 end;
-
 
 // Check if MPC-BE's settings exist
 function SettingsExistCheck(): Boolean;
@@ -334,14 +367,12 @@ begin
     Result := False;
 end;
 
-
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   // Hide the License page
   if IsUpgrade() and (PageID = wpLicense) then
     Result := True;
 end;
-
 
 procedure CleanUpSettingsAndFiles();
 begin
@@ -352,7 +383,6 @@ begin
   RegDeleteKeyIncludingSubkeys(HKCU, 'Software\MPC-BE');
   RegDeleteKeyIncludingSubkeys(HKLM, 'SOFTWARE\MPC-BE');
 end;
-
 
 procedure CurStepChanged(CurStep: TSetupStep);
 var
@@ -376,7 +406,6 @@ begin
 
 end;
 
-
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
   // When uninstalling, ask the user to delete MPC-BE settings
@@ -385,7 +414,6 @@ begin
       CleanUpSettingsAndFiles();
   end;
 end;
-
 
 function InitializeSetup(): Boolean;
 begin
@@ -412,7 +440,6 @@ begin
 
   end;
 end;
-
 
 function InitializeUninstall(): Boolean;
 begin
