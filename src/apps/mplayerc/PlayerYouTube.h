@@ -152,7 +152,7 @@ CString PlayerYouTube(CString fname)
 
 			k += 9;
 
-			for (; i < sizeof(buf) / 4; i++, k++) {
+			for (; i < sizeof(buf) / 2; i++, k++) {
 
 				if (out[k] == '%' && out[k + 1] == '2' && out[k + 2] == '6' && out[k + 3] == 'q') {
 					break;
