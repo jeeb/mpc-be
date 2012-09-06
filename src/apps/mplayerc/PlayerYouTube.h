@@ -111,13 +111,9 @@ CString PlayerYouTube(CString fname)
 
 			if (f) {
 
-				wchar_t path[_MAX_PATH], fn[_MAX_PATH];
+				out = (char*)malloc(fs);
 
-				GetTempPathW(_MAX_PATH, path);
-				GetTempFileNameW(path, _T("mpc_youtube"), 0, fn);
-
-				FILE* fp;
-				_wfopen_s(&fp, fn, _T("wt+"));
+				memset(out, 0, fs);
 
 				for (;;) {
 
@@ -125,20 +121,11 @@ CString PlayerYouTube(CString fname)
 					size += len;
 
 					if (!len || size > fs) {
-
-						size -= len;
 						break;
 					}
 
-					fwrite(buf, len, 1, fp);
+					memcpy(out + (size - len), buf, len);
 				}
-
-				rewind(fp);
-				out = (char*)malloc(size);
-				fread(out, size, 1, fp);
-				fclose(fp);
-
-				_wunlink(fn);
 
 				InternetCloseHandle(f);
 			}
@@ -159,8 +146,6 @@ CString PlayerYouTube(CString fname)
 				}
 			}
 
-			k -= i;
-
 			char *str1, *str2;
 
 			str1 = (char*)malloc(i);
@@ -169,7 +154,7 @@ CString PlayerYouTube(CString fname)
 			memset(str1, 0, i);
 			memset(str2, 0, i);
 
-			memcpy(str1, out + k, i);
+			memcpy(str1, out + (k - i), i);
 
 			_UrlDecode(str1, str2);
 			_UrlDecode(str2, str1);
