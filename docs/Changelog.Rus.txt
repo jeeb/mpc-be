@@ -293,13 +293,13 @@
 * Добавлены проектные файлы для построения плеера в VS2012;
 * zlib до версии 1.2.7
 * libpng 1.5.13 git-95ea04f
-* Little-CMS git-14e1777
+* Little-CMS git-eba3ad7
 * MediaInfoLib v0.7.60
 * ZenLib v0.4.28
 * SoundTouch svn rev.152
 * Logitech SDK v3.01
 * libwebp 0.2.0
-* ffmpeg git-50b0ede
+* ffmpeg git-bdfffa6
  ... и многое другое.
 
 Частично использованы фрагменты исходного кода из MPC-HC из следующих ревизий:

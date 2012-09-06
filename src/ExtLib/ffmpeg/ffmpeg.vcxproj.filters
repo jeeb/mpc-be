@@ -442,6 +442,9 @@
     <ClInclude Include="libavcodec\intrax8.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
+    <ClInclude Include="libavcodec\intrax8dsp.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
     <ClInclude Include="libavcodec\intrax8huf.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
@@ -772,6 +775,9 @@
     <ClInclude Include="libavcodec\wmaprodata.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
+    <ClInclude Include="libavcodec\wmavoice_data.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
     <ClInclude Include="libavcodec\wmv2.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
@@ -806,6 +812,9 @@
       <Filter>libavutil\x86</Filter>
     </ClInclude>
     <ClInclude Include="libavutil\x86\bswap.h">
+      <Filter>libavutil\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="libavutil\x86\cpu.h">
       <Filter>libavutil\x86</Filter>
     </ClInclude>
     <ClInclude Include="libavutil\x86\intmath.h">
@@ -963,9 +972,6 @@
     </ClInclude>
     <ClInclude Include="libswscale\version.h">
       <Filter>libswscale</Filter>
-    </ClInclude>
-    <ClInclude Include="libavcodec\wmavoice_data.h">
-      <Filter>libavcodec</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1776,6 +1782,9 @@
     <ClCompile Include="libavcodec\wmaprodec.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
+    <ClCompile Include="libavcodec\wmavoice.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
     <ClCompile Include="libavcodec\wmv2.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
@@ -1952,9 +1961,6 @@
     </ClCompile>
     <ClCompile Include="libswscale\yuv2rgb.c">
       <Filter>libswscale</Filter>
-    </ClCompile>
-    <ClCompile Include="libavcodec\wmavoice.c">
-      <Filter>libavcodec</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
