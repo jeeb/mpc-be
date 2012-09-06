@@ -137,7 +137,7 @@ IF /I "%CONFIG%" == "All" (
 :x64
 IF /I "%PLATFORM%" == "Win32" GOTO End
 
-CALL "%VS100COMNTOOLS%..\..\VC\vcvarsall.bat" %x64_type%
+CALL "%VS110COMNTOOLS%..\..\VC\vcvarsall.bat" %x64_type%
 
 IF /I "%CONFIG%" == "Filters" (
   CALL :SubFilters x64
