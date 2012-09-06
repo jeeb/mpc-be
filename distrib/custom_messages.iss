@@ -166,6 +166,7 @@ en.AssociationMPCPlayMusicFilesF=Play Music
 en.AssociationMPCPlayMusicFilesS=Music Files
 en.AssociationMPCPlayVideoFilesF=Play Video
 en.AssociationMPCPlayVideoFilesS=Video Files
+en.PinToTaskBar=Pin to TaskBar
 
 
 #ifdef localize
@@ -204,6 +205,7 @@ br.AssociationMPCPlayMusicFilesF=Play Music
 br.AssociationMPCPlayMusicFilesS=Music Files
 br.AssociationMPCPlayVideoFilesF=Play Video
 br.AssociationMPCPlayVideoFilesS=Video Files
+br.PinToTaskBar=Pin to TaskBar
 
 
 ;Belarusian
@@ -240,6 +242,7 @@ by.AssociationMPCPlayMusicFilesF=Play Music
 by.AssociationMPCPlayMusicFilesS=Music Files
 by.AssociationMPCPlayVideoFilesF=Play Video
 by.AssociationMPCPlayVideoFilesS=Video Files
+by.PinToTaskBar=Pin to TaskBar
 
 
 ;Basque
@@ -261,20 +264,21 @@ eu.tsk_ResetSettings=Berrezarri ezarpenak
 eu.types_DefaultInstallation=Berezko ezarpena
 eu.types_CustomInstallation=Norbere ezarpena
 eu.ViewChangelog=Ikusi Aldaketa-oharra
-by.AssociationFormatsAV=Configuring associations with video and audio files:
-by.AssociationFormats=Association with video and audio files
-by.AssociationVideo=Association with video files
-by.AssociationAudio=Association with audio files
-by.AssociationPlaylist=Association with playlists
-by.AutoPlayType=Auto play:
-by.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
-by.AssociationMPCPlayCDAudioS=Audio CD
-by.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
-by.AssociationMPCPlayDVDMovieS=DVD Movie
-by.AssociationMPCPlayMusicFilesF=Play Music
-by.AssociationMPCPlayMusicFilesS=Music Files
-by.AssociationMPCPlayVideoFilesF=Play Video
-by.AssociationMPCPlayVideoFilesS=Video Files
+eu.AssociationFormatsAV=Configuring associations with video and audio files:
+eu.AssociationFormats=Association with video and audio files
+eu.AssociationVideo=Association with video files
+eu.AssociationAudio=Association with audio files
+eu.AssociationPlaylist=Association with playlists
+eu.AutoPlayType=Auto play:
+eu.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+eu.AssociationMPCPlayCDAudioS=Audio CD
+eu.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+eu.AssociationMPCPlayDVDMovieS=DVD Movie
+eu.AssociationMPCPlayMusicFilesF=Play Music
+eu.AssociationMPCPlayMusicFilesS=Music Files
+eu.AssociationMPCPlayVideoFilesF=Play Video
+eu.AssociationMPCPlayVideoFilesS=Video Files
+eu.PinToTaskBar=Pin to TaskBar
 
 
 ;Catalan
@@ -311,6 +315,7 @@ ca.AssociationMPCPlayMusicFilesF=Play Music
 ca.AssociationMPCPlayMusicFilesS=Music Files
 ca.AssociationMPCPlayVideoFilesF=Play Video
 ca.AssociationMPCPlayVideoFilesS=Video Files
+ca.PinToTaskBar=Pin to TaskBar
 
 
 ;Czech
@@ -347,6 +352,7 @@ cz.AssociationMPCPlayMusicFilesF=Play Music
 cz.AssociationMPCPlayMusicFilesS=Music Files
 cz.AssociationMPCPlayVideoFilesF=Play Video
 cz.AssociationMPCPlayVideoFilesS=Video Files
+cz.PinToTaskBar=Pin to TaskBar
 
 
 ;German
@@ -383,6 +389,7 @@ de.AssociationMPCPlayMusicFilesF=Play Music
 de.AssociationMPCPlayMusicFilesS=Music Files
 de.AssociationMPCPlayVideoFilesF=Play Video
 de.AssociationMPCPlayVideoFilesS=Video Files
+de.PinToTaskBar=Pin to TaskBar
 
 
 ;Spanish
@@ -419,6 +426,7 @@ es.AssociationMPCPlayMusicFilesF=Play Music
 es.AssociationMPCPlayMusicFilesS=Music Files
 es.AssociationMPCPlayVideoFilesF=Play Video
 es.AssociationMPCPlayVideoFilesS=Video Files
+es.PinToTaskBar=Pin to TaskBar
 
 
 ;French
@@ -455,6 +463,7 @@ fr.AssociationMPCPlayMusicFilesF=Play Music
 fr.AssociationMPCPlayMusicFilesS=Music Files
 fr.AssociationMPCPlayVideoFilesF=Play Video
 fr.AssociationMPCPlayVideoFilesS=Video Files
+fr.PinToTaskBar=Pin to TaskBar
 
 
 ;Hebrew
@@ -491,6 +500,7 @@ he.AssociationMPCPlayMusicFilesF=Play Music
 he.AssociationMPCPlayMusicFilesS=Music Files
 he.AssociationMPCPlayVideoFilesF=Play Video
 he.AssociationMPCPlayVideoFilesS=Video Files
+he.PinToTaskBar=Pin to TaskBar
 
 
 ;Hungarian
@@ -527,6 +537,7 @@ hu.AssociationMPCPlayMusicFilesF=Play Music
 hu.AssociationMPCPlayMusicFilesS=Music Files
 hu.AssociationMPCPlayVideoFilesF=Play Video
 hu.AssociationMPCPlayVideoFilesS=Video Files
+hu.PinToTaskBar=Pin to TaskBar
 
 
 ;Armenian
@@ -563,6 +574,7 @@ hy.AssociationMPCPlayMusicFilesF=Play Music
 hy.AssociationMPCPlayMusicFilesS=Music Files
 hy.AssociationMPCPlayVideoFilesF=Play Video
 hy.AssociationMPCPlayVideoFilesS=Video Files
+hy.PinToTaskBar=Pin to TaskBar
 
 
 ;Italian
@@ -594,6 +606,7 @@ it.AssociationMPCPlayMusicFilesF=Play Music
 it.AssociationMPCPlayMusicFilesS=Music Files
 it.AssociationMPCPlayVideoFilesF=Play Video
 it.AssociationMPCPlayVideoFilesS=Video Files
+it.PinToTaskBar=Pin to TaskBar
 
 
 ;Japanese
@@ -630,6 +643,7 @@ ja.AssociationMPCPlayMusicFilesF=Play Music
 ja.AssociationMPCPlayMusicFilesS=Music Files
 ja.AssociationMPCPlayVideoFilesF=Play Video
 ja.AssociationMPCPlayVideoFilesS=Video Files
+ja.PinToTaskBar=Pin to TaskBar
 
 
 ;Korean
@@ -666,6 +680,7 @@ kr.AssociationMPCPlayMusicFilesF=음악 재생
 kr.AssociationMPCPlayMusicFilesS=음악 파일
 kr.AssociationMPCPlayVideoFilesF=비디오 재생
 kr.AssociationMPCPlayVideoFilesS=비디오 파일
+kr.PinToTaskBar=Pin to TaskBar
 
 
 
@@ -703,6 +718,7 @@ nl.AssociationMPCPlayMusicFilesF=Play Music
 nl.AssociationMPCPlayMusicFilesS=Music Files
 nl.AssociationMPCPlayVideoFilesF=Play Video
 nl.AssociationMPCPlayVideoFilesS=Video Files
+nl.PinToTaskBar=Pin to TaskBar
 
 
 ;Polish
@@ -739,6 +755,7 @@ pl.AssociationMPCPlayMusicFilesF=Play Music
 pl.AssociationMPCPlayMusicFilesS=Music Files
 pl.AssociationMPCPlayVideoFilesF=Play Video
 pl.AssociationMPCPlayVideoFilesS=Video Files
+pl.PinToTaskBar=Pin to TaskBar
 
 
 ;Russian
@@ -775,6 +792,7 @@ ru.AssociationMPCPlayMusicFilesF=Воспроизведение музыки
 ru.AssociationMPCPlayMusicFilesS=Музыкальные файлы
 ru.AssociationMPCPlayVideoFilesF=Воспроизведение видео
 ru.AssociationMPCPlayVideoFilesS=Видео файлы
+ru.PinToTaskBar=Закрепить в панели задач
 
 
 
@@ -812,6 +830,7 @@ sc.AssociationMPCPlayMusicFilesF=Play Music
 sc.AssociationMPCPlayMusicFilesS=Music Files
 sc.AssociationMPCPlayVideoFilesF=Play Video
 sc.AssociationMPCPlayVideoFilesS=Video Files
+sc.PinToTaskBar=Pin to TaskBar
 
 
 ;Swedish
@@ -848,6 +867,7 @@ sv.AssociationMPCPlayMusicFilesF=Play Music
 sv.AssociationMPCPlayMusicFilesS=Music Files
 sv.AssociationMPCPlayVideoFilesF=Play Video
 sv.AssociationMPCPlayVideoFilesS=Video Files
+sv.PinToTaskBar=Pin to TaskBar
 
 
 ;Slovakian
@@ -884,6 +904,7 @@ sk.AssociationMPCPlayMusicFilesF=Play Music
 sk.AssociationMPCPlayMusicFilesS=Music Files
 sk.AssociationMPCPlayVideoFilesF=Play Video
 sk.AssociationMPCPlayVideoFilesS=Video Files
+sk.PinToTaskBar=Pin to TaskBar
 
 
 ;Chinese Traditional
@@ -920,6 +941,7 @@ tc.AssociationMPCPlayMusicFilesF=Play Music
 tc.AssociationMPCPlayMusicFilesS=Music Files
 tc.AssociationMPCPlayVideoFilesF=Play Video
 tc.AssociationMPCPlayVideoFilesS=Video Files
+tc.PinToTaskBar=Pin to TaskBar
 
 
 ;Turkish
@@ -956,6 +978,7 @@ tr.AssociationMPCPlayMusicFilesF=Play Music
 tr.AssociationMPCPlayMusicFilesS=Music Files
 tr.AssociationMPCPlayVideoFilesF=Play Video
 tr.AssociationMPCPlayVideoFilesS=Video Files
+tr.PinToTaskBar=Pin to TaskBar
 
 
 ;Ukrainian
@@ -992,5 +1015,6 @@ ua.AssociationMPCPlayMusicFilesF=Play Music
 ua.AssociationMPCPlayMusicFilesS=Music Files
 ua.AssociationMPCPlayVideoFilesF=Play Video
 ua.AssociationMPCPlayVideoFilesS=Video Files
+ua.PinToTaskBar=Pin to TaskBar
 
 #endif
