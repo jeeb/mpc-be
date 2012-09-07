@@ -135,6 +135,10 @@ CString PlayerYouTube(CString fname)
 
 		DWORD i = 0, k = _strpos(out, "%2Curl%3Dhttp%253A%252F%252F");
 
+		if (!k) {
+			k = _strpos(out, "%26url%3Dhttp%253A%252F%252F");
+		}
+
 		if (k) {
 
 			k += 9;
