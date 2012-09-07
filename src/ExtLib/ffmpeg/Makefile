@@ -25,20 +25,20 @@ TARGET_LIB     = $(TARGET_LIB_DIR)/ffmpeg.lib
 CFLAGS    = -I. -I.. -Ilibavcodec -Ilibavutil -I$(ZLIB_DIR) \
             -DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_XOPEN_SOURCE=600 \
             -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 \
-            -std=gnu99 -mthreads -pipe
-OPTFLAGS  = -O2 -fno-common -fomit-frame-pointer -ffast-math
+            -O2 -ffast-math -fomit-frame-pointer \
+            -std=gnu99 -fno-common
 YASMFLAGS = -I. -Ilibavutil/x86 -Pconfig.asm
 
 ifeq ($(64BIT),yes)
     FFMPEG_PREFIX = x86_64-w64-mingw32-
     TARGET_OS     = x86_64-w64-mingw32
     CFLAGS       += -DWIN64 -D_WIN64 -DARCH_X86_64 -DPIC
-    OPTFLAGS     += -m64 -fno-leading-underscore -mno-sse -msse2
+    OPTFLAGS      = -m64 -fno-leading-underscore -mno-sse -msse2
     YASMFLAGS    += -f win32 -m amd64 -DWIN64=1 -DARCH_X86_32=0 -DARCH_X86_64=1 -DPIC
 else
     TARGET_OS     = i686-w64-mingw32
     CFLAGS       += -DWIN32 -D_WIN32 -DARCH_X86_32
-    OPTFLAGS     += -m32 -march=i686 -mmmx -msse
+    OPTFLAGS      = -m32 -march=i686 -msse -mfpmath=sse
     YASMFLAGS    += -f win32 -m x86 -DWIN32=1 -DARCH_X86_32=1 -DARCH_X86_64=0 -DPREFIX
 endif
 
@@ -76,7 +76,7 @@ clean:
 
 
 # Objects
-SRCS_C=\
+SRCS_C = \
     libavcodec/aac_ac3_parser.c \
     libavcodec/aac_parser.c \
     libavcodec/aacadtsdec.c \
@@ -387,7 +387,7 @@ SRCS_C=\
 
 
 # Yasm objects
-SRCS_YASM=\
+SRCS_YASM = \
     libavcodec/x86/ac3dsp.asm \
     libavcodec/x86/dct32.asm \
     libavcodec/x86/deinterlace.asm \
