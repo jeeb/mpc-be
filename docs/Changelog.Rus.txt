@@ -299,7 +299,7 @@
 * SoundTouch svn rev.152
 * Logitech SDK v3.01
 * libwebp 0.2.0
-* ffmpeg git-bdfffa6
+* ffmpeg git-a33b4bc
  ... и многое другое.
 
 Частично использованы фрагменты исходного кода из MPC-HC из следующих ревизий:

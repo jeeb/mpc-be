@@ -268,6 +268,7 @@
 %define CONFIG_DCT 1
 %define CONFIG_DWT 0
 %define CONFIG_GPL 1
+%define CONFIG_GPLV3 1
 %define CONFIG_GRAY 1
 %define CONFIG_H264CHROMA 1
 %define CONFIG_H264DSP 1
