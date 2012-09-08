@@ -128,13 +128,17 @@ CString PlayerYouTube(CString fname)
 				}
 
 				InternetCloseHandle(f);
+			} else {
+				InternetCloseHandle(s);
+				return fname;
 			}
 
 			InternetCloseHandle(s);
+		} else {
+			return fname;
 		}
 
-		DWORD i = 0, k = _strpos(out, "%2Curl%3Dhttp%253A%252F%252F");
-
+		DWORD k = _strpos(out, "%2Curl%3Dhttp%253A%252F%252F");
 		if (!k) {
 			k = _strpos(out, "%26url%3Dhttp%253A%252F%252F");
 		}
@@ -142,12 +146,11 @@ CString PlayerYouTube(CString fname)
 		if (k) {
 
 			k += 9;
+			DWORD i = _strpos(out + k, "%26quality");
+			if (!i) {
+				free(out);
 
-			for (; i < sizeof(buf) / 2; i++, k++) {
-
-				if (out[k] == '%' && out[k + 1] == '2' && out[k + 2] == '6' && out[k + 3] == 'q') {
-					break;
-				}
+				return fname;
 			}
 
 			char *str1, *str2;
@@ -158,7 +161,7 @@ CString PlayerYouTube(CString fname)
 			memset(str1, 0, i);
 			memset(str2, 0, i);
 
-			memcpy(str1, out + (k - i), i);
+			memcpy(str1, out + k, i);
 
 			_UrlDecode(str1, str2);
 			_UrlDecode(str2, str1);
