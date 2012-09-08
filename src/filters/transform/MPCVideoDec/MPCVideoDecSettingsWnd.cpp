@@ -508,14 +508,17 @@ bool CMPCVideoDecCodecWnd::OnActivate()
 	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_WMV3_DXVA) != 0);
 
 
-	m_lstCodecs.AddString (_T("Bink video"));
-	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_BINKV) != 0);
-
 	m_lstCodecs.AddString (_T("AMV video"));
 	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_AMVV) != 0);
 
 	m_lstCodecs.AddString (_T("Apple ProRes"));
 	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_PRORES) != 0);
+
+	m_lstCodecs.AddString (_T("Bink video"));
+	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_BINKV) != 0);
+
+	m_lstCodecs.AddString (_T("Canopus Lossless"));
+	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_CLLC) != 0);
 
 	m_lstCodecs.AddString (_T("Dirac"));
 	m_lstCodecs.SetCheck  (nPos++, (nActiveCodecs & MPCVD_DIRAC) != 0);
@@ -619,7 +622,7 @@ bool CMPCVideoDecCodecWnd::OnApply()
 			nActiveCodecs |= MPCVD_BINKV;
 		}
 		if (m_lstCodecs.GetCheck  (nPos++)) {
-			nActiveCodecs |= MPCVD_PRORES;
+			nActiveCodecs |= MPCVD_CLLC;
 		}
 		if (m_lstCodecs.GetCheck  (nPos++)) {
 			nActiveCodecs |= MPCVD_DIRAC;
@@ -653,6 +656,9 @@ bool CMPCVideoDecCodecWnd::OnApply()
 		}
 		if (m_lstCodecs.GetCheck  (nPos++)) {
 			nActiveCodecs |= MPCVD_PNG;
+		}
+		if (m_lstCodecs.GetCheck  (nPos++)) {
+			nActiveCodecs |= MPCVD_PRORES;
 		}
 		if (m_lstCodecs.GetCheck  (nPos++)) {
 			nActiveCodecs |= MPCVD_SCREC;

@@ -20,6 +20,7 @@
 + Декодер QDM2;
 + Декодер UtVideo (RGB, RGBA, 4:2:0, 4:2:2);
 + Декодер WavPack 4;
++ Декодер Canopus Lossless video;
 + Декодер Dirac;
 + Декодер Lagarith lossless video;
 + Декодер APE(Monkey's Audio);

@@ -332,6 +332,9 @@ FFMPEG_CODECS		ffCodecs[] = {
 	// PNG
 	{ &MEDIASUBTYPE_PNG, AV_CODEC_ID_PNG, NULL },
 
+	// Canopus Lossless
+	{ &MEDIASUBTYPE_CLLC, AV_CODEC_ID_CLLC, NULL },
+
 	// Other MPEG-4
 	{ &MEDIASUBTYPE_MP4V, AV_CODEC_ID_MPEG4, NULL },
 	{ &MEDIASUBTYPE_mp4v, AV_CODEC_ID_MPEG4, NULL },
@@ -593,6 +596,9 @@ const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesIn[] = {
 	// PNG
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_PNG },
 
+	// Canopus Lossless
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_CLLC },
+
 	// IMPORTANT : some of the last MediaTypes present in next group may be not available in
 	// the standalone filter (workaround to prevent GraphEdit crash).
 	// Other MPEG-4
@@ -697,7 +703,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_nCodecId				= AV_CODEC_ID_NONE;
 	m_bReorderBFrame		= true;
 	m_DXVADecoderGUID		= GUID_NULL;
-	m_nActiveCodecs			= MPCVD_H264|MPCVD_VC1|MPCVD_XVID|MPCVD_DIVX|MPCVD_MSMPEG4|MPCVD_FLASH|MPCVD_WMV|MPCVD_H263|MPCVD_SVQ3|MPCVD_AMVV|MPCVD_THEORA|MPCVD_H264_DXVA|MPCVD_VC1_DXVA|MPCVD_VP356|MPCVD_VP8|MPCVD_MJPEG|MPCVD_INDEO|MPCVD_RV|MPCVD_WMV3_DXVA|MPCVD_MPEG2_DXVA|MPCVD_DIRAC|MPCVD_DV|MPCVD_UTVD|MPCVD_SCREC|MPCVD_LAGARITH|MPCVD_PRORES|MPCVD_BINKV|MPCVD_PNG;
+	m_nActiveCodecs			= MPCVD_H264|MPCVD_VC1|MPCVD_XVID|MPCVD_DIVX|MPCVD_MSMPEG4|MPCVD_FLASH|MPCVD_WMV|MPCVD_H263|MPCVD_SVQ3|MPCVD_AMVV|MPCVD_THEORA|MPCVD_H264_DXVA|MPCVD_VC1_DXVA|MPCVD_VP356|MPCVD_VP8|MPCVD_MJPEG|MPCVD_INDEO|MPCVD_RV|MPCVD_WMV3_DXVA|MPCVD_MPEG2_DXVA|MPCVD_DIRAC|MPCVD_DV|MPCVD_UTVD|MPCVD_SCREC|MPCVD_LAGARITH|MPCVD_PRORES|MPCVD_BINKV|MPCVD_PNG|MPCVD_CLLC;
 
 	m_rtAvrTimePerFrame		= 0;
 	m_rtLastStart			= 0;
@@ -1095,6 +1101,9 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn)
 					break;
 				case AV_CODEC_ID_PNG :
 					bCodecActivated = (m_nActiveCodecs & MPCVD_PNG) != 0;
+					break;
+				case AV_CODEC_ID_CLLC :
+					bCodecActivated = (m_nActiveCodecs & MPCVD_CLLC) != 0;
 					break;
 			}
 			return (bCodecActivated ? i : -1);

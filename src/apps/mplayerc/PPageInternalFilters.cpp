@@ -92,7 +92,8 @@ static filter_t s_filters[] = {
 	// Video Decoder
 	{_T("AMV Video"),             FFMPEG_DECODER, VIDEO,  FFM_AMVV,       IDS_TRA_FFMPEG},
 	{_T("Apple ProRes"),          FFMPEG_DECODER, VIDEO,  FFM_PRORES,     IDS_TRA_FFMPEG},
-	{_T("Bink Video"),                  FFMPEG_DECODER, VIDEO,  FFM_BINKV,      IDS_TRA_FFMPEG},
+	{_T("Bink Video"),            FFMPEG_DECODER, VIDEO,  FFM_BINKV,      IDS_TRA_FFMPEG},
+	{_T("Canopus Lossless"),      FFMPEG_DECODER, VIDEO,  FFM_CLLC,       IDS_TRA_FFMPEG},
 	{_T("Dirac"),                 FFMPEG_DECODER, VIDEO,  FFM_DIRAC,      IDS_TRA_FFMPEG},
 	{_T("DivX"),                  FFMPEG_DECODER, VIDEO,  FFM_DIVX,       IDS_TRA_FFMPEG},
 	{_T("DV Video"),              FFMPEG_DECODER, VIDEO,  FFM_DV,         IDS_TRA_FFMPEG},
