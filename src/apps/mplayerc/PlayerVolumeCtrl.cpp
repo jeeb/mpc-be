@@ -130,7 +130,13 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					GetClientRect(&r);
 					CDC memdc;
 
-					int height = 28;
+					HBITMAP hBmp = m_logobm.LoadExternalImage("toolbar", -1, -1, -1, -1);
+					DIBSECTION dib;
+					::GetObject(hBmp, sizeof(dib), &dib);
+					DeleteObject(hBmp);
+
+					int m_nBMedian = dib.dsBmih.biHeight - 3 - 0.5 * dib.dsBmih.biHeight - 8;
+					int height = r.Height() + m_nBMedian + 4;
 
 					int fp = m_logobm.FileExists("background");
 
@@ -141,7 +147,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						ThemeRGB(50, 55, 60, R, G, B);
 						ThemeRGB(20, 25, 30, R2, G2, B2);
 						TRIVERTEX tv[2] = {
-							{r.left, r.top, R*256, G*256, B*256, 255*256},
+							{r.left, r.top - m_nBMedian, R*256, G*256, B*256, 255*256},
 							{r.Width(), height, R2*256, G2*256, B2*256, 255*256},
 						};
 						dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
@@ -153,14 +159,14 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						m_bmUnderCtrl.DeleteObject();
 					}
 
-					m_bmUnderCtrl.CreateCompatibleBitmap(&dc, r.Width(), height);
+					m_bmUnderCtrl.CreateCompatibleBitmap(&dc, r.Width(), r.Height());
 					CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
 
 					if (iDisableXPToolbars == 1) {
 						iDisableXPToolbars++;
 					}
 
-					memdc.BitBlt(r.left, r.top, r.Width(), height, &dc, r.left, r.top, SRCCOPY);
+					memdc.BitBlt(r.left, r.top, r.Width(), r.Height(), &dc, r.left, r.top, SRCCOPY);
 
 					dc.Detach();
 					DeleteObject(memdc.SelectObject(bmOld));
