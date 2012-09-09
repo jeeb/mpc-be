@@ -1,6 +1,6 @@
 //	VirtualDub - Video processing and capture application
 //	System library component
-//	Copyright (C) 1998-2007 Avery Lee, All Rights Reserved.
+//	Copyright (C) 1998-2004 Avery Lee, All Rights Reserved.
 //
 //	Beginning with 1.6.0, the VirtualDub system library is licensed
 //	differently than the remainder of VirtualDub.  This particular file is
@@ -23,20 +23,28 @@
 //	3.	This notice may not be removed or altered from any source
 //		distribution.
 
-#define VDTEXTERN
+#ifndef f_VD2_SYSTEM_VDSTDC_H
+#define f_VD2_SYSTEM_VDSTDC_H
 
+#ifdef _MSC_VER
+	#pragma once
+#endif
+
+#include <stdarg.h>
+#include <stdlib.h>
 #include <vd2/system/vdtypes.h>
-#include <vd2/system/vdstl.h>
 
-template class vdspan<char>;
-template class vdspan<uint8>;
-template class vdspan<uint16>;
-template class vdspan<uint32>;
-template class vdspan<uint64>;
-template class vdspan<sint8>;
-template class vdspan<sint16>;
-template class vdspan<sint32>;
-template class vdspan<sint64>;
-template class vdspan<float>;
-template class vdspan<double>;
-template class vdspan<wchar_t>;
+#define vdvsnprintf _vsnprintf
+
+#ifdef VD_COMPILER_GCC_MINGW
+	// MinGW doesn't define the correct standard version of (v)swprintf with
+	// a length parameter, even though VC++ has already been fixed. Fortunately,
+	// it does have non-standardly named versions we can map to.
+	#define vdvswprintf _vsnwprintf
+	#define vdswprintf _snwprintf
+#else
+	#define vdvswprintf vswprintf
+	#define vdswprintf swprintf
+#endif
+
+#endif

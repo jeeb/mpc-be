@@ -1,6 +1,6 @@
 //	VirtualDub - Video processing and capture application
 //	System library component
-//	Copyright (C) 1998-2007 Avery Lee, All Rights Reserved.
+//	Copyright (C) 1998-2004 Avery Lee, All Rights Reserved.
 //
 //	Beginning with 1.6.0, the VirtualDub system library is licensed
 //	differently than the remainder of VirtualDub.  This particular file is
@@ -23,20 +23,32 @@
 //	3.	This notice may not be removed or altered from any source
 //		distribution.
 
-#define VDTEXTERN
+#ifndef f_VD2_SYSTEM_SEH_H
+#define f_VD2_SYSTEM_SEH_H
 
 #include <vd2/system/vdtypes.h>
-#include <vd2/system/vdstl.h>
 
-template class vdspan<char>;
-template class vdspan<uint8>;
-template class vdspan<uint16>;
-template class vdspan<uint32>;
-template class vdspan<uint64>;
-template class vdspan<sint8>;
-template class vdspan<sint16>;
-template class vdspan<sint32>;
-template class vdspan<sint64>;
-template class vdspan<float>;
-template class vdspan<double>;
-template class vdspan<wchar_t>;
+//////////////////////////////////////////////////////////////////////////////
+// Structured Exception Handling (SEH) macros.
+//
+// These are used for memory access operations that may be possibly invalid
+// and must be guarded. This is currently only supported on Win32/Win64
+// platforms with the VC++ compiler, since GCC does not currently support SEH.
+//
+// For cases where a memcpy() is the guarded operation, the VDMemcpyGuarded()
+// function should be used instead.
+//
+//////////////////////////////////////////////////////////////////////////////
+
+#if defined(VD_COMPILER_MSVC) && defined(_WIN32)
+	#include <excpt.h>
+
+	#define vd_seh_guard_try		__try
+	#define vd_seh_guard_except		__except(GetExceptionCode() == STATUS_ACCESS_VIOLATION ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
+#else
+	#define vd_seh_guard_try		if (true)
+	#define vd_seh_guard_except		else
+#endif
+
+#endif
+
