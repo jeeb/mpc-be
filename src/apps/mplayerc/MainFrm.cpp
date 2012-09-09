@@ -12457,9 +12457,9 @@ int CMainFrame::GetSubSelIdx()
 			int rating	= 0;
 
 			if (extsubpri && subarray[i].Extsub)	return i;
-			if (subarray[i].forced == 1)	rating += 4;
-			if (subarray[i].def == 1)	rating += 2;
-			if (i==0)	rating += 1;
+			if (subarray[i].forced == 1)			rating += 4;
+			if (subarray[i].def == 1)				rating += 2;
+			if (i==0)								rating += 1;
 
 			if (rating > maxrating) {
 				maxrating	= rating;
@@ -12468,8 +12468,34 @@ int CMainFrame::GetSubSelIdx()
 		}
 	}
 
-	while (tPos != -1) {
+	if (extsubpri && (tPos != -1)) {
+		// try external sub ...
+		while (tPos != -1) {
+			for (int i = 0, j = cnt; i < j; i++) {
+				if (!subarray[i].Extsub) {
+					continue;
+				}
 
+				int ll = langN.GetLength();
+
+				if (subarray[i].lang.Left(ll).CompareNoCase(langN) == 0) {
+					return i;
+				}
+			}
+
+			langN = slo.Tokenize(_T(",; "), tPos);
+		}
+
+		for (int i = 0, j = cnt; i < j; i++) {
+			if (subarray[i].Extsub) {
+				return i;
+			}
+		}
+	}
+
+	tPos = 0;
+	langN = slo.Tokenize(_T(",; "), tPos);
+	while (tPos != -1) {
 		for (int i = 0, j = cnt; i < j; i++) {
 
 			int rating	= 0;
@@ -12485,9 +12511,9 @@ int CMainFrame::GetSubSelIdx()
 			}
 
 			if (extsubpri && rating == 8 && subarray[i].Extsub)	rating += 16;
-			if (subarray[i].forced == 1)	rating += 4;
-			if (subarray[i].def == 1)	rating += 2;
-			if (i==0)	rating += 1;
+			if (subarray[i].forced == 1)						rating += 4;
+			if (subarray[i].def == 1)							rating += 2;
+			if (i==0)											rating += 1;
 
 			if (rating > maxrating) {
 				maxrating	= rating;
@@ -12500,7 +12526,6 @@ int CMainFrame::GetSubSelIdx()
 		} 
 
 		langN = slo.Tokenize(_T(",; "), tPos);
-
 	}
 
 	return selsub;
