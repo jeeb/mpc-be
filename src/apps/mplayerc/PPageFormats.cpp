@@ -224,7 +224,7 @@ int FileExists(const TCHAR *fileName)
 	return true;
 }
 
-typedef int (*GetIconIndexFunc)(CString);
+typedef int (*GetIconIndexFunc)(LPCTSTR);
 int GetIconIndex(CString ext)
 {
 	int iconindex = -1;
@@ -233,7 +233,7 @@ int GetIconIndex(CString ext)
 	if (mpciconlib) {
 		_getIconIndexFunc = (GetIconIndexFunc) GetProcAddress(mpciconlib, "get_icon_index");
 		if (_getIconIndexFunc) {
-			iconindex = _getIconIndexFunc(ext);
+			iconindex = _getIconIndexFunc((LPCTSTR)ext);
 		}
 		FreeLibrary(mpciconlib);
 	}
