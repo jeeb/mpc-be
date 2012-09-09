@@ -1,19 +1,32 @@
 /* alloc - Convenience routines for safely allocating memory
  * Copyright (C) 2007,2008,2009  Josh Coalson
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * - Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * - Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *
+ * - Neither the name of the Xiph.org Foundation nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #ifndef FLAC__SHARE__ALLOC_H
@@ -36,7 +49,7 @@
 #ifndef SIZE_MAX
 # ifndef SIZE_T_MAX
 #  ifdef _MSC_VER
-#   define SIZE_T_MAX UINT_MAX
+#   define SIZE_T_MAX UINT_MAX /* What happens on 64 bit windows? */
 #  else
 #   error
 #  endif
@@ -47,7 +60,9 @@
 /* avoid malloc()ing 0 bytes, see:
  * https://www.securecoding.cert.org/confluence/display/seccode/MEM04-A.+Do+not+make+assumptions+about+the+result+of+allocating+0+bytes?focusedCommentId=5407003
 */
+// ==> Start patch MPC
 static void *safe_malloc_(size_t size)
+// ==> End patch MPC
 {
 	/* malloc(0) is undefined; FLAC src convention is to always allocate */
 	if(!size)
@@ -55,7 +70,9 @@ static void *safe_malloc_(size_t size)
 	return malloc(size);
 }
 
+// ==> Start patch MPC
 static void *safe_calloc_(size_t nmemb, size_t size)
+// ==> End patch MPC
 {
 	if(!nmemb || !size)
 		return malloc(1); /* malloc(0) is undefined; FLAC src convention is to always allocate */
@@ -64,7 +81,9 @@ static void *safe_calloc_(size_t nmemb, size_t size)
 
 /*@@@@ there's probably a better way to prevent overflows when allocating untrusted sums but this works for now */
 
+// ==> Start patch MPC
 static void *safe_malloc_add_2op_(size_t size1, size_t size2)
+// ==> End patch MPC
 {
 	size2 += size1;
 	if(size2 < size1)
@@ -72,7 +91,9 @@ static void *safe_malloc_add_2op_(size_t size1, size_t size2)
 	return safe_malloc_(size2);
 }
 
+// ==> Start patch MPC
 static void *safe_malloc_add_3op_(size_t size1, size_t size2, size_t size3)
+// ==> End patch MPC
 {
 	size2 += size1;
 	if(size2 < size1)
@@ -83,7 +104,9 @@ static void *safe_malloc_add_3op_(size_t size1, size_t size2, size_t size3)
 	return safe_malloc_(size3);
 }
 
+// ==> Start patch MPC
 static void *safe_malloc_add_4op_(size_t size1, size_t size2, size_t size3, size_t size4)
+// ==> End patch MPC
 {
 	size2 += size1;
 	if(size2 < size1)
@@ -97,29 +120,11 @@ static void *safe_malloc_add_4op_(size_t size1, size_t size2, size_t size3, size
 	return safe_malloc_(size4);
 }
 
-static void *safe_malloc_mul_2op_(size_t size1, size_t size2)
-#if 0
-needs support for cases where sizeof(size_t) != 4
-{
-	/* could be faster #ifdef'ing off SIZEOF_SIZE_T */
-	if(sizeof(size_t) == 4) {
-		if ((double)size1 * (double)size2 < 4294967296.0)
-			return malloc(size1*size2);
-	}
-	return 0;
-}
-#else
-/* better? */
-{
-	if(!size1 || !size2)
-		return malloc(1); /* malloc(0) is undefined; FLAC src convention is to always allocate */
-	if(size1 > SIZE_MAX / size2)
-		return 0;
-	return malloc(size1*size2);
-}
-#endif
+void *safe_malloc_mul_2op_(size_t size1, size_t size2) ;
 
+// ==> Start patch MPC
 static void *safe_malloc_mul_3op_(size_t size1, size_t size2, size_t size3)
+// ==> End patch MPC
 {
 	if(!size1 || !size2 || !size3)
 		return malloc(1); /* malloc(0) is undefined; FLAC src convention is to always allocate */
@@ -132,7 +137,9 @@ static void *safe_malloc_mul_3op_(size_t size1, size_t size2, size_t size3)
 }
 
 /* size1*size2 + size3 */
+// ==> Start patch MPC
 static void *safe_malloc_mul2add_(size_t size1, size_t size2, size_t size3)
+// ==> End patch MPC
 {
 	if(!size1 || !size2)
 		return safe_malloc_(size3);
@@ -142,17 +149,23 @@ static void *safe_malloc_mul2add_(size_t size1, size_t size2, size_t size3)
 }
 
 /* size1 * (size2 + size3) */
+// ==> Start patch MPC
 static void *safe_malloc_muladd2_(size_t size1, size_t size2, size_t size3)
+// ==> End patch MPC
 {
 	if(!size1 || (!size2 && !size3))
 		return malloc(1); /* malloc(0) is undefined; FLAC src convention is to always allocate */
 	size2 += size3;
 	if(size2 < size3)
 		return 0;
-	return safe_malloc_mul_2op_(size1, size2);
+	if(size1 > SIZE_MAX / size2)
+		return 0;
+	return malloc(size1*size2);
 }
 
+// ==> Start patch MPC
 static void *safe_realloc_add_2op_(void *ptr, size_t size1, size_t size2)
+// ==> End patch MPC
 {
 	size2 += size1;
 	if(size2 < size1)
@@ -160,7 +173,9 @@ static void *safe_realloc_add_2op_(void *ptr, size_t size1, size_t size2)
 	return realloc(ptr, size2);
 }
 
+// ==> Start patch MPC
 static void *safe_realloc_add_3op_(void *ptr, size_t size1, size_t size2, size_t size3)
+// ==> End patch MPC
 {
 	size2 += size1;
 	if(size2 < size1)
@@ -171,7 +186,9 @@ static void *safe_realloc_add_3op_(void *ptr, size_t size1, size_t size2, size_t
 	return realloc(ptr, size3);
 }
 
+// ==> Start patch MPC
 static void *safe_realloc_add_4op_(void *ptr, size_t size1, size_t size2, size_t size3, size_t size4)
+// ==> End patch MPC
 {
 	size2 += size1;
 	if(size2 < size1)
@@ -185,7 +202,9 @@ static void *safe_realloc_add_4op_(void *ptr, size_t size1, size_t size2, size_t
 	return realloc(ptr, size4);
 }
 
+// ==> Start patch MPC
 static void *safe_realloc_mul_2op_(void *ptr, size_t size1, size_t size2)
+// ==> End patch MPC
 {
 	if(!size1 || !size2)
 		return realloc(ptr, 0); /* preserve POSIX realloc(ptr, 0) semantics */
@@ -195,7 +214,9 @@ static void *safe_realloc_mul_2op_(void *ptr, size_t size1, size_t size2)
 }
 
 /* size1 * (size2 + size3) */
+// ==> Start patch MPC
 static void *safe_realloc_muladd2_(void *ptr, size_t size1, size_t size2, size_t size3)
+// ==> End patch MPC
 {
 	if(!size1 || (!size2 && !size3))
 		return realloc(ptr, 0); /* preserve POSIX realloc(ptr, 0) semantics */

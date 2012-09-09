@@ -1,5 +1,5 @@
 /* libFLAC - Free Lossless Audio Codec library
- * Copyright (C) 2001,2002,2003,2004,2005,2006,2007,2008,2009  Josh Coalson
+ * Copyright (C) 2012  Xiph.org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,81 +29,38 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if HAVE_CONFIG_H
-#  include <config.h>
+#ifndef FLAC__PRIVATE__MACROS_H
+#define FLAC__PRIVATE__MACROS_H
+
+#if defined(__GNUC__)
+
+#define flac_max(a,b) \
+    ({ __typeof__ (a) _a = (a); \
+    __typeof__ (b) _b = (b); \
+    _a > _b ? _a : _b; })
+
+#define flac_min(a,b) \
+    ({ __typeof__ (a) _a = (a); \
+    __typeof__ (b) _b = (b); \
+    _a < _b ? _a : _b; })
+
+/* Whatever other unix that has sys/param.h */
+#elif defined(HAVE_SYS_PARAM_H)
+#include <sys/param.h>
+#define flac_max(a,b) MAX(a,b)
+#define flac_min(a,b) MIN(a,b)
+
+/* Windows VS has them in stdlib.h.. XXX:Untested */
+#elif defined(_MSC_VER)
+#include <stdlib.h>
+#define flac_max(a,b) __max(a,b)
+#define flac_min(a,b) __min(a,b)
 #endif
 
-#include "private/bitmath.h"
-#include "FLAC/assert.h"
+#if !defined(__cplusplus) && defined(_MSC_VER)
+#ifndef inline
+#define inline __inline
+#endif
+#endif
 
-/* An example of what FLAC__bitmath_silog2() computes:
- *
- * silog2(-10) = 5
- * silog2(- 9) = 5
- * silog2(- 8) = 4
- * silog2(- 7) = 4
- * silog2(- 6) = 4
- * silog2(- 5) = 4
- * silog2(- 4) = 3
- * silog2(- 3) = 3
- * silog2(- 2) = 2
- * silog2(- 1) = 2
- * silog2(  0) = 0
- * silog2(  1) = 2
- * silog2(  2) = 3
- * silog2(  3) = 3
- * silog2(  4) = 4
- * silog2(  5) = 4
- * silog2(  6) = 4
- * silog2(  7) = 4
- * silog2(  8) = 5
- * silog2(  9) = 5
- * silog2( 10) = 5
- */
-unsigned FLAC__bitmath_silog2(int v)
-{
-	while(1) {
-		if(v == 0) {
-			return 0;
-		}
-		else if(v > 0) {
-			unsigned l = 0;
-			while(v) {
-				l++;
-				v >>= 1;
-			}
-			return l+1;
-		}
-		else if(v == -1) {
-			return 2;
-		}
-		else {
-			v++;
-			v = -v;
-		}
-	}
-}
-
-unsigned FLAC__bitmath_silog2_wide(FLAC__int64 v)
-{
-	while(1) {
-		if(v == 0) {
-			return 0;
-		}
-		else if(v > 0) {
-			unsigned l = 0;
-			while(v) {
-				l++;
-				v >>= 1;
-			}
-			return l+1;
-		}
-		else if(v == -1) {
-			return 2;
-		}
-		else {
-			v++;
-			v = -v;
-		}
-	}
-}
+#endif

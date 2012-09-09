@@ -38,19 +38,9 @@
 #include <string.h> /* for memset() */
 #include "FLAC/assert.h"
 #include "FLAC/format.h"
+#include "share/compat.h"
 #include "private/format.h"
-
-#ifdef min
-#undef min
-#endif
-#define min(a,b) ((a)<(b)?(a):(b))
-
-/* adjust for compilers that can't understand using LLU suffix for uint64_t literals */
-#ifdef _MSC_VER
-#define FLAC__U64L(x) x
-#else
-#define FLAC__U64L(x) x##LLU
-#endif
+#include "private/macros.h"
 
 /* VERSION should come from configure */
 FLAC_API const char *FLAC__VERSION_STRING = VERSION;
@@ -542,7 +532,7 @@ unsigned FLAC__format_get_max_rice_partition_order_from_blocksize(unsigned block
 		max_rice_partition_order++;
 		blocksize >>= 1;
 	}
-	return min(FLAC__MAX_RICE_PARTITION_ORDER, max_rice_partition_order);
+	return flac_min(FLAC__MAX_RICE_PARTITION_ORDER, max_rice_partition_order);
 }
 
 unsigned FLAC__format_get_max_rice_partition_order_from_blocksize_limited_max_and_predictor_order(unsigned limit, unsigned blocksize, unsigned predictor_order)
@@ -587,9 +577,9 @@ FLAC__bool FLAC__format_entropy_coding_method_partitioned_rice_contents_ensure_s
 	FLAC__ASSERT(object->capacity_by_order > 0 || (0 == object->parameters && 0 == object->raw_bits));
 
 	if(object->capacity_by_order < max_partition_order) {
-		if(0 == (object->parameters = (unsigned*)realloc(object->parameters, sizeof(unsigned)*(1 << max_partition_order))))
+		if(0 == (object->parameters = realloc(object->parameters, sizeof(unsigned)*(1 << max_partition_order))))
 			return false;
-		if(0 == (object->raw_bits = (unsigned*)realloc(object->raw_bits, sizeof(unsigned)*(1 << max_partition_order))))
+		if(0 == (object->raw_bits = realloc(object->raw_bits, sizeof(unsigned)*(1 << max_partition_order))))
 			return false;
 		memset(object->raw_bits, 0, sizeof(unsigned)*(1 << max_partition_order));
 		object->capacity_by_order = max_partition_order;

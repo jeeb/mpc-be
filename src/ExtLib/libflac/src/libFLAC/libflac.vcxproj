@@ -99,7 +99,15 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\protected\all.h" />
+    <ClInclude Include="..\..\include\FLAC\all.h" />
+    <ClInclude Include="..\..\include\FLAC\assert.h" />
+    <ClInclude Include="..\..\include\FLAC\callback.h" />
+    <ClInclude Include="..\..\include\FLAC\export.h" />
+    <ClInclude Include="..\..\include\FLAC\format.h" />
+    <ClInclude Include="..\..\include\FLAC\metadata.h" />
+    <ClInclude Include="..\..\include\FLAC\ordinals.h" />
+    <ClInclude Include="..\..\include\FLAC\stream_decoder.h" />
+    <ClInclude Include="..\..\include\FLAC\stream_encoder.h" />
     <ClInclude Include="include\private\all.h" />
     <ClInclude Include="include\private\bitmath.h" />
     <ClInclude Include="include\private\bitreader.h" />
@@ -110,27 +118,20 @@
     <ClInclude Include="include\private\float.h" />
     <ClInclude Include="include\private\format.h" />
     <ClInclude Include="include\private\lpc.h" />
+    <ClInclude Include="include\private\macros.h" />
     <ClInclude Include="include\private\md5.h" />
     <ClInclude Include="include\private\memory.h" />
     <ClInclude Include="include\private\metadata.h" />
-    <ClInclude Include="ia32\nasm.h" />
     <ClInclude Include="include\private\ogg_decoder_aspect.h" />
     <ClInclude Include="include\private\ogg_encoder_aspect.h" />
     <ClInclude Include="include\private\ogg_helper.h" />
     <ClInclude Include="include\private\ogg_mapping.h" />
-    <ClInclude Include="include\protected\stream_decoder.h" />
-    <ClInclude Include="include\protected\stream_encoder.h" />
     <ClInclude Include="include\private\stream_encoder_framing.h" />
     <ClInclude Include="include\private\window.h" />
-    <ClInclude Include="..\..\include\FLAC\all.h" />
-    <ClInclude Include="..\..\include\FLAC\assert.h" />
-    <ClInclude Include="..\..\include\FLAC\callback.h" />
-    <ClInclude Include="..\..\include\FLAC\export.h" />
-    <ClInclude Include="..\..\include\FLAC\format.h" />
-    <ClInclude Include="..\..\include\FLAC\metadata.h" />
-    <ClInclude Include="..\..\include\FLAC\ordinals.h" />
-    <ClInclude Include="..\..\include\FLAC\stream_decoder.h" />
-    <ClInclude Include="..\..\include\FLAC\stream_encoder.h" />
+    <ClInclude Include="include\protected\all.h" />
+    <ClInclude Include="include\protected\stream_decoder.h" />
+    <ClInclude Include="include\protected\stream_encoder.h" />
+    <ClInclude Include="ia32\nasm.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bitmath.c" />
@@ -146,6 +147,8 @@
     <ClCompile Include="memory.c" />
     <ClCompile Include="metadata_iterators.c" />
     <ClCompile Include="metadata_object.c" />
+    <ClCompile Include="Ogg\bitwise.c" />
+    <ClCompile Include="Ogg\framing.c" />
     <ClCompile Include="ogg_decoder_aspect.c" />
     <ClCompile Include="ogg_encoder_aspect.c" />
     <ClCompile Include="ogg_helper.c" />
@@ -154,8 +157,6 @@
     <ClCompile Include="stream_encoder.c" />
     <ClCompile Include="stream_encoder_framing.c" />
     <ClCompile Include="window.c" />
-    <ClCompile Include="Ogg\bitwise.c" />
-    <ClCompile Include="Ogg\framing.c" />
   </ItemGroup>
   <ItemGroup>
     <YASM Include="ia32\bitreader_asm.nasm">

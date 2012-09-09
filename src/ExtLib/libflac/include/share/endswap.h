@@ -1,5 +1,5 @@
 /* libFLAC - Free Lossless Audio Codec library
- * Copyright (C) 2001,2002,2003,2004,2005,2006,2007,2008,2009  Josh Coalson
+ * Copyright (C) 2012  Xiph.org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,81 +29,25 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if HAVE_CONFIG_H
-#  include <config.h>
+/* It is assumed that this header will be included after "config.h". */
+
+#if HAVE_BSWAP32			/* GCC and Clang */
+
+#define	ENDSWAP_32(x)		(__builtin_bswap32 (x))
+
+#elif defined _MSC_VER		/* Windows. Apparently in <stdlib.h>. */
+
+#define	ENDSWAP_32(x)		(_byteswap_ulong (x))
+
+#elif HAVE_BYTESWAP_H		/* Linux */
+
+#include <byteswap.h>
+
+#define	ENDSWAP_32(x)		(bswap_32 (x))
+
+#else
+
+#define	ENDSWAP_32(x)		((((x) >> 24) & 0xFF) + (((x) >> 8) & 0xFF00) + (((x) & 0xFF00) << 8) + (((x) & 0xFF) << 24))
+
 #endif
 
-#include "private/bitmath.h"
-#include "FLAC/assert.h"
-
-/* An example of what FLAC__bitmath_silog2() computes:
- *
- * silog2(-10) = 5
- * silog2(- 9) = 5
- * silog2(- 8) = 4
- * silog2(- 7) = 4
- * silog2(- 6) = 4
- * silog2(- 5) = 4
- * silog2(- 4) = 3
- * silog2(- 3) = 3
- * silog2(- 2) = 2
- * silog2(- 1) = 2
- * silog2(  0) = 0
- * silog2(  1) = 2
- * silog2(  2) = 3
- * silog2(  3) = 3
- * silog2(  4) = 4
- * silog2(  5) = 4
- * silog2(  6) = 4
- * silog2(  7) = 4
- * silog2(  8) = 5
- * silog2(  9) = 5
- * silog2( 10) = 5
- */
-unsigned FLAC__bitmath_silog2(int v)
-{
-	while(1) {
-		if(v == 0) {
-			return 0;
-		}
-		else if(v > 0) {
-			unsigned l = 0;
-			while(v) {
-				l++;
-				v >>= 1;
-			}
-			return l+1;
-		}
-		else if(v == -1) {
-			return 2;
-		}
-		else {
-			v++;
-			v = -v;
-		}
-	}
-}
-
-unsigned FLAC__bitmath_silog2_wide(FLAC__int64 v)
-{
-	while(1) {
-		if(v == 0) {
-			return 0;
-		}
-		else if(v > 0) {
-			unsigned l = 0;
-			while(v) {
-				l++;
-				v >>= 1;
-			}
-			return l+1;
-		}
-		else if(v == -1) {
-			return 2;
-		}
-		else {
-			v++;
-			v = -v;
-		}
-	}
-}
