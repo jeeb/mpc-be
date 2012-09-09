@@ -616,6 +616,8 @@ protected:  // control bar embedded members
 
 public:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	afx_msg void OnPaint();
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnDestroy();
 
 	afx_msg LRESULT OnTaskBarRestart(WPARAM, LPARAM);

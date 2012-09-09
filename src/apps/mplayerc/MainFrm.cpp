@@ -891,6 +891,16 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	return 0;
 }
 
+void CMainFrame::OnPaint()
+{
+	CPaintDC dc(this);
+}
+
+BOOL CMainFrame::OnEraseBkgnd(CDC* pDC)
+{
+	return TRUE;
+}
+
 void CMainFrame::OnDestroy()
 {
 	WTSUnRegisterSessionNotification();
