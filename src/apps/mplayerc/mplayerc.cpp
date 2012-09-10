@@ -50,7 +50,7 @@ extern "C" {
 HICON LoadIcon(CString fn, bool fSmall)
 {
 	if (fn.IsEmpty()) {
-		return(NULL);
+		return NULL;
 	}
 
 	CString ext = fn.Left(fn.Find(_T("://"))+1).TrimRight(':');
@@ -70,6 +70,14 @@ HICON LoadIcon(CString fn, bool fSmall)
 		if (HICON hIcon = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_AUDIOCD), IMAGE_ICON, size.cx, size.cy, 0)) {
 			return hIcon;
 		}
+	}
+
+	if (!(CString(fn).MakeLower().Find(_T("http://")))) {
+		if (HICON hIcon = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, size.cx, size.cy, 0)) {
+			return hIcon;
+		}
+
+		return NULL;
 	}
 
 	TCHAR buff[MAX_PATH];

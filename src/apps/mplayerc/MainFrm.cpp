@@ -12133,8 +12133,8 @@ void CMainFrame::OpenSetupStatusBar()
 		m_wndStatusBar.SetStatusBitmap(id);
 	}
 
-	//
-
+	/*
+	disable load icon for status bar ...
 	HICON hIcon = NULL;
 
 	if (GetPlaybackMode() == PM_FILE) {
@@ -12143,7 +12143,8 @@ void CMainFrame::OpenSetupStatusBar()
 		hIcon = LoadIcon(_T(".ifo"), true);
 	}
 
-	//m_wndStatusBar.SetStatusTypeIcon(hIcon); TODO - black icons look bad, maybe add text with file type ???
+	m_wndStatusBar.SetStatusTypeIcon(hIcon); TODO - black icons look bad, maybe add text with file type ???
+	*/
 }
 
 void CMainFrame::OpenSetupWindowTitle(CString fn)
