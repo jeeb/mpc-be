@@ -234,7 +234,6 @@ Name: {#quick_launch}\{#app_name};               Filename: {app}\{#mpcbe_exe}; C
 Name: {group}\Changelog;                         Filename: {app}\Changelog.txt; Comment: {cm:ViewChangelog};                WorkingDir: {app}
 Name: {group}\{cm:ProgramOnTheWeb,{#app_name}};  Filename: https://sourceforge.net/p/mpcbe/
 Name: {group}\{cm:UninstallProgram,{#app_name}}; Filename: {uninstallexe};      Comment: {cm:UninstallProgram,{#app_name}}; WorkingDir: {app}
-Name: {group}\{#app_name};                       Filename: {app}\{#mpcbe_exe};  Comment: {#app_name};                       WorkingDir: {app}; BeforeInstall: PinToTaskbar(ExpandConstant('{app}\{#mpcbe_exe}'), True); MinVersion: 0,6.01; Tasks: pintotaskbar
 
 [Run]
 Filename: "{app}\{#mpcbe_exe}"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent unchecked; Description: "{cm:LaunchProgram,{#app_name}}"
@@ -269,7 +268,7 @@ external 'IsProcessorFeaturePresent@kernel32.dll stdcall';
 
 const
   installer_mutex = 'mpcbe_setup_mutex';
-  LOAD_LIBRARY_AS_DATAFILE = 2;
+  LOAD_LIBRARY_AS_DATAFILE = $2;
 
 function LoadLibraryEx(lpFileName: String; hFile: THandle; dwFlags: DWORD): THandle; external 'LoadLibraryExW@kernel32.dll stdcall';
 function LoadString(hInstance: THandle; uID: SmallInt; var lpBuffer: Char; nBufferMax: Integer): Integer; external 'LoadStringW@user32.dll stdcall';
@@ -399,6 +398,10 @@ begin
       SetIniInt('Settings', 'InterfaceLanguage', iLanguage, ExpandConstant('{app}\{#mpcbe_ini}'))
     else
       RegWriteDWordValue(HKCU, 'Software\MPC-BE\Settings', 'InterfaceLanguage', iLanguage);
+      
+    if IsTaskSelected('pintotaskbar') then begin
+      PinToTaskbar(ExpandConstant('{app}\{#mpcbe_exe}'), True);
+    end;
   end;
 
   if (CurStep = ssDone) and not WizardSilent() and not D3DX9DLLExists() then
@@ -409,9 +412,13 @@ end;
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
   // When uninstalling, ask the user to delete MPC-BE settings
-  if (CurUninstallStep = usUninstall) and SettingsExistCheck() then begin
-    if SuppressibleMsgBox(CustomMessage('msg_DeleteSettings'), mbConfirmation, MB_YESNO or MB_DEFBUTTON2, IDNO) = IDYES then
-      CleanUpSettingsAndFiles();
+  if (CurUninstallStep = usUninstall) then begin
+    PinToTaskbar(ExpandConstant('{app}\{#mpcbe_exe}'), False);
+    
+    if SettingsExistCheck() then begin
+      if SuppressibleMsgBox(CustomMessage('msg_DeleteSettings'), mbConfirmation, MB_YESNO or MB_DEFBUTTON2, IDNO) = IDYES then
+        CleanUpSettingsAndFiles();
+    end;    
   end;
 end;
 
