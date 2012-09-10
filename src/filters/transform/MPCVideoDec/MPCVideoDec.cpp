@@ -1,5 +1,5 @@
 /*
- * $Id: MPCVideoDecFilter.cpp 1077 2012-09-08 22:00:36Z alexins $
+ * $Id$
  *
  * (C) 2006-2012 see Authors.txt
  *
