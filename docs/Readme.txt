@@ -1,5 +1,5 @@
 MPC-BE is a free and open source audio and video player for Windows.
-MPC-BE is based on the original Guliverkli project and contains additional features and bug fixes.
+MPC-BE is based on the original Guliverkli project and "Media Player Classic Home Cinema" project, contains additional features and bug fixes.
 
 
 Main Features:
@@ -32,8 +32,8 @@ System Requirements:
 
 Links:
 -------
-Website:          http://mpcbe.sourceforge.net
 Project Page:     http://sourceforge.net/projects/mpcbe/
+Forum Project:    http://dev.mpc-next.ru
 
 
 For the people involved in the development, see Authors.txt.
