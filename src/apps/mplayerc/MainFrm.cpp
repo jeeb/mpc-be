@@ -103,8 +103,6 @@ static UINT s_uTaskbarRestart	= RegisterWindowMessage(_T("TaskbarCreated"));
 static UINT s_uTBBC				= RegisterWindowMessage(_T("TaskbarButtonCreated"));
 static UINT WM_NOTIFYICON		= RegisterWindowMessage(_T("MYWM_NOTIFYICON"));
 
-#define DEV_BUILD 1 // set to 1 only for the DEV builds
-
 #if (_MSC_VER == 1700) // TODO - keep this until not fix in VS2012 return value of GetSystemMetrics() ...
 	#define _SM_CXSIZEFRAME GetSystemMetrics(SM_CXSIZEFRAME) * 2
 	#define _SM_CYSIZEFRAME GetSystemMetrics(SM_CYSIZEFRAME) * 2
@@ -847,18 +845,21 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_bToggleShaderScreenSpace = s.fToggleShaderScreenSpace;
 
 #ifdef _WIN64
-	#if DEV_BUILD
-	m_strTitle.Format (L"%s x64 - v%s -dev", ResStr(IDR_MAINFRAME), AfxGetMyApp()->m_strVersion);
-	#else
 	m_strTitle.Format (L"%s x64 - v%s", ResStr(IDR_MAINFRAME), AfxGetMyApp()->m_strVersion);
-	#endif
 #else
-	#if DEV_BUILD
-	m_strTitle.Format (L"%s - v%s -dev", ResStr(IDR_MAINFRAME), AfxGetMyApp()->m_strVersion);
-	#else
 	m_strTitle.Format (L"%s - v%s", ResStr(IDR_MAINFRAME), AfxGetMyApp()->m_strVersion);
-	#endif
 #endif
+	switch (MPC_VERSION_STATUS) {
+		case 0:
+			m_strTitle.Append(_T(" -dev"));
+			break;
+		case 1:
+			m_strTitle.Append(_T(" -beta"));
+			break;
+		case 2:
+			m_strTitle.Append(_T(" -rc"));
+			break;
+	}
 
 	SetWindowText(m_strTitle);
 	m_Lcd.SetMediaTitle(LPCTSTR(m_strTitle));
