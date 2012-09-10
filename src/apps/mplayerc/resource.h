@@ -17,8 +17,6 @@
 #define IDB_ONOFF                       205
 #define IDF_LOGO0                       206
 #define IDF_LOGO1                       207
-#define IDF_LOGO2                       208
-#define IDF_LOGO3                       209
 #define IDB_STREAMTYPES                 215
 #define IDI_DVD                         302
 #define IDI_AUDIOCD                     303

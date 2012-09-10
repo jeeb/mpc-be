@@ -419,24 +419,7 @@
       <FileType>ICO</FileType>
     </None>
     <None Include="res\logo.0.png" />
-    <None Include="res\logo.1.png">
-      <ExcludedFromBuild Condition="'$(PlatForm)'=='x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="res\logo.1_x64.png">
-      <ExcludedFromBuild Condition="'$(PlatForm)'=='Win32'">true</ExcludedFromBuild>
-    </None>
-    <None Include="res\logo.2.png">
-      <ExcludedFromBuild Condition="'$(PlatForm)'=='x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="res\logo.2_x64.png">
-      <ExcludedFromBuild Condition="'$(PlatForm)'=='Win32'">true</ExcludedFromBuild>
-    </None>
-    <None Include="res\logo.3.png">
-      <ExcludedFromBuild Condition="'$(PlatForm)'=='x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="res\logo.3_x64.png">
-      <ExcludedFromBuild Condition="'$(PlatForm)'=='Win32'">true</ExcludedFromBuild>
-    </None>
+    <None Include="res\logo.1.png" />
     <None Include="res\mono.bmp">
       <FileType>BMP</FileType>
     </None>

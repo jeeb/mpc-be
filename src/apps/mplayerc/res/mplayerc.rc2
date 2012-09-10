@@ -43,15 +43,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 //
 
 IDF_LOGO0                        FILE                    "res\\logo.0.png"
-#ifdef _WIN64
-IDF_LOGO1                        FILE                    "res\\logo.1_x64.png"
-IDF_LOGO2                        FILE                    "res\\logo.2_x64.png"
-IDF_LOGO3                        FILE                    "res\\logo.3_x64.png"
-#else
 IDF_LOGO1                        FILE                    "res\\logo.1.png"
-IDF_LOGO2                        FILE                    "res\\logo.2.png"
-IDF_LOGO3                        FILE                    "res\\logo.3.png"
-#endif
 IDF_SHADER_BT601_BT709           FILE                    "res\\shaders\\BT601BT709.psh"
 IDF_SHADER_CONTOUR               FILE                    "res\\shaders\\contour.psh"
 IDF_SHADER_DEINTERLACE           FILE                    "res\\shaders\\deinterlace (blend).psh"

@@ -38,7 +38,7 @@
 
 #define MPC_WND_CLASS_NAME L"MediaPlayerClassicW"
 
-#define DEF_LOGO IDF_LOGO3
+#define DEF_LOGO IDF_LOGO1
 
 enum {
 	WM_GRAPHNOTIFY = WM_RESET_DEVICE+1,
