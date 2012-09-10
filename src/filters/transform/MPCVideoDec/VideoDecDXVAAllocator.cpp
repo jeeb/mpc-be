@@ -22,8 +22,7 @@
 
 #include "stdafx.h"
 #include "VideoDecDXVAAllocator.h"
-#include "MPCVideoDecFilter.h"
-
+#include "MPCVideoDec.h"
 
 CDXVA2Sample::CDXVA2Sample(CVideoDecDXVAAllocator *pAlloc, HRESULT *phr)
 	: CMediaSample(NAME("CDXVA2Sample"), (CBaseAllocator*)pAlloc, phr, NULL, 0)

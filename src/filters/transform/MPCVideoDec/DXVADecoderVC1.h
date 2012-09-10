@@ -85,9 +85,6 @@ public:
 		VC1_PANSCAN_FLAG				= 0x0040,
 	} VC1_PIC_SPATIAL_RESID8;
 
-
-protected :
-
 private:
 	DXVA_PictureParameters		m_PictureParams;
 	DXVA_SliceInfo				m_SliceInfo;
@@ -103,5 +100,4 @@ private:
 	void						Init();
 	HRESULT						DisplayStatus();
 	BYTE*						FindNextStartCode(BYTE* pBuffer, UINT nSize, UINT& nPacketSize);
-
 };

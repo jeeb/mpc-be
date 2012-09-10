@@ -60,7 +60,6 @@ typedef struct {
 	DWORD						dwDisplayCount;
 } PICTURE_STORE;
 
-
 #define MAX_COM_BUFFER			6				// Max uncompressed buffer for an Execute command (DXVA1)
 #define COMP_BUFFER_COUNT		18
 #define NO_REF_FRAME			0xFFFF

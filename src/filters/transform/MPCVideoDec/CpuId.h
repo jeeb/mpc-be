@@ -25,7 +25,6 @@
 class CCpuId
 {
 public:
-
 	typedef enum {
 		PROCESSOR_AMD,
 		PROCESSOR_INTEL,

@@ -43,7 +43,6 @@ protected :
 	virtual int		FindOldestFrame();
 
 private:
-
 	DXVA_PicParams_H264		m_DXVAPicParams;
 	DXVA_Qmatrix_H264		m_DXVAScalingMatrix;
 	DXVA_Slice_H264_Short	m_pSliceShort[MAX_SLICES];

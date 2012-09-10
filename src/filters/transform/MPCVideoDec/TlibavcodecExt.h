@@ -26,14 +26,12 @@
 typedef unsigned char uint8_t;
 #endif
 
-
 struct AVCodecContext;
 struct AVFrame;
 
 typedef int				(*FUNC_AV_DEFAULT_GET_BUFFER)(AVCodecContext *s, AVFrame *pic);
 typedef void			(*FUNC_AV_DEFAULT_RELEASE_BUFFER)(AVCodecContext *s, AVFrame *pic);
 typedef int				(*FUNC_AV_DEFAULT_REGET_BUFFER)(AVCodecContext *s, AVFrame *pic);
-
 
 struct TlibavcodecExt {
 protected:

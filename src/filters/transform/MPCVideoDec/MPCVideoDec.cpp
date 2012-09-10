@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: MPCVideoDecFilter.cpp 1077 2012-09-08 22:00:36Z alexins $
  *
  * (C) 2006-2012 see Authors.txt
  *
@@ -30,7 +30,7 @@
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
 #endif
-#include "MPCVideoDecFilter.h"
+#include "MPCVideoDec.h"
 #include "VideoDecOutputPin.h"
 #include "CpuId.h"
 
@@ -53,7 +53,6 @@ extern "C"
 #include <moreuuids.h>
 #include "DXVADecoderH264.h"
 #include "../../../apps/mplayerc/FilterEnum.h"
-
 #include "../../../DSUtil/WinAPIUtils.h"
 
 #define MAX_SUPPORTED_MODE			5

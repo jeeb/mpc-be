@@ -23,7 +23,7 @@
 #include "stdafx.h"
 #include "VideoDecOutputPin.h"
 #include "VideoDecDXVAAllocator.h"
-#include "MPCVideoDecFilter.h"
+#include "MPCVideoDec.h"
 #include "../../../DSUtil/DSUtil.h"
 
 CVideoDecOutputPin::CVideoDecOutputPin(TCHAR* pObjectName, CBaseVideoFilter* pFilter, HRESULT* phr, LPCWSTR pName)
@@ -124,7 +124,6 @@ STDMETHODIMP CVideoDecOutputPin::GetCreateVideoAcceleratorData(const GUID *pGuid
 			}
 		}
 	}
-
 
 	return hr;
 }

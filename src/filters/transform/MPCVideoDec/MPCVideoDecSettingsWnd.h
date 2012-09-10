@@ -126,7 +126,6 @@ public:
 	afx_msg void OnClickedSwOutputFormatUp();
 	afx_msg void OnClickedSwOutputFormatDown();
 	//
-
 };
 
 class __declspec(uuid("3C395D46-8B0F-440d-B962-2F4A97355453"))

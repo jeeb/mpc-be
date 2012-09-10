@@ -404,7 +404,6 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 	return true;
 }
 
-
 BEGIN_MESSAGE_MAP(CMPCVideoDecSettingsWnd, CInternalPropertyPageWnd)
 
 	// === New swscaler options

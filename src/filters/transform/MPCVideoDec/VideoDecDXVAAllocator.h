@@ -25,10 +25,8 @@
 #include <dxva.h>
 #include <dxva2api.h>
 
-
 class CMPCVideoDecFilter;
 class CVideoDecDXVAAllocator;
-
 
 interface __declspec(uuid("AE7EC2A2-1913-4a80-8DD6-DF1497ABA494"))
 IMPCDXVA2Sample :
@@ -41,7 +39,6 @@ class CDXVA2Sample : public CMediaSample, public IMFGetService, public IMPCDXVA2
 	friend class CVideoDecDXVAAllocator;
 
 public:
-
 	CDXVA2Sample(CVideoDecDXVAAllocator *pAlloc, HRESULT *phr);
 
 	//Note: CMediaSample does not derive from CUnknown, so we cannot use the
@@ -62,14 +59,12 @@ public:
 	STDMETHODIMP GetPointer(BYTE ** ppBuffer);
 
 private:
-
 	// Sets the pointer to the Direct3D surface.
 	void SetSurface(DWORD surfaceId, IDirect3DSurface9 *pSurf);
 
 	CComPtr<IDirect3DSurface9>	m_pSurface;
 	DWORD						m_dwSurfaceId;
 };
-
 
 class CVideoDecDXVAAllocator : public CBaseAllocator
 {
@@ -85,16 +80,13 @@ public:
 	//	STDMETHODIMP ReleaseBuffer(IMediaSample *pBuffer);
 	//	CAtlList<int>			m_FreeSurface;
 
-
 protected:
 	HRESULT		Alloc(void);
 	void		Free(void);
 
-
-private :
+private:
 	CMPCVideoDecFilter*		m_pVideoDecFilter;
 
 	IDirect3DSurface9**		m_ppRTSurfaceArray;
 	UINT					m_nSurfaceArrayCount;
-
 };

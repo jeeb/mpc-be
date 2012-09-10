@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: MPCVideoDecFilter.h 843 2012-08-08 01:38:10Z alexins $
  *
  * (C) 2006-2012 see Authors.txt
  *
@@ -81,7 +81,6 @@ class __declspec(uuid("008BAC12-FBAF-497b-9670-BC6F6FBAE2C4"))
 	, public IMPCVideoDecFilterCodec
 {
 protected:
-
 	// === FFMpeg callbacks
 	static void		LogLibAVCodec(void* par,int level,const char *fmt,va_list valist);
 	virtual void	OnGetBuffer(AVFrame *pic);
@@ -214,7 +213,6 @@ protected:
 	void				PopBufferTime(int nPos);
 
 public:
-
 	const static AMOVIESETUP_MEDIATYPE		sudPinTypesIn[];
 	const static int						sudPinTypesInCount;
 	const static AMOVIESETUP_MEDIATYPE		sudPinTypesOut[];
@@ -246,7 +244,6 @@ public:
 	HRESULT			EndOfStream();
 
 	HRESULT			BreakConnect(PIN_DIRECTION dir);
-
 
 	// === ISpecifyPropertyPages2
 
@@ -341,7 +338,6 @@ public:
 	WORD						GetDXVA1RestrictedMode();
 	HRESULT						CreateDXVA1Decoder(IAMVideoAccelerator* pAMVideoAccelerator, const GUID* pDecoderGuid, DWORD dwSurfaceCount);
 
-
 	// === DXVA2 functions
 	void						FillInVideoDescription(DXVA2_VideoDesc *pDesc);
 	DXVA2_ConfigPictureDecode*	GetDXVA2Config()		{ return &m_DXVA2Config; };
@@ -351,6 +347,7 @@ public:
 															  const GUID& guidDecoder,
 															  DXVA2_ConfigPictureDecode *pSelectedConfig,
 															  BOOL *pbFoundDXVA2Configuration);
+
 	HRESULT						CreateDXVA2Decoder(UINT nNumRenderTargets, IDirect3DSurface9** pDecoderRenderTargets);
 
 	// === EVR functions
