@@ -138,47 +138,58 @@ CString PlayerYouTube(CString fname)
 			return fname;
 		}
 
-		DWORD k = _strpos(out, "%2Curl%3Dhttp%253A%252F%252F");
-		if (!k) {
-			k = _strpos(out, "%26url%3Dhttp%253A%252F%252F");
-		}
+		DWORD k, lastpos = 0;
 
-		if (k) {
+		for (;;) {
+			k = _strpos(out + lastpos, "%2Curl%3Dhttp%253A%252F%252F");
+			if (!k) {
+				k = _strpos(out + lastpos, "%26url%3Dhttp%253A%252F%252F");
+			}
 
-			k += 9;
-			DWORD i = _strpos(out + k, "%26quality");
-			if (!i) {
+			if (k) {
+			
+				k += (lastpos + 9);
+				lastpos = k;
+				DWORD i = _strpos(out + k, "%26quality");
+				if (!i) {
+					free(out);
+					return fname;
+				}
+
+				// skip webm format
+				DWORD l = _strpos(out + k, "video%252Fwebm");
+				if (l && (l < i)) {
+					continue;
+				}
+
+				char *str1, *str2;
+
+				str1 = (char*)malloc(i);
+				str2 = (char*)malloc(i);
+
+				memset(str1, 0, i);
+				memset(str2, 0, i);
+
+				memcpy(str1, out + k, i);
+
+				_UrlDecode(str1, str2);
+				_UrlDecode(str2, str1);
+
+				CString str(str1);
+				// need for some url
+				str.Replace(_T("&sig="), _T("&signature="));
+
+				free(str1);
+				free(str2);
+
+				free(out);
+
+				return str;
+			} else {
 				free(out);
 
 				return fname;
 			}
-
-			char *str1, *str2;
-
-			str1 = (char*)malloc(i);
-			str2 = (char*)malloc(i);
-
-			memset(str1, 0, i);
-			memset(str2, 0, i);
-
-			memcpy(str1, out + k, i);
-
-			_UrlDecode(str1, str2);
-			_UrlDecode(str2, str1);
-
-			CString str(str1);
-
-			free(str1);
-			free(str2);
-
-			free(out);
-
-			return str;
-
-		} else {
-			free(out);
-
-			return fname;
 		}
 	} else {
 		return fname;
