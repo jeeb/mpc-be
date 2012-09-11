@@ -31,7 +31,7 @@
 + Декодер "Windows Media Audio Lossless";
 + Декодер "Windows Media Audio Voice"
 + Декодер "Flash Screen Video 1";
-+ Декодер CINEPAK;
++ Декодер Cinepak;
 + Декодер FPS1 (Fraps);
 + Декодер Bink Video (BIKI, BIKB);
 + Декодер Bink Audio (RDFT, DCT);
@@ -42,6 +42,7 @@
 + Декодер Microsoft Screen 3 (Microsoft ATC Screen);
 + Декодер Microsoft Screen 4 (MS Expression Encoder Screen;
 + Декодер RealAudio Lossless;
++ Декодер Indeo Audio (IAC);
 + Расширение оболочки MPCBEShellExt;
 + Поддержка MPEG1 в Matroska, автор идеи и начального патча Vortex (автор Light Alloy);
 + В EVR статистике со встроенным видео декодером теперь отображается реальный тип кадра - интерлейс или прогрессив;
@@ -80,7 +81,6 @@
 + Добавлена поддержка .sup субтитров(PGS/HDMV извлеченные из контейнера в отдельный файл);
 + Ассоциаций с DVD-Audio (*.aob);
 + AMR Source;
-+ Декодер Indeo Audio (IAC);
 + libwebp;
 + Общее меню для субтитров;
 + TTA Splitter;
