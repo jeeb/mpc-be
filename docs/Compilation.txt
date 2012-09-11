@@ -8,10 +8,9 @@ Part A: Preparing the Visual Studio environment
 Part B: Preparing the GCC environment
  NOTES:
   * If you installed the MSYS/MinGW package in an other directory you will have to use that path in the following steps.
-  * If you don't use TortoiseSVN then the revision number will be a hard-coded one, like 1.6.2.0.
+  * If you don't use TortoiseSVN then the revision number will be a hard-coded one, like 1.7.6.0.
 
- 1. Download and extract MSYS_MinGW_GCC_470_x86-x64.7z to C:\MSYS\ -> http://xhmikosr.1f0.de/tools/MSYS_MinGW_GCC_470_x86-x64.7z
-    For the components and their version see: http://xhmikosr.1f0.de/tools/MSYS_MinGW_GCC_470_x86-x64_components.txt
+ 1. Download and extract msys_be_20120911.7z to C:\MSYS\ -> http://dev.mpc-next.ru/index.php/topic,706.0.html
  2. Edit the "fstab" file in C:\MSYS\etc\ to specify your MinGW path.
     Add this to it: C:\MSYS\mingw	\mingw
     Note the tab-space between mingw and \mingw
@@ -21,61 +20,23 @@ Part B: Preparing the GCC environment
     MSYS        C:\MSYS
     MINGW32     C:\MSYS\mingw
     MINGW64     C:\MSYS\mingw
-
-Modify the "Path" environment variable by adding at the end: ;%MINGW32%\bin;%MSYS%\bin
-
- * Optional, if you wish to use the cutting edge GCC branch you can instead follow these steps:
-  a. Delete everything in this folder: C:\MSYS\mingw\
-  b. Download and extract the new MinGW GCC version into C:\MSYS\mingw\ from: http://www.xvidvideo.ru/component/docman/cat_view/28-cross-mingwgcc-x86x64.html
-
+    YASM        C:\MSYS\bin
 
 Part C: Downloading and compiling the MPC-BE source
 
 1. Use a subversion client to checkout MPC-BE's trunk to C:\mpc-be (or anywhere else you like)
-    Repository URL: https://mpcbe.svn.sourceforge.net/svnroot/mpcbe/trunk
-    The recommended SVN client is TortoiseSVN (grab it from http://tortoisesvn.net/downloads)
+    Repository URL: svn://mpc-next.ru/mpc-be/trunk (available only for developers!!!)
+    The recommended SVN client is TortoiseSVN (grab it from http://dev.mpc-next.ru/index.php/board,16.0.html)
 2. When using TortoiseSVN
     a) Create an empty directory where you want to store the source files. e.g: C:\mpc-be
     b) Right-click on that directory and choose "SVN checkout".
-    c) Put https://mpcbe.svn.sourceforge.net/svnroot/mpcbe/trunk in "URL of Repository" and press OK.
+    c) Put svn://mpc-next.ru/mpc-be/trunk in "URL of Repository" and press OK.
     d) Wait for the source tree to be downloaded.
 
-3. Open the solution file C:\mpc-be\mpc-be.sln
+3. Open folder C:\mpc-be\
+   Execute the batch file update_gcc.bat (it is necessary to do to copy the files libgcc.a and libmingwex.a, in the folders lib and lib64)
+4. Open the solution file C:\mpc-be\mpc-be.sln
     Change the solution's configuration to "Release" (in the toolbar).
-4. Right click the mpc-be project, and open up its Properties.
-   There, go to Configuration Properties->Linker->General. Add the following directories to the "Additional Library Directories":
-    For Win32 platform      $(MINGW32)\lib\gcc\i686-pc-mingw32\4.7.0;$(MINGW32)\i686-pc-mingw32\lib\
-    For x64 platform        $(MINGW64)\lib\gcc\x86_64-w64-mingw32\4.7.0;$(MINGW64)\x86_64-w64-mingw32\lib\
-
-Note: If you update your GCC, make sure you change the version number in the above paths, e.g. 4.7.1
-Another way to do it, is by copying the needed MinGW libs (libgcc.a and libmingwex.a) into the C:\mpc-be\lib and C:\mpc-be\lib64 folders.
-
-
-@ECHO OFF
-REM Save this script to your mpc-be source dir
-REM Get the GCC version
-FOR /f "tokens=1,2 delims= " %%K IN (
-  'gcc -dumpversion'
-) DO (
-  SET "gccver=%%K" & Call :SubGCCVer %%gccver:*Z=%%
-)
-
-REM Copy the needed libs
-ECHO x86:
-COPY /V /Y "%MINGW32%\i686-pc-mingw32\lib\libmingwex.a" "lib\"
-COPY /V /Y "%MINGW32%\lib\gcc\i686-pc-mingw32\%gccver%\libgcc.a" "lib\"
-ECHO x64:
-rem See Part D for libmingwex.a x64
-COPY /V /Y "%MINGW64%\lib\gcc\x86_64-w64-mingw32\%gccver%\libgcc.a" "lib64\"
-ECHO .
-
-PAUSE
-EXIT /B
-
-:SubGCCVer
-SET gccver=%*
-EXIT /B
-
 
 5. Press OK to save the changes and close the Properties window.
 6. Press F7 to build the solution.
@@ -90,24 +51,8 @@ EXIT /B
 Alternatively, you can use build.bat (run: build.bat help for more info)
 
 
-Part D: Building FFmpeg x64 (libavcodec) with GCC
+Part D: Building the installer
 
-When building FFmpeg (project libavcodec) in 32 bit mode, GCC is used and according to the makefile that is automatically invoked from the solution. Doing so for 64 bit, requires some additional steps:
- 1. Run MSYS and cd to the trunk\src\filters\transform\MPCVideoDec\ffmpeg_x64 folder
-Example: cd /c/mpc-be/src/filters/transform/MPCVideoDec/ffmpeg_x64/
-(notice that the first part will most probably differ for the exact paths)
- 2. checkout the MinGW64 files by running: buildmingwlibs.sh --update
- 3. run the buildmingwlibs.sh script, only to compile:
-      buildmingwlibs.sh --compile
-    or
-      buildmingwlibs.sh --update --compile
-
-After the compilation is done, libgcc.a and libmingwex.a will be placed in C:\mpc-be\lib64
-
-Now libavcodec can be compiled from within the MPC-BE visual studio solution file, and it will be linked correctly with the other components.
-
-Part E: Building the installer
-
-Download Inno Setup Unicode v5.4.3 or newer from: http://www.jrsoftware.org/isdl.php
+Download Inno Setup Unicode v5.5.1 or newer from: http://www.jrsoftware.org/isdl.php
 Install everything and then go to C:\mpc-be\distrib, open mpc-be_setup.iss with Inno Setup, read the first comments in the script and compile it.
 Note: Use Inno Setup's built-in IDE.
