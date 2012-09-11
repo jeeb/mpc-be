@@ -40,9 +40,10 @@
 + Декодер TechSmith Screen Codec 2;
 + Декодер MS Screen 1 (Windows Media Video V7 Screen);
 + Декодер Microsoft Screen 3 (Microsoft ATC Screen);
-+ Декодер Microsoft Screen 4 (MS Expression Encoder Screen;
++ Декодер Microsoft Screen 4 (MS Expression Encoder Screen);
 + Декодер RealAudio Lossless;
 + Декодер Indeo Audio (IAC);
++ Декодер MusePack SV7/SV8;
 + Расширение оболочки MPCBEShellExt;
 + Поддержка MPEG1 в Matroska, автор идеи и начального патча Vortex (автор Light Alloy);
 + В EVR статистике со встроенным видео декодером теперь отображается реальный тип кадра - интерлейс или прогрессив;
@@ -56,7 +57,6 @@
 + Опция "Выход из полноэкранного режима при перехвате фокуса";
 + Отображение версии libavcodec в окне "О программе";
 + WavPack сплиттер;
-+ Декодер MusePack SV7/SV8;
 + Поддержка DIRAC в MPEG/OGG;
 + Вернули обратно RoQSplitter вырезанный в MPC-HC rev 2760;
 + Кнопки для настроек внутренних фильтров, закладка "Встроенные фильтры";
@@ -293,14 +293,14 @@
 * Удалили a52dec и libdca. Теперь для декодированее AC3 и DTS используется ffmpeg;
 * Добавлены проектные файлы для построения плеера в VS2012;
 * zlib до версии 1.2.7
-* libpng 1.5.13 git-95ea04f
-* Little-CMS git-eba3ad7
+* libpng 1.5.13 git-6e3b0c2
+* Little-CMS git-728139a
 * MediaInfoLib v0.7.60
 * ZenLib v0.4.28
 * SoundTouch svn rev.152
 * Logitech SDK v3.01
 * libwebp 0.2.0
-* ffmpeg git-ec79468
+* ffmpeg git-34b5b73
 * Virtualdub 1.10.3
  ... и многое другое.
 
