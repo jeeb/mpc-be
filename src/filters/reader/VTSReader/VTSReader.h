@@ -30,6 +30,8 @@
 #include <ITrackInfo.h>
 #include "../../../DSUtil/DSMPropertyBag.h"
 
+#include "IVTSReader.h"
+
 #define VTSReaderName L"MPC VTS Reader"
 
 class CVobFile;
@@ -55,9 +57,11 @@ public:
 	void Lock();
 	void Unlock();
 
-	BSTR GetTrackName(UINT aTrackIdx);
-	int GetChaptersCount();
-	REFERENCE_TIME GetChapterOffset(UINT ChapterNumber);
+	BSTR			GetTrackName(UINT aTrackIdx);
+	int				GetChaptersCount();
+	REFERENCE_TIME	GetChapterOffset(UINT ChapterNumber);
+
+	REFERENCE_TIME	GetDuration();
 };
 
 class __declspec(uuid("773EAEDE-D5EE-4fce-9C8F-C4F53D0A2F73"))
@@ -66,6 +70,7 @@ class __declspec(uuid("773EAEDE-D5EE-4fce-9C8F-C4F53D0A2F73"))
 	, public IFileSourceFilter
 	, public ITrackInfo
 	, public IDSMChapterBagImpl
+	, public IVTSReader
 {
 	CVTSStream m_stream;
 	CStringW m_fn;
@@ -93,4 +98,7 @@ public:
 	STDMETHODIMP_(BSTR) GetTrackCodecName(UINT aTrackIdx);
 	STDMETHODIMP_(BSTR) GetTrackCodecInfoURL(UINT aTrackIdx);
 	STDMETHODIMP_(BSTR) GetTrackCodecDownloadURL(UINT aTrackIdx);
+
+	// IVTSReader
+	STDMETHODIMP_(REFERENCE_TIME) GetDuration();
 };

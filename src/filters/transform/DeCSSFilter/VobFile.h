@@ -99,6 +99,8 @@ class CVobFile : public CDVDSession
 
 	int m_ChaptersCount;
 	CAtlMap<BYTE, LONGLONG> m_pChapters;
+
+	REFERENCE_TIME m_rtDuration;
 public:
 	CVobFile();
 	virtual ~CVobFile();
@@ -118,8 +120,10 @@ public:
 
 	BSTR GetTrackName(UINT aTrackIdx);
 
-	int GetChaptersCount() {return m_ChaptersCount;}
-	LONGLONG GetChapterOffset(UINT ChapterNumber);
+	int			GetChaptersCount() {return m_ChaptersCount;}
+	LONGLONG	GetChapterOffset(UINT ChapterNumber);
+
+	REFERENCE_TIME	GetDuration() {return m_rtDuration;}
 
 private:
 	CFile		m_ifoFile;

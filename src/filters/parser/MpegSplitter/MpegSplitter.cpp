@@ -827,9 +827,16 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		return hr;
 	}
 
+	REFERENCE_TIME rt_IfoDuration = 0;
 	if (m_pFile->m_type == mpeg_ps) {
 		if (m_pInput && m_pInput->IsConnected() && (GetCLSID(m_pInput->GetConnected()) == __uuidof(CVTSReader))) { // MPC VTS Reader
 			pTI = GetFilterFromPin(m_pInput->GetConnected());
+
+			if (CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected()) ) {
+				if (CComQIPtr<IVTSReader> VTSREader = pFilter) {
+					rt_IfoDuration = VTSREader->GetDuration();
+				}
+			}
 		}
 	}
 
@@ -1030,7 +1037,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	if (m_rtPlaylistDuration) {
 		m_rtNewStop = m_rtStop = m_rtDuration = m_rtPlaylistDuration;
 	} else if (m_pFile->IsRandomAccess() && m_pFile->m_rate) {
-		m_rtNewStop = m_rtStop = m_rtDuration = 10000000i64 * m_pFile->GetLength() / m_pFile->m_rate;
+		m_rtNewStop = m_rtStop = m_rtDuration = rt_IfoDuration ? rt_IfoDuration : (10000000i64 * m_pFile->GetLength() / m_pFile->m_rate);
 	}
 
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;

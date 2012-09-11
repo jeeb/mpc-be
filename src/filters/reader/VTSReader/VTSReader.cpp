@@ -96,6 +96,7 @@ STDMETHODIMP CVTSReader::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 		QI(IFileSourceFilter)
 		QI(ITrackInfo)
 		QI(IDSMChapterBag)
+		QI(IVTSReader)
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
 
@@ -196,6 +197,13 @@ STDMETHODIMP_(BSTR) CVTSReader::GetTrackCodecDownloadURL(UINT aTrackIdx)
 	return NULL; // Not implemented yet
 }
 
+// IVTSReader
+
+STDMETHODIMP_(REFERENCE_TIME) CVTSReader::GetDuration()
+{
+	return m_stream.GetDuration();
+}
+
 // CVTSStream
 
 CVTSStream::CVTSStream() : m_off(0)
@@ -292,4 +300,9 @@ int CVTSStream::GetChaptersCount()
 REFERENCE_TIME CVTSStream::GetChapterOffset(UINT ChapterNumber)
 {
 	return m_vob->GetChapterOffset(ChapterNumber);
+}
+
+REFERENCE_TIME CVTSStream::GetDuration()
+{
+	return m_vob->GetDuration();
 }

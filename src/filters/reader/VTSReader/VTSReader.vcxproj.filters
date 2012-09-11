@@ -46,6 +46,9 @@
     <ClInclude Include="VTSReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IVTSReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="VTSReader.rc">
