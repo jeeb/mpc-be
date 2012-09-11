@@ -32,8 +32,8 @@ System Requirements:
 
 Links:
 -------
-Project Page:     http://sourceforge.net/projects/mpcbe/
-Forum Project:    http://dev.mpc-next.ru
+Project Page:        http://sourceforge.net/projects/mpcbe/
+Help and Support:    http://dev.mpc-next.ru
 
 
 For the people involved in the development, see Authors.txt.
