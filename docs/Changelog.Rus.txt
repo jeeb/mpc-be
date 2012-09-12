@@ -300,7 +300,7 @@
 * SoundTouch svn rev.152
 * Logitech SDK v3.01
 * libwebp 0.2.0
-* ffmpeg git-34b5b73
+* ffmpeg git-507c041
 * Virtualdub 1.10.3
  ... и многое другое.
 
