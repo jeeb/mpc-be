@@ -65,18 +65,24 @@
 AppId={{FE09AF6D-78B2-4093-B012-FCDAF78693CE}
 DefaultGroupName={#app_name} x64
 OutputBaseFilename=MPC-BE.{#app_version_out}.x64
-UninstallDisplayName={#app_name} {#app_version} x64
+UninstallDisplayName={#app_name} x64 {#app_version}
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
+AppName={#app_name} x64
+AppVerName={#app_name} x64 {#app_version}
+VersionInfoDescription={#app_name} x64 Setup
+VersionInfoProductName={#app_name} x64
 #else
 AppId={{903D098F-DD50-4342-AD23-DA868FCA3126}
 DefaultGroupName={#app_name}
 OutputBaseFilename=MPC-BE.{#app_version_out}.x86
 UninstallDisplayName={#app_name} {#app_version}
-#endif
 AppName={#app_name}
-AppVersion={#app_version}
 AppVerName={#app_name} {#app_version}
+VersionInfoDescription={#app_name} Setup
+VersionInfoProductName={#app_name}
+#endif
+AppVersion={#app_version}
 AppPublisher=MPC-BE Team
 AppPublisherURL=https://sourceforge.net/p/mpcbe/
 AppSupportURL=https://sourceforge.net/p/mpcbe/
@@ -85,8 +91,6 @@ AppContact=https://sourceforge.net/p/mpcbe/
 AppCopyright=Copyright © {#copyright_year} all contributors, see Authors.txt
 VersionInfoCompany=MPC-BE Team
 VersionInfoCopyright=Copyright © {#copyright_year}, MPC-BE Team
-VersionInfoDescription={#app_name} Setup
-VersionInfoProductName={#app_name}
 VersionInfoProductVersion={#app_version}
 VersionInfoProductTextVersion={#app_version}
 VersionInfoTextVersion={#app_version}
@@ -145,7 +149,7 @@ Name: ua; MessagesFile: compiler:Languages\Ukrainian.isl
 
 [Messages]
 #ifdef x64Build
-BeveledLabel={#app_name} {#app_version} x64
+BeveledLabel={#app_name} x64 {#app_version}
 #else
 BeveledLabel={#app_name} {#app_version}
 #endif
@@ -155,8 +159,12 @@ Name: default;            Description: {cm:types_DefaultInstallation}
 Name: custom;             Description: {cm:types_CustomInstallation};                     Flags: iscustom
 
 [Components]
-Name: "main"; Description: "{#app_name} {#app_version}"; Types: default custom; Flags: fixed
-Name: "mpciconlib"; Description: "{cm:comp_mpciconlib}"; Types: default custom
+#ifdef x64Build
+Name: "main";       Description: "{#app_name} x64 {#app_version}"; Types: default custom; Flags: fixed
+#else
+Name: "main";       Description: "{#app_name} {#app_version}"; Types: default custom; Flags: fixed
+#endif
+Name: "mpciconlib"; Description: "{cm:comp_mpciconlib}";       Types: default custom
 
 #ifdef localize
 Name: "mpcresources"; Description: "{cm:comp_mpcresources}"; Types: default custom; Flags: disablenouninstallwarning
@@ -173,10 +181,10 @@ Name: desktopicon;              Description: {cm:CreateDesktopIcon};     GroupDe
 Name: desktopicon\user;         Description: {cm:tsk_CurrentUser};       GroupDescription: {cm:AdditionalIcons}; Flags: exclusive
 Name: desktopicon\common;       Description: {cm:tsk_AllUsers};          GroupDescription: {cm:AdditionalIcons}; Flags: unchecked exclusive
 Name: quicklaunchicon;          Description: {cm:CreateQuickLaunchIcon}; GroupDescription: {cm:AdditionalIcons}; Flags: unchecked;             OnlyBelowVersion: 0,6.01
-;Name: pintotaskbar;             Description: {cm:PinToTaskBar};          GroupDescription: {cm:AdditionalIcons}; MinVersion: 0,6.01
+Name: pintotaskbar;             Description: {cm:PinToTaskBar};          GroupDescription: {cm:AdditionalIcons}; MinVersion: 0,6.01
 
 ;;ResetSettings
-Name: reset_settings;             Description: {cm:tsk_ResetSettings};     GroupDescription: {cm:tsk_Other};       Flags: checkedonce unchecked; Check: SettingsExistCheck()
+Name: reset_settings;           Description: {cm:tsk_ResetSettings};     GroupDescription: {cm:tsk_Other};       Flags: checkedonce unchecked; Check: SettingsExistCheck()
 
 [Files]
 Source: "{#bindir}\{#mpcbe_exe}"; DestDir: "{app}"; Flags: ignoreversion; Components: main
@@ -221,19 +229,22 @@ Source: "..\docs\Readme.txt"; DestDir: "{app}"; Flags: ignoreversion; Components
 
 [Icons]
 #ifdef x64Build
-Name: {group}\{#app_name} x64;                   Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0
-Name: {commondesktop}\{#app_name} x64;           Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\common
-Name: {userdesktop}\{#app_name} x64;             Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\user
-Name: {#quick_launch}\{#app_name} x64;           Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: quicklaunchicon
+Name: {group}\{#app_name} x64;                       Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0
+Name: {commondesktop}\{#app_name} x64;               Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\common
+Name: {userdesktop}\{#app_name} x64;                 Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\user
+Name: {#quick_launch}\{#app_name} x64;               Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: quicklaunchicon
+Name: {app}\{#app_name} 64;                          Filename: {app}\{#mpcbe_exe}; WorkingDir: {app}; AfterInstall: PinToTaskbar(ExpandConstant('{app}\{#app_name} 64.lnk'), True); MinVersion: 0,6.1; Tasks: pintotaskbar
+Name: {group}\{cm:UninstallProgram,{#app_name} x64}; Filename: {uninstallexe};      Comment: {cm:UninstallProgram,{#app_name} x64};  WorkingDir: {app}
 #else
 Name: {group}\{#app_name};                       Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version}; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0
 Name: {commondesktop}\{#app_name};               Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version}; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\common
 Name: {userdesktop}\{#app_name};                 Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version}; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\user
 Name: {#quick_launch}\{#app_name};               Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version}; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: quicklaunchicon
+Name: {app}\{#app_name};                         Filename: {app}\{#mpcbe_exe}; WorkingDir: {app}; AfterInstall: PinToTaskbar(ExpandConstant('{app}\{#app_name}.lnk'), True); MinVersion: 0,6.1; Tasks: pintotaskbar
+Name: {group}\{cm:UninstallProgram,{#app_name}}; Filename: {uninstallexe};      Comment: {cm:UninstallProgram,{#app_name}};  WorkingDir: {app}
 #endif
 Name: {group}\Changelog;                         Filename: {app}\Changelog.txt; Comment: {cm:ViewChangelog};                WorkingDir: {app}
 Name: {group}\{cm:ProgramOnTheWeb,{#app_name}};  Filename: https://sourceforge.net/p/mpcbe/
-Name: {group}\{cm:UninstallProgram,{#app_name}}; Filename: {uninstallexe};      Comment: {cm:UninstallProgram,{#app_name}}; WorkingDir: {app}
 
 [Run]
 Filename: "{app}\{#mpcbe_exe}"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent unchecked; Description: "{cm:LaunchProgram,{#app_name}}"
@@ -283,6 +294,7 @@ var
   objShell, colVerbs: Variant;
 begin
   if not FileExists(Filename) then Exit;
+  
   if IsPin then Res := 5386 else Res := 5387;
   begin
     hInst := LoadLibraryEx(ExpandConstant('{sys}\shell32.dll'), 0, LOAD_LIBRARY_AS_DATAFILE);
@@ -299,6 +311,7 @@ begin
       for i := colVerbs.Count downto 1 do if colVerbs.Item[i].Name = strVerb then
       begin
         colVerbs.Item[i].DoIt;
+        DeleteFile(Filename);
         Break;
       end;
     finally
@@ -311,15 +324,17 @@ function GetInstallFolder(Default: String): String;
 var
   sInstallPath: String;
 begin
-  if not RegQueryStringValue(HKLM, 'SOFTWARE\MPC-BE', 'ExePath', sInstallPath) then begin
-    Result := ExpandConstant('{pf}\MPC-BE');
-  end
-  else begin
-    RegQueryStringValue(HKLM, 'SOFTWARE\MPC-BE', 'ExePath', sInstallPath);
+  Result := '';
+  if RegQueryStringValue(HKLM, 'SOFTWARE\MPC-BE', 'ExePath', sInstallPath) then begin
     Result := ExtractFileDir(sInstallPath);
-    if (Result = '') or not DirExists(Result) then begin
-      Result := ExpandConstant('{pf}\MPC-BE');
-    end;
+  end;
+  
+  if (Result = '') or not DirExists(Result) then begin
+    #ifdef x64Build
+    Result := ExpandConstant('{pf}\MPC-BE x64');
+    #else
+    Result := ExpandConstant('{pf}\MPC-BE');
+    #endif
   end;
 end;
 
@@ -398,10 +413,6 @@ begin
       SetIniInt('Settings', 'InterfaceLanguage', iLanguage, ExpandConstant('{app}\{#mpcbe_ini}'))
     else
       RegWriteDWordValue(HKCU, 'Software\MPC-BE\Settings', 'InterfaceLanguage', iLanguage);
-      
-    if IsTaskSelected('pintotaskbar') then begin
-      PinToTaskbar(ExpandConstant('{app}\{#mpcbe_exe}'), True);
-    end;
   end;
 
   if (CurStep = ssDone) and not WizardSilent() and not D3DX9DLLExists() then
@@ -412,13 +423,9 @@ end;
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
   // When uninstalling, ask the user to delete MPC-BE settings
-  if (CurUninstallStep = usUninstall) then begin
-    PinToTaskbar(ExpandConstant('{app}\{#mpcbe_exe}'), False);
-    
-    if SettingsExistCheck() then begin
-      if SuppressibleMsgBox(CustomMessage('msg_DeleteSettings'), mbConfirmation, MB_YESNO or MB_DEFBUTTON2, IDNO) = IDYES then
-        CleanUpSettingsAndFiles();
-    end;    
+  if ((CurUninstallStep = usUninstall) and SettingsExistCheck()) then begin
+    if SuppressibleMsgBox(CustomMessage('msg_DeleteSettings'), mbConfirmation, MB_YESNO or MB_DEFBUTTON2, IDNO) = IDYES then
+      CleanUpSettingsAndFiles();
   end;
 end;
 

@@ -28,7 +28,6 @@
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // RT_MANIFEST
@@ -171,18 +170,21 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "Based on the original MPC-BE v6.4.9.0 © Gabest"
+            VALUE "Comments", "Based on the original MPC v6.4.9.0 © Gabest & MPC-HC"
             VALUE "CompanyName", MPC_COMP_NAME_STR
-            VALUE "FileDescription", "MPC-BE"
             VALUE "FileVersion", MPC_VERSION_STR
-            VALUE "InternalName", "mpc-be"
             VALUE "LegalCopyright", MPC_COPYRIGHT_STR
 #ifdef _WIN64
+            VALUE "FileDescription", "MPC-BE x64"
+            VALUE "InternalName", "mpc-be64"
             VALUE "OriginalFilename", "mpc-be64.exe"
+            VALUE "ProductName", "MPC-BE x64"
 #else
+            VALUE "FileDescription", "MPC-BE"
+            VALUE "InternalName", "mpc-be"
             VALUE "OriginalFilename", "mpc-be.exe"
-#endif
             VALUE "ProductName", "MPC-BE"
+#endif
             VALUE "ProductVersion", MPC_VERSION_STR
         END
     END
