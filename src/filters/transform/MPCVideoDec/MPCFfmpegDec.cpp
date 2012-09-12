@@ -21,7 +21,7 @@
  */
 
 #include "stdafx.h"
-#include "MPCVideoDec.h"
+#include "MPCVideoDecFilter.h"
 #include "../../../DSUtil/DSUtil.h"
 
 #ifdef REGISTER_FILTER

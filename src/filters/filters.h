@@ -65,5 +65,5 @@
 #include "transform/BufferFilter/BufferFilter.h"
 #include "transform/DeCSSFilter/DeCSSFilter.h"
 #include "transform/MpaDecFilter/MpaDecFilter.h"
-#include "transform/MPCVideoDec/MPCVideoDec.h"
+#include "transform/MPCVideoDec/MPCVideoDecFilter.h"
 #include "transform/Mpeg2DecFilter/Mpeg2DecFilter.h"

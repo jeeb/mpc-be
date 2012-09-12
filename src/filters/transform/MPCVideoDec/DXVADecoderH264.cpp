@@ -23,7 +23,7 @@
 #include "stdafx.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "DXVADecoderH264.h"
-#include "MPCVideoDec.h"
+#include "MPCVideoDecFilter.h"
 #include "VideoDecDXVAAllocator.h"
 #include "../../../DSUtil/PODtypes.h"
 #include <ffmpeg/libavcodec/avcodec.h>

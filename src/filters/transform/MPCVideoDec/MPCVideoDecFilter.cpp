@@ -30,7 +30,7 @@
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
 #endif
-#include "MPCVideoDec.h"
+#include "MPCVideoDecFilter.h"
 #include "VideoDecOutputPin.h"
 #include "CpuId.h"
 
@@ -53,6 +53,7 @@ extern "C"
 #include <moreuuids.h>
 #include "DXVADecoderH264.h"
 #include "../../../apps/mplayerc/FilterEnum.h"
+
 #include "../../../DSUtil/WinAPIUtils.h"
 
 #define MAX_SUPPORTED_MODE			5

@@ -25,8 +25,10 @@
 #include <videoacc.h>
 #include "../BaseVideoFilter/BaseVideoFilter.h"
 
+
 class CMPCVideoDecFilter;
 class CVideoDecDXVAAllocator;
+
 
 class CVideoDecOutputPin : public CBaseVideoOutputPin
 	, public IAMVideoAcceleratorNotify
@@ -46,7 +48,7 @@ public:
 	STDMETHODIMP	SetUncompSurfacesInfo(DWORD dwActualUncompSurfacesAllocated);
 	STDMETHODIMP	GetCreateVideoAcceleratorData(const GUID *pGuid, LPDWORD pdwSizeMiscData, LPVOID *ppMiscData);
 
-private:
+private :
 	CMPCVideoDecFilter*			m_pVideoDecFilter;
 	CVideoDecDXVAAllocator*		m_pDXVA2Allocator;
 	DWORD						m_dwDXVA1SurfaceCount;
