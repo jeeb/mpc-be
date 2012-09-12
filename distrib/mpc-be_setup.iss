@@ -28,7 +28,6 @@
 
 ; Don't forget to update the DirectX SDK number in "include\Version.h" (not updated so often)
 
-
 ; From now on you shouldn't need to change anything
 
 #if VER < EncodeVer(5,5,0)
@@ -146,7 +145,6 @@ Name: ua; MessagesFile: compiler:Languages\Ukrainian.isl
 ; Include installer's custom messages
 #include "custom_messages.iss"
 
-
 [Messages]
 #ifdef x64Build
 BeveledLabel={#app_name} x64 {#app_version}
@@ -187,7 +185,7 @@ Name: pintotaskbar;             Description: {cm:PinToTaskBar};          GroupDe
 Name: reset_settings;           Description: {cm:tsk_ResetSettings};     GroupDescription: {cm:tsk_Other};       Flags: checkedonce unchecked; Check: SettingsExistCheck()
 
 [Files]
-Source: "{#bindir}\{#mpcbe_exe}"; DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "{#bindir}\{#mpcbe_exe}";		DestDir: "{app}"; Flags: ignoreversion; Components: main
 Source: "{#bindir}\mpciconlib.dll"; DestDir: "{app}"; Flags: ignoreversion; Components: mpciconlib
 #ifdef x64Build
 Source: "{#bindir}\MPCBEShellExt64.dll"; DestDir: "{app}"; Flags: ignoreversion noregerror regserver restartreplace uninsrestartdelete; Components: mpcbeshellext
@@ -220,28 +218,26 @@ Source: "{#bindir}\Lang\mpcresources.tc.dll"; DestDir: "{app}\Lang"; Flags: igno
 Source: "{#bindir}\Lang\mpcresources.tr.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
 Source: "{#bindir}\Lang\mpcresources.ua.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
 #endif
-Source: "..\docs\COPYING.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
-Source: "..\docs\Authors.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
-Source: "..\docs\Authors mpc-hc team.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
-Source: "..\docs\Changelog.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
-Source: "..\docs\Changelog.Rus.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
-Source: "..\docs\Readme.txt"; DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "..\docs\COPYING.txt";							DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "..\docs\Authors.txt";							DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "..\docs\Authors mpc-hc team.txt";	DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "..\docs\Changelog.txt";						DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "..\docs\Changelog.Rus.txt";				DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "..\docs\Readme.txt";								DestDir: "{app}"; Flags: ignoreversion; Components: main
 
 [Icons]
 #ifdef x64Build
-Name: {group}\{#app_name} x64;                       Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0
-Name: {commondesktop}\{#app_name} x64;               Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\common
-Name: {userdesktop}\{#app_name} x64;                 Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\user
-Name: {#quick_launch}\{#app_name} x64;               Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: quicklaunchicon
-Name: {app}\{#app_name} 64;                          Filename: {app}\{#mpcbe_exe}; WorkingDir: {app}; AfterInstall: PinToTaskbar(ExpandConstant('{app}\{#app_name} 64.lnk'), True); MinVersion: 0,6.1; Tasks: pintotaskbar
-Name: {group}\{cm:UninstallProgram,{#app_name} x64}; Filename: {uninstallexe};      Comment: {cm:UninstallProgram,{#app_name} x64};  WorkingDir: {app}
+Name: {group}\{#app_name} x64;                   			Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0
+Name: {commondesktop}\{#app_name} x64;           			Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\common
+Name: {userdesktop}\{#app_name} x64;             			Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\user
+Name: {#quick_launch}\{#app_name} x64;           			Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: quicklaunchicon
+Name: {group}\{cm:UninstallProgram,{#app_name} x64};	Filename: {uninstallexe};			Comment: {cm:UninstallProgram,{#app_name} x64};  WorkingDir: {app}
 #else
 Name: {group}\{#app_name};                       Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version}; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0
 Name: {commondesktop}\{#app_name};               Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version}; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\common
 Name: {userdesktop}\{#app_name};                 Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version}; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\user
 Name: {#quick_launch}\{#app_name};               Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version}; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: quicklaunchicon
-Name: {app}\{#app_name};                         Filename: {app}\{#mpcbe_exe}; WorkingDir: {app}; AfterInstall: PinToTaskbar(ExpandConstant('{app}\{#app_name}.lnk'), True); MinVersion: 0,6.1; Tasks: pintotaskbar
-Name: {group}\{cm:UninstallProgram,{#app_name}}; Filename: {uninstallexe};      Comment: {cm:UninstallProgram,{#app_name}};  WorkingDir: {app}
+Name: {group}\{cm:UninstallProgram,{#app_name}}; Filename: {uninstallexe};     Comment: {cm:UninstallProgram,{#app_name}};  WorkingDir: {app}
 #endif
 Name: {group}\Changelog;                         Filename: {app}\Changelog.txt; Comment: {cm:ViewChangelog};                WorkingDir: {app}
 Name: {group}\{cm:ProgramOnTheWeb,{#app_name}};  Filename: https://sourceforge.net/p/mpcbe/
@@ -290,8 +286,8 @@ var
 	hInst: THandle;
   buf: array [0..255] of char;
   i, Res: Integer;
-  strVerb: String;
-  objShell, colVerbs: Variant;
+  strVerb, sVBSFile: String;
+  objShell, colVerbs, oFile: Variant;
 begin
   if not FileExists(Filename) then Exit;
   
@@ -307,12 +303,31 @@ begin
         ShowExceptionMessage;
         Exit;
       end;
-      colVerbs := objShell.Namespace(ExtractFileDir(Filename)).ParseName(ExtractFileName(Filename)).Verbs;
-      for i := colVerbs.Count downto 1 do if colVerbs.Item[i].Name = strVerb then
-      begin
-        colVerbs.Item[i].DoIt;
-        DeleteFile(Filename);
-        Break;
+      oFile    := objShell.Namespace(ExtractFileDir(Filename)).ParseName(ExtractFileName(Filename));
+      colVerbs := oFile.Verbs;
+      
+      if IsWin64 and (Pos (ExpandConstant ('{pf64}\'), Filename) = 1) then begin
+        sVBSFile := GenerateUniqueName (GetTempDir, 'mpc_be.vbs');
+        SaveStringToFile (sVBSFile, \
+          'Set oShell=CreateObject("Shell.Application")'  + #13 + \
+          'Set oVerbs=oShell.NameSpace("' + ExtractFileDir (Filename) + '").ParseName("' + ExtractFileName (Filename) + '").Verbs' + #13 + \
+          'For Each oVerb In oVerbs'											+ #13 + \
+          '  If (oVerb="' + strVerb + '") Then'						+ #13 + \
+          '    oVerb.DoIt'														    + #13 + \
+          '    Exit For'															    + #13 + \
+          '  End If'															        + #13 + \
+          'Next'																, False);
+  
+        exec( ExpandConstant ('{win}\Sysnative\cscript.exe'), '"' + sVBSFile + '" /B', '', SW_HIDE, ewWaitUntilTerminated, i);
+        DeleteFile (sVBSFile);
+      end else begin
+        for i := colVerbs.Count downto 1 do if colVerbs.Item[i].Name = strVerb then begin
+			    if (IsPin and oFile.IsLink) then
+				    DeleteFile (ExpandConstant ('{userappdata}\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\') + ExtractFileName (Filename));
+          
+          colVerbs.Item[i].DoIt;
+          Break;
+        end;
       end;
     finally
       FreeDLL(hInst);
@@ -403,6 +418,10 @@ var
   iLanguage: Integer;
 begin
   if CurStep = ssPostInstall then begin
+  
+    if IsTaskSelected('pintotaskbar') then
+      PinToTaskbar(ExpandConstant('{app}\{#mpcbe_exe}'), True);
+  
     if IsTaskSelected('reset_settings') then
       CleanUpSettingsAndFiles();
 
@@ -417,12 +436,14 @@ begin
 
   if (CurStep = ssDone) and not WizardSilent() and not D3DX9DLLExists() then
     SuppressibleMsgBox(CustomMessage('msg_NoD3DX9DLL_found'), mbError, MB_OK, MB_OK);
-
 end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
-  // When uninstalling, ask the user to delete MPC-BE settings
+  if (CurUninstallStep = usUninstall) then
+    PinToTaskbar(ExpandConstant('{app}\{#mpcbe_exe}'), False);
+
+  // When uninstalling, ask the user to delete MPC-BE settings  
   if ((CurUninstallStep = usUninstall) and SettingsExistCheck()) then begin
     if SuppressibleMsgBox(CustomMessage('msg_DeleteSettings'), mbConfirmation, MB_YESNO or MB_DEFBUTTON2, IDNO) = IDYES then
       CleanUpSettingsAndFiles();
