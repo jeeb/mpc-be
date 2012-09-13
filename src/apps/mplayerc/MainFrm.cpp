@@ -12186,9 +12186,9 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 			}
 			EndEnumFilters;
 		}
-    title = fn + _T(" - ") + m_strTitle;
+		title = fn + _T(" - ") + m_strTitle;
 	} else if (i == 0) {
-    title = fname + _T(" - ") + m_strTitle;
+		title = fname + _T(" - ") + m_strTitle;
 	}
 
 	SetWindowText(title);
@@ -17494,6 +17494,7 @@ CString CMainFrame::FillMessage()
 
 		if (m_fUpdateInfoBar) {
 			OpenSetupInfoBar();
+			OpenSetupWindowTitle(m_strFnFull);
 		}
 	}
 
