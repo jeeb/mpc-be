@@ -21,6 +21,7 @@ Translators:
 -------------
 Ukrainian - arestarh1986, Ukraine
 Korean - kuh3h3
+German - Markus Gaugg(gaugg@gmx.at)
 
 Official Beta testers:
 ----------------------
