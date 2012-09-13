@@ -316,7 +316,7 @@ void CPlayerSeekBar::OnPaint()
 
 	if (s.fDisableXPToolbars) {
 		CRect rt;
-		CString str = s.iTitleBarTextStyle ? ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strFn : ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strFnFull;
+		CString str = ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->GetStrForTitle();//s.iTitleBarTextStyle ? ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strFn : ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strFnFull;
 
 		CDC memdc;
 		CBitmap m_bmPaint;

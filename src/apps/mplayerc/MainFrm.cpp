@@ -15703,6 +15703,8 @@ void CMainFrame::ShowOptions(int idPage)
 
 	m_wndStatusBar.Relayout();
 
+	OpenSetupWindowTitle(m_strFnFull);
+
 	m_bInOptions = false;
 }
 
@@ -17888,4 +17890,27 @@ void CMainFrame::CreateCaptureWindow()
 	}
 
 	m_CaptureWndBitmap = CreateCaptureDIB(rectClient.Width(), rectClient.Height());
+}
+
+CString CMainFrame::GetStrForTitle()
+{
+	AppSettings& s = AfxGetAppSettings();
+
+	if (s.iTitleBarTextStyle == 1) {
+		if (s.fTitleBarTextTitle) {
+			BeginEnumFilters(pGB, pEF, pBF) {
+				if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
+					CComBSTR bstr;
+					if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
+						return CString(bstr.m_str);
+						break;
+					}
+				}
+			}
+			EndEnumFilters;
+		}
+		return m_strFn;
+	} else {
+		return m_strFnFull;
+	}
 }

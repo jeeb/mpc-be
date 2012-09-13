@@ -997,6 +997,8 @@ public:
 	CString		m_strTitle;
 	CString		m_strFn;
 	CString		m_strFnFull;
+	CString		GetStrForTitle();
+
 	bool		m_bToggleShader;
 	bool		m_bToggleShaderScreenSpace;
 	bool		m_bInOptions;
