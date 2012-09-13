@@ -2945,13 +2945,11 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 				PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 			} else {
 				s_fLDown = true;
-				if (OnButton(wmcmd::LDOWN, nFlags, point)) {
-					//PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
-					if (!bFSWnd && !m_fFullScreen) {
-						PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
-					}
-					return;
+				OnButton(wmcmd::LDOWN, nFlags, point);
+				if (!bFSWnd && !m_fFullScreen) {
+					PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 				}
+				return;
 			}
 		}
 
