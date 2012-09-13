@@ -103,7 +103,6 @@ AppReadmeFile={app}\Readme.txt
 WizardImageFile=WizardImageFile.bmp
 WizardSmallImageFile=WizardSmallImageFile.bmp
 Compression=lzma2/ultra64
-InternalCompressLevel=ultra64
 SolidCompression=yes
 AllowNoIcons=yes
 ShowTasksTreeLines=yes
