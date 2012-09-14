@@ -10927,6 +10927,14 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 		m_pVideoWnd		= &m_wndView;
 
 		b_UseSmartSeek = s.fSmartSeek && !s.fD3DFullscreen;
+
+		if (OpenFileData* p = dynamic_cast<OpenFileData*>(pOMD)) {
+			CString fn = p->fns.GetHead();
+			if (!fn.IsEmpty() && (fn.Find(_T("://")) >= 0)) { // disable SmartSeek for streaming data.
+				b_UseSmartSeek = false;
+			}
+		}
+
 		if (b_UseSmartSeek) {
 			DWORD style = WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS;
 			if (!m_wndView2.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL, style, CRect(0, 0, 160, 109), this, 0, NULL)) {
@@ -15214,8 +15222,9 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool fSeekToKeyFrame)
 	}
 
 	m_nStepForwardCount = 0;
+	__int64 start	= 0;
+	__int64 stop	= 0;
 	if (GetPlaybackMode() != PM_CAPTURE) {
-		__int64 start, stop;
 		m_wndSeekBar.GetRange(start, stop);
 		GUID tf;
 		pMS->GetTimeFormat(&tf);
@@ -15227,6 +15236,36 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool fSeekToKeyFrame)
 	}
 
 	if (GetPlaybackMode() == PM_FILE) {
+		// Disable seeking while buffering data if the seeking position is more than a loading progress
+		if (pAMOP && stop) {
+			__int64 t = 0, c = 0;
+			if (SUCCEEDED(pAMOP->QueryProgress(&t, &c)) && t > 0 && c < t) {
+				int Query_percent	= c*100/t;
+				int Seek_percent	= rtPos*100/stop;
+				if (Seek_percent > Query_percent) {
+					return;
+				}
+			}
+		}
+
+		if (m_fBuffering) {
+			BeginEnumFilters(pGB, pEF, pBF) {
+				if (CComQIPtr<IAMNetworkStatus, &IID_IAMNetworkStatus> pAMNS = pBF) {
+					long BufferingProgress = 0;
+					if (SUCCEEDED(pAMNS->get_BufferingProgress(&BufferingProgress)) && (BufferingProgress > 0 && BufferingProgress < 100)) {
+						int Seek_percent = rtPos*100/stop;
+						if (Seek_percent > BufferingProgress) {
+							return;
+						}
+
+					}
+					break;
+				}
+			}
+			EndEnumFilters;
+		}
+
+
 		if (fs == State_Stopped) {
 			SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
 		}

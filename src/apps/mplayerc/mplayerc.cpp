@@ -72,7 +72,7 @@ HICON LoadIcon(CString fn, bool fSmall)
 		}
 	}
 
-	if (!(CString(fn).MakeLower().Find(_T("http://")))) {
+	if ((CString(fn).MakeLower().Find(_T("://"))) >= 0) {
 		if (HICON hIcon = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, size.cx, size.cy, 0)) {
 			return hIcon;
 		}
