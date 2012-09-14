@@ -580,20 +580,23 @@ void CPlayerSeekBar::OnSize(UINT nType, int cx, int cy)
 
 void CPlayerSeekBar::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	if (AfxGetAppSettings().fDisableXPToolbars && m_fEnabled) {
-		SetCapture();
-		MoveThumb(point);
-	} else {
-		if (m_fEnabled && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
+	__int64 pos = CalculatePosition(point);
+	CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
+	if (pFrame->ValidateSeek(pos, m_stop)) {
+
+		if (AfxGetAppSettings().fDisableXPToolbars && m_fEnabled) {
 			SetCapture();
 			MoveThumb(point);
-			GetParent()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
 		} else {
-			CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
-
-			if (!pFrame->m_fFullScreen) {
-				MapWindowPoints(pFrame, &point, 1);
-				pFrame->PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
+			if (m_fEnabled && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
+				SetCapture();
+				MoveThumb(point);
+				GetParent()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
+			} else {
+				if (!pFrame->m_fFullScreen) {
+					MapWindowPoints(pFrame, &point, 1);
+					pFrame->PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
+				}
 			}
 		}
 	}
@@ -605,8 +608,12 @@ void CPlayerSeekBar::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	ReleaseCapture();
 
-	if (AfxGetAppSettings().fDisableXPToolbars && m_fEnabled) {
-		GetParent()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
+	__int64 pos = CalculatePosition(point);
+	if (((CMainFrame*)GetParentFrame())->ValidateSeek(pos, m_stop)) {
+	
+		if (AfxGetAppSettings().fDisableXPToolbars && m_fEnabled) {
+			GetParent()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
+		}
 	}
 
 	CDialogBar::OnLButtonUp(nFlags, point);
@@ -667,16 +674,18 @@ void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 	AppSettings& s = AfxGetAppSettings();
 
 	CWnd* w = GetCapture();
+	CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
 
 	if (w && w->m_hWnd == m_hWnd && (nFlags & MK_LBUTTON)) {
-		MoveThumb(point);
+		__int64 pos = CalculatePosition(point);
+		if (pFrame->ValidateSeek(pos, m_stop)) {
+			MoveThumb(point);
+		}
 
 		if (!s.fDisableXPToolbars) {
 			GetParent()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBTRACK), (LPARAM)m_hWnd);
 		}
 	}
-
-	CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
 
 	if (s.fUseTimeTooltip || pFrame->CanPreviewUse()) {
 		UpdateTooltip(point);

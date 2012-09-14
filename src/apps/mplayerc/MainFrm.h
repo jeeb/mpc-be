@@ -524,6 +524,7 @@ public:
 	OAFilterState GetMediaState();
 	REFERENCE_TIME GetPos(), GetDur();
 	void SeekTo(REFERENCE_TIME rt, bool fSeekToKeyFrame = false);
+	bool ValidateSeek(REFERENCE_TIME rtPos, REFERENCE_TIME rtStop);
 
 	// subtitle streams order function
 	bool LoadSubtitle(CString fn, ISubStream **actualStream = NULL);

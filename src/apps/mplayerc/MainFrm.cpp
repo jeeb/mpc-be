@@ -15236,35 +15236,6 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool fSeekToKeyFrame)
 	}
 
 	if (GetPlaybackMode() == PM_FILE) {
-		// Disable seeking while buffering data if the seeking position is more than a loading progress
-		if (pAMOP && stop) {
-			__int64 t = 0, c = 0;
-			if (SUCCEEDED(pAMOP->QueryProgress(&t, &c)) && t > 0 && c < t) {
-				int Query_percent	= c*100/t;
-				int Seek_percent	= rtPos*100/stop;
-				if (Seek_percent > Query_percent) {
-					return;
-				}
-			}
-		}
-
-		if (m_fBuffering) {
-			BeginEnumFilters(pGB, pEF, pBF) {
-				if (CComQIPtr<IAMNetworkStatus, &IID_IAMNetworkStatus> pAMNS = pBF) {
-					long BufferingProgress = 0;
-					if (SUCCEEDED(pAMNS->get_BufferingProgress(&BufferingProgress)) && (BufferingProgress > 0 && BufferingProgress < 100)) {
-						int Seek_percent = rtPos*100/stop;
-						if (Seek_percent > BufferingProgress) {
-							return;
-						}
-
-					}
-					break;
-				}
-			}
-			EndEnumFilters;
-		}
-
 
 		if (fs == State_Stopped) {
 			SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
@@ -15280,6 +15251,11 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool fSeekToKeyFrame)
 				}
 			}
 		}
+
+		if (!ValidateSeek(rtPos, stop)) {
+			return;
+		}
+
 		m_nSeekDirection = SEEK_DIRECTION_NONE;
 
 		hr = pMS->SetPositions(&rtPos, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
@@ -15301,6 +15277,42 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool fSeekToKeyFrame)
 	OnTimer(TIMER_STREAMPOSPOLLER2);
 
 	SendCurrentPositionToApi(true);
+}
+
+bool CMainFrame::ValidateSeek(REFERENCE_TIME rtPos, REFERENCE_TIME rtStop)
+{
+	// Disable seeking while buffering data if the seeking position is more than a loading progress
+	if (m_iMediaLoadState == MLS_LOADED && GetPlaybackMode() == PM_FILE && (rtPos > 0) && (rtStop > 0) && (rtPos <= rtStop)) {
+		if (pAMOP) {
+			__int64 t = 0, c = 0;
+			if (SUCCEEDED(pAMOP->QueryProgress(&t, &c)) && t > 0 && c < t) {
+				int Query_percent	= c*100/t;
+				int Seek_percent	= rtPos*100/rtStop;
+				if (Seek_percent > Query_percent) {
+					return false;
+				}
+			}
+		}
+
+		if (m_fBuffering) {
+			BeginEnumFilters(pGB, pEF, pBF) {
+				if (CComQIPtr<IAMNetworkStatus, &IID_IAMNetworkStatus> pAMNS = pBF) {
+					long BufferingProgress = 0;
+					if (SUCCEEDED(pAMNS->get_BufferingProgress(&BufferingProgress)) && (BufferingProgress > 0 && BufferingProgress < 100)) {
+						int Seek_percent = rtPos*100/rtStop;
+						if (Seek_percent > BufferingProgress) {
+							return false;
+						}
+
+					}
+					break;
+				}
+			}
+			EndEnumFilters;
+		}
+	}
+
+	return true;
 }
 
 void CMainFrame::CleanGraph()
