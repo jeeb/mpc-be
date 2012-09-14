@@ -61,7 +61,7 @@ CPPageFormats::CPPageFormats()
 	, m_fRtspFileExtFirst(FALSE)
 	, m_bInsufficientPrivileges(false)
 {
-	if (!IsWinEight() && (m_pAAR == NULL)) {
+	if (m_pAAR == NULL) {
 		// Default manager (requires at least Vista)
 		HRESULT hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration,
 									  NULL,
@@ -145,7 +145,7 @@ bool CPPageFormats::IsRegistered(CString ext)
 	BOOL    bIsDefault = FALSE;
 	CString strProgID = PROGID + ext;
 
-	if (!IsWinEight() && (m_pAAR == NULL)) {
+	if (m_pAAR == NULL) {
 		// Default manager (requires at least Vista)
 		hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration,
 							  NULL,
@@ -154,7 +154,7 @@ bool CPPageFormats::IsRegistered(CString ext)
 							  (void**)&m_pAAR);
 	}
 
-	if (!IsWinEight() && m_pAAR) {
+	if (m_pAAR) {
 		// The Vista way
 		hr = m_pAAR->QueryAppIsDefault(ext, AT_FILEEXTENSION, AL_EFFECTIVE, g_strRegisteredAppName, &bIsDefault);
 	} else {
@@ -243,7 +243,7 @@ int GetIconIndex(CString ext)
 
 bool CPPageFormats::RegisterApp()
 {
-	if (!IsWinEight() && (m_pAAR == NULL)) {
+	if (m_pAAR == NULL) {
 		// Default manager (requiered at least Vista)
 		HRESULT hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration,
 									  NULL,
@@ -253,7 +253,7 @@ bool CPPageFormats::RegisterApp()
 		UNREFERENCED_PARAMETER(hr);
 	}
 
-	if (!IsWinEight() && m_pAAR) {
+	if (m_pAAR) {
 		CString AppIcon = _T("");
 		TCHAR buff[_MAX_PATH];
 
@@ -672,7 +672,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool f
 	ULONG   len = _countof(buff);
 	memset(buff, 0, sizeof(buff));
 
-	if (!IsWinEight() && (m_pAAR == NULL)) {
+	if (m_pAAR == NULL) {
 		// Default manager (requiered at least Vista)
 		HRESULT hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration,
 									  NULL,
@@ -682,7 +682,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool f
 		UNREFERENCED_PARAMETER(hr);
 	}
 
-	if (!IsWinEight() && m_pAAR) {
+	if (m_pAAR) {
 		// The Vista way
 		CString strNewApp;
 		if (fRegister) {
@@ -870,9 +870,7 @@ BOOL CPPageFormats::OnApply()
 	s.m_Formats.SetRtspHandler(m_iRtspHandler==0?RealMedia:m_iRtspHandler==1?QuickTime:DirectShow, !!m_fRtspFileExtFirst);
 	s.fAssociatedWithIcons = !!m_fAssociatedWithIcons.GetCheck();
 
-	// TODO - on Win 8 work without this code, but as say on msdn - we need use that Api - temporary disable ...
-	/*
-	if (IsWinEight()) {
+	if (m_bFileExtChanged && IsWinEight()) {
 		IApplicationAssociationRegistrationUI *pUI = NULL;
 
 		HRESULT hr = CoCreateInstance(CLSID_ApplicationAssociationRegistrationUI, 
@@ -886,7 +884,6 @@ BOOL CPPageFormats::OnApply()
 			pUI->Release();
 		}
 	}
-	*/
 
 	SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
 
