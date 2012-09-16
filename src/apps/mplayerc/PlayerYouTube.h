@@ -184,7 +184,7 @@ CString PlayerYouTube(CString fname)
 
 				free(out);
 
-				return str;
+				return str + _T("&title=vid.mp4");
 			} else {
 				free(out);
 

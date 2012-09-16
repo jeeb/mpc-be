@@ -4851,9 +4851,11 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 
 void CMainFrame::OnFileSaveAs()
 {
-	CString ext, in = m_wndPlaylistBar.GetCurFileName(), out = in;
+	CString ext, in = PlayerYouTube(m_wndPlaylistBar.GetCurFileName()), out = in;
 
-	if (out.Find(_T("://")) < 0) {
+	int find = out.Find(_T("://"));
+
+	if (find < 0) {
 		ext = CString(CPath(out).GetExtension()).MakeLower();
 		if (ext == _T(".cda")) {
 			out = out.Left(out.GetLength()-4) + _T(".wav");
@@ -4861,7 +4863,8 @@ void CMainFrame::OnFileSaveAs()
 			out = out.Left(out.GetLength()-4) + _T(".vob");
 		}
 	} else {
-		out.Empty();
+		out = out.Right(find+3);
+		out.Replace(_T("/"), _T("_"));
 	}
 
 	CFileDialog fd(FALSE, 0, out,
@@ -4898,14 +4901,6 @@ void CMainFrame::OnFileSaveAs()
 void CMainFrame::OnUpdateFileSaveAs(CCmdUI* pCmdUI)
 {
 	if (m_iMediaLoadState != MLS_LOADED || GetPlaybackMode() != PM_FILE) {
-		pCmdUI->Enable(FALSE);
-		return;
-	}
-
-	CString fn = m_wndPlaylistBar.GetCurFileName();
-	CString ext = fn.Mid(fn.ReverseFind('.')+1).MakeLower();
-
-	if (fn.Find(_T("://")) >= 0) {
 		pCmdUI->Enable(FALSE);
 		return;
 	}
@@ -11257,7 +11252,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		}
 
 		HRESULT hr = pGB->RenderFile(PlayerYouTube(fn), NULL);
-		
+
 		if (s.fKeepHistory && s.fRememberFilePos && !s.NewFile(fn)) {
 			REFERENCE_TIME	rtPos = s.CurrentFilePosition()->llPosition;
 			if (pMS) {
