@@ -80,10 +80,15 @@ CDVBSub::DVB_REGION* CDVBSub::FindRegion(DVB_PAGE* pPage, BYTE bRegionId)
 CDVBSub::DVB_CLUT* CDVBSub::FindClut(DVB_PAGE* pPage, BYTE bClutId)
 {
 	if (pPage != NULL) {
-		for (int i = 0; i<256; i++) {
-			if (pPage->Clut[i].id == bClutId) {
-				return &pPage->Clut[i];
+		POSITION pos = pPage->Clut.GetHeadPosition();
+
+		while (pos) {
+			DVB_CLUT Clut = pPage->Clut.GetAt(pos);
+
+			if (Clut.id == bClutId) {
+				return &pPage->Clut.GetAt(pos);
 			}
+			pPage->Clut.GetNext(pos);
 		}
 	}
 	return NULL;
@@ -317,7 +322,9 @@ void CDVBSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 					pObject->m_width  = pRegion->width;
 					pObject->m_height = pRegion->height;
 					CDVBSub::DVB_CLUT* pClut = FindClut(pPage, pRegion->CLUT_id);
-					pObject->SetPalette(pClut->Size, pClut->Palette, m_Display.width > 720);
+					if (pClut != NULL) {
+						pObject->SetPalette(pClut->Size, pClut->Palette, m_Display.width > 720);
+					}
 					
 					pObject->RenderDvb(spd, nX, nY);
 				}
@@ -361,13 +368,13 @@ POSITION CDVBSub::GetNext(POSITION pos)
 REFERENCE_TIME CDVBSub::GetStart(POSITION nPos)
 {
 	DVB_PAGE* pPage = m_Pages.GetAt(nPos);
-	return pPage!=NULL ? pPage->rtStart : INVALID_TIME;
+	return pPage != NULL ? pPage->rtStart : INVALID_TIME;
 }
 
 REFERENCE_TIME CDVBSub::GetStop(POSITION nPos)
 {
 	DVB_PAGE* pPage = m_Pages.GetAt(nPos);
-	return pPage!=NULL ? pPage->rtStop : INVALID_TIME;
+	return pPage != NULL ? pPage->rtStop : INVALID_TIME;
 }
 
 void CDVBSub::Reset()
@@ -398,7 +405,7 @@ HRESULT CDVBSub::ParsePage(CGolombBuffer& gb, WORD wSegLength, CAutoPtr<DVB_PAGE
 	while (gb.GetPos() < nEnd) {
 		if (nPos < MAX_REGIONS) {
 			pPage->Regions[nPos].Id			= gb.ReadByte();
-			gb.ReadByte();	// Reserved
+			gb.ReadByte();					// Reserved
 			pPage->Regions[nPos].HorizAddr	= gb.ReadShort();
 			pPage->Regions[nPos].VertAddr	= gb.ReadShort();
 			pPage->RegionCount++;
@@ -482,7 +489,12 @@ HRESULT CDVBSub::ParseClut(CGolombBuffer& gb, WORD wSegLength)
 	BYTE				CLUT_id	= gb.ReadByte();
 
 	if (m_pCurrentPage != NULL) {
-		CDVBSub::DVB_CLUT* pClut	= &m_pCurrentPage->Clut[CLUT_id];
+
+		CDVBSub::DVB_CLUT	DummyClut;
+		CDVBSub::DVB_CLUT*	pClut = FindClut(m_pCurrentPage, CLUT_id);
+		if (pClut == NULL) {
+			pClut = &DummyClut;
+		}
 
 		pClut->id				= CLUT_id;
 		pClut->version_number	= (BYTE)gb.BitRead(4);
@@ -519,6 +531,10 @@ HRESULT CDVBSub::ParseClut(CGolombBuffer& gb, WORD wSegLength)
 
 			pClut->Size = max (pClut->Size, entry_id + 1);
 		}
+
+		if (DummyClut.Size) {
+			m_pCurrentPage->Clut.AddTail(DummyClut);
+		}
 	}	
 
 	return hr;
@@ -549,7 +565,6 @@ HRESULT CDVBSub::ParseObject(CGolombBuffer& gb, WORD wSegLength)
 			hr = E_NOTIMPL;
 		}
 	}
-
 
 	return hr;
 }

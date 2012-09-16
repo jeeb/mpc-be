@@ -171,7 +171,7 @@ public:
 		DVB_REGION						Regions[MAX_REGIONS];
 		CAtlList<CompositionObject*>	Objects;
 		bool							Rendered;
-		DVB_CLUT						Clut[256];
+		CAtlList<DVB_CLUT>				Clut;
 
 		DVB_PAGE() {
 			PageTimeOut			= 0;
@@ -187,6 +187,8 @@ public:
 				pPage = Objects.RemoveHead();
 				delete pPage;
 			}
+
+			Clut.RemoveAll();
 		}
 	};
 
