@@ -29,7 +29,7 @@ function MakeRequest(req) {
 function urlencode(s) {
 	if (encodeURIComponent) return encodeURIComponent(s);
 	if (escape) return escape(s);
-	return s; // whatever
+	return s;
 }
 
 function getOffsetX(m) {
@@ -41,7 +41,7 @@ function getOffsetX(m) {
 }
 
 OnStatus = function (title, status, pos, posstr, dur, durstr, muted, volume, filepath) {
-	var maxtitle = 70;
+	var maxtitle = 64;
 	if (title.length > maxtitle) title = title.substr(0, maxtitle - 3) + '...';
 	var timestr = dur > 0 && posstr && durstr ? posstr + '&nbsp;/&nbsp;' + durstr : '&nbsp;';
 	if (!dur || dur == 0) dur = 1;
@@ -165,24 +165,24 @@ img {
 	width: 100%;
 }
 #header td {
-	height: 30px;
+	height: 27px;
 }
 #headericon {
 	background-image: url(headericon.png);
 	background-repeat: no-repeat;
-	width: 22px;
+	width: 23px;
 }
 #headerback {
 	background-image: url(headerback.png);
 	background-repeat: repeat-x;
 	color: white;
 	font-weight: bold;
-	padding-top: 5px;
+	padding-top: 0px;
 }
 #headerclose {
 	background-image: url(headerclose.png);
 	background-repeat: no-repeat;
-	width: 28px;
+	width: 54px;
 }
 #title, #status, #posstr, #durstr {
 	display: inline;
@@ -204,8 +204,12 @@ img {
 	color: white;
 }
 #video {
+	background-image: url(logo.png);
+	background-repeat: no-repeat;
+	background-position: center;
+	width: 256px;
+	height: 256px;
 	padding: 1px;
-	cursor: pointer;
 }
 #controlbar {
 	background-image: url(controlback.png);
@@ -217,64 +221,81 @@ img {
 	background-repeat: no-repeat;
 	width: 25px;
 	height: 28px;
+	cursor: pointer;
 }
 #controlbuttonpause {
 	background-image: url(controlbuttonpause.png);
 	background-repeat: no-repeat;
 	width: 23px;
 	height: 28px;
+	cursor: pointer;
 }
 #controlbuttonstop {
 	background-image: url(controlbuttonstop.png);
 	background-repeat: no-repeat;
 	width: 25px;
 	height: 28px;
+	cursor: pointer;
 }
 #controlbuttonskipback {
 	background-image: url(controlbuttonskipback.png);
 	background-repeat: no-repeat;
 	width: 24px;
 	height: 28px;
+	cursor: pointer;
 }
 #controlbuttondecrate {
 	background-image: url(controlbuttondecrate.png);
 	background-repeat: no-repeat;
 	width: 22px;
 	height: 28px;
+	cursor: pointer;
 }
 #controlbuttonincrate {
 	background-image: url(controlbuttonincrate.png);
 	background-repeat: no-repeat;
 	width: 23px;
 	height: 28px;
+	cursor: pointer;
 }
 #controlbuttonskipforward {
 	background-image: url(controlbuttonskipforward.png);
 	background-repeat: no-repeat;
 	width: 28px;
 	height: 28px;
+	cursor: pointer;
 }
 #controlbuttonstep {
 	background-image: url(controlbuttonstep.png);
 	background-repeat: no-repeat;
 	width: 31px;
 	height: 28px;
+	cursor: pointer;
 }
 #controlvolumemute {
 	background-image: url(controlvolumeon.png);
 	background-repeat: no-repeat;
 	width: 28px;
 	height: 28px;
+	cursor: pointer;
+}
+#controlvolumegrip {
+	cursor: pointer;
 }
 #controlvolumebar {
 	background-image: url(controlvolumebar.png);
 	background-repeat: no-repeat;
 	width: 55px;
 	height: 28px;
+	cursor: pointer;
 }
 #seekbar {
 	background-image: url(seekbarmid.png);
 	background-repeat: repeat-x;
+	cursor: pointer;
+}
+#seekbargrip {
+	cursor: pointer;
 }
 #seekbar td {
 	height: 15px;
@@ -334,7 +355,7 @@ img {
 		</td>
 		<td>
 			<table cellpadding="0" cellspacing="0" id="center">
-			<tr>
+			<!--<tr>
 				<td>
 					<table id="menu" width="100%">
 					<tr>
@@ -353,16 +374,16 @@ img {
 						<td>
 							Favorites
 						</td>
-						<td width="100%" align="right">
+						<td width="100%" align="left">
 							Help
 						</td>
 					</tr>
 					</table>
 				</td>
-			</tr>
+			</tr>-->
 			<tr>
 				<td id="video" align="center" onclick="OnCommand(889)">
-					<img src="snapshot.png" alt="snapshot" id="snapshot" onload="OnLoadSnapShot()" onabort="OnAbortErrorSnapShot()" onerror="OnAbortErrorSnapShot()">
+					<img src="logo.png" alt="snapshot" id="snapshot" onload="OnLoadSnapShot()" onabort="OnAbortErrorSnapShot()" onerror="OnAbortErrorSnapShot()">
 				</td>
 			</tr>
 			<tr>

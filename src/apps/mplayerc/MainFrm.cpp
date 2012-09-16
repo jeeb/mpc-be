@@ -5020,7 +5020,7 @@ bool CMainFrame::GetDIB(BYTE** ppData, long& size, bool fSilent)
 
 	if (FAILED(hr)) {
 		if (*ppData) {
-			ASSERT(0);    // huh?
+			ASSERT(0);
 			delete [] *ppData;
 			*ppData = NULL;
 		}

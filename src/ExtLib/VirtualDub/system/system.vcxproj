@@ -71,6 +71,7 @@
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Lib>
+      <AdditionalOptions>/ignore:4042 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>Winmm.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
@@ -81,6 +82,7 @@
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
     </ClCompile>
     <Lib>
+      <AdditionalOptions>/ignore:4042 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>Winmm.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
@@ -92,6 +94,7 @@
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Lib>
+      <AdditionalOptions>/ignore:4042 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>Winmm.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
@@ -102,6 +105,7 @@
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
     </ClCompile>
     <Lib>
+      <AdditionalOptions>/ignore:4042 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>Winmm.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>

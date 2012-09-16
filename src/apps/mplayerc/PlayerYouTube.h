@@ -175,6 +175,7 @@ CString PlayerYouTube(CString fname)
 				_UrlDecode(str2, str1);
 
 				CString str(str1);
+
 				// need for some url
 				str.Replace(_T("&sig="), _T("&signature="));
 
