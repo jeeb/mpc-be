@@ -1,7 +1,6 @@
 /*
  * $Id$
  *
- * (C) 2003-2006 Gabest
  * (C) 2006-2012 see Authors.txt
  *
  * This file is part of MPC-BE.

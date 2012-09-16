@@ -4,7 +4,6 @@
  * Adaptation for MPC-BE (C) 2012 Dmitry "Vortex" Koteroff (vortex@light-alloy.ru, http://light-alloy.ru)
  *
  * This file is part of MPC-BE and Light Alloy.
- * YOU CANNOT USE THIS FILE WITHOUT AUTHOR PERMISSION!
  *
  * MPC-BE is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
