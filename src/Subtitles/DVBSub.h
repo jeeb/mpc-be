@@ -79,6 +79,10 @@ public:
 		HDMV_PALETTE	Palette[256];
 
 		DVB_CLUT() {
+			id				= 0;
+			version_number	= 0;
+			Size			= 0;
+
 			memset (Palette, 0, sizeof(Palette));
 		}
 	};
@@ -138,8 +142,6 @@ public:
 		int			ObjectCount;
 		DVB_OBJECT	Objects[MAX_OBJECTS];
 
-		DVB_CLUT	Clut;
-
 		DVB_REGION() {
 			Id						= 0;
 			HorizAddr				= 0;
@@ -169,6 +171,7 @@ public:
 		DVB_REGION						Regions[MAX_REGIONS];
 		CAtlList<CompositionObject*>	Objects;
 		bool							Rendered;
+		DVB_CLUT						Clut[256];
 
 		DVB_PAGE() {
 			PageTimeOut			= 0;

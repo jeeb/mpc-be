@@ -2879,6 +2879,10 @@ LRESULT CMainFrame::OnResumeFromState(WPARAM wParam, LPARAM lParam)
 
 BOOL CMainFrame::OnButton(UINT id, UINT nFlags, CPoint point)
 {
+	if (m_iMediaLoadState == MLS_LOADING) {
+		return FALSE;
+	}
+
 	SetFocus();
 
 	CRect r;
