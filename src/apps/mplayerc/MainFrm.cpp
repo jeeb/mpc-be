@@ -4889,7 +4889,7 @@ void CMainFrame::OnFileSaveAs()
 
 	CString ext_list = ResStr(IDS_MAINFRM_48);
 	if (!ext.IsEmpty()) {
-		ext_list.Format(_T("Media (*%ws)|*%ws||%ws"), ext, ext, ResStr(IDS_MAINFRM_48));
+		ext_list.Format(_T("Media (*%ws)|*%ws|%ws"), ext, ext, ResStr(IDS_MAINFRM_48));
 	}
 
 	CFileDialog fd(FALSE, 0, out,
