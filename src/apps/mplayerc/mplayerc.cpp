@@ -933,61 +933,75 @@ BOOL CMPlayerCApp::InitInstance()
 	}
 
 	if (m_s.nCLSwitches & (CLSW_REGEXTVID | CLSW_REGEXTAUD | CLSW_REGEXTPL)) { // register file types
-		CPPageFormats::RegisterApp();
+		if (IsWinVistaOrLater() && !IsUserAnAdmin()) {
+			TCHAR strApp[_MAX_PATH];
+			GetModuleFileNameEx (GetCurrentProcess(), AfxGetMyApp()->m_hInstance, strApp, _MAX_PATH);
 
-		CMediaFormats& mf = m_s.m_Formats;
-		mf.UpdateData(false);
+			AfxGetMyApp()->RunAsAdministrator (strApp, m_lpCmdLine, false);
+		} else {
 
-		bool bAudioOnly, bPlaylist;
+			CPPageFormats::RegisterApp();
 
-		for (unsigned int i = 0; i < mf.GetCount(); i++) {
-			bPlaylist = !mf[i].GetLabel().CompareNoCase(_T("pls"));
+			CMediaFormats& mf = m_s.m_Formats;
+			mf.UpdateData(false);
 
-			if (bPlaylist && !(m_s.nCLSwitches & CLSW_REGEXTPL)) {
-				continue;
-			}
+			bool bAudioOnly, bPlaylist;
 
-			bAudioOnly = mf[i].IsAudioOnly();
+			for (unsigned int i = 0; i < mf.GetCount(); i++) {
+				bPlaylist = !mf[i].GetLabel().CompareNoCase(_T("pls"));
 
-			int j = 0;
-			CString str = mf[i].GetExtsWithPeriod();
-			for (CString ext = str.Tokenize(_T(" "), j); !ext.IsEmpty(); ext = str.Tokenize(_T(" "), j)) {
-				if (((m_s.nCLSwitches & CLSW_REGEXTVID) && !bAudioOnly) ||
-						((m_s.nCLSwitches & CLSW_REGEXTAUD) && bAudioOnly) ||
-						((m_s.nCLSwitches & CLSW_REGEXTPL) && bPlaylist)) {
-					CPPageFormats::RegisterExt(ext, mf[i].GetDescription(), true);
+				if (bPlaylist && !(m_s.nCLSwitches & CLSW_REGEXTPL)) {
+					continue;
+				}
+
+				bAudioOnly = mf[i].IsAudioOnly();
+
+				int j = 0;
+				CString str = mf[i].GetExtsWithPeriod();
+				for (CString ext = str.Tokenize(_T(" "), j); !ext.IsEmpty(); ext = str.Tokenize(_T(" "), j)) {
+					if (((m_s.nCLSwitches & CLSW_REGEXTVID) && !bAudioOnly) ||
+							((m_s.nCLSwitches & CLSW_REGEXTAUD) && bAudioOnly) ||
+							((m_s.nCLSwitches & CLSW_REGEXTPL) && bPlaylist)) {
+						CPPageFormats::RegisterExt(ext, mf[i].GetDescription(), true);
+					}
 				}
 			}
+
+			if (IsWinEight()) {
+				HRESULT hr = CPPageFormats::RegisterUI();
+				UNREFERENCED_PARAMETER(hr);
+			}
+
+			SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
 		}
-
-		if (IsWinEight()) {
-			HRESULT hr = CPPageFormats::RegisterUI();
-			UNREFERENCED_PARAMETER(hr);
-		}
-
-		SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
-
 		return FALSE;
 	}
 
 	if ((m_s.nCLSwitches&CLSW_UNREGEXT)) { // unregistered file types
-		CMediaFormats& mf = m_s.m_Formats;
-		mf.UpdateData(false);
+		if (IsWinVistaOrLater() && !IsUserAnAdmin()) {
+			TCHAR strApp[_MAX_PATH];
+			GetModuleFileNameEx (GetCurrentProcess(), AfxGetMyApp()->m_hInstance, strApp, _MAX_PATH);
 
-		for (unsigned int i = 0; i < mf.GetCount(); i++) {
-			int j = 0;
-			CString str = mf[i].GetExtsWithPeriod();
-			for (CString ext = str.Tokenize(_T(" "), j); !ext.IsEmpty(); ext = str.Tokenize(_T(" "), j)) {
-				CPPageFormats::RegisterExt(ext, mf[i].GetDescription(), false);
+			AfxGetMyApp()->RunAsAdministrator (strApp, m_lpCmdLine, false);
+		} else {
+			CMediaFormats& mf = m_s.m_Formats;
+			mf.UpdateData(false);
+
+			for (unsigned int i = 0; i < mf.GetCount(); i++) {
+				int j = 0;
+				CString str = mf[i].GetExtsWithPeriod();
+				for (CString ext = str.Tokenize(_T(" "), j); !ext.IsEmpty(); ext = str.Tokenize(_T(" "), j)) {
+					CPPageFormats::RegisterExt(ext, mf[i].GetDescription(), false);
+				}
 			}
-		}
 
-		if (IsWinEight()) {
-			HRESULT hr = CPPageFormats::RegisterUI();
-			UNREFERENCED_PARAMETER(hr);
-		}
+			if (IsWinEight()) {
+				HRESULT hr = CPPageFormats::RegisterUI();
+				UNREFERENCED_PARAMETER(hr);
+			}
 
-		SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
+			SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
+		}
 
 		return FALSE;
 	}

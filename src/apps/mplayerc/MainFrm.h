@@ -998,6 +998,7 @@ public:
 	CString		m_strTitle;
 	CString		m_strFn;
 	CString		m_strFnFull;
+	CString		m_strTitleAlt;
 	CString		GetStrForTitle();
 
 	bool		m_bToggleShader;

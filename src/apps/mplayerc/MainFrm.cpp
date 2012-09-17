@@ -3645,9 +3645,10 @@ void CMainFrame::OnFilePostClosemedia()
 	m_wndStatsBar.RemoveAllLines();
 	m_wndStatusBar.Clear();
 	m_wndStatusBar.ShowTimer(false);
-	m_strFn = _T("");
-	m_strFnFull = _T("");
 	m_wndStatusBar.Relayout();
+	m_strFn					= _T("");
+	m_strFnFull				= _T("");
+	m_strTitleAlt			= _T("");
 
 	if (AfxGetAppSettings().fEnableEDLEditor) {
 		m_wndEditListEditor.CloseFile();
@@ -4851,20 +4852,30 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 
 void CMainFrame::OnFileSaveAs()
 {
-	CString ext, in = PlayerYouTube(m_wndPlaylistBar.GetCurFileName()), out = in;
+	CString ext, in = PlayerYouTube(m_wndPlaylistBar.GetCurFileName(), NULL), out = in;
 
-	int find = out.Find(_T("://"));
-
-	if (find < 0) {
-		ext = CString(CPath(out).GetExtension()).MakeLower();
-		if (ext == _T(".cda")) {
-			out = out.Left(out.GetLength()-4) + _T(".wav");
-		} else if (ext == _T(".ifo")) {
-			out = out.Left(out.GetLength()-4) + _T(".vob");
-		}
+	if (!m_strTitleAlt.IsEmpty()) {
+		out = m_strTitleAlt;
 	} else {
-		out = out.Right(find+3);
-		out.Replace(_T("/"), _T("_"));
+
+		int find = out.Find(_T("://"));
+
+		if (find < 0) {
+			ext = CString(CPath(out).GetExtension()).MakeLower();
+			if (ext == _T(".cda")) {
+				out = out.Left(out.GetLength()-4) + _T(".wav");
+			} else if (ext == _T(".ifo")) {
+				out = out.Left(out.GetLength()-4) + _T(".vob");
+			}
+		} else {
+			int t_pos = out.Find(_T("&title="));
+			if (t_pos > 0) {
+				out = out.Right(out.GetLength() -  t_pos - 7);
+			} else {
+				out = out.Right(find+3);
+				out.Replace(_T("/"), _T("_"));
+			}
+		}
 	}
 
 	CFileDialog fd(FALSE, 0, out,
@@ -11251,17 +11262,12 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			break;
 		}
 
-		HRESULT hr = pGB->RenderFile(PlayerYouTube(fn), NULL);
-
-		if (s.fKeepHistory && s.fRememberFilePos && !s.NewFile(fn)) {
-			REFERENCE_TIME	rtPos = s.CurrentFilePosition()->llPosition;
-			if (pMS) {
-				pMS->SetPositions (&rtPos, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
-			}
-		}
-		QueryPerformanceCounter(&m_LastSaveTime);
+		m_strTitleAlt = _T("");
+		HRESULT hr = pGB->RenderFile(PlayerYouTube(fn, &m_strTitleAlt), NULL);
 
 		if (FAILED(hr)) {
+			m_strTitleAlt = _T("");
+
 			if (fFirst) {
 				if (s.fReportFailedPins) {
 					CComQIPtr<IGraphBuilderDeadEnd> pGBDE = pGB;
@@ -11313,6 +11319,16 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				return err;
 			}
 		}
+
+		if ((CString(fn).MakeLower().Find(_T("://"))) < 0) {
+			if (s.fKeepHistory && s.fRememberFilePos && !s.NewFile(fn)) {
+				REFERENCE_TIME	rtPos = s.CurrentFilePosition()->llPosition;
+				if (pMS) {
+					pMS->SetPositions (&rtPos, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
+				}
+			}
+		}
+		QueryPerformanceCounter(&m_LastSaveTime);
 
 		if (b_UseSmartSeek) {
 			if (FAILED(pGB2->RenderFile(CStringW(fn), NULL))) {
@@ -12054,6 +12070,10 @@ void CMainFrame::OpenSetupInfoBar()
 			}
 		}
 		EndEnumFilters;
+
+		if (!m_strTitleAlt.IsEmpty()) {
+			m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_TITLE), m_strTitleAlt.Left(m_strTitleAlt.GetLength() - 4));
+		}
 	} else if (GetPlaybackMode() == PM_DVD) {
 		CString info('-');
 		m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_DOMAIN), info);
@@ -12182,6 +12202,10 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 
 	if (i == 1) {
 		if (s.fTitleBarTextTitle) {
+			if (!m_strTitleAlt.IsEmpty()) {
+				fn = m_strTitleAlt.Left(m_strTitleAlt.GetLength() - 4);
+			}
+
 			BeginEnumFilters(pGB, pEF, pBF) {
 				if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
 					CComBSTR bstr;
@@ -17948,16 +17972,20 @@ CString CMainFrame::GetStrForTitle()
 
 	if (s.iTitleBarTextStyle == 1) {
 		if (s.fTitleBarTextTitle) {
-			BeginEnumFilters(pGB, pEF, pBF) {
-				if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
-					CComBSTR bstr;
-					if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
-						return CString(bstr.m_str);
-						break;
+			if (!m_strTitleAlt.IsEmpty()) {
+				return m_strTitleAlt.Left(m_strTitleAlt.GetLength() - 4);
+			} else {
+				BeginEnumFilters(pGB, pEF, pBF) {
+					if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
+						CComBSTR bstr;
+						if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
+							return CString(bstr.m_str);
+							break;
+						}
 					}
 				}
+				EndEnumFilters;
 			}
-			EndEnumFilters;
 		}
 		return m_strFn;
 	} else {

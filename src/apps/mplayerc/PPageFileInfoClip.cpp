@@ -26,6 +26,7 @@
 #include "PPageFileInfoClip.h"
 #include <atlbase.h>
 #include <qnetwork.h>
+#include "MainFrm.h"
 #include "../../DSUtil/DSUtil.h"
 #include "../../DSUtil/WinAPIUtils.h"
 
@@ -164,6 +165,11 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 		}
 	}
 	EndEnumFilters;
+
+	CString strTitleAlt = ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strTitleAlt;
+	if (!strTitleAlt.IsEmpty()) {
+		m_clip = strTitleAlt.Left(strTitleAlt.GetLength() - 4);		
+	}
 
 	UpdateData(FALSE);
 

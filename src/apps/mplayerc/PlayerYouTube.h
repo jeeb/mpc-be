@@ -95,8 +95,11 @@ static int _strpos(char* h, char* n)
 	}
 }
 
-CString PlayerYouTube(CString fname)
+CString PlayerYouTube(CString fname, CString* out_title)
 {
+	if (out_title) {
+		*out_title = _T("");
+	}
 	if (wcsstr(fname, L"youtube.com/watch?")) {
 
 		char *out, buf[4096];
@@ -137,8 +140,25 @@ CString PlayerYouTube(CString fname)
 			return fname;
 		}
 
-		DWORD k, lastpos = 0;
+		// get name(title) for output filename
+		CString Title;
+		int t_start = _strpos(out, "<meta name=\"title\" content=\"");
+		if (t_start > 0) {
+			t_start += 28;
+			int t_stop = _strpos(out + t_start, "\">");
+			if (t_stop > 0) {
+				char* title = (char*)malloc(t_stop + 1);
+				memset(title, 0, t_stop + 1);
+				memcpy(title, out + t_start, t_stop);
+				Title = CA2CT(title, CP_UTF8);
+			}
+		}
 
+		if (Title.IsEmpty()) {
+			Title = _T("vid");
+		}
+
+		DWORD k, lastpos = 0;
 		for (;;) {
 			k = _strpos(out + lastpos, "%2Curl%3Dhttp%253A%252F%252F");
 			if (!k) {
@@ -161,6 +181,28 @@ CString PlayerYouTube(CString fname)
 					continue;
 				}
 
+				// get extension for output filename
+				CString ext;
+				l = _strpos(out + k, "video%252Fmp4");
+				if (l && (l < i)) {
+					ext = _T(".mp4");
+				}
+				if (ext.IsEmpty()) {
+					DWORD l = _strpos(out + k, "video%252Fx-flv");
+					if (l && (l < i)) {
+						ext = _T(".flv");
+					}
+				}
+				if (ext.IsEmpty()) {
+					DWORD l = _strpos(out + k, "video%252F3gpp");
+					if (l && (l < i)) {
+						ext = _T(".3gp");
+					}
+				}
+				if (ext.IsEmpty()) {
+					ext = _T(".mp4");
+				}
+
 				char *str1, *str2;
 
 				str1 = (char*)malloc(i);
@@ -176,15 +218,21 @@ CString PlayerYouTube(CString fname)
 
 				CString str(str1);
 
-				// need for some url
-				str.Replace(_T("&sig="), _T("&signature="));
-
 				free(str1);
 				free(str2);
 
 				free(out);
 
-				return str + _T("&title=vid.mp4");
+				// need for some url
+				str.Replace(_T("&sig="), _T("&signature="));
+				// add file name for future ...
+				str.Append(_T("&title=") + Title + ext);
+
+				if (out_title) {
+					*out_title = Title + ext;
+				}
+
+				return str;
 			} else {
 				free(out);
 
