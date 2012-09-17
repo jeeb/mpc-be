@@ -151,6 +151,8 @@ CString PlayerYouTube(CString fname, CString* out_title)
 				memset(title, 0, t_stop + 1);
 				memcpy(title, out + t_start, t_stop);
 				Title = CA2CT(title, CP_UTF8);
+
+				Title = Title.TrimLeft(_T(".")).TrimRight(_T("."));
 			}
 		}
 
