@@ -253,7 +253,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 
 	ON_COMMAND(ID_FILE_OPENQUICK, OnFileOpenQuick)
-	ON_UPDATE_COMMAND_UI(ID_FILE_OPENMEDIA, OnUpdateFileOpen)
+	ON_UPDATE_COMMAND_UI(ID_FILE_OPENQUICK, OnUpdateFileOpen)
 	ON_COMMAND(ID_FILE_OPENMEDIA, OnFileOpenmedia)
 	ON_UPDATE_COMMAND_UI(ID_FILE_OPENMEDIA, OnUpdateFileOpen)
 	ON_WM_COPYDATA()
@@ -4455,7 +4455,7 @@ void CMainFrame::OnUpdateFileOpen(CCmdUI* pCmdUI)
 
 BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 {
-	if (m_fClosingState) {
+	if (m_fClosingState || m_iMediaLoadState == MLS_LOADING) {
 		return FALSE;
 	}
 
@@ -4794,6 +4794,10 @@ void CMainFrame::OnFileOpenCD(UINT nID)
 
 void CMainFrame::OnFileReopen()
 {
+	if (m_iMediaLoadState == MLS_LOADING) {
+		return;
+	}
+
 	if (!m_LastOpenBDPath.IsEmpty() && OpenBD(m_LastOpenBDPath)) {
 		return;
 	}
@@ -4846,6 +4850,10 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 		}
 	}
 
+	if (m_iMediaLoadState == MLS_LOADING) {
+		return;
+	}
+
 	m_wndPlaylistBar.Open(sl, true);
 	OpenCurPlaylistItem();
 }
@@ -4856,6 +4864,7 @@ void CMainFrame::OnFileSaveAs()
 
 	if (!m_strTitleAlt.IsEmpty()) {
 		out = m_strTitleAlt;
+		ext = CString(CPath(m_strTitleAlt).GetExtension()).MakeLower();
 	} else {
 
 		int find = out.Find(_T("://"));
@@ -4878,9 +4887,14 @@ void CMainFrame::OnFileSaveAs()
 		}
 	}
 
+	CString ext_list = ResStr(IDS_MAINFRM_48);
+	if (!ext.IsEmpty()) {
+		ext_list.Format(_T("Media (*%ws)|*%ws||%ws"), ext, ext, ResStr(IDS_MAINFRM_48));
+	}
+
 	CFileDialog fd(FALSE, 0, out,
 				   OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_PATHMUSTEXIST|OFN_NOCHANGEDIR,
-				   ResStr(IDS_MAINFRM_48), GetModalParent(), 0);
+				   ext_list, GetModalParent(), 0);
 	if (fd.DoModal() != IDOK || !in.CompareNoCase(fd.GetPathName())) {
 		return;
 	}
@@ -14626,8 +14640,12 @@ void CMainFrame::SetupRecentFilesSubMenu()
 	if (!IsMenu(pSub->m_hMenu)) {
 		pSub->CreatePopupMenu();
 	} else while (pSub->RemoveMenu(0, MF_BYPOSITION)) {
-			;
-		}
+		;
+	}
+
+	if (m_iMediaLoadState == MLS_LOADING) {
+		return;
+	}
 
 	UINT id = ID_RECENT_FILE_START;
 	CRecentFileList& MRU = AfxGetAppSettings().MRU;
@@ -15923,6 +15941,8 @@ void CMainFrame::CloseMedia()
 	int nTimeWaited = 0;
 
 	while (m_iMediaLoadState == MLS_LOADING) {
+		TRACE(_T("CMainFrame::CloseMedia() : wait for graph is aborted\n"));
+
 		m_fOpeningAborted = true;
 
 		if (pGB) {
