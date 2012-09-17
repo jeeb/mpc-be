@@ -127,6 +127,10 @@ CString PlayerYouTube(CString fname, CString* out_title)
 					}
 
 					memcpy(out + (size - len), buf, len);
+
+					if (strstr(out, "%26quality")) {
+						break;
+					}
 				}
 
 				InternetCloseHandle(f);
