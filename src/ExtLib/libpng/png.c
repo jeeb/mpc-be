@@ -14,7 +14,6 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_5_13rc01 Your_png_h_is_not_version_1_5_13rc01;
 
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
