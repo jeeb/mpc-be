@@ -167,9 +167,9 @@ Name: "mpciconlib"; Description: "{cm:comp_mpciconlib}";       Types: default cu
 Name: "mpcresources"; Description: "{cm:comp_mpcresources}"; Types: default custom; Flags: disablenouninstallwarning
 #endif
 
-Name: "mpcberegvid"; Description: "{cm:AssociationVideo}"; Types: custom; Flags: disablenouninstallwarning
-Name: "mpcberegaud"; Description: "{cm:AssociationAudio}"; Types: custom; Flags: disablenouninstallwarning
-Name: "mpcberegpl"; Description: "{cm:AssociationPlaylist}"; Types: custom; Flags: disablenouninstallwarning
+Name: "mpcberegvid"; Description: "{cm:AssociationVideo}"; Types: custom; Flags: disablenouninstallwarning;
+Name: "mpcberegaud"; Description: "{cm:AssociationAudio}"; Types: custom; Flags: disablenouninstallwarning;
+Name: "mpcberegpl"; Description: "{cm:AssociationPlaylist}"; Types: custom; Flags: disablenouninstallwarning;
 
 Name: "mpcbeshellext"; Description: "{cm:comp_mpcbeshellext}"; Types: custom; Flags: disablenouninstallwarning
 

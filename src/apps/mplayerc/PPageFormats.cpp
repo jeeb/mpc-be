@@ -43,14 +43,7 @@ CComPtr<IApplicationAssociationRegistration> CPPageFormats::m_pAAR;
 	#define PROGID _T("mpc-be")
 #endif // _WIN64
 
-LPCTSTR g_strRegisteredAppName = _T("MPC-BE");
-LPCTSTR g_strOldAssoc          = _T("PreviousRegistration");
-CString g_strRegisteredKey     = _T("Software\\Clients\\Media\\MPC-BE\\Capabilities");
-
-int f_setContextFiles = 0;
-int f_getContextFiles = 0;
-
-int f_setAssociatedWithIcon = 0;
+bool m_fsetContextFiles = false;
 
 IMPLEMENT_DYNAMIC(CPPageFormats, CPPageBase)
 CPPageFormats::CPPageFormats()
@@ -60,6 +53,7 @@ CPPageFormats::CPPageFormats()
 	, m_iRtspHandler(0)
 	, m_fRtspFileExtFirst(FALSE)
 	, m_bInsufficientPrivileges(false)
+	, m_fsetAssociatedWithIcon(true)
 {
 	if (m_pAAR == NULL) {
 		// Default manager (requires at least Vista)
@@ -156,7 +150,7 @@ bool CPPageFormats::IsRegistered(CString ext)
 
 	if (m_pAAR) {
 		// The Vista way
-		hr = m_pAAR->QueryAppIsDefault(ext, AT_FILEEXTENSION, AL_EFFECTIVE, g_strRegisteredAppName, &bIsDefault);
+		hr = m_pAAR->QueryAppIsDefault(ext, AT_FILEEXTENSION, AL_EFFECTIVE, GetRegisteredAppName(), &bIsDefault);
 	} else {
 		// The 2000/XP way
 		CRegKey key;
@@ -174,7 +168,7 @@ bool CPPageFormats::IsRegistered(CString ext)
 
 		bIsDefault = (buff == strProgID);
 	}
-	if (!f_setContextFiles) {
+	if (!m_fsetContextFiles) {
 		CRegKey key;
 		TCHAR   buff[_MAX_PATH];
 		ULONG   len = _countof(buff);
@@ -182,7 +176,7 @@ bool CPPageFormats::IsRegistered(CString ext)
 		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, strProgID + _T("\\shell\\open"), KEY_READ)) {
 			CString strCommand = ResStr(IDS_OPEN_WITH_MPC);
 			if (ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len)) {
-				f_setContextFiles = (strCommand.CompareNoCase(CString(buff)) == 0);
+				m_fsetContextFiles = (strCommand.CompareNoCase(CString(buff)) == 0);
 			}
 		}
 	}
@@ -267,9 +261,9 @@ bool CPPageFormats::RegisterApp()
 		CRegKey key;
 
 		if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\RegisteredApplications"))) {
-			key.SetStringValue(_T("MPC-BE"), g_strRegisteredKey);
+			key.SetStringValue(_T("MPC-BE"), GetRegisteredKey());
 
-			if (ERROR_SUCCESS != key.Create(HKEY_LOCAL_MACHINE, g_strRegisteredKey)) {
+			if (ERROR_SUCCESS != key.Create(HKEY_LOCAL_MACHINE, GetRegisteredKey())) {
 				return false;
 			}
 
@@ -283,7 +277,7 @@ bool CPPageFormats::RegisterApp()
 	return true;
 }
 
-bool CPPageFormats::RegisterExt(CString ext, CString strLabel, bool fRegister)
+bool CPPageFormats::RegisterExt(CString ext, CString strLabel, bool fRegister, bool setAssociatedWithIcon)
 {
 	CRegKey key;
 	bool    bSetValue;
@@ -309,7 +303,7 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, bool fRegister)
 	}
 
 	// Add to playlist option
-	if (f_setContextFiles) {
+	if (m_fsetContextFiles) {
 		if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID + _T("\\shell\\enqueue"))) {
 			return false;
 		}
@@ -333,7 +327,7 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, bool fRegister)
 	if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID + _T("\\shell\\open"))) {
 		return false;
 	}
-	if (f_setContextFiles) {
+	if (m_fsetContextFiles) {
 		if (ERROR_SUCCESS != key.SetStringValue(NULL, ResStr(IDS_OPEN_WITH_MPC))) {
 			return false;
 		}
@@ -350,14 +344,14 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, bool fRegister)
 		return false;
 	}
 
-	if (ERROR_SUCCESS != key.Create(HKEY_LOCAL_MACHINE, g_strRegisteredKey + _T("\\FileAssociations"))) {
+	if (ERROR_SUCCESS != key.Create(HKEY_LOCAL_MACHINE, CString(GetRegisteredKey()) + _T("\\FileAssociations"))) {
 		return false;
 	}
 	if (ERROR_SUCCESS != key.SetStringValue(ext, strProgID)) {
 		return false;
 	}
 
-	if (f_setAssociatedWithIcon) {
+	if (setAssociatedWithIcon) {
 		CString AppIcon;
 		TCHAR buff[_MAX_PATH];
 
@@ -402,6 +396,24 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, bool fRegister)
 	}
 
 	return true;
+}
+
+HRESULT CPPageFormats::RegisterUI()
+{
+	IApplicationAssociationRegistrationUI *pUI = NULL;
+
+	HRESULT hr = CoCreateInstance(CLSID_ApplicationAssociationRegistrationUI, 
+					NULL,
+					CLSCTX_INPROC,
+					__uuidof(IApplicationAssociationRegistrationUI),
+					(void **)&pUI);
+
+	if (SUCCEEDED(hr) && pUI) {
+		hr = pUI->LaunchAdvancedAssociationUI(CPPageFormats::GetRegisteredAppName());
+		pUI->Release();
+	}
+
+	return hr;
 }
 
 static struct {
@@ -607,12 +619,10 @@ BOOL CPPageFormats::OnInitDialog()
 
 	UpdateData(FALSE);
 
-	f_setContextFiles = 0;
-
 	for (int i = 0; i < m_list.GetItemCount(); i++) {
 		SetListItemState(i);
 	}
-	m_fContextFiles.SetCheck(f_setContextFiles);
+	m_fContextFiles.SetCheck(m_fsetContextFiles);
 
 	m_apvideo.SetCheck(IsAutoPlayRegistered(AP_VIDEO));
 	m_apmusic.SetCheck(IsAutoPlayRegistered(AP_MUSIC));
@@ -699,7 +709,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool f
 					return false;
 				}
 
-				key.SetStringValue(g_strOldAssoc, pszCurrentAssociation);
+				key.SetStringValue(GetOldAssoc(), pszCurrentAssociation);
 
 				// Get current icon for file type
 				/*
@@ -716,13 +726,13 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool f
 				*/
 				CoTaskMemFree (pszCurrentAssociation);
 			}
-			strNewApp = g_strRegisteredAppName;
+			strNewApp = GetRegisteredAppName();
 		} else {
 			if (ERROR_SUCCESS != key.Open(HKEY_CLASSES_ROOT, strProgID)) {
 				return false;
 			}
 
-			if (ERROR_SUCCESS == key.QueryStringValue(g_strOldAssoc, buff, &len)) {
+			if (ERROR_SUCCESS == key.QueryStringValue(GetOldAssoc(), buff, &len)) {
 				strNewApp = buff;
 			}
 
@@ -765,7 +775,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool f
 			if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID)) {
 				return false;
 			}
-			key.SetStringValue(g_strOldAssoc, extoldreg);
+			key.SetStringValue(GetOldAssoc(), extoldreg);
 
 			/*
 			if (!extOldIcon.IsEmpty() && (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, strProgID + _T("\\DefaultIcon"))))
@@ -778,7 +788,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool f
 			if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID)) {
 				return false;
 			}
-			if (ERROR_SUCCESS == key.QueryStringValue(g_strOldAssoc, buff, &len) && !CString(buff).Trim().IsEmpty()) {
+			if (ERROR_SUCCESS == key.QueryStringValue(GetOldAssoc(), buff, &len) && !CString(buff).Trim().IsEmpty()) {
 				extoldreg = buff;
 			}
 
@@ -815,8 +825,8 @@ BOOL CPPageFormats::OnApply()
 
 	RegisterApp();
 
-	f_setContextFiles = m_fContextFiles.GetCheck();
-	f_setAssociatedWithIcon = m_fAssociatedWithIcons.GetCheck();
+	m_fsetContextFiles			= !!m_fContextFiles.GetCheck();
+	m_fsetAssociatedWithIcon	= !!m_fAssociatedWithIcons.GetCheck();
 
 	if (m_bFileExtChanged) {
 		for (int i = 0; i < m_list.GetItemCount(); i++) {
@@ -830,7 +840,7 @@ BOOL CPPageFormats::OnApply()
 
 			POSITION pos = exts.GetHeadPosition();
 			while (pos) {
-				RegisterExt(exts.GetNext(pos), mf[(int)m_list.GetItemData(i)].GetDescription(), !!iChecked);
+				RegisterExt(exts.GetNext(pos), mf[(int)m_list.GetItemData(i)].GetDescription(), !!iChecked, m_fsetAssociatedWithIcon);
 			}
 		}
 	}
@@ -871,18 +881,8 @@ BOOL CPPageFormats::OnApply()
 	s.fAssociatedWithIcons = !!m_fAssociatedWithIcons.GetCheck();
 
 	if (m_bFileExtChanged && IsWinEight()) {
-		IApplicationAssociationRegistrationUI *pUI = NULL;
-
-		HRESULT hr = CoCreateInstance(CLSID_ApplicationAssociationRegistrationUI, 
-						NULL,
-						CLSCTX_INPROC,
-						__uuidof(IApplicationAssociationRegistrationUI),
-						(void **)&pUI);
-
-		if (SUCCEEDED(hr)) {
-			hr = pUI->LaunchAdvancedAssociationUI(g_strRegisteredAppName);
-			pUI->Release();
-		}
+		HRESULT hr = RegisterUI();
+		UNREFERENCED_PARAMETER(hr);
 	}
 
 	SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);

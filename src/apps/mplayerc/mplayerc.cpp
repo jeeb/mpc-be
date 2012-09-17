@@ -959,6 +959,12 @@ BOOL CMPlayerCApp::InitInstance()
 				}
 			}
 		}
+
+		if (IsWinEight()) {
+			HRESULT hr = CPPageFormats::RegisterUI();
+			UNREFERENCED_PARAMETER(hr);
+		}
+
 		SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
 
 		return FALSE;
@@ -975,6 +981,12 @@ BOOL CMPlayerCApp::InitInstance()
 				CPPageFormats::RegisterExt(ext, mf[i].GetDescription(), false);
 			}
 		}
+
+		if (IsWinEight()) {
+			HRESULT hr = CPPageFormats::RegisterUI();
+			UNREFERENCED_PARAMETER(hr);
+		}
+
 		SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
 
 		return FALSE;

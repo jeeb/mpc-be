@@ -56,9 +56,14 @@ public:
 	CPPageFormats();
 	virtual ~CPPageFormats();
 
-	static bool RegisterApp();
-	static bool IsRegistered(CString ext);
-	static bool RegisterExt(CString ext, CString strLabel, bool fRegister);
+	static bool		RegisterApp();
+	static bool		IsRegistered(CString ext);
+	static bool		RegisterExt(CString ext, CString strLabel, bool fRegister, bool setAssociatedWithIcon = true);
+	static HRESULT	RegisterUI();
+
+	static LPCTSTR	GetRegisteredAppName()	{return _T("MPC-BE");}
+	static LPCTSTR	GetOldAssoc()			{return _T("PreviousRegistration");}
+	static LPCTSTR	GetRegisteredKey()		{return _T("Software\\Clients\\Media\\MPC-BE\\Capabilities");}
 
 	enum {COL_CATEGORY, COL_ENGINE};
 	CPlayerListCtrl m_list;
@@ -98,4 +103,6 @@ public:
 	CButton m_fContextDir;
 	CButton m_fContextFiles;
 	CButton m_fAssociatedWithIcons;
+
+	bool		m_fsetAssociatedWithIcon;
 };
