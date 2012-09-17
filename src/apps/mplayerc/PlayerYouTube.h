@@ -102,8 +102,7 @@ CString PlayerYouTube(CString fname, CString* out_title)
 	}
 	if (wcsstr(fname, L"youtube.com/watch?")) {
 
-		char *out, buf[4096];
-		DWORD len, size = 0, fs = 12 * sizeof(buf);
+		char *out;
 
 		HINTERNET f, s = InternetOpen(0, 0, 0, 0, 0);
 
@@ -112,6 +111,9 @@ CString PlayerYouTube(CString fname, CString* out_title)
 			f = InternetOpenUrlW(s, fname, 0, 0, INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE, 0);
 
 			if (f) {
+
+				char buf[4096];
+				DWORD len, size = 0, end_pos = 0, fs = 12 * sizeof(buf);
 
 				out = (char*)malloc(fs);
 
@@ -128,8 +130,11 @@ CString PlayerYouTube(CString fname, CString* out_title)
 
 					memcpy(out + (size - len), buf, len);
 
-					if (strstr(out, "%26quality")) {
+					if (end_pos) {
 						break;
+					}
+					if (!end_pos && strstr(out, "%26quality")) {
+						end_pos++;
 					}
 				}
 
