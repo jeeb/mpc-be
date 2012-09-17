@@ -205,11 +205,11 @@ CString PlayerYouTube(CString fname, CString* out_title)
 
 				char *str1, *str2;
 
-				str1 = (char*)malloc(i);
-				str2 = (char*)malloc(i);
+				str1 = (char*)malloc(i + 1);
+				str2 = (char*)malloc(i + 1);
 
-				memset(str1, 0, i);
-				memset(str2, 0, i);
+				memset(str1, 0, i + 1);
+				memset(str2, 0, i + 1);
 
 				memcpy(str1, out + k, i);
 
