@@ -28,6 +28,7 @@
 #include "../../DSUtil/DSUtil.h"
 #include "mpciconlib/mpciconlib.h"
 
+/*
 static HICON get_hicon(CString path, CString fn)
 {
 	HINSTANCE mpciconlib = LoadLibrary(path + _T("mpciconlib.dll"));
@@ -64,6 +65,7 @@ static HICON get_hicon(CString path, CString fn)
 
 	return hicon;
 }
+*/
 
 // CPlayerStatusBar
 
@@ -218,6 +220,7 @@ void CPlayerStatusBar::SetStatusTypeIcon(HICON hIcon)
 		DestroyIcon(m_hIcon);
 	}
 
+	/*
 	HICON hico = get_hicon(m_logobm.LoadCurrentPath(), ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strFn);
 
 	if (hico) {
@@ -225,6 +228,7 @@ void CPlayerStatusBar::SetStatusTypeIcon(HICON hIcon)
 	} else {
 		m_type.SetIcon(m_hIcon = hIcon);
 	}
+	*/
 
 	Relayout();
 
