@@ -15,6 +15,10 @@
 
 /* Generate a compiler error if there is an old png.h in the search path. */
 
+// ==> Start patch MPC
+// typedef png_libpng_version_1_5_13rc01 Your_png_h_is_not_version_1_5_13rc01;
+// <== End patch MPC
+
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
  * stream we can set num_bytes = 8 so that libpng will not attempt to read
