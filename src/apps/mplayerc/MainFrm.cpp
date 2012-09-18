@@ -4887,6 +4887,14 @@ void CMainFrame::OnFileSaveAs()
 		}
 	}
 
+	CString ingnoreFileNameCharlist = _T("< > : \" / \\ | ? *");
+	CAtlList<CString> sl;
+	Explode(ingnoreFileNameCharlist, sl, ' ');
+	POSITION pos = sl.GetHeadPosition();
+	while (pos) {
+		out.Replace(sl.GetNext(pos), _T(" "));
+	}
+
 	CString ext_list = ResStr(IDS_MAINFRM_48);
 	if (!ext.IsEmpty()) {
 		ext_list.Format(_T("Media (*%ws)|*%ws|%ws"), ext, ext, ResStr(IDS_MAINFRM_48));
