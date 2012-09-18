@@ -636,7 +636,6 @@ CMainFrame::CMainFrame() :
 	m_iMediaLoadState(MLS_CLOSED),
 	m_iPlaybackMode(PM_NONE),
 	m_iSpeedLevel(0),
-	//m_dSpeedRate(1.0),
 	m_iSpeedRate(10),
 	m_rtDurationOverride(-1),
 	m_fFullScreen(false),
@@ -7260,8 +7259,6 @@ void CMainFrame::OnPlayPlay()
 	if (m_iMediaLoadState == MLS_LOADED) {
 		if (GetMediaState() == State_Stopped) {
 			m_iSpeedLevel = 0;
-			//double dRate = 1.0;
-			//m_dSpeedRate = 1.0;
 			m_iSpeedRate = 10;
 		}
 
@@ -7273,10 +7270,6 @@ void CMainFrame::OnPlayPlay()
 			pMS->SetRate((double)m_iSpeedRate/10);
 			pMC->Run();
 		} else if (GetPlaybackMode() == PM_DVD) {
-			//double dRate = 1.0;
-			//m_iSpeedLevel = 0;
-			//m_dSpeedRate = 1.0;
-			//m_iSpeedRate = 10;
 			if (m_iSpeedRate > 0) {
 				pDVDC->PlayForwards((double)m_iSpeedRate/10, DVD_CMD_FLAG_Block, NULL);
 			} else {
@@ -7433,7 +7426,6 @@ void CMainFrame::OnPlayStop()
 		}
 
 		m_iSpeedLevel = 0;
-		//m_dSpeedRate = 1.0;
 		m_iSpeedRate = 10;
 
 		if (m_fFrameSteppingActive) { // FIXME
@@ -7856,7 +7848,7 @@ void CMainFrame::OnPlayChangeRate(UINT nID)
 					&& (lSignalStrength != AMTUNER_SIGNALPRESENT || lFreqNew == lFreqOrg));*/
 
 	} else {
-
+		
 		double dRate = 1.0;
 		int iRate = 10;
 		int iNewSpeedLevel;
@@ -7917,16 +7909,11 @@ void CMainFrame::OnPlayChangeRate(UINT nID)
 			break;
 		case 0:
 
-			if (GetMediaState() != State_Running) {
-				SendMessage(WM_COMMAND, ID_PLAY_PLAY);
-			}
 			if (GetPlaybackMode() == PM_FILE) {
 				if (nID == ID_PLAY_INCRATE) {
 					if (m_iSpeedRate + iStep > 120) return;
 					iRate = m_iSpeedRate + iStep;
 				} else if (nID == ID_PLAY_DECRATE) {
-					
-					//ftest = abs(m_dSpeedRate - dStep) - 0.2;
 					if (m_iSpeedRate - iStep < 2) return;
 					iRate = m_iSpeedRate - iStep;
 				} else {
@@ -7945,7 +7932,7 @@ void CMainFrame::OnPlayChangeRate(UINT nID)
 					}
 				} else if (nID == ID_PLAY_DECRATE) {
 					if (m_iSpeedRate - iStep < -160) return;
-					if ((m_iSpeedRate - iStep >= -0.31 && m_iSpeedRate - iStep <= 3) 
+					if ((m_iSpeedRate - iStep >= -3 && m_iSpeedRate - iStep <= 3) 
 						|| (m_iSpeedRate - 1 > 0 && m_iSpeedRate - 1 < 3))  {
 						iRate = m_iSpeedRate - (m_iSpeedRate*2);
 					} else {
@@ -8040,7 +8027,6 @@ void CMainFrame::OnPlayResetRate()
 
 	if (SUCCEEDED(hr)) {
 		m_iSpeedLevel = 0;
-		//m_dSpeedRate = 1.0;
 		m_iSpeedRate = 10;
 
 		CString	strODSMessage;
@@ -8780,7 +8766,6 @@ void CMainFrame::OnNavigateSkip(UINT nID)
 		}
 	} else if (GetPlaybackMode() == PM_DVD) {
 		m_iSpeedLevel = 0;
-		//m_dSpeedRate = 1.0;
 		m_iSpeedRate = 10;
 
 		if (GetMediaState() != State_Running) {
@@ -8940,7 +8925,6 @@ void CMainFrame::OnNavigateMenu(UINT nID)
 	}
 
 	m_iSpeedLevel = 0;
-	//m_dSpeedRate = 1.0;
 	m_iSpeedRate = 10;
 
 	if (GetMediaState() != State_Running) {
