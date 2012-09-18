@@ -6864,8 +6864,8 @@ void CMainFrame::OnViewFullscreenSecondary()
 
 void CMainFrame::OnUpdateViewFullscreen(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(m_iMediaLoadState == MLS_LOADED && !m_fAudioOnly || m_fFullScreen);
-	pCmdUI->SetCheck(m_fFullScreen);
+	//pCmdUI->Enable(m_iMediaLoadState == MLS_LOADED && !m_fAudioOnly || m_fFullScreen);
+	//pCmdUI->SetCheck(m_fFullScreen);
 }
 
 void CMainFrame::OnViewZoom(UINT nID)
@@ -10063,7 +10063,7 @@ CSize CMainFrame::GetVideoSize()
 
 void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasTo, bool check)
 {
-	if (m_pFullscreenWnd->IsWindow() || (check && (!IsSomethingLoaded() || m_fAudioOnly))) {
+	if (m_pFullscreenWnd->IsWindow()/* || (check && (!IsSomethingLoaded() || m_fAudioOnly))*/) {
 		return;
 	}
 
@@ -12709,7 +12709,9 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 		if (MI.Open(mi_fn.GetString())) {
 			CString strFPS =  MI.Get(Stream_Video, 0, _T("FrameRate"), Info_Text, Info_Name).c_str();
-
+			if (strFPS == _T("") || wcstod(strFPS, NULL) > 200.0) {
+				strFPS =  MI.Get(Stream_Video, 0, _T("FrameRate_Original"), Info_Text, Info_Name).c_str();
+			}
 			// 3:2 pulldown
 			CString strST = MI.Get(Stream_Video, 0, _T("ScanType"), Info_Text, Info_Name).c_str();
 			CString strSO = MI.Get(Stream_Video, 0, _T("ScanOrder"), Info_Text, Info_Name).c_str();
