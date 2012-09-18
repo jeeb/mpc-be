@@ -9979,13 +9979,13 @@ void CMainFrame::SetDefaultFullscreenState()
 
 	// Waffs : fullscreen command line
 	if (!(s.nCLSwitches&CLSW_ADD) && (s.nCLSwitches&CLSW_FULLSCREEN) && !s.slFiles.IsEmpty()) {
-		ToggleFullscreen(true, true, false);
+		ToggleFullscreen(true, true);
 		SetCursor(NULL);
 		AfxGetAppSettings().nCLSwitches &= ~CLSW_FULLSCREEN;
 		m_fFirstFSAfterLaunchOnFS = true;
 	} else if (s.fRememberWindowSize && s.fRememberWindowPos && !m_fFullScreen && s.fLastFullScreen) {
 		// if fullscreen was on, put it on back
-		ToggleFullscreen(true, true, false);
+		ToggleFullscreen(true, true);
 	}
 }
 
@@ -10142,9 +10142,9 @@ CSize CMainFrame::GetVideoSize()
 	return ret;
 }
 
-void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasTo, bool check)
+void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasTo)
 {
-	if (m_pFullscreenWnd->IsWindow()/* || (check && (!IsSomethingLoaded() || m_fAudioOnly))*/) {
+	if (m_pFullscreenWnd->IsWindow()) {
 		return;
 	}
 
