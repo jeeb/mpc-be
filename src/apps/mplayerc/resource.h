@@ -673,6 +673,7 @@
 #define IDC_CHECK_PRV                   22064
 #define IDC_COMBOVOLUME                 22065
 #define IDC_CHECK_CHM                   22066
+#define IDC_COMBOSPEEDSTEP              22067
 #define ID_SUB_DELAY_DOWN               24000
 #define ID_SUB_DELAY_UP                 24001
 #define IDS_MPLAYERC_104                24002

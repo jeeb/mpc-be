@@ -455,7 +455,9 @@ protected:
 	DVD_DOMAIN m_iDVDDomain;
 	DWORD m_iDVDTitle;
 	int m_iSpeedLevel;
-	double m_dSpeedRate;
+	//double m_dSpeedRate;
+	int m_iSpeedRate;
+	bool bAutoSpeedStep;
 
 	double m_ZoomX, m_ZoomY, m_PosX, m_PosY;
 	int m_AngleX, m_AngleY, m_AngleZ;

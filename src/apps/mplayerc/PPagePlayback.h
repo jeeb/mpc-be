@@ -57,6 +57,8 @@ public:
 	CString m_audiosLanguageOrder;
 	int m_nVolumeStep;
 	CComboBox m_nVolumeStepCtrl;
+	int m_nSpeedStep;
+	CComboBox m_nSpeedStepCtrl;
 
 	enum { IDD = IDD_PPAGEPLAYBACK };
 

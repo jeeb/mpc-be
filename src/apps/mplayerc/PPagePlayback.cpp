@@ -77,6 +77,8 @@ void CPPagePlayback::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT3, m_audiosLanguageOrder);
 	DDX_CBIndex(pDX, IDC_COMBOVOLUME, m_nVolumeStep);
 	DDX_Control(pDX, IDC_COMBOVOLUME, m_nVolumeStepCtrl);
+	DDX_CBIndex(pDX, IDC_COMBOSPEEDSTEP, m_nSpeedStep);
+	DDX_Control(pDX, IDC_COMBOSPEEDSTEP, m_nSpeedStepCtrl);
 }
 
 BEGIN_MESSAGE_MAP(CPPagePlayback, CPPageBase)
@@ -127,6 +129,19 @@ BOOL CPPagePlayback::OnInitDialog()
 
 	m_nVolumeStep = s.nVolumeStep - 1;
 
+	for (int idx = 0; idx <= 10; idx++) {
+		CString str; 
+		if (idx == 0) {
+			str = _T("Auto"); 
+			m_nSpeedStepCtrl.AddString(str);
+			continue;
+		}
+		str.Format(_T("%.1f"), (float)idx/10);
+		m_nSpeedStepCtrl.AddString(str);
+	}
+
+	m_nSpeedStep = s.nSpeedStep;
+
 	UpdateData(FALSE);
 
 	return TRUE;
@@ -152,6 +167,12 @@ BOOL CPPagePlayback::OnApply()
 	s.strSubtitlesLanguageOrder = m_subtitlesLanguageOrder;
 	s.strAudiosLanguageOrder = m_audiosLanguageOrder;
 	s.nVolumeStep = m_nVolumeStep + 1;
+
+	if ((s.nSpeedStep == 0 && m_nSpeedStep > 0) || (s.nSpeedStep > 0 && m_nSpeedStep == 0)) {
+		((CMainFrame*)GetParentFrame())->OnPlayResetRate();
+	}
+	s.nSpeedStep = m_nSpeedStep;
+
 
 	return __super::OnApply();
 }

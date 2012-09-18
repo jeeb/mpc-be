@@ -361,6 +361,7 @@ public:
 	bool			fRewind;
 	int				iZoomLevel;
 	int				nVolumeStep;
+	int				nSpeedStep;
 	//int			iVideoRendererType;
 	CStringW		strAudioRendererDisplayName;
 	bool			fAutoloadAudio;
