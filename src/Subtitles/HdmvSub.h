@@ -73,12 +73,12 @@ public:
 	};
 
 	virtual REFERENCE_TIME	GetStart(POSITION nPos) {
-		CompositionObject*	pObject = m_pObjects.GetAt(nPos);
+		CompositionObject* pObject = m_pObjects.GetAt(nPos);
 		return pObject!=NULL ? pObject->m_rtStart : INVALID_TIME;
 	};
 
 	virtual REFERENCE_TIME	GetStop(POSITION nPos) {
-		CompositionObject*	pObject = m_pObjects.GetAt(nPos);
+		CompositionObject* pObject = m_pObjects.GetAt(nPos);
 		return pObject!=NULL ? pObject->m_rtStop : INVALID_TIME;
 	};
 
@@ -97,6 +97,8 @@ private :
 
 	VIDEO_DESCRIPTOR				m_VideoDescriptor;
 
+	CAtlList<CompositionObject*>	m_pCurrentObjects;
+	
 	CompositionObject*				m_pCurrentObject;
 	CAtlList<CompositionObject*>	m_pObjects;
 
