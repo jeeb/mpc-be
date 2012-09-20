@@ -24,13 +24,52 @@
 
 #include "BaseSub.h"
 
+#define MAX_WINDOWS 3 // Maximum number of windows (taken from ffdshow, maybe other ...)
+class HDMV_WindowDefinition
+{
+public:
+	SHORT					m_compositionNumber;
+	SHORT					m_palette_id_ref;
+	BYTE					m_nObjectNumber;
+	CompositionObject*		Objects[MAX_WINDOWS];
+
+	HDMV_WindowDefinition() {
+		m_compositionNumber	= -1;
+		m_palette_id_ref	= -1;
+		m_nObjectNumber		= 0;
+
+		for (int i = 0; i<MAX_WINDOWS; i++) {
+			Objects[i]	= NULL;
+		}
+	}
+
+	~HDMV_WindowDefinition() {
+		for (int i = 0; i<MAX_WINDOWS; i++) {
+			if (Objects[i]) {
+				delete Objects[i];
+			}
+		}
+	}
+
+	void Reset() {
+		for (int i = 0; i<MAX_WINDOWS; i++) {
+			if (Objects[i] && !Objects[i]->GetRLEDataSize()) {
+				delete Objects[i];
+			}
+			Objects[i]	= NULL;
+		}
+
+		m_compositionNumber	= -1;
+		m_palette_id_ref	= -1;
+		m_nObjectNumber		= 0;
+	}
+};
+
 class CGolombBuffer;
 
 class CHdmvSub : public CBaseSub
 {
 public:
-	static const REFERENCE_TIME INVALID_TIME = _I64_MIN;
-
 	enum HDMV_SEGMENT_TYPE {
 		NO_SEGMENT			= 0xFFFF,
 		PALETTE				= 0x14,
@@ -97,17 +136,15 @@ private :
 
 	VIDEO_DESCRIPTOR				m_VideoDescriptor;
 
-	CAtlList<CompositionObject*>	m_pCurrentObjects;
-	
-	CompositionObject*				m_pCurrentObject;
 	CAtlList<CompositionObject*>	m_pObjects;
+	HDMV_WindowDefinition*			m_pCurrentWindow;
 
 	HDMV_PALETTE*					m_pDefaultPalette;
 	int								m_nDefaultPaletteNbEntry;
 
 	int								m_nColorNumber;
 
-	int					ParsePresentationSegment(CGolombBuffer* pGBuffer);
+	void				ParsePresentationSegment(CGolombBuffer* pGBuffer, REFERENCE_TIME rtTime);
 	void				ParsePalette(CGolombBuffer* pGBuffer, USHORT nSize);
 	void				ParseObject(CGolombBuffer* pGBuffer, USHORT nUnitSize);
 

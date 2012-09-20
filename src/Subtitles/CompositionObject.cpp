@@ -27,18 +27,41 @@
 
 CompositionObject::CompositionObject()
 {
-	m_rtStart		= 0;
-	m_rtStop		= 0;
+	m_rtStart		= INVALID_TIME;
+	m_rtStop		= INVALID_TIME;
 	m_pRLEData		= NULL;
 	m_nRLEDataSize	= 0;
 	m_nRLEPos		= 0;
 	m_nColorNumber	= 0;
+	m_object_id_ref	= -1;
+	m_window_id_ref	= -1;
+
+	m_object_cropped_flag	= false;
+	m_forced_on_flag		= false;
+
+	m_version_number	= 0;
+	m_nObjectNumber		= 0;
+
+	m_horizontal_position	= 0;
+	m_vertical_position		= 0;
+	m_width					= 0;
+	m_height				= 0;
+
+	m_cropping_horizontal_position	= 0;
+	m_cropping_vertical_position	= 0;
+	m_cropping_width				= 0;
+	m_cropping_height				= 0;
+
+	m_compositionNumber				= -1;
+
 	memsetd (m_Colors, 0xFF000000, sizeof(m_Colors));
 }
 
 CompositionObject::~CompositionObject()
 {
-	delete[] m_pRLEData;
+	if (m_pRLEData) {
+		delete[] m_pRLEData;
+	}
 }
 
 void CompositionObject::SetPalette (int nNbEntry, HDMV_PALETTE* pPalette, bool bIsHD)
@@ -55,7 +78,9 @@ void CompositionObject::SetPalette (int nNbEntry, HDMV_PALETTE* pPalette, bool b
 
 void CompositionObject::SetRLEData(BYTE* pBuffer, int nSize, int nTotalSize)
 {
-	delete[] m_pRLEData;
+	if (m_pRLEData) {
+		delete[] m_pRLEData;
+	}
 	m_pRLEData		= DNew BYTE[nTotalSize];
 	m_nRLEDataSize	= nTotalSize;
 	m_nRLEPos		= nSize;

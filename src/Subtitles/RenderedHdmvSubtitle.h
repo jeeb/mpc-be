@@ -66,4 +66,6 @@ private :
 
 	CBaseSub*		m_pSub;
 	CCritSec		m_csCritSec;
+
+	SUBTITLE_TYPE	m_nType;
 };

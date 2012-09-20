@@ -25,12 +25,14 @@
 
 #include "Rasterizer.h"
 
+static const REFERENCE_TIME INVALID_TIME = _I64_MIN;
+
 struct HDMV_PALETTE {
-	BYTE		entry_id;
-	BYTE		Y;
-	BYTE		Cr;
-	BYTE		Cb;
-	BYTE		T;		// HDMV rule : 0 transparent, 255 opaque (compatible DirectX)
+	BYTE	entry_id;
+	BYTE	Y;
+	BYTE	Cr;
+	BYTE	Cb;
+	BYTE	T;		// HDMV rule : 0 transparent, 255 opaque (compatible DirectX)
 };
 
 class CGolombBuffer;
@@ -39,7 +41,7 @@ class CompositionObject : Rasterizer
 {
 public :
 	SHORT				m_object_id_ref;
-	BYTE				m_window_id_ref;
+	SHORT				m_window_id_ref;
 	bool				m_object_cropped_flag;
 	bool				m_forced_on_flag;
 	BYTE				m_version_number;
@@ -54,6 +56,8 @@ public :
 	SHORT				m_cropping_vertical_position;
 	SHORT				m_cropping_width;
 	SHORT				m_cropping_height;
+
+	SHORT				m_compositionNumber;
 
 	REFERENCE_TIME		m_rtStart;
 	REFERENCE_TIME		m_rtStop;

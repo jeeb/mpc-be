@@ -26,9 +26,12 @@
 #include "RenderedHdmvSubtitle.h"
 
 CRenderedHdmvSubtitle::CRenderedHdmvSubtitle(CCritSec* pLock, SUBTITLE_TYPE nType, const CString& name, LCID lcid)
-	: CSubPicProviderImpl(pLock), m_name(name), m_lcid(lcid)
+	: CSubPicProviderImpl(pLock)
+	, m_name(name)
+	, m_lcid(lcid)
+	, m_nType(nType)
 {
-	switch (nType) {
+	switch (m_nType) {
 		case ST_DVB :
 			m_pSub = DNew CDVBSub();
 			if (name.IsEmpty() || (name == _T("Unknown"))) m_name = _T("DVB");
@@ -89,7 +92,7 @@ STDMETHODIMP_(REFERENCE_TIME) CRenderedHdmvSubtitle::GetStop(POSITION pos, doubl
 
 STDMETHODIMP_(bool) CRenderedHdmvSubtitle::IsAnimated(POSITION pos)
 {
-	return false;
+	return (m_nType == ST_HDMV) ? true : false;
 }
 
 STDMETHODIMP CRenderedHdmvSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fps, RECT& bbox)
