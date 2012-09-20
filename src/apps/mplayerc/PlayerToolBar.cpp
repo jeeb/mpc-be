@@ -632,10 +632,6 @@ void CPlayerToolBar::OnSize(UINT nType, int cx, int cy)
 	__super::OnSize(nType, cx, cy);
 
 	ArrangeControls();
-
-	if (!((CMainFrame*)AfxGetMainWnd())->m_fFullScreen) {
-		::PostMessage(((CMainFrame*)AfxGetMainWnd())->m_hWnd, WM_SIZE, SIZE_RESTORED, MAKELPARAM(0, 0));
-	}
 }
 
 void CPlayerToolBar::OnInitialUpdate()

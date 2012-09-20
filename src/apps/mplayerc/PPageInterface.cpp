@@ -178,8 +178,9 @@ BOOL CPPageInterface::OnApply()
 
 	HWND WndToolBar = ((CMainFrame*)AfxGetMainWnd())->m_hWnd_toolbar;
 
-	if (::IsWindow(WndToolBar)) {
-		::PostMessage(WndToolBar, WM_SIZE, SIZE_RESTORED, MAKELPARAM(320, 240));
+	if (::IsWindow(WndToolBar) && (s.fDisableXPToolbars != !!m_fDisableXPToolbars)) {
+		::PostMessage(WndToolBar,								WM_SIZE, s.nLastWindowType, MAKELPARAM(s.rcLastWindowPos.Width(), s.rcLastWindowPos.Height()));
+		::PostMessage(((CMainFrame*)AfxGetMainWnd())->m_hWnd,	WM_SIZE, s.nLastWindowType, MAKELPARAM(s.rcLastWindowPos.Width(), s.rcLastWindowPos.Height()));
 	}
 
 	s.fDisableXPToolbars	= !!m_fDisableXPToolbars;
