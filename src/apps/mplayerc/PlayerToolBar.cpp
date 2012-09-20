@@ -570,7 +570,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			}
 			
 			if (bGPU && m_hDXVAIcon) {
-				DrawIconEx(dc, r.left+3, r.top+6, m_hDXVAIcon, 0,0, 0, NULL, DI_NORMAL);
+				DrawIconEx(dc, r.left+3, r.CenterPoint().y-9, m_hDXVAIcon, 0,0, 0, NULL, DI_NORMAL);
 			}
 
 			dc.SelectObject(&penSaved);
