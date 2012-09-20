@@ -3533,9 +3533,10 @@ void CMainFrame::OnUpdatePlayerStatus(CCmdUI* pCmdUI)
 			(fs == State_Paused || m_fFrameSteppingActive) ? ResStr(IDS_CONTROLS_PAUSED) :
 			fs == State_Running ? ResStr(IDS_CONTROLS_PLAYING) :
 			_T("");
-		if ((!m_fAudioOnly) && (UI_Text == ResStr(IDS_CONTROLS_PAUSED) || UI_Text == ResStr(IDS_CONTROLS_PLAYING))) {
+		bool bDXVAonStatusBar = (AfxGetAppSettings().fDisableXPToolbars && m_wndToolBar.IsVisible()) ? false : true;
+		if ((!m_fAudioOnly) && bDXVAonStatusBar && (UI_Text == ResStr(IDS_CONTROLS_PAUSED) || UI_Text == ResStr(IDS_CONTROLS_PLAYING))) {
 			CString DXVA_Text = GetDXVADecoderDescription();
-			if (!(_T("Not using DXVA")==DXVA_Text) || (_T("Unknown")==DXVA_Text)) {
+			if (!(_T("Not using DXVA") == DXVA_Text) || (_T("Unknown") == DXVA_Text)) {
 				UI_Text += _T(" [DXVA]");
 			}
 		}
@@ -12696,7 +12697,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 	// Clear DXVA state ...
 	ClearDXVAState();
-
 #ifdef _DEBUG
 	// Debug trace code - Begin
 	// Check for bad / buggy auto loading file code
@@ -13102,6 +13102,10 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 	UpdateThumbarButton();
 
+	if (IsWindow(m_wndToolBar.m_hWnd) && m_wndToolBar.IsVisible()) {
+		m_wndToolBar.Invalidate();
+	}
+
 	return(err.IsEmpty());
 }
 
@@ -13217,6 +13221,10 @@ void CMainFrame::CloseMediaPrivate()
 	AfxGetAppSettings().ResetPositions();
 
 	SetLoadState (MLS_CLOSED);
+
+	if (IsWindow(m_wndToolBar.m_hWnd) && m_wndToolBar.IsVisible()) {
+		m_wndToolBar.Invalidate();
+	}
 }
 
 void CMainFrame::ParseDirs(CAtlList<CString>& sl) {

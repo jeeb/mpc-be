@@ -126,6 +126,7 @@ IDI_UNKNOWN                      ICON                    "res\\Icon_116.ico"
 IDR_TB_PLAY                      ICON                    "res\\tb_play_16.ico"
 IDR_TB_PAUSE                     ICON                    "res\\tb_pause_16.ico"
 IDR_TB_STOP                      ICON                    "res\\tb_stop_16.ico"
+IDR_DXVA_ON                      ICON                    "res\\gpu.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -1261,6 +1261,7 @@
 #define IDS_NO_MORE_MEDIA               41026
 #define IDS_FIRST_IN_FOLDER             41027
 #define IDS_LAST_IN_FOLDER              41028
+#define IDR_DXVA_ON                     41030
 #define IDS_VDF_DXVACOMPATIBILITY       41100
 #define IDS_VDF_DXVA_FULLCHECK          41101
 #define IDS_VDF_DXVA_SKIP_LEVELCHECK    41102

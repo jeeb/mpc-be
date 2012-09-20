@@ -38,11 +38,12 @@ private:
 	void SetMute(bool fMute = true);
 	int getHitButtonIdx(CPoint point);
 
-	MPCPngImage m_logobm;
-	__int64 iDisableXPToolbars;
+	MPCPngImage	m_logobm;
+	__int64		iDisableXPToolbars;
+	int			m_nButtonHeight;
+	CImageList	*m_pButtonsImages;
 
-	int m_nButtonHeight;
-	CImageList *m_pButtonsImages;
+	HICON		m_hDXVAIcon;
 
 public:
 	CPlayerToolBar();

@@ -991,6 +991,9 @@
     <None Include="res\Toolbarw7.png">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="res\gpu.ico">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="mplayerc.rc">

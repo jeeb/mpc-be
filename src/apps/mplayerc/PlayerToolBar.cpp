@@ -27,6 +27,7 @@
 #include <atlbase.h>
 #include <afxpriv.h>
 #include "PlayerToolBar.h"
+#include "IPinHook.h"
 #include "MainFrm.h"
 
 
@@ -39,12 +40,17 @@ CPlayerToolBar::CPlayerToolBar()
 	: fDisableImgListRemap(false)
 	, m_pButtonsImages(NULL)
 {
+	m_hDXVAIcon = (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_DXVA_ON), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 }
 
 CPlayerToolBar::~CPlayerToolBar()
 {
 	if (m_pButtonsImages) {
 		delete m_pButtonsImages;
+	}
+
+	if (m_hDXVAIcon) {
+		DestroyIcon(m_hDXVAIcon);
 	}
 }
 
@@ -433,9 +439,20 @@ END_MESSAGE_MAP()
 
 void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMTBCUSTOMDRAW pTBCD = reinterpret_cast<LPNMTBCUSTOMDRAW>(pNMHDR);
-	LRESULT lr = CDRF_DODEFAULT;
-	AppSettings& s = AfxGetAppSettings();
+	LPNMTBCUSTOMDRAW pTBCD	= reinterpret_cast<LPNMTBCUSTOMDRAW>(pNMHDR);
+	LRESULT lr				= CDRF_DODEFAULT;
+
+	AppSettings& s		= AfxGetAppSettings();
+	CMainFrame* pFrame	= (CMainFrame*)GetParentFrame();
+	OAFilterState fs	= pFrame->GetMediaState();
+	bool bGPU = false;
+	if (fs != -1){
+		CString DXVA_Text = GetDXVADecoderDescription();
+		if (!(_T("Not using DXVA") == DXVA_Text) || (_T("Unknown") == DXVA_Text)) {
+			bGPU = true;
+		}
+	}
+	
 
 	int R, G, B, R2, G2, B2;
 
@@ -550,6 +567,10 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 					};
 					dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 				}
+			}
+			
+			if (bGPU && m_hDXVAIcon) {
+				DrawIconEx(dc, r.left+3, r.top+6, m_hDXVAIcon, 0,0, 0, NULL, DI_NORMAL);
 			}
 
 			dc.SelectObject(&penSaved);
@@ -677,6 +698,7 @@ void CPlayerToolBar::OnMouseMove(UINT nFlags, CPoint point)
 	int i = getHitButtonIdx(point);
 
 	if (i == -1 || (GetButtonStyle(i) & (TBBS_SEPARATOR | TBBS_DISABLED))) {
+		//
 	} else {
 		if (i > 10 || i < 2 || i == 6 || (i < 10 && (pFrame->IsSomethingLoaded() || pFrame->IsD3DFullScreenMode()))) {
 			::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_HAND));
