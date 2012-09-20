@@ -1030,17 +1030,16 @@ BOOL CMPlayerCApp::InitInstance()
 			(!(m_s.GetAllowMultiInst() || m_s.nCLSwitches&CLSW_NEW || m_cmdln.IsEmpty()) || m_s.nCLSwitches&CLSW_ADD) ) {
 
 		DWORD res = WaitForSingleObject(m_mutexOneInstance.m_h, 5000);
-		if (res==WAIT_OBJECT_0 || res==WAIT_ABANDONED) {
+		if (res == WAIT_OBJECT_0 || res == WAIT_ABANDONED) {
 			HWND hWnd = ::FindWindow(MPC_WND_CLASS_NAME, NULL);
 			if (hWnd) {
 				SetForegroundWindow(hWnd);
 				if (!(m_s.nCLSwitches&CLSW_MINIMIZED) && IsIconic(hWnd)) {
 					ShowWindow(hWnd, SW_RESTORE);
 				}
-				if (SendCommandLine(hWnd)) {
-					m_mutexOneInstance.Close();
-					return FALSE;
-				}
+				SendCommandLine(hWnd);
+				m_mutexOneInstance.Close();
+				return FALSE;
 			}
 		}
 	}
