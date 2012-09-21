@@ -230,15 +230,24 @@ HRESULT	CMpcAudioRenderer::CheckMediaType(const CMediaType *pmt)
 			return VFW_E_CANNOT_CONNECT;
 		}
 
-		HRESULT hr = VFW_E_TYPE_NOT_ACCEPTED;
+		WAVEFORMATEX *sharedClosestMatch	= NULL;
+		HRESULT hr							= VFW_E_TYPE_NOT_ACCEPTED;
 		if (m_useWASAPIAfterRestart == 1) { // EXCLUSIVE
 			hr = pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, pwfx, NULL);
 		} else if (m_useWASAPIAfterRestart == 2) { // SHARED
 			WAVEFORMATEX *sharedClosestMatch = 0;
 			hr = pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_SHARED, pwfx, &sharedClosestMatch);
 		}
-		if (FAILED(hr)) {
+		if (hr != S_OK) {
 			TRACE(_T("CMpcAudioRenderer::CheckMediaType WASAPI client refused the format\n"));
+			if (sharedClosestMatch) {
+				if (sharedClosestMatch->nSamplesPerSec != pwfx->nSamplesPerSec) {
+					TRACE(_T("	Invalid Sample Rate\n"));
+				}
+				if (sharedClosestMatch->nChannels != pwfx->nChannels) {
+					TRACE(_T("	Invalid Channel Count\n"));
+				}
+			}
 			return VFW_E_TYPE_NOT_ACCEPTED;
 		}
 		TRACE(_T("CMpcAudioRenderer::CheckMediaType WASAPI client accepted the format\n"));
@@ -1037,7 +1046,7 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx)
 			WAVEFORMATEX *sharedClosestMatch = 0;
 			hr = pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_SHARED, pWaveFormatEx, &sharedClosestMatch);
 		}
-		if (SUCCEEDED(hr)) {
+		if (hr == S_OK) {
 			if (pAudioClient!=NULL && isAudioClientStarted) {
 				pAudioClient->Stop();
 			}
@@ -1224,19 +1233,32 @@ HRESULT CMpcAudioRenderer::GetBufferSize(WAVEFORMATEX *pWaveFormatEx, REFERENCE_
 HRESULT CMpcAudioRenderer::InitAudioClient(WAVEFORMATEX *pWaveFormatEx, IAudioClient *pAudioClient, IAudioRenderClient **ppRenderClient)
 {
 	TRACE(_T("CMpcAudioRenderer::InitAudioClient\n"));
-	HRESULT hr=S_OK;
+	HRESULT hr = S_OK;
 	// Initialize the stream to play at the minimum latency.
-	//if (SUCCEEDED (hr)) hr = pAudioClient->GetDevicePeriod(NULL, &hnsPeriod);
-	hnsPeriod=500000; //50 ms is the best according to James @Slysoft
+	hr = pAudioClient->GetDevicePeriod(NULL, &hnsPeriod);
+	if (FAILED(hr)) {
+		hnsPeriod = 500000; //50 ms is the best according to James @Slysoft
+	}
 
+	WAVEFORMATEX *sharedClosestMatch = NULL;
 	if (m_useWASAPIAfterRestart == 1) { // EXCLUSIVE
 		hr = pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, pWaveFormatEx, NULL);
 	} else if (m_useWASAPIAfterRestart == 2) { // SHARED
 		WAVEFORMATEX *sharedClosestMatch = 0;
 		hr = pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_SHARED, pWaveFormatEx, &sharedClosestMatch);
 	}
-	if (FAILED(hr)) {
+	if (hr != S_OK) {
 		TRACE(_T("CMpcAudioRenderer::InitAudioClient not supported (0x%08x)\n"), hr);
+		if (sharedClosestMatch) {
+			if (sharedClosestMatch->nSamplesPerSec != pWaveFormatEx->nSamplesPerSec) {
+				TRACE(_T("	Invalid Sample Rate\n"));
+			}
+			if (sharedClosestMatch->nChannels != pWaveFormatEx->nChannels) {
+				TRACE(_T("	Invalid Channel Count\n"));
+			}
+		}
+
+		return VFW_E_TYPE_NOT_ACCEPTED;
 	} else {
 		TRACE(_T("CMpcAudioRenderer::InitAudioClient format supported\n"));
 	}
