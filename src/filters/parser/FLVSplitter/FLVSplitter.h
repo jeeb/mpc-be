@@ -39,6 +39,8 @@ class __declspec(uuid("47E792CF-0BBE-4F7A-859C-194B0768650A"))
 	UINT32	m_TimeStampOffset;
 	bool	m_DetectWrongTimeStamp;
 
+	bool	m_bUpdateDuration;
+
 	bool Sync(__int64& pos);
 
 	struct VideoTweak {

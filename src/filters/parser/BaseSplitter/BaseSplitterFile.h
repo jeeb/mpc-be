@@ -54,7 +54,7 @@ public:
 	__int64 GetAvailable();
 	__int64 GetLength(bool fUpdate = false);
 	__int64 GetRemaining() {
-		return max(0, GetLength() - GetPos());
+		return max(0, GetAvailable() - GetPos());
 	}
 	virtual void Seek(__int64 pos);
 

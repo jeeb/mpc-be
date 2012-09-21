@@ -156,12 +156,17 @@ CString PlayerYouTube(CString fname, CString* out_title)
 			t_start += 28;
 			int t_stop = _strpos(out + t_start, "\">");
 			if (t_stop > 0) {
-				char* title = (char*)malloc(t_stop + 1);
+				char* title	= (char*)malloc(t_stop + 1);
 				memset(title, 0, t_stop + 1);
 				memcpy(title, out + t_start, t_stop);
+
 				Title = CA2CT(title, CP_UTF8);
 
 				Title = Title.TrimLeft(_T(".")).TrimRight(_T("."));
+				Title.Replace(_T("&quot;"), _T("\""));
+				Title.Replace(_T("&#39;"), _T("\""));
+
+				free(title);
 			}
 		}
 

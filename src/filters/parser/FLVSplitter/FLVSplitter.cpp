@@ -116,6 +116,7 @@ CFLVSplitterFilter::CFLVSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("CFLVSplitterFilter"), pUnk, phr, __uuidof(this))
 	, m_TimeStampOffset(0)
 	, m_DetectWrongTimeStamp(true)
+	, m_bUpdateDuration(false)
 {
 }
 
@@ -228,10 +229,10 @@ bool CFLVSplitterFilter::Sync(__int64& pos)
 		Tag ct;
 		if (ReadTag(ct)) {
 			__int64 next = m_pFile->GetPos() + ct.DataSize;
-			if (next == m_pFile->GetLength() - 4) {
+			if (next == m_pFile->GetAvailable() - 4) {
 				m_pFile->Seek(pos);
 				return true;
-			} else if (next <= m_pFile->GetLength() - 19) {
+			} else if (next <= m_pFile->GetAvailable() - 19) {
 				m_pFile->Seek(next);
 				Tag nt;
 				if (ReadTag(nt) && (nt.TagType == FLV_AUDIODATA || nt.TagType == FLV_VIDEODATA || nt.TagType == FLV_SCRIPTDATA)) {
@@ -675,23 +676,34 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		m_pFile->Seek(next);
 	}
 
-	if (m_pFile->IsRandomAccess()) {
-		__int64 pos = max(m_DataOffset, m_pFile->GetLength() - 256 * 1024);
 
-		if (Sync(pos)) {
-			Tag t;
-			AudioTag at;
-			VideoTag vt;
+	if (m_pFile->IsStreaming()) {
+		for (int i = 0; i < 20 || i < 50 && S_OK != m_pFile->HasMoreData(1024*100, 100); i++) {
+			;
+		}
+	}
 
-			while (ReadTag(t)) {
-				UINT64 next = m_pFile->GetPos() + t.DataSize;
+	m_bUpdateDuration = (m_pFile->GetAvailable() < m_pFile->GetLength());
 
-				if (t.TagType == FLV_AUDIODATA && ReadTag(at) || t.TagType == FLV_VIDEODATA && ReadTag(vt)) {
-					m_rtDuration = max(m_rtDuration, 10000i64 * t.TimeStamp);
-				}
+	__int64 pos = max(m_DataOffset, m_pFile->GetAvailable() - 256 * 1024);
+		
+	if (Sync(pos)) {
+		Tag t;
+		AudioTag at;
+		VideoTag vt;
 
-				m_pFile->Seek(next);
+		while (ReadTag(t)) {
+			UINT64 next = m_pFile->GetPos() + t.DataSize;
+
+			if ((t.TagType == FLV_AUDIODATA && ReadTag(at)) || (t.TagType == FLV_VIDEODATA && ReadTag(vt))) {
+				m_rtDuration = max(m_rtDuration, 10000i64 * t.TimeStamp);
 			}
+
+			if (m_rtDuration && m_bUpdateDuration) {
+				break;
+			}
+
+			m_pFile->Seek(next);
 		}
 	}
 
@@ -723,6 +735,10 @@ void CFLVSplitterFilter::NormalSeek(REFERENCE_TIME rt)
 	bool fVideo = !!GetOutputPin(FLV_VIDEODATA);
 
 	__int64 pos = m_DataOffset + (__int64)(double(m_pFile->GetLength() - m_DataOffset) * rt / m_rtDuration);
+
+	if (pos > m_pFile->GetAvailable()) {
+		return;
+	}
 
 	if (!Sync(pos)) {
 		ASSERT(0);
@@ -768,7 +784,7 @@ void CFLVSplitterFilter::AlternateSeek(REFERENCE_TIME rt)
 	bool hasAudio = !!GetOutputPin(FLV_AUDIODATA);
 	bool hasVideo = !!GetOutputPin(FLV_VIDEODATA);
 
-	__int64 estimPos = m_DataOffset + (__int64)(double(m_pFile->GetLength() - m_DataOffset) * rt / m_rtDuration);
+	__int64 estimPos = m_DataOffset + (__int64)(double(m_pFile->GetAvailable() - m_DataOffset) * rt / m_rtDuration);
 
 	while (true) {
 		estimPos -= 256 * 1024;
@@ -823,6 +839,38 @@ bool CFLVSplitterFilter::DemuxLoop()
 	VideoTag vt = {};
 
 	while (SUCCEEDED(hr) && !CheckRequest(NULL) && m_pFile->GetRemaining()) {
+
+		// try update duration
+		if (m_bUpdateDuration) {
+			__int64 curpos	= m_pFile->GetPos();
+			__int64 pos		= max(m_DataOffset, m_pFile->GetAvailable() - 256 * 1024);
+		
+			if (Sync(pos)) {
+				Tag t;
+				AudioTag at;
+				VideoTag vt;
+
+				while (ReadTag(t)) {
+					UINT64 next = m_pFile->GetPos() + t.DataSize;
+
+					if ((t.TagType == FLV_AUDIODATA && ReadTag(at)) || (t.TagType == FLV_VIDEODATA && ReadTag(vt))) {
+						m_rtDuration = max(m_rtDuration, 10000i64 * t.TimeStamp);
+					}
+
+					if (m_rtDuration && (m_pFile->GetAvailable() < m_pFile->GetLength())) {
+						break;
+					}
+
+					m_pFile->Seek(next);
+				}
+			}
+			m_rtNewStop = m_rtStop = m_rtDuration;
+
+			m_bUpdateDuration = (m_pFile->GetAvailable() < m_pFile->GetLength());
+
+			m_pFile->Seek(curpos);
+		}
+
 		if (!ReadTag(t)) {
 			break;
 		}
