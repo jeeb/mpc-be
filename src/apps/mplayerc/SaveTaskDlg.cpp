@@ -42,7 +42,7 @@ CSaveTaskDlg::CSaveTaskDlg(CString in, CString out)
 	SetProgressBarRange(0, 100);
 	SetProgressBarPosition(0);
 	
-	SetDialogWidth(220);
+	SetDialogWidth(250);
 
 	InitFileCopy();
 }

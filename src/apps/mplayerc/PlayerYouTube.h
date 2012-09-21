@@ -95,29 +95,34 @@ static int _strpos(char* h, char* n)
 	}
 }
 
+#define YOUTUBE_URL		_T("youtube.com/watch?")
+#define YOUTU_BE_URL	_T("youtu.be/")
+
 CString PlayerYouTube(CString fname, CString* out_title)
 {
 	if (out_title) {
 		*out_title = _T("");
 	}
-	if (wcsstr(fname, L"youtube.com/watch?")) {
 
-		char *out;
+	CString tmp_fname(CString(fname).MakeLower());
+
+	if ((tmp_fname.Find(YOUTUBE_URL) != -1) || (tmp_fname.Find(YOUTU_BE_URL) != -1)) {
+		char *out = NULL;
 
 		HINTERNET f, s = InternetOpen(0, 0, 0, 0, 0);
 
 		if (s) {
 
-			f = InternetOpenUrlW(s, fname, 0, 0, INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE, 0);
+			f = InternetOpenUrl(s, fname, 0, 0, INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE, 0);
 
 			if (f) {
 
 				char buf[4096];
 				DWORD len, size = 0, end_pos = 0, fs = 12 * sizeof(buf);
 
-				out = (char*)malloc(fs);
+				out = (char*)malloc(fs + 1);
 
-				memset(out, 0, fs);
+				memset(out, 0, fs + 1);
 
 				for (;;) {
 
