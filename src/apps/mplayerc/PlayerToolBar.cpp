@@ -444,15 +444,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 
 	AppSettings& s		= AfxGetAppSettings();
 	CMainFrame* pFrame	= (CMainFrame*)GetParentFrame();
-	OAFilterState fs	= pFrame->GetMediaState();
-	bool bGPU = false;
-	if (fs != -1){
-		CString DXVA_Text = GetDXVADecoderDescription();
-		if (!(_T("Not using DXVA") == DXVA_Text) || (_T("Unknown") == DXVA_Text)) {
-			bGPU = true;
-		}
-	}
-	
+	bool bGPU			= (pFrame->GetMediaState() != -1) && (GetDXVAStatus() != 0);
 
 	int R, G, B, R2, G2, B2;
 

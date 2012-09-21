@@ -174,10 +174,14 @@ interface IAMVideoAcceleratorC {
 	CONST_VTBL struct IAMVideoAcceleratorCVtbl *lpVtbl;
 };
 
+// DXVA1 hooks
 void HookAMVideoAccelerator(IAMVideoAcceleratorC* pAMVideoAcceleratorC);
 
 // DXVA2 hooks
 void HookDirectXVideoDecoderService(void* pIDirectXVideoDecoderService);
-LPCTSTR GetDXVADecoderDescription();
-LPCTSTR GetDXVAVersion();
-void ClearDXVAState();
+
+// common function
+LPCTSTR	GetDXVADecoderDescription();
+LPCTSTR	GetDXVAVersion();
+int		GetDXVAStatus();
+void	ClearDXVAState();

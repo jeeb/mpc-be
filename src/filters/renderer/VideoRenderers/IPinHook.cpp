@@ -127,6 +127,11 @@ LPCTSTR GetDXVAVersion()
 	return DXVAVersion[g_nDXVAVersion];
 }
 
+int GetDXVAStatus()
+{
+	return g_nDXVAVersion;	
+}
+
 void ClearDXVAState()
 {
 	g_guidDXVADecoder = GUID_NULL;

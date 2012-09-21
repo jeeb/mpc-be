@@ -3533,11 +3533,10 @@ void CMainFrame::OnUpdatePlayerStatus(CCmdUI* pCmdUI)
 			(fs == State_Paused || m_fFrameSteppingActive) ? ResStr(IDS_CONTROLS_PAUSED) :
 			fs == State_Running ? ResStr(IDS_CONTROLS_PLAYING) :
 			_T("");
-		bool bDXVAonStatusBar = (AfxGetAppSettings().fDisableXPToolbars && m_wndToolBar.IsVisible()) ? false : true;
+		bool bDXVAonStatusBar = !(AfxGetAppSettings().fDisableXPToolbars && m_wndToolBar.IsVisible());
 		if ((!m_fAudioOnly) && bDXVAonStatusBar && (UI_Text == ResStr(IDS_CONTROLS_PAUSED) || UI_Text == ResStr(IDS_CONTROLS_PLAYING))) {
-			CString DXVA_Text = GetDXVADecoderDescription();
-			if (!(_T("Not using DXVA") == DXVA_Text) || (_T("Unknown") == DXVA_Text)) {
-				UI_Text += _T(" [DXVA]");
+			if (GetDXVAStatus()) {
+				UI_Text.AppendFormat(_T(" [%ws]"), GetDXVAVersion());
 			}
 		}
 		pCmdUI->SetText(UI_Text);
@@ -10060,7 +10059,7 @@ OAFilterState CMainFrame::GetMediaState()
 	if (m_iMediaLoadState == MLS_LOADED) {
 		pMC->GetState(0, &ret);
 	}
-	return(ret);
+	return ret;
 }
 
 void CMainFrame::SetPlaybackMode(int iNewStatus)
