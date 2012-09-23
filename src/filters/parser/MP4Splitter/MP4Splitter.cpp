@@ -946,6 +946,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							break;
 						} else if (type == AP4_ATOM_TYPE_MJPA || type == AP4_ATOM_TYPE_MJPB || type == AP4_ATOM_TYPE_MJPG) {
 							SetTrackName(&TrackName, _T("M-Jpeg"));
+						} else if (type == AP4_ATOM_TYPE_MJP2) {
+							SetTrackName(&TrackName, _T("M-Jpeg 2000"));
 						} else if (type == AP4_ATOM_TYPE_APCN ||
 								   type == AP4_ATOM_TYPE_APCH ||
 								   type == AP4_ATOM_TYPE_APCO ||

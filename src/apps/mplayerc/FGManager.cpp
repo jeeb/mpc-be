@@ -2170,6 +2170,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_QTJpeg);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_MJPA);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_MJPB);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_MJP2);
 	}
 
 	if (ffmpeg_filters[FFM_INDEO] || IsPreview) {
@@ -2426,6 +2427,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview
 			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_QTJpeg);
 			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_MJPA);
 			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_MJPB);
+			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_MJP2);
 		}
 
 		if (ffmpeg_filters[FFM_INDEO]) {

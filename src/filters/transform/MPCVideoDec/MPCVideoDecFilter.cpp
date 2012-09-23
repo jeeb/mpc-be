@@ -207,6 +207,7 @@ FFMPEG_CODECS		ffCodecs[] = {
 	{ &MEDIASUBTYPE_QTJpeg, AV_CODEC_ID_MJPEG,  NULL },
 	{ &MEDIASUBTYPE_MJPA,   AV_CODEC_ID_MJPEG,  NULL },
 	{ &MEDIASUBTYPE_MJPB,   AV_CODEC_ID_MJPEGB, NULL },
+	{ &MEDIASUBTYPE_MJP2,   AV_CODEC_ID_JPEG2000, NULL },
 	
 	// DV VIDEO
 	{ &MEDIASUBTYPE_dvsl,   AV_CODEC_ID_DVVIDEO,  NULL },
@@ -471,6 +472,7 @@ const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_QTJpeg },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_MJPA   },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_MJPB   },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_MJP2   },
 
 	// DV VIDEO
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_dvsl   },
@@ -1563,7 +1565,7 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 
 	BOOL bH264avc = FALSE;
 	if (extralen > 0) {
-		TRACE(_T("CMPCVideoDecFilter::AllocExtradata() : processing extradata of %d bytes"), extralen);
+		TRACE(_T("CMPCVideoDecFilter::AllocExtradata() : processing extradata of %d bytes\n"), extralen);
 		// Reconstruct AVC1 extradata format
 		if (pmt->formattype == FORMAT_MPEG2Video && (m_pAVCtx->codec_tag == MAKEFOURCC('a','v','c','1') || m_pAVCtx->codec_tag == MAKEFOURCC('A','V','C','1') || m_pAVCtx->codec_tag == MAKEFOURCC('C','C','V','1'))) {
 			MPEG2VIDEOINFO *mp2vi = (MPEG2VIDEOINFO *)pmt->Format();
@@ -1602,7 +1604,7 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 
 			bH264avc = TRUE;
 			if (!bSPS) {
-				TRACE(_T("CMPCVideoDecFilter::AllocExtradata() : AVC1 extradata doesn't contain a SPS, setting thread_count = 1"));
+				TRACE(_T("CMPCVideoDecFilter::AllocExtradata() : AVC1 extradata doesn't contain a SPS, setting thread_count = 1\n"));
 				m_pAVCtx->thread_count = 1;
 			}
 		} else {
@@ -1622,7 +1624,7 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 
 HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pReceivePin)
 {
-	LOG(_T("CMPCVideoDecFilter::CompleteConnect"));
+	TRACE(_T("CMPCVideoDecFilter::CompleteConnect()\n"));
 
 	if (direction == PINDIR_INPUT && m_pOutput->IsConnected()) {
 		ReconnectOutput (m_nWidth, m_nHeight);
