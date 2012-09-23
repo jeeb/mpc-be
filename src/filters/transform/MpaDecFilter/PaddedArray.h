@@ -22,16 +22,28 @@
 
 #pragma once
 
-struct AVAudioResampleContext;
+#include <atlcoll.h>
 
-class CMixer
+class CPaddedArray : public CAtlArray<BYTE>
 {
 protected:
-	AVAudioResampleContext* m_pAVRCxt;
+	size_t m_padsize;
 
 public:
-	CMixer();
+	CPaddedArray(size_t padsize)
+		: m_padsize(padsize) {
+	}
 
-	HRESULT Mixing(float* pOutput, WORD out_ch, DWORD out_layout, BYTE* pInput, int samples, WORD in_ch, DWORD in_layout, enum AVSampleFormat in_sf);
-	void CMixer::Reset();
+	size_t GetCount() {
+		size_t count = __super::GetCount();
+		return (count > m_padsize) ? count - m_padsize : 0;
+	}
+
+	bool SetCount(size_t nNewSize, int nGrowBy = - 1) {
+		if (__super::SetCount(nNewSize + m_padsize, nGrowBy)) {
+			memset(GetData() + nNewSize, 0, m_padsize);
+			return true;
+		}
+		return false;
+	}
 };

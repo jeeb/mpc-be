@@ -32,7 +32,10 @@ class __declspec(uuid("24103041-884B-4772-B0D3-A600E7CBFEC7"))
 {
 	CComQIPtr<IMpaDecFilter> m_pMDF;
 
-	int m_outputformat;
+	bool  m_outfmt_i16;
+	bool  m_outfmt_i24;
+	bool  m_outfmt_i32;
+	bool  m_outfmt_flt;
 	bool m_mixer;
 	int  m_mixer_layout;
 	bool m_drc;
@@ -40,16 +43,22 @@ class __declspec(uuid("24103041-884B-4772-B0D3-A600E7CBFEC7"))
 	bool m_spdif_dts;
 
 	enum {
-		IDC_PP_COMBO1 = 10000,
-		IDC_PP_COMBO2,
+		IDC_PP_COMBO_MIXLAYOUT = 10000,
+		IDC_PP_CHECK_I16,
+		IDC_PP_CHECK_I24,
+		IDC_PP_CHECK_I32,
+		IDC_PP_CHECK_FLT,
 		IDC_PP_CHECK_MIXER,
 		IDC_PP_CHECK_DRC,
-		IDC_PP_CHECK_AC3_CPDIF,
-		IDC_PP_CHECK_DTS_CPDIF,
+		IDC_PP_CHECK_SPDIF_AC3,
+		IDC_PP_CHECK_SPDIF_DTS
 	};
 
-	CStatic m_outputformat_static;
-	CComboBox m_outputformat_combo;
+	CButton   m_outfmt_group;
+	CButton   m_outfmt_i16_check;
+	CButton   m_outfmt_i24_check;
+	CButton   m_outfmt_i32_check;
+	CButton   m_outfmt_flt_check;
 
 	CButton   m_mixer_group;
 	CButton   m_mixer_check;
@@ -76,5 +85,9 @@ public:
 
 	DECLARE_MESSAGE_MAP()
 
+	afx_msg void OnInt16Check();
+	afx_msg void OnInt24Check();
+	afx_msg void OnInt32Check();
+	afx_msg void OnFloatCheck();
 	afx_msg void OnMixerCheck();
 };
