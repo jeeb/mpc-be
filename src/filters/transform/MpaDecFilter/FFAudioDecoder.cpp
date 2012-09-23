@@ -174,6 +174,7 @@ CFFAudioDecoder::CFFAudioDecoder()
 	, m_pAVCtx(NULL)
 	, m_pParser(NULL)
 	, m_pFrame(NULL)
+	, m_pCurrentMediaType(NULL)
 {
 	memset(&m_raData, 0, sizeof(m_raData));
 }
@@ -183,6 +184,16 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput)
 	if (nCodecId == AV_CODEC_ID_NONE) {
 		return false;
 	}
+
+	if (pInput) {
+		m_pCurrentMediaType = &pInput->CurrentMediaType();
+	}
+
+	if (!m_pCurrentMediaType) {
+		return false;
+	}
+
+	CMediaType *pCurrentMediaType = m_pCurrentMediaType;
 
 	bool bRet = false;
 
@@ -206,7 +217,7 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput)
 	if (m_pAVCodec) {
 		DWORD nSamples, nBytesPerSec;
 		WORD nChannels, nBitsPerSample, nBlockAlign;
-		audioFormatTypeHandler((BYTE*)pInput->CurrentMediaType().Format(), pInput->CurrentMediaType().FormatType(), &nSamples, &nChannels, &nBitsPerSample, &nBlockAlign, &nBytesPerSec);
+		audioFormatTypeHandler((BYTE*)pCurrentMediaType->Format(), pCurrentMediaType->FormatType(), &nSamples, &nChannels, &nBitsPerSample, &nBlockAlign, &nBytesPerSec);
 
 		if (nCodecId == AV_CODEC_ID_AMR_NB || nCodecId == AV_CODEC_ID_AMR_WB) {
 			nChannels = 1;
@@ -228,13 +239,13 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput)
 			m_pAVCtx->flags            |= CODEC_FLAG_TRUNCATED;
 		}
 
-		if (nCodecId != AV_CODEC_ID_AAC && nCodecId != AV_CODEC_ID_AAC_LATM) {
+		if (nCodecId != AV_CODEC_ID_AAC) {
 			m_pParser = av_parser_init(nCodecId);
 		}
 
-		const void* format = pInput->CurrentMediaType().Format();
-		GUID format_type = pInput->CurrentMediaType().formattype;
-		DWORD formatlen = pInput->CurrentMediaType().cbFormat;
+		const void* format = pCurrentMediaType->Format();
+		GUID format_type = pCurrentMediaType->formattype;
+		DWORD formatlen = pCurrentMediaType->cbFormat;
 		unsigned extralen = 0;
 		getExtraData((BYTE*)format, &format_type, formatlen, NULL, &extralen);
 
@@ -341,6 +352,7 @@ HRESULT CFFAudioDecoder::Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, 
 
 		if (used_bytes < 0) {
 			TRACE(_T("CMpaDecFilter::DeliverFFmpeg() - decoding failed\n"));
+			Init(nCodecId, NULL);
 			return E_FAIL;
 		} else if (used_bytes == 0 && !got_frame) {
 			TRACE(_T("CMpaDecFilter::DeliverFFmpeg() - could not process buffer while decoding\n"));
@@ -415,6 +427,8 @@ void CFFAudioDecoder::StreamFinish()
 	if (m_pFrame) {
 		av_freep(&m_pFrame);
 	}
+
+	m_pCurrentMediaType = NULL;
 }
 
 // RealAudio

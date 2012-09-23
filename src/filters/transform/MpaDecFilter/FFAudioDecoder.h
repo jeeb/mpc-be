@@ -52,6 +52,8 @@ protected:
 
 	HRESULT ParseRealAudioHeader(const BYTE* extra, const int extralen);
 
+	CMediaType* m_pCurrentMediaType;
+
 public:
 	CFFAudioDecoder();
 
