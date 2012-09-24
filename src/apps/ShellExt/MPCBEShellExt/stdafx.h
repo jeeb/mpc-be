@@ -56,5 +56,6 @@
 #include <atlbase.h>
 #include <atlcom.h>
 #include <atlctl.h>
+#include <atlpath.h>
 
 using namespace ATL;

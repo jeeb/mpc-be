@@ -29,10 +29,54 @@
 // config dialog
 STDAPI DllConfig(void)
 {
+	// ѕровер€ем - надо ли показывать диалог выбора
+	CRegKey key;
+	TCHAR path_buff[MAX_PATH];
+	memset(path_buff, 0, sizeof(path_buff));
+	ULONG len = sizeof(path_buff);
+	unsigned count = 0;
+
+	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\MPC-BE"))) {
+		if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && CPath(path_buff).FileExists()) {
+			count++;
+		}
+		key.Close();
+	}
 #ifdef _WIN64
-	CConfigDlg dlg;
-	dlg.DoModal();
+	// x86 application on x64 system
+	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\Wow6432Node\\MPC-BE"))) {
+		len = sizeof(path_buff);
+		memset(path_buff, 0, sizeof(path_buff));
+		if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && CPath(path_buff).FileExists()) {
+			count++;
+		}
+		key.Close();
+	}
 #endif
+
+	//
+
+	if (count == 2) {
+		CConfigDlg dlg;
+		dlg.DoModal();
+	} else {
+		CRegKey key;
+		TCHAR path_buff[MAX_PATH];
+		memset(path_buff, 0, sizeof(path_buff));
+		ULONG len = sizeof(path_buff);
+
+		if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\MPC-BE"))) {
+			if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && CPath(path_buff).FileExists()) {
+				CString path(path_buff);
+				key.Close();
+
+				if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
+					key.SetStringValue(_T("MpcPath"), path);
+					key.Close();
+				}
+			}
+		}
+	}
 
 	return S_OK;
 }
@@ -41,7 +85,7 @@ STDAPI DllConfig(void)
 STDAPI DllCanUnloadNow(void)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	return (AfxDllCanUnloadNow()==S_OK && _AtlModule.GetLockCount()==0) ? S_OK : S_FALSE;
+	return (AfxDllCanUnloadNow() == S_OK && _AtlModule.GetLockCount() == 0) ? S_OK : S_FALSE;
 }
 
 // Returns a class factory to create an object of the requested type
@@ -51,29 +95,17 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 }
 
 // DllRegisterServer - Adds entries to the system registry
-#define	IS_KEY_LEN	256
+#define	IS_KEY_LEN 256
 STDAPI DllRegisterServer(void)
 {
-	OLECHAR		strWideCLSID[50];
-	CRegKey		key;
+	OLECHAR	strWideCLSID[50];
 	HRESULT hr = _AtlModule.DllRegisterServer();
 
 	if (SUCCEEDED(hr)) {
-		TCHAR path_buff[MAX_PATH];
-		ULONG len = sizeof(path_buff);
-
-		bool found_registry_path = false;
-		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
-			if (ERROR_SUCCESS == key.QueryStringValue(_T("MpcPath"), path_buff, &len) && !CString(path_buff).Trim().IsEmpty()) {
-				found_registry_path = true;
-			}
-		}
-
-		if (!found_registry_path) {
-			DllConfig();
-		}
+		DllConfig();
 
 		if (::StringFromGUID2(CLSID_MPCBEContextMenu, strWideCLSID, 50) > 0) {
+			CRegKey key;
 			key.SetValue(HKEY_CLASSES_ROOT, _T("directory\\shellex\\ContextMenuHandlers\\MPCBEShellExt\\"), strWideCLSID);
 
 			CRegKey reg;

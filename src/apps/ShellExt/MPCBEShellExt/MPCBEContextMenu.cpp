@@ -291,23 +291,40 @@ void CMPCBEContextMenu::SendData(bool add_pl)
 	} else {
 		CRegKey key;
 		TCHAR path_buff[MAX_PATH];
-		CString mpc_path = _T("");
+		memset(path_buff, 0, sizeof(path_buff));
 		ULONG len = sizeof(path_buff);
+		CString mpc_path;
 		
 		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
-			if (ERROR_SUCCESS == key.QueryStringValue(_T("MpcPath"), path_buff, &len) && !CString(path_buff).Trim().IsEmpty()) {
+			if (ERROR_SUCCESS == key.QueryStringValue(_T("MpcPath"), path_buff, &len) && CPath(path_buff).FileExists()) {
 				mpc_path = path_buff;
 			}
+			key.Close();
 		}
 
 		if (mpc_path.Trim().IsEmpty()) {
 			if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\MPC-BE"))) {
+				memset(path_buff, 0, sizeof(path_buff));
 				len = sizeof(path_buff);
-				if(ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && !CString(path_buff).Trim().IsEmpty()) {
+				if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && CPath(path_buff).FileExists()) {
 					mpc_path = path_buff;
 				}
+				key.Close();
 			}
 		}
+
+#ifdef _WIN64
+		if (mpc_path.Trim().IsEmpty()) {
+			if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\Wow6432Node\\MPC-BE"))) {
+				memset(path_buff, 0, sizeof(path_buff));
+				len = sizeof(path_buff);
+				if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && CPath(path_buff).FileExists()) {
+					mpc_path = path_buff;
+				}
+				key.Close();
+			}
+		}
+#endif
 
 		if (!mpc_path.Trim().IsEmpty()) {
 			if (HINSTANCE(HINSTANCE_ERROR) < ShellExecute(NULL, _T(""), path_buff, NULL, 0, SW_SHOWDEFAULT)) {
@@ -319,8 +336,7 @@ void CMPCBEContextMenu::SendData(bool add_pl)
 					hWnd = ::FindWindow(MPC_WND_CLASS_NAME, NULL);
 				}
 
-				if (hWnd && (wait_count<200))
-				{
+				if (hWnd && (wait_count<200)) {
 					COPYDATASTRUCT cds;
 					cds.dwData = 0x6ABE51;
 					cds.cbData = bufflen;

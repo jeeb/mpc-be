@@ -616,9 +616,19 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 			if (pmt->majortype == MEDIATYPE_DVD_ENCRYPTED_PACK && pmt->subtype != MEDIASUBTYPE_MPEG2_VIDEO) {
 				return S_FALSE;
 			}
+
 		}
 		EndEnumMediaTypes(pmt)
 	}
+
+	BeginEnumMediaTypes(pPinOut, pEM, pmt) {
+		// DVR-MS Caption (WTV Subtitle) pin - disable
+		if (pmt->majortype == MEDIATYPE_MSTVCaption) {
+			return S_FALSE;
+		}
+
+	}
+	EndEnumMediaTypes(pmt)
 
 	bool fDeadEnd = true;
 
