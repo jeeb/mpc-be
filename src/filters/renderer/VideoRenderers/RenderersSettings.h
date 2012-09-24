@@ -77,54 +77,48 @@ public:
 	// Subtitle position settings
 	int bPositionRelative;
 
-	class CRendererSettingsShared
+	class CAdvRendererSettings
 	{
 	public:
-		CRendererSettingsShared() {SetDefault();}
-		bool fVMR9AlterativeVSync;
-		int iVMR9VSyncOffset;
-		bool iVMR9VSyncAccurate;
-		bool iVMR9FullscreenGUISupport;
-		bool iVMR9VSync;
-		bool iVMR9FullFloatingPointProcessing;
-		bool iVMR9HalfFloatingPointProcessing;
-		bool iVMR9ColorManagementEnable;
-		int iVMR9ColorManagementInput;
-		int iVMR9ColorManagementAmbientLight;
-		int iVMR9ColorManagementIntent;
-		bool iVMRDisableDesktopComposition;
-		int iVMRFlushGPUBeforeVSync;
-		int iVMRFlushGPUAfterPresent;
-		int iVMRFlushGPUWait;
+		CAdvRendererSettings() {SetDefault();}
+
+		bool   fVMR9AlterativeVSync;
+		int    iVMR9VSyncOffset;
+		bool   iVMR9VSyncAccurate;
+		bool   iVMR9FullscreenGUISupport;
+		bool   iVMR9VSync;
+		bool   iVMR9FullFloatingPointProcessing;
+		bool   iVMR9HalfFloatingPointProcessing;
+		bool   iVMR9ColorManagementEnable;
+		int    iVMR9ColorManagementInput;
+		int    iVMR9ColorManagementAmbientLight;
+		int    iVMR9ColorManagementIntent;
+		bool   iVMRDisableDesktopComposition;
+		int    iVMRFlushGPUBeforeVSync;
+		int    iVMRFlushGPUAfterPresent;
+		int    iVMRFlushGPUWait;
+
+		// EVR
+		bool   iEVRHighColorResolution;
+		bool   iEVRForceInputHighColorResolution;
+		bool   iEVREnableFrameTimeCorrection;
+		int    iEVROutputRange;
 
 		// SyncRenderer settings
-		int bSynchronizeVideo;
-		int bSynchronizeDisplay;
-		int bSynchronizeNearest;
-		int iLineDelta;
-		int iColumnDelta;
+		int    bSynchronizeVideo;
+		int    bSynchronizeDisplay;
+		int    bSynchronizeNearest;
+		int    iLineDelta;
+		int    iColumnDelta;
 		double fCycleDelta;
 		double fTargetSyncOffset;
 		double fControlLimit;
 
-	protected:
-		void SetDefault();
-		void SetOptimal();
-	};
-	class CRendererSettingsEVR : public CRendererSettingsShared
-	{
-	public:
-		bool iEVRHighColorResolution;
-		bool iEVRForceInputHighColorResolution;
-		bool iEVREnableFrameTimeCorrection;
-		int iEVROutputRange;
-
-		CRendererSettingsEVR() {SetDefault();}
 		void SetDefault();
 		void SetOptimal();
 	};
 
-	CRendererSettingsEVR m_RenderSettings;
+	CAdvRendererSettings m_AdvRendSets;
 
 	int			iAPSurfaceUsage;
 	int			iDX9Resizer;

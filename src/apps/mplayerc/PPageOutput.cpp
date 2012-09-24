@@ -111,7 +111,7 @@ BOOL CPPageOutput::OnInitDialog()
 	m_iDX9Resizer			= renderersSettings.iDX9Resizer;
 	m_fVMR9MixerMode		= renderersSettings.fVMR9MixerMode;
 	m_fVMR9MixerYUV			= renderersSettings.fVMR9MixerYUV;
-	m_fVMR9AlterativeVSync	= renderersSettings.m_RenderSettings.fVMR9AlterativeVSync;
+	m_fVMR9AlterativeVSync	= renderersSettings.m_AdvRendSets.fVMR9AlterativeVSync;
 	m_fD3DFullscreen		= s.fD3DFullscreen;
 	m_iEvrBuffers.Format(L"%d", renderersSettings.iEvrBuffers);
 
@@ -332,7 +332,7 @@ BOOL CPPageOutput::OnApply()
 	renderersSettings.fVMR9MixerMode	                    = !!m_fVMR9MixerMode;
 	renderersSettings.fVMR9MixerYUV		                    = !!m_fVMR9MixerYUV;
 
-	renderersSettings.m_RenderSettings.fVMR9AlterativeVSync	= m_fVMR9AlterativeVSync != 0;
+	renderersSettings.m_AdvRendSets.fVMR9AlterativeVSync	= m_fVMR9AlterativeVSync != 0;
 	s.strAudioRendererDisplayName                           = m_AudioRendererDisplayNames[m_iAudioRendererType];
 	s.fD3DFullscreen			                            = m_fD3DFullscreen ? true : false;
 

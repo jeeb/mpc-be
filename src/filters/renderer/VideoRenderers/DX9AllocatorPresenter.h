@@ -55,7 +55,7 @@ namespace DSObjects
 		bool	m_bNeedCheckSample;
 		DWORD	m_MainThreadId;
 
-		CRenderersSettings::CRendererSettingsEVR m_LastRendererSettings;
+		CRenderersSettings::CAdvRendererSettings m_LastRendererSettings;
 
 		HRESULT (__stdcall * m_pDwmIsCompositionEnabled)(__out BOOL* pfEnabled);
 		HRESULT (__stdcall * m_pDwmEnableComposition)(UINT uCompositionAction);
