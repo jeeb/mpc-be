@@ -226,6 +226,7 @@ const char* Mpegv_profile_and_level_indication_level[]=
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #if MEDIAINFO_EVENTS
     #include "MediaInfo/MediaInfo_Events.h"
+    #include "MediaInfo/MediaInfo_Events_Internal.h"
 #endif //MEDIAINFO_EVENTS
 using namespace ZenLib;
 
@@ -1655,19 +1656,20 @@ bool File_Mpegv::Synched_Test()
     }
 
     //Quick search
-    if (Synched && !Header_Parser_QuickSearch())
+    if (!Header_Parser_QuickSearch())
         return false;
 
     #if MEDIAINFO_IBI
         if (Ibi_SliceParsed)
         {
-            if (Buffer_Offset+4>Buffer_Size)
-                return false;
-            if (Buffer[Buffer_Offset+3]==0x00 && Buffer_Offset+5>Buffer_Size)
-                return false;
-            bool RandomAccess=(Buffer[Buffer_Offset+3]==0x00 && (Buffer[Buffer_Offset+5]&0x38)==0x08) || Buffer[Buffer_Offset+3]==0xB3; //picture_start with I-Frame || sequence_header
-            if (RandomAccess)
-                Ibi_Add();
+            if (Buffer[Buffer_Offset+3]==0x00)
+            {
+                if (Buffer_Offset+6>Buffer_Size)
+                    return false;
+                bool RandomAccess=(Buffer[Buffer_Offset+5]&0x38)==0x08 || Buffer[Buffer_Offset+3]==0xB3; //picture_start with I-Frame || sequence_header
+                if (RandomAccess)
+                    Ibi_Add();
+            }
             Ibi_SliceParsed=false;
         }
     #endif //MEDIAINFO_IBI
@@ -2065,14 +2067,7 @@ bool File_Mpegv::Header_Parser_QuickSearch()
         Buffer_Offset+=4;
         Synched=false;
         if (!Synchronize())
-        {
-            if (File_Offset+Buffer_Size==File_Size)
-            {
-                Synched=true;
-                return true;
-            }
             return false;
-        }
 
         if (Buffer_Offset+4>Buffer_Size)
             return false;
@@ -2209,33 +2204,22 @@ void File_Mpegv::picture_start()
         #endif // MEDIAINFO_ADVANCED || MEDIAINFO_EVENTS
         #if MEDIAINFO_EVENTS
             {
-                struct MediaInfo_Event_Video_SliceInfo_0 Event;
-                Event.EventCode=MediaInfo_EventCode_Create(MediaInfo_Parser_None, MediaInfo_Event_Video_SliceInfo, 0);
-                Event.Stream_Offset=File_Offset+Buffer_Offset;
-                Event.PCR=FrameInfo.PCR;
-                Event.PTS=FrameInfo.PTS;
-                Event.DTS=FrameInfo.DTS;
-                Event.DUR=FrameInfo.DUR;
-                Event.StreamIDs_Size=StreamIDs_Size;
-                Event.StreamIDs=(MediaInfo_int64u*)StreamIDs;
-                Event.StreamIDs_Width=(MediaInfo_int8u*)StreamIDs_Width;
-                Event.ParserIDs=(MediaInfo_int8u* )ParserIDs;
-                Event.FramePosition=Frame_Count;
-                Event.FieldPosition=Field_Count;
-                Event.SlicePosition=0;
-                switch (picture_coding_type)
-                {
-                    case 1 :
-                                Event.SliceType=0; break;
-                    case 2 :
-                                Event.SliceType=1; break;
-                    case 3 :
-                                Event.SliceType=2; break;
-                    default:
-                                Event.SliceType=(int8u)-1;
-                }
-                Event.Flags=0;
-                Config->Event_Send((const int8u*)&Event, sizeof(MediaInfo_Event_Video_SliceInfo_0));
+                EVENT_BEGIN (Video, SliceInfo, 0)
+                    Event.FieldPosition=Field_Count;
+                    Event.SlicePosition=0;
+                    switch (picture_coding_type)
+                    {
+                        case 1 :
+                                    Event.SliceType=0; break;
+                        case 2 :
+                                    Event.SliceType=1; break;
+                        case 3 :
+                                    Event.SliceType=2; break;
+                        default:
+                                    Event.SliceType=(int8u)-1;
+                    }
+                    Event.Flags=0;
+                EVENT_END   ()
             }
         #endif //MEDIAINFO_EVENTS
 
@@ -2465,9 +2449,9 @@ void File_Mpegv::slice_start()
         #if MEDIAINFO_TRACE
             if (Trace_Activated)
             {
-                Element_Info1(__T("Frame ")+Ztring::ToZtring(Frame_Count));
+                Element_Info1(__T("Frame (decoding order) ")+Ztring::ToZtring(Frame_Count));
                 if (Frame_Count_LastIFrame!=(int64u)-1)
-                    Element_Info1(__T("Frame reordered ")+Ztring::ToZtring(Frame_Count_LastIFrame+temporal_reference));
+                    Element_Info1(__T("Frame (presentation order) ")+Ztring::ToZtring(Frame_Count_LastIFrame+temporal_reference));
                 Element_Info1(__T("picture_coding_type ")+Ztring().From_Local(Mpegv_picture_coding_type[picture_coding_type]));
                 Element_Info1(__T("temporal_reference ")+Ztring::ToZtring(temporal_reference));
                 if (FrameInfo.PTS!=(int64u)-1)
@@ -3161,7 +3145,12 @@ void File_Mpegv::user_data_start_CC()
             CC___Parser->FrameInfo.PTS=FrameInfo.PTS;
             CC___Parser->FrameInfo.DTS=FrameInfo.DTS;
         }
-        Demux(Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)(Element_Size-Element_Offset), ContentType_MainStream);
+        #if MEDIAINFO_DEMUX
+            int8u Demux_Level_Save=Demux_Level;
+            Demux_Level=8; //Ancillary
+            Demux(Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)(Element_Size-Element_Offset), ContentType_MainStream);
+            Demux_Level=Demux_Level_Save;
+        #endif // MEDIAINFO_DEMUX
         Open_Buffer_Continue(CC___Parser, Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)(Element_Size-Element_Offset));
         Element_Offset=Element_Size;
     #else //defined(MEDIAINFO_DTVCCTRANSPORT_YES)
@@ -3261,7 +3250,12 @@ void File_Mpegv::user_data_start_3()
                             Scte_Parser->FrameInfo.PTS=FrameInfo.PTS-(TemporalReference.size()-1-Scte20_Pos)*tc;
                             Scte_Parser->FrameInfo.DTS=FrameInfo.DTS-(TemporalReference.size()-1-Scte20_Pos)*tc;
                         }
-                        Demux(TemporalReference[Scte20_Pos]->Scte[Pos]->Data, TemporalReference[Scte20_Pos]->Scte[Pos]->Size, ContentType_MainStream);
+                        #if MEDIAINFO_DEMUX
+                            int8u Demux_Level_Save=Demux_Level;
+                            Demux_Level=8; //Ancillary
+                            Demux(TemporalReference[Scte20_Pos]->Scte[Pos]->Data, TemporalReference[Scte20_Pos]->Scte[Pos]->Size, ContentType_MainStream);
+                            Demux_Level=Demux_Level_Save;
+                        #endif // MEDIAINFO_DEMUX
                         Open_Buffer_Continue(Scte_Parser, TemporalReference[Scte20_Pos]->Scte[Pos]->Data, TemporalReference[Scte20_Pos]->Scte[Pos]->Size);
                         TemporalReference[Scte20_Pos]->Scte_Parsed[Pos]=true;
                     }
@@ -3415,7 +3409,12 @@ void File_Mpegv::user_data_start_GA94_03()
                     GA94_03_Parser->FrameInfo.PTS=FrameInfo.PTS-(FrameInfo.PTS!=(int64u)-1?((TemporalReference.size()-1-GA94_03_Pos)*tc):0);
                     GA94_03_Parser->FrameInfo.DTS=FrameInfo.DTS-(FrameInfo.DTS!=(int64u)-1?((TemporalReference.size()-1-GA94_03_Pos)*tc):0);
                 }
-                Demux(TemporalReference[GA94_03_Pos]->GA94_03->Data, TemporalReference[GA94_03_Pos]->GA94_03->Size, ContentType_MainStream);
+                #if MEDIAINFO_DEMUX
+                    int8u Demux_Level_Save=Demux_Level;
+                    Demux_Level=8; //Ancillary
+                    Demux(TemporalReference[GA94_03_Pos]->GA94_03->Data, TemporalReference[GA94_03_Pos]->GA94_03->Size, ContentType_MainStream);
+                    Demux_Level=Demux_Level_Save;
+                #endif // MEDIAINFO_DEMUX
                 ((File_DtvccTransport*)GA94_03_Parser)->AspectRatio=MPEG_Version==1?Mpegv_aspect_ratio1[aspect_ratio_information]:Mpegv_aspect_ratio2[aspect_ratio_information];
                 Open_Buffer_Continue(GA94_03_Parser, TemporalReference[GA94_03_Pos]->GA94_03->Data, TemporalReference[GA94_03_Pos]->GA94_03->Size);
 

@@ -42,6 +42,9 @@
 #include "ZenLib/Format/Http/Http_Utils.h"
 #include <set>
 #include <algorithm>
+#if MEDIAINFO_EVENTS
+    #include "MediaInfo/MediaInfo_Events_Internal.h"
+#endif //MEDIAINFO_EVENTS
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -70,7 +73,7 @@ File__ReferenceFilesHelper::File__ReferenceFilesHelper(File__Analyze* MI_, Media
 //---------------------------------------------------------------------------
 File__ReferenceFilesHelper::~File__ReferenceFilesHelper()
 {
-    for (references::iterator ReferenceTemp=References.begin(); ReferenceTemp!=References.end(); ReferenceTemp++)
+    for (references::iterator ReferenceTemp=References.begin(); ReferenceTemp!=References.end(); ++ReferenceTemp)
         delete ReferenceTemp->MI; //ReferenceTemp->MI=NULL;
 }
 
@@ -268,13 +271,18 @@ void File__ReferenceFilesHelper::ParseReferences()
                 if (Demux_Interleave)
                 {
                     CountOfReferencesToParse=References.size();
+                    for (references::iterator ReferenceSource=References.begin(); ReferenceSource!=References.end(); ++ReferenceSource)
+                        if (ReferenceSource->FileNames.empty())
+                            CountOfReferencesToParse--;
                     DTS_Interval=3000000000; // 3 seconds
                 }
             }
+            else
+                Demux_Interleave=false;
 
             //Using the frame rate from the first stream having a frame rate
             if (!FrameRate)
-                for (references::iterator ReferenceFrameRate=References.begin(); ReferenceFrameRate!=References.end(); ReferenceFrameRate++)
+                for (references::iterator ReferenceFrameRate=References.begin(); ReferenceFrameRate!=References.end(); ++ReferenceFrameRate)
                     if (ReferenceFrameRate->FrameRate)
                     {
                         FrameRate=ReferenceFrameRate->FrameRate;
@@ -313,18 +321,19 @@ void File__ReferenceFilesHelper::ParseReferences()
         FileSize_Compute();
         Reference=References.begin();
         Init_Done=true;
-        /*
         #if MEDIAINFO_EVENTS
-            struct MediaInfo_Event_General_SubFile_Start_0 Event;
-            MI->Event_Prepare((struct MediaInfo_Event_Generic*)&Event);
-            Event.EventCode=MediaInfo_EventCode_Create(0, MediaInfo_Event_General_SubFile_Start, 0);
-            Event.EventSize=sizeof(struct MediaInfo_Event_General_SubFile_Start_0);
+            if (Reference!=References.end())
+            {
+                struct MediaInfo_Event_General_SubFile_Start_0 Event;
+                MI->Event_Prepare((struct MediaInfo_Event_Generic*)&Event);
+                Event.EventCode=MediaInfo_EventCode_Create(0, MediaInfo_Event_General_SubFile_Start, 0);
+                Event.EventSize=sizeof(struct MediaInfo_Event_General_SubFile_Start_0);
 
-            Event.FileName_Relative_Unicode=Reference->Source.c_str();
+                Event.FileName_Relative_Unicode=Reference->Source.c_str();
 
-            MI->Config->Event_Send(NULL, (const int8u*)&Event, Event.EventSize, MI->File_Name);
+                MI->Config->Event_Send(NULL, (const int8u*)&Event, Event.EventSize, MI->File_Name);
+            }
         #endif //MEDIAINFO_EVENTS
-        */
 
         #if MEDIAINFO_DEMUX
             if (Config->NextPacket_Get() && MI->Demux_EventWasSent_Accept_Specific)
@@ -347,7 +356,7 @@ void File__ReferenceFilesHelper::ParseReferences()
         #if MEDIAINFO_NEXTPACKET
             DTS_Minimal=(int64u)-1;
         #endif //MEDIAINFO_NEXTPACKET
-        for (references::iterator ReferenceTemp=References.begin(); ReferenceTemp!=References.end(); ReferenceTemp++)
+        for (references::iterator ReferenceTemp=References.begin(); ReferenceTemp!=References.end(); ++ReferenceTemp)
         {
             if (ReferenceTemp->MI)
             {
@@ -370,41 +379,38 @@ void File__ReferenceFilesHelper::ParseReferences()
         }
         Config->State_Set(((float)FileSize_Parsed)/MI->Config->File_Size);
 
-        /*
         #if MEDIAINFO_EVENTS
             struct MediaInfo_Event_General_SubFile_End_0 Event;
             MI->Event_Prepare((struct MediaInfo_Event_Generic*)&Event);
             Event.EventCode=MediaInfo_EventCode_Create(0, MediaInfo_Event_General_SubFile_End, 0);
             Event.EventSize=sizeof(struct MediaInfo_Event_General_SubFile_End_0);
 
-            Event.FileName_Relative_Unicode=Reference->Source.c_str();
-
             MI->Config->Event_Send(NULL, (const int8u*)&Event, Event.EventSize, MI->File_Name);
         #endif //MEDIAINFO_EVENTS
-        */
 
         #if MEDIAINFO_DEMUX
             if (Demux_Interleave)
             {
-                references::iterator Reference_Next=Reference; Reference_Next++;
+                references::iterator Reference_Next=Reference; ++Reference_Next;
 
                 if (Reference_Next==References.end() && Config->NextPacket_Get() && CountOfReferencesToParse)
                     Reference=References.begin();
                 else
                     Reference=Reference_Next;
 
-                /*
                 #if MEDIAINFO_EVENTS
-                    struct MediaInfo_Event_General_SubFile_Start_0 Event;
-                    MI->Event_Prepare((struct MediaInfo_Event_Generic*)&Event);
-                    Event.EventCode=MediaInfo_EventCode_Create(0, MediaInfo_Event_General_SubFile_Start, 0);
-                    Event.EventSize=sizeof(struct MediaInfo_Event_General_SubFile_Start_0);
+                    if (Reference_Next!=References.end())
+                    {
+                        struct MediaInfo_Event_General_SubFile_Start_0 Event;
+                        MI->Event_Prepare((struct MediaInfo_Event_Generic*)&Event);
+                        Event.EventCode=MediaInfo_EventCode_Create(0, MediaInfo_Event_General_SubFile_Start, 0);
+                        Event.EventSize=sizeof(struct MediaInfo_Event_General_SubFile_Start_0);
 
-                    Event.FileName_Relative_Unicode=Reference->Source.c_str();
+                        Event.FileName_Relative_Unicode=Reference->Source.c_str();
 
-                    MI->Config->Event_Send(NULL, (const int8u*)&Event, Event.EventSize, MI->File_Name);
+                        MI->Config->Event_Send(NULL, (const int8u*)&Event, Event.EventSize, MI->File_Name);
+                    }
                 #endif //MEDIAINFO_EVENTS
-                */
 
                 if (Config->Demux_EventWasSent)
                     return;
@@ -420,7 +426,6 @@ void File__ReferenceFilesHelper::ParseReferences()
             Reference++;
         #endif //MEDIAINFO_DEMUX
 
-        /*
         #if MEDIAINFO_EVENTS
             if (Reference!=References.end())
             {
@@ -434,7 +439,6 @@ void File__ReferenceFilesHelper::ParseReferences()
                 MI->Config->Event_Send(NULL, (const int8u*)&Event, Event.EventSize, MI->File_Name);
             }
         #endif //MEDIAINFO_EVENTS
-        */
     }
 
     //File size handling
@@ -606,7 +610,7 @@ void File__ReferenceFilesHelper::ParseReference_Finalize ()
             else
             {
                 size_t ToInsert=(size_t)-1;
-                for (references::iterator ReferencePos=References.begin(); ReferencePos!=References.end(); ReferencePos++)
+                for (references::iterator ReferencePos=References.begin(); ReferencePos!=References.end(); ++ReferencePos)
                     if (ReferencePos->StreamKind==StreamKind_Last && Reference->StreamID<ReferencePos->StreamID)
                     {
                         ToInsert=ReferencePos->StreamPos;
@@ -720,7 +724,7 @@ void File__ReferenceFilesHelper::ParseReference_Finalize_PerStream ()
     MI->Fill(StreamKind_Last, StreamPos_To, "MenuID/String", MenuID_String, true);
     if (MI->Retrieve(StreamKind_Last, StreamPos_To, "Source").empty())
         MI->Fill(StreamKind_Last, StreamPos_To, "Source", Reference->Source);
-    for (std::map<string, Ztring>::iterator Info=Reference->Infos.begin(); Info!=Reference->Infos.end(); Info++)
+    for (std::map<string, Ztring>::iterator Info=Reference->Infos.begin(); Info!=Reference->Infos.end(); ++Info)
         MI->Fill(StreamKind_Last, StreamPos_To, Info->first.c_str(), Info->second);
 
     //Others
@@ -737,7 +741,7 @@ void File__ReferenceFilesHelper::ParseReference_Finalize_PerStream ()
 void File__ReferenceFilesHelper::Read_Buffer_Unsynched()
 {
     MI->Open_Buffer_Unsynch();
-    for (references::iterator Reference=References.begin(); Reference!=References.end(); Reference++)
+    for (references::iterator Reference=References.begin(); Reference!=References.end(); ++Reference)
         if (Reference->MI)
             Reference->MI->Open_Buffer_Unsynch();
 
@@ -941,7 +945,7 @@ size_t File__ReferenceFilesHelper::Stream_Prepare (stream_t StreamKind, size_t S
 {
     size_t StreamPos_Last=MI->Stream_Prepare(StreamKind, StreamPos);
 
-    for (references::iterator ReferencePos=References.begin(); ReferencePos!=References.end(); ReferencePos++)
+    for (references::iterator ReferencePos=References.begin(); ReferencePos!=References.end(); ++ReferencePos)
         if (ReferencePos->StreamKind==StreamKind && ReferencePos->StreamPos>=StreamPos_Last)
             if (ReferencePos->StreamPos!=(size_t)-1)
                 ReferencePos->StreamPos++;
@@ -957,7 +961,7 @@ void File__ReferenceFilesHelper::FileSize_Compute ()
 
     MI->Config->File_Size=MI->File_Size;
 
-    for (references::iterator Reference=References.begin(); Reference!=References.end(); Reference++)
+    for (references::iterator Reference=References.begin(); Reference!=References.end(); ++Reference)
     {
         if (Reference->FileSize!=(int64u)-1)
             MI->Config->File_Size+=Reference->FileSize;

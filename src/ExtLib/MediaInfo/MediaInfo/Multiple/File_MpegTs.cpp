@@ -220,7 +220,7 @@ void File_MpegTs::Streams_Update()
                 int64u  TimeStamp_Distance_Total=0;
                 size_t  TimeStamp_Distance_Count=0;
             #endif // MEDIAINFO_ADVANCED
-            for (std::map<int16u, int16u>::iterator PCR_PID=Complete_Stream->PCR_PIDs.begin(); PCR_PID!=Complete_Stream->PCR_PIDs.end(); PCR_PID++)
+            for (std::map<int16u, int16u>::iterator PCR_PID=Complete_Stream->PCR_PIDs.begin(); PCR_PID!=Complete_Stream->PCR_PIDs.end(); ++PCR_PID)
                 if (Complete_Stream->Streams[PCR_PID->first])
                 {
                     if (Complete_Stream->Streams[PCR_PID->first]->TimeStamp_InstantaneousBitRate_BitRateMode_IsVbr>=Config_VbrDetection_Occurences)
@@ -283,7 +283,7 @@ void File_MpegTs::Streams_Update_Programs()
         if (Programs_Size<=2)
         {
             //Testing if it is a Blu-ray
-            for (complete_stream::transport_stream::programs::iterator Program=Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs.begin(); Program!=Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs.end(); Program++)
+            for (complete_stream::transport_stream::programs::iterator Program=Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs.begin(); Program!=Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs.end(); ++Program)
                 if (Program->first!=0x0000 && Program->second.registration_format_identifier!=Elements::HDMV)
                     {
                         PerStream_AlwaysParse=false;
@@ -291,7 +291,7 @@ void File_MpegTs::Streams_Update_Programs()
                     }
         }
     }
-    for (std::set<int16u>::iterator StreamID=Complete_Stream->PES_PIDs.begin(); StreamID!=Complete_Stream->PES_PIDs.end(); StreamID++)
+    for (std::set<int16u>::iterator StreamID=Complete_Stream->PES_PIDs.begin(); StreamID!=Complete_Stream->PES_PIDs.end(); ++StreamID)
         if (PerStream_AlwaysParse || Complete_Stream->Streams[*StreamID]->IsUpdated_IsRegistered || Complete_Stream->Streams[*StreamID]->IsUpdated_Info)
         {
             Streams_Update_Programs_PerStream(*StreamID);
@@ -317,7 +317,7 @@ void File_MpegTs::Streams_Update_Programs()
     }
     Ztring Countries;
     Ztring TimeZones;
-    for (std::map<Ztring, Ztring>::iterator TimeZone=Complete_Stream->TimeZones.begin(); TimeZone!=Complete_Stream->TimeZones.end(); TimeZone++)
+    for (std::map<Ztring, Ztring>::iterator TimeZone=Complete_Stream->TimeZones.begin(); TimeZone!=Complete_Stream->TimeZones.end(); ++TimeZone)
     {
         Countries+=TimeZone->first+__T(" / ");
         TimeZones+=TimeZone->second+__T(" / ");
@@ -343,7 +343,7 @@ void File_MpegTs::Streams_Update_Programs()
     if (Transport_Stream!=Complete_Stream->Transport_Streams.end())
     {
         //TS info
-        for (std::map<std::string, ZenLib::Ztring>::iterator Info=Transport_Stream->second.Infos.begin(); Info!=Transport_Stream->second.Infos.end(); Info++)
+        for (std::map<std::string, ZenLib::Ztring>::iterator Info=Transport_Stream->second.Infos.begin(); Info!=Transport_Stream->second.Infos.end(); ++Info)
             Fill(Stream_General, 0, Info->first.c_str(), Info->second, true);
         Transport_Stream->second.Infos.clear();
 
@@ -356,7 +356,7 @@ void File_MpegTs::Streams_Update_Programs()
                 if (!Source->second.texts.empty())
                 {
                     Ztring Texts;
-                    for (std::map<int16u, Ztring>::iterator text=Source->second.texts.begin(); text!=Source->second.texts.end(); text++)
+                    for (std::map<int16u, Ztring>::iterator text=Source->second.texts.begin(); text!=Source->second.texts.end(); ++text)
                         Texts+=text->second+__T(" - ");
                     if (!Texts.empty())
                         Texts.resize(Texts.size()-3);
@@ -366,7 +366,7 @@ void File_MpegTs::Streams_Update_Programs()
         }
 
         //Per program
-        for (complete_stream::transport_stream::programs::iterator Program=Transport_Stream->second.Programs.begin(); Program!=Transport_Stream->second.Programs.end(); Program++)
+        for (complete_stream::transport_stream::programs::iterator Program=Transport_Stream->second.Programs.begin(); Program!=Transport_Stream->second.Programs.end(); ++Program)
         {
             if (Program->second.IsParsed)
             {
@@ -375,11 +375,19 @@ void File_MpegTs::Streams_Update_Programs()
                 for (size_t Pos=0; Pos<Program->second.elementary_PIDs.size(); Pos++)
                 {
                     int16u elementary_PID=Program->second.elementary_PIDs[Pos];
-                    if (((PerStream_AlwaysParse && Complete_Stream->Streams[elementary_PID]->StreamKind!=Stream_Max)
-                      || Complete_Stream->Streams[elementary_PID]->IsRegistered)
-                     && Retrieve(Stream_Menu, StreamPos_Last, "KLV_PID").To_int16u()!=elementary_PID)
+                    if (PerStream_AlwaysParse || Complete_Stream->Streams[elementary_PID]->IsRegistered)
                     {
                         Ztring Format=Retrieve(Complete_Stream->Streams[elementary_PID]->StreamKind, Complete_Stream->Streams[elementary_PID]->StreamPos, Fill_Parameter(Complete_Stream->Streams[elementary_PID]->StreamKind, Generic_Format));
+                        if (Format.empty())
+                            Format=Mpeg_Psi_stream_type_Format(Complete_Stream->Streams[elementary_PID]->stream_type, Program->second.registration_format_identifier);
+                        if (Format.empty())
+                        {
+                            std::map<std::string, Ztring>::iterator Format_FromInfo=Complete_Stream->Streams[elementary_PID]->Infos.find("Format");
+                            if (Format_FromInfo!=Complete_Stream->Streams[elementary_PID]->Infos.end())
+                                Format=Format_FromInfo->second;
+                        }
+                        if (Format.empty())
+                            Program->second.HasNotDisplayableStreams=true;
                         Formats+=Format+__T(" / ");
                         Codecs+=Retrieve(Complete_Stream->Streams[elementary_PID]->StreamKind, Complete_Stream->Streams[elementary_PID]->StreamPos, Fill_Parameter(Complete_Stream->Streams[elementary_PID]->StreamKind, Generic_Codec))+__T(" / ");
                         if (Complete_Stream->Streams[elementary_PID]->StreamKind!=Stream_Max)
@@ -414,6 +422,7 @@ void File_MpegTs::Streams_Update_Programs()
                 {
                     if (!Transport_Stream->second.Programs.empty()
                      && (Transport_Stream->second.Programs.size()>1
+                      || Transport_Stream->second.Programs.begin()->second.HasNotDisplayableStreams
                       || !Transport_Stream->second.Programs.begin()->second.Infos.empty()
                       || !Transport_Stream->second.Programs.begin()->second.DVB_EPG_Blocks.empty()
                       || (Transport_Stream->second.Programs.begin()->second.source_id_IsValid && Complete_Stream->Sources.find(Transport_Stream->second.Programs.begin()->second.source_id)!=Complete_Stream->Sources.end())
@@ -445,7 +454,7 @@ void File_MpegTs::Streams_Update_Programs()
                         Fill(Stream_Menu, StreamPos_Last, Menu_ID_String, Decimal_Hexa(Program->second.pid), true);
                         Fill(Stream_Menu, StreamPos_Last, Menu_MenuID, Program->first, 10, true);
                         Fill(Stream_Menu, StreamPos_Last, Menu_MenuID_String, Decimal_Hexa(Program->first), true);
-                        for (std::map<std::string, ZenLib::Ztring>::iterator Info=Program->second.Infos.begin(); Info!=Program->second.Infos.end(); Info++)
+                        for (std::map<std::string, ZenLib::Ztring>::iterator Info=Program->second.Infos.begin(); Info!=Program->second.Infos.end(); ++Info)
                             Fill(Stream_Menu, StreamPos_Last, Info->first.c_str(), Info->second, true);
                         Program->second.Infos.clear();
 
@@ -615,7 +624,7 @@ void File_MpegTs::Streams_Update_Programs_PerStream(size_t StreamID)
                 Fill(StreamKind_Last, StreamPos, "Encryption", "Encrypted");
 
             //TS info
-            for (std::map<std::string, ZenLib::Ztring>::iterator Info=Temp->Infos.begin(); Info!=Temp->Infos.end(); Info++)
+            for (std::map<std::string, ZenLib::Ztring>::iterator Info=Temp->Infos.begin(); Info!=Temp->Infos.end(); ++Info)
             {
                 if (Retrieve(StreamKind_Last, StreamPos, Info->first.c_str()).empty())
                     Fill(StreamKind_Last, StreamPos, Info->first.c_str(), Info->second, true);
@@ -708,9 +717,9 @@ void File_MpegTs::Streams_Update_Programs_PerStream(size_t StreamID)
                             {
                                 bool IsFound=false;
 
-                                for (complete_stream::source::atsc_epg_blocks::iterator ATSC_EPG_Block=Source->second.ATSC_EPG_Blocks.begin(); ATSC_EPG_Block!=Source->second.ATSC_EPG_Blocks.end(); ATSC_EPG_Block++)
+                                for (complete_stream::source::atsc_epg_blocks::iterator ATSC_EPG_Block=Source->second.ATSC_EPG_Blocks.begin(); ATSC_EPG_Block!=Source->second.ATSC_EPG_Blocks.end(); ++ATSC_EPG_Block)
                                 {
-                                    for (complete_stream::source::atsc_epg_block::events::iterator Event=ATSC_EPG_Block->second.Events.begin(); Event!=ATSC_EPG_Block->second.Events.end(); Event++)
+                                    for (complete_stream::source::atsc_epg_block::events::iterator Event=ATSC_EPG_Block->second.Events.begin(); Event!=ATSC_EPG_Block->second.Events.end(); ++Event)
                                     {
                                         if (!Event->second.Languages[ID_Text].empty())
                                         {
@@ -738,7 +747,7 @@ void File_MpegTs::Streams_Update_Programs_PerStream(size_t StreamID)
     //Teletext
     if (StreamKind_Last==Stream_Max)
     {
-        for (std::map<int16u, complete_stream::stream::teletext>::iterator Teletext=Temp->Teletexts.begin(); Teletext!=Temp->Teletexts.end(); Teletext++)
+        for (std::map<int16u, complete_stream::stream::teletext>::iterator Teletext=Temp->Teletexts.begin(); Teletext!=Temp->Teletexts.end(); ++Teletext)
         {
             Stream_Prepare(Stream_Text);
             Fill(StreamKind_Last, StreamPos_Last, General_ID, Ztring::ToZtring(StreamID)+__T('-')+Ztring::ToZtring(Teletext->first), true);
@@ -751,7 +760,7 @@ void File_MpegTs::Streams_Update_Programs_PerStream(size_t StreamID)
             }
 
             //TS info
-            for (std::map<std::string, ZenLib::Ztring>::iterator Info=Teletext->second.Infos.begin(); Info!=Teletext->second.Infos.end(); Info++)
+            for (std::map<std::string, ZenLib::Ztring>::iterator Info=Teletext->second.Infos.begin(); Info!=Teletext->second.Infos.end(); ++Info)
             {
                 if (Retrieve(StreamKind_Last, StreamPos_Last, Info->first.c_str()).empty())
                     Fill(StreamKind_Last, StreamPos_Last, Info->first.c_str(), Info->second);
@@ -777,11 +786,11 @@ void File_MpegTs::Streams_Update_EPG()
         {
             //EPG
             std::map<Ztring, Ztring> EPGs;
-            for (complete_stream::source::atsc_epg_blocks::iterator ATSC_EPG_Block=Source->second.ATSC_EPG_Blocks.begin(); ATSC_EPG_Block!=Source->second.ATSC_EPG_Blocks.end(); ATSC_EPG_Block++)
-                for (complete_stream::source::atsc_epg_block::events::iterator Event=ATSC_EPG_Block->second.Events.begin(); Event!=ATSC_EPG_Block->second.Events.end(); Event++)
+            for (complete_stream::source::atsc_epg_blocks::iterator ATSC_EPG_Block=Source->second.ATSC_EPG_Blocks.begin(); ATSC_EPG_Block!=Source->second.ATSC_EPG_Blocks.end(); ++ATSC_EPG_Block)
+                for (complete_stream::source::atsc_epg_block::events::iterator Event=ATSC_EPG_Block->second.Events.begin(); Event!=ATSC_EPG_Block->second.Events.end(); ++Event)
                 {
                     Ztring Texts;
-                    for (std::map<int16u, Ztring>::iterator text=Event->second.texts.begin(); text!=Event->second.texts.end(); text++)
+                    for (std::map<int16u, Ztring>::iterator text=Event->second.texts.begin(); text!=Event->second.texts.end(); ++text)
                         Texts+=text->second+__T(" - ");
                     if (!Texts.empty())
                         Texts.resize(Texts.size()-3);
@@ -798,7 +807,7 @@ void File_MpegTs::Streams_Update_EPG()
 
                 //Filling
                 Fill(Stream_General, 0, General_EPG_Positions_Begin, Count_Get(Stream_General, 0), 10, true);
-                for (std::map<Ztring, Ztring>::iterator EPG=EPGs.begin(); EPG!=EPGs.end(); EPG++)
+                for (std::map<Ztring, Ztring>::iterator EPG=EPGs.begin(); EPG!=EPGs.end(); ++EPG)
                     Fill(Stream_General, 0, EPG->first.To_Local().c_str(), EPG->second, true);
                 Fill(Stream_General, 0, General_EPG_Positions_End, Count_Get(Stream_General, 0), 10, true);
             }
@@ -812,7 +821,7 @@ void File_MpegTs::Streams_Update_EPG()
       || !Transport_Stream->second.Programs.begin()->second.DVB_EPG_Blocks.empty()
       || Complete_Stream->Sources.find(Transport_Stream->second.Programs.begin()->second.source_id)!=Complete_Stream->Sources.end()
       || Config->File_MpegTs_ForceMenu_Get()))
-        for (complete_stream::transport_stream::programs::iterator Program=Transport_Stream->second.Programs.begin(); Program!=Transport_Stream->second.Programs.end(); Program++)
+        for (complete_stream::transport_stream::programs::iterator Program=Transport_Stream->second.Programs.begin(); Program!=Transport_Stream->second.Programs.end(); ++Program)
         {
             if (Program->second.IsParsed)
             {
@@ -822,8 +831,8 @@ void File_MpegTs::Streams_Update_EPG()
                 //EPG - DVB
                 if (Program->second.DVB_EPG_Blocks_IsUpdated)
                 {
-                    for (complete_stream::transport_stream::program::dvb_epg_blocks::iterator DVB_EPG_Block=Program->second.DVB_EPG_Blocks.begin(); DVB_EPG_Block!=Program->second.DVB_EPG_Blocks.end(); DVB_EPG_Block++)
-                        for (complete_stream::transport_stream::program::dvb_epg_block::events::iterator Event=DVB_EPG_Block->second.Events.begin(); Event!=DVB_EPG_Block->second.Events.end(); Event++)
+                    for (complete_stream::transport_stream::program::dvb_epg_blocks::iterator DVB_EPG_Block=Program->second.DVB_EPG_Blocks.begin(); DVB_EPG_Block!=Program->second.DVB_EPG_Blocks.end(); ++DVB_EPG_Block)
+                        for (complete_stream::transport_stream::program::dvb_epg_block::events::iterator Event=DVB_EPG_Block->second.Events.begin(); Event!=DVB_EPG_Block->second.Events.end(); ++Event)
                             if (EPGs.find(Event->second.start_time)==EPGs.end() || DVB_EPG_Block->first==0x4E) //Does not exist or "DVB - event_information_section - actual_transport_stream : return present/following"
                                 EPGs[Event->second.start_time]=Event->second.short_event.event_name+__T(" / ")+Event->second.short_event.text+__T(" / ")+Event->second.content+__T(" /  / ")+Event->second.duration+__T(" / ")+Event->second.running_status;
                     Program->second.DVB_EPG_Blocks_IsUpdated=false;
@@ -839,7 +848,7 @@ void File_MpegTs::Streams_Update_EPG()
                         if (!Source->second.texts.empty())
                         {
                             Ztring Texts;
-                            for (std::map<int16u, Ztring>::iterator text=Source->second.texts.begin(); text!=Source->second.texts.end(); text++)
+                            for (std::map<int16u, Ztring>::iterator text=Source->second.texts.begin(); text!=Source->second.texts.end(); ++text)
                                 Texts+=text->second+__T(" - ");
                             if (!Texts.empty())
                                 Texts.resize(Texts.size()-3);
@@ -853,12 +862,12 @@ void File_MpegTs::Streams_Update_EPG()
                         }
                         if (Source->second.ATSC_EPG_Blocks_IsUpdated)
                         {
-                            for (complete_stream::source::atsc_epg_blocks::iterator ATSC_EPG_Block=Source->second.ATSC_EPG_Blocks.begin(); ATSC_EPG_Block!=Source->second.ATSC_EPG_Blocks.end(); ATSC_EPG_Block++)
-                                for (complete_stream::source::atsc_epg_block::events::iterator Event=ATSC_EPG_Block->second.Events.begin(); Event!=ATSC_EPG_Block->second.Events.end(); Event++)
+                            for (complete_stream::source::atsc_epg_blocks::iterator ATSC_EPG_Block=Source->second.ATSC_EPG_Blocks.begin(); ATSC_EPG_Block!=Source->second.ATSC_EPG_Blocks.end(); ++ATSC_EPG_Block)
+                                for (complete_stream::source::atsc_epg_block::events::iterator Event=ATSC_EPG_Block->second.Events.begin(); Event!=ATSC_EPG_Block->second.Events.end(); ++Event)
                                     if (Event->second.start_time!=(int32u)-1) //TODO: find the reason when start_time is not set
                                     {
                                         Ztring Texts;
-                                        for (std::map<int16u, Ztring>::iterator text=Event->second.texts.begin(); text!=Event->second.texts.end(); text++)
+                                        for (std::map<int16u, Ztring>::iterator text=Event->second.texts.begin(); text!=Event->second.texts.end(); ++text)
                                             Texts+=text->second+__T(" - ");
                                         if (!Texts.empty())
                                             Texts.resize(Texts.size()-3);
@@ -905,7 +914,7 @@ void File_MpegTs::Streams_Update_EPG_PerProgram(complete_stream::transport_strea
     if (!Program->second.EPGs.empty())
     {
         Fill(Stream_Menu, Program->second.StreamPos, Menu_Chapters_Pos_Begin, Count_Get(Stream_Menu, Program->second.StreamPos), 10, true);
-        for (std::map<Ztring, Ztring>::iterator EPG=Program->second.EPGs.begin(); EPG!=Program->second.EPGs.end(); EPG++)
+        for (std::map<Ztring, Ztring>::iterator EPG=Program->second.EPGs.begin(); EPG!=Program->second.EPGs.end(); ++EPG)
             Fill(Stream_Menu, Program->second.StreamPos, EPG->first.To_UTF8().c_str(), EPG->second, true);
         Fill(Stream_Menu, Program->second.StreamPos, Menu_Chapters_Pos_End, Count_Get(Stream_Menu, Program->second.StreamPos), 10, true);
     }
@@ -915,7 +924,7 @@ void File_MpegTs::Streams_Update_EPG_PerProgram(complete_stream::transport_strea
 #ifdef MEDIAINFO_MPEGTS_PCR_YES
 void File_MpegTs::Streams_Update_Duration_Update()
 {
-    for (std::map<int16u, int16u>::iterator PCR_PID=Complete_Stream->PCR_PIDs.begin(); PCR_PID!=Complete_Stream->PCR_PIDs.end(); PCR_PID++)
+    for (std::map<int16u, int16u>::iterator PCR_PID=Complete_Stream->PCR_PIDs.begin(); PCR_PID!=Complete_Stream->PCR_PIDs.end(); ++PCR_PID)
     {
         complete_stream::streams::iterator Stream=Complete_Stream->Streams.begin()+PCR_PID->first;
         if ((*Stream)->TimeStamp_End_IsUpdated)
@@ -974,7 +983,7 @@ void File_MpegTs::Streams_Finish()
             {
                 int64u File_Size_Temp=File_Size;
                 File_Size=File_Offset+Buffer_Offset+Element_Offset;
-                Open_Buffer_Continue(Complete_Stream->Streams[StreamID]->Parser, Buffer, 0);
+                Open_Buffer_Continue(Complete_Stream->Streams[StreamID]->Parser, Buffer, 0, false);
                 File_Size=File_Size_Temp;
                 Finish(Complete_Stream->Streams[StreamID]->Parser);
                 #if MEDIAINFO_DEMUX
@@ -992,10 +1001,10 @@ void File_MpegTs::Streams_Finish()
         if (Config_Ibi_Create)
         {
             ibi Ibi_Temp;
-            for (ibi::streams::iterator IbiStream_Temp=Ibi.Streams.begin(); IbiStream_Temp!=Ibi.Streams.end(); IbiStream_Temp++)
+            for (ibi::streams::iterator IbiStream_Temp=Ibi.Streams.begin(); IbiStream_Temp!=Ibi.Streams.end(); ++IbiStream_Temp)
                 Ibi_Temp.Streams[IbiStream_Temp->first]=new ibi::stream(*IbiStream_Temp->second);
 
-            for (ibi::streams::iterator IbiStream_Temp=Ibi_Temp.Streams.begin(); IbiStream_Temp!=Ibi_Temp.Streams.end(); IbiStream_Temp++)
+            for (ibi::streams::iterator IbiStream_Temp=Ibi_Temp.Streams.begin(); IbiStream_Temp!=Ibi_Temp.Streams.end(); ++IbiStream_Temp)
             {
                 if (IbiStream_Temp->second && IbiStream_Temp->second->DtsFrequencyNumerator==1000000000 && IbiStream_Temp->second->DtsFrequencyDenominator==1)
                 {
@@ -1307,46 +1316,49 @@ bool File_MpegTs::Synched_Test()
                                 )
                                 {
                                     Header_Parse_Events_Duration(program_clock_reference);
-                                    if (Complete_Stream->Streams[pid]->TimeStamp_End_Offset!=(int64u)-1)
+                                    if (program_clock_reference!=Complete_Stream->Streams[pid]->TimeStamp_End) //Some PCRs are buggy (low precision), using the first stream offset in the case of duplicate PCR value
                                     {
-                                        if (program_clock_reference+0x12c00000000LL<Complete_Stream->Streams[pid]->TimeStamp_End)
-                                            program_clock_reference+=0x25800000000LL; //33 bits and *300
-                                        int64u  Duration_27M=program_clock_reference-Complete_Stream->Streams[pid]->TimeStamp_End;
-                                        float64 Duration=((float64)Duration_27M)/27000000; //in seconds
-                                        float64 Bytes=((float64)(File_Offset+Buffer_Offset-Complete_Stream->Streams[pid]->TimeStamp_End_Offset))*8;
-                                        float64 TimeStamp_InstantaneousBitRate=Bytes/Duration;
-                                        if (Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate)
+                                        if (Complete_Stream->Streams[pid]->TimeStamp_End_Offset!=(int64u)-1)
                                         {
-                                            float64 Config_VbrDetection_Delta_Temp=Config_VbrDetection_Delta;
-                                            if (Config_VbrDetection_Delta==0 && TimeStamp_InstantaneousBitRate)
-                                                Config_VbrDetection_Delta_Temp=((float64)(BDAV_Size+188+TSP_Size))/TimeStamp_InstantaneousBitRate;
-                                            if (TimeStamp_InstantaneousBitRate<Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate*(1-Config_VbrDetection_Delta_Temp) || TimeStamp_InstantaneousBitRate>Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate*(1+Config_VbrDetection_Delta_Temp))
+                                            if (program_clock_reference+0x12c00000000LL<Complete_Stream->Streams[pid]->TimeStamp_End)
+                                                program_clock_reference+=0x25800000000LL; //33 bits and *300
+                                            int64u  Duration_27M=program_clock_reference-Complete_Stream->Streams[pid]->TimeStamp_End;
+                                            float64 Duration=((float64)Duration_27M)/27000000; //in seconds
+                                            float64 Bytes=((float64)(File_Offset+Buffer_Offset-Complete_Stream->Streams[pid]->TimeStamp_End_Offset))*8;
+                                            float64 TimeStamp_InstantaneousBitRate=Bytes/Duration;
+                                            if (Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate)
                                             {
-                                                Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate_BitRateMode_IsVbr++;
-                                                #if MEDIAINFO_ADVANCED
-                                                    if (Config_VbrDetection_GiveUp && Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate_BitRateMode_IsVbr>=Config_VbrDetection_Occurences)
-                                                        Config->ParseSpeed=0;
-                                                #endif // MEDIAINFO_ADVANCED
+                                                float64 Config_VbrDetection_Delta_Temp=Config_VbrDetection_Delta;
+                                                if (Config_VbrDetection_Delta==0 && TimeStamp_InstantaneousBitRate)
+                                                    Config_VbrDetection_Delta_Temp=((float64)(BDAV_Size+188+TSP_Size))/TimeStamp_InstantaneousBitRate;
+                                                if (TimeStamp_InstantaneousBitRate<Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate*(1-Config_VbrDetection_Delta_Temp) || TimeStamp_InstantaneousBitRate>Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate*(1+Config_VbrDetection_Delta_Temp))
+                                                {
+                                                    Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate_BitRateMode_IsVbr++;
+                                                    #if MEDIAINFO_ADVANCED
+                                                        if (Config_VbrDetection_GiveUp && Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate_BitRateMode_IsVbr>=Config_VbrDetection_Occurences)
+                                                            Config->ParseSpeed=0;
+                                                    #endif // MEDIAINFO_ADVANCED
+                                                }
+                                                else
+                                                    Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate_BitRateMode_IsCbr++;
                                             }
-                                            else
-                                                Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate_BitRateMode_IsCbr++;
+                                            Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate=TimeStamp_InstantaneousBitRate;
+                                            #if MEDIAINFO_ADVANCED
+                                                if (Complete_Stream->Streams[pid]->TimeStamp_Distance_Min>Duration_27M)
+                                                    Complete_Stream->Streams[pid]->TimeStamp_Distance_Min=Duration_27M;
+                                                if (Complete_Stream->Streams[pid]->TimeStamp_Distance_Max<Duration_27M)
+                                                    Complete_Stream->Streams[pid]->TimeStamp_Distance_Max=Duration_27M;
+                                                Complete_Stream->Streams[pid]->TimeStamp_Distance_Total+=Duration_27M;
+                                                Complete_Stream->Streams[pid]->TimeStamp_Distance_Count++;
+                                            #endif // MEDIAINFO_ADVANCED
                                         }
-                                        Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate=TimeStamp_InstantaneousBitRate;
-                                        #if MEDIAINFO_ADVANCED
-                                            if (Complete_Stream->Streams[pid]->TimeStamp_Distance_Min>Duration_27M)
-                                                Complete_Stream->Streams[pid]->TimeStamp_Distance_Min=Duration_27M;
-                                            if (Complete_Stream->Streams[pid]->TimeStamp_Distance_Max<Duration_27M)
-                                                Complete_Stream->Streams[pid]->TimeStamp_Distance_Max=Duration_27M;
-                                            Complete_Stream->Streams[pid]->TimeStamp_Distance_Total+=Duration_27M;
-                                            Complete_Stream->Streams[pid]->TimeStamp_Distance_Count++;
-                                        #endif // MEDIAINFO_ADVANCED
-                                    }
-                                    Complete_Stream->Streams[pid]->TimeStamp_End=program_clock_reference;
-                                    Complete_Stream->Streams[pid]->TimeStamp_End_IsUpdated=true;
-                                    Complete_Stream->Streams[pid]->TimeStamp_End_Offset=File_Offset+Buffer_Offset;
-                                    {
-                                        Status[IsUpdated]=true;
-                                        Status[User_16]=true;
+                                        Complete_Stream->Streams[pid]->TimeStamp_End=program_clock_reference;
+                                        Complete_Stream->Streams[pid]->TimeStamp_End_IsUpdated=true;
+                                        Complete_Stream->Streams[pid]->TimeStamp_End_Offset=File_Offset+Buffer_Offset;
+                                        {
+                                            Status[IsUpdated]=true;
+                                            Status[User_16]=true;
+                                        }
                                     }
                                 }
                                 if (Complete_Stream->Streams[pid]->Searching_TimeStamp_Start)
@@ -1419,13 +1431,19 @@ void File_MpegTs::Synched_Init()
     for (size_t StreamID=0; StreamID<0x2000; StreamID++)
         Complete_Stream->Streams[StreamID]=new complete_stream::stream;
     Complete_Stream->Streams[0x0000]->Searching_Payload_Start_Set(true);
-    Complete_Stream->Streams[0x0000]->Kind=complete_stream::stream::psi;
+    Complete_Stream->Streams[0x0000]->Kind=complete_stream::stream::psi;                        // Program Association Table
     Complete_Stream->Streams[0x0000]->Table_IDs.resize(0x100);
-    Complete_Stream->Streams[0x0000]->Table_IDs[0x00]=new complete_stream::stream::table_id; //program_association_section
+    Complete_Stream->Streams[0x0000]->Table_IDs[0x00]=new complete_stream::stream::table_id;    // program_association_section
     Complete_Stream->Streams[0x0001]->Searching_Payload_Start_Set(true);
-    Complete_Stream->Streams[0x0001]->Kind=complete_stream::stream::psi;
+    Complete_Stream->Streams[0x0001]->Kind=complete_stream::stream::psi;                        // Conditional Access Table
     Complete_Stream->Streams[0x0001]->Table_IDs.resize(0x100);
-    Complete_Stream->Streams[0x0001]->Table_IDs[0x01]=new complete_stream::stream::table_id; //conditional_access_section
+    Complete_Stream->Streams[0x0001]->Table_IDs[0x01]=new complete_stream::stream::table_id;    // CA_section
+    Complete_Stream->Streams[0x0002]->Searching_Payload_Start_Set(true);
+    Complete_Stream->Streams[0x0002]->Kind=complete_stream::stream::psi;                        // Transport Stream Description Table
+    Complete_Stream->Streams[0x0002]->Table_IDs.resize(0x100);
+    Complete_Stream->Streams[0x0003]->Searching_Payload_Start_Set(true);
+    Complete_Stream->Streams[0x0003]->Kind=complete_stream::stream::psi;                        // IPMP Control Information Table
+    Complete_Stream->Streams[0x0003]->Table_IDs.resize(0x100);
 
     //Temp
     MpegTs_JumpTo_Begin=(File_Offset_FirstSynched==(int64u)-1?0:Buffer_TotalBytes_LastSynched)+MediaInfoLib::Config.MpegTs_MaximumOffset_Get();
@@ -1489,9 +1507,9 @@ void File_MpegTs::Read_Buffer_Unsynched()
         }
         #if MEDIAINFO_IBI
             Complete_Stream->Streams[StreamID]->Ibi_SynchronizationOffset_BeginOfFrame=(int64u)-1;
-            for (complete_stream::stream::table_ids::iterator TableID=Complete_Stream->Streams[StreamID]->Table_IDs.begin(); TableID!=Complete_Stream->Streams[StreamID]->Table_IDs.end(); TableID++)
+            for (complete_stream::stream::table_ids::iterator TableID=Complete_Stream->Streams[StreamID]->Table_IDs.begin(); TableID!=Complete_Stream->Streams[StreamID]->Table_IDs.end(); ++TableID)
                 if (*TableID)
-                    for (complete_stream::stream::table_id::table_id_extensions::iterator TableIdExtension=(*TableID)->Table_ID_Extensions.begin(); TableIdExtension!=(*TableID)->Table_ID_Extensions.end(); TableIdExtension++)
+                    for (complete_stream::stream::table_id::table_id_extensions::iterator TableIdExtension=(*TableID)->Table_ID_Extensions.begin(); TableIdExtension!=(*TableID)->Table_ID_Extensions.end(); ++TableIdExtension)
                         TableIdExtension->second.version_number=(int8u)-1;
         #endif //MEDIAINFO_IBI
     }
@@ -1520,7 +1538,7 @@ void File_MpegTs::Read_Buffer_Continue()
     #if MEDIAINFO_DEMUX
         if (Complete_Stream && pid<0x2000 && Complete_Stream->Streams[pid]->Kind==complete_stream::stream::pes && Complete_Stream->Streams[pid]->Parser && ((File_MpegPs*)Complete_Stream->Streams[pid]->Parser)->Demux_StreamIsBeingParsed_type!=(int8u)-1)
         {
-            Open_Buffer_Continue(Complete_Stream->Streams[pid]->Parser, Buffer, 0);
+            Open_Buffer_Continue(Complete_Stream->Streams[pid]->Parser, Buffer, 0, false);
             PES_Parse_Finish();
         }
     #endif //MEDIAINFO_DEMUX
@@ -1577,7 +1595,7 @@ void File_MpegTs::Read_Buffer_AfterParsing()
             }
 
             //Filling
-            for (std::set<int16u>::iterator StreamID=Complete_Stream->PES_PIDs.begin(); StreamID!=Complete_Stream->PES_PIDs.end(); StreamID++)
+            for (std::set<int16u>::iterator StreamID=Complete_Stream->PES_PIDs.begin(); StreamID!=Complete_Stream->PES_PIDs.end(); ++StreamID)
             {
                 if (Complete_Stream->Streams[*StreamID]->Parser)
                 {
@@ -1595,7 +1613,7 @@ void File_MpegTs::Read_Buffer_AfterParsing()
 
             //Deactivating
             if (Config->File_StopSubStreamAfterFilled_Get())
-                for (std::set<int16u>::iterator StreamID=Complete_Stream->PES_PIDs.begin(); StreamID!=Complete_Stream->PES_PIDs.end(); StreamID++)
+                for (std::set<int16u>::iterator StreamID=Complete_Stream->PES_PIDs.begin(); StreamID!=Complete_Stream->PES_PIDs.end(); ++StreamID)
                 {
                     Complete_Stream->Streams[*StreamID]->Searching_Payload_Start_Set(false);
                     Complete_Stream->Streams[*StreamID]->Searching_Payload_Continue_Set(false);
@@ -1660,7 +1678,7 @@ size_t File_MpegTs::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
             MI.Option(__T("Demux"), Demux_Save); //This is a global value, need to reset it. TODO: local value
             if (!MiOpenResult)
                 return 0;
-            for (ibi::streams::iterator IbiStream_Temp=((File_MpegTs*)MI.Info)->Ibi.Streams.begin(); IbiStream_Temp!=((File_MpegTs*)MI.Info)->Ibi.Streams.end(); IbiStream_Temp++)
+            for (ibi::streams::iterator IbiStream_Temp=((File_MpegTs*)MI.Info)->Ibi.Streams.begin(); IbiStream_Temp!=((File_MpegTs*)MI.Info)->Ibi.Streams.end(); ++IbiStream_Temp)
             {
                 if (Ibi.Streams[IbiStream_Temp->first]==NULL)
                     Ibi.Streams[IbiStream_Temp->first]=new ibi::stream(*IbiStream_Temp->second);
@@ -1701,7 +1719,7 @@ size_t File_MpegTs::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
                         IbiStream_Temp=Ibi.Streams.find(ID);
                     if (IbiStream_Temp==Ibi.Streams.end() || IbiStream_Temp->second->Infos.empty())
                     {
-                        for (IbiStream_Temp=Ibi.Streams.begin(); IbiStream_Temp!=Ibi.Streams.end(); IbiStream_Temp++)
+                        for (IbiStream_Temp=Ibi.Streams.begin(); IbiStream_Temp!=Ibi.Streams.end(); ++IbiStream_Temp)
                             if (!IbiStream_Temp->second->Infos.empty())
                                 break;
 
@@ -1768,7 +1786,7 @@ size_t File_MpegTs::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
                         IbiStream_Temp=Ibi.Streams.find(ID);
                     if (IbiStream_Temp==Ibi.Streams.end() || IbiStream_Temp->second->Infos.empty())
                     {
-                        for (IbiStream_Temp=Ibi.Streams.begin(); IbiStream_Temp!=Ibi.Streams.end(); IbiStream_Temp++)
+                        for (IbiStream_Temp=Ibi.Streams.begin(); IbiStream_Temp!=Ibi.Streams.end(); ++IbiStream_Temp)
                             if (!IbiStream_Temp->second->Infos.empty())
                                 break;
 
@@ -1998,46 +2016,49 @@ void File_MpegTs::Header_Parse_AdaptationField()
                      )
                     {
                         Header_Parse_Events_Duration(program_clock_reference);
-                        if (Complete_Stream->Streams[pid]->TimeStamp_End_Offset!=(int64u)-1)
+                        if (program_clock_reference!=Complete_Stream->Streams[pid]->TimeStamp_End) //Some PCRs are buggy (low precision), using the first stream offset in the case of duplicate PCR value
                         {
-                            if (program_clock_reference+0x12c00000000LL<Complete_Stream->Streams[pid]->TimeStamp_End)
-                                program_clock_reference+=0x25800000000LL; //33 bits and *300
-                            int64u  Duration_27M=program_clock_reference-Complete_Stream->Streams[pid]->TimeStamp_End;
-                            float64 Duration=((float64)Duration_27M)/27000000; //in seconds
-                            float64 Bytes=((float64)(File_Offset+Buffer_Offset-Complete_Stream->Streams[pid]->TimeStamp_End_Offset))*8;
-                            float64 TimeStamp_InstantaneousBitRate=Bytes/Duration;
-                            if (Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate)
+                            if (Complete_Stream->Streams[pid]->TimeStamp_End_Offset!=(int64u)-1)
                             {
-                                float64 Config_VbrDetection_Delta_Temp=Config_VbrDetection_Delta;
-                                if (Config_VbrDetection_Delta==0 && TimeStamp_InstantaneousBitRate)
-                                    Config_VbrDetection_Delta_Temp=((float64)(BDAV_Size+188+TSP_Size))/TimeStamp_InstantaneousBitRate;
-                                if (TimeStamp_InstantaneousBitRate<Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate*(1-Config_VbrDetection_Delta_Temp) || TimeStamp_InstantaneousBitRate>Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate*(1+Config_VbrDetection_Delta_Temp))
+                                if (program_clock_reference+0x12c00000000LL<Complete_Stream->Streams[pid]->TimeStamp_End)
+                                    program_clock_reference+=0x25800000000LL; //33 bits and *300
+                                int64u  Duration_27M=program_clock_reference-Complete_Stream->Streams[pid]->TimeStamp_End;
+                                float64 Duration=((float64)Duration_27M)/27000000; //in seconds
+                                float64 Bytes=((float64)(File_Offset+Buffer_Offset-Complete_Stream->Streams[pid]->TimeStamp_End_Offset))*8;
+                                float64 TimeStamp_InstantaneousBitRate=Bytes/Duration;
+                                if (Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate)
                                 {
-                                    Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate_BitRateMode_IsVbr++;
-                                    #if MEDIAINFO_ADVANCED
-                                        if (Config_VbrDetection_GiveUp && Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate_BitRateMode_IsVbr>=Config_VbrDetection_Occurences)
-                                            Config->ParseSpeed=0;
-                                    #endif // MEDIAINFO_ADVANCED
+                                    float64 Config_VbrDetection_Delta_Temp=Config_VbrDetection_Delta;
+                                    if (Config_VbrDetection_Delta==0 && TimeStamp_InstantaneousBitRate)
+                                        Config_VbrDetection_Delta_Temp=((float64)(BDAV_Size+188+TSP_Size))/TimeStamp_InstantaneousBitRate;
+                                    if (TimeStamp_InstantaneousBitRate<Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate*(1-Config_VbrDetection_Delta_Temp) || TimeStamp_InstantaneousBitRate>Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate*(1+Config_VbrDetection_Delta_Temp))
+                                    {
+                                        Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate_BitRateMode_IsVbr++;
+                                        #if MEDIAINFO_ADVANCED
+                                            if (Config_VbrDetection_GiveUp && Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate_BitRateMode_IsVbr>=Config_VbrDetection_Occurences)
+                                                Config->ParseSpeed=0;
+                                        #endif // MEDIAINFO_ADVANCED
+                                    }
+                                    else
+                                        Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate_BitRateMode_IsCbr++;
                                 }
-                                else
-                                    Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate_BitRateMode_IsCbr++;
+                                Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate=TimeStamp_InstantaneousBitRate;
+                                #if MEDIAINFO_ADVANCED
+                                    if (Complete_Stream->Streams[pid]->TimeStamp_Distance_Min>Duration_27M)
+                                        Complete_Stream->Streams[pid]->TimeStamp_Distance_Min=Duration_27M;
+                                    if (Complete_Stream->Streams[pid]->TimeStamp_Distance_Max<Duration_27M)
+                                        Complete_Stream->Streams[pid]->TimeStamp_Distance_Max=Duration_27M;
+                                    Complete_Stream->Streams[pid]->TimeStamp_Distance_Total+=Duration_27M;
+                                    Complete_Stream->Streams[pid]->TimeStamp_Distance_Count++;
+                                #endif // MEDIAINFO_ADVANCED
                             }
-                            Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate=TimeStamp_InstantaneousBitRate;
-                            #if MEDIAINFO_ADVANCED
-                                if (Complete_Stream->Streams[pid]->TimeStamp_Distance_Min>Duration_27M)
-                                    Complete_Stream->Streams[pid]->TimeStamp_Distance_Min=Duration_27M;
-                                if (Complete_Stream->Streams[pid]->TimeStamp_Distance_Max<Duration_27M)
-                                    Complete_Stream->Streams[pid]->TimeStamp_Distance_Max=Duration_27M;
-                                Complete_Stream->Streams[pid]->TimeStamp_Distance_Total+=Duration_27M;
-                                Complete_Stream->Streams[pid]->TimeStamp_Distance_Count++;
-                            #endif // MEDIAINFO_ADVANCED
-                        }
-                        Complete_Stream->Streams[pid]->TimeStamp_End=program_clock_reference;
-                        Complete_Stream->Streams[pid]->TimeStamp_End_IsUpdated=true;
-                        Complete_Stream->Streams[pid]->TimeStamp_End_Offset=File_Offset+Buffer_Offset;
-                        {
-                            Status[IsUpdated]=true;
-                            Status[User_16]=true;
+                            Complete_Stream->Streams[pid]->TimeStamp_End=program_clock_reference;
+                            Complete_Stream->Streams[pid]->TimeStamp_End_IsUpdated=true;
+                            Complete_Stream->Streams[pid]->TimeStamp_End_Offset=File_Offset+Buffer_Offset;
+                            {
+                                Status[IsUpdated]=true;
+                                Status[User_16]=true;
+                            }
                         }
                     }
                     if (Complete_Stream->Streams[pid]->Searching_TimeStamp_Start)
@@ -2189,46 +2210,49 @@ void File_MpegTs::Header_Parse_AdaptationField()
                      )
                     {
                         Header_Parse_Events_Duration(program_clock_reference);
-                        if (Complete_Stream->Streams[pid]->TimeStamp_End_Offset!=(int64u)-1)
+                        if (program_clock_reference!=Complete_Stream->Streams[pid]->TimeStamp_End) //Some PCRs are buggy (low precision), using the first stream offset in the case of duplicate PCR value
                         {
-                            if (program_clock_reference+0x12c00000000LL<Complete_Stream->Streams[pid]->TimeStamp_End)
-                                program_clock_reference+=0x25800000000LL; //33 bits and *300
-                            int64u  Duration_27M=program_clock_reference-Complete_Stream->Streams[pid]->TimeStamp_End;
-                            float64 Duration=((float64)Duration_27M)/27000000; //in seconds
-                            float64 Bytes=((float64)(File_Offset+Buffer_Offset-Complete_Stream->Streams[pid]->TimeStamp_End_Offset))*8;
-                            float64 TimeStamp_InstantaneousBitRate=Bytes/Duration;
-                            if (Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate)
+                            if (Complete_Stream->Streams[pid]->TimeStamp_End_Offset!=(int64u)-1)
                             {
-                                float64 Config_VbrDetection_Delta_Temp=Config_VbrDetection_Delta;
-                                if (Config_VbrDetection_Delta==0 && TimeStamp_InstantaneousBitRate)
-                                    Config_VbrDetection_Delta_Temp=((float64)(BDAV_Size+188+TSP_Size))/TimeStamp_InstantaneousBitRate;
-                                if (TimeStamp_InstantaneousBitRate<Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate*(1-Config_VbrDetection_Delta_Temp) || TimeStamp_InstantaneousBitRate>Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate*(1+Config_VbrDetection_Delta_Temp))
+                                if (program_clock_reference+0x12c00000000LL<Complete_Stream->Streams[pid]->TimeStamp_End)
+                                    program_clock_reference+=0x25800000000LL; //33 bits and *300
+                                int64u  Duration_27M=program_clock_reference-Complete_Stream->Streams[pid]->TimeStamp_End;
+                                float64 Duration=((float64)Duration_27M)/27000000; //in seconds
+                                float64 Bytes=((float64)(File_Offset+Buffer_Offset-Complete_Stream->Streams[pid]->TimeStamp_End_Offset))*8;
+                                float64 TimeStamp_InstantaneousBitRate=Bytes/Duration;
+                                if (Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate)
                                 {
-                                    Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate_BitRateMode_IsVbr++;
-                                    #if MEDIAINFO_ADVANCED
-                                        if (Config_VbrDetection_GiveUp && Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate_BitRateMode_IsVbr>=Config_VbrDetection_Occurences)
-                                            Config->ParseSpeed=0;
-                                    #endif // MEDIAINFO_ADVANCED
+                                    float64 Config_VbrDetection_Delta_Temp=Config_VbrDetection_Delta;
+                                    if (Config_VbrDetection_Delta==0 && TimeStamp_InstantaneousBitRate)
+                                        Config_VbrDetection_Delta_Temp=((float64)(BDAV_Size+188+TSP_Size))/TimeStamp_InstantaneousBitRate;
+                                    if (TimeStamp_InstantaneousBitRate<Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate*(1-Config_VbrDetection_Delta_Temp) || TimeStamp_InstantaneousBitRate>Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate*(1+Config_VbrDetection_Delta_Temp))
+                                    {
+                                        Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate_BitRateMode_IsVbr++;
+                                        #if MEDIAINFO_ADVANCED
+                                            if (Config_VbrDetection_GiveUp && Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate_BitRateMode_IsVbr>=Config_VbrDetection_Occurences)
+                                                Config->ParseSpeed=0;
+                                        #endif // MEDIAINFO_ADVANCED
+                                    }
+                                    else
+                                        Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate_BitRateMode_IsCbr++;
                                 }
-                                else
-                                    Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate_BitRateMode_IsCbr++;
+                                Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate=TimeStamp_InstantaneousBitRate;
+                                #if MEDIAINFO_ADVANCED
+                                    if (Complete_Stream->Streams[pid]->TimeStamp_Distance_Min>Duration_27M)
+                                        Complete_Stream->Streams[pid]->TimeStamp_Distance_Min=Duration_27M;
+                                    if (Complete_Stream->Streams[pid]->TimeStamp_Distance_Max<Duration_27M)
+                                        Complete_Stream->Streams[pid]->TimeStamp_Distance_Max=Duration_27M;
+                                    Complete_Stream->Streams[pid]->TimeStamp_Distance_Total+=Duration_27M;
+                                    Complete_Stream->Streams[pid]->TimeStamp_Distance_Count++;
+                                #endif // MEDIAINFO_ADVANCED
                             }
-                            Complete_Stream->Streams[pid]->TimeStamp_InstantaneousBitRate=TimeStamp_InstantaneousBitRate;
-                            #if MEDIAINFO_ADVANCED
-                                if (Complete_Stream->Streams[pid]->TimeStamp_Distance_Min>Duration_27M)
-                                    Complete_Stream->Streams[pid]->TimeStamp_Distance_Min=Duration_27M;
-                                if (Complete_Stream->Streams[pid]->TimeStamp_Distance_Max<Duration_27M)
-                                    Complete_Stream->Streams[pid]->TimeStamp_Distance_Max=Duration_27M;
-                                Complete_Stream->Streams[pid]->TimeStamp_Distance_Total+=Duration_27M;
-                                Complete_Stream->Streams[pid]->TimeStamp_Distance_Count++;
-                            #endif // MEDIAINFO_ADVANCED
-                        }
-                        Complete_Stream->Streams[pid]->TimeStamp_End=program_clock_reference;
-                        Complete_Stream->Streams[pid]->TimeStamp_End_IsUpdated=true;
-                        Complete_Stream->Streams[pid]->TimeStamp_End_Offset=File_Offset+Buffer_Offset;
-                        {
-                            Status[IsUpdated]=true;
-                            Status[User_16]=true;
+                            Complete_Stream->Streams[pid]->TimeStamp_End=program_clock_reference;
+                            Complete_Stream->Streams[pid]->TimeStamp_End_IsUpdated=true;
+                            Complete_Stream->Streams[pid]->TimeStamp_End_Offset=File_Offset+Buffer_Offset;
+                            {
+                                Status[IsUpdated]=true;
+                                Status[User_16]=true;
+                            }
                         }
                     }
                     if (Complete_Stream->Streams[pid]->Searching_TimeStamp_Start)
@@ -2680,7 +2704,7 @@ void File_MpegTs::PSI()
                         //Informing that the menu must be recalculated - TODO: only the related programs
                         if (StreamKind!=Stream_Menu)
                         {
-                            for (complete_stream::transport_stream::programs::iterator Program=Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs.begin(); Program!=Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs.end(); Program++)
+                            for (complete_stream::transport_stream::programs::iterator Program=Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs.begin(); Program!=Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs.end(); ++Program)
                                 Program->second.Update_Needed_StreamPos=true;
                         }
                         else if (Complete_Stream->StreamPos_ToRemove[StreamKind][Pos]<Complete_Stream->program_number_Order.size())

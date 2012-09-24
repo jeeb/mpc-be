@@ -1,5 +1,5 @@
 // ZenLib::Translation - Helper for translation
-// Copyright (C) 2007-2011 MediaArea.net SARL, Info@MediaArea.net
+// Copyright (C) 2007-2012 MediaArea.net SARL, Info@MediaArea.net
 //
 // This software is provided 'as-is', without any express or implied
 // warranty.  In no event will the authors be held liable for any damages
@@ -94,7 +94,7 @@ Ztring Translation::Get () const
         ToReturn+=Separator[1];
         ToReturn+=Temp->second;
         ToReturn+=Separator[0];
-        Temp++;
+        ++Temp;
     }
     return ToReturn;
 }
@@ -164,11 +164,3 @@ void Translation::Separator_Set (size_type Level, const Ztring &NewSeparator)
 //***************************************************************************
 
 } //namespace
-
-
-
-
-
-
-
-

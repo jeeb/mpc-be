@@ -71,6 +71,7 @@ struct complete_stream
             bool   source_id_IsValid;
             bool   IsParsed;
             bool   IsRegistered;
+            bool   HasNotDisplayableStreams; //e.g. unknown stream, KLV, SCTE 35
             bool   Update_Needed_IsRegistered;
             bool   Update_Needed_StreamCount;
             bool   Update_Needed_StreamPos;
@@ -143,6 +144,7 @@ struct complete_stream
                 source_id_IsValid=false;
                 IsParsed=false;
                 IsRegistered=false;
+                HasNotDisplayableStreams=false;
                 Update_Needed_IsRegistered=false;
                 Update_Needed_StreamCount=false;
                 Update_Needed_StreamPos=false;
@@ -535,6 +537,9 @@ public :
     File_Mpeg_Descriptors();
 
 private :
+    //Buffer - File header
+    void FileHeader_Parse();
+
     //Buffer - Per element
     void Header_Parse();
     void Data_Parse();

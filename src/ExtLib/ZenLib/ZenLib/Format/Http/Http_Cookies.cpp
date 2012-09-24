@@ -1,5 +1,5 @@
 // ZenLib::Format::Http::Cookies - Cookies handling
-// Copyright (C) 2008-2011 MediaArea.net SARL, Info@MediaArea.net
+// Copyright (C) 2008-2012 MediaArea.net SARL, Info@MediaArea.net
 //
 // This software is provided 'as-is', without any express or implied
 // warranty.  In no event will the authors be held liable for any damages
@@ -93,7 +93,7 @@ size_t Cookies::Set(const std::string &Name, const std::string &Value, std::time
 //---------------------------------------------------------------------------
 void Cookies::Create_Lines(std::ostream& Out)
 {
-    for (Cookies::iterator Cookie=begin(); Cookie!=end(); Cookie++)
+    for (Cookies::iterator Cookie=begin(); Cookie!=end(); ++Cookie)
     {
         Out << "Set-Cookie: " << Cookie->first << "=" << Cookie->second.Value;
         if (Cookie->second.Expires!=(time_t)-1)
@@ -115,4 +115,3 @@ void Cookies::Create_Lines(std::ostream& Out)
 } //Namespace
 
 } //Namespace
-

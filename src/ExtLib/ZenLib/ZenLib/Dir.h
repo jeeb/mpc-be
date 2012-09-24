@@ -1,5 +1,5 @@
 // ZenLib::Dir - Directories functions
-// Copyright (C) 2007-2011 MediaArea.net SARL, Info@MediaArea.net
+// Copyright (C) 2007-2012 MediaArea.net SARL, Info@MediaArea.net
 //
 // This software is provided 'as-is', without any express or implied
 // warranty.  In no event will the authors be held liable for any damages
@@ -48,11 +48,11 @@ public :
     /// @brief Options for Open method
     enum dirlist_t
     {
-        Nothing                     = 0x00,             ///<
-        Include_Files               = 0x01,             ///< Include files
-        Include_Dirs                = 0x02,             ///< Include directories
-        Include_Hidden              = 0x04,             ///< Include hidden files
-        Parse_SubDirs               = 0x10              ///< Parse subdirectories
+        Nothing         = 0x00,         ///<
+        Include_Files   = 0x01,         ///< Include files
+        Include_Dirs    = 0x02,         ///< Include directories
+        Include_Hidden  = 0x04,         ///< Include hidden files
+        Parse_SubDirs   = 0x10          ///< Parse subdirectories
     };
 
     //Constructor/Destructor
@@ -61,8 +61,8 @@ public :
     static ZtringList GetAllFileNames(const Ztring &Dir_Name, dirlist_t Options=(dirlist_t)(Include_Files|Parse_SubDirs));
 
     //Helpers
-    static bool             Exists(const Ztring &Dir_Name);
-    static bool             Create(const Ztring &Dir_Name);
+    static bool Exists(const Ztring &Dir_Name);
+    static bool Create(const Ztring &Dir_Name);
 };
 
 } //NameSpace

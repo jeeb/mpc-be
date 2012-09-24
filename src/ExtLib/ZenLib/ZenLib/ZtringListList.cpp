@@ -1,5 +1,5 @@
 // ZenLib::ZtringListList - More methods for std::vector<std::vector<std::(w)string>>
-// Copyright (C) 2002-2011 MediaArea.net SARL, Info@MediaArea.net
+// Copyright (C) 2002-2012 MediaArea.net SARL, Info@MediaArea.net
 //
 // This software is provided 'as-is', without any express or implied
 // warranty.  In no event will the authors be held liable for any damages
@@ -595,11 +595,3 @@ void ZtringListList::Max_Set (size_type Level, size_type NewMax)
 //***************************************************************************
 
 } //namespace
-
-
-
-
-
-
-
-
