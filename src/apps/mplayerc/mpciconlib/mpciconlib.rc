@@ -159,6 +159,7 @@ IDI_WV_ICON				ICON				"icons\\wv.ico"
 IDI_DEFAULT_ICON		ICON				"icons\\icon.ico"
 IDI_DEFAULT_AUDIO_ICON	ICON				"icons\\default_audio.ico"
 IDI_DEFAULT_VIDEO_ICON	ICON				"icons\\default_video.ico"
+IDI_OPUS_ICON			ICON				"icons\\opus.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //

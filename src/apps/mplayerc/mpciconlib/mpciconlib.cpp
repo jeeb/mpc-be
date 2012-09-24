@@ -246,6 +246,8 @@ extern "C" __declspec(dllexport) int get_icon_index(LPCTSTR ext)
 		iconindex = IDI_WMV_ICON;
 	} else if (_tcsicmp(ext, _T(".wv")) == 0) {
 		iconindex = IDI_WV_ICON;
+	} else if (_tcsicmp(ext, _T(".opus")) == 0) {
+		iconindex = IDI_OPUS_ICON;
 // Playlist
 	} else if (_tcsicmp(ext, _T(".asx")) == 0) {
 		iconindex = IDI_PLAYLIST_ICON;
