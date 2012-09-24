@@ -3,6 +3,7 @@ CC = gcc.exe
 BIN_DIR  = ../../../bin
 ZLIB_DIR = ../zlib
 OPENJPEG_DIR = ../openjpeg
+OPUS_DIR = ../opus
 
 ifeq ($(64BIT),yes)
     MY_ARCH = x64
@@ -23,7 +24,7 @@ TARGET_LIB     = $(TARGET_LIB_DIR)/ffmpeg.lib
 
 
 # Compiler and yasm flags
-CFLAGS    = -I. -I.. -Ilibavcodec -Ilibavutil -I$(ZLIB_DIR) -I$(OPENJPEG_DIR) \
+CFLAGS    = -I. -I.. -Ilibavcodec -Ilibavutil -I$(ZLIB_DIR) -I$(OPENJPEG_DIR) -I$(OPUS_DIR) \
             -DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_XOPEN_SOURCE=600 \
             -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 \
             -O2 -ffast-math -fomit-frame-pointer \
@@ -190,6 +191,7 @@ SRCS_C = \
     libavcodec/lagarithrac.c \
     libavcodec/latm_parser.c \
     libavcodec/libopenjpegdec.c \
+    libavcodec/libopus_dec.c \
     libavcodec/lsp.c \
     libavcodec/mdct.c \
     libavcodec/mjpeg.c \

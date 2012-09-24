@@ -418,6 +418,8 @@ CString CMediaTypeEx::GetAudioCodecName(const GUID& subtype, WORD wFormatTag)
 				   subtype == MEDIASUBTYPE_SAMR ||
 				   subtype == MEDIASUBTYPE_SAWB) {
 			str = _T("AMR");
+		} else if (subtype == MEDIASUBTYPE_OPUS) {
+			str += _T("Opus");
 		} else {
 			str.Format(_T("0x%04x"), wFormatTag);
 		}

@@ -201,6 +201,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_BINKA_RDFT},
 	// Indeo Audio
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_IAC},
+	// Opus Audio
+	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_OPUS},
 };
 
 #ifdef REGISTER_FILTER

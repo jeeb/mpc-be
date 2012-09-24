@@ -106,7 +106,7 @@ public:
 	}
 	unsigned int showbits(int cnt) { // a bit unclean, but works and can read backwards too! :P
 		if (!hasbits(cnt)) {
-			ASSERT(0);
+			//ASSERT(0);
 			return 0;
 		}
 		unsigned int ret = 0, off = 0;
@@ -270,6 +270,15 @@ HRESULT COggSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				pPinOut.Attach(DNew COggDiracOutputPin(page.GetData(), page.GetCount(), name, this, this, &hr));
 				AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 				nWaitForMore++;
+			} else if (!memcmp(page.GetData(), "OpusHead", 8) && page.GetCount() > 8) {
+				name.Format(L"Opus %d", i);
+				CAutoPtr<CBaseSplitterOutputPin> pPinOut;
+				pPinOut.Attach(DNew COggOpusOutputPin(page.GetData(), page.GetCount(), name, this, this, &hr));
+				AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
+			} else if (!memcmp(page.GetData(), "OpusTags", 8) && page.GetCount() > 8) {
+				if (COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
+					pOggPin->AddComment(page.GetData()+8, page.GetCount()-8-1);
+				}
 			} else if (!(type&1) && nWaitForMore <= 0) {
 				break;
 			}
@@ -328,6 +337,7 @@ HRESULT COggSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		tagmap[L"ARTIST"] = L"AUTH"; // not quite
 		tagmap[L"COPYRIGHT"] = L"CPYR";
 		tagmap[L"DESCRIPTION"] = L"DESC";
+		tagmap[L"ENCODER"] = L"DESC";
 
 		POSITION pos2 = tagmap.GetStartPosition();
 		while (pos2) {
@@ -637,6 +647,7 @@ COggSplitterOutputPin::COggSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter
 void COggSplitterOutputPin::AddComment(BYTE* p, int len)
 {
 	bitstream bs(p, len);
+
 	bs.getbits(bs.getbits(32)*8);
 	for (int n = bs.getbits(32); n-- > 0; ) {
 		CStringA str;
@@ -667,7 +678,6 @@ void COggSplitterOutputPin::AddComment(BYTE* p, int len)
 			m_pComments.AddTail(p);
 		}
 	}
-	ASSERT(bs.getbits(1) == 1);
 }
 
 CStringW COggSplitterOutputPin::GetComment(CStringW key)
@@ -904,7 +914,7 @@ HRESULT COggVorbisOutputPin::UnpackInitPage(OggPage& page)
 
 REFERENCE_TIME COggVorbisOutputPin::GetRefTime(__int64 granule_position)
 {
-	REFERENCE_TIME rt = granule_position * 10000000 / m_audio_sample_rate;
+	REFERENCE_TIME rt = (granule_position * UNITS) / m_audio_sample_rate;
 	return rt;
 }
 
@@ -1466,6 +1476,67 @@ HRESULT COggDiracOutputPin::UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, in
 	p->bSyncPoint	= TRUE;
 	p->rtStart		= m_rtLast;
 	p->rtStop		= m_rtLast+1;
+	p->SetData(pData, len);
+
+	return S_OK;
+}
+
+//
+// COggOpusOutputPin
+//
+
+COggOpusOutputPin::COggOpusOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
+	: COggSplitterOutputPin(pName, pFilter, pLock, phr)
+{
+	CGolombBuffer Buffer(h + 8, nCount - 8);
+
+	BYTE version	= Buffer.BitRead(8);
+	BYTE nChannels	= Buffer.BitRead(8);
+	m_Preskip		= (WORD)Buffer.BitRead(16);
+	Buffer.BitRead(32); // Input sample rate
+	Buffer.BitRead(16); // Output gain
+
+	m_nSamplesPerSec	= 48000;
+	WORD wBitsPerSample	= 16;
+	int nAvgBytesPerSec	= (nChannels * (wBitsPerSample >> 3)) * m_nSamplesPerSec;
+
+	WAVEFORMATEX* wfe		= (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + nCount];
+	memset(wfe, 0, sizeof(WAVEFORMATEX));
+	wfe->wFormatTag			= (WORD)WAVE_FORMAT_OPUS;
+	wfe->nChannels			= nChannels;
+	wfe->nSamplesPerSec		= m_nSamplesPerSec;
+	wfe->wBitsPerSample		= wBitsPerSample;
+	wfe->nBlockAlign		= 1;
+	wfe->nAvgBytesPerSec	= nAvgBytesPerSec;
+	wfe->cbSize = nCount;
+	memcpy((BYTE*)(wfe+1), h, nCount);
+
+	CMediaType mt;
+	ZeroMemory(&mt, sizeof(CMediaType));
+
+	mt.majortype	= MEDIATYPE_Audio;
+	mt.subtype		= MEDIASUBTYPE_OPUS;
+	mt.formattype	= FORMAT_WaveFormatEx;
+	mt.SetFormat((BYTE*)wfe, sizeof(WAVEFORMATEX)+wfe->cbSize);
+
+	delete [] wfe;
+
+	m_mts.InsertAt(0, mt);
+
+	*phr = S_OK;
+}
+
+REFERENCE_TIME COggOpusOutputPin::GetRefTime(__int64 granule_position)
+{
+	REFERENCE_TIME rt = ((granule_position - m_Preskip) * UNITS) / m_nSamplesPerSec;
+	return rt;
+}
+
+HRESULT COggOpusOutputPin::UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, int len)
+{
+	p->bSyncPoint	= TRUE;
+	p->rtStart		= m_rtLast;
+	p->rtStop		= m_rtLast+1; // TODO : find packet duration !
 	p->SetData(pData, len);
 
 	return S_OK;

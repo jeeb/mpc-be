@@ -120,6 +120,7 @@ CAppSettings::CAppSettings()
 	FFMFiltersKeys[FFM_BINKV] = _T("FFM_BINKV");
 	FFMFiltersKeys[FFM_BINKA] = _T("FFM_BINKA");
 	FFMFiltersKeys[FFM_IAC] = _T("FFM_IAC");
+	FFMFiltersKeys[FFM_OPUS] = _T("FFM_OPUS");
 	FFMFiltersKeys[FFM_PNG] = _T("FFM_PNG");
 	FFMFiltersKeys[FFM_WMAVOICE] = _T("FFM_WMAVOICE");
 	FFMFiltersKeys[FFM_CLLC] = _T("FFM_CLLC");

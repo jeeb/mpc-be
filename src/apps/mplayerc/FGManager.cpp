@@ -1957,6 +1957,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview
 					(ffmpeg_filters[FFM_IAC]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_IAC);
 		m_transform.AddTail(pFGF);
+
+		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
+					(ffmpeg_filters[FFM_OPUS]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
+					(ffmpeg_filters[FFM_OPUS]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_OPUS);
+		m_transform.AddTail(pFGF);
 	}
 
 	if (!IsPreview) {

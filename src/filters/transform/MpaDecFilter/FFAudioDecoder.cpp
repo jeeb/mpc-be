@@ -45,6 +45,8 @@ typedef struct {
 } FFMPEG_AUDIO_CODECS;
 
 static const FFMPEG_AUDIO_CODECS ffAudioCodecs[] = {
+	// Opus
+	{ &MEDIASUBTYPE_OPUS,              AV_CODEC_ID_OPUS },
 	// AMR
 	{ &MEDIASUBTYPE_AMR,               AV_CODEC_ID_AMR_NB },
 	{ &MEDIASUBTYPE_SAMR,              AV_CODEC_ID_AMR_NB },
