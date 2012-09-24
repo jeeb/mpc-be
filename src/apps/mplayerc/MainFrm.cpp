@@ -6390,7 +6390,7 @@ void CMainFrame::OnViewD3DFullScreen()
 {
 	AppSettings& s = AfxGetAppSettings();
 	s.fD3DFullscreen = !s.fD3DFullscreen;
-	s.UpdateData(true);
+	s.SaveSettings();
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
 						 s.fD3DFullscreen ? ResStr(IDS_OSD_RS_D3D_FULLSCREEN_ON) : ResStr(IDS_OSD_RS_D3D_FULLSCREEN_OFF));
 }
@@ -7083,7 +7083,7 @@ void CMainFrame::OnViewPanNScanPresets(UINT nID)
 		dlg.m_pnspresets.Copy(s.m_pnspresets);
 		if (dlg.DoModal() == IDOK) {
 			s.m_pnspresets.Copy(dlg.m_pnspresets);
-			s.UpdateData(true);
+			s.SaveSettings();
 		}
 		return;
 	}
@@ -15886,7 +15886,7 @@ void CMainFrame::ShowOptions(int idPage)
 
 		m_wndView.LoadLogo();
 
-		s.UpdateData(true);
+		s.SaveSettings();
 
 	}
 	Invalidate();

@@ -460,7 +460,7 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 	}
 
 	// Write settings immediately
-	m_s.UpdateData(true);
+	m_s.SaveSettings();
 
 	// Save favorites to the new location
 	AfxGetAppSettings().SetFav(FAV_FILE, filesFav);
@@ -479,7 +479,7 @@ void CMPlayerCApp::ExportSettings()
 		CString savePath = fileSaveDialog.GetPathName();
 		bool success;
 
-		AfxGetAppSettings().UpdateData(true);
+		AfxGetAppSettings().SaveSettings();
 
 		if (IsIniValid()) {
 			success = !!CopyFile(GetIniPath(), savePath, FALSE);
@@ -887,7 +887,7 @@ BOOL CMPlayerCApp::InitInstance()
 	m_s.ParseCommandLine(m_cmdln);
 
 	if (m_s.nCLSwitches & (CLSW_HELP | CLSW_UNRECOGNIZEDSWITCH)) { // show comandline help window
-		m_s.UpdateData(false);
+		m_s.LoadSettings();
 		ShowCmdlnSwitches();
 		return FALSE;
 	}
@@ -1008,7 +1008,7 @@ BOOL CMPlayerCApp::InitInstance()
 
 	// Enable to open options with administrator privilege (for Vista UAC)
 	if (m_s.nCLSwitches & CLSW_ADMINOPTION) {
-		m_s.UpdateData(false); // read all settings. long time but not critical at this point
+		m_s.LoadSettings(); // read all settings. long time but not critical at this point
 
 		switch (m_s.iAdminOption) {
 			case CPPageFormats::IDD : {
@@ -1044,7 +1044,7 @@ BOOL CMPlayerCApp::InitInstance()
 		}
 	}
 
-	m_s.UpdateData(false); // read settings
+	m_s.LoadSettings(); // read settings
 
 	// If we use an ASCII ini file, let's recreate it to switch to UTF-16LE
 	if (IsIniValid() && !IsIniUTF16LE()) {
@@ -1300,7 +1300,7 @@ UINT CMPlayerCApp::GetVKFromAppCommand(UINT nAppCommand)
 
 int CMPlayerCApp::ExitInstance()
 {
-	m_s.UpdateData(true);
+	m_s.SaveSettings();
 
 	OleUninitialize();
 

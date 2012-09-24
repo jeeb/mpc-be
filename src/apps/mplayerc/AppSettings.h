@@ -589,7 +589,8 @@ private :
 public:
 	CAppSettings();
 	virtual ~CAppSettings();
-	void			UpdateData(bool fSave);
+	void			SaveSettings();
+	void			LoadSettings();
 
 	void			GetFav(favtype ft, CAtlList<CString>& sl);
 	void			SetFav(favtype ft, CAtlList<CString>& sl);
