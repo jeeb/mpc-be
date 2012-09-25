@@ -324,143 +324,44 @@ public:
 	//int			iFixedWidth, iFixedHeight;
 	int				iMonitor;
 
-	CString			strPnSPreset;
-
 	CString			ParseFileName(CString const& param);
 	void			ParseCommandLine(CAtlList<CString>& cmdln);
 
 	// Added a Debug display to the screen (/debug option)
 	bool			fShowDebugInfo;
-
-	int				iDXVer;
 	int				iAdminOption;
+	int				iDXVer;
 
-	UINT			nCS; // Control state for toolbars
-	int				iCaptionMenuMode; // normal -> hidemenu -> frameonly -> borderless
-	bool			fHideNavigation;
-	int				iDefaultVideoSize;
-	bool			fKeepAspectRatio;
-	bool			fCompMonDeskARDiff;
 
-	CRecentFileAndURLList MRU;
-	CRecentFileAndURLList MRUDub;
-
-	CAutoPtrList<FilterOverride> m_filters;
-
-	CRenderersSettings m_RenderersSettings;
-
-	int				iDSVideoRendererType;
-	int				iRMVideoRendererType;
-	int				iQTVideoRendererType;
-
-	int				nVolume;
-	int				nBalance;
-	bool			fMute;
-	int				nLoops;
-	bool			fLoopForever;
-	bool			fRewind;
-	int				iZoomLevel;
-	int				nVolumeStep;
-	int				nSpeedStep;
-	//int			iVideoRendererType;
-	CStringW		strAudioRendererDisplayName;
-	bool			fAutoloadAudio;
-	bool			fAutoloadSubtitles;
-	bool			fBlockVSFilter;
-	bool			fEnableWorkerThreadForOpening;
-	bool			fReportFailedPins;
-
-	CStringW		strFullScreenMonitor;
-	CStringW		strFullScreenMonitorID;
-	dispmode		dm_def;
-	double			dFPS;
-
-	bool			fAssociatedWithIcons;
-	CStringW		strLastOpenDir;
-
+	// Player
 	bool			fAllowMultipleInst;
+	bool			fTrayIcon;
+	bool			fShowOSD;
+	bool			fLimitWindowProportions;
+	bool			fSnapToDesktopEdges;
+	bool			fHideCDROMsSubMenu;
+	DWORD			dwPriority;
 	int				iTitleBarTextStyle;
 	bool			fTitleBarTextTitle;
-	int				iOnTop;
-	bool			fTrayIcon;
-	bool			fRememberZoomLevel;
-	bool			fShowBarsWhenFullScreen;
-	int				nShowBarsWhenFullScreenTimeOut;
-	AChFR			AutoChangeFullscrRes;
-	bool			fExitFullScreenAtTheEnd;
-	bool			fExitFullScreenAtFocusLost;
-	bool			fRestoreResAfterExit;
+	bool			fKeepHistory;
+	CRecentFileAndURLList MRU;
+	CRecentFileAndURLList MRUDub;
+	bool			fRememberDVDPos;
+	bool			fRememberFilePos;
+	bool			bRememberPlaylistItems;
 	bool			fRememberWindowPos;
 	bool			fRememberWindowSize;
 	bool			fSavePnSZoom;
 	float			dZoomX;
 	float			dZoomY;
-	bool			fSnapToDesktopEdges;
-	CRect			rcLastWindowPos;
-	UINT			nLastWindowType;
-	CSize			sizeAspectRatio;
-	bool			fKeepHistory;
-	UINT			nLastUsedPage;
 
-	bool			bShufflePlaylistItems;
-	bool			bRememberPlaylistItems;
-	bool			bHidePlaylistFullScreen;
-	bool			bFavRememberPos;
-	bool			bFavRelativeDrive;
+	// Formats
+	CMediaFormats	m_Formats;
+	bool			fAssociatedWithIcons;
 
-	CString			strDVDPath;
-	bool			fUseDVDPath;
-	LCID			idMenuLang, idAudioLang, idSubtitlesLang;
-	bool			fAutoSpeakerConf;
-	bool			fClosedCaptions;
-
-	STSStyle		subdefstyle;
-	bool			fOverridePlacement;
-	int				nHorPos, nVerPos;
-	int				nSubDelayInterval;
-	bool			fEnableSubtitles;
-	bool			fForcedSubtitles;
-	bool			fUseDefaultSubtitlesStyle;
-	bool			fPrioritizeExternalSubtitles;
-	bool			fDisableInternalSubtitles;
-	CString			strSubtitlePaths;
-
-	bool			fDisableXPToolbars;
-	int				nThemeBrightness;
-	int				nThemeRed;
-	int				nThemeGreen;
-	int				nThemeBlue;
-	bool			fFileNameOnSeekBar;
-
-	int				clrFaceABGR;
-	int				clrOutlineABGR;
-
-	int				nJumpDistS;
-	int				nJumpDistM;
-	int				nJumpDistL;
-	bool			fLimitWindowProportions;
-	bool			fNotifyMSN;
-
-	bool			fEnableAudioSwitcher;
-	bool			fDownSampleTo441;
-	bool			fAudioTimeShift;
-	int				iAudioTimeShift;
-	bool			fCustomChannelMapping;
-	DWORD			pSpeakerToChannelMap[18][18];
-	bool			fAudioNormalize;
-	bool			fAudioNormalizeRecover;
-	float			dAudioBoost_dB;
-
-	bool			fIntRealMedia;
-	//bool			fRealMediaRenderless;
-	int				iQuickTimeRenderer;
-	//float			dRealMediaQuickTimeFPS;
-
-	CStringArray	m_pnspresets;
-
+	// Keys
 	CList<wmcmd>	wmcmds;
 	HACCEL			hAccel;
-
 	bool			fWinLirc;
 	CString			strWinLircAddr;
 	CWinLircClient	WinLircClient;
@@ -469,68 +370,73 @@ public:
 	CUIceClient		UIceClient;
 	bool			fGlobalMedia;
 
-	CMediaFormats	m_Formats;
-
-	bool			SrcFilters[SRC_LAST + !SRC_LAST];
-	bool			TraFilters[TRA_LAST + !TRA_LAST];
-	bool			DXVAFilters[TRA_DXVA_LAST + !TRA_DXVA_LAST];
-	bool			FFmpegFilters[FFM_LAST + !FFM_LAST];
-
-	CString			strLogoFileName;
+	// Logo
 	UINT			nLogoId;
 	bool			fLogoExternal;
+	CString			strLogoFileName;
 
-	bool			fHideCDROMsSubMenu;
-
-	DWORD			dwPriority;
-	bool			fLaunchfullscreen;
-
+	// Web Inteface
 	BOOL			fEnableWebServer;
 	int				nWebServerPort;
 	int				nCmdlnWebServerPort;
-	bool			fWebServerPrintDebugInfo;
 	bool			fWebServerUseCompression;
 	bool			fWebServerLocalhostOnly;
+	bool			fWebServerPrintDebugInfo;
 	CString			strWebRoot, strWebDefIndex;
 	CString			strWebServerCGI;
 
-	CString			strSnapShotPath, strSnapShotExt;
-	int				iThumbRows, iThumbCols, iThumbWidth;
+	// Playback
+	int				nVolume;
+	int				nVolumeStep;
+	bool			fMute;
+	int				nBalance;
+	int				nLoops;
+	bool			fLoopForever;
+	bool			fRewind;
+	int				nSpeedStep;
+	bool			fRememberZoomLevel;
+	int				iZoomLevel;
+	CStringW		strSubtitlesLanguageOrder;
+	CStringW		strAudiosLanguageOrder;
+	bool			fEnableWorkerThreadForOpening;
+	bool			fReportFailedPins;
+	bool			fAutoloadAudio;
+	bool			fAutoloadSubtitles;
+	bool			fBlockVSFilter;
 
-	CString			strISDb;
+    // DVD/OGM
+	bool			fUseDVDPath;
+	CString			strDVDPath;
+	LCID			idMenuLang, idAudioLang, idSubtitlesLang;
+	bool			fAutoSpeakerConf;
+	bool			fClosedCaptions;
 
-	struct Shader {
-		CString		label;
-		CString		target;
-		CString		srcdata;
-	};
-	CAtlList<Shader> m_shaders;
-	CString			strShadercombine;
-	CString			strShadercombineScreenSpace;
+    // Output
+	CRenderersSettings m_RenderersSettings;
+	int				iDSVideoRendererType;
+	int				iRMVideoRendererType;
+	int				iQTVideoRendererType;
 
+	CStringW		strAudioRendererDisplayName;
 	bool			fD3DFullscreen;
-	bool			fMonitorAutoRefreshRate;
-	bool			fLastFullScreen;
-	bool			fEnableEDLEditor;
-	int				iBrightness;
-	int				iContrast;
-	int				iHue;
-	int				iSaturation;
-	CString			strShaderList;
-	CString			strShaderListScreenSpace;
-	bool			fToggleShader;
-	bool			fToggleShaderScreenSpace;
 
-	bool			fRememberDVDPos;
-	bool			fRememberFilePos;
-	bool			fShowOSD;
-	int				iLanguage;
-	bool			fFastSeek;
 
-	bool			fLCDSupport;
-	bool			fSmartSeek;
-	bool			fChapterMarker;
+    // Fullscreen
+	bool			fLaunchfullscreen;
+	bool			fShowBarsWhenFullScreen;
+	int				nShowBarsWhenFullScreenTimeOut;
+	bool			fExitFullScreenAtTheEnd;
+	bool			fExitFullScreenAtFocusLost;
+	CStringW		strFullScreenMonitor;
+	CStringW		strFullScreenMonitorID;
+	AChFR			AutoChangeFullscrRes;
+	bool			fRestoreResAfterExit;
+	dispmode		dm_def;
+	double			dFPS;
 
+    // Sync Renderer Settings
+
+    // Capture (BDA configuration)
 	// BDA configuration
 	int				iDefaultCaptureDevice;		// Default capture device (analog=0, 1=digital)
 	CString			strAnalogVideo;
@@ -549,6 +455,144 @@ public:
 	UINT			nDVBLastChannel;
 	CAtlList<CDVBChannel> m_DVBChannels;
 
+    // Internal Filters
+	bool			SrcFilters[SRC_LAST + !SRC_LAST];
+	bool			TraFilters[TRA_LAST + !TRA_LAST];
+	bool			DXVAFilters[TRA_DXVA_LAST + !TRA_DXVA_LAST];
+	bool			FFmpegFilters[FFM_LAST + !FFM_LAST];
+
+    // Audio Switcher
+	bool			fEnableAudioSwitcher;
+	bool			fAudioNormalize;
+	bool			fAudioNormalizeRecover;
+	float			dAudioBoost_dB;
+	bool			fDownSampleTo441;
+	bool			fAudioTimeShift;
+	int				iAudioTimeShift;
+	bool			fCustomChannelMapping;
+	int				nSpeakerChannels;
+	DWORD			pSpeakerToChannelMap[18][18];
+
+    // External Filters
+	CAutoPtrList<FilterOverride> m_filters;
+
+	// Subtitles
+	bool			fOverridePlacement;
+	int				nHorPos, nVerPos;
+	int				nSubDelayInterval;
+
+    // Default Style
+	STSStyle		subdefstyle;
+
+    // Misc
+	bool			fPrioritizeExternalSubtitles;
+	bool			fDisableInternalSubtitles;
+	CString			strSubtitlePaths;
+	CString			strISDb;
+
+	// Interface
+	bool			fDisableXPToolbars;
+	int				nThemeBrightness;
+	int				nThemeRed;
+	int				nThemeGreen;
+	int				nThemeBlue;
+	int				clrFaceABGR;
+	int				clrOutlineABGR;
+	bool			fUseTimeTooltip;
+	int				nTimeTooltipPosition;
+	bool			fFileNameOnSeekBar;
+	bool			fSmartSeek;
+	bool			fChapterMarker;
+	bool			fUseWin7TaskBar;
+	int				nOSDSize;
+	CString			strOSDFont;
+
+    // Tweaks
+	int				nJumpDistS;
+	int				nJumpDistM;
+	int				nJumpDistL;
+	bool			fDontUseSearchInFolder;
+	bool			fNotifyMSN;
+	bool			fPreventMinimize;
+	bool			fLCDSupport;
+	bool			fFastSeek;
+
+    // Miscellaneous
+	int				iBrightness;
+	int				iContrast;
+	int				iHue;
+	int				iSaturation;
+
+    // MENUS
+    // View
+	int				iCaptionMenuMode; // normal -> hidemenu -> frameonly -> borderless
+	bool			fHideNavigation;
+	UINT			nCS; // Control state for toolbars
+    // Language
+	int				iLanguage;
+    // Subtitles menu
+	bool			fEnableSubtitles;
+	bool			fUseDefaultSubtitlesStyle;
+	bool			fForcedSubtitles;
+    // Video Frame
+	int				iDefaultVideoSize;
+	bool			fKeepAspectRatio;
+	CSize			sizeAspectRatio;
+	bool			fCompMonDeskARDiff;
+    // Pan&Scan
+	CString			strPnSPreset;
+	CStringArray	m_pnspresets;
+    // On top menu
+	int				iOnTop;
+    // After Playback
+	bool			fExitAfterPlayback;
+	bool			fNextInDirAfterPlayback;
+
+    // WINDOWS
+    // Add Favorite
+	bool			bFavRememberPos;
+	bool			bFavRelativeDrive;
+    // Save Image...
+	CString			strSnapShotPath, strSnapShotExt;
+    // Save Thumbnails...
+	int				iThumbRows, iThumbCols, iThumbWidth;
+    // Shader Editor
+	struct Shader {
+		CString		label;
+		CString		target;
+		CString		srcdata;
+	};
+	CAtlList<Shader> m_shaders;
+    // Shader Combiner
+	bool			fToggleShader;
+	bool			fToggleShaderScreenSpace;
+	CString			strShaderList;
+	CString			strShaderListScreenSpace;
+	CString			strShadercombine;
+	CString			strShadercombineScreenSpace;
+    // Playlist (contex menu)
+	bool			bShufflePlaylistItems;
+	bool			bHidePlaylistFullScreen;
+
+    // OTHER STATES
+	CStringW		strLastOpenDir;
+	UINT			nLastWindowType;
+	CRect			rcLastWindowPos;
+	UINT			nLastUsedPage;
+	bool			fRemainingTime;
+	bool			fLastFullScreen;
+
+	CString			strTimeOnSeekBar;
+	bool			bStatusBarIsVisible;
+
+	bool			fIntRealMedia;
+	//bool			fRealMediaRenderless;
+	//float			dRealMediaQuickTimeFPS;
+	//int			iVideoRendererType;
+	//int			iQuickTimeRenderer;
+	//bool			fMonitorAutoRefreshRate;
+	bool			fEnableEDLEditor;
+
 	HWND			hMasterWnd;
 
 	bool			IsD3DFullscreen() const;
@@ -566,9 +610,6 @@ public:
 
 	void			DeserializeHex (LPCTSTR strVal, BYTE* pBuffer, int nBufSize) const;
 	CString			SerializeHex (BYTE* pBuffer, int nBufSize) const;
-
-	CString			strTimeOnSeekBar;
-	bool			bStatusBarIsVisible;
 
 private :
 	DVD_POSITION	DvdPosition[MAX_DVD_POSITION];
@@ -596,22 +637,6 @@ public:
 	void			SetFav(favtype ft, CAtlList<CString>& sl);
 	void			AddFav(favtype ft, CString s);
 	CDVBChannel*	FindChannelByPref(int nPrefNumber);
-
-	bool			fPreventMinimize;
-	bool			fUseWin7TaskBar;
-	bool			fExitAfterPlayback;
-	bool			fNextInDirAfterPlayback;
-	bool			fDontUseSearchInFolder;
-	bool			fUseTimeTooltip;
-	int				nTimeTooltipPosition;
-	int				nOSDSize;
-	CString			strOSDFont;
-	CStringW		strSubtitlesLanguageOrder;
-	CStringW		strAudiosLanguageOrder;
-
-	int				nSpeakerChannels;
-
-	bool			fRemainingTime;
 
 	bool			GetAllowMultiInst();
 private:
