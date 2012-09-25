@@ -20,9 +20,9 @@
 * Отрисовка PGS/DVB субтитров - оптимизация;
 * Оптимизация парсера YouTube;
 * Обновление украинской локализации;
-* MediaInfo 0.7.60+ svn rev.5099;
+* MediaInfo 0.7.60+ svn rev.5104;
 * libpng 1.5.13 git-11c1e0d;
-* ffmpeg git-21c4393;
+* ffmpeg git-49331f7;
 * openjpeg 1.5;
 * libopus (версия git 2c3b5ee от 20120921);
 
