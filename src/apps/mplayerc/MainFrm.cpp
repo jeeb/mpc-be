@@ -2924,7 +2924,10 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 		bool fClicked = false;
 
 		if (GetPlaybackMode() == PM_DVD) {
-			CPoint p = point - m_wndView.GetVideoRect().TopLeft();
+			CRect vid_rect = m_wndView.GetVideoRect();
+			m_wndView.MapWindowPoints(this, &vid_rect);
+
+			CPoint p = point - vid_rect.TopLeft();
 
 			if (SUCCEEDED(pDVDC->ActivateAtPosition(p))
 					|| m_iDVDDomain == DVD_DOMAIN_VideoManagerMenu
@@ -3085,8 +3088,12 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 
 	if (!m_OSD.OnMouseMove (nFlags, point)) {
 		if (GetPlaybackMode() == PM_DVD) {
-			CPoint vp = point - m_wndView.GetVideoRect().TopLeft();
+			CRect vid_rect = m_wndView.GetVideoRect();
+			m_wndView.MapWindowPoints(this, &vid_rect);
+
+			CPoint vp = point - vid_rect.TopLeft();
 			ULONG pulButtonIndex;
+
 			if (!m_fHideCursor) {
 				SetCursor(LoadCursor(NULL, SUCCEEDED(pDVDI->GetButtonAtPosition(vp, &pulButtonIndex)) ? IDC_HAND : IDC_ARROW));
 			}
