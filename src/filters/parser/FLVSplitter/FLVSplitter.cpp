@@ -211,8 +211,8 @@ bool CFLVSplitterFilter::Sync(__int64& pos)
 {
 	m_pFile->Seek(pos);
 
-	while (m_pFile->GetRemaining() >= 15) {
-		__int64 limit = m_pFile->GetRemaining();
+	while (m_pFile->GetRemaining(true) >= 15) {
+		__int64 limit = m_pFile->GetRemaining(true);
 		while (true) {
 			BYTE b = (BYTE)m_pFile->BitRead(8);
 			if (b == FLV_AUDIODATA || b == FLV_VIDEODATA) {
@@ -439,7 +439,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						first_ts = current_ts = 0;
 						int frame_cnt = 0;
 
-						while ((frame_cnt < 30) && ReadTag(tag) && !CheckRequest(NULL) && m_pFile->GetRemaining()) {
+						while ((frame_cnt < 30) && ReadTag(tag) && !CheckRequest(NULL) && m_pFile->GetRemaining(true)) {
 							__int64 _next = m_pFile->GetPos() + tag.DataSize;
 
 							if ((tag.DataSize > 0) && (tag.TagType == FLV_VIDEODATA && ReadTag(vtag))) {
