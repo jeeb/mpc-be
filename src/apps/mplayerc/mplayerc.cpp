@@ -734,10 +734,12 @@ HANDLE WINAPI Mine_CreateFileW(LPCWSTR p1, DWORD p2, DWORD p3, LPSECURITY_ATTRIB
 		if (CreateFakeVideoTS(p1, strFakeFile, _countof(strFakeFile))) {
 			hFile = Real_CreateFileW(strFakeFile, p2, p3, p4, p5, p6, p7);
 
-			AppSettings& s = AfxGetAppSettings();
-			POSITION pos = s.slFakeIfoList.Find(CString(strFakeFile).MakeUpper());
-			if (!pos) {
-				s.slFakeIfoList.AddTail(CString(strFakeFile).MakeUpper());
+			if (hFile != INVALID_HANDLE_VALUE) {
+				AppSettings& s = AfxGetAppSettings();
+				POSITION pos = s.slFakeIfoList.Find(CString(strFakeFile).MakeUpper());
+				if (!pos) {
+					s.slFakeIfoList.AddTail(CString(strFakeFile).MakeUpper());
+				}
 			}
 		}
 	}

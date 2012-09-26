@@ -12292,6 +12292,10 @@ void CMainFrame::OpenSetupStatusBar()
 
 void CMainFrame::OpenSetupWindowTitle(CString fn)
 {
+	if (fn.IsEmpty()) {
+		return;
+	}
+	
 	CString title(MAKEINTRESOURCE(IDR_MAINFRAME));
 	CString fname = fn;
 
