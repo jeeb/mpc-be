@@ -611,6 +611,9 @@ public:
 	void			DeserializeHex (LPCTSTR strVal, BYTE* pBuffer, int nBufSize) const;
 	CString			SerializeHex (BYTE* pBuffer, int nBufSize) const;
 
+	// Fake IFO List
+	CAtlList<CString> slFakeIfoList;
+
 private :
 	DVD_POSITION	DvdPosition[MAX_DVD_POSITION];
 	int				nCurrentDvdPosition;

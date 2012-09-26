@@ -733,6 +733,12 @@ HANDLE WINAPI Mine_CreateFileW(LPCWSTR p1, DWORD p2, DWORD p3, LPSECURITY_ATTRIB
 	if (nLen>=4 && _wcsicmp (p1 + nLen-4, L".ifo") == 0) {
 		if (CreateFakeVideoTS(p1, strFakeFile, _countof(strFakeFile))) {
 			hFile = Real_CreateFileW(strFakeFile, p2, p3, p4, p5, p6, p7);
+
+			AppSettings& s = AfxGetAppSettings();
+			POSITION pos = s.slFakeIfoList.Find(CString(strFakeFile).MakeUpper());
+			if (!pos) {
+				s.slFakeIfoList.AddTail(CString(strFakeFile).MakeUpper());
+			}
 		}
 	}
 

@@ -990,6 +990,13 @@ void CMainFrame::OnClose()
 		::DeleteObject(m_ThumbCashedBitmap);
 	}
 
+	while (s.slFakeIfoList.GetCount()) {
+		CString fakeIfoFileName = s.slFakeIfoList.RemoveHead();
+		if (::PathFileExists(fakeIfoFileName)) {
+			DeleteFile(fakeIfoFileName);
+		}
+	}
+
 	__super::OnClose();
 }
 
