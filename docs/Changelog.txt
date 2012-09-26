@@ -1,11 +1,36 @@
-This file includes only a short list of the changes between MPC-BE's versions.
+This file includes only a short list of the changes between Media Player Classic - BE's versions.
 
 Legend:
-+ New
++ Added
 * Changed
 ! Fixed
 
 
-X.X.X.X - Not released yet
+1.0.3.1
 ==============================
+Added (+):
++ Added an option in "Speed Step" settings;
++ DXVA (GPU) indicator on the toolbar;
++ JPEG 2000 support in MP4/MOV splitter and decoder, ffmpeg + OpenJPEG library (http://www.openjpeg.org) is used for decoding;
++ Full Opus support, splitter + decoder, ffmpeg + libopus is used for decoding;
 
+Changes (*):
+* FLVSplitter, streaming video (youtube or any other http source) - opening speed-up, determining file duration during playback;
+* Short links support - youtu.be;
+* PGS subtitles parsing/handling mechanism has been revised - multiple subtitles are correctly displayed simultaneously now;
+* PGS/DVB subtitles rendering - optimization;
+* YouTube parser optimization;
+* Ukrainian localization update;
+* Disabled DVR-MS Caption;
+* ShellExt - module operation improvement, optimization;
+* MediaInfo 0.7.60+ svn rev.5104;
+* libpng 1.5.13 git-11c1e0d;
+* ffmpeg git-f75c5f0;
+* openjpeg 1.5;
+* libopus (version git 2c3b5ee dated 20120921);
+
+Fixes (!):
+! Fixed problem with incorrect selecting and highlighting of DVD objects (there was displacement of coordinates);
+! Fixed problem with saving window state on program exit(SIZE_MAXIMIZED/SIZE_MINIMIZED);
+! Fixed problem with player startup in "Use same process for every file" mode, multiple windows were opened after multiple clicks, ticket #29;
+! MpcAudioRenderer - WASAPI Shared mode is not used now if sampling rates of the input and output streams differ;
