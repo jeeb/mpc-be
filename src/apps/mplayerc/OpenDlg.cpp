@@ -233,7 +233,8 @@ void COpenDlg::OnUpdateDub(CCmdUI* pCmdUI)
 {
 	UpdateData();
 
-	pCmdUI->Enable(AfxGetAppSettings().m_Formats.GetEngine(m_path) == DirectShow);
+	pCmdUI->Enable(AfxGetAppSettings().m_Formats.GetEngine(m_path) == DirectShow
+					&& ((CString(m_path).MakeLower().Find(_T("://"))) == -1));
 }
 
 void COpenDlg::OnUpdateOk(CCmdUI* pCmdUI)
