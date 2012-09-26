@@ -22,7 +22,7 @@
 * ќбновление украинской локализации;
 * MediaInfo 0.7.60+ svn rev.5104;
 * libpng 1.5.13 git-11c1e0d;
-* ffmpeg git-49331f7;
+* ffmpeg git-f75c5f0;
 * openjpeg 1.5;
 * libopus (верси€ git 2c3b5ee от 20120921);
 
