@@ -11,6 +11,8 @@ Added (+):
 
 Changes (*):
 * libwebp git-931e0ea;
+* libpng 1.5.13 git-753fd3f;
+* libopus git-ba28403;
 
 Fixes (!):
 
