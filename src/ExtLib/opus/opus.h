@@ -139,7 +139,7 @@ extern "C" {
   * <li>max_packet is the maximum number of bytes that can be written in the packet (4000 bytes is recommended)</li>
   * </ul>
   *
-  * opus_encode() and opus_encode_frame() return the number of bytes actually written to the packet.
+  * opus_encode() and opus_encode_float() return the number of bytes actually written to the packet.
   * The return value <b>can be negative</b>, which indicates that an error has occurred. If the return value
   * is 1 byte, then the packet does not need to be transmitted (DTX).
   *
@@ -371,7 +371,7 @@ OPUS_EXPORT int opus_encoder_ctl(OpusEncoder *st, int request, ...) OPUS_ARG_NON
   * @li max_size is the max duration of the frame in samples (per channel) that can fit into the decoded_frame array
   *
   * opus_decode() and opus_decode_float() return the number of samples (per channel) decoded from the packet.
-  * If that value is negative, then an error has occured. This can occur if the packet is corrupted or if the audio
+  * If that value is negative, then an error has occurred. This can occur if the packet is corrupted or if the audio
   * buffer is too small to hold the decoded audio.
   *
   * Opus is a stateful codec with overlapping blocks and as a result Opus
