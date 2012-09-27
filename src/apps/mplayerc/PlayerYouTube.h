@@ -113,7 +113,7 @@ CString PlayerYouTube(CString fname, CString* out_title)
 
 		if (s) {
 
-			f = InternetOpenUrl(s, fname, 0, 0, INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE, 0);
+			f = InternetOpenUrl(s, fname, 0, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE, 0);
 
 			if (f) {
 
@@ -170,6 +170,7 @@ CString PlayerYouTube(CString fname, CString* out_title)
 				Title = Title.TrimLeft(_T(".")).TrimRight(_T("."));
 				Title.Replace(_T("&quot;"), _T("\""));
 				Title.Replace(_T("&#39;"), _T("\""));
+				Title.Replace(_T("|"), _T("-"));
 
 				free(title);
 			}

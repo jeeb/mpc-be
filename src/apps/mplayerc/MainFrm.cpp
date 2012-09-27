@@ -83,6 +83,7 @@
 
 #include "jpeg.h"
 #include "DIB.h"
+#include "OpenImage.h"
 #include "PlayerYouTube.h"
 
 #include "../../filters/transform/VSFilter/IDirectVobSub.h"
@@ -11380,9 +11381,14 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		}
 
 		m_strTitleAlt = _T("");
-		HRESULT hr = pGB->RenderFile(PlayerYouTube(fn, &m_strTitleAlt), NULL);
+		HRESULT hr;
 
-		if (FAILED(hr)) {
+		HBITMAP extimage = OpenImage(fn);
+		if (!extimage) {
+			hr = pGB->RenderFile(PlayerYouTube(fn, &m_strTitleAlt), NULL);
+		}
+
+		if (FAILED(hr) && !extimage) {
 			m_strTitleAlt = _T("");
 
 			if (fFirst) {
@@ -17807,6 +17813,15 @@ HRESULT CMainFrame::SetDwmPreview(BOOL show)
 	if (m_InternalImageSmall) {
 		m_InternalImageSmall.Detach();
 	}
+
+	HBITMAP extimage = OpenImage(m_strFnFull);
+	if (extimage) {
+		m_InternalImage.Attach(extimage);
+		m_InternalImageSmall.Attach(extimage);
+		m_wndView.Invalidate();
+		return S_OK;
+	}
+
 	if (m_fAudioOnly && IsSomethingLoaded() && show) {
 
 		// load image from DSMResource to show in preview & logo;
