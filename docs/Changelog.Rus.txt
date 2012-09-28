@@ -10,9 +10,12 @@
 Добавлено (+):
 
 Изменения (*):
+* Обновлен немецкий перевод, автор - Markus Gaugg;
 * libwebp git-931e0ea;
 * libpng 1.5.13 git-753fd3f;
 * libopus git-ba28403;
+* Virtualdub 1.10.3 Test 7;
+* ffmpeg git-4fefe91;
 
 Исправления (!):
 
