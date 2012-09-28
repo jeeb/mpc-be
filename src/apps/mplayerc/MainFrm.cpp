@@ -11383,12 +11383,12 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		m_strTitleAlt = _T("");
 		HRESULT hr;
 
-		HBITMAP extimage = OpenImage(fn);
+		bool extimage = OpenImageCheck(fn);
 		if (!extimage) {
 			hr = pGB->RenderFile(PlayerYouTube(fn, &m_strTitleAlt), NULL);
 		}
 
-		if (FAILED(hr) && !extimage) {
+		if (hr && FAILED(hr) && !extimage) {
 			m_strTitleAlt = _T("");
 
 			if (fFirst) {
@@ -17831,12 +17831,10 @@ HRESULT CMainFrame::SetDwmPreview(BOOL show)
 	HBITMAP extimage = OpenImage(m_strFnFull);
 	if (extimage) {
 		m_InternalImage.Attach(extimage);
-		m_InternalImageSmall.Attach(extimage);
-		m_wndView.Invalidate();
-		return S_OK;
+		bLoadRes = true;
 	}
 
-	if (m_fAudioOnly && IsSomethingLoaded() && show) {
+	if (extimage || (m_fAudioOnly && IsSomethingLoaded() && show)) {
 
 		// load image from DSMResource to show in preview & logo;
 		BeginEnumFilters(pGB, pEF, pBF) {
@@ -17892,7 +17890,6 @@ HRESULT CMainFrame::SetDwmPreview(BOOL show)
 					bLoadRes = true;
 				}
 			}
-
 		}
 
 		if (!bLoadRes) {

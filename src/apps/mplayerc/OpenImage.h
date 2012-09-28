@@ -20,9 +20,36 @@
  *
  */
 
+#pragma once
+
+#include <libwebp/webp/decode.h>
+
 using namespace Gdiplus;
 
-HBITMAP OpenImage(CString fn)
+static BYTE* ConvertRGBToBMPBuffer(BYTE* Buffer, int width, int height, long* newsize)
+{
+	int padding = 0, scanlinebytes = width * 3;
+	while ((scanlinebytes + padding) % 4 != 0) {
+		padding++;
+	}
+	int psw = scanlinebytes + padding;
+	*newsize = height * psw;
+	BYTE* newbuf = new BYTE[*newsize];
+	memset(newbuf, 0, *newsize);
+	long bufpos = 0, newpos = 0;
+	for (int y = 0; y < height; y++) {
+		for (int x = 0; x < 3 * width; x += 3) {
+			bufpos = y * 3 * width + x;
+			newpos = (height - y - 1) * psw + x;
+			newbuf[newpos] = Buffer[bufpos + 2];
+			newbuf[newpos + 1] = Buffer[bufpos + 1];
+			newbuf[newpos + 2] = Buffer[bufpos];
+		}
+	}
+	return newbuf;
+}
+
+static bool OpenImageCheck(CString fn)
 {
 	CString tmp_fn(CString(fn).MakeLower());
 
@@ -34,7 +61,19 @@ HBITMAP OpenImage(CString fn)
 		|| wcsstr(tmp_fn, L".tif")
 		|| wcsstr(tmp_fn, L".tiff")
 		|| wcsstr(tmp_fn, L".emf")
-		|| wcsstr(tmp_fn, L".ico")) {
+		|| wcsstr(tmp_fn, L".webp")
+		|| wcsstr(tmp_fn, L".webpll")) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+static HBITMAP OpenImage(CString fn)
+{
+	CString tmp_fn(CString(fn).MakeLower());
+
+	if (OpenImageCheck(fn)) {
 
 		FILE *fp;
 		TCHAR path_fn[_MAX_PATH];
@@ -75,28 +114,58 @@ HBITMAP OpenImage(CString fn)
 
 		DWORD fs = ftell(fp);
 		rewind(fp);
-		HGLOBAL hG = ::GlobalAlloc(GMEM_MOVEABLE, fs);
-		fread((void*)hG, 1, fs, fp);
+
+		HBITMAP hB;
+
+		if (wcsstr(tmp_fn, L".webp") || wcsstr(tmp_fn, L".webpll")) {
+
+			void *data = malloc(fs);
+			fread(data, 1, fs, fp);
+
+			WebPDecoderConfig config;
+			WebPDecBuffer* const out_buf = &config.output;
+			WebPInitDecoderConfig(&config);
+			config.options.use_threads = 1;
+			WebPDecode((const uint8_t*)data, fs, &config);
+
+			int width = out_buf->width, height = out_buf->height, bit = (out_buf->colorspace == MODE_RGBA ? 32 : 24);
+			uint8_t *rgb = out_buf->u.RGBA.rgba;
+			size_t slen;
+			BYTE *pBits, *bmp = ConvertRGBToBMPBuffer((BYTE*)rgb, width, height, (long*)&slen);
+
+			BITMAPINFO bi = {{sizeof(BITMAPINFOHEADER), width, height, 1, bit, BI_RGB, 0, 0, 0, 0, 0}};
+			hB = CreateDIBSection(0, &bi, DIB_RGB_COLORS, (void**)&pBits, 0, 0);
+			memcpy(pBits, bmp, slen);
+
+			free(data);
+			WebPFreeDecBuffer(out_buf);
+		} else {
+
+			HGLOBAL hG = ::GlobalAlloc(GMEM_MOVEABLE, fs);
+			fread((void*)hG, 1, fs, fp);
+
+			IStream *s;
+			::CreateStreamOnHGlobal(hG, 1, &s);
+
+			ULONG_PTR gdiplusToken;
+			GdiplusStartupInput gdiplusStartupInput;
+			GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, 0);
+			Bitmap *bm = new Bitmap(s);
+			HBITMAP hBmp;
+			bm->GetHBITMAP(0, &hBmp);
+			delete bm;
+			GdiplusShutdown(gdiplusToken);
+
+			::GlobalFree(hG);
+			s->Release();
+			hB = (HBITMAP)CopyImage(hBmp, IMAGE_BITMAP, 0, 0, LR_COPYRETURNORG);
+		}
+
 		fclose(fp);
 
 		if (type) {
 			_tunlink(path_fn);
 		}
-
-		IStream *s;
-		::CreateStreamOnHGlobal(hG, 1, &s);
-
-		ULONG_PTR gdiplusToken;
-		GdiplusStartupInput gdiplusStartupInput;
-		GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, 0);
-		Bitmap *bm = Bitmap::FromStream(s);
-		HBITMAP hB;
-		bm->GetHBITMAP(0, &hB);
-		delete bm;
-		GdiplusShutdown(gdiplusToken);
-
-		::GlobalFree(hG);
-		s->Release();
 
 		return hB;
 	} else {

@@ -1,7 +1,7 @@
 /*
- * $Id: DIB.h 498 2012-06-05 23:09:29Z exodus8 $
+ * $Id$
  *
- * Adaptation for MPC-BE (C) 2012 Sergey "Exodus8" (rusguy6@gmail.com)
+ * Copyright (C) 2012 Sergey "Exodus8" (rusguy6@gmail.com)
  *
  * This file is part of MPC-BE.
  *

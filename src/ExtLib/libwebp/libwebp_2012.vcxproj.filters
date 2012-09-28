@@ -11,9 +11,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="utils\bit_writer.h">
-      <Filter>Header Files\utils</Filter>
-    </ClInclude>
     <ClInclude Include="dsp\dsp.h">
       <Filter>Header Files\dsp</Filter>
     </ClInclude>
@@ -23,15 +20,63 @@
     <ClInclude Include="enc\vp8enci.h">
       <Filter>Header Files\enc</Filter>
     </ClInclude>
-    <ClInclude Include="webp\types.h">
+    <ClInclude Include="utils\bit_reader.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\bit_writer.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="webp\decode.h">
       <Filter>Header Files\webp</Filter>
     </ClInclude>
     <ClInclude Include="webp\encode.h">
       <Filter>Header Files\webp</Filter>
     </ClInclude>
+    <ClInclude Include="webp\types.h">
+      <Filter>Header Files\webp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="dec\alpha_dec.c">
+      <Filter>Source Files\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="dec\buffer.c">
+      <Filter>Source Files\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="dec\frame_dec.c">
+      <Filter>Source Files\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="dec\idec.c">
+      <Filter>Source Files\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="dec\io.c">
+      <Filter>Source Files\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="dec\layer_dec.c">
+      <Filter>Source Files\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="dec\quant_dec.c">
+      <Filter>Source Files\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="dec\tree_dec.c">
+      <Filter>Source Files\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="dec\vp8.c">
+      <Filter>Source Files\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="dec\vp8l_dec.c">
+      <Filter>Source Files\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="dec\webp.c">
+      <Filter>Source Files\dec</Filter>
+    </ClCompile>
     <ClCompile Include="dsp\cpu.c">
+      <Filter>Source Files\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="dsp\dec.c">
+      <Filter>Source Files\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="dsp\dec_sse2.c">
       <Filter>Source Files\dsp</Filter>
     </ClCompile>
     <ClCompile Include="dsp\enc.c">
@@ -100,6 +145,9 @@
     <ClCompile Include="enc\webpenc.c">
       <Filter>Source Files\enc</Filter>
     </ClCompile>
+    <ClCompile Include="utils\bit_reader.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
     <ClCompile Include="utils\bit_writer.c">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
@@ -109,6 +157,9 @@
     <ClCompile Include="utils\filters.c">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
+    <ClCompile Include="utils\huffman.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
     <ClCompile Include="utils\huffman_encode.c">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
@@ -116,6 +167,9 @@
       <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="utils\rescaler.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\thread.c">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="utils\utils.c">

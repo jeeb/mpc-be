@@ -95,25 +95,33 @@ static int _strpos(char* h, char* n)
 	}
 }
 
-#define YOUTUBE_URL		_T("youtube.com/watch?")
-#define YOUTU_BE_URL	_T("youtu.be/")
+#define YOUTUBE_URL			_T("youtube.com/watch?")
+#define YOUTUBE_FULL_URL		_T("www.youtube.com/watch?v=")
+#define YOUTU_BE_URL			_T("youtu.be/")
+#define YOUTU_BE_FULL_URL		_T("www.youtu.be/")
 
-CString PlayerYouTube(CString fname, CString* out_title)
+static CString PlayerYouTube(CString fn, CString* out_title)
 {
 	if (out_title) {
 		*out_title = _T("");
 	}
 
-	CString tmp_fname(CString(fname).MakeLower());
+	CString tmp_fn(CString(fn).MakeLower());
 
-	if ((tmp_fname.Find(YOUTUBE_URL) != -1) || (tmp_fname.Find(YOUTU_BE_URL) != -1)) {
+	if ((tmp_fn.Find(YOUTUBE_URL) != -1) || (tmp_fn.Find(YOUTU_BE_URL) != -1)) {
+
+		if (tmp_fn.Find(YOUTU_BE_URL) != -1) {
+			fn.Replace(YOUTU_BE_FULL_URL, YOUTUBE_FULL_URL);
+			fn.Replace(YOUTU_BE_URL, YOUTUBE_FULL_URL);
+		}
+
 		char *out = NULL;
 
 		HINTERNET f, s = InternetOpen(0, 0, 0, 0, 0);
 
 		if (s) {
 
-			f = InternetOpenUrl(s, fname, 0, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE, 0);
+			f = InternetOpenUrl(s, fn, 0, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE, 0);
 
 			if (f) {
 
@@ -146,12 +154,12 @@ CString PlayerYouTube(CString fname, CString* out_title)
 				InternetCloseHandle(f);
 			} else {
 				InternetCloseHandle(s);
-				return fname;
+				return fn;
 			}
 
 			InternetCloseHandle(s);
 		} else {
-			return fname;
+			return fn;
 		}
 
 		// get name(title) for output filename
@@ -168,9 +176,9 @@ CString PlayerYouTube(CString fname, CString* out_title)
 				Title = CA2CT(title, CP_UTF8);
 
 				Title = Title.TrimLeft(_T(".")).TrimRight(_T("."));
+				Title.Replace(_T("|"), _T("-"));
 				Title.Replace(_T("&quot;"), _T("\""));
 				Title.Replace(_T("&#39;"), _T("\""));
-				Title.Replace(_T("|"), _T("-"));
 
 				free(title);
 			}
@@ -194,7 +202,7 @@ CString PlayerYouTube(CString fname, CString* out_title)
 				DWORD i = _strpos(out + k, "%26quality");
 				if (!i) {
 					free(out);
-					return fname;
+					return fn;
 				}
 
 				// skip webm format
@@ -247,7 +255,9 @@ CString PlayerYouTube(CString fname, CString* out_title)
 
 				// need for some url
 				str.Replace(_T("&sig="), _T("&signature="));
+
 				// add file name for future ...
+				Title.Replace(ext, _T(""));
 				str.Append(_T("&title=") + Title + ext);
 
 				if (out_title) {
@@ -258,10 +268,10 @@ CString PlayerYouTube(CString fname, CString* out_title)
 			} else {
 				free(out);
 
-				return fname;
+				return fn;
 			}
 		}
 	} else {
-		return fname;
+		return fn;
 	}
 }
