@@ -638,7 +638,7 @@ bool VDPixmapStretchBltBilinear_reference(const VDPixmap& dst, sint32 x1, sint32
 	void (*pVerticalFilter)(void *dstv, const void *src1v, const void *src2v, sint32 w, uint32 f);
 	int bpp;
 
-//#pragma vdpragma_TODO("fixme this is b0rken")
+#pragma vdpragma_TODO("fixme this is b0rken")
 	switch(src.format) {
 	case nsVDPixmap::kPixFormat_XRGB1555:
 		pHorizontalFilter = VDPixmapStretchBiH_XRGB1555_to_XRGB1555;
