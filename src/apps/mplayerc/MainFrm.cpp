@@ -12355,30 +12355,34 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 
 int SelectAudio(const CComPtr<IAMStreamSelect> &pSS)
 {
-	DWORD cStreams = 0;
-	if (pSS && SUCCEEDED(pSS->Count(&cStreams)) && cStreams > 0) {
+	AppSettings& s = AfxGetAppSettings();
 
-		CStringW alo = _T("[Forced],") + AfxGetAppSettings().strAudiosLanguageOrder + _T(",[Default]");
-		int tPos = 0;
-		CStringW lang = alo.Tokenize(_T(",; "), tPos);
-		while (tPos != -1) {
-			int ll = lang.GetLength();
-			for (int iIndex = 0; iIndex < (int)cStreams; iIndex++) {
-				WCHAR* pName = NULL;
-				if (FAILED(pSS->Info(iIndex, NULL, NULL, NULL, NULL, &pName, NULL, NULL))) {
-					continue;
-				}
-				CString name(pName);
-				name = name.Trim();
-				CoTaskMemFree(pName);
+	if (s.fUseInternalSelectTrackLogic) {
+		DWORD cStreams = 0;
+		if (pSS && SUCCEEDED(pSS->Count(&cStreams)) && cStreams > 0) {
 
-				if ((name.Left(ll).CompareNoCase(lang) == 0) || (name.Right(ll).CompareNoCase(lang) == 0)) {
-					return iIndex;
+			CStringW alo = _T("[Forced],") + s.strAudiosLanguageOrder + _T(",[Default]");
+			int tPos = 0;
+			CStringW lang = alo.Tokenize(_T(",; "), tPos);
+			while (tPos != -1) {
+				int ll = lang.GetLength();
+				for (int iIndex = 0; iIndex < (int)cStreams; iIndex++) {
+					WCHAR* pName = NULL;
+					if (FAILED(pSS->Info(iIndex, NULL, NULL, NULL, NULL, &pName, NULL, NULL))) {
+						continue;
+					}
+					CString name(pName);
+					name = name.Trim();
+					CoTaskMemFree(pName);
+
+					if ((name.Left(ll).CompareNoCase(lang) == 0) || (name.Right(ll).CompareNoCase(lang) == 0)) {
+						return iIndex;
+					}
 				}
+				lang = alo.Tokenize(_T(",; "), tPos);
 			}
-			lang = alo.Tokenize(_T(",; "), tPos);
+			return 0;
 		}
-		return 0;
 	}
 
 	return 0;
@@ -12410,16 +12414,19 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 {
 	if (m_pCAP && (!m_fAudioOnly || m_fRealMediaGraph)) {
 
+		AppSettings& s = AfxGetAppSettings();
+
 		SubStreams substream;
 		subarray.RemoveAll();
 		int defsub			= 0;
-		int checkedsplsub	= -1;
+		int checkedsplsub	= 0;
+		int subIndex		= -1;
 		int iNum			= 0;
 		cntintsub			= 0;
 
 		CComQIPtr<IAMStreamSelect> pSSs = FindSourceSelectableFilter();
 		if (!pSSs) pSSs = pGB;
-		if (pSSs && !AfxGetAppSettings().fDisableInternalSubtitles) {
+		if (pSSs && !s.fDisableInternalSubtitles) {
 
 			DWORD cStreams;
 			if (!FAILED(pSSs->Count(&cStreams))) {
@@ -12436,6 +12443,8 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 
 					if (dwGroup == 2) {
 
+						subIndex++;
+
 						CString lang;
 						if (lcid == 0) {
 							lang = pszName;
@@ -12451,7 +12460,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 
 						UINT flags = MF_BYCOMMAND|MF_STRING|MF_ENABLED;
 						if (dwFlags) {
-							checkedsplsub = i;
+							checkedsplsub = subIndex;
 						}
 						cntintsub++;
 						substream.Extsub	= false;
@@ -12588,21 +12597,26 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			LoadSubtitle(pOMD->subs.GetNext(pos));
 		}
 			
-		int cnt = subarray.GetCount();
-		defsub = GetSubSelIdx();
+		if (!s.fUseInternalSelectTrackLogic) {
+			OnNavMixStreamSubtitleSelectSubMenu(checkedsplsub, 2);
+		} else {
 
-		if (FindSourceSelectableFilter() && AfxGetAppSettings().fDisableInternalSubtitles) {
-			defsub++;
-		}
+			int cnt = subarray.GetCount();
+			defsub = GetSubSelIdx();
 
-		if (AfxGetAppSettings().fEnableSubtitles && m_pSubStreams.GetCount() > 0) {
-			CComPtr<ISubStream> pSub = m_pSubStreams.GetHead();
-			SetSubtitle(pSub);
-		}
+			if (FindSourceSelectableFilter() && s.fDisableInternalSubtitles) {
+				defsub++;
+			}
 
-		if (cnt > 0) {
-			UINT udefsub = defsub;
-			OnNavMixStreamSubtitleSelectSubMenu(udefsub, 2);
+			if (s.fEnableSubtitles && m_pSubStreams.GetCount() > 0) {
+				CComPtr<ISubStream> pSub = m_pSubStreams.GetHead();
+				SetSubtitle(pSub);
+			}
+
+			if (cnt > 0) {
+				UINT udefsub = defsub;
+				OnNavMixStreamSubtitleSelectSubMenu(udefsub, 2);
+			}
 		}
 	}
 

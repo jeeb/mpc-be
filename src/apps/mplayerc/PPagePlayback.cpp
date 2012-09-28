@@ -48,6 +48,7 @@ CPPagePlayback::CPPagePlayback()
 	, m_subtitlesLanguageOrder(_T(""))
 	, m_audiosLanguageOrder(_T(""))
 	, m_nVolumeStep(1)
+	, m_fUseInternalSelectTrackLogic(TRUE)
 {
 }
 
@@ -79,6 +80,7 @@ void CPPagePlayback::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBOVOLUME, m_nVolumeStepCtrl);
 	DDX_CBIndex(pDX, IDC_COMBOSPEEDSTEP, m_nSpeedStep);
 	DDX_Control(pDX, IDC_COMBOSPEEDSTEP, m_nSpeedStepCtrl);
+	DDX_Check(pDX, IDC_CHECK4, m_fUseInternalSelectTrackLogic);
 }
 
 BEGIN_MESSAGE_MAP(CPPagePlayback, CPPageBase)
@@ -87,7 +89,8 @@ BEGIN_MESSAGE_MAP(CPPagePlayback, CPPageBase)
 	ON_UPDATE_COMMAND_UI(IDC_EDIT1, OnUpdateLoopNum)
 	ON_UPDATE_COMMAND_UI(IDC_STATIC1, OnUpdateLoopNum)
 	ON_UPDATE_COMMAND_UI(IDC_COMBO1, OnUpdateAutoZoomCombo)
-
+	ON_UPDATE_COMMAND_UI(IDC_EDIT2, OnUpdateTrackOrder)
+	ON_UPDATE_COMMAND_UI(IDC_EDIT3, OnUpdateTrackOrder)
 	ON_STN_DBLCLK(IDC_STATIC_BALANCE, OnBalanceTextDblClk)
 	ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
 END_MESSAGE_MAP()
@@ -142,6 +145,15 @@ BOOL CPPagePlayback::OnInitDialog()
 
 	m_nSpeedStep = s.nSpeedStep;
 
+	m_fUseInternalSelectTrackLogic = s.fUseInternalSelectTrackLogic;
+
+	CString dlgText;
+	GetDlgItemText(IDC_STATIC2, dlgText);
+	if (!dlgText.IsEmpty()) {
+		dlgText = _T("     ") + dlgText;
+		SetDlgItemText(IDC_STATIC2, dlgText);
+	}
+
 	UpdateData(FALSE);
 
 	return TRUE;
@@ -172,7 +184,7 @@ BOOL CPPagePlayback::OnApply()
 		((CMainFrame*)GetParentFrame())->OnPlayResetRate();
 	}
 	s.nSpeedStep = m_nSpeedStep;
-
+	s.fUseInternalSelectTrackLogic = !!m_fUseInternalSelectTrackLogic;
 
 	return __super::OnApply();
 }
@@ -205,6 +217,11 @@ void CPPagePlayback::OnUpdateLoopNum(CCmdUI* pCmdUI)
 void CPPagePlayback::OnUpdateAutoZoomCombo(CCmdUI* pCmdUI)
 {
 	pCmdUI->Enable(!!IsDlgButtonChecked(IDC_CHECK5));
+}
+
+void CPPagePlayback::OnUpdateTrackOrder(CCmdUI* pCmdUI)
+{
+	pCmdUI->Enable(!!IsDlgButtonChecked(IDC_CHECK4));
 }
 
 void CPPagePlayback::OnBalanceTextDblClk()

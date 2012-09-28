@@ -59,6 +59,7 @@ public:
 	CComboBox m_nVolumeStepCtrl;
 	int m_nSpeedStep;
 	CComboBox m_nSpeedStepCtrl;
+	BOOL m_fUseInternalSelectTrackLogic;
 
 	enum { IDD = IDD_PPAGEPLAYBACK };
 
@@ -74,6 +75,7 @@ public:
 	afx_msg void OnBnClickedRadio12(UINT nID);
 	afx_msg void OnUpdateLoopNum(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateAutoZoomCombo(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateTrackOrder(CCmdUI* pCmdUI);
 
 	afx_msg void OnBalanceTextDblClk();
 	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult);

@@ -398,6 +398,7 @@ public:
 	int				iZoomLevel;
 	CStringW		strSubtitlesLanguageOrder;
 	CStringW		strAudiosLanguageOrder;
+	bool			fUseInternalSelectTrackLogic;
 	bool			fEnableWorkerThreadForOpening;
 	bool			fReportFailedPins;
 	bool			fAutoloadAudio;

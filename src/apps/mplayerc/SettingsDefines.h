@@ -135,6 +135,7 @@
 #define IDS_RS_AUTOLOADSUBTITLES			_T("AutoloadSubtitles")
 #define IDS_RS_SUBTITLESLANGORDER			_T("SubtitlesLanguageOrder")
 #define IDS_RS_AUDIOSLANGORDER				_T("AudiosLanguageOrder")
+#define IDS_RS_INTERNALSELECTTRACKLOGIC		_T("UseInternalSelectTrackLogic")
 #define IDS_RS_BLOCKVSFILTER				_T("BlockVSFilter")
 #define IDS_RS_SEARCHKEYFRAMES				_T("SearchKeyframes")
 #define IDS_RS_ACCELTBL						_T("AccelTbl")
