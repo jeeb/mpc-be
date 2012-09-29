@@ -102,10 +102,6 @@ static int _strpos(char* h, char* n)
 
 static CString PlayerYouTube(CString fn, CString* out_title)
 {
-	if (out_title) {
-		*out_title = _T("");
-	}
-
 	CString tmp_fn(CString(fn).MakeLower());
 
 	if ((tmp_fn.Find(YOUTUBE_URL) != -1) || (tmp_fn.Find(YOUTU_BE_URL) != -1)) {
@@ -113,6 +109,10 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 		if (tmp_fn.Find(YOUTU_BE_URL) != -1) {
 			fn.Replace(YOUTU_BE_FULL_URL, YOUTUBE_FULL_URL);
 			fn.Replace(YOUTU_BE_URL, YOUTUBE_FULL_URL);
+		}
+
+		if (out_title) {
+			*out_title = _T("");
 		}
 
 		char *out = NULL;

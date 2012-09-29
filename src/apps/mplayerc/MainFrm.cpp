@@ -11381,7 +11381,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		}
 
 		if (hr && FAILED(hr) && !extimage) {
-			m_strTitleAlt = _T("");
 
 			if (fFirst) {
 				if (s.fReportFailedPins) {
@@ -11460,7 +11459,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		}
 
 		if (fFirst) {
-			pOFD->title = fn;
+			pOFD->title = (m_strTitleAlt == _T("") ? fn : m_strTitleAlt);
 		}
 
 		fFirst = false;
