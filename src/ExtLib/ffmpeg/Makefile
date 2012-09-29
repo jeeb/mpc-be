@@ -3,7 +3,7 @@ CC = gcc.exe
 BIN_DIR  = ../../../bin
 ZLIB_DIR = ../zlib
 OPENJPEG_DIR = ../openjpeg
-OPUS_DIR = ../../../include/opus
+OPUS_DIR = ../opus
 
 ifeq ($(64BIT),yes)
     MY_ARCH = x64
