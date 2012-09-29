@@ -31,10 +31,10 @@ static void BMPDIB(LPCTSTR fn, BYTE* pData)
 	_tfopen_s(&fp, fn, _T("wb"));
 	if (fp) {
 		BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
-		bih->biBitCount = 24;
 
-		int width = bih->biWidth, height = abs(bih->biHeight), sih = sizeof(BITMAPINFOHEADER);
-		int line, stride = width * 3, len = width * height * 3;
+		int width = bih->biWidth, height = abs(bih->biHeight), bit = 24;
+		int stride = (width * bit + 31) / 32 * 4, sih = sizeof(BITMAPINFOHEADER);
+		int line, len = stride * height;
 
 		BYTE* rgb = (BYTE*)malloc(len);
 		BYTE *p, *src = pData + sih;
@@ -55,8 +55,19 @@ static void BMPDIB(LPCTSTR fn, BYTE* pData)
 		bfh.bfSize = bfh.bfOffBits + len;
 		bfh.bfReserved1 = bfh.bfReserved2 = 0;
 
+		BITMAPINFOHEADER header;
+		header.biSize = sih;
+		header.biWidth = width;
+		header.biHeight = height;
+		header.biPlanes = 1;
+		header.biBitCount = bit;
+		header.biCompression = BI_RGB;
+		header.biSizeImage = 0;
+		header.biXPelsPerMeter = header.biYPelsPerMeter = 0;
+		header.biClrUsed = header.biClrImportant = 0;
+
 		fwrite(&bfh, 1, sizeof(bfh), fp);
-		fwrite(bih, 1, sih, fp);
+		fwrite(&header, 1, sizeof(header), fp);
 		fwrite(rgb, 1, len, fp);
 
 		fclose(fp);
