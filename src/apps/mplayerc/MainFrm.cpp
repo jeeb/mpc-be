@@ -716,8 +716,16 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// Should never be RTLed
 	m_wndView.ModifyStyleEx(WS_EX_LAYOUTRTL, WS_EX_NOINHERITLAYOUT);
 
-	// static bars
+	// Create Preview Window
+	DWORD style = WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS;
+	if (!m_wndView2.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL, style, CRect(0, 0, 160, 109), this, 0, NULL)) {
+		TRACE(_T("Failed to create Preview Window\n"));
+		m_wndView.DestroyWindow();
+	} else {
+		m_wndView2.ShowWindow(SW_HIDE);
+	}
 
+	// static bars
 	BOOL bResult = m_wndStatusBar.Create(this);
 	if (bResult) {
 		bResult = m_wndStatsBar.Create(this);
@@ -926,6 +934,8 @@ void CMainFrame::OnDestroy()
 		}
 		delete m_pFullscreenWnd;
 	}
+
+	m_wndView2.DestroyWindow();
 
 	__super::OnDestroy();
 }
@@ -1384,10 +1394,6 @@ void CMainFrame::OnMove(int x, int y)
 	GetWindowPlacement(&wp);
 	if (!m_fFirstFSAfterLaunchOnFS && !m_fFullScreen && wp.flags != WPF_RESTORETOMAXIMIZED && wp.showCmd != SW_SHOWMINIMIZED) {
 		GetWindowRect(AfxGetAppSettings().rcLastWindowPos);
-	}
-
-	if (b_UseSmartSeek && m_wndView2.IsWindowVisible()) {
-		m_wndView2.Invalidate();
 	}
 }
 
@@ -11039,10 +11045,6 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 
 	pGB2 = NULL;
 
-	if (m_wndView2) {
-		m_wndView2.DestroyWindow();
-	}
-
 	if (s.IsD3DFullscreen() &&
 			((s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS) ||
 			 (s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM) ||
@@ -11060,16 +11062,6 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 			CString fn = p->fns.GetHead();
 			if (!fn.IsEmpty() && (fn.Find(_T("://")) >= 0)) { // disable SmartSeek for streaming data.
 				b_UseSmartSeek = false;
-			}
-		}
-
-		if (b_UseSmartSeek) {
-			DWORD style = WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS;
-			if (!m_wndView2.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL, style, CRect(0, 0, 160, 109), this, 0, NULL)) {
-				TRACE(_T("Failed to create Preview Window\n"));
-				b_UseSmartSeek = false;
-			} else {
-				m_wndView2.ShowWindow(SW_HIDE);
 			}
 		}
 	}
@@ -11228,7 +11220,7 @@ HRESULT CMainFrame::PreviewWindowHide()
 {
 	HRESULT hr = S_OK;
 
-	if (!m_wndView2) {
+	if (!(b_UseSmartSeek && m_wndView2)) {
 		return E_FAIL;
 	}
 
@@ -11259,7 +11251,7 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 {
 	HRESULT hr = S_OK;
 
-	if (!AfxGetAppSettings().fSmartSeek || !m_wndView2 || m_fAudioOnly || m_pFullscreenWnd->IsWindow()) {
+	if (!b_UseSmartSeek || !AfxGetAppSettings().fSmartSeek || !m_wndView2 || m_fAudioOnly || m_pFullscreenWnd->IsWindow()) {
 		return E_FAIL;
 	}
 
@@ -11329,7 +11321,7 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 
 		pDVDC2->Pause(FALSE);
 		pMC2->Run();
-	} else if (GetPlaybackMode() == PM_FILE) {
+	} else if (GetPlaybackMode() == PM_FILE && pMS2) {
 		hr = pMS2->SetPositions(&rtCur2, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
 	}
 
@@ -11669,9 +11661,11 @@ CString CMainFrame::OpenDVD(OpenDVDData* pODD)
 		}
 	}
 
-	if (SUCCEEDED(hr) && b_UseSmartSeek)
-		if (FAILED(hr = pGB2->RenderFile(CStringW(pODD->path), NULL)))
+	if (SUCCEEDED(hr) && b_UseSmartSeek) {
+		if (FAILED(hr = pGB2->RenderFile(CStringW(pODD->path), NULL))) {
 			b_UseSmartSeek = false;
+		}
+	}
 
 	BeginEnumFilters(pGB, pEF, pBF) {
 		if ((pDVDC = pBF) && (pDVDI = pBF)) {
@@ -11680,8 +11674,7 @@ CString CMainFrame::OpenDVD(OpenDVDData* pODD)
 	}
 	EndEnumFilters;
 
-	if (b_UseSmartSeek)
-	{
+	if (b_UseSmartSeek) {
 		BeginEnumFilters(pGB2, pEF, pBF) {
 			if ((pDVDC2 = pBF) && (pDVDI2 = pBF)) {
 				break;
@@ -13071,7 +13064,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 	EndWaitCursor();
 
-	if (b_UseSmartSeek) {
+	if (b_UseSmartSeek && pMC2) {
 		pMC2->Pause();
 	}
 
@@ -17735,7 +17728,12 @@ CString CMainFrame::FillMessage()
 
 bool CMainFrame::CanPreviewUse()
 {
-	return (!m_fAudioOnly && AfxGetAppSettings().fSmartSeek && m_wndView2 && (GetPlaybackMode() == PM_DVD || GetPlaybackMode() == PM_FILE)) ? 1 : 0;
+	return ((b_UseSmartSeek
+			&& m_iMediaLoadState == MLS_LOADED)
+			&& (GetPlaybackMode() == PM_DVD || GetPlaybackMode() == PM_FILE)
+			&& !m_fAudioOnly
+			&& AfxGetAppSettings().fSmartSeek
+			&& m_wndView2) ? 1 : 0;
 }
 
 void CMainFrame::CreateChapterTimeArray()
