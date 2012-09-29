@@ -715,7 +715,6 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId)
 		m_FFAudioDec.SetDRC(GetDynamicRangeControl());
 	}
 
-#if INTERNAL_DECODER_REALAUDIO
 	// RealAudio
 	CPaddedArray buffRA(FF_INPUT_BUFFER_PADDING_SIZE);
 	bool isRA = false;
@@ -728,7 +727,6 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId)
 			return S_OK;
 		}
 	}
-#endif
 
 	while (p < end) {
 		int size = 0;
@@ -749,12 +747,10 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId)
 		p += size;
 	}
 
-#if INTERNAL_DECODER_REALAUDIO
 	if (isRA) { // RealAudio
 		p = base + buffRA.GetCount();
 		end = base + m_buff.GetCount();
 	}
-#endif
 
 	memmove(base, p, end - p);
 	m_buff.SetCount(end - p);
