@@ -288,6 +288,8 @@ var
   strVerb, sVBSFile: String;
   objShell, colVerbs, oFile: Variant;
 begin
+  if (GetWindowsVersion shr 24 < 6) or ((GetWindowsVersion shr 24 = 6) and ((GetWindowsVersion shr 16) and $FF < 1)) then Exit; // Windows 7 check
+
   if not FileExists(Filename) then Exit;
   
   if IsPin then Res := 5386 else Res := 5387;
