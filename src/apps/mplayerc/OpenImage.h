@@ -61,6 +61,7 @@ static bool OpenImageCheck(CString fn)
 		|| wcsstr(tmp_fn, L".tif")
 		|| wcsstr(tmp_fn, L".tiff")
 		|| wcsstr(tmp_fn, L".emf")
+		|| wcsstr(tmp_fn, L".ico")
 		|| wcsstr(tmp_fn, L".webp")
 		|| wcsstr(tmp_fn, L".webpll")) {
 		return 1;
@@ -75,6 +76,7 @@ static HBITMAP OpenImage(CString fn)
 
 	if (OpenImageCheck(fn)) {
 
+		HBITMAP hB;
 		FILE *fp;
 		TCHAR path_fn[_MAX_PATH];
 		int type = 0;
@@ -114,13 +116,15 @@ static HBITMAP OpenImage(CString fn)
 
 		DWORD fs = ftell(fp);
 		rewind(fp);
+		void *data = malloc(fs);
+		fread(data, 1, fs, fp);
+		fclose(fp);
 
-		HBITMAP hB;
+		if (type) {
+			_tunlink(path_fn);
+		}
 
 		if (wcsstr(tmp_fn, L".webp") || wcsstr(tmp_fn, L".webpll")) {
-
-			void *data = malloc(fs);
-			fread(data, 1, fs, fp);
 
 			WebPDecoderConfig config;
 			WebPDecBuffer* const out_buf = &config.output;
@@ -137,12 +141,12 @@ static HBITMAP OpenImage(CString fn)
 			hB = CreateDIBSection(0, &bi, DIB_RGB_COLORS, (void**)&pBits, 0, 0);
 			memcpy(pBits, bmp, slen);
 
-			free(data);
 			WebPFreeDecBuffer(out_buf);
 		} else {
 
 			HGLOBAL hG = ::GlobalAlloc(GMEM_MOVEABLE, fs);
-			fread((void*)hG, 1, fs, fp);
+			LPVOID lpBits = ::GlobalLock(hG);
+			memcpy(lpBits, data, fs);
 
 			IStream *s;
 			::CreateStreamOnHGlobal(hG, 1, &s);
@@ -151,21 +155,16 @@ static HBITMAP OpenImage(CString fn)
 			GdiplusStartupInput gdiplusStartupInput;
 			GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, 0);
 			Bitmap *bm = new Bitmap(s);
-			HBITMAP hBmp;
-			bm->GetHBITMAP(0, &hBmp);
+			bm->GetHBITMAP(0, &hB);
 			delete bm;
 			GdiplusShutdown(gdiplusToken);
 
-			::GlobalFree(hG);
 			s->Release();
-			hB = (HBITMAP)CopyImage(hBmp, IMAGE_BITMAP, 0, 0, LR_COPYRETURNORG);
+			::GlobalUnlock(hG);
+			::GlobalFree(hG);
 		}
 
-		fclose(fp);
-
-		if (type) {
-			_tunlink(path_fn);
-		}
+		free(data);
 
 		return hB;
 	} else {

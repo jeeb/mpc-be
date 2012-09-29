@@ -34,9 +34,9 @@ static void BMPDIB(LPCTSTR fn, BYTE* pData)
 		bih->biBitCount = 24;
 
 		int width = bih->biWidth, height = abs(bih->biHeight), sih = sizeof(BITMAPINFOHEADER);
-		int line, stride = width * 3 * sizeof(BYTE), len = width * height * 3;
+		int line, stride = width * 3, len = width * height * 3;
 
-		BYTE* rgb = (BYTE*)malloc(stride * height);
+		BYTE* rgb = (BYTE*)malloc(len);
 		BYTE *p, *src = pData + sih;
 
 		for(int y = 0; y < height; y++) {

@@ -367,6 +367,8 @@ void CMediaFormats::GetFilter(CString& filter, CAtlArray<CString>& mask)
 		filter	+= strTemp;
 	}
 
+	mask[0]	+= _T("*.bmp;*.jpg;*.jpeg;*.png;*.gif;*.tif;*.tiff;*.emf;*.ico;*.webp;*.webpll;");
+
 	mask[0].TrimRight(_T(';'));
 	filter.TrimRight(_T(';'));
 	filter += _T("|");
