@@ -406,7 +406,8 @@ static void decode_ac_filter(WmallDecodeCtx *s)
     s->acfilter_scaling = get_bits(&s->gb, 4);
 
     for (i = 0; i < s->acfilter_order; i++)
-        s->acfilter_coeffs[i] = (s->acfilter_scaling ? get_bits(&s->gb, s->acfilter_scaling) : 0) + 1;
+        s->acfilter_coeffs[i] = (s->acfilter_scaling ?
+                                 get_bits(&s->gb, s->acfilter_scaling) : 0) + 1;
 }
 
 static void decode_mclms(WmallDecodeCtx *s)
@@ -1228,8 +1229,8 @@ static int decode_packet(AVCodecContext *avctx, void *data, int *got_frame_ptr,
             /* Reset number of saved bits so that the decoder does not start
              * to decode incomplete frames in the s->len_prefix == 0 case. */
             s->num_saved_bits = 0;
-            init_put_bits(&s->pb, s->frame_data, MAX_FRAMESIZE);
             s->packet_loss    = 0;
+            init_put_bits(&s->pb, s->frame_data, MAX_FRAMESIZE);
         }
 
     } else {
@@ -1278,11 +1279,11 @@ static void flush(AVCodecContext *avctx)
     s->packet_loss       = 1;
     s->packet_done       = 0;
     s->num_saved_bits    = 0;
-    init_put_bits(&s->pb, s->frame_data, MAX_FRAMESIZE);
     s->frame_offset      = 0;
     s->next_packet_start = 0;
     s->cdlms[0][0].order = 0;
     s->frame.nb_samples  = 0;
+    init_put_bits(&s->pb, s->frame_data, MAX_FRAMESIZE);
 }
 
 AVCodec ff_wmalossless_decoder = {
