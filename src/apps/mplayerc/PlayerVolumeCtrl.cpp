@@ -389,11 +389,17 @@ BOOL CVolumeCtrl::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 	CString str;
 	int nVolume = GetPos();
 
+	str.AppendFormat(_T("%d%%"), nVolume);
+
 	if (AfxGetAppSettings().fMute) {
-		nVolume = 0;
+		CString no_sound_str = ResStr(ID_VOLUME_MUTE_DISABLED);
+		int i = no_sound_str.Find('\n');
+		if (i > 0) {
+			no_sound_str = no_sound_str.Left(i);
+		}
+		str.AppendFormat(_T(" [%ws]"), no_sound_str);
 	}
 
-	str.AppendFormat(_T("%d%%"), nVolume);
 	_tcscpy_s(pTTT->szText, str);
 	pTTT->hinst = NULL;
 
