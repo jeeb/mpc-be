@@ -199,23 +199,19 @@ DWORD CAsyncUrlReader::ThreadProc()
 
 		TCHAR path[_MAX_PATH], fn[_MAX_PATH];
 		CFile fout;
-		if (GetTempPath(MAX_PATH, path) && GetTempFileName(path, _T("mpc_http"), 0, fn)
-				&& fout.Open(fn, modeCreate|modeWrite|shareDenyWrite|typeBinary)) {
+
+		if (GetTempPath(_MAX_PATH, path) && GetTempFileName(path, _T("mpc_http"), 0, fn) && fout.Open(fn, modeCreate|modeWrite|shareDenyWrite|typeBinary)) {
+
 			m_fn = fn;
-
-			char buff[1024];
-			int len = fin->Read(buff, sizeof(buff));
-			if (len > 0) {
-				fout.Write(buff, len);
-			}
-
 			Reply(S_OK);
 
+			char buff[4096];
 			while (!CheckRequest(&cmd)) {
 				int len = fin->Read(buff, sizeof(buff));
-				if (len > 0) {
-					fout.Write(buff, len);
+				if (!len) {
+					break;
 				}
+				fout.Write(buff, len);
 			}
 		} else {
 			Reply((DWORD)E_FAIL);
@@ -227,13 +223,9 @@ DWORD CAsyncUrlReader::ThreadProc()
 		Reply((DWORD)E_FAIL);
 	}
 
-	//
-
 	cmd = GetRequest();
 	ASSERT(cmd == CMD_EXIT);
 	Reply(S_OK);
-
-	//
 
 	m_hThread = NULL;
 
