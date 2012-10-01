@@ -420,6 +420,8 @@ CString CMediaTypeEx::GetAudioCodecName(const GUID& subtype, WORD wFormatTag)
 			str = _T("AMR");
 		} else if (subtype == MEDIASUBTYPE_OPUS) {
 			str += _T("Opus");
+		} else if (subtype == MEDIASUBTYPE_BINKA_DCT) {
+			str += _T("BINK DCT");
 		} else {
 			str.Format(_T("0x%04x"), wFormatTag);
 		}
