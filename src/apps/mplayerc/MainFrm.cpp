@@ -922,7 +922,7 @@ void CMainFrame::OnDestroy()
 	if ( m_pGraphThread ) {
 		CAMEvent e;
 		m_pGraphThread->PostThreadMessage( CGraphThread::TM_EXIT, 0, (LPARAM)&e );
-		if ( !e.Wait(5000) ) {
+		if (!e.Wait(5000)) {
 			TRACE(_T("ERROR: Must call TerminateThread() on CMainFrame::m_pGraphThread->m_hThread\n"));
 			TerminateThread( m_pGraphThread->m_hThread, (DWORD)-1 );
 		}
@@ -2549,6 +2549,8 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 						}
 
 						if (pDVDI && SUCCEEDED (pDVDI->GetDiscID (NULL, &llDVDGuid))) {
+							m_fValidDVDOpen = true;
+
 							if ( s.fShowDebugInfo ) {
 								m_OSD.DebugMessage(_T("DVD Title: %d"), s.lDVDTitle);
 							}
@@ -2649,7 +2651,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 									m_iDVDTitle = DvdPos->lTitle;
 								}
 							} else if (s.fStartMainTitle){
-								pDVDC->ShowMenu((DVD_MENU_ID)2, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+								pDVDC->ShowMenu(DVD_MENU_Title, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 							}
 							AppSettings& s = AfxGetAppSettings();
 							if (s.fRememberZoomLevel && !m_fFullScreen && !s.IsD3DFullscreen()) { // Hack to the normal initial zoom for DVD + DXVA ...
@@ -2674,11 +2676,17 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 						if ( s.fShowDebugInfo ) {
 							m_OSD.DebugMessage(_T("%s"), Domain);
 						}
-						DVD_POSITION*	DvdPos;
+						DVD_POSITION* DvdPos;
 						DvdPos = s.CurrentDVDPosition();
 						if (DvdPos) {
 							DvdPos->lTitle = m_iDVDTitle;
 						}
+
+						if (!m_fValidDVDOpen) {
+							m_fValidDVDOpen = true;
+							pDVDC->ShowMenu(DVD_MENU_Title, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+						}
+
 						break;
 					case DVD_DOMAIN_Stop:
 						Domain = ResStr(IDS_AG_STOP);
@@ -12716,6 +12724,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 	SetDwmPreview(FALSE);
 
+	m_fValidDVDOpen = false;
+
 	OpenFileData *pFileData = dynamic_cast<OpenFileData *>(pOMD.m_p);
 	OpenDVDData* pDVDData = dynamic_cast<OpenDVDData*>(pOMD.m_p);
 	OpenDeviceData* pDeviceData = dynamic_cast<OpenDeviceData*>(pOMD.m_p);
@@ -16103,6 +16113,12 @@ void CMainFrame::CloseMedia()
 		CAMEvent e;
 		m_pGraphThread->PostThreadMessage(CGraphThread::TM_CLOSE, 0, (LPARAM)&e);
 		e.Wait(); // either opening or closing has to be blocked to prevent reentering them, closing is the better choice
+		/*
+		//TODO - test with madVR, CAMMsgEvent::WaitMsg() - allow SENT messages to be processed while we wait
+		CAMMsgEvent e;
+		m_pGraphThread->PostThreadMessage(CGraphThread::TM_CLOSE, 0, (LPARAM)&e);
+		e.WaitMsg();
+		*/
 	} else {
 		CloseMediaPrivate();
 	}

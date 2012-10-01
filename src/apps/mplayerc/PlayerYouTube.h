@@ -24,66 +24,6 @@
 
 #include <afxinet.h>
 
-static int _HexPairValue(const char* code)
-{
-	int value = 0;
-	const char* pch = code;
-
-	for (;;) {
-		int digit = *pch++;
-
-		if (digit >= '0' && digit <= '9') {
-			value += digit - '0';
-		} else if (digit >= 'A' && digit <= 'F') {
-			value += digit - 'A' + 10;
-		} else if (digit >= 'a' && digit <= 'f') {
-			value += digit - 'a' + 10;
-		} else {
-			return -1;
-		}
-
-		if (pch == code + 2) {
-			return value;
-		}
-
-		value <<= 4;
-	}
-}
-
-static int _UrlDecode(const char* source, char* dest)
-{
-	char* start = dest;
-
-	while (*source) {
-		switch (*source)
-		{
-		case '+':
-			*(dest++) = ' ';
-			break;
-		case '%':
-			if (source[1] && source[2]) {
-				int value = _HexPairValue(source + 1);
-
-				if (value >= 0) {
-					*(dest++) = value;
-					source += 2;
-				} else {
-					*dest++ = '?';
-				}
-			} else {
-				*dest++ = '?';
-			}
-			break;
-		default:
-			*dest++ = *source;
-		}
-		source++;
-	}
-	*dest = 0;
-
-	return dest - start;
-}
-
 static int _strpos(char* h, char* n)
 {
 	char* p = strstr(h, n);
@@ -96,9 +36,9 @@ static int _strpos(char* h, char* n)
 }
 
 #define YOUTUBE_URL			_T("youtube.com/watch?")
-#define YOUTUBE_FULL_URL		_T("www.youtube.com/watch?v=")
-#define YOUTU_BE_URL			_T("youtu.be/")
-#define YOUTU_BE_FULL_URL		_T("www.youtu.be/")
+#define YOUTUBE_FULL_URL	_T("www.youtube.com/watch?v=")
+#define YOUTU_BE_URL		_T("youtu.be/")
+#define YOUTU_BE_FULL_URL	_T("www.youtu.be/")
 
 static CString PlayerYouTube(CString fn, CString* out_title)
 {
@@ -178,6 +118,7 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 				Title = Title.TrimLeft(_T(".")).TrimRight(_T("."));
 				Title.Replace(_T("|"), _T("-"));
 				Title.Replace(_T("&quot;"), _T("\""));
+				Title.Replace(_T("&amp;"), _T("&"));
 				Title.Replace(_T("&#39;"), _T("\""));
 
 				free(title);
@@ -243,10 +184,7 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 
 				memcpy(str1, out + k, i);
 
-				_UrlDecode(str1, str2);
-				_UrlDecode(str2, str1);
-
-				CString str(str1);
+				CString str = UTF8To16(UrlDecode(UrlDecode(CStringA(str1))));
 
 				free(str1);
 				free(str2);

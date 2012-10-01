@@ -1074,7 +1074,9 @@ protected:
 	DWORD m_nMenuHideTick;
 	UINT m_nSeekDirection;
 
-	int previous_renderer; // MadVR + DVD fix.
+	int		previous_renderer; // MadVR + DVD fix.
+
+	bool	m_fValidDVDOpen;
 
 public:
 	afx_msg UINT OnPowerBroadcast(UINT nPowerEvent, UINT nEventData);
