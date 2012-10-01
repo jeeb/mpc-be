@@ -1315,7 +1315,7 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, int size, MPCSampleFormat sfmt, DWOR
 	CComPtr<IMediaSample> pOut;
 	BYTE* pDataOut = NULL;
 	if (FAILED(GetDeliveryBuffer(&pOut, &pDataOut))) {
-		return E_FAIL;
+		goto fail;
 	}
 
 	if (hr == S_OK) {
@@ -1414,7 +1414,7 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, int size, MPCSampleFormat sfmt, DWOR
 				}
 				break;
 			default:
-				return E_FAIL;
+				goto fail;
 		}
 	}
 
@@ -1424,6 +1424,14 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, int size, MPCSampleFormat sfmt, DWOR
 	}
 
 	return m_pOutput->Deliver(pOut);
+
+fail:
+	if (pDataMix) {
+		pDataIn = NULL;
+		delete [] pDataMix;
+	}
+
+	return E_FAIL;
 }
 
 HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, int size, int sample_rate, int samples, BYTE type)
