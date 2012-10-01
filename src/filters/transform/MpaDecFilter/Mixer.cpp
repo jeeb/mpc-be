@@ -38,7 +38,11 @@ CMixer::CMixer()
 
 void CMixer::Reset()
 {
-	avresample_free(&m_pAVRCxt);
+	if (m_pAVRCxt) {
+		avresample_close(m_pAVRCxt);
+		avresample_free(&m_pAVRCxt);
+		m_pAVRCxt = NULL;
+	}
 }
 
 HRESULT CMixer::Mixing(float* pOutput, WORD out_ch, DWORD out_layout, BYTE* pInput, int samples, WORD in_ch, DWORD in_layout, enum AVSampleFormat in_sf)
@@ -106,7 +110,7 @@ HRESULT CMixer::Mixing(float* pOutput, WORD out_ch, DWORD out_layout, BYTE* pInp
 			if (ret < 0) {
 				TRACE(_T("avresample_build_matrix failed\n"));
 				av_free(matrix_dbl);
-				avresample_free(&m_pAVRCxt);
+				Reset();
 				return S_FALSE;
 			}
 		}
@@ -129,7 +133,7 @@ HRESULT CMixer::Mixing(float* pOutput, WORD out_ch, DWORD out_layout, BYTE* pInp
 		av_free(matrix_dbl);
 		if (ret < 0) {
 			TRACE(_T("avresample_set_matrix failed\n"));
-			avresample_free(&m_pAVRCxt);
+			Reset();
 			return S_FALSE;
 		}
 	}

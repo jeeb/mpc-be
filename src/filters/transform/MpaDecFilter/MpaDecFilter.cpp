@@ -1746,6 +1746,8 @@ HRESULT CMpaDecFilter::StopStreaming()
 {
 	m_FFAudioDec.StreamFinish();
 
+	m_Mixer.Reset();
+
 	return __super::StopStreaming();
 }
 
