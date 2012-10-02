@@ -155,4 +155,6 @@ private :
 	void				AllocSegment(int nSize);
 
 	CompositionObject*	FindObject(REFERENCE_TIME rt);
+
+	void				SetTimeStamp(REFERENCE_TIME rtTime, bool CheckRLE = false);
 };

@@ -11291,9 +11291,9 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 		if (FAILED(hr) || (Loc.TitleNum != Loc2.TitleNum)) {
 
 			if (FAILED(hr)) {
-				LOG2FILE(_T("DVD - GetCurrentLocation() failed [%d : %d]"), Loc.TitleNum, Loc.ChapterNum);
+				//LOG2FILE(_T("DVD - GetCurrentLocation() failed [%d : %d]"), Loc.TitleNum, Loc.ChapterNum);
 			} else {
-				LOG2FILE(_T("DVD - TitleNum changed : Main :%d, Preview :%d"), Loc.TitleNum, Loc2.TitleNum);
+				//LOG2FILE(_T("DVD - TitleNum changed : Main :%d, Preview :%d"), Loc.TitleNum, Loc2.TitleNum);
 			}
 
 			hr = pDVDC2->PlayTitle(Loc.TitleNum, DVD_CMD_FLAG_Flush, NULL);
@@ -11325,7 +11325,7 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 		}
 
 		pDVDI2->GetCurrentLocation(&Loc2);
-		LOG2FILE(_T("DVD - Текущее воспроизведение : Main [%d : %d], Preview [%d : %d]"), Loc.TitleNum, Loc.ChapterNum, Loc2.TitleNum, Loc2.ChapterNum);
+		//LOG2FILE(_T("DVD - Текущее воспроизведение : Main [%d : %d], Preview [%d : %d]"), Loc.TitleNum, Loc.ChapterNum, Loc2.TitleNum, Loc2.ChapterNum);
 
 		pDVDC2->Pause(FALSE);
 		pMC2->Run();

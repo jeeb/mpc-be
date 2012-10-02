@@ -2986,10 +2986,8 @@ void HexDump(CString fileName, BYTE* buf, int size)
 	}
 }
 
-//#define	MPC_BE_LOG
 void LOG2FILE(LPCTSTR fmt, ...)
 {
-#if defined(MPC_BE_LOG)
 	va_list args;
 	va_start(args, fmt);
 	size_t len = _vsctprintf(fmt, args) + 1;
@@ -3003,5 +3001,4 @@ void LOG2FILE(LPCTSTR fmt, ...)
 		delete [] buff;
 	}
 	va_end(args);
-#endif
 }

@@ -25,9 +25,9 @@
 #include "../DSUtil/GolombBuffer.h"
 
 #if (0)	// Set to 1 to activate HDMV subtitles traces
-#define TRACE_HDMVSUB	TRACE
+	#define TRACE_HDMVSUB	TRACE
 #else
-#define TRACE_HDMVSUB
+	#define TRACE_HDMVSUB
 #endif
 
 CHdmvSub::CHdmvSub(void)
@@ -252,35 +252,7 @@ void CHdmvSub::ParsePresentationSegment(CGolombBuffer* pGBuffer, REFERENCE_TIME 
 			ParseCompositionObject (pGBuffer, m_pCurrentWindow->Objects[i]);
 		}
 
-		POSITION pos = m_pObjects.GetHeadPosition();
-		while (pos) {
-			bool objectWindowFound		= false;
-			CompositionObject* pObject	= m_pObjects.GetAt (pos);
-
-			if (pObject->m_rtStop == _I64_MAX) {
-
-				for (int i=0; i<nObjectNumber; i++) {
-					if (pObject->m_object_id_ref == m_pCurrentWindow->Objects[i]->m_object_id_ref && pObject->m_window_id_ref == m_pCurrentWindow->Objects[i]->m_window_id_ref) {
-						objectWindowFound = true;
-						break;
-					}
-				}
-
-				if (!objectWindowFound && CompositionDescriptor.bState >= 0) {
-					pObject->m_rtStop = rtTime;
-					TRACE_HDMVSUB ("*** CHdmvSub::ParsePresentationSegment() - Set TimeStamp : m_object_id_ref = %d, m_window_id_ref = %d, compositionNumber = %d, [%10I64d -> %10I64d], [%S -> %S]\n",
-									pObject->m_object_id_ref,
-									pObject->m_window_id_ref,
-									pObject->m_compositionNumber,
-									pObject->m_rtStart, pObject->m_rtStop,
-									ReftimeToString(pObject->m_rtStart), ReftimeToString(pObject->m_rtStop)
-									);
-
-				}
-			}
-
-			m_pObjects.GetNext(pos);
-		}
+		SetTimeStamp(rtTime);
 	}
 }
 
@@ -363,6 +335,8 @@ void CHdmvSub::ParseObject(CGolombBuffer* pGBuffer, USHORT nUnitSize)
 
 			}
 		}
+
+		SetTimeStamp(m_pCurrentWindow->Objects[0]->m_rtStart, true);
 	}
 }
 
@@ -490,5 +464,44 @@ void CHdmvSub::CleanOld(REFERENCE_TIME rt)
 		} else {
 			break;
 		}
+	}
+}
+
+void CHdmvSub::SetTimeStamp(REFERENCE_TIME rtTime, bool CheckRLE)
+{
+	if (!m_pCurrentWindow || !m_pCurrentWindow->m_nObjectNumber) {
+		return;
+	}
+
+	POSITION pos = m_pObjects.GetHeadPosition();
+	while (pos) {
+		bool objectWindowFound		= false;
+		CompositionObject* pObject	= m_pObjects.GetAt (pos);
+
+		if (pObject->m_rtStop == _I64_MAX) {
+
+			for (int i=0; i<m_pCurrentWindow->m_nObjectNumber; i++) {
+				if (CheckRLE && m_pCurrentWindow->Objects[i]->GetRLEDataSize()) {
+					continue;
+				}
+				if (pObject->m_object_id_ref == m_pCurrentWindow->Objects[i]->m_object_id_ref && pObject->m_window_id_ref == m_pCurrentWindow->Objects[i]->m_window_id_ref) {
+					objectWindowFound = true;
+					break;
+				}
+			}
+
+			if (!objectWindowFound) {
+				pObject->m_rtStop = rtTime;
+				TRACE_HDMVSUB ("*** CHdmvSub::SetTimeStamp : m_object_id_ref = %d, m_window_id_ref = %d, compositionNumber = %d, [%10I64d -> %10I64d], [%S -> %S]\n",
+								pObject->m_object_id_ref,
+								pObject->m_window_id_ref,
+								pObject->m_compositionNumber,
+								pObject->m_rtStart, pObject->m_rtStop,
+								ReftimeToString(pObject->m_rtStart), ReftimeToString(pObject->m_rtStop)
+								);
+			}
+		}
+
+		m_pObjects.GetNext(pos);
 	}
 }
