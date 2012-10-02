@@ -186,6 +186,7 @@ CPPageDVD::CPPageDVD()
 	, m_fAutoSpeakerConf(FALSE)
 	, m_fClosedCaptions(FALSE)
 	, m_fStartMainTitle(FALSE)
+	, m_fmadVRchange(FALSE)
 {
 }
 
@@ -206,6 +207,7 @@ void CPPageDVD::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK1, m_fAutoSpeakerConf);
 	DDX_Check(pDX, IDC_CHECK2, m_fClosedCaptions);
 	DDX_Check(pDX, IDC_CHECK3, m_fStartMainTitle);
+	DDX_Check(pDX, IDC_CHECK4, m_fmadVRchange);
 }
 
 void CPPageDVD::UpdateLCIDList()
@@ -251,6 +253,7 @@ BOOL CPPageDVD::OnInitDialog()
 	m_fAutoSpeakerConf	= s.fAutoSpeakerConf;
 	m_fClosedCaptions	= s.fClosedCaptions;
 	m_fStartMainTitle	= s.fStartMainTitle;
+	m_fmadVRchange		= s.fmadVRchange;
 
 	UpdateData(FALSE);
 
@@ -278,6 +281,7 @@ BOOL CPPageDVD::OnApply()
 	s.fAutoSpeakerConf	= !!m_fAutoSpeakerConf;
 	s.fClosedCaptions	= !!m_fClosedCaptions;
 	s.fStartMainTitle	= !!m_fStartMainTitle;
+	s.fmadVRchange		= !!m_fmadVRchange;
 
 	((CMainFrame*)AfxGetMyApp()->GetMainWnd())->SetClosedCaptions(s.fClosedCaptions);
 

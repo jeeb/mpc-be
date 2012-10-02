@@ -650,6 +650,7 @@ void CAppSettings::SaveSettings()
 	}
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DVD_START_MAIN_TITLE, (int)fStartMainTitle);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DVD_MADVR_CHANGE, (int)fmadVRchange);
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LASTFULLSCREEN, (int)fLastFullScreen);
 
@@ -1419,6 +1420,7 @@ void CAppSettings::LoadSettings()
 	}
 
 	fStartMainTitle		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DVD_START_MAIN_TITLE, 0);
+	fmadVRchange		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DVD_MADVR_CHANGE, 0);
 	fLastFullScreen		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LASTFULLSCREEN, 0);
 
 	// TODO: sort shaders by label

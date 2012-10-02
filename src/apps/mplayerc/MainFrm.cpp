@@ -12870,7 +12870,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			BREAK(aborted)
 		}
 
-		if (pDVDData && s.iDSVideoRendererType == VIDRNDT_DS_MADVR) {
+		if (pDVDData && s.iDSVideoRendererType == VIDRNDT_DS_MADVR && s.fmadVRchange) {
 			previous_renderer = s.iDSVideoRendererType;
 
 			if (IsWinVistaOrLater()) {
