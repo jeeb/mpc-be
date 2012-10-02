@@ -225,6 +225,7 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 	m_volctrl.SetRange(0, 100);
 
 	iDisableXPToolbars = 2;
+	iMute = 0;
 
 	SwitchTheme();
 
@@ -385,16 +386,19 @@ int CPlayerToolBar::GetVolume()
 {
 	AppSettings& s = AfxGetAppSettings();
 
-	int volume = m_volctrl.GetPos(), size = m_volctrl.GetPageSize();
+	int volume = m_volctrl.GetPos(), type = 0;
 
-/*
-	if (!s.fMute || s.nVolume >= volume + size || s.nVolume <= volume - size) {
-		if ((!IsMuted() && !volume) || (IsMuted() && volume)) {
-			OnVolumeMute(0);
-			SendMessage(WM_COMMAND, ID_VOLUME_MUTE);
-		}
+	if (!s.fMute && volume <= 0 && iMute == 0) {
+		type++;
+		iMute++;
+	} else if (s.fMute && volume > 0 && iMute == 1) {
+		type++;
+		iMute--;
 	}
-*/
+	if (type) {
+		OnVolumeMute(0);
+		SendMessage(WM_COMMAND, ID_VOLUME_MUTE);
+	}
 
 	if (IsMuted() || volume <= 0) {
 		volume = -10000;

@@ -40,6 +40,7 @@ private:
 
 	MPCPngImage	m_logobm;
 	__int64		iDisableXPToolbars;
+	int			iMute;
 	int			m_nButtonHeight;
 	CImageList	*m_pButtonsImages;
 

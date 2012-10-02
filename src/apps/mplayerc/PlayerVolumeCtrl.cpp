@@ -338,12 +338,9 @@ void CVolumeCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 		SetPos(start);
 	} else if (point.x >= r.right) {
 		SetPos(stop);
-	} else {
+	} else if (start < stop) {
 		int w = r.right - r.left - 4;
-
-		if (start < stop) {
-			SetPosInternal(start + ((stop - start) * (point.x - r.left) + (w/2)) / w);
-		}
+		SetPosInternal(start + ((stop - start) * (point.x - r.left) + (w/2)) / w);
 	}
 
 	CSliderCtrl::OnLButtonDown(nFlags, point);
@@ -387,9 +384,8 @@ BOOL CVolumeCtrl::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 {
 	TOOLTIPTEXT *pTTT = reinterpret_cast<LPTOOLTIPTEXT>(pNMHDR);
 	CString str;
-	int nVolume = GetPos();
 
-	str.AppendFormat(_T("%d%%"), nVolume);
+	str.AppendFormat(_T("%d%%"), GetPos());
 
 	if (AfxGetAppSettings().fMute) {
 		CString no_sound_str = ResStr(ID_VOLUME_MUTE_DISABLED);
