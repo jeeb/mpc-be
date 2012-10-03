@@ -66,7 +66,7 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 			if (f) {
 
 				char buf[4096];
-				DWORD len, size = 0, end_pos = 0, fs = 12 * sizeof(buf);
+				DWORD len, size = 0, end_pos = 0, fs = 14 * sizeof(buf);
 
 				out = (char*)malloc(fs + 1);
 
