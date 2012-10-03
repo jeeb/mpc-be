@@ -191,6 +191,7 @@ SRCS_C = \
     libavcodec/lagarithrac.c \
     libavcodec/latm_parser.c \
     libavcodec/libopenjpegdec.c \
+    libavcodec/libopus.c \
     libavcodec/libopusdec.c \
     libavcodec/lsp.c \
     libavcodec/mdct.c \
