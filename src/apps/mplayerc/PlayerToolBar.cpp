@@ -383,14 +383,12 @@ bool CPlayerToolBar::IsMuted()
 
 int CPlayerToolBar::GetVolume()
 {
-	AppSettings& s = AfxGetAppSettings();
-
 	int volume = m_volctrl.GetPos(), type = 0;
 
-	if (!s.fMute && volume <= 0 && iMute == 0) {
+	if (!IsMuted() && volume <= 0 && iMute == 0) {
 		type++;
 		iMute++;
-	} else if (s.fMute && volume > 0 && iMute == 1) {
+	} else if (IsMuted() && volume > 0 && iMute == 1) {
 		type++;
 		iMute--;
 	}
