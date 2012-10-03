@@ -39,7 +39,7 @@
 #endif
 
 #define ISPP_INVOKED
-#include "..\src\apps\mplayerc\Version.h"
+#include "..\include\Version.h"
 
 #define copyright_year "2002-2012"
 #define app_name       "MPC-BE"
