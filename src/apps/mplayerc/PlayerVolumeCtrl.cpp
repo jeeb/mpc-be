@@ -411,9 +411,3 @@ BOOL CVolumeCtrl::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 
 	return TRUE;
 }
-
-void CVolumeCtrl::Redraw()
-{
-	m_fSetRedraw = true;
-	Invalidate();
-}

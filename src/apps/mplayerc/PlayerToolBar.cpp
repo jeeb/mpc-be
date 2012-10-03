@@ -210,7 +210,7 @@ void CPlayerToolBar::SwitchTheme()
 	}
 
 	if (::IsWindow(m_volctrl.GetSafeHwnd())) {
-		m_volctrl.Redraw();
+		m_volctrl.Invalidate();
 	}
 }
 
@@ -641,7 +641,7 @@ BOOL CPlayerToolBar::OnVolumeMute(UINT nID)
 	SetMute(!IsMuted());
 
 	if (::IsWindow(m_volctrl.GetSafeHwnd())) {
-		m_volctrl.Redraw();
+		m_volctrl.Invalidate();
 	}
 
 	return FALSE;

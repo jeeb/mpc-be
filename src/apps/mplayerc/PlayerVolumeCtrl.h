@@ -55,8 +55,6 @@ public:
 
 	void SetPosInternal(int pos);
 
-	void Redraw();
-
 protected:
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
 
@@ -69,4 +67,6 @@ public:
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnSetFocus(CWnd* pOldWnd);
 	afx_msg void HScroll(UINT nSBCode, UINT nPos);
+
+	virtual void Invalidate(BOOL bErase = TRUE) { m_fSetRedraw = true; CSliderCtrl::Invalidate(bErase); }
 };
