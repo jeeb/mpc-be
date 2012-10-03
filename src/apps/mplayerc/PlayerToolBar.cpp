@@ -642,8 +642,12 @@ BOOL CPlayerToolBar::OnVolumeMute(UINT nID)
 	SetMute(!IsMuted());
 
 	if (::IsWindow(m_volctrl.GetSafeHwnd())) {
-		m_volctrl.EnableWindow(FALSE);
-		m_volctrl.EnableWindow(TRUE);
+		if (m_volctrl.GetPos() <= 5) {
+			m_volctrl.Invalidate();
+		} else {
+			m_volctrl.EnableWindow(FALSE);
+			m_volctrl.EnableWindow(TRUE);
+		}
 	}
 
 	return FALSE;

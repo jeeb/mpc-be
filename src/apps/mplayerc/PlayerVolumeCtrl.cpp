@@ -128,6 +128,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					dc.Attach(pNMCD->hdc);
 					CRect r;
 					GetClientRect(&r);
+					InvalidateRect(&r);
 					CDC memdc;
 
 					HBITMAP hBmp = m_logobm.LoadExternalImage("toolbar", -1, -1, -1, -1);
@@ -182,6 +183,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					dc.Attach(pNMCD->hdc);
 					CRect r;
 					GetClientRect(&r);
+					InvalidateRect(&r);
 					CDC memdc;
 					memdc.CreateCompatibleDC(&dc);
 
