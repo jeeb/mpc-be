@@ -43,6 +43,8 @@ private:
 	__int64 iThemeGreen;
 	__int64 iThemeBlue;
 
+	bool m_fSetRedraw;
+
 public:
 	CVolumeCtrl(bool fSelfDrawn = true);
 	virtual ~CVolumeCtrl();
@@ -52,6 +54,8 @@ public:
 	void IncreaseVolume(), DecreaseVolume();
 
 	void SetPosInternal(int pos);
+
+	void Redraw();
 
 protected:
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);

@@ -175,9 +175,13 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 				}
 
 				lr = CDRF_NOTIFYITEMDRAW;
+				if (m_fSetRedraw) {
+					lr |= CDRF_NOTIFYPOSTPAINT;
+				}
 				break;
 
 			case CDDS_ITEMPREPAINT:
+			case CDDS_POSTPAINT:
 				if (s.fDisableXPToolbars && m_bmUnderCtrl.GetSafeHandle() != NULL) {
 					CDC dc;
 					dc.Attach(pNMCD->hdc);
@@ -263,7 +267,9 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 					dc.SelectObject(penOld);
 					dc.Detach();
+
 					lr = CDRF_SKIPDEFAULT;
+					m_fSetRedraw = false;
 				} else if (!s.fDisableXPToolbars && pNMCD->dwItemSpec == TBCD_CHANNEL) {
 					if (m_bmUnderCtrl.GetSafeHandle() != NULL) {
 						m_bmUnderCtrl.DeleteObject();
@@ -404,4 +410,10 @@ BOOL CVolumeCtrl::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 
 	return TRUE;
+}
+
+void CVolumeCtrl::Redraw()
+{
+	m_fSetRedraw = true;
+	Invalidate();
 }

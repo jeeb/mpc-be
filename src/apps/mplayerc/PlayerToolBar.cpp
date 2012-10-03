@@ -210,8 +210,7 @@ void CPlayerToolBar::SwitchTheme()
 	}
 
 	if (::IsWindow(m_volctrl.GetSafeHwnd())) {
-		m_volctrl.EnableWindow(FALSE);
-		m_volctrl.EnableWindow(TRUE);
+		m_volctrl.Redraw();
 	}
 }
 
@@ -642,12 +641,7 @@ BOOL CPlayerToolBar::OnVolumeMute(UINT nID)
 	SetMute(!IsMuted());
 
 	if (::IsWindow(m_volctrl.GetSafeHwnd())) {
-		if (m_volctrl.GetPos() <= 5) {
-			m_volctrl.Invalidate();
-		} else {
-			m_volctrl.EnableWindow(FALSE);
-			m_volctrl.EnableWindow(TRUE);
-		}
+		m_volctrl.Redraw();
 	}
 
 	return FALSE;
