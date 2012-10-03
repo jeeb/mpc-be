@@ -9834,12 +9834,12 @@ void CMainFrame::OnUpdateFavoritesDevice(CCmdUI* pCmdUI)
 
 void CMainFrame::OnHelpHomepage()
 {
-	ShellExecute(m_hWnd, _T("open"), _T("http://sourceforge.net/p/mpcbe/"), NULL, NULL, SW_SHOWDEFAULT);
+	ShellExecute(m_hWnd, _T("open"), _T(MPC_VERSION_COMMENTS), NULL, NULL, SW_SHOWDEFAULT);
 }
 
 UINT CMainFrame::CheckForUpdate(LPVOID pParam)
 {
-//	UpdateChecker updateChecker(_T("http://sourceforge.net/p/mpcbe/version.txt"));
+//	UpdateChecker updateChecker(_T("http://sourceforge.net/projects/mpcbe/version.txt"));
 	UpdateChecker updateChecker(_T("http://www.xvidvideo.ru/updates/mpc_be.txt"));
 	UpdateCheckerDlg dlg(updateChecker.isUpdateAvailable(), updateChecker.getLatestVersion());
 	dlg.DoModal();
@@ -9862,7 +9862,7 @@ void CMainFrame::OnHelpDocumentation()
 
 void CMainFrame::OnHelpToolbarImages()
 {
-	ShellExecute(m_hWnd, _T("open"), _T("http://sourceforge.net/apps/trac/mpc-hc/wiki/Toolbar_images"), NULL, NULL, SW_SHOWDEFAULT);
+	ShellExecute(m_hWnd, _T("open"), _T("http://dev.mpc-next.ru/index.php?board=44.0"), NULL, NULL, SW_SHOWDEFAULT);
 }
 
 /*

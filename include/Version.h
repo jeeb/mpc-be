@@ -1,4 +1,3 @@
-#ifndef ISPP_INVOKED
 /*
  * $Id$
  *
@@ -21,44 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#endif
 
-#ifndef MPC_VERSION_H
-#define MPC_VERSION_H
+#pragma once
 
-#ifndef NO_VERSION_REV_NEEDED
-#include "Version_rev.h"
-#endif
-
-#define DO_MAKE_STR(x) #x
-#define MAKE_STR(x)    DO_MAKE_STR(x)
-
-#define MPC_VERSION_MAJOR  1
-#define MPC_VERSION_MINOR  0
-#define MPC_VERSION_STATUS 0
-#define MPC_VERSION_PATCH  0
-
-// MPC_VERSION_STATUS: 0 - alfa; 1 - beta; 2 - RC; 3 - stable
-
-#ifndef ISPP_INVOKED
-
-#define MPC_COMP_NAME_STR L"MPC-BE Team"
-#define MPC_COPYRIGHT_STR L"Copyright © 2002-2012 all contributors, see Authors.txt"
-
-#ifdef NO_VERSION_REV_NEEDED
-#define MPC_VERSION_NUM MPC_VERSION_MAJOR, MPC_VERSION_MINOR, MPC_VERSION_STATUS, MPC_VERSION_PATCH
-#define MPC_VERSION_STR MAKE_STR(MPC_VERSION_MAJOR) ", " MAKE_STR(MPC_VERSION_MINOR) ", " MAKE_STR(MPC_VERSION_STATUS) ", " MAKE_STR(MPC_VERSION_PATCH)
-#define MPC_VERSION_REV 0
-#else
-#define MPC_VERSION_NUM MPC_VERSION_MAJOR, MPC_VERSION_MINOR, MPC_VERSION_STATUS, MPC_VERSION_PATCH
-#define MPC_VERSION_STR MAKE_STR(MPC_VERSION_MAJOR) ", " MAKE_STR(MPC_VERSION_MINOR) ", " MAKE_STR(MPC_VERSION_STATUS) ", " MAKE_STR(MPC_VERSION_PATCH)
-#endif
-
-#endif
-
-#define MPC_VERSION_COMMENTS "http://sourceforge.net/projects/mpcbe/"
-
-#define DIRECTX_SDK_DATE   "June 2010"
-#define DIRECTX_SDK_NUMBER "43"
-
-#endif
+#include "../src/apps/mplayerc/Version.h"

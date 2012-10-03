@@ -39,7 +39,7 @@
 #endif
 
 #define ISPP_INVOKED
-#include "..\include\Version.h"
+#include "..\src\apps\mplayerc\Version.h"
 
 #define copyright_year "2002-2012"
 #define app_name       "MPC-BE"
@@ -83,10 +83,10 @@ VersionInfoProductName={#app_name}
 #endif
 AppVersion={#app_version}
 AppPublisher=MPC-BE Team
-AppPublisherURL=https://sourceforge.net/p/mpcbe/
-AppSupportURL=https://sourceforge.net/p/mpcbe/
-AppUpdatesURL=https://sourceforge.net/p/mpcbe/
-AppContact=https://sourceforge.net/p/mpcbe/
+AppPublisherURL=http://sourceforge.net/projects/mpcbe/
+AppSupportURL=http://sourceforge.net/projects/mpcbe/
+AppUpdatesURL=http://sourceforge.net/projects/mpcbe/
+AppContact=http://sourceforge.net/projects/mpcbe/
 AppCopyright=Copyright © {#copyright_year} all contributors, see Authors.txt
 VersionInfoCompany=MPC-BE Team
 VersionInfoCopyright=Copyright © {#copyright_year}, MPC-BE Team
@@ -239,7 +239,7 @@ Name: {#quick_launch}\{#app_name};               Filename: {app}\{#mpcbe_exe}; C
 Name: {group}\{cm:UninstallProgram,{#app_name}}; Filename: {uninstallexe};     Comment: {cm:UninstallProgram,{#app_name}};  WorkingDir: {app}
 #endif
 Name: {group}\Changelog;                         Filename: {app}\Changelog.txt; Comment: {cm:ViewChangelog};                WorkingDir: {app}
-Name: {group}\{cm:ProgramOnTheWeb,{#app_name}};  Filename: https://sourceforge.net/p/mpcbe/
+Name: {group}\{cm:ProgramOnTheWeb,{#app_name}};  Filename: http://sourceforge.net/projects/mpcbe/
 
 [Run]
 Filename: "{app}\{#mpcbe_exe}"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent unchecked; Description: "{cm:LaunchProgram,{#app_name}}"
