@@ -471,6 +471,7 @@
     <None Include="res\web\controlvolumegrip.png" />
     <None Include="res\web\controlvolumeoff.png" />
     <None Include="res\web\controlvolumeon.png" />
+    <None Include="res\web\favicon.png" />
     <None Include="res\web\default.css">
       <FileType>CSS</FileType>
     </None>

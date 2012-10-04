@@ -844,6 +844,9 @@
     <None Include="res\web\controlvolumeon.png">
       <Filter>Resource Files\web</Filter>
     </None>
+    <None Include="res\web\favicon.png">
+      <Filter>Resource Files\web</Filter>
+    </None>
     <None Include="res\web\default.css">
       <Filter>Resource Files\web</Filter>
     </None>

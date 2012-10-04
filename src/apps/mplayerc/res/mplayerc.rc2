@@ -99,6 +99,7 @@ IDF_SLIDERBAR_GIF                FILE                    "res\\web\\sliderbar.gi
 IDF_SLIDERGRIP_GIF               FILE                    "res\\web\\slidergrip.gif"
 IDF_VBR_PNG                      FILE                    "res\\web\\vbg.png"
 IDF_VBS_PNG                      FILE                    "res\\web\\vbs.png"
+IDF_FAVICON                      FILE                    "res\\web\\favicon.png"
 
 
 /////////////////////////////////////////////////////////////////////////////

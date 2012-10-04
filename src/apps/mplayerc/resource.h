@@ -62,6 +62,7 @@
 #define IDF_CONTROLVOLUMEBAR_PNG        536
 #define IDF_CONTROLVOLUMEGRIP_PNG       537
 #define IDR_HTML_VARIABLES              538
+#define IDF_FAVICON                     539
 #define IDF_SHADER_RESIZER              700
 #define IDF_SHADER_EMPTY                701
 #define IDF_SHADER_CONTOUR              702
