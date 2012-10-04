@@ -82,7 +82,6 @@ void CDXVADecoder::Init(CMPCVideoDecFilter* pFilter, DXVAMode nMode, int nPicEnt
 
 	memset (&m_DXVA1BufferInfo, 0, sizeof(m_DXVA1BufferInfo));
 	memset (&m_ExecuteParams, 0, sizeof(m_ExecuteParams));
-	Flush();
 }
 
 // === Public functions
@@ -124,6 +123,11 @@ void CDXVADecoder::Flush()
 	m_nFieldSurface = -1;
 	m_dwDisplayCount= 1;
 	m_pFieldSample	= NULL;
+}
+
+void CDXVADecoder::NewSegment()
+{
+	Flush();
 }
 
 HRESULT CDXVADecoder::ConfigureDXVA1()

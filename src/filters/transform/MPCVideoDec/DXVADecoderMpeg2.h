@@ -27,6 +27,15 @@
 
 #define MAX_SLICE		1024 // Max slice number for Mpeg2 streams
 
+#define MAX_BUFF_TIME	20
+
+typedef struct {
+	REFERENCE_TIME	rtStart;
+	REFERENCE_TIME	rtStop;
+	int				nBuffPos;
+} BUFFER_TIME;
+
+
 class CDXVADecoderMpeg2 :	public CDXVADecoder
 {
 public:
@@ -38,9 +47,11 @@ public:
 	virtual HRESULT DecodeFrame   (BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 	virtual void	CopyBitstream (BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
 	virtual void	Flush();
+	virtual void	NewSegment();
 
 protected :
 
+	HRESULT			DecodeFrameInternal (BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 	virtual int		FindOldestFrame();
 private:
 	DXVA_PictureParameters	m_PictureParams;
@@ -68,4 +79,19 @@ private:
 	void					Init();
 	void					UpdatePictureParams(int nSurfaceIndex);
 	void					UpdateFrameTime (REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
+
+protected:
+	BYTE*			m_pMPEG2Buffer;
+	int				m_nMPEG2BufferSize;
+
+	int				m_nMPEG2BufferPos;
+	int				m_nMPEG2PicEnd;
+	BUFFER_TIME		m_MPEG2BufferTime[MAX_BUFF_TIME];
+
+	bool			FindPicture(int nIndex, int nStartCode);
+	bool			AppendBuffer (BYTE* pDataIn, int nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
+	void			PopBufferTime(int nPos);
+	void			PushBufferTime(int nPos, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
+	void			ResetBuffer();
+	bool			ShrinkBuffer();
 };

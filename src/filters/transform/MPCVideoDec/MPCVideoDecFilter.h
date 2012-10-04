@@ -36,8 +36,6 @@
 
 #define MPCVideoDecName L"MPC Video Decoder"
 
-#define MAX_BUFF_TIME   20
-
 #define CHECK_HR(x) hr = ##x; if (FAILED(hr)) { TRACE("Error : 0x%08x\n", hr); ASSERT(hr == VFW_E_NOT_COMMITTED); return hr; }
 
 struct AVCodec;
@@ -57,12 +55,6 @@ typedef struct {
 	REFERENCE_TIME	rtStart;
 	REFERENCE_TIME	rtStop;
 } B_FRAME;
-
-typedef struct {
-	REFERENCE_TIME	rtStart;
-	REFERENCE_TIME	rtStop;
-	int				nBuffPos;
-} BUFFER_TIME;
 
 typedef struct {
 	bool	video_after_seek;
@@ -143,10 +135,6 @@ protected:
 	BYTE*									m_pAlignedFFBuffer;
 	int										m_nAlignedFFBufferSize;
 
-	int										m_nFFBufferPos;
-	int										m_nFFPicEnd;
-	BUFFER_TIME								m_FFBufferTime[MAX_BUFF_TIME];
-
 	REFERENCE_TIME							m_rtLastStart;			// rtStart for last delivered frame
 	int										m_nCountEstimated;		// Number of rtStart estimated since last rtStart received
 	double									m_dRate;
@@ -205,12 +193,6 @@ protected:
 
 	void				SetTypeSpecificFlags(IMediaSample* pMS);
 	HRESULT				SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
-	bool				AppendBuffer (BYTE* pDataIn, int nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-	bool				FindPicture(int nIndex, int nStartCode);
-	void				ShrinkBuffer();
-	void				ResetBuffer();
-	void				PushBufferTime(int nPos, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
-	void				PopBufferTime(int nPos);
 
 public:
 
