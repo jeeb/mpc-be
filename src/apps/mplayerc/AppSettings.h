@@ -421,7 +421,7 @@ public:
 
 	CStringW		strAudioRendererDisplayName;
 	bool			fD3DFullscreen;
-
+	bool			fIsFSWindow;
 
     // Fullscreen
 	bool			fLaunchfullscreen;
@@ -505,6 +505,8 @@ public:
 	bool			fFileNameOnSeekBar;
 	bool			fSmartSeek;
 	bool			fChapterMarker;
+	bool			fFlybar;
+	bool			fFlybarOnTop;
 	bool			fUseWin7TaskBar;
 	int				nOSDSize;
 	CString			strOSDFont;

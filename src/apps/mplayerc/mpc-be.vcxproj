@@ -167,6 +167,7 @@
     <ClCompile Include="BaseGraph.cpp" />
     <ClCompile Include="ComPropertyPage.cpp" />
     <ClCompile Include="ComPropertySheet.cpp" />
+    <ClCompile Include="PlayerFlyBar.cpp" />
     <ClCompile Include="PPageInterface.cpp" />
     <ClCompile Include="SaveTaskDlg.cpp" />
     <ClCompile Include="ShockwaveFlash.cpp" />
@@ -286,6 +287,7 @@
     <ClInclude Include="BaseGraph.h" />
     <ClInclude Include="ComPropertyPage.h" />
     <ClInclude Include="ComPropertySheet.h" />
+    <ClInclude Include="PlayerFlyBar.h" />
     <ClInclude Include="PlayerYouTube.h" />
     <ClInclude Include="PPageInterface.h" />
     <ClInclude Include="SaveTaskDlg.h" />
@@ -406,6 +408,28 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ani.avi" />
+    <None Include="res\flybar\exit.ico" />
+    <None Include="res\flybar\exit2.ico" />
+    <None Include="res\flybar\exit2_a.ico" />
+    <None Include="res\flybar\exit_a.ico" />
+    <None Include="res\flybar\fs.ico" />
+    <None Include="res\flybar\fs_a.ico" />
+    <None Include="res\flybar\info.ico" />
+    <None Include="res\flybar\info_a.ico" />
+    <None Include="res\flybar\lock.ico" />
+    <None Include="res\flybar\lock_a.ico" />
+    <None Include="res\flybar\max.ico" />
+    <None Include="res\flybar\max_a.ico" />
+    <None Include="res\flybar\min.ico" />
+    <None Include="res\flybar\min_a.ico" />
+    <None Include="res\flybar\restore.ico" />
+    <None Include="res\flybar\restore_a.ico" />
+    <None Include="res\flybar\set.ico" />
+    <None Include="res\flybar\set_a.ico" />
+    <None Include="res\flybar\unlock.ico" />
+    <None Include="res\flybar\unlock_a.ico" />
+    <None Include="res\flybar\win.ico" />
+    <None Include="res\flybar\win_a.ico" />
     <None Include="res\gpu.ico" />
     <None Include="res\icon.ico">
       <FileType>ICO</FileType>

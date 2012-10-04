@@ -56,21 +56,33 @@ CVMROSD::CVMROSD(void)
 
 	m_FontSize = 0;
 	m_OSD_Font = _T("");
-
+	bMouseOverExitButton = false;
+	bMouseOverCloseButton = false;
 	m_bShowMessage = true;
+
+	
+	icoExit		= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_EXIT), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
+	icoExit_a	= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_EXIT_A), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
+	icoClose	= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_EXIT2), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
+	icoClose_a	= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_EXIT2_A), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
 }
 
 CVMROSD::~CVMROSD(void)
 {
 	m_MemDC.DeleteDC();
+	if (icoExit) DestroyIcon(icoExit);
+	if (icoExit_a) DestroyIcon(icoExit_a);
+	if (icoClose) DestroyIcon(icoClose);
+	if (icoClose_a) DestroyIcon(icoClose_a);
 }
 
 void CVMROSD::OnSize(UINT nType, int cx, int cy)
 {
 	if (m_pWnd && (m_pVMB || m_pMFVMB)) {
-		if (m_bSeekBarVisible) {
-			m_bCursorMoving   = false;
-			m_bSeekBarVisible = false;
+		if (m_bSeekBarVisible || m_bFlyBarVisible) {
+			m_bCursorMoving		= false;
+			m_bSeekBarVisible	= false;
+			m_bFlyBarVisible	= false;
 			Invalidate();
 		}
 
@@ -189,10 +201,25 @@ void CVMROSD::CalcRect()
 	if (m_pWnd) {
 		m_pWnd->GetClientRect(&m_rectWnd);
 
-		m_rectSeekBar.left		= m_rectWnd.left	+ 10;
-		m_rectSeekBar.right		= m_rectWnd.right	- 10;
-		m_rectSeekBar.top		= m_rectWnd.bottom	- SEEKBAR_HEIGHT;
-		m_rectSeekBar.bottom	= m_rectSeekBar.top	+ SEEKBAR_HEIGHT;
+		m_rectSeekBar.left			= m_rectWnd.left	+ 10;
+		m_rectSeekBar.right			= m_rectWnd.right	- 10;
+		m_rectSeekBar.top			= m_rectWnd.bottom	- SEEKBAR_HEIGHT;
+		m_rectSeekBar.bottom		= m_rectSeekBar.top	+ SEEKBAR_HEIGHT;
+
+		m_rectFlyBar.left			= m_rectWnd.left;
+		m_rectFlyBar.right			= m_rectWnd.right;
+		m_rectFlyBar.top			= m_rectWnd.top;
+		m_rectFlyBar.bottom			= m_rectWnd.top	 + 100;
+
+		m_rectExitButton.left		= m_rectWnd.right - 34;
+		m_rectExitButton.right		= m_rectWnd.right - 10;
+		m_rectExitButton.top		= m_rectWnd.top - 10;
+		m_rectExitButton.bottom		= m_rectWnd.top	 + 34;
+
+		m_rectCloseButton.left		= m_rectExitButton.left	- 28;
+		m_rectCloseButton.right		= m_rectExitButton.left - 4;
+		m_rectCloseButton.top		= m_rectWnd.top - 10;
+		m_rectCloseButton.bottom	= m_rectWnd.top	 + 34;
 	}
 }
 
@@ -235,6 +262,15 @@ void CVMROSD::DrawSlider(CRect* rect, __int64 llMin, __int64 llMax, __int64 llPo
 	DrawRect (&m_rectCursor, NULL, &m_penCursor);
 }
 
+void CVMROSD::DrawFlyBar(CRect* rect)
+{
+	DrawIconEx(m_MemDC, m_rectWnd.right-34, 10, icoExit, 0, 0, 0, NULL, DI_NORMAL);
+	DrawIconEx(m_MemDC, m_rectWnd.right-62, 10, icoClose, 0, 0, 0, NULL, DI_NORMAL);
+
+	if (bMouseOverExitButton) DrawIconEx(m_MemDC, m_rectWnd.right-34, 10, icoExit_a, 0, 0, 0, NULL, DI_NORMAL);
+	if (bMouseOverCloseButton) DrawIconEx(m_MemDC, m_rectWnd.right-62, 10, icoClose_a, 0, 0, 0, NULL, DI_NORMAL);
+}
+
 void CVMROSD::DrawMessage()
 {
 	if (m_BitmapInfo.bmWidth*m_BitmapInfo.bmHeight*(m_BitmapInfo.bmBitsPixel/8) == 0) {
@@ -265,8 +301,10 @@ void CVMROSD::DrawMessage()
 			uFormat = uFormat|DT_END_ELLIPSIS;
 		}
 
-		m_MemDC.DrawText (m_strMessage, &rectMessages, uFormat);
+		m_MemDC.DrawText (m_strMessage, &rectMessages, uFormat);	
+
 	}
+
 }
 
 void CVMROSD::DrawDebug()
@@ -313,7 +351,9 @@ void CVMROSD::Invalidate()
 	if (m_bSeekBarVisible) {
 		DrawSlider(&m_rectSeekBar, m_llSeekMin, m_llSeekMax, m_llSeekPos);
 	}
-
+	if (m_bFlyBarVisible) {
+		DrawFlyBar(&m_rectFlyBar);
+	}
 	DrawMessage();
 	DrawDebug();
 
@@ -344,8 +384,39 @@ bool CVMROSD::OnMouseMove(UINT nFlags, CPoint point)
 		if (m_bCursorMoving) {
 			UpdateSeekBarPos(point);
 			Invalidate();
-		} else if (!m_bSeekBarVisible && AfxGetAppSettings().IsD3DFullscreen() && m_rectSeekBar.PtInRect(point)) {
+		} else if (!m_bSeekBarVisible && AfxGetAppSettings().fIsFSWindow/*AfxGetAppSettings().IsD3DFullscreen()*/ && m_rectSeekBar.PtInRect(point)) {
 			m_bSeekBarVisible = true;
+			Invalidate();
+		} else if (!m_bFlyBarVisible && AfxGetAppSettings().fIsFSWindow/*AfxGetAppSettings().IsD3DFullscreen()*/ && m_rectFlyBar.PtInRect(point)) {
+			m_bFlyBarVisible = true;
+			Invalidate();
+		} else if (m_bFlyBarVisible && AfxGetAppSettings().fIsFSWindow /*AfxGetAppSettings().IsD3DFullscreen()*/ && m_rectFlyBar.PtInRect(point)) {
+			if (!bMouseOverExitButton && m_rectExitButton.PtInRect(point)) {
+				bMouseOverCloseButton = false;
+				bMouseOverExitButton = true;
+				SetCursor(LoadCursor(NULL, IDC_HAND));
+				Invalidate();
+			} else if (!bMouseOverCloseButton && m_rectCloseButton.PtInRect(point)) {
+				bMouseOverExitButton = false;
+				bMouseOverCloseButton = true;
+				SetCursor(LoadCursor(NULL, IDC_HAND));
+				Invalidate();
+			} else if ((bMouseOverCloseButton && !m_rectCloseButton.PtInRect(point)) || (bMouseOverExitButton && !m_rectExitButton.PtInRect(point))) {
+				bMouseOverExitButton = false;
+				bMouseOverCloseButton = false;
+				Invalidate();
+			} else if (m_rectCloseButton.PtInRect(point) || m_rectExitButton.PtInRect(point)) {
+				SetCursor(LoadCursor(NULL, IDC_HAND));
+			}
+		} else if (m_bFlyBarVisible && !m_rectFlyBar.PtInRect(point)) {
+			m_bFlyBarVisible = false;
+			bMouseOverCloseButton = false;
+			bMouseOverExitButton = false;
+			SetCursor(LoadCursor(NULL, IDC_ARROW));
+			if (m_pWnd) {
+				KillTimer(m_pWnd->m_hWnd, (long)this);
+				SetTimer(m_pWnd->m_hWnd, (long)this, 1000, (TIMERPROC)TimerFunc);
+			}
 			Invalidate();
 		} else if (m_bSeekBarVisible && !m_rectSeekBar.PtInRect(point)) {
 			m_bSeekBarVisible = false;
@@ -371,6 +442,8 @@ bool CVMROSD::OnLButtonDown(UINT nFlags, CPoint point)
 		if (m_rectCursor.PtInRect (point)) {
 			m_bCursorMoving	= true;
 			bRet			= true;
+		} else if (m_rectExitButton.PtInRect(point) || m_rectCloseButton.PtInRect(point)) {
+			bRet			= true;
 		} else if (m_rectSeekBar.PtInRect(point)) {
 			bRet			= true;
 			UpdateSeekBarPos(point);
@@ -388,9 +461,21 @@ bool CVMROSD::OnLButtonUp(UINT nFlags, CPoint point)
 	if (m_pVMB || m_pMFVMB) {
 		m_bCursorMoving = false;
 
+		if (m_rectFlyBar.PtInRect(point)) {
+
+			if (m_rectExitButton.PtInRect(point)) {
+				AfxGetApp()->GetMainWnd()->PostMessage(WM_COMMAND, ID_FILE_EXIT); // Alt+X
+			}
+
+			if (m_rectCloseButton.PtInRect(point)) {
+				AfxGetApp()->GetMainWnd()->PostMessage(WM_COMMAND, ID_FILE_CLOSEPLAYLIST); //Ctrl+C
+			}
+
+		}
+
 		bRet = (m_rectCursor.PtInRect (point) || m_rectSeekBar.PtInRect(point));
 	}
-
+	
 	return bRet;
 }
 
@@ -431,7 +516,7 @@ void CVMROSD::ClearMessage(bool hide)
 {
 	CAutoLock Lock(&m_Lock);
 
-	if (m_bSeekBarVisible) {
+	if (m_bSeekBarVisible || m_bFlyBarVisible) { 
 		return;
 	}
 

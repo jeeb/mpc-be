@@ -40,7 +40,7 @@ CPlayerToolBar::CPlayerToolBar()
 	: fDisableImgListRemap(false)
 	, m_pButtonsImages(NULL)
 {
-	m_hDXVAIcon = (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_DXVA_ON), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
+	m_hDXVAIcon = (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_DXVA_ON), IMAGE_ICON, 24, 16, LR_DEFAULTCOLOR);
 }
 
 CPlayerToolBar::~CPlayerToolBar()
@@ -564,8 +564,10 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 				}
 			}
 			
+			CRect r12; //MUTE
+			GetItemRect(12, &r12);
 			if (bGPU && m_hDXVAIcon) {
-				DrawIconEx(dc, r.left+3, r.CenterPoint().y-9, m_hDXVAIcon, 0,0, 0, NULL, DI_NORMAL);
+				DrawIconEx(dc, r12.left - 36, r.CenterPoint().y-9, m_hDXVAIcon, 0,0, 0, NULL, DI_NORMAL);
 			}
 
 			dc.SelectObject(&penSaved);

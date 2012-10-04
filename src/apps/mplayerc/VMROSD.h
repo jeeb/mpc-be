@@ -72,6 +72,8 @@ public:
 	bool OnMouseMove(UINT nFlags, CPoint point);
 	bool OnLButtonDown(UINT nFlags, CPoint point);
 	bool OnLButtonUp(UINT nFlags, CPoint point);
+	bool bMouseOverCloseButton;
+	bool bMouseOverExitButton;
 
 private :
 	CComPtr<IVMRMixerBitmap9>		m_pVMB;
@@ -100,13 +102,21 @@ private :
 	COLORREF	m_Color[OSD_LAST];
 
 	CRect	m_rectSeekBar;
+	CRect	m_rectFlyBar;
+	CRect	m_rectCloseButton;
+	CRect	m_rectExitButton;
 	CRect	m_rectCursor;
 	CRect	m_rectBar;
 	bool	m_bCursorMoving;
 	bool	m_bSeekBarVisible;
+	bool	m_bFlyBarVisible;
 	__int64	m_llSeekMin;
 	__int64	m_llSeekMax;
 	__int64	m_llSeekPos;
+	HICON icoExit;
+	HICON icoExit_a;
+	HICON icoClose;
+	HICON icoClose_a;
 
 	bool	m_bShowMessage;
 
@@ -118,10 +128,10 @@ private :
 	void CalcRect();
 	void UpdateSeekBarPos(CPoint point);
 	void DrawSlider(CRect* rect, __int64 llMin, __int64 llMax, __int64 llPos);
+	void DrawFlyBar(CRect* rect);
 	void DrawRect(CRect* rect, CBrush* pBrush = NULL, CPen* pPen = NULL);
 	void Invalidate();
 	void DrawMessage();
 	void DrawDebug();
-
 	static void CALLBACK TimerFunc(HWND hWnd, UINT nMsg, UINT nIDEvent, DWORD dwTime);
 };

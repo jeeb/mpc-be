@@ -131,6 +131,34 @@ IDR_DXVA_ON                      ICON                    "res\\gpu.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// Icon for flybar
+//
+
+IDR_FB_EXIT_A                    ICON                    "res\\flybar\\exit_a.ico"
+IDR_FB_EXIT                      ICON                    "res\\flybar\\exit.ico"
+IDR_FB_EXIT2_A                   ICON                    "res\\flybar\\exit2_a.ico"
+IDR_FB_EXIT2                     ICON                    "res\\flybar\\exit2.ico"
+IDR_FB_INFO_A                    ICON                    "res\\flybar\\info_a.ico"
+IDR_FB_INFO                      ICON                    "res\\flybar\\info.ico"
+IDR_FB_MINIMIZE_A                ICON                    "res\\flybar\\min_a.ico"
+IDR_FB_MINIMIZE                  ICON                    "res\\flybar\\min.ico"
+IDR_FB_MAXIMIZE_A                ICON                    "res\\flybar\\max_a.ico"
+IDR_FB_MAXIMIZE                  ICON                    "res\\flybar\\max.ico"
+IDR_FB_RESTORE_A                 ICON                    "res\\flybar\\restore_a.ico"
+IDR_FB_RESTORE                   ICON                    "res\\flybar\\restore.ico"
+IDR_FB_SETTINGS_A                ICON                    "res\\flybar\\set_a.ico"
+IDR_FB_SETTINGS                  ICON                    "res\\flybar\\set.ico"
+IDR_FB_FULLSCREEN_A              ICON                    "res\\flybar\\fs_a.ico"
+IDR_FB_FULLSCREEN                ICON                    "res\\flybar\\fs.ico"
+IDR_FB_WINDOW_A                  ICON                    "res\\flybar\\win_a.ico"
+IDR_FB_WINDOW                    ICON                    "res\\flybar\\win.ico"
+IDR_FB_LOCK                      ICON                    "res\\flybar\\lock.ico"
+IDR_FB_UNLOCK                    ICON                    "res\\flybar\\unlock.ico"
+IDR_FB_LOCK_A                    ICON                    "res\\flybar\\lock_a.ico"
+IDR_FB_UNLOCK_A                  ICON                    "res\\flybar\\unlock_a.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // Bitmap
 //
 

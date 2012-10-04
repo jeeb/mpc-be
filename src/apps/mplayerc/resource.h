@@ -675,6 +675,7 @@
 #define IDC_COMBOVOLUME                 22065
 #define IDC_CHECK_CHM                   22066
 #define IDC_COMBOSPEEDSTEP              22067
+#define IDC_CHECK_FLYBAR                22068
 #define ID_SUB_DELAY_DOWN               24000
 #define ID_SUB_DELAY_UP                 24001
 #define IDS_MPLAYERC_104                24002
@@ -1236,6 +1237,28 @@
 #define IDTB_BUTTON3                    40003
 #define IDTB_BUTTON4                    40004
 #define IDTB_BUTTON5                    40005
+#define IDR_FB_EXIT_A                   40101
+#define IDR_FB_EXIT                     40102
+#define IDR_FB_INFO_A                   40103
+#define IDR_FB_INFO                     40104
+#define IDR_FB_MINIMIZE_A               40105
+#define IDR_FB_MINIMIZE                 40106
+#define IDR_FB_MAXIMIZE_A               40107
+#define IDR_FB_MAXIMIZE                 40108
+#define IDR_FB_RESTORE_A                40109
+#define IDR_FB_RESTORE                  40110
+#define IDR_FB_SETTINGS_A               40111
+#define IDR_FB_SETTINGS                 40112
+#define IDR_FB_FULLSCREEN_A             40113
+#define IDR_FB_FULLSCREEN               40114
+#define IDR_FB_WINDOW_A                 40115
+#define IDR_FB_WINDOW                   40116
+#define IDR_FB_LOCK_A                   40117
+#define IDR_FB_LOCK                     40118
+#define IDR_FB_UNLOCK_A                 40119
+#define IDR_FB_UNLOCK                   40120
+#define IDR_FB_EXIT2_A                  40121
+#define IDR_FB_EXIT2                    40122
 #define IDR_TB_PLAY                     41001
 #define IDR_TB_PAUSE                    41002
 #define IDR_TB_STOP                     41003
@@ -1489,6 +1512,14 @@
 #define IDS_SUBDL_DLG_PARSING           41395
 #define IDS_SUBDL_DLG_NOT_FOUND         41396
 #define IDS_SUBDL_DLG_SUBS_AVAIL        41397
+
+#define IDS_TOOLTIP_MINIMIZE            41398
+#define IDS_TOOLTIP_RESTORE             41399
+#define IDS_TOOLTIP_MAXIMIZE            41400
+#define IDS_TOOLTIP_WINDOW              41401
+#define IDS_TOOLTIP_FULLSCREEN          41402
+#define IDS_TOOLTIP_LOCK                41403
+#define IDS_TOOLTIP_UNLOCK              41404
 
 #define IDS_PPAGE_OUTPUT_OLDRENDERER    42001
 #define IDS_PPAGE_OUTPUT_OVERLAYMIXER   42002

@@ -175,6 +175,7 @@
     <ClCompile Include="BaseGraph.cpp" />
     <ClCompile Include="ComPropertyPage.cpp" />
     <ClCompile Include="ComPropertySheet.cpp" />
+    <ClCompile Include="PlayerFlyBar.cpp" />
     <ClCompile Include="PPageInterface.cpp" />
     <ClCompile Include="SaveTaskDlg.cpp" />
     <ClCompile Include="ShockwaveFlash.cpp" />
@@ -294,6 +295,7 @@
     <ClInclude Include="BaseGraph.h" />
     <ClInclude Include="ComPropertyPage.h" />
     <ClInclude Include="ComPropertySheet.h" />
+    <ClInclude Include="PlayerFlyBar.h" />
     <ClInclude Include="PlayerYouTube.h" />
     <ClInclude Include="PPageInterface.h" />
     <ClInclude Include="SaveTaskDlg.h" />
@@ -805,6 +807,28 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\flybar\exit.ico" />
+    <Image Include="res\flybar\exit2.ico" />
+    <Image Include="res\flybar\exit2_a.ico" />
+    <Image Include="res\flybar\exit_a.ico" />
+    <Image Include="res\flybar\fs.ico" />
+    <Image Include="res\flybar\fs_a.ico" />
+    <Image Include="res\flybar\info.ico" />
+    <Image Include="res\flybar\info_a.ico" />
+    <Image Include="res\flybar\lock.ico" />
+    <Image Include="res\flybar\lock_a.ico" />
+    <Image Include="res\flybar\max.ico" />
+    <Image Include="res\flybar\max_a.ico" />
+    <Image Include="res\flybar\min.ico" />
+    <Image Include="res\flybar\min_a.ico" />
+    <Image Include="res\flybar\restore.ico" />
+    <Image Include="res\flybar\restore_a.ico" />
+    <Image Include="res\flybar\set.ico" />
+    <Image Include="res\flybar\set_a.ico" />
+    <Image Include="res\flybar\unlock.ico" />
+    <Image Include="res\flybar\unlock_a.ico" />
+    <Image Include="res\flybar\win.ico" />
+    <Image Include="res\flybar\win_a.ico" />
     <Image Include="res\gpu.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

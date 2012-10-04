@@ -34,6 +34,7 @@ CAppSettings::CAppSettings()
 	, hAccel(NULL)
 	, nCmdlnWebServerPort(-1)
 	, fShowDebugInfo(false)
+	, fIsFSWindow(false)
 {
 	// Internal source filter
 	SrcFiltersKeys[SRC_CDDA] = _T("SRC_CDDA");
@@ -592,6 +593,8 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_LCD_SUPPORT, (int)fLCDSupport);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_SMARTSEEK, (int)fSmartSeek);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_CHAPTER_MARKER, (int)fChapterMarker);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_USE_FLYBAR, (int)fFlybar);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_USE_FLYBAR_ONTOP, (int)fFlybarOnTop);
 
 	// Save analog capture settings
 	pApp->WriteProfileInt   (IDS_R_SETTINGS, IDS_RS_DEFAULT_CAPTURE, iDefaultCaptureDevice);
@@ -1345,18 +1348,20 @@ void CAppSettings::LoadSettings()
 	iHue			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_HUE, 0);
 	iSaturation		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_SATURATION, 0);
 
-	strShaderList	= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SHADERLIST, _T(""));
+	strShaderList				= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SHADERLIST, _T(""));
 	strShaderListScreenSpace	= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SHADERLISTSCREENSPACE, _T(""));
-	fToggleShader = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TOGGLESHADER, 0);
-	fToggleShaderScreenSpace = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TOGGLESHADERSSCREENSPACE, 0);
+	fToggleShader				= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TOGGLESHADER, 0);
+	fToggleShaderScreenSpace	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TOGGLESHADERSSCREENSPACE, 0);
 
-	fShowOSD		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SHOWOSD, 1);
-	fEnableEDLEditor= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEEDLEDITOR, FALSE);
-	fFastSeek = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_FASTSEEK_KEYFRAME, TRUE);
+	fShowOSD			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SHOWOSD, 1);
+	fEnableEDLEditor	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEEDLEDITOR, FALSE);
+	fFastSeek			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_FASTSEEK_KEYFRAME, TRUE);
 
 	fLCDSupport		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_LCD_SUPPORT, FALSE);
 	fSmartSeek		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_SMARTSEEK, FALSE);
 	fChapterMarker	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_CHAPTER_MARKER, FALSE);
+	fFlybar			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_USE_FLYBAR, TRUE);
+	fFlybarOnTop	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_USE_FLYBAR_ONTOP, FALSE);
 
 	// Save analog capture settings
 	iDefaultCaptureDevice = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DEFAULT_CAPTURE, 0);

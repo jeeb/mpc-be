@@ -716,6 +716,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// Should never be RTLed
 	m_wndView.ModifyStyleEx(WS_EX_LAYOUTRTL, WS_EX_NOINHERITLAYOUT);
 
+	// Create flybar-window
+	CreateFlyBar();
+
 	// Create Preview Window
 	DWORD style = WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS;
 	if (!m_wndView2.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL, style, CRect(0, 0, 160, 109), this, 0, NULL)) {
@@ -943,6 +946,11 @@ void CMainFrame::OnDestroy()
 void CMainFrame::OnClose()
 {
 	m_fClosingState = true;
+
+	// Destroy flybar-window
+	KillTimer(TIMER_FLYBARWINDOWHIDER);
+	m_wndFlyBar.ShowWindow(SW_HIDE);
+	m_wndFlyBar.DestroyWindow();
 
 	AppSettings& s = AfxGetAppSettings();
 
@@ -1265,6 +1273,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 	SendMessage(WM_GETMINMAXINFO, 0, (LPARAM)&mmi);
 	r |= CRect(r.TopLeft(), CSize(r.Width(), mmi.ptMinTrackSize.y));
 	MoveWindow(&r);
+	FlyBarSetPos();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1380,9 +1389,69 @@ void CMainFrame::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 	if (lpMMI->ptMinTrackSize.y<16) {
 		lpMMI->ptMinTrackSize.y = 16;
 	}
-
+	FlyBarSetPos();
 	__super::OnGetMinMaxInfo( lpMMI );
 }
+
+void CMainFrame::CreateFlyBar()
+{
+	if (AfxGetAppSettings().fFlybar) {
+		if (!m_wndFlyBar.CreateEx(WS_EX_TOPMOST|WS_EX_TRANSPARENT, NULL, AfxRegisterWndClass(0), WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS,
+						  CRect(0, 0, 0, 0), this, 0, NULL)) {
+		}
+		SetWindowLong(m_wndFlyBar.m_hWnd, GWL_EXSTYLE, WS_EX_LAYERED);
+		m_wndFlyBar.SetLayeredWindowAttributes(0, 150, LWA_ALPHA);
+
+		if (AfxGetAppSettings().fFlybarOnTop) m_wndFlyBar.ShowWindow(SW_SHOWNOACTIVATE);
+		SetTimer(TIMER_FLYBARWINDOWHIDER, 250, NULL);
+		//m_wndFlyBar.Invalidate();
+	}
+}
+
+
+bool CMainFrame::FlyBarSetPos()
+{
+
+	CRect r_wndView;
+	m_wndView.GetWindowRect(&r_wndView);
+	
+	if (AfxGetAppSettings().iDSVideoRendererType == VIDRNDT_DS_MADVR) {
+		if (m_wndFlyBar.IsWindowVisible()) m_wndFlyBar.ShowWindow(SW_HIDE);
+			return 0;
+	}
+
+	if (AfxGetAppSettings().iCaptionMenuMode == MODE_FRAMEONLY || AfxGetAppSettings().iCaptionMenuMode == MODE_BORDERLESS || m_fFullScreen) {
+		m_wndFlyBar.MoveWindow(r_wndView.right-228,r_wndView.top+4, 224, 32);
+		m_wndFlyBar.CalcButtonsRect();
+		if (r_wndView.bottom-r_wndView.top > 40 && r_wndView.right-r_wndView.left > 236) {
+			if (AfxGetAppSettings().fFlybarOnTop && !m_wndFlyBar.IsWindowVisible()) {
+				m_wndFlyBar.ShowWindow(SW_SHOWNOACTIVATE);
+				
+			}
+			return 1;
+		} else {
+			if (m_wndFlyBar.IsWindowVisible()) m_wndFlyBar.ShowWindow(SW_HIDE);
+			return 0;
+		}
+	} else {
+		if (m_wndFlyBar.IsWindowVisible()) m_wndFlyBar.ShowWindow(SW_HIDE);
+			return 0;
+	}
+	return 0;
+}
+
+
+void CMainFrame::DestroyFlyBar()
+{
+	if (m_wndFlyBar) {
+		KillTimer(TIMER_FLYBARWINDOWHIDER);
+		if (m_wndFlyBar.IsWindowVisible()) {
+			m_wndFlyBar.ShowWindow(SW_HIDE);
+		}
+		m_wndFlyBar.DestroyWindow();
+	}
+}
+
 
 void CMainFrame::OnMove(int x, int y)
 {
@@ -1395,6 +1464,9 @@ void CMainFrame::OnMove(int x, int y)
 	if (!m_fFirstFSAfterLaunchOnFS && !m_fFullScreen && wp.flags != WPF_RESTORETOMAXIMIZED && wp.showCmd != SW_SHOWMINIMIZED) {
 		GetWindowRect(AfxGetAppSettings().rcLastWindowPos);
 	}
+
+	FlyBarSetPos();
+
 }
 
 void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)
@@ -1432,6 +1504,7 @@ void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)
 			m_bWasSnapped = true;
 		}
 	}
+	FlyBarSetPos();
 }
 
 void CMainFrame::OnSize(UINT nType, int cx, int cy)
@@ -1451,6 +1524,9 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 		}
 		s.nLastWindowType = nType;
 	}
+
+	FlyBarSetPos();
+	
 }
 
 void CMainFrame::OnSizing(UINT fwSide, LPRECT pRect)
@@ -1543,6 +1619,7 @@ void CMainFrame::OnSizing(UINT fwSide, LPRECT pRect)
 	} else if (fWider && (fwSide == WMSZ_TOPLEFT || fwSide == WMSZ_TOPRIGHT)) {
 		pRect->top = pRect->bottom - wsize.cy;
 	}
+	FlyBarSetPos();
 }
 
 void CMainFrame::OnDisplayChange() // untested, not sure if it's working...
@@ -1772,6 +1849,45 @@ bool g_bExternalSubtitleTime	= false;
 void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 {
 	switch (nIDEvent) {
+		case TIMER_FLYBARWINDOWHIDER:
+			
+			if (m_wndView 
+					&& (AfxGetAppSettings().iCaptionMenuMode == MODE_FRAMEONLY 
+						|| AfxGetAppSettings().iCaptionMenuMode == MODE_BORDERLESS 
+						|| m_fFullScreen)) {
+
+				CPoint p;
+				GetCursorPos(&p);
+
+				CRect r_wndView, r_wndFlybar, r_ShowFlybar;
+				m_wndView.GetWindowRect(&r_wndView);
+				m_wndFlyBar.GetWindowRect(&r_wndFlybar);
+
+				r_ShowFlybar = r_wndView;
+				r_ShowFlybar.bottom = r_wndFlybar.bottom + r_wndFlybar.Height();
+
+				if (FlyBarSetPos() == 0) break;
+				
+				if (r_ShowFlybar.PtInRect(p) && !m_fHideCursor) {
+					if (!m_wndFlyBar.IsWindowVisible()) {
+						
+						m_wndFlyBar.ShowWindow(SW_SHOWNOACTIVATE);
+						m_wndFlyBar.Invalidate();
+					}
+					
+				} else if (!r_ShowFlybar.PtInRect(p)) {
+					if (m_wndFlyBar.IsWindowVisible() && !AfxGetAppSettings().fFlybarOnTop) {
+						m_wndFlyBar.ShowWindow(SW_HIDE);
+						m_wndFlyBar.bt_idx = -1;
+					} else if (m_wndFlyBar.IsWindowVisible() && AfxGetAppSettings().fFlybarOnTop) {
+						m_wndFlyBar.Invalidate();
+					}
+				}
+			
+			} else {
+				if (m_wndFlyBar.IsWindowVisible()) m_wndFlyBar.ShowWindow(SW_HIDE);
+			}
+			break;
 		case TIMER_STREAMPOSPOLLER:
 			if (m_iMediaLoadState == MLS_LOADED) {
 				
@@ -6711,6 +6827,7 @@ void CMainFrame::OnViewCaptionmenu()
 	SetWindowPos(NULL, wr.left, wr.top, wr.Width(), wr.Height(), dwFlags);
 
 	MoveVideoWindow();
+	FlyBarSetPos();
 }
 
 void CMainFrame::OnUpdateViewCaptionmenu(CCmdUI* pCmdUI)
@@ -11071,11 +11188,12 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 		CreateFullScreenWindow();
 		m_pVideoWnd		= m_pFullscreenWnd;
 		b_UseSmartSeek	= false;
+		s.fIsFSWindow = true;
 	} else {
 		m_pVideoWnd		= &m_wndView;
 
 		b_UseSmartSeek = s.fSmartSeek && !s.fD3DFullscreen;
-
+		s.fIsFSWindow = false;
 		if (OpenFileData* p = dynamic_cast<OpenFileData*>(pOMD)) {
 			CString fn = p->fns.GetHead();
 			if (!fn.IsEmpty() && (fn.Find(_T("://")) >= 0)) { // disable SmartSeek for streaming data.
@@ -13196,7 +13314,6 @@ void CMainFrame::CloseMediaPrivate()
 	m_pLN21 = NULL;
 	m_pSyncClock = NULL;
 	m_OSD.Stop();
-
 	pAMXBar.Release();
 	pAMTuner.Release();
 	pAMDF.Release();

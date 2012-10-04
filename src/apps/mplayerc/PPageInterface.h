@@ -64,6 +64,7 @@ public:
 	CString	m_OSD_Font;
 	BOOL m_fSmartSeek;
 	BOOL m_fChapterMarker;
+	BOOL m_fFlybar;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);

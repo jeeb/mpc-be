@@ -27,6 +27,7 @@
 
 #include "PlayerChildView.h"
 #include "PlayerPreView.h"
+#include "PlayerFlyBar.h"
 #include "PlayerSeekBar.h"
 #include "PlayerToolBar.h"
 #include "PlayerInfoBar.h"
@@ -182,7 +183,8 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 		TIMER_FULLSCREENMOUSEHIDER,
 		TIMER_STATS,
 		TIMER_LEFTCLICK,
-		TIMER_STATUSERASER
+		TIMER_STATUSERASER,
+		TIMER_FLYBARWINDOWHIDER
 	};
 	enum {
 		SEEK_DIRECTION_NONE,
@@ -627,7 +629,6 @@ public:
 	afx_msg LRESULT OnTaskBarThumbnailsCreate(WPARAM, LPARAM);
 	afx_msg LRESULT OnDwmSendIconicThumbnail(WPARAM, LPARAM);
 	afx_msg LRESULT OnDwmSendIconicLivePreviewBitmap(WPARAM, LPARAM);
-
 	afx_msg void OnSetFocus(CWnd* pOldWnd);
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 	afx_msg void OnMove(int x, int y);
@@ -971,6 +972,10 @@ public:
 
 	// Main Window
 	CWnd*			m_pVideoWnd;
+	CFlyBar			m_wndFlyBar;
+	void CreateFlyBar();
+	bool FlyBarSetPos();
+	void DestroyFlyBar();
 
 	// SmartSeek
 	CPreView		m_wndView2;
@@ -991,6 +996,7 @@ public:
 	CComPtr<IMFVideoProcessor>		m_pMFVP2;
 	CComPtr<IAMLine21Decoder_2>		m_pLN21;
 	CVMROSD		m_OSD;
+
 	bool		m_OpenFile;
 	bool		m_bRemainingTime;
 	int			m_nCurSubtitle;

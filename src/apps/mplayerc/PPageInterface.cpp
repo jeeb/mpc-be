@@ -45,6 +45,7 @@ CPPageInterface::CPPageInterface()
 	, m_fUseWin7TaskBar(TRUE)
 	, m_fSmartSeek(FALSE)
 	, m_fChapterMarker(FALSE)
+	, m_fFlybar(TRUE)
 {
 }
 
@@ -74,6 +75,7 @@ void CPPageInterface::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO2, m_FontSize);
 	DDX_Check(pDX, IDC_CHECK_PRV, m_fSmartSeek);
 	DDX_Check(pDX, IDC_CHECK_CHM, m_fChapterMarker);
+	DDX_Check(pDX, IDC_CHECK_FLYBAR, m_fFlybar);
 }
 
 int CALLBACK EnumFontProc(ENUMLOGFONT FAR* lf, NEWTEXTMETRIC FAR* tm, int FontType, LPARAM dwData)
@@ -121,6 +123,7 @@ BOOL CPPageInterface::OnInitDialog()
 
 	m_fSmartSeek		= s.fSmartSeek;
 	m_fChapterMarker	= s.fChapterMarker;
+	m_fFlybar			= s.fFlybar;
 
 	m_FontType.Clear();
 	m_FontSize.Clear();
@@ -193,8 +196,16 @@ BOOL CPPageInterface::OnApply()
 
 	s.fSmartSeek		= !!m_fSmartSeek;
 	s.fChapterMarker	= !!m_fChapterMarker;
+	s.fFlybar			= !!m_fFlybar;
 
 	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
+
+	if (s.fFlybar && !pFrame->m_wndFlyBar) {
+		pFrame->CreateFlyBar();
+		
+	} else if (!s.fFlybar && pFrame->m_wndFlyBar){
+		pFrame->DestroyFlyBar();
+	}
 
 	pFrame->CreateThumbnailToolbar();
 	pFrame->UpdateThumbarButton();

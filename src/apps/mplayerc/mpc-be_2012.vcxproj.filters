@@ -19,6 +19,9 @@
     <Filter Include="Resource Files\shaders">
       <UniqueIdentifier>{662236d7-ad89-4026-bb57-bb27667da2e6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Flybar">
+      <UniqueIdentifier>{b5f20ef9-c920-4d8c-9646-c5098b633974}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AppSettings.cpp">
@@ -367,6 +370,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SaveTaskDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerFlyBar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -737,6 +743,9 @@
     <ClInclude Include="PlayerYouTube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PlayerFlyBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ani.avi">
@@ -1011,6 +1020,72 @@
   <ItemGroup>
     <Image Include="res\gpu.ico">
       <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\flybar\exit.ico">
+      <Filter>Resource Files\Flybar</Filter>
+    </Image>
+    <Image Include="res\flybar\exit_a.ico">
+      <Filter>Resource Files\Flybar</Filter>
+    </Image>
+    <Image Include="res\flybar\exit2.ico">
+      <Filter>Resource Files\Flybar</Filter>
+    </Image>
+    <Image Include="res\flybar\exit2_a.ico">
+      <Filter>Resource Files\Flybar</Filter>
+    </Image>
+    <Image Include="res\flybar\fs.ico">
+      <Filter>Resource Files\Flybar</Filter>
+    </Image>
+    <Image Include="res\flybar\fs_a.ico">
+      <Filter>Resource Files\Flybar</Filter>
+    </Image>
+    <Image Include="res\flybar\info.ico">
+      <Filter>Resource Files\Flybar</Filter>
+    </Image>
+    <Image Include="res\flybar\info_a.ico">
+      <Filter>Resource Files\Flybar</Filter>
+    </Image>
+    <Image Include="res\flybar\lock.ico">
+      <Filter>Resource Files\Flybar</Filter>
+    </Image>
+    <Image Include="res\flybar\lock_a.ico">
+      <Filter>Resource Files\Flybar</Filter>
+    </Image>
+    <Image Include="res\flybar\max.ico">
+      <Filter>Resource Files\Flybar</Filter>
+    </Image>
+    <Image Include="res\flybar\max_a.ico">
+      <Filter>Resource Files\Flybar</Filter>
+    </Image>
+    <Image Include="res\flybar\min.ico">
+      <Filter>Resource Files\Flybar</Filter>
+    </Image>
+    <Image Include="res\flybar\min_a.ico">
+      <Filter>Resource Files\Flybar</Filter>
+    </Image>
+    <Image Include="res\flybar\restore.ico">
+      <Filter>Resource Files\Flybar</Filter>
+    </Image>
+    <Image Include="res\flybar\restore_a.ico">
+      <Filter>Resource Files\Flybar</Filter>
+    </Image>
+    <Image Include="res\flybar\set.ico">
+      <Filter>Resource Files\Flybar</Filter>
+    </Image>
+    <Image Include="res\flybar\set_a.ico">
+      <Filter>Resource Files\Flybar</Filter>
+    </Image>
+    <Image Include="res\flybar\unlock.ico">
+      <Filter>Resource Files\Flybar</Filter>
+    </Image>
+    <Image Include="res\flybar\unlock_a.ico">
+      <Filter>Resource Files\Flybar</Filter>
+    </Image>
+    <Image Include="res\flybar\win.ico">
+      <Filter>Resource Files\Flybar</Filter>
+    </Image>
+    <Image Include="res\flybar\win_a.ico">
+      <Filter>Resource Files\Flybar</Filter>
     </Image>
   </ItemGroup>
 </Project>
