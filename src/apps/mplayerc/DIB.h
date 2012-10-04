@@ -25,7 +25,29 @@
 #include <libpng/png.h>
 #include <libwebp/webp/encode.h>
 
-static void BMPDIB(LPCTSTR fn, BYTE* pData)
+using namespace Gdiplus;
+
+static int GetEncoderClsid(CStringW format, CLSID *pClsid)
+{
+	UINT num = 0, size = 0;
+	GetImageEncodersSize(&num, &size);
+	if (size == 0) {
+		return -1;
+	}
+	ImageCodecInfo* pImageCodecInfo = (ImageCodecInfo*)malloc(size);
+	GetImageEncoders(num, size, pImageCodecInfo);
+	for (UINT j = 0; j < num; j++) {
+		if (wcscmp(pImageCodecInfo[j].MimeType, format) == 0) {
+			*pClsid = pImageCodecInfo[j].Clsid;
+			free(pImageCodecInfo);
+			return j;
+		}
+	}
+	free(pImageCodecInfo);
+	return -1;
+}
+
+static void BMPDIB(LPCTSTR fn, BYTE* pData, CStringW format, ULONG quality)
 {
 	FILE* fp;
 	_tfopen_s(&fp, fn, _T("wb"));
@@ -66,11 +88,49 @@ static void BMPDIB(LPCTSTR fn, BYTE* pData)
 		header.biXPelsPerMeter = header.biYPelsPerMeter = 0;
 		header.biClrUsed = header.biClrImportant = 0;
 
-		fwrite(&bfh, 1, sizeof(bfh), fp);
-		fwrite(&header, 1, sizeof(header), fp);
-		fwrite(rgb, 1, len, fp);
+		if (format == L"") {
+			fwrite(&bfh, sizeof(bfh), 1, fp);
+			fwrite(&header, sih, 1, fp);
+			fwrite(rgb, len, 1, fp);
+			fclose(fp);
+		} else {
+			fclose(fp);
 
-		fclose(fp);
+			HGLOBAL hG = ::GlobalAlloc(GMEM_MOVEABLE, bfh.bfOffBits + len);
+			LPVOID lpBits = ::GlobalLock(hG);
+
+			memcpy((BYTE*)lpBits, &bfh, sizeof(bfh));
+			memcpy((BYTE*)lpBits + sizeof(bfh), &header, sih);
+			memcpy((BYTE*)lpBits + bfh.bfOffBits, rgb, len);
+
+			IStream *s;
+			::CreateStreamOnHGlobal(hG, 1, &s);
+
+			ULONG_PTR gdiplusToken;
+			GdiplusStartupInput gdiplusStartupInput;
+			GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, 0);
+			Bitmap *bm = new Bitmap(s);
+
+			CLSID encoderClsid = CLSID_NULL;
+			GetEncoderClsid(format, &encoderClsid);
+
+			EncoderParameters encoderParameters;
+			encoderParameters.Count = 1;
+			encoderParameters.Parameter[0].NumberOfValues = 1;
+			encoderParameters.Parameter[0].Value = &quality;
+			encoderParameters.Parameter[0].Guid = EncoderQuality;
+			encoderParameters.Parameter[0].Type = EncoderParameterValueTypeLong;
+
+			bm->Save(CStringW(fn), &encoderClsid, &encoderParameters);
+
+			delete bm;
+			GdiplusShutdown(gdiplusToken);
+
+			s->Release();
+			::GlobalUnlock(hG);
+			::GlobalFree(hG);
+		}
+
 		free(rgb);
 	}
 }
