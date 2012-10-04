@@ -1506,11 +1506,14 @@
 #define IDC_RMRND_COMBO                 42015
 #define IDC_QTRND_COMBO                 42016
 #define IDC_AUDRND_COMBO                42017
+#define IDS_PPAGE_OUTPUT_UNAVAILABLE    42018
+#define IDS_PPAGE_OUTPUT_UNAVAILABLEMSG 42019
 #define IDS_NAVIGATE_SUBTITLES          43000
 #define IDS_NAVIGATE_AUDIO              43001
 #define ID_NAVIGATE_SUBTITLES           43002
 #define ID_NAVIGATE_AUDIO               43003
 #define IDS_AG_STEP                     43004
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

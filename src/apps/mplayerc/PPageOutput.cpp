@@ -33,10 +33,27 @@
 
 // CPPageOutput dialog
 
+static bool IsRenderTypeAvailable(UINT VideoRendererType)
+{
+	switch (VideoRendererType) {
+		case VIDRNDT_DS_EVR:
+		case VIDRNDT_DS_EVR_CUSTOM:
+		case VIDRNDT_DS_SYNC:
+			return IsCLSIDRegistered(CLSID_EnhancedVideoRenderer);
+		case VIDRNDT_DS_DXR:
+			return IsCLSIDRegistered(CLSID_DXR);
+		case VIDRNDT_DS_MADVR:
+			return IsCLSIDRegistered(CLSID_madVR);
+		default:
+		return true;
+	}
+}
+
 IMPLEMENT_DYNAMIC(CPPageOutput, CPPageBase)
 CPPageOutput::CPPageOutput()
 	: CPPageBase(CPPageOutput::IDD, CPPageOutput::IDD)
 	, m_iDSVideoRendererType(VIDRNDT_DS_DEFAULT)
+	, m_iDSVideoRendererType_store(VIDRNDT_DS_DEFAULT)
 	, m_iRMVideoRendererType(VIDRNDT_RM_DEFAULT)
 	, m_iQTVideoRendererType(VIDRNDT_QT_DEFAULT)
 	, m_iAPSurfaceUsage(0)
@@ -242,24 +259,46 @@ BOOL CPPageOutput::OnInitDialog()
 		m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_EVR)), VIDRNDT_DS_EVR);
 		m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_EVR_CUSTOM)), VIDRNDT_DS_EVR_CUSTOM);
 		m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_SYNC)), VIDRNDT_DS_SYNC);
- 	}
+	} else {
+		CString str;
+		str.Format(_T("%s %s"), ResStr(IDS_PPAGE_OUTPUT_EVR), ResStr(IDS_PPAGE_OUTPUT_UNAVAILABLE));
+		m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(str), VIDRNDT_DS_EVR);
+		str.Format(_T("%s %s"), ResStr(IDS_PPAGE_OUTPUT_EVR_CUSTOM), ResStr(IDS_PPAGE_OUTPUT_UNAVAILABLE));
+		m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(str), VIDRNDT_DS_EVR_CUSTOM);
+		str.Format(_T("%s %s"), ResStr(IDS_PPAGE_OUTPUT_SYNC), ResStr(IDS_PPAGE_OUTPUT_UNAVAILABLE));
+		m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(str), VIDRNDT_DS_SYNC);
+	}
 
 	if (IsCLSIDRegistered(CLSID_DXR)) {
 		m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_DXR)), VIDRNDT_DS_DXR);
+	} else {
+		CString str;
+		str.Format(_T("%s %s"), ResStr(IDS_PPAGE_OUTPUT_DXR), ResStr(IDS_PPAGE_OUTPUT_UNAVAILABLE));
+		m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(str), VIDRNDT_DS_DXR);
 	}
 
 	m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_NULL_COMP)), VIDRNDT_DS_NULL_COMP);
 	m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_NULL_UNCOMP)), VIDRNDT_DS_NULL_UNCOMP);
 	if (IsCLSIDRegistered(CLSID_madVR)) {
 		m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_MADVR)), VIDRNDT_DS_MADVR);
+	} else {
+		CString str;
+		str.Format(_T("%s %s"), ResStr(IDS_PPAGE_OUTPUT_MADVR), ResStr(IDS_PPAGE_OUTPUT_UNAVAILABLE));
+		m_iDSVRTC.SetItemData(m_iDSVRTC.AddString(str), VIDRNDT_DS_MADVR);
 	}
 
 	for (int i = 0; i < m_iDSVRTC.GetCount(); ++i) {
 		if (m_iDSVideoRendererType == m_iDSVRTC.GetItemData(i)) {
-			m_iDSVRTC.SetCurSel(i);
+			if (IsRenderTypeAvailable(m_iDSVideoRendererType)) {
+				m_iDSVRTC.SetCurSel(i);
+				m_iDSVideoRendererType_store = m_iDSVideoRendererType;
+			} else {
+				m_iDSVRTC.SetCurSel(0);
+			}
 			break;
 		}
 	}
+
 	m_iDSVRTC.SetRedraw(TRUE);
 	m_iDSVRTC.Invalidate();
 	m_iDSVRTC.UpdateWindow();
@@ -314,7 +353,6 @@ BOOL CPPageOutput::OnInitDialog()
 	CreateToolTip();
 
 	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
 BOOL CPPageOutput::OnApply()
@@ -324,7 +362,7 @@ BOOL CPPageOutput::OnApply()
 	AppSettings& s = AfxGetAppSettings();
 
 	CRenderersSettings& renderersSettings                   = s.m_RenderersSettings;
-	s.iDSVideoRendererType		                            = m_iDSVideoRendererType = m_iDSVideoRendererTypeCtrl.GetItemData(m_iDSVideoRendererTypeCtrl.GetCurSel());
+	s.iDSVideoRendererType		                            = m_iDSVideoRendererType = m_iDSVideoRendererType_store = m_iDSVideoRendererTypeCtrl.GetItemData(m_iDSVideoRendererTypeCtrl.GetCurSel());
 	s.iRMVideoRendererType		                            = m_iRMVideoRendererType;
 	s.iQTVideoRendererType		                            = m_iQTVideoRendererType;
 	renderersSettings.iAPSurfaceUsage	                    = m_iAPSurfaceUsage;
@@ -364,7 +402,21 @@ void CPPageOutput::OnSurfaceChange()
 
 void CPPageOutput::OnDSRendererChange()
 {
-	const UINT CURRENT_VR = m_iDSVideoRendererTypeCtrl.GetItemData(m_iDSVideoRendererTypeCtrl.GetCurSel());
+	UINT CURRENT_VR = m_iDSVideoRendererTypeCtrl.GetItemData(m_iDSVideoRendererTypeCtrl.GetCurSel());
+
+	if (!IsRenderTypeAvailable(CURRENT_VR)) {
+		AfxMessageBox(IDS_PPAGE_OUTPUT_UNAVAILABLEMSG, MB_ICONEXCLAMATION | MB_OK, 0);
+
+		// revert to the last saved renderer
+		m_iDSVideoRendererTypeCtrl.SetCurSel(0);
+		for (int i = 0; i < m_iDSVideoRendererTypeCtrl.GetCount(); ++i) {
+			if (m_iDSVideoRendererType_store == m_iDSVideoRendererTypeCtrl.GetItemData(i)) {
+				m_iDSVideoRendererTypeCtrl.SetCurSel(i);
+				CURRENT_VR = m_iDSVideoRendererTypeCtrl.GetItemData(m_iDSVideoRendererTypeCtrl.GetCurSel());
+				break;
+			}
+		}
+	}
 
 	GetDlgItem(IDC_DX_SURFACE)->EnableWindow(FALSE);
 	GetDlgItem(IDC_DX9RESIZER_COMBO)->EnableWindow(FALSE);

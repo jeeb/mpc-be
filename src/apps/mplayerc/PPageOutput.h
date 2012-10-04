@@ -45,6 +45,8 @@ private:
 	CComboBox m_iD3D9RenderDeviceCtrl;
 
 	CButton m_audRendPropButton;
+
+	int m_iDSVideoRendererType_store;
 public:
 	CPPageOutput();
 	virtual ~CPPageOutput();
