@@ -39,7 +39,7 @@
 // CDeCSSInputPin
 //
 
-CDeCSSInputPin::CDeCSSInputPin(TCHAR* pObjectName, CTransformFilter* pFilter, HRESULT* phr, LPWSTR pName)
+CDeCSSInputPin::CDeCSSInputPin(TCHAR* pObjectName, CTransformFilter* pFilter, HRESULT* phr, LPCWSTR pName)
 	: CTransformInputPin(pObjectName, pFilter, phr, pName)
 {
 	m_varient = -1;
