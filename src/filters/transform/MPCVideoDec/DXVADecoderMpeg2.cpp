@@ -340,8 +340,8 @@ bool CDXVADecoderMpeg2::AppendBuffer (BYTE* pDataIn, int nSize, REFERENCE_TIME r
 		PushBufferTime (m_nMPEG2BufferPos, rtStart, rtStop);
 	}
 
-	if (m_nMPEG2BufferPos+nSize+FF_INPUT_BUFFER_PADDING_SIZE > m_nMPEG2BufferSize) {
-		m_nMPEG2BufferSize	= m_nMPEG2BufferPos+nSize+FF_INPUT_BUFFER_PADDING_SIZE;
+	if (m_nMPEG2BufferPos+nSize > m_nMPEG2BufferSize) {
+		m_nMPEG2BufferSize	= m_nMPEG2BufferPos+nSize;
 		m_pMPEG2Buffer		= (BYTE*)av_realloc(m_pMPEG2Buffer, m_nMPEG2BufferSize);
 	}
 
