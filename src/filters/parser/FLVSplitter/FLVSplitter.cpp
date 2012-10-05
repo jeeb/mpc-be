@@ -304,8 +304,6 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		CStringW name;
 
 		CMediaType mt;
-		CMediaType ff_mtype;
-		//mt.SetSampleSize(1);
 		mt.subtype = GUID_NULL;
 
 		if (i != 0 && t.PreviousTagSize != prevTagSize) {
@@ -330,8 +328,6 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				wfe->nSamplesPerSec		= 44100*(1<<at.SoundRate)/8;
 				wfe->wBitsPerSample		= 8*(at.SoundSize+1);
 				wfe->nChannels			= at.SoundType+1;
-				wfe->nBlockAlign		= wfe->nChannels * wfe->wBitsPerSample / 8;
-				wfe->nAvgBytesPerSec	= wfe->nSamplesPerSec * wfe->nBlockAlign;
 
 				switch (at.SoundFormat) {
 					case FLV_AUDIO_PCM:
@@ -411,6 +407,9 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 
 				}
+				wfe->nBlockAlign		= wfe->nChannels * wfe->wBitsPerSample / 8;
+				wfe->nAvgBytesPerSec	= wfe->nSamplesPerSec * wfe->nBlockAlign;
+
 				mt.SetSampleSize(wfe->wBitsPerSample * wfe->nChannels / 8);
 			}
 		} else if (t.TagType == FLV_VIDEODATA && t.DataSize != 0 && fTypeFlagsVideo) {
@@ -668,9 +667,6 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		if (mt.subtype != GUID_NULL) {
 			CAtlArray<CMediaType> mts;
-			if (mt.subtype == FOURCCMap(MAKEFOURCC('A','S','W','F'))) {
-				mts.InsertAt(0, ff_mtype);
-			}
 			mts.Add(mt);
 			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, name, this, this, &hr));
 			EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(t.TagType, pPinOut)));
