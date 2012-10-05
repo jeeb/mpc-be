@@ -47,92 +47,111 @@ static int GetEncoderClsid(CStringW format, CLSID *pClsid)
 	return -1;
 }
 
-static void BMPDIB(LPCTSTR fn, BYTE* pData, CStringW format, ULONG quality)
+static bool BMPDIB(LPCTSTR fn, BYTE* pData, CStringW format, ULONG quality, bool type, LPVOID* pBuf, size_t* pSize)
 {
-	FILE* fp;
-	_tfopen_s(&fp, fn, _T("wb"));
-	if (fp) {
-		BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
+	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
 
-		int width = bih->biWidth, height = abs(bih->biHeight), bit = 24;
-		int stride = (width * bit + 31) / 32 * 4, sih = sizeof(BITMAPINFOHEADER);
-		int line, len = stride * height;
+	int width = bih->biWidth, height = abs(bih->biHeight), bit = 24;
+	int stride = (width * bit + 31) / 32 * 4, sih = sizeof(BITMAPINFOHEADER);
+	int line, len = stride * height;
 
-		BYTE* rgb = (BYTE*)malloc(len);
-		BYTE *p, *src = pData + sih;
+	BYTE* rgb = (BYTE*)malloc(len);
+	BYTE *p, *src = pData + sih;
 
-		for(int y = 0; y < height; y++) {
-			for(int x = 0; x < width; x++) {
-				line = (3 * x) + (stride * y);
-				p = src + (width * 4 * y) + (4 * x);
-				rgb[line] = p[0];
-				rgb[line + 1] = p[1];
-				rgb[line + 2] = p[2];
-			}
+	for(int y = 0; y < height; y++) {
+		for(int x = 0; x < width; x++) {
+			line = (3 * x) + (stride * y);
+			p = src + (width * 4 * y) + (4 * x);
+			rgb[line] = p[0];
+			rgb[line + 1] = p[1];
+			rgb[line + 2] = p[2];
 		}
+	}
 
-		BITMAPFILEHEADER bfh;
-		bfh.bfType = 0x4d42;
-		bfh.bfOffBits = sizeof(bfh) + sih;
-		bfh.bfSize = bfh.bfOffBits + len;
-		bfh.bfReserved1 = bfh.bfReserved2 = 0;
+	BITMAPFILEHEADER bfh;
+	bfh.bfType = 0x4d42;
+	bfh.bfOffBits = sizeof(bfh) + sih;
+	bfh.bfSize = bfh.bfOffBits + len;
+	bfh.bfReserved1 = bfh.bfReserved2 = 0;
 
-		BITMAPINFOHEADER header;
-		header.biSize = sih;
-		header.biWidth = width;
-		header.biHeight = height;
-		header.biPlanes = 1;
-		header.biBitCount = bit;
-		header.biCompression = BI_RGB;
-		header.biSizeImage = 0;
-		header.biXPelsPerMeter = header.biYPelsPerMeter = 0;
-		header.biClrUsed = header.biClrImportant = 0;
+	BITMAPINFOHEADER header;
+	header.biSize = sih;
+	header.biWidth = width;
+	header.biHeight = height;
+	header.biPlanes = 1;
+	header.biBitCount = bit;
+	header.biCompression = BI_RGB;
+	header.biSizeImage = 0;
+	header.biXPelsPerMeter = header.biYPelsPerMeter = 0;
+	header.biClrUsed = header.biClrImportant = 0;
 
-		if (format == L"") {
+	if (format == L"") {
+		FILE* fp;
+		_tfopen_s(&fp, fn, _T("wb"));
+		if (fp) {
 			fwrite(&bfh, sizeof(bfh), 1, fp);
 			fwrite(&header, sih, 1, fp);
 			fwrite(rgb, len, 1, fp);
 			fclose(fp);
+		}
+	} else {
+		HGLOBAL hG = ::GlobalAlloc(GMEM_MOVEABLE, bfh.bfOffBits + len);
+		LPVOID lpBits = ::GlobalLock(hG);
+
+		memcpy(lpBits, &bfh, sizeof(bfh));
+		memcpy((BYTE*)lpBits + sizeof(bfh), &header, sih);
+		memcpy((BYTE*)lpBits + bfh.bfOffBits, rgb, len);
+
+		IStream *s;
+		::CreateStreamOnHGlobal(hG, 1, &s);
+
+		ULONG_PTR gdiplusToken;
+		GdiplusStartupInput gdiplusStartupInput;
+		GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, 0);
+		Bitmap *bm = new Bitmap(s);
+
+		CLSID encoderClsid = CLSID_NULL;
+		GetEncoderClsid(format, &encoderClsid);
+
+		EncoderParameters encoderParameters;
+		encoderParameters.Count = 1;
+		encoderParameters.Parameter[0].NumberOfValues = 1;
+		encoderParameters.Parameter[0].Value = &quality;
+		encoderParameters.Parameter[0].Guid = EncoderQuality;
+		encoderParameters.Parameter[0].Type = EncoderParameterValueTypeLong;
+
+		if (type) {
+			LARGE_INTEGER lOfs;
+			ULARGE_INTEGER lSize;
+			IStream *pS;
+			::CreateStreamOnHGlobal(0, 1, &pS);
+			bm->Save(pS, &encoderClsid, &encoderParameters);
+
+			lOfs.QuadPart = 0;
+			pS->Seek(lOfs, STREAM_SEEK_END, &lSize);
+
+			lOfs.QuadPart = 0;
+			pS->Seek(lOfs, STREAM_SEEK_SET, 0);
+
+			*pSize = (ULONG)((DWORD_PTR)lSize.QuadPart);
+			*pBuf = malloc(*pSize);
+
+			pS->Read(*pBuf, (ULONG)*pSize, 0);
+			pS->Release();
 		} else {
-			fclose(fp);
-
-			HGLOBAL hG = ::GlobalAlloc(GMEM_MOVEABLE, bfh.bfOffBits + len);
-			LPVOID lpBits = ::GlobalLock(hG);
-
-			memcpy(lpBits, &bfh, sizeof(bfh));
-			memcpy((BYTE*)lpBits + sizeof(bfh), &header, sih);
-			memcpy((BYTE*)lpBits + bfh.bfOffBits, rgb, len);
-
-			IStream *s;
-			::CreateStreamOnHGlobal(hG, 1, &s);
-
-			ULONG_PTR gdiplusToken;
-			GdiplusStartupInput gdiplusStartupInput;
-			GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, 0);
-			Bitmap *bm = new Bitmap(s);
-
-			CLSID encoderClsid = CLSID_NULL;
-			GetEncoderClsid(format, &encoderClsid);
-
-			EncoderParameters encoderParameters;
-			encoderParameters.Count = 1;
-			encoderParameters.Parameter[0].NumberOfValues = 1;
-			encoderParameters.Parameter[0].Value = &quality;
-			encoderParameters.Parameter[0].Guid = EncoderQuality;
-			encoderParameters.Parameter[0].Type = EncoderParameterValueTypeLong;
-
 			bm->Save(CStringW(fn), &encoderClsid, &encoderParameters);
-
-			delete bm;
-			GdiplusShutdown(gdiplusToken);
-
-			s->Release();
-			::GlobalUnlock(hG);
-			::GlobalFree(hG);
 		}
 
-		free(rgb);
+		delete bm;
+		GdiplusShutdown(gdiplusToken);
+
+		s->Release();
+		::GlobalUnlock(hG);
+		::GlobalFree(hG);
 	}
+
+	free(rgb);
+	return 1;
 }
 
 static void PNGDIB(LPCTSTR fn, BYTE* pData, int level)

@@ -188,7 +188,6 @@
     <ClCompile Include="GoToDlg.cpp" />
     <ClCompile Include="Ifo.cpp" />
     <ClCompile Include="ISDb.cpp" />
-    <ClCompile Include="jpeg.cpp" />
     <ClCompile Include="KeyProvider.cpp" />
     <ClCompile Include="LcdSupport.cpp" />
     <ClCompile Include="LineNumberEdit.cpp" />
@@ -312,7 +311,6 @@
     <ClInclude Include="IGraphBuilder2.h" />
     <ClInclude Include="InternalFiltersConfig.h" />
     <ClInclude Include="ISDb.h" />
-    <ClInclude Include="jpeg.h" />
     <ClInclude Include="KeyProvider.h" />
     <ClInclude Include="LcdSupport.h" />
     <ClInclude Include="LineNumberEdit.h" />

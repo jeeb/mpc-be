@@ -5224,17 +5224,17 @@ void CMainFrame::SaveDIB(LPCTSTR fn, BYTE* pData, long size)
 	CString ext = CString(CPath(fn).GetExtension()).MakeLower();
 
 	if (ext == _T(".bmp")) {
-		BMPDIB(fn, pData, L"", 0);
+		BMPDIB(fn, pData, L"", 0, 0, 0, 0);
 	} else if (ext == _T(".png")) {
 		PNGDIB(fn, pData, 9);
 	} else if (ext == _T(".jpg")) {
-		BMPDIB(fn, pData, L"image/jpeg", 90);
+		BMPDIB(fn, pData, L"image/jpeg", 90, 0, 0, 0);
 	} else if (ext == _T(".webp")) {
 		WebPDIB(fn, pData, 85);
 	} else if (ext == _T(".webpll")) {
 		WebPDIB(fn, pData, 0);
 	} else if (ext == _T(".tif")) {
-		BMPDIB(fn, pData, L"image/tiff", 100);
+		BMPDIB(fn, pData, L"image/tiff", 100, 0, 0, 0);
 	}
 
 	CString fName(fn);

@@ -90,9 +90,6 @@
     <ClCompile Include="ISDb.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="jpeg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="KeyProvider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -450,9 +447,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ISDb.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="jpeg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="KeyProvider.h">

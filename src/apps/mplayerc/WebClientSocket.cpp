@@ -29,7 +29,7 @@
 #include "../../Subtitles/TextFile.h"
 #include "WebServer.h"
 #include "WebClientSocket.h"
-#include "jpeg.h"
+#include "DIB.h"
 
 CWebClientSocket::CWebClientSocket(CWebServer* pWebServer, CMainFrame* pMainFrame)
 	: m_pWebServer(pWebServer)
@@ -827,14 +827,16 @@ bool CWebClientSocket::OnSnapShotJpeg(CStringA& hdr, CStringA& body, CStringA& m
 
 	BYTE* pData = NULL;
 	long size = 0;
-	CAtlArray<BYTE> jpeg;
+	LPVOID jpeg = NULL;
+	size_t jpeg_size = 0;
+
 	if (m_pMainFrame->GetDIB(&pData, size, true)) {
-		if (CJpegEncoderMem().Encode(pData, jpeg)) {
+		if (BMPDIB(0, pData, L"image/jpeg", 80, 1, &jpeg, &jpeg_size)) {
 			hdr +=
 				"Expires: Thu, 19 Nov 1981 08:52:00 GMT\r\n"
 				"Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0\r\n"
 				"Pragma: no-cache\r\n";
-			body = CStringA((char*)jpeg.GetData(), jpeg.GetCount());
+			body = CStringA((char*)jpeg, jpeg_size);
 			mime = "image/jpeg";
 			fRet = true;
 		}
