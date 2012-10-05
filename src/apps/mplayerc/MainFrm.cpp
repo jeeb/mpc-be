@@ -73,7 +73,6 @@
 #include <AllocatorCommon7.h>
 #include <AllocatorCommon.h>
 #include <SyncAllocatorPresenter.h>
-
 #include "ComPropertySheet.h"
 #include "LcdSupport.h"
 #include "SettingsDefines.h"
@@ -81,7 +80,6 @@
 #include <comdef.h>
 #include <dwmapi.h>
 
-#include "jpeg.h"
 #include "DIB.h"
 #include "OpenImage.h"
 #include "PlayerYouTube.h"

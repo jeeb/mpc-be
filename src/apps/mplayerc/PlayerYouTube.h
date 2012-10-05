@@ -22,9 +22,12 @@
 
 #pragma once
 
-#include <afxinet.h>
+#define YOUTUBE_URL			_T("youtube.com/watch?")
+#define YOUTUBE_FULL_URL	_T("www.youtube.com/watch?v=")
+#define YOUTU_BE_URL		_T("youtu.be/")
+#define YOUTU_BE_FULL_URL	_T("www.youtu.be/")
 
-static int _strpos(char* h, char* n)
+static int strpos(char* h, char* n)
 {
 	char* p = strstr(h, n);
 
@@ -35,16 +38,11 @@ static int _strpos(char* h, char* n)
 	}
 }
 
-#define YOUTUBE_URL			_T("youtube.com/watch?")
-#define YOUTUBE_FULL_URL	_T("www.youtube.com/watch?v=")
-#define YOUTU_BE_URL		_T("youtu.be/")
-#define YOUTU_BE_FULL_URL	_T("www.youtu.be/")
-
 static CString PlayerYouTube(CString fn, CString* out_title)
 {
 	CString tmp_fn(CString(fn).MakeLower());
 
-	if ((tmp_fn.Find(YOUTUBE_URL) != -1) || (tmp_fn.Find(YOUTU_BE_URL) != -1)) {
+	if (tmp_fn.Find(YOUTUBE_URL) != -1 || tmp_fn.Find(YOUTU_BE_URL) != -1) {
 
 		if (tmp_fn.Find(YOUTU_BE_URL) != -1) {
 			fn.Replace(YOUTU_BE_FULL_URL, YOUTUBE_FULL_URL);
@@ -104,10 +102,10 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 
 		// get name(title) for output filename
 		CString Title;
-		int t_start = _strpos(out, "<meta name=\"title\" content=\"");
+		int t_start = strpos(out, "<meta name=\"title\" content=\"");
 		if (t_start > 0) {
 			t_start += 28;
-			int t_stop = _strpos(out + t_start, "\">");
+			int t_stop = strpos(out + t_start, "\">");
 			if (t_stop > 0) {
 				char* title	= (char*)malloc(t_stop + 1);
 				memset(title, 0, t_stop + 1);
@@ -131,41 +129,41 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 
 		DWORD k, lastpos = 0;
 		for (;;) {
-			k = _strpos(out + lastpos, "%2Curl%3Dhttp%253A%252F%252F");
+			k = strpos(out + lastpos, "%2Curl%3Dhttp%253A%252F%252F");
 			if (!k) {
-				k = _strpos(out + lastpos, "%26url%3Dhttp%253A%252F%252F");
+				k = strpos(out + lastpos, "%26url%3Dhttp%253A%252F%252F");
 			}
 
 			if (k) {
 			
 				k += (lastpos + 9);
 				lastpos = k;
-				DWORD i = _strpos(out + k, "%26quality");
+				DWORD i = strpos(out + k, "%26quality");
 				if (!i) {
 					free(out);
 					return fn;
 				}
 
 				// skip webm format
-				DWORD l = _strpos(out + k, "video%252Fwebm");
+				DWORD l = strpos(out + k, "video%252Fwebm");
 				if (l && (l < i)) {
 					continue;
 				}
 
 				// get extension for output filename
 				CString ext;
-				l = _strpos(out + k, "video%252Fmp4");
+				l = strpos(out + k, "video%252Fmp4");
 				if (l && (l < i)) {
 					ext = _T(".mp4");
 				}
 				if (ext.IsEmpty()) {
-					DWORD l = _strpos(out + k, "video%252Fx-flv");
+					DWORD l = strpos(out + k, "video%252Fx-flv");
 					if (l && (l < i)) {
 						ext = _T(".flv");
 					}
 				}
 				if (ext.IsEmpty()) {
-					DWORD l = _strpos(out + k, "video%252F3gpp");
+					DWORD l = strpos(out + k, "video%252F3gpp");
 					if (l && (l < i)) {
 						ext = _T(".3gp");
 					}

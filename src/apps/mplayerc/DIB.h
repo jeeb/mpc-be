@@ -99,7 +99,7 @@ static void BMPDIB(LPCTSTR fn, BYTE* pData, CStringW format, ULONG quality)
 			HGLOBAL hG = ::GlobalAlloc(GMEM_MOVEABLE, bfh.bfOffBits + len);
 			LPVOID lpBits = ::GlobalLock(hG);
 
-			memcpy((BYTE*)lpBits, &bfh, sizeof(bfh));
+			memcpy(lpBits, &bfh, sizeof(bfh));
 			memcpy((BYTE*)lpBits + sizeof(bfh), &header, sih);
 			memcpy((BYTE*)lpBits + bfh.bfOffBits, rgb, len);
 
