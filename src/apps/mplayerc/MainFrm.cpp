@@ -1411,13 +1411,18 @@ void CMainFrame::CreateFlyBar()
 
 bool CMainFrame::FlyBarSetPos()
 {
+	if (!m_wndFlyBar || !(::IsWindow(m_wndFlyBar.GetSafeHwnd()))) {
+		return 0;
+	}
 
 	CRect r_wndView;
 	m_wndView.GetWindowRect(&r_wndView);
 	
 	if (AfxGetAppSettings().iDSVideoRendererType == VIDRNDT_DS_MADVR) {
-		if (m_wndFlyBar.IsWindowVisible()) m_wndFlyBar.ShowWindow(SW_HIDE);
-			return 0;
+		if (m_wndFlyBar.IsWindowVisible()) {
+			m_wndFlyBar.ShowWindow(SW_HIDE);
+		}
+		return 0;
 	}
 
 	if (AfxGetAppSettings().iCaptionMenuMode == MODE_FRAMEONLY || AfxGetAppSettings().iCaptionMenuMode == MODE_BORDERLESS || m_fFullScreen) {
@@ -1430,12 +1435,16 @@ bool CMainFrame::FlyBarSetPos()
 			}
 			return 1;
 		} else {
-			if (m_wndFlyBar.IsWindowVisible()) m_wndFlyBar.ShowWindow(SW_HIDE);
+			if (m_wndFlyBar.IsWindowVisible()) {
+				m_wndFlyBar.ShowWindow(SW_HIDE);
+			}
 			return 0;
 		}
 	} else {
-		if (m_wndFlyBar.IsWindowVisible()) m_wndFlyBar.ShowWindow(SW_HIDE);
-			return 0;
+		if (m_wndFlyBar.IsWindowVisible()) {
+			m_wndFlyBar.ShowWindow(SW_HIDE);
+		}
+		return 0;
 	}
 	return 0;
 }

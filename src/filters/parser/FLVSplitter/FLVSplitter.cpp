@@ -305,7 +305,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		CMediaType mt;
 		CMediaType ff_mtype;
-		mt.SetSampleSize(1);
+		//mt.SetSampleSize(1);
 		mt.subtype = GUID_NULL;
 
 		if (i != 0 && t.PreviousTagSize != prevTagSize) {
@@ -323,13 +323,15 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 				fTypeFlagsAudio = false;
 
-				mt.majortype = MEDIATYPE_Audio;
-				mt.formattype = FORMAT_WaveFormatEx;
-				WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX));
+				mt.majortype			= MEDIATYPE_Audio;
+				mt.formattype			= FORMAT_WaveFormatEx;
+				WAVEFORMATEX* wfe		= (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX));
 				memset(wfe, 0, sizeof(WAVEFORMATEX));
-				wfe->nSamplesPerSec = 44100*(1<<at.SoundRate)/8;
-				wfe->wBitsPerSample = 8*(at.SoundSize+1);
-				wfe->nChannels = at.SoundType+1;
+				wfe->nSamplesPerSec		= 44100*(1<<at.SoundRate)/8;
+				wfe->wBitsPerSample		= 8*(at.SoundSize+1);
+				wfe->nChannels			= at.SoundType+1;
+				wfe->nBlockAlign		= wfe->nChannels * wfe->wBitsPerSample / 8;
+				wfe->nAvgBytesPerSec	= wfe->nSamplesPerSec * wfe->nBlockAlign;
 
 				switch (at.SoundFormat) {
 					case FLV_AUDIO_PCM:
@@ -409,6 +411,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 
 				}
+				mt.SetSampleSize(wfe->wBitsPerSample * wfe->nChannels / 8);
 			}
 		} else if (t.TagType == FLV_VIDEODATA && t.DataSize != 0 && fTypeFlagsVideo) {
 			UNREFERENCED_PARAMETER(vt);
