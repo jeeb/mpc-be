@@ -30,6 +30,8 @@ extern "C" __declspec(dllexport) int get_icon_index(LPCTSTR ext)
 
 	if (_tcsicmp(ext, _T(".3g2")) == 0) {
 		iconindex = IDI_3G2_ICON;
+	} else if (_tcsicmp(ext, _T(".3ga")) == 0) {
+		iconindex = IDI_3GP_ICON;
 	} else if (_tcsicmp(ext, _T(".3gp")) == 0) {
 		iconindex = IDI_3GP_ICON;
 	} else if (_tcsicmp(ext, _T(".3gp2")) == 0) {

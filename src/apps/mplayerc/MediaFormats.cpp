@@ -225,7 +225,7 @@ void CMediaFormats::UpdateData(bool fSave)
 		ADDFMT((_T("webm"),        ResStr(IDS_MFMT_WEBM),        _T("webm")));
 		ADDFMT((_T("mp4"),         ResStr(IDS_MFMT_MP4),         _T("mp4 m4v mp4v mpv4 hdmov")));
 		ADDFMT((_T("mov"),         ResStr(IDS_MFMT_MOV),         _T("mov")));
-		ADDFMT((_T("3gp"),         ResStr(IDS_MFMT_3GP),         _T("3gp 3gpp")));
+		ADDFMT((_T("3gp"),         ResStr(IDS_MFMT_3GP),         _T("3gp 3gpp 3ga")));
 		ADDFMT((_T("3g2"),         ResStr(IDS_MFMT_3G2),         _T("3g2 3gp2")));
 		ADDFMT((_T("flv"),         ResStr(IDS_MFMT_FLV),         _T("flv f4v")));
 		ADDFMT((_T("ogm"),         ResStr(IDS_MFMT_OGM),         _T("ogm ogv")));
