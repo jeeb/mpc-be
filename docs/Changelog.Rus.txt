@@ -15,7 +15,7 @@
 * libpng 1.5.13 git-753fd3f;
 * libopus git-ba28403;
 * Virtualdub 1.10.3 Test 7;
-* ffmpeg git-2e8dcde1;
+* ffmpeg git-db4bb4c9;
 * MediaInfo 0.7.60+ svn rev.5108;
 
 Исправления (!):
