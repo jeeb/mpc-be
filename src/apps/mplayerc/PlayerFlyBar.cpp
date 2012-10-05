@@ -43,30 +43,37 @@ CFlyBar::CFlyBar() :
 	SetDefault();
 }
 
+#define DestroyIcons(icon) \
+	if (icon) DestroyIcon(icon); \
+
 CFlyBar::~CFlyBar()
 {
-	if (m_ExitIcon_a) DestroyIcon(m_ExitIcon_a);
-	if (m_ExitIcon) DestroyIcon(m_ExitIcon);
-	if (m_MinIcon_a) DestroyIcon(m_MinIcon_a);
-	if (m_MinIcon) DestroyIcon(m_MinIcon);
-	if (m_MaxIcon_a) DestroyIcon(m_MaxIcon_a);
-	if (m_MaxIcon) DestroyIcon(m_MaxIcon);
-	if (m_RestoreIcon_a) DestroyIcon(m_RestoreIcon_a);
-	if (m_RestoreIcon) DestroyIcon(m_RestoreIcon);
-	if (m_SettingsIcon_a) DestroyIcon(m_SettingsIcon_a);
-	if (m_SettingsIcon) DestroyIcon(m_SettingsIcon);
-	if (m_InfoIcon_a) DestroyIcon(m_InfoIcon_a);
-	if (m_InfoIcon) DestroyIcon(m_InfoIcon);
-	if (m_FSIcon_a) DestroyIcon(m_FSIcon_a);
-	if (m_FSIcon) DestroyIcon(m_FSIcon);
-	if (m_WindowIcon_a) DestroyIcon(m_WindowIcon_a);
-	if (m_WindowIcon) DestroyIcon(m_WindowIcon);
-	if (m_LockIcon) DestroyIcon(m_LockIcon);
-	if (m_UnLockIcon) DestroyIcon(m_UnLockIcon);
-	if (m_LockIcon_a) DestroyIcon(m_LockIcon_a);
-	if (m_UnLockIcon_a) DestroyIcon(m_UnLockIcon_a);
+	Destroy();
 }
 
+void CFlyBar::Destroy()
+{
+	DestroyIcons(m_ExitIcon_a)
+	DestroyIcons(m_ExitIcon)
+	DestroyIcons(m_MinIcon_a)
+	DestroyIcons(m_MinIcon)
+	DestroyIcons(m_MaxIcon_a)
+	DestroyIcons(m_MaxIcon)
+	DestroyIcons(m_RestoreIcon_a)
+	DestroyIcons(m_RestoreIcon)
+	DestroyIcons(m_SettingsIcon_a)
+	DestroyIcons(m_SettingsIcon)
+	DestroyIcons(m_InfoIcon_a)
+	DestroyIcons(m_InfoIcon)
+	DestroyIcons(m_FSIcon_a)
+	DestroyIcons(m_FSIcon)
+	DestroyIcons(m_WindowIcon_a)
+	DestroyIcons(m_WindowIcon)
+	DestroyIcons(m_LockIcon_a)
+	DestroyIcons(m_LockIcon)
+	DestroyIcons(m_UnLockIcon_a)
+	DestroyIcons(m_UnLockIcon)
+}
 
 IMPLEMENT_DYNAMIC(CFlyBar, CWnd)
 
@@ -132,9 +139,7 @@ int CFlyBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_tooltip.Create(this, TTS_ALWAYSTIP);
 	EnableToolTips(true);
 	
-	CRect r;
-	GetWindowRect(&r);
-	m_tooltip.AddTool(this,(LPTSTR)(LPCTSTR)_T(""), r);
+	m_tooltip.AddTool(this, _T(""));
 	m_tooltip.Activate(TRUE);
 
 	m_tooltip.SetDelayTime(TTDT_AUTOPOP, -1);
@@ -148,29 +153,21 @@ void CFlyBar::CalcButtonsRect()
 {
 	CRect rcBar;
 	GetWindowRect(&rcBar);
-	
-	CRect r_Exit(rcBar.right-4-(iw), rcBar.top+4, rcBar.right-4, rcBar.bottom-4);
-	CRect r_Restore(rcBar.right-4-(iw*2), rcBar.top+4, rcBar.right-4-(iw), rcBar.bottom-4);
-	CRect r_Min(rcBar.right-4-(iw*3), rcBar.top+4, rcBar.right-4-(iw*2), rcBar.bottom-4);
-	CRect r_FS(rcBar.right-4-(iw*4), rcBar.top+4, rcBar.right-4-(iw*3), rcBar.bottom-4);
-	CRect r_Info(rcBar.right-4-(iw*6), rcBar.top+4, rcBar.right-4-(iw*5), rcBar.bottom-4);
-	CRect r_Settings(rcBar.right-4-(iw*7), rcBar.top+4, rcBar.right-4-(iw*6), rcBar.bottom-4);
-	CRect r_Lock(rcBar.right-4-(iw*9), rcBar.top+4, rcBar.right-4-(iw*8), rcBar.bottom-4);
 
-	r_ExitIcon		= r_Exit;
-	r_MinIcon		= r_Min;
-	r_RestoreIcon	= r_Restore;
-	r_SettingsIcon	= r_Settings;
-	r_InfoIcon		= r_Info;
-	r_FSIcon		= r_FS;
-	r_LockIcon		= r_Lock;
+	r_ExitIcon		= CRect(rcBar.right-4-(iw), rcBar.top+4, rcBar.right-4, rcBar.bottom-4);
+	r_MinIcon		= CRect(rcBar.right-4-(iw*3), rcBar.top+4, rcBar.right-4-(iw*2), rcBar.bottom-4);
+	r_RestoreIcon	= CRect(rcBar.right-4-(iw*2), rcBar.top+4, rcBar.right-4-(iw), rcBar.bottom-4);
+	r_SettingsIcon	= CRect(rcBar.right-4-(iw*7), rcBar.top+4, rcBar.right-4-(iw*6), rcBar.bottom-4);;
+	r_InfoIcon		= CRect(rcBar.right-4-(iw*6), rcBar.top+4, rcBar.right-4-(iw*5), rcBar.bottom-4);;
+	r_FSIcon		= CRect(rcBar.right-4-(iw*4), rcBar.top+4, rcBar.right-4-(iw*3), rcBar.bottom-4);;
+	r_LockIcon		= CRect(rcBar.right-4-(iw*9), rcBar.top+4, rcBar.right-4-(iw*8), rcBar.bottom-4);;
 }
 
 
 void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 {
 
-	CMainFrame* pFrame	= (CMainFrame*)GetParentFrame();
+	CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
 	pFrame->SetFocus();
 	
 	CRect rcBar;
@@ -189,7 +186,6 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 	} else if (r_MinIcon.PtInRect(p)) {
 		pFrame->ShowWindow(SW_SHOWMINIMIZED );
 	} else if (r_RestoreIcon.PtInRect(p) && !pFrame->m_fFullScreen) {
-		
 		if (wp.showCmd == SW_SHOWMAXIMIZED) {
 			pFrame->ShowWindow(SW_SHOWNORMAL);
 		} else if (wp.showCmd != SW_SHOWMAXIMIZED) {
@@ -200,8 +196,10 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 		pFrame->OnViewOptions();
 		Invalidate();
 	} else if (r_InfoIcon.PtInRect(p)) {
-		OAFilterState fs	= pFrame->GetMediaState();
-		if (fs != -1) pFrame->OnFileProperties();
+		OAFilterState fs = pFrame->GetMediaState();
+		if (fs != -1) {
+			pFrame->OnFileProperties();
+		}
 		Invalidate();
 	} else if (r_FSIcon.PtInRect(p) && wp.showCmd != SW_SHOWMAXIMIZED) {
 		pFrame->ToggleFullscreen(true, true);
@@ -225,36 +223,52 @@ void CFlyBar::OnMouseMove(UINT nFlags, CPoint point)
 	m_tooltip.GetText(str,this);
 	
 	if (r_ExitIcon.PtInRect(point)) {
-		if (str != ResStr(IDS_AG_EXIT)) m_tooltip.UpdateTipText(ResStr(IDS_AG_EXIT), this);
+		if (str != ResStr(IDS_AG_EXIT)) {
+			m_tooltip.UpdateTipText(ResStr(IDS_AG_EXIT), this);
+		}
 		bt_idx = 0;
 	} else if (r_MinIcon.PtInRect(point)) {
-		if (str != ResStr(IDS_TOOLTIP_MINIMIZE)) m_tooltip.UpdateTipText(ResStr(IDS_TOOLTIP_MINIMIZE), this);
+		if (str != ResStr(IDS_TOOLTIP_MINIMIZE)) {
+			m_tooltip.UpdateTipText(ResStr(IDS_TOOLTIP_MINIMIZE), this);
+		}
 		bt_idx = 1;
 	} else if (r_RestoreIcon.PtInRect(point)) {
-		CMainFrame* pFrame	= (CMainFrame*)GetParentFrame();
+		CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
 		WINDOWPLACEMENT wp;
 		pFrame->GetWindowPlacement(&wp);
 		wp.showCmd == SW_SHOWMAXIMIZED ? str2 = ResStr(IDS_TOOLTIP_MINIMIZE) : str2 = ResStr(IDS_TOOLTIP_MAXIMIZE);
-		if (str != str2) m_tooltip.UpdateTipText(str2, this);
+		if (str != str2) {
+			m_tooltip.UpdateTipText(str2, this);
+		}
 		bt_idx = 2;
 	} else if (r_SettingsIcon.PtInRect(point)) {
-		if (str != ResStr(IDS_AG_OPTIONS)) m_tooltip.UpdateTipText(ResStr(IDS_AG_OPTIONS), this);
+		if (str != ResStr(IDS_AG_OPTIONS)) {
+			m_tooltip.UpdateTipText(ResStr(IDS_AG_OPTIONS), this);
+		}
 		bt_idx = 3;
 	} else if (r_InfoIcon.PtInRect(point)) {
-		if (str != ResStr(IDS_AG_PROPERTIES)) m_tooltip.UpdateTipText(ResStr(IDS_AG_PROPERTIES), this);
+		if (str != ResStr(IDS_AG_PROPERTIES)) {
+			m_tooltip.UpdateTipText(ResStr(IDS_AG_PROPERTIES), this);
+		}
 		bt_idx = 4;
 	} else if (r_FSIcon.PtInRect(point)) {
-		CMainFrame* pFrame	= (CMainFrame*)GetParentFrame();
+		CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
 		pFrame->m_fFullScreen ? str2 = ResStr(IDS_TOOLTIP_WINDOW) : str2 = ResStr(IDS_TOOLTIP_FULLSCREEN);
-		if (str != str2) m_tooltip.UpdateTipText(str2, this);
+		if (str != str2) {
+			m_tooltip.UpdateTipText(str2, this);
+		}
 		bt_idx = 5;
 	} else if (r_LockIcon.PtInRect(point)) {
 		AppSettings& s = AfxGetAppSettings();
 		s.fFlybarOnTop ? str2 = ResStr(IDS_TOOLTIP_UNLOCK) : str2 = ResStr(IDS_TOOLTIP_LOCK);
-		if (str != str2) m_tooltip.UpdateTipText(str2, this);
+		if (str != str2) {
+			m_tooltip.UpdateTipText(str2, this);
+		}
 		bt_idx = 6;
 	} else {
-		if (str != _T("")) m_tooltip.UpdateTipText(_T(""), this);
+		if (str != _T("")) {
+			m_tooltip.UpdateTipText(_T(""), this);
+		}
 		SetCursor(LoadCursor(NULL, IDC_ARROW));
 		bt_idx = -1;
 	}
@@ -345,26 +359,7 @@ void CFlyBar::OnPaint()
 
 void CFlyBar::SetDefault()
 {
-	if (m_ExitIcon_a) DestroyIcon(m_ExitIcon_a);
-	if (m_ExitIcon) DestroyIcon(m_ExitIcon);
-	if (m_MinIcon_a) DestroyIcon(m_MinIcon_a);
-	if (m_MinIcon) DestroyIcon(m_MinIcon);
-	if (m_MaxIcon_a) DestroyIcon(m_MaxIcon_a);
-	if (m_MaxIcon) DestroyIcon(m_MaxIcon);
-	if (m_RestoreIcon_a) DestroyIcon(m_RestoreIcon_a);
-	if (m_RestoreIcon) DestroyIcon(m_RestoreIcon);
-	if (m_SettingsIcon_a) DestroyIcon(m_SettingsIcon_a);
-	if (m_SettingsIcon) DestroyIcon(m_SettingsIcon);
-	if (m_InfoIcon_a) DestroyIcon(m_InfoIcon_a);
-	if (m_InfoIcon) DestroyIcon(m_InfoIcon);
-	if (m_FSIcon_a) DestroyIcon(m_FSIcon_a);
-	if (m_FSIcon) DestroyIcon(m_FSIcon);
-	if (m_WindowIcon_a) DestroyIcon(m_WindowIcon_a);
-	if (m_WindowIcon) DestroyIcon(m_WindowIcon);
-	if (m_LockIcon) DestroyIcon(m_LockIcon);
-	if (m_UnLockIcon) DestroyIcon(m_UnLockIcon);
-	if (m_LockIcon_a) DestroyIcon(m_LockIcon_a);
-	if (m_UnLockIcon_a) DestroyIcon(m_UnLockIcon_a);
+	Destroy();
 
 	m_ExitIcon_a		= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_EXIT_A), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
 	m_ExitIcon			= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_EXIT), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);

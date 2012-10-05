@@ -724,6 +724,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (!m_wndView2.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL, style, CRect(0, 0, 160, 109), this, 0, NULL)) {
 		TRACE(_T("Failed to create Preview Window\n"));
 		m_wndView.DestroyWindow();
+		return -1;
 	} else {
 		m_wndView2.ShowWindow(SW_HIDE);
 	}
@@ -949,8 +950,8 @@ void CMainFrame::OnClose()
 
 	// Destroy flybar-window
 	KillTimer(TIMER_FLYBARWINDOWHIDER);
-	m_wndFlyBar.ShowWindow(SW_HIDE);
-	m_wndFlyBar.DestroyWindow();
+
+	DestroyFlyBar();
 
 	AppSettings& s = AfxGetAppSettings();
 
@@ -1396,13 +1397,15 @@ void CMainFrame::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 void CMainFrame::CreateFlyBar()
 {
 	if (AfxGetAppSettings().fFlybar) {
-		if (!m_wndFlyBar.CreateEx(WS_EX_TOPMOST|WS_EX_TRANSPARENT, NULL, AfxRegisterWndClass(0), WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS,
-						  CRect(0, 0, 0, 0), this, 0, NULL)) {
+		if (!m_wndFlyBar.CreateEx(WS_EX_TOPMOST|WS_EX_TRANSPARENT, AfxRegisterWndClass(0), NULL, WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS, CRect(0, 0, 0, 0), this, 0, NULL)) {
+			TRACE(_T("Failed to create Flybar Window\n"));
 		}
 		SetWindowLong(m_wndFlyBar.m_hWnd, GWL_EXSTYLE, WS_EX_LAYERED);
 		m_wndFlyBar.SetLayeredWindowAttributes(0, 150, LWA_ALPHA);
 
-		if (AfxGetAppSettings().fFlybarOnTop) m_wndFlyBar.ShowWindow(SW_SHOWNOACTIVATE);
+		if (AfxGetAppSettings().fFlybarOnTop) {
+			m_wndFlyBar.ShowWindow(SW_SHOWNOACTIVATE);
+		}
 		SetTimer(TIMER_FLYBARWINDOWHIDER, 250, NULL);
 		//m_wndFlyBar.Invalidate();
 	}
@@ -1860,8 +1863,8 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 	switch (nIDEvent) {
 		case TIMER_FLYBARWINDOWHIDER:
 			
-			if (m_wndView 
-					&& (AfxGetAppSettings().iCaptionMenuMode == MODE_FRAMEONLY 
+			if (m_wndView && 
+						(AfxGetAppSettings().iCaptionMenuMode == MODE_FRAMEONLY 
 						|| AfxGetAppSettings().iCaptionMenuMode == MODE_BORDERLESS 
 						|| m_fFullScreen)) {
 
@@ -1893,8 +1896,8 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 					}
 				}
 			
-			} else {
-				if (m_wndFlyBar.IsWindowVisible()) m_wndFlyBar.ShowWindow(SW_HIDE);
+			} else if (m_wndFlyBar && m_wndFlyBar.IsWindowVisible()) {
+				m_wndFlyBar.ShowWindow(SW_HIDE);
 			}
 			break;
 		case TIMER_STREAMPOSPOLLER:

@@ -68,6 +68,8 @@ private:
 	
 	CToolTipCtrl m_tooltip;
 
+	void Destroy();
+
 protected:
 	
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
