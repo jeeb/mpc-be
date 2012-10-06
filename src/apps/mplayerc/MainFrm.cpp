@@ -948,7 +948,7 @@ void CMainFrame::OnClose()
 
 	// Destroy flybar-window
 	KillTimer(TIMER_FLYBARWINDOWHIDER);
-
+	KillTimer(TIMER_EXCLUSIVEBARHIDER);
 	DestroyFlyBar();
 
 	AppSettings& s = AfxGetAppSettings();
@@ -1859,6 +1859,25 @@ bool g_bExternalSubtitleTime	= false;
 void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 {
 	switch (nIDEvent) {
+
+		case TIMER_EXCLUSIVEBARHIDER:
+			if (m_pFullscreenWnd->IsWindow()) {
+				CPoint p;
+				GetCursorPos(&p);
+				CWnd* pWnd = WindowFromPoint(p);
+				bool bD3DFS = AfxGetAppSettings().fIsFSWindow;
+				if (pWnd == m_pFullscreenWnd && GetCursor() != NULL) {
+					if (!bD3DFS) {
+						AfxGetAppSettings().fIsFSWindow = true;
+					}
+				} else {
+					if (bD3DFS) {
+						AfxGetAppSettings().fIsFSWindow = false;
+						m_OSD.HideExclusiveBars();
+					}
+				}
+			}
+			break;
 		case TIMER_FLYBARWINDOWHIDER:
 			
 			if (m_wndView && 
@@ -5564,9 +5583,10 @@ BOOL CMainFrame::IsRendererCompatibleWithSaveImage()
 	} else if (s.iDSVideoRendererType == VIDRNDT_DS_OVERLAYMIXER) {
 		AfxMessageBox(ResStr(IDS_SCREENSHOT_ERROR_OVERLAY), MB_ICONEXCLAMATION | MB_OK);
 		result = FALSE;
-	} else if (s.iDSVideoRendererType == VIDRNDT_DS_MADVR) {
-		AfxMessageBox(ResStr(IDS_SCREENSHOT_ERROR_MADVR), MB_ICONEXCLAMATION | MB_OK);
-		result = FALSE;
+	// the latest madVR build v0.84.0 now supports screenshots.
+	//} else if (s.iDSVideoRendererType == VIDRNDT_DS_MADVR) {
+	//	AfxMessageBox(ResStr(IDS_SCREENSHOT_ERROR_MADVR), MB_ICONEXCLAMATION | MB_OK);
+	//	result = FALSE;
 	}
 
 	return result;
@@ -11199,6 +11219,7 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 		m_pVideoWnd		= m_pFullscreenWnd;
 		b_UseSmartSeek	= false;
 		s.fIsFSWindow = true;
+		SetTimer(TIMER_EXCLUSIVEBARHIDER, 1000, NULL);
 	} else {
 		m_pVideoWnd		= &m_wndView;
 

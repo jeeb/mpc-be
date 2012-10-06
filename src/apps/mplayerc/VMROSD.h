@@ -61,6 +61,7 @@ public:
 	void DebugMessage( LPCTSTR format, ... );
 	void ClearMessage(bool hide=false);
 	void HideMessage(bool hide);
+	void HideExclusiveBars();
 	void EnableShowMessage(bool enabled = true);
 
 	__int64 GetPos() const;

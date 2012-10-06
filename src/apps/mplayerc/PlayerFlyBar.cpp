@@ -58,14 +58,17 @@ void CFlyBar::Destroy()
 	DestroyIcons(m_MinIcon_a)
 	DestroyIcons(m_MinIcon)
 	DestroyIcons(m_MaxIcon_a)
+	DestroyIcons(m_MaxIcon_na)
 	DestroyIcons(m_MaxIcon)
 	DestroyIcons(m_RestoreIcon_a)
 	DestroyIcons(m_RestoreIcon)
 	DestroyIcons(m_SettingsIcon_a)
 	DestroyIcons(m_SettingsIcon)
 	DestroyIcons(m_InfoIcon_a)
+	DestroyIcons(m_InfoIcon_na)
 	DestroyIcons(m_InfoIcon)
 	DestroyIcons(m_FSIcon_a)
+	DestroyIcons(m_FSIcon_na)
 	DestroyIcons(m_FSIcon)
 	DestroyIcons(m_WindowIcon_a)
 	DestroyIcons(m_WindowIcon)
@@ -154,7 +157,7 @@ void CFlyBar::CalcButtonsRect()
 	CRect rcBar;
 	GetWindowRect(&rcBar);
 
-	r_ExitIcon		= CRect(rcBar.right-4-(iw), rcBar.top+4, rcBar.right-4, rcBar.bottom-4);
+	r_ExitIcon		= CRect(rcBar.right-4-(iw),	rcBar.top+4, rcBar.right-4, rcBar.bottom-4);
 	r_MinIcon		= CRect(rcBar.right-4-(iw*3), rcBar.top+4, rcBar.right-4-(iw*2), rcBar.bottom-4);
 	r_RestoreIcon	= CRect(rcBar.right-4-(iw*2), rcBar.top+4, rcBar.right-4-(iw), rcBar.bottom-4);
 	r_SettingsIcon	= CRect(rcBar.right-4-(iw*7), rcBar.top+4, rcBar.right-4-(iw*6), rcBar.bottom-4);;
@@ -303,6 +306,7 @@ void CFlyBar::OnPaint()
 		CMainFrame* pFrame	= (CMainFrame*)GetParentFrame();
 		WINDOWPLACEMENT wp;
 		pFrame->GetWindowPlacement(&wp);
+		
 		OAFilterState fs	= pFrame->GetMediaState();
 		CDC mdc;
 		mdc.CreateCompatibleDC(&dc);
@@ -311,13 +315,11 @@ void CFlyBar::OnPaint()
 		CBitmap* pOldBm = mdc.SelectObject(&bm);
 		mdc.SetBkMode(TRANSPARENT);
 
-//		SetDefault();
-
-		DrawIconEx(mdc, rcBar.Width()-4-(iw), 4, m_ExitIcon, 0,0, 0, NULL, DI_NORMAL);
-		DrawIconEx(mdc, rcBar.Width()-4-(iw*2), 4, wp.showCmd == SW_SHOWMAXIMIZED ? m_RestoreIcon : m_MaxIcon, 0,0, 0, NULL, DI_NORMAL);
+		DrawIconEx(mdc, rcBar.Width()-4-(iw),   4, m_ExitIcon, 0,0, 0, NULL, DI_NORMAL);
+		DrawIconEx(mdc, rcBar.Width()-4-(iw*2), 4, wp.showCmd == SW_SHOWMAXIMIZED ? m_RestoreIcon : (pFrame->m_fFullScreen ? m_MaxIcon_na : m_MaxIcon), 0,0, 0, NULL, DI_NORMAL);
 		DrawIconEx(mdc, rcBar.Width()-4-(iw*3), 4, m_MinIcon, 0,0, 0, NULL, DI_NORMAL);
-		DrawIconEx(mdc, rcBar.Width()-4-(iw*4), 4, pFrame->m_fFullScreen ? m_WindowIcon : m_FSIcon, 0,0, 0, NULL, DI_NORMAL);
-		DrawIconEx(mdc, rcBar.Width()-4-(iw*6), 4, m_InfoIcon, 0,0, 0, NULL, DI_NORMAL);
+		DrawIconEx(mdc, rcBar.Width()-4-(iw*4), 4, pFrame->m_fFullScreen ? m_WindowIcon : (wp.showCmd == SW_SHOWMAXIMIZED || (s.IsD3DFullscreen()  && fs != -1) ? m_FSIcon_na : m_FSIcon), 0,0, 0, NULL, DI_NORMAL);
+		DrawIconEx(mdc, rcBar.Width()-4-(iw*6), 4, fs != -1 ? m_InfoIcon : m_InfoIcon_na, 0,0, 0, NULL, DI_NORMAL);
 		DrawIconEx(mdc, rcBar.Width()-4-(iw*7), 4, m_SettingsIcon, 0,0, 0, NULL, DI_NORMAL);
 		DrawIconEx(mdc, rcBar.Width()-4-(iw*9), 4, s.fFlybarOnTop ? m_LockIcon : m_UnLockIcon, 0,0, 0, NULL, DI_NORMAL);
 
@@ -331,16 +333,16 @@ void CFlyBar::OnPaint()
 				DrawIconEx(mdc, rcBar.Width()-4-(iw*3), 4, m_MinIcon_a, 0,0, 0, NULL, DI_NORMAL);
 				break;
 			case 2:
-				DrawIconEx(mdc, rcBar.Width()-4-(iw*2), 4, wp.showCmd == SW_SHOWMAXIMIZED ? m_RestoreIcon_a : (pFrame->m_fFullScreen ? m_MaxIcon : m_MaxIcon_a), 0,0, 0, NULL, DI_NORMAL);
+				DrawIconEx(mdc, rcBar.Width()-4-(iw*2), 4, wp.showCmd == SW_SHOWMAXIMIZED ? m_RestoreIcon_a : (pFrame->m_fFullScreen ? m_MaxIcon_na : m_MaxIcon_a), 0,0, 0, NULL, DI_NORMAL);
 				break;
 			case 3:
 				DrawIconEx(mdc, rcBar.Width()-4-(iw*7), 4, m_SettingsIcon_a, 0,0, 0, NULL, DI_NORMAL);
 				break;
 			case 4:
-				DrawIconEx(mdc, rcBar.Width()-4-(iw*6), 4, fs !=-1 ? m_InfoIcon_a : m_InfoIcon, 0,0, 0, NULL, DI_NORMAL);
+				DrawIconEx(mdc, rcBar.Width()-4-(iw*6), 4, fs !=-1 ? m_InfoIcon_a : m_InfoIcon_na, 0,0, 0, NULL, DI_NORMAL);
 				break;
 			case 5:
-				DrawIconEx(mdc, rcBar.Width()-4-(iw*4), 4, pFrame->m_fFullScreen ? m_WindowIcon_a : (wp.showCmd == SW_SHOWMAXIMIZED ? m_FSIcon : m_FSIcon_a), 0,0, 0, NULL, DI_NORMAL);
+				DrawIconEx(mdc, rcBar.Width()-4-(iw*4), 4, pFrame->m_fFullScreen ? m_WindowIcon_a : (wp.showCmd == SW_SHOWMAXIMIZED || (s.IsD3DFullscreen() && fs != -1) ? m_FSIcon_na : m_FSIcon_a), 0,0, 0, NULL, DI_NORMAL);
 				break;
 			case 6:
 				DrawIconEx(mdc, rcBar.Width()-4-(iw*9), 4, s.fFlybarOnTop ? m_LockIcon_a : m_UnLockIcon_a, 0,0, 0, NULL, DI_NORMAL);
@@ -366,14 +368,17 @@ void CFlyBar::SetDefault()
 	m_MinIcon_a			= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_MINIMIZE_A), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
 	m_MinIcon			= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_MINIMIZE), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
 	m_MaxIcon_a			= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_MAXIMIZE_A), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
+	m_MaxIcon_na		= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_MAXIMIZE_NA), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
 	m_MaxIcon			= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_MAXIMIZE), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
 	m_RestoreIcon_a		= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_RESTORE_A), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
 	m_RestoreIcon		= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_RESTORE), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
 	m_SettingsIcon_a	= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_SETTINGS_A), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
 	m_SettingsIcon		= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_SETTINGS), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
 	m_InfoIcon_a		= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_INFO_A), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
+	m_InfoIcon_na		= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_INFO_NA), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
 	m_InfoIcon			= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_INFO), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
 	m_FSIcon_a			= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_FULLSCREEN_A), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
+	m_FSIcon_na			= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_FULLSCREEN_NA), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
 	m_FSIcon			= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_FULLSCREEN), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
 	m_WindowIcon_a		= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_WINDOW_A), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
 	m_WindowIcon		= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_WINDOW), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);

@@ -54,11 +54,11 @@ CVMROSD::CVMROSD(void)
 	m_pMVTO				= NULL;
 	memset(&m_BitmapInfo, 0, sizeof(m_BitmapInfo));
 
-	m_FontSize = 0;
-	m_OSD_Font = _T("");
-	bMouseOverExitButton = false;
-	bMouseOverCloseButton = false;
-	m_bShowMessage = true;
+	m_FontSize				= 0;
+	m_OSD_Font				= _T("");
+	bMouseOverExitButton	= false;
+	bMouseOverCloseButton	= false;
+	m_bShowMessage			= true;
 
 	
 	icoExit		= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_EXIT), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
@@ -209,17 +209,17 @@ void CVMROSD::CalcRect()
 		m_rectFlyBar.left			= m_rectWnd.left;
 		m_rectFlyBar.right			= m_rectWnd.right;
 		m_rectFlyBar.top			= m_rectWnd.top;
-		m_rectFlyBar.bottom			= m_rectWnd.top	 + 100;
+		m_rectFlyBar.bottom			= m_rectWnd.top		+ 100;
 
-		m_rectExitButton.left		= m_rectWnd.right - 34;
-		m_rectExitButton.right		= m_rectWnd.right - 10;
-		m_rectExitButton.top		= m_rectWnd.top - 10;
-		m_rectExitButton.bottom		= m_rectWnd.top	 + 34;
+		m_rectExitButton.left		= m_rectWnd.right	- 34;
+		m_rectExitButton.right		= m_rectWnd.right	- 10;
+		m_rectExitButton.top		= m_rectWnd.top		- 10;
+		m_rectExitButton.bottom		= m_rectWnd.top		+ 34;
 
 		m_rectCloseButton.left		= m_rectExitButton.left	- 28;
-		m_rectCloseButton.right		= m_rectExitButton.left - 4;
-		m_rectCloseButton.top		= m_rectWnd.top - 10;
-		m_rectCloseButton.bottom	= m_rectWnd.top	 + 34;
+		m_rectCloseButton.right		= m_rectExitButton.left	- 4;
+		m_rectCloseButton.top		= m_rectWnd.top			- 10;
+		m_rectCloseButton.bottom	= m_rectWnd.top			+ 34;
 	}
 }
 
@@ -384,26 +384,26 @@ bool CVMROSD::OnMouseMove(UINT nFlags, CPoint point)
 		if (m_bCursorMoving) {
 			UpdateSeekBarPos(point);
 			Invalidate();
-		} else if (!m_bSeekBarVisible && AfxGetAppSettings().fIsFSWindow/*AfxGetAppSettings().IsD3DFullscreen()*/ && m_rectSeekBar.PtInRect(point)) {
+		} else if (!m_bSeekBarVisible && AfxGetAppSettings().fIsFSWindow && m_rectSeekBar.PtInRect(point)) {
 			m_bSeekBarVisible = true;
 			Invalidate();
-		} else if (!m_bFlyBarVisible && AfxGetAppSettings().fIsFSWindow/*AfxGetAppSettings().IsD3DFullscreen()*/ && m_rectFlyBar.PtInRect(point)) {
+		} else if (!m_bFlyBarVisible && AfxGetAppSettings().fIsFSWindow && m_rectFlyBar.PtInRect(point)) {
 			m_bFlyBarVisible = true;
 			Invalidate();
-		} else if (m_bFlyBarVisible && AfxGetAppSettings().fIsFSWindow /*AfxGetAppSettings().IsD3DFullscreen()*/ && m_rectFlyBar.PtInRect(point)) {
+		} else if (m_bFlyBarVisible && AfxGetAppSettings().fIsFSWindow && m_rectFlyBar.PtInRect(point)) {
 			if (!bMouseOverExitButton && m_rectExitButton.PtInRect(point)) {
-				bMouseOverCloseButton = false;
-				bMouseOverExitButton = true;
+				bMouseOverCloseButton	= false;
+				bMouseOverExitButton	= true;
 				SetCursor(LoadCursor(NULL, IDC_HAND));
 				Invalidate();
 			} else if (!bMouseOverCloseButton && m_rectCloseButton.PtInRect(point)) {
-				bMouseOverExitButton = false;
-				bMouseOverCloseButton = true;
+				bMouseOverExitButton	= false;
+				bMouseOverCloseButton	= true;
 				SetCursor(LoadCursor(NULL, IDC_HAND));
 				Invalidate();
 			} else if ((bMouseOverCloseButton && !m_rectCloseButton.PtInRect(point)) || (bMouseOverExitButton && !m_rectExitButton.PtInRect(point))) {
-				bMouseOverExitButton = false;
-				bMouseOverCloseButton = false;
+				bMouseOverExitButton	= false;
+				bMouseOverCloseButton	= false;
 				Invalidate();
 			} else if (m_rectCloseButton.PtInRect(point) || m_rectExitButton.PtInRect(point)) {
 				SetCursor(LoadCursor(NULL, IDC_HAND));
@@ -616,6 +616,24 @@ void CVMROSD::HideMessage(bool hide)
 		}
 	}
 }
+
+
+void CVMROSD::HideExclusiveBars()
+{
+	if (m_pVMB || m_pMFVMB) {
+			
+		if (m_bFlyBarVisible || m_bSeekBarVisible) {
+			m_bFlyBarVisible	= false;
+			m_bSeekBarVisible	= false;
+			if (m_pWnd) {
+				KillTimer(m_pWnd->m_hWnd, (long)this);
+				SetTimer(m_pWnd->m_hWnd, (long)this, 1000, (TIMERPROC)TimerFunc);
+			}
+			Invalidate();
+		}
+	}
+}
+
 
 void CVMROSD::EnableShowMessage(bool enabled)
 {

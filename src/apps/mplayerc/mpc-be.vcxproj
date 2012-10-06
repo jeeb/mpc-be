@@ -412,12 +412,15 @@
     <None Include="res\flybar\exit_a.ico" />
     <None Include="res\flybar\fs.ico" />
     <None Include="res\flybar\fs_a.ico" />
+    <None Include="res\flybar\fs_na.ico" />
     <None Include="res\flybar\info.ico" />
     <None Include="res\flybar\info_a.ico" />
+    <None Include="res\flybar\info_na.ico" />
     <None Include="res\flybar\lock.ico" />
     <None Include="res\flybar\lock_a.ico" />
     <None Include="res\flybar\max.ico" />
     <None Include="res\flybar\max_a.ico" />
+    <None Include="res\flybar\max_na.ico" />
     <None Include="res\flybar\min.ico" />
     <None Include="res\flybar\min_a.ico" />
     <None Include="res\flybar\restore.ico" />

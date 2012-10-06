@@ -42,14 +42,17 @@ private:
 	HICON m_MinIcon_a;
 	HICON m_MinIcon;
 	HICON m_MaxIcon_a;
+	HICON m_MaxIcon_na;
 	HICON m_MaxIcon;
 	HICON m_RestoreIcon_a;
 	HICON m_RestoreIcon;
 	HICON m_SettingsIcon_a;
 	HICON m_SettingsIcon;
 	HICON m_InfoIcon_a;
+	HICON m_InfoIcon_na;
 	HICON m_InfoIcon;
 	HICON m_FSIcon_a;
+	HICON m_FSIcon_na;
 	HICON m_FSIcon;
 	HICON m_WindowIcon_a;
 	HICON m_WindowIcon;

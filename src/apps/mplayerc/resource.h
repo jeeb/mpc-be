@@ -1259,6 +1259,9 @@
 #define IDR_FB_UNLOCK                   40120
 #define IDR_FB_EXIT2_A                  40121
 #define IDR_FB_EXIT2                    40122
+#define IDR_FB_FULLSCREEN_NA            40123
+#define IDR_FB_MAXIMIZE_NA              40124
+#define IDR_FB_INFO_NA                  40125
 #define IDR_TB_PLAY                     41001
 #define IDR_TB_PAUSE                    41002
 #define IDR_TB_STOP                     41003

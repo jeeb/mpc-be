@@ -1066,6 +1066,15 @@
     <None Include="res\flybar\win_a.ico">
       <Filter>Resource Files\Flybar</Filter>
     </None>
+    <None Include="res\flybar\fs_na.ico">
+      <Filter>Resource Files\Flybar</Filter>
+    </None>
+    <None Include="res\flybar\info_na.ico">
+      <Filter>Resource Files\Flybar</Filter>
+    </None>
+    <None Include="res\flybar\max_na.ico">
+      <Filter>Resource Files\Flybar</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="mplayerc.rc">
