@@ -127,7 +127,7 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 			Title = _T("vid");
 		}
 
-		DWORD k, lastpos = 0;
+		DWORD i, k, l, lastpos = 0;
 		for (;;) {
 			k = strpos(out + lastpos, "%2Curl%3Dhttp%253A%252F%252F");
 			if (!k) {
@@ -135,17 +135,23 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 			}
 
 			if (k) {
-			
+
 				k += (lastpos + 9);
 				lastpos = k;
-				DWORD i = strpos(out + k, "%26quality");
+				i = strpos(out + k, "%26quality");
 				if (!i) {
 					free(out);
 					return fn;
 				}
 
+				// skip stereo3d format
+				l = strpos(out + k, "%26stereo3d");
+				if (l && (l < i)) {
+					continue;
+				}
+
 				// skip webm format
-				DWORD l = strpos(out + k, "video%252Fwebm");
+				l = strpos(out + k, "video%252Fwebm");
 				if (l && (l < i)) {
 					continue;
 				}
@@ -157,13 +163,13 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 					ext = _T(".mp4");
 				}
 				if (ext.IsEmpty()) {
-					DWORD l = strpos(out + k, "video%252Fx-flv");
+					l = strpos(out + k, "video%252Fx-flv");
 					if (l && (l < i)) {
 						ext = _T(".flv");
 					}
 				}
 				if (ext.IsEmpty()) {
-					DWORD l = strpos(out + k, "video%252F3gpp");
+					l = strpos(out + k, "video%252F3gpp");
 					if (l && (l < i)) {
 						ext = _T(".3gp");
 					}
@@ -172,20 +178,17 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 					ext = _T(".mp4");
 				}
 
-				char *str1, *str2;
+				char *str1;
 
 				str1 = (char*)malloc(i + 1);
-				str2 = (char*)malloc(i + 1);
 
 				memset(str1, 0, i + 1);
-				memset(str2, 0, i + 1);
 
 				memcpy(str1, out + k, i);
 
 				CString str = UTF8To16(UrlDecode(UrlDecode(CStringA(str1))));
 
 				free(str1);
-				free(str2);
 
 				free(out);
 
