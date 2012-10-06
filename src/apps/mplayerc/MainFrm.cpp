@@ -7017,7 +7017,7 @@ void CMainFrame::OnViewNormal()
 	while (AfxGetAppSettings().iCaptionMenuMode!=MODE_SHOWCAPTIONMENU) {
 		SendMessage(WM_COMMAND, ID_VIEW_CAPTIONMENU);
 	}
-	ShowControls(CS_SEEKBAR|CS_TOOLBAR|CS_STATUSBAR|CS_INFOBAR);
+	ShowControls(CS_SEEKBAR|CS_TOOLBAR|CS_STATUSBAR);
 }
 
 void CMainFrame::OnUpdateViewNormal(CCmdUI* pCmdUI)
