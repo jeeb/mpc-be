@@ -443,9 +443,6 @@
     <ClInclude Include="IGraphBuilder2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="InternalFiltersConfig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ISDb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
