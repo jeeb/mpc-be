@@ -239,7 +239,7 @@ void CFlyBar::OnMouseMove(UINT nFlags, CPoint point)
 		CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
 		WINDOWPLACEMENT wp;
 		pFrame->GetWindowPlacement(&wp);
-		wp.showCmd == SW_SHOWMAXIMIZED ? str2 = ResStr(IDS_TOOLTIP_MINIMIZE) : str2 = ResStr(IDS_TOOLTIP_MAXIMIZE);
+		wp.showCmd == SW_SHOWMAXIMIZED ? str2 = ResStr(IDS_TOOLTIP_RESTORE) : str2 = ResStr(IDS_TOOLTIP_MAXIMIZE);
 		if (str != str2) {
 			m_tooltip.UpdateTipText(str2, this);
 		}
