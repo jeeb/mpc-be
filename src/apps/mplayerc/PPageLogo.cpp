@@ -24,7 +24,9 @@
 #include "stdafx.h"
 #include "mplayerc.h"
 #include "MainFrm.h"
+#include <afxinet.h>
 #include "PPageLogo.h"
+#include "OpenImage.h"
 
 
 // CPPageLogo dialog
@@ -69,7 +71,7 @@ BOOL CPPageLogo::OnInitDialog()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	m_intext = s.fLogoExternal?1:0;
+	m_intext = s.fLogoExternal ? 1 : 0;
 	m_logofn = s.strLogoFileName;
 
 	UpdateData(FALSE);
@@ -126,10 +128,13 @@ void CPPageLogo::OnBnClickedRadio2()
 	UpdateData();
 
 	m_author.Empty();
-
 	m_logobm.Destroy();
-	m_logobm.Load(m_logofn);
-	m_logopreview.SetBitmap(m_logobm);
+
+	HBITMAP hBmp = OpenImage(m_logofn);
+	m_logobm.Attach(hBmp);
+	m_logopreview.SetBitmap(hBmp);
+	DeleteObject(hBmp);
+
 	Invalidate();
 
 	m_intext = 1;
@@ -167,9 +172,11 @@ void CPPageLogo::OnDeltaposSpin1(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CPPageLogo::OnBnClickedButton2()
 {
+	CString formats = _T("*.bmp;*.jpg;*.jpeg;*.png;*.gif;*.tif;*.tiff;*.emf;*.ico;*.webp;*.webpll");
+
 	CFileDialog dlg(TRUE, NULL, m_logofn,
 					OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_NOCHANGEDIR,
-					_T("Images (*.bmp;*.gif;*.jpg;*.png)|*.bmp;*.gif;*.jpg;*.png|All files (*.*)|*.*||"),
+					_T("Images (") + formats + _T(")|") + formats + _T("||"),
 					this, 0);
 
 	if (dlg.DoModal() == IDOK) {

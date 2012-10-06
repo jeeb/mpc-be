@@ -21,8 +21,6 @@
  */
 
 #include "stdafx.h"
-#include <malloc.h>
-#include <afxpriv.h>
 #include "PngImage.h"
 #include <libpng/png.h>
 #include <libpng/pnginfo.h>

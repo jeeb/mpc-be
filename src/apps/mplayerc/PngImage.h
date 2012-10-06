@@ -23,8 +23,6 @@
 #pragma once
 
 #include <atlimage.h>
-#include "mplayerc.h"
-
 
 class MPCPngImage : public CImage
 {
