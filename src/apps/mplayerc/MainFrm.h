@@ -502,6 +502,10 @@ protected:
 	bool m_fOpeningAborted;
 	bool m_bWasSnapped;
 
+	UINT	m_flastnID;
+	bool	m_bfirstPlay;
+	DWORD	m_nLastRunTicket;
+
 public:
 	void OpenCurPlaylistItem(REFERENCE_TIME rtStart = 0);
 	void OpenMedia(CAutoPtr<OpenMediaData> pOMD);

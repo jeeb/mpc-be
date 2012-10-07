@@ -1879,7 +1879,8 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 		}
 
 		FILE* f = NULL;
-		if (!_tfopen_s(&f, fn, _T("rb"))) {
+		_tfopen_s(&f, fn, _T("rb"));
+		if (f) {
 			CStringA str;
 			str.ReleaseBufferSetLength(fread(str.GetBuffer(10240), 1, 10240, f));
 			body = AToT(str);

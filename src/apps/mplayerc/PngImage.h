@@ -31,11 +31,11 @@ public:
 	bool LoadFromResource(UINT id);
 	bool LoadFromFile(CString fn);
 
-	CString LoadCurrentPath();
-	int FileExists(CString fn);
+	CString	LoadCurrentPath();
+	bool	FileExists(CString fn);
 
-	BYTE* BrightnessRGB(int type, BYTE* lpBits, int width, int height, int bpp, int br, int rc, int gc, int bc);
-	HBITMAP TypeLoadImage(int type, BYTE** pData, int* width, int* height, int* bpp, FILE* fp, int resid, int br, int rc, int gc, int bc);
-	HBITMAP LoadExternalImage(CString fn, int br, int rc, int gc, int bc);
-	void LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop, int br, int rc, int gc, int bc);
+	BYTE*	BrightnessRGB(int type, BYTE* lpBits, int width, int height, int bpp, int br, int rc, int gc, int bc);
+	HBITMAP	TypeLoadImage(int type, BYTE** pData, int* width, int* height, int* bpp, FILE* fp, int resid, int br, int rc, int gc, int bc);
+	HBITMAP	LoadExternalImage(CString fn, int br, int rc, int gc, int bc);
+	void	LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop, int br, int rc, int gc, int bc);
 };

@@ -147,24 +147,17 @@ CString MPCPngImage::LoadCurrentPath()
 	return path.Left(path.ReverseFind('\\') + 1);
 }
 
-int MPCPngImage::FileExists(CString fn)
+bool MPCPngImage::FileExists(CString fn)
 {
 	CString path = LoadCurrentPath();
 
-	FILE* fp;
-	_tfopen_s(&fp, path + fn + _T(".png"), _T("rb"));
-	if (fp) {
-		fclose(fp);
-		return 1;
-	} else {
-		_tfopen_s(&fp, path + fn + _T(".bmp"), _T("rb"));
-		if (fp) {
-			fclose(fp);
-			return 1;
-		} else {
-			return NULL;
-		}
+	if (::PathFileExists(path + fn + _T(".png"))) {
+		return true;
+	} else if (::PathFileExists(path + fn + _T(".bmp"))) {
+		return true;
 	}
+
+	return false;
 }
 
 BYTE* MPCPngImage::BrightnessRGB(int type, BYTE* lpBits, int width, int height, int bpp, int br, int rc, int gc, int bc)

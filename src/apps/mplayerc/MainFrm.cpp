@@ -112,10 +112,6 @@ static UINT WM_NOTIFYICON		= RegisterWindowMessage(_T("MYWM_NOTIFYICON"));
 	#define _SM_CYSIZEFRAME GetSystemMetrics(SM_CYSIZEFRAME)
 #endif
 
-DWORD last_run		= 0;
-UINT flast_nID		= 0;
-bool b_firstPlay	= false;
-
 class CSubClock : public CUnknown, public ISubClock
 {
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv) {
@@ -683,7 +679,10 @@ CMainFrame::CMainFrame() :
 	m_fClosingState(false),
 	m_OldMessage(_T("")),
 	b_UseSmartSeek(false),
-	previous_renderer(-1)
+	previous_renderer(-1),
+	m_flastnID(0),
+	m_bfirstPlay(false),
+	m_nLastRunTicket(0)
 {
 	m_Lcd.SetVolumeRange(0, 100);
 	m_LastSaveTime.QuadPart = 0;
@@ -4786,10 +4785,10 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 			}
 			OpenMedia(p);
 		} else {
-			if (last_run && ((GetTickCount()-last_run)<500)) {
+			if (m_nLastRunTicket && ((GetTickCount() - m_nLastRunTicket)<500)) {
 				s.nCLSwitches |= CLSW_ADD;
 			}
-			last_run = GetTickCount();
+			m_nLastRunTicket = GetTickCount();
 
 			if ((s.nCLSwitches&CLSW_ADD) && m_wndPlaylistBar.GetCount() > 0) {
 				m_wndPlaylistBar.Append(sl, fMulti, &s.slSubs);
@@ -7461,7 +7460,7 @@ void CMainFrame::OnViewOptions()
 void CMainFrame::OnPlayPlay()
 {
 	if (m_iMediaLoadState == MLS_CLOSED) {
-		b_firstPlay = false;
+		m_bfirstPlay = false;
 		OpenCurPlaylistItem();
 		return;
 	}
@@ -7520,8 +7519,8 @@ void CMainFrame::OnPlayPlay()
 
 	SetupEVRColorControl(); // can be configured when streaming begins
 
-	if (b_firstPlay) {
-		b_firstPlay = false;
+	if (m_bfirstPlay) {
+		m_bfirstPlay = false;
 		CString m_strOSD = _T("");
 		if (GetPlaybackMode() == PM_FILE) {
 			m_strOSD =  m_wndPlaylistBar.GetCurFileName();
@@ -8935,7 +8934,7 @@ void CMainFrame::OnNavigateSkip(UINT nID)
 	if (GetPlaybackMode() == PM_FILE) {
 		SetupChapters();
 
-		flast_nID = nID;
+		m_flastnID = nID;
 
 		if (DWORD nChapters = m_pCB->ChapGetCount()) {
 			REFERENCE_TIME rtCur;
@@ -13212,7 +13211,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 		PostMessage(WM_COMMAND, ID_PLAY_PAUSE);
 
-		b_firstPlay = true;
+		m_bfirstPlay = true;
 
 		if (!(AfxGetAppSettings().nCLSwitches&CLSW_OPEN) && (AfxGetAppSettings().nLoops > 0)) {
 			PostMessage(WM_COMMAND, ID_PLAY_PLAY);
@@ -13275,7 +13274,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 				if (s.fLoopForever || m_nLoops < s.nLoops) {
 					bool hasValidFile = false;
 
-					if (flast_nID == ID_NAVIGATE_SKIPBACK) {
+					if (m_flastnID == ID_NAVIGATE_SKIPBACK) {
 						hasValidFile = m_wndPlaylistBar.SetPrev();
 					} else {
 						hasValidFile = m_wndPlaylistBar.SetNext();
@@ -13301,7 +13300,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		}
 	}
 
-	flast_nID = 0;
+	m_flastnID = 0;
 
 	if (AfxGetAppSettings().AutoChangeFullscrRes.bEnabled == 1 && m_fFullScreen) {
 		AutoChangeMonitorMode();
