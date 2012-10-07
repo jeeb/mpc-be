@@ -447,6 +447,7 @@ HRESULT CFGManager::AddSourceFilter(CFGFilter* pFGF, LPCWSTR lpcwstrFileName, LP
 			pFGF = DNew CFGFilterRegistry(CLSID_NetShowSource);
 			hr = AddSourceFilter(pFGF, lpcwstrFileName, lpcwstrFilterName, ppBF);
 			delete pFGF;
+			SAFE_DELETE(pmt);
 			return hr;
 		}
 	}

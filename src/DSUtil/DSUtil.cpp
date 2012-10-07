@@ -350,6 +350,7 @@ IPin* FindPin(IBaseFilter* pBF, PIN_DIRECTION direction, const AM_MEDIA_TYPE* pR
 				pPin->ConnectedTo(&pFellow) == VFW_E_NOT_CONNECTED) {
 			BeginEnumMediaTypes(pPin, pEM, pmt) {
 				if (pmt->majortype == pRequestedMT->majortype && pmt->subtype == pRequestedMT->subtype) {
+					SAFE_DELETE(pmt);
 					return (pPin);
 				}
 			}
