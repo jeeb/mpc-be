@@ -22,9 +22,26 @@
 
 #pragma once
 
+#include <libpng/png.h>
 #include <libwebp/webp/decode.h>
 
 using namespace Gdiplus;
+
+typedef struct
+{
+	png_bytep p;
+	png_uint_32 len;
+} PNGData, *PNGDataPtr;
+
+static void PNGReadFromBytes(png_structp png_ptr, png_bytep data, png_uint_32 length)
+{
+	PNGDataPtr dataptr = (PNGDataPtr)png_get_io_ptr(png_ptr);
+	for (png_uint_32 i = 0; i < length; i++) {
+		data[i] = dataptr->p[i];
+	}
+	dataptr->p += length;
+	dataptr->len -= length;
+}
 
 static BYTE* ConvertRGBToBMPBuffer(BYTE* Buffer, int width, int height, long* newsize)
 {
@@ -142,6 +159,33 @@ static HBITMAP OpenImage(CString fn)
 			memcpy(pBits, bmp, slen);
 
 			WebPFreeDecBuffer(out_buf);
+
+		} else if (wcsstr(tmp_fn, L".png")) {
+
+			PNGData png;
+			png.p = (unsigned char*)data;
+			png.len = fs;
+
+			png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
+			png_set_read_fn(png_ptr, (void*)&png, (png_rw_ptr)PNGReadFromBytes);
+			png_infop info_ptr = png_create_info_struct(png_ptr);
+
+			png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND | PNG_TRANSFORM_BGR, 0);
+			png_bytep *row_pointers = png_get_rows(png_ptr, info_ptr);
+
+			int width = png_get_image_width(png_ptr, info_ptr), height = png_get_image_height(png_ptr, info_ptr);
+			int bit = png_get_channels(png_ptr, info_ptr);
+			int memWidth = width * bit;
+
+			BYTE *pBits;
+			BITMAPINFO bi = {{sizeof(BITMAPINFOHEADER), width, -height, 1, bit * 8, BI_RGB, 0, 0, 0, 0, 0}};
+			hB = CreateDIBSection(0, &bi, DIB_RGB_COLORS, (void**)&pBits, 0, 0);
+			for (int i = 0; i < height; i++) {
+				memcpy(pBits + memWidth * i, row_pointers[i], memWidth);
+			}
+
+			png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+
 		} else {
 
 			HGLOBAL hG = ::GlobalAlloc(GMEM_MOVEABLE, fs);

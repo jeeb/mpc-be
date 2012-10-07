@@ -130,10 +130,8 @@ void CPPageLogo::OnBnClickedRadio2()
 	m_author.Empty();
 	m_logobm.Destroy();
 
-	HBITMAP hBmp = OpenImage(m_logofn);
-	m_logobm.Attach(hBmp);
-	m_logopreview.SetBitmap(hBmp);
-	DeleteObject(hBmp);
+	m_logobm.Attach(OpenImage(m_logofn));
+	m_logopreview.SetBitmap(m_logobm);
 
 	Invalidate();
 

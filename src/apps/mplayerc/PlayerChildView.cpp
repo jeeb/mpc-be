@@ -23,8 +23,10 @@
 
 #include "stdafx.h"
 #include "mplayerc.h"
-#include "PlayerChildView.h"
 #include "MainFrm.h"
+#include <afxinet.h>
+#include "PlayerChildView.h"
+#include "OpenImage.h"
 
 
 // CChildView
@@ -128,7 +130,8 @@ void CChildView::LoadLogo()
 		m_logo.LoadFromFile("logo");
 	} else {
 		if (s.fLogoExternal) {
-			bHaveLogo = SUCCEEDED(m_logo.Load(s.strLogoFileName));
+			m_logo.Attach(OpenImage(s.strLogoFileName));
+			bHaveLogo = 1;
 		}
 
 		if (!bHaveLogo) {

@@ -23,7 +23,6 @@
 #include "stdafx.h"
 #include "PngImage.h"
 #include <libpng/png.h>
-#include <libpng/pnginfo.h>
 
 struct png_t {
 	unsigned char* data;
@@ -35,7 +34,6 @@ static void read_data_fn(png_structp png_ptr, png_bytep data, png_size_t length)
 	struct png_t* png = (struct png_t*)png_get_progressive_ptr(png_ptr);
 
 	memcpy(data, &png->data[png->pos], length);
-
 	png->pos += length;
 }
 
@@ -45,26 +43,26 @@ bool MPCPngImage::DecompressPNG(struct png_t* png)
 		png->pos = 8;
 	}
 
-	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
 
 	if (!png_ptr) {
-		return NULL;
+		return 0;
 	}
 
 	png_set_read_fn(png_ptr, (png_voidp)png, read_data_fn);
-
 	png_infop info_ptr = png_create_info_struct(png_ptr);
 
 	if (!info_ptr) {
 		png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
-		return NULL;
+		return 0;
 	}
 
 	png_set_sig_bytes(png_ptr, 8);
+	png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND | PNG_TRANSFORM_BGR, 0);
+	png_bytep *row_pointers = png_get_rows(png_ptr, info_ptr);
 
-	png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND | PNG_TRANSFORM_BGR, NULL);
-
-	unsigned int w = info_ptr->width, h = info_ptr->height, b = info_ptr->channels;
+	unsigned int w = png_get_image_width(png_ptr, info_ptr), h = png_get_image_height(png_ptr, info_ptr);
+	unsigned int b = png_get_channels(png_ptr, info_ptr);
 	unsigned int x, y, c, len = w * b;
 	unsigned char *row, *pic = (unsigned char*)malloc(len * h);
 
@@ -80,7 +78,7 @@ bool MPCPngImage::DecompressPNG(struct png_t* png)
 
 				for (c = 0; c < b; c++) {
 
-					row[c] = info_ptr->row_pointers[y][x++];
+					row[c] = row_pointers[y][x++];
 				}
 			}
 
@@ -90,7 +88,7 @@ bool MPCPngImage::DecompressPNG(struct png_t* png)
 		ret = true;
 	}
 
-	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+	png_destroy_read_struct(&png_ptr, &info_ptr, 0);
 
 	free(pic);
 
