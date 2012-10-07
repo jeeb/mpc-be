@@ -91,6 +91,8 @@
 #include "Monitors.h"
 #include "MultiMonitor.h"
 
+#include "FileVersionInfo.h"
+
 #include <MediaInfo/MediaInfo.h>
 using namespace MediaInfoLib;
 
@@ -5584,9 +5586,31 @@ BOOL CMainFrame::IsRendererCompatibleWithSaveImage()
 		AfxMessageBox(ResStr(IDS_SCREENSHOT_ERROR_OVERLAY), MB_ICONEXCLAMATION | MB_OK);
 		result = FALSE;
 	// the latest madVR build v0.84.0 now supports screenshots.
-	//} else if (s.iDSVideoRendererType == VIDRNDT_DS_MADVR) {
-	//	AfxMessageBox(ResStr(IDS_SCREENSHOT_ERROR_MADVR), MB_ICONEXCLAMATION | MB_OK);
-	//	result = FALSE;
+	} else if (s.iDSVideoRendererType == VIDRNDT_DS_MADVR) {
+		CRegKey key;
+		CString clsid = _T("{E1A8B82A-32CE-4B0D-BE0D-AA68C772E423}");
+
+		TCHAR buff[256];
+		ULONG len = sizeof(buff);
+		memset(buff, 0, len);
+
+		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, _T("CLSID\\") + clsid + _T("\\InprocServer32"), KEY_READ)
+				&& ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len)) {
+			CFileVersionInfo Version;
+			if (Version.Create(buff)) {
+				result = FALSE;
+				WORD versionLS = Version.GetFileVersion(0);
+				WORD versionMS = Version.GetFileVersion(2);
+				if ((versionLS == 0 && versionMS >= 84) || (versionLS > 1)) {
+					result = TRUE;
+				}
+			}
+			key.Close();
+		}
+
+		if (!result) {
+			AfxMessageBox(ResStr(IDS_SCREENSHOT_ERROR_MADVR), MB_ICONEXCLAMATION | MB_OK);
+		}
 	}
 
 	return result;
