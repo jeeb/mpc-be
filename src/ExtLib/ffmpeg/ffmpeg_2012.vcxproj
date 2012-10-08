@@ -52,6 +52,7 @@
     <None Include="libavresample\x86\audio_convert.asm" />
     <None Include="libavresample\x86\audio_mix.asm" />
     <None Include="libavresample\x86\util.asm" />
+    <None Include="libavutil\x86\cpuid.asm" />
     <None Include="libavutil\x86\float_dsp.asm" />
     <None Include="libavutil\x86\x86inc.asm" />
     <None Include="libavutil\x86\x86util.asm" />
@@ -145,7 +146,6 @@
     <ClInclude Include="libavcodec\h264_mvpred.h" />
     <ClInclude Include="libavcodec\huffman.h" />
     <ClInclude Include="libavcodec\imcdata.h" />
-    <ClInclude Include="libavcodec\imgconvert.h" />
     <ClInclude Include="libavcodec\indeo3data.h" />
     <ClInclude Include="libavcodec\indeo4data.h" />
     <ClInclude Include="libavcodec\indeo5data.h" />
@@ -159,6 +159,7 @@
     <ClInclude Include="libavcodec\jpeglsdec.h" />
     <ClInclude Include="libavcodec\kbdwin.h" />
     <ClInclude Include="libavcodec\lagarithrac.h" />
+    <ClInclude Include="libavcodec\libopus.h" />
     <ClInclude Include="libavcodec\lpc.h" />
     <ClInclude Include="libavcodec\lsp.h" />
     <ClInclude Include="libavcodec\mathops.h" />
@@ -463,6 +464,9 @@
     <ClCompile Include="libavcodec\lagarith.c" />
     <ClCompile Include="libavcodec\lagarithrac.c" />
     <ClCompile Include="libavcodec\latm_parser.c" />
+    <ClCompile Include="libavcodec\libopenjpegdec.c" />
+    <ClCompile Include="libavcodec\libopus.c" />
+    <ClCompile Include="libavcodec\libopusdec.c" />
     <ClCompile Include="libavcodec\lsp.c" />
     <ClCompile Include="libavcodec\mdct.c" />
     <ClCompile Include="libavcodec\mjpeg.c" />
@@ -607,7 +611,6 @@
     <ClCompile Include="libavcodec\x86\rv40dsp_init.c" />
     <ClCompile Include="libavcodec\x86\sbrdsp_init.c" />
     <ClCompile Include="libavcodec\x86\simple_idct.c" />
-    <ClCompile Include="libavcodec\x86\snowdsp.c" />
     <ClCompile Include="libavcodec\x86\vc1dsp_mmx.c" />
     <ClCompile Include="libavcodec\x86\vp3dsp_init.c" />
     <ClCompile Include="libavcodec\x86\vp56dsp_init.c" />
