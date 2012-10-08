@@ -94,7 +94,6 @@ void CDXVADecoderH264::Init()
 void CDXVADecoderH264::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize)
 {
 	CH264Nalu	Nalu;
-	int			nDummy;
 	int			nSlices		= 0;
 	UINT		m_nSize		= nSize;
 	int			slice_step	= 1;
@@ -136,12 +135,14 @@ void CDXVADecoderH264::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSi
 		slice_step++;
 	}
 
-	// Complete with zero padding (buffer size should be a multiple of 128)
-	nDummy  = 128 - (nSize %128);
+	// Complete bitstream buffer with zero padding (buffer size should be a multiple of 128)
+	if (nSize % 128) {
+		int nDummy = 128 - (nSize % 128);
 
-	memset (pDXVABuffer, 0, nDummy);
-	m_pSliceShort[nSlices-1].SliceBytesInBuffer	+= nDummy;
-	nSize										+= nDummy;
+		memset (pDXVABuffer, 0, nDummy);
+		m_pSliceShort[nSlices-1].SliceBytesInBuffer	+= nDummy;
+		nSize										+= nDummy;		
+	}
 }
 
 void CDXVADecoderH264::Flush()

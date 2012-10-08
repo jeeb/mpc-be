@@ -250,8 +250,6 @@ BYTE* CDXVADecoderVC1::FindNextStartCode(BYTE* pBuffer, UINT nSize, UINT& nPacke
 
 void CDXVADecoderVC1::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize)
 {
-	int		nDummy;
-
 	if (m_PictureParams.bSecondField) {
 		memcpy_sse (pDXVABuffer, (BYTE*)pBuffer, nSize);
 	} else {
@@ -279,12 +277,14 @@ void CDXVADecoderVC1::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSiz
 		}
 	}
 
-	// Copy bitstream buffer, with zero padding (buffer is rounded to multiple of 128)
-	nDummy  = 128 - (nSize %128);
-
-	pDXVABuffer += nSize;
-	memset (pDXVABuffer, 0, nDummy);
-	nSize  += nDummy;
+	// Complete bitstream buffer with zero padding (buffer size should be a multiple of 128)
+	if (nSize % 128) {
+		int nDummy = 128 - (nSize % 128);
+		
+		pDXVABuffer += nSize;
+		memset (pDXVABuffer, 0, nDummy);
+		nSize  += nDummy;
+	}
 }
 
 void CDXVADecoderVC1::Flush()
