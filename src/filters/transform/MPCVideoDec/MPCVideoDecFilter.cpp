@@ -25,6 +25,7 @@
 #include <atlbase.h>
 #include <MMReg.h>
 #include "../../../DSUtil/PODtypes.h"
+#include "../../../DSUtil/ff_log.h"
 #include <ffmpeg/libavcodec/avcodec.h>
 
 #ifdef REGISTER_FILTER
@@ -846,12 +847,8 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 	m_nDXVACheckCompatibility = max(0, min(m_nDXVACheckCompatibility, 3));
 
-	ff_avcodec_default_get_buffer		= avcodec_default_get_buffer;
-	ff_avcodec_default_release_buffer	= avcodec_default_release_buffer;
-	ff_avcodec_default_reget_buffer		= avcodec_default_reget_buffer;
-
 	avcodec_register_all();
-	av_log_set_callback(LogLibAVCodec);
+	av_log_set_callback(ff_log);
 
 	EnumWindows(EnumFindProcessWnd, (LPARAM)&hWnd);
 	DetectVideoCard(hWnd);
@@ -1191,21 +1188,6 @@ void CMPCVideoDecFilter::CalcAvgTimePerFrame()
 	m_rtAvrTimePerFrame = max (1, m_rtAvrTimePerFrame);
 }
 
-void CMPCVideoDecFilter::LogLibAVCodec(void* par, int level, const char *fmt, va_list valist)
-{
-#if defined(_DEBUG) && 0
-	char		Msg [500];
-	vsnprintf_s (Msg, sizeof(Msg), _TRUNCATE, fmt, valist);
-	TRACE("AVLIB : %s", Msg);
-#endif
-}
-
-void CMPCVideoDecFilter::OnGetBuffer(AVFrame *pic)
-{
-	// Callback from FFMpeg to store Ref Time in frame (needed to have correct rtStart after avcodec_decode_video calls)
-	//	pic->rtStart	= m_rtStart;
-}
-
 STDMETHODIMP CMPCVideoDecFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {
 	return
@@ -1216,8 +1198,6 @@ STDMETHODIMP CMPCVideoDecFilter::NonDelegatingQueryInterface(REFIID riid, void**
 		QI(ISpecifyPropertyPages2)
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
-
-
 
 HRESULT CMPCVideoDecFilter::CheckInputType(const CMediaType* mtIn)
 {
@@ -1369,9 +1349,6 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 			m_pAVCtx->idct_algo				= m_nIDCTAlgo;
 			m_pAVCtx->skip_loop_filter		= (AVDiscard)m_nDiscardMode;
 
-			m_pAVCtx->opaque				= this;
-			m_pAVCtx->get_buffer			= get_buffer;
-
 			if (m_nCodecId == AV_CODEC_ID_H264) {
 				m_pAVCtx->flags2			|= CODEC_FLAG2_SHOW_ALL;
 			}
@@ -1379,7 +1356,6 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 			m_pAVCtx->mpeg2_using_dxva		= (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO);
 
 			AllocExtradata (m_pAVCtx, pmt);
-			ConnectTo (m_pAVCtx);
 			CalcAvgTimePerFrame();
 
 			if (avcodec_open2(m_pAVCtx, m_pAVCodec, NULL)<0) {

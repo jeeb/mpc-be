@@ -139,6 +139,7 @@
     <ClInclude Include="AudioParser.h" />
     <ClInclude Include="DSMPropertyBag.h" />
     <ClInclude Include="DSUtil.h" />
+    <ClInclude Include="ff_log.h" />
     <ClInclude Include="FontInstaller.h" />
     <ClInclude Include="GolombBuffer.h" />
     <ClInclude Include="H264Nalu.h" />

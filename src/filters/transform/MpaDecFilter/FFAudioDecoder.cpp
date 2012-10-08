@@ -35,6 +35,7 @@ extern "C" {
 #include "moreuuids.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioParser.h"
+#include "../../../DSUtil/ff_log.h"
 
 #define INT16_PEAK      32768
 #define INT32_PEAK      2147483648
@@ -162,15 +163,6 @@ static DWORD get_lav_channel_layout(uint64_t layout)
 
 // CFFAudioDecoder
 
-void CFFAudioDecoder::LogLibavcodec(void* par, int level, const char* fmt, va_list valist)
-{
-#if defined(_DEBUG) && 0
-	char Msg [500];
-	vsnprintf_s(Msg, sizeof(Msg), _TRUNCATE, fmt, valist);
-	TRACE(_T("AVLIB : %s"), Msg);
-#endif
-}
-
 CFFAudioDecoder::CFFAudioDecoder()
 	: m_pAVCodec(NULL)
 	, m_pAVCtx(NULL)
@@ -200,7 +192,7 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput)
 	bool bRet = false;
 
 	avcodec_register_all();
-	av_log_set_callback(LogLibavcodec);
+	av_log_set_callback(ff_log);
 
 	if (m_pAVCodec) {
 		StreamFinish();

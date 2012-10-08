@@ -121,5 +121,8 @@
     <ClInclude Include="WinAPIUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ff_log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

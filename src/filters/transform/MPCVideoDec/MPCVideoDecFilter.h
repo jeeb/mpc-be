@@ -30,7 +30,6 @@
 #include "IMPCVideoDecFilter.h"
 #include "MPCVideoDecSettingsWnd.h"
 #include "DXVADecoder.h"
-#include "TlibavcodecExt.h"
 #include "H264RandomAccess.h"
 #include <atlpath.h>
 
@@ -65,17 +64,12 @@ typedef struct {
 class __declspec(uuid("008BAC12-FBAF-497b-9670-BC6F6FBAE2C4"))
 	CMPCVideoDecFilter
 	: public CBaseVideoFilter
-	, public TlibavcodecExt
 	, public ISpecifyPropertyPages2
 	, public IMPCVideoDecFilter
 	, public IMPCVideoDecFilter2
 	, public IMPCVideoDecFilterCodec
 {
 protected:
-
-	// === FFMpeg callbacks
-	static void		LogLibAVCodec(void* par,int level,const char *fmt,va_list valist);
-	virtual void	OnGetBuffer(AVFrame *pic);
 
 	friend class CVideoDecDXVAAllocator;
 

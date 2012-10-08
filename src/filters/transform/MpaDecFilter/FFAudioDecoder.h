@@ -48,8 +48,6 @@ protected:
 		unsigned int deint_id;
 	} m_raData;
 
-	static void LogLibavcodec(void* par, int level, const char* fmt, va_list valist);
-
 	HRESULT ParseRealAudioHeader(const BYTE* extra, const int extralen);
 
 	CMediaType* m_pCurrentMediaType;

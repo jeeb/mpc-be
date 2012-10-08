@@ -276,7 +276,6 @@ update_version.bat</Command>
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="TlibavcodecExt.cpp" />
     <ClCompile Include="VideoDecDXVAAllocator.cpp" />
     <ClCompile Include="VideoDecOutputPin.cpp" />
   </ItemGroup>
@@ -299,7 +298,6 @@ update_version.bat</Command>
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="TlibavcodecExt.h" />
     <ClInclude Include="VideoDecDXVAAllocator.h" />
     <ClInclude Include="VideoDecOutputPin.h" />
   </ItemGroup>

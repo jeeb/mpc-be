@@ -1478,9 +1478,6 @@ enum AVFieldOrder {
  * applications.
  * sizeof(AVCodecContext) must not be used outside libav*.
  */
-// ==> Start patch MPC
-struct TlibavcodecExt;
-// <== End patch MPC
 typedef struct AVCodecContext {
     /**
      * information on struct for av_log
@@ -1539,9 +1536,7 @@ typedef struct AVCodecContext {
      * - encoding: Set by user.
      * - decoding: Set by user.
      */
-// ==> Start patch MPC
-    struct TlibavcodecExt *opaque;
-// ==> End patch MPC
+    void *opaque;
 
     /**
      * the average bitrate
