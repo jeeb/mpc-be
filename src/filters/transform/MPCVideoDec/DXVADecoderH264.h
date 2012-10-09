@@ -58,6 +58,8 @@ private:
 	USHORT					m_nRefPicFlag;
 	UINT					m_nBrokenFramesFlag, m_nBrokenFramesFlag_POC;
 
+	UINT					m_nSlices;
+
 	// Private functions
 	void					Init();
 	HRESULT					DisplayStatus();

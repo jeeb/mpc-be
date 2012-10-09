@@ -38,6 +38,7 @@
 #if defined(_DEBUG) && DXVA_LOGFILE_A
 #define LOG_FILE_DXVA       _T("dxva_ipinhook.log")
 #define LOG_FILE_PICTURE    _T("picture.log")
+#define LOG_FILE_BITFIELDS  _T("picture_BitFields.log")
 #define LOG_FILE_SLICELONG  _T("slicelong.log")
 #define LOG_FILE_SLICESHORT _T("sliceshort.log")
 #define LOG_FILE_BITSTREAM  _T("bitstream.log")
@@ -358,7 +359,6 @@ static void LogDXVA_PicParams_H264 (DXVA_PicParams_H264* pPic)
 					_T("num_slice_groups_minus1,slice_group_map_type,deblocking_filter_control_present_flag,redundant_pic_cnt_present_flag,Reserved8BitsB,slice_group_change_rate_minus1"));
 
 	}
-	bFirstParam = false;
 
 	strRes.AppendFormat(_T("%d,"), pPic->RefPicFlag);
 	strRes.AppendFormat(_T("%d,"), pPic->wFrameWidthInMbsMinus1);
@@ -450,6 +450,35 @@ static void LogDXVA_PicParams_H264 (DXVA_PicParams_H264* pPic)
 	//}
 
 	LOG_TOFILE(LOG_FILE_PICTURE, strRes);
+
+	if (bFirstParam) {
+		LOG_TOFILE (LOG_FILE_BITFIELDS, _T("field_pic_flag,")\
+					_T("MbaffFrameFlag, residual_colour_transform_flag, sp_for_switch_flag,") \
+					_T("chroma_format_idc, RefPicFlag, constrained_intra_pred_flag,") \
+					_T("weighted_pred_flag, weighted_bipred_idc, MbsConsecutiveFlag,") \
+					_T("frame_mbs_only_flag, transform_8x8_mode_flag, MinLumaBipredSize8x8Flag, IntraPicFlag"));
+	}
+
+	strRes.Empty();
+	strRes.AppendFormat(_T("%d,"), pPic->field_pic_flag);
+	strRes.AppendFormat(_T("%d,"), pPic->MbaffFrameFlag);
+	strRes.AppendFormat(_T("%d,"), pPic->residual_colour_transform_flag);
+	strRes.AppendFormat(_T("%d,"), pPic->sp_for_switch_flag);
+	strRes.AppendFormat(_T("%d,"), pPic->chroma_format_idc);
+	strRes.AppendFormat(_T("%d,"), pPic->RefPicFlag);
+	strRes.AppendFormat(_T("%d,"), pPic->constrained_intra_pred_flag);
+	strRes.AppendFormat(_T("%d,"), pPic->weighted_pred_flag);
+	strRes.AppendFormat(_T("%d,"), pPic->weighted_bipred_idc);
+	strRes.AppendFormat(_T("%d,"), pPic->MbsConsecutiveFlag);
+	strRes.AppendFormat(_T("%d,"), pPic->frame_mbs_only_flag);
+	strRes.AppendFormat(_T("%d,"), pPic->transform_8x8_mode_flag);
+	strRes.AppendFormat(_T("%d,"), pPic->MinLumaBipredSize8x8Flag);
+	strRes.AppendFormat(_T("%d,"), pPic->IntraPicFlag);
+
+	LOG_TOFILE(LOG_FILE_BITFIELDS, strRes);
+
+	bFirstParam = false;
+
 }
 
 static void LogH264SliceShort (DXVA_Slice_H264_Short* pSlice, int nCount)
