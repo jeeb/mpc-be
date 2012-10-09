@@ -769,7 +769,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_nSwOutputLevels		= 2;
 	//
 
-	m_PixFmt				= PIX_FMT_NB;
+	m_PixFmt				= AV_PIX_FMT_NB;
 
 	m_nDialogHWND			= 0;
 #ifdef REGISTER_FILTER
@@ -1146,7 +1146,7 @@ void CMPCVideoDecFilter::Cleanup()
 	if (m_pSwsContext) {
 		sws_freeContext(m_pSwsContext);
 		m_pSwsContext	= NULL;
-		m_PixFmt		= PIX_FMT_NB;
+		m_PixFmt		= AV_PIX_FMT_NB;
 	}
 
 	m_pAVCodec		= NULL;
@@ -1860,7 +1860,7 @@ void CMPCVideoDecFilter::InitSwscale()
 		}
 
 		m_PixFmt = csp_ffdshow2lavc(csp_lavc2ffdshow(m_pAVCtx->pix_fmt));
-		if (m_PixFmt == PIX_FMT_NB) {
+		if (m_PixFmt == AV_PIX_FMT_NB) {
 			m_PixFmt = m_pAVCtx->pix_fmt;
 		}
 
@@ -1878,7 +1878,7 @@ void CMPCVideoDecFilter::InitSwscale()
 							NULL);
 
 		if (m_pSwsContext == NULL) {
-			m_PixFmt = PIX_FMT_NB;
+			m_PixFmt = AV_PIX_FMT_NB;
 			return;
 		}
 
@@ -2099,7 +2099,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			if (m_pSwsContext) {
 				sws_freeContext(m_pSwsContext);
 				m_pSwsContext	= NULL;
-				m_PixFmt		= PIX_FMT_NB;
+				m_PixFmt		= AV_PIX_FMT_NB;
 			}
 		}
 
@@ -2149,15 +2149,15 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 		}
 		//
 
-		PixelFormat PixFmt = csp_ffdshow2lavc(csp_lavc2ffdshow(m_pAVCtx->pix_fmt));
-		if (PixFmt == PIX_FMT_NB) {
+		AVPixelFormat PixFmt = csp_ffdshow2lavc(csp_lavc2ffdshow(m_pAVCtx->pix_fmt));
+		if (PixFmt == AV_PIX_FMT_NB) {
 			PixFmt = m_pAVCtx->pix_fmt;
 		}
 
-		if ((m_PixFmt != PIX_FMT_NB) && (PixFmt != m_PixFmt)) {
+		if ((m_PixFmt != AV_PIX_FMT_NB) && (PixFmt != m_PixFmt)) {
 			sws_freeContext(m_pSwsContext);
 			m_pSwsContext	= NULL;
-			m_PixFmt		= PIX_FMT_NB;
+			m_PixFmt		= AV_PIX_FMT_NB;
 		}
 
 		if (m_pSwsContext == NULL) {

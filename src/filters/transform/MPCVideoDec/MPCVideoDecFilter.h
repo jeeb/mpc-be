@@ -100,7 +100,7 @@ protected:
 	int										m_nSwOutputLevels;
 	//
 
-	enum PixelFormat						m_PixFmt;
+	enum AVPixelFormat						m_PixFmt;
 
 	FF_FIELD_TYPE							m_nFrameType;
 
