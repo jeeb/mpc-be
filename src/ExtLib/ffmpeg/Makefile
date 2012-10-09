@@ -332,6 +332,7 @@ SRCS_C = \
     libavcodec/x86/sbrdsp_init.c \
     libavcodec/x86/simple_idct.c \
     libavcodec/x86/snowdsp.c \
+    libavcodec/x86/vc1dsp_init.c \
     libavcodec/x86/vc1dsp_mmx.c \
     libavcodec/x86/vp3dsp_init.c \
     libavcodec/x86/vp56dsp_init.c \
