@@ -46,7 +46,7 @@ extern "C" {
 	#include <ffmpeg/libavcodec/vc1.h>
 	#include <ffmpeg/libavcodec/mpeg12.h>
 
-	int av_h264_decode_frame(struct AVCodecContext* avctx, int* nOutPOC, int64_t* rtStartTime, uint8_t *buf, int buf_size);
+	int av_h264_decode_frame(struct AVCodecContext* avctx, uint8_t *buf, int buf_size);
 	int av_vc1_decode_frame(AVCodecContext *avctx, uint8_t *buf, int buf_size, int *nFrameSize);
 	void av_init_packet(AVPacket *pkt);
 
@@ -96,15 +96,32 @@ inline MpegEncContext* GetMpegEncContext(struct AVCodecContext* pAVCtx)
 	return s;
 }
 
-int FFH264DecodeBuffer (struct AVCodecContext* pAVCtx, BYTE* pBuffer, UINT nSize, int* pFramePOC, int* pOutPOC, REFERENCE_TIME* pOutrtStart)
+int FFH264DecodeBuffer (struct AVCodecContext* pAVCtx, BYTE* pBuffer, UINT nSize, int* pFramePOC, int* pOutPOC, REFERENCE_TIME* pOutrtStart, UINT* SecondFieldOffset, int* Sync)
 {
 	int result = -1;
 	if (pBuffer != NULL) {
-		H264Context* h = (H264Context*) pAVCtx->priv_data;
-		result = av_h264_decode_frame (pAVCtx, pOutPOC, pOutrtStart, pBuffer, nSize);
+		H264Context* h	= (H264Context*) pAVCtx->priv_data;
+		result			= av_h264_decode_frame (pAVCtx, pBuffer, nSize);
 
-		if (result != -1 && h->s.current_picture_ptr != NULL && pFramePOC) {
-			*pFramePOC = h->s.current_picture_ptr->poc;
+		if (result != -1 && h->s.current_picture_ptr) {
+			if (pOutPOC) {
+				*pOutPOC = h->out_poc;
+			}
+			if (pOutrtStart) {
+				*pOutrtStart = h->out_rtstart;
+			}
+			if (pFramePOC) {
+				*pFramePOC = h->s.current_picture_ptr->poc;
+			}
+			if (SecondFieldOffset) {
+				*SecondFieldOffset = 0;
+				if (h->second_field_offset && (h->second_field_offset < nSize)) {
+					*SecondFieldOffset = h->second_field_offset;
+				}
+			}
+			if (Sync) {
+				*Sync = h->sync;
+			}
 		}
 	}
 	return result;
@@ -144,7 +161,7 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 	int max_ref_frames_dpb41		= min(11, 8388608/(nWidth * nHeight) );
 
 	if (pBuffer != NULL) {
-		av_h264_decode_frame (pAVCtx, NULL, NULL, pBuffer, nSize);
+		av_h264_decode_frame (pAVCtx, pBuffer, nSize);
 	}
 
 	cur_sps	= &pContext->sps;
@@ -806,7 +823,7 @@ void FFGetOutputSize(struct AVCodecContext* pAVCtx, AVFrame* pFrame, int* OutWid
 		H264Context*	h = (H264Context*) pAVCtx->priv_data;
 		SPS*			cur_sps;
 		if (pAVCtx->extradata_size) {
-			av_h264_decode_frame (pAVCtx, NULL, NULL, pAVCtx->extradata, pAVCtx->extradata_size);
+			av_h264_decode_frame (pAVCtx, pAVCtx->extradata, pAVCtx->extradata_size);
 		}
 
 		cur_sps	= &h->sps;

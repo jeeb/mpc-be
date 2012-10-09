@@ -603,15 +603,20 @@ typedef struct H264Context {
     int parse_last_mb;
 
     // ==> Start patch MPC
-    int sp_for_switch_flag;
-    int slice_qs_delta;
-    int slice_qp_delta;
-    unsigned int first_mb_in_slice;
-    int bit_offset_to_slice_data;
-    int raw_slice_type;
-    int64_t outputed_rtstart;
-    void*	dxva_slice_long;
-    int ref_pic_flag;
+    int				sp_for_switch_flag;
+    int				slice_qs_delta;
+    int				slice_qp_delta;
+    unsigned int	first_mb_in_slice;
+    int				bit_offset_to_slice_data;
+    int				raw_slice_type;
+
+    int64_t			out_rtstart;
+	int				out_poc;
+
+    void*			dxva_slice_long;
+    int				ref_pic_flag;
+
+    int				second_field_offset;
     // <== End patch MPC
 }H264Context;
 
