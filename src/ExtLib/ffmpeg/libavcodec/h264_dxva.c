@@ -476,7 +476,7 @@ static int decode_slice_header_noexecute(H264Context *h, H264Context *h0)
                       h->sps.num_units_in_tick, den, 1 << 30);
         }
 
-        s->avctx->pix_fmt = PIX_FMT_YUV420P;
+        s->avctx->pix_fmt = AV_PIX_FMT_YUV420P;
 
         if (ff_MPV_common_init(s) < 0) {
             av_log(h->s.avctx, AV_LOG_ERROR, "ff_MPV_common_init() failed.\n");

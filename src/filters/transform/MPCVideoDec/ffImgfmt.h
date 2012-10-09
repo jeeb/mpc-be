@@ -152,124 +152,124 @@ static __inline uint64_t csp_xvid4_2ffdshow(int csp)
 }
 
 //================================= ffmpeg ===================================
-static __inline uint64_t csp_lavc2ffdshow(enum PixelFormat pix_fmt)
+static __inline uint64_t csp_lavc2ffdshow(enum AVPixelFormat pix_fmt)
 {
 	switch (pix_fmt) {
-		case PIX_FMT_YUV420P :
-		case PIX_FMT_YUVJ420P:
+		case AV_PIX_FMT_YUV420P :
+		case AV_PIX_FMT_YUVJ420P:
 			return FF_CSP_420P;
-		case PIX_FMT_YUV422P :
-		case PIX_FMT_YUVJ422P:
+		case AV_PIX_FMT_YUV422P :
+		case AV_PIX_FMT_YUVJ422P:
 			return FF_CSP_422P;
-		case PIX_FMT_YUV444P :
-		case PIX_FMT_YUVJ444P:
+		case AV_PIX_FMT_YUV444P :
+		case AV_PIX_FMT_YUVJ444P:
 			return FF_CSP_444P;
-		case PIX_FMT_YUV411P :
+		case AV_PIX_FMT_YUV411P :
 			return FF_CSP_411P;
-		case PIX_FMT_YUV410P :
+		case AV_PIX_FMT_YUV410P :
 			return FF_CSP_410P;
-		case PIX_FMT_YUYV422 :
+		case AV_PIX_FMT_YUYV422 :
 			return FF_CSP_YUY2;
-		case PIX_FMT_UYVY422 :
+		case AV_PIX_FMT_UYVY422 :
 			return FF_CSP_UYVY;
-		case PIX_FMT_YUV420P10:
+		case AV_PIX_FMT_YUV420P10:
 			return FF_CSP_420P10;
-		case PIX_FMT_YUV422P10:
+		case AV_PIX_FMT_YUV422P10:
 			return FF_CSP_422P10;
-		case PIX_FMT_YUV444P10:
+		case AV_PIX_FMT_YUV444P10:
 			return FF_CSP_444P10;
-		case PIX_FMT_BGR24	 :
+		case AV_PIX_FMT_BGR24	 :
 			return FF_CSP_RGB24;
-		case PIX_FMT_RGB24	 :
+		case AV_PIX_FMT_RGB24	 :
 			return FF_CSP_BGR24;
-		case PIX_FMT_RGB32	 :
-		case PIX_FMT_ARGB:
+		case AV_PIX_FMT_RGB32	 :
+		case AV_PIX_FMT_ARGB:
 			return FF_CSP_RGB32;
-		case PIX_FMT_RGB555	:
+		case AV_PIX_FMT_RGB555	:
 			return FF_CSP_RGB15;
-		case PIX_FMT_RGB565	:
+		case AV_PIX_FMT_RGB565	:
 			return FF_CSP_RGB16;
-		case PIX_FMT_GRAY8	 :
+		case AV_PIX_FMT_GRAY8	 :
 			return FF_CSP_Y800;
-		case PIX_FMT_PAL8	:
+		case AV_PIX_FMT_PAL8	:
 			return FF_CSP_PAL8;
-		case PIX_FMT_NV12	:
+		case AV_PIX_FMT_NV12	:
 			return FF_CSP_NV12;
-		case PIX_FMT_GBRP	:
+		case AV_PIX_FMT_GBRP	:
 			return FF_CSP_GBRP;
-		case PIX_FMT_GBRP9	 :
+		case AV_PIX_FMT_GBRP9	 :
 			return FF_CSP_GBRP9;
-		case PIX_FMT_GBRP10	:
+		case AV_PIX_FMT_GBRP10	:
 			return FF_CSP_GBRP10;
-		case PIX_FMT_YUV420P9:
+		case AV_PIX_FMT_YUV420P9:
 			return FF_CSP_420P9;
-		case PIX_FMT_YUV422P9:
+		case AV_PIX_FMT_YUV422P9:
 			return FF_CSP_422P9;
-		case PIX_FMT_YUV444P9:
+		case AV_PIX_FMT_YUV444P9:
 			return FF_CSP_444P9;
 		default				:
 			return FF_CSP_NULL;
 	}
 }
-static __inline enum PixelFormat csp_ffdshow2lavc(uint64_t pix_fmt)
+static __inline enum AVPixelFormat csp_ffdshow2lavc(uint64_t pix_fmt)
 {
 	switch (pix_fmt&FF_CSPS_MASK) {
 		case FF_CSP_420P:
-			return pix_fmt&FF_CSP_FLAGS_YUV_JPEG?PIX_FMT_YUVJ420P:PIX_FMT_YUV420P;
+			return pix_fmt&FF_CSP_FLAGS_YUV_JPEG?AV_PIX_FMT_YUVJ420P:AV_PIX_FMT_YUV420P;
 		case FF_CSP_422P:
-			return pix_fmt&FF_CSP_FLAGS_YUV_JPEG?PIX_FMT_YUVJ422P:PIX_FMT_YUV422P;
+			return pix_fmt&FF_CSP_FLAGS_YUV_JPEG?AV_PIX_FMT_YUVJ422P:AV_PIX_FMT_YUV422P;
 		case FF_CSP_444P:
-			return pix_fmt&FF_CSP_FLAGS_YUV_JPEG?PIX_FMT_YUVJ444P:PIX_FMT_YUV444P;
+			return pix_fmt&FF_CSP_FLAGS_YUV_JPEG?AV_PIX_FMT_YUVJ444P:AV_PIX_FMT_YUV444P;
 		case FF_CSP_411P:
-			return PIX_FMT_YUV411P;
+			return AV_PIX_FMT_YUV411P;
 		case FF_CSP_410P:
-			return PIX_FMT_YUV410P;
+			return AV_PIX_FMT_YUV410P;
 		case FF_CSP_YUY2:
-			return PIX_FMT_YUYV422;
+			return AV_PIX_FMT_YUYV422;
 		case FF_CSP_UYVY:
-			return PIX_FMT_UYVY422;
+			return AV_PIX_FMT_UYVY422;
 		case FF_CSP_420P10:
-			return PIX_FMT_YUV420P10;
+			return AV_PIX_FMT_YUV420P10;
 		case FF_CSP_422P10:
-			return PIX_FMT_YUV422P10;
+			return AV_PIX_FMT_YUV422P10;
 		case FF_CSP_444P10:
-			return PIX_FMT_YUV444P10;
+			return AV_PIX_FMT_YUV444P10;
 		case FF_CSP_RGB24:
-			return PIX_FMT_BGR24;
+			return AV_PIX_FMT_BGR24;
 		case FF_CSP_BGR24:
-			return PIX_FMT_RGB24;
+			return AV_PIX_FMT_RGB24;
 		case FF_CSP_RGB32:
-			return PIX_FMT_RGB32;
+			return AV_PIX_FMT_RGB32;
 		case FF_CSP_BGR32:
-			return PIX_FMT_BGR32;
+			return AV_PIX_FMT_BGR32;
 		case FF_CSP_RGB15:
-			return PIX_FMT_RGB555;
+			return AV_PIX_FMT_RGB555;
 		case FF_CSP_RGB16:
-			return PIX_FMT_RGB565;
+			return AV_PIX_FMT_RGB565;
 		case FF_CSP_Y800:
-			return PIX_FMT_GRAY8;
+			return AV_PIX_FMT_GRAY8;
 		case FF_CSP_PAL8:
-			return PIX_FMT_PAL8;
+			return AV_PIX_FMT_PAL8;
 		case FF_CSP_NV12:
-			return PIX_FMT_NV12;
+			return AV_PIX_FMT_NV12;
 		case FF_CSP_ABGR:
-			return PIX_FMT_ABGR;
+			return AV_PIX_FMT_ABGR;
 		case FF_CSP_RGBA:
-			return PIX_FMT_RGBA;
+			return AV_PIX_FMT_RGBA;
 		case FF_CSP_GBRP:
-			return PIX_FMT_GBRP;
+			return AV_PIX_FMT_GBRP;
 		case FF_CSP_GBRP9:
-			return PIX_FMT_GBRP9;
+			return AV_PIX_FMT_GBRP9;
 		case FF_CSP_GBRP10:
-			return PIX_FMT_GBRP10;
+			return AV_PIX_FMT_GBRP10;
 		case FF_CSP_420P9:
-			return PIX_FMT_YUV420P9;
+			return AV_PIX_FMT_YUV420P9;
 		case FF_CSP_422P9:
-			return PIX_FMT_YUV422P9;
+			return AV_PIX_FMT_YUV422P9;
 		case FF_CSP_444P9:
-			return PIX_FMT_YUV444P9;
+			return AV_PIX_FMT_YUV444P9;
 		default		 :
-			return PIX_FMT_NB;
+			return AV_PIX_FMT_NB;
 	}
 }
 
