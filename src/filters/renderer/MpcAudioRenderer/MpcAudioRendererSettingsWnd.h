@@ -60,11 +60,13 @@ public:
 	HRESULT GetAvailableAudioDevices();
 
 	static LPCTSTR GetWindowTitle() {
+#ifdef REGISTER_FILTER
+		return _T("Settings");
+#else
 		return MAKEINTRESOURCE(IDS_AG_SETTINGS);
+#endif
 	}
-	static CSize GetWindowSize() {
-		return CSize(350, 325);
-	}
+	static CSize GetWindowSize() { return CSize(350, 325); }
 
 	DECLARE_MESSAGE_MAP()
 };

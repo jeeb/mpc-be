@@ -114,11 +114,13 @@ public:
 	bool OnApply();
 
 	static LPCTSTR GetWindowTitle() {
+#ifdef REGISTER_FILTER
+		return _T("Settings");
+#else
 		return MAKEINTRESOURCE(IDS_AG_SETTINGS);
+#endif
 	}
-	static CSize GetWindowSize() {
-		return CSize(470, 365); // (470, 325)
-	}
+	static CSize GetWindowSize() { return CSize(470, 365); }
 
 	DECLARE_MESSAGE_MAP()
 
@@ -147,8 +149,8 @@ public:
 	void OnDeactivate();
 	bool OnApply();
 
-	static LPCTSTR GetWindowTitle() { return _T("Codecs"); }
-	static CSize GetWindowSize()    { return CSize(453, 356); }
+	static LPCTSTR GetWindowTitle() { return _T("Codecs");		}
+	static CSize GetWindowSize()    { return CSize(453, 356);	}
 
 	DECLARE_MESSAGE_MAP()
 };

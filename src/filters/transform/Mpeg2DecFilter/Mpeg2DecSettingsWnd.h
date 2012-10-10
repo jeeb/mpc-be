@@ -78,8 +78,14 @@ public:
 	void OnDeactivate();
 	bool OnApply();
 
-	static LPCTSTR GetWindowTitle() { return MAKEINTRESOURCE(IDS_AG_SETTINGS); }
-	static CSize GetWindowSize()    { return CSize(340, 296); }
+	static LPCTSTR GetWindowTitle() {
+#ifdef REGISTER_FILTER
+		return _T("Settings");
+#else
+		return MAKEINTRESOURCE(IDS_AG_SETTINGS);
+#endif
+	}
+	static CSize GetWindowSize() { return CSize(340, 296); }
 
 	DECLARE_MESSAGE_MAP()
 
