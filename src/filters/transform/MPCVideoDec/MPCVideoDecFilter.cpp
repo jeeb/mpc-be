@@ -2038,9 +2038,16 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			pDataIn += used_bytes;
 		}
 
+		bool fWaitKeyFrame =	m_nCodecId == AV_CODEC_ID_VC1
+							 || m_nCodecId == AV_CODEC_ID_RV30
+							 || m_nCodecId == AV_CODEC_ID_RV40
+							 || m_nCodecId == AV_CODEC_ID_VP3
+							 || m_nCodecId == AV_CODEC_ID_THEORA
+							 || m_nCodecId == AV_CODEC_ID_MPEG4;
+
 		if (m_nCodecId == AV_CODEC_ID_H264) {
 			m_h264RandomAccess.judgeFrameUsability(m_pFrame, &got_picture);
-		} else if (m_nCodecId == AV_CODEC_ID_VC1 || m_nCodecId == AV_CODEC_ID_RV30 || m_nCodecId == AV_CODEC_ID_RV40) {
+		} else if (fWaitKeyFrame) {
 			if (m_bWaitingForKeyFrame && got_picture) {
 				if (m_pFrame->key_frame) {
 					m_bWaitingForKeyFrame = FALSE;
