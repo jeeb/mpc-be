@@ -55,7 +55,6 @@ CDXVADecoderH264::~CDXVADecoderH264()
 
 void CDXVADecoderH264::Init()
 {
-	memset (&m_DXVAPicParams,	0, sizeof (m_DXVAPicParams));
 	memset (&m_DXVAPicParams,	0, sizeof (DXVA_PicParams_H264));
 	memset (&m_pSliceLong,		0, sizeof (DXVA_Slice_H264_Long) *MAX_SLICES);
 	memset (&m_pSliceShort,		0, sizeof (DXVA_Slice_H264_Short)*MAX_SLICES);
@@ -176,10 +175,6 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 	UINT						nSize_Result		= 0;
 	int							Sync				= 0;
 
-	if (FFH264DecodeBuffer (m_pFilter->GetAVCtx(), pDataIn, nSize, &nFramePOC, &nOutPOC, &rtOutStart, &SecondFieldOffset, &Sync) == -1) {
-		return S_FALSE;
-	}
-
 	while (!nSlices && slice_step <= 2) {
 		Nalu.SetBuffer (pDataIn, nSize, slice_step == 1 ? m_nNALLength : 0);
 		while (Nalu.ReadNext()) {
@@ -211,12 +206,12 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 		return S_FALSE;
 	}
 
-	m_nMaxWaiting = min (max (m_DXVAPicParams.num_ref_frames, 3), 8);
+	CHECK_HR (FFH264DecodeBuffer (m_pFilter->GetAVCtx(), pDataIn, nSize, &nFramePOC, &nOutPOC, &rtOutStart, &SecondFieldOffset, &Sync));
 
 	// If parsing fail (probably no PPS/SPS), continue anyway it may arrived later (happen on truncated streams)
-	if (FAILED (FFH264BuildPicParams (&m_DXVAPicParams, &m_DXVAScalingMatrix, &nFieldType, &nSliceType, m_pFilter->GetAVCtx(), m_pFilter->GetPCIVendor()))) {
-		return S_FALSE;
-	}
+	CHECK_HR (FFH264BuildPicParams (&m_DXVAPicParams, &m_DXVAScalingMatrix, &nFieldType, &nSliceType, m_pFilter->GetAVCtx(), m_pFilter->GetPCIVendor()));
+	
+	m_nMaxWaiting = min (max (m_DXVAPicParams.num_ref_frames, 3), 8);
 
 	TRACE_H264 ("CDXVADecoderH264::DecodeFrame() : nFramePOC = %11d, nOutPOC = %11d[%11d], [%d - %d], rtOutStart = [%20I64d]\n", nFramePOC, nOutPOC, m_nOutPOC, m_DXVAPicParams.field_pic_flag, m_DXVAPicParams.RefPicFlag, rtOutStart);
 
@@ -376,7 +371,7 @@ int CDXVADecoderH264::FindOldestFrame()
 	}
 
 	if (nPos != -1) {
-		m_pPictureStore[nPos].rtStart	= m_rtOutStart;
+		m_pPictureStore[nPos].rtStart = m_rtOutStart;
 		m_pFilter->UpdateFrameTime(m_pPictureStore[nPos].rtStart, m_pPictureStore[nPos].rtStop);
 		m_pFilter->ReorderBFrames (m_pPictureStore[nPos].rtStart, m_pPictureStore[nPos].rtStop);
 	}

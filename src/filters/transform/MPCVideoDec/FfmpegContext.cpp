@@ -96,14 +96,17 @@ inline MpegEncContext* GetMpegEncContext(struct AVCodecContext* pAVCtx)
 	return s;
 }
 
-int FFH264DecodeBuffer (struct AVCodecContext* pAVCtx, BYTE* pBuffer, UINT nSize, int* pFramePOC, int* pOutPOC, REFERENCE_TIME* pOutrtStart, UINT* SecondFieldOffset, int* Sync)
+HRESULT FFH264DecodeBuffer (struct AVCodecContext* pAVCtx, BYTE* pBuffer, UINT nSize, int* pFramePOC, int* pOutPOC, REFERENCE_TIME* pOutrtStart, UINT* SecondFieldOffset, int* Sync)
 {
-	int result = -1;
+	HRESULT hr = E_FAIL;
 	if (pBuffer != NULL) {
 		H264Context* h	= (H264Context*) pAVCtx->priv_data;
-		result			= av_h264_decode_frame (pAVCtx, pBuffer, nSize);
+		if (av_h264_decode_frame (pAVCtx, pBuffer, nSize) == -1) {
+			return hr;
+		}
 
-		if (result != -1 && h->s.current_picture_ptr) {
+		hr = S_OK;
+		if (h->s.current_picture_ptr) {
 			if (pOutPOC) {
 				*pOutPOC = h->out_poc;
 			}
@@ -112,6 +115,9 @@ int FFH264DecodeBuffer (struct AVCodecContext* pAVCtx, BYTE* pBuffer, UINT nSize
 			}
 			if (pFramePOC) {
 				*pFramePOC = h->s.current_picture_ptr->poc;
+				if (*pFramePOC == INT_MIN) {
+					return E_FAIL;
+				}
 			}
 			if (SecondFieldOffset) {
 				*SecondFieldOffset = 0;
@@ -124,7 +130,7 @@ int FFH264DecodeBuffer (struct AVCodecContext* pAVCtx, BYTE* pBuffer, UINT nSize
 			}
 		}
 	}
-	return result;
+	return hr;
 }
 
 // returns TRUE if version is equal to or higher than A.B.C.D, returns FALSE otherwise

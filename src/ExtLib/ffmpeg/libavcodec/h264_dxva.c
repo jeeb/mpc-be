@@ -1395,7 +1395,7 @@ int av_h264_decode_frame(struct AVCodecContext* avctx, const uint8_t *buf, int b
             // ==> Start patch MPC DXVA
             //*data_size = sizeof(AVFrame);
             //*pict      = out->f;
-            h->out_poc		= h->next_outputed_poc;
+            h->out_poc		= out->poc;
             h->out_rtstart	= out->f.reordered_opaque;
             // <== End patch MPC DXVA
         }
@@ -1428,6 +1428,10 @@ int av_h264_decode_frame(struct AVCodecContext* avctx, const uint8_t *buf, int b
         decode_postinit_dxva(h);
         field_end_noexecute(h);
         // <== End patch MPC DXVA
+    }
+
+    if (h->out_poc == INT_MIN && h->next_output_pic) {
+        h->out_poc = h->next_output_pic->poc;
     }
 
     return get_consumed_bytes(s, buf_index, buf_size);
