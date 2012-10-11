@@ -1,5 +1,5 @@
-// File_Speex - Info for Speex files
-// Copyright (C) 2008-2012 MediaArea.net SARL, Info@MediaArea.net
+// File_Pcm_M2ts_M2ts - Info for PCM (from Blu-ray) streams
+// Copyright (C) 2007-2012 MediaArea.net SARL, Info@MediaArea.net
 //
 // This library is free software: you can redistribute it and/or modify it
 // under the terms of the GNU Library General Public License as published by
@@ -14,20 +14,16 @@
 // You should have received a copy of the GNU Library General Public License
 // along with this library. If not, see <http://www.gnu.org/licenses/>.
 //
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
-//
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
-// Information about Speex files
+// Information about PCM (from Blu-ray) streams
 //
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifndef MediaInfo_File_SpeexH
-#define MediaInfo_File_SpeexH
+#ifndef MediaInfo_File_Pcm_M2tsH
+#define MediaInfo_File_Pcm_M2tsH
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -38,25 +34,26 @@ namespace MediaInfoLib
 {
 
 //***************************************************************************
-// Class File_Speex
+// Class File_Pcm_M2ts
 //***************************************************************************
 
-class File_Speex : public File__Analyze
+class File_Pcm_M2ts : public File__Analyze
 {
 public :
-    File_Speex();
+    //Constructor/Destructor
+    File_Pcm_M2ts();
 
 private :
-    //Buffer - Per element
-    void Header_Parse();
-    void Data_Parse();
+    //Streams management
+    void Streams_Fill();
 
-    //Elements
-    void Identification();
-    void Comment();
+    //Buffer - Global
+    void Read_Buffer_Continue ();
 
     //Temp
-    bool Identification_Done;
+    int8u   channel_assignment;
+    int8u   sampling_frequency;
+    int8u   bits_per_sample;
 };
 
 } //NameSpace

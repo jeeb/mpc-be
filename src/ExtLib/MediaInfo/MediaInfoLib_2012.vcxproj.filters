@@ -443,6 +443,36 @@
     <ClInclude Include="MediaInfo\Video\File_Y4m.h">
       <Filter>Header Files\Video</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Archive\File_Iso9660.h">
+      <Filter>Header Files\Archive</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaInfo\Multiple\File_Ibi.h">
+      <Filter>Header Files\Multiple</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaInfo\Multiple\File_Ibi_Creation.h">
+      <Filter>Header Files\Multiple</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaInfo\Multiple\File_Ism.h">
+      <Filter>Header Files\Multiple</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaInfo\Image\File_Tga.h">
+      <Filter>Header Files\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaInfo\Export\Export_reVTMD.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaInfo\Multiple\File_SequenceInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaInfo\Video\File_ProRes.h">
+      <Filter>Header Files\Video</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaInfo\Image\File_Pcx.h">
+      <Filter>Header Files\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaInfo\Image\File_Psd.h">
+      <Filter>Header Files\Image</Filter>
+    </ClInclude>
     <ClInclude Include="MediaInfo\Audio\File_Aac.h">
       <Filter>Header Files\Audio</Filter>
     </ClInclude>
@@ -482,6 +512,9 @@
     <ClInclude Include="MediaInfo\Audio\File_Celt.h">
       <Filter>Header Files\Audio</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Audio\File_ChannelGrouping.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
     <ClInclude Include="MediaInfo\Audio\File_DolbyE.h">
       <Filter>Header Files\Audio</Filter>
     </ClInclude>
@@ -515,6 +548,9 @@
     <ClInclude Include="MediaInfo\Audio\File_Mpega.h">
       <Filter>Header Files\Audio</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Audio\File_Opus.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
     <ClInclude Include="MediaInfo\Audio\File_Pcm.h">
       <Filter>Header Files\Audio</Filter>
     </ClInclude>
@@ -545,40 +581,19 @@
     <ClInclude Include="MediaInfo\Audio\File_Wvpk.h">
       <Filter>Header Files\Audio</Filter>
     </ClInclude>
-    <ClInclude Include="MediaInfo\Archive\File_Iso9660.h">
-      <Filter>Header Files\Archive</Filter>
-    </ClInclude>
-    <ClInclude Include="MediaInfo\Audio\File_ChannelGrouping.h">
+    <ClInclude Include="MediaInfo\Audio\File_Pcm_M2ts.h">
       <Filter>Header Files\Audio</Filter>
     </ClInclude>
-    <ClInclude Include="MediaInfo\Multiple\File_Ibi.h">
-      <Filter>Header Files\Multiple</Filter>
+    <ClInclude Include="MediaInfo\Audio\File_Pcm_Vob.h">
+      <Filter>Header Files\Audio</Filter>
     </ClInclude>
-    <ClInclude Include="MediaInfo\Multiple\File_Ibi_Creation.h">
-      <Filter>Header Files\Multiple</Filter>
+    <ClInclude Include="MediaInfo\Audio\File_SmpteSt0302.h">
+      <Filter>Header Files\Audio</Filter>
     </ClInclude>
-    <ClInclude Include="MediaInfo\Multiple\File_Ism.h">
-      <Filter>Header Files\Multiple</Filter>
+    <ClInclude Include="MediaInfo\Audio\File_SmpteSt0331.h">
+      <Filter>Header Files\Audio</Filter>
     </ClInclude>
-    <ClInclude Include="MediaInfo\Image\File_Tga.h">
-      <Filter>Header Files\Image</Filter>
-    </ClInclude>
-    <ClInclude Include="MediaInfo\Export\Export_reVTMD.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MediaInfo\Multiple\File_SequenceInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MediaInfo\Video\File_ProRes.h">
-      <Filter>Header Files\Video</Filter>
-    </ClInclude>
-    <ClInclude Include="MediaInfo\Image\File_Pcx.h">
-      <Filter>Header Files\Image</Filter>
-    </ClInclude>
-    <ClInclude Include="MediaInfo\Image\File_Psd.h">
-      <Filter>Header Files\Image</Filter>
-    </ClInclude>
-    <ClInclude Include="MediaInfo\Audio\File_Opus.h">
+    <ClInclude Include="MediaInfo\Audio\File_SmpteSt0337.h">
       <Filter>Header Files\Audio</Filter>
     </ClInclude>
   </ItemGroup>
@@ -961,6 +976,36 @@
     <ClCompile Include="MediaInfo\Tag\File_VorbisCom.cpp">
       <Filter>Source Files\Tag</Filter>
     </ClCompile>
+    <ClCompile Include="MediaInfo\Archive\File_Iso9660.cpp">
+      <Filter>Source Files\Archive</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Image\File_Tga.cpp">
+      <Filter>Source Files\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Multiple\File_Ibi.cpp">
+      <Filter>Source Files\Multiple</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Multiple\File_Ibi_Creation.cpp">
+      <Filter>Source Files\Multiple</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Multiple\File_Ism.cpp">
+      <Filter>Source Files\Multiple</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Export\Export_reVTMD.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Multiple\File_SequenceInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Image\File_Pcx.cpp">
+      <Filter>Source Files\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Image\File_Psd.cpp">
+      <Filter>Source Files\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Video\File_ProRes.cpp">
+      <Filter>Source Files\Video</Filter>
+    </ClCompile>
     <ClCompile Include="MediaInfo\Audio\File_Aac.cpp">
       <Filter>Source Files\Audio</Filter>
     </ClCompile>
@@ -1006,6 +1051,9 @@
     <ClCompile Include="MediaInfo\Audio\File_Celt.cpp">
       <Filter>Source Files\Audio</Filter>
     </ClCompile>
+    <ClCompile Include="MediaInfo\Audio\File_ChannelGrouping.cpp">
+      <Filter>Source Files\Audio</Filter>
+    </ClCompile>
     <ClCompile Include="MediaInfo\Audio\File_DolbyE.cpp">
       <Filter>Source Files\Audio</Filter>
     </ClCompile>
@@ -1039,6 +1087,9 @@
     <ClCompile Include="MediaInfo\Audio\File_Mpega.cpp">
       <Filter>Source Files\Audio</Filter>
     </ClCompile>
+    <ClCompile Include="MediaInfo\Audio\File_Opus.cpp">
+      <Filter>Source Files\Audio</Filter>
+    </ClCompile>
     <ClCompile Include="MediaInfo\Audio\File_Pcm.cpp">
       <Filter>Source Files\Audio</Filter>
     </ClCompile>
@@ -1069,41 +1120,20 @@
     <ClCompile Include="MediaInfo\Audio\File_Wvpk.cpp">
       <Filter>Source Files\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="MediaInfo\Archive\File_Iso9660.cpp">
-      <Filter>Source Files\Archive</Filter>
-    </ClCompile>
-    <ClCompile Include="MediaInfo\Audio\File_ChannelGrouping.cpp">
+    <ClCompile Include="MediaInfo\Audio\File_Pcm_M2ts.cpp">
       <Filter>Source Files\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="MediaInfo\Image\File_Tga.cpp">
-      <Filter>Source Files\Image</Filter>
-    </ClCompile>
-    <ClCompile Include="MediaInfo\Multiple\File_Ibi.cpp">
-      <Filter>Source Files\Multiple</Filter>
-    </ClCompile>
-    <ClCompile Include="MediaInfo\Multiple\File_Ibi_Creation.cpp">
-      <Filter>Source Files\Multiple</Filter>
-    </ClCompile>
-    <ClCompile Include="MediaInfo\Multiple\File_Ism.cpp">
-      <Filter>Source Files\Multiple</Filter>
-    </ClCompile>
-    <ClCompile Include="MediaInfo\Export\Export_reVTMD.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MediaInfo\Multiple\File_SequenceInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MediaInfo\Audio\File_Opus.cpp">
+    <ClCompile Include="MediaInfo\Audio\File_Pcm_Vob.cpp">
       <Filter>Source Files\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="MediaInfo\Image\File_Pcx.cpp">
-      <Filter>Source Files\Image</Filter>
+    <ClCompile Include="MediaInfo\Audio\File_SmpteSt0302.cpp">
+      <Filter>Source Files\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="MediaInfo\Image\File_Psd.cpp">
-      <Filter>Source Files\Image</Filter>
+    <ClCompile Include="MediaInfo\Audio\File_SmpteSt0331.cpp">
+      <Filter>Source Files\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="MediaInfo\Video\File_ProRes.cpp">
-      <Filter>Source Files\Video</Filter>
+    <ClCompile Include="MediaInfo\Audio\File_SmpteSt0337.cpp">
+      <Filter>Source Files\Audio</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

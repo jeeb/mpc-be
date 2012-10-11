@@ -1,5 +1,5 @@
-// File_Speex - Info for Speex files
-// Copyright (C) 2008-2012 MediaArea.net SARL, Info@MediaArea.net
+// File_SmpteSt0302 - Info for SMPTE ST0302
+/// Copyright (C) 2008-2012 MediaArea.net SARL, Info@MediaArea.net
 //
 // This library is free software: you can redistribute it and/or modify it
 // under the terms of the GNU Library General Public License as published by
@@ -14,20 +14,16 @@
 // You should have received a copy of the GNU Library General Public License
 // along with this library. If not, see <http://www.gnu.org/licenses/>.
 //
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
-//
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
-// Information about Speex files
+// Information about SMPTE ST0302
 //
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifndef MediaInfo_File_SpeexH
-#define MediaInfo_File_SpeexH
+#ifndef MediaInfo_File_SmpteSt0302H
+#define MediaInfo_File_SmpteSt0302H
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -38,27 +34,36 @@ namespace MediaInfoLib
 {
 
 //***************************************************************************
-// Class File_Speex
+// Class File_SmpteSt0302
 //***************************************************************************
 
-class File_Speex : public File__Analyze
+class File_SmpteSt0302 : public File__Analyze
 {
 public :
-    File_Speex();
+    //Constructor/Destructor
+    File_SmpteSt0302();
+    ~File_SmpteSt0302();
 
 private :
-    //Buffer - Per element
-    void Header_Parse();
-    void Data_Parse();
+    //Streams management
+    void Streams_Accept();
+    void Streams_Fill();
 
-    //Elements
-    void Identification();
-    void Comment();
+    //Buffer - Global
+    void Read_Buffer_Continue ();
 
     //Temp
-    bool Identification_Done;
+    int16u  audio_packet_size;
+    int8u   number_channels;
+    int8u   bits_per_sample;
+
+    //Parsers
+    std::vector<File__Analyze*> Parsers;
+    void            Parsers_Init();
+    void            Parsers_Parse(const int8u* Parser_Buffer, size_t Parser_Buffer_Size);
 };
 
 } //NameSpace
 
 #endif
+

@@ -1,4 +1,4 @@
-// File_Speex - Info for Speex files
+// File_SmpteSt0331 - Info about SMPTE ST 331 streams
 // Copyright (C) 2008-2012 MediaArea.net SARL, Info@MediaArea.net
 //
 // This library is free software: you can redistribute it and/or modify it
@@ -14,20 +14,16 @@
 // You should have received a copy of the GNU Library General Public License
 // along with this library. If not, see <http://www.gnu.org/licenses/>.
 //
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
-//
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
-// Information about Speex files
+// Information about SMPTE ST 331 streams
 //
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifndef MediaInfo_File_SpeexH
-#define MediaInfo_File_SpeexH
+#ifndef MediaInfo_File_SmpteSt0331H
+#define MediaInfo_File_SmpteSt0331H
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -38,27 +34,30 @@ namespace MediaInfoLib
 {
 
 //***************************************************************************
-// Class File_Speex
+// Class File_SmpteSt0331
 //***************************************************************************
 
-class File_Speex : public File__Analyze
+class File_SmpteSt0331 : public File__Analyze
 {
 public :
-    File_Speex();
+    //In
+    int32u  QuantizationBits;
+
+    //Constructor/Destructor
+    File_SmpteSt0331();
 
 private :
-    //Buffer - Per element
-    void Header_Parse();
-    void Data_Parse();
+    //Streams management
+    void Streams_Fill();
 
-    //Elements
-    void Identification();
-    void Comment();
+    //Buffer - Global
+    void Read_Buffer_Continue ();
 
     //Temp
-    bool Identification_Done;
+    int8u   Channels_valid;
 };
 
 } //NameSpace
 
 #endif
+
