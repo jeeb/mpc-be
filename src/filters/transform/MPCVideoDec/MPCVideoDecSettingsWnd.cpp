@@ -619,6 +619,9 @@ bool CMPCVideoDecCodecWnd::OnApply()
 			nActiveCodecs |= MPCVD_AMVV;
 		}
 		if (m_lstCodecs.GetCheck  (nPos++)) {
+			nActiveCodecs |= MPCVD_PRORES;
+		}
+		if (m_lstCodecs.GetCheck  (nPos++)) {
 			nActiveCodecs |= MPCVD_BINKV;
 		}
 		if (m_lstCodecs.GetCheck  (nPos++)) {
@@ -656,9 +659,6 @@ bool CMPCVideoDecCodecWnd::OnApply()
 		}
 		if (m_lstCodecs.GetCheck  (nPos++)) {
 			nActiveCodecs |= MPCVD_PNG;
-		}
-		if (m_lstCodecs.GetCheck  (nPos++)) {
-			nActiveCodecs |= MPCVD_PRORES;
 		}
 		if (m_lstCodecs.GetCheck  (nPos++)) {
 			nActiveCodecs |= MPCVD_SCREC;
