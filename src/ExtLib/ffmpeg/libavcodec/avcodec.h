@@ -2242,7 +2242,7 @@ typedef struct AVCodecContext {
 
     /** Field order
      * - encoding: set by libavcodec
-     * - decoding: Set by libavcodec
+     * - decoding: Set by user.
      */
     enum AVFieldOrder field_order;
 
