@@ -164,7 +164,7 @@ BOOL DriverVersionCheck (LARGE_INTEGER VideoDriverVersion, int A, int B, int C, 
 	return FALSE;
 }
 
-int FFH264CheckCompatibility (int nWidth, int nHeight, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize, DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion, bool nIsAtiDXVACompatible)
+int FFH264CheckCompatibility (int nWidth, int nHeight, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion, bool nIsAtiDXVACompatible)
 {
 	H264Context*	pContext = (H264Context*) pAVCtx->priv_data;
 
@@ -174,7 +174,7 @@ int FFH264CheckCompatibility (int nWidth, int nHeight, struct AVCodecContext* pA
 	int profile_higher_than_high	= 0;
 	int max_ref_frames_dpb41		= min(11, 8388608/(nWidth * nHeight) );
 
-	if (pBuffer != NULL) {
+	if (pAVCtx->extradata != NULL) {
 		int				got_picture	= 0;
 		AVPacket		avpkt;
 		av_init_packet(&avpkt);
