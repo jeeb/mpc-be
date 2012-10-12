@@ -1233,7 +1233,7 @@ static enum AVPixelFormat mpeg_get_pixelformat(AVCodecContext *avctx)
 
     if (s->chroma_format < 2) {
         // ==> Start patch MPC
-        if (s->avctx->mpeg2_using_dxva)
+        if (s->avctx->using_dxva)
         return AV_PIX_FMT_YUV420P;
         // ==> End patch MPC
         enum AVPixelFormat res;
@@ -1741,7 +1741,7 @@ static int mpeg_decode_slice(MpegEncContext *s, int mb_y,
     }
 
     // ==> Start patch MPC
-    if (s->avctx->mpeg2_using_dxva) {
+    if (s->avctx->using_dxva) {
         Mpeg1Context *s1 = (Mpeg1Context*)s;
         const uint8_t *buf_end, *buf_start = *buf - 4; /* include start_code */
         const uint8_t *buffer;
@@ -2007,7 +2007,7 @@ static int slice_end(AVCodecContext *avctx, AVFrame *pict)
         s->current_picture_ptr->f.qscale_type = FF_QSCALE_TYPE_MPEG2;
 
         // ==> Start patch MPC
-        if (!s->avctx->mpeg2_using_dxva)
+        if (!s->avctx->using_dxva)
         // ==> End patch MPC
         ff_er_frame_end(s);
 
@@ -2523,7 +2523,7 @@ static int decode_chunks(AVCodecContext *avctx,
                 }
 
                 // ==> Start patch MPC
-                if (!s2->avctx->mpeg2_using_dxva) {
+                if (!s2->avctx->using_dxva) {
                 if (uses_vdpau(avctx)) {
                     s->slice_count++;
                     break;
@@ -2560,7 +2560,7 @@ static int decode_chunks(AVCodecContext *avctx,
                             ff_er_add_slice(s2, s2->resync_mb_x, s2->resync_mb_y, s2->mb_x, s2->mb_y, ER_AC_ERROR | ER_DC_ERROR | ER_MV_ERROR);
                     } else {
                         // ==> Start patch MPC
-                        if (!s2->avctx->mpeg2_using_dxva)
+                        if (!s2->avctx->using_dxva)
                         // <== End patch MPC
                         ff_er_add_slice(s2, s2->resync_mb_x, s2->resync_mb_y, s2->mb_x-1, s2->mb_y, ER_AC_END | ER_DC_END | ER_MV_END);
                     }

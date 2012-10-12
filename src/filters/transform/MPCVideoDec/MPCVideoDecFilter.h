@@ -35,7 +35,8 @@
 
 #define MPCVideoDecName L"MPC Video Decoder"
 
-#define CHECK_HR(x) hr = ##x; if (FAILED(hr)) { TRACE("Error : 0x%08x\n", hr); ASSERT(hr == VFW_E_NOT_COMMITTED); return hr; }
+#define CHECK_HR(x)			hr = ##x; if (FAILED(hr)) { TRACE("Error : 0x%08x\n", hr); ASSERT(hr == VFW_E_NOT_COMMITTED); return hr; }
+#define CHECK_HR_FALSE(x)	hr = ##x; if (FAILED(hr)) { TRACE("Error : 0x%08x\n", hr); return S_FALSE; }
 
 struct AVCodec;
 struct AVCodecContext;
@@ -187,6 +188,8 @@ protected:
 
 	void				SetTypeSpecificFlags(IMediaSample* pMS);
 	HRESULT				SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
+
+	HRESULT				ReopenVideo();
 
 public:
 

@@ -28,7 +28,6 @@ The following files have MPC-BE specific custom code (compared to ffmpeg):
 ======
 The following files are available only in MPC-BE (compared with ffmpeg):
 
-* libavcodec/h264_dxva.h
 * libavcodec/h264_recov.c
 * libavcodec/mpc_helper.c
 * libavcodec/vc1_dxva.h

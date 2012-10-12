@@ -187,7 +187,7 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 						m_pSliceLong[nSlices].slice_id				= nSlices;
 						FF264UpdateRefFrameSliceLong(&m_DXVAPicParams, &m_pSliceLong[nSlices], m_pFilter->GetAVCtx());
 
-						if (nSlices>0) {
+						if (nSlices) {
 							m_pSliceLong[nSlices-1].NumMbsForSlice = m_pSliceLong[nSlices].NumMbsForSlice = m_pSliceLong[nSlices].first_mb_in_slice - m_pSliceLong[nSlices-1].first_mb_in_slice;
 						}
 					}
@@ -206,10 +206,10 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 		return S_FALSE;
 	}
 
-	CHECK_HR (FFH264DecodeBuffer (m_pFilter->GetAVCtx(), pDataIn, nSize, &nFramePOC, &nOutPOC, &rtOutStart, &SecondFieldOffset, &Sync));
+	CHECK_HR_FALSE (FFH264DecodeFrame (m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), pDataIn, nSize, &nFramePOC, &nOutPOC, &rtOutStart, &SecondFieldOffset, &Sync));
 
 	// If parsing fail (probably no PPS/SPS), continue anyway it may arrived later (happen on truncated streams)
-	CHECK_HR (FFH264BuildPicParams (&m_DXVAPicParams, &m_DXVAScalingMatrix, &nFieldType, &nSliceType, m_pFilter->GetAVCtx(), m_pFilter->GetPCIVendor()));
+	CHECK_HR_FALSE (FFH264BuildPicParams (&m_DXVAPicParams, &m_DXVAScalingMatrix, &nFieldType, &nSliceType, m_pFilter->GetAVCtx(), m_pFilter->GetPCIVendor()));
 	
 	m_nMaxWaiting = min (max (m_DXVAPicParams.num_ref_frames, 3), 8);
 
@@ -325,7 +325,7 @@ void CDXVADecoderH264::SetExtraData (BYTE* pDataIn, UINT nSize)
 	AVCodecContext* pAVCtx	= m_pFilter->GetAVCtx();
 	m_nNALLength			= pAVCtx->nal_length_size;
 
-	FFH264DecodeBuffer (pAVCtx, pDataIn, nSize, NULL, NULL, NULL, NULL, NULL);
+	FFH264DecodeFrame (pAVCtx, m_pFilter->GetFrame(), pDataIn, nSize, NULL, NULL, NULL, NULL, NULL);
 	FFH264SetDxvaSliceLong (pAVCtx, m_pSliceLong);
 }
 

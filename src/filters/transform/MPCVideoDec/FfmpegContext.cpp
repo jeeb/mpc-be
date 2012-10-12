@@ -46,9 +46,7 @@ extern "C" {
 	#include <ffmpeg/libavcodec/vc1.h>
 	#include <ffmpeg/libavcodec/mpeg12.h>
 
-	int av_h264_decode_frame(struct AVCodecContext* avctx, uint8_t *buf, int buf_size);
 	int av_vc1_decode_frame(AVCodecContext *avctx, uint8_t *buf, int buf_size, int *nFrameSize);
-	void av_init_packet(AVPacket *pkt);
 
 	// Hack to use MinGW64 from 2.x branch
 	void __mingw_raise_matherr(int typ, const char *name, double a1, double a2, double rslt) {}
@@ -96,12 +94,24 @@ inline MpegEncContext* GetMpegEncContext(struct AVCodecContext* pAVCtx)
 	return s;
 }
 
-HRESULT FFH264DecodeBuffer (struct AVCodecContext* pAVCtx, BYTE* pBuffer, UINT nSize, int* pFramePOC, int* pOutPOC, REFERENCE_TIME* pOutrtStart, UINT* SecondFieldOffset, int* Sync)
+HRESULT FFH264DecodeFrame (struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize, int* pFramePOC, int* pOutPOC, REFERENCE_TIME* pOutrtStart, UINT* SecondFieldOffset, int* Sync)
 {
 	HRESULT hr = E_FAIL;
 	if (pBuffer != NULL) {
 		H264Context* h	= (H264Context*) pAVCtx->priv_data;
-		if (av_h264_decode_frame (pAVCtx, pBuffer, nSize) == -1) {
+		int				got_picture	= 0;
+		AVPacket		avpkt;
+		av_init_packet(&avpkt);
+		avpkt.data		= pBuffer;
+		avpkt.size		= nSize;
+		avpkt.flags		= AV_PKT_FLAG_KEY;
+		int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
+		
+#if defined(_DEBUG) && 0
+		av_log(pAVCtx, AV_LOG_INFO, "FFH264DecodeFrame() : %d, %d\n", used_bytes, got_picture);
+#endif
+
+		if (used_bytes < 0) {
 			return hr;
 		}
 
@@ -134,7 +144,7 @@ HRESULT FFH264DecodeBuffer (struct AVCodecContext* pAVCtx, BYTE* pBuffer, UINT n
 }
 
 // returns TRUE if version is equal to or higher than A.B.C.D, returns FALSE otherwise
-BOOL DriverVersionCheck(LARGE_INTEGER VideoDriverVersion, int A, int B, int C, int D)
+BOOL DriverVersionCheck (LARGE_INTEGER VideoDriverVersion, int A, int B, int C, int D)
 {
 	if (HIWORD(VideoDriverVersion.HighPart) > A) {
 		return TRUE;
@@ -154,11 +164,9 @@ BOOL DriverVersionCheck(LARGE_INTEGER VideoDriverVersion, int A, int B, int C, i
 	return FALSE;
 }
 
-int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx, BYTE* pBuffer, UINT nSize, DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion, bool nIsAtiDXVACompatible)
+int FFH264CheckCompatibility (int nWidth, int nHeight, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize, DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion, bool nIsAtiDXVACompatible)
 {
 	H264Context*	pContext = (H264Context*) pAVCtx->priv_data;
-	SPS*			cur_sps;
-	PPS*			cur_pps;
 
 	int video_is_level51			= 0;
 	int no_level51_support			= 1;
@@ -167,11 +175,16 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 	int max_ref_frames_dpb41		= min(11, 8388608/(nWidth * nHeight) );
 
 	if (pBuffer != NULL) {
-		av_h264_decode_frame (pAVCtx, pBuffer, nSize);
+		int				got_picture	= 0;
+		AVPacket		avpkt;
+		av_init_packet(&avpkt);
+		avpkt.data		= pAVCtx->extradata;
+		avpkt.size		= pAVCtx->extradata_size;
+		avpkt.flags		= AV_PKT_FLAG_KEY;
+		int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
 	}
 
-	cur_sps	= &pContext->sps;
-	cur_pps = &pContext->pps;
+	SPS* cur_sps		= &pContext->sps;
 
 	if (cur_sps != NULL) {
 		if (cur_sps->bit_depth_luma > 8 || cur_sps->chroma_format_idc > 1) {
@@ -241,7 +254,7 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 	return (video_is_level51 * no_level51_support * DXVA_UNSUPPORTED_LEVEL) + (too_much_ref_frames * DXVA_TOO_MANY_REF_FRAMES) + (profile_higher_than_high * DXVA_PROFILE_HIGHER_THAN_HIGH);
 }
 
-void CopyScalingMatrix(DXVA_Qmatrix_H264* pDest, PPS* pps, DWORD nPCIVendor)
+void CopyScalingMatrix (DXVA_Qmatrix_H264* pDest, PPS* pps, DWORD nPCIVendor)
 {
 	int i, j;
 	memset(pDest, 0, sizeof(DXVA_Qmatrix_H264));
@@ -266,10 +279,9 @@ void CopyScalingMatrix(DXVA_Qmatrix_H264* pDest, PPS* pps, DWORD nPCIVendor)
 	}
 }
 
-USHORT FFH264FindRefFrameIndex(USHORT num_frame, DXVA_PicParams_H264* pDXVAPicParams)
+USHORT FFH264FindRefFrameIndex (USHORT num_frame, DXVA_PicParams_H264* pDXVAPicParams)
 {
-	int i;
-	for (i=0; i<pDXVAPicParams->num_ref_frames; i++) {
+	for (int i=0; i<pDXVAPicParams->num_ref_frames; i++) {
 		if (pDXVAPicParams->FrameNumList[i] == num_frame) {
 			return pDXVAPicParams->RefFrameList[i].Index7Bits;
 		}
@@ -473,7 +485,7 @@ BOOL FFH264IsRefFrameInUse (int nFrameNum, struct AVCodecContext* pAVCtx)
 	return FALSE;
 }
 
-void FF264UpdateRefFrameSliceLong(DXVA_PicParams_H264* pDXVAPicParams, DXVA_Slice_H264_Long* pSlice, struct AVCodecContext* pAVCtx)
+void FF264UpdateRefFrameSliceLong (DXVA_PicParams_H264* pDXVAPicParams, DXVA_Slice_H264_Long* pSlice, struct AVCodecContext* pAVCtx)
 {
 	H264Context*			h	= (H264Context*) pAVCtx->priv_data;
 	MpegEncContext* const	s	= &h->s;
@@ -628,19 +640,18 @@ HRESULT FFVC1UpdatePictureParam (DXVA_PictureParameters* pPicParams, struct AVCo
 	return S_OK;
 }
 
-int	MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame)
+int	MPEG2CheckCompatibility (struct AVCodecContext* pAVCtx, struct AVFrame* pFrame)
 {
-	int				got_picture	= 0;
 	Mpeg1Context*	s1			= (Mpeg1Context*)pAVCtx->priv_data;
 	MpegEncContext*	s			= (MpegEncContext*)&s1->mpeg_enc_ctx;
+
+	int				got_picture	= 0;
 	AVPacket		avpkt;
-
 	av_init_packet(&avpkt);
-	avpkt.data	= (BYTE*)pAVCtx->extradata;
-	avpkt.size	= pAVCtx->extradata_size;
-	avpkt.flags = AV_PKT_FLAG_KEY;
-
-	avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
+	avpkt.data		= pAVCtx->extradata;
+	avpkt.size		= pAVCtx->extradata_size;
+	avpkt.flags		= AV_PKT_FLAG_KEY;
+	int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
 
 	return (s->chroma_format<2);
 }
@@ -648,24 +659,33 @@ int	MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx, struct AVFrame* pFram
 HRESULT FFMpeg2DecodeFrame (DXVA_PictureParameters* pPicParams, DXVA_QmatrixData* pQMatrixData, DXVA_SliceInfo* pSliceInfo, int* nSliceCount,
 							struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int* nNextCodecIndex, int* nFieldType, int* nSliceType, BYTE* pBuffer, UINT nSize)
 {
+	HRESULT			hr = E_FAIL;
 	int				i;
-	int				got_picture	= 0;
 	Mpeg1Context*	s1			= (Mpeg1Context*)pAVCtx->priv_data;
 	MpegEncContext*	s			= (MpegEncContext*)&s1->mpeg_enc_ctx;
 	int				is_field	= 0;
 	unsigned		mb_count	= 0;
-
-	AVPacket		avpkt;
+	int				got_picture	= 0;
 
 	if (pBuffer) {
 		s1->pSliceInfo	= pSliceInfo;
 
+		AVPacket		avpkt;
 		av_init_packet(&avpkt);
 		avpkt.data		= pBuffer;
 		avpkt.size		= nSize;
 		avpkt.flags		= AV_PKT_FLAG_KEY;
-		avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
+		int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
 
+#if defined(_DEBUG) && 0
+		av_log(pAVCtx, AV_LOG_INFO, "FFMpeg2DecodeFrame() : %d, %d\n", used_bytes, got_picture);
+#endif
+
+		if (used_bytes < 0) {
+			return hr;
+		}
+
+		hr				= S_OK;
 		*nSliceCount	= s1->slice_count;
 		*nFieldType		= s->progressive_frame ? PICT_FRAME : s->current_picture.f.top_field_first ? PICT_TOP_FIELD : PICT_BOTTOM_FIELD;
 		*nSliceType		= s->pict_type;
@@ -758,14 +778,14 @@ HRESULT FFMpeg2DecodeFrame (DXVA_PictureParameters* pPicParams, DXVA_QmatrixData
 	return S_OK;
 }
 
-unsigned long FFGetMBNumber(struct AVCodecContext* pAVCtx)
+unsigned long FFGetMBNumber (struct AVCodecContext* pAVCtx)
 {
 	MpegEncContext* s = GetMpegEncContext(pAVCtx);
 
 	return (s != NULL) ? s->mb_num : 0;
 }
 
-int FFGetThreadType(enum AVCodecID nCodecId)
+int FFGetThreadType (enum AVCodecID nCodecId)
 {
 	switch (nCodecId)
 	{
@@ -793,43 +813,49 @@ int FFGetThreadType(enum AVCodecID nCodecId)
 	}
 }
 
-void FFSetThreadNumber(struct AVCodecContext* pAVCtx, enum AVCodecID nCodecId, int nThreadCount)
+void FFSetThreadNumber (struct AVCodecContext* pAVCtx, enum AVCodecID nCodecId, int nThreadCount)
 {
 	pAVCtx->thread_count	= nThreadCount;
 	pAVCtx->thread_type		= nThreadCount ? FFGetThreadType(nCodecId) : 0;
 }
 
-BOOL FFSoftwareCheckCompatibility(struct AVCodecContext* pAVCtx)
+BOOL FFSoftwareCheckCompatibility (struct AVCodecContext* pAVCtx)
 {
 	if (pAVCtx->codec_id == AV_CODEC_ID_VC1) {
-		VC1Context*		vc1 = (VC1Context*) pAVCtx->priv_data;
+		VC1Context* vc1 = (VC1Context*) pAVCtx->priv_data;
 		return !vc1->interlace;
 	} else {
 		return TRUE;
 	}
 }
 
-int FFGetCodedPicture(struct AVCodecContext* pAVCtx)
+int FFGetCodedPicture (struct AVCodecContext* pAVCtx)
 {
 	MpegEncContext* s = GetMpegEncContext(pAVCtx);
 
 	return (s != NULL) ? s->current_picture.f.coded_picture_number : 0;
 }
 
-BOOL FFGetAlternateScan(struct AVCodecContext* pAVCtx)
+BOOL FFGetAlternateScan (struct AVCodecContext* pAVCtx)
 {
 	MpegEncContext* s = GetMpegEncContext(pAVCtx);
 
 	return (s != NULL) ? s->alternate_scan : 0;
 }
 
-void FFGetOutputSize(struct AVCodecContext* pAVCtx, AVFrame* pFrame, int* OutWidth, int* OutHeight)
+void FFGetOutputSize (struct AVCodecContext* pAVCtx, AVFrame* pFrame, int* OutWidth, int* OutHeight)
 {
 	if (pAVCtx->codec_id == AV_CODEC_ID_H264) {
 		H264Context*	h = (H264Context*) pAVCtx->priv_data;
 		SPS*			cur_sps;
 		if (pAVCtx->extradata_size) {
-			av_h264_decode_frame (pAVCtx, pAVCtx->extradata, pAVCtx->extradata_size);
+			int				got_picture	= 0;
+			AVPacket		avpkt;
+			av_init_packet(&avpkt);
+			avpkt.data		= pAVCtx->extradata;
+			avpkt.size		= pAVCtx->extradata_size;
+			avpkt.flags		= AV_PKT_FLAG_KEY;
+			int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
 		}
 
 		cur_sps	= &h->sps;
@@ -846,17 +872,18 @@ void FFGetOutputSize(struct AVCodecContext* pAVCtx, AVFrame* pFrame, int* OutWid
 	}
 
 	if (pAVCtx->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
-		int				got_picture	= 0;
-		Mpeg1Context*	s1			= (Mpeg1Context*)pAVCtx->priv_data;
-		MpegEncContext*	s			= (MpegEncContext*)&s1->mpeg_enc_ctx;
-		AVPacket		avpkt;
+		Mpeg1Context*	s1	= (Mpeg1Context*)pAVCtx->priv_data;
+		MpegEncContext*	s	= (MpegEncContext*)&s1->mpeg_enc_ctx;
 
-		av_init_packet(&avpkt);
-		avpkt.data	= (BYTE*)pAVCtx->extradata;
-		avpkt.size	= pAVCtx->extradata_size;
-		avpkt.flags = AV_PKT_FLAG_KEY;
-
-		avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
+		if (pAVCtx->extradata_size) {
+			int				got_picture	= 0;
+			AVPacket		avpkt;
+			av_init_packet(&avpkt);
+			avpkt.data		= pAVCtx->extradata;
+			avpkt.size		= pAVCtx->extradata_size;
+			avpkt.flags		= AV_PKT_FLAG_KEY;
+			int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
+		}
 
 		if (OutWidth) {
 			*OutWidth	= FFALIGN(s->width, 16);
@@ -870,7 +897,7 @@ void FFGetOutputSize(struct AVCodecContext* pAVCtx, AVFrame* pFrame, int* OutWid
 	}
 }
 
-BOOL DXVACheckFramesize(int width, int height, DWORD nPCIVendor, DWORD nPCIDevice)
+BOOL DXVACheckFramesize (int width, int height, DWORD nPCIVendor, DWORD nPCIDevice)
 {
 	width = (width + 15) & ~15; // (width + 15) / 16 * 16;
 	height = (height + 15) & ~15; // (height + 15) / 16 * 16;

@@ -1353,7 +1353,7 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 				m_pAVCtx->flags2			|= CODEC_FLAG2_SHOW_ALL;
 			}
 
-			m_pAVCtx->mpeg2_using_dxva		= (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO);
+			m_pAVCtx->using_dxva			= (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO || (IsDXVASupported() && m_nCodecId == AV_CODEC_ID_H264));
 
 			AllocExtradata (m_pAVCtx, pmt);
 			CalcAvgTimePerFrame();
@@ -1389,7 +1389,7 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 						} else if (m_nPCIVendor == PCIV_Intel && !IsWinVistaOrLater() && m_nPCIDevice == 0x8108) {
 							break; // Disable support H.264 DXVA on Intel GMA500 in WinXP
 						}
-						int nCompat = FFH264CheckCompatibility (PictWidthRounded(), PictHeightRounded(), m_pAVCtx, (BYTE*)m_pAVCtx->extradata, m_pAVCtx->extradata_size, m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion, IsAtiDXVACompatible);
+						int nCompat = FFH264CheckCompatibility (PictWidthRounded(), PictHeightRounded(), m_pAVCtx, m_pFrame, m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion, IsAtiDXVACompatible);
 						if (nCompat && (
 								nCompat == DXVA_HIGH_BIT ||												// unsupported video
 								m_nDXVACheckCompatibility == 0 ||										// full check
@@ -1411,14 +1411,10 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 					m_bDXVACompatible = true;
 				} while (false);
 
-				if (!m_bDXVACompatible) { // reset the threads count
-					m_bUseDXVA = false;
-					if ((nThreadNumber > 1) && FFGetThreadType(m_nCodecId)) {
-						avcodec_close (m_pAVCtx);
-						FFSetThreadNumber(m_pAVCtx, m_nCodecId, nThreadNumber);
-						if (avcodec_open2(m_pAVCtx, m_pAVCodec, NULL)<0) {
-							return VFW_E_INVALIDMEDIATYPE;
-						}
+				if (!m_bDXVACompatible) { // reopen video codec - reset the threads count and dxva flag
+					HRESULT hr;
+					if FAILED(hr = ReopenVideo()) {
+						return hr;
 					}
 				}
 
@@ -1616,14 +1612,9 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 		}
 
 		if (m_nDXVAMode == MODE_SOFTWARE && IsDXVASupported()) { // reset the threads count
-			int nThreadNumber = m_nThreadNumber ? m_nThreadNumber : m_pCpuId->GetProcessorNumber() * 3/2;
-			m_bUseDXVA = false;
-			if ((nThreadNumber > 1) && FFGetThreadType(m_nCodecId)) {
-				avcodec_close (m_pAVCtx);
-				FFSetThreadNumber(m_pAVCtx, m_nCodecId, nThreadNumber);
-				if (avcodec_open2(m_pAVCtx, m_pAVCodec, NULL)<0) {
-					return VFW_E_INVALIDMEDIATYPE;
-				}
+			HRESULT hr;
+			if FAILED(hr = ReopenVideo()) {
+				return hr;
 			}
 		}
 
@@ -2235,6 +2226,23 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 	}
 
 	return hr;
+}
+
+// reopen video codec - reset the threads count and dxva flag
+HRESULT CMPCVideoDecFilter::ReopenVideo()
+{
+	int nThreadNumber = m_nThreadNumber ? m_nThreadNumber : m_pCpuId->GetProcessorNumber() * 3/2;
+	m_bUseDXVA = false;
+	if ((nThreadNumber > 1 || m_pAVCtx->using_dxva) && FFGetThreadType(m_nCodecId)) {
+		avcodec_close (m_pAVCtx);
+		m_pAVCtx->using_dxva = false;
+		FFSetThreadNumber(m_pAVCtx, m_nCodecId, nThreadNumber);
+		if (avcodec_open2(m_pAVCtx, m_pAVCodec, NULL)<0) {
+			return VFW_E_INVALIDMEDIATYPE;
+		}
+	}
+
+	return S_OK;
 }
 
 HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)

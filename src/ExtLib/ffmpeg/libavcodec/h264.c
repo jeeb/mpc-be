@@ -48,6 +48,11 @@
 // #undef NDEBUG
 #include <assert.h>
 
+// ==> Start patch MPC
+#include <windows.h>
+#include <dxva.h>
+// <== End patch MPC
+
 const uint16_t ff_h264_mb_sizes[4] = { 256, 384, 512, 768 };
 
 static const uint8_t rem6[QP_MAX_NUM + 1] = {
@@ -1511,6 +1516,10 @@ static void decode_postinit(H264Context *h, int setup_finished)
             h->next_outputed_poc = INT_MIN;
         } else
             h->next_outputed_poc = out->poc;
+        // ==> Start patch MPC
+        h->out_poc		= h->next_outputed_poc;
+        h->out_rtstart	= out->f.reordered_opaque;
+        // <== End patch MPC
     } else {
         av_log(s->avctx, AV_LOG_DEBUG, "no picture %s\n", out_of_order ? "ooo" : "");
     }
@@ -2343,6 +2352,87 @@ int ff_h264_get_profile(SPS *sps)
     return profile;
 }
 
+// ==> Start patch MPC
+static void fill_dxva_slice_long(H264Context *h)
+{
+	MpegEncContext* const	s = &h->s;
+	DXVA_Slice_H264_Long*	pSlice = &((DXVA_Slice_H264_Long*) h->dxva_slice_long)[h->current_slice-1];
+	unsigned				i, list;
+
+	memset(pSlice, 0, sizeof(DXVA_Slice_H264_Long));
+
+	pSlice->slice_id						= h->current_slice-1;
+	pSlice->first_mb_in_slice				= h->first_mb_in_slice;
+	pSlice->NumMbsForSlice					= 0; // h->s.mb_num;				// TODO : to be checked !
+	pSlice->BitOffsetToSliceData			= h->bit_offset_to_slice_data;
+	pSlice->slice_type						= h->raw_slice_type; 
+	pSlice->luma_log2_weight_denom			= h->luma_log2_weight_denom;
+	pSlice->chroma_log2_weight_denom		= h->chroma_log2_weight_denom;
+	pSlice->slice_alpha_c0_offset_div2		= h->slice_alpha_c0_offset / 2;
+	pSlice->slice_beta_offset_div2			= h->slice_beta_offset / 2;
+	pSlice->Reserved8Bits					= 0;
+
+	pSlice->num_ref_idx_l0_active_minus1	= 0;
+	pSlice->num_ref_idx_l1_active_minus1	= 0;
+	if (h->list_count > 0) {
+		pSlice->num_ref_idx_l0_active_minus1 = h->ref_count[0] - 1;
+	}
+	if (h->list_count > 1) {
+		pSlice->num_ref_idx_l1_active_minus1 = h->ref_count[1] - 1;
+	}
+
+	// Fill prediction weights
+	memset (pSlice->Weights, 0, sizeof(pSlice->Weights));
+	for (list = 0; list < 2; list++) {
+		for (i = 0; i < 32; i++) {
+			if (list < h->list_count && i < h->ref_count[list]) {
+				const Picture *r = &h->ref_list[list][i];
+				unsigned plane;
+				for (plane = 0; plane < 3; plane++) {
+					int w, o;
+					if (plane == 0 && h->luma_weight_flag[list]) {
+						w = h->luma_weight[i][list][0];
+						o = h->luma_weight[i][list][1];
+					} else if (plane >= 1 && h->chroma_weight_flag[list]) {
+						w = h->chroma_weight[i][list][plane-1][0];
+						o = h->chroma_weight[i][list][plane-1][1];
+					} else {
+						w = 1 << (plane == 0 ? h->luma_log2_weight_denom :
+										   h->chroma_log2_weight_denom);
+						o = 0;
+					}
+					pSlice->Weights[list][i][plane][0] = w;
+					pSlice->Weights[list][i][plane][1] = o;
+				}
+			} else {
+				unsigned plane;
+				for (plane = 0; plane < 3; plane++) {
+					pSlice->Weights[list][i][plane][0] = 0;
+					pSlice->Weights[list][i][plane][1] = 0;
+				}
+			}
+		}
+	}
+
+	pSlice->slice_qs_delta					= h->slice_qs_delta;
+	pSlice->slice_qp_delta					= h->slice_qp_delta;
+	pSlice->redundant_pic_cnt				= h->redundant_pic_count;
+	pSlice->direct_spatial_mv_pred_flag		= h->direct_spatial_mv_pred;
+	pSlice->cabac_init_idc					= h->cabac_init_idc;
+	pSlice->disable_deblocking_filter_idc	= h->deblocking_filter;
+
+	for(i=0; i<32; i++)
+	{ pSlice->RefPicList[0][i].AssociatedFlag	= 1;
+	  pSlice->RefPicList[0][i].bPicEntry		= 255; 
+	  pSlice->RefPicList[0][i].Index7Bits		= 127;
+	  
+	  pSlice->RefPicList[1][i].AssociatedFlag	= 1; 
+	  pSlice->RefPicList[1][i].bPicEntry		= 255;
+	  pSlice->RefPicList[1][i].Index7Bits		= 127;
+	}
+}
+// <== End patch MPC
+
 /**
  * Decode a slice header.
  * This will also call ff_MPV_common_init() and frame_start() as needed.
@@ -2406,6 +2496,9 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
     } else
         h->slice_type_fixed = 0;
 
+    // ==> Start patch MPC
+    h->raw_slice_type = slice_type;
+    // <== End patch MPC
     slice_type = golomb_to_pict_type[slice_type];
     if (slice_type == AV_PICTURE_TYPE_I ||
         (h0->current_slice != 0 && slice_type == h0->last_slice_type)) {
@@ -3007,7 +3100,10 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
     }
 
     h->last_qscale_diff = 0;
-    tmp = h->pps.init_qp + get_se_golomb(&s->gb);
+    // ==> Start patch MPC
+    h->slice_qp_delta = get_se_golomb(&s->gb);
+    tmp = h->pps.init_qp + h->slice_qp_delta;
+    // <== End patch MPC
     if (tmp > 51 + 6 * (h->sps.bit_depth_luma - 8)) {
         av_log(s->avctx, AV_LOG_ERROR, "QP %u out of range\n", tmp);
         return -1;
@@ -3020,7 +3116,9 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
         get_bits1(&s->gb); /* sp_for_switch_flag */
     if (h->slice_type == AV_PICTURE_TYPE_SP ||
         h->slice_type == AV_PICTURE_TYPE_SI)
-        get_se_golomb(&s->gb); /* slice_qs_delta */
+        // ==> Start patch MPC
+        h->slice_qs_delta = get_se_golomb(&s->gb); /* slice_qs_delta */
+        // <== End patch MPC
 
     h->deblocking_filter     = 1;
     h->slice_alpha_c0_offset = 52;
@@ -3084,6 +3182,15 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
                           h->pps.chroma_qp_index_offset[1]) +
                    6 * (h->sps.bit_depth_luma - 8);
 
+    // ==> Start patch MPC
+    // If entropy_coding_mode, align to 8 bits
+    av_log(s->avctx, AV_LOG_INFO, "using_dxva = %d, at %s:%i\n", s->avctx->using_dxva, __FILE__, __LINE__);
+    if (s->avctx->using_dxva) {
+        if (h->pps.cabac) align_get_bits(&s->gb);
+        h->bit_offset_to_slice_data = s->gb.index;
+    }
+    // <== End patch MPC
+
     h0->last_slice_type = slice_type;
     h->slice_num = ++h0->current_slice;
 
@@ -3135,6 +3242,14 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
                            s->avctx->active_thread_type))
                          ? 0 : 16;
     h->emu_edge_height = (FRAME_MBAFF || FIELD_PICTURE) ? 0 : h->emu_edge_width;
+
+    // ==> Start patch MPC
+    av_log(s->avctx, AV_LOG_INFO, "using_dxva = %d, at %s:%i\n", s->avctx->using_dxva, __FILE__, __LINE__);
+    if (s->avctx->using_dxva) {
+        h->first_mb_in_slice = first_mb_in_slice;
+        fill_dxva_slice_long(h);
+    }
+    // ==> End patch MPC
 
     if (s->avctx->debug & FF_DEBUG_PICT_INFO) {
         av_log(h->s.avctx, AV_LOG_DEBUG,
@@ -3704,6 +3819,11 @@ static int execute_decode_slices(H264Context *h, int context_count)
     H264Context *hx;
     int i;
 
+// ==> Start patch MPC
+    av_log(s->avctx, AV_LOG_INFO, "using_dxva = %d, at %s:%i\n", s->avctx->using_dxva, __FILE__, __LINE__);
+    if (s->avctx->using_dxva)
+        return 0;
+// <== End patch MPC
     if (s->avctx->hwaccel ||
         s->avctx->codec->capabilities & CODEC_CAP_HWACCEL_VDPAU)
         return 0;
@@ -3873,6 +3993,9 @@ again:
                     hx->inter_gb_ptr    = &hx->s.gb;
                 hx->s.data_partitioning = 0;
 
+                // ==> Start patch MPC
+                hx->ref_pic_flag = (h->nal_ref_idc != 0);
+                // <== End patch MPC
                 if ((err = decode_slice_header(hx, h)))
                     break;
 
@@ -4067,6 +4190,10 @@ static int decode_frame(AVCodecContext *avctx, void *data,
     int buf_index      = 0;
     Picture *out;
     int i, out_idx;
+    // ==> Start patch MPC
+    h->out_poc     = INT_MIN;
+    h->out_rtstart = INT64_MIN;
+    // <== End patch MPC
 
     s->flags  = avctx->flags;
     s->flags2 = avctx->flags2;
@@ -4096,6 +4223,10 @@ static int decode_frame(AVCodecContext *avctx, void *data,
         if (out) {
             *data_size = sizeof(AVFrame);
             *pict      = out->f;
+            // ==> Start patch MPC
+            h->out_poc		= out->poc;
+            h->out_rtstart	= out->f.reordered_opaque;
+            // <== End patch MPC
         }
 
         return buf_index;
@@ -4154,6 +4285,12 @@ not_extra:
             *pict      = h->next_output_pic->f;
         }
     }
+
+    // ==> Start patch MPC
+    if (h->out_poc == INT_MIN && h->next_output_pic) {
+        h->out_poc = h->next_output_pic->poc;
+    }
+    // <== End patch MPC
 
     assert(pict->data[0] || !*data_size);
     ff_print_debug_info(s, pict);
@@ -4277,5 +4414,4 @@ AVCodec ff_h264_vdpau_decoder = {
 
 // ==> Start patch MPC
 #include "h264_recov.c"
-#include "h264_dxva.c"
 // ==> End patch MPC

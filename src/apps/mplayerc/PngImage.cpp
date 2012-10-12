@@ -325,9 +325,10 @@ HBITMAP MPCPngImage::LoadExternalImage(CString fn, int br, int rc, int gc, int b
 					return TypeLoadImage(1, &pData, &width, &height, &bpp, NULL, IDB_PLAYERFLYBAR_PNG, br, rc, gc, bc);
 				}
 			}
-			return NULL;
 		}
 	}
+
+	return NULL;
 }
 
 void MPCPngImage::LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop, int br, int rc, int gc, int bc)
