@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2012 Sergey "judelaw"
+ * Copyright (C) 2012 Sergey "judelaw" and Sergey "Exodus8"
  *
  * This file is part of MPC-BE.
  *
@@ -22,45 +22,23 @@
 
 #pragma once
 
+#include "PngImage.h"
+
 class CFlyBar : public CWnd
 {
 public:
 	CFlyBar();
 	virtual ~CFlyBar();
-	void SetDefault();
-	void SetDefault2();
+
 	int bt_idx;
-	//int ih;
 	int iw;
+
 	void CalcButtonsRect();
+	void DrawBitmap(CDC *pDC, int x, int y, int z);
 
 	DECLARE_DYNAMIC(CFlyBar)
-	
-private:
-	HICON m_ExitIcon_a;
-	HICON m_ExitIcon;
-	HICON m_MinIcon_a;
-	HICON m_MinIcon;
-	HICON m_MaxIcon_a;
-	HICON m_MaxIcon_na;
-	HICON m_MaxIcon;
-	HICON m_RestoreIcon_a;
-	HICON m_RestoreIcon;
-	HICON m_SettingsIcon_a;
-	HICON m_SettingsIcon;
-	HICON m_InfoIcon_a;
-	HICON m_InfoIcon_na;
-	HICON m_InfoIcon;
-	HICON m_FSIcon_a;
-	HICON m_FSIcon_na;
-	HICON m_FSIcon;
-	HICON m_WindowIcon_a;
-	HICON m_WindowIcon;
-	HICON m_LockIcon;
-	HICON m_UnLockIcon;
-	HICON m_LockIcon_a;
-	HICON m_UnLockIcon_a;
 
+private:
 	CRect r_ExitIcon;
 	CRect r_MinIcon;
 	CRect r_RestoreIcon;
@@ -68,21 +46,22 @@ private:
 	CRect r_InfoIcon;
 	CRect r_FSIcon;
 	CRect r_LockIcon;
-	
+
+	HBITMAP hBmp;
+	MPCPngImage m_logobm;
 	CToolTipCtrl m_tooltip;
 
 	void Destroy();
 
 protected:
-	
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-
-	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+
 	afx_msg LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
-	
 	afx_msg void OnPaint();
+
 	DECLARE_MESSAGE_MAP()
 };

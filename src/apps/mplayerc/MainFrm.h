@@ -25,6 +25,7 @@
 
 #include <atlbase.h>
 
+#include "PngImage.h"
 #include "PlayerChildView.h"
 #include "PlayerPreView.h"
 #include "PlayerFlyBar.h"
@@ -584,8 +585,9 @@ public:
 
 protected:  // control bar embedded members
 
-	CChildView m_wndView;
+	MPCPngImage m_logobm;
 
+	CChildView m_wndView;
 	CPlayerSeekBar m_wndSeekBar;
 	CPlayerToolBar m_wndToolBar;
 	CPlayerInfoBar m_wndInfoBar;

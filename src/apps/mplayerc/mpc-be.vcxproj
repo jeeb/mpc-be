@@ -405,31 +405,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ani.avi" />
-    <None Include="res\flybar\exit.ico" />
-    <None Include="res\flybar\exit2.ico" />
-    <None Include="res\flybar\exit2_a.ico" />
-    <None Include="res\flybar\exit_a.ico" />
-    <None Include="res\flybar\fs.ico" />
-    <None Include="res\flybar\fs_a.ico" />
-    <None Include="res\flybar\fs_na.ico" />
-    <None Include="res\flybar\info.ico" />
-    <None Include="res\flybar\info_a.ico" />
-    <None Include="res\flybar\info_na.ico" />
-    <None Include="res\flybar\lock.ico" />
-    <None Include="res\flybar\lock_a.ico" />
-    <None Include="res\flybar\max.ico" />
-    <None Include="res\flybar\max_a.ico" />
-    <None Include="res\flybar\max_na.ico" />
-    <None Include="res\flybar\min.ico" />
-    <None Include="res\flybar\min_a.ico" />
-    <None Include="res\flybar\restore.ico" />
-    <None Include="res\flybar\restore_a.ico" />
-    <None Include="res\flybar\set.ico" />
-    <None Include="res\flybar\set_a.ico" />
-    <None Include="res\flybar\unlock.ico" />
-    <None Include="res\flybar\unlock_a.ico" />
-    <None Include="res\flybar\win.ico" />
-    <None Include="res\flybar\win_a.ico" />
     <None Include="res\gpu.ico" />
     <None Include="res\icon.ico">
       <FileType>ICO</FileType>
@@ -463,6 +438,7 @@
     <None Include="res\tb_stop_16.ico" />
     <None Include="res\toolbar.bmp" />
     <None Include="res\toolbar.png" />
+    <None Include="res\flybar.png" />
     <None Include="res\Toolbarw7.png" />
     <None Include="res\web\1pix.gif" />
     <None Include="res\web\404.html">

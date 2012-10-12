@@ -1428,7 +1428,14 @@ bool CMainFrame::FlyBarSetPos()
 	}
 
 	if (AfxGetAppSettings().iCaptionMenuMode == MODE_FRAMEONLY || AfxGetAppSettings().iCaptionMenuMode == MODE_BORDERLESS || m_fFullScreen) {
-		m_wndFlyBar.MoveWindow(r_wndView.right-228,r_wndView.top+4, 224, 32);
+
+		HBITMAP hBmp = m_logobm.LoadExternalImage("flybar", -1, -1, -1, -1);
+		BITMAP bm;
+		::GetObject(hBmp, sizeof(bm), &bm);
+		DeleteObject(hBmp);
+		int pos = (bm.bmHeight * 9) + (bm.bmHeight / 8) + 6;
+
+		m_wndFlyBar.MoveWindow(r_wndView.right-4-pos, r_wndView.top+4, pos, bm.bmHeight+8);
 		m_wndFlyBar.CalcButtonsRect();
 		if (r_wndView.bottom-r_wndView.top > 40 && r_wndView.right-r_wndView.left > 236) {
 			if (AfxGetAppSettings().fFlybarOnTop && !m_wndFlyBar.IsWindowVisible()) {

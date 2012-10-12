@@ -991,6 +991,9 @@
     <None Include="res\toolbar.png">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="res\flybar.png">
+      <Filter>Resource Files</Filter>
+    </None>
     <None Include="res\Toolbarw7.png">
       <Filter>Resource Files</Filter>
     </None>
@@ -1011,81 +1014,6 @@
   <ItemGroup>
     <Image Include="res\gpu.ico">
       <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\flybar\exit.ico">
-      <Filter>Resource Files\Flybar</Filter>
-    </Image>
-    <Image Include="res\flybar\exit_a.ico">
-      <Filter>Resource Files\Flybar</Filter>
-    </Image>
-    <Image Include="res\flybar\exit2.ico">
-      <Filter>Resource Files\Flybar</Filter>
-    </Image>
-    <Image Include="res\flybar\exit2_a.ico">
-      <Filter>Resource Files\Flybar</Filter>
-    </Image>
-    <Image Include="res\flybar\fs.ico">
-      <Filter>Resource Files\Flybar</Filter>
-    </Image>
-    <Image Include="res\flybar\fs_a.ico">
-      <Filter>Resource Files\Flybar</Filter>
-    </Image>
-    <Image Include="res\flybar\info.ico">
-      <Filter>Resource Files\Flybar</Filter>
-    </Image>
-    <Image Include="res\flybar\info_a.ico">
-      <Filter>Resource Files\Flybar</Filter>
-    </Image>
-    <Image Include="res\flybar\lock.ico">
-      <Filter>Resource Files\Flybar</Filter>
-    </Image>
-    <Image Include="res\flybar\lock_a.ico">
-      <Filter>Resource Files\Flybar</Filter>
-    </Image>
-    <Image Include="res\flybar\max.ico">
-      <Filter>Resource Files\Flybar</Filter>
-    </Image>
-    <Image Include="res\flybar\max_a.ico">
-      <Filter>Resource Files\Flybar</Filter>
-    </Image>
-    <Image Include="res\flybar\min.ico">
-      <Filter>Resource Files\Flybar</Filter>
-    </Image>
-    <Image Include="res\flybar\min_a.ico">
-      <Filter>Resource Files\Flybar</Filter>
-    </Image>
-    <Image Include="res\flybar\restore.ico">
-      <Filter>Resource Files\Flybar</Filter>
-    </Image>
-    <Image Include="res\flybar\restore_a.ico">
-      <Filter>Resource Files\Flybar</Filter>
-    </Image>
-    <Image Include="res\flybar\set.ico">
-      <Filter>Resource Files\Flybar</Filter>
-    </Image>
-    <Image Include="res\flybar\set_a.ico">
-      <Filter>Resource Files\Flybar</Filter>
-    </Image>
-    <Image Include="res\flybar\unlock.ico">
-      <Filter>Resource Files\Flybar</Filter>
-    </Image>
-    <Image Include="res\flybar\unlock_a.ico">
-      <Filter>Resource Files\Flybar</Filter>
-    </Image>
-    <Image Include="res\flybar\win.ico">
-      <Filter>Resource Files\Flybar</Filter>
-    </Image>
-    <Image Include="res\flybar\win_a.ico">
-      <Filter>Resource Files\Flybar</Filter>
-    </Image>
-    <Image Include="res\flybar\fs_na.ico">
-      <Filter>Resource Files\Flybar</Filter>
-    </Image>
-    <Image Include="res\flybar\info_na.ico">
-      <Filter>Resource Files\Flybar</Filter>
-    </Image>
-    <Image Include="res\flybar\max_na.ico">
-      <Filter>Resource Files\Flybar</Filter>
     </Image>
   </ItemGroup>
 </Project>

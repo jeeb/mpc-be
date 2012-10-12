@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2012 Sergey "judelaw"
+ * Copyright (C) 2012 Sergey "judelaw" and Sergey "Exodus8"
  *
  * This file is part of MPC-BE.
  *
@@ -25,13 +25,10 @@
 #include "PlayerFlyBar.h"
 #include "MainFrm.h"
 
-
 // CPrevView
 
 CFlyBar::CFlyBar() : 
 	bt_idx(-1),
-	//ih(24),
-	iw(24),
 	r_ExitIcon(0,0,0,0),
 	r_MinIcon(0,0,0,0),
 	r_RestoreIcon(0,0,0,0),
@@ -40,11 +37,11 @@ CFlyBar::CFlyBar() :
 	r_FSIcon(0,0,0,0),
 	r_LockIcon(0,0,0,0)
 {
-	SetDefault();
+	hBmp = m_logobm.LoadExternalImage("flybar", -1, -1, -1, -1);
+	BITMAP bm;
+	::GetObject(hBmp, sizeof(bm), &bm);
+	iw = bm.bmHeight;
 }
-
-#define DestroyIcons(icon) \
-	if (icon) DestroyIcon(icon); \
 
 CFlyBar::~CFlyBar()
 {
@@ -53,29 +50,7 @@ CFlyBar::~CFlyBar()
 
 void CFlyBar::Destroy()
 {
-	DestroyIcons(m_ExitIcon_a)
-	DestroyIcons(m_ExitIcon)
-	DestroyIcons(m_MinIcon_a)
-	DestroyIcons(m_MinIcon)
-	DestroyIcons(m_MaxIcon_a)
-	DestroyIcons(m_MaxIcon_na)
-	DestroyIcons(m_MaxIcon)
-	DestroyIcons(m_RestoreIcon_a)
-	DestroyIcons(m_RestoreIcon)
-	DestroyIcons(m_SettingsIcon_a)
-	DestroyIcons(m_SettingsIcon)
-	DestroyIcons(m_InfoIcon_a)
-	DestroyIcons(m_InfoIcon_na)
-	DestroyIcons(m_InfoIcon)
-	DestroyIcons(m_FSIcon_a)
-	DestroyIcons(m_FSIcon_na)
-	DestroyIcons(m_FSIcon)
-	DestroyIcons(m_WindowIcon_a)
-	DestroyIcons(m_WindowIcon)
-	DestroyIcons(m_LockIcon_a)
-	DestroyIcons(m_LockIcon)
-	DestroyIcons(m_UnLockIcon_a)
-	DestroyIcons(m_UnLockIcon)
+	DeleteObject(hBmp);
 }
 
 IMPLEMENT_DYNAMIC(CFlyBar, CWnd)
@@ -86,7 +61,6 @@ BEGIN_MESSAGE_MAP(CFlyBar, CWnd)
 	ON_WM_MOUSEMOVE()
 	ON_WM_PAINT()
 END_MESSAGE_MAP()
-
 
 // CFlyBar message handlers
 
@@ -111,7 +85,6 @@ BOOL CFlyBar::PreTranslateMessage(MSG* pMsg)
 
 	return CWnd::PreTranslateMessage(pMsg);
 }
-
 
 LRESULT CFlyBar::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -160,12 +133,23 @@ void CFlyBar::CalcButtonsRect()
 	r_ExitIcon		= CRect(rcBar.right-4-(iw),	rcBar.top+4, rcBar.right-4, rcBar.bottom-4);
 	r_MinIcon		= CRect(rcBar.right-4-(iw*3), rcBar.top+4, rcBar.right-4-(iw*2), rcBar.bottom-4);
 	r_RestoreIcon	= CRect(rcBar.right-4-(iw*2), rcBar.top+4, rcBar.right-4-(iw), rcBar.bottom-4);
-	r_SettingsIcon	= CRect(rcBar.right-4-(iw*7), rcBar.top+4, rcBar.right-4-(iw*6), rcBar.bottom-4);;
-	r_InfoIcon		= CRect(rcBar.right-4-(iw*6), rcBar.top+4, rcBar.right-4-(iw*5), rcBar.bottom-4);;
-	r_FSIcon		= CRect(rcBar.right-4-(iw*4), rcBar.top+4, rcBar.right-4-(iw*3), rcBar.bottom-4);;
-	r_LockIcon		= CRect(rcBar.right-4-(iw*9), rcBar.top+4, rcBar.right-4-(iw*8), rcBar.bottom-4);;
+	r_SettingsIcon	= CRect(rcBar.right-4-(iw*7), rcBar.top+4, rcBar.right-4-(iw*6), rcBar.bottom-4);
+	r_InfoIcon		= CRect(rcBar.right-4-(iw*6), rcBar.top+4, rcBar.right-4-(iw*5), rcBar.bottom-4);
+	r_FSIcon		= CRect(rcBar.right-4-(iw*4), rcBar.top+4, rcBar.right-4-(iw*3), rcBar.bottom-4);
+	r_LockIcon		= CRect(rcBar.right-4-(iw*9), rcBar.top+4, rcBar.right-4-(iw*8), rcBar.bottom-4);
 }
 
+void CFlyBar::DrawBitmap(CDC *pDC, int x, int y, int z)
+{
+	CDC *mdci = GetDC(), hdcSrc;
+	hdcSrc.CreateCompatibleDC(mdci);
+	hdcSrc.SelectObject(CBitmap::FromHandle(hBmp));
+
+	pDC->StretchBlt(x - 4 - (iw * z), 4, iw, iw, &hdcSrc, iw * y, 0, iw, iw, SRCCOPY);
+
+	hdcSrc.DeleteDC();
+	mdci->DeleteDC();
+}
 
 void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 {
@@ -187,7 +171,7 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 		ShowWindow(SW_HIDE);
 		pFrame->OnClose();
 	} else if (r_MinIcon.PtInRect(p)) {
-		pFrame->ShowWindow(SW_SHOWMINIMIZED );
+		pFrame->ShowWindow(SW_SHOWMINIMIZED);
 	} else if (r_RestoreIcon.PtInRect(p) && !pFrame->m_fFullScreen) {
 		if (wp.showCmd == SW_SHOWMAXIMIZED) {
 			pFrame->ShowWindow(SW_SHOWNORMAL);
@@ -284,7 +268,7 @@ void CFlyBar::OnMouseMove(UINT nFlags, CPoint point)
 	GetMonitorInfo(MonitorFromWindow(this->m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
 	CPoint p;
 	p.x = max(0, min(point.x, mi.rcMonitor.right - r_tooltip.Width()));
-	int iCursorHeight = 24; // ???
+	int iCursorHeight = 24;
 	m_tooltip.SetWindowPos(NULL, p.x, point.y + iCursorHeight, r_tooltip.Width(), iCursorHeight, SWP_NOACTIVATE|SWP_NOZORDER);
 
 	Invalidate();
@@ -297,95 +281,111 @@ void CFlyBar::OnPaint()
 	CPaintDC dc(this);
 
 	if (IsWindowVisible()) {
+
 		AppSettings& s = AfxGetAppSettings();
 
 		CRect rcBar;
 		GetClientRect(&rcBar);
 		ClientToScreen(&rcBar);
+		int x = rcBar.Width();
 
 		CMainFrame* pFrame	= (CMainFrame*)GetParentFrame();
 		WINDOWPLACEMENT wp;
 		pFrame->GetWindowPlacement(&wp);
-		
+
 		OAFilterState fs	= pFrame->GetMediaState();
 		CDC mdc;
 		mdc.CreateCompatibleDC(&dc);
 		CBitmap bm;
-		bm.CreateCompatibleBitmap(&dc, rcBar.Width(), rcBar.Height());
+		bm.CreateCompatibleBitmap(&dc, x, rcBar.Height());
 		CBitmap* pOldBm = mdc.SelectObject(&bm);
 		mdc.SetBkMode(TRANSPARENT);
 
-		DrawIconEx(mdc, rcBar.Width()-4-(iw),   4, m_ExitIcon, 0,0, 0, NULL, DI_NORMAL);
-		DrawIconEx(mdc, rcBar.Width()-4-(iw*2), 4, wp.showCmd == SW_SHOWMAXIMIZED ? m_RestoreIcon : (pFrame->m_fFullScreen ? m_MaxIcon_na : m_MaxIcon), 0,0, 0, NULL, DI_NORMAL);
-		DrawIconEx(mdc, rcBar.Width()-4-(iw*3), 4, m_MinIcon, 0,0, 0, NULL, DI_NORMAL);
-		DrawIconEx(mdc, rcBar.Width()-4-(iw*4), 4, pFrame->m_fFullScreen ? m_WindowIcon : (wp.showCmd == SW_SHOWMAXIMIZED || (s.IsD3DFullscreen()  && fs != -1) ? m_FSIcon_na : m_FSIcon), 0,0, 0, NULL, DI_NORMAL);
-		DrawIconEx(mdc, rcBar.Width()-4-(iw*6), 4, fs != -1 ? m_InfoIcon : m_InfoIcon_na, 0,0, 0, NULL, DI_NORMAL);
-		DrawIconEx(mdc, rcBar.Width()-4-(iw*7), 4, m_SettingsIcon, 0,0, 0, NULL, DI_NORMAL);
-		DrawIconEx(mdc, rcBar.Width()-4-(iw*9), 4, s.fFlybarOnTop ? m_LockIcon : m_UnLockIcon, 0,0, 0, NULL, DI_NORMAL);
+		DrawBitmap(&mdc, x, 0, 1);
+
+		DrawBitmap(&mdc, x, 13, 3);
+
+		if (wp.showCmd == SW_SHOWMAXIMIZED) {
+			DrawBitmap(&mdc, x, 15, 2);
+		} else if (pFrame->m_fFullScreen) {
+			DrawBitmap(&mdc, x, 12, 2);
+		} else {
+			DrawBitmap(&mdc, x, 10, 2);
+		}
+
+		DrawBitmap(&mdc, x, 17, 7);
+
+		if (fs != -1) {
+			DrawBitmap(&mdc, x, 5, 6);
+		} else {
+			DrawBitmap(&mdc, x, 7, 6);
+		}
+
+		if (pFrame->m_fFullScreen) {
+			DrawBitmap(&mdc, x, 21, 4);
+		} else if (wp.showCmd == SW_SHOWMAXIMIZED || (s.IsD3DFullscreen() && fs != -1)) {
+			DrawBitmap(&mdc, x, 2, 4);
+		} else {
+			DrawBitmap(&mdc, x, 4, 4);
+		}
+
+		if (s.fFlybarOnTop) {
+			DrawBitmap(&mdc, x, 8, 9);
+		} else {
+			DrawBitmap(&mdc, x, 19, 9);
+		}
 
 		switch (bt_idx) {
 			case -1:
 				break;
 			case 0:
-				DrawIconEx(mdc, rcBar.Width()-4-(iw), 4, m_ExitIcon_a, 0,0, 0, NULL, DI_NORMAL);
+				DrawBitmap(&mdc, x, 1, 1);
 				break;
 			case 1:
-				DrawIconEx(mdc, rcBar.Width()-4-(iw*3), 4, m_MinIcon_a, 0,0, 0, NULL, DI_NORMAL);
+				DrawBitmap(&mdc, x, 14, 3);
 				break;
 			case 2:
-				DrawIconEx(mdc, rcBar.Width()-4-(iw*2), 4, wp.showCmd == SW_SHOWMAXIMIZED ? m_RestoreIcon_a : (pFrame->m_fFullScreen ? m_MaxIcon_na : m_MaxIcon_a), 0,0, 0, NULL, DI_NORMAL);
+				if (wp.showCmd == SW_SHOWMAXIMIZED) {
+					DrawBitmap(&mdc, x, 16, 2);
+				} else if (pFrame->m_fFullScreen) {
+					DrawBitmap(&mdc, x, 12, 2);
+				} else {
+					DrawBitmap(&mdc, x, 11, 2);
+				}
 				break;
 			case 3:
-				DrawIconEx(mdc, rcBar.Width()-4-(iw*7), 4, m_SettingsIcon_a, 0,0, 0, NULL, DI_NORMAL);
+				DrawBitmap(&mdc, x, 18, 7);
 				break;
 			case 4:
-				DrawIconEx(mdc, rcBar.Width()-4-(iw*6), 4, fs !=-1 ? m_InfoIcon_a : m_InfoIcon_na, 0,0, 0, NULL, DI_NORMAL);
+				if (fs != -1) {
+					DrawBitmap(&mdc, x, 6, 6);
+				} else {
+					DrawBitmap(&mdc, x, 7, 6);
+				}
 				break;
 			case 5:
-				DrawIconEx(mdc, rcBar.Width()-4-(iw*4), 4, pFrame->m_fFullScreen ? m_WindowIcon_a : (wp.showCmd == SW_SHOWMAXIMIZED || (s.IsD3DFullscreen() && fs != -1) ? m_FSIcon_na : m_FSIcon_a), 0,0, 0, NULL, DI_NORMAL);
+				if (pFrame->m_fFullScreen) {
+					DrawBitmap(&mdc, x, 22, 4);
+				} else if (wp.showCmd == SW_SHOWMAXIMIZED || (s.IsD3DFullscreen() && fs != -1)) {
+					DrawBitmap(&mdc, x, 4, 4);
+				} else {
+					DrawBitmap(&mdc, x, 3, 4);
+				}
 				break;
 			case 6:
-				DrawIconEx(mdc, rcBar.Width()-4-(iw*9), 4, s.fFlybarOnTop ? m_LockIcon_a : m_UnLockIcon_a, 0,0, 0, NULL, DI_NORMAL);
+				if (s.fFlybarOnTop) {
+					DrawBitmap(&mdc, x, 9, 9);
+				} else {
+					DrawBitmap(&mdc, x, 20, 9);
+				}
 				break;
 		}
 
-		dc.BitBlt(0, 0, rcBar.Width(), rcBar.Height(), &mdc, 0, 0, SRCCOPY);
+		dc.BitBlt(0, 0, x, rcBar.Height(), &mdc, 0, 0, SRCCOPY);
 
 		mdc.SelectObject(pOldBm);
 		bm.DeleteObject();
 		mdc.DeleteDC();
 	}
-	bt_idx = -1;
-}
-
-
-void CFlyBar::SetDefault()
-{
-	Destroy();
-
-	m_ExitIcon_a		= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_EXIT_A), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	m_ExitIcon			= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_EXIT), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	m_MinIcon_a			= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_MINIMIZE_A), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	m_MinIcon			= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_MINIMIZE), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	m_MaxIcon_a			= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_MAXIMIZE_A), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	m_MaxIcon_na		= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_MAXIMIZE_NA), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	m_MaxIcon			= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_MAXIMIZE), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	m_RestoreIcon_a		= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_RESTORE_A), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	m_RestoreIcon		= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_RESTORE), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	m_SettingsIcon_a	= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_SETTINGS_A), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	m_SettingsIcon		= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_SETTINGS), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	m_InfoIcon_a		= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_INFO_A), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	m_InfoIcon_na		= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_INFO_NA), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	m_InfoIcon			= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_INFO), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	m_FSIcon_a			= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_FULLSCREEN_A), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	m_FSIcon_na			= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_FULLSCREEN_NA), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	m_FSIcon			= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_FULLSCREEN), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	m_WindowIcon_a		= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_WINDOW_A), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	m_WindowIcon		= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_WINDOW), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	m_LockIcon			= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_LOCK), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	m_UnLockIcon		= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_UNLOCK), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	m_LockIcon_a		= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_LOCK_A), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	m_UnLockIcon_a		= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_UNLOCK_A), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	
 	bt_idx = -1;
 }

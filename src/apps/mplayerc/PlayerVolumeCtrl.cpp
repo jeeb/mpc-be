@@ -132,11 +132,11 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					CDC memdc;
 
 					HBITMAP hBmp = m_logobm.LoadExternalImage("toolbar", -1, -1, -1, -1);
-					DIBSECTION dib;
-					::GetObject(hBmp, sizeof(dib), &dib);
+					BITMAP bm;
+					::GetObject(hBmp, sizeof(bm), &bm);
 					DeleteObject(hBmp);
 
-					int m_nBMedian = dib.dsBmih.biHeight - 3 - 0.5 * dib.dsBmih.biHeight - 8;
+					int m_nBMedian = bm.bmHeight - 3 - 0.5 * bm.bmHeight - 8;
 					int height = r.Height() + m_nBMedian + 4;
 
 					int fp = m_logobm.FileExists("background");
