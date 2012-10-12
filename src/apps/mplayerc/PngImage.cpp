@@ -324,9 +324,8 @@ HBITMAP MPCPngImage::LoadExternalImage(CString fn, int br, int rc, int gc, int b
 				} else if (fn == _T("flybar")) {
 					return TypeLoadImage(1, &pData, &width, &height, &bpp, NULL, IDB_PLAYERFLYBAR_PNG, br, rc, gc, bc);
 				}
-			} else {
-				return NULL;
 			}
+			return NULL;
 		}
 	}
 }
