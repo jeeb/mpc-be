@@ -3184,7 +3184,6 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
 
     // ==> Start patch MPC
     // If entropy_coding_mode, align to 8 bits
-    av_log(s->avctx, AV_LOG_INFO, "using_dxva = %d, at %s:%i\n", s->avctx->using_dxva, __FILE__, __LINE__);
     if (s->avctx->using_dxva) {
         if (h->pps.cabac) align_get_bits(&s->gb);
         h->bit_offset_to_slice_data = s->gb.index;
@@ -3244,7 +3243,6 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
     h->emu_edge_height = (FRAME_MBAFF || FIELD_PICTURE) ? 0 : h->emu_edge_width;
 
     // ==> Start patch MPC
-    av_log(s->avctx, AV_LOG_INFO, "using_dxva = %d, at %s:%i\n", s->avctx->using_dxva, __FILE__, __LINE__);
     if (s->avctx->using_dxva) {
         h->first_mb_in_slice = first_mb_in_slice;
         fill_dxva_slice_long(h);
@@ -3819,11 +3817,10 @@ static int execute_decode_slices(H264Context *h, int context_count)
     H264Context *hx;
     int i;
 
-// ==> Start patch MPC
-    av_log(s->avctx, AV_LOG_INFO, "using_dxva = %d, at %s:%i\n", s->avctx->using_dxva, __FILE__, __LINE__);
+    // ==> Start patch MPC
     if (s->avctx->using_dxva)
         return 0;
-// <== End patch MPC
+    // <== End patch MPC
     if (s->avctx->hwaccel ||
         s->avctx->codec->capabilities & CODEC_CAP_HWACCEL_VDPAU)
         return 0;
@@ -3864,8 +3861,14 @@ static int decode_nal_units(H264Context *h, const uint8_t *buf, int buf_size)
     int pass = !(avctx->active_thread_type & FF_THREAD_FRAME);
     int nals_needed = 0; ///< number of NALs that need decoding before the next frame thread starts
     int nal_index;
+    // ==> Start patch MPC
+    int nal_pass = 0;
+    // <== End patch MPC
 
     h->nal_unit_type= 0;
+    // ==> Start patch MPC
+    h->second_field_offset = 0;
+    // <== End patch MPC
 
     if(!s->slice_context_count)
          s->slice_context_count= 1;
@@ -4025,6 +4028,11 @@ again:
                 s->current_picture_ptr->sync |= h->sync;
 
                 if (h->current_slice == 1) {
+                    // ==> Start patch MPC
+                    nal_pass++;
+                    if (nal_pass == 1)
+                        h->second_field_offset = buf_index;
+                    // <== End patch MPC
                     if (!(s->flags2 & CODEC_FLAG2_CHUNKS))
                         decode_postinit(h, nal_index >= nals_needed);
 
@@ -4162,6 +4170,11 @@ end:
         ff_thread_report_progress(&s->current_picture_ptr->f, INT_MAX,
                                   s->picture_structure == PICT_BOTTOM_FIELD);
     }
+
+    // ==> Start patch MPC
+    if (nal_pass < 2)
+        h->second_field_offset = 0;
+    // <== End patch MPC
 
     return buf_index;
 }
