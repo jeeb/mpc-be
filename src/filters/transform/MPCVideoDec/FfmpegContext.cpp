@@ -58,24 +58,6 @@ void *__imp_time64 = _time64;
 void *__imp_vscprintf = _vscprintf;
 #endif
 
-const byte ZZ_SCAN[16]  = {
-	0,  1,  4,  8,
-	5,  2,  3,  6,
-	9, 12, 13, 10,
-	7, 11, 14, 15
-};
-
-const byte ZZ_SCAN8[64] = {
-	0,   1,  8, 16,  9,  2,  3, 10,
-	17, 24, 32, 25, 18, 11,  4,  5,
-	12, 19, 26, 33, 40, 48, 41, 34,
-	27, 20, 13,  6,  7, 14, 21, 28,
-	35, 42, 49, 56, 57, 50, 43, 36,
-	29, 22, 15, 23, 30, 37, 44, 51,
-	58, 59, 52, 45, 38, 31, 39, 46,
-	53, 60, 61, 54, 47, 55, 62, 63
-};
-
 inline MpegEncContext* GetMpegEncContext(struct AVCodecContext* pAVCtx)
 {
 	Mpeg1Context*		s1;
@@ -270,11 +252,11 @@ void CopyScalingMatrix (DXVA_Qmatrix_H264* pDest, PPS* pps, DWORD nPCIVendor)
 	} else {
 		for (i = 0; i < 6; i++)
 			for (j = 0; j < 16; j++)
-				pDest->bScalingLists4x4[i][j] = pps->scaling_matrix4[i][ZZ_SCAN[j]];
+				pDest->bScalingLists4x4[i][j] = pps->scaling_matrix4[i][zigzag_scan[j]];
 
 		for (i = 0; i < 64; i++) {
-			pDest->bScalingLists8x8[0][i] = pps->scaling_matrix8[0][ZZ_SCAN8[i]];
-			pDest->bScalingLists8x8[1][i] = pps->scaling_matrix8[3][ZZ_SCAN8[i]];
+			pDest->bScalingLists8x8[0][i] = pps->scaling_matrix8[0][ff_zigzag_direct[i]];
+			pDest->bScalingLists8x8[1][i] = pps->scaling_matrix8[3][ff_zigzag_direct[i]];
 		}
 	}
 }
@@ -753,7 +735,7 @@ HRESULT FFMpeg2DecodeFrame (DXVA_PictureParameters* pPicParams, DXVA_QmatrixData
 	pQMatrixData->bNewQmatrix[2] = 1;
 	pQMatrixData->bNewQmatrix[3] = 1;
 	for (i = 0; i < 64; i++) {
-		int n = s->dsp.idct_permutation[ZZ_SCAN8[i]];
+		int n = s->dsp.idct_permutation[ff_zigzag_direct[i]];
 		pQMatrixData->Qmatrix[0][i] = s->intra_matrix[n];
 		pQMatrixData->Qmatrix[1][i] = s->inter_matrix[n];
 		pQMatrixData->Qmatrix[2][i] = s->chroma_intra_matrix[n];
