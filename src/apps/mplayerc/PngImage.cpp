@@ -321,9 +321,10 @@ HBITMAP MPCPngImage::LoadExternalImage(CString fn, int br, int rc, int gc, int b
 			if (AfxGetAppSettings().fDisableXPToolbars) {
 				if (fn == _T("toolbar")) {
 					return TypeLoadImage(1, &pData, &width, &height, &bpp, NULL, IDB_PLAYERTOOLBAR_PNG, br, rc, gc, bc);
-				} else if (fn == _T("flybar")) {
-					return TypeLoadImage(1, &pData, &width, &height, &bpp, NULL, IDB_PLAYERFLYBAR_PNG, br, rc, gc, bc);
 				}
+			}
+			if (fn == _T("flybar")) {
+				return TypeLoadImage(1, &pData, &width, &height, &bpp, NULL, IDB_PLAYERFLYBAR_PNG, br, rc, gc, bc);
 			}
 		}
 	}

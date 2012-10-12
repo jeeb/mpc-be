@@ -301,84 +301,58 @@ void CFlyBar::OnPaint()
 		CBitmap* pOldBm = mdc.SelectObject(&bm);
 		mdc.SetBkMode(TRANSPARENT);
 
-		DrawBitmap(&mdc, x, 0, 1);
+		int sep[][2] = {{0,1},{13,14},{15,16},{12,12},{10,11},{17,18},{5,6},{7,7},{21,22},{4,4},{2,3},{8,9},{19,20}};
 
-		DrawBitmap(&mdc, x, 13, 3);
+		for (int i = 0; i < 2; i++) {
 
-		if (wp.showCmd == SW_SHOWMAXIMIZED) {
-			DrawBitmap(&mdc, x, 15, 2);
-		} else if (pFrame->m_fFullScreen) {
-			DrawBitmap(&mdc, x, 12, 2);
-		} else {
-			DrawBitmap(&mdc, x, 10, 2);
-		}
+			if (!i || bt_idx == 0) {
+				DrawBitmap(&mdc, x, sep[0][i], 1);
+			}
 
-		DrawBitmap(&mdc, x, 17, 7);
+			if (!i || bt_idx == 1) {
+				DrawBitmap(&mdc, x, sep[1][i], 3);
+			}
 
-		if (fs != -1) {
-			DrawBitmap(&mdc, x, 5, 6);
-		} else {
-			DrawBitmap(&mdc, x, 7, 6);
-		}
-
-		if (pFrame->m_fFullScreen) {
-			DrawBitmap(&mdc, x, 21, 4);
-		} else if (wp.showCmd == SW_SHOWMAXIMIZED || (s.IsD3DFullscreen() && fs != -1)) {
-			DrawBitmap(&mdc, x, 2, 4);
-		} else {
-			DrawBitmap(&mdc, x, 4, 4);
-		}
-
-		if (s.fFlybarOnTop) {
-			DrawBitmap(&mdc, x, 8, 9);
-		} else {
-			DrawBitmap(&mdc, x, 19, 9);
-		}
-
-		switch (bt_idx) {
-			case -1:
-				break;
-			case 0:
-				DrawBitmap(&mdc, x, 1, 1);
-				break;
-			case 1:
-				DrawBitmap(&mdc, x, 14, 3);
-				break;
-			case 2:
+			if (!i || bt_idx == 2) {
 				if (wp.showCmd == SW_SHOWMAXIMIZED) {
-					DrawBitmap(&mdc, x, 16, 2);
+					DrawBitmap(&mdc, x, sep[2][i], 2);
 				} else if (pFrame->m_fFullScreen) {
-					DrawBitmap(&mdc, x, 12, 2);
+					DrawBitmap(&mdc, x, sep[3][i], 2);
 				} else {
-					DrawBitmap(&mdc, x, 11, 2);
+					DrawBitmap(&mdc, x, sep[4][i], 2);
 				}
-				break;
-			case 3:
-				DrawBitmap(&mdc, x, 18, 7);
-				break;
-			case 4:
+			}
+
+			if (!i || bt_idx == 3) {
+				DrawBitmap(&mdc, x, sep[5][i], 7);
+			}
+
+			if (!i || bt_idx == 4) {
 				if (fs != -1) {
-					DrawBitmap(&mdc, x, 6, 6);
+					DrawBitmap(&mdc, x, sep[6][i], 6);
 				} else {
-					DrawBitmap(&mdc, x, 7, 6);
+					DrawBitmap(&mdc, x, sep[7][i], 6);
 				}
-				break;
-			case 5:
+			}
+
+			if (!i || bt_idx == 5) {
 				if (pFrame->m_fFullScreen) {
-					DrawBitmap(&mdc, x, 22, 4);
+					DrawBitmap(&mdc, x, sep[8][i], 4);
 				} else if (wp.showCmd == SW_SHOWMAXIMIZED || (s.IsD3DFullscreen() && fs != -1)) {
-					DrawBitmap(&mdc, x, 4, 4);
+					DrawBitmap(&mdc, x, sep[9][i], 4);
 				} else {
-					DrawBitmap(&mdc, x, 3, 4);
+					DrawBitmap(&mdc, x, sep[10][i], 4);
 				}
-				break;
-			case 6:
+			}
+
+			if (!i || bt_idx == 6) {
 				if (s.fFlybarOnTop) {
-					DrawBitmap(&mdc, x, 9, 9);
+					DrawBitmap(&mdc, x, sep[11][i], 9);
 				} else {
-					DrawBitmap(&mdc, x, 20, 9);
+					DrawBitmap(&mdc, x, sep[12][i], 9);
 				}
-				break;
+			}
+
 		}
 
 		dc.BitBlt(0, 0, x, rcBar.Height(), &mdc, 0, 0, SRCCOPY);
