@@ -1728,12 +1728,16 @@ HRESULT CMpaDecFilter::StopStreaming()
 	return __super::StopStreaming();
 }
 
-HRESULT	CMpaDecFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType *pmt)
+HRESULT CMpaDecFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType *pmt)
 {
 	if (dir == PINDIR_INPUT) {
 		enum AVCodecID nCodecId = FindCodec(pmt->subtype);
-		if (nCodecId != AV_CODEC_ID_NONE && !m_FFAudioDec.Init(nCodecId, m_pInput)) {
-			return VFW_E_TYPE_NOT_ACCEPTED;
+		if (nCodecId != AV_CODEC_ID_NONE) {
+			if (m_FFAudioDec.Init(nCodecId, m_pInput)) {
+				m_FFAudioDec.SetDRC(GetDynamicRangeControl());
+			} else {
+				return VFW_E_TYPE_NOT_ACCEPTED;
+			}
 		}
 	}
 

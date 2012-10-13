@@ -46,8 +46,6 @@ typedef struct {
 } FFMPEG_AUDIO_CODECS;
 
 static const FFMPEG_AUDIO_CODECS ffAudioCodecs[] = {
-	// Opus
-	{ &MEDIASUBTYPE_OPUS,              AV_CODEC_ID_OPUS },
 	// AMR
 	{ &MEDIASUBTYPE_AMR,               AV_CODEC_ID_AMR_NB },
 	{ &MEDIASUBTYPE_SAMR,              AV_CODEC_ID_AMR_NB },
@@ -126,6 +124,8 @@ static const FFMPEG_AUDIO_CODECS ffAudioCodecs[] = {
 	{ &MEDIASUBTYPE_BINKA_RDFT,        AV_CODEC_ID_BINKAUDIO_RDFT },
 	// Indeo Audio
 	{ &MEDIASUBTYPE_IAC,               AV_CODEC_ID_IAC },
+	// Opus
+	{ &MEDIASUBTYPE_OPUS,              AV_CODEC_ID_OPUS },
 
 	{ &MEDIASUBTYPE_None,              AV_CODEC_ID_NONE },
 };
