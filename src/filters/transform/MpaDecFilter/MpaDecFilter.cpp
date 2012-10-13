@@ -324,8 +324,6 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		return;
 	}
 
-	m_InputParams.Reset();
-
 	// default settings
 	m_fSampleFmt[SF_PCM16] = true;
 	m_fSampleFmt[SF_PCM24] = false;
@@ -1239,8 +1237,6 @@ HRESULT CMpaDecFilter::GetDeliveryBuffer(IMediaSample** pSample, BYTE** pData)
 
 HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, int size, MPCSampleFormat sfmt, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask)
 {
-	HRESULT hr;
-
 	int nSamples;
 	AVSampleFormat in_avsf;
 	switch (sfmt) {
@@ -1282,22 +1278,17 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, int size, MPCSampleFormat sfmt, DWOR
 	//ASSERT(nChannels == av_get_channel_layout_nb_channels(dwChannelMask));
 
 	BYTE*  pDataIn  = pBuff;
-	float* pDataMix = NULL;
+	CAtlArray<float> mixData;
 
 	if (GetMixer()) {
 		int sc = GetMixerLayout();
 		WORD  mixed_channels = channel_mode[sc].channels;
 		DWORD mixed_mask     = channel_mode[sc].ch_layout;
 
-		pDataMix = new float[nSamples * mixed_channels];
+		mixData.SetCount(nSamples * mixed_channels);
 
-		if (m_InputParams.LayoutUpdate(nChannels, dwChannelMask)) {
-			m_Mixer.Reset();
-		}
-
-		hr = m_Mixer.Mixing(pDataMix, mixed_channels, mixed_mask, pDataIn, nSamples, nChannels, dwChannelMask, in_avsf);
-		if (hr == S_OK) {
-			pDataIn       = (BYTE*)pDataMix;
+		if (S_OK == m_Mixer.Mixing(mixData.GetData(), mixed_channels, mixed_mask, pDataIn, nSamples, nChannels, dwChannelMask, in_avsf)) {
+			pDataIn       = (BYTE*)mixData.GetData();
 			sfmt          = SF_FLOAT; // float after mixing
 			size          = nSamples * mixed_channels * sizeof(float);
 			nChannels     = mixed_channels;
@@ -1308,6 +1299,7 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, int size, MPCSampleFormat sfmt, DWOR
 	CMediaType mt = CreateMediaType(out_sf, nSamplesPerSec, nChannels, dwChannelMask);
 	WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.Format();
 
+	HRESULT hr;
 	if (FAILED(hr = ReconnectOutput(nSamples, mt))) {
 		return hr;
 	}
@@ -1315,7 +1307,7 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, int size, MPCSampleFormat sfmt, DWOR
 	CComPtr<IMediaSample> pOut;
 	BYTE* pDataOut = NULL;
 	if (FAILED(GetDeliveryBuffer(&pOut, &pDataOut))) {
-		goto fail;
+		return E_FAIL;
 	}
 
 	if (hr == S_OK) {
@@ -1414,24 +1406,11 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, int size, MPCSampleFormat sfmt, DWOR
 				}
 				break;
 			default:
-				goto fail;
+				return E_FAIL;
 		}
 	}
 
-	if (pDataMix) {
-		pDataIn = NULL;
-		delete [] pDataMix;
-	}
-
 	return m_pOutput->Deliver(pOut);
-
-fail:
-	if (pDataMix) {
-		pDataIn = NULL;
-		delete [] pDataMix;
-	}
-
-	return E_FAIL;
 }
 
 HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, int size, int sample_rate, int samples, BYTE type)
@@ -1746,8 +1725,6 @@ HRESULT CMpaDecFilter::StopStreaming()
 {
 	m_FFAudioDec.StreamFinish();
 
-	m_Mixer.Reset();
-
 	return __super::StopStreaming();
 }
 
@@ -1825,11 +1802,7 @@ STDMETHODIMP CMpaDecFilter::SetMixerLayout(int sc)
 	if (sc < SPK_MONO || sc > SPK_7_1) {
 		return E_INVALIDARG;
 	}
-
-	if (m_iMixerLayout != sc) {
-		m_Mixer.Reset();
-		m_iMixerLayout = sc;
-	}
+	m_iMixerLayout = sc;
 
 	return S_OK;
 }
