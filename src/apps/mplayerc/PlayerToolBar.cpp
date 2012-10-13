@@ -159,9 +159,6 @@ void CPlayerToolBar::SwitchTheme()
 
 			SetSizes(CSize(bitmapBmp.bmHeight + 7, bitmapBmp.bmHeight + 6), CSize(bitmapBmp.bmHeight, bitmapBmp.bmHeight));
 
-			CDC dc;
-			dc.CreateCompatibleDC(NULL);
-
 			DIBSECTION dib;
 			::GetObject(hBmp, sizeof(dib), &dib);
 			int fileDepth = dib.dsBmih.biBitCount;
@@ -563,11 +560,11 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 					dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 				}
 			}
-			
+
 			CRect r12; //MUTE
 			GetItemRect(12, &r12);
 			if (bGPU && m_hDXVAIcon) {
-				DrawIconEx(dc, r12.left - 36, r.CenterPoint().y-9, m_hDXVAIcon, 0,0, 0, NULL, DI_NORMAL);
+				DrawIconEx(dc, r12.left - 36, r.CenterPoint().y-9, m_hDXVAIcon, 0, 0, 0, NULL, DI_NORMAL);
 			}
 
 			dc.SelectObject(&penSaved);
@@ -613,6 +610,12 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 				GetItemRect(sep[j], &r);
 
 				dc.FillSolidRect(r, GetSysColor(COLOR_BTNFACE));
+			}
+
+			CRect r12; //MUTE
+			GetItemRect(12, &r12);
+			if (bGPU && m_hDXVAIcon) {
+				DrawIconEx(dc, r12.left - 36, r.CenterPoint().y-9, m_hDXVAIcon, 0, 0, 0, NULL, DI_NORMAL);
 			}
 
 			dc.Detach();
