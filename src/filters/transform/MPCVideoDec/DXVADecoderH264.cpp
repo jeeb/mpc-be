@@ -169,7 +169,6 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 	CH264Nalu					Nalu;
 	UINT						nNalOffset		= 0;
 	CComPtr<IMediaSample>		pSampleToDeliver;
-	CComQIPtr<IMPCDXVA2Sample>	pDXVA2Sample;
 	int							slice_step		= 1;
 	UINT						SecondFieldOffset	= 0;
 	UINT						nSize_Result		= 0;
@@ -242,6 +241,7 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 		} else {
 			CHECK_HR (AddExecuteBuffer (DXVA2_SliceControlBufferType, sizeof (DXVA_Slice_H264_Short)*m_nSlices, m_pSliceShort));
 		}
+		// Decode frame
 		CHECK_HR (Execute());
 		CHECK_HR (EndFrame(nSurfaceIndex));
 
@@ -262,6 +262,7 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 			} else {
 				CHECK_HR (AddExecuteBuffer (DXVA2_SliceControlBufferType, sizeof (DXVA_Slice_H264_Short)*m_nSlices, m_pSliceShort));
 			}
+			// Decode frame
 			CHECK_HR (Execute());
 			CHECK_HR (EndFrame(nSurfaceIndex));
 

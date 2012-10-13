@@ -60,7 +60,8 @@ HRESULT			FFVC1UpdatePictureParam (DXVA_PictureParameters* pPicParams, struct AV
 // === Mpeg2 functions
 int				MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame);
 HRESULT			FFMpeg2DecodeFrame (DXVA_PictureParameters* pPicParams, DXVA_QmatrixData* m_QMatrixData, DXVA_SliceInfo* pSliceInfo, int* nSliceCount,
-									struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int* nNextCodecIndex, int* nFieldType, int* nSliceType, BYTE* pBuffer, UINT nSize);
+									struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int* nNextCodecIndex, int* nFieldType, int* nSliceType, BYTE* pBuffer, UINT nSize,
+									bool* bIsField);
 
 // === Common functions
 unsigned long	FFGetMBNumber(struct AVCodecContext* pAVCtx);

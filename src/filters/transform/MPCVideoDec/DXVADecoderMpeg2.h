@@ -64,12 +64,6 @@ private:
 
 	REFERENCE_TIME			m_rtLastStart;
 
-	int						m_nSurfaceIndex;
-	CComPtr<IMediaSample>	m_pSampleToDeliver;
-	bool					m_bSecondField;
-	BYTE					m_bSecondFieldPrev;
-	REFERENCE_TIME			m_rtStart, m_rtStop;
-
 	// calculate Average FrameRate
 	REFERENCE_TIME			m_rtAvrTimePerFrame;
 	REFERENCE_TIME			m_rtLastValidStart;
