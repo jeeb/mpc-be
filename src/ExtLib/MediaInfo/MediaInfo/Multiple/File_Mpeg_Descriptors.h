@@ -27,10 +27,8 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include "MediaInfo/File__Analyze.h"
 #include "MediaInfo/Multiple/File_Mpeg4_Descriptors.h"
 #include "MediaInfo/Duplicate/File__Duplicate_MpegTs.h"
-#include <map>
 #include <cfloat>
 //---------------------------------------------------------------------------
 
@@ -156,6 +154,7 @@ struct complete_stream
         };
         typedef std::map<int16u, program> programs; //Key is program_number
         programs Programs; //Key is program_number
+        std::vector<int16u> programs_List;
         size_t   Programs_NotParsedCount;
 
         //Per IOD
