@@ -194,6 +194,7 @@ SRCS_C = \
     libavcodec/libopus.c \
     libavcodec/libopusdec.c \
     libavcodec/lsp.c \
+    libavcodec/mathtables.c \
     libavcodec/mdct.c \
     libavcodec/mjpeg.c \
     libavcodec/mjpegbdec.c \
@@ -360,7 +361,6 @@ SRCS_C = \
     libavutil/float_dsp.c \
     libavutil/imgutils.c \
     libavutil/intfloat_readwrite.c \
-    libavutil/inverse.c \
     libavutil/lfg.c \
     libavutil/log.c \
     libavutil/lzo.c \

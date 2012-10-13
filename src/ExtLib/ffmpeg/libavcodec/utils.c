@@ -289,7 +289,8 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
 
 void avcodec_align_dimensions(AVCodecContext *s, int *width, int *height)
 {
-    int chroma_shift = av_pix_fmt_descriptors[s->pix_fmt].log2_chroma_w;
+    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(s->pix_fmt);
+    int chroma_shift = desc->log2_chroma_w;
     int linesize_align[AV_NUM_DATA_POINTERS];
     int align;
 
@@ -490,7 +491,8 @@ static int video_get_buffer(AVCodecContext *s, AVFrame *pic)
         int unaligned;
         AVPicture picture;
         int stride_align[AV_NUM_DATA_POINTERS];
-        const int pixel_size = av_pix_fmt_descriptors[s->pix_fmt].comp[0].step_minus1 + 1;
+        const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(s->pix_fmt);
+        const int pixel_size = desc->comp[0].step_minus1 + 1;
 
         avcodec_get_chroma_sub_sample(s->pix_fmt, &h_chroma_shift, &v_chroma_shift);
 
@@ -1757,10 +1759,14 @@ int attribute_align_arg avcodec_decode_audio4(AVCodecContext *avctx,
     /* many decoders assign whole AVFrames, thus overwriting extended_data;
      * make sure it's set correctly; assume decoders that actually use
      * extended_data are doing it correctly */
-    planar   = av_sample_fmt_is_planar(frame->format);
-    channels = av_get_channel_layout_nb_channels(frame->channel_layout);
-    if (!(planar && channels > AV_NUM_DATA_POINTERS))
-        frame->extended_data = frame->data;
+    if (*got_frame_ptr) {
+        planar   = av_sample_fmt_is_planar(frame->format);
+        channels = av_get_channel_layout_nb_channels(frame->channel_layout);
+        if (!(planar && channels > AV_NUM_DATA_POINTERS))
+            frame->extended_data = frame->data;
+    } else {
+        frame->extended_data = NULL;
+    }
 
     return ret;
 }

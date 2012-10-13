@@ -27,11 +27,11 @@
  * The simplest mpeg encoder (well, it was the simplest!).
  */
 
-#include "libavutil/intmath.h"
 #include "libavutil/imgutils.h"
 #include "avcodec.h"
 #include "dsputil.h"
 #include "internal.h"
+#include "mathops.h"
 #include "mpegvideo.h"
 #include "mjpegenc.h"
 #include "msmpeg4.h"
@@ -1526,8 +1526,9 @@ void ff_MPV_frame_end(MpegEncContext *s)
               !(s->flags & CODEC_FLAG_EMU_EDGE) &&
               !s->avctx->lowres
             ) {
-        int hshift = av_pix_fmt_descriptors[s->avctx->pix_fmt].log2_chroma_w;
-        int vshift = av_pix_fmt_descriptors[s->avctx->pix_fmt].log2_chroma_h;
+        const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(s->avctx->pix_fmt);
+        int hshift = desc->log2_chroma_w;
+        int vshift = desc->log2_chroma_h;
         s->dsp.draw_edges(s->current_picture.f.data[0], s->current_picture.f.linesize[0],
                           s->h_edge_pos, s->v_edge_pos,
                           EDGE_WIDTH, EDGE_WIDTH,
@@ -2345,7 +2346,7 @@ int ff_MPV_lowest_referenced_row(MpegEncContext *s, int dir)
     int my_max = INT_MIN, my_min = INT_MAX, qpel_shift = !s->quarter_sample;
     int my, off, i, mvs;
 
-    if (s->picture_structure != PICT_FRAME) goto unhandled;
+    if (s->picture_structure != PICT_FRAME || s->mcsel) goto unhandled;
 
     switch (s->mv_type) {
         case MV_TYPE_16X16:
@@ -2715,9 +2716,10 @@ void ff_draw_horiz_band(MpegEncContext *s, int y, int h){
        && s->current_picture.f.reference
        && !s->intra_only
        && !(s->flags&CODEC_FLAG_EMU_EDGE)) {
+        const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(s->avctx->pix_fmt);
         int sides = 0, edge_h;
-        int hshift = av_pix_fmt_descriptors[s->avctx->pix_fmt].log2_chroma_w;
-        int vshift = av_pix_fmt_descriptors[s->avctx->pix_fmt].log2_chroma_h;
+        int hshift = desc->log2_chroma_w;
+        int vshift = desc->log2_chroma_h;
         if (y==0) sides |= EDGE_TOP;
         if (y + h >= s->v_edge_pos) sides |= EDGE_BOTTOM;
 
