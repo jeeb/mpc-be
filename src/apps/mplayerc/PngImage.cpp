@@ -22,20 +22,6 @@
 
 #include "stdafx.h"
 #include "PngImage.h"
-#include <libpng/png.h>
-
-struct png_t {
-	unsigned char* data;
-	png_size_t size, pos;
-};
-
-static void read_data_fn(png_structp png_ptr, png_bytep data, png_size_t length)
-{
-	struct png_t* png = (struct png_t*)png_get_progressive_ptr(png_ptr);
-
-	memcpy(data, &png->data[png->pos], length);
-	png->pos += length;
-}
 
 bool MPCPngImage::DecompressPNG(struct png_t* png)
 {

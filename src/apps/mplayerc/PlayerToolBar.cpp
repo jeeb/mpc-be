@@ -612,12 +612,6 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 				dc.FillSolidRect(r, GetSysColor(COLOR_BTNFACE));
 			}
 
-			CRect r12; //MUTE
-			GetItemRect(12, &r12);
-			if (bGPU && m_hDXVAIcon) {
-				DrawIconEx(dc, r12.left - 36, r.CenterPoint().y-9, m_hDXVAIcon, 0, 0, 0, NULL, DI_NORMAL);
-			}
-
 			dc.Detach();
 			lr |= CDRF_SKIPDEFAULT;
 			break;

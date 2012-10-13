@@ -131,7 +131,9 @@ void CPPageLogo::OnBnClickedRadio2()
 	m_logobm.Destroy();
 
 	m_logobm.Attach(OpenImage(m_logofn));
-	m_logopreview.SetBitmap(m_logobm);
+	if (m_logobm) {
+		m_logopreview.SetBitmap(m_logobm);
+	}
 
 	Invalidate();
 

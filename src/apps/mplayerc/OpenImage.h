@@ -22,26 +22,10 @@
 
 #pragma once
 
-#include <libpng/png.h>
+#include "PngImage.h"
 #include <libwebp/webp/decode.h>
 
 using namespace Gdiplus;
-
-typedef struct
-{
-	png_bytep p;
-	png_uint_32 len;
-} PNGData, *PNGDataPtr;
-
-static void PNGReadFromBytes(png_structp png_ptr, png_bytep data, png_uint_32 length)
-{
-	PNGDataPtr dataptr = (PNGDataPtr)png_get_io_ptr(png_ptr);
-	for (png_uint_32 i = 0; i < length; i++) {
-		data[i] = dataptr->p[i];
-	}
-	dataptr->p += length;
-	dataptr->len -= length;
-}
 
 static BYTE* ConvertRGBToBMPBuffer(BYTE* Buffer, int width, int height, long* newsize)
 {
@@ -82,9 +66,9 @@ static bool OpenImageCheck(CString fn)
 		|| wcsstr(tmp_fn, L".webp")
 		|| wcsstr(tmp_fn, L".webpll")) {
 		return 1;
-	} else {
-		return 0;
 	}
+
+	return 0;
 }
 
 static HBITMAP OpenImage(CString fn)
@@ -125,9 +109,17 @@ static HBITMAP OpenImage(CString fn)
 					InternetCloseHandle(f);
 				}
 				InternetCloseHandle(s);
+				if (!f) {
+					return NULL;
+				}
+			} else {
+				return NULL;
 			}
 		} else {
 			fp = _tfopen(fn, _T("rb"));
+			if (!fp) {
+				return NULL;
+			}
 			fseek(fp, 0, SEEK_END);
 		}
 
@@ -162,12 +154,14 @@ static HBITMAP OpenImage(CString fn)
 
 		} else if (wcsstr(tmp_fn, L".png")) {
 
-			PNGData png;
-			png.p = (unsigned char*)data;
-			png.len = fs;
+			struct png_t png;
+			png.data = (unsigned char*)data;
+			png.size = fs;
+			png.pos = 8;
 
 			png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
-			png_set_read_fn(png_ptr, (void*)&png, (png_rw_ptr)PNGReadFromBytes);
+			png_set_read_fn(png_ptr, (png_voidp)&png, read_data_fn);
+			png_set_sig_bytes(png_ptr, 8);
 			png_infop info_ptr = png_create_info_struct(png_ptr);
 
 			png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND | PNG_TRANSFORM_BGR, 0);
@@ -211,7 +205,7 @@ static HBITMAP OpenImage(CString fn)
 		free(data);
 
 		return hB;
-	} else {
-		return NULL;
 	}
+
+	return NULL;
 }

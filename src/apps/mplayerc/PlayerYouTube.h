@@ -33,9 +33,9 @@ static int strpos(char* h, char* n)
 
 	if (p) {
 		return p - h;
-	} else {
-		return 0;
 	}
+
+	return 0;
 }
 
 static CString PlayerYouTube(CString fn, CString* out_title)
@@ -90,12 +90,13 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 				}
 
 				InternetCloseHandle(f);
-			} else {
-				InternetCloseHandle(s);
-				return fn;
 			}
 
 			InternetCloseHandle(s);
+
+			if (!f) {
+				return fn;
+			}
 		} else {
 			return fn;
 		}
@@ -210,7 +211,7 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 				return fn;
 			}
 		}
-	} else {
-		return fn;
 	}
+
+	return fn;
 }
