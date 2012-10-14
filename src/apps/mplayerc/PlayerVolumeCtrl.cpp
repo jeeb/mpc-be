@@ -131,7 +131,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					InvalidateRect(&r);
 					CDC memdc;
 
-					HBITMAP hBmp = m_logobm.LoadExternalImage("toolbar", -1, -1, -1, -1);
+					HBITMAP hBmp = m_logobm.LoadExternalImage("toolbar", IDB_PLAYERTOOLBAR_PNG, 1, -1, -1, -1, -1);
 					BITMAP bm;
 					::GetObject(hBmp, sizeof(bm), &bm);
 					DeleteObject(hBmp);

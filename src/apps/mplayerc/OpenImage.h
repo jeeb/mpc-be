@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include "PngImage.h"
 #include <libwebp/webp/decode.h>
 
 using namespace Gdiplus;
@@ -151,34 +150,6 @@ static HBITMAP OpenImage(CString fn)
 			memcpy(pBits, bmp, slen);
 
 			WebPFreeDecBuffer(out_buf);
-
-		} else if (wcsstr(tmp_fn, L".png")) {
-
-			struct png_t png;
-			png.data = (unsigned char*)data;
-			png.size = fs;
-			png.pos = 8;
-
-			png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
-			png_set_read_fn(png_ptr, (png_voidp)&png, read_data_fn);
-			png_set_sig_bytes(png_ptr, 8);
-			png_infop info_ptr = png_create_info_struct(png_ptr);
-
-			png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND | PNG_TRANSFORM_BGR, 0);
-			png_bytep *row_pointers = png_get_rows(png_ptr, info_ptr);
-
-			int width = png_get_image_width(png_ptr, info_ptr), height = png_get_image_height(png_ptr, info_ptr);
-			int bit = png_get_channels(png_ptr, info_ptr);
-			int memWidth = width * bit;
-
-			BYTE *pBits;
-			BITMAPINFO bi = {{sizeof(BITMAPINFOHEADER), width, -height, 1, bit * 8, BI_RGB, 0, 0, 0, 0, 0}};
-			hB = CreateDIBSection(0, &bi, DIB_RGB_COLORS, (void**)&pBits, 0, 0);
-			for (int i = 0; i < height; i++) {
-				memcpy(pBits + memWidth * i, row_pointers[i], memWidth);
-			}
-
-			png_destroy_read_struct(&png_ptr, &info_ptr, 0);
 
 		} else {
 

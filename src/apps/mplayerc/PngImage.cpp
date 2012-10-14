@@ -97,31 +97,6 @@ bool MPCPngImage::LoadFromResource(UINT id) {
 	return ret;
 }
 
-bool MPCPngImage::LoadFromFile(CString fn) {
-	bool ret = false;
-
-	FILE* fp;
-	_tfopen_s(&fp, LoadCurrentPath() + fn + _T(".png"), _T("rb"));
-	if (fp) {
-		fseek(fp, 0, SEEK_END);
-		int size = ftell(fp);
-		rewind(fp);
-		void* str = malloc(size);
-		fread(str, 1, size, fp);
-		fclose(fp);
-
-		struct png_t png;
-		png.data = (unsigned char*)str;
-		png.size = size;
-
-		ret = DecompressPNG(&png);
-
-		free(str);
-	}
-
-	return ret;
-}
-
 CString MPCPngImage::LoadCurrentPath()
 {
 	CString path;
@@ -288,7 +263,7 @@ HBITMAP MPCPngImage::TypeLoadImage(int type, BYTE** pData, int* width, int* heig
 	return hbm;
 }
 
-HBITMAP MPCPngImage::LoadExternalImage(CString fn, int br, int rc, int gc, int bc)
+HBITMAP MPCPngImage::LoadExternalImage(CString fn, int resid, int type, int br, int rc, int gc, int bc)
 {
 	CString path = LoadCurrentPath();
 
@@ -304,13 +279,8 @@ HBITMAP MPCPngImage::LoadExternalImage(CString fn, int br, int rc, int gc, int b
 		if (fp) {
 			return TypeLoadImage(0, &pData, &width, &height, &bpp, fp, 0, br, rc, gc, bc);
 		} else {
-			if (AfxGetAppSettings().fDisableXPToolbars) {
-				if (fn == _T("toolbar")) {
-					return TypeLoadImage(1, &pData, &width, &height, &bpp, NULL, IDB_PLAYERTOOLBAR_PNG, br, rc, gc, bc);
-				}
-			}
-			if (fn == _T("flybar")) {
-				return TypeLoadImage(1, &pData, &width, &height, &bpp, NULL, IDB_PLAYERFLYBAR_PNG, br, rc, gc, bc);
+			if (resid && ((int)AfxGetAppSettings().fDisableXPToolbars == type || type == -1)) {
+				return TypeLoadImage(1, &pData, &width, &height, &bpp, NULL, resid, br, rc, gc, bc);
 			}
 		}
 	}

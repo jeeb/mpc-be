@@ -33,7 +33,6 @@ struct png_t {
 static void read_data_fn(png_structp png_ptr, png_bytep data, png_size_t length)
 {
 	struct png_t* png = (struct png_t*)png_get_progressive_ptr(png_ptr);
-
 	memcpy(data, &png->data[png->pos], length);
 	png->pos += length;
 }
@@ -43,13 +42,12 @@ class MPCPngImage : public CImage
 public:
 	bool DecompressPNG(struct png_t* png);
 	bool LoadFromResource(UINT id);
-	bool LoadFromFile(CString fn);
 
 	CString	LoadCurrentPath();
 	bool	FileExists(CString fn);
 
 	BYTE*	BrightnessRGB(int type, BYTE* lpBits, int width, int height, int bpp, int br, int rc, int gc, int bc);
 	HBITMAP	TypeLoadImage(int type, BYTE** pData, int* width, int* height, int* bpp, FILE* fp, int resid, int br, int rc, int gc, int bc);
-	HBITMAP	LoadExternalImage(CString fn, int br, int rc, int gc, int bc);
+	HBITMAP	LoadExternalImage(CString fn, int resid, int type, int br, int rc, int gc, int bc);
 	void	LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop, int br, int rc, int gc, int bc);
 };

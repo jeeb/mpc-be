@@ -37,7 +37,7 @@ CFlyBar::CFlyBar() :
 	r_FSIcon(0,0,0,0),
 	r_LockIcon(0,0,0,0)
 {
-	hBmp = m_logobm.LoadExternalImage("flybar", -1, -1, -1, -1);
+	hBmp = m_logobm.LoadExternalImage("flybar", IDB_PLAYERFLYBAR_PNG, -1, -1, -1, -1, -1);
 	BITMAP bm;
 	::GetObject(hBmp, sizeof(bm), &bm);
 	iw = bm.bmHeight;

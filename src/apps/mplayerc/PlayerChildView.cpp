@@ -127,7 +127,7 @@ void CChildView::LoadLogo()
 	m_logo.Destroy();
 
 	if (m_logo.FileExists("logo")) {
-		m_logo.LoadFromFile("logo");
+		m_logo.Attach(m_logo.LoadExternalImage("logo", 0, -1, -1, -1, -1, -1));
 	} else {
 		if (s.fLogoExternal) {
 			m_logo.Attach(OpenImage(s.strLogoFileName));

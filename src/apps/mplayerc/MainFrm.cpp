@@ -1429,7 +1429,7 @@ bool CMainFrame::FlyBarSetPos()
 
 	if (AfxGetAppSettings().iCaptionMenuMode == MODE_FRAMEONLY || AfxGetAppSettings().iCaptionMenuMode == MODE_BORDERLESS || m_fFullScreen) {
 
-		HBITMAP hBmp = m_logobm.LoadExternalImage("flybar", -1, -1, -1, -1);
+		HBITMAP hBmp = m_logobm.LoadExternalImage("flybar", IDB_PLAYERFLYBAR_PNG, -1, -1, -1, -1, -1);
 		BITMAP bm;
 		::GetObject(hBmp, sizeof(bm), &bm);
 		DeleteObject(hBmp);

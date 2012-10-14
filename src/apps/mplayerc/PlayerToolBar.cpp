@@ -144,9 +144,9 @@ void CPlayerToolBar::SwitchTheme()
 		//r = col & 0xFF;
 		//g = (col >> 8) & 0xFF;
 		//b = col >> 16;
-		hBmp = m_logobm.LoadExternalImage("toolbar", s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
+		hBmp = m_logobm.LoadExternalImage("toolbar", IDB_PLAYERTOOLBAR_PNG, 1, s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
 	} else if (fp) {
-		hBmp = m_logobm.LoadExternalImage("toolbar", -1, -1, -1, -1);
+		hBmp = m_logobm.LoadExternalImage("toolbar", 0, -1, -1, -1, -1, -1);
 	}
 
 	if (NULL != hBmp) {
