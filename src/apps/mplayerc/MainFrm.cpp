@@ -15279,7 +15279,8 @@ void CMainFrame::AddTextPassThruFilter()
 			AM_MEDIA_TYPE mt;
 			if (FAILED(pPin->ConnectedTo(&pPinTo)) || !pPinTo
 					|| FAILED(pPin->ConnectionMediaType(&mt))
-					|| mt.majortype != MEDIATYPE_Text && mt.majortype != MEDIATYPE_Subtitle) {
+					|| (mt.majortype != MEDIATYPE_Text && mt.majortype != MEDIATYPE_Subtitle
+						&& !(mt.majortype == MEDIATYPE_Video && mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE))) {
 				continue;
 			}
 

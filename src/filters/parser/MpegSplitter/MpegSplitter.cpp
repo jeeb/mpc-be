@@ -960,12 +960,21 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = 0;
 
+	int vid_width	= 0;
+	int vid_height	= 0;
+
 	for (int i = 0; i < _countof(m_pFile->m_streams); i++) {
 		POSITION pos = m_pFile->m_streams[i].GetHeadPosition();
 		while (pos) {
 			CMpegSplitterFile::stream& s = m_pFile->m_streams[i].GetNext(pos);
 			CAtlArray<CMediaType> mts;
 			mts.Add(s.mt);
+
+			// Get resolution for first video track
+			if (i == CMpegSplitterFile::video && !vid_width) {
+				int arx, ary;
+				ExtractDim(&s.mt, vid_width, vid_height, arx, ary);
+			}
 			
 			// Add addition GUID for compatible with Cyberlink & Arcsoft VC1 Decoder
 			CMediaType mt = s.mt;
@@ -973,6 +982,22 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				mt.subtype = MEDIASUBTYPE_WVC1_CYBERLINK;
 				mts.InsertAt(0, mt);
 				mt.subtype = MEDIASUBTYPE_WVC1_ARCSOFT;
+				mts.InsertAt(0, mt);
+			}
+
+			// Add addition VobSub type
+			if (mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE) {
+				CStringA hdr = VobSubDefHeader(vid_width ? vid_width : 720, vid_height ? vid_height : 576);
+
+				mt.majortype		= MEDIATYPE_Subtitle;
+				mt.subtype			= MEDIASUBTYPE_VOBSUB;
+				mt.formattype		= FORMAT_SubtitleInfo;
+				SUBTITLEINFO* si	= (SUBTITLEINFO*)mt.AllocFormatBuffer(sizeof(SUBTITLEINFO) + hdr.GetLength());
+				memset(si, 0, mt.FormatLength());
+				si->dwOffset		= sizeof(SUBTITLEINFO);
+				strncpy_s(si->IsoLang, pTI ? CStringA(pTI->GetTrackName(s.ps1id)) : "eng", _countof(si->IsoLang)-1);
+
+				memcpy(si + 1, (LPCSTR)hdr, hdr.GetLength());
 				mts.InsertAt(0, mt);
 			}
 

@@ -433,7 +433,7 @@ HRESULT CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, IAsyncRead
 					}
 
 					if (h2.fpts && CalcDuration && (m_AlternativeDuration || (GetMasterStream() && GetMasterStream()->GetHead() == h.pid))) {
-						if ((m_rtMin == _I64_MAX) || (m_rtMin > h2.pts)) {
+						if ((m_rtMin == _I64_MAX)/* || (m_rtMin > h2.pts)*/) {
 							m_rtMin = h2.pts;
 							m_posMin = GetPos();
 							TRACE ("m_rtMin(SearchStreams)=%S, PID=%d\n", ReftimeToString(m_rtMin), h.pid);
