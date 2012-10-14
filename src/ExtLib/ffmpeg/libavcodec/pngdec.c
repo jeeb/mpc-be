@@ -467,6 +467,18 @@ static int decode_frame(AVCodecContext *avctx,
                     s->width, s->height, s->bit_depth, s->color_type,
                     s->compression_type, s->filter_type, s->interlace_type);
             break;
+        case MKTAG('p', 'H', 'Y', 's'):
+            if (s->state & PNG_IDAT) {
+                av_log(avctx, AV_LOG_ERROR, "pHYs after IDAT\n");
+                goto fail;
+            }
+            avctx->sample_aspect_ratio.num = bytestream2_get_be32(&s->gb);
+            avctx->sample_aspect_ratio.den = bytestream2_get_be32(&s->gb);
+            if (avctx->sample_aspect_ratio.num < 0 || avctx->sample_aspect_ratio.den < 0)
+                avctx->sample_aspect_ratio = (AVRational){ 0, 1 };
+            bytestream2_skip(&s->gb, 1); /* unit specifier */
+            bytestream2_skip(&s->gb, 4); /* crc */
+            break;
         case MKTAG('I', 'D', 'A', 'T'):
             if (!(s->state & PNG_IHDR)) {
                 av_log(avctx, AV_LOG_ERROR, "IDAT without IHDR\n");
@@ -580,10 +592,10 @@ static int decode_frame(AVCodecContext *avctx,
                     r = bytestream2_get_byte(&s->gb);
                     g = bytestream2_get_byte(&s->gb);
                     b = bytestream2_get_byte(&s->gb);
-                    s->palette[i] = (0xff << 24) | (r << 16) | (g << 8) | b;
+                    s->palette[i] = (0xFFU << 24) | (r << 16) | (g << 8) | b;
                 }
                 for(;i<256;i++) {
-                    s->palette[i] = (0xff << 24);
+                    s->palette[i] = (0xFFU << 24);
                 }
                 s->state |= PNG_PLTE;
                 bytestream2_skip(&s->gb, 4); /* crc */

@@ -363,6 +363,7 @@ SRCS_C = \
     libavutil/intfloat_readwrite.c \
     libavutil/lfg.c \
     libavutil/log.c \
+    libavutil/log2_tab.c \
     libavutil/lzo.c \
     libavutil/mathematics.c \
     libavutil/md5.c \
