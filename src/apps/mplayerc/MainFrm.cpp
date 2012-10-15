@@ -15284,6 +15284,14 @@ void CMainFrame::AddTextPassThruFilter()
 				continue;
 			}
 
+			// TextPassThruFilter can connect only to NullTextRenderer - verify it.
+			CPinInfo pi;
+			pPinTo->QueryPinInfo(&pi);
+			CLSID ClsidFilter = GetCLSID(pi.pFilter);
+			if (SUCCEEDED(pPin->QueryPinInfo(&pi)) && GetCLSID(pi.pFilter) != __uuidof(CNullTextRenderer)) {
+				continue;
+			}
+
 			CComQIPtr<IBaseFilter> pTPTF = DNew CTextPassThruFilter(this);
 			CStringW name;
 			name.Format(L"TextPassThru%08x", pTPTF);
