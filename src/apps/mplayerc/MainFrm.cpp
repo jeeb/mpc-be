@@ -15286,9 +15286,7 @@ void CMainFrame::AddTextPassThruFilter()
 
 			// TextPassThruFilter can connect only to NullTextRenderer - verify it.
 			CPinInfo pi;
-			pPinTo->QueryPinInfo(&pi);
-			CLSID ClsidFilter = GetCLSID(pi.pFilter);
-			if (SUCCEEDED(pPin->QueryPinInfo(&pi)) && GetCLSID(pi.pFilter) != __uuidof(CNullTextRenderer)) {
+			if (SUCCEEDED(pPinTo->QueryPinInfo(&pi)) && GetCLSID(pi.pFilter) != __uuidof(CNullTextRenderer)) {
 				continue;
 			}
 
