@@ -26,7 +26,6 @@ FOR /f "tokens=1,2 delims=" %%K IN (
   SET "gccver=%%K" & Call :SubGCCVer %%gccver:*Z=%%
 )
 
-COPY /V /Y "%MINGW32%\i686-w64-mingw32\lib\libpthreadGC2.a" "lib\"
 COPY /V /Y "%MINGW32%\i686-w64-mingw32\lib\libmingwex.a" "lib\"
 COPY /V /Y "%MINGW32%\lib\gcc\i686-w64-mingw32\%gccver%\libgcc.a" "lib\"
 

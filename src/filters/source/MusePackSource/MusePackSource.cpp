@@ -28,6 +28,20 @@
 
 #include "MusePackSource.h"
 
+#ifdef REGISTER_FILTER
+
+STDAPI DllRegisterServer()
+{
+	return AMovieDllRegisterServer2(TRUE);
+}
+
+STDAPI DllUnregisterServer()
+{
+	return AMovieDllRegisterServer2(FALSE);
+}
+
+#endif
+
 //-----------------------------------------------------------------------------
 //
 //	CMusePackSplitter class

@@ -28,6 +28,20 @@
 
 #include "WVSource.h"
 
+#ifdef REGISTER_FILTER
+
+STDAPI DllRegisterServer()
+{
+	return AMovieDllRegisterServer2(TRUE);
+}
+
+STDAPI DllUnregisterServer()
+{
+	return AMovieDllRegisterServer2(FALSE);
+}
+
+#endif
+
 #define constrain(x,y,z) (((y) < (x)) ? (x) : ((y) > (z)) ? (z) : (y))
 
 CUnknown *WINAPI CWavPackSplitterFilter::CreateInstance(LPUNKNOWN punk, HRESULT *phr) {

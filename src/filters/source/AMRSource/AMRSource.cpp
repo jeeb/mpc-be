@@ -28,6 +28,51 @@
 
 #include "AMRSource.h"
 
+#ifdef REGISTER_FILTER
+
+HRESULT Register_AMR_Types()
+{
+	CRegKey	r;
+	if (r.Create(HKEY_CLASSES_ROOT, _T("Media Type\\{E436EB83-524F-11CE-9F53-0020AF0BA770}\\{726D6173-0000-0010-8000-00AA00389B71}")) != ERROR_SUCCESS) {
+		return E_FAIL;
+	}
+
+	r.SetStringValue(_T("0"), _T("0,6,,2321414D520A"));
+	r.SetStringValue(_T("Source Filter"), _T("{E436EBB5-524F-11CE-9F53-0020AF0BA770}"));
+	r.Close();
+
+	return NOERROR;
+}
+
+HRESULT Unregister_AMR_Types()
+{
+	CRegKey	r;
+	if (r.Create(HKEY_CLASSES_ROOT, _T("Media Type\\{E436EB83-524F-11CE-9F53-0020AF0BA770}")) == ERROR_SUCCESS) {
+		r.DeleteSubKey(_T("{726D6173-0000-0010-8000-00AA00389B71}"));
+		r.Close();
+	}
+
+	return NOERROR;
+}
+
+STDAPI DllRegisterServer() 
+{
+	HRESULT hr = Register_AMR_Types();
+	if (FAILED(hr)) {
+		return hr;
+	}
+
+	return AMovieDllRegisterServer2(TRUE);
+}
+
+STDAPI DllUnregisterServer()
+{
+	Unregister_AMR_Types();
+	return AMovieDllRegisterServer2(FALSE);
+}
+
+#endif
+
 //-----------------------------------------------------------------------------
 //
 //	CAMRSplitter class

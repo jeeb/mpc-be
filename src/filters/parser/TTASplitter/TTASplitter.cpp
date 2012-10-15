@@ -51,11 +51,21 @@ int g_cTemplates = _countof(g_Templates);
 
 STDAPI DllRegisterServer()
 {
+	RegisterSourceFilterPattern("0,4,,54544131", CLSID_AsyncReader, MEDIATYPE_Stream, MEDIASUBTYPE_TTA1_Stream);
+
+	RegisterSourceFilterExtension(".tta", CLSID_AsyncReader, MEDIATYPE_Stream, MEDIASUBTYPE_TTA1_Stream);
+
+	RegisterWMPExtension("*.tta", "True Audio Files (*.tta)", "True Audio Files", "audio");
+
 	return AMovieDllRegisterServer2(TRUE);
 }
 
 STDAPI DllUnregisterServer()
 {
+	UnRegisterWMPExtension("*.tta");
+	UnRegisterSourceFilterExtension(".tta");
+	UnRegisterSourceFilterPattern(MEDIATYPE_Stream, MEDIASUBTYPE_TTA1_Stream);
+
 	return AMovieDllRegisterServer2(FALSE);
 }
 
