@@ -100,7 +100,7 @@ static const uint8_t string_table[256] = {
                 break;                                                  \
         }                                                               \
         /* divide block if next bit set */                              \
-        if (get_bits1(bitbuf) == 0)                                     \
+        if (!get_bits1(bitbuf))                                         \
             break;                                                      \
         /* add child nodes */                                           \
         list[n++] = list[i];                                            \
@@ -206,7 +206,7 @@ static int svq1_decode_block_intra(GetBitContext *bitbuf, uint8_t *pixels,
             av_dlog(NULL,
                     "Error (svq1_decode_block_intra): invalid vector: stages=%i level=%i\n",
                     stages, level);
-            return -1;  /* invalid vector */
+            return AVERROR_INVALIDDATA;  /* invalid vector */
         }
 
         mean = get_vlc2(bitbuf, svq1_intra_mean.table, 8, 3);
@@ -258,7 +258,7 @@ static int svq1_decode_block_non_intra(GetBitContext *bitbuf, uint8_t *pixels,
             av_dlog(NULL,
                     "Error (svq1_decode_block_non_intra): invalid vector: stages=%i level=%i\n",
                     stages, level);
-            return -1;  /* invalid vector */
+            return AVERROR_INVALIDDATA;  /* invalid vector */
         }
 
         mean = get_vlc2(bitbuf, svq1_inter_mean.table, 9, 3) - 256;
@@ -279,7 +279,7 @@ static int svq1_decode_motion_vector(GetBitContext *bitbuf, svq1_pmv *mv,
         /* get motion code */
         diff = get_vlc2(bitbuf, svq1_motion_component.table, 7, 2);
         if (diff < 0)
-            return -1;
+            return AVERROR_INVALIDDATA;
         else if (diff) {
             if (get_bits1(bitbuf))
                 diff = -diff;
@@ -333,8 +333,7 @@ static int svq1_motion_inter_block(MpegEncContext *s, GetBitContext *bitbuf,
     }
 
     result = svq1_decode_motion_vector(bitbuf, &mv, pmv);
-
-    if (result != 0)
+    if (result)
         return result;
 
     motion[0].x         =
@@ -378,8 +377,7 @@ static int svq1_motion_inter_4v_block(MpegEncContext *s, GetBitContext *bitbuf,
     }
 
     result = svq1_decode_motion_vector(bitbuf, &mv, pmv);
-
-    if (result != 0)
+    if (result)
         return result;
 
     /* predict and decode motion vector (1) */
@@ -391,8 +389,7 @@ static int svq1_motion_inter_4v_block(MpegEncContext *s, GetBitContext *bitbuf,
         pmv[1] = &motion[(x / 8) + 3];
     }
     result = svq1_decode_motion_vector(bitbuf, &motion[0], pmv);
-
-    if (result != 0)
+    if (result)
         return result;
 
     /* predict and decode motion vector (2) */
@@ -400,8 +397,7 @@ static int svq1_motion_inter_4v_block(MpegEncContext *s, GetBitContext *bitbuf,
     pmv[2] = &motion[(x / 8) + 1];
 
     result = svq1_decode_motion_vector(bitbuf, &motion[(x / 8) + 2], pmv);
-
-    if (result != 0)
+    if (result)
         return result;
 
     /* predict and decode motion vector (3) */
@@ -409,8 +405,7 @@ static int svq1_motion_inter_4v_block(MpegEncContext *s, GetBitContext *bitbuf,
     pmv[3] = &motion[(x / 8) + 3];
 
     result = svq1_decode_motion_vector(bitbuf, pmv[3], pmv);
-
-    if (result != 0)
+    if (result)
         return result;
 
     /* form predictions */
@@ -467,8 +462,7 @@ static int svq1_decode_delta_block(MpegEncContext *s, GetBitContext *bitbuf,
     case SVQ1_BLOCK_INTER:
         result = svq1_motion_inter_block(s, bitbuf, current, previous,
                                          pitch, motion, x, y);
-
-        if (result != 0) {
+        if (result) {
             av_dlog(s->avctx, "Error in svq1_motion_inter_block %i\n", result);
             break;
         }
@@ -478,8 +472,7 @@ static int svq1_decode_delta_block(MpegEncContext *s, GetBitContext *bitbuf,
     case SVQ1_BLOCK_INTER_4V:
         result = svq1_motion_inter_4v_block(s, bitbuf, current, previous,
                                             pitch, motion, x, y);
-
-        if (result != 0) {
+        if (result) {
             av_dlog(s->avctx,
                     "Error in svq1_motion_inter_4v_block %i\n", result);
             break;
@@ -518,7 +511,7 @@ static int svq1_decode_frame_header(GetBitContext *bitbuf, MpegEncContext *s)
     /* frame type */
     s->pict_type = get_bits(bitbuf, 2) + 1;
     if (s->pict_type == 4)
-        return -1;
+        return AVERROR_INVALIDDATA;
 
     if (s->pict_type == AV_PICTURE_TYPE_I) {
         /* unknown fields */
@@ -538,7 +531,7 @@ static int svq1_decode_frame_header(GetBitContext *bitbuf, MpegEncContext *s)
 
             svq1_parse_string(bitbuf, msg);
 
-            av_log(s->avctx, AV_LOG_ERROR,
+            av_log(s->avctx, AV_LOG_INFO,
                    "embedded message: \"%s\"\n", (char *)msg);
         }
 
@@ -555,7 +548,7 @@ static int svq1_decode_frame_header(GetBitContext *bitbuf, MpegEncContext *s)
             s->height = get_bits(bitbuf, 12);
 
             if (!s->width || !s->height)
-                return -1;
+                return AVERROR_INVALIDDATA;
         } else {
             /* get width, height from table */
             s->width  = ff_svq1_frame_size_table[frame_size_code].width;
@@ -564,21 +557,21 @@ static int svq1_decode_frame_header(GetBitContext *bitbuf, MpegEncContext *s)
     }
 
     /* unknown fields */
-    if (get_bits1(bitbuf) == 1) {
+    if (get_bits1(bitbuf)) {
         skip_bits1(bitbuf);    /* use packet checksum if (1) */
         skip_bits1(bitbuf);    /* component checksums after image data if (1) */
 
         if (get_bits(bitbuf, 2) != 0)
-            return -1;
+            return AVERROR_INVALIDDATA;
     }
 
-    if (get_bits1(bitbuf) == 1) {
+    if (get_bits1(bitbuf)) {
         skip_bits1(bitbuf);
         skip_bits(bitbuf, 4);
         skip_bits1(bitbuf);
         skip_bits(bitbuf, 2);
 
-        while (get_bits1(bitbuf) == 1)
+        while (get_bits1(bitbuf))
             skip_bits(bitbuf, 8);
     }
 
@@ -603,7 +596,7 @@ static int svq1_decode_frame(AVCodecContext *avctx, void *data,
     s->f_code = get_bits(&s->gb, 22);
 
     if ((s->f_code & ~0x70) || !(s->f_code & 0x60))
-        return -1;
+        return AVERROR_INVALIDDATA;
 
     /* swap some header bytes (why?) */
     if (s->f_code != 0x20) {
@@ -617,8 +610,7 @@ static int svq1_decode_frame(AVCodecContext *avctx, void *data,
     }
 
     result = svq1_decode_frame_header(&s->gb, s);
-
-    if (result != 0) {
+    if (result) {
         av_dlog(s->avctx, "Error in svq1_decode_frame_header %i\n", result);
         return result;
     }
@@ -637,12 +629,12 @@ static int svq1_decode_frame(AVCodecContext *avctx, void *data,
         avctx->skip_frame >= AVDISCARD_ALL)
         return buf_size;
 
-    if (ff_MPV_frame_start(s, avctx) < 0)
-        return -1;
+    if ((result = ff_MPV_frame_start(s, avctx)) < 0)
+        return result;
 
     pmv = av_malloc((FFALIGN(s->width, 16) / 8 + 3) * sizeof(*pmv));
     if (!pmv)
-        return -1;
+        return AVERROR(ENOMEM);
 
     /* decode y, u and v components */
     for (i = 0; i < 3; i++) {
@@ -672,8 +664,8 @@ static int svq1_decode_frame(AVCodecContext *avctx, void *data,
                 for (x = 0; x < width; x += 16) {
                     result = svq1_decode_block_intra(&s->gb, &current[x],
                                                      linesize);
-                    if (result != 0) {
-                        av_log(s->avctx, AV_LOG_INFO,
+                    if (result) {
+                        av_log(s->avctx, AV_LOG_ERROR,
                                "Error in svq1_decode_block %i (keyframe)\n",
                                result);
                         goto err;
@@ -690,7 +682,7 @@ static int svq1_decode_frame(AVCodecContext *avctx, void *data,
                     result = svq1_decode_delta_block(s, &s->gb, &current[x],
                                                      previous, linesize,
                                                      pmv, x, y);
-                    if (result != 0) {
+                    if (result) {
                         av_dlog(s->avctx,
                                 "Error in svq1_decode_delta_block %i\n",
                                 result);
