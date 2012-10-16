@@ -184,6 +184,11 @@ CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipInfo::Str
 
 	if (_pMediaType->majortype == MEDIATYPE_Video) {
 		MajorType = "Video";
+		if (_pMediaType->subtype == MEDIASUBTYPE_DVD_SUBPICTURE
+			|| _pMediaType->subtype == MEDIASUBTYPE_SVCD_SUBPICTURE
+			|| _pMediaType->subtype == MEDIASUBTYPE_CVD_SUBPICTURE) {
+			MajorType = "Subtitle";
+		}
 
 		if (pClipInfo) {
 			CString name = ISO6392ToLanguage(pClipInfo->m_LanguageCode);

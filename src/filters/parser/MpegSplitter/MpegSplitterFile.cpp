@@ -217,21 +217,21 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 			if (!m_bIsHdmv && m_streams[subpic].GetCount()) {
 				stream s;
 				s.pid = NO_SUBTITLE_PID;
-				s.mt.majortype = m_streams[subpic].GetHead().mt.majortype;
-				s.mt.subtype = m_streams[subpic].GetHead().mt.subtype;
-				s.mt.formattype = m_streams[subpic].GetHead().mt.formattype;
+				s.mt.majortype	= m_streams[subpic].GetHead().mt.majortype;
+				s.mt.subtype	= m_streams[subpic].GetHead().mt.subtype;
+				s.mt.formattype	= m_streams[subpic].GetHead().mt.formattype;
 				m_streams[subpic].AddTail(s);
 			} else {
 				AddHdmvPGStream(NO_SUBTITLE_PID, "---");
 			}
 		}
 	} else {
-		if (m_streams[video].GetCount() && m_streams[subpic].GetCount()) {
+		if (m_streams[video].GetCount()) {
 			stream s;
 			s.pid = NO_SUBTITLE_PID;
-			s.mt.majortype = m_streams[subpic].GetHead().mt.majortype;
-			s.mt.subtype = m_streams[subpic].GetHead().mt.subtype;
-			s.mt.formattype = m_streams[subpic].GetHead().mt.formattype;
+			s.mt.majortype	= m_streams[subpic].GetCount() ? m_streams[subpic].GetHead().mt.majortype	: MEDIATYPE_Video;
+			s.mt.subtype	= m_streams[subpic].GetCount() ? m_streams[subpic].GetHead().mt.subtype		: MEDIASUBTYPE_DVD_SUBPICTURE;
+			s.mt.formattype	= m_streams[subpic].GetCount() ? m_streams[subpic].GetHead().mt.formattype	: FORMAT_None;
 			m_streams[subpic].AddTail(s);
 		}
 	}

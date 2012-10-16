@@ -1718,9 +1718,6 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt)
 
 bool CBaseSplitterFileEx::Read(avchdr& h, spsppsindex index)
 {
-	static BYTE profiles[] = {44, 66, 77, 88, 100, 110, 118, 122, 128, 144, 244};
-	static BYTE levels[] = {10, 11, 12, 13, 20, 21, 22, 30, 31, 32, 40, 41, 42, 50, 51};
-
 	// Only care about SPS and subset SPS
 	if (index != index_sps && index != index_subsetsps)
 		return true;
