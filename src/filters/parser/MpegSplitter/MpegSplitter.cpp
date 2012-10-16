@@ -997,6 +997,23 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				CStringA palette;
 
 				CString fullname = GetPartFilename(pAsyncReader);
+				if (fullname.IsEmpty()) {
+					// trying to get file name from FileSource
+					BeginEnumFilters(m_pGraph, pEF, pBF) {
+						CComQIPtr<IFileSourceFilter> pFSF = pBF;
+						if (pFSF) {
+							LPOLESTR pFN = NULL;
+							AM_MEDIA_TYPE mt;
+							if (SUCCEEDED(pFSF->GetCurFile(&pFN, &mt)) && pFN && *pFN) {
+								fullname = CString(pFN);
+								CoTaskMemFree(pFN);
+							}
+							break;
+						}
+					}
+					EndEnumFilters
+				}
+
 				if (::PathFileExists(fullname)) {
 					CPath fname(fullname);
 					fname.StripPath();
