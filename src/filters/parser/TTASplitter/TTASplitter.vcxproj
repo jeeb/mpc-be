@@ -133,6 +133,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>TTASplitter.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)bin\lib\Debug_$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ReSplitterCompile>
@@ -146,6 +147,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>TTASplitter.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)bin\lib\Debug_$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ReSplitterCompile>
@@ -158,6 +160,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>TTASplitter.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)bin\lib\Release_$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ReSplitterCompile>
@@ -170,6 +173,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>TTASplitter.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)bin\lib\Release_$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ReSplitterCompile>
@@ -217,6 +221,9 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TTASplitter.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TTASplitter.def" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tta_file.h" />

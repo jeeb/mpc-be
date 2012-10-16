@@ -24,6 +24,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="MusePackSource.def">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="bits.h">
       <Filter>Header Files</Filter>
     </ClInclude>

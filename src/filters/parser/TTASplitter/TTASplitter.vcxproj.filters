@@ -21,6 +21,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="TTASplitter.def">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="tta_file.h">
       <Filter>Header Files</Filter>
     </ClInclude>
