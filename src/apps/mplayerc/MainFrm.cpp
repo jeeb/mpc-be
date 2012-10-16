@@ -16772,6 +16772,10 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 	DefaultMenu.Detach();
 	// TODO : destroy old menu ???
 	//OldMenu->DestroyMenu();
+
+	// Re-create Win 7 TaskBar preview button for change button hint
+	CreateThumbnailToolbar();
+	UpdateThumbarButton();
 }
 
 afx_msg void CMainFrame::OnUpdateLanguage(CCmdUI* pCmdUI)
