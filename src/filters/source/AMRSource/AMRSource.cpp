@@ -30,36 +30,32 @@
 
 #ifdef REGISTER_FILTER
 
-HRESULT Register_AMR_Types()
-{
-	CRegKey	r;
-	if (r.Create(HKEY_CLASSES_ROOT, _T("Media Type\\{E436EB83-524F-11CE-9F53-0020AF0BA770}\\{726D6173-0000-0010-8000-00AA00389B71}")) != ERROR_SUCCESS) {
-		return E_FAIL;
-	}
+const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
+	{&MEDIATYPE_Stream, &MEDIASUBTYPE_AMR},
+	{&MEDIATYPE_Audio, &MEDIASUBTYPE_AMR},
+};
 
-	r.SetStringValue(_T("0"), _T("0,6,,2321414D520A"));
-	r.SetStringValue(_T("Source Filter"), _T("{E436EBB5-524F-11CE-9F53-0020AF0BA770}"));
-	r.Close();
+const AMOVIESETUP_PIN sudOpPin[] = {
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut), sudPinTypesOut}
+};
 
-	return NOERROR;
-}
+const AMOVIESETUP_FILTER sudFilter[] = {
+	{&__uuidof(CAMRSplitter), AMRSplitterName, MERIT_NORMAL, _countof(sudOpPin), sudOpPin, CLSID_LegacyAmFilterCategory}
+};
 
-HRESULT Unregister_AMR_Types()
-{
-	CRegKey	r;
-	if (r.Create(HKEY_CLASSES_ROOT, _T("Media Type\\{E436EB83-524F-11CE-9F53-0020AF0BA770}")) == ERROR_SUCCESS) {
-		r.DeleteSubKey(_T("{726D6173-0000-0010-8000-00AA00389B71}"));
-		r.Close();
-	}
+CFactoryTemplate g_Templates[] = {
+	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CAMRSplitter>, NULL, &sudFilter[0]}
+};
 
-	return NOERROR;
-}
+int g_cTemplates = _countof(g_Templates);
 
 STDAPI DllRegisterServer() 
 {
-	HRESULT hr = Register_AMR_Types();
-	if (FAILED(hr)) {
-		return hr;
+	CRegKey	r;
+	if (r.Create(HKEY_CLASSES_ROOT, _T("Media Type\\{E436EB83-524F-11CE-9F53-0020AF0BA770}\\{726D6173-0000-0010-8000-00AA00389B71}")) == ERROR_SUCCESS) {
+		r.SetStringValue(_T("0"), _T("0,6,,2321414D520A"));
+		r.SetStringValue(_T("Source Filter"), _T("{E436EBB5-524F-11CE-9F53-0020AF0BA770}"));
+		r.Close();
 	}
 
 	return AMovieDllRegisterServer2(TRUE);
@@ -67,9 +63,18 @@ STDAPI DllRegisterServer()
 
 STDAPI DllUnregisterServer()
 {
-	Unregister_AMR_Types();
+	CRegKey	r;
+	if (r.Create(HKEY_CLASSES_ROOT, _T("Media Type\\{E436EB83-524F-11CE-9F53-0020AF0BA770}")) == ERROR_SUCCESS) {
+		r.DeleteSubKey(_T("{726D6173-0000-0010-8000-00AA00389B71}"));
+		r.Close();
+	}
+
 	return AMovieDllRegisterServer2(FALSE);
 }
+
+#include "../../core/FilterApp.h"
+
+CFilterApp theApp;
 
 #endif
 

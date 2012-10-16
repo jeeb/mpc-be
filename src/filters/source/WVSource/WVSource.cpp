@@ -30,6 +30,24 @@
 
 #ifdef REGISTER_FILTER
 
+const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
+	{&MEDIATYPE_Stream, &MEDIASUBTYPE_NULL},
+};
+
+const AMOVIESETUP_PIN sudOpPin[] = {
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut), sudPinTypesOut}
+};
+
+const AMOVIESETUP_FILTER sudFilter[] = {
+	{&__uuidof(CWavPackSplitterFilter), WavPackSplitterName, MERIT_NORMAL, _countof(sudOpPin), sudOpPin, CLSID_LegacyAmFilterCategory}
+};
+
+CFactoryTemplate g_Templates[] = {
+	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CWavPackSplitterFilter>, NULL, &sudFilter[0]}
+};
+
+int g_cTemplates = _countof(g_Templates);
+
 STDAPI DllRegisterServer()
 {
 	return AMovieDllRegisterServer2(TRUE);
@@ -39,6 +57,10 @@ STDAPI DllUnregisterServer()
 {
 	return AMovieDllRegisterServer2(FALSE);
 }
+
+#include "../../core/FilterApp.h"
+
+CFilterApp theApp;
 
 #endif
 
