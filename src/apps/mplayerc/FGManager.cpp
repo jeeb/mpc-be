@@ -770,11 +770,38 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 		while (pos) {
 			CFGFilter* pFGF = fl.GetNext(pos);
 
+			/*
 			// Checks if madVR is already in the graph to avoid two instances at the same time
 			CComPtr<IBaseFilter> pBFmadVR;
 			FindFilterByName(_T("madVR Renderer"), &pBFmadVR);
 			if (pBFmadVR && (pFGF->GetName() == _T("madVR Renderer"))) {
 				continue;
+			}
+			*/
+
+			// Checks if any Video Renderer is already in the graph to avoid trying to connect a second instance
+			CLSID clsid = pFGF->GetCLSID();
+			if (clsid == CLSID_OverlayMixer
+				|| clsid == CLSID_VideoMixingRenderer
+				|| clsid == CLSID_VideoMixingRenderer9
+				|| clsid == CLSID_VMR7AllocatorPresenter
+				|| clsid == CLSID_VMR9AllocatorPresenter
+				|| clsid == CLSID_EnhancedVideoRenderer
+				|| clsid == CLSID_EVRAllocatorPresenter
+				|| clsid == CLSID_DXRAllocatorPresenter
+				|| clsid == CLSID_madVRAllocatorPresenter
+				|| clsid == CLSID_VideoRenderer
+				|| clsid == CLSID_VideoRendererDefault
+				|| clsid == CLSID_SyncAllocatorPresenter) {
+
+				CString fname = pFGF->GetName();
+				if (!fname.IsEmpty()) {
+					CComPtr<IBaseFilter> pBFVR;
+					if (SUCCEEDED(FindFilterByName(fname, &pBFVR)) && pBFVR) {
+						TRACE(_T("FGM: Skip '%s' - already in graph\n"), pFGF->GetName());
+						continue;
+					}
+				}
 			}
 
 			if ((pMadVRAllocatorPresenter) && (pFGF->GetCLSID() == CLSID_madVR)) {
