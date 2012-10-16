@@ -134,7 +134,7 @@ extern void		DumpBuffer(BYTE* pBuffer, int nSize);
 extern void		HexDump(CString fName, BYTE* buf, int size);
 extern void		LOG2FILE(LPCTSTR fmt, ...);
 
-extern CStringA	VobSubDefHeader(int w, int h);
+extern CStringA	VobSubDefHeader(int w, int h, CStringA palette = "");
 
 typedef enum {
 	PICT_NONE,

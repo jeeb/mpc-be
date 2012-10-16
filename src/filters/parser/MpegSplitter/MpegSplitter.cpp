@@ -30,6 +30,7 @@
 #include "MpegSplitter.h"
 #include <moreuuids.h>
 #include "../../../DSUtil/AudioParser.h"
+#include <atlpath.h>
 
 #include "../../../apps/mplayerc/SettingsDefines.h"
 #include "../../reader/VTSReader/VTSReader.h"
@@ -812,6 +813,12 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 
 //
 
+#define ReadBEdw(var) \
+	f.Read(&((BYTE*)&var)[3], 1); \
+	f.Read(&((BYTE*)&var)[2], 1); \
+	f.Read(&((BYTE*)&var)[1], 1); \
+	f.Read(&((BYTE*)&var)[0], 1); \
+
 HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 {
 	CheckPointer(pAsyncReader, E_POINTER);
@@ -987,7 +994,64 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			// Add addition VobSub type
 			if (mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE) {
-				CStringA hdr = VobSubDefHeader(vid_width ? vid_width : 720, vid_height ? vid_height : 576);
+				CStringA palette;
+
+				CString fullname = GetPartFilename(pAsyncReader);
+				if (::PathFileExists(fullname)) {
+					CPath fname(fullname);
+					fname.StripPath();
+					if (!CString(fname).Find(_T("VTS_"))) {
+						fullname = fullname.Left(fullname.ReverseFind('.')+1);
+						fullname.TrimRight(_T(".0123456789")) += _T("0.ifo");
+
+						if (::PathFileExists(fullname)) {
+							// read palette from .ifo file, code from CVobSubFile::ReadIfo()
+							CFile f;
+							if (!f.Open(fullname, CFile::modeRead|CFile::typeBinary|CFile::shareDenyNone)) {
+								return false;
+							}
+
+							/* PGC1 */
+							f.Seek(0xc0+0x0c, SEEK_SET);
+
+							DWORD pos;
+							ReadBEdw(pos);
+
+							f.Seek(pos*0x800 + 0x0c, CFile::begin);
+
+							DWORD offset;
+							ReadBEdw(offset);
+
+							/* Subpic palette */
+							f.Seek(pos*0x800 + offset + 0xa4, CFile::begin);
+
+							CAtlList<CStringA> sl;
+							for (size_t i = 0; i < 16; i++) {
+								BYTE y, u, v, tmp;
+
+								f.Read(&tmp, 1);
+								f.Read(&y, 1);
+								f.Read(&u, 1);
+								f.Read(&v, 1);
+
+								y = (y-16)*255/219;
+
+								BYTE r = (BYTE)min(max(1.0*y + 1.4022*(v-128), 0), 255);
+								BYTE g = (BYTE)min(max(1.0*y - 0.3456*(u-128) - 0.7145*(v-128), 0), 255);
+								BYTE b = (BYTE)min(max(1.0*y + 1.7710*(u-128), 0) , 255);
+								
+								CStringA str;
+								str.Format("%02x%02x%02x", r, g, b);
+								sl.AddTail(str);
+							}
+							palette = Implode(sl, ',');
+
+							f.Close();
+						}
+					}
+				}
+
+				CStringA hdr		= VobSubDefHeader(vid_width ? vid_width : 720, vid_height ? vid_height : 576, palette);
 
 				mt.majortype		= MEDIATYPE_Subtitle;
 				mt.subtype			= MEDIASUBTYPE_VOBSUB;
@@ -2327,7 +2391,64 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 		m_p->Append(*p);
 
 		return hr;
+	}
+	// DVD(Vob) Subtitle
+	else if (m_mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE) {
+		HRESULT hr = S_OK;
 
+		if (!m_p) {
+			m_p.Attach(DNew Packet());
+			m_p->TrackNumber	= p->TrackNumber;
+			m_p->bDiscontinuity	= p->bDiscontinuity;
+			p->bDiscontinuity	= FALSE;
+
+			m_p->bSyncPoint	= p->bSyncPoint;
+			p->bSyncPoint	= FALSE;
+
+			m_p->rtStart	= p->rtStart;
+			p->rtStart		= Packet::INVALID_TIME;
+
+			m_p->rtStop	= p->rtStop;
+			p->rtStop	= Packet::INVALID_TIME;
+		}
+
+		m_p->Append(*p);
+
+		BYTE* pData = m_p->GetData();
+		int len = (pData[0]<<8)|pData[1];
+
+		if (!len) {
+			if (m_p) {
+				m_p.Free();
+			}
+			return hr;
+
+		}
+
+		if (m_p->GetCount() <= 4 || (len > (int)m_p->GetCount())) {
+			return hr;
+		}
+
+		if (m_p) {
+			CAutoPtr<Packet> p2(DNew Packet());
+			p2->TrackNumber		= m_p->TrackNumber;
+			p2->bDiscontinuity	= m_p->bDiscontinuity;
+			p2->bSyncPoint		= m_p->bSyncPoint;
+			p2->rtStart			= m_p->rtStart;
+			p2->rtStop			= m_p->rtStop;
+			p2->pmt				= m_p->pmt;
+			p2->SetData(m_p->GetData(), m_p->GetCount());
+			m_p.Free();
+
+			if (!p2->pmt && m_bFlushed) {
+				p2->pmt = CreateMediaType(&m_mt);
+				m_bFlushed = false;
+			}
+		
+			hr = __super::DeliverPacket(p2);
+		}
+
+		return hr;
 	} else {
 		m_p.Free();
 		m_pl.RemoveAll();

@@ -3004,14 +3004,17 @@ void LOG2FILE(LPCTSTR fmt, ...)
 	va_end(args);
 }
 
-CStringA VobSubDefHeader(int w, int h)
+CStringA VobSubDefHeader(int w, int h, CStringA palette)
 {
+	CStringA def_palette = "000000,e0e0e0,808080,202020,3333fa,1111bb,fa3333,bb1111,33fa33,11bb11,fafa33,bbbb11,fa33fa,bb11bb,33fafa,11bbbb";
+	//"000000, 000000, 000000, ffffff, ffffff, ffffff, ffffff, ffffff, ffffff, ffffff, ffffff, ffffff, ffffff, ffffff, ffffff, ffffff"; // some vobsub better, some worse !
+
 	CStringA hdr;
 	hdr.Format(
 		"# VobSub index file, v7 (do not modify this line!)\n"
 		"size: %dx%d\n"
-		"palette: 000000,f0f0f0,dddddd,222222,3333fa,1111bb,fa3333,bb1111,33fa33,11bb11,fafa33,bbbb11,fa33fa,bb11bb,33fafa,11bbbb\n",
-		w, h);
+		"palette: %s\n",
+		w, h, !palette.IsEmpty() ? palette : def_palette);
 
 	return hdr;
 }
