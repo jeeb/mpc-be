@@ -100,10 +100,10 @@ HRESULT FFH264DecodeFrame (struct AVCodecContext* pAVCtx, struct AVFrame* pFrame
 		hr = S_OK;
 		if (h->s.current_picture_ptr) {
 			if (pOutPOC) {
-				*pOutPOC = h->out_poc;
+				*pOutPOC = pFrame->h264_poc_outputed;
 			}
 			if (pOutrtStart) {
-				*pOutrtStart = h->out_rtstart;
+				*pOutrtStart = pFrame->reordered_opaque;
 			}
 			if (pFramePOC) {
 				*pFramePOC = h->s.current_picture_ptr->poc;

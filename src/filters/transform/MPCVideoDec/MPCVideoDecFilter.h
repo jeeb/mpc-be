@@ -35,8 +35,8 @@
 
 #define MPCVideoDecName L"MPC Video Decoder"
 
-#define CHECK_HR(x)			hr = ##x; if (FAILED(hr)) { TRACE("Error : 0x%08x\n", hr); ASSERT(hr == VFW_E_NOT_COMMITTED); return hr; }
-#define CHECK_HR_FALSE(x)	hr = ##x; if (FAILED(hr)) { TRACE("Error : 0x%08x\n", hr); return S_FALSE; }
+#define CHECK_HR(x)			hr = ##x; if (FAILED(hr)) { TRACE("Error : 0x%08x, %s:%i\n", hr, __FILE__, __LINE__); return hr; }
+#define CHECK_HR_FALSE(x)	hr = ##x; if (FAILED(hr)) { TRACE("Error : 0x%08x, %s:%i\n", hr, __FILE__, __LINE__); return S_FALSE; }
 
 struct AVCodec;
 struct AVCodecContext;

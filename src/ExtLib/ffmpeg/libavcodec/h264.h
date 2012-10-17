@@ -610,9 +610,6 @@ typedef struct H264Context {
     int				bit_offset_to_slice_data;
     int				raw_slice_type;
 
-    int64_t			out_rtstart;
-	int				out_poc;
-
     void*			dxva_slice_long;
     int				ref_pic_flag;
 

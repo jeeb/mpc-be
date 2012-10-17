@@ -1516,10 +1516,6 @@ static void decode_postinit(H264Context *h, int setup_finished)
             h->next_outputed_poc = INT_MIN;
         } else
             h->next_outputed_poc = out->poc;
-        // ==> Start patch MPC
-        h->out_poc		= h->next_outputed_poc;
-        h->out_rtstart	= out->f.reordered_opaque;
-        // <== End patch MPC
     } else {
         av_log(s->avctx, AV_LOG_DEBUG, "no picture %s\n", out_of_order ? "ooo" : "");
     }
@@ -4203,10 +4199,6 @@ static int decode_frame(AVCodecContext *avctx, void *data,
     int buf_index      = 0;
     Picture *out;
     int i, out_idx;
-    // ==> Start patch MPC
-    h->out_poc     = INT_MIN;
-    h->out_rtstart = INT64_MIN;
-    // <== End patch MPC
 
     s->flags  = avctx->flags;
     s->flags2 = avctx->flags2;
@@ -4236,10 +4228,6 @@ static int decode_frame(AVCodecContext *avctx, void *data,
         if (out) {
             *data_size = sizeof(AVFrame);
             *pict      = out->f;
-            // ==> Start patch MPC
-            h->out_poc		= out->poc;
-            h->out_rtstart	= out->f.reordered_opaque;
-            // <== End patch MPC
         }
 
         return buf_index;
@@ -4298,12 +4286,6 @@ not_extra:
             *pict      = h->next_output_pic->f;
         }
     }
-
-    // ==> Start patch MPC
-    if (h->out_poc == INT_MIN && h->next_output_pic) {
-        h->out_poc = h->next_output_pic->poc;
-    }
-    // <== End patch MPC
 
     assert(pict->data[0] || !*data_size);
     ff_print_debug_info(s, pict);
