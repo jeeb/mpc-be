@@ -1243,9 +1243,9 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 						PostMessage(WM_COMMAND, ID_PLAY_PAUSE);
 					}
 					return TRUE;
-				} else if (IsCaptionHidden()) {
-					PostMessage(WM_COMMAND, ID_VIEW_CAPTIONMENU);
-					return TRUE;
+				//} else if (IsCaptionHidden()) {
+				//	PostMessage(WM_COMMAND, ID_VIEW_CAPTIONMENU);
+				//	return TRUE;
 				}
 			}
 		} else if (pMsg->wParam == VK_LEFT && pAMTuner) {
