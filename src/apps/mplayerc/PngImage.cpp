@@ -339,3 +339,25 @@ void MPCPngImage::LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop, i
 		}
 	}
 }
+
+void MPCPngImage::DrawTransparentBitmap(CDC* mdci, HDC* dc, int x, int y, HBITMAP hBmp)
+{
+	CDC hdcSrc;
+	hdcSrc.CreateCompatibleDC(mdci);
+	hdcSrc.SelectObject(CBitmap::FromHandle(hBmp));
+
+	BITMAP bm;
+	::GetObject(hBmp, sizeof(bm), &bm);
+	int w = bm.bmWidth, h = bm.bmHeight;
+
+	BLENDFUNCTION bf;
+	bf.AlphaFormat = AC_SRC_ALPHA;
+	bf.BlendFlags = 0;
+	bf.BlendOp = 0;
+	bf.SourceConstantAlpha = 255;
+
+	::AlphaBlend(*dc, x, y, w, h, hdcSrc.m_hDC, 0, 0, w, h, bf);
+
+	hdcSrc.DeleteDC();
+	mdci->DeleteDC();
+}

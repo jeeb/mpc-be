@@ -127,7 +127,6 @@ IDI_UNKNOWN                      ICON                    "res\\Icon_116.ico"
 IDR_TB_PLAY                      ICON                    "res\\tb_play_16.ico"
 IDR_TB_PAUSE                     ICON                    "res\\tb_pause_16.ico"
 IDR_TB_STOP                      ICON                    "res\\tb_stop_16.ico"
-IDR_DXVA_ON                      ICON                    "res\\gpu.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -143,6 +142,7 @@ IDB_PLAYERTOOLBAR_PNG            PNG                     "res\\toolbar.png"
 IDB_PLAYERFLYBAR_PNG             PNG                     "res\\flybar.png"
 IDB_W7_TOOLBAR                   PNG                     "res\\Toolbarw7.png"
 IDB_W7_AUDIO                     PNG                     "res\\audio.png"
+IDB_DXVA_ON                      PNG                     "res\\gpu.png"
 
 /////////////////////////////////////////////////////////////////////////////
 //

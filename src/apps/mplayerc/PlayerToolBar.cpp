@@ -40,7 +40,7 @@ CPlayerToolBar::CPlayerToolBar()
 	: fDisableImgListRemap(false)
 	, m_pButtonsImages(NULL)
 {
-	m_hDXVAIcon = (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_DXVA_ON), IMAGE_ICON, 24, 16, LR_DEFAULTCOLOR);
+	m_hDXVAIcon = m_logobm.LoadExternalImage("gpu", IDB_DXVA_ON, -1, -1, -1, -1, -1);
 }
 
 CPlayerToolBar::~CPlayerToolBar()
@@ -50,7 +50,7 @@ CPlayerToolBar::~CPlayerToolBar()
 	}
 
 	if (m_hDXVAIcon) {
-		DestroyIcon(m_hDXVAIcon);
+		DeleteObject(m_hDXVAIcon);
 	}
 }
 
@@ -564,7 +564,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			CRect r12; //MUTE
 			GetItemRect(12, &r12);
 			if (bGPU && m_hDXVAIcon) {
-				DrawIconEx(dc, r12.left - 36, r.CenterPoint().y-9, m_hDXVAIcon, 0, 0, 0, NULL, DI_NORMAL);
+				m_logobm.DrawTransparentBitmap(GetDC(), &(dc.m_hDC), r12.left - 36, r.CenterPoint().y - 9, m_hDXVAIcon);
 			}
 
 			dc.SelectObject(&penSaved);

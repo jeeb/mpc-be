@@ -44,7 +44,7 @@ private:
 	int			m_nButtonHeight;
 	CImageList	*m_pButtonsImages;
 
-	HICON		m_hDXVAIcon;
+	HBITMAP		m_hDXVAIcon;
 
 public:
 	CPlayerToolBar();

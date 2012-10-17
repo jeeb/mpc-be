@@ -405,7 +405,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ani.avi" />
-    <None Include="res\gpu.ico" />
+    <None Include="res\gpu.png" />
     <None Include="res\icon.ico">
       <FileType>ICO</FileType>
     </None>

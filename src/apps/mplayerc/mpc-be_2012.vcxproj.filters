@@ -1012,7 +1012,7 @@
     </CustomBuildStep>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\gpu.ico">
+    <Image Include="res\gpu.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
