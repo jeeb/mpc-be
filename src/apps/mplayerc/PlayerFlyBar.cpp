@@ -145,7 +145,13 @@ void CFlyBar::DrawBitmap(CDC *pDC, int x, int y, int z)
 	hdcSrc.CreateCompatibleDC(mdci);
 	hdcSrc.SelectObject(CBitmap::FromHandle(hBmp));
 
-	pDC->StretchBlt(x - 4 - (iw * z), 4, iw, iw, &hdcSrc, iw * y, 0, iw, iw, SRCCOPY);
+	BLENDFUNCTION bf;
+	bf.AlphaFormat = AC_SRC_ALPHA;
+	bf.BlendFlags = 0;
+	bf.BlendOp = 0;
+	bf.SourceConstantAlpha = 255;
+
+	pDC->AlphaBlend(x - 4 - (iw * z), 4, iw, iw, &hdcSrc, iw * y, 0, iw, iw, bf);
 
 	hdcSrc.DeleteDC();
 	mdci->DeleteDC();
