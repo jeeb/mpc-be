@@ -564,7 +564,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			CRect r12; //MUTE
 			GetItemRect(12, &r12);
 			if (bGPU && m_hDXVAIcon) {
-				m_logobm.DrawTransparentBitmap(GetDC(), &(dc.m_hDC), r12.left - 36, r.CenterPoint().y - 9, m_hDXVAIcon);
+				m_logobm.DrawTransparentBitmap(GetDC(), &dc, r12.left - 36, r.CenterPoint().y - 9, m_hDXVAIcon);
 			}
 
 			dc.SelectObject(&penSaved);

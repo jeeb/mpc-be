@@ -50,5 +50,5 @@ public:
 	HBITMAP	TypeLoadImage(int type, BYTE** pData, int* width, int* height, int* bpp, FILE* fp, int resid, int br, int rc, int gc, int bc);
 	HBITMAP	LoadExternalImage(CString fn, int resid, int type, int br, int rc, int gc, int bc);
 	void	LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop, int br, int rc, int gc, int bc);
-	void	DrawTransparentBitmap(CDC* mdci, HDC* dc, int x, int y, HBITMAP hBmp);
+	void	DrawTransparentBitmap(CDC* mdci, CDC* dc, int x, int y, HBITMAP hBmp);
 };

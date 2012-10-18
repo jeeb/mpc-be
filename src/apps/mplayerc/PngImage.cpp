@@ -340,7 +340,7 @@ void MPCPngImage::LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop, i
 	}
 }
 
-void MPCPngImage::DrawTransparentBitmap(CDC* mdci, HDC* dc, int x, int y, HBITMAP hBmp)
+void MPCPngImage::DrawTransparentBitmap(CDC* mdci, CDC* dc, int x, int y, HBITMAP hBmp)
 {
 	CDC hdcSrc;
 	hdcSrc.CreateCompatibleDC(mdci);
@@ -348,15 +348,26 @@ void MPCPngImage::DrawTransparentBitmap(CDC* mdci, HDC* dc, int x, int y, HBITMA
 
 	BITMAP bm;
 	::GetObject(hBmp, sizeof(bm), &bm);
-	int w = bm.bmWidth, h = bm.bmHeight;
 
-	BLENDFUNCTION bf;
-	bf.AlphaFormat = AC_SRC_ALPHA;
-	bf.BlendFlags = 0;
-	bf.BlendOp = 0;
-	bf.SourceConstantAlpha = 255;
+	COLORREF clrSrc;
+	BYTE rDest, gDest, bDest;
 
-	::AlphaBlend(*dc, x, y, w, h, hdcSrc.m_hDC, 0, 0, w, h, bf);
+	for (int j = 0; j < bm.bmHeight; j++) {
+
+		for (int i = 0; i < bm.bmWidth; i++) {
+
+			clrSrc = hdcSrc.GetPixel(i, j);
+
+			rDest = GetRValue(clrSrc);
+			gDest = GetGValue(clrSrc);
+			bDest = GetBValue(clrSrc);
+
+			if (rDest > 0 && gDest > 0 && bDest > 0) {
+
+				dc->SetPixel(x + i, y + j, RGB(rDest, gDest, bDest));
+			}
+		}
+	}
 
 	hdcSrc.DeleteDC();
 	mdci->DeleteDC();
