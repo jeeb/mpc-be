@@ -290,6 +290,7 @@ enum AVCodecID {
     AV_CODEC_ID_PAF_VIDEO  = MKBETAG('P','A','F','V'),
     AV_CODEC_ID_AVRN       = MKBETAG('A','V','R','n'),
     AV_CODEC_ID_CPIA       = MKBETAG('C','P','I','A'),
+    AV_CODEC_ID_XFACE      = MKBETAG('X','F','A','C'),
 
     /* various PCM "codecs" */
     AV_CODEC_ID_FIRST_AUDIO = 0x10000,     ///< A dummy id pointing at the start of audio codecs
@@ -1072,7 +1073,7 @@ typedef struct AVFrame {
      * extended_data must be used by the decoder in order to access all
      * channels.
      *
-     * encoding: unused
+     * encoding: set by user
      * decoding: set by AVCodecContext.get_buffer()
      */
     uint8_t **extended_data;

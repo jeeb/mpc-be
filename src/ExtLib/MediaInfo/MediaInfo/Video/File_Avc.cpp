@@ -928,7 +928,6 @@ void File_Avc::Read_Buffer_Unsynched()
             (*pic_parameter_set_Item)->IsSynched=false;
 
     //Status
-    IFrame_Count=0;
     Interlaced_Top=0;
     Interlaced_Bottom=0;
     prevPicOrderCntMsb=0;
@@ -1088,14 +1087,14 @@ bool File_Avc::Header_Parser_QuickSearch()
         Synched=false;
         if (!Synchronize())
         {
-            return false;
             UnSynched_IsNotJunk=true;
+            return false;
         }
 
         if (Buffer_Offset+6>Buffer_Size)
         {
-            return false;
             UnSynched_IsNotJunk=true;
+            return false;
         }
     }
 

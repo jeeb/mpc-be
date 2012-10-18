@@ -78,6 +78,7 @@
     <ClInclude Include="libavcodec\ac3dec.h" />
     <ClInclude Include="libavcodec\ac3dec_data.h" />
     <ClInclude Include="libavcodec\ac3dsp.h" />
+    <ClInclude Include="libavcodec\ac3enc.h" />
     <ClInclude Include="libavcodec\ac3tab.h" />
     <ClInclude Include="libavcodec\ac3_parser.h" />
     <ClInclude Include="libavcodec\acelp_filters.h" />
@@ -120,7 +121,7 @@
     <ClInclude Include="libavcodec\dv_tablegen.h" />
     <ClInclude Include="libavcodec\dv_vlc_data.h" />
     <ClInclude Include="libavcodec\dwt.h" />
-    <ClInclude Include="libavcodec\dxva.h" />
+    <ClInclude Include="libavcodec\eac3enc.h" />
     <ClInclude Include="libavcodec\eac3_data.h" />
     <ClInclude Include="libavcodec\faandct.h" />
     <ClInclude Include="libavcodec\faanidct.h" />
@@ -167,6 +168,7 @@
     <ClInclude Include="libavcodec\mjpegdec.h" />
     <ClInclude Include="libavcodec\mjpegenc.h" />
     <ClInclude Include="libavcodec\mlp.h" />
+    <ClInclude Include="libavcodec\mlpdsp.h" />
     <ClInclude Include="libavcodec\mlp_parser.h" />
     <ClInclude Include="libavcodec\mpc.h" />
     <ClInclude Include="libavcodec\mpc7data.h" />
@@ -353,6 +355,10 @@
     <ClCompile Include="libavcodec\ac3dec.c" />
     <ClCompile Include="libavcodec\ac3dec_data.c" />
     <ClCompile Include="libavcodec\ac3dsp.c" />
+    <ClCompile Include="libavcodec\ac3enc.c" />
+    <ClCompile Include="libavcodec\ac3enc_float.c" />
+    <ClCompile Include="libavcodec\ac3enc_opts_template.c" />
+    <ClCompile Include="libavcodec\ac3enc_template.c" />
     <ClCompile Include="libavcodec\ac3tab.c" />
     <ClCompile Include="libavcodec\ac3_parser.c" />
     <ClCompile Include="libavcodec\acelp_filters.c" />
@@ -404,6 +410,7 @@
     <ClCompile Include="libavcodec\dv_tablegen.c" />
     <ClCompile Include="libavcodec\dwt.c" />
     <ClCompile Include="libavcodec\eac3dec.c" />
+    <ClCompile Include="libavcodec\eac3enc.c" />
     <ClCompile Include="libavcodec\eac3_data.c" />
     <ClCompile Include="libavcodec\error_resilience.c" />
     <ClCompile Include="libavcodec\faandct.c" />
@@ -436,7 +443,6 @@
     <ClCompile Include="libavcodec\h264_cabac.c" />
     <ClCompile Include="libavcodec\h264_cavlc.c" />
     <ClCompile Include="libavcodec\h264_direct.c" />
-    <ClCompile Include="libavcodec\h264_dxva.c" />
     <ClCompile Include="libavcodec\h264_loopfilter.c" />
     <ClCompile Include="libavcodec\h264_mb_template.c" />
     <ClCompile Include="libavcodec\h264_mc_template.c" />
@@ -467,7 +473,9 @@
     <ClCompile Include="libavcodec\libopenjpegdec.c" />
     <ClCompile Include="libavcodec\libopus.c" />
     <ClCompile Include="libavcodec\libopusdec.c" />
+    <ClCompile Include="libavcodec\log2_tab.c" />
     <ClCompile Include="libavcodec\lsp.c" />
+    <ClCompile Include="libavcodec\mathtables.c" />
     <ClCompile Include="libavcodec\mdct.c" />
     <ClCompile Include="libavcodec\mjpeg.c" />
     <ClCompile Include="libavcodec\mjpegbdec.c" />

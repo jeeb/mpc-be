@@ -92,6 +92,8 @@ SRCS_C = \
     libavcodec/ac3dec.c \
     libavcodec/ac3dec_data.c \
     libavcodec/ac3dsp.c \
+    libavcodec/ac3enc.c \
+    libavcodec/ac3enc_float.c \
     libavcodec/ac3tab.c \
     libavcodec/acelp_filters.c \
     libavcodec/acelp_pitch_delay.c \
@@ -140,6 +142,7 @@ SRCS_C = \
     libavcodec/dvdec.c \
     libavcodec/dwt.c \
     libavcodec/eac3_data.c \
+    libavcodec/eac3enc.c \
     libavcodec/eac3dec.c \
     libavcodec/error_resilience.c \
     libavcodec/faandct.c \

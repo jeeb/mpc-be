@@ -45,7 +45,7 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const Char*  MediaInfo_Version=__T("MediaInfoLib - v0.7.60");
+const Char*  MediaInfo_Version=__T("MediaInfoLib - v0.7.61");
 const Char*  MediaInfo_Url=__T("http://mediainfo.sourceforge.net");
       Ztring EmptyZtring;       //Use it when we can't return a reference to a true Ztring
 const Ztring EmptyZtring_Const; //Use it when we can't return a reference to a true Ztring, const version
@@ -115,7 +115,7 @@ void MediaInfo_Config::Init()
         InitDataNotRepeated_GiveUp=false;
     #endif //MEDIAINFO_ADVANCED
     MpegTs_MaximumOffset=32*1024*1024;
-    MpegTs_MaximumScanDuration=16000000000LL;
+    MpegTs_MaximumScanDuration=32000000000LL;
     MpegTs_ForceStreamDisplay=false;
     #if MEDIAINFO_ADVANCED
         MpegTs_VbrDetection_Delta=0;

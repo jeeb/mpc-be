@@ -105,7 +105,6 @@ void avcodec_register_all(void)
     /* audio codecs */
     REGISTER_DECODER (AAC, aac);
     REGISTER_DECODER (AAC_LATM, aac_latm);
-    REGISTER_DECODER (AC3, ac3);
     REGISTER_DECODER (ALAC, alac);
     REGISTER_DECODER (ALS, als);
     REGISTER_DECODER (APE, ape);
@@ -114,7 +113,6 @@ void avcodec_register_all(void)
     REGISTER_DECODER (BINKAUDIO_RDFT, binkaudio_rdft);
     REGISTER_DECODER (COOK, cook);
     REGISTER_DECODER (DCA, dca);
-    REGISTER_DECODER (EAC3, eac3);
     REGISTER_DECODER (FLAC, flac);
     REGISTER_DECODER (IAC, iac);
     REGISTER_DECODER (MPC7, mpc7);
@@ -141,6 +139,9 @@ void avcodec_register_all(void)
     REGISTER_DECODER (WMAV2, wmav2);
     REGISTER_DECODER (WMAVOICE, wmavoice);
     REGISTER_DECODER (TTA, tta);
+
+    REGISTER_ENCDEC  (AC3, ac3);
+    REGISTER_ENCDEC  (EAC3, eac3);
 
     /* ADPCM codecs */
     REGISTER_DECODER (ADPCM_4XM, adpcm_4xm);
