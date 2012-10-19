@@ -23,9 +23,6 @@
 
 #include "stdafx.h"
 #include "mplayerc.h"
-#include <math.h>
-#include <atlbase.h>
-#include <afxpriv.h>
 #include "PlayerToolBar.h"
 #include "IPinHook.h"
 #include "MainFrm.h"
@@ -159,10 +156,6 @@ void CPlayerToolBar::SwitchTheme()
 
 			SetSizes(CSize(bitmapBmp.bmHeight + 7, bitmapBmp.bmHeight + 6), CSize(bitmapBmp.bmHeight, bitmapBmp.bmHeight));
 
-			DIBSECTION dib;
-			::GetObject(hBmp, sizeof(dib), &dib);
-			int fileDepth = dib.dsBmih.biBitCount;
-
 			if (m_pButtonsImages) {
 				delete m_pButtonsImages;
 				m_pButtonsImages = NULL;
@@ -170,7 +163,7 @@ void CPlayerToolBar::SwitchTheme()
 
 			m_pButtonsImages = DNew CImageList();
 
-			if (32 == fileDepth) {
+			if (32 == bitmapBmp.bmBitsPixel) {
 				m_pButtonsImages->Create(bitmapBmp.bmHeight, bitmapBmp.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
 				m_pButtonsImages->Add(bmp, static_cast<CBitmap*>(0));
 			} else {
