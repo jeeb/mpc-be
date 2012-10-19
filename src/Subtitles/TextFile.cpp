@@ -26,10 +26,13 @@
 #include <afxinet.h>
 #include "TextFile.h"
 
+#include <Utf8.h>
+
 CTextFile::CTextFile(enc e)
+	: m_encoding(e)
+	, m_defaultencoding(e)
+	, m_offset(0)
 {
-	m_encoding = m_defaultencoding = e;
-	m_offset = 0;
 }
 
 bool CTextFile::Open(LPCTSTR lpszFileName)
@@ -63,6 +66,22 @@ bool CTextFile::Open(LPCTSTR lpszFileName)
 				m_encoding = UTF8;
 				m_offset = 3;
 			}
+		} else {
+			// trying detect UTF-8 without BOM
+			size_t buf_size = min(8192, GetLength());
+
+			unsigned char* buf = (unsigned char*)malloc(buf_size);
+			memset(buf, 0, sizeof(buf));
+			if ((sizeof(buf) - 1)!= Read(buf, sizeof(buf) - 1)) {
+				return Close(), false;
+			}
+			CStdioFile::Seek(0, begin);
+
+			if (Utf8::isValid(buf, sizeof(buf))) {
+				m_encoding = UTF8;
+			}
+
+			free(buf);
 		}
 	}
 
