@@ -150,7 +150,7 @@ bool CFLVSplitterFilter::ReadTag(Tag& t)
 	t.TimeStamp			= (UINT32)m_pFile->BitRead(24);
 	t.TimeStamp			|= (UINT32)m_pFile->BitRead(8) << 24;
 	t.StreamID			= (UINT32)m_pFile->BitRead(24);
-	
+
 	if (m_DetectWrongTimeStamp && (t.TagType == FLV_AUDIODATA || t.TagType == FLV_VIDEODATA)) {
 		if (t.TimeStamp > 0) {
 			m_TimeStampOffset = t.TimeStamp;
@@ -161,7 +161,7 @@ bool CFLVSplitterFilter::ReadTag(Tag& t)
 	if (m_TimeStampOffset > 0) {
 		t.TimeStamp -= m_TimeStampOffset;
 
-		TRACE(_T("CFLVSplitterFilter::ReadTag() : Detect wrong TimeStamp offset, corrected [%d -> %d]\n"), (t.TimeStamp + m_TimeStampOffset), t.TimeStamp);
+		//TRACE(_T("CFLVSplitterFilter::ReadTag() : Detect wrong TimeStamp offset, corrected [%d -> %d]\n"), (t.TimeStamp + m_TimeStampOffset), t.TimeStamp);
 	}
 
 	return m_pFile->GetRemaining() >= t.DataSize;
@@ -342,7 +342,6 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					case FLV_AUDIO_MP3:
 						mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_MP3);
 						name += L" MP3";
-
 						{
 							CBaseSplitterFileEx::mpahdr h;
 							CMediaType mt2;
@@ -366,7 +365,6 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						name += L" Nellimoser";
 						break;
 					case FLV_AUDIO_AAC: {
-						mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_AAC);
 						if (dataSize < 1 || m_pFile->BitRead(8) != 0) { // packet type 0 == aac header
 							fTypeFlagsAudio = true;
 							break;
@@ -404,8 +402,9 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						m_pFile->Seek(configOffset);
 						m_pFile->ByteRead((BYTE*)(wfe+1), configSize);
-					}
 
+						mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_AAC);
+					}
 				}
 				wfe->nBlockAlign		= wfe->nChannels * wfe->wBitsPerSample / 8;
 				wfe->nAvgBytesPerSec	= wfe->nSamplesPerSec * wfe->nBlockAlign;
@@ -457,7 +456,6 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								}
 							}
 							m_pFile->Seek(_next);
-
 						}
 
 						AvgTimePerFrame = 10000 * (current_ts - first_ts)/frame_cnt;
@@ -675,7 +673,6 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		m_pFile->Seek(next);
 	}
 
-
 	if (m_pFile->IsStreaming()) {
 		for (int i = 0; i < 20 || i < 50 && S_OK != m_pFile->HasMoreData(1024*100, 100); i++) {
 			;
@@ -823,7 +820,6 @@ void CFLVSplitterFilter::AlternateSeek(REFERENCE_TIME rt)
 			m_pFile->Seek(m_DataOffset);
 			return;
 		}
-
 	}
 }
 
@@ -914,7 +910,6 @@ bool CFLVSplitterFilter::DemuxLoop()
 			m_pFile->ByteRead(p->GetData(), p->GetCount());
 			hr = DeliverPacket(p);
 		}
-
 NextTag:
 		m_pFile->Seek(next);
 	}
