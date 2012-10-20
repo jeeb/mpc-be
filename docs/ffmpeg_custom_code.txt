@@ -1,4 +1,4 @@
-The following files have MPC-BE specific custom code (compared to ffmpeg):
+﻿The following files have MPC-BE specific custom code (compared to ffmpeg):
 
 * config.h
 * config.asm

@@ -1,4 +1,4 @@
-; $Id$
+ï»¿; $Id$
 ;
 ; (C) 2009-2012 see Authors.txt
 ;
@@ -87,9 +87,9 @@ AppPublisherURL=http://sourceforge.net/projects/mpcbe/
 AppSupportURL=http://sourceforge.net/projects/mpcbe/
 AppUpdatesURL=http://sourceforge.net/projects/mpcbe/
 AppContact=http://sourceforge.net/projects/mpcbe/
-AppCopyright=Copyright © {#copyright_year} all contributors, see Authors.txt
+AppCopyright=Copyright Â© {#copyright_year} all contributors, see Authors.txt
 VersionInfoCompany=MPC-BE Team
-VersionInfoCopyright=Copyright © {#copyright_year}, MPC-BE Team
+VersionInfoCopyright=Copyright Â© {#copyright_year}, MPC-BE Team
 VersionInfoProductVersion={#app_version}
 VersionInfoProductTextVersion={#app_version}
 VersionInfoTextVersion={#app_version}
