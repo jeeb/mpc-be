@@ -51,20 +51,15 @@ static bool BMPDIB(LPCTSTR fn, BYTE* pData, CStringW format, ULONG quality, bool
 {
 	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
 
-	int width = bih->biWidth, height = abs(bih->biHeight), bit = 24;
-	int stride = (width * bit + 31) / 32 * 4, sih = sizeof(BITMAPINFOHEADER);
-	int line, len = stride * height;
+	int bit = 24, width = bih->biWidth, height = abs(bih->biHeight);
+	int stride = (width * bit + 31) / 32 * 4;
+	int len = stride * height, sih = sizeof(BITMAPINFOHEADER);
 
-	BYTE* rgb = (BYTE*)malloc(len);
-	BYTE *p, *src = pData + sih;
+	BYTE *src = pData + sih, *rgb = (BYTE*)malloc(len);
 
-	for(int y = 0; y < height; y++) {
-		for(int x = 0; x < width; x++) {
-			line = (3 * x) + (stride * y);
-			p = src + (width * 4 * y) + (4 * x);
-			rgb[line] = p[0];
-			rgb[line + 1] = p[1];
-			rgb[line + 2] = p[2];
+	for (int y = 0; y < height; y++) {
+		for (int x = 0; x < width; x++) {
+			memcpy(rgb + (3 * x) + (stride * y), src + (width * 4 * y) + (4 * x), 3);
 		}
 	}
 
@@ -174,8 +169,8 @@ static void PNGDIB(LPCTSTR fn, BYTE* pData, int level)
 		png_bytep row_ptr = (png_bytep)malloc(width * 3);
 		BYTE *p, *src = pData + sizeof(BITMAPINFOHEADER);
 
-		for(int y = height - 1; y >= 0; y--) {
-			for(int x = 0; x < width; x++) {
+		for (int y = height - 1; y >= 0; y--) {
+			for (int x = 0; x < width; x++) {
 				line = (3 * x);
 				p = src + (width * 4 * y) + (4 * x);
 				row_ptr[line] = (png_byte)p[2];
@@ -210,8 +205,8 @@ static void WebPDIB(LPCTSTR fn, BYTE* pData, float quality)
 		uint8_t* rgb = (uint8_t*)malloc(stride * height);
 		BYTE *p, *src = pData + sizeof(BITMAPINFOHEADER);
 
-		for(int y = 0, j = height - 1; y < height; y++, j--) {
-			for(int x = 0; x < width; x++) {
+		for (int y = 0, j = height - 1; y < height; y++, j--) {
+			for (int x = 0; x < width; x++) {
 				line = (3 * x) + (stride * j);
 				p = src + (width * 4 * y) + (4 * x);
 				rgb[line] = (uint8_t)p[2];
