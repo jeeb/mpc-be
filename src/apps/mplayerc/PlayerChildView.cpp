@@ -192,49 +192,62 @@ void CChildView::OnPaint()
 BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 {
 	CAutoLock cAutoLock(&m_csLogo);
+
 	CRect r;
+	GetClientRect(r);
+	pDC->FillSolidRect(r, 0);
+	BITMAP bm;
+	int x, y, w, h;
+
+	CDC *mdci = GetDC(), hdcSrc;
+	hdcSrc.CreateCompatibleDC(mdci);
+
+	BLENDFUNCTION bf;
+	bf.AlphaFormat = AC_SRC_ALPHA;
+	bf.BlendFlags = 0;
+	bf.BlendOp = 0;
+	bf.SourceConstantAlpha = 255;
 
 	if (((CMainFrame*)GetParentFrame())->IsSomethingLoaded()) {
-		BITMAP bm;
-		if (GetObject(((CMainFrame*)GetParentFrame())->m_InternalImage, sizeof(bm), &bm)) {
-			GetClientRect(r);
-			int h	= min(abs(bm.bmHeight), r.Height());
-			int w	= min(r.Width(), MulDiv(h, bm.bmWidth, abs(bm.bmHeight)));
-			h		= MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
-			int x	= (r.Width() - w) / 2;
-			int y	= (r.Height() - h) / 2;
-			r		= CRect(CPoint(x, y), CSize(w, h));
 
-			int oldmode = pDC->SetStretchBltMode(STRETCH_HALFTONE);
-			((CMainFrame*)GetParentFrame())->m_InternalImage.StretchBlt(*pDC, r, CRect(0, 0, bm.bmWidth, abs(bm.bmHeight)));
-			pDC->SetStretchBltMode(oldmode);
+		if (GetObject(((CMainFrame*)GetParentFrame())->m_InternalImage, sizeof(bm), &bm)) {
+
+			h = min(abs(bm.bmHeight), r.Height());
+			w = min(r.Width(), MulDiv(h, bm.bmWidth, abs(bm.bmHeight)));
+			h = MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
+			x = (r.Width() - w) / 2;
+			y = (r.Height() - h) / 2;
+
+			hdcSrc.SelectObject(((CMainFrame*)GetParentFrame())->m_InternalImage);
+			pDC->AlphaBlend(x, y, w, h, &hdcSrc, 0, 0, bm.bmWidth, abs(bm.bmHeight), bf);
+			pDC->SetStretchBltMode(STRETCH_HALFTONE);
 
 			pDC->ExcludeClipRect(r);
 		} else {
 			pDC->ExcludeClipRect(m_vrect);
 		}
 		UNREFERENCED_PARAMETER(bm);
-	} else if (!m_logo.IsNull() /*&& ((CMainFrame*)GetParentFrame())->IsPlaylistEmpty()*/) {
-		BITMAP bm;
-		if (GetObject(m_logo, sizeof(bm), &bm)) {
-			GetClientRect(r);
-			int h	= min(abs(bm.bmHeight), r.Height());
-			int w	= min(r.Width(), MulDiv(h, bm.bmWidth, abs(bm.bmHeight)));
-			h		= MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
-			int x	= (r.Width() - w) / 2;
-			int y	= (r.Height() - h) / 2;
-			r		= CRect(CPoint(x, y), CSize(w, h));
 
-			int oldmode = pDC->SetStretchBltMode(STRETCH_HALFTONE);
-			m_logo.StretchBlt(*pDC, r, CRect(0, 0, bm.bmWidth, abs(bm.bmHeight)));
-			pDC->SetStretchBltMode(oldmode);
+	} else if (!m_logo.IsNull() /*&& ((CMainFrame*)GetParentFrame())->IsPlaylistEmpty()*/) {
+
+		if (GetObject(m_logo, sizeof(bm), &bm)) {
+
+			h = min(abs(bm.bmHeight), r.Height());
+			w = min(r.Width(), MulDiv(h, bm.bmWidth, abs(bm.bmHeight)));
+			h = MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
+			x = (r.Width() - w) / 2;
+			y = (r.Height() - h) / 2;
+
+			hdcSrc.SelectObject(m_logo);
+			pDC->AlphaBlend(x, y, w, h, &hdcSrc, 0, 0, bm.bmWidth, abs(bm.bmHeight), bf);
+			pDC->SetStretchBltMode(STRETCH_HALFTONE);
 
 			pDC->ExcludeClipRect(r);
 		}
 	}
 
-	GetClientRect(r);
-	pDC->FillSolidRect(r, 0);
+	hdcSrc.DeleteDC();
+	mdci->DeleteDC();
 
 	return TRUE;
 }
