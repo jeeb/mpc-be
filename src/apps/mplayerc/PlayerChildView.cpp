@@ -197,10 +197,7 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 	GetClientRect(r);
 	pDC->FillSolidRect(r, 0);
 	BITMAP bm;
-	int x, y, w, h;
-
-	CDC *mdci = GetDC(), hdcSrc;
-	hdcSrc.CreateCompatibleDC(mdci);
+	int x, y, w, h, oldmode;
 
 	BLENDFUNCTION bf;
 	bf.AlphaFormat = AC_SRC_ALPHA;
@@ -217,10 +214,12 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 			h = MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
 			x = (r.Width() - w) / 2;
 			y = (r.Height() - h) / 2;
+			r = CRect(CPoint(x, y), CSize(w, h));
 
-			hdcSrc.SelectObject(((CMainFrame*)GetParentFrame())->m_InternalImage);
-			pDC->AlphaBlend(x, y, w, h, &hdcSrc, 0, 0, bm.bmWidth, abs(bm.bmHeight), bf);
-			pDC->SetStretchBltMode(STRETCH_HALFTONE);
+			oldmode = pDC->SetStretchBltMode(STRETCH_HALFTONE);
+			((CMainFrame*)GetParentFrame())->m_InternalImage.StretchBlt(*pDC, r, CRect(0, 0, bm.bmWidth, abs(bm.bmHeight)));
+			pDC->SetStretchBltMode(oldmode);
+			pDC->AlphaBlend(x, y, w, h, pDC, x, y, w, h, bf);
 
 			pDC->ExcludeClipRect(r);
 		} else {
@@ -237,17 +236,16 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 			h = MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
 			x = (r.Width() - w) / 2;
 			y = (r.Height() - h) / 2;
+			r = CRect(CPoint(x, y), CSize(w, h));
 
-			hdcSrc.SelectObject(m_logo);
-			pDC->AlphaBlend(x, y, w, h, &hdcSrc, 0, 0, bm.bmWidth, abs(bm.bmHeight), bf);
-			pDC->SetStretchBltMode(STRETCH_HALFTONE);
+			oldmode = pDC->SetStretchBltMode(STRETCH_HALFTONE);
+			m_logo.StretchBlt(*pDC, r, CRect(0, 0, bm.bmWidth, abs(bm.bmHeight)));
+			pDC->SetStretchBltMode(oldmode);
+			pDC->AlphaBlend(x, y, w, h, pDC, x, y, w, h, bf);
 
 			pDC->ExcludeClipRect(r);
 		}
 	}
-
-	hdcSrc.DeleteDC();
-	mdci->DeleteDC();
 
 	return TRUE;
 }
