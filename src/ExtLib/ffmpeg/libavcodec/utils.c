@@ -246,11 +246,13 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
             w_align = 64;
             h_align = 64;
         }
+        break;
     case AV_PIX_FMT_RGB555:
         if (s->codec_id == AV_CODEC_ID_RPZA) {
             w_align = 4;
             h_align = 4;
         }
+        break;
     case AV_PIX_FMT_PAL8:
     case AV_PIX_FMT_BGR8:
     case AV_PIX_FMT_RGB8:
@@ -801,6 +803,27 @@ int attribute_align_arg avcodec_open(AVCodecContext *avctx, AVCodec *codec)
     return avcodec_open2(avctx, codec, NULL);
 }
 #endif
+
+int attribute_align_arg ff_codec_open2_recursive(AVCodecContext *avctx, const AVCodec *codec, AVDictionary **options)
+{
+    int ret = 0;
+
+    entangled_thread_counter--;
+    /* Release any user-supplied mutex. */
+    if (ff_lockmgr_cb) {
+        (*ff_lockmgr_cb)(&codec_mutex, AV_LOCK_RELEASE);
+    }
+
+    ret = avcodec_open2(avctx, codec, options);
+
+    /* If there is a user-supplied mutex locking routine, call it. */
+    if (ff_lockmgr_cb) {
+        if ((*ff_lockmgr_cb)(&codec_mutex, AV_LOCK_OBTAIN))
+            return -1;
+    }
+    entangled_thread_counter++;
+    return ret;
+}
 
 int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *codec, AVDictionary **options)
 {
@@ -1811,6 +1834,27 @@ void avsubtitle_free(AVSubtitle *sub)
     av_freep(&sub->rects);
 
     memset(sub, 0, sizeof(AVSubtitle));
+}
+
+av_cold int ff_codec_close_recursive(AVCodecContext *avctx)
+{
+    int ret = 0;
+
+    entangled_thread_counter--;
+    /* Release any user-supplied mutex. */
+    if (ff_lockmgr_cb) {
+        (*ff_lockmgr_cb)(&codec_mutex, AV_LOCK_RELEASE);
+    }
+
+    ret = avcodec_close(avctx);
+
+    /* If there is a user-supplied mutex locking routine, call it. */
+    if (ff_lockmgr_cb) {
+        if ((*ff_lockmgr_cb)(&codec_mutex, AV_LOCK_OBTAIN))
+            return -1;
+    }
+    entangled_thread_counter++;
+    return ret;
 }
 
 av_cold int avcodec_close(AVCodecContext *avctx)
