@@ -1390,8 +1390,11 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 							break; // Disable support H.264 DXVA on Intel GMA500 in WinXP
 						}
 						int nCompat = FFH264CheckCompatibility (PictWidthRounded(), PictHeightRounded(), m_pAVCtx, m_pFrame, m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion, IsAtiDXVACompatible);
+
+						if ((nCompat & DXVA_PROFILE_HIGHER_THAN_HIGH) || (nCompat & DXVA_HIGH_BIT)) { // DXVA unsupported
+							break;
+						}
 						if (nCompat && (
-								nCompat == DXVA_HIGH_BIT ||												// unsupported video
 								m_nDXVACheckCompatibility == 0 ||										// full check
 								m_nDXVACheckCompatibility == 1 && nCompat != DXVA_UNSUPPORTED_LEVEL ||	// skip level check
 								m_nDXVACheckCompatibility == 2 && nCompat != DXVA_TOO_MANY_REF_FRAMES)	// skip reference frame check

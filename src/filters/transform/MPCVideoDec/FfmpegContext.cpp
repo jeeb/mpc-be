@@ -155,7 +155,6 @@ int FFH264CheckCompatibility (int nWidth, int nHeight, struct AVCodecContext* pA
 	int video_is_level51			= 0;
 	int no_level51_support			= 1;
 	int too_much_ref_frames			= 0;
-	int profile_higher_than_high	= 0;
 	int max_ref_frames_dpb41		= min(11, 8388608/(nWidth * nHeight) );
 
 	if (pAVCtx->extradata != NULL) {
@@ -175,11 +174,12 @@ int FFH264CheckCompatibility (int nWidth, int nHeight, struct AVCodecContext* pA
 			return DXVA_HIGH_BIT;
 		}
 
-		int max_ref_frames = 0;
+		if (cur_sps->profile_idc > 100) {
+			return DXVA_PROFILE_HIGHER_THAN_HIGH;
+		}
 
 		video_is_level51			= cur_sps->level_idc >= 51 ? 1 : 0;
-		profile_higher_than_high	= (cur_sps->profile_idc > 100);
-		max_ref_frames				= max_ref_frames_dpb41; // default value is calculate
+		int max_ref_frames			= max_ref_frames_dpb41; // default value is calculate
 
 		if (nPCIVendor == PCIV_nVidia) {
 			// nVidia cards support level 5.1 since drivers v6.14.11.7800 for XP and drivers v7.15.11.7800 for Vista/7
@@ -235,7 +235,15 @@ int FFH264CheckCompatibility (int nWidth, int nHeight, struct AVCodecContext* pA
 		}
 	}
 
-	return (video_is_level51 * no_level51_support * DXVA_UNSUPPORTED_LEVEL) + (too_much_ref_frames * DXVA_TOO_MANY_REF_FRAMES) + (profile_higher_than_high * DXVA_PROFILE_HIGHER_THAN_HIGH);
+	int Flags = 0;
+	if (video_is_level51 * no_level51_support) {
+		Flags |= DXVA_UNSUPPORTED_LEVEL;
+	}
+	if (too_much_ref_frames) {
+		Flags |= DXVA_TOO_MANY_REF_FRAMES;
+	}
+
+	return Flags;
 }
 
 void CopyScalingMatrix (DXVA_Qmatrix_H264* pDest, PPS* pps, DWORD nPCIVendor)
