@@ -212,7 +212,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 					bHasVideo = true;
 				} else if (CodecID == "V_UNCOMPRESSED") {
-				} else if (CodecID == "V_MPEG4/ISO/AVC") {
+				} else if (CodecID.Find("V_MPEG4/ISO/AVC") == 0) {
 					if (pTE->CodecPrivate.GetCount() > 9) {
 						CGolombBuffer gb((BYTE*)pTE->CodecPrivate.GetData() + 9, pTE->CodecPrivate.GetCount() - 9);
 						avc_hdr h;
@@ -272,7 +272,6 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 avcfail:
 						continue;
 avcsuccess:
-						;
 					}
 
 					CAtlArray<BYTE> data;
@@ -424,7 +423,7 @@ avcsuccess:
 							mts.Add(mt);
 						bHasVideo = true;
 					}
-				} else if (CodecID == "V_DSHOW/MPEG1VIDEO"  || CodecID == "V_MPEG1") {
+				} else if (CodecID == "V_DSHOW/MPEG1VIDEO" || CodecID == "V_MPEG1") {
 					mt.majortype	= MEDIATYPE_Video;
 					mt.subtype		= MEDIASUBTYPE_MPEG1Payload;
 					mt.formattype	= FORMAT_MPEGVideo;
@@ -897,7 +896,6 @@ avcsuccess:
 		}
 	}
 
-
 	Info& info = m_pFile->m_segment.SegmentInfo;
 
 	if (m_pFile->IsRandomAccess()) {
@@ -995,7 +993,6 @@ void CMatroskaSplitterFilter::SetupChapters(LPCSTR lng, ChapterAtom* parent, int
 			}
 		}
 	}
-
 }
 
 void CMatroskaSplitterFilter::InstallFonts()
