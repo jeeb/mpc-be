@@ -272,6 +272,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 avcfail:
 						continue;
 avcsuccess:
+;
 					}
 
 					CAtlArray<BYTE> data;
