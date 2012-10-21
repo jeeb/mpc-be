@@ -25,7 +25,6 @@
 #include <shlobj.h>
 #include <dlgs.h>
 #include "OpenFileDlg.h"
-#include "MainFrm.h"
 
 #define __DUMMY__ _T("*.*")
 
@@ -42,8 +41,17 @@ COpenFileDlg::COpenFileDlg(CAtlArray<CString>& mask, bool fAllowDirSelection, LP
 {
 	m_fAllowDirSelection = fAllowDirSelection;
 
-	CString str = ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strFnFull;
-	m_pOFN->lpstrInitialDir = (str == _T("") || wcsstr(str, L"://") ? lpszFileName : str);
+	CRecentFileList& MRU = AfxGetAppSettings().MRU;
+	MRU.ReadList();
+	CString str = _T("");
+
+	for (int i = 0; i < MRU.GetSize(); i++)
+		if (!MRU[i].IsEmpty()) {
+			str = MRU[i];
+			break;
+		}
+
+	m_pOFN->lpstrInitialDir = str;
 
 	m_buff = DNew TCHAR[10000];
 	m_buff[0] = 0;
