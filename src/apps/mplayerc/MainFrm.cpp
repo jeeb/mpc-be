@@ -4991,6 +4991,12 @@ void CMainFrame::OnFileReopen()
 	OpenCurPlaylistItem();
 }
 
+static TCHAR* extsubtitles[] = {
+	_T(".srt"), _T(".sub"), _T(".smi"), _T(".psb"),
+	_T(".ssa"), _T(".ass"), _T(".idx"), _T(".usf"),
+	_T(".xss"), _T(".txt"), _T(".rt"),  _T(".sup")
+};
+
 void CMainFrame::OnDropFiles(HDROP hDropInfo)
 {
 	SetForegroundWindow();
@@ -5027,13 +5033,24 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 	}
 
 	if (sl.GetCount() == 1 && m_iMediaLoadState == MLS_LOADED && m_pCAP) {
-		ISubStream *pSubStream = NULL;
-		if (LoadSubtitle(sl.GetHead(), &pSubStream)) {
-			SetSubtitle(pSubStream); // the subtitle at the insert position according to LoadSubtitle()
-			CPath p(sl.GetHead());
-			p.StripPath();
-			SendStatusMessage(CString((LPCTSTR)p) + ResStr(IDS_MAINFRM_47), 3000);
-			return;
+		CString ext			= CPath(sl.GetHead()).GetExtension().MakeLower();
+		bool validate_ext	= false;
+		for (size_t i = 0; i < _countof(extsubtitles); i++) {
+			if (ext == extsubtitles[i]) {
+				validate_ext = true;
+				break;
+			}
+		}
+
+		if (validate_ext) {
+			ISubStream *pSubStream = NULL;
+			if (LoadSubtitle(sl.GetHead(), &pSubStream)) {
+				SetSubtitle(pSubStream); // the subtitle at the insert position according to LoadSubtitle()
+				CPath p(sl.GetHead());
+				p.StripPath();
+				SendStatusMessage(CString((LPCTSTR)p) + ResStr(IDS_MAINFRM_47), 3000);
+				return;
+			}
 		}
 	}
 

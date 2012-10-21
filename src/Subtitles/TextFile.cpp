@@ -67,7 +67,6 @@ bool CTextFile::Open(LPCTSTR lpszFileName)
 				m_offset = 3;
 			}
 		} else {
-			/*
 			// trying detect UTF-8 without BOM
 			size_t buf_size = min(8192, GetLength());
 
@@ -83,7 +82,6 @@ bool CTextFile::Open(LPCTSTR lpszFileName)
 			}
 
 			free(buf);
-			*/
 		}
 	}
 
