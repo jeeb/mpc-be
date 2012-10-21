@@ -35,6 +35,12 @@ CTextFile::CTextFile(enc e)
 {
 }
 
+#define ReopenAsText()														\
+	__super::Close();														\
+	if (!__super::Open(lpszFileName, modeRead|typeText|shareDenyNone)) {	\
+		return false;														\
+	}																		\
+
 bool CTextFile::Open(LPCTSTR lpszFileName)
 {
 	if (!__super::Open(lpszFileName, modeRead|typeBinary|shareDenyNone)) {
@@ -75,21 +81,20 @@ bool CTextFile::Open(LPCTSTR lpszFileName)
 			if ((sizeof(buf) - 1)!= Read(buf, sizeof(buf) - 1)) {
 				return Close(), false;
 			}
-			CStdioFile::Seek(0, begin);
 
-			if (Utf8::isValid(buf, sizeof(buf))) {
-				m_encoding = UTF8;
-			}
-
+			bool IsUTF8Valid = Utf8::isValid(buf, sizeof(buf));
 			free(buf);
+
+			if (IsUTF8Valid) {
+				// Reopen as Text file to avoid read binary files ...
+				m_encoding = UTF8;
+				ReopenAsText();
+			}
 		}
 	}
 
 	if (m_encoding == m_defaultencoding) {
-		__super::Close(); // CWebTextFile::Close() would delete the temp file if we called it...
-		if (!__super::Open(lpszFileName, modeRead|typeText|shareDenyNone)) {
-			return false;
-		}
+		ReopenAsText();
 	}
 
 	return true;
