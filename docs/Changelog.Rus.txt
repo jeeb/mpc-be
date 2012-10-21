@@ -16,7 +16,7 @@
 * libopus git-b7b5872c;
 * Virtualdub 1.10.3 Test 7;
 * ffmpeg git-e1681654;
-* MediaInfo 0.7.60+ svn rev.5162;
+* MediaInfo 0.7.60+ svn rev.5172;
 
 Исправления (!):
 
