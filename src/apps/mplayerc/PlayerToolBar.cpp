@@ -134,7 +134,7 @@ void CPlayerToolBar::SwitchTheme()
 
 	int fp = m_logobm.FileExists("toolbar");
 
-	HBITMAP hBmp;
+	HBITMAP hBmp = NULL;
 	if (s.fDisableXPToolbars && NULL == fp) {
 		//int col = s.clrFaceABGR;
 		//int r, g, b, R, G, B;
@@ -146,42 +146,48 @@ void CPlayerToolBar::SwitchTheme()
 		hBmp = m_logobm.LoadExternalImage("toolbar", 0, -1, -1, -1, -1, -1);
 	}
 
+	BITMAP bitmapBmp;
+	if (NULL != hBmp) {
+		::GetObject(hBmp, sizeof(bitmapBmp), &bitmapBmp);
+
+		if (fp && bitmapBmp.bmWidth != bitmapBmp.bmHeight * 15) {
+			if (s.fDisableXPToolbars) {
+				hBmp = m_logobm.LoadExternalImage("", IDB_PLAYERTOOLBAR_PNG, 1, s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
+				::GetObject(hBmp, sizeof(bitmapBmp), &bitmapBmp);
+			} else {
+				DeleteObject(hBmp);
+				hBmp = NULL;
+			}
+		}
+	}
+
 	if (NULL != hBmp) {
 		CBitmap *bmp = DNew CBitmap();
 		bmp->Attach(hBmp);
-		BITMAP bitmapBmp;
-		bmp->GetBitmap(&bitmapBmp);
 
-		if (bitmapBmp.bmWidth == bitmapBmp.bmHeight * 15) {
+		SetSizes(CSize(bitmapBmp.bmHeight + 7, bitmapBmp.bmHeight + 6), CSize(bitmapBmp.bmHeight, bitmapBmp.bmHeight));
 
-			SetSizes(CSize(bitmapBmp.bmHeight + 7, bitmapBmp.bmHeight + 6), CSize(bitmapBmp.bmHeight, bitmapBmp.bmHeight));
-
-			if (m_pButtonsImages) {
-				delete m_pButtonsImages;
-				m_pButtonsImages = NULL;
-			}
-
-			m_pButtonsImages = DNew CImageList();
-
-			if (32 == bitmapBmp.bmBitsPixel) {
-				m_pButtonsImages->Create(bitmapBmp.bmHeight, bitmapBmp.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
-				m_pButtonsImages->Add(bmp, static_cast<CBitmap*>(0));
-			} else {
-				m_pButtonsImages->Create(bitmapBmp.bmHeight, bitmapBmp.bmHeight, ILC_COLOR24 | ILC_MASK, 1, 0);
-				m_pButtonsImages->Add(bmp, RGB(255, 0, 255));
-			}
-
-			m_nButtonHeight = bitmapBmp.bmHeight;
-			GetToolBarCtrl().SetImageList(m_pButtonsImages);
-			fDisableImgListRemap = true;
+		if (m_pButtonsImages) {
+			delete m_pButtonsImages;
+			m_pButtonsImages = NULL;
 		}
+
+		m_pButtonsImages = DNew CImageList();
+
+		if (32 == bitmapBmp.bmBitsPixel) {
+			m_pButtonsImages->Create(bitmapBmp.bmHeight, bitmapBmp.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
+			m_pButtonsImages->Add(bmp, static_cast<CBitmap*>(0));
+		} else {
+			m_pButtonsImages->Create(bitmapBmp.bmHeight, bitmapBmp.bmHeight, ILC_COLOR24 | ILC_MASK, 1, 0);
+			m_pButtonsImages->Add(bmp, RGB(255, 0, 255));
+		}
+
+		m_nButtonHeight = bitmapBmp.bmHeight;
+		GetToolBarCtrl().SetImageList(m_pButtonsImages);
+		fDisableImgListRemap = true;
 
 		delete bmp;
 		DeleteObject(hBmp);
-	}
-
-	if (!s.fDisableXPToolbars) {
-		fDisableImgListRemap = true;
 	}
 
 	if (s.fDisableXPToolbars) {
@@ -190,6 +196,8 @@ void CPlayerToolBar::SwitchTheme()
 			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 1);// 1 Remap Disabled
 		}
 	} else {
+		fDisableImgListRemap = true;
+
 		if (NULL == fp) {
 			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 2);// 2 Undo  Active
 

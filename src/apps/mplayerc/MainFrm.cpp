@@ -1429,13 +1429,8 @@ bool CMainFrame::FlyBarSetPos()
 
 	if (AfxGetAppSettings().iCaptionMenuMode == MODE_FRAMEONLY || AfxGetAppSettings().iCaptionMenuMode == MODE_BORDERLESS || m_fFullScreen) {
 
-		HBITMAP hBmp = m_logobm.LoadExternalImage("flybar", IDB_PLAYERFLYBAR_PNG, -1, -1, -1, -1, -1);
-		BITMAP bm;
-		::GetObject(hBmp, sizeof(bm), &bm);
-		DeleteObject(hBmp);
-		int pos = (bm.bmHeight * 9) + 8;
-
-		m_wndFlyBar.MoveWindow(r_wndView.right-4-pos, r_wndView.top+4, pos, bm.bmHeight+8);
+		int pos = (m_wndFlyBar.iw * 9) + 8;
+		m_wndFlyBar.MoveWindow(r_wndView.right-4-pos, r_wndView.top+4, pos, m_wndFlyBar.iw+8);
 		m_wndFlyBar.CalcButtonsRect();
 		if (r_wndView.bottom-r_wndView.top > 40 && r_wndView.right-r_wndView.left > 236) {
 			if (AfxGetAppSettings().fFlybarOnTop && !m_wndFlyBar.IsWindowVisible()) {

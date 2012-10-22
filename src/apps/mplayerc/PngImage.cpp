@@ -183,7 +183,7 @@ BYTE* MPCPngImage::BrightnessRGB(int type, BYTE* lpBits, int width, int height, 
 
 HBITMAP MPCPngImage::TypeLoadImage(int type, BYTE** pData, int* width, int* height, int* bpp, FILE* fp, int resid, int br, int rc, int gc, int bc)
 {
-	HBITMAP hbm;
+	HBITMAP hbm = NULL;
 	BYTE* bmp;
 
 	png_structp png_ptr;
@@ -272,8 +272,10 @@ HBITMAP MPCPngImage::LoadExternalImage(CString fn, int resid, int type, int br, 
 	BYTE* pData;
 	int width, height, bpp;
 
-	FILE* fp;
-	_tfopen_s(&fp, path + fn + _T(".png"), _T("rb"));
+	FILE* fp = NULL;
+	if (fn != _T("")) {
+		_tfopen_s(&fp, path + fn + _T(".png"), _T("rb"));
+	}
 	if (fp) {
 		if (br >= 0 && rc >= 0 && gc >= 0 && bc >= 0) {
 			return TypeLoadImage(1, &pData, &width, &height, &bpp, fp, 0, br, rc, gc, bc);
@@ -282,7 +284,9 @@ HBITMAP MPCPngImage::LoadExternalImage(CString fn, int resid, int type, int br, 
 			return OpenImage(path + fn + _T(".png"));
 		}
 	} else {
-		_tfopen_s(&fp, path + fn + _T(".bmp"), _T("rb"));
+		if (fn != _T("")) {
+			_tfopen_s(&fp, path + fn + _T(".bmp"), _T("rb"));
+		}
 		if (fp) {
 			return TypeLoadImage(0, &pData, &width, &height, &bpp, fp, 0, br, rc, gc, bc);
 		} else {
@@ -302,7 +306,7 @@ void MPCPngImage::LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop, i
 	BYTE* pData;
 	int width, height, bpp;
 
-	FILE* fp;
+	FILE* fp = NULL;
 	_tfopen_s(&fp, path + fn + _T(".png"), _T("rb"));
 	if (fp) {
 		TypeLoadImage(1, &pData, &width, &height, &bpp, fp, 0, br, rc, gc, bc);

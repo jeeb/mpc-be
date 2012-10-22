@@ -202,8 +202,8 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 	BLENDFUNCTION bf;
 	bf.AlphaFormat = AC_SRC_ALPHA;
 	bf.BlendFlags = 0;
-	bf.BlendOp = 0;
-	bf.SourceConstantAlpha = 255;
+	bf.BlendOp = AC_SRC_OVER;
+	bf.SourceConstantAlpha = 0xFF;
 
 	if (((CMainFrame*)GetParentFrame())->IsSomethingLoaded()) {
 

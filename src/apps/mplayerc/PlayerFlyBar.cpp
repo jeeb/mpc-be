@@ -37,9 +37,17 @@ CFlyBar::CFlyBar() :
 	r_FSIcon(0,0,0,0),
 	r_LockIcon(0,0,0,0)
 {
+	int fp = m_logobm.FileExists("flybar");
+
 	hBmp = m_logobm.LoadExternalImage("flybar", IDB_PLAYERFLYBAR_PNG, -1, -1, -1, -1, -1);
 	BITMAP bm;
 	::GetObject(hBmp, sizeof(bm), &bm);
+
+	if (fp && bm.bmWidth != bm.bmHeight * 23) {
+		hBmp = m_logobm.LoadExternalImage("", IDB_PLAYERFLYBAR_PNG, -1, -1, -1, -1, -1);
+		::GetObject(hBmp, sizeof(bm), &bm);
+	}
+
 	iw = bm.bmHeight;
 }
 
@@ -148,8 +156,8 @@ void CFlyBar::DrawBitmap(CDC *pDC, int x, int y, int z)
 	BLENDFUNCTION bf;
 	bf.AlphaFormat = AC_SRC_ALPHA;
 	bf.BlendFlags = 0;
-	bf.BlendOp = 0;
-	bf.SourceConstantAlpha = 255;
+	bf.BlendOp = AC_SRC_OVER;
+	bf.SourceConstantAlpha = 0xFF;
 
 	pDC->AlphaBlend(x - 4 - (iw * z), 4, iw, iw, &hdcSrc, iw * y, 0, iw, iw, bf);
 
