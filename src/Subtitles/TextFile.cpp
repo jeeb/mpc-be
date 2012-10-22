@@ -248,7 +248,8 @@ void CTextFile::WriteString(LPCWSTR lpsz/*CStringW str*/)
 
 BOOL CTextFile::ReadString(CStringA& str)
 {
-	bool fEOF = true;
+	bool fEOF			= true;
+	ULONGLONG curPos	= GetPosition();
 
 	str.Empty();
 
@@ -271,8 +272,9 @@ BOOL CTextFile::ReadString(CStringA& str)
 	} else if (m_encoding == UTF8) {
 		BYTE b;
 		while (Read(&b, sizeof(b)) == sizeof(b)) {
-			fEOF = false;
-			char c = '?';
+			fEOF		= false;
+			char c		= '?';
+			bool bValid	= true;
 			if (!(b&0x80)) { // 0xxxxxxx
 				c = b&0x7f;
 			} else if ((b&0xe0) == 0xc0) { // 110xxxxx 10xxxxxx
@@ -286,14 +288,24 @@ BOOL CTextFile::ReadString(CStringA& str)
 				if (Read(&b, sizeof(b)) != sizeof(b)) {
 					break;
 				}
+			} else {
+				bValid = false;
 			}
-			if (c == '\r') {
-				continue;
+
+			if (bValid) {
+				if (c == '\r') {
+					continue;
+				}
+				if (c == '\n') {
+					break;
+				}
+				str += c;
+			} else {
+				// Read again as ASCII
+				m_encoding = ASCII;
+				Seek(curPos, CFile::begin);
+				fEOF = !ReadString(str);				
 			}
-			if (c == '\n') {
-				break;
-			}
-			str += c;
 		}
 	} else if (m_encoding == LE16) {
 		WORD w;
@@ -334,7 +346,8 @@ BOOL CTextFile::ReadString(CStringA& str)
 
 BOOL CTextFile::ReadString(CStringW& str)
 {
-	bool fEOF = true;
+	bool fEOF			= true;
+	ULONGLONG curPos	= GetPosition();
 
 	str.Empty();
 
@@ -359,8 +372,9 @@ BOOL CTextFile::ReadString(CStringW& str)
 	} else if (m_encoding == UTF8) {
 		BYTE b;
 		while (Read(&b, sizeof(b)) == sizeof(b)) {
-			fEOF = false;
-			WCHAR c = '?';
+			fEOF		= false;
+			WCHAR c		= '?';
+			bool bValid	= true;
 			if (!(b&0x80)) { // 0xxxxxxx
 				c = b&0x7f;
 			} else if ((b&0xe0) == 0xc0) { // 110xxxxx 10xxxxxx
@@ -379,14 +393,24 @@ BOOL CTextFile::ReadString(CStringW& str)
 					break;
 				}
 				c |= (b&0x3f);
+			} else {
+				bValid = false;
 			}
-			if (c == '\r') {
-				continue;
+
+			if (bValid) {
+				if (c == '\r') {
+					continue;
+				}
+				if (c == '\n') {
+					break;
+				}
+				str += c;
+			} else {
+				// Read again as ASCII
+				m_encoding = ASCII;
+				Seek(curPos, CFile::begin);
+				fEOF = !ReadString(str);
 			}
-			if (c == '\n') {
-				break;
-			}
-			str += c;
 		}
 	} else if (m_encoding == LE16) {
 		WCHAR wc;

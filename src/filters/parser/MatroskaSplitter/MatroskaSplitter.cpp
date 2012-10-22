@@ -212,7 +212,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 					bHasVideo = true;
 				} else if (CodecID == "V_UNCOMPRESSED") {
-				} else if (CodecID.Find("V_MPEG4/ISO/AVC") == 0) {
+					// TODO
+				} else if (CodecID == "V_MPEG4/ISO/AVC") {
 					if (pTE->CodecPrivate.GetCount() > 9) {
 						CGolombBuffer gb((BYTE*)pTE->CodecPrivate.GetData() + 9, pTE->CodecPrivate.GetCount() - 9);
 						avc_hdr h;
@@ -272,7 +273,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 avcfail:
 						continue;
 avcsuccess:
-;
+						;
 					}
 
 					CAtlArray<BYTE> data;

@@ -209,7 +209,7 @@ bool CBaseSplitterFileEx::Read(peshdr& h, BYTE code)
 	if (h.fpts) {
 		if (h.type == mpeg2) {
 			BYTE b = (BYTE)BitRead(4);
-			if (!(h.fdts && b == 3 || !h.fdts && b == 2)) {/*ASSERT(0); */return false;}
+			if (!(h.fdts && b == 3 || !h.fdts && b == 2)) {/*ASSERT(0); */return false;} // TODO
 		}
 
 		h.pts = 0;
@@ -223,7 +223,8 @@ bool CBaseSplitterFileEx::Read(peshdr& h, BYTE code)
 	}
 
 	if (h.fdts) {
-		if ((BYTE)BitRead(4) != 1) {/*ASSERT(0); */return false;}
+		BYTE b = (BYTE)BitRead(4);
+		if (b != 1) {/*return false;*/} // TODO
 
 		h.dts = 0;
 		h.dts |= BitRead(3) << 30;
@@ -272,7 +273,7 @@ bool CBaseSplitterFileEx::Read(peshdr& h, BYTE code)
 			BYTE skip = (pes_ext >> 4) & 0xb;
 			skip += skip & 0x9;
 			if (pes_ext & 0x40 || skip > left) {
-				TRACE(_T("pes_ext %X is invalid\n"), pes_ext);
+				TRACE(_T("peshdr read - pes_ext %X is invalid\n"), pes_ext);
 				pes_ext = skip = 0;
 			}
 			for (int i=0; i<skip; i++) {
