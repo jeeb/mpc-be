@@ -589,7 +589,6 @@ protected:  // control bar embedded members
 
 	CChildView m_wndView;
 	CPlayerSeekBar m_wndSeekBar;
-	CPlayerToolBar m_wndToolBar;
 	CPlayerInfoBar m_wndInfoBar;
 	CPlayerInfoBar m_wndStatsBar;
 	CPlayerStatusBar m_wndStatusBar;
@@ -979,7 +978,9 @@ public:
 
 	// Main Window
 	CWnd*			m_pVideoWnd;
+	CPlayerToolBar	m_wndToolBar;
 	CFlyBar			m_wndFlyBar;
+
 	void CreateFlyBar();
 	bool FlyBarSetPos();
 	void DestroyFlyBar();

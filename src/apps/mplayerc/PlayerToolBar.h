@@ -41,7 +41,6 @@ private:
 	MPCPngImage	m_logobm;
 	__int64		iDisableXPToolbars;
 	int			iMute;
-	int			m_nButtonHeight;
 	CImageList	*m_pButtonsImages;
 
 	HBITMAP		m_hDXVAIcon;
@@ -54,6 +53,7 @@ protected:
 	CImageList	m_reImgListActive;
 	CImageList	m_reImgListDisabled;
 	void CreateRemappedImgList(UINT bmID, int nRemapState, CImageList& reImgList);
+
 public:
 	void SwitchRemmapedImgList(UINT bmID, int nRemapState);
 	bool fDisableImgListRemap;
@@ -65,6 +65,7 @@ public:
 	void SwitchTheme();
 	void ArrangeControls();
 
+	int m_nButtonHeight;
 	CVolumeCtrl m_volctrl;
 
 	// Overrides
@@ -75,6 +76,7 @@ public:
 	//}}AFX_VIRTUAL
 
 	// Generated message map functions
+
 protected:
 	//{{AFX_MSG(CPlayerToolBar)
 	afx_msg void OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult);

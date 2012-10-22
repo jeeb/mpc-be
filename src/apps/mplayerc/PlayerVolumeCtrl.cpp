@@ -24,6 +24,7 @@
 #include "stdafx.h"
 #include "mplayerc.h"
 #include "PlayerVolumeCtrl.h"
+#include "MainFrm.h"
 
 
 // CVolumeCtrl
@@ -131,12 +132,8 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					InvalidateRect(&r);
 					CDC memdc;
 
-					HBITMAP hBmp = m_logobm.LoadExternalImage("toolbar", IDB_PLAYERTOOLBAR_PNG, 1, -1, -1, -1, -1);
-					BITMAP bm;
-					::GetObject(hBmp, sizeof(bm), &bm);
-					DeleteObject(hBmp);
-
-					int m_nBMedian = bm.bmHeight - 3 - 0.5 * bm.bmHeight - 8;
+					int m_nHeight = ((CMainFrame*)AfxGetMainWnd())->m_wndToolBar.m_nButtonHeight;
+					int m_nBMedian = m_nHeight - 3 - 0.5 * m_nHeight - 8;
 					int height = r.Height() + m_nBMedian + 4;
 
 					int fp = m_logobm.FileExists("background");
@@ -308,7 +305,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					dc.Draw3dRect(&r, light, shadow);
 					r.DeflateRect(1, 1, 1, 1);
 					dc.FillSolidRect(&r, GetSysColor(COLOR_BTNFACE));
-					dc.SetPixel(r.left+7, r.top-1, GetSysColor(COLOR_BTNFACE));
+					dc.SetPixel(r.left + 7, r.top - 1, GetSysColor(COLOR_BTNFACE));
 
 					dc.Detach();
 					lr = CDRF_SKIPDEFAULT;
@@ -348,7 +345,7 @@ void CVolumeCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 		SetPos(stop);
 	} else if (start < stop) {
 		int w = r.right - r.left - 4;
-		SetPosInternal(start + ((stop - start) * (point.x - r.left) + (w/2)) / w);
+		SetPosInternal(start + ((stop - start) * (point.x - r.left) + (w / 2)) / w);
 	}
 
 	CSliderCtrl::OnLButtonDown(nFlags, point);
