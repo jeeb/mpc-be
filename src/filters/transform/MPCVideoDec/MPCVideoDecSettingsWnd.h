@@ -45,7 +45,8 @@ enum {
 	IDC_PP_RESIZEMETHODBE,
 	IDC_PP_SWCOLORSPACE,
 	IDC_PP_SWINPUTLEVELS,
-	IDC_PP_SWOUTPUTLEVELS
+	IDC_PP_SWOUTPUTLEVELS,
+	IDC_PP_DEINTERLACING
 };
 
 class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
@@ -62,6 +63,8 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CComboBox	m_cbErrorRecognition;
 	CStatic		m_txtIDCTAlgo;
 	CComboBox	m_cbIDCTAlgo;
+	CStatic		m_txtDeinterlacing;
+	CComboBox	m_cbDeinterlacing;
 
 	CButton		m_grpDXVA;
 	CStatic		m_txtDXVAMode;

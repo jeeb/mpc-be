@@ -55,6 +55,13 @@ typedef enum {
 	MPCVD_CLLC       = 1 << 29,
 } MPC_VIDEO_CODEC;
 
+typedef enum {
+	AUTO,
+	TOPFIELD,
+	BOTTOMFIELD,
+	PROGRESSIVE,
+} MPC_DEINTERLACING_FLAGS;
+
 interface __declspec(uuid("CDC3B5B3-A8B0-4c70-A805-9FC80CDEF262"))
 IMPCVideoDecFilter :
 public IUnknown {
@@ -71,6 +78,9 @@ public IUnknown {
 
 	STDMETHOD(SetIDCTAlgo(int nValue)) = 0;
 	STDMETHOD_(int, GetIDCTAlgo()) = 0;
+
+	STDMETHOD(SetDeinterlacing(MPC_DEINTERLACING_FLAGS nValue)) = 0;
+	STDMETHOD_(MPC_DEINTERLACING_FLAGS, GetDeinterlacing()) = 0;
 
 	STDMETHOD_(GUID*, GetDXVADecoderGuid()) = 0;
 

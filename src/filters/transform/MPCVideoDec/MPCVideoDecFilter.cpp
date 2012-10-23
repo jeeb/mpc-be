@@ -720,6 +720,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_nDiscardMode			= AVDISCARD_DEFAULT;
 	m_nErrorRecognition		= AV_EF_CAREFUL;
 	m_nIDCTAlgo				= FF_IDCT_AUTO;
+	m_nDeinterlacing		= MPC_DEINTERLACING_FLAGS::AUTO;
 	m_bDXVACompatible		= true;
 	m_pFFBuffer				= NULL;
 	m_nFFBufferSize			= 0;
@@ -788,6 +789,9 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("IDCTAlgo"), dw)) {
 			m_nIDCTAlgo = dw;
 		}
+		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("Deinterlacing"), dw)) {
+			m_nDeinterlacing = dw;
+		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("ActiveCodecs"), dw)) {
 			m_nActiveCodecs = dw;
 		}
@@ -823,21 +827,22 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		//
 	}
 #else
-	m_nThreadNumber = AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("ThreadNumber"), m_nThreadNumber);
-	m_nDiscardMode = AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("DiscardMode"), m_nDiscardMode);
-	m_nErrorRecognition = AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("ErrorRecognition"), m_nErrorRecognition);
-	m_nIDCTAlgo = AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("IDCTAlgo"), m_nIDCTAlgo);
-	m_nARMode = AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("ARMode"), m_nARMode);
-	m_nDXVACheckCompatibility = AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("DXVACheckCompatibility"), m_nDXVACheckCompatibility);
-	m_nDXVA_SD = AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("DisableDXVA_SD"), m_nDXVA_SD);
+	m_nThreadNumber				= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("ThreadNumber"), m_nThreadNumber);
+	m_nDiscardMode				= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("DiscardMode"), m_nDiscardMode);
+	m_nErrorRecognition			= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("ErrorRecognition"), m_nErrorRecognition);
+	m_nIDCTAlgo					= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("IDCTAlgo"), m_nIDCTAlgo);
+	m_nDeinterlacing			= (MPC_DEINTERLACING_FLAGS)AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("Deinterlacing"), m_nDeinterlacing);
+	m_nARMode					= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("ARMode"), m_nARMode);
+	m_nDXVACheckCompatibility	= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("DXVACheckCompatibility"), m_nDXVACheckCompatibility);
+	m_nDXVA_SD					= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("DisableDXVA_SD"), m_nDXVA_SD);
 
 	// === New swscaler options
-	m_nSwOutputFormats = AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("SwOutputFormats"), m_nSwOutputFormats);
-	m_nSwChromaToRGB = AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("SwChromaToRGB"), m_nSwChromaToRGB);
-	m_nSwResizeMethodBE = AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("SwResizeMethodBE"), m_nSwResizeMethodBE);
-	m_nSwColorspace = AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("SwColorspace"), m_nSwColorspace);
-	m_nSwInputLevels = AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("SwInputLevels"), m_nSwInputLevels);
-	m_nSwOutputLevels = AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("SwOutputLevels"), m_nSwOutputLevels);
+	m_nSwOutputFormats	= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("SwOutputFormats"), m_nSwOutputFormats);
+	m_nSwChromaToRGB	= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("SwChromaToRGB"), m_nSwChromaToRGB);
+	m_nSwResizeMethodBE	= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("SwResizeMethodBE"), m_nSwResizeMethodBE);
+	m_nSwColorspace		= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("SwColorspace"), m_nSwColorspace);
+	m_nSwInputLevels	= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("SwInputLevels"), m_nSwInputLevels);
+	m_nSwOutputLevels	= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("SwOutputLevels"), m_nSwOutputLevels);
 	//
 #endif
 
@@ -846,6 +851,10 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	}
 
 	m_nDXVACheckCompatibility = max(0, min(m_nDXVACheckCompatibility, 3));
+
+	if (m_nDeinterlacing > MPC_DEINTERLACING_FLAGS::PROGRESSIVE) {
+		m_nDeinterlacing = MPC_DEINTERLACING_FLAGS::AUTO;
+	}
 
 	avcodec_register_all();
 	av_log_set_callback(ff_log);
@@ -2788,6 +2797,7 @@ STDMETHODIMP CMPCVideoDecFilter::Apply()
 		key.SetDWORDValue(_T("DiscardMode"), m_nDiscardMode);
 		key.SetDWORDValue(_T("ErrorRecognition"), m_nErrorRecognition);
 		key.SetDWORDValue(_T("IDCTAlgo"), m_nIDCTAlgo);
+		key.SetDWORDValue(_T("Deinterlacing"), m_nDeinterlacing);
 		key.SetDWORDValue(_T("ActiveCodecs"), m_nActiveCodecs);
 		key.SetDWORDValue(_T("ARMode"), m_nARMode);
 		key.SetDWORDValue(_T("DXVACheckCompatibility"), m_nDXVACheckCompatibility);
@@ -2811,6 +2821,7 @@ STDMETHODIMP CMPCVideoDecFilter::Apply()
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Video Decoder"), _T("DiscardMode"), m_nDiscardMode);
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Video Decoder"), _T("ErrorRecognition"), m_nErrorRecognition);
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Video Decoder"), _T("IDCTAlgo"), m_nIDCTAlgo);
+	AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Video Decoder"), _T("Deinterlacing"), (int)m_nDeinterlacing);
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Video Decoder"), _T("ARMode"), m_nARMode);
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Video Decoder"), _T("DXVACheckCompatibility"), m_nDXVACheckCompatibility);
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Video Decoder"), _T("DisableDXVA_SD"), m_nDXVA_SD);
@@ -2884,6 +2895,19 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetIDCTAlgo()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_nIDCTAlgo;
+}
+
+STDMETHODIMP CMPCVideoDecFilter::SetDeinterlacing(MPC_DEINTERLACING_FLAGS nValue)
+{
+	CAutoLock cAutoLock(&m_csProps);
+	m_nDeinterlacing = nValue;
+	return S_OK;
+}
+
+STDMETHODIMP_(MPC_DEINTERLACING_FLAGS) CMPCVideoDecFilter::GetDeinterlacing()
+{
+	CAutoLock cAutoLock(&m_csProps);
+	return m_nDeinterlacing;
 }
 
 STDMETHODIMP_(GUID*) CMPCVideoDecFilter::GetDXVADecoderGuid()

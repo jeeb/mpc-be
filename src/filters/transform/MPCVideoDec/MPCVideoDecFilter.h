@@ -85,6 +85,7 @@ protected:
 	int										m_nDiscardMode;
 	int										m_nErrorRecognition;
 	int										m_nIDCTAlgo;
+	MPC_DEINTERLACING_FLAGS					m_nDeinterlacing;
 	bool									m_bDXVACompatible;
 	int										m_nActiveCodecs;
 	int										m_nARMode;
@@ -241,6 +242,8 @@ public:
 	STDMETHOD_(int, GetErrorRecognition());
 	STDMETHOD(SetIDCTAlgo(int nValue));
 	STDMETHOD_(int, GetIDCTAlgo());
+	STDMETHOD(SetDeinterlacing(MPC_DEINTERLACING_FLAGS nValue));
+	STDMETHOD_(MPC_DEINTERLACING_FLAGS, GetDeinterlacing());
 	STDMETHOD_(GUID*, GetDXVADecoderGuid());
 	STDMETHOD(SetActiveCodecs(MPC_VIDEO_CODEC nValue));
 	STDMETHOD_(MPC_VIDEO_CODEC, GetActiveCodecs());

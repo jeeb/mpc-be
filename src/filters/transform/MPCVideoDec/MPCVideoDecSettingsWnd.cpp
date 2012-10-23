@@ -108,7 +108,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	CPoint p(10, 10);
 	GUID* DxvaGui = NULL;
 
-	m_grpFFMpeg.Create(ResStr(IDS_VDF_FFSETTINGS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(350), h20 + h25 * 4 + h20)), this, (UINT)IDC_STATIC);
+	m_grpFFMpeg.Create(ResStr(IDS_VDF_FFSETTINGS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(350), h20 + h25 * 5 + h20)), this, (UINT)IDC_STATIC);
 	p.y += h20;
 
 	// Decoding threads
@@ -151,10 +151,20 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbIDCTAlgo.AddString (ResStr (IDS_VDF_IDCT_SIMPLE));
 	p.y += h25;
 
+	// Deinterlacing
+	m_txtDeinterlacing.Create(_T("Deinterlacing"), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(220), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_cbDeinterlacing.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(IPP_SCALE(230), -4), CSize(IPP_SCALE(110), 200)), this, IDC_PP_DEINTERLACING);
+	m_cbDeinterlacing.AddString (_T("Auto"));
+	m_cbDeinterlacing.AddString (_T("Top-Field First"));
+	m_cbDeinterlacing.AddString (_T("Bottom-Field First"));
+	m_cbDeinterlacing.AddString (_T("Progressive"));
+	p.y += h25;
+
 	m_cbARMode.Create(ResStr(IDS_VDF_AR_MODE), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(340), m_fontheight)), this, IDC_PP_AR);
 	m_cbARMode.SetCheck(FALSE);
 	p.y += h25;
 
+	//
 	m_grpDXVA.Create(ResStr(IDS_VDF_DXVA_SETTING),   WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(350), h20 + h25 +h20 * 3 + m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h20;
 
@@ -297,6 +307,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		m_cbDiscardMode.SetCurSel		(FindDiscardIndex (m_pMDF->GetDiscardMode()));
 		m_cbErrorRecognition.SetCurSel	(FindErrRecognitionIndex (m_pMDF->GetErrorRecognition()));
 		m_cbIDCTAlgo.SetCurSel			(m_pMDF->GetIDCTAlgo());
+		m_cbDeinterlacing.SetCurSel		((int)m_pMDF->GetDeinterlacing());
 
 		m_cbARMode.SetCheck(m_pMDF->GetARMode());
 
@@ -343,6 +354,7 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 		m_pMDF->SetDiscardMode		(g_AVDiscard[m_cbDiscardMode.GetCurSel()]);
 		m_pMDF->SetErrorRecognition  (g_AVErrRecognition[m_cbErrorRecognition.GetCurSel()]);
 		m_pMDF->SetIDCTAlgo			(m_cbIDCTAlgo.GetCurSel());
+		m_pMDF->SetDeinterlacing	((MPC_DEINTERLACING_FLAGS)m_cbDeinterlacing.GetCurSel());
 
 		m_pMDF->SetARMode(m_cbARMode.GetCheck());
 
