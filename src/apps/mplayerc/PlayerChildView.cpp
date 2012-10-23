@@ -195,7 +195,7 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 
 	CRect r;
 	GetClientRect(r);
-	pDC->FillSolidRect(r, 0);
+
 	BITMAP bm;
 	int x, y, w, h, oldmode;
 
@@ -246,6 +246,9 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 			pDC->ExcludeClipRect(r);
 		}
 	}
+
+	GetClientRect(r);
+	pDC->FillSolidRect(r, 0);
 
 	return TRUE;
 }
