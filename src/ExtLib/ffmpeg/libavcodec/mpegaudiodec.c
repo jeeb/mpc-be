@@ -1416,6 +1416,7 @@ static int mp_decode_layer3(MPADecodeContext *s)
                 g = &s->granules[ch][gr];
                 s->last_buf_size += g->part2_3_length;
                 memset(g->sb_hybrid, 0, sizeof(g->sb_hybrid));
+                compute_imdct(s, g, &s->sb_samples[ch][18 * gr][0], s->mdct_buf[ch]);
             }
         }
         skip = s->last_buf_size - 8 * main_data_begin;
@@ -1712,11 +1713,15 @@ static int decode_frame(AVCodecContext * avctx, void *data, int *got_frame_ptr,
     return buf_size;
 }
 
+static void mp_flush(MPADecodeContext *ctx)
+{
+    memset(ctx->synth_buf, 0, sizeof(ctx->synth_buf));
+    ctx->last_buf_size = 0;
+}
+
 static void flush(AVCodecContext *avctx)
 {
-    MPADecodeContext *s = avctx->priv_data;
-    memset(s->synth_buf, 0, sizeof(s->synth_buf));
-    s->last_buf_size = 0;
+    mp_flush(avctx->priv_data);
 }
 
 #if CONFIG_MP3ADU_DECODER || CONFIG_MP3ADUFLOAT_DECODER
@@ -1907,11 +1912,8 @@ static void flush_mp3on4(AVCodecContext *avctx)
     int i;
     MP3On4DecodeContext *s = avctx->priv_data;
 
-    for (i = 0; i < s->frames; i++) {
-        MPADecodeContext *m = s->mp3decctx[i];
-        memset(m->synth_buf, 0, sizeof(m->synth_buf));
-        m->last_buf_size = 0;
-    }
+    for (i = 0; i < s->frames; i++)
+        mp_flush(s->mp3decctx[i]);
 }
 
 

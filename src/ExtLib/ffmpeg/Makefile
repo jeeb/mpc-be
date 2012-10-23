@@ -273,7 +273,6 @@ SRCS_C = \
     libavcodec/sipr16k.c \
     libavcodec/snow.c \
     libavcodec/sp5xdec.c \
-    libavcodec/sqrt_tab.c \
     libavcodec/svq1.c \
     libavcodec/svq13.c \
     libavcodec/svq1dec.c \
