@@ -16,7 +16,8 @@ Changes (*):
 * libopus git-2572c1e7;
 * Virtualdub 1.10.3 Test 7;
 * ffmpeg git-5442c6cc;
-* MediaInfo 0.7.60+ svn rev.5172;
+* MediaInfo 0.7.61+ svn rev.5192;
+* ZenLibs v0.4.28+ svn rev.411;
 
 Fixes (!):
 
