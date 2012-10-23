@@ -26,8 +26,6 @@
 #include <afxinet.h>
 #include "TextFile.h"
 
-#include <Utf8.h>
-
 CTextFile::CTextFile(enc e)
 	: m_encoding(e)
 	, m_defaultencoding(e)
@@ -40,6 +38,30 @@ CTextFile::CTextFile(enc e)
 	if (!__super::Open(lpszFileName, modeRead|typeText|shareDenyNone)) {	\
 		return false;														\
 	}																		\
+
+bool CTextFile::isUTF8Valid()
+{
+	BYTE b;
+	while (Read(&b, sizeof(b)) == sizeof(b) && (GetPosition() < 65536)) {
+		if (!(b&0x80)) {				// 0xxxxxxx
+		} else if ((b&0xe0) == 0xc0) {	// 110xxxxx 10xxxxxx
+			if (Read(&b, sizeof(b)) != sizeof(b)) {
+				break;
+			}
+		} else if ((b&0xf0) == 0xe0) {	// 1110xxxx 10xxxxxx 10xxxxxx
+			if (Read(&b, sizeof(b)) != sizeof(b)) {
+				break;
+			}
+			if (Read(&b, sizeof(b)) != sizeof(b)) {
+				break;
+			}
+		} else {
+			return false;
+		}
+	}
+
+	return true;
+}
 
 bool CTextFile::Open(LPCTSTR lpszFileName)
 {
@@ -74,18 +96,9 @@ bool CTextFile::Open(LPCTSTR lpszFileName)
 			}
 		} else {
 			// trying detect UTF-8 without BOM
-			size_t buf_size = min(8192, GetLength());
+			SeekToBegin();
 
-			unsigned char* buf = (unsigned char*)malloc(buf_size);
-			memset(buf, 0, sizeof(buf));
-			if ((sizeof(buf) - 1)!= Read(buf, sizeof(buf) - 1)) {
-				return Close(), false;
-			}
-
-			bool IsUTF8Valid = Utf8::isValid(buf, sizeof(buf));
-			free(buf);
-
-			if (IsUTF8Valid) {
+			if (isUTF8Valid()) {
 				// Reopen as Text file to avoid read binary files ...
 				m_encoding = UTF8;
 				ReopenAsText();
@@ -215,13 +228,13 @@ void CTextFile::WriteString(LPCWSTR lpsz/*CStringW str*/)
 		for (size_t i = 0; i < uLen; ++i) { 
 			DWORD c = (WORD)str[i];
 
-			if (0 <= c && c < 0x80) { // 0xxxxxxx
+			if (0 <= c && c < 0x80) {				// 0xxxxxxx
 				Write(&c, 1);
-			} else if (0x80 <= c && c < 0x800) { // 110xxxxx 10xxxxxx
+			} else if (0x80 <= c && c < 0x800) {	// 110xxxxx 10xxxxxx
 				c = 0xc080|((c<<2)&0x1f00)|(c&0x003f);
 				Write((BYTE*)&c+1, 1);
 				Write(&c, 1);
-			} else if (0x800 <= c && c < 0xFFFF) { // 1110xxxx 10xxxxxx 10xxxxxx
+			} else if (0x800 <= c && c < 0xFFFF) {	// 1110xxxx 10xxxxxx 10xxxxxx
 				c = 0xe08080|((c<<4)&0x0f0000)|((c<<2)&0x3f00)|(c&0x003f);
 				Write((BYTE*)&c+2, 1);
 				Write((BYTE*)&c+1, 1);
@@ -248,9 +261,7 @@ void CTextFile::WriteString(LPCWSTR lpsz/*CStringW str*/)
 
 BOOL CTextFile::ReadString(CStringA& str)
 {
-	bool fEOF			= true;
-	ULONGLONG curPos	= GetPosition();
-
+	bool fEOF = true;
 	str.Empty();
 
 	if (m_encoding == ASCII) {
@@ -274,38 +285,28 @@ BOOL CTextFile::ReadString(CStringA& str)
 		while (Read(&b, sizeof(b)) == sizeof(b)) {
 			fEOF		= false;
 			char c		= '?';
-			bool bValid	= true;
-			if (!(b&0x80)) { // 0xxxxxxx
+			if (!(b&0x80)) {				// 0xxxxxxx
 				c = b&0x7f;
-			} else if ((b&0xe0) == 0xc0) { // 110xxxxx 10xxxxxx
+			} else if ((b&0xe0) == 0xc0) {	// 110xxxxx 10xxxxxx
 				if (Read(&b, sizeof(b)) != sizeof(b)) {
 					break;
 				}
-			} else if ((b&0xf0) == 0xe0) { // 1110xxxx 10xxxxxx 10xxxxxx
+			} else if ((b&0xf0) == 0xe0) {	// 1110xxxx 10xxxxxx 10xxxxxx
 				if (Read(&b, sizeof(b)) != sizeof(b)) {
 					break;
 				}
 				if (Read(&b, sizeof(b)) != sizeof(b)) {
 					break;
 				}
-			} else {
-				bValid = false;
 			}
 
-			if (bValid) {
-				if (c == '\r') {
-					continue;
-				}
-				if (c == '\n') {
-					break;
-				}
-				str += c;
-			} else {
-				// Read again as ASCII
-				m_encoding = ASCII;
-				Seek(curPos, CFile::begin);
-				fEOF = !ReadString(str);				
+			if (c == '\r') {
+				continue;
 			}
+			if (c == '\n') {
+				break;
+			}
+			str += c;
 		}
 	} else if (m_encoding == LE16) {
 		WORD w;
@@ -346,9 +347,7 @@ BOOL CTextFile::ReadString(CStringA& str)
 
 BOOL CTextFile::ReadString(CStringW& str)
 {
-	bool fEOF			= true;
-	ULONGLONG curPos	= GetPosition();
-
+	bool fEOF = true;
 	str.Empty();
 
 	if (m_encoding == ASCII) {
@@ -374,16 +373,15 @@ BOOL CTextFile::ReadString(CStringW& str)
 		while (Read(&b, sizeof(b)) == sizeof(b)) {
 			fEOF		= false;
 			WCHAR c		= '?';
-			bool bValid	= true;
-			if (!(b&0x80)) { // 0xxxxxxx
+			if (!(b&0x80)) {				// 0xxxxxxx
 				c = b&0x7f;
-			} else if ((b&0xe0) == 0xc0) { // 110xxxxx 10xxxxxx
+			} else if ((b&0xe0) == 0xc0) {	// 110xxxxx 10xxxxxx
 				c = (b&0x1f)<<6;
 				if (Read(&b, sizeof(b)) != sizeof(b)) {
 					break;
 				}
 				c |= (b&0x3f);
-			} else if ((b&0xf0) == 0xe0) { // 1110xxxx 10xxxxxx 10xxxxxx
+			} else if ((b&0xf0) == 0xe0) {	// 1110xxxx 10xxxxxx 10xxxxxx
 				c = (b&0x0f)<<12;
 				if (Read(&b, sizeof(b)) != sizeof(b)) {
 					break;
@@ -393,24 +391,15 @@ BOOL CTextFile::ReadString(CStringW& str)
 					break;
 				}
 				c |= (b&0x3f);
-			} else {
-				bValid = false;
 			}
 
-			if (bValid) {
-				if (c == '\r') {
-					continue;
-				}
-				if (c == '\n') {
-					break;
-				}
-				str += c;
-			} else {
-				// Read again as ASCII
-				m_encoding = ASCII;
-				Seek(curPos, CFile::begin);
-				fEOF = !ReadString(str);
+			if (c == '\r') {
+				continue;
 			}
+			if (c == '\n') {
+				break;
+			}
+			str += c;
 		}
 	} else if (m_encoding == LE16) {
 		WCHAR wc;

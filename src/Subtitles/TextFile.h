@@ -34,6 +34,8 @@ private:
 	enc m_encoding, m_defaultencoding;
 	int m_offset;
 
+	bool isUTF8Valid();
+
 public:
 	CTextFile(enc e = ASCII);
 

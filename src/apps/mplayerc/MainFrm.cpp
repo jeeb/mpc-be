@@ -12743,8 +12743,6 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			LoadSubtitle(pOMD->subs.GetNext(pos));
 		}
 
-
-
 		pos = m_pSubStreams.GetHeadPosition();
 		CComPtr<ISubStream> pSubStream;
 		int tPos = -1;
@@ -12798,6 +12796,14 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 		}
 			
 		if (!s.fUseInternalSelectTrackLogic) {
+			if (s.fPrioritizeExternalSubtitles) {
+				size_t cnt = subarray.GetCount();
+				for (size_t i = 0; i < cnt; i++) {
+					if (subarray[i].Extsub)	{
+						checkedsplsub = i;
+					}
+				}
+			}
 			OnNavMixStreamSubtitleSelectSubMenu(checkedsplsub, 2);
 		} else {
 
