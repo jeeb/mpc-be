@@ -275,6 +275,7 @@
     <ClInclude Include="libavcodec\x86\h264_i386.h" />
     <ClInclude Include="libavcodec\x86\idct_xvid.h" />
     <ClInclude Include="libavcodec\x86\mathops.h" />
+    <ClInclude Include="libavcodec\x86\vc1dsp.h" />
     <ClInclude Include="libavcodec\x86\vp56_arith.h" />
     <ClInclude Include="libavcodec\xiph.h" />
     <ClInclude Include="libavcodec\xvmc_internal.h" />
@@ -318,6 +319,7 @@
     <ClInclude Include="libavutil\mathematics.h" />
     <ClInclude Include="libavutil\md5.h" />
     <ClInclude Include="libavutil\mem.h" />
+    <ClInclude Include="libavutil\old_pix_fmts.h" />
     <ClInclude Include="libavutil\opt.h" />
     <ClInclude Include="libavutil\parseutils.h" />
     <ClInclude Include="libavutil\pixdesc.h" />
@@ -332,7 +334,6 @@
     <ClInclude Include="libavutil\x86\asm.h" />
     <ClInclude Include="libavutil\x86\bswap.h" />
     <ClInclude Include="libavutil\x86\cpu.h" />
-    <ClInclude Include="libavutil\x86\intmath.h" />
     <ClInclude Include="libavutil\x86\intreadwrite.h" />
     <ClInclude Include="libavutil\x86\timer.h" />
     <ClInclude Include="libavutil\x86_cpu.h" />
@@ -619,6 +620,8 @@
     <ClCompile Include="libavcodec\x86\rv40dsp_init.c" />
     <ClCompile Include="libavcodec\x86\sbrdsp_init.c" />
     <ClCompile Include="libavcodec\x86\simple_idct.c" />
+    <ClCompile Include="libavcodec\x86\snowdsp.c" />
+    <ClCompile Include="libavcodec\x86\vc1dsp_init.c" />
     <ClCompile Include="libavcodec\x86\vc1dsp_mmx.c" />
     <ClCompile Include="libavcodec\x86\vp3dsp_init.c" />
     <ClCompile Include="libavcodec\x86\vp56dsp_init.c" />
@@ -650,6 +653,8 @@
     <ClCompile Include="libavutil\lfg.c" />
     <ClCompile Include="libavutil\lls.c" />
     <ClCompile Include="libavutil\log.c" />
+    <ClCompile Include="libavutil\log2.c" />
+    <ClCompile Include="libavutil\log2_tab.c" />
     <ClCompile Include="libavutil\lzo.c" />
     <ClCompile Include="libavutil\mathematics.c" />
     <ClCompile Include="libavutil\md5.c" />
