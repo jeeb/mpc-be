@@ -13,7 +13,7 @@
 * Обновлен немецкий перевод, автор - Markus Gaugg;
 * libwebp git-c6e98658;
 * libpng 1.5.13 git-753fd3f;
-* libopus git-b7b5872c;
+* libopus git-2572c1e7;
 * Virtualdub 1.10.3 Test 7;
 * ffmpeg git-5442c6cc;
 * MediaInfo 0.7.60+ svn rev.5172;
