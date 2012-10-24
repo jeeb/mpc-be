@@ -5064,12 +5064,22 @@ void CMainFrame::OnFileSaveAs()
 	if (!m_strTitleAlt.IsEmpty()) {
 		out = m_strTitleAlt;
 		ext = CString(CPath(m_strTitleAlt).GetExtension()).MakeLower();
+
+		CString ingnoreFileNameCharlist = _T("< > : \" / \\ | ? *");
+		CAtlList<CString> sl;
+		Explode(ingnoreFileNameCharlist, sl, ' ');
+		POSITION pos = sl.GetHeadPosition();
+		while (pos) {
+			out.Replace(sl.GetNext(pos), _T(" "));
+		}
 	} else {
 
 		int find = out.Find(_T("://"));
 
 		if (find < 0) {
 			ext = CString(CPath(out).GetExtension()).MakeLower();
+			CPath p(out); p.StripPath();
+			out = CString(p);
 			if (ext == _T(".cda")) {
 				out = out.Left(out.GetLength()-4) + _T(".wav");
 			} else if (ext == _T(".ifo")) {
@@ -5084,14 +5094,6 @@ void CMainFrame::OnFileSaveAs()
 				out.Replace(_T("/"), _T("_"));
 			}
 		}
-	}
-
-	CString ingnoreFileNameCharlist = _T("< > : \" / \\ | ? *");
-	CAtlList<CString> sl;
-	Explode(ingnoreFileNameCharlist, sl, ' ');
-	POSITION pos = sl.GetHeadPosition();
-	while (pos) {
-		out.Replace(sl.GetNext(pos), _T(" "));
 	}
 
 	CString ext_list = ResStr(IDS_MAINFRM_48);
@@ -11581,14 +11583,24 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		}
 
 		m_strTitleAlt = _T("");
-		HRESULT hr;
+		HRESULT hr = S_OK;
 
-		bool extimage = OpenImageCheck(fn);
-		if (!extimage) {
-			hr = pGB->RenderFile(PlayerYouTube(fn, &m_strTitleAlt), NULL);
+		bool extimage = false;
+		hr = pGB->RenderFile(PlayerYouTube(fn, &m_strTitleAlt), NULL);
+		if (FAILED(hr)) {
+			if (OpenImageCheck(fn)) {
+				hr				= S_OK;
+				HBITMAP bitmap	= OpenImage(fn);
+				if (!bitmap) {
+					hr = VFW_E_CANNOT_RENDER;
+				} else {
+					DeleteObject(bitmap);
+					extimage = true;
+				}
+			}
 		}
 
-		if (hr && FAILED(hr) && !extimage) {
+		if (!extimage && FAILED(hr)) {
 
 			if (fFirst) {
 				if (s.fReportFailedPins) {
