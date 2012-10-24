@@ -338,10 +338,18 @@ HRESULT CFLACStream::FillBuffer(IMediaSample* pSample, int nFrame, BYTE* pOut, l
 	}
 
 	m_file.Seek (llCurPos, CFile::begin);
-	m_file.Read (pOut, len);
+	try {
+		m_file.Read (pOut, len);
+	} catch (CFileException* e) {
+		// TODO - Handle exception
+		e->Delete();
+		len = 0;
+	}
 	m_file.Seek (llCurFile, CFile::begin);
 
-	m_AvgTimePerFrame = m_rtDuration * len / (m_llFileSize-m_llOffset);
+	if (len) {
+		m_AvgTimePerFrame = m_rtDuration * len / (m_llFileSize-m_llOffset);
+	}
 
 	return S_OK;
 }
