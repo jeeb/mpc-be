@@ -790,7 +790,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 			m_nIDCTAlgo = dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("Deinterlacing"), dw)) {
-			m_nDeinterlacing = dw;
+			m_nDeinterlacing = (MPC_DEINTERLACING_FLAGS)dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("ActiveCodecs"), dw)) {
 			m_nActiveCodecs = dw;
@@ -2811,7 +2811,7 @@ STDMETHODIMP CMPCVideoDecFilter::Apply()
 		key.SetDWORDValue(_T("DiscardMode"), m_nDiscardMode);
 		key.SetDWORDValue(_T("ErrorRecognition"), m_nErrorRecognition);
 		key.SetDWORDValue(_T("IDCTAlgo"), m_nIDCTAlgo);
-		key.SetDWORDValue(_T("Deinterlacing"), m_nDeinterlacing);
+		key.SetDWORDValue(_T("Deinterlacing"), (int)m_nDeinterlacing);
 		key.SetDWORDValue(_T("ActiveCodecs"), m_nActiveCodecs);
 		key.SetDWORDValue(_T("ARMode"), m_nARMode);
 		key.SetDWORDValue(_T("DXVACheckCompatibility"), m_nDXVACheckCompatibility);
