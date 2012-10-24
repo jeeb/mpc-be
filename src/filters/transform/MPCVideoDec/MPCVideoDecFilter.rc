@@ -101,7 +101,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_VDF_SETTINGS        "FFmpeg settings"
+    IDS_VDF_SETTINGS        "Video settings"
     IDS_VDF_THREADNUMBER    "Decoding thread number"
     IDS_VDF_SKIPDEBLOCK     "H264 skip deblocking mode"
     IDS_VDF_DBLK_NONE       "None"
@@ -138,6 +138,15 @@ BEGIN
     IDS_VDF_DXVA_SKIP_LEVELCHECK "Skip level check"
     IDS_VDF_DXVA_SKIP_REFCHECK "Skip ref frame check"
     IDS_VDF_DXVA_SKIP_ALLCHECK "Skip all checks"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_VDF_DEINTERLACING		"Deinterlacing"
+    IDS_VDF_DEINTER_AUTO		"Auto"
+    IDS_VDF_DEINTER_TOP			"Top-Field First"
+    IDS_VDF_DEINTER_BOTTOM		"Bottom-Field First"
+    IDS_VDF_DEINTER_PROGRESSIVE	"Progressive"
 END
 
 #endif    // English (United States) resources
