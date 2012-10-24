@@ -327,6 +327,7 @@ HRESULT CFLACStream::FillBuffer(IMediaSample* pSample, int nFrame, BYTE* pOut, l
 	if (m_bIsEOF) {
 		return S_FALSE;
 	}
+
 	FLAC__stream_decoder_get_decode_position(_DECODER_, &llNextPos);
 
 	FLAC__uint64	llCurFile = m_file.GetPosition();
@@ -384,28 +385,18 @@ HRESULT CFLACStream::CheckMediaType(const CMediaType* pmt)
 }
 
 static bool ParseVorbisComment(const char *field_name, const FLAC__StreamMetadata_VorbisComment_Entry *entry, CString* TagValue){
-	CString TagValues[2] = {0, 0};
 	*TagValue = _T("");
 
-	CString vorvis_data(entry->entry);
+	CStringA vorbis_data(entry->entry);
+	CStringA TagId(field_name);
+	if (CStringA(vorbis_data).MakeLower().Find(TagId + "=") < 0) {
+		return false;
+	}
 	
-	int tPos = 0, count = 0;
-	CString vorvis_data_field = vorvis_data.Tokenize(_T("="), tPos);
-	while (tPos != -1 && (count <= 2)) {
-		TagValues[count] = vorvis_data_field;
-		vorvis_data_field = vorvis_data.Tokenize(_T("="), tPos);
-		count++;
-	}
+	vorbis_data.Delete(0, vorbis_data.Find("=") + 1);
+	*TagValue = CA2CT(vorbis_data, CP_UTF8);
 
-	if (count == 2) {
-		CString TagId(field_name);
-		if(!TagId.CompareNoCase(TagValues[0])) {
-			*TagValue = TagValues[1];
-			return true;
-		}
-	}
-
-	return false;
+	return true;
 }
 
 void CFLACStream::UpdateFromMetadata (void* pBuffer)
