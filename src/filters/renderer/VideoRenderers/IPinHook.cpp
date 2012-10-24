@@ -55,6 +55,8 @@ IMemInputPinCVtbl*	g_pMemInputPinCVtbl = NULL;
 // Aleksoid : validate Pin
 IPinC*				g_pPin				= NULL;
 
+FF_FIELD_TYPE		g_nFrameType		= FF_FIELD_TYPE::PICT_FRAME;
+
 typedef struct {
 	const int     Format;
 	const LPCTSTR Description;
@@ -169,6 +171,23 @@ static HRESULT STDMETHODCALLTYPE ReceiveMineI(IMemInputPinC * This, IMediaSample
 	REFERENCE_TIME rtStart, rtStop;
 	if (pSample && SUCCEEDED(pSample->GetTime(&rtStart, &rtStop))) {
 		g_tSampleStart = rtStart;
+
+		// Get frame type
+		g_nFrameType = FF_FIELD_TYPE::PICT_NONE;
+		if (CComQIPtr<IMediaSample2> pMS2 = pSample) {
+			AM_SAMPLE2_PROPERTIES props;
+			if(SUCCEEDED(pMS2->GetProperties(sizeof(props), (BYTE*)&props))) {
+				g_nFrameType = FF_FIELD_TYPE::PICT_BOTTOM_FIELD;
+				if (props.dwTypeSpecificFlags & AM_VIDEO_FLAG_WEAVE) {
+					g_nFrameType = FF_FIELD_TYPE::PICT_FRAME;
+				} else if (props.dwTypeSpecificFlags & AM_VIDEO_FLAG_FIELD1FIRST) {
+					g_nFrameType = FF_FIELD_TYPE::PICT_TOP_FIELD;
+				} else {
+					// TODO
+				}
+				
+			}
+		}
 	}
 
 	return ReceiveOrg(This, pSample);

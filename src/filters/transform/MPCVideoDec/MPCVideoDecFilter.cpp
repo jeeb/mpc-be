@@ -1743,15 +1743,29 @@ void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 		if (SUCCEEDED(pMS2->GetProperties(sizeof(props), (BYTE*)&props))) {
 			props.dwTypeSpecificFlags &= ~0x7f;
 
-			m_nFrameType = PICT_BOTTOM_FIELD;
-			if (!m_pFrame->interlaced_frame) {
-				props.dwTypeSpecificFlags	|= AM_VIDEO_FLAG_WEAVE;
-				m_nFrameType				= PICT_FRAME;
-			} else {
-				if (m_pFrame->top_field_first) {
+			switch (m_nDeinterlacing) {
+				case MPC_DEINTERLACING_FLAGS::AUTO :
+					m_nFrameType = FF_FIELD_TYPE::PICT_BOTTOM_FIELD;
+					if (!m_pFrame->interlaced_frame) {
+						props.dwTypeSpecificFlags		|= AM_VIDEO_FLAG_WEAVE;
+						m_nFrameType					= FF_FIELD_TYPE::PICT_FRAME;
+					} else {
+						if (m_pFrame->top_field_first) {
+							props.dwTypeSpecificFlags	|= AM_VIDEO_FLAG_FIELD1FIRST;
+							m_nFrameType				= FF_FIELD_TYPE::PICT_TOP_FIELD;
+						}
+					}
+					break;
+				case MPC_DEINTERLACING_FLAGS::PROGRESSIVE :
+					props.dwTypeSpecificFlags	|= AM_VIDEO_FLAG_WEAVE;
+					m_nFrameType				= FF_FIELD_TYPE::PICT_FRAME;
+					break;
+				case MPC_DEINTERLACING_FLAGS::TOPFIELD :
 					props.dwTypeSpecificFlags	|= AM_VIDEO_FLAG_FIELD1FIRST;
-					m_nFrameType				= PICT_TOP_FIELD;
-				}
+					m_nFrameType				= FF_FIELD_TYPE::PICT_TOP_FIELD;
+					break;
+				case MPC_DEINTERLACING_FLAGS::BOTTOMFIELD :
+					m_nFrameType = FF_FIELD_TYPE::PICT_BOTTOM_FIELD;
 			}
 
 			switch (m_pFrame->pict_type) {

@@ -108,7 +108,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	CPoint p(10, 10);
 	GUID* DxvaGui = NULL;
 
-	m_grpFFMpeg.Create(ResStr(IDS_VDF_FFSETTINGS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(350), h20 + h25 * 5 + h20)), this, (UINT)IDC_STATIC);
+	m_grpFFMpeg.Create(ResStr(IDS_VDF_SETTINGS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(350), h20 + h25 * 5 + h20)), this, (UINT)IDC_STATIC);
 	p.y += h20;
 
 	// Decoding threads
@@ -152,12 +152,12 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	p.y += h25;
 
 	// Deinterlacing
-	m_txtDeinterlacing.Create(_T("Deinterlacing"), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(220), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_txtDeinterlacing.Create(ResStr(IDS_VDF_DEINTERLACING), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(220), m_fontheight)), this, (UINT)IDC_STATIC);
 	m_cbDeinterlacing.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(IPP_SCALE(230), -4), CSize(IPP_SCALE(110), 200)), this, IDC_PP_DEINTERLACING);
-	m_cbDeinterlacing.AddString (_T("Auto"));
-	m_cbDeinterlacing.AddString (_T("Top-Field First"));
-	m_cbDeinterlacing.AddString (_T("Bottom-Field First"));
-	m_cbDeinterlacing.AddString (_T("Progressive"));
+	m_cbDeinterlacing.AddString (ResStr(IDS_VDF_DEINTER_AUTO));
+	m_cbDeinterlacing.AddString (ResStr(IDS_VDF_DEINTER_TOP));
+	m_cbDeinterlacing.AddString (ResStr(IDS_VDF_DEINTER_BOTTOM));
+	m_cbDeinterlacing.AddString (ResStr(IDS_VDF_DEINTER_PROGRESSIVE));
 	p.y += h25;
 
 	m_cbARMode.Create(ResStr(IDS_VDF_AR_MODE), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(340), m_fontheight)), this, IDC_PP_AR);
@@ -337,6 +337,9 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		m_cbSwOutputLevels.EnableWindow(m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp));
 		//
 	}
+
+	SetClassLongPtr(m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_ARROW));
+	SetClassLongPtr(GetDlgItem(IDC_PP_THREAD_NUMBER)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
 
 	return true;
 }

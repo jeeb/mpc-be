@@ -73,6 +73,9 @@ bool CAviSplitterSettingsWnd::OnActivate()
 		pWnd->SetFont(&m_font, FALSE);
 	}
 
+	SetClassLongPtr(m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_ARROW));
+	SetClassLongPtr(GetDlgItem(IDC_PP_INTERLEAVED_SUPPORT)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
+
 	return true;
 }
 

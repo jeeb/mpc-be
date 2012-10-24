@@ -1010,7 +1010,7 @@
 #define IDS_APP_DESCRIPTION             33164
 #define IDS_MAINFRM_12                  33165
 #define IDS_MAINFRM_13                  33166
-#define IDS_VDF_FFSETTINGS              33167
+#define IDS_VDF_SETTINGS                33167
 #define IDS_VDF_THREADNUMBER            33168
 #define IDS_VDF_SKIPDEBLOCK             33169
 #define IDS_VDF_DBLK_NONE               33170
@@ -1550,11 +1550,17 @@
 #define ID_NAVIGATE_AUDIO               43003
 #define IDS_AG_STEP                     43004
 
+#define IDS_VDF_DEINTERLACING           43100
+#define IDS_VDF_DEINTER_AUTO            43101
+#define IDS_VDF_DEINTER_TOP             43102
+#define IDS_VDF_DEINTER_BOTTOM          43103
+#define IDS_VDF_DEINTER_PROGRESSIVE     43104
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        41387
+#define _APS_NEXT_RESOURCE_VALUE        43105
 #define _APS_NEXT_COMMAND_VALUE         33443
 #define _APS_NEXT_CONTROL_VALUE         22054
 #define _APS_NEXT_SYMED_VALUE           24044

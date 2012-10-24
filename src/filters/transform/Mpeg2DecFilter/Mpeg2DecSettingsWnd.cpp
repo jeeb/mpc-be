@@ -126,25 +126,26 @@ bool CMpeg2DecSettingsWnd::OnActivate()
 			m_procamp_slider[i].Create(dwStyle, CRect(p + CPoint(IPP_SCALE(85), 0), CSize(201, h)), this, IDC_PP_SLIDER1 + i);
 			m_procamp_value[i].Create(_T(""), WS_VISIBLE | WS_CHILD, CRect(p + CPoint(IPP_SCALE(85) + 201, 0), CSize(IPP_SCALE(30), m_fontheight)), this);
 			p.y += h;
-	}
-	m_procamp_slider[0].SetRange(0, 2*128);
-	m_procamp_slider[0].SetTic(128);
-	m_procamp_slider[0].SetPos((int)(m_procamp[0] + (m_procamp[0] >= 0 ? 0.5f : -0.5f)) + 128);
-	m_procamp_slider[1].SetRange(0, 200);
-	m_procamp_slider[1].SetTic(100);
-	m_procamp_slider[1].SetPos((int)(100*m_procamp[1] + 0.5f));
-	m_procamp_slider[2].SetRange(0, 2*180);
-	m_procamp_slider[2].SetTic(180);
-	m_procamp_slider[2].SetPos((int)(m_procamp[2] + (m_procamp[2] >= 0 ? 0.5f : -0.5f)) + 180);
-	m_procamp_slider[3].SetRange(0, 200);
-	m_procamp_slider[3].SetTic(100);
-	m_procamp_slider[3].SetPos((int)(100*m_procamp[3] + 0.5f));
-	p.y += 5;
+		}
+		m_procamp_slider[0].SetRange(0, 2*128);
+		m_procamp_slider[0].SetTic(128);
+		m_procamp_slider[0].SetPos((int)(m_procamp[0] + (m_procamp[0] >= 0 ? 0.5f : -0.5f)) + 128);
+		m_procamp_slider[1].SetRange(0, 200);
+		m_procamp_slider[1].SetTic(100);
+		m_procamp_slider[1].SetPos((int)(100*m_procamp[1] + 0.5f));
+		m_procamp_slider[2].SetRange(0, 2*180);
+		m_procamp_slider[2].SetTic(180);
+		m_procamp_slider[2].SetPos((int)(m_procamp[2] + (m_procamp[2] >= 0 ? 0.5f : -0.5f)) + 180);
+		m_procamp_slider[3].SetRange(0, 200);
+		m_procamp_slider[3].SetTic(100);
+		m_procamp_slider[3].SetPos((int)(100*m_procamp[3] + 0.5f));
+		p.y += 5;
+	
 		m_procamp_tv2pc.Create(_T("TV->PC"), dwStyle, CRect(p + CPoint(IPP_SCALE(85) + 200 / 2 - 80 -5, 0), CSize(80, m_fontheight + 6)), this, IDC_PP_BUTTON1);
 		m_procamp_reset.Create(ResStr(IDS_MPEG2_RESET), dwStyle, CRect(p + CPoint(IPP_SCALE(85) + 200 / 2 + 6, 0), CSize(80, m_fontheight + 6)), this, IDC_PP_BUTTON2);
 		p.y += h25;
-
-	UpdateProcampValues();
+	
+		UpdateProcampValues();
 	}
 
 	m_note_static.Create(
@@ -155,6 +156,9 @@ bool CMpeg2DecSettingsWnd::OnActivate()
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
 		pWnd->SetFont(&m_font, FALSE);
 	}
+
+	SetClassLongPtr(m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_ARROW));
+	SetClassLongPtr(GetDlgItem(IDC_PP_CHECK1)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
 
 	return true;
 }

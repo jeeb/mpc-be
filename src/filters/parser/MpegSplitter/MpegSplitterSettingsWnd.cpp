@@ -112,6 +112,9 @@ bool CMpegSplitterSettingsWnd::OnActivate()
 		pWnd->SetFont(&m_font, FALSE);
 	}
 
+	SetClassLongPtr(m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_ARROW));
+	SetClassLongPtr(GetDlgItem(IDC_PP_FAST_STREAM_SELECT)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
+
 	return true;
 }
 

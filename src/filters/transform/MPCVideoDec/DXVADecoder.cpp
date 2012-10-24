@@ -564,26 +564,39 @@ void CDXVADecoder::SetTypeSpecificFlags(PICTURE_STORE* pPicture, IMediaSample* p
 		if (SUCCEEDED(pMS2->GetProperties(sizeof(props), (BYTE*)&props))) {
 			props.dwTypeSpecificFlags &= ~0x7f;
 
-			m_pFilter->SetFrameType(pPicture->n1FieldType);
-
-			if (pPicture->n1FieldType == PICT_FRAME) {
-				props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
-			} else if (pPicture->n1FieldType == PICT_TOP_FIELD) {
-				props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_FIELD1FIRST;
+			switch (m_pFilter->GetDeinterlacing()) {
+				case MPC_DEINTERLACING_FLAGS::AUTO :
+					m_pFilter->SetFrameType(pPicture->n1FieldType);
+					if (pPicture->n1FieldType == FF_FIELD_TYPE::PICT_FRAME) {
+						props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
+					} else if (pPicture->n1FieldType == FF_FIELD_TYPE::PICT_TOP_FIELD) {
+						props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_FIELD1FIRST;
+					}
+					break;
+				case MPC_DEINTERLACING_FLAGS::PROGRESSIVE :
+					m_pFilter->SetFrameType(FF_FIELD_TYPE::PICT_FRAME);
+					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
+					break;
+				case MPC_DEINTERLACING_FLAGS::TOPFIELD :
+					m_pFilter->SetFrameType(FF_FIELD_TYPE::PICT_TOP_FIELD);
+					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_FIELD1FIRST;
+					break;
+				case MPC_DEINTERLACING_FLAGS::BOTTOMFIELD :
+					m_pFilter->SetFrameType(FF_FIELD_TYPE::PICT_BOTTOM_FIELD);
 			}
 
 			switch (pPicture->nSliceType) {
-				case I_TYPE :
-				case SI_TYPE :
+				case I_TYPE:
+				case SI_TYPE:
 					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_I_SAMPLE;
 					break;
-				case P_TYPE :
-				case SP_TYPE :
+				case P_TYPE:
+				case SP_TYPE:
 					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_P_SAMPLE;
 					break;
-				default :
+				default:
 					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_B_SAMPLE;
-					break;
+				break;
 			}
 
 			pMS2->SetProperties(sizeof(props), (BYTE*)&props);
