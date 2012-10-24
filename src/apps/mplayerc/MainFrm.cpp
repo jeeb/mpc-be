@@ -15313,9 +15313,13 @@ void CMainFrame::AddTextPassThruFilter()
 				continue;
 			}
 
-			// TextPassThruFilter can connect only to NullTextRenderer - verify it.
+			// TextPassThruFilter can connect only to NullTextRenderer & ffdshow (video decoder/subtitles filter) - verify it.
 			CPinInfo pi;
-			if (SUCCEEDED(pPinTo->QueryPinInfo(&pi)) && GetCLSID(pi.pFilter) != __uuidof(CNullTextRenderer)) {
+			if (SUCCEEDED(pPinTo->QueryPinInfo(&pi)) &&
+				GetCLSID(pi.pFilter) != __uuidof(CNullTextRenderer)
+				&& GetCLSID(pi.pFilter) != GUIDFromCString(_T("{04FE9017-F873-410E-871E-AB91661A4EF7}"))	// ffdshow video decoder
+				&& GetCLSID(pi.pFilter) != GUIDFromCString(_T("{DBF9000E-F08C-4858-B769-C914A0FBB1D7}"))	// ffdshow subtitles filter
+					){
 				continue;
 			}
 
