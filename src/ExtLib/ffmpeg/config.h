@@ -613,7 +613,7 @@ Note: when adding a new codec, you have to:
 
 #define CONFIG_AC3_ENCODER 1
 #define CONFIG_AC3_FIXED_ENCODER 0
-#define CONFIG_EAC3_ENCODER 1
+#define CONFIG_EAC3_ENCODER 0
 
 #define CONFIG_AAC_PARSER 0
 #define CONFIG_AAC_LATM_PARSER 1
