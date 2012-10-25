@@ -52,15 +52,15 @@ typedef enum {
 	MPCVD_PRORES     = 1 << 26,
 	MPCVD_BINKV      = 1 << 27,
 	MPCVD_PNG        = 1 << 28,
-	MPCVD_CLLC       = 1 << 29,
+	MPCVD_CLLC       = 1 << 29
 } MPC_VIDEO_CODEC;
 
-typedef enum {
+typedef enum MPC_DEINTERLACING_FLAGS {
 	AUTO,
 	TOPFIELD,
 	BOTTOMFIELD,
-	PROGRESSIVE,
-} MPC_DEINTERLACING_FLAGS;
+	PROGRESSIVE
+};
 
 interface __declspec(uuid("CDC3B5B3-A8B0-4c70-A805-9FC80CDEF262"))
 IMPCVideoDecFilter :

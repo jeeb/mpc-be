@@ -136,12 +136,12 @@ extern void		LOG2FILE(LPCTSTR fmt, ...);
 
 extern CStringA	VobSubDefHeader(int w, int h, CStringA palette = "");
 
-typedef enum {
+typedef enum FF_FIELD_TYPE{
 	PICT_NONE,
 	PICT_TOP_FIELD,
 	PICT_BOTTOM_FIELD,
-	PICT_FRAME
-} FF_FIELD_TYPE;
+	PICT_FRAME	
+};
 
 class CPinInfo : public PIN_INFO
 {

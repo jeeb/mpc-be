@@ -1985,13 +1985,13 @@ void CDX9AllocatorPresenter::DrawStats()
 		if (bDetailedStats > 1) {
 			if (m_bIsEVR) {
 				if (g_nFrameType != PICT_NONE) {
-					strText.Format(L"Frame rate   : %7.03f   (%7.3f ms = %.03f, %s)   (%7.3f ms = %.03f%s, %2.03f StdDev)  Clock: %1.4f %%", m_fAvrFps, double(m_rtTimePerFrame) / 10000.0, 10000000.0 / (double)(m_rtTimePerFrame), g_nFrameType == FF_FIELD_TYPE::PICT_FRAME ? L"P" : L"I", GetFrameTime() * 1000.0, GetFrameRate(), m_DetectedLock ? L" L" : L"", m_DetectedFrameTimeStdDev / 10000.0, m_ModeratedTimeSpeed*100.0);
+					strText.Format(L"Frame rate   : %7.03f   (%7.3f ms = %.03f, %s)   (%7.3f ms = %.03f%s, %2.03f StdDev)  Clock: %1.4f %%", m_fAvrFps, double(m_rtTimePerFrame) / 10000.0, 10000000.0 / (double)(m_rtTimePerFrame), g_nFrameType == PICT_FRAME ? L"P" : L"I", GetFrameTime() * 1000.0, GetFrameRate(), m_DetectedLock ? L" L" : L"", m_DetectedFrameTimeStdDev / 10000.0, m_ModeratedTimeSpeed*100.0);
 				} else {
 					strText.Format(L"Frame rate   : %7.03f   (%7.3f ms = %.03f, %s)   (%7.3f ms = %.03f%s, %2.03f StdDev)  Clock: %1.4f %%", m_fAvrFps, double(m_rtTimePerFrame) / 10000.0, 10000000.0 / (double)(m_rtTimePerFrame), m_bInterlaced ? L"I" : L"P", GetFrameTime() * 1000.0, GetFrameRate(), m_DetectedLock ? L" L" : L"", m_DetectedFrameTimeStdDev / 10000.0, m_ModeratedTimeSpeed*100.0);
 				}
 			} else {
 				if (g_nFrameType != PICT_NONE) {
-					strText.Format(L"Frame rate   : %7.03f   (%7.3f ms = %.03f, %s)", m_fAvrFps, double(m_rtTimePerFrame) / 10000.0, 10000000.0 / (double)(m_rtTimePerFrame), g_nFrameType == FF_FIELD_TYPE::PICT_FRAME ? L"P" : L"I");
+					strText.Format(L"Frame rate   : %7.03f   (%7.3f ms = %.03f, %s)", m_fAvrFps, double(m_rtTimePerFrame) / 10000.0, 10000000.0 / (double)(m_rtTimePerFrame), g_nFrameType == PICT_FRAME ? L"P" : L"I");
 				} else {
 					strText.Format(L"Frame rate   : %7.03f   (%7.3f ms = %.03f, %s)", m_fAvrFps, double(m_rtTimePerFrame) / 10000.0, 10000000.0 / (double)(m_rtTimePerFrame), m_bInterlaced ? L"I" : L"P");
 				}
@@ -2004,8 +2004,8 @@ void CDX9AllocatorPresenter::DrawStats()
 
 		if (g_nFrameType != PICT_NONE) {
 			strText.Format(L"Frame type   : %s",
-							g_nFrameType == FF_FIELD_TYPE::PICT_FRAME ? L"Progressive" :
-							g_nFrameType == FF_FIELD_TYPE::PICT_BOTTOM_FIELD ? L"Interlaced : Bottom field first" :
+							g_nFrameType == PICT_FRAME ? L"Progressive" :
+							g_nFrameType == PICT_BOTTOM_FIELD ? L"Interlaced : Bottom field first" :
 							L"Interlaced : Top field first");
 			DrawText(rc, strText, 1);
 			OffsetRect (&rc, 0, TextHeight);

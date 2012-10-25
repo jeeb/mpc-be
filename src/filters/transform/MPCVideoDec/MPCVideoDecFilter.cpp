@@ -719,7 +719,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_nDiscardMode			= AVDISCARD_DEFAULT;
 	m_nErrorRecognition		= AV_EF_CAREFUL;
 	m_nIDCTAlgo				= FF_IDCT_AUTO;
-	m_nDeinterlacing		= MPC_DEINTERLACING_FLAGS::AUTO;
+	m_nDeinterlacing		= AUTO;
 	m_bDXVACompatible		= true;
 	m_pFFBuffer				= NULL;
 	m_nFFBufferSize			= 0;
@@ -851,8 +851,8 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 	m_nDXVACheckCompatibility = max(0, min(m_nDXVACheckCompatibility, 3));
 
-	if (m_nDeinterlacing > MPC_DEINTERLACING_FLAGS::PROGRESSIVE) {
-		m_nDeinterlacing = MPC_DEINTERLACING_FLAGS::AUTO;
+	if (m_nDeinterlacing > PROGRESSIVE) {
+		m_nDeinterlacing = AUTO;
 	}
 
 	avcodec_register_all();
@@ -1743,28 +1743,28 @@ void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 			props.dwTypeSpecificFlags &= ~0x7f;
 
 			switch (m_nDeinterlacing) {
-				case MPC_DEINTERLACING_FLAGS::AUTO :
-					m_nFrameType = FF_FIELD_TYPE::PICT_BOTTOM_FIELD;
+				case AUTO :
+					m_nFrameType = PICT_BOTTOM_FIELD;
 					if (!m_pFrame->interlaced_frame) {
 						props.dwTypeSpecificFlags		|= AM_VIDEO_FLAG_WEAVE;
-						m_nFrameType					= FF_FIELD_TYPE::PICT_FRAME;
+						m_nFrameType					= PICT_FRAME;
 					} else {
 						if (m_pFrame->top_field_first) {
 							props.dwTypeSpecificFlags	|= AM_VIDEO_FLAG_FIELD1FIRST;
-							m_nFrameType				= FF_FIELD_TYPE::PICT_TOP_FIELD;
+							m_nFrameType				= PICT_TOP_FIELD;
 						}
 					}
 					break;
-				case MPC_DEINTERLACING_FLAGS::PROGRESSIVE :
+				case PROGRESSIVE :
 					props.dwTypeSpecificFlags	|= AM_VIDEO_FLAG_WEAVE;
-					m_nFrameType				= FF_FIELD_TYPE::PICT_FRAME;
+					m_nFrameType				= PICT_FRAME;
 					break;
-				case MPC_DEINTERLACING_FLAGS::TOPFIELD :
+				case TOPFIELD :
 					props.dwTypeSpecificFlags	|= AM_VIDEO_FLAG_FIELD1FIRST;
-					m_nFrameType				= FF_FIELD_TYPE::PICT_TOP_FIELD;
+					m_nFrameType				= PICT_TOP_FIELD;
 					break;
-				case MPC_DEINTERLACING_FLAGS::BOTTOMFIELD :
-					m_nFrameType = FF_FIELD_TYPE::PICT_BOTTOM_FIELD;
+				case BOTTOMFIELD :
+					m_nFrameType = PICT_BOTTOM_FIELD;
 			}
 
 			switch (m_pFrame->pict_type) {

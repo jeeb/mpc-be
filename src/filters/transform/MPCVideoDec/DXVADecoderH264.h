@@ -51,7 +51,7 @@ private:
 	UINT					m_nMaxSlices;
 	int						m_nNALLength;
 	bool					m_bUseLongSlice;
-	int						m_nOutPOC, m_nPrevOutPOC;
+	int						m_nOutPOC;
 	REFERENCE_TIME			m_rtOutStart;
 
 	UINT					m_nSlices;
