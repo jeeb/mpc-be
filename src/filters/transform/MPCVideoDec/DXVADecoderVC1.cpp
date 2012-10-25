@@ -23,8 +23,8 @@
 #include "stdafx.h"
 #include "DXVADecoderVC1.h"
 #include "MPCVideoDecFilter.h"
-#include <ffmpeg/libavcodec/avcodec.h>
 #include "FfmpegContext.h"
+#include <ffmpeg/libavcodec/avcodec.h>
 
 #if 0
 	#define TRACE_VC1 TRACE

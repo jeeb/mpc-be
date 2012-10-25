@@ -47,7 +47,7 @@ extern "C" {
 
 #include <vector>
 
-#include "ffmpeg/libavcodec/avcodec.h"
+#include <ffmpeg/libavcodec/avcodec.h>
 
 // options names
 #define OPT_REGKEY_MpaDec   _T("Software\\MPC-BE Filters\\MPEG Audio Decoder")

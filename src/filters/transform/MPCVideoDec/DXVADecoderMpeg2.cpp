@@ -24,7 +24,12 @@
 #include "DXVADecoderMpeg2.h"
 #include "MPCVideoDecFilter.h"
 #include "FfmpegContext.h"
+
+#pragma warning(disable: 4005)
+extern "C" {
 #include <ffmpeg/libavcodec/avcodec.h>
+}
+#pragma warning(default: 4005)
 
 #if 0
 	#define TRACE_MPEG2 TRACE

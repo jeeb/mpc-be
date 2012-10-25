@@ -26,8 +26,8 @@
 #include "MPCVideoDecFilter.h"
 #include "VideoDecDXVAAllocator.h"
 #include "../../../DSUtil/PODtypes.h"
-#include <ffmpeg/libavcodec/avcodec.h>
 #include "FfmpegContext.h"
+#include <ffmpeg/libavcodec/avcodec.h>
 
 #if 0
 	#define TRACE_H264 TRACE

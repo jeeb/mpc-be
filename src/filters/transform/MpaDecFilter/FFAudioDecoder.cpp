@@ -24,13 +24,12 @@
 #include "FFAudioDecoder.h"
 
 #pragma warning(disable: 4005 4244)
-#include "ffmpeg/libavcodec/avcodec.h"
-#include "ffmpeg/libavutil/intreadwrite.h"
 extern "C" {
-#include "ffmpeg/libavutil/opt.h"
+#include <ffmpeg/libavcodec/avcodec.h>
+#include <ffmpeg/libavutil/intreadwrite.h>
+#include <ffmpeg/libavutil/opt.h>
 }
 #pragma warning(default: 4005 4244)
-
 
 #include "moreuuids.h"
 #include "../../../DSUtil/DSUtil.h"

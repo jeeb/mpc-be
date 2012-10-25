@@ -26,7 +26,6 @@
 #include <MMReg.h>
 #include "../../../DSUtil/PODtypes.h"
 #include "../../../DSUtil/ff_log.h"
-#include <ffmpeg/libavcodec/avcodec.h>
 
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
@@ -37,14 +36,14 @@
 
 #include "ffImgfmt.h"
 #include "FfmpegContext.h"
-extern "C"
-{
-#include <ffmpeg/libswscale/swscale.h>
 
-// === New swscaler options
+#pragma warning(disable: 4005)
+extern "C" {
+#include <ffmpeg/libavcodec/avcodec.h>
 #include <ffmpeg/libavutil/opt.h>
-//
+#include <ffmpeg/libswscale/swscale.h>
 }
+#pragma warning(default: 4005)
 
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/MediaTypes.h"

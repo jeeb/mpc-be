@@ -19,9 +19,7 @@
 * libavutil/attributes.h
 * libavutil/common.h
 * libavutil/internal.h
-* libavutil/log.h
 * libavutil/mathematics.h
-* libavutil/mem.h
 
 * libavresample/x86/audio_mix_init.c
 
