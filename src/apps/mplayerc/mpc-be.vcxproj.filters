@@ -372,6 +372,9 @@
     <ClCompile Include="PlayerFlyBar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\ExtLib\stb_image\stb_image.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSettings.h">

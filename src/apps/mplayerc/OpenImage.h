@@ -23,12 +23,13 @@
 #pragma once
 
 #include <libwebp/webp/decode.h>
+#include <stb_image/stb_image.h>
 
 using namespace Gdiplus;
 
-static BYTE* ConvertRGBToBMPBuffer(BYTE* Buffer, int width, int height, long* newsize)
+static BYTE* ConvertRGBToBMPBuffer(BYTE* Buffer, int width, int height, int bpp, long* newsize)
 {
-	int padding = 0, scanlinebytes = width * 3;
+	int padding = 0, scanlinebytes = width * bpp;
 	while ((scanlinebytes + padding) % 4 != 0) {
 		padding++;
 	}
@@ -38,8 +39,8 @@ static BYTE* ConvertRGBToBMPBuffer(BYTE* Buffer, int width, int height, long* ne
 	memset(newbuf, 0, *newsize);
 	long bufpos = 0, newpos = 0;
 	for (int y = 0; y < height; y++) {
-		for (int x = 0; x < 3 * width; x += 3) {
-			bufpos = y * 3 * width + x;
+		for (int x = 0; x < scanlinebytes; x += bpp) {
+			bufpos = y * scanlinebytes + x;
 			newpos = (height - y - 1) * psw + x;
 			newbuf[newpos] = Buffer[bufpos + 2];
 			newbuf[newpos + 1] = Buffer[bufpos + 1];
@@ -63,7 +64,8 @@ static bool OpenImageCheck(CString fn)
 		|| wcsstr(tmp_fn, L".emf")
 		|| wcsstr(tmp_fn, L".ico")
 		|| wcsstr(tmp_fn, L".webp")
-		|| wcsstr(tmp_fn, L".webpll")) {
+		|| wcsstr(tmp_fn, L".webpll")
+		|| wcsstr(tmp_fn, L".psd")) {
 		return 1;
 	}
 
@@ -143,13 +145,26 @@ static HBITMAP OpenImage(CString fn)
 			int width = out_buf->width, height = out_buf->height, bit = (out_buf->colorspace == MODE_RGBA ? 32 : 24);
 			uint8_t *rgb = out_buf->u.RGBA.rgba;
 			size_t slen;
-			BYTE *pBits, *bmp = ConvertRGBToBMPBuffer((BYTE*)rgb, width, height, (long*)&slen);
+			BYTE *pBits, *bmp = ConvertRGBToBMPBuffer((BYTE*)rgb, width, height, 3, (long*)&slen);
 
 			BITMAPINFO bi = {{sizeof(BITMAPINFOHEADER), width, height, 1, bit, BI_RGB, 0, 0, 0, 0, 0}};
 			hB = CreateDIBSection(0, &bi, DIB_RGB_COLORS, (void**)&pBits, 0, 0);
 			memcpy(pBits, bmp, slen);
 
 			WebPFreeDecBuffer(out_buf);
+
+		} else if (wcsstr(tmp_fn, L".psd")) {
+
+			int width, height, n, bpp = 4;
+			BYTE *lpBits = (BYTE*)stbi_load_from_memory((const stbi_uc*)data, fs, &width, &height, &n, bpp);
+
+			size_t slen;
+			BYTE *pBits, *bmp = ConvertRGBToBMPBuffer(lpBits, width, height, bpp, (long*)&slen);
+			int bit = bpp * 8;
+
+			BITMAPINFO bi = {{sizeof(BITMAPINFOHEADER), width, height, 1, bit, BI_RGB, 0, 0, 0, 0, 0}};
+			hB = CreateDIBSection(0, &bi, DIB_RGB_COLORS, (void**)&pBits, 0, 0);
+			memcpy(pBits, bmp, slen);
 
 		} else {
 

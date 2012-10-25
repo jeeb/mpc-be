@@ -285,6 +285,7 @@
     <ClCompile Include="WebServer.cpp" />
     <ClCompile Include="WebServerSocket.cpp" />
     <ClCompile Include="WinHotkeyCtrl.cpp" />
+    <ClCompile Include="..\..\ExtLib\stb_image\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ExtLib\mfc\afxmaskededit.h" />
