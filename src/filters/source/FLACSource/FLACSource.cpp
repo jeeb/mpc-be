@@ -406,12 +406,38 @@ static bool ParseVorbisComment(const LPCSTR field_name, const FLAC__StreamMetada
 	return true;
 }
 
+/*
+ * Calculate an estimate for the maximum frame size based on verbatim mode.
+ * get from ffmpeg
+ */
+static int CalculateFLACFrameSize(UINT max_blocksize, UINT channels, UINT bits_per_sample)
+{
+	int count;
+
+	count = 16;										/* frame header */
+	count += channels * ((7+bits_per_sample+7)/8);	/* subframe headers */
+	if (channels == 2) {
+		/* for stereo, need to account for using decorrelation */
+		count += (( 2*bits_per_sample+1) * max_blocksize + 7) / 8;
+	} else {
+		count += ( channels*bits_per_sample * max_blocksize + 7) / 8;
+	}
+	count += 2;										/* frame footer */
+
+	return count;
+}
+
 void CFLACStream::UpdateFromMetadata (void* pBuffer)
 {
 	const FLAC__StreamMetadata* pMetadata = (const FLAC__StreamMetadata*) pBuffer;
 
 	if (pMetadata->type == FLAC__METADATA_TYPE_STREAMINFO) {
 		m_nMaxFrameSize			= pMetadata->data.stream_info.max_framesize;
+		if (!m_nMaxFrameSize) {
+			m_nMaxFrameSize		= CalculateFLACFrameSize(pMetadata->data.stream_info.max_blocksize,
+														 pMetadata->data.stream_info.channels,
+														 pMetadata->data.stream_info.bits_per_sample);
+		}
 		m_nSamplesPerSec		= pMetadata->data.stream_info.sample_rate;
 		m_nChannels				= pMetadata->data.stream_info.channels;
 		m_wBitsPerSample		= pMetadata->data.stream_info.bits_per_sample;
@@ -512,6 +538,7 @@ FLAC__StreamDecoderWriteStatus StreamDecoderWrite(const FLAC__StreamDecoder *dec
 
 void StreamDecoderError(const FLAC__StreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data)
 {
+	TRACE(_T("FLAC::StreamDecoderError() : %s\n"), FLAC__StreamDecoderErrorStatusString[status]);
 }
 
 void StreamDecoderMetadata(const FLAC__StreamDecoder *decoder, const FLAC__StreamMetadata *metadata, void *client_data)
