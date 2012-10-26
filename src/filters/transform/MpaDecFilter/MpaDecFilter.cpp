@@ -33,6 +33,7 @@
 
 #ifdef REGISTER_FILTER
 	#include <InitGuid.h>
+	void* __imp_toupper   = toupper;
 	void* __imp_time64 = _time64;
 #endif
 
