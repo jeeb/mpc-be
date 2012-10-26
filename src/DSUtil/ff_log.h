@@ -25,7 +25,7 @@
 
 #pragma warning(disable: 4005)
 extern "C" {
-#include <ffmpeg/libavcodec/avcodec.h>
+	#include <ffmpeg/libavcodec/avcodec.h>
 }
 #pragma warning(default: 4005)
 

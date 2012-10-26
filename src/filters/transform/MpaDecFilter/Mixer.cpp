@@ -25,9 +25,9 @@
 
 #pragma warning(disable: 4005)
 extern "C" {
-#include <ffmpeg/libavutil/samplefmt.h>
-#include <ffmpeg/libavutil/opt.h>
-#include <ffmpeg/libavresample/avresample.h>
+	#include <ffmpeg/libavutil/samplefmt.h>
+	#include <ffmpeg/libavutil/opt.h>
+	#include <ffmpeg/libavresample/avresample.h>
 }
 #pragma warning(default: 4005)
 

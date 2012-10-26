@@ -32,19 +32,11 @@
 #include "../../../DSUtil/AudioParser.h"
 
 #ifdef REGISTER_FILTER
-void* __imp_toupper   = toupper;
-void* __imp_time64    = _time64;
-void* __imp_vscprintf = _vscprintf;
+	#include <InitGuid.h>
+	void* __imp_time64 = _time64;
+#endif
 
-#include <InitGuid.h>
-
-extern "C" {
-	void __mingw_raise_matherr(int typ, const char* name, double a1, double a2, double rslt) {}
-}
-#endif // REGISTER_FILTER
-
-#include "moreuuids.h"
-
+#include <moreuuids.h>
 #include <vector>
 
 #include <ffmpeg/libavcodec/avcodec.h>

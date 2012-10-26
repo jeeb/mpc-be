@@ -46,16 +46,12 @@ extern "C" {
 	#include <ffmpeg/libavcodec/vc1.h>
 	#include <ffmpeg/libavcodec/mpeg12.h>
 
-	int av_vc1_decode_frame(AVCodecContext *avctx, uint8_t *buf, int buf_size, int *nFrameSize);
-
 	// Hack to use MinGW64 from 2.x branch
 	void __mingw_raise_matherr(int typ, const char *name, double a1, double a2, double rslt) {}
 }
 
-#if defined(REGISTER_FILTER)
-void *__imp_toupper = toupper;
-void *__imp_time64 = _time64;
-void *__imp_vscprintf = _vscprintf;
+#ifdef REGISTER_FILTER
+	void *__imp_time64 = _time64;
 #endif
 
 #define CHECK_AVC_L52_SIZE(w, h) ((w) <= 4096 && (h) <= 4096 && (w) * (h) <= 36864 * 16 * 16)
@@ -325,7 +321,7 @@ HRESULT FFH264BuildPicParams (DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_
 
 		*nSliceType = h->slice_type;
 
-		if (cur_sps->mb_width==0 || cur_sps->mb_height==0) {
+		if (cur_sps->mb_width == 0 || cur_sps->mb_height == 0) {
 			return VFW_E_INVALID_FILE_FORMAT;
 		}
 

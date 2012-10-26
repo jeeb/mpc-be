@@ -28,8 +28,9 @@
 #include "../../../DSUtil/ff_log.h"
 
 #ifdef REGISTER_FILTER
-#include <InitGuid.h>
+	#include <InitGuid.h>
 #endif
+
 #include "MPCVideoDecFilter.h"
 #include "VideoDecOutputPin.h"
 #include "CpuId.h"
@@ -39,9 +40,9 @@
 
 #pragma warning(disable: 4005)
 extern "C" {
-#include <ffmpeg/libavcodec/avcodec.h>
-#include <ffmpeg/libavutil/opt.h>
-#include <ffmpeg/libswscale/swscale.h>
+	#include <ffmpeg/libavcodec/avcodec.h>
+	#include <ffmpeg/libavutil/opt.h>
+	#include <ffmpeg/libswscale/swscale.h>
 }
 #pragma warning(default: 4005)
 
