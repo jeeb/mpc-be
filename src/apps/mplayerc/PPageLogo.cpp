@@ -172,7 +172,7 @@ void CPPageLogo::OnDeltaposSpin1(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CPPageLogo::OnBnClickedButton2()
 {
-	CString formats = _T("*.bmp;*.jpg;*.jpeg;*.png;*.gif;*.tif;*.tiff;*.emf;*.ico;*.webp;*.webpll");
+	CString formats = _T("*.bmp;*.jpg;*.jpeg;*.png;*.gif;*.tif;*.tiff;*.emf;*.ico;*.webp;*.webpll;*.psd;*.tga");
 
 	CFileDialog dlg(TRUE, NULL, m_logofn,
 					OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_NOCHANGEDIR,

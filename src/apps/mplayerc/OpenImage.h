@@ -65,7 +65,8 @@ static bool OpenImageCheck(CString fn)
 		|| wcsstr(tmp_fn, L".ico")
 		|| wcsstr(tmp_fn, L".webp")
 		|| wcsstr(tmp_fn, L".webpll")
-		|| wcsstr(tmp_fn, L".psd")) {
+		|| wcsstr(tmp_fn, L".psd")
+		|| wcsstr(tmp_fn, L".tga")) {
 		return 1;
 	}
 
@@ -153,7 +154,7 @@ static HBITMAP OpenImage(CString fn)
 
 			WebPFreeDecBuffer(out_buf);
 
-		} else if (wcsstr(tmp_fn, L".psd")) {
+		} else if (wcsstr(tmp_fn, L".psd") || wcsstr(tmp_fn, L".tga")) {
 
 			int width, height, n, bpp = 4;
 			BYTE *lpBits = (BYTE*)stbi_load_from_memory((const stbi_uc*)data, fs, &width, &height, &n, bpp);
