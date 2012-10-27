@@ -113,6 +113,11 @@ bool CVobSubImage::Decode(BYTE* lpData, int packetsize, int datasize,
 	int end0 = nOffset[1];
 	int end1 = datasize;
 
+	if (nOffset[0] > nOffset[1]) {
+		end1 = nOffset[0];
+		end0 = datasize;
+	}
+
 	while ((nPlane == 0 && nOffset[0] < end0) || (nPlane == 1 && nOffset[1] < end1)) {
 		DWORD code;
 
@@ -218,7 +223,9 @@ void CVobSubImage::GetPacketInfo(BYTE* lpData, int packetsize, int datasize)
 					i += 2;
 					break;
 				case 0x04:
-					tr = (lpData[i] << 8) | lpData[i+1];
+					if (lpData[i] || lpData[i+1]) {
+						tr = (lpData[i] << 8) | lpData[i+1];
+					}
 					i += 2;
 					//tr &= 0x00f0;
 					break;

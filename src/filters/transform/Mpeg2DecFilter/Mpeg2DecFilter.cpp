@@ -2053,10 +2053,12 @@ bool CSubpicInputPin::dvdspu::Parse()
 					i += 2;
 					break;
 				case 0x04:
-					m_sphli.ColCon.emph2con = p[i]>>4;
-					m_sphli.ColCon.emph1con = p[i]&0xf;
-					m_sphli.ColCon.patcon = p[i+1]>>4;
-					m_sphli.ColCon.backcon = p[i+1]&0xf;
+					if (p[i] || p[i+1]) {
+						m_sphli.ColCon.emph2con = p[i]>>4;
+						m_sphli.ColCon.emph1con = p[i]&0xf;
+						m_sphli.ColCon.patcon = p[i+1]>>4;
+						m_sphli.ColCon.backcon = p[i+1]&0xf;
+					}
 					i += 2;
 					break;
 				case 0x05:
@@ -2129,6 +2131,10 @@ void CSubpicInputPin::dvdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h
 	int fAligned = 1;
 
 	DWORD end[2] = {offset[1], (p[2]<<8)|p[3]};
+	if (offset[0] > offset[1]) {
+		end[0] = (p[2]<<8)|p[3];
+		end[1] = offset[0];
+	}
 
 	while ((nField == 0 && offset[0] < end[0]) || (nField == 1 && offset[1] < end[1])) {
 		DWORD code;
