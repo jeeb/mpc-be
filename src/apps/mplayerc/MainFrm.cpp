@@ -24,8 +24,6 @@
 #include "stdafx.h"
 #include "mplayerc.h"
 #include "MainFrm.h"
-#include <math.h>
-#include <afxpriv.h>
 #include <atlconv.h>
 #include <atlrx.h>
 #include <atlsync.h>
@@ -11584,20 +11582,18 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 		m_strTitleAlt = _T("");
 		HRESULT hr = S_OK;
-
 		bool extimage = false;
-		hr = pGB->RenderFile(PlayerYouTube(fn, &m_strTitleAlt), NULL);
-		if (FAILED(hr)) {
-			if (OpenImageCheck(fn)) {
-				hr				= S_OK;
-				HBITMAP bitmap	= OpenImage(fn);
-				if (!bitmap) {
-					hr = VFW_E_CANNOT_RENDER;
-				} else {
-					DeleteObject(bitmap);
-					extimage = true;
-				}
+
+		if (OpenImageCheck(fn)) {
+			HBITMAP bitmap = OpenImage(fn);
+			if (bitmap) {
+				DeleteObject(bitmap);
+				extimage = true;
 			}
+		}
+
+		if (!extimage) {
+			hr = pGB->RenderFile(PlayerYouTube(fn, &m_strTitleAlt), NULL);
 		}
 
 		if (!extimage && FAILED(hr)) {
@@ -17853,7 +17849,7 @@ bool CMainFrame::OpenBD(CString Path)
 void CMainFrame::SetStatusMessage(CString m_msg)
 {
 	if (m_OldMessage != m_msg) {
-		TRACE(_T("Change msg = %ws\n"), m_msg);
+		//TRACE(_T("Change msg = %ws\n"), m_msg);
 		m_wndStatusBar.SetStatusMessage(m_msg);
 	}
 	m_OldMessage = m_msg;

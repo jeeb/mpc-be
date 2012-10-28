@@ -22,8 +22,6 @@
  */
 
 #include "stdafx.h"
-#include <math.h>
-#include <afxinet.h>
 #include <atlrx.h>
 #include <atlutil.h>
 #include "mplayerc.h"
@@ -63,7 +61,6 @@ BOOL CPlayerPlaylistBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 		CRect(0,0,100,100), this, IDC_PLAYLIST);
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle()|LVS_EX_FULLROWSELECT|LVS_EX_DOUBLEBUFFER);
-	m_list.SetBkColor(0x0037322d);
 	m_list.InsertColumn(COL_NAME, _T("Name"), LVCFMT_LEFT, 380);
 
 	CDC* pDC = m_list.GetDC();
@@ -845,7 +842,7 @@ BEGIN_MESSAGE_MAP(CPlayerPlaylistBar, CSizingControlBarG)
 	ON_WM_SIZE()
 	ON_NOTIFY(LVN_KEYDOWN, IDC_PLAYLIST, OnLvnKeyDown)
 	ON_NOTIFY(NM_DBLCLK, IDC_PLAYLIST, OnNMDblclkList)
-	//ON_NOTIFY(NM_CUSTOMDRAW, IDC_PLAYLIST, OnCustomdrawList)
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_PLAYLIST, OnCustomdrawList)
 	ON_WM_DRAWITEM()
 	ON_COMMAND_EX(ID_PLAY_PLAY, OnPlayPlay)
 	ON_WM_DROPFILES()
@@ -857,7 +854,6 @@ BEGIN_MESSAGE_MAP(CPlayerPlaylistBar, CSizingControlBarG)
 	ON_WM_CONTEXTMENU()
 	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_PLAYLIST, OnLvnEndlabeleditList)
 END_MESSAGE_MAP()
-
 
 // CPlayerPlaylistBar message handlers
 
@@ -943,54 +939,64 @@ void CPlayerPlaylistBar::OnNMDblclkList(NMHDR* pNMHDR, LRESULT* pResult)
 
 	*pResult = 0;
 }
-/*
+
 void CPlayerPlaylistBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NMLVCUSTOMDRAW* pLVCD = reinterpret_cast<NMLVCUSTOMDRAW*>(pNMHDR);
-
 	*pResult = CDRF_DODEFAULT;
+	AppSettings& s = AfxGetAppSettings();
 
-	if (CDDS_PREPAINT == pLVCD->nmcd.dwDrawStage)
-	{
-		*pResult = CDRF_NOTIFYPOSTPAINT|CDRF_NOTIFYITEMDRAW;
-	}
-	else if (CDDS_ITEMPREPAINT == pLVCD->nmcd.dwDrawStage)
-	{
+	int R, G, B;
+
+	if (CDDS_PREPAINT == pLVCD->nmcd.dwDrawStage) {
+
+		if (s.fDisableXPToolbars) {
+			ThemeRGB(30, 35, 40, R, G, B);
+		}
+
+		CRect r;
+		GetClientRect(&r);
+		FillRect(pLVCD->nmcd.hdc, &r, CBrush(s.fDisableXPToolbars ? RGB(R, G, B) : GetSysColor(COLOR_BTNFACE)));
+
+		*pResult = CDRF_NOTIFYPOSTPAINT | CDRF_NOTIFYITEMDRAW;
+
+	}/* else if (CDDS_ITEMPREPAINT == pLVCD->nmcd.dwDrawStage) {
+
 		pLVCD->nmcd.uItemState &= ~CDIS_SELECTED;
 		pLVCD->nmcd.uItemState &= ~CDIS_FOCUS;
 
-		pLVCD->clrText = (pLVCD->nmcd.dwItemSpec == m_playList.m_idx) ? 0x0000ff : CLR_DEFAULT;
-		pLVCD->clrTextBk = m_list.GetItemState(pLVCD->nmcd.dwItemSpec, LVIS_SELECTED) ? 0xf1dacc : CLR_DEFAULT;
+		if (!s.fDisableXPToolbars) {
+			pLVCD->clrTextBk = m_list.GetItemState(pLVCD->nmcd.dwItemSpec, LVIS_SELECTED) ? 0xf1dacc : CLR_DEFAULT;
+		}
 
 		*pResult = CDRF_NOTIFYPOSTPAINT;
-	}
-	else if (CDDS_ITEMPOSTPAINT == pLVCD->nmcd.dwDrawStage)
-	{
-		int nItem = static_cast<int>(pLVCD->nmcd.dwItemSpec);
 
-		if (m_list.GetItemState(pLVCD->nmcd.dwItemSpec, LVIS_SELECTED))
-		{
-			CRect r, r2;
+	} else if (CDDS_ITEMPOSTPAINT == pLVCD->nmcd.dwDrawStage) {
+
+		if (m_list.GetItemState(pLVCD->nmcd.dwItemSpec, LVIS_SELECTED)) {
+
+			int nItem = static_cast<int>(pLVCD->nmcd.dwItemSpec);
+			CRect r;
 			m_list.GetItemRect(nItem, &r, LVIR_BOUNDS);
-			m_list.GetItemRect(nItem, &r2, LVIR_LABEL);
-			r.left = r2.left;
-			FrameRect(pLVCD->nmcd.hdc, &r, CBrush(0xc56a31));
+
+			if (!s.fDisableXPToolbars) {
+				FrameRect(pLVCD->nmcd.hdc, &r, CBrush(0xc56a31));
+			}
 		}
 
 		*pResult = CDRF_SKIPDEFAULT;
-	}
-	else if (CDDS_POSTPAINT == pLVCD->nmcd.dwDrawStage)
-	{
-	}
+	}*/
 }
-*/
 
 void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 {
 	if (nIDCtl != IDC_PLAYLIST) {
 		return;
 	}
+
 	AppSettings& s = AfxGetAppSettings();
+
+	int R, G, B;
 
 	int nItem = lpDrawItemStruct->itemID;
 	CRect rcItem = lpDrawItemStruct->rcItem;
@@ -1001,19 +1007,24 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 	CDC* pDC = CDC::FromHandle(lpDrawItemStruct->hDC);
 
 	if (!!m_list.GetItemState(nItem, LVIS_SELECTED)) {
-		//FillRect(pDC->m_hDC, rcItem, CBrush(0xf1dacc));
-		//FrameRect(pDC->m_hDC, rcItem, CBrush(0xc56a31));
-		FillRect(pDC->m_hDC, rcItem, CBrush(s.fDisableXPToolbars ? 0x00a08264 : 0x00f1dacc));
-		FrameRect(pDC->m_hDC, rcItem, CBrush(s.fDisableXPToolbars ?  s.clrOutlineABGR : 0xc56a31));
-
+		if (s.fDisableXPToolbars) {
+			ThemeRGB(15, 20, 25, R, G, B);
+		}
+		FillRect(pDC->m_hDC, rcItem, CBrush(s.fDisableXPToolbars ? RGB(R, G, B) : 0x00f1dacc));
+		FrameRect(pDC->m_hDC, rcItem, CBrush(s.fDisableXPToolbars ? RGB(R, G, B) : 0xc56a31));
 	} else {
-		//FillRect(pDC->m_hDC, rcItem, CBrush(GetSysColor(COLOR_WINDOW)));
-		FillRect(pDC->m_hDC, rcItem, CBrush(s.fDisableXPToolbars ? 0x0037322d : GetSysColor(COLOR_WINDOW)));
-
+		if (s.fDisableXPToolbars) {
+			ThemeRGB(30, 35, 40, R, G, B);
+		}
+		FillRect(pDC->m_hDC, rcItem, CBrush(s.fDisableXPToolbars ? RGB(R, G, B) : GetSysColor(COLOR_BTNFACE)));
 	}
 
-	COLORREF textcolor = fSelected?0xff:0;
-	if (s.fDisableXPToolbars) textcolor = 0x00ffffff;
+	COLORREF textcolor = fSelected ? 0xff : 0;
+
+	if (s.fDisableXPToolbars) {
+		ThemeRGB(135, 140, 145, R, G, B);
+		textcolor = RGB(R, G, B);
+	}
 	if (pli.m_fInvalid) {
 		textcolor |= 0xA0A0A0;
 	}

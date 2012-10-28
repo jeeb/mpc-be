@@ -239,6 +239,8 @@ void CPPageInterface::OnThemeChange()
 	}
 
 	pFrame->Invalidate();
+
+	((CMainFrame*)AfxGetMainWnd())->m_wndPlaylistBar.Invalidate();
 }
 
 BEGIN_MESSAGE_MAP(CPPageInterface, CPPageBase)

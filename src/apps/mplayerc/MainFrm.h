@@ -595,7 +595,6 @@ protected:  // control bar embedded members
 	CList<CControlBar*> m_bars;
 
 	CPlayerSubresyncBar m_wndSubresyncBar;
-	CPlayerPlaylistBar m_wndPlaylistBar;
 	CPlayerCaptureBar m_wndCaptureBar;
 	CPlayerNavigationBar m_wndNavigationBar;
 	CPlayerShaderEditorBar m_wndShaderEditorBar;
@@ -979,6 +978,8 @@ public:
 	// Main Window
 	CWnd*			m_pVideoWnd;
 	CPlayerToolBar	m_wndToolBar;
+	CPlayerListCtrl	m_wndListCtrl;
+	CPlayerPlaylistBar	m_wndPlaylistBar;
 	CFlyBar			m_wndFlyBar;
 
 	void CreateFlyBar();

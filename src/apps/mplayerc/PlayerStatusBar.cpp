@@ -26,7 +26,9 @@
 #include "PlayerStatusBar.h"
 #include "MainFrm.h"
 #include "../../DSUtil/DSUtil.h"
-#include "mpciconlib/mpciconlib.h"
+#include <afxinet.h>
+#include "OpenImage.h"
+//#include "mpciconlib/mpciconlib.h"
 
 /*
 static HICON get_hicon(CString path, CString fn)
@@ -238,7 +240,6 @@ void CPlayerStatusBar::SetStatusTypeIcon(HICON hIcon)
 void CPlayerStatusBar::SetStatusMessage(CString str)
 {
 	str.Trim();
-
 	m_status.SetWindowText(str);
 
 	Relayout();
@@ -271,8 +272,12 @@ void CPlayerStatusBar::SetStatusTimer(CString str)
 		return;
 	}
 
-	str.Trim();
-	m_time.SetWindowText(str);
+	if (OpenImageCheck(((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strFn)) {
+		m_time.SetWindowText(_T(""));
+	} else {
+		str.Trim();
+		m_time.SetWindowText(str);
+	}
 
 	Relayout();
 
@@ -281,7 +286,7 @@ void CPlayerStatusBar::SetStatusTimer(CString str)
 
 void CPlayerStatusBar::SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur, bool fHighPrecision, const GUID* pTimeFormat)
 {
-	ASSERT(pTimeFormat);
+	//ASSERT(pTimeFormat);
 	//ASSERT(rtNow <= rtDur);
 
 	CString str;
