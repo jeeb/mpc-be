@@ -842,6 +842,10 @@ void ff_er_add_slice(MpegEncContext *s, int startx, int starty,
 
     if (s->avctx->hwaccel)
         return;
+    // ==> Start patch MPC
+    if (s->avctx->using_dxva)
+        return;
+    // <== End patch MPC
 
     if (start_i > end_i || start_xy > end_xy) {
         av_log(s->avctx, AV_LOG_ERROR,
@@ -912,6 +916,9 @@ void ff_er_frame_end(MpegEncContext *s)
     /* We do not support ER of field pictures yet,
      * though it should not crash if enabled. */
     if (!s->err_recognition || s->error_count == 0 || s->avctx->lowres ||
+        // ==> Start patch MPC
+        s->avctx->using_dxva                                           ||
+        // <== End patch MPC
         s->avctx->hwaccel                                              ||
         s->avctx->codec->capabilities&CODEC_CAP_HWACCEL_VDPAU          ||
         s->picture_structure != PICT_FRAME                             ||

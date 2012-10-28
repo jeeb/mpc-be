@@ -41,7 +41,6 @@
 #pragma warning(disable: 4005)
 extern "C" {
 	#include <ffmpeg/libavcodec/avcodec.h>
-	#include <ffmpeg/libavutil/opt.h>
 	#include <ffmpeg/libswscale/swscale.h>
 }
 #pragma warning(default: 4005)

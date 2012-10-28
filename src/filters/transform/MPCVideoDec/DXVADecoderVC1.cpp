@@ -260,8 +260,7 @@ void CDXVADecoderVC1::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSiz
 				pDXVABuffer[0]=pDXVABuffer[1]=0;
 				pDXVABuffer[2]=1;
 				pDXVABuffer[3]=0x0D;
-				pDXVABuffer	+=4;
-				memcpy_sse (pDXVABuffer, (BYTE*)pBuffer, nSize);
+				memcpy_sse (pDXVABuffer + 4, (BYTE*)pBuffer, nSize);
 				nSize  +=4;
 			}
 		} else {

@@ -1517,6 +1517,9 @@ void ff_MPV_frame_end(MpegEncContext *s)
     if (CONFIG_MPEG_XVMC_DECODER && s->avctx->xvmc_acceleration) {
         ff_xvmc_field_end(s);
    } else if((s->error_count || s->encoding || !(s->avctx->codec->capabilities&CODEC_CAP_DRAW_HORIZ_BAND)) &&
+              // ==> Start patch MPC
+              !s->avctx->using_dxva &&
+              // <== End patch MPC
               !s->avctx->hwaccel &&
               !(s->avctx->codec->capabilities & CODEC_CAP_HWACCEL_VDPAU) &&
               s->unrestricted_mv &&
@@ -1676,6 +1679,9 @@ static void draw_arrow(uint8_t *buf, int sx, int sy, int ex,
 void ff_print_debug_info(MpegEncContext *s, AVFrame *pict)
 {
     if (   s->avctx->hwaccel || !pict || !pict->mb_type
+        // ==> Start patch MPC
+        || s->avctx->using_dxva 
+        // <== End patch MPC
         || (s->avctx->codec->capabilities&CODEC_CAP_HWACCEL_VDPAU))
         return;
 
@@ -2711,6 +2717,9 @@ void ff_draw_horiz_band(MpegEncContext *s, int y, int h){
     }
 
     if (!s->avctx->hwaccel
+       // ==> Start patch MPC
+       && !s->avctx->using_dxva 
+       // <== End patch MPC
        && !(s->avctx->codec->capabilities&CODEC_CAP_HWACCEL_VDPAU)
        && s->unrestricted_mv
        && s->current_picture.f.reference
