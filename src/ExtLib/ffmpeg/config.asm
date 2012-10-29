@@ -133,11 +133,14 @@
 %define HAVE_ARPA_INET_H 0
 %define HAVE_ASM_MOD_Y 0
 %define HAVE_ASM_TYPES_H 0
+%define HAVE_ATANF 1
+%define HAVE_ATAN2F 1
 %define HAVE_ATTRIBUTE_MAY_ALIAS 1
 %define HAVE_ATTRIBUTE_PACKED 1
 %define HAVE_CBRTF 1
 %define HAVE_CLOCK_GETTIME 0
 %define HAVE_CLOSESOCKET 0
+%define HAVE_COSF 1
 %define HAVE_CPUNOP 1
 %define HAVE_DCBZL 0
 %define HAVE_DEV_BKTR_IOCTL_BT848_H 0
@@ -174,6 +177,7 @@
 %define HAVE_JACK_PORT_GET_LATENCY_RANGE 0
 %define HAVE_KBHIT 1
 %define HAVE_LDBRX 0
+%define HAVE_LDEXPF 1
 %define HAVE_LIBDC1394_1 0
 %define HAVE_LIBDC1394_2 0
 %define HAVE_LLRINT 1
@@ -183,6 +187,7 @@
 %define HAVE_LOCALTIME_R 0
 %define HAVE_LOG2 1
 %define HAVE_LOG2F 1
+%define HAVE_LOG10F 1
 %define HAVE_LOONGSON 0
 %define HAVE_LRINT 1
 %define HAVE_LRINTF 1
@@ -201,6 +206,7 @@
 %define HAVE_POD2MAN 1
 %define HAVE_POLL_H 0
 %define HAVE_POSIX_MEMALIGN 0
+%define HAVE_POWF 1
 %define HAVE_PTHREAD_CANCEL 0
 %define HAVE_RDTSC 1
 %define HAVE_RINT 1
@@ -211,6 +217,7 @@
 %define HAVE_SDL_VIDEO_SIZE 0
 %define HAVE_SETMODE 1
 %define HAVE_SETRLIMIT 0
+%define HAVE_SINF 1
 %define HAVE_SLEEP 1
 %define HAVE_SNDIO_H 0
 %define HAVE_SOCKLEN_T 0
