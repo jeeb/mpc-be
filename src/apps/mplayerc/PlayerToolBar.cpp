@@ -667,18 +667,20 @@ BOOL CPlayerToolBar::OnVolumeDown(UINT nID)
 
 void CPlayerToolBar::OnNcPaint()
 {
-	CRect wr, cr;
-	CWindowDC dc(this);
+	CRect	wr, cr;
+	CDC*	pDC = CDC::FromHandle(::GetWindowDC(m_hWnd));
 	GetClientRect(&cr);
 	ClientToScreen(&cr);
 	GetWindowRect(&wr);
 	cr.OffsetRect(-wr.left, -wr.top);
 	wr.OffsetRect(-wr.left, -wr.top);
-	dc.ExcludeClipRect(&cr);
+	pDC->ExcludeClipRect(&cr);
 
 	if (!AfxGetAppSettings().fDisableXPToolbars) {
-		dc.FillSolidRect(wr, GetSysColor(COLOR_BTNFACE));
+		pDC->FillSolidRect(wr, GetSysColor(COLOR_BTNFACE));
 	}
+
+	::ReleaseDC(m_hWnd, pDC->m_hDC);
 }
 
 void CPlayerToolBar::OnMouseMove(UINT nFlags, CPoint point)

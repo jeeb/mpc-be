@@ -93,15 +93,19 @@ void CVMROSD::OnSize(UINT nType, int cx, int cy)
 void CVMROSD::UpdateBitmap()
 {
 	CAutoLock Lock(&m_Lock);
-	CRect				rc;
-	CWindowDC			dc (m_pWnd);
+
+	CRect	rc;
+	CDC*	pDC = CDC::FromHandle(::GetWindowDC(m_pWnd->m_hWnd));
 
 	CalcRect();
 
-	m_MemDC.DeleteDC();
+	if (m_MemDC) {
+		m_MemDC.DeleteDC();
+	}
+
 	memset(&m_BitmapInfo, 0, sizeof(m_BitmapInfo));
 
-	if (m_MemDC.CreateCompatibleDC (&dc)) {
+	if (m_MemDC.CreateCompatibleDC (pDC)) {
 		BITMAPINFO	bmi = {0};
 		HBITMAP		hbmpRender;
 
@@ -149,6 +153,8 @@ void CVMROSD::UpdateBitmap()
 
 		DeleteObject(hbmpRender);
 	}
+
+	::ReleaseDC(m_pWnd->m_hWnd, pDC->m_hDC);
 }
 
 void CVMROSD::Start (CWnd* pWnd, IVMRMixerBitmap9* pVMB)
