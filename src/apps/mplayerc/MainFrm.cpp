@@ -4580,7 +4580,7 @@ void CMainFrame::OnFileOpenQuick()
 	m_wndPlaylistBar.Open(fns, fMultipleFiles);
 
 	if (m_wndPlaylistBar.GetCount() == 1 && m_wndPlaylistBar.IsWindowVisible() && !m_wndPlaylistBar.IsFloating()) {
-		ShowControlBar(&m_wndPlaylistBar, FALSE, TRUE);
+		//ShowControlBar(&m_wndPlaylistBar, FALSE, TRUE);
 	}
 
 	OpenCurPlaylistItem();
@@ -4622,7 +4622,7 @@ void CMainFrame::OnFileOpenmedia()
 	m_wndPlaylistBar.Open(dlg.m_fns, dlg.m_fMultipleFiles);
 
 	if (m_wndPlaylistBar.GetCount() == 1 && m_wndPlaylistBar.IsWindowVisible() && !m_wndPlaylistBar.IsFloating()) {
-		ShowControlBar(&m_wndPlaylistBar, FALSE, TRUE);
+		//ShowControlBar(&m_wndPlaylistBar, FALSE, TRUE);
 	}
 
 	OpenCurPlaylistItem();
