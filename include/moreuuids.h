@@ -1374,8 +1374,11 @@ DEFINE_GUID(MEDIASUBTYPE_WMSP1,
 // Additionnal DXVA GUIDs
 
 // Intel ClearVideo VC1 bitstream decoder
-DEFINE_GUID(DXVA_Intel_VC1_ClearVideo, 
+DEFINE_GUID(DXVA_Intel_VC1_ClearVideo,
 			0xBCC5DB6D, 0xA2B6,0x4AF0,0xAC,0xE4,0xAD,0xB1,0xF7,0x87,0xBC,0x89);
+
+DEFINE_GUID(DXVA_Intel_VC1_ClearVideo_2,
+			0xE07EC519, 0xE651,0x4CD6,0xAC,0x84,0x13,0x70,0xCC,0xEE,0xC8,0x51);
 
 // Intel ClearVideo H264 bitstream decoder
 DEFINE_GUID(DXVA_Intel_H264_ClearVideo,
