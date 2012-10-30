@@ -58,7 +58,9 @@ CFlyBar::~CFlyBar()
 
 void CFlyBar::Destroy()
 {
-	DeleteObject(hBmp);
+	if (hBmp) {
+		DeleteObject(hBmp);
+	}
 }
 
 IMPLEMENT_DYNAMIC(CFlyBar, CWnd)
@@ -75,7 +77,7 @@ END_MESSAGE_MAP()
 BOOL CFlyBar::PreTranslateMessage(MSG* pMsg)
 {
 	m_tooltip.RelayEvent(pMsg);
-	
+
 	switch (pMsg->message) {
 		case WM_LBUTTONDOWN :
 		case WM_LBUTTONDBLCLK :
@@ -86,8 +88,8 @@ BOOL CFlyBar::PreTranslateMessage(MSG* pMsg)
 		case WM_RBUTTONUP :
 		case WM_RBUTTONDBLCLK :
 
-		CMainFrame* pFrame	= (CMainFrame*)GetParentFrame();
-		pFrame->SetFocus();
+		(CMainFrame*)GetParentFrame()->SetFocus();
+
 		break;
 	}
 
@@ -119,10 +121,10 @@ int CFlyBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CWnd::OnCreate(lpCreateStruct) == -1) {
 		return -1;
 	}
-	
+
 	m_tooltip.Create(this, TTS_ALWAYSTIP);
 	EnableToolTips(true);
-	
+
 	m_tooltip.AddTool(this, _T(""));
 	m_tooltip.Activate(TRUE);
 
@@ -167,12 +169,9 @@ void CFlyBar::DrawBitmap(CDC *pDC, int x, int y, int z)
 
 void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 {
-
 	CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
 	pFrame->SetFocus();
-	
-	CRect rcBar;
-	GetWindowRect(rcBar);
+
 	WINDOWPLACEMENT wp;
 	pFrame->GetWindowPlacement(&wp);
 	CPoint p;
@@ -180,7 +179,6 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 
 	CalcButtonsRect();
 
-	bt_idx = -1;
 	if (r_ExitIcon.PtInRect(p)) {
 		ShowWindow(SW_HIDE);
 		pFrame->OnClose();
@@ -206,22 +204,23 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 		pFrame->ToggleFullscreen(true, true);
 		Invalidate();
 	} else if (r_LockIcon.PtInRect(p)) {
-		AfxGetAppSettings().fFlybarOnTop = !AfxGetAppSettings().fFlybarOnTop;
+		AppSettings& s = AfxGetAppSettings();
+		s.fFlybarOnTop = !s.fFlybarOnTop;
 	}
+
+	bt_idx = -1;
 }
 
 void CFlyBar::OnMouseMove(UINT nFlags, CPoint point)
 {
 	SetCursor(LoadCursor(NULL, IDC_HAND));
 
-	CRect rcBar;
-	GetWindowRect(&rcBar);
-
 	ClientToScreen(&point);
 
-	int ibt = bt_idx;
 	CString str, str2;
 	m_tooltip.GetText(str,this);
+
+	CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
 	
 	if (r_ExitIcon.PtInRect(point)) {
 		if (str != ResStr(IDS_AG_EXIT)) {
@@ -234,7 +233,6 @@ void CFlyBar::OnMouseMove(UINT nFlags, CPoint point)
 		}
 		bt_idx = 1;
 	} else if (r_RestoreIcon.PtInRect(point)) {
-		CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
 		WINDOWPLACEMENT wp;
 		pFrame->GetWindowPlacement(&wp);
 		wp.showCmd == SW_SHOWMAXIMIZED ? str2 = ResStr(IDS_TOOLTIP_RESTORE) : str2 = ResStr(IDS_TOOLTIP_MAXIMIZE);
@@ -253,15 +251,13 @@ void CFlyBar::OnMouseMove(UINT nFlags, CPoint point)
 		}
 		bt_idx = 4;
 	} else if (r_FSIcon.PtInRect(point)) {
-		CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
 		pFrame->m_fFullScreen ? str2 = ResStr(IDS_TOOLTIP_WINDOW) : str2 = ResStr(IDS_TOOLTIP_FULLSCREEN);
 		if (str != str2) {
 			m_tooltip.UpdateTipText(str2, this);
 		}
 		bt_idx = 5;
 	} else if (r_LockIcon.PtInRect(point)) {
-		AppSettings& s = AfxGetAppSettings();
-		s.fFlybarOnTop ? str2 = ResStr(IDS_TOOLTIP_UNLOCK) : str2 = ResStr(IDS_TOOLTIP_LOCK);
+		AfxGetAppSettings().fFlybarOnTop ? str2 = ResStr(IDS_TOOLTIP_UNLOCK) : str2 = ResStr(IDS_TOOLTIP_LOCK);
 		if (str != str2) {
 			m_tooltip.UpdateTipText(str2, this);
 		}
@@ -375,5 +371,6 @@ void CFlyBar::OnPaint()
 		bm.DeleteObject();
 		mdc.DeleteDC();
 	}
+
 	bt_idx = -1;
 }
