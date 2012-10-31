@@ -27,6 +27,8 @@
 #include <atlcoll.h>
 #include "CoordGeom.h"
 
+#include "../DSUtil/DSUtil.h"
+
 // flag for display only forced subtitles (PGS/VOBSUB)
 extern bool g_bForcedSubtitle;
 
@@ -126,6 +128,8 @@ public IUnknown {
 
 	STDMETHOD (Render) (SubPicDesc& spd, REFERENCE_TIME rt, double fps, RECT& bbox) PURE;
 	STDMETHOD (GetTextureSize) (POSITION pos, SIZE& MaxTextureSize, SIZE& VirtualSize, POINT& VirtualTopLeft) PURE;
+
+	STDMETHOD_(SUBTITLE_TYPE, GetType) (POSITION pos) PURE;
 };
 
 //

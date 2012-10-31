@@ -140,7 +140,14 @@ typedef enum FF_FIELD_TYPE{
 	PICT_NONE,
 	PICT_TOP_FIELD,
 	PICT_BOTTOM_FIELD,
-	PICT_FRAME	
+	PICT_FRAME
+};
+
+typedef enum SUBTITLE_TYPE{
+	ST_TEXT,
+	ST_VOBSUB,
+	ST_DVB,
+	ST_HDMV
 };
 
 class CPinInfo : public PIN_INFO

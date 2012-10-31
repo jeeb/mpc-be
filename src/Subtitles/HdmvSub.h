@@ -34,9 +34,7 @@ public:
 	CompositionObject*		Objects[MAX_WINDOWS];
 
 	HDMV_WindowDefinition() {
-		m_compositionNumber	= -1;
-		m_palette_id_ref	= -1;
-		m_nObjectNumber		= 0;
+		Reset();
 
 		for (int i = 0; i<MAX_WINDOWS; i++) {
 			Objects[i]	= NULL;
@@ -52,13 +50,6 @@ public:
 	}
 
 	void Reset() {
-		for (int i = 0; i<MAX_WINDOWS; i++) {
-			if (Objects[i] && !Objects[i]->GetRLEDataSize()) {
-				delete Objects[i];
-			}
-			Objects[i]	= NULL;
-		}
-
 		m_compositionNumber	= -1;
 		m_palette_id_ref	= -1;
 		m_nObjectNumber		= 0;
@@ -138,6 +129,7 @@ private :
 
 	CAtlList<CompositionObject*>	m_pObjects;
 	HDMV_WindowDefinition*			m_pCurrentWindow;
+	CompositionObject				m_ParsedObjects[MAX_WINDOWS];
 
 	HDMV_PALETTE*					m_pDefaultPalette;
 	int								m_nDefaultPaletteNbEntry;
@@ -155,6 +147,4 @@ private :
 	void				AllocSegment(int nSize);
 
 	CompositionObject*	FindObject(REFERENCE_TIME rt);
-
-	void				SetTimeStamp(REFERENCE_TIME rtTime, bool CheckRLE = false);
 };

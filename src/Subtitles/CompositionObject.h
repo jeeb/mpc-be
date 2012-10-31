@@ -65,22 +65,19 @@ public :
 	CompositionObject();
 	~CompositionObject();
 
-	void				SetRLEData(BYTE* pBuffer, int nSize, int nTotalSize);
-	void				AppendRLEData(BYTE* pBuffer, int nSize);
-	int					GetRLEDataSize()  {
-		return m_nRLEDataSize;
-	};
-	bool				IsRLEComplete() {
-		return m_nRLEPos >= m_nRLEDataSize;
-	};
+	void				SetRLEData(const BYTE* pBuffer, int nSize, int nTotalSize);
+	void				AppendRLEData(const BYTE* pBuffer, int nSize);
+	int					GetRLEDataSize() { return m_nRLEDataSize; };
+	const BYTE*			GetRLEData() { return m_pRLEData; };
+	bool				IsRLEComplete() { return m_nRLEPos >= m_nRLEDataSize; };
+
 	void				RenderHdmv(SubPicDesc& spd);
 	void				RenderDvb(SubPicDesc& spd, SHORT nX, SHORT nY);
 	void				WriteSeg (SubPicDesc& spd, SHORT nX, SHORT nY, SHORT nCount, SHORT nPaletteIndex);
+
 	void				SetPalette (int nNbEntry, HDMV_PALETTE* pPalette, bool bIsHD);
 	void				SetPalette (int nNbEntry, DWORD* dwColors);
-	bool				HavePalette() {
-		return m_nColorNumber>0;
-	};
+	bool				HavePalette() { return m_nColorNumber > 0; };
 
 private :
 	BYTE*		m_pRLEData;

@@ -39,8 +39,8 @@ CompositionObject::CompositionObject()
 	m_object_cropped_flag	= false;
 	m_forced_on_flag		= false;
 
-	m_version_number	= 0;
-	m_nObjectNumber		= 0;
+	m_version_number		= 0;
+	m_nObjectNumber			= 0;
 
 	m_horizontal_position	= 0;
 	m_vertical_position		= 0;
@@ -76,7 +76,7 @@ void CompositionObject::SetPalette (int nNbEntry, HDMV_PALETTE* pPalette, bool b
 	}
 }
 
-void CompositionObject::SetRLEData(BYTE* pBuffer, int nSize, int nTotalSize)
+void CompositionObject::SetRLEData(const BYTE* pBuffer, int nSize, int nTotalSize)
 {
 	if (m_pRLEData) {
 		delete[] m_pRLEData;
@@ -88,7 +88,7 @@ void CompositionObject::SetRLEData(BYTE* pBuffer, int nSize, int nTotalSize)
 	memcpy (m_pRLEData, pBuffer, nSize);
 }
 
-void CompositionObject::AppendRLEData(BYTE* pBuffer, int nSize)
+void CompositionObject::AppendRLEData(const BYTE* pBuffer, int nSize)
 {
 	ASSERT (m_nRLEPos+nSize <= m_nRLEDataSize);
 	if (m_nRLEPos+nSize <= m_nRLEDataSize) {

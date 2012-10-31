@@ -25,11 +25,6 @@
 
 #include "CompositionObject.h"
 
-enum SUBTITLE_TYPE {
-	ST_DVB,
-	ST_HDMV
-};
-
 class CBaseSub
 {
 public:

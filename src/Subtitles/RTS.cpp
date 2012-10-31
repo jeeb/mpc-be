@@ -2506,6 +2506,11 @@ STDMETHODIMP_(bool) CRenderedTextSubtitle::IsAnimated(POSITION pos)
 	return true;
 }
 
+STDMETHODIMP_(SUBTITLE_TYPE) CRenderedTextSubtitle::GetType(POSITION pos)
+{
+	return ST_TEXT;
+}
+
 struct LSub {
 	int idx, layer, readorder;
 };

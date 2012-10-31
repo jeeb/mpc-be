@@ -92,7 +92,7 @@ STDMETHODIMP_(REFERENCE_TIME) CRenderedHdmvSubtitle::GetStop(POSITION pos, doubl
 
 STDMETHODIMP_(bool) CRenderedHdmvSubtitle::IsAnimated(POSITION pos)
 {
-	return (m_nType == ST_HDMV) ? true : false;
+	return false;
 }
 
 STDMETHODIMP CRenderedHdmvSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fps, RECT& bbox)
@@ -110,6 +110,11 @@ STDMETHODIMP CRenderedHdmvSubtitle::GetTextureSize (POSITION pos, SIZE& MaxTextu
 	HRESULT hr = m_pSub->GetTextureSize(pos, MaxTextureSize, VideoSize, VideoTopLeft);
 	return hr;
 };
+
+STDMETHODIMP_(SUBTITLE_TYPE) CRenderedHdmvSubtitle::GetType(POSITION pos)
+{
+	return m_nType;
+}
 
 // IPersist
 

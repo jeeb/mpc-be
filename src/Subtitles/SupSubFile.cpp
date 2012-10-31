@@ -206,6 +206,11 @@ STDMETHODIMP CSupSubFile::GetTextureSize(POSITION pos, SIZE& MaxTextureSize, SIZ
 	return hr;
 }
 
+STDMETHODIMP_(SUBTITLE_TYPE) CSupSubFile::GetType(POSITION pos)
+{
+	return ST_HDMV;
+}
+
 // IPersist
 
 STDMETHODIMP CSupSubFile::GetClassID(CLSID* pClassID)

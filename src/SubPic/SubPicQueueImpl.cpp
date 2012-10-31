@@ -29,6 +29,8 @@
 // CSubPicQueueImpl
 //
 
+#define DSubPicTraceLevel 0
+
 CSubPicQueueImpl::CSubPicQueueImpl(ISubPicAllocator* pAllocator, HRESULT* phr)
 	: CUnknown(NAME("CSubPicQueueImpl"), NULL)
 	, m_pAllocator(pAllocator)
@@ -213,7 +215,7 @@ STDMETHODIMP CSubPicQueue::Invalidate(REFERENCE_TIME rtInvalidate)
 		m_rtInvalidate = rtInvalidate;
 		m_fBreakBuffering = true;
 #if DSubPicTraceLevel > 0
-		TRACE(_T("Invalidate: %f\n"), double(rtInvalidate) / 10000000.0);
+		TRACE(_T("Invalidate(): %ws\n"), ReftimeToString(rtInvalidate));
 #endif
 
 		SetEvent(m_ThreadEvents[EVENT_TIME]);
@@ -230,7 +232,7 @@ STDMETHODIMP_(bool) CSubPicQueue::LookupSubPic(REFERENCE_TIME rtNow, CComPtr<ISu
 	REFERENCE_TIME rtBestStop = 0x7fffffffffffffffi64;
 	POSITION pos = m_Queue.GetHeadPosition();
 #if DSubPicTraceLevel > 2
-	TRACE("Find: ");
+	TRACE(_T("LookupSubPic(): "));
 #endif
 	while (pos) {
 		CComPtr<ISubPic> pSubPic = m_Queue.GetNext(pos);
@@ -246,13 +248,13 @@ STDMETHODIMP_(bool) CSubPicQueue::LookupSubPic(REFERENCE_TIME rtNow, CComPtr<ISu
 			}
 #if DSubPicTraceLevel > 2
 			else {
-				TRACE("   !%f->%f", double(Diff) / 10000000.0, double(rtStop) / 10000000.0);
+				TRACE(_T("   !%ws->%ws"), ReftimeToString(Diff), ReftimeToString(rtStop));
 			}
 #endif
 		}
 #if DSubPicTraceLevel > 2
 		else {
-			TRACE("   !!%f->%f", double(rtStart) / 10000000.0, double(rtSegmentStop) / 10000000.0);
+			TRACE(_T("   !!%ws->%ws"), ReftimeToString(rtStart), ReftimeToString(rtSegmentStop));
 		}
 #endif
 
@@ -262,7 +264,7 @@ STDMETHODIMP_(bool) CSubPicQueue::LookupSubPic(REFERENCE_TIME rtNow, CComPtr<ISu
 #endif
 	if (!ppSubPic) {
 #if DSubPicTraceLevel > 1
-		TRACE("NO Display: %f\n", double(rtNow) / 10000000.0);
+		TRACE(_T("NO Display: %ws\n"), ReftimeToString(rtNow));
 #endif
 	} else {
 #if DSubPicTraceLevel > 0
@@ -270,7 +272,7 @@ STDMETHODIMP_(bool) CSubPicQueue::LookupSubPic(REFERENCE_TIME rtNow, CComPtr<ISu
 		REFERENCE_TIME rtSegmentStop = (ppSubPic)->GetSegmentStop();
 		CRect r;
 		(ppSubPic)->GetDirtyRect(&r);
-		TRACE("Display: %f->%f   %f    %dx%d\n", double(rtStart) / 10000000.0, double(rtSegmentStop) / 10000000.0, double(rtNow) / 10000000.0, r.Width(), r.Height());
+		TRACE(_T("Display: %ws, %ws->%ws	%dx%d\n"), ReftimeToString(rtNow), ReftimeToString(rtStart), ReftimeToString(rtSegmentStop), r.Width(), r.Height());
 #endif
 	}
 
@@ -356,7 +358,7 @@ REFERENCE_TIME CSubPicQueue::UpdateQueue()
 			ISubPic *pSubPic = GetAt(SavePos);
 			REFERENCE_TIME rtStart = pSubPic->GetStart();
 			REFERENCE_TIME rtStop = pSubPic->GetStop();
-			TRACE("Save: %f->%f\n", double(rtStart) / 10000000.0, double(rtStop) / 10000000.0);
+			TRACE(_T("UpdateQueue() : Save - %ws->%ws\n"), ReftimeToString(rtStart), ReftimeToString(rtStop));
 		}
 #endif
 		{
@@ -370,7 +372,7 @@ REFERENCE_TIME CSubPicQueue::UpdateQueue()
 
 				if (rtStop <= rtNowCompare && ThisPos != SavePos) {
 #if DSubPicTraceLevel > 0
-					TRACE("Remove: %f->%f\n", double(rtStart) / 10000000.0, double(rtStop) / 10000000.0);
+					TRACE(_T("UpdateQueue() : Remove - %ws->%ws\n"), ReftimeToString(rtStart), ReftimeToString(rtStop));
 #endif
 					m_Queue.RemoveAt(ThisPos);
 					continue;
@@ -406,7 +408,8 @@ void CSubPicQueue::AppendQueue(ISubPic* pSubPic)
 DWORD CSubPicQueue::ThreadProc()
 {
 	BOOL bDisableAnim = m_bDisableAnim;
-	SetThreadPriority(m_hThread, bDisableAnim ? THREAD_PRIORITY_LOWEST : THREAD_PRIORITY_ABOVE_NORMAL/*THREAD_PRIORITY_BELOW_NORMAL*/);
+	int m_nPriority = bDisableAnim ? THREAD_PRIORITY_LOWEST : THREAD_PRIORITY_ABOVE_NORMAL;
+	SetThreadPriority(m_hThread, m_nPriority);
 
 	bool bAgain = true;
 	for (;;) {
@@ -433,11 +436,23 @@ DWORD CSubPicQueue::ThreadProc()
 				REFERENCE_TIME rtStart = pSubPicProvider->GetStart(pos, fps);
 				REFERENCE_TIME rtStop = pSubPicProvider->GetStop(pos, fps);
 
-				if (m_rtNow >= rtStart) {
-					//						m_fBufferUnderrun = true;
-					if (m_rtNow >= rtStop) {
-						continue;
+				// change the priority of the thread, as for bitmap subtitles do not need a high priority
+				{
+					bool bIsAnimated = pSubPicProvider->IsAnimated(pos) && !bDisableAnim && (pSubPicProvider->GetType(pos) == ST_TEXT);
+					int nPriorityNew = m_nPriority;
+					if (bIsAnimated && m_nPriority != THREAD_PRIORITY_ABOVE_NORMAL) {
+						nPriorityNew = THREAD_PRIORITY_ABOVE_NORMAL;
+					} else if (!bIsAnimated && m_nPriority != THREAD_PRIORITY_LOWEST) {
+						nPriorityNew = THREAD_PRIORITY_LOWEST;
 					}
+					if (nPriorityNew != m_nPriority) {
+						m_nPriority = nPriorityNew;
+						SetThreadPriority(m_hThread, m_nPriority);
+					}
+				}
+
+				if (m_rtNow >= rtStop) {
+					continue;
 				}
 
 				if (rtStart >= m_rtNow + 60*10000000i64) { // we are already one minute ahead, this should be enough
@@ -446,9 +461,9 @@ DWORD CSubPicQueue::ThreadProc()
 
 				if (rtNow < rtStop) {
 					REFERENCE_TIME rtCurrent = max(rtNow, rtStart);
-					bool bIsAnimated = pSubPicProvider->IsAnimated(pos) && !bDisableAnim;
+					bool bIsAnimated = (pSubPicProvider->IsAnimated(pos) && !bDisableAnim);
+					
 					while (rtCurrent < rtStop) {
-
 						SIZE	MaxTextureSize, VirtualSize;
 						POINT	VirtualTopLeft;
 						HRESULT	hr2;
@@ -474,7 +489,10 @@ DWORD CSubPicQueue::ThreadProc()
 #if DSubPicTraceLevel > 0
 							CRect r;
 							pStatic->GetDirtyRect(&r);
-							TRACE("Render: %f->%f    %f->%f      %dx%d\n", double(rtCurrent) / 10000000.0, double(rtEndThis) / 10000000.0, double(rtStart) / 10000000.0, double(rtStop) / 10000000.0, r.Width(), r.Height());
+							TRACE(_T("Render: %ws->%ws, %ws->%ws	%dx%d\n"),
+										ReftimeToString(rtCurrent), ReftimeToString(rtEndThis),
+										ReftimeToString(rtStart), ReftimeToString(rtStop),
+										r.Width(), r.Height());
 #endif
 							rtCurrent = rtEndThis;
 
@@ -485,7 +503,7 @@ DWORD CSubPicQueue::ThreadProc()
 						}
 #if DSubPicTraceLevel > 0
 						if (m_rtNow > rtCurrent) {
-							TRACE("BEHIND\n");
+							TRACE(_T("BEHIND: %ws > %ws\n"), ReftimeToString(m_rtNow), ReftimeToString(rtCurrent));
 						}
 #endif
 
@@ -536,24 +554,12 @@ DWORD CSubPicQueue::ThreadProc()
 
 				if (rtStop > rtInvalidate) {
 #if DSubPicTraceLevel >= 0
-					TRACE(_T("Removed subtitle because of invalidation: %f->%f\n"), double(rtStart) / 10000000.0, double(rtStop) / 10000000.0);
+					TRACE(_T("Removed subtitle because of invalidation: %ws->%ws\n"), ReftimeToString(rtStart), ReftimeToString(rtStop));
 #endif
 					m_Queue.RemoveAt(ThisPos);
 					continue;
 				}
 			}
-
-			/*
-						while (GetCount() && GetTail()->GetStop() > rtInvalidate)
-						{
-							if (GetTail()->GetStart() < rtInvalidate) GetTail()->SetStop(rtInvalidate);
-							else
-							{
-								RemoveTail();
-							}
-						}
-			*/
-
 			m_fBreakBuffering = false;
 		}
 	}
