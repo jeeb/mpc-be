@@ -75,7 +75,8 @@ void CVolumeCtrl::IncreaseVolume()
 		SetPageSize(s.nVolumeStep);
 	}
 
-	SetPosInternal(GetPos() + GetPageSize());
+	// align volume up to step. recommend using steps 1, 2, 5 and 10
+	SetPosInternal(GetPos() + GetPageSize() - GetPos() % GetPageSize());
 }
 
 void CVolumeCtrl::DecreaseVolume()
@@ -86,7 +87,9 @@ void CVolumeCtrl::DecreaseVolume()
 		SetPageSize(s.nVolumeStep);
 	}
 
-	SetPosInternal(GetPos() - GetPageSize());
+	// align volume down to step. recommend using steps 1, 2, 5 and 10
+	int m = GetPos() % GetPageSize();
+	SetPosInternal(GetPos() - (m ? m : GetPageSize()));
 }
 
 BEGIN_MESSAGE_MAP(CVolumeCtrl, CSliderCtrl)
