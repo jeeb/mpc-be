@@ -4,4 +4,7 @@ body, th, td
 	font-family: Verdana, Arial, Helvetica, Sans-Serif;
 }
 
-.nobr  { white-space:nowrap; }
+.nobr
+{
+	white-space: nowrap;
+}
