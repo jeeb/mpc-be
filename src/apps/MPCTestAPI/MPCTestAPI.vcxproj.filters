@@ -63,12 +63,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\MPCTestAPI.ico">
-      <Filter>Resource Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Manifest Include="res\MPCTestAPI.exe.manifest">
+    <Manifest Include="MPCTestAPI.exe.manifest">
       <Filter>Resource Files</Filter>
     </Manifest>
   </ItemGroup>

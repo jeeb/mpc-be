@@ -130,12 +130,7 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <Manifest Include="res\MPCTestAPI.exe.manifest" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\MPCTestAPI.ico">
-      <FileType>ICO</FileType>
-    </None>
+    <Manifest Include="MPCTestAPI.exe.manifest" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
