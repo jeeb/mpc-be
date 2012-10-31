@@ -18,6 +18,7 @@
 * ffmpeg git-18389613;
 * MediaInfo 0.7.61+ svn rev.5244;
 * ZenLibs v0.4.28+ svn rev.411;
+* Little-CMS git-886e2f52;
 
 Исправления (!):
 
