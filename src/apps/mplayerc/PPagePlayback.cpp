@@ -179,6 +179,7 @@ BOOL CPPagePlayback::OnApply()
 	s.strSubtitlesLanguageOrder = m_subtitlesLanguageOrder;
 	s.strAudiosLanguageOrder = m_audiosLanguageOrder;
 	s.nVolumeStep = m_nVolumeStep + 1;
+	((CMainFrame*)GetParentFrame())->m_wndToolBar.m_volctrl.SetPageSize(s.nVolumeStep);
 
 	if ((s.nSpeedStep == 0 && m_nSpeedStep > 0) || (s.nSpeedStep > 0 && m_nSpeedStep == 0)) {
 		((CMainFrame*)GetParentFrame())->OnPlayResetRate();

@@ -69,24 +69,12 @@ void CVolumeCtrl::SetPosInternal(int pos)
 
 void CVolumeCtrl::IncreaseVolume()
 {
-	AppSettings& s = AfxGetAppSettings();
-
-	if (s.nVolumeStep != GetPageSize()) {
-		SetPageSize(s.nVolumeStep);
-	}
-
 	// align volume up to step. recommend using steps 1, 2, 5 and 10
 	SetPosInternal(GetPos() + GetPageSize() - GetPos() % GetPageSize());
 }
 
 void CVolumeCtrl::DecreaseVolume()
 {
-	AppSettings& s = AfxGetAppSettings();
-
-	if (s.nVolumeStep != GetPageSize()) {
-		SetPageSize(s.nVolumeStep);
-	}
-
 	// align volume down to step. recommend using steps 1, 2, 5 and 10
 	int m = GetPos() % GetPageSize();
 	SetPosInternal(GetPos() - (m ? m : GetPageSize()));
