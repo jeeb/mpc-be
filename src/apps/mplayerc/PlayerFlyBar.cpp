@@ -176,8 +176,9 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 	pFrame->GetWindowPlacement(&wp);
 	CPoint p;
 	GetCursorPos(&p);
-
 	CalcButtonsRect();
+
+	bt_idx = -1;
 
 	if (r_ExitIcon.PtInRect(p)) {
 		ShowWindow(SW_HIDE);
@@ -207,8 +208,6 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 		AppSettings& s = AfxGetAppSettings();
 		s.fFlybarOnTop = !s.fFlybarOnTop;
 	}
-
-	bt_idx = -1;
 }
 
 void CFlyBar::OnMouseMove(UINT nFlags, CPoint point)
