@@ -98,6 +98,7 @@ private :
 	CBrush	m_debugBrushBack;
 	int		m_FontSize;
 	CString	m_OSD_Font;
+	int		m_OSD_Transparent;
 
 	CRect		m_rectWnd;
 	COLORREF	m_Color[OSD_LAST];

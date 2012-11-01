@@ -207,6 +207,7 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 	} else if (r_LockIcon.PtInRect(p)) {
 		AppSettings& s = AfxGetAppSettings();
 		s.fFlybarOnTop = !s.fFlybarOnTop;
+		OnMouseMove(nFlags, point);
 	}
 }
 

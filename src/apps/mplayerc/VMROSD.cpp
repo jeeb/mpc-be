@@ -56,6 +56,7 @@ CVMROSD::CVMROSD(void)
 
 	m_FontSize				= 0;
 	m_OSD_Font				= _T("");
+	m_OSD_Transparent		= 0;
 	bMouseOverExitButton	= false;
 	bMouseOverCloseButton	= false;
 	m_bShowMessage			= true;
@@ -83,11 +84,12 @@ void CVMROSD::OnSize(UINT nType, int cx, int cy)
 			m_bCursorMoving		= false;
 			m_bSeekBarVisible	= false;
 			m_bFlyBarVisible	= false;
-			Invalidate();
+			
 		}
-
+		Invalidate();
 		UpdateBitmap();
 	}
+	
 }
 
 void CVMROSD::UpdateBitmap()
@@ -291,7 +293,7 @@ void CVMROSD::DrawMessage()
 		rectText.InflateRect(20, 10);
 		switch (m_nMessagePos) {
 			case OSD_TOPLEFT :
-				rectMessages = CRect  (10, 10, min((rectText.right + 10),(m_rectWnd.right - 10)), (rectText.bottom + 10));
+				rectMessages = CRect  (10, 10, min((rectText.right + 10),(m_rectWnd.right - 10)), (rectText.bottom + 12));
 				break;
 			case OSD_TOPRIGHT :
 			default :
@@ -299,16 +301,84 @@ void CVMROSD::DrawMessage()
 				break;
 		}
 
-		DrawRect (&rectMessages, &m_brushBack, &m_penBorder);
-		DWORD uFormat = DT_SINGLELINE|DT_CENTER|DT_VCENTER|DT_NOPREFIX;
+		//m_MemDC.BeginPath();
+		//m_MemDC.RoundRect(rectMessages.left, rectMessages.top, rectMessages.right, rectMessages.bottom, 10, 10);
+		//m_MemDC.EndPath();
+		//m_MemDC.SelectClipPath(RGN_COPY);
 
-		if (rectText.right > (m_rectWnd.right - 20)) {
-			m_strMessage = _T(" ") + m_strMessage;
-			uFormat = uFormat|DT_END_ELLIPSIS;
+		int R, G, B, R1, G1, B1, R_, G_, B_, R1_, G1_, B1_;
+		R = GetRValue((AfxGetAppSettings().clrGrad1ABGR));
+		G = GetGValue((AfxGetAppSettings().clrGrad1ABGR));
+		B = GetBValue((AfxGetAppSettings().clrGrad1ABGR));
+		R1 = GetRValue((AfxGetAppSettings().clrGrad2ABGR));
+		G1 = GetGValue((AfxGetAppSettings().clrGrad2ABGR));
+		B1 = GetBValue((AfxGetAppSettings().clrGrad2ABGR));
+		R_ = (R+32>=255?255:R+32);
+		R1_ = (R1+32>=255?255:R1+32);
+		G_ = (G+32>=255?255:G+32);
+		G1_ = (G1+32>=255?255:G1+32);
+		B_ = (B+32>=255?255:B+32);
+		B1_ = (B1+32>=255?255:B1+32);
+		m_OSD_Transparent	=	AfxGetAppSettings().nOSDTransparent;
+		int iBorder = AfxGetAppSettings().nOSDBorder;
+
+		GRADIENT_RECT gr[1] = {{0, 1}};
+		TRIVERTEX tv[2] = {
+					{rectMessages.left, rectMessages.top, R*256, G*256, B*256, m_OSD_Transparent*256},
+					{rectMessages.right, rectMessages.bottom, R1*256, G1*256, B1*256, m_OSD_Transparent*256},
+				};
+		m_MemDC.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+
+		if (iBorder>0) {
+			GRADIENT_RECT gr2[1] = {{0, 1}};
+			TRIVERTEX tv2[2] = {
+					{rectMessages.left, rectMessages.top, R_*256, G_*256, B_*256, m_OSD_Transparent*256},
+					{rectMessages.left+iBorder, rectMessages.bottom, R1_*256, G1_*256, B1_*256, m_OSD_Transparent*256},
+				};
+			m_MemDC.GradientFill(tv2, 2, gr2, 1, GRADIENT_FILL_RECT_V);
+
+			GRADIENT_RECT gr3[1] = {{0, 1}};
+			TRIVERTEX tv3[2] = {
+			{rectMessages.right, rectMessages.top, R_*256, G_*256, B_*256, m_OSD_Transparent*256},
+			{rectMessages.right-iBorder, rectMessages.bottom, R1_*256, G1_*256, B1_*256, m_OSD_Transparent*256},
+				};
+			m_MemDC.GradientFill(tv3, 2, gr3, 1, GRADIENT_FILL_RECT_V);
+
+			GRADIENT_RECT gr4[1] = {{0, 1}};
+			TRIVERTEX tv4[2] = {
+			{rectMessages.left, rectMessages.top, R_*256, G_*256, B_*256, m_OSD_Transparent*256},
+			{rectMessages.right, rectMessages.top+iBorder, R_*256, G_*256, B_*256, m_OSD_Transparent*256},
+				};
+			m_MemDC.GradientFill(tv4, 2, gr4, 1, GRADIENT_FILL_RECT_V);
+
+			GRADIENT_RECT gr5[1] = {{0, 1}};
+			TRIVERTEX tv5[2] = {
+			{rectMessages.left, rectMessages.bottom, R1_*256, G1_*256, B1_*256, m_OSD_Transparent*256},
+			{rectMessages.right, rectMessages.bottom-iBorder, R1_*256, G1_*256, B1_*256, m_OSD_Transparent*256},
+				};
+			m_MemDC.GradientFill(tv5, 2, gr5, 1, GRADIENT_FILL_RECT_V);
 		}
 
-		m_MemDC.DrawText (m_strMessage, &rectMessages, uFormat);	
+		DWORD uFormat = DT_LEFT|DT_VCENTER|DT_NOPREFIX;
 
+		if (rectText.right +10 >= (rectMessages.right)) {
+			uFormat = uFormat|DT_END_ELLIPSIS;
+		}
+	
+		CRect r;
+		if (AfxGetAppSettings().fFontShadow) {
+			r = rectMessages;
+			r.left += 12;
+			r.top += 7;
+			m_MemDC.SetTextColor(RGB(16,24,32));
+			m_MemDC.DrawText (m_strMessage, &r, uFormat);
+		}
+		
+		r = rectMessages;
+		r.left += 10;
+		r.top += 5;
+		m_MemDC.SetTextColor(AfxGetAppSettings().clrFontABGR);
+		m_MemDC.DrawText (m_strMessage, &r, uFormat);	
 	}
 
 }
@@ -347,7 +417,7 @@ void CVMROSD::DrawDebug()
 void CVMROSD::Invalidate()
 {
 	CAutoLock Lock(&m_Lock);
-
+	CalcRect();
 	if (m_BitmapInfo.bmWidth*m_BitmapInfo.bmHeight*(m_BitmapInfo.bmBitsPixel/8) == 0) {
 		return;
 	}
@@ -579,14 +649,25 @@ void CVMROSD::DisplayMessage (OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration
 			m_OSD_Font = OSD_Font;
 		}
 
-		if ((temp_m_FontSize != m_FontSize) || (temp_m_OSD_Font != m_OSD_Font)) {
+		
+
+		//if ((temp_m_FontSize != m_FontSize) || (temp_m_OSD_Font != m_OSD_Font)) {
 			if (m_MainFont.GetSafeHandle()) {
 				m_MainFont.DeleteObject();
 			}
 
-			m_MainFont.CreatePointFont(m_FontSize*10, m_OSD_Font);
+			LOGFONT lf;
+			memset(&lf, 0, sizeof(lf));
+			lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
+			LPCTSTR fonts[] = {m_OSD_Font};
+			int fonts_size[] = {m_FontSize*10};
+			_tcscpy_s(lf.lfFaceName, fonts[0]);
+			lf.lfHeight = fonts_size[0];
+			lf.lfQuality = AfxGetAppSettings().fFontAA ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY;
+
+			m_MainFont.CreatePointFontIndirect(&lf,&m_MemDC);
 			m_MemDC.SelectObject(m_MainFont);
-		}
+		//}
 
 		if (m_pWnd) {
 			KillTimer(m_pWnd->m_hWnd, (long)this);

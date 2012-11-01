@@ -285,6 +285,8 @@ void CAppSettings::CreateCommands()
 	ADDCMD((ID_DVD_SUB_ONOFF,					  0, FVIRTKEY|FNOINVERT,				IDS_MPLAYERC_97));
 	ADDCMD((ID_VIEW_TEARING_TEST,				'T', FVIRTKEY|FCONTROL|FNOINVERT,		IDS_AG_TEARING_TEST));
 	ADDCMD((ID_VIEW_REMAINING_TIME,				'I', FVIRTKEY|FCONTROL|FNOINVERT,		IDS_MPLAYERC_98));
+	ADDCMD((ID_OSD_LOCAL_TIME,		   		    'I', FVIRTKEY|FNOINVERT|FNOINVERT,		IDS_AG_OSD_LOCAL_TIME));
+	ADDCMD((ID_OSD_FILE_NAME,		   		    'I', FVIRTKEY|FSHIFT|FNOINVERT,		    IDS_AG_OSD_FILE_NAME));
 	ADDCMD((ID_SHADERS_TOGGLE,					'P', FVIRTKEY|FCONTROL|FNOINVERT,		IDS_AT_TOGGLE_SHADER));
 	ADDCMD((ID_SHADERS_TOGGLE_SCREENSPACE,		'P', FVIRTKEY|FCONTROL|FALT|FNOINVERT,	IDS_AT_TOGGLE_SHADERSCREENSPACE));
 	ADDCMD((ID_D3DFULLSCREEN_TOGGLE,			'F', FVIRTKEY|FCONTROL|FNOINVERT,		IDS_MPLAYERC_99));
@@ -595,6 +597,8 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_CHAPTER_MARKER, (int)fChapterMarker);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_USE_FLYBAR, (int)fFlybar);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_USE_FLYBAR_ONTOP, (int)fFlybarOnTop);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("OSDFontShadow"), (int)fFontShadow);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("OSDFontAA"), (int)fFontAA);
 
 	// Save analog capture settings
 	pApp->WriteProfileInt   (IDS_R_SETTINGS, IDS_RS_DEFAULT_CAPTURE, iDefaultCaptureDevice);
@@ -697,10 +701,15 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("ThemeRed"), nThemeRed);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("ThemeGreen"), nThemeGreen);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("ThemeBlue"), nThemeBlue);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("OSDTransparent"), nOSDTransparent);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("OSDBorder"), nOSDBorder);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("FileNameOnSeekBar"), fFileNameOnSeekBar);
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CLRFACEABGR, clrFaceABGR);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CLROUTLINEABGR, clrOutlineABGR);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("OSDFontColor"), clrFontABGR);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("OSDGrad1Color"), clrGrad1ABGR);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("OSDGrad2Color"), clrGrad2ABGR);
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTS, nJumpDistS);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTM, nJumpDistM);
@@ -1200,10 +1209,15 @@ void CAppSettings::LoadSettings()
 	nThemeRed = pApp->GetProfileInt(IDS_R_SETTINGS, _T("ThemeRed"), 256);
 	nThemeGreen = pApp->GetProfileInt(IDS_R_SETTINGS, _T("ThemeGreen"), 256);
 	nThemeBlue = pApp->GetProfileInt(IDS_R_SETTINGS, _T("ThemeBlue"), 256);
+	nOSDTransparent = pApp->GetProfileInt(IDS_R_SETTINGS, _T("OSDTransparent"), 100);
+	nOSDBorder = pApp->GetProfileInt(IDS_R_SETTINGS, _T("OSDBorder"), 1);
 	fFileNameOnSeekBar = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("FileNameOnSeekBar"), TRUE);
 
 	clrFaceABGR = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CLRFACEABGR, 0x00ffffff);
 	clrOutlineABGR = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CLROUTLINEABGR, 0x00868686);
+	clrFontABGR = pApp->GetProfileInt(IDS_R_SETTINGS, _T("OSDFontColor"), 0x00E0E0E0);
+	clrGrad1ABGR = pApp->GetProfileInt(IDS_R_SETTINGS, _T("OSDGrad1Color"), 0x00302820);
+	clrGrad2ABGR = pApp->GetProfileInt(IDS_R_SETTINGS, _T("OSDGrad2Color"), 0x00302820);
 
 	nJumpDistS = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTS, DEFAULT_JUMPDISTANCE_1);
 	nJumpDistM = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTM, DEFAULT_JUMPDISTANCE_2);
@@ -1371,6 +1385,8 @@ void CAppSettings::LoadSettings()
 	fChapterMarker	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_CHAPTER_MARKER, FALSE);
 	fFlybar			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_USE_FLYBAR, TRUE);
 	fFlybarOnTop	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_USE_FLYBAR_ONTOP, FALSE);
+	fFontShadow		= !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("OSDFontShadow"), FALSE);
+	fFontAA	= !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("OSDFontAA"), TRUE);
 
 	// Save analog capture settings
 	iDefaultCaptureDevice = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DEFAULT_CAPTURE, 0);

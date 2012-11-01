@@ -1556,6 +1556,17 @@
 #define IDS_VDF_DEINTER_BOTTOM          43103
 #define IDS_VDF_DEINTER_PROGRESSIVE     43104
 
+#define ID_OSD_LOCAL_TIME               44001
+#define IDS_AG_OSD_LOCAL_TIME           44002
+#define ID_OSD_FILE_NAME                44003
+#define IDS_AG_OSD_FILE_NAME            44004
+#define IDC_BUTTON_CLRFONT              44010
+#define IDC_BUTTON_CLRGRAD1             44011
+#define IDC_BUTTON_CLRGRAD2             44012
+#define IDC_SLIDER_OSDTRANS             44013
+#define IDC_CHECK_SHADOW                44014
+#define IDC_CHECK_AA                    44015
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

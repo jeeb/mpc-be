@@ -430,6 +430,12 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_SHADERS_TOGGLE_SCREENSPACE, OnUpdateShaderToggleScreenSpace)
 	ON_COMMAND(ID_SHADERS_TOGGLE_SCREENSPACE, OnShaderToggleScreenSpace)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_REMAINING_TIME, OnUpdateViewRemainingTime)
+
+	ON_UPDATE_COMMAND_UI(ID_OSD_LOCAL_TIME, OnUpdateViewOSDLocalTime)
+	ON_UPDATE_COMMAND_UI(ID_OSD_FILE_NAME, OnUpdateViewOSDFileName)
+	ON_COMMAND(ID_OSD_LOCAL_TIME, OnViewOSDLocalTime)
+	ON_COMMAND(ID_OSD_FILE_NAME, OnViewOSDFileName)
+
 	ON_COMMAND(ID_VIEW_REMAINING_TIME, OnViewRemainingTime)
 	ON_COMMAND(ID_D3DFULLSCREEN_TOGGLE, OnD3DFullscreenToggle)
 	ON_COMMAND_RANGE(ID_GOTO_PREV_SUB, ID_GOTO_NEXT_SUB, OnGotoSubtitle)
@@ -656,6 +662,8 @@ CMainFrame::CMainFrame() :
 	m_pFullscreenWnd(NULL),
 	m_pVideoWnd(NULL),
 	m_bRemainingTime(false),
+	m_bOSDLocalTime(false),
+	m_bOSDFileName(false),
 	m_nCurSubtitle(-1),
 	m_lSubtitleShift(0),
 	m_bToggleShader(false),
@@ -2069,8 +2077,19 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 					m_wndStatusBar.SetStatusTimer(str);					
 				} else {
 					m_wndStatusBar.SetStatusTimer(pos, stop, !!m_wndSubresyncBar.IsWindowVisible(), &tf);
-					if (m_bRemainingTime) {
-						m_OSD.DisplayMessage(OSD_TOPLEFT, m_wndStatusBar.GetStatusTimer());
+					CString str_temp = _T("");
+					bool bmadvr = (AfxGetAppSettings().iDSVideoRendererType == VIDRNDT_DS_MADVR);
+
+					if (m_bOSDLocalTime) str_temp = GetSystemLocalTime();
+
+					if (m_bRemainingTime) str_temp != _T("") ? str_temp +=  _T("\n") + m_wndStatusBar.GetStatusTimer() : str_temp = m_wndStatusBar.GetStatusTimer();
+
+					if (m_bOSDFileName) str_temp != _T("") ? str_temp +=  _T("\n") + m_strFn : str_temp = m_strFn;
+
+					if (bmadvr) str_temp.Replace(_T("\n"), _T(" / ")); // MadVR only singleline
+
+					if (str_temp != _T("")) {
+						m_OSD.DisplayMessage(OSD_TOPLEFT, str_temp);
 					}
 				}
 
@@ -6836,6 +6855,54 @@ void CMainFrame::OnViewRemainingTime()
 	m_bRemainingTime = !m_bRemainingTime;
 
 	if (!m_bRemainingTime) {
+		m_OSD.ClearMessage();
+	}
+
+	OnTimer(TIMER_STREAMPOSPOLLER2);
+}
+
+
+CString CMainFrame::GetSystemLocalTime()
+{
+	CString strResult;
+
+	SYSTEMTIME st;
+	GetLocalTime(&st);			
+	strResult.Format(_T("%02d:%02d"),st.wHour,st.wMinute);
+
+	return strResult;
+}
+
+void CMainFrame::OnUpdateViewOSDLocalTime(CCmdUI* pCmdUI)
+{
+	AppSettings& s = AfxGetAppSettings();
+	pCmdUI->Enable (s.fShowOSD && (m_iMediaLoadState != MLS_CLOSED));
+	pCmdUI->SetCheck (m_bOSDLocalTime);
+}
+
+void CMainFrame::OnViewOSDLocalTime()
+{
+	m_bOSDLocalTime = !m_bOSDLocalTime;
+
+	if (!m_bOSDLocalTime) {
+		m_OSD.ClearMessage();
+	}
+
+	OnTimer(TIMER_STREAMPOSPOLLER2);
+}
+
+void CMainFrame::OnUpdateViewOSDFileName(CCmdUI* pCmdUI)
+{
+	AppSettings& s = AfxGetAppSettings();
+	pCmdUI->Enable (s.fShowOSD && (m_iMediaLoadState != MLS_CLOSED));
+	pCmdUI->SetCheck (m_bOSDFileName);
+}
+
+void CMainFrame::OnViewOSDFileName()
+{
+	m_bOSDFileName = !m_bOSDFileName;
+
+	if (!m_bOSDFileName) {
 		m_OSD.ClearMessage();
 	}
 

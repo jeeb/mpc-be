@@ -880,6 +880,12 @@ public:
 	afx_msg void OnShaderToggleScreenSpace();
 	afx_msg void OnUpdateViewRemainingTime(CCmdUI* pCmdUI);
 	afx_msg void OnViewRemainingTime();
+
+	afx_msg void OnUpdateViewOSDLocalTime(CCmdUI* pCmdUI);
+	afx_msg void OnViewOSDLocalTime();
+	afx_msg void OnUpdateViewOSDFileName(CCmdUI* pCmdUI);
+	afx_msg void OnViewOSDFileName();
+
 	afx_msg void OnD3DFullscreenToggle();
 	afx_msg void OnGotoSubtitle(UINT nID);
 	afx_msg void OnShiftSubtitle(UINT nID);
@@ -1008,6 +1014,9 @@ public:
 
 	bool		m_OpenFile;
 	bool		m_bRemainingTime;
+	bool		m_bOSDLocalTime;
+	bool		m_bOSDFileName;
+	CString		GetSystemLocalTime();
 	int			m_nCurSubtitle;
 	long		m_lSubtitleShift;
 	__int64		m_rtCurSubPos;
