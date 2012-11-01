@@ -4101,7 +4101,7 @@ void CMainFrame::OnStreamSub(UINT nID)
 		CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
 		if (pDVS) {
 			int nLangs;
-			if SUCCEEDED(pDVS->get_LanguageCount(&nLangs) && nLangs) {
+			if (SUCCEEDED(pDVS->get_LanguageCount(&nLangs)) && nLangs) {
 				bool fHideSubtitles = false;
 				pDVS->get_HideSubtitles(&fHideSubtitles);
 
@@ -4266,7 +4266,7 @@ void CMainFrame::OnStreamSubOnOff()
 		CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
 		if (pDVS) {
 			int nLangs;
-			if SUCCEEDED(pDVS->get_LanguageCount(&nLangs) && nLangs) {
+			if (SUCCEEDED(pDVS->get_LanguageCount(&nLangs)) && nLangs) {
 				bool fHideSubtitles = false;
 				pDVS->get_HideSubtitles(&fHideSubtitles);
 				fHideSubtitles = !fHideSubtitles;
@@ -8648,7 +8648,7 @@ void CMainFrame::OnUpdateNavMixSubtitles(CCmdUI* pCmdUI)
 			CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
 			if (pDVS) {
 				int nLangs;
-				if SUCCEEDED(pDVS->get_LanguageCount(&nLangs) && nLangs) {
+				if (SUCCEEDED(pDVS->get_LanguageCount(&nLangs)) && nLangs) {
 					bool fHideSubtitles = false;
 					pDVS->get_HideSubtitles(&fHideSubtitles);
 					pCmdUI->Enable();
@@ -9388,7 +9388,7 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 				pDVS->put_HideSubtitles(fHideSubtitles);
 			} else {
 				int nLangs;
-				if SUCCEEDED(pDVS->get_LanguageCount(&nLangs) && nLangs && (i <= (nLangs-1))) {
+				if (SUCCEEDED(pDVS->get_LanguageCount(&nLangs)) && nLangs && (i <= (nLangs-1))) {
 					pDVS->put_SelectedLanguage(i);
 				}
 			}
@@ -12809,7 +12809,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 	if (pDVS) {
 		b_UseVSFilter = true;
 		int nLangs;
-		if SUCCEEDED(pDVS->get_LanguageCount(&nLangs) && nLangs) {
+		if (SUCCEEDED(pDVS->get_LanguageCount(&nLangs)) && nLangs) {
 			// TODO ...
 			/*
 			SubStreams substream;
@@ -13057,7 +13057,7 @@ int CMainFrame::GetSubSelIdx()
 		CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
 		if (pDVS) {
 			int nLangs;
-			if SUCCEEDED(pDVS->get_LanguageCount(&nLangs) && nLangs) {
+			if (SUCCEEDED(pDVS->get_LanguageCount(&nLangs)) && nLangs) {
 				pDVS->get_SelectedLanguage(&SelectedLanguage);
 			}
 		}
@@ -14376,7 +14376,7 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 			CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
 			if (pDVS) {
 				int nLangs;
-				if SUCCEEDED(pDVS->get_LanguageCount(&nLangs) && nLangs) {
+				if (SUCCEEDED(pDVS->get_LanguageCount(&nLangs)) && nLangs) {
 					bool fHideSubtitles = false;
 					pDVS->get_HideSubtitles(&fHideSubtitles);
 					pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|(!fHideSubtitles ? MF_ENABLED : MF_DISABLED), id++, ResStr(IDS_SUBTITLES_ENABLE));
@@ -17005,6 +17005,22 @@ afx_msg void CMainFrame::OnShiftSubtitle(UINT nID)
 
 afx_msg void CMainFrame::OnSubtitleDelay(UINT nID)
 {
+	if (b_UseVSFilter) {
+		CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
+		if (pDVS) {
+			int SubtitleDelay, SubtitleSpeedMul, SubtitleSpeedDiv;
+			if (SUCCEEDED(pDVS->get_SubtitleTiming(&SubtitleDelay, &SubtitleSpeedMul, &SubtitleSpeedDiv))) {
+				if (nID == ID_SUB_DELAY_DOWN) {
+					SubtitleDelay -= AfxGetAppSettings().nSubDelayInterval;
+				} else {
+					SubtitleDelay += AfxGetAppSettings().nSubDelayInterval;
+				}
+				pDVS->put_SubtitleTiming(SubtitleDelay, SubtitleSpeedMul, SubtitleSpeedDiv);
+			}
+		}	
+		return;
+	}
+
 	if (m_pCAP) {
 		if (m_pSubStreams.IsEmpty()) {
 			SendStatusMessage(ResStr(IDS_SUBTITLES_ERROR), 3000);
