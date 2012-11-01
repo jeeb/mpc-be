@@ -1093,6 +1093,9 @@ protected:
 
 	bool	m_fValidDVDOpen;
 
+	IBaseFilter*	GetVSFilter();
+	bool			b_UseVSFilter;
+
 public:
 	afx_msg UINT OnPowerBroadcast(UINT nPowerEvent, UINT nEventData);
 	afx_msg void OnSessionChange(UINT nSessionState, UINT nId);
