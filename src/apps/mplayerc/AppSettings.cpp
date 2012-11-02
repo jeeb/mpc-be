@@ -35,6 +35,7 @@ CAppSettings::CAppSettings()
 	, nCmdlnWebServerPort(-1)
 	, fShowDebugInfo(false)
 	, fIsFSWindow(false)
+	, fShaderEditorWasOpened(false)
 {
 	// Internal source filter
 	SrcFiltersKeys[SRC_CDDA] = _T("SRC_CDDA");
@@ -767,19 +768,21 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileString(IDS_R_SHADERS, IDS_R_SHADERS_COMBINE, strShadercombine);
 	pApp->WriteProfileString(IDS_R_SHADERS, IDS_R_SHADERS_COMBINESCREENSPACE, strShadercombineScreenSpace);
 
+	if (fShaderEditorWasOpened) {
+		// This is a large data block. Save it only when really necessary.
+		pos = m_shaders.GetHeadPosition();
+		for (int i = 0; pos; i++) {
+			const Shader& s = m_shaders.GetNext(pos);
 
-	pos = m_shaders.GetHeadPosition();
-	for (int i = 0; pos; i++) {
-		const Shader& s = m_shaders.GetNext(pos);
-
-		if (!s.label.IsEmpty()) {
-			CString index;
-			index.Format(_T("%d"), i);
-			CString srcdata = s.srcdata;
-			srcdata.Replace(_T("\r"), _T(""));
-			srcdata.Replace(_T("\n"), _T("\\n"));
-			srcdata.Replace(_T("\t"), _T("\\t"));
-			AfxGetApp()->WriteProfileString(IDS_R_SHADERS, index, s.label + _T("|") + s.target + _T("|") + srcdata);
+			if (!s.label.IsEmpty()) {
+				CString index;
+				index.Format(_T("%d"), i);
+				CString srcdata = s.srcdata;
+				srcdata.Replace(_T("\r"), _T(""));
+				srcdata.Replace(_T("\n"), _T("\\n"));
+				srcdata.Replace(_T("\t"), _T("\\t"));
+				AfxGetApp()->WriteProfileString(IDS_R_SHADERS, index, s.label + _T("|") + s.target + _T("|") + srcdata);
+			}
 		}
 	}
 
