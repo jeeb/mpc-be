@@ -8629,6 +8629,17 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 		AfxGetAppSettings().fUseDefaultSubtitlesStyle = !AfxGetAppSettings().fUseDefaultSubtitlesStyle;
 		UpdateSubtitle();
 	} else if (i == -1) {
+		if (b_UseVSFilter) {
+			CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
+			if (pDVS) {
+				bool fBuffer, fOnlyShowForcedSubs, fPolygonize;
+				pDVS->get_VobSubSettings(&fBuffer, &fOnlyShowForcedSubs, &fPolygonize);
+				fOnlyShowForcedSubs = !fOnlyShowForcedSubs;
+				pDVS->put_VobSubSettings(fBuffer, fOnlyShowForcedSubs, fPolygonize);
+			}
+			return;
+		}
+
 		AfxGetAppSettings().fForcedSubtitles = !AfxGetAppSettings().fForcedSubtitles;
 		g_bForcedSubtitle = AfxGetAppSettings().fForcedSubtitles;
 		if (m_pCAP) {
@@ -8706,15 +8717,51 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 
 			i -= pSubStream->GetStreamCount();
 		}
+	} else if (i == -4) {
+		if (b_UseVSFilter) {
+			pCmdUI->SetCheck(FALSE);
+			pCmdUI->Enable(FALSE);
+			return;
+		}
 	} else if (i == -3) {
 		// enabled
+		if (b_UseVSFilter) {
+			CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
+			bool fHideSubtitles = false;
+			if (pDVS) {
+				pDVS->get_HideSubtitles(&fHideSubtitles);
+			}
+
+			pCmdUI->Enable();
+			pCmdUI->SetCheck(!fHideSubtitles);
+			return;
+		}
 		pCmdUI->SetCheck(AfxGetAppSettings().fEnableSubtitles);
 	} else if (i == -2) {
 		// override
+		if (b_UseVSFilter) {
+			pCmdUI->SetCheck(FALSE);
+			pCmdUI->Enable(FALSE);
+			return;
+		}
+
 		// TODO: foxX - default subtitles style toggle here; still wip
 		pCmdUI->SetCheck(AfxGetAppSettings().fUseDefaultSubtitlesStyle);
 		pCmdUI->Enable(AfxGetAppSettings().fEnableSubtitles && m_pCAP && !m_fAudioOnly);
 	} else if (i == -1) {
+		if (b_UseVSFilter) {
+			CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
+			bool fOnlyShowForcedSubs = false;
+			if (pDVS) {
+				bool fBuffer, fPolygonize;
+				pDVS->get_VobSubSettings(&fBuffer, &fOnlyShowForcedSubs, &fPolygonize);
+			}
+
+			pCmdUI->Enable();
+			pCmdUI->SetCheck(fOnlyShowForcedSubs);
+			return;
+		}
+
 		pCmdUI->SetCheck(AfxGetAppSettings().fForcedSubtitles);
 		pCmdUI->Enable(AfxGetAppSettings().fEnableSubtitles && m_pCAP && !m_fAudioOnly);
 	}
@@ -8763,9 +8810,6 @@ void CMainFrame::OnPlayLanguage(UINT nID)
 			pSSA->Enable(0, AMSTREAMSELECTENABLE_ENABLE);
 		}
 	} else if (iGr == 2) { // Subtitle Stream
-		if (!AfxGetAppSettings().fEnableSubtitles || AfxGetAppSettings().fDisableInternalSubtitles) {
-			return;
-		}
 		if (m_iSubtitleSel > 0) {
 			m_iSubtitleSel = 0;
 			UpdateSubtitle();
