@@ -8425,14 +8425,18 @@ void CMainFrame::SetAudioDelay(REFERENCE_TIME rtShift)
 
 void CMainFrame::SetSubtitleDelay(int delay_ms)
 {
+	if (!m_pCAP && !b_UseVSFilter) {
+		return;
+	}
+
 	if (m_pCAP) {
 		m_pCAP->SetSubtitleDelay(delay_ms);
-
-		CString		strSubDelay;
-		strSubDelay.Format (ResStr(IDS_MAINFRM_139), delay_ms);
-		SendStatusMessage(strSubDelay, 3000);
-		m_OSD.DisplayMessage (OSD_TOPLEFT, strSubDelay);
 	}
+
+	CString strSubDelay;
+	strSubDelay.Format (ResStr(IDS_MAINFRM_139), delay_ms);
+	SendStatusMessage(strSubDelay, 3000);
+	m_OSD.DisplayMessage (OSD_TOPLEFT, strSubDelay);
 }
 
 void CMainFrame::OnPlayChangeAudDelay(UINT nID)
@@ -17060,6 +17064,7 @@ afx_msg void CMainFrame::OnSubtitleDelay(UINT nID)
 					SubtitleDelay += AfxGetAppSettings().nSubDelayInterval;
 				}
 				pDVS->put_SubtitleTiming(SubtitleDelay, SubtitleSpeedMul, SubtitleSpeedDiv);
+				SetSubtitleDelay(SubtitleDelay);
 			}
 		}	
 		return;
