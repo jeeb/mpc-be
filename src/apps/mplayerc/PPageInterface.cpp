@@ -443,7 +443,7 @@ void CPPageInterface::OnClickClrGrad2()
 	}
 
 	UpdateData();
-	s.clrGrad1ABGR		= m_clrGrad1ABGR;
+	s.clrGrad2ABGR		= m_clrGrad2ABGR;
 	OnChngOSDCombo();
 
 }
