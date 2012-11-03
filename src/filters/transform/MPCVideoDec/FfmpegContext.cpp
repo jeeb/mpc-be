@@ -647,7 +647,7 @@ int	MPEG2CheckCompatibility (struct AVCodecContext* pAVCtx, struct AVFrame* pFra
 
 HRESULT FFMpeg2DecodeFrame (DXVA_PictureParameters* pPicParams, DXVA_QmatrixData* pQMatrixData, DXVA_SliceInfo* pSliceInfo, int* nSliceCount,
 							struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int* nNextCodecIndex, int* nFieldType, int* nSliceType, BYTE* pBuffer, UINT nSize,
-							bool* bIsField)
+							bool* bIsField, int* b_repeat_pict)
 {
 	HRESULT			hr = E_FAIL;
 	int				i;
@@ -689,6 +689,10 @@ HRESULT FFMpeg2DecodeFrame (DXVA_PictureParameters* pPicParams, DXVA_QmatrixData
 	is_field									= s->picture_structure != PICT_FRAME;
 	if (bIsField) {
 		*bIsField								= is_field;
+	}
+
+	if (b_repeat_pict) {
+		*b_repeat_pict							= s->current_picture.f.repeat_pict;
 	}
 
 	pPicParams->wPicWidthInMBminus1				= s->mb_width-1;

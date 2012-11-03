@@ -45,6 +45,8 @@ enum PCI_Vendors {
 #define DXVA_PROFILE_HIGHER_THAN_HIGH	8
 #define DXVA_HIGH_BIT					16
 
+#define AVRTIMEPERFRAME_PULLDOWN		417083
+
 // === H264 functions
 HRESULT			FFH264DecodeFrame (struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize, int* pFramePOC, int* pOutPOC, REFERENCE_TIME* pOutrtStart, UINT* SecondFieldOffset, int* Sync);
 HRESULT			FFH264BuildPicParams (DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_H264* pDXVAScalingMatrix, int* nFieldType, int* nSliceType, struct AVCodecContext* pAVCtx, DWORD nPCIVendor);
@@ -62,7 +64,7 @@ HRESULT			FFVC1UpdatePictureParam (DXVA_PictureParameters* pPicParams, struct AV
 int				MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame);
 HRESULT			FFMpeg2DecodeFrame (DXVA_PictureParameters* pPicParams, DXVA_QmatrixData* m_QMatrixData, DXVA_SliceInfo* pSliceInfo, int* nSliceCount,
 									struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int* nNextCodecIndex, int* nFieldType, int* nSliceType, BYTE* pBuffer, UINT nSize,
-									bool* bIsField);
+									bool* bIsField, int* b_repeat_pict);
 
 // === Common functions
 unsigned long	FFGetMBNumber(struct AVCodecContext* pAVCtx);

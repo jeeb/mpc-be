@@ -73,9 +73,11 @@ void CDXVADecoderMpeg2::Init()
 			ASSERT(FALSE);
 	}
 
-	m_pMPEG2Buffer		= NULL;
-	m_nMPEG2BufferSize	= 0;
+	m_pMPEG2Buffer			= NULL;
+	m_nMPEG2BufferSize		= 0;
 	ResetBuffer();
+
+	m_bFrame_repeat_pict	= false;
 
 }
 
@@ -115,20 +117,25 @@ static CString FrameType(bool bIsField, BYTE bSecondField)
 
 HRESULT CDXVADecoderMpeg2::DecodeFrameInternal (BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
-	HRESULT					hr				= S_FALSE;
-	int						nSurfaceIndex	= -1;
+	HRESULT					hr					= S_FALSE;
+	int						nSurfaceIndex		= -1;
 	CComPtr<IMediaSample>	pSampleToDeliver;
-	int						nFieldType		= -1;
-	int						nSliceType		= -1;
-	bool					bIsField		= false;
+	int						nFieldType			= -1;
+	int						nSliceType			= -1;
+	bool					bIsField			= false;
+	int						bFrame_repeat_pict	= 0;
 
 	CHECK_HR_FALSE (FFMpeg2DecodeFrame (&m_PictureParams, &m_QMatrixData, m_SliceInfo, &m_nSliceCount, m_pFilter->GetAVCtx(),
-					m_pFilter->GetFrame(), &m_nNextCodecIndex, &nFieldType, &nSliceType, pDataIn, nSize, &bIsField));
+					m_pFilter->GetFrame(), &m_nNextCodecIndex, &nFieldType, &nSliceType, pDataIn, nSize, &bIsField, &bFrame_repeat_pict));
 
 	// Wait I frame after a flush
 	if (m_bFlushed && (!m_PictureParams.bPicIntra || (bIsField && m_PictureParams.bSecondField))) {
 		TRACE_MPEG2 ("CDXVADecoderMpeg2::DecodeFrame() : Flush - wait I frame, %ws\n", FrameType(bIsField, m_PictureParams.bSecondField));
 		return S_FALSE;
+	}
+
+	if (!m_bFrame_repeat_pict && bFrame_repeat_pict) {
+		m_bFrame_repeat_pict = true;
 	}
 
 	CHECK_HR (GetFreeSurfaceIndex (nSurfaceIndex, &pSampleToDeliver, rtStart, rtStop));
@@ -243,14 +250,12 @@ void CDXVADecoderMpeg2::Flush()
 		RemoveRefFrame (m_wRefPictureIndex[1]);
 	}
 
-	m_wRefPictureIndex[0] = NO_REF_FRAME;
-	m_wRefPictureIndex[1] = NO_REF_FRAME;
+	m_wRefPictureIndex[0]	= NO_REF_FRAME;
+	m_wRefPictureIndex[1]	= NO_REF_FRAME;
 
-	m_rtLastStart		= 0;
+	m_rtLastStart			= 0;
 
-	m_FrameCount		= 0;
-	m_rtLastValidStart	= 0;
-	m_rtAvrTimePerFrame	= 0;
+	m_bFrame_repeat_pict	= 0;
 
 	__super::Flush();
 }
@@ -283,24 +288,15 @@ int CDXVADecoderMpeg2::FindOldestFrame()
 
 void CDXVADecoderMpeg2::UpdateFrameTime (REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
 {
-	m_FrameCount++;
-	if (rtStart != _I64_MIN) {
-		if (m_FrameCount > 5) { // TODO - possible minimal count of frame without timestamp is different ... i think 5 is optimal
-			m_rtAvrTimePerFrame = abs(rtStart - m_rtLastValidStart)/m_FrameCount;
-		}
-
-		m_rtLastValidStart	= rtStart;
-		m_FrameCount		= 0;
-	}
-
 	if (m_rtLastStart && (rtStart == _I64_MIN || (rtStart < m_rtLastStart))) {
 		rtStart = m_rtLastStart;
 	}
 
-	TRACE_MPEG2 ("UpdateFrameTime() : {AvrTimePerFrame = %10I64d, Calculated AvrTimePerFrame = %10I64d}\n", m_pFilter->GetAvrTimePerFrame(), m_rtAvrTimePerFrame);
-
-	REFERENCE_TIME Duration	= m_rtAvrTimePerFrame ? m_rtAvrTimePerFrame : m_pFilter->GetAvrTimePerFrame();
-	rtStop					= rtStart + (Duration / m_pFilter->GetRate());
+	REFERENCE_TIME AvgTimePerFrame = m_pFilter->GetAvrTimePerFrame();
+	
+	bool m_PullDownFlag	= (m_bFrame_repeat_pict && AvgTimePerFrame == 333666);
+	AvgTimePerFrame		= m_PullDownFlag ? AVRTIMEPERFRAME_PULLDOWN : AvgTimePerFrame;
+	rtStop				= rtStart + (AvgTimePerFrame / m_pFilter->GetRate());
 
 	m_rtLastStart = rtStop;
 }

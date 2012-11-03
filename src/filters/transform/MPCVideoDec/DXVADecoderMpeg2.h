@@ -64,10 +64,7 @@ private:
 
 	REFERENCE_TIME			m_rtLastStart;
 
-	// calculate Average FrameRate
-	REFERENCE_TIME			m_rtAvrTimePerFrame;
-	REFERENCE_TIME			m_rtLastValidStart;
-	unsigned				m_FrameCount;
+	bool 					m_bFrame_repeat_pict;
 
 	// Private functions
 	void					Init();
