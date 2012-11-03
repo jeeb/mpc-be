@@ -763,13 +763,10 @@ void CAppSettings::SaveSettings()
 
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_ISDB, strISDb);
 
-	pApp->WriteProfileString(IDS_R_SHADERS, NULL, NULL);
-	pApp->WriteProfileInt(IDS_R_SHADERS, IDS_R_SHADERS_INITIALIZED, 1);
-	pApp->WriteProfileString(IDS_R_SHADERS, IDS_R_SHADERS_COMBINE, strShadercombine);
-	pApp->WriteProfileString(IDS_R_SHADERS, IDS_R_SHADERS_COMBINESCREENSPACE, strShadercombineScreenSpace);
-
 	if (fShaderEditorWasOpened) {
 		// This is a large data block. Save it only when really necessary.
+		pApp->WriteProfileString(IDS_R_SHADERS, NULL, NULL);
+		pApp->WriteProfileInt(IDS_R_SHADERS, IDS_R_SHADERS_INITIALIZED, 1);
 		pos = m_shaders.GetHeadPosition();
 		for (int i = 0; pos; i++) {
 			const Shader& s = m_shaders.GetNext(pos);
@@ -1455,11 +1452,6 @@ void CAppSettings::LoadSettings()
 	fStartMainTitle		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DVD_START_MAIN_TITLE, 0);
 	fmadVRchange		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DVD_MADVR_CHANGE, 0);
 	fLastFullScreen		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LASTFULLSCREEN, 0);
-
-	// TODO: sort shaders by label
-
-	strShadercombine = pApp->GetProfileString(IDS_R_SHADERS, IDS_R_SHADERS_COMBINE, _T(""));
-	strShadercombineScreenSpace = pApp->GetProfileString(IDS_R_SHADERS, IDS_R_SHADERS_COMBINESCREENSPACE, _T(""));
 
 	fRemainingTime = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_REMAINING_TIME, FALSE);
 
