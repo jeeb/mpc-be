@@ -57,6 +57,10 @@ cz.WinVersionTooLowError=[name] vyžaduje Windows XP Service Pack 3 nebo nověj�
 de.WelcomeLabel2=Dieses Programm installiert [name] auf Ihrem Computer.%n%nEs wird empfohlen, alle laufenden Programme zu beenden, bevor Sie mit der Installation fortfahren.
 de.WinVersionTooLowError=[name] benötigt Windows XP Service Pack 3 oder höher.
 
+;Greek
+el.WelcomeLabel2=Θα γίνει εγκατάσταση του [name] στον υπολογιστή σας.%n%nΣας συνιστούμε να κλείσετε κάθε άλλη εφαρμογή πριν συνεχίσετε.
+el.WinVersionTooLowError=Το [name] χρειάζεται Windows XP Service Pack 3 ή νεότερο για να λειτουργήσει.
+
 ;Spanish
 es.WelcomeLabel2=Este programa instalara [name] en tu computadora.%n%nEs recomendable que cierres todas las aplicaciones antes de continuar.
 es.WinVersionTooLowError=[name] require Windows XP Service Pack 3 o superior para funcionar.
@@ -172,7 +176,7 @@ en.PinToTaskBar=Pin to TaskBar
 #ifdef localize
 
 ;Portuguese (Brasil)
-br.langid=00000017
+br.langid=00001046
 br.comp_mpciconlib=Biblioteca de ícones
 br.comp_mpcresources=Traduções
 br.comp_mpcbeshellext=Install the shell extension
@@ -209,7 +213,7 @@ br.PinToTaskBar=Pin to TaskBar
 
 
 ;Belarusian
-by.langid=00000015
+by.langid=00001059
 by.comp_mpciconlib=Бібліятэка значкоў
 by.comp_mpcresources=Пераклады
 by.comp_mpcbeshellext=Install the shell extension
@@ -246,16 +250,16 @@ by.PinToTaskBar=Pin to TaskBar
 
 
 ;Basque
-eu.langid=00000023
+eu.langid=00001069
 eu.comp_mpciconlib=Ikur Liburutegia
 eu.comp_mpcresources=Itzulpenak
-eu.msg_DeleteSettings=MPC-HC ezarpenak kentzea ere nahi dituzu?%n%nMPC-HC berriro ezartzeko asmoa baduzu ez dituzu ezabatu behar.
+eu.msg_DeleteSettings=MPC-BE ezarpenak kentzea ere nahi dituzu?%n%nMPC-BE berriro ezartzeko asmoa baduzu ez dituzu ezabatu behar.
 eu.msg_NoD3DX9DLL_found=Azken DirectX bertsioa ez dago ezarrita!%n%nMesedez jeitsi eta ezarri azken DirectX bertsioa ({#DIRECTX_SDK_DATE}) sistema eragileari kasu egin gabe.
-eu.msg_SetupIsRunningWarning=MPC-HC ezarpena jadanik ekinean dago!
+eu.msg_SetupIsRunningWarning=MPC-BE ezarpena jadanik ekinean dago!
 #if defined(sse_required)
-eu.msg_simd_sse=MPC-HC eraiketa honek SSE hedapen sostengua duen CPU bat behar du.%n%nZure CPU-ak ez ditu gaitasun hauek.
+eu.msg_simd_sse=MPC-BE eraiketa honek SSE hedapen sostengua duen CPU bat behar du.%n%nZure CPU-ak ez ditu gaitasun hauek.
 #elif defined(sse2_required)
-eu.msg_simd_sse2=MPC-HC erakiketa honek SSE2 hedapen sostengua duen CPU bat behar du.%n%nZure CPU-ak ez ditu gaitasun hauek.
+eu.msg_simd_sse2=MPC-BE erakiketa honek SSE2 hedapen sostengua duen CPU bat behar du.%n%nZure CPU-ak ez ditu gaitasun hauek.
 #endif
 eu.tsk_AllUsers=Erabiltzaile guztientzat
 eu.tsk_CurrentUser=Oraingo erabiltzailearentzat bakarrrik
@@ -282,7 +286,7 @@ eu.PinToTaskBar=Pin to TaskBar
 
 
 ;Catalan
-ca.langid=00000019
+ca.langid=00001027
 ca.comp_mpciconlib=Llibreria d'icones
 ca.comp_mpcresources=Traduccions
 ca.comp_mpcbeshellext=Install the shell extension
@@ -319,7 +323,7 @@ ca.PinToTaskBar=Pin to TaskBar
 
 
 ;Czech
-cz.langid=00000005
+cz.langid=00001029
 cz.comp_mpciconlib=Ikony typů souborů
 cz.comp_mpcresources=Jazykové soubory
 cz.comp_mpcbeshellext=Install the shell extension
@@ -392,8 +396,45 @@ de.AssociationMPCPlayVideoFilesS=Video Files
 de.PinToTaskBar=Pin to TaskBar
 
 
+;Greek
+el.langid=00001032
+el.comp_mpciconlib=Βιβλιοθήκη Εικονιδίων
+el.comp_mpcresources=Μεταφράσεις
+el.comp_mpcbeshellext=Install the shell extension
+el.msg_DeleteSettings=Θέλετε να διαγράψετε τις ρυθμίσεις του MPC-BE;%n%nΑν σκοπεύετε να εγκαταστήσετε το MPC-BE πάλι τότε δεν χρειάζεται να τις διαγράψετε.
+el.msg_NoD3DX9DLL_found=The latest DirectX runtime is not installed!%n%nPlease download and install the latest DirectX runtime ({#DIRECTX_SDK_DATE}) regardless of your operating system.
+el.msg_SetupIsRunningWarning=Η εγκατάσταση του MPC-BE εκτελείται ήδη!
+#if defined(sse_required)
+el.msg_simd_sse=Αυτή η έκδοση του MPC-BE απαιτεί επεξεργαστή CPU με υποστήριξη SSE.%n%nΟ επεξεργαστής σας δεν το υποστηρίζει.
+#elif defined(sse2_required)
+el.msg_simd_sse2=Αυτή η έκδοση του MPC-BE απαιτεί επεξεργαστή CPU με υποστήριξη SSE2.%n%nΟ επεξεργαστής σας δεν το υποστηρίζει.
+#endif
+el.tsk_AllUsers=Για όλους τους χρήστες
+el.tsk_CurrentUser=Για τον τρέχων χρήστη μόνο
+el.tsk_Other=Επιπλέον ενέργειες:
+el.tsk_ResetSettings=Επαναφορά ρυθμίσεων
+el.types_DefaultInstallation=Προκαθορισμένη εγκατάσταση
+el.types_CustomInstallation=Προσαρμοσμένη εγκατάσταση
+el.ViewChangelog=Εμφάνιση Λίστας Αλλαγών
+el.AssociationFormatsAV=Configuring associations with video and audio files:
+el.AssociationFormats=Association with video and audio files
+el.AssociationVideo=Association with video files
+el.AssociationAudio=Association with audio files
+el.AssociationPlaylist=Association with playlists
+el.AutoPlayType=Auto play:
+el.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+el.AssociationMPCPlayCDAudioS=Audio CD
+el.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+el.AssociationMPCPlayDVDMovieS=DVD Movie
+el.AssociationMPCPlayMusicFilesF=Play Music
+el.AssociationMPCPlayMusicFilesS=Music Files
+el.AssociationMPCPlayVideoFilesF=Play Video
+el.AssociationMPCPlayVideoFilesS=Video Files
+el.PinToTaskBar=Pin to TaskBar
+
+
 ;Spanish
-es.langid=00000006
+es.langid=00001034
 es.comp_mpciconlib=Librería de iconos
 es.comp_mpcresources=Traducciones
 es.comp_mpcbeshellext=Install the shell extension
@@ -430,7 +471,7 @@ es.PinToTaskBar=Pin to TaskBar
 
 
 ;French
-fr.langid=00000001
+fr.langid=00001036
 fr.comp_mpciconlib=Bibliothèque d'icône
 fr.comp_mpcresources=Traductions
 fr.comp_mpcbeshellext=Install the shell extension
@@ -467,7 +508,7 @@ fr.PinToTaskBar=Pin to TaskBar
 
 
 ;Hebrew
-he.langid=00000022
+he.langid=00001037
 he.comp_mpciconlib=ספריית אייקונים
 he.comp_mpcresources=תרגומים
 he.comp_mpcbeshellext=Install the shell extension
@@ -504,7 +545,7 @@ he.PinToTaskBar=Pin to TaskBar
 
 
 ;Hungarian
-hu.langid=00000007
+hu.langid=00001038
 hu.comp_mpciconlib=Ikon Gyűjtemény
 hu.comp_mpcresources=Fordítások
 hu.comp_mpcbeshellext=Install the shell extension
@@ -541,7 +582,7 @@ hu.PinToTaskBar=Pin to TaskBar
 
 
 ;Armenian
-hy.langid=00000021
+hy.langid=00001067
 hy.comp_mpciconlib=Պատկերների գրադարան
 hy.comp_mpcresources=Թարգմանություններ
 hy.comp_mpcbeshellext=Install the shell extension
@@ -578,7 +619,7 @@ hy.PinToTaskBar=Pin to TaskBar
 
 
 ;Italian
-it.langid=00000011
+it.langid=00001040
 it.comp_mpciconlib=Libreria icone
 it.comp_mpcresources=Traduzioni
 it.comp_mpcbeshellext=Install the shell extension
@@ -610,7 +651,7 @@ it.PinToTaskBar=Pin to TaskBar
 
 
 ;Japanese
-ja.langid=00000020
+ja.langid=00001041
 ja.comp_mpciconlib=アイコン ライブラリー
 ja.comp_mpcresources=翻訳
 ja.comp_mpcbeshellext=Install the shell extension
@@ -647,7 +688,7 @@ ja.PinToTaskBar=Pin to TaskBar
 
 
 ;Korean
-kr.langid=00000008
+kr.langid=00001042
 kr.comp_mpciconlib=아이콘 라이브러리
 kr.comp_mpcresources=번역
 kr.comp_mpcbeshellext=쉘확장 설치
@@ -683,9 +724,8 @@ kr.AssociationMPCPlayVideoFilesS=비디오 파일
 kr.PinToTaskBar=Pin to TaskBar
 
 
-
 ;Dutch
-nl.langid=00000018
+nl.langid=00001043
 nl.comp_mpciconlib=Iconen voor mediabestanden
 nl.comp_mpcresources=Localisaties
 nl.comp_mpcbeshellext=Install the shell extension
@@ -722,7 +762,7 @@ nl.PinToTaskBar=Pin to TaskBar
 
 
 ;Polish
-pl.langid=00000009
+pl.langid=00001045
 pl.comp_mpciconlib=Ikony plików multimedialnych
 pl.comp_mpcresources=Tłumaczenia
 pl.comp_mpcbeshellext=Install the shell extension
@@ -759,7 +799,7 @@ pl.PinToTaskBar=Pin to TaskBar
 
 
 ;Russian
-ru.langid=00000003
+ru.langid=00001049
 ru.comp_mpciconlib=Библиотека значков
 ru.comp_mpcresources=Локализации
 ru.comp_mpcbeshellext=Установить расширение оболочки
@@ -795,9 +835,8 @@ ru.AssociationMPCPlayVideoFilesS=Видео файлы
 ru.PinToTaskBar=Закрепить в панели задач
 
 
-
 ;Chinese Simplified
-sc.langid=00000013
+sc.langid=00002052
 sc.comp_mpciconlib=图标库
 sc.comp_mpcresources=翻译
 sc.comp_mpcbeshellext=Install the shell extension
@@ -834,7 +873,7 @@ sc.PinToTaskBar=Pin to TaskBar
 
 
 ;Swedish
-sv.langid=00000016
+sv.langid=00001051
 sv.comp_mpciconlib=Ikonbibliotek
 sv.comp_mpcbeshellext=Install the shell extension
 sv.comp_mpcresources=Översättningar
@@ -871,7 +910,7 @@ sv.PinToTaskBar=Pin to TaskBar
 
 
 ;Slovakian
-sk.langid=00000012
+sk.langid=00001053
 sk.comp_mpciconlib=Knižnica ikon
 sk.comp_mpcresources=Preklady
 sk.comp_mpcbeshellext=Install the shell extension
@@ -908,7 +947,7 @@ sk.PinToTaskBar=Pin to TaskBar
 
 
 ;Chinese Traditional
-tc.langid=00000014
+tc.langid=00003076
 tc.comp_mpciconlib=圖示庫
 tc.comp_mpcresources=翻譯
 tc.comp_mpcbeshellext=Install the shell extension
@@ -945,7 +984,7 @@ tc.PinToTaskBar=Pin to TaskBar
 
 
 ;Turkish
-tr.langid=00000004
+tr.langid=00001055
 tr.comp_mpciconlib=Simge Kütüphanesi
 tr.comp_mpcresources=Çeviriler
 tr.comp_mpcbeshellext=Install the shell extension
@@ -982,7 +1021,7 @@ tr.PinToTaskBar=Pin to TaskBar
 
 
 ;Ukrainian
-ua.langid=00000010
+ua.langid=00001058
 ua.comp_mpciconlib=Бібліотека іконок
 ua.comp_mpcresources=Локалізації
 ua.comp_mpcbeshellext=Install the shell extension

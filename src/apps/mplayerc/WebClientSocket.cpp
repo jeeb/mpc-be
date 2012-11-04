@@ -22,12 +22,10 @@
  */
 
 #include "stdafx.h"
-#include <atlisapi.h>
 #include "mplayerc.h"
-#include "resource.h"
 #include "MainFrm.h"
+#include <atlisapi.h>
 #include "../../Subtitles/TextFile.h"
-#include "WebServer.h"
 #include "WebClientSocket.h"
 #include "DIB.h"
 
@@ -112,20 +110,15 @@ void CWebClientSocket::Header()
 
 	// remember new cookies
 
-	POSITION pos = m_hdrlines.GetStartPosition();
-	while (pos) {
-		CString key, value;
-		m_hdrlines.GetNextAssoc(pos, key, value);
-
-		if (key == _T("cookie")) {
-			CAtlList<CString> sl;
-			Explode(value, sl, ';');
-			POSITION pos2 = sl.GetHeadPosition();
-			while (pos2) {
-				CAtlList<CString> sl2;
-				Explode(sl.GetNext(pos2), sl2, '=', 2);
-				m_cookie[sl2.GetHead()] = sl2.GetCount() == 2 ? sl2.GetTail() : _T("");
-			}
+	CString value;
+	if (m_hdrlines.Lookup(_T("cookie"), value)) {
+		CAtlList<CString> sl;
+		Explode(value, sl, ';');
+		POSITION pos = sl.GetHeadPosition();
+		while (pos) {
+			CAtlList<CString> sl2;
+			Explode(sl.GetNext(pos), sl2, '=', 2);
+			m_cookie[sl2.GetHead()] = sl2.GetCount() == 2 ? sl2.GetTail() : _T("");
 		}
 	}
 

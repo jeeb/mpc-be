@@ -23,14 +23,11 @@
 
 #include "stdafx.h"
 #include "mplayerc.h"
-#include "resource.h"
 #include "MainFrm.h"
-#include <atlbase.h>
 #include <atlisapi.h>
 #include <zlib/zlib.h>
 #include "WebServerSocket.h"
 #include "WebClientSocket.h"
-#include "WebServer.h"
 
 CAtlStringMap<CWebServer::RequestHandler> CWebServer::m_internalpages;
 CAtlStringMap<UINT> CWebServer::m_downloads;
@@ -354,8 +351,7 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 					hdrlines.RemoveAt(cur);
 				}
 			}
-			tmphdr = Implode(hdrlines, '\n');
-			tmphdr.Replace("\n", "\r\n");
+			tmphdr = Implode(hdrlines, "\r\n");
 			hdr += tmphdr + "\r\n";
 		}
 	}
@@ -387,12 +383,10 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 	}
 
 	UINT resid;
-	CStringA res;
-	if (!fHandled && m_downloads.Lookup(pClient->m_path, resid) && LoadResource(resid, res, _T("FILE"))) {
+	if (!fHandled && m_downloads.Lookup(pClient->m_path, resid) && LoadResource(resid, body, _T("FILE"))) {
 		if (mime.IsEmpty()) {
 			mime = "application/octet-stream";
 		}
-		memcpy(body.GetBufferSetLength(res.GetLength()), res.GetBuffer(), res.GetLength());
 		fHandled = true;
 	}
 
@@ -457,7 +451,7 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 	}
 
 	// gzip
-	if (AfxGetAppSettings().fWebServerUseCompression && hdr.Find("Content-Encoding:") < 0)
+	if (AfxGetAppSettings().fWebServerUseCompression && hdr.Find("Content-Encoding:") < 0 && ext != ".png" && ext != ".jpg" && ext != ".gif")
 		do {
 			CString accept_encoding;
 			pClient->m_hdrlines.Lookup(_T("accept-encoding"), accept_encoding);
@@ -468,34 +462,34 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 				break;
 			}
 
-			CHAR path[_MAX_PATH], fn[_MAX_PATH];
-			if (!GetTempPathA(_MAX_PATH, path) || !GetTempFileNameA(path, "mpc_gz", 0, fn)) {
+			z_stream strm;
+			strm.zalloc = Z_NULL;
+			strm.zfree = Z_NULL;
+			strm.opaque = Z_NULL;
+			int ret = deflateInit2(&strm, 9, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY);
+			if (ret != Z_OK) {
+				ASSERT(0);
 				break;
 			}
 
-			gzFile gf = gzopen(fn, "wb9");
-			if (!gf || gzwrite(gf, (LPVOID)(LPCSTR)body, body.GetLength()) != body.GetLength()) {
-				if (gf) {
-					gzclose(gf);
-				}
-				DeleteFileA(fn);
-				break;
-			}
-			gzclose(gf);
+			int gzippedBuffLen = body.GetLength();
+			BYTE* gzippedBuff = new BYTE[gzippedBuffLen];
+			strm.avail_in = body.GetLength();
+			strm.next_in = (Bytef*)(LPCSTR)body;
+			strm.avail_out = gzippedBuffLen;
+			strm.next_out = gzippedBuff;
 
-			FILE* f = NULL;
-			if (fopen_s(&f, fn, "rb")) {
-				DeleteFileA(fn);
+			ret = deflate(&strm, Z_FINISH);
+			if (ret != Z_STREAM_END || strm.avail_in != 0) {
+				ASSERT(0);
+				deflateEnd(&strm);
+				delete [] gzippedBuff;
 				break;
 			}
-			fseek(f, 0, 2);
-			CHAR* s = body.GetBufferSetLength(ftell(f));
-			fseek(f, 0, 0);
-			int len = fread(s, 1, body.GetLength(), f);
-			ASSERT(len == body.GetLength());
-			UNREFERENCED_PARAMETER(len);
-			fclose(f);
-			DeleteFileA(fn);
+			gzippedBuffLen -= strm.avail_out;
+			memcpy(body.GetBufferSetLength(gzippedBuffLen), gzippedBuff, gzippedBuffLen);
+			deflateEnd(&strm);
+			delete [] gzippedBuff;
 
 			hdr += "Content-Encoding: gzip\r\n";
 		} while (0);
