@@ -125,7 +125,7 @@ BOOL CSaveDlg::OnInitDialog()
 	if (!pReader) {
 		hr = S_OK;
 		CComPtr<IUnknown> pUnk;
-		pUnk.CoCreateInstance(CLSID_AsyncReader);
+		hr = pUnk.CoCreateInstance(CLSID_AsyncReader);
 
 		if (FAILED(hr) || !(pReader = pUnk) || FAILED(pReader->Load(fnw, NULL))) {
 			pReader.Release();
@@ -135,10 +135,10 @@ BOOL CSaveDlg::OnInitDialog()
 	if (!pReader) {
 		hr = S_OK;
 		CComPtr<IUnknown> pUnk;
-		pUnk.CoCreateInstance(CLSID_URLReader);
+		hr = pUnk.CoCreateInstance(CLSID_URLReader);
 
 		if (CComQIPtr<IBaseFilter> pSrc = pUnk) {
-			pGB->AddFilter(pSrc, fnw);
+			hr = pGB->AddFilter(pSrc, fnw);
 
 			if (FAILED(hr) || !(pReader = pUnk) || FAILED(hr = pReader->Load(fnw, NULL))) {
 				pReader.Release();

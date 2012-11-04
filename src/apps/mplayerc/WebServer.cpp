@@ -451,7 +451,8 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 	}
 
 	// gzip
-	if (AfxGetAppSettings().fWebServerUseCompression && hdr.Find("Content-Encoding:") < 0 && ext != ".png" && ext != ".jpg" && ext != ".gif")
+	if (AfxGetAppSettings().fWebServerUseCompression && !body.IsEmpty()
+		&& hdr.Find("Content-Encoding:") < 0 && ext != ".png" && ext != ".jpg" && ext != ".gif")
 		do {
 			CString accept_encoding;
 			pClient->m_hdrlines.Lookup(_T("accept-encoding"), accept_encoding);
