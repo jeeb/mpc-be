@@ -14217,15 +14217,11 @@ void CMainFrame::SetupLanguageMenu()
 	for (size_t i = 0; i < CMPlayerCApp::languageResourcesCount; i++) {
 
 		const LanguageResource& lr = CMPlayerCApp::languageResources[i];
-
-		if (i == AfxGetMyApp()->GetLanguageId(_T("English"))) {
-			pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, lr.resourceID, lr.name);
-		}
-
 		LPCTSTR strSatellite = AfxGetMyApp()->GetSatelliteDll(i);
-		if (strSatellite) {
+
+		if (strSatellite || lr.dllPath == NULL) {
 			HMODULE lib = NULL;
-			if ((lib = LoadLibrary(strSatellite)) != NULL) {
+			if ((lib = LoadLibrary(strSatellite)) != NULL || lr.dllPath == NULL) {
 				FreeLibrary(lib);
 				pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, i + ID_LANGUAGE_ENGLISH, lr.name);
 				iCount++;
@@ -14233,7 +14229,7 @@ void CMainFrame::SetupLanguageMenu()
 		}
 	}
 
-	if (!iCount) {
+	if (iCount <= 1) {
 		pSub->RemoveMenu(0, MF_BYPOSITION);
 	}
 }
