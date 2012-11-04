@@ -14213,17 +14213,21 @@ void CMainFrame::SetupLanguageMenu()
 	} else while (pSub->RemoveMenu(0, MF_BYPOSITION)) {
 			;
 		}
-	for (int i=1; i<ID_LANGUAGE_LAST-ID_LANGUAGE_ENGLISH; i++) {
-		UINT nID = AfxGetMyApp()->GetLanguageAlph(i);
-		if (nID == 1) {
-			pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, ID_LANGUAGE_ENGLISH, AfxGetMyApp()->GetLanguageName(0));
+
+	for (size_t i = 0; i < CMPlayerCApp::languageResourcesCount; i++) {
+
+		const LanguageResource& lr = CMPlayerCApp::languageResources[i];
+
+		if (i == AfxGetMyApp()->GetLanguageId(_T("English"))) {
+			pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, lr.resourceID, lr.name);
 		}
-		LPCTSTR strSatellite = AfxGetMyApp()->GetSatelliteDll(nID);
+
+		LPCTSTR strSatellite = AfxGetMyApp()->GetSatelliteDll(i);
 		if (strSatellite) {
 			HMODULE lib = NULL;
 			if ((lib = LoadLibrary(strSatellite)) != NULL) {
 				FreeLibrary(lib);
-				pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, nID+ID_LANGUAGE_ENGLISH, AfxGetMyApp()->GetLanguageName(nID));
+				pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, i + ID_LANGUAGE_ENGLISH, lr.name);
 				iCount++;
 			}
 		}
@@ -17097,7 +17101,7 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 
 	nID -= ID_LANGUAGE_ENGLISH;
 
-	if (nID == 22) { // Show a warning when switching to Hebrew (must not be translated)
+	if (nID == AfxGetMyApp()->GetLanguageId(_T("Hebrew"))) { // Show a warning when switching to Hebrew (must not be translated)
 		MessageBox(_T("The Hebrew translation will be correctly displayed (with a right-to-left layout) after restarting the application.\n"),
 				   _T("MPC-BE"), MB_ICONINFORMATION | MB_OK);
 	}
@@ -17137,9 +17141,8 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 
 afx_msg void CMainFrame::OnUpdateLanguage(CCmdUI* pCmdUI)
 {
-	AppSettings &s            = AfxGetAppSettings();
-	int          nLang        = pCmdUI->m_nID - ID_LANGUAGE_ENGLISH;
-	LPCTSTR	     strSatellite = AfxGetMyApp()->GetSatelliteDll(nLang);
+	int nLang = pCmdUI->m_nID - ID_LANGUAGE_ENGLISH;
+	LPCTSTR strSatellite = AfxGetMyApp()->GetSatelliteDll(nLang);
 
 	if (strSatellite) {
 		HMODULE lib = NULL;
@@ -17150,7 +17153,7 @@ afx_msg void CMainFrame::OnUpdateLanguage(CCmdUI* pCmdUI)
 		pCmdUI->Enable(lib != NULL);
 	}
 
-	pCmdUI->SetCheck(nLang == s.iLanguage);
+	pCmdUI->SetCheck(nLang == AfxGetAppSettings().iLanguage);
 }
 
 void CMainFrame::ProcessAPICommand(COPYDATASTRUCT* pCDS)

@@ -42,6 +42,35 @@
 #include <atlutil.h>
 #include <atlrx.h>
 
+const LanguageResource CMPlayerCApp::languageResources[] = {
+	{ID_LANGUAGE_ARMENIAN,			1067,	_T("Armenian"),				_T("hy")},
+	{ID_LANGUAGE_BASQUE,			1069,	_T("Basque"),				_T("eu")},
+	{ID_LANGUAGE_BELARUSIAN,		1059,	_T("Belarusian"),			_T("by")},
+	{ID_LANGUAGE_CATALAN,			1027,	_T("Catalan"),				_T("ca")},
+	{ID_LANGUAGE_CHINESE_SIMPLIFIED,	2052,	_T("Chinese (Simplified)"),		_T("sc")},
+	{ID_LANGUAGE_CHINESE_TRADITIONAL,	3076,	_T("Chinese (Traditional)"),	_T("tc")},
+	{ID_LANGUAGE_CZECH,				1029,	_T("Czech"),				_T("cz")},
+	{ID_LANGUAGE_DUTCH,				1043,	_T("Dutch"),				_T("nl")},
+	{ID_LANGUAGE_ENGLISH,			0,		_T("English"),				NULL},
+	{ID_LANGUAGE_FRENCH,			1036,	_T("French"),				_T("fr")},
+	{ID_LANGUAGE_GERMAN,			1031,	_T("German"),				_T("de")},
+	//{ID_LANGUAGE_GREEK,			1032,	_T("Greek"),				_T("el")},
+	{ID_LANGUAGE_HEBREW,			1037,	_T("Hebrew"),				_T("he")},
+	{ID_LANGUAGE_HUNGARIAN,			1038,	_T("Hungarian"),			_T("hu")},
+	{ID_LANGUAGE_ITALIAN,			1040,	_T("Italian"),				_T("it")},
+	{ID_LANGUAGE_JAPANESE,			1041,	_T("Japanese"),				_T("ja")},
+	{ID_LANGUAGE_KOREAN,			1042,	_T("Korean"),				_T("kr")},
+	{ID_LANGUAGE_POLISH,			1045,	_T("Polish"),				_T("pl")},
+	{ID_LANGUAGE_PORTUGUESE_BR,		1046,	_T("Portuguese (Brazil)"),	_T("br")},
+	{ID_LANGUAGE_RUSSIAN,			1049,	_T("Russian"),				_T("ru")},
+	{ID_LANGUAGE_SLOVAK,			1053,	_T("Slovak"),				_T("sk")},
+	{ID_LANGUAGE_SWEDISH,			1051,	_T("Swedish"),				_T("sv")},
+	{ID_LANGUAGE_SPANISH,			1034,	_T("Spanish"),				_T("es")},
+	{ID_LANGUAGE_TURKISH,			1055,	_T("Turkish"),				_T("tr")},
+	{ID_LANGUAGE_UKRAINIAN,			1058,	_T("Ukrainian"),			_T("ua")}
+};
+
+const size_t CMPlayerCApp::languageResourcesCount = _countof(CMPlayerCApp::languageResources);
 
 extern "C" {
 	int mingw_app_type = 1;
@@ -608,9 +637,9 @@ MMRESULT  (__stdcall * Real_mixerSetControlDetails)( HMIXEROBJ hmxobj,
 		DWORD fdwDetails)
 	= mixerSetControlDetails;
 
-
 typedef NTSTATUS (WINAPI *FUNC_NTQUERYINFORMATIONPROCESS)(HANDLE ProcessHandle, PROCESSINFOCLASS ProcessInformationClass, PVOID ProcessInformation, ULONG ProcessInformationLength, PULONG ReturnLength);
 static FUNC_NTQUERYINFORMATIONPROCESS		Real_NtQueryInformationProcess = NULL;
+
 /*
 NTSTATUS (* Real_NtQueryInformationProcess) (HANDLE				ProcessHandle,
 											 PROCESSINFOCLASS	ProcessInformationClass,
@@ -620,13 +649,11 @@ NTSTATUS (* Real_NtQueryInformationProcess) (HANDLE				ProcessHandle,
 	= NULL;
 */
 
-
 BOOL WINAPI Mine_IsDebuggerPresent()
 {
 	TRACE(_T("Oops, somebody was trying to be naughty! (called IsDebuggerPresent)\n"));
 	return FALSE;
 }
-
 
 NTSTATUS WINAPI Mine_NtQueryInformationProcess(HANDLE ProcessHandle, PROCESSINFOCLASS ProcessInformationClass, PVOID ProcessInformation, ULONG ProcessInformationLength, PULONG ReturnLength)
 {
@@ -1623,7 +1650,6 @@ void SetHandCursor(HWND m_hWnd, UINT nID)
 	SetClassLongPtr(GetDlgItem(m_hWnd, nID), GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
 }
 
-
 typedef CAtlRegExp<CAtlRECharTraits> CAtlRegExpT;
 typedef CAtlREMatchContext<CAtlRECharTraits> CAtlREMatchContextT;
 
@@ -2082,223 +2108,6 @@ DXVA2_ValueRange* CMPlayerCApp::GetEVRColorControl(ControlType nFlag)
 	return NULL;
 }
 
-LPCTSTR CMPlayerCApp::GetSatelliteDll(int nLanguage)
-{
-	switch (nLanguage) {
-		case 1:		// French
-			return _T("Lang\\mpcresources.fr.dll");
-		case 2:		// German
-			return _T("Lang\\mpcresources.de.dll");
-		case 3:		// Russian
-			return _T("Lang\\mpcresources.ru.dll");
-		case 4:		// Turkish
-			return _T("Lang\\mpcresources.tr.dll");
-		case 5:		// Czech
-			return _T("Lang\\mpcresources.cz.dll");
-		case 6:		// Spanish
-			return _T("Lang\\mpcresources.es.dll");
-		case 7:		// Hungarian
-			return _T("Lang\\mpcresources.hu.dll");
-		case 8:		// Korean
-			return _T("Lang\\mpcresources.kr.dll");
-		case 9:		// Polish
-			return _T("Lang\\mpcresources.pl.dll");
-		case 10:	// Ukrainian
-			return _T("Lang\\mpcresources.ua.dll");
-		case 11:	// Italian
-			return _T("Lang\\mpcresources.it.dll");
-		case 12 :	// Slovak
-			return _T("Lang\\mpcresources.sk.dll");
-		case 13 :	// Chinese (Simplified)
-			return _T("Lang\\mpcresources.sc.dll");
-		case 14 :	// Chinese (Traditional)
-			return _T("Lang\\mpcresources.tc.dll");
-		case 15 :	// Belarusian
-			return _T("Lang\\mpcresources.by.dll");
-		case 16 :	// Swedish
-			return _T("Lang\\mpcresources.sv.dll");
-		case 17 :	// Portuguese (Brasil)
-			return _T("Lang\\mpcresources.br.dll");
-		case 18 :	// Dutch
-			return _T("Lang\\mpcresources.nl.dll");
-		case 19 :	// Catalan
-			return _T("Lang\\mpcresources.ca.dll");
-		case 20 :	// Japanese
-			return _T("Lang\\mpcresources.ja.dll");
-		case 21 :	// Armenian
-			return _T("Lang\\mpcresources.hy.dll");
-		case 22 :	// Hebrew
-			return _T("Lang\\mpcresources.he.dll");
-		case 23 :	// Basque
-			return _T("Lang\\mpcresources.eu.dll");
-	}
-	return NULL;
-}
-
-LPCTSTR CMPlayerCApp::GetLanguageName(int nLanguage)
-{
-	switch (nLanguage) {
-		case 0:		// English
-			return _T("English");
-		case 1:		// French
-			return _T("French");
-		case 2:		// German
-			return _T("German");
-		case 3:		// Russian
-			return _T("Russian");
-		case 4:		// Turkish
-			return _T("Turkish");
-		case 5:		// Czech
-			return _T("Czech");
-		case 6:		// Spanish
-			return _T("Spanish");
-		case 7:		// Hungarian
-			return _T("Hungarian");
-		case 8:		// Korean
-			return _T("Korean");
-		case 9:		// Polish
-			return _T("Polish");
-		case 10:	// Ukrainian
-			return _T("Ukrainian");
-		case 11:	// Italian
-			return _T("Italian");
-		case 12 :	// Slovak
-			return _T("Slovak");
-		case 13 :	// Chinese (Simplified)
-			return _T("Chinese (Simplified)");
-		case 14 :	// Chinese (Traditional)
-			return _T("Chinese (Traditional)");
-		case 15 :	// Belarusian
-			return _T("Belarusian");
-		case 16 :	// Swedish
-			return _T("Swedish");
-		case 17 :	// Portuguese (Brasil)
-			return _T("Portuguese (Brasil)");
-		case 18 :	// Dutch
-			return _T("Dutch");
-		case 19 :	// Catalan
-			return _T("Catalan");
-		case 20 :	// Japanese
-			return _T("Japanese");
-		case 21 :	// Armenian
-			return _T("Armenian");
-		case 22 :	// Hebrew
-			return _T("Hebrew");
-		case 23 :	// Basque
-			return _T("Basque");
-	}
-	return NULL;
-}
-
-
-int CMPlayerCApp::GetDefLanguage()
-{
-	switch (GetUserDefaultUILanguage()) {
-		case 1036:	// French
-			return 1;
-		case 1031:	// German
-			return 2;
-		case 1049:	// Russian
-			return 3;
-		case 1055:	// Turkish
-			return 4;
-		case 1029:	// Czech
-			return 5;
-		case 1034:	// Spanish
-			return 6;
-		case 1038:	// Hungarian
-			return 7;
-		case 1042:	// Korean
-			return 8;
-		case 1045:	// Polish
-			return 9;
-		case 1058:	// Ukrainian
-			return 10;
-		case 1040:	// Italian
-			return 11;
-		case 1051 :	// Slovak
-			return 12;
-		case 2052 :	// Chinese (simplified)
-			return 13;
-		case 3076 :	// Chinese (traditional)
-			return 14;
-		case 1059 :	// Belarusian
-			return 15;
-		case 1053 :	// Swedish
-			return 16;
-		case 1046 :	// Portuguese (brasil)
-			return 17;
-		case 1043 :	// Dutch
-			return 18;
-		case 1027 :	// Catalan
-			return 19;
-		case 1041 :	// Japanese
-			return 20;
-		case 1067 : // Armenian
-			return 21;
-		case 1037 : // Hebrew
-			return 22;
-		case 1069 : // Basque
-			return 23;
-		default:
-			return 0;
-	}
-}
-
-int CMPlayerCApp::GetLanguageAlph(int nLanguage)
-{
-	switch (nLanguage) {
-		case 1 :	// Armenian
-			return 21;
-		case 2 :	// Basque
-			return 23;
-		case 3 :	// Belarusian
-			return 15;
-		case 4 :	// Catalan
-			return 19;
-		case 5 :	// Chinese (Simplified)
-			return 13;
-		case 6 :	// Chinese (Traditional)
-			return 14;
-		case 7:		// Czech
-			return  5;
-		case 8 :	// Dutch
-			return 18;
-		case 9:		// French
-			return  1;
-		case 10:	// German
-			return  2;
-		case 11 :	// Hebrew
-			return 22;
-		case 12:	// Hungarian
-			return  7;
-		case 13:	// Italian
-			return 11;
-		case 14 :	// Japanese
-			return 20;
-		case 15:	// Korean
-			return  8;
-		case 16:	// Polish
-			return  9;
-		case 17 :	// Portuguese (Brasil)
-			return 17;
-		case 18:	// Russian
-			return  3;
-		case 19 :	// Slovak
-			return 12;
-		case 20:	// Spanish
-			return  6;
-		case 21 :	// Swedish
-			return 16;
-		case 22:	// Turkish
-			return  4;
-		case 23:	// Ukrainian
-			return 10;
-		default:
-			return 0;
-	}
-}
-
 LRESULT CALLBACK RTLWindowsLayoutCbtFilterHook(int code, WPARAM wParam, LPARAM lParam)
 {
 	if (code == HCBT_CREATEWND)
@@ -2316,7 +2125,45 @@ LRESULT CALLBACK RTLWindowsLayoutCbtFilterHook(int code, WPARAM wParam, LPARAM l
 	return CallNextHookEx(NULL, code, wParam, lParam);
 }
 
-void CMPlayerCApp::SetLanguage (int nLanguage)
+LPCTSTR CMPlayerCApp::GetSatelliteDll(int nLanguage)
+{
+	CString path;
+	GetModuleFileName(NULL, path.GetBuffer(_MAX_PATH), _MAX_PATH);
+	path.ReleaseBuffer();
+	path = path.Left(path.ReverseFind('\\') + 1);
+
+	for (size_t i = 0; i < languageResourcesCount; i++) {
+		if (nLanguage == i) {
+			if (languageResources[i].dllPath == NULL) {
+				break;
+			}
+			return path + _T("Lang\\mpcresources.") + languageResources[i].dllPath + _T(".dll");
+		}
+	}
+	return NULL;
+}
+
+int CMPlayerCApp::GetLanguageId(CString lang)
+{
+	for (size_t i = 0; i < languageResourcesCount; i++) {
+		if (lang == languageResources[i].name) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+int CMPlayerCApp::GetDefLanguage()
+{
+	for (size_t i = 0; i < languageResourcesCount; i++) {
+		if (GetUserDefaultUILanguage() == languageResources[i].localeID) {
+			return i;
+		}
+	}
+	return GetLanguageId(_T("English"));
+}
+
+void CMPlayerCApp::SetLanguage(int nLanguage)
 {
 	AppSettings&	s = AfxGetAppSettings();
 	HMODULE			hMod = NULL;
@@ -2346,8 +2193,9 @@ void CMPlayerCApp::SetLanguage (int nLanguage)
 
 	if ( hMod == NULL ) {
 		hMod = AfxGetApp()->m_hInstance;
-		s.iLanguage = 0;
-	} else if (nLanguage == 22) {
+		s.iLanguage = GetLanguageId(_T("English"));
+
+	} else if (nLanguage == GetLanguageId(_T("Hebrew"))) {
 		// Hebrew needs the RTL flag.
 		SetProcessDefaultLayout(LAYOUT_RTL);
 		SetWindowsHookEx(WH_CBT, RTLWindowsLayoutCbtFilterHook, NULL, GetCurrentThreadId());
@@ -2433,10 +2281,13 @@ CRenderersSettings& GetRenderersSettings()
 
 void ThemeRGB(int iR, int iG, int iB, int& iRed, int& iGreen, int& iBlue)
 {
-	int iThemeBrightness = AfxGetAppSettings().nThemeBrightness;
-	int iThemeRed = AfxGetAppSettings().nThemeRed;
-	int iThemeGreen = AfxGetAppSettings().nThemeGreen;
-	int iThemeBlue = AfxGetAppSettings().nThemeBlue;
+	AppSettings& s = AfxGetAppSettings();
+
+	int iThemeBrightness = s.nThemeBrightness;
+	int iThemeRed = s.nThemeRed;
+	int iThemeGreen = s.nThemeGreen;
+	int iThemeBlue = s.nThemeBlue;
+
 	(iThemeBrightness+iR)*iThemeRed/256 >= 255 ? iRed = 255 : iRed = (iThemeBrightness+iR)*iThemeRed/256;
 	(iThemeBrightness+iG)*iThemeGreen/256 >= 255 ? iGreen = 255 : iGreen = (iThemeBrightness+iG)*iThemeGreen/256;
 	(iThemeBrightness+iB)*iThemeBlue/256 >= 255 ? iBlue = 255 : iBlue = (iThemeBrightness+iB)*iThemeBlue/256;

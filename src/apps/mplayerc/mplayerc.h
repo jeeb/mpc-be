@@ -94,6 +94,13 @@ extern void ThemeRGB(int iR, int iG, int iB, int& iRed, int& iGreen, int& iBlue)
 
 extern void SetHandCursor(HWND m_hWnd, UINT nID);
 
+struct LanguageResource {
+	const UINT resourceID;
+	const LANGID localeID;
+	const LPCTSTR name;
+	const LPCTSTR dllPath;
+};
+
 class CMPlayerCApp : public CWinApp
 {
 	ATL::CMutex m_mutexOneInstance;
@@ -139,11 +146,15 @@ public:
 	void						UpdateColorControlRange(bool isEVR);
 	VMR9ProcAmpControlRange*	GetVMR9ColorControl(ControlType nFlag);
 	DXVA2_ValueRange*			GetEVRColorControl(ControlType nFlag);
-	static void					SetLanguage (int nLanguage);
-	static LPCTSTR				GetSatelliteDll(int nLang);
-	static LPCTSTR				GetLanguageName(int nLang);
-	static int					GetLanguageAlph(int nLang);
+
+	static const LanguageResource languageResources[];
+	static const size_t languageResourcesCount;
+
+	static void					SetLanguage(int nLanguage);
+	static LPCTSTR				GetSatelliteDll(int nLanguage);
+	static int					GetLanguageId(CString lang);
 	static int					GetDefLanguage();
+
 	static bool					IsVSFilterInstalled();
 	static bool					HasEVR();
 	static HRESULT				GetElevationType(TOKEN_ELEVATION_TYPE* ptet);

@@ -879,10 +879,12 @@ void CAppSettings::LoadSettings()
 	}
 
 	// Set interface language first!
-	iLanguage  = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LANGUAGE, CMPlayerCApp::GetDefLanguage());
-	if (iLanguage != 0) {
+	iLanguage = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LANGUAGE, CMPlayerCApp::GetDefLanguage());
+
+	if (iLanguage != CMPlayerCApp::GetLanguageId(_T("English"))) {
 		CMPlayerCApp::SetLanguage(iLanguage);
 	}
+
 	CreateCommands();
 
 	iCaptionMenuMode = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_HIDECAPTIONMENU, MODE_SHOWCAPTIONMENU);

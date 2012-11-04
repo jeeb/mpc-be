@@ -31,16 +31,11 @@ using namespace MediaInfoLib;
 
 String mi_get_lang_file()
 {
-	CString path;
-	GetModuleFileName(NULL, path.GetBuffer(_MAX_PATH), _MAX_PATH);
-	path.ReleaseBuffer();
-	path = path.Left(path.ReverseFind('\\') + 1);
-
 	HINSTANCE mpcres = NULL;
 	int lang = AfxGetAppSettings().iLanguage;
 
 	if (lang) {
-		mpcres = LoadLibrary(path + CMPlayerCApp::GetSatelliteDll(lang));
+		mpcres = LoadLibrary(CMPlayerCApp::GetSatelliteDll(lang));
 	}
 
 	if (mpcres) {
