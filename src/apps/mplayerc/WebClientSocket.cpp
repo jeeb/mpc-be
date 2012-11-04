@@ -22,9 +22,9 @@
  */
 
 #include "stdafx.h"
+#include <atlisapi.h>
 #include "mplayerc.h"
 #include "MainFrm.h"
-#include <atlisapi.h>
 #include "../../Subtitles/TextFile.h"
 #include "WebClientSocket.h"
 #include "DIB.h"
