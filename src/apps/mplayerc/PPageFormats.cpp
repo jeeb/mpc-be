@@ -277,22 +277,13 @@ bool CPPageFormats::RegisterApp()
 	return true;
 }
 
-bool CPPageFormats::RegisterExt(CString ext, CString strLabel, bool fRegister, bool setAssociatedWithIcon)
+bool CPPageFormats::RegisterExt(CString ext, CString strLabel, bool fAudioOnly, bool setAssociatedWithIcon)
 {
 	CRegKey key;
-	bool    bSetValue;
 	CString strProgID = PROGID + ext;
 
-	if (!fRegister) {
-		if (fRegister != IsRegistered(ext)) {
-			SetFileAssociation (ext, strProgID, fRegister);
-		}
-		key.Attach(HKEY_CLASSES_ROOT);
-		key.RecurseDeleteKey(strProgID);
-		return true;
-	}
-
-	bSetValue = fRegister || (ERROR_SUCCESS != key.Open(HKEY_CLASSES_ROOT, strProgID + _T("\\shell\\open\\command"), KEY_READ));
+	bool bSetValue = true || (ERROR_SUCCESS != key.Open(HKEY_CLASSES_ROOT, strProgID + _T("\\shell\\open\\command"), KEY_READ));
+	// Why bSetValue?
 
 	// Create ProgID for this file type
 	if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID)) {
@@ -365,9 +356,14 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, bool fRegister, b
 			CString mpciconlib = GetProgramDir() + _T("\\mpciconlib.dll");
 			if (FileExists(mpciconlib)) {
 				int icon_index = GetIconIndex(ext);
-
-				/* icon_index value -1 means no icon was found in the iconlib for the file extension */
-				if ((icon_index >= 0) && ExtractIcon(AfxGetApp()->m_hInstance,(LPCWSTR)mpciconlib, icon_index)) {
+				if (icon_index < 0) {
+					if (fAudioOnly) {
+						icon_index = GetIconIndex(_T(":audio"));
+					} else {
+						icon_index = GetIconIndex(_T(":video"));
+					}
+				}
+				if (icon_index >= 0 && ExtractIcon(AfxGetApp()->m_hInstance,(LPCWSTR)mpciconlib, icon_index)) {
 					AppIcon.Format(_T("\"%s\",%d"), mpciconlib, icon_index);
 				}
 			}
@@ -391,9 +387,23 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, bool fRegister, b
 		key.RecurseDeleteKey(strProgID + _T("\\DefaultIcon"));
 	}
 
-	if (fRegister != IsRegistered(ext)) {
-		SetFileAssociation (ext, strProgID, fRegister);
+	if (!IsRegistered(ext)) {
+		SetFileAssociation (ext, strProgID, true);
 	}
+
+	return true;
+}
+
+bool CPPageFormats::UnRegisterExt(CString ext)
+{
+	CRegKey key;
+	CString strProgID = PROGID + ext;
+
+	if (IsRegistered(ext)) {
+		SetFileAssociation (ext, strProgID, false);
+	}
+	key.Attach(HKEY_CLASSES_ROOT);
+	key.RecurseDeleteKey(strProgID);
 
 	return true;
 }
@@ -840,7 +850,11 @@ BOOL CPPageFormats::OnApply()
 
 			POSITION pos = exts.GetHeadPosition();
 			while (pos) {
-				RegisterExt(exts.GetNext(pos), mf[(int)m_list.GetItemData(i)].GetDescription(), !!iChecked, m_fsetAssociatedWithIcon);
+				if (iChecked) {
+					RegisterExt(exts.GetNext(pos), mf[(int)m_list.GetItemData(i)].GetDescription(), mf[i].IsAudioOnly(), m_fsetAssociatedWithIcon);
+				} else {
+					UnRegisterExt(exts.GetNext(pos));
+				}
 			}
 		}
 	}

@@ -28,7 +28,13 @@ extern "C" __declspec(dllexport) int get_icon_index(LPCTSTR ext)
 {
 	int iconindex = IDI_NONE;
 
-	if (_tcsicmp(ext, _T(".3g2")) == 0) {
+	// icons by type
+	if (_tcsicmp(ext, _T(":video")) == 0) {
+		iconindex = IDI_DEFAULT_VIDEO_ICON;
+	} else if (_tcsicmp(ext, _T(":audio")) == 0) {
+		iconindex = IDI_DEFAULT_AUDIO_ICON;
+	// icons by extension
+	} else if (_tcsicmp(ext, _T(".3g2")) == 0) {
 		iconindex = IDI_3G2_ICON;
 	} else if (_tcsicmp(ext, _T(".3ga")) == 0) {
 		iconindex = IDI_3GP_ICON;
