@@ -14195,7 +14195,7 @@ void CMainFrame::SetupLanguageMenu()
 	for (size_t i = 0; i < CMPlayerCApp::languageResourcesCount; i++) {
 
 		const LanguageResource& lr = CMPlayerCApp::languageResources[i];
-		LPCTSTR strSatellite = AfxGetMyApp()->GetSatelliteDll(i);
+		LPCTSTR strSatellite = CMPlayerCApp::GetSatelliteDll(i);
 
 		if (strSatellite || lr.dllPath == NULL) {
 			HMODULE lib = NULL;
@@ -17072,12 +17072,12 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 
 	nID -= ID_LANGUAGE_ENGLISH;
 
-	if (nID == AfxGetMyApp()->GetLanguageIndex(_T("Hebrew"))) { // Show a warning when switching to Hebrew (must not be translated)
+	if (nID == CMPlayerCApp::GetLanguageIndex(_T("Hebrew"))) { // Show a warning when switching to Hebrew (must not be translated)
 		MessageBox(_T("The Hebrew translation will be correctly displayed (with a right-to-left layout) after restarting the application.\n"),
 				   _T("MPC-BE"), MB_ICONINFORMATION | MB_OK);
 	}
 
-	AfxGetMyApp()->SetLanguage(nID);
+	CMPlayerCApp::SetLanguage(nID);
 
 	m_opencds.DestroyMenu();
 	m_filters.DestroyMenu();
@@ -17113,7 +17113,7 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 afx_msg void CMainFrame::OnUpdateLanguage(CCmdUI* pCmdUI)
 {
 	int nLang = pCmdUI->m_nID - ID_LANGUAGE_ENGLISH;
-	LPCTSTR strSatellite = AfxGetMyApp()->GetSatelliteDll(nLang);
+	LPCTSTR strSatellite = CMPlayerCApp::GetSatelliteDll(nLang);
 
 	if (strSatellite) {
 		HMODULE lib = NULL;
