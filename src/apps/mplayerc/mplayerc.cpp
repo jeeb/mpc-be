@@ -2127,7 +2127,7 @@ LRESULT CALLBACK RTLWindowsLayoutCbtFilterHook(int code, WPARAM wParam, LPARAM l
 
 LPCTSTR CMPlayerCApp::GetSatelliteDll(int nLanguage)
 {
-	CString path;
+	static CString path;
 	GetModuleFileName(NULL, path.GetBuffer(_MAX_PATH), _MAX_PATH);
 	path.ReleaseBuffer();
 	path = path.Left(path.ReverseFind('\\') + 1);
@@ -2137,7 +2137,8 @@ LPCTSTR CMPlayerCApp::GetSatelliteDll(int nLanguage)
 			if (languageResources[i].dllPath == NULL) {
 				break;
 			}
-			return path + _T("Lang\\mpcresources.") + languageResources[i].dllPath + _T(".dll");
+			path.AppendFormat(_T("Lang\\mpcresources.%ws.dll"), languageResources[i].dllPath);
+			return path;
 		}
 	}
 	return NULL;
