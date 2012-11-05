@@ -18367,10 +18367,12 @@ HRESULT CMainFrame::SetDwmPreview(BOOL show)
 		m_InternalImageSmall.Detach();
 	}
 
-	HBITMAP extimage = OpenImage(m_strFnFull);
-	if (extimage) {
-		m_InternalImage.Attach(extimage);
+	bool extimage = false;
+
+	if (OpenImageCheck(m_strFn)) {
+		m_InternalImage.Attach(OpenImage(m_strFnFull));
 		bLoadRes = true;
+		extimage = true;
 	}
 
 	if (extimage || (m_fAudioOnly && IsSomethingLoaded() && show)) {

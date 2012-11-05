@@ -196,7 +196,7 @@ HBITMAP MPCPngImage::TypeLoadImage(int type, BYTE** pData, int* width, int* heig
 		int size = ftell(fp);
 		rewind(fp);
 		bmp = (BYTE*)malloc(size);
-		fread((void*)bmp, 1, size, fp);
+		fread((void*)bmp, size, 1, fp);
 
 		BITMAPINFO& bi = (BITMAPINFO&)bmp[sizeof(BITMAPFILEHEADER)];
 

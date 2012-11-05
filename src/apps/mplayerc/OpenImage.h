@@ -106,7 +106,7 @@ static HBITMAP OpenImage(CString fn)
 							break;
 						}
 
-						fwrite(buf, 1, len, fp);
+						fwrite(buf, len, 1, fp);
 					}
 					InternetCloseHandle(f);
 				}
@@ -128,7 +128,7 @@ static HBITMAP OpenImage(CString fn)
 		DWORD fs = ftell(fp);
 		rewind(fp);
 		void *data = malloc(fs);
-		fread(data, 1, fs, fp);
+		fread(data, fs, 1, fp);
 		fclose(fp);
 
 		if (type) {
