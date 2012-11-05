@@ -152,7 +152,8 @@ public:
 
 	static void					SetLanguage(int nLanguage);
 	static LPCTSTR				GetSatelliteDll(int nLanguage);
-	static int					GetLanguageId(CString lang);
+	static int					GetLanguageIndex(CString lang);
+	static int					GetLanguageIndex(UINT resID);
 	static int					GetDefLanguage();
 
 	static bool					IsVSFilterInstalled();

@@ -2144,10 +2144,20 @@ LPCTSTR CMPlayerCApp::GetSatelliteDll(int nLanguage)
 	return NULL;
 }
 
-int CMPlayerCApp::GetLanguageId(CString lang)
+int CMPlayerCApp::GetLanguageIndex(CString lang)
 {
 	for (size_t i = 0; i < languageResourcesCount; i++) {
 		if (lang == languageResources[i].name) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+int CMPlayerCApp::GetLanguageIndex(UINT resID)
+{
+	for (size_t i = 0; i < languageResourcesCount; i++) {
+		if (resID == languageResources[i].resourceID) {
 			return i;
 		}
 	}
@@ -2161,7 +2171,7 @@ int CMPlayerCApp::GetDefLanguage()
 			return i;
 		}
 	}
-	return GetLanguageId(_T("English"));
+	return GetLanguageIndex(_T("English"));
 }
 
 void CMPlayerCApp::SetLanguage(int nLanguage)
@@ -2194,9 +2204,9 @@ void CMPlayerCApp::SetLanguage(int nLanguage)
 
 	if ( hMod == NULL ) {
 		hMod = AfxGetApp()->m_hInstance;
-		s.iLanguage = GetLanguageId(_T("English"));
+		s.iLanguage = GetLanguageIndex(_T("English"));
 
-	} else if (nLanguage == GetLanguageId(_T("Hebrew"))) {
+	} else if (nLanguage == GetLanguageIndex(_T("Hebrew"))) {
 		// Hebrew needs the RTL flag.
 		SetProcessDefaultLayout(LAYOUT_RTL);
 		SetWindowsHookEx(WH_CBT, RTLWindowsLayoutCbtFilterHook, NULL, GetCurrentThreadId());

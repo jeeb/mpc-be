@@ -17072,7 +17072,7 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 
 	nID -= ID_LANGUAGE_ENGLISH;
 
-	if (nID == AfxGetMyApp()->GetLanguageId(_T("Hebrew"))) { // Show a warning when switching to Hebrew (must not be translated)
+	if (nID == AfxGetMyApp()->GetLanguageIndex(_T("Hebrew"))) { // Show a warning when switching to Hebrew (must not be translated)
 		MessageBox(_T("The Hebrew translation will be correctly displayed (with a right-to-left layout) after restarting the application.\n"),
 				   _T("MPC-BE"), MB_ICONINFORMATION | MB_OK);
 	}
