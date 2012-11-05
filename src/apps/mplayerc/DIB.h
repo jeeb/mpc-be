@@ -51,15 +51,15 @@ static bool BMPDIB(LPCTSTR fn, BYTE* pData, CStringW format, ULONG quality, bool
 {
 	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
 
-	int bit = 24, width = bih->biWidth, height = abs(bih->biHeight);
-	int stride = (width * bit + 31) / 32 * 4;
+	int bit = 24, width = bih->biWidth, height = abs(bih->biHeight), bpp = bih->biBitCount / 8;
+	int stride = (width * bit + 31) / 32 * bpp;
 	int len = stride * height, sih = sizeof(BITMAPINFOHEADER);
 
 	BYTE *src = pData + sih, *rgb = (BYTE*)malloc(len);
 
 	for (int y = 0; y < height; y++) {
 		for (int x = 0; x < width; x++) {
-			memcpy(rgb + (3 * x) + (stride * y), src + (width * 4 * y) + (4 * x), 3);
+			memcpy(rgb + (3 * x) + (stride * y), src + (width * bpp * y) + (bpp * x), 3);
 		}
 	}
 
@@ -156,7 +156,7 @@ static void PNGDIB(LPCTSTR fn, BYTE* pData, int level)
 	if (fp) {
 		BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
 
-		int line, width = bih->biWidth, height = abs(bih->biHeight);
+		int line, width = bih->biWidth, height = abs(bih->biHeight), bpp = bih->biBitCount / 8;
 
 		png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
 		png_infop info_ptr = png_create_info_struct(png_ptr);
@@ -172,7 +172,7 @@ static void PNGDIB(LPCTSTR fn, BYTE* pData, int level)
 		for (int y = height - 1; y >= 0; y--) {
 			for (int x = 0; x < width; x++) {
 				line = (3 * x);
-				p = src + (width * 4 * y) + (4 * x);
+				p = src + (width * bpp * y) + (bpp * x);
 				row_ptr[line] = (png_byte)p[2];
 				row_ptr[line + 1] = (png_byte)p[1];
 				row_ptr[line + 2] = (png_byte)p[0];
@@ -199,7 +199,7 @@ static void WebPDIB(LPCTSTR fn, BYTE* pData, float quality)
 	if (fp) {
 		BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
 
-		int width = bih->biWidth, height = abs(bih->biHeight);
+		int width = bih->biWidth, height = abs(bih->biHeight), bpp = bih->biBitCount / 8;
 		int line, stride = width * 3 * sizeof(uint8_t);
 
 		uint8_t* rgb = (uint8_t*)malloc(stride * height);
@@ -208,7 +208,7 @@ static void WebPDIB(LPCTSTR fn, BYTE* pData, float quality)
 		for (int y = 0, j = height - 1; y < height; y++, j--) {
 			for (int x = 0; x < width; x++) {
 				line = (3 * x) + (stride * j);
-				p = src + (width * 4 * y) + (4 * x);
+				p = src + (width * bpp * y) + (bpp * x);
 				rgb[line] = (uint8_t)p[2];
 				rgb[line + 1] = (uint8_t)p[1];
 				rgb[line + 2] = (uint8_t)p[0];
