@@ -2125,9 +2125,9 @@ LRESULT CALLBACK RTLWindowsLayoutCbtFilterHook(int code, WPARAM wParam, LPARAM l
 	return CallNextHookEx(NULL, code, wParam, lParam);
 }
 
-LPCTSTR CMPlayerCApp::GetSatelliteDll(int nLanguage)
+CString CMPlayerCApp::GetSatelliteDll(int nLanguage)
 {
-	static CString path;
+	CString path;
 	GetModuleFileName(NULL, path.GetBuffer(_MAX_PATH), _MAX_PATH);
 	path.ReleaseBuffer();
 	path = path.Left(path.ReverseFind('\\') + 1);
@@ -2138,10 +2138,10 @@ LPCTSTR CMPlayerCApp::GetSatelliteDll(int nLanguage)
 				break;
 			}
 			path.AppendFormat(_T("Lang\\mpcresources.%ws.dll"), languageResources[i].dllPath);
-			return path;
+			break;
 		}
 	}
-	return NULL;
+	return path;
 }
 
 int CMPlayerCApp::GetLanguageIndex(CString lang)
@@ -2178,21 +2178,21 @@ void CMPlayerCApp::SetLanguage(int nLanguage)
 {
 	AppSettings&	s = AfxGetAppSettings();
 	HMODULE			hMod = NULL;
-	LPCTSTR			strSatellite;
+	CString			strSatellite;
 
-	strSatellite = GetSatelliteDll( nLanguage );
-	if ( strSatellite ) {
+	strSatellite = GetSatelliteDll(nLanguage);
+	if (!strSatellite.IsEmpty()) {
 		CFileVersionInfo	Version;
 		CString				strSatVersion;
 
-		if ( Version.Create(strSatellite) ) {
+		if (Version.Create(strSatellite)) {
 			strSatVersion = Version.GetFileVersionEx();
 
 			CString strNeededVersion = MPC_VERSION_STR;
 			strNeededVersion.Replace(_T(", "), _T("."));
 
-			if ( strSatVersion == strNeededVersion ) {
-				hMod = LoadLibrary( strSatellite );
+			if (strSatVersion == strNeededVersion) {
+				hMod = LoadLibrary(strSatellite);
 				s.iLanguage = nLanguage;
 			} else {
 				// This message should stay in English!
@@ -2202,7 +2202,7 @@ void CMPlayerCApp::SetLanguage(int nLanguage)
 		}
 	}
 
-	if ( hMod == NULL ) {
+	if (hMod == NULL) {
 		hMod = AfxGetApp()->m_hInstance;
 		s.iLanguage = GetLanguageIndex(ID_LANGUAGE_ENGLISH);
 
@@ -2211,6 +2211,7 @@ void CMPlayerCApp::SetLanguage(int nLanguage)
 		SetProcessDefaultLayout(LAYOUT_RTL);
 		SetWindowsHookEx(WH_CBT, RTLWindowsLayoutCbtFilterHook, NULL, GetCurrentThreadId());
 	}
+
 	if (AfxGetResourceHandle() != AfxGetApp()->m_hInstance) {
 		FreeLibrary(AfxGetResourceHandle());
 	}

@@ -14194,10 +14194,10 @@ void CMainFrame::SetupLanguageMenu()
 
 	for (size_t i = 0; i < CMPlayerCApp::languageResourcesCount; i++) {
 
-		const LanguageResource& lr = CMPlayerCApp::languageResources[i];
-		LPCTSTR strSatellite = CMPlayerCApp::GetSatelliteDll(i);
+		const LanguageResource& lr	= CMPlayerCApp::languageResources[i];
+		CString strSatellite		= CMPlayerCApp::GetSatelliteDll(i);
 
-		if (strSatellite || lr.dllPath == NULL) {
+		if (!strSatellite.IsEmpty() || lr.dllPath == NULL) {
 			HMODULE lib = NULL;
 			if ((lib = LoadLibrary(strSatellite)) != NULL || lr.dllPath == NULL) {
 				if (lib) {
@@ -17111,10 +17111,10 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 
 afx_msg void CMainFrame::OnUpdateLanguage(CCmdUI* pCmdUI)
 {
-	int nLang = pCmdUI->m_nID - ID_LANGUAGE_ENGLISH;
-	LPCTSTR strSatellite = CMPlayerCApp::GetSatelliteDll(nLang);
+	int nLang				= pCmdUI->m_nID - ID_LANGUAGE_ENGLISH;
+	CString strSatellite	= CMPlayerCApp::GetSatelliteDll(nLang);
 
-	if (strSatellite) {
+	if (!strSatellite.IsEmpty()) {
 		HMODULE lib = NULL;
 		if ((lib = LoadLibrary(strSatellite)) != NULL) {
 			FreeLibrary(lib);

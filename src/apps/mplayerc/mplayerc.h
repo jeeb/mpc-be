@@ -151,7 +151,7 @@ public:
 	static const size_t languageResourcesCount;
 
 	static void					SetLanguage(int nLanguage);
-	static LPCTSTR				GetSatelliteDll(int nLanguage);
+	static CString				GetSatelliteDll(int nLanguage);
 	static int					GetLanguageIndex(CString lang);
 	static int					GetLanguageIndex(UINT resID);
 	static int					GetDefLanguage();
