@@ -2171,7 +2171,7 @@ int CMPlayerCApp::GetDefLanguage()
 			return i;
 		}
 	}
-	return GetLanguageIndex(_T("English"));
+	return GetLanguageIndex(ID_LANGUAGE_ENGLISH);
 }
 
 void CMPlayerCApp::SetLanguage(int nLanguage)
@@ -2204,9 +2204,9 @@ void CMPlayerCApp::SetLanguage(int nLanguage)
 
 	if ( hMod == NULL ) {
 		hMod = AfxGetApp()->m_hInstance;
-		s.iLanguage = GetLanguageIndex(_T("English"));
+		s.iLanguage = GetLanguageIndex(ID_LANGUAGE_ENGLISH);
 
-	} else if (nLanguage == GetLanguageIndex(_T("Hebrew"))) {
+	} else if (nLanguage == GetLanguageIndex(ID_LANGUAGE_HEBREW)) {
 		// Hebrew needs the RTL flag.
 		SetProcessDefaultLayout(LAYOUT_RTL);
 		SetWindowsHookEx(WH_CBT, RTLWindowsLayoutCbtFilterHook, NULL, GetCurrentThreadId());
