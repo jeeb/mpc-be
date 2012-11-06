@@ -246,9 +246,13 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				case FCC('MPG2'):
 					mt.subtype = MEDIASUBTYPE_MPEG2_VIDEO;
 					break;
+				case FCC('DXSB'):
+				case FCC('DXSA'):
+					label = L"XSub";
 				default:
 					mt.subtype = FOURCCMap(pbmi->biCompression);
 			}
+
 			mt.formattype = FORMAT_VideoInfo;
 			VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + (ULONG)s->strf.GetCount() - sizeof(BITMAPINFOHEADER));
 			memset(mt.Format(), 0, mt.FormatLength());

@@ -147,7 +147,8 @@ typedef enum SUBTITLE_TYPE{
 	ST_TEXT,
 	ST_VOBSUB,
 	ST_DVB,
-	ST_HDMV
+	ST_HDMV,
+	ST_XSUB
 };
 
 class CPinInfo : public PIN_INFO

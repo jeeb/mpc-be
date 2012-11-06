@@ -609,7 +609,8 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 				pmt->majortype	== MEDIATYPE_Midi ||
 				pmt->majortype	== MEDIATYPE_Text ||
 				pmt->majortype	== MEDIASUBTYPE_DVD_SUBPICTURE ||
-				pmt->subtype	== MEDIASUBTYPE_DVD_SUBPICTURE) {
+				pmt->subtype	== MEDIASUBTYPE_DVD_SUBPICTURE ||
+				pmt->subtype	== MEDIASUBTYPE_XSUB) {
 					return S_FALSE;
 			}
 
@@ -2012,6 +2013,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview
 		pFGF->AddType(MEDIATYPE_NULL, MEDIASUBTYPE_DVD_SUBPICTURE);
 		pFGF->AddType(MEDIATYPE_NULL, MEDIASUBTYPE_CVD_SUBPICTURE);
 		pFGF->AddType(MEDIATYPE_NULL, MEDIASUBTYPE_SVCD_SUBPICTURE);
+		pFGF->AddType(MEDIATYPE_NULL, MEDIASUBTYPE_XSUB);
 		m_transform.AddTail(pFGF);
 	}
 

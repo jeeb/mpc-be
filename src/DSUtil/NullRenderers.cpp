@@ -408,6 +408,7 @@ HRESULT CNullTextRenderer::CTextInputPin::CheckMediaType(const CMediaType* pmt)
 		   || pmt->subtype == MEDIASUBTYPE_DVD_SUBPICTURE
 		   || pmt->subtype == MEDIASUBTYPE_CVD_SUBPICTURE
 		   || pmt->subtype == MEDIASUBTYPE_SVCD_SUBPICTURE
+		   || pmt->subtype == MEDIASUBTYPE_XSUB
 		   ? S_OK
 		   : E_FAIL;
 }

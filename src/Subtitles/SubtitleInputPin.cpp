@@ -26,6 +26,7 @@
 #include "VobSubFile.h"
 #include "RTS.h"
 #include "RenderedHdmvSubtitle.h"
+#include "XSUBSubtitle.h"
 
 #include <InitGuid.h>
 #include <uuids.h>
@@ -64,7 +65,7 @@ HRESULT CSubtitleInputPin::CheckMediaType(const CMediaType* pmt)
 		   || pmt->majortype == MEDIATYPE_Subtitle && pmt->subtype == MEDIASUBTYPE_UTF8
 		   || pmt->majortype == MEDIATYPE_Subtitle && (pmt->subtype == MEDIASUBTYPE_SSA || pmt->subtype == MEDIASUBTYPE_ASS || pmt->subtype == MEDIASUBTYPE_ASS2)
 		   || pmt->majortype == MEDIATYPE_Subtitle && (pmt->subtype == MEDIASUBTYPE_VOBSUB)
-		   || pmt->majortype == MEDIATYPE_Video && (pmt->subtype == MEDIASUBTYPE_DVD_SUBPICTURE)
+		   || pmt->majortype == MEDIATYPE_Video && (pmt->subtype == MEDIASUBTYPE_DVD_SUBPICTURE || pmt->subtype == MEDIASUBTYPE_XSUB)
 		   || IsHdmvSub(pmt)
 		   ? S_OK
 		   : E_FAIL;
@@ -80,28 +81,29 @@ HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
 		pRTS->m_name = CString(GetPinName(pReceivePin)) + _T(" (embeded)");
 		pRTS->m_dstScreenSize = CSize(384, 288);
 		pRTS->CreateDefaultStyle(DEFAULT_CHARSET);
-	} else if (m_mt.majortype == MEDIATYPE_Subtitle || (m_mt.majortype == MEDIATYPE_Video && m_mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE)) {
+	} else if (m_mt.majortype == MEDIATYPE_Subtitle || (m_mt.majortype == MEDIATYPE_Video && (m_mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE || m_mt.subtype == MEDIASUBTYPE_XSUB))) {
 		SUBTITLEINFO*	psi		= (SUBTITLEINFO*)m_mt.pbFormat;
 		DWORD			dwOffset	= 0;
 		CString			name;
 		LCID			lcid = 0;
 
-		if (psi != NULL) {
-			dwOffset = psi->dwOffset;
+		if (m_mt.subtype == MEDIASUBTYPE_XSUB) {
+			name = CString(GetPinName(pReceivePin));
+		} else {
+			if (psi != NULL) {
+				dwOffset = psi->dwOffset;
 
-			name = ISO6392ToLanguage(psi->IsoLang);
-			lcid = ISO6392ToLcid(psi->IsoLang);
+				name = ISO6392ToLanguage(psi->IsoLang);
+				lcid = ISO6392ToLcid(psi->IsoLang);
 
-			if (wcslen(psi->TrackName) > 0) {
-				name += (!name.IsEmpty() ? _T(", ") : _T("")) + CString(psi->TrackName);
-			}
-			if (name.IsEmpty()) {
-				name = _T("Unknown");
+				if (wcslen(psi->TrackName) > 0) {
+					name += (!name.IsEmpty() ? _T(", ") : _T("")) + CString(psi->TrackName);
+				}
+				if (name.IsEmpty()) {
+					name = _T("Unknown");
+				}
 			}
 		}
-
-		name.Replace(_T(""), _T(""));
-		name.Replace(_T(""), _T(""));
 
 		if (m_mt.subtype == MEDIASUBTYPE_UTF8
 				/*|| m_mt.subtype == MEDIASUBTYPE_USF*/
@@ -148,6 +150,10 @@ HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
 
 			CStringA hdr = VobSubDefHeader(720, 576);
 			pVSS->Open(name, (BYTE*)(LPCSTR)hdr, hdr.GetLength());
+		} else if (m_mt.subtype == MEDIASUBTYPE_XSUB) {
+			if (!(m_pSubStream = DNew CXSUBSubtitle(m_pSubLock, name, lcid))) {
+				return E_FAIL;
+			}
 		}
 	}
 
@@ -203,6 +209,10 @@ STDMETHODIMP CSubtitleInputPin::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME
 		CAutoLock cAutoLock(m_pSubLock);
 		CRenderedHdmvSubtitle* pHdmvSubtitle = (CRenderedHdmvSubtitle*)(ISubStream*)m_pSubStream;
 		pHdmvSubtitle->NewSegment (tStart, tStop, dRate);
+	} else if (m_mt.subtype == MEDIASUBTYPE_XSUB) {
+		CAutoLock cAutoLock(m_pSubLock);
+		CXSUBSubtitle* pXSUBSubtitle = (CXSUBSubtitle*)(ISubStream*)m_pSubStream;
+		pXSUBSubtitle->NewSegment (tStart, tStop, dRate);
 	}
 
 	return __super::NewSegment(tStart, tStop, dRate);
@@ -299,7 +309,7 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 				fInvalidate = true;
 			}
 		}
-	} else if (m_mt.majortype == MEDIATYPE_Subtitle || (m_mt.majortype == MEDIATYPE_Video && m_mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE)) {
+	} else if (m_mt.majortype == MEDIATYPE_Subtitle || (m_mt.majortype == MEDIATYPE_Video && (m_mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE || m_mt.subtype == MEDIASUBTYPE_XSUB))) {
 		CAutoLock cAutoLock(m_pSubLock);
 
 		if (m_mt.subtype == MEDIASUBTYPE_UTF8) {
@@ -350,6 +360,10 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 			CAutoLock cAutoLock(m_pSubLock);
 			CRenderedHdmvSubtitle* pHdmvSubtitle = (CRenderedHdmvSubtitle*)(ISubStream*)m_pSubStream;
 			pHdmvSubtitle->ParseSample (pSample);
+		} else if (m_mt.subtype == MEDIASUBTYPE_XSUB) {
+			CAutoLock cAutoLock(m_pSubLock);
+			CXSUBSubtitle* pXSUBSubtitle = (CXSUBSubtitle*)(ISubStream*)m_pSubStream;
+			pXSUBSubtitle->ParseSample (pSample);
 		}
 	}
 

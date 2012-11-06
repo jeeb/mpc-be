@@ -15591,7 +15591,8 @@ void CMainFrame::AddTextPassThruFilter()
 			if (FAILED(pPin->ConnectedTo(&pPinTo)) || !pPinTo
 					|| FAILED(pPin->ConnectionMediaType(&mt))
 					|| (mt.majortype != MEDIATYPE_Text && mt.majortype != MEDIATYPE_Subtitle
-						&& !(mt.majortype == MEDIATYPE_Video && mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE))) {
+						&& !(mt.majortype == MEDIATYPE_Video && mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE)
+						&& !(mt.majortype == MEDIATYPE_Video && mt.subtype == MEDIASUBTYPE_XSUB))) {
 				continue;
 			}
 

@@ -68,6 +68,9 @@
     <ClCompile Include="SupSubFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="XSUBSubtitle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseSub.h">
@@ -130,5 +133,8 @@
     <ClInclude Include="SupSubFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClCompile Include="XSUBSubtitle.h">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

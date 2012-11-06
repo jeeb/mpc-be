@@ -113,6 +113,7 @@
     <ClCompile Include="VobSubFile.cpp" />
     <ClCompile Include="VobSubFileRipper.cpp" />
     <ClCompile Include="VobSubImage.cpp" />
+    <ClCompile Include="XSUBSubtitle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseSub.h" />
@@ -135,6 +136,7 @@
     <ClInclude Include="VobSubFile.h" />
     <ClInclude Include="VobSubFileRipper.h" />
     <ClInclude Include="VobSubImage.h" />
+    <ClCompile Include="XSUBSubtitle.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
