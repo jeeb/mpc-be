@@ -25,9 +25,9 @@
 
 #pragma warning(disable: 4005)
 extern "C" {
-	#include <ffmpeg/libavutil/samplefmt.h>
-	#include <ffmpeg/libavutil/opt.h>
-	#include <ffmpeg/libavresample/avresample.h>
+#include "ffmpeg/libavresample/avresample.h"
+#include "ffmpeg/libavutil/samplefmt.h"
+#include "ffmpeg/libavutil/opt.h"
 }
 #pragma warning(default: 4005)
 
@@ -141,7 +141,7 @@ HRESULT CMixer::Mixing(float* pOutput, WORD out_ch, DWORD out_layout, BYTE* pInp
 	if (in_layout == out_layout) {
 		return E_ABORT;
 	}
-	if (in_sf < AV_SAMPLE_FMT_U8 || in_sf > AV_SAMPLE_FMT_DBL) {
+	if (in_sf < AV_SAMPLE_FMT_U8 || in_sf > AV_SAMPLE_FMT_DBLP) {
 		return E_INVALIDARG;
 	}
 
