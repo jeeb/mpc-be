@@ -33,9 +33,10 @@ public:
 	INT64			SExpGolombRead();
 	void			BitByteAlign();
 
-	inline BYTE		ReadByte()  { return (BYTE)BitRead (8); };
-	inline SHORT	ReadShort() { return (SHORT)BitRead (16); };
-	inline DWORD	ReadDword() { return (DWORD)BitRead (32); };
+	inline BYTE		ReadByte()		{ return (BYTE)BitRead (8); };
+	inline SHORT	ReadShort()		{ return (SHORT)BitRead (16); };
+	inline SHORT	ReadShortLE()	{ return (SHORT)ReadByte() | ReadByte() << 8; };
+	inline DWORD	ReadDword()		{ return (DWORD)BitRead (32); };
 	void			ReadBuffer(BYTE* pDest, int nSize);
 
 	void			Reset();

@@ -33,6 +33,10 @@ struct HDMV_PALETTE {
 	BYTE	Cr;
 	BYTE	Cb;
 	BYTE	T;		// HDMV rule : 0 transparent, 255 opaque (compatible DirectX)
+
+	HDMV_PALETTE() {
+		entry_id = Y = Cr = Cb = T = 0;
+	}
 };
 
 class CGolombBuffer;

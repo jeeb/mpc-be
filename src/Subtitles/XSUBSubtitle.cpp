@@ -22,6 +22,7 @@
 
 #include "stdafx.h"
 #include "XSUBSubtitle.h"
+#include "../DSUtil/GolombBuffer.h"
 
 CXSUBSubtitle::CXSUBSubtitle(CCritSec* pLock, const CString& name, LCID lcid)
 	: CSubPicProviderImpl(pLock)
@@ -33,6 +34,7 @@ CXSUBSubtitle::CXSUBSubtitle(CCritSec* pLock, const CString& name, LCID lcid)
 
 CXSUBSubtitle::~CXSUBSubtitle(void)
 {
+	Reset();
 }
 
 STDMETHODIMP CXSUBSubtitle::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -52,25 +54,36 @@ STDMETHODIMP CXSUBSubtitle::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 STDMETHODIMP_(POSITION) CXSUBSubtitle::GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld)
 {
 	CAutoLock cAutoLock(&m_csCritSec);
-	return NULL;//m_pSub->GetStartPosition(rt - m_rtStart, fps, CleanOld);
+
+	if (CleanOld) {
+		CXSUBSubtitle::CleanOld(rt/* - m_rtStart*/);
+	}
+
+	return m_pObjects.GetHeadPosition();
 }
 
 STDMETHODIMP_(POSITION) CXSUBSubtitle::GetNext(POSITION pos)
 {
 	CAutoLock cAutoLock(&m_csCritSec);
-	return NULL;//m_pSub->GetNext (pos);
+
+	m_pObjects.GetNext(pos);
+	return pos;
 }
 
 STDMETHODIMP_(REFERENCE_TIME) CXSUBSubtitle::GetStart(POSITION pos, double fps)
 {
 	CAutoLock cAutoLock(&m_csCritSec);
-	return 0;//m_pSub->GetStart(pos) + m_rtStart;
+
+	CompositionObject* pObject = m_pObjects.GetAt(pos);
+	return pObject!=NULL ? pObject->m_rtStart/* + m_rtStart */: INVALID_TIME;
 }
 
 STDMETHODIMP_(REFERENCE_TIME) CXSUBSubtitle::GetStop(POSITION pos, double fps)
 {
 	CAutoLock cAutoLock(&m_csCritSec);
-	return 0;//m_pSub->GetStop(pos) + m_rtStart;
+
+	CompositionObject* pObject = m_pObjects.GetAt(pos);
+	return pObject!=NULL ? pObject->m_rtStop/* + m_rtStart */: INVALID_TIME;
 }
 
 STDMETHODIMP_(bool) CXSUBSubtitle::IsAnimated(POSITION pos)
@@ -81,10 +94,12 @@ STDMETHODIMP_(bool) CXSUBSubtitle::IsAnimated(POSITION pos)
 STDMETHODIMP CXSUBSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fps, RECT& bbox)
 {
 	CAutoLock cAutoLock(&m_csCritSec);
+	
 	/*
-	m_pSub->Render (spd, rt - m_rtStart, bbox);
-	m_pSub->CleanOld(rt - m_rtStart - 60*10000000i64); // Cleanup subtitles older than 1 minute ...
+	Render (spd, rt - m_rtStart, bbox);
 	*/
+
+	CleanOld(rt - /*m_rtStart - */60*10000000i64); // Cleanup subtitles older than 1 minute ...
 
 	return S_OK;
 }
@@ -157,7 +172,64 @@ HRESULT CXSUBSubtitle::ParseSample (IMediaSample* pSample)
 	CAutoLock cAutoLock(&m_csCritSec);
 	HRESULT		hr = E_FAIL;
 
-	//hr = m_pSub->ParseSample (pSample);
+	CheckPointer (pSample, E_POINTER);
+	REFERENCE_TIME	rtStart = INVALID_TIME, rtStop = INVALID_TIME;
+	BYTE*			pData = NULL;
+	int				lSampleLen;
+
+	hr = pSample->GetPointer(&pData);
+	if (FAILED(hr) || pData == NULL) {
+		return hr;
+	}
+	lSampleLen = pSample->GetActualDataLength();
+	if (lSampleLen < (27 + 7 * 2 + 4 * 3)) {
+		return E_FAIL;
+	}
+
+	if (pData[0] != '[' || pData[13] != '-' || pData[26] != ']') {
+		return E_FAIL;
+	}
+
+	CString tmp((char*)pData, 26);
+	rtStart	= StringToReftime(tmp.Mid(1, 12));
+	rtStop	= StringToReftime(tmp.Mid(14, 12));
+
+	if (rtStop <= rtStart) {
+		return E_FAIL;
+	}
+
+	CompositionObject*	pSub = DNew CompositionObject;
+	pSub->m_rtStart	= rtStart;
+	pSub->m_rtStop	= rtStop;
+
+	CGolombBuffer gb(pData + 27, lSampleLen - 27);
+	pSub->m_width				= gb.ReadShortLE();
+	pSub->m_height				= gb.ReadShortLE();
+	pSub->m_horizontal_position	= gb.ReadShortLE();
+	pSub->m_vertical_position	= gb.ReadShortLE();
+	// skip bottom right position
+	gb.ReadShortLE();
+	gb.ReadShortLE();
+	// length of the RLE data
+	gb.ReadShortLE();
+	// Palette, 4 color entries
+	HDMV_PALETTE Palette[4];
+	for (int entry=0; entry < 4; entry++) {
+		Palette[entry].entry_id	= entry;
+		Palette[entry].Y	= gb.ReadByte();	// red
+		Palette[entry].Cr	= gb.ReadByte();	// green
+		Palette[entry].Cb	= gb.ReadByte();	// blue
+	}
+
+	pSub->SetPalette(4, Palette, false);
+
+	int RLESize = gb.GetSize() - gb.GetPos();
+	pSub->SetRLEData(gb.GetBufferPos(), RLESize, RLESize);
+
+	m_pObjects.AddTail(pSub);
+
+	hr = S_OK;
+
 	return hr;
 }
 
@@ -165,7 +237,33 @@ HRESULT CXSUBSubtitle::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, d
 {
 	CAutoLock cAutoLock(&m_csCritSec);
 
-	//m_pSub->Reset();
+	Reset();
 	m_rtStart = tStart;
 	return S_OK;
+}
+
+void CXSUBSubtitle::Reset()
+{
+	CompositionObject* pObject;
+	while (m_pObjects.GetCount() > 0) {
+		pObject = m_pObjects.RemoveHead();
+		if (pObject) {
+			delete pObject;
+		}
+	}
+
+}
+void CXSUBSubtitle::CleanOld(REFERENCE_TIME rt)
+{
+	CompositionObject* pObject_old;
+
+	while (m_pObjects.GetCount()>0) {
+		pObject_old = m_pObjects.GetHead();
+		if (pObject_old->m_rtStop < rt) {
+			m_pObjects.RemoveHead();
+			delete pObject_old;
+		} else {
+			break;
+		}
+	}
 }

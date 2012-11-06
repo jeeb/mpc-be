@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include "Rasterizer.h"
 #include "../SubPic/SubPicProviderImpl.h"
 #include "HdmvSub.h"
 #include "BaseSub.h"

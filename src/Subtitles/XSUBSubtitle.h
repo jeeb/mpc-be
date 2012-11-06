@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "Rasterizer.h"
 #include "../SubPic/SubPicProviderImpl.h"
+#include "CompositionObject.h"
 
 class __declspec(uuid("86551353-62BE-4513-B14D-B5882A73823E"))
 	CXSUBSubtitle : public CSubPicProviderImpl, public ISubStream
@@ -56,13 +56,18 @@ public:
 	STDMETHODIMP SetStream(int iStream);
 	STDMETHODIMP Reload();
 
-	HRESULT ParseSample (IMediaSample* pSample);
+	void	Reset();
+	void	CleanOld(REFERENCE_TIME rt);
+
+	HRESULT	ParseSample (IMediaSample* pSample);
 	HRESULT	NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
 
 private :
 	CString			m_name;
 	LCID			m_lcid;
 	REFERENCE_TIME	m_rtStart;
+
+	CAtlList<CompositionObject*>	m_pObjects;
 
 	CCritSec		m_csCritSec;
 };
