@@ -2135,6 +2135,7 @@ CString CMPlayerCApp::GetSatelliteDll(int nLanguage)
 	for (size_t i = 0; i < languageResourcesCount; i++) {
 		if (nLanguage == i) {
 			if (languageResources[i].dllPath == NULL) {
+				path = _T("");
 				break;
 			}
 			path.AppendFormat(_T("Lang\\mpcresources.%ws.dll"), languageResources[i].dllPath);
