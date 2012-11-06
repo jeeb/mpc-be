@@ -2144,16 +2144,6 @@ CString CMPlayerCApp::GetSatelliteDll(int nLanguage)
 	return path;
 }
 
-int CMPlayerCApp::GetLanguageIndex(CString lang)
-{
-	for (size_t i = 0; i < languageResourcesCount; i++) {
-		if (lang == languageResources[i].name) {
-			return i;
-		}
-	}
-	return -1;
-}
-
 int CMPlayerCApp::GetLanguageIndex(UINT resID)
 {
 	for (size_t i = 0; i < languageResourcesCount; i++) {

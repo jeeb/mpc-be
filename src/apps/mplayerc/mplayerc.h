@@ -152,7 +152,6 @@ public:
 
 	static void					SetLanguage(int nLanguage);
 	static CString				GetSatelliteDll(int nLanguage);
-	static int					GetLanguageIndex(CString lang);
 	static int					GetLanguageIndex(UINT resID);
 	static int					GetDefLanguage();
 

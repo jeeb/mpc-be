@@ -17070,11 +17070,12 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 	CMenu	DefaultMenu;
 	CMenu*	OldMenu;
 
-	if (nID == ID_LANGUAGE_HEBREW) { // Show a warning when switching to Hebrew (must not be translated)
+	nID -= ID_LANGUAGE_ENGLISH; // resource ID to index
+
+	if (nID == CMPlayerCApp::GetLanguageIndex(ID_LANGUAGE_HEBREW)) { // Show a warning when switching to Hebrew (must not be translated)
 		MessageBox(_T("The Hebrew translation will be correctly displayed (with a right-to-left layout) after restarting the application.\n"),
 				   _T("MPC-BE"), MB_ICONINFORMATION | MB_OK);
 	}
-	nID -= ID_LANGUAGE_ENGLISH; // resource ID to index
 
 	CMPlayerCApp::SetLanguage(nID);
 
