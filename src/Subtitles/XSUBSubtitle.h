@@ -66,7 +66,6 @@ private :
 	CString			m_name;
 	LCID			m_lcid;
 	SIZE			m_size;
-	REFERENCE_TIME	m_rtStart;
 
 	CAtlList<CompositionObject*>	m_pObjects;
 

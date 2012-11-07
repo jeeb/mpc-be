@@ -29,7 +29,6 @@ CXSUBSubtitle::CXSUBSubtitle(CCritSec* pLock, const CString& name, LCID lcid, SI
 	, m_name(name)
 	, m_lcid(lcid)
 	, m_size(size)
-	, m_rtStart(0)
 {
 }
 
@@ -119,6 +118,8 @@ STDMETHODIMP CXSUBSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fp
 
 		m_pObjects.GetNext(pos);
 	}
+
+	CleanOld(rt - 60*10000000i64);
 
 	return S_OK;
 }
@@ -266,7 +267,6 @@ HRESULT CXSUBSubtitle::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, d
 	CAutoLock cAutoLock(&m_csCritSec);
 
 	Reset();
-	m_rtStart = tStart;
 	return S_OK;
 }
 
