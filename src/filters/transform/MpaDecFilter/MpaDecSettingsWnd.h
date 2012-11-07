@@ -41,6 +41,9 @@ class __declspec(uuid("24103041-884B-4772-B0D3-A600E7CBFEC7"))
 	bool m_drc;
 	bool m_spdif_ac3;
 	bool m_spdif_dts;
+#if ENABLE_AC3_ENCODER
+	bool m_spdif_ac3enc;
+#endif
 
 	enum {
 		IDC_PP_COMBO_MIXLAYOUT = 10000,
@@ -51,7 +54,10 @@ class __declspec(uuid("24103041-884B-4772-B0D3-A600E7CBFEC7"))
 		IDC_PP_CHECK_MIXER,
 		IDC_PP_CHECK_DRC,
 		IDC_PP_CHECK_SPDIF_AC3,
-		IDC_PP_CHECK_SPDIF_DTS
+		IDC_PP_CHECK_SPDIF_DTS,
+#if ENABLE_AC3_ENCODER
+		IDC_PP_CHECK_SPDIF_AC3ENC
+#endif
 	};
 
 	CButton   m_outfmt_group;
@@ -70,6 +76,9 @@ class __declspec(uuid("24103041-884B-4772-B0D3-A600E7CBFEC7"))
 	CButton   m_spdif_group;
 	CButton   m_spdif_ac3_check;
 	CButton   m_spdif_dts_check;
+#if ENABLE_AC3_ENCODER
+	CButton   m_spdif_ac3enc_check;
+#endif
 
 public:
 	CMpaDecSettingsWnd();

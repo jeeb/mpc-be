@@ -62,6 +62,9 @@ bool CMpaDecSettingsWnd::OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>
 	m_drc          = m_pMDF->GetDynamicRangeControl();
 	m_spdif_ac3    = m_pMDF->GetSPDIF(IMpaDecFilter::ac3);
 	m_spdif_dts    = m_pMDF->GetSPDIF(IMpaDecFilter::dts);
+#if ENABLE_AC3_ENCODER
+	m_spdif_ac3enc = m_pMDF->GetSPDIF(IMpaDecFilter::ac3enc);;
+#endif
 
 	return true;
 }
@@ -124,6 +127,10 @@ bool CMpaDecSettingsWnd::OnActivate()
 	m_spdif_dts_check.Create(_T("DTS"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(IPP_SCALE(50), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_CHECK_SPDIF_DTS);
 	m_spdif_ac3_check.SetCheck(m_spdif_ac3);
 	m_spdif_dts_check.SetCheck(m_spdif_dts);
+#if ENABLE_AC3_ENCODER
+	m_spdif_ac3enc_check.Create(_T("Encode to AC-3"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(IPP_SCALE(100), 0), CSize(IPP_SCALE(95), m_fontheight)), this, IDC_PP_CHECK_SPDIF_AC3ENC);
+	m_spdif_ac3enc_check.SetCheck(m_spdif_ac3enc);
+#endif
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
 		pWnd->SetFont(&m_font, FALSE);
@@ -146,6 +153,9 @@ void CMpaDecSettingsWnd::OnDeactivate()
 	m_drc          = !!m_drc_check.GetCheck();
 	m_spdif_ac3    = !!m_spdif_ac3_check.GetCheck();
 	m_spdif_dts    = !!m_spdif_dts_check.GetCheck();
+#if ENABLE_AC3_ENCODER
+	m_spdif_ac3enc = !!m_spdif_ac3enc_check.GetCheck();
+#endif
 }
 
 bool CMpaDecSettingsWnd::OnApply()
@@ -162,6 +172,9 @@ bool CMpaDecSettingsWnd::OnApply()
 		m_pMDF->SetDynamicRangeControl(m_drc);
 		m_pMDF->SetSPDIF(IMpaDecFilter::ac3, m_spdif_ac3);
 		m_pMDF->SetSPDIF(IMpaDecFilter::dts, m_spdif_dts);
+#if ENABLE_AC3_ENCODER
+		m_pMDF->SetSPDIF(IMpaDecFilter::ac3enc, m_spdif_ac3enc);
+#endif
 
 		m_pMDF->SaveSettings();
 	}

@@ -23,6 +23,8 @@
 
 #pragma once
 
+#define ENABLE_AC3_ENCODER 0
+
 #include <atlcoll.h>
 // TODO: remove this when it's fixed in MSVC
 // Work around warning C4005: 'XXXX' : macro redefinition
@@ -36,6 +38,10 @@
 #include "Mixer.h"
 #include "PaddedArray.h"
 #include "FFAudioDecoder.h"
+#if ENABLE_AC3_ENCODER
+#include "AC3Encoder.h"
+#endif
+
 #define MPCAudioDecName L"MPC Audio Decoder"
 
 enum {
@@ -85,6 +91,12 @@ protected:
 	ps2_state_t             m_ps2_state;
 
 	CFFAudioDecoder m_FFAudioDec;
+
+#if ENABLE_AC3_ENCODER
+	CAC3Encoder m_AC3Enc;
+	CAtlArray<float> m_encbuff;
+	HRESULT AC3Encode(BYTE* pBuff, int size, AVSampleFormat avsf, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask = 0);
+#endif
 
 	HRESULT ProcessFFmpeg(enum AVCodecID nCodecId);
 
