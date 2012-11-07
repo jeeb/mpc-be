@@ -70,18 +70,20 @@ typedef enum {
 #define FRGM_CHUNK_SIZE    6     // Size of a FRGM chunk.
 #define VP8X_CHUNK_SIZE    10    // Size of a VP8X chunk.
 
-#define TILING_FLAG_BIT    0x01  // Set if tiles are possibly used.
-#define ANIMATION_FLAG_BIT 0x02  // Set if some animation is expected
-#define ICC_FLAG_BIT       0x04  // Whether ICC is present or not.
-#define METADATA_FLAG_BIT  0x08  // Set if some META chunk is possibly present.
-#define ALPHA_FLAG_BIT     0x10  // Should be same as the ALPHA_FLAG in mux.h
-#define ROTATION_FLAG_BITS 0xe0  // all 3 bits for rotation + symmetry
+// VP8X Feature Flags. These should be the same as the corresponding values in
+// the 'WebPFeatureFlags' enum defined in mux.h.
+#define FRAGMENTS_FLAG_BIT 0x01
+#define ANIMATION_FLAG_BIT 0x02
+#define XMP_FLAG_BIT       0x04
+#define EXIF_FLAG_BIT      0x08
+#define ALPHA_FLAG_BIT     0x10
+#define ICC_FLAG_BIT       0x20
 
 #define MAX_CANVAS_SIZE     (1 << 24)    // 24-bit max for VP8X width/height.
 #define MAX_IMAGE_AREA      (1ULL << 32) // 32-bit max for width x height.
 #define MAX_LOOP_COUNT      (1 << 16)    // maximum value for loop-count
 #define MAX_DURATION        (1 << 24)    // maximum duration
-#define MAX_POSITION_OFFSET (1 << 24)    // maximum frame/tile x/y offset
+#define MAX_POSITION_OFFSET (1 << 24)    // maximum frame/fragment x/y offset
 
 // Maximum chunk payload is such that adding the header and padding won't
 // overflow a uint32_t.
