@@ -359,14 +359,15 @@ SRCS_C = \
     libavutil/cpu.c \
     libavutil/crc.c \
     libavutil/dict.c \
+    libavutil/error.c \
     libavutil/eval.c \
     libavutil/fifo.c \
     libavutil/float_dsp.c \
     libavutil/imgutils.c \
     libavutil/intfloat_readwrite.c \
+    libavutil/intmath.c \
     libavutil/lfg.c \
     libavutil/log.c \
-    libavutil/log2.c \
     libavutil/log2_tab.c \
     libavutil/lzo.c \
     libavutil/mathematics.c \
