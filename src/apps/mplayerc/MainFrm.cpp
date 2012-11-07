@@ -85,6 +85,7 @@
 #include "../../filters/transform/VSFilter/IDirectVobSub.h"
 #include "../../Subtitles/RenderedHdmvSubtitle.h"
 #include "../../Subtitles/SupSubFile.h"
+#include "../../Subtitles/XSUBSubtitle.h"
 
 #include "Monitors.h"
 #include "MultiMonitor.h"
@@ -15793,7 +15794,7 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, bool fApplyDefStyle)
 			pRTS->SetOverride(s.fUseDefaultSubtitlesStyle, &s.subdefstyle);
 
 			pRTS->Deinit();
-		} else if (clsid == __uuidof(CRenderedHdmvSubtitle) || clsid == __uuidof(CSupSubFile)) {
+		} else if (clsid == __uuidof(CRenderedHdmvSubtitle) || clsid == __uuidof(CSupSubFile) || clsid == __uuidof(CXSUBSubtitle)) {
 			s.m_RenderersSettings.bPositionRelative	= s.subdefstyle.relativeTo;
 		}
 	}
