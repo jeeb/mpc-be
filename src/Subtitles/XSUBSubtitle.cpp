@@ -57,7 +57,7 @@ STDMETHODIMP_(POSITION) CXSUBSubtitle::GetStartPosition(REFERENCE_TIME rt, doubl
 	CAutoLock cAutoLock(&m_csCritSec);
 
 	if (CleanOld) {
-		CXSUBSubtitle::CleanOld(rt/* - m_rtStart*/);
+		CXSUBSubtitle::CleanOld(rt);
 	}
 
 	return m_pObjects.GetHeadPosition();
@@ -76,7 +76,7 @@ STDMETHODIMP_(REFERENCE_TIME) CXSUBSubtitle::GetStart(POSITION pos, double fps)
 	CAutoLock cAutoLock(&m_csCritSec);
 
 	CompositionObject* pObject = m_pObjects.GetAt(pos);
-	return pObject!=NULL ? pObject->m_rtStart/* + m_rtStart */: INVALID_TIME;
+	return pObject!=NULL ? pObject->m_rtStart: INVALID_TIME;
 }
 
 STDMETHODIMP_(REFERENCE_TIME) CXSUBSubtitle::GetStop(POSITION pos, double fps)
@@ -84,7 +84,7 @@ STDMETHODIMP_(REFERENCE_TIME) CXSUBSubtitle::GetStop(POSITION pos, double fps)
 	CAutoLock cAutoLock(&m_csCritSec);
 
 	CompositionObject* pObject = m_pObjects.GetAt(pos);
-	return pObject!=NULL ? pObject->m_rtStop/* + m_rtStart */: INVALID_TIME;
+	return pObject!=NULL ? pObject->m_rtStop: INVALID_TIME;
 }
 
 STDMETHODIMP_(bool) CXSUBSubtitle::IsAnimated(POSITION pos)
@@ -118,10 +118,6 @@ STDMETHODIMP CXSUBSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fp
 		}
 
 		m_pObjects.GetNext(pos);
-	}
-
-	if (rt > 60*10000000i64) {
-		CleanOld(rt - 60*10000000i64); // Cleanup subtitles older than 1 minute ...
 	}
 
 	return S_OK;

@@ -373,13 +373,55 @@ void CompositionObject::Dvb8PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb,
 	gb.BitByteAlign();
 }
 
+// from ffmpeg
+const BYTE ff_log2_tab[256]={
+		0,0,1,1,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+		5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
+		6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+		6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+		7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+		7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+		7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+		7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7
+};
+
 void CompositionObject::RenderXSUB(SubPicDesc& spd)
 {
 	if (!m_pRLEData) {
 		return;
 	}
 
-	// test pattern
-    // FillSolidRect(spd, m_horizontal_position, m_vertical_position, m_width, m_height, m_Colors[1]);
+	CGolombBuffer	gb (m_pRLEData, m_nRLEDataSize);
+	BYTE			nPaletteIndex = 0;
+	SHORT			nCount;
+	SHORT			nX	= m_horizontal_position;
+	SHORT			nY	= m_vertical_position;
+
+	for (int y = 0; y < m_height; y++) {
+		if (gb.IsEOF()) {
+			break;
+		}
+		if (y == (m_height + 1) / 2) {
+			// interlaced: do odd lines
+			nY	= m_vertical_position + 1;
+		}
+		nX	= m_horizontal_position;
+		while (nX < (m_horizontal_position + m_width)) {
+			int log2		= ff_log2_tab[gb.BitRead(8, true)];
+			nCount			= gb.BitRead(14 - 4 * (log2 >> 1));
+			nCount			= min(nCount, m_width - (nX - m_horizontal_position));
+			nPaletteIndex	= gb.BitRead(2);
+            // count 0 - means till end of row
+            if (!nCount) {
+				nCount = m_width - (nX - m_horizontal_position);
+			}
+			FillSolidRect(spd, nX, nY, nCount, 1, m_Colors[nPaletteIndex]);
+			nX += nCount;
+		}
+		// interlaced, skip every second line
+		nY += 2;
+
+		gb.BitByteAlign();
+	}
 }
 
