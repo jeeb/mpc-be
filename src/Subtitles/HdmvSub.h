@@ -24,7 +24,7 @@
 
 #include "BaseSub.h"
 
-#define MAX_WINDOWS 3 // Maximum number of windows (taken from ffdshow, maybe other ...)
+#define MAX_WINDOWS 64
 class HDMV_WindowDefinition
 {
 public:
