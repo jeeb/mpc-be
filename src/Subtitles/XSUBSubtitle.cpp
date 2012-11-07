@@ -24,10 +24,11 @@
 #include "XSUBSubtitle.h"
 #include "../DSUtil/GolombBuffer.h"
 
-CXSUBSubtitle::CXSUBSubtitle(CCritSec* pLock, const CString& name, LCID lcid)
+CXSUBSubtitle::CXSUBSubtitle(CCritSec* pLock, const CString& name, LCID lcid, SIZE size)
 	: CSubPicProviderImpl(pLock)
 	, m_name(name)
 	, m_lcid(lcid)
+	, m_size(size)
 	, m_rtStart(0)
 {
 }
@@ -94,12 +95,34 @@ STDMETHODIMP_(bool) CXSUBSubtitle::IsAnimated(POSITION pos)
 STDMETHODIMP CXSUBSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fps, RECT& bbox)
 {
 	CAutoLock cAutoLock(&m_csCritSec);
-	
-	/*
-	Render (spd, rt - m_rtStart, bbox);
-	*/
 
-	CleanOld(rt - /*m_rtStart - */60*10000000i64); // Cleanup subtitles older than 1 minute ...
+	POSITION pos = m_pObjects.GetHeadPosition();
+	while (pos) {
+		CompositionObject* pObject = m_pObjects.GetAt (pos);
+
+		if (pObject && rt >= pObject->m_rtStart && rt < pObject->m_rtStop && pObject->HavePalette()) {
+
+			ASSERT (spd.w >= (pObject->m_horizontal_position + pObject->m_width) && spd.h >= (pObject->m_vertical_position + pObject->m_height));
+
+			if (pObject->GetRLEDataSize() && pObject->m_width > 0 && pObject->m_height > 0 &&
+					spd.w >= (pObject->m_horizontal_position + pObject->m_width) &&
+					spd.h >= (pObject->m_vertical_position + pObject->m_height)) {
+
+				bbox.left	= pObject->m_horizontal_position;
+				bbox.top	= pObject->m_vertical_position;
+				bbox.right	= pObject->m_horizontal_position + pObject->m_width;
+				bbox.bottom	= pObject->m_vertical_position + pObject->m_height;
+
+				pObject->RenderXSUB(spd);
+			}
+		}
+
+		m_pObjects.GetNext(pos);
+	}
+
+	if (rt > 60*10000000i64) {
+		CleanOld(rt - 60*10000000i64); // Cleanup subtitles older than 1 minute ...
+	}
 
 	return S_OK;
 }
@@ -107,8 +130,14 @@ STDMETHODIMP CXSUBSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fp
 STDMETHODIMP CXSUBSubtitle::GetTextureSize (POSITION pos, SIZE& MaxTextureSize, SIZE& VideoSize, POINT& VideoTopLeft)
 {
 	CAutoLock cAutoLock(&m_csCritSec);
-	HRESULT hr = E_FAIL;//m_pSub->GetTextureSize(pos, MaxTextureSize, VideoSize, VideoTopLeft);
-	return hr;
+
+	MaxTextureSize.cx = VideoSize.cx = m_size.cx;
+	MaxTextureSize.cy = VideoSize.cy = m_size.cy;
+
+	VideoTopLeft.x	= 0;
+	VideoTopLeft.y	= 0;
+
+	return S_OK;
 };
 
 STDMETHODIMP_(SUBTITLE_TYPE) CXSUBSubtitle::GetType(POSITION pos)
@@ -173,9 +202,8 @@ HRESULT CXSUBSubtitle::ParseSample (IMediaSample* pSample)
 	HRESULT		hr = E_FAIL;
 
 	CheckPointer (pSample, E_POINTER);
-	REFERENCE_TIME	rtStart = INVALID_TIME, rtStop = INVALID_TIME;
-	BYTE*			pData = NULL;
-	int				lSampleLen;
+	BYTE*	pData = NULL;
+	int		lSampleLen;
 
 	hr = pSample->GetPointer(&pData);
 	if (FAILED(hr) || pData == NULL) {
@@ -190,6 +218,7 @@ HRESULT CXSUBSubtitle::ParseSample (IMediaSample* pSample)
 		return E_FAIL;
 	}
 
+	REFERENCE_TIME rtStart = INVALID_TIME, rtStop = INVALID_TIME;
 	CString tmp((char*)pData, 26);
 	rtStart	= StringToReftime(tmp.Mid(1, 12));
 	rtStop	= StringToReftime(tmp.Mid(14, 12));
@@ -219,9 +248,12 @@ HRESULT CXSUBSubtitle::ParseSample (IMediaSample* pSample)
 		Palette[entry].Y	= gb.ReadByte();	// red
 		Palette[entry].Cr	= gb.ReadByte();	// green
 		Palette[entry].Cb	= gb.ReadByte();	// blue
+		if (entry) {
+			Palette[entry].T = 0xFF; // first entry - background, fully transparent
+		}
 	}
 
-	pSub->SetPalette(4, Palette, false);
+	pSub->SetPalette(4, Palette, false, true);
 
 	int RLESize = gb.GetSize() - gb.GetPos();
 	pSub->SetRLEData(gb.GetBufferPos(), RLESize, RLESize);
@@ -255,13 +287,12 @@ void CXSUBSubtitle::Reset()
 }
 void CXSUBSubtitle::CleanOld(REFERENCE_TIME rt)
 {
-	CompositionObject* pObject_old;
-
+	CompositionObject* pObject;
 	while (m_pObjects.GetCount()>0) {
-		pObject_old = m_pObjects.GetHead();
-		if (pObject_old->m_rtStop < rt) {
+		pObject = m_pObjects.GetHead();
+		if (pObject->m_rtStop < rt) {
 			m_pObjects.RemoveHead();
-			delete pObject_old;
+			delete pObject;
 		} else {
 			break;
 		}

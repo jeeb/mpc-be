@@ -339,11 +339,11 @@ void CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 	while (pos) {
 		CompositionObject* pObject = m_pObjects.GetAt (pos);
 
-		if (rt >= pObject->m_rtStart && rt < pObject->m_rtStop) {
+		if (pObject && rt >= pObject->m_rtStart && rt < pObject->m_rtStop) {
 
-			ASSERT (pObject!=NULL && spd.w >= (pObject->m_horizontal_position + pObject->m_width) && spd.h >= (pObject->m_vertical_position + pObject->m_height));
+			ASSERT (spd.w >= (pObject->m_horizontal_position + pObject->m_width) && spd.h >= (pObject->m_vertical_position + pObject->m_height));
 
-			if (pObject && pObject->GetRLEDataSize() && pObject->m_width > 0 && pObject->m_height > 0 &&
+			if (pObject->GetRLEDataSize() && pObject->m_width > 0 && pObject->m_height > 0 &&
 					spd.w >= (pObject->m_horizontal_position + pObject->m_width) &&
 					spd.h >= (pObject->m_vertical_position + pObject->m_height)) {
 

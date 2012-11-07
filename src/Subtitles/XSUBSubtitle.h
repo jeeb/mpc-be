@@ -29,7 +29,7 @@ class __declspec(uuid("86551353-62BE-4513-B14D-B5882A73823E"))
 	CXSUBSubtitle : public CSubPicProviderImpl, public ISubStream
 {
 public:
-	CXSUBSubtitle(CCritSec* pLock, const CString& name, LCID lcid);
+	CXSUBSubtitle(CCritSec* pLock, const CString& name, LCID lcid, SIZE size);
 	~CXSUBSubtitle(void);
 
 	DECLARE_IUNKNOWN
@@ -65,6 +65,7 @@ public:
 private :
 	CString			m_name;
 	LCID			m_lcid;
+	SIZE			m_size;
 	REFERENCE_TIME	m_rtStart;
 
 	CAtlList<CompositionObject*>	m_pObjects;

@@ -23,7 +23,7 @@
 #include "stdafx.h"
 #include "CompositionObject.h"
 #include "../DSUtil/GolombBuffer.h"
-
+#include <d3d9types.h>
 
 CompositionObject::CompositionObject()
 {
@@ -64,14 +64,18 @@ CompositionObject::~CompositionObject()
 	}
 }
 
-void CompositionObject::SetPalette (int nNbEntry, HDMV_PALETTE* pPalette, bool bIsHD)
+void CompositionObject::SetPalette (int nNbEntry, HDMV_PALETTE* pPalette, bool bIsHD, bool bIsRGB)
 {
 	m_nColorNumber = nNbEntry;
 	for (int i=0; i<nNbEntry; i++) {
-		if (bIsHD) {
-			m_Colors[pPalette[i].entry_id] = YCrCbToRGB_Rec709 (pPalette[i].T, pPalette[i].Y, pPalette[i].Cr, pPalette[i].Cb);
+		if (bIsRGB) {
+			m_Colors[pPalette[i].entry_id] = D3DCOLOR_ARGB(pPalette[i].T, pPalette[i].Y, pPalette[i].Cr, pPalette[i].Cb);
 		} else {
-			m_Colors[pPalette[i].entry_id] = YCrCbToRGB_Rec601 (pPalette[i].T, pPalette[i].Y, pPalette[i].Cr, pPalette[i].Cb);
+			if (bIsHD) {
+				m_Colors[pPalette[i].entry_id] = YCrCbToRGB_Rec709 (pPalette[i].T, pPalette[i].Y, pPalette[i].Cr, pPalette[i].Cb);
+			} else {
+				m_Colors[pPalette[i].entry_id] = YCrCbToRGB_Rec601 (pPalette[i].T, pPalette[i].Y, pPalette[i].Cr, pPalette[i].Cb);
+			}
 		}
 	}
 }
@@ -368,3 +372,14 @@ void CompositionObject::Dvb8PixelsCodeString(SubPicDesc& spd, CGolombBuffer& gb,
 
 	gb.BitByteAlign();
 }
+
+void CompositionObject::RenderXSUB(SubPicDesc& spd)
+{
+	if (!m_pRLEData) {
+		return;
+	}
+
+	// test pattern
+    // FillSolidRect(spd, m_horizontal_position, m_vertical_position, m_width, m_height, m_Colors[1]);
+}
+

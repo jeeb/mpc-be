@@ -77,9 +77,10 @@ public :
 
 	void				RenderHdmv(SubPicDesc& spd);
 	void				RenderDvb(SubPicDesc& spd, SHORT nX, SHORT nY);
+	void				RenderXSUB(SubPicDesc& spd);
 	void				WriteSeg (SubPicDesc& spd, SHORT nX, SHORT nY, SHORT nCount, SHORT nPaletteIndex);
 
-	void				SetPalette (int nNbEntry, HDMV_PALETTE* pPalette, bool bIsHD);
+	void				SetPalette (int nNbEntry, HDMV_PALETTE* pPalette, bool bIsHD, bool bIsRGB = false);
 	void				SetPalette (int nNbEntry, DWORD* dwColors);
 	bool				HavePalette() { return m_nColorNumber > 0; };
 

@@ -148,10 +148,17 @@ HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
 			}
 			CVobSubStream* pVSS = (CVobSubStream*)(ISubStream*)m_pSubStream;
 
-			CStringA hdr = VobSubDefHeader(720, 576);
+			int x, y, arx, ary;
+			ExtractDim(&m_mt, x, y, arx, ary);
+
+			CStringA hdr = VobSubDefHeader(x, y);
 			pVSS->Open(name, (BYTE*)(LPCSTR)hdr, hdr.GetLength());
 		} else if (m_mt.subtype == MEDIASUBTYPE_XSUB) {
-			if (!(m_pSubStream = DNew CXSUBSubtitle(m_pSubLock, name, lcid))) {
+			int x, y, arx, ary;
+			ExtractDim(&m_mt, x, y, arx, ary);
+			SIZE size = {x, y};
+
+			if (!(m_pSubStream = DNew CXSUBSubtitle(m_pSubLock, name, lcid, size))) {
 				return E_FAIL;
 			}
 		}
