@@ -30,12 +30,13 @@ extern "C" {
 #include "ffmpeg/libavutil/opt.h"
 }
 #pragma warning(default: 4005)
+#include "AudioHelper.h"
 
 CMixer::CMixer()
 	: m_pAVRCxt(NULL)
 	, last_in_layout(0)
 	, last_out_layout(0)
-	, last_in_sf(AV_SAMPLE_FMT_NONE)
+	, last_in_avsf(AV_SAMPLE_FMT_NONE)
 {
 }
 
@@ -44,15 +45,19 @@ CMixer::~CMixer()
 	avresample_free(&m_pAVRCxt);
 }
 
-void CMixer::Init(DWORD out_layout, DWORD in_layout, enum AVSampleFormat in_sf)
+void CMixer::Init(DWORD out_layout, DWORD in_layout, enum AVSampleFormat in_avsf)
 {
 	avresample_free(&m_pAVRCxt);
+
+	if (in_avsf >= AV_SAMPLE_FMT_U8P && in_avsf <= AV_SAMPLE_FMT_DBLP) { // planar audio is not supported (ffmpeg crashed)
+		in_avsf = AV_SAMPLE_FMT_FLT; // convert to float
+	}
 
 	int ret = 0;
 	// Allocate Resample Context and set options.
 	m_pAVRCxt = avresample_alloc_context();
 	av_opt_set_int(m_pAVRCxt, "in_channel_layout", in_layout, 0);
-	av_opt_set_int(m_pAVRCxt, "in_sample_fmt", in_sf, 0);
+	av_opt_set_int(m_pAVRCxt, "in_sample_fmt", in_avsf, 0);
 	av_opt_set_int(m_pAVRCxt, "out_channel_layout", out_layout, 0);
 	av_opt_set_int(m_pAVRCxt, "out_sample_fmt", AV_SAMPLE_FMT_FLT, 0); // forced float output
 
@@ -133,27 +138,48 @@ void CMixer::Init(DWORD out_layout, DWORD in_layout, enum AVSampleFormat in_sf)
 
 	last_in_layout  = in_layout;
 	last_out_layout = out_layout;
-	last_in_sf      = in_sf;
+	last_in_avsf      = in_avsf;
 }
 
-HRESULT CMixer::Mixing(float* pOutput, WORD out_ch, DWORD out_layout, BYTE* pInput, int samples, WORD in_ch, DWORD in_layout, enum AVSampleFormat in_sf)
+HRESULT CMixer::Mixing(float* pOutput, DWORD out_layout, BYTE* pInput, int in_samples, DWORD in_layout, enum AVSampleFormat in_avsf)
 {
 	if (in_layout == out_layout) {
-		return E_ABORT;
+		return E_ABORT; // do nothing
 	}
-	if (in_sf < AV_SAMPLE_FMT_U8 || in_sf > AV_SAMPLE_FMT_DBLP) {
+
+	AVSampleFormat avsf;
+	if (in_avsf >= AV_SAMPLE_FMT_U8 && in_avsf <= AV_SAMPLE_FMT_DBL) {
+		avsf = in_avsf;
+	} else if (in_avsf >= AV_SAMPLE_FMT_U8P && in_avsf <= AV_SAMPLE_FMT_DBLP) { // planar audio is not supported (ffmpeg crashed)
+		avsf = AV_SAMPLE_FMT_FLT; // convert to float
+	} else {
 		return E_INVALIDARG;
 	}
 
-	if (!m_pAVRCxt || in_layout != last_in_layout || out_layout != last_out_layout || in_sf != last_in_sf) {
-		Init(out_layout, in_layout, in_sf);
+	if (!m_pAVRCxt || in_layout != last_in_layout || out_layout != last_out_layout || avsf != last_in_avsf) {
+		Init(out_layout, in_layout, avsf);
 	}
-
 	if (!m_pAVRCxt) {
 		return E_FAIL;
 	}
 
-	int ret = avresample_convert(m_pAVRCxt, (uint8_t**)&pOutput, samples * out_ch, samples, (uint8_t**)&pInput, samples * in_ch, samples);
+	int in_ch = av_popcount(in_layout);
+	float* buf  = NULL;
+	if (avsf != in_avsf) { // need convert
+		buf = new float[in_samples * in_ch];
+		convert_to_float(in_avsf, (WORD)in_ch, in_samples, pInput, buf); // convert to float
+		pInput = (BYTE*)buf;
+		in_avsf = AV_SAMPLE_FMT_FLT;
+	}
+
+	// int in_plane_size  = in_samples * (av_sample_fmt_is_planar(in_avsf) ? 1 : av_popcount(in_layout)) * av_get_bytes_per_sample(in_avsf);
+	int in_plane_size  = in_samples * in_ch * av_get_bytes_per_sample(avsf);
+	int out_plane_size = in_samples * av_popcount(out_layout) * sizeof(float);
+
+	int ret = avresample_convert(m_pAVRCxt, (uint8_t**)&pOutput, in_plane_size, in_samples, (uint8_t**)&pInput, out_plane_size, in_samples);
+	if (buf) {
+		delete [] buf;
+	}
 	if (ret < 0) {
 		TRACE(_T("Mixer: avresample_convert failed\n"));
 		return E_FAIL;
