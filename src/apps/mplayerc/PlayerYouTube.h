@@ -26,6 +26,7 @@
 #define YOUTUBE_FULL_URL	_T("www.youtube.com/watch?v=")
 #define YOUTU_BE_URL		_T("youtu.be/")
 #define YOUTU_BE_FULL_URL	_T("www.youtu.be/")
+#define XVIDEOS_URL			_T("www.xvideos.com/video")
 
 static int strpos(char* h, char* n)
 {
@@ -42,7 +43,7 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 {
 	CString tmp_fn(CString(fn).MakeLower());
 
-	if (tmp_fn.Find(YOUTUBE_URL) != -1 || tmp_fn.Find(YOUTU_BE_URL) != -1) {
+	if (tmp_fn.Find(YOUTUBE_URL) != -1 || tmp_fn.Find(YOUTU_BE_URL) != -1 || tmp_fn.Find(XVIDEOS_URL) != -1) {
 
 		if (tmp_fn.Find(YOUTU_BE_URL) != -1) {
 			fn.Replace(YOUTU_BE_FULL_URL, YOUTUBE_FULL_URL);
@@ -103,10 +104,10 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 
 		// get name(title) for output filename
 		CString Title;
-		int t_start = strpos(out, "<meta name=\"title\" content=\"");
+		int t_start = strpos(out, "<title>");
 		if (t_start > 0) {
-			t_start += 28;
-			int t_stop = strpos(out + t_start, "\">");
+			t_start += 7;
+			int t_stop = strpos(out + t_start, "</title>");
 			if (t_stop > 0) {
 				char* title	= (char*)malloc(t_stop + 1);
 				memset(title, 0, t_stop + 1);
@@ -128,18 +129,33 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 			Title = _T("vid");
 		}
 
+		CString ext;
 		DWORD i, k, l, lastpos = 0;
+
 		for (;;) {
 			k = strpos(out + lastpos, "%2Curl%3Dhttp%253A%252F%252F");
 			if (!k) {
 				k = strpos(out + lastpos, "%26url%3Dhttp%253A%252F%252F");
 			}
 
+			// xvideos.com
+			if (!k) {
+				k = strpos(out + lastpos, ";flv_url=http");
+			}
+
 			if (k) {
 
 				k += (lastpos + 9);
 				lastpos = k;
+
 				i = strpos(out + k, "%26quality");
+
+				// xvideos.com
+				if (!i) {
+					i = strpos(out + k, "&amp;url");
+					ext = _T(".flv");
+				}
+
 				if (!i) {
 					free(out);
 					return fn;
@@ -158,7 +174,7 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 				}
 
 				// get extension for output filename
-				CString ext;
+
 				l = strpos(out + k, "video%252Fmp4");
 				if (l && (l < i)) {
 					ext = _T(".mp4");
@@ -179,9 +195,7 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 					ext = _T(".mp4");
 				}
 
-				char *str1;
-
-				str1 = (char*)malloc(i + 1);
+				char *str1 = (char*)malloc(i + 1);
 
 				memset(str1, 0, i + 1);
 

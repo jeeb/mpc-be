@@ -27,7 +27,7 @@
 
 using namespace Gdiplus;
 
-static int GetEncoderClsid(CStringW format, CLSID *pClsid)
+static int GetEncoderClsid(CStringW format, CLSID* pClsid)
 {
 	UINT num = 0, size = 0;
 	GetImageEncodersSize(&num, &size);
@@ -37,7 +37,7 @@ static int GetEncoderClsid(CStringW format, CLSID *pClsid)
 	ImageCodecInfo* pImageCodecInfo = (ImageCodecInfo*)malloc(size);
 	GetImageEncoders(num, size, pImageCodecInfo);
 	for (UINT j = 0; j < num; j++) {
-		if (wcscmp(pImageCodecInfo[j].MimeType, format) == 0) {
+		if (!wcscmp(pImageCodecInfo[j].MimeType, format)) {
 			*pClsid = pImageCodecInfo[j].Clsid;
 			free(pImageCodecInfo);
 			return j;
@@ -47,7 +47,42 @@ static int GetEncoderClsid(CStringW format, CLSID *pClsid)
 	return -1;
 }
 
-static bool BMPDIB(LPCTSTR fn, BYTE* pData, CStringW format, ULONG quality, bool type, LPVOID* pBuf, size_t* pSize)
+static void GdiplusConvert(Bitmap* bm, CStringW fn, CStringW format, ULONG* quality, bool type, BYTE** pBuf, size_t* pSize)
+{
+	CLSID encoderClsid = CLSID_NULL;
+	GetEncoderClsid(format, &encoderClsid);
+
+	EncoderParameters encoderParameters;
+	encoderParameters.Count = 1;
+	encoderParameters.Parameter[0].NumberOfValues = 1;
+	encoderParameters.Parameter[0].Value = &quality;
+	encoderParameters.Parameter[0].Guid = EncoderQuality;
+	encoderParameters.Parameter[0].Type = EncoderParameterValueTypeLong;
+
+	if (type) {
+		LARGE_INTEGER lOfs;
+		ULARGE_INTEGER lSize;
+		IStream *pS;
+		::CreateStreamOnHGlobal(0, 1, &pS);
+		bm->Save(pS, &encoderClsid, &encoderParameters);
+
+		lOfs.QuadPart = 0;
+		pS->Seek(lOfs, STREAM_SEEK_END, &lSize);
+
+		lOfs.QuadPart = 0;
+		pS->Seek(lOfs, STREAM_SEEK_SET, 0);
+
+		*pSize = (ULONG)((DWORD_PTR)lSize.QuadPart);
+		*pBuf = (BYTE*)malloc(*pSize);
+
+		pS->Read(*pBuf, (ULONG)*pSize, 0);
+		pS->Release();
+	} else {
+		bm->Save(fn, &encoderClsid, &encoderParameters);
+	}
+}
+
+static bool BMPDIB(LPCTSTR fn, BYTE* pData, CStringW format, ULONG quality, bool type, BYTE** pBuf, size_t* pSize)
 {
 	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
 
@@ -91,11 +126,11 @@ static bool BMPDIB(LPCTSTR fn, BYTE* pData, CStringW format, ULONG quality, bool
 		}
 	} else {
 		HGLOBAL hG = ::GlobalAlloc(GMEM_MOVEABLE, bfh.bfOffBits + len);
-		LPVOID lpBits = ::GlobalLock(hG);
+		BYTE* lpBits = (BYTE*)::GlobalLock(hG);
 
 		memcpy(lpBits, &bfh, sizeof(bfh));
-		memcpy((BYTE*)lpBits + sizeof(bfh), &header, sih);
-		memcpy((BYTE*)lpBits + bfh.bfOffBits, rgb, len);
+		memcpy(lpBits + sizeof(bfh), &header, sih);
+		memcpy(lpBits + bfh.bfOffBits, rgb, len);
 
 		IStream *s;
 		::CreateStreamOnHGlobal(hG, 1, &s);
@@ -105,37 +140,7 @@ static bool BMPDIB(LPCTSTR fn, BYTE* pData, CStringW format, ULONG quality, bool
 		GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, 0);
 		Bitmap *bm = new Bitmap(s);
 
-		CLSID encoderClsid = CLSID_NULL;
-		GetEncoderClsid(format, &encoderClsid);
-
-		EncoderParameters encoderParameters;
-		encoderParameters.Count = 1;
-		encoderParameters.Parameter[0].NumberOfValues = 1;
-		encoderParameters.Parameter[0].Value = &quality;
-		encoderParameters.Parameter[0].Guid = EncoderQuality;
-		encoderParameters.Parameter[0].Type = EncoderParameterValueTypeLong;
-
-		if (type) {
-			LARGE_INTEGER lOfs;
-			ULARGE_INTEGER lSize;
-			IStream *pS;
-			::CreateStreamOnHGlobal(0, 1, &pS);
-			bm->Save(pS, &encoderClsid, &encoderParameters);
-
-			lOfs.QuadPart = 0;
-			pS->Seek(lOfs, STREAM_SEEK_END, &lSize);
-
-			lOfs.QuadPart = 0;
-			pS->Seek(lOfs, STREAM_SEEK_SET, 0);
-
-			*pSize = (ULONG)((DWORD_PTR)lSize.QuadPart);
-			*pBuf = malloc(*pSize);
-
-			pS->Read(*pBuf, (ULONG)*pSize, 0);
-			pS->Release();
-		} else {
-			bm->Save(CStringW(fn), &encoderClsid, &encoderParameters);
-		}
+		GdiplusConvert(bm, fn, format, &quality, type, pBuf, pSize);
 
 		delete bm;
 		GdiplusShutdown(gdiplusToken);

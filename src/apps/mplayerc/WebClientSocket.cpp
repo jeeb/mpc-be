@@ -820,7 +820,7 @@ bool CWebClientSocket::OnSnapShotJpeg(CStringA& hdr, CStringA& body, CStringA& m
 
 	BYTE* pData = NULL;
 	long size = 0;
-	LPVOID jpeg = NULL;
+	BYTE* jpeg = NULL;
 	size_t jpeg_size = 0;
 
 	if (m_pMainFrame->GetDIB(&pData, size, true)) {
