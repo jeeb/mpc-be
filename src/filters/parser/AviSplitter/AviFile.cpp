@@ -157,7 +157,11 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 			if (S_OK != Read(size)) {
 				return E_FAIL;
 			}
-			if (GetPos() + size > end) {
+
+			DWORD cur_pos = GetPos();
+			if (cur_pos < end) {
+				size = min(size, end - cur_pos);
+			} else if (cur_pos + size > end) {
 				return E_FAIL; // broken chunk
 			}
 
@@ -323,19 +327,38 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 
 REFERENCE_TIME CAviFile::GetTotalTime()
 {
-	REFERENCE_TIME t = 0/*10i64*m_avih.dwMicroSecPerFrame*m_avih.dwTotalFrames*/;
+	REFERENCE_TIME total = 0;
 
+	// first - try to get the length of the video track
 	for (DWORD i = 0; i < m_avih.dwStreams; ++i) {
 		strm_t* s = m_strms[i];
-		REFERENCE_TIME t2 = s->GetRefTime((DWORD)s->cs.GetCount(), s->totalsize);
-		t = max(t, t2);
+		if (s->strh.fccType == FCC('vids')) {
+			ASSERT(s->strf.GetCount() >= sizeof(BITMAPINFOHEADER));
+
+			BITMAPINFOHEADER* pbmi = &((BITMAPINFO*)s->strf.GetData())->bmiHeader;
+			if (pbmi->biCompression != FCC('DXSB') && pbmi->biCompression != FCC('DXSA')) { // skip XSUB subtitle
+				REFERENCE_TIME t = s->GetRefTime((DWORD)s->cs.GetCount(), s->totalsize);
+				total = max(total, t);
+			}
+		}
 	}
 
-	if (t == 0) {
-		t = 10i64*m_avih.dwMicroSecPerFrame*m_avih.dwTotalFrames;
+	if (!total) {
+		// second - try to get the length of the audio track
+		for (DWORD i = 0; i < m_avih.dwStreams; ++i) {
+			strm_t* s = m_strms[i];
+			if (s->strh.fccType == FCC('auds') || s->strh.fccType == FCC('amva')) {
+				REFERENCE_TIME t = s->GetRefTime((DWORD)s->cs.GetCount(), s->totalsize);
+				total = max(total, t);
+			}
+		}
 	}
 
-	return t;
+	if (!total) {
+		total = 10i64*m_avih.dwMicroSecPerFrame*m_avih.dwTotalFrames;
+	}
+
+	return total;
 }
 
 HRESULT CAviFile::BuildIndex()
