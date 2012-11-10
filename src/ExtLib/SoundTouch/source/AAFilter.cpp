@@ -48,12 +48,12 @@
 #include "FIRFilter.h"
 
 using namespace soundtouch;
-
+// ==> Start patch MPC
 #ifndef M_PI
 #define M_PI      3.14159265358979323846
 #endif
 #define TWOPI    (2 * M_PI)
-
+// <== End patch MPC
 /*****************************************************************************
  *
  * Implementation of the class 'AAFilter'
@@ -115,7 +115,9 @@ void AAFilter::calculateCoeffs()
     coeffs = new SAMPLETYPE[length];
 
     fc2 = 2.0 * cutoffFreq; 
+    // ==> Start patch MPC
     wc = M_PI * fc2;
+    // <== End patch MPC
     tempCoeff = TWOPI / (double)length;
 
     sum = 0;

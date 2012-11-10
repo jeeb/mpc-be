@@ -19,6 +19,7 @@ Changes (*):
 * MediaInfo 0.7.61+ svn rev.5251;
 * ZenLibs v0.4.28+ svn rev.411;
 * Little-CMS git-886e2f52;
+* SoundTouch svn rev.160;
 
 Fixes (!):
 
