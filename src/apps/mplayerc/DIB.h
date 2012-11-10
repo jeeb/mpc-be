@@ -104,23 +104,14 @@ static bool BMPDIB(LPCTSTR fn, BYTE* pData, CStringW format, ULONG quality, bool
 	bfh.bfSize = bfh.bfOffBits + len;
 	bfh.bfReserved1 = bfh.bfReserved2 = 0;
 
-	BITMAPINFOHEADER header;
-	header.biSize = sih;
-	header.biWidth = width;
-	header.biHeight = height;
-	header.biPlanes = 1;
-	header.biBitCount = bit;
-	header.biCompression = BI_RGB;
-	header.biSizeImage = 0;
-	header.biXPelsPerMeter = header.biYPelsPerMeter = 0;
-	header.biClrUsed = header.biClrImportant = 0;
+	BITMAPINFO bi = {{sih, width, height, 1, bit, BI_RGB, 0, 0, 0, 0, 0}};
 
 	if (format == L"") {
 		FILE* fp;
 		_tfopen_s(&fp, fn, _T("wb"));
 		if (fp) {
 			fwrite(&bfh, sizeof(bfh), 1, fp);
-			fwrite(&header, sih, 1, fp);
+			fwrite(&bi.bmiHeader, sih, 1, fp);
 			fwrite(rgb, len, 1, fp);
 			fclose(fp);
 		}
@@ -129,7 +120,7 @@ static bool BMPDIB(LPCTSTR fn, BYTE* pData, CStringW format, ULONG quality, bool
 		BYTE* lpBits = (BYTE*)::GlobalLock(hG);
 
 		memcpy(lpBits, &bfh, sizeof(bfh));
-		memcpy(lpBits + sizeof(bfh), &header, sih);
+		memcpy(lpBits + sizeof(bfh), &bi.bmiHeader, sih);
 		memcpy(lpBits + bfh.bfOffBits, rgb, len);
 
 		IStream *s;

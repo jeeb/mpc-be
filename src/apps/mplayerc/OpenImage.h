@@ -79,17 +79,17 @@ static HBITMAP OpenImage(CString fn)
 
 	if (OpenImageCheck(fn)) {
 
-		HBITMAP hB;
+		HBITMAP hB = NULL;
 		FILE *fp;
 		TCHAR path_fn[_MAX_PATH];
-		int type = 0;
+		int type = 0, sih = sizeof(BITMAPINFOHEADER);
 
 		if (wcsstr(fn, L"://")) {
 			HINTERNET f, s = InternetOpen(0, 0, 0, 0, 0);
 			if (s) {
 				f = InternetOpenUrlW(s, fn, 0, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE, 0);
 				if (f) {
-					type++;
+					type = 1;
 
 					DWORD len;
 					char buf[4096];
@@ -127,7 +127,7 @@ static HBITMAP OpenImage(CString fn)
 
 		DWORD fs = ftell(fp);
 		rewind(fp);
-		void *data = malloc(fs);
+		BYTE *data = (BYTE*)malloc(fs);
 		fread(data, fs, 1, fp);
 		fclose(fp);
 
@@ -148,7 +148,7 @@ static HBITMAP OpenImage(CString fn)
 			size_t slen;
 			BYTE *pBits, *bmp = ConvertRGBToBMPBuffer((BYTE*)rgb, width, height, 3, (long*)&slen);
 
-			BITMAPINFO bi = {{sizeof(BITMAPINFOHEADER), width, height, 1, bit, BI_RGB, 0, 0, 0, 0, 0}};
+			BITMAPINFO bi = {{sih, width, height, 1, bit, BI_RGB, 0, 0, 0, 0, 0}};
 			hB = CreateDIBSection(0, &bi, DIB_RGB_COLORS, (void**)&pBits, 0, 0);
 			memcpy(pBits, bmp, slen);
 
@@ -163,14 +163,14 @@ static HBITMAP OpenImage(CString fn)
 			BYTE *pBits, *bmp = ConvertRGBToBMPBuffer(lpBits, width, height, bpp, (long*)&slen);
 			int bit = bpp * 8;
 
-			BITMAPINFO bi = {{sizeof(BITMAPINFOHEADER), width, height, 1, bit, BI_RGB, 0, 0, 0, 0, 0}};
+			BITMAPINFO bi = {{sih, width, height, 1, bit, BI_RGB, 0, 0, 0, 0, 0}};
 			hB = CreateDIBSection(0, &bi, DIB_RGB_COLORS, (void**)&pBits, 0, 0);
 			memcpy(pBits, bmp, slen);
 
 		} else {
 
 			HGLOBAL hG = ::GlobalAlloc(GMEM_MOVEABLE, fs);
-			LPVOID lpBits = ::GlobalLock(hG);
+			BYTE *lpBits = (BYTE*)::GlobalLock(hG);
 			memcpy(lpBits, data, fs);
 
 			IStream *s;

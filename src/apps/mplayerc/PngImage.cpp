@@ -193,15 +193,15 @@ HBITMAP MPCPngImage::TypeLoadImage(int type, BYTE** pData, int* width, int* heig
 	if (type == 0) {
 
 		fseek(fp, 0, SEEK_END);
-		int size = ftell(fp);
+		DWORD size = ftell(fp);
 		rewind(fp);
 		bmp = (BYTE*)malloc(size);
-		fread((void*)bmp, size, 1, fp);
+		fread(bmp, size, 1, fp);
 
 		BITMAPINFO& bi = (BITMAPINFO&)bmp[sizeof(BITMAPFILEHEADER)];
 
 		*width = bi.bmiHeader.biWidth;
-		*height = bi.bmiHeader.biHeight;
+		*height = abs(bi.bmiHeader.biHeight);
 		*bpp = bi.bmiHeader.biBitCount;
 
 		hbm = CreateDIBSection(0, &bi, DIB_RGB_COLORS, (void**)&(*pData), 0, 0);
