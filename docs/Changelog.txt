@@ -11,7 +11,7 @@ Added (+):
 
 Changes (*):
 * Updated German translation, the author - Markus Gaugg;
-* libwebp 0.2.1 git-d9c5fbef;
+* libwebp 0.2.1 git-2ca642e0;
 * libpng 1.5.13 git-753fd3f;
 * libopus 1.0.1 git-c55f4d8d;
 * Virtualdub 1.10.3 Test 7;
