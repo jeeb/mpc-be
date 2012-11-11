@@ -23,8 +23,11 @@
 
 #include "stdafx.h"
 #include "mplayerc.h"
+#include "MainFrm.h"
 #include "SaveDlg.h"
 #include "../../filters/Filters.h"
+#include <afxinet.h>
+#include "OpenImage.h"
 
 // CSaveDlg dialog
 
@@ -60,6 +63,12 @@ END_MESSAGE_MAP()
 
 BOOL CSaveDlg::OnInitDialog()
 {
+	if (OpenImageCheck(m_in)) {
+		OpenImageDIB(m_in, m_out, 90, 0);
+		EndDialog(IDOK);
+		return TRUE;
+	}
+
 	CCmdUIDialog::OnInitDialog();
 
 	m_anim.SendMessage(ACM_OPEN, (WPARAM)AfxGetInstanceHandle(), (LPARAM)IDR_AVI_FILECOPY);
@@ -221,7 +230,7 @@ LRESULT CSaveDlg::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 		if (EC_COMPLETE == evCode) {
 			EndDialog(IDOK);
 		} else if (EC_ERRORABORT == evCode) {
-			TRACE(_T("CSaveDlg::OnGraphNotify / EC_ERRORABORT, hr = %08x\n"), (HRESULT)evParam1);
+			//TRACE(_T("CSaveDlg::OnGraphNotify / EC_ERRORABORT, hr = %08x\n"), (HRESULT)evParam1);
 			m_report.SetWindowText(_T("Copying unexpectedly terminated!"));
 		}
 	}

@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "DIB.h"
 #include <libwebp/webp/decode.h>
 #include <stb_image/stb_image.h>
 
@@ -73,7 +74,51 @@ static bool OpenImageCheck(CString fn)
 	return 0;
 }
 
-static HBITMAP OpenImage(CString fn)
+static HBITMAP SaveImageDIB(CString out, ULONG* quality, bool mode, BYTE* pBuf, size_t pSize)
+{
+	HBITMAP hB = NULL;
+
+	HGLOBAL hG = ::GlobalAlloc(GMEM_MOVEABLE, pSize);
+	BYTE* lpBits = (BYTE*)::GlobalLock(hG);
+	memcpy(lpBits, pBuf, pSize);
+
+	IStream *s;
+	::CreateStreamOnHGlobal(hG, 1, &s);
+
+	ULONG_PTR gdiplusToken;
+	GdiplusStartupInput gdiplusStartupInput;
+	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, 0);
+	Bitmap *bm = new Bitmap(s);
+
+	if (mode) {
+		bm->GetHBITMAP(0, &hB);
+	} else {
+		CStringW format;
+		CString tmp_out(CString(out).MakeLower());
+
+		if (wcsstr(tmp_out, L".bmp")) {
+			format = L"image/bmp";
+		} else if (wcsstr(tmp_out, L".jpg")) {
+			format = L"image/jpeg";
+		} else if (wcsstr(tmp_out, L".png")) {
+			format = L"image/png";
+		} else if (wcsstr(tmp_out, L".tif")) {
+			format = L"image/tiff";
+		}
+		GdiplusConvert(bm, out, format, quality, 0, NULL, 0);
+	}
+
+	delete bm;
+	GdiplusShutdown(gdiplusToken);
+
+	s->Release();
+	::GlobalUnlock(hG);
+	::GlobalFree(hG);
+
+	return hB;
+}
+
+static HBITMAP OpenImageDIB(CString fn, CString out, ULONG quality, bool mode)
 {
 	CString tmp_fn(CString(fn).MakeLower());
 
@@ -127,12 +172,19 @@ static HBITMAP OpenImage(CString fn)
 
 		DWORD fs = ftell(fp);
 		rewind(fp);
-		BYTE *data = (BYTE*)malloc(fs);
+		BYTE *data = (BYTE*)malloc(fs), *pBuf = NULL;
 		fread(data, fs, 1, fp);
 		fclose(fp);
 
 		if (type) {
 			_tunlink(path_fn);
+		}
+
+		BITMAPFILEHEADER bfh;
+		if (!mode) {
+			bfh.bfType = 0x4d42;
+			bfh.bfOffBits = sizeof(bfh) + sih;
+			bfh.bfReserved1 = bfh.bfReserved2 = 0;
 		}
 
 		if (wcsstr(tmp_fn, L".webp") || wcsstr(tmp_fn, L".webpll")) {
@@ -149,8 +201,20 @@ static HBITMAP OpenImage(CString fn)
 			BYTE *pBits, *bmp = ConvertRGBToBMPBuffer((BYTE*)rgb, width, height, 3, (long*)&slen);
 
 			BITMAPINFO bi = {{sih, width, height, 1, bit, BI_RGB, 0, 0, 0, 0, 0}};
-			hB = CreateDIBSection(0, &bi, DIB_RGB_COLORS, (void**)&pBits, 0, 0);
-			memcpy(pBits, bmp, slen);
+
+			if (mode) {
+				hB = CreateDIBSection(0, &bi, DIB_RGB_COLORS, (void**)&pBits, 0, 0);
+				memcpy(pBits, bmp, slen);
+			} else {
+				bfh.bfSize = bfh.bfOffBits + slen;
+				pBuf = (BYTE*)malloc(bfh.bfSize);
+				memset(pBuf, 0, bfh.bfSize);
+				memcpy(pBuf, &bfh, sizeof(bfh));
+				memcpy(pBuf + sizeof(bfh), &bi.bmiHeader, sih);
+				memcpy(pBuf + bfh.bfOffBits, bmp, slen);
+				SaveImageDIB(out, &quality, 0, pBuf, bfh.bfSize);
+				free(pBuf);
+			}
 
 			WebPFreeDecBuffer(out_buf);
 
@@ -164,29 +228,23 @@ static HBITMAP OpenImage(CString fn)
 			int bit = bpp * 8;
 
 			BITMAPINFO bi = {{sih, width, height, 1, bit, BI_RGB, 0, 0, 0, 0, 0}};
-			hB = CreateDIBSection(0, &bi, DIB_RGB_COLORS, (void**)&pBits, 0, 0);
-			memcpy(pBits, bmp, slen);
+
+			if (mode) {
+				hB = CreateDIBSection(0, &bi, DIB_RGB_COLORS, (void**)&pBits, 0, 0);
+				memcpy(pBits, bmp, slen);
+			} else {
+				bfh.bfSize = bfh.bfOffBits + slen;
+				pBuf = (BYTE*)malloc(bfh.bfSize);
+				memset(pBuf, 0, bfh.bfSize);
+				memcpy(pBuf, &bfh, sizeof(bfh));
+				memcpy(pBuf + sizeof(bfh), &bi.bmiHeader, sih);
+				memcpy(pBuf + bfh.bfOffBits, bmp, slen);
+				SaveImageDIB(out, &quality, 0, pBuf, bfh.bfSize);
+				free(pBuf);
+			}
 
 		} else {
-
-			HGLOBAL hG = ::GlobalAlloc(GMEM_MOVEABLE, fs);
-			BYTE *lpBits = (BYTE*)::GlobalLock(hG);
-			memcpy(lpBits, data, fs);
-
-			IStream *s;
-			::CreateStreamOnHGlobal(hG, 1, &s);
-
-			ULONG_PTR gdiplusToken;
-			GdiplusStartupInput gdiplusStartupInput;
-			GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, 0);
-			Bitmap *bm = new Bitmap(s);
-			bm->GetHBITMAP(0, &hB);
-			delete bm;
-			GdiplusShutdown(gdiplusToken);
-
-			s->Release();
-			::GlobalUnlock(hG);
-			::GlobalFree(hG);
+			hB = SaveImageDIB(out, &quality, mode, data, fs);
 		}
 
 		free(data);
@@ -195,4 +253,9 @@ static HBITMAP OpenImage(CString fn)
 	}
 
 	return NULL;
+}
+
+static HBITMAP OpenImage(CString fn)
+{
+	return OpenImageDIB(fn, L"", 0, 1);
 }

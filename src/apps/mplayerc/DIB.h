@@ -87,8 +87,8 @@ static bool BMPDIB(LPCTSTR fn, BYTE* pData, CStringW format, ULONG quality, bool
 	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
 
 	int bit = 24, width = bih->biWidth, height = abs(bih->biHeight), bpp = bih->biBitCount / 8;
-	int stride = (width * bit + 31) / 32 * bpp;
-	int len = stride * height, sih = sizeof(BITMAPINFOHEADER);
+	int stride = (width * bit + 31) / 32 * bpp, sih = sizeof(BITMAPINFOHEADER);
+	DWORD len = stride * height;
 
 	BYTE *src = pData + sih, *rgb = (BYTE*)malloc(len);
 
@@ -196,7 +196,7 @@ static void WebPDIB(LPCTSTR fn, BYTE* pData, float quality)
 		BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
 
 		int width = bih->biWidth, height = abs(bih->biHeight), bpp = bih->biBitCount / 8;
-		int line, stride = width * 3 * sizeof(uint8_t);
+		DWORD line, stride = width * 3 * sizeof(uint8_t);
 
 		uint8_t* rgb = (uint8_t*)malloc(stride * height);
 		BYTE *p, *src = pData + sizeof(BITMAPINFOHEADER);

@@ -78,7 +78,6 @@
 #include <comdef.h>
 #include <dwmapi.h>
 
-#include "DIB.h"
 #include "OpenImage.h"
 #include "PlayerYouTube.h"
 
@@ -5136,6 +5135,8 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 
 void CMainFrame::OnFileSaveAs()
 {
+	AppSettings& s = AfxGetAppSettings();
+
 	CString ext, in = PlayerYouTube(m_wndPlaylistBar.GetCurFileName(), NULL), out = in;
 
 	if (!m_strTitleAlt.IsEmpty()) {
@@ -5150,9 +5151,7 @@ void CMainFrame::OnFileSaveAs()
 			out.Replace(sl.GetNext(pos), _T(" "));
 		}
 	} else {
-
 		int find = out.Find(_T("://"));
-
 		if (find < 0) {
 			ext = CString(CPath(out).GetExtension()).MakeLower();
 			CPath p(out); p.StripPath();
@@ -5174,24 +5173,59 @@ void CMainFrame::OnFileSaveAs()
 	}
 
 	CString ext_list = ResStr(IDS_MAINFRM_48);
-	if (!ext.IsEmpty()) {
+
+	if (OpenImageCheck(in)) {
+		ext_list = _T("BMP - Windows Bitmap (*.bmp)|*.bmp|JPG - JPEG Image (*.jpg)|*.jpg|PNG - Portable Network Graphics (*.png)|*.png|TIFF - Tagged Image File Format (*.tif)|*.tif||");
+	} else if (!ext.IsEmpty()) {
 		ext_list.Format(_T("Media (*%ws)|*%ws|%ws"), ext, ext, ResStr(IDS_MAINFRM_48));
 	}
 
 	CFileDialog fd(FALSE, 0, out,
 				   OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_PATHMUSTEXIST|OFN_NOCHANGEDIR,
 				   ext_list, GetModalParent(), 0);
+
+	if (OpenImageCheck(in)) {
+
+		if (s.strSnapShotExt == _T(".bmp")) {
+			fd.m_pOFN->nFilterIndex = 1;
+		} else if (s.strSnapShotExt == _T(".jpg")) {
+			fd.m_pOFN->nFilterIndex = 2;
+		} else if (s.strSnapShotExt == _T(".png")) {
+			fd.m_pOFN->nFilterIndex = 3;
+		} else if (s.strSnapShotExt == _T(".tif")) {
+			fd.m_pOFN->nFilterIndex = 4;
+		}
+	}
+
 	if (fd.DoModal() != IDOK || !in.CompareNoCase(fd.GetPathName())) {
 		return;
 	}
 
 	CPath p(fd.GetPathName());
-	if (!ext.IsEmpty()) {
+
+	if (OpenImageCheck(in)) {
+
+		if (fd.m_pOFN->nFilterIndex == 1) {
+			s.strSnapShotExt = _T(".bmp");
+		} else if (fd.m_pOFN->nFilterIndex == 2) {
+			s.strSnapShotExt = _T(".jpg");
+		} else if (fd.m_pOFN->nFilterIndex == 3) {
+			s.strSnapShotExt = _T(".png");
+		} else if (fd.m_pOFN->nFilterIndex == 4) {
+			s.strSnapShotExt = _T(".tif");
+		}
+
+		if (p.GetExtension().MakeLower() != s.strSnapShotExt) {
+			p.RenameExtension(s.strSnapShotExt);
+		}
+
+	} else if (!ext.IsEmpty()) {
 		p.AddExtension(ext);
 	}
 
 	OAFilterState fs = State_Stopped;
 	pMC->GetState(0, &fs);
+
 	if (fs == State_Running) {
 		pMC->Pause();
 	}

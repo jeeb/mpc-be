@@ -22,8 +22,11 @@
 
 #include "stdafx.h"
 #include "mplayerc.h"
+#include "MainFrm.h"
 #include "SaveTaskDlg.h"
 #include "../../filters/Filters.h"
+#include <afxinet.h>
+#include "OpenImage.h"
 
 // CSaveTaskDlg dialog
 
@@ -66,6 +69,11 @@ HRESULT CSaveTaskDlg::OnInit()
 
 HRESULT CSaveTaskDlg::InitFileCopy()
 {
+	if (OpenImageCheck(m_in)) {
+		OpenImageDIB(m_in, m_out, 90, 0);
+		return S_OK;
+	}
+
 	if (FAILED(pGB.CoCreateInstance(CLSID_FilterGraph)) || !(pMC = pGB) || !(pME = pGB) || !(pMS = pGB)) {
 		SetFooterIcon(MAKEINTRESOURCE(IDI_ERROR));
 		SetFooterText(ResStr(IDS_AG_ERROR));
