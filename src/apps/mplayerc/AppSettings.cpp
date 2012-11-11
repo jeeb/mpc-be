@@ -881,7 +881,8 @@ void CAppSettings::LoadSettings()
 	}
 
 	// Set interface language first!
-	UINT resID = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LANGUAGE, CMPlayerCApp::GetDefLanguage()) + ID_LANGUAGE_ENGLISH;
+	UINT deflangset =  CMPlayerCApp::languageResources[CMPlayerCApp::GetDefLanguage()].resourceID - ID_LANGUAGE_ENGLISH;
+	UINT resID = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LANGUAGE, deflangset) + ID_LANGUAGE_ENGLISH;
 	iLanguage = CMPlayerCApp::GetLanguageIndex(resID);
 	if (resID != ID_LANGUAGE_ENGLISH) {
 		CMPlayerCApp::SetLanguage(iLanguage);
