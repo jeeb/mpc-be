@@ -5154,7 +5154,8 @@ void CMainFrame::OnFileSaveAs()
 		int find = out.Find(_T("://"));
 		if (find < 0) {
 			ext = CString(CPath(out).GetExtension()).MakeLower();
-			CPath p(out); p.StripPath();
+			CPath p(out);
+			p.StripPath();
 			out = CString(p);
 			if (ext == _T(".cda")) {
 				out = out.Left(out.GetLength()-4) + _T(".wav");
@@ -5164,7 +5165,7 @@ void CMainFrame::OnFileSaveAs()
 		} else {
 			int t_pos = out.Find(_T("&title="));
 			if (t_pos > 0) {
-				out = out.Right(out.GetLength() -  t_pos - 7);
+				out = out.Right(out.GetLength() - t_pos - 7);
 			} else {
 				out = out.Right(find+3);
 				out.Replace(_T("/"), _T("_"));
@@ -5175,7 +5176,7 @@ void CMainFrame::OnFileSaveAs()
 	CString ext_list = ResStr(IDS_MAINFRM_48);
 
 	if (OpenImageCheck(in)) {
-		ext_list = _T("BMP - Windows Bitmap (*.bmp)|*.bmp|JPG - JPEG Image (*.jpg)|*.jpg|PNG - Portable Network Graphics (*.png)|*.png|TIFF - Tagged Image File Format (*.tif)|*.tif||");
+		ext_list = _T("BMP - Windows Bitmap (*.bmp)|*.bmp|JPG - JPEG Image (*.jpg)|*.jpg|PNG - Portable Network Graphics (*.png)|*.png|TIFF - Tagged Image File Format (*.tif)|*.tif|") + ResStr(IDS_AG_ALLFILES) + _T("|");
 	} else if (!ext.IsEmpty()) {
 		ext_list.Format(_T("Media (*%ws)|*%ws|%ws"), ext, ext, ResStr(IDS_MAINFRM_48));
 	}
@@ -5194,6 +5195,8 @@ void CMainFrame::OnFileSaveAs()
 			fd.m_pOFN->nFilterIndex = 3;
 		} else if (s.strSnapShotExt == _T(".tif")) {
 			fd.m_pOFN->nFilterIndex = 4;
+		} else {
+			fd.m_pOFN->nFilterIndex = 5;
 		}
 	}
 
@@ -5213,6 +5216,8 @@ void CMainFrame::OnFileSaveAs()
 			s.strSnapShotExt = _T(".png");
 		} else if (fd.m_pOFN->nFilterIndex == 4) {
 			s.strSnapShotExt = _T(".tif");
+		} else {
+			s.strSnapShotExt = _T(".*");
 		}
 
 		if (p.GetExtension().MakeLower() != s.strSnapShotExt) {

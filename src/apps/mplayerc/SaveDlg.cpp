@@ -63,12 +63,6 @@ END_MESSAGE_MAP()
 
 BOOL CSaveDlg::OnInitDialog()
 {
-	if (OpenImageCheck(m_in)) {
-		OpenImageDIB(m_in, m_out, 90, 0);
-		EndDialog(IDOK);
-		return TRUE;
-	}
-
 	CCmdUIDialog::OnInitDialog();
 
 	m_anim.SendMessage(ACM_OPEN, (WPARAM)AfxGetInstanceHandle(), (LPARAM)IDR_AVI_FILECOPY);
@@ -88,6 +82,12 @@ BOOL CSaveDlg::OnInitDialog()
 	m_fromto.SetWindowText(str);
 
 	m_progress.SetRange(0, 100);
+
+	if (OpenImageCheck(m_in) && AfxGetAppSettings().strSnapShotExt != _T(".*")) {
+		OpenImageDIB(m_in, m_out, 90, 0);
+		EndDialog(IDOK);
+		return TRUE;
+	}
 
 	if (FAILED(pGB.CoCreateInstance(CLSID_FilterGraph)) || !(pMC = pGB) || !(pME = pGB) || !(pMS = pGB)
 			|| FAILED(pME->SetNotifyWindow((OAHWND)m_hWnd, WM_GRAPHNOTIFY, 0))) {

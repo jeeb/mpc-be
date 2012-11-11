@@ -69,7 +69,7 @@ HRESULT CSaveTaskDlg::OnInit()
 
 HRESULT CSaveTaskDlg::InitFileCopy()
 {
-	if (OpenImageCheck(m_in)) {
+	if (OpenImageCheck(m_in) && AfxGetAppSettings().strSnapShotExt != _T(".*")) {
 		OpenImageDIB(m_in, m_out, 90, 0);
 		return S_OK;
 	}
