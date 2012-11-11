@@ -196,15 +196,14 @@ static HBITMAP OpenImageDIB(CString fn, CString out, ULONG quality, bool mode)
 			WebPDecode((const uint8_t*)data, fs, &config);
 
 			int width = out_buf->width, height = out_buf->height, bit = (out_buf->colorspace == MODE_RGBA ? 32 : 24);
-			uint8_t *rgb = out_buf->u.RGBA.rgba;
 			size_t slen;
-			BYTE *pBits, *bmp = ConvertRGBToBMPBuffer((BYTE*)rgb, width, height, 3, (long*)&slen);
+			BYTE *bmp = ConvertRGBToBMPBuffer((BYTE*)out_buf->u.RGBA.rgba, width, height, 3, (long*)&slen);
 
 			BITMAPINFO bi = {{sih, width, height, 1, bit, BI_RGB, 0, 0, 0, 0, 0}};
 
 			if (mode) {
-				hB = CreateDIBSection(0, &bi, DIB_RGB_COLORS, (void**)&pBits, 0, 0);
-				memcpy(pBits, bmp, slen);
+				hB = CreateDIBSection(0, &bi, DIB_RGB_COLORS, (void**)&pBuf, 0, 0);
+				memcpy(pBuf, bmp, slen);
 			} else {
 				bfh.bfSize = bfh.bfOffBits + slen;
 				pBuf = (BYTE*)malloc(bfh.bfSize);
@@ -222,16 +221,14 @@ static HBITMAP OpenImageDIB(CString fn, CString out, ULONG quality, bool mode)
 
 			int width, height, n, bpp = 4;
 			BYTE *lpBits = (BYTE*)stbi_load_from_memory((const stbi_uc*)data, fs, &width, &height, &n, bpp);
-
 			size_t slen;
-			BYTE *pBits, *bmp = ConvertRGBToBMPBuffer(lpBits, width, height, bpp, (long*)&slen);
-			int bit = bpp * 8;
+			BYTE *bmp = ConvertRGBToBMPBuffer(lpBits, width, height, bpp, (long*)&slen);
 
-			BITMAPINFO bi = {{sih, width, height, 1, bit, BI_RGB, 0, 0, 0, 0, 0}};
+			BITMAPINFO bi = {{sih, width, height, 1, bpp * 8, BI_RGB, 0, 0, 0, 0, 0}};
 
 			if (mode) {
-				hB = CreateDIBSection(0, &bi, DIB_RGB_COLORS, (void**)&pBits, 0, 0);
-				memcpy(pBits, bmp, slen);
+				hB = CreateDIBSection(0, &bi, DIB_RGB_COLORS, (void**)&pBuf, 0, 0);
+				memcpy(pBuf, bmp, slen);
 			} else {
 				bfh.bfSize = bfh.bfOffBits + slen;
 				pBuf = (BYTE*)malloc(bfh.bfSize);
