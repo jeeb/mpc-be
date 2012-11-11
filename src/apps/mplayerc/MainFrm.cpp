@@ -5176,7 +5176,7 @@ void CMainFrame::OnFileSaveAs()
 	CString ext_list = ResStr(IDS_MAINFRM_48);
 
 	if (OpenImageCheck(in)) {
-		ext_list = _T("BMP - Windows Bitmap (*.bmp)|*.bmp|JPG - JPEG Image (*.jpg)|*.jpg|PNG - Portable Network Graphics (*.png)|*.png|TIFF - Tagged Image File Format (*.tif)|*.tif|") + ResStr(IDS_AG_ALLFILES) + _T("|");
+		ext_list = _T("BMP - Windows Bitmap (*.bmp)|*.bmp|JPG - JPEG Image (*.jpg)|*.jpg|PNG - Portable Network Graphics (*.png)|*.png|TIFF - Tagged Image File Format (*.tif)|*.tif|") + ResStr(IDS_MAINFRM_48);
 	} else if (!ext.IsEmpty()) {
 		ext_list.Format(_T("Media (*%ws)|*%ws|%ws"), ext, ext, ResStr(IDS_MAINFRM_48));
 	}
@@ -5221,7 +5221,7 @@ void CMainFrame::OnFileSaveAs()
 		}
 
 		if (p.GetExtension().MakeLower() != s.strSnapShotExt) {
-			p.RenameExtension(s.strSnapShotExt);
+			p.RenameExtension(s.strSnapShotExt != _T(".*") ? s.strSnapShotExt : ext);
 		}
 
 	} else if (!ext.IsEmpty()) {
