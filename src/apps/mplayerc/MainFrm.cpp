@@ -5196,7 +5196,7 @@ void CMainFrame::OnFileSaveAs()
 {
 	AppSettings& s = AfxGetAppSettings();
 
-	CString ext, in = PlayerYouTube(m_wndPlaylistBar.GetCurFileName(), NULL), out = in;
+	CString ext, ext_list, in = PlayerYouTube(m_wndPlaylistBar.GetCurFileName(), NULL), out = in;
 
 	if (!m_strTitleAlt.IsEmpty()) {
 		out = m_strTitleAlt;
@@ -5232,13 +5232,12 @@ void CMainFrame::OnFileSaveAs()
 		}
 	}
 
-	CString ext_list = ResStr(IDS_MAINFRM_48);
-
 	if (OpenImageCheck(in)) {
-		ext_list = _T("BMP - Windows Bitmap (*.bmp)|*.bmp|JPG - JPEG Image (*.jpg)|*.jpg|PNG - Portable Network Graphics (*.png)|*.png|TIFF - Tagged Image File Format (*.tif)|*.tif|") + ResStr(IDS_MAINFRM_48);
+		ext_list = _T("BMP - Windows Bitmap (*.bmp)|*.bmp|JPG - JPEG Image (*.jpg)|*.jpg|PNG - Portable Network Graphics (*.png)|*.png|TIFF - Tagged Image File Format (*.tif)|*.tif|");
 	} else if (!ext.IsEmpty()) {
-		ext_list.Format(_T("Media (*%ws)|*%ws|%ws"), ext, ext, ResStr(IDS_MAINFRM_48));
+		ext_list.Format(_T("Media (*%ws)|*%ws|"), ext, ext);
 	}
+	ext_list.Append(ResStr(IDS_MAINFRM_48));
 
 	CFileDialog fd(FALSE, 0, out,
 				   OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_PATHMUSTEXIST|OFN_NOCHANGEDIR,
@@ -9385,10 +9384,8 @@ void CMainFrame::OnNavigateSkip(UINT nID)
 						m_wndNavigationBar.m_navdlg.UpdatePos(nCurrentChannel + 1);
 					}
 				}
-
 			}
 		}
-
 	}
 }
 
@@ -13311,8 +13308,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		UINT index = 0;
 		while ( pos != NULL ) {
 			CString path = pFileData->fns.GetNext( pos );
-			TRACE(_T("--> CMainFrame::OpenMediaPrivate - pFileData->fns[%d]:\n"), index);
-			TRACE(_T("\t%ws\n"), path.GetString()); // %ws - wide character string always
+			//TRACE(_T("--> CMainFrame::OpenMediaPrivate - pFileData->fns[%d]:\n"), index);
+			//TRACE(_T("\t%ws\n"), path.GetString()); // %ws - wide character string always
 			index++;
 		}
 	}
@@ -14366,7 +14363,6 @@ void CMainFrame::SetupAudioOptionSubMenu()
 		}
 	UINT id = ID_AUDIO_SUBITEM_START;
 	pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id, ResStr(IDS_SUBTITLES_OPTIONS));
-
 }
 
 void CMainFrame::SetupSubtitlesSubMenu()
@@ -15054,7 +15050,6 @@ void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSe
 						bSetCheck = false;
 						break;
 					}
-
 				}
 			}
 		}
@@ -15120,7 +15115,6 @@ void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSe
 						if (bSetCheck == true) {
 							flags |= MF_CHECKED|MFT_RADIOCHECK;
 						}
-
 					}
 
 					str.Replace(_T("&"), _T("&&"));
@@ -15331,7 +15325,6 @@ void CMainFrame::OnNavMixStreamSelectSubMenu(UINT id, DWORD dwSelGroup)
 											bExternalTrack = true;
 											break;
 										}
-
 									}
 								}
 							}
@@ -15341,11 +15334,11 @@ void CMainFrame::OnNavMixStreamSelectSubMenu(UINT id, DWORD dwSelGroup)
 							pSSA->Enable(0, AMSTREAMSELECTENABLE_ENABLE);
 							pSS->Enable(m, AMSTREAMSELECTENABLE_ENABLE);
 							return;
-					    }
+						}
 						pSS->Enable(m, AMSTREAMSELECTENABLE_ENABLE);
 						return;
 					}
-						
+
 					id--;
 				}
 			}
@@ -16058,7 +16051,7 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool fSeekToKeyFrame)
 			SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
 		}
 	} else if (GetPlaybackMode() == PM_CAPTURE) {
-		TRACE(_T("Warning (CMainFrame::SeekTo): Trying to seek in capture mode"));
+		//TRACE(_T("Warning (CMainFrame::SeekTo): Trying to seek in capture mode"));
 	}
 	m_fEndOfStream = false;
 
@@ -16682,14 +16675,14 @@ void CMainFrame::CloseMedia()
 {
 	if (m_iMediaLoadState == MLS_CLOSING) {
 		
-		TRACE(_T("WARNING: CMainFrame::CloseMedia() called twice or more\n"));
+		//TRACE(_T("WARNING: CMainFrame::CloseMedia() called twice or more\n"));
 		return;
 	}
 
 	int nTimeWaited = 0;
 
 	while (m_iMediaLoadState == MLS_LOADING) {
-		TRACE(_T("CMainFrame::CloseMedia() : wait for graph is aborted\n"));
+		//TRACE(_T("CMainFrame::CloseMedia() : wait for graph is aborted\n"));
 
 		m_fOpeningAborted = true;
 
@@ -16845,7 +16838,7 @@ void CGraphThread::OnExit(WPARAM wParam, LPARAM lParam)
 
 void CGraphThread::OnOpen(WPARAM wParam, LPARAM lParam)
 {
-	TRACE("--> CGraphThread::OnOpen on thread: %d\n", GetCurrentThreadId());
+	//TRACE("--> CGraphThread::OnOpen on thread: %d\n", GetCurrentThreadId());
 	if (m_pMainFrame) {
 		CAutoPtr<OpenMediaData> pOMD((OpenMediaData*)lParam);
 		m_pMainFrame->OpenMediaPrivate(pOMD);
