@@ -118,6 +118,7 @@ STDMETHODIMP CFLACSource::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 	return
 		QI2(IAMMediaContent)
 		QI(IDSMResourceBag)
+		QI(IDSMChapterBag)
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
 
@@ -251,7 +252,8 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 		}
 
 		FLAC__stream_decoder_set_metadata_respond(_DECODER_, FLAC__METADATA_TYPE_VORBIS_COMMENT);
-		FLAC__stream_decoder_set_metadata_respond(_DECODER_, FLAC__METADATA_TYPE_PICTURE); 
+		FLAC__stream_decoder_set_metadata_respond(_DECODER_, FLAC__METADATA_TYPE_PICTURE);
+		FLAC__stream_decoder_set_metadata_respond(_DECODER_, FLAC__METADATA_TYPE_CUESHEET);
 
 		if (FLAC__STREAM_DECODER_INIT_STATUS_OK != FLAC__stream_decoder_init_stream (_DECODER_,
 				StreamDecoderRead,
@@ -432,23 +434,25 @@ void CFLACStream::UpdateFromMetadata (void* pBuffer)
 	const FLAC__StreamMetadata* pMetadata = (const FLAC__StreamMetadata*) pBuffer;
 
 	if (pMetadata->type == FLAC__METADATA_TYPE_STREAMINFO) {
-		m_nMaxFrameSize			= pMetadata->data.stream_info.max_framesize;
+		const FLAC__StreamMetadata_StreamInfo *si = &pMetadata->data.stream_info;
+
+		m_nMaxFrameSize			= si->max_framesize;
 		if (!m_nMaxFrameSize) {
-			m_nMaxFrameSize		= CalculateFLACFrameSize(pMetadata->data.stream_info.max_blocksize,
-														 pMetadata->data.stream_info.channels,
-														 pMetadata->data.stream_info.bits_per_sample);
+			m_nMaxFrameSize		= CalculateFLACFrameSize(si->max_blocksize,
+														 si->channels,
+														 si->bits_per_sample);
 		}
-		m_nSamplesPerSec		= pMetadata->data.stream_info.sample_rate;
-		m_nChannels				= pMetadata->data.stream_info.channels;
-		m_wBitsPerSample		= pMetadata->data.stream_info.bits_per_sample;
-		m_i64TotalNumSamples	= pMetadata->data.stream_info.total_samples;
+		m_nSamplesPerSec		= si->sample_rate;
+		m_nChannels				= si->channels;
+		m_wBitsPerSample		= si->bits_per_sample;
+		m_i64TotalNumSamples	= si->total_samples;
 		m_nAvgBytesPerSec		= (m_nChannels * (m_wBitsPerSample >> 3)) * m_nSamplesPerSec;
 
 		// === Init members from base classes
 		GetFileSizeEx (m_file.m_hFile, (LARGE_INTEGER*)&m_llFileSize);
 		m_rtDuration			= (m_i64TotalNumSamples * UNITS) / m_nSamplesPerSec;
 		m_rtStop				= m_rtDuration;
-		m_AvgTimePerFrame		= (m_nMaxFrameSize + pMetadata->data.stream_info.min_framesize) * m_rtDuration / 2 / m_llFileSize;
+		m_AvgTimePerFrame		= (m_nMaxFrameSize + si->min_framesize) * m_rtDuration / 2 / m_llFileSize;
 	} else if (pMetadata->type == FLAC__METADATA_TYPE_VORBIS_COMMENT) {
 		const FLAC__StreamMetadata_VorbisComment *vc = &pMetadata->data.vorbis_comment;
 		
@@ -465,13 +469,43 @@ void CFLACStream::UpdateFromMetadata (void* pBuffer)
 				file_info.comment	= TagValue;
 			} else  if (ParseVorbisComment("date", &vc->comments[i], &TagValue)) {
 				file_info.year		= TagValue.GetAllocLength() > 4 ? TagValue.Right(4) : TagValue;
+			} else if (!CStringA(vc->comments[i].entry).MakeLower().Find("cuesheet=")) {
+				// TODO - parse cuesheet;
+				//CStringA TagValue(vc->comments[i].entry);
+				//TagValue.Delete(0, TagValue.Find("=") + 1);
 			}
 		}
 	} else if (pMetadata->type == FLAC__METADATA_TYPE_PICTURE) {
-		if (!m_Cover.GetCount() && pMetadata->data.picture.data_length) {
-			m_CoverMime = pMetadata->data.picture.mime_type;
-			m_Cover.SetCount(pMetadata->data.picture.data_length);
-			memcpy(m_Cover.GetData(), pMetadata->data.picture.data, pMetadata->data.picture.data_length);
+		const FLAC__StreamMetadata_Picture *pic = &pMetadata->data.picture;
+
+		if (!m_Cover.GetCount() && pic->data_length) {
+			m_CoverMime = pic->mime_type;
+			m_Cover.SetCount(pic->data_length);
+			memcpy(m_Cover.GetData(), pic->data, pic->data_length);
+		}
+	} else if (pMetadata->type == FLAC__METADATA_TYPE_CUESHEET) {
+		const FLAC__StreamMetadata_CueSheet *cs = &pMetadata->data.cue_sheet;
+
+		for(size_t i = 0; i < cs->num_tracks; ++i) {
+			FLAC__StreamMetadata_CueSheet_Track *track = &cs->tracks[i];
+			if (track->type || track->offset >= m_i64TotalNumSamples) {
+				continue;
+			}
+
+			REFERENCE_TIME rt = MILLISECONDS_TO_100NS_UNITS(1000*track->offset/m_nSamplesPerSec); 
+			CString s;
+			s.Format(_T("Track %02d"), i+1);
+			((CFLACSource*)m_pFilter)->ChapAppend(rt, s);
+
+			if (track->num_indices > 1) {
+				for (int j = 0; j < track->num_indices; ++j) {
+					FLAC__StreamMetadata_CueSheet_Index *index = &track->indices[j];
+					s.Format(_T("+ INDEX %02d"), index->number);
+					REFERENCE_TIME r = rt + MILLISECONDS_TO_100NS_UNITS(1000*index->offset/m_nSamplesPerSec);
+					((CFLACSource*)m_pFilter)->ChapAppend(r, s);
+				}
+			}
+		
 		}
 	}
 }

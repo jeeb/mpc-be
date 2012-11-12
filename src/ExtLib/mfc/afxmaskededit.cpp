@@ -9,14 +9,10 @@
 // Microsoft Foundation Classes product.
 
 #include "stdafx.h"
-
+//#include "afxcontrolbarutil.h"
 #include "afxmaskededit.h"
+//#include "afxtagmanager.h"
 #include "afxctrlcontainer.h"
-
-#if 0
-#include "afxcontrolbarutil.h"
-#include "afxtagmanager.h"
-#endif
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

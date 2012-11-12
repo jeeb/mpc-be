@@ -45,6 +45,7 @@ class __declspec(uuid("1930D8FF-4739-4e42-9199-3B2EDEAA3BF2"))
 	: public CBaseSource<CFLACStream>
 	, public IAMMediaContent
 	, public IDSMResourceBagImpl
+	, public IDSMChapterBagImpl 
 {
 public:
 	CFLACSource(LPUNKNOWN lpunk, HRESULT* phr);

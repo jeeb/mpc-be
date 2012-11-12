@@ -74,7 +74,18 @@ CMemDC::CMemDC(CDC& dc, CWnd* pWnd) :
 		m_bMemDC = TRUE;
 		m_dcMem.Attach(hdcPaint);
 	}
+	else
+	{
+		if (m_bUseMemoryDC && m_dcMem.CreateCompatibleDC(&m_dc) && m_bmp.CreateCompatibleBitmap(&m_dc, m_rect.Width(), m_rect.Height()))
+		{
+			//-------------------------------------------------------------
+			// Off-screen DC successfully created. Better paint to it then!
+			//-------------------------------------------------------------
+			m_bMemDC = TRUE;
+			m_pOldBmp = m_dcMem.SelectObject(&m_bmp);
+		}
 	}
+}
 
 CMemDC::CMemDC(CDC& dc, const CRect& rect) :
 	m_dc(dc), m_bMemDC(FALSE), m_hBufferedPaint(NULL), m_pOldBmp(NULL), m_rect(rect)
@@ -96,6 +107,17 @@ CMemDC::CMemDC(CDC& dc, const CRect& rect) :
 		m_bMemDC = TRUE;
 		m_dcMem.Attach(hdcPaint);
 	}
+	else
+	{
+		if (m_bUseMemoryDC && m_dcMem.CreateCompatibleDC(&m_dc) && m_bmp.CreateCompatibleBitmap(&m_dc, m_rect.Width(), m_rect.Height()))
+		{
+			//-------------------------------------------------------------
+			// Off-screen DC successfully created. Better paint to it then!
+			//-------------------------------------------------------------
+			m_bMemDC = TRUE;
+			m_pOldBmp = m_dcMem.SelectObject(&m_bmp);
+		}
+	}
 }
 
 CMemDC::~CMemDC()
@@ -104,6 +126,26 @@ CMemDC::~CMemDC()
 	{
 		m_dcMem.Detach();
 		EndBufferedPaint(m_hBufferedPaint, TRUE);
+	}
+	else if (m_bMemDC)
+	{
+		//--------------------------------------
+		// Copy the results to the on-screen DC:
+		//--------------------------------------
+		CRect rectClip;
+		int nClipType = m_dc.GetClipBox(rectClip);
+
+		if (nClipType != NULLREGION)
+		{
+			if (nClipType != SIMPLEREGION)
+			{
+				rectClip = m_rect;
+			}
+
+			m_dc.BitBlt(rectClip.left, rectClip.top, rectClip.Width(), rectClip.Height(), &m_dcMem, rectClip.left, rectClip.top, SRCCOPY);
+		}
+
+		m_dcMem.SelectObject(m_pOldBmp);
 	}
 }
 
@@ -124,6 +166,10 @@ AFX_GLOBAL_DATA afxGlobalData;
 // Reference count on global data
 DWORD g_dwAfxGlobalDataRef = 0;
 #endif
+
+// Use a global flag to determine whether IsDwmCompositionEnabled
+// needs to be called, because it is checked very often at runtime.
+static BOOL g_bCheckCompositionEnableSucceeded = FALSE;
 
 AFX_GLOBAL_DATA::AFX_GLOBAL_DATA()
 {
@@ -447,6 +493,9 @@ void AFX_GLOBAL_DATA::OnSettingChange()
 	{
 		::SystemParametersInfo(SPI_GETWORKAREA, 0, &m_rectVirtual, 0);
 	}
+
+	// Reset flag so IsDwmCompositionEnabled is re-checked after setting change.
+	g_bCheckCompositionEnableSucceeded = FALSE;
 
 	// Get system menu animation type:
 	m_bMenuAnimation = FALSE;
@@ -1044,7 +1093,18 @@ BOOL AFX_GLOBAL_DATA::IsDwmCompositionEnabled()
 	// then called again after a very short time, so use a static var
 	// so the last obtained value is returned if the method fails.
 	static BOOL bEnabled = FALSE;
-	DwmIsCompositionEnabled(&bEnabled);
+
+	if (g_bCheckCompositionEnableSucceeded)
+	{
+		return bEnabled;
+	}
+
+	HRESULT hr = _AfxDwmIsCompositionEnabled(&bEnabled);
+	if (hr == S_OK)
+	{
+		g_bCheckCompositionEnableSucceeded = TRUE;
+	}
+
 	return bEnabled;
 }
 
