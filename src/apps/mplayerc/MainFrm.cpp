@@ -685,6 +685,9 @@ CMainFrame::CMainFrame() :
 	b_UseSmartSeek(false),
 	previous_renderer(-1),
 	m_flastnID(0),
+	bLeftClicked(false),
+	bWindowDragged(false),
+	bDVDMenuClicked(false),
 	m_bfirstPlay(false),
 	m_nLastRunTicket(0),
 	b_UseVSFilter(false)
@@ -3102,19 +3105,25 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 	if (!m_pFullscreenWnd->IsWindow() || !m_OSD.OnLButtonDown (nFlags, point)) {
 		SetFocus();
 
-		bool fClicked = false;
+		bDVDMenuClicked = false;
+		bDVDButtonAtPosition = false;
 
 		if (GetPlaybackMode() == PM_DVD) {
 			CRect vid_rect = m_wndView.GetVideoRect();
 			m_wndView.MapWindowPoints(this, &vid_rect);
 
-			CPoint p = point - vid_rect.TopLeft();
+			CPoint pDVD = point - vid_rect.TopLeft();
 
-			if (SUCCEEDED(pDVDC->ActivateAtPosition(p))
+			ULONG pulButtonIndex;
+			if (SUCCEEDED(pDVDI->GetButtonAtPosition(pDVD, &pulButtonIndex))) {
+				bDVDButtonAtPosition = true;
+			}
+
+			if (SUCCEEDED(pDVDC->ActivateAtPosition(pDVD))
 					|| m_iDVDDomain == DVD_DOMAIN_VideoManagerMenu
 					|| m_iDVDDomain == DVD_DOMAIN_VideoTitleSetMenu) {
-				fClicked = true;
-			}
+				bDVDMenuClicked = true;
+			}	
 		}
 
 		CPoint p;
@@ -3131,35 +3140,63 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 			bFSWnd = true;
 		}
 
-		if (!fClicked) {
-			bool fLeftMouseBtnUnassigned = !AssignedToCmd(wmcmd::LDOWN, m_fFullScreen);
+		bool fLeftMouseBtnUnassigned = !AssignedToCmd(wmcmd::LDOWN, m_fFullScreen);
+		if (!m_fFullScreen && !bFSWnd && !IsSomethingLoaded() && ((IsCaptionHidden() && (AfxGetAppSettings().nCS <= CS_SEEKBAR)) || fLeftMouseBtnUnassigned || ((GetTickCount()-m_nMenuHideTick)<100))) {
+			PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
+		} else {
+			s_fLDown = true;
 
-			//if (!m_fFullScreen && ((IsCaptionHidden() && AfxGetAppSettings().nCS<=CS_SEEKBAR) || !IsSomethingLoaded() || fLeftMouseBtnUnassigned || ((GetTickCount()-m_nMenuHideTick)<100))) {
-			if (!m_fFullScreen && !bFSWnd && !IsSomethingLoaded() && ((IsCaptionHidden() && (AfxGetAppSettings().nCS <= CS_SEEKBAR)) || fLeftMouseBtnUnassigned || ((GetTickCount()-m_nMenuHideTick)<100))) {
-				PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
-			} else {
-				s_fLDown = true;
-				OnButton(wmcmd::LDOWN, nFlags, point);
-				if (!bFSWnd && !m_fFullScreen) {
-					PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
-				}
-				return;
+			if (!bFSWnd && !m_fFullScreen) {
+				bLeftClicked = true;
+				bWindowDragged = false;
+
+				SetCapture();
+				GetWindowRect(m_RectWindow);
+				m_MouseInWindow = p - m_RectWindow.TopLeft();
 			}
-		}
-
+		}		
 		__super::OnLButtonDown(nFlags, point);
 	}
 }
 
 void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 {
+	bLeftClicked = false;
+	ReleaseCapture();
+
 	if (!m_pFullscreenWnd->IsWindow() || !m_OSD.OnLButtonUp (nFlags, point)) {
-		bool fLeftMouseBtnUnassigned = !AssignedToCmd(wmcmd::LDOWN, m_fFullScreen);
-		if (fLeftMouseBtnUnassigned || ((GetTickCount()-m_nMenuHideTick)<100)) {
-			PostMessage(WM_NCLBUTTONUP, HTCAPTION, MAKELPARAM(point.x, point.y));
-		} else if (OnButton(wmcmd::LUP, nFlags, point)) {
+		
+		if (bDVDMenuClicked) {
+			PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 			return;
 		}
+		
+		bool i = false;
+		if (!s_fLDown) {
+			return;
+		}
+
+		bool fLeftDownMouseBtnUnassigned = !AssignedToCmd(wmcmd::LDOWN, m_fFullScreen);
+		if (fLeftDownMouseBtnUnassigned || ((GetTickCount()-m_nMenuHideTick)<100)) {
+			PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
+		} else if (!bWindowDragged) {
+			if (OnButton(wmcmd::LDOWN, nFlags, point)); {
+				bWindowDragged = false;
+				i = true;
+			}
+		}
+
+		bool fLeftUpMouseBtnUnassigned = !AssignedToCmd(wmcmd::LUP, m_fFullScreen);
+		if (fLeftUpMouseBtnUnassigned || ((GetTickCount()-m_nMenuHideTick)<100)) {
+			PostMessage(WM_NCLBUTTONUP, HTCAPTION, MAKELPARAM(point.x, point.y));
+		} else if (!bWindowDragged) {
+			if (OnButton(wmcmd::LUP, nFlags, point)); {
+				bWindowDragged = false;
+				i = true;
+			}
+		}
+
+		if (i) return;
 
 		__super::OnLButtonUp(nFlags, point);
 	}
@@ -3167,10 +3204,17 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 
 void CMainFrame::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
+	
+	if (bDVDButtonAtPosition) {
+		PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
+		return;
+	}
+	
 	if (s_fLDown) {
-		SendMessage(WM_LBUTTONDOWN, nFlags, MAKELPARAM(point.x, point.y));
+		SendMessage(WM_LBUTTONUP, nFlags, MAKELPARAM(point.x, point.y));
 		s_fLDown = false;
 	}
+	
 	if (!OnButton(wmcmd::LDBLCLK, nFlags, point)) {
 		__super::OnLButtonDblClk(nFlags, point);
 	}
@@ -3265,6 +3309,21 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 	if (m_lastMouseMove.x == -1 && m_lastMouseMove.y == -1) {
 		m_lastMouseMove.x = point.x;
 		m_lastMouseMove.y = point.y;
+	}
+	bWindowDragged = false;
+	if (bLeftClicked) {
+		CPoint p;
+		GetCursorPos(&p);
+
+		MoveWindow(p.x - m_MouseInWindow.x, p.y - m_MouseInWindow.y, 
+			m_RectWindow.right - m_RectWindow.left, m_RectWindow.bottom - m_RectWindow.top);
+			
+		CRect m_RectWindowNew;
+		GetWindowRect(m_RectWindowNew);
+			
+		if (m_RectWindowNew != m_RectWindow) {
+			bWindowDragged = true;
+		}
 	}
 
 	if (!m_OSD.OnMouseMove (nFlags, point)) {
@@ -3385,7 +3444,7 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 LRESULT CMainFrame::OnNcHitTest(CPoint point)
 {
 	LRESULT nHitTest = __super::OnNcHitTest(point);
-	return ((IsCaptionHidden()) && nHitTest == HTCLIENT) ? HTCAPTION : nHitTest;
+	return /*((IsCaptionHidden()) && nHitTest == HTCLIENT) ? HTCAPTION : */nHitTest;
 }
 
 void CMainFrame::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
