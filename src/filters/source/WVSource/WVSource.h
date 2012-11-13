@@ -80,6 +80,10 @@ public:
 
 	HRESULT DoSeeking(REFERENCE_TIME rtStart);
 
+	CAtlArray<BYTE>		m_Cover;
+	CString				m_CoverMime;
+	CString				m_CoverFileName;
+
 protected:
 	enum {CMD_EXIT, CMD_STOP, CMD_PAUSE, CMD_RUN};
 
@@ -144,7 +148,10 @@ protected:
 };
 
 class __declspec(uuid("B5554304-3C9A-40A1-8E82-8C8CFBED56C0"))
-		CWavPackSplitterFilter : public CBaseFilter
+	CWavPackSplitterFilter
+	: public CBaseFilter
+	, public IDSMResourceBagImpl
+	, public IDSMChapterBagImpl 
 {
 public :
 	DECLARE_IUNKNOWN
@@ -153,7 +160,13 @@ public :
 	CWavPackSplitterFilter(LPUNKNOWN lpunk, HRESULT *phr);
 	virtual ~CWavPackSplitterFilter();
 
-	// ----- CBaseFilter -----
+	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
+
+	// IDSMResourceBag
+	STDMETHODIMP_(DWORD) ResGetCount();
+	STDMETHODIMP ResGet(DWORD iIndex, BSTR* ppName, BSTR* ppDesc, BSTR* ppMime, BYTE** ppData, DWORD* pDataLen, DWORD_PTR* pTag);
+
+	// CBaseFilter
 	int GetPinCount();
 	CBasePin *GetPin(int n);
 	STDMETHODIMP Stop(void);

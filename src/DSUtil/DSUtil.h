@@ -272,3 +272,19 @@ struct AV_Rational {
 	typedef signed long			int32;
 	typedef signed __int64		int64;
 #endif
+
+struct Chapters {
+	REFERENCE_TIME	rt;
+	CString			name;
+
+	Chapters() {
+		rt		= 0;
+	}
+
+	Chapters(CString s, REFERENCE_TIME t) {
+		rt		= t;
+		name	= s;
+	}
+};
+
+extern bool ParseCUESheet(CString cueData, CAtlList<Chapters> &ChaptersList);

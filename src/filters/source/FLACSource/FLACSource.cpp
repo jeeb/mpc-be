@@ -429,32 +429,6 @@ static int CalculateFLACFrameSize(UINT max_blocksize, UINT channels, UINT bits_p
 	return count;
 }
 
-static CString GetCueCommand(CString& ln)
-{
-	CString c;
-	int i = ln.Find(' ');
-	if (i < 0) {
-		c = ln;
-		ln.Empty();
-	} else {
-		c = ln.Left(i);
-		ln.Delete(0, i+1);
-		ln.TrimLeft();
-	}
-	return c;
-}
-
-static void MakeCUETitle(CString &Title, CString title, CString performer, int track_no)
-{
-	if (!performer.IsEmpty() || !title.IsEmpty()) {
-		Title.Format(_T("%02d. %s - %s"), track_no, performer, title);
-	} else if (!performer.IsEmpty()) {
-		Title.Format(_T("%02d. %s"), track_no, performer);
-	} else if (!title.IsEmpty()) {
-		Title.Format(_T("%02d. %s"), track_no, title);
-	}
-}
-
 void CFLACStream::UpdateFromMetadata (void* pBuffer)
 {
 	const FLAC__StreamMetadata* pMetadata = (const FLAC__StreamMetadata*) pBuffer;
@@ -500,82 +474,15 @@ void CFLACStream::UpdateFromMetadata (void* pBuffer)
 				Tag.Delete(0, Tag.Find("=") + 1);
 				TagValue = CA2CT(Tag, CP_UTF8);
 
-				BOOL fAudioTrack;
-				int track_no = -1, /*index, */index_cnt = 0;
-				REFERENCE_TIME rt = _I64_MAX;
-				CString Title;
-				CString title, performer;
+				CAtlList<Chapters> ChaptersList;
+				ParseCUESheet(TagValue, ChaptersList);
 
-				CAtlList<CString> cuelines;
-				Explode(TagValue, cuelines, '\n');
-				if (cuelines.GetCount()) {
+				if (ChaptersList.GetCount()) {
+
 					((CFLACSource*)m_pFilter)->ChapRemoveAll();
-				}
-
-				while (cuelines.GetCount()) {
-					CString cueLine	= cuelines.RemoveHead().Trim();
-					CString cmd		= GetCueCommand(cueLine);
-
-					if (cmd == _T("TRACK")) {
-						if (rt != _I64_MAX && track_no != -1 && index_cnt) {
-							MakeCUETitle(Title, title, performer, track_no);
-							if (!Title.IsEmpty()) {
-								((CFLACSource*)m_pFilter)->ChapAppend(rt, Title);
-							}
-						}
-						rt = _I16_MAX;
-						index_cnt = 0;
-
-						TCHAR type[256];
-						swscanf_s(cueLine, _T("%d %s"), &track_no, type, _countof(type)-1);
-						fAudioTrack = (wcscmp(type, _T("AUDIO")) == 0);
-						Title.Format(_T("Track %02d"), track_no);
-					} else if (cmd == _T("TITLE")) {
-						cueLine.Trim(_T(" \""));
-						title = cueLine;
-					} else if (cmd == _T("PERFORMER")) {
-						cueLine.Trim(_T(" \""));
-						performer = cueLine;
-					} else if (cmd == _T("INDEX")) {
-						int idx, mm, ss, ff;
-						swscanf_s(cueLine, _T("%d %d:%d:%d"), &idx, &mm, &ss, &ff);
-
-						if (fAudioTrack) {
-							index_cnt++;
-
-							rt = MILLISECONDS_TO_100NS_UNITS((mm*60+ss)*1000);
-
-							/*
-							REFERENCE_TIME pos = MILLISECONDS_TO_100NS_UNITS((mm*60+ss)*1000);
-
-							if (index_cnt == 1) {
-								rt = pos;
-								index = idx;
-							} else if (index_cnt == 2) {
-								MakeCUETitle(Title, title, performer, track_no);
-								if (!Title.IsEmpty()) {
-									((CFLACSource*)m_pFilter)->ChapAppend(rt, Title);
-								}
-
-								Title.Format(_T("+ INDEX %02d"), index);
-								((CFLACSource*)m_pFilter)->ChapAppend(rt, Title);
-								rt = _I64_MAX;
-
-								Title.Format(_T("+ INDEX %02d"), idx);
-								((CFLACSource*)m_pFilter)->ChapAppend(pos, Title);
-							} else {
-								Title.Format(_T("+ INDEX %02d"), idx);
-								((CFLACSource*)m_pFilter)->ChapAppend(pos, Title);
-								rt = _I64_MAX;
-							}
-							*/
-						}
-					}
-				}
-				if (rt != _I64_MAX && track_no != -1 && index_cnt) {
-					MakeCUETitle(Title, title, performer, track_no);
-					if (!Title.IsEmpty()) {
-						((CFLACSource*)m_pFilter)->ChapAppend(rt, Title);
+						while (ChaptersList.GetCount()) {
+							Chapters cp = ChaptersList.RemoveHead();
+							((CFLACSource*)m_pFilter)->ChapAppend(cp.rt, cp.name);
 					}
 				}
 			}

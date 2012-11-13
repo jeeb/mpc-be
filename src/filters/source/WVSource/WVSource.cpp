@@ -114,6 +114,61 @@ CWavPackSplitterFilter::~CWavPackSplitterFilter()
 	m_pOutputPin = NULL;
 }
 
+STDMETHODIMP CWavPackSplitterFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
+{
+	CheckPointer(ppv, E_POINTER);
+
+	return
+		QI(IDSMResourceBag)
+		QI(IDSMChapterBag)
+		__super::NonDelegatingQueryInterface(riid, ppv);
+}
+
+// IDSMResourceBag
+STDMETHODIMP_(DWORD) CWavPackSplitterFilter::ResGetCount()
+{
+	return m_pInputPin ? (m_pInputPin->m_Cover.IsEmpty() ? 0 : 1) : 0;
+}
+
+STDMETHODIMP CWavPackSplitterFilter::ResGet(DWORD iIndex, BSTR* ppName, BSTR* ppDesc, BSTR* ppMime, BYTE** ppData, DWORD* pDataLen, DWORD_PTR* pTag)
+{
+	if (ppData) {
+		CheckPointer(pDataLen, E_POINTER);
+	}
+
+	if (iIndex) {
+		return E_INVALIDARG;
+	}
+
+	CheckPointer(m_pInputPin, E_NOTIMPL);
+
+	if (m_pInputPin->m_Cover.IsEmpty()) {
+		return E_NOTIMPL;
+	}
+
+	if (ppName) {
+		*ppName = m_pInputPin->m_CoverFileName.AllocSysString();
+	}
+	if (ppDesc) {
+		CString str = _T("cover");
+		*ppDesc = str.AllocSysString();
+	}
+	if (ppMime) {
+		CString str = m_pInputPin->m_CoverMime;
+		*ppMime = str.AllocSysString();
+	}
+	if (ppData) {
+		*pDataLen = (DWORD)m_pInputPin->m_Cover.GetCount();
+		memcpy(*ppData = (BYTE*)CoTaskMemAlloc(*pDataLen), m_pInputPin->m_Cover.GetData(), *pDataLen);
+	}
+	if (pTag) {
+		*pTag = 0;
+	}
+
+	return S_OK;
+}
+
+// CBaseFilter
 int CWavPackSplitterFilter::GetPinCount()
 {
 	CAutoLock lock(m_pLock);
@@ -298,6 +353,12 @@ HRESULT CWavPackSplitterFilterInputPin::BreakConnect(void)
 	return S_OK;
 }
 
+#define APE_TAG_FOOTER_BYTES			32
+#define APE_TAG_VERSION					2000
+
+#define APE_TAG_FLAG_IS_HEADER			(1 << 29)
+#define APE_TAG_FLAG_IS_BINARY			(1 << 1)
+
 HRESULT CWavPackSplitterFilterInputPin::CompleteConnect(IPin *pReceivePin)
 {
 	HRESULT hr = CBaseInputPin::CompleteConnect(pReceivePin);
@@ -320,6 +381,110 @@ HRESULT CWavPackSplitterFilterInputPin::CompleteConnect(IPin *pReceivePin)
 	rtDuration = m_pWavPackParser->first_wphdr.total_samples;
 	rtDuration = (rtDuration * 10000000) / m_pWavPackParser->sample_rate;
 	m_pParentFilter->SetDuration(rtDuration);
+
+	// try parse APE Tag Header
+	stream_reader* io = m_pWavPackParser->io;
+	char buf[APE_TAG_FOOTER_BYTES];
+	memset(buf, 0, sizeof(buf));
+	uint32_t cur_pos = io->get_pos(io);
+	DWORD file_size = io->get_length(io);
+	if (cur_pos + APE_TAG_FOOTER_BYTES <= file_size) {
+		io->set_pos_rel(io, -APE_TAG_FOOTER_BYTES, SEEK_END);
+		if (io->read_bytes(io, buf, APE_TAG_FOOTER_BYTES) == APE_TAG_FOOTER_BYTES) {
+			if (!memcmp(buf, "APETAGEX", 8)) {
+				CGolombBuffer gb((BYTE*)buf + 8, APE_TAG_FOOTER_BYTES - 8);
+				DWORD ver		= gb.ReadDwordLE();
+				if (ver <= APE_TAG_VERSION) {
+					DWORD tag_size	= gb.ReadDwordLE();
+					DWORD tag_start	= file_size - tag_size - APE_TAG_FOOTER_BYTES;
+					if (tag_start > 0) {
+						DWORD fields = gb.ReadDwordLE();
+						if (fields <= 65536) {
+							DWORD flags = gb.ReadDwordLE();
+							if (!(flags & APE_TAG_FLAG_IS_HEADER)) {
+								io->set_pos_rel(io, file_size - tag_size, SEEK_SET);
+								BYTE *p = new BYTE[tag_size];
+								if (io->read_bytes(io, p, tag_size) == tag_size) {
+
+									CGolombBuffer gb(p, tag_size);
+									for (size_t i = 0; i < fields; i++) {
+										// parse APE Tag Item
+										tag_size	= gb.ReadDwordLE();	/* field size */
+										flags		= gb.ReadDwordLE();	/* field flags */
+										CString key;
+										BYTE b = gb.ReadByte();
+										while (b) {
+											key += b;
+											b = gb.ReadByte();
+										}
+
+										if (flags & APE_TAG_FLAG_IS_BINARY) {
+											key = "";
+											b = gb.ReadByte();
+											tag_size--;
+											while (b && tag_size) {
+												key += b;
+												b = gb.ReadByte();
+												tag_size--;
+											}
+
+											if (tag_size) {
+												BYTE* value = new BYTE[tag_size];
+												gb.ReadBuffer(value, tag_size);
+
+												m_CoverMime = _T("");
+												if (!key.IsEmpty()) {
+													CString ext = key.Mid(key.ReverseFind('.')+1).MakeLower();
+													if (ext == _T("jpeg") || ext == _T("jpg")) {
+														m_CoverMime = _T("image/jpeg");
+													} else if (ext == _T("png")) {
+														m_CoverMime = _T("image/png");
+													}
+												}
+
+												if (!m_Cover.GetCount() && !m_CoverMime.IsEmpty()) {
+													m_CoverFileName = key;
+													m_Cover.SetCount(tag_size);
+													memcpy(m_Cover.GetData(), value, tag_size);
+												}
+											
+												delete [] value;
+											}
+
+										} else {
+											BYTE* value = new BYTE[tag_size];
+											gb.ReadBuffer(value, tag_size);
+
+											if (CString(key).MakeLower() == "cuesheet") {
+												CString TagValue = CA2CT(CStringA(value), CP_UTF8);
+
+												CAtlList<Chapters> ChaptersList;
+												ParseCUESheet(TagValue, ChaptersList);
+
+												if (ChaptersList.GetCount()) {
+
+													m_pParentFilter->ChapRemoveAll();
+													while (ChaptersList.GetCount()) {
+														Chapters cp = ChaptersList.RemoveHead();
+														m_pParentFilter->ChapAppend(cp.rt, cp.name);
+													}
+												}
+											}
+
+											delete [] value;
+										}
+									}
+								}
+
+								delete [] p;
+							}
+						}
+					}
+				}
+			}
+		}
+		io->set_pos_rel(io, cur_pos, SEEK_SET);
+	}
 
 	return S_OK;
 }

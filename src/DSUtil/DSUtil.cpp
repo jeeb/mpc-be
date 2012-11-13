@@ -3021,3 +3021,116 @@ CStringA VobSubDefHeader(int w, int h, CStringA palette)
 
 	return hdr;
 }
+
+static CString GetCueCommand(CString& ln)
+{
+	CString c;
+	int i = ln.Find(' ');
+	if (i < 0) {
+		c = ln;
+		ln.Empty();
+	} else {
+		c = ln.Left(i);
+		ln.Delete(0, i+1);
+		ln.TrimLeft();
+	}
+	return c;
+}
+
+static void MakeCUETitle(CString &Title, CString title, CString performer, int track_no)
+{
+	if (!performer.IsEmpty() || !title.IsEmpty()) {
+		Title.Format(_T("%02d. %s - %s"), track_no, performer, title);
+	} else if (!performer.IsEmpty()) {
+		Title.Format(_T("%02d. %s"), track_no, performer);
+	} else if (!title.IsEmpty()) {
+		Title.Format(_T("%02d. %s"), track_no, title);
+	}
+}
+
+bool ParseCUESheet(CString cueData, CAtlList<Chapters> &ChaptersList)
+{
+	BOOL fAudioTrack;
+	int track_no = -1, /*index, */index_cnt = 0;
+	REFERENCE_TIME rt = _I64_MAX;
+	CString Title;
+	CString title, performer;
+
+	CAtlList<CString> cuelines;
+	Explode(cueData, cuelines, '\n');
+
+	if (cuelines.GetCount() <= 1) {
+		return false;
+	}
+
+	while (cuelines.GetCount()) {
+		CString cueLine	= cuelines.RemoveHead().Trim();
+		CString cmd		= GetCueCommand(cueLine);
+
+		if (cmd == _T("TRACK")) {
+			if (rt != _I64_MAX && track_no != -1 && index_cnt) {
+				MakeCUETitle(Title, title, performer, track_no);
+				if (!Title.IsEmpty()) {
+					//((CFLACSource*)m_pFilter)->ChapAppend(rt, Title);
+					ChaptersList.AddTail(Chapters(Title, rt));
+				}
+			}
+			rt = _I16_MAX;
+			index_cnt = 0;
+
+			TCHAR type[256];
+			swscanf_s(cueLine, _T("%d %s"), &track_no, type, _countof(type)-1);
+			fAudioTrack = (wcscmp(type, _T("AUDIO")) == 0);
+			Title.Format(_T("Track %02d"), track_no);
+		} else if (cmd == _T("TITLE")) {
+			cueLine.Trim(_T(" \""));
+			title = cueLine;
+		} else if (cmd == _T("PERFORMER")) {
+			cueLine.Trim(_T(" \""));
+			performer = cueLine;
+		} else if (cmd == _T("INDEX")) {
+			int idx, mm, ss, ff;
+			swscanf_s(cueLine, _T("%d %d:%d:%d"), &idx, &mm, &ss, &ff);
+
+			if (fAudioTrack) {
+				index_cnt++;
+
+				rt = MILLISECONDS_TO_100NS_UNITS((mm*60+ss)*1000);
+
+				/*
+				REFERENCE_TIME pos = MILLISECONDS_TO_100NS_UNITS((mm*60+ss)*1000);
+
+				if (index_cnt == 1) {
+					rt = pos;
+					index = idx;
+				} else if (index_cnt == 2) {
+					MakeCUETitle(Title, title, performer, track_no);
+					if (!Title.IsEmpty()) {
+						((CFLACSource*)m_pFilter)->ChapAppend(rt, Title);
+					}
+
+					Title.Format(_T("+ INDEX %02d"), index);
+					((CFLACSource*)m_pFilter)->ChapAppend(rt, Title);
+					rt = _I64_MAX;
+
+					Title.Format(_T("+ INDEX %02d"), idx);
+					((CFLACSource*)m_pFilter)->ChapAppend(pos, Title);
+				} else {
+					Title.Format(_T("+ INDEX %02d"), idx);
+					((CFLACSource*)m_pFilter)->ChapAppend(pos, Title);
+					rt = _I64_MAX;
+				}
+				*/
+			}
+		}
+	}
+	if (rt != _I64_MAX && track_no != -1 && index_cnt) {
+		MakeCUETitle(Title, title, performer, track_no);
+		if (!Title.IsEmpty()) {
+			//((CFLACSource*)m_pFilter)->ChapAppend(rt, Title);
+			ChaptersList.AddTail(Chapters(Title, rt));
+		}
+	}
+
+	return true;;
+}

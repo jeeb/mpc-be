@@ -35,8 +35,9 @@ public:
 
 	inline BYTE		ReadByte()		{ return (BYTE)BitRead (8); };
 	inline SHORT	ReadShort()		{ return (SHORT)BitRead (16); };
-	inline SHORT	ReadShortLE()	{ return (SHORT)ReadByte() | ReadByte() << 8; };
 	inline DWORD	ReadDword()		{ return (DWORD)BitRead (32); };
+	inline SHORT	ReadShortLE()	{ return (SHORT)ReadByte() | (SHORT)ReadByte() << 8; };
+	inline DWORD	ReadDwordLE()	{ return (DWORD)(ReadByte() | ReadByte() << 8 | ReadByte() << 16 | ReadByte() << 24); };
 	void			ReadBuffer(BYTE* pDest, int nSize);
 
 	void			Reset();

@@ -3180,7 +3180,7 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 		if (fLeftDownMouseBtnUnassigned || ((GetTickCount()-m_nMenuHideTick)<100)) {
 			PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 		} else if (!bWindowDragged) {
-			if (OnButton(wmcmd::LDOWN, nFlags, point)); {
+			if (OnButton(wmcmd::LDOWN, nFlags, point)) {
 				bWindowDragged = false;
 				i = true;
 			}
@@ -3190,7 +3190,7 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 		if (fLeftUpMouseBtnUnassigned || ((GetTickCount()-m_nMenuHideTick)<100)) {
 			PostMessage(WM_NCLBUTTONUP, HTCAPTION, MAKELPARAM(point.x, point.y));
 		} else if (!bWindowDragged) {
-			if (OnButton(wmcmd::LUP, nFlags, point)); {
+			if (OnButton(wmcmd::LUP, nFlags, point)) {
 				bWindowDragged = false;
 				i = true;
 			}
