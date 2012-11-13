@@ -158,8 +158,8 @@ static int lag_read_prob_header(lag_rac *rac, GetBitContext *gb)
                 av_log(rac->avctx, AV_LOG_ERROR, "Invalid probability run encountered.\n");
                 return -1;
             }
-            if (prob > 257 - i)
-                prob = 257 - i;
+            if (prob > 256 - i)
+                prob = 256 - i;
             for (j = 0; j < prob; j++)
                 rac->prob[++i] = 0;
         }
@@ -569,7 +569,7 @@ static int lag_decode_frame(AVCodecContext *avctx,
 
         if (!l->rgb_planes) {
             l->rgb_stride = FFALIGN(avctx->width, 16);
-            l->rgb_planes = av_malloc(l->rgb_stride * avctx->height * planes + 16);
+            l->rgb_planes = av_malloc(l->rgb_stride * avctx->height * 4 + 16);
             if (!l->rgb_planes) {
                 av_log(avctx, AV_LOG_ERROR, "cannot allocate temporary buffer\n");
                 return AVERROR(ENOMEM);

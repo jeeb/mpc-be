@@ -352,10 +352,10 @@ SRCS_C = \
     libavresample/x86/audio_convert_init.c \
     libavresample/x86/audio_mix_init.c \
 \
-    libavutil/audioconvert.c \
     libavutil/audio_fifo.c \
     libavutil/avstring.c \
     libavutil/bprint.c \
+    libavutil/channel_layout.c \
     libavutil/cpu.c \
     libavutil/crc.c \
     libavutil/dict.c \

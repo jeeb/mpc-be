@@ -21,7 +21,7 @@
 
 #define BITSTREAM_READER_LE
 
-#include "libavutil/audioconvert.h"
+#include "libavutil/channel_layout.h"
 #include "avcodec.h"
 #include "get_bits.h"
 #include "unary.h"
@@ -789,6 +789,11 @@ static int wavpack_decode_block(AVCodecContext *avctx, int block_no,
         return -1;
     }
 
+    if (wc->ch_offset >= avctx->channels) {
+        av_log(avctx, AV_LOG_ERROR, "too many channels\n");
+        return -1;
+    }
+
     memset(s->decorr, 0, MAX_TERMS * sizeof(Decorr));
     memset(s->ch, 0, sizeof(s->ch));
     s->extra_bits = 0;
@@ -800,6 +805,10 @@ static int wavpack_decode_block(AVCodecContext *avctx, int block_no,
         if (!s->samples) {
             *got_frame_ptr = 0;
             return 0;
+        }
+        if (s->samples > wc->samples) {
+            av_log(avctx, AV_LOG_ERROR, "too many samples in block");
+            return -1;
         }
     } else {
         s->samples = wc->samples;
@@ -1208,11 +1217,12 @@ static int wavpack_decode_frame(AVCodecContext *avctx, void *data,
     }
 
     /* get output buffer */
-    s->frame.nb_samples = s->samples;
+    s->frame.nb_samples = s->samples + 1;
     if ((ret = avctx->get_buffer(avctx, &s->frame)) < 0) {
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
     }
+    s->frame.nb_samples = s->samples;
 
     while (buf_size > 0) {
         if (!s->multichannel) {
