@@ -3071,7 +3071,6 @@ bool ParseCUESheet(CString cueData, CAtlList<Chapters> &ChaptersList)
 			if (rt != _I64_MAX && track_no != -1 && index_cnt) {
 				MakeCUETitle(Title, title, performer, track_no);
 				if (!Title.IsEmpty()) {
-					//((CFLACSource*)m_pFilter)->ChapAppend(rt, Title);
 					ChaptersList.AddTail(Chapters(Title, rt));
 				}
 			}
@@ -3124,13 +3123,18 @@ bool ParseCUESheet(CString cueData, CAtlList<Chapters> &ChaptersList)
 			}
 		}
 	}
+
 	if (rt != _I64_MAX && track_no != -1 && index_cnt) {
 		MakeCUETitle(Title, title, performer, track_no);
 		if (!Title.IsEmpty()) {
-			//((CFLACSource*)m_pFilter)->ChapAppend(rt, Title);
 			ChaptersList.AddTail(Chapters(Title, rt));
 		}
 	}
 
-	return true;;
+
+	if (ChaptersList.GetCount()) {
+		return true;
+	} else {
+		return false;
+	}
 }
