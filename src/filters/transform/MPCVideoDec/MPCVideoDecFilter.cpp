@@ -907,6 +907,7 @@ bool CMPCVideoDecFilter::IsVideoInterlaced()
 	return true;
 };
 
+#define AVRTIMEPERFRAME_PULLDOWN 417083
 void CMPCVideoDecFilter::UpdateFrameTime (REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop, bool b_repeat_pict)
 {
 	REFERENCE_TIME AvgTimePerFrame = m_rtAvrTimePerFrame;

@@ -292,13 +292,10 @@ void CDXVADecoderMpeg2::UpdateFrameTime (REFERENCE_TIME& rtStart, REFERENCE_TIME
 		rtStart = m_rtLastStart;
 	}
 
-	REFERENCE_TIME AvgTimePerFrame = m_pFilter->GetAvrTimePerFrame();
+	REFERENCE_TIME AvgTimePerFrame = m_pFilter->GetAvrTimePerFrame() * (m_pFilter->GetFrame()->repeat_pict ? 3 : 2) / 2;
 	
-	bool m_PullDownFlag	= (m_bFrame_repeat_pict && AvgTimePerFrame == 333666);
-	AvgTimePerFrame		= m_PullDownFlag ? AVRTIMEPERFRAME_PULLDOWN : AvgTimePerFrame;
-	rtStop				= rtStart + (AvgTimePerFrame / m_pFilter->GetRate());
-
-	m_rtLastStart = rtStop;
+	rtStop			= rtStart + (AvgTimePerFrame / m_pFilter->GetRate());
+	m_rtLastStart	= rtStop;
 }
 
 bool CDXVADecoderMpeg2::FindPicture(int nIndex, int nStartCode)

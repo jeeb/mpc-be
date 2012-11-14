@@ -45,8 +45,6 @@ enum PCI_Vendors {
 #define DXVA_PROFILE_HIGHER_THAN_HIGH	8
 #define DXVA_HIGH_BIT					16
 
-#define AVRTIMEPERFRAME_PULLDOWN		417083
-
 // === H264 functions
 HRESULT			FFH264DecodeFrame (struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize, int* pFramePOC, int* pOutPOC, REFERENCE_TIME* pOutrtStart, UINT* SecondFieldOffset, int* Sync);
 HRESULT			FFH264BuildPicParams (DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_H264* pDXVAScalingMatrix, int* nFieldType, int* nSliceType, struct AVCodecContext* pAVCtx, DWORD nPCIVendor);
