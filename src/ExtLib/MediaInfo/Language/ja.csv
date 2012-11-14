@@ -500,7 +500,7 @@ Genre_137;Heavy Metal
 Genre_138;Black Metal
 Genre_139;Crossover
 Genre_140;Contemporary Christian
-Genre_141;Christian Rock 
+Genre_141;Christian Rock
 Genre_142;Merengue
 Genre_143;Salsa
 Genre_144;Trash Metal
@@ -748,7 +748,7 @@ List;リスト
 Lyrics;歌詞
 Lyricist;作詞
 Mastered_Date;マスタリング日
-MasteredBy;マスタリング by 
+MasteredBy;マスタリング by
 matrix_coefficients;
 MediaInfo_About; 詳細情報提供者 \r\n マルチメディア ファイル:\r\n Matroska, OGG ( OGM を含む)\r\n MPEG1 ( VCD を含む)\r\n MPEG2 ( DVD , SVCD を含む)\r\n MPEG4 (iTunes の M4A を含む)\r\n Quicktime\r\n RealMedia\r\n WindowsMedia ( WMV , WMA を含む)\r\n Microsoft RIFF ( AVI , WAV を含む)\r\n 音声のみ (AC3 , DTS , AAC , AU , AIFF ...)
 Menu;メニュー
@@ -866,7 +866,9 @@ s;秒
 SamplingRate;サンプルレート
 Save;保存
 ScanType;スキャンの種類
+ScanType_Original;
 ScanOrder;スキャンの並び
+ScanOrder_Original;
 ScreenplayBy;監督
 Season;シーズン
 see below;以下詳細
@@ -975,5 +977,5 @@ Written_Location;作成場所
 WrittenBy;著者
 Yes;はい
 Your system;システム情報
-ZZ_Automatic_Percent;96
-ZZ_AutomaticLanguage_Percent;96
+ZZ_Automatic_Percent;95
+ZZ_AutomaticLanguage_Percent;95

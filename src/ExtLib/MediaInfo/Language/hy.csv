@@ -500,7 +500,7 @@ Genre_137;Heavy Metal
 Genre_138;Black Metal
 Genre_139;Crossover
 Genre_140;Contemporary Christian
-Genre_141;Christian Rock 
+Genre_141;Christian Rock
 Genre_142;Merengue
 Genre_143;Salsa
 Genre_144;Trash Metal
@@ -866,7 +866,9 @@ s; վայր.
 SamplingRate;Հաճախականությունը
 Save;Պահպանել
 ScanType;Ստուգման տեսակը
+ScanType_Original;
 ScanOrder;Ստուգման հերթը
+ScanOrder_Original;
 ScreenplayBy;Սցենարը՝
 Season;Խաղաշրջանը
 see below;նայեք ներքև

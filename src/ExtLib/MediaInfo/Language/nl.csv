@@ -500,7 +500,7 @@ Genre_137;Heavy Metal
 Genre_138;Black Metal
 Genre_139;Crossover
 Genre_140;Gospelrock
-Genre_141;Christelijke Rock 
+Genre_141;Christelijke Rock
 Genre_142;Merengue
 Genre_143;Salsa
 Genre_144;Trash Metal
@@ -866,7 +866,9 @@ s;s
 SamplingRate;Samplerate
 Save;Opslaan
 ScanType;Scansoort
+ScanType_Original;
 ScanOrder;Scanvolgorde
+ScanOrder_Original;
 ScreenplayBy;Draaiboek door
 Season;Seizoen
 see below;zie onder
