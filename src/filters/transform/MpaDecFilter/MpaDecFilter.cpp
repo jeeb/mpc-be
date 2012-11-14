@@ -410,6 +410,8 @@ HRESULT CMpaDecFilter::EndFlush()
 {
 	CAutoLock cAutoLock(&m_csReceive);
 	m_buff.RemoveAll();
+	m_FFAudioDec.FlushBuffers();
+	m_Mixer.FlushBuffers();
 #if ENABLE_AC3_ENCODER
 	m_encbuff.RemoveAll();
 #endif
@@ -419,13 +421,7 @@ HRESULT CMpaDecFilter::EndFlush()
 HRESULT CMpaDecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
 {
 	CAutoLock cAutoLock(&m_csReceive);
-	m_buff.RemoveAll();
-#if ENABLE_AC3_ENCODER
-	m_encbuff.RemoveAll();
-#endif
 	m_ps2_state.sync = false;
-	m_FFAudioDec.FlushBuffers();
-
 	m_bResync = true;
 	m_rtStart = 0; // LOOKATTHIS // reset internal timer?
 
@@ -1185,7 +1181,7 @@ HRESULT CMpaDecFilter::GetDeliveryBuffer(IMediaSample** pSample, BYTE** pData)
 HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, int size, AVSampleFormat avsf, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask)
 {
 #if ENABLE_AC3_ENCODER
-	if (GetSPDIF(ac3enc) && nChannels > 2) { // do not encode mono and stereo
+	if (GetSPDIF(ac3enc) /*&& nChannels > 2*/) { // do not encode mono and stereo
 		return AC3Encode(pBuff, size, avsf, nSamplesPerSec, nChannels, dwChannelMask);
 	}
 #endif
@@ -1214,14 +1210,17 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, int size, AVSampleFormat avsf, DWORD
 		WORD  mixed_channels = channel_mode[sc].channels;
 		DWORD mixed_mask     = channel_mode[sc].ch_layout;
 
-		mixData.SetCount(nSamples * mixed_channels);
+		if (dwChannelMask != mixed_mask) {
+			mixData.SetCount(nSamples * mixed_channels);
+			m_Mixer.Update(avsf, dwChannelMask, mixed_mask);
 
-		if (S_OK == m_Mixer.Mixing(mixData.GetData(), mixed_mask, pDataIn, nSamples, dwChannelMask, avsf)) {
-			pDataIn       = (BYTE*)mixData.GetData();
-			avsf          = AV_SAMPLE_FMT_FLT; // float after mixing
-			size          = nSamples * mixed_channels * sizeof(float);
-			nChannels     = mixed_channels;
-			dwChannelMask = mixed_mask;
+			if (m_Mixer.Mixing(mixData.GetData(), nSamples, pDataIn, nSamples) > 0) {
+				pDataIn       = (BYTE*)mixData.GetData();
+				avsf          = AV_SAMPLE_FMT_FLT; // float after mixing
+				size          = nSamples * mixed_channels * sizeof(float);
+				nChannels     = mixed_channels;
+				dwChannelMask = mixed_mask;
+			}
 		}
 	}
 
@@ -1321,8 +1320,8 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, int size, int sample_rate, 
 	}
 
 	CMediaType mt;
-	if (isDTSWAV) {
-		mt = CreateMediaTypeSPDIF(sample_rate);
+	if (sample_rate % 11025 == 0) {
+		mt = CreateMediaTypeSPDIF(44100);
 	} else {
 		mt = CreateMediaTypeSPDIF();
 	}
@@ -1378,38 +1377,43 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, int size, int sample_rate, 
 #if ENABLE_AC3_ENCODER
 HRESULT CMpaDecFilter::AC3Encode(BYTE* pBuff, int size, AVSampleFormat avsf, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask)
 {
-	DWORD new_layout = m_AC3Enc.SelectLayout(dwChannelMask);
+	DWORD new_layout     = m_AC3Enc.SelectLayout(dwChannelMask);
+	WORD  new_channels   = av_popcount(new_layout);
+	DWORD new_samplerate = m_AC3Enc.SelectSamplerate(nSamplesPerSec);
 
 	if (!m_AC3Enc.OK()) {
-		m_AC3Enc.Init(nSamplesPerSec, new_layout);
+		m_AC3Enc.Init(new_samplerate, new_layout);
 		m_encbuff.RemoveAll();
 	}
 
-	DWORD nSamples = size / (nChannels * av_get_bytes_per_sample(avsf));
+	int nSamples = size / (nChannels * av_get_bytes_per_sample(avsf));
 
 	size_t remain = m_encbuff.GetCount();
-	size_t added  = size / av_get_bytes_per_sample(avsf);
 	float* p;
 
-	if (new_layout == dwChannelMask) {
+	if (new_layout == dwChannelMask && new_samplerate == nSamplesPerSec) {
+		int added  = size / av_get_bytes_per_sample(avsf);
 		m_encbuff.SetCount(remain + added);
 		p = m_encbuff.GetData() + remain;
 
 		convert_to_float(avsf, nChannels, nSamples, pBuff, p);
 	} else {
-		WORD new_channels = av_popcount(new_layout);
-		added = added / nChannels * new_channels;
+		m_Mixer.Update(avsf, dwChannelMask, new_layout, nSamplesPerSec, new_samplerate);
+		int added = m_Mixer.CalcOutSamples(nSamples) * new_channels;
 		m_encbuff.SetCount(remain + added);
 		p = m_encbuff.GetData() + remain;
 
-		if (S_OK != m_Mixer.Mixing(p, new_channels, new_layout, pBuff, nSamples, nChannels, dwChannelMask, avsf)) {
+		added = m_Mixer.Mixing(p, added, pBuff, nSamples) * new_channels;
+		if (added <= 0) {
+			m_encbuff.SetCount(remain);
 			return S_OK;
 		}
+		m_encbuff.SetCount(remain + added);
 	}
 
 	CAtlArray<BYTE> output;
 
-	if (m_AC3Enc.Encode(m_encbuff, output) == S_OK) {
+	while (m_AC3Enc.Encode(m_encbuff, output) == S_OK) {
 		DeliverBitstream(output.GetData(), output.GetCount(), nSamplesPerSec, 1536, 0x0001);
 	}
 
@@ -1612,15 +1616,16 @@ HRESULT CMpaDecFilter::GetMediaType(int iPosition, CMediaType* pmt)
 
 	if (GetSPDIF(ac3) && (subtype == MEDIASUBTYPE_DOLBY_AC3 || subtype == MEDIASUBTYPE_WAVE_DOLBY_AC3) ||
 #if ENABLE_AC3_ENCODER
-			GetSPDIF(ac3enc) && wfe->nChannels > 2 ||
+		GetSPDIF(ac3enc) /*&& wfe->nChannels > 2*/ ||
 #endif
-			GetSPDIF(dts) && (subtype == MEDIASUBTYPE_DTS || subtype == MEDIASUBTYPE_WAVE_DTS)) {
-		if (wfe->nSamplesPerSec == 44100) { // DTS-WAVE
-			*pmt = CreateMediaTypeSPDIF(44100);
-		} else {
-			*pmt = CreateMediaTypeSPDIF();
-		}
-		return S_OK;
+		GetSPDIF(dts) && (subtype == MEDIASUBTYPE_DTS || subtype == MEDIASUBTYPE_WAVE_DTS)) {
+			if (wfe->nSamplesPerSec % 11025 == 0) {
+				*pmt = CreateMediaTypeSPDIF(44100);
+			} else {
+				*pmt = CreateMediaTypeSPDIF();
+			}
+
+			return S_OK;
 	}
 
 	if (GetMixer()) {

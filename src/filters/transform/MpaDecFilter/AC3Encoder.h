@@ -46,8 +46,8 @@ public:
 	void    FlushBuffers();
 	void    StreamFinish();
 
-	bool    CheckLayout(DWORD layout);
 	DWORD   SelectLayout(DWORD layout);
+	DWORD   SelectSamplerate(DWORD samplerate);
 
 	bool OK() { return (m_pAVCtx != NULL); }
 };

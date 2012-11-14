@@ -30,9 +30,6 @@ extern "C" {
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/ff_log.h"
 
-#define INT16_PEAK      32768
-#define INT32_PEAK      2147483648
-
 // CFFAudioEncoder
 
 CAC3Encoder::CAC3Encoder()
@@ -59,11 +56,7 @@ bool CAC3Encoder::Init(int sample_rate, DWORD channel_layout)
 
 	m_pAVCtx->sample_fmt = AV_SAMPLE_FMT_FLTP;
 
-	if (sample_rate % 11025 == 0) {
-		m_pAVCtx->sample_rate = 44100;
-	} else {
-		m_pAVCtx->sample_rate = 48000;
-	}
+	m_pAVCtx->sample_rate = SelectSamplerate(sample_rate);
 
 	m_pAVCtx->channel_layout = channel_layout;
 	m_pAVCtx->channels = av_popcount(channel_layout);
@@ -176,19 +169,6 @@ void CAC3Encoder::StreamFinish()
 	m_buffersize = 0;
 }
 
-bool CAC3Encoder::CheckLayout(DWORD layout)
-{
-	if (m_pAVCodec && m_pAVCodec->channel_layouts) {
-		for (size_t i = 0; m_pAVCodec->channel_layouts[i] != 0; i++) {
-			if (layout == (DWORD)m_pAVCodec->channel_layouts[i]) {
-				return true;
-			}
-		}
-	}
-	
-	return false;
-}
-
 DWORD CAC3Encoder::SelectLayout(DWORD layout)
 {
 	if (m_pAVCodec && m_pAVCodec->channel_layouts) {
@@ -214,4 +194,22 @@ DWORD CAC3Encoder::SelectLayout(DWORD layout)
 	}
 
 	return new_layout;
+}
+
+DWORD CAC3Encoder::SelectSamplerate(DWORD samplerate)
+{
+	/* // this code does not work, because supported_samplerates is always NULL.
+	if (m_pAVCodec && m_pAVCodec->supported_samplerates) {
+		for (size_t i = 0; m_pAVCodec->supported_samplerates[i] != 0; i++) {
+			if (samplerate == (DWORD)m_pAVCodec->supported_samplerates[i]) {
+				return samplerate;
+			}
+		}
+	}*/
+
+	if (samplerate % 11025 == 0) {
+		return 44100;
+	} else {
+		return 48000;
+	}
 }
