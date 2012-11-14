@@ -1,47 +1,49 @@
 
-Libpng 1.5.13 - September 27, 2012
+Libpng 1.5.14beta01 - October 24, 2012
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.5.13.tar.xz (LZMA-compressed, recommended)
-   libpng-1.5.13.tar.gz
-   libpng-1.5.13.tar.bz2
+   1.5.14beta01.tar.xz (LZMA-compressed, recommended)
+   1.5.14beta01.tar.gz
+   1.5.14beta01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1513.7z  (LZMA-compressed, recommended)
-   lpng1513.zip
+   lp1514b01.7z  (LZMA-compressed, recommended)
+   lp1514b01.zip
 
 Other information:
 
-   libpng-1.5.13-README.txt
-   libpng-1.5.13-LICENSE.txt
+   1.5.14beta01-README.txt
+   1.5.14beta01-LICENSE.txt
 
-Changes since the last public release (1.5.12):
-  Do not compile PNG_DEPRECATED, PNG_ALLOC and PNG_PRIVATE when __GNUC__ < 3.
-  Removed references to png_zalloc() and png_zfree() from the manual.
-  Revised PNG_FP_EXPORT and PNG_FIXED_EXPORT macros to avoid generating
-    lone semicolons (patch ported from libpng-1.6.0beta11).
-  Corrected handling of the image array and the row_pointers array in example.c
-  When png_set_filler is used to strip a filler channel during write, the
-    code prior to 1.5 would ignore the case where the output required an
-    alpha channel or when the output was a palettized PNG.  In libpng-1.5 the
-    ignorance was lost and libpng proceeded to strip the channel resulting
-    in a bad (potential memory overwrite) failure later.  This reverts
-    the behavior to the pre-1.5 state but issues a warning. libpng-1.6 is
-    expected to issue an error on the erroneous png_set_filler call.
-  Use png_memset() consistently (pngmem.c contained some bare "memset" calls).
+Changes since the last public release (1.5.13):
+
+Version 1.5.14beta01 [October 24, 2012]
+  Added -DZ_SOLO to contrib/pngminim/*/makefile to work with zlib-1.2.7
+  Warn about the incorrect runtime library setting for VS2010 debug DLL builds.
+  Fixed build when using #define PNG_NO_READ_GAMMA in png_do_compose() in
+    pngrtran.c (Domani Hannes).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe)
 or to glennrp at users.sourceforge.net
+
+Glenn R-P
+#endif
+
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
+(subscription required; visit
+https://lists.sourceforge.net/lists/listinfo/png-mng-implement
+to subscribe) or to glennrp at users.sourceforge.net
 
 Glenn R-P
