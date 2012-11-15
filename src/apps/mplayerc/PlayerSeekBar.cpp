@@ -459,38 +459,37 @@ void CPlayerSeekBar::OnPaint()
 
 			CFont* oldfont2 = memdc.SelectObject(&font2);
 			SetBkMode(memdc, TRANSPARENT);
+
+			LONG xt = s.bStatusBarIsVisible ? 0 : s.strTimeOnSeekBar.GetLength() <= 21 ? 150 : 160;
+
 			if (s.fFileNameOnSeekBar) {
+				// draw filename
 				rt = rc;
-				rt.left = rc.left+6;
-				rt.top = rc.top - 2;
-				if (!s.bStatusBarIsVisible) rt.right = rc.right - 150;
+				rt.left  += 6;
+				rt.top   -= 2;
+				rt.right -= xt;
 				memdc.DrawText(str, str.GetLength(), &rt, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS|DT_NOPREFIX);
-	
+
+				// highlights filename
 				ThemeRGB(205, 210, 215, R, G, B);
 				memdc.SetTextColor(RGB(R,G,B));
-				CRect rt2;
-				rt2 = rc;
-				rt2.left = rc.left+6;
-				rt2.right = (nposx > rc.right - 150 && !s.bStatusBarIsVisible ? rc.right - 150 : nposx);
-				rt2.top = rc.top - 2;
-
-				if (nposx > rt.right-15) {
-					rt2.right = rt.right;
-					memdc.DrawText(str, str.GetLength(), &rt2, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS|DT_NOPREFIX);
+				if (nposx > rt.right - 15) {
+					memdc.DrawText(str, str.GetLength(), &rt, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS|DT_NOPREFIX);
 				} else {
-					rt2.right = nposx;
-					memdc.DrawText(str, str.GetLength(), &rt2, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX);
+					rt.right = nposx;
+					memdc.DrawText(str, str.GetLength(), &rt, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX);
 				}
 			}
 
 			if (!s.bStatusBarIsVisible) {
 				CString strT = s.strTimeOnSeekBar;
-				CRect rT = rc;
-				rT.left  = rc.right - (strT.GetLength() < 20 ? 140 : 150);
-				rT.right = rc.right - 6;
+				rt = rc;
+				rt.left  -= xt - 10;
+				rt.top   -= 2;
+				rt.right -= 6;
 				ThemeRGB(200, 205, 210, R, G, B);
 				memdc.SetTextColor(RGB(R,G,B));
-				memdc.DrawText(strT, strT.GetLength(), &rT, DT_RIGHT|DT_VCENTER|DT_SINGLELINE);
+				memdc.DrawText(strT, strT.GetLength(), &rt, DT_RIGHT|DT_VCENTER|DT_SINGLELINE);
 			}
 		}
 
