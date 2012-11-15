@@ -901,6 +901,8 @@ BOOL CPPageFormats::OnApply()
 
 	SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
 
+	m_bFileExtChanged = false;
+
 	return __super::OnApply();
 }
 
