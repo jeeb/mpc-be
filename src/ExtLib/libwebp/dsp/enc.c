@@ -134,25 +134,25 @@ static void FTransform(const uint8_t* src, const uint8_t* ref, int16_t* out) {
   int i;
   int tmp[16];
   for (i = 0; i < 4; ++i, src += BPS, ref += BPS) {
-    const int d0 = src[0] - ref[0];
+    const int d0 = src[0] - ref[0];   // 9bit dynamic range ([-255,255])
     const int d1 = src[1] - ref[1];
     const int d2 = src[2] - ref[2];
     const int d3 = src[3] - ref[3];
-    const int a0 = (d0 + d3) << 3;
-    const int a1 = (d1 + d2) << 3;
-    const int a2 = (d1 - d2) << 3;
-    const int a3 = (d0 - d3) << 3;
-    tmp[0 + i * 4] = (a0 + a1);
-    tmp[1 + i * 4] = (a2 * 2217 + a3 * 5352 + 14500) >> 12;
-    tmp[2 + i * 4] = (a0 - a1);
-    tmp[3 + i * 4] = (a3 * 2217 - a2 * 5352 +  7500) >> 12;
+    const int a0 = (d0 + d3);         // 10b                      [-510,510]
+    const int a1 = (d1 + d2);
+    const int a2 = (d1 - d2);
+    const int a3 = (d0 - d3);
+    tmp[0 + i * 4] = (a0 + a1) << 3;  // 14b                      [-8160,8160]
+    tmp[1 + i * 4] = (a2 * 2217 + a3 * 5352 + 1812) >> 9;      // [-7536,7542]
+    tmp[2 + i * 4] = (a0 - a1) << 3;
+    tmp[3 + i * 4] = (a3 * 2217 - a2 * 5352 +  937) >> 9;
   }
   for (i = 0; i < 4; ++i) {
-    const int a0 = (tmp[0 + i] + tmp[12 + i]);
+    const int a0 = (tmp[0 + i] + tmp[12 + i]);  // 15b
     const int a1 = (tmp[4 + i] + tmp[ 8 + i]);
     const int a2 = (tmp[4 + i] - tmp[ 8 + i]);
     const int a3 = (tmp[0 + i] - tmp[12 + i]);
-    out[0 + i] = (a0 + a1 + 7) >> 4;
+    out[0 + i] = (a0 + a1 + 7) >> 4;            // 12b
     out[4 + i] = ((a2 * 2217 + a3 * 5352 + 12000) >> 16) + (a3 != 0);
     out[8 + i] = (a0 - a1 + 7) >> 4;
     out[12+ i] = ((a3 * 2217 - a2 * 5352 + 51000) >> 16);
@@ -569,30 +569,30 @@ static int TTransform(const uint8_t* in, const uint16_t* w) {
   int i;
   // horizontal pass
   for (i = 0; i < 4; ++i, in += BPS) {
-    const int a0 = (in[0] + in[2]) << 2;
-    const int a1 = (in[1] + in[3]) << 2;
-    const int a2 = (in[1] - in[3]) << 2;
-    const int a3 = (in[0] - in[2]) << 2;
-    tmp[0 + i * 4] = a0 + a1 + (a0 != 0);
+    const int a0 = in[0] + in[2];
+    const int a1 = in[1] + in[3];
+    const int a2 = in[1] - in[3];
+    const int a3 = in[0] - in[2];
+    tmp[0 + i * 4] = a0 + a1;
     tmp[1 + i * 4] = a3 + a2;
     tmp[2 + i * 4] = a3 - a2;
     tmp[3 + i * 4] = a0 - a1;
   }
   // vertical pass
   for (i = 0; i < 4; ++i, ++w) {
-    const int a0 = (tmp[0 + i] + tmp[8 + i]);
-    const int a1 = (tmp[4 + i] + tmp[12+ i]);
-    const int a2 = (tmp[4 + i] - tmp[12+ i]);
-    const int a3 = (tmp[0 + i] - tmp[8 + i]);
+    const int a0 = tmp[0 + i] + tmp[8 + i];
+    const int a1 = tmp[4 + i] + tmp[12+ i];
+    const int a2 = tmp[4 + i] - tmp[12+ i];
+    const int a3 = tmp[0 + i] - tmp[8 + i];
     const int b0 = a0 + a1;
     const int b1 = a3 + a2;
     const int b2 = a3 - a2;
     const int b3 = a0 - a1;
-    // abs((b + (b<0) + 3) >> 3) = (abs(b) + 3) >> 3
-    sum += w[ 0] * ((abs(b0) + 3) >> 3);
-    sum += w[ 4] * ((abs(b1) + 3) >> 3);
-    sum += w[ 8] * ((abs(b2) + 3) >> 3);
-    sum += w[12] * ((abs(b3) + 3) >> 3);
+
+    sum += w[ 0] * abs(b0);
+    sum += w[ 4] * abs(b1);
+    sum += w[ 8] * abs(b2);
+    sum += w[12] * abs(b3);
   }
   return sum;
 }
@@ -601,7 +601,7 @@ static int Disto4x4(const uint8_t* const a, const uint8_t* const b,
                     const uint16_t* const w) {
   const int sum1 = TTransform(a, w);
   const int sum2 = TTransform(b, w);
-  return (abs(sum2 - sum1) + 8) >> 4;
+  return abs(sum2 - sum1) >> 5;
 }
 
 static int Disto16x16(const uint8_t* const a, const uint8_t* const b,

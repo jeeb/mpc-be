@@ -243,7 +243,7 @@ static void ITransformSSE2(const uint8_t* ref, const int16_t* in, uint8_t* dst,
 
   // Add inverse transform to 'ref' and store.
   {
-    const __m128i zero = _mm_set1_epi16(0);
+    const __m128i zero = _mm_setzero_si128();
     // Load the reference(s).
     __m128i ref0, ref1, ref2, ref3;
     if (do_two) {
@@ -295,8 +295,8 @@ static void FTransformSSE2(const uint8_t* src, const uint8_t* ref,
                            int16_t* out) {
   const __m128i zero = _mm_setzero_si128();
   const __m128i seven = _mm_set1_epi16(7);
-  const __m128i k7500 = _mm_set1_epi32(7500);
-  const __m128i k14500 = _mm_set1_epi32(14500);
+  const __m128i k937 = _mm_set1_epi32(937);
+  const __m128i k1812 = _mm_set1_epi32(1812);
   const __m128i k51000 = _mm_set1_epi32(51000);
   const __m128i k12000_plus_one = _mm_set1_epi32(12000 + (1 << 16));
   const __m128i k5352_2217 = _mm_set_epi16(5352,  2217, 5352,  2217,
@@ -352,32 +352,32 @@ static void FTransformSSE2(const uint8_t* src, const uint8_t* ref,
   // First pass and subsequent transpose.
   {
     // Same operations are done on the (0,3) and (1,2) pairs.
-    // b0 = (a0 + a3) << 3
-    // b1 = (a1 + a2) << 3
-    // b3 = (a0 - a3) << 3
-    // b2 = (a1 - a2) << 3
+    // b0 = (a0 + a3)
+    // b1 = (a1 + a2)
+    // b3 = (a0 - a3)
+    // b2 = (a1 - a2)
     const __m128i a01 = _mm_add_epi16(v01, v32);
     const __m128i a32 = _mm_sub_epi16(v01, v32);
-    const __m128i b01 = _mm_slli_epi16(a01, 3);
-    const __m128i b32 = _mm_slli_epi16(a32, 3);
-    const __m128i b11 = _mm_unpackhi_epi64(b01, b01);
-    const __m128i b22 = _mm_unpackhi_epi64(b32, b32);
+    const __m128i b11 = _mm_unpackhi_epi64(a01, a01);
+    const __m128i b22 = _mm_unpackhi_epi64(a32, a32);
 
-    // e0 = b0 + b1
-    // e2 = b0 - b1
-    const __m128i e0 = _mm_add_epi16(b01, b11);
-    const __m128i e2 = _mm_sub_epi16(b01, b11);
-    const __m128i e02 = _mm_unpacklo_epi64(e0, e2);
+    // e0 = (b0 + b1)
+    // e2 = (b0 - b1)
+    const __m128i e0 = _mm_add_epi16(a01, b11);
+    const __m128i e2 = _mm_sub_epi16(a01, b11);
+    // e02 = [e0 | e2] << 3
+    const __m128i e0_e2 = _mm_unpacklo_epi64(e0, e2);
+    const __m128i e02 = _mm_slli_epi16(e0_e2, 3);
 
-    // e1 = (b3 * 5352 + b2 * 2217 + 14500) >> 12
-    // e3 = (b3 * 2217 - b2 * 5352 +  7500) >> 12
-    const __m128i b23 = _mm_unpacklo_epi16(b22, b32);
+    // e1 = (b3 * 5352 + b2 * 2217 + 1812) >> 9
+    // e3 = (b3 * 2217 - b2 * 5352 + 937) >> 9
+    const __m128i b23 = _mm_unpacklo_epi16(b22, a32);
     const __m128i c1 = _mm_madd_epi16(b23, k5352_2217);
     const __m128i c3 = _mm_madd_epi16(b23, k2217_5352);
-    const __m128i d1 = _mm_add_epi32(c1, k14500);
-    const __m128i d3 = _mm_add_epi32(c3, k7500);
-    const __m128i e1 = _mm_srai_epi32(d1, 12);
-    const __m128i e3 = _mm_srai_epi32(d3, 12);
+    const __m128i d1 = _mm_add_epi32(c1, k1812);
+    const __m128i d3 = _mm_add_epi32(c3, k937);
+    const __m128i e1 = _mm_srai_epi32(d1, 9);
+    const __m128i e3 = _mm_srai_epi32(d3, 9);
     const __m128i e13 = _mm_packs_epi32(e1, e3);
 
     // Transpose.
@@ -406,13 +406,12 @@ static void FTransformSSE2(const uint8_t* src, const uint8_t* ref,
     const __m128i a32 = _mm_sub_epi16(v01, v32);
     const __m128i a11 = _mm_unpackhi_epi64(a01, a01);
     const __m128i a22 = _mm_unpackhi_epi64(a32, a32);
+    const __m128i a01_plus_7 = _mm_add_epi16(a01, seven);
 
     // d0 = (a0 + a1 + 7) >> 4;
     // d2 = (a0 - a1 + 7) >> 4;
-    const __m128i b0 = _mm_add_epi16(a01, a11);
-    const __m128i b2 = _mm_sub_epi16(a01, a11);
-    const __m128i c0 = _mm_add_epi16(b0, seven);
-    const __m128i c2 = _mm_add_epi16(b2, seven);
+    const __m128i c0 = _mm_add_epi16(a01_plus_7, a11);
+    const __m128i c2 = _mm_sub_epi16(a01_plus_7, a11);
     const __m128i d0 = _mm_srai_epi16(c0, 4);
     const __m128i d2 = _mm_srai_epi16(c2, 4);
 
@@ -430,6 +429,7 @@ static void FTransformSSE2(const uint8_t* src, const uint8_t* ref,
     // f1 = f1 + (a3 != 0);
     // The compare will return (0xffff, 0) for (==0, !=0). To turn that into the
     // desired (0, 1), we add one earlier through k12000_plus_one.
+    // -> f1 = f1 + 1 - (a3 == 0)
     const __m128i g1 = _mm_add_epi16(f1, _mm_cmpeq_epi16(a32, zero));
 
     _mm_storel_epi64((__m128i*)&out[ 0], d0);
@@ -442,10 +442,101 @@ static void FTransformSSE2(const uint8_t* src, const uint8_t* ref,
 //------------------------------------------------------------------------------
 // Metric
 
-static int SSE4x4SSE2(const uint8_t* a, const uint8_t* b) {
-  const __m128i zero = _mm_set1_epi16(0);
+static int SSE_Nx4SSE2(const uint8_t* a, const uint8_t* b,
+                       int num_quads, int do_16) {
+  const __m128i zero = _mm_setzero_si128();
+  __m128i sum1 = zero;
+  __m128i sum2 = zero;
 
-  // Load values.
+  while (num_quads-- > 0) {
+    // Note: for the !do_16 case, we read 16 pixels instead of 8 but that's ok,
+    // thanks to buffer over-allocation to that effect.
+    const __m128i a0 = _mm_loadu_si128((__m128i*)&a[BPS * 0]);
+    const __m128i a1 = _mm_loadu_si128((__m128i*)&a[BPS * 1]);
+    const __m128i a2 = _mm_loadu_si128((__m128i*)&a[BPS * 2]);
+    const __m128i a3 = _mm_loadu_si128((__m128i*)&a[BPS * 3]);
+    const __m128i b0 = _mm_loadu_si128((__m128i*)&b[BPS * 0]);
+    const __m128i b1 = _mm_loadu_si128((__m128i*)&b[BPS * 1]);
+    const __m128i b2 = _mm_loadu_si128((__m128i*)&b[BPS * 2]);
+    const __m128i b3 = _mm_loadu_si128((__m128i*)&b[BPS * 3]);
+
+    // compute clip0(a-b) and clip0(b-a)
+    const __m128i a0p = _mm_subs_epu8(a0, b0);
+    const __m128i a0m = _mm_subs_epu8(b0, a0);
+    const __m128i a1p = _mm_subs_epu8(a1, b1);
+    const __m128i a1m = _mm_subs_epu8(b1, a1);
+    const __m128i a2p = _mm_subs_epu8(a2, b2);
+    const __m128i a2m = _mm_subs_epu8(b2, a2);
+    const __m128i a3p = _mm_subs_epu8(a3, b3);
+    const __m128i a3m = _mm_subs_epu8(b3, a3);
+
+    // compute |a-b| with 8b arithmetic as clip0(a-b) | clip0(b-a)
+    const __m128i diff0 = _mm_or_si128(a0p, a0m);
+    const __m128i diff1 = _mm_or_si128(a1p, a1m);
+    const __m128i diff2 = _mm_or_si128(a2p, a2m);
+    const __m128i diff3 = _mm_or_si128(a3p, a3m);
+
+    // unpack (only four operations, instead of eight)
+    const __m128i low0 = _mm_unpacklo_epi8(diff0, zero);
+    const __m128i low1 = _mm_unpacklo_epi8(diff1, zero);
+    const __m128i low2 = _mm_unpacklo_epi8(diff2, zero);
+    const __m128i low3 = _mm_unpacklo_epi8(diff3, zero);
+
+    // multiply with self
+    const __m128i low_madd0 = _mm_madd_epi16(low0, low0);
+    const __m128i low_madd1 = _mm_madd_epi16(low1, low1);
+    const __m128i low_madd2 = _mm_madd_epi16(low2, low2);
+    const __m128i low_madd3 = _mm_madd_epi16(low3, low3);
+
+    // collect in a cascading way
+    const __m128i low_sum0 = _mm_add_epi32(low_madd0, low_madd1);
+    const __m128i low_sum1 = _mm_add_epi32(low_madd2, low_madd3);
+    sum1 = _mm_add_epi32(sum1, low_sum0);
+    sum2 = _mm_add_epi32(sum2, low_sum1);
+
+    if (do_16) {  // if necessary, process the higher 8 bytes similarly
+      const __m128i hi0 = _mm_unpackhi_epi8(diff0, zero);
+      const __m128i hi1 = _mm_unpackhi_epi8(diff1, zero);
+      const __m128i hi2 = _mm_unpackhi_epi8(diff2, zero);
+      const __m128i hi3 = _mm_unpackhi_epi8(diff3, zero);
+
+      const __m128i hi_madd0 = _mm_madd_epi16(hi0, hi0);
+      const __m128i hi_madd1 = _mm_madd_epi16(hi1, hi1);
+      const __m128i hi_madd2 = _mm_madd_epi16(hi2, hi2);
+      const __m128i hi_madd3 = _mm_madd_epi16(hi3, hi3);
+      const __m128i hi_sum0 = _mm_add_epi32(hi_madd0, hi_madd1);
+      const __m128i hi_sum1 = _mm_add_epi32(hi_madd2, hi_madd3);
+      sum1 = _mm_add_epi32(sum1, hi_sum0);
+      sum2 = _mm_add_epi32(sum2, hi_sum1);
+    }
+    a += 4 * BPS;
+    b += 4 * BPS;
+  }
+  {
+    int32_t tmp[4];
+    const __m128i sum = _mm_add_epi32(sum1, sum2);
+    _mm_storeu_si128((__m128i*)tmp, sum);
+    return (tmp[3] + tmp[2] + tmp[1] + tmp[0]);
+  }
+}
+
+static int SSE16x16SSE2(const uint8_t* a, const uint8_t* b) {
+  return SSE_Nx4SSE2(a, b, 4, 1);
+}
+
+static int SSE16x8SSE2(const uint8_t* a, const uint8_t* b) {
+  return SSE_Nx4SSE2(a, b, 2, 1);
+}
+
+static int SSE8x8SSE2(const uint8_t* a, const uint8_t* b) {
+  return SSE_Nx4SSE2(a, b, 2, 0);
+}
+
+static int SSE4x4SSE2(const uint8_t* a, const uint8_t* b) {
+  const __m128i zero = _mm_setzero_si128();
+
+  // Load values. Note that we read 8 pixels instead of 4,
+  // but the a/b buffers are over-allocated to that effect.
   const __m128i a0 = _mm_loadl_epi64((__m128i*)&a[BPS * 0]);
   const __m128i a1 = _mm_loadl_epi64((__m128i*)&a[BPS * 1]);
   const __m128i a2 = _mm_loadl_epi64((__m128i*)&a[BPS * 2]);
@@ -483,6 +574,7 @@ static int SSE4x4SSE2(const uint8_t* a, const uint8_t* b) {
   const __m128i sum0 = _mm_add_epi32(madd0, madd1);
   const __m128i sum1 = _mm_add_epi32(madd2, madd3);
   const __m128i sum2 = _mm_add_epi32(sum0, sum1);
+
   int32_t tmp[4];
   _mm_storeu_si128((__m128i*)tmp, sum2);
   return (tmp[3] + tmp[2] + tmp[1] + tmp[0]);
@@ -502,8 +594,6 @@ static int TTransformSSE2(const uint8_t* inA, const uint8_t* inB,
   int32_t sum[4];
   __m128i tmp_0, tmp_1, tmp_2, tmp_3;
   const __m128i zero = _mm_setzero_si128();
-  const __m128i one = _mm_set1_epi16(1);
-  const __m128i three = _mm_set1_epi16(3);
 
   // Load, combine and tranpose inputs.
   {
@@ -550,17 +640,14 @@ static int TTransformSSE2(const uint8_t* inA, const uint8_t* inB,
   // Horizontal pass and subsequent transpose.
   {
     // Calculate a and b (two 4x4 at once).
-    const __m128i a0 = _mm_slli_epi16(_mm_add_epi16(tmp_0, tmp_2), 2);
-    const __m128i a1 = _mm_slli_epi16(_mm_add_epi16(tmp_1, tmp_3), 2);
-    const __m128i a2 = _mm_slli_epi16(_mm_sub_epi16(tmp_1, tmp_3), 2);
-    const __m128i a3 = _mm_slli_epi16(_mm_sub_epi16(tmp_0, tmp_2), 2);
-    // b0_extra = (a0 != 0);
-    const __m128i b0_extra = _mm_andnot_si128(_mm_cmpeq_epi16 (a0, zero), one);
-    const __m128i b0_base = _mm_add_epi16(a0, a1);
+    const __m128i a0 = _mm_add_epi16(tmp_0, tmp_2);
+    const __m128i a1 = _mm_add_epi16(tmp_1, tmp_3);
+    const __m128i a2 = _mm_sub_epi16(tmp_1, tmp_3);
+    const __m128i a3 = _mm_sub_epi16(tmp_0, tmp_2);
+    const __m128i b0 = _mm_add_epi16(a0, a1);
     const __m128i b1 = _mm_add_epi16(a3, a2);
     const __m128i b2 = _mm_sub_epi16(a3, a2);
     const __m128i b3 = _mm_sub_epi16(a0, a1);
-    const __m128i b0 = _mm_add_epi16(b0_base, b0_extra);
     // a00 a01 a02 a03   b00 b01 b02 b03
     // a10 a11 a12 a13   b10 b11 b12 b13
     // a20 a21 a22 a23   b20 b21 b22 b23
@@ -635,19 +722,6 @@ static int TTransformSSE2(const uint8_t* inA, const uint8_t* inB,
       B_b2 = _mm_sub_epi16(B_b2, sign_B_b2);
     }
 
-    // b = abs(b) + 3
-    A_b0 = _mm_add_epi16(A_b0, three);
-    A_b2 = _mm_add_epi16(A_b2, three);
-    B_b0 = _mm_add_epi16(B_b0, three);
-    B_b2 = _mm_add_epi16(B_b2, three);
-
-    // abs((b + (b<0) + 3) >> 3) = (abs(b) + 3) >> 3
-    // b = (abs(b) + 3) >> 3
-    A_b0 = _mm_srai_epi16(A_b0, 3);
-    A_b2 = _mm_srai_epi16(A_b2, 3);
-    B_b0 = _mm_srai_epi16(B_b0, 3);
-    B_b2 = _mm_srai_epi16(B_b2, 3);
-
     // weighted sums
     A_b0 = _mm_madd_epi16(A_b0, w_0);
     A_b2 = _mm_madd_epi16(A_b2, w_8);
@@ -666,7 +740,7 @@ static int TTransformSSE2(const uint8_t* inA, const uint8_t* inB,
 static int Disto4x4SSE2(const uint8_t* const a, const uint8_t* const b,
                         const uint16_t* const w) {
   const int diff_sum = TTransformSSE2(a, b, w);
-  return (abs(diff_sum) + 8) >> 4;
+  return abs(diff_sum) >> 5;
 }
 
 static int Disto16x16SSE2(const uint8_t* const a, const uint8_t* const b,
@@ -681,7 +755,6 @@ static int Disto16x16SSE2(const uint8_t* const a, const uint8_t* const b,
   return D;
 }
 
-
 //------------------------------------------------------------------------------
 // Quantization
 //
@@ -690,8 +763,7 @@ static int Disto16x16SSE2(const uint8_t* const a, const uint8_t* const b,
 static int QuantizeBlockSSE2(int16_t in[16], int16_t out[16],
                              int n, const VP8Matrix* const mtx) {
   const __m128i max_coeff_2047 = _mm_set1_epi16(2047);
-  const __m128i zero = _mm_set1_epi16(0);
-  __m128i sign0, sign8;
+  const __m128i zero = _mm_setzero_si128();
   __m128i coeff0, coeff8;
   __m128i out0, out8;
   __m128i packed_out;
@@ -713,8 +785,8 @@ static int QuantizeBlockSSE2(int16_t in[16], int16_t out[16],
   const __m128i zthresh8 = _mm_loadu_si128((__m128i*)&mtx->zthresh_[8]);
 
   // sign(in) = in >> 15  (0x0000 if positive, 0xffff if negative)
-  sign0 = _mm_srai_epi16(in0, 15);
-  sign8 = _mm_srai_epi16(in8, 15);
+  const __m128i sign0 = _mm_srai_epi16(in0, 15);
+  const __m128i sign8 = _mm_srai_epi16(in8, 15);
 
   // coeff = abs(in) = (in ^ sign) - sign
   coeff0 = _mm_xor_si128(in0, sign0);
@@ -832,6 +904,9 @@ void VP8EncDspInitSSE2(void) {
   VP8EncQuantizeBlock = QuantizeBlockSSE2;
   VP8ITransform = ITransformSSE2;
   VP8FTransform = FTransformSSE2;
+  VP8SSE16x16 = SSE16x16SSE2;
+  VP8SSE16x8 = SSE16x8SSE2;
+  VP8SSE8x8 = SSE8x8SSE2;
   VP8SSE4x4 = SSE4x4SSE2;
   VP8TDisto4x4 = Disto4x4SSE2;
   VP8TDisto16x16 = Disto16x16SSE2;
