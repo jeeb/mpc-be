@@ -486,7 +486,7 @@ void CPlayerSeekBar::OnPaint()
 			if (!s.bStatusBarIsVisible) {
 				CString strT = s.strTimeOnSeekBar;
 				CRect rT = rc;
-				rT.left  = rc.right - 140;
+				rT.left  = rc.right - (strT.GetLength() < 20 ? 140 : 150);
 				rT.right = rc.right - 6;
 				ThemeRGB(200, 205, 210, R, G, B);
 				memdc.SetTextColor(RGB(R,G,B));
