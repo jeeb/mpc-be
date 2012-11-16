@@ -8766,7 +8766,7 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 		ReloadSubtitle();
 	} else if (i == -3) {
 
-		OnNavMixStreamSubtitleSelectSubMenu(-2, 2);
+		OnNavMixStreamSubtitleSelectSubMenu(-1, 2);
 
 	} else if (i == -2) {
 		// override default style
@@ -8796,7 +8796,7 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 void CMainFrame::OnUpdateNavMixSubtitles(CCmdUI* pCmdUI)
 {
 	UINT nID = pCmdUI->m_nID;
-	int i = (int)nID - (2 + ID_NAVIGATE_SUBP_SUBITEM_START);
+	int i = (int)nID - (1 + ID_NAVIGATE_SUBP_SUBITEM_START);
 
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
 
@@ -8808,10 +8808,8 @@ void CMainFrame::OnUpdateNavMixSubtitles(CCmdUI* pCmdUI)
 					bool fHideSubtitles = false;
 					pDVS->get_HideSubtitles(&fHideSubtitles);
 					pCmdUI->Enable();
-					if (i == -2) {
+					if (i == -1) {
 						pCmdUI->SetCheck(!fHideSubtitles);
-					} else if (i == -1) {
-						pCmdUI->Enable(!fHideSubtitles);
 					} else {
 						pCmdUI->Enable(!fHideSubtitles);
 					}
@@ -8823,10 +8821,8 @@ void CMainFrame::OnUpdateNavMixSubtitles(CCmdUI* pCmdUI)
 
 		pCmdUI->Enable(m_pCAP && !m_fAudioOnly);
 
-		if (i == -2) {	// enabled
+		if (i == -1) {	// enabled
 			pCmdUI->SetCheck(AfxGetAppSettings().fEnableSubtitles);
-		} else if (i == -1) { // load subtitle...
-			pCmdUI->Enable(AfxGetAppSettings().fEnableSubtitles);
 		} else if (i >= 0) {
 			pCmdUI->Enable(AfxGetAppSettings().fEnableSubtitles);
 		}
@@ -9546,7 +9542,7 @@ void CMainFrame::OnNavigateAudioMix(UINT nID)
 void CMainFrame::OnNavigateSubpic(UINT nID)
 {
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
-		OnNavMixStreamSubtitleSelectSubMenu(nID - (ID_NAVIGATE_SUBP_SUBITEM_START+2), 2);
+		OnNavMixStreamSubtitleSelectSubMenu(nID - (ID_NAVIGATE_SUBP_SUBITEM_START+1), 2);
 	} else if (GetPlaybackMode() == PM_DVD) {
 		int i = (int)nID - (1 + ID_NAVIGATE_SUBP_SUBITEM_START);
 
@@ -9648,7 +9644,7 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 	}
 
 
-	if (i == -2) {
+	if (i == -1) {
 		AfxGetAppSettings().fEnableSubtitles = !AfxGetAppSettings().fEnableSubtitles;
 		// enable
 
@@ -9659,8 +9655,6 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 		}
 
 		UpdateSubtitle();
-	} else if (i == -1) {
-		OnFileLoadsubtitle();
 	} else if (i >= 0) {
 		int m = splsubcnt - (splsubcnt > 0 ? 1 : 0);
 		m = i - m;
@@ -14594,7 +14588,6 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 		POSITION pos = m_pSubStreams.GetHeadPosition();
 
 		pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|(pos ? MF_ENABLED : MF_DISABLED), id++, ResStr(IDS_SUBTITLES_ENABLE));
-		pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|(pos ? MF_ENABLED : MF_DISABLED), id++, ResStr(IDS_AG_LOAD_SUBTITLE));
 		pSub->AppendMenu(MF_SEPARATOR);
 
 		bool sep = false;
