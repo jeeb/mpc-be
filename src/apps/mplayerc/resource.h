@@ -1550,6 +1550,8 @@
 #define ID_NAVIGATE_SUBTITLES           43002
 #define ID_NAVIGATE_AUDIO               43003
 #define IDS_AG_STEP                     43004
+#define ID_FILE_LOAD_AUDIO              43005
+#define IDS_AG_LOAD_AUDIO               43006
 
 #define IDS_VDF_DEINTERLACING           43100
 #define IDS_VDF_DEINTER_AUTO            43101

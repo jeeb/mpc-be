@@ -740,6 +740,7 @@ public:
 	afx_msg void OnUpdateFileLoadsubtitle(CCmdUI* pCmdUI);
 	afx_msg void OnFileSavesubtitle();
 	afx_msg void OnUpdateFileSavesubtitle(CCmdUI* pCmdUI);
+	afx_msg void OnFileLoadaudio();
 	afx_msg void OnFileISDBSearch();
 	afx_msg void OnUpdateFileISDBSearch(CCmdUI* pCmdUI);
 	afx_msg void OnFileISDBUpload();
@@ -924,6 +925,7 @@ public:
 	afx_msg void OnPlayAudioOption(UINT nID);
 
 	afx_msg void OnUpdatePlayAudio(CCmdUI* pCmdUI);
+	afx_msg void OnUpdatePlayAudioOption(CCmdUI* pCmdUI);
 	afx_msg void OnPlaySubtitles(UINT nID);
 	afx_msg void OnUpdatePlaySubtitles(CCmdUI* pCmdUI);
 

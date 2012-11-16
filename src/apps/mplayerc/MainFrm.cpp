@@ -270,6 +270,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_FILE_LOAD_SUBTITLE, OnUpdateFileLoadsubtitle)
 	ON_COMMAND(ID_FILE_SAVE_SUBTITLE, OnFileSavesubtitle)
 	ON_UPDATE_COMMAND_UI(ID_FILE_SAVE_SUBTITLE, OnUpdateFileSavesubtitle)
+	ON_COMMAND(ID_FILE_LOAD_AUDIO, OnFileLoadaudio)
 	ON_COMMAND(ID_FILE_ISDB_SEARCH, OnFileISDBSearch)
 	ON_UPDATE_COMMAND_UI(ID_FILE_ISDB_SEARCH, OnUpdateFileISDBSearch)
 	ON_COMMAND(ID_FILE_ISDB_UPLOAD, OnFileISDBUpload)
@@ -475,7 +476,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND_RANGE(ID_SHADERS_START, ID_SHADERS_END, OnPlayShaders)
 	ON_COMMAND_RANGE(ID_AUDIO_SUBITEM_START, ID_AUDIO_SUBITEM_END, OnPlayAudioOption)
 	ON_COMMAND_RANGE(ID_AUDIO_SUBITEM_START, ID_AUDIO_SUBITEM_END, OnPlayAudio)
-
+	ON_UPDATE_COMMAND_UI_RANGE(ID_AUDIO_SUBITEM_START, ID_AUDIO_SUBITEM_END, OnUpdatePlayAudioOption)
 	ON_COMMAND(ID_MENU_NAVIGATE_AUDIO, OnMenuNavAudio)
 	ON_COMMAND(ID_MENU_NAVIGATE_SUBTITLES, OnMenuNavSubtitle)
 	ON_COMMAND(ID_MENU_NAVIGATE_JUMPTO, OnMenuNavJumpTo)
@@ -6047,6 +6048,43 @@ void CMainFrame::OnUpdateFileLoadsubtitle(CCmdUI *pCmdUI)
 	pCmdUI->Enable(m_iMediaLoadState == MLS_LOADED && /*m_pCAP &&*/ !m_fAudioOnly);
 }
 
+void CMainFrame::OnFileLoadaudio()
+{
+	if (m_iMediaLoadState == MLS_LOADING || !IsWindow(m_wndPlaylistBar) || m_pFullscreenWnd->IsWindow()) {
+		return;
+	}
+
+	AppSettings& s = AfxGetAppSettings();
+	CAtlList<CString> m_fns;
+	m_fns.RemoveAll();
+	CRecentFileList& MRU = AfxGetAppSettings().MRU;
+	MRU.ReadList();
+	m_fns.AddTail(MRU[0].GetString());
+
+	CString filter;
+	CAtlArray<CString> mask;
+	s.m_Formats.GetAudioFilter(filter, mask);
+
+	CFileDialog fd(TRUE, NULL, NULL,
+				   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY|OFN_NOCHANGEDIR,
+				   filter, GetModalParent(), 0);
+
+	if (fd.DoModal() != IDOK) {
+		return;
+	}
+
+	SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+	
+	ShowWindow(SW_SHOW);
+	SetForegroundWindow();
+
+	CString str = fd.GetFolderPath() + _T("\\") + fd.GetFileName();
+	m_fns.AddTail(str);
+	m_wndPlaylistBar.Open(m_fns, FALSE);
+
+	OpenCurPlaylistItem();
+}
+
 void CMainFrame::OnFileSavesubtitle()
 {
 	int i = m_iSubtitleSel;
@@ -8607,9 +8645,23 @@ void CMainFrame::OnPlayAudio(UINT nID)
 
 void CMainFrame::OnPlayAudioOption(UINT nID)
 {
-	int i = (int)nID - (ID_AUDIO_SUBITEM_START);
-	if (i == 0) {
-		ShowOptions(CPPageAudioSwitcher::IDD);
+	int i = (int)nID - (1 + ID_AUDIO_SUBITEM_START);
+	if (i == -1) {
+ 		ShowOptions(CPPageAudioSwitcher::IDD);
+	} else if (i == 0) {
+		OnFileLoadaudio();
+ 	}
+}
+
+void CMainFrame::OnUpdatePlayAudioOption(CCmdUI* pCmdUI)
+{
+	UINT nID = pCmdUI->m_nID;
+	int i = (int)nID - (1 + ID_AUDIO_SUBITEM_START);
+	
+	if (i == -1) {
+		pCmdUI->Enable(TRUE);
+	} else if (i == 0) {
+		pCmdUI->Enable(GetPlaybackMode() == PM_FILE && !m_fAudioOnly);
 	}
 }
 
@@ -8647,11 +8699,13 @@ void CMainFrame::OnUpdatePlayAudio(CCmdUI* pCmdUI)
 
 void CMainFrame::OnPlaySubtitles(UINT nID)
 {
-	int i = (int)nID - (6 + ID_SUBTITLES_SUBITEM_START); // currently the subtitles submenu contains 5 items, apart from the actual subtitles list
+	int i = (int)nID - (7 + ID_SUBTITLES_SUBITEM_START); // currently the subtitles submenu contains 5 items, apart from the actual subtitles list
 
-	if (i == -6) {
+	if (i == -7) {
 		// options
 		ShowOptions(CPPageSubtitles::IDD);
+	} else if (i == -6) {
+		OnFileLoadsubtitle();
 	} else if (i == -5) {
 		// styles
 		int i = m_iSubtitleSel;
@@ -8712,7 +8766,7 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 		ReloadSubtitle();
 	} else if (i == -3) {
 
-		OnNavMixStreamSubtitleSelectSubMenu(-1, 2);
+		OnNavMixStreamSubtitleSelectSubMenu(-2, 2);
 
 	} else if (i == -2) {
 		// override default style
@@ -8742,7 +8796,7 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 void CMainFrame::OnUpdateNavMixSubtitles(CCmdUI* pCmdUI)
 {
 	UINT nID = pCmdUI->m_nID;
-	int i = (int)nID - (1 + ID_NAVIGATE_SUBP_SUBITEM_START);
+	int i = (int)nID - (2 + ID_NAVIGATE_SUBP_SUBITEM_START);
 
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
 
@@ -8754,8 +8808,10 @@ void CMainFrame::OnUpdateNavMixSubtitles(CCmdUI* pCmdUI)
 					bool fHideSubtitles = false;
 					pDVS->get_HideSubtitles(&fHideSubtitles);
 					pCmdUI->Enable();
-					if (i == -1) {
+					if (i == -2) {
 						pCmdUI->SetCheck(!fHideSubtitles);
+					} else if (i == -1) {
+						pCmdUI->Enable(!fHideSubtitles);
 					} else {
 						pCmdUI->Enable(!fHideSubtitles);
 					}
@@ -8767,8 +8823,10 @@ void CMainFrame::OnUpdateNavMixSubtitles(CCmdUI* pCmdUI)
 
 		pCmdUI->Enable(m_pCAP && !m_fAudioOnly);
 
-		if (i == -1) {	// enabled
+		if (i == -2) {	// enabled
 			pCmdUI->SetCheck(AfxGetAppSettings().fEnableSubtitles);
+		} else if (i == -1) { // load subtitle...
+			pCmdUI->Enable(AfxGetAppSettings().fEnableSubtitles);
 		} else if (i >= 0) {
 			pCmdUI->Enable(AfxGetAppSettings().fEnableSubtitles);
 		}
@@ -8778,12 +8836,14 @@ void CMainFrame::OnUpdateNavMixSubtitles(CCmdUI* pCmdUI)
 void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 {
 	UINT nID = pCmdUI->m_nID;
-	int i = (int)nID - (6 + ID_SUBTITLES_SUBITEM_START); // again, 5 pre-set subtitles options before the actual list
+	int i = (int)nID - (7 + ID_SUBTITLES_SUBITEM_START); // again, 5 pre-set subtitles options before the actual list
 
 	pCmdUI->Enable(m_pCAP && !m_fAudioOnly);
 	
-	if (i == -6) {
+	if (i == -7) {
 		pCmdUI->Enable(TRUE);
+	} else if (i == -6) {
+		pCmdUI->Enable(GetPlaybackMode() == PM_FILE && AfxGetAppSettings().fEnableSubtitles);
 	} else if (i == -5) {
 		// styles
 		pCmdUI->Enable(FALSE);
@@ -9486,7 +9546,7 @@ void CMainFrame::OnNavigateAudioMix(UINT nID)
 void CMainFrame::OnNavigateSubpic(UINT nID)
 {
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
-		OnNavMixStreamSubtitleSelectSubMenu(nID - (ID_NAVIGATE_SUBP_SUBITEM_START+1), 2);
+		OnNavMixStreamSubtitleSelectSubMenu(nID - (ID_NAVIGATE_SUBP_SUBITEM_START+2), 2);
 	} else if (GetPlaybackMode() == PM_DVD) {
 		int i = (int)nID - (1 + ID_NAVIGATE_SUBP_SUBITEM_START);
 
@@ -9514,7 +9574,7 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 	if (GetPlaybackMode() == PM_FILE && b_UseVSFilter) {
 		CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
 		if (pDVS) {
-			if (i == -1) {
+			if (i == -2) {
 				bool fHideSubtitles = false;
 				pDVS->get_HideSubtitles(&fHideSubtitles);
 				fHideSubtitles = !fHideSubtitles;
@@ -9588,7 +9648,7 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 	}
 
 
-	if (i == -1) {
+	if (i == -2) {
 		AfxGetAppSettings().fEnableSubtitles = !AfxGetAppSettings().fEnableSubtitles;
 		// enable
 
@@ -9599,7 +9659,8 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 		}
 
 		UpdateSubtitle();
-	
+	} else if (i == -1) {
+		OnFileLoadsubtitle();
 	} else if (i >= 0) {
 		int m = splsubcnt - (splsubcnt > 0 ? 1 : 0);
 		m = i - m;
@@ -14362,7 +14423,8 @@ void CMainFrame::SetupAudioOptionSubMenu()
 			;
 		}
 	UINT id = ID_AUDIO_SUBITEM_START;
-	pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id, ResStr(IDS_SUBTITLES_OPTIONS));
+	pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_SUBTITLES_OPTIONS));
+	pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_AG_LOAD_AUDIO));
 }
 
 void CMainFrame::SetupSubtitlesSubMenu()
@@ -14378,6 +14440,7 @@ void CMainFrame::SetupSubtitlesSubMenu()
 	UINT id = ID_SUBTITLES_SUBITEM_START;
 
 	pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_SUBTITLES_OPTIONS));
+	pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_AG_LOAD_SUBTITLE));
 	pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_SUBTITLES_STYLES));
 	pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, ResStr(IDS_SUBTITLES_RELOAD));
 	pSub->AppendMenu(MF_SEPARATOR);
@@ -14531,6 +14594,7 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 		POSITION pos = m_pSubStreams.GetHeadPosition();
 
 		pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|(pos ? MF_ENABLED : MF_DISABLED), id++, ResStr(IDS_SUBTITLES_ENABLE));
+		pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|(pos ? MF_ENABLED : MF_DISABLED), id++, ResStr(IDS_AG_LOAD_SUBTITLE));
 		pSub->AppendMenu(MF_SEPARATOR);
 
 		bool sep = false;
