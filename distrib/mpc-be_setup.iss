@@ -418,7 +418,7 @@ end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
 var
-  iLanguage: Integer;
+  sLanguage: String;
 begin
   if CurStep = ssPostInstall then begin
   
@@ -428,13 +428,13 @@ begin
     if IsTaskSelected('reset_settings') then
       CleanUpSettingsAndFiles();
 
-    iLanguage := StrToInt(ExpandConstant('{cm:langid}'));
+    sLanguage := ExpandConstant('{cm:langcode}');
     RegWriteStringValue(HKLM, 'SOFTWARE\MPC-BE', 'ExePath', ExpandConstant('{app}\{#mpcbe_exe}'));
 
     if IsComponentSelected('mpcresources') and FileExists(ExpandConstant('{app}\{#mpcbe_ini}')) then
-      SetIniInt('Settings', 'InterfaceLanguage', iLanguage, ExpandConstant('{app}\{#mpcbe_ini}'))
+      SetIniString('Settings', 'Language', sLanguage, ExpandConstant('{app}\{#mpcbe_ini}'))
     else
-      RegWriteDWordValue(HKCU, 'Software\MPC-BE\Settings', 'InterfaceLanguage', iLanguage);
+      RegWriteStringValue(HKCU, 'Software\MPC-BE\Settings', 'Language', sLanguage);
   end;
 
   if (CurStep = ssDone) and not WizardSilent() and not D3DX9DLLExists() then

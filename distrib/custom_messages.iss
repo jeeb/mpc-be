@@ -138,6 +138,7 @@ ua.WinVersionTooLowError=[name] вимагає використання ОС Win
 
 ;English
 en.langid=00000000
+en.langcode=en
 en.comp_mpciconlib=Icon Library
 en.comp_mpcresources=Translations
 en.comp_mpcbeshellext=Install the shell extension
@@ -177,6 +178,7 @@ en.PinToTaskBar=Pin to TaskBar
 
 ;Portuguese (Brasil)
 br.langid=00001046
+br.langcode=br
 br.comp_mpciconlib=Biblioteca de ícones
 br.comp_mpcresources=Traduções
 br.comp_mpcbeshellext=Install the shell extension
@@ -214,6 +216,7 @@ br.PinToTaskBar=Pin to TaskBar
 
 ;Belarusian
 by.langid=00001059
+by.langcode=by
 by.comp_mpciconlib=Бібліятэка значкоў
 by.comp_mpcresources=Пераклады
 by.comp_mpcbeshellext=Install the shell extension
@@ -251,6 +254,7 @@ by.PinToTaskBar=Pin to TaskBar
 
 ;Basque
 eu.langid=00001069
+eu.langcode=eu
 eu.comp_mpciconlib=Ikur Liburutegia
 eu.comp_mpcresources=Itzulpenak
 eu.msg_DeleteSettings=MPC-BE ezarpenak kentzea ere nahi dituzu?%n%nMPC-BE berriro ezartzeko asmoa baduzu ez dituzu ezabatu behar.
@@ -287,6 +291,7 @@ eu.PinToTaskBar=Pin to TaskBar
 
 ;Catalan
 ca.langid=00001027
+ca.langcode=ca
 ca.comp_mpciconlib=Llibreria d'icones
 ca.comp_mpcresources=Traduccions
 ca.comp_mpcbeshellext=Install the shell extension
@@ -324,6 +329,7 @@ ca.PinToTaskBar=Pin to TaskBar
 
 ;Czech
 cz.langid=00001029
+cz.langcode=cz
 cz.comp_mpciconlib=Ikony typů souborů
 cz.comp_mpcresources=Jazykové soubory
 cz.comp_mpcbeshellext=Install the shell extension
@@ -361,6 +367,7 @@ cz.PinToTaskBar=Pin to TaskBar
 
 ;German
 de.langid=00000002
+de.langcode=de
 de.comp_mpciconlib=Symbole für Mediendateien
 de.comp_mpcresources=Übersetzungen
 de.comp_mpcbeshellext=Install the shell extension
@@ -398,6 +405,7 @@ de.PinToTaskBar=Pin to TaskBar
 
 ;Greek
 el.langid=00001032
+el.langcode=el
 el.comp_mpciconlib=Βιβλιοθήκη Εικονιδίων
 el.comp_mpcresources=Μεταφράσεις
 el.comp_mpcbeshellext=Install the shell extension
@@ -435,6 +443,7 @@ el.PinToTaskBar=Pin to TaskBar
 
 ;Spanish
 es.langid=00001034
+es.langcode=es
 es.comp_mpciconlib=Librería de iconos
 es.comp_mpcresources=Traducciones
 es.comp_mpcbeshellext=Install the shell extension
@@ -472,6 +481,7 @@ es.PinToTaskBar=Pin to TaskBar
 
 ;French
 fr.langid=00001036
+fr.langcode=fr
 fr.comp_mpciconlib=Bibliothèque d'icône
 fr.comp_mpcresources=Traductions
 fr.comp_mpcbeshellext=Install the shell extension
@@ -509,6 +519,7 @@ fr.PinToTaskBar=Pin to TaskBar
 
 ;Hebrew
 he.langid=00001037
+he.langcode=he
 he.comp_mpciconlib=ספריית אייקונים
 he.comp_mpcresources=תרגומים
 he.comp_mpcbeshellext=Install the shell extension
@@ -546,6 +557,7 @@ he.PinToTaskBar=Pin to TaskBar
 
 ;Hungarian
 hu.langid=00001038
+hu.langcode=hu
 hu.comp_mpciconlib=Ikon Gyűjtemény
 hu.comp_mpcresources=Fordítások
 hu.comp_mpcbeshellext=Install the shell extension
@@ -583,6 +595,7 @@ hu.PinToTaskBar=Pin to TaskBar
 
 ;Armenian
 hy.langid=00001067
+hy.langcode=hy
 hy.comp_mpciconlib=Պատկերների գրադարան
 hy.comp_mpcresources=Թարգմանություններ
 hy.comp_mpcbeshellext=Install the shell extension
@@ -620,6 +633,7 @@ hy.PinToTaskBar=Pin to TaskBar
 
 ;Italian
 it.langid=00001040
+it.langcode=it
 it.comp_mpciconlib=Libreria icone
 it.comp_mpcresources=Traduzioni
 it.comp_mpcbeshellext=Install the shell extension
@@ -652,6 +666,7 @@ it.PinToTaskBar=Pin to TaskBar
 
 ;Japanese
 ja.langid=00001041
+ja.langcode=ja
 ja.comp_mpciconlib=アイコン ライブラリー
 ja.comp_mpcresources=翻訳
 ja.comp_mpcbeshellext=Install the shell extension
@@ -689,6 +704,7 @@ ja.PinToTaskBar=Pin to TaskBar
 
 ;Korean
 kr.langid=00001042
+kr.langcode=kr
 kr.comp_mpciconlib=아이콘 라이브러리
 kr.comp_mpcresources=번역
 kr.comp_mpcbeshellext=쉘확장 설치
@@ -726,6 +742,7 @@ kr.PinToTaskBar=Pin to TaskBar
 
 ;Dutch
 nl.langid=00001043
+nl.langcode=nl
 nl.comp_mpciconlib=Iconen voor mediabestanden
 nl.comp_mpcresources=Localisaties
 nl.comp_mpcbeshellext=Install the shell extension
@@ -763,6 +780,7 @@ nl.PinToTaskBar=Pin to TaskBar
 
 ;Polish
 pl.langid=00001045
+pl.langcode=pl
 pl.comp_mpciconlib=Ikony plików multimedialnych
 pl.comp_mpcresources=Tłumaczenia
 pl.comp_mpcbeshellext=Install the shell extension
@@ -800,6 +818,7 @@ pl.PinToTaskBar=Pin to TaskBar
 
 ;Russian
 ru.langid=00001049
+ru.langcode=ru
 ru.comp_mpciconlib=Библиотека значков
 ru.comp_mpcresources=Локализации
 ru.comp_mpcbeshellext=Установить расширение оболочки
@@ -837,6 +856,7 @@ ru.PinToTaskBar=Закрепить в панели задач
 
 ;Chinese Simplified
 sc.langid=00002052
+sc.langcode=sc
 sc.comp_mpciconlib=图标库
 sc.comp_mpcresources=翻译
 sc.comp_mpcbeshellext=Install the shell extension
@@ -874,6 +894,7 @@ sc.PinToTaskBar=Pin to TaskBar
 
 ;Swedish
 sv.langid=00001051
+sv.langcode=sv
 sv.comp_mpciconlib=Ikonbibliotek
 sv.comp_mpcbeshellext=Install the shell extension
 sv.comp_mpcresources=Översättningar
@@ -911,6 +932,7 @@ sv.PinToTaskBar=Pin to TaskBar
 
 ;Slovakian
 sk.langid=00001053
+sk.langcode=sk
 sk.comp_mpciconlib=Knižnica ikon
 sk.comp_mpcresources=Preklady
 sk.comp_mpcbeshellext=Install the shell extension
@@ -948,6 +970,7 @@ sk.PinToTaskBar=Pin to TaskBar
 
 ;Chinese Traditional
 tc.langid=00003076
+tc.langcode=tc
 tc.comp_mpciconlib=圖示庫
 tc.comp_mpcresources=翻譯
 tc.comp_mpcbeshellext=Install the shell extension
@@ -985,6 +1008,7 @@ tc.PinToTaskBar=Pin to TaskBar
 
 ;Turkish
 tr.langid=00001055
+tr.langcode=tr
 tr.comp_mpciconlib=Simge Kütüphanesi
 tr.comp_mpcresources=Çeviriler
 tr.comp_mpcbeshellext=Install the shell extension
@@ -1022,6 +1046,7 @@ tr.PinToTaskBar=Pin to TaskBar
 
 ;Ukrainian
 ua.langid=00001058
+ua.langcode=ua
 ua.comp_mpciconlib=Бібліотека іконок
 ua.comp_mpcresources=Локалізації
 ua.comp_mpcbeshellext=Install the shell extension
