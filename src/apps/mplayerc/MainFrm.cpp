@@ -10232,6 +10232,13 @@ void CMainFrame::OnRecentFileClear()
 	s.MRU.WriteList();
 	s.MRUDub.WriteList();
 
+	// Empty the "Recent" jump list
+	CComPtr<IApplicationDestinations> pDests;
+	HRESULT hr = pDests.CoCreateInstance(CLSID_ApplicationDestinations, NULL, CLSCTX_INPROC_SERVER);
+	if (SUCCEEDED(hr)) {
+		hr = pDests->RemoveAllDestinations();
+	}
+
 	s.ClearFilePositions();
 	s.ClearDVDPositions();
 }
