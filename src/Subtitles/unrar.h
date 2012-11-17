@@ -64,78 +64,78 @@
 
 struct RARHeaderData
 {
-  char         ArcName[260];
-  char         FileName[260];
-  unsigned int Flags;
-  unsigned int PackSize;
-  unsigned int UnpSize;
-  unsigned int HostOS;
-  unsigned int FileCRC;
-  unsigned int FileTime;
-  unsigned int UnpVer;
-  unsigned int Method;
-  unsigned int FileAttr;
-  char         *CmtBuf;
-  unsigned int CmtBufSize;
-  unsigned int CmtSize;
-  unsigned int CmtState;
+	char         ArcName[260];
+	char         FileName[260];
+	unsigned int Flags;
+	unsigned int PackSize;
+	unsigned int UnpSize;
+	unsigned int HostOS;
+	unsigned int FileCRC;
+	unsigned int FileTime;
+	unsigned int UnpVer;
+	unsigned int Method;
+	unsigned int FileAttr;
+	char         *CmtBuf;
+	unsigned int CmtBufSize;
+	unsigned int CmtSize;
+	unsigned int CmtState;
 };
 
 struct RARHeaderDataEx
 {
-  char         ArcName[1024];
-  wchar_t      ArcNameW[1024];
-  char         FileName[1024];
-  wchar_t      FileNameW[1024];
-  unsigned int Flags;
-  unsigned int PackSize;
-  unsigned int PackSizeHigh;
-  unsigned int UnpSize;
-  unsigned int UnpSizeHigh;
-  unsigned int HostOS;
-  unsigned int FileCRC;
-  unsigned int FileTime;
-  unsigned int UnpVer;
-  unsigned int Method;
-  unsigned int FileAttr;
-  char         *CmtBuf;
-  unsigned int CmtBufSize;
-  unsigned int CmtSize;
-  unsigned int CmtState;
-  unsigned int Reserved[1024];
+	char         ArcName[1024];
+	wchar_t      ArcNameW[1024];
+	char         FileName[1024];
+	wchar_t      FileNameW[1024];
+	unsigned int Flags;
+	unsigned int PackSize;
+	unsigned int PackSizeHigh;
+	unsigned int UnpSize;
+	unsigned int UnpSizeHigh;
+	unsigned int HostOS;
+	unsigned int FileCRC;
+	unsigned int FileTime;
+	unsigned int UnpVer;
+	unsigned int Method;
+	unsigned int FileAttr;
+	char         *CmtBuf;
+	unsigned int CmtBufSize;
+	unsigned int CmtSize;
+	unsigned int CmtState;
+	unsigned int Reserved[1024];
 };
 
 struct RAROpenArchiveData
 {
-  char         *ArcName;
-  unsigned int OpenMode;
-  unsigned int OpenResult;
-  char         *CmtBuf;
-  unsigned int CmtBufSize;
-  unsigned int CmtSize;
-  unsigned int CmtState;
+	char         *ArcName;
+	unsigned int OpenMode;
+	unsigned int OpenResult;
+	char         *CmtBuf;
+	unsigned int CmtBufSize;
+	unsigned int CmtSize;
+	unsigned int CmtState;
 };
 
 typedef int (CALLBACK *UNRARCALLBACK)(UINT msg,LPARAM UserData,LPARAM P1,LPARAM P2);
 
 struct RAROpenArchiveDataEx
 {
-  char         *ArcName;
-  wchar_t      *ArcNameW;
-  unsigned int  OpenMode;
-  unsigned int  OpenResult;
-  char         *CmtBuf;
-  unsigned int  CmtBufSize;
-  unsigned int  CmtSize;
-  unsigned int  CmtState;
-  unsigned int  Flags;
-  UNRARCALLBACK Callback;
-  LPARAM        UserData;
-  unsigned int  Reserved[28];
+	char         *ArcName;
+	wchar_t      *ArcNameW;
+	unsigned int  OpenMode;
+	unsigned int  OpenResult;
+	char         *CmtBuf;
+	unsigned int  CmtBufSize;
+	unsigned int  CmtSize;
+	unsigned int  CmtState;
+	unsigned int  Flags;
+	UNRARCALLBACK Callback;
+	LPARAM        UserData;
+	unsigned int  Reserved[28];
 };
 
 enum UNRARCALLBACK_MESSAGES {
-  UCM_CHANGEVOLUME,UCM_PROCESSDATA,UCM_NEEDPASSWORD
+	UCM_CHANGEVOLUME,UCM_PROCESSDATA,UCM_NEEDPASSWORD
 };
 
 typedef int (PASCAL *CHANGEVOLPROC)(char *ArcName,int Mode);

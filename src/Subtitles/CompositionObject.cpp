@@ -424,4 +424,3 @@ void CompositionObject::RenderXSUB(SubPicDesc& spd)
 		gb.BitByteAlign();
 	}
 }
-

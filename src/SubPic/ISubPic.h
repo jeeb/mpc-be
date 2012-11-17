@@ -26,7 +26,6 @@
 #include <atlbase.h>
 #include <atlcoll.h>
 #include "CoordGeom.h"
-
 #include "../DSUtil/DSUtil.h"
 
 // flag for display only forced subtitles (PGS/VOBSUB)

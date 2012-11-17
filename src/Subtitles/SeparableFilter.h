@@ -28,7 +28,6 @@
 #endif
 #include <math.h>
 
-
 // Filter an image in horizontal direction with a one-dimensional filter
 // PixelWidth is the distance in bytes between pixels
 template<ptrdiff_t PixelDist>
@@ -65,7 +64,6 @@ void SeparableFilterX(unsigned char *src, unsigned char *dst, int width, int hei
 		}
 	}
 }
-
 
 // Filter an image in vertical direction with a one-dimensional filter
 // This one templated with PixelWidth since the channel interlacing is horizontal only,
@@ -107,7 +105,6 @@ void SeparableFilterY(unsigned char *src, unsigned char *dst, int width, int hei
 	}
 }
 
-
 static inline double NormalDist(double sigma, double x)
 {
 	if (sigma <= 0 && x == 0) {
@@ -118,7 +115,6 @@ static inline double NormalDist(double sigma, double x)
 		return exp(-(x*x)/(2*sigma*sigma)) / (sigma * sqrt(2*3.1415926535));
 	}
 }
-
 
 struct GaussianKernel {
 	int *kernel;

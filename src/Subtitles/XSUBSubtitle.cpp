@@ -281,6 +281,7 @@ void CXSUBSubtitle::Reset()
 	}
 
 }
+
 void CXSUBSubtitle::CleanOld(REFERENCE_TIME rt)
 {
 	CompositionObject* pObject;

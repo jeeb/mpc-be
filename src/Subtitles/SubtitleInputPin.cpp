@@ -27,7 +27,6 @@
 #include "RTS.h"
 #include "RenderedHdmvSubtitle.h"
 #include "XSUBSubtitle.h"
-
 #include <InitGuid.h>
 #include <uuids.h>
 #include <moreuuids.h>
