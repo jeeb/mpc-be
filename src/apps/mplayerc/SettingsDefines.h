@@ -42,7 +42,7 @@
 #define IDS_RS_LASTFULLSCREEN				_T("LastFullScreen")
 #define IDS_RS_EVR_BUFFERS					_T("EVRBuffers")
 #define IDS_RS_SHOWOSD						_T("Show OSD")
-#define IDS_RS_LANGUAGE						_T("InterfaceLanguage")
+#define IDS_RS_LANGUAGE						_T("Language")
 #define IDS_RS_GLOBALMEDIA					_T("UseGlobalMedia")
 #define IDS_RS_DXVAFILTERS					_T("DXVAFilters")
 #define IDS_RS_FFMPEGFILTERS				_T("FFmpegFilters")

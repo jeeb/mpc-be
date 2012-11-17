@@ -591,8 +591,7 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SHOWOSD, (int)fShowOSD);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEEDLEDITOR, (int)fEnableEDLEditor);
 
-	int lang = CMPlayerCApp::languageResources[iLanguage].resourceID - ID_LANGUAGE_ENGLISH;
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LANGUAGE, lang);
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_LANGUAGE, CMPlayerCApp::languageResources[iLanguage].strcode);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_FASTSEEK_KEYFRAME, (int)fFastSeek);
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_LCD_SUPPORT, (int)fLCDSupport);
@@ -881,12 +880,12 @@ void CAppSettings::LoadSettings()
 	}
 
 	// Set interface language first!
-	UINT deflangset =  CMPlayerCApp::languageResources[CMPlayerCApp::GetDefLanguage()].resourceID - ID_LANGUAGE_ENGLISH;
-	UINT resID = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LANGUAGE, deflangset) + ID_LANGUAGE_ENGLISH;
-	iLanguage = CMPlayerCApp::GetLanguageIndex(resID);
-	if (resID != ID_LANGUAGE_ENGLISH) {
-		CMPlayerCApp::SetLanguage(iLanguage);
+	CString langcode = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LANGUAGE, _T(""));
+	iLanguage = CMPlayerCApp::GetLanguageIndex(langcode);
+	if (iLanguage < 0) {
+		iLanguage = CMPlayerCApp::GetDefLanguage();
 	}
+	CMPlayerCApp::SetLanguage(iLanguage);
 
 	CreateCommands();
 

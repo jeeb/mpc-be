@@ -51,7 +51,7 @@ const LanguageResource CMPlayerCApp::languageResources[] = {
 	{ID_LANGUAGE_CHINESE_TRADITIONAL,	3076,	_T("Chinese (Traditional)"),	_T("tc")},
 	{ID_LANGUAGE_CZECH,					1029,	_T("Czech"),					_T("cz")},
 	{ID_LANGUAGE_DUTCH,					1043,	_T("Dutch"),					_T("nl")},
-	{ID_LANGUAGE_ENGLISH,				0,		_T("English"),					NULL},
+	{ID_LANGUAGE_ENGLISH,				0,		_T("English"),					_T("en")},
 	{ID_LANGUAGE_FRENCH,				1036,	_T("French"),					_T("fr")},
 	{ID_LANGUAGE_GERMAN,				1031,	_T("German"),					_T("de")},
 	//{ID_LANGUAGE_GREEK,				1032,	_T("Greek"),					_T("el")},
@@ -2132,16 +2132,12 @@ CString CMPlayerCApp::GetSatelliteDll(int nLanguage)
 	path.ReleaseBuffer();
 	path = path.Left(path.ReverseFind('\\') + 1);
 
-	for (size_t i = 0; i < languageResourcesCount; i++) {
-		if (nLanguage == i) {
-			if (languageResources[i].dllPath == NULL) {
-				path = _T("");
-				break;
-			}
-			path.AppendFormat(_T("Lang\\mpcresources.%ws.dll"), languageResources[i].dllPath);
-			break;
-		}
+	if (nLanguage < 0 || nLanguage >= languageResourcesCount || languageResources[nLanguage].resourceID == ID_LANGUAGE_ENGLISH) {
+		path = _T("");
+	} else {
+		path.AppendFormat(_T("Lang\\mpcresources.%ws.dll"), languageResources[nLanguage].strcode);
 	}
+
 	return path;
 }
 
@@ -2155,11 +2151,22 @@ int CMPlayerCApp::GetLanguageIndex(UINT resID)
 	return -1;
 }
 
-int CMPlayerCApp::GetDefLanguage()
+int CMPlayerCApp::GetLanguageIndex(CString langcode)
 {
 	for (size_t i = 0; i < languageResourcesCount; i++) {
-		if (GetUserDefaultUILanguage() == languageResources[i].localeID) {
+		if (langcode == languageResources[i].strcode) {
 			return i;
+		}
+	}
+	return -1;
+}
+
+int CMPlayerCApp::GetDefLanguage()
+{
+	const LANGID userlangID = GetUserDefaultUILanguage();
+	for (size_t i = 0; i < languageResourcesCount; i++) {
+		if (userlangID == languageResources[i].localeID) {
+			return (int)i;
 		}
 	}
 	return GetLanguageIndex(ID_LANGUAGE_ENGLISH);

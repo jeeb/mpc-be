@@ -98,7 +98,7 @@ struct LanguageResource {
 	const UINT resourceID;
 	const LANGID localeID;
 	const LPCTSTR name;
-	const LPCTSTR dllPath;
+	const LPCTSTR strcode;
 };
 
 class CMPlayerCApp : public CWinApp
@@ -153,6 +153,7 @@ public:
 	static void					SetLanguage(int nLanguage);
 	static CString				GetSatelliteDll(int nLanguage);
 	static int					GetLanguageIndex(UINT resID);
+	static int					GetLanguageIndex(CString langcode);
 	static int					GetDefLanguage();
 
 	static bool					IsVSFilterInstalled();

@@ -14347,17 +14347,17 @@ void CMainFrame::SetupLanguageMenu()
 	if (!IsMenu(pSub->m_hMenu)) {
 		pSub->CreatePopupMenu();
 	} else while (pSub->RemoveMenu(0, MF_BYPOSITION)) {
-			;
-		}
+		;
+	}
 
 	for (size_t i = 0; i < CMPlayerCApp::languageResourcesCount; i++) {
 
 		const LanguageResource& lr	= CMPlayerCApp::languageResources[i];
 		CString strSatellite		= CMPlayerCApp::GetSatelliteDll(i);
 
-		if (!strSatellite.IsEmpty() || lr.dllPath == NULL) {
-			HMODULE lib = NULL;
-			if ((lib = LoadLibrary(strSatellite)) != NULL || lr.dllPath == NULL) {
+		if (!strSatellite.IsEmpty() || lr.resourceID == ID_LANGUAGE_ENGLISH) {
+			HMODULE lib = LoadLibrary(strSatellite);
+			if (lib != NULL || lr.resourceID == ID_LANGUAGE_ENGLISH) {
 				if (lib) {
 					FreeLibrary(lib);
 				}
