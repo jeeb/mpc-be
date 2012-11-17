@@ -3142,20 +3142,28 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 		}
 
 		bool fLeftMouseBtnUnassigned = !AssignedToCmd(wmcmd::LDOWN, m_fFullScreen);
-		if (!m_fFullScreen && !bFSWnd && !IsSomethingLoaded() && ((IsCaptionHidden() && (AfxGetAppSettings().nCS <= CS_SEEKBAR)) || fLeftMouseBtnUnassigned || ((GetTickCount()-m_nMenuHideTick)<100))) {
+		s_fLDown = true;
+
+		if (m_fFullScreen || bFSWnd) {
+			return;
+		}
+			
+		if (fLeftMouseBtnUnassigned
+				|| (!fLeftMouseBtnUnassigned && !(m_iMediaLoadState == MLS_LOADING || m_iMediaLoadState == MLS_LOADED))
+				|| ((IsCaptionHidden() && (AfxGetAppSettings().nCS <= CS_SEEKBAR)) ||  ((GetTickCount()-m_nMenuHideTick)<100))) {
+			
 			PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
+			return;
 		} else {
-			s_fLDown = true;
+			bLeftClicked = true;
+			bWindowDragged = false;
 
-			if (!bFSWnd && !m_fFullScreen) {
-				bLeftClicked = true;
-				bWindowDragged = false;
-
-				SetCapture();
-				GetWindowRect(m_RectWindow);
-				m_MouseInWindow = p - m_RectWindow.TopLeft();
-			}
-		}		
+			SetCapture();
+			GetWindowRect(m_RectWindow);
+			m_MouseInWindow = p - m_RectWindow.TopLeft();
+			return;
+		}
+	
 		__super::OnLButtonDown(nFlags, point);
 	}
 }
