@@ -50,16 +50,13 @@ bool CAC3Encoder::Init(int sample_rate, DWORD channel_layout)
 	StreamFinish();
 	int ret;
 
-	m_pAVCtx   = avcodec_alloc_context3(m_pAVCodec);
+	m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
 
-	m_pAVCtx->bit_rate = 640000;
-
-	m_pAVCtx->sample_fmt = AV_SAMPLE_FMT_FLTP;
-
-	m_pAVCtx->sample_rate = SelectSamplerate(sample_rate);
-
+	m_pAVCtx->bit_rate       = 640000;
+	m_pAVCtx->sample_fmt     = AV_SAMPLE_FMT_FLTP;
+	m_pAVCtx->sample_rate    = SelectSamplerate(sample_rate);
 	m_pAVCtx->channel_layout = channel_layout;
-	m_pAVCtx->channels = av_popcount(channel_layout);
+	m_pAVCtx->channels       = av_popcount(channel_layout);
 
 	ret = avcodec_open2(m_pAVCtx, m_pAVCodec, NULL);
 	if (ret < 0) {
@@ -78,7 +75,7 @@ bool CAC3Encoder::Init(int sample_rate, DWORD channel_layout)
 
 	// the codec gives us the frame size, in samples,
 	// we calculate the size of the samples buffer in bytes
-	m_framesize = m_pAVCtx->frame_size * m_pAVCtx->channels * sizeof(float);
+	m_framesize  = m_pAVCtx->frame_size * m_pAVCtx->channels * sizeof(float);
 	m_buffersize = av_samples_get_buffer_size(NULL, m_pAVCtx->channels, m_pAVCtx->frame_size, m_pAVCtx->sample_fmt, 0);
 	
 	m_pSamples = (float*)av_malloc(m_buffersize);
@@ -103,8 +100,8 @@ HRESULT CAC3Encoder::Encode(CAtlArray<float>& BuffIn, CAtlArray<BYTE>& BuffOut)
 		return E_ABORT;
 	}
 
-	float* pEnc = m_pSamples;
-	float* pIn = BuffIn.GetData();
+	float* pEnc  = m_pSamples;
+	float* pIn   = BuffIn.GetData();
 	int channels = m_pAVCtx->channels;
 	int samples  = m_pAVCtx->frame_size;
 
@@ -132,8 +129,8 @@ HRESULT CAC3Encoder::Encode(CAtlArray<float>& BuffIn, CAtlArray<BYTE>& BuffOut)
 		av_free_packet(&avpkt);
 	}
 
-	size_t old_size = BuffIn.GetCount() * sizeof(float);
-	size_t new_size = BuffIn.GetCount() * sizeof(float) - m_framesize;
+	size_t old_size  = BuffIn.GetCount() * sizeof(float);
+	size_t new_size  = BuffIn.GetCount() * sizeof(float) - m_framesize;
 	size_t new_count = new_size / sizeof(float);
 
 	memmove(pIn, (BYTE*)pIn + m_framesize, new_size);
@@ -171,6 +168,7 @@ void CAC3Encoder::StreamFinish()
 
 DWORD CAC3Encoder::SelectLayout(DWORD layout)
 {
+	// check supported layouts
 	if (m_pAVCodec && m_pAVCodec->channel_layouts) {
 		for (size_t i = 0; m_pAVCodec->channel_layouts[i] != 0; i++) {
 			if (layout == (DWORD)m_pAVCodec->channel_layouts[i]) {
@@ -179,6 +177,7 @@ DWORD CAC3Encoder::SelectLayout(DWORD layout)
 		}
 	}
 
+	// select the suitable format
 	int channels = av_popcount(layout & ~AV_CH_LOW_FREQUENCY); // number of channels without lfe
 	DWORD new_layout = layout & AV_CH_LOW_FREQUENCY;
 	if (channels >= 5) {

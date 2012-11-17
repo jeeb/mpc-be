@@ -23,7 +23,7 @@
 
 #pragma once
 
-#define ENABLE_AC3_ENCODER 0
+#define ENABLE_AC3_ENCODER 1
 
 #include <atlcoll.h>
 // TODO: remove this when it's fixed in MSVC
