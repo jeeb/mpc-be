@@ -230,6 +230,7 @@
     <ClCompile Include="..\..\..\ExtLib\mfc\winmdi.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="AC3Encoder.cpp" />
     <ClCompile Include="AudioHelper.cpp" />
     <ClCompile Include="FFAudioDecoder.cpp" />
     <ClCompile Include="Mixer.cpp" />
@@ -240,6 +241,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AC3Encoder.h" />
     <ClInclude Include="AudioHelper.h" />
     <ClInclude Include="FFAudioDecoder.h" />
     <ClInclude Include="IMpaDecFilter.h" />
