@@ -2588,7 +2588,9 @@ static int mpeg_decode_frame(AVCodecContext *avctx,
     MpegEncContext *s2 = &s->mpeg_enc_ctx;
     av_dlog(avctx, "fill_buffer\n");
 
-    s2->current_picture_ptr = NULL;
+    // ==> Start patch MPC. this line - broken second field decode
+    //s2->current_picture_ptr = NULL;
+    // ==> End patch MPC
 
     if (buf_size == 0 || (buf_size == 4 && AV_RB32(buf) == SEQ_END_CODE)) {
         /* special case for last picture */
