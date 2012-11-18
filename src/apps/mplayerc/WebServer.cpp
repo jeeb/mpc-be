@@ -162,6 +162,7 @@ CWebServer::~CWebServer()
 
 DWORD WINAPI CWebServer::StaticThreadProc(LPVOID lpParam)
 {
+	SetThreadName(DWORD(-1), "WebServer Thread");
 	return ((CWebServer*)lpParam)->ThreadProc();
 }
 
@@ -411,30 +412,30 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 			pos = pClient->m_hdrlines.GetStartPosition();
 			while (pos) {
 				pClient->m_hdrlines.GetNextAssoc(pos, key, value);
-				debug += "HEADER[" + key + "] = " + value + "<br>\r\n";
+				debug += "HEADER[" + key + "] = " + value + "<br/>\r\n";
 			}
-			debug += "cmd: " + pClient->m_cmd + "<br>\r\n";
-			debug += "path: " + pClient->m_path + "<br>\r\n";
-			debug += "ver: " + pClient->m_ver + "<br>\r\n";
+			debug += "cmd: " + pClient->m_cmd + "<br/>\r\n";
+			debug += "path: " + pClient->m_path + "<br/>\r\n";
+			debug += "ver: " + pClient->m_ver + "<br/>\r\n";
 			pos = pClient->m_get.GetStartPosition();
 			while (pos) {
 				pClient->m_get.GetNextAssoc(pos, key, value);
-				debug += "GET[" + key + "] = " + value + "<br>\r\n";
+				debug += "GET[" + HtmlSpecialChars(key) + "] = " + HtmlSpecialChars(UTF8(value)) + "<br/>\r\n";
 			}
 			pos = pClient->m_post.GetStartPosition();
 			while (pos) {
 				pClient->m_post.GetNextAssoc(pos, key, value);
-				debug += "POST[" + key + "] = " + value + "<br>\r\n";
+				debug += "POST[" + HtmlSpecialChars(key) + "] = " + HtmlSpecialChars(UTF8(value)) + "<br/>\r\n";
 			}
 			pos = pClient->m_cookie.GetStartPosition();
 			while (pos) {
 				pClient->m_cookie.GetNextAssoc(pos, key, value);
-				debug += "COOKIE[" + key + "] = " + value + "<br>\r\n";
+				debug += "COOKIE[" + HtmlSpecialChars(key) + "] = " + HtmlSpecialChars(UTF8(value)) + "<br/>\r\n";
 			}
 			pos = pClient->m_request.GetStartPosition();
 			while (pos) {
 				pClient->m_request.GetNextAssoc(pos, key, value);
-				debug += "REQUEST[" + key + "] = " + value + "<br>\r\n";
+				debug += "REQUEST[" + HtmlSpecialChars(key) + "] = " + HtmlSpecialChars(UTF8(value)) + "<br/>\r\n";
 			}
 		}
 

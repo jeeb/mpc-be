@@ -409,6 +409,7 @@ DWORD CSubPicQueue::ThreadProc()
 {
 	BOOL bDisableAnim = m_bDisableAnim;
 	int m_nPriority = bDisableAnim ? THREAD_PRIORITY_LOWEST : THREAD_PRIORITY_ABOVE_NORMAL;
+	SetThreadName(DWORD(-1), "Subtitle Renderer Thread");
 	SetThreadPriority(m_hThread, m_nPriority);
 
 	bool bAgain = true;
