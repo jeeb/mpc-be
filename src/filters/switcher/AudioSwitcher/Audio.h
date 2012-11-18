@@ -23,11 +23,6 @@
 
 #pragma once
 
-#include <windows.h>
-#include <MMREG.H>
-#include <mmsystem.h>
-#include <msacm.h>
-
 typedef long (*AudioPointSampler)(void *, void *, long, long, long);
 typedef long (*AudioDownSampler)(void *, void *, long *, int, long, long, long);
 

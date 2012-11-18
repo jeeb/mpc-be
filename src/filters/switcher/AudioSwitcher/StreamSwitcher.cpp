@@ -24,13 +24,6 @@
 #include "stdafx.h"
 #include "StreamSwitcher.h"
 
-#include <shlwapi.h>
-#include <atlpath.h>
-#include <MMReg.h>
-#include <ks.h>
-#include <ksmedia.h>
-#include "AudioSwitcher.h"
-#include "Audio.h"
 #include "../../../DSUtil/DSUtil.h"
 
 #ifdef REGISTER_FILTER
