@@ -459,10 +459,7 @@ HRESULT CWavPackSplitterFilterInputPin::CompleteConnect(IPin *pReceivePin)
 												CString TagValue = CA2CT(CStringA(value), CP_UTF8);
 
 												CAtlList<Chapters> ChaptersList;
-												ParseCUESheet(TagValue, ChaptersList);
-
-												if (ChaptersList.GetCount()) {
-
+												if (ParseCUESheet(TagValue, ChaptersList)) {
 													m_pParentFilter->ChapRemoveAll();
 													while (ChaptersList.GetCount()) {
 														Chapters cp = ChaptersList.RemoveHead();

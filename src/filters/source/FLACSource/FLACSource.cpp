@@ -469,16 +469,9 @@ void CFLACStream::UpdateFromMetadata (void* pBuffer)
 				file_info.comment	= TagValue;
 			} else  if (ParseVorbisComment("date", &vc->comments[i], &TagValue)) {
 				file_info.year		= TagValue.GetAllocLength() > 4 ? TagValue.Right(4) : TagValue;
-			} else if (!CStringA(vc->comments[i].entry).MakeLower().Find("cuesheet=")) {
-				CStringA Tag(vc->comments[i].entry);
-				Tag.Delete(0, Tag.Find("=") + 1);
-				TagValue = CA2CT(Tag, CP_UTF8);
-
+			} else  if (ParseVorbisComment("cuesheet", &vc->comments[i], &TagValue)) {
 				CAtlList<Chapters> ChaptersList;
-				ParseCUESheet(TagValue, ChaptersList);
-
-				if (ChaptersList.GetCount()) {
-
+				if (ParseCUESheet(TagValue, ChaptersList)) {
 					((CFLACSource*)m_pFilter)->ChapRemoveAll();
 						while (ChaptersList.GetCount()) {
 							Chapters cp = ChaptersList.RemoveHead();

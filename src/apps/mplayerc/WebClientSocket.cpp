@@ -601,7 +601,7 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 	}
 
 	m_pWebServer->LoadPage(IDR_HTML_BROWSER, body, m_path);
-	body.Replace("[currentdir]", HtmlSpecialChars(UTF8(path)));
+	body.Replace("[currentdir]", UTF8(path));
 	body.Replace("[currentfiles]", files);
 
 	return true;
