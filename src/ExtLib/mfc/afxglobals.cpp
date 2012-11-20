@@ -63,11 +63,11 @@ CMemDC::CMemDC(CDC& dc, CWnd* pWnd) :
 
 	if (!GetGlobalData()->m_bBufferedPaintInited)
 	{
-		BufferedPaintInit();
+		_AfxBufferedPaintInit();
 		GetGlobalData()->m_bBufferedPaintInited = TRUE;
 	}
 
-	m_hBufferedPaint = BeginBufferedPaint(dc.GetSafeHdc(), m_rect, BPBF_TOPDOWNDIB, NULL, &hdcPaint);
+	m_hBufferedPaint = _AfxBeginBufferedPaint(dc.GetSafeHdc(), m_rect, BPBF_TOPDOWNDIB, NULL, &hdcPaint);
 
 	if (m_hBufferedPaint != NULL && hdcPaint != NULL)
 	{
@@ -96,11 +96,11 @@ CMemDC::CMemDC(CDC& dc, const CRect& rect) :
 
 	if (!GetGlobalData()->m_bBufferedPaintInited)
 	{
-		BufferedPaintInit();
+		_AfxBufferedPaintInit();
 		GetGlobalData()->m_bBufferedPaintInited = TRUE;
 	}
 
-	m_hBufferedPaint = BeginBufferedPaint(dc.GetSafeHdc(), m_rect, BPBF_TOPDOWNDIB, NULL, &hdcPaint);
+	m_hBufferedPaint = _AfxBeginBufferedPaint(dc.GetSafeHdc(), m_rect, BPBF_TOPDOWNDIB, NULL, &hdcPaint);
 
 	if (m_hBufferedPaint != NULL && hdcPaint != NULL)
 	{
@@ -125,7 +125,7 @@ CMemDC::~CMemDC()
 	if (m_hBufferedPaint != NULL)
 	{
 		m_dcMem.Detach();
-		EndBufferedPaint(m_hBufferedPaint, TRUE);
+		_AfxEndBufferedPaint(m_hBufferedPaint, TRUE);
 	}
 	else if (m_bMemDC)
 	{
@@ -790,7 +790,7 @@ void AFX_GLOBAL_DATA::CleanUp()
 
 	if (m_bBufferedPaintInited)
 	{
-		BufferedPaintUnInit();
+		_AfxBufferedPaintUnInit();
 		m_bBufferedPaintInited = FALSE;
 	}
 
@@ -1138,7 +1138,7 @@ BOOL AFX_GLOBAL_DATA::DrawTextOnGlass(HTHEME hTheme, CDC* pDC, int iPartId, int 
 		dto.crText = clrText;
 	}
 
-	DrawThemeTextEx(hTheme, pDC->GetSafeHdc(), iPartId, iStateId, wbuf, -1, dwFlags, rect, &dto);
+	_AfxDrawThemeTextEx(hTheme, pDC->GetSafeHdc(), iPartId, iStateId, wbuf, -1, dwFlags, rect, &dto);
 
 	delete [] wbuf;
 

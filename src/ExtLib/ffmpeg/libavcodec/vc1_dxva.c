@@ -54,9 +54,10 @@ int av_vc1_decode_frame(AVCodecContext *avctx, const uint8_t *buf, int buf_size,
                 case VC1_CODE_FIELD: {
                     int buf_size3;
                     buf_start_second_field = start;
-                    slices = av_realloc(slices, sizeof(*slices) * (n_slices+1));
-                    if (!slices)
+                    tmp = av_realloc(slices, sizeof(*slices) * (n_slices+1));
+                    if (!tmp)
                         goto err;
+                    slices = tmp;
                     slices[n_slices].buf = av_mallocz(buf_size + FF_INPUT_BUFFER_PADDING_SIZE);
                     if (!slices[n_slices].buf)
                         goto err;
@@ -77,9 +78,10 @@ int av_vc1_decode_frame(AVCodecContext *avctx, const uint8_t *buf, int buf_size,
                     break;
                 case VC1_CODE_SLICE: {
                     int buf_size3;
-                    slices = av_realloc(slices, sizeof(*slices) * (n_slices+1));
-                    if (!slices)
+                    tmp = av_realloc(slices, sizeof(*slices) * (n_slices+1));
+                    if (!tmp)
                         goto err;
+                    slices = tmp;
                     slices[n_slices].buf = av_mallocz(buf_size + FF_INPUT_BUFFER_PADDING_SIZE);
                     if (!slices[n_slices].buf)
                         goto err;
@@ -102,7 +104,7 @@ int av_vc1_decode_frame(AVCodecContext *avctx, const uint8_t *buf, int buf_size,
                 av_log(avctx, AV_LOG_ERROR, "Error in WVC1 interlaced frame\n");
                 goto err;
             } else { // found field marker, unescape second field
-            	buf_start_second_field = divider;
+                buf_start_second_field = divider;
                 tmp = av_realloc(slices, sizeof(*slices) * (n_slices+1));
                 if (!tmp)
                     goto err;
@@ -133,12 +135,16 @@ int av_vc1_decode_frame(AVCodecContext *avctx, const uint8_t *buf, int buf_size,
 
     if (!s->context_initialized) {
         if (ff_msmpeg4_decode_init(avctx) < 0 || ff_vc1_decode_init_alloc_tables(v) < 0)
-            return -1;
+            goto err;
 
         s->low_delay = !avctx->has_b_frames || v->res_sprite;
 
-        s->h_edge_pos = avctx->coded_width;
-        s->v_edge_pos = avctx->coded_height;
+        if (v->profile == PROFILE_ADVANCED) {
+            if(avctx->coded_width<=1 || avctx->coded_height<=1)
+                goto err;
+            s->h_edge_pos = avctx->coded_width;
+            s->v_edge_pos = avctx->coded_height;
+        }
     }
 
     /* We need to set current_picture_ptr before reading the header,
@@ -152,11 +158,11 @@ int av_vc1_decode_frame(AVCodecContext *avctx, const uint8_t *buf, int buf_size,
 
     // do parse frame header
     v->pic_header_flag = 0;
-
+    v->first_pic_header_flag = 1;
     if (v->profile < PROFILE_ADVANCED) {
-			ff_vc1_parse_frame_header(v, &s->gb);
+        ff_vc1_parse_frame_header(v, &s->gb);
     } else {
-			ff_vc1_parse_frame_header_adv(v, &s->gb);
+        ff_vc1_parse_frame_header_adv(v, &s->gb);
     }
 
     if (v->field_mode && buf_start_second_field) {
