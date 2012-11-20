@@ -36,7 +36,7 @@ BOOL CFilterApp::InitInstance()
 		return FALSE;
 	}
 
-	SetRegistryKey(_T("Gabest"));
+	SetRegistryKey(_T("MPC-BE"));
 
 	DllEntryPoint(AfxGetInstanceHandle(), DLL_PROCESS_ATTACH, 0);
 

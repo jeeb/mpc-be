@@ -71,42 +71,14 @@ STDAPI DllRegisterServer()
 
 STDAPI DllUnregisterServer()
 {
-	//UnRegisterSourceFilter(MEDIASUBTYPE_Avi);
+	UnRegisterSourceFilter(MEDIASUBTYPE_Avi);
 
 	return AMovieDllRegisterServer2(FALSE);
 }
 
-extern "C" BOOL WINAPI DllEntryPoint(HINSTANCE, ULONG, LPVOID);
+#include "../../core/FilterApp.h"
 
-class CAviSplitterApp : public CWinApp
-{
-public:
-	CAviSplitterApp() {}
-
-	BOOL InitInstance() {
-		if (!__super::InitInstance()) {
-			return FALSE;
-		}
-		DllEntryPoint(m_hInstance, DLL_PROCESS_ATTACH, 0);
-		return TRUE;
-	}
-
-	BOOL ExitInstance() {
-		DllEntryPoint(m_hInstance, DLL_PROCESS_DETACH, 0);
-		return __super::ExitInstance();
-	}
-
-	void SetDefaultRegistryKey() {
-		SetRegistryKey(_T("Gabest"));
-	}
-
-	DECLARE_MESSAGE_MAP()
-};
-
-BEGIN_MESSAGE_MAP(CAviSplitterApp, CWinApp)
-END_MESSAGE_MAP()
-
-CAviSplitterApp theApp;
+CFilterApp theApp;
 
 #endif
 
