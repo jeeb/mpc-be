@@ -49,7 +49,7 @@ cextern pw_17
 cextern pw_32
 
 ;-----------------------------------------------------------------------------
-; void pred16x16_vertical(uint8_t *src, int stride)
+; void pred16x16_vertical_8(uint8_t *src, int stride)
 ;-----------------------------------------------------------------------------
 
 INIT_MMX mmx
@@ -85,7 +85,7 @@ cglobal pred16x16_vertical_8, 2,3
     REP_RET
 
 ;-----------------------------------------------------------------------------
-; void pred16x16_horizontal(uint8_t *src, int stride)
+; void pred16x16_horizontal_8(uint8_t *src, int stride)
 ;-----------------------------------------------------------------------------
 
 %macro PRED16x16_H 0
@@ -120,13 +120,13 @@ cglobal pred16x16_horizontal_8, 2,3
 
 INIT_MMX mmx
 PRED16x16_H
-INIT_MMX mmx2
+INIT_MMX mmxext
 PRED16x16_H
 INIT_XMM ssse3
 PRED16x16_H
 
 ;-----------------------------------------------------------------------------
-; void pred16x16_dc(uint8_t *src, int stride)
+; void pred16x16_dc_8(uint8_t *src, int stride)
 ;-----------------------------------------------------------------------------
 
 %macro PRED16x16_DC 0
@@ -180,7 +180,7 @@ cglobal pred16x16_dc_8, 2,7
     REP_RET
 %endmacro
 
-INIT_MMX mmx2
+INIT_MMX mmxext
 PRED16x16_DC
 INIT_XMM sse2
 PRED16x16_DC
@@ -188,7 +188,7 @@ INIT_XMM ssse3
 PRED16x16_DC
 
 ;-----------------------------------------------------------------------------
-; void pred16x16_tm_vp8(uint8_t *src, int stride)
+; void pred16x16_tm_vp8_8(uint8_t *src, int stride)
 ;-----------------------------------------------------------------------------
 
 %macro PRED16x16_TM 0
@@ -229,7 +229,7 @@ cglobal pred16x16_tm_vp8_8, 2,5
 
 INIT_MMX mmx
 PRED16x16_TM
-INIT_MMX mmx2
+INIT_MMX mmxext
 PRED16x16_TM
 
 INIT_XMM sse2
@@ -269,7 +269,7 @@ cglobal pred16x16_tm_vp8_8, 2,6,6
     REP_RET
 
 ;-----------------------------------------------------------------------------
-; void pred16x16_plane(uint8_t *src, int stride)
+; void pred16x16_plane_*_8(uint8_t *src, int stride)
 ;-----------------------------------------------------------------------------
 
 %macro H264_PRED16x16_PLANE 1
@@ -309,14 +309,14 @@ cglobal pred16x16_plane_%1_8, 2,9,7
     movhlps      m1, m0
 %endif
     paddw        m0, m1
-%if cpuflag(mmx2)
+%if cpuflag(mmxext)
     PSHUFLW      m1, m0, 0xE
 %elif cpuflag(mmx)
     mova         m1, m0
     psrlq        m1, 32
 %endif
     paddw        m0, m1
-%if cpuflag(mmx2)
+%if cpuflag(mmxext)
     PSHUFLW      m1, m0, 0x1
 %elif cpuflag(mmx)
     mova         m1, m0
@@ -536,7 +536,7 @@ INIT_MMX mmx
 H264_PRED16x16_PLANE h264
 H264_PRED16x16_PLANE rv40
 H264_PRED16x16_PLANE svq3
-INIT_MMX mmx2
+INIT_MMX mmxext
 H264_PRED16x16_PLANE h264
 H264_PRED16x16_PLANE rv40
 H264_PRED16x16_PLANE svq3
@@ -550,7 +550,7 @@ H264_PRED16x16_PLANE rv40
 H264_PRED16x16_PLANE svq3
 
 ;-----------------------------------------------------------------------------
-; void pred8x8_plane(uint8_t *src, int stride)
+; void pred8x8_plane_8(uint8_t *src, int stride)
 ;-----------------------------------------------------------------------------
 
 %macro H264_PRED8x8_PLANE 0
@@ -582,7 +582,7 @@ cglobal pred8x8_plane_8, 2,9,7
     paddw        m0, m1
 
 %if notcpuflag(ssse3)
-%if cpuflag(mmx2)
+%if cpuflag(mmxext)
     PSHUFLW      m1, m0, 0xE
 %elif cpuflag(mmx)
     mova         m1, m0
@@ -591,7 +591,7 @@ cglobal pred8x8_plane_8, 2,9,7
     paddw        m0, m1
 %endif ; !ssse3
 
-%if cpuflag(mmx2)
+%if cpuflag(mmxext)
     PSHUFLW      m1, m0, 0x1
 %elif cpuflag(mmx)
     mova         m1, m0
@@ -716,7 +716,7 @@ ALIGN 16
 
 INIT_MMX mmx
 H264_PRED8x8_PLANE
-INIT_MMX mmx2
+INIT_MMX mmxext
 H264_PRED8x8_PLANE
 INIT_XMM sse2
 H264_PRED8x8_PLANE
@@ -724,7 +724,7 @@ INIT_XMM ssse3
 H264_PRED8x8_PLANE
 
 ;-----------------------------------------------------------------------------
-; void pred8x8_vertical(uint8_t *src, int stride)
+; void pred8x8_vertical_8(uint8_t *src, int stride)
 ;-----------------------------------------------------------------------------
 
 INIT_MMX mmx
@@ -741,7 +741,7 @@ cglobal pred8x8_vertical_8, 2,2
     RET
 
 ;-----------------------------------------------------------------------------
-; void pred8x8_horizontal(uint8_t *src, int stride)
+; void pred8x8_horizontal_8(uint8_t *src, int stride)
 ;-----------------------------------------------------------------------------
 
 %macro PRED8x8_H 0
@@ -763,13 +763,13 @@ cglobal pred8x8_horizontal_8, 2,3
 
 INIT_MMX mmx
 PRED8x8_H
-INIT_MMX mmx2
+INIT_MMX mmxext
 PRED8x8_H
 INIT_MMX ssse3
 PRED8x8_H
 
 ;-----------------------------------------------------------------------------
-; void pred8x8_top_dc_mmxext(uint8_t *src, int stride)
+; void pred8x8_top_dc_8_mmxext(uint8_t *src, int stride)
 ;-----------------------------------------------------------------------------
 INIT_MMX mmxext
 cglobal pred8x8_top_dc_8, 2,5
@@ -803,7 +803,7 @@ cglobal pred8x8_top_dc_8, 2,5
     RET
 
 ;-----------------------------------------------------------------------------
-; void pred8x8_dc_mmxext(uint8_t *src, int stride)
+; void pred8x8_dc_8_mmxext(uint8_t *src, int stride)
 ;-----------------------------------------------------------------------------
 
 INIT_MMX mmxext
@@ -864,7 +864,7 @@ cglobal pred8x8_dc_8, 2,5
     RET
 
 ;-----------------------------------------------------------------------------
-; void pred8x8_dc_rv40(uint8_t *src, int stride)
+; void pred8x8_dc_rv40_8(uint8_t *src, int stride)
 ;-----------------------------------------------------------------------------
 
 INIT_MMX mmxext
@@ -901,7 +901,7 @@ cglobal pred8x8_dc_rv40_8, 2,7
     REP_RET
 
 ;-----------------------------------------------------------------------------
-; void pred8x8_tm_vp8(uint8_t *src, int stride)
+; void pred8x8_tm_vp8_8(uint8_t *src, int stride)
 ;-----------------------------------------------------------------------------
 
 %macro PRED8x8_TM 0
@@ -941,7 +941,7 @@ cglobal pred8x8_tm_vp8_8, 2,6
 
 INIT_MMX mmx
 PRED8x8_TM
-INIT_MMX mmx2
+INIT_MMX mmxext
 PRED8x8_TM
 
 INIT_XMM sse2
@@ -1013,7 +1013,7 @@ cglobal pred8x8_tm_vp8_8, 2,3,6
 %endmacro
 
 ;-----------------------------------------------------------------------------
-; void pred8x8l_top_dc(uint8_t *src, int has_topleft, int has_topright, int stride)
+; void pred8x8l_top_dc_8(uint8_t *src, int has_topleft, int has_topright, int stride)
 ;-----------------------------------------------------------------------------
 %macro PRED8x8L_TOP_DC 0
 cglobal pred8x8l_top_dc_8, 4,4
@@ -1068,7 +1068,7 @@ INIT_MMX ssse3
 PRED8x8L_TOP_DC
 
 ;-----------------------------------------------------------------------------
-;void pred8x8l_dc(uint8_t *src, int has_topleft, int has_topright, int stride)
+;void pred8x8l_dc_8(uint8_t *src, int has_topleft, int has_topright, int stride)
 ;-----------------------------------------------------------------------------
 
 %macro PRED8x8L_DC 0
@@ -1171,7 +1171,7 @@ INIT_MMX ssse3
 PRED8x8L_DC
 
 ;-----------------------------------------------------------------------------
-; void pred8x8l_horizontal(uint8_t *src, int has_topleft, int has_topright, int stride)
+; void pred8x8l_horizontal_8(uint8_t *src, int has_topleft, int has_topright, int stride)
 ;-----------------------------------------------------------------------------
 
 %macro PRED8x8L_HORIZONTAL 0
@@ -1242,7 +1242,7 @@ INIT_MMX ssse3
 PRED8x8L_HORIZONTAL
 
 ;-----------------------------------------------------------------------------
-; void pred8x8l_vertical(uint8_t *src, int has_topleft, int has_topright, int stride)
+; void pred8x8l_vertical_8(uint8_t *src, int has_topleft, int has_topright, int stride)
 ;-----------------------------------------------------------------------------
 
 %macro PRED8x8L_VERTICAL 0
@@ -1292,7 +1292,7 @@ INIT_MMX ssse3
 PRED8x8L_VERTICAL
 
 ;-----------------------------------------------------------------------------
-;void pred8x8l_down_left(uint8_t *src, int has_topleft, int has_topright, int stride)
+;void pred8x8l_down_left_8(uint8_t *src, int has_topleft, int has_topright, int stride)
 ;-----------------------------------------------------------------------------
 
 INIT_MMX mmxext
@@ -1492,7 +1492,7 @@ INIT_MMX ssse3
 PRED8x8L_DOWN_LEFT
 
 ;-----------------------------------------------------------------------------
-;void pred8x8l_down_right_mmxext(uint8_t *src, int has_topleft, int has_topright, int stride)
+;void pred8x8l_down_right_8_mmxext(uint8_t *src, int has_topleft, int has_topright, int stride)
 ;-----------------------------------------------------------------------------
 
 INIT_MMX mmxext
@@ -1743,7 +1743,7 @@ INIT_MMX ssse3
 PRED8x8L_DOWN_RIGHT
 
 ;-----------------------------------------------------------------------------
-; void pred8x8l_vertical_right(uint8_t *src, int has_topleft, int has_topright, int stride)
+; void pred8x8l_vertical_right_8(uint8_t *src, int has_topleft, int has_topright, int stride)
 ;-----------------------------------------------------------------------------
 
 INIT_MMX mmxext
@@ -1970,7 +1970,7 @@ INIT_MMX ssse3
 PRED8x8L_VERTICAL_RIGHT
 
 ;-----------------------------------------------------------------------------
-;void pred8x8l_vertical_left(uint8_t *src, int has_topleft, int has_topright, int stride)
+;void pred8x8l_vertical_left_8(uint8_t *src, int has_topleft, int has_topright, int stride)
 ;-----------------------------------------------------------------------------
 
 %macro PRED8x8L_VERTICAL_LEFT 0
@@ -2059,7 +2059,7 @@ INIT_MMX ssse3
 PRED8x8L_VERTICAL_LEFT
 
 ;-----------------------------------------------------------------------------
-; void pred8x8l_horizontal_up(uint8_t *src, int has_topleft, int has_topright, int stride)
+; void pred8x8l_horizontal_up_8(uint8_t *src, int has_topleft, int has_topright, int stride)
 ;-----------------------------------------------------------------------------
 
 %macro PRED8x8L_HORIZONTAL_UP 0
@@ -2146,7 +2146,7 @@ INIT_MMX ssse3
 PRED8x8L_HORIZONTAL_UP
 
 ;-----------------------------------------------------------------------------
-;void pred8x8l_horizontal_down(uint8_t *src, int has_topleft, int has_topright, int stride)
+;void pred8x8l_horizontal_down_8(uint8_t *src, int has_topleft, int has_topright, int stride)
 ;-----------------------------------------------------------------------------
 
 INIT_MMX mmxext
@@ -2394,7 +2394,7 @@ INIT_MMX ssse3
 PRED8x8L_HORIZONTAL_DOWN
 
 ;-----------------------------------------------------------------------------
-; void pred4x4_dc_mmxext(uint8_t *src, const uint8_t *topright, int stride)
+; void pred4x4_dc_8_mmxext(uint8_t *src, const uint8_t *topright, int stride)
 ;-----------------------------------------------------------------------------
 
 INIT_MMX mmxext
@@ -2424,7 +2424,7 @@ cglobal pred4x4_dc_8, 3,5
     RET
 
 ;-----------------------------------------------------------------------------
-; void pred4x4_tm_vp8_mmxext(uint8_t *src, const uint8_t *topright, int stride)
+; void pred4x4_tm_vp8_8_mmxext(uint8_t *src, const uint8_t *topright, int stride)
 ;-----------------------------------------------------------------------------
 
 %macro PRED4x4_TM 0
@@ -2442,7 +2442,7 @@ cglobal pred4x4_tm_vp8_8, 3,6
     sub       r3d, r4d
     movd      mm2, r1d
     movd      mm4, r3d
-%if cpuflag(mmx2)
+%if cpuflag(mmxext)
     pshufw    mm2, mm2, 0
     pshufw    mm4, mm4, 0
 %else
@@ -2465,7 +2465,7 @@ cglobal pred4x4_tm_vp8_8, 3,6
 
 INIT_MMX mmx
 PRED4x4_TM
-INIT_MMX mmx2
+INIT_MMX mmxext
 PRED4x4_TM
 
 INIT_XMM ssse3
@@ -2505,7 +2505,7 @@ cglobal pred4x4_tm_vp8_8, 3,3
     RET
 
 ;-----------------------------------------------------------------------------
-; void pred4x4_vertical_vp8_mmxext(uint8_t *src, const uint8_t *topright, int stride)
+; void pred4x4_vertical_vp8_8_mmxext(uint8_t *src, const uint8_t *topright, int stride)
 ;-----------------------------------------------------------------------------
 
 INIT_MMX mmxext
@@ -2525,7 +2525,7 @@ cglobal pred4x4_vertical_vp8_8, 3,3
     RET
 
 ;-----------------------------------------------------------------------------
-; void pred4x4_down_left_mmxext(uint8_t *src, const uint8_t *topright, int stride)
+; void pred4x4_down_left_8_mmxext(uint8_t *src, const uint8_t *topright, int stride)
 ;-----------------------------------------------------------------------------
 INIT_MMX mmxext
 cglobal pred4x4_down_left_8, 3,3
@@ -2551,7 +2551,7 @@ cglobal pred4x4_down_left_8, 3,3
     RET
 
 ;-----------------------------------------------------------------------------
-; void pred4x4_vertical_left_mmxext(uint8_t *src, const uint8_t *topright, int stride)
+; void pred4x4_vertical_left_8_mmxext(uint8_t *src, const uint8_t *topright, int stride)
 ;-----------------------------------------------------------------------------
 
 INIT_MMX mmxext
@@ -2576,7 +2576,7 @@ cglobal pred4x4_vertical_left_8, 3,3
     RET
 
 ;-----------------------------------------------------------------------------
-; void pred4x4_horizontal_up_mmxext(uint8_t *src, const uint8_t *topright, int stride)
+; void pred4x4_horizontal_up_8_mmxext(uint8_t *src, const uint8_t *topright, int stride)
 ;-----------------------------------------------------------------------------
 
 INIT_MMX mmxext
@@ -2609,7 +2609,7 @@ cglobal pred4x4_horizontal_up_8, 3,3
     RET
 
 ;-----------------------------------------------------------------------------
-; void pred4x4_horizontal_down_mmxext(uint8_t *src, const uint8_t *topright, int stride)
+; void pred4x4_horizontal_down_8_mmxext(uint8_t *src, const uint8_t *topright, int stride)
 ;-----------------------------------------------------------------------------
 
 INIT_MMX mmxext
@@ -2644,7 +2644,7 @@ cglobal pred4x4_horizontal_down_8, 3,3
     RET
 
 ;-----------------------------------------------------------------------------
-; void pred4x4_vertical_right_mmxext(uint8_t *src, const uint8_t *topright, int stride)
+; void pred4x4_vertical_right_8_mmxext(uint8_t *src, const uint8_t *topright, int stride)
 ;-----------------------------------------------------------------------------
 
 INIT_MMX mmxext
@@ -2674,7 +2674,7 @@ cglobal pred4x4_vertical_right_8, 3,3
     RET
 
 ;-----------------------------------------------------------------------------
-; void pred4x4_down_right_mmxext(uint8_t *src, const uint8_t *topright, int stride)
+; void pred4x4_down_right_8_mmxext(uint8_t *src, const uint8_t *topright, int stride)
 ;-----------------------------------------------------------------------------
 
 INIT_MMX mmxext
