@@ -735,7 +735,7 @@ void CDXVADecoder::EndOfStream()
 	CComPtr<IMediaSample> pSampleToDeliver;
 
 	for (int nPicIndex=0; nPicIndex<m_nPicEntryNumber; nPicIndex++) {
-		if (m_pPictureStore[nPicIndex].bInUse && !m_pPictureStore[nPicIndex].bDisplayed && m_pPictureStore[nPicIndex].rtStart != _I64_MIN) {
+		if (m_pPictureStore[nPicIndex].bInUse && !m_pPictureStore[nPicIndex].bDisplayed && m_pPictureStore[nPicIndex].rtStart >= 0) {
 			switch (m_nEngine) {
 				// TODO - need check under WinXP on DXVA1
 				/*

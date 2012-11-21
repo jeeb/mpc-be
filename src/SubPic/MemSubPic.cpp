@@ -98,6 +98,8 @@ void ColorConvInit()
 // CMemSubPic
 //
 
+#define CheckSize(rc, subpic, fail) if (rc.Width() > subpic.w || rc.Height() > subpic.h) return fail;
+
 CMemSubPic::CMemSubPic(SubPicDesc& spd)
 	: m_spd(spd)
 {
@@ -144,6 +146,8 @@ STDMETHODIMP CMemSubPic::CopyTo(ISubPic* pSubPic)
 		return E_FAIL;
 	}
 
+	CheckSize(m_rcDirty, src, E_FAIL);
+
 	int w = m_rcDirty.Width(), h = m_rcDirty.Height();
 	BYTE* s = (BYTE*)src.bits + src.pitch*m_rcDirty.top + m_rcDirty.left*4;
 	BYTE* d = (BYTE*)dst.bits + dst.pitch*m_rcDirty.top + m_rcDirty.left*4;
@@ -160,6 +164,8 @@ STDMETHODIMP CMemSubPic::ClearDirtyRect(DWORD color)
 	if (m_rcDirty.IsRectEmpty()) {
 		return S_FALSE;
 	}
+
+	CheckSize(m_rcDirty, m_spd, S_FALSE);
 
 	BYTE* p = (BYTE*)m_spd.bits + m_spd.pitch*m_rcDirty.top + m_rcDirty.left*(m_spd.bpp>>3);
 	for (ptrdiff_t j = 0, h = m_rcDirty.Height(); j < h; j++, p += m_spd.pitch) {
@@ -194,6 +200,8 @@ STDMETHODIMP CMemSubPic::Unlock(RECT* pDirtyRect)
 	if (m_rcDirty.IsRectEmpty()) {
 		return S_OK;
 	}
+
+	CheckSize(m_rcDirty, m_spd, S_OK);
 
 	if(m_spd.type == MSP_YUY2 || m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV || m_spd.type == MSP_AYUV
 		|| m_spd.type == MSP_P010 || m_spd.type == MSP_P016) {
