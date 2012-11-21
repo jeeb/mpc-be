@@ -30,6 +30,7 @@
 #include <AllocatorCommon7.h>
 #include <AllocatorCommon.h>
 #include <SyncAllocatorPresenter.h>
+#include <madVRAllocatorPresenter.h>
 #include "DeinterlacerFilter.h"
 #include "../../DSUtil/WinAPIUtils.h"
 #include "../../filters/transform/DeCSSFilter/VobFile.h"
@@ -49,7 +50,7 @@ DEFINE_GUID	(CLSID_NvidiaVideoDecoder,			0x71E4616A, 0xDB5E, 0x452B, 0x8C, 0xA5,
 // {D7D50E8D-DD72-43C2-8587-A0C197D837D2}
 DEFINE_GUID	(CLSID_SonicCinemasterVideoDecoder,	0xD7D50E8D, 0xDD72, 0x43C2, 0x85, 0x87, 0xA0, 0xC1, 0x97, 0xD8, 0x37, 0xD2);
 // {AB9D6472-752F-43F6-B29E-61207BDA8E06}
-DEFINE_GUID(CLSID_RDPDShowRedirectionFilter, 0xAB9D6472, 0x752F, 0x43F6, 0xB2, 0x9E, 0x61, 0x20, 0x7B, 0xDA, 0x8E, 0x06);
+DEFINE_GUID (CLSID_RDPDShowRedirectionFilter,	0xAB9D6472, 0x752F, 0x43F6, 0xB2, 0x9E, 0x61, 0x20, 0x7B, 0xDA, 0x8E, 0x06);
 
 //
 // CFGManager
@@ -231,118 +232,133 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 	TCHAR buff[256], buff2[256];
 	ULONG len, len2;
 
-	if (hFile == INVALID_HANDLE_VALUE) {
-		// internal / protocol
-
-		POSITION pos = m_source.GetHeadPosition();
-		while (pos) {
-			CFGFilter* pFGF = m_source.GetNext(pos);
-			if (pFGF->m_protocols.Find(CString(protocol))) {
-				fl.Insert(pFGF, 0, false, false);
-			}
-		}
-	} else {
-		// internal / check bytes
-
-		POSITION pos = m_source.GetHeadPosition();
-		while (pos) {
-			CFGFilter* pFGF = m_source.GetNext(pos);
-
-			POSITION pos2 = pFGF->m_chkbytes.GetHeadPosition();
-			while (pos2) {
-				if (CheckBytes(hFile, pFGF->m_chkbytes.GetNext(pos2))) {
-					fl.Insert(pFGF, 1, false, false);
-					break;
-				}
-			}
-		}
-	}
-
-	if (!ext.IsEmpty()) {
-		// internal / file extension
-
-		POSITION pos = m_source.GetHeadPosition();
-		while (pos) {
-			CFGFilter* pFGF = m_source.GetNext(pos);
-			if (pFGF->m_extensions.Find(CString(ext))) {
-				fl.Insert(pFGF, 2, false, false);
-			}
-		}
-	}
-
+	// internal filters
 	{
-		// internal / the rest
+		if (hFile == INVALID_HANDLE_VALUE) {
+			// protocol
 
-		POSITION pos = m_source.GetHeadPosition();
-		while (pos) {
-			CFGFilter* pFGF = m_source.GetNext(pos);
-			if (pFGF->m_protocols.IsEmpty() && pFGF->m_chkbytes.IsEmpty() && pFGF->m_extensions.IsEmpty()) {
-				fl.Insert(pFGF, 3, false, false);
+			POSITION pos = m_source.GetHeadPosition();
+			while (pos) {
+				CFGFilter* pFGF = m_source.GetNext(pos);
+				if (pFGF->m_protocols.Find(CString(protocol))) {
+					fl.Insert(pFGF, 0, false, false);
+				}
+			}
+		} else {
+			// check bytes
+
+			POSITION pos = m_source.GetHeadPosition();
+			while (pos) {
+				CFGFilter* pFGF = m_source.GetNext(pos);
+
+				POSITION pos2 = pFGF->m_chkbytes.GetHeadPosition();
+				while (pos2) {
+					if (CheckBytes(hFile, pFGF->m_chkbytes.GetNext(pos2))) {
+						fl.Insert(pFGF, 1, false, false);
+						break;
+					}
+				}
+			}
+		}
+
+		if (!ext.IsEmpty()) {
+			// file extension
+
+			POSITION pos = m_source.GetHeadPosition();
+			while (pos) {
+				CFGFilter* pFGF = m_source.GetNext(pos);
+				if (pFGF->m_extensions.Find(CString(ext))) {
+					fl.Insert(pFGF, 2, false, false);
+				}
+			}
+		}
+
+		{
+			// the rest
+
+			POSITION pos = m_source.GetHeadPosition();
+			while (pos) {
+				CFGFilter* pFGF = m_source.GetNext(pos);
+				if (pFGF->m_protocols.IsEmpty() && pFGF->m_chkbytes.IsEmpty() && pFGF->m_extensions.IsEmpty()) {
+					fl.Insert(pFGF, 3, false, false);
+				}
 			}
 		}
 	}
 
-	if (hFile == INVALID_HANDLE_VALUE) {
-		// protocol
-
-		CRegKey key;
-		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, CString(protocol), KEY_READ)) {
-			CRegKey exts;
-			if (ERROR_SUCCESS == exts.Open(key, _T("Extensions"), KEY_READ)) {
-				len = _countof(buff);
-				if (ERROR_SUCCESS == exts.QueryStringValue(CString(ext), buff, &len)) {
-					fl.Insert(LookupFilterRegistry(GUIDFromCString(buff), m_override), 4);
-				}
-			}
-
-			len = _countof(buff);
-			if (ERROR_SUCCESS == key.QueryStringValue(_T("Source Filter"), buff, &len)) {
-				fl.Insert(LookupFilterRegistry(GUIDFromCString(buff), m_override), 5);
-			}
+	// add an external preferred filter
+	POSITION pos = m_override.GetHeadPosition();
+	while (pos) {
+		CFGFilter* pFGF = m_override.GetNext(pos);
+		if (pFGF->GetMerit() >= MERIT64_ABOVE_DSHOW) { // FilterOverride::PREFERRED
+			fl.Insert(pFGF, 0, false, false);
 		}
+	}	
 
-		fl.Insert(DNew CFGFilterRegistry(CLSID_URLReader), 6);
-	} else {
-		// check bytes
+	// external
+	{
+		if (hFile == INVALID_HANDLE_VALUE) {
+			// protocol
 
-		CRegKey key;
-		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, _T("Media Type"), KEY_READ)) {
-			FILETIME ft;
-			len = _countof(buff);
-			for (DWORD i = 0; ERROR_SUCCESS == key.EnumKey(i, buff, &len, &ft); i++, len = _countof(buff)) {
-				GUID majortype;
-				if (FAILED(GUIDFromCString(buff, majortype))) {
-					continue;
+			CRegKey key;
+			if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, CString(protocol), KEY_READ)) {
+				CRegKey exts;
+				if (ERROR_SUCCESS == exts.Open(key, _T("Extensions"), KEY_READ)) {
+					len = _countof(buff);
+					if (ERROR_SUCCESS == exts.QueryStringValue(CString(ext), buff, &len)) {
+						fl.Insert(LookupFilterRegistry(GUIDFromCString(buff), m_override), 4);
+					}
 				}
 
-				CRegKey majorkey;
-				if (ERROR_SUCCESS == majorkey.Open(key, buff, KEY_READ)) {
-					len = _countof(buff);
-					for (DWORD j = 0; ERROR_SUCCESS == majorkey.EnumKey(j, buff, &len, &ft); j++, len = _countof(buff)) {
-						GUID subtype;
-						if (FAILED(GUIDFromCString(buff, subtype))) {
-							continue;
-						}
+				len = _countof(buff);
+				if (ERROR_SUCCESS == key.QueryStringValue(_T("Source Filter"), buff, &len)) {
+					fl.Insert(LookupFilterRegistry(GUIDFromCString(buff), m_override), 5);
+				}
+			}
 
-						CRegKey subkey;
-						if (ERROR_SUCCESS == subkey.Open(majorkey, buff, KEY_READ)) {
-							len = _countof(buff);
-							if (ERROR_SUCCESS != subkey.QueryStringValue(_T("Source Filter"), buff, &len)) {
+			fl.Insert(DNew CFGFilterRegistry(CLSID_URLReader), 6);
+		} else {
+			// check bytes
+
+			CRegKey key;
+			if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, _T("Media Type"), KEY_READ)) {
+				FILETIME ft;
+				len = _countof(buff);
+				for (DWORD i = 0; ERROR_SUCCESS == key.EnumKey(i, buff, &len, &ft); i++, len = _countof(buff)) {
+					GUID majortype;
+					if (FAILED(GUIDFromCString(buff, majortype))) {
+						continue;
+					}
+
+					CRegKey majorkey;
+					if (ERROR_SUCCESS == majorkey.Open(key, buff, KEY_READ)) {
+						len = _countof(buff);
+						for (DWORD j = 0; ERROR_SUCCESS == majorkey.EnumKey(j, buff, &len, &ft); j++, len = _countof(buff)) {
+							GUID subtype;
+							if (FAILED(GUIDFromCString(buff, subtype))) {
 								continue;
 							}
 
-							GUID clsid = GUIDFromCString(buff);
+							CRegKey subkey;
+							if (ERROR_SUCCESS == subkey.Open(majorkey, buff, KEY_READ)) {
+								len = _countof(buff);
+								if (ERROR_SUCCESS != subkey.QueryStringValue(_T("Source Filter"), buff, &len)) {
+									continue;
+								}
 
-							len = _countof(buff);
-							len2 = sizeof(buff2);
-							for (DWORD k = 0, type;
-									clsid != GUID_NULL && ERROR_SUCCESS == RegEnumValue(subkey, k, buff2, &len2, 0, &type, (BYTE*)buff, &len);
-									k++, len = _countof(buff), len2 = sizeof(buff2)) {
-								if (CheckBytes(hFile, CString(buff))) {
-									CFGFilter* pFGF = LookupFilterRegistry(clsid, m_override);
-									pFGF->AddType(majortype, subtype);
-									fl.Insert(pFGF, 9);
-									break;
+								GUID clsid = GUIDFromCString(buff);
+
+								len = _countof(buff);
+								len2 = sizeof(buff2);
+								for (DWORD k = 0, type;
+										clsid != GUID_NULL && ERROR_SUCCESS == RegEnumValue(subkey, k, buff2, &len2, 0, &type, (BYTE*)buff, &len);
+										k++, len = _countof(buff), len2 = sizeof(buff2)) {
+									if (CheckBytes(hFile, CString(buff))) {
+										CFGFilter* pFGF = LookupFilterRegistry(clsid, m_override);
+										pFGF->AddType(majortype, subtype);
+										fl.Insert(pFGF, 9);
+										break;
+									}
 								}
 							}
 						}
@@ -350,34 +366,34 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 				}
 			}
 		}
-	}
 
-	if (!ext.IsEmpty()) {
-		// file extension
+		if (!ext.IsEmpty()) {
+			// file extension
 
-		CRegKey key;
-		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, _T("Media Type\\Extensions\\") + CString(ext), KEY_READ)) {
-			ULONG len = _countof(buff);
-			memset(buff, 0, sizeof(buff));
-			LONG ret = key.QueryStringValue(_T("Source Filter"), buff, &len); // QueryStringValue can return ERROR_INVALID_DATA on bogus strings (radlight mpc v1003, fixed in v1004)
-			if (ERROR_SUCCESS == ret || ERROR_INVALID_DATA == ret && GUIDFromCString(buff) != GUID_NULL) {
-				GUID clsid = GUIDFromCString(buff);
-				GUID majortype = GUID_NULL;
-				GUID subtype = GUID_NULL;
+			CRegKey key;
+			if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, _T("Media Type\\Extensions\\") + CString(ext), KEY_READ)) {
+				ULONG len = _countof(buff);
+				memset(buff, 0, sizeof(buff));
+				LONG ret = key.QueryStringValue(_T("Source Filter"), buff, &len); // QueryStringValue can return ERROR_INVALID_DATA on bogus strings (radlight mpc v1003, fixed in v1004)
+				if (ERROR_SUCCESS == ret || ERROR_INVALID_DATA == ret && GUIDFromCString(buff) != GUID_NULL) {
+					GUID clsid = GUIDFromCString(buff);
+					GUID majortype = GUID_NULL;
+					GUID subtype = GUID_NULL;
 
-				len = _countof(buff);
-				if (ERROR_SUCCESS == key.QueryStringValue(_T("Media Type"), buff, &len)) {
-					majortype = GUIDFromCString(buff);
+					len = _countof(buff);
+					if (ERROR_SUCCESS == key.QueryStringValue(_T("Media Type"), buff, &len)) {
+						majortype = GUIDFromCString(buff);
+					}
+
+					len = _countof(buff);
+					if (ERROR_SUCCESS == key.QueryStringValue(_T("Subtype"), buff, &len)) {
+						subtype = GUIDFromCString(buff);
+					}
+
+					CFGFilter* pFGF = LookupFilterRegistry(clsid, m_override);
+					pFGF->AddType(majortype, subtype);
+					fl.Insert(pFGF, 7);
 				}
-
-				len = _countof(buff);
-				if (ERROR_SUCCESS == key.QueryStringValue(_T("Subtype"), buff, &len)) {
-					subtype = GUIDFromCString(buff);
-				}
-
-				CFGFilter* pFGF = LookupFilterRegistry(clsid, m_override);
-				pFGF->AddType(majortype, subtype);
-				fl.Insert(pFGF, 7);
 			}
 		}
 	}
@@ -386,9 +402,9 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 		CloseHandle(hFile);
 	}
 
-	CFGFilter* pFGF = LookupFilterRegistry(CLSID_AsyncReader, m_override);
+	CFGFilter* pFGF = LookupFilterRegistry(CLSID_AsyncReader, m_override, MERIT64_ABOVE_DSHOW - 1);
 	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_NULL);
-	fl.Insert(pFGF, 9);
+	fl.Insert(pFGF, 3);
 
 	return S_OK;
 }
@@ -880,6 +896,12 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 
 					if (CComQIPtr<IVMRMixerBitmap9> pMB = pBF) {
 						m_pUnks.AddTail (pMB);
+					}
+
+					if (CComQIPtr<IMadVRTextOsd> pMVTO = pBF) {
+						// without this, m_pUnks would be empty after MainFrm.cpp queried for ISubPicAllocatorPresenter
+						// adding this allows MainFrm.cpp to successfully query for ISubPicAllocatorPresenter2, too
+						m_pUnks.AddTail(pMVTO);
 					}
 
 					if (CComQIPtr<IMFGetService, &__uuidof(IMFGetService)> pMFGS = pBF) {
