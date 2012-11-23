@@ -2453,14 +2453,6 @@ CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error): CBa
 		_Error += L"DXVA2CreateDirect3DDeviceManager9 failed\n";
 	}
 
-	CComPtr<IDirectXVideoDecoderService> pDecoderService;
-	HANDLE hDevice;
-	if (SUCCEEDED (m_pD3DManager->OpenDeviceHandle(&hDevice)) &&
-			SUCCEEDED (m_pD3DManager->GetVideoService (hDevice, __uuidof(IDirectXVideoDecoderService), (void**)&pDecoderService))) {
-		HookDirectXVideoDecoderService (pDecoderService);
-		m_pD3DManager->CloseDeviceHandle (hDevice);
-	}
-
 	// Bufferize frame only with 3D texture
 	if (s.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) {
 		m_nDXSurface = max(min (s.iEvrBuffers, MAX_PICTURE_SLOTS-2), 4);

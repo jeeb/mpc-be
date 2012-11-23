@@ -43,6 +43,8 @@
 #include <ksproxy.h>
 #include <moreuuids.h>
 
+#include "../../filters/renderer/VideoRenderers/IPinHook.h"
+
 // {212690FB-83E5-4526-8FD7-74478B7939CD} from wmcodecdsp.h
 DEFINE_GUID	(CLSID_CMPEG2VidDecoderDS,			0x212690FB, 0x83E5, 0x4526, 0x8F, 0xD7, 0x74, 0x47, 0x8B, 0x79, 0x39, 0xCD);
 // {71E4616A-DB5E-452B-8CA5-71D9CC7805E9}
@@ -925,6 +927,44 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 						//	pMFGS->GetService (MF_WORKQUEUE_SERVICES, IID_IMFWorkQueueServices, (void**)&pMFWQS);
 						//	pMFWQS->BeginRegisterPlatformWorkQueueWithMMCSS(
 
+
+						// hook IDirectXVideoDecoderService to get DXVA status & logging;
+						CComPtr<IDirectXVideoDecoderService>	pDecoderService;
+						CComPtr<IMFGetService>					pGetService;
+						CComPtr<IDirect3DDeviceManager9>		pDeviceManager;
+						HANDLE									hDevice = INVALID_HANDLE_VALUE;
+
+						// Query the pin for IMFGetService.
+						hr = pMFGS->QueryInterface(__uuidof(IMFGetService), (void**)&pGetService);
+
+						// Get the Direct3D device manager.
+						if (SUCCEEDED(hr)) {
+							hr = pGetService->GetService(
+										MR_VIDEO_ACCELERATION_SERVICE,
+										__uuidof(IDirect3DDeviceManager9),
+										(void**)&pDeviceManager);
+						}
+
+						// Open a new device handle.
+						if (SUCCEEDED(hr)) {
+							hr = pDeviceManager->OpenDeviceHandle(&hDevice);
+						}
+
+						// Get the video decoder service.
+						if (SUCCEEDED(hr)) {
+							hr = pDeviceManager->GetVideoService(
+										hDevice,
+										__uuidof(IDirectXVideoDecoderService),
+										(void**)&pDecoderService);
+						}
+
+						if (SUCCEEDED(hr)) {
+							HookDirectXVideoDecoderService (pDecoderService);
+						}
+
+						if (hDevice != INVALID_HANDLE_VALUE) {
+							pDeviceManager->CloseDeviceHandle (hDevice);
+						}
 					}
 
 					return hr;
