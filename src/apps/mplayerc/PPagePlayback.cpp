@@ -228,9 +228,10 @@ void CPPagePlayback::OnUpdateTrackOrder(CCmdUI* pCmdUI)
 void CPPagePlayback::OnBalanceTextDblClk()
 {
 	// double click on text "Balance" resets the balance to zero
-	m_balancectrl.SetPos(0);
+	m_nBalance = 0;
+	m_balancectrl.SetPos(m_nBalance);
 
-	((CMainFrame*)GetParentFrame())->SetBalance(0);
+	((CMainFrame*)GetParentFrame())->SetBalance(m_nBalance);
 
 	SetModified();
 }
