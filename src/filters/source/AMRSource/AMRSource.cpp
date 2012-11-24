@@ -99,7 +99,7 @@ CAMRSplitter::CAMRSplitter(LPUNKNOWN pUnk, HRESULT *phr) :
 	rate(1.0),
 	ev_abort(TRUE)
 {
-	input = new CAMRInputPin(NAME("AMR Input Pin"), this, phr, L"In");
+	input = DNew CAMRInputPin(NAME("AMR Input Pin"), this, phr, L"In");
 	output.RemoveAll();
 	retired.RemoveAll();
 
@@ -204,8 +204,8 @@ HRESULT CAMRSplitter::CompleteConnect(PIN_DIRECTION Dir, CBasePin *pCaller, IPin
 		//	Analyse the source file
 		//
 		//---------------------------------------------------------------------
-		reader	= new CAMRReader(input->Reader());
-		file	= new CAMRFile();
+		reader	= DNew CAMRReader(input->Reader());
+		file	= DNew CAMRFile();
 
 		// try to open the file
 		int ret	= file->Open(reader);
@@ -220,7 +220,7 @@ HRESULT CAMRSplitter::CompleteConnect(PIN_DIRECTION Dir, CBasePin *pCaller, IPin
 
 		HRESULT hr = NOERROR;
 		
-		CAMROutputPin *opin = new CAMROutputPin(_T("Outpin"), this, &hr, L"Out", 5);
+		CAMROutputPin *opin = DNew CAMROutputPin(_T("Outpin"), this, &hr, L"Out", 5);
 		ConfigureMediaType(opin);
 		AddOutputPin(opin);
 	} else {
@@ -1009,7 +1009,7 @@ int CAMROutputPin::GetDataPacketAMR(DataPacketAMR **packet)
 		ret = WaitForMultipleObjects(2, events, FALSE, 10);
 		if (ret == WAIT_OBJECT_0) {
 			// return new packet
-			*packet = new DataPacketAMR();
+			*packet = DNew DataPacketAMR();
 			return 0;
 		}
 
@@ -1072,7 +1072,7 @@ HRESULT CAMROutputPin::DeliverPacket(CAMRPacket &packet)
 
 HRESULT CAMROutputPin::DoEndOfStream()
 {
-	DataPacketAMR *packet = new DataPacketAMR();
+	DataPacketAMR *packet = DNew DataPacketAMR();
 
 	// naqueueujeme EOS
 	{

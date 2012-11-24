@@ -275,7 +275,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			}
 			m_file.Seek(m_dataOffset, CFile::begin);
 
-			BYTE* buf = new BYTE[buflen];
+			BYTE* buf = DNew BYTE[buflen];
 			int len = m_file.Read(buf, buflen);
 			if (len < 100) {
 				break;    // file is very small

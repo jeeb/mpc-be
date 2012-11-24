@@ -36,7 +36,7 @@ static BYTE* ConvertRGBToBMPBuffer(BYTE* Buffer, int width, int height, int bpp,
 	}
 	int psw = scanlinebytes + padding;
 	*newsize = height * psw;
-	BYTE* newbuf = new BYTE[*newsize];
+	BYTE* newbuf = DNew BYTE[*newsize];
 	memset(newbuf, 0, *newsize);
 	long bufpos = 0, newpos = 0;
 	for (int y = 0; y < height; y++) {

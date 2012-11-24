@@ -474,7 +474,7 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 			}
 
 			int gzippedBuffLen = body.GetLength();
-			BYTE* gzippedBuff = new BYTE[gzippedBuffLen];
+			BYTE* gzippedBuff = DNew BYTE[gzippedBuffLen];
 			strm.avail_in = body.GetLength();
 			strm.next_in = (Bytef*)(LPCSTR)body;
 			strm.avail_out = gzippedBuffLen;

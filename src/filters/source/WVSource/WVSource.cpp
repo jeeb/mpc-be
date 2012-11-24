@@ -403,7 +403,7 @@ HRESULT CWavPackSplitterFilterInputPin::CompleteConnect(IPin *pReceivePin)
 							DWORD flags = gb.ReadDwordLE();
 							if (!(flags & APE_TAG_FLAG_IS_HEADER)) {
 								io->set_pos_rel(io, file_size - tag_size, SEEK_SET);
-								BYTE *p = new BYTE[tag_size];
+								BYTE *p = DNew BYTE[tag_size];
 								if (io->read_bytes(io, p, tag_size) == tag_size) {
 
 									CGolombBuffer gb(p, tag_size);
@@ -429,7 +429,7 @@ HRESULT CWavPackSplitterFilterInputPin::CompleteConnect(IPin *pReceivePin)
 											}
 
 											if (tag_size) {
-												BYTE* value = new BYTE[tag_size];
+												BYTE* value = DNew BYTE[tag_size];
 												gb.ReadBuffer(value, tag_size);
 
 												m_CoverMime = _T("");
@@ -452,7 +452,7 @@ HRESULT CWavPackSplitterFilterInputPin::CompleteConnect(IPin *pReceivePin)
 											}
 
 										} else {
-											BYTE* value = new BYTE[tag_size];
+											BYTE* value = DNew BYTE[tag_size];
 											gb.ReadBuffer(value, tag_size);
 
 											if (CString(key).MakeLower() == "cuesheet") {

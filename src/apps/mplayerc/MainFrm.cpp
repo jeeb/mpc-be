@@ -18575,6 +18575,7 @@ HRESULT CMainFrame::SetDwmPreview(BOOL show)
 
 								break;
 							}
+							CoTaskMemFree(pData);
 						}
 					}
 				}
@@ -18617,10 +18618,10 @@ HRESULT CMainFrame::SetDwmPreview(BOOL show)
 					h		= MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
 
 					CDC *screenDC = GetDC();
-					CDC *pMDC = new CDC;
+					CDC *pMDC = DNew CDC;
 					pMDC->CreateCompatibleDC(screenDC);
 
-					CBitmap *pb = new CBitmap;
+					CBitmap *pb = DNew CBitmap;
 					pb->CreateCompatibleBitmap(screenDC, w, h);
 
 					CBitmap *pob = pMDC->SelectObject(pb);
@@ -18631,6 +18632,9 @@ HRESULT CMainFrame::SetDwmPreview(BOOL show)
 					m_InternalImageSmall.Attach((HBITMAP)(pb->Detach()));
 					pb->DeleteObject();
 					ReleaseDC(screenDC);
+
+					delete pMDC;
+					delete pb;
 				}
 			}
 		}

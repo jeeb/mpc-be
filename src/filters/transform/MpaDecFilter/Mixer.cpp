@@ -177,7 +177,7 @@ int CMixer::Mixing(float* pOutput, int out_samples, BYTE* pInput, int in_samples
 
 	float* buf  = NULL;
 	if (m_in_avsf != m_in_avsf_used) { // need convert
-		buf = new float[in_samples * in_ch];
+		buf = DNew float[in_samples * in_ch];
 		convert_to_float(m_in_avsf, (WORD)in_ch, in_samples, pInput, buf); // convert to float
 		pInput = (BYTE*)buf;
 	}

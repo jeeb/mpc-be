@@ -100,6 +100,8 @@ BOOL CPPageFileInfoRes::OnInitDialog()
 						int iItem = m_list.InsertItem(m_list.GetItemCount(), CString(name));
 						m_list.SetItemText(iItem, 1, CString(mime));
 						m_list.SetItemData(iItem, (DWORD_PTR)pos);
+
+						CoTaskMemFree(pData);
 					}
 				}
 			}

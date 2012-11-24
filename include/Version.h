@@ -58,6 +58,13 @@
 
 #define MPC_VERSION_COMMENTS "http://sourceforge.net/projects/mpcbe/"
 
+// MPC_VERSION_ARCH is currently used in VSFilter only.
+#ifdef _WIN64
+#define MPC_VERSION_ARCH	_T("x64")
+#else
+#define MPC_VERSION_ARCH	_T("x86")
+#endif
+
 #define DIRECTX_SDK_DATE   "June 2010"
 #define DIRECTX_SDK_NUMBER "43"
 

@@ -45,7 +45,7 @@ String mi_get_lang_file()
 			HANDLE lRes = LoadResource(mpcres, hRes);
 			int size = SizeofResource(mpcres, hRes);
 
-			wchar_t* wstr = new wchar_t[size];
+			wchar_t* wstr = DNew wchar_t[size];
 			MultiByteToWideChar(CP_UTF8, 0, (char*)LockResource(lRes), size, wstr, size);
 
 			UnlockResource(lRes);
