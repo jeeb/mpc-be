@@ -491,9 +491,6 @@
     <ClInclude Include="MediaInfo\Audio\File_Adpcm.h">
       <Filter>Header Files\Audio</Filter>
     </ClInclude>
-    <ClInclude Include="MediaInfo\Audio\File_Aes3.h">
-      <Filter>Header Files\Audio</Filter>
-    </ClInclude>
     <ClInclude Include="MediaInfo\Audio\File_Als.h">
       <Filter>Header Files\Audio</Filter>
     </ClInclude>
@@ -1028,9 +1025,6 @@
       <Filter>Source Files\Audio</Filter>
     </ClCompile>
     <ClCompile Include="MediaInfo\Audio\File_Adpcm.cpp">
-      <Filter>Source Files\Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="MediaInfo\Audio\File_Aes3.cpp">
       <Filter>Source Files\Audio</Filter>
     </ClCompile>
     <ClCompile Include="MediaInfo\Audio\File_Als.cpp">

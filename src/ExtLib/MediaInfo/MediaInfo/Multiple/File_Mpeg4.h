@@ -331,7 +331,7 @@ private :
     struct stream
     {
         Ztring                  File_Name;
-        File__Analyze*          Parser;
+        std::vector<File__Analyze*> Parsers;
         MediaInfo_Internal*     MI;
         struct timecode
         {
@@ -385,6 +385,7 @@ private :
         int32u                  mvex_trex_default_sample_size;
         int32u                  TimeCode_TrackID;
         bool                    TimeCode_IsVisual;
+        bool                    IsPcm;
         bool                    IsPcmMono;
         bool                    IsPriorityStream;
         bool                    IsFilled;
@@ -413,7 +414,6 @@ private :
 
         stream()
         {
-            Parser=NULL;
             MI=NULL;
             TimeCode=NULL;
             StreamKind=Stream_Max;
@@ -435,6 +435,7 @@ private :
             mvex_trex_default_sample_size=0;
             TimeCode_TrackID=(int32u)-1;
             TimeCode_IsVisual=false;
+            IsPcm=false;
             IsPcmMono=false;
             IsPriorityStream=false;
             IsFilled=false;
@@ -453,7 +454,8 @@ private :
 
         ~stream()
         {
-            delete Parser; //Parser=NULL;
+            for (size_t Pos=0; Pos<Parsers.size(); Pos++)
+                delete Parsers[Pos];
             delete MI; //MI=NULL;
             delete TimeCode; //TimeCode=NULL;
         }

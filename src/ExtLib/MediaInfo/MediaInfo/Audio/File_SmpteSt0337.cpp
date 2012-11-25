@@ -211,6 +211,7 @@ void File_SmpteSt0337::Streams_Fill()
         {
             Stream_Prepare(Smpte_St0337_data_type_StreamKind[data_type]);
             Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_Format), Smpte_St0337_data_type[data_type]);
+            Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_Codec), Smpte_St0337_data_type[data_type]);
         }
     }
 
@@ -229,10 +230,18 @@ void File_SmpteSt0337::Streams_Fill()
 
     for (size_t Pos=0; Pos<Count_Get(StreamKind_Last); Pos++)
     {
+        if (Endianness=='L' && Retrieve(StreamKind_Last, Pos, "Format_Settings_Endianness")==__T("Little"))
+            Endianness='B';
         switch (Endianness)
         {
-            case 'B' : Fill(StreamKind_Last, Pos, "Format_Settings_Endianness", "Big"); break;
-            case 'L' : Fill(StreamKind_Last, Pos, "Format_Settings_Endianness", "Little"); break;
+            case 'B' :
+                        Fill(StreamKind_Last, Pos, "Format_Settings", "Big");
+                        Fill(StreamKind_Last, Pos, "Format_Settings_Endianness", "Big", Unlimited, true, true);
+                        break;
+            case 'L' : 
+                        Fill(StreamKind_Last, Pos, "Format_Settings", "Little");
+                        Fill(StreamKind_Last, Pos, "Format_Settings_Endianness", "Little", Unlimited, true, true);
+                        break;
             default  : ;
         }
         Fill(StreamKind_Last, Pos, "Format_Settings_Mode", Container_Bits_Original);
@@ -240,7 +249,8 @@ void File_SmpteSt0337::Streams_Fill()
             Fill(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_BitDepth), Stream_Bits);
 
         Fill(StreamKind_Last, Pos, "MuxingMode", "AES3");
-        Fill(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_BitRate_Mode), "CBR");
+        if (Retrieve(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_BitRate_Mode))!=__T("CBR"))
+            Fill(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_BitRate_Mode), "CBR");
         if (File_Size!=(int64u)-1 && FrameSizes.size()==1)
             Fill(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_FrameCount), File_Size/FrameSizes.begin()->first);
         if (Retrieve(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_Duration)).empty())
@@ -598,6 +608,9 @@ bool File_SmpteSt0337::Synchronize()
         return false;
     }
 
+    if (!Status[IsAccepted])
+        Accept("AES3");
+
     // Synched
     return true;
 }
@@ -715,9 +728,9 @@ bool File_SmpteSt0337::Synched_Test()
                         case 32 :
                                     switch (Stream_Bits)
                                     {
-                                        case 16 : if (CC6(Buffer+Buffer_Offset)!=0x0000F87200004E1FLL) {Synched=false; return true;} break;
-                                        case 20 : if (CC6(Buffer+Buffer_Offset)!=0x006F87200054E1F0LL) {Synched=false; return true;} break;
-                                        case 24 : if (CC6(Buffer+Buffer_Offset)!=0x0096F87200A5F41FLL) {Synched=false; return true;} break;
+                                        case 16 : if (CC8(Buffer+Buffer_Offset)!=0x0000F87200004E1FLL) {Synched=false; return true;} break;
+                                        case 20 : if (CC8(Buffer+Buffer_Offset)!=0x006F87200054E1F0LL) {Synched=false; return true;} break;
+                                        case 24 : if (CC8(Buffer+Buffer_Offset)!=0x0096F87200A5F41FLL) {Synched=false; return true;} break;
                                         default : ;
                                     }
                                     break;
@@ -793,9 +806,9 @@ void File_SmpteSt0337::Header_Parse()
                         case 32 :
                                     switch (Stream_Bits)
                                     {
-                                        case 16 : Size=BigEndian2int16u(Buffer+Buffer_Offset+0xC)   ; break;
-                                        case 20 : Size=BigEndian2int24u(Buffer+Buffer_Offset+0xC)>>4; break;
-                                        case 24 : Size=BigEndian2int24u(Buffer+Buffer_Offset+0xC)   ; break;
+                                        case 16 : Size=BigEndian2int16u(Buffer+Buffer_Offset+0xE)   ; break;
+                                        case 20 : Size=BigEndian2int24u(Buffer+Buffer_Offset+0xD)>>4; break;
+                                        case 24 : Size=BigEndian2int24u(Buffer+Buffer_Offset+0xD)   ; break;
                                         default : ;
                                     }
                                     break;
@@ -873,8 +886,12 @@ void File_SmpteSt0337::Header_Parse()
 //---------------------------------------------------------------------------
 void File_SmpteSt0337::Data_Parse()
 {
-    if (!Status[IsAccepted])
-        Accept("AES3");
+    #if MEDIAINFO_DEMUX
+        FrameInfo.PTS=FrameInfo.DTS;
+        Demux_random_access=true;
+        Element_Code=(int64u)-1;
+        Demux(Buffer+Buffer_Offset-Header_Size, (size_t)(Header_Size+Element_Size), ContentType_MainStream);
+    #endif //MEDIAINFO_DEMUX
 
     // Adapting
     const int8u* Save_Buffer=NULL;
@@ -1071,12 +1088,14 @@ void File_SmpteSt0337::Data_Parse()
 
     if (Parser && !Parser->Status[IsFinished])
     {
+        /*
         #if MEDIAINFO_DEMUX
             FrameInfo.PTS=FrameInfo.DTS;
             Demux_random_access=true;
             Element_Code=(int64u)-1;
             Demux(Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)(Element_Size-Element_Offset), ContentType_MainStream);
         #endif // MEDIAINFO_DEMUX
+        */
 
         Parser->FrameInfo=FrameInfo;
         Open_Buffer_Continue(Parser, Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)(Element_Size-Element_Offset));
