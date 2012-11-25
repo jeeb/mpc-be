@@ -13,7 +13,7 @@ Changes (*):
 * Updated German translation, the author - Markus Gaugg;
 * libwebp 0.2.1 git-2e7f6e8e;
 * libpng 1.5.13 git-753fd3f;
-* libopus 1.0.1 git-14454c49;
+* libopus 1.0.1 git-b880e9b4;
 * Virtualdub 1.10.3 Test 7;
 * ffmpeg git-9a7256e8;
 * MediaInfo 0.7.61+ svn rev.5256;
