@@ -404,9 +404,9 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 		CloseHandle(hFile);
 	}
 
-	CFGFilter* pFGF = LookupFilterRegistry(CLSID_AsyncReader, m_override, MERIT64_ABOVE_DSHOW - 1);
+	CFGFilter* pFGF = LookupFilterRegistry(CLSID_AsyncReader, m_override);
 	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_NULL);
-	fl.Insert(pFGF, 3);
+	fl.Insert(pFGF, 9);
 
 	return S_OK;
 }

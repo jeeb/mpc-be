@@ -75,14 +75,21 @@ public:
         return AP4_SUCCESS;  
     }
 
-	void GetTranslation(AP4_Float& x, AP4_Float& y)
-	{
-		x = (AP4_Float)(*(int*)&m_Matrix[6]) / 65536;
-		y = (AP4_Float)(*(int*)&m_Matrix[7]) / 65536;
-	}
+    void GetTranslation(AP4_Float& x, AP4_Float& y) {
+        x = (AP4_Float)(*(int*)&m_Matrix[6]) / 65536;
+        y = (AP4_Float)(*(int*)&m_Matrix[7]) / 65536;
+    }
 
-	AP4_UI32 GetWidth() const {return m_Width;}
-	AP4_UI32 GetHeight() const {return m_Height;}
+    AP4_UI32 GetWidth() const {return m_Width;}
+    AP4_UI32 GetHeight() const {return m_Height;}
+
+    AP4_Integer GetRotation() {
+        AP4_Integer rotation = atan2((AP4_Integer)m_Matrix[1], (AP4_Integer)m_Matrix[0])*180.0/3.14159;
+        if (rotation < 0) {
+		    rotation += 360;
+		}
+        return rotation;
+	}
 
  private:
     // members

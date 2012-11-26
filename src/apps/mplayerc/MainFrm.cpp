@@ -13688,7 +13688,27 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 		AfxGetAppSettings().nCLSwitches &= ~CLSW_OPEN;
 
+		m_AngleX = 0;
 		if (pFileData) {
+			// Rotation flag;
+			BeginEnumFilters(pGB, pEF, pBF) {
+				if (CComQIPtr<IPropertyBag> pPB = pBF) {
+					CComVariant var;
+					if (SUCCEEDED(pPB->Read(CComBSTR(_T("ROTATION")), &var, NULL))) {
+						CString fstr = var.bstrVal;
+						if (!fstr.IsEmpty()) {
+							int rotationValue = 0;
+							if ((_stscanf_s(fstr, _T("%d"), &rotationValue) == 1) && rotationValue) {
+								m_AngleX = rotationValue;
+							}
+						}
+					}
+					break;
+				}
+			}
+			EndEnumFilters;
+			//
+
 			if (pFileData->rtStart > 0) {
 				PostMessage(WM_RESUMEFROMSTATE, (WPARAM)PM_FILE, (LPARAM)(pFileData->rtStart/10000));    // REFERENCE_TIME doesn't fit in LPARAM under a 32bit env.
 			}

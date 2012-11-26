@@ -464,6 +464,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	m_framesize.SetSize(640, 480);
 
+	int nRotation = 0;
+
 	if (AP4_Movie* movie = (AP4_Movie*)m_pFile->GetMovie()) {
 		// looking for main video track (skip tracks with motionless frames)
 		AP4_UI32 mainvideoID = 0;
@@ -507,6 +509,17 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			if (!AP4_SUCCEEDED(track->GetSample(0, sample)) || sample.GetDescriptionIndex() == 0xFFFFFFFF) {
 				continue;
+			}
+
+			if (track->GetType() == AP4_Track::TYPE_VIDEO && !nRotation) {
+				if (AP4_TkhdAtom* tkhd = dynamic_cast<AP4_TkhdAtom*>(track->GetTrakAtom()->GetChild(AP4_ATOM_TYPE_TKHD))) {
+					nRotation = tkhd->GetRotation();
+					if (nRotation) {
+						CString prop;
+						prop.Format(_T("%d"), nRotation);
+						SetProperty(L"ROTATION", prop);
+					}
+				}
 			}
 
 			CStringW TrackName = UTF8ToStringW(track->GetTrackName().c_str());
