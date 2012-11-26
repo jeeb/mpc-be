@@ -27,6 +27,7 @@
 #include <mmreg.h>
 
 #include "MusePackSource.h"
+#include "../DSUtil/ApeTag.h"
 
 #ifdef REGISTER_FILTER
 
@@ -227,122 +228,83 @@ HRESULT CMusePackSplitter::CompleteConnect(PIN_DIRECTION Dir, CBasePin *pCaller,
 			return E_FAIL;
 		}
 
-		//
-
-		// try parse APE Tag Header
+		// parse APE Tag Header
 		char buf[APE_TAG_FOOTER_BYTES];
 		memset(buf, 0, sizeof(buf));
 		__int64 cur_pos, file_size;
 		reader->GetPosition(&cur_pos, &file_size);
+
 		if (cur_pos + APE_TAG_FOOTER_BYTES <= file_size) {
 			reader->Seek(file_size - APE_TAG_FOOTER_BYTES);
 			if (reader->Read(buf, APE_TAG_FOOTER_BYTES) >= 0) {
-				if (!memcmp(buf, "APETAGEX", 8)) {
-					CGolombBuffer gb((BYTE*)buf + 8, APE_TAG_FOOTER_BYTES - 8);
-					DWORD ver		= gb.ReadDwordLE();
-					if (ver <= APE_TAG_VERSION) {
-						DWORD tag_size	= gb.ReadDwordLE();
-						DWORD tag_start	= file_size - tag_size - APE_TAG_FOOTER_BYTES;
-						if (tag_start > 0) {
-							DWORD fields = gb.ReadDwordLE();
-							if (fields <= 65536) {
-								DWORD flags = gb.ReadDwordLE();
-								if (!(flags & APE_TAG_FLAG_IS_HEADER)) {
-									//io->set_pos_rel(io, file_size - tag_size, SEEK_SET);
-									reader->Seek(file_size - tag_size);
-									BYTE *p = DNew BYTE[tag_size];
-									//if (io->read_bytes(io, p, tag_size) == tag_size) {
-									if (reader->Read(p, tag_size) >= 0) {
+				CAPETag* APETag = DNew CAPETag;
+				if (APETag->ReadFooter((BYTE*)buf, APE_TAG_FOOTER_BYTES) && APETag->GetTagSize()) {
+					size_t tag_size = APETag->GetTagSize();
+					reader->Seek(file_size - tag_size);
+					BYTE *p = DNew BYTE[tag_size];
+					if (reader->Read(p, tag_size) >= 0) {
+						if (APETag->ReadTags(p, tag_size)) {
+							POSITION pos = APETag->TagItems.GetHeadPosition();
+							while (pos) {
+								CApeTagItem* item = APETag->TagItems.GetAt(pos);
+								CString TagKey = item->GetKey();
+								TagKey.MakeLower();
 
-										CGolombBuffer gb(p, tag_size);
-										for (size_t i = 0; i < fields; i++) {
-											// parse APE Tag Item
-											tag_size	= gb.ReadDwordLE();	/* field size */
-											flags		= gb.ReadDwordLE();	/* field flags */
-											CString key;
-											BYTE b = gb.ReadByte();
-											while (b) {
-												key += b;
-												b = gb.ReadByte();
-											}
+								if (item->GetType() == CApeTagItem::APE_TYPE_BINARY) {
+									m_CoverMime = _T("");
+									if (!TagKey.IsEmpty()) {
+										CString ext = TagKey.Mid(TagKey.ReverseFind('.')+1);
+										if (ext == _T("jpeg") || ext == _T("jpg")) {
+											m_CoverMime = _T("image/jpeg");
+										} else if (ext == _T("png")) {
+											m_CoverMime = _T("image/png");
+										}
+									}
 
-											if (flags & APE_TAG_FLAG_IS_BINARY) {
-												key = "";
-												b = gb.ReadByte();
-												tag_size--;
-												while (b && tag_size) {
-													key += b;
-													b = gb.ReadByte();
-													tag_size--;
-												}
-
-												if (tag_size) {
-													BYTE* value = DNew BYTE[tag_size];
-													gb.ReadBuffer(value, tag_size);
-
-													m_CoverMime = _T("");
-													if (!key.IsEmpty()) {
-														CString ext = key.Mid(key.ReverseFind('.')+1).MakeLower();
-														if (ext == _T("jpeg") || ext == _T("jpg")) {
-															m_CoverMime = _T("image/jpeg");
-														} else if (ext == _T("png")) {
-															m_CoverMime = _T("image/png");
-														}
-													}
-
-													if (!m_Cover.GetCount() && !m_CoverMime.IsEmpty()) {
-														m_CoverFileName = key;
-														m_Cover.SetCount(tag_size);
-														memcpy(m_Cover.GetData(), value, tag_size);
-													}
-											
-													delete [] value;
-												}
-
-											} else {
-												BYTE* value = DNew BYTE[tag_size + 1];
-												memset(value, 0, tag_size + 1);
-												gb.ReadBuffer(value, tag_size);
-												CString TagValue	= CA2CT(CStringA(value), CP_UTF8);
-												CString Tagkey		= CString(key).MakeLower();
-
-												if (Tagkey == _T("cuesheet")) {
-													CAtlList<Chapters> ChaptersList;
-													if (ParseCUESheet(TagValue, ChaptersList)) {
-														ChapRemoveAll();
-														while (ChaptersList.GetCount()) {
-															Chapters cp = ChaptersList.RemoveHead();
-															ChapAppend(cp.rt, cp.name);
-														}
-													}
-												}
-
-												if (Tagkey == _T("artist")) {
-													SetProperty(L"AUTH", TagValue);
-												} else if (Tagkey == _T("comment")) {
-													SetProperty(L"DESC", TagValue);
-												} else if (Tagkey == _T("title")) {
-													SetProperty(L"TITL", TagValue);
-												} else if (Tagkey == _T("year")) {
-													SetProperty(L"YEAR", TagValue);
-												}
-
-												delete [] value;
+									if (!m_Cover.GetCount() && !m_CoverMime.IsEmpty()) {
+										m_CoverFileName = TagKey;
+										m_Cover.SetCount(tag_size);
+										memcpy(m_Cover.GetData(), item->GetData(), item->GetDataLen());
+									}
+							
+								} else {
+									CString TagValue = item->GetValue();
+									if (TagKey == _T("cuesheet")) {
+										CAtlList<Chapters> ChaptersList;
+										if (ParseCUESheet(TagValue, ChaptersList)) {
+											ChapRemoveAll();
+											while (ChaptersList.GetCount()) {
+												Chapters cp = ChaptersList.RemoveHead();
+												ChapAppend(cp.rt, cp.name);
 											}
 										}
 									}
 
-									delete [] p;
+									if (TagKey == _T("artist")) {
+										SetProperty(L"AUTH", TagValue);
+									} else if (TagKey == _T("comment")) {
+										SetProperty(L"DESC", TagValue);
+									} else if (TagKey == _T("title")) {
+										SetProperty(L"TITL", TagValue);
+									} else if (TagKey == _T("year")) {
+										SetProperty(L"YEAR", TagValue);
+									}
+							
 								}
+
+								APETag->TagItems.GetNext(pos);
 							}
 						}
 					}
+
+					delete [] p;
 				}
+
+				delete APETag;
 			}
-			//io->set_pos_rel(io, cur_pos, SEEK_SET);
+
 			reader->Seek(cur_pos);
 		}
-		//
 
 		HRESULT hr = S_OK;
 		CMusePackOutputPin *opin = DNew CMusePackOutputPin(_T("Outpin"), this, &hr, L"Out", 5);
