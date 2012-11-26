@@ -84,7 +84,7 @@ public:
     AP4_UI32 GetHeight() const {return m_Height;}
 
     AP4_Integer GetRotation() {
-        AP4_Integer rotation = atan2((AP4_Integer)m_Matrix[1], (AP4_Integer)m_Matrix[0])*180.0/3.14159;
+        AP4_Integer rotation = atan2((double)(AP4_Integer)m_Matrix[1], (double)(AP4_Integer)m_Matrix[0])*180.0/3.14159;
         if (rotation < 0) {
 		    rotation += 360;
 		}
