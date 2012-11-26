@@ -119,53 +119,11 @@ STDMETHODIMP CWavPackSplitterFilter::NonDelegatingQueryInterface(REFIID riid, vo
 	CheckPointer(ppv, E_POINTER);
 
 	return
+		QI2(IAMMediaContent)
 		QI(IDSMResourceBag)
 		QI(IDSMChapterBag)
+		QI(IDSMPropertyBag)
 		__super::NonDelegatingQueryInterface(riid, ppv);
-}
-
-// IDSMResourceBag
-STDMETHODIMP_(DWORD) CWavPackSplitterFilter::ResGetCount()
-{
-	return m_pInputPin ? (m_pInputPin->m_Cover.IsEmpty() ? 0 : 1) : 0;
-}
-
-STDMETHODIMP CWavPackSplitterFilter::ResGet(DWORD iIndex, BSTR* ppName, BSTR* ppDesc, BSTR* ppMime, BYTE** ppData, DWORD* pDataLen, DWORD_PTR* pTag)
-{
-	if (ppData) {
-		CheckPointer(pDataLen, E_POINTER);
-	}
-
-	if (iIndex) {
-		return E_INVALIDARG;
-	}
-
-	CheckPointer(m_pInputPin, E_NOTIMPL);
-
-	if (m_pInputPin->m_Cover.IsEmpty()) {
-		return E_NOTIMPL;
-	}
-
-	if (ppName) {
-		*ppName = m_pInputPin->m_CoverFileName.AllocSysString();
-	}
-	if (ppDesc) {
-		CString str = _T("cover");
-		*ppDesc = str.AllocSysString();
-	}
-	if (ppMime) {
-		CString str = m_pInputPin->m_CoverMime;
-		*ppMime = str.AllocSysString();
-	}
-	if (ppData) {
-		*pDataLen = (DWORD)m_pInputPin->m_Cover.GetCount();
-		memcpy(*ppData = (BYTE*)CoTaskMemAlloc(*pDataLen), m_pInputPin->m_Cover.GetData(), *pDataLen);
-	}
-	if (pTag) {
-		*pTag = 0;
-	}
-
-	return S_OK;
 }
 
 // CBaseFilter
@@ -265,6 +223,77 @@ HRESULT CWavPackSplitterFilter::DoSeeking()
 STDMETHODIMP CWavPackSplitterFilter::JoinFilterGraph(IFilterGraph *pGraph, LPCWSTR pName)
 {
 	return CBaseFilter::JoinFilterGraph(pGraph,pName);
+}
+
+// IDSMResourceBag
+STDMETHODIMP_(DWORD) CWavPackSplitterFilter::ResGetCount()
+{
+	return m_pInputPin ? (m_pInputPin->m_Cover.IsEmpty() ? 0 : 1) : 0;
+}
+
+STDMETHODIMP CWavPackSplitterFilter::ResGet(DWORD iIndex, BSTR* ppName, BSTR* ppDesc, BSTR* ppMime, BYTE** ppData, DWORD* pDataLen, DWORD_PTR* pTag)
+{
+	if (ppData) {
+		CheckPointer(pDataLen, E_POINTER);
+	}
+
+	if (iIndex) {
+		return E_INVALIDARG;
+	}
+
+	CheckPointer(m_pInputPin, E_NOTIMPL);
+
+	if (m_pInputPin->m_Cover.IsEmpty()) {
+		return E_NOTIMPL;
+	}
+
+	if (ppName) {
+		*ppName = m_pInputPin->m_CoverFileName.AllocSysString();
+	}
+	if (ppDesc) {
+		CString str = _T("cover");
+		*ppDesc = str.AllocSysString();
+	}
+	if (ppMime) {
+		CString str = m_pInputPin->m_CoverMime;
+		*ppMime = str.AllocSysString();
+	}
+	if (ppData) {
+		*pDataLen = (DWORD)m_pInputPin->m_Cover.GetCount();
+		memcpy(*ppData = (BYTE*)CoTaskMemAlloc(*pDataLen), m_pInputPin->m_Cover.GetData(), *pDataLen);
+	}
+	if (pTag) {
+		*pTag = 0;
+	}
+
+	return S_OK;
+}
+
+// IAMMediaContent
+
+STDMETHODIMP CWavPackSplitterFilter::get_AuthorName(BSTR* pbstrAuthorName)
+{
+	return GetProperty(L"AUTH", pbstrAuthorName);
+}
+
+STDMETHODIMP CWavPackSplitterFilter::get_Title(BSTR* pbstrTitle)
+{
+	return GetProperty(L"TITL", pbstrTitle);
+}
+
+STDMETHODIMP CWavPackSplitterFilter::get_Rating(BSTR* pbstrRating)
+{
+	return GetProperty(L"RTNG", pbstrRating);
+}
+
+STDMETHODIMP CWavPackSplitterFilter::get_Description(BSTR* pbstrDescription)
+{
+	return GetProperty(L"DESC", pbstrDescription);
+}
+
+STDMETHODIMP CWavPackSplitterFilter::get_Copyright(BSTR* pbstrCopyright)
+{
+	return GetProperty(L"CPYR", pbstrCopyright);
 }
 
 // ============================================================================
@@ -452,12 +481,13 @@ HRESULT CWavPackSplitterFilterInputPin::CompleteConnect(IPin *pReceivePin)
 											}
 
 										} else {
-											BYTE* value = DNew BYTE[tag_size];
+											BYTE* value = DNew BYTE[tag_size + 1];
+											memset(value, 0, tag_size + 1);
 											gb.ReadBuffer(value, tag_size);
+											CString TagValue	= CA2CT(CStringA(value), CP_UTF8);
+											CString Tagkey		= CString(key).MakeLower();
 
-											if (CString(key).MakeLower() == "cuesheet") {
-												CString TagValue = CA2CT(CStringA(value), CP_UTF8);
-
+											if (Tagkey == _T("cuesheet")) {
 												CAtlList<Chapters> ChaptersList;
 												if (ParseCUESheet(TagValue, ChaptersList)) {
 													m_pParentFilter->ChapRemoveAll();
@@ -466,6 +496,16 @@ HRESULT CWavPackSplitterFilterInputPin::CompleteConnect(IPin *pReceivePin)
 														m_pParentFilter->ChapAppend(cp.rt, cp.name);
 													}
 												}
+											}
+
+											if (Tagkey == _T("artist")) {
+												m_pParentFilter->SetProperty(L"AUTH", TagValue);
+											} else if (Tagkey == _T("comment")) {
+												m_pParentFilter->SetProperty(L"DESC", TagValue);
+											} else if (Tagkey == _T("title")) {
+												m_pParentFilter->SetProperty(L"TITL", TagValue);
+											} else if (Tagkey == _T("year")) {
+												m_pParentFilter->SetProperty(L"YEAR", TagValue);
 											}
 
 											delete [] value;

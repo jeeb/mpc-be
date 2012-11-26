@@ -151,7 +151,9 @@ class __declspec(uuid("B5554304-3C9A-40A1-8E82-8C8CFBED56C0"))
 	CWavPackSplitterFilter
 	: public CBaseFilter
 	, public IDSMResourceBagImpl
-	, public IDSMChapterBagImpl 
+	, public IDSMChapterBagImpl
+	, public IDSMPropertyBagImpl
+	, public IAMMediaContent
 {
 public :
 	DECLARE_IUNKNOWN
@@ -161,10 +163,6 @@ public :
 	virtual ~CWavPackSplitterFilter();
 
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
-
-	// IDSMResourceBag
-	STDMETHODIMP_(DWORD) ResGetCount();
-	STDMETHODIMP ResGet(DWORD iIndex, BSTR* ppName, BSTR* ppDesc, BSTR* ppMime, BYTE** ppData, DWORD* pDataLen, DWORD_PTR* pTag);
 
 	// CBaseFilter
 	int GetPinCount();
@@ -176,6 +174,31 @@ public :
 
 	HRESULT BeginFlush();
 	HRESULT EndFlush();
+
+	// IDSMResourceBag
+	STDMETHODIMP_(DWORD) ResGetCount();
+	STDMETHODIMP ResGet(DWORD iIndex, BSTR* ppName, BSTR* ppDesc, BSTR* ppMime, BYTE** ppData, DWORD* pDataLen, DWORD_PTR* pTag);
+
+	// IDispatch
+	STDMETHODIMP GetTypeInfoCount(UINT* pctinfo) {return E_NOTIMPL;}
+	STDMETHODIMP GetTypeInfo(UINT itinfo, LCID lcid, ITypeInfo** pptinfo) {return E_NOTIMPL;}
+	STDMETHODIMP GetIDsOfNames(REFIID riid, OLECHAR** rgszNames, UINT cNames, LCID lcid, DISPID* rgdispid) {return E_NOTIMPL;}
+	STDMETHODIMP Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS* pdispparams, VARIANT* pvarResult, EXCEPINFO* pexcepinfo, UINT* puArgErr) {return E_NOTIMPL;}
+
+	// IAMMediaContent
+	STDMETHODIMP get_AuthorName(BSTR* pbstrAuthorName);
+	STDMETHODIMP get_Title(BSTR* pbstrTitle);
+	STDMETHODIMP get_Rating(BSTR* pbstrRating);
+	STDMETHODIMP get_Description(BSTR* pbstrDescription);
+	STDMETHODIMP get_Copyright(BSTR* pbstrCopyright);
+	STDMETHODIMP get_BaseURL(BSTR* pbstrBaseURL) {return E_NOTIMPL;}
+	STDMETHODIMP get_LogoURL(BSTR* pbstrLogoURL) {return E_NOTIMPL;}
+	STDMETHODIMP get_LogoIconURL(BSTR* pbstrLogoURL) {return E_NOTIMPL;}
+	STDMETHODIMP get_WatermarkURL(BSTR* pbstrWatermarkURL) {return E_NOTIMPL;}
+	STDMETHODIMP get_MoreInfoURL(BSTR* pbstrMoreInfoURL) {return E_NOTIMPL;}
+	STDMETHODIMP get_MoreInfoBannerImage(BSTR* pbstrMoreInfoBannerImage) {return E_NOTIMPL;}
+	STDMETHODIMP get_MoreInfoBannerURL(BSTR* pbstrMoreInfoBannerURL) {return E_NOTIMPL;}
+	STDMETHODIMP get_MoreInfoText(BSTR* pbstrMoreInfoText) {return E_NOTIMPL;}
 
 protected:
 	CCritSec m_Lock;

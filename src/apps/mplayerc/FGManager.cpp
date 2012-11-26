@@ -404,9 +404,20 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 		CloseHandle(hFile);
 	}
 
-	CFGFilter* pFGF = LookupFilterRegistry(CLSID_AsyncReader, m_override);
-	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_NULL);
-	fl.Insert(pFGF, 9);
+	AppSettings& s	= AfxGetAppSettings();
+	bool *src		= s.SrcFilters;
+	if ((ext == _T(".tta") && src[SRC_TTA])
+			|| (ext == _T(".amr") && src[SRC_AMR])
+			|| (ext == _T(".wv") && src[SRC_WPAC])
+			|| (ext == _T(".mpc") && src[SRC_MPAC])) { // hack for internal Splitter without Source - add File Source (Async) with high merit
+		CFGFilter* pFGF = LookupFilterRegistry(CLSID_AsyncReader, m_override, MERIT64_ABOVE_DSHOW - 1);
+		pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_NULL);
+		fl.Insert(pFGF, 3);
+	} else {
+		CFGFilter* pFGF = LookupFilterRegistry(CLSID_AsyncReader, m_override);
+		pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_NULL);
+		fl.Insert(pFGF, 9);
+	}
 
 	return S_OK;
 }

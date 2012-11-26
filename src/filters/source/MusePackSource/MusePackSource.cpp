@@ -129,9 +129,14 @@ STDMETHODIMP CMusePackSplitter::NonDelegatingQueryInterface(REFIID riid,void **p
 
     if (riid == IID_IMediaSeeking) {
         return GetInterface((IMediaSeeking*)this, ppv);
-	} 
-		
-	return CBaseFilter::NonDelegatingQueryInterface(riid,ppv);
+	}
+
+	return
+		QI2(IAMMediaContent)
+		QI(IDSMResourceBag)
+		QI(IDSMChapterBag)
+		QI(IDSMPropertyBag)
+		__super::NonDelegatingQueryInterface(riid, ppv);
 }
 
 int CMusePackSplitter::GetPinCount()
@@ -187,6 +192,12 @@ HRESULT CMusePackSplitter::CheckInputType(const CMediaType* mtIn)
 	return VFW_E_TYPE_NOT_ACCEPTED;
 }
 
+#define APE_TAG_FOOTER_BYTES			32
+#define APE_TAG_VERSION					2000
+
+#define APE_TAG_FLAG_IS_HEADER			(1 << 29)
+#define APE_TAG_FLAG_IS_BINARY			(1 << 1)
+
 HRESULT CMusePackSplitter::CompleteConnect(PIN_DIRECTION Dir, CBasePin *pCaller, IPin *pReceivePin)
 {
 	if (Dir == PINDIR_INPUT) {
@@ -215,6 +226,123 @@ HRESULT CMusePackSplitter::CompleteConnect(PIN_DIRECTION Dir, CBasePin *pCaller,
 			reader = NULL;
 			return E_FAIL;
 		}
+
+		//
+
+		// try parse APE Tag Header
+		char buf[APE_TAG_FOOTER_BYTES];
+		memset(buf, 0, sizeof(buf));
+		__int64 cur_pos, file_size;
+		reader->GetPosition(&cur_pos, &file_size);
+		if (cur_pos + APE_TAG_FOOTER_BYTES <= file_size) {
+			reader->Seek(file_size - APE_TAG_FOOTER_BYTES);
+			if (reader->Read(buf, APE_TAG_FOOTER_BYTES) >= 0) {
+				if (!memcmp(buf, "APETAGEX", 8)) {
+					CGolombBuffer gb((BYTE*)buf + 8, APE_TAG_FOOTER_BYTES - 8);
+					DWORD ver		= gb.ReadDwordLE();
+					if (ver <= APE_TAG_VERSION) {
+						DWORD tag_size	= gb.ReadDwordLE();
+						DWORD tag_start	= file_size - tag_size - APE_TAG_FOOTER_BYTES;
+						if (tag_start > 0) {
+							DWORD fields = gb.ReadDwordLE();
+							if (fields <= 65536) {
+								DWORD flags = gb.ReadDwordLE();
+								if (!(flags & APE_TAG_FLAG_IS_HEADER)) {
+									//io->set_pos_rel(io, file_size - tag_size, SEEK_SET);
+									reader->Seek(file_size - tag_size);
+									BYTE *p = DNew BYTE[tag_size];
+									//if (io->read_bytes(io, p, tag_size) == tag_size) {
+									if (reader->Read(p, tag_size) >= 0) {
+
+										CGolombBuffer gb(p, tag_size);
+										for (size_t i = 0; i < fields; i++) {
+											// parse APE Tag Item
+											tag_size	= gb.ReadDwordLE();	/* field size */
+											flags		= gb.ReadDwordLE();	/* field flags */
+											CString key;
+											BYTE b = gb.ReadByte();
+											while (b) {
+												key += b;
+												b = gb.ReadByte();
+											}
+
+											if (flags & APE_TAG_FLAG_IS_BINARY) {
+												key = "";
+												b = gb.ReadByte();
+												tag_size--;
+												while (b && tag_size) {
+													key += b;
+													b = gb.ReadByte();
+													tag_size--;
+												}
+
+												if (tag_size) {
+													BYTE* value = DNew BYTE[tag_size];
+													gb.ReadBuffer(value, tag_size);
+
+													m_CoverMime = _T("");
+													if (!key.IsEmpty()) {
+														CString ext = key.Mid(key.ReverseFind('.')+1).MakeLower();
+														if (ext == _T("jpeg") || ext == _T("jpg")) {
+															m_CoverMime = _T("image/jpeg");
+														} else if (ext == _T("png")) {
+															m_CoverMime = _T("image/png");
+														}
+													}
+
+													if (!m_Cover.GetCount() && !m_CoverMime.IsEmpty()) {
+														m_CoverFileName = key;
+														m_Cover.SetCount(tag_size);
+														memcpy(m_Cover.GetData(), value, tag_size);
+													}
+											
+													delete [] value;
+												}
+
+											} else {
+												BYTE* value = DNew BYTE[tag_size + 1];
+												memset(value, 0, tag_size + 1);
+												gb.ReadBuffer(value, tag_size);
+												CString TagValue	= CA2CT(CStringA(value), CP_UTF8);
+												CString Tagkey		= CString(key).MakeLower();
+
+												if (Tagkey == _T("cuesheet")) {
+													CAtlList<Chapters> ChaptersList;
+													if (ParseCUESheet(TagValue, ChaptersList)) {
+														ChapRemoveAll();
+														while (ChaptersList.GetCount()) {
+															Chapters cp = ChaptersList.RemoveHead();
+															ChapAppend(cp.rt, cp.name);
+														}
+													}
+												}
+
+												if (Tagkey == _T("artist")) {
+													SetProperty(L"AUTH", TagValue);
+												} else if (Tagkey == _T("comment")) {
+													SetProperty(L"DESC", TagValue);
+												} else if (Tagkey == _T("title")) {
+													SetProperty(L"TITL", TagValue);
+												} else if (Tagkey == _T("year")) {
+													SetProperty(L"YEAR", TagValue);
+												}
+
+												delete [] value;
+											}
+										}
+									}
+
+									delete [] p;
+								}
+							}
+						}
+					}
+				}
+			}
+			//io->set_pos_rel(io, cur_pos, SEEK_SET);
+			reader->Seek(cur_pos);
+		}
+		//
 
 		HRESULT hr = S_OK;
 		CMusePackOutputPin *opin = DNew CMusePackOutputPin(_T("Outpin"), this, &hr, L"Out", 5);
@@ -652,6 +780,77 @@ DWORD CMusePackSplitter::ThreadProc()
 		}
 	}
 	return S_OK;
+}
+
+// IDSMResourceBag
+STDMETHODIMP_(DWORD) CMusePackSplitter::ResGetCount()
+{
+	return input ? (m_Cover.IsEmpty() ? 0 : 1) : 0;
+}
+
+STDMETHODIMP CMusePackSplitter::ResGet(DWORD iIndex, BSTR* ppName, BSTR* ppDesc, BSTR* ppMime, BYTE** ppData, DWORD* pDataLen, DWORD_PTR* pTag)
+{
+	if (ppData) {
+		CheckPointer(pDataLen, E_POINTER);
+	}
+
+	if (iIndex) {
+		return E_INVALIDARG;
+	}
+
+	CheckPointer(input, E_NOTIMPL);
+
+	if (m_Cover.IsEmpty()) {
+		return E_NOTIMPL;
+	}
+
+	if (ppName) {
+		*ppName = m_CoverFileName.AllocSysString();
+	}
+	if (ppDesc) {
+		CString str = _T("cover");
+		*ppDesc = str.AllocSysString();
+	}
+	if (ppMime) {
+		CString str = m_CoverMime;
+		*ppMime = str.AllocSysString();
+	}
+	if (ppData) {
+		*pDataLen = (DWORD)m_Cover.GetCount();
+		memcpy(*ppData = (BYTE*)CoTaskMemAlloc(*pDataLen), m_Cover.GetData(), *pDataLen);
+	}
+	if (pTag) {
+		*pTag = 0;
+	}
+
+	return S_OK;
+}
+
+// IAMMediaContent
+
+STDMETHODIMP CMusePackSplitter::get_AuthorName(BSTR* pbstrAuthorName)
+{
+	return GetProperty(L"AUTH", pbstrAuthorName);
+}
+
+STDMETHODIMP CMusePackSplitter::get_Title(BSTR* pbstrTitle)
+{
+	return GetProperty(L"TITL", pbstrTitle);
+}
+
+STDMETHODIMP CMusePackSplitter::get_Rating(BSTR* pbstrRating)
+{
+	return GetProperty(L"RTNG", pbstrRating);
+}
+
+STDMETHODIMP CMusePackSplitter::get_Description(BSTR* pbstrDescription)
+{
+	return GetProperty(L"DESC", pbstrDescription);
+}
+
+STDMETHODIMP CMusePackSplitter::get_Copyright(BSTR* pbstrCopyright)
+{
+	return GetProperty(L"CPYR", pbstrCopyright);
 }
 
 //-----------------------------------------------------------------------------

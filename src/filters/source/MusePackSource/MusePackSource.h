@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include "../../parser/BaseSplitter/BaseSplitter.h"
+
 #include <windows.h>
 #include <initguid.h>
 #include <moreuuids.h>
@@ -242,10 +244,14 @@ public:
 //
 //-----------------------------------------------------------------------------
 class __declspec(uuid("47A759C8-CCD7-471A-81D3-A92870431979"))
-    CMusePackSplitter : 
-	public CBaseFilter,
-	public CAMThread,
-	public IMediaSeeking
+    CMusePackSplitter
+	: public CBaseFilter
+	, public CAMThread
+	, public IMediaSeeking
+	, public IDSMResourceBagImpl
+	, public IDSMChapterBagImpl
+	, public IDSMPropertyBagImpl
+	, public IAMMediaContent
 {
 public:
 	enum {CMD_EXIT, CMD_STOP, CMD_RUN};
@@ -320,4 +326,34 @@ public:
 	STDMETHODIMP SetPositionsInternal(int iD, LONGLONG* pCurrent, DWORD dwCurrentFlags, LONGLONG* pStop, DWORD dwStopFlags);
 
 	virtual HRESULT DoNewSeek();
+
+	// IDSMResourceBag
+	STDMETHODIMP_(DWORD) ResGetCount();
+	STDMETHODIMP ResGet(DWORD iIndex, BSTR* ppName, BSTR* ppDesc, BSTR* ppMime, BYTE** ppData, DWORD* pDataLen, DWORD_PTR* pTag);
+
+	// IDispatch
+	STDMETHODIMP GetTypeInfoCount(UINT* pctinfo) {return E_NOTIMPL;}
+	STDMETHODIMP GetTypeInfo(UINT itinfo, LCID lcid, ITypeInfo** pptinfo) {return E_NOTIMPL;}
+	STDMETHODIMP GetIDsOfNames(REFIID riid, OLECHAR** rgszNames, UINT cNames, LCID lcid, DISPID* rgdispid) {return E_NOTIMPL;}
+	STDMETHODIMP Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS* pdispparams, VARIANT* pvarResult, EXCEPINFO* pexcepinfo, UINT* puArgErr) {return E_NOTIMPL;}
+
+	// IAMMediaContent
+	STDMETHODIMP get_AuthorName(BSTR* pbstrAuthorName);
+	STDMETHODIMP get_Title(BSTR* pbstrTitle);
+	STDMETHODIMP get_Rating(BSTR* pbstrRating);
+	STDMETHODIMP get_Description(BSTR* pbstrDescription);
+	STDMETHODIMP get_Copyright(BSTR* pbstrCopyright);
+	STDMETHODIMP get_BaseURL(BSTR* pbstrBaseURL) {return E_NOTIMPL;}
+	STDMETHODIMP get_LogoURL(BSTR* pbstrLogoURL) {return E_NOTIMPL;}
+	STDMETHODIMP get_LogoIconURL(BSTR* pbstrLogoURL) {return E_NOTIMPL;}
+	STDMETHODIMP get_WatermarkURL(BSTR* pbstrWatermarkURL) {return E_NOTIMPL;}
+	STDMETHODIMP get_MoreInfoURL(BSTR* pbstrMoreInfoURL) {return E_NOTIMPL;}
+	STDMETHODIMP get_MoreInfoBannerImage(BSTR* pbstrMoreInfoBannerImage) {return E_NOTIMPL;}
+	STDMETHODIMP get_MoreInfoBannerURL(BSTR* pbstrMoreInfoBannerURL) {return E_NOTIMPL;}
+	STDMETHODIMP get_MoreInfoText(BSTR* pbstrMoreInfoText) {return E_NOTIMPL;}
+
+protected:
+	CAtlArray<BYTE>		m_Cover;
+	CString				m_CoverMime;
+	CString				m_CoverFileName;
 };
