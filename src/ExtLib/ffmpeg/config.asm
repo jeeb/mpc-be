@@ -86,6 +86,7 @@
     %define CONFIG_PIC 0
 %endif
 
+%define ARCH_AARCH64 0
 %define ARCH_ALPHA 0
 %define ARCH_ARM 0
 %define ARCH_AVR32 0
@@ -261,6 +262,7 @@
 %define CONFIG_DCT 1
 %define CONFIG_DWT 0
 %define CONFIG_GPL 1
+%define CONFIG_VERSION3 1
 %define CONFIG_GPLV3 1
 %define CONFIG_GRAY 1
 %define CONFIG_H264CHROMA 1
