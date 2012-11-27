@@ -9,6 +9,7 @@
 #define IDS_MPADEC_MONO                 33139
 #define IDS_MPADEC_STEREO               33140
 #define IDS_MPADEC_SPDIF                33141
+#define IDS_MPADEC_AC3ENCODE            33142
 
 // Next default values for new objects
 // 

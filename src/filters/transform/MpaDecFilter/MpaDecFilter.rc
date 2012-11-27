@@ -100,6 +100,7 @@ BEGIN
     IDS_MPADEC_MONO         "Mono"
     IDS_MPADEC_STEREO       "Stereo"
     IDS_MPADEC_SPDIF        "S/PDIF passthrough:"
+    IDS_MPADEC_AC3ENCODE    "Encode to AC-3"
 END
 
 #endif    // English (United States) resources
