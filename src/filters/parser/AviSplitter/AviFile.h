@@ -26,7 +26,7 @@
 #include <Aviriff.h> // conflicts with vfw.h...
 #include "../BaseSplitter/BaseSplitter.h"
 
-class CAviFile : public CBaseSplitterFile
+class CAviFile : public CBaseSplitterFileEx
 {
 	HRESULT Init();
 	HRESULT Parse(DWORD parentid, __int64 end);
@@ -37,7 +37,7 @@ public:
 
 	//using CBaseSplitterFile::Read;
 	template<typename T>
-	HRESULT Read(T& var, int offset = 0) {
+	HRESULT ReadAvi(T& var, int offset = 0) {
 		memset(&var, 0, sizeof(var));
 		HRESULT hr = ByteRead((BYTE*)&var + offset, sizeof(var) - offset);
 		return hr;

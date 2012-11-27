@@ -25,6 +25,7 @@
 #include <MMReg.h>
 #include "AviFile.h"
 #include "AviSplitter.h"
+#include <moreuuids.h>
 
 #define MAXPACKETS_AVI	MAXPACKETS*10
 
@@ -258,6 +259,23 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				continue;
 			}
 
+			// parse MPEGAudio frame to identify the correct codec MP3/MP2
+			if (pwfe->wFormatTag == WAVE_FORMAT_MP3 || pwfe->wFormatTag == WAVE_FORMAT_MPEG) {
+
+				if (s->cs.GetCount()) {
+					__int64 cur_pos = m_pFile->GetPos();
+					m_pFile->Seek(s->cs[0].filepos);
+
+					CBaseSplitterFileEx::mpahdr h;
+					CMediaType mt2;
+					if (m_pFile->Read(h, s->cs[0].orgsize, false, &mt2) && mt2.cbFormat) {
+						pwfe->wFormatTag = ((WAVEFORMATEX*)mt2.pbFormat)->wFormatTag;
+					}
+
+					m_pFile->Seek(cur_pos);
+				}
+			}
+
 			mt.majortype = MEDIATYPE_Audio;
 			if (m_pFile->m_isamv) {
 				mt.subtype = FOURCCMap(MAKEFOURCC('A','M','V','A'));
@@ -279,6 +297,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			if (pwfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE) {
 				mt.subtype = FOURCCMap(WAVE_FORMAT_PCM);    // audio renderer doesn't accept fffe in the subtype
 			}
+
 			mt.SetSampleSize(s->strh.dwSuggestedBufferSize > 0
 							 ? s->strh.dwSuggestedBufferSize*3/2
 							 : (pwfe->nChannels*pwfe->nSamplesPerSec*32>>3));
@@ -416,12 +435,12 @@ HRESULT CAviSplitterFilter::ReIndex(__int64 end, UINT64* pSize)
 		__int64 pos = m_pFile->GetPos();
 
 		DWORD id = 0, size;
-		if (S_OK != m_pFile->Read(id) || id == 0) {
+		if (S_OK != m_pFile->ReadAvi(id) || id == 0) {
 			return E_FAIL;
 		}
 
 		if (id == FCC('RIFF') || id == FCC('LIST')) {
-			if (S_OK != m_pFile->Read(size) || S_OK != m_pFile->Read(id)) {
+			if (S_OK != m_pFile->ReadAvi(size) || S_OK != m_pFile->ReadAvi(id)) {
 				return E_FAIL;
 			}
 
@@ -431,7 +450,7 @@ HRESULT CAviSplitterFilter::ReIndex(__int64 end, UINT64* pSize)
 				hr = ReIndex(pos + size, pSize);
 			}
 		} else {
-			if (S_OK != m_pFile->Read(size)) {
+			if (S_OK != m_pFile->ReadAvi(size)) {
 				return E_FAIL;
 			}
 
@@ -563,8 +582,8 @@ bool CAviSplitterFilter::DemuxLoop()
 
 			if (s->cs[f].fChunkHdr) {
 				DWORD id = 0;
-				if (S_OK != m_pFile->Read(id) || id == 0 || minTrack != TRACKNUM(id)
-						|| S_OK != m_pFile->Read(size)) {
+				if (S_OK != m_pFile->ReadAvi(id) || id == 0 || minTrack != TRACKNUM(id)
+						|| S_OK != m_pFile->ReadAvi(size)) {
 					fDiscontinuity[minTrack] = true;
 					break;
 				}

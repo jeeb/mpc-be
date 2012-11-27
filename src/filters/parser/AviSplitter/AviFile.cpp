@@ -30,7 +30,7 @@
 //
 
 CAviFile::CAviFile(IAsyncReader* pAsyncReader, HRESULT& hr)
-	: CBaseSplitterFile(pAsyncReader, hr)
+	: CBaseSplitterFileEx(pAsyncReader, hr)
 {
 	if (FAILED(hr)) {
 		return;
@@ -43,7 +43,7 @@ HRESULT CAviFile::Init()
 {
 	Seek(0);
 	DWORD dw[3];
-	if (S_OK != Read(dw) || dw[0] != FCC('RIFF') || (dw[2] != FCC('AVI ') && dw[2] != FCC('AVIX') && dw[2] != FCC('AMV '))) {
+	if (S_OK != ReadAvi(dw) || dw[0] != FCC('RIFF') || (dw[2] != FCC('AVI ') && dw[2] != FCC('AVIX') && dw[2] != FCC('AMV '))) {
 		return E_FAIL;
 	}
 
@@ -91,7 +91,7 @@ HRESULT CAviFile::BuildAMVIndex()
 	DWORD ulSize;
 
 	memset (&NewChunk, 0, sizeof(strm_t::chunk));
-	while ((Read(ulType) == S_OK) && (Read(ulSize) == S_OK)) {
+	while ((ReadAvi(ulType) == S_OK) && (ReadAvi(ulSize) == S_OK)) {
 		switch (ulType) {
 			case FCC('00dc'): // 01bw : JPeg
 				NewChunk.size = ulSize;
@@ -125,12 +125,12 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 		UINT64 pos = GetPos();
 
 		DWORD id = 0, size;
-		if (S_OK != Read(id) || id == 0) {
+		if (S_OK != ReadAvi(id) || id == 0) {
 			return E_FAIL;
 		}
 
 		if (id == FCC('RIFF') || id == FCC('LIST')) {
-			if (S_OK != Read(size) || S_OK != Read(id)) {
+			if (S_OK != ReadAvi(size) || S_OK != ReadAvi(id)) {
 				return E_FAIL;
 			}
 
@@ -154,7 +154,7 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 				hr = Parse(id, pos + size);
 			}
 		} else {
-			if (S_OK != Read(size)) {
+			if (S_OK != ReadAvi(size)) {
 				return E_FAIL;
 			}
 
@@ -211,7 +211,7 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 				case FCC('avih'):
 					m_avih.fcc = id;
 					m_avih.cb = size;
-					if (S_OK != Read(m_avih, 8)) {
+					if (S_OK != ReadAvi(m_avih, 8)) {
 						return E_FAIL;
 					}
 					break;
@@ -221,7 +221,7 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 					}
 					strm->strh.fcc = FCC('strh');
 					strm->strh.cb = size;
-					if (S_OK != Read(strm->strh, 8)) {
+					if (S_OK != ReadAvi(strm->strh, 8)) {
 						return E_FAIL;
 					}
 					if (m_isamv) {
@@ -287,12 +287,12 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 					}
 					break;
 				case FCC('dmlh'):
-					if (S_OK != Read(m_dmlh)) {
+					if (S_OK != ReadAvi(m_dmlh)) {
 						return E_FAIL;
 					}
 					break;
 				case FCC('vprp'):
-					//if (S_OK != Read(m_vprp)) return E_FAIL;
+					//if (S_OK != ReadAvi(m_vprp)) return E_FAIL;
 					break;
 				case FCC('idx1'):
 					ASSERT(m_idx1 == NULL);
@@ -437,7 +437,7 @@ HRESULT CAviFile::BuildIndex()
 		if (idx->aIndex[0].dwOffset > offset) {
 			DWORD id;
 			Seek(offset + idx->aIndex[0].dwOffset);
-			Read(id);
+			ReadAvi(id);
 			if (id != idx->aIndex[0].dwChunkId) {
 				TRACE(_T("WARNING: CAviFile::Init() detected absolute chunk addressing in \'idx1\'"));
 				offset = 0;
