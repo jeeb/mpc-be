@@ -7818,29 +7818,37 @@ void CMainFrame::OnPlayPlay()
 
 	if (m_bfirstPlay) {
 		m_bfirstPlay = false;
-		CString m_strOSD = _T("");
-		if (GetPlaybackMode() == PM_FILE) {
-			m_strOSD =  m_wndPlaylistBar.GetCurFileName();
-			if (!m_LastOpenBDPath.IsEmpty()) {
+		CString m_strOSD;
+
+		if (!m_strTitleAlt.IsEmpty()) {
+			m_strOSD = m_strTitleAlt.Left(m_strTitleAlt.GetLength() - 4);
+		}
+
+		if (m_strOSD.IsEmpty()) {
+			if (GetPlaybackMode() == PM_FILE) {
+				m_strOSD =  m_wndPlaylistBar.GetCurFileName();
+				if (!m_LastOpenBDPath.IsEmpty()) {
+					m_strOSD = ResStr(ID_PLAY_PLAY);
+					int i = m_strOSD.Find(_T("\n"));
+					if (i > 0) {
+						m_strOSD.Delete(i, m_strOSD.GetLength()-i);
+					}
+					m_strOSD += _T(" BD");
+				} else if (m_strOSD != _T("")) {
+					m_strOSD.TrimRight('/');
+					m_strOSD.Replace('\\', '/');
+					m_strOSD = m_strOSD.Mid(m_strOSD.ReverseFind('/')+1);
+				}
+			} else if (GetPlaybackMode() == PM_DVD) {
 				m_strOSD = ResStr(ID_PLAY_PLAY);
 				int i = m_strOSD.Find(_T("\n"));
 				if (i > 0) {
 					m_strOSD.Delete(i, m_strOSD.GetLength()-i);
 				}
-				m_strOSD += _T(" BD");
-			} else if (m_strOSD != _T("")) {
-				m_strOSD.TrimRight('/');
-				m_strOSD.Replace('\\', '/');
-				m_strOSD = m_strOSD.Mid(m_strOSD.ReverseFind('/')+1);
+				m_strOSD += _T(" DVD");
 			}
-		} else if (GetPlaybackMode() == PM_DVD) {
-			m_strOSD = ResStr(ID_PLAY_PLAY);
-			int i = m_strOSD.Find(_T("\n"));
-			if (i > 0) {
-				m_strOSD.Delete(i, m_strOSD.GetLength()-i);
-			}
-			m_strOSD += _T(" DVD");
 		}
+
 		if (m_strOSD != _T("")) {
 			m_OSD.DisplayMessage(OSD_TOPLEFT, m_strOSD, 3000);
 		}
