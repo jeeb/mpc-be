@@ -16,7 +16,7 @@ Changes (*):
 * libopus 1.0.1 git-b880e9b4;
 * Virtualdub 1.10.3 Test 7;
 * ffmpeg git-2c923983;
-* MediaInfo 0.7.61+ svn rev.5302;
+* MediaInfo 0.7.61+ svn rev.5307;
 * ZenLibs v0.4.28+ svn rev.411;
 * Little-CMS git-886e2f52;
 * SoundTouch svn rev.160;
