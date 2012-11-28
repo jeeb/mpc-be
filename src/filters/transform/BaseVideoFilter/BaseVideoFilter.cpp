@@ -418,14 +418,19 @@ HRESULT CBaseVideoFilter::CheckInputType(const CMediaType* mtIn)
 		   : VFW_E_TYPE_NOT_ACCEPTED;
 }
 
-HRESULT CBaseVideoFilter::CheckTransform(const CMediaType* mtIn, const CMediaType* mtOut)
+HRESULT CBaseVideoFilter::DoCheckTransform(const CMediaType* mtIn, const CMediaType* mtOut, bool checkReconnection)
 {
 	if (FAILED(CheckInputType(mtIn)) || mtOut->majortype != MEDIATYPE_Video) {
 		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
 
 	if (mtIn->majortype == MEDIATYPE_Video
-			&& (mtIn->subtype == MEDIASUBTYPE_YV12
+				&& (mtIn->subtype == MEDIASUBTYPE_P016 || mtIn->subtype == MEDIASUBTYPE_P010)) {
+		if (mtOut->subtype != mtIn->subtype && checkReconnection) {
+			return VFW_E_TYPE_NOT_ACCEPTED;
+		}
+	} else if (mtIn->majortype == MEDIATYPE_Video
+				&& (mtIn->subtype == MEDIASUBTYPE_YV12
 				|| mtIn->subtype == MEDIASUBTYPE_I420
 				|| mtIn->subtype == MEDIASUBTYPE_IYUV)) {
 		if (mtOut->subtype != MEDIASUBTYPE_YV12
@@ -483,6 +488,11 @@ HRESULT CBaseVideoFilter::CheckTransform(const CMediaType* mtIn, const CMediaTyp
 	}
 
 	return S_OK;
+}
+
+HRESULT CBaseVideoFilter::CheckTransform(const CMediaType* mtIn, const CMediaType* mtOut)
+{
+	return DoCheckTransform(mtIn, mtOut, false);
 }
 
 HRESULT CBaseVideoFilter::CheckOutputType(const CMediaType& mtOut)
@@ -556,7 +566,6 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 	if (m_pInput->IsConnected() == FALSE) {
 		return E_UNEXPECTED;
 	}
-
 
 	// this will make sure we won't connect to the old renderer in dvd mode
 	// that renderer can't switch the format dynamically

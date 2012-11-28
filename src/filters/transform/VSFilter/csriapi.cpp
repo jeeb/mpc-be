@@ -187,10 +187,10 @@ CSRIAPI void *csri_query_ext(csri_rend *rend, csri_ext_id extname)
 static struct csri_info csri_vsfilter_info = {
 #ifdef _DEBUG
 	"vsfilter_textsub_debug", // name
-	"2.41", // version (assumed version number, svn revision, patchlevel)
+	"2.42", // version (assumed version number, svn revision, patchlevel)
 #else
 	"vsfilter_textsub", // name
-	"2.41", // version (assumed version number, svn revision, patchlevel)
+	"2.42", // version (assumed version number, svn revision, patchlevel)
 #endif
 	// 2.38-0611 is base svn 611
 	// 2.38-0611-1 is with clipfix and fax/fay patch
@@ -199,9 +199,10 @@ static struct csri_info csri_vsfilter_info = {
 	// 2.38-0611-4 fixes be1-dots and ugly-fade bugs and adds xbord/ybord/xshad/yshad/blur tags and extends be
 	// 2.39 merges with guliverkli2 fork
 	// 2.41 removes SSF support
-	"VSFilter/TextSub (MPC-HC)", // longname
+	// 2.42 add support .sup(external PGS subtitle), XSUB, add support P010/P016 input/output
+	"VSFilter/TextSub (MPC-BE)", // longname
 	"Gabest", // author
-	"Copyright (c) 2003-2012 by Gabest et al." // copyright
+	"Copyright 2001-2012 MPC-BE Team" // copyright
 };
 
 CSRIAPI struct csri_info *csri_renderer_info(csri_rend *rend) {

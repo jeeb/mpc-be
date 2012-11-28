@@ -342,7 +342,7 @@ bool CDVSMainPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 						CFileDialog fd(TRUE, NULL, NULL,
 									   OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST,
-									   _T(".idx .smi .sub .srt .psb .ssa .ass .usf|*.idx;*.smi;*.sub;*.srt;*.psb;*.ssa;*.ass;*.usf|")
+									   _T(".idx .smi .sub .srt .psb .ssa .ass .usf .sup|*.idx;*.smi;*.sub;*.srt;*.psb;*.ssa;*.ass;*.usf;*.sup|")
 									   _T("All files (*.*)|*.*||"),
 									   CDialog::FromHandle(m_Dlg), 0);
 
@@ -762,7 +762,7 @@ bool CDVSAboutPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg) {
 		case WM_INITDIALOG: {
-			SetDlgItemText(m_Dlg, IDC_VERSION, _T("DirectVobSub 2.41.") _T(MAKE_STR(MPC_VERSION_REV)) _T(" ") _T(MPC_VERSION_ARCH) _T("\nCopyright 2001-2012 MPC-BE Team"));
+			SetDlgItemText(m_Dlg, IDC_VERSION, _T("DirectVobSub 2.42.") _T(MAKE_STR(MPC_VERSION_REV)) _T(" ") _T(MPC_VERSION_ARCH) _T("\nCopyright 2001-2012 MPC-BE Team"));
 		}
 		break;
 		case WM_COMMAND: {
