@@ -18743,7 +18743,7 @@ LRESULT CMainFrame::OnDwmSendIconicLivePreviewBitmap(WPARAM, LPARAM)
 	if (!IsSomethingLoaded() || !m_fAudioOnly || !m_DwmSetIconicLivePreviewBitmapFnc) {
 		return 0;
 	}
-	
+
 	AppSettings& s = AfxGetAppSettings();
 
 	CRect rectClient(0, 0, 0, 0);
@@ -18763,28 +18763,24 @@ LRESULT CMainFrame::OnDwmSendIconicLivePreviewBitmap(WPARAM, LPARAM)
 		offset.y = (rectClient.top)  - _SM_CYSIZEFRAME;
 	}
 
-	HBITMAP hBitmap = CreateCaptureDIB(rectClient.Width(), rectClient.Height());
-
 	HRESULT hr = E_FAIL;
-	
+
 	if (isWindowMinimized && m_CaptureWndBitmap) {
-		hr = m_DwmSetIconicLivePreviewBitmapFnc(m_hWnd, m_CaptureWndBitmap, NULL, (style & WS_CAPTION || style & WS_THICKFRAME) ? DWM_SIT_DISPLAYFRAME : 0);	
+		hr = m_DwmSetIconicLivePreviewBitmapFnc(m_hWnd, m_CaptureWndBitmap, NULL, (style & WS_CAPTION || style & WS_THICKFRAME) ? DWM_SIT_DISPLAYFRAME : 0);
 	} else {
+		HBITMAP hBitmap = CreateCaptureDIB(rectClient.Width(), rectClient.Height());
 		if (hBitmap) {
 			if (style & WS_CAPTION || style & WS_THICKFRAME) {
 				hr = m_DwmSetIconicLivePreviewBitmapFnc(m_hWnd, hBitmap, NULL, DWM_SIT_DISPLAYFRAME);
 			} else {
 				hr = m_DwmSetIconicLivePreviewBitmapFnc(m_hWnd, hBitmap, &offset, 0);
 			}
+			::DeleteObject(hBitmap);
 		}
 	}
 
 	if (FAILED(hr)) {
 		// TODO ...
-	}
-
-	if (hBitmap) {
-		::DeleteObject(hBitmap);
 	}
 
 	return 0;
@@ -18800,9 +18796,9 @@ HBITMAP CMainFrame::CreateCaptureDIB(int nWidth, int nHeight)
 
 	bool bCaptionWithMenu = (s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU) ? true : false;
 	DWORD style = GetStyle();
-	
+
 	if (hdcMem != NULL) {
-    
+
 		BITMAPINFO bmi;
 		ZeroMemory(&bmi.bmiHeader, sizeof(BITMAPINFOHEADER));
 		bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
@@ -18856,7 +18852,7 @@ void CMainFrame::CreateCaptureWindow()
 {
 	AppSettings& s = AfxGetAppSettings();
 	CRect rectClient(0, 0, 0, 0);
-	
+
 	if (s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU) {
 		GetWindowRect(&rectClient);
 	} else {

@@ -20,16 +20,12 @@
  *
  */
 
-// PPageTuner.cpp : implementation file
-//
-
 #include "stdafx.h"
 #include <ks.h>
 #include <ksmedia.h>
 #include <bdatypes.h>
 #include <bdamedia.h>
 #include <bdaiface.h>
-
 #include "mplayerc.h"
 #include "PPageCapture.h"
 #include "../../DSUtil/DSUtil.h"

@@ -25,7 +25,6 @@
 #include "mplayerc.h"
 #include "PPageFullscreen.h"
 #include "../../DSUtil/WinAPIUtils.h"
-
 #include "Monitors.h"
 #include "MultiMonitor.h"
 
@@ -212,7 +211,6 @@ BOOL CPPageFullscreen::OnInitDialog()
  		GetDlgItem(IDC_COMBO1)->EnableWindow(FALSE);
  	}
 
-
 	if (m_AutoChangeFullscrRes.bEnabled == false && (m_MonitorDisplayNames[m_iMonitorType]).Left(7) == _T("Current")){
 		m_f_hmonitor = _T("Current");
  	}
@@ -227,8 +225,7 @@ BOOL CPPageFullscreen::OnInitDialog()
 	ModesUpdate();
 	UpdateData(FALSE);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 void CPPageFullscreen::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
@@ -450,7 +447,6 @@ void CPPageFullscreen::OnUpdateSetFullscreenRes()
 	}
 }
 
-
 void CPPageFullscreen::OnUpdateRestoreRes(CCmdUI* pCmdUI)
 {
 	pCmdUI->Enable(!!IsDlgButtonChecked(IDC_CHECK2) && m_fSetFullscreenRes != 2);
@@ -501,8 +497,6 @@ void CPPageFullscreen::OnUpdateStatic2(CCmdUI* pCmdUI)
 	pCmdUI->Enable(!AfxGetAppSettings().IsD3DFullscreen());
 }
 
-
-
 void CPPageFullscreen::OnUpdateFullScrCombo()
 {
 	CMonitors monitors;
@@ -522,7 +516,6 @@ void CPPageFullscreen::OnUpdateFullScrCombo()
 	if (m_f_hmonitor != _T("Current") && m_f_hmonitor != strCurMon) {
  		m_AutoChangeFullscrRes.bEnabled = false;
  	}
-	
 
 	ModesUpdate();
 	SetModified();
@@ -536,7 +529,6 @@ void CPPageFullscreen::OnUpdateTimeout(CCmdUI* pCmdUI)
 
 void CPPageFullscreen::ModesUpdate()
 {
-	
 	AppSettings& s = AfxGetAppSettings();
 	CMonitors monitors;
 
@@ -558,7 +550,6 @@ void CPPageFullscreen::ModesUpdate()
 	if ( s.strFullScreenMonitorID != m_f_hmonitorID) {
 		m_AutoChangeFullscrRes.bEnabled = false;
 	}
-
 
 	int iNoData = 0;
 	for (int i=0; i<MaxFpsCount; i++) {
@@ -785,7 +776,6 @@ void CPPageFullscreen::OnUpdateAdd(CCmdUI* pCmdUI)
 	pCmdUI->Enable(!!IsDlgButtonChecked(IDC_CHECK2));
 }
 
-
 void CPPageFullscreen::OnMoveUp()
 {
 	if (POSITION pos = m_list.GetFirstSelectedItemPosition()) {
@@ -865,7 +855,6 @@ void CPPageFullscreen::OnUpdateDown(CCmdUI* pCmdUI)
 	POSITION pos = m_list.GetFirstSelectedItemPosition();
 	int i = m_list.GetNextSelectedItem(pos);
 	pCmdUI->Enable(!!IsDlgButtonChecked(IDC_CHECK2) && i < m_list.GetItemCount()-1);
-
 }
 
 void CPPageFullscreen::ReindexList()
