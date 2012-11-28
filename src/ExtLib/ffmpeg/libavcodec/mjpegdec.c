@@ -94,6 +94,7 @@ av_cold int ff_mjpeg_decode_init(AVCodecContext *avctx)
     s->buffer        = NULL;
     s->start_code    = -1;
     s->first_picture = 1;
+    s->got_picture   = 0;
     s->org_height    = avctx->coded_height;
     avctx->chroma_sample_location = AVCHROMA_LOC_CENTER;
 
@@ -1602,7 +1603,6 @@ int ff_mjpeg_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
     int ret = 0;
     AVFrame *picture = data;
 
-    s->got_picture = 0; // picture from previous image can not be reused
     buf_ptr = buf;
     buf_end = buf + buf_size;
     while (buf_ptr < buf_end) {
@@ -1638,6 +1638,7 @@ int ff_mjpeg_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
             else if (start_code == COM)
                 mjpeg_decode_com(s);
 
+            ret = -1;
             switch (start_code) {
             case SOI:
                 s->restart_interval = 0;
@@ -1650,7 +1651,7 @@ int ff_mjpeg_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
             case DHT:
                 if ((ret = ff_mjpeg_decode_dht(s)) < 0) {
                     av_log(avctx, AV_LOG_ERROR, "huffman table decode error\n");
-                    return ret;
+                    goto fail;
                 }
                 break;
             case SOF0:
@@ -1659,33 +1660,33 @@ int ff_mjpeg_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
                 s->ls          = 0;
                 s->progressive = 0;
                 if ((ret = ff_mjpeg_decode_sof(s)) < 0)
-                    return ret;
+                    goto fail;
                 break;
             case SOF2:
                 s->lossless    = 0;
                 s->ls          = 0;
                 s->progressive = 1;
                 if ((ret = ff_mjpeg_decode_sof(s)) < 0)
-                    return ret;
+                    goto fail;
                 break;
             case SOF3:
                 s->lossless    = 1;
                 s->ls          = 0;
                 s->progressive = 0;
                 if ((ret = ff_mjpeg_decode_sof(s)) < 0)
-                    return ret;
+                    goto fail;
                 break;
             case SOF48:
                 s->lossless    = 1;
                 s->ls          = 1;
                 s->progressive = 0;
                 if ((ret = ff_mjpeg_decode_sof(s)) < 0)
-                    return ret;
+                    goto fail;
                 break;
             case LSE:
                 if (!CONFIG_JPEGLS_DECODER ||
                     (ret = ff_jpegls_decode_lse(s)) < 0)
-                    return ret;
+                    goto fail;
                 break;
             case EOI:
 eoi_parser:
@@ -1703,6 +1704,7 @@ eoi_parser:
                 }
                     *picture   = *s->picture_ptr;
                     *data_size = sizeof(AVFrame);
+                    s->got_picture = 0;
 
                     if (!s->lossless) {
                         picture->quality      = FFMAX3(s->qscale[0],
@@ -1722,7 +1724,7 @@ eoi_parser:
             case SOS:
                 if ((ret = ff_mjpeg_decode_sos(s, NULL, NULL)) < 0 &&
                     (avctx->err_recognition & AV_EF_EXPLODE))
-                    return ret;
+                    goto fail;
                 break;
             case DRI:
                 mjpeg_decode_dri(s);
@@ -1755,6 +1757,9 @@ eoi_parser:
     }
     av_log(avctx, AV_LOG_FATAL, "No JPEG data found in image\n");
     return AVERROR_INVALIDDATA;
+fail:
+    s->got_picture = 0;
+    return ret;
 the_end:
     if (s->upscale_h) {
         uint8_t *line = s->picture_ptr->data[s->upscale_h];
@@ -1839,6 +1844,12 @@ av_cold int ff_mjpeg_decode_end(AVCodecContext *avctx)
     return 0;
 }
 
+static void decode_flush(AVCodecContext *avctx)
+{
+    MJpegDecodeContext *s = avctx->priv_data;
+    s->got_picture = 0;
+}
+
 #if CONFIG_MJPEG_DECODER
 #define OFFSET(x) offsetof(MJpegDecodeContext, x)
 #define VD AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_DECODING_PARAM
@@ -1863,6 +1874,7 @@ AVCodec ff_mjpeg_decoder = {
     .init           = ff_mjpeg_decode_init,
     .close          = ff_mjpeg_decode_end,
     .decode         = ff_mjpeg_decode_frame,
+    .flush          = decode_flush,
     .capabilities   = CODEC_CAP_DR1,
     .max_lowres     = 3,
     .long_name      = NULL_IF_CONFIG_SMALL("MJPEG (Motion JPEG)"),
@@ -1878,6 +1890,7 @@ AVCodec ff_thp_decoder = {
     .init           = ff_mjpeg_decode_init,
     .close          = ff_mjpeg_decode_end,
     .decode         = ff_mjpeg_decode_frame,
+    .flush          = decode_flush,
     .capabilities   = CODEC_CAP_DR1,
     .max_lowres     = 3,
     .long_name      = NULL_IF_CONFIG_SMALL("Nintendo Gamecube THP video"),

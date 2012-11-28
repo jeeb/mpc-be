@@ -2044,6 +2044,7 @@ DIRAC_PIXOP(put, mmx)
 DIRAC_PIXOP(avg, mmx)
 DIRAC_PIXOP(avg, mmxext)
 
+#if HAVE_YASM
 void ff_put_dirac_pixels16_sse2(uint8_t *dst, const uint8_t *src[5], int stride, int h)
 {
     ff_put_pixels16_sse2(dst, src[0], stride, h);
@@ -2062,6 +2063,7 @@ void ff_avg_dirac_pixels32_sse2(uint8_t *dst, const uint8_t *src[5], int stride,
     ff_avg_pixels16_sse2(dst   , src[0]   , stride, h);
     ff_avg_pixels16_sse2(dst+16, src[0]+16, stride, h);
 }
+#endif
 #endif
 
 /* XXX: Those functions should be suppressed ASAP when all IDCTs are
@@ -2429,6 +2431,18 @@ static void dsputil_init_mmxext(DSPContext *c, AVCodecContext *avctx,
 #if HAVE_INLINE_ASM
     c->prefetch = prefetch_mmxext;
 
+    SET_QPEL_FUNCS(avg_qpel,        0, 16, mmxext, );
+    SET_QPEL_FUNCS(avg_qpel,        1,  8, mmxext, );
+    SET_QPEL_FUNCS(avg_2tap_qpel,   0, 16, mmxext, );
+    SET_QPEL_FUNCS(avg_2tap_qpel,   1,  8, mmxext, );
+
+    SET_QPEL_FUNCS(put_qpel,        0, 16, mmxext, );
+    SET_QPEL_FUNCS(put_qpel,        1,  8, mmxext, );
+    SET_QPEL_FUNCS(put_2tap_qpel,   0, 16, mmxext, );
+    SET_QPEL_FUNCS(put_2tap_qpel,   1,  8, mmxext, );
+    SET_QPEL_FUNCS(put_no_rnd_qpel, 0, 16, mmxext, );
+    SET_QPEL_FUNCS(put_no_rnd_qpel, 1,  8, mmxext, );
+
     if (!high_bit_depth) {
         c->put_pixels_tab[0][1] = put_pixels16_x2_mmxext;
         c->put_pixels_tab[0][2] = put_pixels16_y2_mmxext;
@@ -2466,13 +2480,6 @@ static void dsputil_init_mmxext(DSPContext *c, AVCodecContext *avctx,
 
 #if HAVE_MMXEXT_EXTERNAL
     if (CONFIG_H264QPEL) {
-        SET_QPEL_FUNCS(put_qpel,        0, 16, mmxext, );
-        SET_QPEL_FUNCS(put_qpel,        1,  8, mmxext, );
-        SET_QPEL_FUNCS(put_no_rnd_qpel, 0, 16, mmxext, );
-        SET_QPEL_FUNCS(put_no_rnd_qpel, 1,  8, mmxext, );
-        SET_QPEL_FUNCS(avg_qpel,        0, 16, mmxext, );
-        SET_QPEL_FUNCS(avg_qpel,        1,  8, mmxext, );
-
         if (!high_bit_depth) {
             SET_QPEL_FUNCS(put_h264_qpel, 0, 16, mmxext, );
             SET_QPEL_FUNCS(put_h264_qpel, 1,  8, mmxext, );
@@ -2490,11 +2497,6 @@ static void dsputil_init_mmxext(DSPContext *c, AVCodecContext *avctx,
             SET_QPEL_FUNCS(put_h264_qpel, 2, 4,  10_mmxext, ff_);
             SET_QPEL_FUNCS(avg_h264_qpel, 2, 4,  10_mmxext, ff_);
         }
-
-        SET_QPEL_FUNCS(put_2tap_qpel, 0, 16, mmxext, );
-        SET_QPEL_FUNCS(put_2tap_qpel, 1,  8, mmxext, );
-        SET_QPEL_FUNCS(avg_2tap_qpel, 0, 16, mmxext, );
-        SET_QPEL_FUNCS(avg_2tap_qpel, 1,  8, mmxext, );
     }
 
     if (!high_bit_depth && CONFIG_H264CHROMA) {
@@ -2624,10 +2626,19 @@ static void dsputil_init_sse(DSPContext *c, AVCodecContext *avctx, int mm_flags)
 static void dsputil_init_sse2(DSPContext *c, AVCodecContext *avctx,
                               int mm_flags)
 {
-#if HAVE_SSE2_EXTERNAL
     const int bit_depth      = avctx->bits_per_raw_sample;
     const int high_bit_depth = bit_depth > 8;
 
+#if HAVE_SSE2_INLINE
+    if (!high_bit_depth && avctx->idct_algo == FF_IDCT_XVIDMMX) {
+        c->idct_put              = ff_idct_xvid_sse2_put;
+        c->idct_add              = ff_idct_xvid_sse2_add;
+        c->idct                  = ff_idct_xvid_sse2;
+        c->idct_permutation_type = FF_SSE2_IDCT_PERM;
+    }
+#endif /* HAVE_SSE2_INLINE */
+
+#if HAVE_SSE2_EXTERNAL
     if (!(mm_flags & AV_CPU_FLAG_SSE2SLOW)) {
         // these functions are slower than mmx on AMD, but faster on Intel
         if (!high_bit_depth) {
