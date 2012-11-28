@@ -418,7 +418,7 @@ CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipInfo::Str
 						Infos.AddTail(L"AAC (LATM)");
 					}
 					break;
-					case WAVE_FORMAT_MP3: {
+					case WAVE_FORMAT_MPEGLAYER3: {
 						Infos.AddTail(L"MP3");
 					}
 					break;
@@ -1418,7 +1418,7 @@ LONGLONG GetMediaTypeQuality(const CMediaType *_pMediaType, int _PresentationFor
 						TypePriority = 7;
 					}
 					break;
-					case WAVE_FORMAT_MP3: {
+					case WAVE_FORMAT_MPEGLAYER3: {
 						TypePriority = 6;
 					}
 					break;

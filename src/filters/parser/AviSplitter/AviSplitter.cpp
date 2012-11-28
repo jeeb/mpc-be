@@ -25,7 +25,6 @@
 #include <MMReg.h>
 #include "AviFile.h"
 #include "AviSplitter.h"
-#include <moreuuids.h>
 
 #define MAXPACKETS_AVI	MAXPACKETS*10
 
@@ -260,7 +259,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 
 			// parse MPEGAudio frame to identify the correct codec MP3/MP2
-			if (pwfe->wFormatTag == WAVE_FORMAT_MP3 || pwfe->wFormatTag == WAVE_FORMAT_MPEG) {
+			if (pwfe->wFormatTag == WAVE_FORMAT_MPEGLAYER3 || pwfe->wFormatTag == WAVE_FORMAT_MPEG) {
 
 				if (s->cs.GetCount()) {
 					__int64 cur_pos = m_pFile->GetPos();
