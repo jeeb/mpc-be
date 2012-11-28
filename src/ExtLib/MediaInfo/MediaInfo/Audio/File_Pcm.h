@@ -47,6 +47,7 @@ public :
     int16u          Channels;
     int32u          SamplingRate;
     int8u           Endianness;
+    int8u           Sign;
 
     //Constructor/Destructor
     File_Pcm();
@@ -57,6 +58,11 @@ private :
 
     //Buffer - File header
     bool FileHeader_Begin();
+
+    //Buffer - Global
+    #if MEDIAINFO_DEMUX
+    void Read_Buffer_Continue ();
+    #endif //MEDIAINFO_DEMUX
 
     //Buffer - Per element
     void Header_Parse();

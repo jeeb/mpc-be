@@ -101,7 +101,6 @@ File_Riff::File_Riff()
     #endif //MEDIAINFO_EVENTS
     #if MEDIAINFO_DEMUX
         Demux_Level=2; //Container
-        Demux_EventWasSent_Accept_Specific=true;
     #endif //MEDIAINFO_DEMUX
     DataMustAlwaysBeComplete=false;
 
@@ -144,6 +143,9 @@ File_Riff::File_Riff()
     SecondPass=false;
     DV_FromHeader=NULL;
     Kind=Kind_None;
+    #if MEDIAINFO_DEMUX
+    Demux_Parser=NULL;
+    #endif //MEDIAINFO_DEMUX
 
     //Pointers
     Stream_Structure_Temp=Stream_Structure.end();
@@ -190,6 +192,15 @@ void File_Riff::Streams_Finish ()
         if (Temp->second.StreamSize>0)
             Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_StreamSize), Temp->second.StreamSize);
 
+        //When there are few frames, difficult to detect PCM
+        if (Temp->second.IsPcm && !Temp->second.Parsers.empty() && !Temp->second.Parsers[0]->Status[IsAccepted])
+        {
+            for (size_t Pos=0; Pos<Temp->second.Parsers.size()-1; Pos++)
+                delete Temp->second.Parsers[Pos];
+            Temp->second.Parsers.erase(Temp->second.Parsers.begin(), Temp->second.Parsers.begin()+Temp->second.Parsers.size()-1);
+            Temp->second.Parsers[0]->Accept();
+        }
+
         //Parser specific
         if (Temp->second.Parsers.size()==1)
         {
@@ -209,9 +220,33 @@ void File_Riff::Streams_Finish ()
                 Temp->second.Parsers[0]->Open_Buffer_Unsynch();
             }
             Finish(Temp->second.Parsers[0]);
-            Merge(*Temp->second.Parsers[0], StreamKind_Last, 0, StreamPos_Last);
-            Fill(StreamKind_Last, StreamPos_Last, General_ID, ((Temp->first>>24)-'0')*10+(((Temp->first>>16)&0xFF)-'0'));
-            Fill(StreamKind_Last, StreamPos_Last, General_StreamOrder, ((Temp->first>>24)-'0')*10+(((Temp->first>>16)&0xFF)-'0'));
+            Ztring ID;
+            if (Retrieve(Stream_General, 0, "Format")!=__T("Wave") && Retrieve(Stream_General, 0, "Format")!=__T("AIFF"))
+                ID.From_Number(((Temp->first>>24)-'0')*10+(((Temp->first>>16)&0xFF)-'0'));
+            if (!Temp->second.Parsers.empty() && Temp->second.Parsers[0]->Count_Get(StreamKind_Last))
+                for (size_t Pos=0; Pos<Temp->second.Parsers[0]->Count_Get(StreamKind_Last); Pos++)
+                {
+                    Ztring Temp_ID=ID;
+                    Ztring Temp_ID_String=ID;
+                    Merge(*Temp->second.Parsers[0], StreamKind_Last, Pos, StreamPos_Last+Pos);
+                    if (!Retrieve(StreamKind_Last, StreamPos_Last, General_ID).empty())
+                    {
+                        if (!Temp_ID.empty())
+                        {
+                            Temp_ID+=__T('-');
+                            Temp_ID_String+=__T('-');
+                        }
+                        Temp_ID+=Retrieve(StreamKind_Last, StreamPos_Last, General_ID);
+                        Temp_ID_String+=Retrieve(StreamKind_Last, StreamPos_Last, General_ID);
+                    }
+                    Fill(StreamKind_Last, StreamPos_Last, General_ID, Temp_ID, true);
+                    Fill(StreamKind_Last, StreamPos_Last, General_StreamOrder, Temp_ID_String, true);
+                }
+            else
+            {
+                Fill(StreamKind_Last, StreamPos_Last, General_ID, ID, true);
+                Fill(StreamKind_Last, StreamPos_Last, General_StreamOrder, ID, true);
+            }
 
             //Hacks - After
             Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_StreamSize), StreamSize, true);
@@ -601,6 +636,19 @@ void File_Riff::Read_Buffer_Unsynched()
     }
 }
 
+//---------------------------------------------------------------------------
+#if MEDIAINFO_DEMUX
+void File_Riff::Read_Buffer_Continue()
+{
+    if (Demux_Parser)
+    {
+        Open_Buffer_Continue(Demux_Parser, Buffer+Buffer_Offset, 0, false);
+        //if (Config->Demux_EventWasSent)
+        //    return;
+    }
+}
+#endif //MEDIAINFO_DEMUX
+
 //***************************************************************************
 // Buffer
 //***************************************************************************
@@ -865,7 +913,10 @@ void File_Riff::Header_Parse()
     if ((Name==Elements::WAVE_data || Name==Elements::AIFF_SSND))
     {
         Buffer_DataToParse_Begin=File_Offset+Buffer_Offset+8;
-        Buffer_DataToParse_End=File_Offset+Buffer_Offset+8+Size_Complete;
+        if (Size_Complete)
+            Buffer_DataToParse_End=File_Offset+Buffer_Offset+8+Size_Complete;
+        else
+            Buffer_DataToParse_End=File_Size; //Found one file with 0 as size of data part
         Size_Complete=0;
     }
 

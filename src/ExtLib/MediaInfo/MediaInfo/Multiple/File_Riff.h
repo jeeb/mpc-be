@@ -63,6 +63,9 @@ private :
     #if MEDIAINFO_SEEK
     size_t Read_Buffer_Seek (size_t Method, int64u Value, int64u ID);
     #endif //MEDIAINFO_SEEK
+    #if MEDIAINFO_DEMUX
+    void Read_Buffer_Continue ();
+    #endif //MEDIAINFO_DEMUX
     void Read_Buffer_Unsynched();
 
     //Buffer - Per element
@@ -93,6 +96,7 @@ private :
         bool                    SearchingPayload;
         bool                    Specific_IsMpeg4v;
         bool                    ChunksAreComplete;
+        bool                    IsPcm;
 
         stream()
         {
@@ -113,6 +117,7 @@ private :
             SearchingPayload=true;
             Specific_IsMpeg4v=false;
             ChunksAreComplete=true;
+            IsPcm=false;
         }
 
         ~stream()
@@ -321,6 +326,11 @@ private :
     void wave_data () {WAVE_data();}
     void wave_fmt_ () {WAVE_fmt_();}
     void W3DI();
+
+    //Temp
+    #if MEDIAINFO_DEMUX
+    File__Analyze*  Demux_Parser;
+    #endif //MEDIAINFO_DEMUX
 };
 
 } //NameSpace
