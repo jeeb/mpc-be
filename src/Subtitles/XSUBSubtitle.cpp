@@ -95,6 +95,11 @@ STDMETHODIMP CXSUBSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fp
 {
 	CAutoLock cAutoLock(&m_csCritSec);
 
+	bbox.left	= LONG_MAX;
+	bbox.top	= LONG_MAX;
+	bbox.right	= 0;
+	bbox.bottom	= 0;
+
 	POSITION pos = m_pObjects.GetHeadPosition();
 	while (pos) {
 		CompositionObject* pObject = m_pObjects.GetAt (pos);
@@ -107,10 +112,16 @@ STDMETHODIMP CXSUBSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fp
 					spd.w >= (pObject->m_horizontal_position + pObject->m_width) &&
 					spd.h >= (pObject->m_vertical_position + pObject->m_height)) {
 
-				bbox.left	= pObject->m_horizontal_position;
-				bbox.top	= pObject->m_vertical_position;
-				bbox.right	= pObject->m_horizontal_position + pObject->m_width;
-				bbox.bottom	= pObject->m_vertical_position + pObject->m_height;
+				bbox.left	= min(pObject->m_horizontal_position, bbox.left);
+				bbox.top	= min(pObject->m_vertical_position, bbox.top);
+				bbox.right	= max(pObject->m_horizontal_position + pObject->m_width, bbox.right);
+				bbox.bottom	= max(pObject->m_vertical_position + pObject->m_height, bbox.bottom);
+
+				ASSERT(spd.h>=0);
+				bbox.left	= bbox.left > 0 ? bbox.left : 0;
+				bbox.top	= bbox.top > 0 ? bbox.top : 0;
+				bbox.right	= bbox.right < spd.w ? bbox.right : spd.w;
+				bbox.bottom	= bbox.bottom < spd.h ? bbox.bottom : spd.h;
 
 				pObject->RenderXSUB(spd);
 			}

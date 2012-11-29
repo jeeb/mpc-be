@@ -330,10 +330,10 @@ void CHdmvSub::ParseCompositionDescriptor(CGolombBuffer* pGBuffer, COMPOSITION_D
 
 void CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 {
-	bbox.left	= 0;
-	bbox.top	= 0;
-	bbox.right	= m_VideoDescriptor.nVideoWidth;
-	bbox.bottom	= m_VideoDescriptor.nVideoHeight;
+	bbox.left	= LONG_MAX;
+	bbox.top	= LONG_MAX;
+	bbox.right	= 0;
+	bbox.bottom	= 0;
 
 	POSITION pos = m_pObjects.GetHeadPosition();
 	while (pos) {
@@ -364,6 +364,12 @@ void CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 				bbox.top	= min(pObject->m_vertical_position, bbox.top);
 				bbox.right	= max(pObject->m_horizontal_position + pObject->m_width, bbox.right);
 				bbox.bottom	= max(pObject->m_vertical_position + pObject->m_height, bbox.bottom);
+
+				ASSERT(spd.h>=0);
+				bbox.left	= bbox.left > 0 ? bbox.left : 0;
+				bbox.top	= bbox.top > 0 ? bbox.top : 0;
+				bbox.right	= bbox.right < spd.w ? bbox.right : spd.w;
+				bbox.bottom	= bbox.bottom < spd.h ? bbox.bottom : spd.h;
 
 				TRACE_HDMVSUB (_T("CHdmvSub::Render() : size = %ld, ObjRes = %dx%d, SPDRes = %dx%d, %I64d = %s\n"),
 								pObject->GetRLEDataSize(),
