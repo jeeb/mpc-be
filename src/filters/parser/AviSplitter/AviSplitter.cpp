@@ -260,15 +260,21 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			// parse MPEGAudio frame to identify the correct codec MP3/MP2
 			if (pwfe->wFormatTag == WAVE_FORMAT_MPEGLAYER3 || pwfe->wFormatTag == WAVE_FORMAT_MPEG) {
-
-				if (s->cs.GetCount()) {
+				size_t scCount = s->cs.GetCount();
+				if (scCount) {
 					__int64 cur_pos = m_pFile->GetPos();
-					m_pFile->Seek(s->cs[0].filepos);
 
 					CBaseSplitterFileEx::mpahdr h;
 					CMediaType mt2;
-					if (m_pFile->Read(h, s->cs[0].orgsize, false, &mt2) && mt2.cbFormat) {
-						pwfe->wFormatTag = ((WAVEFORMATEX*)mt2.pbFormat)->wFormatTag;
+					for (size_t i = 0; i < 100; i++) {
+						if (i > scCount) {
+							break;
+						}
+						m_pFile->Seek(s->cs[i].filepos);
+						if (m_pFile->Read(h, s->cs[i].orgsize, false, &mt2) && mt2.cbFormat) {
+							pwfe->wFormatTag = ((WAVEFORMATEX*)mt2.pbFormat)->wFormatTag;
+							break;
+						}
 					}
 
 					m_pFile->Seek(cur_pos);

@@ -155,6 +155,9 @@ HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
 		} else if (m_mt.subtype == MEDIASUBTYPE_XSUB) {
 			int x, y, arx, ary;
 			ExtractDim(&m_mt, x, y, arx, ary);
+			if (!x || !y) {
+				return E_FAIL;
+			}
 			SIZE size = {x, y};
 
 			if (!(m_pSubStream = DNew CXSUBSubtitle(m_pSubLock, name, lcid, size))) {
