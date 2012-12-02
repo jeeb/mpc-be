@@ -1231,26 +1231,36 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 	AppSettings& s = AfxGetAppSettings();
 
 	BeginEnumPins(pBF, pEP, pPin) {
-		if (S_OK == IsPinDirection(pPin, PINDIR_OUTPUT)
-				&& S_OK != IsPinConnected(pPin)
-				&& !((s.iDSVideoRendererType != VIDRNDT_DS_EVR_CUSTOM && s.iDSVideoRendererType != VIDRNDT_DS_EVR && s.iDSVideoRendererType != VIDRNDT_DS_SYNC) && GetPinName(pPin)[0] == '~')) {
+		if (S_OK == IsPinDirection(pPin, PINDIR_OUTPUT) && S_OK != IsPinConnected(pPin)) {
+			if (GetPinName(pPin)[0] == '~'
+					&& s.iDSVideoRendererType != VIDRNDT_DS_EVR_CUSTOM
+					&& s.iDSVideoRendererType != VIDRNDT_DS_EVR
+					&& s.iDSVideoRendererType != VIDRNDT_DS_SYNC
+					&& s.iDSVideoRendererType != VIDRNDT_DS_VMR9WINDOWED) {
+
+				// detect Source/Splitter
+				CComQIPtr<IFileSourceFilter> pFSF = pBF;
+				if (!pFSF) {
+					continue;
+				}
+			}
 
 			CLSID clsid;
 			pBF->GetClassID(&clsid);
+
 			// Disable DVD subtitle mixing in EVR-CP and EVR-Sync for Microsoft DTV-DVD Video Decoder, it's corrupt DVD playback ...
 			if (clsid == CLSID_CMPEG2VidDecoderDS) {
 				if (s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM || s.iDSVideoRendererType == VIDRNDT_DS_SYNC) {
-					CString pin_name = GetPinName(pPin);
 					if (GetPinName(pPin)[0] == '~') {
 						continue;
 					}
 				}
 			}
+
 			// No multiple pin for Internal MPEG2 Software Decoder, Nvidia PureVideo Decoder, Sonic Cinemaster VideoDecoder
-			else if (clsid == __uuidof(CMpegSourceFilter)
+			else if (clsid == __uuidof(CMpeg2DecFilter)
 					 || clsid == CLSID_NvidiaVideoDecoder
 					 || clsid == CLSID_SonicCinemasterVideoDecoder) {
-				CString pin_name = GetPinName(pPin);
 				if (GetPinName(pPin)[0] == '~') {
 					continue;
 				}
@@ -1301,9 +1311,7 @@ STDMETHODIMP CFGManager::ConnectFilter(IPin* pPinOut, IBaseFilter* pBF)
 	AppSettings& s = AfxGetAppSettings();
 
 	BeginEnumPins(pBF, pEP, pPin) {
-		if (S_OK == IsPinDirection(pPin, PINDIR_INPUT)
-				&& S_OK != IsPinConnected(pPin)
-				&& !((s.iDSVideoRendererType != VIDRNDT_DS_EVR_CUSTOM && s.iDSVideoRendererType != VIDRNDT_DS_EVR && s.iDSVideoRendererType != VIDRNDT_DS_SYNC) && GetPinName(pPin)[0] == '~')) {
+		if (S_OK == IsPinDirection(pPin, PINDIR_INPUT) && S_OK != IsPinConnected(pPin)) {
 			HRESULT hr = Connect(pPinOut, pPin);
 			if (SUCCEEDED(hr)) {
 				return hr;
@@ -1329,9 +1337,7 @@ STDMETHODIMP CFGManager::ConnectFilterDirect(IPin* pPinOut, IBaseFilter* pBF, co
 	AppSettings& s = AfxGetAppSettings();
 
 	BeginEnumPins(pBF, pEP, pPin) {
-		if (S_OK == IsPinDirection(pPin, PINDIR_INPUT)
-				&& S_OK != IsPinConnected(pPin)
-				&& !((s.iDSVideoRendererType != VIDRNDT_DS_EVR_CUSTOM && s.iDSVideoRendererType != VIDRNDT_DS_EVR && s.iDSVideoRendererType != VIDRNDT_DS_SYNC) && GetPinName(pPin)[0] == '~')) {
+		if (S_OK == IsPinDirection(pPin, PINDIR_INPUT) && S_OK != IsPinConnected(pPin)) {
 			HRESULT hr = ConnectDirect(pPinOut, pPin, pmt);
 			if (SUCCEEDED(hr)) {
 				return hr;
