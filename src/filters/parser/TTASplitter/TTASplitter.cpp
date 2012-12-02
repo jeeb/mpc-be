@@ -325,7 +325,6 @@ DWORD CTTASplitterInputPin::ThreadProc()
 				DoProcessingLoop();
 				break; 
 		}
-
 	} while (com != CMD_EXIT);
 
 	return NOERROR; 
@@ -397,7 +396,6 @@ HRESULT CTTASplitterInputPin::DoProcessingLoop(void)
 		if (FAILED(hr)) {
 			return hr;
 		}
-
 	} while (!CheckRequest((DWORD*)&com) && !m_bAbort);
 
 	return NOERROR;
