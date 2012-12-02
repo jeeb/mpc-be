@@ -76,6 +76,9 @@
     <None Include="libavcodec\x86\h264_intrapred_10bit.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
+    <None Include="libavcodec\x86\h264_qpel_8bit.asm">
+      <Filter>libavcodec\x86</Filter>
+    </None>
     <None Include="libavcodec\x86\h264_qpel_10bit.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
@@ -862,6 +865,9 @@
     <ClInclude Include="libavutil\bswap.h">
       <Filter>libavutil</Filter>
     </ClInclude>
+    <ClInclude Include="libavutil\channel_layout.h">
+      <Filter>libavutil</Filter>
+    </ClInclude>
     <ClInclude Include="libavutil\colorspace.h">
       <Filter>libavutil</Filter>
     </ClInclude>
@@ -1188,6 +1194,9 @@
     <ClCompile Include="libavcodec\avpacket.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
+    <ClCompile Include="libavcodec\avpicture.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
     <ClCompile Include="libavcodec\bgmc.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
@@ -1318,6 +1327,9 @@
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\flacdsp.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\flacdsp_lpc_template.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\flacdsp_template.c">
@@ -1878,13 +1890,13 @@
     <ClCompile Include="libavutil\audio_fifo.c">
       <Filter>libavutil</Filter>
     </ClCompile>
-    <ClCompile Include="libavutil\audioconvert.c">
-      <Filter>libavutil</Filter>
-    </ClCompile>
     <ClCompile Include="libavutil\avstring.c">
       <Filter>libavutil</Filter>
     </ClCompile>
     <ClCompile Include="libavutil\bprint.c">
+      <Filter>libavutil</Filter>
+    </ClCompile>
+    <ClCompile Include="libavutil\channel_layout.c">
       <Filter>libavutil</Filter>
     </ClCompile>
     <ClCompile Include="libavutil\cpu.c">
@@ -1894,6 +1906,9 @@
       <Filter>libavutil</Filter>
     </ClCompile>
     <ClCompile Include="libavutil\dict.c">
+      <Filter>libavutil</Filter>
+    </ClCompile>
+    <ClCompile Include="libavutil\error.c">
       <Filter>libavutil</Filter>
     </ClCompile>
     <ClCompile Include="libavutil\eval.c">
@@ -1911,6 +1926,9 @@
     <ClCompile Include="libavutil\intfloat_readwrite.c">
       <Filter>libavutil</Filter>
     </ClCompile>
+    <ClCompile Include="libavutil\intmath.c">
+      <Filter>libavutil</Filter>
+    </ClCompile>
     <ClCompile Include="libavutil\inverse.c">
       <Filter>libavutil</Filter>
     </ClCompile>
@@ -1921,9 +1939,6 @@
       <Filter>libavutil</Filter>
     </ClCompile>
     <ClCompile Include="libavutil\log.c">
-      <Filter>libavutil</Filter>
-    </ClCompile>
-    <ClCompile Include="libavutil\log2.c">
       <Filter>libavutil</Filter>
     </ClCompile>
     <ClCompile Include="libavutil\log2_tab.c">
