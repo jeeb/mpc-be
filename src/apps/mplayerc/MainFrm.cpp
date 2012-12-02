@@ -18539,14 +18539,14 @@ CString GetCoverImgFromPath(CString path)
 			return coverpath;
 	}
 
-	coverpath.Combine(path, _T("cover\front.jpg"));
+	coverpath.Combine(path, _T("cover\\front.jpg"));
 	if (coverpath.FileExists() ||
 		coverpath.RenameExtension(_T("jpeg")) && coverpath.FileExists() ||
 		coverpath.RenameExtension(_T("png")) && coverpath.FileExists()) {
 			return coverpath;
 	}
 
-	coverpath.Combine(path, _T("covers\front.jpg"));
+	coverpath.Combine(path, _T("covers\\front.jpg"));
 	if (coverpath.FileExists() ||
 		coverpath.RenameExtension(_T("jpeg")) && coverpath.FileExists() ||
 		coverpath.RenameExtension(_T("png")) && coverpath.FileExists()) {
