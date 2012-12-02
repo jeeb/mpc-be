@@ -18502,37 +18502,58 @@ void CMainFrame::CreateChapterTimeArray()
 	}
 }
 
-CString GetCoverImgFromPath(CString path, CString mask)
+CString GetCoverImgFromPath(CString path)
 {
-	CString bFoundFName;
-	CString dir = path.Mid(0, path.ReverseFind('\\')+1);
-	CString dir_mask = dir + _T("*.*");
-	WIN32_FIND_DATA fd;
-	HANDLE h = FindFirstFile(dir_mask, &fd);
-	if (h != INVALID_HANDLE_VALUE) {
-		do {
-			if (fd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) {
-				continue;
-			}
+	CPath coverpath;
 
-			CString fn = CString(fd.cFileName).MakeLower();
-			CString ext = fn.Mid(fn.ReverseFind('.')).MakeLower();
-			CString path = dir + fd.cFileName;
-
-			if (ext == _T(".jpg") || ext == _T(".jpeg") || ext == _T(".png")) {
-				if (!mask.IsEmpty() && (fn.Find(mask) >= 0)) {
-					bFoundFName = path;
-					break;
-				} else {
-					bFoundFName = path;
-					break;
-				}
-			}
-		} while (FindNextFile(h, &fd));
-		FindClose(h);
+	coverpath.Combine(path, _T("cover.jpg"));
+	if (coverpath.FileExists() ||
+		coverpath.RenameExtension(_T("jpeg")) && coverpath.FileExists() ||
+		coverpath.RenameExtension(_T("png")) && coverpath.FileExists()) {
+			return coverpath;
 	}
 
-	return bFoundFName;
+	coverpath.Combine(path, _T("folder.jpg"));
+	if (coverpath.FileExists() ||
+		coverpath.RenameExtension(_T("jpeg")) && coverpath.FileExists() ||
+		coverpath.RenameExtension(_T("png")) && coverpath.FileExists()) {
+			return coverpath;
+	}
+
+	CPath dir(path);
+	dir.RemoveBackslash();
+	int k = dir.FindFileName();
+	if (k >= 0) {
+		coverpath.Combine(path, CString(dir).Right(k) + _T(".jpg"));
+		if (coverpath.FileExists() ||
+			coverpath.RenameExtension(_T("jpeg")) && coverpath.FileExists() ||
+			coverpath.RenameExtension(_T("png")) && coverpath.FileExists()) {
+				return coverpath;
+		}
+	}
+
+	coverpath.Combine(path, _T("front.jpg"));
+	if (coverpath.FileExists() ||
+		coverpath.RenameExtension(_T("jpeg")) && coverpath.FileExists() ||
+		coverpath.RenameExtension(_T("png")) && coverpath.FileExists()) {
+			return coverpath;
+	}
+
+	coverpath.Combine(path, _T("cover\front.jpg"));
+	if (coverpath.FileExists() ||
+		coverpath.RenameExtension(_T("jpeg")) && coverpath.FileExists() ||
+		coverpath.RenameExtension(_T("png")) && coverpath.FileExists()) {
+			return coverpath;
+	}
+
+	coverpath.Combine(path, _T("covers\front.jpg"));
+	if (coverpath.FileExists() ||
+		coverpath.RenameExtension(_T("jpeg")) && coverpath.FileExists() ||
+		coverpath.RenameExtension(_T("png")) && coverpath.FileExists()) {
+			return coverpath;
+	}
+
+	return _T("");
 }
 
 /* this is for custom draw in windows 7 preview */
@@ -18612,14 +18633,8 @@ HRESULT CMainFrame::SetDwmPreview(BOOL show)
 		
 		if (!bLoadRes) {
 			// try to load image from file in the same dir that media file to show in preview & logo;
-			CString dir = m_strFnFull.Mid(0, m_strFnFull.ReverseFind('\\')+1);
-			CString img_fname = GetCoverImgFromPath(dir, _T("cover"));
-			if (img_fname.IsEmpty()) {
-				img_fname = GetCoverImgFromPath(dir, _T("art"));
-			}
-			if (img_fname.IsEmpty()) {
-				img_fname = GetCoverImgFromPath(dir, _T(""));
-			}
+			CString dir = m_strFnFull.Mid(0, m_strFnFull.ReverseFind('\\') + 1);
+			CString img_fname = GetCoverImgFromPath(dir);
 
 			if (!img_fname.IsEmpty()) {
 				if(SUCCEEDED(m_InternalImage.Load(img_fname))) {
