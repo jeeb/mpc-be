@@ -84,7 +84,7 @@ CWavPackSplitterFilter::CWavPackSplitterFilter(LPUNKNOWN lpunk, HRESULT *phr) :
 	m_rtDuration(0),
 	m_dRateSeeking(1.0)
 {
-	m_dwSeekingCaps = AM_SEEKING_CanGetDuration     
+	m_dwSeekingCaps = AM_SEEKING_CanGetDuration
 		| AM_SEEKING_CanGetStopPos
 		| AM_SEEKING_CanSeekForwards
 		| AM_SEEKING_CanSeekBackwards
@@ -189,8 +189,8 @@ STDMETHODIMP CWavPackSplitterFilter::Run(REFERENCE_TIME tStart)
 
 void CWavPackSplitterFilter::SetDuration(REFERENCE_TIME rtDuration)
 {
-	m_rtStart = 0; 
-	m_rtStop = rtDuration; 
+	m_rtStart = 0;
+	m_rtStop = rtDuration;
 	m_rtDuration = rtDuration;
 }
 
@@ -212,7 +212,7 @@ HRESULT CWavPackSplitterFilter::EndFlush()
 	CAutoLock lock(m_pLock);
 
 	m_pOutputPin->DeliverEndFlush();
-	m_pInputPin->EndFlush(); 
+	m_pInputPin->EndFlush();
 	return NOERROR;
 }
 
@@ -349,7 +349,7 @@ HRESULT CWavPackSplitterFilterInputPin::CheckConnect(IPin* pPin)
 		return hr;
 	}
 
-	hr = pPin->QueryInterface(IID_IAsyncReader, (void**)&m_pReader); 
+	hr = pPin->QueryInterface(IID_IAsyncReader, (void**)&m_pReader);
 	if (FAILED(hr)) {
 		return S_FALSE;
 	}
@@ -358,7 +358,7 @@ HRESULT CWavPackSplitterFilterInputPin::CheckConnect(IPin* pPin)
 		IAsyncCallBackWrapper_wv_free(m_pIACBW);
 		m_pIACBW = NULL;
 	}
-	m_pIACBW = IAsyncCallBackWrapper_wv_new(m_pReader);        
+	m_pIACBW = IAsyncCallBackWrapper_wv_new(m_pReader);
 
 	return S_OK;
 }
@@ -376,8 +376,8 @@ HRESULT CWavPackSplitterFilterInputPin::BreakConnect(void)
 	}
 
 	if (m_pReader) {
-		m_pReader->Release(); 
-		m_pReader = NULL; 
+		m_pReader->Release();
+		m_pReader = NULL;
 	}
 
 	return S_OK;
@@ -450,7 +450,7 @@ HRESULT CWavPackSplitterFilterInputPin::CompleteConnect(IPin *pReceivePin)
 									m_Cover.SetCount(tag_size);
 									memcpy(m_Cover.GetData(), item->GetData(), item->GetDataLen());
 								}
-							
+
 							} else {
 								CString TagValue = item->GetValue();
 								if (TagKey == _T("cuesheet")) {
@@ -473,7 +473,7 @@ HRESULT CWavPackSplitterFilterInputPin::CompleteConnect(IPin *pReceivePin)
 								} else if (TagKey == _T("year")) {
 									m_pParentFilter->SetProperty(L"YEAR", TagValue);
 								}
-							
+
 							}
 
 							APETag->TagItems.GetNext(pos);
@@ -497,25 +497,25 @@ DWORD CWavPackSplitterFilterInputPin::ThreadProc()
 {
 	DWORD cmd;
 
-	do 
-	{ 
+	do
+	{
 		cmd = GetRequest();
 		switch (cmd) {
 			case CMD_EXIT:
-				Reply(NOERROR); 
-				break; 
+				Reply(NOERROR);
+				break;
 
-			case CMD_STOP: 
-				Reply(NOERROR); 
-				break; 
+			case CMD_STOP:
+				Reply(NOERROR);
+				break;
 
 			case CMD_RUN:
-				DoProcessingLoop(); 
-				break; 
-		} 
+				DoProcessingLoop();
+				break;
+		}
 	} while (cmd != CMD_EXIT);
 
-	return NOERROR; 
+	return NOERROR;
 }
 
 HRESULT CWavPackSplitterFilterInputPin::DeliverOneFrame(WavPack_parser* wpp)
@@ -526,7 +526,7 @@ HRESULT CWavPackSplitterFilterInputPin::DeliverOneFrame(WavPack_parser* wpp)
 	unsigned long FrameLenBytes = 0, FrameLenSamples = 0, FrameIndex = 0;
 
 	// Get a new media sample
-	hr = m_pParentFilter->m_pOutputPin->GetDeliveryBuffer(&pSample, NULL, NULL, 0); 
+	hr = m_pParentFilter->m_pOutputPin->GetDeliveryBuffer(&pSample, NULL, NULL, 0);
 	if (FAILED(hr)) {
 		return hr;
 	}
@@ -635,7 +635,7 @@ HRESULT CWavPackSplitterFilterInputPin::Active()
 HRESULT CWavPackSplitterFilterInputPin::Inactive()
 {
 	// Stop the thread
-	if (ThreadExists()) { 
+	if (ThreadExists()) {
 		m_bAbort = TRUE;
 		CallWorker(CMD_EXIT);
 		Close();
@@ -672,7 +672,7 @@ STDMETHODIMP CWavPackSplitterFilterInputPin::EndFlush()
 		CallWorker(CMD_RUN);
 	}
 
-	return NOERROR; 
+	return NOERROR;
 }
 
 HRESULT CWavPackSplitterFilterInputPin::DoSeeking(REFERENCE_TIME rtStart)
@@ -747,10 +747,10 @@ HRESULT CWavPackSplitterFilterOutputPin::GetMediaType(int iPosition, CMediaType 
 
 	pwfxout->wBitsPerSample = wpp->bits_per_sample;
 	pwfxout->nChannels = wpp->channel_count;
-	pwfxout->nSamplesPerSec = wpp->sample_rate;    
+	pwfxout->nSamplesPerSec = wpp->sample_rate;
 
 	wavpack_codec_private_data* pd = (wavpack_codec_private_data*)(pwfxout + 1);
-	pd->version = wpp->wphdr.version;    
+	pd->version = wpp->wphdr.version;
 
 	return S_OK;
 }

@@ -32,7 +32,7 @@
 #define WavPackSplitterName   L"Light Alloy/MPC WavPack Source"
 
 // B5554304-3C9A-40A1-8E82-8C8CFBED56C0
-static const GUID CLSID_WavPackSplitter = 
+static const GUID CLSID_WavPackSplitter =
 	{ 0xd8cf6a42, 0x3e09, 0x4922, { 0xa4, 0x52, 0x21, 0xdf, 0xf1, 0xb, 0xee, 0xba } };
 
 // Flag that identify additionnal block data
@@ -70,7 +70,7 @@ public:
 
 	HRESULT CheckConnect(IPin* pPin);
 	HRESULT BreakConnect(void);
-	HRESULT CompleteConnect(IPin *pReceivePin); 
+	HRESULT CompleteConnect(IPin *pReceivePin);
 
 	HRESULT Active();
 	HRESULT Inactive();
