@@ -198,9 +198,6 @@ int CMPCFile::Open_SV7()
 	b.NeedBits32();
 	int ver = b.UGetBits(8);
 
-	//-------------------------------------------------------------------------
-	// Seek table
-	//-------------------------------------------------------------------------
 	seek_pwr = 6;
 	if (block_pwr > seek_pwr) {
 		seek_pwr = block_pwr;
@@ -263,12 +260,6 @@ int CMPCFile::Open(CMusePackReader *reader)
 	int		tagsize = 0;
 
 	reader->GetSize(&avail, &size);
-
-	//-------------------------------------------------------------------------
-	//
-	//	Load MPC file
-	//
-	//-------------------------------------------------------------------------
 
 	// keep a local copy of the reader
 	this->reader = reader;
@@ -396,9 +387,6 @@ int CMPCFile::ReadStreamHeader(CMPCPacket *packet)
 	switch (stream_version) {
 		case 8:
 			{
-				//-----------------------------------------------------------------
-				//	Stream Version 8
-				//-----------------------------------------------------------------
 				total_samples = b.GetMpcSize();
 				int64 silence = b.GetMpcSize();
 
@@ -581,10 +569,6 @@ int CMPCPacket::Load_SV7(CMusePackReader *reader, int &bits_to_skip, bool only_p
 	Bitstream b(temp);
 	Bitstream o(outtemp);
 	b.NeedBits32();
-
-	// We load bits from input file and store it into our buffer.
-	// There they will always start at byte alignment so they can 
-	// be transferred to decoder in a pleasant way.
 
 	// skip bits from previous frame
 	if (bits_to_skip > 0) {

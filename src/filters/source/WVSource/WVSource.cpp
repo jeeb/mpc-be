@@ -450,7 +450,6 @@ HRESULT CWavPackSplitterFilterInputPin::CompleteConnect(IPin *pReceivePin)
 									m_Cover.SetCount(tag_size);
 									memcpy(m_Cover.GetData(), item->GetData(), item->GetDataLen());
 								}
-
 							} else {
 								CString TagValue = item->GetValue();
 								if (TagKey == _T("cuesheet")) {
@@ -473,7 +472,6 @@ HRESULT CWavPackSplitterFilterInputPin::CompleteConnect(IPin *pReceivePin)
 								} else if (TagKey == _T("year")) {
 									m_pParentFilter->SetProperty(L"YEAR", TagValue);
 								}
-
 							}
 
 							APETag->TagItems.GetNext(pos);
@@ -601,7 +599,6 @@ HRESULT CWavPackSplitterFilterInputPin::DoProcessingLoop(void)
 		if (FAILED(hr)) {
 			return hr;
 		}
-
 	} while (!CheckRequest(&cmd) && !m_bAbort);
 
 	return NOERROR;

@@ -134,10 +134,10 @@ CAMRSplitter::~CAMRSplitter()
 
 STDMETHODIMP CAMRSplitter::NonDelegatingQueryInterface(REFIID riid, void **ppv)
 {
-    CheckPointer(ppv,E_POINTER);
+	CheckPointer(ppv,E_POINTER);
 
-    if (riid == IID_IMediaSeeking) {
-        return GetInterface((IMediaSeeking*)this, ppv);
+	if (riid == IID_IMediaSeeking) {
+		return GetInterface((IMediaSeeking*)this, ppv);
 	}
 
 	return CBaseFilter::NonDelegatingQueryInterface(riid,ppv);
@@ -199,11 +199,6 @@ HRESULT CAMRSplitter::CompleteConnect(PIN_DIRECTION Dir, CBasePin *pCaller, IPin
 		ASSERT(!reader);
 		ASSERT(!file);
 
-		//---------------------------------------------------------------------
-		//
-		//	Analyse the source file
-		//
-		//---------------------------------------------------------------------
 		reader	= DNew CAMRReader(input->Reader());
 		file	= DNew CAMRFile();
 
@@ -223,7 +218,6 @@ HRESULT CAMRSplitter::CompleteConnect(PIN_DIRECTION Dir, CBasePin *pCaller, IPin
 		CAMROutputPin *opin = DNew CAMROutputPin(_T("Outpin"), this, &hr, L"Out", 5);
 		ConfigureMediaType(opin);
 		AddOutputPin(opin);
-	} else {
 	}
 	return NOERROR;
 }
@@ -298,8 +292,6 @@ HRESULT CAMRSplitter::BreakConnect(PIN_DIRECTION Dir, CBasePin *pCaller)
 		}
 
 		ev_abort.Reset();
-	} else if (Dir == PINDIR_OUTPUT) {
-		// nothing yet
 	}
 	return NOERROR;
 }
@@ -343,7 +335,7 @@ STDMETHODIMP CAMRSplitter::GetTimeFormat(GUID* pFormat)				{return pFormat ? *pF
 STDMETHODIMP CAMRSplitter::IsUsingTimeFormat(const GUID* pFormat)	{return IsFormatSupported(pFormat);}
 STDMETHODIMP CAMRSplitter::SetTimeFormat(const GUID* pFormat)		{return S_OK == IsFormatSupported(pFormat) ? S_OK : E_INVALIDARG;}
 
-STDMETHODIMP CAMRSplitter::GetStopPosition(LONGLONG* pStop) 
+STDMETHODIMP CAMRSplitter::GetStopPosition(LONGLONG* pStop)
 {
 	if (pStop) {
 		*pStop = this->rtStop;
@@ -382,7 +374,7 @@ STDMETHODIMP CAMRSplitter::SetRate(double dRate)			{return dRate > 0 ? rate = dR
 STDMETHODIMP CAMRSplitter::GetRate(double* pdRate)			{return pdRate ? *pdRate = rate, S_OK : E_POINTER;}
 STDMETHODIMP CAMRSplitter::GetPreroll(LONGLONG* pllPreroll)	{return pllPreroll ? *pllPreroll = 0, S_OK : E_POINTER;}
 
-STDMETHODIMP CAMRSplitter::GetDuration(LONGLONG* pDuration) 
+STDMETHODIMP CAMRSplitter::GetDuration(LONGLONG* pDuration)
 {	
 	CheckPointer(pDuration, E_POINTER); 
 	*pDuration = 0;
@@ -504,7 +496,6 @@ STDMETHODIMP CAMRSplitter::Stop()
 		ev_abort.Reset();
 	}
 
-
 	m_State = State_Stopped;
 	return hr;
 }
@@ -600,19 +591,12 @@ DWORD CAMRSplitter::ThreadProc()
 					HRESULT		hr;
 					int64		current_sample = 0;
 
-					/*
-						With a more complex demultiplexer we would need a mechanism
-						to identify streams. Now we have only one output stream
-						so it's easy.
-					*/
-
 					if ((output.GetCount() <= 0) || (output[0]->IsConnected() == FALSE)) {
 						break;
 					}
 					int	delivered = 0;
 
 					do {
-
 						// are we supposed to abort ?
 						if (ev_abort.Check()) {
 							break; 
@@ -643,7 +627,6 @@ DWORD CAMRSplitter::ThreadProc()
 	
 							delivered++;
 						}
-
 					} while (!CheckRequest(&cmd2));
 				}
 				break;
@@ -808,7 +791,6 @@ CAMROutputPin::CAMROutputPin(TCHAR *pObjectName, CAMRSplitter *pDemux, HRESULT *
 
 CAMROutputPin::~CAMROutputPin()
 {
-	// nothing yet
 }
 
 STDMETHODIMP CAMROutputPin::NonDelegatingQueryInterface(REFIID riid, void **ppv)
@@ -1012,7 +994,6 @@ int CAMROutputPin::GetDataPacketAMR(DataPacketAMR **packet)
 			*packet = DNew DataPacketAMR();
 			return 0;
 		}
-
 	} while (1);
 
 	// unexpected
@@ -1113,10 +1094,6 @@ HRESULT CAMROutputPin::DeliverDataPacketAMR(DataPacketAMR &packet)
 
 	BYTE *buf;
 	sample->GetPointer(&buf);
-
-	//*************************************************************************
-	//	data
-	//*************************************************************************
 
 	memcpy(buf, packet.buf, packet.size);
 	sample->SetActualDataLength(packet.size);
@@ -1251,7 +1228,6 @@ DWORD CAMROutputPin::ThreadProc()
 							}
 						}
 					} while (!CheckRequest(&cmd2));
-
 				}
 				break;
 			default:

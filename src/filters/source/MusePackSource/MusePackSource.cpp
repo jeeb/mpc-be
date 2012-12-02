@@ -208,11 +208,6 @@ HRESULT CMusePackSplitter::CompleteConnect(PIN_DIRECTION Dir, CBasePin *pCaller,
 		ASSERT(!reader);
 		ASSERT(!file);
 
-		//---------------------------------------------------------------------
-		//
-		//	Analyse the source file
-		//
-		//---------------------------------------------------------------------
 		CAutoLock lck(&lock_filter);
 
 		reader	= DNew CMusePackReader(input->Reader());
@@ -397,8 +392,6 @@ HRESULT CMusePackSplitter::BreakConnect(PIN_DIRECTION Dir, CBasePin *pCaller)
 		}
 
 		ev_abort.Reset();
-	} else if (Dir == PINDIR_OUTPUT) {
-		// nothing yet
 	}
 
 	return S_OK;
@@ -595,7 +588,6 @@ STDMETHODIMP CMusePackSplitter::Stop()
 		ev_abort.Reset();
 	}
 
-
 	m_State = State_Stopped;
 	return hr;
 }
@@ -686,12 +678,6 @@ DWORD CMusePackSplitter::ThreadProc()
 					HRESULT		hr;
 					int64		current_sample;
 
-					/*
-						With a more complex demultiplexer we would need a mechanism
-						to identify streams. Now we have only one output stream
-						so it's easy.
-					*/
-
 					if (output.GetCount() <= 0) {
 						break;
 					}
@@ -701,7 +687,6 @@ DWORD CMusePackSplitter::ThreadProc()
 					int	delivered = 0;
 
 					do {
-
 						// are we supposed to abort ?
 						if (ev_abort.Check()) {
 							break; 
@@ -732,7 +717,6 @@ DWORD CMusePackSplitter::ThreadProc()
 
 							delivered++;
 						}
-
 					} while (!CheckRequest(&cmd2));
 				}
 				break;
@@ -962,7 +946,6 @@ CMusePackOutputPin::CMusePackOutputPin(TCHAR *pObjectName, CMusePackSplitter *pD
 
 CMusePackOutputPin::~CMusePackOutputPin()
 {
-	// nothing yet
 }
 
 STDMETHODIMP CMusePackOutputPin::NonDelegatingQueryInterface(REFIID riid, void **ppv)
@@ -1174,7 +1157,6 @@ int CMusePackOutputPin::GetDataPacketMPC(DataPacketMPC **packet)
 			*packet = DNew DataPacketMPC();
 			return 0;
 		}
-
 	} while (1);
 
 	// unexpected
@@ -1266,12 +1248,6 @@ HRESULT CMusePackOutputPin::DeliverDataPacketMPC(DataPacketMPC &packet)
 
 	BYTE *buf;
 	sample->GetPointer(&buf);
-
-	//*************************************************************************
-	//
-	//	data
-	//
-	//*************************************************************************
 
 	memcpy(buf, packet.buf, packet.size);
 	sample->SetActualDataLength(packet.size);
@@ -1403,7 +1379,6 @@ DWORD CMusePackOutputPin::ThreadProc()
 							}
 						}
 					} while (!CheckRequest(&cmd2));
-
 				}
 				break;
 			default:
