@@ -1237,10 +1237,8 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 					&& s.iDSVideoRendererType != VIDRNDT_DS_EVR
 					&& s.iDSVideoRendererType != VIDRNDT_DS_SYNC
 					&& s.iDSVideoRendererType != VIDRNDT_DS_VMR9WINDOWED) {
-
-				// detect Source/Splitter
-				CComQIPtr<IFileSourceFilter> pFSF = pBF;
-				if (!pFSF) {
+				// Transform filter
+				if (FindPin(pBF, PINDIR_INPUT, MEDIATYPE_Video) && FindPin(pBF, PINDIR_OUTPUT, MEDIATYPE_Video)) {
 					continue;
 				}
 			}
@@ -1338,6 +1336,16 @@ STDMETHODIMP CFGManager::ConnectFilterDirect(IPin* pPinOut, IBaseFilter* pBF, co
 
 	BeginEnumPins(pBF, pEP, pPin) {
 		if (S_OK == IsPinDirection(pPin, PINDIR_INPUT) && S_OK != IsPinConnected(pPin)) {
+
+			CLSID clsid;
+			pBF->GetClassID(&clsid);
+			// Disable Line21 Decoder when not in DVD playback mode
+			if (clsid == CLSID_Line21Decoder || clsid == CLSID_Line21Decoder2) {
+				if (!FindFilter(CLSID_DVDNavigator, this)) {
+					continue;
+				}
+			}
+
 			HRESULT hr = ConnectDirect(pPinOut, pPin, pmt);
 			if (SUCCEEDED(hr)) {
 				return hr;

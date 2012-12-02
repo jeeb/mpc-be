@@ -341,6 +341,10 @@ IBaseFilter* FindFilter(const CLSID& clsid, IFilterGraph* pFG)
 
 IPin* FindPin(IBaseFilter* pBF, PIN_DIRECTION direction, const AM_MEDIA_TYPE* pRequestedMT)
 {
+	if (!pBF) {
+		return NULL;
+	}
+
 	PIN_DIRECTION	pindir;
 	BeginEnumPins(pBF, pEP, pPin) {
 		CComPtr<IPin>		pFellow;
@@ -350,7 +354,6 @@ IPin* FindPin(IBaseFilter* pBF, PIN_DIRECTION direction, const AM_MEDIA_TYPE* pR
 				pPin->ConnectedTo(&pFellow) == VFW_E_NOT_CONNECTED) {
 			BeginEnumMediaTypes(pPin, pEM, pmt) {
 				if (pmt->majortype == pRequestedMT->majortype && pmt->subtype == pRequestedMT->subtype) {
-					SAFE_DELETE(pmt);
 					return (pPin);
 				}
 			}
@@ -358,6 +361,30 @@ IPin* FindPin(IBaseFilter* pBF, PIN_DIRECTION direction, const AM_MEDIA_TYPE* pR
 		}
 	}
 	EndEnumPins
+
+	return NULL;
+}
+
+IPin* FindPin(IBaseFilter* pBF, PIN_DIRECTION direction, const GUID majortype)
+{
+	if (!pBF) {
+		return NULL;
+	}
+
+	PIN_DIRECTION	pindir;
+	BeginEnumPins(pBF, pEP, pPin) {
+
+		if (SUCCEEDED (pPin->QueryDirection(&pindir)) && pindir == direction) {
+			BeginEnumMediaTypes(pPin, pEM, pmt) {
+				if (pmt->majortype == majortype) {
+					return (pPin);
+				}
+			}
+			EndEnumMediaTypes(pmt)
+		}
+	}
+	EndEnumPins
+
 	return NULL;
 }
 
