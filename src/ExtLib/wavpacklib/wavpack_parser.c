@@ -205,6 +205,14 @@ WavPack_parser* wavpack_parser_new(stream_reader* io, int is_correction)
 			break;
 		}
 
+		// ==> Start patch MPC
+		// If found non audio block - skip it, instead of breaking
+		if(bcount == -2)
+		{
+			continue;
+		}
+		// ==> End patch MPC
+
 		if(wpp->fb->nb_block == 0)
 		{
             // Store the first header
@@ -290,9 +298,18 @@ unsigned long wavpack_parser_read_frame(
 			bcount = get_wp_block(wpp, &is_final_block);
 			if(bcount == -1)
 			{
-                wpp->wvparser_eof = 1;
+				wpp->wvparser_eof = 1;
 				break;
 			}
+
+			// ==> Start patch MPC
+			// If found non audio block - skip it, instead of breaking
+			if(bcount == -2)
+			{
+				continue;
+			}
+			// ==> End patch MPC
+
             strip_wavpack_block(wpp->fb, &wpp->wphdr, wpp->io, bcount,
                 !wpp->is_correction,  wpp->several_blocks);
 		} while(is_final_block == FALSE);
@@ -485,7 +502,10 @@ get_wp_block(WavPack_parser *wpp, int* is_final_block)
 	else
 	{
 		// printf ("non-audio block found\n");
-		return -1;
+		// ==> Start patch MPC
+		// return -1;
+		return -2;
+		// ==> End patch MPC
 	}
 
 	data_size = wpp->wphdr.ckSize - sizeof(WavpackHeader) + 8;
