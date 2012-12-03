@@ -28,9 +28,9 @@
 #include "MacrovisionKicker.h"
 
 #if (0)		// Set to 1 to activate EVR traces
-#define TRACE_EVR		TRACE
+	#define TRACE_EVR	TRACE
 #else
-#define TRACE_EVR		__noop
+	#define TRACE_EVR	__noop
 #endif
 
 typedef enum {

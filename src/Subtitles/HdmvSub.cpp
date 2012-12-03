@@ -27,7 +27,7 @@
 #if (0)	// Set to 1 to activate HDMV subtitles traces
 	#define TRACE_HDMVSUB	TRACE
 #else
-	#define TRACE_HDMVSUB
+	#define TRACE_HDMVSUB	__noop
 #endif
 
 CHdmvSub::CHdmvSub(void)

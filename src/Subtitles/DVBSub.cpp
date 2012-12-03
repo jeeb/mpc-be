@@ -28,7 +28,7 @@
 #if (0)		// Set to 1 to activate DVB subtitles traces
 	#define TRACE_DVB	TRACE
 #else
-	#define TRACE_DVB
+	#define TRACE_DVB	__noop
 #endif
 
 #define BUFFER_CHUNK_GROW		0x1000
@@ -245,7 +245,7 @@ HRESULT CDVBSub::ParseSample(IMediaSample* pSample)
 						CAutoPtr<DVB_PAGE>	pPage;
 						ParsePage(gb, wSegLength, pPage);
 
-						if (pPage->PageState == DPS_ACQUISITION) {
+						if (pPage->PageState == DPS_ACQUISITION || pPage->PageState == DPS_MODE) {
 							if (m_pCurrentPage != NULL) {
 								m_pCurrentPage->rtStop = max(m_pCurrentPage->rtStop, m_rtStart);
 								m_Pages.AddTail (m_pCurrentPage.Detach());
@@ -294,6 +294,7 @@ HRESULT CDVBSub::ParseSample(IMediaSample* pSample)
 						}
 						break;
 					default :
+						TRACE_DVB ("DVB - unknown Segment\n");
 						break;
 				}
 				nLastPos = gb.GetPos();
@@ -325,6 +326,13 @@ void CDVBSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 					if (pClut != NULL) {
 						pObject->SetPalette(pClut->Size, pClut->Palette, m_Display.width > 720);
 					}
+
+					TRACE_DVB (_T("CDVBSub::Render() : size = %ld, %d:%d, ObjRes = %dx%d, SPDRes = %dx%d, %I64d = %s\n"),
+									pObject->GetRLEDataSize(),
+									nX, nY,
+									pObject->m_width, pObject->m_height, spd.w, spd.h,
+									rt, ReftimeToString(rt));
+
 					
 					pObject->RenderDvb(spd, nX, nY);
 				}
