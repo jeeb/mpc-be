@@ -18502,55 +18502,52 @@ void CMainFrame::CreateChapterTimeArray()
 	}
 }
 
+bool CheckCoverImgExist(CString &path, CString name) {
+	CPath coverpath;
+	coverpath.Combine(path, name);
+
+	if (coverpath.FileExists() ||
+		coverpath.RenameExtension(_T("jpeg")) && coverpath.FileExists() ||
+		coverpath.RenameExtension(_T("png"))  && coverpath.FileExists()) {
+			path.SetString(coverpath);
+			return true;
+	}
+	return false;
+}
+
 CString GetCoverImgFromPath(CString path)
 {
-	CPath coverpath;
-
-	coverpath.Combine(path, _T("cover.jpg"));
-	if (coverpath.FileExists() ||
-		coverpath.RenameExtension(_T("jpeg")) && coverpath.FileExists() ||
-		coverpath.RenameExtension(_T("png")) && coverpath.FileExists()) {
-			return coverpath;
+	if (CheckCoverImgExist(path, _T("cover.jpg"))) {
+		return path;
 	}
 
-	coverpath.Combine(path, _T("folder.jpg"));
-	if (coverpath.FileExists() ||
-		coverpath.RenameExtension(_T("jpeg")) && coverpath.FileExists() ||
-		coverpath.RenameExtension(_T("png")) && coverpath.FileExists()) {
-			return coverpath;
+	if (CheckCoverImgExist(path, _T("folder.jpg"))) {
+		return path;
 	}
 
 	CPath dir(path);
 	dir.RemoveBackslash();
 	int k = dir.FindFileName();
 	if (k >= 0) {
-		coverpath.Combine(path, CString(dir).Right(k) + _T(".jpg"));
-		if (coverpath.FileExists() ||
-			coverpath.RenameExtension(_T("jpeg")) && coverpath.FileExists() ||
-			coverpath.RenameExtension(_T("png")) && coverpath.FileExists()) {
-				return coverpath;
+		if (CheckCoverImgExist(path, CString(dir).Right(k) + _T(".jpg"))) {
+			return path;
 		}
 	}
 
-	coverpath.Combine(path, _T("front.jpg"));
-	if (coverpath.FileExists() ||
-		coverpath.RenameExtension(_T("jpeg")) && coverpath.FileExists() ||
-		coverpath.RenameExtension(_T("png")) && coverpath.FileExists()) {
-			return coverpath;
+	if (CheckCoverImgExist(path, _T("front.jpg"))) {
+		return path;
 	}
 
-	coverpath.Combine(path, _T("cover\\front.jpg"));
-	if (coverpath.FileExists() ||
-		coverpath.RenameExtension(_T("jpeg")) && coverpath.FileExists() ||
-		coverpath.RenameExtension(_T("png")) && coverpath.FileExists()) {
-			return coverpath;
+	if (CheckCoverImgExist(path, _T("cover\\front.jpg"))) {
+		return path;
 	}
 
-	coverpath.Combine(path, _T("covers\\front.jpg"));
-	if (coverpath.FileExists() ||
-		coverpath.RenameExtension(_T("jpeg")) && coverpath.FileExists() ||
-		coverpath.RenameExtension(_T("png")) && coverpath.FileExists()) {
-			return coverpath;
+	if (CheckCoverImgExist(path, _T("covers\\front.jpg"))) {
+		return path;
+	}
+
+	if (CheckCoverImgExist(path, _T("box.jpg"))) {
+		return path;
 	}
 
 	return _T("");
