@@ -56,6 +56,27 @@ public:
 		END_OF_DISPLAY		= 0x80
 	};
 
+	const CString GetSegmentType(const DVB_SEGMENT_TYPE SegmentType) {
+		switch (SegmentType) {
+			case NO_SEGMENT:
+				return _T("NO_SEGMENT");
+			case PAGE:
+				return _T("PAGE");
+			case REGION:
+				return _T("REGION");
+			case CLUT:
+				return _T("CLUT");
+			case OBJECT:
+				return _T("OBJECT");
+			case DISPLAY:
+				return _T("DISPLAY");
+			case END_OF_DISPLAY:
+				return _T("END_OF_DISPLAY");
+			default:
+				return _T("UNKNOWN_SEGMENT");
+		}
+	}
+
 	// EN 300-743, table 6
 	enum DVB_OBJECT_TYPE {
 		OT_BASIC_BITMAP       = 0x00,
