@@ -153,6 +153,7 @@
     <ClCompile Include="enc\picture.c" />
     <ClCompile Include="enc\quant.c" />
     <ClCompile Include="enc\syntax.c" />
+    <ClCompile Include="enc\token.c" />
     <ClCompile Include="enc\tree.c" />
     <ClCompile Include="enc\vp8l.c" />
     <ClCompile Include="enc\webpenc.c" />

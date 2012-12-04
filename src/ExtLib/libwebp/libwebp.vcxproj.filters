@@ -136,6 +136,9 @@
     <ClCompile Include="enc\syntax.c">
       <Filter>Source Files\enc</Filter>
     </ClCompile>
+    <ClCompile Include="enc\token.c">
+      <Filter>Source Files\enc</Filter>
+    </ClCompile>
     <ClCompile Include="enc\tree.c">
       <Filter>Source Files\enc</Filter>
     </ClCompile>
