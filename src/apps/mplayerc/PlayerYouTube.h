@@ -59,7 +59,7 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 			f = InternetOpenUrl(s, fn, 0, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE, 0);
 			if (f) {
 				char buf[4096];
-				DWORD len, size = 0, end_pos = 0, fs = 15 * sizeof(buf);
+				DWORD len, size = 0, end_pos = 0, fs = 16 * sizeof(buf);
 
 				out = (char*)malloc(fs + 1);
 				memset(out, 0, fs + 1);
@@ -105,6 +105,7 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 				Title = CA2CT(title, CP_UTF8);
 				Title = Title.TrimLeft(_T(".")).TrimRight(_T("."));
 
+				Title.Replace(_T(" - YouTube"), _T(""));
 				Title.Replace(_T("|"), _T("-"));
 				Title.Replace(_T("&quot;"), _T("\""));
 				Title.Replace(_T("&amp;"), _T("&"));
