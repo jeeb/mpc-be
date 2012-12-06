@@ -5302,11 +5302,16 @@ void CMainFrame::OnFileSaveAs()
 		pMC->Pause();
 	}
 
+	CString name = in;
+	if (!m_strTitleAlt.IsEmpty()) {
+		name = m_strTitleAlt;
+	}
+
 	if (CTaskDialog::IsSupported()) {
-		CSaveTaskDlg dlg(in, p);
+		CSaveTaskDlg dlg(in, name, p);
 		dlg.DoModal();
 	} else {
-		CSaveDlg dlg(in, p);
+		CSaveDlg dlg(in, name, p);
 		dlg.DoModal();
 	}
 

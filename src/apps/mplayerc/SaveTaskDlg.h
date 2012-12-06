@@ -40,7 +40,7 @@ private:
 	HWND	m_TaskDlgHwnd;
 
 public:
-	CSaveTaskDlg(CString in, CString out);
+	CSaveTaskDlg(CString in, CString name, CString out);
 	virtual ~CSaveTaskDlg();
 
 protected:

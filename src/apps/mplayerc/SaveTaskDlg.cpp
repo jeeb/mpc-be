@@ -31,9 +31,10 @@
 // CSaveTaskDlg dialog
 
 IMPLEMENT_DYNAMIC(CSaveTaskDlg, CTaskDialog)
-CSaveTaskDlg::CSaveTaskDlg(CString in, CString out)
-	: CTaskDialog(_T(""), /*_T("")*/in + _T("\n") + out, ResStr(IDS_SAVE_FILE), TDCBF_CANCEL_BUTTON, TDF_CALLBACK_TIMER|TDF_POSITION_RELATIVE_TO_WINDOW)
-	, m_in(in), m_out(out)
+CSaveTaskDlg::CSaveTaskDlg(CString in, CString name, CString out)
+	: CTaskDialog(_T(""), name + _T("\n") + out, ResStr(IDS_SAVE_FILE), TDCBF_CANCEL_BUTTON, TDF_CALLBACK_TIMER|TDF_POSITION_RELATIVE_TO_WINDOW)
+	, m_in(in)
+	, m_out(out)
 	, m_TaskDlgHwnd(0)
 {
 	m_hIcon = (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);

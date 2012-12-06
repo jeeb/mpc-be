@@ -32,9 +32,11 @@
 // CSaveDlg dialog
 
 IMPLEMENT_DYNAMIC(CSaveDlg, CCmdUIDialog)
-CSaveDlg::CSaveDlg(CString in, CString out, CWnd* pParent)
+CSaveDlg::CSaveDlg(CString in, CString name, CString out, CWnd* pParent)
 	: CCmdUIDialog(CSaveDlg::IDD, pParent)
-	, m_in(in), m_out(out)
+	, m_in(in)
+	, m_name(name)
+	, m_out(out)
 	, m_nIDTimerEvent((UINT_PTR)-1)
 {
 }
@@ -68,7 +70,7 @@ BOOL CSaveDlg::OnInitDialog()
 	m_anim.SendMessage(ACM_OPEN, (WPARAM)AfxGetInstanceHandle(), (LPARAM)IDR_AVI_FILECOPY);
 	m_anim.Play(0, (UINT)-1, (UINT)-1);
 
-	CString str, in = m_in, out = m_out;
+	CString str, in = m_name, out = m_out;
 
 	if (in.GetLength() > 60) {
 		in = in.Left(17) + _T("..") + in.Right(43);

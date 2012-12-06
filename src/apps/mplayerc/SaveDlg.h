@@ -34,7 +34,7 @@ class CSaveDlg : public CCmdUIDialog
 	DECLARE_DYNAMIC(CSaveDlg)
 
 private:
-	CString m_in, m_out;
+	CString m_in, m_name, m_out;
 	CComPtr<IGraphBuilder> pGB;
 	CComQIPtr<IMediaControl> pMC;
 	CComQIPtr<IMediaEventEx> pME;
@@ -42,7 +42,7 @@ private:
 	UINT_PTR m_nIDTimerEvent;
 
 public:
-	CSaveDlg(CString in, CString out, CWnd* pParent = NULL);
+	CSaveDlg(CString in, CString name, CString out, CWnd* pParent = NULL);
 	virtual ~CSaveDlg();
 
 	enum { IDD = IDD_SAVE_DLG };
