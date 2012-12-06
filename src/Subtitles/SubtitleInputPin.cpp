@@ -227,6 +227,17 @@ STDMETHODIMP CSubtitleInputPin::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME
 	return __super::NewSegment(tStart, tStop, dRate);
 }
 
+STDMETHODIMP CSubtitleInputPin::EndOfStream()
+{
+	if (IsHdmvSub(&m_mt)) {
+		CAutoLock cAutoLock(m_pSubLock);
+		CRenderedHdmvSubtitle* pHdmvSubtitle = (CRenderedHdmvSubtitle*)(ISubStream*)m_pSubStream;
+		pHdmvSubtitle->EndOfStream();
+	}
+
+	return __super::EndOfStream();
+}
+
 interface __declspec(uuid("D3D92BC3-713B-451B-9122-320095D51EA5"))
 IMpeg2DemultiplexerTesting :
 public IUnknown {

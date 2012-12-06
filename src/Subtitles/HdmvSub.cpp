@@ -199,7 +199,7 @@ void CHdmvSub::ParsePresentationSegment(CGolombBuffer* pGBuffer, REFERENCE_TIME 
 			
 					pObject->SetRLEData(pObjectData.GetRLEData(), pObjectData.GetRLEDataSize(), pObjectData.GetRLEDataSize());
 
-					TRACE_HDMVSUB (_T("			AddTail() : m_object_id_ref = %d, m_window_id_ref = %d, compositionNumber = %d, [%10I64d -> %10I64d], [%s -> %s]\n"),
+					TRACE_HDMVSUB (_T("			store Segment : m_object_id_ref = %d, m_window_id_ref = %d, compositionNumber = %d, [%10I64d -> %10I64d], [%s -> %s]\n"),
 									m_pCurrentWindow->Objects[i]->m_object_id_ref,
 									m_pCurrentWindow->Objects[i]->m_window_id_ref,
 									m_pCurrentWindow->Objects[i]->m_compositionNumber,

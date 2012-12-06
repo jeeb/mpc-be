@@ -93,11 +93,11 @@ public:
 	CHdmvSub();
 	~CHdmvSub();
 
-	HRESULT			ParseSample (IMediaSample* pSample);
-	HRESULT			ParseSample (BYTE* pData, int lSampleLen, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
+	virtual HRESULT			ParseSample (IMediaSample* pSample);
+	HRESULT					ParseSample (BYTE* pData, int lSampleLen, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 
-	POSITION		GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld = false);
-	POSITION		GetNext(POSITION pos) {
+	virtual POSITION		GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld = false);
+	virtual POSITION		GetNext(POSITION pos) {
 		m_pObjects.GetNext(pos);
 		return pos;
 	};
@@ -112,11 +112,12 @@ public:
 		return pObject!=NULL ? pObject->m_rtStop : INVALID_TIME;
 	};
 
-	void			Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox);
-	HRESULT			GetTextureSize (POSITION pos, SIZE& MaxTextureSize, SIZE& VideoSize, POINT& VideoTopLeft);
-	void			Reset();
+	virtual void			Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox);
+	virtual HRESULT			GetTextureSize (POSITION pos, SIZE& MaxTextureSize, SIZE& VideoSize, POINT& VideoTopLeft);
+	virtual void			Reset();
 
-	void			CleanOld(REFERENCE_TIME rt);
+	virtual void			CleanOld(REFERENCE_TIME rt);
+	virtual HRESULT			EndOfStream() { return S_OK; }
 
 private :
 	HDMV_SEGMENT_TYPE				m_nCurSegment;

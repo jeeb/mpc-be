@@ -41,6 +41,7 @@ public:
 	virtual void			Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox) = NULL;
 	virtual HRESULT			GetTextureSize (POSITION pos, SIZE& MaxTextureSize, SIZE& VideoSize, POINT& VideoTopLeft) = NULL;
 	virtual void			CleanOld(REFERENCE_TIME rt) = NULL;
+	virtual HRESULT			EndOfStream() = NULL;
 
 protected :
 	SUBTITLE_TYPE			m_nType;

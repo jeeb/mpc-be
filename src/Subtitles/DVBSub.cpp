@@ -233,12 +233,12 @@ HRESULT CDVBSub::ParseSample(IMediaSample* pSample)
 				wPageId		= gb.ReadShort();
 				wSegLength	= gb.ReadShort();
 
-				TRACE_DVB (_T("DVB - ParseSample, Segment = [%ws], PageId = [%d], SegLength/Buffer = [%d]/[%d]\n"), GetSegmentType(nCurSegment), wPageId, wSegLength, gb.RemainingSize());
-
 				if (gb.RemainingSize() < wSegLength) {
 					hr = S_FALSE;
 					break;
 				}
+
+				TRACE_DVB (_T("DVB - ParseSample, Segment = [%ws], PageId = [%d], SegLength/Buffer = [%d]/[%d]\n"), GetSegmentType(nCurSegment), wPageId, wSegLength, gb.RemainingSize());
 
 				switch (nCurSegment) {
 					case PAGE : {
@@ -246,26 +246,29 @@ HRESULT CDVBSub::ParseSample(IMediaSample* pSample)
 						ParsePage(gb, wSegLength, pPage);
 
 						if (pPage->PageState == DPS_ACQUISITION || pPage->PageState == DPS_MODE) {
+							TRACE_DVB (_T("DVB - Page start\n"));
+
 							if (m_pCurrentPage != NULL) {
-								m_pCurrentPage->rtStop = max(m_pCurrentPage->rtStop, m_rtStart);
+								m_pCurrentPage->rtStop = min(m_pCurrentPage->rtStop, m_rtStart);
+								TRACE_DVB (_T("DVB - store Page : %ws => %ws\n"), ReftimeToString(m_pCurrentPage->rtStart), ReftimeToString(m_pCurrentPage->rtStop));
 								m_Pages.AddTail (m_pCurrentPage.Detach());
 							}
 							UpdateTimeStamp(m_rtStart);
 
 							m_pCurrentPage = pPage;
 							m_pCurrentPage->rtStart	= m_rtStart;
-							m_pCurrentPage->rtStop	= m_pCurrentPage->rtStart + m_pCurrentPage->PageTimeOut * 1000000;
+							m_pCurrentPage->rtStop	= m_pCurrentPage->rtStart + m_pCurrentPage->PageTimeOut * UNITS; // TODO - need to limit the duration of the segment
 
-							TRACE_DVB (_T("DVB - Page started : %ws, TimeOut = %d\n"), ReftimeToString(m_rtStart), m_pCurrentPage->PageTimeOut);
+							TRACE_DVB (_T("DVB - Page started : %ws, TimeOut = %d\n"), ReftimeToString(m_pCurrentPage->rtStart), m_pCurrentPage->PageTimeOut);
 						} else if (pPage->PageState == DPS_NORMAL) {
 							TRACE_DVB (_T("DVB - Page update\n"));
 
 							if (m_pCurrentPage && !m_pCurrentPage->RegionCount && pPage->RegionCount) {
 								m_pCurrentPage = pPage;
 								m_pCurrentPage->rtStart	= m_rtStart;
-								m_pCurrentPage->rtStop	= m_pCurrentPage->rtStart + m_pCurrentPage->PageTimeOut * 1000000;
+								m_pCurrentPage->rtStop	= m_pCurrentPage->rtStart + m_pCurrentPage->PageTimeOut * UNITS; // TODO - need to limit the duration of the segment
 
-								TRACE_DVB (_T("DVB - Page started[update] : %ws, TimeOut = %d\n"), ReftimeToString(m_rtStart), m_pCurrentPage->PageTimeOut);
+								TRACE_DVB (_T("DVB - Page started[update] : %ws, TimeOut = %d\n"), ReftimeToString(m_pCurrentPage->rtStart), m_pCurrentPage->PageTimeOut);
 							}
 						}
 					}
@@ -287,11 +290,14 @@ HRESULT CDVBSub::ParseSample(IMediaSample* pSample)
 						TRACE_DVB (_T("DVB - Display\n"));
 						break;
 					case END_OF_DISPLAY :
+						/*
 						if (m_pCurrentPage != NULL && (m_pCurrentPage->rtStart != m_rtStart)) {
 							m_pCurrentPage->rtStop = max(m_pCurrentPage->rtStop, m_rtStart);
 							TRACE_DVB (_T("DVB - End display : %ws => %ws\n"), ReftimeToString(m_pCurrentPage->rtStart), ReftimeToString(m_pCurrentPage->rtStop));
 							m_Pages.AddTail (m_pCurrentPage.Detach());
 						}
+						*/
+						TRACE_DVB (_T("DVB - End display\n"));
 						break;
 					default :
 						TRACE_DVB (_T("DVB - unknown Segment\n"));
@@ -327,11 +333,12 @@ void CDVBSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 						pObject->SetPalette(pClut->Size, pClut->Palette, m_Display.width > 720);
 					}
 
-					TRACE_DVB (_T("CDVBSub::Render() : size = %ld, %d:%d, ObjRes = %dx%d, SPDRes = %dx%d, %I64d = %ws\n"),
+					TRACE_DVB (_T("CDVBSub::Render() : size = %ld, %d:%d, ObjRes = %dx%d, SPDRes = %dx%d, %I64d = %ws, [%ws => %ws]\n"),
 									pObject->GetRLEDataSize(),
 									nX, nY,
 									pObject->m_width, pObject->m_height, spd.w, spd.h,
-									rt, ReftimeToString(rt));
+									rt, ReftimeToString(rt),
+									ReftimeToString(pPage->rtStart), ReftimeToString(pPage->rtStop));
 
 					
 					pObject->RenderDvb(spd, nX, nY);
@@ -602,7 +609,7 @@ void CDVBSub::CleanOld(REFERENCE_TIME rt)
 		pPage_old = m_Pages.GetHead();
 		if (pPage_old->rtStop < rt) {
 			if (!pPage_old->Rendered) {
-				TRACE_DVB ("DVB - remove unrendered object, %S => %S, (rt=%S)\n",
+				TRACE_DVB (_T("DVB - remove unrendered object, %ws => %ws, (rt = %ws)\n"),
 							ReftimeToString(pPage_old->rtStart), ReftimeToString(pPage_old->rtStop),
 							ReftimeToString(rt));
 			}
@@ -612,4 +619,14 @@ void CDVBSub::CleanOld(REFERENCE_TIME rt)
 			break;
 		}
 	}
+}
+
+HRESULT CDVBSub::EndOfStream()
+{
+	if (m_pCurrentPage != NULL) {
+		TRACE_DVB (_T("DVB - EndOfStream() : %ws => %ws\n"), ReftimeToString(m_pCurrentPage->rtStart), ReftimeToString(m_pCurrentPage->rtStop));
+		m_Pages.AddTail (m_pCurrentPage.Detach());
+	}
+
+	return S_OK;
 }

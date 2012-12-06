@@ -184,3 +184,10 @@ HRESULT CRenderedHdmvSubtitle::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME 
 	m_rtStart = tStart;
 	return S_OK;
 }
+
+HRESULT CRenderedHdmvSubtitle::EndOfStream()
+{
+	CAutoLock cAutoLock(&m_csCritSec);
+
+	return m_pSub->EndOfStream();
+}

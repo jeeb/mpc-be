@@ -44,6 +44,7 @@ public:
 	virtual REFERENCE_TIME	GetStop(POSITION nPos);
 	virtual void			Reset();
 	virtual	void			CleanOld(REFERENCE_TIME rt);
+	virtual HRESULT			EndOfStream();
 
 	// EN 300-743, table 2
 	enum DVB_SEGMENT_TYPE {
