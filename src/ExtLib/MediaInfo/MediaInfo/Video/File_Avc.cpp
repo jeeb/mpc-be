@@ -727,96 +727,249 @@ bool File_Avc::Synched_Test()
 #if MEDIAINFO_DEMUX
 bool File_Avc::Demux_UnpacketizeContainer_Test()
 {
-    bool zero_byte=Buffer[Buffer_Offset+2]==0x00;
-    if (!(((Buffer[Buffer_Offset+(zero_byte?4:3)]&0x1B)==0x01 && (Buffer[Buffer_Offset+(zero_byte?5:4)]&0x80)!=0x80)
-       || (Buffer[Buffer_Offset+(zero_byte?4:3)]&0x1F)==0x0C))
+    const int8u*    Buffer_Temp=NULL;
+    size_t          Buffer_Temp_Size=0;
+    bool            RandomAccess=true; //Default, in case of problem
+
+    if (Demux_Avc_Transcode_Iso14496_15_to_Iso14496_10)
     {
-        if (Demux_Offset==0)
-        {
-            Demux_Offset=Buffer_Offset;
-            Demux_IntermediateItemFound=false;
-        }
-        while (Demux_Offset+6<=Buffer_Size)
-        {
-            //Synchronizing
-            while(Demux_Offset+6<=Buffer_Size && (Buffer[Demux_Offset  ]!=0x00
-                                               || Buffer[Demux_Offset+1]!=0x00
-                                               || Buffer[Demux_Offset+2]!=0x01))
-            {
-                Demux_Offset+=2;
-                while(Demux_Offset<Buffer_Size && Buffer[Buffer_Offset]!=0x00)
-                    Demux_Offset+=2;
-                if (Demux_Offset>=Buffer_Size || Buffer[Demux_Offset-1]==0x00)
-                    Demux_Offset--;
-            }
+        if (MustParse_SPS_PPS)
+            return true; //Wait for SPS and PPS
 
-            if (Demux_Offset+6<=Buffer_Size)
+        //Random access check
+        RandomAccess=false;
+        
+        //Computing final size
+        size_t TranscodedBuffer_Size=0;
+        while (Buffer_Offset+SizeOfNALU_Minus1+1+1<=Buffer_Size)
+        {
+            size_t Size;
+            switch (SizeOfNALU_Minus1)
             {
-                zero_byte=Buffer[Demux_Offset+2]==0x00;
-                if (Demux_IntermediateItemFound)
-                {
-                    if (!(((Buffer[Demux_Offset+(zero_byte?4:3)]&0x1B)==0x01 && (Buffer[Demux_Offset+(zero_byte?5:4)]&0x80)!=0x80)
-                       || (Buffer[Demux_Offset+(zero_byte?4:3)]&0x1F)==0x0C))
+                case 0: Size=Buffer[Buffer_Offset];
+                        TranscodedBuffer_Size+=2;
                         break;
-                }
-                else
-                {
-                    if ((Buffer[Demux_Offset+(zero_byte?4:3)]&0x1B)==0x01 && (Buffer[Demux_Offset+(zero_byte?5:4)]&0x80)==0x80)
-                        Demux_IntermediateItemFound=true;
-                }
-
-                Demux_Offset++;
+                case 1: Size=BigEndian2int16u(Buffer+Buffer_Offset);
+                        TranscodedBuffer_Size++;
+                        break;
+                case 2: Size=BigEndian2int24u(Buffer+Buffer_Offset);
+                        break;
+                case 3: Size=BigEndian2int32u(Buffer+Buffer_Offset);
+                        TranscodedBuffer_Size--;
+                        break;
+                default:    return true; //Problem
             }
-        }
+            Size+=SizeOfNALU_Minus1+1;
 
-        if (Demux_Offset+6>Buffer_Size && !FrameIsAlwaysComplete && File_Offset+Buffer_Size<File_Size)
-            return false; //No complete frame
-
-        if (Demux_Offset && Buffer[Demux_Offset-1]==0x00)
-            Demux_Offset--;
-
-        zero_byte=Buffer[Buffer_Offset+2]==0x00;
-        size_t Buffer_Offset_Random=Buffer_Offset;
-        if ((Buffer[Buffer_Offset_Random+(zero_byte?4:3)]&0x1F)==0x09)
-        {
-            Buffer_Offset_Random++;
-            if (zero_byte)
-                Buffer_Offset_Random++;
-            while(Buffer_Offset_Random+6<=Buffer_Size && (Buffer[Buffer_Offset_Random  ]!=0x00
-                                                       || Buffer[Buffer_Offset_Random+1]!=0x00
-                                                       || Buffer[Buffer_Offset_Random+2]!=0x01))
-                Buffer_Offset_Random++;
-            zero_byte=Buffer[Buffer_Offset_Random+2]==0x00;
-        }
-        bool RandomAccess=Buffer_Offset_Random+6<=Buffer_Size && (Buffer[Buffer_Offset_Random+(zero_byte?4:3)]&0x1F)==0x07; //seq_parameter_set
-        if (!Status[IsAccepted])
-        {
-            Accept("AVC");
-            if (Config->Demux_EventWasSent)
-                return false;
-        }
-
-        if (IFrame_Count || RandomAccess)
-        {
-            bool Frame_Count_NotParsedIncluded_PlusOne=false;
-            int64u PTS_Temp=FrameInfo.PTS;
-            if (!IsSub)
-                FrameInfo.PTS=(int64u)-1;
-            if (Frame_Count_NotParsedIncluded!=(int64u)-1 && Interlaced_Top!=Interlaced_Bottom)
+            //Coherency checking
+            if (Size==0 || Buffer_Offset+Size>Buffer_Size || (Buffer_Offset+Size!=Buffer_Size && Buffer_Offset+Size+SizeOfNALU_Minus1+1>Buffer_Size))
+                Size=Buffer_Size-Buffer_Offset;
+            
+            //Random access check
+            if (!RandomAccess && Buffer_Offset+SizeOfNALU_Minus1+1<Buffer_Size && (Buffer[Buffer_Offset+SizeOfNALU_Minus1+1]&0x1F) && (Buffer[Buffer_Offset+SizeOfNALU_Minus1+1]&0x1F)<=5) //Is a slice
             {
-                Frame_Count_NotParsedIncluded--;
-                Frame_Count_NotParsedIncluded_PlusOne=true;
+                int32u slice_type;
+                Element_Offset=SizeOfNALU_Minus1+1+1;
+                Element_Size=Size;
+                BS_Begin();
+                Skip_UE("first_mb_in_slice");
+                Get_UE (slice_type, "slice_type");
+                BS_End();
+                Element_Offset=0;
+
+                switch (slice_type)
+                {
+                    case 2 :
+                    case 7 :
+                                RandomAccess=true;
+                }
             }
-            Demux_UnpacketizeContainer_Demux(RandomAccess);
-            if (!IsSub)
-                FrameInfo.PTS=PTS_Temp;
-            if (Frame_Count_NotParsedIncluded_PlusOne)
-                Frame_Count_NotParsedIncluded++;
+
+            TranscodedBuffer_Size+=Size;
+            Buffer_Offset+=Size;
         }
-        else
-            Demux_UnpacketizeContainer_Demux_Clear();
+        Buffer_Offset=0;    
+
+        //Adding SPS/PPS sizes
+        if (RandomAccess)
+        {
+            for (seq_parameter_set_structs::iterator Data_Item=seq_parameter_sets.begin(); Data_Item!=seq_parameter_sets.end(); ++Data_Item)
+                TranscodedBuffer_Size+=(*Data_Item)->Iso14496_10_Buffer_Size;
+            for (seq_parameter_set_structs::iterator Data_Item=subset_seq_parameter_sets.begin(); Data_Item!=subset_seq_parameter_sets.end(); ++Data_Item)
+                TranscodedBuffer_Size+=(*Data_Item)->Iso14496_10_Buffer_Size;
+            for (pic_parameter_set_structs::iterator Data_Item=pic_parameter_sets.begin(); Data_Item!=pic_parameter_sets.end(); ++Data_Item)
+                TranscodedBuffer_Size+=(*Data_Item)->Iso14496_10_Buffer_Size;
+        }
+
+        //Copying
+        int8u* TranscodedBuffer=new int8u[TranscodedBuffer_Size+100];
+        size_t TranscodedBuffer_Pos=0;
+        if (RandomAccess)
+        {
+            for (seq_parameter_set_structs::iterator Data_Item=seq_parameter_sets.begin(); Data_Item!=seq_parameter_sets.end(); ++Data_Item)
+            {
+                std::memcpy(TranscodedBuffer+TranscodedBuffer_Pos, (*Data_Item)->Iso14496_10_Buffer, (*Data_Item)->Iso14496_10_Buffer_Size);
+                TranscodedBuffer_Pos+=(*Data_Item)->Iso14496_10_Buffer_Size;
+            }
+            for (seq_parameter_set_structs::iterator Data_Item=subset_seq_parameter_sets.begin(); Data_Item!=subset_seq_parameter_sets.end(); ++Data_Item)
+            {
+                std::memcpy(TranscodedBuffer+TranscodedBuffer_Pos, (*Data_Item)->Iso14496_10_Buffer, (*Data_Item)->Iso14496_10_Buffer_Size);
+                TranscodedBuffer_Pos+=(*Data_Item)->Iso14496_10_Buffer_Size;
+            }
+            for (pic_parameter_set_structs::iterator Data_Item=pic_parameter_sets.begin(); Data_Item!=pic_parameter_sets.end(); ++Data_Item)
+            {
+                std::memcpy(TranscodedBuffer+TranscodedBuffer_Pos, (*Data_Item)->Iso14496_10_Buffer, (*Data_Item)->Iso14496_10_Buffer_Size);
+                TranscodedBuffer_Pos+=(*Data_Item)->Iso14496_10_Buffer_Size;
+            }
+        }
+        while (Buffer_Offset<Buffer_Size)
+        {
+            //Sync layer
+            TranscodedBuffer[TranscodedBuffer_Pos]=0x00;
+            TranscodedBuffer_Pos++;
+            TranscodedBuffer[TranscodedBuffer_Pos]=0x00;
+            TranscodedBuffer_Pos++;
+            TranscodedBuffer[TranscodedBuffer_Pos]=0x01;
+            TranscodedBuffer_Pos++;
+            
+            //Block
+            size_t Size;
+            switch (SizeOfNALU_Minus1)
+            {
+                case 0: Size=Buffer[Buffer_Offset];
+                        Buffer_Offset++;
+                        break;
+                case 1: Size=BigEndian2int16u(Buffer+Buffer_Offset);
+                        Buffer_Offset+=2;
+                        break;
+                case 2: Size=BigEndian2int24u(Buffer+Buffer_Offset);
+                        Buffer_Offset+=3;
+                        break;
+                case 3: Size=BigEndian2int32u(Buffer+Buffer_Offset);
+                        Buffer_Offset+=4;
+                        break;
+                default:return false; //Problem
+            }
+
+            //Coherency checking
+            if (Size==0 || Buffer_Offset+Size>Buffer_Size || (Buffer_Offset+Size!=Buffer_Size && Buffer_Offset+Size+SizeOfNALU_Minus1+1>Buffer_Size))
+                Size=Buffer_Size-Buffer_Offset;
+            
+            std::memcpy(TranscodedBuffer+TranscodedBuffer_Pos, Buffer+Buffer_Offset, Size);
+            TranscodedBuffer_Pos+=Size;
+            Buffer_Offset+=Size;
+        }
+        Buffer_Offset=0;
+
+        Buffer_Temp=Buffer;
+        Buffer=TranscodedBuffer;
+        Buffer_Temp_Size=Buffer_Size;
+        Buffer_Size=TranscodedBuffer_Size;
+        Demux_Offset=Buffer_Size;
+    }
+    else
+    {
+        bool zero_byte=Buffer[Buffer_Offset+2]==0x00;
+        if (!(((Buffer[Buffer_Offset+(zero_byte?4:3)]&0x1B)==0x01 && (Buffer[Buffer_Offset+(zero_byte?5:4)]&0x80)!=0x80)
+           || (Buffer[Buffer_Offset+(zero_byte?4:3)]&0x1F)==0x0C))
+        {
+            if (Demux_Offset==0)
+            {
+                Demux_Offset=Buffer_Offset;
+                Demux_IntermediateItemFound=false;
+            }
+            while (Demux_Offset+6<=Buffer_Size)
+            {
+                //Synchronizing
+                while(Demux_Offset+6<=Buffer_Size && (Buffer[Demux_Offset  ]!=0x00
+                                                   || Buffer[Demux_Offset+1]!=0x00
+                                                   || Buffer[Demux_Offset+2]!=0x01))
+                {
+                    Demux_Offset+=2;
+                    while(Demux_Offset<Buffer_Size && Buffer[Buffer_Offset]!=0x00)
+                        Demux_Offset+=2;
+                    if (Demux_Offset>=Buffer_Size || Buffer[Demux_Offset-1]==0x00)
+                        Demux_Offset--;
+                }
+
+                if (Demux_Offset+6<=Buffer_Size)
+                {
+                    zero_byte=Buffer[Demux_Offset+2]==0x00;
+                    if (Demux_IntermediateItemFound)
+                    {
+                        if (!(((Buffer[Demux_Offset+(zero_byte?4:3)]&0x1B)==0x01 && (Buffer[Demux_Offset+(zero_byte?5:4)]&0x80)!=0x80)
+                           || (Buffer[Demux_Offset+(zero_byte?4:3)]&0x1F)==0x0C))
+                            break;
+                    }
+                    else
+                    {
+                        if ((Buffer[Demux_Offset+(zero_byte?4:3)]&0x1B)==0x01 && (Buffer[Demux_Offset+(zero_byte?5:4)]&0x80)==0x80)
+                            Demux_IntermediateItemFound=true;
+                    }
+
+                    Demux_Offset++;
+                }
+            }
+
+            if (Demux_Offset+6>Buffer_Size && !FrameIsAlwaysComplete && File_Offset+Buffer_Size<File_Size)
+                return false; //No complete frame
+
+            if (Demux_Offset && Buffer[Demux_Offset-1]==0x00)
+                Demux_Offset--;
+
+            zero_byte=Buffer[Buffer_Offset+2]==0x00;
+            size_t Buffer_Offset_Random=Buffer_Offset;
+            if ((Buffer[Buffer_Offset_Random+(zero_byte?4:3)]&0x1F)==0x09)
+            {
+                Buffer_Offset_Random++;
+                if (zero_byte)
+                    Buffer_Offset_Random++;
+                while(Buffer_Offset_Random+6<=Buffer_Size && (Buffer[Buffer_Offset_Random  ]!=0x00
+                                                           || Buffer[Buffer_Offset_Random+1]!=0x00
+                                                           || Buffer[Buffer_Offset_Random+2]!=0x01))
+                    Buffer_Offset_Random++;
+                zero_byte=Buffer[Buffer_Offset_Random+2]==0x00;
+            }
+            RandomAccess=Buffer_Offset_Random+6<=Buffer_Size && (Buffer[Buffer_Offset_Random+(zero_byte?4:3)]&0x1F)==0x07; //seq_parameter_set
+        }
     }
 
+    if (!Status[IsAccepted])
+    {
+        Accept("AVC");
+        if (Config->Demux_EventWasSent)
+            return false;
+    }
+
+    if (IFrame_Count || RandomAccess)
+    {
+        bool Frame_Count_NotParsedIncluded_PlusOne=false;
+        int64u PTS_Temp=FrameInfo.PTS;
+        if (!IsSub)
+            FrameInfo.PTS=(int64u)-1;
+        if (Frame_Count_NotParsedIncluded!=(int64u)-1 && Interlaced_Top!=Interlaced_Bottom)
+        {
+            Frame_Count_NotParsedIncluded--;
+            Frame_Count_NotParsedIncluded_PlusOne=true;
+        }
+        Demux_UnpacketizeContainer_Demux(RandomAccess);
+        if (!IsSub)
+            FrameInfo.PTS=PTS_Temp;
+        if (Frame_Count_NotParsedIncluded_PlusOne)
+            Frame_Count_NotParsedIncluded++;
+    }
+    else
+        Demux_UnpacketizeContainer_Demux_Clear();
+
+    if (Buffer_Temp)
+    {
+        Demux_TotalBytes-=Buffer_Size;
+        Demux_TotalBytes+=Buffer_Temp_Size;
+        delete[] Buffer;
+        Buffer=Buffer_Temp;
+        Buffer_Size=Buffer_Temp_Size;
+    }
+    
     return true;
 }
 #endif //MEDIAINFO_DEMUX
@@ -889,6 +1042,9 @@ void File_Avc::Synched_Init()
             Streams[0x05].Searching_Payload=true; //slice_header
         }
     #endif //MEDIAINFO_EVENTS
+    #if MEDIAINFO_DEMUX
+        Demux_Avc_Transcode_Iso14496_15_to_Iso14496_10=Config->Demux_Avc_Transcode_Iso14496_15_to_Iso14496_10_Get();
+    #endif //MEDIAINFO_DEMUX
 }
 
 //***************************************************************************
@@ -1216,6 +1372,58 @@ void File_Avc::Data_Parse()
         if (!Streams.empty() && Streams[(size_t)Element_Code].ShouldDuplicate)
             File__Duplicate_Write(Element_Code);
     #endif //MEDIAINFO_DUPLICATE
+        
+    #if MEDIAINFO_DEMUX
+        if (Demux_Avc_Transcode_Iso14496_15_to_Iso14496_10)
+        {
+            if (Element_Code==0x07)
+            {
+                std::vector<seq_parameter_set_struct*>::iterator Data_Item=seq_parameter_sets.begin();
+                if (Data_Item!=seq_parameter_sets.end() && (*Data_Item))
+                {
+                    delete[] (*Data_Item)->Iso14496_10_Buffer;
+                    (*Data_Item)->Iso14496_10_Buffer_Size=(size_t)(Element_Size+4);
+                    (*Data_Item)->Iso14496_10_Buffer=new int8u[(*Data_Item)->Iso14496_10_Buffer_Size];
+                    (*Data_Item)->Iso14496_10_Buffer[0]=0x00;
+                    (*Data_Item)->Iso14496_10_Buffer[1]=0x00;
+                    (*Data_Item)->Iso14496_10_Buffer[2]=0x01;
+                    (*Data_Item)->Iso14496_10_Buffer[3]=0x67;
+                    std::memcpy((*Data_Item)->Iso14496_10_Buffer+4, Buffer+Buffer_Offset, (size_t)Element_Size);
+                }
+            }
+            if (Element_Code==0x08)
+            {
+                std::vector<pic_parameter_set_struct*>::iterator Data_Item=pic_parameter_sets.begin();
+                if (Data_Item!=pic_parameter_sets.end() && (*Data_Item))
+                {
+                    delete[] (*Data_Item)->Iso14496_10_Buffer;
+                    (*Data_Item)->Iso14496_10_Buffer_Size=(size_t)(Element_Size+4);
+                    (*Data_Item)->Iso14496_10_Buffer=new int8u[(*Data_Item)->Iso14496_10_Buffer_Size];
+                    (*Data_Item)->Iso14496_10_Buffer[0]=0x00;
+                    (*Data_Item)->Iso14496_10_Buffer[1]=0x00;
+                    (*Data_Item)->Iso14496_10_Buffer[2]=0x01;
+                    (*Data_Item)->Iso14496_10_Buffer[3]=0x68;
+                    std::memcpy((*Data_Item)->Iso14496_10_Buffer+4, Buffer+Buffer_Offset, (size_t)Element_Size);
+                }
+            }
+            if (Element_Code==0x0F)
+            {
+                std::vector<seq_parameter_set_struct*>::iterator Data_Item=subset_seq_parameter_sets.begin();
+                if (Data_Item!=subset_seq_parameter_sets.end() && (*Data_Item))
+                {
+                    SizeOfNALU_Minus1=0;
+                    delete[] (*Data_Item)->Iso14496_10_Buffer;
+                    (*Data_Item)->Iso14496_10_Buffer_Size=(size_t)(Element_Size+4);
+                    (*Data_Item)->Iso14496_10_Buffer=new int8u[(*Data_Item)->Iso14496_10_Buffer_Size];
+                    (*Data_Item)->Iso14496_10_Buffer[0]=0x00;
+                    (*Data_Item)->Iso14496_10_Buffer[1]=0x00;
+                    (*Data_Item)->Iso14496_10_Buffer[2]=0x01;
+                    (*Data_Item)->Iso14496_10_Buffer[3]=0x6F;
+                    std::memcpy((*Data_Item)->Iso14496_10_Buffer+4, Buffer+Buffer_Offset, (size_t)Element_Size);
+                }
+            }
+        }
+    #endif //MEDIAINFO_DEMUX
 
     //Trailing zeroes
     Element_Size=Element_Size_SaveBeforeZeroes;
@@ -3513,4 +3721,3 @@ std::string File_Avc::ScanOrder_Detect (std::string ScanOrders)
 } //NameSpace
 
 #endif //MEDIAINFO_AVC_YES
-
