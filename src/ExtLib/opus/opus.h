@@ -451,7 +451,10 @@ OPUS_EXPORT int opus_decoder_init(
   *  is frame_size*channels*sizeof(opus_int16)
   * @param [in] frame_size Number of samples per channel of available space in \a pcm.
   *  If this is less than the maximum packet duration (120ms; 5760 for 48kHz), this function will
-  *  not be capable of decoding some packets.
+  *  not be capable of decoding some packets. In the case of PLC (data==NULL) or FEC (decode_fec=1),
+  *  then frame_size needs to be exactly the duration of audio that is missing, otherwise the
+  *  decoder will not be in the optimal state to decode the next incoming packet. For the PLC and
+  *  FEC cases, frame_size <b>must</b> be a multiple of 2.5 ms.
   * @param [in] decode_fec <tt>int</tt>: Flag (0 or 1) to request that any in-band forward error correction data be
   *  decoded. If no such data is available, the frame is decoded as if it were lost.
   * @returns Number of decoded samples or @ref opus_errorcodes
@@ -473,7 +476,10 @@ OPUS_EXPORT OPUS_WARN_UNUSED_RESULT int opus_decode(
   *  is frame_size*channels*sizeof(float)
   * @param [in] frame_size Number of samples per channel of available space in \a pcm.
   *  If this is less than the maximum packet duration (120ms; 5760 for 48kHz), this function will
-  *  not be capable of decoding some packets.
+  *  not be capable of decoding some packets. In the case of PLC (data==NULL) or FEC (decode_fec=1),
+  *  then frame_size needs to be exactly the duration of audio that is missing, otherwise the
+  *  decoder will not be in the optimal state to decode the next incoming packet. For the PLC and
+  *  FEC cases, frame_size <b>must</b> be a multiple of 2.5 ms.
   * @param [in] decode_fec <tt>int</tt>: Flag (0 or 1) to request that any in-band forward error correction data be
   *  decoded. If no such data is available the frame is decoded as if it were lost.
   * @returns Number of decoded samples or @ref opus_errorcodes
@@ -563,6 +569,17 @@ OPUS_EXPORT OPUS_WARN_UNUSED_RESULT int opus_packet_get_nb_channels(const unsign
   * @retval OPUS_INVALID_PACKET The compressed data passed is corrupted or of an unsupported type
   */
 OPUS_EXPORT OPUS_WARN_UNUSED_RESULT int opus_packet_get_nb_frames(const unsigned char packet[], opus_int32 len) OPUS_ARG_NONNULL(1);
+
+/** Gets the number of samples of an Opus packet.
+  * @param [in] packet <tt>char*</tt>: Opus packet
+  * @param [in] len <tt>opus_int32</tt>: Length of packet
+  * @param [in] Fs <tt>opus_int32</tt>: Sampling rate in Hz.
+  *                                     This must be a multiple of 400, or
+  *                                     inaccurate results will be returned.
+  * @returns Number of samples
+  * @retval OPUS_INVALID_PACKET The compressed data passed is corrupted or of an unsupported type
+  */
+OPUS_EXPORT OPUS_WARN_UNUSED_RESULT int opus_packet_get_nb_samples(const unsigned char packet[], opus_int32 len, opus_int32 Fs) OPUS_ARG_NONNULL(1);
 
 /** Gets the number of samples of an Opus packet.
   * @param [in] dec <tt>OpusDecoder*</tt>: Decoder state
