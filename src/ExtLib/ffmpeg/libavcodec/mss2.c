@@ -24,6 +24,7 @@
  */
 
 #include "libavutil/avassert.h"
+#include "internal.h"
 #include "msmpeg4data.h"
 #include "vc1.h"
 #include "mss12.h"
@@ -460,7 +461,7 @@ typedef struct Rectangle {
 #define MAX_WMV9_RECTANGLES 20
 #define ARITH2_PADDING 2
 
-static int mss2_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
+static int mss2_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
                              AVPacket *avpkt)
 {
     const uint8_t *buf = avpkt->data;
@@ -605,7 +606,7 @@ static int mss2_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
                                 FF_BUFFER_HINTS_PRESERVE |
                                 FF_BUFFER_HINTS_REUSABLE;
 
-        if ((ret = avctx->get_buffer(avctx, &ctx->pic)) < 0) {
+        if ((ret = ff_get_buffer(avctx, &ctx->pic)) < 0) {
             av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
             return ret;
         }
@@ -743,7 +744,7 @@ static int mss2_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
     if (buf_size)
         av_log(avctx, AV_LOG_WARNING, "buffer not fully consumed\n");
 
-    *data_size       = sizeof(AVFrame);
+    *got_frame       = 1;
     *(AVFrame *)data = ctx->pic;
 
     return avpkt->size;

@@ -30,6 +30,7 @@
 #include "dsputil.h"
 #include "get_bits.h"
 #include "bytestream.h"
+#include "internal.h"
 #include "golomb.h"
 #include "dirac_arith.h"
 #include "mpeg12data.h"
@@ -1668,7 +1669,7 @@ static int dirac_decode_picture_header(DiracContext *s)
             for (j = 0; j < MAX_FRAMES; j++)
                 if (!s->all_frames[j].avframe.data[0]) {
                     s->ref_pics[i] = &s->all_frames[j];
-                    s->avctx->get_buffer(s->avctx, &s->ref_pics[i]->avframe);
+                    ff_get_buffer(s->avctx, &s->ref_pics[i]->avframe);
                     break;
                 }
     }
@@ -1705,7 +1706,7 @@ static int dirac_decode_picture_header(DiracContext *s)
     return 0;
 }
 
-static int get_delayed_pic(DiracContext *s, AVFrame *picture, int *data_size)
+static int get_delayed_pic(DiracContext *s, AVFrame *picture, int *got_frame)
 {
     DiracFrame *out = s->delay_frames[0];
     int i, out_idx  = 0;
@@ -1722,7 +1723,7 @@ static int get_delayed_pic(DiracContext *s, AVFrame *picture, int *data_size)
 
     if (out) {
         out->avframe.reference ^= DELAYED_PIC_REF;
-        *data_size = sizeof(AVFrame);
+        *got_frame = 1;
         *(AVFrame *)picture = out->avframe;
     }
 
@@ -1806,7 +1807,7 @@ static int dirac_decode_data_unit(AVCodecContext *avctx, const uint8_t *buf, int
         pic->avframe.key_frame = s->num_refs == 0;             /* [DIRAC_STD] is_intra()      */
         pic->avframe.pict_type = s->num_refs + 1;              /* Definition of AVPictureType in avutil.h */
 
-        if (avctx->get_buffer(avctx, &pic->avframe) < 0) {
+        if (ff_get_buffer(avctx, &pic->avframe) < 0) {
             av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
             return -1;
         }
@@ -1826,7 +1827,7 @@ static int dirac_decode_data_unit(AVCodecContext *avctx, const uint8_t *buf, int
     return 0;
 }
 
-static int dirac_decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPacket *pkt)
+static int dirac_decode_frame(AVCodecContext *avctx, void *data, int *got_frame, AVPacket *pkt)
 {
     DiracContext *s     = avctx->priv_data;
     DiracFrame *picture = data;
@@ -1842,11 +1843,11 @@ static int dirac_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
         }
 
     s->current_picture = NULL;
-    *data_size = 0;
+    *got_frame = 0;
 
     /* end of stream, so flush delayed pics */
     if (buf_size == 0)
-        return get_delayed_pic(s, (AVFrame *)data, data_size);
+        return get_delayed_pic(s, (AVFrame *)data, got_frame);
 
     for (;;) {
         /*[DIRAC_STD] Here starts the code from parse_info() defined in 9.6
@@ -1904,15 +1905,15 @@ static int dirac_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
         if (delayed_frame) {
             delayed_frame->avframe.reference ^= DELAYED_PIC_REF;
             *(AVFrame*)data = delayed_frame->avframe;
-            *data_size = sizeof(AVFrame);
+            *got_frame = 1;
         }
     } else if (s->current_picture->avframe.display_picture_number == s->frame_number) {
         /* The right frame at the right time :-) */
         *(AVFrame*)data = s->current_picture->avframe;
-        *data_size = sizeof(AVFrame);
+        *got_frame = 1;
     }
 
-    if (*data_size)
+    if (*got_frame)
         s->frame_number = picture->avframe.display_picture_number + 1;
 
     return buf_idx;

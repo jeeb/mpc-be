@@ -184,10 +184,15 @@ static int set_string_number(void *obj, const AVOption *o, const char *val, void
         double d, num = 1;
         int64_t intnum = 1;
 
-        if (*val == '+' || *val == '-')
-            cmd = *(val++);
+        i = 0;
+        if (*val == '+' || *val == '-') {
+            if (o->type == AV_OPT_TYPE_FLAGS)
+                cmd = *(val++);
+            else if (!notfirst)
+                buf[i++] = *val;
+        }
 
-        for (i = 0; i < sizeof(buf) - 1 && val[i] && val[i] != '+' && val[i] != '-'; i++)
+        for (; i < sizeof(buf) - 1 && val[i] && val[i] != '+' && val[i] != '-'; i++)
             buf[i] = val[i];
         buf[i] = 0;
 
@@ -1162,8 +1167,6 @@ void *av_opt_ptr(const AVClass *class, void *obj, const char *name)
 }
 
 #ifdef TEST
-
-#undef printf
 
 typedef struct TestContext
 {

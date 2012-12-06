@@ -2780,7 +2780,7 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
     h->mb_mbaff        = 0;
     h->mb_aff_frame    = 0;
     last_pic_structure = s0->picture_structure;
-    last_pic_dropable  = s->dropable;
+    last_pic_dropable  = s0->dropable;
     s->dropable        = h->nal_ref_idc == 0;
     if (h->sps.frame_mbs_only_flag) {
         s->picture_structure = PICT_FRAME;
@@ -2806,6 +2806,11 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
                    last_pic_structure, s->picture_structure);
             s->picture_structure = last_pic_structure;
             s->dropable          = last_pic_dropable;
+            return AVERROR_INVALIDDATA;
+        } else if (!s0->current_picture_ptr) {
+            av_log(s->avctx, AV_LOG_ERROR,
+                   "unset current_picture_ptr on %d. slice\n",
+                   h0->current_slice + 1);
             return AVERROR_INVALIDDATA;
         }
     } else {
@@ -4146,6 +4151,8 @@ again:
                            "SPS decoding failure, trying again with the complete NAL\n");
                     if (h->is_avc)
                         av_assert0(next_avc - buf_index + consumed == nalsize);
+                    if ((next_avc - buf_index + consumed - 1) >= INT_MAX/8)
+                        break;
                     init_get_bits(&s->gb, &buf[buf_index + 1 - consumed],
                                   8*(next_avc - buf_index + consumed - 1));
                     ff_h264_decode_seq_parameter_set(h);
@@ -4233,7 +4240,7 @@ static int get_consumed_bytes(MpegEncContext *s, int pos, int buf_size)
 }
 
 static int decode_frame(AVCodecContext *avctx, void *data,
-                        int *data_size, AVPacket *avpkt)
+                        int *got_frame, AVPacket *avpkt)
 {
     const uint8_t *buf = avpkt->data;
     int buf_size       = avpkt->size;
@@ -4270,7 +4277,7 @@ static int decode_frame(AVCodecContext *avctx, void *data,
             h->delayed_pic[i] = h->delayed_pic[i + 1];
 
         if (out) {
-            *data_size = sizeof(AVFrame);
+            *got_frame = 1;
             *pict      = out->f;
         }
 
@@ -4324,14 +4331,14 @@ not_extra:
         field_end(h, 0);
 
         /* Wait for second field. */
-        *data_size = 0;
+        *got_frame = 0;
         if (h->next_output_pic && (h->next_output_pic->sync || h->sync>1)) {
-            *data_size = sizeof(AVFrame);
+            *got_frame = 1;
             *pict      = h->next_output_pic->f;
         }
     }
 
-    assert(pict->data[0] || !*data_size);
+    assert(pict->data[0] || !*got_frame);
     ff_print_debug_info(s, pict);
     // printf("out %d\n", (int)pict->data[0]);
 

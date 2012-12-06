@@ -30,6 +30,7 @@
 
 #include "avcodec.h"
 #include "get_bits.h"
+#include "internal.h"
 #include "simple_idct.h"
 #include "proresdec.h"
 
@@ -521,7 +522,7 @@ static int decode_picture(AVCodecContext *avctx)
     return 0;
 }
 
-static int decode_frame(AVCodecContext *avctx, void *data, int *data_size,
+static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
                         AVPacket *avpkt)
 {
     ProresContext *ctx = avctx->priv_data;
@@ -550,7 +551,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size,
     if (frame->data[0])
         avctx->release_buffer(avctx, frame);
 
-    if (avctx->get_buffer(avctx, frame) < 0)
+    if (ff_get_buffer(avctx, frame) < 0)
         return -1;
 
  decode_picture:
@@ -573,7 +574,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size,
         goto decode_picture;
     }
 
-    *data_size = sizeof(AVFrame);
+    *got_frame      = 1;
     *(AVFrame*)data = *frame;
 
     return avpkt->size;
