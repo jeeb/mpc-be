@@ -34,7 +34,7 @@
 #define MAKE_STR(x)    DO_MAKE_STR(x)
 
 #define MPC_VERSION_MAJOR  1
-#define MPC_VERSION_MINOR  0
+#define MPC_VERSION_MINOR  1
 #define MPC_VERSION_STATUS 0
 #define MPC_VERSION_PATCH  0
 
