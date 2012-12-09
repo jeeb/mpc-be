@@ -564,7 +564,6 @@ void CPlayerSeekBar::OnPaint()
 			CBrush b(bkg);
 			dc.FillRect(&r, &b);
 		}
-
 	}
 }
 
@@ -581,6 +580,7 @@ void CPlayerSeekBar::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	__int64 pos = CalculatePosition(point);
 	CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
+
 	if (pFrame->ValidateSeek(pos, m_stop)) {
 
 		if (AfxGetAppSettings().fDisableXPToolbars && m_fEnabled) {
@@ -873,7 +873,7 @@ void CPlayerSeekBar::UpdateToolTipText()
 		if (AfxGetAppSettings().fDisableXPToolbars) {
 			pFrame->m_wndView2.SetWindowText(tooltipText);
 		} else {
-			// TODO - Center Caption ...
+			// TODO - Center Caption
 			CString str = _T("               ") + tooltipText + _T("               ");
 			pFrame->m_wndView2.SetWindowText(str);
 		}

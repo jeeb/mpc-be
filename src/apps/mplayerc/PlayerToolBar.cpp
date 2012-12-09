@@ -136,11 +136,13 @@ void CPlayerToolBar::SwitchTheme()
 
 	HBITMAP hBmp = NULL;
 	if (s.fDisableXPToolbars && NULL == fp) {
-		//int col = s.clrFaceABGR;
-		//int r, g, b, R, G, B;
-		//r = col & 0xFF;
-		//g = (col >> 8) & 0xFF;
-		//b = col >> 16;
+		/*
+		int col = s.clrFaceABGR;
+		int r, g, b, R, G, B;
+		r = col & 0xFF;
+		g = (col >> 8) & 0xFF;
+		b = col >> 16;
+		*/
 		hBmp = m_logobm.LoadExternalImage("toolbar", IDB_PLAYERTOOLBAR_PNG, 1, s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
 	} else if (fp) {
 		hBmp = m_logobm.LoadExternalImage("toolbar", 0, -1, -1, -1, -1, -1);
@@ -241,11 +243,6 @@ BOOL CPlayerToolBar::PreCreateWindow(CREATESTRUCT& cs)
 
 void CPlayerToolBar::CreateRemappedImgList(UINT bmID, int nRemapState, CImageList& reImgList)
 {
-	// 0 Remap Active
-	// 1 Remap Disabled
-	// 2 Undo  Active
-	// 3 Undo  Disabled
-
 	AppSettings& s = AfxGetAppSettings();
 
 	COLORMAP cmActive[] =
@@ -300,11 +297,6 @@ void CPlayerToolBar::CreateRemappedImgList(UINT bmID, int nRemapState, CImageLis
 
 void CPlayerToolBar::SwitchRemmapedImgList(UINT bmID, int nRemapState)
 {
-	// 0 Remap Active
-	// 1 Remap Disabled
-	// 2 Undo  Active
-	// 3 Undo  Disabled
-
 	CToolBarCtrl& ctrl = GetToolBarCtrl();
 
 	if (nRemapState == 0 || nRemapState == 2) {
@@ -376,6 +368,7 @@ bool CPlayerToolBar::IsMuted()
 	bi.cbSize = sizeof(bi);
 	bi.dwMask = TBIF_IMAGE;
 	tb.GetButtonInfo(ID_VOLUME_MUTE, &bi);
+
 	return(bi.iImage == 13);
 }
 
@@ -383,22 +376,25 @@ int CPlayerToolBar::GetVolume()
 {
 	int volume = m_volctrl.GetPos(), type = 0;
 
-	if (!IsMuted() && volume <= 0 && iMute == 0) {
+	if (volume < 1 && !iMute) {
+		if (!IsMuted()) {
+			type++;
+		}
+		iMute = 1;
+	} else if (IsMuted() && volume > 0 && iMute) {
 		type++;
-		iMute++;
-	} else if (IsMuted() && volume > 0 && iMute == 1) {
-		type++;
-		iMute--;
+		iMute = 0;
 	}
+
 	if (type) {
 		OnVolumeMute(0);
 		SendMessage(WM_COMMAND, ID_VOLUME_MUTE);
 	}
 
-	if (IsMuted() || volume <= 0) {
+	if (IsMuted() || volume < 1) {
 		volume = -10000;
 	} else {
-		volume = min((int)(4000 * log10(volume / 100.0f)), 0);// 4000=2.0*100*20, where 2.0 is a special factor
+		volume = min((int)(4000 * log10(volume / 100.0f)), 0);
 	}
 
 	return volume;
@@ -538,13 +534,13 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 				dc.RoundRect(r.left + 1, r.top + 1, r.right - 2, r.bottom - 1, 6, 4);
 				AlphaBlend(dc.m_hDC, r.left + 2, r.top + 2, r.Width() - 4, 0.7 * r.Height() - 2, memdc, 0, 0, nW, nH, bf);
 			}
-/*
+			/*
 			if (CDIS_CHECKED == pTBCD->nmcd.uItemState) {
 				CPen penFrChecked(PS_SOLID,0,0x00808080);//clr_resDark
 				dc.SelectObject(&penFrChecked);
 				dc.RoundRect(r.left + 1, r.top + 1, r.right - 2, r.bottom - 1, 6, 4);
 			}
-*/
+			*/
 			for (int j = 0; j < _countof(sep); j++) {
 				GetItemRect(sep[j], &r);
 
@@ -800,7 +796,6 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 	OAFilterState fs	= pFrame->GetMediaState();
 
 	::SendMessage(pNMHDR->hwndFrom, TTM_SETMAXTIPWIDTH, 0, (LPARAM)(INT)1000);
-
 	static CString m_strTipText;
 
 	if (pNMHDR->idFrom == ID_PLAY_PLAY) {
@@ -829,11 +824,9 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 
 	} else if (pNMHDR->idFrom == ID_NAVIGATE_AUDIO) {
 		m_strTipText = ResStr(IDS_AG_AUDIOLANG) + _T(" | ") + ResStr(IDS_AG_OPTIONS);
-
 	}
 
 	pTTT->lpszText = m_strTipText.GetBuffer();
-
 	*pResult = 0;
 
 	return TRUE;

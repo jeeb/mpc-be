@@ -242,8 +242,8 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						i < m_nVolPos ? dc.SelectObject(penLeft) : dc.SelectObject(penRight);
 
 						dc.MoveTo(nposx, nposy);			//top_left
-						dc.LineTo(nposx + 2, nposy);			//top_right
-						dc.LineTo(nposx + 2, r.bottom);			//bottom_right
+						dc.LineTo(nposx + 2, nposy);		//top_right
+						dc.LineTo(nposx + 2, r.bottom);		//bottom_right
 						dc.LineTo(nposx, r.bottom);			//bottom_left
 						dc.LineTo(nposx, nposy);			//top_left
 

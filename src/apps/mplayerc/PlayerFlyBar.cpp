@@ -362,7 +362,6 @@ void CFlyBar::OnPaint()
 					DrawBitmap(&mdc, x, sep[12][i], 9);
 				}
 			}
-
 		}
 
 		dc.BitBlt(0, 0, x, rcBar.Height(), &mdc, 0, 0, SRCCOPY);
