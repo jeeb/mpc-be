@@ -60,8 +60,7 @@
 #define OPTION_SPDIF_ac3enc _T("SPDIF_ac3enc")
 #endif
 
-#define AC3_HEADER_SIZE 7
-#define MAX_JITTER      1000000i64 // +-100ms jitter is allowed for now 
+#define MAX_JITTER      1400000i64 // +-140ms jitter is allowed for now 
 
 #define PADDING_SIZE    FF_INPUT_BUFFER_PADDING_SIZE
 
@@ -270,6 +269,8 @@ channel_mode[] = {
 
 CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CTransformFilter(NAME("CMpaDecFilter"), lpunk, __uuidof(this))
+	, m_rtStart(0)
+	, m_fDiscontinuity(false)
 	, m_bResync(false)
 	, m_buff(PADDING_SIZE)
 {
@@ -749,7 +750,7 @@ HRESULT CMpaDecFilter::ProcessAC3_SPDIF()
 	BYTE* const end = base + m_buff.GetCount();
 	BYTE* p = base;
 
-	while (p + AC3_HEADER_SIZE <= end) {
+	while (p + 8 <= end) { // 8 =  AC3 header size + 1
 		int size = 0;
 		int samplerate, channels, framelength, bitrate;
 
