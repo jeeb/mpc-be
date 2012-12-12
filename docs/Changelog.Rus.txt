@@ -99,7 +99,7 @@
 * ffmpeg git-e6701d51;
 * MediaInfo 0.7.61+ svn rev.5314;
 * ZenLibs v0.4.28+ svn rev.411;
-* Little-CMS git-886e2f52;
+* Little-CMS git-026ba4fa;
 * SoundTouch svn rev.160;
  ... и многое другое.
 
