@@ -166,6 +166,8 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 	UINT						nSize_Result		= 0;
 	int							Sync				= 0;
 
+	CHECK_HR_FALSE (FFH264DecodeFrame (m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), pDataIn, nSize, &nFramePOC, &nOutPOC, &rtOutStart, &SecondFieldOffset, &Sync));
+
 	while (!nSlices && slice_step <= 2) {
 		Nalu.SetBuffer (pDataIn, nSize, slice_step == 1 ? m_nNALLength : 0);
 		while (Nalu.ReadNext()) {
@@ -196,8 +198,6 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 	if (!nSlices) {
 		return S_FALSE;
 	}
-
-	CHECK_HR_FALSE (FFH264DecodeFrame (m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), pDataIn, nSize, &nFramePOC, &nOutPOC, &rtOutStart, &SecondFieldOffset, &Sync));
 
 	// If parsing fail (probably no PPS/SPS), continue anyway it may arrived later (happen on truncated streams)
 	CHECK_HR_FALSE (FFH264BuildPicParams (&m_DXVAPicParams, &m_DXVAScalingMatrix, &nFieldType, &nSliceType, m_pFilter->GetAVCtx(), m_pFilter->GetPCIVendor()));
