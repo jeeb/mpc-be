@@ -1250,7 +1250,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						mts.Add(mt);
 						break;
 					} else {
-						TRACE(_T("Unknow MP4 Stream %x") , fourcc);
+						TRACE(_T("Unknow MP4 Stream %x\n") , fourcc);
 					}
 				}
 			}
