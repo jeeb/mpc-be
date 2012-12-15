@@ -618,8 +618,8 @@ STDMETHODIMP_(bool) CSubPicQueueNoThread::LookupSubPic(REFERENCE_TIME rtNow, CCo
 		if (pSubPicProvider) {
 			double fps = m_fps;
 
-			POSITION pos = pSubPicProvider->GetStartPosition(rtNow, fps, true);
-			if (pos != 0) {
+			for (POSITION pos = pSubPicProvider->GetStartPosition(rtNow, fps);
+					pos; pos = pSubPicProvider->GetNext(pos)) {
 				REFERENCE_TIME rtStart = pSubPicProvider->GetStart(pos, fps);
 				REFERENCE_TIME rtStop = pSubPicProvider->GetStop(pos, fps);
 
@@ -657,12 +657,13 @@ STDMETHODIMP_(bool) CSubPicQueueNoThread::LookupSubPic(REFERENCE_TIME rtNow, CCo
 						pSubPic->SetVirtualTextureSize (VirtualSize, VirtualTopLeft);
 					}
 				}
-			}
 
-			if (ppSubPic) {
-				CAutoLock cAutoLock(&m_csLock);
+				if (ppSubPic) {
+					CAutoLock cAutoLock(&m_csLock);
 
-				m_pSubPic = ppSubPic;
+					m_pSubPic = ppSubPic;
+					break;
+				}
 			}
 		}
 	}
