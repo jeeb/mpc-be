@@ -23,11 +23,9 @@
 
 #pragma once
 
-#pragma warning(disable: 4005)
 extern "C" {
-	#include <ffmpeg/libavcodec/avcodec.h>
+	#include <ffmpeg/libavutil/log.h>
 }
-#pragma warning(default: 4005)
 
 inline void ff_log(void* par, int level, const char *fmt, va_list valist)
 {
