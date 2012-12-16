@@ -512,10 +512,12 @@ void ff_init_buffer_info(AVCodecContext *s, AVFrame *frame)
         frame->pkt_pts = s->pkt->pts;
         frame->pkt_pos = s->pkt->pos;
         frame->pkt_duration = s->pkt->duration;
+        frame->pkt_size = s->pkt->size;
     } else {
         frame->pkt_pts = AV_NOPTS_VALUE;
         frame->pkt_pos = -1;
         frame->pkt_duration = 0;
+        frame->pkt_size = -1;
     }
     frame->reordered_opaque = s->reordered_opaque;
 
@@ -681,6 +683,7 @@ void avcodec_get_frame_defaults(AVFrame *frame)
     frame->best_effort_timestamp = AV_NOPTS_VALUE;
     frame->pkt_duration        = 0;
     frame->pkt_pos             = -1;
+    frame->pkt_size            = -1;
     frame->key_frame           = 1;
     frame->sample_aspect_ratio = (AVRational) {0, 1 };
     frame->format              = -1; /* unknown */
@@ -727,6 +730,7 @@ MAKE_ACCESSORS(AVFrame, frame, int,     channels)
 MAKE_ACCESSORS(AVFrame, frame, int,     sample_rate)
 MAKE_ACCESSORS(AVFrame, frame, AVDictionary *, metadata)
 MAKE_ACCESSORS(AVFrame, frame, int,     decode_error_flags)
+MAKE_ACCESSORS(AVFrame, frame, int,     pkt_size)
 
 MAKE_ACCESSORS(AVCodecContext, codec, AVRational, pkt_timebase)
 MAKE_ACCESSORS(AVCodecContext, codec, const AVCodecDescriptor *, codec_descriptor)
@@ -1615,16 +1619,19 @@ int attribute_align_arg avcodec_decode_video2(AVCodecContext *avctx, AVFrame *pi
         else {
             ret = avctx->codec->decode(avctx, picture, got_picture_ptr,
                                        &tmp);
-            picture->pkt_dts             = avpkt->dts;
+            picture->pkt_dts = avpkt->dts;
 
             if(!avctx->has_b_frames){
                 picture->pkt_pos         = avpkt->pos;
             }
             //FIXME these should be under if(!avctx->has_b_frames)
-            if (!picture->sample_aspect_ratio.num) picture->sample_aspect_ratio = avctx->sample_aspect_ratio;
-            if (!picture->width)                   picture->width               = avctx->width;
-            if (!picture->height)                  picture->height              = avctx->height;
-            if (picture->format == AV_PIX_FMT_NONE)   picture->format              = avctx->pix_fmt;
+            /* get_buffer is supposed to set frame parameters */
+            if (!(avctx->codec->capabilities & CODEC_CAP_DR1)) {
+                if (!picture->sample_aspect_ratio.num)    picture->sample_aspect_ratio = avctx->sample_aspect_ratio;
+                if (!picture->width)                      picture->width               = avctx->width;
+                if (!picture->height)                     picture->height              = avctx->height;
+                if (picture->format == AV_PIX_FMT_NONE)   picture->format              = avctx->pix_fmt;
+            }
         }
         add_metadata_from_side_data(avctx, picture);
 
