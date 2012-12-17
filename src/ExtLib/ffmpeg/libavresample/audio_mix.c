@@ -30,6 +30,29 @@
 
 static const char *coeff_type_names[] = { "q8", "q15", "flt" };
 
+struct AudioMix {
+    AVAudioResampleContext *avr;
+    enum AVSampleFormat fmt;
+    enum AVMixCoeffType coeff_type;
+    uint64_t in_layout;
+    uint64_t out_layout;
+    int in_channels;
+    int out_channels;
+
+    int ptr_align;
+    int samples_align;
+    int has_optimized_func;
+    const char *func_descr;
+    const char *func_descr_generic;
+    mix_func *mix;
+    mix_func *mix_generic;
+
+    int16_t *matrix_q8[AVRESAMPLE_MAX_CHANNELS];
+    int32_t *matrix_q15[AVRESAMPLE_MAX_CHANNELS];
+    float   *matrix_flt[AVRESAMPLE_MAX_CHANNELS];
+    void   **matrix;
+};
+
 void ff_audio_mix_set_func(AudioMix *am, enum AVSampleFormat fmt,
                            enum AVMixCoeffType coeff_type, int in_channels,
                            int out_channels, int ptr_align, int samples_align,
@@ -444,13 +467,13 @@ int ff_audio_mix_get_matrix(AudioMix *am, double *matrix, int stride)
 
     if ( am->in_channels <= 0 ||  am->in_channels > AVRESAMPLE_MAX_CHANNELS ||
         am->out_channels <= 0 || am->out_channels > AVRESAMPLE_MAX_CHANNELS) {
-        av_log(am, AV_LOG_ERROR, "Invalid channel counts\n");
+        av_log(am->avr, AV_LOG_ERROR, "Invalid channel counts\n");
         return AVERROR(EINVAL);
     }
 
 #define GET_MATRIX_CONVERT(suffix, scale)                                   \
     if (!am->matrix_ ## suffix[0]) {                                        \
-        av_log(am, AV_LOG_ERROR, "matrix is not set\n");                    \
+        av_log(am->avr, AV_LOG_ERROR, "matrix is not set\n");               \
         return AVERROR(EINVAL);                                             \
     }                                                                       \
     for (o = 0; o < am->out_channels; o++)                                  \
@@ -468,7 +491,7 @@ int ff_audio_mix_get_matrix(AudioMix *am, double *matrix, int stride)
         GET_MATRIX_CONVERT(flt, 1.0);
         break;
     default:
-        av_log(am, AV_LOG_ERROR, "Invalid mix coeff type\n");
+        av_log(am->avr, AV_LOG_ERROR, "Invalid mix coeff type\n");
         return AVERROR(EINVAL);
     }
 
@@ -481,7 +504,7 @@ int ff_audio_mix_set_matrix(AudioMix *am, const double *matrix, int stride)
 
     if ( am->in_channels <= 0 ||  am->in_channels > AVRESAMPLE_MAX_CHANNELS ||
         am->out_channels <= 0 || am->out_channels > AVRESAMPLE_MAX_CHANNELS) {
-        av_log(am, AV_LOG_ERROR, "Invalid channel counts\n");
+        av_log(am->avr, AV_LOG_ERROR, "Invalid channel counts\n");
         return AVERROR(EINVAL);
     }
 
@@ -517,7 +540,7 @@ int ff_audio_mix_set_matrix(AudioMix *am, const double *matrix, int stride)
         CONVERT_MATRIX(flt, v)
         break;
     default:
-        av_log(am, AV_LOG_ERROR, "Invalid mix coeff type\n");
+        av_log(am->avr, AV_LOG_ERROR, "Invalid mix coeff type\n");
         return AVERROR(EINVAL);
     }
 

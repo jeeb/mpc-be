@@ -285,6 +285,9 @@ enum AVCodecID {
     AV_CODEC_ID_AVRN       = MKBETAG('A','V','R','n'),
     AV_CODEC_ID_CPIA       = MKBETAG('C','P','I','A'),
     AV_CODEC_ID_XFACE      = MKBETAG('X','F','A','C'),
+    AV_CODEC_ID_SGIRLE     = MKBETAG('S','G','I','R'),
+    AV_CODEC_ID_MVC1       = MKBETAG('M','V','C','1'),
+    AV_CODEC_ID_MVC2       = MKBETAG('M','V','C','2'),
 
     /* various PCM "codecs" */
     AV_CODEC_ID_FIRST_AUDIO = 0x10000,     ///< A dummy id pointing at the start of audio codecs
@@ -435,7 +438,9 @@ enum AVCodecID {
     AV_CODEC_ID_COMFORT_NOISE,
     AV_CODEC_ID_TAK_DEPRECATED,
     AV_CODEC_ID_FFWAVESYNTH = MKBETAG('F','F','W','S'),
+#if LIBAVCODEC_VERSION_MAJOR <= 54
     AV_CODEC_ID_8SVX_RAW    = MKBETAG('8','S','V','X'),
+#endif
     AV_CODEC_ID_SONIC       = MKBETAG('S','O','N','C'),
     AV_CODEC_ID_SONIC_LS    = MKBETAG('S','O','N','L'),
     AV_CODEC_ID_PAF_AUDIO   = MKBETAG('P','A','F','A'),
