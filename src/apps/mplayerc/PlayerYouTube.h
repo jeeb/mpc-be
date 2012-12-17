@@ -106,8 +106,12 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 				Title = Title.TrimLeft(_T(".")).TrimRight(_T("."));
 
 				Title.Replace(_T(" - YouTube"), _T(""));
-				Title.Replace(_T(":"), _T(""));
+				Title.Replace(_T(":"), _T(" -"));
 				Title.Replace(_T("|"), _T("-"));
+				Title.Replace(_T("—"), _T("-"));
+				Title.Replace(_T("--"), _T("-"));
+				Title.Replace(_T("  "), _T(" "));
+
 				Title.Replace(_T("&quot;"), _T("\""));
 				Title.Replace(_T("&amp;"), _T("&"));
 				Title.Replace(_T("&#39;"), _T("\""));
