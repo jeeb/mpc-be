@@ -40,8 +40,10 @@ extern "C" {
 	#include <ffmpeg/libavcodec/mpegvideo.h>
 #undef class
 	#include <ffmpeg/libavcodec/golomb.h>
-
+// hack since "h264.h" is using "new" as a variable
+#define new newFFMPEG
 	#include <ffmpeg/libavcodec/h264.h>
+#undef new
 	#include <ffmpeg/libavcodec/h264data.h>
 	#include <ffmpeg/libavcodec/vc1.h>
 	#include <ffmpeg/libavcodec/mpeg12.h>

@@ -25,7 +25,7 @@
 #include <dxva.h>
 #include "DXVADecoder.h"
 
-#define MAX_SLICES 16		// Also define in ffmpeg!
+#define MAX_SLICES 16	// Also define in ffmpeg!
 
 class CDXVADecoderH264 : public CDXVADecoder
 {
