@@ -97,6 +97,7 @@ public:
 	afx_msg void OnBnClickedButton13();
 	afx_msg void OnBnClickedButton12();
 	afx_msg void OnBnClickedButton11();
+	afx_msg void OnBnClickedButton6();
 	afx_msg void OnBnVistaModify();
 	afx_msg void OnFilesAssocModified();
 	afx_msg void OnUpdateButtonDefault(CCmdUI* pCmdUI);

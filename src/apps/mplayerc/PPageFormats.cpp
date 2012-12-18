@@ -573,6 +573,7 @@ BEGIN_MESSAGE_MAP(CPPageFormats, CPPageBase)
 	ON_BN_CLICKED(IDC_BUTTON4, OnBnClickedButton14)
 	ON_BN_CLICKED(IDC_BUTTON3, OnBnClickedButton13)
 	ON_BN_CLICKED(IDC_BUTTON5, OnBnVistaModify)
+	ON_BN_CLICKED(IDC_BUTTON6, OnBnClickedButton6)
 	ON_BN_CLICKED(IDC_CHECK7, OnFilesAssocModified)
 	ON_BN_CLICKED(IDC_CHECK8, OnFilesAssocModified)
 	ON_UPDATE_COMMAND_UI(IDC_BUTTON2, OnUpdateButtonDefault)
@@ -584,6 +585,8 @@ END_MESSAGE_MAP()
 BOOL CPPageFormats::OnInitDialog()
 {
 	__super::OnInitDialog();
+
+	SetHandCursor(m_hWnd, IDC_BUTTON1);
 
 	m_bFileExtChanged = false;
 
@@ -1079,6 +1082,21 @@ void CPPageFormats::OnBnVistaModify()
 	for (int i = 0; i < m_list.GetItemCount(); i++) {
 		SetListItemState(i);
 	}
+}
+
+void CPPageFormats::OnBnClickedButton6()
+{
+	for (int i = 0, j = m_list.GetItemCount(); i < j; i++) {
+		SetChecked(i, 0);
+	}
+	m_bFileExtChanged = true;
+
+	m_apvideo.SetCheck(0);
+	m_apmusic.SetCheck(0);
+	m_apaudiocd.SetCheck(0);
+	m_apdvd.SetCheck(0);
+
+	SetModified();
 }
 
 void CPPageFormats::OnBnClickedButton12()
