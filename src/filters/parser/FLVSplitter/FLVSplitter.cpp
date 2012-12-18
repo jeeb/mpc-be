@@ -261,7 +261,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	HRESULT hr = E_FAIL;
 
 	m_pFile.Free();
-	m_pFile.Attach(DNew CBaseSplitterFileEx(pAsyncReader, hr, DEFAULT_CACHE_LENGTH, false));
+	m_pFile.Attach(DNew CBaseSplitterFileEx(pAsyncReader, hr, DEFAULT_CACHE_LENGTH, false, true));
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
 	}
@@ -680,7 +680,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	m_bUpdateDuration = (m_pFile->GetAvailable() < m_pFile->GetLength());
+	m_bUpdateDuration = (m_pFile->GetAvailable() < m_pFile->GetLength()) || m_pFile->IsStreaming();
 
 	__int64 pos = max(m_DataOffset, m_pFile->GetAvailable() - 256 * 1024);
 		
@@ -862,7 +862,7 @@ bool CFLVSplitterFilter::DemuxLoop()
 			}
 			m_rtNewStop = m_rtStop = m_rtDuration;
 
-			m_bUpdateDuration = (m_pFile->GetAvailable() < m_pFile->GetLength());
+			//m_bUpdateDuration = (m_pFile->GetAvailable() < m_pFile->GetLength());
 
 			m_pFile->Seek(curpos);
 		}

@@ -178,6 +178,10 @@ WavPack_parser* wavpack_parser_new(stream_reader* io, int is_correction)
 	uint32_t bcount = 0;
 	int is_final_block = FALSE;
     int striped_header_len = 0;
+	// ==> Start patch MPC
+	char ckID[4];
+	// ==> End patch MPC
+
     WavPack_parser* wpp = wp_alloc(sizeof(WavPack_parser));
     if(!wpp)
 	{
@@ -195,6 +199,18 @@ WavPack_parser* wavpack_parser_new(stream_reader* io, int is_correction)
         wavpack_parser_free(wpp);
         return NULL;
     }
+
+	// ==> Start patch MPC
+	// at first - check header ...
+	if (wpp->io->read_bytes (wpp->io, &ckID, sizeof(ckID)) != sizeof(ckID)) {
+		wavpack_parser_free(wpp);
+		return NULL;
+	}
+	if (strncmp (ckID, "wvpk", 4)) {
+		wavpack_parser_free(wpp);
+		return NULL;
+	}
+	// ==> End patch MPC
 
 	// Read the first frame
 	do {
