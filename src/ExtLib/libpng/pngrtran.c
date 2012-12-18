@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.5.11 [June 14, 2012]
+ * Last changed in libpng 1.5.14 [(PENDING RELEASE)]
  * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1221,7 +1221,7 @@ png_init_rgb_transformations(png_structp png_ptr)
             default:
 
             case 8:
-               /* Already 8 bits, fall through */
+               /* FALL THROUGH (already 8 bits) */
 
             case 16:
                /* Already a full 16 bits */
