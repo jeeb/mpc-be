@@ -85,16 +85,17 @@ void CompositionObject::SetRLEData(const BYTE* pBuffer, int nSize, int nTotalSiz
 	if (m_pRLEData) {
 		delete[] m_pRLEData;
 	}
+
 	m_pRLEData		= DNew BYTE[nTotalSize];
 	m_nRLEDataSize	= nTotalSize;
-	m_nRLEPos		= nSize;
+	m_nRLEPos		= min(nSize, nTotalSize);
 
-	memcpy (m_pRLEData, pBuffer, nSize);
+	memcpy (m_pRLEData, pBuffer, min(nSize, nTotalSize));
 }
 
 void CompositionObject::AppendRLEData(const BYTE* pBuffer, int nSize)
 {
-	ASSERT (m_nRLEPos+nSize <= m_nRLEDataSize);
+	//ASSERT (m_nRLEPos+nSize <= m_nRLEDataSize);
 	if (m_nRLEPos+nSize <= m_nRLEDataSize) {
 		memcpy (m_pRLEData+m_nRLEPos, pBuffer, nSize);
 		m_nRLEPos += nSize;
