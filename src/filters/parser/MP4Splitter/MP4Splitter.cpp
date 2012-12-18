@@ -42,6 +42,7 @@
 #include <Bento4/Core/Ap4FtabAtom.h>
 #include <Bento4/Core/Ap4DataAtom.h>
 #include <Bento4/Core/Ap4PaspAtom.h>
+#include <Bento4/Core/Ap4ChapAtom.h>
 
 #ifdef REGISTER_FILTER
 
@@ -464,7 +465,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	m_framesize.SetSize(640, 480);
 
-	int nRotation = 0;
+	int nRotation		= 0;
+	int ChapterTrackId	= 0;
 
 	if (AP4_Movie* movie = (AP4_Movie*)m_pFile->GetMovie()) {
 		// looking for main video track (skip tracks with motionless frames)
@@ -508,6 +510,50 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			AP4_Sample sample;
 
 			if (!AP4_SUCCEEDED(track->GetSample(0, sample)) || sample.GetDescriptionIndex() == 0xFFFFFFFF) {
+				continue;
+			}
+
+			if (AP4_ChapAtom* chap = dynamic_cast<AP4_ChapAtom*>(track->GetTrakAtom()->FindChild("tref/chap"))) {
+				ChapterTrackId = chap->GetChapterTrackId();
+			}
+
+			if (track->GetId() == ChapterTrackId) {
+
+				for (AP4_Cardinal i = 0; i < track->GetSampleCount(); i++) {
+					AP4_Sample sample;
+					AP4_DataBuffer data;
+					track->ReadSample(i, sample, data);
+
+					const AP4_Byte* ptr	= data.GetData();
+					AP4_Size avail		= data.GetDataSize();
+					CStringA ChapterName;
+
+					if (avail > 2) {
+						AP4_UI16 size = (ptr[0] << 8) | ptr[1];
+
+						if (size <= avail-2) {
+
+							if (size >= 2 && ptr[2] == 0xfe && ptr[3] == 0xff) {
+								CStringW wstr = CStringW((LPCWSTR)&ptr[2], size/2);
+								for (int i = 0; i < wstr.GetLength(); ++i) {
+									wstr.SetAt(i, ((WORD)wstr[i] >> 8) | ((WORD)wstr[i] << 8));
+								}
+								ChapterName = UTF16To8(wstr);
+							} else {
+								ChapterName = CStringA((LPCSTR)&ptr[2], size);
+							}
+						}
+					}
+
+					REFERENCE_TIME rtStart	= (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetCts());
+					
+					ChapAppend(rtStart, UTF8To16(ChapterName));
+				}
+
+				if (ChapGetCount()) {
+					ChapSort();
+				}
+
 				continue;
 			}
 
@@ -1325,15 +1371,17 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 		}
 
-		if (AP4_ChplAtom* chpl = dynamic_cast<AP4_ChplAtom*>(movie->GetMoovAtom()->FindChild("udta/chpl"))) {
-			AP4_Array<AP4_ChplAtom::AP4_Chapter>& chapters = chpl->GetChapters();
+		if (!ChapGetCount()) {
+			if (AP4_ChplAtom* chpl = dynamic_cast<AP4_ChplAtom*>(movie->GetMoovAtom()->FindChild("udta/chpl"))) {
+				AP4_Array<AP4_ChplAtom::AP4_Chapter>& chapters = chpl->GetChapters();
 
-			for (AP4_Cardinal i = 0; i < chapters.ItemCount(); ++i) {
-				AP4_ChplAtom::AP4_Chapter& chapter = chapters[i];
-				ChapAppend(chapter.Time, UTF8To16(ConvertMBCS(chapter.Name.c_str(), ANSI_CHARSET, CP_UTF8))); // this is b0rked, thx to nero :P
+				for (AP4_Cardinal i = 0; i < chapters.ItemCount(); ++i) {
+					AP4_ChplAtom::AP4_Chapter& chapter = chapters[i];
+					ChapAppend(chapter.Time, UTF8To16(ConvertMBCS(chapter.Name.c_str(), ANSI_CHARSET, CP_UTF8))); // this is b0rked, thx to nero :P
+				}
+
+				ChapSort();
 			}
-
-			ChapSort();
 		}
 
 		if (AP4_ContainerAtom* ilst = dynamic_cast<AP4_ContainerAtom*>(movie->GetMoovAtom()->FindChild("udta/meta/ilst"))) {

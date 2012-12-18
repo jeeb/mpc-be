@@ -240,6 +240,9 @@
     <ClInclude Include="Crypto\Ap4StreamCipher.h">
       <Filter>Crypto</Filter>
     </ClInclude>
+    <ClInclude Include="Core\Ap4ChapAtom.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Ap4Atom.cpp">
@@ -447,5 +450,8 @@
       <Filter>Crypto</Filter>
     </ClCompile>
     <ClCompile Include="precomp.cpp" />
+    <ClCompile Include="Core\Ap4ChapAtom.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

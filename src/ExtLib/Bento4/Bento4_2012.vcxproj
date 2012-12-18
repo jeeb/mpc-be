@@ -108,6 +108,7 @@
     <ClInclude Include="Core\Ap4AtomSampleTable.h" />
     <ClInclude Include="Core\Ap4AvcCAtom.h" />
     <ClInclude Include="Core\Ap4ByteStream.h" />
+    <ClInclude Include="Core\Ap4ChapAtom.h" />
     <ClInclude Include="Core\Ap4ChplAtom.h" />
     <ClInclude Include="Core\Ap4CmvdAtom.h" />
     <ClInclude Include="Core\Ap4Co64Atom.h" />
@@ -185,6 +186,7 @@
     <ClCompile Include="Core\Ap4AtomSampleTable.cpp" />
     <ClCompile Include="Core\Ap4AvcCAtom.cpp" />
     <ClCompile Include="Core\Ap4ByteStream.cpp" />
+    <ClCompile Include="Core\Ap4ChapAtom.cpp" />
     <ClCompile Include="Core\Ap4ChplAtom.cpp" />
     <ClCompile Include="Core\Ap4CmvdAtom.cpp" />
     <ClCompile Include="Core\Ap4Co64Atom.cpp" />
