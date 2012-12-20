@@ -25,6 +25,8 @@
 #include <atlbase.h>
 #include <afxinet.h>
 #include "TextFile.h"
+#include <string>
+#include <utfcpp/source/utf8.h>
 
 CTextFile::CTextFile(enc e)
 	: m_encoding(e)
@@ -41,26 +43,18 @@ CTextFile::CTextFile(enc e)
 
 bool CTextFile::isUTF8Valid()
 {
-	BYTE b;
-	while (Read(&b, sizeof(b)) == sizeof(b) && (GetPosition() < 65536)) {
-		if (!(b&0x80)) {				// 0xxxxxxx
-		} else if ((b&0xe0) == 0xc0) {	// 110xxxxx 10xxxxxx
-			if (Read(&b, sizeof(b)) != sizeof(b)) {
-				break;
-			}
-		} else if ((b&0xf0) == 0xe0) {	// 1110xxxx 10xxxxxx 10xxxxxx
-			if (Read(&b, sizeof(b)) != sizeof(b)) {
-				break;
-			}
-			if (Read(&b, sizeof(b)) != sizeof(b)) {
-				break;
-			}
-		} else {
-			return false;
-		}
-	}
+	SeekToBegin();
 
-	return true;
+	unsigned int len = min(65536, GetLength());
+	char* buf = new char[len + 1];
+	memset(buf, 0, len + 1);
+	Read(buf, len);
+	std::string str(buf);
+	bool valid = utf8::is_valid(str.begin(), str.end());
+
+	delete [] buf;
+
+	return valid;
 }
 
 bool CTextFile::Open(LPCTSTR lpszFileName)
@@ -97,7 +91,7 @@ bool CTextFile::Open(LPCTSTR lpszFileName)
 		} else {
 			// trying detect UTF-8 without BOM
 			SeekToBegin();
-
+			
 			if (isUTF8Valid()) {
 				// Reopen as Text file to avoid read binary files ...
 				m_encoding = UTF8;

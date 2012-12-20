@@ -33,6 +33,7 @@
 + Ссылка на "Download Toolbar Images";
 + Возможность открытия изображений: bmp, jpeg, gif, png, psd, tiff, emf, ico, webp и webpll;
 + Название ролика с youtube, теперь выводится в заголовке главного окна, seekbar и OSD;
++ utfcpp 2.3.2
  ... и многое другое.
 
 
