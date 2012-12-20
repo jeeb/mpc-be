@@ -15,7 +15,7 @@ Changes (*):
 * libpng 1.5.13 git-753fd3f;
 * libopus 1.0.1 git-90bac9d1;
 * Virtualdub 1.10.3 Test 7;
-* ffmpeg git-2f7465b5;
+* ffmpeg git-174c483e;
 * MediaInfo 0.7.61+ svn rev.5314;
 * ZenLibs v0.4.28+ svn rev.411;
 * Little-CMS git-e4624c8d;
