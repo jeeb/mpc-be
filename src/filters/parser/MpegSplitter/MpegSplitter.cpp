@@ -775,6 +775,11 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 				p->bSyncPoint	= !!h2.fpts;
 				p->bAppendable	= !h2.fpts;
 				p->rtStart		= h2.fpts ? (h2.pts - rtStartOffset) : Packet::INVALID_TIME;
+#if (DEBUG) && 0
+				if (h2.fpts) {
+					TRACE(_T("h.pid = %d, h2.pts = %ws [%10I64d] ==> %ws [%10I64d]\n"), h.pid, ReftimeToString(h2.pts), h2.pts, ReftimeToString(p->rtStart), p->rtStart);
+				}
+#endif
 				p->rtStop		= p->rtStart+1;
 				p->SetCount(h.bytes - (size_t)(m_pFile->GetPos() - pos));
 
@@ -1186,19 +1191,22 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		return;
 	}
 
-	REFERENCE_TIME rtPreroll = 10000000;
-
-	if (rt <= rtPreroll || m_rtDuration <= 0) {
+	if (rt <= UNITS || m_rtDuration <= 0) {
 		m_pFile->Seek(0);
 	} else {
 		__int64 len			= m_pFile->GetLength();
 		__int64 seekpos		= (__int64)(1.0*rt/m_rtDuration*len);
 		__int64 minseekpos	= _I64_MAX;
 
-		REFERENCE_TIME rtmax = rt - rtPreroll;
-		REFERENCE_TIME rtmin = rtmax - 5000000;
+		REFERENCE_TIME rtmax = rt - UNITS;
+		REFERENCE_TIME rtmin = rtmax - UNITS/2;
 
 		for (int i = 0; i < _countof(m_pFile->m_streams)-1; i++) {
+
+			if (i == CMpegSplitterFile::subpic) {
+				continue;
+			}
+
 			POSITION pos = m_pFile->m_streams[i].GetHeadPosition();
 			while (pos) {
 				DWORD TrackNum = m_pFile->m_streams[i].GetNext(pos);
@@ -1206,36 +1214,65 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 				CBaseSplitterOutputPin* pPin = GetOutputPin(TrackNum);
 				if (pPin && pPin->IsConnected()) {
 					m_pFile->Seek(seekpos);
-
 					__int64 curpos = seekpos;
-					REFERENCE_TIME pdt = _I64_MIN;
 
-					for (int j = 0; j < 10; j++) {
-						REFERENCE_TIME rt2 = m_pFile->NextPTS(TrackNum);
+					if (m_pFile->m_type == mpeg_ts) {
 
-						if (rt2 < 0) {
-							break;
+						REFERENCE_TIME dt2 = 20*UNITS;
+						for (;;) {
+							REFERENCE_TIME rt2 = m_pFile->NextPTS(TrackNum);
+
+							if (rt2 < 0) {
+								break;
+							}
+
+							REFERENCE_TIME dt = rt2 - rtmax;
+							dt2 /= 1.1;
+
+							if (dt > 0) {
+								dt = dt2;
+							} else if (dt < 0) {
+								dt = -dt2;
+							}
+
+							if (rtmin <= rt2 && rt2 <= rtmax) {
+								minseekpos = min(minseekpos, curpos);
+								break;
+							}
+
+							if (dt2 < UNITS/2) {
+								break;
+							}
+
+							curpos -= (__int64)(1.0*dt/m_rtDuration*len);
+							m_pFile->Seek(curpos);
 						}
+					} else {
+						for (int j = 0; j < 10; j++) {
+							REFERENCE_TIME rt2 = m_pFile->NextPTS(TrackNum);
 
-						REFERENCE_TIME dt = rt2 - rtmax;
-						if (dt > 0 && dt == pdt) {
-							dt = 10000000i64;
+							if (rt2 < 0) {
+								break;
+							}
+
+							REFERENCE_TIME dt = rt2 - rtmax;
+
+							if (rtmin <= rt2 && rt2 <= rtmax) {
+								minseekpos = min(minseekpos, curpos);
+								break;
+							}
+
+							curpos -= (__int64)(1.0*dt/m_rtDuration*len);
+							m_pFile->Seek(curpos);
 						}
-
-
-						if (rtmin <= rt2 && rt2 <= rtmax || pdt > 0 && dt < 0) {
-							minseekpos = min(minseekpos, curpos);
-							//m_rtStartOffset = m_pFile->m_rtMin + rt2 - rt;
-							break;
-						}
-
-						curpos -= (__int64)(1.0*dt/m_rtDuration*len);
-						m_pFile->Seek(curpos);
-
-						//pdt = dt;
 					}
 				}
 			}
+
+			if (minseekpos != _I64_MAX) {
+				break;
+			}
+
 		}
 
 		if (minseekpos != _I64_MAX) {
@@ -1247,6 +1284,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 			seekpos	= (__int64)(1.0*rt/m_rtDuration*len);
 			m_pFile->Seek(seekpos);
 			m_rtStartOffset = m_pFile->m_rtMin + m_pFile->NextPTS(pMasterStream->GetHead()) - rt;
+
 			if (m_rtStartOffset > m_pFile->m_rtMax)  {
 				m_rtStartOffset = 0;
 			}
@@ -2257,7 +2295,7 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			if (start <= end-8) {
 				int size, sample_rate, channels, framelength, bitrate;
 				if ((size = ParseAC3Header(start, &sample_rate, &channels, &framelength, &bitrate)) > 0) {
-					
+
 					if (size <= (end-start)) {
 
 						// TODO - found better way to detect valid AC3 frame(core) in TrueHD stream ...

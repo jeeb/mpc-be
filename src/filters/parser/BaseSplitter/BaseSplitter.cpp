@@ -601,7 +601,7 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			pSample->SetMediaType(p->pmt);
 			p->bDiscontinuity = true;
 
-			CAutoLock cAutoLock(m_pLock);
+			// CAutoLock cAutoLock(m_pLock); // this can cause the lock
 			m_mts.RemoveAll();
 			m_mts.Add(*p->pmt);
 		}

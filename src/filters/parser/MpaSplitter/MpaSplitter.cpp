@@ -203,7 +203,6 @@ void CMpaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		m_pFile->Seek(startpos + (__int64)((1.0 * rt / m_pFile->GetDuration()) * (endpos - startpos)));
 		m_rtStart = rt;
 	}
-
 }
 
 bool CMpaSplitterFilter::DemuxLoop()

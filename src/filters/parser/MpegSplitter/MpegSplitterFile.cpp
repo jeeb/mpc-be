@@ -304,14 +304,18 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum)
 
 			rtpos = GetPos()-4;
 
-			if (h.payload && h.payloadstart && ISVALIDPID(h.pid)) {
+			if (h.payload && h.payloadstart && ISVALIDPID(h.pid) && h.pid == TrackNum) {
 				peshdr h2;
-				if (NextMpegStartCode(b, 4) && Read(h2, b)) { // pes packet
+				if (NextMpegStartCode(b, 4) && Read(h2, b) && h2.fpts) { // pes packet
+					rt = h2.pts;
+					break;
+					/*
 					if (h2.fpts && AddStream(h.pid, b, 0, DWORD(h.bytes - (GetPos() - rtpos)) == TrackNum)) {
 						//ASSERT(h2.pts >= m_rtMin && h2.pts <= m_rtMax);
 						rt = h2.pts;
 						break;
 					}
+					*/
 				}
 			}
 

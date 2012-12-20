@@ -1642,6 +1642,8 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview
 		pFGF = DNew CFGFilterInternal<CMpaSourceFilter>();
 		pFGF->m_chkbytes.AddTail(_T("0,2,FFE0,FFE0"));
 		pFGF->m_chkbytes.AddTail(_T("0,10,FFFFFF00000080808080,49443300000000000000"));
+		pFGF->m_extensions.AddTail(_T(".mp3"));
+		pFGF->m_extensions.AddTail(_T(".aac"));
 		m_source.AddTail(pFGF);
 	}
 

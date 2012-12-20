@@ -11772,7 +11772,7 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 	}
 
 	if (!pGB2) {
-		TRACE(_T("=== Disable SmartSeek ==="));
+		TRACE(_T("=== Disable SmartSeek ===\n"));
 		b_UseSmartSeek = false;
 	}
 

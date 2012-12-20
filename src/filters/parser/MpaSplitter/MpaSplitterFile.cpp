@@ -347,7 +347,7 @@ HRESULT CMpaSplitterFile::Init()
 		}
 	}
 
-	searchlen = (int)min(m_endpos - m_startpos, m_startpos > 0 ? 512 : 7);
+	searchlen = (int)min(m_endpos - m_startpos, 512);
 	Seek(m_startpos);
 
 	if (m_mode == none && Read(m_aachdr, searchlen, &m_mt)) {
@@ -375,9 +375,9 @@ HRESULT CMpaSplitterFile::Init()
 			BitRead(32); // Skip ID tag
 			DWORD dwFlags = (DWORD)BitRead(32);
 			// extract total number of frames in file
-			if (dwFlags & FRAMES_FLAG)
+			if (dwFlags & FRAMES_FLAG) {
 				m_dwFrames = (DWORD)BitRead(32);
-
+			}
 		} else if (BitRead(32, true) == 'VBRI') {
 			BitRead(32); // Skip ID tag
 			// extract all fields from header (all mandatory)
@@ -389,7 +389,6 @@ HRESULT CMpaSplitterFile::Init()
 		}
 
 		if (m_dwFrames) {
-
 			bool l3ext = m_mpahdr.layer == 3 && !(m_mpahdr.version&1);
 			DWORD m_dwSamplesPerFrame = m_mpahdr.layer == 1 ? 384 : l3ext ? 576 : 1152;
 
