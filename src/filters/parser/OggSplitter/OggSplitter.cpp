@@ -244,7 +244,7 @@ HRESULT COggSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 
 				AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
-			} else if (type == 3 && !memcmp(p, "vorbis", 6) && 0) { // disable by default;
+			} else if (type == 3 && !memcmp(p, "vorbis", 6)) {
 				if (COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
 					pOggPin->AddComment(p+6, page.GetCount()-6-1);
 				}
@@ -655,28 +655,32 @@ void COggSplitterOutputPin::AddComment(BYTE* p, int len)
 			str += (CHAR)bs.getbits(8);
 		}
 
-		CAtlList<CStringA> sl;
-		Explode(str, sl, '=', 2);
-		if (sl.GetCount() == 2) {
-			CAutoPtr<CComment> p(DNew CComment(UTF8To16(sl.GetHead()), UTF8To16(sl.GetTail())));
-
-			if (p->m_key == L"LANGUAGE") {
-				CString lang = ISO6392ToLanguage(sl.GetTail()), iso6392 = LanguageToISO6392(CString(p->m_value));
-
-				if (p->m_value.GetLength() == 3 && !lang.IsEmpty()) {
-					SetName(CStringW(lang));
-					SetProperty(L"LANG", p->m_value);
-				} else if (!iso6392.IsEmpty()) {
-					SetName(p->m_value);
-					SetProperty(L"LANG", CStringW(iso6392));
-				} else {
-					SetName(p->m_value);
-					SetProperty(L"NAME", p->m_value);
-				}
-			}
-
-			m_pComments.AddTail(p);
+		int sepPos = str.Find('=');
+		if (sepPos <= 0 || sepPos == str.GetLength()-1) {
+			continue;
 		}
+
+        CStringA TagKey		= str.Left(sepPos);
+        CStringA TagValue	= str.Mid(sepPos + 1);
+
+		CAutoPtr<CComment> p(DNew CComment(UTF8To16(TagKey), UTF8To16(TagValue)));
+
+		if (p->m_key == L"LANGUAGE") {
+			CString lang = ISO6392ToLanguage(TagValue), iso6392 = LanguageToISO6392(CString(p->m_value));
+
+			if (p->m_value.GetLength() == 3 && !lang.IsEmpty()) {
+				SetName(CStringW(lang));
+				SetProperty(L"LANG", p->m_value);
+			} else if (!iso6392.IsEmpty()) {
+				SetName(p->m_value);
+				SetProperty(L"LANG", CStringW(iso6392));
+			} else {
+				SetName(p->m_value);
+				SetProperty(L"NAME", p->m_value);
+			}
+		}
+
+		m_pComments.AddTail(p);
 	}
 }
 
