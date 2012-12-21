@@ -1,5 +1,7 @@
 ﻿This file includes only a short list of the changes between Media Player Classic - BE's versions.
 
+English translation of the change log made by u_shell.
+
 Legend:
 + Added
 * Changed
@@ -7,10 +9,102 @@ Legend:
 
 1.1.3.0
 ==============================
+A total of about 450 changes have been made in this version.
+
 Added (+):
++ MPEGSplitter - added a "fast seek" option;
++ File formats - button for deselecting all formats;
++ AVISplitter - added support for parsing MPEG Audio tracks, as there are files with "untrustworthy" headers;
++ MP4/MOV Splitter - added support for AMR Wide band audio tracks, support for Rotate tag;
++ Support for reading Rotate tag from QuickTime files (using internal splitter) and video rotation (if video renderer supports it);
++ Getting DXVA status for ANY compliant renderer, and not only internal one (works on EVR, madVR). Only DXVA 2.0 is supported;
++ Support for custom Pixel Shader in madVR;
++ Added commands for toolbar buttons SUB / AUD (Load Ext Subtitle... / Laod Ext Audio...) into context menu appearing upon right click;
++ WVSource/MusePackSource - added support for APE Tag, reading cuesheet (information about chapters);
++ FLACSource - support for reading information about chapters; in particular, using CUE file embedded into Flac's tag - CUESHEET;;
++ Support for subtitles in XSUB format (DiVX subtitles);
++ Added a possibility for setting icons by type (video and audio) instead of extension;
++ MPEG2 DXVA decoder - detecting 2:3 Pulldown and correctly setting frame duration;
++ Added two hotkeys for showing system time and file name in OSD;
++ Added basic support for handling subtitles with VSFilter - full support for managing subtitles' list, show/hide, switching, loading external subtitles via menu and via Drag'n'Drop;
++ MPCVideoDec - support for choosing Deintelacing method;
++ Support for external subtitles in UTF-8 without BOM header;
++ MPEGSplitter - support for reading palette for VobSub subtitles upon opening via .IFO;
++ Support for DVD_Subpicture;
++ Possibility for opening external logos in the following formats: *.bmp; *.jpg; *.jpeg; *.png; *.psd, *.gif; *.tif; *.tiff; *.tga, *.emf; *.ico; *.webp; *.webpll;
++ Added Flybar panel;
++ Added buttons for Flybar in D3D exclusive mode (file close and program exit);
++ "Download Toolbar Images" link;
++ Possibility for opening images: bmp, jpeg, gif, png, psd, tiff, emf, ico, webp and webpll;
++ Youtube clip title is now shown in main window's title, seekbar and OSD;
+ ... and many more.
+
 
 Changes (*):
-* Updated German translation, the author - Markus Gaugg;
+* Improved Vorbis parser;
+* OggSplitter - added header check;
+* Changed UTF-8 detection method in a file without BOM;
+* MP4Splitter - improved Chapter support;
+* FLVSplitter - improved streaming video support;
+* Improved handling of external/system filters: now "Prefer" works for external Source/Splitter filters as well as for Transform filters. Also fixed priority setting for internal WavPack/MusePack/TTA/AMR Splitter (since they do not have their own Source);
+* Stricter filter for loading logos for musical files;
+* WVSource: code cosmetics;
+* VSFilter - XSUB: if subtitles' size exceeds video size, then trying to fit the frame;
+* MpaDecFilter -> Mixer: changed stereo upmix coefficients;
+* MusePack/WavPack - APETAG support, now getting and showing in the player full information on artist, title, year, album, etc.;
+* Small cosmetics for EVR/VMR9 statistics;
+* Improved memory leaks handling mechanism;
+* Enabled optimization of 7.1-to-stereo downmix;
+* DXVA decoder - refined handling of an EndOfStream signal from a lower-merit filter;
+* OSD options cosmetics;
+* "Recent" jump list in Windows 7 taskbar is cleared upon clearing MRU files
+list;
+* File associations - if the user presses the "Apply" button, changes nothing and presses "OK", then file types registration is not launched once more; also, the window for choosing assotiated extensions/types is not shown under Win8
+* Updated MediaInfo language files;
+* MpaDecFilter: updated CMixer, optimization;
+* MPEG2 DXVA decoder - changed handling of 2:3 Pulldown frames, disallowed setting constant frame duration, since there can be mixed content (interlaced
+frames together with 2:3 Pulldown);
+* XSUB subtitles - correct positioning and scaling upon changing window size;
+* MpaDecFilter: using sample formats from ffmpeg for internal processing;
+* MpaDecFilter: optimized decoding PS2PCM and PS2ADPCM;
+* WebServer: optimization;
+* Shaders are only saved when it is needed;
+* OSD message upon changing subtitles' delay interval when using VSFilter;
+* More correct display and behavior of "Subtitles" menu when using VSFilter;
+* Improved handling of subtitles with VSFilter, also added a possibility to control delays (F1/F2) for VSFilter;
+* Optimized volume level step setting;
+* Improved HDMV (PGS) subtitles parsing;
+* Subtitles queue handler - changing thread priority not only according to settings, but also for subtitles' type: ALWAYS setting low priority for raster subtitles;
+* An error or warning message upon creating video renderer is displayed only once;
+* FLACSource - changed mechanism of tags extraction, now UTF8 tags are read correctly;
+* SaveAs - using only file name, without path, for local files;
+* Video renderer, statistics - obtaining and showing frame type (progressive/interlace) regardless of decoder;
+* Correct setting mouse cursor for filters' settings, now the hand (IDC_HAND) is set only for relevant elements;
+* Changed algorighm of UTF-8 recognition;
+* Improved background painting for VolumeCtrl;
+* Checking toolbar и flybar for correct sizes;
+* Transparency in logos and external images is rendered correctly;
+* DXVA H.264 - improved supported video check for DXVA decoding;
+* Weakened restriction on frame size for Nvidia GTX 660Ti;
+* Removed switching player's mode (look) on pressing Esc;
+* MPEGSplitter - upon opening a .vob/.mpg file, looking for a DVD .ifo file with a corresponding structure, and if one is found - reading palette from it for rendering VobSub subtitles;
+* Subtitles - improved action of TextPassThruFilter filter;
+* Optimized FlyBar behavior;
+* Completely revised H.264 DXVA decoder, improved handling of H.264 Interlaced;
+* Youtube parser: added stereo3d format to exception list;
+* Removed exception for taking screenshots for MadVR with version 0.84.0 and above;
+* Added SeekBar in compact mode;
+* Saving screenshots in JPG and TIFF is now performed through GDI+;
+* MPEG2 DXVA Decoder - optimization;
+* DVD: if FirstPlay command is absent, trying opening DVD Menu Title;
+* Removed automatic switching the sound on/off upon changing the volume;
+* Optimized AsyncReader;
+* Optimized opening and saving images;
+* Optimized opening links from youtu.be;
+* Added a possibility to disable internal logic of choosing audio tracks and subtitles;
+* Updated Korean translation, author - kuh3h3;
+* Updated Ukrainian translation, author - arestarh1986;
+* Updated German translation, author - Markus Gaugg;
 * libwebp 0.2.1 git-6bf20874;
 * libpng 1.5.13 git-753fd3f;
 * libopus 1.0.1 git-90bac9d1;
@@ -22,6 +116,52 @@ Changes (*):
 * SoundTouch svn rev.160;
 
 Fixes (!):
+! HDMV(PGS) субтитры - fixed several problems leading to runtime errors;
+! Fixed subtitles handling;
+! DVB subtitles parser: parsing PAGE was not fully correct;
+! AudioSwitcher: fixed overflow (which could result in stutter and crash on some WavPack tracks);
+! Slightly corrected handling of raster subtitles, fixed problems that resulted in runtime errors;
+! When opening a link from Youtube, OSD now correctly displays the clip's title;
+! DirectVobSub(VSFilter) - fixed handling of P010/P016 video;
+! The command "reload subtitles" was erroneously exchanged with subtitles' style dialog;
+! DirectVobSub - crashed upon showing PGS/DVB subtitles when their resolution exceeded video stream resolution;
+! DirectVobSub (auto-loading version) - was not loaded automatically under Win7;
+! DXVA decoding of VC1-I;
+! Showing time on the scrollbar when "Subresync" is enabled;
+! MpaDecFilter: fixed crash on DTS files;
+! AviSplitter: corrected playback of files with corrupt fragments in the header;
+! PGS subtitles parser;
+! The possibility of switching tracks with subtitles via filter's menu should not depend on subtitles' handling in the player itself;
+! The Lock/Unlock button on the flybar was rendered incorrectly;
+! Playlist closed upon opening a file;
+! Big CPU load in DXVA mode during H.264 decoding;
+! Seekbar and statusbar do not indicate image loading;
+! Playlistbar: fixed background rendering upon switching a theme;
+! Internal FLACSource did not play files whose header lacked information about minimal and maximal frame size;
+! Subtitles were not shown when using ffdshow video decoder & subtitle filter;
+! FLACSource - problem opening corrupt files;
+! SaveAs - removing "incorrect" characters - only for files from youtube;
+! Subtitles' option "Всегда использовать внешние субтитры как основные" did not work when internal track selection logic was disabled;
+! Opening some ANSI/ASCII files;
+! MPEGSplitter - sometimes not all data were read from Packetized Elementary Stream (PES) header;
+! Language switching - buttons' tooltips language was not changed in Win 7'spreview in the taskbar;
+! Some external filters were not registered;
+! Showing subtitles in YUY2 output mode;
+! MPEGSplitter - some MPEG-TS could not be opened;
+! Fixed problem with png rendering;
+! MPCVideoDec, external filter - codecs' selection was not saved;
+! External filters - Settings' header missed text;
+! VP3, THEORA, MPEG4 - eliminated artifacts and picture "spilling" after seek;
+! H264 DXVA decoder - slice control data were supplied to the decoder incorrectly for some specific Interlaced streams;
+! FLV splitter - incorrect handling of PCM audio tracks;
+! VolumeCtrl sometimes caused malfunction;
+! Fixed volume control rendering;
+! Memory leak in MPADecFilter when using mixer;
+! WebServer - numerous fixes and optimization;
+! Main window header was constructed incorrectly;
+! Installer - fixed the error on uninstall;
+! Hangs in specific circumstances with Preview enabled;
+ ... and many more.
 
 
 1.0.3.1
