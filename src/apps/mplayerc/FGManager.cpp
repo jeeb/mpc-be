@@ -1610,18 +1610,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview
 		m_source.AddTail(pFGF);
 	}
 
-	if (src[SRC_MPEG] || IsPreview) {
-		pFGF = DNew CFGFilterInternal<CMpegSourceFilter>();
-		pFGF->m_chkbytes.AddTail(_T("0,16,FFFFFFFFF100010001800001FFFFFFFF,000001BA2100010001800001000001BB"));
-		pFGF->m_chkbytes.AddTail(_T("0,5,FFFFFFFFC0,000001BA40"));
-		pFGF->m_chkbytes.AddTail(_T("0,1,,47,188,1,,47,376,1,,47"));
-		pFGF->m_chkbytes.AddTail(_T("4,1,,47,196,1,,47,388,1,,47"));
-		pFGF->m_chkbytes.AddTail(_T("0,4,,54467263,1660,1,,47"));
-		pFGF->m_chkbytes.AddTail(_T("0,8,fffffc00ffe00000,4156000055000000"));
-		pFGF->m_chkbytes.AddTail(_T("0,8,,4D504C5330323030"));	// MPLS0200
-		pFGF->m_chkbytes.AddTail(_T("0,8,,4D504C5330313030"));	// MPLS0100
-		pFGF->m_extensions.AddTail(_T(".ts"));
-		pFGF->m_extensions.AddTail(_T(".m2ts"));
+	if (src[SRC_MPA] && !IsPreview) {
+		pFGF = DNew CFGFilterInternal<CMpaSourceFilter>();
+		pFGF->m_chkbytes.AddTail(_T("0,2,FFE0,FFE0"));
+		pFGF->m_chkbytes.AddTail(_T("0,10,FFFFFF00000080808080,49443300000000000000"));
+		pFGF->m_extensions.AddTail(_T(".mp3"));
+		pFGF->m_extensions.AddTail(_T(".aac"));
 		m_source.AddTail(pFGF);
 	}
 
@@ -1638,12 +1632,19 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview
 		m_source.AddTail(pFGF);
 	}
 
-	if (src[SRC_MPA] && !IsPreview) {
-		pFGF = DNew CFGFilterInternal<CMpaSourceFilter>();
-		pFGF->m_chkbytes.AddTail(_T("0,2,FFE0,FFE0"));
-		pFGF->m_chkbytes.AddTail(_T("0,10,FFFFFF00000080808080,49443300000000000000"));
-		pFGF->m_extensions.AddTail(_T(".mp3"));
-		pFGF->m_extensions.AddTail(_T(".aac"));
+	// add CMpegSourceFilter last since it can parse the stream for a long time
+	if (src[SRC_MPEG] || IsPreview) {
+		pFGF = DNew CFGFilterInternal<CMpegSourceFilter>();
+		pFGF->m_chkbytes.AddTail(_T("0,16,FFFFFFFFF100010001800001FFFFFFFF,000001BA2100010001800001000001BB"));
+		pFGF->m_chkbytes.AddTail(_T("0,5,FFFFFFFFC0,000001BA40"));
+		pFGF->m_chkbytes.AddTail(_T("0,1,,47,188,1,,47,376,1,,47"));
+		pFGF->m_chkbytes.AddTail(_T("4,1,,47,196,1,,47,388,1,,47"));
+		pFGF->m_chkbytes.AddTail(_T("0,4,,54467263,1660,1,,47"));
+		pFGF->m_chkbytes.AddTail(_T("0,8,fffffc00ffe00000,4156000055000000"));
+		pFGF->m_chkbytes.AddTail(_T("0,8,,4D504C5330323030"));	// MPLS0200
+		pFGF->m_chkbytes.AddTail(_T("0,8,,4D504C5330313030"));	// MPLS0100
+		pFGF->m_extensions.AddTail(_T(".ts"));
+		pFGF->m_extensions.AddTail(_T(".m2ts"));
 		m_source.AddTail(pFGF);
 	}
 
@@ -1705,18 +1706,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview
 		pFGF = DNew CFGFilterInternal<COggSplitterFilter>(LowMerit(OggSplitterName), MERIT64_DO_USE);
 	}
 	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_Ogg);
-	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
-	m_transform.AddTail(pFGF);
-
-	if (src[SRC_MPEG] || IsPreview) {
-		pFGF = DNew CFGFilterInternal<CMpegSplitterFilter>(MpegSplitterName, MERIT64_ABOVE_DSHOW);
-	} else {
-		pFGF = DNew CFGFilterInternal<CMpegSplitterFilter>(LowMerit(MpegSplitterName), MERIT64_DO_USE);
-	}
-	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MPEG1System);
-	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MPEG2_PROGRAM);
-	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MPEG2_TRANSPORT);
-	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MPEG2_PVA);
 	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
 	m_transform.AddTail(pFGF);
 
@@ -1797,6 +1786,19 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview
 		pFGF = DNew CFGFilterInternal<CFLVSplitterFilter>(LowMerit(FlvSplitterName), MERIT64_DO_USE);
 	}
 	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_FLV);
+	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
+	m_transform.AddTail(pFGF);
+
+	// add CMpegSplitterFilter last since it can parse the stream for a long time
+	if (src[SRC_MPEG] || IsPreview) {
+		pFGF = DNew CFGFilterInternal<CMpegSplitterFilter>(MpegSplitterName, MERIT64_ABOVE_DSHOW);
+	} else {
+		pFGF = DNew CFGFilterInternal<CMpegSplitterFilter>(LowMerit(MpegSplitterName), MERIT64_DO_USE);
+	}
+	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MPEG1System);
+	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MPEG2_PROGRAM);
+	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MPEG2_TRANSPORT);
+	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MPEG2_PVA);
 	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
 	m_transform.AddTail(pFGF);
 

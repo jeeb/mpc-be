@@ -36,6 +36,9 @@ COggFile::COggFile(IAsyncReader* pAsyncReader, HRESULT& hr)
 HRESULT COggFile::Init()
 {
 	Seek(0);
+	if (BitRead(32, true) != 'OggS') {
+		return E_FAIL;
+	}
 	if (!Sync()) {
 		return E_FAIL;
 	}
