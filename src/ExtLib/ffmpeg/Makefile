@@ -348,6 +348,7 @@ SRCS_C = \
     libavresample/audio_data.c \
     libavresample/audio_mix.c \
     libavresample/audio_mix_matrix.c \
+    libavresample/dither.c \
     libavresample/options.c \
     libavresample/resample.c \
     libavresample/utils.c \
