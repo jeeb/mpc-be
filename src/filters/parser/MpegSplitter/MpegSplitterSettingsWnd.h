@@ -47,6 +47,8 @@ private :
 	CButton		m_cbAC3Core;
 	CButton		m_cbAsIs;
 
+	CButton		m_cbFastSeek;
+
 	enum {
 		IDC_PP_FAST_STREAM_SELECT = 10000,
 		IDC_PP_SUBTITLE_FORCED,
@@ -56,7 +58,8 @@ private :
 		IDC_PP_TRUEHD,
 		IDC_PP_AC3CORE,
 		IDC_PP_ASIS,
-		IDC_PP_ALTERNATIVE_DURATION
+		IDC_PP_ALTERNATIVE_DURATION,
+		IDC_PP_FAST_SEEK
 	};
 
 public:
@@ -78,4 +81,6 @@ public:
 	static CSize GetWindowSize() { return CSize(325, 230); }
 
 	DECLARE_MESSAGE_MAP()
+
+	afx_msg void OnClickedFastSeek();
 };

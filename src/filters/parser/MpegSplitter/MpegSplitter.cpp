@@ -535,6 +535,7 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	, m_csAudioLanguageOrder(_T(""))
 	, m_csSubtitlesLanguageOrder(_T(""))
 	, m_useFastStreamChange(true)
+	, m_useFastSeek(false)
 	, m_ForcedSub(false)
 	, m_TrackPriority(false)
 	, m_AC3CoreOnly(0)
@@ -550,6 +551,10 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 
 		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("UseFastStreamChange"), dw)) {
 			m_useFastStreamChange = !!dw;
+		}
+
+		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("UseFastSeek"), dw)) {
+			m_useFastSeek = !!dw;
 		}
 
 		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("ForcedSub"), dw)) {
@@ -582,6 +587,7 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	}
 #else
 	m_useFastStreamChange		= !!AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("UseFastStreamChange"), m_useFastStreamChange);
+	m_useFastSeek				= !!AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("UseFastSeek"), m_useFastSeek);
 	m_ForcedSub					= !!AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("ForcedSub"), m_ForcedSub);
 	m_TrackPriority				= !!AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("TrackPriority"), m_TrackPriority);
 
@@ -1201,78 +1207,81 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		REFERENCE_TIME rtmax = rt - UNITS;
 		REFERENCE_TIME rtmin = rtmax - UNITS/2;
 
-		for (int i = 0; i < _countof(m_pFile->m_streams)-1; i++) {
+		if (!m_useFastSeek) {
 
-			if (i == CMpegSplitterFile::subpic) {
-				continue;
-			}
+			for (int i = 0; i < _countof(m_pFile->m_streams)-1; i++) {
 
-			POSITION pos = m_pFile->m_streams[i].GetHeadPosition();
-			while (pos) {
-				DWORD TrackNum = m_pFile->m_streams[i].GetNext(pos);
+				if (i == CMpegSplitterFile::subpic) {
+					continue;
+				}
 
-				CBaseSplitterOutputPin* pPin = GetOutputPin(TrackNum);
-				if (pPin && pPin->IsConnected()) {
-					m_pFile->Seek(seekpos);
-					__int64 curpos = seekpos;
+				POSITION pos = m_pFile->m_streams[i].GetHeadPosition();
+				while (pos) {
+					DWORD TrackNum = m_pFile->m_streams[i].GetNext(pos);
 
-					if (m_pFile->m_type == mpeg_ts) {
+					CBaseSplitterOutputPin* pPin = GetOutputPin(TrackNum);
+					if (pPin && pPin->IsConnected()) {
+						m_pFile->Seek(seekpos);
+						__int64 curpos = seekpos;
 
-						REFERENCE_TIME dt2 = 20*UNITS;
-						for (;;) {
-							REFERENCE_TIME rt2 = m_pFile->NextPTS(TrackNum);
+						if (m_pFile->m_type == mpeg_ts) {
 
-							if (rt2 < 0) {
-								break;
+							REFERENCE_TIME dt2 = 20*UNITS;
+							for (;;) {
+								REFERENCE_TIME rt2 = m_pFile->NextPTS(TrackNum);
+
+								if (rt2 < 0) {
+									break;
+								}
+
+								REFERENCE_TIME dt = rt2 - rtmax;
+								dt2 /= 1.1;
+
+								if (dt > 0) {
+									dt = dt2;
+								} else if (dt < 0) {
+									dt = -dt2;
+								}
+
+								if (rtmin <= rt2 && rt2 <= rtmax) {
+									minseekpos = min(minseekpos, curpos);
+									break;
+								}
+
+								if (dt2 < UNITS/2) {
+									break;
+								}
+
+								curpos -= (__int64)(1.0*dt/m_rtDuration*len);
+								m_pFile->Seek(curpos);
 							}
+						} else {
+							for (int j = 0; j < 10; j++) {
+								REFERENCE_TIME rt2 = m_pFile->NextPTS(TrackNum);
 
-							REFERENCE_TIME dt = rt2 - rtmax;
-							dt2 /= 1.1;
+								if (rt2 < 0) {
+									break;
+								}
 
-							if (dt > 0) {
-								dt = dt2;
-							} else if (dt < 0) {
-								dt = -dt2;
+								REFERENCE_TIME dt = rt2 - rtmax;
+
+								if (rtmin <= rt2 && rt2 <= rtmax) {
+									minseekpos = min(minseekpos, curpos);
+									break;
+								}
+
+								curpos -= (__int64)(1.0*dt/m_rtDuration*len);
+								m_pFile->Seek(curpos);
 							}
-
-							if (rtmin <= rt2 && rt2 <= rtmax) {
-								minseekpos = min(minseekpos, curpos);
-								break;
-							}
-
-							if (dt2 < UNITS/2) {
-								break;
-							}
-
-							curpos -= (__int64)(1.0*dt/m_rtDuration*len);
-							m_pFile->Seek(curpos);
-						}
-					} else {
-						for (int j = 0; j < 10; j++) {
-							REFERENCE_TIME rt2 = m_pFile->NextPTS(TrackNum);
-
-							if (rt2 < 0) {
-								break;
-							}
-
-							REFERENCE_TIME dt = rt2 - rtmax;
-
-							if (rtmin <= rt2 && rt2 <= rtmax) {
-								minseekpos = min(minseekpos, curpos);
-								break;
-							}
-
-							curpos -= (__int64)(1.0*dt/m_rtDuration*len);
-							m_pFile->Seek(curpos);
 						}
 					}
 				}
-			}
 
-			if (minseekpos != _I64_MAX) {
-				break;
-			}
+				if (minseekpos != _I64_MAX) {
+					break;
+				}
 
+			}
 		}
 
 		if (minseekpos != _I64_MAX) {
@@ -1637,6 +1646,7 @@ STDMETHODIMP CMpegSplitterFilter::Apply()
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, _T("Software\\MPC-BE Filters\\MPEG Splitter"))) {
 		key.SetDWORDValue(_T("UseFastStreamChange"), m_useFastStreamChange);
+		key.SetDWORDValue(_T("UseFastSeek"), m_useFastSeek);
 		key.SetDWORDValue(_T("ForcedSub"), m_ForcedSub);
 		key.SetDWORDValue(_T("TrackPriority"), m_TrackPriority);
 		key.SetStringValue(_T("AudioLanguageOrder"), m_csAudioLanguageOrder);
@@ -1646,6 +1656,7 @@ STDMETHODIMP CMpegSplitterFilter::Apply()
 	}
 #else
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("UseFastStreamChange"), m_useFastStreamChange);
+	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("UseFastSeek"), m_useFastSeek);
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("ForcedSub"), m_ForcedSub);
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("TrackPriority"), m_TrackPriority);
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("AC3CoreOnly"), m_AC3CoreOnly);
@@ -1666,6 +1677,19 @@ STDMETHODIMP_(BOOL) CMpegSplitterFilter::GetFastStreamChange()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_useFastStreamChange;
+}
+
+STDMETHODIMP CMpegSplitterFilter::SetFastSeek(BOOL nValue)
+{
+	CAutoLock cAutoLock(&m_csProps);
+	m_useFastSeek = !!nValue;
+	return S_OK;
+}
+
+STDMETHODIMP_(BOOL) CMpegSplitterFilter::GetFastSeek()
+{
+	CAutoLock cAutoLock(&m_csProps);
+	return m_useFastSeek;
 }
 
 STDMETHODIMP CMpegSplitterFilter::SetForcedSub(BOOL nValue)
