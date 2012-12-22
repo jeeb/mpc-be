@@ -37,8 +37,6 @@
 #endif
 #include <moreuuids.h>
 
-#define MAXPACKETS_RV	MAXPACKETS*10
-
 template<typename T>
 static void bswap(T& var)
 {
@@ -822,7 +820,7 @@ STDMETHODIMP CRealMediaSplitterFilter::GetKeyFrames(const GUID* pFormat, REFEREN
 //
 
 CRealMediaSplitterOutputPin::CRealMediaSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
-	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr, 0, MAXPACKETS_RV)
+	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr, 0, MAXPACKETS*10)
 {
 }
 

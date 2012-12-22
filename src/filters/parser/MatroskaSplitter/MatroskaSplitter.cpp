@@ -1392,7 +1392,7 @@ CMatroskaSourceFilter::CMatroskaSourceFilter(LPUNKNOWN pUnk, HRESULT* phr)
 CMatroskaSplitterOutputPin::CMatroskaSplitterOutputPin(
 	unsigned int nMinCache, REFERENCE_TIME rtDefaultDuration,
 	CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
-	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr)
+	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr, 0, MAXPACKETS*5)
 	, m_nMinCache(nMinCache), m_rtDefaultDuration(rtDefaultDuration)
 {
 	m_nMinCache = 1;//max(m_nMinCache, 1);
