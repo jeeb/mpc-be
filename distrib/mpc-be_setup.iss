@@ -109,7 +109,7 @@ ShowTasksTreeLines=yes
 DisableDirPage=auto
 DisableProgramGroupPage=auto
 MinVersion=0,5.01.2600sp2
-AppMutex=MPC-BE
+AppMutex={#MPC_WND_CLASS_NAME}
 ChangesAssociations=true
 
 [Languages]

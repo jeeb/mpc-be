@@ -69,3 +69,5 @@
 #define DIRECTX_SDK_NUMBER "43"
 
 #endif
+
+#define MPC_WND_CLASS_NAME "MPC-BE"

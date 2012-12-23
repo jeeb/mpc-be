@@ -56,6 +56,8 @@ extern "C" {
 
 #include "../../../DSUtil/WinAPIUtils.h"
 
+#include "Version.h"
+
 #define MAX_SUPPORTED_MODE			5
 
 typedef struct {
@@ -660,7 +662,7 @@ BOOL CALLBACK EnumFindProcessWnd (HWND hwnd, LPARAM lParam)
 	GetWindowThreadProcessId (hwnd, &procid);
 	GetClassName (hwnd, WindowClass, _countof(WindowClass));
 
-	if (procid == GetCurrentProcessId() && _tcscmp (WindowClass, _T("MPC-BE")) == 0) {
+	if (procid == GetCurrentProcessId() && _tcscmp (WindowClass, _T(MPC_WND_CLASS_NAME)) == 0) {
 		HWND*		pWnd = (HWND*) lParam;
 		*pWnd = hwnd;
 		return FALSE;
