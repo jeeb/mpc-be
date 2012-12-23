@@ -109,7 +109,7 @@ ShowTasksTreeLines=yes
 DisableDirPage=auto
 DisableProgramGroupPage=auto
 MinVersion=0,5.01.2600sp2
-AppMutex=MediaPlayerClassicW
+AppMutex=MPC-BE
 ChangesAssociations=true
 
 [Languages]

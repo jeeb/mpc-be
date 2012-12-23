@@ -660,7 +660,7 @@ BOOL CALLBACK EnumFindProcessWnd (HWND hwnd, LPARAM lParam)
 	GetWindowThreadProcessId (hwnd, &procid);
 	GetClassName (hwnd, WindowClass, _countof(WindowClass));
 
-	if (procid == GetCurrentProcessId() && _tcscmp (WindowClass, _T("MediaPlayerClassicW")) == 0) {
+	if (procid == GetCurrentProcessId() && _tcscmp (WindowClass, _T("MPC-BE")) == 0) {
 		HWND*		pWnd = (HWND*) lParam;
 		*pWnd = hwnd;
 		return FALSE;

@@ -24,7 +24,7 @@
 #include "resource.h"
 #include "MPCBEContextMenu.h"
 
-#define MPC_WND_CLASS_NAME L"MediaPlayerClassicW"
+#define MPC_WND_CLASS_NAME L"MPC-BE"
 
 // CMPCBEContextMenu
 #define PLAY_MPC_RU		_T("&Воспроизвести в MPC-BE")

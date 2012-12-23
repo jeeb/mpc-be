@@ -36,7 +36,7 @@
 #include <vmr9.h>
 #include <dxva2api.h> //#include <evr9.h>
 
-#define MPC_WND_CLASS_NAME L"MediaPlayerClassicW"
+#define MPC_WND_CLASS_NAME L"MPC-BE"
 
 #define DEF_LOGO IDF_LOGO1
 
