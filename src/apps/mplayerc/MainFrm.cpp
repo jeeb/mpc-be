@@ -9591,7 +9591,7 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 	if (GetPlaybackMode() == PM_FILE && b_UseVSFilter) {
 		CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
 		if (pDVS) {
-			if (i == -2) {
+			if (i == -1) {
 				bool fHideSubtitles = false;
 				pDVS->get_HideSubtitles(&fHideSubtitles);
 				fHideSubtitles = !fHideSubtitles;
