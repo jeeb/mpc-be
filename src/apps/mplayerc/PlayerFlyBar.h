@@ -34,7 +34,7 @@ public:
 	int iw;
 
 	void CalcButtonsRect();
-	void DrawBitmap(CDC *pDC, int x, int y, int z);
+	void DrawButton(CDC *pDC, int x, int y, int z);
 
 	DECLARE_DYNAMIC(CFlyBar)
 
@@ -50,6 +50,7 @@ private:
 	HBITMAP hBmp;
 	MPCPngImage m_logobm;
 	CToolTipCtrl m_tooltip;
+	CImageList	*m_pButtonsImages;
 
 	void Destroy();
 

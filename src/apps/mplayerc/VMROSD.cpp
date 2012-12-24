@@ -61,20 +61,56 @@ CVMROSD::CVMROSD(void)
 	bMouseOverCloseButton	= false;
 	m_bShowMessage			= true;
 
+	m_pButtonsImages = NULL;
+	int fp = m_bm.FileExists("flybar");
+
+	hBmp = m_bm.LoadExternalImage("flybar", IDB_PLAYERFLYBAR_PNG, -1, -1, -1, -1, -1);
+	BITMAP bm;
+	::GetObject(hBmp, sizeof(bm), &bm);
+
+	if (fp && bm.bmWidth != bm.bmHeight * 25) {
+		hBmp = m_bm.LoadExternalImage("", IDB_PLAYERFLYBAR_PNG, -1, -1, -1, -1, -1);
+		::GetObject(hBmp, sizeof(bm), &bm);
+	}
+
+	if (NULL != hBmp) {
+		CBitmap *bmp = DNew CBitmap();
+		bmp->Attach(hBmp);
+		BITMAP bitmapBmp;
+		bmp->GetBitmap(&bitmapBmp);
+
+		if (bm.bmWidth == bm.bmHeight * 25) {
+
+			if (m_pButtonsImages) {
+				delete m_pButtonsImages;
+				m_pButtonsImages = NULL;
+			}
+
+			m_pButtonsImages = DNew CImageList();
+			
+			m_pButtonsImages->Create(bm.bmHeight, bm.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
+			m_pButtonsImages->Add(bmp, static_cast<CBitmap*>(0));
+
+			m_nButtonHeight = bitmapBmp.bmHeight;
+		}
+
+		delete bmp;
+		DeleteObject(hBmp);
+	}
 	
-	icoExit		= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_EXIT), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	icoExit_a	= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_EXIT_A), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	icoClose	= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_EXIT2), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
-	icoClose_a	= (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_FB_EXIT2_A), IMAGE_ICON, 24, 24, LR_DEFAULTCOLOR);
 }
 
 CVMROSD::~CVMROSD(void)
 {
 	m_MemDC.DeleteDC();
-	if (icoExit) DestroyIcon(icoExit);
-	if (icoExit_a) DestroyIcon(icoExit_a);
-	if (icoClose) DestroyIcon(icoClose);
-	if (icoClose_a) DestroyIcon(icoClose_a);
+
+	if (hBmp) {
+		DeleteObject(hBmp);
+	}
+
+	if (m_pButtonsImages) {
+		delete m_pButtonsImages;
+	}
 }
 
 void CVMROSD::OnSize(UINT nType, int cx, int cy)
@@ -272,11 +308,24 @@ void CVMROSD::DrawSlider(CRect* rect, __int64 llMin, __int64 llMax, __int64 llPo
 
 void CVMROSD::DrawFlyBar(CRect* rect)
 {
+	icoExit = m_pButtonsImages->ExtractIcon(0);
 	DrawIconEx(m_MemDC, m_rectWnd.right-34, 10, icoExit, 0, 0, 0, NULL, DI_NORMAL);
-	DrawIconEx(m_MemDC, m_rectWnd.right-62, 10, icoClose, 0, 0, 0, NULL, DI_NORMAL);
+	DestroyIcon(icoExit);
 
-	if (bMouseOverExitButton) DrawIconEx(m_MemDC, m_rectWnd.right-34, 10, icoExit_a, 0, 0, 0, NULL, DI_NORMAL);
-	if (bMouseOverCloseButton) DrawIconEx(m_MemDC, m_rectWnd.right-62, 10, icoClose_a, 0, 0, 0, NULL, DI_NORMAL);
+	icoClose = m_pButtonsImages->ExtractIcon(23);
+	DrawIconEx(m_MemDC, m_rectWnd.right-62, 10, icoClose, 0, 0, 0, NULL, DI_NORMAL);
+	DestroyIcon(icoClose);
+
+	if (bMouseOverExitButton) {
+		icoExit_a = m_pButtonsImages->ExtractIcon(1);
+		DrawIconEx(m_MemDC, m_rectWnd.right-34, 10, icoExit_a, 0, 0, 0, NULL, DI_NORMAL);
+		DestroyIcon(icoExit_a);
+	}
+	if (bMouseOverCloseButton) {
+		icoClose_a = m_pButtonsImages->ExtractIcon(24);
+		DrawIconEx(m_MemDC, m_rectWnd.right-62, 10, icoClose_a, 0, 0, 0, NULL, DI_NORMAL);
+		DestroyIcon(icoClose_a);
+	}
 }
 
 void CVMROSD::DrawMessage()

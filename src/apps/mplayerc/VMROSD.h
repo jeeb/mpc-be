@@ -27,6 +27,7 @@
 #include <evr9.h>
 #include <vmr9.h>
 #include <madVRAllocatorPresenter.h>
+#include "PngImage.h"
 
 typedef enum {
 	OSD_TRANSPARENT,
@@ -107,6 +108,11 @@ private :
 	CRect	m_rectFlyBar;
 	CRect	m_rectCloseButton;
 	CRect	m_rectExitButton;
+	HBITMAP hBmp;
+	MPCPngImage m_bm;
+	int			m_nButtonHeight;
+	CImageList	*m_pButtonsImages;
+
 	CRect	m_rectCursor;
 	CRect	m_rectBar;
 	bool	m_bCursorMoving;

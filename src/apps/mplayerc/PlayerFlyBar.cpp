@@ -35,7 +35,8 @@ CFlyBar::CFlyBar() :
 	r_SettingsIcon(0,0,0,0),
 	r_InfoIcon(0,0,0,0),
 	r_FSIcon(0,0,0,0),
-	r_LockIcon(0,0,0,0)
+	r_LockIcon(0,0,0,0),
+	m_pButtonsImages(NULL)
 {
 	int fp = m_logobm.FileExists("flybar");
 
@@ -43,12 +44,36 @@ CFlyBar::CFlyBar() :
 	BITMAP bm;
 	::GetObject(hBmp, sizeof(bm), &bm);
 
-	if (fp && bm.bmWidth != bm.bmHeight * 23) {
+	if (fp && bm.bmWidth != bm.bmHeight * 25) {
 		hBmp = m_logobm.LoadExternalImage("", IDB_PLAYERFLYBAR_PNG, -1, -1, -1, -1, -1);
 		::GetObject(hBmp, sizeof(bm), &bm);
 	}
 
 	iw = bm.bmHeight;
+
+	if (NULL != hBmp) {
+		CBitmap *bmp = DNew CBitmap();
+		bmp->Attach(hBmp);
+		BITMAP bitmapBmp;
+		bmp->GetBitmap(&bitmapBmp);
+
+		if (bm.bmWidth == bm.bmHeight * 25) {
+
+			if (m_pButtonsImages) {
+				delete m_pButtonsImages;
+				m_pButtonsImages = NULL;
+			}
+
+			m_pButtonsImages = DNew CImageList();
+			
+			m_pButtonsImages->Create(bm.bmHeight, bm.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
+			m_pButtonsImages->Add(bmp, static_cast<CBitmap*>(0));
+
+		}
+
+		delete bmp;
+		DeleteObject(hBmp);
+	}
 }
 
 CFlyBar::~CFlyBar()
@@ -60,6 +85,9 @@ void CFlyBar::Destroy()
 {
 	if (hBmp) {
 		DeleteObject(hBmp);
+	}
+	if (m_pButtonsImages) {
+		delete m_pButtonsImages;
 	}
 }
 
@@ -149,22 +177,12 @@ void CFlyBar::CalcButtonsRect()
 	r_LockIcon		= CRect(rcBar.right-4-(iw*9), rcBar.top+4, rcBar.right-4-(iw*8), rcBar.bottom-4);
 }
 
-void CFlyBar::DrawBitmap(CDC *pDC, int x, int y, int z)
+void CFlyBar::DrawButton(CDC *pDC, int x, int y, int z)
 {
-	CDC *mdci = GetDC(), hdcSrc;
-	hdcSrc.CreateCompatibleDC(mdci);
-	hdcSrc.SelectObject(CBitmap::FromHandle(hBmp));
-
-	BLENDFUNCTION bf;
-	bf.AlphaFormat = AC_SRC_ALPHA;
-	bf.BlendFlags = 0;
-	bf.BlendOp = AC_SRC_OVER;
-	bf.SourceConstantAlpha = 0xFF;
-
-	pDC->AlphaBlend(x - 4 - (iw * z), 4, iw, iw, &hdcSrc, iw * y, 0, iw, iw, bf);
-
-	hdcSrc.DeleteDC();
-	mdci->DeleteDC();
+	HICON hIcon;
+	hIcon = m_pButtonsImages->ExtractIcon(y);
+	DrawIconEx(pDC->m_hDC, x - 4 - (iw * z),   4, hIcon, 0,0, 0, NULL, DI_NORMAL);
+	DestroyIcon(hIcon);
 }
 
 void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
@@ -315,51 +333,51 @@ void CFlyBar::OnPaint()
 
 		for (int i = 0; i < 2; i++) {
 
-			if (!i || bt_idx == 0) {
-				DrawBitmap(&mdc, x, sep[0][i], 1);
+			if (!i || bt_idx == 0) { // exit
+				DrawButton(&mdc, x, sep[0][i], 1);
 			}
 
-			if (!i || bt_idx == 1) {
-				DrawBitmap(&mdc, x, sep[1][i], 3);
+			if (!i || bt_idx == 1) { // min
+				DrawButton(&mdc, x, sep[1][i], 3);
 			}
 
-			if (!i || bt_idx == 2) {
+			if (!i || bt_idx == 2) { // restore
 				if (wp.showCmd == SW_SHOWMAXIMIZED) {
-					DrawBitmap(&mdc, x, sep[2][i], 2);
+					DrawButton(&mdc, x, sep[2][i], 2);
 				} else if (pFrame->m_fFullScreen) {
-					DrawBitmap(&mdc, x, sep[3][i], 2);
+					DrawButton(&mdc, x, sep[3][i], 2);
 				} else {
-					DrawBitmap(&mdc, x, sep[4][i], 2);
+					DrawButton(&mdc, x, sep[4][i], 2);
 				}
 			}
 
-			if (!i || bt_idx == 3) {
-				DrawBitmap(&mdc, x, sep[5][i], 7);
+			if (!i || bt_idx == 3) { // settings
+				DrawButton(&mdc, x, sep[5][i], 7);
 			}
 
-			if (!i || bt_idx == 4) {
+			if (!i || bt_idx == 4) { // info
 				if (fs != -1) {
-					DrawBitmap(&mdc, x, sep[6][i], 6);
+					DrawButton(&mdc, x, sep[6][i], 6);
 				} else {
-					DrawBitmap(&mdc, x, sep[7][i], 6);
+					DrawButton(&mdc, x, sep[7][i], 6);
 				}
 			}
 
-			if (!i || bt_idx == 5) {
+			if (!i || bt_idx == 5) { // fs
 				if (pFrame->m_fFullScreen) {
-					DrawBitmap(&mdc, x, sep[8][i], 4);
+					DrawButton(&mdc, x, sep[8][i], 4);
 				} else if (wp.showCmd == SW_SHOWMAXIMIZED || (s.IsD3DFullscreen() && fs != -1)) {
-					DrawBitmap(&mdc, x, sep[9][i], 4);
+					DrawButton(&mdc, x, sep[9][i], 4);
 				} else {
-					DrawBitmap(&mdc, x, sep[10][i], 4);
+					DrawButton(&mdc, x, sep[10][i], 4);
 				}
 			}
 
-			if (!i || bt_idx == 6) {
+			if (!i || bt_idx == 6) { // lock
 				if (s.fFlybarOnTop) {
-					DrawBitmap(&mdc, x, sep[11][i], 9);
+					DrawButton(&mdc, x, sep[11][i], 9);
 				} else {
-					DrawBitmap(&mdc, x, sep[12][i], 9);
+					DrawButton(&mdc, x, sep[12][i], 9);
 				}
 			}
 		}
