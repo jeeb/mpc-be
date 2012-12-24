@@ -785,6 +785,7 @@ public:
 	afx_msg void OnUpdateViewNormal(CCmdUI* pCmdUI);
 	afx_msg void OnViewFullscreen();
 	afx_msg void OnViewFullscreenSecondary();
+	afx_msg void OnMoveWindowToPrimaryScreen();
 	afx_msg void OnUpdateViewFullscreen(CCmdUI* pCmdUI);
 	afx_msg void OnViewZoom(UINT nID);
 	afx_msg void OnUpdateViewZoom(CCmdUI* pCmdUI);

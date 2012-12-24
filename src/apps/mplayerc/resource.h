@@ -1574,6 +1574,8 @@
 #define IDC_CHECK_SHADOW                44014
 #define IDC_CHECK_AA                    44015
 
+#define ID_WINDOW_TO_PRIMARYSCREEN		44101
+#define IDS_AG_WINDOW_TO_PRIMARYSCREEN	44102
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

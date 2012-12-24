@@ -313,6 +313,11 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_PRESETS_NORMAL, OnUpdateViewNormal)
 	ON_COMMAND(ID_VIEW_FULLSCREEN, OnViewFullscreen)
 	ON_COMMAND(ID_VIEW_FULLSCREEN_SECONDARY, OnViewFullscreenSecondary)
+	ON_COMMAND(ID_VIEW_FULLSCREEN, OnViewFullscreen)
+
+	ON_COMMAND(ID_WINDOW_TO_PRIMARYSCREEN, OnMoveWindowToPrimaryScreen)
+	
+
 	ON_UPDATE_COMMAND_UI(ID_VIEW_FULLSCREEN, OnUpdateViewFullscreen)
 	ON_COMMAND_RANGE(ID_VIEW_ZOOM_50, ID_VIEW_ZOOM_200, OnViewZoom)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_VIEW_ZOOM_50, ID_VIEW_ZOOM_200, OnUpdateViewZoom)
@@ -7385,6 +7390,27 @@ void CMainFrame::OnUpdateViewFullscreen(CCmdUI* pCmdUI)
 {
 	//pCmdUI->Enable(m_iMediaLoadState == MLS_LOADED && !m_fAudioOnly || m_fFullScreen);
 	//pCmdUI->SetCheck(m_fFullScreen);
+}
+
+void CMainFrame::OnMoveWindowToPrimaryScreen()
+{
+	AppSettings& s = AfxGetAppSettings();
+	if (m_fFullScreen) ToggleFullscreen(false,false);
+	if (!IsD3DFullScreenMode()){
+		HMONITOR hMonitor = MonitorFromWindow(NULL, MONITOR_DEFAULTTOPRIMARY);
+		int x, y;
+		CRect r;
+		GetClientRect(r);
+
+		MONITORINFO mi;
+		mi.cbSize = sizeof(MONITORINFO);
+		GetMonitorInfo(hMonitor, &mi);
+		
+		x = (mi.rcWork.left+mi.rcWork.right-r.Width())/2; // Center main window
+		y = (mi.rcWork.top+mi.rcWork.bottom-r.Height())/2;
+	
+		SetWindowPos(NULL, x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+	}
 }
 
 void CMainFrame::OnViewZoom(UINT nID)
