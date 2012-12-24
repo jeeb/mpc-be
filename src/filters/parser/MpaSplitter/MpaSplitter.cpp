@@ -212,7 +212,7 @@ bool CMpaSplitterFilter::DemuxLoop()
 	int FrameSize;
 	REFERENCE_TIME rtDuration;
 
-	while (SUCCEEDED(hr) && !CheckRequest(NULL) && m_pFile->GetPos() < m_pFile->GetEndPos() - 9) {
+	while (SUCCEEDED(hr) && !CheckRequest(NULL) && (m_pFile->GetPos() < m_pFile->GetEndPos() - 9 || m_pFile->IsStreaming())) {
 		if (!m_pFile->Sync(FrameSize, rtDuration)) {
 			Sleep(1);
 			continue;

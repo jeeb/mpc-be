@@ -78,7 +78,7 @@ static const LPCTSTR s_genre[] = {
 //
 
 CMpaSplitterFile::CMpaSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr)
-	: CBaseSplitterFileEx(pAsyncReader, hr, DEFAULT_CACHE_LENGTH, false)
+	: CBaseSplitterFileEx(pAsyncReader, hr, DEFAULT_CACHE_LENGTH, false, true)
 	, m_mode(none)
 	, m_rtDuration(0)
 	, m_startpos(0)
@@ -366,6 +366,12 @@ HRESULT CMpaSplitterFile::Init()
 		return E_FAIL;
 	}
 
+	if (IsStreaming()) {
+		for (int i = 0; i < 20 || i < 50 && S_OK != HasMoreData(1024*100, 100); i++) {
+			;
+		}
+	}
+
 	m_startpos = startpos;
 
 	if (m_mode == mpa) {
@@ -425,6 +431,8 @@ bool CMpaSplitterFile::Sync(int limit)
 
 bool CMpaSplitterFile::Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limit)
 {
+	m_endpos = GetLength();
+
 	__int64 endpos = min(m_endpos, GetPos() + limit);
 
 	if (m_mode == mpa) {
@@ -477,7 +485,7 @@ void CMpaSplitterFile::AdjustDuration(int nBytesPerSec)
 {
 	ASSERT(nBytesPerSec);
 
-	if (!m_bIsVBR) {
+	if (!m_bIsVBR && !IsStreaming()) {
 		int rValue;
 		if (!m_pos2bps.Lookup(GetPos(), rValue)) {
 			m_totalbps += nBytesPerSec;
