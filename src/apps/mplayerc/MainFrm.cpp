@@ -2340,6 +2340,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 				}
 
 				m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_LOCATION), Location);
+				CreateChapterTimeArray();
 
 				// Video
 
@@ -2693,6 +2694,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 						Domain.Format(ResStr(IDS_AG_TITLE), m_iDVDTitle);
 						m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_DOMAIN), Domain);
 					}
+					CreateChapterTimeArray();
 				}
 			}
 			break;
@@ -9433,6 +9435,7 @@ void CMainFrame::OnNavigateSkip(UINT nID)
 			m_OSD.DisplayMessage(OSD_TOPLEFT, m_strOSD, 3000);
 		}
 
+		CreateChapterTimeArray();
 		/*
 				if (nID == ID_NAVIGATE_SKIPBACK)
 					pDVDC->PlayPrevChapter(DVD_CMD_FLAG_Block, NULL);
@@ -12334,6 +12337,8 @@ CString CMainFrame::OpenDVD(OpenDVDData* pODD)
 	}
 
 	m_iDVDDomain = DVD_DOMAIN_Stop;
+
+	CreateChapterTimeArray();
 
 	SetPlaybackMode(PM_DVD);
 
@@ -18503,7 +18508,21 @@ void CMainFrame::CreateChapterTimeArray()
 			}
 		}
 	} else if (GetPlaybackMode() == PM_DVD) {
-		// TODO - support for DVD mode ...
+ 		WCHAR buff[_MAX_PATH];
+ 		ULONG len = 0;
+ 		DVD_PLAYBACK_LOCATION2 loc;
+ 		if (SUCCEEDED(pDVDI->GetDVDDirectory(buff, _countof(buff), &len)) && SUCCEEDED(pDVDI->GetCurrentLocation(&loc))) {
+ 			CStringW path;
+ 			path.Format(L"%s\\VTS_%02d_0.IFO", buff, loc.TitleNum);
+ 			CVobFile vob;
+ 			CAtlList<CString> files;
+ 			if(vob.Open(path, files)) {
+ 				for(int i=0; i<vob.GetChaptersCount(); i++) {
+ 					REFERENCE_TIME rt = vob.GetChapterOffset(i);
+					chaptersarray.Add(rt);
+ 				}
+			}
+		}
 	}
 }
 
