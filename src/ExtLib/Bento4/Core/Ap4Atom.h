@@ -343,6 +343,8 @@ const AP4_Atom::Type AP4_ATOM_TYPE_SAWB = AP4_ATOM_TYPE('s','a','w','b');
 
 const AP4_Atom::Type AP4_ATOM_TYPE_CHAP = AP4_ATOM_TYPE('c','h','a','p');
 
+const AP4_Atom::Type AP4_ATOM_TYPE_3IVD = AP4_ATOM_TYPE('3','I','V','D');
+
 /*----------------------------------------------------------------------
 |       AP4_AtomListInspector
 +---------------------------------------------------------------------*/
