@@ -8858,9 +8858,9 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 	pCmdUI->Enable(m_pCAP && !m_fAudioOnly);
 	
 	if (i == -7) {
-		pCmdUI->Enable(TRUE);
+		pCmdUI->Enable(m_pCAP && !b_UseVSFilter && !m_fAudioOnly);
 	} else if (i == -6) {
-		pCmdUI->Enable(GetPlaybackMode() == PM_FILE && AfxGetAppSettings().fEnableSubtitles);
+		pCmdUI->Enable((m_pCAP || b_UseVSFilter) && !m_fAudioOnly);
 	} else if (i == -5) {
 		// styles
 		pCmdUI->Enable(FALSE);
