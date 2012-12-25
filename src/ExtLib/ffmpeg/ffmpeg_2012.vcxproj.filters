@@ -109,6 +109,9 @@
     <None Include="libavcodec\x86\vc1dsp.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
+    <None Include="libavcodec\x86\videodsp.asm">
+      <Filter>libavcodec\x86</Filter>
+    </None>
     <None Include="libavcodec\x86\vp3dsp.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
@@ -251,6 +254,9 @@
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\adpcm_data.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="libavcodec\alac_data.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\amr.h">
@@ -742,6 +748,9 @@
     <ClInclude Include="libavcodec\version.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
+    <ClInclude Include="libavcodec\videodsp.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
     <ClInclude Include="libavcodec\vorbis.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
@@ -812,6 +821,9 @@
       <Filter>libavresample</Filter>
     </ClInclude>
     <ClInclude Include="libavresample\avresample.h">
+      <Filter>libavresample</Filter>
+    </ClInclude>
+    <ClInclude Include="libavresample\dither.h">
       <Filter>libavresample</Filter>
     </ClInclude>
     <ClInclude Include="libavresample\internal.h">
@@ -1083,6 +1095,9 @@
     <ClCompile Include="libavcodec\x86\vc1dsp_mmx.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
+    <ClCompile Include="libavcodec\x86\videodsp_init.c">
+      <Filter>libavcodec\x86</Filter>
+    </ClCompile>
     <ClCompile Include="libavcodec\x86\vp3dsp_init.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
@@ -1165,6 +1180,9 @@
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\alac.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\alac_data.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\allcodecs.c">
@@ -1779,6 +1797,12 @@
     <ClCompile Include="libavcodec\vc1dsp.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
+    <ClCompile Include="libavcodec\videodsp.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\videodsp_template.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
     <ClCompile Include="libavcodec\vorbis.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
@@ -1867,6 +1891,9 @@
       <Filter>libavresample</Filter>
     </ClCompile>
     <ClCompile Include="libavresample\audio_mix_matrix.c">
+      <Filter>libavresample</Filter>
+    </ClCompile>
+    <ClCompile Include="libavresample\dither.c">
       <Filter>libavresample</Filter>
     </ClCompile>
     <ClCompile Include="libavresample\options.c">

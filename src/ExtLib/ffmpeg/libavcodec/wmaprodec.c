@@ -299,7 +299,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
 
     } else {
         av_log_ask_for_sample(avctx, "Unknown extradata size\n");
-        return AVERROR_INVALIDDATA;
+        return AVERROR_PATCHWELCOME;
     }
 
     /** generic init */
@@ -690,7 +690,7 @@ static int decode_channel_transform(WMAProDecodeCtx* s)
         if (get_bits1(&s->gb)) {
             av_log_ask_for_sample(s->avctx,
                                   "unsupported channel transform bit\n");
-            return AVERROR_INVALIDDATA;
+            return AVERROR_PATCHWELCOME;
         }
 
         for (s->num_chgroups = 0; remaining_channels &&
@@ -1099,7 +1099,7 @@ static int decode_subframe(WMAProDecodeCtx *s)
     s->channels_for_cur_subframe = 0;
     for (i = 0; i < s->avctx->channels; i++) {
         const int cur_subframe = s->channel[i].cur_subframe;
-        /** substract already processed samples */
+        /** subtract already processed samples */
         total_samples -= s->channel[i].decoded_samples;
 
         /** and count if there are multiple subframes that match our profile */
@@ -1160,7 +1160,7 @@ static int decode_subframe(WMAProDecodeCtx *s)
     /** no idea for what the following bit is used */
     if (get_bits1(&s->gb)) {
         av_log_ask_for_sample(s->avctx, "reserved bit set\n");
-        return AVERROR_INVALIDDATA;
+        return AVERROR_PATCHWELCOME;
     }
 
 
