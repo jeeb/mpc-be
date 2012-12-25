@@ -47,10 +47,9 @@ private:
 	CRect r_FSIcon;
 	CRect r_LockIcon;
 
-	HBITMAP hBmp;
 	MPCPngImage m_logobm;
 	CToolTipCtrl m_tooltip;
-	CImageList	*m_pButtonsImages;
+	CImageList *m_pButtonsImages;
 
 	void Destroy();
 

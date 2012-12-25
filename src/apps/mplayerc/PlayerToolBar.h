@@ -43,7 +43,8 @@ private:
 	int			iMute;
 	CImageList	*m_pButtonsImages;
 
-	HBITMAP		m_hDXVAIcon;
+	CImageList	*m_pButtonDXVA;
+	HICON		m_hDXVAIcon;
 
 public:
 	CPlayerToolBar();

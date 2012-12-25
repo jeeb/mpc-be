@@ -40,7 +40,7 @@ CFlyBar::CFlyBar() :
 {
 	int fp = m_logobm.FileExists("flybar");
 
-	hBmp = m_logobm.LoadExternalImage("flybar", IDB_PLAYERFLYBAR_PNG, -1, -1, -1, -1, -1);
+	HBITMAP hBmp = m_logobm.LoadExternalImage("flybar", IDB_PLAYERFLYBAR_PNG, -1, -1, -1, -1, -1);
 	BITMAP bm;
 	::GetObject(hBmp, sizeof(bm), &bm);
 
@@ -49,24 +49,16 @@ CFlyBar::CFlyBar() :
 		::GetObject(hBmp, sizeof(bm), &bm);
 	}
 
-	iw = bm.bmHeight;
-
 	if (NULL != hBmp) {
 		CBitmap *bmp = DNew CBitmap();
 		bmp->Attach(hBmp);
-		BITMAP bitmapBmp;
-		bmp->GetBitmap(&bitmapBmp);
 
 		if (bm.bmWidth == bm.bmHeight * 25) {
-
-			if (m_pButtonsImages) {
-				delete m_pButtonsImages;
-				m_pButtonsImages = NULL;
-			}
-
 			m_pButtonsImages = DNew CImageList();
 			m_pButtonsImages->Create(bm.bmHeight, bm.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
 			m_pButtonsImages->Add(bmp, static_cast<CBitmap*>(0));
+
+			iw = bm.bmHeight;
 		}
 
 		delete bmp;
@@ -81,10 +73,6 @@ CFlyBar::~CFlyBar()
 
 void CFlyBar::Destroy()
 {
-	if (hBmp) {
-		DeleteObject(hBmp);
-	}
-
 	if (m_pButtonsImages) {
 		delete m_pButtonsImages;
 	}

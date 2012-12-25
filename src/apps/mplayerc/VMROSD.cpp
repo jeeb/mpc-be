@@ -61,10 +61,9 @@ CVMROSD::CVMROSD(void)
 	bMouseOverCloseButton	= false;
 	m_bShowMessage			= true;
 
-	m_pButtonsImages = NULL;
 	int fp = m_bm.FileExists("flybar");
 
-	hBmp = m_bm.LoadExternalImage("flybar", IDB_PLAYERFLYBAR_PNG, -1, -1, -1, -1, -1);
+	HBITMAP hBmp = m_bm.LoadExternalImage("flybar", IDB_PLAYERFLYBAR_PNG, -1, -1, -1, -1, -1);
 	BITMAP bm;
 	::GetObject(hBmp, sizeof(bm), &bm);
 
@@ -76,21 +75,13 @@ CVMROSD::CVMROSD(void)
 	if (NULL != hBmp) {
 		CBitmap *bmp = DNew CBitmap();
 		bmp->Attach(hBmp);
-		BITMAP bitmapBmp;
-		bmp->GetBitmap(&bitmapBmp);
 
 		if (bm.bmWidth == bm.bmHeight * 25) {
-
-			if (m_pButtonsImages) {
-				delete m_pButtonsImages;
-				m_pButtonsImages = NULL;
-			}
-
 			m_pButtonsImages = DNew CImageList();
 			m_pButtonsImages->Create(bm.bmHeight, bm.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
 			m_pButtonsImages->Add(bmp, static_cast<CBitmap*>(0));
 
-			m_nButtonHeight = bitmapBmp.bmHeight;
+			m_nButtonHeight = bm.bmHeight;
 		}
 
 		delete bmp;
@@ -101,10 +92,6 @@ CVMROSD::CVMROSD(void)
 CVMROSD::~CVMROSD(void)
 {
 	m_MemDC.DeleteDC();
-
-	if (hBmp) {
-		DeleteObject(hBmp);
-	}
 
 	if (m_pButtonsImages) {
 		delete m_pButtonsImages;

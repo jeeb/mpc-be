@@ -37,17 +37,38 @@ CPlayerToolBar::CPlayerToolBar()
 	: fDisableImgListRemap(false)
 	, m_pButtonsImages(NULL)
 {
-	m_hDXVAIcon = m_logobm.LoadExternalImage("gpu", IDB_DXVA_ON, -1, -1, -1, -1, -1);
+	m_hDXVAIcon = NULL;
+
+	HBITMAP hBmp = m_logobm.LoadExternalImage("gpu", IDB_DXVA_ON, -1, -1, -1, -1, -1);
+	BITMAP bm;
+	::GetObject(hBmp, sizeof(bm), &bm);
+
+	if (fp && (bm.bmWidth != 24 || bm.bmHeight != 16)) {
+		hBmp = m_logobm.LoadExternalImage("", IDB_DXVA_ON, -1, -1, -1, -1, -1);
+		::GetObject(hBmp, sizeof(bm), &bm);
+	}
+
+	if (bm.bmWidth == 24 && bm.bmHeight == 16) {
+		CBitmap *bmp = DNew CBitmap();
+		bmp->Attach(hBmp);
+
+		m_pButtonDXVA = DNew CImageList();
+		m_pButtonDXVA->Create(bm.bmWidth, bm.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
+		m_pButtonDXVA->Add(bmp, static_cast<CBitmap*>(0));
+
+		m_hDXVAIcon = m_pButtonDXVA->ExtractIcon(0);
+
+		delete m_pButtonDXVA;
+		delete bmp;
+	}
+
+	DeleteObject(hBmp);
 }
 
 CPlayerToolBar::~CPlayerToolBar()
 {
 	if (m_pButtonsImages) {
 		delete m_pButtonsImages;
-	}
-
-	if (m_hDXVAIcon) {
-		DeleteObject(m_hDXVAIcon);
 	}
 }
 
@@ -561,7 +582,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			CRect r12; //MUTE
 			GetItemRect(12, &r12);
 			if (bGPU && m_hDXVAIcon) {
-				m_logobm.DrawTransparentBitmap(GetDC(), &dc, r12.left - 36, r.CenterPoint().y - 9, m_hDXVAIcon);
+				DrawIconEx(dc.m_hDC, r12.left - 36, r.CenterPoint().y - 9, m_hDXVAIcon, 0, 0, 0, NULL, DI_NORMAL);
 			}
 
 			dc.SelectObject(&penSaved);

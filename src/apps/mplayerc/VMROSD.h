@@ -108,7 +108,7 @@ private :
 	CRect	m_rectFlyBar;
 	CRect	m_rectCloseButton;
 	CRect	m_rectExitButton;
-	HBITMAP hBmp;
+
 	MPCPngImage m_bm;
 	int			m_nButtonHeight;
 	CImageList	*m_pButtonsImages;
