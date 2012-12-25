@@ -65,10 +65,8 @@ CFlyBar::CFlyBar() :
 			}
 
 			m_pButtonsImages = DNew CImageList();
-			
 			m_pButtonsImages->Create(bm.bmHeight, bm.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
 			m_pButtonsImages->Add(bmp, static_cast<CBitmap*>(0));
-
 		}
 
 		delete bmp;
@@ -86,6 +84,7 @@ void CFlyBar::Destroy()
 	if (hBmp) {
 		DeleteObject(hBmp);
 	}
+
 	if (m_pButtonsImages) {
 		delete m_pButtonsImages;
 	}
@@ -179,9 +178,8 @@ void CFlyBar::CalcButtonsRect()
 
 void CFlyBar::DrawButton(CDC *pDC, int x, int y, int z)
 {
-	HICON hIcon;
-	hIcon = m_pButtonsImages->ExtractIcon(y);
-	DrawIconEx(pDC->m_hDC, x - 4 - (iw * z),   4, hIcon, 0,0, 0, NULL, DI_NORMAL);
+	HICON hIcon = m_pButtonsImages->ExtractIcon(y);
+	DrawIconEx(pDC->m_hDC, x - 4 - (iw * z), 4, hIcon, 0, 0, 0, NULL, DI_NORMAL);
 	DestroyIcon(hIcon);
 }
 

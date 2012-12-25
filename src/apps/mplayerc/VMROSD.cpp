@@ -87,7 +87,6 @@ CVMROSD::CVMROSD(void)
 			}
 
 			m_pButtonsImages = DNew CImageList();
-			
 			m_pButtonsImages->Create(bm.bmHeight, bm.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
 			m_pButtonsImages->Add(bmp, static_cast<CBitmap*>(0));
 
@@ -97,7 +96,6 @@ CVMROSD::CVMROSD(void)
 		delete bmp;
 		DeleteObject(hBmp);
 	}
-	
 }
 
 CVMROSD::~CVMROSD(void)
@@ -120,12 +118,10 @@ void CVMROSD::OnSize(UINT nType, int cx, int cy)
 			m_bCursorMoving		= false;
 			m_bSeekBarVisible	= false;
 			m_bFlyBarVisible	= false;
-			
 		}
 		Invalidate();
 		UpdateBitmap();
 	}
-	
 }
 
 void CVMROSD::UpdateBitmap()
@@ -429,7 +425,6 @@ void CVMROSD::DrawMessage()
 		m_MemDC.SetTextColor(AfxGetAppSettings().clrFontABGR);
 		m_MemDC.DrawText (m_strMessage, &r, uFormat);	
 	}
-
 }
 
 void CVMROSD::DrawDebug()
@@ -698,8 +693,6 @@ void CVMROSD::DisplayMessage (OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration
 			m_OSD_Font = OSD_Font;
 		}
 
-		
-
 		//if ((temp_m_FontSize != m_FontSize) || (temp_m_OSD_Font != m_OSD_Font)) {
 			if (m_MainFont.GetSafeHandle()) {
 				m_MainFont.DeleteObject();
@@ -753,7 +746,6 @@ void CVMROSD::HideMessage(bool hide)
 	}
 }
 
-
 void CVMROSD::HideExclusiveBars()
 {
 	if (m_pVMB || m_pMFVMB) {
@@ -769,7 +761,6 @@ void CVMROSD::HideExclusiveBars()
 		}
 	}
 }
-
 
 void CVMROSD::EnableShowMessage(bool enabled)
 {
