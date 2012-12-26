@@ -56,10 +56,10 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 		char *out = NULL;
 		HINTERNET f, s = InternetOpen(0, 0, 0, 0, 0);
 		if (s) {
-			f = InternetOpenUrl(s, fn, 0, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE, 0);
+			f = InternetOpenUrl(s, fn, 0, 0, INTERNET_FLAG_TRANSFER_ASCII | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 			if (f) {
-				char buf[4096];
-				DWORD len, size = 0, end_pos = 0, fs = 16 * sizeof(buf);
+				char buf[8192];
+				DWORD len, size = 0, end_pos = 0, fs = sizeof(buf) * 16;
 
 				out = (char*)malloc(fs + 1);
 				memset(out, 0, fs + 1);
@@ -128,9 +128,9 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 		DWORD i, k, l, lastpos = 0;
 
 		for (;;) {
-			k = strpos(out + lastpos, "%2Curl%3Dhttp%253A%252F%252F");
+			k = strpos(out + lastpos, "%26url%3Dhttp%253A%252F%252F");
 			if (!k) {
-				k = strpos(out + lastpos, "%26url%3Dhttp%253A%252F%252F");
+				k = strpos(out + lastpos, "%2Curl%3Dhttp%253A%252F%252F");
 			}
 
 			if (k) {
