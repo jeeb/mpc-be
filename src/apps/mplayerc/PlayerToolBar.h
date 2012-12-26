@@ -45,6 +45,8 @@ private:
 
 	CImageList	*m_pButtonDXVA;
 	HICON		m_hDXVAIcon;
+	int iDXVAIconHeight;
+	int iDXVAIconWidth;
 
 public:
 	CPlayerToolBar();

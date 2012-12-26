@@ -38,17 +38,19 @@ CPlayerToolBar::CPlayerToolBar()
 	, m_pButtonsImages(NULL)
 {
 	m_hDXVAIcon = NULL;
+	
+	int fp = m_logobm.FileExists("gpu");
 
 	HBITMAP hBmp = m_logobm.LoadExternalImage("gpu", IDB_DXVA_ON, -1, -1, -1, -1, -1);
 	BITMAP bm;
 	::GetObject(hBmp, sizeof(bm), &bm);
 
-	if (fp && (bm.bmWidth != 24 || bm.bmHeight != 16)) {
+	if (fp && (bm.bmHeight > 32 || bm.bmWidth > 32)) {
 		hBmp = m_logobm.LoadExternalImage("", IDB_DXVA_ON, -1, -1, -1, -1, -1);
 		::GetObject(hBmp, sizeof(bm), &bm);
 	}
 
-	if (bm.bmWidth == 24 && bm.bmHeight == 16) {
+	if (bm.bmWidth <= 32 && bm.bmHeight <= 32) {
 		CBitmap *bmp = DNew CBitmap();
 		bmp->Attach(hBmp);
 
@@ -61,7 +63,8 @@ CPlayerToolBar::CPlayerToolBar()
 		delete m_pButtonDXVA;
 		delete bmp;
 	}
-
+	iDXVAIconHeight = bm.bmHeight;
+	iDXVAIconWidth	= bm.bmWidth;
 	DeleteObject(hBmp);
 }
 
@@ -578,11 +581,14 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 					dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 				}
 			}
+			CRect r10; //MUTE
+			GetItemRect(10, &r10);
 
 			CRect r12; //MUTE
 			GetItemRect(12, &r12);
+
 			if (bGPU && m_hDXVAIcon) {
-				DrawIconEx(dc.m_hDC, r12.left - 36, r.CenterPoint().y - 9, m_hDXVAIcon, 0, 0, 0, NULL, DI_NORMAL);
+				if (r10.right < r12.left - iDXVAIconWidth) DrawIconEx(dc.m_hDC, r12.left - 8 - iDXVAIconWidth, r.CenterPoint().y - (iDXVAIconHeight/2+1), m_hDXVAIcon, 0, 0, 0, NULL, DI_NORMAL);
 			}
 
 			dc.SelectObject(&penSaved);
