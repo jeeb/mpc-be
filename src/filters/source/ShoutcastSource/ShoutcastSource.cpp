@@ -333,13 +333,13 @@ BOOL CShoutcastStream::CShoutcastSocket::OnMessagePending()
 	return __super::OnMessagePending();
 }
 
-bool CShoutcastStream::CShoutcastSocket::SetTimeOut(UINT uTimeOut)
+BOOL CShoutcastStream::CShoutcastSocket::SetTimeOut(UINT uTimeOut)
 {
 	m_nTimerID = SetTimer(NULL, 0, uTimeOut, NULL);
-	return m_nTimerID;
+	return (m_nTimerID != 0);
 }
 
-bool CShoutcastStream::CShoutcastSocket::KillTimeOut()
+BOOL CShoutcastStream::CShoutcastSocket::KillTimeOut()
 {
 	return KillTimer(NULL,m_nTimerID);
 }

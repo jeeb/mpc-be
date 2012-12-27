@@ -168,8 +168,8 @@ class CShoutcastStream : public CSourceStream
 		bool Connect(CUrl& url);
 		bool FindSync();
 
-		bool SetTimeOut(UINT uTimeOut);
-		bool KillTimeOut();
+		BOOL SetTimeOut(UINT uTimeOut);
+		BOOL KillTimeOut();
 	} m_socket;
 
 	HANDLE m_hSocketThread;

@@ -649,6 +649,7 @@ BOOL CPPageFormats::OnInitDialog()
 		GetDlgItem(IDC_BUTTON1)->ShowWindow (SW_HIDE);
 		GetDlgItem(IDC_BUTTON3)->ShowWindow (SW_HIDE);
 		GetDlgItem(IDC_BUTTON4)->ShowWindow (SW_HIDE);
+		GetDlgItem(IDC_BUTTON6)->ShowWindow (SW_HIDE);
 		GetDlgItem(IDC_CHECK1)->EnableWindow (FALSE);
 		GetDlgItem(IDC_CHECK2)->EnableWindow (FALSE);
 		GetDlgItem(IDC_CHECK3)->EnableWindow (FALSE);
