@@ -18484,8 +18484,8 @@ CString CMainFrame::FillMessage()
 		EndEnumFilters;
 	} else if (pAMOP) {
 		__int64 t = 0, c = 0;
-		if (SUCCEEDED(pAMOP->QueryProgress(&t, &c)) && t > 0 && c < t) {
-			msg.Format(ResStr(IDS_CONTROLS_BUFFERING), c*100/t);
+		if (SUCCEEDED(pMS->GetDuration(&t)) && t > 0 && SUCCEEDED(pAMOP->QueryProgress(&t, &c)) && t > 0 && c < t) {
+			msg.Format(ResStr(IDS_CONTROLS_BUFFERING), c * 100 / t);
 		}
 
 		if (m_fUpdateInfoBar) {
