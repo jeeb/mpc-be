@@ -25,6 +25,8 @@
 
 #include "../BaseSplitter/BaseSplitter.h"
 
+#define MAX_PAGE_SIZE 65536
+
 #pragma pack(push, 1)
 
 struct OggPageHeader {

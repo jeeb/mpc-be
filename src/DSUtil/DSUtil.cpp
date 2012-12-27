@@ -3034,6 +3034,16 @@ void LOG2FILE(LPCTSTR fmt, ...)
 	va_end(args);
 }
 
+void LOG2FILE(CString txt)
+{
+	CStdioFile file;
+	if (file.Open(_T("mpc-be.log"), CFile::modeCreate|CFile::modeWrite|CFile::modeNoTruncate|CFile::typeText)) {
+		file.SeekToEnd();
+		file.WriteString(txt);
+		file.Close();
+	}
+}
+
 CStringA VobSubDefHeader(int w, int h, CStringA palette)
 {
 	CStringA def_palette = "000000,e0e0e0,808080,202020,3333fa,1111bb,fa3333,bb1111,33fa33,11bb11,fafa33,bbbb11,fa33fa,bb11bb,33fafa,11bbbb";

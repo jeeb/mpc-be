@@ -290,12 +290,58 @@ CShoutcastStream::CShoutcastStream(const WCHAR* wfn, CShoutcastSource* pParent, 
 		return;
 	}
 
-	if (!m_socket.Create() || !m_socket.Connect(m_url)) {
+	if (!m_socket.Create()) {
 		*phr = E_FAIL;
 		return;
 	}
 
+	// set 3sec. timeout for connect
+	if (!m_socket.SetTimeOut(3000)) {
+		TRACE(_T("CShoutcastStream(): Unable to set Timeout\n"));
+	}
+
+	if (!m_socket.Connect(m_url)) {
+		int nError = GetLastError();
+		if (nError == WSAEINTR) {
+			TRACE(_T("CShoutcastStream(): failed connect for 3 secs!\n"));
+		}
+
+		m_socket.KillTimeOut();
+		*phr = E_FAIL;
+		return;
+	}
+
+	m_socket.KillTimeOut();
+
 	m_socket.Close();
+}
+
+BOOL CShoutcastStream::CShoutcastSocket::OnMessagePending()
+{
+	MSG msg;
+
+	if (::PeekMessage(&msg, NULL, WM_TIMER, WM_TIMER, PM_REMOVE)) {
+		if (msg.wParam == (UINT) m_nTimerID) {
+			TRACE(_T("OnMessagePending(WM_TIMER) PASSED!\n"));
+			// Remove the message and call CancelBlockingCall.
+			::PeekMessage(&msg, NULL, WM_TIMER, WM_TIMER, PM_REMOVE);
+			CancelBlockingCall();
+			return FALSE;  // No need for idle time processing.
+		};
+	};
+
+	return __super::OnMessagePending();
+}
+
+bool CShoutcastStream::CShoutcastSocket::SetTimeOut(UINT uTimeOut)
+{
+	m_nTimerID = SetTimer(NULL, 0, uTimeOut, NULL);
+	return m_nTimerID;
+}
+
+bool CShoutcastStream::CShoutcastSocket::KillTimeOut()
+{
+	return KillTimer(NULL,m_nTimerID);
 }
 
 CShoutcastStream::~CShoutcastStream()
@@ -627,6 +673,10 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url)
 	if (!__super::Connect(url.GetHostName(), url.GetPortNumber())) {
 		return false;
 	}
+	KillTimeOut();
+
+	// set 10sec. timeout for data receive
+	SetTimeOut(10000);
 
 	CStringA str;
 	str.Format(
@@ -689,6 +739,8 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url)
 			fTryAgain = false;
 		}
 	} while (fTryAgain);
+
+	KillTimeOut();
 
 	if (!fOK || m_bitrate == 0) {
 		Close();

@@ -146,6 +146,8 @@ public:
 COggSplitterFilter::COggSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("COggSplitterFilter"), pUnk, phr, __uuidof(this))
 	, m_bIsTheora(false)
+	, m_rtMin(0)
+	, m_rtMax(0)
 {
 }
 
@@ -313,22 +315,57 @@ HRESULT COggSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		return E_FAIL;
 	}
 
+	// it's a magic - to determine the correct length to play
 	if (m_pFile->IsRandomAccess()) {
-		m_pFile->Seek(max(m_pFile->GetLength()-65536, 0));
+		int step = 1;
+		while (!m_rtDuration && step <= 10) {
+			m_pFile->Seek(max(m_pFile->GetLength()-(MAX_PAGE_SIZE*step), 0));
 
-		OggPage page;
-		while (m_pFile->Read(page)) {
-			COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
-			if (!pOggPin || page.m_hdr.granule_position == -1) {
-				continue;
+			if (m_pFile->GetPos() < MAX_PAGE_SIZE) {
+				break;
 			}
-			REFERENCE_TIME rt = pOggPin->GetRefTime(page.m_hdr.granule_position);
-			m_rtDuration = max(rt, m_rtDuration);
+
+			OggPage page;
+			while (m_pFile->Read(page)) {
+
+				if (m_pFile->GetPos() >= max(m_pFile->GetLength()-(MAX_PAGE_SIZE*(step-1)), 0)) {
+					break;
+				}
+
+				COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
+				if (!pOggPin || page.m_hdr.granule_position == -1) {
+					continue;
+				}
+				REFERENCE_TIME rt = pOggPin->GetRefTime(page.m_hdr.granule_position);
+				m_rtDuration = max(rt, m_rtDuration);
+			}
+
+			step++;
 		}
 	}
 
-	m_rtNewStart = m_rtCurrent = 0;
-	m_rtNewStop = m_rtStop = m_rtDuration;
+	m_pFile->Seek(0);
+
+	OggPage page2;
+	while (m_pFile->Read(page2)) {
+		COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page2.m_hdr.bitstream_serial_number));
+		if (!pOggPin || page2.m_hdr.granule_position == -1 || page2.m_hdr.granule_position == 0 || page2.m_hdr.header_type_flag) {
+			continue;
+		}
+		REFERENCE_TIME rt = pOggPin->GetRefTime(page2.m_hdr.granule_position);
+		if (rt != _I64_MIN) {
+			m_rtMin = rt;
+			break;
+		}
+	}
+
+	m_pFile->Seek(0);
+
+	m_rtNewStart = m_rtCurrent = m_rtMin;
+	m_rtDuration	-= m_rtNewStart;
+	m_rtDuration	= max(0, m_rtDuration);
+
+	m_rtMax = m_rtNewStop = m_rtStop = m_rtDuration;
 
 	// comments
 	{
@@ -406,6 +443,10 @@ bool COggSplitterFilter::DemuxInit()
 
 void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
+	if (rt > m_rtDuration) {
+		rt -= m_rtMin;
+	}
+
 	if (rt <= 0 ) {
 		m_pFile->Seek(0);
 	} else if (m_rtDuration > 0) {
@@ -434,7 +475,7 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 					continue;
 				}
 
-				rtPos = pOggPin->GetRefTime(page.m_hdr.granule_position);
+				rtPos = pOggPin->GetRefTime(page.m_hdr.granule_position) - m_rtMin;
 				endpos = m_pFile->GetPos();
 
 				break;
@@ -503,7 +544,7 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 						continue;
 					}
 
-					if (pPin->GetRefTime(page.m_hdr.granule_position) > rt) {
+					if ((pPin->GetRefTime(page.m_hdr.granule_position) - m_rtMin) > rt) {
 						break;
 					}
 
@@ -536,13 +577,13 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 				if (!(fKeyFrameFound && !fSkipKeyFrame)) {
 					endpos = startpos;
-					startpos = max(startpos - 10*65536, 0);
+					startpos = max(startpos - 10*MAX_PAGE_SIZE, 0);
 				}
 
 				m_pFile->Seek(startpos);
 			}
 
-#ifdef _DEBUG
+#if _DEBUG && 0
 			// verify kf
 			{
 				fKeyFrameFound = false;
@@ -557,7 +598,7 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 						continue;
 					}
 
-					REFERENCE_TIME rtPos = pPin->GetRefTime(page.m_hdr.granule_position);
+					REFERENCE_TIME rtPos = pPin->GetRefTime(page.m_hdr.granule_position) - m_rtMin;
 					if (rtPos > rt) {
 						break;
 					}
@@ -572,8 +613,6 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 						}
 					}
 				}
-
-				//ASSERT(fKeyFrameFound);
 
 				m_pFile->Seek(startpos);
 			}
@@ -596,7 +635,6 @@ bool COggSplitterFilter::DemuxLoop()
 
 		COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
 		if (!pOggPin) {
-			//ASSERT(0);
 			continue;
 		}
 		if (!pOggPin->IsConnected()) {
@@ -640,6 +678,7 @@ COggSourceFilter::COggSourceFilter(LPUNKNOWN pUnk, HRESULT* phr)
 
 COggSplitterOutputPin::COggSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseSplitterOutputPin(pName, pFilter, pLock, phr)
+	, m_pFilter(pFilter)
 {
 	ResetState((DWORD)-1);
 }
@@ -761,7 +800,8 @@ HRESULT COggSplitterOutputPin::UnpackPage(OggPage& page)
 				if (last == pos && page.m_hdr.granule_position != -1) {
 					p->bDiscontinuity = m_fSkip;
 					REFERENCE_TIME rtLast = m_rtLast;
-					m_rtLast = GetRefTime(page.m_hdr.granule_position);
+					m_rtLast = GetRefTime(page.m_hdr.granule_position) - (dynamic_cast<COggSplitterFilter*>(m_pFilter))->m_rtMin;
+
 					// some bad encodings have a +/-1 frame difference from the normal timeline,
 					// but these seem to cancel eachother out nicely so we can just ignore them
 					// to make it play a bit more smooth.

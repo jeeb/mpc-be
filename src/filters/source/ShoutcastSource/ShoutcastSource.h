@@ -152,6 +152,10 @@ class CShoutcastStream : public CSourceStream
 	class CShoutcastSocket : public CSocket
 	{
 		DWORD m_nBytesRead;
+		int m_nTimerID;
+
+	protected:
+		virtual BOOL OnMessagePending();
 
 	public:
 		CShoutcastSocket() {
@@ -163,6 +167,9 @@ class CShoutcastStream : public CSourceStream
 		CString m_title, m_url;
 		bool Connect(CUrl& url);
 		bool FindSync();
+
+		bool SetTimeOut(UINT uTimeOut);
+		bool KillTimeOut();
 	} m_socket;
 
 	HANDLE m_hSocketThread;
