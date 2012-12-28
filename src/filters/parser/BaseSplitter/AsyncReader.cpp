@@ -156,7 +156,24 @@ CAsyncUrlReader::CAsyncUrlReader(CString url, HRESULT& hr)
 	}
 
 	hr = Open(m_fn, modeRead|shareDenyRead|typeBinary|osSequentialScan) ? S_OK : E_FAIL;
-	m_len = (ULONGLONG)-1; // force GetLength() return actual length always
+
+	DWORD dwLength=32,npos=0;
+	char dwData[sizeof(dwLength)];
+	HINTERNET f,s=InternetOpen(0,0,0,0,0);
+	if (s) {
+		f=InternetOpenUrlW(s,url,0,0,INTERNET_FLAG_TRANSFER_BINARY|INTERNET_FLAG_EXISTING_CONNECT|INTERNET_FLAG_NO_CACHE_WRITE|INTERNET_FLAG_RELOAD,0);
+		if (f) {
+			HttpQueryInfo(f,HTTP_QUERY_CONTENT_LENGTH,dwData,&dwLength,0);
+			npos=atoi(dwData);
+			if (npos) {
+				m_len = (ULONGLONG)npos;
+			} else {
+				m_len = (ULONGLONG)-1;
+			}
+			InternetCloseHandle(f);
+		}
+		InternetCloseHandle(s);
+	}
 }
 
 CAsyncUrlReader::~CAsyncUrlReader()
@@ -195,7 +212,7 @@ DWORD CAsyncUrlReader::ThreadProc()
 
 	try {
 		CInternetSession is;
-		CAutoPtr<CStdioFile> fin(is.OpenURL(m_url, 1, INTERNET_FLAG_TRANSFER_BINARY|INTERNET_FLAG_EXISTING_CONNECT|INTERNET_FLAG_NO_CACHE_WRITE));
+		CAutoPtr<CStdioFile> fin(is.OpenURL(m_url, 1, INTERNET_FLAG_TRANSFER_BINARY|INTERNET_FLAG_EXISTING_CONNECT|INTERNET_FLAG_NO_CACHE_WRITE|INTERNET_FLAG_RELOAD));
 
 		TCHAR path[_MAX_PATH], fn[_MAX_PATH];
 		CFile fout;
@@ -205,7 +222,7 @@ DWORD CAsyncUrlReader::ThreadProc()
 			m_fn = fn;
 			Reply(S_OK);
 
-			char buff[4096];
+			char buff[8192];
 			while (!CheckRequest(&cmd)) {
 				int len = fin->Read(buff, sizeof(buff));
 				if (!len) {
