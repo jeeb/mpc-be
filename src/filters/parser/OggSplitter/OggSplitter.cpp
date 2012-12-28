@@ -361,8 +361,7 @@ HRESULT COggSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	m_pFile->Seek(0);
 
-	m_rtNewStart = m_rtCurrent = m_rtMin;
-	m_rtDuration	-= m_rtNewStart;
+	m_rtDuration	-= m_rtMin;
 	m_rtDuration	= max(0, m_rtDuration);
 
 	m_rtMax = m_rtNewStop = m_rtStop = m_rtDuration;
@@ -471,7 +470,7 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 				COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
 				if (!pOggPin) {
-					ASSERT(0);
+					//ASSERT(0);
 					continue;
 				}
 
