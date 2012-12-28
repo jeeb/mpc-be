@@ -16155,6 +16155,14 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool fSeekToKeyFrame)
 
 	if (GetPlaybackMode() == PM_FILE) {
 
+		REFERENCE_TIME total = 0;
+		if (pMS) {
+			pMS->GetDuration(&total);
+		}
+		if (!total) {
+			return;
+		}
+
 		if (fs == State_Stopped) {
 			SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
 		}
