@@ -57,6 +57,12 @@ bool COggFile::Sync(HANDLE hBreak)
 {
 	__int64 start = GetPos();
 
+	if (IsStreaming()) {
+		for (int i = 0; i < 20 || i < 50 && S_OK != HasMoreData(MAX_PAGE_SIZE, 100); i++) {
+			;
+		}
+	}
+
 	DWORD dw;
 	for (__int64 i = 0, j = hBreak ? GetLength() - start : MAX_PAGE_SIZE;
 			i < j && S_OK == ByteRead((BYTE*)&dw, sizeof(dw))
