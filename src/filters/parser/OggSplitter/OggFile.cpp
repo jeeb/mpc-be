@@ -25,7 +25,7 @@
 #include "OggFile.h"
 
 COggFile::COggFile(IAsyncReader* pAsyncReader, HRESULT& hr)
-	: CBaseSplitterFile(pAsyncReader, hr, DEFAULT_CACHE_LENGTH, false)
+	: CBaseSplitterFile(pAsyncReader, hr, DEFAULT_CACHE_LENGTH, false, true)
 {
 	if (FAILED(hr)) {
 		return;
@@ -39,6 +39,13 @@ HRESULT COggFile::Init()
 	if (BitRead(32, true) != 'OggS') {
 		return E_FAIL;
 	}
+
+	if (IsStreaming()) {
+		for (int i = 0; i < 20 || i < 50 && S_OK != HasMoreData(MAX_PAGE_SIZE, 100); i++) {
+			;
+		}
+	}
+
 	if (!Sync()) {
 		return E_FAIL;
 	}

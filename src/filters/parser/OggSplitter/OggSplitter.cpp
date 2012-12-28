@@ -963,6 +963,12 @@ REFERENCE_TIME COggVorbisOutputPin::GetRefTime(__int64 granule_position)
 
 HRESULT COggVorbisOutputPin::UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, int len)
 {
+	if (len >= 7 && !memcmp(pData+1, "vorbis", 6)) {
+		if (IsInitialized()) {
+			return E_FAIL; // skip Vorbis header packets ...
+		}
+	}
+
 	if (len > 0 && m_blockflags.GetCount()) {
 		bitstream bs(pData, len);
 		if (bs.getbits(1) == 0) {
