@@ -375,6 +375,9 @@
     <ClCompile Include="..\..\ExtLib\stb_image\stb_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerYouTube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSettings.h">
@@ -988,9 +991,6 @@
     <None Include="res\shaders\YV12ChromaUpsampling.psh">
       <Filter>Resource Files\shaders</Filter>
     </None>
-    <None Include="res\flybar.bmp">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="res\toolbar.bmp">
       <Filter>Resource Files</Filter>
     </None>
@@ -1003,6 +1003,7 @@
     <None Include="res\gpu.png">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="res\flybar.png" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="mplayerc.rc">

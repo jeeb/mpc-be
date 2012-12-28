@@ -13422,8 +13422,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		UINT index = 0;
 		while ( pos != NULL ) {
 			CString path = pFileData->fns.GetNext( pos );
-			//TRACE(_T("--> CMainFrame::OpenMediaPrivate - pFileData->fns[%d]:\n"), index);
-			//TRACE(_T("\t%ws\n"), path.GetString()); // %ws - wide character string always
+			TRACE(_T("--> CMainFrame::OpenMediaPrivate() - pFileData->fns[%d]:\n"), index);
+			TRACE(_T("\t%ws\n"), path.GetString()); // %ws - wide character string always
 			index++;
 		}
 	}
