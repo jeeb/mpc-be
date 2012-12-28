@@ -295,13 +295,13 @@ HRESULT FFH264BuildPicParams (DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_
 	HRESULT					hr = E_FAIL;
 	const					Picture *current_picture = s->current_picture_ptr;
 
-	field_pic_flag = (h->s.picture_structure != PICT_FRAME);
+	field_pic_flag = (s->picture_structure != PICT_FRAME);
 
 	cur_sps	= &h->sps;
 	cur_pps = &h->pps;
 
 	if (cur_sps && cur_pps) {
-		*nFieldType = h->s.picture_structure;
+		*nFieldType = current_picture->f.interlaced_frame ? PICT_TOP_FIELD : s->picture_structure;
 		if (h->sps.pic_struct_present_flag) {
 			switch (h->sei_pic_struct) {
 				case SEI_PIC_STRUCT_TOP_FIELD:
@@ -378,13 +378,13 @@ HRESULT FFH264BuildPicParams (DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_
 		pDXVAPicParams->pic_init_qp_minus26						= cur_pps->init_qp - 26;
 		pDXVAPicParams->pic_init_qs_minus26						= cur_pps->init_qs - 26;
 
-		pDXVAPicParams->CurrPic.AssociatedFlag = field_pic_flag && (h->s.picture_structure == PICT_BOTTOM_FIELD);
+		pDXVAPicParams->CurrPic.AssociatedFlag = field_pic_flag && (s->picture_structure == PICT_BOTTOM_FIELD);
 		pDXVAPicParams->CurrFieldOrderCnt[0] = 0;
-		if ((h->s.picture_structure & PICT_TOP_FIELD) && current_picture->field_poc[0] != INT_MAX) {
+		if ((s->picture_structure & PICT_TOP_FIELD) && current_picture->field_poc[0] != INT_MAX) {
 			pDXVAPicParams->CurrFieldOrderCnt[0] = current_picture->field_poc[0];
 		}
 		pDXVAPicParams->CurrFieldOrderCnt[1] = 0;
-		if ((h->s.picture_structure & PICT_BOTTOM_FIELD) && current_picture->field_poc[1] != INT_MAX) {
+		if ((s->picture_structure & PICT_BOTTOM_FIELD) && current_picture->field_poc[1] != INT_MAX) {
 			pDXVAPicParams->CurrFieldOrderCnt[1] = current_picture->field_poc[1];
 		}
 

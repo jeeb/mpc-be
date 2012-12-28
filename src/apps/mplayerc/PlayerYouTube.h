@@ -221,7 +221,8 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 				}
 			}
 
-			/*
+			CString ext;
+
 			CString itagValueStr;
 			UrlFields.Lookup(_T("itag"), itagValueStr);
 			if (itagValueStr.IsEmpty()) {
@@ -268,13 +269,11 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 			if (!itagValue) {
 				continue;
 			}
-			*/
 
+			/*
 			if ((str.Find(_T("video/webm")) != -1) || (str.Find(_T("stereo3d")) != -1)) {
 				continue;
 			}
-
-			CString ext;
 
 			if (str.Find(_T("video/mp4")) != -1) {
 				ext = _T(".mp4");
@@ -283,6 +282,7 @@ static CString PlayerYouTube(CString fn, CString* out_title)
 			} else if (str.Find(_T("video/3gpp")) != -1) {
 				ext = _T(".3gp");
 			}
+			*/
 
 			if (ext.IsEmpty()) {
 				continue;

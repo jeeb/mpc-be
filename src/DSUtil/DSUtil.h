@@ -134,7 +134,6 @@ extern void		audioFormatTypeHandler(const BYTE *format, const GUID *formattype, 
 extern void		DumpBuffer(BYTE* pBuffer, int nSize);
 extern void		HexDump(CString fName, BYTE* buf, int size);
 extern void		LOG2FILE(LPCTSTR fmt, ...);
-extern void		LOG2FILE(CString txt);
 
 extern CStringA	VobSubDefHeader(int w, int h, CStringA palette = "");
 
