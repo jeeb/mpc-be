@@ -167,12 +167,13 @@ CAsyncUrlReader::CAsyncUrlReader(CString url, HRESULT& hr)
 			npos=atoi(dwData);
 			if (npos) {
 				m_len = (ULONGLONG)npos;
-			} else {
-				m_len = (ULONGLONG)-1;
 			}
 			InternetCloseHandle(f);
 		}
 		InternetCloseHandle(s);
+	}
+	if (!npos) {
+		m_len = (ULONGLONG)-1;
 	}
 }
 

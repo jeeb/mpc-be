@@ -132,12 +132,12 @@ static HBITMAP OpenImageDIB(CString fn, CString out, ULONG quality, bool mode)
 		if (wcsstr(fn, L"://")) {
 			HINTERNET f, s = InternetOpen(0, 0, 0, 0, 0);
 			if (s) {
-				f = InternetOpenUrlW(s, fn, 0, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE, 0);
+				f = InternetOpenUrlW(s, fn, 0, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 				if (f) {
 					type = 1;
 
 					DWORD len;
-					char buf[4096];
+					char buf[8192];
 					TCHAR path[_MAX_PATH];
 
 					GetTempPath(_MAX_PATH, path);

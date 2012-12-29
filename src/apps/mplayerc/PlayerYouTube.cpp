@@ -21,8 +21,8 @@
  */
 
 #include "stdafx.h"
-#include "PlayerYouTube.h"
 #include <afxinet.h>
+#include "PlayerYouTube.h"
 
 CString PlayerYouTube(CString fn, CString* out_title)
 {
@@ -153,7 +153,7 @@ CString PlayerYouTube(CString fn, CString* out_title)
 		while (pos) {
 			str = sl.GetNext(pos);
 
-			// little fix ...
+			// little fix
 			str.Replace(_T(","), _T("&"));
 
 			int sigStart = str.Find(_T("&sig"));
@@ -224,7 +224,7 @@ CString PlayerYouTube(CString fn, CString* out_title)
 			// add file name for future
 			Title.Replace(ext, _T(""));
 			str.Append(_T("&title="));
-			str.Append(Title);//str.Append(CString(UrlEncode(UTF16To8(Title)))); // ???
+			str.Append(Title);//str.Append(CString(UrlEncode(UTF16To8(Title))));
 			str.Append(ext);
 
 			if (out_title) {
