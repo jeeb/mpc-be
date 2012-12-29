@@ -307,6 +307,7 @@ CShoutcastStream::CShoutcastStream(const WCHAR* wfn, CShoutcastSource* pParent, 
 		}
 
 		m_socket.KillTimeOut();
+		m_socket.Close();
 		*phr = E_FAIL;
 		return;
 	}

@@ -12009,16 +12009,62 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		HRESULT hr = S_OK;
 		bool extimage = false;
 
-		if (OpenImageCheck(fn)) {
-			HBITMAP bitmap = OpenImage(fn);
-			if (bitmap) {
-				DeleteObject(bitmap);
-				extimage = true;
+		CString local(fn);
+		local.MakeLower();
+		bool validateUrl = true;
+		for (;;) {
+			if (local.Find(_T("http://")) == 0 || local.Find(_T("https://")) == 0 || local.Find(_T("www.")) == 0) {
+				// validate url before try to opening
+				if (local.Find(_T("www.")) == 0) {
+					local = _T("http://") + local;
+				}
+				CUrl url;
+				url.CrackUrl(local);
+
+				if (url.GetUrlPathLength() == 0) {
+					url.SetUrlPath(_T("/"));
+				}
+
+				if (url.GetPortNumber() == ATL_URL_INVALID_PORT_NUMBER) {
+					url.SetPortNumber(ATL_URL_DEFAULT_HTTP_PORT);
+				}
+
+				if (url.GetScheme() != ATL_URL_SCHEME_HTTP && url.GetScheme() != ATL_URL_SCHEME_HTTPS) {
+					break;
+				}
+
+				CMPCSocket socket;
+
+				if (!socket.Create()) {
+					break;
+				}
+
+				socket.SetTimeOut(3000);
+
+				if (!socket.Connect(url.GetHostName(), url.GetPortNumber())) {
+					validateUrl = false;
+				}
+
+				socket.KillTimeOut();
+				socket.Close();
 			}
+			break;
 		}
 
-		if (!extimage) {
-			hr = pGB->RenderFile(PlayerYouTube(fn, &m_strTitleAlt), NULL);
+		if (!validateUrl) {
+			hr = VFW_E_NOT_FOUND;
+		} else {
+			if (OpenImageCheck(fn)) {
+				HBITMAP bitmap = OpenImage(fn);
+				if (bitmap) {
+					DeleteObject(bitmap);
+					extimage = true;
+				}
+			}
+
+			if (!extimage) {
+				hr = pGB->RenderFile(PlayerYouTube(fn, &m_strTitleAlt), NULL);
+			}
 		}
 
 		if (!extimage && FAILED(hr)) {
