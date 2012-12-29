@@ -28,6 +28,7 @@
 #include <afxinet.h>
 #include <afxsock.h>
 #include <qnetwork.h>
+#include "../../../DSUtil/MPCSocket.h"
 
 #define ShoutcastSourceName   L"MPC ShoutCast Source"
 
@@ -149,13 +150,9 @@ class CShoutcastStream : public CSourceStream
 
 	class mp3queue : public CAtlList<mp3frame>, public CCritSec {} m_queue;
 
-	class CShoutcastSocket : public CSocket
+	class CShoutcastSocket : public CMPCSocket
 	{
 		DWORD m_nBytesRead;
-		int m_nTimerID;
-
-	protected:
-		virtual BOOL OnMessagePending();
 
 	public:
 		CShoutcastSocket() {
@@ -167,9 +164,6 @@ class CShoutcastStream : public CSourceStream
 		CString m_title, m_url;
 		bool Connect(CUrl& url);
 		bool FindSync();
-
-		BOOL SetTimeOut(UINT uTimeOut);
-		BOOL KillTimeOut();
 	} m_socket;
 
 	HANDLE m_hSocketThread;

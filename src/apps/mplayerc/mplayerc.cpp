@@ -34,6 +34,7 @@
 #include "Monitors.h"
 #define NO_VERSION_REV_NEEDED
 #include "../../DSUtil/WinAPIUtils.h"
+#include "../../DSUtil/MPCSocket.h"
 #include <winddk/ntddcdvd.h>
 #include <detours/detours.h>
 #include <afxsock.h>
@@ -1781,11 +1782,14 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 			}
 		}
 
-		CSocket s;
+		CMPCSocket s;
 		s.Create();
+		s.SetTimeOut(3000);
 		if (s.Connect(
 					ProxyEnable ? ProxyServer : url.GetHostName(),
 					ProxyEnable ? ProxyPort : url.GetPortNumber())) {
+			s.KillTimeOut();
+
 			CStringA host = CStringA(url.GetHostName());
 			CStringA path = CStringA(url.GetUrlPath()) + CStringA(url.GetExtraInfo());
 

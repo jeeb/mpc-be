@@ -65,6 +65,9 @@
     <ClCompile Include="ApeTag.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MPCSocket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DSMPropertyBag.h">
@@ -128,6 +131,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ApeTag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MPCSocket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

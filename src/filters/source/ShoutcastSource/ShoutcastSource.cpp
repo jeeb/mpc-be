@@ -316,34 +316,6 @@ CShoutcastStream::CShoutcastStream(const WCHAR* wfn, CShoutcastSource* pParent, 
 	m_socket.Close();
 }
 
-BOOL CShoutcastStream::CShoutcastSocket::OnMessagePending()
-{
-	MSG msg;
-
-	if (::PeekMessage(&msg, NULL, WM_TIMER, WM_TIMER, PM_REMOVE)) {
-		if (msg.wParam == (UINT) m_nTimerID) {
-			TRACE(_T("OnMessagePending(WM_TIMER) PASSED!\n"));
-			// Remove the message and call CancelBlockingCall.
-			::PeekMessage(&msg, NULL, WM_TIMER, WM_TIMER, PM_REMOVE);
-			CancelBlockingCall();
-			return FALSE;  // No need for idle time processing.
-		};
-	};
-
-	return __super::OnMessagePending();
-}
-
-BOOL CShoutcastStream::CShoutcastSocket::SetTimeOut(UINT uTimeOut)
-{
-	m_nTimerID = SetTimer(NULL, 0, uTimeOut, NULL);
-	return (m_nTimerID != 0);
-}
-
-BOOL CShoutcastStream::CShoutcastSocket::KillTimeOut()
-{
-	return KillTimer(NULL,m_nTimerID);
-}
-
 CShoutcastStream::~CShoutcastStream()
 {
 }
