@@ -1114,6 +1114,9 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							SetTrackName(&TrackName, _T("Alac Audio"));
 						} else if (type == AP4_ATOM_TYPE_QDM2) {
 							SetTrackName(&TrackName, _T("QDesign Music 2"));
+						} else if (type == AP4_ATOM_TYPE_SPEX) {
+							fourcc = 0xa109;
+							SetTrackName(&TrackName, _T("Speex"));
 						} else if ((type == AP4_ATOM_TYPE_NONE || type == AP4_ATOM_TYPE_RAW) && bitspersample == 8 ||
 								    type == AP4_ATOM_TYPE_SOWT && bitspersample == 16 ||
 								   (type == AP4_ATOM_TYPE_IN24 || type == AP4_ATOM_TYPE_IN32) && ase->GetEndian()==ENDIAN_LITTLE) {
