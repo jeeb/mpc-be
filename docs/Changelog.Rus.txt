@@ -12,6 +12,7 @@
 + Декодер SPEEX (Speex Audio);
 
 Изменения (*):
+* ffmpeg git-c77eb4ee;
 
 Исправления (!):
 
