@@ -185,6 +185,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_IAC},
 	// Opus Audio
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_OPUS},
+	// Speex Audio
+	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_SPEEX},
 };
 
 #ifdef REGISTER_FILTER

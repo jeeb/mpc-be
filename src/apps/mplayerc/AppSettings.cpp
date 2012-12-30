@@ -126,6 +126,7 @@ CAppSettings::CAppSettings()
 	FFMFiltersKeys[FFM_PNG] = _T("FFM_PNG");
 	FFMFiltersKeys[FFM_WMAVOICE] = _T("FFM_WMAVOICE");
 	FFMFiltersKeys[FFM_CLLC] = _T("FFM_CLLC");
+	FFMFiltersKeys[FFM_SPEEX] = _T("FFM_SPEEX");
 }
 
 void CAppSettings::CreateCommands()

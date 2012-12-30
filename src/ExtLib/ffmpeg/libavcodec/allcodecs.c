@@ -65,8 +65,6 @@ void avcodec_register_all(void)
     REGISTER_DECODER (INDEO4, indeo4);
     REGISTER_DECODER (INDEO5, indeo5);
     REGISTER_DECODER (LAGARITH, lagarith);
-    REGISTER_DECODER (LIBOPENJPEG, libopenjpeg);
-    REGISTER_DECODER (LIBOPUS, libopus);
     REGISTER_DECODER (MJPEG, mjpeg);
     REGISTER_DECODER (MJPEGB, mjpegb);
     REGISTER_DECODER (MPEG2VIDEO, mpeg2video);
@@ -170,4 +168,9 @@ void avcodec_register_all(void)
     REGISTER_PARSER  (MPEGAUDIO, mpegaudio);
     REGISTER_PARSER  (H264, h264);
     REGISTER_PARSER  (MPEGVIDEO, mpegvideo);
+
+    /* external libraries */
+    REGISTER_DECODER (LIBOPENJPEG, libopenjpeg);
+    REGISTER_DECODER (LIBOPUS, libopus);
+    REGISTER_DECODER (LIBSPEEX, libspeex);
 }

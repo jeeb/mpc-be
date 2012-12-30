@@ -120,6 +120,8 @@ static const FFMPEG_AUDIO_CODECS ffAudioCodecs[] = {
 	{ &MEDIASUBTYPE_IAC,               AV_CODEC_ID_IAC },
 	// Opus
 	{ &MEDIASUBTYPE_OPUS,              AV_CODEC_ID_OPUS },
+	// Speex
+	{ &MEDIASUBTYPE_SPEEX,             AV_CODEC_ID_SPEEX },
 
 	{ &MEDIASUBTYPE_None,              AV_CODEC_ID_NONE },
 };
