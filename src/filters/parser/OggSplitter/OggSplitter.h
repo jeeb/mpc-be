@@ -28,8 +28,8 @@
 #include "OggFile.h"
 #include "../BaseSplitter/BaseSplitter.h"
 
-#define OggSplitterName L"MPC Ogg/Opus Splitter"
-#define OggSourceName   L"MPC Ogg/Opus Source"
+#define OggSplitterName L"MPC Ogg Splitter"
+#define OggSourceName   L"MPC Ogg Source"
 
 class OggPacket : public Packet
 {
@@ -218,6 +218,17 @@ class COggOpusOutputPin : public COggSplitterOutputPin
 
 public:
 	COggOpusOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
+};
+
+class COggSpeexOutputPin : public COggSplitterOutputPin
+{
+	int m_samplerate;
+
+	virtual HRESULT UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, int len);
+	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
+
+public:
+	COggSpeexOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
 };
 
 class __declspec(uuid("9FF48807-E133-40AA-826F-9B2959E5232D"))

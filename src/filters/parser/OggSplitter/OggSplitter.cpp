@@ -281,6 +281,11 @@ HRESULT COggSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				if (COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
 					pOggPin->AddComment(page.GetData()+8, page.GetCount()-8-1);
 				}
+			} else if (!memcmp(page.GetData(), "Speex   ", 8) && page.GetCount() > 8) {
+				name.Format(L"Speex %d", i);
+				CAutoPtr<CBaseSplitterOutputPin> pPinOut;
+				pPinOut.Attach(DNew COggSpeexOutputPin(page.GetData(), page.GetCount(), name, this, this, &hr));
+				AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 			} else if (!(type&1) && nWaitForMore <= 0) {
 				break;
 			}
@@ -1582,6 +1587,75 @@ REFERENCE_TIME COggOpusOutputPin::GetRefTime(__int64 granule_position)
 }
 
 HRESULT COggOpusOutputPin::UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, int len)
+{
+	p->bSyncPoint	= TRUE;
+	p->rtStart		= m_rtLast;
+	p->rtStop		= m_rtLast+1; // TODO : find packet duration !
+	p->SetData(pData, len);
+
+	return S_OK;
+}
+
+//
+// COggSpeexOutputPin
+//
+COggSpeexOutputPin::COggSpeexOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
+	: COggSplitterOutputPin(pName, pFilter, pLock, phr)
+{
+	// http://wiki.xiph.org/OggSpeex
+	// http://www.speex.org/docs/manual/speex-manual/node8.html
+
+	CGolombBuffer Buffer(h + (8 + 20), nCount - (8 + 20)); // 8 + 20 = speex_string + speex_version
+
+	int speex_version_id       = Buffer.ReadDwordLE();
+	int header_size            = Buffer.ReadDwordLE();
+	int rate                   = Buffer.ReadDwordLE();
+	int mode                   = Buffer.ReadDwordLE();
+	int mode_bitstream_version = Buffer.ReadDwordLE();
+	int nb_channels            = Buffer.ReadDwordLE();
+	int bitrate                = Buffer.ReadDwordLE();
+	int frame_size             = Buffer.ReadDwordLE();
+	int vbr                    = Buffer.ReadDwordLE();
+	int frames_per_packet      = Buffer.ReadDwordLE();
+	int extra_headers          = Buffer.ReadDwordLE();
+	int reserved1              = Buffer.ReadDwordLE();
+	int reserved2              = Buffer.ReadDwordLE();
+
+	m_samplerate = rate;
+
+	WAVEFORMATEX* wfe    = (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + nCount];
+	memset(wfe, 0, sizeof(WAVEFORMATEX));
+	wfe->wFormatTag      = WAVE_FORMAT_SPEEX;
+	wfe->nChannels       = nb_channels;
+	wfe->nSamplesPerSec  = rate;
+	wfe->wBitsPerSample  = 16;
+	wfe->nBlockAlign     = frame_size * frames_per_packet;
+	wfe->nAvgBytesPerSec = bitrate / 8;
+	wfe->cbSize          = nCount;
+	memcpy((BYTE*)(wfe+1), h, nCount);
+
+	CMediaType mt;
+	ZeroMemory(&mt, sizeof(CMediaType));
+
+	mt.majortype  = MEDIATYPE_Audio;
+	mt.subtype    = MEDIASUBTYPE_SPEEX;
+	mt.formattype = FORMAT_WaveFormatEx;
+	mt.SetFormat((BYTE*)wfe, sizeof(WAVEFORMATEX) + wfe->cbSize);
+
+	delete [] wfe;
+
+	m_mts.InsertAt(0, mt);
+
+	*phr = S_OK;
+}
+
+REFERENCE_TIME COggSpeexOutputPin::GetRefTime(__int64 granule_position)
+{
+	REFERENCE_TIME rt = (granule_position * UNITS) / m_samplerate;
+	return rt;
+}
+
+HRESULT COggSpeexOutputPin::UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, int len)
 {
 	p->bSyncPoint	= TRUE;
 	p->rtStart		= m_rtLast;
