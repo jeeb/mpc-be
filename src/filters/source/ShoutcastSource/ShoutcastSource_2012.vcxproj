@@ -239,6 +239,9 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\DSUtil\DSUtil_2012.vcxproj">
+      <Project>{fc70988b-1ae5-4381-866d-4f405e28ac42}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\ExtLib\BaseClasses\BaseClasses_2012.vcxproj">
       <Project>{e8a3f6fa-ae1c-4c8e-a0b6-9c8480324eaa}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
