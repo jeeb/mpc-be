@@ -1542,35 +1542,34 @@ HRESULT COggDiracOutputPin::UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, in
 COggOpusOutputPin::COggOpusOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: COggSplitterOutputPin(pName, pFilter, pLock, phr)
 {
-	CGolombBuffer Buffer(h + 8, nCount - 8);
+	// http://wiki.xiph.org/OggOpus
+	CGolombBuffer Buffer(h + 8, nCount - 8); // skip "OpusHead"
 
-	BYTE version	= Buffer.BitRead(8);
-	BYTE nChannels	= Buffer.BitRead(8);
-	m_Preskip		= (WORD)Buffer.BitRead(16);
-	Buffer.BitRead(32); // Input sample rate
-	Buffer.BitRead(16); // Output gain
+	BYTE version  = Buffer.ReadByte();
+	BYTE channels = Buffer.ReadByte();
+	m_Preskip     = Buffer.ReadShortLE();
+	Buffer.SkipBytes(4); // Input sample rate
+	Buffer.SkipBytes(2); // Output gain
 
-	m_nSamplesPerSec	= 48000;
-	WORD wBitsPerSample	= 16;
-	int nAvgBytesPerSec	= (nChannels * (wBitsPerSample >> 3)) * m_nSamplesPerSec;
+	m_SampleRate = 48000;
 
-	WAVEFORMATEX* wfe		= (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + nCount];
+	WAVEFORMATEX* wfe    = (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + nCount];
 	memset(wfe, 0, sizeof(WAVEFORMATEX));
-	wfe->wFormatTag			= (WORD)WAVE_FORMAT_OPUS;
-	wfe->nChannels			= nChannels;
-	wfe->nSamplesPerSec		= m_nSamplesPerSec;
-	wfe->wBitsPerSample		= wBitsPerSample;
-	wfe->nBlockAlign		= 1;
-	wfe->nAvgBytesPerSec	= nAvgBytesPerSec;
-	wfe->cbSize = nCount;
+	wfe->wFormatTag      = WAVE_FORMAT_OPUS;
+	wfe->nChannels       = channels;
+	wfe->nSamplesPerSec  = m_SampleRate;
+	wfe->wBitsPerSample  = 16;
+	wfe->nBlockAlign     = 1;
+	wfe->nAvgBytesPerSec = 0;
+	wfe->cbSize          = nCount;
 	memcpy((BYTE*)(wfe+1), h, nCount);
 
 	CMediaType mt;
 	ZeroMemory(&mt, sizeof(CMediaType));
 
-	mt.majortype	= MEDIATYPE_Audio;
-	mt.subtype		= MEDIASUBTYPE_OPUS;
-	mt.formattype	= FORMAT_WaveFormatEx;
+	mt.majortype  = MEDIATYPE_Audio;
+	mt.subtype    = MEDIASUBTYPE_OPUS;
+	mt.formattype = FORMAT_WaveFormatEx;
 	mt.SetFormat((BYTE*)wfe, sizeof(WAVEFORMATEX)+wfe->cbSize);
 
 	delete [] wfe;
@@ -1582,15 +1581,15 @@ COggOpusOutputPin::COggOpusOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFi
 
 REFERENCE_TIME COggOpusOutputPin::GetRefTime(__int64 granule_position)
 {
-	REFERENCE_TIME rt = ((granule_position - m_Preskip) * UNITS) / m_nSamplesPerSec;
+	REFERENCE_TIME rt = ((granule_position - m_Preskip) * UNITS) / m_SampleRate;
 	return rt;
 }
 
 HRESULT COggOpusOutputPin::UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, int len)
 {
-	p->bSyncPoint	= TRUE;
-	p->rtStart		= m_rtLast;
-	p->rtStop		= m_rtLast+1; // TODO : find packet duration !
+	p->bSyncPoint = TRUE;
+	p->rtStart    = m_rtLast;
+	p->rtStop     = m_rtLast+1; // TODO : find packet duration !
 	p->SetData(pData, len);
 
 	return S_OK;
@@ -1621,7 +1620,7 @@ COggSpeexOutputPin::COggSpeexOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBase
 	int reserved1              = Buffer.ReadDwordLE();
 	int reserved2              = Buffer.ReadDwordLE();
 
-	m_samplerate = rate;
+	m_SampleRate = rate;
 
 	WAVEFORMATEX* wfe    = (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + nCount];
 	memset(wfe, 0, sizeof(WAVEFORMATEX));
@@ -1630,7 +1629,7 @@ COggSpeexOutputPin::COggSpeexOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBase
 	wfe->nSamplesPerSec  = rate;
 	wfe->wBitsPerSample  = 16;
 	wfe->nBlockAlign     = frame_size * frames_per_packet;
-	wfe->nAvgBytesPerSec = bitrate / 8;
+	wfe->nAvgBytesPerSec = 0;
 	wfe->cbSize          = nCount;
 	memcpy((BYTE*)(wfe+1), h, nCount);
 
@@ -1651,15 +1650,15 @@ COggSpeexOutputPin::COggSpeexOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBase
 
 REFERENCE_TIME COggSpeexOutputPin::GetRefTime(__int64 granule_position)
 {
-	REFERENCE_TIME rt = (granule_position * UNITS) / m_samplerate;
+	REFERENCE_TIME rt = (granule_position * UNITS) / m_SampleRate;
 	return rt;
 }
 
 HRESULT COggSpeexOutputPin::UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, int len)
 {
-	p->bSyncPoint	= TRUE;
-	p->rtStart		= m_rtLast;
-	p->rtStop		= m_rtLast+1; // TODO : find packet duration !
+	p->bSyncPoint = TRUE;
+	p->rtStart    = m_rtLast;
+	p->rtStop     = m_rtLast+1; // TODO : find packet duration !
 	p->SetData(pData, len);
 
 	return S_OK;

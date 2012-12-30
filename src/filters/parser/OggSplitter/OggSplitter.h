@@ -210,8 +210,8 @@ public:
 
 class COggOpusOutputPin : public COggSplitterOutputPin
 {
-	int		m_nSamplesPerSec;
-	WORD	m_Preskip;
+	int  m_SampleRate;
+	WORD m_Preskip;
 
 	virtual HRESULT UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, int len);
 	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
@@ -222,7 +222,7 @@ public:
 
 class COggSpeexOutputPin : public COggSplitterOutputPin
 {
-	int m_samplerate;
+	int  m_SampleRate;
 
 	virtual HRESULT UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, int len);
 	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
