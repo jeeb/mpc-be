@@ -483,6 +483,7 @@
     <ClCompile Include="libavcodec\libopenjpegdec.c" />
     <ClCompile Include="libavcodec\libopus.c" />
     <ClCompile Include="libavcodec\libopusdec.c" />
+    <ClCompile Include="libavcodec\libspeexdec.c" />
     <ClCompile Include="libavcodec\log2_tab.c" />
     <ClCompile Include="libavcodec\lsp.c" />
     <ClCompile Include="libavcodec\mathtables.c" />

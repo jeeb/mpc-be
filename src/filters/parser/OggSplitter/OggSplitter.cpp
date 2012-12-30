@@ -1628,7 +1628,7 @@ COggSpeexOutputPin::COggSpeexOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBase
 	wfe->nChannels       = nb_channels;
 	wfe->nSamplesPerSec  = rate;
 	wfe->wBitsPerSample  = 16;
-	wfe->nBlockAlign     = frame_size * frames_per_packet;
+	wfe->nBlockAlign     = frame_size;
 	wfe->nAvgBytesPerSec = 0;
 	wfe->cbSize          = nCount;
 	memcpy((BYTE*)(wfe+1), h, nCount);
