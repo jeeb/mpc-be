@@ -148,6 +148,8 @@ COggSplitterFilter::COggSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	, m_bIsTheora(false)
 	, m_rtMin(0)
 	, m_rtMax(0)
+	, m_bitstream_serial_number_start(0)
+	, m_bitstream_serial_number_prev(0)
 {
 }
 
@@ -195,7 +197,12 @@ HRESULT COggSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	m_rtDuration = 0;
 
-	m_pFile->Seek(0);
+	__int64 start_pos = 0;
+
+start:
+
+	m_pFile->Seek(start_pos);
+
 	OggPage page;
 	for (int i = 0, nWaitForMore = 0; m_pFile->Read(page), i<100; i++) {
 		BYTE* p = page.GetData();
@@ -230,6 +237,7 @@ HRESULT COggSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					if ((*(OggVorbisIdHeader*)(p + 6)).audio_sample_rate == 0) return E_FAIL; // fix crash on broken files
 					name.Format(L"Vorbis %d", i);
 					pPinOut.Attach(DNew COggVorbisOutputPin((OggVorbisIdHeader*)(p+6), name, this, this, &hr));
+					m_bitstream_serial_number_start = m_bitstream_serial_number_prev = page.m_hdr.bitstream_serial_number;
 					nWaitForMore++;
 				} else if (!memcmp(p, "video", 5)) {
 					name.Format(L"Video %d", i);
@@ -322,49 +330,38 @@ HRESULT COggSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	// it's a magic - to determine the correct length to play
 	if (m_pFile->IsRandomAccess()) {
-		int step = 1;
-		while (!m_rtDuration && step <= 10) {
-			m_pFile->Seek(max(m_pFile->GetLength()-(MAX_PAGE_SIZE*step), 0));
+		m_pFile->Seek(max(m_pFile->GetLength()-MAX_PAGE_SIZE, 0));
 
-			if (m_pFile->GetPos() < MAX_PAGE_SIZE) {
-				break;
+		OggPage page;
+		while (m_pFile->Read(page)) {
+			COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
+			if (!pOggPin || page.m_hdr.granule_position == -1) {
+				continue;
 			}
-
-			OggPage page;
-			while (m_pFile->Read(page)) {
-
-				if (m_pFile->GetPos() >= max(m_pFile->GetLength()-(MAX_PAGE_SIZE*(step-1)), 0)) {
-					break;
-				}
-
-				COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
-				if (!pOggPin || page.m_hdr.granule_position == -1) {
-					continue;
-				}
-				REFERENCE_TIME rt = pOggPin->GetRefTime(page.m_hdr.granule_position);
-				m_rtDuration = max(rt, m_rtDuration);
-			}
-
-			step++;
+			REFERENCE_TIME rt = pOggPin->GetRefTime(page.m_hdr.granule_position);
+			m_rtDuration = max(rt, m_rtDuration);
 		}
 	}
 
-	m_pFile->Seek(0);
-
-	OggPage page2;
-	while (m_pFile->Read(page2)) {
-		COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page2.m_hdr.bitstream_serial_number));
-		if (!pOggPin || page2.m_hdr.granule_position == -1 || page2.m_hdr.granule_position == 0 || page2.m_hdr.header_type_flag) {
+	m_pFile->Seek(start_pos);
+	for (int i = 0, nWaitForMore = 0; m_pFile->Read(page), i<10; i++) {
+		COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
+		if (!pOggPin || page.m_hdr.granule_position == -1 || page.m_hdr.granule_position == 0 || page.m_hdr.header_type_flag) {
+			if (!pOggPin && m_pOutputs.GetCount() == 1) {
+				DeleteOutputs();
+				goto start;
+			}
+			start_pos = m_pFile->GetPos();
 			continue;
 		}
-		REFERENCE_TIME rt = pOggPin->GetRefTime(page2.m_hdr.granule_position);
+		REFERENCE_TIME rt = pOggPin->GetRefTime(page.m_hdr.granule_position);
 		if (rt != _I64_MIN) {
 			m_rtMin = rt;
 			break;
 		}
 	}
 
-	m_pFile->Seek(0);
+	m_pFile->Seek(start_pos);
 
 	m_rtDuration	-= m_rtMin;
 	m_rtDuration	= max(0, m_rtDuration);
@@ -374,11 +371,11 @@ HRESULT COggSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	// comments
 	{
 		CAtlMap<CStringW, CStringW, CStringElementTraits<CStringW> > tagmap;
-		tagmap[L"TITLE"] = L"TITL";
-		tagmap[L"ARTIST"] = L"AUTH"; // not quite
-		tagmap[L"COPYRIGHT"] = L"CPYR";
-		tagmap[L"DESCRIPTION"] = L"DESC";
-		tagmap[L"ENCODER"] = L"DESC";
+		tagmap[L"TITLE"]		= L"TITL";
+		tagmap[L"ARTIST"]		= L"AUTH";
+		tagmap[L"COPYRIGHT"]	= L"CPYR";
+		tagmap[L"DESCRIPTION"]	= L"DESC";
+		tagmap[L"ENCODER"]		= L"DESC";
 
 		POSITION pos2 = tagmap.GetStartPosition();
 		while (pos2) {
@@ -637,6 +634,35 @@ bool COggSplitterFilter::DemuxLoop()
 			break;
 		}
 
+		if (page.m_hdr.header_type_flag & OggPageHeader::first) {
+			if (m_pOutputs.GetCount() == 1 && m_bitstream_serial_number_prev && m_bitstream_serial_number_prev != page.m_hdr.bitstream_serial_number) {
+
+				TRACE(_T("COggSplitterFilter::DemuxLoop() : Page change [%d => %d]\n"), m_bitstream_serial_number_prev, page.m_hdr.bitstream_serial_number);
+
+				DWORD bitstream_serial_number = page.m_hdr.bitstream_serial_number;
+				__int64 start_pos = m_pFile->GetPos();
+				for (int i = 0, nWaitForMore = 0; m_pFile->Read(page), bitstream_serial_number == page.m_hdr.bitstream_serial_number, i<10; i++) {
+					page.m_hdr.bitstream_serial_number	= m_bitstream_serial_number_start;
+					COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
+					if (!pOggPin || page.m_hdr.granule_position == -1 || page.m_hdr.granule_position == 0 || (page.m_hdr.header_type_flag & OggPageHeader::first)) {
+						continue;
+					}
+					REFERENCE_TIME rt = pOggPin->GetRefTime(page.m_hdr.granule_position);
+					if (rt != _I64_MIN) {
+						m_rtMin = rt;
+						break;
+					}
+				}
+				m_pFile->Seek(start_pos);
+			}
+			continue;
+		}
+
+		if (m_pOutputs.GetCount() == 1 && m_bitstream_serial_number_start && m_bitstream_serial_number_start != page.m_hdr.bitstream_serial_number) {
+			m_bitstream_serial_number_prev		= page.m_hdr.bitstream_serial_number;
+			page.m_hdr.bitstream_serial_number	= m_bitstream_serial_number_start;
+		}
+
 		COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
 		if (!pOggPin) {
 			continue;
@@ -648,6 +674,7 @@ bool COggSplitterFilter::DemuxLoop()
 			ASSERT(0);
 			break;
 		}
+
 		CAutoPtr<OggPacket> p;
 		while (!CheckRequest(NULL) && SUCCEEDED(hr) && (p = pOggPin->GetPacket())) {
 			if (!p->fSkip) {
@@ -1545,31 +1572,31 @@ COggOpusOutputPin::COggOpusOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFi
 	// http://wiki.xiph.org/OggOpus
 	CGolombBuffer Buffer(h + 8, nCount - 8); // skip "OpusHead"
 
-	BYTE version  = Buffer.ReadByte();
-	BYTE channels = Buffer.ReadByte();
-	m_Preskip     = Buffer.ReadShortLE();
+	BYTE version	= Buffer.ReadByte();
+	BYTE channels	= Buffer.ReadByte();
+	m_Preskip		= Buffer.ReadShortLE();
 	Buffer.SkipBytes(4); // Input sample rate
 	Buffer.SkipBytes(2); // Output gain
 
-	m_SampleRate = 48000;
+	m_SampleRate	= 48000;
 
-	WAVEFORMATEX* wfe    = (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + nCount];
+	WAVEFORMATEX* wfe		= (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + nCount];
 	memset(wfe, 0, sizeof(WAVEFORMATEX));
-	wfe->wFormatTag      = WAVE_FORMAT_OPUS;
-	wfe->nChannels       = channels;
-	wfe->nSamplesPerSec  = m_SampleRate;
-	wfe->wBitsPerSample  = 16;
-	wfe->nBlockAlign     = 1;
-	wfe->nAvgBytesPerSec = 0;
-	wfe->cbSize          = nCount;
+	wfe->wFormatTag			= (WORD)WAVE_FORMAT_OPUS;
+	wfe->nChannels			= channels;
+	wfe->nSamplesPerSec		= m_SampleRate;
+	wfe->wBitsPerSample		= 16;
+	wfe->nBlockAlign		= 1;
+	wfe->nAvgBytesPerSec	= 0;
+	wfe->cbSize				= nCount;
 	memcpy((BYTE*)(wfe+1), h, nCount);
 
 	CMediaType mt;
 	ZeroMemory(&mt, sizeof(CMediaType));
 
-	mt.majortype  = MEDIATYPE_Audio;
-	mt.subtype    = MEDIASUBTYPE_OPUS;
-	mt.formattype = FORMAT_WaveFormatEx;
+	mt.majortype	= MEDIATYPE_Audio;
+	mt.subtype		= MEDIASUBTYPE_OPUS;
+	mt.formattype	= FORMAT_WaveFormatEx;
 	mt.SetFormat((BYTE*)wfe, sizeof(WAVEFORMATEX)+wfe->cbSize);
 
 	delete [] wfe;
@@ -1587,9 +1614,9 @@ REFERENCE_TIME COggOpusOutputPin::GetRefTime(__int64 granule_position)
 
 HRESULT COggOpusOutputPin::UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, int len)
 {
-	p->bSyncPoint = TRUE;
-	p->rtStart    = m_rtLast;
-	p->rtStop     = m_rtLast+1; // TODO : find packet duration !
+	p->bSyncPoint	= TRUE;
+	p->rtStart		= m_rtLast;
+	p->rtStop		= m_rtLast+1; // TODO : find packet duration !
 	p->SetData(pData, len);
 
 	return S_OK;
@@ -1606,39 +1633,39 @@ COggSpeexOutputPin::COggSpeexOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBase
 
 	CGolombBuffer Buffer(h + (8 + 20), nCount - (8 + 20)); // 8 + 20 = speex_string + speex_version
 
-	int speex_version_id       = Buffer.ReadDwordLE();
-	int header_size            = Buffer.ReadDwordLE();
-	int rate                   = Buffer.ReadDwordLE();
-	int mode                   = Buffer.ReadDwordLE();
-	int mode_bitstream_version = Buffer.ReadDwordLE();
-	int nb_channels            = Buffer.ReadDwordLE();
-	int bitrate                = Buffer.ReadDwordLE();
-	int frame_size             = Buffer.ReadDwordLE();
-	int vbr                    = Buffer.ReadDwordLE();
-	int frames_per_packet      = Buffer.ReadDwordLE();
-	int extra_headers          = Buffer.ReadDwordLE();
-	int reserved1              = Buffer.ReadDwordLE();
-	int reserved2              = Buffer.ReadDwordLE();
+	int speex_version_id		= Buffer.ReadDwordLE();
+	int header_size				= Buffer.ReadDwordLE();
+	int rate					= Buffer.ReadDwordLE();
+	int mode					= Buffer.ReadDwordLE();
+	int mode_bitstream_version	= Buffer.ReadDwordLE();
+	int nb_channels				= Buffer.ReadDwordLE();
+	int bitrate					= Buffer.ReadDwordLE();
+	int frame_size				= Buffer.ReadDwordLE();
+	int vbr						= Buffer.ReadDwordLE();
+	int frames_per_packet		= Buffer.ReadDwordLE();
+	int extra_headers			= Buffer.ReadDwordLE();
+	int reserved1				= Buffer.ReadDwordLE();
+	int reserved2				= Buffer.ReadDwordLE();
 
 	m_SampleRate = rate;
 
-	WAVEFORMATEX* wfe    = (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + nCount];
+	WAVEFORMATEX* wfe		= (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + nCount];
 	memset(wfe, 0, sizeof(WAVEFORMATEX));
-	wfe->wFormatTag      = WAVE_FORMAT_SPEEX;
-	wfe->nChannels       = nb_channels;
-	wfe->nSamplesPerSec  = rate;
-	wfe->wBitsPerSample  = 16;
-	wfe->nBlockAlign     = frame_size;
-	wfe->nAvgBytesPerSec = 0;
-	wfe->cbSize          = nCount;
+	wfe->wFormatTag			= WAVE_FORMAT_SPEEX;
+	wfe->nChannels			= nb_channels;
+	wfe->nSamplesPerSec		= rate;
+	wfe->wBitsPerSample		= 16;
+	wfe->nBlockAlign		= frame_size;
+	wfe->nAvgBytesPerSec	= 0;
+	wfe->cbSize				= nCount;
 	memcpy((BYTE*)(wfe+1), h, nCount);
 
 	CMediaType mt;
 	ZeroMemory(&mt, sizeof(CMediaType));
 
-	mt.majortype  = MEDIATYPE_Audio;
-	mt.subtype    = MEDIASUBTYPE_SPEEX;
-	mt.formattype = FORMAT_WaveFormatEx;
+	mt.majortype	= MEDIATYPE_Audio;
+	mt.subtype		= MEDIASUBTYPE_SPEEX;
+	mt.formattype	= FORMAT_WaveFormatEx;
 	mt.SetFormat((BYTE*)wfe, sizeof(WAVEFORMATEX) + wfe->cbSize);
 
 	delete [] wfe;
@@ -1656,9 +1683,9 @@ REFERENCE_TIME COggSpeexOutputPin::GetRefTime(__int64 granule_position)
 
 HRESULT COggSpeexOutputPin::UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, int len)
 {
-	p->bSyncPoint = TRUE;
-	p->rtStart    = m_rtLast;
-	p->rtStop     = m_rtLast+1; // TODO : find packet duration !
+	p->bSyncPoint	= TRUE;
+	p->rtStart		= m_rtLast;
+	p->rtStop		= m_rtLast+1; // TODO : find packet duration !
 	p->SetData(pData, len);
 
 	return S_OK;

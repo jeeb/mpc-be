@@ -244,6 +244,8 @@ protected:
 
 	bool m_bIsTheora;
 
+	DWORD m_bitstream_serial_number_start, m_bitstream_serial_number_prev;
+
 public:
 	COggSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr);
 	virtual ~COggSplitterFilter();
