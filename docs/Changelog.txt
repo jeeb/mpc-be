@@ -13,7 +13,7 @@ Legend:
 Added (+):
 
 Changes (*):
-* ffmpeg git-c77eb4ee;
+* ffmpeg git-f105fe5c;
 
 Fixes (!):
 
