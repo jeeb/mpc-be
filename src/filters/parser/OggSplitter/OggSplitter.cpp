@@ -730,8 +730,8 @@ void COggSplitterOutputPin::AddComment(BYTE* p, int len)
 			continue;
 		}
 
-        CStringA TagKey		= str.Left(sepPos);
-        CStringA TagValue	= str.Mid(sepPos + 1);
+		CStringA TagKey		= str.Left(sepPos);
+		CStringA TagValue	= str.Mid(sepPos + 1);
 
 		CAutoPtr<CComment> p(DNew CComment(UTF8To16(TagKey), UTF8To16(TagValue)));
 
