@@ -18611,16 +18611,19 @@ bool CheckCoverImgExist(CString &path, CString name) {
 	coverpath.Combine(path, name);
 
 	if (coverpath.FileExists() ||
-		coverpath.RenameExtension(_T("jpeg")) && coverpath.FileExists() ||
-		coverpath.RenameExtension(_T("png"))  && coverpath.FileExists()) {
+		coverpath.RenameExtension(_T(".jpeg")) && coverpath.FileExists() ||
+		coverpath.RenameExtension(_T(".png"))  && coverpath.FileExists()) {
 			path.SetString(coverpath);
 			return true;
 	}
 	return false;
 }
 
-CString GetCoverImgFromPath(CString path)
+CString GetCoverImgFromPath(CString fullfilename)
 {
+	CString path = fullfilename.Left(fullfilename.ReverseFind('\\') + 1);
+
+
 	if (CheckCoverImgExist(path, _T("cover.jpg"))) {
 		return path;
 	}
@@ -18639,6 +18642,12 @@ CString GetCoverImgFromPath(CString path)
 	}
 
 	if (CheckCoverImgExist(path, _T("front.jpg"))) {
+		return path;
+	}
+
+	CString fname = fullfilename.Mid(path.GetLength());
+	fname = fname.Left(fname.ReverseFind('.'));
+	if (CheckCoverImgExist(path, fname + _T(".jpg"))) {
 		return path;
 	}
 
@@ -18734,8 +18743,7 @@ HRESULT CMainFrame::SetDwmPreview(BOOL show)
 		
 		if (!bLoadRes) {
 			// try to load image from file in the same dir that media file to show in preview & logo;
-			CString dir = m_strFnFull.Mid(0, m_strFnFull.ReverseFind('\\') + 1);
-			CString img_fname = GetCoverImgFromPath(dir);
+			CString img_fname = GetCoverImgFromPath(m_strFnFull);
 
 			if (!img_fname.IsEmpty()) {
 				if(SUCCEEDED(m_InternalImage.Load(img_fname))) {
