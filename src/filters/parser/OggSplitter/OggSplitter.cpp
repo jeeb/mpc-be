@@ -149,7 +149,7 @@ COggSplitterFilter::COggSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	, m_rtMin(0)
 	, m_rtMax(0)
 	, m_bitstream_serial_number_start(0)
-	, m_bitstream_serial_number_prev(0)
+	, m_bitstream_serial_number_last(0)
 {
 }
 
@@ -207,7 +207,7 @@ start:
 	for (int i = 0, nWaitForMore = 0; m_pFile->Read(page), i<100; i++) {
 		BYTE* p = page.GetData();
 		if (!p) {
-			break;
+			continue;
 		}
 
 		if (!(page.m_hdr.header_type_flag & OggPageHeader::continued)) {
@@ -237,7 +237,7 @@ start:
 					if ((*(OggVorbisIdHeader*)(p + 6)).audio_sample_rate == 0) return E_FAIL; // fix crash on broken files
 					name.Format(L"Vorbis %d", i);
 					pPinOut.Attach(DNew COggVorbisOutputPin((OggVorbisIdHeader*)(p+6), name, this, this, &hr));
-					m_bitstream_serial_number_start = m_bitstream_serial_number_prev = page.m_hdr.bitstream_serial_number;
+					m_bitstream_serial_number_start = m_bitstream_serial_number_last = page.m_hdr.bitstream_serial_number;
 					nWaitForMore++;
 				} else if (!memcmp(p, "video", 5)) {
 					name.Format(L"Video %d", i);
@@ -328,7 +328,6 @@ start:
 		return E_FAIL;
 	}
 
-	// it's a magic - to determine the correct length to play
 	if (m_pFile->IsRandomAccess()) {
 		m_pFile->Seek(max(m_pFile->GetLength()-MAX_PAGE_SIZE, 0));
 
@@ -344,9 +343,18 @@ start:
 	}
 
 	m_pFile->Seek(start_pos);
-	for (int i = 0, nWaitForMore = 0; m_pFile->Read(page), i<10; i++) {
+	for (int i = 0; m_pFile->Read(page), i<10; i++) {
 		COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
-		if (!pOggPin || page.m_hdr.granule_position == -1 || page.m_hdr.granule_position == 0 || page.m_hdr.header_type_flag) {
+		if (!pOggPin ||
+			page.m_hdr.granule_position == -1 ||
+			page.m_hdr.granule_position == 0 ||
+			page.m_hdr.header_type_flag & OggPageHeader::first ||
+			(m_bitstream_serial_number_start && page.m_hdr.header_type_flag)) {
+			BYTE* p = page.GetData();
+			if (!p || (p && (!memcmp(p, "fishead", 7) || !memcmp(p, "fisbone", 7)))) {
+				start_pos = m_pFile->GetPos();
+				continue;
+			}
 			if (!pOggPin && m_pOutputs.GetCount() == 1) {
 				DeleteOutputs();
 				goto start;
@@ -635,9 +643,9 @@ bool COggSplitterFilter::DemuxLoop()
 		}
 
 		if (page.m_hdr.header_type_flag & OggPageHeader::first) {
-			if (m_pOutputs.GetCount() == 1 && m_bitstream_serial_number_prev && m_bitstream_serial_number_prev != page.m_hdr.bitstream_serial_number) {
+			if (m_pOutputs.GetCount() == 1 && m_bitstream_serial_number_last && m_bitstream_serial_number_last != page.m_hdr.bitstream_serial_number) {
 
-				TRACE(_T("COggSplitterFilter::DemuxLoop() : Page change [%d => %d]\n"), m_bitstream_serial_number_prev, page.m_hdr.bitstream_serial_number);
+				TRACE(_T("COggSplitterFilter::DemuxLoop() : Page change [%d => %d]\n"), m_bitstream_serial_number_last, page.m_hdr.bitstream_serial_number);
 
 				DWORD bitstream_serial_number = page.m_hdr.bitstream_serial_number;
 				__int64 start_pos = m_pFile->GetPos();
@@ -659,7 +667,7 @@ bool COggSplitterFilter::DemuxLoop()
 		}
 
 		if (m_pOutputs.GetCount() == 1 && m_bitstream_serial_number_start && m_bitstream_serial_number_start != page.m_hdr.bitstream_serial_number) {
-			m_bitstream_serial_number_prev		= page.m_hdr.bitstream_serial_number;
+			m_bitstream_serial_number_last		= page.m_hdr.bitstream_serial_number;
 			page.m_hdr.bitstream_serial_number	= m_bitstream_serial_number_start;
 		}
 
