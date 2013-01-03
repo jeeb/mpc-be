@@ -41,6 +41,8 @@
 						 (version_minor>(_min)||version_minor==(_min)&& \
 						  version_subminor>=(_sub)))
 
+#define MAX_PTS_SHIFT 10*UNITS
+
 #ifdef REGISTER_FILTER
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
@@ -328,6 +330,29 @@ start:
 		return E_FAIL;
 	}
 
+	if (m_pOutputs.GetCount() > 1) {
+		m_bitstream_serial_number_start = m_bitstream_serial_number_last = 0;
+	}
+
+	// verify that stream contain data, not only header
+	if (m_bitstream_serial_number_start) {
+		m_pFile->Seek(start_pos);
+		for (int i = 0; m_pFile->Read(page), i<10; i++) {
+			COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
+			if (!pOggPin) {
+				BYTE* p = page.GetData();
+				if (!p || (p && (!memcmp(p, "fishead", 7) || !memcmp(p, "fisbone", 7)))) {
+					start_pos = m_pFile->GetPos();
+					continue;
+				}
+				DeleteOutputs();
+				goto start;
+			}
+			start_pos = m_pFile->GetPos();
+		}
+	}
+
+	// get max pts to calculate duration
 	if (m_pFile->IsRandomAccess()) {
 		m_pFile->Seek(max(m_pFile->GetLength()-MAX_PAGE_SIZE, 0));
 
@@ -342,30 +367,20 @@ start:
 		}
 	}
 
+	// get min pts to calculate duration
 	m_pFile->Seek(start_pos);
 	for (int i = 0; m_pFile->Read(page), i<10; i++) {
 		COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
-		if (!pOggPin ||
-			page.m_hdr.granule_position == -1 ||
-			page.m_hdr.granule_position == 0 ||
-			page.m_hdr.header_type_flag & OggPageHeader::first ||
-			(m_bitstream_serial_number_start && page.m_hdr.header_type_flag)) {
-			BYTE* p = page.GetData();
-			if (!p || (p && (!memcmp(p, "fishead", 7) || !memcmp(p, "fisbone", 7)))) {
-				start_pos = m_pFile->GetPos();
-				continue;
-			}
-			if (!pOggPin && m_pOutputs.GetCount() == 1) {
-				DeleteOutputs();
-				goto start;
-			}
-			start_pos = m_pFile->GetPos();
+		if (!pOggPin || page.m_hdr.granule_position == -1 || page.m_hdr.header_type_flag & OggPageHeader::first) {
 			continue;
 		}
 		REFERENCE_TIME rt = pOggPin->GetRefTime(page.m_hdr.granule_position);
-		if (rt != _I64_MIN) {
-			m_rtMin = rt;
-			break;
+		if (rt > 0) {
+			if ((rt - m_rtMin) > MAX_PTS_SHIFT) {
+				m_rtMin = rt;
+			} else {
+				break;
+			}
 		}
 	}
 
@@ -649,16 +664,21 @@ bool COggSplitterFilter::DemuxLoop()
 
 				DWORD bitstream_serial_number = page.m_hdr.bitstream_serial_number;
 				__int64 start_pos = m_pFile->GetPos();
-				for (int i = 0, nWaitForMore = 0; m_pFile->Read(page), bitstream_serial_number == page.m_hdr.bitstream_serial_number, i<10; i++) {
-					page.m_hdr.bitstream_serial_number	= m_bitstream_serial_number_start;
+				m_rtMin = 0;
+
+				for (int i = 0; m_pFile->Read(page), bitstream_serial_number == page.m_hdr.bitstream_serial_number, i<10; i++) {
 					COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
-					if (!pOggPin || page.m_hdr.granule_position == -1 || page.m_hdr.granule_position == 0 || (page.m_hdr.header_type_flag & OggPageHeader::first)) {
+					page.m_hdr.bitstream_serial_number = m_bitstream_serial_number_start;
+					if (!pOggPin || page.m_hdr.granule_position == -1 || page.m_hdr.header_type_flag & OggPageHeader::first) {
 						continue;
 					}
 					REFERENCE_TIME rt = pOggPin->GetRefTime(page.m_hdr.granule_position);
-					if (rt != _I64_MIN) {
-						m_rtMin = rt;
-						break;
+					if (rt > 0) {
+						if ((rt - m_rtMin) > MAX_PTS_SHIFT) {
+							m_rtMin = rt;
+						} else {
+							break;
+						}
 					}
 				}
 				m_pFile->Seek(start_pos);
