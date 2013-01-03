@@ -684,8 +684,8 @@ bool COggSplitterFilter::DemuxLoop()
 					}
 				}
 				m_pFile->Seek(start_pos);
+				continue;
 			}
-			continue;
 		}
 
 		if (m_pOutputs.GetCount() == 1 && m_bitstream_serial_number_start && m_bitstream_serial_number_start != page.m_hdr.bitstream_serial_number) {

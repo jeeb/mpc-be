@@ -16,6 +16,7 @@
 * libavcodec/pthread.c
 * libavcodec/utils.c
 * libavcodec/vc1dec.c
+* libavcodec/vorbis.c
 
 * libavutil/attributes.h
 * libavutil/common.h

@@ -197,8 +197,9 @@ int FFH264CheckCompatibility (int nWidth, int nHeight, struct AVCodecContext* pA
 					max_ref_frames = 14;
 				}
 			}
-		} else if (nPCIVendor == PCIV_S3_Graphics) {
+		} else if (nPCIVendor == PCIV_S3_Graphics || nPCIVendor == PCIV_Intel) {
 			no_level51_support = 0;
+			max_ref_frames = 16;
 		} else if (nPCIVendor == PCIV_ATI && nIsAtiDXVACompatible) {
 			TCHAR path[MAX_PATH];
 			GetSystemDirectory(path, MAX_PATH);
