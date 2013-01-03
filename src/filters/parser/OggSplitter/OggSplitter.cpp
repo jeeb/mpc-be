@@ -336,19 +336,21 @@ start:
 
 	// verify that stream contain data, not only header
 	if (m_bitstream_serial_number_start) {
-		m_pFile->Seek(start_pos);
+		__int64 start_pos2 = start_pos;
+		m_pFile->Seek(start_pos2);
 		for (int i = 0; m_pFile->Read(page), i<10; i++) {
 			COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
 			if (!pOggPin) {
 				BYTE* p = page.GetData();
 				if (!p || (p && (!memcmp(p, "fishead", 7) || !memcmp(p, "fisbone", 7)))) {
-					start_pos = m_pFile->GetPos();
+					start_pos2 = m_pFile->GetPos();
 					continue;
 				}
 				DeleteOutputs();
+				start_pos = start_pos2;
 				goto start;
 			}
-			start_pos = m_pFile->GetPos();
+			start_pos2 = m_pFile->GetPos();
 		}
 	}
 
