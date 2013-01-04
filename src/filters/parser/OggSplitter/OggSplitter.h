@@ -242,8 +242,6 @@ protected:
 	void DemuxSeek(REFERENCE_TIME rt);
 	bool DemuxLoop();
 
-	bool m_bIsTheora;
-
 	DWORD m_bitstream_serial_number_start, m_bitstream_serial_number_last;
 
 public:

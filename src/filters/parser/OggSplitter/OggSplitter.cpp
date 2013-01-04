@@ -147,7 +147,6 @@ public:
 
 COggSplitterFilter::COggSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("COggSplitterFilter"), pUnk, phr, __uuidof(this))
-	, m_bIsTheora(false)
 	, m_rtMin(0)
 	, m_rtMax(0)
 	, m_bitstream_serial_number_start(0)
@@ -314,7 +313,6 @@ start:
 			p->UnpackInitPage(page);
 			if (p->IsInitialized()) {
 				nWaitForMore--;
-				m_bIsTheora = true;
 			}
 		}
 
@@ -708,7 +706,7 @@ bool COggSplitterFilter::DemuxLoop()
 		CAutoPtr<OggPacket> p;
 		while (!CheckRequest(NULL) && SUCCEEDED(hr) && (p = pOggPin->GetPacket())) {
 			if (!p->fSkip) {
-				if (m_bIsTheora) {
+				if (COggTheoraOutputPin* pPin = dynamic_cast<COggTheoraOutputPin*>(pOggPin)) {
 					if ((m_rtStart - p->rtStart) < 30000000) {
 						hr = DeliverPacket(p);
 					}
