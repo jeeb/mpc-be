@@ -2,7 +2,7 @@
  * $Id$
  *
  * (C) 2003-2006 Gabest
- * (C) 2006-2012 see Authors.txt
+ * (C) 2006-2013 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -377,11 +377,9 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 			CVobSubStream* pVSS = (CVobSubStream*)(ISubStream*)m_pSubStream;
 			pVSS->Add(tStart, tStop, pData, len);
 		} else if (IsHdmvSub(&m_mt)) {
-			CAutoLock cAutoLock(m_pSubLock);
 			CRenderedHdmvSubtitle* pHdmvSubtitle = (CRenderedHdmvSubtitle*)(ISubStream*)m_pSubStream;
 			pHdmvSubtitle->ParseSample (pSample);
 		} else if (m_mt.subtype == MEDIASUBTYPE_XSUB) {
-			CAutoLock cAutoLock(m_pSubLock);
 			CXSUBSubtitle* pXSUBSubtitle = (CXSUBSubtitle*)(ISubStream*)m_pSubStream;
 			pXSUBSubtitle->ParseSample (pSample);
 		}
