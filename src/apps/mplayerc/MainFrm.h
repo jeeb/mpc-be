@@ -287,6 +287,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	void SetupLanguageMenu();
 
 	IBaseFilter* FindSourceSelectableFilter();
+	IBaseFilter* FindSwitcherFilter();
 	void SetupNavStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup);
 	void OnNavStreamSelectSubMenu(UINT id, DWORD dwSelGroup);
 
@@ -310,14 +311,23 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	CInterfaceArray<IUnknown, &IID_IUnknown> m_pparray;
 	CInterfaceArray<IAMStreamSelect> m_ssarray;
 
-	typedef struct {
+	typedef struct AudStreams {
 		int iFilter;
 		int iIndex;
 		int iNum;
 		int iSel;
-	} AudStreams;
+		bool forced;
+		bool def;
+		CString Name;
 
-	typedef struct {
+		AudStreams() {
+			iFilter = iIndex = 0;
+			iNum = iSel = -1;
+			forced = def = false;
+		};
+	};
+
+	typedef struct SubStreams {
 		int iFilter;
 		int iIndex;
 		int iNum;
@@ -326,7 +336,13 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 		bool forced;
 		bool def;
 		CString lang;
-	} SubStreams;
+
+		SubStreams() {
+			iFilter = iIndex = 0;
+			iNum = iSel = -1;
+			Extsub = forced = def = false;
+		}
+	};
 
 	CAtlArray<SubStreams> subarray;
 	void SubFlags(CString strname, bool &forced, bool &def);
@@ -483,6 +499,7 @@ protected:
 	void OpenCustomizeGraph();
 	void OpenSetupVideo();
 	void OpenSetupAudio();
+	void OpenSetupAudioStream();
 	void OpenSetupSubStream(OpenMediaData* pOMD);
 	void OpenSetupInfoBar();
 	void OpenSetupStatsBar();

@@ -4032,11 +4032,7 @@ void CMainFrame::OnStreamAudio(UINT nID)
 		}
 
 
-		CComQIPtr<IAMStreamSelect> pSSa = FindFilter(__uuidof(CAudioSwitcherFilter), pGB);
-		if (!pSSa) {
-			pSSa = FindFilter(L"{D3CD7858-971A-4838-ACEC-40CA5D529DC8}", pGB);    // morgan's switcher
-		}
-
+		CComQIPtr<IAMStreamSelect> pSSa = FindSwitcherFilter();
 		if (pSSa) {
 			DWORD cStreamsA = 0;
 			int i;
@@ -8680,10 +8676,7 @@ void CMainFrame::OnPlayAudio(UINT nID)
 {
 	int i = (int)nID - (ID_AUDIO_SUBITEM_START);
 
-	CComQIPtr<IAMStreamSelect> pSS = FindFilter(__uuidof(CAudioSwitcherFilter), pGB);
-	if (!pSS) {
-		pSS = FindFilter(L"{D3CD7858-971A-4838-ACEC-40CA5D529DC8}", pGB);
-	}
+	CComQIPtr<IAMStreamSelect> pSS = FindSwitcherFilter();
 
 	if (i == -1) {
 		ShowOptions(CPPageAudioSwitcher::IDD);
@@ -8719,10 +8712,7 @@ void CMainFrame::OnUpdatePlayAudio(CCmdUI* pCmdUI)
 	UINT nID = pCmdUI->m_nID;
 	int i = (int)nID - (ID_AUDIO_SUBITEM_START);
 
-	CComQIPtr<IAMStreamSelect> pSS = FindFilter(__uuidof(CAudioSwitcherFilter), pGB);
-	if (!pSS) {
-		pSS = FindFilter(L"{D3CD7858-971A-4838-ACEC-40CA5D529DC8}", pGB);
-	}
+	CComQIPtr<IAMStreamSelect> pSS = FindSwitcherFilter();
 
 	/*if (i == -1)
 	{
@@ -8983,10 +8973,7 @@ void CMainFrame::OnPlayLanguage(UINT nID)
 
 	if (iGr == 1) { // Audio Stream
 		bool bExternalTrack = false;
-		CComQIPtr<IAMStreamSelect> pSSA = FindFilter(__uuidof(CAudioSwitcherFilter), pGB);
-		if (!pSSA) {
-			pSSA = FindFilter(L"{D3CD7858-971A-4838-ACEC-40CA5D529DC8}", pGB);
-		}
+		CComQIPtr<IAMStreamSelect> pSSA = FindSwitcherFilter();
 		if (pSSA) {
 			DWORD cStreamsA = 0;
 			if (SUCCEEDED(pSSA->Count(&cStreamsA)) && cStreamsA > 1) {
@@ -13034,41 +13021,6 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 	m_Lcd.SetMediaTitle(LPCTSTR(fn));
 }
 
-int SelectAudio(const CComPtr<IAMStreamSelect> &pSS)
-{
-	AppSettings& s = AfxGetAppSettings();
-
-	if (s.fUseInternalSelectTrackLogic) {
-		DWORD cStreams = 0;
-		if (pSS && SUCCEEDED(pSS->Count(&cStreams)) && cStreams > 0) {
-
-			CStringW alo = _T("[Forced],") + s.strAudiosLanguageOrder + _T(",[Default]");
-			int tPos = 0;
-			CStringW lang = alo.Tokenize(_T(",; "), tPos);
-			while (tPos != -1) {
-				int ll = lang.GetLength();
-				for (int iIndex = 0; iIndex < (int)cStreams; iIndex++) {
-					WCHAR* pName = NULL;
-					if (FAILED(pSS->Info(iIndex, NULL, NULL, NULL, NULL, &pName, NULL, NULL))) {
-						continue;
-					}
-					CString name(pName);
-					name = name.Trim();
-					CoTaskMemFree(pName);
-
-					if ((name.Left(ll).CompareNoCase(lang) == 0) || (name.Right(ll).CompareNoCase(lang) == 0)) {
-						return iIndex;
-					}
-				}
-				lang = alo.Tokenize(_T(",; "), tPos);
-			}
-			return 0;
-		}
-	}
-
-	return 0;
-}
-
 #define BREAK(msg) {err = msg; break;}
 
 void CMainFrame::SubFlags(CString strname, bool &forced, bool &def)
@@ -13085,6 +13037,210 @@ void CMainFrame::SubFlags(CString strname, bool &forced, bool &def)
 	} else {
 		def		= 0;
 		forced	= 0;
+	}
+}
+
+void CMainFrame::OpenSetupAudioStream()
+{
+	if (m_iMediaLoadState != MLS_LOADED) {
+		return;
+	}
+
+	AppSettings& s = AfxGetAppSettings();
+	if (s.fUseInternalSelectTrackLogic) {
+	
+		if (GetPlaybackMode() == PM_FILE) {
+
+			// build list of audio stream
+			AudStreams as;
+			CAtlArray<AudStreams> MixAS;
+			int iSel	= -1;
+			as.iNum		= -1;
+
+			CComQIPtr<IAMStreamSelect> pSSs = FindSourceSelectableFilter();
+			if (pSSs) {
+				CComQIPtr<ITrackInfo> pInfo = pSSs;
+				DWORD cStreamsS = 0;
+				if (SUCCEEDED(pSSs->Count(&cStreamsS)) && cStreamsS > 0) {
+					for (int i = 0; i < (int)cStreamsS; i++) {
+						//iSel = 0;
+						AM_MEDIA_TYPE* pmt	= NULL;
+						DWORD dwFlags		= 0;
+						LCID lcid			= 0;
+						DWORD dwGroup		= 0;
+						WCHAR* pszName		= NULL;
+						if (FAILED(pSSs->Info(i, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))) {
+							continue;
+						}
+
+						if (dwGroup == 1) {
+							if (dwFlags&(AMSTREAMSELECTINFO_ENABLED|AMSTREAMSELECTINFO_EXCLUSIVE)) {
+								iSel = MixAS.GetCount();
+								//iSel = 1;
+							}
+
+							as.forced = as.def = false;
+							if (pInfo) {
+								TrackElement TrackInfo;
+								TrackInfo.Size = sizeof(TrackInfo);
+								if (pInfo->GetTrackInfo((UINT)i, &TrackInfo) && TrackInfo.Type == TrackType::TypeAudio) {
+									as.def		= !!TrackInfo.FlagDefault;
+									as.forced	= !!TrackInfo.FlagForced;
+								}
+							}
+
+							as.iFilter	= 1;
+							as.iIndex	= i;
+							as.iNum++;
+							as.iSel		= iSel;
+							as.Name		= CString(pszName);
+							MixAS.Add(as);
+						}
+
+						if (pmt) {
+							DeleteMediaType(pmt);
+						}
+						if (pszName) {
+							CoTaskMemFree(pszName);
+						}
+					}
+				}
+			}
+
+			CComQIPtr<IAMStreamSelect> pSSa = FindSwitcherFilter();
+			if (pSSa) {
+
+				UINT maxAudioTrack = 0;
+				CComQIPtr<ITrackInfo> pInfo = FindFilter(__uuidof(CMatroskaSourceFilter), pGB);
+				if (!pInfo) {
+					pInfo = FindFilter(__uuidof(CMatroskaSplitterFilter), pGB);
+				}
+				if (pInfo) {
+					for (UINT i = 0; i < pInfo->GetTrackCount(); i++) {
+						TrackElement TrackInfo;
+						TrackInfo.Size = sizeof(TrackInfo);
+						if (pInfo->GetTrackInfo(i, &TrackInfo) && TrackInfo.Type == TrackType::TypeAudio) {
+							maxAudioTrack = max(maxAudioTrack, i);
+						}											
+					}
+				}
+
+				DWORD cStreamsA = 0;
+				int i;
+				MixAS.GetCount() > 0 ? i = 1 : i = 0;
+				if (SUCCEEDED(pSSa->Count(&cStreamsA)) && cStreamsA > 0) {
+					for (i; i < (int)cStreamsA; i++) {
+						//iSel = 0;
+						AM_MEDIA_TYPE* pmt	= NULL;
+						DWORD dwFlags		= 0;
+						LCID lcid			= 0;
+						DWORD dwGroup		= 0;
+						WCHAR* pszName		= NULL;
+						if (FAILED(pSSa->Info(i, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))) {
+							continue;
+						}
+
+						as.forced = as.def = false;
+						UINT l = i+1;
+						if (pInfo && l <= maxAudioTrack) {
+							TrackElement TrackInfo;
+							TrackInfo.Size = sizeof(TrackInfo);
+							if (pInfo->GetTrackInfo(l, &TrackInfo) && TrackInfo.Type == TrackType::TypeAudio) {
+								as.def		= !!TrackInfo.FlagDefault;
+								as.forced	= !!TrackInfo.FlagForced;
+							}											
+						}
+
+						if (dwFlags&(AMSTREAMSELECTINFO_ENABLED|AMSTREAMSELECTINFO_EXCLUSIVE)) {
+							//iSel = 1;
+							iSel = MixAS.GetCount();
+							for (size_t i = 0; i < MixAS.GetCount(); i++) {
+								if (MixAS[i].iSel == 1) {
+									MixAS[i].iSel = 0;
+								}
+							}
+						}
+
+						as.iFilter	= 2;
+						as.iIndex	= i;
+						as.iNum++;
+						as.iSel		= iSel;
+						as.Name		= CString(pszName);
+						MixAS.Add(as);
+
+						if (pmt) {
+							DeleteMediaType(pmt);
+						}
+
+						if (pszName) {
+							CoTaskMemFree(pszName);
+						}
+					}
+				}
+			}
+
+			// processing the stream list
+			if (MixAS.GetCount()) {
+#ifdef DEBUG
+				TRACE(_T("\nAudio Track list :\n"));
+				for (size_t i = 0; i < MixAS.GetCount(); i++) {
+					CString Name = MixAS[i].Name;
+					TRACE(_T("	%ws, type = %ws\n"), MixAS[i].Name, MixAS[i].iFilter == 1 ? _T("Splitter") : _T("AudioSwitcher"));
+				}
+#endif
+
+				bool bLangMatch	= false;
+				size_t bLangIdx	= 0;
+				
+				CStringW alo = s.strAudiosLanguageOrder;
+				if (alo.IsEmpty()) {
+					alo = _T("forced default");
+				} else {
+					alo.Replace(_T("[fc]"), _T("forced"));
+					alo.Replace(_T("[def]"), _T("default"));
+				}
+
+				int tPos = 0;
+				CStringW lang = alo.Tokenize(_T(",; "), tPos);
+				while (tPos != -1 && !bLangMatch) {
+					for (size_t iIndex = 0; iIndex < MixAS.GetCount(); iIndex++) {
+						
+						CString name(MixAS[iIndex].Name);
+						name.MakeLower();
+						lang.MakeLower();
+
+						if ((MixAS[iIndex].forced && lang == _T("forced")) || (MixAS[iIndex].def && lang == _T("default"))) {
+							bLangIdx	= iIndex;
+							bLangMatch	= true;
+							break;
+						}
+
+						if (name.Find(lang) >= 0) {
+							bLangIdx	= iIndex;
+							bLangMatch	= true;
+							break;
+						}
+					}
+					lang = alo.Tokenize(_T(",; "), tPos);
+				}
+
+				if (bLangMatch) {
+					AudStreams as = MixAS[bLangIdx];
+					if (as.iFilter == 1) {
+						pSSs->Enable(as.iIndex, AMSTREAMSELECTENABLE_ENABLE);
+					} else if (as.iFilter == 2) {
+						pSSa->Enable(as.iIndex, AMSTREAMSELECTENABLE_ENABLE);
+					}
+					return;
+				}
+			}
+		}
+	}
+
+	// if no selected above ...
+	CComQIPtr<IAMStreamSelect> pSS = FindSwitcherFilter();
+	if (pSS) {
+		pSS->Enable(0, AMSTREAMSELECTENABLE_ENABLE);
 	}
 }
 
@@ -13764,17 +13920,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			OnTimer(TIMER_STREAMPOSPOLLER2);
 		}
 
-		// audio selection should be done before running the graph to prevent an
-		// unnecessary seek when a file is opened (PostMessage ID_AUDIO_SUBITEM_START removed)
-		CComQIPtr<IAMStreamSelect> pSS = FindFilter(__uuidof(CAudioSwitcherFilter), pGB);
-		if (!pSS) {
-			pSS = FindFilter(L"{D3CD7858-971A-4838-ACEC-40CA5D529DC8}", pGB);    // morgan's switcher
-		}
-
-		DWORD cStreams = 0;
-		if (pSS && SUCCEEDED(pSS->Count(&cStreams)) && cStreams > 0) {
-			OnPlayAudio (ID_AUDIO_SUBITEM_START + SelectAudio(pSS));
-		}
+		OpenSetupAudioStream();
 
 		AfxGetAppSettings().nCLSwitches &= ~CLSW_OPEN;
 
@@ -14503,11 +14649,7 @@ void CMainFrame::SetupAudioSwitcherSubMenu()
 	if (m_iMediaLoadState == MLS_LOADED) {
 		UINT id = ID_AUDIO_SUBITEM_START;
 
-		CComQIPtr<IAMStreamSelect> pSS = FindFilter(__uuidof(CAudioSwitcherFilter), pGB);
-		if (!pSS) {
-			pSS = FindFilter(L"{D3CD7858-971A-4838-ACEC-40CA5D529DC8}", pGB);
-		}
-
+		CComQIPtr<IAMStreamSelect> pSS = FindSwitcherFilter();
 		if (pSS) {
 			DWORD cStreams = 0;
 			if (SUCCEEDED(pSS->Count(&cStreams)) && cStreams > 0) {
@@ -15090,6 +15232,18 @@ IBaseFilter* CMainFrame::FindSourceSelectableFilter()
 	return pSF;
 }
 
+IBaseFilter* CMainFrame::FindSwitcherFilter()
+{
+	IBaseFilter* pSF = NULL;
+
+	pSF = FindFilter(__uuidof(CAudioSwitcherFilter), pGB);
+	if (!pSF) {
+		pSF = FindFilter(CLSID_MorganSwitcher, pGB);
+	}
+
+	return pSF;
+}
+
 void CMainFrame::SetupNavStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup)
 {
 	UINT baseid = id;
@@ -15217,11 +15371,7 @@ void CMainFrame::OnNavStreamSelectSubMenu(UINT id, DWORD dwSelGroup)
 void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup)
 {
 	bool bSetCheck = true;
-	CComQIPtr<IAMStreamSelect> pSSA = FindFilter(__uuidof(CAudioSwitcherFilter), pGB);
-	if (!pSSA) {
-		pSSA = FindFilter(L"{D3CD7858-971A-4838-ACEC-40CA5D529DC8}", pGB);
-	}
-
+	CComQIPtr<IAMStreamSelect> pSSA = FindSwitcherFilter();
 	if (pSSA) {
 		DWORD cStreamsA = 0;
 		if (SUCCEEDED(pSSA->Count(&cStreamsA)) && cStreamsA > 1) {
@@ -15464,10 +15614,7 @@ void CMainFrame::OnNavMixStreamSelectSubMenu(UINT id, DWORD dwSelGroup)
 {
 	bool bSplitterMenu = false;
 
-	CComQIPtr<IAMStreamSelect> pSSA = FindFilter(__uuidof(CAudioSwitcherFilter), pGB);
-	if (!pSSA) {
-		pSSA = FindFilter(L"{D3CD7858-971A-4838-ACEC-40CA5D529DC8}", pGB);
-	}
+	CComQIPtr<IAMStreamSelect> pSSA = FindSwitcherFilter();
 
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
 		
@@ -15802,47 +15949,6 @@ void CMainFrame::SetAlwaysOnTop(int i)
 	}
 }
 
-// foxX: as with audio streams, this one will tell if a subtitle comes before the other,
-// in accordance with user options regarding subtitle language order
-bool DoesSubPrecede(const CComPtr<ISubStream> &a, const CComPtr<ISubStream> &b)
-{
-	WCHAR *pName;
-	if (!SUCCEEDED(a->GetStreamInfo(0, &pName, NULL))) {
-		return false;
-	}
-	CStringW nameA(pName);
-	nameA = nameA.Trim();
-	CoTaskMemFree(pName);
-
-	if (!SUCCEEDED(b->GetStreamInfo(0, &pName, NULL))) {
-		return false;
-	}
-	CStringW nameB(pName);
-	nameB = nameB.Trim();
-	CoTaskMemFree(pName);
-
-	int ia = -1;
-	int ib = -1;
-	CStringW slo = _T("[Forced],") + AfxGetAppSettings().strSubtitlesLanguageOrder + _T(",[Default]");
-	int tPos = 0;
-	CStringW lang = slo.Tokenize(_T(",; "), tPos);
-	while (tPos != -1 && ia == -1 && ib == -1) {
-		int ll = lang.GetLength();
-		if ((nameA.Left(ll).CompareNoCase(lang) == 0) || (nameA.Right(ll).CompareNoCase(lang) == 0)) {
-			ia = tPos;
-		}
-		if ((nameB.Left(ll).CompareNoCase(lang) == 0) || (nameB.Right(ll).CompareNoCase(lang) == 0)) {
-			ib = tPos;
-		}
-		lang = slo.Tokenize(_T(",; "), tPos);
-	}
-	if (ia != -1 && ib == -1) {
-		return true;
-	}
-	return false;
-}
-
-// foxX: inserts the subtitle stream exactly where it should be, base on user preference
 ISubStream *InsertSubStream(CInterfaceList<ISubStream> *subStreams, const CComPtr<ISubStream> &theSubStream)
 {
 	POSITION pos = subStreams->GetHeadPosition();
@@ -16151,10 +16257,7 @@ void CMainFrame::SetSubtitleTrackIdx(int index)
 void CMainFrame::SetAudioTrackIdx(int index)
 {
 	if (m_iMediaLoadState == MLS_LOADED) {
-		CComQIPtr<IAMStreamSelect> pSS = FindFilter(__uuidof(CAudioSwitcherFilter), pGB);
-		if (!pSS) {
-			pSS = FindFilter(L"{D3CD7858-971A-4838-ACEC-40CA5D529DC8}", pGB);    // morgan's switcher
-		}
+		CComQIPtr<IAMStreamSelect> pSS = FindSwitcherFilter();
 
 		DWORD cStreams = 0;
 		DWORD dwFlags = AMSTREAMSELECTENABLE_ENABLE;
@@ -17675,10 +17778,7 @@ void CMainFrame::SendAudioTracksToApi()
 	CStringW	strAudios;
 
 	if (m_iMediaLoadState == MLS_LOADED) {
-		CComQIPtr<IAMStreamSelect> pSS = FindFilter(__uuidof(CAudioSwitcherFilter), pGB);
-		if (!pSS) {
-			pSS = FindFilter(L"{D3CD7858-971A-4838-ACEC-40CA5D529DC8}", pGB);    // morgan's switcher
-		}
+		CComQIPtr<IAMStreamSelect> pSS = FindSwitcherFilter();
 
 		DWORD cStreams = 0;
 		if (pSS && SUCCEEDED(pSS->Count(&cStreams))) {
@@ -17826,8 +17926,7 @@ void CMainFrame::JumpOfNSeconds(int nSeconds)
 //	{
 //		if (GetPlaybackMode() == PM_FILE)
 //		{
-//			CComQIPtr<IAMStreamSelect> pSS = FindFilter(__uuidof(CAudioSwitcherFilter), pGB);
-//			if (!pSS) pSS = FindFilter(L"{D3CD7858-971A-4838-ACEC-40CA5D529DC8}", pGB); // morgan's switcher
+//			CComQIPtr<IAMStreamSelect> pSS = FindSwitcherFilter();
 //
 //			DWORD cStreams = 0;
 //			if (pSS && SUCCEEDED(pSS->Count(&cStreams)))

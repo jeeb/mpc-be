@@ -820,7 +820,9 @@ avcsuccess:
 					memset(psi, 0, mt.FormatLength());
 					strncpy_s(psi->IsoLang, pTE->Language, _countof(psi->IsoLang)-1);
 					CString subtitle_Name = pTE->Name;
-					if (pTE->FlagForced) { // "Forced" overrides "Default"
+					if (pTE->FlagForced && pTE->FlagDefault) {
+						subtitle_Name += L" [Default, Forced]";
+					} else if (pTE->FlagForced) {
 						subtitle_Name += L" [Forced]";
 					} else if (pTE->FlagDefault) {
 						subtitle_Name += L" [Default]";
@@ -858,7 +860,9 @@ avcsuccess:
 				   + (pTE->Name.IsEmpty() ? L"" : (Language.IsEmpty() ? L"" : L", ") + pTE->Name)
 				   + (L" (" + Name + L")");
 
-			if (pTE->FlagForced) { // "Forced" overrides "Default"
+			if (pTE->FlagForced && pTE->FlagDefault) {
+				Name = Name + L" [Default, Forced]";
+			} else if (pTE->FlagForced) {
 				Name = Name + L" [Forced]";
 			} else if (pTE->FlagDefault) {
 				Name = Name + L" [Default]";

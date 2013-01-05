@@ -45,15 +45,6 @@
 
 #include "../../filters/renderer/VideoRenderers/IPinHook.h"
 
-// {212690FB-83E5-4526-8FD7-74478B7939CD} from wmcodecdsp.h
-DEFINE_GUID	(CLSID_CMPEG2VidDecoderDS,			0x212690FB, 0x83E5, 0x4526, 0x8F, 0xD7, 0x74, 0x47, 0x8B, 0x79, 0x39, 0xCD);
-// {71E4616A-DB5E-452B-8CA5-71D9CC7805E9}
-DEFINE_GUID	(CLSID_NvidiaVideoDecoder,			0x71E4616A, 0xDB5E, 0x452B, 0x8C, 0xA5, 0x71, 0xD9, 0xCC, 0x78, 0x05, 0xE9);
-// {D7D50E8D-DD72-43C2-8587-A0C197D837D2}
-DEFINE_GUID	(CLSID_SonicCinemasterVideoDecoder,	0xD7D50E8D, 0xDD72, 0x43C2, 0x85, 0x87, 0xA0, 0xC1, 0x97, 0xD8, 0x37, 0xD2);
-// {AB9D6472-752F-43F6-B29E-61207BDA8E06}
-DEFINE_GUID (CLSID_RDPDShowRedirectionFilter,	0xAB9D6472, 0x752F, 0x43F6, 0xB2, 0x9E, 0x61, 0x20, 0x7B, 0xDA, 0x8E, 0x06);
-
 //
 // CFGManager
 //
@@ -2853,7 +2844,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_transform.AddTail(pFGF);
 
 		// morgan stream switcher
-		m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(_T("{D3CD7858-971A-4838-ACEC-40CA5D529DC8}")), MERIT64_DO_NOT_USE));
+		m_transform.AddTail(DNew CFGFilterRegistry(CLSID_MorganSwitcher, MERIT64_DO_NOT_USE));
 	}
 
 	// Renderers
@@ -3056,7 +3047,7 @@ CFGManagerCapture::CFGManagerCapture(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd)
 	m_transform.AddTail(pFGF);
 
 	// morgan stream switcher
-	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(_T("{D3CD7858-971A-4838-ACEC-40CA5D529DC8}")), MERIT64_DO_NOT_USE));
+	m_transform.AddTail(DNew CFGFilterRegistry(CLSID_MorganSwitcher, MERIT64_DO_NOT_USE));
 }
 
 //
