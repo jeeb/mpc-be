@@ -2,7 +2,7 @@
  * $Id$
  *
  * (C) 2003-2006 Gabest
- * (C) 2006-2012 see Authors.txt
+ * (C) 2006-2013 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1313,7 +1313,7 @@ BOOL CPlayerCaptureDialog::OnInitDialog()
 	InitCodecList(m_pAudEncArray, m_audcodec, CLSID_AudioCompressorCategory);
 	UpdateAudioCodec();
 
-	m_fEnableOgm = IsCLSIDRegistered(_T("{8cae96b7-85b1-4605-b23c-17ff5262b296}"));
+	m_fEnableOgm = IsCLSIDRegistered(CLSID_OggMux);
 
 	m_nVidBuffers = AfxGetApp()->GetProfileInt(IDS_RS_CAPTURE, _T("VidBuffers"), 50);
 	m_nAudBuffers = AfxGetApp()->GetProfileInt(IDS_RS_CAPTURE, _T("AudBuffers"), 50);
