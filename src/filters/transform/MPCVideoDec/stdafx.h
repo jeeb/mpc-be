@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * (C) 2007-2012 see Authors.txt
+ * (C) 2007-2013 see Authors.txt
  *
  * This file is part of MPC-BE.
  *

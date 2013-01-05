@@ -2,7 +2,7 @@
  * $Id: PPageFileInfoRes.h 779 2012-07-31 17:52:09Z exodus8 $
  *
  * (C) 2003-2006 Gabest
- * (C) 2006-2012 see Authors.txt
+ * (C) 2006-2013 see Authors.txt
  *
  * This file is part of MPC-BE.
  *

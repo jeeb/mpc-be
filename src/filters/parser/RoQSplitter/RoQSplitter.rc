@@ -47,7 +47,7 @@ BEGIN
             VALUE "FileDescription", "RoQ Splitter (based on Tim Ferguson's decoder)"
             VALUE "FileVersion", MAKE_STR(MPC_VERSION_MAJOR) ", " MAKE_STR(MPC_VERSION_MINOR) ", " MAKE_STR(MPC_VERSION_REV) ", " MAKE_STR(MPC_VERSION_PATCH)
             VALUE "InternalName", "RoQ Splitter"
-            VALUE "LegalCopyright", "Copyright (C) 2002-2012 see AUTHORS file"
+            VALUE "LegalCopyright", "Copyright (C) 2002-2013 see AUTHORS file"
             VALUE "OriginalFilename", "RoQSplitter.ax"
             VALUE "ProductName", "RoQ Splitter"
             VALUE "ProductVersion", MAKE_STR(MPC_VERSION_MAJOR) ", " MAKE_STR(MPC_VERSION_MINOR) ", " MAKE_STR(MPC_VERSION_REV) ", " MAKE_STR(MPC_VERSION_PATCH)

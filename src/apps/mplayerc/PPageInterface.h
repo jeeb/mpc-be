@@ -2,7 +2,7 @@
  * $Id: PPageTweaks.h 778 2012-07-31 12:26:37Z alexins $
  *
  * (C) 2003-2006 Gabest
- * (C) 2006-2012 see Authors.txt
+ * (C) 2006-2013 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
