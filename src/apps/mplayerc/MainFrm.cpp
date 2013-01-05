@@ -13025,6 +13025,7 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 
 void CMainFrame::SubFlags(CString strname, bool &forced, bool &def)
 {
+	strname.Remove(' ');
 	if (strname.Right(16).MakeLower() == _T("[default,forced]")) {
 		def		= 1;
 		forced	= 1;
