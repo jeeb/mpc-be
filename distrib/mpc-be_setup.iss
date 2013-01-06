@@ -1,6 +1,6 @@
 ﻿; $Id$
 ;
-; (C) 2009-2012 see Authors.txt
+; (C) 2009-2013 see Authors.txt
 ;
 ; This file is part of MPC-BE.
 ;
@@ -30,8 +30,8 @@
 
 ; From now on you shouldn't need to change anything
 
-#if VER < EncodeVer(5,5,0)
-  #error Update your Inno Setup version (5.5.0 or newer)
+#if VER < EncodeVer(5,5,2)
+  #error Update your Inno Setup version (5.5.2 or newer)
 #endif
 
 #ifndef UNICODE
@@ -41,7 +41,7 @@
 #define ISPP_INVOKED
 #include "..\include\Version.h"
 
-#define copyright_year "2002-2012"
+#define copyright_year "2002-2013"
 #define app_name       "MPC-BE"
 #define app_version    str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_STATUS) + "." + str(MPC_VERSION_PATCH)
 #define app_version_out    str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_STATUS) + "." + str(MPC_VERSION_PATCH)+ "." + str(MPC_VERSION_REV)
