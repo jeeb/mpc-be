@@ -13181,7 +13181,7 @@ void CMainFrame::OpenSetupAudioStream()
 			}
 
 			// processing the stream list
-			if (MixAS.GetCount()) {
+			if (MixAS.GetCount() > 1) {
 #ifdef DEBUG
 				TRACE(_T("\nAudio Track list :\n"));
 				for (size_t i = 0; i < MixAS.GetCount(); i++) {
