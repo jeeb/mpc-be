@@ -13202,13 +13202,25 @@ void CMainFrame::OpenSetupAudioStream()
 						name.MakeLower();
 						lang.MakeLower();
 
-						if ((MixAS[iIndex].forced && lang == _T("forced")) || (MixAS[iIndex].def && lang == _T("default"))) {
-							bLangIdx	= iIndex;
-							bLangMatch	= true;
-							break;
+						CAtlList<CString> sl;
+						Explode(lang, sl, '|');
+						POSITION pos = sl.GetHeadPosition();
+
+						int nLangMatch = 0;
+						while (pos) {
+							CString pattern = sl.GetNext(pos);
+
+							if ((MixAS[iIndex].forced && pattern == _T("forced")) || (MixAS[iIndex].def && pattern == _T("default"))) {
+								nLangMatch++;
+								continue;
+							}
+
+							if (name.Find(pattern) >= 0) {
+								nLangMatch++;
+							}
 						}
 
-						if (name.Find(lang) >= 0) {
+						if (nLangMatch == sl.GetCount()) {
 							bLangIdx	= iIndex;
 							bLangMatch	= true;
 							break;
