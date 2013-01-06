@@ -217,7 +217,7 @@ IF %ERRORLEVEL% NEQ 0 (
 )
 
 FOR %%A IN ("Armenian" "Basque" "Belarusian" "Catalan" "Chinese Simplified"
- "Chinese Traditional" "Czech" "Dutch" "French" "German" "Hebrew" "Hungarian"
+ "Chinese Traditional" "Czech" "Dutch" "French" "German" "Greek" "Hebrew" "Hungarian"
  "Italian" "Japanese" "Korean" "Polish" "Portuguese" "Russian" "Slovak" "Spanish"
  "Swedish" "Turkish" "Ukrainian"
 ) DO (
