@@ -99,7 +99,6 @@ IF NOT EXIST "%LOG_DIR%" MD "%LOG_DIR%"
 
 CALL :SubDetectWinArch
 
-SET "MSBUILD=%WINDIR%\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe"
 SET "MSBUILD_SWITCHES=/nologo /consoleloggerparameters:Verbosity=minimal /maxcpucount /nodeReuse:true"
 
 SET START_TIME=%TIME%
@@ -175,7 +174,7 @@ EXIT /B
 TITLE Compiling MPC-BE Filters - %BUILDCFG% Filter^|%1...
 REM Call update_version.bat before building the filters
 CALL "update_version.bat"
-"%MSBUILD%" mpc-be.sln %MSBUILD_SWITCHES%^
+MSBuild.exe mpc-be.sln %MSBUILD_SWITCHES%^
  /target:%BUILDTYPE% /property:Configuration="%BUILDCFG% Filter";Platform=%1^
  /flp1:LogFile=%LOG_DIR%\filters_errors_%BUILDCFG%_%1.log;errorsonly;Verbosity=diagnostic^
  /flp2:LogFile=%LOG_DIR%\filters_warnings_%BUILDCFG%_%1.log;warningsonly;Verbosity=diagnostic
@@ -189,7 +188,7 @@ EXIT /B
 
 :SubMPCBE
 TITLE Compiling MPC-BE - %BUILDCFG%^|%1...
-"%MSBUILD%" mpc-be.sln %MSBUILD_SWITCHES%^
+MSBuild.exe mpc-be.sln %MSBUILD_SWITCHES%^
  /target:%BUILDTYPE% /property:Configuration=%BUILDCFG%;Platform=%1^
  /flp1:LogFile=%LOG_DIR%\mpc-be_errors_%BUILDCFG%_%1.log;errorsonly;Verbosity=diagnostic^
  /flp2:LogFile=%LOG_DIR%\mpc-be_warnings_%BUILDCFG%_%1.log;warningsonly;Verbosity=diagnostic
@@ -208,7 +207,7 @@ EXIT /B
 )
 
 TITLE Compiling mpciconlib - Release^|%1...
-"%MSBUILD%" mpciconlib.sln %MSBUILD_SWITCHES%^
+MSBuild.exe mpciconlib.sln %MSBUILD_SWITCHES%^
  /target:%BUILDTYPE% /property:Configuration=Release;Platform=%1
 IF %ERRORLEVEL% NEQ 0 (
   CALL :SubMsg "ERROR" "mpciconlib.sln %1 - Compilation failed!"
@@ -222,7 +221,7 @@ FOR %%A IN ("Armenian" "Basque" "Belarusian" "Catalan" "Chinese Simplified"
  "Swedish" "Turkish" "Ukrainian"
 ) DO (
  TITLE Compiling mpcresources - %%~A^|%1...
- "%MSBUILD%" mpcresources.sln %MSBUILD_SWITCHES%^
+ MSBuild.exe mpcresources.sln %MSBUILD_SWITCHES%^
  /target:%BUILDTYPE% /property:Configuration="Release %%~A";Platform=%1
  IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Compilation failed!"
 )
