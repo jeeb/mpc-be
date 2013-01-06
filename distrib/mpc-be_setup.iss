@@ -199,7 +199,7 @@ Source: "{#bindir}\Lang\mpcresources.by.dll"; DestDir: "{app}\Lang"; Flags: igno
 Source: "{#bindir}\Lang\mpcresources.ca.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
 Source: "{#bindir}\Lang\mpcresources.cz.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
 Source: "{#bindir}\Lang\mpcresources.de.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-;Source: "{#bindir}\Lang\mpcresources.el.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
+Source: "{#bindir}\Lang\mpcresources.el.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
 Source: "{#bindir}\Lang\mpcresources.es.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
 Source: "{#bindir}\Lang\mpcresources.eu.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
 Source: "{#bindir}\Lang\mpcresources.fr.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
