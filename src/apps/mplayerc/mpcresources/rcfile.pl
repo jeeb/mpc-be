@@ -49,6 +49,7 @@ my %LANG_EXEPTIONS = (
 	'es' => 'es',
 	'eu' => 'eu',
 	'fr' => 'fr',
+	'hu' => 'hu',
 	'hy' => 'hy',
 	'it' => 'it',
 	'ja' => 'ja',
