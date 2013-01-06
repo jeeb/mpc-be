@@ -1,7 +1,7 @@
 @ECHO OFF
 REM $Id$
 REM
-REM (C) 2009-2012 see Authors.txt
+REM (C) 2009-2013 see Authors.txt
 REM
 REM This file is part of MPC-BE.
 REM
@@ -36,7 +36,6 @@ IF %ERRORLEVEL% NEQ 0 GOTO SubError
 POPD
 ENDLOCAL
 EXIT /B
-
 
 :SubNoSubWCRev
 ECHO. & ECHO SubWCRev, which is part of TortoiseSVN, wasn't found!
