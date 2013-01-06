@@ -101,14 +101,6 @@ static UINT s_uTaskbarRestart	= RegisterWindowMessage(_T("TaskbarCreated"));
 static UINT s_uTBBC				= RegisterWindowMessage(_T("TaskbarButtonCreated"));
 static UINT WM_NOTIFYICON		= RegisterWindowMessage(_T("MYWM_NOTIFYICON"));
 
-#if (_MSC_VER == 1700) // TODO - keep this until not fix in VS2012 return value of GetSystemMetrics() ...
-	#define _SM_CXSIZEFRAME GetSystemMetrics(SM_CXSIZEFRAME) * 2
-	#define _SM_CYSIZEFRAME GetSystemMetrics(SM_CYSIZEFRAME) * 2
-#else
-	#define _SM_CXSIZEFRAME GetSystemMetrics(SM_CXSIZEFRAME)
-	#define _SM_CYSIZEFRAME GetSystemMetrics(SM_CYSIZEFRAME)
-#endif
-
 class CSubClock : public CUnknown, public ISubClock
 {
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv) {
@@ -1376,8 +1368,8 @@ void CMainFrame::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 	}
 
 	if (style & WS_THICKFRAME) {
-		lpMMI->ptMinTrackSize.x += _SM_CXSIZEFRAME * 2;
-		lpMMI->ptMinTrackSize.y += _SM_CYSIZEFRAME * 2;
+		lpMMI->ptMinTrackSize.x += GetSystemMetrics(SM_CXSIZEFRAME) * 2;
+		lpMMI->ptMinTrackSize.y += GetSystemMetrics(SM_CYSIZEFRAME) * 2;
 		if ( (style & WS_CAPTION) == 0 ) {
 			lpMMI->ptMinTrackSize.x -= 2;
 			lpMMI->ptMinTrackSize.y -= 2;
@@ -1584,8 +1576,8 @@ void CMainFrame::OnSizing(UINT fwSide, LPRECT pRect)
 		//::GetMenuBarInfo(m_hWnd, OBJID_MENU, 0, &mbi);
 
 		if (style & WS_THICKFRAME) {
-			fsize.cx += _SM_CXSIZEFRAME * 2;
-			fsize.cy += _SM_CYSIZEFRAME * 2;
+			fsize.cx += GetSystemMetrics(SM_CXSIZEFRAME) * 2;
+			fsize.cy += GetSystemMetrics(SM_CYSIZEFRAME) * 2;
 			if ( (style & WS_CAPTION) == 0 ) {
 				fsize.cx -= 2;
 				fsize.cy -= 2;
@@ -7152,8 +7144,8 @@ void CMainFrame::OnViewCaptionmenu()
 		case MODE_SHOWCAPTIONMENU:	// borderless -> normal
 			dwAdd = WS_CAPTION | WS_THICKFRAME;
 			hMenu = m_hMenuDefault;
-			wr.right  += _SM_CXSIZEFRAME * 2;
-			wr.bottom += _SM_CYSIZEFRAME * 2;
+			wr.right  += GetSystemMetrics(SM_CXSIZEFRAME) * 2;
+			wr.bottom += GetSystemMetrics(SM_CYSIZEFRAME) * 2;
 			wr.bottom += GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYMENU);
 			break;
 
@@ -7170,8 +7162,8 @@ void CMainFrame::OnViewCaptionmenu()
 
 		case MODE_BORDERLESS:		// frameonly -> borderless
 			dwRemove = WS_THICKFRAME;
-			wr.right  -= _SM_CXSIZEFRAME * 2 - 2;
-			wr.bottom -= _SM_CYSIZEFRAME * 2 - 2;
+			wr.right  -= GetSystemMetrics(SM_CXSIZEFRAME) * 2 - 2;
+			wr.bottom -= GetSystemMetrics(SM_CYSIZEFRAME) * 2 - 2;
 			break;
 	}
 
@@ -10525,8 +10517,8 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 		h = _DEFCLIENTH + r1.Height() - r2.Height();
 
 		if (style & WS_THICKFRAME) {
-			w += _SM_CXSIZEFRAME * 2;
-			h += _SM_CYSIZEFRAME * 2;
+			w += GetSystemMetrics(SM_CXSIZEFRAME) * 2;
+			h += GetSystemMetrics(SM_CYSIZEFRAME) * 2;
 			if ( (style & WS_CAPTION) == 0 ) {
 				w -= 2;
 				h -= 2;
@@ -10659,8 +10651,8 @@ void CMainFrame::RestoreDefaultWindowRect()
 			h = _DEFCLIENTH + r1.Height() - r2.Height();
 
 			if (style & WS_THICKFRAME) {
-				w += _SM_CXSIZEFRAME * 2;
-				h += _SM_CYSIZEFRAME * 2;
+				w += GetSystemMetrics(SM_CXSIZEFRAME) * 2;
+				h += GetSystemMetrics(SM_CYSIZEFRAME) * 2;
 				if ( (style & WS_CAPTION) == 0 ) {
 					w -= 2;
 					h -= 2;
@@ -11339,8 +11331,8 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 		h = r1.Height() - r2.Height() + lHeight;
 
 		if (style & WS_THICKFRAME) {
-			w += _SM_CXSIZEFRAME * 2;
-			h += _SM_CYSIZEFRAME * 2;
+			w += GetSystemMetrics(SM_CXSIZEFRAME) * 2;
+			h += GetSystemMetrics(SM_CYSIZEFRAME) * 2;
 			if ( (style & WS_CAPTION) == 0 ) {
 				w -= 2;
 				h -= 2;
@@ -18980,11 +18972,11 @@ LRESULT CMainFrame::OnDwmSendIconicLivePreviewBitmap(WPARAM, LPARAM)
 	POINT offset = {0, 0};
 	DWORD style = GetStyle();
 	if ( style & WS_CAPTION ) {
-		offset.x = (rectClient.left) - _SM_CXSIZEFRAME;
+		offset.x = (rectClient.left) - GetSystemMetrics(SM_CXSIZEFRAME);
 		offset.y = (rectClient.top)  - (GetSystemMetrics(SM_CYCAPTION) + SM_CYSIZEFRAME);
 	} else if (style & WS_THICKFRAME) {
-		offset.x = (rectClient.left) - _SM_CXSIZEFRAME;
-		offset.y = (rectClient.top)  - _SM_CYSIZEFRAME;
+		offset.x = (rectClient.left) - GetSystemMetrics(SM_CXSIZEFRAME);
+		offset.y = (rectClient.top)  - GetSystemMetrics(SM_CYSIZEFRAME);
 	}
 
 	HRESULT hr = E_FAIL;
@@ -19027,8 +19019,8 @@ HBITMAP CMainFrame::CreateCaptureDIB(int nWidth, int nHeight)
 		ZeroMemory(&bmi.bmiHeader, sizeof(BITMAPINFOHEADER));
 		bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
 		if (bCaptionWithMenu) {
-			bmi.bmiHeader.biWidth	= nWidth - (_SM_CXSIZEFRAME * 2);
-			bmi.bmiHeader.biHeight	= -(nHeight - GetSystemMetrics(SM_CYCAPTION) - (_SM_CYSIZEFRAME * 2));
+			bmi.bmiHeader.biWidth	= nWidth - (GetSystemMetrics(SM_CXSIZEFRAME) * 2);
+			bmi.bmiHeader.biHeight	= -(nHeight - GetSystemMetrics(SM_CYCAPTION) - (GetSystemMetrics(SM_CYSIZEFRAME) * 2));
 		} else {
 			bmi.bmiHeader.biWidth	= nWidth;
 			bmi.bmiHeader.biHeight	= -nHeight;
@@ -19045,11 +19037,11 @@ HBITMAP CMainFrame::CreateCaptureDIB(int nWidth, int nHeight)
 					hdcMem,
 					0,
 					0,
-					nWidth + (_SM_CXSIZEFRAME * 2),
-					nHeight + (GetSystemMetrics(SM_CYCAPTION) + _SM_CYSIZEFRAME),
+					nWidth + (GetSystemMetrics(SM_CXSIZEFRAME) * 2),
+					nHeight + (GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYSIZEFRAME)),
 					hDCw,
-					_SM_CXSIZEFRAME,
-					GetSystemMetrics(SM_CYCAPTION) + _SM_CYSIZEFRAME,
+					GetSystemMetrics(SM_CXSIZEFRAME),
+					GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYSIZEFRAME),
 					MERGECOPY
 				);
 			} else {
