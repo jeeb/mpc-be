@@ -30,6 +30,9 @@
     <ResourceCompile Include="mplayerc.de.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
+    <ResourceCompile Include="mplayerc.el.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
     <ResourceCompile Include="mplayerc.es.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
