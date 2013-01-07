@@ -27,6 +27,7 @@
 #endif
 #include "ShoutcastSource.h"
 #include "../../../DSUtil/DSUtil.h"
+#include <MMReg.h>
 #include <moreuuids.h>
 
 #define MAXFRAMESIZE ((144 * 320000 / 8000) + 1)
@@ -684,6 +685,14 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url)
 				str.MakeLower();
 				if (str.Find("icy 200 ok") >= 0) {
 					fOK = true;
+				} else if (str.Left(13) == "content-type:") {
+					str = str.Mid(13);
+					if (str == "audio/mpeg") {
+						m_wFormat = WAVE_FORMAT_MPEGLAYER3;
+					} else if (str == "audio/aacp") {
+						m_wFormat = WAVE_FORMAT_RAW_AAC1;
+						TRACE(_T("CShoutcastStream(): not supported AAC+ stream\n"));
+					}
 				} else if (1 == sscanf_s(str, "icy-br:%d", &m_bitrate)) {
 					m_bitrate *= 1000;
 				} else if (1 == sscanf_s(str, "icy-metaint:%d", &metaint)) {
@@ -728,6 +737,10 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url)
 
 bool CShoutcastStream::CShoutcastSocket::FindSync()
 {
+	if (m_wFormat == WAVE_FORMAT_RAW_AAC1) {
+		return false; // not supported
+	}
+
 	m_freq = (DWORD)-1;
 	m_channels = (DWORD)-1;
 
