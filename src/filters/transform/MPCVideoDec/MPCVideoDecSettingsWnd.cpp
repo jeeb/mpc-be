@@ -229,9 +229,10 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	p.y += IPP_SCALE(82);
 
 	// Software Output formats order
-	int btn_size = m_fontheight + 4;
-	m_cbSwOutputFormatUp.Create(_T("<"), dwStyle|BS_PUSHBUTTON, CRect(p + CPoint(width_s - btn_size * 2, 0), CSize(btn_size, btn_size)), this, IDC_PP_SWOUTPUTFORMATUP);
-	m_cbSwOutputFormatDown.Create(_T(">"), dwStyle|BS_PUSHBUTTON, CRect(p + CPoint(width_s - btn_size, 0), CSize(btn_size, btn_size)), this, IDC_PP_SWOUTPUTFORMATDOWN);
+	int btn_w = m_fontheight + 12;
+	int btn_h = m_fontheight + 4;
+	m_cbSwOutputFormatUp.Create(_T("\x25B2"), dwStyle|BS_PUSHBUTTON, CRect(p + CPoint(width_s - btn_w * 2, 0), CSize(btn_w, btn_h)), this, IDC_PP_SWOUTPUTFORMATUP);
+	m_cbSwOutputFormatDown.Create(_T("\x25BC"), dwStyle|BS_PUSHBUTTON, CRect(p + CPoint(width_s - btn_w, 0), CSize(btn_w, btn_h)), this, IDC_PP_SWOUTPUTFORMATDOWN);
 	p.y += h20;
 
 	// Resize Method
