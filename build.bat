@@ -18,7 +18,6 @@ REM
 REM You should have received a copy of the GNU General Public License
 REM along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 SETLOCAL
 CD /D %~dp0
 
@@ -91,7 +90,6 @@ IF %ARGM%  GTR 1 (GOTO UnsupportedSwitch)
 
 IF /I "%PACKAGES%" == "True" SET "INSTALLER=True" & SET "ZIP=True"
 
-
 :Start
 REM Check if the %LOG_DIR% folder exists otherwise MSBuild will fail
 SET "LOG_DIR=bin\logs"
@@ -106,7 +104,6 @@ SET START_TIME=%TIME%
 SET START_DATE=%DATE%
 
 IF /I "%PLATFORM%" == "Win32" (GOTO Win32) ELSE IF /I "%PLATFORM%" == "x64" (GOTO x64)
-
 
 :Win32
 CALL "%VS100COMNTOOLS%..\..\VC\vcvarsall.bat" x86
@@ -132,7 +129,6 @@ IF /I "%CONFIG%" == "All" (
   CALL :SubFilters Win32
   IF /I "%ZIP%" == "True" CALL :SubCreatePackages Filters Win32
 )
-
 
 :x64
 IF /I "%PLATFORM%" == "Win32" GOTO End
@@ -161,7 +157,6 @@ IF /I "%CONFIG%" == "All" (
   IF /I "%ZIP%" == "True" CALL :SubCreatePackages Filters x64
 )
 
-
 :End
 TITLE Compiling MPC-BE [FINISHED]
 SET END_TIME=%TIME%
@@ -169,7 +164,6 @@ CALL :SubGetDuration
 CALL :SubMsg "INFO" "Compilation started on %START_DATE%-%START_TIME% and completed on %DATE%-%END_TIME% [%DURATION%]"
 ENDLOCAL
 EXIT /B
-
 
 :SubFilters
 TITLE Compiling MPC-BE Filters - %BUILDCFG% Filter^|%1...
@@ -186,7 +180,6 @@ IF %ERRORLEVEL% NEQ 0 (
 )
 EXIT /B
 
-
 :SubMPCBE
 TITLE Compiling MPC-BE - %BUILDCFG%^|%1...
 "%MSBUILD%" mpc-be.sln %MSBUILD_SWITCHES%^
@@ -199,7 +192,6 @@ IF %ERRORLEVEL% NEQ 0 (
   CALL :SubMsg "INFO" "mpc-be.sln %BUILDCFG% %1 compiled successfully"
 )
 EXIT /B
-
 
 :SubResources
 IF /I "%BUILDCFG%" == "Debug" (
@@ -228,7 +220,6 @@ FOR %%A IN ("Armenian" "Basque" "Belarusian" "Catalan" "Chinese Simplified"
 )
 EXIT /B
 
-
 :SubCreateInstaller
 IF "%~1" == "x64" SET ISDefs=/Dx64Build
 
@@ -245,7 +236,6 @@ IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Compilation failed!"
 CALL :SubMsg "INFO" "%1 installer successfully built"
 
 EXIT /B
-
 
 :SubCreatePackages
 CALL :SubDetectSevenzipPath
@@ -320,7 +310,6 @@ IF EXIST "%PCKG_NAME%" RD /Q /S "%PCKG_NAME%"
 POPD
 EXIT /B
 
-
 :SubGetVersion
 REM Get the version
 FOR /F "tokens=3,4 delims= " %%A IN (
@@ -337,11 +326,9 @@ FOR /F "tokens=3,4 delims= " %%A IN (
 SET MPCBE_VER=%VerMajor%.%VerMinor%.%VerStatus%.%VerPatch%.%VerRev%
 EXIT /B
 
-
 :SubDetectWinArch
 IF DEFINED PROGRAMFILES(x86) (SET x64_type=amd64) ELSE (SET x64_type=x86_amd64)
 EXIT /B
-
 
 :SubDetectInnoSetup
 REM Detect if we are running on 64bit WIN and use Wow6432Node, and set the path
@@ -356,7 +343,6 @@ FOR /F "delims=" %%A IN (
   'REG QUERY "%U_%\Inno Setup 5_is1" /v "Inno Setup: App Path" 2^>Nul ^|FIND "REG_SZ"') DO (
   SET "InnoSetupPath=%%A" & CALL :SubInnoSetupPath %%InnoSetupPath:*Z=%%)
 EXIT /B
-
 
 :SubDetectSevenzipPath
 IF EXIST "%PROGRAMFILES%\7za.exe" (SET "SEVENZIP=%PROGRAMFILES%\7za.exe" & EXIT /B)
@@ -380,7 +366,6 @@ FOR /F "delims=" %%A IN (
   SET "SEVENZIP_REG=%%A" & CALL :SubSevenzipPath %%SEVENZIP_REG:*REG_SZ=%%
 )
 EXIT /B
-
 
 :ShowHelp
 TITLE %~nx0 Help
@@ -407,7 +392,6 @@ ECHO.
 ENDLOCAL
 EXIT /B
 
-
 :MissingVar
 COLOR 0C
 TITLE Compiling MPC-BE [ERROR]
@@ -420,7 +404,6 @@ PAUSE >NUL
 ENDLOCAL
 EXIT /B
 
-
 :UnsupportedSwitch
 ECHO.
 ECHO Unsupported commandline switch!
@@ -429,7 +412,6 @@ ECHO "build.bat %*"
 ECHO.
 ECHO Run "%~nx0 help" for details about the commandline switches.
 CALL :SubMsg "ERROR" "Compilation failed!"
-
 
 :SubInnoSetupPath
 SET InnoSetupPath=%*
@@ -458,7 +440,6 @@ IF /I "%~1" == "ERROR" (
   EXIT /B
 )
 
-
 :SubColorText
 FOR /F "tokens=1,2 delims=#" %%A IN (
   '"PROMPT #$H#$E# & ECHO ON & FOR %%B IN (1) DO REM"') DO (
@@ -467,7 +448,6 @@ FOR /F "tokens=1,2 delims=#" %%A IN (
 FINDSTR /v /a:%1 /R ".18" "%~2" NUL
 DEL "%~2" > NUL 2>&1
 EXIT /B
-
 
 :SubGetDuration
 SET START_TIME=%START_TIME: =%
