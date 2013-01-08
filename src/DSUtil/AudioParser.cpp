@@ -100,7 +100,7 @@ int GetMLPFrameSize(const BYTE *buf)
 	return 0;
 }
 
-int GetADTSFrameSize(const BYTE *buf)
+int GetADTSFrameSize(const BYTE *buf, int *headersize)
 {
 	if (*(WORD*)buf & 0x0fff != 0x0fff) { // syncword
 		return 0;
@@ -111,12 +111,9 @@ int GetADTSFrameSize(const BYTE *buf)
 	}
 
 	int protection_absent = buf[1] & 0x01;
+	*headersize = protection_absent == 1 ? 7 : 9;
 
-	int frame_length = ((buf[3] & 0x03) << 11) | (buf[4] << 3) | ((buf[5] & 0xe0) >> 5);
-	
-	int frame_size = frame_length - (protection_absent == 1 ? 7 : 9);
-
-	return frame_size;
+	return ((buf[3] & 0x03) << 11) | (buf[4] << 3) | ((buf[5] & 0xe0) >> 5);
 }
 
 // Dolby Digital
