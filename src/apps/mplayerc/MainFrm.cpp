@@ -3150,7 +3150,7 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 			
 		if (fLeftMouseBtnUnassigned
 				|| (!fLeftMouseBtnUnassigned && !(m_iMediaLoadState == MLS_LOADING || m_iMediaLoadState == MLS_LOADED))
-				|| ((IsCaptionHidden() && (AfxGetAppSettings().nCS <= CS_SEEKBAR)) ||  ((GetTickCount()-m_nMenuHideTick)<100))) {
+				|| /*((IsCaptionHidden() && (AfxGetAppSettings().nCS <= CS_SEEKBAR)) ||  */ ((GetTickCount()-m_nMenuHideTick)<100)) {
 			
 			PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 			return;
