@@ -289,3 +289,6 @@ struct Chapters {
 };
 
 extern bool ParseCUESheet(CString cueData, CAtlList<Chapters> &ChaptersList);
+
+extern CString GetFileOnly(LPCTSTR Path);
+extern CString GetFolderOnly(LPCTSTR Path);

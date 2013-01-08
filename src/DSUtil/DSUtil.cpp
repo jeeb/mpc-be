@@ -3162,3 +3162,27 @@ bool ParseCUESheet(CString cueData, CAtlList<Chapters> &ChaptersList)
 		return false;
 	}
 }
+
+//
+//	Returns the file portion from a path
+//
+CString GetFileOnly(LPCTSTR Path)
+{
+	// Strip off the path and return just the filename part
+	CString temp = (LPCTSTR) Path; // Force CString to make a copy
+	::PathStripPath(temp.GetBuffer(0));
+	temp.ReleaseBuffer(-1);
+	return temp;
+}
+
+//
+//	Returns the folder portion from a path
+//
+CString GetFolderOnly(LPCTSTR Path)
+{
+	// Strip off the filename and return only path part
+	CString temp = (LPCTSTR) Path; // Force CString to make a copy
+	::PathRemoveFileSpec(temp.GetBuffer(0));
+	temp.ReleaseBuffer(-1);
+	return temp;
+}

@@ -41,26 +41,40 @@ COpenFileDlg::COpenFileDlg(CAtlArray<CString>& mask, bool fAllowDirSelection, LP
 {
 	m_fAllowDirSelection = fAllowDirSelection;
 
-	CRecentFileList& MRU = AfxGetAppSettings().MRU;
-	MRU.ReadList();
-	CString str = _T("");
+	CString str(lpszFileName);
 
-	for (int i = 0; i < MRU.GetSize(); i++)
-		if (!MRU[i].IsEmpty()) {
-			str = MRU[i];
-			break;
+	if (str.IsEmpty()) {
+		CRecentFileList& MRU = AfxGetAppSettings().MRU;
+		MRU.ReadList();
+
+		for (int i = 0; i < MRU.GetSize(); i++) {
+			if (!MRU[i].IsEmpty()) {
+				str = MRU[i];
+				break;
+			}
 		}
+	}
 
-	m_pOFN->lpstrInitialDir = str;
+	if (str.Find(_T("://")) > 0) {
+		str.Empty();
+	}
+
+	str = GetFolderOnly(str);
+
+	m_InitialDir = DNew TCHAR[max(1000, str.GetLength() + 1)];
+	memset(m_InitialDir, 0, sizeof(m_InitialDir));
+	_tcscpy(m_InitialDir, str);
+	m_pOFN->lpstrInitialDir = m_InitialDir;
 
 	m_buff = DNew TCHAR[10000];
-	m_buff[0] = 0;
+	memset(m_buff, 0, sizeof(m_buff));
 	m_pOFN->lpstrFile = m_buff;
 	m_pOFN->nMaxFile = 10000;
 }
 
 COpenFileDlg::~COpenFileDlg()
 {
+	delete [] m_InitialDir;
 	delete [] m_buff;
 }
 
