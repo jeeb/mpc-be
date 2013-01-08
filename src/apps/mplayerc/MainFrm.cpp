@@ -1480,6 +1480,7 @@ void CMainFrame::OnMove(int x, int y)
 		GetWindowRect(AfxGetAppSettings().rcLastWindowPos);
 	}
 
+	m_wndToolBar.Invalidate();
 	FlyBarSetPos();
 
 }
