@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: ConfigDlg.h 1136 2012-09-14 05:13:52Z szl $
  *
  * Copyright (C) 2012 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
  *
@@ -20,4 +20,30 @@
  *
  */
 
-#include "stdafx.h"
+#pragma once
+
+#include "afxwin.h"
+
+// CConfigDlg dialog
+
+class CConfigDlg : public CDialog
+{
+	DECLARE_DYNAMIC(CConfigDlg)
+
+public:
+	CConfigDlg(CWnd* pParent = NULL);
+	virtual ~CConfigDlg();
+
+// Dialog Data
+	enum { IDD = IDD_CONFIGDLG };
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);
+	virtual BOOL OnInitDialog();
+
+	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnBnClickedOk();
+	afx_msg void OnBnClickedCancel();
+	CComboBox m_MPCPath;
+};

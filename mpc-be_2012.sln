@@ -154,7 +154,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VSFilter", "src\filters\tra
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bento4", "src\ExtLib\Bento4\Bento4_2012.vcxproj", "{40177920-A66C-4647-B119-332A10224C83}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MPCBEShellExt", "src\apps\ShellExt\MPCBEShellExt\MPCBEShellExt_2012.vcxproj", "{BF167235-4EEA-43E5-91E6-7B143B26C56B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MPCBEShellExt", "src\apps\mplayerc\MPCBEShellExt\MPCBEShellExt_2012.vcxproj", "{BF167235-4EEA-43E5-91E6-7B143B26C56B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mpciconlib", "src\apps\mplayerc\mpciconlib\mpciconlib_2012.vcxproj", "{86251DC4-9298-424C-AE6C-07844F79C0B5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WVSource", "src\filters\source\WVSource\WVSource_2012.vcxproj", "{F22DE3B2-4DE9-4013-BBAB-1BB39F2B7DF7}"
 EndProject
@@ -1262,6 +1264,10 @@ Global
 		{1557AA86-976C-4315-8FE8-A138E33F6580}.Release|Win32.Build.0 = Release|Win32
 		{1557AA86-976C-4315-8FE8-A138E33F6580}.Release|x64.ActiveCfg = Release|x64
 		{1557AA86-976C-4315-8FE8-A138E33F6580}.Release|x64.Build.0 = Release|x64
+		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Release|Win32.ActiveCfg = Release|Win32
+		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Release|Win32.Build.0 = Release|Win32
+		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Release|x64.ActiveCfg = Release|x64
+		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

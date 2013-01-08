@@ -199,15 +199,6 @@ IF /I "%BUILDCFG%" == "Debug" (
 EXIT /B
 )
 
-TITLE Compiling mpciconlib - Release^|%1...
-"%MSBUILD%" mpciconlib.sln %MSBUILD_SWITCHES%^
- /target:%BUILDTYPE% /property:Configuration=Release;Platform=%1
-IF %ERRORLEVEL% NEQ 0 (
-  CALL :SubMsg "ERROR" "mpciconlib.sln %1 - Compilation failed!"
-) ELSE (
-  CALL :SubMsg "INFO" "mpciconlib.sln %1 compiled successfully"
-)
-
 FOR %%A IN ("Armenian" "Basque" "Belarusian" "Catalan" "Chinese Simplified"
  "Chinese Traditional" "Czech" "Dutch" "French" "German" "Greek" "Hebrew" "Hungarian"
  "Italian" "Japanese" "Korean" "Polish" "Portuguese" "Russian" "Slovak" "Spanish"
