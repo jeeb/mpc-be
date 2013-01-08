@@ -581,7 +581,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 					dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 				}
 			}
-			CRect r10; //MUTE
+			CRect r10; //SUB
 			GetItemRect(10, &r10);
 
 			CRect r12; //MUTE

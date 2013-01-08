@@ -13305,9 +13305,9 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 				for (int i = 0, j = cStreams; i < j; i++) {
 					DWORD dwFlags, dwGroup;
 					LCID lcid;
-					WCHAR* pszName = NULL;
+					WCHAR* pName = NULL;
 
-					if (FAILED(pSSs->Info(i, NULL, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))	|| !pszName) {
+					if (FAILED(pSSs->Info(i, NULL, &dwFlags, &lcid, &dwGroup, &pName, NULL, NULL))	|| !pName) {
 						continue;
 					}
 
@@ -13317,16 +13317,11 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 
 						CString lang;
 						if (lcid == 0) {
-							lang = pszName;
+							lang = pName;
 						} else {
 							int len = GetLocaleInfo(lcid, LOCALE_SENGLANGUAGE, lang.GetBuffer(64), 64);
 							lang.ReleaseBufferSetLength(max(len-1, 0));
 						}
-
-						CString name(pszName);
-						name = name.Trim();
-						name.Replace(_T("&"), _T("&&"));
-						if (pszName) CoTaskMemFree(pszName);
 
 						UINT flags = MF_BYCOMMAND|MF_STRING|MF_ENABLED;
 						if (dwFlags) {
@@ -13339,13 +13334,17 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 						substream.iIndex	= i;
 
 						bool Forced, Def;
-						SubFlags(name, Forced, Def);
+						SubFlags(lang, Forced, Def);
 
-						substream.lang		= lang;
+						substream.lang		= CString(pName);
 						substream.forced	= Forced;
 						substream.def		= Def;
 
 						subarray.Add(substream);
+
+						if (pName) {
+							CoTaskMemFree(pName);
+						}
 					}
 				}
 			}
@@ -13371,16 +13370,11 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 
 					CString lang;
 					if (lcid == 0) {
-						lang = pName;
+						lang = CString(pName);
 					} else {
 						int len = GetLocaleInfo(lcid, LOCALE_SENGLANGUAGE, lang.GetBuffer(64), 64);
 						lang.ReleaseBufferSetLength(max(len-1, 0));
 					}
-
-					CString name(pName);
-					name = name.Trim();
-					name.Replace(_T("&"), _T("&&"));
-					if (pName) CoTaskMemFree(pName);
 
 					substream.Extsub	= false;
 					substream.iFilter	= 2;
@@ -13388,13 +13382,17 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 					substream.iIndex	= tPos;
 
 					bool Forced, Def;
-					SubFlags(name, Forced, Def);
+					SubFlags(lang, Forced, Def);
 
-					substream.lang		= lang;
+					substream.lang		= CString(pName);
 					substream.forced	= Forced;
 					substream.def		= Def;
 
 					subarray.Add(substream);
+
+					if (pName) {
+						CoTaskMemFree(pName);
+					}
 				}
 			}
 		}
@@ -13430,9 +13428,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 				WCHAR* pName = NULL;
 				LCID lcid;
 				if (SUCCEEDED(pSubStream->GetStreamInfo(i, &pName, &lcid))) {
-					CString name(pName);
-					name.Replace(_T("&"), _T("&&"));
-					if (pName) CoTaskMemFree(pName);
+					CString name = CString(pName);
 
 					substream.Extsub	= true;
 					substream.iFilter	= 2;
@@ -13447,6 +13443,10 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 					substream.def		= 0;
 
 					subarray.Add(substream);
+
+					if (pName) {
+						CoTaskMemFree(pName);
+					}
 				}
 			}
 		}
@@ -13511,92 +13511,106 @@ int CMainFrame::GetSubSelIdx()
 	}
 
 	bool extsubpri	= AfxGetAppSettings().fPrioritizeExternalSubtitles;
-	int selsub		= 0;
-	int maxrating	= 0;
 	int cnt			= subarray.GetCount();
-	bool bLangFound = false;
-	CStringW slo = AfxGetAppSettings().strSubtitlesLanguageOrder;
-	int tPos = 0;
-	CStringW langN = slo.Tokenize(_T(",; "), tPos);
+	CStringW slo	= AfxGetAppSettings().strSubtitlesLanguageOrder;
+	bool bLangMatch	= false;
 
-	if (tPos == -1) {
-		for (int i = 0, j = cnt; i < j; i++) {
-
-			int rating	= 0;
-
-			if (extsubpri && subarray[i].Extsub)	return i;
-			if (subarray[i].forced == 1)			rating += 4;
-			if (subarray[i].def == 1)				rating += 2;
-			if (i==0)								rating += 1;
-
-			if (rating > maxrating) {
-				maxrating	= rating;
-				selsub		= i;
-			}
-		}
+	if (slo.IsEmpty()) {
+		slo = _T("forced default");
+	} else {
+		slo.Replace(_T("[fc]"), _T("forced"));
+		slo.Replace(_T("[def]"), _T("default"));
 	}
 
-	if (extsubpri && (tPos != -1)) {
-		// try external sub ...
-		while (tPos != -1) {
-			for (int i = 0, j = cnt; i < j; i++) {
-				if (!subarray[i].Extsub) {
+	if (extsubpri && cnt > 1) { // try external sub ...
+		int bLangIdx	= 0;
+		int tPos = 0;
+		CStringW lang = slo.Tokenize(_T(",; "), tPos);
+		while (tPos != -1 && !bLangMatch) {
+			for (int iIndex = 0; iIndex < cnt; iIndex++) {
+				if (!subarray[iIndex].Extsub) {
 					continue;
+				}		
+				CString name(subarray[iIndex].lang);
+				name.MakeLower();
+				lang.MakeLower();
+
+				CAtlList<CString> sl;
+				Explode(lang, sl, '|');
+				POSITION pos = sl.GetHeadPosition();
+
+				int nLangMatch = 0;
+				while (pos) {
+					CString pattern = sl.GetNext(pos);
+ 
+					if ((subarray[iIndex].forced && pattern == _T("forced")) || (subarray[iIndex].def && pattern == _T("default"))) {
+						nLangMatch++;
+						continue;
+					}
+
+					if (name.Find(pattern) >= 0) {
+						nLangMatch++;
+					}
+ 				}
+
+				if (nLangMatch == sl.GetCount()) {
+					bLangIdx	= iIndex;
+					bLangMatch	= true;
+					break;
+ 				}
+ 			}
+			lang = slo.Tokenize(_T(",; "), tPos);
+ 		}
+
+		if (bLangMatch) {
+			return bLangIdx;
+ 		}
+	} 
+	
+	if (cnt > 1) { // try all sub ...
+		int bLangIdx	= 0;
+		int tPos = 0;
+		CStringW lang = slo.Tokenize(_T(",; "), tPos);
+		while (tPos != -1 && !bLangMatch) {
+			for (int iIndex = 0; iIndex < cnt; iIndex++) {
+					
+				CString name(subarray[iIndex].lang);
+				name.MakeLower();
+				lang.MakeLower();
+ 
+				CAtlList<CString> sl;
+				Explode(lang, sl, '|');
+				POSITION pos = sl.GetHeadPosition();
+ 
+				int nLangMatch = 0;
+				while (pos) {
+					CString pattern = sl.GetNext(pos);
+ 
+					if ((subarray[iIndex].forced && pattern == _T("forced")) || (subarray[iIndex].def && pattern == _T("default"))) {
+						nLangMatch++;
+						continue;
+					}
+ 
+					if (name.Find(pattern) >= 0) {
+						nLangMatch++;
+					}
 				}
-
-				int ll = langN.GetLength();
-
-				if (subarray[i].lang.Left(ll).CompareNoCase(langN) == 0) {
-					return i;
+ 
+				if (nLangMatch == sl.GetCount()) {
+					bLangIdx	= iIndex;
+					bLangMatch	= true;
+					break;
 				}
-			}
-
-			langN = slo.Tokenize(_T(",; "), tPos);
+ 			}
+			lang = slo.Tokenize(_T(",; "), tPos);
+ 		}
+ 
+		if (bLangMatch) {
+			return bLangIdx;
 		}
-
-		for (int i = 0, j = cnt; i < j; i++) {
-			if (subarray[i].Extsub) {
-				return i;
-			}
-		}
-	}
-
-	tPos = 0;
-	langN = slo.Tokenize(_T(",; "), tPos);
-	while (tPos != -1) {
-		for (int i = 0, j = cnt; i < j; i++) {
-
-			int rating	= 0;
-			int ll		= langN.GetLength();
-
-			if (subarray[i].lang.Left(ll).CompareNoCase(langN) == 0 && extsubpri && subarray[i].Extsub) {
-				return i;
-			}
-
-			if (subarray[i].lang.Left(ll).CompareNoCase(langN) == 0) {
-				rating += 8;
-				bLangFound = true;
-			}
-
-			if (extsubpri && rating == 8 && subarray[i].Extsub)	rating += 16;
-			if (subarray[i].forced == 1)						rating += 4;
-			if (subarray[i].def == 1)							rating += 2;
-			if (i==0)											rating += 1;
-
-			if (rating > maxrating) {
-				maxrating	= rating;
-				selsub		= i;
-			}
-		}
-
-		if (bLangFound) {
-			return selsub;
-		} 
-
-		langN = slo.Tokenize(_T(",; "), tPos);
-	}
-
-	return selsub;
+ 	}
+ 
+	return 0;
 }
 
 bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
