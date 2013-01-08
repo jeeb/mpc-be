@@ -20,7 +20,6 @@
 ; Requirements:
 ; Inno Setup Unicode: http://www.jrsoftware.org/isdl.php
 
-
 ; If you want to compile the 64-bit version define "x64build" (uncomment the define below or use build_2010.bat)
 #define localize
 #define sse_required
@@ -41,11 +40,12 @@
 #define ISPP_INVOKED
 #include "..\include\Version.h"
 
-#define copyright_year "2002-2013"
-#define app_name       "MPC-BE"
-#define app_version    str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_STATUS) + "." + str(MPC_VERSION_PATCH)
-#define app_version_out    str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_STATUS) + "." + str(MPC_VERSION_PATCH)+ "." + str(MPC_VERSION_REV)
-#define quick_launch   "{userappdata}\Microsoft\Internet Explorer\Quick Launch"
+#define copyright_year   "2002-2013"
+#define app_url          "http://sourceforge.net/projects/mpcbe/"
+#define app_name         "MPC-BE"
+#define app_version      str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_STATUS) + "." + str(MPC_VERSION_PATCH)
+#define app_version_out  str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_STATUS) + "." + str(MPC_VERSION_PATCH)+ "." + str(MPC_VERSION_REV)
+#define quick_launch     "{userappdata}\Microsoft\Internet Explorer\Quick Launch"
 
 #ifdef x64Build
   #define bindir       = "..\bin\mpc-be_x64"
@@ -63,37 +63,37 @@
 #ifdef x64Build
 AppId={{FE09AF6D-78B2-4093-B012-FCDAF78693CE}
 DefaultGroupName={#app_name} x64
-OutputBaseFilename=MPC-BE.{#app_version_out}.x64
-UninstallDisplayName={#app_name} x64 {#app_version}
+OutputBaseFilename={#app_name}.{#app_version_out}.x64
+UninstallDisplayName={#app_name} x64 {#app_version_out}
 ArchitecturesAllowed=x64
-ArchitecturesInstallIn64BitMode=x64
+ArchitecturesInstallIn64BitMode=x64 ia64
 AppName={#app_name} x64
-AppVerName={#app_name} x64 {#app_version}
+AppVerName={#app_name} x64 {#app_version_out}
 VersionInfoDescription={#app_name} x64 Setup
 VersionInfoProductName={#app_name} x64
 #else
 AppId={{903D098F-DD50-4342-AD23-DA868FCA3126}
 DefaultGroupName={#app_name}
-OutputBaseFilename=MPC-BE.{#app_version_out}.x86
-UninstallDisplayName={#app_name} {#app_version}
+OutputBaseFilename={#app_name}.{#app_version_out}.x86
+UninstallDisplayName={#app_name} {#app_version_out}
 AppName={#app_name}
-AppVerName={#app_name} {#app_version}
+AppVerName={#app_name} {#app_version_out}
 VersionInfoDescription={#app_name} Setup
 VersionInfoProductName={#app_name}
 #endif
-AppVersion={#app_version}
-AppPublisher=MPC-BE Team
-AppPublisherURL=http://sourceforge.net/projects/mpcbe/
-AppSupportURL=http://sourceforge.net/projects/mpcbe/
-AppUpdatesURL=http://sourceforge.net/projects/mpcbe/
-AppContact=http://sourceforge.net/projects/mpcbe/
+AppVersion={#app_version_out}
+AppPublisher={#app_name} Team
+AppPublisherURL={#app_url}
+AppSupportURL={#app_url}
+AppUpdatesURL={#app_url}
+AppContact={#app_url}
 AppCopyright=Copyright © {#copyright_year} all contributors, see Authors.txt
-VersionInfoCompany=MPC-BE Team
-VersionInfoCopyright=Copyright © {#copyright_year}, MPC-BE Team
-VersionInfoProductVersion={#app_version}
-VersionInfoProductTextVersion={#app_version}
-VersionInfoTextVersion={#app_version}
-VersionInfoVersion={#app_version}
+VersionInfoCompany={#app_name} Team
+VersionInfoCopyright=Copyright © {#copyright_year}, {#app_name} Team
+VersionInfoProductVersion={#app_version_out}
+VersionInfoProductTextVersion={#app_version_out}
+VersionInfoTextVersion={#app_version_out}
+VersionInfoVersion={#app_version_out}
 UninstallDisplayIcon={app}\{#mpcbe_exe}
 DefaultDirName={code:GetInstallFolder}
 LicenseFile=..\docs\COPYING.txt
@@ -103,12 +103,13 @@ AppReadmeFile={app}\Readme.txt
 WizardImageFile=WizardImageFile.bmp
 WizardSmallImageFile=WizardSmallImageFile.bmp
 Compression=lzma2/ultra64
+InternalCompressLevel=ultra64
 SolidCompression=yes
 AllowNoIcons=yes
 ShowTasksTreeLines=yes
 DisableDirPage=auto
 DisableProgramGroupPage=auto
-MinVersion=0,5.01.2600sp2
+MinVersion=5.01.2600sp2
 AppMutex={#MPC_WND_CLASS_NAME}
 ChangesAssociations=true
 
@@ -147,9 +148,9 @@ Name: ua; MessagesFile: compiler:Languages\Ukrainian.isl
 
 [Messages]
 #ifdef x64Build
-BeveledLabel={#app_name} x64 {#app_version}
+BeveledLabel={#app_name} x64 {#app_version_out}
 #else
-BeveledLabel={#app_name} {#app_version}
+BeveledLabel={#app_name} {#app_version_out}
 #endif
 
 [Types]
@@ -186,7 +187,7 @@ Name: reset_settings;           Description: {cm:tsk_ResetSettings};     GroupDe
 
 [Files]
 Source: "{#bindir}\{#mpcbe_exe}";		DestDir: "{app}"; Flags: ignoreversion; Components: main
-Source: "{#bindir}\mpciconlib.dll"; DestDir: "{app}"; Flags: ignoreversion; Components: mpciconlib
+Source: "{#bindir}\mpciconlib.dll"; 	DestDir: "{app}"; Flags: ignoreversion; Components: mpciconlib
 #ifdef x64Build
 Source: "{#bindir}\MPCBEShellExt64.dll"; DestDir: "{app}"; Flags: ignoreversion noregerror regserver restartreplace uninsrestartdelete; Components: mpcbeshellext
 #else
@@ -221,10 +222,10 @@ Source: "{#bindir}\Lang\mpcresources.ua.dll"; DestDir: "{app}\Lang"; Flags: igno
 #endif
 Source: "..\docs\COPYING.txt";							DestDir: "{app}"; Flags: ignoreversion; Components: main
 Source: "..\docs\Authors.txt";							DestDir: "{app}"; Flags: ignoreversion; Components: main
-Source: "..\docs\Authors mpc-hc team.txt";	DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "..\docs\Authors mpc-hc team.txt";				DestDir: "{app}"; Flags: ignoreversion; Components: main
 Source: "..\docs\Changelog.txt";						DestDir: "{app}"; Flags: ignoreversion; Components: main
-Source: "..\docs\Changelog.Rus.txt";				DestDir: "{app}"; Flags: ignoreversion; Components: main
-Source: "..\docs\Readme.txt";								DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "..\docs\Changelog.Rus.txt";					DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "..\docs\Readme.txt";							DestDir: "{app}"; Flags: ignoreversion; Components: main
 
 [Icons]
 #ifdef x64Build
@@ -232,7 +233,7 @@ Name: {group}\{#app_name} x64;                   			Filename: {app}\{#mpcbe_exe}
 Name: {commondesktop}\{#app_name} x64;           			Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\common
 Name: {userdesktop}\{#app_name} x64;             			Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\user
 Name: {#quick_launch}\{#app_name} x64;           			Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: quicklaunchicon
-Name: {group}\{cm:UninstallProgram,{#app_name} x64};	Filename: {uninstallexe};			Comment: {cm:UninstallProgram,{#app_name} x64};  WorkingDir: {app}
+Name: {group}\{cm:UninstallProgram,{#app_name} x64};		Filename: {uninstallexe};     Comment: {cm:UninstallProgram,{#app_name} x64};  WorkingDir: {app}
 #else
 Name: {group}\{#app_name};                       Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version}; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0
 Name: {commondesktop}\{#app_name};               Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version}; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\common
@@ -240,12 +241,14 @@ Name: {userdesktop}\{#app_name};                 Filename: {app}\{#mpcbe_exe}; C
 Name: {#quick_launch}\{#app_name};               Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version}; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: quicklaunchicon
 Name: {group}\{cm:UninstallProgram,{#app_name}}; Filename: {uninstallexe};     Comment: {cm:UninstallProgram,{#app_name}};  WorkingDir: {app}
 #endif
-Name: {group}\Changelog;                         Filename: {app}\Changelog.txt; Comment: {cm:ViewChangelog};                WorkingDir: {app}
-Name: {group}\{cm:ProgramOnTheWeb,{#app_name}};  Filename: http://sourceforge.net/projects/mpcbe/
+Name: {group}\Changelog;                         Filename: {app}\Changelog.txt;     Comment: {cm:ViewChangelog};            WorkingDir: {app}
+Name: {group}\ChangelogRus;                      Filename: {app}\Changelog.Rus.txt; Comment: {cm:ViewChangelog};            WorkingDir: {app}
+Name: {group}\{cm:ProgramOnTheWeb,{#app_name}};  Filename: {#app_url}
 
 [Run]
 Filename: "{app}\{#mpcbe_exe}"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent unchecked; Description: "{cm:LaunchProgram,{#app_name}}"
 Filename: "{app}\Changelog.txt"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent unchecked shellexec; Description: "{cm:ViewChangelog}"
+Filename: "{app}\Changelog.Rus.txt"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent unchecked shellexec; Description: "{cm:ViewChangelog}"
 Filename: "{app}\{#mpcbe_exe}"; Parameters: "/regvid"; WorkingDir: "{app}"; Flags: runasoriginaluser runhidden; Components: mpcberegvid
 Filename: "{app}\{#mpcbe_exe}"; Parameters: "/regaud"; WorkingDir: "{app}"; Flags: runasoriginaluser runhidden; Components: mpcberegaud
 Filename: "{app}\{#mpcbe_exe}"; Parameters: "/regpl"; WorkingDir: "{app}"; Flags: runasoriginaluser runhidden; Components: mpcberegpl
@@ -256,6 +259,7 @@ Type: files; Name: {commondesktop}\{#app_name}.lnk; Check: not IsTaskSelected('d
 Type: files; Name: {#quick_launch}\{#app_name}.lnk; Check: not IsTaskSelected('quicklaunchicon')    and IsUpgrade(); OnlyBelowVersion: 0,6.01
 Type: files; Name: {app}\AUTHORS
 Type: files; Name: {app}\ChangeLog
+Type: files; Name: {app}\ChangeLogRus
 Type: files; Name: {app}\COPYING
 #ifdef localize
 ; remove the old language dlls when upgrading
@@ -266,7 +270,7 @@ Type: files; Name: {app}\mpcresources.*.dll
 Filename: "{app}\{#mpcbe_exe}"; Parameters: "/unregall"; WorkingDir: "{app}"; Flags: runhidden
 
 [Registry]
-Root: "HKCU"; Subkey: "Software\MPC-BE\ShellExt"; ValueType: string; ValueName: "MpcPath"; ValueData: "{app}\{#mpcbe_exe}"; Flags: uninsdeletekey; Components: mpcbeshellext
+Root: "HKCU"; Subkey: "Software\{#app_name}\ShellExt"; ValueType: string; ValueName: "MpcPath"; ValueData: "{app}\{#mpcbe_exe}"; Flags: uninsdeletekey; Components: mpcbeshellext
 
 [Code]
 #if defined(sse_required) || defined(sse2_required)
@@ -343,15 +347,15 @@ var
   sInstallPath: String;
 begin
   Result := '';
-  if RegQueryStringValue(HKLM, 'SOFTWARE\MPC-BE', 'ExePath', sInstallPath) then begin
+  if RegQueryStringValue(HKLM, 'SOFTWARE\{#app_name}', 'ExePath', sInstallPath) then begin
     Result := ExtractFileDir(sInstallPath);
   end;
   
   if (Result = '') or not DirExists(Result) then begin
     #ifdef x64Build
-    Result := ExpandConstant('{pf}\MPC-BE x64');
+    Result := ExpandConstant('{pf}\{#app_name} x64');
     #else
-    Result := ExpandConstant('{pf}\MPC-BE');
+    Result := ExpandConstant('{pf}\{#app_name}');
     #endif
   end;
 end;
@@ -389,10 +393,10 @@ begin
   Result := (sPrevPath <> '');
 end;
 
-// Check if MPC-BE's settings exist
+// Check if settings exist
 function SettingsExistCheck(): Boolean;
 begin
-  if RegKeyExists(HKEY_CURRENT_USER, 'Software\MPC-BE') or
+  if RegKeyExists(HKEY_CURRENT_USER, 'Software\{#app_name}') or
   FileExists(ExpandConstant('{app}\{#mpcbe_ini}')) then
     Result := True
   else
@@ -409,11 +413,11 @@ end;
 procedure CleanUpSettingsAndFiles();
 begin
   DeleteFile(ExpandConstant('{app}\{#mpcbe_ini}'));
-  DeleteFile(ExpandConstant('{userappdata}\MPC-BE\default.mpcpl'));
-  RemoveDir(ExpandConstant('{userappdata}\MPC-BE'));
-  RegDeleteKeyIncludingSubkeys(HKCU, 'Software\MPC-BE Filters');
-  RegDeleteKeyIncludingSubkeys(HKCU, 'Software\MPC-BE');
-  RegDeleteKeyIncludingSubkeys(HKLM, 'SOFTWARE\MPC-BE');
+  DeleteFile(ExpandConstant('{userappdata}\{#app_name}\default.mpcpl'));
+  RemoveDir(ExpandConstant('{userappdata}\{#app_name}'));
+  RegDeleteKeyIncludingSubkeys(HKCU, 'Software\{#app_name} Filters');
+  RegDeleteKeyIncludingSubkeys(HKCU, 'Software\{#app_name}');
+  RegDeleteKeyIncludingSubkeys(HKLM, 'SOFTWARE\{#app_name}');
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
@@ -429,12 +433,12 @@ begin
       CleanUpSettingsAndFiles();
 
     sLanguage := ExpandConstant('{cm:langcode}');
-    RegWriteStringValue(HKLM, 'SOFTWARE\MPC-BE', 'ExePath', ExpandConstant('{app}\{#mpcbe_exe}'));
+    RegWriteStringValue(HKLM, 'SOFTWARE\{#app_name}', 'ExePath', ExpandConstant('{app}\{#mpcbe_exe}'));
 
     if IsComponentSelected('mpcresources') and FileExists(ExpandConstant('{app}\{#mpcbe_ini}')) then
       SetIniString('Settings', 'Language', sLanguage, ExpandConstant('{app}\{#mpcbe_ini}'))
     else
-      RegWriteStringValue(HKCU, 'Software\MPC-BE\Settings', 'Language', sLanguage);
+      RegWriteStringValue(HKCU, 'Software\{#app_name}\Settings', 'Language', sLanguage);
   end;
 
   if (CurStep = ssDone) and not WizardSilent() and not D3DX9DLLExists() then
@@ -446,7 +450,7 @@ begin
   if (CurUninstallStep = usUninstall) then
     PinToTaskbar(ExpandConstant('{app}\{#mpcbe_exe}'), False);
 
-  // When uninstalling, ask the user to delete MPC-BE settings  
+  // When uninstalling, ask the user to delete settings
   if ((CurUninstallStep = usUninstall) and SettingsExistCheck()) then begin
     if SuppressibleMsgBox(CustomMessage('msg_DeleteSettings'), mbConfirmation, MB_YESNO or MB_DEFBUTTON2, IDNO) = IDYES then
       CleanUpSettingsAndFiles();
