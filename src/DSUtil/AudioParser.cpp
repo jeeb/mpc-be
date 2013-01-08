@@ -39,8 +39,6 @@
 #define AC3_CHANNEL_MASK            15
 #define AC3_LFE                     16
 
-// Dolby Digital
-
 int GetAC3FrameSize(const BYTE *buf)
 {
 	if (*(WORD*)buf != AC3_SYNC_WORD) { // syncword
@@ -102,6 +100,26 @@ int GetMLPFrameSize(const BYTE *buf)
 	return 0;
 }
 
+int GetADTSFrameSize(const BYTE *buf)
+{
+	if (*(WORD*)buf & 0x0fff != 0x0fff) { // syncword
+		return 0;
+	}
+
+	if ((buf[1] & 0x06) !=  0) { // Layer: always 0 
+		return 0;
+	}
+
+	int protection_absent = buf[1] & 0x01;
+
+	int frame_length = ((buf[3] & 0x03) << 11) | (buf[4] << 3) | ((buf[5] & 0xe0) >> 5);
+	
+	int frame_size = frame_length - (protection_absent == 1 ? 7 : 9);
+
+	return frame_size;
+}
+
+// Dolby Digital
 
 int ParseAC3Header(const BYTE *buf, int *samplerate, int *channels, int *framelength, int *bitrate)
 {

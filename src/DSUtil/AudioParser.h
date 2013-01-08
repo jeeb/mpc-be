@@ -43,6 +43,7 @@
 int GetAC3FrameSize(const BYTE* buf);  // for AC3
 int GetEAC3FrameSize(const BYTE* buf); // for E-AC3
 int GetMLPFrameSize(const BYTE *buf); // for TrueHD and MLP
+int GetADTSFrameSize(const BYTE *buf);
 
 int ParseAC3Header     (const BYTE *buf, int *samplerate, int *channels, int *framelength, int *bitrate);
 int ParseEAC3Header    (const BYTE *buf, int *samplerate, int *channels, int *framelength, int *frametype);
