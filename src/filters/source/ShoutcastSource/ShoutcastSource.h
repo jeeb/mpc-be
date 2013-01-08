@@ -32,6 +32,13 @@
 
 #define ShoutcastSourceName   L"MPC ShoutCast Source"
 
+typedef enum {
+	AUDIO_NONE,
+	AUDIO_MPEG,
+	AUDIO_AAC,
+	AUDIO_PLAYLIST
+} StreamFormat;
+
 class __declspec(uuid("68F540E9-766F-44d2-AB07-E26CC6D27A79"))
 	CShoutcastSource
 	: public CSource
@@ -157,14 +164,14 @@ class CShoutcastStream : public CSourceStream
 	public:
 		CShoutcastSocket() {
 			m_metaint = m_bitrate = m_freq = m_channels = 0;
-			m_wFormat = 0;
+			m_Format = AUDIO_NONE;
 		}
 		int Receive(void* lpBuf, int nBufLen, int nFlags = 0);
 
 		DWORD m_metaint, m_bitrate, m_freq, m_channels;
-		WORD m_wFormat;
+		StreamFormat m_Format;
 		CString m_title, m_url;
-		bool Connect(CUrl& url);
+		bool Connect(CUrl& url, CString& redirectUrl);
 		bool FindSync();
 	} m_socket;
 
