@@ -53,8 +53,6 @@ typedef struct DitherState {
 struct DitherContext {
     DitherDSPContext  ddsp;
     enum AVResampleDitherMethod method;
-    int apply_map;
-    ChannelMapInfo *ch_map_info;
 
     int mute_dither_threshold;  // threshold for disabling dither
     int mute_reset_threshold;   // threshold for resetting noise shaping
@@ -253,21 +251,15 @@ int ff_convert_dither(DitherContext *c, AudioData *dst, AudioData *src)
             return ret;
     }
 
-    if (src->sample_fmt != AV_SAMPLE_FMT_FLTP || c->apply_map) {
+    if (src->sample_fmt != AV_SAMPLE_FMT_FLTP) {
         /* make sure flt_data is large enough for the input */
         ret = ff_audio_data_realloc(c->flt_data, src->nb_samples);
         if (ret < 0)
             return ret;
         flt_data = c->flt_data;
-    }
 
-    if (src->sample_fmt != AV_SAMPLE_FMT_FLTP) {
         /* convert input samples to fltp and scale to s16 range */
         ret = ff_audio_convert(c->ac_in, flt_data, src);
-        if (ret < 0)
-            return ret;
-    } else if (c->apply_map) {
-        ret = ff_audio_data_copy(flt_data, src, c->ch_map_info);
         if (ret < 0)
             return ret;
     } else {
@@ -341,7 +333,7 @@ static void dither_init(DitherDSPContext *ddsp,
 DitherContext *ff_dither_alloc(AVAudioResampleContext *avr,
                                enum AVSampleFormat out_fmt,
                                enum AVSampleFormat in_fmt,
-                               int channels, int sample_rate, int apply_map)
+                               int channels, int sample_rate)
 {
     AVLFG seed_gen;
     DitherContext *c;
@@ -357,10 +349,6 @@ DitherContext *ff_dither_alloc(AVAudioResampleContext *avr,
     c = av_mallocz(sizeof(*c));
     if (!c)
         return NULL;
-
-    c->apply_map = apply_map;
-    if (apply_map)
-        c->ch_map_info = &avr->ch_map_info;
 
     if (avr->dither_method == AV_RESAMPLE_DITHER_TRIANGULAR_NS &&
         sample_rate != 48000 && sample_rate != 44100) {
@@ -391,20 +379,19 @@ DitherContext *ff_dither_alloc(AVAudioResampleContext *avr,
             goto fail;
 
         c->ac_out = ff_audio_convert_alloc(avr, out_fmt, AV_SAMPLE_FMT_S16P,
-                                           channels, sample_rate, 0);
+                                           channels, sample_rate);
         if (!c->ac_out)
             goto fail;
     }
 
-    if (in_fmt != AV_SAMPLE_FMT_FLTP || c->apply_map) {
+    if (in_fmt != AV_SAMPLE_FMT_FLTP) {
         c->flt_data = ff_audio_data_alloc(channels, 1024, AV_SAMPLE_FMT_FLTP,
                                           "dither flt buffer");
         if (!c->flt_data)
             goto fail;
-    }
-    if (in_fmt != AV_SAMPLE_FMT_FLTP) {
+
         c->ac_in = ff_audio_convert_alloc(avr, AV_SAMPLE_FMT_FLTP, in_fmt,
-                                          channels, sample_rate, c->apply_map);
+                                          channels, sample_rate);
         if (!c->ac_in)
             goto fail;
     }

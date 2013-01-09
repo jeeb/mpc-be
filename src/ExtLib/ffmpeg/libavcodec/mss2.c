@@ -163,7 +163,7 @@ static int decode_pal_v2(MSS12Context *ctx, const uint8_t *buf, int buf_size)
 
     ncol = *buf++;
     if (ncol > ctx->free_colours || buf_size < 2 + ncol * 3)
-        return AVERROR_INVALIDDATA;
+        return -1;
     for (i = 0; i < ncol; i++)
         *pal++ = AV_RB24(buf + 3 * i);
 
@@ -189,7 +189,7 @@ static int decode_555(GetByteContext *gB, uint16_t *dst, int stride,
         READ_PAIR(y, endy)
 
         if (endx >= w || endy >= h || x > endx || y > endy)
-            return AVERROR_INVALIDDATA;
+            return -1;
         dst += x + stride * y;
         w    = endx - x + 1;
         h    = endy - y + 1;
@@ -373,14 +373,13 @@ static int decode_wmv9(AVCodecContext *avctx, const uint8_t *buf, int buf_size,
     VC1Context *v     = avctx->priv_data;
     MpegEncContext *s = &v->s;
     AVFrame *f;
-    int ret;
 
     ff_mpeg_flush(avctx);
 
     if (s->current_picture_ptr == NULL || s->current_picture_ptr->f.data[0]) {
         int i = ff_find_unused_picture(s, 0);
         if (i < 0)
-            return i;
+            return -1;
         s->current_picture_ptr = &s->picture[i];
     }
 
@@ -400,10 +399,10 @@ static int decode_wmv9(AVCodecContext *avctx, const uint8_t *buf, int buf_size,
 
     avctx->pix_fmt = AV_PIX_FMT_YUV420P;
 
-    if ((ret = ff_MPV_frame_start(s, avctx)) < 0) {
+    if (ff_MPV_frame_start(s, avctx) < 0) {
         av_log(v->s.avctx, AV_LOG_ERROR, "ff_MPV_frame_start error\n");
         avctx->pix_fmt = AV_PIX_FMT_RGB24;
-        return ret;
+        return -1;
     }
 
     ff_er_frame_start(s);
@@ -618,7 +617,7 @@ static int mss2_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
                               ctx->last_pic.linesize[0] * (avctx->height - 1);
         } else {
             av_log(avctx, AV_LOG_ERROR, "Missing keyframe\n");
-            return AVERROR_INVALIDDATA;
+            return -1;
         }
     } else {
         if (ctx->last_pic.data[0])
@@ -754,7 +753,6 @@ static int mss2_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
 static av_cold int wmv9_init(AVCodecContext *avctx)
 {
     VC1Context *v = avctx->priv_data;
-    int ret;
 
     v->s.avctx    = avctx;
     avctx->flags |= CODEC_FLAG_EMU_EDGE;
@@ -763,8 +761,8 @@ static av_cold int wmv9_init(AVCodecContext *avctx)
     if (avctx->idct_algo == FF_IDCT_AUTO)
         avctx->idct_algo = FF_IDCT_WMV2;
 
-    if ((ret = ff_vc1_init_common(v)) < 0)
-        return ret;
+    if (ff_vc1_init_common(v) < 0)
+        return -1;
     ff_vc1dsp_init(&v->vc1dsp);
 
     v->profile = PROFILE_MAIN;
@@ -804,9 +802,9 @@ static av_cold int wmv9_init(AVCodecContext *avctx)
 
     ff_vc1_init_transposed_scantables(v);
 
-    if ((ret = ff_msmpeg4_decode_init(avctx)) < 0 ||
-        (ret = ff_vc1_decode_init_alloc_tables(v)) < 0)
-        return ret;
+    if (ff_msmpeg4_decode_init(avctx) < 0 ||
+        ff_vc1_decode_init_alloc_tables(v) < 0)
+        return -1;
 
     /* error concealment */
     v->s.me.qpel_put = v->s.dsp.put_qpel_pixels_tab;

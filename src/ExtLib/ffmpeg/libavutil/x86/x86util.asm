@@ -172,19 +172,11 @@
     psignw     %1, %2
 %endmacro
 
-%macro ABS1 2
-%if cpuflag(ssse3)
-    pabsw   %1, %1
-%elif cpuflag(mmxext) ; a, tmp
-    pxor    %2, %2
-    psubw   %2, %1
-    pmaxsw  %1, %2
-%else ; a, tmp
+%macro ABS1_MMX 2    ; a, tmp
     pxor       %2, %2
     pcmpgtw    %2, %1
     pxor       %1, %2
     psubw      %1, %2
-%endif
 %endmacro
 
 %macro ABS2_MMX 4    ; a, b, tmp0, tmp1
@@ -198,6 +190,12 @@
     psubw      %2, %4
 %endmacro
 
+%macro ABS1_MMXEXT 2 ; a, tmp
+    pxor    %2, %2
+    psubw   %2, %1
+    pmaxsw  %1, %2
+%endmacro
+
 %macro ABS2_MMXEXT 4 ; a, b, tmp0, tmp1
     pxor    %3, %3
     pxor    %4, %4
@@ -205,6 +203,10 @@
     psubw   %4, %2
     pmaxsw  %1, %3
     pmaxsw  %2, %4
+%endmacro
+
+%macro ABS1_SSSE3 2
+    pabsw   %1, %1
 %endmacro
 
 %macro ABS2_SSSE3 4
@@ -252,6 +254,7 @@
     ABS2 %3, %4, %5, %6
 %endmacro
 
+%define ABS1 ABS1_MMX
 %define ABS2 ABS2_MMX
 %define ABSB ABSB_MMX
 %define ABSB2 ABSB2_MMX

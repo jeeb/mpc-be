@@ -22,8 +22,9 @@
 #define AVRESAMPLE_RESAMPLE_H
 
 #include "avresample.h"
-#include "internal.h"
 #include "audio_data.h"
+
+typedef struct ResampleContext ResampleContext;
 
 /**
  * Allocate and initialize a ResampleContext.

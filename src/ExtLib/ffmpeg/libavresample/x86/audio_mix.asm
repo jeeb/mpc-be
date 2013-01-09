@@ -266,20 +266,29 @@ MIX_1_TO_2_S16P_FLT
 %else
     %assign matrix_elements_stack 0
 %endif
-%assign matrix_stack_size matrix_elements_stack * mmsize
 
-%assign needed_stack_size -1 * matrix_stack_size
-%if ARCH_X86_32 && in_channels >= 7
-%assign needed_stack_size needed_stack_size - 16
-%endif
+cglobal mix_%1_to_%2_%3_flt, 3,in_channels+2,needed_mmregs+matrix_elements_mm, src0, src1, len, src2, src3, src4, src5, src6, src7
 
-cglobal mix_%1_to_%2_%3_flt, 3,in_channels+2,needed_mmregs+matrix_elements_mm, needed_stack_size, src0, src1, len, src2, src3, src4, src5, src6, src7
-
-; define src pointers on stack if needed
-%if matrix_elements_stack > 0 && ARCH_X86_32 && in_channels >= 7
+; get aligned stack space if needed
+%if matrix_elements_stack > 0
+    %if mmsize == 32
+    %assign bkpreg %1 + 1
+    %define bkpq r %+ bkpreg %+ q
+    mov           bkpq, rsp
+    and           rsp, ~(mmsize-1)
+    sub           rsp, matrix_elements_stack * mmsize
+    %else
+    %assign matrix_stack_size matrix_elements_stack * mmsize
+    %assign pad matrix_stack_size + (mmsize - gprsize) - (stack_offset & (mmsize - gprsize))
+    ; on x86-32 for 7 and 8 channels we need more stack space for src pointers
+    %if ARCH_X86_32 && in_channels >= 7
+    %assign pad pad + 0x10
     %define src5m [rsp+matrix_stack_size+0]
     %define src6m [rsp+matrix_stack_size+4]
     %define src7m [rsp+matrix_stack_size+8]
+    %endif
+    SUB           rsp, pad
+    %endif
 %endif
 
 ; load matrix pointers
@@ -460,6 +469,14 @@ cglobal mix_%1_to_%2_%3_flt, 3,in_channels+2,needed_mmregs+matrix_elements_mm, n
 
     add          lenq, mmsize
     jl .loop
+; restore stack pointer
+%if matrix_elements_stack > 0
+    %if mmsize == 32
+    mov           rsp, bkpq
+    %else
+    ADD           rsp, pad
+    %endif
+%endif
 ; zero ymm high halves
 %if mmsize == 32
     vzeroupper
