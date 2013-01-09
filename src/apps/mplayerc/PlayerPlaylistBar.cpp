@@ -30,6 +30,7 @@
 #include "SaveTextFileDialog.h"
 #include "PlayerPlaylistBar.h"
 #include "SettingsDefines.h"
+#include "OpenFileDlg.h"
 
 
 IMPLEMENT_DYNAMIC(CPlayerPlaylistBar, CPlayerBar)
@@ -1324,11 +1325,10 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 	};
 
 	AppSettings& s = AfxGetAppSettings();
+	CMainFrame* pMainFrm = (CMainFrame*)AfxGetMainWnd();
 
 	m.AppendMenu(MF_STRING|(!fOnItem?(MF_DISABLED|MF_GRAYED):MF_ENABLED), M_OPEN, ResStr(IDS_PLAYLIST_OPEN));
-	if (((CMainFrame*)AfxGetMainWnd())->GetPlaybackMode() == PM_CAPTURE) {
-		m.AppendMenu(MF_STRING|MF_ENABLED, M_ADD, ResStr(IDS_PLAYLIST_ADD));
-	}
+	m.AppendMenu(MF_STRING|MF_ENABLED, M_ADD, ResStr(IDS_PLAYLIST_ADD));
 	m.AppendMenu(MF_STRING|(/*fSelected||*/!fOnItem?(MF_DISABLED|MF_GRAYED):MF_ENABLED), M_REMOVE, ResStr(IDS_PLAYLIST_REMOVE));
 	m.AppendMenu(MF_SEPARATOR);
 	m.AppendMenu(MF_STRING|(!m_pl.GetCount()?(MF_DISABLED|MF_GRAYED):MF_ENABLED), M_CLEAR, ResStr(IDS_PLAYLIST_CLEAR));
@@ -1345,8 +1345,6 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 	m.AppendMenu(MF_SEPARATOR);
 	m.AppendMenu(MF_STRING|MF_ENABLED|(s.bHidePlaylistFullScreen?MF_CHECKED:MF_UNCHECKED), M_HIDEFULLSCREEN, ResStr(IDS_PLAYLIST_HIDEFS));
 
-	CMainFrame* pMainFrm = (CMainFrame*)AfxGetMainWnd();
-
 	int nID = (int)m.TrackPopupMenu(TPM_LEFTBUTTON|TPM_RETURNCMD, p.x, p.y, this);
 	switch (nID) {
 		case M_OPEN:
@@ -1355,8 +1353,35 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			pMainFrm->OpenCurPlaylistItem();
 			break;
 		case M_ADD:
-			pMainFrm->AddCurDevToPlaylist();
-			m_pl.SetPos(m_pl.GetTailPosition());
+			{
+				if (pMainFrm->GetPlaybackMode() == PM_CAPTURE) {
+					pMainFrm->AddCurDevToPlaylist();
+					m_pl.SetPos(m_pl.GetTailPosition());
+				} else {
+					CString filter;
+					CAtlArray<CString> mask;
+					s.m_Formats.GetFilter(filter, mask);
+
+					DWORD dwFlags = OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_ALLOWMULTISELECT|OFN_ENABLEINCLUDENOTIFY|OFN_NOCHANGEDIR;
+					if (!s.fKeepHistory) {
+						dwFlags |= OFN_DONTADDTORECENT;
+					}
+
+					COpenFileDlg fd(mask, true, NULL, NULL, dwFlags, filter, this);
+					if (fd.DoModal() != IDOK) {
+						return;
+					}
+
+					CAtlList<CString> fns;
+
+					POSITION pos = fd.GetStartPosition();
+					while (pos) {
+						fns.AddTail(fd.GetNextPathName(pos));
+					}
+
+					Append(fns, fns.GetCount() > 1, NULL);
+				}
+			}
 			break;
 		case M_REMOVE:
 			if (m_pl.RemoveAt(pos)) {
