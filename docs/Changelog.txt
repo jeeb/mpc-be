@@ -14,6 +14,7 @@ Added (+):
 
 Changes (*):
 * ffmpeg git-6a9af925;
+* libopus 1.0.1 git-fa28dea7;
 
 Fixes (!):
 
