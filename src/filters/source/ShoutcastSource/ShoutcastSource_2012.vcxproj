@@ -246,6 +246,14 @@
       <Project>{e8a3f6fa-ae1c-4c8e-a0b6-9c8480324eaa}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Subtitles\Subtitles_2012.vcxproj">
+      <Project>{5e56335f-0fb1-4eea-b240-d8dc5e0608e4}</Project>
+      <Private>false</Private>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+    </ProjectReference>
     <ProjectReference Include="..\..\core\Filters_2012.vcxproj">
       <Project>{273b3149-3192-4b75-a791-470320b90812}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
