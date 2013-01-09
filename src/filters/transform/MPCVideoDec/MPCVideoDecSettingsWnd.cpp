@@ -108,6 +108,9 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	CPoint p(10, 10);
 	GUID* DxvaGui = NULL;
 
+	LOGFONT lf = {m_fontheight*7/4,0L,0L,0L,FW_NORMAL,0,0,0,SYMBOL_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,FF_DONTCARE|DEFAULT_PITCH,_T("Webdings")};
+	m_arrowsFont.CreateFontIndirect(&lf);
+
 	m_grpFFMpeg.Create(ResStr(IDS_VDF_SETTINGS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(350), h20 + h25 * 5 + h20)), this, (UINT)IDC_STATIC);
 	p.y += h20;
 
@@ -231,8 +234,8 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	// Software Output formats order
 	int btn_w = m_fontheight + 12;
 	int btn_h = m_fontheight + 4;
-	m_cbSwOutputFormatUp.Create(_T("\x25B2"), dwStyle|BS_PUSHBUTTON, CRect(p + CPoint(width_s - btn_w * 2, 0), CSize(btn_w, btn_h)), this, IDC_PP_SWOUTPUTFORMATUP);
-	m_cbSwOutputFormatDown.Create(_T("\x25BC"), dwStyle|BS_PUSHBUTTON, CRect(p + CPoint(width_s - btn_w, 0), CSize(btn_w, btn_h)), this, IDC_PP_SWOUTPUTFORMATDOWN);
+	m_cbSwOutputFormatUp.Create(_T("\x35"), dwStyle|BS_PUSHBUTTON, CRect(p + CPoint(width_s - btn_w * 2, 0), CSize(btn_w, btn_h)), this, IDC_PP_SWOUTPUTFORMATUP);
+	m_cbSwOutputFormatDown.Create(_T("\x36"), dwStyle|BS_PUSHBUTTON, CRect(p + CPoint(width_s - btn_w, 0), CSize(btn_w, btn_h)), this, IDC_PP_SWOUTPUTFORMATDOWN);
 	p.y += h20;
 
 	// Resize Method
@@ -297,6 +300,8 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
 		pWnd->SetFont(&m_font, FALSE);
 	}
+	m_cbSwOutputFormatUp.SetFont(&m_arrowsFont);
+	m_cbSwOutputFormatDown.SetFont(&m_arrowsFont);
 
 	CorrectComboListWidth(m_cbDXVACompatibilityCheck);
 	CorrectComboListWidth(m_cbDiscardMode);
