@@ -28,7 +28,6 @@
 #endif
 #include "ShoutcastSource.h"
 #include "../../../DSUtil/DSUtil.h"
-#include "../Subtitles/TextFile.h"
 #include <MMReg.h>
 #include <moreuuids.h>
 
@@ -708,7 +707,9 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 
 		str.Empty();
 		BYTE cur = 0, prev = 0;
+#if DEBUG & 1
 		TRACE(_T("\nCShoutcastStream(): began to receive data:\n"), CString(str));
+#endif
 		while (Receive(&cur, 1) == 1 && cur && !(cur == '\n' && prev == '\n')) {
 			if (cur == '\r') {
 				continue;
@@ -758,7 +759,9 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 			prev = cur;
 			cur = 0;
 		}
+#if DEBUG & 1
 		TRACE(_T("CShoutcastStream(): finished receiving data\n"), CString(str));
+#endif
 
 		if (!fOK && GetLastError() == WSAECONNRESET && !fTryAgain) {
 			str.Format(
@@ -785,7 +788,7 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 			if (ContentLength == Receive((void*)buf, ContentLength)) {
 				typedef CAtlRegExp<CAtlRECharTraits> CAtlRegExpT;
 				typedef CAtlREMatchContext<CAtlRECharTraits> CAtlREMatchContextT;
-				CString body = AToT(buf);
+				CString body(buf);
 				CAutoPtr<CAtlRegExpT> re;
 
 				re.Attach(DNew CAtlRegExp<>());
