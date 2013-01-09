@@ -17508,6 +17508,12 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 	SetMenu(&DefaultMenu);
 	m_hMenuDefault = DefaultMenu;
 	DefaultMenu.Detach();
+
+	if (AfxGetAppSettings().iCaptionMenuMode != MODE_SHOWCAPTIONMENU) {
+		HMENU hMenu = NULL;
+		::SetMenu(m_hWnd, hMenu);
+	}
+
 	// TODO : destroy old menu ???
 	//OldMenu->DestroyMenu();
 
