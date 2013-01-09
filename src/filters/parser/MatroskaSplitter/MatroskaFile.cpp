@@ -805,6 +805,9 @@ HRESULT SimpleBlock::Parse(CMatroskaNode* pMN, bool fFull)
 	POSITION pos = lens.GetHeadPosition();
 	while (pos) {
 		MatroskaReader::QWORD len = lens.GetNext(pos);
+		if ((__int64)len < 0) {
+			continue;
+		}
 		CAutoPtr<CBinary> p(DNew CBinary());
 		p->SetCount((INT_PTR)len);
 		pMN->Read(p->GetData(), len);
