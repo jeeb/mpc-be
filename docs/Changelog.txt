@@ -15,6 +15,7 @@ Added (+):
 Changes (*):
 * ffmpeg git-6a9af925;
 * libopus 1.0.1 git-fa28dea7;
+* Little-CMS git-310db3d5;
 
 Fixes (!):
 
