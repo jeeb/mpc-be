@@ -108,9 +108,6 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	CPoint p(10, 10);
 	GUID* DxvaGui = NULL;
 
-	LOGFONT lf = {m_fontheight*7/4,0L,0L,0L,FW_NORMAL,0,0,0,SYMBOL_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,FF_DONTCARE|DEFAULT_PITCH,_T("Webdings")};
-	m_arrowsFont.CreateFontIndirect(&lf);
-
 	m_grpFFMpeg.Create(ResStr(IDS_VDF_SETTINGS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(350), h20 + h25 * 5 + h20)), this, (UINT)IDC_STATIC);
 	p.y += h20;
 
@@ -300,6 +297,8 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
 		pWnd->SetFont(&m_font, FALSE);
 	}
+	LOGFONT lf = {m_fontheight*7/4,0L,0L,0L,FW_NORMAL,0,0,0,SYMBOL_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,FF_DONTCARE|DEFAULT_PITCH,_T("Webdings")};
+	m_arrowsFont.CreateFontIndirect(&lf);
 	m_cbSwOutputFormatUp.SetFont(&m_arrowsFont);
 	m_cbSwOutputFormatDown.SetFont(&m_arrowsFont);
 
