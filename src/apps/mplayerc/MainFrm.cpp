@@ -18539,13 +18539,22 @@ bool CMainFrame::OpenBD(CString Path)
 			Path.Replace(_T("\\BDMV"), _T("\\"));
 		}
 		if (SUCCEEDED (ClipInfo.FindMainMovie (Path, strPlaylistFile, MainPlaylist, m_MPLSPlaylist))) {
-			m_wndPlaylistBar.Empty();
-			CAtlList<CString> sl;
-			sl.AddTail(CString(strPlaylistFile));
-			m_wndPlaylistBar.Append(sl, false);
+			bool InternalMpegSplitter = AfxGetAppSettings().SrcFilters[SRC_MPEG];
 			m_bIsBDPlay = true;
-			OpenCurPlaylistItem();
-			return true;
+			if (!InternalMpegSplitter && ext == _T(".bdmv")) {
+				return false;
+			} else {
+				m_wndPlaylistBar.Empty();
+				CAtlList<CString> sl;
+				if (InternalMpegSplitter) {
+					sl.AddTail(strPlaylistFile);
+				} else {
+					sl.AddTail(CString(Path + _T("BDMV\\index.bdmv")));
+				}
+				m_wndPlaylistBar.Append(sl, false);
+				OpenCurPlaylistItem();
+				return true;
+			}
 		}
 	}
 

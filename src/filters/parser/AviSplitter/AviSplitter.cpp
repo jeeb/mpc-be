@@ -256,29 +256,6 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				continue;
 			}
 
-			// parse MPEGAudio frame to identify the correct codec MP3/MP2
-			if (pwfe->wFormatTag == WAVE_FORMAT_MPEGLAYER3 || pwfe->wFormatTag == WAVE_FORMAT_MPEG) {
-				size_t scCount = s->cs.GetCount();
-				if (scCount) {
-					__int64 cur_pos = m_pFile->GetPos();
-
-					CBaseSplitterFileEx::mpahdr h;
-					CMediaType mt2;
-					for (size_t i = 0; i < 100; i++) {
-						if (i > scCount) {
-							break;
-						}
-						m_pFile->Seek(s->cs[i].filepos);
-						if (m_pFile->Read(h, s->cs[i].orgsize, false, &mt2) && mt2.cbFormat) {
-							pwfe->wFormatTag = ((WAVEFORMATEX*)mt2.pbFormat)->wFormatTag;
-							break;
-						}
-					}
-
-					m_pFile->Seek(cur_pos);
-				}
-			}
-
 			mt.majortype = MEDIATYPE_Audio;
 			if (m_pFile->m_isamv) {
 				mt.subtype = FOURCCMap(MAKEFOURCC('A','M','V','A'));

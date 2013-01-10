@@ -201,10 +201,15 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 
 	// If parsing fail (probably no PPS/SPS), continue anyway it may arrived later (happen on truncated streams)
 	CHECK_HR_FALSE (FFH264BuildPicParams (&m_DXVAPicParams, &m_DXVAScalingMatrix, &nFieldType, &nSliceType, m_pFilter->GetAVCtx(), m_pFilter->GetPCIVendor()));
-	
+
 	m_nMaxWaiting = min (max (m_DXVAPicParams.num_ref_frames, 3), 8);
 
 	TRACE_H264 ("CDXVADecoderH264::DecodeFrame() : nFramePOC = %11d, nOutPOC = %11d[%11d], [%d - %d], rtOutStart = [%20I64d]\n", nFramePOC, nOutPOC, m_nOutPOC, m_DXVAPicParams.field_pic_flag, m_DXVAPicParams.RefPicFlag, rtOutStart);
+
+	if (!m_DXVAPicParams.field_pic_flag && nOutPOC == INT_MIN && m_nOutPOC != INT_MIN && !m_bFlushed && !m_DXVAPicParams.IntraPicFlag) {
+		TRACE_H264 ("		CDXVADecoderH264::DecodeFrame() : Skip frame\n");
+		return S_FALSE;
+	}
 
 	// Wait I frame after a flush
 	if (m_bFlushed && !(m_DXVAPicParams.IntraPicFlag || (Sync && SecondFieldOffset))) {
