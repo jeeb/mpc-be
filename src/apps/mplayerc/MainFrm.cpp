@@ -90,6 +90,8 @@
 #include "MultiMonitor.h"
 #include "FileVersionInfo.h"
 
+#include <mvrInterfaces.h>
+
 #include <MediaInfo/MediaInfo.h>
 using namespace MediaInfoLib;
 
@@ -1424,12 +1426,19 @@ bool CMainFrame::FlyBarSetPos()
 
 	CRect r_wndView;
 	m_wndView.GetWindowRect(&r_wndView);
-	
-	if (AfxGetAppSettings().iDSVideoRendererType == VIDRNDT_DS_MADVR) {
-		if (m_wndFlyBar.IsWindowVisible()) {
-			m_wndFlyBar.ShowWindow(SW_HIDE);
+
+	IBaseFilter* pBF = FindFilter(CLSID_madVR, pGB);
+	if (pBF) {
+		CComQIPtr<IMadVRExclusiveModeInfo> pMVEMI = pBF;
+		if (pMVEMI) {
+			if (pMVEMI->IsExclusiveModeActive()) {
+				if (m_wndFlyBar.IsWindowVisible()) {
+					m_wndFlyBar.ShowWindow(SW_HIDE);
+				}
+
+				return 0;
+			}
 		}
-		return 0;
 	}
 
 	if (AfxGetAppSettings().iCaptionMenuMode == MODE_FRAMEONLY || AfxGetAppSettings().iCaptionMenuMode == MODE_BORDERLESS || m_fFullScreen) {
@@ -1482,7 +1491,6 @@ void CMainFrame::OnMove(int x, int y)
 
 	m_wndToolBar.Invalidate();
 	FlyBarSetPos();
-
 }
 
 void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)

@@ -26,25 +26,9 @@
 #include "../../../SubPic/SubPicQueueImpl.h"
 #include "RenderersSettings.h"
 #include <moreuuids.h>
+#include <mvrInterfaces.h>
 
 using namespace DSObjects;
-
-interface __declspec(uuid("D6EE8031-214E-4E9E-A3A7-458925F933AB"))
-IMadVRExclusiveModeInfo :
-public IUnknown {
-	STDMETHOD_(BOOL, IsExclusiveModeActive)(void) = 0;
-	STDMETHOD_(BOOL, IsMadVRSeekbarEnabled)(void) = 0;
-};
-
-#define ShaderStage_PreScale	0
-#define ShaderStage_PostScale	1
-
-interface __declspec(uuid("B6A6D5D4-9637-4C7D-AAAE-BC0B36F5E433"))
-IMadVRExternalPixelShaders :
-public IUnknown {
-	STDMETHOD(ClearPixelShaders)(bool postScale) = 0;
-	STDMETHOD(AddPixelShader)(LPCSTR sourceCode, LPCSTR compileProfile, int stage, LPVOID reserved) = 0;
-};
 
 //
 // CmadVRAllocatorPresenter
