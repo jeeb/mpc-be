@@ -1014,6 +1014,7 @@ public:
 	CPlayerListCtrl	m_wndListCtrl;
 	CPlayerPlaylistBar	m_wndPlaylistBar;
 	CFlyBar			m_wndFlyBar;
+	bool			IsMadVRExclusiveMode;
 
 	void CreateFlyBar();
 	bool FlyBarSetPos();

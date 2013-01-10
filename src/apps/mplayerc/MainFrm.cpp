@@ -1424,8 +1424,12 @@ bool CMainFrame::FlyBarSetPos()
 		return 0;
 	}
 
-	CRect r_wndView;
-	m_wndView.GetWindowRect(&r_wndView);
+	if (IsMadVRExclusiveMode) {
+		if (m_wndFlyBar.IsWindowVisible()) {
+			m_wndFlyBar.ShowWindow(SW_HIDE);
+		}
+		return 0;		
+	}
 
 	IBaseFilter* pBF = FindFilter(CLSID_madVR, pGB);
 	if (pBF) {
@@ -1440,6 +1444,9 @@ bool CMainFrame::FlyBarSetPos()
 			}
 		}
 	}
+
+	CRect r_wndView;
+	m_wndView.GetWindowRect(&r_wndView);
 
 	if (AfxGetAppSettings().iCaptionMenuMode == MODE_FRAMEONLY || AfxGetAppSettings().iCaptionMenuMode == MODE_BORDERLESS || m_fFullScreen) {
 
@@ -13621,6 +13628,26 @@ int CMainFrame::GetSubSelIdx()
 	return 0;
 }
 
+void __stdcall MadVRExclusiveModeCallback(LPVOID context, int event)
+{
+	CString _event;
+	switch (event) {
+		case ExclusiveModeIsAboutToBeEntered	: _event = _T("ExclusiveModeIsAboutToBeEntered"); break;
+		case ExclusiveModeWasJustEntered		: _event = _T("ExclusiveModeWasJustEntered"); break;
+		case ExclusiveModeIsAboutToBeLeft		: _event = _T("ExclusiveModeIsAboutToBeLeft"); break;
+		case ExclusiveModeWasJustLeft			: _event = _T("ExclusiveModeWasJustLeft"); break;
+		default									: _event = _T("Unknown event"); break;
+	}
+	TRACE(_T("MadVRExclusiveModeCallback() : event = %ws\n"), _event);
+
+	if (event == ExclusiveModeIsAboutToBeEntered) {
+		((CMainFrame*)context)->IsMadVRExclusiveMode = true;
+	} else if (event == ExclusiveModeIsAboutToBeLeft) {
+		((CMainFrame*)context)->IsMadVRExclusiveMode = false;
+	}
+	((CMainFrame*)context)->FlyBarSetPos();
+}
+
 bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 {
 	AppSettings& s = AfxGetAppSettings();
@@ -13913,6 +13940,16 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 		OpenSetupWindowTitle(pOMD->title);
 
+		IsMadVRExclusiveMode = false;
+		// madVR - register Callback function for detect Entered to ExclusiveMode
+		IBaseFilter* pBF = FindFilter(CLSID_madVR, pGB);
+		if (pBF) {
+			CComQIPtr<IMadVRExclusiveModeCallback> pMVEMC = pBF;
+			if (pMVEMC) {
+				pMVEMC->Register(MadVRExclusiveModeCallback, this);
+			}
+		}
+
 		if (s.fEnableEDLEditor) {
 			m_wndEditListEditor.OpenFile(pOMD->title);
 		}
@@ -14081,6 +14118,16 @@ void CMainFrame::CloseMediaPrivate()
 	}
 
 	SetPlaybackMode(PM_NONE);
+
+	// madVR - unregister Callback function
+	IBaseFilter* pBF = FindFilter(CLSID_madVR, pGB);
+	if (pBF) {
+		CComQIPtr<IMadVRExclusiveModeCallback> pMVEMC = pBF;
+		if (pMVEMC) {
+			pMVEMC->Unregister(MadVRExclusiveModeCallback, this);
+		}
+	}
+	IsMadVRExclusiveMode = false;
 
 	m_fLiveWM = false;
 
