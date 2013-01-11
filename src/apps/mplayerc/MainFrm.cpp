@@ -5013,10 +5013,20 @@ void CMainFrame::OnFileOpendvd()
 
 		if (openDlgPtr != NULL) {
 			openDlgPtr->SetTitle(strTitle);
-			
+
 			CComPtr<IShellItem> psiFolder;
-			if (SUCCEEDED(SHCreateItemFromParsingName(s.strDVDPath, NULL, IID_PPV_ARGS(&psiFolder)))) {
-				openDlgPtr->SetFolder(psiFolder);
+
+			typedef HRESULT (WINAPI *SHCIFPN)(PCWSTR pszPath, IBindCtx * pbc, REFIID riid, void ** ppv);
+			HMODULE hLib = LoadLibrary(L"shell32.dll");
+			if (hLib) {
+				SHCIFPN pSHCIFPN = (SHCIFPN)GetProcAddress(hLib, "SHCreateItemFromParsingName");
+				if (pSHCIFPN) {
+					if (SUCCEEDED(pSHCIFPN(s.strDVDPath, NULL, IID_PPV_ARGS(&psiFolder)))) {
+						openDlgPtr->SetFolder(psiFolder);
+						psiFolder = NULL;
+					}
+				}
+				FreeLibrary(hLib);
 			}
 
 			openDlgPtr->SetOptions(FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST);
@@ -5025,7 +5035,6 @@ void CMainFrame::OnFileOpendvd()
 				return;
 			}
 
-			psiFolder = NULL;
 			if (SUCCEEDED(openDlgPtr->GetResult(&psiFolder))) {
 				LPWSTR folderpath = NULL;
 				if(SUCCEEDED(psiFolder->GetDisplayName(SIGDN_FILESYSPATH, &folderpath))) {

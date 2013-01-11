@@ -919,6 +919,8 @@ bool CShoutcastStream::CShoutcastSocket::FindSync()
 			}
 		}
 	} else if (m_Format == AUDIO_AAC) {
+		return false; // not supported yet - disable
+
 		int aacCount = 0;
 		for (int i = MAXFRAMESIZE; i > 0; i--, Receive(&b, 1)) {
 			mp3hdr h;
