@@ -102,7 +102,7 @@ int GetMLPFrameSize(const BYTE *buf)
 
 int GetADTSFrameSize(const BYTE *buf, int *headersize)
 {
-	if (*(WORD*)buf & 0x0fff != 0x0fff) { // syncword
+	if ((*(WORD*)buf & 0x0fff) != 0x0fff) { // syncword
 		return 0;
 	}
 

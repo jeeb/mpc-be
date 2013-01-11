@@ -135,6 +135,7 @@ typedef struct {
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 	{&MEDIATYPE_Audio, &MEDIASUBTYPE_MP3},
+	{&MEDIATYPE_Audio, &MEDIASUBTYPE_AAC},
 };
 
 const AMOVIESETUP_PIN sudOpPin[] = {
