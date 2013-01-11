@@ -292,3 +292,5 @@ extern bool ParseCUESheet(CString cueData, CAtlList<Chapters> &ChaptersList);
 
 extern CString GetFileOnly(LPCTSTR Path);
 extern CString GetFolderOnly(LPCTSTR Path);
+extern CString AddSlash(LPCTSTR Path);
+extern CString RemoveSlash(LPCTSTR Path);

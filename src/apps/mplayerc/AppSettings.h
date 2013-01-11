@@ -625,16 +625,19 @@ public:
 	// Fake IFO List
 	CAtlList<CString> slFakeIfoList;
 
+	CString			strLastOpenFilterDir;
+	CString			strLastOpenSubDir;
+
 private :
 	DVD_POSITION	DvdPosition[MAX_DVD_POSITION];
 	int				nCurrentDvdPosition;
 	FILE_POSITION	FilePosition[MAX_FILE_POSITION];
 	int				nCurrentFilePosition;
 
-	CString		SrcFiltersKeys[SRC_LAST + !SRC_LAST];
-	CString		TraFiltersKeys[TRA_LAST + !TRA_LAST];
-	CString		DXVAFiltersKeys[TRA_DXVA_LAST + !TRA_DXVA_LAST];
-	CString		FFMFiltersKeys[FFM_LAST + !FFM_LAST];
+	CString			SrcFiltersKeys[SRC_LAST + !SRC_LAST];
+	CString			TraFiltersKeys[TRA_LAST + !TRA_LAST];
+	CString			DXVAFiltersKeys[TRA_DXVA_LAST + !TRA_DXVA_LAST];
+	CString			FFMFiltersKeys[FFM_LAST + !FFM_LAST];
 
 	__int64			ConvertTimeToMSec(CString& time) const;
 	void			ExtractDVDStartPos(CString& strParam);

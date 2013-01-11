@@ -267,3 +267,6 @@
 
 #define IDS_USE_FLYBAR						_T("UseFlybar")
 #define IDS_USE_FLYBAR_ONTOP				_T("UseFlybarOnTop")
+
+#define IDS_RS_LAST_OPEN_FILTER_DIR			_T("LastOpenFilterDir")
+#define IDS_RS_LAST_OPEN_SUB_DIR			_T("LastOpenSubDir")

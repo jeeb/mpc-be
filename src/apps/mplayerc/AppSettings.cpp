@@ -766,6 +766,9 @@ void CAppSettings::SaveSettings()
 
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_ISDB, strISDb);
 
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILTER_DIR, strLastOpenFilterDir);
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_SUB_DIR, strLastOpenSubDir);
+
 	if (fShaderEditorWasOpened) {
 		// This is a large data block. Save it only when really necessary.
 		pApp->WriteProfileString(IDS_R_SHADERS, NULL, NULL);
@@ -1462,7 +1465,10 @@ void CAppSettings::LoadSettings()
 	fmadVRchange		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DVD_MADVR_CHANGE, 0);
 	fLastFullScreen		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LASTFULLSCREEN, 0);
 
-	fRemainingTime = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_REMAINING_TIME, FALSE);
+	fRemainingTime		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_REMAINING_TIME, FALSE);
+
+	strLastOpenFilterDir	= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILTER_DIR, _T(""));
+	strLastOpenSubDir		= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_SUB_DIR, _T(""));
 
 	if (fLaunchfullscreen && !IsD3DFullscreen()) {
 		nCLSwitches |= CLSW_FULLSCREEN;

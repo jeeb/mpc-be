@@ -3163,6 +3163,8 @@ bool ParseCUESheet(CString cueData, CAtlList<Chapters> &ChaptersList)
 	}
 }
 
+// Some handy file functions
+
 //
 //	Returns the file portion from a path
 //
@@ -3185,4 +3187,29 @@ CString GetFolderOnly(LPCTSTR Path)
 	::PathRemoveFileSpec(temp.GetBuffer(0));
 	temp.ReleaseBuffer(-1);
 	return temp;
+}
+
+//
+//	Adds a backslash to the end of a path if it is needed
+//
+CString AddSlash(LPCTSTR Path)
+{
+	CString cs = Path;
+	::PathAddBackslash(cs.GetBuffer(_MAX_PATH));
+	cs.ReleaseBuffer(-1);
+	if(cs.IsEmpty()) {
+		cs = _T("\\");
+	}
+	return cs;
+}
+
+//
+//	Removes a backslash from the end of a path if it is there
+//
+CString RemoveSlash(LPCTSTR Path)
+{
+	CString cs = Path;
+	::PathRemoveBackslash(cs.GetBuffer(_MAX_PATH));
+	cs.ReleaseBuffer(-1);
+	return cs;
 }

@@ -5013,14 +5013,28 @@ void CMainFrame::OnFileOpendvd()
 
 		if (openDlgPtr != NULL) {
 			openDlgPtr->SetTitle(strTitle);
+			
+			CComPtr<IShellItem> psiFolder;
+			if (SUCCEEDED(SHCreateItemFromParsingName(s.strDVDPath, NULL, IID_PPV_ARGS(&psiFolder)))) {
+				openDlgPtr->SetFolder(psiFolder);
+			}
+
 			openDlgPtr->SetOptions(FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST);
 			if (FAILED(openDlgPtr->Show(m_hWnd))) {
 				openDlgPtr->Release();
 				return;
 			}
-			openDlgPtr->Release();
 
-			path = dlg.GetFolderPath();
+			psiFolder = NULL;
+			if (SUCCEEDED(openDlgPtr->GetResult(&psiFolder))) {
+				LPWSTR folderpath = NULL;
+				if(SUCCEEDED(psiFolder->GetDisplayName(SIGDN_FILESYSPATH, &folderpath))) {
+					path = folderpath;
+					CoTaskMemFree(folderpath);
+				}
+			}
+
+			openDlgPtr->Release();
 		}
 	} else {
 		TCHAR _path[_MAX_PATH];
@@ -5044,7 +5058,7 @@ void CMainFrame::OnFileOpendvd()
 	}
 	
 	if (!path.IsEmpty()) {
-		s.strDVDPath = path;
+		s.strDVDPath = AddSlash(path);
 		if (!OpenBD(path)) {
 			CAutoPtr<OpenDVDData> p(DNew OpenDVDData());
 			p->path = path;
@@ -6045,13 +6059,17 @@ void CMainFrame::OnFileLoadsubtitle()
 		_T(".srt .sub .ssa .ass .smi .psb .txt .idx .usf .xss .sup|")
 		_T("*.srt;*.sub;*.ssa;*.ass;*smi;*.psb;*.txt;*.idx;*.usf;*.xss;*.sup||");
 
-	CFileDialog fd(TRUE, NULL, NULL,
+	AppSettings& s = AfxGetAppSettings();
+
+	CFileDialog fd(TRUE, NULL, s.strLastOpenSubDir,
 				   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY|OFN_NOCHANGEDIR,
 				   szFilter, GetModalParent(), 0);
 
 	if (fd.DoModal() != IDOK) {
 		return;
 	}
+
+	s.strLastOpenSubDir = AddSlash(GetFolderOnly(fd.GetPathName()));
 
 	if (b_UseVSFilter) {
 		CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
@@ -6089,7 +6107,9 @@ void CMainFrame::OnFileLoadaudio()
 	CAtlArray<CString> mask;
 	s.m_Formats.GetAudioFilter(filter, mask);
 
-	CFileDialog fd(TRUE, NULL, NULL,
+	CString path = AddSlash(GetFolderOnly(m_wndPlaylistBar.GetCurFileName()));
+
+	CFileDialog fd(TRUE, NULL, path,
 				   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY|OFN_NOCHANGEDIR,
 				   filter, GetModalParent(), 0);
 
@@ -8879,14 +8899,14 @@ void CMainFrame::OnUpdateNavMixSubtitles(CCmdUI* pCmdUI)
 void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 {
 	UINT nID = pCmdUI->m_nID;
-	int i = (int)nID - (7 + ID_SUBTITLES_SUBITEM_START); // again, 5 pre-set subtitles options before the actual list
+	int i = (int)nID - (7 + ID_SUBTITLES_SUBITEM_START);
 
-	pCmdUI->Enable(m_pCAP && !m_fAudioOnly);
+	pCmdUI->Enable(m_pCAP && !m_fAudioOnly && GetPlaybackMode() != PM_DVD);
 	
 	if (i == -7) {
-		pCmdUI->Enable(m_pCAP && !b_UseVSFilter && !m_fAudioOnly);
+		pCmdUI->Enable(GetPlaybackMode() == PM_NONE || (m_pCAP && !b_UseVSFilter && !m_fAudioOnly)) ;
 	} else if (i == -6) {
-		pCmdUI->Enable((m_pCAP || b_UseVSFilter) && !m_fAudioOnly);
+		pCmdUI->Enable((m_pCAP || b_UseVSFilter) && !m_fAudioOnly && GetPlaybackMode() != PM_DVD);
 	} else if (i == -5) {
 		// styles
 		pCmdUI->Enable(FALSE);
@@ -8941,7 +8961,7 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 
 		// TODO: foxX - default subtitles style toggle here; still wip
 		pCmdUI->SetCheck(AfxGetAppSettings().fUseDefaultSubtitlesStyle);
-		pCmdUI->Enable(AfxGetAppSettings().fEnableSubtitles && m_pCAP && !m_fAudioOnly);
+		pCmdUI->Enable(AfxGetAppSettings().fEnableSubtitles && m_pCAP && !m_fAudioOnly && GetPlaybackMode() != PM_DVD);
 	} else if (i == -1) {
 		if (b_UseVSFilter) {
 			CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
@@ -8957,7 +8977,7 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 		}
 
 		pCmdUI->SetCheck(AfxGetAppSettings().fForcedSubtitles);
-		pCmdUI->Enable(AfxGetAppSettings().fEnableSubtitles && m_pCAP && !m_fAudioOnly);
+		pCmdUI->Enable(AfxGetAppSettings().fEnableSubtitles && m_pCAP && !m_fAudioOnly && GetPlaybackMode() != PM_DVD);
 	}
 }
 
