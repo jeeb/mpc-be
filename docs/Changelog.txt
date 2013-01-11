@@ -16,6 +16,7 @@ Changes (*):
 * ffmpeg git-6471f63d;
 * libopus 1.0.1 git-fa28dea7;
 * Little-CMS git-310db3d5;
+* libwebp 0.2.1 git-36c52c2c;
 
 Fixes (!):
 
