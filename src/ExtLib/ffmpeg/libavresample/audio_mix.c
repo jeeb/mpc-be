@@ -575,9 +575,9 @@ int ff_audio_mix_set_matrix(AudioMix *am, const double *matrix, int stride)
     am->in_matrix_channels  = am->in_channels;
     am->out_matrix_channels = am->out_channels;
 
-    // ==> Start patch MPC
-    if (0) {
-    // <== End patch MPC
+// ==> Start patch MPC
+#if (0)
+// <== End patch MPC
     /* exclude output channels if they can be zeroed instead of mixed */
     for (o = 0; o < am->out_channels; o++) {
         int zero = 1;
@@ -667,9 +667,9 @@ int ff_audio_mix_set_matrix(AudioMix *am, const double *matrix, int stride)
         am->in_matrix_channels = 0;
         return 0;
     }
-    // ==> Start patch MPC
-    }
-    // <== End patch MPC
+// ==> Start patch MPC
+#endif
+// <== End patch MPC
 
 #define CONVERT_MATRIX(type, expr)                                          \
     am->matrix_## type[0] = av_mallocz(am->out_matrix_channels *            \
