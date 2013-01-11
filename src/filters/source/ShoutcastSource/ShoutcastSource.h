@@ -39,6 +39,37 @@ typedef enum {
 	AUDIO_PLAYLIST
 } StreamFormat;
 
+struct aachdr
+{
+	WORD sync:12;
+	WORD version:1;
+	WORD layer:2;
+	WORD fcrc:1;
+	WORD profile:2;
+	WORD freq:4;
+	WORD privatebit:1;
+	WORD channels:3;
+	WORD original:1;
+	WORD home:1; // ?
+
+	WORD copyright_id_bit:1;
+	WORD copyright_id_start:1;
+	WORD aac_frame_length:13;
+	WORD adts_buffer_fullness:11;
+	WORD no_raw_data_blocks_in_frame:2;
+
+	WORD crc;
+
+	int FrameSize, nBytesPerSec;
+	REFERENCE_TIME rtDuration;
+
+	aachdr() {
+		memset(this, 0, sizeof(*this));
+	}
+};
+
+static int aacfreq[] = {96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350};
+
 class __declspec(uuid("68F540E9-766F-44d2-AB07-E26CC6D27A79"))
 	CShoutcastSource
 	: public CSource
@@ -169,6 +200,7 @@ class CShoutcastStream : public CSourceStream
 		int Receive(void* lpBuf, int nBufLen, int nFlags = 0);
 
 		DWORD m_metaint, m_bitrate, m_freq, m_channels;
+		aachdr m_aachdr;
 		StreamFormat m_Format;
 		CString m_title, m_url;
 		bool Connect(CUrl& url, CString& redirectUrl);
