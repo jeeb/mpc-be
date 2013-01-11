@@ -1433,6 +1433,18 @@ bool CMainFrame::FlyBarSetPos()
 
 	IBaseFilter* pBF = FindFilter(CLSID_madVR, pGB);
 	if (pBF) {
+		CComQIPtr<IMadVRSettings> pMVS = pBF;
+		BOOL boolVal;
+		if (pMVS) pMVS->SettingsGetBoolean(L"enableExclusive", &boolVal);
+		if (m_fFullScreen && boolVal) {
+			if (m_wndFlyBar.IsWindowVisible()) {
+				m_wndFlyBar.ShowWindow(SW_HIDE);
+			}
+			return 0;
+		}
+	}
+
+	if (pBF) {
 		CComQIPtr<IMadVRExclusiveModeInfo> pMVEMI = pBF;
 		if (pMVEMI) {
 			if (pMVEMI->IsExclusiveModeActive()) {
