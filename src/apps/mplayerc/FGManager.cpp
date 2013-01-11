@@ -202,9 +202,9 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 	fl.RemoveAll();
 
-	CStringW fn = CStringW(lpcwstrFileName).TrimLeft();
-	CStringW protocol = fn.Left(fn.Find(':')+1).TrimRight(':').MakeLower();
-	CStringW ext = CPathW(fn).GetExtension().MakeLower();
+	CString fn = CString(lpcwstrFileName).TrimLeft();
+	CString protocol = fn.Left(fn.Find(':')+1).TrimRight(':').MakeLower();
+	CString ext = CPath(fn).GetExtension().MakeLower();
 
 	HANDLE hFile = INVALID_HANDLE_VALUE;
 
@@ -284,6 +284,15 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 	while (pos) {
 		CFGFilter* pFGF = m_override.GetNext(pos);
 		if (pFGF->GetMerit() >= MERIT64_ABOVE_DSHOW) { // FilterOverride::PREFERRED
+			if (ext == _T(".avi")) {
+				CLSID clsid = pFGF->GetCLSID();
+				if (clsid == GUIDFromCString(_T("{55DA30FC-F16B-49FC-BAA5-AE59FC65F82D}")) || clsid == GUIDFromCString(_T("{564FD788-86C9-4444-971E-CC4A243DA150}"))) {
+					// skip Haali Source for .avi files
+					TRACE(_T("FGM: EnumSourceFilters() : skip '%ws' on file '%ws'\n"), CStringFromGUID(pFGF->GetCLSID()), lpcwstrFileName);
+					continue;
+				}
+			}
+
 			fl.Insert(pFGF, 0, false, false);
 		}
 	}	
@@ -415,7 +424,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 HRESULT CFGManager::AddSourceFilter(CFGFilter* pFGF, LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrFilterName, IBaseFilter** ppBF)
 {
-	TRACE(_T("FGM: AddSourceFilter trying '%s'\n"), CStringFromGUID(pFGF->GetCLSID()));
+	TRACE(_T("FGM: AddSourceFilter() trying '%ws'\n"), CStringFromGUID(pFGF->GetCLSID()));
 
 	CheckPointer(lpcwstrFileName, E_POINTER);
 	CheckPointer(ppBF, E_POINTER);
