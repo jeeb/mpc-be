@@ -241,9 +241,9 @@ static struct scmap_t {
 s_scmap_hdmv[] = {
 	//   FL FR FC LFe BL BR FLC FRC
 	{0, {-1,-1,-1,-1,-1,-1,-1,-1 }, 0}, // INVALID
-	{1, { 0,-1,-1,-1,-1,-1,-1,-1 }, 0}, // Mono    M1, 0
+	{1, { 0,-1,-1,-1,-1,-1,-1,-1 }, SPEAKER_FRONT_CENTER}, // Mono    M1, 0
 	{0, {-1,-1,-1,-1,-1,-1,-1,-1 }, 0}, // INVALID
-	{2, { 0, 1,-1,-1,-1,-1,-1,-1 }, 0}, // Stereo  FL, FR
+	{2, { 0, 1,-1,-1,-1,-1,-1,-1 }, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT}, // Stereo  FL, FR
 	{4, { 0, 1, 2,-1,-1,-1,-1,-1 }, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER},															// 3/0      FL, FR, FC
 	{4, { 0, 1, 2,-1,-1,-1,-1,-1 }, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_LOW_FREQUENCY},															// 2/1      FL, FR, Surround
 	{4, { 0, 1, 2, 3,-1,-1,-1,-1 }, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_LOW_FREQUENCY},										// 3/1      FL, FR, FC, Surround
@@ -1187,6 +1187,11 @@ HRESULT CMpaDecFilter::GetDeliveryBuffer(IMediaSample** pSample, BYTE** pData)
 
 HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, int size, AVSampleFormat avsf, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask)
 {
+	if (dwChannelMask == 0) {
+		dwChannelMask = GetDefChannelMask(nChannels);
+	}
+	ASSERT(nChannels == av_popcount(dwChannelMask));
+
 #if ENABLE_AC3_ENCODER
 	if (GetSPDIF(ac3enc) /*&& nChannels > 2*/) { // do not encode mono and stereo
 		return AC3Encode(pBuff, size, avsf, nSamplesPerSec, nChannels, dwChannelMask);
@@ -1203,11 +1208,6 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, int size, AVSampleFormat avsf, DWORD
 	if (rtStart < 0 /*200000*/ /* < 0, FIXME: 0 makes strange noises */) {
 		return S_OK;
 	}
-
-	if (dwChannelMask == 0) {
-		dwChannelMask = GetDefChannelMask(nChannels);
-	}
-	ASSERT(nChannels == av_popcount(dwChannelMask));
 
 	BYTE*  pDataIn  = pBuff;
 	CAtlArray<float> mixData;
