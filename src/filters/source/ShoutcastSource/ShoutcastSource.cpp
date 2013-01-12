@@ -27,8 +27,8 @@
 #include <InitGuid.h>
 #endif
 #include "ShoutcastSource.h"
-#include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/GolombBuffer.h"
+#include "../../parser/BaseSplitter/BaseSplitter.h"
 #include <MMReg.h>
 #include <moreuuids.h>
 
@@ -583,6 +583,8 @@ UINT CShoutcastStream::SocketThreadProc()
 
 	REFERENCE_TIME m_rtSampleTime = 0;
 
+	CAutoPtr<Packet> m_p;
+
 	while (!fExitThread) {
 		int len = MAXFRAMESIZE;
 		len = m_socket.Receive(pData, len);
@@ -603,9 +605,81 @@ UINT CShoutcastStream::SocketThreadProc()
 			CAutoLock cAutoLock(&m_queue);
 			m_queue.AddTail(f);
 		} else if (m_socket.m_Format == AUDIO_AAC) {
-			// TODO - split AAC frames ...
+			// code from MpegSplitter.cpp
+			CAutoPtr<Packet> p(DNew Packet());
+			p->SetData(pData, len);
+
+			if (m_p && m_p->GetCount() == 1 && m_p->GetAt(0) == 0xff && !(!p->IsEmpty() && (p->GetAt(0) & 0xf6) == 0xf0)) {
+				m_p.Free();
+			}
+
+			if (!m_p) {
+				BYTE* base = p->GetData();
+				BYTE* s = base;
+				BYTE* e = s + p->GetCount();
+
+				for (; s < e; s++) {
+					if (*s != 0xff) {
+						continue;
+					}
+
+					if (s == e-1 || (s[1]&0xf6) == 0xf0) {
+						memmove(base, s, e - s);
+						p->SetCount(e - s);
+						m_p = p;
+						break;
+					}
+				}
+			} else {
+				m_p->Append(*p);
+			}
+
+			while (m_p && m_p->GetCount() > ADTS_FRAME_SIZE) {
+				BYTE* base	= m_p->GetData();
+				BYTE* s		= base;
+				BYTE* e		= s + m_p->GetCount();
+				int len		= ((s[3]&3)<<11)|(s[4]<<3)|(s[5]>>5);
+				bool crc	= !(s[1]&1);
+				s	+= 7;
+				len	-= 7;
+				if (crc) {
+					s += 2, len -= 2;
+				}
+
+				if (e - s < len) {
+					break;
+				}
+
+				if (len <= 0 || e - s >= len + 2 && (s[len] != 0xff || (s[len+1]&0xf6) != 0xf0)) {
+					m_p.Free();
+					break;
+				}
+
+				CAutoPtr<Packet> p2(DNew Packet());
+				p2->SetData(s, len);
+
+				s += len;
+				memmove(base, s, e - s);
+				m_p->SetCount(e - s);
+
+				{
+					mp3frame f(p2->GetCount());
+					memcpy(f.pData, p2->GetData(), p2->GetCount());
+					f.rtStop = (f.rtStart = m_rtSampleTime) + m_socket.m_aachdr.rtDuration;
+					m_rtSampleTime = f.rtStop;
+					f.title = m_socket.m_title;
+					if (f.title.IsEmpty()) {
+						f.title = m_socket.m_url;
+					}
+
+					CAutoLock cAutoLock(&m_queue);
+					m_queue.AddTail(f);
+				}
+			}
 		}
 	}
+
+	m_p.Free();
 
 	m_socket.Close();
 
@@ -920,9 +994,6 @@ bool CShoutcastStream::CShoutcastSocket::FindSync()
 			}
 		}
 	} else if (m_Format == AUDIO_AAC) {
-		return false; // not supported yet - disable
-
-		int aacCount = 0;
 		for (int i = MAXFRAMESIZE; i > 0; i--, Receive(&b, 1)) {
 			mp3hdr h;
 			if (h.ExtractAACHeader(*this)) {

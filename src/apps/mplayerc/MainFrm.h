@@ -346,7 +346,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 
 	CAtlArray<SubStreams> subarray;
 	void SubFlags(CString strname, bool &forced, bool &def);
-	int GetSubSelIdx();
+	size_t GetSubSelIdx();
 	int cntintsub;
 	int SelSub2;
 	// chapters (file mode)

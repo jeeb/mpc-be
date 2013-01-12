@@ -13072,24 +13072,6 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 
 #define BREAK(msg) {err = msg; break;}
 
-void CMainFrame::SubFlags(CString strname, bool &forced, bool &def)
-{
-	strname.Remove(' ');
-	if (strname.Right(16).MakeLower() == _T("[default,forced]")) {
-		def		= 1;
-		forced	= 1;
-	} else if (strname.Right(9).MakeLower() == _T("[default]")) {
-		def		= 1;
-		forced	= 0;
-	} else if (strname.Right(8).MakeLower() == _T("[forced]")) {
-		def		= 0;
-		forced	= 1;
-	} else {
-		def		= 0;
-		forced	= 0;
-	}
-}
-
 void CMainFrame::OpenSetupAudioStream()
 {
 	if (m_iMediaLoadState != MLS_LOADED) {
@@ -13306,6 +13288,24 @@ void CMainFrame::OpenSetupAudioStream()
 	}
 }
 
+void CMainFrame::SubFlags(CString strname, bool &forced, bool &def)
+{
+	strname.Remove(' ');
+	if (strname.Right(16).MakeLower() == _T("[default,forced]")) {
+		def		= 1;
+		forced	= 1;
+	} else if (strname.Right(9).MakeLower() == _T("[default]")) {
+		def		= 1;
+		forced	= 0;
+	} else if (strname.Right(8).MakeLower() == _T("[forced]")) {
+		def		= 0;
+		forced	= 1;
+	} else {
+		def		= 0;
+		forced	= 0;
+	}
+}
+
 void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 {
 	b_UseVSFilter = false;
@@ -13344,7 +13344,6 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 
 		SubStreams substream;
 		subarray.RemoveAll();
-		int defsub			= 0;
 		int checkedsplsub	= 0;
 		int subIndex		= -1;
 		int iNum			= 0;
@@ -13531,7 +13530,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 		} else {
 
 			int cnt = subarray.GetCount();
-			defsub = GetSubSelIdx();
+			size_t defsub = GetSubSelIdx();
 
 			if (FindSourceSelectableFilter() && s.fDisableInternalSubtitles) {
 				defsub++;
@@ -13543,17 +13542,17 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			}
 
 			if (cnt > 0) {
-				UINT udefsub = defsub;
-				OnNavMixStreamSubtitleSelectSubMenu(udefsub, 2);
+				//UINT udefsub = defsub;
+				OnNavMixStreamSubtitleSelectSubMenu(defsub, 2);
 			}
 		}
 	}
 }
 
-int CMainFrame::GetSubSelIdx()
+size_t CMainFrame::GetSubSelIdx()
 {
 	if (b_UseVSFilter) {
-		int SelectedLanguage = 0;
+		size_t SelectedLanguage = 0;
 		/*
 		CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
 		if (pDVS) {
@@ -13567,7 +13566,7 @@ int CMainFrame::GetSubSelIdx()
 	}
 
 	bool extsubpri	= AfxGetAppSettings().fPrioritizeExternalSubtitles;
-	int cnt			= subarray.GetCount();
+	size_t cnt		= subarray.GetCount();
 	CStringW slo	= AfxGetAppSettings().strSubtitlesLanguageOrder;
 	bool bLangMatch	= false;
 
@@ -13579,11 +13578,11 @@ int CMainFrame::GetSubSelIdx()
 	}
 
 	if (extsubpri && cnt > 1) { // try external sub ...
-		int bLangIdx	= 0;
+		size_t bLangIdx	= 0;
 		int tPos = 0;
 		CStringW lang = slo.Tokenize(_T(",; "), tPos);
 		while (tPos != -1 && !bLangMatch) {
-			for (int iIndex = 0; iIndex < cnt; iIndex++) {
+			for (size_t iIndex = 0; iIndex < cnt; iIndex++) {
 				if (!subarray[iIndex].Extsub) {
 					continue;
 				}		
@@ -13620,15 +13619,21 @@ int CMainFrame::GetSubSelIdx()
 
 		if (bLangMatch) {
 			return bLangIdx;
- 		}
+ 		} else {
+			for (size_t iIndex = 0; iIndex < cnt; iIndex++) {
+				if (subarray[iIndex].Extsub) {
+					return iIndex;
+				}
+			}
+		}
 	} 
 	
 	if (cnt > 1) { // try all sub ...
-		int bLangIdx	= 0;
+		size_t bLangIdx = 0;
 		int tPos = 0;
 		CStringW lang = slo.Tokenize(_T(",; "), tPos);
 		while (tPos != -1 && !bLangMatch) {
-			for (int iIndex = 0; iIndex < cnt; iIndex++) {
+			for (size_t iIndex = 0; iIndex < cnt; iIndex++) {
 					
 				CString name(subarray[iIndex].lang);
 				name.MakeLower();
