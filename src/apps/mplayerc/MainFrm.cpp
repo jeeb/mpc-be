@@ -11112,7 +11112,7 @@ void CMainFrame::AutoChangeMonitorMode()
 			}
 		}
 
-		for (int rs = 0; rs < 30 ; rs++) {
+		for (int rs = 0; rs < MaxFpsCount ; rs++) {
 			if (s.AutoChangeFullscrRes.dmFullscreenRes[rs].fIsData == true
 					&& s.AutoChangeFullscrRes.dmFullscreenRes[rs].fChecked == 1
 					&& MediaFPS >= s.AutoChangeFullscrRes.dmFullscreenRes[rs].vfr_from
@@ -11126,7 +11126,7 @@ void CMainFrame::AutoChangeMonitorMode()
 	} else if (s.AutoChangeFullscrRes.bEnabled == 2) {
 
 		if (iMonValid == 1 && s.dFPS >= 1){
-			for (int rs = 0; rs < 30 ; rs++) {
+			for (int rs = 0; rs < MaxFpsCount ; rs++) {
 				if (s.AutoChangeFullscrRes.dmFullscreenRes[rs].fIsData == true 
 					&& s.AutoChangeFullscrRes.dmFullscreenRes[rs].fChecked == 1 
 					&& s.dFPS >= s.AutoChangeFullscrRes.dmFullscreenRes[rs].vfr_from
