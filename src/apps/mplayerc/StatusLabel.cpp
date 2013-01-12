@@ -99,23 +99,24 @@ void CStatusLabel::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	CSize size = dc.GetTextExtent(str);
 	CPoint p = CPoint(m_fRightAlign ? r.Width() - size.cx : 0, (r.Height()-size.cy)/2);
 
-	if (m_fAddEllipses)
+	if (m_fAddEllipses) {
 		while (size.cx > r.Width()-3 && str.GetLength() > 3) {
 			str = str.Left(str.GetLength()-4) + _T("...");
 			size = dc.GetTextExtent(str);
 		}
+	}
 
 	if (s.fDisableXPToolbars) {
-			dc.SelectObject(&old);
-			ThemeRGB(5, 10, 15, R, G, B);
-			dc.FillSolidRect(&r, RGB(R, G, B));
-			dc.TextOut(p.x, p.y, str);
-		} else {
-			dc.TextOut(p.x, p.y, str);
-			dc.ExcludeClipRect(CRect(p, size));
-			dc.SelectObject(&old);
-			dc.FillSolidRect(&r, 0);
-		}
+		dc.SelectObject(&old);
+		ThemeRGB(5, 10, 15, R, G, B);
+		dc.FillSolidRect(&r, RGB(R, G, B));
+		dc.TextOut(p.x, p.y, str);
+	} else {
+		dc.TextOut(p.x, p.y, str);
+		dc.ExcludeClipRect(CRect(p, size));
+		dc.SelectObject(&old);
+		dc.FillSolidRect(&r, 0);
+	}
 
 	dc.Detach();
 }
