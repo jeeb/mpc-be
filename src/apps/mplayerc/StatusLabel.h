@@ -42,8 +42,9 @@ public:
 	void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);
 
 protected:
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+
 	DECLARE_MESSAGE_MAP()
 
-public:
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 };

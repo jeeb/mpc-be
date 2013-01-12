@@ -64,6 +64,15 @@ END_MESSAGE_MAP()
 
 // CStatusLabel message handlers
 
+BOOL CStatusLabel::PreTranslateMessage(MSG* pMsg)
+{
+	if (pMsg->message == WM_LBUTTONDOWN) {
+		GetParent()->SendMessage(pMsg->message, pMsg->wParam, pMsg->lParam);
+	}
+
+	return __super::PreTranslateMessage(pMsg);
+}
+
 void CStatusLabel::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 {
 	CDC dc;
