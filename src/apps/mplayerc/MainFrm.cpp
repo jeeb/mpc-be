@@ -10562,7 +10562,6 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 		CSize logosize = m_wndView.GetLogoSize();
 		int _DEFCLIENTW = max(logosize.cx, DEFCLIENTW);
 		int _DEFCLIENTH = max(logosize.cy, DEFCLIENTH);
-		if (s.fDisableXPToolbars) _DEFCLIENTW = _DEFCLIENTH * 16/9;
 
 		if (GetSystemMetrics(SM_REMOTESESSION)) {
 			_DEFCLIENTH = 0;
@@ -10573,21 +10572,20 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 		w = _DEFCLIENTW + r1.Width() - r2.Width();
 		h = _DEFCLIENTH + r1.Height() - r2.Height();
 
-		if (style & WS_THICKFRAME) {
+		if (s.iCaptionMenuMode!=MODE_BORDERLESS) {
 			w += GetSystemMetrics(SM_CXSIZEFRAME) * 2;
 			h += GetSystemMetrics(SM_CYSIZEFRAME) * 2;
-			if ( (style & WS_CAPTION) == 0 ) {
+			if (s.iCaptionMenuMode==MODE_SHOWCAPTIONMENU || s.iCaptionMenuMode==MODE_HIDEMENU) {
 				w -= 2;
 				h -= 2;
 			}
 		}
 
-		if (style & WS_CAPTION) {
+		if (s.iCaptionMenuMode==MODE_SHOWCAPTIONMENU || s.iCaptionMenuMode==MODE_HIDEMENU) {
 			h += GetSystemMetrics(SM_CYCAPTION);
 			if (s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU) {
 				h += GetSystemMetrics(SM_CYMENU);
 			}
-			//else MODE_HIDEMENU
 		}
 	}
 

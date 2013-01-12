@@ -198,6 +198,8 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 	BITMAP bm;
 	int x, y, w, h, oldmode;
 
+	COLORREF bkcolor = 0;
+
 	BLENDFUNCTION bf;
 	bf.AlphaFormat = AC_SRC_ALPHA;
 	bf.BlendFlags = 0;
@@ -237,6 +239,8 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 			y = (r.Height() - h) / 2;
 			r = CRect(CPoint(x, y), CSize(w, h));
 
+			bkcolor = m_logo.GetPixel(0,0);
+
 			oldmode = pDC->SetStretchBltMode(STRETCH_HALFTONE);
 			m_logo.StretchBlt(*pDC, r, CRect(0, 0, bm.bmWidth, abs(bm.bmHeight)));
 			pDC->SetStretchBltMode(oldmode);
@@ -247,7 +251,7 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 	}
 
 	GetClientRect(r);
-	pDC->FillSolidRect(r, 0);
+	pDC->FillSolidRect(r, bkcolor);
 
 	return TRUE;
 }
