@@ -51,6 +51,7 @@ IDF_SHADER_LEVELS2               FILE                    "res\\shaders\\levels2.
 IDF_SHADER_LEVELS3               FILE                    "res\\shaders\\levels3.psh"
 IDF_SHADER_BT601_BT709           FILE                    "res\\shaders\\BT601BT709.psh"
 IDF_SHADER_YV12CHROMAUP          FILE                    "res\\shaders\\YV12ChromaUpsampling.psh"
+IDF_SHADER_LCD                   FILE                    "res\\shaders\\LCDAngleCorrection.psh"
 IDF_SHADER_GRAYSCALE             FILE                    "res\\shaders\\grayscale.psh"
 IDF_SHADER_SHARPEN               FILE                    "res\\shaders\\sharpen.psh"
 IDF_SHADER_SHARPEN_COMPLEX       FILE                    "res\\shaders\\SharpenComplex.psh"

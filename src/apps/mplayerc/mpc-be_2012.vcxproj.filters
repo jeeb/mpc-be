@@ -991,6 +991,9 @@
     <None Include="res\shaders\YV12ChromaUpsampling.psh">
       <Filter>Resource Files\shaders</Filter>
     </None>
+    <None Include="res\shaders\LCDAngleCorrection.psh">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
     <None Include="res\toolbar.bmp">
       <Filter>Resource Files</Filter>
     </None>
