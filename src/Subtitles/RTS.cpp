@@ -690,8 +690,11 @@ bool CPolygon::CreatePath()
 
 	if (mPathPoints != len) {
 		mpPathTypes = (BYTE*)realloc(mpPathTypes, len*sizeof(BYTE));
+		if (!mpPathTypes) {
+			return false;
+		}
 		mpPathPoints = (POINT*)realloc(mpPathPoints, len*sizeof(POINT));
-		if (!mpPathTypes || !mpPathPoints) {
+		if (!mpPathPoints) {
 			return false;
 		}
 		mPathPoints = (int)len;
