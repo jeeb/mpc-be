@@ -683,25 +683,27 @@ bool CPolygon::ParseStr()
 
 bool CPolygon::CreatePath()
 {
-	size_t len = m_pathTypesOrg.GetCount();
+	int len = (int)m_pathTypesOrg.GetCount();
 	if (len == 0) {
 		return false;
 	}
 
 	if (mPathPoints != len) {
-		mpPathTypes = (BYTE*)realloc(mpPathTypes, len*sizeof(BYTE));
-		if (!mpPathTypes) {
+		BYTE* pNewPathTypes = (BYTE*)realloc(mpPathTypes, len * sizeof(BYTE));
+		if (!pNewPathTypes) {
 			return false;
 		}
-		mpPathPoints = (POINT*)realloc(mpPathPoints, len*sizeof(POINT));
-		if (!mpPathPoints) {
+		mpPathTypes = pNewPathTypes;
+		POINT* pNewPathPoints = (POINT*)realloc(mpPathPoints, len * sizeof(POINT));
+		if (!pNewPathPoints) {
 			return false;
 		}
-		mPathPoints = (int)len;
+		mpPathPoints = pNewPathPoints;
+		mPathPoints = len;
 	}
 
-	memcpy(mpPathTypes, m_pathTypesOrg.GetData(), len*sizeof(BYTE));
-	memcpy(mpPathPoints, m_pathPointsOrg.GetData(), len*sizeof(POINT));
+	memcpy(mpPathTypes, m_pathTypesOrg.GetData(), len * sizeof(BYTE));
+	memcpy(mpPathPoints, m_pathPointsOrg.GetData(), len * sizeof(POINT));
 
 	return true;
 }
