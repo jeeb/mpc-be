@@ -157,6 +157,7 @@ FFMPEG_CODECS		ffCodecs[] = {
 	{ &MEDIASUBTYPE_dx50, AV_CODEC_ID_MPEG4, NULL },
 	{ &MEDIASUBTYPE_DIVX, AV_CODEC_ID_MPEG4, NULL },
 	{ &MEDIASUBTYPE_divx, AV_CODEC_ID_MPEG4, NULL },
+	{ &MEDIASUBTYPE_Divx, AV_CODEC_ID_MPEG4, NULL },
 
 	// WMV1/2/3
 	{ &MEDIASUBTYPE_WMV1, AV_CODEC_ID_WMV1, NULL },
@@ -422,6 +423,7 @@ const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_dx50   },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_DIVX   },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_divx   },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_Divx   },
 
 	// WMV1/2/3
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_WMV1   },
@@ -1012,7 +1014,8 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn)
 					if ((*ffCodecs[i].clsMinorType == MEDIASUBTYPE_DX50) ||		// DivX
 							(*ffCodecs[i].clsMinorType == MEDIASUBTYPE_dx50) ||
 							(*ffCodecs[i].clsMinorType == MEDIASUBTYPE_DIVX) ||
-							(*ffCodecs[i].clsMinorType == MEDIASUBTYPE_divx) ) {
+							(*ffCodecs[i].clsMinorType == MEDIASUBTYPE_divx) ||
+							(*ffCodecs[i].clsMinorType == MEDIASUBTYPE_Divx) ) {
 						bCodecActivated = (m_nActiveCodecs & MPCVD_DIVX) != 0;
 					} else {
 						bCodecActivated = (m_nActiveCodecs & MPCVD_XVID) != 0;	// Xvid/MPEG-4

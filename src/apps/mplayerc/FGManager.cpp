@@ -2217,6 +2217,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview
 	if (ffmpeg_filters[FFM_DIVX] || IsPreview) {
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DIVX);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_divx);
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_Divx);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DX50);
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dx50);
 	}
@@ -2473,6 +2474,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview
 		if (!(ffmpeg_filters[FFM_DIVX])) {
 			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DIVX);
 			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_divx);
+			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_Divx);
 			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_DX50);
 			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_dx50);
 		}
