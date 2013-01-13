@@ -370,7 +370,6 @@ void CStreamSwitcherAllocator::NotifyMediaType(const CMediaType& mt)
 	m_fMediaTypeChanged = true;
 }
 
-
 //
 // CStreamSwitcherInputPin
 //
