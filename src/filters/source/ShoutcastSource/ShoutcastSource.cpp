@@ -28,7 +28,6 @@
 #endif
 #include "ShoutcastSource.h"
 #include "../../../DSUtil/GolombBuffer.h"
-#include "../../parser/BaseSplitter/BaseSplitter.h"
 #include <MMReg.h>
 #include <moreuuids.h>
 
@@ -404,7 +403,7 @@ LONGLONG CShoutcastStream::GetBufferFullness()
 	if (m_queue.IsEmpty()) {
 		return 0;
 	}
-	LONGLONG ret = 100i64*(m_queue.GetTail().rtStart - m_queue.GetHead().rtStart) / AVGBUFFERLENGTH;
+	LONGLONG ret = 100i64*(m_queue.GetTail()->rtStart - m_queue.GetHead()->rtStart) / AVGBUFFERLENGTH;
 	return min(ret, 100);
 }
 
@@ -450,7 +449,7 @@ HRESULT CShoutcastStream::FillBuffer(IMediaSample* pSample)
 		// do we have to refill our buffer?
 		{
 			CAutoLock cAutoLock(&m_queue);
-			if (!m_queue.IsEmpty() && m_queue.GetHead().rtStart < m_queue.GetTail().rtStart - MINBUFFERLENGTH) {
+			if (!m_queue.IsEmpty() && m_queue.GetHead()->rtStart < m_queue.GetTail()->rtStart - MINBUFFERLENGTH) {
 				break;    // nope, that's great
 			}
 		}
@@ -466,7 +465,7 @@ HRESULT CShoutcastStream::FillBuffer(IMediaSample* pSample)
 			Sleep(50);
 
 			CAutoLock cAutoLock(&m_queue);
-			if (!m_queue.IsEmpty() && m_queue.GetHead().rtStart < m_queue.GetTail().rtStart - AVGBUFFERLENGTH) {
+			if (!m_queue.IsEmpty() && m_queue.GetHead()->rtStart < m_queue.GetTail()->rtStart - AVGBUFFERLENGTH) {
 				break;    // this is enough
 			}
 		}
@@ -486,12 +485,12 @@ HRESULT CShoutcastStream::FillBuffer(IMediaSample* pSample)
 		CAutoLock cAutoLock(&m_queue);
 		ASSERT(!m_queue.IsEmpty());
 		if (!m_queue.IsEmpty()) {
-			mp3frame f = m_queue.RemoveHead();
-			DWORD len = min((DWORD)pSample->GetSize(), f.len);
-			memcpy(pData, f.pData, len);
+			CAutoPtr<ShoutCastPacket> p = m_queue.RemoveHead();
+			DWORD len = min((DWORD)pSample->GetSize(), p->GetCount());
+			memcpy(pData, p->GetData(), len);
 			pSample->SetActualDataLength(len);
-			pSample->SetTime(&f.rtStart, &f.rtStop);
-			m_title = f.title;
+			pSample->SetTime(&p->rtStart, &p->rtStop);
+			m_title = p->title;
 		}
 	}
 
@@ -586,24 +585,29 @@ UINT CShoutcastStream::SocketThreadProc()
 	CAutoPtr<Packet> m_p;
 
 	while (!fExitThread) {
-		int len = MAXFRAMESIZE;
-		len = m_socket.Receive(pData, len);
+		{
+			if (m_queue.GetCount() >= MAXPACKETS) {
+				// Buffer is full
+				Sleep(100);	
+				continue;
+			}
+		}
+
+		int len = m_socket.Receive(pData, MAXFRAMESIZE);
 		if (len <= 0) {
 			break;
 		}
 
 		if (m_socket.m_Format == AUDIO_MPEG) {
-			mp3frame f(len);
-			memcpy(f.pData, pData, len);
-			f.rtStop = (f.rtStart = m_rtSampleTime) + (10000000i64 * len * 8/m_socket.m_bitrate);
-			m_rtSampleTime = f.rtStop;
-			f.title = m_socket.m_title;
-			if (f.title.IsEmpty()) {
-				f.title = m_socket.m_url;
-			}
+			CAutoPtr<ShoutCastPacket> p(DNew ShoutCastPacket());
+
+			p->SetData(pData, len);
+			p->rtStop = (p->rtStart = m_rtSampleTime) + (10000000i64 * len * 8/m_socket.m_bitrate);
+			m_rtSampleTime = p->rtStop;
+			p->title = !m_socket.m_title.IsEmpty() ? m_socket.m_title : m_socket.m_url;
 
 			CAutoLock cAutoLock(&m_queue);
-			m_queue.AddTail(f);
+			m_queue.AddTail(p);
 		} else if (m_socket.m_Format == AUDIO_AAC) {
 			// code from MpegSplitter.cpp
 			CAutoPtr<Packet> p(DNew Packet());
@@ -655,26 +659,20 @@ UINT CShoutcastStream::SocketThreadProc()
 					break;
 				}
 
-				CAutoPtr<Packet> p2(DNew Packet());
-				p2->SetData(s, len);
+				{
+					CAutoPtr<ShoutCastPacket> p2(DNew ShoutCastPacket());
+					p2->SetData(s, len);
+					p2->rtStop = (p2->rtStart = m_rtSampleTime) + (10000000i64 * len * 8/m_socket.m_bitrate);
+					m_rtSampleTime = p2->rtStop;
+					p2->title = !m_socket.m_title.IsEmpty() ? m_socket.m_title : m_socket.m_url;
+
+					CAutoLock cAutoLock(&m_queue);
+					m_queue.AddTail(p2);
+				}
 
 				s += len;
 				memmove(base, s, e - s);
 				m_p->SetCount(e - s);
-
-				{
-					mp3frame f(p2->GetCount());
-					memcpy(f.pData, p2->GetData(), p2->GetCount());
-					f.rtStop = (f.rtStart = m_rtSampleTime) + m_socket.m_aachdr.rtDuration;
-					m_rtSampleTime = f.rtStop;
-					f.title = m_socket.m_title;
-					if (f.title.IsEmpty()) {
-						f.title = m_socket.m_url;
-					}
-
-					CAutoLock cAutoLock(&m_queue);
-					m_queue.AddTail(f);
-				}
 			}
 		}
 	}

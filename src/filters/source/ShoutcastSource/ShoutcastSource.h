@@ -29,6 +29,7 @@
 #include <afxsock.h>
 #include <qnetwork.h>
 #include "../../../DSUtil/MPCSocket.h"
+#include "../../parser/BaseSplitter/BaseSplitter.h"
 
 #define ShoutcastSourceName   L"MPC ShoutCast Source"
 
@@ -155,38 +156,13 @@ public:
 
 class CShoutcastStream : public CSourceStream
 {
-	class mp3frame
+	class ShoutCastPacket : public Packet
 	{
 	public:
-		DWORD len;
-		BYTE* pData;
-		REFERENCE_TIME rtStart, rtStop;
 		CString title;
-		mp3frame(DWORD len = 0) {
-			this->len = len;
-			pData = len ? DNew BYTE[len] : NULL;
-			rtStart = rtStop = 0;
-		}
-		mp3frame(const mp3frame& f) {
-			*this = f;
-		}
-		~mp3frame() {
-			delete pData;
-		}
-		mp3frame& operator = (const mp3frame& f) {
-			if (this != &f) {
-				len = f.len;
-				pData = f.pData;
-				rtStart = f.rtStart;
-				rtStop = f.rtStop;
-				title = f.title;
-				((mp3frame*)&f)->pData = NULL;
-			}
-			return *this;
-		}
 	};
 
-	class mp3queue : public CAtlList<mp3frame>, public CCritSec {} m_queue;
+	class ShoutCastqueue : public CAutoPtrList<ShoutCastPacket>, public CCritSec {} m_queue;
 
 	class CShoutcastSocket : public CMPCSocket
 	{
