@@ -5553,7 +5553,11 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 		return;
 	}
 
-	pMC->Pause();
+	//pMC->Pause();
+
+	if (GetMediaState() != State_Paused) {
+		SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
+	}
 	GetMediaState(); // wait for completion of the pause command
 
 	//
