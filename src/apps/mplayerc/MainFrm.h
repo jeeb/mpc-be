@@ -1083,7 +1083,7 @@ public:
 	void		SendSubtitleTracksToApi();
 	void		SendAudioTracksToApi();
 	void		SendPlaylistToApi();
-	afx_msg void OnFileOpendirectory();
+	afx_msg void OnFileOpenDirectory();
 
 	void		SendCurrentPositionToApi(bool fNotifySeek = false);
 	void		ShowOSDCustomMessageApi(MPC_OSDDATA *osdData);

@@ -146,9 +146,10 @@ void CRegFilterChooserDlg::OnBnClickedButton1()
 {
 	AppSettings& s = AfxGetAppSettings();
 
-	CFileDialog dlg(TRUE, NULL, s.strLastOpenFilterDir,
+	CFileDialog dlg(TRUE, NULL, NULL,
 					OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_NOCHANGEDIR,
 					_T("DirectShow Filters (*.ax,*.dll)|*.ax;*.dll|"), this, 0);
+	dlg.m_ofn.lpstrInitialDir = s.strLastOpenFilterDir;
 
 	if (dlg.DoModal() == IDOK) {
 		CString fname = dlg.GetPathName();

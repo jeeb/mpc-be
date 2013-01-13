@@ -541,7 +541,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	//ON_COMMAND(ID_HELP_DONATE, OnHelpDonate)
 
 	// Open Dir incl. SubDir
-	ON_COMMAND(ID_FILE_OPENDIRECTORY, OnFileOpendirectory)
+	ON_COMMAND(ID_FILE_OPENDIRECTORY, OnFileOpenDirectory)
 	ON_UPDATE_COMMAND_UI(ID_FILE_OPENDIRECTORY, OnUpdateFileOpen)
 	ON_WM_POWERBROADCAST()
 
@@ -6082,9 +6082,10 @@ void CMainFrame::OnFileLoadsubtitle()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	CFileDialog fd(TRUE, NULL, s.strLastOpenSubDir,
+	CFileDialog fd(TRUE, NULL, NULL,
 				   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY|OFN_NOCHANGEDIR,
 				   szFilter, GetModalParent(), 0);
+	fd.m_ofn.lpstrInitialDir = s.strLastOpenSubDir;
 
 	if (fd.DoModal() != IDOK) {
 		return;
@@ -6130,9 +6131,11 @@ void CMainFrame::OnFileLoadaudio()
 
 	CString path = AddSlash(GetFolderOnly(m_wndPlaylistBar.GetCurFileName()));
 
-	CFileDialog fd(TRUE, NULL, path,
+	CFileDialog fd(TRUE, NULL, NULL,
 				   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY|OFN_NOCHANGEDIR,
 				   filter, GetModalParent(), 0);
+
+	fd.m_ofn.lpstrInitialDir = path;
 
 	if (fd.DoModal() != IDOK) {
 		return;
@@ -18038,106 +18041,7 @@ void CMainFrame::JumpOfNSeconds(int nSeconds)
 	}
 }
 
-// TODO : to be finished !
-//void CMainFrame::AutoSelectTracks()
-//{
-//	LCID		DefAudioLanguageLcid	[2] = {MAKELCID( MAKELANGID(LANG_FRENCH, SUBLANG_DEFAULT), SORT_DEFAULT), MAKELCID( MAKELANGID(LANG_ENGLISH, SUBLANG_DEFAULT), SORT_DEFAULT)};
-//	int			DefAudioLanguageIndex	[2] = {-1, -1};
-//	LCID		DefSubtitleLanguageLcid [2] = {0, MAKELCID( MAKELANGID(LANG_FRENCH, SUBLANG_DEFAULT), SORT_DEFAULT)};
-//	int			DefSubtitleLanguageIndex[2] = {-1, -1};
-//	LCID		Language = MAKELCID( MAKELANGID(LANG_FRENCH, SUBLANG_DEFAULT), SORT_DEFAULT);
-//
-//	if ((m_iMediaLoadState == MLS_LOADING) || (m_iMediaLoadState == MLS_LOADED))
-//	{
-//		if (GetPlaybackMode() == PM_FILE)
-//		{
-//			CComQIPtr<IAMStreamSelect> pSS = FindSwitcherFilter();
-//
-//			DWORD cStreams = 0;
-//			if (pSS && SUCCEEDED(pSS->Count(&cStreams)))
-//			{
-//				for (int i = 0; i < (int)cStreams; i++)
-//				{
-//					AM_MEDIA_TYPE* pmt = NULL;
-//					DWORD dwFlags = 0;
-//					LCID lcid = 0;
-//					DWORD dwGroup = 0;
-//					WCHAR* pszName = NULL;
-//					if (FAILED(pSS->Info(i, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL)))
-//						return;
-//				}
-//			}
-//
-//			POSITION pos = m_pSubStreams.GetHeadPosition();
-//			while (pos)
-//			{
-//				CComPtr<ISubStream> pSubStream = m_pSubStreams.GetNext(pos);
-//				if (!pSubStream) continue;
-//
-//				for (int i = 0, j = pSubStream->GetStreamCount(); i < j; i++)
-//				{
-//					WCHAR* pName = NULL;
-//					if (SUCCEEDED(pSubStream->GetStreamInfo(i, &pName, &Language)))
-//					{
-//						if (DefAudioLanguageLcid[0] == Language)	DefSubtitleLanguageIndex[0] = i;
-//						if (DefSubtitleLanguageLcid[1] == Language) DefSubtitleLanguageIndex[1] = i;
-//						CoTaskMemFree(pName);
-//					}
-//				}
-//			}
-//		}
-//		else if (GetPlaybackMode() == PM_DVD)
-//		{
-//			ULONG	ulStreamsAvailable, ulCurrentStream;
-//			BOOL	bIsDisabled;
-//
-//			if (SUCCEEDED(pDVDI->GetCurrentSubpicture(&ulStreamsAvailable, &ulCurrentStream, &bIsDisabled)))
-//			{
-//				for (ULONG i = 0; i < ulStreamsAvailable; i++)
-//				{
-//					DVD_SubpictureAttributes	ATR;
-//					if (SUCCEEDED(pDVDI->GetSubpictureLanguage(i, &Language)))
-//					{
-//						// Auto select forced subtitle
-//						if ((DefAudioLanguageLcid[0] == Language) && (ATR.LanguageExtension == DVD_SP_EXT_Forced))
-//							DefSubtitleLanguageIndex[0] = i;
-//
-//						if (DefSubtitleLanguageLcid[1] == Language) DefSubtitleLanguageIndex[1] = i;
-//					}
-//				}
-//			}
-//
-//			if (SUCCEEDED(pDVDI->GetCurrentAudio(&ulStreamsAvailable, &ulCurrentStream)))
-//			{
-//				for (ULONG i = 0; i < ulStreamsAvailable; i++)
-//				{
-//					if (SUCCEEDED(pDVDI->GetAudioLanguage(i, &Language)))
-//					{
-//						if (DefAudioLanguageLcid[0] == Language)	DefAudioLanguageIndex[0] = i;
-//						if (DefAudioLanguageLcid[1] == Language)	DefAudioLanguageIndex[1] = i;
-//					}
-//				}
-//			}
-//
-//			// Select best audio/subtitles tracks
-//			if (DefAudioLanguageLcid[0] != -1)
-//			{
-//				pDVDC->SelectAudioStream(DefAudioLanguageIndex[0], DVD_CMD_FLAG_Block, NULL);
-//				if (DefSubtitleLanguageIndex[0] != -1)
-//					pDVDC->SelectSubpictureStream(DefSubtitleLanguageIndex[0], DVD_CMD_FLAG_Block, NULL);
-//			}
-//			else if ((DefAudioLanguageLcid[1] != -1) && (DefSubtitleLanguageLcid[1] != -1))
-//			{
-//				pDVDC->SelectAudioStream	  (DefAudioLanguageIndex[1],    DVD_CMD_FLAG_Block, NULL);
-//				pDVDC->SelectSubpictureStream (DefSubtitleLanguageIndex[1], DVD_CMD_FLAG_Block, NULL);
-//			}
-//		}
-//
-//
-//	}
-//}
-
-void CMainFrame::OnFileOpendirectory()
+void CMainFrame::OnFileOpenDirectory()
 {
 	if (m_iMediaLoadState == MLS_LOADING || !IsWindow(m_wndPlaylistBar)) {
 		return;
@@ -18153,15 +18057,37 @@ void CMainFrame::OnFileOpendirectory()
 		IFileOpenDialog *openDlgPtr = dlg.GetIFileOpenDialog();
 
 		if (openDlgPtr != NULL) {
+			CComPtr<IShellItem> psiFolder;
+
+			typedef HRESULT (WINAPI *SHCIFPN)(PCWSTR pszPath, IBindCtx * pbc, REFIID riid, void ** ppv);
+			HMODULE hLib = LoadLibrary(L"shell32.dll");
+			if (hLib) {
+				SHCIFPN pSHCIFPN = (SHCIFPN)GetProcAddress(hLib, "SHCreateItemFromParsingName");
+				if (pSHCIFPN) {
+					if (SUCCEEDED(pSHCIFPN(s.strLastOpenDir, NULL, IID_PPV_ARGS(&psiFolder)))) {
+						openDlgPtr->SetFolder(psiFolder);
+						psiFolder = NULL;
+					}
+				}
+				FreeLibrary(hLib);
+			}
+
 			openDlgPtr->SetTitle(strTitle);
 			openDlgPtr->SetOptions(FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST);
 			if (FAILED(openDlgPtr->Show(m_hWnd))) {
 				openDlgPtr->Release();
 				return;
 			}
-			openDlgPtr->Release();
 
-			path = dlg.GetFolderPath();
+			if (SUCCEEDED(openDlgPtr->GetResult(&psiFolder))) {
+				LPWSTR folderpath = NULL;
+				if(SUCCEEDED(psiFolder->GetDisplayName(SIGDN_FILESYSPATH, &folderpath))) {
+					path = folderpath;
+					CoTaskMemFree(folderpath);
+				}
+			}
+
+			openDlgPtr->Release();
 
 			BOOL recur = TRUE;
 			dlg.GetCheckButtonState(IDS_MAINFRM_DIR_CHECK, recur);
@@ -18199,9 +18125,8 @@ void CMainFrame::OnFileOpendirectory()
 		path = _path;
 	}
 
-	if (path[path.GetLength() - 1] != '\\') {
-		path += '\\';
-	}
+	path = AddSlash(path);
+	s.strLastOpenDir = path;
 
 	CAtlList<CString> sl;
 	sl.AddTail(path);
