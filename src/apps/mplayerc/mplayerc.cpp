@@ -1886,7 +1886,7 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 			}
 
 			if (redir && (ct == _T("audio/x-scpls") || ct == _T("audio/x-mpegurl") || ct == _T("application/xspf+xml"))) {
-				while (body.GetLength() < 4*1024) { // should be enough for a playlist...
+				while (body.GetLength() < 16*1024) { // should be enough for a playlist...
 					CStringA str;
 					str.ReleaseBuffer(s.Receive(str.GetBuffer(256), 256)); // SOCKET_ERROR == -1, also suitable for ReleaseBuffer
 					if (str.IsEmpty()) {
