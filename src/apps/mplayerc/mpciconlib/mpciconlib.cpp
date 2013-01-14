@@ -277,6 +277,8 @@ extern "C" __declspec(dllexport) int get_icon_index(LPCTSTR ext)
 		iconindex = IDI_PLAYLIST_ICON;
 	} else if (_tcsicmp(ext, _T(".wvx")) == 0) {
 		iconindex = IDI_PLAYLIST_ICON;
+	} else if (_tcsicmp(ext, _T(".xspf")) == 0) {
+		iconindex = IDI_PLAYLIST_ICON;
 	}
 
 	return iconindex;

@@ -1720,6 +1720,12 @@ bool FindRedir(CString& fn, CString ct, CAtlList<CString>& fns, CAutoPtrList<CAt
 				fn2 = (LPCTSTR)p;
 			}
 
+			CString fntmp = fn2;
+			fntmp.MakeLower();
+			if (fn2.Find(_T("file:///")) == 0) {
+				fn2 = fn2.Mid(8, fn2.GetLength() - 8);
+			}
+
 			if (!fn2.CompareNoCase(fn)) {
 				continue;
 			}
@@ -1870,7 +1876,7 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 				}
 			}
 
-			if (redir && (ct == _T("audio/x-scpls") || ct == _T("audio/x-mpegurl"))) {
+			if (redir && (ct == _T("audio/x-scpls") || ct == _T("audio/x-mpegurl") || ct == _T("application/xspf+xml"))) {
 				while (body.GetLength() < 4*1024) { // should be enough for a playlist...
 					CStringA str;
 					str.ReleaseBuffer(s.Receive(str.GetBuffer(256), 256)); // SOCKET_ERROR == -1, also suitable for ReleaseBuffer
@@ -1896,6 +1902,8 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 			ct = _T("application/x-mpc-playlist");
 		} else if (ext == _T(".bdmv")) {
 			ct = _T("application/x-bdmv-playlist");
+		} else if (ext == _T(".xspf")) {
+			ct = _T("application/xspf+xml");
 		}
 
 		FILE* f = NULL;
@@ -1916,7 +1924,6 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 		if (!strncmp((LPCSTR)str, "FWS", 3)) {
 			return "application/x-shockwave-flash";
 		}
-
 	}
 
 	if (redir && !ct.IsEmpty()) {
@@ -1951,6 +1958,12 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 			// rtsp://...
 			re.Attach(DNew CAtlRegExp<>());
 			if (re && REPARSE_ERROR_OK == re->Parse(_T("{rtsp://[^\n]+}"), FALSE)) {
+				res.AddTail(re);
+			}
+		} else if (ct == _T("application/xspf+xml")) {
+			// <location>...</location>
+			re.Attach(DNew CAtlRegExp<>());
+			if (re && REPARSE_ERROR_OK == re->Parse(_T("<location>{[^<]+}"), FALSE)) {
 				res.AddTail(re);
 			}
 		}
