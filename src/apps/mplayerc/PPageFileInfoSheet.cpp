@@ -51,7 +51,9 @@ CPPageFileInfoSheet::CPPageFileInfoSheet(CString fn, CMainFrame* pMainFrame, CWn
 	}
 	EndEnumFilters;
 
-	AddPage(&m_mi);
+	if (m_fn.Find(_T("://")) < 0) {
+		AddPage(&m_mi);
+	}
 }
 
 CPPageFileInfoSheet::~CPPageFileInfoSheet()

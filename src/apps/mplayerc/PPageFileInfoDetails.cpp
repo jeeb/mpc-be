@@ -231,7 +231,15 @@ BOOL CPPageFileInfoDetails::OnInitDialog()
 
 	m_fn.TrimRight('/');
 	m_fn.Replace('\\', '/');
-	m_fn = m_fn.Mid(m_fn.ReverseFind('/')+1);
+
+	CString tmpStr;
+	if (m_fn.Find(_T("://")) > 0) {
+		if (m_fn.Find(_T("/"), m_fn.Find(_T("://")) + 3) < 0) {
+			tmpStr = m_fn;
+		}
+	}
+
+	m_fn = tmpStr.IsEmpty() ? m_fn.Mid(m_fn.ReverseFind('/')+1) : tmpStr;
 
 	UpdateData(FALSE);
 
