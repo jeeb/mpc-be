@@ -1643,6 +1643,10 @@ typedef CAtlREMatchContext<CAtlRECharTraits> CAtlREMatchContextT;
 
 bool FindRedir(CUrl& src, CString ct, CString& body, CAtlList<CString>& urls, CAutoPtrList<CAtlRegExpT>& res)
 {
+	if (body[body.GetLength()-1] != '\n') {
+		body += '\n';
+	}
+
 	POSITION pos = res.GetHeadPosition();
 	while (pos) {
 		CAtlRegExpT* re = res.GetNext(pos);
@@ -1660,6 +1664,10 @@ bool FindRedir(CUrl& src, CString ct, CString& body, CAtlList<CString>& urls, CA
 			url.Trim();
 
 			if (url.CompareNoCase(_T("asf path")) == 0) {
+				continue;
+			}
+
+			if (url.Find(_T("EXTM3U")) == 0 || url.Find(_T("#EXTINF")) == 0) {
 				continue;
 			}
 
@@ -1710,6 +1718,7 @@ bool FindRedir(CString& fn, CString ct, CAtlList<CString>& fns, CAutoPtrList<CAt
 			if (!fn2.CompareNoCase(_T("asf path"))) {
 				continue;
 			}
+
 			if (fn2.Find(_T("EXTM3U")) == 0 || fn2.Find(_T("#EXTINF")) == 0) {
 				continue;
 			}
