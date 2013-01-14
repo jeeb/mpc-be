@@ -119,9 +119,7 @@ public:
 	STDMETHODIMP get_Rating(BSTR* pbstrRating) {
 		return E_NOTIMPL;
 	}
-	STDMETHODIMP get_Description(BSTR* pbstrDescription) {
-		return E_NOTIMPL;
-	}
+	STDMETHODIMP get_Description(BSTR* pbstrDescription);
 	STDMETHODIMP get_Copyright(BSTR* pbstrCopyright) {
 		return E_NOTIMPL;
 	}
@@ -178,7 +176,7 @@ class CShoutcastStream : public CSourceStream
 		DWORD m_metaint, m_bitrate, m_freq, m_channels;
 		aachdr m_aachdr;
 		StreamFormat m_Format;
-		CString m_title, m_url;
+		CString m_title, m_url, m_Description;
 		bool Connect(CUrl& url, CString& redirectUrl);
 		bool FindSync();
 	} m_socket;
@@ -188,7 +186,7 @@ class CShoutcastStream : public CSourceStream
 	CUrl m_url;
 
 	bool m_fBuffering;
-	CString m_title;
+	CString m_title, m_Description;
 
 public:
 	CShoutcastStream(const WCHAR* wfn, CShoutcastSource* pParent, HRESULT* phr);
@@ -200,6 +198,7 @@ public:
 	void EmptyBuffer();
 	LONGLONG GetBufferFullness();
 	CString GetTitle();
+	CString GetDescription();
 
 	HRESULT DecideBufferSize(IMemAllocator* pIMemAlloc, ALLOCATOR_PROPERTIES* pProperties);
 	HRESULT FillBuffer(IMediaSample* pSample);

@@ -296,6 +296,18 @@ STDMETHODIMP CShoutcastSource::get_Title(BSTR* pbstrTitle)
 	return E_UNEXPECTED;
 }
 
+STDMETHODIMP CShoutcastSource::get_Description(BSTR* pbstrDescription)
+{
+	CheckPointer(pbstrDescription, E_POINTER);
+
+	if (m_iPins == 1) {
+		*pbstrDescription = (static_cast<CShoutcastStream*>(m_paStreams[0]))->GetDescription().AllocSysString();
+		return S_OK;
+	}
+
+	return E_UNEXPECTED;
+}
+
 STDMETHODIMP CShoutcastSource::QueryFilterInfo(FILTER_INFO* pInfo)
 {
 	CheckPointer(pInfo, E_POINTER);
@@ -411,6 +423,12 @@ CString CShoutcastStream::GetTitle()
 {
 	CAutoLock cAutoLock(&m_queue);
 	return m_title;
+}
+
+CString CShoutcastStream::GetDescription()
+{
+	CAutoLock cAutoLock(&m_queue);
+	return m_Description;
 }
 
 HRESULT CShoutcastStream::DecideBufferSize(IMemAllocator* pAlloc, ALLOCATOR_PROPERTIES* pProperties)
@@ -579,6 +597,8 @@ UINT CShoutcastStream::SocketThreadProc()
 		m_socket.Close();
 		return 1;
 	}
+
+	m_Description = m_socket.m_Description;
 
 	REFERENCE_TIME m_rtSampleTime = 0;
 
@@ -765,7 +785,10 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 					j = str.ReverseFind('\'');
 				}
 				if (j > i) {
-					m_url = str.Mid(i, j - i);
+					str = str.Mid(i, j - i);
+					if (!str.IsEmpty()) {
+						m_url = str;
+					}
 				}
 			}
 		}
@@ -895,6 +918,8 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 				} else if (str.Find("content-disposition:") >= 0 && str.Find("filename=") > 0) {
 					int pos = str.Find("filename=");
 					redirectUrl = _T("/") + CString(str.Mid(pos + 9).Trim());
+				} else if (str.Left(16) == "icy-description:") {
+					m_Description = dup.Mid(16).Trim();
 				}
 				str.Empty();
 			} else {

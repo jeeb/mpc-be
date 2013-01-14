@@ -122,14 +122,23 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 	}
 
 	m_fn.TrimRight('/');
-	int i = max(m_fn.ReverseFind('\\'), m_fn.ReverseFind('/'));
 
-	if (i >= 0 && i < m_fn.GetLength()-1) {
-		m_location_str = m_fn.Left(i);
-		m_fn = m_fn.Mid(i+1);
+	if (m_fn.Find(_T("://")) > 0) {
+		if (m_fn.Find(_T("/"), m_fn.Find(_T("://")) + 3) < 0) {
+			m_location_str = m_fn;
+		}
+	}
+	
+	if (m_location_str.IsEmpty() || m_location_str == ResStr(IDS_AG_NONE)) {
+		int i = max(m_fn.ReverseFind('\\'), m_fn.ReverseFind('/'));
 
-		if (m_location_str.GetLength() == 2 && m_location_str[1] == ':') {
-			m_location_str += '\\';
+		if (i >= 0 && i < m_fn.GetLength()-1) {
+			m_location_str = m_fn.Left(i);
+			m_fn = m_fn.Mid(i+1);
+
+			if (m_location_str.GetLength() == 2 && m_location_str[1] == ':') {
+				m_location_str += '\\';
+			}
 		}
 	}
 
