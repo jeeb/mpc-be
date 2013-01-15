@@ -135,6 +135,7 @@ SRCS_C = \
     libavcodec/dct32_float.c \
     libavcodec/dirac.c \
     libavcodec/dirac_arith.c \
+    libavcodec/dirac_dwt.c \
     libavcodec/diracdec.c \
     libavcodec/diracdsp.c \
     libavcodec/dsputil.c \
@@ -143,7 +144,6 @@ SRCS_C = \
     libavcodec/dv_tablegen.c \
     libavcodec/dvdata.c \
     libavcodec/dvdec.c \
-    libavcodec/dwt.c \
     libavcodec/eac3_data.c \
     libavcodec/eac3enc.c \
     libavcodec/eac3dec.c \
@@ -275,6 +275,7 @@ SRCS_C = \
     libavcodec/sinewin.c \
     libavcodec/sipr.c \
     libavcodec/sipr16k.c \
+    libavcodec/snow_dwt.c \
     libavcodec/snow.c \
     libavcodec/sp5xdec.c \
     libavcodec/svq1.c \
@@ -319,9 +320,9 @@ SRCS_C = \
     libavcodec/wmv2dec.c \
     libavcodec/xiph.c \
     libavcodec/x86/ac3dsp_init.c \
+    libavcodec/x86/dirac_dwt.c \
     libavcodec/x86/diracdsp_mmx.c \
     libavcodec/x86/dsputil_mmx.c \
-    libavcodec/x86/dwt.c \
     libavcodec/x86/fdct.c \
     libavcodec/x86/fft_init.c \
     libavcodec/x86/fmtconvert_init.c \
