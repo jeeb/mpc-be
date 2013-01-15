@@ -135,7 +135,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 	// Error recognition
 	m_txtErrorRecognition.Create(ResStr(IDS_VDF_ERROR_RECOGNITION), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(220), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbErrorRecognition.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(IPP_SCALE(230), -4), CSize(IPP_SCALE(110), 200)), this, IDC_PP_DISCARD_MODE);
+	m_cbErrorRecognition.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(IPP_SCALE(230), -4), CSize(IPP_SCALE(110), 200)), this, IDC_PP_ERROR_RECOGNITION);
 	m_cbErrorRecognition.AddString (ResStr (IDS_VDF_ERR_CAREFUL));
 	m_cbErrorRecognition.AddString (ResStr (IDS_VDF_ERR_COMPLIANT));
 	m_cbErrorRecognition.AddString (ResStr (IDS_VDF_ERR_AGGRESSIVE));
@@ -143,7 +143,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 	// IDCT Algorithm
 	m_txtIDCTAlgo.Create(ResStr(IDS_VDF_IDCT_ALGO), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(220), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbIDCTAlgo.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(IPP_SCALE(230), -4), CSize(IPP_SCALE(110), 200)), this, IDC_PP_DISCARD_MODE);
+	m_cbIDCTAlgo.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(IPP_SCALE(230), -4), CSize(IPP_SCALE(110), 200)), this, IDC_PP_IDCTALGO);
 	m_cbIDCTAlgo.AddString (ResStr (IDS_VDF_IDCT_AUTO));
 	m_cbIDCTAlgo.AddString (ResStr (IDS_VDF_IDCT_LIBMPEG2));
 	m_cbIDCTAlgo.AddString (ResStr (IDS_VDF_IDCT_SIMPLE_MMX));
@@ -345,6 +345,8 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 	SetClassLongPtr(m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_ARROW));
 	SetClassLongPtr(GetDlgItem(IDC_PP_THREAD_NUMBER)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
+
+	SetDirty(false);
 
 	return true;
 }
