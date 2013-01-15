@@ -517,7 +517,7 @@ bool CVobFile::Open(CString fn, CAtlList<CString>& vobs)
 
 	// Chapters & duration ...
 	m_ifoFile.Seek(0xCC, CFile::begin); //Get VTS_PGCI adress
-	WORD pcgITPosition = ReadDword() * 2048;
+	DWORD pcgITPosition = ReadDword() * 2048;
 	m_ifoFile.Seek(pcgITPosition, CFile::begin);
 	WORD NumberOfProgramChains = ReadShort();
 
@@ -527,7 +527,7 @@ bool CVobFile::Open(CString fn, CAtlList<CString>& vobs)
 
 	for (int i = 0; i < NumberOfProgramChains; i++) {
 		m_ifoFile.Seek(pcgITPosition + 4 + 8 * (i + 1), CFile::begin);
-		WORD chainOffset = ReadDword();
+		DWORD chainOffset = ReadDword();
 		m_ifoFile.Seek(pcgITPosition + chainOffset + 2, CFile::begin);
 		/*BYTE programChainPrograms = */ReadByte();
 		
@@ -543,7 +543,7 @@ bool CVobFile::Open(CString fn, CAtlList<CString>& vobs)
 	/*for (int i = 0; i < NumberOfProgramChains; i++) */
 	{
 		m_ifoFile.Seek(pcgITPosition + 4 + 8 * (ProgramChains + 1), CFile::begin);
-		WORD chainOffset = ReadDword();
+		DWORD chainOffset = ReadDword();
 		m_ifoFile.Seek(pcgITPosition + chainOffset + 2, CFile::begin);
 		BYTE programChainPrograms = ReadByte();
 		
