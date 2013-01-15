@@ -111,9 +111,6 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 				m_cbSoundDevice.SetCurSel(m_cbSoundDevice.FindString(0, m_pMAR->GetSoundDevice()));
 			}
 		}
-
-		CorrectComboListWidth(m_cbSoundDevice);
-
 		m_cbWasapiMode.SetCurSel(m_pMAR->GetWasapiMode());
 		m_cbMuteFastForward.SetCheck(m_pMAR->GetMuteFastForward());
 	}
@@ -121,6 +118,8 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
 		pWnd->SetFont(&m_font, FALSE);
 	}
+
+	CorrectComboListWidth(m_cbSoundDevice);
 
 	SetClassLongPtr(m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_ARROW));
 	SetClassLongPtr(GetDlgItem(IDC_PP_SOUND_DEVICE)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
