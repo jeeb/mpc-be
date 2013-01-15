@@ -16096,9 +16096,7 @@ void CMainFrame::AddTextPassThruFilter()
 			AM_MEDIA_TYPE mt;
 			if (FAILED(pPin->ConnectedTo(&pPinTo)) || !pPinTo
 					|| FAILED(pPin->ConnectionMediaType(&mt))
-					|| (mt.majortype != MEDIATYPE_Text && mt.majortype != MEDIATYPE_Subtitle
-						&& !(mt.majortype == MEDIATYPE_Video && mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE)
-						&& !(mt.majortype == MEDIATYPE_Video && mt.subtype == MEDIASUBTYPE_XSUB))) {
+					|| (!CMediaTypeEx(mt).ValidateSubtitle())) {
 				continue;
 			}
 
@@ -16106,9 +16104,8 @@ void CMainFrame::AddTextPassThruFilter()
 			CPinInfo pi;
 			if (SUCCEEDED(pPinTo->QueryPinInfo(&pi)) &&
 				GetCLSID(pi.pFilter) != __uuidof(CNullTextRenderer)
-				&& GetCLSID(pi.pFilter) != GUIDFromCString(_T("{04FE9017-F873-410E-871E-AB91661A4EF7}"))	// ffdshow video decoder
-				&& GetCLSID(pi.pFilter) != GUIDFromCString(_T("{DBF9000E-F08C-4858-B769-C914A0FBB1D7}"))	// ffdshow subtitles filter
-				) {
+					&& GetCLSID(pi.pFilter) != GUIDFromCString(_T("{04FE9017-F873-410E-871E-AB91661A4EF7}"))	// ffdshow video decoder
+					&& GetCLSID(pi.pFilter) != GUIDFromCString(_T("{DBF9000E-F08C-4858-B769-C914A0FBB1D7}"))) {	// ffdshow subtitles filter
 				continue;
 			}
 

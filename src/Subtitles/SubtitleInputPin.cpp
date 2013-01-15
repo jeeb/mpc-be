@@ -61,13 +61,16 @@ CSubtitleInputPin::CSubtitleInputPin(CBaseFilter* pFilter, CCritSec* pLock, CCri
 HRESULT CSubtitleInputPin::CheckMediaType(const CMediaType* pmt)
 {
 	return pmt->majortype == MEDIATYPE_Text && (pmt->subtype == MEDIASUBTYPE_NULL || pmt->subtype == FOURCCMap((DWORD)0))
-		   || pmt->majortype == MEDIATYPE_Subtitle && pmt->subtype == MEDIASUBTYPE_UTF8
-		   || pmt->majortype == MEDIATYPE_Subtitle && (pmt->subtype == MEDIASUBTYPE_SSA || pmt->subtype == MEDIASUBTYPE_ASS || pmt->subtype == MEDIASUBTYPE_ASS2)
-		   || pmt->majortype == MEDIATYPE_Subtitle && (pmt->subtype == MEDIASUBTYPE_VOBSUB)
-		   || pmt->majortype == MEDIATYPE_Video && (pmt->subtype == MEDIASUBTYPE_DVD_SUBPICTURE || pmt->subtype == MEDIASUBTYPE_XSUB)
-		   || IsHdmvSub(pmt)
-		   ? S_OK
-		   : E_FAIL;
+			|| pmt->majortype == MEDIATYPE_Subtitle &&
+				(pmt->subtype == MEDIASUBTYPE_UTF8
+				|| pmt->subtype == MEDIASUBTYPE_SSA
+				|| pmt->subtype == MEDIASUBTYPE_ASS
+				|| pmt->subtype == MEDIASUBTYPE_ASS2
+				|| pmt->subtype == MEDIASUBTYPE_VOBSUB)
+			|| pmt->majortype == MEDIATYPE_Video && (pmt->subtype == MEDIASUBTYPE_DVD_SUBPICTURE || pmt->subtype == MEDIASUBTYPE_XSUB)
+			|| IsHdmvSub(pmt)
+			? S_OK
+			: E_FAIL;
 }
 
 HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
@@ -80,7 +83,10 @@ HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
 		pRTS->m_name = CString(GetPinName(pReceivePin)) + _T(" (embeded)");
 		pRTS->m_dstScreenSize = CSize(384, 288);
 		pRTS->CreateDefaultStyle(DEFAULT_CHARSET);
-	} else if (m_mt.majortype == MEDIATYPE_Subtitle || (m_mt.majortype == MEDIATYPE_Video && (m_mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE || m_mt.subtype == MEDIASUBTYPE_XSUB))) {
+	} else if (IsHdmvSub(&m_mt)
+			|| m_mt.majortype == MEDIATYPE_Subtitle
+			|| (m_mt.majortype == MEDIATYPE_Video && (m_mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE || m_mt.subtype == MEDIASUBTYPE_XSUB))) {
+
 		SUBTITLEINFO*	psi		= (SUBTITLEINFO*)m_mt.pbFormat;
 		DWORD			dwOffset	= 0;
 		CString			name;
@@ -329,7 +335,10 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 				fInvalidate = true;
 			}
 		}
-	} else if (m_mt.majortype == MEDIATYPE_Subtitle || (m_mt.majortype == MEDIATYPE_Video && (m_mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE || m_mt.subtype == MEDIASUBTYPE_XSUB))) {
+	} else if (IsHdmvSub(&m_mt)
+			|| m_mt.majortype == MEDIATYPE_Subtitle
+			|| (m_mt.majortype == MEDIATYPE_Video && (m_mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE || m_mt.subtype == MEDIASUBTYPE_XSUB))) {
+
 		CAutoLock cAutoLock(m_pSubLock);
 
 		if (m_mt.subtype == MEDIASUBTYPE_UTF8) {
@@ -398,9 +407,9 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 
 bool CSubtitleInputPin::IsHdmvSub(const CMediaType* pmt)
 {
-	return pmt->majortype == MEDIATYPE_Subtitle
-			&& (pmt->subtype == MEDIASUBTYPE_HDMVSUB || pmt->subtype == MEDIASUBTYPE_DVB_SUBTITLES
-				|| (pmt->subtype == MEDIASUBTYPE_NULL && pmt->formattype == FORMAT_SubtitleInfo)) // Workaround : support for Haali PGS
-		   ? true
-		   : false;
+	return (pmt->subtype == MEDIASUBTYPE_DVB_SUBTITLES
+			|| (pmt->majortype == MEDIATYPE_Subtitle && pmt->subtype == MEDIASUBTYPE_HDMVSUB)
+			|| (pmt->subtype == MEDIASUBTYPE_NULL && pmt->formattype == FORMAT_SubtitleInfo)) // Workaround : support for Haali PGS
+			? true
+			: false;
 }

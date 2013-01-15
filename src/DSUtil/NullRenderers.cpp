@@ -24,6 +24,7 @@
 #include "stdafx.h"
 #include "NullRenderers.h"
 #include <moreuuids.h>
+#include "MediaTypeEx.h"
 
 #define USE_DXVA
 
@@ -402,15 +403,7 @@ HRESULT CNullUAudioRenderer::CheckMediaType(const CMediaType* pmt)
 
 HRESULT CNullTextRenderer::CTextInputPin::CheckMediaType(const CMediaType* pmt)
 {
-	return pmt->majortype == MEDIATYPE_Text
-		   || pmt->majortype == MEDIATYPE_ScriptCommand
-		   || pmt->majortype == MEDIATYPE_Subtitle
-		   || pmt->subtype == MEDIASUBTYPE_DVD_SUBPICTURE
-		   || pmt->subtype == MEDIASUBTYPE_CVD_SUBPICTURE
-		   || pmt->subtype == MEDIASUBTYPE_SVCD_SUBPICTURE
-		   || pmt->subtype == MEDIASUBTYPE_XSUB
-		   ? S_OK
-		   : E_FAIL;
+	return CMediaTypeEx(*pmt).ValidateSubtitle() ? S_OK : E_FAIL;
 }
 
 #pragma warning (disable : 4355)

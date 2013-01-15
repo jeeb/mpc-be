@@ -749,3 +749,16 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 		sl.AddTail(_T(""));
 	}
 }
+
+bool CMediaTypeEx::ValidateSubtitle()
+{
+	return majortype == MEDIATYPE_Text
+			|| majortype == MEDIATYPE_ScriptCommand
+			|| majortype == MEDIATYPE_Subtitle
+			|| subtype == MEDIASUBTYPE_DVD_SUBPICTURE
+			|| subtype == MEDIASUBTYPE_CVD_SUBPICTURE
+			|| subtype == MEDIASUBTYPE_SVCD_SUBPICTURE
+			|| subtype == MEDIASUBTYPE_XSUB
+			|| subtype == MEDIASUBTYPE_DVB_SUBTITLES
+			|| subtype == MEDIASUBTYPE_HDMVSUB;
+}

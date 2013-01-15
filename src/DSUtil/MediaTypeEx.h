@@ -38,4 +38,6 @@ public:
 	static CString GetSubtitleCodecName(const GUID& subtype);
 
 	void Dump(CAtlList<CString>& sl);
+
+	bool ValidateSubtitle();
 };

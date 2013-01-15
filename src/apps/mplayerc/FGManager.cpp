@@ -634,15 +634,11 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 	if (m_IsPreview) {
 		BeginEnumMediaTypes(pPinOut, pEM, pmt) {
 			// Allow only video
-			if (pmt->majortype	== MEDIATYPE_Audio ||
-				pmt->majortype	== MEDIATYPE_Subtitle ||
-				pmt->majortype	== MEDIATYPE_AUXLine21Data ||
-				pmt->majortype	== MEDIATYPE_Midi ||
-				pmt->majortype	== MEDIATYPE_Text ||
-				pmt->majortype	== MEDIASUBTYPE_DVD_SUBPICTURE ||
-				pmt->subtype	== MEDIASUBTYPE_DVD_SUBPICTURE ||
-				pmt->subtype	== MEDIASUBTYPE_XSUB) {
-					return S_FALSE;
+			if (pmt->majortype	== MEDIATYPE_Audio
+				|| pmt->majortype	== MEDIATYPE_AUXLine21Data
+				|| pmt->majortype	== MEDIATYPE_Midi
+				|| CMediaTypeEx(*pmt).ValidateSubtitle()) {
+				return S_FALSE;
 			}
 
 			// DVD
@@ -2114,6 +2110,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview
 		pFGF->AddType(MEDIATYPE_NULL, MEDIASUBTYPE_CVD_SUBPICTURE);
 		pFGF->AddType(MEDIATYPE_NULL, MEDIASUBTYPE_SVCD_SUBPICTURE);
 		pFGF->AddType(MEDIATYPE_NULL, MEDIASUBTYPE_XSUB);
+		pFGF->AddType(MEDIATYPE_NULL, MEDIASUBTYPE_DVB_SUBTITLES);
 		m_transform.AddTail(pFGF);
 	}
 
