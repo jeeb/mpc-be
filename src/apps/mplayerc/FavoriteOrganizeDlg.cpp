@@ -264,7 +264,6 @@ void CFavoriteOrganizeDlg::OnKeyPressed(NMHDR* pNMHDR, LRESULT* pResult)
 
 	switch (pLVKeyDow->wVKey) {
 		case VK_DELETE:
-		case VK_BACK:
 			OnDeleteBnClicked();
 			*pResult = 1;
 			break;

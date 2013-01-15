@@ -58,7 +58,7 @@ BOOL CPlayerPlaylistBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 		|LVS_OWNERDRAWFIXED
 		|LVS_NOCOLUMNHEADER
 		|LVS_EDITLABELS
-		|LVS_REPORT|LVS_SINGLESEL|LVS_AUTOARRANGE|LVS_NOSORTHEADER, // TODO: remove LVS_SINGLESEL and implement multiple item repositioning (dragging is ready)
+		|LVS_REPORT|/*LVS_SINGLESEL|*/LVS_AUTOARRANGE|LVS_NOSORTHEADER, // TODO: remove LVS_SINGLESEL and implement multiple item repositioning (dragging is ready)
 		CRect(0,0,100,100), this, IDC_PLAYLIST);
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle()|LVS_EX_FULLROWSELECT|LVS_EX_DOUBLEBUFFER);
@@ -91,9 +91,44 @@ BOOL CPlayerPlaylistBar::PreCreateWindow(CREATESTRUCT& cs)
 BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 {
 	if (IsWindow(pMsg->hwnd) && IsVisible() && pMsg->message >= WM_KEYFIRST && pMsg->message <= WM_KEYLAST) {
-		if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_ESCAPE) {
-			GetParentFrame()->ShowControlBar(this, FALSE, TRUE);
-			return TRUE;
+		if (pMsg->message == WM_KEYDOWN) {
+			if (pMsg->wParam == VK_ESCAPE) {
+				GetParentFrame()->ShowControlBar(this, FALSE, TRUE);
+				return TRUE;
+			} else if (pMsg->wParam == VK_RETURN) {
+				CList<int> items;
+				POSITION pos = m_list.GetFirstSelectedItemPosition();
+				while (pos) {
+					items.AddHead(m_list.GetNextSelectedItem(pos));
+				}
+				if (items.GetCount() == 1) {
+					m_pl.SetPos(FindPos(items.GetHead()));
+
+					((CMainFrame*)AfxGetMainWnd())->OpenCurPlaylistItem();
+
+					AfxGetMainWnd()->SetFocus();
+
+					return TRUE;
+				}
+			}
+		}
+
+		if (pMsg->message == WM_CHAR) {
+			TCHAR chr = static_cast<TCHAR>(pMsg->wParam);
+			switch (chr) {
+				case 0x01: // Ctrl+A - select all
+					if (GetKeyState(VK_CONTROL) < 0) {
+						m_list.SetItemState(-1, LVIS_SELECTED, LVIS_SELECTED);
+					}
+					break;
+				case 0x09: // Ctrl+I - inverse selection
+					if (GetKeyState(VK_CONTROL) < 0) {
+						for (int nItem = 0; nItem < m_list.GetItemCount(); nItem++) {
+							m_list.SetItemState(nItem, ~m_list.GetItemState(nItem, LVIS_SELECTED), LVIS_SELECTED);
+						}
+					}					   
+					break;
+			}
 		}
 
 		if (IsDialogMessage(pMsg)) {
@@ -1384,11 +1419,31 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			}
 			break;
 		case M_REMOVE:
-			if (m_pl.RemoveAt(pos)) {
-				pMainFrm->CloseMedia();
+			{
+				CList<int> items;
+				POSITION pos = m_list.GetFirstSelectedItemPosition();
+				while (pos) {
+					items.AddHead(m_list.GetNextSelectedItem(pos));
+				}
+
+				pos = items.GetHeadPosition();
+				while (pos) {
+					int i = items.GetNext(pos);
+					if (m_pl.RemoveAt(FindPos(i))) {
+						((CMainFrame*)AfxGetMainWnd())->CloseMedia();
+					}
+					m_list.DeleteItem(i);
+				}
+
+				m_list.SetItemState(-1, 0, LVIS_SELECTED);
+				m_list.SetItemState(
+					max(min(items.GetTail(), m_list.GetItemCount()-1), 0),
+					LVIS_SELECTED, LVIS_SELECTED);
+
+				ResizeListColumn();
+
+				SavePlaylist();
 			}
-			m_list.DeleteItem(lvhti.iItem);
-			SavePlaylist();
 			break;
 		case M_CLEAR:
 			if (Empty()) {
@@ -1419,11 +1474,22 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			if (OpenClipboard() && EmptyClipboard()) {
 				CString str;
 
-				CPlaylistItem& pli = m_pl.GetAt(pos);
-				POSITION pos = pli.m_fns.GetHeadPosition();
+				CList<int> items;
+				POSITION pos = m_list.GetFirstSelectedItemPosition();
 				while (pos) {
-					str += _T("\r\n") + pli.m_fns.GetNext(pos);
+					items.AddHead(m_list.GetNextSelectedItem(pos));
 				}
+
+				pos = items.GetHeadPosition();
+				while (pos) {
+					int i = items.GetNext(pos);
+					CPlaylistItem &pli = m_pl.GetAt(FindPos(i));
+					POSITION pos2 = pli.m_fns.GetHeadPosition();
+					while (pos2) {
+						str += _T("\r\n") + pli.m_fns.GetNext(pos2);
+					}
+				}
+
 				str.Trim();
 
 				if (HGLOBAL h = GlobalAlloc(GMEM_MOVEABLE, (str.GetLength()+1)*sizeof(TCHAR))) {
