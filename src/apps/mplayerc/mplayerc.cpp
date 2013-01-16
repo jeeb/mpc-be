@@ -1667,7 +1667,7 @@ bool FindRedir(CUrl& src, CString ct, CString& body, CAtlList<CString>& urls, CA
 				continue;
 			}
 
-			if (url.Find(_T("EXTM3U")) == 0 || url.Find(_T("#EXTINF")) == 0) {
+			if (url.Find(_T("EXTM3U")) == 0 || url.Find(_T("#")) == 0) {
 				continue;
 			}
 
@@ -1719,7 +1719,7 @@ bool FindRedir(CString& fn, CString ct, CAtlList<CString>& fns, CAutoPtrList<CAt
 				continue;
 			}
 
-			if (fn2.Find(_T("EXTM3U")) == 0 || fn2.Find(_T("#EXTINF")) == 0) {
+			if (fn2.Find(_T("EXTM3U")) == 0 || fn2.Find(_T("#")) == 0) {
 				continue;
 			}
 
@@ -1858,6 +1858,26 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 				if (field == "content-type" && !sl2.IsEmpty()) {
 					ct = sl2.GetHead();
 				}
+			}
+
+			if (ct == _T("") || ct == _T("application/octet-stream")) {
+				CPath p(fn);
+				CString ext = p.GetExtension().MakeLower();
+				if (ext == _T(".asx")) {
+					ct = _T("video/x-ms-asf");
+				} else if (ext == _T(".pls")) {
+					ct = _T("audio/x-scpls");
+				} else if (ext == _T(".m3u") || ext == _T(".m3u8")) {
+					ct = _T("audio/x-mpegurl");
+				} else if (ext == _T(".qtl")) {
+					ct = _T("application/x-quicktimeplayer");
+				} else if (ext == _T(".mpcpl")) {
+					ct = _T("application/x-mpc-playlist");
+				} else if (ext == _T(".bdmv")) {
+					ct = _T("application/x-bdmv-playlist");
+				} else if (ext == _T(".xspf")) {
+					ct = _T("application/xspf+xml");
+				}			
 			}
 
 			while (body.GetLength() < 256) {
