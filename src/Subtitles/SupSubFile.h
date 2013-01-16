@@ -66,5 +66,4 @@ private:
 	CCritSec	m_csCritSec;
 
 	CWinThread*	m_Thread;
-	bool		fThreadRun;
 };

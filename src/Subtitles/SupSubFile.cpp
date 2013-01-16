@@ -28,7 +28,6 @@ CSupSubFile::CSupSubFile(CCritSec* pLock)
 {
 	m_fname		= _T("");
 	m_Subname	= _T("");
-	fThreadRun	= false;
 	m_Thread	= NULL;
 	m_pSub		= NULL;
 }
@@ -36,9 +35,8 @@ CSupSubFile::CSupSubFile(CCritSec* pLock)
 CSupSubFile::~CSupSubFile()
 {
 	if (m_Thread) {
-		WaitForSingleObject(m_Thread->m_hThread, (DWORD)5000); // wait maximum 5 sec before terminate;
-		if (fThreadRun) {
-			TerminateThread(m_Thread->m_hThread, (DWORD)-1 );
+		if (WaitForSingleObject(m_Thread->m_hThread, 5000) == WAIT_TIMEOUT) {
+			TerminateThread(m_Thread->m_hThread, 0xDEAD);
 		}
 	}
 
@@ -107,8 +105,6 @@ UINT CSupSubFile::ThreadProc()
 		return 1;
 	}
 
-	fThreadRun = true;
-
 	CAutoLock cAutoLock(&m_csCritSec);
 
 	f.SeekToBegin();
@@ -144,7 +140,6 @@ UINT CSupSubFile::ThreadProc()
 
 	m_sub.Close();
 
-	fThreadRun = false;
 	return 0;
 }
 
