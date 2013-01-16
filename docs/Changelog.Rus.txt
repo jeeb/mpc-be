@@ -12,7 +12,7 @@
 + Декодер SPEEX (Speex Audio);
 
 Изменения (*):
-* ffmpeg git-df4203ac;
+* ffmpeg git-2c85d7c0;
 * libopus 1.0.1 git-fa28dea7;
 * Little-CMS git-310db3d5;
 * libwebp 0.2.1 git-36c52c2c;
