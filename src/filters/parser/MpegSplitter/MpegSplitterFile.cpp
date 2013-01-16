@@ -30,8 +30,6 @@
 #endif
 #include <moreuuids.h>
 
-#define MEGABYTE 1024*1024
-
 CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bool bIsHdmv, CHdmvClipInfo &ClipInfo, bool ForcedSub, bool TrackPriority, int AC3CoreOnly, bool AlternativeDuration)
 	: CBaseSplitterFileEx(pAsyncReader, hr, DEFAULT_CACHE_LENGTH, false, true)
 	, m_type(mpeg_us)
@@ -139,7 +137,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 
 	if (IsRandomAccess() || IsStreaming()) {
 		if (IsStreaming()) {
-			for (int i = 0; i < 20 || i < 50 && S_OK != HasMoreData(MEGABYTE*5, 100); i++) {
+			for (int i = 0; i < 50 && S_OK != HasMoreData(MEGABYTE*5, 100); i++) {
 				;
 			}
 		}
@@ -167,7 +165,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	if (m_type == mpeg_ts) {
 		if (IsRandomAccess() || IsStreaming()) {
 			if (IsStreaming()) {
-				for (int i = 0; i < 20 || i < 50 && S_OK != HasMoreData(MEGABYTE, 100); i++) {
+				for (int i = 0; i < 50 && S_OK != HasMoreData(MEGABYTE, 100); i++) {
 					;
 				}
 			}

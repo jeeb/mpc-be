@@ -28,6 +28,8 @@
 #include "../BaseSplitter/BaseSplitter.h"
 #include "../../../DSUtil/GolombBuffer.h"
 
+#define MEGABYTE			1024*1024
+
 #define NO_SUBTITLE_PID		1 // Fake PID use for the "No subtitle" entry
 #define NO_SUBTITLE_NAME	_T("No subtitle")
 
