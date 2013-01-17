@@ -50,7 +50,7 @@ public:
 	virtual ~CPPageFileInfoSheet();
 
 	afx_msg void OnSaveAs();
-	int DoModal();
+	INT_PTR DoModal();
 	CString m_fn;
 
 protected:

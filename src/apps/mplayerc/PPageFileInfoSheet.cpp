@@ -155,7 +155,7 @@ int CALLBACK CPPageFileInfoSheet::XmnPropSheetCallback(HWND hWnd, UINT message, 
 	return nRes;
 }
 
-int CPPageFileInfoSheet::DoModal() 
+INT_PTR CPPageFileInfoSheet::DoModal() 
 {
 	m_psh.dwFlags |= PSH_USECALLBACK;
 	m_psh.pfnCallback = XmnPropSheetCallback;
