@@ -902,6 +902,14 @@ CMPCVideoDecFilter::~CMPCVideoDecFilter()
 	Cleanup();
 
 	SAFE_DELETE(m_pCpuId);
+
+	if (FFmpegFilters) {
+		delete [] FFmpegFilters;
+	}
+
+	if (DXVAFilters) {
+		delete [] DXVAFilters;
+	}
 }
 
 bool CMPCVideoDecFilter::IsVideoInterlaced()
@@ -3099,13 +3107,21 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetFrameType()
 STDMETHODIMP CMPCVideoDecFilter::SetFFMpegCodec(bool* bValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
-	FFmpegFilters = bValue;
+	if (FFmpegFilters) {
+		delete [] FFmpegFilters;
+	}
+	FFmpegFilters = DNew bool[sizeof(bValue)];
+	memcpy(FFmpegFilters, bValue, sizeof(bValue));
 	return S_OK;
 }
 
 STDMETHODIMP CMPCVideoDecFilter::SetDXVACodec(bool* bValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
-	DXVAFilters = bValue;
+	if (DXVAFilters) {
+		delete [] DXVAFilters;
+	}
+	DXVAFilters = DNew bool[sizeof(bValue)];
+	memcpy(DXVAFilters, bValue, sizeof(bValue));
 	return S_OK;
 }
