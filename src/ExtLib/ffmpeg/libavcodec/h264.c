@@ -1221,15 +1221,17 @@ static int decode_update_thread_context(AVCodecContext *dst,
         }
         h->context_reinitialized = 1;
 
-        /* update linesize on resize for h264. The h264 decoder doesn't
-         * necessarily call ff_MPV_frame_start in the new thread */
-        s->linesize   = s1->linesize;
-        s->uvlinesize = s1->uvlinesize;
-
-        /* copy block_offset since frame_start may not be called */
-        memcpy(h->block_offset, h1->block_offset, sizeof(h->block_offset));
         h264_set_parameter_from_sps(h);
+        //Note we set context_reinitialized which will cause h264_set_parameter_from_sps to be reexecuted
+        h->cur_chroma_format_idc = h1->cur_chroma_format_idc;
     }
+    /* update linesize on resize for h264. The h264 decoder doesn't
+     * necessarily call ff_MPV_frame_start in the new thread */
+    s->linesize   = s1->linesize;
+    s->uvlinesize = s1->uvlinesize;
+
+    /* copy block_offset since frame_start may not be called */
+    memcpy(h->block_offset, h1->block_offset, sizeof(h->block_offset));
 
     err = ff_mpeg_update_thread_context(dst, src);
     if (err)
@@ -3840,6 +3842,8 @@ static int decode_slice(struct AVCodecContext *avctx, void *arg)
     int lf_x_start = s->mb_x;
 
     s->mb_skip_run = -1;
+
+    av_assert0(h->block_offset[15] == (4 * ((scan8[15] - scan8[0]) & 7) << h->pixel_shift) + 4 * s->linesize * ((scan8[15] - scan8[0]) >> 3));
 
     h->is_complex = FRAME_MBAFF || s->picture_structure != PICT_FRAME ||
                     s->codec_id != AV_CODEC_ID_H264 ||
