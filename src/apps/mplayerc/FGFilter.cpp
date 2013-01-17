@@ -536,7 +536,7 @@ void CFGFilterList::Insert(CFGFilter* pFGF, int group, bool exactmatch, bool aut
 	while (pos) {
 		filter_t f = m_filters.GetNext(pos);
 		CFGFilter* pFGF2 = f.pFGF;
-		if (pFGF2->GetCLSID() == pFGF->GetCLSID() && ((pFGF2->GetMerit() >= pFGF->GetMerit()) || (f.group <= group))) {
+		if (pFGF2->GetCLSID() == pFGF->GetCLSID() && ((pFGF2->GetMerit() >= pFGF->GetMerit()) || (f.group < group))) {
 			TRACE(_T("FGM: Inserting %d %d %016I64x '%s' DUP!\n"),
 				  group, exactmatch, pFGF->GetMerit(),
 				  pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName()));
