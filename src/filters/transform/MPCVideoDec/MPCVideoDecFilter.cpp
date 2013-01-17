@@ -3109,9 +3109,12 @@ STDMETHODIMP CMPCVideoDecFilter::SetFFMpegCodec(bool* bValue)
 	CAutoLock cAutoLock(&m_csProps);
 	if (FFmpegFilters) {
 		delete [] FFmpegFilters;
+		FFmpegFilters = NULL;
 	}
-	FFmpegFilters = DNew bool[sizeof(bValue)];
-	memcpy(FFmpegFilters, bValue, sizeof(bValue));
+	if (bValue) {
+		FFmpegFilters = DNew bool[sizeof(bValue)];
+		memcpy(FFmpegFilters, bValue, sizeof(bValue));
+	}
 	return S_OK;
 }
 
@@ -3120,8 +3123,11 @@ STDMETHODIMP CMPCVideoDecFilter::SetDXVACodec(bool* bValue)
 	CAutoLock cAutoLock(&m_csProps);
 	if (DXVAFilters) {
 		delete [] DXVAFilters;
+		DXVAFilters = NULL;
 	}
-	DXVAFilters = DNew bool[sizeof(bValue)];
-	memcpy(DXVAFilters, bValue, sizeof(bValue));
+	if (bValue) {
+		DXVAFilters = DNew bool[sizeof(bValue)];
+		memcpy(DXVAFilters, bValue, sizeof(bValue));
+	}
 	return S_OK;
 }
