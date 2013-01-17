@@ -71,6 +71,7 @@ void CPPageFileInfoDetails::DoDataExchange(CDataExchange* pDX)
 
 #define SETPAGEFOCUS WM_APP+252 // arbitrary number, can be changed if necessary
 BEGIN_MESSAGE_MAP(CPPageFileInfoDetails, CPropertyPage)
+	ON_WM_SIZE()
 	ON_MESSAGE(SETPAGEFOCUS, OnSetPageFocus)
 END_MESSAGE_MAP()
 
@@ -328,4 +329,29 @@ void CPPageFileInfoDetails::InitEncoding()
 	CString text = Implode(sl, '\n');
 	text.Replace(_T("\n"), _T("\r\n"));
 	m_encoding.SetWindowText(text);
+}
+
+void CPPageFileInfoDetails::OnSize(UINT nType, int cx, int cy) 
+{
+	int dx = cx - m_rCrt.Width();
+	int dy = cy - m_rCrt.Height();
+	GetClientRect(&m_rCrt);
+
+	CRect r;
+
+	m_encoding.GetWindowRect(&r);
+	r.right += dx;
+	r.bottom += dy;
+
+	HDWP hDWP = ::BeginDeferWindowPos(1);
+	m_encoding.SetWindowPos(NULL,0, 0, r.Width(), r.Height(),SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
+	for (CWnd *pChild = GetWindow(GW_CHILD); pChild != NULL; pChild = pChild->GetWindow(GW_HWNDNEXT)) {
+		if (pChild != GetDlgItem(IDC_EDIT7) && pChild != GetDlgItem(IDC_DEFAULTICON)) {
+			pChild->GetWindowRect(&r); 
+			ScreenToClient(&r); 
+			r.right += dx;
+			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, 0, 0, r.Width(), r.Height(), SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
+		}
+	}
+	::EndDeferWindowPos(hDWP);
 }

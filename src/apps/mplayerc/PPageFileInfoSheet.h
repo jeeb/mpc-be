@@ -50,10 +50,20 @@ public:
 	virtual ~CPPageFileInfoSheet();
 
 	afx_msg void OnSaveAs();
-
+	int DoModal();
 	CString m_fn;
+
 protected:
 	virtual BOOL OnInitDialog();
+	static int CALLBACK XmnPropSheetCallback(HWND hWnd, UINT message, LPARAM lParam);
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI);
 
 	DECLARE_MESSAGE_MAP()
+
+	BOOL   m_bNeedInit;
+	CRect  m_rCrt;
+	CRect  m_rWnd;
+	int    m_nMinCX;
+	int    m_nMinCY;
 };

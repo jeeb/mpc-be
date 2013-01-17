@@ -53,9 +53,9 @@ public:
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
-
+	afx_msg void OnSize(UINT nType, int cx, int cy);
 	DECLARE_MESSAGE_MAP()
-
+	CRect  m_rCrt;
 public:
 	afx_msg void OnSaveAs();
 	afx_msg void OnUpdateSaveAs(CCmdUI* pCmdUI);

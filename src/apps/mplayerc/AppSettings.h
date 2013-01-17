@@ -522,6 +522,9 @@ public:
 	int				nOSDSize;
 	CString			strOSDFont;
 
+	int				iDlgPropX;
+	int				iDlgPropY;
+
     // Tweaks
 	int				nJumpDistS;
 	int				nJumpDistM;

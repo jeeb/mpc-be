@@ -27,7 +27,6 @@
 #include "PPageFileInfoSheet.h"
 #include "PPageFileMediaInfo.h"
 
-
 // CPPageFileInfoSheet
 
 IMPLEMENT_DYNAMIC(CPPageFileInfoSheet, CPropertySheet)
@@ -38,6 +37,9 @@ CPPageFileInfoSheet::CPPageFileInfoSheet(CString fn, CMainFrame* pMainFrame, CWn
 	, m_res(fn, pMainFrame->pGB)
 	, m_mi(fn, pMainFrame->pGB)
 	, m_fn(fn)
+	, m_bNeedInit(TRUE)
+	, m_nMinCX(0)
+	, m_nMinCY(0)
 {
 	AddPage(&m_details);
 	AddPage(&m_clip);
@@ -58,9 +60,13 @@ CPPageFileInfoSheet::CPPageFileInfoSheet(CString fn, CMainFrame* pMainFrame, CWn
 
 CPPageFileInfoSheet::~CPPageFileInfoSheet()
 {
+	AfxGetAppSettings().iDlgPropX = m_rWnd.Width()	- m_nMinCX;
+	AfxGetAppSettings().iDlgPropY = m_rWnd.Height()	- m_nMinCY;
 }
 
 BEGIN_MESSAGE_MAP(CPPageFileInfoSheet, CPropertySheet)
+	ON_WM_GETMINMAXINFO()
+	ON_WM_SIZE()
 	ON_BN_CLICKED(IDC_BUTTON_MI, OnSaveAs)
 END_MESSAGE_MAP()
 
@@ -68,7 +74,7 @@ END_MESSAGE_MAP()
 
 BOOL CPPageFileInfoSheet::OnInitDialog()
 {
-	__super::OnInitDialog();
+	BOOL bResult = CPropertySheet::OnInitDialog();
 
 	m_fn.TrimRight('/');
 	int i = max(m_fn.ReverseFind('\\'), m_fn.ReverseFind('/'));
@@ -96,7 +102,25 @@ BOOL CPPageFileInfoSheet::OnInitDialog()
 
 	GetTabControl()->SetFocus();
 
-	return FALSE;
+	GetWindowRect(&m_rWnd);
+	m_nMinCX = m_rWnd.Width();
+	m_nMinCY = m_rWnd.Height();
+
+	m_bNeedInit = FALSE;
+	GetClientRect(&m_rCrt);
+	ScreenToClient(&m_rCrt); 
+
+	GetWindowRect (&r);
+	ScreenToClient (&r);
+	r.right		+= AfxGetAppSettings().iDlgPropX;
+	r.bottom	+= AfxGetAppSettings().iDlgPropY;
+	MoveWindow (&r);
+
+	CenterWindow();
+
+	ModifyStyle(0,WS_MAXIMIZEBOX);
+
+	return bResult;
 }
 
 void CPPageFileInfoSheet::OnSaveAs()
@@ -115,4 +139,84 @@ void CPPageFileInfoSheet::OnSaveAs()
 			mFile.Close();
 		}
 	}
+}
+
+int CALLBACK CPPageFileInfoSheet::XmnPropSheetCallback(HWND hWnd, UINT message, LPARAM lParam)
+{
+	extern int CALLBACK AfxPropSheetCallback(HWND, UINT message, LPARAM lParam);
+	int nRes = AfxPropSheetCallback(hWnd, message, lParam);
+	
+	switch (message)
+	{
+	case PSCB_PRECREATE:
+		((LPDLGTEMPLATE)lParam)->style |= (DS_3DLOOK | DS_SETFONT | WS_THICKFRAME | WS_SYSMENU | WS_POPUP | WS_VISIBLE | WS_CAPTION);
+		break;
+	}
+	return nRes;
+}
+
+int CPPageFileInfoSheet::DoModal() 
+{
+	m_psh.dwFlags |= PSH_USECALLBACK;
+	m_psh.pfnCallback = XmnPropSheetCallback;
+
+	return CPropertySheet::DoModal();
+}
+
+void CPPageFileInfoSheet::OnSize(UINT nType, int cx, int cy) 
+{
+	
+	CPropertySheet::OnSize(nType, cx, cy);
+
+	CRect r; 
+
+	if (m_bNeedInit) return;
+
+	CTabCtrl *pTab = GetTabControl();
+	ASSERT(NULL != pTab && IsWindow(pTab->m_hWnd));
+    
+	int dx = cx - m_rCrt.Width();
+	int dy = cy - m_rCrt.Height();
+	GetClientRect(&m_rCrt);
+	
+	HDWP hDWP = ::BeginDeferWindowPos(5);
+
+	pTab->GetClientRect(&r); 
+	r.right += dx; 
+	r.bottom += dy;
+	::DeferWindowPos(hDWP, pTab->m_hWnd, NULL, 0, 0, r.Width(), r.Height(), SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
+
+	for (CWnd *pChild = GetWindow(GW_CHILD); pChild != NULL; pChild = pChild->GetWindow(GW_HWNDNEXT)) {
+		if ((pChild->SendMessage(WM_GETDLGCODE) & DLGC_BUTTON) && pChild == GetDlgItem(IDOK)) {
+			pChild->GetWindowRect(&r); 
+			ScreenToClient(&r); 
+			r.top += dy; 
+			r.bottom += dy; 
+			r.left+= dx; 
+			r.right += dx;
+			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, r.left, r.top, 0, 0, SWP_NOACTIVATE|SWP_NOSIZE|SWP_NOZORDER);
+		} else if ((pChild->SendMessage(WM_GETDLGCODE) & DLGC_BUTTON) && pChild == GetDlgItem(IDC_BUTTON_MI)) {
+			pChild->GetWindowRect(&r); 
+			ScreenToClient(&r); 
+			r.top += dy; 
+			r.bottom += dy;
+			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, r.left, r.top, 0, 0, SWP_NOACTIVATE|SWP_NOSIZE|SWP_NOZORDER);
+		} else {
+			pChild->GetClientRect(&r); 
+			r.right += dx; 
+			r.bottom += dy;
+			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, 0, 0, r.Width(), r.Height(),SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
+		}
+	}
+
+	::EndDeferWindowPos(hDWP);
+
+	GetWindowRect(&m_rWnd);
+}
+
+void CPPageFileInfoSheet::OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI) 
+{
+	CPropertySheet::OnGetMinMaxInfo(lpMMI);
+	lpMMI->ptMinTrackSize.x = m_nMinCX;
+	lpMMI->ptMinTrackSize.y = m_nMinCY;
 }

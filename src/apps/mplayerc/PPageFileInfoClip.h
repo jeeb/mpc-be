@@ -58,8 +58,9 @@ protected:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual BOOL OnSetActive();
 	virtual LRESULT OnSetPageFocus(WPARAM wParam, LPARAM lParam);
+	afx_msg void OnSize(UINT nType, int cx, int cy);
 
 	DECLARE_MESSAGE_MAP()
 
-public:
+	CRect  m_rCrt;
 };

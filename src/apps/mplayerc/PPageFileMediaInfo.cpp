@@ -82,6 +82,7 @@ void CPPageFileMediaInfo::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CPPageFileMediaInfo, CPropertyPage)
+	ON_WM_SIZE()
 	ON_WM_SHOWWINDOW()
 END_MESSAGE_MAP()
 
@@ -160,4 +161,18 @@ void CPPageFileMediaInfo::OnShowWindow(BOOL bShow, UINT nStatus)
 	} else {
 		GetParent()->GetDlgItem(IDC_BUTTON_MI)->ShowWindow(SW_HIDE);
 	}
+}
+
+void CPPageFileMediaInfo::OnSize(UINT nType, int cx, int cy) 
+{
+	CRect r; 
+
+	int dx = cx - m_rCrt.Width();
+	int dy = cy - m_rCrt.Height();
+	GetClientRect(&m_rCrt);
+	
+	m_mediainfo.GetWindowRect(&r);
+	r.right += dx;
+	r.bottom += dy;
+	m_mediainfo.SetWindowPos(NULL,0, 0, r.Width(), r.Height(),SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
 }

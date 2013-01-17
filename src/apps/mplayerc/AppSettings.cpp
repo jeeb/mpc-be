@@ -723,6 +723,9 @@ void CAppSettings::SaveSettings()
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LASTUSEDPAGE, nLastUsedPage);
 
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("DlgPropX"), iDlgPropX);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("DlgPropY"), iDlgPropY);
+
 	m_Formats.UpdateData(true);
 
 	// Internal filters
@@ -1233,6 +1236,9 @@ void CAppSettings::LoadSettings()
 	nJumpDistL = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTL, DEFAULT_JUMPDISTANCE_3);
 	fLimitWindowProportions = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LIMITWINDOWPROPORTIONS, FALSE);
 	fNotifyMSN = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_NOTIFYMSN, FALSE);
+
+	iDlgPropX = pApp->GetProfileInt(IDS_R_SETTINGS, _T("DlgPropX"), 0);
+	iDlgPropY = pApp->GetProfileInt(IDS_R_SETTINGS, _T("DlgPropY"), 0);
 
 	m_Formats.UpdateData(false);
 

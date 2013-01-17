@@ -54,6 +54,7 @@ void CPPageFileInfoRes::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CPPageFileInfoRes, CPPageBase)
+	ON_WM_SIZE()
 	ON_BN_CLICKED(IDC_BUTTON1, OnSaveAs)
 	ON_UPDATE_COMMAND_UI(IDC_BUTTON1, OnUpdateSaveAs)
 END_MESSAGE_MAP()
@@ -136,4 +137,35 @@ void CPPageFileInfoRes::OnSaveAs()
 void CPPageFileInfoRes::OnUpdateSaveAs(CCmdUI* pCmdUI)
 {
 	pCmdUI->Enable(m_list.GetSelectedCount());
+}
+
+void CPPageFileInfoRes::OnSize(UINT nType, int cx, int cy) 
+{
+	int dx = cx - m_rCrt.Width();
+	int dy = cy - m_rCrt.Height();
+	GetClientRect(&m_rCrt);
+
+	CRect r;
+
+	m_list.GetWindowRect(&r);
+	r.right += dx;
+	r.bottom += dy;
+
+	HDWP hDWP = ::BeginDeferWindowPos(1);
+	m_list.SetWindowPos(NULL,0, 0, r.Width(), r.Height(),SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
+	for (CWnd *pChild = GetWindow(GW_CHILD); pChild != NULL; pChild = pChild->GetWindow(GW_HWNDNEXT)) {
+		if (pChild->SendMessage(WM_GETDLGCODE) & DLGC_BUTTON) {
+			pChild->GetWindowRect(&r); 
+			ScreenToClient(&r); 
+			r.top += dy; 
+			r.bottom += dy; 
+			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, r.left, r.top, 0, 0, SWP_NOACTIVATE|SWP_NOSIZE|SWP_NOZORDER);
+		} else if (pChild != GetDlgItem(IDC_LIST1) && pChild != GetDlgItem(IDC_DEFAULTICON)) {
+			pChild->GetWindowRect(&r); 
+			ScreenToClient(&r); 
+			r.right += dx;
+			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, 0, 0, r.Width(), r.Height(), SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
+		}
+	}
+	::EndDeferWindowPos(hDWP);
 }
