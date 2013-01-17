@@ -2780,8 +2780,19 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 	}
 
 	if (CComQIPtr<IMPCVideoDecFilterCodec> MPCVideoDecFilter = pBF) {
-		MPCVideoDecFilter->SetFFMpegCodec(s.FFmpegFilters);
-		MPCVideoDecFilter->SetDXVACodec(!m_IsPreview ? s.DXVAFilters : NULL);
+		CString name = GetFilterName(pBF);
+		bool ffmpeg_filters[FFM_LAST + !FFM_LAST];
+		bool dxva_filters[TRA_DXVA_LAST + !TRA_DXVA_LAST];
+
+		memcpy(&ffmpeg_filters, &s.FFmpegFilters, sizeof(s.FFmpegFilters));
+		memcpy(&dxva_filters, &s.DXVAFilters, sizeof(s.DXVAFilters));
+
+		if (name == LowMerit(MPCVideoDecName)) {
+			memset(&ffmpeg_filters, true, sizeof(ffmpeg_filters));
+			memset(&dxva_filters, true, sizeof(dxva_filters));
+		}
+		MPCVideoDecFilter->SetFFMpegCodec(ffmpeg_filters);
+		MPCVideoDecFilter->SetDXVACodec(!m_IsPreview ? dxva_filters : NULL);
 	}
 
 	return hr;
