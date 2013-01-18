@@ -296,7 +296,8 @@ void File_Mpeg4::Streams_Finish()
                     {
                         Delay=Temp->second.edts[0].Delay;
                         Delay=-Delay;
-                        Delay/=Temp->second.mdhd_TimeScale; //In seconds
+                        if (Temp->second.mdhd_TimeScale)
+                            Delay/=Temp->second.mdhd_TimeScale; //In seconds
                     }
                     break;
             case 2 :
@@ -1097,11 +1098,16 @@ size_t File_Mpeg4::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
                     return Read_Buffer_Seek(0, FirstMdatPos+(LastMdatPos-FirstMdatPos)*Value/10000, ID);
         case 2  :   //Timestamp
                     {
-                        Value=Value*Stream->second.mdhd_TimeScale/1000000000; //Transformed in mpeg4 ticks
-                        if (Value>TimeCode_FrameOffset*Stream->second.stts_Duration/Stream->second.stts_FrameCount) //Removing Time Code offset
-                            Value-=TimeCode_FrameOffset*Stream->second.stts_Duration/Stream->second.stts_FrameCount;
-                        else
-                            Value=0; //Sooner
+                        //Searching time stamp offset due to Time code offset
+                        for (std::map<int32u, stream>::iterator Stream=Streams.begin(); Stream!=Streams.end(); ++Stream)
+                            if (Stream->second.StreamKind==Stream_Video)
+                            {
+                                if (Value>TimeCode_FrameOffset*1000000000/Stream->second.mdhd_TimeScale) //Removing Time Code offset
+                                    Value-=TimeCode_FrameOffset*1000000000/Stream->second.mdhd_TimeScale;
+                                else
+                                    Value=0; //Sooner
+                                break;
+                            }
 
                         //Looking for the minimal stream offset, for every video/audio/text stream
                         int64u JumpTo=File_Size;
@@ -1112,12 +1118,14 @@ size_t File_Mpeg4::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
                                 case Stream_Audio :
                                 case Stream_Text  :
                                                     {
+                                                        int64u Value2=float64_int64s(((float64)Value)*Stream->second.mdhd_TimeScale/1000000000); //Transformed in mpeg4 ticks (per track)
+
                                                         //Searching the corresponding frame
                                                         for (stream::stts_durations::iterator stts_Duration=Stream->second.stts_Durations.begin(); stts_Duration!=Stream->second.stts_Durations.end(); ++stts_Duration)
                                                         {
-                                                            if (Value>=stts_Duration->DTS_Begin && Value<stts_Duration->DTS_End)
+                                                            if (Value2>=stts_Duration->DTS_Begin && Value2<stts_Duration->DTS_End)
                                                             {
-                                                                int64u FrameNumber=stts_Duration->Pos_Begin+(Value-stts_Duration->DTS_Begin)/stts_Duration->SampleDuration;
+                                                                int64u FrameNumber=stts_Duration->Pos_Begin+(Value2-stts_Duration->DTS_Begin)/stts_Duration->SampleDuration;
 
                                                                 //Searching the I-Frame
                                                                 if (!Stream->second.stss.empty())
@@ -1240,6 +1248,21 @@ size_t File_Mpeg4::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
     }
 }
 #endif //MEDIAINFO_SEEK
+
+//***************************************************************************
+// Buffer - Global
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void File_Mpeg4::Read_Buffer_Init()
+{
+    if (MediaInfoLib::Config.ParseSpeed_Get()==1.00)
+        FrameCount_MaxPerStream=(int64u)-1;
+    else if (MediaInfoLib::Config.ParseSpeed_Get()<=0.3)
+        FrameCount_MaxPerStream=512;
+    else
+        FrameCount_MaxPerStream=2048;
+}
 
 //***************************************************************************
 // Buffer
@@ -1518,7 +1541,7 @@ bool File_Mpeg4::BookMark_Needed()
                                 Chunk_Offset+=Temp->second.stsz_Sample_Size*Temp->second.stsz_Sample_Multiplier;
                                 Chunk_FrameCount++;
                             }
-                        if (Config->ParseSpeed<1.0 && Chunk_FrameCount>=300)
+                        if (Chunk_FrameCount>=FrameCount_MaxPerStream)
                             break;
                     }
 
@@ -1793,8 +1816,15 @@ void File_Mpeg4::TimeCode_Associate(int32u TrackID)
                 Fill(Stream_Video, Strea->second.StreamPos, Video_Delay_Settings, Ztring(__T("24HourMax="))+(Streams[TrackID].TimeCode->H24?__T("Yes"):__T("No")));
                 Fill(Stream_Video, Strea->second.StreamPos, Video_Delay_Settings, Ztring(__T("IsVisual="))+(Streams[TrackID].TimeCode_IsVisual?__T("Yes"):__T("No")));
             }
-            Fill(Strea->second.StreamKind, Strea->second.StreamPos, "Delay", Streams[TrackID].Parsers[0]->Get(Stream_General, 0, "Delay"));
-            Fill(Strea->second.StreamKind, Strea->second.StreamPos, "Delay_Source", "Container");
+            if (Strea->second.StreamKind!=Stream_Other)
+            {
+                Fill(Strea->second.StreamKind, Strea->second.StreamPos, "Delay", Streams[TrackID].Parsers[0]->Get(Stream_General, 0, "Delay"));
+                Fill(Strea->second.StreamKind, Strea->second.StreamPos, "Delay_DropFrame", Streams[TrackID].TimeCode->DropFrame?__T("Yes"):__T("No"));
+                Fill(Strea->second.StreamKind, Strea->second.StreamPos, "Delay_Source", "Container");
+            }
+
+            //Fill(Strea->second.StreamKind, Strea->second.StreamPos, "TimeCode_FirstFrame", Streams[TrackID].Parsers[0]->Get(Stream_General, 0, "TimeCode_FirstFrame"));
+            //Fill(Strea->second.StreamKind, Strea->second.StreamPos, "TimeCode_Source", Streams[TrackID].Parsers[0]->Get(Stream_General, 0, "TimeCode_Source"));
         }
  }
 

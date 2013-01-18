@@ -83,17 +83,39 @@ File_SmpteSt0302::~File_SmpteSt0302()
 void File_SmpteSt0302::Streams_Accept()
 {
     // SMPTE ST 337
-    File_SmpteSt0337* SmpteSt0337=new File_SmpteSt0337();
-    SmpteSt0337->Container_Bits_Original=(4+bits_per_sample)*4;
-    SmpteSt0337->Container_Bits=SmpteSt0337->Container_Bits_Original==20?24:SmpteSt0337->Container_Bits_Original;
-    Parsers.push_back(SmpteSt0337);
+    //if (Config->ID_Format_Get(StreamIDs[0]==(int64u)-1?Ztring():Ztring::ToZtring(StreamIDs[0]))!=__T("PCM"))
+    {
+        File_SmpteSt0337* SmpteSt0337=new File_SmpteSt0337();
+        SmpteSt0337->Container_Bits_Original=(4+bits_per_sample)*4;
+        SmpteSt0337->Container_Bits=SmpteSt0337->Container_Bits_Original==20?24:SmpteSt0337->Container_Bits_Original;
+        #if MEDIAINFO_DEMUX
+            if (Config->Demux_Unpacketize_Get())
+            {
+                Demux_Level=4; //Intermediate
+                SmpteSt0337->Demux_Level=2; //Container
+                SmpteSt0337->Demux_UnpacketizeContainer=true;
+            }
+        #endif //MEDIAINFO_DEMUX
+        Parsers.push_back(SmpteSt0337);
+    }
 
     // Raw PCM
     File_Pcm* Pcm=new File_Pcm();
-    Pcm->Codec.From_Local("SMPTE ST 337");
-    Pcm->BitDepth=(4+bits_per_sample)*4;
+    Pcm->Codec.From_Local("SMPTE ST 302");
+    Pcm->BitDepth_Original=(4+bits_per_sample)*4;
+    Pcm->BitDepth=Pcm->BitDepth_Original==20?24:Pcm->BitDepth_Original;
     Pcm->Channels=(1+number_channels)*2;
     Pcm->SamplingRate=48000;
+    //if (Config->ID_Format_Get(StreamIDs[0]==(int64u)-1?Ztring():Ztring::ToZtring(StreamIDs[0]))==__T("PCM"))
+    //    Pcm->Frame_Count_Valid=1;
+    #if MEDIAINFO_DEMUX
+        if (Config->Demux_Unpacketize_Get())
+        {
+            Demux_Level=4; //Intermediate
+            Pcm->Demux_Level=2; //Container
+            Pcm->Demux_UnpacketizeContainer=true;
+        }
+    #endif //MEDIAINFO_DEMUX
     Parsers.push_back(Pcm);
 
     // Init
@@ -217,7 +239,7 @@ void File_SmpteSt0302::Read_Buffer_Continue()
                         Info_Offset+=6;
                         Element_Offset+=6;
                         break;
-            case 2  : //24 bits
+            case 2  :   //24 bits
                         //Channel 1 (24 bits, as "s24l" codec)
                         Info[Info_Offset+0] = Reverse8(Buffer[Buffer_Pos+0] );
                         Info[Info_Offset+1] = Reverse8(Buffer[Buffer_Pos+1] );
@@ -260,40 +282,36 @@ void File_SmpteSt0302::Read_Buffer_Continue()
                 Info_Pos+=6;
             }
 
-            Demux(Info2, Info2_Pos, ContentType_MainStream, Buffer+Buffer_Offset+4, (size_t)Element_Size-4);
+            Element_Offset=0;
+            Demux(Info2, Info2_Pos, ContentType_MainStream, Buffer+Buffer_Offset, (size_t)Element_Size);
+            Element_Offset=4;
         }
         else if (bits_per_sample==1 && Config->Demux_PCM_20bitTo24bit_Get()) // && (StreamIDs_Size==0 || Config->ID_Format_Get(StreamIDs[0]==(int64u)-1?Ztring():Ztring::ToZtring(StreamIDs[0]))==__T("PCM")))
         {
-            size_t Info2_Size=((size_t)Element_Size-4);
-            int8u* Info2=new int8u[Info2_Size];
-            size_t Info2_Pos=0;
-            size_t Info_Pos=0;
-
-            while (Info_Pos<Info_Offset)
-            {
-                Info2[Info2_Pos+0]=0x00;
-                Info2[Info2_Pos+1]=Info[Info_Pos+1];
-                Info2[Info2_Pos+2]=Info[Info_Pos+2];
-                Info2[Info2_Pos+3]=0x00;
-                Info2[Info2_Pos+4]=Info[Info_Pos+4];
-                Info2[Info2_Pos+5]=Info[Info_Pos+5];
-
-                Info2_Pos+=6;
-                Info_Pos+=6;
-            }
-
-            Demux(Info2, Info2_Pos, ContentType_MainStream, Buffer+Buffer_Offset+4, (size_t)Element_Size-4);
+            Element_Offset=0;
+            Demux(Info, Info_Offset, ContentType_MainStream, Buffer+Buffer_Offset, (size_t)Element_Size);
+            Element_Offset=4;
         }
         else
-            Demux(Info, Info_Offset, ContentType_MainStream, Buffer+Buffer_Offset+4, (size_t)Element_Size-4);
+        {
+            Element_Offset=0;
+            Demux(Info, Info_Offset, ContentType_MainStream, Buffer+Buffer_Offset, (size_t)Element_Size);
+            Element_Offset=4;
+        }
     #endif //MEDIAINFO_DEMUX
 
     //Parsers
     for (size_t Pos=0; Pos<Parsers.size(); Pos++)
     {
         Parsers[Pos]->FrameInfo=FrameInfo;
+        Parsers[Pos]->OriginalBuffer=Buffer+Buffer_Offset;
+        Parsers[Pos]->OriginalBuffer_ParserStreamOffset=(size_t)Element_Offset;
+        Parsers[Pos]->OriginalBuffer_Size=(size_t)Element_Size;
         Open_Buffer_Continue(Parsers[Pos], Info, Info_Offset);
         Element_Offset=Element_Size;
+        Parsers[Pos]->OriginalBuffer=NULL;
+        Parsers[Pos]->OriginalBuffer_ParserStreamOffset=0;
+        Parsers[Pos]->OriginalBuffer_Size=0;
 
         if (Parsers.size()>1 && Parsers[Pos]->Status[IsAccepted])
         {

@@ -1363,7 +1363,7 @@ void File_Mpegv::Streams_Fill()
     }
 
     //Delay
-    if (group_start_FirstPass && Time_Begin_Seconds!=Error)
+    if (group_start_FirstPass && !TimeCodeIsNotTrustable && Time_Begin_Seconds!=Error)
     {
         float64 Time_Begin=((float64)Time_Begin_Seconds)*1000;
         if (FrameRate)
@@ -1373,6 +1373,11 @@ void File_Mpegv::Streams_Fill()
         Fill(Stream_Video, 0, Video_Delay_Settings, Ztring(__T("closed_gop="))+(group_start_closed_gop?__T("1"):__T("0")));
         Fill(Stream_Video, 0, Video_Delay_Settings, Ztring(__T("broken_link="))+(group_start_broken_link?__T("1"):__T("0")));
         Fill(Stream_Video, 0, Video_Delay_Source, "Stream");
+        Fill(Stream_Video, 0, Video_Delay_DropFrame, group_start_drop_frame_flag?"Yes":"No");
+
+        Fill(Stream_Video, 0, Video_TimeCode_FirstFrame, TimeCode_FirstFrame.c_str());
+        if (IsSub)
+            Fill(Stream_Video, 0, Video_TimeCode_Source, "Group of pictures header");
     }
 
     //BVOP
@@ -2521,7 +2526,7 @@ void File_Mpegv::slice_start()
         #endif //defined(MEDIAINFO_AFDBARDATA_YES)
 
         //Counting
-        if (File_Offset+Buffer_Offset+Element_Size==File_Size)
+        if (!MustExtendParsingDuration && File_Offset+Buffer_Offset+Element_Size==File_Size)
             Frame_Count_Valid=Frame_Count; //Finish frames in case of there are less than Frame_Count_Valid frames
         if (!TimeCodeIsNotTrustable && (picture_coding_type==1 || picture_coding_type==2)) //IFrame or PFrame
         {
@@ -2591,9 +2596,9 @@ void File_Mpegv::slice_start()
         //Filling only if not already done
         if (!Status[IsAccepted])
             Accept("MPEG Video");
-        if (IFrame_Count==8)
+        if (!MustExtendParsingDuration && IFrame_Count==8)
             Frame_Count_Valid=Frame_Count; //We have enough frames
-        if ((!Status[IsFilled] && (!MustExtendParsingDuration && Frame_Count>=Frame_Count_Valid)) || Frame_Count>=512)
+        if (!Status[IsFilled] && ((!MustExtendParsingDuration && Frame_Count>=Frame_Count_Valid) || Frame_Count>=Frame_Count_Valid*4))
         {
             Fill("MPEG Video");
             if (File_Size==(int64u)-1)
@@ -3917,6 +3922,7 @@ void File_Mpegv::group_start()
             //Time code is always 0
             TimeCodeIsNotTrustable=true;
             Time_End_Seconds=(size_t)-1;
+            TimeCode_FirstFrame.clear();
             return;
         }
 
@@ -3932,6 +3938,18 @@ void File_Mpegv::group_start()
             group_start_drop_frame_flag=drop_frame_flag;
             group_start_closed_gop=closed_gop;
             group_start_broken_link=broken_link;
+
+            TimeCode_FirstFrame+=('0'+Hours/10);
+            TimeCode_FirstFrame+=('0'+Hours%10);
+            TimeCode_FirstFrame+=':';
+            TimeCode_FirstFrame+=('0'+Minutes/10);
+            TimeCode_FirstFrame+=('0'+Minutes%10);
+            TimeCode_FirstFrame+=':';
+            TimeCode_FirstFrame+=('0'+Seconds/10);
+            TimeCode_FirstFrame+=('0'+Seconds%10);
+            TimeCode_FirstFrame+=drop_frame_flag?';':':';
+            TimeCode_FirstFrame+=('0'+Frames/10);
+            TimeCode_FirstFrame+=('0'+Frames%10);
         }
 
         RefFramesCount=0;

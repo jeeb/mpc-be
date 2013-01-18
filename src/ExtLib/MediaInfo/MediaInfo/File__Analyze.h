@@ -123,6 +123,9 @@ public :
     std::vector<int64u> Offsets_Stream;
     std::vector<int64u> Offsets_Buffer;
     size_t              Offsets_Pos;
+    const int8u*        OriginalBuffer;
+    size_t              OriginalBuffer_ParserStreamOffset;
+    size_t              OriginalBuffer_Size;
 
     //Out
     int64u PTS_Begin;                  //In nanoseconds
@@ -1044,7 +1047,7 @@ protected :
     void Streams_Finish_StreamOnly_Video(size_t StreamPos);
     void Streams_Finish_StreamOnly_Audio(size_t StreamPos);
     void Streams_Finish_StreamOnly_Text(size_t StreamPos);
-    void Streams_Finish_StreamOnly_Chapters(size_t StreamPos);
+    void Streams_Finish_StreamOnly_Other(size_t StreamPos);
     void Streams_Finish_StreamOnly_Image(size_t StreamPos);
     void Streams_Finish_StreamOnly_Menu(size_t StreamPos);
     void Streams_Finish_InterStreams();

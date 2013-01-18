@@ -129,6 +129,15 @@ File_Lxf::File_Lxf()
     LastAudio_BufferOffset=(int64u)-1;
 }
 
+//---------------------------------------------------------------------------
+File_Lxf::~File_Lxf()
+{
+    for (size_t Pos=0; Pos<Videos.size(); Pos++)
+        delete Videos[Pos].Parser;
+    for (size_t Pos=0; Pos<Audios.size(); Pos++)
+        delete Audios[Pos].Parser;
+}
+
 //***************************************************************************
 // Streams management
 //***************************************************************************
@@ -138,7 +147,7 @@ void File_Lxf::Streams_Fill()
 {
     Fill(Stream_General, 0, General_Format_Version, __T("Version "+Ztring::ToZtring(Version)));
 
-    for (size_t Pos=0; Pos<Videos.size(); Pos++)
+    for (size_t Pos=2; Pos<Videos.size(); Pos++) //TODO: better handling of fill/finish for Ancillary data
         Streams_Fill_PerStream(Videos[Pos].Parser, 1, Pos);
     for (size_t Pos=0; Pos<Audios.size(); Pos++)
         Streams_Fill_PerStream(Audios[Pos].Parser, 2, Pos);
@@ -191,7 +200,7 @@ void File_Lxf::Streams_Fill_PerStream(File__Analyze* Parser, size_t Container_St
 //---------------------------------------------------------------------------
 void File_Lxf::Streams_Finish()
 {
-    if (Videos[1].Parser && Count_Get(Stream_Text)==0) //TODO: better handling of fill/finish
+    if (Videos[1].Parser) //TODO: better handling of fill/finish for Ancillary data
     {
         Finish(Videos[1].Parser);
         Streams_Fill_PerStream(Videos[1].Parser, Stream_Video, 1);
@@ -1044,6 +1053,8 @@ void File_Lxf::Audio_Stream(size_t Pos)
                 }
 
                 Demux(SixteenBit, SixteenBit_Pos, ContentType_MainStream);
+
+                delete[] SixteenBit; 
             }
             else if (SampleSize==20 && Config->Demux_PCM_20bitTo24bit_Get())
             {
@@ -1067,6 +1078,8 @@ void File_Lxf::Audio_Stream(size_t Pos)
                 }
 
                 Demux(Output, Output_Pos, ContentType_MainStream);
+
+                delete[] Output; 
             }
             else
                 Demux(Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)Audio_Sizes[Pos], ContentType_MainStream);

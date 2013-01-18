@@ -98,6 +98,9 @@ File__Analyze::File__Analyze ()
     DTS_Begin=(int64u)-1;
     DTS_End=0;
     Offsets_Pos=(size_t)-1;
+    OriginalBuffer=NULL;
+    OriginalBuffer_Size=0;
+    OriginalBuffer_ParserStreamOffset=0;
 
     //Out
     Frame_Count=0;
@@ -627,12 +630,12 @@ void File__Analyze::Open_Buffer_Continue (File__Analyze* Sub, const int8u* ToAdd
             {
                 if (Buffer_Offset-Header_Size<Offsets_Buffer[0])
                 {
-                    Sub->Offsets_Stream.push_back(Offsets_Stream[0]);
+                    Sub->Offsets_Stream.push_back(Offsets_Stream[0]-Sub->OriginalBuffer_ParserStreamOffset);
                     Sub->Offsets_Buffer.push_back(Sub->Buffer_Size+Offsets_Buffer[0]-(Buffer_Offset+Element_Offset));
                 }
                 else
                 {
-                    Sub->Offsets_Stream.push_back(Offsets_Stream[0]+Buffer_Offset+Element_Offset-Offsets_Buffer[0]);
+                    Sub->Offsets_Stream.push_back(Offsets_Stream[0]+Buffer_Offset+Element_Offset-Offsets_Buffer[0]-Sub->OriginalBuffer_ParserStreamOffset);
                     Sub->Offsets_Buffer.push_back(Sub->Buffer_Size);
                 }
             }
@@ -642,12 +645,12 @@ void File__Analyze::Open_Buffer_Continue (File__Analyze* Sub, const int8u* ToAdd
                     if (Buffer_Offset-Header_Size<Offsets_Buffer[Pos])
                     {
                         Sub->Offsets_Stream.push_back(Offsets_Stream[Pos]);
-                        Sub->Offsets_Buffer.push_back(Sub->Buffer_Size+Offsets_Buffer[Pos]-(Buffer_Offset+Element_Offset));
+                        Sub->Offsets_Buffer.push_back(Sub->OriginalBuffer_ParserStreamOffset+Sub->Buffer_Size+Offsets_Buffer[Pos]-(Buffer_Offset+Element_Offset));
                     }
                     else
                     {
                         Sub->Offsets_Stream.push_back(Offsets_Stream[Pos]+Buffer_Offset+Element_Offset-Offsets_Buffer[Pos]);
-                        Sub->Offsets_Buffer.push_back(Sub->Buffer_Size);
+                        Sub->Offsets_Buffer.push_back(Sub->OriginalBuffer_ParserStreamOffset+Sub->Buffer_Size);
                     }
                 }
         }
@@ -736,7 +739,9 @@ bool File__Analyze::Open_Buffer_Continue_Loop ()
     #endif //MEDIAINFO_DEMUX
 
     //Parsing;
-    while (Buffer_Parse());
+    while (Buffer_Offset<Buffer_Size)
+        if (!Buffer_Parse())
+            break;
     Buffer_TotalBytes+=Buffer_Offset;
     #if MEDIAINFO_DEMUX
         if (Config->Demux_EventWasSent)
@@ -863,7 +868,8 @@ void File__Analyze::Open_Buffer_Unsynch ()
 //---------------------------------------------------------------------------
 void File__Analyze::Open_Buffer_Update ()
 {
-    Streams_Update();
+    if (Status[IsAccepted])
+        Streams_Update();
 
     Status[File__Analyze::IsUpdated]=false;
     for (size_t Pos=File__Analyze::User_16; Pos<File__Analyze::User_16+16; Pos++)
@@ -1061,7 +1067,7 @@ bool File__Analyze::Buffer_Parse()
 
     Buffer_TotalBytes_LastSynched=Buffer_TotalBytes+Buffer_Offset;
 
-    return Buffer_Offset!=Buffer_Size;
+    return true;
 }
 
 //---------------------------------------------------------------------------

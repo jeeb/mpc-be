@@ -1075,15 +1075,36 @@ void File_Avc::Read_Buffer_Unsynched()
     #endif //defined(MEDIAINFO_DTVCCTRANSPORT_YES)
 
     //parameter_sets
-    for (std::vector<seq_parameter_set_struct*>::iterator seq_parameter_set_Item=seq_parameter_sets.begin(); seq_parameter_set_Item!=seq_parameter_sets.end(); ++seq_parameter_set_Item)
-        if ((*seq_parameter_set_Item))
-            (*seq_parameter_set_Item)->IsSynched=false;
-    for (std::vector<seq_parameter_set_struct*>::iterator subset_seq_parameter_set_Item=subset_seq_parameter_sets.begin(); subset_seq_parameter_set_Item!=subset_seq_parameter_sets.end(); ++subset_seq_parameter_set_Item)
-        if ((*subset_seq_parameter_set_Item))
-            (*subset_seq_parameter_set_Item)->IsSynched=false;
-    for (std::vector<pic_parameter_set_struct*>::iterator pic_parameter_set_Item=pic_parameter_sets.begin(); pic_parameter_set_Item!=pic_parameter_sets.end(); ++pic_parameter_set_Item)
-        if ((*pic_parameter_set_Item))
-            (*pic_parameter_set_Item)->IsSynched=false;
+    if (SizedBlocks) //If sized blocks, it is not a broadcasted stream so SPS/PPS are only in container header, we must not disable them.
+    {
+        //Rebuilding immediatly TemporalReferences
+        for (std::vector<seq_parameter_set_struct*>::iterator seq_parameter_set_Item=seq_parameter_sets.begin(); seq_parameter_set_Item!=seq_parameter_sets.end(); ++seq_parameter_set_Item)
+            if ((*seq_parameter_set_Item))
+            {
+                size_t MaxNumber;
+                switch ((*seq_parameter_set_Item)->pic_order_cnt_type)
+                {
+                    case 0 : MaxNumber=(*seq_parameter_set_Item)->MaxPicOrderCntLsb; break;
+                    case 2 : MaxNumber=(*seq_parameter_set_Item)->MaxFrameNum*2; break;
+                    default: Trusted_IsNot("Not supported"); return;
+                }
+
+                TemporalReferences.resize(4*MaxNumber);
+                TemporalReferences_Reserved=MaxNumber;
+            }
+    }
+    else
+    {
+        for (std::vector<seq_parameter_set_struct*>::iterator seq_parameter_set_Item=seq_parameter_sets.begin(); seq_parameter_set_Item!=seq_parameter_sets.end(); ++seq_parameter_set_Item)
+            if ((*seq_parameter_set_Item))
+                (*seq_parameter_set_Item)->IsSynched=false;
+        for (std::vector<seq_parameter_set_struct*>::iterator subset_seq_parameter_set_Item=subset_seq_parameter_sets.begin(); subset_seq_parameter_set_Item!=subset_seq_parameter_sets.end(); ++subset_seq_parameter_set_Item)
+            if ((*subset_seq_parameter_set_Item))
+                (*subset_seq_parameter_set_Item)->IsSynched=false;
+        for (std::vector<pic_parameter_set_struct*>::iterator pic_parameter_set_Item=pic_parameter_sets.begin(); pic_parameter_set_Item!=pic_parameter_sets.end(); ++pic_parameter_set_Item)
+            if ((*pic_parameter_set_Item))
+                (*pic_parameter_set_Item)->IsSynched=false;
+    }
 
     //Status
     Interlaced_Top=0;
@@ -1888,7 +1909,7 @@ void File_Avc::slice_header()
                             if ((Pos%2)==0)
                                 PictureTypes+=' ';
                         }
-                    if (!GOP_Detect(PictureTypes).empty())
+                    if (!GOP_Detect(PictureTypes).empty() && !GA94_03_IsPresent)
                         Frame_Count_Valid=Frame_Count; //We have enough frames
                 }
             }
@@ -1950,10 +1971,10 @@ void File_Avc::slice_header()
             Accept("AVC");
         if (!Status[IsFilled])
         {
-            if (IFrame_Count>=8)
+            if (!GA94_03_IsPresent && IFrame_Count>=8)
                 Frame_Count_Valid=Frame_Count; //We have enough frames
             #ifdef MEDIAINFO_DTVCCTRANSPORT_YES
-            if (((!GA94_03_IsPresent && Frame_Count>=Frame_Count_Valid) || Frame_Count>=512)) //Going more far if captions are detected
+            if (((!GA94_03_IsPresent && Frame_Count>=Frame_Count_Valid) || Frame_Count>=Frame_Count_Valid*4)) //Going more far if captions are detected
             #else //MEDIAINFO_DTVCCTRANSPORT_YES
             if (Frame_Count>=Frame_Count_Valid)
             #endif //MEDIAINFO_DTVCCTRANSPORT_YES
