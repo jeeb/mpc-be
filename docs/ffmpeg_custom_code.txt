@@ -18,6 +18,8 @@
 * libavcodec/vc1dec.c
 * libavcodec/vorbis.c
 
+* libavresample/audio_mix.c
+
 * libavutil/attributes.h
 * libavutil/common.h
 * libavutil/internal.h
