@@ -18,14 +18,10 @@
 * libavcodec/vc1dec.c
 * libavcodec/vorbis.c
 
-* libavresample/audio_mix.c
-
 * libavutil/attributes.h
 * libavutil/common.h
 * libavutil/internal.h
 * libavutil/mathematics.h
-
-* libavresample/x86/audio_mix_init.c
 
 ======
 The following files are available only in MPC-BE (compared with ffmpeg):
