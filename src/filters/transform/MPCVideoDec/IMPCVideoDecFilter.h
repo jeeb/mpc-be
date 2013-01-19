@@ -128,6 +128,6 @@ public IUnknown {
 interface __declspec(uuid("EAAE8911-3EB7-49F4-A255-67D84651EE8F"))
 IMPCVideoDecFilterCodec :
 public IUnknown {
-	STDMETHOD(SetFFMpegCodec(bool* bValue)) = 0;
-	STDMETHOD(SetDXVACodec(bool* bValue)) = 0;
+	STDMETHOD(SetFFMpegCodec(int nCodec, bool bEnabled)) = 0;
+	STDMETHOD(SetDXVACodec(int nCodec, bool bEnabled)) = 0;
 };

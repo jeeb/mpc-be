@@ -54,7 +54,6 @@ class __declspec(uuid("39F498AF-1A09-4275-B193-673B0BA3D478"))
 	REFERENCE_TIME m_AvgTimePerFrame;
 	bool m_fWaitForKeyFrame;
 	bool m_fInitializedBuffer;
-	CSize m_par;
 
 	struct framebuf {
 		int w, h, pitch;

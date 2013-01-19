@@ -2791,8 +2791,16 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 			memset(&ffmpeg_filters, true, sizeof(ffmpeg_filters));
 			memset(&dxva_filters, true, sizeof(dxva_filters));
 		}
-		MPCVideoDecFilter->SetFFMpegCodec(ffmpeg_filters);
-		MPCVideoDecFilter->SetDXVACodec(!m_IsPreview ? dxva_filters : NULL);
+		if (m_IsPreview) {
+			memset(&dxva_filters, false, sizeof(dxva_filters));
+		}
+
+		for (int f=0; f<TRA_DXVA_LAST; f++) {
+			MPCVideoDecFilter->SetDXVACodec(f, dxva_filters[f]);
+		}
+		for (int f=0; f<FFM_LAST; f++) {
+			MPCVideoDecFilter->SetFFMpegCodec(f, ffmpeg_filters[f]);
+		}
 	}
 
 	return hr;

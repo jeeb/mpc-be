@@ -75,9 +75,11 @@ CBaseVideoFilter::~CBaseVideoFilter()
 
 void CBaseVideoFilter::SetAspect(CSize aspect)
 {
-	f_need_set_aspect = true;
-	m_arx = aspect.cx;
-	m_ary = aspect.cy;
+	if (m_arx != aspect.cx || m_ary != aspect.cy) {
+		m_arx = aspect.cx;
+		m_ary = aspect.cy;
+		f_need_set_aspect = true;
+	}
 }
 
 int CBaseVideoFilter::GetPinCount()
@@ -168,7 +170,6 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, int re
 		int wout = 0, hout = 0, arxout = 0, aryout = 0;
 		ExtractDim(&mt, wout, hout, arxout, aryout);
 		if (arxout != m_arx || aryout != m_ary) {
-			TRACE(_T("\nCBaseVideoFilter::ReconnectOutput; wout = %d, hout = %d, current = %dx%d, set = %dx%d\n"), wout, hout, arxout, aryout, m_arx, m_ary);
 			m_update_aspect = true;
 		}
 	}
@@ -198,27 +199,21 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, int re
 			vih_rect = CRect(0, 0, m_w, m_h);
 		}
 
+		TRACE(_T("CBaseVideoFilter::ReconnectOutput() : SIZE %d:%d => %d:%d, AR %d:%d => %d:%d\n"), w_org, h_org, vih_rect.Width(), vih_rect.Height(), m_arxout, m_aryout, m_arx, m_ary);
+
 		CMediaType& pmtInput	= m_pInput->CurrentMediaType();
 		BITMAPINFOHEADER* bmi	= NULL;
 
 		if (mt.formattype == FORMAT_VideoInfo) {
 			VIDEOINFOHEADER* vih = (VIDEOINFOHEADER*)mt.Format();
-			int w = vih->rcSource.right - vih->rcSource.left;
-			int h = vih->rcSource.bottom - vih->rcSource.top;
-			if ((w && h && (w > vih_rect.Width() || h > vih_rect.Height())) || (pmtInput.majortype == MEDIATYPE_DVD_ENCRYPTED_PACK)) {
-				vih->rcSource = vih->rcTarget = vih_rect;
-			}
+			vih->rcSource = vih->rcTarget = vih_rect;
 
 			bmi = &vih->bmiHeader;
 			bmi->biXPelsPerMeter = m_w * m_ary;
 			bmi->biYPelsPerMeter = m_h * m_arx;
 		} else if (mt.formattype == FORMAT_VideoInfo2) {
 			VIDEOINFOHEADER2* vih = (VIDEOINFOHEADER2*)mt.Format();
-			int w = vih->rcSource.right - vih->rcSource.left;
-			int h = vih->rcSource.bottom - vih->rcSource.top;
-			if ((w & h & (w > vih_rect.Width() || h > vih_rect.Height())) || (pmtInput.majortype == MEDIATYPE_DVD_ENCRYPTED_PACK)) {
-				vih->rcSource = vih->rcTarget = vih_rect;
-			}
+			vih->rcSource = vih->rcTarget = vih_rect;
 
 			bmi = &vih->bmiHeader;
 			vih->dwPictAspectRatioX = m_arx;

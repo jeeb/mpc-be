@@ -290,8 +290,6 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 	m_rate.Rate = 10000;
 	m_rate.StartTime = 0;
-
-	m_par.SetSize(1,1);
 }
 
 CMpeg2DecFilter::~CMpeg2DecFilter()
@@ -650,11 +648,9 @@ bool CMpeg2DecFilter::IsVideoInterlaced()
 
 void CMpeg2DecFilter::UpdateAspectRatio()
 {
-	if (m_bReadARFromStream && ((unsigned int)m_par.cx != m_dec->m_info.m_sequence->pixel_width || (unsigned int)m_par.cy != m_dec->m_info.m_sequence->pixel_height)) {
-		m_par.cx = m_dec->m_info.m_sequence->pixel_width;
-		m_par.cy = m_dec->m_info.m_sequence->pixel_height;
-		CSize dar(m_dec->m_info.m_sequence->picture_width * m_par.cx,
-				  m_dec->m_info.m_sequence->picture_height * m_par.cy);
+	if (m_bReadARFromStream && m_dec->m_info.m_sequence->pixel_width && m_dec->m_info.m_sequence->pixel_height) {
+		CSize dar(m_dec->m_info.m_sequence->picture_width * m_dec->m_info.m_sequence->pixel_width,
+				  m_dec->m_info.m_sequence->picture_height * m_dec->m_info.m_sequence->pixel_height);
 		int lnko = LNKO(dar.cx, dar.cy);
 		if (lnko > 1) {
 			dar.cx /= lnko, dar.cy /= lnko;

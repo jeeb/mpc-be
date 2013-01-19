@@ -21,27 +21,3 @@
  */
 
 #include "stdafx.h"
-
-//#define DXVA_LOGFILE_B
-
-#if defined(_DEBUG) && defined(DXVA_LOGFILE_B)
-
-#define LOG_FILE _T("dxva.log")
-
-void LOG(LPCTSTR fmt, ...)
-{
-	va_list args;
-	va_start(args, fmt);
-	if (TCHAR* buff = DNew TCHAR[_vsctprintf(fmt, args) + 1]) {
-		_vstprintf(buff, fmt, args);
-		if (FILE* f = _tfopen(LOG_FILE, _T("at"))) {
-			fseek(f, 0, 2);
-			_ftprintf_s(f, _T("%s\n"), buff);
-			fclose(f);
-		}
-		delete [] buff;
-	}
-	va_end(args);
-}
-
-#endif

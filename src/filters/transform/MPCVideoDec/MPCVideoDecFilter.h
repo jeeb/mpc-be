@@ -32,6 +32,7 @@
 #include "DXVADecoder.h"
 #include "H264RandomAccess.h"
 #include <atlpath.h>
+#include "../../../apps/mplayerc/FilterEnum.h"
 
 #define MPCVideoDecName L"MPC Video Decoder"
 
@@ -77,8 +78,8 @@ protected:
 	CCpuId*									m_pCpuId;
 	CCritSec								m_csProps;
 
-	bool*									FFmpegFilters;
-	bool*									DXVAFilters;
+	bool									m_FFmpegFilters[FFM_LAST + !FFM_LAST];
+	bool									m_DXVAFilters[TRA_DXVA_LAST + !TRA_DXVA_LAST];
 
 	// === Persistants parameters (registry)
 	int										m_nThreadNumber;
@@ -118,8 +119,6 @@ protected:
 	bool									m_bReorderBFrame;
 	B_FRAME									m_BFrames[2];
 	int										m_nPosB;
-	int										m_nWidth;				// Frame width give to input pin
-	int										m_nHeight;				// Frame height give to input pin
 	int										m_nOutputWidth;
 	int										m_nOutputHeight;
 
@@ -139,7 +138,6 @@ protected:
 
 	bool									m_bUseDXVA;
 	bool									m_bUseFFmpeg;
-	CSize 									m_sar;
 	SwsContext*								m_pSwsContext;
 	unsigned __int64						m_nOutCsp;
 	CSize									m_pOutSize;				// Picture size on output pin
@@ -281,8 +279,8 @@ public:
 	STDMETHOD_(int, GetFrameType());
 
 	// === IMPCVideoDecFilterCodec
-	STDMETHOD(SetFFMpegCodec(bool* bValue));
-	STDMETHOD(SetDXVACodec(bool* bValue));
+	STDMETHOD(SetFFMpegCodec(int nCodec, bool bEnabled));
+	STDMETHOD(SetDXVACodec(int nCodec, bool bEnabled));
 
 	// === DXVA common functions
 	BOOL						IsSupportedDecoderConfig(const D3DFORMAT nD3DFormat, const DXVA2_ConfigPictureDecode& config, bool& bIsPrefered);

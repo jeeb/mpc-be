@@ -36,9 +36,3 @@
 #include "memcpy_sse.h"
 
 #pragma warning(disable:4005)
-
-#if defined(_DEBUG) && defined(DXVA_LOGFILE_B)
-void LOG(LPCTSTR fmt, ...);
-#else
-inline void LOG(LPCTSTR fmt, ...) {}
-#endif
