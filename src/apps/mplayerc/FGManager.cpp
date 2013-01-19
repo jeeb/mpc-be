@@ -216,12 +216,6 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 		}
 	}
 
-	// exceptions first
-
-	if (ext == _T(".dvr-ms") || ext == _T(".wtv")) { // doh, this is stupid
-		fl.Insert(LookupFilterRegistry(CLSID_StreamBufferSource, m_override, MERIT64_PREFERRED), 0);
-	}
-
 	TCHAR buff[256], buff2[256];
 	ULONG len, len2;
 
