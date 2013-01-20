@@ -293,7 +293,7 @@ HRESULT CDXVADecoder::GetDeliveryBuffer(REFERENCE_TIME rtStart, REFERENCE_TIME r
 	if (m_nEngine == ENGINE_DXVA2) {
 		if (m_bNeedChangeAspect) {
 			m_pFilter->UpdateAspectRatio();
-			m_pFilter->ReconnectOutput(m_pFilter->PictWidthRounded(), m_pFilter->PictHeightRounded(), true, m_pFilter->PictWidth(), m_pFilter->PictHeight());
+			m_pFilter->ReconnectOutput(m_pFilter->PictWidth(), m_pFilter->PictHeight());
 		}
 	}
 	hr = m_pFilter->GetOutputPin()->GetDeliveryBuffer(&pNewSample, 0, 0, 0);

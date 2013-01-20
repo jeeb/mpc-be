@@ -941,19 +941,19 @@ void CMPCVideoDecFilter::GetOutputSize(int& w, int& h, int& arx, int& ary, int& 
 
 int CMPCVideoDecFilter::PictWidth()
 {
-	return m_pAVCtx->coded_width;
+	return m_pAVCtx->width;
 }
 
 int CMPCVideoDecFilter::PictHeight()
 {
-	return m_pAVCtx->coded_height;
+	return m_pAVCtx->height;
 }
 
 int CMPCVideoDecFilter::PictWidthRounded()
 {
 	// Picture height should be rounded to 16 for DXVA
-	if (!m_nOutputWidth || m_nOutputWidth < PictWidth()) {
-		m_nOutputWidth = PictWidth();
+	if (!m_nOutputWidth || m_nOutputWidth < m_pAVCtx->coded_width) {
+		m_nOutputWidth = m_pAVCtx->coded_width;
 	}
 	return ((m_nOutputWidth + 15) / 16) * 16;
 }
@@ -961,8 +961,8 @@ int CMPCVideoDecFilter::PictWidthRounded()
 int CMPCVideoDecFilter::PictHeightRounded()
 {
 	// Picture height should be rounded to 16 for DXVA
-	if (!m_nOutputHeight || m_nOutputHeight < PictHeight()) {
-		m_nOutputHeight = PictHeight();
+	if (!m_nOutputHeight || m_nOutputHeight < m_pAVCtx->coded_height) {
+		m_nOutputHeight = m_pAVCtx->coded_height;
 	}
 	return ((m_nOutputHeight + 15) / 16) * 16;
 }
@@ -1895,7 +1895,7 @@ void CMPCVideoDecFilter::InitSwscale()
 		if (ret >= 0) {
 			int nColorspace;
 			if (m_nSwColorspace == 2) {
-				nColorspace = PictWidthRounded() > 768 ? SWS_CS_ITU709 : SWS_CS_ITU601;	// GUI 'Auto'
+				nColorspace = PictWidth() > 768 ? SWS_CS_ITU709 : SWS_CS_ITU601;	// GUI 'Auto'
 			} else {
 				nColorspace = m_nSwColorspace == 1 ? SWS_CS_ITU709 : SWS_CS_ITU601;	// GUI 'HD(BT.709)' : 'SD(BT.601)'
 			}
@@ -2134,7 +2134,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 				// madVR accepts dynamic media type changes but does not support IPinConnection
 				if (S_OK == (hr = pRendererPin->QueryAccept(&cmtRenderer))) {
 					if (S_OK == (hr = m_pOutput->SetMediaType(&cmtRenderer))) {
-						ReconnectOutput(PictWidthRounded()-64, PictHeightRounded(), true, PictWidth(), PictHeight()); // Force by altering 'w'
+						ReconnectOutput(PictWidth(), PictHeight(), true, true); // Force Reconnect
 					}
 				}
 				return hr;
@@ -2143,7 +2143,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			if (SUCCEEDED(hr)) {
 				//VMR accepts dynamic media type changes.
 				if (S_OK == (hr = m_pOutput->SetMediaType(&cmtRenderer))) {
-					ReconnectOutput(PictWidthRounded()-64, PictHeightRounded(), true, PictWidth(), PictHeight());  // Force by altering 'w'
+					ReconnectOutput(PictWidth(), PictHeight(), true, true); // Force Reconnect
 				}
 			}	else {
 				//EVR does not accept dynamic media type changes so it needs the DISPLAY CHANGED hack
@@ -2306,7 +2306,7 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 
 			// Change aspect ratio for DXVA1
 			if ((m_nDXVAMode == MODE_DXVA1) &&
-					ReconnectOutput(PictWidthRounded(), PictHeightRounded(), true, PictWidth(), PictHeight()) == S_OK) {
+					ReconnectOutput(PictWidth(), PictHeight()) == S_OK) {
 				m_pDXVADecoder->ConfigureDXVA1();
 			}
 
@@ -2323,8 +2323,7 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 void CMPCVideoDecFilter::UpdateAspectRatio()
 {
 	if (((m_nARMode) && (m_pAVCtx)) && ((m_pAVCtx->sample_aspect_ratio.num>0) && (m_pAVCtx->sample_aspect_ratio.den>0))) {
-		CSize SAR(m_pAVCtx->sample_aspect_ratio.num, m_pAVCtx->sample_aspect_ratio.den);
-		CSize aspect(PictWidth() * SAR.cx, PictHeight() * SAR.cy);
+		CSize aspect(m_pAVCtx->sample_aspect_ratio.num * m_pAVCtx->width, m_pAVCtx->sample_aspect_ratio.den * m_pAVCtx->height);
 		int lnko = LNKO(aspect.cx, aspect.cy);
 		if (lnko > 1) {
 			aspect.cx /= lnko, aspect.cy /= lnko;
@@ -2373,7 +2372,7 @@ BOOL CMPCVideoDecFilter::IsSupportedDecoderConfig(const D3DFORMAT nD3DFormat, co
 	bRet = (nD3DFormat == MAKEFOURCC('N', 'V', '1', '2') || nD3DFormat == MAKEFOURCC('I', 'M', 'C', '3'));
 
 	bIsPrefered = (config.ConfigBitstreamRaw == ffCodecs[m_nCodecNb].DXVAModes->PreferedConfigBitstream);
-	TRACE (_T("IsSupportedDecoderConfig() : 0x%08x,  %d"), nD3DFormat, bRet);
+	TRACE (_T("IsSupportedDecoderConfig() : 0x%08x,  %d\n"), nD3DFormat, bRet);
 	return bRet;
 }
 
@@ -2392,12 +2391,12 @@ HRESULT CMPCVideoDecFilter::FindDXVA2DecoderConfiguration(IDirectXVideoDecoderSe
 
 	// Find the valid render target formats for this decoder GUID.
 	hr = pDecoderService->GetDecoderRenderTargets(guidDecoder, &cFormats, &pFormats);
-	TRACE (_T("FindDXVA2DecoderConfiguration() : GetDecoderRenderTargets => %d"), cFormats);
+	TRACE (_T("FindDXVA2DecoderConfiguration() : GetDecoderRenderTargets => %d\n"), cFormats);
 
 	if (SUCCEEDED(hr)) {
 		// Look for a format that matches our output format.
 		for (UINT iFormat = 0; iFormat < cFormats;  iFormat++) {
-			TRACE (_T("		: Try to negociate => 0x%08x"), pFormats[iFormat]);
+			TRACE (_T("		: Try to negociate => 0x%08x\n"), pFormats[iFormat]);
 
 			// Fill in the video description. Set the width, height, format, and frame rate.
 			FillInVideoDescription(&m_VideoDesc); // Private helper function.

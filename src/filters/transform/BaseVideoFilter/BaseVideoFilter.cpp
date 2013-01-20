@@ -161,7 +161,7 @@ HRESULT CBaseVideoFilter::GetDeliveryBuffer(int w, int h, IMediaSample** ppOut)
 	return S_OK;
 }
 
-HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, int realWidth, int realHeight)
+HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool bForce)
 {
 	CMediaType& mt = m_pOutput->CurrentMediaType();
 
@@ -186,21 +186,13 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, int re
 
 	HRESULT hr = S_OK;
 
-	if (m_update_aspect || fForceReconnection || m_w != m_wout || m_h != m_hout || m_arx != m_arxout || m_ary != m_aryout) {
+	if (bForce || m_update_aspect || fForceReconnection || m_w != m_wout || m_h != m_hout || m_arx != m_arxout || m_ary != m_aryout) {
 		if (GetCLSID(m_pOutput->GetConnected()) == CLSID_VideoRenderer) {
 			NotifyEvent(EC_ERRORABORT, 0, 0);
 			return E_FAIL;
 		}
 
-		CRect vih_rect(0, 0, 0, 0);
-		if (realWidth > 0 && realHeight > 0) {
-			if (realWidth == 1920 && realHeight == 1088) {
-			  realHeight = 1080;
-			}
-			vih_rect = CRect(0, 0, realWidth, realHeight);
-		} else {
-			vih_rect = CRect(0, 0, m_w, m_h);
-		}
+		CRect vih_rect(0, 0, m_w, m_h);
 
 		TRACE(_T("CBaseVideoFilter::ReconnectOutput() : SIZE %d:%d => %d:%d, AR %d:%d => %d:%d\n"), w_org, h_org, vih_rect.Width(), vih_rect.Height(), m_arxout, m_aryout, m_arx, m_ary);
 
