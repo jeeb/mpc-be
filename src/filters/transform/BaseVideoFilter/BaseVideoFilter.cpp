@@ -194,6 +194,9 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, int re
 
 		CRect vih_rect(0, 0, 0, 0);
 		if (realWidth > 0 && realHeight > 0) {
+			if (realWidth == 1920 && realHeight == 1088) {
+			  realHeight = 1080;
+			}
 			vih_rect = CRect(0, 0, realWidth, realHeight);
 		} else {
 			vih_rect = CRect(0, 0, m_w, m_h);
