@@ -16,25 +16,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVCODEC_VP3DSP_H
-#define AVCODEC_VP3DSP_H
+#ifndef AVCODEC_VORBISDSP_H
+#define AVCODEC_VORBISDSP_H
 
-#include <stdint.h>
-#include "dsputil.h"
+typedef struct VorbisDSPContext {
+    /* assume len is a multiple of 4, and arrays are 16-byte aligned */
+    void (*vorbis_inverse_coupling)(float *mag, float *ang, int blocksize);
+} VorbisDSPContext;
 
-typedef struct VP3DSPContext {
-    void (*idct_put)(uint8_t *dest, int line_size, DCTELEM *block);
-    void (*idct_add)(uint8_t *dest, int line_size, DCTELEM *block);
-    void (*idct_dc_add)(uint8_t *dest, int line_size, DCTELEM *block);
-    void (*v_loop_filter)(uint8_t *src, int stride, int *bounding_values);
-    void (*h_loop_filter)(uint8_t *src, int stride, int *bounding_values);
+void ff_vorbisdsp_init(VorbisDSPContext *dsp);
 
-    int idct_perm;
-} VP3DSPContext;
+/* for internal use only */
+void ff_vorbisdsp_init_x86(VorbisDSPContext *dsp);
+void ff_vorbisdsp_init_arm(VorbisDSPContext *dsp);
+void ff_vorbisdsp_init_ppc(VorbisDSPContext *dsp);
 
-void ff_vp3dsp_init(VP3DSPContext *c, int flags);
-void ff_vp3dsp_init_arm(VP3DSPContext *c, int flags);
-void ff_vp3dsp_init_ppc(VP3DSPContext *c, int flags);
-void ff_vp3dsp_init_x86(VP3DSPContext *c, int flags);
-
-#endif /* AVCODEC_VP3DSP_H */
+#endif /* AVCODEC_VORBISDSP_H */

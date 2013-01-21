@@ -16,25 +16,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVCODEC_VP3DSP_H
-#define AVCODEC_VP3DSP_H
+#include "config.h"
+#include "vorbisdsp.h"
+#include "vorbis.h"
 
-#include <stdint.h>
-#include "dsputil.h"
+void ff_vorbisdsp_init(VorbisDSPContext *dsp)
+{
+    dsp->vorbis_inverse_coupling = ff_vorbis_inverse_coupling;
 
-typedef struct VP3DSPContext {
-    void (*idct_put)(uint8_t *dest, int line_size, DCTELEM *block);
-    void (*idct_add)(uint8_t *dest, int line_size, DCTELEM *block);
-    void (*idct_dc_add)(uint8_t *dest, int line_size, DCTELEM *block);
-    void (*v_loop_filter)(uint8_t *src, int stride, int *bounding_values);
-    void (*h_loop_filter)(uint8_t *src, int stride, int *bounding_values);
-
-    int idct_perm;
-} VP3DSPContext;
-
-void ff_vp3dsp_init(VP3DSPContext *c, int flags);
-void ff_vp3dsp_init_arm(VP3DSPContext *c, int flags);
-void ff_vp3dsp_init_ppc(VP3DSPContext *c, int flags);
-void ff_vp3dsp_init_x86(VP3DSPContext *c, int flags);
-
-#endif /* AVCODEC_VP3DSP_H */
+    if (ARCH_X86)
+        ff_vorbisdsp_init_x86(dsp);
+    if (ARCH_PPC)
+        ff_vorbisdsp_init_ppc(dsp);
+    if (ARCH_ARM)
+        ff_vorbisdsp_init_arm(dsp);
+}

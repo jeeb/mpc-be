@@ -36,7 +36,6 @@
 #include "mathops.h"
 #include "mpegvideo.h"
 #include "config.h"
-#include "vorbis.h"
 #include "diracdsp.h"
 
 uint8_t ff_cropTbl[256 + 2 * MAX_NEG_CROP] = {0, };
@@ -2998,9 +2997,6 @@ av_cold void ff_dsputil_init(DSPContext* c, AVCodecContext *avctx)
     c->try_8x8basis= try_8x8basis_c;
     c->add_8x8basis= add_8x8basis_c;
 
-#if CONFIG_VORBIS_DECODER
-    c->vorbis_inverse_coupling = ff_vorbis_inverse_coupling;
-#endif
     c->vector_fmul_reverse = vector_fmul_reverse_c;
     c->vector_fmul_add = vector_fmul_add_c;
     c->vector_clipf = vector_clipf_c;
@@ -3057,8 +3053,7 @@ av_cold void ff_dsputil_init(DSPContext* c, AVCodecContext *avctx)
     c->clear_blocks                  = FUNCC(clear_blocks ## dct   , depth);\
     c->add_pixels8                   = FUNCC(add_pixels8  ## dct   , depth);\
     c->add_pixels4                   = FUNCC(add_pixels4  ## dct   , depth);\
-    c->put_no_rnd_pixels_l2[0]       = FUNCC(put_no_rnd_pixels16_l2, depth);\
-    c->put_no_rnd_pixels_l2[1]       = FUNCC(put_no_rnd_pixels8_l2 , depth);\
+    c->put_no_rnd_pixels_l2          = FUNCC(put_no_rnd_pixels8_l2 , depth);\
 \
     c->put_h264_chroma_pixels_tab[0] = FUNCC(put_h264_chroma_mc8   , depth);\
     c->put_h264_chroma_pixels_tab[1] = FUNCC(put_h264_chroma_mc4   , depth);\
