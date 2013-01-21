@@ -13293,21 +13293,21 @@ void CMainFrame::OpenSetupAudioStream()
 	}
 }
 
-void CMainFrame::SubFlags(CString strname, bool &forced, bool &def)
+void CMainFrame::SubFlags(CString strname, bool* forced, bool* def)
 {
 	strname.Remove(' ');
 	if (strname.Right(16).MakeLower() == _T("[default,forced]")) {
-		def		= 1;
-		forced	= 1;
+		*def		= true;
+		*forced	= true;
 	} else if (strname.Right(9).MakeLower() == _T("[default]")) {
-		def		= 1;
-		forced	= 0;
+		*def		= true;
+		*forced	= false;
 	} else if (strname.Right(8).MakeLower() == _T("[forced]")) {
-		def		= 0;
-		forced	= 1;
+		*def		= false;
+		*forced	= true;
 	} else {
-		def		= 0;
-		forced	= 0;
+		*def		= false;
+		*forced	= false;
 	}
 }
 
@@ -13394,7 +13394,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 						substream.iIndex	= i;
 
 						bool Forced, Def;
-						SubFlags(lang, Forced, Def);
+						SubFlags(lang, &Forced, &Def);
 
 						substream.lang		= CString(pName);
 						substream.forced	= Forced;
@@ -13442,7 +13442,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 					substream.iIndex	= tPos;
 
 					bool Forced, Def;
-					SubFlags(lang, Forced, Def);
+					SubFlags(lang, &Forced, &Def);
 
 					substream.lang		= CString(pName);
 					substream.forced	= Forced;
@@ -13496,7 +13496,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 					substream.iIndex	= tPos+ (extcnt<0?0:extcnt+1);
 
 					bool Forced, Def;
-					SubFlags(name, Forced, Def);
+					SubFlags(name, &Forced, &Def);
 
 					substream.lang		= name;
 					substream.forced	= 0;
