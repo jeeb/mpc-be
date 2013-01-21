@@ -337,16 +337,12 @@ void CPPageFileInfoDetails::OnSize(UINT nType, int cx, int cy)
 	int dy = cy - m_rCrt.Height();
 	GetClientRect(&m_rCrt);
 
-	CRect r(0, 0, 0, 0);
-	if (m_encoding.m_hWnd) {
-		m_encoding.GetWindowRect(&r);
-	}
+	CRect r;
+	GetDlgItem(IDC_EDIT7)->GetWindowRect(&r);
 	r.right += dx;
 	r.bottom += dy;
 
-	if (m_encoding.m_hWnd) {
-		m_encoding.SetWindowPos(NULL,0, 0, r.Width(), r.Height(),SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
-	}
+	GetDlgItem(IDC_EDIT7)->SetWindowPos(NULL,0, 0, r.Width(), r.Height(),SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
 
 	HDWP hDWP = ::BeginDeferWindowPos(1);
 	for (CWnd *pChild = GetWindow(GW_CHILD); pChild != NULL; pChild = pChild->GetWindow(GW_HWNDNEXT)) {
