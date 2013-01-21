@@ -13120,7 +13120,7 @@ void CMainFrame::OpenSetupAudioStream()
 							if (pInfo) {
 								TrackElement TrackInfo;
 								TrackInfo.Size = sizeof(TrackInfo);
-								if (pInfo->GetTrackInfo((UINT)i, &TrackInfo) && TrackInfo.Type == TrackType::TypeAudio) {
+								if (pInfo->GetTrackInfo((UINT)i, &TrackInfo) && TrackInfo.Type == TypeAudio) {
 									as.def		= !!TrackInfo.FlagDefault;
 									as.forced	= !!TrackInfo.FlagForced;
 								}
@@ -13156,7 +13156,7 @@ void CMainFrame::OpenSetupAudioStream()
 					for (UINT i = 0; i < pInfo->GetTrackCount(); i++) {
 						TrackElement TrackInfo;
 						TrackInfo.Size = sizeof(TrackInfo);
-						if (pInfo->GetTrackInfo(i, &TrackInfo) && TrackInfo.Type == TrackType::TypeAudio) {
+						if (pInfo->GetTrackInfo(i, &TrackInfo) && TrackInfo.Type == TypeAudio) {
 							maxAudioTrack = max(maxAudioTrack, i);
 						}											
 					}
@@ -13182,7 +13182,7 @@ void CMainFrame::OpenSetupAudioStream()
 						if (pInfo && l <= maxAudioTrack) {
 							TrackElement TrackInfo;
 							TrackInfo.Size = sizeof(TrackInfo);
-							if (pInfo->GetTrackInfo(l, &TrackInfo) && TrackInfo.Type == TrackType::TypeAudio) {
+							if (pInfo->GetTrackInfo(l, &TrackInfo) && TrackInfo.Type == TypeAudio) {
 								as.def		= !!TrackInfo.FlagDefault;
 								as.forced	= !!TrackInfo.FlagForced;
 							}											
