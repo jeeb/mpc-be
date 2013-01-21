@@ -169,10 +169,12 @@ void CPPageFileMediaInfo::OnSize(UINT nType, int cx, int cy)
 	int dy = cy - m_rCrt.Height();
 	GetClientRect(&m_rCrt);
 
-	CRect r;
-	GetDlgItem(IDC_MIEDIT)->GetWindowRect(&r);
-	r.right += dx;
-	r.bottom += dy;
+	if (::IsWindow(m_mediainfo.GetSafeHwnd())) {
+		CRect r;
+		m_mediainfo.GetWindowRect(&r);
+		r.right += dx;
+		r.bottom += dy;
 
-	GetDlgItem(IDC_MIEDIT)->SetWindowPos(NULL, 0, 0, r.Width(), r.Height(), SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
+		m_mediainfo.SetWindowPos(NULL, 0, 0, r.Width(), r.Height(), SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
+	}
 }

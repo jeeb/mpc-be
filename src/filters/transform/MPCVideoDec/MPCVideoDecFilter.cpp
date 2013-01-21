@@ -2302,8 +2302,8 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 			UpdateAspectRatio();
 
 			// Change aspect ratio for DXVA1
-			if ((m_nDXVAMode == MODE_DXVA1) &&
-					ReconnectOutput(PictWidth(), PictHeight()) == S_OK) {
+			// stupid DXVA1 - size for the output MediaType should be the same that size of DXVA surface
+			if (m_nDXVAMode == MODE_DXVA1 && ReconnectOutput(PictWidthRounded(), PictHeightRounded(), true, false, PictWidth(), PictHeight()) == S_OK) {
 				m_pDXVADecoder->ConfigureDXVA1();
 			}
 

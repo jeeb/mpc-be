@@ -161,7 +161,7 @@ HRESULT CBaseVideoFilter::GetDeliveryBuffer(int w, int h, IMediaSample** ppOut)
 	return S_OK;
 }
 
-HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool bForce)
+HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool bForce, int RealWidth, int RealHeight)
 {
 	CMediaType& mt = m_pOutput->CurrentMediaType();
 
@@ -192,7 +192,7 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 			return E_FAIL;
 		}
 
-		CRect vih_rect(0, 0, m_w, m_h);
+		CRect vih_rect(0, 0, RealWidth > 0 ? RealWidth : m_w, RealHeight > 0 ? RealHeight : m_h);
 
 		TRACE(_T("CBaseVideoFilter::ReconnectOutput() : SIZE %d:%d => %d:%d, AR %d:%d => %d:%d\n"), w_org, h_org, vih_rect.Width(), vih_rect.Height(), m_arxout, m_aryout, m_arx, m_ary);
 
