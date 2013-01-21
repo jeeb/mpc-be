@@ -503,12 +503,11 @@ HRESULT CShoutcastStream::FillBuffer(IMediaSample* pSample)
 		CAutoLock cAutoLock(&m_queue);
 		ASSERT(!m_queue.IsEmpty());
 		if (!m_queue.IsEmpty()) {
-			CAutoPtr<ShoutCastPacket> p = m_queue.RemoveHead();
+			CAutoPtr<Packet> p = m_queue.RemoveHead();
 			DWORD len = min((DWORD)pSample->GetSize(), p->GetCount());
 			memcpy(pData, p->GetData(), len);
 			pSample->SetActualDataLength(len);
 			pSample->SetTime(&p->rtStart, &p->rtStop);
-			m_title = p->title;
 		}
 	}
 
@@ -586,7 +585,7 @@ UINT CShoutcastStream::SocketThreadProc()
 {
 	fExitThread = false;
 
-	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
+	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
 
 	AfxSocketInit();
 
@@ -598,7 +597,8 @@ UINT CShoutcastStream::SocketThreadProc()
 		return 1;
 	}
 
-	m_Description = m_socket.m_Description;
+	m_title			= m_socket.m_title;
+	m_Description	= m_socket.m_Description;
 
 	REFERENCE_TIME m_rtSampleTime = 0;
 
@@ -618,13 +618,14 @@ UINT CShoutcastStream::SocketThreadProc()
 			break;
 		}
 
+		m_title = !m_socket.m_title.IsEmpty() ? m_socket.m_title : m_socket.m_url;
+
 		if (m_socket.m_Format == AUDIO_MPEG) {
-			CAutoPtr<ShoutCastPacket> p(DNew ShoutCastPacket());
+			CAutoPtr<Packet> p(DNew Packet());
 
 			p->SetData(pData, len);
 			p->rtStop = (p->rtStart = m_rtSampleTime) + (10000000i64 * len * 8/m_socket.m_bitrate);
 			m_rtSampleTime = p->rtStop;
-			p->title = !m_socket.m_title.IsEmpty() ? m_socket.m_title : m_socket.m_url;
 
 			CAutoLock cAutoLock(&m_queue);
 			m_queue.AddTail(p);
@@ -680,11 +681,10 @@ UINT CShoutcastStream::SocketThreadProc()
 				}
 
 				{
-					CAutoPtr<ShoutCastPacket> p2(DNew ShoutCastPacket());
+					CAutoPtr<Packet> p2(DNew Packet());
 					p2->SetData(s, len);
 					p2->rtStop = (p2->rtStart = m_rtSampleTime) + (10000000i64 * len * 8/m_socket.m_bitrate);
 					m_rtSampleTime = p2->rtStop;
-					p2->title = !m_socket.m_title.IsEmpty() ? m_socket.m_title : m_socket.m_url;
 
 					CAutoLock cAutoLock(&m_queue);
 					m_queue.AddTail(p2);

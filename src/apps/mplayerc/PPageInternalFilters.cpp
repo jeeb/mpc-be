@@ -118,7 +118,7 @@ static filter_t s_filters[] = {
 	{_T("VP8"),                   FFMPEG_DECODER, VIDEO,  FFM_VP8,        IDS_TRA_FFMPEG},
 	{_T("WMV1/2/3"),              FFMPEG_DECODER, VIDEO,  FFM_WMV,        IDS_TRA_FFMPEG},
 	{_T("Xvid/MPEG-4"),           FFMPEG_DECODER, VIDEO,  FFM_XVID,       IDS_TRA_FFMPEG},
-	{_T("RealVideo"),             DECODER,        VIDEO,  TRA_RV,         IDS_TRA_RV},
+	{_T("RealVideo"),             FFMPEG_DECODER, VIDEO,  FFM_RV,         IDS_TRA_RV},
 
 	// End
 	{NULL, 0, 0, 0, NULL}

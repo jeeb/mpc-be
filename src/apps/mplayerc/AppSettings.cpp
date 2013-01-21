@@ -66,7 +66,6 @@ CAppSettings::CAppSettings()
 	// Internal decoders
 	TraFiltersKeys[TRA_MPEG1] = _T("TRA_MPEG1");
 	TraFiltersKeys[TRA_MPEG2] = _T("TRA_MPEG2");
-	TraFiltersKeys[TRA_RV] = _T("TRA_RV");
 	TraFiltersKeys[TRA_RA] = _T("TRA_RA");
 	TraFiltersKeys[TRA_DTS] = _T("TRA_DTS");
 	TraFiltersKeys[TRA_LPCM] = _T("TRA_LPCM");
@@ -127,6 +126,7 @@ CAppSettings::CAppSettings()
 	FFMFiltersKeys[FFM_WMAVOICE] = _T("FFM_WMAVOICE");
 	FFMFiltersKeys[FFM_CLLC] = _T("FFM_CLLC");
 	FFMFiltersKeys[FFM_SPEEX] = _T("FFM_SPEEX");
+	FFMFiltersKeys[FFM_RV] = _T("FFM_RV");
 }
 
 void CAppSettings::CreateCommands()

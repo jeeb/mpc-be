@@ -165,6 +165,10 @@ void CPPageFileMediaInfo::OnShowWindow(BOOL bShow, UINT nStatus)
 
 void CPPageFileMediaInfo::OnSize(UINT nType, int cx, int cy) 
 {
+	if (!m_mediainfo.m_hWnd) {
+		return;
+	}
+
 	CRect r; 
 
 	int dx = cx - m_rCrt.Width();

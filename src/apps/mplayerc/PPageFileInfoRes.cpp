@@ -141,6 +141,10 @@ void CPPageFileInfoRes::OnUpdateSaveAs(CCmdUI* pCmdUI)
 
 void CPPageFileInfoRes::OnSize(UINT nType, int cx, int cy) 
 {
+	if (!m_list.m_hWnd) {
+		return;
+	}
+
 	int dx = cx - m_rCrt.Width();
 	int dy = cy - m_rCrt.Height();
 	GetClientRect(&m_rCrt);

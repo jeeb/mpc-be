@@ -70,6 +70,10 @@ public:
 	CAtlList<CString> m_protocols, m_extensions, m_chkbytes; // TODO: subtype?
 
 	virtual HRESULT Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_IUnknown>& pUnks) = 0;
+
+	virtual CString GetType() {
+		return _T("CFGFilter");
+	}
 };
 
 class CFGFilterRegistry : public CFGFilter
@@ -93,6 +97,10 @@ public:
 	}
 
 	HRESULT Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_IUnknown>& pUnks);
+
+	virtual CString GetType() {
+		return _T("CFGFilterRegistry");
+	}
 private:
 	void QueryProperties();
 };
@@ -116,6 +124,10 @@ public:
 
 		return hr;
 	}
+
+	virtual CString GetType() {
+		return _T("CFGFilterInternal");
+	}
 };
 
 class CFGFilterFile : public CFGFilter
@@ -128,6 +140,10 @@ public:
 	CFGFilterFile(const CLSID& clsid, CString path, CStringW name = L"", UINT64 merit = MERIT64_DO_USE);
 
 	HRESULT Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_IUnknown>& pUnks);
+
+	virtual CString GetType() {
+		return _T("CFGFilterFile");
+	}
 };
 
 class CFGFilterVideoRenderer : public CFGFilter
@@ -139,6 +155,10 @@ public:
 	CFGFilterVideoRenderer(HWND hWnd, const CLSID& clsid, CStringW name = L"", UINT64 merit = MERIT64_DO_USE);
 
 	HRESULT Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_IUnknown>& pUnks);
+
+	virtual CString GetType() {
+		return _T("CFGFilterVideoRenderer");
+	}
 };
 
 class CFGFilterList

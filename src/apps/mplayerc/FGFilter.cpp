@@ -537,9 +537,19 @@ void CFGFilterList::Insert(CFGFilter* pFGF, int group, bool exactmatch, bool aut
 		filter_t f = m_filters.GetNext(pos);
 		CFGFilter* pFGF2 = f.pFGF;
 		if (pFGF2->GetCLSID() == pFGF->GetCLSID() && ((pFGF2->GetMerit() >= pFGF->GetMerit()) || (f.group < group))) {
-			TRACE(_T("FGM: Inserting %d %d %016I64x '%s' DUP!\n"),
+			if (pFGF->GetType() != pFGF2->GetType()) {
+				continue;
+			}
+			if (!pFGF->GetName().IsEmpty() && !pFGF2->GetName().IsEmpty()) {
+				if (pFGF2->GetName() != pFGF->GetName()) {
+					continue;
+				}
+			}
+
+			TRACE(_T("FGM: Inserting %d %d %016I64x '%s', type = '%s' DUP!\n"),
 				  group, exactmatch, pFGF->GetMerit(),
-				  pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName()));
+				  pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName()),
+				  pFGF->GetType());
 
 			if (autodelete) {
 				delete pFGF;
@@ -548,9 +558,10 @@ void CFGFilterList::Insert(CFGFilter* pFGF, int group, bool exactmatch, bool aut
 		}
 	}
 
-	TRACE(_T("FGM: Inserting %d %d %016I64x '%s'\n"),
+	TRACE(_T("FGM: Inserting %d %d %016I64x '%s', type = '%s'\n"),
 		  group, exactmatch, pFGF->GetMerit(),
-		  pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName()));
+		  pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName()),
+		  pFGF->GetType());
 
 	filter_t f = {m_filters.GetCount(), pFGF, group, exactmatch, autodelete};
 	m_filters.AddTail(f);
@@ -580,7 +591,7 @@ POSITION CFGFilterList::GetHeadPosition()
 	POSITION pos = m_sortedfilters.GetHeadPosition();
 	while (pos) {
 		CFGFilter* pFGF = m_sortedfilters.GetNext(pos);
-		TRACE(_T("FGM: - %016I64x '%s'\n"), pFGF->GetMerit(), pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName()));
+		TRACE(_T("FGM: - %016I64x '%s', type = '%s'\n"), pFGF->GetMerit(), pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName()), pFGF->GetType());
 	}
 #endif
 

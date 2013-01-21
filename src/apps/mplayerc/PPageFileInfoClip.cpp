@@ -205,6 +205,10 @@ LRESULT CPPageFileInfoClip::OnSetPageFocus(WPARAM wParam, LPARAM lParam)
 
 void CPPageFileInfoClip::OnSize(UINT nType, int cx, int cy) 
 {
+	if (!m_desc.m_hWnd) {
+		return;
+	}
+
 	int dx = cx - m_rCrt.Width();
 	int dy = cy - m_rCrt.Height();
 	GetClientRect(&m_rCrt);

@@ -333,6 +333,10 @@ void CPPageFileInfoDetails::InitEncoding()
 
 void CPPageFileInfoDetails::OnSize(UINT nType, int cx, int cy) 
 {
+	if (!m_encoding.m_hWnd) {
+		return;
+	}
+
 	int dx = cx - m_rCrt.Width();
 	int dy = cy - m_rCrt.Height();
 	GetClientRect(&m_rCrt);

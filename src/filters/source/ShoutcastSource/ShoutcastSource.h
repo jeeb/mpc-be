@@ -154,13 +154,7 @@ public:
 
 class CShoutcastStream : public CSourceStream
 {
-	class ShoutCastPacket : public Packet
-	{
-	public:
-		CString title;
-	};
-
-	class ShoutCastqueue : public CAutoPtrList<ShoutCastPacket>, public CCritSec {} m_queue;
+	class ShoutCastqueue : public CAutoPtrList<Packet>, public CCritSec {} m_queue;
 
 	class CShoutcastSocket : public CMPCSocket
 	{
