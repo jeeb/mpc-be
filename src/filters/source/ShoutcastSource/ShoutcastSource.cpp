@@ -326,6 +326,7 @@ STDMETHODIMP CShoutcastSource::QueryFilterInfo(FILTER_INFO* pInfo)
 CShoutcastStream::CShoutcastStream(const WCHAR* wfn, CShoutcastSource* pParent, HRESULT* phr)
 	: CSourceStream(NAME("ShoutcastStream"), phr, pParent, L"Output")
 	, m_fBuffering(false)
+	, m_hSocket(-1)
 {
 	ASSERT(phr);
 
@@ -392,11 +393,12 @@ redirect:
 
 	m_socket.KillTimeOut();
 
-	m_socket.Close();
+	m_hSocket = m_socket.Detach();
 }
 
 CShoutcastStream::~CShoutcastStream()
 {
+	m_socket.Attach(m_hSocket);
 	m_socket.Close();
 }
 
@@ -589,16 +591,18 @@ UINT CShoutcastStream::SocketThreadProc()
 
 	AfxSocketInit();
 
-	CString empty;
+	CShoutcastSocket soc;
+
 	CAutoVectorPtr<BYTE> pData;
-	if (!m_socket.Create() || !m_socket.Connect(m_url, empty)
-			|| !pData.Allocate(max(m_socket.m_metaint, MAXFRAMESIZE))) {
-		m_socket.Close();
+	if (!pData.Allocate(max(m_socket.m_metaint, MAXFRAMESIZE)) || !soc.Create()) {
 		return 1;
 	}
 
-	m_title			= m_socket.m_title;
-	m_Description	= m_socket.m_Description;
+	soc.Attach(m_hSocket);
+	soc = m_socket;
+
+	m_title			= soc.m_title;
+	m_Description	= soc.m_Description;
 
 	REFERENCE_TIME m_rtSampleTime = 0;
 
@@ -613,18 +617,18 @@ UINT CShoutcastStream::SocketThreadProc()
 			}
 		}
 
-		int len = m_socket.Receive(pData, MAXFRAMESIZE);
+		int len = soc.Receive(pData, MAXFRAMESIZE);
 		if (len <= 0) {
 			break;
 		}
 
-		m_title = !m_socket.m_title.IsEmpty() ? m_socket.m_title : m_socket.m_url;
+		m_title = !soc.m_title.IsEmpty() ? soc.m_title : soc.m_url;
 
 		if (m_socket.m_Format == AUDIO_MPEG) {
 			CAutoPtr<Packet> p(DNew Packet());
 
 			p->SetData(pData, len);
-			p->rtStop = (p->rtStart = m_rtSampleTime) + (10000000i64 * len * 8/m_socket.m_bitrate);
+			p->rtStop = (p->rtStart = m_rtSampleTime) + (10000000i64 * len * 8/soc.m_bitrate);
 			m_rtSampleTime = p->rtStop;
 
 			CAutoLock cAutoLock(&m_queue);
@@ -683,7 +687,7 @@ UINT CShoutcastStream::SocketThreadProc()
 				{
 					CAutoPtr<Packet> p2(DNew Packet());
 					p2->SetData(s, len);
-					p2->rtStop = (p2->rtStart = m_rtSampleTime) + (10000000i64 * len * 8/m_socket.m_bitrate);
+					p2->rtStop = (p2->rtStart = m_rtSampleTime) + (10000000i64 * len * 8/soc.m_bitrate);
 					m_rtSampleTime = p2->rtStop;
 
 					CAutoLock cAutoLock(&m_queue);
@@ -699,7 +703,7 @@ UINT CShoutcastStream::SocketThreadProc()
 
 	m_p.Free();
 
-	m_socket.Close();
+	m_hSocket = soc.Detach();
 
 	return 0;
 }
@@ -710,6 +714,7 @@ HRESULT CShoutcastStream::OnThreadCreate()
 
 	fExitThread = true;
 	m_hSocketThread = AfxBeginThread(::SocketThreadProc, this)->m_hThread;
+
 	while (fExitThread) {
 		Sleep(10);
 	}

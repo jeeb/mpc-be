@@ -166,7 +166,9 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 				fEmpty = false;
 			}
 			if (SUCCEEDED(pAMMC->get_Description(&bstr)) && wcslen(bstr.m_str) > 0) {
-				m_desc.SetWindowText(CString(bstr.m_str));
+				CString desc(bstr.m_str);
+				desc.Replace(_T(";"), _T("\r\n"));
+				m_desc.SetWindowText(desc);
 				fEmpty = false;
 			}
 			if (!fEmpty) {
@@ -205,22 +207,23 @@ LRESULT CPPageFileInfoClip::OnSetPageFocus(WPARAM wParam, LPARAM lParam)
 
 void CPPageFileInfoClip::OnSize(UINT nType, int cx, int cy) 
 {
-	if (!m_desc.m_hWnd) {
-		return;
-	}
-
 	int dx = cx - m_rCrt.Width();
 	int dy = cy - m_rCrt.Height();
 	GetClientRect(&m_rCrt);
 
-	CRect r;
+	CRect r(0, 0, 0, 0);
+	if (m_desc.m_hWnd) {
+		m_desc.GetWindowRect(&r);
+	}
 
-	m_desc.GetWindowRect(&r);
 	r.right += dx;
 	r.bottom += dy;
 
+	if (m_desc.m_hWnd) {
+		m_desc.SetWindowPos(NULL, 0, 0, r.Width(), r.Height(),SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
+	}
+
 	HDWP hDWP = ::BeginDeferWindowPos(1);
-	m_desc.SetWindowPos(NULL,0, 0, r.Width(), r.Height(),SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
 	for (CWnd *pChild = GetWindow(GW_CHILD); pChild != NULL; pChild = pChild->GetWindow(GW_HWNDNEXT)) {
 		if (pChild != GetDlgItem(IDC_EDIT7) && pChild != GetDlgItem(IDC_DEFAULTICON)) {
 			pChild->GetWindowRect(&r); 

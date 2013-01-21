@@ -163,6 +163,7 @@ class CShoutcastStream : public CSourceStream
 	public:
 		CShoutcastSocket() {
 			m_metaint = m_bitrate = m_freq = m_channels = 0;
+			m_nBytesRead = 0;
 			m_Format = AUDIO_NONE;
 		}
 		int Receive(void* lpBuf, int nBufLen, int nFlags = 0);
@@ -173,9 +174,27 @@ class CShoutcastStream : public CSourceStream
 		CString m_title, m_url, m_Description;
 		bool Connect(CUrl& url, CString& redirectUrl);
 		bool FindSync();
+
+		CShoutcastSocket& operator = (const CShoutcastSocket& soc) {
+			m_metaint		= soc.m_metaint;
+			m_bitrate		= soc.m_bitrate;
+			m_freq			= soc.m_freq;
+			m_channels		= soc.m_channels;
+			m_nBytesRead	= soc.m_nBytesRead;
+			m_Format		= soc.m_Format;
+			m_aachdr		= soc.m_aachdr;
+
+			m_title			= soc.m_title;
+			m_url			= soc.m_url;
+			m_Description	= soc.m_Description;
+
+			return *this;
+		}
+
 	} m_socket;
 
 	HANDLE m_hSocketThread;
+	SOCKET m_hSocket;
 
 	CUrl m_url;
 

@@ -149,14 +149,18 @@ void CPPageFileInfoRes::OnSize(UINT nType, int cx, int cy)
 	int dy = cy - m_rCrt.Height();
 	GetClientRect(&m_rCrt);
 
-	CRect r;
-
-	m_list.GetWindowRect(&r);
+	CRect r(0, 0, 0, 0);
+	if (m_list.m_hWnd) {
+		m_list.GetWindowRect(&r);
+	}
 	r.right += dx;
 	r.bottom += dy;
 
+	if (m_list.m_hWnd) {
+		m_list.SetWindowPos(NULL,0, 0, r.Width(), r.Height(),SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
+	}
+
 	HDWP hDWP = ::BeginDeferWindowPos(1);
-	m_list.SetWindowPos(NULL,0, 0, r.Width(), r.Height(),SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
 	for (CWnd *pChild = GetWindow(GW_CHILD); pChild != NULL; pChild = pChild->GetWindow(GW_HWNDNEXT)) {
 		if (pChild->SendMessage(WM_GETDLGCODE) & DLGC_BUTTON) {
 			pChild->GetWindowRect(&r); 
