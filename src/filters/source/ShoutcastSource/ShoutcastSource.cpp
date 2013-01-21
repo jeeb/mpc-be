@@ -505,11 +505,12 @@ HRESULT CShoutcastStream::FillBuffer(IMediaSample* pSample)
 		CAutoLock cAutoLock(&m_queue);
 		ASSERT(!m_queue.IsEmpty());
 		if (!m_queue.IsEmpty()) {
-			CAutoPtr<Packet> p = m_queue.RemoveHead();
+			CAutoPtr<ShoutCastPacket> p = m_queue.RemoveHead();
 			DWORD len = min((DWORD)pSample->GetSize(), p->GetCount());
 			memcpy(pData, p->GetData(), len);
 			pSample->SetActualDataLength(len);
 			pSample->SetTime(&p->rtStart, &p->rtStop);
+			m_title = p->title;
 		}
 	}
 
@@ -622,13 +623,12 @@ UINT CShoutcastStream::SocketThreadProc()
 			break;
 		}
 
-		m_title = !soc.m_title.IsEmpty() ? soc.m_title : soc.m_url;
-
 		if (m_socket.m_Format == AUDIO_MPEG) {
-			CAutoPtr<Packet> p(DNew Packet());
+			CAutoPtr<ShoutCastPacket> p(DNew ShoutCastPacket());
 
 			p->SetData(pData, len);
 			p->rtStop = (p->rtStart = m_rtSampleTime) + (10000000i64 * len * 8/soc.m_bitrate);
+			p->title = !soc.m_title.IsEmpty() ? soc.m_title : soc.m_url;
 			m_rtSampleTime = p->rtStop;
 
 			CAutoLock cAutoLock(&m_queue);
@@ -685,9 +685,10 @@ UINT CShoutcastStream::SocketThreadProc()
 				}
 
 				{
-					CAutoPtr<Packet> p2(DNew Packet());
+					CAutoPtr<ShoutCastPacket> p2(DNew ShoutCastPacket());
 					p2->SetData(s, len);
 					p2->rtStop = (p2->rtStart = m_rtSampleTime) + (10000000i64 * len * 8/soc.m_bitrate);
+					p2->title = !soc.m_title.IsEmpty() ? soc.m_title : soc.m_url;
 					m_rtSampleTime = p2->rtStop;
 
 					CAutoLock cAutoLock(&m_queue);
