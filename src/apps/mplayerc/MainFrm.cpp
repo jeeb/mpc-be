@@ -690,7 +690,8 @@ CMainFrame::CMainFrame() :
 	bDVDMenuClicked(false),
 	m_bfirstPlay(false),
 	m_nLastRunTicket(0),
-	b_UseVSFilter(false)
+	b_UseVSFilter(false),
+	IsMadVRExclusiveMode(false)
 {
 	m_Lcd.SetVolumeRange(0, 100);
 	m_LastSaveTime.QuadPart = 0;
@@ -1442,9 +1443,7 @@ bool CMainFrame::FlyBarSetPos()
 			}
 			return 0;
 		}
-	}
 
-	if (pBF) {
 		CComQIPtr<IMadVRExclusiveModeInfo> pMVEMI = pBF;
 		if (pMVEMI) {
 			if (pMVEMI->IsExclusiveModeActive()) {
