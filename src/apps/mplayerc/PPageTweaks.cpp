@@ -59,7 +59,7 @@ void CPPageTweaks::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK7, m_fDontUseSearchInFolder);
 	DDX_Check(pDX, IDC_CHECK1, m_fFastSeek);
 	DDX_Check(pDX, IDC_CHECK_LCD, m_fLCDSupport);
-	DDX_Check(pDX, IDC_CHECK1, m_fMiniDump);
+	DDX_Check(pDX, IDC_CHECK2, m_fMiniDump);
 }
 
 BOOL CPPageTweaks::OnInitDialog()
