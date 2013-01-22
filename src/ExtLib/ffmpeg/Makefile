@@ -319,6 +319,7 @@ SRCS_C = \
     libavcodec/wmavoice.c \
     libavcodec/wmv2.c \
     libavcodec/wmv2dec.c \
+    libavcodec/wmv2dsp.c \
     libavcodec/xiph.c \
     libavcodec/x86/ac3dsp_init.c \
     libavcodec/x86/dirac_dwt.c \

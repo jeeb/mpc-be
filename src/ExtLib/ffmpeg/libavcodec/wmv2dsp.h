@@ -16,22 +16,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVCODEC_VORBISDSP_H
-#define AVCODEC_VORBISDSP_H
+#ifndef AVCODEC_WMV2DSP_H
+#define AVCODEC_WMV2DSP_H
 
 #include <stdint.h>
+#include "dsputil.h"
 
-typedef struct VorbisDSPContext {
-    /* assume len is a multiple of 4, and arrays are 16-byte aligned */
-    void (*vorbis_inverse_coupling)(float *mag, float *ang,
-                                    intptr_t blocksize);
-} VorbisDSPContext;
+typedef struct WMV2DSPContext {
+    void (*idct_add)(uint8_t *dest, int line_size, DCTELEM *block);
+    void (*idct_put)(uint8_t *dest, int line_size, DCTELEM *block);
 
-void ff_vorbisdsp_init(VorbisDSPContext *dsp);
+    int idct_perm;
+} WMV2DSPContext;
 
-/* for internal use only */
-void ff_vorbisdsp_init_x86(VorbisDSPContext *dsp);
-void ff_vorbisdsp_init_arm(VorbisDSPContext *dsp);
-void ff_vorbisdsp_init_ppc(VorbisDSPContext *dsp);
+void ff_wmv2dsp_init(WMV2DSPContext *c);
 
-#endif /* AVCODEC_VORBISDSP_H */
+#endif /* AVCODEC_WMV2DSP_H */

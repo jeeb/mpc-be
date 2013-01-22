@@ -49,7 +49,6 @@ void ff_j_rev_dct (DCTELEM *data);
 void ff_j_rev_dct4 (DCTELEM *data);
 void ff_j_rev_dct2 (DCTELEM *data);
 void ff_j_rev_dct1 (DCTELEM *data);
-void ff_wmv2_idct_c(DCTELEM *data);
 
 void ff_fdct_mmx(DCTELEM *block);
 void ff_fdct_mmxext(DCTELEM *block);
@@ -339,9 +338,6 @@ typedef struct DSPContext {
     qpel_mc_func put_h264_qpel_pixels_tab[4][16];
     qpel_mc_func avg_h264_qpel_pixels_tab[4][16];
 
-    qpel_mc_func put_2tap_qpel_pixels_tab[4][16];
-    qpel_mc_func avg_2tap_qpel_pixels_tab[4][16];
-
     me_cmp_func pix_abs[2][4];
 
     /* huffyuv specific */
@@ -384,23 +380,6 @@ typedef struct DSPContext {
      * @param len length of vectors, multiple of 4
      */
     void (*butterflies_float)(float *av_restrict v1, float *av_restrict v2, int len);
-
-    /**
-     * Calculate the sum and difference of two vectors of floats and interleave
-     * results into a separate output vector of floats, with each sum
-     * positioned before the corresponding difference.
-     *
-     * @param dst  output vector
-     *             constraints: 16-byte aligned
-     * @param src0 first input vector
-     *             constraints: 32-byte aligned
-     * @param src1 second input vector
-     *             constraints: 32-byte aligned
-     * @param len  number of elements in the input
-     *             constraints: multiple of 8
-     */
-    void (*butterflies_float_interleave)(float *dst, const float *src0,
-                                         const float *src1, int len);
 
     /* (I)DCT */
     void (*fdct)(DCTELEM *block/* align 16*/);
