@@ -534,6 +534,7 @@ public:
 	bool			fPreventMinimize;
 	bool			fLCDSupport;
 	bool			fFastSeek;
+	bool			fMiniDump;
 
     // Miscellaneous
 	int				iBrightness;

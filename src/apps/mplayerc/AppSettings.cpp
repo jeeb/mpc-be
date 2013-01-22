@@ -595,6 +595,7 @@ void CAppSettings::SaveSettings()
 
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_LANGUAGE, CMPlayerCApp::languageResources[iLanguage].strcode);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_FASTSEEK_KEYFRAME, (int)fFastSeek);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_MINI_DUMP, (int)fMiniDump);
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_LCD_SUPPORT, (int)fLCDSupport);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_SMARTSEEK, (int)fSmartSeek);
@@ -1382,7 +1383,7 @@ void CAppSettings::LoadSettings()
 		}
 	}
 
-	fD3DFullscreen			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_D3DFULLSCREEN, FALSE);
+	fD3DFullscreen	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_D3DFULLSCREEN, FALSE);
 	//fMonitorAutoRefreshRate	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MONITOR_AUTOREFRESHRATE, FALSE);
 
 	iBrightness		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_BRIGHTNESS, 0);
@@ -1398,6 +1399,8 @@ void CAppSettings::LoadSettings()
 	fShowOSD			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SHOWOSD, 1);
 	fEnableEDLEditor	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEEDLEDITOR, FALSE);
 	fFastSeek			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_FASTSEEK_KEYFRAME, TRUE);
+	fMiniDump			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_MINI_DUMP, FALSE);
+	CMiniDump::SetState(fMiniDump);
 
 	fLCDSupport		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_LCD_SUPPORT, FALSE);
 	fSmartSeek		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_SMARTSEEK, FALSE);
@@ -1405,25 +1408,25 @@ void CAppSettings::LoadSettings()
 	fFlybar			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_USE_FLYBAR, TRUE);
 	fFlybarOnTop	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_USE_FLYBAR_ONTOP, FALSE);
 	fFontShadow		= !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("OSDFontShadow"), FALSE);
-	fFontAA	= !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("OSDFontAA"), TRUE);
+	fFontAA			= !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("OSDFontAA"), TRUE);
 
 	// Save analog capture settings
-	iDefaultCaptureDevice = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DEFAULT_CAPTURE, 0);
-	strAnalogVideo		= pApp->GetProfileString(IDS_RS_CAPTURE, IDS_RS_VIDEO_DISP_NAME, _T("dummy"));
-	strAnalogAudio		= pApp->GetProfileString(IDS_RS_CAPTURE, IDS_RS_AUDIO_DISP_NAME, _T("dummy"));
-	iAnalogCountry		= pApp->GetProfileInt(IDS_RS_CAPTURE, IDS_RS_COUNTRY, 1);
+	iDefaultCaptureDevice	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DEFAULT_CAPTURE, 0);
+	strAnalogVideo			= pApp->GetProfileString(IDS_RS_CAPTURE, IDS_RS_VIDEO_DISP_NAME, _T("dummy"));
+	strAnalogAudio			= pApp->GetProfileString(IDS_RS_CAPTURE, IDS_RS_AUDIO_DISP_NAME, _T("dummy"));
+	iAnalogCountry			= pApp->GetProfileInt(IDS_RS_CAPTURE, IDS_RS_COUNTRY, 1);
 
-	strBDANetworkProvider = pApp->GetProfileString(IDS_RS_DVB, IDS_RS_BDA_NETWORKPROVIDER, _T(""));
-	strBDATuner			= pApp->GetProfileString(IDS_RS_DVB, IDS_RS_BDA_TUNER, _T(""));
-	strBDAReceiver		= pApp->GetProfileString(IDS_RS_DVB, IDS_RS_BDA_RECEIVER, _T(""));
-	//sBDAStandard		= pApp->GetProfileString(IDS_RS_DVB, IDS_RS_BDA_STANDARD, _T(""));
-	iBDAScanFreqStart	= pApp->GetProfileInt(IDS_RS_DVB, IDS_RS_BDA_SCAN_FREQ_START, 474000);
-	iBDAScanFreqEnd		= pApp->GetProfileInt(IDS_RS_DVB, IDS_RS_BDA_SCAN_FREQ_END, 858000);
-	iBDABandwidth		= pApp->GetProfileInt(IDS_RS_DVB, IDS_RS_BDA_BANDWIDTH, 8);
-	fBDAUseOffset		= !!pApp->GetProfileInt(IDS_RS_DVB, IDS_RS_BDA_USE_OFFSET, 0);
-	iBDAOffset			= pApp->GetProfileInt(IDS_RS_DVB, IDS_RS_BDA_OFFSET, 166);
+	strBDANetworkProvider	= pApp->GetProfileString(IDS_RS_DVB, IDS_RS_BDA_NETWORKPROVIDER, _T(""));
+	strBDATuner				= pApp->GetProfileString(IDS_RS_DVB, IDS_RS_BDA_TUNER, _T(""));
+	strBDAReceiver			= pApp->GetProfileString(IDS_RS_DVB, IDS_RS_BDA_RECEIVER, _T(""));
+	//sBDAStandard			= pApp->GetProfileString(IDS_RS_DVB, IDS_RS_BDA_STANDARD, _T(""));
+	iBDAScanFreqStart		= pApp->GetProfileInt(IDS_RS_DVB, IDS_RS_BDA_SCAN_FREQ_START, 474000);
+	iBDAScanFreqEnd			= pApp->GetProfileInt(IDS_RS_DVB, IDS_RS_BDA_SCAN_FREQ_END, 858000);
+	iBDABandwidth			= pApp->GetProfileInt(IDS_RS_DVB, IDS_RS_BDA_BANDWIDTH, 8);
+	fBDAUseOffset			= !!pApp->GetProfileInt(IDS_RS_DVB, IDS_RS_BDA_USE_OFFSET, 0);
+	iBDAOffset				= pApp->GetProfileInt(IDS_RS_DVB, IDS_RS_BDA_OFFSET, 166);
+	nDVBLastChannel			= pApp->GetProfileInt(IDS_RS_DVB, IDS_RS_DVB_LAST_CHANNEL, 1);
 	fBDAIgnoreEncryptedChannels = !!pApp->GetProfileInt(IDS_RS_DVB, IDS_RS_BDA_IGNORE_ENCRYPTED_CHANNELS, 0);
-	nDVBLastChannel		= pApp->GetProfileInt(IDS_RS_DVB, IDS_RS_DVB_LAST_CHANNEL, 1);
 
 	for (int iChannel = 0; ; iChannel++) {
 		CString strTemp;
@@ -1468,11 +1471,11 @@ void CAppSettings::LoadSettings()
 		FilePosition[i].llPosition = _tstoi64 (strValue);
 	}
 
-	fStartMainTitle		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DVD_START_MAIN_TITLE, 0);
-	fmadVRchange		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DVD_MADVR_CHANGE, 0);
-	fLastFullScreen		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LASTFULLSCREEN, 0);
+	fStartMainTitle			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DVD_START_MAIN_TITLE, 0);
+	fmadVRchange			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DVD_MADVR_CHANGE, 0);
+	fLastFullScreen			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LASTFULLSCREEN, 0);
 
-	fRemainingTime		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_REMAINING_TIME, FALSE);
+	fRemainingTime			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_REMAINING_TIME, FALSE);
 
 	strLastOpenFilterDir	= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILTER_DIR, _T(""));
 	strLastOpenSubDir		= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_SUB_DIR, _T(""));
@@ -1497,7 +1500,7 @@ void CAppSettings::UpdateRenderersData(bool fSave)
 
 	if (fSave) {
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_APSURACEFUSAGE, r.iAPSurfaceUsage);
-		//		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VMRSYNCFIX, fVMRSyncFix);
+		// pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VMRSYNCFIX, fVMRSyncFix);
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_RESIZER, r.iDX9Resizer);
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VMR9MIXERMODE, r.fVMR9MixerMode);
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VMR9MIXERYUV, r.fVMR9MixerYUV);
@@ -1859,7 +1862,7 @@ void CAppSettings::ParseCommandLine(CAtlList<CString>& cmdln)
 			} else if (sw == _T("debug")) {
 				fShowDebugInfo = true;
 			} else if (sw == _T("nominidump")) {
-				CMiniDump::Disable();
+				CMiniDump::SetState(false);
 			} else if (sw == _T("audiorenderer") && pos) {
 				SetAudioRenderer(_ttoi(cmdln.GetNext(pos)));
 			} else if (sw == _T("reset")) {

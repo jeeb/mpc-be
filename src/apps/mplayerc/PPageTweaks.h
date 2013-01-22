@@ -46,6 +46,7 @@ public:
 	BOOL m_fDontUseSearchInFolder;
 	BOOL m_fFastSeek;
 	BOOL m_fLCDSupport;
+	BOOL m_fMiniDump;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);

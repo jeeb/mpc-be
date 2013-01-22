@@ -248,6 +248,7 @@
 #define IDS_D3D9RENDERDEVICE				_T("D3D9RenderDevice")
 
 #define IDS_FASTSEEK_KEYFRAME				_T("FastSeek")
+#define IDS_MINI_DUMP						_T("MiniDump")
 
 #define IDS_LCD_SUPPORT						_T("LcdSupport")
 #define IDS_SMARTSEEK						_T("UseSmartSeek")

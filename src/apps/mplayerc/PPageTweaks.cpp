@@ -25,7 +25,7 @@
 #include "mplayerc.h"
 #include "PPageTweaks.h"
 #include "MainFrm.h"
-
+#include "MiniDump.h"
 
 // CPPageTweaks dialog
 
@@ -59,6 +59,7 @@ void CPPageTweaks::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK7, m_fDontUseSearchInFolder);
 	DDX_Check(pDX, IDC_CHECK1, m_fFastSeek);
 	DDX_Check(pDX, IDC_CHECK_LCD, m_fLCDSupport);
+	DDX_Check(pDX, IDC_CHECK1, m_fMiniDump);
 }
 
 BOOL CPPageTweaks::OnInitDialog()
@@ -80,6 +81,8 @@ BOOL CPPageTweaks::OnInitDialog()
 	m_fFastSeek		= s.fFastSeek;
 	m_fLCDSupport	= s.fLCDSupport;
 
+	m_fMiniDump		= s.fMiniDump;
+
 	UpdateData(FALSE);
 
 	return TRUE;
@@ -95,11 +98,14 @@ BOOL CPPageTweaks::OnApply()
 	s.nJumpDistL			= m_nJumpDistL;
 	s.fNotifyMSN			= !!m_fNotifyMSN;
 
-	s.fPreventMinimize		= !!m_fPreventMinimize;
+	s.fPreventMinimize			= !!m_fPreventMinimize;
 	s.fDontUseSearchInFolder	= !!m_fDontUseSearchInFolder;
 
 	s.fFastSeek		= !!m_fFastSeek;
 	s.fLCDSupport	= !!m_fLCDSupport;
+
+	s.fMiniDump		= !!m_fMiniDump;
+	CMiniDump::SetState(s.fMiniDump);
 
 	return __super::OnApply();
 }
