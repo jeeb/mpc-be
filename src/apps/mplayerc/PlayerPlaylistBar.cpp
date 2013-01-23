@@ -755,11 +755,8 @@ void CPlayerPlaylistBar::SetCurValid(bool fValid)
 	POSITION pos = m_pl.GetPos();
 	if (pos) {
 		m_pl.GetAt(pos).m_fInvalid = !fValid;
-		if (!fValid) {
-			int i = FindItem(pos);
-			m_list.RedrawItems(i, i);
-		}
 	}
+	UpdateList();
 }
 
 void CPlayerPlaylistBar::SetCurTime(REFERENCE_TIME rt)
@@ -770,6 +767,7 @@ void CPlayerPlaylistBar::SetCurTime(REFERENCE_TIME rt)
 		pli.m_duration = rt;
 		m_list.SetItemText(FindItem(pos), COL_TIME, pli.GetLabel(1));
 	}
+	UpdateList();
 }
 
 OpenMediaData* CPlayerPlaylistBar::GetCurOMD(REFERENCE_TIME rtStart)
@@ -1029,6 +1027,8 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 	if (nIDCtl != IDC_PLAYLIST) {
 		return;
 	}
+
+	ResizeListColumn();
 
 	AppSettings& s = AfxGetAppSettings();
 
