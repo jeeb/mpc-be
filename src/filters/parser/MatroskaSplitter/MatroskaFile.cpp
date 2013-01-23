@@ -74,7 +74,7 @@ CMatroskaFile::CMatroskaFile(IAsyncReader* pAsyncReader, HRESULT& hr)
 HRESULT CMatroskaFile::Init()
 {
 	DWORD dw;
-	if (FAILED(Read(dw)) || dw != 0x1A45DFA3) {
+	if (FAILED(Read(dw)) || dw != EBML_ID_HEADER) {
 		return E_FAIL;
 	}
 
@@ -84,8 +84,8 @@ HRESULT CMatroskaFile::Init()
 	}
 
 	CAutoPtr<CMatroskaNode> pSegment, pCluster;
-	if ((pSegment = Root.Child(0x18538067))
-			&& (pCluster = pSegment->Child(0x1F43B675))) {
+	if ((pSegment = Root.Child(MATROSKA_ID_SEGMENT))
+			&& (pCluster = pSegment->Child(MATROSKA_ID_CLUSTER))) {
 		Cluster c0;
 		c0.ParseTimeCode(pCluster);
 		m_rtOffset = m_segment.GetRefTime(c0.TimeCode);
@@ -107,13 +107,13 @@ HRESULT CMatroskaFile::Read(T& var)
 HRESULT CMatroskaFile::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0x1A45DFA3:
+case EBML_ID_HEADER:
 	m_ebml.Parse(pMN);
 	if ((m_ebml.DocType != DOCTYPE || m_ebml.DocTypeReadVersion > DOCTYPEVERSION) &&  m_ebml.DocType != DOCTYPE_WEBM) {
 		return E_FAIL;
 	}
 	break;
-case 0x18538067:
+case MATROSKA_ID_SEGMENT:
 	if (m_segment.SegmentInfo.SegmentUID.IsEmpty()) {
 		m_segment.ParseMinimal(pMN);
 	}
@@ -155,28 +155,28 @@ HRESULT Segment::Parse(CMatroskaNode* pMN0)
 	pos = pMN0->GetPos();
 
 	BeginChunk
-case 0x1549A966:
+case MATROSKA_ID_INFO:
 	SegmentInfo.Parse(pMN);
 	break;
-case 0x114D9B74:
+case MATROSKA_ID_SEEKHEAD:
 	MetaSeekInfo.Parse(pMN);
 	break;
-case 0x1654AE6B:
+case MATROSKA_ID_TRACKS:
 	Tracks.Parse(pMN);
 	break;
-case 0x1F43B675:
+case MATROSKA_ID_CLUSTER:
 	Clusters.Parse(pMN);
 	break;
-case 0x1C53BB6B:
+case MATROSKA_ID_CUES:
 	Cues.Parse(pMN);
 	break;
-case 0x1941A469:
+case MATROSKA_ID_ATTACHMENTS:
 	Attachments.Parse(pMN);
 	break;
-case 0x1043A770:
+case MATROSKA_ID_CHAPTERS:
 	Chapters.Parse(pMN);
 	break;
-	//	case 0x1254C367: Tags.Parse(pMN); break;
+	//	case MATROSKA_ID_TAGS: Tags.Parse(pMN); break;
 	EndChunk
 }
 
@@ -196,30 +196,30 @@ HRESULT Segment::ParseMinimal(CMatroskaNode* pMN0)
 
 	do {
 		switch (pMN->m_id) {
-			case 0x1549A966:
+			case MATROSKA_ID_INFO:
 				SegmentInfo.Parse(pMN);
 				k |= (1 << 0);
 				break;
-			case 0x114D9B74:
+			case MATROSKA_ID_SEEKHEAD:
 				MetaSeekInfo.Parse(pMN);
 				k |= (1 << 1);
 				break;
-			case 0x1654AE6B:
+			case MATROSKA_ID_TRACKS:
 				Tracks.Parse(pMN);
 				k |= (1 << 2);
 				break;
-			case 0x1C53BB6B:
+			case MATROSKA_ID_CUES:
 				k |= (1 << 3);
 				Cues.Parse(pMN);
 				break;
 		}
-	} while (k != 15 && pMN->m_id != 0x1F43B675 && pMN->Next());
+	} while (k != 15 && pMN->m_id != MATROSKA_ID_CLUSTER && pMN->Next());
 
 	if (!pMN->IsRandomAccess()) {
 		return S_OK;
 	}
 
-	while (MatroskaReader::QWORD pos = pMN->FindPos(0x114D9B74, pMN->GetPos())) {
+	while (MatroskaReader::QWORD pos = pMN->FindPos(MATROSKA_ID_SEEKHEAD, pMN->GetPos())) {
 		pMN->SeekTo(pos);
 		if (FAILED(pMN->Parse())) {
 			break; // a broken file
@@ -228,20 +228,20 @@ HRESULT Segment::ParseMinimal(CMatroskaNode* pMN0)
 	}
 
 	if (k != 15) {
-		if (Cues.IsEmpty() && (pMN = pMN0->Child(0x1C53BB6B, false))) {
+		if (Cues.IsEmpty() && (pMN = pMN0->Child(MATROSKA_ID_CUES, false))) {
 			do {
 				Cues.Parse(pMN);
 			} while (pMN->Next(true));
 		}
 
-		if (Chapters.IsEmpty() && (pMN = pMN0->Child(0x1043A770, false))) {
+		if (Chapters.IsEmpty() && (pMN = pMN0->Child(MATROSKA_ID_CHAPTERS, false))) {
 			do {
 				Chapters.Parse(pMN); /*BIG UGLY HACK:*/
 				break;
 			} while (pMN->Next(true));
 		}
 
-		if (Attachments.IsEmpty() && (pMN = pMN0->Child(0x1941A469, false))) {
+		if (Attachments.IsEmpty() && (pMN = pMN0->Child(MATROSKA_ID_ATTACHMENTS, false))) {
 			do {
 				Attachments.Parse(pMN); /*BIG UGLY HACK:*/
 				break;
@@ -678,10 +678,10 @@ case 0xA7:
 case 0xAB:
 	PrevSize.Parse(pMN);
 	break;
-case 0xA0:
+case MATROSKA_ID_BLOCKGROUP:
 	BlockGroups.Parse(pMN, true);
 	break;
-case 0xA3:
+case MATROSKA_ID_SIMPLEBLOCK:
 	SimpleBlocks.Parse(pMN, true);
 	break;
 	EndChunk
@@ -1392,7 +1392,7 @@ CMatroskaNode::CMatroskaNode(CMatroskaNode* pParent)
 HRESULT CMatroskaNode::Parse()
 {
 	m_filepos = GetPos();
-	if (FAILED(m_id.Parse(this)) || FAILED(m_len.Parse(this))) {
+	if (FAILED(m_id.Parse(this)) || FAILED(m_len.Parse(this)) || m_len > m_pParent->m_len) {
 		return E_FAIL;
 	}
 	m_start = GetPos();
@@ -1439,7 +1439,7 @@ bool CMatroskaNode::Next(bool fSame)
 
 bool CMatroskaNode::Find(DWORD id, bool fSearch)
 {
-	MatroskaReader::QWORD pos = m_pParent && m_pParent->m_id == 0x18538067 /*segment?*/
+	MatroskaReader::QWORD pos = m_pParent && m_pParent->m_id == MATROSKA_ID_SEGMENT
 								? FindPos(id)
 								: 0;
 
@@ -1516,7 +1516,7 @@ CAutoPtr<CMatroskaNode> CMatroskaNode::GetFirstBlock()
 {
 	CAutoPtr<CMatroskaNode> pNode = Child();
 	do {
-		if (pNode->m_id == 0xA0 || pNode->m_id == 0xA3) {
+		if (pNode->m_id == MATROSKA_ID_BLOCKGROUP || pNode->m_id == MATROSKA_ID_SIMPLEBLOCK) {
 			return pNode;
 		}
 	} while (pNode->Next());
@@ -1540,7 +1540,7 @@ bool CMatroskaNode::NextBlock()
 			}
 		}
 
-		if (m_id == 0xA0 || m_id == 0xA3) {
+		if (m_id == MATROSKA_ID_BLOCKGROUP || m_id == MATROSKA_ID_SIMPLEBLOCK) {
 			return true;
 		}
 	}
@@ -1550,7 +1550,7 @@ bool CMatroskaNode::NextBlock()
 
 bool CMatroskaNode::Resync()
 {
-	if (m_pParent->m_id == 0x18538067) { /*segment?*/
+	if (m_pParent->m_id == MATROSKA_ID_SEGMENT) {
 		SeekTo(m_filepos);
 
 		for (BYTE b = 0; S_OK == Read(b); b = 0) {
@@ -1563,14 +1563,14 @@ bool CMatroskaNode::Resync()
 			bswap((BYTE*)&dw, 4);
 
 			switch (dw) {
-				case 0x1549A966: // SegmentInfo
-				case 0x114D9B74: // MetaSeekInfo
-				case 0x1654AE6B: // Tracks
-				case 0x1F43B675: // Clusters
-				case 0x1C53BB6B: // Cues
-				case 0x1941A469: // Attachments
-				case 0x1043A770: // Chapters
-				case 0x1254C367: // Tags
+				case MATROSKA_ID_INFO:			// SegmentInfo
+				case MATROSKA_ID_SEEKHEAD:		// MetaSeekInfo
+				case MATROSKA_ID_TRACKS:		// Tracks
+				case MATROSKA_ID_CLUSTER:		// Clusters
+				case MATROSKA_ID_CUES:			// Cues
+				case MATROSKA_ID_ATTACHMENTS:	// Attachments
+				case MATROSKA_ID_CHAPTERS:		// Chapters
+				case MATROSKA_ID_TAGS:			// Tags
 					SeekTo(GetPos()-4);
 					return SUCCEEDED(Parse());
 				default:

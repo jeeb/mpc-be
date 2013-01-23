@@ -59,6 +59,11 @@
 #define FLV_VIDEO_SCREEN2 6 // Screen video version 2
 #define FLV_VIDEO_AVC     7 // AVC
 
+#define AMF_DATA_TYPE_STRING		0x02
+#define AMF_DATA_TYPE_NUMBER		0x00
+#define AMF_DATA_TYPE_MIXEDARRAY	0x08
+
+
 #ifdef REGISTER_FILTER
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
@@ -254,6 +259,19 @@ bool CFLVSplitterFilter::Sync(__int64& pos)
 	return false;
 }
 
+static double int64toDouble(__int64 value)
+{
+	union
+	{
+		__int64	i;
+		double	f;
+	} intfloat64;
+	
+	intfloat64.i = value;
+
+	return intfloat64.f;
+}
+
 HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 {
 	CheckPointer(pAsyncReader, E_POINTER);
@@ -295,7 +313,8 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	m_pFile->Seek(m_DataOffset);
 
-	REFERENCE_TIME AvgTimePerFrame = 0;
+	REFERENCE_TIME AvgTimePerFrame	= 0;
+	REFERENCE_TIME metaDataDuration	= 0;
 
 	for (int i = 0; ReadTag(t) && (fTypeFlagsVideo || fTypeFlagsAudio); i++) {
 		if (!t.DataSize) continue; // skip empty Tag
@@ -312,7 +331,32 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 		prevTagSize = t.DataSize + 11;
 
-		if (t.TagType == FLV_AUDIODATA && t.DataSize != 0 && fTypeFlagsAudio) {
+		if (t.TagType == FLV_SCRIPTDATA && t.DataSize) {
+			BYTE type = m_pFile->BitRead(8);
+			SHORT length = m_pFile->BitRead(16);
+			if (type == AMF_DATA_TYPE_STRING && length <= 11) {
+				char name[256];
+				memset(name, 0, 256);
+				m_pFile->ByteRead((BYTE*)name, length);
+				if (!strncmp(name, "onTextData", length) || (!strncmp(name, "onMetaData", length))) {
+
+					BYTE amf_type = m_pFile->BitRead(8);
+					if (amf_type == AMF_DATA_TYPE_MIXEDARRAY) {
+						m_pFile->BitRead(32); // skip 32-bit max array index
+
+						length = m_pFile->BitRead(16);
+						memset(name, 0, 256);
+						m_pFile->ByteRead((BYTE*)name, length);
+						if (!strncmp(name, "duration", length)) {
+							amf_type = m_pFile->BitRead(8);
+							if (amf_type == AMF_DATA_TYPE_NUMBER) {
+								metaDataDuration = UNITS * (REFERENCE_TIME)int64toDouble(m_pFile->BitRead(64));
+							}
+						}
+					}
+				}
+			}
+		} else if (t.TagType == FLV_AUDIODATA && t.DataSize != 0 && fTypeFlagsAudio) {
 			UNREFERENCED_PARAMETER(at);
 			AudioTag at;
 			name = L"Audio";
@@ -702,6 +746,10 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			m_pFile->Seek(next);
 		}
+	}
+
+	if (!m_rtDuration && metaDataDuration) {
+		m_rtDuration = metaDataDuration;
 	}
 
 	m_rtNewStop = m_rtStop = m_rtDuration;

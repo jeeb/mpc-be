@@ -27,6 +27,26 @@
 #include <atlcoll.h>
 #include "../BaseSplitter/BaseSplitter.h"
 
+/* top-level master-IDs */
+#define EBML_ID_HEADER			0x1A45DFA3
+
+/* toplevel segment */
+#define MATROSKA_ID_SEGMENT		0x18538067
+
+/* Matroska top-level master IDs */
+#define MATROSKA_ID_INFO		0x1549A966
+#define MATROSKA_ID_TRACKS		0x1654AE6B
+#define MATROSKA_ID_CUES		0x1C53BB6B
+#define MATROSKA_ID_TAGS		0x1254C367
+#define MATROSKA_ID_SEEKHEAD	0x114D9B74
+#define MATROSKA_ID_ATTACHMENTS	0x1941A469
+#define MATROSKA_ID_CLUSTER		0x1F43B675
+#define MATROSKA_ID_CHAPTERS	0x1043A770
+
+/* IDs in the cluster master */
+#define MATROSKA_ID_BLOCKGROUP	0xA0
+#define MATROSKA_ID_SIMPLEBLOCK	0xA3
+
 namespace MatroskaReader
 {
 	class CMatroskaNode;

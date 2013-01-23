@@ -454,8 +454,8 @@ avcsuccess:
 				} 
 				if (!AvgTimePerFrame || AvgTimePerFrame < 166666) { // fps > 60 ... need to make additional checks
 					CMatroskaNode Root(m_pFile);
-					m_pSegment = Root.Child(0x18538067);
-					m_pCluster = m_pSegment->Child(0x1F43B675);
+					m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
+					m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 
 					MatroskaReader::QWORD lastCueClusterPosition = (MatroskaReader::QWORD)-1;
 					UINT64 timecode1 = -1;
@@ -491,9 +491,9 @@ avcsuccess:
 									do {
 										CBlockGroupNode bgn;
 
-										if (pBlock->m_id == 0xA0) {
+										if (pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
 											bgn.Parse(pBlock, true);
-										} else if (pBlock->m_id == 0xA3) {
+										} else if (pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
 											CAutoPtr<BlockGroup> bg(DNew BlockGroup());
 											bg->Block.Parse(pBlock, true);
 											if (!(bg->Block.Lacing & 0x80)) {
@@ -910,17 +910,6 @@ avcsuccess:
 
 	m_rtNewStop = m_rtStop = m_rtDuration;
 
-/*#ifdef _DEBUG
-	for (int i = 1, j = GetChapterCount(CHAPTER_ROOT_ID); i <= j; i++)
-	{
-		UINT id = GetChapterId(CHAPTER_ROOT_ID, i);
-		struct ChapterElement ce;
-		BOOL b = GetChapterInfo(id, &ce);
-		BSTR bstr = GetChapterStringInfo(id, "eng", "");
-		if (bstr) ::SysFreeString(bstr);
-	}
-#endif*/
-
 	SetProperty(L"TITL", info.Title);
 	// TODO
 
@@ -1094,8 +1083,8 @@ bool CMatroskaSplitterFilter::DemuxInit()
 
 	CMatroskaNode Root(m_pFile);
 	if (!m_pFile
-			|| !(m_pSegment = Root.Child(0x18538067))
-			|| !(m_pCluster = m_pSegment->Child(0x1F43B675))) {
+			|| !(m_pSegment = Root.Child(MATROSKA_ID_SEGMENT))
+			|| !(m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER))) {
 		return false;
 	}
 
@@ -1152,7 +1141,7 @@ bool CMatroskaSplitterFilter::DemuxInit()
 
 void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
-	m_pCluster = m_pSegment->Child(0x1F43B675);
+	m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 	m_pBlock.Free();
 
 	if (rt > 0) {
@@ -1191,21 +1180,14 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 					lastCueClusterPosition = pCueTrackPositions->CueClusterPosition;
 
 					m_pCluster->SeekTo(m_pSegment->m_start + pCueTrackPositions->CueClusterPosition);
-					m_pCluster->Parse();
+					if (FAILED(m_pCluster->Parse())) {
+						continue;
+					}
 
-					bool fFoundKeyFrame = false;
-					/*
-										if (pCueTrackPositions->CueBlockNumber > 0)
-										{
-											// TODO: CueBlockNumber only tells the block num of the track and not for all mixed in the cluster
-											m_nLastBlock = (int)pCueTrackPositions->CueBlockNumber;
-											fFoundKeyFrame = true;
-										}
-										else
-					*/
 					{
 						Cluster c;
 						c.ParseTimeCode(m_pCluster);
+						REFERENCE_TIME seek_rt = s.GetRefTime(c.TimeCode);
 
 						if (CAutoPtr<CMatroskaNode> pBlock = m_pCluster->GetFirstBlock()) {
 							bool fPassedCueTime = false;
@@ -1213,13 +1195,13 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 							do {
 								CBlockGroupNode bgn;
 
-								if (pBlock->m_id == 0xA0) {
+								if (pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
 									bgn.Parse(pBlock, true);
-								} else if (pBlock->m_id == 0xA3) {
+								} else if (pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
 									CAutoPtr<BlockGroup> bg(DNew BlockGroup());
 									bg->Block.Parse(pBlock, true);
 									if (!(bg->Block.Lacing & 0x80)) {
-										bg->ReferenceBlock.Set(0);    // not a kf
+										bg->ReferenceBlock.Set(0); // not a kf
 									}
 									bgn.AddTail(bg);
 								}
@@ -1227,29 +1209,51 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 								POSITION pos4 = bgn.GetHeadPosition();
 								while (!fPassedCueTime && pos4) {
 									BlockGroup* bg = bgn.GetNext(pos4);
+									seek_rt = s.GetRefTime(c.TimeCode + bg->Block.TimeCode);
 
-									if (bg->Block.TrackNumber == pCueTrackPositions->CueTrack && rt < s.GetRefTime(c.TimeCode + bg->Block.TimeCode)
-											|| rt + 5000000i64 < s.GetRefTime(c.TimeCode + bg->Block.TimeCode)) { // allow 500ms difference between tracks, just in case intreleaving wasn't that much precise
+									if (bg->Block.TrackNumber == pCueTrackPositions->CueTrack && rt < seek_rt
+											|| rt + 5000000i64 < seek_rt) { // allow 500ms difference between tracks, just in case intreleaving wasn't that much precise
 										fPassedCueTime = true;
-									} else if (bg->Block.TrackNumber == pCueTrackPositions->CueTrack && !bg->ReferenceBlock.IsValid()) {
-										fFoundKeyFrame = true;
-										m_pBlock = pBlock->Copy();
 									}
 								}
 							} while (!fPassedCueTime && pBlock->NextBlock());
 						}
-					}
 
-					if (fFoundKeyFrame) {
-						pos1 = pos2 = pos3 = NULL;
+						if (seek_rt > 0) {
+							TRACE(_T("CMatroskaSplitterFilter::DemuxSeek() : %ws => %ws, [%10I64d - %10I64d]\n"), ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt);
+							return;
+						}
 					}
+				}
+				Cluster c;
+				c.ParseTimeCode(m_pCluster);
+				REFERENCE_TIME seek_rt = s.GetRefTime(c.TimeCode);
+
+				if (seek_rt > 0) {
+					TRACE(_T("CMatroskaSplitterFilter::DemuxSeek() : %ws => %ws, [%10I64d - %10I64d]\n"), ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt);
+					return;
 				}
 			}
 		}
 
-		if (!m_pBlock) {
-			m_pCluster = m_pSegment->Child(0x1F43B675);
-		}
+		// Plan B ))
+		m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
+
+		do {
+			Cluster c;
+			if (FAILED(c.ParseTimeCode(m_pCluster))) {
+				continue;
+			}
+			REFERENCE_TIME seek_rt = s.GetRefTime(c.TimeCode);
+
+			if (seek_rt >= rt && seek_rt <= m_rtDuration) {
+				TRACE(_T("CMatroskaSplitterFilter::DemuxSeek(), plan B : %ws => %ws, [%10I64d - %10I64d]\n"), ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt);
+				return;
+			}
+		} while (m_pCluster->Next());
+
+		// epic fail ...
+		m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 	}
 }
 
@@ -1273,9 +1277,9 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 		do {
 			CBlockGroupNode bgn;
 
-			if (m_pBlock->m_id == 0xA0) {
+			if (m_pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
 				bgn.Parse(m_pBlock, true);
-			} else if (m_pBlock->m_id == 0xA3) {
+			} else if (m_pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
 				CAutoPtr<BlockGroup> bg(DNew BlockGroup());
 				bg->Block.Parse(m_pBlock, true);
 				if (!(bg->Block.Lacing & 0x80)) {
@@ -1485,11 +1489,7 @@ HRESULT CMatroskaSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			mp1->bg->BlockDuration.Set(1); // just to set it valid
 
 			if (mp1->rtStart >= mp2->rtStart) {
-				/*				CString str;
-								str.Format(_T("mp1->rtStart (%I64d) >= mp2->rtStart (%I64d)!!!\n"), mp1->rtStart, mp2->rtStart);
-								AfxMessageBox(str);
-				*/
-				// TRACE(_T("mp1->rtStart (%I64d) >= mp2->rtStart (%I64d)!!!\n"), mp1->rtStart, mp2->rtStart);
+				;
 			} else {
 				mp1->rtStop = mp2->rtStart;
 			}
