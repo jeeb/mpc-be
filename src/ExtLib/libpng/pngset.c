@@ -690,6 +690,17 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr,
    /* Make sure we have enough space in the "text" array in info_struct
     * to hold all of the incoming text_ptr objects.
     */
+
+   if (num_text < 0 ||
+       num_text > INT_MAX - info_ptr->num_text - 8 ||
+       (unsigned int)/*SAFE*/(num_text +/*SAFE*/
+       info_ptr->num_text + 8) >=
+       PNG_SIZE_MAX/png_sizeof(png_text))
+   {
+      png_warning(png_ptr, "too many text chunks");
+      return(0);
+   }
+
    if (info_ptr->num_text + num_text > info_ptr->max_text)
    {
       int old_max_text = info_ptr->max_text;
@@ -969,9 +980,18 @@ png_set_sPLT(png_structp png_ptr,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   np = (png_sPLT_tp)png_malloc_warn(png_ptr,
-       (info_ptr->splt_palettes_num + nentries) *
-       (png_size_t)png_sizeof(png_sPLT_t));
+   if (nentries < 0 ||
+       nentries > INT_MAX-info_ptr->splt_palettes_num ||
+       (unsigned int)/*SAFE*/(nentries +/*SAFE*/
+       info_ptr->splt_palettes_num) >=
+       PNG_SIZE_MAX/png_sizeof(png_sPLT_t))
+      np=NULL;
+
+   else
+
+      np = (png_sPLT_tp)png_malloc_warn(png_ptr,
+          (info_ptr->splt_palettes_num + nentries) *
+          (png_size_t)png_sizeof(png_sPLT_t));
 
    if (np == NULL)
    {
@@ -1040,9 +1060,10 @@ png_set_unknown_chunks(png_structp png_ptr,
       return;
 
    if (num_unknowns < 0 ||
-       num_unknowns >= UINT_MAX-info_ptr->unknown_chunks_num ||
-       num_unknowns >= PNG_SIZE_MAX/png_sizeof(png_unknown_chunk)
-       - info_ptr->unknown_chunks_num)
+       num_unknowns > INT_MAX-info_ptr->unknown_chunks_num ||
+       (unsigned int)/*SAFE*/(num_unknowns +/*SAFE*/
+       info_ptr->unknown_chunks_num) >=
+       PNG_SIZE_MAX/png_sizeof(png_unknown_chunk))
       np=NULL;
 
    else
