@@ -1028,8 +1028,6 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 		return;
 	}
 
-	ResizeListColumn();
-
 	AppSettings& s = AfxGetAppSettings();
 
 	int R, G, B;
