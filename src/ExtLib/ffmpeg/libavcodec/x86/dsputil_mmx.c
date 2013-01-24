@@ -39,9 +39,6 @@
 DECLARE_ALIGNED(8,  const uint64_t, ff_bone) = 0x0101010101010101ULL;
 DECLARE_ALIGNED(8,  const uint64_t, ff_wtwo) = 0x0002000200020002ULL;
 
-DECLARE_ALIGNED(16, const uint64_t, ff_pdw_80000000)[2] =
-    { 0x8000000080000000ULL, 0x8000000080000000ULL };
-
 DECLARE_ALIGNED(16, const xmm_reg,  ff_pw_1)    = { 0x0001000100010001ULL, 0x0001000100010001ULL };
 DECLARE_ALIGNED(16, const xmm_reg,  ff_pw_2)    = { 0x0002000200020002ULL, 0x0002000200020002ULL };
 DECLARE_ALIGNED(16, const xmm_reg,  ff_pw_3)    = { 0x0003000300030003ULL, 0x0003000300030003ULL };
@@ -164,6 +161,7 @@ DECLARE_ALIGNED(16, const double, ff_pd_2)[2] = { 2.0, 2.0 };
 
 /***********************************/
 /* MMX no rounding */
+#define NO_RND 1
 #define DEF(x, y) x ## _no_rnd_ ## y ## _mmx
 #define SET_RND  MOVQ_WONE
 #define PAVGBP(a, b, c, d, e, f)        PAVGBP_MMX_NO_RND(a, b, c, d, e, f)
@@ -176,6 +174,7 @@ DECLARE_ALIGNED(16, const double, ff_pd_2)[2] = { 2.0, 2.0 };
 #undef SET_RND
 #undef PAVGBP
 #undef PAVGB
+#undef NO_RND
 /***********************************/
 /* MMX rounding */
 
@@ -229,10 +228,10 @@ DECLARE_ALIGNED(16, const double, ff_pd_2)[2] = { 2.0, 2.0 };
 /***********************************/
 /* standard MMX */
 
-void ff_put_pixels_clamped_mmx(const DCTELEM *block, uint8_t *pixels,
+void ff_put_pixels_clamped_mmx(const int16_t *block, uint8_t *pixels,
                                int line_size)
 {
-    const DCTELEM *p;
+    const int16_t *p;
     uint8_t *pix;
 
     /* read the pixels */
@@ -304,7 +303,7 @@ void ff_put_pixels_clamped_mmx(const DCTELEM *block, uint8_t *pixels,
     "movq               %%mm3, (%0, %3, 2)  \n\t"           \
     "movq               %%mm4, (%0, %1)     \n\t"
 
-void ff_put_signed_pixels_clamped_mmx(const DCTELEM *block, uint8_t *pixels,
+void ff_put_signed_pixels_clamped_mmx(const int16_t *block, uint8_t *pixels,
                                       int line_size)
 {
     x86_reg line_skip = line_size;
@@ -321,10 +320,10 @@ void ff_put_signed_pixels_clamped_mmx(const DCTELEM *block, uint8_t *pixels,
         : "memory");
 }
 
-void ff_add_pixels_clamped_mmx(const DCTELEM *block, uint8_t *pixels,
+void ff_add_pixels_clamped_mmx(const int16_t *block, uint8_t *pixels,
                                int line_size)
 {
-    const DCTELEM *p;
+    const int16_t *p;
     uint8_t *pix;
     int i;
 
@@ -426,7 +425,7 @@ static void put_pixels16_mmx(uint8_t *block, const uint8_t *pixels,
 }
 
 #define CLEAR_BLOCKS(name, n)                           \
-static void name(DCTELEM *blocks)                       \
+static void name(int16_t *blocks)                       \
 {                                                       \
     __asm__ volatile (                                  \
         "pxor %%mm7, %%mm7              \n\t"           \
@@ -446,7 +445,7 @@ static void name(DCTELEM *blocks)                       \
 CLEAR_BLOCKS(clear_blocks_mmx, 6)
 CLEAR_BLOCKS(clear_block_mmx, 1)
 
-static void clear_block_sse(DCTELEM *block)
+static void clear_block_sse(int16_t *block)
 {
     __asm__ volatile (
         "xorps  %%xmm0, %%xmm0          \n"
@@ -463,7 +462,7 @@ static void clear_block_sse(DCTELEM *block)
     );
 }
 
-static void clear_blocks_sse(DCTELEM *blocks)
+static void clear_blocks_sse(int16_t *blocks)
 {
     __asm__ volatile (
         "xorps  %%xmm0, %%xmm0              \n"
@@ -1885,28 +1884,28 @@ void ff_avg_dirac_pixels32_sse2(uint8_t *dst, const uint8_t *src[5], int stride,
  * converted. */
 #if CONFIG_GPL
 static void ff_libmpeg2mmx_idct_put(uint8_t *dest, int line_size,
-                                    DCTELEM *block)
+                                    int16_t *block)
 {
     ff_mmx_idct(block);
     ff_put_pixels_clamped_mmx(block, dest, line_size);
 }
 
 static void ff_libmpeg2mmx_idct_add(uint8_t *dest, int line_size,
-                                    DCTELEM *block)
+                                    int16_t *block)
 {
     ff_mmx_idct(block);
     ff_add_pixels_clamped_mmx(block, dest, line_size);
 }
 
 static void ff_libmpeg2mmx2_idct_put(uint8_t *dest, int line_size,
-                                     DCTELEM *block)
+                                     int16_t *block)
 {
     ff_mmxext_idct(block);
     ff_put_pixels_clamped_mmx(block, dest, line_size);
 }
 
 static void ff_libmpeg2mmx2_idct_add(uint8_t *dest, int line_size,
-                                     DCTELEM *block)
+                                     int16_t *block)
 {
     ff_mmxext_idct(block);
     ff_add_pixels_clamped_mmx(block, dest, line_size);
@@ -1987,18 +1986,6 @@ int  ff_add_hfyu_left_prediction_ssse3(uint8_t *dst, const uint8_t *src,
 int  ff_add_hfyu_left_prediction_sse4(uint8_t *dst, const uint8_t *src,
                                       int w, int left);
 
-float ff_scalarproduct_float_sse(const float *v1, const float *v2, int order);
-
-void ff_vector_fmul_reverse_sse(float *dst, const float *src0,
-                                const float *src1, int len);
-void ff_vector_fmul_reverse_avx(float *dst, const float *src0,
-                                const float *src1, int len);
-
-void ff_vector_fmul_add_sse(float *dst, const float *src0, const float *src1,
-                            const float *src2, int len);
-void ff_vector_fmul_add_avx(float *dst, const float *src0, const float *src1,
-                            const float *src2, int len);
-
 void ff_vector_clip_int32_mmx     (int32_t *dst, const int32_t *src,
                                    int32_t min, int32_t max, unsigned int len);
 void ff_vector_clip_int32_sse2    (int32_t *dst, const int32_t *src,
@@ -2030,10 +2017,10 @@ void ff_vector_clip_int32_sse4    (int32_t *dst, const int32_t *src,
 
 #define SET_HPEL_FUNCS(PFX, IDX, SIZE, CPU)                                     \
     do {                                                                        \
-        c->PFX ## _pixels_tab[IDX][0] = PFX ## _pixels ## SIZE ## _     ## CPU; \
-        c->PFX ## _pixels_tab[IDX][1] = PFX ## _pixels ## SIZE ## _x2_  ## CPU; \
-        c->PFX ## _pixels_tab[IDX][2] = PFX ## _pixels ## SIZE ## _y2_  ## CPU; \
-        c->PFX ## _pixels_tab[IDX][3] = PFX ## _pixels ## SIZE ## _xy2_ ## CPU; \
+        c->PFX ## _pixels_tab IDX [0] = PFX ## _pixels ## SIZE ## _     ## CPU; \
+        c->PFX ## _pixels_tab IDX [1] = PFX ## _pixels ## SIZE ## _x2_  ## CPU; \
+        c->PFX ## _pixels_tab IDX [2] = PFX ## _pixels ## SIZE ## _y2_  ## CPU; \
+        c->PFX ## _pixels_tab IDX [3] = PFX ## _pixels ## SIZE ## _xy2_ ## CPU; \
     } while (0)
 
 #define H264_QPEL_FUNCS(x, y, CPU)                                                            \
@@ -2066,14 +2053,13 @@ static void dsputil_init_mmx(DSPContext *c, AVCodecContext *avctx, int mm_flags)
         c->clear_blocks = clear_blocks_mmx;
         c->draw_edges   = draw_edges_mmx;
 
-        SET_HPEL_FUNCS(put,        0, 16, mmx);
-        SET_HPEL_FUNCS(put_no_rnd, 0, 16, mmx);
-        SET_HPEL_FUNCS(avg,        0, 16, mmx);
-        SET_HPEL_FUNCS(avg_no_rnd, 0, 16, mmx);
-        SET_HPEL_FUNCS(put,        1,  8, mmx);
-        SET_HPEL_FUNCS(put_no_rnd, 1,  8, mmx);
-        SET_HPEL_FUNCS(avg,        1,  8, mmx);
-        SET_HPEL_FUNCS(avg_no_rnd, 1,  8, mmx);
+        SET_HPEL_FUNCS(put,        [0], 16, mmx);
+        SET_HPEL_FUNCS(put_no_rnd, [0], 16, mmx);
+        SET_HPEL_FUNCS(avg,        [0], 16, mmx);
+        SET_HPEL_FUNCS(avg_no_rnd,    , 16, mmx);
+        SET_HPEL_FUNCS(put,        [1],  8, mmx);
+        SET_HPEL_FUNCS(put_no_rnd, [1],  8, mmx);
+        SET_HPEL_FUNCS(avg,        [1],  8, mmx);
     }
 
 #if ARCH_X86_32 || !HAVE_YASM
@@ -2262,11 +2248,6 @@ static void dsputil_init_sse(DSPContext *c, AVCodecContext *avctx, int mm_flags)
 #endif /* HAVE_INLINE_ASM */
 
 #if HAVE_YASM
-    c->vector_fmul_reverse = ff_vector_fmul_reverse_sse;
-    c->vector_fmul_add     = ff_vector_fmul_add_sse;
-
-    c->scalarproduct_float          = ff_scalarproduct_float_sse;
-
 #if HAVE_INLINE_ASM && CONFIG_VIDEODSP
     c->gmc = gmc_sse;
 #endif
@@ -2420,8 +2401,6 @@ static void dsputil_init_avx(DSPContext *c, AVCodecContext *avctx, int mm_flags)
             c->avg_h264_chroma_pixels_tab[0] = ff_avg_h264_chroma_mc8_10_avx;
         }
     }
-    c->vector_fmul_reverse = ff_vector_fmul_reverse_avx;
-    c->vector_fmul_add = ff_vector_fmul_add_avx;
 #endif /* HAVE_AVX_EXTERNAL */
 }
 

@@ -441,6 +441,7 @@ SRCS_YASM = \
     libavcodec/x86/sbrdsp.asm \
     libavcodec/x86/vc1dsp.asm \
     libavcodec/x86/videodsp.asm \
+    libavcodec/x86/vorbisdsp.asm \
     libavcodec/x86/vp3dsp.asm \
     libavcodec/x86/vp56dsp.asm \
     libavcodec/x86/vp8dsp.asm \

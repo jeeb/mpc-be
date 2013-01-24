@@ -32,6 +32,9 @@
 #include "eval.h"
 #include "log.h"
 #include "mathematics.h"
+// ==> Start patch MPC BE
+//#include "time.h"
+// <== End patch MPC BE
 
 typedef struct Parser {
     const AVClass *class;
@@ -155,6 +158,13 @@ struct AVExpr {
     struct AVExpr *param[3];
     double *var;
 };
+
+// ==> Start patch MPC BE
+//static double etime(double v)
+//{
+//    return av_gettime() * 0.000001;
+//}
+// <== End patch MPC BE
 
 static double eval_expr(Parser *p, AVExpr *e)
 {
@@ -377,6 +387,9 @@ static int parse_primary(AVExpr **e, Parser *p)
     else if (strmatch(next, "exp"   )) d->a.func0 = exp;
     else if (strmatch(next, "log"   )) d->a.func0 = log;
     else if (strmatch(next, "abs"   )) d->a.func0 = fabs;
+// ==> Start patch MPC BE
+//    else if (strmatch(next, "time"  )) d->a.func0 = etime;
+// <== End patch MPC BE
     else if (strmatch(next, "squish")) d->type = e_squish;
     else if (strmatch(next, "gauss" )) d->type = e_gauss;
     else if (strmatch(next, "mod"   )) d->type = e_mod;
