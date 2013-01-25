@@ -952,6 +952,12 @@ void CMainFrame::OnDestroy()
 
 	m_wndView2.DestroyWindow();
 
+	if (AfxGetAppSettings().fReset) {
+		CString strAppPath;
+		GetModuleFileName(NULL, strAppPath.GetBuffer(MAX_PATH), MAX_PATH);
+		ShellExecute(NULL, _T("open"), strAppPath, _T("/reset"), NULL, SW_SHOWNORMAL) ;
+	}
+
 	__super::OnDestroy();
 }
 
@@ -12041,11 +12047,16 @@ UINT CMainFrame::YoutubeThreadProc()
 {
 	HINTERNET f, s = InternetOpen(L"MPC-BE Youtube downloader", 0, 0, 0, 0);
 	if (s) {
+#ifdef _DEBUG
+		CString tmp = m_YoutubeFile;
+#endif
 		f = InternetOpenUrl(s, m_YoutubeFile, 0, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 		if (f) {
 			if (GetTemporaryFilePath(CPath(m_YoutubeFile).GetExtension(), m_YoutubeFile)) {
 				CFile file;
 				if (file.Open(m_YoutubeFile, CFile::modeCreate|CFile::modeWrite|CFile::shareDenyWrite, NULL)) {
+					AfxGetAppSettings().slTMPFilesList.AddTail(m_YoutubeFile);
+
 					DWORD dwBytesRead		= 0;
 					DWORD dwBytesReadTotal	= 0;
 					DWORD dataSize			= 0;
@@ -12058,6 +12069,13 @@ UINT CMainFrame::YoutubeThreadProc()
 							m_fYoutubeThreadWork = TH_WORK;
 						}
 					}
+#ifdef _DEBUG
+					if (dwBytesReadTotal) {
+						LOG2FILE(_T("Open Youtube, GOOD from \'%s\'"), tmp);
+					} else {
+						LOG2FILE(_T("Open Youtube, FAILED from \'%s\'"), tmp);
+					}
+#endif
 					file.Close();
 				}
 			}
@@ -12164,7 +12182,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 						if (m_fYoutubeThreadWork == TH_WORK && ::PathFileExists(m_YoutubeFile)) {
 							tmpName = m_YoutubeFile;
-							s.slTMPFilesList.AddTail(tmpName);
 						} else {
 							tmpName = _T("");
 						}
@@ -17012,7 +17029,13 @@ void CMainFrame::ShowOptions(int idPage)
 	CPPageSheet options(ResStr(IDS_OPTIONS_CAPTION), pGB, GetModalParent(), idPage);
 
 	m_bInOptions = true;
-	if (options.DoModal() == IDOK) {
+	INT_PTR dResult = options.DoModal();
+	if (s.fReset) {
+		PostMessage(WM_CLOSE);
+		return;
+	}
+
+	if (dResult == IDOK) {
 		m_bInOptions = false;
 		if (!m_fFullScreen) {
 			SetAlwaysOnTop(s.iOnTop);

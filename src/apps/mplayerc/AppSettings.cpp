@@ -36,6 +36,7 @@ CAppSettings::CAppSettings()
 	, fShowDebugInfo(false)
 	, fIsFSWindow(false)
 	, fShaderEditorWasOpened(false)
+	, fReset(false)
 {
 	// Internal source filter
 	SrcFiltersKeys[SRC_CDDA] = _T("SRC_CDDA");

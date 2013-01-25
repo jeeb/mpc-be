@@ -309,6 +309,8 @@ class CAppSettings
 	};
 
 public:
+	bool fReset;
+
 	bool fShaderEditorWasOpened;
 
 	// cmdline params
