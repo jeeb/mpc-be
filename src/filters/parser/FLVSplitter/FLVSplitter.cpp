@@ -146,7 +146,7 @@ STDMETHODIMP CFLVSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 
 bool CFLVSplitterFilter::ReadTag(Tag& t)
 {
-	if (m_pFile->GetRemaining() < 15) {
+	if (FAILED(m_pFile->WaitAvailable(1500, 15))) {
 		return false;
 	}
 
@@ -166,16 +166,15 @@ bool CFLVSplitterFilter::ReadTag(Tag& t)
 
 	if (m_TimeStampOffset > 0) {
 		t.TimeStamp -= m_TimeStampOffset;
-
 		//TRACE(_T("CFLVSplitterFilter::ReadTag() : Detect wrong TimeStamp offset, corrected [%d -> %d]\n"), (t.TimeStamp + m_TimeStampOffset), t.TimeStamp);
 	}
 
-	return m_pFile->GetRemaining() >= t.DataSize;
+	return SUCCEEDED(m_pFile->WaitAvailable(2000, t.DataSize));
 }
 
 bool CFLVSplitterFilter::ReadTag(AudioTag& at)
 {
-	if (!m_pFile->GetRemaining()) {
+	if (FAILED(m_pFile->WaitAvailable())) {
 		return false;
 	}
 
@@ -189,7 +188,7 @@ bool CFLVSplitterFilter::ReadTag(AudioTag& at)
 
 bool CFLVSplitterFilter::ReadTag(VideoTag& vt)
 {
-	if (!m_pFile->GetRemaining()) {
+	if (FAILED(m_pFile->WaitAvailable())) {
 		return false;
 	}
 
@@ -202,7 +201,7 @@ bool CFLVSplitterFilter::ReadTag(VideoTag& vt)
 #ifndef NOVIDEOTWEAK
 bool CFLVSplitterFilter::ReadTag(VideoTweak& vt)
 {
-	if (!m_pFile->GetRemaining()) {
+	if (FAILED(m_pFile->WaitAvailable())) {
 		return false;
 	}
 

@@ -75,5 +75,5 @@ public:
 
 	HRESULT HasMoreData(__int64 len = 1, DWORD ms = 1);
 
-	HRESULT WaitAvailable(DWORD dwMilliseconds);
+	HRESULT WaitAvailable(DWORD dwMilliseconds = 1500, __int64 AvailBytes = 1);
 };

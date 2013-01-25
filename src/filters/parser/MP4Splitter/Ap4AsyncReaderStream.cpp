@@ -52,6 +52,8 @@ void AP4_AsyncReaderStream::Release()
 
 AP4_Result AP4_AsyncReaderStream::Read(void* buffer, AP4_Size bytesToRead, AP4_Size* bytesRead)
 {
+	m_pFile->WaitAvailable(1500, bytesToRead);
+
 	__int64 bytesAvail = m_pFile->GetRemaining();
 
 	if (bytesAvail < (long long)bytesToRead) {

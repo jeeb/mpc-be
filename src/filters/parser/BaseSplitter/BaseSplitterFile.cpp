@@ -251,22 +251,22 @@ HRESULT CBaseSplitterFile::HasMoreData(__int64 len, DWORD ms)
 	return S_OK;
 }
 
-HRESULT CBaseSplitterFile::WaitAvailable(DWORD dwMilliseconds)
+HRESULT CBaseSplitterFile::WaitAvailable(DWORD dwMilliseconds, __int64 AvailBytes)
 {
-	if (GetRemaining()) {
+	if (!m_fStreaming) {
+		return (GetRemaining() >= AvailBytes) ? S_OK : E_FAIL;
+	}
+	
+	for (int i = 0; i < int(dwMilliseconds/100); i++) {
+		if (GetRemaining() >= AvailBytes) {
+			return S_OK;
+		}
+		Sleep(100);
+	}
+
+	if (GetRemaining() >= AvailBytes) {
 		return S_OK;
 	}
 
-	for (int i = 0; i < int(dwMilliseconds/100); i++) {
-		Sleep(100);
-		if (GetRemaining()) {
-			return S_OK;
-		}
-	}
-
-	if (!GetRemaining()) {
-		return E_FAIL;
-	}
-
-	return S_OK;
+	return E_FAIL;
 }
