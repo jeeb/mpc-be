@@ -267,4 +267,6 @@ HRESULT CBaseSplitterFile::WaitAvailable(DWORD dwMilliseconds)
 	if (!GetRemaining()) {
 		return E_FAIL;
 	}
+
+	return S_OK;
 }
