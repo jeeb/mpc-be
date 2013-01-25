@@ -766,9 +766,9 @@ HANDLE WINAPI Mine_CreateFileW(LPCWSTR p1, DWORD p2, DWORD p3, LPSECURITY_ATTRIB
 
 			if (hFile != INVALID_HANDLE_VALUE) {
 				AppSettings& s = AfxGetAppSettings();
-				POSITION pos = s.slFakeIfoList.Find(CString(strFakeFile).MakeUpper());
+				POSITION pos = s.slTMPFilesList.Find(CString(strFakeFile).MakeUpper());
 				if (!pos) {
-					s.slFakeIfoList.AddTail(CString(strFakeFile).MakeUpper());
+					s.slTMPFilesList.AddTail(CString(strFakeFile).MakeUpper());
 				}
 			}
 		}

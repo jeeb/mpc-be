@@ -45,11 +45,12 @@ CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, in
 	LONGLONG total = 0, available;
 	hr = m_pAsyncReader->Length(&total, &available);
 
-	m_fStreaming = total == 0 && available > 0;
-	m_fRandomAccess = total > 0 && total == available;
+	m_fStreaming	= (total == 0 && available > 0);
+	m_fRandomAccess	= (total > 0 && total == available);
+
 	m_len = total;
 
-	if (FAILED(hr) || fRandomAccess && !m_fRandomAccess  || !fStreaming && m_fStreaming || m_len < 0) {
+	if (FAILED(hr) || (fRandomAccess && !m_fRandomAccess) || (!fStreaming && m_fStreaming) || m_len < 0) {
 		hr = E_FAIL;
 		return;
 	}
@@ -248,4 +249,22 @@ HRESULT CBaseSplitterFile::HasMoreData(__int64 len, DWORD ms)
 	}
 
 	return S_OK;
+}
+
+HRESULT CBaseSplitterFile::WaitAvailable(DWORD dwMilliseconds)
+{
+	if (GetRemaining()) {
+		return S_OK;
+	}
+
+	for (int i = 0; i < int(dwMilliseconds/100); i++) {
+		Sleep(100);
+		if (GetRemaining()) {
+			return S_OK;
+		}
+	}
+
+	if (!GetRemaining()) {
+		return E_FAIL;
+	}
 }

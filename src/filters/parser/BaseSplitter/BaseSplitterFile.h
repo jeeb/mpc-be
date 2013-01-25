@@ -25,7 +25,8 @@
 
 #include <atlcoll.h>
 
-#define DEFAULT_CACHE_LENGTH 64*1024	// Beliyaal: Changed the default cache length to allow Bluray playback over network
+#define MEGABYTE				1024*1024
+#define DEFAULT_CACHE_LENGTH	64*1024
 
 class CBaseSplitterFile
 {
@@ -73,4 +74,6 @@ public:
 	}
 
 	HRESULT HasMoreData(__int64 len = 1, DWORD ms = 1);
+
+	HRESULT WaitAvailable(DWORD dwMilliseconds);
 };

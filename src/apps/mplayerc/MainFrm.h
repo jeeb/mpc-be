@@ -71,6 +71,7 @@
 #include "../../filters/renderer/SyncClock/SyncClock.h"
 #include "../../filters/transform/DecSSFilter/VobFile.h"
 #include <sizecbar/scbarg.h>
+#include <afxinet.h>
 
 class CFullscreenWnd;
 
@@ -1143,4 +1144,13 @@ public:
 	CAtlList<CHdmvClipInfo::PlaylistItem> m_MPLSPlaylist;
 	bool m_bIsBDPlay;
 	bool OpenBD(CString Path);
+
+private:
+	typedef enum TH_STATE {TH_START, TH_WORK, TH_CLOSE};
+	TH_STATE	m_fYoutubeThreadWork;
+	CString		m_YoutubeFile;
+	CWinThread*	m_YoutubeThread;
+
+public:
+	UINT		YoutubeThreadProc();
 };

@@ -3213,3 +3213,28 @@ CString RemoveSlash(LPCTSTR Path)
 	cs.ReleaseBuffer(-1);
 	return cs;
 }
+
+//
+// Generate temporary files with any extension
+//
+BOOL GetTemporaryFilePath(CString strExtension, CString& strFileName)
+{
+	TCHAR lpszTempPath[MAX_PATH] = { 0 };
+	if (!GetTempPath(MAX_PATH, lpszTempPath)) {
+		return FALSE;
+	}
+ 
+	TCHAR lpszFilePath[MAX_PATH] = { 0 };
+	do {
+		if (!GetTempFileName(lpszTempPath, _T("mpc"), 0, lpszFilePath)) {
+			return FALSE;
+		}
+ 
+		strFileName = lpszFilePath;
+		VERIFY(::DeleteFile(strFileName));
+		strFileName.Replace(_T(".tmp"), strExtension);
+	} while (_taccess(strFileName, 00) != -1);
+ 
+	TRACE(_T("GetTemporaryFilePath() : \'%ws\'\n"), strFileName);
+	return TRUE;
+}

@@ -691,7 +691,10 @@ CMainFrame::CMainFrame() :
 	m_bfirstPlay(false),
 	m_nLastRunTicket(0),
 	b_UseVSFilter(false),
-	IsMadVRExclusiveMode(false)
+	IsMadVRExclusiveMode(false),
+	m_YoutubeFile(_T("")),
+	m_fYoutubeThreadWork(TH_CLOSE),
+	m_YoutubeThread(NULL)
 {
 	m_Lcd.SetVolumeRange(0, 100);
 	m_LastSaveTime.QuadPart = 0;
@@ -1018,10 +1021,10 @@ void CMainFrame::OnClose()
 		::DeleteObject(m_ThumbCashedBitmap);
 	}
 
-	while (s.slFakeIfoList.GetCount()) {
-		CString fakeIfoFileName = s.slFakeIfoList.RemoveHead();
-		if (::PathFileExists(fakeIfoFileName)) {
-			DeleteFile(fakeIfoFileName);
+	while (s.slTMPFilesList.GetCount()) {
+		CString tmpFileName = s.slTMPFilesList.RemoveHead();
+		if (::PathFileExists(tmpFileName)) {
+			DeleteFile(tmpFileName);
 		}
 	}
 
@@ -12028,11 +12031,54 @@ CWnd *CMainFrame::GetModalParent()
 	return pParentWnd;
 }
 
+static UINT tmpYoutubeThreadProc(LPVOID pParam)
+{
+	return (static_cast<CMainFrame*>(pParam))->YoutubeThreadProc();
+}
+
+#define MEGABYTE 1024*1024
+UINT CMainFrame::YoutubeThreadProc()
+{
+	HINTERNET f, s = InternetOpen(L"MPC-BE Youtube downloader", 0, 0, 0, 0);
+	if (s) {
+		f = InternetOpenUrl(s, m_YoutubeFile, 0, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
+		if (f) {
+			if (GetTemporaryFilePath(CPath(m_YoutubeFile).GetExtension(), m_YoutubeFile)) {
+				CFile file;
+				if (file.Open(m_YoutubeFile, CFile::modeCreate|CFile::modeWrite|CFile::shareDenyWrite, NULL)) {
+					DWORD dwBytesRead		= 0;
+					DWORD dwBytesReadTotal	= 0;
+					DWORD dataSize			= 0;
+					BYTE buf[1024*16];
+					while (InternetReadFile(f, (LPVOID)buf, sizeof(buf), &dwBytesRead) && dwBytesRead && m_fYoutubeThreadWork != TH_CLOSE) {
+						file.Write((void*)buf, dwBytesRead);
+
+						dwBytesReadTotal += dwBytesRead;
+						if (dwBytesReadTotal > MEGABYTE) {
+							m_fYoutubeThreadWork = TH_WORK;
+						}
+					}
+					file.Close();
+				}
+			}
+			InternetCloseHandle(f);
+		}
+		InternetCloseHandle(s);
+	}
+
+	m_fYoutubeThreadWork = TH_CLOSE;
+	return (UINT)m_fYoutubeThreadWork;
+}
+
 CString CMainFrame::OpenFile(OpenFileData* pOFD)
 {
 	if (pOFD->fns.IsEmpty()) {
 		return ResStr(IDS_MAINFRM_81);
 	}
+
+	m_YoutubeFile			= _T("");
+	m_YoutubeThread			= NULL;
+	m_fYoutubeThreadWork	= TH_CLOSE;
 
 	AppSettings& s = AfxGetAppSettings();
 
@@ -12105,7 +12151,27 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 
 			if (!extimage) {
-				hr = pGB->RenderFile(PlayerYouTube(fn, &m_strTitleAlt), NULL);
+				CString tmpName = PlayerYouTube(fn, &m_strTitleAlt);
+
+				{
+					if (!m_strTitleAlt.IsEmpty() && tmpName.Find(_T("http://")) == 0) {
+						m_fYoutubeThreadWork = TH_START;
+						m_YoutubeFile = tmpName;
+						m_YoutubeThread = AfxBeginThread(::tmpYoutubeThreadProc, static_cast<LPVOID>(this), THREAD_PRIORITY_ABOVE_NORMAL);
+						while (m_fYoutubeThreadWork == TH_START) {
+							Sleep(100);
+						}
+
+						if (m_fYoutubeThreadWork == TH_WORK && ::PathFileExists(m_YoutubeFile)) {
+							tmpName = m_YoutubeFile;
+							s.slTMPFilesList.AddTail(tmpName);
+						} else {
+							tmpName = _T("");
+						}
+					}
+				}
+
+				hr = pGB->RenderFile(tmpName, NULL);
 			}
 		}
 
@@ -14280,6 +14346,14 @@ void CMainFrame::CloseMediaPrivate()
 	if (IsWindow(m_wndToolBar.m_hWnd) && m_wndToolBar.IsVisible()) {
 		m_wndToolBar.Invalidate();
 	}
+
+	if (m_YoutubeThread) {
+		m_fYoutubeThreadWork = TH_CLOSE;
+		if (WaitForSingleObject(m_YoutubeThread->m_hThread, 3000) == WAIT_TIMEOUT) {
+			TerminateThread(m_YoutubeThread->m_hThread, 0xDEAD);
+		}
+	}
+	m_YoutubeThread = NULL;
 
 	b_UseVSFilter = false;
 }
