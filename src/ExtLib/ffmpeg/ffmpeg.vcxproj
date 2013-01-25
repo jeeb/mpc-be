@@ -150,6 +150,7 @@
     <ClInclude Include="libavcodec\h264data.h" />
     <ClInclude Include="libavcodec\h264dsp.h" />
     <ClInclude Include="libavcodec\h264pred.h" />
+    <ClInclude Include="libavcodec\h264qpel.h" />
     <ClInclude Include="libavcodec\h264_mvpred.h" />
     <ClInclude Include="libavcodec\huffman.h" />
     <ClInclude Include="libavcodec\imcdata.h" />
@@ -457,6 +458,8 @@
     <ClCompile Include="libavcodec\h264idct_template.c" />
     <ClCompile Include="libavcodec\h264pred.c" />
     <ClCompile Include="libavcodec\h264pred_template.c" />
+    <ClCompile Include="libavcodec\h264qpel.c" />
+    <ClCompile Include="libavcodec\h264qpel_template.c" />
     <ClCompile Include="libavcodec\h264_cabac.c" />
     <ClCompile Include="libavcodec\h264_cavlc.c" />
     <ClCompile Include="libavcodec\h264_direct.c" />
@@ -468,6 +471,7 @@
     <ClCompile Include="libavcodec\h264_recov.c" />
     <ClCompile Include="libavcodec\h264_refs.c" />
     <ClCompile Include="libavcodec\h264_sei.c" />
+    <ClCompile Include="libavcodec\hpel_template.c" />
     <ClCompile Include="libavcodec\huffman.c" />
     <ClCompile Include="libavcodec\imc.c" />
     <ClCompile Include="libavcodec\imgconvert.c" />

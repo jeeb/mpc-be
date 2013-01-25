@@ -29,7 +29,7 @@ CFLAGS    = -I. -I.. -Ilibavcodec -Ilibavutil -I$(ZLIB_DIR) -I$(OPENJPEG_DIR) -I
             -DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_XOPEN_SOURCE=600 \
             -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 \
             -O2 -ffast-math -fomit-frame-pointer \
-            -std=gnu99 -fno-common
+            -std=gnu99 -fno-common -mthreads
 YASMFLAGS = -I. -Ilibavutil/x86 -Pconfig.asm
 
 ifeq ($(64BIT),yes)
@@ -177,6 +177,7 @@ SRCS_C = \
     libavcodec/h264dsp.c \
     libavcodec/h264idct.c \
     libavcodec/h264pred.c \
+    libavcodec/h264qpel.c \
     libavcodec/huffman.c \
     libavcodec/imc.c \
     libavcodec/imgconvert.c \
@@ -330,6 +331,7 @@ SRCS_C = \
     libavcodec/x86/fmtconvert_init.c \
     libavcodec/x86/h264_intrapred_init.c \
     libavcodec/x86/h264dsp_init.c \
+    libavcodec/x86/h264_qpel.c \
     libavcodec/x86/idct_mmx.c \
     libavcodec/x86/idct_mmx_xvid.c \
     libavcodec/x86/idct_sse2_xvid.c \
