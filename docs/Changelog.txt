@@ -17,7 +17,7 @@ Changes (*):
 * libopus 1.0.1 git-2fd3d0aa;
 * Little-CMS git-d0df7551;
 * libwebp 0.2.1 git-152ec3d2;
-* MediaInfo 0.7.61+ svn rev.5348;
+* MediaInfo 0.7.61+ svn rev.5354;
 * libpng 1.5.14 rc3 git-40a8cd05;
 
 Fixes (!):

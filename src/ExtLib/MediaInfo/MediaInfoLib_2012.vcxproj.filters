@@ -593,6 +593,9 @@
     <ClInclude Include="MediaInfo\Audio\File_SmpteSt0337.h">
       <Filter>Header Files\Audio</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Text\File_AribStdB24B37.h">
+      <Filter>Header Files\Text</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
@@ -1128,6 +1131,9 @@
     </ClCompile>
     <ClCompile Include="MediaInfo\Audio\File_SmpteSt0337.cpp">
       <Filter>Source Files\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Text\File_AribStdB24B37.cpp">
+      <Filter>Source Files\Text</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

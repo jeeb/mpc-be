@@ -138,6 +138,7 @@
     <ClInclude Include="MediaInfo\Audio\File_Wvpk.h" />
     <ClInclude Include="MediaInfo\Image\File_Pcx.h" />
     <ClInclude Include="MediaInfo\Image\File_Psd.h" />
+    <ClInclude Include="MediaInfo\Text\File_AribStdB24B37.h" />
     <ClInclude Include="MediaInfo\Video\File_ProRes.h" />
     <ClInclude Include="ThirdParty\base64\base64.h" />
     <ClInclude Include="ThirdParty\tinyxml2\tinyxml2.h" />
@@ -365,6 +366,7 @@
     <ClCompile Include="MediaInfo\PreComp.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="MediaInfo\Text\File_AribStdB24B37.cpp" />
     <ClCompile Include="MediaInfo\TimeCode.cpp" />
     <ClCompile Include="MediaInfo\Multiple\File_Ancillary.cpp" />
     <ClCompile Include="MediaInfo\Multiple\File_Bdmv.cpp" />
