@@ -19,7 +19,7 @@
 * Little-CMS git-d0df7551;
 * libwebp 0.2.1 git-152ec3d2;
 * MediaInfo 0.7.61+ svn rev.5354;
-* libpng 1.5.14 rc3 git-40a8cd05;
+* libpng 1.5.14 RELEASE git-8799d783;
 
 Исправления (!):
 
