@@ -1110,6 +1110,8 @@ bool ExtractAvgTimePerFrame(const AM_MEDIA_TYPE* pmt, REFERENCE_TIME& rtAvgTimeP
 		return false;
 	}
 
+	rtAvgTimePerFrame = max(1, rtAvgTimePerFrame);
+
 	return true;
 }
 

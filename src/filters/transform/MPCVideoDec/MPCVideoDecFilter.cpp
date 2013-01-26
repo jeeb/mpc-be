@@ -1170,25 +1170,6 @@ void CMPCVideoDecFilter::Cleanup()
 	m_pDecoderRenderTarget	= NULL;
 }
 
-void CMPCVideoDecFilter::CalcAvgTimePerFrame()
-{
-	CMediaType &mt = m_pInput->CurrentMediaType();
-	if (mt.formattype==FORMAT_VideoInfo) {
-		m_rtAvrTimePerFrame = ((VIDEOINFOHEADER*)mt.pbFormat)->AvgTimePerFrame;
-	} else if (mt.formattype==FORMAT_VideoInfo2) {
-		m_rtAvrTimePerFrame = ((VIDEOINFOHEADER2*)mt.pbFormat)->AvgTimePerFrame;
-	} else if (mt.formattype==FORMAT_MPEGVideo) {
-		m_rtAvrTimePerFrame = ((MPEG1VIDEOINFO*)mt.pbFormat)->hdr.AvgTimePerFrame;
-	} else if (mt.formattype==FORMAT_MPEG2Video) {
-		m_rtAvrTimePerFrame = ((MPEG2VIDEOINFO*)mt.pbFormat)->hdr.AvgTimePerFrame;
-	} else {
-		ASSERT (FALSE);
-		m_rtAvrTimePerFrame	= 1;
-	}
-
-	m_rtAvrTimePerFrame = max (1, m_rtAvrTimePerFrame);
-}
-
 STDMETHODIMP CMPCVideoDecFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {
 	return
@@ -1214,7 +1195,7 @@ HRESULT CMPCVideoDecFilter::CheckInputType(const CMediaType* mtIn)
 
 bool CMPCVideoDecFilter::IsAVI()
 {
-	CString ext, fname;
+	CString fname;
 
 	BeginEnumFilters(m_pGraph, pEF, pBF) {
 		CComQIPtr<IFileSourceFilter> pFSF = pBF;
@@ -1222,8 +1203,7 @@ bool CMPCVideoDecFilter::IsAVI()
 			LPOLESTR pFN = NULL;
 			AM_MEDIA_TYPE mt;
 			if (SUCCEEDED(pFSF->GetCurFile(&pFN, &mt)) && pFN && *pFN) {
-				fname	= CString(pFN);
-				ext		= CPath(fname).GetExtension().MakeLower();
+				fname = CString(pFN);
 				CoTaskMemFree(pFN);
 			}
 			break;
@@ -1231,7 +1211,7 @@ bool CMPCVideoDecFilter::IsAVI()
 	}
 	EndEnumFilters
 
-	if (ext == _T(".avi")) {
+	if (!fname.IsEmpty() && ::PathFileExists(fname)) {
 		CFile f;
 		CFileException fileException;
 		if (!f.Open(fname, CFile::modeRead|CFile::typeBinary|CFile::shareDenyNone, &fileException)) {
@@ -1345,10 +1325,10 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 				m_bReorderBFrame = false;
 			}
 			
-			m_pAVCtx->using_dxva			= (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO || (IsDXVASupported() && m_nCodecId == AV_CODEC_ID_H264));
+			m_pAVCtx->using_dxva = (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO || (IsDXVASupported() && m_nCodecId == AV_CODEC_ID_H264));
 
 			AllocExtradata (m_pAVCtx, pmt);
-			CalcAvgTimePerFrame();
+			ExtractAvgTimePerFrame(&m_pInput->CurrentMediaType(), m_rtAvrTimePerFrame);
 
 			if (avcodec_open2(m_pAVCtx, m_pAVCodec, NULL)<0) {
 				return VFW_E_INVALIDMEDIATYPE;
@@ -1567,10 +1547,6 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 			extra[extralen-1] = 0;
 
 			bH264avc = TRUE;
-			if (!bSPS) {
-				TRACE(_T("CMPCVideoDecFilter::AllocExtradata() : AVC1 extradata doesn't contain a SPS, setting thread_count = 1\n"));
-				m_pAVCtx->thread_count = 1;
-			}
 		} else {
 			// Just copy extradata for other formats
 			extra = (uint8_t *)av_mallocz(extralen + FF_INPUT_BUFFER_PADDING_SIZE);
@@ -1588,8 +1564,6 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 
 HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pReceivePin)
 {
-	TRACE(_T("CMPCVideoDecFilter::CompleteConnect()\n"));
-
 	if (direction == PINDIR_INPUT && m_pOutput->IsConnected()) {
 		ReconnectOutput (PictWidth(), PictHeight());
 	} else if (direction == PINDIR_OUTPUT) {

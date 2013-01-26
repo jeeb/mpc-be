@@ -193,6 +193,19 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			ASSERT(s->strf.GetCount() >= sizeof(BITMAPINFOHEADER));
 
 			BITMAPINFOHEADER* pbmi = &((BITMAPINFO*)s->strf.GetData())->bmiHeader;
+			RECT rc = {0, 0, pbmi->biWidth, abs(pbmi->biHeight)};
+			
+			REFERENCE_TIME AvgTimePerFrame = s->strh.dwRate > 0 ? 10000000ui64 * s->strh.dwScale / s->strh.dwRate : 0;
+			
+			DWORD dwBitRate = 0;
+			if (s->cs.GetCount() && AvgTimePerFrame > 0) {
+				UINT64 size = 0;
+				for (unsigned int i = 0; i < s->cs.GetCount(); ++i) {
+					size += s->cs[i].orgsize;
+				}
+				dwBitRate = (DWORD)(10000000.0 * size * 8 / (s->cs.GetCount() * AvgTimePerFrame) + 0.5);
+				// need calculate in double, because the (10000000ui64 * size * 8) can give overflow
+			}
 
 			mt.majortype = MEDIATYPE_Video;
 			switch (pbmi->biCompression) {
@@ -223,22 +236,70 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mt.subtype = FOURCCMap(pbmi->biCompression);
 			}
 
-			mt.formattype = FORMAT_VideoInfo;
-			VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + (ULONG)s->strf.GetCount() - sizeof(BITMAPINFOHEADER));
-			memset(mt.Format(), 0, mt.FormatLength());
-			memcpy(&pvih->bmiHeader, s->strf.GetData(), s->strf.GetCount());
-			if (s->strh.dwRate > 0) {
-				pvih->AvgTimePerFrame = 10000000ui64 * s->strh.dwScale / s->strh.dwRate;
+			if (pbmi->biCompression == FCC('H264') && s->strf.GetCount() > sizeof(BITMAPINFOHEADER)) {
+				size_t extralen	= s->strf.GetCount() - sizeof(BITMAPINFOHEADER);
+				BYTE* extra		= s->strf.GetData() + (s->strf.GetCount() - extralen);
+
+				mt.majortype	= MEDIATYPE_Video;
+				mt.formattype	= FORMAT_MPEG2Video;
+
+				MPEG2VIDEOINFO* mvih = (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + extralen - 7);
+				memset(mvih, 0, mt.FormatLength());
+				memcpy(&mvih->hdr.bmiHeader, s->strf.GetData(), sizeof(BITMAPINFOHEADER));
+
+				CSize aspect(mvih->hdr.bmiHeader.biWidth, mvih->hdr.bmiHeader.biHeight);
+				int lnko = LNKO(aspect.cx, aspect.cy);
+				if (lnko > 1) {
+					aspect.cx /= lnko, aspect.cy /= lnko;
+				}
+
+				mvih->hdr.dwPictAspectRatioX	= aspect.cx;
+				mvih->hdr.dwPictAspectRatioY	= aspect.cy;
+				mvih->hdr.AvgTimePerFrame		= AvgTimePerFrame;
+				mvih->hdr.dwBitRate				= dwBitRate;
+				mvih->hdr.rcSource				= mvih->hdr.rcTarget = rc;
+
+				mvih->dwProfile	= extra[1];
+				mvih->dwLevel	= extra[3];
+				mvih->dwFlags	= (extra[4] & 3) + 1;
+
+				mvih->cbSequenceHeader = 0;
+
+				BYTE* src = (BYTE*)extra + 5;
+				BYTE* dst = (BYTE*)mvih->dwSequenceHeader;
+
+				BYTE* src_end = (BYTE*)extra + extralen;
+				BYTE* dst_end = (BYTE*)mvih->dwSequenceHeader + extralen;
+
+				for (int i = 0; i < 2; ++i) {
+					for (int n = *src++ & 0x1f; n > 0; --n) {
+						int len = ((src[0] << 8) | src[1]) + 2;
+						if (src + len > src_end || dst + len > dst_end) {
+							ASSERT(0);
+							break;
+						}
+						memcpy(dst, src, len);
+						src += len;
+						dst += len;
+						mvih->cbSequenceHeader += len;
+					}
+				}
+
+				mt.SetSampleSize(s->strh.dwSuggestedBufferSize > 0
+								 ? s->strh.dwSuggestedBufferSize*3/2
+								 : (mvih->hdr.bmiHeader.biWidth*mvih->hdr.bmiHeader.biHeight*4));
+
+				mt.subtype = FOURCCMap(mvih->hdr.bmiHeader.biCompression = '1CVA');
+				mts.Add(mt);
 			}
 
-			if (s->cs.GetCount() && pvih->AvgTimePerFrame > 0) {
-				UINT64 size = 0;
-				for (unsigned int i = 0; i < s->cs.GetCount(); ++i) {
-					size += s->cs[i].orgsize;
-				}
-				pvih->dwBitRate = (DWORD)(10000000.0 * size * 8 / (s->cs.GetCount() * pvih->AvgTimePerFrame) + 0.5);
-				// need calculate in double, because the (10000000ui64 * size * 8) can give overflow
-			}
+			mt.formattype			= FORMAT_VideoInfo;
+			VIDEOINFOHEADER* pvih	= (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + (ULONG)s->strf.GetCount() - sizeof(BITMAPINFOHEADER));
+			memset(mt.Format(), 0, mt.FormatLength());
+			memcpy(&pvih->bmiHeader, s->strf.GetData(), s->strf.GetCount());
+			pvih->AvgTimePerFrame	= AvgTimePerFrame;
+			pvih->dwBitRate			= dwBitRate;
+			pvih->rcSource			= pvih->rcTarget = rc;
 
 			mt.SetSampleSize(s->strh.dwSuggestedBufferSize > 0
 							 ? s->strh.dwSuggestedBufferSize*3/2
@@ -276,6 +337,9 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 			if (pwfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE) {
 				mt.subtype = FOURCCMap(WAVE_FORMAT_PCM);    // audio renderer doesn't accept fffe in the subtype
+			}
+			if (!pwfe->nChannels) {
+				pwfe->nChannels = 2;
 			}
 
 			mt.SetSampleSize(s->strh.dwSuggestedBufferSize > 0
@@ -590,7 +654,7 @@ bool CAviSplitterFilter::DemuxLoop()
 			p->bSyncPoint = (BOOL)s->cs[f].fKeyFrame;
 			p->bDiscontinuity = fDiscontinuity[minTrack];
 			p->rtStart = s->GetRefTime(f, s->cs[f].size);
-			p->rtStop = s->GetRefTime(f+1, f+1 < (DWORD)s->cs.GetCount() ? s->cs[f+1].size : s->totalsize);
+			p->rtStop = max(s->GetRefTime(f+1, f+1 < (DWORD)s->cs.GetCount() ? s->cs[f+1].size : s->totalsize), p->rtStart + 1);
 			p->SetCount(size);
 			if (S_OK != (hr = m_pFile->ByteRead(p->GetData(), p->GetCount()))) {
 				return true;    // break;
