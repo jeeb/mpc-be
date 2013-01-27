@@ -1767,12 +1767,21 @@ unsigned __int64 CMPCVideoDecFilter::GetCspFromMediaType(GUID& subtype)
 
 void CMPCVideoDecFilter::InitSwscale()
 {
-	if (m_pSwsContext == NULL) {
+	BITMAPINFOHEADER bihOut;
+	ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
+
+	if (m_pSwsContext == NULL
+		|| (m_pOutSize.cx != bihOut.biWidth)
+		|| (m_pOutSize.cy != abs(bihOut.biHeight))) {
+
+		if (m_pSwsContext) {
+			sws_freeContext(m_pSwsContext);
+			m_pSwsContext	= NULL;
+			m_PixFmt		= AV_PIX_FMT_NB;
+		}
+
 		int sws_FlagsR = 0;
 		int sws_FlagsO = 0;
-
-		BITMAPINFOHEADER bihOut;
-		ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
 
 		switch (m_nSwChromaToRGB) {
 			case 0  :										// GUI 'Fast'
@@ -2141,9 +2150,8 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			m_PixFmt		= AV_PIX_FMT_NB;
 		}
 
-		if (m_pSwsContext == NULL) {
-			InitSwscale();
-		}
+		InitSwscale();
+
 		if (m_pSwsContext != NULL) {
 
 			int outStride = m_pOutSize.cx;

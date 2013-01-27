@@ -1830,8 +1830,10 @@ HRESULT CRealVideoDecoder::Transform(IMediaSample* pIn)
 
 	CopyBuffer(pDataOut, pI420[0], m_w, m_h, m_w, MEDIASUBTYPE_I420);
 
+#if 0
 	DbgLog((LOG_TRACE, 0, _T("V: rtStart=%I64d, rtStop=%I64d, disc=%d, sync=%d"),
 			rtStart, rtStop, pOut->IsDiscontinuity() == S_OK, pOut->IsSyncPoint() == S_OK));
+#endif
 
 	return m_pOutput->Deliver(pOut);
 }
@@ -2385,8 +2387,10 @@ HRESULT CRealAudioDecoder::Receive(IMediaSample* pIn)
 
 		pOut->SetActualDataLength(len);
 
+#if 0
 		DbgLog((LOG_TRACE, 0, _T("A: rtStart=%I64d, rtStop=%I64d, disc=%d, sync=%d"),
 				rtStart, rtStop, pOut->IsDiscontinuity() == S_OK, pOut->IsSyncPoint() == S_OK));
+#endif
 
 		if (rtStart >= 0 && S_OK != (hr = m_pOutput->Deliver(pOut))) {
 			return hr;
