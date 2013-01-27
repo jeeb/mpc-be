@@ -711,7 +711,7 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId)
 			end = p + buffRA.GetCount();
 			isRA = true;
 		} else {
-			return S_OK;
+			// trying continue decoding without any pre-processing ...
 		}
 	}
 
