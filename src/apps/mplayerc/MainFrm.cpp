@@ -18672,7 +18672,7 @@ bool CMainFrame::OpenBD(CString Path)
 				if (InternalMpegSplitter) {
 					sl.AddTail(strPlaylistFile);
 				} else {
-					sl.AddTail(CString(Path + _T("BDMV\\index.bdmv")));
+					sl.AddTail(CString(Path + _T("\\BDMV\\index.bdmv")));
 				}
 				m_wndPlaylistBar.Append(sl, false);
 				OpenCurPlaylistItem();
