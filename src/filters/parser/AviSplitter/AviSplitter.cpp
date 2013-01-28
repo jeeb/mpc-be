@@ -240,56 +240,13 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				size_t extralen	= s->strf.GetCount() - sizeof(BITMAPINFOHEADER);
 				BYTE* extra		= s->strf.GetData() + (s->strf.GetCount() - extralen);
 
-				mt.majortype	= MEDIATYPE_Video;
-				mt.formattype	= FORMAT_MPEG2Video;
-
-				MPEG2VIDEOINFO* mvih = (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + extralen - 7);
-				memset(mvih, 0, mt.FormatLength());
-				memcpy(&mvih->hdr.bmiHeader, s->strf.GetData(), sizeof(BITMAPINFOHEADER));
-
-				CSize aspect(mvih->hdr.bmiHeader.biWidth, mvih->hdr.bmiHeader.biHeight);
+				CSize aspect(pbmi->biWidth, pbmi->biHeight);
 				int lnko = LNKO(aspect.cx, aspect.cy);
 				if (lnko > 1) {
 					aspect.cx /= lnko, aspect.cy /= lnko;
 				}
+				CreateMPEG2VIfromAVC(&mt, pbmi, AvgTimePerFrame, aspect, extra, extralen); 
 
-				mvih->hdr.dwPictAspectRatioX	= aspect.cx;
-				mvih->hdr.dwPictAspectRatioY	= aspect.cy;
-				mvih->hdr.AvgTimePerFrame		= AvgTimePerFrame;
-				mvih->hdr.dwBitRate				= dwBitRate;
-				mvih->hdr.rcSource				= mvih->hdr.rcTarget = rc;
-
-				mvih->dwProfile	= extra[1];
-				mvih->dwLevel	= extra[3];
-				mvih->dwFlags	= (extra[4] & 3) + 1;
-
-				mvih->cbSequenceHeader = 0;
-
-				BYTE* src = (BYTE*)extra + 5;
-				BYTE* dst = (BYTE*)mvih->dwSequenceHeader;
-
-				BYTE* src_end = (BYTE*)extra + extralen;
-				BYTE* dst_end = (BYTE*)mvih->dwSequenceHeader + extralen;
-
-				for (int i = 0; i < 2; ++i) {
-					for (int n = *src++ & 0x1f; n > 0; --n) {
-						int len = ((src[0] << 8) | src[1]) + 2;
-						if (src + len > src_end || dst + len > dst_end) {
-							ASSERT(0);
-							break;
-						}
-						memcpy(dst, src, len);
-						src += len;
-						dst += len;
-						mvih->cbSequenceHeader += len;
-					}
-				}
-
-				mt.SetSampleSize(s->strh.dwSuggestedBufferSize > 0
-								 ? s->strh.dwSuggestedBufferSize*3/2
-								 : (mvih->hdr.bmiHeader.biWidth*mvih->hdr.bmiHeader.biHeight*4));
-
-				mt.subtype = FOURCCMap(mvih->hdr.bmiHeader.biCompression = '1CVA');
 				mts.Add(mt);
 			}
 

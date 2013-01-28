@@ -146,7 +146,7 @@ STDMETHODIMP CFLVSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 
 bool CFLVSplitterFilter::ReadTag(Tag& t)
 {
-	if (FAILED(m_pFile->WaitAvailable(1500, 15))) {
+	if (FAILED(m_pFile->WaitAvailable(200, 15))) {
 		return false;
 	}
 
@@ -154,7 +154,7 @@ bool CFLVSplitterFilter::ReadTag(Tag& t)
 	t.TagType			= (BYTE)m_pFile->BitRead(8);
 	t.DataSize			= (UINT32)m_pFile->BitRead(24);
 	t.TimeStamp			= (UINT32)m_pFile->BitRead(24);
-	t.TimeStamp			|= (UINT32)m_pFile->BitRead(8) << 24;
+	t.TimeStamp		   |= (UINT32)m_pFile->BitRead(8) << 24;
 	t.StreamID			= (UINT32)m_pFile->BitRead(24);
 
 	if (m_DetectWrongTimeStamp && (t.TagType == FLV_AUDIODATA || t.TagType == FLV_VIDEODATA)) {
@@ -169,12 +169,12 @@ bool CFLVSplitterFilter::ReadTag(Tag& t)
 		//TRACE(_T("CFLVSplitterFilter::ReadTag() : Detect wrong TimeStamp offset, corrected [%d -> %d]\n"), (t.TimeStamp + m_TimeStampOffset), t.TimeStamp);
 	}
 
-	return SUCCEEDED(m_pFile->WaitAvailable(2000, t.DataSize));
+	return (t.DataSize > 0);
 }
 
 bool CFLVSplitterFilter::ReadTag(AudioTag& at)
 {
-	if (FAILED(m_pFile->WaitAvailable())) {
+	if (FAILED(m_pFile->WaitAvailable(200))) {
 		return false;
 	}
 
@@ -188,7 +188,7 @@ bool CFLVSplitterFilter::ReadTag(AudioTag& at)
 
 bool CFLVSplitterFilter::ReadTag(VideoTag& vt)
 {
-	if (FAILED(m_pFile->WaitAvailable())) {
+	if (FAILED(m_pFile->WaitAvailable(200))) {
 		return false;
 	}
 
@@ -201,7 +201,7 @@ bool CFLVSplitterFilter::ReadTag(VideoTag& vt)
 #ifndef NOVIDEOTWEAK
 bool CFLVSplitterFilter::ReadTag(VideoTweak& vt)
 {
-	if (FAILED(m_pFile->WaitAvailable())) {
+	if (FAILED(m_pFile->WaitAvailable(200))) {
 		return false;
 	}
 
@@ -300,11 +300,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	bool fTypeFlagsVideo = !!m_pFile->BitRead(1);
 	m_DataOffset = (UINT32)m_pFile->BitRead(32);
 
-	if (m_pFile->IsStreaming()) {
-		for (int i = 0; i < 50 && S_OK != m_pFile->HasMoreData(MEGABYTE/2, 100); i++) {
-			;
-		}
-	}
+	m_pFile->WaitAvailable(2000, MEGABYTE/2);
 
 	// doh, these flags aren't always telling the truth
 	fTypeFlagsAudio = fTypeFlagsVideo = true;
@@ -644,65 +640,25 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							break;
 						}
 
+						BITMAPINFOHEADER pbmi;
+						memset(&pbmi, 0, sizeof(BITMAPINFOHEADER));
+						pbmi.biSize			= sizeof(pbmi);
+						pbmi.biWidth		= h.width;
+						pbmi.biHeight		= h.height;
+						pbmi.biCompression	= '1CVA';
+						pbmi.biPlanes		= 1;
+						pbmi.biBitCount		= 24;
+
 						CSize aspect(h.width * h.sar.num, h.height * h.sar.den);
 						int lnko = LNKO(aspect.cx, aspect.cy);
 						if (lnko > 1) {
 							aspect.cx /= lnko, aspect.cy /= lnko;
 						}
 
-						mt.formattype		= FORMAT_MPEG2Video;
-						MPEG2VIDEOINFO* vih	= (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + headerSize);
-						memset(vih, 0, mt.FormatLength());
-						vih->hdr.bmiHeader.biSize		= sizeof(vih->hdr.bmiHeader);
-						vih->hdr.bmiHeader.biPlanes		= 1;
-						vih->hdr.bmiHeader.biBitCount	= 24;
-						vih->hdr.AvgTimePerFrame		= AvgTimePerFrame;
-						vih->hdr.dwPictAspectRatioX = aspect.cx;
-						vih->hdr.dwPictAspectRatioY = aspect.cy;
-						vih->hdr.bmiHeader.biWidth = h.width;
-						vih->hdr.bmiHeader.biHeight = h.height;
-
-						vih->dwFlags	= (headerData[4] & 0x03) + 1; // nal length size
-						vih->dwProfile	= h.profile;
-						vih->dwLevel	= h.level;
-
-						BYTE* src = (BYTE*)headerData + 5;
-						BYTE* dst = (BYTE*)vih->dwSequenceHeader;
-						BYTE* src_end = (BYTE*)headerData + headerSize;
-						BYTE* dst_end = (BYTE*)vih->dwSequenceHeader + headerSize;
-						int spsCount = *(src++) & 0x1F;
-						int ppsCount = -1;
-
-						vih->cbSequenceHeader = 0;
-
-						while (src < src_end - 1) {
-							if (spsCount == 0 && ppsCount == -1) {
-								ppsCount = *(src++);
-								continue;
-							}
-
-							if (spsCount > 0) {
-								spsCount--;
-							} else if (ppsCount > 0) {
-								ppsCount--;
-							} else {
-								break;
-							}
-
-							int len = ((src[0] << 8) | src[1]) + 2;
-							if (src + len > src_end || dst + len > dst_end) {
-								ASSERT(0);
-								break;
-							}
-							memcpy(dst, src, len);
-							src += len;
-							dst += len;
-							vih->cbSequenceHeader += len;
-						}
+						CreateMPEG2VIfromAVC(&mt, &pbmi, AvgTimePerFrame, aspect, headerData, headerSize); 
 
 						delete[] headerData;
 
-						mt.subtype = FOURCCMap(vih->hdr.bmiHeader.biCompression = '1CVA');
 						name += L" H.264";
 
 						break;
@@ -725,7 +681,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	m_bUpdateDuration = false;//(m_pFile->GetAvailable() < m_pFile->GetLength()) || m_pFile->IsStreaming();
 
-	if (!m_pFile->IsStreaming()) {
+	if (m_pFile->IsRandomAccess()) {
 		__int64 pos = max(m_DataOffset, m_pFile->GetAvailable() - 256 * 1024);
 		
 		if (Sync(pos)) {
@@ -883,7 +839,7 @@ bool CFLVSplitterFilter::DemuxLoop()
 	AudioTag at = {};
 	VideoTag vt = {};
 
-	while (SUCCEEDED(hr) && !CheckRequest(NULL) && SUCCEEDED(m_pFile->WaitAvailable(1500))) {
+	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
 		// try update duration
 		/*
 		if (m_bUpdateDuration) {
