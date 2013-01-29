@@ -2867,6 +2867,8 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
                      // ==> Start patch MPC
                      /*|| av_cmp_q(h->sps.sar, s->avctx->sample_aspect_ratio)))*/
                      // ==> End patch MPC
+    if (h0->s.avctx->pix_fmt != get_pixel_format(h0))
+        must_reinit = 1;
 
 
     s->mb_width  = h->sps.mb_width;
