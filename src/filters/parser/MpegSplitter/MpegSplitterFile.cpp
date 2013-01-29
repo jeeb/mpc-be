@@ -136,11 +136,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	m_init = true;
 
 	if (IsRandomAccess() || IsStreaming()) {
-		if (IsStreaming()) {
-			for (int i = 0; i < 50 && S_OK != HasMoreData(MEGABYTE*5, 100); i++) {
-				;
-			}
-		}
+		WaitAvailable(5000, MEGABYTE*5);
 
 		SearchPrograms(0, min(GetLength(), MEGABYTE*5)); // max 5Mb for search a valid Program Map Table
 
@@ -164,11 +160,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 
 	if (m_type == mpeg_ts) {
 		if (IsRandomAccess() || IsStreaming()) {
-			if (IsStreaming()) {
-				for (int i = 0; i < 50 && S_OK != HasMoreData(MEGABYTE, 100); i++) {
-					;
-				}
-			}
+			WaitAvailable(5000, MEGABYTE);
 
 			__int64 pfp = 0;
 			const int k = 5;

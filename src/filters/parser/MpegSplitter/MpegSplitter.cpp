@@ -1308,14 +1308,9 @@ bool CMpegSplitterFilter::DemuxLoop()
 	REFERENCE_TIME rtStartOffset = m_rtStartOffset ? m_rtStartOffset : m_pFile->m_rtMin;
 
 	HRESULT hr = S_OK;
-	while (SUCCEEDED(hr) && !CheckRequest(NULL) && SUCCEEDED(m_pFile->WaitAvailable(1500))) {
-		for (int i = 0; i < 10 && S_OK != m_pFile->HasMoreData(MEGABYTE/4, 100); i++) {
-			;
-		}
-		if ((hr = m_pFile->HasMoreData(MEGABYTE/2)) == S_OK) {
-			if ((hr = DemuxNextPacket(rtStartOffset)) == S_FALSE) {
-				Sleep(1);
-			}
+	while (SUCCEEDED(hr) && !CheckRequest(NULL) && SUCCEEDED(m_pFile->WaitAvailable(3000, MEGABYTE/4))) {
+		if ((hr = DemuxNextPacket(rtStartOffset)) == S_FALSE) {
+			Sleep(1);
 		}
 	}
 

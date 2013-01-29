@@ -221,7 +221,7 @@ HRESULT Segment::ParseMinimal(CMatroskaNode* pMN0)
 
 	while (MatroskaReader::QWORD pos = pMN->FindPos(MATROSKA_ID_SEEKHEAD, pMN->GetPos())) {
 		pMN->SeekTo(pos);
-		if (FAILED(pMN->Parse())) {
+		if (FAILED(pMN->Parse()) || (pMN->m_filepos + pMN->m_len) >= (pMN0->m_filepos + pMN0->m_len)) {
 			break; // a broken file
 		}
 		MetaSeekInfo.Parse(pMN);
@@ -1392,9 +1392,10 @@ CMatroskaNode::CMatroskaNode(CMatroskaNode* pParent)
 HRESULT CMatroskaNode::Parse()
 {
 	m_filepos = GetPos();
-	if (FAILED(m_id.Parse(this)) || FAILED(m_len.Parse(this)) || m_len > m_pParent->m_len) {
+	if (FAILED(m_id.Parse(this)) || FAILED(m_len.Parse(this))) {
 		return E_FAIL;
 	}
+
 	m_start = GetPos();
 	return S_OK;
 }
@@ -1420,8 +1421,15 @@ bool CMatroskaNode::Next(bool fSame)
 
 	CID id = m_id;
 
-	while (m_start+m_len < m_pParent->m_start+m_pParent->m_len) {
-		SeekTo(m_start+m_len);
+	for (;;) {
+		if (/*m_pParent->m_id == MATROSKA_ID_SEGMENT && */m_len > m_pParent->m_len) {
+			TRACE(_T("CMatroskaNode::Next() : skip invalid element : len = %I64d, parent element len = %I64d\n"), __int64(m_len), __int64(m_pParent->m_len));
+			SeekTo(m_start + 1);
+		} else if (m_start+m_len >= m_pParent->m_start+m_pParent->m_len) {
+			break;
+		} else {
+			SeekTo(m_start+m_len);
+		}
 
 		if (FAILED(Parse())) {
 			if (!Resync()) {
@@ -1433,7 +1441,6 @@ bool CMatroskaNode::Next(bool fSame)
 			return true;
 		}
 	}
-
 	return false;
 }
 

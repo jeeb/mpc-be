@@ -253,14 +253,14 @@ HRESULT CBaseSplitterFile::HasMoreData(__int64 len, DWORD ms)
 
 HRESULT CBaseSplitterFile::WaitAvailable(DWORD dwMilliseconds, __int64 AvailBytes)
 {
+	if (m_fRandomAccess) {
+		return HasMoreData(AvailBytes, dwMilliseconds);
+	}
+
 	if (GetAvailable() < GetLength()) {
 		AvailBytes = min(AvailBytes, GetLength() - GetAvailable());
 	}
 
-	if (m_fRandomAccess) {
-		return (GetRemaining() >= AvailBytes) ? S_OK : E_FAIL;
-	}
-	
 	for (int i = 0; i < int(dwMilliseconds/100); i++) {
 		if (GetRemaining() >= AvailBytes) {
 			return S_OK;
