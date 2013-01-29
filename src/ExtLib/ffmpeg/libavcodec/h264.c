@@ -1467,7 +1467,6 @@ static void decode_postinit(H264Context *h, int setup_finished)
             cur->f.repeat_pict = 1;
             break;
         case SEI_PIC_STRUCT_FRAME_DOUBLING:
-            // Force progressive here, doubling interlaced frame is a bad idea.
             cur->f.repeat_pict = 2;
             break;
         case SEI_PIC_STRUCT_FRAME_TRIPLING:
@@ -2869,7 +2868,6 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
                      // ==> End patch MPC
     if (h0->s.avctx->pix_fmt != get_pixel_format(h0))
         must_reinit = 1;
-
 
     s->mb_width  = h->sps.mb_width;
     s->mb_height = h->sps.mb_height * (2 - h->sps.frame_mbs_only_flag);
