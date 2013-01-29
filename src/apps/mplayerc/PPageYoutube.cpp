@@ -60,7 +60,7 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	m_iYoutubeFormatCtrl.AddString(_T("Default"));
+	m_iYoutubeFormatCtrl.AddString(ResStr(IDS_PPAGE_FS_DEFAULT));
 	m_iYoutubeFormatType = 0;
 	for (int i = 0; i < _countof(youtubeProfiles) && youtubeProfiles[i].iTag <= 46; i++) {
 		CString fmt; fmt.Format(_T("%s@%s"), youtubeProfiles[i].Container, youtubeProfiles[i].Resolution);
