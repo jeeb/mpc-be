@@ -165,8 +165,8 @@ STDMETHODIMP CDX7SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 		/*
 				for(ptrdiff_t i = 0; i < _countof(pVertices); i++)
 				{
-					pVertices[i].x -= 0.5;
-					pVertices[i].y -= 0.5;
+					pVertices[i].x -= 0.5f;
+					pVertices[i].y -= 0.5f;
 				}
 		*/
 		hr = m_pD3DDev->SetTexture(0, m_pSurface);

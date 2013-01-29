@@ -46,7 +46,7 @@ struct MYD3DVERTEX<0> {
 template<int texcoords>
 static void AdjustQuad(MYD3DVERTEX<texcoords>* v, double dx, double dy)
 {
-	float offset = 0.5;
+	float offset = 0.5f;
 
 	for (int i = 0; i < 4; i++) {
 		v[i].x -= offset;
@@ -1382,8 +1382,8 @@ HRESULT CDX9RenderingEngine::FinalPass(IDirect3DTexture9* pTexture)
 	};
 
 	for (int i = 0; i < _countof(v); i++) {
-		v[i].x -= 0.5;
-		v[i].y -= 0.5;
+		v[i].x -= 0.5f;
+		v[i].y -= 0.5f;
 	}
 
 	hr = m_pD3DDev->SetPixelShader(m_pFinalPixelShader);
@@ -1455,8 +1455,8 @@ HRESULT CDX9RenderingEngine::TextureCopy(IDirect3DTexture9* pTexture)
 	};
 
 	for (int i = 0; i < _countof(v); i++) {
-		v[i].x -= 0.5;
-		v[i].y -= 0.5;
+		v[i].x -= 0.5f;
+		v[i].y -= 0.5f;
 	}
 
 	hr = m_pD3DDev->SetTexture(0, pTexture);
@@ -1518,8 +1518,8 @@ HRESULT CDX9RenderingEngine::DrawRect(DWORD _Color, DWORD _Alpha, const CRect &_
 	};
 
 	for (int i = 0; i < _countof(v); i++) {
-		v[i].x -= 0.5;
-		v[i].y -= 0.5;
+		v[i].x -= 0.5f;
+		v[i].y -= 0.5f;
 	}
 
 	HRESULT hr = m_pD3DDev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
@@ -1578,8 +1578,8 @@ HRESULT CDX9RenderingEngine::AlphaBlt(RECT* pSrc, RECT* pDst, IDirect3DTexture9*
 	};
 
 	for (int i = 0; i < _countof(pVertices); i++) {
-		pVertices[i].x -= 0.5;
-		pVertices[i].y -= 0.5;
+		pVertices[i].x -= 0.5f;
+		pVertices[i].y -= 0.5f;
 	}
 
 	hr = m_pD3DDev->SetTexture(0, pTexture);

@@ -63,8 +63,8 @@ static HRESULT TextureBlt(IDirect3DDevice7* pD3DDev, IDirectDrawSurface7* pTextu
 		};
 
 		for (int i = 0; i < _countof(pVertices); i++) {
-			pVertices[i].x -= 0.5;
-			pVertices[i].y -= 0.5;
+			pVertices[i].x -= 0.5f;
+			pVertices[i].y -= 0.5f;
 		}
 
 		hr = pD3DDev->SetTexture(0, pTexture);
