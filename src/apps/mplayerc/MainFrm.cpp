@@ -694,7 +694,9 @@ CMainFrame::CMainFrame() :
 	IsMadVRExclusiveMode(false),
 	m_YoutubeFile(_T("")),
 	m_fYoutubeThreadWork(TH_CLOSE),
-	m_YoutubeThread(NULL)
+	m_YoutubeThread(NULL),
+	m_YoutubeCurrent(0),
+	m_YoutubeTotal(0)
 {
 	m_Lcd.SetVolumeRange(0, 100);
 	m_LastSaveTime.QuadPart = 0;
@@ -3947,6 +3949,7 @@ void CMainFrame::OnFilePostClosemedia()
 	m_strFn					= _T("");
 	m_strFnFull				= _T("");
 	m_strTitleAlt			= _T("");
+	m_strAuthorAlt			= _T("");
 
 	if (AfxGetAppSettings().fEnableEDLEditor) {
 		m_wndEditListEditor.CloseFile();
@@ -5261,7 +5264,7 @@ void CMainFrame::OnFileSaveAs()
 {
 	AppSettings& s = AfxGetAppSettings();
 
-	CString ext, ext_list, in = PlayerYouTube(m_wndPlaylistBar.GetCurFileName(), NULL), out = in;
+	CString ext, ext_list, in = PlayerYouTube(m_wndPlaylistBar.GetCurFileName(), NULL, NULL), out = in;
 
 	if (!m_strTitleAlt.IsEmpty()) {
 		out = m_strTitleAlt;
@@ -12045,32 +12048,38 @@ static UINT tmpYoutubeThreadProc(LPVOID pParam)
 #define MEGABYTE 1024*1024
 UINT CMainFrame::YoutubeThreadProc()
 {
-	HINTERNET f, s = InternetOpen(L"MPC-BE Youtube downloader", 0, 0, 0, 0);
+	HINTERNET f, s = InternetOpen(L"MPC-BE Youtube Downloader", 0, NULL, NULL, 0);
 	if (s) {
 #ifdef _DEBUG
 		CString tmp = m_YoutubeFile;
 #endif
-		f = InternetOpenUrl(s, m_YoutubeFile, 0, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
+		f = InternetOpenUrl(s, m_YoutubeFile, NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 		if (f) {
+
+			DWORD cb = sizeof(DWORD);
+
+			if (!HttpQueryInfo(f, HTTP_QUERY_CONTENT_LENGTH|HTTP_QUERY_FLAG_NUMBER, &m_YoutubeTotal, &cb, 0)) {
+				m_YoutubeTotal = 0;
+			}
+
 			if (GetTemporaryFilePath(CPath(m_YoutubeFile).GetExtension(), m_YoutubeFile)) {
 				CFile file;
 				if (file.Open(m_YoutubeFile, CFile::modeCreate|CFile::modeWrite|CFile::shareDenyWrite, NULL)) {
 					AfxGetAppSettings().slTMPFilesList.AddTail(m_YoutubeFile);
 
-					DWORD dwBytesRead		= 0;
-					DWORD dwBytesReadTotal	= 0;
-					DWORD dataSize			= 0;
+					DWORD dwBytesRead	= 0;
+					DWORD dataSize		= 0;
 					BYTE buf[1024*16];
 					while (InternetReadFile(f, (LPVOID)buf, sizeof(buf), &dwBytesRead) && dwBytesRead && m_fYoutubeThreadWork != TH_CLOSE) {
 						file.Write((void*)buf, dwBytesRead);
 
-						dwBytesReadTotal += dwBytesRead;
-						if (dwBytesReadTotal > MEGABYTE) {
+						m_YoutubeCurrent += dwBytesRead;
+						if (m_YoutubeCurrent > min(MEGABYTE, m_YoutubeTotal/2)) {
 							m_fYoutubeThreadWork = TH_WORK;
 						}
 					}
 #ifdef _DEBUG
-					if (dwBytesReadTotal) {
+					if (m_YoutubeCurrent) {
 						LOG2FILE(_T("Open Youtube, GOOD from \'%s\'"), tmp);
 					} else {
 						LOG2FILE(_T("Open Youtube, FAILED from \'%s\'"), tmp);
@@ -12097,6 +12106,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	m_YoutubeFile			= _T("");
 	m_YoutubeThread			= NULL;
 	m_fYoutubeThreadWork	= TH_CLOSE;
+	m_YoutubeTotal			= 0;
+	m_YoutubeCurrent		= 0;
 
 	AppSettings& s = AfxGetAppSettings();
 
@@ -12111,13 +12122,15 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			break;
 		}
 
-		m_strTitleAlt = _T("");
+		m_strTitleAlt	= _T("");
+		m_strAuthorAlt	= _T("");
 		HRESULT hr = S_OK;
 		bool extimage = false;
 
 		CString local(fn);
 		local.MakeLower();
 		bool validateUrl = true;
+
 		for (;;) {
 			if (local.Find(_T("http://")) == 0 || local.Find(_T("https://")) == 0 || local.Find(_T("www.")) == 0) {
 				// validate url before try to opening
@@ -12169,7 +12182,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 
 			if (!extimage) {
-				CString tmpName = PlayerYouTube(fn, &m_strTitleAlt);
+				CString tmpName = PlayerYouTube(fn, &m_strTitleAlt, &m_strAuthorAlt);
 
 				{
 					if (!m_strTitleAlt.IsEmpty() && tmpName.Find(_T("http://")) == 0) {
@@ -14370,7 +14383,9 @@ void CMainFrame::CloseMediaPrivate()
 			TerminateThread(m_YoutubeThread->m_hThread, 0xDEAD);
 		}
 	}
-	m_YoutubeThread = NULL;
+	m_YoutubeThread		= NULL;
+	m_YoutubeTotal		= 0;
+	m_YoutubeCurrent	= 0;
 
 	b_UseVSFilter = false;
 }
@@ -16575,7 +16590,7 @@ bool CMainFrame::ValidateSeek(REFERENCE_TIME rtPos, REFERENCE_TIME rtStop)
 	if (m_iMediaLoadState == MLS_LOADED && GetPlaybackMode() == PM_FILE && (rtPos > 0) && (rtStop > 0) && (rtPos <= rtStop)) {
 		if (pAMOP) {
 			__int64 t = 0, c = 0;
-			if (SUCCEEDED(pAMOP->QueryProgress(&t, &c)) && t > 0 && c < t) {
+			if ((SUCCEEDED(pAMOP->QueryProgress(&t, &c)) || SUCCEEDED(QueryProgressYoutube(&t, &c))) && t > 0 && c < t) {
 				int Query_percent	= c*100/t;
 				int Seek_percent	= rtPos*100/rtStop;
 				if (Seek_percent > Query_percent) {
@@ -16599,6 +16614,15 @@ bool CMainFrame::ValidateSeek(REFERENCE_TIME rtPos, REFERENCE_TIME rtStop)
 				}
 			}
 			EndEnumFilters;
+		}
+
+		__int64 t = 0, c = 0;
+		if (SUCCEEDED(QueryProgressYoutube(&t, &c)) && t > 0 && c < t) {
+			int Query_percent	= c*100/t;
+			int Seek_percent	= rtPos*100/rtStop;
+			if (Seek_percent > Query_percent) {
+				return false;
+			}
 		}
 	}
 
@@ -18793,9 +18817,13 @@ CString CMainFrame::FillMessage()
 			}
 		}
 		EndEnumFilters;
-	} else if (pAMOP) {
+	} else if (pAMOP || SUCCEEDED(QueryProgressYoutube(NULL, NULL))) {
 		__int64 t = 0, c = 0;
 		if (SUCCEEDED(pMS->GetDuration(&t)) && t > 0 && SUCCEEDED(pAMOP->QueryProgress(&t, &c)) && t > 0 && c < t) {
+			msg.Format(ResStr(IDS_CONTROLS_BUFFERING), c * 100 / t);
+		}
+
+		if (SUCCEEDED(QueryProgressYoutube(&t, &c))) {
 			msg.Format(ResStr(IDS_CONTROLS_BUFFERING), c * 100 / t);
 		}
 

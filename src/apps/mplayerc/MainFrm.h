@@ -1054,6 +1054,7 @@ public:
 	CString		m_strFnFull;
 	CString		m_strTitleAlt;
 	CString		GetStrForTitle();
+	CString		m_strAuthorAlt;
 
 	bool		m_bToggleShader;
 	bool		m_bToggleShaderScreenSpace;
@@ -1150,6 +1151,21 @@ private:
 	TH_STATE	m_fYoutubeThreadWork;
 	CString		m_YoutubeFile;
 	CWinThread*	m_YoutubeThread;
+	DWORD		m_YoutubeCurrent;
+	DWORD		m_YoutubeTotal;
+	HRESULT		QueryProgressYoutube(LONGLONG *pllTotal, LONGLONG *pllCurrent) {
+		if (m_YoutubeTotal > 0 && m_YoutubeCurrent < m_YoutubeTotal) {
+			if (pllTotal) {
+				*pllTotal = m_YoutubeTotal;
+			}
+			if (pllCurrent) {
+				*pllCurrent = m_YoutubeCurrent;
+			}
+			return S_OK;
+		}
+
+		return E_FAIL;
+	}
 
 public:
 	UINT		YoutubeThreadProc();

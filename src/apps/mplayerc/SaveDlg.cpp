@@ -273,9 +273,32 @@ void CSaveDlg::OnTimer(UINT_PTR nIDEvent)
 		double dSpeed = speed / 1024.;
 		unsigned int unitSpeed = AdaptUnit(dSpeed, _countof(speedUnits));
 
-		str.Format(_T("%.2lf %s / %.2lf %s, %.2lf %s, %I64d s"),
+		str.Format(_T("%.2lf %s / %.2lf %s , %.2lf %s"),
 				   dPos, ResStr(sizeUnits[unitPos]), dDur, ResStr(sizeUnits[unitDur]),
-				   dSpeed, ResStr(speedUnits[unitSpeed]), speed > 0 ? (dur-pos) / speed : 0);
+				   dSpeed, ResStr(speedUnits[unitSpeed]));
+
+		if (speed > 0) {
+			str.Append(_T(","));
+			REFERENCE_TIME sec = (dur-pos) / speed;
+
+			DVD_HMSF_TIMECODE tcDur = {
+				(BYTE)(sec / 3600),
+				(BYTE)(sec / 60 % 60),
+				(BYTE)(sec % 60),
+				0
+			};
+
+			if (tcDur.bHours > 0) {
+				str.AppendFormat(_T(" %0.2dh"), tcDur.bHours);
+			}
+			if (tcDur.bMinutes > 0) {
+				str.AppendFormat(_T(" %0.2dm"), tcDur.bMinutes);
+			}
+			if (tcDur.bSeconds > 0) {
+				str.AppendFormat(_T(" %0.2ds"), tcDur.bSeconds);
+			}
+		}
+
 		m_report.SetWindowText(str);
 
 		m_progress.SetPos(dur > 0 ? (int)(100*pos/dur) : 0);

@@ -22,49 +22,52 @@
 
 #pragma once
 
-#define YOUTUBE_URL			_T("youtube.com/watch?")
-#define YOUTUBE_FULL_URL	_T("www.youtube.com/watch?v=")
-#define YOUTU_BE_URL		_T("youtu.be/")
-#define YOUTU_BE_FULL_URL	_T("www.youtu.be/")
+#define YOUTUBE_URL		_T("youtube.com/watch?")
+#define YOUTU_BE_URL	_T("youtu.be/")
 
-#define MATCH_START			"url_encoded_fmt_stream_map"
-#define MATCH_END			"\\u0026amp"
+#define GET_VIDEO_URL	_T("http://www.youtube.com/get_video_info?video_id=%s")
 
-#define URL_DELIMETER		_T("url=")
+#define MATCH_START		"url_encoded_fmt_stream_map="
+#define MATCH_END		"\\u0026amp"
+
+#define	MATCH_TITLE		_T("&title=")
+#define	MATCH_AUTHOR	_T("&author=")
+#define MATCH_URL		_T("url=http://")
 
 typedef struct {
 	const int		iTag;
 	const LPCTSTR	Container;
 	const LPCTSTR	Profile;
+	const LPCTSTR	Resolution;
 } YOUTUBE_PROFILES;
 
 static const YOUTUBE_PROFILES youtubeProfiles[] = {
-	{5,		_T("FLV"),	_T("N/A")},
-	{6,		_T("FLV"),	_T("N/A")},
-	{13,	_T("3GP"),	_T("N/A")},
-	{17,	_T("3GP"),	_T("Simple")},
-	{18,	_T("MP4"),	_T("Baseline")},
-	{22,	_T("MP4"),	_T("High")},
-	{34,	_T("FLV"),	_T("Main")},
-	{35,	_T("FLV"),	_T("Main")},
-	{36,	_T("3GP"),	_T("Simple")},
-	{37,	_T("MP4"),	_T("High")},
-	{38,	_T("MP4"),	_T("High")},
-	{43,	_T("WebM"),	_T("N/A")},
-	{44,	_T("WebM"),	_T("N/A")},
-	{45,	_T("WebM"),	_T("N/A")},
-	{46,	_T("WebM"),	_T("N/A")},
-	{82,	_T("MP4"),	_T("3D")},
-	{83,	_T("MP4"),	_T("3D")},
-	{84,	_T("MP4"),	_T("3D")},
-	{85,	_T("MP4"),	_T("3D")},
-	{100,	_T("WebM"),	_T("3D")},
-	{101,	_T("WebM"),	_T("3D")},
-	{102,	_T("WebM"),	_T("3D")},
-	{120,	_T("FLV"),	_T("Main@L3.1")}
+	{5,		_T("FLV"),	_T("N/A"),			_T("240p")},
+	{6,		_T("FLV"),	_T("N/A"),			_T("270p")},
+	{13,	_T("3GP"),	_T("N/A"),			_T("N/A")},
+	{17,	_T("3GP"),	_T("Simple"),		_T("144p")},
+	{18,	_T("MP4"),	_T("Baseline"),		_T("360p")},
+	{22,	_T("MP4"),	_T("High"),			_T("720p")},
+	{34,	_T("FLV"),	_T("Main"),			_T("360p")},
+	{35,	_T("FLV"),	_T("Main"),			_T("480p")},
+	{36,	_T("3GP"),	_T("Simple"),		_T("240p")},
+	{37,	_T("MP4"),	_T("High"),			_T("1080p")},
+	{38,	_T("MP4"),	_T("High"),			_T("3072p")},
+	{43,	_T("WebM"),	_T("N/A"),			_T("360p")},
+	{44,	_T("WebM"),	_T("N/A"),			_T("480p")},
+	{45,	_T("WebM"),	_T("N/A"),			_T("720p")},
+	{46,	_T("WebM"),	_T("N/A"),			_T("1080p")},
+	{82,	_T("MP4"),	_T("3D"),			_T("360p")},
+	{83,	_T("MP4"),	_T("3D"),			_T("240p")},
+	{84,	_T("MP4"),	_T("3D"),			_T("720p")},
+	{85,	_T("MP4"),	_T("3D"),			_T("520p")},
+	{100,	_T("WebM"),	_T("3D"),			_T("360p")},
+	{101,	_T("WebM"),	_T("3D"),			_T("360p")},
+	{102,	_T("WebM"),	_T("3D"),			_T("720p")},
+	{120,	_T("FLV"),	_T("Main@L3.1"),	_T("720p")}
 };
 
-static const YOUTUBE_PROFILES youtubeProfileEmpty = {0, _T(""), _T("N/A")};
+static const YOUTUBE_PROFILES youtubeProfileEmpty = {0, _T(""), _T("N/A"), _T("")};
 
 static YOUTUBE_PROFILES getProfile(int iTag) {
 	for (int i = 0; i < _countof(youtubeProfiles); i++)
@@ -86,23 +89,4 @@ static DWORD strpos(char* h, char* n)
 	return 0;
 }
 
-static void Explode(const CString str, const CString sep, CAtlList<CString>& arr)
-{
-	arr.RemoveAll();
-
-	CString local(str);
-
-	int pos = local.Find(sep);
-	while (pos != -1) {
-		CString sss = local.Left(pos);
-		arr.AddTail(sss);
-		local.Delete(0, pos + sep.GetLength());
-		pos = local.Find(sep);
-	}
-
-	if (!local.IsEmpty()) {
-		arr.AddTail(local);
-	}
-}
-
-CString PlayerYouTube(CString fn, CString* out_title);
+CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author);

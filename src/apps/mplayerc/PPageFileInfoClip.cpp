@@ -180,7 +180,14 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 
 	CString strTitleAlt = ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strTitleAlt;
 	if (!strTitleAlt.IsEmpty()) {
-		m_clip = strTitleAlt.Left(strTitleAlt.GetLength() - 4);
+		m_clip		= strTitleAlt.Left(strTitleAlt.GetLength() - 4);
+		fEmpty		= false;
+	}
+
+	CString strAuthorAlt = ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strAuthorAlt;
+	if (!strAuthorAlt.IsEmpty()) {
+		m_author	= strAuthorAlt;
+		fEmpty		= false;
 	}
 
 	UpdateData(FALSE);
