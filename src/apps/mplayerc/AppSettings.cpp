@@ -774,6 +774,8 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILTER_DIR, strLastOpenFilterDir);
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_SUB_DIR, strLastOpenSubDir);
 
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_TAG, iYoutubeTag);
+
 	if (fShaderEditorWasOpened) {
 		// This is a large data block. Save it only when really necessary.
 		pApp->WriteProfileString(IDS_R_SHADERS, NULL, NULL);
@@ -1480,6 +1482,8 @@ void CAppSettings::LoadSettings()
 
 	strLastOpenFilterDir	= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILTER_DIR, _T(""));
 	strLastOpenSubDir		= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_SUB_DIR, _T(""));
+
+	iYoutubeTag				= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_TAG, 0);
 
 	if (fLaunchfullscreen && !IsD3DFullscreen()) {
 		nCLSwitches |= CLSW_FULLSCREEN;

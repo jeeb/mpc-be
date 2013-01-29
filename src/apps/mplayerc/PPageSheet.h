@@ -30,6 +30,7 @@
 #include "PPagePlayback.h"
 #include "PPageDVD.h"
 #include "PPageOutput.h"
+#include "PPageYoutube.h"
 #include "PPageFullscreen.h"
 #include "PPageSync.h"
 #include "PPageWebServer.h"
@@ -78,6 +79,7 @@ private:
 	CPPagePlayback m_playback;
 	CPPageDVD m_dvd;
 	CPPageOutput m_output;
+	CPPageYoutube m_youtube;
 	CPPageFullscreen m_fullscreen;
 	CPPageSync m_sync;
 	CPPageCapture m_tuner;

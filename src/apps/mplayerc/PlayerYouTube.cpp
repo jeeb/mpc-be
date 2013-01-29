@@ -278,10 +278,19 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 #endif
 		}
 
+		CString tag; tag.Format(_T("itag=%d"), AfxGetAppSettings().iYoutubeTag);
+		boolean match_itag = AfxGetAppSettings().iYoutubeTag != 0;
+
+again:
+
 		POSITION pos = sl.GetHeadPosition();
 		while (pos) {
 			str = sl.GetNext(pos);
 			str.Trim(_T("&,="));
+
+			if (match_itag && (str.Find(tag) == -1)) {
+				continue;
+			}
 
 #ifdef _DEBUG
 			LOG2FILE(_T("	trying \'%s\'"), str);
@@ -334,7 +343,9 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 			int itagValue = 0;
 			if (_stscanf_s(itagValueStr, _T("%d"), &itagValue) == 1) {
 				YOUTUBE_PROFILES youtubePtofile = getProfile(itagValue);
-				if (youtubePtofile.iTag == 0 || youtubePtofile.Container == _T("WebM") || youtubePtofile.Profile == _T("3D")) {
+				if (youtubePtofile.iTag == 0
+					|| (youtubePtofile.Container == _T("WebM") && !match_itag)
+					|| youtubePtofile.Profile == _T("3D")) {
 					continue;
 				}
 
@@ -365,6 +376,14 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 				slparams.AddTail(_T("fexp"));
 				slparams.AddTail(_T("key"));
 				slparams.AddTail(_T("sig"));
+
+				/*
+				CString tagTmp;
+				UrlFields.Lookup(_T("newshard"), tagTmp);
+				if (!tagTmp.IsEmpty()) {
+					slparams.AddTail(_T("newshard"));
+				}
+				*/
 			}
 
 			POSITION pos = slparams.GetHeadPosition();
@@ -397,6 +416,11 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 			}
 
 			return url;
+		}
+
+		if (match_itag) {
+			match_itag = false;
+			goto again;
 		}
 
 		return fn;

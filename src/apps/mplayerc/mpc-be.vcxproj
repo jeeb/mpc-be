@@ -170,6 +170,7 @@
     <ClCompile Include="PlayerFlyBar.cpp" />
     <ClCompile Include="PlayerYouTube.cpp" />
     <ClCompile Include="PPageInterface.cpp" />
+    <ClCompile Include="PPageYoutube.cpp" />
     <ClCompile Include="SaveTaskDlg.cpp" />
     <ClCompile Include="ShockwaveFlash.cpp" />
     <ClCompile Include="DeinterlacerFilter.cpp" />
@@ -291,6 +292,7 @@
     <ClInclude Include="PlayerFlyBar.h" />
     <ClInclude Include="PlayerYouTube.h" />
     <ClInclude Include="PPageInterface.h" />
+    <ClInclude Include="PPageYoutube.h" />
     <ClInclude Include="SaveTaskDlg.h" />
     <ClInclude Include="ShockwaveFlash.h" />
     <ClInclude Include="DeinterlacerFilter.h" />
