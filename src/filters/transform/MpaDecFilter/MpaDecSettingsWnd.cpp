@@ -118,6 +118,7 @@ bool CMpaDecSettingsWnd::OnActivate()
 		}
 	}
 	m_mixer_layout_combo.GetWindowRect(r);
+	OnMixerCheck();
 	ScreenToClient(r);
 	p.y += h30;
 
