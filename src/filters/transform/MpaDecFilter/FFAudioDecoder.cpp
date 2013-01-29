@@ -488,7 +488,7 @@ HRESULT CFFAudioDecoder::ParseRealAudioHeader(const BYTE* extra, const int extra
 	return S_OK;
 }
 
-bool CFFAudioDecoder::RealPrepare(BYTE* p, int buffsize, CPaddedArray& BuffOut)
+HRESULT CFFAudioDecoder::RealPrepare(BYTE* p, int buffsize, CPaddedArray& BuffOut)
 {
 	if (m_raData.deint_id == MAKEFOURCC('r', 'n', 'e', 'g') || m_raData.deint_id == MAKEFOURCC('r', 'p', 'i', 's')) {
 
@@ -508,7 +508,7 @@ bool CFFAudioDecoder::RealPrepare(BYTE* p, int buffsize, CPaddedArray& BuffOut)
 						p += sps;
 					}
 				}
-				return true;
+				return S_OK;
 			}
 
 			if (m_raData.deint_id == MAKEFOURCC('r', 'p', 'i', 's')) { // SIPR codec
@@ -545,11 +545,13 @@ bool CFFAudioDecoder::RealPrepare(BYTE* p, int buffsize, CPaddedArray& BuffOut)
 						++o;
 					}
 				}
-				return true;
+				return S_OK;
 			}
+		} else {
+			return E_FAIL;
 		}
 	}
-	return false;
+	return S_FALSE;
 }
 
 // Info

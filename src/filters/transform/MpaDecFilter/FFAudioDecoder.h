@@ -56,7 +56,7 @@ public:
 	bool    Init(enum AVCodecID nCodecId, CTransformInputPin* m_pInput);
 	void    SetDRC(bool fDRC);
 
-	bool    RealPrepare(BYTE* p, int buffsize, CPaddedArray& BuffOut);
+	HRESULT RealPrepare(BYTE* p, int buffsize, CPaddedArray& BuffOut);
 	HRESULT Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, int& size, CAtlArray<BYTE>& BuffOut, enum AVSampleFormat& samplefmt);
 	void    FlushBuffers();
 	void    StreamFinish();

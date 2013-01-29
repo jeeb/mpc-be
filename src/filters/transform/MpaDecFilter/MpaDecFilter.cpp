@@ -706,10 +706,13 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId)
 	CPaddedArray buffRA(FF_INPUT_BUFFER_PADDING_SIZE);
 	bool isRA = false;
 	if (nCodecId == AV_CODEC_ID_ATRAC3 || nCodecId == AV_CODEC_ID_COOK || nCodecId == AV_CODEC_ID_SIPR) {
-		if (m_FFAudioDec.RealPrepare(p, int(end - p), buffRA)) {
+		HRESULT hrRA = m_FFAudioDec.RealPrepare(p, int(end - p), buffRA);
+		if (hrRA == S_OK) {
 			p = buffRA.GetData();
 			end = p + buffRA.GetCount();
 			isRA = true;
+		} else if (hrRA == E_FAIL) {
+			return S_OK;
 		} else {
 			// trying continue decoding without any pre-processing ...
 		}
