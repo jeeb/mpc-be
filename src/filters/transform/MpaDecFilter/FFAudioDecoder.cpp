@@ -419,8 +419,6 @@ void CFFAudioDecoder::StreamFinish()
 	if (m_pFrame) {
 		av_freep(&m_pFrame);
 	}
-
-	m_pCurrentMediaType = NULL;
 }
 
 // RealAudio
