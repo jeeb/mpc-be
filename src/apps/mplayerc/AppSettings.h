@@ -637,6 +637,7 @@ public:
 	CString			strLastOpenSubDir;
 
 	int				iYoutubeTag;
+	int				iYoutubeSource;
 
 private :
 	DVD_POSITION	DvdPosition[MAX_DVD_POSITION];

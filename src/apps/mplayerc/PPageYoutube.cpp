@@ -26,7 +26,6 @@
 #include "PPageYoutube.h"
 #include "PlayerYouTube.h"
 #include "AppSettings.h"
-//#include "ComPropertySheet.h"
 
 // CPPageYoutube dialog
 
@@ -34,6 +33,7 @@ IMPLEMENT_DYNAMIC(CPPageYoutube, CPPageBase)
 CPPageYoutube::CPPageYoutube()
 	: CPPageBase(CPPageYoutube::IDD, CPPageYoutube::IDD)
 	, m_iYoutubeFormatType(0)
+	, m_iYoutubeSourceType(0)
 {
 }
 
@@ -45,9 +45,11 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_COMBO1, m_iYoutubeFormatCtrl);
+	DDX_Radio(pDX, IDC_RADIO1, m_iYoutubeSourceType);
 }
 
 BEGIN_MESSAGE_MAP(CPPageYoutube, CPPageBase)
+	ON_CONTROL_RANGE(BN_CLICKED, IDC_RADIO1, IDC_RADIO2, OnBnClickedRadio12)
 END_MESSAGE_MAP()
 
 // CPPageYoutube message handlers
@@ -73,6 +75,10 @@ BOOL CPPageYoutube::OnInitDialog()
 	CorrectComboListWidth(m_iYoutubeFormatCtrl);
 	m_iYoutubeFormatCtrl.SetCurSel(m_iYoutubeFormatType);
 
+	m_iYoutubeSourceType = s.iYoutubeSource ? 1 : 0;
+
+	UpdateData(FALSE);
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 }
 
@@ -89,5 +95,12 @@ BOOL CPPageYoutube::OnApply()
 		s.iYoutubeTag = youtubeProfiles[m_iYoutubeFormatType - 1].iTag;
 	}
 
+	s.iYoutubeSource = m_iYoutubeSourceType;
+
 	return __super::OnApply();
+}
+
+void CPPageYoutube::OnBnClickedRadio12(UINT nID)
+{
+	SetModified();
 }

@@ -12184,7 +12184,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			if (!extimage) {
 				CString tmpName = PlayerYouTube(fn, &m_strTitleAlt, &m_strAuthorAlt);
 
-				{
+				if (s.iYoutubeSource == 0) {
 					if (!m_strTitleAlt.IsEmpty() && tmpName.Find(_T("http://")) == 0) {
 						m_fYoutubeThreadWork = TH_START;
 						m_YoutubeFile = tmpName;

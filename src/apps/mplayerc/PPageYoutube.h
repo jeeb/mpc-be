@@ -42,6 +42,7 @@ public:
 
 	enum { IDD = IDD_PPAGEYOUTUBE };
 	int m_iYoutubeFormatType;
+	int m_iYoutubeSourceType;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
@@ -49,4 +50,7 @@ protected:
 	virtual BOOL OnApply();
 
 	DECLARE_MESSAGE_MAP()
+
+public:
+	afx_msg void OnBnClickedRadio12(UINT nID);
 };
