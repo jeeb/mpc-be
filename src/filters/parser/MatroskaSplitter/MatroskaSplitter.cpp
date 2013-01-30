@@ -841,9 +841,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	Info& info = m_pFile->m_segment.SegmentInfo;
 
-	if (m_pFile->IsRandomAccess()) {
-		m_rtDuration = (REFERENCE_TIME)(info.Duration * info.TimeCodeScale / 100);
-	}
+	m_rtDuration = (REFERENCE_TIME)(info.Duration * info.TimeCodeScale / 100);
 
 	m_rtNewStop = m_rtStop = m_rtDuration;
 
