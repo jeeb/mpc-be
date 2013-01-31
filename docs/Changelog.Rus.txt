@@ -20,6 +20,7 @@
 * libwebp 0.2.1 git-60904aa6;
 * MediaInfo 0.7.61+ svn rev.5354;
 * libpng 1.5.14 RELEASE git-8799d783;
+* ZenLibs v0.4.28+ svn rev.430;
 
 Исправления (!):
 
