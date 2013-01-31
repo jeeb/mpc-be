@@ -34,7 +34,8 @@ IMPLEMENT_DYNAMIC(CPlayerSeekBar, CDialogBar)
 CPlayerSeekBar::CPlayerSeekBar() :
 	m_start(0), m_stop(100), m_pos(0), m_posreal(0),
 	m_fEnabled(false),
-	m_tooltipState(TOOLTIP_HIDDEN), m_tooltipLastPos(-1), m_tooltipTimer(1)
+	m_tooltipState(TOOLTIP_HIDDEN), m_tooltipLastPos(-1), m_tooltipTimer(1),
+	r_Lock(0,0,0,0)
 {
 }
 
@@ -365,8 +366,23 @@ void CPlayerSeekBar::OnPaint()
 		memdc.MoveTo(rc.left -1, rc.top +19);
 		memdc.LineTo(rc.right+2, rc.top +19);
 
-		if (fEnabled) {
+		// buffer
+		r_Lock.SetRect(-1,-1,-1,-1);
+		int Progress;
+		if (((CMainFrame*)AfxGetMyApp()->GetMainWnd())->GetBufferingProgress(&Progress)) {
+			r_Lock = r;
+			int r_right = ((__int64)r.Width()/100) * Progress;
+			ThemeRGB(45, 55, 60, R, G, B);
+				ThemeRGB(65, 70, 75, R2, G2, B2);
+				TRIVERTEX tvb[2] = {
+					{r.left, r.top, R*256, G*256, B*256, pa},
+					{r_right, r.bottom-3, R2*256, G2*256, B2*256, pa},
+				};
+				memdc.GradientFill(tvb, 2, gr, 1, GRADIENT_FILL_RECT_V);
+				r_Lock.left = r_right;
+		}
 
+		if (fEnabled) {
 			if (NULL != fp) {
 				rc.right = nposx;
 				rc.left = rc.left + 1;
@@ -733,6 +749,17 @@ BOOL CPlayerSeekBar::OnEraseBkgnd(CDC* pDC)
 
 BOOL CPlayerSeekBar::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 {
+	
+	CPoint p;
+	GetCursorPos(&p);
+	ScreenToClient(&p);
+	if (r_Lock.PtInRect(p)) {
+		::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_ARROW));
+
+		return TRUE;
+	}
+	
+	
 	if (m_fEnabled && m_start < m_stop && m_stop != 100) {
 		::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_HAND));
 

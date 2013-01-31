@@ -554,6 +554,8 @@ public:
 	void SeekTo(REFERENCE_TIME rt, bool fSeekToKeyFrame = false);
 	bool ValidateSeek(REFERENCE_TIME rtPos, REFERENCE_TIME rtStop);
 
+	bool GetBufferingProgress(int* Progress);
+
 	// subtitle streams order function
 	bool LoadSubtitle(CString fn, ISubStream **actualStream = NULL);
 

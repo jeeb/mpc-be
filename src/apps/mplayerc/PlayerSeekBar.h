@@ -63,6 +63,7 @@ private:
 	CRect GetChannelRect();
 	CRect GetThumbRect();
 	CRect GetInnerThumbRect();
+	CRect r_Lock;
 
 public:
 	CPlayerSeekBar();

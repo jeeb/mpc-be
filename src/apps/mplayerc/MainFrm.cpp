@@ -14248,6 +14248,13 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		m_wndToolBar.Invalidate();
 	}
 
+	if (!m_strTitleAlt.IsEmpty()) {
+		CPlaylistItem pli;
+		if (m_wndPlaylistBar.GetCur(pli)) {
+			m_wndPlaylistBar.SetCurLabel(m_strTitleAlt.Left(m_strTitleAlt.GetLength() - 4));
+		}
+	}
+
 	return(err.IsEmpty());
 }
 
@@ -16627,6 +16634,50 @@ bool CMainFrame::ValidateSeek(REFERENCE_TIME rtPos, REFERENCE_TIME rtStop)
 	}
 
 	return true;
+}
+
+bool CMainFrame::GetBufferingProgress(int* iProgress)
+{
+	if (iProgress) {
+		*iProgress = 0;
+	}
+
+	int Progress = 0;
+	if (m_iMediaLoadState == MLS_LOADED && GetPlaybackMode() == PM_FILE) {
+		if (pAMOP) {
+			__int64 t = 0, c = 0;
+			if ((SUCCEEDED(pAMOP->QueryProgress(&t, &c)) || SUCCEEDED(QueryProgressYoutube(&t, &c))) && t > 0 && c < t) {
+				Progress = c*100/t;
+			}
+		}
+
+		if (m_fBuffering) {
+			BeginEnumFilters(pGB, pEF, pBF) {
+				if (CComQIPtr<IAMNetworkStatus, &IID_IAMNetworkStatus> pAMNS = pBF) {
+					long BufferingProgress = 0;
+					if (SUCCEEDED(pAMNS->get_BufferingProgress(&BufferingProgress)) && (BufferingProgress > 0 && BufferingProgress < 100)) {
+						Progress = BufferingProgress;
+					}
+					break;
+				}
+			}
+			EndEnumFilters;
+		}
+
+		__int64 t = 0, c = 0;
+		if (SUCCEEDED(QueryProgressYoutube(&t, &c)) && t > 0 && c < t) {
+			Progress = c*100/t;
+		}
+
+		if (Progress > 0 && Progress < 100) {
+			if (iProgress) {
+				*iProgress = Progress;
+			}
+			return true;
+		}
+	} 
+
+	return false;
 }
 
 void CMainFrame::CleanGraph()

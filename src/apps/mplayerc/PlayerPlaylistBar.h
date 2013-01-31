@@ -98,6 +98,7 @@ public:
 	void SetLast();
 	void SetCurValid(bool fValid);
 	void SetCurTime(REFERENCE_TIME rt);
+	void SetCurLabel(CString label);
 
 	void Refresh();
 	bool Empty();

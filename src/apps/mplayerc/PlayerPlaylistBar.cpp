@@ -759,6 +759,15 @@ void CPlayerPlaylistBar::SetCurValid(bool fValid)
 	UpdateList();
 }
 
+void CPlayerPlaylistBar::SetCurLabel(CString label)
+{
+	POSITION pos = m_pl.GetPos();
+	if (pos) {
+		m_pl.GetAt(pos).m_label = label;
+	}
+	UpdateList();
+}
+
 void CPlayerPlaylistBar::SetCurTime(REFERENCE_TIME rt)
 {
 	POSITION pos = m_pl.GetPos();
