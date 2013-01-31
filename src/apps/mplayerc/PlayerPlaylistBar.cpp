@@ -1596,6 +1596,8 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 
 			if (idx == 2) {
 				f.WriteString(_T("[playlist]\n"));
+			} else if (idx == 2) {
+				f.WriteString(_T("#EXTM3U\n"));
 			} else if (idx == 4) {
 				f.WriteString(_T("<ASX version = \"3.0\">\n"));
 			}
@@ -1620,6 +1622,11 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 								fn = (LPCTSTR)p;
 							}
 				*/
+
+				if (idx == 3 && !pli.m_label.IsEmpty()) { // M3U
+					str.Format(_T("#EXTINF:%s\n"), pli.m_label);
+					f.WriteString(str);
+				}
 
 				switch (idx) {
 					case 2:
