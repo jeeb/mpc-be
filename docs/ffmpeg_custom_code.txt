@@ -19,6 +19,7 @@
 * libavcodec/vorbis.c
 
 * libavresample/audio_mix.c
+* libavresample/x86/audio_mix_init.c
 
 * libavutil/attributes.h
 * libavutil/common.h
