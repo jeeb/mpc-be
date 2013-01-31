@@ -102,13 +102,12 @@ void File__Analyze::Streams_Finish_Global()
 }
 
 //---------------------------------------------------------------------------
-void File__Analyze::Streams_Accept_TestContinuousFileNames_Static(ZtringList &File_Names, bool IsReferenced)
+void File__Analyze::TestContinuousFileNames()
 {
-    if (File_Names.size()!=1)
-        return;
-
+    size_t Pos=Config->File_Names.size();
+    
     //Trying to detect continuous file names (e.g. video stream as an image or HLS)
-    FileName FileToTest(File_Names.Read(0));
+    FileName FileToTest(Config->File_Names.Read(Config->File_Names.size()-1));
     Ztring FileToTest_Name=FileToTest.Name_Get();
     size_t FileNameToTest_Pos=FileToTest_Name.size();
     while (FileNameToTest_Pos && FileToTest_Name[FileNameToTest_Pos-1]>=__T('0') && FileToTest_Name[FileNameToTest_Pos-1]<=__T('9'))
@@ -129,28 +128,17 @@ void File__Analyze::Streams_Accept_TestContinuousFileNames_Static(ZtringList &Fi
             Ztring Next=FileToTest.Path_Get()+PathSeparator+FileToTest_Name+Pos_Ztring+__T('.')+FileToTest.Extension_Get();
             if (!File::Exists(Next))
                 break;
-            File_Names.push_back(Next);
+            Config->File_Names.push_back(Next);
         }
 
-        if (!IsReferenced && File_Names.size()<24)
-            File_Names.resize(1); //Removing files, wrong detection
+        if (!Config->File_IsReferenced_Get() && Config->File_Names.size()<24)
+            Config->File_Names.resize(1); //Removing files, wrong detection
     }
-}
 
-//---------------------------------------------------------------------------
-void File__Analyze::Streams_Accept_TestContinuousFileNames()
-{
-    if (Config->File_Names.size()!=1)
+    if (Config->File_Names.size()==Pos)
         return;
 
-    Streams_Accept_TestContinuousFileNames_Static(Config->File_Names, Config->File_IsReferenced_Get());
-
-    if (Config->File_Names.size()==1)
-        return;
-
-    Config->File_Sizes.clear();
-    Config->File_Size=0;
-    for (size_t Pos=0; Pos<Config->File_Names.size(); Pos++)
+    for (; Pos<Config->File_Names.size(); Pos++)
     {
         int64u Size=File::Size_Get(Config->File_Names[Pos]);
         Config->File_Sizes.push_back(Size);
@@ -160,6 +148,10 @@ void File__Analyze::Streams_Accept_TestContinuousFileNames()
     File_Size=Config->File_Size;
     Element[0].Next=File_Size;
     Fill (Stream_General, 0, General_FileSize, File_Size, 10, true);
+    Fill (Stream_General, 0, General_CompleteName_Last, Config->File_Names[Config->File_Names.size()-1], true);
+    Fill (Stream_General, 0, General_FolderName_Last, FileName::Path_Get(Config->File_Names[Config->File_Names.size()-1]), true);
+    Fill (Stream_General, 0, General_FileName_Last, FileName::Name_Get(Config->File_Names[Config->File_Names.size()-1]), true);
+    Fill (Stream_General, 0, General_FileExtension_Last, FileName::Extension_Get(Config->File_Names[Config->File_Names.size()-1]), true);
 }
 
 //---------------------------------------------------------------------------
