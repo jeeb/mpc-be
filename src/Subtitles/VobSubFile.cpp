@@ -2364,20 +2364,26 @@ void CVobSubStream::Open(CString name, BYTE* pData, int len)
 				sl.RemoveHead();
 				CAtlList<CString> tridx, colors;
 				Explode(sl.RemoveHead(), tridx, ':', 2);
+
+				int _tridx = 1;
 				if (tridx.RemoveHead() == _T("tridx")) {
 					TCHAR tr[4];
 					_stscanf_s(tridx.RemoveHead(), _T("%c%c%c%c"), &tr[0], sizeof(TCHAR),
 							   &tr[1], sizeof(TCHAR), &tr[2], sizeof(TCHAR), &tr[3], sizeof(TCHAR));
 					for (size_t i = 0; i < 4; i++) {
-						m_tridx |= ((tr[i]=='1')?1:0)<<i;
+						_tridx |= ((tr[i]=='1')?1:0)<<i;
 					}
 				}
 				Explode(sl.RemoveHead(), colors, ':', 2);
 				if (colors.RemoveHead() == _T("colors")) {
 					Explode(colors.RemoveHead(), colors, ',', 4);
+
+					RGBQUAD pal[4];
 					for (size_t i = 0; i < 4 && colors.GetCount(); i++) {
-						*(DWORD*)&m_cuspal[i] = _tcstol(colors.RemoveHead(), NULL, 16);
+						*(DWORD*)&pal[i] = _tcstol(colors.RemoveHead(), NULL, 16);
 					}
+					
+					SetCustomPal(pal, _tridx);
 				}
 			}
 		}
