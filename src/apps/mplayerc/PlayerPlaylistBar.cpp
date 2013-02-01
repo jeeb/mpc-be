@@ -331,11 +331,12 @@ void CPlayerPlaylistBar::ParsePlayList(CAtlList<CString>& fns, CAtlList<CString>
 	if (ct == "application/x-mpc-playlist") {
 		ParseMPCPlayList(fns.GetHead());
 		return;
-	} else {
-		if (ct == "application/x-bdmv-playlist" && s.SrcFilters[SRC_MPEG]) {
-			ParseBDMVPlayList(fns.GetHead());
-			return;
-		}
+	} else if (ct == "application/x-bdmv-playlist" && s.SrcFilters[SRC_MPEG]) {
+		ParseBDMVPlayList(fns.GetHead());
+		return;
+	} else if (ct == _T("audio/x-mpegurl")) {
+		ParseM3UPlayList(fns.GetHead());
+		return;
 	}
 
 	AddItem(fns, subs);
@@ -505,6 +506,68 @@ bool CPlayerPlaylistBar::SaveMPCPlayList(CString fn, CTextFile::enc e, bool fRem
 	}
 
 	return true;
+}
+
+bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
+{
+	CString str;
+
+	CWebTextFile f;
+	if (!f.Open(fn) || !f.ReadString(str)) {
+		return false;
+	}
+	f.Seek(0, CFile::begin);
+
+	if (f.GetEncoding() == CTextFile::ASCII) {
+		f.SetEncoding(CTextFile::ANSI);
+	}
+
+	CPath base(fn);
+	base.RemoveFileSpec();
+
+	CPlaylistItem *pli = NULL;
+
+	INT_PTR c = m_pl.GetCount();
+	while (f.ReadString(str)) {
+		str = str.Trim();
+
+		if (str.IsEmpty() || (str.Find(_T("#EXTM3U")) >= 0)) {
+			continue;
+		}
+
+		if (!pli) {
+			pli = DNew CPlaylistItem;
+			pli->m_type = CPlaylistItem::file;
+		}
+
+		if (str.Find(_T("#EXTINF:")) >= 0) {
+			int k = str.Find(_T("#EXTINF:")) + 8;
+			str = str.Mid(k, str.GetLength() - k);
+
+			k = str.Find(_T(","));
+			if (k > 0) {
+				CString tmp = str.Left(k);
+				int dur = 0;
+				if (_stscanf_s(tmp, _T("%dx"), &dur) == 1) {
+					k++;
+					str = str.Mid(k, str.GetLength() - k);
+				}
+			}
+			pli->m_label = str.Trim();
+		} else {
+			pli->m_fns.AddTail(str);
+			m_pl.AddTail(*pli);
+
+			delete pli;
+			pli = NULL;
+		}
+	}
+
+	if (pli) {
+		delete pli;
+	}
+
+	return (m_pl.GetCount() > c);
 }
 
 void CPlayerPlaylistBar::Refresh()
