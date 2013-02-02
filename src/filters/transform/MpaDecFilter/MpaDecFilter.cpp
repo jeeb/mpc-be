@@ -1255,9 +1255,7 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, int size, AVSampleFormat avsf, DWORD
 		default:
 			return E_INVALIDARG;
 	}
-	if (!GetSampleFormat(out_sf)) {
-		out_sf = GetSampleFormat2();
-	}
+	out_sf = SelectSampleFormat(out_sf);
 
 	CMediaType mt = CreateMediaType(out_sf, nSamplesPerSec, nChannels, dwChannelMask);
 	WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.Format();
@@ -1618,31 +1616,41 @@ HRESULT CMpaDecFilter::GetMediaType(int iPosition, CMediaType* pmt)
 	}
 
 	CMediaType mt = m_pInput->CurrentMediaType();
-	const GUID& subtype = mt.subtype;
 	WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.Format();
 	if (wfe == NULL) {
 		return E_INVALIDARG;
 	}
 
+	const GUID& subtype = mt.subtype;
 	if (GetSPDIF(ac3) && (subtype == MEDIASUBTYPE_DOLBY_AC3 || subtype == MEDIASUBTYPE_WAVE_DOLBY_AC3) ||
 #if ENABLE_AC3_ENCODER
-		GetSPDIF(ac3enc) /*&& wfe->nChannels > 2*/ ||
+			GetSPDIF(ac3enc) /*&& wfe->nChannels > 2*/ ||
 #endif
-		GetSPDIF(dts) && (subtype == MEDIASUBTYPE_DTS || subtype == MEDIASUBTYPE_WAVE_DTS)) {
-			if (wfe->nSamplesPerSec % 11025 == 0) {
-				*pmt = CreateMediaTypeSPDIF(44100);
-			} else {
-				*pmt = CreateMediaTypeSPDIF();
-			}
-
-			return S_OK;
+			GetSPDIF(dts) && (subtype == MEDIASUBTYPE_DTS || subtype == MEDIASUBTYPE_WAVE_DTS)) {
+		if (wfe->nSamplesPerSec % 11025 == 0) {
+			*pmt = CreateMediaTypeSPDIF(44100);
+		} else {
+			*pmt = CreateMediaTypeSPDIF();
+		}
+		return S_OK;
 	}
 
 	if (GetMixer()) {
+		DWORD in_layout;
+		if (m_FFAudioDec.GetCodecId() != AV_CODEC_ID_NONE) {
+			in_layout = m_FFAudioDec.GetChannelMask();
+		} else {
+			in_layout = GetDefChannelMask(wfe->nChannels);
+		}
+
 		int sc = GetMixerLayout();
-		*pmt = CreateMediaType(GetSampleFormat2(), wfe->nSamplesPerSec, channel_mode[sc].channels, channel_mode[sc].ch_layout);
+		if (in_layout != channel_mode[sc].ch_layout) {
+			*pmt = CreateMediaType(SelectSampleFormat(SF_FLOAT), wfe->nSamplesPerSec, channel_mode[sc].channels, channel_mode[sc].ch_layout);
+			return S_OK;
+		}
 	}
-	else if (m_FFAudioDec.GetCodecId() != AV_CODEC_ID_NONE) {
+
+	if (m_FFAudioDec.GetCodecId() != AV_CODEC_ID_NONE) {
 		AVSampleFormat avsf = m_FFAudioDec.GetSampleFmt();
 		MPCSampleFormat out_sf;
 		switch (avsf) {
@@ -1665,14 +1673,23 @@ HRESULT CMpaDecFilter::GetMediaType(int iPosition, CMediaType* pmt)
 			default:
 				out_sf = SF_PCM16;
 		}
-		if (!GetSampleFormat(out_sf)) {
-			out_sf = GetSampleFormat2();
-		}
+		out_sf = SelectSampleFormat(out_sf);
+
 		*pmt = CreateMediaType(out_sf, m_FFAudioDec.GetSampleRate(), m_FFAudioDec.GetChannels(), m_FFAudioDec.GetChannelMask());
+		return S_OK;
 	}
-	else {
-		*pmt = CreateMediaType(GetSampleFormat2(), wfe->nSamplesPerSec, wfe->nChannels);
+
+	MPCSampleFormat out_sf;
+	if (wfe->wFormatTag == WAVE_FORMAT_PCM && wfe->wBitsPerSample > 16) {
+		out_sf = SF_PCM32;
+	} else if (wfe->wFormatTag == WAVE_FORMAT_IEEE_FLOAT) {
+		out_sf = SF_FLOAT;
+	} else {
+		out_sf = SF_PCM16;
 	}
+	out_sf = SelectSampleFormat(out_sf);
+
+	*pmt = CreateMediaType(out_sf, wfe->nSamplesPerSec, wfe->nChannels);
 
 	return S_OK;
 }
@@ -1737,9 +1754,13 @@ STDMETHODIMP_(bool) CMpaDecFilter::GetSampleFormat(MPCSampleFormat sf)
 	return false;
 }
 
-STDMETHODIMP_(MPCSampleFormat) CMpaDecFilter::GetSampleFormat2()
+STDMETHODIMP_(MPCSampleFormat) CMpaDecFilter::SelectSampleFormat(MPCSampleFormat sf)
 {
 	CAutoLock cAutoLock(&m_csProps);
+	if (sf >= 0 && sf < sfcount && m_fSampleFmt[sf]) {
+		return sf;
+	}
+
 	if (m_fSampleFmt[SF_FLOAT]) {
 		return SF_FLOAT;
 	}
