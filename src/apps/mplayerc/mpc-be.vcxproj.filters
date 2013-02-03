@@ -282,6 +282,9 @@
     <ClCompile Include="SaveTextFileDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SaveImageDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="SaveThumbnailsDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -651,6 +654,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SaveTextFileDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SaveImageDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SaveThumbnailsDialog.h">

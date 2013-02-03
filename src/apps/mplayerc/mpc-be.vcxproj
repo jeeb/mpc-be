@@ -257,6 +257,7 @@
     <ClCompile Include="RegFilterChooserDlg.cpp" />
     <ClCompile Include="SaveDlg.cpp" />
     <ClCompile Include="SaveTextFileDialog.cpp" />
+    <ClCompile Include="SaveImageDialog.cpp" />
     <ClCompile Include="SaveThumbnailsDialog.cpp" />
     <ClCompile Include="SelectMediaType.cpp" />
     <ClCompile Include="ShaderAutoCompleteDlg.cpp" />
@@ -383,6 +384,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="SaveDlg.h" />
     <ClInclude Include="SaveTextFileDialog.h" />
+    <ClInclude Include="SaveImageDialog.h" />
     <ClInclude Include="SaveThumbnailsDialog.h" />
     <ClInclude Include="SelectMediaType.h" />
     <ClInclude Include="SettingsDefines.h" />

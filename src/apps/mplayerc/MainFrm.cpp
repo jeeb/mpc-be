@@ -24,6 +24,7 @@
 #include "stdafx.h"
 #include "mplayerc.h"
 #include "MainFrm.h"
+#include <math.h>
 #include <atlconv.h>
 #include <atlrx.h>
 #include <atlsync.h>
@@ -38,6 +39,7 @@
 #include "PnSPresetsDlg.h"
 #include "MediaTypesDlg.h"
 #include "SaveTextFileDialog.h"
+#include "SaveImageDialog.h"
 #include "SaveThumbnailsDialog.h"
 #include "FavoriteAddDlg.h"
 #include "FavoriteOrganizeDlg.h"
@@ -5508,20 +5510,22 @@ bool CMainFrame::GetDIB(BYTE** ppData, long& size, bool fSilent)
 
 void CMainFrame::SaveDIB(LPCTSTR fn, BYTE* pData, long size)
 {
+	AppSettings& s = AfxGetAppSettings();
+
 	CString ext = CString(CPath(fn).GetExtension()).MakeLower();
 
 	if (ext == _T(".bmp")) {
 		BMPDIB(fn, pData, L"", 0, 0, 0, 0);
 	} else if (ext == _T(".png")) {
-		PNGDIB(fn, pData, 9);
+		PNGDIB(fn, pData, (int)floor(s.iThumbQuality / 12 + 0.5));
 	} else if (ext == _T(".jpg")) {
-		BMPDIB(fn, pData, L"image/jpeg", 90, 0, 0, 0);
+		BMPDIB(fn, pData, L"image/jpeg", s.iThumbQuality, 0, 0, 0);
 	} else if (ext == _T(".webp")) {
-		WebPDIB(fn, pData, 85);
+		WebPDIB(fn, pData, s.iThumbQuality);
 	} else if (ext == _T(".webpll")) {
 		WebPDIB(fn, pData, 0);
 	} else if (ext == _T(".tif")) {
-		BMPDIB(fn, pData, L"image/tiff", 100, 0, 0, 0);
+		BMPDIB(fn, pData, L"image/tiff", s.iThumbQuality, 0, 0, 0);
 	}
 
 	CString fName(fn);
@@ -5928,9 +5932,10 @@ void CMainFrame::OnFileSaveImage()
 	}
 	psrc.Combine(s.strSnapShotPath, MakeSnapshotFileName(prefix));
 
-	CFileDialog fd(FALSE, 0, (LPCTSTR)psrc,
-				   OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_PATHMUSTEXIST|OFN_NOCHANGEDIR,
-				   _T("BMP - Windows Bitmap (*.bmp)|*.bmp|JPG - JPEG Image (*.jpg)|*.jpg|PNG - Portable Network Graphics (*.png)|*.png|WebP - WebP-lossy Image (*.webp)|*.webp|WebPLL - WebP-lossless Image (*.webpll)|*.webpll|TIFF - Tagged Image File Format (*.tif)|*.tif||"), GetModalParent(), 0);
+	CSaveImageDialog fd(
+		s.iThumbQuality,
+		0, (LPCTSTR)psrc,
+		_T("BMP - Windows Bitmap (*.bmp)|*.bmp|JPG - JPEG Image (*.jpg)|*.jpg|PNG - Portable Network Graphics (*.png)|*.png|WebP - WebP-lossy Image (*.webp)|*.webp|WebPLL - WebP-lossless Image (*.webpll)|*.webpll|TIFF - Tagged Image File Format (*.tif)|*.tif||"), GetModalParent());
 
 	if (s.strSnapShotExt == _T(".bmp")) {
 		fd.m_pOFN->nFilterIndex = 1;
@@ -5963,6 +5968,8 @@ void CMainFrame::OnFileSaveImage()
 	} else if (fd.m_pOFN->nFilterIndex == 6) {
 		s.strSnapShotExt = _T(".tif");
 	}
+
+	s.iThumbQuality = fd.m_quality;
 
 	CPath pdst(fd.GetPathName());
 	if (pdst.GetExtension().MakeLower() != s.strSnapShotExt) {
@@ -6023,7 +6030,7 @@ void CMainFrame::OnFileSaveThumbnails()
 	psrc.Combine(s.strSnapShotPath, MakeSnapshotFileName(prefix));
 
 	CSaveThumbnailsDialog fd(
-		s.iThumbRows, s.iThumbCols, s.iThumbWidth,
+		s.iThumbRows, s.iThumbCols, s.iThumbWidth, s.iThumbQuality,
 		0, (LPCTSTR)psrc,
 		_T("BMP - Windows Bitmap (*.bmp)|*.bmp|JPG - JPEG Image (*.jpg)|*.jpg|PNG - Portable Network Graphics (*.png)|*.png|WebP - WebP-lossy Image (*.webp)|*.webp|WebPLL - WebP-lossless Image (*.webpll)|*.webpll|TIFF - Tagged Image File Format (*.tif)|*.tif||"), GetModalParent());
 
@@ -6062,6 +6069,7 @@ void CMainFrame::OnFileSaveThumbnails()
 	s.iThumbRows = fd.m_rows;
 	s.iThumbCols = fd.m_cols;
 	s.iThumbWidth = fd.m_width;
+	s.iThumbQuality = fd.m_quality;
 
 	CPath pdst(fd.GetPathName());
 	if (pdst.GetExtension().MakeLower() != s.strSnapShotExt) {

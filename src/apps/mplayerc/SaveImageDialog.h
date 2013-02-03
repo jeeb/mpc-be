@@ -23,18 +23,18 @@
 
 #pragma once
 
-// CSaveThumbnailsDialog
+// CSaveImageDialog
 
-class CSaveThumbnailsDialog : public CFileDialog
+class CSaveImageDialog : public CFileDialog
 {
-	DECLARE_DYNAMIC(CSaveThumbnailsDialog)
+	DECLARE_DYNAMIC(CSaveImageDialog)
 
 public:
-	CSaveThumbnailsDialog(
-		int rows, int cols, int width, int quality,
+	CSaveImageDialog(
+		int quality,
 		LPCTSTR lpszDefExt = NULL, LPCTSTR lpszFileName = NULL,
 		LPCTSTR lpszFilter = NULL, CWnd* pParentWnd = NULL);
-	virtual ~CSaveThumbnailsDialog();
+	virtual ~CSaveImageDialog();
 
 protected:
 	DECLARE_MESSAGE_MAP()
@@ -43,6 +43,6 @@ protected:
 	virtual BOOL OnFileNameOK();
 
 public:
-	int m_rows, m_cols, m_width, m_quality;
-	CSpinButtonCtrl m_rowsctrl, m_colsctrl, m_widthctrl, m_qualityctrl;
+	int m_quality;
+	CSpinButtonCtrl m_qualityctrl;
 };

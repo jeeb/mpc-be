@@ -363,6 +363,7 @@
 #define IDD_COMPROPERTYPAGE             10048
 #define IDD_FILEPROPRES                 10049
 #define IDD_SAVETHUMBSDIALOGTEMPL       10050
+#define IDD_SAVEIMAGEDIALOGTEMPL        10051
 #define IDD_PPAGEMISC                   10052
 #define IDD_FILEMEDIAINFO               10053
 #define IDD_PPAGECAPTURE                10054
@@ -1533,6 +1534,11 @@
 #define IDS_TOOLTIP_LOCK                41403
 #define IDS_TOOLTIP_UNLOCK              41404
 
+#define IDS_THUMB_IMAGE_QUALITY         41505
+#define IDS_THUMB_QUALITY               41506
+#define IDS_THUMB_THUMBNAILS            41507
+#define IDS_THUMB_PIXELS                41508
+
 #define IDS_PPAGE_OUTPUT_OLDRENDERER    42001
 #define IDS_PPAGE_OUTPUT_OVERLAYMIXER   42002
 #define IDS_PPAGE_OUTPUT_VMR7WINDOWED   42003
@@ -1577,8 +1583,8 @@
 #define IDC_CHECK_SHADOW                44014
 #define IDC_CHECK_AA                    44015
 
-#define ID_WINDOW_TO_PRIMARYSCREEN		44101
-#define IDS_AG_WINDOW_TO_PRIMARYSCREEN	44102
+#define ID_WINDOW_TO_PRIMARYSCREEN      44101
+#define IDS_AG_WINDOW_TO_PRIMARYSCREEN  44102
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
