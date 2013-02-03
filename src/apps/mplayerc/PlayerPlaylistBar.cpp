@@ -513,10 +513,9 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 	CString str;
 
 	CWebTextFile f;
-	if (!f.Open(fn) || !f.ReadString(str)) {
+	if (!f.Open(fn)) {
 		return false;
 	}
-	f.Seek(0, CFile::begin);
 
 	if (f.GetEncoding() == CTextFile::ASCII) {
 		f.SetEncoding(CTextFile::ANSI);
@@ -531,7 +530,7 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 	while (f.ReadString(str)) {
 		str = str.Trim();
 
-		if (str.IsEmpty() || (str.Find(_T("#EXTM3U")) >= 0)) {
+		if (str.IsEmpty() || (str.Find(_T("#EXTM3U")) == 0)) {
 			continue;
 		}
 
@@ -540,20 +539,22 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 			pli->m_type = CPlaylistItem::file;
 		}
 
-		if (str.Find(_T("#EXTINF:")) >= 0) {
-			int k = str.Find(_T("#EXTINF:")) + 8;
-			str = str.Mid(k, str.GetLength() - k);
+		if (str.Find(_T("#")) == 0) {
+			if (str.Find(_T("#EXTINF:")) == 0) {
+				int k = str.Find(_T("#EXTINF:")) + 8;
+				str = str.Mid(k, str.GetLength() - k);
 
-			k = str.Find(_T(","));
-			if (k > 0) {
-				CString tmp = str.Left(k);
-				int dur = 0;
-				if (_stscanf_s(tmp, _T("%dx"), &dur) == 1) {
-					k++;
-					str = str.Mid(k, str.GetLength() - k);
+				k = str.Find(_T(","));
+				if (k > 0) {
+					CString tmp = str.Left(k);
+					int dur = 0;
+					if (_stscanf_s(tmp, _T("%dx"), &dur) == 1) {
+						k++;
+						str = str.Mid(k, str.GetLength() - k);
+					}
 				}
+				pli->m_label = str.Trim();
 			}
-			pli->m_label = str.Trim();
 		} else {
 			pli->m_fns.AddTail(str);
 			m_pl.AddTail(*pli);
