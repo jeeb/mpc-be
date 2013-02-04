@@ -24,7 +24,6 @@
 #include "stdafx.h"
 #include "mplayerc.h"
 #include "MainFrm.h"
-#include <math.h>
 #include <atlconv.h>
 #include <atlrx.h>
 #include <atlsync.h>
