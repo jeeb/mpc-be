@@ -22,7 +22,7 @@
 
 #include <Windows.h>
 #include <tchar.h>
-#include "mpciconlib.h"
+#include "resource.h"
 
 extern "C" __declspec(dllexport) int get_icon_index(LPCTSTR ext)
 {

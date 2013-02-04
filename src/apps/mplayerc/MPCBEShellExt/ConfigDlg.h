@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "afxwin.h"
+#include <afxwin.h>
 
 // CConfigDlg dialog
 

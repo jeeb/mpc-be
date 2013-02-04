@@ -1,7 +1,3 @@
-; MPCBEShellExt.def : Declares the module parameters.
-
-;LIBRARY      "MPCBEShellExt.DLL"
-
 EXPORTS
 	DllCanUnloadNow		PRIVATE
 	DllGetClassObject	PRIVATE
@@ -9,4 +5,3 @@ EXPORTS
 	DllUnregisterServer	PRIVATE
 	DllInstall		PRIVATE
 	DllConfig		PRIVATE
-	

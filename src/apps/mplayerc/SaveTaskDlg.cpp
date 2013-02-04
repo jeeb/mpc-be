@@ -65,13 +65,16 @@ CSaveTaskDlg::~CSaveTaskDlg()
 HRESULT CSaveTaskDlg::OnInit()
 {
 	m_TaskDlgHwnd = ::GetActiveWindow();
+
 	return S_OK;
 }
 
 HRESULT CSaveTaskDlg::InitFileCopy()
 {
-	if (OpenImageCheck(m_in) && AfxGetAppSettings().strSnapShotExt != _T(".*")) {
-		OpenImageDIB(m_in, m_out, 90, 0);
+	AppSettings& s = AfxGetAppSettings();
+
+	if (OpenImageCheck(m_in) && s.strSnapShotExt != _T(".*")) {
+		OpenImageDIB(m_in, m_out, s.iThumbQuality, 0);
 		return S_OK;
 	}
 

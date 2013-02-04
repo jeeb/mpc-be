@@ -67,6 +67,8 @@ BOOL CSaveDlg::OnInitDialog()
 {
 	CCmdUIDialog::OnInitDialog();
 
+	AppSettings& s = AfxGetAppSettings();
+
 	m_anim.SendMessage(ACM_OPEN, (WPARAM)AfxGetInstanceHandle(), (LPARAM)IDR_AVI_FILECOPY);
 	m_anim.Play(0, (UINT)-1, (UINT)-1);
 
@@ -85,8 +87,8 @@ BOOL CSaveDlg::OnInitDialog()
 
 	m_progress.SetRange(0, 100);
 
-	if (OpenImageCheck(m_in) && AfxGetAppSettings().strSnapShotExt != _T(".*")) {
-		OpenImageDIB(m_in, m_out, 90, 0);
+	if (OpenImageCheck(m_in) && s.strSnapShotExt != _T(".*")) {
+		OpenImageDIB(m_in, m_out, s.iThumbQuality, 0);
 		EndDialog(IDOK);
 		return TRUE;
 	}

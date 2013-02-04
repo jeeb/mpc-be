@@ -1206,7 +1206,6 @@ BOOL AFX_GLOBAL_DATA::GetNonClientMetrics (NONCLIENTMETRICS& info)
 	return ::SystemParametersInfo(SPI_GETNONCLIENTMETRICS, info.cbSize, &info, 0);
 }
 
-
 BOOL AFXAPI AfxIsExtendedFrameClass(CWnd* pWnd)
 {
 	ENSURE( pWnd );
@@ -1234,7 +1233,6 @@ BOOL AFXAPI AfxIsExtendedFrameClass(CWnd* pWnd)
 #endif
 	return FALSE;
 }
-
 
 BOOL AFXAPI AfxIsMFCToolBar(CWnd* pWnd)
 {
@@ -2616,7 +2614,6 @@ BOOL AFX_GLOBAL_DATA::GetNonClientMetrics (NONCLIENTMETRICS& info)
 	return ::SystemParametersInfo(SPI_GETNONCLIENTMETRICS, info.cbSize, &info, 0);
 }
 
-
 BOOL AFXAPI AfxIsExtendedFrameClass(CWnd* pWnd)
 {
 	ENSURE( pWnd );
@@ -2644,7 +2641,6 @@ BOOL AFXAPI AfxIsExtendedFrameClass(CWnd* pWnd)
 #endif
 	return FALSE;
 }
-
 
 BOOL AFXAPI AfxIsMFCToolBar(CWnd* pWnd)
 {

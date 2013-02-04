@@ -349,7 +349,6 @@ CMDIChildWnd* CMDIFrameWnd::MDIGetActive(BOOL* pbMaximized) const
 	return pWnd;
 }
 
-
 CMDIChildWnd* CMDIFrameWnd::CreateNewChild(CRuntimeClass* pClass,
 		UINT nResources, HMENU hMenu /* = NULL */, HACCEL hAccel /* = NULL */)
 {

@@ -101,6 +101,10 @@ nl.WinVersionTooLowError=[name] requires Windows XP Service Pack 3 or newer to r
 pl.WelcomeLabel2=Ten instalator zainstaluje [name] na Twoim komputerze.%n%nZaleca się zamknięcie wszystkich innych aplikacji przed kontynuowaniem.
 pl.WinVersionTooLowError=[name] wymaga systemu Windows XP Service Pack 3 lub nowszego do uruchomienia.
 
+;Romanian
+ro.WelcomeLabel2=Se va instala [name] pe calculatorul dumneavoastră.%n%nEste recomandat să închideţi toate celelalte aplicaţii înainte de a continua.
+ro.WinVersionTooLowError=[name] necesită Windows XP Service Pack 3 sau mai nou pentru a rula.
+
 ;Russian
 ru.WelcomeLabel2=Программа установит [name] на ваш компьютер.%n%nРекомендуется закрыть все прочие приложения перед тем, как продолжить.
 ru.WinVersionTooLowError=[name] Эта программа требует Windows XP Service Pack 3 или выше.
@@ -814,6 +818,42 @@ pl.AssociationMPCPlayMusicFilesS=Music Files
 pl.AssociationMPCPlayVideoFilesF=Play Video
 pl.AssociationMPCPlayVideoFilesS=Video Files
 pl.PinToTaskBar=Pin to TaskBar
+
+
+;Romanian
+ro.langid=00001048
+ro.langcode=ro
+ro.comp_mpciconlib=Bibliotecă de pictograme
+ro.comp_mpcresources=Traduceri
+ro.msg_DeleteSettings=Doriţi de asemenea să ştergeţi setările MPC-BE?%n%nDacă doriţi a reinstala MPC-BE, atunci nu este necesar să le ştergeţi.
+ro.msg_SetupIsRunningWarning=Instalatorul MPC-BE rulează deja!
+#if defined(sse_required)
+ro.msg_simd_sse=Această versiune de MPC-BE necesită un procesor cu suport pentru extensii SSE.%n%nProcesorul dumneavoastră nu are aceste capacităţi.
+#elif defined(sse2_required)
+ro.msg_simd_sse2=Această versiune de MPC-BE necesită un procesor cu suport pentru extensii SSE2.%n%nProcesorul dumneavoastră nu are aceste capacităţi.
+#endif
+ro.tsk_AllUsers=Pentru toţi utilizatorii
+ro.tsk_CurrentUser=Doar pentru utilizatorul curent
+ro.tsk_Other=Alte activităţi:
+ro.tsk_ResetSettings=Resetează setările
+ro.types_DefaultInstallation=Instalare implicită
+ro.types_CustomInstallation=Instalare specială
+ro.ViewChangelog=Vezi jurnalul de modificări
+ro.AssociationFormatsAV=Configuring associations with video and audio files:
+ro.AssociationFormats=Association with video and audio files
+ro.AssociationVideo=Association with video files
+ro.AssociationAudio=Association with audio files
+ro.AssociationPlaylist=Association with playlists
+ro.AutoPlayType=Auto play:
+ro.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+ro.AssociationMPCPlayCDAudioS=Audio CD
+ro.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
+ro.AssociationMPCPlayDVDMovieS=DVD Movie
+ro.AssociationMPCPlayMusicFilesF=Play Music
+ro.AssociationMPCPlayMusicFilesS=Music Files
+ro.AssociationMPCPlayVideoFilesF=Play Video
+ro.AssociationMPCPlayVideoFilesS=Video Files
+ro.PinToTaskBar=Pin to TaskBar
 
 
 ;Russian

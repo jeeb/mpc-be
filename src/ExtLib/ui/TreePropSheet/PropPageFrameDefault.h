@@ -26,7 +26,6 @@
 #endif // _MSC_VER > 1000
 
 #include "PropPageFrame.h"
-#include <afxcmn.h>
 
 
 namespace TreePropSheet
@@ -40,7 +39,7 @@ styled systems and older windows versions (without themes).
 @author Sven Wiegand
 */
 class /*AFX_EXT_CLASS*/ CPropPageFrameDefault : public CWnd,
-                                            public CPropPageFrame
+											public CPropPageFrame
 {
 // construction/destruction
 public:
@@ -55,7 +54,7 @@ public:
 	virtual BOOL Create(DWORD dwWindowStyle, const RECT &rect, CWnd *pwndParent, UINT nID);
 	virtual CWnd* GetWnd();
 	virtual void SetCaption(LPCTSTR lpszCaption, HICON hIcon = NULL);
-	
+
 protected:
 	virtual CRect CalcMsgArea();
 	virtual CRect CalcCaptionArea();
@@ -80,7 +79,7 @@ protected:
 	void FillGradientRectH(CDC *pDc, const RECT &rect, COLORREF clrLeft, COLORREF clrRight);
 
 	/**
-	Returns TRUE if Windows XP theme support is available, FALSE 
+	Returns TRUE if Windows XP theme support is available, FALSE
 	otherwise.
 	*/
 	BOOL ThemeSupport() const;
@@ -99,7 +98,7 @@ protected:
 
 // attributes
 protected:
-	/** 
+	/**
 	Image list that contains only the current icon or nothing if there
 	is no icon.
 	*/

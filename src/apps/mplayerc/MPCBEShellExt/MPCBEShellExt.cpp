@@ -21,10 +21,9 @@
  */
 
 #include "stdafx.h"
-#include "resource.h"
 #include "MPCBEShellExt_i.h"
 #include "dllmain.h"
-#include "configdlg.h"
+#include "ConfigDlg.h"
 
 // config dialog
 STDAPI DllConfig(void)

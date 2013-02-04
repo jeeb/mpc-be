@@ -39,7 +39,7 @@ BEGIN_MESSAGE_MAP(CTreePropSheet, CPropertySheet)
 	ON_MESSAGE(PSM_SETCURSEL, OnSetCurSel)
 	ON_MESSAGE(PSM_SETCURSELID, OnSetCurSelId)
 	ON_MESSAGE(PSM_ISDIALOGMESSAGE, OnIsDialogMessage)
-	
+
 	ON_NOTIFY(TVN_SELCHANGINGA, s_unPageTreeId, OnPageTreeSelChanging)
 	ON_NOTIFY(TVN_SELCHANGINGW, s_unPageTreeId, OnPageTreeSelChanging)
 	ON_NOTIFY(TVN_SELCHANGEDA, s_unPageTreeId, OnPageTreeSelChanged)
@@ -51,7 +51,8 @@ IMPLEMENT_DYNAMIC(CTreePropSheet, CPropertySheet)
 const UINT CTreePropSheet::s_unPageTreeId = 0x7EEE;
 
 CTreePropSheet::CTreePropSheet()
-:	m_bPageTreeSelChangedActive(FALSE),
+:	CPropertySheet(),
+	m_bPageTreeSelChangedActive(FALSE),
 	m_bTreeViewMode(TRUE),
 	m_bPageCaption(FALSE),
 	m_bTreeImages(FALSE),
@@ -89,9 +90,6 @@ CTreePropSheet::CTreePropSheet(LPCTSTR pszCaption, CWnd* pParentWnd, UINT iSelec
 
 CTreePropSheet::~CTreePropSheet()
 {
-	if(m_Images.GetSafeHandle()) m_Images.DeleteImageList();
-	delete m_pwndPageTree, m_pwndPageTree = NULL;
-	delete m_pFrame, m_pFrame = NULL;
 }
 
 
@@ -162,7 +160,7 @@ BOOL CTreePropSheet::SetTreeDefaultImages(CImageList *pImages)
 	// update, if necessary
 	if (IsWindow(m_hWnd))
 		RefillPageTree();
-	
+
 	return TRUE;
 }
 
@@ -239,7 +237,7 @@ BOOL CTreePropSheet::DestroyPageIcon(CPropertyPage *pPage)
 
 CString CTreePropSheet::GenerateEmptyPageMessage(LPCTSTR lpszEmptyPageMessage, LPCTSTR lpszCaption)
 {
-	CString	strMsg;
+	CString strMsg;
 	strMsg.Format(lpszEmptyPageMessage, lpszCaption);
 	return strMsg;
 }
@@ -312,7 +310,7 @@ void CTreePropSheet::RefillPageTree()
 
 		// add default images
 		if (m_DefaultImages.GetSafeHandle())
-		{	
+		{
 			HICON	hIcon;
 
 			// add default images
@@ -334,7 +332,7 @@ void CTreePropSheet::RefillPageTree()
 	for (int nPage = 0; nPage < nPageCount; ++nPage)
 	{
 		// Get title and image of the page
-		CString	strPagePath;
+		CString strPagePath;
 
 		TCITEM	ti;
 		ZeroMemory(&ti, sizeof(ti));
@@ -358,12 +356,13 @@ void CTreePropSheet::RefillPageTree()
 			// set image
 			if (m_bTreeImages)
 			{
-				int	nImage = ti.iImage;
+				int nImage = ti.iImage;
 				if (nImage < 0 || nImage >= m_Images.GetImageCount())
 					nImage = m_DefaultImages.GetSafeHandle()? m_Images.GetImageCount()-1 : -1;
 
 				m_pwndPageTree->SetItemImage(hItem, nImage, nImage);
 			}
+			m_pwndPageTree->Expand(m_pwndPageTree->GetParentItem(hItem), TVE_EXPAND);
 		}
 	}
 }
@@ -371,9 +370,9 @@ void CTreePropSheet::RefillPageTree()
 
 HTREEITEM CTreePropSheet::CreatePageTreeItem(LPCTSTR lpszPath, HTREEITEM hParent /* = TVI_ROOT */)
 {
-	CString		strPath(lpszPath);
-	CString		strTopMostItem(SplitPageTreePath(strPath));
-	
+	CString	 strPath(lpszPath);
+	CString	 strTopMostItem(SplitPageTreePath(strPath));
+
 	// Check if an item with the given text does already exist
 	HTREEITEM	hItem = NULL;
 	HTREEITEM	hChild = m_pwndPageTree->GetChildItem(hParent);
@@ -411,13 +410,13 @@ HTREEITEM CTreePropSheet::CreatePageTreeItem(LPCTSTR lpszPath, HTREEITEM hParent
 
 CString CTreePropSheet::SplitPageTreePath(CString &strRest)
 {
-	int	nSeperatorPos = 0;
+	int nSeperatorPos = 0;
 	for (;;)
 	{
 		nSeperatorPos = strRest.Find(_T("::"), nSeperatorPos);
 		if (nSeperatorPos == -1)
 		{
-			CString	strItem(strRest);
+			CString strItem(strRest);
 			strRest.Empty();
 			return strItem;
 		}
@@ -425,7 +424,7 @@ CString CTreePropSheet::SplitPageTreePath(CString &strRest)
 		{
 			// if there is an odd number of backslashes infront of the
 			// seperator, than do not interpret it as separator
-			int	nBackslashCount = 0;
+			int nBackslashCount = 0;
 			for (int nPos = nSeperatorPos-1; nPos >= 0 && strRest[nPos]==_T('\\'); --nPos, ++nBackslashCount);
 			if (nBackslashCount%2 == 0)
 				break;
@@ -434,7 +433,7 @@ CString CTreePropSheet::SplitPageTreePath(CString &strRest)
 		}
 	}
 
-	CString	strItem(strRest.Left(nSeperatorPos));
+	CString strItem(strRest.Left(nSeperatorPos));
 	strItem.Replace(_T("\\::"), _T("::"));
 	strItem.Replace(_T("\\\\"), _T("\\"));
 	strRest = strRest.Mid(nSeperatorPos+2);
@@ -541,7 +540,7 @@ void CTreePropSheet::UpdateCaption()
 	HTREEITEM	hItem = m_pwndPageTree->GetSelectedItem();
 	if (!hItem)
 		return;
-	CString		strCaption = m_pwndPageTree->GetItemText(hItem);
+	CString	 strCaption = m_pwndPageTree->GetItemText(hItem);
 
 	// if empty page, then update empty page message
 	if (!bRealPage)
@@ -562,7 +561,7 @@ void CTreePropSheet::UpdateCaption()
 	if (m_bTreeImages)
 	{
 		// get image from tree
-		int	nImage;
+		int nImage;
 		m_pwndPageTree->GetItemImage(hItem, nImage, nImage);
 		HICON	hIcon = m_Images.ExtractIcon(nImage);
 		m_pFrame->SetCaption(strCaption, hIcon);
@@ -604,11 +603,11 @@ void CTreePropSheet::ActivatePreviousPage()
 	if (!IsWindow(m_pwndPageTree->GetSafeHwnd()))
 	{
 		// normal tab property sheet. Simply use page index
-		int	nPageIndex = GetActiveIndex();
+		int nPageIndex = GetActiveIndex();
 		if (nPageIndex<0 || nPageIndex>=GetPageCount())
 			return;
 
-		int	nPrevIndex = (nPageIndex==0)? GetPageCount()-1 : nPageIndex-1;
+		int nPrevIndex = (nPageIndex==0)? GetPageCount()-1 : nPageIndex-1;
 		SetActivePage(nPrevIndex);
 	}
 	else
@@ -632,7 +631,7 @@ void CTreePropSheet::ActivatePreviousPage()
 					hPrevItem = m_pwndPageTree->GetNextSiblingItem(hPrevItem);
 			}
 		}
-		else 
+		else
 			hPrevItem = m_pwndPageTree->GetParentItem(hItem);
 
 		if (!hPrevItem)
@@ -666,11 +665,11 @@ void CTreePropSheet::ActivateNextPage()
 	if (!IsWindow(m_pwndPageTree->GetSafeHwnd()))
 	{
 		// normal tab property sheet. Simply use page index
-		int	nPageIndex = GetActiveIndex();
+		int nPageIndex = GetActiveIndex();
 		if (nPageIndex<0 || nPageIndex>=GetPageCount())
 			return;
 
-		int	nNextIndex = (nPageIndex==GetPageCount()-1)? 0 : nPageIndex+1;
+		int nNextIndex = (nPageIndex==GetPageCount()-1)? 0 : nPageIndex+1;
 		SetActivePage(nNextIndex);
 	}
 	else
@@ -714,7 +713,7 @@ void CTreePropSheet::ActivateNextPage()
 /////////////////////////////////////////////////////////////////////
 // Overridings
 
-BOOL CTreePropSheet::OnInitDialog() 
+BOOL CTreePropSheet::OnInitDialog()
 {
 	if (m_bTreeViewMode)
 	{
@@ -736,7 +735,7 @@ BOOL CTreePropSheet::OnInitDialog()
 	}
 
 	// perform default implementation
-	BOOL bResult = __super::OnInitDialog();
+	BOOL bResult = CPropertySheet::OnInitDialog();
 
 	if (!m_bTreeViewMode)
 		// stop here, if we would like to use tabs
@@ -814,43 +813,35 @@ BOOL CTreePropSheet::OnInitDialog()
 		GetWindowRect(rect);
 		rect.top+= rectFrameCaption.Height()/2;
 		rect.bottom-= rectFrameCaption.Height()-rectFrameCaption.Height()/2;
-//		if (GetParent())
-//			GetParent()->ScreenToClient(rect);
+		if (GetParent())
+			GetParent()->ScreenToClient(rect);
 		MoveWindow(rect);
 	}
 
-	// finally create tht tree control
-	const DWORD	dwTreeStyle = TVS_SHOWSELALWAYS|TVS_TRACKSELECT|TVS_HASLINES|TVS_LINESATROOT|TVS_HASBUTTONS;
+	// finally create the tree control
+	const DWORD dwTreeStyle = TVS_SHOWSELALWAYS|TVS_TRACKSELECT|TVS_HASLINES|TVS_LINESATROOT|TVS_HASBUTTONS;
 	m_pwndPageTree = CreatePageTreeObject();
 	if (!m_pwndPageTree)
 	{
 		ASSERT(FALSE);
 		AfxThrowMemoryException();
 	}
-	
+
 	// MFC7-support here (Thanks to Rainer Wollgarten)
-	#if _MFC_VER >= 0x0700
-	{
-		m_pwndPageTree->CreateEx(
-			WS_EX_CLIENTEDGE|WS_EX_NOPARENTNOTIFY, 
-			WS_TABSTOP|WS_CHILD|WS_VISIBLE|dwTreeStyle, 
-			rectTree, this, s_unPageTreeId);
-	}
-	#else
-	{
-		m_pwndPageTree->CreateEx(
-			WS_EX_CLIENTEDGE|WS_EX_NOPARENTNOTIFY, 
-			_T("SysTreeView32"), _T("PageTree"), 
-			WS_TABSTOP|WS_CHILD|WS_VISIBLE|dwTreeStyle, 
-			rectTree, this, s_unPageTreeId);
-	}
-	#endif
-	
+	// YT: Cast tree control to CWnd and calls CWnd::CreateEx in all cases (VC 6 and7).
+	((CWnd*)m_pwndPageTree)->CreateEx(
+		WS_EX_CLIENTEDGE|WS_EX_NOPARENTNOTIFY|TVS_EX_DOUBLEBUFFER,
+		_T("SysTreeView32"), _T("PageTree"),
+		WS_TABSTOP|WS_CHILD|WS_VISIBLE|dwTreeStyle,
+		rectTree, this, s_unPageTreeId);
+
 	if (m_bTreeImages)
 	{
 		m_pwndPageTree->SetImageList(&m_Images, TVSIL_NORMAL);
 		m_pwndPageTree->SetImageList(&m_Images, TVSIL_STATE);
 	}
+
+	SetWindowTheme(m_pwndPageTree->GetSafeHwnd(), L"Explorer", NULL);
 
 	// Fill the tree ctrl
 	RefillPageTree();
@@ -863,21 +854,24 @@ BOOL CTreePropSheet::OnInitDialog()
 }
 
 
-void CTreePropSheet::OnDestroy() 
+void CTreePropSheet::OnDestroy()
 {
-	__super::OnDestroy();
-	
-	if(m_pwndPageTree && m_pwndPageTree->m_hWnd)
-		m_pwndPageTree->DestroyWindow();
-	
-	if(m_pFrame && m_pFrame->GetWnd()->m_hWnd)
-		m_pFrame->GetWnd()->DestroyWindow();
+	CPropertySheet::OnDestroy();
+
+	if (m_Images.GetSafeHandle())
+		m_Images.DeleteImageList();
+
+	delete m_pwndPageTree;
+	m_pwndPageTree = NULL;
+
+	delete m_pFrame;
+	m_pFrame = NULL;
 }
 
 
 LRESULT CTreePropSheet::OnAddPage(WPARAM wParam, LPARAM lParam)
 {
-	LRESULT	lResult = DefWindowProc(PSM_ADDPAGE, wParam, lParam);
+	LRESULT lResult = DefWindowProc(PSM_ADDPAGE, wParam, lParam);
 	if (!m_bTreeViewMode)
 		return lResult;
 
@@ -890,7 +884,7 @@ LRESULT CTreePropSheet::OnAddPage(WPARAM wParam, LPARAM lParam)
 
 LRESULT CTreePropSheet::OnRemovePage(WPARAM wParam, LPARAM lParam)
 {
-	LRESULT	lResult = DefWindowProc(PSM_REMOVEPAGE, wParam, lParam);
+	LRESULT lResult = DefWindowProc(PSM_REMOVEPAGE, wParam, lParam);
 	if (!m_bTreeViewMode)
 		return lResult;
 
@@ -903,7 +897,7 @@ LRESULT CTreePropSheet::OnRemovePage(WPARAM wParam, LPARAM lParam)
 
 LRESULT CTreePropSheet::OnSetCurSel(WPARAM wParam, LPARAM lParam)
 {
-	LRESULT	lResult = DefWindowProc(PSM_SETCURSEL, wParam, lParam);
+	LRESULT lResult = DefWindowProc(PSM_SETCURSEL, wParam, lParam);
 	if (!m_bTreeViewMode)
 		return lResult;
 
@@ -912,16 +906,9 @@ LRESULT CTreePropSheet::OnSetCurSel(WPARAM wParam, LPARAM lParam)
 	return lResult;
 }
 
-
 LRESULT CTreePropSheet::OnSetCurSelId(WPARAM wParam, LPARAM lParam)
 {
-	LRESULT	lResult = DefWindowProc(PSM_SETCURSEL, wParam, lParam);
-	if (!m_bTreeViewMode)
-		return lResult;
-
-	SelectCurrentPageTreeItem();
-	UpdateCaption();
-	return lResult;
+	return OnSetCurSel(wParam, lParam);
 }
 
 
@@ -934,9 +921,14 @@ void CTreePropSheet::OnPageTreeSelChanging(NMHDR *pNotifyStruct, LRESULT *plResu
 		m_bPageTreeSelChangedActive = TRUE;
 
 	NMTREEVIEW	*pTvn = reinterpret_cast<NMTREEVIEW*>(pNotifyStruct);
-	int					nPage = m_pwndPageTree->GetItemData(pTvn->itemNew.hItem);
+	int				 nPage = (int)m_pwndPageTree->GetItemData(pTvn->itemNew.hItem);
+	if (nPage < 0)
+	{
+		HTREEITEM nextItem = m_pwndPageTree->GetChildItem(pTvn->itemNew.hItem);
+		nPage = (int)m_pwndPageTree->GetItemData(nextItem);
+	}
 	BOOL				bResult;
-	if (nPage<0 || (unsigned)nPage>=m_pwndPageTree->GetCount())
+	if (nPage >= (int)m_pwndPageTree->GetCount())
 		bResult = KillActiveCurrentPage();
 	else
 		bResult = SetActivePage(nPage);
@@ -954,7 +946,7 @@ void CTreePropSheet::OnPageTreeSelChanging(NMHDR *pNotifyStruct, LRESULT *plResu
 }
 
 
-void CTreePropSheet::OnPageTreeSelChanged(NMHDR* /*pNotifyStruct*/, LRESULT *plResult)
+void CTreePropSheet::OnPageTreeSelChanged(NMHDR * /*pNotifyStruct*/, LRESULT *plResult)
 {
 	*plResult = 0;
 
@@ -966,7 +958,7 @@ void CTreePropSheet::OnPageTreeSelChanged(NMHDR* /*pNotifyStruct*/, LRESULT *plR
 
 LRESULT CTreePropSheet::OnIsDialogMessage(WPARAM wParam, LPARAM lParam)
 {
-	MSG	*pMsg = reinterpret_cast<MSG*>(lParam);
+	MSG *pMsg = reinterpret_cast<MSG*>(lParam);
 	if (pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_TAB && GetKeyState(VK_CONTROL)&0x8000)
 	{
 		if (GetKeyState(VK_SHIFT)&0x8000)
@@ -977,7 +969,7 @@ LRESULT CTreePropSheet::OnIsDialogMessage(WPARAM wParam, LPARAM lParam)
 	}
 
 
-	return __super::DefWindowProc(PSM_ISDIALOGMESSAGE, wParam, lParam);
+	return CPropertySheet::DefWindowProc(PSM_ISDIALOGMESSAGE, wParam, lParam);
 }
 
 } //namespace TreePropSheet

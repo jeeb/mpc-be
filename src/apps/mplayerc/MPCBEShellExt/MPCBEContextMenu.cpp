@@ -21,7 +21,6 @@
  */
 
 #include "stdafx.h"
-#include "resource.h"
 #include "MPCBEContextMenu.h"
 
 #define MPC_WND_CLASS_NAME L"MPC-BE"

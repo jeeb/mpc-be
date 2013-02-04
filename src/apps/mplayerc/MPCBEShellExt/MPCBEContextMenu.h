@@ -24,7 +24,6 @@
 
 #include "resource.h"
 #include <atlcoll.h>
-
 #include "MPCBEShellExt_i.h"
 
 #define ID_MPCBE_PLAY	0

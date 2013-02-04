@@ -1,12 +1,5 @@
-// MPCBEShellExt.idl : IDL source for MPCBEShellExt
-//
-
-// This file will be processed by the MIDL tool to
-// produce the type library (MPCBEShellExt.tlb) and marshalling code.
-
 import "oaidl.idl";
 import "ocidl.idl";
-
 [
 	object,
 	uuid(6F28F887-69C8-4ADD-9E5F-FDDBFC2ABBED),

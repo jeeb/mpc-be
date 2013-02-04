@@ -260,7 +260,7 @@
     <ClInclude Include="ConfigDlg.h" />
     <ClInclude Include="dllmain.h" />
     <ClInclude Include="MPCBEContextMenu.h" />
-    <ClInclude Include="Resource.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="MPCBEShellExt_i.h" />
   </ItemGroup>

@@ -40,8 +40,8 @@ static void read_data_fn(png_structp png_ptr, png_bytep data, png_size_t length)
 class MPCPngImage : public CImage
 {
 public:
-	bool DecompressPNG(struct png_t* png);
-	bool LoadFromResource(UINT id);
+	bool	DecompressPNG(struct png_t* png);
+	bool	LoadFromResource(UINT id);
 
 	CString	LoadCurrentPath();
 	bool	FileExists(CString fn);
@@ -50,5 +50,4 @@ public:
 	HBITMAP	TypeLoadImage(int type, BYTE** pData, int* width, int* height, int* bpp, FILE* fp, int resid, int br, int rc, int gc, int bc);
 	HBITMAP	LoadExternalImage(CString fn, int resid, int type, int br, int rc, int gc, int bc);
 	void	LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop, int br, int rc, int gc, int bc);
-	void	DrawTransparentBitmap(CDC* mdci, CDC* dc, int x, int y, HBITMAP hBmp);
 };

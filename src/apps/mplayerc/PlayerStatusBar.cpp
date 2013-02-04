@@ -28,7 +28,7 @@
 #include "../../DSUtil/DSUtil.h"
 #include <afxinet.h>
 #include "OpenImage.h"
-//#include "mpciconlib/mpciconlib.h"
+//#include "mpciconlib/resource.h"
 
 /*
 static HICON get_hicon(CString path, CString fn)

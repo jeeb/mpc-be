@@ -63,6 +63,9 @@
     <ResourceCompile Include="mplayerc.pl.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
+    <ResourceCompile Include="mplayerc.ro.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
     <ResourceCompile Include="mplayerc.ru.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>

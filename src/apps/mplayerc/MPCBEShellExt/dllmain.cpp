@@ -21,7 +21,6 @@
  */
 
 #include "stdafx.h"
-#include "resource.h"
 #include "MPCBEShellExt_i.h"
 #include "dllmain.h"
 

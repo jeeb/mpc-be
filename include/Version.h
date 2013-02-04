@@ -43,7 +43,7 @@
 #ifndef ISPP_INVOKED
 
 #define MPC_COMP_NAME_STR L"MPC-BE Team"
-#define MPC_COPYRIGHT_STR L"Copyright © 2002-2012 all contributors, see Authors.txt"
+#define MPC_COPYRIGHT_STR L"Copyright © 2002-2013 all contributors, see Authors.txt"
 
 #ifdef NO_VERSION_REV_NEEDED
 #define MPC_VERSION_NUM MPC_VERSION_MAJOR, MPC_VERSION_MINOR, MPC_VERSION_STATUS, MPC_VERSION_PATCH

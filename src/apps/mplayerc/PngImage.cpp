@@ -343,36 +343,3 @@ void MPCPngImage::LoadExternalGradient(CString fn, CDC* dc, CRect r, int ptop, i
 		}
 	}
 }
-
-void MPCPngImage::DrawTransparentBitmap(CDC* mdci, CDC* dc, int x, int y, HBITMAP hBmp)
-{
-	CDC hdcSrc;
-	hdcSrc.CreateCompatibleDC(mdci);
-	hdcSrc.SelectObject(CBitmap::FromHandle(hBmp));
-
-	BITMAP bm;
-	::GetObject(hBmp, sizeof(bm), &bm);
-
-	COLORREF clrSrc;
-	BYTE rDest, gDest, bDest;
-
-	for (int j = 0; j < bm.bmHeight; j++) {
-
-		for (int i = 0; i < bm.bmWidth; i++) {
-
-			clrSrc = hdcSrc.GetPixel(i, j);
-
-			rDest = GetRValue(clrSrc);
-			gDest = GetGValue(clrSrc);
-			bDest = GetBValue(clrSrc);
-
-			if (rDest > 0 && gDest > 0 && bDest > 0) {
-
-				dc->SetPixel(x + i, y + j, RGB(rDest, gDest, bDest));
-			}
-		}
-	}
-
-	hdcSrc.DeleteDC();
-	mdci->DeleteDC();
-}
