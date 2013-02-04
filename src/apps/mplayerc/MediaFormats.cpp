@@ -355,10 +355,12 @@ CMediaFormatCategory* CMediaFormats::FindMediaByExt(CString ext, bool fAudioOnly
 	return NULL;
 }
 
+#define GRAPHIC_FMT _T("*.bmp;*.jpg;*.jpeg;*.png;*.gif;*.tif;*.tiff;*.emf;*.ico;*.webp;*.webpll;*.psd;*.tga")
 void CMediaFormats::GetFilter(CString& filter, CAtlArray<CString>& mask)
 {
 	CString strTemp;
 
+	// Add All Media formats
 	filter += ResStr(IDS_AG_MEDIAFILES);
 	mask.Add(_T(""));
 
@@ -367,9 +369,38 @@ void CMediaFormats::GetFilter(CString& filter, CAtlArray<CString>& mask)
 		mask[0]	+= strTemp;
 		filter	+= strTemp;
 	}
+	// add graphics formats
+	mask[0]	+= GRAPHIC_FMT;
+	filter	+= GRAPHIC_FMT;
+	filter	+= _T("|");
 
-	mask[0]	+= _T("*.bmp;*.jpg;*.jpeg;*.png;*.gif;*.tif;*.tiff;*.emf;*.ico;*.webp;*.webpll;*.psd;*.tga");
+	// Add Video formats
+	filter += ResStr(IDS_AG_VIDEOFILES);
+	mask.Add(_T(""));
 
+	for (size_t i = 0; i < GetCount(); i++) {
+		if (GetAt(i).IsAudioOnly() || !GetAt(i).GetLabel().CompareNoCase(_T("pls"))) {
+			continue;
+		}
+
+		strTemp	= GetAt(i).GetFilter() + _T(";");
+		mask[1]	+= strTemp;
+		filter	+= strTemp;
+	}
+	filter.TrimRight(_T(';'));
+	filter += _T("|");
+
+	// Add Audio formats
+	filter += ResStr(IDS_AG_AUDIOFILES);
+	mask.Add(_T(""));
+
+	for (size_t i = 0; i < GetCount(); i++) {
+		if (GetAt(i).IsAudioOnly()) {
+			strTemp	= GetAt(i).GetFilter() + _T(";");
+			mask[1]	+= strTemp;
+			filter	+= strTemp;
+		}
+	}
 	filter.TrimRight(_T(';'));
 	filter += _T("|");
 

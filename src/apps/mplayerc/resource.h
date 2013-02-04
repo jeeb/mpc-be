@@ -1185,6 +1185,7 @@
 #define IDS_CANCEL                      33445
 #define IDS_TEXTFILE_ENC                33446
 #define IDS_SAVE_FILE                   33447
+#define IDS_AG_VIDEOFILES               33448
 #define IDS_MFMT_AVI                    39001
 #define IDS_MFMT_MPEG                   39002
 #define IDS_MFMT_MPEGTS                 39003
