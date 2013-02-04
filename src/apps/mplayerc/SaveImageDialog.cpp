@@ -25,6 +25,7 @@
 #include "mplayerc.h"
 #include "SaveImageDialog.h"
 #include "../../DSUtil/WinAPIUtils.h"
+#include "DialogEventHandler.h"
 
 // CSaveImageDialog
 
@@ -35,13 +36,26 @@ CSaveImageDialog::CSaveImageDialog(
 	LPCTSTR lpszFilter, CWnd* pParentWnd) :
 	CFileDialog(FALSE, lpszDefExt, lpszFileName,
 				OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_PATHMUSTEXIST|OFN_NOCHANGEDIR,
-				lpszFilter, pParentWnd, 0)
+				lpszFilter, pParentWnd)
 	, m_quality(quality)
 {
 	if (IsWinVistaOrLater()) {
 
 		IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
 		if (pfdc) {
+
+			// Create an event handling object, and hook it up to the dialog.
+			IFileDialogEvents *pfde = NULL;
+			HRESULT hr = _CDialogEventHandler_CreateInstance(IID_PPV_ARGS(&pfde));
+			if (SUCCEEDED(hr)) {
+				// Hook up the event handler.
+				DWORD dwCookie;
+				hr = GetIFileSaveDialog()->Advise(pfde, &dwCookie);
+				if (SUCCEEDED(hr)) {
+					;
+				}
+			}
+
 			CString str;
 
 			pfdc->StartVisualGroup(IDS_THUMB_IMAGE_QUALITY, ResStr(IDS_THUMB_IMAGE_QUALITY));
@@ -59,6 +73,18 @@ CSaveImageDialog::CSaveImageDialog(
 
 CSaveImageDialog::~CSaveImageDialog()
 {
+}
+
+HRESULT CSaveImageDialog::_CDialogEventHandler_CreateInstance(REFIID riid, void **ppv)
+{
+	*ppv = NULL;
+	CDialogEventHandler *pDialogEventHandler = new (std::nothrow) CDialogEventHandler();
+	HRESULT hr = pDialogEventHandler ? S_OK : E_OUTOFMEMORY;
+	if (SUCCEEDED(hr)) {
+		hr = pDialogEventHandler->QueryInterface(riid, ppv);
+		pDialogEventHandler->Release();
+	}
+	return hr;
 }
 
 void CSaveImageDialog::DoDataExchange(CDataExchange* pDX)

@@ -384,6 +384,9 @@
     <ClCompile Include="PPageYoutube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DialogEventHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSettings.h">
@@ -753,6 +756,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PPageYoutube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DialogEventHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

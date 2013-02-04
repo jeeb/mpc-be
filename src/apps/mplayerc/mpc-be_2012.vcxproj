@@ -175,6 +175,7 @@
     <ClCompile Include="BaseGraph.cpp" />
     <ClCompile Include="ComPropertyPage.cpp" />
     <ClCompile Include="ComPropertySheet.cpp" />
+    <ClCompile Include="DialogEventHandler.cpp" />
     <ClCompile Include="PlayerFlyBar.cpp" />
     <ClCompile Include="PlayerYouTube.cpp" />
     <ClCompile Include="PPageInterface.cpp" />
@@ -298,6 +299,7 @@
     <ClInclude Include="BaseGraph.h" />
     <ClInclude Include="ComPropertyPage.h" />
     <ClInclude Include="ComPropertySheet.h" />
+    <ClInclude Include="DialogEventHandler.h" />
     <ClInclude Include="PlayerFlyBar.h" />
     <ClInclude Include="PlayerYouTube.h" />
     <ClInclude Include="PPageInterface.h" />

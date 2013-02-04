@@ -25,6 +25,7 @@
 #include "mplayerc.h"
 #include "SaveThumbnailsDialog.h"
 #include "../../DSUtil/WinAPIUtils.h"
+#include "DialogEventHandler.h"
 
 // CSaveThumbnailsDialog
 
@@ -35,7 +36,7 @@ CSaveThumbnailsDialog::CSaveThumbnailsDialog(
 	LPCTSTR lpszFilter, CWnd* pParentWnd) :
 	CFileDialog(FALSE, lpszDefExt, lpszFileName,
 				OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_PATHMUSTEXIST|OFN_NOCHANGEDIR,
-				lpszFilter, pParentWnd, 0)
+				lpszFilter, pParentWnd)
 	, m_rows(rows)
 	, m_cols(cols)
 	, m_width(width)
@@ -45,6 +46,19 @@ CSaveThumbnailsDialog::CSaveThumbnailsDialog(
 
 		IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
 		if (pfdc) {
+
+			// Create an event handling object, and hook it up to the dialog.
+			IFileDialogEvents *pfde = NULL;
+			HRESULT hr = _CDialogEventHandler_CreateInstance(IID_PPV_ARGS(&pfde));
+			if (SUCCEEDED(hr)) {
+				// Hook up the event handler.
+				DWORD dwCookie;
+				hr = GetIFileSaveDialog()->Advise(pfde, &dwCookie);
+				if (SUCCEEDED(hr)) {
+					;
+				}
+			}
+
 			CString str;
 
 			pfdc->StartVisualGroup(IDS_THUMB_THUMBNAILS, ResStr(IDS_THUMB_THUMBNAILS));
@@ -78,6 +92,18 @@ CSaveThumbnailsDialog::CSaveThumbnailsDialog(
 
 CSaveThumbnailsDialog::~CSaveThumbnailsDialog()
 {
+}
+
+HRESULT CSaveThumbnailsDialog::_CDialogEventHandler_CreateInstance(REFIID riid, void **ppv)
+{
+	*ppv = NULL;
+	CDialogEventHandler *pialogEventHandler = new (std::nothrow) CDialogEventHandler();
+	HRESULT hr = pialogEventHandler ? S_OK : E_OUTOFMEMORY;
+	if (SUCCEEDED(hr)) {
+		hr = pialogEventHandler->QueryInterface(riid, ppv);
+		pialogEventHandler->Release();
+	}
+	return hr;
 }
 
 void CSaveThumbnailsDialog::DoDataExchange(CDataExchange* pDX)

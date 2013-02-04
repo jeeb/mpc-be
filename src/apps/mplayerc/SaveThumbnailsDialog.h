@@ -42,6 +42,8 @@ protected:
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnFileNameOK();
 
+	HRESULT _CDialogEventHandler_CreateInstance(REFIID riid, void **ppv);
+
 public:
 	int m_rows, m_cols, m_width, m_quality;
 	CSpinButtonCtrl m_rowsctrl, m_colsctrl, m_widthctrl, m_qualityctrl;
