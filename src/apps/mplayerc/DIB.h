@@ -47,7 +47,7 @@ static int GetEncoderClsid(CStringW format, CLSID* pClsid)
 	return -1;
 }
 
-static void GdiplusConvert(Bitmap* bm, CStringW fn, CStringW format, ULONG* quality, bool type, BYTE** pBuf, size_t* pSize)
+static void GdiplusConvert(Bitmap* bm, CStringW fn, CStringW format, ULONG quality, bool type, BYTE** pBuf, size_t* pSize)
 {
 	CLSID encoderClsid = CLSID_NULL;
 	GetEncoderClsid(format, &encoderClsid);
@@ -131,7 +131,7 @@ static bool BMPDIB(LPCTSTR fn, BYTE* pData, CStringW format, ULONG quality, bool
 		GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, 0);
 		Bitmap *bm = new Bitmap(s);
 
-		GdiplusConvert(bm, fn, format, &quality, type, pBuf, pSize);
+		GdiplusConvert(bm, fn, format, quality, type, pBuf, pSize);
 
 		delete bm;
 		GdiplusShutdown(gdiplusToken);

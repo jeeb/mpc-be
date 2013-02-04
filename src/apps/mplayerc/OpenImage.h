@@ -74,7 +74,7 @@ static bool OpenImageCheck(CString fn)
 	return 0;
 }
 
-static HBITMAP SaveImageDIB(CString out, ULONG* quality, bool mode, BYTE* pBuf, size_t pSize)
+static HBITMAP SaveImageDIB(CString out, ULONG quality, bool mode, BYTE* pBuf, size_t pSize)
 {
 	HBITMAP hB = NULL;
 
@@ -211,7 +211,7 @@ static HBITMAP OpenImageDIB(CString fn, CString out, ULONG quality, bool mode)
 				memcpy(pBuf, &bfh, sizeof(bfh));
 				memcpy(pBuf + sizeof(bfh), &bi.bmiHeader, sih);
 				memcpy(pBuf + bfh.bfOffBits, bmp, slen);
-				SaveImageDIB(out, &quality, 0, pBuf, bfh.bfSize);
+				SaveImageDIB(out, quality, 0, pBuf, bfh.bfSize);
 				free(pBuf);
 			}
 
@@ -236,12 +236,12 @@ static HBITMAP OpenImageDIB(CString fn, CString out, ULONG quality, bool mode)
 				memcpy(pBuf, &bfh, sizeof(bfh));
 				memcpy(pBuf + sizeof(bfh), &bi.bmiHeader, sih);
 				memcpy(pBuf + bfh.bfOffBits, bmp, slen);
-				SaveImageDIB(out, &quality, 0, pBuf, bfh.bfSize);
+				SaveImageDIB(out, quality, 0, pBuf, bfh.bfSize);
 				free(pBuf);
 			}
 
 		} else {
-			hB = SaveImageDIB(out, &quality, mode, data, fs);
+			hB = SaveImageDIB(out, quality, mode, data, fs);
 		}
 
 		free(data);
