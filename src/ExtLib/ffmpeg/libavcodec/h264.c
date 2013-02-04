@@ -2372,7 +2372,7 @@ static int field_end(H264Context *h, int in_setup)
      * past end by one (callers fault) and resync_mb_y != 0
      * causes problems for the first MB line, too.
      */
-    if (!FIELD_PICTURE && h->current_slice)
+    if (!FIELD_PICTURE && h->current_slice && !h->sps.new)
         ff_er_frame_end(s);
 
     ff_MPV_frame_end(s);
@@ -4026,6 +4026,7 @@ static int execute_decode_slices(H264Context *h, int context_count)
     if (context_count == 1) {
         return decode_slice(avctx, &h);
     } else {
+        av_assert0(context_count > 0);
         for (i = 1; i < context_count; i++) {
             hx                    = h->thread_context[i];
             hx->s.err_recognition = avctx->err_recognition;
