@@ -1437,7 +1437,7 @@ bool CMainFrame::FlyBarSetPos()
 		return 0;
 	}
 
-	if (IsMadVRExclusiveMode) {
+	if (IsMadVRExclusiveMode || !m_wndView.IsWindowVisible()) {
 		if (m_wndFlyBar.IsWindowVisible()) {
 			m_wndFlyBar.ShowWindow(SW_HIDE);
 		}
@@ -1736,6 +1736,9 @@ void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
 		TRACE(_T("SC_SCREENSAVE, nID = %d, lParam = %d\n"), nID, lParam);
 		return;
 	} else if ((nID & 0xFFF0) == SC_MINIMIZE && m_fTrayIcon) {
+		if (m_wndFlyBar.IsWindowVisible()) {
+			m_wndFlyBar.ShowWindow(SW_HIDE);
+		}
 		ShowWindow(SW_HIDE);
 		return;
 	} else if ((nID & 0xFFF0) == SC_MINIMIZE) {
@@ -3994,6 +3997,9 @@ void CMainFrame::OnUpdateFilePostClosemedia(CCmdUI* pCmdUI)
 
 void CMainFrame::OnBossKey()
 {
+	if (m_wndFlyBar.IsWindowVisible()) {
+		m_wndFlyBar.ShowWindow(SW_HIDE);
+	}
 	// Disable animation
 	ANIMATIONINFO AnimationInfo;
 	AnimationInfo.cbSize = sizeof(ANIMATIONINFO);
