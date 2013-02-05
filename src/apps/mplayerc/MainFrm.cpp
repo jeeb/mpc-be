@@ -5799,6 +5799,21 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 
 		CPath path(m_wndPlaylistBar.GetCurFileName());
 		path.StripPath();
+
+		if (!m_strTitleAlt.IsEmpty()) {
+			CString out = m_strTitleAlt;
+
+			CString ingnoreFileNameCharlist = _T("< > : \" / \\ | ? *");
+			CAtlList<CString> sl;
+			Explode(ingnoreFileNameCharlist, sl, ' ');
+			POSITION pos = sl.GetHeadPosition();
+			while (pos) {
+				out.Replace(sl.GetNext(pos), _T(" "));
+			}
+
+			path = CPath(out);
+		}
+
 		CStringW fn = (LPCTSTR)path;
 
 		CStringW fs;
@@ -5925,6 +5940,20 @@ void CMainFrame::OnFileSaveImage()
 	if (GetPlaybackMode() == PM_FILE) {
 		CPath path(m_wndPlaylistBar.GetCurFileName());
 		path.StripPath();
+
+		if (!m_strTitleAlt.IsEmpty()) {
+			CString out = m_strTitleAlt;
+
+			CString ingnoreFileNameCharlist = _T("< > : \" / \\ | ? *");
+			CAtlList<CString> sl;
+			Explode(ingnoreFileNameCharlist, sl, ' ');
+			POSITION pos = sl.GetHeadPosition();
+			while (pos) {
+				out.Replace(sl.GetNext(pos), _T(" "));
+			}
+
+			path = CPath(out);
+		}
 		prefix.Format(_T("%s_snapshot_%s"), path, GetVidPos());
 	} else if (GetPlaybackMode() == PM_DVD) {
 		prefix.Format(_T("snapshot_dvd_%s"), GetVidPos());
@@ -6025,6 +6054,20 @@ void CMainFrame::OnFileSaveThumbnails()
 	if (GetPlaybackMode() == PM_FILE) {
 		CPath path(m_wndPlaylistBar.GetCurFileName());
 		path.StripPath();
+
+		if (!m_strTitleAlt.IsEmpty()) {
+			CString out = m_strTitleAlt;
+
+			CString ingnoreFileNameCharlist = _T("< > : \" / \\ | ? *");
+			CAtlList<CString> sl;
+			Explode(ingnoreFileNameCharlist, sl, ' ');
+			POSITION pos = sl.GetHeadPosition();
+			while (pos) {
+				out.Replace(sl.GetNext(pos), _T(" "));
+			}
+
+			path = CPath(out);
+		}
 		prefix.Format(_T("%s_thumbs"), path);
 	}
 	psrc.Combine(s.strSnapShotPath, MakeSnapshotFileName(prefix));
