@@ -291,6 +291,7 @@ SRCS_C = \
     libavcodec/utvideo.c \
     libavcodec/utvideodec.c \
     libavcodec/utils.c \
+    libavcodec/v210dec.c \
     libavcodec/vc1.c \
     libavcodec/vc1data.c \
     libavcodec/vc1dec.c \
@@ -346,6 +347,7 @@ SRCS_C = \
     libavcodec/x86/sbrdsp_init.c \
     libavcodec/x86/simple_idct.c \
     libavcodec/x86/snowdsp.c \
+    libavcodec/x86/v210-init.c \
     libavcodec/x86/vc1dsp_init.c \
     libavcodec/x86/vc1dsp_mmx.c \
     libavcodec/x86/videodsp_init.c \
@@ -443,6 +445,7 @@ SRCS_YASM = \
     libavcodec/x86/rv34dsp.asm \
     libavcodec/x86/rv40dsp.asm \
     libavcodec/x86/sbrdsp.asm \
+    libavcodec/x86/v210.asm \
     libavcodec/x86/vc1dsp.asm \
     libavcodec/x86/videodsp.asm \
     libavcodec/x86/vorbisdsp.asm \

@@ -547,6 +547,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_ZLIB_DECODER 0
 #define CONFIG_ZMBV_DECODER 0
 #define CONFIG_UTVIDEO_DECODER 1
+#define CONFIG_V210_DECODER 1
 
 #define CONFIG_AAC_DECODER 1
 #define CONFIG_AAC_LATM_DECODER 1

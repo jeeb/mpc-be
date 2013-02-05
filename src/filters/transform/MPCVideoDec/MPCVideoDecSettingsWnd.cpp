@@ -538,6 +538,7 @@ MPCFILTER_VIDEO_CODECS mpc_codecs[] = {
 	{MPCVD_SVQ3,		_T("SVQ1/3")},
 	{MPCVD_THEORA,		_T("Theora")},
 	{MPCVD_UTVD,		_T("Ut video")},
+	{MPCVD_V210,		_T("QT video")},
 	{MPCVD_VC1,			_T("VC1 (FFmpeg)")},
 	{MPCVD_VP356,		_T("VP3/5/6")},
 	{MPCVD_VP8,			_T("VP8")},

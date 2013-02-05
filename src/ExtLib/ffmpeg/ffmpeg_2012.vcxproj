@@ -40,12 +40,15 @@
     <None Include="libavcodec\x86\h264_qpel_8bit.asm" />
     <None Include="libavcodec\x86\h264_weight.asm" />
     <None Include="libavcodec\x86\h264_weight_10bit.asm" />
+    <None Include="libavcodec\x86\hpeldsp.asm" />
     <None Include="libavcodec\x86\imdct36.asm" />
+    <None Include="libavcodec\x86\mpeg4qpel.asm" />
     <None Include="libavcodec\x86\pngdsp.asm" />
     <None Include="libavcodec\x86\proresdsp.asm" />
     <None Include="libavcodec\x86\rv34dsp.asm" />
     <None Include="libavcodec\x86\rv40dsp.asm" />
     <None Include="libavcodec\x86\sbrdsp.asm" />
+    <None Include="libavcodec\x86\v210.asm" />
     <None Include="libavcodec\x86\vc1dsp.asm" />
     <None Include="libavcodec\x86\videodsp.asm" />
     <None Include="libavcodec\x86\vorbisdsp.asm" />
@@ -251,6 +254,7 @@
     <ClInclude Include="libavcodec\tscc2data.h" />
     <ClInclude Include="libavcodec\unary.h" />
     <ClInclude Include="libavcodec\utvideo.h" />
+    <ClInclude Include="libavcodec\v210dec.h" />
     <ClInclude Include="libavcodec\vc1.h" />
     <ClInclude Include="libavcodec\vc1acdata.h" />
     <ClInclude Include="libavcodec\vc1data.h" />
@@ -587,6 +591,7 @@
     <ClCompile Include="libavcodec\utils.c" />
     <ClCompile Include="libavcodec\utvideo.c" />
     <ClCompile Include="libavcodec\utvideodec.c" />
+    <ClCompile Include="libavcodec\v210dec.c" />
     <ClCompile Include="libavcodec\vc1.c" />
     <ClCompile Include="libavcodec\vc1data.c" />
     <ClCompile Include="libavcodec\vc1dec.c" />
@@ -647,6 +652,7 @@
     <ClCompile Include="libavcodec\x86\sbrdsp_init.c" />
     <ClCompile Include="libavcodec\x86\simple_idct.c" />
     <ClCompile Include="libavcodec\x86\snowdsp.c" />
+    <ClCompile Include="libavcodec\x86\v210-init.c" />
     <ClCompile Include="libavcodec\x86\vc1dsp_init.c" />
     <ClCompile Include="libavcodec\x86\vc1dsp_mmx.c" />
     <ClCompile Include="libavcodec\x86\videodsp_init.c" />

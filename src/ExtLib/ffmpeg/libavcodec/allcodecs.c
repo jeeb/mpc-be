@@ -99,6 +99,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (WMV2, wmv2);
     REGISTER_DECODER (WMV3, wmv3);
     REGISTER_DECODER (UTVIDEO, utvideo);
+    REGISTER_DECODER (V210, v210);
 
     /* audio codecs */
     REGISTER_DECODER (AAC, aac);

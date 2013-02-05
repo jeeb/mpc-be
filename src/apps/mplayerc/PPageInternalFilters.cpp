@@ -113,6 +113,7 @@ static filter_t s_filters[] = {
 	{_T("SVQ1/3"),                FFMPEG_DECODER, VIDEO,  FFM_SVQ3,       IDS_TRA_FFMPEG},
 	{_T("Theora"),                FFMPEG_DECODER, VIDEO,  FFM_THEORA,     IDS_TRA_FFMPEG},
 	{_T("Ut Video"),              FFMPEG_DECODER, VIDEO,  FFM_UTVD,       IDS_TRA_FFMPEG},
+	{_T("QT video"),              FFMPEG_DECODER, VIDEO,  FFM_V210,       IDS_TRA_FFMPEG},
 	{_T("VC1 (FFmpeg)"),          FFMPEG_DECODER, VIDEO,  FFM_VC1,        IDS_TRA_FFMPEG},
 	{_T("VP3/5/6"),               FFMPEG_DECODER, VIDEO,  FFM_VP356,      IDS_TRA_FFMPEG},
 	{_T("VP8"),                   FFMPEG_DECODER, VIDEO,  FFM_VP8,        IDS_TRA_FFMPEG},
