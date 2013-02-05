@@ -31,13 +31,14 @@
 
 IMPLEMENT_DYNAMIC(CSaveImageDialog, CFileDialog)
 CSaveImageDialog::CSaveImageDialog(
-	int quality,
+	int quality, int levelPNG,
 	LPCTSTR lpszDefExt, LPCTSTR lpszFileName,
 	LPCTSTR lpszFilter, CWnd* pParentWnd) :
 	CFileDialog(FALSE, lpszDefExt, lpszFileName,
 				OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_PATHMUSTEXIST|OFN_NOCHANGEDIR,
 				lpszFilter, pParentWnd)
 	, m_quality(quality)
+	, m_levelPNG(levelPNG)
 {
 	if (IsWinVistaOrLater()) {
 
@@ -61,7 +62,11 @@ CSaveImageDialog::CSaveImageDialog(
 			pfdc->StartVisualGroup(IDS_THUMB_IMAGE_QUALITY, ResStr(IDS_THUMB_IMAGE_QUALITY));
 			pfdc->AddText(IDS_THUMB_QUALITY, ResStr(IDS_THUMB_QUALITY));
 			str.Format(L"%d", max(70, min(100, m_quality)));
-			pfdc->AddEditBox(IDC_EDIT1, str);
+			pfdc->AddEditBox(IDC_EDIT4, str);
+
+			pfdc->AddText(IDS_THUMB_LEVEL, ResStr(IDS_THUMB_LEVEL));
+			str.Format(L"%d", max(1, min(9, m_levelPNG)));
+			pfdc->AddEditBox(IDC_EDIT5, str);
 			pfdc->EndVisualGroup();
 
 			pfdc->Release();
@@ -122,10 +127,17 @@ BOOL CSaveImageDialog::OnFileNameOK()
 		if (pfdc) {
 			WCHAR* result;
 
-			pfdc->GetEditBoxText(IDC_EDIT1, &result);
+			pfdc->GetEditBoxText(IDC_EDIT4, &result);
 			int quality = _wtoi(result);
 			if (quality > 0 && quality <= 100) {
 				m_quality = quality;
+			}
+			CoTaskMemFree(result);
+
+			pfdc->GetEditBoxText(IDC_EDIT5, &result);
+			int level = _wtoi(result);
+			if (level > 0  && level <= 9) {
+				m_levelPNG = level;
 			}
 			CoTaskMemFree(result);
 	

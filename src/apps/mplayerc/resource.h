@@ -1540,6 +1540,7 @@
 #define IDS_THUMB_QUALITY               41506
 #define IDS_THUMB_THUMBNAILS            41507
 #define IDS_THUMB_PIXELS                41508
+#define IDS_THUMB_LEVEL                 41509
 
 #define IDS_PPAGE_OUTPUT_OLDRENDERER    42001
 #define IDS_PPAGE_OUTPUT_OVERLAYMIXER   42002

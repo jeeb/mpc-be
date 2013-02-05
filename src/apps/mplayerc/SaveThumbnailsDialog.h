@@ -31,7 +31,7 @@ class CSaveThumbnailsDialog : public CFileDialog
 
 public:
 	CSaveThumbnailsDialog(
-		int rows, int cols, int width, int quality,
+		int rows, int cols, int width, int quality, int levelPNG,
 		LPCTSTR lpszDefExt = NULL, LPCTSTR lpszFileName = NULL,
 		LPCTSTR lpszFilter = NULL, CWnd* pParentWnd = NULL);
 	virtual ~CSaveThumbnailsDialog();
@@ -45,6 +45,6 @@ protected:
 	HRESULT _CDialogEventHandler_CreateInstance(REFIID riid, void **ppv);
 
 public:
-	int m_rows, m_cols, m_width, m_quality;
+	int m_rows, m_cols, m_width, m_quality, m_levelPNG;
 	CSpinButtonCtrl m_rowsctrl, m_colsctrl, m_widthctrl, m_qualityctrl;
 };

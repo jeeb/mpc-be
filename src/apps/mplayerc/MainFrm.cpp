@@ -5516,7 +5516,7 @@ void CMainFrame::SaveDIB(LPCTSTR fn, BYTE* pData, long size)
 	if (ext == _T(".bmp")) {
 		BMPDIB(fn, pData, L"", 0, 0, 0, 0);
 	} else if (ext == _T(".png")) {
-		PNGDIB(fn, pData, min(9, (100 - s.iThumbQuality)/10));
+		PNGDIB(fn, pData, max(1, min(9, s.iThumbLevelPNG)));
 	} else if (ext == _T(".jpg")) {
 		BMPDIB(fn, pData, L"image/jpeg", s.iThumbQuality, 0, 0, 0);
 	} else if (ext == _T(".webp")) {
@@ -5932,7 +5932,7 @@ void CMainFrame::OnFileSaveImage()
 	psrc.Combine(s.strSnapShotPath, MakeSnapshotFileName(prefix));
 
 	CSaveImageDialog fd(
-		s.iThumbQuality,
+		s.iThumbQuality, s.iThumbLevelPNG,
 		0, (LPCTSTR)psrc,
 		_T("BMP - Windows Bitmap (*.bmp)|*.bmp|JPG - JPEG Image (*.jpg)|*.jpg|PNG - Portable Network Graphics (*.png)|*.png|WebP - WebP-lossy Image (*.webp)|*.webp|WebPLL - WebP-lossless Image (*.webpll)|*.webpll|TIFF - Tagged Image File Format (*.tif)|*.tif||"), GetModalParent());
 
@@ -5968,7 +5968,8 @@ void CMainFrame::OnFileSaveImage()
 		s.strSnapShotExt = _T(".tif");
 	}
 
-	s.iThumbQuality = fd.m_quality;
+	s.iThumbQuality		= fd.m_quality;
+	s.iThumbLevelPNG	= fd.m_levelPNG;
 
 	CPath pdst(fd.GetPathName());
 	if (pdst.GetExtension().MakeLower() != s.strSnapShotExt) {
@@ -6029,7 +6030,7 @@ void CMainFrame::OnFileSaveThumbnails()
 	psrc.Combine(s.strSnapShotPath, MakeSnapshotFileName(prefix));
 
 	CSaveThumbnailsDialog fd(
-		s.iThumbRows, s.iThumbCols, s.iThumbWidth, s.iThumbQuality,
+		s.iThumbRows, s.iThumbCols, s.iThumbWidth, s.iThumbQuality, s.iThumbLevelPNG,
 		0, (LPCTSTR)psrc,
 		_T("BMP - Windows Bitmap (*.bmp)|*.bmp|JPG - JPEG Image (*.jpg)|*.jpg|PNG - Portable Network Graphics (*.png)|*.png|WebP - WebP-lossy Image (*.webp)|*.webp|WebPLL - WebP-lossless Image (*.webpll)|*.webpll|TIFF - Tagged Image File Format (*.tif)|*.tif||"), GetModalParent());
 
@@ -6065,10 +6066,11 @@ void CMainFrame::OnFileSaveThumbnails()
 		s.strSnapShotExt = _T(".tif");
 	}
 
-	s.iThumbRows = fd.m_rows;
-	s.iThumbCols = fd.m_cols;
-	s.iThumbWidth = fd.m_width;
-	s.iThumbQuality = fd.m_quality;
+	s.iThumbRows		= fd.m_rows;
+	s.iThumbCols		= fd.m_cols;
+	s.iThumbWidth		= fd.m_width;
+	s.iThumbQuality		= fd.m_quality;
+	s.iThumbLevelPNG	= fd.m_levelPNG;
 
 	CPath pdst(fd.GetPathName());
 	if (pdst.GetExtension().MakeLower() != s.strSnapShotExt) {

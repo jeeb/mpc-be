@@ -576,7 +576,7 @@ public:
     // Save Image...
 	CString			strSnapShotPath, strSnapShotExt;
     // Save Thumbnails...
-	int				iThumbRows, iThumbCols, iThumbWidth, iThumbQuality;
+	int				iThumbRows, iThumbCols, iThumbWidth, iThumbQuality, iThumbLevelPNG;
     // Shader Editor
 	struct Shader {
 		CString		label;

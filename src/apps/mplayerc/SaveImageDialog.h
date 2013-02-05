@@ -31,7 +31,7 @@ class CSaveImageDialog : public CFileDialog
 
 public:
 	CSaveImageDialog(
-		int quality,
+		int quality, int levelPNG,
 		LPCTSTR lpszDefExt = NULL, LPCTSTR lpszFileName = NULL,
 		LPCTSTR lpszFilter = NULL, CWnd* pParentWnd = NULL);
 	virtual ~CSaveImageDialog();
@@ -45,6 +45,6 @@ protected:
 	HRESULT _CDialogEventHandler_CreateInstance(REFIID riid, void **ppv);
 
 public:
-	int m_quality;
+	int m_quality, m_levelPNG;
 	CSpinButtonCtrl m_qualityctrl;
 };

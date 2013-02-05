@@ -48,13 +48,26 @@ IFACEMETHODIMP CDialogEventHandler::OnTypeChange(IFileDialog *pfd)
 						pfdc->SetControlState(IDS_THUMB_IMAGE_QUALITY, CDCS_INACTIVE);
 						pfdc->SetControlState(IDS_THUMB_QUALITY, CDCS_INACTIVE);
 						pfdc->SetControlState(IDC_EDIT4, CDCS_INACTIVE);
+
+						pfdc->SetControlState(IDS_THUMB_LEVEL, CDCS_INACTIVE);
+						pfdc->SetControlState(IDC_EDIT5, CDCS_INACTIVE);
 						break;
 					case 2:
-					case 3:
 					case 4:
 						pfdc->SetControlState(IDS_THUMB_IMAGE_QUALITY, CDCS_ENABLEDVISIBLE);
 						pfdc->SetControlState(IDS_THUMB_QUALITY, CDCS_ENABLEDVISIBLE);
 						pfdc->SetControlState(IDC_EDIT4, CDCS_ENABLEDVISIBLE);
+
+						pfdc->SetControlState(IDS_THUMB_LEVEL, CDCS_INACTIVE);
+						pfdc->SetControlState(IDC_EDIT5, CDCS_INACTIVE);
+						break;
+					case 3:
+						pfdc->SetControlState(IDS_THUMB_IMAGE_QUALITY, CDCS_ENABLEDVISIBLE);
+						pfdc->SetControlState(IDS_THUMB_QUALITY, CDCS_INACTIVE);
+						pfdc->SetControlState(IDC_EDIT4, CDCS_INACTIVE);
+
+						pfdc->SetControlState(IDS_THUMB_LEVEL, CDCS_ENABLEDVISIBLE);
+						pfdc->SetControlState(IDC_EDIT5, CDCS_ENABLEDVISIBLE);
 						break;
 					default :
 						break;

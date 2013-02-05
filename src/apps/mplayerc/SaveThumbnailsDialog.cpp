@@ -31,7 +31,7 @@
 
 IMPLEMENT_DYNAMIC(CSaveThumbnailsDialog, CFileDialog)
 CSaveThumbnailsDialog::CSaveThumbnailsDialog(
-	int rows, int cols, int width, int quality,
+	int rows, int cols, int width, int quality, int levelPNG,
 	LPCTSTR lpszDefExt, LPCTSTR lpszFileName,
 	LPCTSTR lpszFilter, CWnd* pParentWnd) :
 	CFileDialog(FALSE, lpszDefExt, lpszFileName,
@@ -41,6 +41,7 @@ CSaveThumbnailsDialog::CSaveThumbnailsDialog(
 	, m_cols(cols)
 	, m_width(width)
 	, m_quality(quality)
+	, m_levelPNG(levelPNG)
 {
 	if (IsWinVistaOrLater()) {
 
@@ -81,6 +82,10 @@ CSaveThumbnailsDialog::CSaveThumbnailsDialog(
 			pfdc->AddText(IDS_THUMB_QUALITY, ResStr(IDS_THUMB_QUALITY));
 			str.Format(L"%d", max(70, min(100, m_quality)));
 			pfdc->AddEditBox(IDC_EDIT4, str);
+
+			pfdc->AddText(IDS_THUMB_LEVEL, ResStr(IDS_THUMB_LEVEL));
+			str.Format(L"%d", max(1, min(9, m_levelPNG)));
+			pfdc->AddEditBox(IDC_EDIT5, str);
 			pfdc->EndVisualGroup();
 
 			pfdc->Release();
@@ -166,6 +171,13 @@ BOOL CSaveThumbnailsDialog::OnFileNameOK()
 			int quality = _wtoi(result);
 			if (quality > 0 && quality <= 100) {
 				m_quality = quality;
+			}
+			CoTaskMemFree(result);
+
+			pfdc->GetEditBoxText(IDC_EDIT5, &result);
+			int level = _wtoi(result);
+			if (level > 0  && level <= 9) {
+				m_levelPNG = level;
 			}
 			CoTaskMemFree(result);
 

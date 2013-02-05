@@ -209,6 +209,7 @@
 #define IDS_RS_THUMBROWS					_T("ThumbRows")
 #define IDS_RS_THUMBCOLS					_T("ThumbCols")
 #define IDS_RS_THUMBQUALITY					_T("ThumbQuality")
+#define IDS_RS_THUMBLEVELPNG				_T("ThumbLevelPNG")
 #define IDS_RS_ENABLEEDLEDITOR				_T("EnableEDLEditor")
 #define IDS_RS_SHADERLISTSCREENSPACE		_T("ShaderListScreenSpace")
 #define IDS_RS_FULLSCREENMONITOR			_T("FullScreenMonitor")
