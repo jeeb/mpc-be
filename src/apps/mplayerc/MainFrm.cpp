@@ -6087,7 +6087,23 @@ void CMainFrame::OnUpdateFileSaveThumbnails(CCmdUI* pCmdUI)
 {
 	OAFilterState fs = GetMediaState();
 	UNREFERENCED_PARAMETER(fs);
-	pCmdUI->Enable(m_iMediaLoadState == MLS_LOADED && !m_fAudioOnly && (GetPlaybackMode() == PM_FILE /*|| GetPlaybackMode() == PM_DVD*/));
+
+	int iProgress;
+	pCmdUI->Enable(m_iMediaLoadState == MLS_LOADED 
+					&& !m_fAudioOnly 
+					&& (GetPlaybackMode() == PM_FILE /*|| GetPlaybackMode() == PM_DVD*/) 
+					&& !GetBufferingProgress(&iProgress));
+	UNREFERENCED_PARAMETER(iProgress);
+
+	if (GetPlaybackMode() == PM_FILE) {
+		REFERENCE_TIME total = 0;
+		if (pMS) {
+			pMS->GetDuration(&total);
+		}
+		if (!total) {
+			pCmdUI->Enable(FALSE);
+		}
+	}
 }
 
 void CMainFrame::OnFileLoadsubtitle()

@@ -65,7 +65,7 @@ BOOL CPPageFileInfoClip::PreTranslateMessage(MSG* pMsg)
 
 		path += m_fn;
 
-		if (ExploreToFile(path)) {
+		if (path.Find(_T("://")) == -1 && ExploreToFile(path)) {
 			return TRUE;
 		}
 	}
