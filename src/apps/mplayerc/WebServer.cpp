@@ -323,7 +323,7 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 		m_mimes.Lookup(ext, mime);
 	}
 
-	hdr = "HTTP/1.0 200 OK\r\n";
+	hdr = "HTTP/1.1 200 OK\r\n";
 
 	bool fHandled = false, fCGI = false;
 
@@ -370,7 +370,7 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 			}
 
 			hdr =
-				"HTTP/1.0 302 Found\r\n"
+				"HTTP/1.1 302 Found\r\n"
 				"Location: " + CStringA(redir) + "\r\n";
 			return;
 		}
@@ -392,8 +392,8 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 
 	if (!fHandled) {
 		hdr = mime == "text/html"
-			  ? "HTTP/1.0 301 Moved Permanently\r\n" "Location: /404.html\r\n"
-			  : "HTTP/1.0 404 Not Found\r\n";
+			  ? "HTTP/1.1 301 Moved Permanently\r\n" "Location: /404.html\r\n"
+			  : "HTTP/1.1 404 Not Found\r\n";
 		return;
 	}
 
@@ -447,7 +447,6 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 		body.Replace("[setposcommand]", CMD_SETPOS);
 		body.Replace("[setvolumecommand]", CMD_SETVOLUME);
 		body.Replace("[debug]", debug);
-		// TODO: add more general tags to replace
 	}
 
 	// gzip

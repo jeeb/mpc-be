@@ -44,6 +44,7 @@ bool CWebClientSocket::SetCookie(CString name, CString value, __time64_t expire,
 	if (name.IsEmpty()) {
 		return false;
 	}
+
 	if (value.IsEmpty()) {
 		m_cookie.RemoveKey(name);
 		return true;
@@ -137,6 +138,7 @@ void CWebClientSocket::Header()
 	if (m_cmd == _T("POST")) {
 		CString str;
 		if (m_hdrlines.Lookup(_T("content-length"), str)) {
+
 			int len = _tcstol(str, NULL, 10);
 			str.Empty();
 
@@ -172,10 +174,8 @@ void CWebClientSocket::Header()
 				if (err == SOCKET_ERROR) {
 					Sleep(1);
 				}
-			} while (err == SOCKET_ERROR && GetLastError() == WSAEWOULDBLOCK
-					 && timeout-- > 0); // FIXME: this is just a dirty fix now
+			} while (err == SOCKET_ERROR && GetLastError() == WSAEWOULDBLOCK && timeout-- > 0);
 
-			// FIXME: with IE it will only work if I read +2 bytes (?), btw Receive will just return -1
 			Receive(&c, 1);
 			Receive(&c, 1);
 		}
@@ -231,7 +231,7 @@ void CWebClientSocket::Header()
 
 		m_pWebServer->OnRequest(this, reshdr, resbody);
 	} else {
-		reshdr = "HTTP/1.0 400 Bad Request\r\n";
+		reshdr = "HTTP/1.1 400 Bad Request\r\n";
 	}
 
 	if (!reshdr.IsEmpty()) {
@@ -268,7 +268,7 @@ void CWebClientSocket::Header()
 
 		Send(reshdr, reshdr.GetLength());
 
-		if (m_cmd != _T("HEAD") && reshdr.Find("HTTP/1.0 200 OK") == 0 && !resbody.IsEmpty()) {
+		if (m_cmd != _T("HEAD") && reshdr.Find("HTTP/1.1 200 OK") == 0 && !resbody.IsEmpty()) {
 			Send(resbody, resbody.GetLength());
 		}
 
@@ -277,13 +277,10 @@ void CWebClientSocket::Header()
 
 		Clear();
 
-		// TODO
 		// if (connection == _T("close"))
 		OnClose(0);
 	}
 }
-
-//
 
 void CWebClientSocket::OnReceive(int nErrorCode)
 {
@@ -309,12 +306,10 @@ void CWebClientSocket::OnReceive(int nErrorCode)
 
 void CWebClientSocket::OnClose(int nErrorCode)
 {
-	// TODO: save session
 	m_pWebServer->OnClose(this);
+
 	__super::OnClose(nErrorCode);
 }
-
-////////////////////
 
 bool CWebClientSocket::OnCommand(CStringA& hdr, CStringA& body, CStringA& mime)
 {
@@ -361,7 +356,7 @@ bool CWebClientSocket::OnCommand(CStringA& hdr, CStringA& body, CStringA& mime)
 	}
 
 	hdr =
-		"HTTP/1.0 302 Found\r\n"
+		"HTTP/1.1 302 Found\r\n"
 		"Location: " + CStringA(ref) + "\r\n";
 
 	return true;
@@ -421,6 +416,7 @@ bool CWebClientSocket::OnInfo(CStringA& hdr, CStringA& body, CStringA& mime)
 	body.Replace("[position]", UTF8(positionstring));
 	body.Replace("[duration]", UTF8(durationstring));
 	body.Replace("[size]", UTF8(sizestring));
+
 	return true;
 }
 
@@ -439,7 +435,6 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 	if (m_get.Lookup(_T("path"), path)) {
 
 		if (CFileGetStatus(path, fs) && !(fs.m_attribute&CFile::directory)) {
-			// TODO: make a new message for just opening files, this is a bit overkill now...
 
 			CAtlList<CString> cmdln;
 
@@ -497,8 +492,7 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 		path.Empty();
 	}
 
-	if (CFileGetStatus(path, fs) && (fs.m_attribute&CFile::directory)
-			|| path.Find(_T("\\")) == 0) { // FIXME
+	if (CFileGetStatus(path, fs) && (fs.m_attribute&CFile::directory) || path.Find(_T("\\")) == 0) {
 		CPath p(path);
 		p.Canonicalize();
 		p.MakePretty();
@@ -645,17 +639,17 @@ bool CWebClientSocket::OnControls(CStringA& hdr, CStringA& body, CStringA& mime)
 	duration.Format(_T("%d"), dur);
 
 	CString positionstring, durationstring, playbackrate;
-	//	positionstring.Format(_T("%02d:%02d:%02d.%03d"), (pos/3600000), (pos/60000)%60, (pos/1000)%60, pos%1000);
-	//	durationstring.Format(_T("%02d:%02d:%02d.%03d"), (dur/3600000), (dur/60000)%60, (dur/1000)%60, dur%1000);
+	//positionstring.Format(_T("%02d:%02d:%02d.%03d"), (pos/3600000), (pos/60000)%60, (pos/1000)%60, pos%1000);
+	//durationstring.Format(_T("%02d:%02d:%02d.%03d"), (dur/3600000), (dur/60000)%60, (dur/1000)%60, dur%1000);
 	positionstring.Format(_T("%02d:%02d:%02d"), (pos/3600000), (pos/60000)%60, (pos/1000)%60);
 	durationstring.Format(_T("%02d:%02d:%02d"), (dur/3600000), (dur/60000)%60, (dur/1000)%60);
-	playbackrate = _T("1"); // TODO
+	playbackrate = _T("1");
 
 	CString volumelevel, muted;
 	volumelevel.Format(_T("%d"), m_pMainFrame->m_wndToolBar.m_volctrl.GetPos());
 	muted.Format(_T("%d"), m_pMainFrame->m_wndToolBar.Volume == -10000 ? 1 : 0);
 
-	CString reloadtime(_T("0")); // TODO
+	CString reloadtime(_T("0"));
 
 	m_pWebServer->LoadPage(IDR_HTML_CONTROLS, body, m_path);
 	body.Replace("[filepatharg]", UTF8Arg(path));
@@ -714,17 +708,17 @@ bool CWebClientSocket::OnVariables(CStringA& hdr, CStringA& body, CStringA& mime
 	duration.Format(_T("%d"), dur);
 
 	CString positionstring, durationstring, playbackrate;
-	//	positionstring.Format(_T("%02d:%02d:%02d.%03d"), (pos/3600000), (pos/60000)%60, (pos/1000)%60, pos%1000);
-	//	durationstring.Format(_T("%02d:%02d:%02d.%03d"), (dur/3600000), (dur/60000)%60, (dur/1000)%60, dur%1000);
+	//positionstring.Format(_T("%02d:%02d:%02d.%03d"), (pos/3600000), (pos/60000)%60, (pos/1000)%60, pos%1000);
+	//durationstring.Format(_T("%02d:%02d:%02d.%03d"), (dur/3600000), (dur/60000)%60, (dur/1000)%60, dur%1000);
 	positionstring.Format(_T("%02d:%02d:%02d"), (pos/3600000), (pos/60000)%60, (pos/1000)%60);
 	durationstring.Format(_T("%02d:%02d:%02d"), (dur/3600000), (dur/60000)%60, (dur/1000)%60);
-	playbackrate = _T("1"); // TODO
+	playbackrate = _T("1");
 
 	CString volumelevel, muted;
 	volumelevel.Format(_T("%d"), m_pMainFrame->m_wndToolBar.m_volctrl.GetPos());
 	muted.Format(_T("%d"), m_pMainFrame->m_wndToolBar.Volume == -10000 ? 1 : 0);
 
-	CString reloadtime(_T("0")); // TODO
+	CString reloadtime(_T("0"));
 
 	m_pWebServer->LoadPage(IDR_HTML_VARIABLES, body, m_path);
 	body.Replace("[filepatharg]", UTF8Arg(path));
@@ -748,17 +742,22 @@ bool CWebClientSocket::OnVariables(CStringA& hdr, CStringA& body, CStringA& mime
 bool CWebClientSocket::OnStatus(CStringA& hdr, CStringA& body, CStringA& mime)
 {
 	/*
-		CString path = m_pMainFrame->m_wndPlaylistBar.GetCur(), dir;
-		if (!path.IsEmpty()) {CPath p(path); p.RemoveFileSpec(); dir = (LPCTSTR)p;}
-		path.Replace(_T("'"), _T("\\'"));
-		dir.Replace(_T("'"), _T("\\'"));
+	CString path = m_pMainFrame->m_wndPlaylistBar.GetCur(), dir;
+	if (!path.IsEmpty()) {
+		CPath p(path);
+		p.RemoveFileSpec();
+		dir = (LPCTSTR)p;
+	}
+	path.Replace(_T("'"), _T("\\'"));
+	dir.Replace(_T("'"), _T("\\'"));
 
-		CString volumelevel, muted;
-		volumelevel.Format(_T("%d"), m_pMainFrame->m_wndToolBar.m_volctrl.GetPos());
-		muted.Format(_T("%d"), m_pMainFrame->m_wndToolBar.Volume == -10000 ? 1 : 0);
-		body.Replace("[volumelevel]", UTF8(volumelevel));
-		body.Replace("[muted]", UTF8(muted));
+	CString volumelevel, muted;
+	volumelevel.Format(_T("%d"), m_pMainFrame->m_wndToolBar.m_volctrl.GetPos());
+	muted.Format(_T("%d"), m_pMainFrame->m_wndToolBar.Volume == -10000 ? 1 : 0);
+	body.Replace("[volumelevel]", UTF8(volumelevel));
+	body.Replace("[muted]", UTF8(muted));
 	*/
+
 	CString title;
 	m_pMainFrame->GetWindowText(title);
 
@@ -803,28 +802,27 @@ bool CWebClientSocket::OnStatus(CStringA& hdr, CStringA& body, CStringA& mime)
 bool CWebClientSocket::OnError404(CStringA& hdr, CStringA& body, CStringA& mime)
 {
 	m_pWebServer->LoadPage(IDR_HTML_404, body, m_path);
+
 	return true;
 }
 
 bool CWebClientSocket::OnPlayer(CStringA& hdr, CStringA& body, CStringA& mime)
 {
 	m_pWebServer->LoadPage(IDR_HTML_PLAYER, body, m_path);
+
 	return true;
 }
 
 bool CWebClientSocket::OnSnapShotJpeg(CStringA& hdr, CStringA& body, CStringA& mime)
 {
-	// TODO: add quality control and return logo when nothing is loaded
-
 	bool fRet = false;
 
-	BYTE* pData = NULL;
+	BYTE *pData = NULL, *jpeg = NULL;
 	long size = 0;
-	BYTE* jpeg = NULL;
 	size_t jpeg_size = 0;
 
 	if (m_pMainFrame->GetDIB(&pData, size, true)) {
-		if (BMPDIB(0, pData, L"image/jpeg", 80, 1, &jpeg, &jpeg_size)) {
+		if (BMPDIB(0, pData, L"image/jpeg", AfxGetAppSettings().nWebServerQuality, 1, &jpeg, &jpeg_size)) {
 			hdr +=
 				"Expires: Thu, 19 Nov 1981 08:52:00 GMT\r\n"
 				"Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0\r\n"

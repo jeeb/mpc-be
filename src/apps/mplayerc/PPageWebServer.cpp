@@ -34,7 +34,8 @@ IMPLEMENT_DYNAMIC(CPPageWebServer, CPPageBase)
 CPPageWebServer::CPPageWebServer()
 	: CPPageBase(CPPageWebServer::IDD, CPPageWebServer::IDD)
 	, m_fEnableWebServer(FALSE)
-	, m_nWebServerPort(0)
+	, m_nWebServerPort(13579)
+	, m_nWebServerQuality(85)
 	, m_launch(_T("http://localhost:13579/"))
 	, m_fWebServerPrintDebugInfo(FALSE)
 	, m_fWebServerUseCompression(FALSE)
@@ -57,6 +58,8 @@ void CPPageWebServer::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK1, m_fEnableWebServer);
 	DDX_Text(pDX, IDC_EDIT1, m_nWebServerPort);
 	DDX_Control(pDX, IDC_EDIT1, m_nWebServerPortCtrl);
+	DDX_Text(pDX, IDC_EDIT4, m_nWebServerQuality);
+	DDX_Control(pDX, IDC_SPIN1, m_nWebServerQualityCtrl);
 	DDX_Control(pDX, IDC_STATIC1, m_launch);
 	DDX_Check(pDX, IDC_CHECK2, m_fWebServerPrintDebugInfo);
 	DDX_Check(pDX, IDC_CHECK3, m_fWebServerUseCompression);
@@ -96,6 +99,7 @@ BOOL CPPageWebServer::OnInitDialog()
 
 	m_fEnableWebServer = s.fEnableWebServer;
 	m_nWebServerPort = s.nWebServerPort;
+	m_nWebServerQuality = s.nWebServerQuality;
 	m_fWebServerPrintDebugInfo = s.fWebServerPrintDebugInfo;
 	m_fWebServerLocalhostOnly = s.fWebServerLocalhostOnly;
 	m_fWebServerUseCompression = s.fWebServerUseCompression;
@@ -106,6 +110,9 @@ BOOL CPPageWebServer::OnInitDialog()
 	m_WebServerCGI = s.strWebServerCGI;
 
 	m_launch.EnableWindow(m_fEnableWebServer);
+
+	m_nWebServerQualityCtrl.SetRange(70, 100);
+	m_nWebServerQualityCtrl.SetPos(m_nWebServerQuality);
 
 	UpdateData(FALSE);
 
@@ -131,6 +138,7 @@ BOOL CPPageWebServer::OnApply()
 
 	s.fEnableWebServer = !!m_fEnableWebServer;
 	s.nWebServerPort = m_nWebServerPort;
+	s.nWebServerQuality = m_nWebServerQuality;
 	s.fWebServerPrintDebugInfo = !!m_fWebServerPrintDebugInfo;
 	s.fWebServerLocalhostOnly = !!m_fWebServerLocalhostOnly;
 	s.fWebServerUseCompression = !!m_fWebServerUseCompression;

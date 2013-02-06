@@ -177,6 +177,7 @@
 #define IDS_RS_APSURACEFUSAGE				_T("APSurfaceUsage")
 #define IDS_RS_ENABLEWEBSERVER				_T("EnableWebServer")
 #define IDS_RS_WEBSERVERPORT				_T("WebServerPort")
+#define IDS_RS_WEBSERVERQUALITY				_T("WebServerQuality")
 #define IDS_RS_LASTWINDOWTYPE				_T("LastWindowType")
 #define IDS_RS_ONTOP						_T("OnTop")
 #define IDS_RS_MPASF						_T("MPASampleFormat")

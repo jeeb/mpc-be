@@ -385,6 +385,7 @@ public:
 	// Web Inteface
 	BOOL			fEnableWebServer;
 	int				nWebServerPort;
+	int				nWebServerQuality;
 	int				nCmdlnWebServerPort;
 	bool			fWebServerUseCompression;
 	bool			fWebServerLocalhostOnly;
@@ -412,14 +413,14 @@ public:
 	bool			fAutoloadSubtitles;
 	bool			fBlockVSFilter;
 
-    // DVD/OGM
+	// DVD/OGM
 	bool			fUseDVDPath;
 	CString			strDVDPath;
 	LCID			idMenuLang, idAudioLang, idSubtitlesLang;
 	bool			fAutoSpeakerConf;
 	bool			fClosedCaptions;
 
-    // Output
+	// Output
 	CRenderersSettings m_RenderersSettings;
 	int				iDSVideoRendererType;
 	int				iRMVideoRendererType;
@@ -429,7 +430,7 @@ public:
 	bool			fD3DFullscreen;
 	bool			fIsFSWindow;
 
-    // Fullscreen
+	// Fullscreen
 	bool			fLaunchfullscreen;
 	bool			fShowBarsWhenFullScreen;
 	int				nShowBarsWhenFullScreenTimeOut;
@@ -442,9 +443,9 @@ public:
 	dispmode		dm_def;
 	double			dFPS;
 
-    // Sync Renderer Settings
+	// Sync Renderer Settings
 
-    // Capture (BDA configuration)
+	// Capture (BDA configuration)
 	// BDA configuration
 	int				iDefaultCaptureDevice;		// Default capture device (analog=0, 1=digital)
 	CString			strAnalogVideo;
@@ -463,13 +464,13 @@ public:
 	UINT			nDVBLastChannel;
 	CAtlList<CDVBChannel> m_DVBChannels;
 
-    // Internal Filters
+	// Internal Filters
 	bool			SrcFilters[SRC_LAST + !SRC_LAST];
 	bool			TraFilters[TRA_LAST + !TRA_LAST];
 	bool			DXVAFilters[TRA_DXVA_LAST + !TRA_DXVA_LAST];
 	bool			FFmpegFilters[FFM_LAST + !FFM_LAST];
 
-    // Audio Switcher
+	// Audio Switcher
 	bool			fEnableAudioSwitcher;
 	bool			fAudioNormalize;
 	bool			fAudioNormalizeRecover;
@@ -481,7 +482,7 @@ public:
 	int				nSpeakerChannels;
 	DWORD			pSpeakerToChannelMap[AS_MAX_CHANNELS][AS_MAX_CHANNELS];
 
-    // External Filters
+	// External Filters
 	CAutoPtrList<FilterOverride> m_filters;
 
 	// Subtitles
@@ -489,10 +490,10 @@ public:
 	int				nHorPos, nVerPos;
 	int				nSubDelayInterval;
 
-    // Default Style
+	// Default Style
 	STSStyle		subdefstyle;
 
-    // Misc
+	// Misc
 	bool			fPrioritizeExternalSubtitles;
 	bool			fDisableInternalSubtitles;
 	CString			strSubtitlePaths;
@@ -527,7 +528,7 @@ public:
 	int				iDlgPropX;
 	int				iDlgPropY;
 
-    // Tweaks
+	// Tweaks
 	int				nJumpDistS;
 	int				nJumpDistM;
 	int				nJumpDistL;
@@ -538,62 +539,62 @@ public:
 	bool			fFastSeek;
 	bool			fMiniDump;
 
-    // Miscellaneous
+	// Miscellaneous
 	int				iBrightness;
 	int				iContrast;
 	int				iHue;
 	int				iSaturation;
 
-    // MENUS
-    // View
+	// MENUS
+	// View
 	int				iCaptionMenuMode; // normal -> hidemenu -> frameonly -> borderless
 	bool			fHideNavigation;
 	UINT			nCS; // Control state for toolbars
-    // Language
+	// Language
 	int				iLanguage;
-    // Subtitles menu
+	// Subtitles menu
 	bool			fEnableSubtitles;
 	bool			fUseDefaultSubtitlesStyle;
 	bool			fForcedSubtitles;
-    // Video Frame
+	// Video Frame
 	int				iDefaultVideoSize;
 	bool			fKeepAspectRatio;
 	CSize			sizeAspectRatio;
 	bool			fCompMonDeskARDiff;
-    // Pan&Scan
+	// Pan&Scan
 	CString			strPnSPreset;
 	CStringArray	m_pnspresets;
-    // On top menu
+	// On top menu
 	int				iOnTop;
-    // After Playback
+	// After Playback
 	bool			fExitAfterPlayback;
 	bool			fNextInDirAfterPlayback;
 
-    // WINDOWS
-    // Add Favorite
+	// WINDOWS
+	// Add Favorite
 	bool			bFavRememberPos;
 	bool			bFavRelativeDrive;
-    // Save Image...
+	// Save Image...
 	CString			strSnapShotPath, strSnapShotExt;
-    // Save Thumbnails...
+	// Save Thumbnails...
 	int				iThumbRows, iThumbCols, iThumbWidth, iThumbQuality, iThumbLevelPNG;
-    // Shader Editor
+	// Shader Editor
 	struct Shader {
 		CString		label;
 		CString		target;
 		CString		srcdata;
 	};
 	CAtlList<Shader> m_shaders;
-    // Shader Combiner
+	// Shader Combiner
 	bool			fToggleShader;
 	bool			fToggleShaderScreenSpace;
 	CString			strShaderList;
 	CString			strShaderListScreenSpace;
-    // Playlist (contex menu)
+	// Playlist (contex menu)
 	bool			bShufflePlaylistItems;
 	bool			bHidePlaylistFullScreen;
 
-    // OTHER STATES
+	// OTHER STATES
 	CStringW		strLastOpenDir;
 	UINT			nLastWindowType;
 	CRect			rcLastWindowPos;

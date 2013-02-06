@@ -47,6 +47,8 @@ public:
 	BOOL m_fEnableWebServer;
 	int m_nWebServerPort;
 	CIntEdit m_nWebServerPortCtrl;
+	int m_nWebServerQuality;
+	CSpinButtonCtrl m_nWebServerQualityCtrl;
 	CStaticLink m_launch;
 	BOOL m_fWebServerPrintDebugInfo;
 	BOOL m_fWebServerUseCompression;
