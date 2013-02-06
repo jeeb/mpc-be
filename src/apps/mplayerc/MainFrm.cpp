@@ -5274,16 +5274,8 @@ void CMainFrame::OnFileSaveAs()
 	CString ext, ext_list, in = PlayerYouTube(m_wndPlaylistBar.GetCurFileName(), NULL, NULL), out = in;
 
 	if (!m_strTitleAlt.IsEmpty()) {
-		out = m_strTitleAlt;
-		ext = CString(CPath(m_strTitleAlt).GetExtension()).MakeLower();
-
-		CString ingnoreFileNameCharlist = _T("< > : \" / \\ | ? *");
-		CAtlList<CString> sl;
-		Explode(ingnoreFileNameCharlist, sl, ' ');
-		POSITION pos = sl.GetHeadPosition();
-		while (pos) {
-			out.Replace(sl.GetNext(pos), _T(" "));
-		}
+		out = GetAltFileName();
+		ext = CString(CPath(out).GetExtension()).MakeLower();
 	} else {
 		int find = out.Find(_T("://"));
 		if (find < 0) {
@@ -5807,17 +5799,7 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 		path.StripPath();
 
 		if (!m_strTitleAlt.IsEmpty()) {
-			CString out = m_strTitleAlt;
-
-			CString ingnoreFileNameCharlist = _T("< > : \" / \\ | ? *");
-			CAtlList<CString> sl;
-			Explode(ingnoreFileNameCharlist, sl, ' ');
-			POSITION pos = sl.GetHeadPosition();
-			while (pos) {
-				out.Replace(sl.GetNext(pos), _T(" "));
-			}
-
-			path = CPath(out);
+			path = CPath(GetAltFileName());
 		}
 
 		CStringW fn = (LPCTSTR)path;
@@ -5948,17 +5930,7 @@ void CMainFrame::OnFileSaveImage()
 		path.StripPath();
 
 		if (!m_strTitleAlt.IsEmpty()) {
-			CString out = m_strTitleAlt;
-
-			CString ingnoreFileNameCharlist = _T("< > : \" / \\ | ? *");
-			CAtlList<CString> sl;
-			Explode(ingnoreFileNameCharlist, sl, ' ');
-			POSITION pos = sl.GetHeadPosition();
-			while (pos) {
-				out.Replace(sl.GetNext(pos), _T(" "));
-			}
-
-			path = CPath(out);
+			path = CPath(GetAltFileName());
 		}
 		prefix.Format(_T("%s_snapshot_%s"), path, GetVidPos());
 	} else if (GetPlaybackMode() == PM_DVD) {
@@ -6062,17 +6034,7 @@ void CMainFrame::OnFileSaveThumbnails()
 		path.StripPath();
 
 		if (!m_strTitleAlt.IsEmpty()) {
-			CString out = m_strTitleAlt;
-
-			CString ingnoreFileNameCharlist = _T("< > : \" / \\ | ? *");
-			CAtlList<CString> sl;
-			Explode(ingnoreFileNameCharlist, sl, ' ');
-			POSITION pos = sl.GetHeadPosition();
-			while (pos) {
-				out.Replace(sl.GetNext(pos), _T(" "));
-			}
-
-			path = CPath(out);
+			path = CPath(GetAltFileName());
 		}
 		prefix.Format(_T("%s_thumbs"), path);
 	}
@@ -19421,6 +19383,24 @@ CString CMainFrame::GetStrForTitle()
 	} else {
 		return m_strFnFull;
 	}
+}
+
+CString CMainFrame::GetAltFileName()
+{
+	CString ret;
+	if (!m_strTitleAlt.IsEmpty()) {
+		ret = m_strTitleAlt;
+
+		CString ignoreFileNameCharlist = _T("< > : \" / \\ | ? *");
+		CAtlList<CString> sl;
+		Explode(ignoreFileNameCharlist, sl, ' ');
+		POSITION pos = sl.GetHeadPosition();
+		while (pos) {
+			ret.Replace(sl.GetNext(pos), _T(" "));
+		}
+	}
+
+	return ret;
 }
 
 IBaseFilter* CMainFrame::GetVSFilter()

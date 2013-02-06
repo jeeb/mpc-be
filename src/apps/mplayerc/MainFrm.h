@@ -1056,6 +1056,7 @@ public:
 	CString		m_strFnFull;
 	CString		m_strTitleAlt;
 	CString		GetStrForTitle();
+	CString		GetAltFileName();
 	CString		m_strAuthorAlt;
 
 	bool		m_bToggleShader;
