@@ -8808,7 +8808,7 @@ void CMainFrame::OnUpdatePlayAudioOption(CCmdUI* pCmdUI)
 	if (i == -1) {
 		pCmdUI->Enable(TRUE);
 	} else if (i == 0) {
-		pCmdUI->Enable(GetPlaybackMode() == PM_FILE && !m_fAudioOnly);
+		pCmdUI->Enable(GetPlaybackMode() == PM_FILE/* && !m_fAudioOnly*/);
 	}
 }
 
@@ -9177,7 +9177,7 @@ void CMainFrame::OnUpdateMenuNavAudio(CCmdUI* pCmdUI)
 {
 	bool fEnable = false;
 
-	if (/*IsSomethingLoaded() && */m_iMediaLoadState == MLS_LOADED && !m_fAudioOnly) {
+	if (/*IsSomethingLoaded() && */m_iMediaLoadState == MLS_LOADED/* && !m_fAudioOnly*/) {
 		fEnable = true;
 	}
 	
