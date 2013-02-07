@@ -471,6 +471,15 @@ bool CVobFile::Open(CString fn, CAtlList<CString>& vobs)
 	}
 
 	// Audio streams ...
+	struct audio_streams_struct {
+		int ToAdd;
+		CString Lang;
+
+		audio_streams_struct() {
+			ToAdd = 0;
+		}
+	} audio_streams[8];
+
 	m_ifoFile.Seek(0x202, CFile::begin);
 	BYTE buffer[Subtitle_block_size];
 	m_ifoFile.Read(buffer, Audio_block_size);
@@ -478,31 +487,34 @@ bool CVobFile::Open(CString fn, CAtlList<CString>& vobs)
 	int stream_count = gb.ReadShort();
 	for (int i = 0; i< min(stream_count,8); i++) {
 		BYTE Coding_mode = (BYTE)gb.BitRead(3);
-		gb.BitRead(5);// skip
-		int ToAdd=0;
+		gb.BitRead(5);
+		int ToAdd = 0;
 		switch(Coding_mode) {
 			case 0:
-				ToAdd=0x80;
+				ToAdd = 0x80;
 				break;
 			case 4:
-				ToAdd=0xA0;
+				ToAdd = 0xA0;
 				break;
 			case 6:
-				ToAdd=0x88;
+				ToAdd = 0x88;
 				break;
 			default:
 				break;
 		}
-		gb.ReadByte();// skip
+		gb.ReadByte();
 		char lang[2];
 		gb.ReadBuffer((BYTE *)lang, 2);
-		gb.ReadDword();// skip
+		gb.ReadDword();
 		if(ToAdd) {
-			m_pStream_Lang[ToAdd + i] = ISO6391ToLanguage(lang);
+			audio_streams[i].ToAdd	= ToAdd;
+			audio_streams[i].Lang	= ISO6391ToLanguage(lang);
 		}
 	}
 
 	// Subtitle streams ...
+	CString subtitle_streams[32];
+
 	m_ifoFile.Seek(0x254, CFile::begin);
 	m_ifoFile.Read(buffer, Subtitle_block_size);
 	CGolombBuffer gb_s(buffer, Subtitle_block_size);
@@ -512,7 +524,7 @@ bool CVobFile::Open(CString fn, CAtlList<CString>& vobs)
 		char lang[2];
 		gb_s.ReadBuffer((BYTE *)lang, 2);
 		gb_s.ReadShort();
-		m_pStream_Lang[0x20 + i] = ISO6391ToLanguage(lang);
+		subtitle_streams[i] = ISO6391ToLanguage(lang);
 	}
 
 	// Chapters & duration ...
@@ -538,6 +550,34 @@ bool CVobFile::Open(CString fn, CAtlList<CString>& vobs)
 			m_rtDuration	= rtPlaybackTime;
 			ProgramChains	= i;
 		}
+
+		// PGC_AST_CTL
+		m_ifoFile.Seek(pcgITPosition + chainOffset + 0x0C, CFile::begin);
+		for (int i = 0; i < 8; i++) {
+			BYTE tmp	= ReadByte();
+			BYTE avail	= tmp >> 7;		// stream available
+			BYTE ID		= tmp & ~0x80;	// Stream number (MPEG audio) or Substream number (all others)
+			
+			if (avail && audio_streams[i].ToAdd) {
+				m_pStream_Lang[audio_streams[i].ToAdd + ID] = audio_streams[i].Lang;
+			}
+
+			m_ifoFile.Seek(1, CFile::current);
+		}
+
+		// PGC_SPST_CTL
+		m_ifoFile.Seek(pcgITPosition + chainOffset + 0x1C, CFile::begin);
+		for (int i = 0; i < 32; i++) {
+			BYTE avail	= ReadByte() >> 7;	// stream available
+			BYTE ID		= ReadByte();		// Stream number for wide
+
+			if (avail && !subtitle_streams[i].IsEmpty()) {
+				m_pStream_Lang[0x20 + ID] = subtitle_streams[i];
+			}
+
+			m_ifoFile.Seek(2, CFile::current);
+		}
+
 	}
 
 	/*for (int i = 0; i < NumberOfProgramChains; i++) */
