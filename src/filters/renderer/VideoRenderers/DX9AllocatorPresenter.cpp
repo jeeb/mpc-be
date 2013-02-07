@@ -1059,7 +1059,6 @@ UINT CDX9AllocatorPresenter::GetAdapter(IDirect3D9* pD3D, bool bGetAdapter)
 	}
 
 	m_D3D9Device = _T("");
-	m_nPCIVendor = 0;
 
 	CRenderersSettings& s = GetRenderersSettings();
 	if (bGetAdapter && (pD3D->GetAdapterCount()>1) && (s.D3D9RenderDevice != _T(""))) {
@@ -1070,7 +1069,6 @@ UINT CDX9AllocatorPresenter::GetAdapter(IDirect3D9* pD3D, bool bGetAdapter)
 			if (pD3D->GetAdapterIdentifier(adp, 0, &adapterIdentifier) == S_OK) {
 				if ((::StringFromGUID2(adapterIdentifier.DeviceIdentifier, strGUID, 50) > 0) && (s.D3D9RenderDevice == strGUID)) {
 					m_D3D9Device = adapterIdentifier.Description;
-					m_nPCIVendor = adapterIdentifier.VendorId;
 					return adp;
 				}
 			}
@@ -1089,7 +1087,6 @@ UINT CDX9AllocatorPresenter::GetAdapter(IDirect3D9* pD3D, bool bGetAdapter)
 				D3DADAPTER_IDENTIFIER9 adapterIdentifier;
 				if (pD3D->GetAdapterIdentifier(adp, 0, &adapterIdentifier) == S_OK) {
 					m_D3D9Device = adapterIdentifier.Description;
-					m_nPCIVendor = adapterIdentifier.VendorId;
 				}
 			}
 			return adp;

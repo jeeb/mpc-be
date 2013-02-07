@@ -29,8 +29,6 @@
 
 #define NB_JITTER					126
 
-#define PCIV_ATI					0x1002
-
 extern bool g_bNoDuration;
 extern bool g_bExternalSubtitleTime;
 
@@ -293,7 +291,6 @@ namespace DSObjects
 		CString					m_strStatsMsg[10];
 
 		CString					m_D3D9Device;
-		DWORD					m_nPCIVendor;
 
 		CString					m_Decoder;
 
