@@ -76,7 +76,11 @@ if(!-e "text"){
 
 foreach my $filename(@FileLists) {
 	print "Analyzing locale file: $filename...\n";
-	my @rcfile = readFile($filename, 1);
+	my $encoding = 2; # UTF16-LE
+	if ($filename eq "mplayerc.rc") { # The main English resource file uses ASCII encoding
+		$encoding = 0;
+	}
+	my @rcfile = readFile($filename, $encoding);
 	my($curDialogs, $curMenus, $curStrings, @curOutline) = ({},{},{}, ());
 	my @curVersionInfo = ();
 	my $curDesignInfos = {};
@@ -122,7 +126,7 @@ sub writeFileStrings {
 
 	if(@contents) {
 		print "Generating string files $filename...\n";
-		writePatchFile($filename, \@contents, 1);
+		writePatchFile($filename, \@contents, 0);
 	}
 }
 

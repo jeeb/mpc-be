@@ -65,6 +65,7 @@ my %LANG_EXEPTIONS = (
 	'tr' => 'tr',
 	'ua' => 'uk',
 );
+
 my $MEDIA_INFO_LANG_FILE = 'IDB_MEDIAINFO_LANGUAGE  FILE                    "..\\\\..\\\\..\\\\ExtLib\\\\MediaInfo\\\\Language\\\\%s.csv"';
 
 my $result = GetOptions("base|b=s" =>\$BaseFileName, "new|n=s" =>\$NewFileName, "help|h"=>\$help);
@@ -107,8 +108,9 @@ my($NewDialogs, $NewMenus, $NewStrings, @NewOutline) = ({}, {}, {}, ());
 my($MenuDiffs, $DialogDiffs) = ({}, {});
 my($BaseDesignInfos, $NewDesignInfos) = ({}, {});
 
-my @BaseFile = readFile($BaseFileName, 1);
-my @NewFile = readFile($NewFileName, 1);
+# /!\ Note that the English RC file is ASCII encoded
+my @BaseFile = readFile($BaseFileName, 0);
+my @NewFile = readFile($NewFileName, 0);
 print "Scanning changes between baseline file and new version...\n\n";
 getDifference();
 
@@ -131,7 +133,7 @@ if(!-e "newrc"){
 
 foreach my $filename(@FileLists) {
 	print "Analyzing locale file: $filename...\n";
-	my @oldrcfile = readFile($filename, 1);
+	my @oldrcfile = readFile($filename, 2);
 	my($curDialogs, $curMenus, $curStrings, @curOutline) = ({},{},{}, ());
 	my @curVersionInfo = ();
 	my $curDesignInfos = {};
@@ -145,16 +147,16 @@ foreach my $filename(@FileLists) {
 	writeData(\@newrc, \@patches, \@curOutline, $curDialogs, $curMenus, $curStrings, \@curVersionInfo, $curDesignInfos);
 	if ($newrcfile =~ m/\.(\w{2,3})\.rc$/ and $LANG_EXEPTIONS{$1}) #Some lang file;
 	{
-        my $pos = 0;
-        for (my $i = 0; $i < @newrc; $i++)
-        {
-            if ($newrc[$i] eq '// Toolbar') {$pos = $i; last;}
-        }
-        if ($pos)
-        {
-            my $lang = $LANG_EXEPTIONS{$1};
-            splice @newrc, $pos-2, 0, (sprintf($MEDIA_INFO_LANG_FILE, $lang), '');
-        }
+		my $pos = 0;
+		for (my $i = 0; $i < @newrc; $i++)
+		{
+			if ($newrc[$i] eq '// Toolbar') {$pos = $i; last;}
+		}
+		if ($pos)
+		{
+			my $lang = $LANG_EXEPTIONS{$1};
+			splice @newrc, $pos-2, 0, (sprintf($MEDIA_INFO_LANG_FILE, $lang), '');
+		}
 	}
 
 	print "Generating new locale file: $newrcfile...\n\n";

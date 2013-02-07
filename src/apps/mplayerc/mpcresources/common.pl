@@ -287,10 +287,16 @@ sub Trace {
 
 #--------------------------------------------------------------------------------------------------
 sub readFile {
-	my ($filename, $withBOM) = @_;
+	my ($filename, $encoding) = @_;
 
 	open(INPUT, "<$filename") || die "Cannot open $filename to read";
-	if($withBOM) {
+	if ($encoding == 0) {
+		binmode(INPUT);
+	}
+	elsif ($encoding == 1) {
+		binmode(INPUT, ":encoding(UTF8)");
+	}
+	elsif ($encoding == 2) {
 		binmode(INPUT, ":encoding(UTF16-LE)");
 	}
 
@@ -301,16 +307,20 @@ sub readFile {
 
 #--------------------------------------------------------------------------------------------------
 sub writeFile {
-	my ($filename, $data, $withBOM) = @_;
+	my ($filename, $data, $encoding) = @_;
 
 	open(OUTPUT, ">$filename")|| die "Cannot open $filename to write";
 
-	if($withBOM==1) {
+	if ($encoding == 0) {
+		binmode(OUTPUT, ":raw:encoding(UTF8)");
+	}
+	elsif ($encoding == 1) {
 		binmode(OUTPUT);
-		print OUTPUT chr(0xff);	print OUTPUT chr(0xfe);	#write unicode bom
+		print OUTPUT chr(0xff);
+		print OUTPUT chr(0xfe);	#write unicode bom
 		binmode(OUTPUT, ":raw:encoding(UTF16-LE)");
 	}
-	elsif($withBOM==2) {
+	elsif ($encoding == 2) {
 		binmode(OUTPUT, ":raw:encoding(UTF16-LE)");
 	}
 
@@ -397,7 +407,7 @@ sub lcs {
 
 #--------------------------------------------------------------------------------------------------
 sub writePatchFile {
-	my ($output, $data, $withBOM) = @_;
+	my ($output, $data, $encoding) = @_;
 
 	my @localData = ();
 	foreach (@$data) {
@@ -439,7 +449,7 @@ sub writePatchFile {
 		}
 	}
 
-	writeFile($output, \@localData, $withBOM);
+	writeFile($output, \@localData, $encoding);
 }
 
 ###################################################################################################

@@ -59,7 +59,7 @@ my $DesignInfos = {};
 
 print "Reading rc file...\n";
 my $rcfile = shift(@ARGV);
-my @RcFile = readFile($rcfile, 1);
+my @RcFile = readFile($rcfile, 2);
 analyseData(\@RcFile, \@Outline, $Dialogs, $Menus, $Strings, \@VersionInfo, $DesignInfos);
 
 print "\nReading string texts file...\n";
