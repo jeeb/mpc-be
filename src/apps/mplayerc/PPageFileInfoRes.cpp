@@ -25,7 +25,6 @@
 #include "mplayerc.h"
 #include "PPageFileInfoRes.h"
 
-
 // CPPageFileInfoRes dialog
 
 IMPLEMENT_DYNAMIC(CPPageFileInfoRes, CPPageBase)
@@ -122,9 +121,32 @@ void CPPageFileInfoRes::OnSaveAs()
 
 	CDSMResource& r = m_res.GetAt((POSITION)m_list.GetItemData(i));
 
-	CFileDialog fd(FALSE, NULL, CString(r.name),
+	CString fname(r.name);
+	CString ext = ::PathFindExtension(fname);
+
+	CString ext_list = _T("All files|*.*|");
+	CString mime(r.mime);
+	mime.MakeLower();
+	if (mime == _T("application/x-truetype-font") || mime == _T("application/x-font-ttf")) {
+		ext_list = _T("TrueType Font (*.ttf)|*.ttf|");
+		if (ext.IsEmpty()) {
+			fname += _T(".ttf");
+		}
+	} else if (mime == _T("image/jpeg") || mime == _T("image/jpg")) {
+		ext_list = _T("JPG - JPEG Image (*.jpg)|*.jpg|");
+		if (ext.IsEmpty()) {
+			fname += _T(".jpg");
+		}
+	} else if (mime == _T("image/png")) {
+		ext_list = _T("PNG - Portable Network Graphics (*.png)|*.png|");
+		if (ext.IsEmpty()) {
+			fname += _T(".png");
+		}
+	}
+
+	CFileDialog fd(FALSE, NULL, fname,
 				   OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_NOCHANGEDIR,
-				   _T("All files|*.*||"), this, 0);
+				   ext_list, this, 0);
 	if (fd.DoModal() == IDOK) {
 		FILE* f = NULL;
 		if (!_tfopen_s(&f, fd.GetPathName(), _T("wb"))) {
