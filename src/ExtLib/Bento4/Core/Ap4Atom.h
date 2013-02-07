@@ -330,9 +330,25 @@ const AP4_Atom::Type AP4_ATOM_TYPE_DV5P = AP4_ATOM_TYPE('d','v','5','p'); // DVC
 const AP4_Atom::Type AP4_ATOM_TYPE_DVHQ = AP4_ATOM_TYPE('d','v','h','q');
 const AP4_Atom::Type AP4_ATOM_TYPE_DVH5 = AP4_ATOM_TYPE('d','v','h','5');
 const AP4_Atom::Type AP4_ATOM_TYPE_DVH6 = AP4_ATOM_TYPE('d','v','h','6');
-//
+// Apple HDV
 const AP4_Atom::Type AP4_ATOM_TYPE_HDV1 = AP4_ATOM_TYPE('h','d','v','1');
 const AP4_Atom::Type AP4_ATOM_TYPE_HDV2 = AP4_ATOM_TYPE('h','d','v','2');
+const AP4_Atom::Type AP4_ATOM_TYPE_HDV3 = AP4_ATOM_TYPE('h','d','v','3');
+const AP4_Atom::Type AP4_ATOM_TYPE_HDV4 = AP4_ATOM_TYPE('h','d','v','4');
+const AP4_Atom::Type AP4_ATOM_TYPE_HDV5 = AP4_ATOM_TYPE('h','d','v','5');
+const AP4_Atom::Type AP4_ATOM_TYPE_HDV6 = AP4_ATOM_TYPE('h','d','v','6');
+const AP4_Atom::Type AP4_ATOM_TYPE_HDV7 = AP4_ATOM_TYPE('h','d','v','7');
+const AP4_Atom::Type AP4_ATOM_TYPE_HDV8 = AP4_ATOM_TYPE('h','d','v','8');
+// Apple XDCAM
+const AP4_Atom::Type AP4_ATOM_TYPE_XDV1 = AP4_ATOM_TYPE('x','d','v','1');
+const AP4_Atom::Type AP4_ATOM_TYPE_XDV2 = AP4_ATOM_TYPE('x','d','v','2');
+const AP4_Atom::Type AP4_ATOM_TYPE_XDV3 = AP4_ATOM_TYPE('x','d','v','3');
+const AP4_Atom::Type AP4_ATOM_TYPE_XDV4 = AP4_ATOM_TYPE('x','d','v','4');
+const AP4_Atom::Type AP4_ATOM_TYPE_XDV5 = AP4_ATOM_TYPE('x','d','v','5');
+const AP4_Atom::Type AP4_ATOM_TYPE_XDV6 = AP4_ATOM_TYPE('x','d','v','6');
+const AP4_Atom::Type AP4_ATOM_TYPE_XDV7 = AP4_ATOM_TYPE('x','d','v','7');
+const AP4_Atom::Type AP4_ATOM_TYPE_XDV8 = AP4_ATOM_TYPE('x','d','v','8');
+const AP4_Atom::Type AP4_ATOM_TYPE_XDV9 = AP4_ATOM_TYPE('x','d','v','9');
 
 const AP4_Atom::Type AP4_ATOM_TYPE_APCN = AP4_ATOM_TYPE('a','p','c','n');
 const AP4_Atom::Type AP4_ATOM_TYPE_APCH = AP4_ATOM_TYPE('a','p','c','h');

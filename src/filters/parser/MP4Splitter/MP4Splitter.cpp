@@ -439,6 +439,14 @@ void SetTrackName(CString *TrackName, CString Suffix)
 	}
 }
 
+#define FormatTrackName(name, append) \
+	if (tname.IsEmpty()) { \
+		tname = name; \
+	} else if (append) { \
+		tname.AppendFormat(_T("(%s)"), name); \
+	} \
+	SetTrackName(&TrackName, tname); \
+
 HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 {
 	CheckPointer(pAsyncReader, E_POINTER);
@@ -955,8 +963,17 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					if (AP4_VisualSampleEntry* vse = dynamic_cast<AP4_VisualSampleEntry*>(atom)) {
 
-						if (type == AP4_ATOM_TYPE_HDV1 || type == AP4_ATOM_TYPE_HDV2) {
-							SetTrackName(&TrackName, type == AP4_ATOM_TYPE_HDV1 ? _T("HDV 720p/MPEG2") : _T("HDV 1080i/MPEG2"));
+						CString tname = UTF8To16(vse->GetCompressorName());
+						if (type == AP4_ATOM_TYPE_HDV1 || type == AP4_ATOM_TYPE_HDV2
+							|| type == AP4_ATOM_TYPE_HDV3 || type == AP4_ATOM_TYPE_HDV4
+							|| type == AP4_ATOM_TYPE_HDV5 || type == AP4_ATOM_TYPE_HDV6
+							|| type == AP4_ATOM_TYPE_HDV7 || type == AP4_ATOM_TYPE_HDV8
+							|| type == AP4_ATOM_TYPE_XDV1 || type == AP4_ATOM_TYPE_XDV2
+							|| type == AP4_ATOM_TYPE_XDV3 || type == AP4_ATOM_TYPE_XDV4
+							|| type == AP4_ATOM_TYPE_XDV5 || type == AP4_ATOM_TYPE_XDV6
+							|| type == AP4_ATOM_TYPE_XDV7 || type == AP4_ATOM_TYPE_XDV8
+							|| type == AP4_ATOM_TYPE_XDV9) {
+							FormatTrackName(_T("HDV/XDV MPEG2"), 0);
 
 							BYTE* seqhdr	= (BYTE*)db.GetData();
 							DWORD len		= db.GetDataSize();
@@ -964,27 +981,33 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							int h			= vse->GetHeight();
 
 							if (MakeMPEG2MediaType(mt, seqhdr, len, w, h)) {
+								VIDEOINFOHEADER* vih((VIDEOINFOHEADER*)mt.Format());
+								vih->rcSource = vih->rcTarget = CRect(0, 0, w, h);
+								if (!vih->AvgTimePerFrame && item->GetData()->GetSampleCount()) {
+									vih->AvgTimePerFrame = item->GetData()->GetDurationMs()*10000 / (item->GetData()->GetSampleCount());
+								}
+
 								mts.Add(mt);
 								//b_HasVideo = true;
 							}
 
 							break;
 						} else if (type == AP4_ATOM_TYPE_MJPA || type == AP4_ATOM_TYPE_MJPB || type == AP4_ATOM_TYPE_MJPG) {
-							SetTrackName(&TrackName, _T("M-Jpeg"));
+							FormatTrackName(_T("M-Jpeg"), 1);
 						} else if (type == AP4_ATOM_TYPE_MJP2) {
-							SetTrackName(&TrackName, _T("M-Jpeg 2000"));
+							FormatTrackName(_T("M-Jpeg 2000"), 1);
 						} else if (type == AP4_ATOM_TYPE_APCN ||
 								   type == AP4_ATOM_TYPE_APCH ||
 								   type == AP4_ATOM_TYPE_APCO ||
 								   type == AP4_ATOM_TYPE_APCS ||
 								   type == AP4_ATOM_TYPE_AP4H) {
-							SetTrackName(&TrackName, _T("Apple ProRes"));
+							FormatTrackName(_T("Apple ProRes"), 0);
 						} else if (type == AP4_ATOM_TYPE_SVQ1 ||
 								   type == AP4_ATOM_TYPE_SVQ2 ||
 								   type == AP4_ATOM_TYPE_SVQ3) {
-							SetTrackName(&TrackName, _T("Sorenson"));
+							FormatTrackName(_T("Sorenson"), 0);
 						} else if (type == AP4_ATOM_TYPE_CVID) {
-							SetTrackName(&TrackName, _T("Cinepack"));
+							FormatTrackName(_T("Cinepack"), 0);
 						} else if (type == AP4_ATOM_TYPE_RAW) {
 							fourcc = BI_RGB;
 						}
