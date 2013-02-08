@@ -188,7 +188,7 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 		ShowWindow(SW_HIDE);
 		pFrame->OnClose();
 	} else if (r_MinIcon.PtInRect(p)) {
-		pFrame->ShowWindow(SW_SHOWMINIMIZED);
+		pFrame->m_fTrayIcon ? pFrame->SendMessage(WM_SYSCOMMAND, SC_MINIMIZE, -1) : pFrame->ShowWindow(SW_SHOWMINIMIZED);
 	} else if (r_RestoreIcon.PtInRect(p) && !pFrame->m_fFullScreen) {
 		if (wp.showCmd == SW_SHOWMAXIMIZED) {
 			pFrame->ShowWindow(SW_SHOWNORMAL);
