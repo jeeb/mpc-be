@@ -165,10 +165,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\ExtLib\mfc\afxctrlcontainer.cpp" />
-    <ClCompile Include="..\..\ExtLib\mfc\afxglobals.cpp" />
-    <ClCompile Include="..\..\ExtLib\mfc\afxmaskededit.cpp" />
-    <ClCompile Include="..\..\ExtLib\mfc\winmdi.cpp" />
+    <ClCompile Include="..\..\ExtLib\mfc\afxctrlcontainer.cpp">
+      <ExcludedFromBuild Condition="'$(PlatformToolsetVersion)'=='110'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\ExtLib\mfc\afxglobals.cpp">
+      <ExcludedFromBuild Condition="'$(PlatformToolsetVersion)'=='110'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\ExtLib\mfc\afxmaskededit.cpp">
+      <ExcludedFromBuild Condition="'$(PlatformToolsetVersion)'=='110'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\ExtLib\mfc\winmdi.cpp">
+      <ExcludedFromBuild Condition="'$(PlatformToolsetVersion)'=='110'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="AppSettings.cpp" />
     <ClCompile Include="AuthDlg.cpp" />
