@@ -1752,7 +1752,7 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 	CUrl url;
 	CString ct, body;
 
-	if (fn.Find(_T("://")) >= 0) {
+	if (fn.Find(_T("://")) > 0) {
 		url.CrackUrl(fn);
 
 		if (_tcsicmp(url.GetSchemeName(), _T("pnm")) == 0) {
@@ -1977,15 +1977,13 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 			if (re && REPARSE_ERROR_OK == re->Parse(_T("file\\z\\b*=\\b*[\"]*{[^\n\"]+}"), FALSE)) {
 				res.AddTail(re);
 			}
-		/*
-		} else if (ct == _T("audio/x-mpegurl")) {
+		} else if (ct == _T("audio/x-mpegurl") && fn.Find(_T("://")) > 0) {
 			// #comment
 			// ...
 			re.Attach(DNew CAtlRegExp<>());
 			if (re && REPARSE_ERROR_OK == re->Parse(_T("{[^#][^\n]+}"), FALSE)) {
 				res.AddTail(re);
 			}
-		*/
 		} else if (ct == _T("audio/x-pn-realaudio")) {
 			// rtsp://...
 			re.Attach(DNew CAtlRegExp<>());

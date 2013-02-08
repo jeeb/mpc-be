@@ -398,7 +398,9 @@ redirect:
 
 CShoutcastStream::~CShoutcastStream()
 {
-	m_socket.Attach(m_hSocket);
+	if (m_hSocket != -1) {
+		m_socket.Attach(m_hSocket);
+	}
 	m_socket.Close();
 }
 
@@ -882,7 +884,7 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 		str.Empty();
 		BYTE cur = 0, prev = 0;
 #if DEBUG & 1
-		TRACE(_T("\nCShoutcastStream(): began to receive data:\n"), CString(str));
+		TRACE(_T("\nCShoutcastStream(): began to receive data:\n"));
 #endif
 		while (Receive(&cur, 1) == 1 && cur && !(cur == '\n' && prev == '\n')) {
 			if (cur == '\r') {
@@ -895,7 +897,7 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 #endif
 				CStringA dup(str);
 				str.MakeLower();
-				if (str.Find("icy 200 ok") >= 0 || str.Find("http/1.0 200 ok") >= 0) {
+				if (str.Find("200 ok") > 0 && (str.Find("icy") == 0 || str.Find("http/") == 0)) {
 					fOK = true;
 				} else if (str.Left(13) == "content-type:") {
 					str = str.Mid(13).Trim();
@@ -936,7 +938,7 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 			cur = 0;
 		}
 #if DEBUG & 1
-		TRACE(_T("CShoutcastStream(): finished receiving data\n"), CString(str));
+		TRACE(_T("CShoutcastStream(): finished receiving data\n"));
 #endif
 
 		if (!fOK && GetLastError() == WSAECONNRESET && !fTryAgain) {
@@ -956,7 +958,7 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 
 	KillTimeOut();
 
-	if (!fOK || m_bitrate == 0) {
+	if (!fOK || (m_bitrate == 0 && metaint == 0 && m_title.IsEmpty())) {
 		if (m_Format == AUDIO_PLAYLIST && ContentLength) {
 
 			char* buf = DNew char[ContentLength + 1];
@@ -1012,7 +1014,7 @@ bool CShoutcastStream::CShoutcastSocket::FindSync()
 	if (m_Format == AUDIO_MPEG) {
 		for (int i = MAXFRAMESIZE; i > 0; i--, Receive(&b, 1)) {
 			mp3hdr h;
-			if (h.ExtractHeader(*this) && m_bitrate == h.bitrate) {
+			if (h.ExtractHeader(*this)) {
 				if (h.bitrate > 1) {
 					m_bitrate = h.bitrate;
 				}

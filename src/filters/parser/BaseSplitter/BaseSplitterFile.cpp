@@ -284,7 +284,6 @@ HRESULT CBaseSplitterFile::WaitAvailable(DWORD dwMilliseconds, __int64 AvailByte
 
 void CBaseSplitterFile::ForceMode(MODE mode) {
 	if (mode == Streaming) {
-		// TODO
 		m_len = 0;
 
 		m_fStreaming	= true;
