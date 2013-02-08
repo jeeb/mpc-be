@@ -281,3 +281,23 @@ HRESULT CBaseSplitterFile::WaitAvailable(DWORD dwMilliseconds, __int64 AvailByte
 
 	return E_FAIL;
 }
+
+void CBaseSplitterFile::ForceMode(MODE mode) {
+	if (mode == Streaming) {
+		// TODO
+		m_len = 0;
+
+		m_fStreaming	= true;
+		m_fRandomAccess	= false;
+	} else if (mode == RandomAccess) {
+		LONGLONG total = 0, available;
+		m_pAsyncReader->Length(&total, &available);
+		if (total < available) {
+			total = available;
+		}
+		m_len = total;
+
+		m_fStreaming	= false;
+		m_fRandomAccess	= true;
+	}
+}

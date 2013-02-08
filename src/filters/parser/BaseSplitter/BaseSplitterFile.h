@@ -74,6 +74,11 @@ public:
 	}
 
 	HRESULT HasMoreData(__int64 len = 1, DWORD ms = 1);
-
 	HRESULT WaitAvailable(DWORD dwMilliseconds = 1500, __int64 AvailBytes = 1);
+
+	typedef enum {
+		Streaming,
+		RandomAccess,
+	} MODE;
+	void ForceMode(MODE mode);
 };
