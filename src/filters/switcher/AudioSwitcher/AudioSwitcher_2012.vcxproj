@@ -210,13 +210,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\ExtLib\mfc\afxctrlcontainer.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release' or '$(PlatformToolsetVersion)'=='110'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\ExtLib\mfc\afxglobals.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release' or '$(PlatformToolsetVersion)'=='110'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\ExtLib\mfc\winmdi.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release' or '$(PlatformToolsetVersion)'=='110'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Audio.cpp" />
     <ClCompile Include="AudioSwitcher.cpp" />
