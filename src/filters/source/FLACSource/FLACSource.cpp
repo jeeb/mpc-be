@@ -320,7 +320,7 @@ HRESULT CFLACStream::FillBuffer(IMediaSample* pSample, int nFrame, BYTE* pOut, l
 	FLAC__uint64	llNextPos;
 
 	if (m_bDiscontinuity) {
-		FLAC__stream_decoder_seek_absolute (_DECODER_, (m_rtPosition * m_i64TotalNumSamples) / m_rtDuration);
+		FLAC__stream_decoder_seek_absolute (_DECODER_, FLAC__uint64(m_rtPosition * m_i64TotalNumSamples) / m_rtDuration);
 	}
 
 	FLAC__stream_decoder_get_decode_position(_DECODER_, &llCurPos);
