@@ -61,7 +61,7 @@ typedef struct {
 	UINT8		Duration[6];
 	WORD		RunninStatus			: 3;
 	WORD		FreeCAMode				: 1;
-	WORD		DescriptorsLoopLenght	:12;
+	WORD		DescriptorsLoopLength	:12;
 
 } EventInformationSection;
 
