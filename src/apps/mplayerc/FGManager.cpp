@@ -970,6 +970,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 						}
 					}
 
+					TRACE(_T("FGM: '%s' Successfully connected\n"), pFGF->GetName());
 					return hr;
 				}
 			}
