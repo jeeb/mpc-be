@@ -107,7 +107,7 @@ END
 
 BEGIN DIALOGEX IDD_OPEN_DLG LINES 17
 3		"Відкрити"
-7		"Введіть шлях до фільму або аудіофайлу\n(в тенетах або на вашому комп'ютері)"
+7		"Введіть шлях до фільму або аудіофайлу\n(в мережі або на вашому комп'ютері)"
 8		"Відкрити:"
 10		"Обрати..."
 11		"Дубляж:"
@@ -451,7 +451,7 @@ END
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 5		"Використовувати порт:"
 7		"Запустити в web-оглядачі..."
-9		"Image quality %:"
+9		"Якість зображень %:"
 12		"Використовувати стиснення"
 13		"Виводити відлагоджувальну інформацію"
 14		"Брати сторінки з:"
@@ -470,7 +470,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 10
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
-5		"Quality:"
+5		"Якість:"
 END
 
 BEGIN DIALOGEX IDD_SAVETEXTFILEDIALOGTEMPL LINES 7
@@ -483,7 +483,7 @@ BEGIN DIALOGEX IDD_SAVETHUMBSDIALOGTEMPL LINES 20
 11		"стовпців"
 14		"Ширина зображення:"
 15		"точок"
-16		"Quality:"
+16		"Якість:"
 END
 
 BEGIN DIALOGEX IDD_SAVE_DLG LINES 11
@@ -1274,7 +1274,7 @@ STRING IDS_AG_TOGGLE_SUBRESYNC		"Ввімк./Вимк. синхронізато�
 STRING IDS_AG_TYPE		"Тип"
 STRING IDS_AG_UNKNOWN		"Невідомий %d"
 STRING IDS_AG_UNKNOWN_STREAM		"Невідомий потік"
-STRING IDS_AG_VIDEOFILES		"Video files (all types)|"
+STRING IDS_AG_VIDEOFILES		"Відеофайли (усі типи)|"
 STRING IDS_AG_VIDEO_ANGLE		"Кут зору &відео"
 STRING IDS_AG_VIDEO_FRAME		"&Відеокадр"
 STRING IDS_AG_VIDFRM_DOUBLE		"Подвійний відеокадр"
@@ -1863,16 +1863,16 @@ STRING IDS_SUBTITLE_STREAM		"Субтитри: %s"
 STRING IDS_SUBTITLE_STREAM_OFF		"Субтитри: вимкнено"
 STRING IDS_TEXTFILE_ENC		"Набір символів:"
 STRING IDS_THUMB_COLNUMBER		"Стовпців:"
-STRING IDS_THUMB_IMAGE_QUALITY		"Quality"
-STRING IDS_THUMB_IMAGE_WIDTH		"Image width"
-STRING IDS_THUMB_LEVEL		"Compression (1-9):"
-STRING IDS_THUMB_PIXELS		"Pixels:"
-STRING IDS_THUMB_QUALITY		"Quality (%):"
+STRING IDS_THUMB_IMAGE_QUALITY		"Якість"
+STRING IDS_THUMB_IMAGE_WIDTH		"Ширина зображення"
+STRING IDS_THUMB_LEVEL		"Стиснення (1-9):"
+STRING IDS_THUMB_PIXELS		"Пікселів:"
+STRING IDS_THUMB_QUALITY		"Якість (%):"
 STRING IDS_THUMB_ROWNUMBER		"Рядків:"
-STRING IDS_THUMB_THUMBNAILS		"Layout"
+STRING IDS_THUMB_THUMBNAILS		"Компонування"
 STRING IDS_TIME_TOOLTIP_ABOVE		"Над стрічкою перемотування"
 STRING IDS_TIME_TOOLTIP_BELOW		"Під стрічкою перемотування"
-STRING IDS_TOOLTIP_FULLSCREEN		"FullScreen"
+STRING IDS_TOOLTIP_FULLSCREEN		"На повний екран"
 STRING IDS_TOOLTIP_LOCK		"Заблокувати"
 STRING IDS_TOOLTIP_MAXIMIZE		"Максимізувати"
 STRING IDS_TOOLTIP_MINIMIZE		"Мінімізувати"
