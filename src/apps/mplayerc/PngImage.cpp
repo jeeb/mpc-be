@@ -22,8 +22,8 @@
 
 #include "stdafx.h"
 #include "PngImage.h"
-#include <afxinet.h>
-#include "OpenImage.h"
+//#include <afxinet.h>
+//#include "OpenImage.h"
 
 bool MPCPngImage::DecompressPNG(struct png_t* png)
 {
@@ -277,12 +277,12 @@ HBITMAP MPCPngImage::LoadExternalImage(CString fn, int resid, int type, int br, 
 		_tfopen_s(&fp, path + fn + _T(".png"), _T("rb"));
 	}
 	if (fp) {
-		if (br >= 0 && rc >= 0 && gc >= 0 && bc >= 0) {
+		//if (br >= 0 && rc >= 0 && gc >= 0 && bc >= 0) {
 			return TypeLoadImage(1, &pData, &width, &height, &bpp, fp, 0, br, rc, gc, bc);
-		} else {
-			fclose(fp);
-			return OpenImage(path + fn + _T(".png"));
-		}
+		//} else {
+		//	fclose(fp);
+		//	return OpenImage(path + fn + _T(".png"));
+		//}
 	} else {
 		if (fn != _T("")) {
 			_tfopen_s(&fp, path + fn + _T(".bmp"), _T("rb"));
