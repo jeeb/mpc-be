@@ -673,6 +673,9 @@ void CPlayerPlaylistBar::EnsureVisible(POSITION pos)
 	if (i < 0) {
 		return;
 	}
+	m_list.SetItemState(-1, ~LVIS_SELECTED, LVIS_SELECTED);	// deselect all
+	m_list.SetItemState(i, LVIS_SELECTED, LVIS_SELECTED);	// select current
+
 	m_list.EnsureVisible(i, TRUE);
 	m_list.Invalidate();
 }
