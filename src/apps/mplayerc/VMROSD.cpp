@@ -89,8 +89,9 @@ CVMROSD::CVMROSD(void)
 	}
 }
 
-CVMROSD::~CVMROSD(void)
+CVMROSD::~CVMROSD()
 {
+	Stop();
 	m_MemDC.DeleteDC();
 
 	if (m_pButtonsImages) {
@@ -178,7 +179,7 @@ void CVMROSD::UpdateBitmap()
 	::ReleaseDC(m_pWnd->m_hWnd, pDC->m_hDC);
 }
 
-void CVMROSD::Start (CWnd* pWnd, IVMRMixerBitmap9* pVMB)
+void CVMROSD::Start(CWnd* pWnd, IVMRMixerBitmap9* pVMB)
 {
 	m_pVMB   = pVMB;
 	m_pMFVMB = NULL;
@@ -188,7 +189,7 @@ void CVMROSD::Start (CWnd* pWnd, IVMRMixerBitmap9* pVMB)
 	UpdateBitmap();
 }
 
-void CVMROSD::Start (CWnd* pWnd, IMFVideoMixerBitmap* pMFVMB)
+void CVMROSD::Start(CWnd* pWnd, IMFVideoMixerBitmap* pMFVMB)
 {
 	m_pMFVMB = pMFVMB;
 	m_pVMB   = NULL;
@@ -198,7 +199,7 @@ void CVMROSD::Start (CWnd* pWnd, IMFVideoMixerBitmap* pMFVMB)
 	UpdateBitmap();
 }
 
-void CVMROSD::Start (CWnd* pWnd, IMadVRTextOsd* pMVTO)
+void CVMROSD::Start(CWnd* pWnd, IMadVRTextOsd* pMVTO)
 {
 	m_pMFVMB = NULL;
 	m_pVMB   = NULL;
@@ -643,7 +644,7 @@ void CVMROSD::ClearMessage(bool hide)
 	}
 }
 
-void CVMROSD::DisplayMessage (OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, int FontSize, CString OSD_Font)
+void CVMROSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, int FontSize, CString OSD_Font)
 {
 	if (!m_bShowMessage) {
 		return;
@@ -711,7 +712,7 @@ void CVMROSD::DisplayMessage (OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration
 	}
 }
 
-void CVMROSD::DebugMessage( LPCTSTR format, ... )
+void CVMROSD::DebugMessage(LPCTSTR format, ...)
 {
 	CString tmp;
 	va_list argList;

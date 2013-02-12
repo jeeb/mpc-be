@@ -50,16 +50,16 @@ typedef enum {
 class CVMROSD
 {
 public:
-	CVMROSD(void);
-	~CVMROSD(void);
+	CVMROSD();
+	~CVMROSD();
 
-	void Start (CWnd* pWnd, IVMRMixerBitmap9* pVMB);
-	void Start (CWnd* pWnd, IMFVideoMixerBitmap* pVMB);
-	void Start (CWnd* pWnd, IMadVRTextOsd* pMVTO);
+	void Start(CWnd* pWnd, IVMRMixerBitmap9* pVMB);
+	void Start(CWnd* pWnd, IMFVideoMixerBitmap* pVMB);
+	void Start(CWnd* pWnd, IMadVRTextOsd* pMVTO);
 	void Stop();
 
-	void DisplayMessage (OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration = 5000, int FontSize = 0, CString OSD_Font = _T(""));
-	void DebugMessage( LPCTSTR format, ... );
+	void DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration = 5000, int FontSize = 0, CString OSD_Font = _T(""));
+	void DebugMessage(LPCTSTR format, ...);
 	void ClearMessage(bool hide=false);
 	void HideMessage(bool hide);
 	void HideExclusiveBars();

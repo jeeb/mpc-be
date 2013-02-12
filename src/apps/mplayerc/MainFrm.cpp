@@ -8123,10 +8123,12 @@ void CMainFrame::OnUpdatePlayPauseStop(CCmdUI* pCmdUI)
 			fEnable = true;
 
 			if (fs == State_Stopped && pCmdUI->m_nID == ID_PLAY_PAUSE && m_fRealMediaGraph) {
-				fEnable = false;    // can't go into paused state from stopped with rm
+				fEnable = false;
 			} else if (m_fCapturing) {
 				fEnable = false;
 			} else if (m_fLiveWM && pCmdUI->m_nID == ID_PLAY_PAUSE) {
+				fEnable = false;
+			} else if (GetPlaybackMode() == PM_CAPTURE && pCmdUI->m_nID == ID_PLAY_PAUSE && AfxGetAppSettings().iDefaultCaptureDevice == 1) {
 				fEnable = false;
 			}
 		} else if (GetPlaybackMode() == PM_DVD) {
