@@ -29,16 +29,20 @@ int avcodec_h264_search_recovery_point(AVCodecContext *avctx,
     int found = 0; // 0: no recovery point, 1:Recovery Point SEI (GDR), 2:IDR
     AVCodecContext *users_MpegEncContext_avctx;
 
+    int is_avc;           ///< this flag is != 0 if codec is avc1
+    int nal_length_size;  ///< Number of bytes used for nal length (1, 2 or 4)
+
+
     avctx = get_thread0_avctx(avctx); // Next frame will start on thread 0, and we want to store SPS and PPS in the context of thread 0.
     h = avctx->priv_data;
-    h->is_avc = avcodec_h264_decode_init_is_avc(avctx);
+    is_avc = avcodec_h264_decode_init_is_avc(avctx);
     s = &h->s;
     users_MpegEncContext_avctx = s->avctx; // save it and write back before return.
 
     if (s->avctx == NULL)
         s->avctx = avctx; // Hack, this function can be used before decoding, so we can't expect everything initialized.
 
-    h->nal_length_size = avctx->nal_length_size ? avctx->nal_length_size : 4;
+    nal_length_size = avctx->nal_length_size ? avctx->nal_length_size : 4;
 
     for(;;){
         int consumed;
@@ -47,10 +51,10 @@ int avcodec_h264_search_recovery_point(AVCodecContext *avctx,
         const uint8_t *ptr;
         int i, nalsize = 0;
 
-        if(h->is_avc) {
+        if(is_avc) {
             if(buf_index >= buf_size) break;
             nalsize = 0;
-            for(i = 0; i < h->nal_length_size; i++)
+            for(i = 0; i < nal_length_size; i++)
                 nalsize = (nalsize << 8) | buf[buf_index++];
             if(nalsize <= 1 || (nalsize+buf_index > buf_size)){
                 if(nalsize == 1){
@@ -74,7 +78,7 @@ int avcodec_h264_search_recovery_point(AVCodecContext *avctx,
             buf_index+=3;
         }
 
-        ptr= ff_h264_decode_nal(h, buf + buf_index, &dst_length, &consumed, h->is_avc ? nalsize : buf_size - buf_index);
+        ptr = ff_h264_decode_nal(h, buf + buf_index, &dst_length, &consumed, is_avc ? nalsize : buf_size - buf_index);
         if (ptr==NULL || dst_length < 0){
             found = -1;
             goto end;
@@ -83,7 +87,7 @@ int avcodec_h264_search_recovery_point(AVCodecContext *avctx,
             dst_length--;
         bit_length= !dst_length ? 0 : (8*dst_length - decode_rbsp_trailing(h, ptr + dst_length - 1));
 
-        if (h->is_avc && (nalsize != consumed)){
+        if (is_avc && (nalsize != consumed)){
             av_log(h->s.avctx, AV_LOG_ERROR, "AVC: Consumed only %d bytes instead of %d\n", consumed, nalsize);
             consumed= nalsize;
         }
