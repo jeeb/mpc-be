@@ -28,6 +28,9 @@
 #define CPUID_SSE      (1 << 25)
 #define CPUID_SSE2     (1 << 26)
 #define CPUID_SSE3     (1 << 0)
+#define CPUID_SSE41    (1 << 19)
+#define CPUID_SSE42    (1 << 20)
+#define CPUID_AVX      ((1 << 27) | (1 << 28))
 
 // Intel specifics
 #define CPUID_SSSE3    (1 << 9)
@@ -36,7 +39,6 @@
 #define CPUID_3DNOW    (1 << 31)
 #define CPUID_3DNOWEXT (1 << 30)
 #define CPUID_MMXEXT   (1 << 22)
-
 
 CCpuId::CCpuId(void)
 {
@@ -98,12 +100,21 @@ CCpuId::CCpuId(void)
 		if (nBuff[3] & CPUID_SSE)  m_nCPUFeatures |= MPC_MM_SSE;
 		if (nBuff[3] & CPUID_SSE2) m_nCPUFeatures |= MPC_MM_SSE2;
 		if (nBuff[2] & CPUID_SSE3) m_nCPUFeatures |= MPC_MM_SSE3;
+		if (nBuff[2] & CPUID_SSE41) m_nCPUFeatures |= MPC_MM_SSE4;
+		if (nBuff[2] & CPUID_SSE42) m_nCPUFeatures |= MPC_MM_SSE42;
 
 		// Intel specific:
 		if (m_nType == PROCESSOR_INTEL)
 		{
 			if (nBuff[2] & CPUID_SSSE3) m_nCPUFeatures |= MPC_MM_SSSE3;
 			//if (nBuff[2] & CPUID_EST) strcat(szFeatures, "EST ");
+			if ((nBuff[2] & CPUID_AVX) == CPUID_AVX) {
+				// Check for OS support
+				unsigned long long xcrFeatureMask = _xgetbv(_XCR_XFEATURE_ENABLED_MASK);
+				if ((xcrFeatureMask & 0x6) == 0x6) {
+					m_nCPUFeatures |= MPC_MM_AVX;
+				}
+			}
 		}
 
 		//if(nBuff[3] & CPUID_HTT)

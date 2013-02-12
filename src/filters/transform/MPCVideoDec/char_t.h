@@ -86,7 +86,6 @@ static __forceinline char* ff_strncpy(char *dst, const char *src, size_t count)
 	strncpy_s(dst, count, src, _TRUNCATE);
 	return dst;
 }
-
 static __forceinline wchar_t* strcat(wchar_t *a, const wchar_t *b)
 {
 	return wcscat(a,b);
@@ -103,7 +102,6 @@ static __forceinline int strnicmp(const wchar_t *a, const wchar_t *b,size_t c)
 {
 	return _wcsnicmp(a,b,c);
 }
-
 static __forceinline long strtol(const wchar_t *a, wchar_t **b, int c)
 {
 	return wcstol(a,b,c);
@@ -156,7 +154,6 @@ static __forceinline int _vsnprintf(wchar_t *a, size_t b, const wchar_t *c, va_l
 {
 	return _vsnwprintf(a,b,c,d);
 }
-
 static __forceinline FILE* fopen(const wchar_t *a, const wchar_t *b)
 {
 	return _wfopen(a,b);
@@ -201,7 +198,6 @@ static __forceinline int64_t _strtoi64(const wchar_t *nptr, wchar_t **endptr, in
 {
 	return _wcstoi64(nptr,endptr,base);
 };
-
 template<class Tout> struct text
 		// ANSI <--> UNICODE conversion.
 		// in	 : input  string in char* or wchar_t*.
@@ -225,8 +221,6 @@ public:
 		return buf;
 	}
 };
-
-
 template<> template<> inline text<char>::text(const char *in,int code_page):buf(const_cast<char*>(in)),own(false) {}
 template<> template<> inline text<char>::text(const char *in,char *Ibuf,int code_page):buf(strcpy(Ibuf,in)),own(false) {}
 template<> template<> inline text<char>::text(const char *in,int inlen,char *Ibuf,size_t outlen,int code_page):own(false)
@@ -243,8 +237,6 @@ template<> template<> inline text<char>::text(const char *in,int inlen,char *Ibu
 		ff_strncpy(Ibuf, in, outlen);
 	}
 }
-
-
 template<> template<> inline text<wchar_t>::text(const wchar_t *in,int code_page):buf(const_cast<wchar_t*>(in)),own(false) {}
 template<> template<> inline text<wchar_t>::text(const wchar_t *in,wchar_t *Ibuf,int code_page):buf(strcpy(Ibuf,in)),own(false) {}
 template<> template<> inline text<wchar_t>::text(const wchar_t *in,int inlen,wchar_t *Ibuf,size_t outlen,int code_page):own(false)
@@ -261,8 +253,6 @@ template<> template<> inline text<wchar_t>::text(const wchar_t *in,int inlen,wch
 		ff_strncpy(Ibuf, in, outlen);
 	}
 }
-
-
 template<> template<> inline text<wchar_t>::text(const char *in,int code_page):own(in?true:false)
 {
 	if (in) {
@@ -282,8 +272,6 @@ template<> template<> inline text<wchar_t>::text(const char *in,int inlen,wchar_
 {
 	MultiByteToWideChar(code_page,0,in,int(inlen),buf,int(outlen));
 }
-
-
 template<> template<> inline text<char>::text(const wchar_t *in,int code_page):own(in?true:false)
 {
 	if (in) {
