@@ -1,7 +1,4 @@
 /*
- * H.264 IDCT
- * Copyright (c) 2004 Michael Niedermayer <michaelni@gmx.at>
- *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -19,30 +16,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/**
- * @file
- * H.264 IDCT.
- * @author Michael Niedermayer <michaelni@gmx.at>
- */
+#ifndef AVCODEC_IMGCONVERT_H
+#define AVCODEC_IMGCONVERT_H
 
-#include "h264idct.h"
+#include <stdint.h>
 
-#define BIT_DEPTH 8
-#include "h264idct_template.c"
-#undef BIT_DEPTH
+/* 1/2^n downscaling functions */
+void ff_shrink22(uint8_t *dst, int dst_wrap, const uint8_t *src, int src_wrap, int width, int height);
+void ff_shrink44(uint8_t *dst, int dst_wrap, const uint8_t *src, int src_wrap, int width, int height);
+void ff_shrink88(uint8_t *dst, int dst_wrap, const uint8_t *src, int src_wrap, int width, int height);
 
-#define BIT_DEPTH 9
-#include "h264idct_template.c"
-#undef BIT_DEPTH
-
-#define BIT_DEPTH 10
-#include "h264idct_template.c"
-#undef BIT_DEPTH
-
-#define BIT_DEPTH 12
-#include "h264idct_template.c"
-#undef BIT_DEPTH
-
-#define BIT_DEPTH 14
-#include "h264idct_template.c"
-#undef BIT_DEPTH
+#endif /* AVCODEC_IMGCONVERT_H */

@@ -1,7 +1,4 @@
 /*
- * H.264 IDCT
- * Copyright (c) 2004 Michael Niedermayer <michaelni@gmx.at>
- *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -19,30 +16,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/**
- * @file
- * H.264 IDCT.
- * @author Michael Niedermayer <michaelni@gmx.at>
- */
+#ifndef AVCODEC_SVQ3_H
+#define AVCODEC_SVQ3_H
 
-#include "h264idct.h"
+#include <stdint.h>
 
-#define BIT_DEPTH 8
-#include "h264idct_template.c"
-#undef BIT_DEPTH
+void ff_svq3_luma_dc_dequant_idct_c(int16_t *output, int16_t *input, int qp);
+void ff_svq3_add_idct_c(uint8_t *dst, int16_t *block, int stride, int qp, int dc);
 
-#define BIT_DEPTH 9
-#include "h264idct_template.c"
-#undef BIT_DEPTH
-
-#define BIT_DEPTH 10
-#include "h264idct_template.c"
-#undef BIT_DEPTH
-
-#define BIT_DEPTH 12
-#include "h264idct_template.c"
-#undef BIT_DEPTH
-
-#define BIT_DEPTH 14
-#include "h264idct_template.c"
-#undef BIT_DEPTH
+#endif /* AVCODEC_DSPUTIL_H */
