@@ -298,3 +298,5 @@ extern CString AddSlash(LPCTSTR Path);
 extern CString RemoveSlash(LPCTSTR Path);
 
 extern BOOL GetTemporaryFilePath(CString strExtension, CString& strFileName);
+
+extern BOOL IsVideoRenderer(const CLSID clsid);

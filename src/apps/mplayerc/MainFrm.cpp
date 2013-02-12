@@ -12306,7 +12306,37 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		QueryPerformanceCounter(&m_LastSaveTime);
 
 		if (b_UseSmartSeek) {
-			if (FAILED(pGB2->RenderFile(CStringW(fn), NULL))) {
+			bool bIsVideo = false;
+			BeginEnumFilters(pGB, pEF, pBF) {
+				// Checks if any Video Renderer is in the graph
+				if (IsVideoRenderer(GetCLSID(pBF))) {
+					bIsVideo = true;
+					break;
+				}
+			}
+			EndEnumFilters;
+
+			if (!bIsVideo || FAILED(pGB2->RenderFile(CStringW(fn), NULL))) {
+				if (pGB2) {
+					m_pMFVP2	= NULL;
+					m_pMFVDC2	= NULL;
+
+					pMC2.Release();
+					pME2.Release();
+					pMS2.Release();
+					pVW2.Release();
+					pBV2.Release();
+					pFS2.Release();
+
+					if (pDVDC2) {
+						pDVDC2.Release();
+						pDVDI2.Release();
+					}
+
+					pGB2->RemoveFromROT();
+					pGB2.Release();
+					pGB2 = NULL;
+				}
 				b_UseSmartSeek = false;
 			}
 		}

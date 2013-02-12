@@ -28,6 +28,7 @@
 #include "mplayerc.h"
 #include "MainFrm.h"
 #include "../../DSUtil/DSUtil.h"
+#include "moreuuids.h"
 
 using namespace DSObjects;
 

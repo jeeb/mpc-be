@@ -3286,3 +3286,23 @@ BOOL GetTemporaryFilePath(CString strExtension, CString& strFileName)
 	TRACE(_T("GetTemporaryFilePath() : \'%ws\'\n"), strFileName);
 	return TRUE;
 }
+
+BOOL IsVideoRenderer(const CLSID clsid)
+{
+	if (clsid == CLSID_OverlayMixer
+		|| clsid == CLSID_VideoMixingRenderer
+		|| clsid == CLSID_VideoMixingRenderer9
+		|| clsid == CLSID_VMR7AllocatorPresenter
+		|| clsid == CLSID_VMR9AllocatorPresenter
+		|| clsid == CLSID_EnhancedVideoRenderer
+		|| clsid == CLSID_EVRAllocatorPresenter
+		|| clsid == CLSID_DXRAllocatorPresenter
+		|| clsid == CLSID_madVRAllocatorPresenter
+		|| clsid == CLSID_VideoRenderer
+		|| clsid == CLSID_VideoRendererDefault
+		|| clsid == CLSID_SyncAllocatorPresenter) {
+		return TRUE;
+	}
+
+	return FALSE;
+}

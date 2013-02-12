@@ -804,20 +804,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 			*/
 
 			// Checks if any Video Renderer is already in the graph to avoid trying to connect a second instance
-			CLSID clsid = pFGF->GetCLSID();
-			if (clsid == CLSID_OverlayMixer
-				|| clsid == CLSID_VideoMixingRenderer
-				|| clsid == CLSID_VideoMixingRenderer9
-				|| clsid == CLSID_VMR7AllocatorPresenter
-				|| clsid == CLSID_VMR9AllocatorPresenter
-				|| clsid == CLSID_EnhancedVideoRenderer
-				|| clsid == CLSID_EVRAllocatorPresenter
-				|| clsid == CLSID_DXRAllocatorPresenter
-				|| clsid == CLSID_madVRAllocatorPresenter
-				|| clsid == CLSID_VideoRenderer
-				|| clsid == CLSID_VideoRendererDefault
-				|| clsid == CLSID_SyncAllocatorPresenter) {
-
+			if (IsVideoRenderer(pFGF->GetCLSID())) {
 				CString fname = pFGF->GetName();
 				if (!fname.IsEmpty()) {
 					CComPtr<IBaseFilter> pBFVR;

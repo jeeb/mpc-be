@@ -34,6 +34,7 @@
 #include <realmedia/rmaevent.h>
 #include <realmedia/rmaprefs.h>
 #include "../../DSUtil/DSUtil.h"
+#include "moreuuids.h"
 #include "AuthDlg.h"
 
 using namespace DSObjects;
