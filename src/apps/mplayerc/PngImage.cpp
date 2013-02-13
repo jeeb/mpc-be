@@ -108,13 +108,18 @@ CString MPCPngImage::LoadCurrentPath()
 	return path.Left(path.ReverseFind('\\') + 1);
 }
 
-bool MPCPngImage::FileExists(CString fn)
+bool MPCPngImage::FileExists(CString& fn, bool bInclJPEG)
 {
 	CString path = LoadCurrentPath();
 
 	if (::PathFileExists(path + fn + _T(".png"))) {
+		fn = path + fn + _T(".png");
 		return true;
 	} else if (::PathFileExists(path + fn + _T(".bmp"))) {
+		fn = path + fn + _T(".bmp");
+		return true;
+	} else if (bInclJPEG && ::PathFileExists(path + fn + _T(".jpg"))) {
+		fn = path + fn + _T(".jpg");
 		return true;
 	}
 

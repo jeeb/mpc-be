@@ -44,7 +44,7 @@ public:
 	bool	LoadFromResource(UINT id);
 
 	CString	LoadCurrentPath();
-	bool	FileExists(CString fn);
+	bool	FileExists(CString& fn, bool bInclJPEG = false);
 
 	BYTE*	BrightnessRGB(int type, BYTE* lpBits, int width, int height, int bpp, int br, int rc, int gc, int bc);
 	HBITMAP	TypeLoadImage(int type, BYTE** pData, int* width, int* height, int* bpp, FILE* fp, int resid, int br, int rc, int gc, int bc);

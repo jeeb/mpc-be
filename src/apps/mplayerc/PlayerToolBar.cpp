@@ -39,7 +39,7 @@ CPlayerToolBar::CPlayerToolBar()
 {
 	m_hDXVAIcon = NULL;
 	
-	int fp = m_logobm.FileExists("gpu");
+	int fp = m_logobm.FileExists(CString(_T("gpu")));
 
 	HBITMAP hBmp = m_logobm.LoadExternalImage("gpu", IDB_DXVA_ON, -1, -1, -1, -1, -1);
 	BITMAP bm;
@@ -156,7 +156,7 @@ void CPlayerToolBar::SwitchTheme()
 		GetToolBarCtrl().SetIndent(0);
 	}
 
-	int fp = m_logobm.FileExists("toolbar");
+	int fp = m_logobm.FileExists(CString(_T("toolbar")));
 
 	HBITMAP hBmp = NULL;
 	if (s.fDisableXPToolbars && NULL == fp) {
@@ -475,7 +475,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 
 	if (s.fDisableXPToolbars) {
 
-		int fp = m_logobm.FileExists("background");
+		int fp = m_logobm.FileExists(CString(_T("background")));
 
 		switch(pTBCD->nmcd.dwDrawStage)
 		{

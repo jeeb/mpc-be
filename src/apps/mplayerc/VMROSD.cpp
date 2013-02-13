@@ -61,7 +61,7 @@ CVMROSD::CVMROSD(void)
 	bMouseOverCloseButton	= false;
 	m_bShowMessage			= true;
 
-	int fp = m_bm.FileExists("flybar");
+	int fp = m_bm.FileExists(CString(_T("flybar")));
 
 	HBITMAP hBmp = m_bm.LoadExternalImage("flybar", IDB_PLAYERFLYBAR_PNG, -1, -1, -1, -1, -1);
 	BITMAP bm;

@@ -125,8 +125,10 @@ void CChildView::LoadLogo()
 
 	m_logo.Destroy();
 
-	if (m_logo.FileExists("logo")) {
-		m_logo.Attach(m_logo.LoadExternalImage("logo", 0, -1, -1, -1, -1, -1));
+	CString logoFName = _T("logo");
+
+	if (m_logo.FileExists(logoFName, true)) {
+		m_logo.Attach(OpenImage(logoFName));
 	} else {
 		if (s.fLogoExternal) {
 			m_logo.Attach(OpenImage(s.strLogoFileName));
@@ -140,7 +142,7 @@ void CChildView::LoadLogo()
 			s.strLogoFileName = "";
 
 			if (!m_logo.LoadFromResource(s.nLogoId)) {
-				m_logo.LoadFromResource(s.nLogoId=DEF_LOGO);
+				m_logo.LoadFromResource(s.nLogoId = DEF_LOGO);
 			}
 		}
 	}

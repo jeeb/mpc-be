@@ -127,7 +127,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					int m_nBMedian = m_nHeight - 3 - 0.5 * m_nHeight - 8;
 					int height = r.Height() + m_nBMedian + 4;
 
-					int fp = m_logobm.FileExists("background");
+					int fp = m_logobm.FileExists(CString(_T("background")));
 
 					if (NULL != fp) {
 						ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);
@@ -200,7 +200,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 					int m_nVolPos = r.left + (nVolume * 0.43) + 4;
 
-					int fp = m_logobm.FileExists("volume");
+					int fp = m_logobm.FileExists(CString(_T("volume")));
 
 					if (NULL != fp) {
 						m_logobm.LoadExternalGradient("volume", &dc, r, 0, -1, -1, -1, -1);

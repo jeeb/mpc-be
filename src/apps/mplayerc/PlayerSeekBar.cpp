@@ -330,7 +330,7 @@ void CPlayerSeekBar::OnPaint()
 		GRADIENT_RECT gr[1] = {{0, 1}};
 		int pa = 255 * 256;
 
-		int fp = m_logobm.FileExists("background");
+		int fp = m_logobm.FileExists(CString(_T("background")));
 
 		if (NULL != fp) {
 			ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);

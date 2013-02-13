@@ -38,7 +38,7 @@ CFlyBar::CFlyBar() :
 	r_LockIcon(0,0,0,0),
 	m_pButtonsImages(NULL)
 {
-	int fp = m_logobm.FileExists("flybar");
+	int fp = m_logobm.FileExists(CString(_T("flybar")));
 
 	HBITMAP hBmp = m_logobm.LoadExternalImage("flybar", IDB_PLAYERFLYBAR_PNG, -1, -1, -1, -1, -1);
 	BITMAP bm;
