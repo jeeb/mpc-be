@@ -1406,7 +1406,7 @@ HRESULT CMpaDecFilter::AC3Encode(BYTE* pBuff, int size, AVSampleFormat avsf, DWO
 
 		convert_to_float(avsf, nChannels, nSamples, pBuff, p);
 	} else {
-		m_Mixer.Update(avsf, dwChannelMask, new_layout, nSamplesPerSec, new_samplerate);
+		m_Mixer.Update(avsf, dwChannelMask, new_layout, 0.0f, nSamplesPerSec, new_samplerate);
 		int added = m_Mixer.CalcOutSamples(nSamples) * new_channels;
 		m_encbuff.SetCount(remain + added);
 		p = m_encbuff.GetData() + remain;
