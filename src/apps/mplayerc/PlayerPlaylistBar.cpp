@@ -673,9 +673,6 @@ void CPlayerPlaylistBar::EnsureVisible(POSITION pos)
 	if (i < 0) {
 		return;
 	}
-	m_list.SetItemState(-1, ~LVIS_SELECTED, LVIS_SELECTED);	// deselect all
-	m_list.SetItemState(i, LVIS_SELECTED, LVIS_SELECTED);	// select current
-
 	m_list.EnsureVisible(i, TRUE);
 	m_list.Invalidate();
 }
@@ -1133,7 +1130,7 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 
 	if (s.fDisableXPToolbars) {
 		ThemeRGB(135, 140, 145, R, G, B);
-		textcolor = RGB(R, G, B);
+		textcolor = fSelected ? 0x7070ff : RGB(R, G, B);
 	}
 	if (pli.m_fInvalid) {
 		textcolor |= 0xA0A0A0;
