@@ -1256,9 +1256,12 @@ static int decode_update_thread_context(AVCodecContext *dst,
         for (i = 0; i < MAX_PPS_COUNT; i++)
             av_freep(h->pps_buffers + i);
 
-        // copy all fields after MpegEnc
+        // copy all fields after MpegEnc, except mb
         memcpy(&h->s + 1, &h1->s + 1,
-               sizeof(H264Context) - sizeof(MpegEncContext));
+               offsetof(H264Context, mb) - sizeof(MpegEncContext));
+        av_assert0(&h->cabac == &h->mb_padding + 1);
+        memcpy(&h->cabac, &h1->cabac,
+               sizeof(H264Context) - offsetof(H264Context, cabac));
         memset(h->sps_buffers, 0, sizeof(h->sps_buffers));
         memset(h->pps_buffers, 0, sizeof(h->pps_buffers));
 
@@ -1278,9 +1281,6 @@ static int decode_update_thread_context(AVCodecContext *dst,
         h->bipred_scratchpad = NULL;
 
         h->thread_context[0] = h;
-
-        s->dsp.clear_blocks(h->mb);
-        s->dsp.clear_blocks(h->mb + (24 * 16 << h->pixel_shift));
     }
 
     /* frame_start may not be called for the next thread (if it's decoding
@@ -3080,6 +3080,9 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
             Picture *prev = h->short_ref_count ? h->short_ref[0] : NULL;
             av_log(h->s.avctx, AV_LOG_DEBUG, "Frame num gap %d %d\n",
                    h->frame_num, h->prev_frame_num);
+            if (!h->sps.gaps_in_frame_num_allowed_flag)
+                for(i=0; i<FF_ARRAY_ELEMS(h->last_pocs); i++)
+                    h->last_pocs[i] = INT_MIN;
             if (ff_h264_frame_start(h) < 0)
                 return -1;
             h->prev_frame_num++;
