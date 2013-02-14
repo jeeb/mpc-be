@@ -51,5 +51,8 @@ public IUnknown {
 	STDMETHOD(SetAlternativeDuration(BOOL nValue)) = 0;
 	STDMETHOD_(BOOL, GetAlternativeDuration()) = 0;
 
+	STDMETHOD(SetSubEmptyPin(BOOL nValue)) = 0;
+	STDMETHOD_(BOOL, GetSubEmptyPin()) = 0;
+
 	STDMETHOD_(int, GetMPEGType()) = 0;
 };

@@ -80,7 +80,7 @@ protected:
 
 private:
 	CString m_csAudioLanguageOrder, m_csSubtitlesLanguageOrder;
-	bool m_useFastStreamChange, m_useFastSeek, m_ForcedSub, m_TrackPriority, m_AlternativeDuration;
+	bool m_useFastStreamChange, m_useFastSeek, m_ForcedSub, m_TrackPriority, m_AlternativeDuration, m_SubEmptyPin;
 	int m_AC3CoreOnly;
 	CCritSec m_csProps;
 
@@ -141,6 +141,9 @@ public:
 
 	STDMETHODIMP SetAlternativeDuration(BOOL nValue);
 	STDMETHODIMP_(BOOL) GetAlternativeDuration();
+
+	STDMETHODIMP SetSubEmptyPin(BOOL nValue);
+	STDMETHODIMP_(BOOL) GetSubEmptyPin();
 
 	STDMETHODIMP_(int) GetMPEGType();
 };

@@ -48,7 +48,7 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 
 public:
 	CHdmvClipInfo &m_ClipInfo;
-	CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bool bIsHdmv, CHdmvClipInfo &ClipInfo, bool ForcedSub, bool TrackPriority, int AC3CoreOnly, bool m_AlternativeDuration);
+	CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bool bIsHdmv, CHdmvClipInfo &ClipInfo, bool ForcedSub, bool TrackPriority, int AC3CoreOnly, bool m_AlternativeDuration, bool SubEmptyPin);
 
 	REFERENCE_TIME NextPTS(DWORD TrackNum);
 
@@ -61,7 +61,7 @@ public:
 	int m_rate; // byte/sec
 
 	int m_AC3CoreOnly;
-	bool m_ForcedSub, m_TrackPriority, m_AlternativeDuration;
+	bool m_ForcedSub, m_TrackPriority, m_AlternativeDuration, m_SubEmptyPin;
 
 	struct stream {
 		CMpegSplitterFile *m_pFile;

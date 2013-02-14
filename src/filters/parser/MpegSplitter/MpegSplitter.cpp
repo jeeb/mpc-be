@@ -540,6 +540,7 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	, m_TrackPriority(false)
 	, m_AC3CoreOnly(0)
 	, m_AlternativeDuration(false)
+	, m_SubEmptyPin(false)
 {
 #ifdef REGISTER_FILTER
 	CRegKey key;
@@ -584,6 +585,10 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("AlternativeDuration"), dw)) {
 			m_AlternativeDuration = !!dw;
 		}
+
+		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("SubtitleEmptyOutput"), dw)) {
+			m_SubEmptyPin = !!dw;
+		}
 	}
 #else
 	m_useFastStreamChange		= !!AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("UseFastStreamChange"), m_useFastStreamChange);
@@ -599,6 +604,7 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 
 	m_AC3CoreOnly				= AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("AC3CoreOnly"), m_AC3CoreOnly);
 	m_AlternativeDuration		= !!AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("AlternativeDuration"), m_AlternativeDuration);
+	m_SubEmptyPin				= !!AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("SubtitleEmptyOutput"), m_SubEmptyPin);
 #endif
 }
 
@@ -844,7 +850,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_pFile.Free();
 
 	ReadClipInfo (GetPartFilename(pAsyncReader));
-	m_pFile.Attach(DNew CMpegSplitterFile(pAsyncReader, hr, m_ClipInfo.IsHdmv(), m_ClipInfo, m_ForcedSub, m_TrackPriority, m_AC3CoreOnly, m_AlternativeDuration));
+	m_pFile.Attach(DNew CMpegSplitterFile(pAsyncReader, hr, m_ClipInfo.IsHdmv(), m_ClipInfo, m_ForcedSub, m_TrackPriority, m_AC3CoreOnly, m_AlternativeDuration, m_SubEmptyPin));
 
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
@@ -1767,6 +1773,19 @@ STDMETHODIMP_(BOOL) CMpegSplitterFilter::GetAlternativeDuration()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_AlternativeDuration;
+}
+
+STDMETHODIMP CMpegSplitterFilter::SetSubEmptyPin(BOOL nValue)
+{
+	CAutoLock cAutoLock(&m_csProps);
+	m_SubEmptyPin = !!nValue;
+	return S_OK;
+}
+
+STDMETHODIMP_(BOOL) CMpegSplitterFilter::GetSubEmptyPin()
+{
+	CAutoLock cAutoLock(&m_csProps);
+	return m_SubEmptyPin;
 }
 
 STDMETHODIMP_(int) CMpegSplitterFilter::GetMPEGType()

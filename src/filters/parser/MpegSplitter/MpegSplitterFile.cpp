@@ -30,7 +30,7 @@
 #endif
 #include <moreuuids.h>
 
-CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bool bIsHdmv, CHdmvClipInfo &ClipInfo, bool ForcedSub, bool TrackPriority, int AC3CoreOnly, bool AlternativeDuration)
+CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bool bIsHdmv, CHdmvClipInfo &ClipInfo, bool ForcedSub, bool TrackPriority, int AC3CoreOnly, bool AlternativeDuration, bool SubEmptyPin)
 	: CBaseSplitterFileEx(pAsyncReader, hr, DEFAULT_CACHE_LENGTH, false, true)
 	, m_type(mpeg_us)
 	, m_rate(0)
@@ -42,6 +42,7 @@ CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bo
 	, m_TrackPriority(TrackPriority)
 	, m_AC3CoreOnly(AC3CoreOnly)
 	, m_AlternativeDuration(AlternativeDuration)
+	, m_SubEmptyPin(SubEmptyPin)
 	, m_init(false)
 {
 	if (SUCCEEDED(hr)) {
@@ -210,28 +211,30 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	}
 #endif
 
-	// Add fake Subtitle stream ...
-	if (m_type == mpeg_ts) {
-		if (m_streams[video].GetCount()) {
-			if (!m_bIsHdmv && m_streams[subpic].GetCount()) {
+	if (m_SubEmptyPin) {
+		// Add fake Subtitle stream ...
+		if (m_type == mpeg_ts) {
+			if (m_streams[video].GetCount()) {
+				if (!m_bIsHdmv && m_streams[subpic].GetCount()) {
+					stream s;
+					s.pid = NO_SUBTITLE_PID;
+					s.mt.majortype	= m_streams[subpic].GetHead().mt.majortype;
+					s.mt.subtype	= m_streams[subpic].GetHead().mt.subtype;
+					s.mt.formattype	= m_streams[subpic].GetHead().mt.formattype;
+					m_streams[subpic].AddTail(s);
+				} else {
+					AddHdmvPGStream(NO_SUBTITLE_PID, "---");
+				}
+			}
+		} else {
+			if (m_streams[video].GetCount()) {
 				stream s;
 				s.pid = NO_SUBTITLE_PID;
-				s.mt.majortype	= m_streams[subpic].GetHead().mt.majortype;
-				s.mt.subtype	= m_streams[subpic].GetHead().mt.subtype;
-				s.mt.formattype	= m_streams[subpic].GetHead().mt.formattype;
+				s.mt.majortype	= m_streams[subpic].GetCount() ? m_streams[subpic].GetHead().mt.majortype	: MEDIATYPE_Video;
+				s.mt.subtype	= m_streams[subpic].GetCount() ? m_streams[subpic].GetHead().mt.subtype		: MEDIASUBTYPE_DVD_SUBPICTURE;
+				s.mt.formattype	= m_streams[subpic].GetCount() ? m_streams[subpic].GetHead().mt.formattype	: FORMAT_None;
 				m_streams[subpic].AddTail(s);
-			} else {
-				AddHdmvPGStream(NO_SUBTITLE_PID, "---");
 			}
-		}
-	} else {
-		if (m_streams[video].GetCount()) {
-			stream s;
-			s.pid = NO_SUBTITLE_PID;
-			s.mt.majortype	= m_streams[subpic].GetCount() ? m_streams[subpic].GetHead().mt.majortype	: MEDIATYPE_Video;
-			s.mt.subtype	= m_streams[subpic].GetCount() ? m_streams[subpic].GetHead().mt.subtype		: MEDIASUBTYPE_DVD_SUBPICTURE;
-			s.mt.formattype	= m_streams[subpic].GetCount() ? m_streams[subpic].GetHead().mt.formattype	: FORMAT_None;
-			m_streams[subpic].AddTail(s);
 		}
 	}
 
