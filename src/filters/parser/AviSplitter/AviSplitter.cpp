@@ -229,6 +229,10 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				case FCC('MPG2'):
 					mt.subtype = MEDIASUBTYPE_MPEG2_VIDEO;
 					break;
+				case FCC('MPEG'):
+					mt.subtype = MEDIASUBTYPE_MPEG1Payload;
+					break;
+
 				case FCC('DXSB'):
 				case FCC('DXSA'):
 					label = L"XSub";
