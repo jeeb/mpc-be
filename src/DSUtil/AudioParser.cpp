@@ -22,8 +22,8 @@
 
 #include "stdafx.h"
 #include "AudioParser.h"
-#include <MMReg.h>
 #include "GolombBuffer.h"
+#include <MMReg.h>
 
 #define AC3_CHANNEL                  0
 #define AC3_MONO                     1
@@ -39,7 +39,7 @@
 #define AC3_CHANNEL_MASK            15
 #define AC3_LFE                     16
 
-int GetAC3FrameSize(const BYTE *buf)
+int GetAC3FrameSize(const BYTE* buf)
 {
 	if (*(WORD*)buf != AC3_SYNC_WORD) { // syncword
 		return 0;
@@ -91,7 +91,7 @@ int GetEAC3FrameSize(const BYTE* buf)
 	return frame_size;
 }
 
-int GetMLPFrameSize(const BYTE *buf)
+int GetMLPFrameSize(const BYTE* buf)
 {
 	DWORD sync = *(DWORD*)(buf+4);
 	if (sync == TRUEHD_SYNC_WORD || sync == MLP_SYNC_WORD) {
@@ -100,7 +100,24 @@ int GetMLPFrameSize(const BYTE *buf)
 	return 0;
 }
 
-int GetADTSFrameSize(const BYTE *buf, int *headersize)
+int GetDTSHDFrameSize(const BYTE* buf)
+{
+    if (*(DWORD*)buf != DTSHD_SYNC_WORD) { // syncword
+        return 0;
+    }
+
+    int frame_size;
+    BYTE isBlownUpHeader = (buf[5] >> 5) & 1;
+    if (isBlownUpHeader) {
+        frame_size = ((buf[6] & 1) << 19 | buf[7] << 11 | buf[8] << 3 | buf[9] >> 5) + 1;
+    } else {
+        frame_size = ((buf[6] & 31) << 11 | buf[7] << 3 | buf[8] >> 5) + 1;
+    }
+
+    return frame_size;
+}
+
+int GetADTSFrameSize(const BYTE* buf, int* headersize)
 {
 	if ((*(WORD*)buf & 0x0fff) != 0x0fff) { // syncword
 		return 0;
@@ -118,7 +135,7 @@ int GetADTSFrameSize(const BYTE *buf, int *headersize)
 
 // Dolby Digital
 
-int ParseAC3Header(const BYTE *buf, int *samplerate, int *channels, int *framelength, int *bitrate)
+int ParseAC3Header(const BYTE* buf, int* samplerate, int* channels, int* framelength, int* bitrate)
 {
 	if (*(WORD*)buf != AC3_SYNC_WORD) { // syncword
 		return 0;
@@ -192,7 +209,7 @@ int ParseAC3Header(const BYTE *buf, int *samplerate, int *channels, int *framele
 	return frame_size;
 }
 
-int ParseEAC3Header(const BYTE *buf, int *samplerate, int *channels, int *framelength, int *frametype)
+int ParseEAC3Header(const BYTE* buf, int* samplerate, int* channels, int* framelength, int* frametype)
 {
 	if (*(WORD*)buf != AC3_SYNC_WORD) { // syncword
 		return 0;
@@ -231,7 +248,7 @@ int ParseEAC3Header(const BYTE *buf, int *samplerate, int *channels, int *framel
 	return frame_size;
 }
 
-int ParseMLPHeader(const BYTE *buf, int *samplerate, int *channels, int *framelength, WORD *bitdepth, bool *isTrueHD)
+int ParseMLPHeader(const BYTE* buf, int* samplerate, int* channels, int* framelength, WORD* bitdepth, bool* isTrueHD)
 {
 	static const int sampling_rates[]           = { 48000, 96000, 192000, 0, 0, 0, 0, 0, 44100, 88200, 176400, 0, 0, 0, 0, 0 };
 	static const unsigned char mlp_quants[16]   = { 16, 20, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -409,7 +426,7 @@ int ParseDTSHeader(const BYTE* buf, int* samplerate, int* channels, int* framele
 
 // HDMV LPCM
 
-int ParseHdmvLPCMHeader(const BYTE *buf, int *samplerate, int *channels)
+int ParseHdmvLPCMHeader(const BYTE* buf, int* samplerate, int* channels)
 {
 	*samplerate = 0;
 	*channels   = 0;
@@ -535,9 +552,9 @@ bool StreamMuxConfig(CGolombBuffer gb, int* samplingFrequency, int* channelConfi
 	return true;
 }
 
-bool ParseAACLatmHeader(const BYTE *buf, int len, int *samplerate, int *channels, BYTE *extra, unsigned int* extralen)
+bool ParseAACLatmHeader(const BYTE* buf, int len, int* samplerate, int* channels, BYTE* extra, unsigned int* extralen)
 {
-	CGolombBuffer gb((BYTE* )buf, len);
+	CGolombBuffer gb((BYTE*)buf, len);
 
 	if (gb.BitRead(11) != 0x2b7) {
 		return false;
