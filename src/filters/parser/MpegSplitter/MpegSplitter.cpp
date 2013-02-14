@@ -1658,6 +1658,7 @@ STDMETHODIMP CMpegSplitterFilter::Apply()
 		key.SetStringValue(_T("SubtitlesLanguageOrder"), m_csSubtitlesLanguageOrder);
 		key.SetDWORDValue(_T("AC3CoreOnly"), m_AC3CoreOnly);
 		key.SetDWORDValue(_T("AlternativeDuration"), m_AlternativeDuration);
+		key.SetDWORDValue(_T("SubtitleEmptyOutput"), m_SubEmptyPin);
 	}
 #else
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("UseFastStreamChange"), m_useFastStreamChange);
@@ -1666,6 +1667,7 @@ STDMETHODIMP CMpegSplitterFilter::Apply()
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("TrackPriority"), m_TrackPriority);
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("AC3CoreOnly"), m_AC3CoreOnly);
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("AlternativeDuration"), m_AlternativeDuration);
+	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("SubtitleEmptyOutput"), m_SubEmptyPin);
 #endif
 
 	return S_OK;
