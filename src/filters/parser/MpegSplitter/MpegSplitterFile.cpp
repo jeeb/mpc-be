@@ -154,9 +154,9 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		const int k = 5;
 		for (int i = 0; i <= k; i++) {
 			__int64 fp = i * GetLength() / k;
-			fp = min(GetLength() - MEGABYTE/8, fp);
+			fp = min(GetLength() - MEGABYTE/2, fp);
 			fp = max(pfp, fp);
-			__int64 nfp = fp + (pfp == 0 ? 20*MEGABYTE : MEGABYTE/8);
+			__int64 nfp = fp + (pfp == 0 ? 20*MEGABYTE : MEGABYTE/2);
 			if (FAILED(hr = SearchStreams(fp, nfp, pAsyncReader))) {
 				return hr;
 			}
