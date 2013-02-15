@@ -218,15 +218,17 @@ WavPack_parser* wavpack_parser_new(stream_reader* io, int is_correction)
             // Assume first block is the biggest ???
             wpp->samples_per_block = wpp->block_samples_per_block;
 
+            // ==> Start patch MPC
             // Make sure we have the total number of samples
-            if(wpp->first_wphdr.total_samples == (uint32_t)-1)
+            // if(wpp->first_wphdr.total_samples == (uint32_t)-1)
+            // ==> End patch MPC
             {
                 // Seek at the end of the file to guess total_samples
                 uint32_t curr_pos = wpp->io->get_pos(wpp->io);
                 uint32_t final_index = seek_final_index (wpp->io, wpp->io);
-                if (final_index != (uint32_t) -1)
+                if (final_index != (uint32_t)-1)
                 {
-                    wpp->first_wphdr.total_samples = final_index - wpp->first_wphdr.block_index;
+                    wpp->first_wphdr.total_samples = final_index;// - wpp->first_wphdr.block_index;
                 }                
                 // restaure position
                 wpp->io->set_pos_abs(wpp->io, curr_pos);
