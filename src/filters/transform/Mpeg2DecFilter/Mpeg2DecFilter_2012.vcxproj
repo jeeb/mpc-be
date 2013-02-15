@@ -224,13 +224,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\ExtLib\mfc\afxctrlcontainer.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release' or '$(PlatformToolsetVersion)'=='110'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\ExtLib\mfc\afxglobals.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release' or '$(PlatformToolsetVersion)'=='110'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\ExtLib\mfc\winmdi.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release' or '$(PlatformToolsetVersion)'=='110'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="idct_sse2.cpp" />
     <ClCompile Include="libmpeg2.cpp" />

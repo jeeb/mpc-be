@@ -157,7 +157,6 @@ typedef int64_t score_t;     // type used for scores, rate, distortion
 static WEBP_INLINE int QUANTDIV(int n, int iQ, int B) {
   return (n * iQ + B) >> QFIX;
 }
-extern const uint8_t VP8Zigzag[16];
 
 // size of histogram used by CollectHistogram.
 #define MAX_COEFF_THRESH   31
@@ -390,6 +389,7 @@ struct VP8Encoder {
   VP8SegmentInfo dqm_[NUM_MB_SEGMENTS];
   int base_quant_;                 // nominal quantizer value. Only used
                                    // for relative coding of segments' quant.
+  int alpha_;                      // global susceptibility (<=> complexity)
   int uv_alpha_;                   // U/V quantization susceptibility
   // global offset of quantizers, shared by all segments
   int dq_y1_dc_;
