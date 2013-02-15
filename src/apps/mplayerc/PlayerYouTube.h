@@ -25,14 +25,8 @@
 #define YOUTUBE_URL		_T("youtube.com/watch?")
 #define YOUTU_BE_URL	_T("youtu.be/")
 
-#define GET_VIDEO_URL	_T("http://www.youtube.com/get_video_info?video_id=%s")
-
-#define MATCH_START		"url_encoded_fmt_stream_map="
-#define MATCH_END		"\\u0026amp"
-
-#define	MATCH_TITLE		_T("&title=")
-#define	MATCH_AUTHOR	_T("&author=")
-#define MATCH_URL		_T("url=http://")
+#define MATCH_START		"\"url_encoded_fmt_stream_map\": \""
+#define MATCH_END		"\""
 
 typedef struct {
 	const int		iTag;

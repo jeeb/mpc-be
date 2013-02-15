@@ -36,26 +36,23 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 	CString tmp_fn(CString(fn).MakeLower());
 
 	if (tmp_fn.Find(YOUTUBE_URL) != -1 || tmp_fn.Find(YOUTU_BE_URL) != -1) {
-		CString vidId;
-		if (tmp_fn.Find(YOUTUBE_URL) >= 0) {
-			int v	= fn.Find(_T("?v=")) + 3;
-			int end	= fn.Find(_T("&"), v);
-			if (end == -1) {
-				end = fn.GetLength();
-			}
-			vidId = fn.Mid(v, end - v);
-		} else {
-			int v = fn.ReverseFind('/') + 1;
-			vidId = fn.Mid(v, fn.GetLength() - v);
-		}
 
-		CString newUrl;
-		newUrl.Format(GET_VIDEO_URL, vidId);
-
+#ifdef _DEBUG
+		LOG2FILE(_T("------"));
+		LOG2FILE(_T("Youtube parser"));
+#endif
 		char* final	= NULL;
+
+		CString str;
+		CString Title, Author;
+
+		int match_start	= 0;
+		int match_len	= 0;
+
+		final = NULL;
 		HINTERNET f, s = InternetOpen(L"MPC-BE Youtube Downloader", 0, NULL, NULL, 0);
 		if (s) {
-			f = InternetOpenUrl(s, newUrl, NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
+			f = InternetOpenUrl(s, fn, NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 			if (f) {
 				char *out			= NULL;
 				DWORD dwBytesRead	= 0;
@@ -74,6 +71,18 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 					out = tempData;
 					dataSize += dwBytesRead;
 
+					// optimization - to not download the entire page
+					if (!match_start) {
+						match_start	= strpos(out, MATCH_START);
+					} else {
+						match_len	= strpos(out + match_start + strlen(MATCH_START), MATCH_END);
+					};
+
+					if (match_start && match_len) {
+						match_start += strlen(MATCH_START);
+						match_len	-= strlen(MATCH_START);
+						break;
+					}
 				} while (dwBytesRead);
 
 				final = DNew char[dataSize + 1];
@@ -96,187 +105,82 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 			return fn;
 		}
 
-		CString str = UTF8To16(UrlDecode(UrlDecode(CStringA(final))));
-		delete [] final;
-
-#ifdef _DEBUG
-		LOG2FILE(_T("------"));
-		LOG2FILE(_T("Youtube parser"));
-#endif
-
-		CString Title, Author;
-
-		if (str.Find(_T(MATCH_START)) == -1) {
-			// open original html page
-			int match_start	= 0;
-			int match_len	= 0;
-
-			final = NULL;
-			HINTERNET f, s = InternetOpen(L"MPC-BE Youtube Downloader", 0, NULL, NULL, 0);
-			if (s) {
-				f = InternetOpenUrl(s, fn, NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
-				if (f) {
-					char *out			= NULL;
-					DWORD dwBytesRead	= 0;
-					DWORD dataSize		= 0;
-
-					do {
-						char buffer[4096];
-						if (InternetReadFile(f, (LPVOID)buffer, _countof(buffer), &dwBytesRead) == FALSE) {
-							break;
-						}
-
-						char *tempData = DNew char[dataSize + dwBytesRead];
-						memcpy(tempData, out, dataSize);
-						memcpy(tempData + dataSize, buffer, dwBytesRead);
-						delete[] out;
-						out = tempData;
-						dataSize += dwBytesRead;
-
-						// optimization - to not download the entire page
-						if (!match_start) {
-							match_start	= strpos(out, MATCH_START);
-						} else {
-							match_len	= strpos(out + match_start, MATCH_END);
-						};
-
-						if (match_start && match_len) {
-							match_start += strlen(MATCH_START);
-							match_len	-= strlen(MATCH_START);
-							break;
-						}
-					} while (dwBytesRead);
-
-					final = DNew char[dataSize + 1];
-					memset(final, 0, dataSize + 1);
-					memcpy(final, out, dataSize);
-					delete [] out;
-
-					InternetCloseHandle(f);
-				}
-				InternetCloseHandle(s);
-
-				if (!f) {
-					return fn;
-				}
-			} else {
-				return fn;
+		if (!match_start || !match_len) {
+			if (strpos(final, "http://www.youtube.com")) {
+				// This is looks like Youtube page, but this page doesn't contains necessary information about video, so may be you have to register on google.com to view it.
+				fn.Empty();
 			}
-
-			if (!final) {
-				return fn;
-			}
-
-			if (!match_start || !match_len) {
-				if (strpos(final, "http://www.youtube.com")) {
-					// This is looks like Youtube page, but this page doesn't contains necessary information about video, so may be you have to register on google.com to view it.
-					fn.Empty();
-				}
-				delete[] final;
-				return fn;
-			}
-
-			int t_start = strpos(final, "<title>");
-			if (t_start > 0) {
-				t_start += 7;
-				int t_stop = strpos(final + t_start, "</title>");
-				if (t_stop > 0) {
-					char* title = DNew char[t_stop + 1];
-					memset(title, 0, t_stop + 1);
-					memcpy(title, final + t_start, t_stop);
-
-					Title = UTF8To16(title);
-					Title = Title.TrimLeft(_T(".")).TrimRight(_T("."));
-
-					Title.Replace(_T(" - YouTube"), _T(""));
-					Title.Replace(_T(":"), _T(" -"));
-					Title.Replace(_T("|"), _T("-"));
-					Title.Replace(_T("—"), _T("-"));
-					Title.Replace(_T("--"), _T("-"));
-					Title.Replace(_T("  "), _T(" "));
-
-					Title.Replace(_T("&quot;"), _T("\""));
-					Title.Replace(_T("&amp;"), _T("&"));
-					Title.Replace(_T("&#39;"), _T("\""));
-
-					delete [] title;
-				}
-			}
-
-			char *tmp = DNew char[match_len + 1];
-			memset(tmp, 0, match_len + 1);
-			memcpy(tmp, final + match_start, match_len);
-
-			str = UTF8To16(UrlDecode(UrlDecode(CStringA(tmp))));
-			delete [] tmp;
-
-#ifdef _DEBUG
-			LOG2FILE(_T("Source = \'%s\'"), str);
-#endif
-		} else {
-
-			// get name(title) for output filename
-			int tpos = CString(str).MakeLower().Find(MATCH_TITLE);
-			if (tpos >= 0) {
-				tpos += CString(MATCH_TITLE).GetLength();
-				int tposend = str.Find(_T("&"), tpos);
-				if (tposend == -1) {
-					tposend = str.GetLength();
-				}
-				Title = str.Mid(tpos, tposend - tpos);
-
-				Title.Replace(_T("+"), _T(" "));
-			}
-
-			// get Author of clip
-			int apos = CString(str).MakeLower().Find(MATCH_AUTHOR);
-			if (apos >= 0) {
-				apos += CString(MATCH_AUTHOR).GetLength();
-				int aposend = str.Find(_T("&"), apos);
-				if (aposend == -1) {
-					aposend = str.GetLength();
-				}
-				Author = str.Mid(apos, aposend - apos);
-
-				Author.Replace(_T("+"), _T(" "));
-			}
-
-#ifdef _DEBUG
-			LOG2FILE(_T("Source = \'%s\'"), str);
-#endif
-
-			str.Delete(0, str.Find(_T(MATCH_START)) + CString(_T(MATCH_START)).GetLength());
+			delete[] final;
+			return fn;
 		}
+
+		int t_start = strpos(final, "<title>");
+		if (t_start > 0) {
+			t_start += 7;
+			int t_stop = strpos(final + t_start, "</title>");
+			if (t_stop > 0) {
+				char* title = DNew char[t_stop + 1];
+				memset(title, 0, t_stop + 1);
+				memcpy(title, final + t_start, t_stop);
+
+				Title = UTF8To16(title);
+				Title = Title.TrimLeft(_T(".")).TrimRight(_T("."));
+
+				Title.Replace(_T(" - YouTube"), _T(""));
+				Title.Replace(_T(":"), _T(" -"));
+				Title.Replace(_T("|"), _T("-"));
+				Title.Replace(_T("—"), _T("-"));
+				Title.Replace(_T("--"), _T("-"));
+				Title.Replace(_T("  "), _T(" "));
+
+				Title.Replace(_T("&quot;"), _T("\""));
+				Title.Replace(_T("&amp;"), _T("&"));
+				Title.Replace(_T("&#39;"), _T("\""));
+
+				delete [] title;
+			}
+		}
+
+		char *tmp = DNew char[match_len + 1];
+		memset(tmp, 0, match_len + 1);
+		memcpy(tmp, final + match_start, match_len);
+
+		// because separator is a ',', then replace it with '~' to avoid matches
+		for (size_t i = 0; i < strlen(tmp); i++) {
+			if (tmp[i] == ',') {
+				tmp[i] = '~';
+			}
+		}
+		str = UTF8To16(UrlDecode(UrlDecode(CStringA(tmp))));
+		delete [] tmp;
+
+		// Character Representation
+		str.Replace(_T("\\u0022"), _T("\""));
+		str.Replace(_T("\\u0026"), _T("&"));
+		str.Replace(_T("\\u0027"), _T("'"));
+		str.Replace(_T("\\u003c"), _T("<"));
+		str.Replace(_T("\\u003e"), _T(">"));
+
+#ifdef _DEBUG
+		LOG2FILE(_T("Source = \'%s\'"), str);
+#endif
 
 		if (Title.IsEmpty()) {
 			Title = _T("video");
 		}
 
-#ifdef _DEBUG
-		LOG2FILE(_T("	==> \'%s\'"), str);
-#endif
-
 		CAtlList<CString> sl;
-		CString tmp;
-		for (int i = 0; i < str.GetLength(); i++) {
-			if ((i+1 < str.GetLength()) && str[i] == ',' && str[i+1] != '+') {
-				if (tmp.Find(MATCH_URL) >= 0) {
-					sl.AddTail(tmp);
+		Explode(str, sl, '~');
+
 #ifdef _DEBUG
-					LOG2FILE(_T("		=== >\'%s\'"), tmp);
-#endif
-				}
-				tmp.Empty();
-			} else {
-				tmp += str[i];
+		{
+			LOG2FILE(_T("	==> \'%s\'"), str);
+			POSITION pos = sl.GetHeadPosition();
+			while (pos) {
+				LOG2FILE(_T("		=== >\'%s\'"), sl.GetNext(pos));
 			}
 		}
-		if (!tmp.IsEmpty() && tmp.Find(MATCH_URL) >= 0) {
-			sl.AddTail(tmp);
-#ifdef _DEBUG
-			LOG2FILE(_T("		=== >\'%s\'"), tmp);
 #endif
-		}
 
 		CString tag; tag.Format(_T("itag=%d"), AfxGetAppSettings().iYoutubeTag);
 		boolean match_itag = AfxGetAppSettings().iYoutubeTag != 0;
@@ -286,7 +190,7 @@ again:
 		POSITION pos = sl.GetHeadPosition();
 		while (pos) {
 			str = sl.GetNext(pos);
-			str.Trim(_T("&,="));
+			//str.Trim(_T("&,="));
 
 			if (match_itag && (str.Find(tag) == -1)) {
 				continue;
@@ -301,9 +205,10 @@ again:
 				// extract fields/params from url
 				CString templateStr = str;
 				CAtlList<CString> sl2;
+
 				CString tmp;
 				for (int i = 0; i < templateStr.GetLength(); i++) {
-					if (templateStr[i] == '&' || templateStr[i] == '?' || ((i+1 < templateStr.GetLength()) && templateStr[i] == ',' && templateStr[i+1] != '+')) {
+					if (templateStr[i] == '&' || templateStr[i] == '?') {
 						sl2.AddTail(tmp);
 						tmp.Empty();
 					} else {
@@ -316,7 +221,7 @@ again:
 
 				POSITION pos = sl2.GetHeadPosition();
 				while (pos) {
-					tmp = sl2.GetNext(pos);
+					CString tmp = sl2.GetNext(pos);
 					int sepPos = tmp.Find('=');
 					if (sepPos <= 0 || sepPos == tmp.GetLength()-1) {
 						continue;
@@ -364,9 +269,8 @@ again:
 			CString url = UrlFields[_T("url")] + _T("?");
 
 			CString sparams = UrlFields[_T("sparams")];
-			sparams.Replace(_T("%2C"), _T(";"));
 			CAtlList<CString> slparams;
-			Explode(sparams, slparams, ';');
+			Explode(sparams, slparams, ',');
 			{
 				slparams.AddTail(_T("sparams"));
 				slparams.AddTail(_T("mt"));
