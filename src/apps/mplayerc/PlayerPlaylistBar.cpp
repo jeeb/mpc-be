@@ -556,7 +556,7 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 				pli->m_label = str.Trim();
 			}
 		} else {
-			pli->m_fns.AddTail(str);
+			pli->m_fns.AddTail(CombinePath(base, str));
 			m_pl.AddTail(*pli);
 
 			delete pli;
