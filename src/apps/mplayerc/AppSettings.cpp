@@ -1306,7 +1306,7 @@ void CAppSettings::LoadSettings()
 	iThumbCols		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_THUMBCOLS, 4);
 	iThumbWidth		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_THUMBWIDTH, 1024);
 	iThumbQuality	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_THUMBQUALITY, 85);
-	iThumbLevelPNG	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_THUMBLEVELPNG, 9);
+	iThumbLevelPNG	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_THUMBLEVELPNG, 7);
 
 	strISDb = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_ISDB, _T("www.opensubtitles.org/isdb"));
 
