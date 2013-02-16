@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.6.0 [February 14, 2013]
+ * Last changed in libpng 1.7.0 [(PENDING RELEASE)]
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -17,8 +17,6 @@
 #include "pngpriv.h"
 
 #ifdef PNG_READ_SUPPORTED
-
-#define png_strtod(p,a,b) strtod(a,b)
 
 png_uint_32 PNGAPI
 png_get_uint_31(png_const_structrp png_ptr, png_const_bytep buf)
@@ -562,7 +560,7 @@ png_decompress_chunk(png_structrp png_ptr,
     */
    png_alloc_size_t limit = PNG_SIZE_MAX;
 
-#  ifdef PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED
+#  ifdef PNG_SET_USER_LIMITS_SUPPOPRTED
       if (png_ptr->user_chunk_malloc_max > 0 &&
          png_ptr->user_chunk_malloc_max < limit)
          limit = png_ptr->user_chunk_malloc_max;
@@ -1582,7 +1580,8 @@ png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
       if (--png_ptr->user_chunk_cache_max == 1)
       {
-         png_warning(png_ptr, "No space in chunk cache for sPLT");
+         /* Warn the first time */
+         png_chunk_benign_error(png_ptr, "chunk cache full");
          png_crc_finish(png_ptr, length);
          return;
       }
@@ -1659,8 +1658,8 @@ png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
    if (dl > max_dl)
    {
-       png_warning(png_ptr, "sPLT chunk too long");
-       return;
+      png_warning(png_ptr, "sPLT chunk too long");
+      return;
    }
 
    new_palette.nentries = (png_int_32)(data_length / entry_size);
@@ -1670,8 +1669,8 @@ png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
    if (new_palette.entries == NULL)
    {
-       png_warning(png_ptr, "sPLT chunk requires too much memory");
-       return;
+      png_warning(png_ptr, "sPLT chunk requires too much memory");
+      return;
    }
 
 #ifdef PNG_POINTER_INDEXING_SUPPORTED
@@ -1832,6 +1831,8 @@ png_handle_tRNS(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
     */
    png_set_tRNS(png_ptr, info_ptr, readbuf, png_ptr->num_trans,
        &(png_ptr->trans_color));
+
+   png_ptr->trans_alpha = info_ptr->trans_alpha;
 }
 #endif
 
@@ -2370,7 +2371,7 @@ png_handle_tEXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       if (--png_ptr->user_chunk_cache_max == 1)
       {
          png_crc_finish(png_ptr, length);
-         png_chunk_benign_error(png_ptr, "no space in chunk cache");
+         png_chunk_benign_error(png_ptr, "chunk cache full");
          return;
       }
    }
@@ -2449,7 +2450,7 @@ png_handle_zTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       if (--png_ptr->user_chunk_cache_max == 1)
       {
          png_crc_finish(png_ptr, length);
-         png_chunk_benign_error(png_ptr, "no space in chunk cache");
+         png_chunk_benign_error(png_ptr, "chunk cache full");
          return;
       }
    }
@@ -2558,7 +2559,7 @@ png_handle_iTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       if (--png_ptr->user_chunk_cache_max == 1)
       {
          png_crc_finish(png_ptr, length);
-         png_chunk_benign_error(png_ptr, "no space in chunk cache");
+         png_chunk_benign_error(png_ptr, "chunk cache full");
          return;
       }
    }
@@ -2698,7 +2699,7 @@ png_cache_unknown_chunk(png_structrp png_ptr, png_uint_32 length)
       png_ptr->unknown_chunk.data = NULL;
    }
 
-#  ifdef PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED
+#  ifdef PNG_SET_USER_LIMITS_SUPPOPRTED
       if (png_ptr->user_chunk_malloc_max > 0 &&
          png_ptr->user_chunk_malloc_max < limit)
          limit = png_ptr->user_chunk_malloc_max;
@@ -2893,7 +2894,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
          {
             case 2:
                png_ptr->user_chunk_cache_max = 1;
-               png_chunk_benign_error(png_ptr, "no space in chunk cache");
+               png_chunk_benign_error(png_ptr, "chunk cache full");
                /* FALL THROUGH */
             case 1:
                /* NOTE: prior to 1.6.0 this case resulted in an unknown critical
@@ -3870,7 +3871,7 @@ png_init_filter_functions(png_structrp pp)
     * the filter is the first transformation performed on the row data.  It is
     * performed in place, therefore an implementation can be selected based on
     * the image pixel format.  If the implementation depends on image width then
-    * take care to ensure that it works corretly if the image is interlaced -
+    * take care to ensure that it works correctly if the image is interlaced -
     * interlacing causes the actual row width to vary.
     */
 {
@@ -4370,7 +4371,7 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
       png_error(png_ptr, "This image requires a row greater than 64KB");
 #endif
 
-   if (row_bytes + 48 > png_ptr->old_big_row_buf_size)
+   if (row_bytes + 48 > png_ptr->big_row_buf_size)
    {
      png_free(png_ptr, png_ptr->big_row_buf);
      png_free(png_ptr, png_ptr->big_prev_row);
@@ -4407,7 +4408,7 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
      png_ptr->row_buf = png_ptr->big_row_buf + 31;
      png_ptr->prev_row = png_ptr->big_prev_row + 31;
 #endif
-     png_ptr->old_big_row_buf_size = row_bytes + 48;
+     png_ptr->big_row_buf_size = row_bytes + 48;
    }
 
 #ifdef PNG_MAX_MALLOC_64K
