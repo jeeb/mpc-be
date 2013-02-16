@@ -975,21 +975,13 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							|| type == AP4_ATOM_TYPE_XDV9) {
 							FormatTrackName(_T("HDV/XDV MPEG2"), 0);
 
-							BYTE* seqhdr	= (BYTE*)db.GetData();
-							DWORD len		= db.GetDataSize();
-							int w			= vse->GetWidth();
-							int h			= vse->GetHeight();
-
-							if (MakeMPEG2MediaType(mt, seqhdr, len, w, h)) {
-								VIDEOINFOHEADER* vih((VIDEOINFOHEADER*)mt.Format());
-								vih->rcSource = vih->rcTarget = CRect(0, 0, w, h);
-								if (!vih->AvgTimePerFrame && item->GetData()->GetSampleCount()) {
-									vih->AvgTimePerFrame = item->GetData()->GetDurationMs()*10000 / (item->GetData()->GetSampleCount());
-								}
-
-								mts.Add(mt);
-								//b_HasVideo = true;
+							m_pFile->Seek(sample.GetOffset());
+							CBaseSplitterFileEx::seqhdr h;
+							CMediaType mt2;
+							if (m_pFile->Read(h, sample.GetSize(), &mt2)) {
+								mt = mt2;
 							}
+							mts.Add(mt);
 
 							break;
 						} else if (type == AP4_ATOM_TYPE_MJPA || type == AP4_ATOM_TYPE_MJPB || type == AP4_ATOM_TYPE_MJPG) {
