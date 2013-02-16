@@ -304,6 +304,22 @@ size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
                 MI->Config.File_Buffer=new int8u[MI->Config.File_Buffer_Size_Max];
             }
 
+            //Testing multiple file per stream
+            if (F.Position_Get()>=F.Size_Get())
+            {
+                if (MI->Config.File_Names_Pos<MI->Config.File_Names.size())
+                {
+                    MI->Config.File_Current_Offset+=F.Size_Get();
+                    F.Close();
+                    #if MEDIAINFO_EVENTS
+                        MI->Config.Event_SubFile_Start(MI->Config.File_Names[MI->Config.File_Names_Pos]);
+                    #endif //MEDIAINFO_EVENTS
+                    F.Open(MI->Config.File_Names[MI->Config.File_Names_Pos]);
+                    MI->Config.File_Names_Pos++;
+                    MI->Config.File_Current_Size+=F.Size_Get();
+                }
+            }
+
             MI->Config.File_Buffer_Size=F.Read(MI->Config.File_Buffer, (F.Position_Get()+MI->Config.File_Buffer_Size_ToRead<(Partial_End<=MI->Config.File_Size?Partial_End:MI->Config.File_Size))?MI->Config.File_Buffer_Size_ToRead:((size_t)((Partial_End<=MI->Config.File_Size?Partial_End:MI->Config.File_Size)-F.Position_Get())));
 
             //Testing growing files
@@ -316,7 +332,7 @@ size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
                     if (MI->Config.File_Size!=Growing_Temp)
                         MI->Config.File_IsGrowing=true;
                 }
-                else
+                else if (MI->Config.File_TestContinuousFileNames_Get())
                 {
                     Growing_Temp=MI->Config.File_Names.size();
                     MI->TestContinuousFileNames();
@@ -372,35 +388,6 @@ size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
 
             //Parser
             Status=MI->Open_Buffer_Continue(MI->Config.File_Buffer, MI->Config.File_Buffer_Size);
-
-            //Testing multiple file per stream
-            if (F.Position_Get()>=F.Size_Get())
-            {
-                if (MI->Config.File_Names_Pos<MI->Config.File_Names.size())
-                {
-                    MI->Config.File_Current_Offset+=F.Size_Get();
-                    F.Close();
-                    #if MEDIAINFO_EVENTS
-                        Ztring Root=MI->Config.File_Names_RootDirectory+PathSeparator;
-                        Ztring FileName_Relative_Unicode=MI->Config.File_Names[MI->Config.File_Names_Pos];
-                        if (MI->Config.File_Names[MI->Config.File_Names_Pos].find(Root)==0)
-                            FileName_Relative_Unicode.erase(0, Root.size());
-                        {
-                            struct MediaInfo_Event_General_SubFile_Start_0 Event;
-                            MI->Event_Prepare((struct MediaInfo_Event_Generic*)&Event);
-                            Event.EventCode=MediaInfo_EventCode_Create(0, MediaInfo_Event_General_SubFile_Start, 0);
-                            Event.EventSize=sizeof(struct MediaInfo_Event_General_SubFile_Start_0);
-
-                            Event.FileName_Relative_Unicode=FileName_Relative_Unicode.c_str();
-
-                            MI->Config.Event_Send(NULL, (const int8u*)&Event, Event.EventSize, MI->Config.File_Names[0]);
-                        }
-                    #endif //MEDIAINFO_EVENTS
-                    F.Open(MI->Config.File_Names[MI->Config.File_Names_Pos]);
-                    MI->Config.File_Names_Pos++;
-                    MI->Config.File_Current_Size+=F.Size_Get();
-                }
-            }
 
             if (MI->Config.File_Buffer_Size==0)
             {

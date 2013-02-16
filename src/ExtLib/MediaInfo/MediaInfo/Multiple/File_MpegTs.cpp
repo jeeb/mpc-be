@@ -525,7 +525,7 @@ void File_MpegTs::Streams_Update_Programs_PerStream(size_t StreamID)
         }
 
         //By the descriptors
-        if (StreamKind_Last==Stream_Max && Complete_Stream->transport_stream_id_IsValid && !Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs.empty())
+        if (StreamKind_Last==Stream_Max && Complete_Stream->transport_stream_id_IsValid && !Temp->program_numbers.empty() && !Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs.empty())
         {
             int32u format_identifier=Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[Temp->program_numbers[0]].registration_format_identifier;
             if (Temp->IsRegistered
@@ -1173,9 +1173,6 @@ bool File_MpegTs::Synched_Test()
         pid=(Buffer[Buffer_Offset+BDAV_Size+1]&0x1F)<<8
           |  Buffer[Buffer_Offset+BDAV_Size+2];
 
-        if (pid==241)
-            int A=0;    
-            
         complete_stream::stream* Stream=Complete_Stream->Streams[pid];
         if (Stream->Searching)
         {
@@ -2790,7 +2787,7 @@ void File_MpegTs::PSI()
 //    if (pid!=0 && pid!=0x101/*0x2f0*/)
     {
   //      Element_DoNotShow();
-    //    return;    
+    //    return;
     }
 
     //Initializing

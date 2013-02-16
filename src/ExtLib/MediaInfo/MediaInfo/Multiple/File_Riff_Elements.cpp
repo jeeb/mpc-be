@@ -702,7 +702,7 @@ void File_Riff::AIFF_COMM()
         BlockAlign=numChannels*sampleSize/8;
         AvgBytesPerSec=(int32u)float64_int64s(BlockAlign*sampleRate);
     #endif //MEDIAINFO_DEMUX
-        
+
     Element_Code=(int64u)-1;
     for (size_t Pos=0; Pos<Stream[Stream_ID].Parsers.size(); Pos++)
         Open_Buffer_Init(Stream[Stream_ID].Parsers[Pos]);
@@ -2034,10 +2034,12 @@ void File_Riff::AVI__idx1()
         int32u StreamID=BigEndian2int32u   (Buffer+Buffer_Offset+(size_t)Element_Offset   )&0xFFFF0000;
         int32u Offset  =LittleEndian2int32u(Buffer+Buffer_Offset+(size_t)Element_Offset+ 8);
         int32u Size    =LittleEndian2int32u(Buffer+Buffer_Offset+(size_t)Element_Offset+12);
-        Stream[StreamID].StreamSize+=Size;
-        Stream[StreamID].PacketCount++;
-        Stream_Structure[Idx1_Offset+Offset].Name=StreamID;
-        Stream_Structure[Idx1_Offset+Offset].Size=Size;
+        stream& Stream_Item=Stream[StreamID];
+        Stream_Item.StreamSize+=Size;
+        Stream_Item.PacketCount++;
+        stream_structure& Stream_Structure_Item=Stream_Structure[Idx1_Offset+Offset];
+        Stream_Structure_Item.Name=StreamID;
+        Stream_Structure_Item.Size=Size;
         Element_Offset+=16;
     }
 
