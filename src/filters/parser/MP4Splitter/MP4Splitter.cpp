@@ -1514,14 +1514,18 @@ void CMP4SplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		if (AP4_StssAtom* stss = dynamic_cast<AP4_StssAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stss"))) {
 			if (stss->m_Entries.ItemCount() > 0) {
 				AP4_Cardinal i = 1;
+				bool bFoundKeyFrame = false;
 				while (i < stss->m_Entries.ItemCount()) {
 					if (stss->m_Entries[i] - 1 > pPair->m_value.index) {
+						bFoundKeyFrame = true;
 						break;
 					}
 					++i;
 				}
 				//ASSERT(pPair->m_value.index == stss->m_Entries[i-1] - 1); // fast seek test
-				pPair->m_value.index = stss->m_Entries[i-1] - 1;
+				if (bFoundKeyFrame) {
+					pPair->m_value.index = stss->m_Entries[i-1] - 1;
+				}
 			}
 		}
 	}
