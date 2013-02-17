@@ -56,7 +56,6 @@ endif
 OBJ_DIRS = $(OBJ_DIR) \
     $(OBJ_DIR)libavcodec \
     $(OBJ_DIR)libavcodec/x86 \
-    $(OBJ_DIR)libavformat \
     $(OBJ_DIR)libavresample \
     $(OBJ_DIR)libavresample/x86 \
     $(OBJ_DIR)libavutil \
@@ -359,9 +358,6 @@ SRCS_C = \
     libavcodec/x86/vp56dsp_init.c \
     libavcodec/x86/vp8dsp_init.c \
 \
-    libavformat/spdif.c \
-    libavformat/spdifenc.c \
-\
     libavresample/audio_convert.c \
     libavresample/audio_data.c \
     libavresample/audio_mix.c \
@@ -402,7 +398,6 @@ SRCS_C = \
     libavutil/rational.c \
     libavutil/samplefmt.c \
     libavutil/sha.c \
-    libavutil/time.c \
     libavutil/timecode.c \
     libavutil/utils.c \
     libavutil/x86/cpu.c \
