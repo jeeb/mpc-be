@@ -4,26 +4,29 @@
     <Filter Include="libavcodec">
       <UniqueIdentifier>{c2fed7ea-5dd1-4366-b969-e4408a26e1a1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="libavutil">
-      <UniqueIdentifier>{38a96b13-792e-4258-997a-6408508cbb4f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="libswscale">
-      <UniqueIdentifier>{d1738ff1-c377-4452-b576-6ee9f937f3e9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="libswscale\x86">
-      <UniqueIdentifier>{9d4ec9b5-51c2-46df-9b8a-0a7003ddd49f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="libavutil\x86">
-      <UniqueIdentifier>{068000d1-640e-4c5b-b667-8da7ad8df9b8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="libavcodec\x86">
       <UniqueIdentifier>{927d8398-e10f-483b-8cb6-9698fad28e24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libavformat">
+      <UniqueIdentifier>{3b272c59-13a1-45a9-8ba8-364b58a9d291}</UniqueIdentifier>
     </Filter>
     <Filter Include="libavresample">
       <UniqueIdentifier>{616c530e-ecc8-4edb-86d1-35c6421cc973}</UniqueIdentifier>
     </Filter>
     <Filter Include="libavresample\x86">
       <UniqueIdentifier>{fd07c506-80d3-453f-8f7e-5b51f6a6b951}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libavutil">
+      <UniqueIdentifier>{38a96b13-792e-4258-997a-6408508cbb4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libavutil\x86">
+      <UniqueIdentifier>{068000d1-640e-4c5b-b667-8da7ad8df9b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libswscale">
+      <UniqueIdentifier>{d1738ff1-c377-4452-b576-6ee9f937f3e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libswscale\x86">
+      <UniqueIdentifier>{9d4ec9b5-51c2-46df-9b8a-0a7003ddd49f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -846,6 +849,24 @@
     </ClInclude>
     <ClInclude Include="libavcodec\xvmc_internal.h">
       <Filter>libavcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="libavformat\avformat.h">
+      <Filter>libavformat</Filter>
+    </ClInclude>
+    <ClInclude Include="libavformat\avio.h">
+      <Filter>libavformat</Filter>
+    </ClInclude>
+    <ClInclude Include="libavformat\avio_internal.h">
+      <Filter>libavformat</Filter>
+    </ClInclude>
+    <ClInclude Include="libavformat\spdif.h">
+      <Filter>libavformat</Filter>
+    </ClInclude>
+    <ClInclude Include="libavformat\version.h">
+      <Filter>libavformat</Filter>
+    </ClInclude>
+    <ClInclude Include="libavformat\url.h">
+      <Filter>libavformat</Filter>
     </ClInclude>
     <ClInclude Include="libavresample\audio_convert.h">
       <Filter>libavresample</Filter>
@@ -1952,6 +1973,12 @@
     </ClCompile>
     <ClCompile Include="libavcodec\xiph.c">
       <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavformat\spdif.c">
+      <Filter>libavformat</Filter>
+    </ClCompile>
+    <ClCompile Include="libavformat\spdifenc.c">
+      <Filter>libavformat</Filter>
     </ClCompile>
     <ClCompile Include="libavresample\x86\audio_convert_init.c">
       <Filter>libavresample\x86</Filter>
