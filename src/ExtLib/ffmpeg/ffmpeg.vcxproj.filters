@@ -850,7 +850,22 @@
     <ClInclude Include="libavcodec\xvmc_internal.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
+    <ClInclude Include="libavformat\avformat.h">
+      <Filter>libavformat</Filter>
+    </ClInclude>
+    <ClInclude Include="libavformat\avio.h">
+      <Filter>libavformat</Filter>
+    </ClInclude>
+    <ClInclude Include="libavformat\avio_internal.h">
+      <Filter>libavformat</Filter>
+    </ClInclude>
     <ClInclude Include="libavformat\spdif.h">
+      <Filter>libavformat</Filter>
+    </ClInclude>
+    <ClInclude Include="libavformat\version.h">
+      <Filter>libavformat</Filter>
+    </ClInclude>
+    <ClInclude Include="libavformat\url.h">
       <Filter>libavformat</Filter>
     </ClInclude>
     <ClInclude Include="libavresample\audio_convert.h">
@@ -1022,6 +1037,9 @@
       <Filter>libavutil</Filter>
     </ClInclude>
     <ClInclude Include="libavutil\sha.h">
+      <Filter>libavutil</Filter>
+    </ClInclude>
+    <ClInclude Include="libavutil\time.h">
       <Filter>libavutil</Filter>
     </ClInclude>
     <ClInclude Include="libavutil\timecode.h">
@@ -2095,6 +2113,9 @@
       <Filter>libavutil</Filter>
     </ClCompile>
     <ClCompile Include="libavutil\sha.c">
+      <Filter>libavutil</Filter>
+    </ClCompile>
+    <ClCompile Include="libavutil\time.c">
       <Filter>libavutil</Filter>
     </ClCompile>
     <ClCompile Include="libavutil\timecode.c">

@@ -295,7 +295,12 @@
     <ClInclude Include="libavcodec\x86\vp56_arith.h" />
     <ClInclude Include="libavcodec\xiph.h" />
     <ClInclude Include="libavcodec\xvmc_internal.h" />
+    <ClInclude Include="libavformat\avformat.h" />
+    <ClInclude Include="libavformat\avio.h" />
+    <ClInclude Include="libavformat\avio_internal.h" />
     <ClInclude Include="libavformat\spdif.h" />
+    <ClInclude Include="libavformat\url.h" />
+    <ClInclude Include="libavformat\version.h" />
     <ClInclude Include="libavresample\audio_convert.h" />
     <ClInclude Include="libavresample\audio_data.h" />
     <ClInclude Include="libavresample\audio_mix.h" />
@@ -347,6 +352,7 @@
     <ClInclude Include="libavutil\rational.h" />
     <ClInclude Include="libavutil\samplefmt.h" />
     <ClInclude Include="libavutil\sha.h" />
+    <ClInclude Include="libavutil\time.h" />
     <ClInclude Include="libavutil\timecode.h" />
     <ClInclude Include="libavutil\timer.h" />
     <ClInclude Include="libavutil\version.h" />
@@ -710,6 +716,7 @@
     <ClCompile Include="libavutil\rational.c" />
     <ClCompile Include="libavutil\samplefmt.c" />
     <ClCompile Include="libavutil\sha.c" />
+    <ClCompile Include="libavutil\time.c" />
     <ClCompile Include="libavutil\timecode.c" />
     <ClCompile Include="libavutil\utils.c" />
     <ClCompile Include="libavutil\x86\cpu.c" />
