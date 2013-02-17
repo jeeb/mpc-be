@@ -3212,7 +3212,7 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 
 		bool fLeftDownMouseBtnUnassigned = !AssignedToCmd(wmcmd::LDOWN, m_fFullScreen);
 		if (fLeftDownMouseBtnUnassigned || ((GetTickCount()-m_nMenuHideTick)<100)) {
-			SendMessage(WM_NCLBUTTONDOWN, HTCAPTION, NULL);
+			if (!m_fFullScreen ) SendMessage(WM_NCLBUTTONDOWN, HTCAPTION, NULL);
 		} else if (!fLeftDownMouseBtnUnassigned) {
 			OnButton(wmcmd::LDOWN, nFlags, point);
 			return;
@@ -3220,7 +3220,7 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 
 		bool fLeftUpMouseBtnUnassigned = !AssignedToCmd(wmcmd::LUP, m_fFullScreen);
 		if (fLeftUpMouseBtnUnassigned || ((GetTickCount()-m_nMenuHideTick)<100)) {
-			SendMessage(WM_NCLBUTTONUP, HTCAPTION, NULL);
+			if (!m_fFullScreen ) SendMessage(WM_NCLBUTTONUP, HTCAPTION, NULL);
 		} else if (!fLeftUpMouseBtnUnassigned) {
 			OnButton(wmcmd::LUP, nFlags, point);
 			return;
