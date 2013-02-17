@@ -14178,7 +14178,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 		AfxGetAppSettings().nCLSwitches &= ~CLSW_OPEN;
 
-		m_AngleX = 0;
+		m_AngleZ = 0;
 		if (pFileData) {
 			// Rotation flag;
 			BeginEnumFilters(pGB, pEF, pBF) {
@@ -14189,7 +14189,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 						if (!fstr.IsEmpty()) {
 							int rotationValue = 0;
 							if ((_stscanf_s(fstr, _T("%d"), &rotationValue) == 1) && rotationValue) {
-								m_AngleX = rotationValue;
+								m_AngleZ = rotationValue;
 							}
 						}
 					}
