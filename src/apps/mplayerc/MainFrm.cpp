@@ -686,8 +686,6 @@ CMainFrame::CMainFrame() :
 	b_UseSmartSeek(false),
 	previous_renderer(-1),
 	m_flastnID(0),
-	bLeftClicked(false),
-	bWindowDragged(false),
 	bDVDMenuClicked(false),
 	m_bfirstPlay(false),
 	m_nLastRunTicket(0),
@@ -1420,7 +1418,7 @@ void CMainFrame::CreateFlyBar()
 		if (!m_wndFlyBar.CreateEx(WS_EX_TOPMOST|WS_EX_TRANSPARENT, AfxRegisterWndClass(0), NULL, WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS, CRect(0, 0, 0, 0), this, 0, NULL)) {
 			TRACE(_T("Failed to create Flybar Window\n"));
 		}
-		SetWindowLong(m_wndFlyBar.m_hWnd, GWL_EXSTYLE, WS_EX_LAYERED);
+		SetWindowLongPtr(m_wndFlyBar.m_hWnd, GWL_EXSTYLE, WS_EX_LAYERED);
 		m_wndFlyBar.SetLayeredWindowAttributes(0, 150, LWA_ALPHA);
 
 		if (AfxGetAppSettings().fFlybarOnTop) {
@@ -3184,28 +3182,14 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 			bFSWnd = true;
 		}
 
-		bool fLeftMouseBtnUnassigned = !AssignedToCmd(wmcmd::LDOWN, m_fFullScreen);
 		s_fLDown = true;
 
-		if (m_fFullScreen || bFSWnd) {
+		if (m_fFullScreen || bFSWnd || ((GetTickCount()-m_nMenuHideTick)<100)) {
 			return;
 		}
 			
-		if (fLeftMouseBtnUnassigned
-				|| (!fLeftMouseBtnUnassigned && !(m_iMediaLoadState == MLS_LOADING || m_iMediaLoadState == MLS_LOADED))
-				|| /*((IsCaptionHidden() && (AfxGetAppSettings().nCS <= CS_SEEKBAR)) ||  */ ((GetTickCount()-m_nMenuHideTick)<100)) {
-			
-			PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
-			return;
-		} else {
-			bLeftClicked = true;
-			bWindowDragged = false;
-
-			SetCapture();
-			GetWindowRect(m_RectWindow);
-			m_MouseInWindow = p - m_RectWindow.TopLeft();
-			return;
-		}
+		templclick = false;
+		SetCapture();
 	
 		__super::OnLButtonDown(nFlags, point);
 	}
@@ -3213,42 +3197,34 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 
 void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	bLeftClicked = false;
 	ReleaseCapture();
 
 	if (!m_pFullscreenWnd->IsWindow() || !m_OSD.OnLButtonUp (nFlags, point)) {
 		
 		if (bDVDMenuClicked) {
-			PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
+			SendMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 			return;
 		}
 		
-		bool i = false;
 		if (!s_fLDown) {
 			return;
 		}
 
 		bool fLeftDownMouseBtnUnassigned = !AssignedToCmd(wmcmd::LDOWN, m_fFullScreen);
 		if (fLeftDownMouseBtnUnassigned || ((GetTickCount()-m_nMenuHideTick)<100)) {
-			PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
-		} else if (!bWindowDragged) {
-			if (OnButton(wmcmd::LDOWN, nFlags, point)) {
-				bWindowDragged = false;
-				i = true;
-			}
+			SendMessage(WM_NCLBUTTONDOWN, HTCAPTION, NULL);
+		} else if (!fLeftDownMouseBtnUnassigned) {
+			OnButton(wmcmd::LDOWN, nFlags, point);
+			return;
 		}
 
 		bool fLeftUpMouseBtnUnassigned = !AssignedToCmd(wmcmd::LUP, m_fFullScreen);
 		if (fLeftUpMouseBtnUnassigned || ((GetTickCount()-m_nMenuHideTick)<100)) {
-			PostMessage(WM_NCLBUTTONUP, HTCAPTION, MAKELPARAM(point.x, point.y));
-		} else if (!bWindowDragged) {
-			if (OnButton(wmcmd::LUP, nFlags, point)) {
-				bWindowDragged = false;
-				i = true;
-			}
+			SendMessage(WM_NCLBUTTONUP, HTCAPTION, NULL);
+		} else if (!fLeftUpMouseBtnUnassigned) {
+			OnButton(wmcmd::LUP, nFlags, point);
+			return;
 		}
-
-		if (i) return;
 
 		__super::OnLButtonUp(nFlags, point);
 	}
@@ -3362,21 +3338,13 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 		m_lastMouseMove.x = point.x;
 		m_lastMouseMove.y = point.y;
 	}
-	bWindowDragged = false;
-	if (bLeftClicked) {
-		CPoint p;
-		GetCursorPos(&p);
 
-		MoveWindow(p.x - m_MouseInWindow.x, p.y - m_MouseInWindow.y, 
-			m_RectWindow.right - m_RectWindow.left, m_RectWindow.bottom - m_RectWindow.top);
-			
-		CRect m_RectWindowNew;
-		GetWindowRect(m_RectWindowNew);
-			
-		if (m_RectWindowNew != m_RectWindow) {
-			bWindowDragged = true;
-		}
+	CWnd* w = GetCapture();
+	if (w && w->m_hWnd == m_hWnd && (nFlags & MK_LBUTTON) && templclick) {
+		ReleaseCapture();
+		SendMessage(WM_NCLBUTTONDOWN, HTCAPTION, NULL);
 	}
+	templclick = true;
 
 	if (!m_OSD.OnMouseMove (nFlags, point)) {
 		if (GetPlaybackMode() == PM_DVD) {
