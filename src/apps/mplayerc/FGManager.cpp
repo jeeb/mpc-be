@@ -49,9 +49,10 @@
 // CFGManager
 //
 
-CFGManager::CFGManager(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview)
+CFGManager::CFGManager(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview)
 	: CUnknown(pName, pUnk)
 	, m_dwRegister(0)
+	, m_hWnd(hWnd)
 	, m_IsPreview(IsPreview)
 {
 	m_pUnkInner.CoCreateInstance(CLSID_FilterGraph, GetOwner());
@@ -835,6 +836,18 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 				continue;
 			}
 
+			if (!m_IsPreview) {
+				CComQIPtr<IVideoWindow> pVW = pBF;
+				if (pVW && m_hWnd) {
+					OAHWND Owner;
+					pVW->get_Owner(&Owner);
+					if ((OAHWND)m_hWnd != Owner) {
+						HRESULT hrVR = pVW->put_Owner((OAHWND)m_hWnd);
+						TRACE(_T("FGM: IVideoWindow->put_Owner() = 0x%08x\n"), hrVR);
+					}
+				}
+			}
+
 			hr = ConnectFilterDirect(pPinOut, pBF, NULL);
 			/*
 			if (FAILED(hr))
@@ -1461,8 +1474,8 @@ STDMETHODIMP CFGManager::GetDeadEnd(int iIndex, CAtlList<CStringW>& path, CAtlLi
 // 	CFGManagerCustom
 //
 
-CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview)
-	: CFGManager(pName, pUnk, IsPreview)
+CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview)
+	: CFGManager(pName, pUnk, hWnd, IsPreview)
 {
 	AppSettings& s = AfxGetAppSettings();
 
@@ -2281,8 +2294,7 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 //
 
 CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview)
-	: CFGManagerCustom(pName, pUnk, IsPreview)
-	, m_hWnd(hWnd)
+	: CFGManagerCustom(pName, pUnk, hWnd, IsPreview)
 	, m_vrmerit(MERIT64(MERIT_PREFERRED))
 	, m_armerit(MERIT64(MERIT_PREFERRED))
 {

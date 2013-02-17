@@ -12925,7 +12925,12 @@ void CMainFrame::OpenSetupVideo()
 	}
 
 	{
-		pVW->put_Owner((OAHWND)m_pVideoWnd->m_hWnd);
+		OAHWND Owner;
+		pVW->get_Owner(&Owner);
+		if ((OAHWND)m_pVideoWnd->m_hWnd != Owner) {
+			pVW->put_Owner((OAHWND)m_pVideoWnd->m_hWnd);
+		}
+
 		pVW->put_WindowStyle(WS_CHILD|WS_CLIPSIBLINGS|WS_CLIPCHILDREN);
 		pVW->put_MessageDrain((OAHWND)m_hWnd);
 

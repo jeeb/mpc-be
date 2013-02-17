@@ -116,8 +116,11 @@ protected:
 	STDMETHODIMP_(size_t) GetCount();
 	STDMETHODIMP GetDeadEnd(int iIndex, CAtlList<CStringW>& path, CAtlList<CMediaType>& mts);
 
+	//
+	HWND m_hWnd;
+
 public:
-	CFGManager(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview = false);
+	CFGManager(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd = 0, bool IsPreview = false);
 	virtual ~CFGManager();
 
 	bool m_IsPreview;
@@ -134,13 +137,12 @@ public:
 	STDMETHODIMP AddFilter(IBaseFilter* pFilter, LPCWSTR pName);
 
 public:
-	CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, bool IsPreview = false);
+	CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd = 0, bool IsPreview = false);
 };
 
 class CFGManagerPlayer : public CFGManagerCustom
 {
 protected:
-	HWND m_hWnd;
 	UINT64 m_vrmerit, m_armerit;
 
 	// IFilterGraph
