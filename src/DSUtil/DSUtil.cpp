@@ -3297,7 +3297,7 @@ BOOL IsVideoRenderer(const CLSID clsid)
 		|| clsid == CLSID_EnhancedVideoRenderer
 		|| clsid == CLSID_EVRAllocatorPresenter
 		|| clsid == CLSID_DXRAllocatorPresenter
-		|| clsid == CLSID_madVRAllocatorPresenter
+		|| clsid == CLSID_madVRAllocatorPresenter || clsid == CLSID_madVR
 		|| clsid == CLSID_VideoRenderer
 		|| clsid == CLSID_VideoRendererDefault
 		|| clsid == CLSID_SyncAllocatorPresenter) {
