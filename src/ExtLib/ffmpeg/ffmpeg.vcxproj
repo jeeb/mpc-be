@@ -295,6 +295,7 @@
     <ClInclude Include="libavcodec\x86\vp56_arith.h" />
     <ClInclude Include="libavcodec\xiph.h" />
     <ClInclude Include="libavcodec\xvmc_internal.h" />
+    <ClInclude Include="libavformat\spdif.h" />
     <ClInclude Include="libavresample\audio_convert.h" />
     <ClInclude Include="libavresample\audio_data.h" />
     <ClInclude Include="libavresample\audio_mix.h" />
@@ -665,6 +666,8 @@
     <ClCompile Include="libavcodec\x86\vp56dsp_init.c" />
     <ClCompile Include="libavcodec\x86\vp8dsp_init.c" />
     <ClCompile Include="libavcodec\xiph.c" />
+    <ClCompile Include="libavformat\spdif.c" />
+    <ClCompile Include="libavformat\spdifenc.c" />
     <ClCompile Include="libavresample\audio_convert.c" />
     <ClCompile Include="libavresample\audio_data.c" />
     <ClCompile Include="libavresample\audio_mix.c" />
