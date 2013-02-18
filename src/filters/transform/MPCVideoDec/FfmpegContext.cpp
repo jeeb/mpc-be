@@ -158,7 +158,7 @@ HRESULT FFH264DecodeFrame (struct AVCodecContext* pAVCtx, struct AVFrame* pFrame
 		}
 
 		hr = S_OK;
-		if (h->s.current_picture_ptr) {
+		if (h->cur_pic_ptr) {
 			if (pOutPOC) {
 				*pOutPOC = pFrame->h264_poc_outputed;
 			}
@@ -166,7 +166,7 @@ HRESULT FFH264DecodeFrame (struct AVCodecContext* pAVCtx, struct AVFrame* pFrame
 				*pOutrtStart = pFrame->reordered_opaque;
 			}
 			if (pFramePOC) {
-				*pFramePOC = h->s.current_picture_ptr->poc;
+				*pFramePOC = h->cur_pic_ptr->poc;
 				if (*pFramePOC == INT_MIN) {
 					return E_FAIL;
 				}
@@ -350,18 +350,17 @@ HRESULT FFH264BuildPicParams (DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_
 	H264Context*			h = (H264Context*) pAVCtx->priv_data;
 	SPS*					cur_sps;
 	PPS*					cur_pps;
-	MpegEncContext* const	s = &h->s;
 	int						field_pic_flag;
 	HRESULT					hr = E_FAIL;
-	const					Picture *current_picture = s->current_picture_ptr;
+	const					Picture *current_picture = h->cur_pic_ptr;
 
-	field_pic_flag = (s->picture_structure != PICT_FRAME);
+	field_pic_flag = (h->picture_structure != PICT_FRAME);
 
 	cur_sps	= &h->sps;
 	cur_pps = &h->pps;
 
 	if (cur_sps && cur_pps) {
-		*nFieldType = current_picture->f.interlaced_frame ? PICT_TOP_FIELD : s->picture_structure;
+		*nFieldType = current_picture->f.interlaced_frame ? PICT_TOP_FIELD : h->picture_structure;
 		if (h->sps.pic_struct_present_flag) {
 			switch (h->sei_pic_struct) {
 				case SEI_PIC_STRUCT_TOP_FIELD:
@@ -438,13 +437,13 @@ HRESULT FFH264BuildPicParams (DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_
 		pDXVAPicParams->pic_init_qp_minus26						= cur_pps->init_qp - 26;
 		pDXVAPicParams->pic_init_qs_minus26						= cur_pps->init_qs - 26;
 
-		pDXVAPicParams->CurrPic.AssociatedFlag = field_pic_flag && (s->picture_structure == PICT_BOTTOM_FIELD);
+		pDXVAPicParams->CurrPic.AssociatedFlag = field_pic_flag && (h->picture_structure == PICT_BOTTOM_FIELD);
 		pDXVAPicParams->CurrFieldOrderCnt[0] = 0;
-		if ((s->picture_structure & PICT_TOP_FIELD) && current_picture->field_poc[0] != INT_MAX) {
+		if ((h->picture_structure & PICT_TOP_FIELD) && current_picture->field_poc[0] != INT_MAX) {
 			pDXVAPicParams->CurrFieldOrderCnt[0] = current_picture->field_poc[0];
 		}
 		pDXVAPicParams->CurrFieldOrderCnt[1] = 0;
-		if ((s->picture_structure & PICT_BOTTOM_FIELD) && current_picture->field_poc[1] != INT_MAX) {
+		if ((h->picture_structure & PICT_BOTTOM_FIELD) && current_picture->field_poc[1] != INT_MAX) {
 			pDXVAPicParams->CurrFieldOrderCnt[1] = current_picture->field_poc[1];
 		}
 
@@ -460,8 +459,8 @@ void FFH264SetCurrentPicture (int nIndex, DXVA_PicParams_H264* pDXVAPicParams, s
 	H264Context* h = (H264Context*) pAVCtx->priv_data;
 
 	pDXVAPicParams->CurrPic.Index7Bits		= nIndex;
-	if (h->s.current_picture_ptr) {
-		h->s.current_picture_ptr->f.opaque	= (void*)nIndex;
+	if (h->cur_pic_ptr) {
+		h->cur_pic_ptr->f.opaque	= (void*)nIndex;
 	}
 }
 
@@ -539,7 +538,6 @@ BOOL FFH264IsRefFrameInUse (int nFrameNum, struct AVCodecContext* pAVCtx)
 void FF264UpdateRefFrameSliceLong (DXVA_PicParams_H264* pDXVAPicParams, DXVA_Slice_H264_Long* pSlice, struct AVCodecContext* pAVCtx)
 {
 	H264Context*			h	= (H264Context*) pAVCtx->priv_data;
-	MpegEncContext* const	s	= &h->s;
 	HRESULT					hr	= E_FAIL;
 	unsigned				i, list;
 

@@ -24,7 +24,7 @@ int avcodec_h264_search_recovery_point(AVCodecContext *avctx,
                          const uint8_t *buf, int buf_size, int *recovery_frame_cnt)
 {
     H264Context *h;
-    MpegEncContext *s;
+//    MpegEncContext *s;
     int buf_index = 0;
     int found = 0; // 0: no recovery point, 1:Recovery Point SEI (GDR), 2:IDR
     AVCodecContext *users_MpegEncContext_avctx;
@@ -36,11 +36,11 @@ int avcodec_h264_search_recovery_point(AVCodecContext *avctx,
     avctx = get_thread0_avctx(avctx); // Next frame will start on thread 0, and we want to store SPS and PPS in the context of thread 0.
     h = avctx->priv_data;
     is_avc = avcodec_h264_decode_init_is_avc(avctx);
-    s = &h->s;
-    users_MpegEncContext_avctx = s->avctx; // save it and write back before return.
+    //s = &h->s;
+    users_MpegEncContext_avctx = h->avctx; // save it and write back before return.
 
-    if (s->avctx == NULL)
-        s->avctx = avctx; // Hack, this function can be used before decoding, so we can't expect everything initialized.
+    if (h->avctx == NULL)
+        h->avctx = avctx; // Hack, this function can be used before decoding, so we can't expect everything initialized.
 
     nal_length_size = avctx->nal_length_size ? avctx->nal_length_size : 4;
 
@@ -61,7 +61,7 @@ int avcodec_h264_search_recovery_point(AVCodecContext *avctx,
                     buf_index++;
                     continue;
                 }else{
-                    av_log(h->s.avctx, AV_LOG_ERROR, "AVC: nal size %d\n", nalsize);
+                    av_log(h->avctx, AV_LOG_ERROR, "AVC: nal size %d\n", nalsize);
                     break;
                 }
             }
@@ -88,7 +88,7 @@ int avcodec_h264_search_recovery_point(AVCodecContext *avctx,
         bit_length= !dst_length ? 0 : (8*dst_length - decode_rbsp_trailing(h, ptr + dst_length - 1));
 
         if (is_avc && (nalsize != consumed)){
-            av_log(h->s.avctx, AV_LOG_ERROR, "AVC: Consumed only %d bytes instead of %d\n", consumed, nalsize);
+            av_log(h->avctx, AV_LOG_ERROR, "AVC: Consumed only %d bytes instead of %d\n", consumed, nalsize);
             consumed= nalsize;
         }
 
@@ -98,7 +98,7 @@ int avcodec_h264_search_recovery_point(AVCodecContext *avctx,
         switch(h->nal_unit_type){
         case NAL_SEI:
             if (ptr[0] == 6/* Recovery Point SEI */){
-                init_get_bits(&s->gb, ptr, bit_length);
+                init_get_bits(&h->gb, ptr, bit_length);
                 ff_h264_decode_sei(h);
                 if (found < 2)
                     found = 2;
@@ -106,17 +106,17 @@ int avcodec_h264_search_recovery_point(AVCodecContext *avctx,
             }
             break;
         case NAL_SPS:
-            init_get_bits(&s->gb, ptr, bit_length);
+            init_get_bits(&h->gb, ptr, bit_length);
             ff_h264_decode_seq_parameter_set(h);
 
-            if(s->flags& CODEC_FLAG_LOW_DELAY)
-                s->low_delay=1;
+            if(h->flags& CODEC_FLAG_LOW_DELAY)
+                h->low_delay=1;
 
             if(avctx->has_b_frames < 2)
-                avctx->has_b_frames= !s->low_delay;
+                avctx->has_b_frames= !h->low_delay;
             break;
         case NAL_PPS:
-            init_get_bits(&s->gb, ptr, bit_length);
+            init_get_bits(&h->gb, ptr, bit_length);
 
             ff_h264_decode_picture_parameter_set(h, bit_length);
 
@@ -124,8 +124,8 @@ int avcodec_h264_search_recovery_point(AVCodecContext *avctx,
         case NAL_AUD:
         {
             int primary_pic_type;
-            init_get_bits(&s->gb, ptr, bit_length);
-            primary_pic_type = get_bits(&s->gb, 3);
+            init_get_bits(&h->gb, ptr, bit_length);
+            primary_pic_type = get_bits(&h->gb, 3);
             if (found == 0 && (primary_pic_type == 0 || primary_pic_type == 3)) // I-frame (all I/SI slices)
                 found = 1;
             break;
@@ -134,9 +134,9 @@ int avcodec_h264_search_recovery_point(AVCodecContext *avctx,
         case NAL_SLICE:
         case NAL_DPA:
             // decode part of slice header and find I frame
-            init_get_bits(&s->gb, ptr, bit_length);
-            int first_mb_in_slice = get_ue_golomb(&s->gb);
-            unsigned int slice_type= get_ue_golomb(&s->gb);
+            init_get_bits(&h->gb, ptr, bit_length);
+            int first_mb_in_slice = get_ue_golomb(&h->gb);
+            unsigned int slice_type= get_ue_golomb(&h->gb);
             if (!is_I_slice(slice_type))
                 goto end;
 
@@ -169,6 +169,6 @@ int avcodec_h264_search_recovery_point(AVCodecContext *avctx,
     }
     *recovery_frame_cnt = h->sei_recovery_frame_cnt;
 end:
-    s->avctx = users_MpegEncContext_avctx;
+    h->avctx = users_MpegEncContext_avctx;
     return found;
 }

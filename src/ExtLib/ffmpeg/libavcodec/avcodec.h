@@ -540,6 +540,10 @@ typedef struct AVCodecDescriptor {
  * Codec supports lossless compression. Audio and video codecs only.
  */
 #define AV_CODEC_PROP_LOSSLESS      (1 << 2)
+/**
+ * Subtitle codec is bitmap based
+ */
+#define AV_CODEC_PROP_BITMAP_SUB    (1 << 16)
 
 #if FF_API_OLD_DECODE_AUDIO
 /* in bytes */
@@ -3186,7 +3190,7 @@ typedef struct AVCodecContext {
     /**
      * Timebase in which pkt_dts/pts and AVPacket.dts/pts are.
      * Code outside libavcodec should access this field using:
-     * avcodec_set_pkt_timebase(avctx)
+     * av_codec_{get,set}_pkt_timebase(avctx)
      * - encoding unused.
      * - decodimg set by user
      */
@@ -3195,7 +3199,7 @@ typedef struct AVCodecContext {
     /**
      * AVCodecDescriptor
      * Code outside libavcodec should access this field using:
-     * avcodec_get_codec_descriptior(avctx)
+     * av_codec_{get,set}_codec_descriptor(avctx)
      * - encoding: unused.
      * - decoding: set by libavcodec.
      */
@@ -3222,6 +3226,24 @@ typedef struct AVCodecContext {
      * - encoding: unused
      */
     AVDictionary *metadata;
+
+    /**
+     * Character encoding of the input subtitles file.
+     * - decoding: set by user
+     * - encoding: unused
+     */
+    char *sub_charenc;
+
+    /**
+     * Subtitles character encoding mode. Formats or codecs might be adjusting
+     * this setting (if they are doing the conversion themselves for instance).
+     * - decoding: set by libavcodec
+     * - encoding: unused
+     */
+    int sub_charenc_mode;
+#define FF_SUB_CHARENC_MODE_DO_NOTHING  -1  ///< do nothing (demuxer outputs a stream supposed to be already in UTF-8, or the codec is bitmap for instance)
+#define FF_SUB_CHARENC_MODE_AUTOMATIC    0  ///< libavcodec will select the mode itself
+#define FF_SUB_CHARENC_MODE_PRE_DECODER  1  ///< the AVPacket data needs to be recoded to UTF-8 before being fed to the decoder, requires iconv
 } AVCodecContext;
 
 AVRational av_codec_get_pkt_timebase         (const AVCodecContext *avctx);
