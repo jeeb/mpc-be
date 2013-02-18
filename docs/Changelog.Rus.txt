@@ -16,7 +16,7 @@
 * Обновлен итальянский перевод (автор Lord Maius);
 * ffmpeg git-c63f9fb3;
 * libopus 1.0.1 git-6044907c;
-* Little-CMS git-6fccc3d4;
+* Little-CMS git-4ba02590;
 * libwebp 0.2.1 git-60904aa6;
 * MediaInfo 0.7.61+ svn rev.5374;
 * libpng 1.5.14 RELEASE git-8799d783;
