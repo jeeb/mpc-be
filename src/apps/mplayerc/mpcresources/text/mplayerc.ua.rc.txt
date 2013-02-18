@@ -1599,7 +1599,7 @@ STRING IDS_MPEGSPLITTER_ALT_DUR_CALC		"Альтернативний метод �
 STRING IDS_MPEGSPLITTER_FAST_SEEK		"Швидке(неточне) перемотування"
 STRING IDS_MPEGSPLITTER_FSTREAM_CHANGE		"Швидке перемикання потоків"
 STRING IDS_MPEGSPLITTER_LANG_ORDER		"Порядок вибору аудіо:"
-STRING IDS_MPEGSPLITTER_SUB_EMPTY_PIN		"Output empty Subtitle pin"
+STRING IDS_MPEGSPLITTER_SUB_EMPTY_PIN		"Виводити пустий пін субтитрів"
 STRING IDS_MPEGSPLITTER_SUB_FORCING		"Примусово завантажувати всі субтитри"
 STRING IDS_MPEGSPLITTER_SUB_ORDER		"Порядок вибору субтитрів:"
 STRING IDS_MPEGSPLITTER_THD_NOSPLIT		"Без змін"
