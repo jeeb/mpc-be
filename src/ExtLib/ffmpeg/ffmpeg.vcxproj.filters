@@ -337,6 +337,9 @@
     <ClInclude Include="libavcodec\cookdata.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
+    <ClInclude Include="libavcodec\copy_block.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
     <ClInclude Include="libavcodec\dca.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
@@ -389,6 +392,9 @@
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\eac3enc.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="libavcodec\error_resilience.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\faandct.h">
@@ -457,6 +463,9 @@
     <ClInclude Include="libavcodec\h264dsp.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
+    <ClInclude Include="libavcodec\h264idct.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
     <ClInclude Include="libavcodec\h264pred.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
@@ -467,6 +476,9 @@
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\imcdata.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="libavcodec\imgconvert.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\indeo3data.h">
@@ -673,6 +685,9 @@
     <ClInclude Include="libavcodec\rl.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
+    <ClInclude Include="libavcodec\rnd_avg.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
     <ClInclude Include="libavcodec\rv30data.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
@@ -737,6 +752,9 @@
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\svq1_vlc.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="libavcodec\svq3.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\synth_filter.h">
@@ -862,10 +880,10 @@
     <ClInclude Include="libavformat\spdif.h">
       <Filter>libavformat</Filter>
     </ClInclude>
-    <ClInclude Include="libavformat\version.h">
+    <ClInclude Include="libavformat\url.h">
       <Filter>libavformat</Filter>
     </ClInclude>
-    <ClInclude Include="libavformat\url.h">
+    <ClInclude Include="libavformat\version.h">
       <Filter>libavformat</Filter>
     </ClInclude>
     <ClInclude Include="libavresample\audio_convert.h">
@@ -950,9 +968,6 @@
       <Filter>libavutil</Filter>
     </ClInclude>
     <ClInclude Include="libavutil\crc.h">
-      <Filter>libavutil</Filter>
-    </ClInclude>
-    <ClInclude Include="libavutil\crc_data.h">
       <Filter>libavutil</Filter>
     </ClInclude>
     <ClInclude Include="libavutil\dict.h">
@@ -1492,6 +1507,9 @@
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\h264_sei.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\h264addpx_template.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\h264chroma.c">

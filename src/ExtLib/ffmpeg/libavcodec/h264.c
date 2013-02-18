@@ -1533,7 +1533,7 @@ static int decode_update_thread_context(AVCodecContext *dst,
         for (i = 0; i < MAX_PPS_COUNT; i++)
             av_freep(h->pps_buffers + i);
 
-        memcpy(h, h1, offsetof(H264Context, mb));
+        memcpy(h, h1, offsetof(H264Context, intra_pcm_ptr));
         memcpy(&h->cabac, &h1->cabac,
                sizeof(H264Context) - offsetof(H264Context, cabac));
         av_assert0(&h->cabac == &h->mb_padding + 1);
@@ -1709,7 +1709,8 @@ int ff_h264_frame_start(H264Context *h)
 
     if ((ret = alloc_picture(h, pic)) < 0)
         return ret;
-    if(!h->sync && !h->avctx->hwaccel)
+    if(!h->sync && !h->avctx->hwaccel &&
+       !(h->avctx->codec->capabilities & CODEC_CAP_HWACCEL_VDPAU))
         avpriv_color_frame(&pic->f, c);
 
     h->cur_pic_ptr = pic;
@@ -3016,11 +3017,17 @@ static enum PixelFormat get_pixel_format(H264Context *h)
             return h->avctx->color_range == AVCOL_RANGE_JPEG ? AV_PIX_FMT_YUVJ422P
                                                              : AV_PIX_FMT_YUV422P;
         } else {
-            return h->avctx->get_format(h->avctx, h->avctx->codec->pix_fmts ?
+            int i;
+            const enum AVPixelFormat * fmt = h->avctx->codec->pix_fmts ?
                                         h->avctx->codec->pix_fmts :
                                         h->avctx->color_range == AVCOL_RANGE_JPEG ?
                                         hwaccel_pixfmt_list_h264_jpeg_420 :
-                                        ff_hwaccel_pixfmt_list_420);
+                                        ff_hwaccel_pixfmt_list_420;
+
+            for (i=0; fmt[i] != AV_PIX_FMT_NONE; i++)
+                if (fmt[i] == h->avctx->pix_fmt)
+                    return fmt[i];
+            return h->avctx->get_format(h->avctx, fmt);
         }
         break;
     default:
