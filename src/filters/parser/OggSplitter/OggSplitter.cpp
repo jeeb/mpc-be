@@ -510,7 +510,7 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 			if (rtDiff < 0) {
 				rtDiff = -rtDiff;
 
-				if (rtDiff < 1000000 || rtDiff >= rtMinDiff) {
+				if (rtDiff < 500000 || rtDiff >= rtMinDiff) {
 					m_pFile->Seek(startpos);
 					break;
 				}
@@ -545,6 +545,8 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		}
 
 		m_pFile->Seek(startpos);
+
+		return;
 
 		POSITION pos = m_pOutputs.GetHeadPosition();
 		while (pos) {
@@ -705,6 +707,8 @@ bool COggSplitterFilter::DemuxLoop()
 
 		CAutoPtr<OggPacket> p;
 		while (!CheckRequest(NULL) && SUCCEEDED(hr) && (p = pOggPin->GetPacket())) {
+			hr = DeliverPacket(p);
+			/*
 			if (!p->fSkip) {
 				if (COggTheoraOutputPin* pPin = dynamic_cast<COggTheoraOutputPin*>(pOggPin)) {
 					if ((m_rtStart - p->rtStart) < 30000000) {
@@ -714,6 +718,7 @@ bool COggSplitterFilter::DemuxLoop()
 					hr = DeliverPacket(p);
 				}
 			}
+			*/
 		}
 	}
 
@@ -802,8 +807,7 @@ void COggSplitterOutputPin::ResetState(DWORD seqnum)
 	m_packets.RemoveAll();
 	m_lastpacket.Free();
 	m_lastseqnum = seqnum;
-	m_rtLast = 0;
-	m_fSkip = true;
+	m_fSkip = false;//true;
 }
 
 HRESULT COggSplitterOutputPin::UnpackPage(OggPage& page)
@@ -873,10 +877,11 @@ HRESULT COggSplitterOutputPin::UnpackPage(OggPage& page)
 				p->TrackNumber = page.m_hdr.bitstream_serial_number;
 
 				if (S_OK == UnpackPacket(p, pData + i, j-i)) {
-					//if(p->TrackNumber == 1)
-					//TRACE(_T("[%d]: %d, %I64d -> %I64d (skip=%d, disc=%d, sync=%d)\n"),
-					//		(int)p->TrackNumber, p->GetCount(), p->rtStart, p->rtStop,
-					//		(int)m_fSkip, (int)p->bDiscontinuity, (int)p->bSyncPoint);
+					/*
+					TRACE(_T("COggSplitterOutputPin::UnpackPage() : [%d]: %d, %I64d -> %I64d (skip=%d, disc=%d, sync=%d)\n"),
+							(int)p->TrackNumber, p->GetCount(), p->rtStart, p->rtStop,
+							(int)m_fSkip, (int)p->bDiscontinuity, (int)p->bSyncPoint);
+					*/
 
 					if (p->rtStart <= p->rtStop && p->rtStop <= p->rtStart + 10000000i64*60) {
 						CAutoLock csAutoLock(&m_csPackets);
@@ -921,6 +926,7 @@ HRESULT COggSplitterOutputPin::DeliverEndFlush()
 HRESULT COggSplitterOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
 {
 	ResetState();
+	m_rtLast = tStart;
 	return __super::DeliverNewSegment(tStart, tStop, dRate);
 }
 
@@ -1642,9 +1648,33 @@ REFERENCE_TIME COggOpusOutputPin::GetRefTime(__int64 granule_position)
 
 HRESULT COggOpusOutputPin::UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, int len)
 {
+	if (len > 8 && !memcmp(pData, "Opus", 4)) {
+		return E_FAIL; // skip Opus header packets ...
+	}
+
+	// code from ffmpeg
+	// calculate packet duration
+    unsigned int toc, toc_config, toc_count, frame_size, nb_frames = 1;
+
+	toc = *pData;
+	toc_config = toc >> 3;
+	toc_count  = toc & 3;
+	frame_size = toc_config < 12 ? max(480, 960 * (toc_config & 3)) :
+				 toc_config < 16 ? 480 << (toc_config & 1) :
+								   120 << (toc_config & 3);
+	if (toc_count == 3) {
+		if (len < 2) {
+			return E_FAIL;
+		}
+		nb_frames = pData[1] & 0x3F;
+	} else if (toc_count) {
+		nb_frames = 2;
+	}
+	__int64 pduration = (frame_size * nb_frames * UNITS) / m_SampleRate;
+
 	p->bSyncPoint	= TRUE;
 	p->rtStart		= m_rtLast;
-	p->rtStop		= m_rtLast+1; // TODO : find packet duration !
+	p->rtStop		= m_rtLast + pduration;
 	p->SetData(pData, len);
 
 	return S_OK;
