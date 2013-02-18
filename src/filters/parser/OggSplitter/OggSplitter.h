@@ -31,15 +31,6 @@
 #define OggSplitterName L"MPC Ogg Splitter"
 #define OggSourceName   L"MPC Ogg Source"
 
-class OggPacket : public Packet
-{
-public:
-	OggPacket() {
-		fSkip = false;
-	}
-	bool fSkip;
-};
-
 class COggSplitterOutputPin : public CBaseSplitterOutputPin
 {
 	class CComment
@@ -55,11 +46,11 @@ class COggSplitterOutputPin : public CBaseSplitterOutputPin
 
 protected:
 	CCritSec m_csPackets;
-	CAutoPtrList<OggPacket> m_packets;
-	CAutoPtr<OggPacket> m_lastpacket;
+	CAutoPtrList<Packet> m_packets;
+	CAutoPtr<Packet> m_lastpacket;
 	DWORD m_lastseqnum;
 	REFERENCE_TIME m_rtLast;
-	bool m_fSkip;
+	bool m_fSetKeyFrame;
 
 	CBaseFilter* m_pFilter;
 
@@ -72,9 +63,9 @@ public:
 	CStringW GetComment(CStringW key);
 
 	HRESULT UnpackPage(OggPage& page);
-	virtual HRESULT UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, int len) = 0;
+	virtual HRESULT UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int len) = 0;
 	virtual REFERENCE_TIME GetRefTime(__int64 granule_position) = 0;
-	CAutoPtr<OggPacket> GetPacket();
+	CAutoPtr<Packet> GetPacket();
 
 	HRESULT DeliverEndFlush();
 	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
@@ -82,16 +73,16 @@ public:
 
 class COggVorbisOutputPin : public COggSplitterOutputPin
 {
-	CAutoPtrList<OggPacket> m_initpackets;
+	CAutoPtrList<Packet> m_initpackets;
 
 	DWORD m_audio_sample_rate;
 	DWORD m_blocksize[2], m_lastblocksize;
 	CAtlArray<bool> m_blockflags;
 
-	virtual HRESULT UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, int len);
+	virtual HRESULT UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int len);
 	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
 
-	HRESULT DeliverPacket(CAutoPtr<OggPacket> p);
+	HRESULT DeliverPacket(CAutoPtr<Packet> p);
 	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
 
 public:
@@ -105,7 +96,7 @@ public:
 
 class COggFlacOutputPin : public COggSplitterOutputPin
 {
-	CAutoPtrList<OggPacket> m_initpackets;
+	CAutoPtrList<Packet> m_initpackets;
 
 	int		m_nSamplesPerSec;
 	int		m_nChannels;
@@ -115,10 +106,10 @@ class COggFlacOutputPin : public COggSplitterOutputPin
 	DWORD m_blocksize[2], m_lastblocksize;
 	CAtlArray<bool> m_blockflags;
 
-	virtual HRESULT UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, int len);
+	virtual HRESULT UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int len);
 	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
 
-	HRESULT DeliverPacket(CAutoPtr<OggPacket> p);
+	HRESULT DeliverPacket(CAutoPtr<Packet> p);
 	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
 
 public:
@@ -131,7 +122,7 @@ public:
 
 class COggDirectShowOutputPin : public COggSplitterOutputPin
 {
-	virtual HRESULT UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, int len);
+	virtual HRESULT UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int len);
 	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
 
 public:
@@ -143,7 +134,7 @@ class COggStreamOutputPin : public COggSplitterOutputPin
 	__int64 m_time_unit, m_samples_per_unit;
 	DWORD m_default_len;
 
-	virtual HRESULT UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, int len);
+	virtual HRESULT UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int len);
 	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
 
 public:
@@ -170,14 +161,14 @@ public:
 
 class COggTheoraOutputPin : public COggSplitterOutputPin
 {
-	CAutoPtrList<OggPacket> m_initpackets;
+	CAutoPtrList<Packet> m_initpackets;
 	LONGLONG				m_KfgShift;
 	int						m_nIndexOffset;
 	int						m_nFpsNum;
 	int						m_nFpsDenum;
 	REFERENCE_TIME			m_rtAvgTimePerFrame;
 
-	virtual HRESULT UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, int len);
+	virtual HRESULT UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int len);
 	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
 
 public:
@@ -195,7 +186,7 @@ class COggDiracOutputPin : public COggSplitterOutputPin
 	bool			m_bOldDirac;
 	bool			m_IsInitialized;
 
-	virtual HRESULT UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, int len);
+	virtual HRESULT UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int len);
 	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
 
 public:
@@ -213,7 +204,7 @@ class COggOpusOutputPin : public COggSplitterOutputPin
 	int  m_SampleRate;
 	WORD m_Preskip;
 
-	virtual HRESULT UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, int len);
+	virtual HRESULT UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int len);
 	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
 
 public:
@@ -224,7 +215,7 @@ class COggSpeexOutputPin : public COggSplitterOutputPin
 {
 	int  m_SampleRate;
 
-	virtual HRESULT UnpackPacket(CAutoPtr<OggPacket>& p, BYTE* pData, int len);
+	virtual HRESULT UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int len);
 	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
 
 public:
