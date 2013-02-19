@@ -139,6 +139,7 @@
     <ClInclude Include="MediaInfo\Image\File_Pcx.h" />
     <ClInclude Include="MediaInfo\Image\File_Psd.h" />
     <ClInclude Include="MediaInfo\Text\File_AribStdB24B37.h" />
+    <ClInclude Include="MediaInfo\Video\File_Aic.h" />
     <ClInclude Include="MediaInfo\Video\File_ProRes.h" />
     <ClInclude Include="ThirdParty\base64\base64.h" />
     <ClInclude Include="ThirdParty\tinyxml2\tinyxml2.h" />
@@ -436,6 +437,7 @@
     <ClCompile Include="MediaInfo\Text\File_Scte20.cpp" />
     <ClCompile Include="MediaInfo\Text\File_Teletext.cpp" />
     <ClCompile Include="MediaInfo\Video\File_AfdBarData.cpp" />
+    <ClCompile Include="MediaInfo\Video\File_Aic.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Avc.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Avc_Duplicate.cpp" />
     <ClCompile Include="MediaInfo\Video\File_AvsV.cpp" />
