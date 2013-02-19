@@ -354,9 +354,6 @@ typedef struct H264Context {
     int mb_linesize;    ///< may be equal to s->linesize or s->linesize * 2, for mbaff
     int mb_uvlinesize;
 
-    int emu_edge_width;
-    int emu_edge_height;
-
     unsigned current_sps_id; ///< id of the current SPS
     SPS sps; ///< current sps
 
@@ -647,6 +644,8 @@ typedef struct H264Context {
     int parse_last_mb;
     uint8_t *edge_emu_buffer;
     int16_t *dc_val_base;
+
+   uint8_t *visualization_buffer[3]; ///< temporary buffer vor MV visualization
     // ==> Start patch MPC
     int				sp_for_switch_flag;
     int				slice_qs_delta;
