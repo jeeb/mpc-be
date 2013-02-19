@@ -194,6 +194,62 @@ bool IsStreamEnd(IBaseFilter* pBF)
 	return (nOut == 0);
 }
 
+bool IsVideoDecoder(IBaseFilter* pBF, bool fCountConnectedOnly)
+{
+	// All popular video decoders includes in the name the "video"
+	CString filterName = GetFilterName(pBF).MakeLower();
+	if (filterName.Find(_T("video")) < 0) {
+		return false;
+	}
+
+	int nIn, nOut, nInC, nOutC;
+	CountPins(pBF, nIn, nOut, nInC, nOutC);
+
+	if (nInC > 0 && nOut > 0) {
+		BeginEnumPins(pBF, pEP, pPin) {
+
+			PIN_DIRECTION dir;
+			if (SUCCEEDED(pPin->QueryDirection(&dir))) {
+				CComPtr<IPin> pPinConnectedTo;
+				pPin->ConnectedTo(&pPinConnectedTo);
+
+				if (dir == PINDIR_INPUT) {
+					AM_MEDIA_TYPE mt;
+					if (S_OK != pPin->ConnectionMediaType(&mt)) {
+						continue;
+					}
+					FreeMediaType(mt);
+
+					if (mt.majortype == MEDIATYPE_Video) {
+						nIn++;
+						if (pPinConnectedTo) {
+							nInC++;
+						}
+					}
+				} else if (dir == PINDIR_OUTPUT) {
+					AM_MEDIA_TYPE mt;
+					if (S_OK != pPin->ConnectionMediaType(&mt)) {
+						continue;
+					}
+					FreeMediaType(mt);
+
+					if (mt.majortype == MEDIATYPE_Video) {
+						nOut++;
+						if (pPinConnectedTo) {
+							nOutC++;
+						}
+					}
+				}
+			}
+		}
+		EndEnumPins
+
+		return fCountConnectedOnly ? (nIn && nInC && nOut && nOutC) : (nIn && nInC);
+	}
+
+	return false;
+}
+
 bool IsVideoRenderer(IBaseFilter* pBF)
 {
 	int nIn, nOut, nInC, nOutC;
@@ -209,16 +265,31 @@ bool IsVideoRenderer(IBaseFilter* pBF)
 			FreeMediaType(mt);
 
 			return !!(mt.majortype == MEDIATYPE_Video);
-			/*&& (mt.formattype == FORMAT_VideoInfo || mt.formattype == FORMAT_VideoInfo2));*/
 		}
 		EndEnumPins
 	}
 
-	CLSID clsid;
-	memcpy(&clsid, &GUID_NULL, sizeof(clsid));
-	pBF->GetClassID(&clsid);
+	return IsVideoRenderer(GetCLSID(pBF));
+}
 
-	return (clsid == CLSID_VideoRenderer || clsid == CLSID_VideoRendererDefault);
+bool IsVideoRenderer(const CLSID clsid)
+{
+	if (clsid == CLSID_OverlayMixer
+		|| clsid == CLSID_VideoMixingRenderer
+		|| clsid == CLSID_VideoMixingRenderer9
+		|| clsid == CLSID_VMR7AllocatorPresenter
+		|| clsid == CLSID_VMR9AllocatorPresenter
+		|| clsid == CLSID_EnhancedVideoRenderer
+		|| clsid == CLSID_EVRAllocatorPresenter
+		|| clsid == CLSID_DXRAllocatorPresenter
+		|| clsid == CLSID_madVRAllocatorPresenter || clsid == CLSID_madVR
+		|| clsid == CLSID_VideoRenderer
+		|| clsid == CLSID_VideoRendererDefault
+		|| clsid == CLSID_SyncAllocatorPresenter) {
+		return true;
+	}
+
+	return false;
 }
 
 bool IsAudioWaveRenderer(IBaseFilter* pBF)
@@ -3285,24 +3356,4 @@ BOOL GetTemporaryFilePath(CString strExtension, CString& strFileName)
  
 	TRACE(_T("GetTemporaryFilePath() : \'%ws\'\n"), strFileName);
 	return TRUE;
-}
-
-BOOL IsVideoRenderer(const CLSID clsid)
-{
-	if (clsid == CLSID_OverlayMixer
-		|| clsid == CLSID_VideoMixingRenderer
-		|| clsid == CLSID_VideoMixingRenderer9
-		|| clsid == CLSID_VMR7AllocatorPresenter
-		|| clsid == CLSID_VMR9AllocatorPresenter
-		|| clsid == CLSID_EnhancedVideoRenderer
-		|| clsid == CLSID_EVRAllocatorPresenter
-		|| clsid == CLSID_DXRAllocatorPresenter
-		|| clsid == CLSID_madVRAllocatorPresenter || clsid == CLSID_madVR
-		|| clsid == CLSID_VideoRenderer
-		|| clsid == CLSID_VideoRendererDefault
-		|| clsid == CLSID_SyncAllocatorPresenter) {
-		return TRUE;
-	}
-
-	return FALSE;
 }

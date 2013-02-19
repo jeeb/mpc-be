@@ -534,11 +534,8 @@
 #define IDS_SRC_MPA                     14016
 #define IDS_TRA_RV                      14018
 #define IDS_TRA_RA                      14019
-#define IDS_TRA_MPEG1                   14020
 #define IDS_TRA_MPEG2                   14021
 #define IDS_TRA_LPCM                    14023
-#define IDS_TRA_AC3                     14024
-#define IDS_TRA_DTS                     14025
 #define IDS_TRA_PS2AUD                  14028
 #define IDS_TRA_FFMPEG                  14029
 #define IDS_PLAYLIST_OPEN               14114

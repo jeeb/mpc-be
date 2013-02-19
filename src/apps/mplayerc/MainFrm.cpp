@@ -12279,7 +12279,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			bool bIsVideo = false;
 			BeginEnumFilters(pGB, pEF, pBF) {
 				// Checks if any Video Renderer is in the graph
-				if (IsVideoRenderer(GetCLSID(pBF))) {
+				if (IsVideoRenderer(pBF)) {
 					bIsVideo = true;
 					break;
 				}

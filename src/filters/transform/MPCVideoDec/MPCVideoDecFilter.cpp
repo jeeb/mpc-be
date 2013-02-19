@@ -271,7 +271,7 @@ FFMPEG_CODECS		ffCodecs[] = {
 	{ &MEDIASUBTYPE_IV50, AV_CODEC_ID_INDEO5, NULL, FFM_INDEO, -1 },
 
 	// v210 (QT video)
-	// { &MEDIASUBTYPE_v210, AV_CODEC_ID_V210, NULL, FFM_V210, -1 },
+	{ &MEDIASUBTYPE_v210, AV_CODEC_ID_V210, NULL, FFM_V210, -1 },
 
 	// H264/AVC
 	{ &MEDIASUBTYPE_H264,	  AV_CODEC_ID_H264, &DXVA_H264, FFM_H264, TRA_DXVA_H264 },
@@ -538,7 +538,7 @@ const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_IV50 },
 
 	// v210 (QT video)
-	// { &MEDIATYPE_Video, &MEDIASUBTYPE_v210 },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_v210 },
 
 	// H264/AVC
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_H264     },
@@ -1253,6 +1253,13 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 
 		if (nNewCodec == -1) {
 			return VFW_E_TYPE_NOT_ACCEPTED;
+		}
+
+		if (CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected()) ) {
+			// Prevent connection to the video decoder - need to support decoding of uncompressed(v210) video
+			if (IsVideoDecoder(pFilter, true)) {
+				return VFW_E_TYPE_NOT_ACCEPTED;
+			}
 		}
 
 		if (nNewCodec != m_nCodecNb) {

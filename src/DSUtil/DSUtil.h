@@ -39,7 +39,9 @@ extern bool IsSplitter(IBaseFilter* pBF, bool fCountConnectedOnly = false);
 extern bool IsMultiplexer(IBaseFilter* pBF, bool fCountConnectedOnly = false);
 extern bool IsStreamStart(IBaseFilter* pBF);
 extern bool IsStreamEnd(IBaseFilter* pBF);
+extern bool IsVideoDecoder(IBaseFilter* pBF, bool fCountConnectedOnly = false);
 extern bool IsVideoRenderer(IBaseFilter* pBF);
+extern bool IsVideoRenderer(const CLSID clsid);
 extern bool IsAudioWaveRenderer(IBaseFilter* pBF);
 extern IBaseFilter* GetUpStreamFilter(IBaseFilter* pBF, IPin* pInputPin = NULL);
 extern IPin* GetUpStreamPin(IBaseFilter* pBF, IPin* pInputPin = NULL);
@@ -298,5 +300,3 @@ extern CString AddSlash(LPCTSTR Path);
 extern CString RemoveSlash(LPCTSTR Path);
 
 extern BOOL GetTemporaryFilePath(CString strExtension, CString& strFileName);
-
-extern BOOL IsVideoRenderer(const CLSID clsid);
