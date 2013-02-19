@@ -567,10 +567,8 @@ bool CRealMediaSplitterFilter::DemuxInit()
 	}
 
 	// reindex if needed
-
 	if (m_pFile->m_irs.GetCount() == 0) {
 		m_nOpenProgress = 0;
-		m_rtDuration = 0;
 
 		int stream = m_pFile->GetMasterStream();
 
@@ -593,16 +591,18 @@ bool CRealMediaSplitterFilter::DemuxInit()
 					break;
 				}
 
-				m_rtDuration = max((__int64)(10000i64*mph.tStart), m_rtDuration);
+				if (mph.stream == stream) {
+					m_rtDuration = max((__int64)(10000i64*mph.tStart), m_rtDuration);
 
-				if (mph.stream == stream && (mph.flags&MediaPacketHeader::PN_KEYFRAME_FLAG) && tLastStart != mph.tStart) {
-					CAutoPtr<IndexRecord> pir(DNew IndexRecord);
-					pir->tStart = mph.tStart;
-					pir->ptrFilePos = (UINT32)filepos;
-					pir->packet = nPacket;
-					m_pFile->m_irs.AddTail(pir);
+					if (mph.flags&MediaPacketHeader::PN_KEYFRAME_FLAG && tLastStart != mph.tStart) {
+						CAutoPtr<IndexRecord> pir(DNew IndexRecord);
+						pir->tStart = mph.tStart;
+						pir->ptrFilePos = (UINT32)filepos;
+						pir->packet = nPacket;
+						m_pFile->m_irs.AddTail(pir);
 
-					tLastStart = mph.tStart;
+						tLastStart = mph.tStart;
+					}
 				}
 
 				m_nOpenProgress = m_pFile->GetPos()*100/m_pFile->GetLength();
@@ -627,9 +627,9 @@ bool CRealMediaSplitterFilter::DemuxInit()
 		m_fAbort = false;
 	}
 
-	m_seekpos = NULL;
-	m_seekpacket = 0;
-	m_seekfilepos = 0;
+	m_seekpos		= NULL;
+	m_seekpacket	= 0;
+	m_seekfilepos	= 0;
 
 	return true;
 }
@@ -1112,6 +1112,7 @@ HRESULT CRMFile::Read(MediaPacketHeader& mph, bool fFull)
 			|| S_OK != (hr = Read(flags))) {
 		return hr;
 	}
+
 	mph.flags = (MediaPacketHeader::flag_t)flags;
 
 	LONG len = mph.len;
