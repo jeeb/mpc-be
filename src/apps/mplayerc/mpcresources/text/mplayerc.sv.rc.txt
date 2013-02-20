@@ -61,13 +61,14 @@ BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
 12		"OK"
 END
 
-BEGIN DIALOGEX IDD_FILEPROPCLIP LINES 22
+BEGIN DIALOGEX IDD_FILEPROPCLIP LINES 24
 8		"Titel:"
 10		"Författare:"
-12		"Upphovsrätt:"
-14		"Betyg:"
-17		"Plats:"
-20		"Beskrivning:"
+12		"Album:"
+14		"Upphovsrätt:"
+16		"Betyg:"
+19		"Plats:"
+22		"Beskrivning:"
 END
 
 BEGIN DIALOGEX IDD_FILEPROPDETAILS LINES 20

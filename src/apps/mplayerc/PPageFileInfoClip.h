@@ -46,6 +46,7 @@ public:
 	CString m_fn;
 	CString m_clip;
 	CString m_author;
+	CString m_album;
 	CString m_copyright;
 	CString m_rating;
 	CString m_location_str;

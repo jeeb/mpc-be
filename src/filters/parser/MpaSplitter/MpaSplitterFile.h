@@ -44,6 +44,9 @@ class CMpaSplitterFile : public CBaseSplitterFileEx
 
 	bool m_bIsVBR;
 
+	CString ReadText(DWORD &size, BYTE encoding);
+	CString ReadField(DWORD &size, BYTE encoding);
+
 public:
 	CMpaSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr);
 

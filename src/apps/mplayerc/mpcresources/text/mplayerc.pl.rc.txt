@@ -61,13 +61,14 @@ BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
 12		"OK"
 END
 
-BEGIN DIALOGEX IDD_FILEPROPCLIP LINES 22
+BEGIN DIALOGEX IDD_FILEPROPCLIP LINES 24
 8		"Nazwa:"
 10		"Autor:"
-12		"Prawa autorskie:"
-14		"Ocena:"
-17		"Położenie:"
-20		"Opis:"
+12		"Album:"
+14		"Prawa autorskie:"
+16		"Ocena:"
+19		"Położenie:"
+22		"Opis:"
 END
 
 BEGIN DIALOGEX IDD_FILEPROPDETAILS LINES 20

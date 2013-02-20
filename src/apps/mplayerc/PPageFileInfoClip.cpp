@@ -81,6 +81,7 @@ void CPPageFileInfoClip::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT1, m_fn);
 	DDX_Text(pDX, IDC_EDIT4, m_clip);
 	DDX_Text(pDX, IDC_EDIT3, m_author);
+	DDX_Text(pDX, IDC_EDIT8, m_album);
 	DDX_Text(pDX, IDC_EDIT2, m_copyright);
 	DDX_Text(pDX, IDC_EDIT5, m_rating);
 	DDX_Control(pDX, IDC_EDIT6, m_location);
@@ -145,34 +146,32 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 
 	m_location.SetWindowText(m_location_str);
 
-	bool fEmpty = true;
 	BeginEnumFilters(m_pFG, pEF, pBF) {
+		if (CComQIPtr<IPropertyBag> pPB = pBF) {
+			CComVariant var;
+			if (SUCCEEDED(pPB->Read(CComBSTR(_T("ALBUM")), &var, NULL))) {
+				m_album = var.bstrVal;
+			}
+		}
+
 		if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
 			CComBSTR bstr;
 			if (SUCCEEDED(pAMMC->get_Title(&bstr)) && wcslen(bstr.m_str) > 0) {
 				m_clip = bstr.m_str;
-				fEmpty = false;
 			}
 			if (SUCCEEDED(pAMMC->get_AuthorName(&bstr)) && wcslen(bstr.m_str) > 0) {
 				m_author = bstr.m_str;
-				fEmpty = false;
 			}
 			if (SUCCEEDED(pAMMC->get_Copyright(&bstr)) && wcslen(bstr.m_str) > 0) {
 				m_copyright = bstr.m_str;
-				fEmpty = false;
 			}
 			if (SUCCEEDED(pAMMC->get_Rating(&bstr)) && wcslen(bstr.m_str) > 0) {
 				m_rating = bstr.m_str;
-				fEmpty = false;
 			}
 			if (SUCCEEDED(pAMMC->get_Description(&bstr)) && wcslen(bstr.m_str) > 0) {
 				CString desc(bstr.m_str);
 				desc.Replace(_T(";"), _T("\r\n"));
 				m_desc.SetWindowText(desc);
-				fEmpty = false;
-			}
-			if (!fEmpty) {
-				break;
 			}
 		}
 	}
@@ -180,14 +179,12 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 
 	CString strTitleAlt = ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strTitleAlt;
 	if (!strTitleAlt.IsEmpty()) {
-		m_clip		= strTitleAlt.Left(strTitleAlt.GetLength() - 4);
-		fEmpty		= false;
+		m_clip = strTitleAlt.Left(strTitleAlt.GetLength() - 4);
 	}
 
 	CString strAuthorAlt = ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strAuthorAlt;
 	if (!strAuthorAlt.IsEmpty()) {
-		m_author	= strAuthorAlt;
-		fEmpty		= false;
+		m_author = strAuthorAlt;
 	}
 
 	UpdateData(FALSE);

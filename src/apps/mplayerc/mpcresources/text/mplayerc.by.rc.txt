@@ -61,13 +61,14 @@ BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
 12		"OK"
 END
 
-BEGIN DIALOGEX IDD_FILEPROPCLIP LINES 22
+BEGIN DIALOGEX IDD_FILEPROPCLIP LINES 24
 8		"Назва:"
 10		"Аўтар:"
-12		"Капірайт:"
-14		"Рэйтынг:"
-17		"Размяшчэнне:"
-20		"Апісанне:"
+12		"Album:"
+14		"Капірайт:"
+16		"Рэйтынг:"
+19		"Размяшчэнне:"
+22		"Апісанне:"
 END
 
 BEGIN DIALOGEX IDD_FILEPROPDETAILS LINES 20

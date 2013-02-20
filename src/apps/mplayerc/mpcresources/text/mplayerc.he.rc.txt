@@ -61,13 +61,14 @@ BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
 12		"אישור"
 END
 
-BEGIN DIALOGEX IDD_FILEPROPCLIP LINES 22
+BEGIN DIALOGEX IDD_FILEPROPCLIP LINES 24
 8		"קליפ:"
 10		"יוצר:"
-12		"זכות יוצרים:"
-14		"דירוג:"
-17		"מיקום:"
-20		"תיאור:"
+12		"Album:"
+14		"זכות יוצרים:"
+16		"דירוג:"
+19		"מיקום:"
+22		"תיאור:"
 END
 
 BEGIN DIALOGEX IDD_FILEPROPDETAILS LINES 20

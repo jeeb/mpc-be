@@ -92,6 +92,72 @@ CMpaSplitterFile::CMpaSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr)
 	}
 }
 
+// text encoding:
+// 0 - ISO-8859-1
+// 1 - UCS-2 (UTF-16 encoded Unicode with BOM)
+// 2 - UTF-16BE encoded Unicode without BOM
+// 3 - UTF-8 encoded Unicode
+
+CString CMpaSplitterFile::ReadText(DWORD &size, BYTE encoding)
+{
+	WORD bom = (WORD)BitRead(16, true);
+
+	CStringA	str;
+	CString		wstr;
+
+	if (encoding > 0 && size >= 2 && bom == 0xfffe) {
+		BitRead(16);
+		size = (size - 2) / 2;
+		ByteRead((BYTE*)wstr.GetBufferSetLength(size), size*2);
+		return wstr.Trim();
+	} else if (encoding > 0 && size >= 2 && bom == 0xfeff) {
+		BitRead(16);
+		size = (size - 2) / 2;
+		ByteRead((BYTE*)wstr.GetBufferSetLength(size), size*2);
+		for (int i = 0, j = wstr.GetLength(); i < j; i++) {
+			wstr.SetAt(i, (wstr[i]<<8)|(wstr[i]>>8));
+		}
+		return wstr.Trim();
+	} else {
+		ByteRead((BYTE*)str.GetBufferSetLength(size), size);
+		return (encoding > 0 ? UTF8To16(str) : CStringW(str)).Trim();
+	}
+}
+
+CString CMpaSplitterFile::ReadField(DWORD &size, BYTE encoding)
+{
+	DWORD fieldSize	= 0;
+	DWORD pos		= GetPos();
+
+	CString wstr;
+	
+	if (encoding > 0) {
+		while (size -= 2) {
+			fieldSize += 2;
+
+			WORD w = (WORD)BitRead(16);
+			if (w == 0) {
+				break;
+			}
+		}
+	} else {
+		while (size--) {
+			fieldSize++;
+
+			if (BitRead(8) == 0) {
+				break;
+			}
+		}
+	}
+
+	if (fieldSize) {
+		Seek(pos);
+		wstr = ReadText(fieldSize, encoding);
+	};
+
+	return wstr;
+}
+
 HRESULT CMpaSplitterFile::Init()
 {
 	m_startpos = 0;
@@ -206,14 +272,16 @@ HRESULT CMpaSplitterFile::Init()
 
 				if (tag == 'TIT2'
 						|| tag == 'TPE1'
-						|| tag == 'TALB'
+						|| tag == 'TALB' || tag == '\0TAL'
 						|| tag == 'TYER'
 						|| tag == 'COMM'
 						|| tag == 'TRCK'
 						|| tag == 'TCOP'
 						|| tag == '\0TP1'
 						|| tag == '\0TT2'
-						|| tag == '\0PIC' || tag == 'APIC') {
+						|| tag == '\0PIC' || tag == 'APIC'
+						|| tag == '\0ULT' || tag == 'USLT'
+						) {
 
 					if (tag == 'APIC' || tag == '\0PIC') {
 						if (!m_Cover.GetCount()) {
@@ -225,14 +293,15 @@ HRESULT CMpaSplitterFile::Init()
 
 							int mime_len = 0;
 							while (size-- && (mime[mime_len++] = BitRead(8)) != 0) {
+								;
 							}
 
 							BYTE pic_type = (BYTE)BitRead(8);
 							size--;
 
 							if (tag == 'APIC') {
-								while (size-- && BitRead(8) != 0) {
-								}
+								CString Desc = ReadField(size, encoding);
+								UNREFERENCED_PARAMETER(Desc);
 							}
 
 							m_CoverMime = mime;
@@ -250,12 +319,30 @@ HRESULT CMpaSplitterFile::Init()
 							m_Cover.SetCount(size);
 							ByteRead(m_Cover.GetData(), size);
 						}
+					} else if (tag == '\0ULT' || tag == 'USLT') {
+						// Text encoding
+						BYTE encoding = (BYTE)BitRead(8);
+						size--;
+						
+						// Language
+						CHAR lang[3];
+						memset(&lang, 0 ,3);
+						ByteRead((BYTE*)lang, 3);
+						UNREFERENCED_PARAMETER(lang);
+						size -= 3;
+
+						CString Desc = ReadField(size, encoding);
+						UNREFERENCED_PARAMETER(Desc);
+
+						m_tags[tag] = ReadText(size, encoding);
 					} else {
 
+						// Text encoding
 						BYTE encoding = (BYTE)BitRead(8);
 						size--;
 
 						if (tag == 'COMM') {
+							// Language
 							CHAR lang[3];
 							memset(&lang, 0 ,3);
 							ByteRead((BYTE*)lang, 3);
@@ -274,28 +361,7 @@ HRESULT CMpaSplitterFile::Init()
 							}
 						}
 
-						WORD bom = (WORD)BitRead(16, true);
-
-						CStringA str;
-						CStringW wstr;
-
-						if (encoding > 0 && size >= 2 && bom == 0xfffe) {
-							BitRead(16);
-							size = (size - 2) / 2;
-							ByteRead((BYTE*)wstr.GetBufferSetLength(size), size*2);
-							m_tags[tag] = wstr.Trim();
-						} else if (encoding > 0 && size >= 2 && bom == 0xfeff) {
-							BitRead(16);
-							size = (size - 2) / 2;
-							ByteRead((BYTE*)wstr.GetBufferSetLength(size), size*2);
-							for (int i = 0, j = wstr.GetLength(); i < j; i++) {
-								wstr.SetAt(i, (wstr[i]<<8)|(wstr[i]>>8));
-							}
-							m_tags[tag] = wstr.Trim();
-						} else {
-							ByteRead((BYTE*)str.GetBufferSetLength(size), size);
-							m_tags[tag] = (encoding > 0 ? UTF8To16(str) : CStringW(str)).Trim();
-						}
+						m_tags[tag] = ReadText(size, encoding);
 					}
 				}
 			}

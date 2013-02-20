@@ -61,13 +61,14 @@ BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
 12		"OK"
 END
 
-BEGIN DIALOGEX IDD_FILEPROPCLIP LINES 22
+BEGIN DIALOGEX IDD_FILEPROPCLIP LINES 24
 8		"Clip:"
 10		"Autor:"
-12		"Drepturi de autor:"
-14		"Apreciere:"
-17		"Locație:"
-20		"Descriere:"
+12		"Album:"
+14		"Drepturi de autor:"
+16		"Apreciere:"
+19		"Locație:"
+22		"Descriere:"
 END
 
 BEGIN DIALOGEX IDD_FILEPROPDETAILS LINES 20

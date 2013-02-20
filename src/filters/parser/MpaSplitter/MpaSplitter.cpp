@@ -154,6 +154,12 @@ HRESULT CMpaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	if (m_pFile->m_tags.Lookup('COMM', str)) {
 		SetProperty(L"DESC", str);
 	}
+	if (m_pFile->m_tags.Lookup('USLT', str) || m_pFile->m_tags.Lookup('\0ULT', str)) {
+		SetProperty(L"LYRICS", str);
+	}
+	if (m_pFile->m_tags.Lookup('TALB', str) || m_pFile->m_tags.Lookup('\0TAL', str)) {
+		SetProperty(L"ALBUM", str);
+	}
 
 	if (m_pFile->m_Cover.GetCount()) {
 		CString f_name = _T("cover");
