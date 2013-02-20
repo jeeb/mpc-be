@@ -134,6 +134,8 @@ STDMETHODIMP CMusePackSplitter::NonDelegatingQueryInterface(REFIID riid,void **p
 
 	return
 		QI2(IAMMediaContent)
+		QI(IPropertyBag)
+		QI(IPropertyBag2)
 		QI(IDSMResourceBag)
 		QI(IDSMChapterBag)
 		QI(IDSMPropertyBag)
@@ -283,6 +285,8 @@ HRESULT CMusePackSplitter::CompleteConnect(PIN_DIRECTION Dir, CBasePin *pCaller,
 										SetProperty(L"TITL", TagValue);
 									} else if (TagKey == _T("year")) {
 										SetProperty(L"YEAR", TagValue);
+									} else if (TagKey == _T("album")) {
+										SetProperty(L"ALBUM", TagValue);
 									}
 							
 								}
