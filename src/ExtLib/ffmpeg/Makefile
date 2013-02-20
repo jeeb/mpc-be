@@ -431,6 +431,7 @@ SRCS_YASM = \
     libavcodec/x86/dwt_yasm.asm \
     libavcodec/x86/fft.asm \
     libavcodec/x86/fmtconvert.asm \
+    libavcodec/x86/h263_loopfilter.asm \
     libavcodec/x86/h264_chromamc.asm \
     libavcodec/x86/h264_chromamc_10bit.asm \
     libavcodec/x86/h264_deblock.asm \

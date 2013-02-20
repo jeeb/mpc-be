@@ -645,7 +645,8 @@ typedef struct H264Context {
     uint8_t *edge_emu_buffer;
     int16_t *dc_val_base;
 
-   uint8_t *visualization_buffer[3]; ///< temporary buffer vor MV visualization
+    uint8_t *visualization_buffer[3]; ///< temporary buffer vor MV visualization
+
     // ==> Start patch MPC
     int				sp_for_switch_flag;
     int				slice_qs_delta;
