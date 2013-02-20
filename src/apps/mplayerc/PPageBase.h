@@ -44,6 +44,7 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual BOOL OnSetActive();
+	virtual BOOL OnApply();
 
 	DECLARE_MESSAGE_MAP()
 

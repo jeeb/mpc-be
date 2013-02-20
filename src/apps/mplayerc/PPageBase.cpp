@@ -25,7 +25,7 @@
 #include "mplayerc.h"
 #include "PPageBase.h"
 #include "SettingsDefines.h"
-
+#include "MainFrm.h"
 
 // CPPageBase dialog
 
@@ -99,4 +99,12 @@ void CPPageBase::OnDestroy()
 	__super::OnDestroy();
 
 	m_wndToolTip.DestroyWindow();
+}
+
+BOOL CPPageBase::OnApply()
+{
+	((CMainFrame*)AfxGetMainWnd())->CreateThumbnailToolbar();
+	((CMainFrame*)AfxGetMainWnd())->UpdateThumbarButton();
+
+	return __super::OnApply();
 }
