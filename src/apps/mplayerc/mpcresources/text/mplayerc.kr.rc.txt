@@ -64,7 +64,7 @@ END
 BEGIN DIALOGEX IDD_FILEPROPCLIP LINES 24
 8		"클립:"
 10		"만든이:"
-12		"Album:"
+12		"앨범:"
 14		"저작권:"
 16		"등급:"
 19		"위치:"
