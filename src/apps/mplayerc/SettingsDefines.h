@@ -204,7 +204,6 @@
 #define IDS_RS_WEBSERVERCGI					_T("WebServerCGI")
 #define IDS_RS_WEBDEFINDEX					_T("WebDefIndex")
 #define IDS_RS_LIMITWINDOWPROPORTIONS		_T("LimitWindowProportions")
-#define IDS_RS_NOTIFYMSN					_T("NotifyMSN2")
 #define IDS_RS_LASTUSEDPAGE					_T("LastUsedPage")
 #define IDS_RS_VMR9MIXERMODE				_T("VMR9MixerMode")
 #define IDS_RS_THUMBROWS					_T("ThumbRows")

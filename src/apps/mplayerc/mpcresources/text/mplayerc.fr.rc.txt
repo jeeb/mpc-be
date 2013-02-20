@@ -437,15 +437,14 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"Les changements prennent effet après que la lecture soit arretée et redémarrée."
 END
 
-BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 19
+BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
 5		"Jump distances (small, medium, large in ms)"
 9		"Default"
 10		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
-12		"Send ""Now Playing"" information to MSN Messenger"
-14		"Prevent from MINIMIZE when Fullscreen on non default monitor"
-16		"Enable Logitech LCD support (experimental)"
-17		"Fast seek (on keyframe)"
-18		"Enable MiniDump"
+12		"Prevent from MINIMIZE when Fullscreen on non default monitor"
+14		"Enable Logitech LCD support (experimental)"
+15		"Fast seek (on keyframe)"
+16		"Enable MiniDump"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

@@ -437,15 +437,14 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"현재 파일을 닫고 다시 시작해야만 설정이 적용됩니다."
 END
 
-BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 19
+BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
 5		"이동 간격 (최소/중간/최대 간격을 밀리초 단위로 입력)"
 9		"기본값"
 10		"재생목록에 파일 하나만 있다면 '앞/뒤 탐색'시에 '폴더내에서찾기' 사용안함"
-12		"MSN 메신저에 ""지금 재생중"" 정보 표시하기"
-14		"전체화면시 최소화 예방 (기본 모니터가 없을시)"
-16		"로지텍 LCD 지원 활성화(실험적)"
-17		"빠른 탐색 (키프레임)"
-18		"미니덤프 활성화"
+12		"전체화면시 최소화 예방 (기본 모니터가 없을시)"
+14		"로지텍 LCD 지원 활성화(실험적)"
+15		"빠른 탐색 (키프레임)"
+16		"미니덤프 활성화"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

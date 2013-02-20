@@ -385,13 +385,11 @@ BEGIN
     PUSHBUTTON      "Default",IDC_BUTTON1,158,17,56,14
     CONTROL         "Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,55,250,18
-    CONTROL         "Send ""Now Playing"" information to MSN Messenger",IDC_CHECK4,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,250,8
     CONTROL         "Prevent from MINIMIZE when Fullscreen on non default monitor",IDC_CHECK6,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,87,280,8
-    CONTROL         "Enable Logitech LCD support (experimental)",IDC_CHECK_LCD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,99,264,8
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,75,280,8
+    CONTROL         "Enable Logitech LCD support (experimental)",IDC_CHECK_LCD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,87,264,8
     CONTROL         "Fast seek (on keyframe)",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,45,264,8
-    CONTROL         "Enable MiniDump",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,111,264,8
+    CONTROL         "Enable MiniDump",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,99,264,8
 END
 
 IDD_PPAGEINTERFACE DIALOGEX 0, 0, 296, 241

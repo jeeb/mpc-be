@@ -437,15 +437,14 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"Modificările vor avea efect după ce redarea a fost închisă și repornită."
 END
 
-BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 19
+BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
 5		"Intervale de sărire (mic, mediu, mare în ms)"
 9		"Implicit"
 10		"Căutare rapidă (la cadru cheie)"
-12		"Arată semne pentru capitole în bara de căutare"
-14		"Trimite informații ""Acum în redare"" către MSN Messenger"
-16		"Prevină minimizarea playerului din ecran complet pe un monitor care nu este implicit"
-17		"Folosește facilitățile barei de activități Windows 7"
-18		"Deschide următorul/precedentul fişier din dosar la comenzile ""Sari înapoi/înainte"" când este un singur element în lista de redare"
+12		"Trimite informații ""Acum în redare"" către MSN Messenger"
+14		"Prevină minimizarea playerului din ecran complet pe un monitor care nu este implicit"
+15		"Folosește facilitățile barei de activități Windows 7"
+16		"Deschide următorul/precedentul fişier din dosar la comenzile ""Sari înapoi/înainte"" când este un singur element în lista de redare"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

@@ -437,15 +437,14 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"Die Änderungen werden erst nach Neustart der Wiedergabe wirksam."
 END
 
-BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 19
+BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
 5		"Sprung-Intervalle (klein, mittel, groß) - in Millisekunden"
 9		"Standard"
 10		"Die Nächste/Vorige Datei eines Ordners beim Vor- und Zurückspulen öffnen, wenn nur eine Datei in der Wiedergabeliste ist"
-12		"Info über gerade laufende Datei an den MSN-Messenger senden"
-14		"Minimieren des Fensters bei Vollbild-Ausgabe auf Nicht-Standardmonitor verhindern."
-16		"Logitech LCD Unterstützung (experimentell)"
-17		"Schnelle Suche (bei Keyframes)"
-18		"Enable MiniDump"
+12		"Minimieren des Fensters bei Vollbild-Ausgabe auf Nicht-Standardmonitor verhindern."
+14		"Logitech LCD Unterstützung (experimentell)"
+15		"Schnelle Suche (bei Keyframes)"
+16		"Enable MiniDump"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

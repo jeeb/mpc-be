@@ -533,7 +533,6 @@ public:
 	int				nJumpDistM;
 	int				nJumpDistL;
 	bool			fDontUseSearchInFolder;
-	bool			fNotifyMSN;
 	bool			fPreventMinimize;
 	bool			fLCDSupport;
 	bool			fFastSeek;

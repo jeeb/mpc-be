@@ -41,7 +41,6 @@ public:
 	int m_nJumpDistS;
 	int m_nJumpDistM;
 	int m_nJumpDistL;
-	BOOL m_fNotifyMSN;
 	BOOL m_fPreventMinimize;
 	BOOL m_fDontUseSearchInFolder;
 	BOOL m_fFastSeek;

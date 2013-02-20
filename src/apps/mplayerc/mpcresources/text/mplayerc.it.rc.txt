@@ -437,15 +437,14 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"Le modifiche saranno effettive dopo un riavvio della riproduzione."
 END
 
-BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 19
+BEGIN DIALOGEX IDD_PPAGETWEAKS LINES 17
 5		"Intervalli di salto (piccolo, medio, grande in ms)"
 9		"Default"
 10		"Non usare la funzione 'cerca nella cartella' nei comandi 'Salta avanti/indietro' quando è presente un solo elemento in playlist"
-12		"Aggiorna MSN Messenger su cosa si sta riproducendo"
-14		"Evita che MPC BE si minimizzi quando è a tutto schermo su un monitor non di default"
-16		"Abilita supporto Logitech LCD (sperimentale)"
-17		"Ricerca veloce (sul fotogramma)"
-18		"Abilita file MiniDump"
+12		"Evita che MPC BE si minimizzi quando è a tutto schermo su un monitor non di default"
+14		"Abilita supporto Logitech LCD (sperimentale)"
+15		"Ricerca veloce (sul fotogramma)"
+16		"Abilita file MiniDump"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
