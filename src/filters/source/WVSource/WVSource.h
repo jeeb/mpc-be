@@ -188,7 +188,7 @@ public :
 	// IAMMediaContent
 	STDMETHODIMP get_AuthorName(BSTR* pbstrAuthorName);
 	STDMETHODIMP get_Title(BSTR* pbstrTitle);
-	STDMETHODIMP get_Rating(BSTR* pbstrRating);
+	STDMETHODIMP get_Rating(BSTR* pbstrRating) {return E_NOTIMPL;}
 	STDMETHODIMP get_Description(BSTR* pbstrDescription);
 	STDMETHODIMP get_Copyright(BSTR* pbstrCopyright);
 	STDMETHODIMP get_BaseURL(BSTR* pbstrBaseURL) {return E_NOTIMPL;}

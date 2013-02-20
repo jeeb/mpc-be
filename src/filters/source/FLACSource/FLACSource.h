@@ -35,6 +35,7 @@ typedef struct{
 	CString artist;
 	CString comment;
 	CString year;
+	CString album;
 	bool	got_vorbis_comments;
 } file_info_struct;
 
@@ -44,6 +45,7 @@ class __declspec(uuid("1930D8FF-4739-4e42-9199-3B2EDEAA3BF2"))
 	CFLACSource
 	: public CBaseSource<CFLACStream>
 	, public IAMMediaContent
+	, public IDSMPropertyBagImpl
 	, public IDSMResourceBagImpl
 	, public IDSMChapterBagImpl 
 {

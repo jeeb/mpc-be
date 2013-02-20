@@ -43,6 +43,7 @@ CPPageFileInfoClip::CPPageFileInfoClip(CString fn, IFilterGraph* pFG)
 	, m_copyright(ResStr(IDS_AG_NONE))
 	, m_rating(ResStr(IDS_AG_NONE))
 	, m_location_str(ResStr(IDS_AG_NONE))
+	, m_album(ResStr(IDS_AG_NONE))
 	, m_hIcon(NULL)
 {
 }

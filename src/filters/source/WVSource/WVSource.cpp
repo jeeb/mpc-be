@@ -121,6 +121,8 @@ STDMETHODIMP CWavPackSplitterFilter::NonDelegatingQueryInterface(REFIID riid, vo
 
 	return
 		QI2(IAMMediaContent)
+		QI(IPropertyBag)
+		QI(IPropertyBag2)
 		QI(IDSMResourceBag)
 		QI(IDSMChapterBag)
 		QI(IDSMPropertyBag)
@@ -280,11 +282,6 @@ STDMETHODIMP CWavPackSplitterFilter::get_AuthorName(BSTR* pbstrAuthorName)
 STDMETHODIMP CWavPackSplitterFilter::get_Title(BSTR* pbstrTitle)
 {
 	return GetProperty(L"TITL", pbstrTitle);
-}
-
-STDMETHODIMP CWavPackSplitterFilter::get_Rating(BSTR* pbstrRating)
-{
-	return GetProperty(L"RTNG", pbstrRating);
 }
 
 STDMETHODIMP CWavPackSplitterFilter::get_Description(BSTR* pbstrDescription)
@@ -471,6 +468,8 @@ HRESULT CWavPackSplitterFilterInputPin::CompleteConnect(IPin *pReceivePin)
 									m_pParentFilter->SetProperty(L"TITL", TagValue);
 								} else if (TagKey == _T("year")) {
 									m_pParentFilter->SetProperty(L"YEAR", TagValue);
+								} else if (TagKey == _T("album")) {
+									m_pParentFilter->SetProperty(L"ALBUM", TagValue);
 								}
 							}
 

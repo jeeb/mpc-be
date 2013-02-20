@@ -117,6 +117,8 @@ STDMETHODIMP CFLACSource::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 
 	return
 		QI2(IAMMediaContent)
+		QI(IPropertyBag)
+		QI(IPropertyBag2)
 		QI(IDSMResourceBag)
 		QI(IDSMChapterBag)
 		__super::NonDelegatingQueryInterface(riid, ppv);
@@ -124,47 +126,19 @@ STDMETHODIMP CFLACSource::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 
 // IAMMediaContent
 
-STDMETHODIMP CFLACSource::get_AuthorName(BSTR* pbstrTitle)
+STDMETHODIMP CFLACSource::get_AuthorName(BSTR* pbstrAuthorName)
 {
-	CheckPointer(pbstrTitle, E_POINTER);
-
-	file_info_struct file_info = (static_cast<CFLACStream*>(m_paStreams[0]))->GetInfo();
-	if (file_info.got_vorbis_comments) {
-		*pbstrTitle = file_info.artist.AllocSysString();
-		return S_OK;
-	}
-	return E_UNEXPECTED;
+	return GetProperty(L"AUTH", pbstrAuthorName);
 }
 
 STDMETHODIMP CFLACSource::get_Title(BSTR* pbstrTitle)
 {
-	CheckPointer(pbstrTitle, E_POINTER);
-	
-	file_info_struct file_info = (static_cast<CFLACStream*>(m_paStreams[0]))->GetInfo();
-	if (file_info.got_vorbis_comments) {
-		CString Title	= file_info.title;
-		CString Year	= file_info.year;
-
-		if (!Title.IsEmpty() && !Year.IsEmpty()) {
-			Title += _T(" (") + Year + _T(")");
-		}
-
-		*pbstrTitle = Title.AllocSysString();
-		return S_OK;
-	}
-	return E_UNEXPECTED;
+	return GetProperty(L"TITL", pbstrTitle);
 }
 
-STDMETHODIMP CFLACSource::get_Description(BSTR* pbstrTitle)
+STDMETHODIMP CFLACSource::get_Description(BSTR* pbstrDescription)
 {
-	CheckPointer(pbstrTitle, E_POINTER);
-	
-	file_info_struct file_info = (static_cast<CFLACStream*>(m_paStreams[0]))->GetInfo();
-	if (file_info.got_vorbis_comments) {
-		*pbstrTitle = file_info.comment.AllocSysString();
-		return S_OK;
-	}
-	return E_UNEXPECTED;
+	return GetProperty(L"DESC", pbstrDescription);
 }
 
 STDMETHODIMP CFLACSource::QueryFilterInfo(FILTER_INFO* pInfo)
@@ -274,6 +248,20 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 		}
 
 		FLAC__stream_decoder_get_decode_position(_DECODER_, &m_llOffset);
+
+		// IDSMPropertyBagImpl
+		if (file_info.got_vorbis_comments) {
+			CString Title	= file_info.title;
+			CString Year	= file_info.year;
+			if (!Title.IsEmpty() && !Year.IsEmpty()) {
+				Title += _T(" (") + Year + _T(")");
+			}
+
+			((CFLACSource*)m_pFilter)->SetProperty(L"TITL", Title);
+			((CFLACSource*)m_pFilter)->SetProperty(L"AUTH", file_info.artist);
+			((CFLACSource*)m_pFilter)->SetProperty(L"DESC", file_info.comment);
+			((CFLACSource*)m_pFilter)->SetProperty(L"ALBUM", file_info.album);
+		}
 
 		hr = S_OK;
 	} while (false);
@@ -473,6 +461,8 @@ void CFLACStream::UpdateFromMetadata (void* pBuffer)
 				file_info.comment	= TagValue;
 			} else  if (ParseVorbisComment("date", &vc->comments[i], &TagValue)) {
 				file_info.year		= TagValue.GetAllocLength() > 4 ? TagValue.Right(4) : TagValue;
+			} else  if (ParseVorbisComment("album", &vc->comments[i], &TagValue)) {
+				file_info.album		= TagValue;
 			} else  if (ParseVorbisComment("cuesheet", &vc->comments[i], &TagValue)) {
 				CAtlList<Chapters> ChaptersList;
 				if (ParseCUESheet(TagValue, ChaptersList)) {
