@@ -677,9 +677,12 @@ public:
 
 	BOOL OnButton(UINT id, UINT nFlags, CPoint point);
 
+	bool bLeftClicked;
+	bool bWindowDragged;
 	bool bDVDMenuClicked;
 	bool bDVDButtonAtPosition;
-	bool templclick;
+	CPoint m_MouseInWindow;
+	CRect m_RectWindow;
 
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
