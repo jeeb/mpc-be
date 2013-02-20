@@ -959,15 +959,26 @@ void CTreePropSheet::OnPageTreeSelChanged(NMHDR * /*pNotifyStruct*/, LRESULT *pl
 LRESULT CTreePropSheet::OnIsDialogMessage(WPARAM wParam, LPARAM lParam)
 {
 	MSG *pMsg = reinterpret_cast<MSG*>(lParam);
-	if (pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_TAB && GetKeyState(VK_CONTROL)&0x8000)
-	{
-		if (GetKeyState(VK_SHIFT)&0x8000)
-			ActivatePreviousPage();
-		else
-			ActivateNextPage();
-		return TRUE;
-	}
+	if (pMsg->message == WM_KEYDOWN) {
+		if (pMsg->wParam == VK_TAB && GetKeyState(VK_CONTROL)&0x8000) {
+			if (GetKeyState(VK_SHIFT)&0x8000) {
+				ActivatePreviousPage();
+			} else {
+				ActivateNextPage();
+			}
+			return TRUE;
+		}
 
+		if (GetKeyState(VK_CONTROL)&0x8000) {
+			if (pMsg->wParam == VK_PRIOR) {
+				ActivatePreviousPage();
+				return TRUE;
+			} else if (pMsg->wParam == VK_NEXT) {
+				ActivateNextPage();
+				return TRUE;
+			}
+		}
+	}
 
 	return CPropertySheet::DefWindowProc(PSM_ISDIALOGMESSAGE, wParam, lParam);
 }
