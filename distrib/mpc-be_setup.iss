@@ -249,8 +249,8 @@ Name: {group}\{cm:ProgramOnTheWeb,{#app_name}};  Filename: {#app_url}
 
 [Run]
 Filename: "{app}\{#mpcbe_exe}"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent unchecked; Description: "{cm:LaunchProgram,{#app_name}}"
-Filename: "{app}\Changelog.txt"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent unchecked shellexec; Description: "{cm:ViewChangelog}"
-Filename: "{app}\Changelog.Rus.txt"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent unchecked shellexec; Description: "{cm:ViewChangelog}"
+Filename: "{app}\Changelog.txt"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent unchecked shellexec; Description: "{cm:ViewChangelog}"; Check: IsInactiveLang('ru')
+Filename: "{app}\Changelog.Rus.txt"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent unchecked shellexec; Description: "{cm:ViewChangelog}"; Languages: ru
 Filename: "{app}\{#mpcbe_exe}"; Parameters: "/regvid"; WorkingDir: "{app}"; Flags: runasoriginaluser runhidden; Components: mpcberegvid
 Filename: "{app}\{#mpcbe_exe}"; Parameters: "/regaud"; WorkingDir: "{app}"; Flags: runasoriginaluser runhidden; Components: mpcberegaud
 Filename: "{app}\{#mpcbe_exe}"; Parameters: "/regpl"; WorkingDir: "{app}"; Flags: runasoriginaluser runhidden; Components: mpcberegpl
@@ -494,5 +494,15 @@ begin
   else begin
     Result := True;
     CreateMutex(installer_mutex);
+  end;
+end;
+
+function IsInactiveLang(Lang: String): Boolean;
+begin
+  if ActiveLanguage() = lang then begin
+    Result := False;
+  end
+  else begin
+    Result :=  True;
   end;
 end;
