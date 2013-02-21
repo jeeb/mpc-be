@@ -835,7 +835,24 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 		m_strTipText = ResStr(IDS_AG_STEP) + _T(" | ") + ResStr(IDS_AG_JUMP_TO);
 
 	} else if (pNMHDR->idFrom == ID_VOLUME_MUTE) {
-		m_strTipText = ResStr(IDS_AG_VOLUME_MUTE);
+		CToolBarCtrl& tb = GetToolBarCtrl();
+		TBBUTTONINFO bi;
+		bi.cbSize = sizeof(bi);
+		bi.dwMask = TBIF_IMAGE;
+		tb.GetButtonInfo(ID_VOLUME_MUTE, &bi);
+	
+		if (bi.iImage == 12) {
+			m_strTipText = ResStr(ID_VOLUME_MUTE);
+		} else if (bi.iImage == 13) {
+			m_strTipText = ResStr(ID_VOLUME_MUTE_ON);
+		} else if (bi.iImage == 14) {
+			m_strTipText = ResStr(ID_VOLUME_MUTE_DISABLED);
+		}
+		
+		int i = m_strTipText.Find('\n'); // TODO: remove it
+		if (i > 0) {
+			m_strTipText = m_strTipText.Left(i);
+		}
 
 	} else if (pNMHDR->idFrom == ID_FILE_OPENQUICK) {
 		m_strTipText = ResStr(IDS_MPLAYERC_0);

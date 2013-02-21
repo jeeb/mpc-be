@@ -383,7 +383,7 @@ BOOL CVolumeCtrl::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 
 	str.AppendFormat(_T("%d%%"), GetPos());
 
-	if (AfxGetAppSettings().fMute) {
+	if (AfxGetAppSettings().fMute) { // TODO: remove i
 		CString no_sound_str = ResStr(ID_VOLUME_MUTE_DISABLED);
 		int i = no_sound_str.Find('\n');
 		if (i > 0) {
