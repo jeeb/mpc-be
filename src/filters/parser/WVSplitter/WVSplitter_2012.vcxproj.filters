@@ -13,14 +13,9 @@
     <ClCompile Include="..\..\..\ExtLib\mfc\winmdi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WVSource.cpp">
+    <ClCompile Include="WVSplitter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="WVSource.def">
-      <Filter>Source Files</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -29,7 +24,7 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WVSource.h">
+    <ClInclude Include="WVSplitter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -45,7 +40,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="WVSource.rc">
+    <None Include="WVSplitter.def">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="WVSplitter.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

@@ -40,6 +40,7 @@
 #include "parser/RoQSplitter/RoQSplitter.h"
 #include "parser/StreamDriveThru/StreamDriveThru.h"
 #include "parser/TTASplitter/TTASplitter.h"
+#include "parser/WVSplitter/WVSplitter.h"
 
 #include "reader/CDDAReader/CDDAReader.h"
 #include "reader/CDXAReader/CDXAReader.h"
@@ -57,7 +58,6 @@
 #include "source/MusePackSource/MusePackSource.h"
 #include "source/ShoutcastSource/ShoutcastSource.h"
 #include "source/SubtitleSource/SubtitleSource.h"
-#include "source/WVSource/WVSource.h"
 
 #include "switcher/AudioSwitcher/AudioSwitcher.h"
 

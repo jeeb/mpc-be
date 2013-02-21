@@ -26,7 +26,7 @@
 #include <moreuuids.h>
 #include <mmreg.h>
 
-#include "WVSource.h"
+#include "WVSplitter.h"
 #include "../DSUtil/ApeTag.h"
 
 #ifdef REGISTER_FILTER
@@ -76,7 +76,7 @@ CUnknown *WINAPI CWavPackSplitterFilter::CreateInstance(LPUNKNOWN punk, HRESULT 
 }
 
 CWavPackSplitterFilter::CWavPackSplitterFilter(LPUNKNOWN lpunk, HRESULT *phr) :
-	CBaseFilter(NAME("Light Alloy/MPC WavPack Splitter"), lpunk, &m_Lock, CLSID_WavPackSplitter),
+	CBaseFilter(NAME("CWavPackSplitterFilter"), lpunk, &m_Lock, CLSID_WavPackSplitter),
 	m_pInputPin(NULL),
 	m_pOutputPin(NULL),
 	m_rtStart(0),

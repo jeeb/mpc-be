@@ -207,7 +207,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						mts.Add(mt);
 						if (mt.subtype == MEDIASUBTYPE_WVC1) {
 							mt.subtype = MEDIASUBTYPE_WVC1_CYBERLINK;
-							mts.Add(mt);
+							mts.InsertAt(0, mt);
 						}
 					}
 					bHasVideo = true;

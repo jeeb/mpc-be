@@ -29,15 +29,11 @@
 #include <wavpacklib/wavpack_frame.h>
 #include <wavpacklib/wavpack_parser.h>
 
-#define WavPackSplitterName   L"Light Alloy/MPC WavPack Source"
+#define WavPackSplitterName   L"MPC WavPack Splitter"
 
 // B5554304-3C9A-40A1-8E82-8C8CFBED56C0
 static const GUID CLSID_WavPackSplitter =
 	{ 0xd8cf6a42, 0x3e09, 0x4922, { 0xa4, 0x52, 0x21, 0xdf, 0xf1, 0xb, 0xee, 0xba } };
-
-// Flag that identify additionnal block data
-// It's correction data in case of WavPack
-#define AM_STREAM_BLOCK_ADDITIONNAL 0x80000001
 
 typedef struct {
 	short version;

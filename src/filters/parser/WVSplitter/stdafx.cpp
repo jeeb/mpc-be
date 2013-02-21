@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: stdafx.cpp 1775 2013-01-05 14:19:34Z szl $
  *
  * (C) 2006-2013 see Authors.txt
  *

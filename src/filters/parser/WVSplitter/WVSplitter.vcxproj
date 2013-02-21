@@ -36,58 +36,49 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F22DE3B2-4DE9-4013-BBAB-1BB39F2B7DF7}</ProjectGuid>
-    <RootNamespace>WVSource</RootNamespace>
+    <RootNamespace>WVSplitter</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <ProjectName>WVSource</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v110_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v110_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Filter|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v110_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Filter|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v110_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v110_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v110_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Filter|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v110_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Filter|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v110_xp</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -142,7 +133,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>WVSource.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>WVSplitter.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)bin\lib\Debug_$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ResourceCompile>
@@ -155,7 +146,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>WVSource.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>WVSplitter.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)bin\lib\Debug_$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ResourceCompile>
@@ -168,7 +159,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>WVSource.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>WVSplitter.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)bin\lib\Release_$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ResourceCompile>
@@ -181,7 +172,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>WVSource.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>WVSplitter.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)bin\lib\Release_$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ResourceCompile>
@@ -226,44 +217,44 @@
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="WVSource.cpp" />
+    <ClCompile Include="WVSplitter.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="WVSource.def" />
+    <None Include="WVSplitter.def" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="WVSource.h" />
+    <ClInclude Include="WVSplitter.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="WVSource.rc">
+    <ResourceCompile Include="WVSplitter.rc">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\DSUtil\DSUtil_2012.vcxproj">
+    <ProjectReference Include="..\..\..\DSUtil\DSUtil.vcxproj">
       <Project>{fc70988b-1ae5-4381-866d-4f405e28ac42}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\ExtLib\VirtualDub\Kasumi\Kasumi_2012.vcxproj">
+    <ProjectReference Include="..\..\..\ExtLib\VirtualDub\Kasumi\Kasumi.vcxproj">
       <Project>{0d252872-7542-4232-8d02-53f9182aee15}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\ExtLib\VirtualDub\system\system_2012.vcxproj">
+    <ProjectReference Include="..\..\..\ExtLib\VirtualDub\system\system.vcxproj">
       <Project>{c2082189-3ecb-4079-91fa-89d3c8a305c0}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\ExtLib\BaseClasses\BaseClasses_2012.vcxproj">
+    <ProjectReference Include="..\..\..\ExtLib\BaseClasses\BaseClasses.vcxproj">
       <Project>{e8a3f6fa-ae1c-4c8e-a0b6-9c8480324eaa}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\ExtLib\wavpacklib\wavpacklib_2012.vcxproj">
+    <ProjectReference Include="..\..\..\ExtLib\wavpacklib\wavpacklib.vcxproj">
       <Project>{99e59c6f-4e0e-40a1-9f16-f1302947516b}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\core\Filters_2012.vcxproj">
+    <ProjectReference Include="..\..\core\Filters.vcxproj">
       <Project>{273b3149-3192-4b75-a791-470320b90812}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

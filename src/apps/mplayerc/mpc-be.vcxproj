@@ -555,7 +555,7 @@
     <ProjectReference Include="..\..\filters\source\MusePackSource\MusePackSource.vcxproj">
       <Project>{3ff8d24a-877c-4957-b377-f20a1527f423}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\filters\source\WVSource\WVSource.vcxproj">
+    <ProjectReference Include="..\..\filters\parser\WVSplitter\WVSplitter.vcxproj">
       <Project>{f22de3b2-4de9-4013-bbab-1bb39f2b7df7}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\ExtLib\BaseClasses\BaseClasses.vcxproj">
