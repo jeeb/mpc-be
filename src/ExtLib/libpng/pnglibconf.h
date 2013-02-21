@@ -1,6 +1,6 @@
 /* pnglibconf.h - library build configuration */
 
-/* libpng version 1.7.0beta01 - February 15, 2013 */
+/* libpng version 1.7.0beta03 - February 19, 2013 */
 
 /* Copyright (c) 1998-2013 Glenn Randers-Pehrson */
 
@@ -39,7 +39,8 @@
 /* end of settings */
 /* options */
 #define PNG_16BIT_SUPPORTED
-#define PNG_ALIGN_MEMORY_SUPPORTED
+#define PNG_ALIGNED_MEMORY_SUPPORTED
+#define PNG_ARM_NEON_CHECK_SUPPORTED
 #define PNG_BENIGN_ERRORS_SUPPORTED
 #define PNG_BENIGN_READ_ERRORS_SUPPORTED
 /*#undef PNG_BENIGN_WRITE_ERRORS_SUPPORTED*/
