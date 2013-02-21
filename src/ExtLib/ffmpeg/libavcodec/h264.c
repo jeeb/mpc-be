@@ -1620,14 +1620,6 @@ static int decode_update_thread_context(AVCodecContext *dst,
     h->low_delay       = h1->low_delay;
     h->droppable       = h1->droppable;
 
-    /* frame_start may not be called for the next thread (if it's decoding
-     * a bottom field) so this has to be allocated here */
-    if (h1->linesize) {
-        err = alloc_scratch_buffers(h, h1->linesize);
-        if (err < 0)
-            return err;
-    }
-
     // extradata/NAL handling
     h->is_avc = h1->is_avc;
 
@@ -1668,6 +1660,7 @@ static int decode_update_thread_context(AVCodecContext *dst,
 
     h->last_slice_type = h1->last_slice_type;
     h->sync            = h1->sync;
+    memcpy(h->last_ref_count, h1->last_ref_count, sizeof(h->last_ref_count));
 
     if (context_reinitialized)
         h264_set_parameter_from_sps(h);
@@ -1751,15 +1744,6 @@ int ff_h264_frame_start(H264Context *h)
         h->block_offset[48 + 16 + i] =
         h->block_offset[48 + 32 + i] = (4 * ((scan8[i] - scan8[0]) & 7) << pixel_shift) + 8 * h->uvlinesize * ((scan8[i] - scan8[0]) >> 3);
     }
-
-    /* can't be in alloc_tables because linesize isn't known there.
-     * FIXME: redo bipred weight to not require extra buffer? */
-    for (i = 0; i < h->slice_context_count; i++)
-        if (h->thread_context[i]) {
-            ret = alloc_scratch_buffers(h->thread_context[i], h->linesize);
-            if (ret < 0)
-                return ret;
-        }
 
     /* Some macroblocks can be accessed before they're available in case
      * of lost slices, MBAFF or threading. */
@@ -3208,7 +3192,9 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
     // <== End patch MPC
     slice_type = golomb_to_pict_type[slice_type];
     if (slice_type == AV_PICTURE_TYPE_I ||
-        (h0->current_slice != 0 && slice_type == h0->last_slice_type)) {
+        (h0->current_slice != 0 &&
+         slice_type == h0->last_slice_type &&
+         !memcmp(h0->last_ref_count, h0->ref_count, sizeof(h0->ref_count)))) {
         default_ref_list_done = 1;
     }
     h->slice_type     = slice_type;
@@ -3560,6 +3546,15 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
     if (h != h0 && (ret = clone_slice(h, h0)) < 0)
         return ret;
 
+    /* can't be in alloc_tables because linesize isn't known there.
+     * FIXME: redo bipred weight to not require extra buffer? */
+    for (i = 0; i < h->slice_context_count; i++)
+        if (h->thread_context[i]) {
+            ret = alloc_scratch_buffers(h->thread_context[i], h->linesize);
+            if (ret < 0)
+                return ret;
+        }
+
     h->cur_pic_ptr->frame_num = h->frame_num; // FIXME frame_num cleanup
 
     av_assert1(h->mb_num == h->mb_width * h->mb_height);
@@ -3788,6 +3783,7 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
     // <== End patch MPC
 
     h0->last_slice_type = slice_type;
+    memcpy(h0->last_ref_count, h0->ref_count, sizeof(h0->last_ref_count));
     h->slice_num = ++h0->current_slice;
 
     if (h->slice_num)
