@@ -849,28 +849,24 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	// TODO
 
 	// resources
+	pos = m_pFile->m_segment.Attachments.GetHeadPosition();
+	while (pos) {
+		Attachment* pA = m_pFile->m_segment.Attachments.GetNext(pos);
 
-	{
-		POSITION pos = m_pFile->m_segment.Attachments.GetHeadPosition();
+		POSITION pos = pA->AttachedFiles.GetHeadPosition();
 		while (pos) {
-			Attachment* pA = m_pFile->m_segment.Attachments.GetNext(pos);
+			AttachedFile* pF = pA->AttachedFiles.GetNext(pos);
 
-			POSITION pos = pA->AttachedFiles.GetHeadPosition();
-			while (pos) {
-				AttachedFile* pF = pA->AttachedFiles.GetNext(pos);
-
-				CAtlArray<BYTE> pData;
-				pData.SetCount((size_t)pF->FileDataLen);
-				m_pFile->Seek(pF->FileDataPos);
-				if (SUCCEEDED(m_pFile->ByteRead(pData.GetData(), pData.GetCount()))) {
-					ResAppend(pF->FileName, pF->FileDescription, CStringW(pF->FileMimeType), pData.GetData(), (DWORD)pData.GetCount());
-				}
+			CAtlArray<BYTE> pData;
+			pData.SetCount((size_t)pF->FileDataLen);
+			m_pFile->Seek(pF->FileDataPos);
+			if (SUCCEEDED(m_pFile->ByteRead(pData.GetData(), pData.GetCount()))) {
+				ResAppend(pF->FileName, pF->FileDescription, CStringW(pF->FileMimeType), pData.GetData(), (DWORD)pData.GetCount());
 			}
 		}
 	}
 
 	// chapters
-
 	if (ChapterAtom* caroot = m_pFile->m_segment.FindChapterAtom(0)) {
 		CStringA str;
 		str.ReleaseBufferSetLength(GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SISO639LANGNAME, str.GetBuffer(3), 3));
@@ -880,6 +876,47 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 
 		SetupChapters(ChapLanguage, caroot);
+	}
+
+	// Tags
+	pos = m_pFile->m_segment.Tags.GetHeadPosition();
+	while (pos) {
+		Tags* Tags = m_pFile->m_segment.Tags.GetNext(pos);
+
+		POSITION pos = Tags->Tag.GetHeadPosition();
+		while (pos) {
+			Tag* Tag = Tags->Tag.GetNext(pos);
+
+			POSITION pos = Tag->SimpleTag.GetHeadPosition();
+			while (pos) {
+				SimpleTag* SimpleTag = Tag->SimpleTag.GetNext(pos);
+				if (SimpleTag->TagName == _T("TITLE")) {
+					DelProperty(L"TITL");
+					SetProperty(L"TITL", SimpleTag->TagString);
+				} else if (SimpleTag->TagName == _T("ARTIST")) {
+					DelProperty(L"AUTH");
+					SetProperty(L"AUTH", SimpleTag->TagString);
+				} else if (SimpleTag->TagName == _T("DATE_RELEASED")) {
+					DelProperty(L"DATE");
+					SetProperty(L"DATE", SimpleTag->TagString);
+				} else if (SimpleTag->TagName == _T("COPYRIGHT")) {
+					DelProperty(L"CPYR");
+					SetProperty(L"CPYR", SimpleTag->TagString);
+				} else if (SimpleTag->TagName == _T("COMMENT")) {
+					DelProperty(L"DESC");
+					SetProperty(L"DESC", SimpleTag->TagString);
+				}
+			}
+		}
+	}
+
+	BSTR title, date;
+	if (SUCCEEDED(GetProperty(L"TITL", &title)) & SUCCEEDED(GetProperty(L"DATE", &date))) {
+		if (!CString(title).IsEmpty() && !CString(date).IsEmpty()) {
+			CString Title;
+			Title.Format(_T("%s (%s)"), title, date);
+			SetProperty(L"TITL", Title);
+		}
 	}
 
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;

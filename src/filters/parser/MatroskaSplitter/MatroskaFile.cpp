@@ -176,7 +176,9 @@ case MATROSKA_ID_ATTACHMENTS:
 case MATROSKA_ID_CHAPTERS:
 	Chapters.Parse(pMN);
 	break;
-	//	case MATROSKA_ID_TAGS: Tags.Parse(pMN); break;
+case MATROSKA_ID_TAGS:
+	Tags.Parse(pMN);
+	break;
 	EndChunk
 }
 
@@ -244,6 +246,13 @@ HRESULT Segment::ParseMinimal(CMatroskaNode* pMN0)
 		if (Attachments.IsEmpty() && (pMN = pMN0->Child(MATROSKA_ID_ATTACHMENTS, false))) {
 			do {
 				Attachments.Parse(pMN); /*BIG UGLY HACK:*/
+				break;
+			} while (pMN->Next(true));
+		}
+
+		if (Tags.IsEmpty() && (pMN = pMN0->Child(MATROSKA_ID_TAGS, false))) {
+			do {
+				Tags.Parse(pMN); /*BIG UGLY HACK:*/
 				break;
 			} while (pMN->Next(true));
 		}
@@ -1004,6 +1013,65 @@ case 0x437C:
 	break;
 case 0x437E:
 	ChapCountry.Parse(pMN);
+	break;
+	EndChunk
+}
+
+HRESULT Tags::Parse(CMatroskaNode* pMN0)
+{
+	BeginChunk
+case 0x7373:
+	Tag.Parse(pMN);
+	break;
+	EndChunk
+}
+
+HRESULT Tag::Parse(CMatroskaNode* pMN0)
+{
+	BeginChunk
+case 0x67C8:
+	SimpleTag.Parse(pMN);
+case 0x63C0:
+	Targets.Parse(pMN);
+	break;
+	EndChunk
+}
+
+HRESULT SimpleTag::Parse(CMatroskaNode* pMN0)
+{
+	BeginChunk
+case 0x45A3:
+	TagName.Parse(pMN);
+	break;
+case 0x447A:
+	TagLanguage.Parse(pMN);
+	break;
+case 0x4487:
+	TagString.Parse(pMN);
+	break;
+	EndChunk
+}
+
+HRESULT Targets::Parse(CMatroskaNode* pMN0)
+{
+	BeginChunk
+case 0x68CA:
+	TargetTypeValue.Parse(pMN);
+	break;
+case 0x63CA:
+	TargetType.Parse(pMN);
+	break;
+case 0x63C5:
+	TrackUID.Parse(pMN);
+	break;
+case 0x63C9:
+	EditionUID.Parse(pMN);
+	break;
+case 0x63C4:
+	ChapterUID.Parse(pMN);
+	break;
+case 0x63C6:
+	AttachmentUID.Parse(pMN);
 	break;
 	EndChunk
 }

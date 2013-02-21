@@ -538,6 +538,54 @@ namespace MatroskaReader
 		HRESULT Parse(CMatroskaNode* pMN);
 	};
 
+	class Targets
+	{
+	public:
+		CUInt TargetTypeValue;
+		CANSI TargetType;
+		CUInt TrackUID;
+		CUInt EditionUID;
+		CUInt ChapterUID;
+		CUInt AttachmentUID;
+
+		Targets() {
+			TargetTypeValue.Set(50);
+		}
+
+		HRESULT Parse(CMatroskaNode* pMN);
+	};
+
+	class SimpleTag
+	{
+	public:
+		CUTF8 TagName;
+		CANSI TagLanguage;
+		CUTF8 TagString;
+
+		SimpleTag() {
+			TagLanguage.CStringA::operator = ("eng");
+		}
+
+		HRESULT Parse(CMatroskaNode* pMN);
+	};
+
+	class Tag
+	{
+	public:
+		CNode<SimpleTag> SimpleTag;
+		CNode<Targets> Targets;
+
+		HRESULT Parse(CMatroskaNode* pMN);
+	};
+
+	class Tags
+	{
+	public:
+		CNode<Tag> Tag;
+
+		HRESULT Parse(CMatroskaNode* pMN);
+	};
+
 	class Segment
 	{
 	public:
@@ -549,8 +597,7 @@ namespace MatroskaReader
 		CNode<Cue> Cues;
 		CNode<Attachment> Attachments;
 		CNode<Chapter> Chapters;
-		// TODO: Chapters
-		// TODO: Tags
+		CNode<Tags> Tags;
 
 		HRESULT Parse(CMatroskaNode* pMN);
 		HRESULT ParseMinimal(CMatroskaNode* pMN);
