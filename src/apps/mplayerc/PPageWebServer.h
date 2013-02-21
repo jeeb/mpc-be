@@ -46,7 +46,6 @@ public:
 	enum { IDD = IDD_PPAGEWEBSERVER };
 	BOOL m_fEnableWebServer;
 	int m_nWebServerPort;
-	CIntEdit m_nWebServerPortCtrl;
 	int m_nWebServerQuality;
 	CSpinButtonCtrl m_nWebServerQualityCtrl;
 	CStaticLink m_launch;

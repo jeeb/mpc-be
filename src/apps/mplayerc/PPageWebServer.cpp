@@ -57,7 +57,6 @@ void CPPageWebServer::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Check(pDX, IDC_CHECK1, m_fEnableWebServer);
 	DDX_Text(pDX, IDC_EDIT1, m_nWebServerPort);
-	DDX_Control(pDX, IDC_EDIT1, m_nWebServerPortCtrl);
 	DDX_Text(pDX, IDC_EDIT4, m_nWebServerQuality);
 	DDX_Control(pDX, IDC_SPIN1, m_nWebServerQualityCtrl);
 	DDX_Control(pDX, IDC_STATIC1, m_launch);
