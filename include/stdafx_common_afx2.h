@@ -39,8 +39,8 @@
 
 #include "afxole.h"
 
-#if (_MSC_VER >= 1600)
 #include "afxpriv.h"
 #include "..\src\mfc\oleimpl2.h"
 #include "..\src\mfc\afximpl.h"
-#endif
+
+#include <afxglobals.h>

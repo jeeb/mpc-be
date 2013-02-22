@@ -5046,18 +5046,8 @@ void CMainFrame::OnFileOpendvd()
 			openDlgPtr->SetTitle(strTitle);
 
 			CComPtr<IShellItem> psiFolder;
-
-			typedef HRESULT (WINAPI *SHCIFPN)(PCWSTR pszPath, IBindCtx * pbc, REFIID riid, void ** ppv);
-			HMODULE hLib = LoadLibrary(L"shell32.dll");
-			if (hLib) {
-				SHCIFPN pSHCIFPN = (SHCIFPN)GetProcAddress(hLib, "SHCreateItemFromParsingName");
-				if (pSHCIFPN) {
-					if (SUCCEEDED(pSHCIFPN(s.strDVDPath, NULL, IID_PPV_ARGS(&psiFolder)))) {
-						openDlgPtr->SetFolder(psiFolder);
-						psiFolder = NULL;
-					}
-				}
-				FreeLibrary(hLib);
+			if (SUCCEEDED(afxGlobalData.ShellCreateItemFromParsingName(s.strDVDPath, NULL, IID_PPV_ARGS(&psiFolder)))) {
+				openDlgPtr->SetFolder(psiFolder);
 			}
 
 			openDlgPtr->SetOptions(FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST);
@@ -18238,18 +18228,8 @@ void CMainFrame::OnFileOpenDirectory()
 
 		if (openDlgPtr != NULL) {
 			CComPtr<IShellItem> psiFolder;
-
-			typedef HRESULT (WINAPI *SHCIFPN)(PCWSTR pszPath, IBindCtx * pbc, REFIID riid, void ** ppv);
-			HMODULE hLib = LoadLibrary(L"shell32.dll");
-			if (hLib) {
-				SHCIFPN pSHCIFPN = (SHCIFPN)GetProcAddress(hLib, "SHCreateItemFromParsingName");
-				if (pSHCIFPN) {
-					if (SUCCEEDED(pSHCIFPN(s.strLastOpenDir, NULL, IID_PPV_ARGS(&psiFolder)))) {
-						openDlgPtr->SetFolder(psiFolder);
-						psiFolder = NULL;
-					}
-				}
-				FreeLibrary(hLib);
+			if (SUCCEEDED(afxGlobalData.ShellCreateItemFromParsingName(s.strLastOpenDir, NULL, IID_PPV_ARGS(&psiFolder)))) {
+				openDlgPtr->SetFolder(psiFolder);
 			}
 
 			openDlgPtr->SetTitle(strTitle);

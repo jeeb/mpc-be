@@ -1246,7 +1246,7 @@ BOOL AFXAPI AfxIsMFCToolBar(CWnd* pWnd)
 
 HRESULT AFX_GLOBAL_DATA::ShellCreateItemFromParsingName(PCWSTR pszPath, IBindCtx *pbc, REFIID riid, void **ppv)
 {
-	return SHCreateItemFromParsingName(pszPath, pbc, riid, ppv);
+	return _AfxSHCreateItemFromParsingName(pszPath, pbc, riid, ppv);
 }
 
 #else
