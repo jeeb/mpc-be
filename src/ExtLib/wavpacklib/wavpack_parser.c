@@ -179,14 +179,14 @@ WavPack_parser* wavpack_parser_new(stream_reader* io, int is_correction)
     }
 
 	// ==> Start patch MPC
-	// at first - check header ...
-	if (wpp->io->read_bytes (wpp->io, &ckID, sizeof(ckID)) != sizeof(ckID)) {
-		wavpack_parser_free(wpp);
-		return NULL;
-	}
-	if (strncmp (ckID, "wvpk", 4)) {
-		wavpack_parser_free(wpp);
-		return NULL;
+	// check header ...
+	{
+		uint32_t curr_pos = wpp->io->get_pos(wpp->io);
+		if ((wpp->io->read_bytes (wpp->io, &ckID, sizeof(ckID)) != sizeof(ckID)) || (strncmp (ckID, "wvpk", 4))) {
+			wavpack_parser_free(wpp);
+			return NULL;
+		}
+		wpp->io->set_pos_abs(wpp->io, curr_pos);
 	}
 	// ==> End patch MPC
 
