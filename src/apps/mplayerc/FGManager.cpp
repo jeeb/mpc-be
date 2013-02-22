@@ -795,15 +795,6 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 		while (pos) {
 			CFGFilter* pFGF = fl.GetNext(pos);
 
-			/*
-			// Checks if madVR is already in the graph to avoid two instances at the same time
-			CComPtr<IBaseFilter> pBFmadVR;
-			FindFilterByName(_T("madVR Renderer"), &pBFmadVR);
-			if (pBFmadVR && (pFGF->GetName() == _T("madVR Renderer"))) {
-				continue;
-			}
-			*/
-
 			// Checks if any Video Renderer is already in the graph to avoid trying to connect a second instance
 			if (IsVideoRenderer(pFGF->GetCLSID())) {
 				CString fname = pFGF->GetName();
@@ -834,18 +825,6 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 			if (FAILED(hr = AddFilter(pBF, pFGF->GetName()))) {
 				pBF.Release();
 				continue;
-			}
-
-			if (!m_IsPreview) {
-				CComQIPtr<IVideoWindow> pVW = pBF;
-				if (pVW && m_hWnd) {
-					OAHWND Owner;
-					pVW->get_Owner(&Owner);
-					if ((OAHWND)m_hWnd != Owner) {
-						HRESULT hrVR = pVW->put_Owner((OAHWND)m_hWnd);
-						TRACE(_T("FGM: IVideoWindow->put_Owner() = 0x%08x\n"), hrVR);
-					}
-				}
 			}
 
 			hr = ConnectFilterDirect(pPinOut, pBF, NULL);
@@ -901,12 +880,6 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 
 					if (CComQIPtr<IVMRMixerBitmap9> pMB = pBF) {
 						m_pUnks.AddTail (pMB);
-					}
-
-					if (CComQIPtr<IMadVRTextOsd> pMVTO = pBF) {
-						// without this, m_pUnks would be empty after MainFrm.cpp queried for ISubPicAllocatorPresenter
-						// adding this allows MainFrm.cpp to successfully query for ISubPicAllocatorPresenter2, too
-						m_pUnks.AddTail(pMVTO);
 					}
 
 					if (CComQIPtr<IMFGetService, &__uuidof(IMFGetService)> pMFGS = pBF) {
