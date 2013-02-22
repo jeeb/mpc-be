@@ -14181,11 +14181,12 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		}
 
 		// correct window size if "Limit window proportions on resize" enable.
-		CRect r;
-		GetWindowRect(&r);
-		OnSizing(WMSZ_LEFT, r);
-		MoveWindow(r);
-
+		if (!s.fRememberZoomLevel) {
+			CRect r;
+			GetWindowRect(&r);
+			OnSizing(WMSZ_LEFT, r);
+			MoveWindow(r);
+		}
 		// PostMessage instead of SendMessage because the user might call CloseMedia and then we would deadlock
 		PostMessage(WM_COMMAND, ID_PLAY_PAUSE);
 
