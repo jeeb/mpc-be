@@ -94,14 +94,12 @@ namespace DSObjects
 		STDMETHODIMP	get_AvgSyncOffset				(int *piAvg);
 		STDMETHODIMP	get_DevSyncOffset				(int *piDev);
 
-
 		// IMFRateSupport
 		STDMETHODIMP	GetSlowestRate(MFRATE_DIRECTION eDirection, BOOL fThin, float *pflRate);
 		STDMETHODIMP	GetFastestRate(MFRATE_DIRECTION eDirection, BOOL fThin, float *pflRate);
 		STDMETHODIMP	IsRateSupported(BOOL fThin, float flRate, float *pflNearestSupportedRate);
 
 		float			GetMaxRate(BOOL bThin);
-
 
 		// IMFVideoPresenter
 		STDMETHODIMP	ProcessMessage(MFVP_MESSAGE_TYPE eMessage, ULONG_PTR ulParam);
@@ -168,14 +166,6 @@ namespace DSObjects
 		LONGLONG		GetClockTime(LONGLONG PerformanceCounter);
 
 	private :
-
-		typedef enum {
-			Started = State_Running,
-			Stopped = State_Stopped,
-			Paused = State_Paused,
-			Shutdown = State_Running + 1
-		} RENDER_STATE;
-
 		COuterEVR*								m_pOuterEVR;
 		CComPtr<IMFClock>						m_pClock;
 		CComPtr<IDirect3DDeviceManager9>		m_pD3DManager;
@@ -185,7 +175,6 @@ namespace DSObjects
 		MFVideoAspectRatioMode					m_dwVideoAspectRatioMode;
 		MFVideoRenderPrefs						m_dwVideoRenderPrefs;
 		COLORREF								m_BorderColor;
-
 
 		HANDLE									m_hEvtQuit;			// Stop rendering thread event
 		bool									m_bEvtQuit;
@@ -199,7 +188,6 @@ namespace DSObjects
 
 		HANDLE									m_hThread;
 		HANDLE									m_hGetMixerThread;
-		RENDER_STATE							m_nRenderState;
 
 		CCritSec								m_SampleQueueLock;
 		CCritSec								m_ImageProcessingLock;
@@ -230,7 +218,6 @@ namespace DSObjects
 		UINT									m_pcFramesDrawn;	// Retrieves the number of frames drawn since streaming started
 		UINT									m_piAvg;
 		UINT									m_piDev;
-
 
 		void									GetMixerThread();
 		static DWORD WINAPI						GetMixerThreadStatic(LPVOID lpParam);

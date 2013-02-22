@@ -68,6 +68,7 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_hEvtQuit(NULL)
 	, m_bIsFullscreen(bFullscreen)
 	, m_Decoder(_T(""))
+	, m_nRenderState(Undefined)
 {
 	HINSTANCE		hDll;
 
@@ -439,6 +440,11 @@ void CDX9AllocatorPresenter::VSyncThread()
 			case WAIT_TIMEOUT : {
 				// Do our stuff
 				if (m_pD3DDev && s.m_AdvRendSets.iVMR9VSync) {
+
+					if (m_nRenderState != Undefined && m_nRenderState != Started) {
+						// we do not need clear m_DetectedRefreshRate & m_DetectedScanlinesPerFrame variable, so do continue
+						continue;
+					}
 
 					int VSyncPos = GetVBlackPos();
 					int WaitRange = max(m_ScreenSize.cy / 40, 5);

@@ -41,7 +41,17 @@ namespace DSObjects
 	public:
 		CCritSec				m_VMR9AlphaBitmapLock;
 		void					UpdateAlphaBitmap();
+
 	protected:
+		typedef enum {
+			Undefined	= State_Stopped-1,
+			Started		= State_Running,
+			Stopped		= State_Stopped,
+			Paused		= State_Paused,
+			Shutdown	= State_Running + 1
+		} RENDER_STATE;
+		RENDER_STATE			m_nRenderState;
+
 		UINT	m_RefreshRate;
 		bool	m_bAlternativeVSync;
 		bool	m_bCompositionEnabled;
@@ -163,7 +173,6 @@ namespace DSObjects
 			LPCWSTR			pFaceName,
 			LPD3DXFONT*		ppFont);
 
-
 		void				DrawText(const RECT &rc, const CString &strText, int _Priority);
 		void				ResetStats();
 		void				DrawStats();
@@ -172,7 +181,6 @@ namespace DSObjects
 
 		double GetFrameTime();
 		double GetFrameRate();
-
 
 		int						m_nTearingPos;
 		VMR9AlphaBitmap			m_VMR9AlphaBitmap;
@@ -185,8 +193,6 @@ namespace DSObjects
 		D3DXCreateLinePtr		m_pD3DXCreateLine;
 		D3DXCreateFontPtr		m_pD3DXCreateFont;
 		HRESULT (__stdcall *m_pD3DXCreateSprite)(LPDIRECT3DDEVICE9 pDevice, LPD3DXSPRITE * ppSprite);
-
-
 
 		int						m_nVMR9Surfaces;				// Total number of DX Surfaces
 		int						m_iVMR9Surface;
