@@ -14,7 +14,7 @@
 Изменения (*):
 * Обновлен русский перевод;
 * Обновлен итальянский перевод (автор Lord Maius);
-* ffmpeg git-b16bf913;
+* ffmpeg git-73fce258;
 * libopus 1.0.1 git-541a472f;
 * Little-CMS git-4ba02590;
 * libwebp 0.2.1 git-c0ba0903;
