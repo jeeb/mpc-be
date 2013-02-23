@@ -636,7 +636,7 @@ bool File_Mpega::Synchronize()
                     //Padding
                     while (Buffer_Offset+Size0+4<=Buffer_Size && Buffer[Buffer_Offset+Size0]==0x00)
                         Size0++;
-                    
+
                     if (Buffer_Offset+Size0+4>Buffer_Size)
                         return false; //Need more data
 
@@ -794,10 +794,6 @@ bool File_Mpega::Synched_Test()
     //Tags
     if (!File__Tags_Helper::Synched_Test())
         return false;
-
-    //Padding
-    while (Buffer_Offset<Buffer_Size && Buffer[Buffer_Offset]==0x00)
-        Buffer_Offset++;
 
     //Padding
     while (Buffer_Offset<Buffer_Size && Buffer[Buffer_Offset]==0x00)
