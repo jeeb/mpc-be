@@ -25,9 +25,6 @@
 #include "MainFrm.h"
 #include "PPageFileMediaInfo.h"
 #include "../../DSUtil/WinAPIUtils.h"
-#include <MediaInfo/MediaInfo.h>
-
-using namespace MediaInfoLib;
 
 String mi_get_lang_file()
 {
@@ -44,9 +41,11 @@ String mi_get_lang_file()
 		if (hRes) {
 			HANDLE lRes = LoadResource(mpcres, hRes);
 			int size = SizeofResource(mpcres, hRes);
-
 			wchar_t* wstr = DNew wchar_t[size];
-			MultiByteToWideChar(CP_UTF8, 0, (char*)LockResource(lRes), size, wstr, size);
+
+			if (!MultiByteToWideChar(CP_UTF8, 0, (char*)LockResource(lRes), size, wstr, size)) {
+				MultiByteToWideChar(CP_ACP, 0, (char*)LockResource(lRes), size, wstr, size);
+			}
 
 			UnlockResource(lRes);
 			FreeResource(lRes);
@@ -163,7 +162,7 @@ void CPPageFileMediaInfo::OnShowWindow(BOOL bShow, UINT nStatus)
 	}
 }
 
-void CPPageFileMediaInfo::OnSize(UINT nType, int cx, int cy) 
+void CPPageFileMediaInfo::OnSize(UINT nType, int cx, int cy)
 {
 	int dx = cx - m_rCrt.Width();
 	int dy = cy - m_rCrt.Height();

@@ -50,7 +50,6 @@
 
 #include "RealMediaGraph.h"
 #ifndef _WIN64
-// TODO: add QuickTime support for x64 when available!
 #include "QuicktimeGraph.h"
 #endif
 #include "ShockwaveGraph.h"
@@ -72,6 +71,9 @@
 #include "../../filters/transform/DecSSFilter/VobFile.h"
 #include <sizecbar/scbarg.h>
 #include <afxinet.h>
+
+#include <MediaInfo/MediaInfo.h>
+using namespace MediaInfoLib;
 
 class CFullscreenWnd;
 

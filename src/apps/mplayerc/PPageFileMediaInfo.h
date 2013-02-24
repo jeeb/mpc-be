@@ -45,7 +45,7 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 
-	CRect  m_rCrt;
+	CRect m_rCrt;
 
 public:
 	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);

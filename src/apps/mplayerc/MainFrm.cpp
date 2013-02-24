@@ -90,11 +90,7 @@
 #include "Monitors.h"
 #include "MultiMonitor.h"
 #include "FileVersionInfo.h"
-
 #include <mvrInterfaces.h>
-
-#include <MediaInfo/MediaInfo.h>
-using namespace MediaInfoLib;
 
 #define DEFCLIENTW		292
 #define DEFCLIENTH		200
