@@ -1528,7 +1528,7 @@ void CEVRAllocatorPresenter::GetMixerThread()
 	bool				bQuit		= false;
 	TIMECAPS			tc;
 	DWORD				dwResolution;
-	DWORD				dwUse = 0;
+	DWORD				dwUser = 0;
 
 	// Tell Vista Multimedia Class Scheduler we are a playback thread (increase priority)
 	//HANDLE	hAvrt;
