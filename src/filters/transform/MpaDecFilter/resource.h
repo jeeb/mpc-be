@@ -11,6 +11,8 @@
 #define IDS_MPADEC_SPDIF                33141
 #define IDS_MPADEC_AC3ENCODE            33142
 
+#define IDS_AG_SETTINGS                 33143
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

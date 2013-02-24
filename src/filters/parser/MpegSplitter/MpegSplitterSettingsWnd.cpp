@@ -24,8 +24,6 @@
 #include "MpegSplitterSettingsWnd.h"
 #include "../../../DSUtil/DSUtil.h"
 
-#define ResStr(id) CString(MAKEINTRESOURCE(id))
-
 CMpegSplitterSettingsWnd::CMpegSplitterSettingsWnd(void)
 {
 }

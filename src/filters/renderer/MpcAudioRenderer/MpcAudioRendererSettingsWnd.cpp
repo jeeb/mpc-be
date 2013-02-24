@@ -24,9 +24,6 @@
 #include "MpcAudioRendererSettingsWnd.h"
 #include "../../../DSUtil/DSUtil.h"
 
-// ==>>> Resource identifier from "resource.h" present in mplayerc project!
-#define ResStr(id) CString(MAKEINTRESOURCE(id))
-
 CMpcAudioRendererSettingsWnd::CMpcAudioRendererSettingsWnd(void)
 {
 }

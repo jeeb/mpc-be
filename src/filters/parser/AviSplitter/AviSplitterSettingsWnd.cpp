@@ -24,8 +24,6 @@
 #include "AviSplitterSettingsWnd.h"
 #include "../../../DSUtil/DSUtil.h"
 
-#define ResStr(id) CString(MAKEINTRESOURCE(id))
-
 CAviSplitterSettingsWnd::CAviSplitterSettingsWnd(void)
 {
 }

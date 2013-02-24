@@ -33,6 +33,8 @@
 
 #define LCID_NOSUBTITLES -1
 
+#define ResStr(id) CString(MAKEINTRESOURCE(id))
+
 extern void DumpStreamConfig(TCHAR* fn, IAMStreamConfig* pAMVSCCap);
 extern int CountPins(IBaseFilter* pBF, int& nIn, int& nOut, int& nInC, int& nOutC);
 extern bool IsSplitter(IBaseFilter* pBF, bool fCountConnectedOnly = false);

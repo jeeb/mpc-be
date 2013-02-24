@@ -27,8 +27,6 @@
 
 #define VC_EXTRALEAN	// Exclude rarely-used stuff from Windows headers
 
-#define ResStr(id) CString(MAKEINTRESOURCE(id))
-
 #include <afxdisp.h>
 #include <afxole.h>
 #include <crtdefs.h>
