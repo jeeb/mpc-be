@@ -25,7 +25,7 @@
 #include "OggFile.h"
 
 COggFile::COggFile(IAsyncReader* pAsyncReader, HRESULT& hr)
-	: CBaseSplitterFile(pAsyncReader, hr, DEFAULT_CACHE_LENGTH, false, true)
+	: CBaseSplitterFile(pAsyncReader, hr, false, true)
 {
 	if (FAILED(hr)) {
 		return;

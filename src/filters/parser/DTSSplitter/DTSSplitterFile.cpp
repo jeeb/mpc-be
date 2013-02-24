@@ -71,7 +71,7 @@ static DWORD ParseWAVECDHeader(const BYTE wh[44])
 //
 
 CDTSSplitterFile::CDTSSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr)
-	: CBaseSplitterFileEx(pAsyncReader, hr, DEFAULT_CACHE_LENGTH, false)
+	: CBaseSplitterFileEx(pAsyncReader, hr, false)
 	, m_rtDuration(0)
 	, m_startpos(0)
 	, m_endpos(0)

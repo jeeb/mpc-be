@@ -276,3 +276,7 @@
 
 #define IDS_RS_YOUTUBE_TAG					_T("YoutubeTag")
 #define IDS_RS_YOUTUBE_SOURCE				_T("YoutubeSourceType")
+
+#define IDS_RS_PERFOMANCE_CACHE_LENGTH		_T("Perfomance\\CacheLen")
+#define IDS_RS_PERFOMANCE_MINQUEUESIZE		_T("Perfomance\\MinQueueSize")
+#define IDS_RS_PERFOMANCE_MAXQUEUESIZE		_T("Perfomance\\MaxQueueSize")

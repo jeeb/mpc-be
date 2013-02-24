@@ -34,73 +34,10 @@
 #include "../../../DSUtil/DSMPropertyBag.h"
 #include "../../../DSUtil/FontInstaller.h"
 
-#define MINPACKETS 100			// Beliyaal: Changed the min number of packets to allow Bluray playback over network
-#define MINPACKETSIZE 256*1024	// Beliyaal: Changed the min packet size to allow Bluray playback over network
-#define MAXPACKETS 1000
-#define MAXPACKETSIZE 1024*1024*128
-
-enum {
-	/* various PCM "codecs" */
-	FF_CODEC_ID_FIRST_AUDIO = 0x10000,     ///< A dummy id pointing at the start of audio codecs
-	FF_CODEC_ID_PCM_S16LE= 0x10000,
-	FF_CODEC_ID_PCM_S16BE,
-	FF_CODEC_ID_PCM_U16LE,
-	FF_CODEC_ID_PCM_U16BE,
-	FF_CODEC_ID_PCM_S8,
-	FF_CODEC_ID_PCM_U8,
-	FF_CODEC_ID_PCM_MULAW,
-	FF_CODEC_ID_PCM_ALAW,
-	FF_CODEC_ID_PCM_S32LE,
-	FF_CODEC_ID_PCM_S32BE,
-	FF_CODEC_ID_PCM_U32LE,
-	FF_CODEC_ID_PCM_U32BE,
-	FF_CODEC_ID_PCM_S24LE,
-	FF_CODEC_ID_PCM_S24BE,
-	FF_CODEC_ID_PCM_U24LE,
-	FF_CODEC_ID_PCM_U24BE,
-	FF_CODEC_ID_PCM_S24DAUD,
-	FF_CODEC_ID_PCM_ZORK,
-	FF_CODEC_ID_PCM_S16LE_PLANAR,
-	FF_CODEC_ID_PCM_DVD,
-	FF_CODEC_ID_PCM_F32BE,
-	FF_CODEC_ID_PCM_F32LE,
-	FF_CODEC_ID_PCM_F64BE,
-	FF_CODEC_ID_PCM_F64LE,
-	FF_CODEC_ID_PCM_BLURAY,
-	FF_CODEC_ID_PCM_LXF,
-	FF_CODEC_ID_S302M,
-
-	/* various ADPCM codecs */
-	FF_CODEC_ID_ADPCM_IMA_QT= 0x11000,
-	FF_CODEC_ID_ADPCM_IMA_WAV,
-	FF_CODEC_ID_ADPCM_IMA_DK3,
-	FF_CODEC_ID_ADPCM_IMA_DK4,
-	FF_CODEC_ID_ADPCM_IMA_WS,
-	FF_CODEC_ID_ADPCM_IMA_SMJPEG,
-	FF_CODEC_ID_ADPCM_MS,
-	FF_CODEC_ID_ADPCM_4XM,
-	FF_CODEC_ID_ADPCM_XA,
-	FF_CODEC_ID_ADPCM_ADX,
-	FF_CODEC_ID_ADPCM_EA,
-	FF_CODEC_ID_ADPCM_G726,
-	FF_CODEC_ID_ADPCM_CT,
-	FF_CODEC_ID_ADPCM_SWF,
-	FF_CODEC_ID_ADPCM_YAMAHA,
-	FF_CODEC_ID_ADPCM_SBPRO_4,
-	FF_CODEC_ID_ADPCM_SBPRO_3,
-	FF_CODEC_ID_ADPCM_SBPRO_2,
-	FF_CODEC_ID_ADPCM_THP,
-	FF_CODEC_ID_ADPCM_IMA_AMV,
-	FF_CODEC_ID_ADPCM_EA_R1,
-	FF_CODEC_ID_ADPCM_EA_R3,
-	FF_CODEC_ID_ADPCM_EA_R2,
-	FF_CODEC_ID_ADPCM_IMA_EA_SEAD,
-	FF_CODEC_ID_ADPCM_IMA_EA_EACS,
-	FF_CODEC_ID_ADPCM_EA_XAS,
-	FF_CODEC_ID_ADPCM_EA_MAXIS_XA,
-	FF_CODEC_ID_ADPCM_IMA_ISS,
-	FF_CODEC_ID_ADPCM_G722,
-};
+#define MINPACKETS		100
+#define MINQUEUESIZE	256*KILOBYTE
+#define MAXPACKETS		1000
+#define MAXQUEUESIZE	128*MEGABYTE
 
 class Packet : public CAtlArray<BYTE>
 {
@@ -119,7 +56,7 @@ public:
 			DeleteMediaType(pmt);
 		}
 	}
-	virtual int GetDataSize() {return (int)GetCount();}
+	virtual size_t GetDataSize() {return GetCount();}
 	void SetData(const void* ptr, DWORD len) {
 		SetCount(len);
 		memcpy(GetData(), ptr, len);
@@ -130,14 +67,14 @@ class CPacketQueue
 	: public CCritSec
 	, protected CAutoPtrList<Packet>
 {
-	int m_size;
+	size_t m_size;
 
 public:
 	CPacketQueue();
 	void Add(CAutoPtr<Packet> p);
 	CAutoPtr<Packet> Remove();
 	void RemoveAll();
-	int GetCount(), GetSize();
+	size_t GetCount(), GetSize();
 };
 
 class CBaseSplitterFilter;
@@ -206,7 +143,7 @@ private:
 		DWORD nAverageBitRate;
 	} m_brs;
 
-	int m_QueueMaxPackets;
+	size_t m_QueueMaxPackets;
 
 protected:
 	REFERENCE_TIME m_rtStart;
@@ -236,8 +173,8 @@ protected:
 	STDMETHODIMP GetPreroll(LONGLONG* pllPreroll);
 
 public:
-	CBaseSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int nBuffers = 0, int QueueMaxPackets = MAXPACKETS);
-	CBaseSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int nBuffers = 0, int QueueMaxPackets = MAXPACKETS);
+	CBaseSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int nBuffers = 0, size_t QueueMaxPackets = MAXPACKETS);
+	CBaseSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int nBuffers = 0, size_t QueueMaxPackets = MAXPACKETS);
 	virtual ~CBaseSplitterOutputPin();
 
 	DECLARE_IUNKNOWN;
@@ -271,8 +208,8 @@ public:
 	HRESULT DeliverEndFlush();
 	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
 
-	int QueueCount();
-	int QueueSize();
+	size_t QueueCount();
+	size_t QueueSize();
 	HRESULT QueueEndOfStream();
 	HRESULT QueuePacket(CAutoPtr<Packet> p);
 
@@ -460,4 +397,11 @@ public:
 	STDMETHODIMP_(int) GetCount();
 	STDMETHODIMP GetStatus(int i, int& samples, int& size);
 	STDMETHODIMP_(DWORD) GetPriority();
+
+protected:
+	DWORD m_MinQueueSize, m_MaxQueueSize;
+
+public:
+	DWORD GetMinQueueSize() { return m_MinQueueSize; }
+	DWORD GetMaxQueueSize() { return m_MaxQueueSize; }
 };

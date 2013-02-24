@@ -27,7 +27,7 @@
 #include <moreuuids.h>
 
 CDSMSplitterFile::CDSMSplitterFile(IAsyncReader* pReader, HRESULT& hr, IDSMResourceBagImpl& res, IDSMChapterBagImpl& chap)
-	: CBaseSplitterFile(pReader, hr, DEFAULT_CACHE_LENGTH, false)
+	: CBaseSplitterFile(pReader, hr, false)
 	, m_rtFirst(0)
 	, m_rtDuration(0)
 {

@@ -25,8 +25,9 @@
 
 #include <atlcoll.h>
 
-#define MEGABYTE				1024*1024
-#define DEFAULT_CACHE_LENGTH	64*1024
+#define KILOBYTE				1024
+#define MEGABYTE				1024*KILOBYTE
+#define DEFAULT_CACHE_LENGTH	64*KILOBYTE
 
 class CBaseSplitterFile
 {
@@ -46,7 +47,7 @@ protected:
 	virtual void OnComplete() {}
 
 public:
-	CBaseSplitterFile(IAsyncReader* pReader, HRESULT& hr, int cachelen = DEFAULT_CACHE_LENGTH, bool fRandomAccess = true, bool fStreaming = false);
+	CBaseSplitterFile(IAsyncReader* pReader, HRESULT& hr, bool fRandomAccess = true, bool fStreaming = false);
 	virtual ~CBaseSplitterFile() {}
 
 	bool SetCacheSize(int cachelen = DEFAULT_CACHE_LENGTH);

@@ -12068,7 +12068,6 @@ static UINT tmpYoutubeThreadProc(LPVOID pParam)
 	return (static_cast<CMainFrame*>(pParam))->YoutubeThreadProc();
 }
 
-#define MEGABYTE 1024*1024
 UINT CMainFrame::YoutubeThreadProc()
 {
 	HINTERNET f, s = InternetOpen(L"MPC-BE Youtube Downloader", 0, NULL, NULL, 0);

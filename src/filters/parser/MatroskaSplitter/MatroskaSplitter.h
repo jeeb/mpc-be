@@ -35,13 +35,13 @@
 class MatroskaPacket : public Packet
 {
 protected:
-	int GetDataSize() {
+	size_t GetDataSize() {
 		size_t size = 0;
 		POSITION pos = bg->Block.BlockData.GetHeadPosition();
 		while (pos) {
 			size += bg->Block.BlockData.GetNext(pos)->GetCount();
 		}
-		return (int)size;
+		return size;
 	}
 public:
 	CAutoPtr<MatroskaReader::BlockGroup> bg;

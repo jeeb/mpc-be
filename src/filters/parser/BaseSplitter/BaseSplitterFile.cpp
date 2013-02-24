@@ -24,12 +24,13 @@
 #include "stdafx.h"
 #include "BaseSplitterFile.h"
 #include "../../../DSUtil/DSUtil.h"
+#include "../apps/mplayerc/SettingsDefines.h"
 
 //
 // CBaseSplitterFile
 //
 
-CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, int cachelen, bool fRandomAccess, bool fStreaming)
+CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bool fRandomAccess, bool fStreaming)
 	: m_pAsyncReader(pAsyncReader)
 	, m_fStreaming(false)
 	, m_fRandomAccess(false)
@@ -55,6 +56,7 @@ CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, in
 		return;
 	}
 
+	int cachelen = max(16*KILOBYTE, min(MEGABYTE, AfxGetApp()->GetProfileInt(IDS_R_SETTINGS, IDS_RS_PERFOMANCE_CACHE_LENGTH, DEFAULT_CACHE_LENGTH)));
 	if (!SetCacheSize(cachelen)) {
 		hr = E_OUTOFMEMORY;
 		return;

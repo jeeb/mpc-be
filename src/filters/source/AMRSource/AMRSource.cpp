@@ -90,7 +90,7 @@ CUnknown *CAMRSplitter::CreateInstance(LPUNKNOWN pUnk, HRESULT *phr)
 }
 
 CAMRSplitter::CAMRSplitter(LPUNKNOWN pUnk, HRESULT *phr) :
-	CBaseFilter(AMRSplitterName, pUnk, &lock_filter, CLSID_AMRSplitter, phr),
+	CBaseFilter(NAME("CAMRSplitter"), pUnk, &lock_filter, CLSID_AMRSplitter, phr),
 	CAMThread(),
 	reader(NULL),
 	file(NULL),

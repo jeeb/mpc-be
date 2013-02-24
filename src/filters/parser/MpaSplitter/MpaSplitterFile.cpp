@@ -78,7 +78,7 @@ static const LPCTSTR s_genre[] = {
 //
 
 CMpaSplitterFile::CMpaSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr)
-	: CBaseSplitterFileEx(pAsyncReader, hr, DEFAULT_CACHE_LENGTH, false, true)
+	: CBaseSplitterFileEx(pAsyncReader, hr, false, true)
 	, m_mode(none)
 	, m_rtDuration(0)
 	, m_startpos(0)

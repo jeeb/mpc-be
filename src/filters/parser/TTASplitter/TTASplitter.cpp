@@ -78,7 +78,7 @@ CUnknown *WINAPI CTTASplitter::CreateInstance(LPUNKNOWN punk, HRESULT *phr)
 }
 
 CTTASplitter::CTTASplitter(LPUNKNOWN lpunk, HRESULT *phr) :
-	CBaseFilter(TTASplitterName, lpunk, &m_Lock, CLSID_TTASplitter),
+	CBaseFilter(NAME("CTTASplitter"), lpunk, &m_Lock, CLSID_TTASplitter),
 	m_pInputPin(NULL),
 	m_pOutputPin(NULL),
 	m_rtStart(0),

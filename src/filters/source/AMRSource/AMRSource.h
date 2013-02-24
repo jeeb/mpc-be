@@ -29,7 +29,7 @@
 
 #include "amr_file.h"
 
-#define AMRSplitterName	L"MPC AMR Source"
+#define AMRSplitterName	L"MPC AMR Splitter"
 
 // {24FA7933-FE18-46a9-914A-C2AA0DBACE93}
 static const GUID CLSID_AMRSplitter = 
