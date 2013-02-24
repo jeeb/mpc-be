@@ -417,8 +417,8 @@ void CDX9AllocatorPresenter::VSyncThread()
 	DWORD				dwResolution;
 	DWORD				dwUser		= 0;
 
+	// Tell Vista Multimedia Class Scheduler we are a playback thread (increase priority)
 	//DWORD				dwTaskIndex = 0;
-	//// Tell Vista Multimedia Class Scheduler we are a playback thread (increase priority)
 	//if (pfAvSetMmThreadCharacteristicsW)
 	//	hAvrt = pfAvSetMmThreadCharacteristicsW (L"Playback", &dwTaskIndex);
 	//if (pfAvSetMmThreadPriority)

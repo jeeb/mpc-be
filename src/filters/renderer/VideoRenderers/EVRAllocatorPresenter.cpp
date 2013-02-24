@@ -1524,19 +1524,19 @@ bool ExtractInterlaced(const AM_MEDIA_TYPE* pmt)
 
 void CEVRAllocatorPresenter::GetMixerThread()
 {
-	//HANDLE				hAvrt;
 	HANDLE				hEvts[]		= { m_hEvtQuit};
 	bool				bQuit		= false;
 	TIMECAPS			tc;
 	DWORD				dwResolution;
-	DWORD				dwUser = 0;
-	//DWORD				dwTaskIndex	= 0;
+	DWORD				dwUse = 0;
 
-	// Tell Vista Multimedia Class Scheduler we are a playback thretad (increase priority)
-	//	if (pfAvSetMmThreadCharacteristicsW)
-	//		hAvrt = pfAvSetMmThreadCharacteristicsW (L"Playback", &dwTaskIndex);
-	//	if (pfAvSetMmThreadPriority)
-	//		pfAvSetMmThreadPriority (hAvrt, AVRT_PRIORITY_HIGH /*AVRT_PRIORITY_CRITICAL*/);
+	// Tell Vista Multimedia Class Scheduler we are a playback thread (increase priority)
+	//HANDLE	hAvrt;
+	//DWORD		dwTaskIndex = 0;
+	//if (pfAvSetMmThreadCharacteristicsW)
+	//	hAvrt = pfAvSetMmThreadCharacteristicsW (L"Playback", &dwTaskIndex);
+	//if (pfAvSetMmThreadPriority)
+	//	pfAvSetMmThreadPriority (hAvrt, AVRT_PRIORITY_HIGH /*AVRT_PRIORITY_CRITICAL*/);
 
 	timeGetDevCaps(&tc, sizeof(TIMECAPS));
 	dwResolution = min(max(tc.wPeriodMin, 0), tc.wPeriodMax);
@@ -1582,7 +1582,7 @@ void CEVRAllocatorPresenter::GetMixerThread()
 
 					// Update internal subtitle clock
 					if (m_fUseInternalTimer && m_pSubPicQueue) {
-						m_fps = (float)(10000000.0 / m_rtTimePerFrame);
+						m_fps = 10000000.0 / m_rtTimePerFrame;
 						m_pSubPicQueue->SetFPS(m_fps);
 					}
 
@@ -1908,7 +1908,7 @@ void CEVRAllocatorPresenter::RenderThread()
 	DWORD				dwObject;
 
 
-	// Tell Vista Multimedia Class Scheduler we are a playback thretad (increase priority)
+	// Tell Vista Multimedia Class Scheduler we are a playback thread (increase priority)
 	HANDLE hAvrt = 0;
 	if (pfAvSetMmThreadCharacteristicsW) {
 		DWORD dwTaskIndex	= 0;
