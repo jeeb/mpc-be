@@ -25,7 +25,6 @@
 #include "mplayerc.h"
 #include "PPageYoutube.h"
 #include "PlayerYouTube.h"
-#include "AppSettings.h"
 
 // CPPageYoutube dialog
 
@@ -44,6 +43,7 @@ CPPageYoutube::~CPPageYoutube()
 void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+
 	DDX_Control(pDX, IDC_COMBO1, m_iYoutubeFormatCtrl);
 	DDX_Radio(pDX, IDC_RADIO1, m_iYoutubeSourceType);
 }
@@ -64,6 +64,7 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	m_iYoutubeFormatCtrl.AddString(ResStr(IDS_PPAGE_FS_DEFAULT));
 	m_iYoutubeFormatType = 0;
+
 	for (int i = 0; i < _countof(youtubeProfiles) && youtubeProfiles[i].iTag <= 46; i++) {
 		CString fmt; fmt.Format(_T("%s@%s"), youtubeProfiles[i].Container, youtubeProfiles[i].Resolution);
 		m_iYoutubeFormatCtrl.AddString(fmt);
@@ -72,6 +73,7 @@ BOOL CPPageYoutube::OnInitDialog()
 			m_iYoutubeFormatType = i + 1;
 		}
 	}
+
 	CorrectComboListWidth(m_iYoutubeFormatCtrl);
 	m_iYoutubeFormatCtrl.SetCurSel(m_iYoutubeFormatType);
 
@@ -79,7 +81,7 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	UpdateData(FALSE);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
+	return TRUE;
 }
 
 BOOL CPPageYoutube::OnApply()
@@ -89,6 +91,7 @@ BOOL CPPageYoutube::OnApply()
 	AppSettings& s = AfxGetAppSettings();
 
 	m_iYoutubeFormatType = m_iYoutubeFormatCtrl.GetCurSel();
+
 	if (m_iYoutubeFormatType <= 0 || (m_iYoutubeFormatType - 1) >= _countof(youtubeProfiles)) {
 		s.iYoutubeTag = m_iYoutubeFormatType;
 	} else {
