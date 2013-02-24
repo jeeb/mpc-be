@@ -21,8 +21,8 @@
  */
 
 #include "stdafx.h"
-#include "VMROSD.h"
 #include "mplayerc.h"
+#include "VMROSD.h"
 
 #define SEEKBAR_HEIGHT			60
 #define SLIDER_BAR_HEIGHT		10

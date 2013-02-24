@@ -27,7 +27,6 @@
 #include "../../DSUtil/WinAPIUtils.h"
 #include <moreuuids.h>
 #include "Monitors.h"
-#include "AppSettings.h"
 #include "ComPropertySheet.h"
 #include "../../filters/Filters.h"
 

@@ -23,7 +23,6 @@
 #pragma once
 
 #include <afxwin.h>
-#include "resource.h"
 
 class CAboutDlg : public CDialog
 {

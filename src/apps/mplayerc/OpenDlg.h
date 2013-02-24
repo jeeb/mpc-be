@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include "resource.h"
 #include <ResizableLib/ResizableDialog.h>
 
 
