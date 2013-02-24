@@ -32,7 +32,7 @@
 #include "mpc_file.h"
 #include "bits.h"
 
-#define MusePackSplitterName	L"Light Alloy/MPC MusePack Splitter"
+#define MusePackSplitterName	L"MPC MusePack Source"
 
 // {47A759C8-CCD7-471A-81D3-A92870431979}
 static const GUID CLSID_MusePackSplitter = 
