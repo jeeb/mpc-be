@@ -22,11 +22,6 @@
 
 #pragma once
 
-#include <windows.h>
-#include <initguid.h>
-#include <moreuuids.h>
-#include <mmreg.h>
-
 #include "amr_file.h"
 
 #define AMRSplitterName	L"MPC AMR Splitter"

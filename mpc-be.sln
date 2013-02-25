@@ -166,7 +166,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MusePackSource", "src\filte
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DTSSplitter", "src\filters\parser\DTSSplitter\DTSSplitter.vcxproj", "{F68D02E9-32DE-4EDA-8691-B911DC5317DC}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AMRSource", "src\filters\source\AMRSource\AMRSource.vcxproj", "{7FF3D24A-879C-4987-B377-F20A6527F426}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AMRSplitter", "src\filters\parser\AMRSplitter\AMRSplitter.vcxproj", "{7FF3D24A-879C-4987-B377-F20A6527F426}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTASplitter", "src\filters\parser\TTASplitter\TTASplitter.vcxproj", "{BF33D28A-879C-4527-B397-F20A1527F327}"
 EndProject

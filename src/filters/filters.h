@@ -27,6 +27,7 @@
 #include "muxer/MatroskaMuxer/MatroskaMuxer.h"
 #include "muxer/WavDest/WavDest.h"
 
+#include "parser/AMRSplitter/AMRSplitter.h"
 #include "parser/AviSplitter/AviSplitter.h"
 #include "parser/DSMSplitter/DSMSplitter.h"
 #include "parser/DTSSplitter/DTSSplitter.h"
@@ -50,7 +51,6 @@
 #include "renderer/MpcAudioRenderer/MpcAudioRenderer.h"
 #include "renderer/SyncClock/SyncClock.h"
 
-#include "source/AMRSource/AMRSource.h"
 #include "source/D2VSource/D2VSource.h"
 #include "source/DTSAC3Source/DTSAC3Source.h"
 #include "source/FLACSource/FLACSource.h"

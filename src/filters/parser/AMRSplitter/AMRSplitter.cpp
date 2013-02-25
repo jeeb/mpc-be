@@ -26,7 +26,7 @@
 #include <moreuuids.h>
 #include <mmreg.h>
 
-#include "AMRSource.h"
+#include "AMRSplitter.h"
 
 #ifdef REGISTER_FILTER
 

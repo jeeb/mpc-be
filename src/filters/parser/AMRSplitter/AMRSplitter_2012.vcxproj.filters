@@ -13,7 +13,7 @@
     <ClCompile Include="amr_file.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AMRSource.cpp">
+    <ClCompile Include="AMRSplitter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
@@ -21,7 +21,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="AMRSource.def">
+    <None Include="AMRSplitter.def">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
@@ -29,7 +29,7 @@
     <ClInclude Include="amr_file.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AMRSource.h">
+    <ClInclude Include="AMRSplitter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
@@ -51,7 +51,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="AMRSource.rc">
+    <ResourceCompile Include="AMRSplitter.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

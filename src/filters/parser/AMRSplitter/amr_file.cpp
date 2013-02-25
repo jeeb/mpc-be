@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: amr_file.cpp 1136 2012-09-14 05:13:52Z szl $
  *
  * Adaptation for MPC-BE (C) 2012 Sergey "Exodus8" (rusguy6@gmail.com)
  *
@@ -22,7 +22,7 @@
 
 #include "stdafx.h"
 #include "amr_file.h"
-#include "AMRSource.h"
+#include "AMRSplitter.h"
 #include <math.h>
 
 const int AMR_Frame_Size[] = {

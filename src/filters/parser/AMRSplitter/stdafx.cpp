@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: stdafx.cpp 1775 2013-01-05 14:19:34Z szl $
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2013 see Authors.txt
@@ -21,9 +21,4 @@
  *
  */
 
-#pragma once
-
-#include "../../../DSUtil/SharedInclude.h"
-#include "../../../../include/stdafx_common.h"
-#include "../../../../include/stdafx_common_afx.h"
-#include "../../../../include/stdafx_common_dshow.h"
+#include "stdafx.h"
