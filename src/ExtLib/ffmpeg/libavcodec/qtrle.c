@@ -46,12 +46,12 @@ typedef struct QtrleContext {
     uint32_t pal[256];
 } QtrleContext;
 
-#define CHECK_PIXEL_PTR(n) \
-  if ((pixel_ptr + n > pixel_limit) || (pixel_ptr + n < 0)) { \
-    av_log (s->avctx, AV_LOG_INFO, "Problem: pixel_ptr = %d, pixel_limit = %d\n", \
-      pixel_ptr + n, pixel_limit); \
-    return; \
-  } \
+#define CHECK_PIXEL_PTR(n)                                                            \
+    if ((pixel_ptr + n > pixel_limit) || (pixel_ptr + n < 0)) {                       \
+        av_log (s->avctx, AV_LOG_ERROR, "Problem: pixel_ptr = %d, pixel_limit = %d\n",\
+                pixel_ptr + n, pixel_limit);                                          \
+        return;                                                                       \
+    }                                                                                 \
 
 static void qtrle_decode_1bpp(QtrleContext *s, int row_ptr, int lines_to_change)
 {
@@ -128,7 +128,7 @@ static inline void qtrle_decode_2n4bpp(QtrleContext *s, int row_ptr,
 
     while (lines_to_change--) {
         pixel_ptr = row_ptr + (num_pixels * (bytestream2_get_byte(&s->g) - 1));
-        CHECK_PIXEL_PTR(0);  /* make sure pixel_ptr is positive */
+        CHECK_PIXEL_PTR(0);
 
         while ((rle_code = (signed char)bytestream2_get_byte(&s->g)) != -1) {
             if (rle_code == 0) {
@@ -183,7 +183,7 @@ static void qtrle_decode_8bpp(QtrleContext *s, int row_ptr, int lines_to_change)
 
     while (lines_to_change--) {
         pixel_ptr = row_ptr + (4 * (bytestream2_get_byte(&s->g) - 1));
-        CHECK_PIXEL_PTR(0);  /* make sure pixel_ptr is positive */
+        CHECK_PIXEL_PTR(0);
 
         while ((rle_code = (signed char)bytestream2_get_byte(&s->g)) != -1) {
             if (rle_code == 0) {
@@ -233,7 +233,7 @@ static void qtrle_decode_16bpp(QtrleContext *s, int row_ptr, int lines_to_change
 
     while (lines_to_change--) {
         pixel_ptr = row_ptr + (bytestream2_get_byte(&s->g) - 1) * 2;
-        CHECK_PIXEL_PTR(0);  /* make sure pixel_ptr is positive */
+        CHECK_PIXEL_PTR(0);
 
         while ((rle_code = (signed char)bytestream2_get_byte(&s->g)) != -1) {
             if (rle_code == 0) {
@@ -277,7 +277,7 @@ static void qtrle_decode_24bpp(QtrleContext *s, int row_ptr, int lines_to_change
 
     while (lines_to_change--) {
         pixel_ptr = row_ptr + (bytestream2_get_byte(&s->g) - 1) * 3;
-        CHECK_PIXEL_PTR(0);  /* make sure pixel_ptr is positive */
+        CHECK_PIXEL_PTR(0);
 
         while ((rle_code = (signed char)bytestream2_get_byte(&s->g)) != -1) {
             if (rle_code == 0) {
@@ -324,7 +324,7 @@ static void qtrle_decode_32bpp(QtrleContext *s, int row_ptr, int lines_to_change
 
     while (lines_to_change--) {
         pixel_ptr = row_ptr + (bytestream2_get_byte(&s->g) - 1) * 4;
-        CHECK_PIXEL_PTR(0);  /* make sure pixel_ptr is positive */
+        CHECK_PIXEL_PTR(0);
 
         while ((rle_code = (signed char)bytestream2_get_byte(&s->g)) != -1) {
             if (rle_code == 0) {
