@@ -150,12 +150,6 @@ void CPlayerSeekBar::SetPosInternal(__int64 pos)
 		if (!s.fDisableXPToolbars) {
 			InvalidateRect (before | after);
 		}
-
-		CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
-
-		if (pFrame && (s.fUseWin7TaskBar && pFrame->m_pTaskbarList)) {
-			pFrame->m_pTaskbarList->SetProgressValue (pFrame->m_hWnd, pos, m_stop);
-		}
 	}
 }
 

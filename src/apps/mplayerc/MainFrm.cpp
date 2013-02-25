@@ -2080,6 +2080,14 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 				if (m_DwmInvalidateIconicBitmapsFnc) {
 					m_DwmInvalidateIconicBitmapsFnc(m_hWnd);
 				}
+
+				__int64 start, stop, pos;
+				m_wndSeekBar.GetRange(start, stop);
+				pos = min(max(m_wndSeekBar.GetPos(), start), stop);
+
+				if (AfxGetAppSettings().fUseWin7TaskBar && m_pTaskbarList && stop) {
+					m_pTaskbarList->SetProgressValue (m_hWnd, pos, stop);
+				}
 			}
 			break;
 		case TIMER_STREAMPOSPOLLER2:
