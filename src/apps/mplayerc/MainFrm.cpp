@@ -191,6 +191,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_MESSAGE(WM_RESUMEFROMSTATE, OnResumeFromState)
 
 	ON_WM_LBUTTONDOWN()
+	ON_WM_NCLBUTTONDOWN()
 	ON_WM_LBUTTONUP()
 	ON_WM_LBUTTONDBLCLK()
 	ON_WM_MBUTTONDOWN()
@@ -3147,6 +3148,13 @@ BOOL CMainFrame::OnButton(UINT id, UINT nFlags, CPoint point)
 }
 
 static bool s_fLDown = false;
+
+void CMainFrame::OnNcLButtonDown(UINT nFlags, CPoint point)
+{
+	__super::OnNcLButtonDown(nFlags, point);
+
+	s_fLDown = false;
+}
 
 void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 {
