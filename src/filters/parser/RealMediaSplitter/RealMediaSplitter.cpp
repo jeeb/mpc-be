@@ -820,7 +820,7 @@ STDMETHODIMP CRealMediaSplitterFilter::GetKeyFrames(const GUID* pFormat, REFEREN
 //
 
 CRealMediaSplitterOutputPin::CRealMediaSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
-	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr, 0, MAXPACKETS*10)
+	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr, 0, 10)
 {
 }
 

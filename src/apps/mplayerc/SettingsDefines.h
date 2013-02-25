@@ -22,6 +22,16 @@
 
 #pragma once
 
+#define KILOBYTE				1024
+#define MEGABYTE				1024*KILOBYTE
+
+#define DEFAULT_CACHE_LENGTH	64		// in Kb
+
+#define MINQUEUEPACKETS			100
+#define MAXQUEUEPACKETS			1000
+#define MINQUEUESIZE			256		// in Kb
+#define MAXQUEUESIZE			128		// in Mb
+
 #define IDS_R_SETTINGS						_T("Settings")
 #define IDS_R_FILTERS						_T("Filters")
 #define IDS_R_INTERNAL_FILTERS				_T("Internal Filters")
@@ -277,6 +287,9 @@
 #define IDS_RS_YOUTUBE_TAG					_T("YoutubeTag")
 #define IDS_RS_YOUTUBE_SOURCE				_T("YoutubeSourceType")
 
-#define IDS_RS_PERFOMANCE_CACHE_LENGTH		_T("Perfomance\\CacheLen")
-#define IDS_RS_PERFOMANCE_MINQUEUESIZE		_T("Perfomance\\MinQueueSize")
-#define IDS_RS_PERFOMANCE_MAXQUEUESIZE		_T("Perfomance\\MaxQueueSize")
+#define IDS_RS_PERFOMANCE					_T("\\Perfomance")
+#define IDS_RS_PERFOMANCE_CACHE_LENGTH		_T("CacheLen")
+#define IDS_RS_PERFOMANCE_MINQUEUESIZE		_T("MinQueueSize")
+#define IDS_RS_PERFOMANCE_MAXQUEUESIZE		_T("MaxQueueSize")
+#define IDS_RS_PERFOMANCE_MINQUEUEPACKETS	_T("MinQueuePackets")
+#define IDS_RS_PERFOMANCE_MAXQUEUEPACKETS	_T("MaxQueuePackets")

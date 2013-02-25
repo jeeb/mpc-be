@@ -35,8 +35,6 @@
 #include "../../../apps/mplayerc/SettingsDefines.h"
 #include "../../reader/VTSReader/VTSReader.h"
 
-#define MAXPACKETS_MPEG	MAXPACKETS*5
-
 TCHAR* MPEG2_Profile[]=
 {
 	L"0",
@@ -1131,7 +1129,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			}
 
-			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CMpegSplitterOutputPin(mts, str, this, this, &hr, m_pFile->m_type, (i != CMpegSplitterFile::video) ? MAXPACKETS_MPEG : MAXPACKETS));
+			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CMpegSplitterOutputPin(mts, str, this, this, &hr, m_pFile->m_type, (i != CMpegSplitterFile::video) ? 5 : 1));
 			if (i == CMpegSplitterFile::subpic) {
 				(static_cast<CMpegSplitterOutputPin*>(pPinOut.m_p))->SetMaxShift (_I64_MAX);
 			}

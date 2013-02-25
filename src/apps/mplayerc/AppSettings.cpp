@@ -459,6 +459,8 @@ void CAppSettings::SaveSettings()
 		return;
 	}
 
+	PerfomanceSettings.SaveSettings();
+
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_HIDECAPTIONMENU, iCaptionMenuMode);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_HIDENAVIGATION, fHideNavigation);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CONTROLSTATE, nCS);
@@ -904,6 +906,8 @@ void CAppSettings::LoadSettings()
 	CMPlayerCApp::SetLanguage(iLanguage);
 
 	CreateCommands();
+
+	PerfomanceSettings.LoadSettings();
 
 	iCaptionMenuMode = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_HIDECAPTIONMENU, MODE_SHOWCAPTIONMENU);
 	fHideNavigation = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_HIDENAVIGATION, 0);

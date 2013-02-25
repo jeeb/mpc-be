@@ -294,6 +294,46 @@ public:
 	CUIceClient();
 };
 
+class CPerfomanceSettings {
+public:
+	void SetDefault() {
+		iCacheLen = DEFAULT_CACHE_LENGTH;
+
+		iMinQueueSize = MINQUEUESIZE;
+		iMaxQueueSize = MAXQUEUESIZE;
+
+		iMinQueuePackets = MINQUEUEPACKETS;
+		iMaxQueuePackets = MAXQUEUEPACKETS;
+	};
+
+	void LoadSettings() {
+		MEMORYSTATUSEX msEx;
+		msEx.dwLength = sizeof(msEx);
+		::GlobalMemoryStatusEx(&msEx);
+		DWORDLONG halfMemMB = msEx.ullTotalPhys/0x200000;
+
+		iCacheLen = max(16, min(KILOBYTE, AfxGetApp()->GetProfileInt(IDS_R_SETTINGS IDS_RS_PERFOMANCE, IDS_RS_PERFOMANCE_CACHE_LENGTH, DEFAULT_CACHE_LENGTH)));
+
+		iMinQueueSize = max(64, min(MINQUEUESIZE * 4, AfxGetApp()->GetProfileInt(IDS_R_SETTINGS IDS_RS_PERFOMANCE, IDS_RS_PERFOMANCE_MINQUEUESIZE, MINQUEUESIZE)));
+		iMaxQueueSize = max(10, min(min(512, halfMemMB), AfxGetApp()->GetProfileInt(IDS_R_SETTINGS IDS_RS_PERFOMANCE, IDS_RS_PERFOMANCE_MAXQUEUESIZE, MAXQUEUESIZE)));
+
+		iMinQueuePackets = max(10, min(MAXQUEUEPACKETS, AfxGetApp()->GetProfileInt(IDS_R_SETTINGS IDS_RS_PERFOMANCE, IDS_RS_PERFOMANCE_MINQUEUEPACKETS, MINQUEUEPACKETS)));
+		iMaxQueuePackets = max(iMinQueuePackets*2, min(MAXQUEUEPACKETS*10, AfxGetApp()->GetProfileInt(IDS_R_SETTINGS IDS_RS_PERFOMANCE, IDS_RS_PERFOMANCE_MAXQUEUEPACKETS, MAXQUEUEPACKETS)));
+	};
+
+	void SaveSettings() {
+		AfxGetApp()->WriteProfileInt(IDS_R_SETTINGS IDS_RS_PERFOMANCE, IDS_RS_PERFOMANCE_CACHE_LENGTH, iCacheLen);
+		AfxGetApp()->WriteProfileInt(IDS_R_SETTINGS IDS_RS_PERFOMANCE, IDS_RS_PERFOMANCE_MINQUEUESIZE, iMinQueueSize);
+		AfxGetApp()->WriteProfileInt(IDS_R_SETTINGS IDS_RS_PERFOMANCE, IDS_RS_PERFOMANCE_MAXQUEUESIZE, iMaxQueueSize);
+		AfxGetApp()->WriteProfileInt(IDS_R_SETTINGS IDS_RS_PERFOMANCE, IDS_RS_PERFOMANCE_MINQUEUEPACKETS, iMinQueuePackets);
+		AfxGetApp()->WriteProfileInt(IDS_R_SETTINGS IDS_RS_PERFOMANCE, IDS_RS_PERFOMANCE_MAXQUEUEPACKETS, iMaxQueuePackets);
+	};
+
+	DWORD iCacheLen;
+	DWORD iMinQueueSize, iMaxQueueSize;
+	DWORD iMinQueuePackets, iMaxQueuePackets;
+};
+
 class CAppSettings
 {
 	bool fInitialized;
@@ -671,4 +711,7 @@ public:
 private:
 	void			UpdateRenderersData(bool fSave);
 	friend	void	CRenderersSettings::UpdateData(bool bSave);
+
+public:
+	CPerfomanceSettings	PerfomanceSettings;
 };

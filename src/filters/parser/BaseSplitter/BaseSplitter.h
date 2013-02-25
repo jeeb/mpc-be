@@ -33,11 +33,7 @@
 #include "AsyncReader.h"
 #include "../../../DSUtil/DSMPropertyBag.h"
 #include "../../../DSUtil/FontInstaller.h"
-
-#define MINPACKETS		100
-#define MINQUEUESIZE	256*KILOBYTE
-#define MAXPACKETS		1000
-#define MAXQUEUESIZE	128*MEGABYTE
+#include "../apps/mplayerc/SettingsDefines.h"
 
 class Packet : public CAtlArray<BYTE>
 {
@@ -143,7 +139,8 @@ private:
 		DWORD nAverageBitRate;
 	} m_brs;
 
-	size_t m_QueueMaxPackets;
+	DWORD m_MinQueuePackets, m_MaxQueuePackets;
+	DWORD m_MinQueueSize, m_MaxQueueSize;
 
 protected:
 	REFERENCE_TIME m_rtStart;
@@ -173,8 +170,8 @@ protected:
 	STDMETHODIMP GetPreroll(LONGLONG* pllPreroll);
 
 public:
-	CBaseSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int nBuffers = 0, size_t QueueMaxPackets = MAXPACKETS);
-	CBaseSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int nBuffers = 0, size_t QueueMaxPackets = MAXPACKETS);
+	CBaseSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int nBuffers = 0, int factor = 1);
+	CBaseSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int nBuffers = 0, int factor = 1);
 	virtual ~CBaseSplitterOutputPin();
 
 	DECLARE_IUNKNOWN;
@@ -303,7 +300,7 @@ public:
 	DECLARE_IUNKNOWN;
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
-	bool IsAnyPinDrying(int QueueMaxPackets = MAXPACKETS);
+	bool IsAnyPinDrying(DWORD MaxQueuePackets);
 
 	HRESULT BreakConnect(PIN_DIRECTION dir, CBasePin* pPin);
 	HRESULT CompleteConnect(PIN_DIRECTION dir, CBasePin* pPin);
@@ -400,8 +397,12 @@ public:
 
 protected:
 	DWORD m_MinQueueSize, m_MaxQueueSize;
+	DWORD m_MinQueuePackets, m_MaxQueuePackets;
 
 public:
 	DWORD GetMinQueueSize() { return m_MinQueueSize; }
 	DWORD GetMaxQueueSize() { return m_MaxQueueSize; }
+
+	DWORD GetMinQueuePackets() { return m_MinQueuePackets; }
+	DWORD GetMaxQueuePackets() { return m_MaxQueuePackets; }
 };

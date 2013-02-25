@@ -30,6 +30,7 @@
 #include "../../../DSUtil/GolombBuffer.h"
 #include <MMReg.h>
 #include <moreuuids.h>
+#include "../apps/mplayerc/SettingsDefines.h"
 
 #define MAXFRAMESIZE ((144 * 320000 / 8000) + 1)
 #define BUFFERS 2
@@ -611,9 +612,12 @@ UINT CShoutcastStream::SocketThreadProc()
 
 	CAutoPtr<Packet> m_p;
 
+	DWORD MinQueuePackets = max(10, min(MAXQUEUEPACKETS, AfxGetApp()->GetProfileInt(IDS_R_SETTINGS, IDS_RS_PERFOMANCE_MINQUEUEPACKETS, MINQUEUEPACKETS)));
+	DWORD MaxQueuePackets = max(MinQueuePackets*2, min(MAXQUEUEPACKETS*10, AfxGetApp()->GetProfileInt(IDS_R_SETTINGS, IDS_RS_PERFOMANCE_MAXQUEUEPACKETS, MAXQUEUEPACKETS)));
+
 	while (!fExitThread) {
 		{
-			if (m_queue.GetCount() >= MAXPACKETS) {
+			if (m_queue.GetCount() >= MaxQueuePackets) {
 				// Buffer is full
 				Sleep(100);	
 				continue;

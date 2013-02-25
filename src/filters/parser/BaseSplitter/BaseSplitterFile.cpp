@@ -56,7 +56,7 @@ CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bo
 		return;
 	}
 
-	int cachelen = max(16*KILOBYTE, min(MEGABYTE, AfxGetApp()->GetProfileInt(IDS_R_SETTINGS, IDS_RS_PERFOMANCE_CACHE_LENGTH, DEFAULT_CACHE_LENGTH)));
+	size_t cachelen = KILOBYTE * max(16, min(KILOBYTE, AfxGetApp()->GetProfileInt(IDS_R_SETTINGS, IDS_RS_PERFOMANCE_CACHE_LENGTH, DEFAULT_CACHE_LENGTH)));
 	if (!SetCacheSize(cachelen)) {
 		hr = E_OUTOFMEMORY;
 		return;
@@ -65,11 +65,11 @@ CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bo
 	hr = S_OK;
 }
 
-bool CBaseSplitterFile::SetCacheSize(int cachelen)
+bool CBaseSplitterFile::SetCacheSize(size_t cachelen)
 {
 	m_pCache.Free();
 	m_cachetotal = 0;
-	m_pCache.Allocate((size_t)cachelen);
+	m_pCache.Allocate(cachelen);
 	if (!m_pCache) {
 		return false;
 	}
