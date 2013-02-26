@@ -195,6 +195,18 @@ BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20
 19		"Επαναφορά λίστας"
 END
 
+BEGIN DIALOGEX IDD_PPAGEFILTERSPERFOMANCE LINES 23
+14		"Min Queue Packets:"
+15		"Max Queue Packets:"
+16		"Min Queue Size:"
+17		"Max Queue Size:"
+18		"Cach size:"
+19		"Kb"
+20		"Mb"
+21		"Kb"
+22		"Default"
+END
+
 BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 30
 6		"Επεκτάσεις αρχείων"
 8		"Προεπιλογή"
@@ -1113,11 +1125,11 @@ STRING IDD_FILEPROPCLIP		"Απόσπασμα"
 STRING IDD_FILEPROPDETAILS		"Λεπτομέρειες"
 STRING IDD_FILEPROPRES		"Πόροι"
 STRING IDD_PPAGEACCELTBL		"Αναπαραγωγός::Πλήκτρα συντομεύσεων"
-STRING IDD_PPAGEAUDIODEC		"Internal Filters::Audio Decoders"
 STRING IDD_PPAGEAUDIOSWITCHER		"Εσωτερικά φίλτρα::Επιλογέας ήχου"
 STRING IDD_PPAGECAPTURE		"Αναπαραγωγή::Καταγραφή"
 STRING IDD_PPAGEDVD		"Αναπαραγωγή::DVD/OGM"
 STRING IDD_PPAGEEXTERNALFILTERS		"Εξωτερικά φίλτρα"
+STRING IDD_PPAGEFILTERSPERFOMANCE		"Internal Filters::Perfomance"
 STRING IDD_PPAGEFORMATS		"Αναπαραγωγός::Μορφές"
 STRING IDD_PPAGEFULLSCREEN		"Αναπαραγωγή::Μεγιστοποιημένη προβολή"
 STRING IDD_PPAGEINTERFACE		"Interface"
@@ -1197,7 +1209,6 @@ STRING IDS_AG_MEDIAFILES		"Αρχεία πολυμέσων (όλοι οι τύπ
 STRING IDS_AG_MENU_AUDIOLANG		"Menu Audio Language"
 STRING IDS_AG_MENU_JUMPTO		"Menu Jump To..."
 STRING IDS_AG_MENU_SUBTITLELANG		"Menu Subtitle Language"
-STRING IDS_AG_MODIFIER		"Modifier"
 STRING IDS_AG_MOUSE		"Ποντίκι παραθύρου"
 STRING IDS_AG_MOUSE_FS		"Ποντίκι πλήρους οθόνης"
 STRING IDS_AG_NAVIGATE		"Navigate"

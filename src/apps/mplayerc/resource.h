@@ -104,8 +104,8 @@
 #define ID_FILE_ISDB_DOWNLOAD           812
 #define ID_FILE_ISDB_SEARCH             813
 #define ID_FILE_PROPERTIES              814
-#define ID_FILE_EXIT                    816
 #define ID_VIEW_OPTIONS                 815
+#define ID_FILE_EXIT                    816
 #define ID_VIEW_CAPTIONMENU             817
 #define ID_VIEW_SEEKER                  818
 #define ID_VIEW_CONTROLS                819
@@ -354,7 +354,6 @@
 #define IDD_PPAGEVIDREND                10038
 #define IDD_PPAGEOUTPUT                 10039
 #define IDD_PPAGEWEBSERVER              10040
-#define IDD_PPAGEAUDIODEC               10041
 #define IDD_PPAGESUBDB                  10042
 #define IDD_SAVETEXTFILEDIALOGTEMPL     10043
 #define IDD_CAPTURE_DLG                 10045
@@ -372,6 +371,7 @@
 #define IDD_NAVIGATION                  10057
 #define IDD_PPAGEINTERFACE              10058
 #define IDD_PPAGEYOUTUBE                10059
+#define IDD_PPAGEFILTERSPERFOMANCE      10060
 #define IDC_COMBO1                      11000
 #define IDC_COMBO2                      11001
 #define IDC_COMBO3                      11002
@@ -461,6 +461,10 @@
 #define IDC_STATIC3                     11262
 #define IDC_STATIC4                     11263
 #define IDC_STATIC_BALANCE              11264
+#define IDC_STATIC5                     11264
+#define IDC_STATIC6                     11265
+#define IDC_STATIC7                     11266
+#define IDC_STATIC8                     11267
 #define IDC_DVDPATH                     12000
 #define IDC_SUBRESYNCLIST               12001
 #define IDC_PLAYLIST                    12002
@@ -597,8 +601,8 @@
 #define IDS_PROPSHEET_PROPERTIES        14185
 #define IDS_GRAPHBUILDER_AUDIOSWITCHER  14186
 #define IDS_SHADERS_EDIT                14187
-#define IDS_SUBTITLES_DEFAULT_STYLE    	14188
-#define IDS_SUBTITLES_FORCED    	    14189
+#define IDS_SUBTITLES_DEFAULT_STYLE     14188
+#define IDS_SUBTITLES_FORCED            14189
 #define IDS_FAVFILES                    14190
 #define IDS_FAVDVDS                     14191
 #define IDS_SHADERS_SELECT_SCREENSPACE  14193
@@ -746,7 +750,6 @@
 #define IDS_SHADEREDITORDLG_0           32831
 #define IDS_AG_NONE                     32832
 #define IDS_AG_COMMAND                  32833
-#define IDS_AG_MODIFIER                 32983
 #define IDS_AG_KEY                      32834
 #define IDS_AG_TYPE                     32835
 #define IDS_AG_MOUSE                    32836
@@ -1525,7 +1528,6 @@
 #define IDS_SUBDL_DLG_PARSING           41395
 #define IDS_SUBDL_DLG_NOT_FOUND         41396
 #define IDS_SUBDL_DLG_SUBS_AVAIL        41397
-
 #define IDS_TOOLTIP_MINIMIZE            41398
 #define IDS_TOOLTIP_RESTORE             41399
 #define IDS_TOOLTIP_MAXIMIZE            41400
@@ -1533,13 +1535,11 @@
 #define IDS_TOOLTIP_FULLSCREEN          41402
 #define IDS_TOOLTIP_LOCK                41403
 #define IDS_TOOLTIP_UNLOCK              41404
-
 #define IDS_THUMB_IMAGE_QUALITY         41505
 #define IDS_THUMB_QUALITY               41506
 #define IDS_THUMB_THUMBNAILS            41507
 #define IDS_THUMB_PIXELS                41508
 #define IDS_THUMB_LEVEL                 41509
-
 #define IDS_PPAGE_OUTPUT_OLDRENDERER    42001
 #define IDS_PPAGE_OUTPUT_OVERLAYMIXER   42002
 #define IDS_PPAGE_OUTPUT_VMR7WINDOWED   42003
@@ -1566,13 +1566,11 @@
 #define IDS_AG_STEP                     43004
 #define ID_FILE_LOAD_AUDIO              43005
 #define IDS_AG_LOAD_AUDIO               43006
-
 #define IDS_VDF_DEINTERLACING           43100
 #define IDS_VDF_DEINTER_AUTO            43101
 #define IDS_VDF_DEINTER_TOP             43102
 #define IDS_VDF_DEINTER_BOTTOM          43103
 #define IDS_VDF_DEINTER_PROGRESSIVE     43104
-
 #define ID_OSD_LOCAL_TIME               44001
 #define IDS_AG_OSD_LOCAL_TIME           44002
 #define ID_OSD_FILE_NAME                44003
@@ -1583,9 +1581,9 @@
 #define IDC_SLIDER_OSDTRANS             44013
 #define IDC_CHECK_SHADOW                44014
 #define IDC_CHECK_AA                    44015
-
 #define ID_WINDOW_TO_PRIMARYSCREEN      44101
 #define IDS_AG_WINDOW_TO_PRIMARYSCREEN  44102
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

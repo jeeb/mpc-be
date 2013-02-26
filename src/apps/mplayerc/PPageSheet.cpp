@@ -50,6 +50,7 @@ CPPageSheet::CPPageSheet(LPCTSTR pszCaption, IFilterGraph* pFG, CWnd* pParentWnd
 	AddPage(&m_youtube);
 	AddPage(&m_internalfilters);
 	AddPage(&m_audioswitcher);
+	AddPage(&m_filtersperfomance);
 	AddPage(&m_externalfilters);
 	AddPage(&m_subtitles);
 	AddPage(&m_substyle);
