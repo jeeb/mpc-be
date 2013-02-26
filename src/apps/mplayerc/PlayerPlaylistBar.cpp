@@ -27,11 +27,11 @@
 #include "mplayerc.h"
 #include "MainFrm.h"
 #include "../../DSUtil/DSUtil.h"
+#include "../../DSUtil/WinAPIUtils.h"
 #include "SaveTextFileDialog.h"
 #include "PlayerPlaylistBar.h"
 #include "SettingsDefines.h"
 #include "OpenFileDlg.h"
-
 
 IMPLEMENT_DYNAMIC(CPlayerPlaylistBar, CPlayerBar)
 CPlayerPlaylistBar::CPlayerPlaylistBar()
@@ -673,7 +673,11 @@ void CPlayerPlaylistBar::EnsureVisible(POSITION pos)
 	if (i < 0) {
 		return;
 	}
+
 	m_list.EnsureVisible(i, TRUE);
+	m_list.SetItemState(-1, 0, LVIS_SELECTED);
+	m_list.SetItemState(i, LVIS_SELECTED, LVIS_SELECTED);
+
 	m_list.Invalidate();
 }
 
@@ -973,7 +977,7 @@ void CPlayerPlaylistBar::ResizeListColumn()
 		m_list.SetRedraw(FALSE);
 		m_list.MoveWindow(r);
 		m_list.GetClientRect(r);
-		m_list.SetColumnWidth(COL_NAME, r.Width()-m_nTimeColWidth); //LVSCW_AUTOSIZE_USEHEADER
+		m_list.SetColumnWidth(COL_NAME, r.Width() - m_nTimeColWidth);
 		m_list.SetRedraw(TRUE);
 	}
 }
@@ -1056,6 +1060,9 @@ void CPlayerPlaylistBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 	int R, G, B;
 
 	if (CDDS_PREPAINT == pLVCD->nmcd.dwDrawStage) {
+		if (IsWinSevenOrLater()) { // under WinXP cause the hang
+			ResizeListColumn();
+		}
 
 		if (s.fDisableXPToolbars) {
 			ThemeRGB(30, 35, 40, R, G, B);
