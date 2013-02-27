@@ -49,19 +49,19 @@ CPPageFiltersPerfomance::~CPPageFiltersPerfomance()
 void CPPageFiltersPerfomance::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_PERFOMANCE_DEFAULT, m_DefaultCtrl);
+	DDX_Text(pDX, IDC_MINQUEUE_PACKETS, m_nMinQueuePackets);
+	DDX_Text(pDX, IDC_MAXQUEUE_PACKETS, m_nMaxQueuePackets);
 	DDX_Control(pDX, IDC_SPIN2, m_nMinQueueSizeCtrl);
 	DDX_Control(pDX, IDC_SPIN3, m_nMaxQueueSizeCtrl);
 	DDX_Control(pDX, IDC_SPIN4, m_nCachSizeCtrl);
-	DDX_Text(pDX, IDC_EDIT3, m_nMinQueueSize);
-	DDX_Text(pDX, IDC_EDIT4, m_nMaxQueueSize);
-	DDX_Text(pDX, IDC_EDIT5, m_nCachSize);
-	DDX_Text(pDX, IDC_EDIT1, m_nMinQueuePackets);
-	DDX_Text(pDX, IDC_EDIT2, m_nMaxQueuePackets);
-	DDX_Control(pDX, IDC_CHECK1, m_DefaultCtrl);
+	DDX_Text(pDX, IDC_MINQUEUE_SIZE, m_nMinQueueSize);
+	DDX_Text(pDX, IDC_MAXQUEUE_SIZE, m_nMaxQueueSize);
+	DDX_Text(pDX, IDC_CACH_SIZE, m_nCachSize);
 }
 
 BEGIN_MESSAGE_MAP(CPPageFiltersPerfomance, CPPageBase)
-	ON_BN_CLICKED(IDC_CHECK1, &CPPageFiltersPerfomance::OnBnClickedCheck1)
+	ON_BN_CLICKED(IDC_PERFOMANCE_DEFAULT, &CPPageFiltersPerfomance::OnBnClickedCheck1)
 END_MESSAGE_MAP()
 
 // CPPageFiltersPerfomance message handlers
@@ -70,7 +70,7 @@ BOOL CPPageFiltersPerfomance::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	SetHandCursor(m_hWnd, IDC_CHECK1);
+	SetHandCursor(m_hWnd, IDC_PERFOMANCE_DEFAULT);
 
 	AppSettings& s = AfxGetAppSettings();
 
@@ -89,6 +89,8 @@ BOOL CPPageFiltersPerfomance::OnInitDialog()
 	OnBnClickedCheck1();
 
 	UpdateData(FALSE);
+
+	CreateToolTip();
 
 	return TRUE;
 }
@@ -129,7 +131,7 @@ void CPPageFiltersPerfomance::OnBnClickedCheck1()
 	}
 
 	for (CWnd *pChild = GetWindow(GW_CHILD); pChild != NULL; pChild = pChild->GetWindow(GW_HWNDNEXT)) {
-		if (pChild != GetDlgItem(IDC_CHECK1) && pChild != GetDlgItem(IDC_STATIC)) {
+		if (pChild != GetDlgItem(IDC_PERFOMANCE_DEFAULT) && pChild != GetDlgItem(IDC_STATIC)) {
 			pChild->EnableWindow(!m_DefaultCtrl.GetCheck()); 
 		}
 	}

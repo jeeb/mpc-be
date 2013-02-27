@@ -1096,6 +1096,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 318
 END
 
 STRING IDC_BUTTON_EXT_SET		"Μετά το κλικ σε αυτό το κουμπί, το επιλεγμένο μέλος της ομάδας μορφής, θα αντικατοπτρίζει την πραγματική συσχέτιση αρχείου για το MPC-BE. Μια επέκταση που προστέθηκε πρόσφατα, θα είναι συνήθως γκρι, ώστε να μην ξεχάσετε να το ελέγξτε ξανά πριν να κλείσετε αυτό το παράθυρο διαλόγου!"
+STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_MPEGINTERLACED		"Use it together with ""Weave"" if the video renderer can also deinterlace. The currently loaded file has to be opened again."
 STRING IDC_CHECK_RELATIVETO		"Η προεπιλεγμένη τιμή χρησιμοποιείται και σε άλλα στυλ, όπου δεν έχει καθοριστεί"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Επιτρέπετε η κίνηση του υπότιτλου όταν χρησιμοποιείται μια προσωρινή επιμέρους εικόνα μεγαλύτερη από 0. Η απενεργοποίηση αυτής της επιλογής θα μειώσει τη χρήση της CPU. Επίσης να το απενεργοποιήσετε εάν οι υπότιτλοι αναβοσβήνουν."
@@ -1111,6 +1112,11 @@ STRING IDC_DSVMR9LOADMIXER		"Θέτει το VMR-9 (χωρίς απόδοση) �
 STRING IDC_DSVMR9REN		"Ίδιο με το VMR-9 (σε παράθυρο), αλλά με το πρόσθετο Εκχώρησης-Παρουσίασης του MPC-BE για υποτιτλισμό. Το καθρέπτισμα βίντεο επικάλυψης ΕΝΔΕΧΕΤΑΙ να λειτουργεί. Συνιστάται το μέγιστο βάθος χρώματος οθόνης (32 bit). Συνιστάται για Windows XP."
 STRING IDC_DSVMR9WIN		"Είναι διαθέσιμο μόνο αν έχετε εγκατεστημένο το DirectX 9. Έχει τις ίδιες δυνατότητες με το VMR-7 (σε παράθυρο), αλλά δεν χρησιμοποιεί ποτέ απόδοση επικάλυψης και λόγω αυτού μπορεί να είναι λίγο πιο αργό από το VMR-7 (σε παράθυρο)."
 STRING IDC_DX9RESIZER_COMBO		"Εάν δεν υπάρχει υποστήριξη Pixel Shader 2.0, χρησιμοποιείται αυτόματα η απλή διγραμμική."
+STRING IDC_MAXQUEUE_PACKETS		"The maximum number of packets (data), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MAXQUEUE_SIZE		"The maximum size of memory in the queue (in megabytes), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MINQUEUE_PACKETS		"The minimum number of packets (data) in the queue, when begins playing\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MINQUEUE_SIZE		"The minimum size of memory in the queue (in kilobytes), when begins playing\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_PERFOMANCE_DEFAULT		"Reset settings to the default, which is optimized for most PC"
 STRING IDC_QTDX7		"Η έξοδος των μηχανών απόδοσης του QuickTime, από τη βασισμένη στο DX7 Εκχώρηση-Παρουσίαση της VMR-7 (χωρίς απόδοση)."
 STRING IDC_QTDX9		"Η έξοδος των μηχανών απόδοσης του QuickTime, από τη βασισμένη στο DX9 Εκχώρηση-Παρουσίαση της VMR-9 (χωρίς απόδοση)."
 STRING IDC_QTSYSDEF		"Η απόδοση του QuickTime. Είναι λίγο αργή όταν η περιοχή του βίντεο αλλάζει μέγεθος ή καλύπτεται εν μέρει από ένα άλλο παράθυρο. Όταν η επικάλυψη δεν είναι διαθέσιμη, αυτό μπορεί να επανέλθει στο GDI."

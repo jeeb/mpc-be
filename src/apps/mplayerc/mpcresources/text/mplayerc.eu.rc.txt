@@ -1091,6 +1091,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 318
 END
 
 STRING IDC_BUTTON_EXT_SET		"Botoi hau sakatu ondoren, hautatutako multzo heuskarri egoerak  MPC-HC-rentzat oraingo agiri elkarketa adieraziko du. Berriki gehitutako hedapen ba arrunt urdinabarrago ikusiko da, hortaz ez ahaztu hura berriro hautazeaz elkarrizketa hau itxitakoan!"
+STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_MPEGINTERLACED		"Erabili ""Weave""-rekin batera bideo aurkezleak ez-elkarlotura ere egin badezake. Orain gertatuta dagoen agiria berriro ireki behar da."
 STRING IDC_CHECK_RELATIVETO		"Berezko egoera beste estilo batzuetatik lortzen da oraindik zehaztugabe dagoenean."
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Ahalbidetzen du azpidatzi animazioa 0 baino handiagoa den azpirudi buffer bat erabiltzerakoan. Aukera hau ezgaitzeak CPU erabilera gutxiago izango du. Ezgaitu ere azpidatziak keinuka ikusten badituzu."
@@ -1106,6 +1107,11 @@ STRING IDC_DSVMR9LOADMIXER		"VMR-9 (aurkezgabe) nahastzaile modu barnean jartzen
 STRING IDC_DSVMR9REN		"VMR-9-ren berdina da (leihotuta), baina MPC-HC-ren Banantzaile-Aurkezle pluginarekin azpidatzientzat. Bideo gainjarpen ispiluak AHAL DA lan egitea. 'True Color' mahigain margo tartea gomendatuta. Windows XP-rako gomendatuta."
 STRING IDC_DSVMR9WIN		"Eskuragarri bakarrik DirectX 9 ezarrita baduzu. VMR-7-ren (leihotuta) gaitasun berak ditu, baina inoiz ezingo du Ganjarpen aurkezpena erabili eta honegaitik VMR-7 (leihotuta) baino apur bat astiroagoa izan daiteke."
 STRING IDC_DX9RESIZER_COMBO		"Pixel Itzal 2.0 sostengurik ez badago, bilinear arrunta erabiltzen da berezgaitaunez."
+STRING IDC_MAXQUEUE_PACKETS		"The maximum number of packets (data), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MAXQUEUE_SIZE		"The maximum size of memory in the queue (in megabytes), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MINQUEUE_PACKETS		"The minimum number of packets (data) in the queue, when begins playing\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MINQUEUE_SIZE		"The minimum size of memory in the queue (in kilobytes), when begins playing\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_PERFOMANCE_DEFAULT		"Reset settings to the default, which is optimized for most PC"
 STRING IDC_QTDX7		"QuickTime-ren gailuaren irteera VMR-7-ren (aurkezgabe) DX7-ohinarriko Banantzaile-Aurkezleak aurkeztuta."
 STRING IDC_QTDX9		"QuickTime-ren gailuaren irteera VMR-9-ren (aurkezgabe) DX9-ohinarriko Banantzaile-Aurkezleak aurkeztuta."
 STRING IDC_QTSYSDEF		"QuickTime-ren bere aurkezlea. Apur bat astiroa bideo eremua birneurriratua bada edo beste leiho batez erdi estalia. Gainjarpena ez dagoenean eskuragarri GDI-ra itzultzeko joera dau."

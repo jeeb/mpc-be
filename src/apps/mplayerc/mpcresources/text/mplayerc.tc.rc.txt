@@ -1091,6 +1091,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 318
 END
 
 STRING IDC_BUTTON_EXT_SET		"按下此按鈕後, 格式群組中有選取的狀態會反映到 MPC-BE 實際對應的附檔名. 新加入的附檔名通常呈現灰色, 所以在關閉對話框之前別忘了再檢查一遍!"
+STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_MPEGINTERLACED		"如果視訊繪製器也支援去交錯, 就和 ""Weave"" 一同使用. 已載入的檔案需要重新開啟."
 STRING IDC_CHECK_RELATIVETO		"如果依舊沒定義, 預設會繼承其他的樣式"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"當子畫面緩衝大於 0 時允許字幕動畫. 停用這個選項會降低 CPU 使用量. 如果您覺得字幕在閃爍時也請停用."
@@ -1106,6 +1107,11 @@ STRING IDC_DSVMR9LOADMIXER		"將 VMR-9 (無轉換) 放進合成器模式, 這表
 STRING IDC_DSVMR9REN		"和 VMR-9 (視窗式) 相同, 但藉助 MPC-BE 的配置呈現器顯示字幕. 覆疊式視訊鏡射輸出可能能運作. 桌面建議使用'全彩'顯示."
 STRING IDC_DSVMR9WIN		"只有在您安裝了 DirectX 9 之後才能用. 它有著和 VMR-7 (視窗式) 相同的能力, 但永遠不會使用覆疊模式繪製. 因此這可能會比 VMR-7 (視窗式) 慢一點."
 STRING IDC_DX9RESIZER_COMBO		"如果沒有 Pixel Shader 2.0 的支援, 就會自動使用比較簡單的 Bilinear."
+STRING IDC_MAXQUEUE_PACKETS		"The maximum number of packets (data), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MAXQUEUE_SIZE		"The maximum size of memory in the queue (in megabytes), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MINQUEUE_PACKETS		"The minimum number of packets (data) in the queue, when begins playing\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MINQUEUE_SIZE		"The minimum size of memory in the queue (in kilobytes), when begins playing\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_PERFOMANCE_DEFAULT		"Reset settings to the default, which is optimized for most PC"
 STRING IDC_QTDX7		"QuickTime 引擎的輸出由基於 DX7 的 VMR-7 (無轉換) 配置呈現器繪製."
 STRING IDC_QTDX9		"QuickTime 引擎的輸出由基於 DX9 的 VMR-9 (無轉換) 配置呈現器繪製."
 STRING IDC_QTSYSDEF		"QuickTime 自己的繪製器. 當視訊區域有變更大小或是部分被其它視窗蓋住時會稍微變慢. 當覆疊模式不能用的時候會回復到 GDI."

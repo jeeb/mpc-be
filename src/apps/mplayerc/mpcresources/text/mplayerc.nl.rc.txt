@@ -1091,6 +1091,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 318
 END
 
 STRING IDC_BUTTON_EXT_SET		"Als je hierop klikt zal de aangevinkte status bij de formaten-groep overeenkomen met de daadwerkelijke bestandskoppeling van MPC-BE. Een nieuw toegevoegde bestandsextensie zal het meestal grijs maken, dus vergeet die niet weer aan te vinken, voor u deze dialoog sluit!"
+STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_MPEGINTERLACED		"Gebruik dit samen met ""Weave"" als de video renderer ook kan deinterlacen. Het huidige bestand zal opnieuw geopend moeten worden."
 STRING IDC_CHECK_RELATIVETO		"Standaardwaarden worden ook op andere stijlen toegepast, waar nog geen waarde voor bepaald is."
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Maakt ondertitelings-animatie mogelijk bij een subpicture-buffer groter dan 0. Dit uitzetten zal de CPU ontlasten. Zet dit ook uit als de ondertiteling flikkert."
@@ -1106,6 +1107,11 @@ STRING IDC_DSVMR9LOADMIXER		"Zet VMR-9 (renderless) in de mixer-modus. Dit betek
 STRING IDC_DSVMR9REN		"Hetzelfde als VMR-9 (venster), maar met de Allocator-Presenter plugin van MPC-BE voor ondertiteling. Overlay video mirroring KAN werken. De kleurkwaliteit van het bureaublad kan het beste 'True Color' zijn. Aangeraden in Windows XP."
 STRING IDC_DSVMR9WIN		"Alleen beschikbaar als DirectX 9 is geïnstalleerd. Heeft dezelfde mogelijkheden als VMR-7 (venster), maar het zal nooit Overlay rendering gebruiken en kan daarom iets langzamer zijn dan VMR-7 (venster)."
 STRING IDC_DX9RESIZER_COMBO		"Als er geen Pixel Shader 2.0 ondersteuning is, zal automatisch Simple Bilinear gebruikt worden."
+STRING IDC_MAXQUEUE_PACKETS		"The maximum number of packets (data), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MAXQUEUE_SIZE		"The maximum size of memory in the queue (in megabytes), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MINQUEUE_PACKETS		"The minimum number of packets (data) in the queue, when begins playing\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MINQUEUE_SIZE		"The minimum size of memory in the queue (in kilobytes), when begins playing\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_PERFOMANCE_DEFAULT		"Reset settings to the default, which is optimized for most PC"
 STRING IDC_QTDX7		"The output van QuickTime's engine wordt gerendert door de op DX7 gebasserde VMR-9 (renderless)."
 STRING IDC_QTDX9		"The output van QuickTime's engine wordt gerendert door de op DX7 gebasserde VMR-9 (renderless)."
 STRING IDC_QTSYSDEF		"QuickTime's eigen renderer. Wordt langzaam als het venster gedeeltelijk bedekt is of als de grootte verandert wordt. Als Overlay niet toegepast kan worden, wordt normaliter GDI toegepast."

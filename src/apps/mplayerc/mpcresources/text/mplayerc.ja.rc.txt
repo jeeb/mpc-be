@@ -1091,6 +1091,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 318
 END
 
 STRING IDC_BUTTON_EXT_SET		"このボタンをクリックすると MPC-BE の実際のファイルの関連付けがフォーマットグループのチェックの状態に反映されます。\n新しく拡張子が追加されると大抵チェックボックスは灰色になるので、このダイアログを閉じる前に再びチェックすることを忘れないでください！"
+STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_MPEGINTERLACED		"ビデオ レンダラがインターレース解除が可能な場合に ""Weave"" と共に使用します。開いているファイルは開き直してください。"
 STRING IDC_CHECK_RELATIVETO		"未設定のスタイルにはデフォルト状態の設定が適用される"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"サブピクチャーバッファを使用している時に字幕アニメーションを許可します。無効にすると CPU 使用率が下がります。字幕がチラつく場合も無効にしてください。"
@@ -1106,6 +1107,11 @@ STRING IDC_DSVMR9LOADMIXER		"VMR-9 (レンダーレス) をミキサ モード�
 STRING IDC_DSVMR9REN		"字幕表示のための MPC-BE のアロケータ-プレゼンタ プラグインを除いて VMR-9 (ウィンドウ) と同じです。オーバーレイのビデオミラーリングは動作 す る でしょう。デスクトップの色数を 'True Color' にする事を推奨します。Windows XP で推奨します。"
 STRING IDC_DSVMR9WIN		"DirectX 9 がインストールされている場合にのみ使用できます。VMR-7 (ウィンドウ) と同等ですが、オーバーレイ レンダリングをしないため VMR-7 (ウィンドウ) より少し遅いです。"
 STRING IDC_DX9RESIZER_COMBO		"ピクセル シェーダ 2.0 に対応していなければ自動的に単純な線形補間が使用されます。"
+STRING IDC_MAXQUEUE_PACKETS		"The maximum number of packets (data), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MAXQUEUE_SIZE		"The maximum size of memory in the queue (in megabytes), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MINQUEUE_PACKETS		"The minimum number of packets (data) in the queue, when begins playing\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MINQUEUE_SIZE		"The minimum size of memory in the queue (in kilobytes), when begins playing\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_PERFOMANCE_DEFAULT		"Reset settings to the default, which is optimized for most PC"
 STRING IDC_QTDX7		"VMR-7 (レンダーレス) の DirectX 7 ベースのアロケータプレゼンタでレンダリングされる QuickTime 用の出力エンジンです。"
 STRING IDC_QTDX9		"VMR-9 (レンダーレス) の DirectX 9 ベースのアロケータプレゼンタでレンダリングされる QuickTime 用の出力エンジンです。"
 STRING IDC_QTSYSDEF		"QuickTime 独自のレンダラです。映像の表示領域がリサイズされたり、他のウィンドウによって部分的に隠されると少し遅くなります。オーバーレイが利用できない場合は GDI が使用されます。"

@@ -1091,6 +1091,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 318
 END
 
 STRING IDC_BUTTON_EXT_SET		"Այս կոճակը սեղմելուց հետո ցույց կտրվի MPC-BE-ի հետ ասոցացված տեսակների խմբերը։ Նոր ավելացումները երևում են մոխրագույն գույնով, ուստի մի մոռացեք նորից ստուգել դրանք պատուհանը փակելիս։"
+STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_MPEGINTERLACED		"Օգտագործել սա ""Weave""-ի հետ, եթե ցուցադրիչը նույնպես հնարավորություն է տալիս իրականացնել  Deinterlacing. Բացվող ֆայլը նորից կբացվի։"
 STRING IDC_CHECK_RELATIVETO		"Ծրագրային վիճակը որոշվում է այնտեղ, որտեղ այն դեռ չի որոշվել"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Հնարավորություն է տալիս շարժապատկերել տողագրերը։"
@@ -1106,6 +1107,11 @@ STRING IDC_DSVMR9LOADMIXER		"Փոխում է VMR-9 (renderless)-ը Խառնիչ�
 STRING IDC_DSVMR9REN		"Նույնն է ինչ VMR-9 (windowed)-ը, բայց ունի տողագրերի արտածման MPC-BE Allocator-Presenter խրոցակ։ Տեսանյութի ""Հայելային"" արտապատկերումը Overlay-ում կարող է աշխատել։ Գույնի առումով խորհուրդ է տրվում նշել 'True Color'։"
 STRING IDC_DSVMR9WIN		"Հասանելի է տեղակայված DirectX 9-ի դեպքում։ Հնարավորությունները նույն են ինչ VMR-7 (windowed)-ում, բայց երբեք չի օգտագործում է Overlay, դրա հանար կարող է փոքր ինչ դանդաղ լինել VMR-7 (windowed)-ից։"
 STRING IDC_DX9RESIZER_COMBO		"Փիքսելային շեյդերների տարբերակ 2.0-ն չաջակցելու դեպքում, կօգտագործվի պարզունակ մեթոդ։"
+STRING IDC_MAXQUEUE_PACKETS		"The maximum number of packets (data), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MAXQUEUE_SIZE		"The maximum size of memory in the queue (in megabytes), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MINQUEUE_PACKETS		"The minimum number of packets (data) in the queue, when begins playing\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MINQUEUE_SIZE		"The minimum size of memory in the queue (in kilobytes), when begins playing\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_PERFOMANCE_DEFAULT		"Reset settings to the default, which is optimized for most PC"
 STRING IDC_QTDX7		"QuickTime-ի արտածումը մշակվում է Allocator-Presenter խրոցակի միջոցով VMR-7 (renderless)-ում։"
 STRING IDC_QTDX9		"QuickTime-ի արտածումը մշակվում է Allocator-Presenter խրոցակի միջոցով VMR-9 (renderless)-ում։"
 STRING IDC_QTSYSDEF		"QuickTime-ի սեփական ցուցադրիչը։ Դանդաղում է կադրի չափի փոփոխման դեպքում։ Եթե Overlay-ը հասանելի չէ անցեք GDI-ի եղանակի։"

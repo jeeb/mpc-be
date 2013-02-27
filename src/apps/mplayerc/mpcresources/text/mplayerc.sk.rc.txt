@@ -1091,6 +1091,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 318
 END
 
 STRING IDC_BUTTON_EXT_SET		"Po kliknutí na toto tlačidlo, sa zmenia asociácie vybraných koncoviek súborov a súbory sa budú otvárať v programe MPC-BE. Po pridaní nejakého ďalšieho rozšírenia programu sa však asociácie môžu opäť zmeniť. Preto si ich pred zatvorením tohto dialógového okna nezabudnite skontrolovať, prípadne nastaviť znova!"
+STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_MPEGINTERLACED		"Túto voľbu nastavte spolu s voľbou ""Weave"" ak technológia vykresľovania videa podporuje aj deinterlacing. Zmeny sa prejavia až po opätovnom načítaní práve otvoreného súboru."
 STRING IDC_CHECK_RELATIVETO		"Predvolené hodnoty sa nastavia aj v iných štýloch, ak užívateľ nastavenia nezmení"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Ak je použitá vyrovnávacia pamäť pre podobrázky väčšia ako 0, môžu sa titulky animovať. Zablokovaním tejto voľby znížite vyťaženie procesora. Voľbu zablokujte aj v prípade, že titulky blikajú."
@@ -1106,6 +1107,11 @@ STRING IDC_DSVMR9LOADMIXER		"Nastaví VMR-9 (bezstratové) na mixovací mód, v 
 STRING IDC_DSVMR9REN		"To isté ako VMR-9 (s vykresľovaním v okne), ale použije sa aj prídavný modul Allocator-Presenter, pre podporu titulkovania. Zrkadlenie videa s prekrytím MôŽE byť funkčné. Odporúčame nastaviť farby zobrazenia na hodnotu 'True Color'."
 STRING IDC_DSVMR9WIN		"Táto funkcia je dostupná, len ak je v systéme nainštalovaný DirectX 9. Má rovnaké schopnosti ako kodek VMR-7 (s vykresľovaním v okne), ale nikdy sa nepoužíva vykresľovania videa s prekrývaním. Preto má tento kodek pomalšie vykresľovanie ako VMR-7 (s vykresľovaním v okne)."
 STRING IDC_DX9RESIZER_COMBO		"Ak karta nepodporuje Pixel Shader 2.0, automaticky sa aktivuje jednoduché bilineárne prepočítavanie."
+STRING IDC_MAXQUEUE_PACKETS		"The maximum number of packets (data), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MAXQUEUE_SIZE		"The maximum size of memory in the queue (in megabytes), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MINQUEUE_PACKETS		"The minimum number of packets (data) in the queue, when begins playing\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MINQUEUE_SIZE		"The minimum size of memory in the queue (in kilobytes), when begins playing\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_PERFOMANCE_DEFAULT		"Reset settings to the default, which is optimized for most PC"
 STRING IDC_QTDX7		"Výstup z enginu Real vykresľovaný pomocou Allocator-Presentera na báze DX7 z VMR-7 (bezstratový kodek)."
 STRING IDC_QTDX9		"Výstup z enginu Real vykresľovaný pomocou Allocator-Presentera na báze DX9 z VMR-9 (bezstratový kodek)."
 STRING IDC_QTSYSDEF		"Vlastné vykresľovanie programu QuickTime. Vykresľovanie sa spomalí pri zmene stranového pomeru videa. Ak nie je dostupná funkcia Overlay, použije sa namiesto nej GDI."

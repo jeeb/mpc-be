@@ -1091,6 +1091,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 318
 END
 
 STRING IDC_BUTTON_EXT_SET		"Пасля націску гэтае кнопкі абраны стан групы фарматаў будзе адлюстроўваць рэальныя асацыяцыі файлаў для MPC-BE. Дададзеныя пашырэнні звычайна ўсталёўваюць стан у ""шэры"" так што не забывайце выключыць іх зноў перад закрыццём дыялогу!"
+STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_MPEGINTERLACED		"Выкарыстоўвайце гэта сумесна з ""Weave"", калі відэарэндэр таксама дазваляе вырабляць дэінтэрлейсінг. Загружаны файл будзе загружаны ізноў."
 STRING IDC_CHECK_RELATIVETO		"Стандартны стан наследуецца іншымі стылямі там, дзе ён  яшчэ не вызначаны."
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Дазваляе анімацыю субтытраў, калі выкарыстоўваецца буфер subpicture болей 0. Адключэнне гэтай опцыі знізіць нагрузку на працэсар. Таксама адключыце, калі выкарыстоўваеце флэш субтытры."
@@ -1106,6 +1107,11 @@ STRING IDC_DSVMR9LOADMIXER		"Перакладае рэжым VMR-9 (renderless) 
 STRING IDC_DSVMR9REN		"Тое ж што і VMR-9 (windowed) але з плагінам MPC-BE Allocator-Presenter для вываду субтытраў. ""Люстраное"" адлюстраванне відэа ў аверлэі МОЖА працаваць. Глыбіню колеру рэкамендуецца ўсталяваць у 'True Color'."
 STRING IDC_DSVMR9WIN		"Даступны толькі пры ўсталяваным DirectX 9. Магчымасці аналагічныя VMR-7 (windowed) але ніколі не выкарыстоўвае аверлэй, а таму можа быць трохі павольней чым VMR-7 (windowed)."
 STRING IDC_DX9RESIZER_COMBO		"Пры адсутнасці падтрымкі піксельных шэйдараў версіі 2.0 будзе аўтаматычна выкарыстаны просты білінейны метад."
+STRING IDC_MAXQUEUE_PACKETS		"The maximum number of packets (data), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MAXQUEUE_SIZE		"The maximum size of memory in the queue (in megabytes), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MINQUEUE_PACKETS		"The minimum number of packets (data) in the queue, when begins playing\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MINQUEUE_SIZE		"The minimum size of memory in the queue (in kilobytes), when begins playing\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_PERFOMANCE_DEFAULT		"Reset settings to the default, which is optimized for most PC"
 STRING IDC_QTDX7		"Вывад QuickTime апрацоўваецца з дапамогай плагіна Allocator-Presenter у VMR-7 (renderless)."
 STRING IDC_QTDX9		"Вывад QuickTime апрацоўваецца з дапамогай плагіна Allocator-Presenter у VMR-9 (renderless)."
 STRING IDC_QTSYSDEF		"Уласны рэндэр QuickTime. Запавольваецца пры змене памеру відэакадра або калі акно часткова закрыта іншым акном. Калі аверлэй недаступны вяртаецца да метаду GDI."

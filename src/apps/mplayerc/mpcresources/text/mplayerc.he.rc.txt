@@ -1091,6 +1091,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 318
 END
 
 STRING IDC_BUTTON_EXT_SET		"אחרי לחיצה על כפתור זה, המצב המסומן של קבוצת פורמטים ייצג את השיוך האמיתי של הקבצים ל-MPC-BE. הרחבת חדשה שנוספת בדרך כלל תהפוך זאת לאפור, אז אל תשכח לסמון אותו שוב לפני שאתה סוגר את הדיאלוג!"
+STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_MPEGINTERLACED		"השתמש בזה יחד עם ""שזירה"" אם מציג הוידאו יכול גם להפוך שזירה. הקובץ שכרגע טעון צריך להפתח מחדש."
 STRING IDC_CHECK_RELATIVETO		"מצב ברירת המחדל עובר בירושה לסגנונות אחרים בהם שם הוא עדיין אינו מוגדר"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"מאפשר הנפשת כתוביות כאשר משתמשים בחוצץ תת-תמונות גדול מ-0. כיבוי אפשרות זו תנמיך את השימוש במעבד. אפשר לכבות אם אתה סובל מכתוביות מהבהבות."
@@ -1106,6 +1107,11 @@ STRING IDC_DSVMR9LOADMIXER		"מכניס את VMR-9 (renderless) למצב מיק�
 STRING IDC_DSVMR9REN		"כמו VMR-9 (windowed), אך עם תוסף הקצבת תצוגה של MPC-BE עבור כתוביות. שיקוף וידאו של Overlay אולי יעבוד. מרחב הצבעים 'צבע אמיתי' לשולחן העבודה מומלץ. מומלץ עבור Windows XP."
 STRING IDC_DSVMR9WIN		"זמין רק אם מותקן אצלך DirectX 9. ברשותו אותן יכולות כמו VMR-7 (windowed), אך הוא לעולם לא משתמש בהצגת Overlay ולכן יתכן ויהיה טיפה יותר איטי מ-VMR-7 (windowed)."
 STRING IDC_DX9RESIZER_COMBO		"אם לא קיימת תמיכה במצליל פיקסלים 2.0, אלגוריתם פשוט דו-כיווני יהיה בשימוש בצורה אוטומטית."
+STRING IDC_MAXQUEUE_PACKETS		"The maximum number of packets (data), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MAXQUEUE_SIZE		"The maximum size of memory in the queue (in megabytes), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MINQUEUE_PACKETS		"The minimum number of packets (data) in the queue, when begins playing\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_MINQUEUE_SIZE		"The minimum size of memory in the queue (in kilobytes), when begins playing\n\rThe number of queues is equal the number of active output pins"
+STRING IDC_PERFOMANCE_DEFAULT		"Reset settings to the default, which is optimized for most PC"
 STRING IDC_QTDX7		"פלט מנוע ה-QuickTime המוצג על-ידי מקציב התצוגה מבוסס ה-DX7 של VMR-7 (renderless)."
 STRING IDC_QTDX9		"פלט מנוע ה-QuickTime המוצג על-ידי מקציב התצוגה מבוסס ה-DX9 של VMR-9 (renderless)."
 STRING IDC_QTSYSDEF		"מציג הוידאו של QuickTime. קצת איטי כאשר גודל שטח הוידאו משתנה או מכוסה על-ידי חלון אחר. כאשר Overlay אינו זמין, הוא כנראה ניסוג ל-GDI."

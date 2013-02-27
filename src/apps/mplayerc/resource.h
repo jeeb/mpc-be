@@ -529,6 +529,12 @@
 #define IDC_MIEDIT                      12137
 #define IDC_LISTCHANNELS                12138
 #define IDC_STATUSBAR                   12139
+#define IDC_MINQUEUE_PACKETS            12140
+#define IDC_MAXQUEUE_PACKETS            12141
+#define IDC_MINQUEUE_SIZE               12142
+#define IDC_MAXQUEUE_SIZE               12143
+#define IDC_CACH_SIZE                   12144
+#define IDC_PERFOMANCE_DEFAULT          12145
 #define IDS_SRC_CDDA                    14001
 #define IDS_SRC_AVI                     14002
 #define IDS_SRC_VTS                     14004
