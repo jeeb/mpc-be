@@ -387,7 +387,7 @@
     <ClCompile Include="DialogEventHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PPageFiltersPerfomance.cpp">
+    <ClCompile Include="PPageFiltersPerformance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -764,7 +764,7 @@
     <ClInclude Include="DialogEventHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PPageFiltersPerfomance.h">
+    <ClInclude Include="PPageFiltersPerformance.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

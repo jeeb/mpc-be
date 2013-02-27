@@ -26,17 +26,17 @@
 #include "PPageBase.h"
 #include "PlayerListCtrl.h"
 
-// CPPageFiltersPerfomance dialog
+// CPPageFiltersPerformance dialog
 
-class CPPageFiltersPerfomance : public CPPageBase
+class CPPageFiltersPerformance : public CPPageBase
 {
-	DECLARE_DYNAMIC(CPPageFiltersPerfomance)
+	DECLARE_DYNAMIC(CPPageFiltersPerformance)
 
 public:
-	CPPageFiltersPerfomance();
-	virtual ~CPPageFiltersPerfomance();
+	CPPageFiltersPerformance();
+	virtual ~CPPageFiltersPerformance();
 
-	enum { IDD = IDD_PPAGEFILTERSPERFOMANCE };
+	enum { IDD = IDD_PPAGEFILTERSPERFORMANCE };
 
 protected:
 	DWORDLONG m_halfMemMB;

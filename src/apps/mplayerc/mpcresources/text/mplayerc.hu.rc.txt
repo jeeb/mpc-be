@@ -195,15 +195,15 @@ BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20
 19		"Lista visszaállítása"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFILTERSPERFOMANCE LINES 23
+BEGIN DIALOGEX IDD_PPAGEFILTERSPERFORMANCE LINES 23
 14		"Min Queue Packets:"
 15		"Max Queue Packets:"
 16		"Min Queue Size:"
 17		"Max Queue Size:"
-18		"Cach size:"
-19		"Kb"
-20		"Mb"
-21		"Kb"
+18		"Cache size:"
+19		"KB"
+20		"MB"
+21		"KB"
 22		"Default"
 END
 
@@ -1130,7 +1130,7 @@ STRING IDD_PPAGEAUDIOSWITCHER		"Belső szűrők::Audió-váltó"
 STRING IDD_PPAGECAPTURE		"Lejátszás::Rögzítés"
 STRING IDD_PPAGEDVD		"Lejátszás::DVD/OGM"
 STRING IDD_PPAGEEXTERNALFILTERS		"Külső szűrők"
-STRING IDD_PPAGEFILTERSPERFOMANCE		"Internal Filters::Perfomance"
+STRING IDD_PPAGEFILTERSPERFORMANCE		"Internal Filters::Performance"
 STRING IDD_PPAGEFORMATS		"Lejátszó::Formátumok"
 STRING IDD_PPAGEFULLSCREEN		"Lejátszás::Teljes Képernyő"
 STRING IDD_PPAGEINTERFACE		"Interface"

@@ -23,13 +23,13 @@
 
 #include "stdafx.h"
 #include "mplayerc.h"
-#include "PPageFiltersPerfomance.h"
+#include "PPageFiltersPerformance.h"
 
-// CPPageFiltersPerfomance dialog
+// CPPageFiltersPerformance dialog
 
-IMPLEMENT_DYNAMIC(CPPageFiltersPerfomance, CPPageBase)
-CPPageFiltersPerfomance::CPPageFiltersPerfomance()
-	: CPPageBase(CPPageFiltersPerfomance::IDD, CPPageFiltersPerfomance::IDD)
+IMPLEMENT_DYNAMIC(CPPageFiltersPerformance, CPPageBase)
+CPPageFiltersPerformance::CPPageFiltersPerformance()
+	: CPPageBase(CPPageFiltersPerformance::IDD, CPPageFiltersPerformance::IDD)
 	, m_nMinQueueSize(0)
 	, m_nMaxQueueSize(0)
 	, m_nCachSize(0)
@@ -42,11 +42,11 @@ CPPageFiltersPerfomance::CPPageFiltersPerfomance()
 	m_halfMemMB = msEx.ullTotalPhys/0x200000;
 }
 
-CPPageFiltersPerfomance::~CPPageFiltersPerfomance()
+CPPageFiltersPerformance::~CPPageFiltersPerformance()
 {
 }
 
-void CPPageFiltersPerfomance::DoDataExchange(CDataExchange* pDX)
+void CPPageFiltersPerformance::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_PERFOMANCE_DEFAULT, m_DefaultCtrl);
@@ -60,13 +60,13 @@ void CPPageFiltersPerfomance::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_CACH_SIZE, m_nCachSize);
 }
 
-BEGIN_MESSAGE_MAP(CPPageFiltersPerfomance, CPPageBase)
-	ON_BN_CLICKED(IDC_PERFOMANCE_DEFAULT, &CPPageFiltersPerfomance::OnBnClickedCheck1)
+BEGIN_MESSAGE_MAP(CPPageFiltersPerformance, CPPageBase)
+	ON_BN_CLICKED(IDC_PERFOMANCE_DEFAULT, &CPPageFiltersPerformance::OnBnClickedCheck1)
 END_MESSAGE_MAP()
 
-// CPPageFiltersPerfomance message handlers
+// CPPageFiltersPerformance message handlers
 
-BOOL CPPageFiltersPerfomance::OnInitDialog()
+BOOL CPPageFiltersPerformance::OnInitDialog()
 {
 	__super::OnInitDialog();
 
@@ -95,7 +95,7 @@ BOOL CPPageFiltersPerfomance::OnInitDialog()
 	return TRUE;
 }
 
-BOOL CPPageFiltersPerfomance::OnApply()
+BOOL CPPageFiltersPerformance::OnApply()
 {
 	UpdateData();
 
@@ -113,7 +113,7 @@ BOOL CPPageFiltersPerfomance::OnApply()
 	return __super::OnApply();
 }
 
-void CPPageFiltersPerfomance::OnBnClickedCheck1()
+void CPPageFiltersPerformance::OnBnClickedCheck1()
 {
 	if (m_DefaultCtrl.GetCheck()) {
 		AppSettings& s = AfxGetAppSettings();

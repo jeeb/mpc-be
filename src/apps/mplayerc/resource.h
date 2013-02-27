@@ -371,7 +371,7 @@
 #define IDD_NAVIGATION                  10057
 #define IDD_PPAGEINTERFACE              10058
 #define IDD_PPAGEYOUTUBE                10059
-#define IDD_PPAGEFILTERSPERFOMANCE      10060
+#define IDD_PPAGEFILTERSPERFORMANCE     10060
 #define IDC_COMBO1                      11000
 #define IDC_COMBO2                      11001
 #define IDC_COMBO3                      11002

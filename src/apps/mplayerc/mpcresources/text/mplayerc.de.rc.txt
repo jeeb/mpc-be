@@ -195,15 +195,15 @@ BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20
 19		"Liste zur&ücksetzen"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFILTERSPERFOMANCE LINES 23
+BEGIN DIALOGEX IDD_PPAGEFILTERSPERFORMANCE LINES 23
 14		"Min Queue Packets:"
 15		"Max Queue Packets:"
 16		"Min Queue Size:"
 17		"Max Queue Size:"
-18		"Cach size:"
-19		"Kb"
-20		"Mb"
-21		"Kb"
+18		"Cache size:"
+19		"KB"
+20		"MB"
+21		"KB"
 22		"Default"
 END
 
@@ -1130,7 +1130,7 @@ STRING IDD_PPAGEAUDIOSWITCHER		"Interne Filter::Audio-Umschalter"
 STRING IDD_PPAGECAPTURE		"Wiedergabe::Aufnahme"
 STRING IDD_PPAGEDVD		"Wiedergabe::DVD/OGM"
 STRING IDD_PPAGEEXTERNALFILTERS		"Externe Filter"
-STRING IDD_PPAGEFILTERSPERFOMANCE		"Internal Filters::Perfomance"
+STRING IDD_PPAGEFILTERSPERFORMANCE		"Internal Filters::Performance"
 STRING IDD_PPAGEFORMATS		"Player::Formate"
 STRING IDD_PPAGEFULLSCREEN		"Wiedergabe::Vollbild"
 STRING IDD_PPAGEINTERFACE		"Interface"

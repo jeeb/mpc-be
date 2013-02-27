@@ -178,7 +178,7 @@
     <ClCompile Include="DialogEventHandler.cpp" />
     <ClCompile Include="PlayerFlyBar.cpp" />
     <ClCompile Include="PlayerYouTube.cpp" />
-    <ClCompile Include="PPageFiltersPerfomance.cpp" />
+    <ClCompile Include="PPageFiltersPerformance.cpp" />
     <ClCompile Include="PPageInterface.cpp" />
     <ClCompile Include="PPageYoutube.cpp" />
     <ClCompile Include="SaveTaskDlg.cpp" />
@@ -303,7 +303,7 @@
     <ClInclude Include="DialogEventHandler.h" />
     <ClInclude Include="PlayerFlyBar.h" />
     <ClInclude Include="PlayerYouTube.h" />
-    <ClInclude Include="PPageFiltersPerfomance.h" />
+    <ClInclude Include="PPageFiltersPerformance.h" />
     <ClInclude Include="PPageInterface.h" />
     <ClInclude Include="PPageYoutube.h" />
     <ClInclude Include="SaveTaskDlg.h" />
