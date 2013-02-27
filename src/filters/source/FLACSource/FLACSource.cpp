@@ -460,7 +460,7 @@ void CFLACStream::UpdateFromMetadata (void* pBuffer)
 			} else  if (ParseVorbisComment("comment", &vc->comments[i], &TagValue)) {
 				file_info.comment	= TagValue;
 			} else  if (ParseVorbisComment("date", &vc->comments[i], &TagValue)) {
-				file_info.year		= TagValue.GetAllocLength() > 4 ? TagValue.Right(4) : TagValue;
+				file_info.year		= TagValue;
 			} else  if (ParseVorbisComment("album", &vc->comments[i], &TagValue)) {
 				file_info.album		= TagValue;
 			} else  if (ParseVorbisComment("cuesheet", &vc->comments[i], &TagValue)) {

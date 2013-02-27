@@ -382,7 +382,7 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn)
 	CAtlArray<int> idx;
 
 	CWebTextFile f;
-	if (!f.Open(fn) || !f.ReadString(str) || str != _T("MPCPLAYLIST")) {
+	if (!f.Open(fn) || !f.ReadString(str) || str != _T("MPCPLAYLIST") || f.GetLength() > MEGABYTE) {
 		return false;
 	}
 
@@ -409,6 +409,8 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn)
 				idx.Add(i);
 			} else if (key == _T("label")) {
 				pli[i].m_label = value;
+			} else if (key == _T("time")) {
+				pli[i].m_duration = StringToReftime2(value);
 			} else if (key == _T("filename")) {
 				value = CombinePath(base, value);
 				pli[i].m_fns.AddTail(value);
@@ -467,6 +469,10 @@ bool CPlayerPlaylistBar::SaveMPCPlayList(CString fn, CTextFile::enc e, bool fRem
 
 		if (!pli.m_label.IsEmpty()) {
 			f.WriteString(idx + _T(",label,") + pli.m_label + _T("\n"));
+		}
+
+		if (pli.m_duration > 0) {
+			f.WriteString(idx + _T(",time,") + pli.GetLabel(1) + _T("\n"));
 		}
 
 		if (pli.m_type == CPlaylistItem::file) {
@@ -674,7 +680,7 @@ void CPlayerPlaylistBar::EnsureVisible(POSITION pos)
 		return;
 	}
 
-	m_list.EnsureVisible(i, TRUE);
+	m_list.EnsureVisible(i - 1, TRUE);
 	m_list.SetItemState(-1, 0, LVIS_SELECTED);
 	m_list.SetItemState(i, LVIS_SELECTED, LVIS_SELECTED);
 
@@ -1137,7 +1143,7 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 
 	if (s.fDisableXPToolbars) {
 		ThemeRGB(135, 140, 145, R, G, B);
-		textcolor = fSelected ? 0x7070ff : RGB(R, G, B);
+		textcolor = fSelected ? s.clrFaceABGR : RGB(R, G, B);
 	}
 	if (pli.m_fInvalid) {
 		textcolor |= 0xA0A0A0;
