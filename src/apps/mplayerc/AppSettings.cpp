@@ -848,6 +848,14 @@ void CAppSettings::SaveExternalFilters()
 		if (f->type == FilterOverride::REGISTERED) {
 			pApp->WriteProfileString(key, _T("DisplayName"), CString(f->dispname));
 			pApp->WriteProfileString(key, _T("Name"), f->name);
+			if (f->clsid == CLSID_NULL) {
+				CComPtr<IBaseFilter> pBF;
+				CStringW FriendlyName;
+				if (CreateFilter(f->dispname, &pBF, FriendlyName)) {
+					f->clsid = GetCLSID(pBF);
+				}
+			}
+			pApp->WriteProfileString(key, _T("CLSID"), CStringFromGUID(f->clsid));
 		} else if (f->type == FilterOverride::EXTERNAL) {
 			pApp->WriteProfileString(key, _T("Path"), f->path);
 			pApp->WriteProfileString(key, _T("Name"), f->name);
@@ -1105,6 +1113,15 @@ void CAppSettings::LoadSettings()
 				f->type = FilterOverride::REGISTERED;
 				f->dispname = CStringW(pApp->GetProfileString(key, _T("DisplayName"), _T("")));
 				f->name = pApp->GetProfileString(key, _T("Name"), _T(""));
+				f->clsid = GUIDFromCString(pApp->GetProfileString(key, _T("CLSID"), _T("")));
+				if (f->clsid == CLSID_NULL) {
+					CComPtr<IBaseFilter> pBF;
+					CStringW FriendlyName;
+					if (CreateFilter(f->dispname, &pBF, FriendlyName)) {
+						f->clsid = GetCLSID(pBF);
+						pApp->WriteProfileString(key, _T("CLSID"), CStringFromGUID(f->clsid));
+					}
+				}
 			} else if (j == 1) {
 				f->type = FilterOverride::EXTERNAL;
 				f->path = pApp->GetProfileString(key, _T("Path"), _T(""));

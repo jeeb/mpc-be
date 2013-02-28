@@ -42,7 +42,9 @@ public:
 	DWORD dwMerit;
 
 	FilterOverride() {
-		fTemporary = false;
+		fDisabled	= false;
+		fTemporary	= false;
+		clsid		= CLSID_NULL;
 	}
 	FilterOverride(FilterOverride* f) {
 		fDisabled = f->fDisabled;

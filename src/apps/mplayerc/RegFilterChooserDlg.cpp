@@ -132,6 +132,7 @@ void CRegFilterChooserDlg::OnBnClickedOk()
 		f->type = FilterOverride::REGISTERED;
 		f->name = fgf.GetName();
 		f->dispname = fgf.GetDisplayName();
+		f->clsid = fgf.GetCLSID();
 		f->guids.AddTailList(&fgf.GetTypes());
 		f->backup.AddTailList(&fgf.GetTypes());
 		f->dwMerit = fgf.GetMeritForDirectShow();
