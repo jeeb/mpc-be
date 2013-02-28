@@ -120,7 +120,7 @@ extern "C" __declspec(dllexport) int get_icon_index(LPCTSTR ext)
 		iconindex = IDI_M2A_ICON;
 	} else if (_tcsicmp(ext, _T(".m2p")) == 0) {
 		iconindex = IDI_M2P_ICON;
-	} else if (_tcsicmp(ext, _T(".m2t")) == 0) {
+	} else if (_tcsicmp(ext, _T(".m2t")) == 0 || _tcsicmp(ext, _T(".ssif")) == 0) {
 		iconindex = IDI_M2T_ICON;
 	} else if (_tcsicmp(ext, _T(".m2ts")) == 0) {
 		iconindex = IDI_M2TS_ICON;

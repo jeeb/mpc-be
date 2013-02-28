@@ -219,7 +219,7 @@ void CMediaFormats::UpdateData(bool fSave)
 
 		ADDFMT((_T("avi"),         ResStr(IDS_MFMT_AVI),         _T("avi")));
 		ADDFMT((_T("mpeg"),        ResStr(IDS_MFMT_MPEG),        _T("mpg mpeg mpe m1v m2v mpv2 mp2v pva evo m2p")));
-		ADDFMT((_T("mpegts"),      ResStr(IDS_MFMT_MPEGTS),      _T("ts tp trp m2t m2ts mts rec")));
+		ADDFMT((_T("mpegts"),      ResStr(IDS_MFMT_MPEGTS),      _T("ts tp trp m2t m2ts mts rec ssif")));
 		ADDFMT((_T("dvdvideo"),    ResStr(IDS_MFMT_DVDVIDEO),    _T("vob ifo")));
 		ADDFMT((_T("mkv"),         ResStr(IDS_MFMT_MKV),         _T("mkv")));
 		ADDFMT((_T("webm"),        ResStr(IDS_MFMT_WEBM),        _T("webm")));

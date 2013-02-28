@@ -89,6 +89,7 @@ public:
 
 	STDMETHODIMP GetMaxSize(SIZE* pMaxSize);
 	STDMETHODIMP SetSize(SIZE size, RECT vidrect);
+	STDMETHODIMP GetSize(SIZE* pSize);
 
 	STDMETHODIMP Lock(SubPicDesc& spd) = 0;
 	STDMETHODIMP Unlock(RECT* pDirtyRect) = 0;

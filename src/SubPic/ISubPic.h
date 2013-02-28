@@ -72,6 +72,7 @@ public IUnknown {
 
 	STDMETHOD (GetMaxSize) (SIZE* pMaxSize /*[out]*/) PURE;
 	STDMETHOD (SetSize) (SIZE pSize /*[in]*/, RECT vidrect /*[in]*/) PURE;
+	STDMETHOD (GetSize) (SIZE* pSize /*[out]*/) PURE;
 
 	STDMETHOD (Lock) (SubPicDesc& spd /*[out]*/) PURE;
 	STDMETHOD (Unlock) (RECT* pDirtyRect /*[in]*/) PURE;

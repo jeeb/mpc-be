@@ -403,8 +403,10 @@ STDMETHODIMP CDX9SubPicAllocator::ChangeDevice(IUnknown* pDev)
 STDMETHODIMP CDX9SubPicAllocator::SetMaxTextureSize(SIZE MaxTextureSize)
 {
 	ClearCache();
-	m_maxsize	= MaxTextureSize;
+	m_maxsize = MaxTextureSize;
 	SetCurSize(MaxTextureSize);
+	SetCurVidRect(CRect(CPoint(0,0), MaxTextureSize));
+
 	return S_OK;
 }
 
