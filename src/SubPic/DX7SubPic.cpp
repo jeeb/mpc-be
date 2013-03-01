@@ -245,6 +245,15 @@ STDMETHODIMP CDX7SubPicAllocator::ChangeDevice(IUnknown* pDev)
 	return __super::ChangeDevice(pDev);
 }
 
+STDMETHODIMP CDX7SubPicAllocator::SetMaxTextureSize(SIZE MaxTextureSize)
+{
+	m_maxsize = MaxTextureSize;
+	SetCurSize(MaxTextureSize);
+	SetCurVidRect(CRect(CPoint(0,0), MaxTextureSize));
+
+	return S_OK;
+}
+
 // ISubPicAllocatorImpl
 
 bool CDX7SubPicAllocator::Alloc(bool fStatic, ISubPic** ppSubPic)

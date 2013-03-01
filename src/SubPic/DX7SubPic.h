@@ -63,4 +63,5 @@ public:
 
 	// ISubPicAllocator
 	STDMETHODIMP ChangeDevice(IUnknown* pDev);
+	STDMETHODIMP SetMaxTextureSize(SIZE MaxTextureSize);
 };
