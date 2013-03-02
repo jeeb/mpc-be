@@ -16,6 +16,7 @@
 #include "../webp/encode.h"
 #include "../dsp/dsp.h"
 #include "../utils/bit_writer.h"
+#include "../utils/thread.h"
 
 #if defined(__cplusplus) || defined(c_plusplus)
 extern "C" {
@@ -44,7 +45,8 @@ enum { B_DC_PRED = 0,   // 4x4 modes
 
        // Luma16 or UV modes
        DC_PRED = B_DC_PRED, V_PRED = B_VE_PRED,
-       H_PRED = B_HE_PRED, TM_PRED = B_TM_PRED
+       H_PRED = B_HE_PRED, TM_PRED = B_TM_PRED,
+       NUM_PRED_MODES = 4
      };
 
 enum { NUM_MB_SEGMENTS = 4,
@@ -56,6 +58,13 @@ enum { NUM_MB_SEGMENTS = 4,
        MAX_LF_LEVELS = 64,      // Maximum loop filter level
        MAX_VARIABLE_LEVEL = 67  // last (inclusive) level with variable cost
      };
+
+typedef enum {   // Rate-distortion optimization levels
+  RD_OPT_NONE        = 0,  // no rd-opt
+  RD_OPT_BASIC       = 1,  // basic scoring (no trellis)
+  RD_OPT_TRELLIS     = 2,  // perform trellis-quant on the final decision only
+  RD_OPT_TRELLIS_ALL = 3   // trellis-quant for every scoring (much slower)
+} VP8RDLevel;
 
 // YUV-cache parameters. Cache is 16-pixels wide.
 // The original or reconstructed samples can be accessed using VP8Scan[]
@@ -318,23 +327,24 @@ void VP8SetSegment(const VP8EncIterator* const it, int segment);
 //------------------------------------------------------------------------------
 // Paginated token buffer
 
-// WIP: #define USE_TOKEN_BUFFER
+// WIP:#define USE_TOKEN_BUFFER
 
 typedef struct VP8Tokens VP8Tokens;  // struct details in token.c
 
 typedef struct {
+#ifdef USE_TOKEN_BUFFER
   VP8Tokens* pages_;        // first page
   VP8Tokens** last_page_;   // last page
   uint16_t* tokens_;        // set to (*last_page_)->tokens_
   int left_;          // how many free tokens left before the page is full.
   int error_;         // true in case of malloc error
+#endif
 } VP8TBuffer;
 
 void VP8TBufferInit(VP8TBuffer* const b);    // initialize an empty buffer
+void VP8TBufferClear(VP8TBuffer* const b);   // de-allocate pages memory
 
 #ifdef USE_TOKEN_BUFFER
-
-void VP8TBufferClear(VP8TBuffer* const b);   // de-allocate pages memory
 
 int VP8EmitTokens(const VP8TBuffer* const b, VP8BitWriter* const bw,
                   const uint8_t* const probas, int final_pass);
@@ -370,14 +380,14 @@ struct VP8Encoder {
 
   int percent_;                             // for progress
 
-#ifdef USE_TOKEN_BUFFER
+  int use_tokens_;                          // if true, use Token buffer
   VP8TBuffer tokens_;                       // token buffer
-#endif
 
   // transparency blob
   int has_alpha_;
   uint8_t* alpha_data_;       // non-NULL if transparency is present
   uint32_t alpha_data_size_;
+  WebPWorker alpha_worker_;
 
   // enhancement layer
   int use_layer_;
@@ -405,9 +415,10 @@ struct VP8Encoder {
   int      block_count_[3];
 
   // quality/speed settings
-  int method_;              // 0=fastest, 6=best/slowest.
-  int rd_opt_level_;        // Deduced from method_.
-  int max_i4_header_bits_;  // partition #0 safeness factor
+  int method_;               // 0=fastest, 6=best/slowest.
+  VP8RDLevel rd_opt_level_;  // Deduced from method_.
+  int max_i4_header_bits_;   // partition #0 safeness factor
+  int thread_level_;         // derived from config->thread_level
 
   // Memory
   VP8MBInfo* mb_info_;   // contextual macroblock infos (mb_w_ + 1)
@@ -467,7 +478,7 @@ void VP8MakeIntra4Preds(const VP8EncIterator* const it);
 int VP8GetCostLuma16(VP8EncIterator* const it, const VP8ModeScore* const rd);
 int VP8GetCostLuma4(VP8EncIterator* const it, const int16_t levels[16]);
 int VP8GetCostUV(VP8EncIterator* const it, const VP8ModeScore* const rd);
-// Main stat / coding passes
+// Main coding calls
 int VP8EncLoop(VP8Encoder* const enc);
 int VP8StatLoop(VP8Encoder* const enc);
 
@@ -486,12 +497,14 @@ int VP8EncAnalyze(VP8Encoder* const enc);
 // Sets up segment's quantization values, base_quant_ and filter strengths.
 void VP8SetSegmentParams(VP8Encoder* const enc, float quality);
 // Pick best modes and fills the levels. Returns true if skipped.
-int VP8Decimate(VP8EncIterator* const it, VP8ModeScore* const rd, int rd_opt);
+int VP8Decimate(VP8EncIterator* const it, VP8ModeScore* const rd,
+                VP8RDLevel rd_opt);
 
   // in alpha.c
 void VP8EncInitAlpha(VP8Encoder* const enc);    // initialize alpha compression
+int VP8EncStartAlpha(VP8Encoder* const enc);    // start alpha coding process
 int VP8EncFinishAlpha(VP8Encoder* const enc);   // finalize compressed data
-void VP8EncDeleteAlpha(VP8Encoder* const enc);  // delete compressed data
+int VP8EncDeleteAlpha(VP8Encoder* const enc);   // delete compressed data
 
   // in layer.c
 void VP8EncInitLayer(VP8Encoder* const enc);     // init everything
