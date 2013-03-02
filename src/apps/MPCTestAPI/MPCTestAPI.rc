@@ -1,6 +1,7 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
+#include "../../../include/Version.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -79,8 +80,8 @@ CAPTION "About MPC-BE Test API"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
-    LTEXT           "MPC-BE Test API Version 1.0.1.0",IDC_STATIC,40,10,120,10,SS_NOPREFIX
-    LTEXT           "Copyright © 2005-2012 all contributors, see Authors.txt",IDC_STATIC,40,27,197,10
+    LTEXT           "MPC-BE Test API",IDC_STATIC,40,10,120,10,SS_NOPREFIX
+    LTEXT           MPC_COPYRIGHT_STR,IDC_STATIC,40,27,197,10
     DEFPUSHBUTTON   "OK",IDOK,187,7,50,14,WS_GROUP
 END
 
@@ -106,8 +107,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,1,0
- PRODUCTVERSION 1,0,1,0
+ FILEVERSION MPC_VERSION_NUM
+ PRODUCTVERSION MPC_VERSION_NUM
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -122,14 +123,14 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "CompanyName", "MPC-BE Team"
+            VALUE "CompanyName", MPC_COMP_NAME_STR
             VALUE "FileDescription", "MPC-BE Test API"
-            VALUE "FileVersion", "1, 0, 1, 0"
+            VALUE "FileVersion", MPC_VERSION_STR
             VALUE "InternalName", "MPC-BE Test API"
-            VALUE "LegalCopyright", "Copyright © 2005-2012 all contributors, see AUTHORS file"
+            VALUE "LegalCopyright", MPC_COPYRIGHT_STR
             VALUE "OriginalFilename", "MPCTestAPI.exe"
             VALUE "ProductName", "MPC-BE Test API"
-            VALUE "ProductVersion", "1, 0, 1, 0"
+            VALUE "ProductVersion", MPC_VERSION_STR
         END
     END
     BLOCK "VarFileInfo"
