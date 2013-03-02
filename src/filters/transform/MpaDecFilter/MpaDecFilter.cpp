@@ -1383,12 +1383,7 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, int size, WORD type, int sa
 			return E_INVALIDARG;
 	}
 
-	CMediaType mt;
-	if (sample_rate % 11025 == 0) {
-		mt = CreateMediaTypeSPDIF(44100);
-	} else {
-		mt = CreateMediaTypeSPDIF();
-	}
+	CMediaType mt = CreateMediaTypeSPDIF(sample_rate);
 
 	if (FAILED(hr = ReconnectOutput(length, mt))) {
 		return hr;
@@ -1595,7 +1590,12 @@ CMediaType CMpaDecFilter::CreateMediaType(MPCSampleFormat sf, DWORD nSamplesPerS
 
 CMediaType CMpaDecFilter::CreateMediaTypeSPDIF(DWORD nSamplesPerSec)
 {
-	CMediaType mt = CreateMediaType(SF_PCM16, nSamplesPerSec, 2);
+	if (nSamplesPerSec % 11025 == 0) {
+		nSamplesPerSec = 44100;
+	} else {
+		nSamplesPerSec = 48000;
+	}
+	CMediaType mt = CreateMediaType(SF_PCM16, nSamplesPerSec, 2, SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT);
 	((WAVEFORMATEX*)mt.pbFormat)->wFormatTag = WAVE_FORMAT_DOLBY_AC3_SPDIF;
 	return mt;
 }
@@ -1690,11 +1690,7 @@ HRESULT CMpaDecFilter::GetMediaType(int iPosition, CMediaType* pmt)
 			GetSPDIF(ac3enc) /*&& wfe->nChannels > 2*/ ||
 #endif
 			GetSPDIF(dts) && (subtype == MEDIASUBTYPE_DTS || subtype == MEDIASUBTYPE_WAVE_DTS)) {
-		if (wfe->nSamplesPerSec % 11025 == 0) {
-			*pmt = CreateMediaTypeSPDIF(44100);
-		} else {
-			*pmt = CreateMediaTypeSPDIF();
-		}
+		*pmt = CreateMediaTypeSPDIF(wfe->nSamplesPerSec);
 		return S_OK;
 	}
 
