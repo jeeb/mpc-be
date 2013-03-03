@@ -171,6 +171,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_WM_SETFOCUS()
 	ON_WM_GETMINMAXINFO()
+	ON_WM_ENTERSIZEMOVE()
 	ON_WM_MOVE()
 	ON_WM_MOVING()
 	ON_WM_SIZE()
@@ -683,8 +684,6 @@ CMainFrame::CMainFrame() :
 	b_UseSmartSeek(false),
 	previous_renderer(-1),
 	m_flastnID(0),
-	bLeftClicked(false),
-	bWindowDragged(false),
 	bDVDMenuClicked(false),
 	m_bfirstPlay(false),
 	m_nLastRunTicket(0),
@@ -1504,6 +1503,43 @@ void CMainFrame::DestroyFlyBar()
 	}
 }
 
+void CMainFrame::OnEnterSizeMove()
+{
+	bWndZoomed = false;
+	
+	POINT cur_pos;
+	RECT rcWindow;
+	GetWindowRect(&rcWindow);
+	GetCursorPos(&cur_pos);
+
+    MONITORINFO mi;
+    mi.cbSize = sizeof(mi);
+    GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
+    RECT rcWork = mi.rcWork;
+
+	if (IsZoomed() // window is maximized
+		|| (rcWindow.top == rcWork.top && rcWindow.bottom == rcWork.bottom) // window is aero snapped (???)
+		|| m_fFullScreen) { // window is fullscreen
+	
+		bWndZoomed = true;
+	}
+
+	if (!bWndZoomed) {
+		WINDOWPLACEMENT wp;
+		GetWindowPlacement(&wp);
+		RECT rcNormalPosition = wp.rcNormalPosition;
+		snap_x = cur_pos.x - rcNormalPosition.left;
+		snap_y = cur_pos.y - rcNormalPosition.top;
+		
+	}
+}
+
+BOOL CMainFrame::isSnapClose( int a, int b ) 
+{ 
+	snap_Margin = GetSystemMetrics(SM_CYCAPTION);
+	return (abs( a - b ) < snap_Margin);
+}
+
 void CMainFrame::OnMove(int x, int y)
 {
 	__super::OnMove(x, y);
@@ -1522,41 +1558,84 @@ void CMainFrame::OnMove(int x, int y)
 	FlyBarSetPos();
 }
 
+void CMainFrame::ClipRectToMonitor(LPRECT prc)
+{
+    
+	WINDOWPLACEMENT wp;
+	GetWindowPlacement(&wp);
+	RECT rcNormalPosition = wp.rcNormalPosition;
+    
+	int w = rcNormalPosition.right - rcNormalPosition.left;
+	int h = rcNormalPosition.bottom - rcNormalPosition.top;
+
+    MONITORINFO mi;
+    mi.cbSize = sizeof(mi);
+    GetMonitorInfo(MonitorFromRect(prc, MONITOR_DEFAULTTONEAREST), &mi);
+	RECT rcWork = mi.rcWork;
+
+	POINT cur_pos;
+	GetCursorPos(&cur_pos);
+	
+	// by cursor position
+	// prc->left   = max(rcWork.left, min(rcWork.right-w, cur_pos.x - (double)((rnp.right-rnp.left)/((double)(rcWork.right-rcWork.left)/cur_pos.x))));
+	// prc->top    = max(rcWork.top,  min(rcWork.bottom-h, cur_pos.y - (double)((rnp.bottom-rnp.top)/((double)(rcWork.bottom-rcWork.top)/cur_pos.y))));
+
+	prc->left   = max(rcWork.left, min(rcWork.right-w, cur_pos.x - (w/2)));
+	prc->top    = max(rcWork.top,  min(rcWork.bottom-h, cur_pos.y - (h/2)));
+	prc->right  = prc->left + w;
+	prc->bottom = prc->top  + h;
+
+}
+
 void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)
 {
-	__super::OnMoving(fwSide, pRect);
 	m_bWasSnapped = false;
+	bool fCtrl = !!(GetAsyncKeyState(VK_CONTROL)&0x80000000); 
 
-	if (AfxGetAppSettings().fSnapToDesktopEdges) {
-		const CPoint threshold(5, 5);
+	POINT cur_pos;
+	GetCursorPos(&cur_pos);
 
-		CRect r0 = m_rcDesktop;
-		CRect r1 = r0 + threshold;
-		CRect r2 = r0 - threshold;
+	if (bWndZoomed){
+		ClipRectToMonitor(pRect);
+		SetWindowPos(NULL, pRect->left, pRect->top, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+		bWndZoomed = false;
+		snap_x = cur_pos.x - pRect->left;
+        snap_y = cur_pos.y - pRect->top;
 
-		RECT& wr = *pRect;
-		CSize ws = CRect(wr).Size();
-
-		if (wr.left < r1.left && wr.left > r2.left) {
-			wr.right = (wr.left = r0.left) + ws.cx;
-			m_bWasSnapped = true;
-		}
-
-		if (wr.top < r1.top && wr.top > r2.top) {
-			wr.bottom = (wr.top = r0.top) + ws.cy;
-			m_bWasSnapped = true;
-		}
-
-		if (wr.right < r1.right && wr.right > r2.right) {
-			wr.left = (wr.right = r0.right) - ws.cx;
-			m_bWasSnapped = true;
-		}
-
-		if (wr.bottom < r1.bottom && wr.bottom > r2.bottom) {
-			wr.top = (wr.bottom = r0.bottom) - ws.cy;
-			m_bWasSnapped = true;
-		}
+		return;
 	}
+
+	if (AfxGetAppSettings().fSnapToDesktopEdges && !fCtrl) { 
+
+		MONITORINFO mi;
+		mi.cbSize = sizeof(mi);
+		GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
+		RECT rcWork = mi.rcWork;
+		RECT rcMonitor = mi.rcMonitor;
+
+		OffsetRect(pRect, cur_pos.x - (pRect->left + snap_x), cur_pos.y - (pRect->top + snap_y));
+
+		if (isSnapClose(pRect->left, rcWork.left)) { // left screen snap
+			OffsetRect(pRect, rcWork.left - pRect->left, 0);
+			m_bWasSnapped = true;
+		} else if (isSnapClose(rcWork.right, pRect->right)) { // right screen snap
+			OffsetRect(pRect, rcWork.right - pRect->right, 0);
+			m_bWasSnapped = true;
+		}
+
+		if (isSnapClose(pRect->top, rcWork.top)) { // top screen snap
+			OffsetRect(pRect, 0, rcWork.top - pRect->top);
+			m_bWasSnapped = true;
+		} else if (isSnapClose(rcWork.bottom, pRect->bottom)) { // bottom taskbar snap
+			OffsetRect(pRect, 0, rcWork.bottom - pRect->bottom);
+			m_bWasSnapped = true;
+		} else if (isSnapClose(pRect->bottom, rcMonitor.bottom)) { // bottom screen snap
+			OffsetRect(pRect, 0, rcMonitor.bottom - pRect->bottom);
+			m_bWasSnapped = true;
+		}
+	
+	}
+
 	FlyBarSetPos();
 }
 
@@ -3196,36 +3275,29 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 			bFSWnd = true;
 		}
 
-		bool fLeftMouseBtnUnassigned = !AssignedToCmd(wmcmd::LDOWN, m_fFullScreen);
 		s_fLDown = true;
-
-		if (m_fFullScreen || bFSWnd) {
+			
+		bool fLeftDownMouseBtnUnassigned = !AssignedToCmd(wmcmd::LDOWN, m_fFullScreen);
+		if (!fLeftDownMouseBtnUnassigned && (m_fFullScreen || bFSWnd)) {
+			OnButton(wmcmd::LDOWN, nFlags, point);
 			return;
 		}
-			
-		if (fLeftMouseBtnUnassigned
-				|| (!fLeftMouseBtnUnassigned && !(m_iMediaLoadState == MLS_LOADING || m_iMediaLoadState == MLS_LOADED))
-				|| /*((IsCaptionHidden() && (AfxGetAppSettings().nCS <= CS_SEEKBAR)) ||  */ ((GetTickCount()-m_nMenuHideTick)<100)) {
-			
-			PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
-			return;
-		} else {
-			bLeftClicked = true;
-			bWindowDragged = false;
 
-			SetCapture();
-			GetWindowRect(m_RectWindow);
-			m_MouseInWindow = p - m_RectWindow.TopLeft();
-			return;
+		if (m_fFullScreen || bFSWnd || ((GetTickCount()-m_nMenuHideTick)<100)) {
+ 			return;
 		}
-	
+
+		templclick = false;
+		SetCapture();
+		return;
+
 		__super::OnLButtonDown(nFlags, point);
 	}
 }
 
 void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	bLeftClicked = false;
+
 	ReleaseCapture();
 
 	if (!m_pFullscreenWnd->IsWindow() || !m_OSD.OnLButtonUp (nFlags, point)) {
@@ -3234,34 +3306,39 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 			PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 			return;
 		}
-
-		bool i = false;
 		
 		if (!s_fLDown) {
 			return;
 		}
 
+		CPoint p;
+		GetCursorPos(&p);
+		CWnd* pWnd = WindowFromPoint(p);
+		CRect r(0,0,0,0);
+		if (m_pFullscreenWnd && ::IsWindow(m_pFullscreenWnd->m_hWnd)) {
+			m_pFullscreenWnd->GetWindowRect(r);
+		}
+
+		bool bFSWnd = false;
+		if (pWnd && m_pFullscreenWnd == pWnd && r.PtInRect(p)) {
+			bFSWnd = true;
+		}
+
 		bool fLeftDownMouseBtnUnassigned = !AssignedToCmd(wmcmd::LDOWN, m_fFullScreen);
 		if (fLeftDownMouseBtnUnassigned || ((GetTickCount()-m_nMenuHideTick)<100)) {
-			PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
-		} else if (!bWindowDragged) {
-			if (OnButton(wmcmd::LDOWN, nFlags, point)) {
-				bWindowDragged = false;
-				i = true;
-			}
-		}
+			;//if (!m_fFullScreen ) SendMessage(WM_NCLBUTTONUP, HTCAPTION, MAKELPARAM(point.x, point.y));
+		} else if (!fLeftDownMouseBtnUnassigned && !m_fFullScreen && !bFSWnd) {
+			OnButton(wmcmd::LDOWN, nFlags, point);
+			return;
+ 		}
 
 		bool fLeftUpMouseBtnUnassigned = !AssignedToCmd(wmcmd::LUP, m_fFullScreen);
 		if (fLeftUpMouseBtnUnassigned || ((GetTickCount()-m_nMenuHideTick)<100)) {
-			PostMessage(WM_NCLBUTTONUP, HTCAPTION, MAKELPARAM(point.x, point.y));
-		} else if (!bWindowDragged) {
-			if (OnButton(wmcmd::LUP, nFlags, point)) {
-				bWindowDragged = false;
-				i = true;
-			}
-		}
-
-		if (i) return;
+			;//if (!m_fFullScreen ) SendMessage(WM_NCLBUTTONUP, HTCAPTION, MAKELPARAM(point.x, point.y));
+		} else if (!fLeftUpMouseBtnUnassigned && !m_fFullScreen) {
+			OnButton(wmcmd::LUP, nFlags, point);
+			return;
+ 		}
 
 		__super::OnLButtonUp(nFlags, point);
 	}
@@ -3276,7 +3353,7 @@ void CMainFrame::OnLButtonDblClk(UINT nFlags, CPoint point)
 	}
 	
 	if (s_fLDown) {
-		SendMessage(WM_LBUTTONUP, nFlags, MAKELPARAM(point.x, point.y));
+		OnButton(wmcmd::LDOWN, nFlags, point);
 		s_fLDown = false;
 	}
 	
@@ -3376,21 +3453,12 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 		m_lastMouseMove.y = point.y;
 	}
 
-	bWindowDragged = false;
-	if (bLeftClicked) {
-		CPoint p;
-		GetCursorPos(&p);
-
-		MoveWindow(p.x - m_MouseInWindow.x, p.y - m_MouseInWindow.y, 
-			m_RectWindow.right - m_RectWindow.left, m_RectWindow.bottom - m_RectWindow.top);
-			
-		CRect m_RectWindowNew;
-		GetWindowRect(m_RectWindowNew);
-			
-		if (m_RectWindowNew != m_RectWindow) {
-			bWindowDragged = true;
-		}
-	}
+	CWnd* w = GetCapture();
+	if (w && w->m_hWnd == m_hWnd && (nFlags & MK_LBUTTON) && templclick) {
+		ReleaseCapture();
+		SendMessage(WM_NCLBUTTONDOWN, HTCAPTION, NULL);
+ 	}
+	templclick = true;
 
 	if (!m_OSD.OnMouseMove (nFlags, point)) {
 		if (GetPlaybackMode() == PM_DVD) {

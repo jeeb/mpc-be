@@ -679,12 +679,15 @@ public:
 
 	BOOL OnButton(UINT id, UINT nFlags, CPoint point);
 
-	bool bLeftClicked;
-	bool bWindowDragged;
 	bool bDVDMenuClicked;
 	bool bDVDButtonAtPosition;
-	CPoint m_MouseInWindow;
-	CRect m_RectWindow;
+	bool templclick;
+
+	afx_msg void OnEnterSizeMove();
+	afx_msg void ClipRectToMonitor(LPRECT prc);
+	int snap_Margin, snap_x, snap_y;
+	BOOL isSnapClose( int a, int b );
+	BOOL bWndZoomed;
 
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
