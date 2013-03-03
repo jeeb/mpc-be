@@ -89,7 +89,7 @@ File_Pcm::File_Pcm()
     PTS_DTS_Needed=true;
 
     //In
-    Frame_Count_Valid=2;
+    Frame_Count_Valid=4;
     BitDepth=0;
     Channels=0;
     SamplingRate=0;
@@ -266,19 +266,6 @@ bool File_Pcm::FileHeader_Begin()
 }
 
 //***************************************************************************
-// Buffer - Global
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-#if MEDIAINFO_DEMUX
-void File_Pcm::Read_Buffer_Continue()
-{
-    if (Demux_UnpacketizeContainer && !Status[IsAccepted] && Buffer_Size && Frame_Count_Valid && Frame_Count+1>=Frame_Count_Valid)
-        Accept();
-}
-#endif //MEDIAINFO_DEMUX
-
-//***************************************************************************
 // Buffer - Per element
 //***************************************************************************
 
@@ -375,6 +362,13 @@ void File_Pcm::Data_Parse()
     Skip_XX(Element_Size,                                       "Data"); //It is impossible to detect... Default is no detection, only filling
 
     Frame_Count++;
+    if (Frame_Count_NotParsedIncluded!=(int64u)-1)
+        Frame_Count_NotParsedIncluded++;
+    if (FrameInfo.DTS!=(int64u)-1 && FrameInfo.DUR!=(int64u)-1)
+    {
+        FrameInfo.DTS+=FrameInfo.DUR;
+        FrameInfo.PTS=FrameInfo.DTS;
+    }
     if ((!Status[IsAccepted] && Frame_Count>=Frame_Count_Valid) || File_Offset+Buffer_Size>=File_Size)
     {
         Accept();
