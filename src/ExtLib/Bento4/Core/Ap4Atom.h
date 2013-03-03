@@ -339,6 +339,8 @@ const AP4_Atom::Type AP4_ATOM_TYPE_HDV5 = AP4_ATOM_TYPE('h','d','v','5');
 const AP4_Atom::Type AP4_ATOM_TYPE_HDV6 = AP4_ATOM_TYPE('h','d','v','6');
 const AP4_Atom::Type AP4_ATOM_TYPE_HDV7 = AP4_ATOM_TYPE('h','d','v','7');
 const AP4_Atom::Type AP4_ATOM_TYPE_HDV8 = AP4_ATOM_TYPE('h','d','v','8');
+const AP4_Atom::Type AP4_ATOM_TYPE_HDV9 = AP4_ATOM_TYPE('h','d','v','9');
+const AP4_Atom::Type AP4_ATOM_TYPE_HDVA = AP4_ATOM_TYPE('h','d','v','a');
 // Apple XDCAM
 const AP4_Atom::Type AP4_ATOM_TYPE_XDV1 = AP4_ATOM_TYPE('x','d','v','1');
 const AP4_Atom::Type AP4_ATOM_TYPE_XDV2 = AP4_ATOM_TYPE('x','d','v','2');
@@ -349,6 +351,24 @@ const AP4_Atom::Type AP4_ATOM_TYPE_XDV6 = AP4_ATOM_TYPE('x','d','v','6');
 const AP4_Atom::Type AP4_ATOM_TYPE_XDV7 = AP4_ATOM_TYPE('x','d','v','7');
 const AP4_Atom::Type AP4_ATOM_TYPE_XDV8 = AP4_ATOM_TYPE('x','d','v','8');
 const AP4_Atom::Type AP4_ATOM_TYPE_XDV9 = AP4_ATOM_TYPE('x','d','v','9');
+const AP4_Atom::Type AP4_ATOM_TYPE_XDVA = AP4_ATOM_TYPE('x','d','v','a');
+const AP4_Atom::Type AP4_ATOM_TYPE_XDVB = AP4_ATOM_TYPE('x','d','v','b');
+const AP4_Atom::Type AP4_ATOM_TYPE_XDVC = AP4_ATOM_TYPE('x','d','v','c');
+const AP4_Atom::Type AP4_ATOM_TYPE_XDVD = AP4_ATOM_TYPE('x','d','v','d');
+const AP4_Atom::Type AP4_ATOM_TYPE_XDVE = AP4_ATOM_TYPE('x','d','v','e');
+const AP4_Atom::Type AP4_ATOM_TYPE_XDVF = AP4_ATOM_TYPE('x','d','v','f');
+
+const AP4_Atom::Type AP4_ATOM_TYPE_XDHD = AP4_ATOM_TYPE('x','d','h','d');
+
+const AP4_Atom::Type AP4_ATOM_TYPE_XD54 = AP4_ATOM_TYPE('x','d','5','4');
+const AP4_Atom::Type AP4_ATOM_TYPE_XD55 = AP4_ATOM_TYPE('x','d','5','5');
+const AP4_Atom::Type AP4_ATOM_TYPE_XD59 = AP4_ATOM_TYPE('x','d','5','9');
+const AP4_Atom::Type AP4_ATOM_TYPE_XD5A = AP4_ATOM_TYPE('x','d','5','A');
+const AP4_Atom::Type AP4_ATOM_TYPE_XD5B = AP4_ATOM_TYPE('x','d','5','B');
+const AP4_Atom::Type AP4_ATOM_TYPE_XD5C = AP4_ATOM_TYPE('x','d','5','C');
+const AP4_Atom::Type AP4_ATOM_TYPE_XD5D = AP4_ATOM_TYPE('x','d','5','D');
+const AP4_Atom::Type AP4_ATOM_TYPE_XD5E = AP4_ATOM_TYPE('x','d','5','E');
+const AP4_Atom::Type AP4_ATOM_TYPE_XD5F = AP4_ATOM_TYPE('x','d','5','F');
 
 const AP4_Atom::Type AP4_ATOM_TYPE_APCN = AP4_ATOM_TYPE('a','p','c','n');
 const AP4_Atom::Type AP4_ATOM_TYPE_APCH = AP4_ATOM_TYPE('a','p','c','h');

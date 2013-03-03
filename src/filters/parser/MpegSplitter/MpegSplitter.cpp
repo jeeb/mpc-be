@@ -782,18 +782,21 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 				}
 
 				p->TrackNumber	= TrackNumber;
-				p->bSyncPoint	= !!h2.fpts;
 				p->bAppendable	= !h2.fpts;
 				p->rtStart		= h2.fpts ? (h2.pts - rtStartOffset) : Packet::INVALID_TIME;
+				if (m_rtDuration && p->rtStart > m_rtDuration) {
+					p->rtStart	= Packet::INVALID_TIME;
+				}
+				p->rtStop		= (p->rtStart == Packet::INVALID_TIME) ? Packet::INVALID_TIME : p->rtStart+1;
+				p->bSyncPoint	= !!h2.fpts && (p->rtStart != Packet::INVALID_TIME);
 #if (DEBUG) && 0
 				if (h2.fpts) {
 					TRACE(_T("h.pid = %d, h2.pts = %ws [%10I64d] ==> %ws [%10I64d]\n"), h.pid, ReftimeToString(h2.pts), h2.pts, ReftimeToString(p->rtStart), p->rtStart);
 				}
 #endif
-				p->rtStop		= p->rtStart+1;
-				p->SetCount(h.bytes - (size_t)(m_pFile->GetPos() - pos));
 
-				int nBytes	= int(h.bytes - (m_pFile->GetPos() - pos));
+				size_t nBytes = h.bytes - (m_pFile->GetPos() - pos);
+				p->SetCount(nBytes);
 				m_pFile->ByteRead(p->GetData(), nBytes);
 
 				hr = DeliverPacket(p);

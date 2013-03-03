@@ -422,6 +422,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
 		case AP4_ATOM_TYPE_IV41:
 		case AP4_ATOM_TYPE_VP31:
 		case AP4_ATOM_TYPE_YV12:
+
 		case AP4_ATOM_TYPE_HDV1:
 		case AP4_ATOM_TYPE_HDV2:
 		case AP4_ATOM_TYPE_HDV3:
@@ -430,6 +431,9 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
 		case AP4_ATOM_TYPE_HDV6:
 		case AP4_ATOM_TYPE_HDV7:
 		case AP4_ATOM_TYPE_HDV8:
+		case AP4_ATOM_TYPE_HDV9:
+		case AP4_ATOM_TYPE_HDVA:
+
 		case AP4_ATOM_TYPE_XDV1:
 		case AP4_ATOM_TYPE_XDV2:
 		case AP4_ATOM_TYPE_XDV3:
@@ -439,6 +443,24 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
 		case AP4_ATOM_TYPE_XDV7:
 		case AP4_ATOM_TYPE_XDV8:
 		case AP4_ATOM_TYPE_XDV9:
+		case AP4_ATOM_TYPE_XDVA:
+		case AP4_ATOM_TYPE_XDVB:
+		case AP4_ATOM_TYPE_XDVC:
+		case AP4_ATOM_TYPE_XDVD:
+		case AP4_ATOM_TYPE_XDVE:
+		case AP4_ATOM_TYPE_XDVF:
+
+		case AP4_ATOM_TYPE_XD54:
+		case AP4_ATOM_TYPE_XD55:
+		case AP4_ATOM_TYPE_XD59:
+		case AP4_ATOM_TYPE_XD5A:
+		case AP4_ATOM_TYPE_XD5B:
+		case AP4_ATOM_TYPE_XD5C:
+		case AP4_ATOM_TYPE_XD5D:
+		case AP4_ATOM_TYPE_XD5E:
+		case AP4_ATOM_TYPE_XD5F:
+
+		case AP4_ATOM_TYPE_XDHD:
 		case AP4_ATOM_TYPE_APCN:
 		case AP4_ATOM_TYPE_APCH:
 		case AP4_ATOM_TYPE_APCO:

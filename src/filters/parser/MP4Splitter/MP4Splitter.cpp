@@ -963,16 +963,13 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					if (AP4_VisualSampleEntry* vse = dynamic_cast<AP4_VisualSampleEntry*>(atom)) {
 
+						char buff[5];
+						memcpy(buff, &fourcc, 4);
+						buff[4] = 0;
+
 						CString tname = UTF8To16(vse->GetCompressorName());
-						if (type == AP4_ATOM_TYPE_HDV1 || type == AP4_ATOM_TYPE_HDV2
-							|| type == AP4_ATOM_TYPE_HDV3 || type == AP4_ATOM_TYPE_HDV4
-							|| type == AP4_ATOM_TYPE_HDV5 || type == AP4_ATOM_TYPE_HDV6
-							|| type == AP4_ATOM_TYPE_HDV7 || type == AP4_ATOM_TYPE_HDV8
-							|| type == AP4_ATOM_TYPE_XDV1 || type == AP4_ATOM_TYPE_XDV2
-							|| type == AP4_ATOM_TYPE_XDV3 || type == AP4_ATOM_TYPE_XDV4
-							|| type == AP4_ATOM_TYPE_XDV5 || type == AP4_ATOM_TYPE_XDV6
-							|| type == AP4_ATOM_TYPE_XDV7 || type == AP4_ATOM_TYPE_XDV8
-							|| type == AP4_ATOM_TYPE_XDV9) {
+						if ((buff[0] == 'x' || buff[0] == 'h') && buff[1] == 'd') {
+							// Apple HDV/XDCAM
 							FormatTrackName(_T("HDV/XDV MPEG2"), 0);
 
 							m_pFile->Seek(sample.GetOffset());
@@ -1035,10 +1032,6 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 						mt.subtype = FOURCCMap(fourcc);
 						mts.Add(mt);
-
-						char buff[5];
-						memcpy(buff, &fourcc, 4);
-						buff[4] = 0;
 
 						_strlwr_s(buff);
 						AP4_Atom::Type typelwr = *(AP4_Atom::Type*)buff;

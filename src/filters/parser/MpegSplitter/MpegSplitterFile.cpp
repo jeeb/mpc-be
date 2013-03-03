@@ -139,6 +139,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		return E_FAIL;
 	}
 
+again:
 	// min/max pts & bitrate
 	m_rtMin = m_posMin = _I64_MAX;
 	m_rtMax = m_posMax = 0;
@@ -192,6 +193,10 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	}
 
 	if (m_posMax - m_posMin <= 0 || m_rtMax - m_rtMin <= 0) {
+		if (m_AlternativeDuration) {
+			m_AlternativeDuration = false;
+			goto again;
+		}
 		return E_FAIL;
 	}
 
