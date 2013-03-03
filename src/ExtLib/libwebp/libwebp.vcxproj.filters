@@ -12,171 +12,177 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dsp\dsp.h">
-      <Filter>Header Files\dsp</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="enc\cost.h">
-      <Filter>Header Files\enc</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="enc\vp8enci.h">
-      <Filter>Header Files\enc</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="utils\bit_reader.h">
-      <Filter>Header Files\utils</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="utils\bit_writer.h">
-      <Filter>Header Files\utils</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="webp\decode.h">
-      <Filter>Header Files\webp</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="webp\encode.h">
-      <Filter>Header Files\webp</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="webp\types.h">
-      <Filter>Header Files\webp</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\quant_levels_dec.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dec\alpha_dec.c">
-      <Filter>Source Files\dec</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dec\buffer.c">
-      <Filter>Source Files\dec</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dec\frame_dec.c">
-      <Filter>Source Files\dec</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dec\idec.c">
-      <Filter>Source Files\dec</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dec\io.c">
-      <Filter>Source Files\dec</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dec\layer_dec.c">
-      <Filter>Source Files\dec</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dec\quant_dec.c">
-      <Filter>Source Files\dec</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dec\tree_dec.c">
-      <Filter>Source Files\dec</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dec\vp8.c">
-      <Filter>Source Files\dec</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dec\vp8l_dec.c">
-      <Filter>Source Files\dec</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dec\webp.c">
-      <Filter>Source Files\dec</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dsp\cpu.c">
-      <Filter>Source Files\dsp</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dsp\dec.c">
-      <Filter>Source Files\dsp</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dsp\dec_sse2.c">
-      <Filter>Source Files\dsp</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dsp\enc.c">
-      <Filter>Source Files\dsp</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dsp\enc_sse2.c">
-      <Filter>Source Files\dsp</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dsp\lossless.c">
-      <Filter>Source Files\dsp</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dsp\upsampling.c">
-      <Filter>Source Files\dsp</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dsp\upsampling_sse2.c">
-      <Filter>Source Files\dsp</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dsp\yuv.c">
-      <Filter>Source Files\dsp</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="enc\alpha.c">
-      <Filter>Source Files\enc</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="enc\analysis.c">
-      <Filter>Source Files\enc</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="enc\backward_references.c">
-      <Filter>Source Files\enc</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="enc\config.c">
-      <Filter>Source Files\enc</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="enc\cost.c">
-      <Filter>Source Files\enc</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="enc\filter.c">
-      <Filter>Source Files\enc</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="enc\frame.c">
-      <Filter>Source Files\enc</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="enc\histogram.c">
-      <Filter>Source Files\enc</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="enc\iterator.c">
-      <Filter>Source Files\enc</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="enc\layer.c">
-      <Filter>Source Files\enc</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="enc\picture.c">
-      <Filter>Source Files\enc</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="enc\quant.c">
-      <Filter>Source Files\enc</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="enc\syntax.c">
-      <Filter>Source Files\enc</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="enc\token.c">
-      <Filter>Source Files\enc</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="enc\tree.c">
-      <Filter>Source Files\enc</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="enc\vp8l.c">
-      <Filter>Source Files\enc</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="enc\webpenc.c">
-      <Filter>Source Files\enc</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="utils\bit_reader.c">
-      <Filter>Source Files\utils</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="utils\bit_writer.c">
-      <Filter>Source Files\utils</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="utils\color_cache.c">
-      <Filter>Source Files\utils</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="utils\filters.c">
-      <Filter>Source Files\utils</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="utils\huffman.c">
-      <Filter>Source Files\utils</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="utils\huffman_encode.c">
-      <Filter>Source Files\utils</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="utils\quant_levels.c">
-      <Filter>Source Files\utils</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="utils\rescaler.c">
-      <Filter>Source Files\utils</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="utils\thread.c">
-      <Filter>Source Files\utils</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="utils\utils.c">
-      <Filter>Source Files\utils</Filter>
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\quant_levels_dec.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
