@@ -55,6 +55,9 @@
     <None Include="libavcodec\x86\fmtconvert.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
+    <None Include="libavcodec\x86\h263_loopfilter.asm">
+      <Filter>libavcodec\x86</Filter>
+    </None>
     <None Include="libavcodec\x86\h264_chromamc.asm">
       <Filter>libavcodec\x86</Filter>
     </None>

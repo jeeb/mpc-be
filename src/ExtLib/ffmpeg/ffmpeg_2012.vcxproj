@@ -28,6 +28,7 @@
     <None Include="libavcodec\x86\dwt_yasm.asm" />
     <None Include="libavcodec\x86\fft.asm" />
     <None Include="libavcodec\x86\fmtconvert.asm" />
+    <None Include="libavcodec\x86\h263_loopfilter.asm" />
     <None Include="libavcodec\x86\h264_chromamc.asm" />
     <None Include="libavcodec\x86\h264_chromamc_10bit.asm" />
     <None Include="libavcodec\x86\h264_deblock.asm" />

@@ -148,12 +148,54 @@ static void h264_er_decode_mb(void *opaque, int ref, int mv_dir, int mv_type,
     ff_h264_hl_decode_mb(h);
 }
 
+static void draw_horiz_band(AVCodecContext *avctx, Picture *cur,
+                            Picture *last, int y, int h, int picture_structure,
+                            int first_field, int low_delay)
+{
+    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(avctx->pix_fmt);
+    int vshift = desc->log2_chroma_h;
+    const int field_pic = picture_structure != PICT_FRAME;
+    if(field_pic){
+        h <<= 1;
+        y <<= 1;
+    }
+
+    h = FFMIN(h, avctx->height - y);
+
+    if(field_pic && first_field && !(avctx->slice_flags&SLICE_FLAG_ALLOW_FIELD)) return;
+
+    if (avctx->draw_horiz_band) {
+        AVFrame *src;
+        int offset[AV_NUM_DATA_POINTERS];
+        int i;
+
+        if(cur->f.pict_type == AV_PICTURE_TYPE_B || low_delay ||
+           (avctx->slice_flags & SLICE_FLAG_CODED_ORDER))
+            src = &cur->f;
+        else if (last)
+            src = &last->f;
+        else
+            return;
+
+        offset[0]= y * src->linesize[0];
+        offset[1]=
+        offset[2]= (y >> vshift) * src->linesize[1];
+        for (i = 3; i < AV_NUM_DATA_POINTERS; i++)
+            offset[i] = 0;
+
+        emms_c();
+
+        avctx->draw_horiz_band(avctx, src, offset,
+                               y, picture_structure, h);
+    }
+}
+
 void ff_h264_draw_horiz_band(H264Context *h, int y, int height)
 {
-    ff_draw_horiz_band(h->avctx, NULL, &h->cur_pic,
-                       h->ref_list[0][0].f.data[0] ? &h->ref_list[0][0] : NULL,
-                       y, height, h->picture_structure, h->first_field, 0,
-                       h->low_delay, h->mb_height * 16, h->mb_width * 16);
+    draw_horiz_band(h->avctx, &h->cur_pic,
+                    h->ref_list[0][0].f.data[0] ? &h->ref_list[0][0] : NULL,
+                    y, height, h->picture_structure, h->first_field,
+                    h->low_delay);
 }
 
 static void free_frame_buffer(H264Context *h, Picture *pic)
@@ -1233,6 +1275,7 @@ static int context_init(H264Context *h)
     h->ref_cache[1][scan8[7]  + 1] =
     h->ref_cache[1][scan8[13] + 1] = PART_NOT_AVAILABLE;
 
+    if (CONFIG_ERROR_RESILIENCE) {
     /* init ER */
     er->avctx          = h->avctx;
     er->dsp            = &h->dsp;
@@ -1272,6 +1315,7 @@ static int context_init(H264Context *h)
     er->dc_val[2] = er->dc_val[1] + c_size;
     for (i = 0; i < yc_size; i++)
         h->dc_val_base[i] = 1024;
+    }
 
     return 0;
 
@@ -1302,9 +1346,11 @@ static av_cold void common_init(H264Context *h)
 
     h->dequant_coeff_pps = -1;
 
-    h->dsp.dct_bits = 16;
-    /* needed so that IDCT permutation is known early */
-    ff_dsputil_init(&h->dsp, h->avctx);
+    if (CONFIG_ERROR_RESILIENCE) {
+        h->dsp.dct_bits = 16;
+        /* needed so that IDCT permutation is known early */
+        ff_dsputil_init(&h->dsp, h->avctx);
+    }
     ff_videodsp_init(&h->vdsp, 8);
 
     memset(h->pps.scaling_matrix4, 16, 6 * 16 * sizeof(uint8_t));
@@ -1728,9 +1774,11 @@ int ff_h264_frame_start(H264Context *h)
     h->cur_pic     = *h->cur_pic_ptr;
     h->cur_pic.f.extended_data = h->cur_pic.f.data;
 
-    ff_er_frame_start(&h->er);
-    h->er.last_pic =
-    h->er.next_pic = NULL;
+    if (CONFIG_ERROR_RESILIENCE) {
+        ff_er_frame_start(&h->er);
+        h->er.last_pic =
+        h->er.next_pic = NULL;
+    }
 
     assert(h->linesize && h->uvlinesize);
 
@@ -2740,7 +2788,8 @@ static int field_end(H264Context *h, int in_setup)
      * past end by one (callers fault) and resync_mb_y != 0
      * causes problems for the first MB line, too.
      */
-    if (!FIELD_PICTURE && h->current_slice && !h->sps.new) {
+    if (CONFIG_ERROR_RESILIENCE &&
+        !FIELD_PICTURE && h->current_slice && !h->sps.new) {
         h->er.cur_pic  = h->cur_pic_ptr;
         ff_er_frame_end(&h->er);
     }
@@ -2923,8 +2972,10 @@ static int h264_set_parameter_from_sps(H264Context *h)
             ff_h264qpel_init(&h->h264qpel, h->sps.bit_depth_luma);
             ff_h264_pred_init(&h->hpc, h->avctx->codec_id, h->sps.bit_depth_luma,
                               h->sps.chroma_format_idc);
-            h->dsp.dct_bits = h->sps.bit_depth_luma > 8 ? 32 : 16;
-            ff_dsputil_init(&h->dsp, h->avctx);
+            if (CONFIG_ERROR_RESILIENCE) {
+                h->dsp.dct_bits = h->sps.bit_depth_luma > 8 ? 32 : 16;
+                ff_dsputil_init(&h->dsp, h->avctx);
+            }
             ff_videodsp_init(&h->vdsp, h->sps.bit_depth_luma);
         } else {
             av_log(h->avctx, AV_LOG_ERROR, "Unsupported bit depth: %d\n",
@@ -3086,7 +3137,9 @@ static int h264_slice_header_init(H264Context *h, int reinit)
             H264Context *c;
             c = h->thread_context[i] = av_mallocz(sizeof(H264Context));
             c->avctx       = h->avctx;
-            c->dsp         = h->dsp;
+            if (CONFIG_ERROR_RESILIENCE) {
+                c->dsp         = h->dsp;
+            }
             c->vdsp        = h->vdsp;
             c->h264dsp     = h->h264dsp;
             c->h264qpel    = h->h264qpel;
@@ -4225,10 +4278,12 @@ static void decode_finish_row(H264Context *h)
 static void er_add_slice(H264Context *h, int startx, int starty,
                          int endx, int endy, int status)
 {
-    ERContext *er = &h->er;
+    if (CONFIG_ERROR_RESILIENCE) {
+        ERContext *er = &h->er;
 
-    er->ref_count = h->ref_count[0];
-    ff_er_add_slice(er, startx, starty, endx, endy, status);
+        er->ref_count = h->ref_count[0];
+        ff_er_add_slice(er, startx, starty, endx, endy, status);
+    }
 }
 
 static int decode_slice(struct AVCodecContext *avctx, void *arg)
@@ -4421,7 +4476,9 @@ static int execute_decode_slices(H264Context *h, int context_count)
         av_assert0(context_count > 0);
         for (i = 1; i < context_count; i++) {
             hx                    = h->thread_context[i];
-            hx->er.error_count  = 0;
+            if (CONFIG_ERROR_RESILIENCE) {
+                hx->er.error_count = 0;
+            }
             hx->x264_build        = h->x264_build;
         }
 
@@ -4434,8 +4491,10 @@ static int execute_decode_slices(H264Context *h, int context_count)
         h->mb_y              = hx->mb_y;
         h->droppable         = hx->droppable;
         h->picture_structure = hx->picture_structure;
-        for (i = 1; i < context_count; i++)
-            h->er.error_count += h->thread_context[i]->er.error_count;
+        if (CONFIG_ERROR_RESILIENCE) {
+            for (i = 1; i < context_count; i++)
+                h->er.error_count += h->thread_context[i]->er.error_count;
+        }
     }
 
     return 0;
@@ -4921,9 +4980,10 @@ not_extra:
 
     assert(pict->data[0] || !*got_frame);
 
-    ff_print_debug_info2(h->avctx, pict, h->er.mbskip_table, h->visualization_buffer, &h->low_delay,
-                         h->mb_width, h->mb_height, h->mb_stride, 1);
-
+    if (CONFIG_MPEGVIDEO) {
+        ff_print_debug_info2(h->avctx, pict, h->er.mbskip_table, h->visualization_buffer, &h->low_delay,
+                             h->mb_width, h->mb_height, h->mb_stride, 1);
+    }
     /* ffdshow custom code (begin) */
     pict->h264_poc_decoded = h->poc_lsb + h->poc_msb;
     if (h->next_output_pic)
