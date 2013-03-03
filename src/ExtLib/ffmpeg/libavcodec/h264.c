@@ -1649,8 +1649,6 @@ static int decode_update_thread_context(AVCodecContext *dst,
     copy_fields(h, h1, poc_lsb, redundant_pic_count);
 
     // reference lists
-    copy_fields(h, h1, ref_count, list_count);
-    copy_fields(h, h1, ref2frm, intra_gb);
     copy_fields(h, h1, short_ref, cabac_init_idc);
 
     copy_picture_range(h->short_ref, h1->short_ref, 32, h, h1);
@@ -3622,7 +3620,7 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
 
         if (h->ref_count[0]-1 > max[0] || h->ref_count[1]-1 > max[1]){
             av_log(h->avctx, AV_LOG_ERROR, "reference overflow %u > %u or %u > %u\n", h->ref_count[0]-1, max[0], h->ref_count[1]-1, max[1]);
-            h->ref_count[0] = h->ref_count[1] = 1;
+            h->ref_count[0] = h->ref_count[1] = 0;
             return AVERROR_INVALIDDATA;
         }
 
@@ -3630,8 +3628,10 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
             h->list_count = 2;
         else
             h->list_count = 1;
-    } else
-        h->ref_count[1]= h->ref_count[0]= h->list_count= 0;
+    } else {
+        h->list_count = 0;
+        h->ref_count[0] = h->ref_count[1] = 0;
+    }
 
     if (!default_ref_list_done)
         ff_h264_fill_default_ref_list(h);

@@ -381,7 +381,7 @@
 #define HAVE_WINDOWS_H 1
 #define HAVE_WINSOCK2_H 0
 #define HAVE_XFORM_ASM 0
-#define HAVE_ICONV 0
+#define CONFIG_ICONV 0
 #define HAVE_YASM 1
 
 #ifdef __GNUC__

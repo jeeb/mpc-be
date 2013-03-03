@@ -1871,6 +1871,15 @@ static int mpeg_decode_slice(MpegEncContext *s, int mb_y,
                              && s->intra_dc_precision == 2 && s->q_scale_type == 1 && s->alternate_scan == 0
                              && s->progressive_frame == 0 /* vbv_delay == 0xBBB || 0xE10*/;
 
+                if (left >= 32 && !is_d10) {
+                    GetBitContext gb = s->gb;
+                    align_get_bits(&gb);
+                    if (show_bits(&gb, 24) == 0x060E2B) {
+                        av_log(avctx, AV_LOG_DEBUG, "Invalid MXF data found in video stream\n");
+                        is_d10 = 1;
+                    }
+                }
+
                 if (left < 0 || (left && show_bits(&s->gb, FFMIN(left, 23)) && !is_d10)
                     || ((avctx->err_recognition & (AV_EF_BITSTREAM | AV_EF_AGGRESSIVE)) && left > 8)) {
                     av_log(avctx, AV_LOG_ERROR, "end mismatch left=%d %0X\n", left, show_bits(&s->gb, FFMIN(left, 23)));
@@ -2313,6 +2322,7 @@ static int decode_chunks(AVCodecContext *avctx,
     const uint8_t *buf_end = buf + buf_size;
     int ret, input_size;
     int last_code = 0;
+    int picture_start_code_seen = 0;
 
     for (;;) {
         /* find next start code */
@@ -2363,6 +2373,14 @@ static int decode_chunks(AVCodecContext *avctx,
             break;
 
         case PICTURE_START_CODE:
+            if (picture_start_code_seen && s2->picture_structure == PICT_FRAME) {
+               /* If it's a frame picture, there can't be more than one picture header.
+                  Yet, it does happen and we need to handle it. */
+               av_log(avctx, AV_LOG_WARNING, "ignoring extra picture following a frame-picture\n");
+               break;
+            }
+            picture_start_code_seen = 1;
+
             if (s2->width <= 0 || s2->height <= 0) {
                 av_log(avctx, AV_LOG_ERROR, "%dx%d is invalid\n", s2->width, s2->height);
                 return AVERROR_INVALIDDATA;

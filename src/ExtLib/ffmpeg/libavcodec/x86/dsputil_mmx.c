@@ -130,8 +130,6 @@ void ff_put_no_rnd_pixels8_y2_exact_mmxext(uint8_t *block,
 void ff_put_no_rnd_pixels8_y2_exact_3dnow(uint8_t *block,
                                           const uint8_t *pixels,
                                           ptrdiff_t line_size, int h);
-void ff_avg_pixels8_mmxext(uint8_t *block, const uint8_t *pixels,
-                           ptrdiff_t line_size, int h);
 void ff_avg_pixels8_3dnow(uint8_t *block, const uint8_t *pixels,
                           ptrdiff_t line_size, int h);
 void ff_avg_pixels8_x2_mmxext(uint8_t *block, const uint8_t *pixels,
@@ -300,7 +298,6 @@ void ff_put_no_rnd_mpeg4_qpel8_v_lowpass_mmxext(uint8_t *dst, uint8_t *src,
 
 
 #if HAVE_YASM
-#define ff_put_pixels8_mmx ff_put_pixels8_mmxext
 
 /***********************************/
 /* 3Dnow specific */
@@ -326,11 +323,6 @@ void ff_put_no_rnd_mpeg4_qpel8_v_lowpass_mmxext(uint8_t *dst, uint8_t *src,
 #if HAVE_INLINE_ASM
 #define put_no_rnd_pixels16_mmx put_pixels16_mmx
 #define put_no_rnd_pixels8_mmx put_pixels8_mmx
-#define put_pixels16_mmxext put_pixels16_mmx
-#define put_pixels8_mmxext put_pixels8_mmx
-#define put_pixels4_mmxext put_pixels4_mmx
-#define put_no_rnd_pixels16_mmxext put_no_rnd_pixels16_mmx
-#define put_no_rnd_pixels8_mmxext put_no_rnd_pixels8_mmx
 
 /***********************************/
 /* standard MMX */
@@ -777,7 +769,7 @@ static void draw_edges_mmx(uint8_t *buf, int wrap, int width, int height,
 
 
 #if HAVE_YASM
-#define QPEL_OP(OPNAME, ROUNDER, RND, OP, MMX)                          \
+#define QPEL_OP(OPNAME, ROUNDER, RND, MMX)                              \
 static void OPNAME ## qpel8_mc00_ ## MMX (uint8_t *dst, uint8_t *src,   \
                                           int stride)                   \
 {                                                                       \
@@ -1158,17 +1150,9 @@ static void OPNAME ## qpel16_mc22_ ## MMX(uint8_t *dst, uint8_t *src,   \
                                                     stride, 16);        \
 }
 
-#define PUT_OP(a, b, temp, size)                \
-    "mov"#size"        "#a", "#b"       \n\t"
-
-#define AVG_MMXEXT_OP(a, b, temp, size)         \
-    "mov"#size"        "#b", "#temp"    \n\t"   \
-    "pavgb          "#temp", "#a"       \n\t"   \
-    "mov"#size"        "#a", "#b"       \n\t"
-
-QPEL_OP(put_,          ff_pw_16, _,        PUT_OP,        mmxext)
-QPEL_OP(avg_,          ff_pw_16, _,        AVG_MMXEXT_OP, mmxext)
-QPEL_OP(put_no_rnd_,   ff_pw_15, _no_rnd_, PUT_OP,        mmxext)
+QPEL_OP(put_,          ff_pw_16, _,        mmxext)
+QPEL_OP(avg_,          ff_pw_16, _,        mmxext)
+QPEL_OP(put_no_rnd_,   ff_pw_15, _no_rnd_, mmxext)
 #endif /* HAVE_YASM */
 
 
@@ -1381,22 +1365,13 @@ void ff_avg_cavs_qpel16_mc00_mmxext(uint8_t *dst, uint8_t *src, int stride)
 {
     avg_pixels16_mmx(dst, src, stride, 16);
 }
-#endif /* HAVE_INLINE_ASM */
 
-#if HAVE_YASM
 /* VC-1-specific */
 void ff_put_vc1_mspel_mc00_mmx(uint8_t *dst, const uint8_t *src,
                                int stride, int rnd)
 {
-    ff_put_pixels8_mmx(dst, src, stride, 8);
+    put_pixels8_mmx(dst, src, stride, 8);
 }
-
-void ff_avg_vc1_mspel_mc00_mmxext(uint8_t *dst, const uint8_t *src,
-                                  int stride, int rnd)
-{
-    ff_avg_pixels8_mmxext(dst, src, stride, 8);
-}
-#endif /* HAVE_YASM */
 
 #if CONFIG_DIRAC_DECODER
 #define DIRAC_PIXOP(OPNAME2, OPNAME, EXT)\
@@ -1499,7 +1474,6 @@ static void ff_libmpeg2mmx2_idct_add(uint8_t *dest, int line_size,
 }
 #endif
 
-#if HAVE_INLINE_ASM
 static void vector_clipf_sse(float *dst, const float *src,
                              float min, float max, int len)
 {
