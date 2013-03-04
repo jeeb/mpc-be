@@ -53,7 +53,6 @@ extern "C" {
 }
 
 #ifdef REGISTER_FILTER
-	void *__imp_toupper = toupper;
 	void *__imp_time64 = _time64;
 #endif
 
