@@ -1844,7 +1844,7 @@ HRESULT CMpegSplitterOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFEREN
 {
 	CAutoLock cAutoLock(this);
 
-	m_rtPrev	= Packet::INVALID_TIME;
+	m_rtPrev	= 0;
 	m_rtOffset	= 0;
 
 	return __super::DeliverNewSegment(tStart, tStop, dRate);
