@@ -57,6 +57,7 @@ bool CMpaDecSettingsWnd::OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>
 	m_drc          = m_pMDF->GetDynamicRangeControl();
 	m_spdif_ac3    = m_pMDF->GetSPDIF(IMpaDecFilter::ac3);
 	m_spdif_dts    = m_pMDF->GetSPDIF(IMpaDecFilter::dts);
+	m_spdif_dtshd  = m_pMDF->GetSPDIF(IMpaDecFilter::dtshd);
 #if ENABLE_AC3_ENCODER
 	m_spdif_ac3enc = m_pMDF->GetSPDIF(IMpaDecFilter::ac3enc);;
 #endif
@@ -121,12 +122,16 @@ bool CMpaDecSettingsWnd::OnActivate()
 	p.y += h20;
 	m_spdif_ac3_check.Create(_T("AC-3"), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_CHECK_SPDIF_AC3);
 	m_spdif_dts_check.Create(_T("DTS"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(IPP_SCALE(50), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_CHECK_SPDIF_DTS);
+	m_spdif_dtshd_check.Create(_T("DTS-HD"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(IPP_SCALE(100), 0), CSize(IPP_SCALE(60), m_fontheight)), this, IDC_PP_CHECK_SPDIF_DTSHD);
 	m_spdif_ac3_check.SetCheck(m_spdif_ac3);
 	m_spdif_dts_check.SetCheck(m_spdif_dts);
+	m_spdif_dtshd_check.SetCheck(m_spdif_dtshd);
 #if ENABLE_AC3_ENCODER
-	m_spdif_ac3enc_check.Create(ResStr(IDS_MPADEC_AC3ENCODE), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(IPP_SCALE(100), 0), CSize(IPP_SCALE(115), m_fontheight)), this, IDC_PP_CHECK_SPDIF_AC3ENC);
+	p.y += h20;
+	m_spdif_ac3enc_check.Create(ResStr(IDS_MPADEC_AC3ENCODE), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(115), m_fontheight)), this, IDC_PP_CHECK_SPDIF_AC3ENC);
 	m_spdif_ac3enc_check.SetCheck(m_spdif_ac3enc);
 #endif
+	OnDTSCheck();
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
 		pWnd->SetFont(&m_font, FALSE);
@@ -149,6 +154,7 @@ void CMpaDecSettingsWnd::OnDeactivate()
 	m_drc          = !!m_drc_check.GetCheck();
 	m_spdif_ac3    = !!m_spdif_ac3_check.GetCheck();
 	m_spdif_dts    = !!m_spdif_dts_check.GetCheck();
+	m_spdif_dtshd  = !!m_spdif_dtshd_check.GetCheck();
 #if ENABLE_AC3_ENCODER
 	m_spdif_ac3enc = !!m_spdif_ac3enc_check.GetCheck();
 #endif
@@ -168,6 +174,7 @@ bool CMpaDecSettingsWnd::OnApply()
 		m_pMDF->SetDynamicRangeControl(m_drc);
 		m_pMDF->SetSPDIF(IMpaDecFilter::ac3, m_spdif_ac3);
 		m_pMDF->SetSPDIF(IMpaDecFilter::dts, m_spdif_dts);
+		m_pMDF->SetSPDIF(IMpaDecFilter::dtshd, m_spdif_dtshd);
 #if ENABLE_AC3_ENCODER
 		m_pMDF->SetSPDIF(IMpaDecFilter::ac3enc, m_spdif_ac3enc);
 #endif
@@ -184,6 +191,7 @@ BEGIN_MESSAGE_MAP(CMpaDecSettingsWnd, CInternalPropertyPageWnd)
 	ON_BN_CLICKED(IDC_PP_CHECK_I32, OnInt32Check)
 	ON_BN_CLICKED(IDC_PP_CHECK_FLT, OnFloatCheck)
 	ON_BN_CLICKED(IDC_PP_CHECK_MIXER, OnMixerCheck)
+	ON_BN_CLICKED(IDC_PP_CHECK_SPDIF_DTS, OnDTSCheck)
 END_MESSAGE_MAP()
 
 void CMpaDecSettingsWnd::OnInt16Check()
@@ -229,4 +237,9 @@ void CMpaDecSettingsWnd::OnFloatCheck()
 void CMpaDecSettingsWnd::OnMixerCheck()
 {
 	m_mixer_layout_combo.EnableWindow(!!m_mixer_check.GetCheck());
+}
+
+void CMpaDecSettingsWnd::OnDTSCheck()
+{
+	m_spdif_dtshd_check.EnableWindow(!!m_spdif_dts_check.GetCheck());
 }

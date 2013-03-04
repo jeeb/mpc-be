@@ -118,6 +118,7 @@ protected:
 	HRESULT ReconnectOutput(int nSamples, CMediaType& mt);
 	CMediaType CreateMediaType(MPCSampleFormat sf, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask = 0);
 	CMediaType CreateMediaTypeSPDIF(DWORD nSamplesPerSec = 48000);
+	CMediaType CreateMediaTypeHDMI(WORD type);
 
 public:
 	CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr);

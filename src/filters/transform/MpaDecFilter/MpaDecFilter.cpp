@@ -25,6 +25,8 @@
 #include <math.h>
 #include <atlbase.h>
 #include <MMReg.h>
+#include <Ks.h>
+#include <KsMedia.h>
 #include <sys/timeb.h>
 
 #include "MpaDecFilter.h"
@@ -56,6 +58,7 @@
 #define OPTION_DRC          _T("DRC")
 #define OPTION_SPDIF_ac3    _T("SPDIF_ac3")
 #define OPTION_SPDIF_dts    _T("SPDIF_dts")
+#define OPTION_SPDIF_dtshd  _T("HDMI_dtshd")
 #if ENABLE_AC3_ENCODER
 #define OPTION_SPDIF_ac3enc _T("SPDIF_ac3enc")
 #endif
@@ -368,6 +371,9 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SPDIF_dts, dw)) {
 			m_fSPDIF[dts] = !!dw;
 		}
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SPDIF_dtshd, dw)) {
+			m_fSPDIF[dtshd] = !!dw;
+		}
 #if ENABLE_AC3_ENCODER
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SPDIF_ac3enc, dw)) {
 			m_fSPDIF[ac3enc] = !!dw;
@@ -384,6 +390,7 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_fDRC                 = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_DRC, m_fDRC);
 	m_fSPDIF[ac3]          = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3, m_fSPDIF[ac3]);
 	m_fSPDIF[dts]          = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_dts, m_fSPDIF[dts]);
+	m_fSPDIF[dtshd]        = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_dtshd, m_fSPDIF[dtshd]);
 #if ENABLE_AC3_ENCODER
 	m_fSPDIF[ac3enc]       = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3enc, m_fSPDIF[ac3enc]);
 #endif
@@ -817,39 +824,55 @@ HRESULT CMpaDecFilter::ProcessDTS_SPDIF()
 	BYTE* p = base;
 
 	while (p + 16 <= end) {
-		int size = 0;
 		int samplerate, channels, framelength, bitrate;
 
-		size = ParseDTSHeader(p, &samplerate, &channels, &framelength, &bitrate);
-
+		int size  = GetDTSFrameSize(p);
+		if (size > 0) {
+			size = ParseDTSHeader(p, &samplerate, &channels, &framelength, &bitrate);
+		}
 		if (size == 0) {
 			p++;
 			continue;
 		}
-		if (p + size > end) {
-			break;
+
+		int sizehd = 0;
+		if (p + size + 16 <= end) {
+			sizehd = GetDTSHDFrameSize(p + size);
+		} else {
+			break; // need more data
 		}
 
-		BYTE type;
-		switch (framelength) {
-			case  512:
-				type = IEC61937_DTS1;
-				break;
-			case 1024:
-				type = IEC61937_DTS2;
-				break;
-			case 2048:
-				type = IEC61937_DTS3;
-				break;
-			default:
-				TRACE(_T("CMpaDecFilter:ProcessDTS_SPDIF() - framelength is not supported\n"));
-				return E_FAIL;
-		}
-		if (FAILED(hr = DeliverBitstream(p, size, type, samplerate, framelength))) {
-			return hr;
+		if (p + size + sizehd > end) {
+			break; // need more data
 		}
 
-		p += size;
+		bool usehdmi = sizehd &&  GetSPDIF(dtshd);
+		if (usehdmi) {
+			if (FAILED(hr = DeliverBitstream(p, size + sizehd, IEC61937_DTSHD, samplerate, framelength))) {
+				return hr;
+			}
+		} else {
+			BYTE type;
+			switch (framelength) {
+				case  512:
+					type = IEC61937_DTS1;
+					break;
+				case 1024:
+					type = IEC61937_DTS2;
+					break;
+				case 2048:
+					type = IEC61937_DTS3;
+					break;
+				default:
+					TRACE(_T("CMpaDecFilter:ProcessDTS_SPDIF() - framelength is not supported\n"));
+					return E_FAIL;
+			}
+			if (FAILED(hr = DeliverBitstream(p, size, type, samplerate, framelength))) {
+				return hr;
+			}
+		}
+
+		p += (size + sizehd);
 	}
 
 	memmove(base, p, end - p);
@@ -1350,13 +1373,14 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, int size, AVSampleFormat avsf, DWORD
 HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, int size, WORD type, int sample_rate, int samples)
 {
 	HRESULT hr;
+	WORD subtype  = 0;
 	bool isDTSWAV = false;
-
-	int length = 0;
+	bool isDTSHD  = false;
+	int  length   = 0;
 
 	switch (type) {
 		case IEC61937_AC3:
-			length = samples * 4;
+			length = 6144;
 			break;
 		case IEC61937_DTS1:
 		case IEC61937_DTS2:
@@ -1368,22 +1392,30 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, int size, WORD type, int sa
 				length += 2048;
 			}
 			break;
-		/*case IEC61937_DTSHD:
-			type |= (4 << 8);
-			length = 32768;
+		case IEC61937_DTSHD:
+			length  = 32768;
+			subtype = 4;
+			isDTSHD = true;
 			break;
-		case IEC61937_EAC3:
+		/*case IEC61937_EAC3:
 			length = 24576; // 6144 for DD Plus * 4 for IEC 60958 frames
+			isHDMI = true;
 			break;
 		case IEC61937_TRUEHD:
 			length = 61440; // max length of MAT data: 61424 bytes (total=61432+8 header bytes)
+			isHDMI = true;
 			break;*/
 		default:
 			TRACE(_T("CMpaDecFilter::DeliverBitstream() - type is not supported\n"));
 			return E_INVALIDARG;
 	}
 
-	CMediaType mt = CreateMediaTypeSPDIF(sample_rate);
+	CMediaType mt;
+	if (isDTSHD) {
+		mt = CreateMediaTypeHDMI(type);
+	} else {
+		mt = CreateMediaTypeSPDIF(sample_rate);
+	}
 
 	if (FAILED(hr = ReconnectOutput(length, mt))) {
 		return hr;
@@ -1400,16 +1432,29 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, int size, WORD type, int sa
 	} else {
 		memset(pDataOut + 8 + size, 0, length - (8 + size)); // Fill after the input buffer with zeros if any extra bytes
 
+		int index = 0;
 		// Fill the 8 bytes (4 words) of IEC header
 		WORD* pDataOutW = (WORD*)pDataOut;
-		pDataOutW[0] = 0xf872;
-		pDataOutW[1] = 0x4e1f;
-		pDataOutW[2] = type;
-		pDataOutW[3] = size*8;
-		_swab((char*)pBuff, (char*)&pDataOutW[4], size & ~1);
+		pDataOutW[index++] = 0xf872;
+		pDataOutW[index++] = 0x4e1f;
+		pDataOutW[index++] = type | subtype << 8;
+		if (isDTSHD) {
+			pDataOutW[index++] = (size & ~0xf) + 0x18;
+			// begin dts-hd start code
+			pDataOutW[index++] = 0x0100;
+			pDataOutW[index++] = 0;
+			pDataOutW[index++] = 0;
+			pDataOutW[index++] = 0;
+			pDataOutW[index++] = 0xfefe;
+			// end dts-hd start code
+			pDataOutW[index++] = size;
+		} else {
+			pDataOutW[index++] = size * 8;
+		}
+		_swab((char*)pBuff, (char*)&pDataOutW[index], size & ~1);
 		if (size & 1) { // _swab doesn't like odd number.
-			pDataOut[8 + size - 1] = 0;
-			pDataOut[8 + size] = pBuff[size - 1];
+			pDataOut[index * 2 + size - 1] = 0;
+			pDataOut[index * 2 + size] = pBuff[size - 1];
 		}
 	}
 
@@ -1597,6 +1642,56 @@ CMediaType CMpaDecFilter::CreateMediaTypeSPDIF(DWORD nSamplesPerSec)
 	}
 	CMediaType mt = CreateMediaType(SF_PCM16, nSamplesPerSec, 2, SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT);
 	((WAVEFORMATEX*)mt.pbFormat)->wFormatTag = WAVE_FORMAT_DOLBY_AC3_SPDIF;
+	return mt;
+}
+
+CMediaType CMpaDecFilter::CreateMediaTypeHDMI(WORD type)
+{
+	CMediaType mt;
+	mt.majortype  = MEDIATYPE_Audio;
+	mt.subtype    = MEDIASUBTYPE_PCM;
+	mt.formattype = FORMAT_WaveFormatEx;
+
+	WAVEFORMATEXTENSIBLE wfex;
+	memset(&wfex, 0, sizeof(wfex));
+
+	GUID subtype = GUID_NULL;
+
+	switch(type) {
+	case IEC61937_DTSHD:
+		wfex.Format.nChannels = 8;
+		wfex.dwChannelMask    = KSAUDIO_SPEAKER_7POINT1_SURROUND;
+		subtype = KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD;
+		break;
+	case IEC61937_EAC3:
+		wfex.Format.nChannels = 2;
+		wfex.dwChannelMask    = KSAUDIO_SPEAKER_5POINT1_SURROUND;
+		subtype = KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS;
+		break;
+	case IEC61937_TRUEHD:
+		wfex.Format.nChannels = 8;
+		wfex.dwChannelMask    = KSAUDIO_SPEAKER_7POINT1_SURROUND;
+		subtype = KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_MLP;
+		break;
+	default:
+		ASSERT(0);
+		break;
+	}
+
+	if (subtype != GUID_NULL) {
+		wfex.Format.wFormatTag           = WAVE_FORMAT_EXTENSIBLE;
+		wfex.Format.nSamplesPerSec       = 192000;
+		wfex.Format.wBitsPerSample       = 16;
+		wfex.Format.nBlockAlign          = wfex.Format.nChannels * wfex.Format.wBitsPerSample / 8;
+		wfex.Format.nAvgBytesPerSec      = wfex.Format.nSamplesPerSec * wfex.Format.nBlockAlign;
+		wfex.Format.cbSize               = sizeof(wfex) - sizeof(wfex.Format);
+		wfex.Samples.wValidBitsPerSample = wfex.Format.wBitsPerSample;
+		wfex.SubFormat = subtype;
+	}
+
+	mt.SetSampleSize(1);
+	mt.SetFormat((BYTE*)&wfex, sizeof(wfex.Format) + wfex.Format.cbSize);
+
 	return mt;
 }
 
@@ -1888,22 +1983,25 @@ STDMETHODIMP_(bool) CMpaDecFilter::GetDynamicRangeControl()
 STDMETHODIMP CMpaDecFilter::SetSPDIF(enctype et, bool fSPDIF)
 {
 	CAutoLock cAutoLock(&m_csProps);
-	if (et >= 0 && et < etcount) {
-		m_fSPDIF[et] = fSPDIF;
-	} else {
+	if (et < 0 && et >= etcount) {
 		return E_INVALIDARG;
 	}
 
+	m_fSPDIF[et] = fSPDIF;
 	return S_OK;
 }
 
 STDMETHODIMP_(bool) CMpaDecFilter::GetSPDIF(enctype et)
 {
 	CAutoLock cAutoLock(&m_csProps);
-	if (et >= 0 && et < etcount) {
-		return m_fSPDIF[et];
+	if (et < 0 && et >= etcount) {
+		return false;
 	}
-	return false;
+	if (et == dtshd && !m_fSPDIF[dts]) {
+		return false;
+	}
+
+	return m_fSPDIF[et];
 }
 
 STDMETHODIMP CMpaDecFilter::SaveSettings()
@@ -1922,6 +2020,7 @@ STDMETHODIMP CMpaDecFilter::SaveSettings()
 		key.SetDWORDValue(OPTION_DRC, m_fDRC);
 		key.SetDWORDValue(OPTION_SPDIF_ac3, m_fSPDIF[ac3]);
 		key.SetDWORDValue(OPTION_SPDIF_dts, m_fSPDIF[dts]);
+		key.SetDWORDValue(OPTION_SPDIF_dtshd, m_fSPDIF[dtshd]);
 #if ENABLE_AC3_ENCODER
 		key.SetDWORDValue(OPTION_SPDIF_ac3enc, m_fSPDIF[ac3enc]);
 #endif
@@ -1936,6 +2035,7 @@ STDMETHODIMP CMpaDecFilter::SaveSettings()
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_DRC, m_fDRC);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3, m_fSPDIF[ac3]);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_dts, m_fSPDIF[dts]);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_dtshd, m_fSPDIF[dtshd]);
 #if ENABLE_AC3_ENCODER
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3enc, m_fSPDIF[ac3enc]);
 #endif
