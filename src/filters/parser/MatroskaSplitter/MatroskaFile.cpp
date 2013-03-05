@@ -230,7 +230,7 @@ HRESULT Segment::ParseMinimal(CMatroskaNode* pMN0)
 	while (MatroskaReader::QWORD pos = pMN->FindPos(MATROSKA_ID_SEEKHEAD, pMN->GetPos())) {
 		pMN->SeekTo(pos);
 		if (FAILED(pMN->Parse()) || (pMN->m_filepos + pMN->m_len) >= (pMN0->m_filepos + pMN0->m_len)) {
-			continue; // a broken file
+			break; // a broken file
 		}
 		MetaSeekInfo.Parse(pMN);
 	}
