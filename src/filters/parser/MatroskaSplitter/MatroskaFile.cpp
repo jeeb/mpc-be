@@ -211,11 +211,17 @@ HRESULT Segment::ParseMinimal(CMatroskaNode* pMN0)
 				k |= (1 << 2);
 				break;
 			case MATROSKA_ID_CUES:
-				k |= (1 << 3);
 				Cues.Parse(pMN);
+				k |= (1 << 3);
+				break;
+			case MATROSKA_ID_CHAPTERS:
+				Chapters.Parse(pMN);
+				k |= (1 << 4);
+				break;
+			default:
 				break;
 		}
-	} while (k != 15 && pMN->m_id != MATROSKA_ID_CLUSTER && pMN->Next());
+	} while (k != 31 && pMN->m_id != MATROSKA_ID_CLUSTER && pMN->Next());
 
 	if (!pMN->IsRandomAccess()) {
 		return S_OK;
@@ -224,13 +230,13 @@ HRESULT Segment::ParseMinimal(CMatroskaNode* pMN0)
 	while (MatroskaReader::QWORD pos = pMN->FindPos(MATROSKA_ID_SEEKHEAD, pMN->GetPos())) {
 		pMN->SeekTo(pos);
 		if (FAILED(pMN->Parse()) || (pMN->m_filepos + pMN->m_len) >= (pMN0->m_filepos + pMN0->m_len)) {
-			break; // a broken file
+			continue; // a broken file
 		}
 		MetaSeekInfo.Parse(pMN);
 	}
 
-	if (k != 15) {
-		if (Cues.IsEmpty() && (pMN = pMN0->Child(MATROSKA_ID_CUES, false))) {
+	if (k != 31) {
+		if (Cues.IsEmpty() && (pMN = pMN0->Child(MATROSKA_ID_CUES, true))) {
 			do {
 				Cues.Parse(pMN);
 			} while (pMN->Next(true));
@@ -238,21 +244,21 @@ HRESULT Segment::ParseMinimal(CMatroskaNode* pMN0)
 
 		if (Chapters.IsEmpty() && (pMN = pMN0->Child(MATROSKA_ID_CHAPTERS, false))) {
 			do {
-				Chapters.Parse(pMN); /*BIG UGLY HACK:*/
+				Chapters.Parse(pMN);
 				break;
 			} while (pMN->Next(true));
 		}
 
 		if (Attachments.IsEmpty() && (pMN = pMN0->Child(MATROSKA_ID_ATTACHMENTS, false))) {
 			do {
-				Attachments.Parse(pMN); /*BIG UGLY HACK:*/
+				Attachments.Parse(pMN);
 				break;
 			} while (pMN->Next(true));
 		}
 
 		if (Tags.IsEmpty() && (pMN = pMN0->Child(MATROSKA_ID_TAGS, false))) {
 			do {
-				Tags.Parse(pMN); /*BIG UGLY HACK:*/
+				Tags.Parse(pMN);
 				break;
 			} while (pMN->Next(true));
 		}

@@ -1161,8 +1161,8 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 						c.ParseTimeCode(m_pCluster);
 						REFERENCE_TIME seek_rt = s.GetRefTime(c.TimeCode);
 
+						bool fPassedCueTime = false;
 						if (CAutoPtr<CMatroskaNode> pBlock = m_pCluster->GetFirstBlock()) {
-							bool fPassedCueTime = false;
 
 							do {
 								CBlockGroupNode bgn;
@@ -1183,16 +1183,15 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 									BlockGroup* bg = bgn.GetNext(pos4);
 									seek_rt = s.GetRefTime(c.TimeCode + bg->Block.TimeCode);
 
-									if (bg->Block.TrackNumber == pCueTrackPositions->CueTrack && rt < seek_rt
-											|| rt + 5000000i64 < seek_rt) { // allow 500ms difference between tracks, just in case intreleaving wasn't that much precise
+									if ((bg->Block.TrackNumber == pCueTrackPositions->CueTrack && rt < seek_rt) || (abs(seek_rt - rt) <= 5000000i64)) {
 										fPassedCueTime = true;
 									}
 								}
 							} while (!fPassedCueTime && pBlock->NextBlock());
 						}
 
-						if (seek_rt > 0) {
-							TRACE(_T("CMatroskaSplitterFilter::DemuxSeek() : %ws => %ws, [%10I64d - %10I64d]\n"), ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt);
+						if (fPassedCueTime && seek_rt > 0) {
+							TRACE(_T("CMatroskaSplitterFilter::DemuxSeek() : Seek One - %ws => %ws, [%10I64d - %10I64d]\n"), ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt);
 							return;
 						}
 					}
@@ -1202,7 +1201,7 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 				REFERENCE_TIME seek_rt = s.GetRefTime(c.TimeCode);
 
 				if (seek_rt > 0) {
-					TRACE(_T("CMatroskaSplitterFilter::DemuxSeek() : %ws => %ws, [%10I64d - %10I64d]\n"), ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt);
+					TRACE(_T("CMatroskaSplitterFilter::DemuxSeek() : Seek Two - %ws => %ws, [%10I64d - %10I64d]\n"), ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt);
 					return;
 				}
 			}
@@ -1226,6 +1225,7 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 		// epic fail ...
 		m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
+		TRACE(_T("CMatroskaSplitterFilter::DemuxSeek(), epic fail ...\n"));
 	}
 }
 
