@@ -225,12 +225,12 @@ STDMETHODIMP CSubPicAllocatorImpl::GetStatic(ISubPic** ppSubPic)
 	}
 
 	CSize size(0, 0);
-	if (m_pStatic) {
-		m_pStatic->GetSize(&size);
+	if (m_pStatic && (FAILED(m_pStatic->GetSize(&size)) || size.cx != m_cursize.cx) || (size.cy != m_cursize.cy)) {
+		m_pStatic.Release();
+		m_pStatic = NULL;
 	}
 
-	if (!m_pStatic || (size.cx != m_cursize.cx) || (size.cy != m_cursize.cy)) {
-		m_pStatic = NULL;
+	if (!m_pStatic) {
 		if (!Alloc(true, &m_pStatic) || !m_pStatic) {
 			return E_OUTOFMEMORY;
 		}
@@ -265,12 +265,20 @@ STDMETHODIMP_(bool) CSubPicAllocatorImpl::IsDynamicWriteOnly()
 
 STDMETHODIMP CSubPicAllocatorImpl::ChangeDevice(IUnknown* pDev)
 {
+	if (m_pStatic) {
+		m_pStatic.Release();
+	}
+
 	m_pStatic = NULL;
 	return S_OK;
 }
 
 STDMETHODIMP CSubPicAllocatorImpl::Reset()
 {
+	if (m_pStatic) {
+		m_pStatic.Release();
+	}
+
 	m_pStatic = NULL;
 	return S_OK;
 }
