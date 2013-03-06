@@ -37,6 +37,7 @@
 #include "PPageInternalFilters.h"
 #include "PPageAudioSwitcher.h"
 #include "PPageFiltersPerformance.h"
+#include "PPageFiltersPriority.h"
 #include "PPageExternalFilters.h"
 #include "PPageSubtitles.h"
 #include "PPageSubStyle.h"
@@ -87,6 +88,7 @@ private:
 	CPPageInternalFilters m_internalfilters;
 	CPPageAudioSwitcher m_audioswitcher;
 	CPPageFiltersPerformance m_filtersperformance;
+	CPPageFiltersPriority m_filterspriority;
 	CPPageExternalFilters m_externalfilters;
 	CPPageSubtitles m_subtitles;
 	CPPageSubStyle m_substyle;

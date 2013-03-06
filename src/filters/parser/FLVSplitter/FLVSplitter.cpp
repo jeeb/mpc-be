@@ -743,7 +743,6 @@ void CFLVSplitterFilter::NormalSeek(REFERENCE_TIME rt)
 	}
 
 	if (!Sync(pos)) {
-		ASSERT(0);
 		m_pFile->Seek(m_DataOffset);
 		return;
 	}
@@ -753,6 +752,12 @@ void CFLVSplitterFilter::NormalSeek(REFERENCE_TIME rt)
 	VideoTag vt;
 
 	while (ReadTag(t)) {
+		CBaseSplitterOutputPin* pOutPin = dynamic_cast<CBaseSplitterOutputPin*>(GetOutputPin(t.TagType));
+		if (!pOutPin) {
+			continue;
+		}
+		t.TimeStamp += (pOutPin->GetOffset() / 10000i64);
+
 		if (10000i64 * t.TimeStamp >= rt) {
 			m_pFile->Seek(m_pFile->GetPos() - 15);
 			break;
@@ -763,6 +768,13 @@ void CFLVSplitterFilter::NormalSeek(REFERENCE_TIME rt)
 
 	while (m_pFile->GetPos() >= m_DataOffset && (fAudio || fVideo) && ReadTag(t)) {
 		UINT64 prev = m_pFile->GetPos() - 15 - t.PreviousTagSize - 4;
+
+		CBaseSplitterOutputPin* pOutPin = dynamic_cast<CBaseSplitterOutputPin*>(GetOutputPin(t.TagType));
+		if (!pOutPin) {
+			continue;
+		}
+
+		t.TimeStamp += (pOutPin->GetOffset() / 10000i64);
 
 		if (10000i64 * t.TimeStamp <= rt) {
 			if (t.TagType == FLV_AUDIODATA && ReadTag(at)) {
@@ -776,7 +788,6 @@ void CFLVSplitterFilter::NormalSeek(REFERENCE_TIME rt)
 	}
 
 	if (fAudio || fVideo) {
-		ASSERT(0);
 		m_pFile->Seek(m_DataOffset);
 	}
 }

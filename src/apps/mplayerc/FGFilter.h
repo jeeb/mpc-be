@@ -24,12 +24,13 @@
 #pragma once
 
 #define MERIT64(merit)      (((UINT64)(merit)) << 16)
-#define MERIT64_DO_NOT_USE  MERIT64(MERIT_DO_NOT_USE)
-#define MERIT64_DO_USE      MERIT64(MERIT_DO_NOT_USE + 1)
+#define MERIT64_DO_NOT_USE  (MERIT64(MERIT_DO_NOT_USE))
+#define MERIT64_DO_USE      (MERIT64(MERIT_DO_NOT_USE + 1))
 #define MERIT64_UNLIKELY    (MERIT64(MERIT_UNLIKELY))
 #define MERIT64_NORMAL      (MERIT64(MERIT_NORMAL))
 #define MERIT64_PREFERRED   (MERIT64(MERIT_PREFERRED))
 #define MERIT64_ABOVE_DSHOW (MERIT64(1) << 32)
+#define MERIT64_PRIORITY    (MERIT64_ABOVE_DSHOW<<10)
 
 class CFGFilter
 {
@@ -64,6 +65,7 @@ public:
 	}
 	const CAtlList<GUID>& GetTypes() const;
 	void SetTypes(const CAtlList<GUID>& types);
+	void SetMerit(UINT64 merit);
 	void AddType(const GUID& majortype, const GUID& subtype);
 	bool CheckTypes(const CAtlArray<GUID>& types, bool fExactMatch);
 

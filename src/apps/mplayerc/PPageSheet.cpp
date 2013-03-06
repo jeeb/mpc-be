@@ -35,7 +35,7 @@ CPPageSheet::CPPageSheet(LPCTSTR pszCaption, IFilterGraph* pFG, CWnd* pParentWnd
 	, m_audioswitcher(pFG)
 	, m_bLockPage(false)
 {
-	SetTreeWidth(180);
+	SetTreeWidth(210);
 	AddPage(&m_player);
 	AddPage(&m_formats);
 	AddPage(&m_acceltbl);
@@ -50,6 +50,7 @@ CPPageSheet::CPPageSheet(LPCTSTR pszCaption, IFilterGraph* pFG, CWnd* pParentWnd
 	AddPage(&m_youtube);
 	AddPage(&m_internalfilters);
 	AddPage(&m_audioswitcher);
+	AddPage(&m_filterspriority);
 	AddPage(&m_filtersperformance);
 	AddPage(&m_externalfilters);
 	AddPage(&m_subtitles);

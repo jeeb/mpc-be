@@ -53,6 +53,11 @@ void CFGFilter::SetTypes(const CAtlList<GUID>& types)
 	m_types.AddTailList(&types);
 }
 
+void CFGFilter::SetMerit(UINT64 merit)
+{
+	m_merit.val = merit;
+}
+
 void CFGFilter::AddType(const GUID& majortype, const GUID& subtype)
 {
 	m_types.AddTail(majortype);

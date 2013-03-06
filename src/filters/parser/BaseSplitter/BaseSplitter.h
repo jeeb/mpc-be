@@ -143,6 +143,7 @@ private:
 	DWORD m_MinQueueSize, m_MaxQueueSize;
 
 protected:
+	REFERENCE_TIME m_rtPrev, m_rtOffset;
 	REFERENCE_TIME m_rtStart;
 
 	// override this if you need some second level stream specific demuxing (optional)
@@ -220,6 +221,8 @@ public:
 
 	STDMETHODIMP_(DWORD) GetCurrentBitRate() {return m_brs.nCurrentBitRate;}
 	STDMETHODIMP_(DWORD) GetAverageBitRate() {return m_brs.nAverageBitRate;}
+
+	REFERENCE_TIME GetOffset() { return m_rtOffset; }
 };
 
 class CBaseSplitterFilter

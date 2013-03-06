@@ -293,3 +293,5 @@
 #define IDS_RS_PERFOMANCE_MAXQUEUESIZE		_T("MaxQueueSize")
 #define IDS_RS_PERFOMANCE_MINQUEUEPACKETS	_T("MinQueuePackets")
 #define IDS_RS_PERFOMANCE_MAXQUEUEPACKETS	_T("MaxQueuePackets")
+
+#define IDS_RS_FILTERS_PRIORITY				_T("\\Filters Priority")

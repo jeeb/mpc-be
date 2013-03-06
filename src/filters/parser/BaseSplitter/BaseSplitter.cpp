@@ -367,6 +367,10 @@ HRESULT CBaseSplitterOutputPin::DeliverEndFlush()
 HRESULT CBaseSplitterOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
 {
 	m_brs.rtLastDeliverTime = Packet::INVALID_TIME;
+
+	m_rtPrev	= 0;
+	m_rtOffset	= 0;
+
 	if (m_fFlushing) {
 		return S_FALSE;
 	}
@@ -421,12 +425,7 @@ HRESULT CBaseSplitterOutputPin::QueuePacket(CAutoPtr<Packet> p)
 
 bool CBaseSplitterOutputPin::IsDiscontinuous()
 {
-	return m_mt.majortype		== MEDIATYPE_Text
-		   || m_mt.majortype	== MEDIATYPE_ScriptCommand
-		   || m_mt.majortype	== MEDIATYPE_Subtitle
-		   || m_mt.subtype		== MEDIASUBTYPE_DVD_SUBPICTURE
-		   || m_mt.subtype		== MEDIASUBTYPE_CVD_SUBPICTURE
-		   || m_mt.subtype		== MEDIASUBTYPE_SVCD_SUBPICTURE;
+	return CMediaTypeEx(m_mt).ValidateSubtitle();
 }
 
 bool CBaseSplitterOutputPin::IsActive()
@@ -514,6 +513,7 @@ DWORD CBaseSplitterOutputPin::ThreadProc()
 	}
 }
 
+#define MAX_PTS_SHIFT 50000000i64
 HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 {
 	HRESULT hr;
@@ -522,6 +522,21 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 
 	if (nBytes == 0) {
 		return S_OK;
+	}
+
+	if (p->rtStart != Packet::INVALID_TIME) {
+		REFERENCE_TIME rt = p->rtStart + m_rtOffset;
+
+		// Filter invalid PTS (if too different from previous packet)
+		if (!IsDiscontinuous() && m_rtPrev != Packet::INVALID_TIME)
+			if (_abs64(rt - m_rtPrev) > MAX_PTS_SHIFT) {
+				m_rtOffset += m_rtPrev - rt;
+			}
+
+		p->rtStart	+= m_rtOffset;
+		p->rtStop	+= m_rtOffset;
+
+		m_rtPrev	= p->rtStart;
 	}
 
 	m_brs.nBytesSinceLastDeliverTime += nBytes;

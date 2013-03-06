@@ -294,6 +294,45 @@ public:
 	CUIceClient();
 };
 
+
+class CFiltersPrioritySettings {
+	template <class T = CString, class S = CString>
+	class CAtlStringMap : public CAtlMap<S, T, CStringElementTraits<S> > {};
+
+public:
+	CAtlStringMap<CLSID> values;
+
+	CFiltersPrioritySettings() {
+		SetDefault();
+	}
+	void SetDefault() {
+		static CString formats[] = {_T("avi"), _T("mkv"), _T("mpegts"), _T("mpeg"), _T("mp4"), _T("flv")};
+
+		values.RemoveAll();
+		for (size_t i = 0; i < _countof(formats); i++) {
+			values[formats[i]] = CLSID_NULL;
+		}
+	};
+
+	void LoadSettings() {
+		SetDefault();
+
+		POSITION pos = values.GetStartPosition();
+		while (pos) {
+			CAtlStringMap<CLSID>::CPair* pPair = values.GetNext(pos);
+			pPair->m_value = GUIDFromCString(AfxGetApp()->GetProfileString(IDS_R_SETTINGS IDS_RS_FILTERS_PRIORITY, pPair->m_key, CStringFromGUID(pPair->m_value)));
+		}
+	};
+
+	void SaveSettings() {
+		POSITION pos = values.GetStartPosition();
+		while (pos) {
+			CAtlStringMap<CLSID>::CPair* pPair = values.GetNext(pos);
+			AfxGetApp()->WriteProfileString(IDS_R_SETTINGS IDS_RS_FILTERS_PRIORITY, pPair->m_key, CStringFromGUID(pPair->m_value));
+		}
+	};
+};
+
 class CPerfomanceSettings {
 public:
 	void SetDefault() {
@@ -731,5 +770,7 @@ private:
 	friend	void	CRenderersSettings::UpdateData(bool bSave);
 
 public:
-	CPerfomanceSettings	PerfomanceSettings;
+	CPerfomanceSettings			PerfomanceSettings;
+	CFiltersPrioritySettings	FiltersPrioritySettings;
+
 };

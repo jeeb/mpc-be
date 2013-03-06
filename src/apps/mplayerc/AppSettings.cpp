@@ -460,6 +460,7 @@ void CAppSettings::SaveSettings()
 	}
 
 	PerfomanceSettings.SaveSettings();
+	FiltersPrioritySettings.SaveSettings();
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_HIDECAPTIONMENU, iCaptionMenuMode);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_HIDENAVIGATION, fHideNavigation);
@@ -916,6 +917,7 @@ void CAppSettings::LoadSettings()
 	CreateCommands();
 
 	PerfomanceSettings.LoadSettings();
+	FiltersPrioritySettings.LoadSettings();
 
 	iCaptionMenuMode = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_HIDECAPTIONMENU, MODE_SHOWCAPTIONMENU);
 	fHideNavigation = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_HIDENAVIGATION, 0);

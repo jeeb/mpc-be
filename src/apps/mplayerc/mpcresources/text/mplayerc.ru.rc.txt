@@ -207,6 +207,16 @@ BEGIN DIALOGEX IDD_PPAGEFILTERSPERFORMANCE LINES 23
 22		"По умолчанию"
 END
 
+BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 18
+11		"AVI:"
+12		"MKV:"
+13		"MPEG-TS:"
+14		"MPEG-PS:"
+15		"MP4:"
+16		"FLV:"
+17		"Фильтры источников"
+END
+
 BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 30
 6		"Расширения файлов"
 8		"По умолчанию"
@@ -1131,6 +1141,7 @@ STRING IDD_PPAGECAPTURE		"Воспроизведение::Захват"
 STRING IDD_PPAGEDVD		"Воспроизведение::DVD/OGM"
 STRING IDD_PPAGEEXTERNALFILTERS		"Внешние фильтры"
 STRING IDD_PPAGEFILTERSPERFORMANCE		"Встроенные фильтры::Производительность"
+STRING IDD_PPAGEFILTERSPRIORITY		"Встроенные фильтры::Управление приоритетами"
 STRING IDD_PPAGEFORMATS		"Проигрыватель::Форматы"
 STRING IDD_PPAGEFULLSCREEN		"Воспроизведение::Полный экран"
 STRING IDD_PPAGEINTERFACE		"Интерфейс"

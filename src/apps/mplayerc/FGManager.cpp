@@ -42,6 +42,7 @@
 #include <evr9.h>
 #include <ksproxy.h>
 #include <moreuuids.h>
+#include "MediaFormats.h"
 
 #include "../../filters/renderer/VideoRenderers/IPinHook.h"
 
@@ -197,8 +198,6 @@ CFGFilter *LookupFilterRegistry(const GUID &guid, CAtlList<CFGFilter*> &list, UI
 
 HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl)
 {
-	// TODO: use overrides
-
 	CheckPointer(lpcwstrFileName, E_POINTER);
 
 	fl.RemoveAll();
@@ -274,23 +273,69 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 		}
 	}
 
-	// add an external preferred filter
-	POSITION pos = m_override.GetHeadPosition();
-	while (pos) {
-		CFGFilter* pFGF = m_override.GetNext(pos);
-		if (pFGF->GetMerit() >= MERIT64_ABOVE_DSHOW) { // FilterOverride::PREFERRED
-			if (ext == _T(".avi")) {
-				CLSID clsid = pFGF->GetCLSID();
-				if (clsid == GUIDFromCString(_T("{55DA30FC-F16B-49FC-BAA5-AE59FC65F82D}")) || clsid == GUIDFromCString(_T("{564FD788-86C9-4444-971E-CC4A243DA150}"))) {
-					// skip Haali Source for .avi files
-					TRACE(_T("FGM: EnumSourceFilters() : skip '%ws' on file '%ws'\n"), CStringFromGUID(pFGF->GetCLSID()), lpcwstrFileName);
-					continue;
+	{
+		// add an external preferred filter
+		POSITION pos = m_override.GetHeadPosition();
+		while (pos) {
+			CFGFilter* pFGF = m_override.GetNext(pos);
+			if (pFGF->GetMerit() >= MERIT64_ABOVE_DSHOW) { // FilterOverride::PREFERRED
+				/*
+				if (ext == _T(".avi")) {
+					CLSID clsid = pFGF->GetCLSID();
+					if (clsid == GUIDFromCString(_T("{55DA30FC-F16B-49FC-BAA5-AE59FC65F82D}")) || clsid == GUIDFromCString(_T("{564FD788-86C9-4444-971E-CC4A243DA150}"))) {
+						// skip Haali Source for .avi files
+						TRACE(_T("FGM: EnumSourceFilters() : skip '%ws' on file '%ws'\n"), CStringFromGUID(pFGF->GetCLSID()), lpcwstrFileName);
+						continue;
+					}
+				}
+				*/
+
+				fl.Insert(pFGF, 0, false, false);
+			}
+		}
+	}
+
+	{
+		// Filters Priority
+		AppSettings& s = AfxGetAppSettings();	
+		CMediaFormatCategory* mfc = AfxGetAppSettings().m_Formats.FindMediaByExt(ext);
+		if (mfc) {
+			CString type = mfc->GetLabel();
+			CLSID clsid_value = CLSID_NULL;
+			if (s.FiltersPrioritySettings.values.Lookup(type, clsid_value) && clsid_value != CLSID_NULL) {
+				POSITION pos = m_override.GetHeadPosition();
+				while (pos) {
+					CFGFilter* pFGF = m_override.GetNext(pos);
+					if (pFGF->GetCLSID() == clsid_value) {
+						pFGF->SetMerit(MERIT64_PRIORITY);
+						fl.Insert(pFGF, 0, false, false);
+
+						const CAtlList<GUID>& types = pFGF->GetTypes();
+						if (types.GetCount()) {
+							bool bIsSplitter = true;
+							POSITION pos = types.GetHeadPosition();
+							while (pos) {
+								CLSID major	= types.GetNext(pos);
+								CLSID sub	= types.GetNext(pos);
+
+								if (major != MEDIATYPE_Stream) {
+									bIsSplitter = false;
+									break;
+								}
+							}
+							if (bIsSplitter) {
+								CFGFilter* pFGF = LookupFilterRegistry(CLSID_AsyncReader, m_override, MERIT64_PRIORITY - 1);
+								pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_NULL);
+								fl.Insert(pFGF, 0);
+							}
+						}
+
+						break;
+					}
 				}
 			}
-
-			fl.Insert(pFGF, 0, false, false);
 		}
-	}	
+	}
 
 	// external
 	{
@@ -828,6 +873,14 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 			}
 
 			hr = ConnectFilterDirect(pPinOut, pBF, NULL);
+
+			if (FAILED(hr)) {
+				if (pFGF->GetMerit() == MERIT64_PRIORITY) {
+					TRACE(_T("FGM: Connecting priority filter '%s' FAILED!\n"), pFGF->GetName());
+					return 0xDEAD;
+				}
+			}
+
 			/*
 			if (FAILED(hr))
 			{
@@ -1015,8 +1068,11 @@ STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlay
 			m_streampath.RemoveAll();
 			m_deadends.RemoveAll();
 
-			if (SUCCEEDED(hr = ConnectFilter(pBF, NULL))) {
-				return hr;
+			hr = ConnectFilter(pBF, NULL);
+			if (hr == 0xDEAD) {
+				; // TODO
+			} else if (SUCCEEDED(hr)) {
+				return hr;			
 			}
 
 			NukeDownstream(pBF);
@@ -1234,6 +1290,9 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 			m_streampath.Append(pBF, pPin);
 
 			HRESULT hr = Connect(pPin, pPinIn);
+			if (hr == 0xDEAD) {
+				return hr;
+			}
 
 			if (SUCCEEDED(hr)) {
 				for (int i = m_deadends.GetCount()-1; i >= 0; i--)

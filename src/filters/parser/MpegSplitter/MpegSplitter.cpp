@@ -1133,9 +1133,6 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 
 			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CMpegSplitterOutputPin(mts, str, this, this, &hr, m_pFile->m_type, (i != CMpegSplitterFile::video) ? 5 : 1));
-			if (i == CMpegSplitterFile::subpic) {
-				(static_cast<CMpegSplitterOutputPin*>(pPinOut.m_p))->SetMaxShift (_I64_MAX);
-			}
 
 			if (i == CMpegSplitterFile::audio) {
 				if (!cs_audioProgram.IsEmpty()) {
@@ -1813,7 +1810,6 @@ CMpegSourceFilter::CMpegSourceFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLSID& 
 CMpegSplitterOutputPin::CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int type, int QueueMaxPackets)
 	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr, 0, QueueMaxPackets)
 	, m_fHasAccessUnitDelimiters(false)
-	, m_rtMaxShift(50000000)
 	, m_bFilterDTSMA(false)
 	, m_type(type)
 	, DD_reset(false)
@@ -1840,16 +1836,6 @@ HRESULT CMpegSplitterOutputPin::Flush()
 	return S_OK;
 }
 
-HRESULT CMpegSplitterOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
-{
-	CAutoLock cAutoLock(this);
-
-	m_rtPrev	= 0;
-	m_rtOffset	= 0;
-
-	return __super::DeliverNewSegment(tStart, tStop, dRate);
-}
-
 HRESULT CMpegSplitterOutputPin::DeliverEndFlush()
 {
 	CAutoLock cAutoLock(this);
@@ -1865,21 +1851,6 @@ HRESULT CMpegSplitterOutputPin::DeliverEndFlush()
 HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 {
 	CAutoLock cAutoLock(this);
-
-	if (p->rtStart != Packet::INVALID_TIME) {
-		REFERENCE_TIME rt = p->rtStart + m_rtOffset;
-
-		// Filter invalid PTS (if too different from previous packet)
-		if (m_rtPrev != Packet::INVALID_TIME)
-			if (_abs64(rt - m_rtPrev) > m_rtMaxShift) {
-				m_rtOffset += m_rtPrev - rt;
-			}
-
-		p->rtStart	+= m_rtOffset;
-		p->rtStop	+= m_rtOffset;
-
-		m_rtPrev	= p->rtStart;
-	}
 
 	if (p->pmt) {
 		if (*((CMediaType *)p->pmt) != m_mt) {
