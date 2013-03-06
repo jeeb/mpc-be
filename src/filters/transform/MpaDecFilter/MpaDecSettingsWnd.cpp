@@ -56,6 +56,7 @@ bool CMpaDecSettingsWnd::OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>
 	m_mixer_layout = m_pMDF->GetMixerLayout();
 	m_drc          = m_pMDF->GetDynamicRangeControl();
 	m_spdif_ac3    = m_pMDF->GetSPDIF(IMpaDecFilter::ac3);
+	m_spdif_eac3   = m_pMDF->GetSPDIF(IMpaDecFilter::eac3);
 	m_spdif_dts    = m_pMDF->GetSPDIF(IMpaDecFilter::dts);
 	m_spdif_dtshd  = m_pMDF->GetSPDIF(IMpaDecFilter::dtshd);
 #if ENABLE_AC3_ENCODER
@@ -80,7 +81,7 @@ bool CMpaDecSettingsWnd::OnActivate()
 	CPoint p(10, 10);
 	CRect r;
 
-	m_outfmt_group.Create(ResStr(IDS_MPADEC_SAMPLE_FMT), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(225), h20 + h20)), this, (UINT)IDC_STATIC);
+	m_outfmt_group.Create(ResStr(IDS_MPADEC_SAMPLE_FMT), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(215), h20 + h20)), this, (UINT)IDC_STATIC);
 	p.y += h20;
 	m_outfmt_i16_check.Create(_T("Int16"), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_CHECK_I16);
 	m_outfmt_i24_check.Create(_T("Int24"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(IPP_SCALE(50), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_CHECK_I24);
@@ -96,12 +97,12 @@ bool CMpaDecSettingsWnd::OnActivate()
 	m_drc_check.SetCheck(m_drc);
 	p.y += h25;
 
-	m_mixer_group.Create(_T(""), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(225), h20 + h25)), this, (UINT)IDC_STATIC);
+	m_mixer_group.Create(_T(""), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(215), h20 + h25)), this, (UINT)IDC_STATIC);
 	m_mixer_check.Create(ResStr(IDS_MPADEC_MIXER), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(60), m_fontheight)), this, IDC_PP_CHECK_MIXER);
 	m_mixer_check.SetCheck(m_mixer);
 	p.y += h20;
-	m_mixer_layout_static.Create(ResStr(IDS_MPADEC_MIX_SPEAKERS), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(130), m_fontheight)), this);
-	m_mixer_layout_combo.Create(dwStyle | CBS_DROPDOWNLIST, CRect(p + CPoint(IPP_SCALE(135), -4), CSize(IPP_SCALE(80), 200)), this, IDC_PP_COMBO_MIXLAYOUT);
+	m_mixer_layout_static.Create(ResStr(IDS_MPADEC_MIX_SPEAKERS), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(120), m_fontheight)), this);
+	m_mixer_layout_combo.Create(dwStyle | CBS_DROPDOWNLIST, CRect(p + CPoint(IPP_SCALE(125), -4), CSize(IPP_SCALE(80), 200)), this, IDC_PP_COMBO_MIXLAYOUT);
 	m_mixer_layout_combo.SetItemData(m_mixer_layout_combo.AddString(ResStr(IDS_MPADEC_MONO)),   SPK_MONO);
 	m_mixer_layout_combo.SetItemData(m_mixer_layout_combo.AddString(ResStr(IDS_MPADEC_STEREO)), SPK_STEREO);
 	m_mixer_layout_combo.SetItemData(m_mixer_layout_combo.AddString(_T("4.0")), SPK_4_0);
@@ -118,12 +119,15 @@ bool CMpaDecSettingsWnd::OnActivate()
 	ScreenToClient(r);
 	p.y += h30;
 
-	m_spdif_group.Create(ResStr(IDS_MPADEC_SPDIF), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(225), h20 + h20 + h20)), this, (UINT)IDC_STATIC);
+	m_spdif_group.Create(ResStr(IDS_MPADEC_SPDIF), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(215), h20 + h20 * 3)), this, (UINT)IDC_STATIC);
 	p.y += h20;
 	m_spdif_ac3_check.Create(_T("AC-3"), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_CHECK_SPDIF_AC3);
-	m_spdif_dts_check.Create(_T("DTS"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(IPP_SCALE(50), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_CHECK_SPDIF_DTS);
+	m_spdif_dts_check.Create(_T("DTS"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(IPP_SCALE(100), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_CHECK_SPDIF_DTS);
+	p.y += h20;
+	m_spdif_eac3_check.Create(_T("E-AC3"), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(50), m_fontheight)), this, IDC_PP_CHECK_SPDIF_EAC3);
 	m_spdif_dtshd_check.Create(_T("DTS-HD"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(IPP_SCALE(100), 0), CSize(IPP_SCALE(60), m_fontheight)), this, IDC_PP_CHECK_SPDIF_DTSHD);
 	m_spdif_ac3_check.SetCheck(m_spdif_ac3);
+	m_spdif_eac3_check.SetCheck(m_spdif_eac3);
 	m_spdif_dts_check.SetCheck(m_spdif_dts);
 	m_spdif_dtshd_check.SetCheck(m_spdif_dtshd);
 #if ENABLE_AC3_ENCODER
@@ -153,6 +157,7 @@ void CMpaDecSettingsWnd::OnDeactivate()
 	m_mixer_layout = (int)m_mixer_layout_combo.GetItemData(m_mixer_layout_combo.GetCurSel());
 	m_drc          = !!m_drc_check.GetCheck();
 	m_spdif_ac3    = !!m_spdif_ac3_check.GetCheck();
+	m_spdif_eac3   = !!m_spdif_eac3_check.GetCheck();
 	m_spdif_dts    = !!m_spdif_dts_check.GetCheck();
 	m_spdif_dtshd  = !!m_spdif_dtshd_check.GetCheck();
 #if ENABLE_AC3_ENCODER
@@ -173,6 +178,7 @@ bool CMpaDecSettingsWnd::OnApply()
 		m_pMDF->SetMixerLayout(m_mixer_layout);
 		m_pMDF->SetDynamicRangeControl(m_drc);
 		m_pMDF->SetSPDIF(IMpaDecFilter::ac3, m_spdif_ac3);
+		m_pMDF->SetSPDIF(IMpaDecFilter::eac3, m_spdif_eac3);
 		m_pMDF->SetSPDIF(IMpaDecFilter::dts, m_spdif_dts);
 		m_pMDF->SetSPDIF(IMpaDecFilter::dtshd, m_spdif_dtshd);
 #if ENABLE_AC3_ENCODER

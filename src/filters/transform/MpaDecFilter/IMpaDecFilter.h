@@ -36,6 +36,7 @@ IMpaDecFilter :
 public IUnknown {
 	enum enctype {
 		ac3 = 0,
+		eac3,
 		dts,
 		dtshd,
 #if ENABLE_AC3_ENCODER

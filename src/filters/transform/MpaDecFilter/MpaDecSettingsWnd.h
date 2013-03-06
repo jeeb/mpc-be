@@ -41,6 +41,7 @@ class __declspec(uuid("24103041-884B-4772-B0D3-A600E7CBFEC7"))
 	int  m_mixer_layout;
 	bool m_drc;
 	bool m_spdif_ac3;
+	bool m_spdif_eac3;
 	bool m_spdif_dts;
 	bool m_spdif_dtshd;
 #if ENABLE_AC3_ENCODER
@@ -56,6 +57,7 @@ class __declspec(uuid("24103041-884B-4772-B0D3-A600E7CBFEC7"))
 		IDC_PP_CHECK_MIXER,
 		IDC_PP_CHECK_DRC,
 		IDC_PP_CHECK_SPDIF_AC3,
+		IDC_PP_CHECK_SPDIF_EAC3,
 		IDC_PP_CHECK_SPDIF_DTS,
 		IDC_PP_CHECK_SPDIF_DTSHD,
 #if ENABLE_AC3_ENCODER
@@ -78,6 +80,7 @@ class __declspec(uuid("24103041-884B-4772-B0D3-A600E7CBFEC7"))
 
 	CButton   m_spdif_group;
 	CButton   m_spdif_ac3_check;
+	CButton   m_spdif_eac3_check;
 	CButton   m_spdif_dts_check;
 	CButton   m_spdif_dtshd_check;
 #if ENABLE_AC3_ENCODER

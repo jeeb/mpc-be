@@ -103,6 +103,7 @@ protected:
 	HRESULT ProcessLPCM();
 	HRESULT ProcessHdmvLPCM(bool bAlignOldBuffer);
 	HRESULT ProcessAC3_SPDIF();
+	HRESULT ProcessEAC3_SPDIF();
 	HRESULT ProcessDTS_SPDIF();
 	HRESULT ProcessPS2PCM();
 	HRESULT ProcessPS2ADPCM();
