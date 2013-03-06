@@ -490,9 +490,6 @@ static int update_context_from_user(AVCodecContext *dst, AVCodecContext *src)
 
     dst->frame_number     = src->frame_number;
     dst->reordered_opaque = src->reordered_opaque;
-    // ==> Start patch MPC
-    dst->reordered_opaque2 = src->reordered_opaque2;
-    // ==> End patch MPC
     dst->thread_safe_callbacks = src->thread_safe_callbacks;
 
     if (src->slice_count && src->slice_offset) {

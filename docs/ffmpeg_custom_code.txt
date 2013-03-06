@@ -14,7 +14,6 @@
 * libavcodec/mpeg12.h
 * libavcodec/mpegvideo.c
 * libavcodec/pthread.c
-* libavcodec/utils.c
 * libavcodec/vc1dec.c
 * libavcodec/vorbis.c
 

@@ -1975,6 +1975,8 @@ void copyPlane(BYTE *dstp, stride_t dst_pitch, const BYTE *srcp, stride_t src_pi
 	}
 }
 
+#define PULLDOWN_FLAG (m_nCodecId == AV_CODEC_ID_VC1 && (m_bFrame_repeat_pict || m_bIsEVO) && m_rtAvrTimePerFrame == 333666)
+
 HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
 {
 	HRESULT			hr = S_OK;
@@ -2013,7 +2015,6 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			avpkt.data = m_pFFBuffer;
 			avpkt.size = nSize;
 			avpkt.pts  = rtStart;
-			avpkt.dts  = rtStop;
 			avpkt.flags = AV_PKT_FLAG_KEY;
 		} else {
 			avpkt.data = NULL;
@@ -2077,24 +2078,22 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			return hr;
 		}
 
-		if (m_nCodecId == AV_CODEC_ID_THEORA || (m_nCodecId == AV_CODEC_ID_VP8 && m_rtAvrTimePerFrame == 10000)) { // need more tests
-			rtStart = m_pFrame->pkt_pts;
-			rtStop = m_pFrame->pkt_dts;
-		} else if ((m_nCodecId == AV_CODEC_ID_RV10 || m_nCodecId == AV_CODEC_ID_RV20) && m_pFrame->pict_type == AV_PICTURE_TYPE_B) {
+		if ((m_nCodecId == AV_CODEC_ID_RV10 || m_nCodecId == AV_CODEC_ID_RV20) && m_pFrame->pict_type == AV_PICTURE_TYPE_B) {
 			rtStart = m_rtPrevStop;
-			rtStop = rtStart + m_rtAvrTimePerFrame;
 		} else if ((m_nCodecId == AV_CODEC_ID_RV30 || m_nCodecId == AV_CODEC_ID_RV40) && avpkt.data) {
-			rtStart = m_pFrame->reordered_opaque;
+			rtStart = m_pFrame->pkt_pts;
 			rtStart = (rtStart == _I64_MIN) ? m_rtPrevStop : (10000i64*process_rv_timestamp(&rm, m_nCodecId, avpkt.data, (rtStart + m_rtStart)/10000i64) - m_rtStart);
-			rtStop = rtStart + m_rtAvrTimePerFrame;
-		} else if (!(m_nCodecId == AV_CODEC_ID_VC1 && m_bFrame_repeat_pict && m_rtAvrTimePerFrame == 333666)) {
-			rtStart = m_pFrame->reordered_opaque;
-			rtStop  = m_pFrame->reordered_opaque2;
+		} else if (!PULLDOWN_FLAG) {
+			rtStart = m_pFrame->pkt_pts;
+		}
+
+		ReorderBFrames(rtStart, rtStop);
+
+		if (!PULLDOWN_FLAG) {
+			UpdateFrameTime(rtStart, rtStop, m_bFrame_repeat_pict);
 		}
 
 		m_rtPrevStop = rtStop;
-
-		ReorderBFrames(rtStart, rtStop);
 
 		pOut->SetTime(&rtStart, &rtStop);
 		pOut->SetMediaTime(NULL, NULL);
@@ -2278,12 +2277,9 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 		rtStart = rtStop = _I64_MIN;
 	}
 
-	if (m_nDXVAMode == MODE_SOFTWARE || (m_nCodecId == AV_CODEC_ID_VC1 && !m_bIsEVO)) {
+	if (m_nDXVAMode == MODE_SOFTWARE && PULLDOWN_FLAG) {
 		UpdateFrameTime(rtStart, rtStop, m_bFrame_repeat_pict);
 	}
-
-	m_pAVCtx->reordered_opaque  = rtStart;
-	m_pAVCtx->reordered_opaque2 = rtStop;
 
 	if (m_pAVCtx->has_b_frames) {
 		m_BFrames[m_nPosB].rtStart	= rtStart;

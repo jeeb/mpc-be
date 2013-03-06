@@ -1398,9 +1398,6 @@ typedef struct AVFrame {
      * - decoding: Read by user.
      */
     int64_t reordered_opaque;
-// ==> Start patch MPC
-    int64_t reordered_opaque2;
-// <== End patch MPC
 
     /**
      * hardware accelerator private data (FFmpeg-allocated)
@@ -2856,9 +2853,6 @@ typedef struct AVCodecContext {
      * - decoding: Set by user.
      */
     int64_t reordered_opaque;
-// ==> Start patch MPC
-    int64_t reordered_opaque2;
-// ==> End patch MPC
 
     /**
      * Hardware accelerator in use
