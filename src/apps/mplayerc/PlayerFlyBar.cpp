@@ -189,8 +189,11 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 		pFrame->OnClose();
 	} else if (r_MinIcon.PtInRect(p)) {
 		pFrame->m_fTrayIcon ? pFrame->SendMessage(WM_SYSCOMMAND, SC_MINIMIZE, -1) : pFrame->ShowWindow(SW_SHOWMINIMIZED);
-	} else if (r_RestoreIcon.PtInRect(p) && !pFrame->m_fFullScreen) {
-		if (wp.showCmd == SW_SHOWMAXIMIZED) {
+	} else if (r_RestoreIcon.PtInRect(p)) {
+		if (wp.showCmd != SW_SHOWMAXIMIZED && pFrame->m_fFullScreen) {
+			pFrame->ToggleFullscreen(true, true);
+			pFrame->ShowWindow(SW_SHOWMAXIMIZED);
+		} else if (wp.showCmd == SW_SHOWMAXIMIZED) {
 			pFrame->ShowWindow(SW_SHOWNORMAL);
 		} else if (wp.showCmd != SW_SHOWMAXIMIZED) {
 			pFrame->ShowWindow(SW_SHOWMAXIMIZED);
@@ -205,7 +208,7 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 			pFrame->OnFileProperties();
 		}
 		Invalidate();
-	} else if (r_FSIcon.PtInRect(p) && wp.showCmd != SW_SHOWMAXIMIZED) {
+	} else if (r_FSIcon.PtInRect(p)) {
 		pFrame->ToggleFullscreen(true, true);
 		Invalidate();
 	} else if (r_LockIcon.PtInRect(p)) {
@@ -300,7 +303,6 @@ void CFlyBar::OnPaint()
 
 		CRect rcBar;
 		GetClientRect(&rcBar);
-		ClientToScreen(&rcBar);
 		int x = rcBar.Width();
 
 		CMainFrame* pFrame	= (CMainFrame*)GetParentFrame();
@@ -314,6 +316,7 @@ void CFlyBar::OnPaint()
 		bm.CreateCompatibleBitmap(&dc, x, rcBar.Height());
 		CBitmap* pOldBm = mdc.SelectObject(&bm);
 		mdc.SetBkMode(TRANSPARENT);
+		mdc.FillSolidRect(rcBar, RGB(0,0,0));
 
 		int sep[][2] = {{0,1},{13,14},{15,16},{12,12},{10,11},{17,18},{5,6},{7,7},{21,22},{4,4},{2,3},{8,9},{19,20}};
 
@@ -331,7 +334,7 @@ void CFlyBar::OnPaint()
 				if (wp.showCmd == SW_SHOWMAXIMIZED) {
 					DrawButton(&mdc, x, sep[2][i], 2);
 				} else if (pFrame->m_fFullScreen) {
-					DrawButton(&mdc, x, sep[3][i], 2);
+					DrawButton(&mdc, x, sep[4][i], 2);
 				} else {
 					DrawButton(&mdc, x, sep[4][i], 2);
 				}
@@ -353,7 +356,7 @@ void CFlyBar::OnPaint()
 				if (pFrame->m_fFullScreen) {
 					DrawButton(&mdc, x, sep[8][i], 4);
 				} else if (wp.showCmd == SW_SHOWMAXIMIZED || (s.IsD3DFullscreen() && fs != -1)) {
-					DrawButton(&mdc, x, sep[9][i], 4);
+					DrawButton(&mdc, x, sep[10][i], 4);
 				} else {
 					DrawButton(&mdc, x, sep[10][i], 4);
 				}

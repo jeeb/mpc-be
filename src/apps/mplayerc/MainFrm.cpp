@@ -1413,11 +1413,11 @@ void CMainFrame::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 void CMainFrame::CreateFlyBar()
 {
 	if (AfxGetAppSettings().fFlybar) {
-		if (!m_wndFlyBar.CreateEx(WS_EX_TOPMOST|WS_EX_TRANSPARENT, AfxRegisterWndClass(0), NULL, WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS, CRect(0, 0, 0, 0), this, 0, NULL)) {
-			TRACE(_T("Failed to create Flybar Window\n"));
+		if (!m_wndFlyBar.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL, WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS, CRect(0, 0, 0, 0), this, 0, NULL)) {
+		TRACE(_T("Failed to create Flybar Window\n"));
 		}
 		SetWindowLongPtr(m_wndFlyBar.m_hWnd, GWL_EXSTYLE, WS_EX_LAYERED);
-		m_wndFlyBar.SetLayeredWindowAttributes(0, 150, LWA_ALPHA);
+		m_wndFlyBar.SetLayeredWindowAttributes(RGB(255,0,255), 150, LWA_ALPHA|LWA_COLORKEY);
 
 		if (AfxGetAppSettings().fFlybarOnTop) {
 			m_wndFlyBar.ShowWindow(SW_SHOWNOACTIVATE);
@@ -1584,7 +1584,10 @@ void CMainFrame::ClipRectToMonitor(LPRECT prc)
 	prc->top    = max(rcWork.top,  min(rcWork.bottom-h, cur_pos.y - (h/2)));
 	prc->right  = prc->left + w;
 	prc->bottom = prc->top  + h;
-
+	rc_forceNP.left = prc->left;
+	rc_forceNP.right = prc->right;
+	rc_forceNP.top = prc->top;
+	rc_forceNP.bottom = prc->bottom;
 }
 
 void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)
@@ -1655,6 +1658,21 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 			GetWindowRect(s.rcLastWindowPos);
 		}
 		s.nLastWindowType = nType;
+	}
+
+	// maximized window in MODE_FRAMEONLY|MODE_BORDERLESS is not correct;
+	AppSettings& s = AfxGetAppSettings();
+	if (nType == SIZE_MAXIMIZED && (s.iCaptionMenuMode == MODE_FRAMEONLY || s.iCaptionMenuMode == MODE_BORDERLESS)) {
+		CRect r; GetWindowRect(&r);
+		MONITORINFO mi; mi.cbSize = sizeof(mi);
+		GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
+		RECT rcWork = mi.rcWork;
+		r.bottom = rcWork.bottom;
+		if (s.iCaptionMenuMode == MODE_FRAMEONLY) {
+			SetWindowPos(NULL, r.left, r.top, r.right - r.left, r.bottom - r.top + GetSystemMetrics(SM_CYSIZEFRAME), SWP_NOZORDER|SWP_NOACTIVATE);
+		} else if (s.iCaptionMenuMode == MODE_BORDERLESS) {
+			SetWindowPos(NULL, r.left, r.top, r.right - r.left, r.bottom - r.top, SWP_NOZORDER|SWP_NOACTIVATE);
+		}
 	}
 
 	FlyBarSetPos();
@@ -1826,6 +1844,8 @@ void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
 		if (m_fAudioOnly && m_DwmSetIconicLivePreviewBitmapFnc) {
 			isWindowMinimized = false;
 		}
+	} else if ((nID & 0xFFF0) == SC_MAXIMIZE && m_fFullScreen) {
+		ToggleFullscreen(true, true);
 	}
 
 	__super::OnSysCommand(nID, lParam);
@@ -3456,6 +3476,18 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 	CWnd* w = GetCapture();
 	if (w && w->m_hWnd == m_hWnd && (nFlags & MK_LBUTTON) && templclick) {
 		ReleaseCapture();
+		
+		if (AfxGetAppSettings().iCaptionMenuMode == MODE_BORDERLESS) {
+			WINDOWPLACEMENT wp;
+			GetWindowPlacement(&wp);
+			if (wp.showCmd == SW_SHOWMAXIMIZED) {
+				SendMessage(WM_SYSCOMMAND, SC_RESTORE, -1);
+				RECT r;	GetWindowRect(&r);
+				ClipRectToMonitor(&r);
+				SetWindowPos(NULL, rc_forceNP.left, rc_forceNP.top, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+			}
+		}
+
 		SendMessage(WM_NCLBUTTONDOWN, HTCAPTION, NULL);
  	}
 	templclick = true;
@@ -11045,6 +11077,13 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 	ModifyStyleEx(dwRemoveEx, dwAddEx, SWP_NOZORDER);
 	::SetMenu(m_hWnd, hMenu);
 
+	if (IsZoomed() && m_fFullScreen) {
+		bWndWasZoomed = true;
+		WINDOWPLACEMENT wp; GetWindowPlacement(&wp);
+		rc_NP = wp.rcNormalPosition;
+		ShowWindow(SW_RESTORE);
+	}
+
 	static bool m_Change_Monitor = false;
 	// try disable shader when move from one monitor to other ...
 	if (m_fFullScreen) {
@@ -11152,6 +11191,14 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 
 	if ((m_Change_Monitor) && (!m_bToggleShader || !m_bToggleShaderScreenSpace)) { // Enabled shader ...
 		SetShaders();
+	}
+
+	 if (bWndWasZoomed && !m_fFullScreen) {
+		bWndWasZoomed = false;
+		WINDOWPLACEMENT wp;	GetWindowPlacement(&wp);
+		wp.rcNormalPosition = rc_NP;
+		SetWindowPlacement(&wp);
+		ShowWindow(SW_MAXIMIZE);
 	}
 }
 
