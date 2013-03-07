@@ -61,7 +61,7 @@ void CPPagePlayer::DoDataExchange(CDataExchange* pDX)
 	__super::DoDataExchange(pDX);
 
 	DDX_Radio(pDX, IDC_RADIO1, m_iAllowMultipleInst);
-	DDX_Radio(pDX, IDC_RADIO3, m_iTitleBarTextStyle);
+	DDX_Radio(pDX, IDC_RADIO4, m_iTitleBarTextStyle);
 	DDX_Check(pDX, IDC_CHECK13, m_bTitleBarTextTitle);
 	//DDX_Check(pDX, IDC_CHECK2, m_iAlwaysOnTop);
 	DDX_Check(pDX, IDC_CHECK3, m_fTrayIcon);
@@ -94,7 +94,7 @@ BOOL CPPagePlayer::OnInitDialog()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	m_iAllowMultipleInst = s.fAllowMultipleInst;
+	m_iAllowMultipleInst = s.iAllowMultipleInst;
 	m_iTitleBarTextStyle = s.iTitleBarTextStyle;
 	m_bTitleBarTextTitle = s.fTitleBarTextTitle;
 	m_iAlwaysOnTop = s.iOnTop;
@@ -127,7 +127,7 @@ BOOL CPPagePlayer::OnApply()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	s.fAllowMultipleInst = !!m_iAllowMultipleInst;
+	s.iAllowMultipleInst = m_iAllowMultipleInst;
 	s.iTitleBarTextStyle = m_iTitleBarTextStyle;
 	s.fTitleBarTextTitle = !!m_bTitleBarTextTitle;
 	s.iOnTop = m_iAlwaysOnTop;

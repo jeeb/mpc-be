@@ -1053,8 +1053,10 @@ BOOL CMPlayerCApp::InitInstance()
 
 	m_mutexOneInstance.Create(NULL, TRUE, _T(MPC_WND_CLASS_NAME));
 
-	if ( GetLastError() == ERROR_ALREADY_EXISTS &&
-			(!(m_s.GetAllowMultiInst() || m_s.nCLSwitches&CLSW_NEW || m_cmdln.IsEmpty()) || m_s.nCLSwitches&CLSW_ADD) ) {
+	if ( GetLastError() == ERROR_ALREADY_EXISTS && !(m_s.nCLSwitches&CLSW_NEW) &&
+			(m_s.nCLSwitches&CLSW_ADD ||
+			m_s.GetAllowMultiInst() == 0 && !m_cmdln.IsEmpty() ||
+			m_s.GetAllowMultiInst() == 2) ) {
 
 		DWORD res = WaitForSingleObject(m_mutexOneInstance.m_h, 5000);
 		if (res == WAIT_OBJECT_0 || res == WAIT_ABANDONED) {

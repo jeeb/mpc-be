@@ -215,15 +215,17 @@ IDD_PPAGEPLAYER DIALOGEX 0, 0, 296, 241
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Open options",IDC_STATIC,5,5,115,53
+    GROUPBOX        "Open options",IDC_STATIC,5,5,115,71
     CONTROL         "Use same process for every file",IDC_RADIO1,
                     "Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE | WS_GROUP,10,17,105,18
     CONTROL         "New process for every file",IDC_RADIO2,
                     "Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE,10,35,105,18
-    GROUPBOX        "Title bar",IDC_STATIC,5,62,115,68
-    CONTROL         "Display full path",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,74,105,8
-    CONTROL         "File name only",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON,10,86,105,8
-    CONTROL         "Don't prefix anything",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON,10,98,105,8
+    CONTROL         "Force a single process",IDC_RADIO3,
+                    "Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE,10,53,105,18
+    GROUPBOX        "Title bar",IDC_STATIC,5,80,115,68
+    CONTROL         "Display full path",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,92,105,8
+    CONTROL         "File name only",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON,10,104,105,8
+    CONTROL         "Don't prefix anything",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON,10,116,105,8
     GROUPBOX        "Other",IDC_STATIC,124,135,167,102,WS_GROUP
     CONTROL         "Tray icon",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,147,156,8
     CONTROL         "Show OSD (requires restart)",IDC_SHOW_OSD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,159,156,8
@@ -235,7 +237,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,17,156,8
     CONTROL         "Disable 'Open Disc' menu",IDC_CHECK10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,207,156,8
     CONTROL         "Process priority above normal",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,219,156,8
-    CONTROL         "Replace file name with title",IDC_CHECK13,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,10,110,105,18
+    CONTROL         "Replace file name with title",IDC_CHECK13,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,10,128,105,18
     CONTROL         "Remember DVD position",IDC_DVD_POS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,29,156,8
     CONTROL         "Remember File position",IDC_FILE_POS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,41,156,8
     CONTROL         "Limit window proportions on resize",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,171,160,8
