@@ -14294,7 +14294,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 						if (!fstr.IsEmpty()) {
 							int rotationValue = 0;
 							if ((_stscanf_s(fstr, _T("%d"), &rotationValue) == 1) && rotationValue) {
-								m_AngleZ = rotationValue;
+								m_AngleZ = -rotationValue;
 							}
 						}
 					}
