@@ -6268,8 +6268,7 @@ void CMainFrame::OnFileLoadaudio()
 	ShowWindow(SW_SHOW);
 	SetForegroundWindow();
 
-	CString str = fd.GetFolderPath() + _T("\\") + fd.GetFileName();
-	m_fns.AddTail(str);
+	m_fns.AddTail(fd.GetPathName());
 	m_wndPlaylistBar.Open(m_fns, FALSE);
 
 	OpenCurPlaylistItem();
