@@ -14,7 +14,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-//typedef png_libpng_version_1_7_0beta05 Your_png_h_is_not_version_1_7_0beta05;
+//typedef png_libpng_version_1_7_0beta06 Your_png_h_is_not_version_1_7_0beta06;
 
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
@@ -691,13 +691,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.7.0beta05 - February 27, 2013" PNG_STRING_NEWLINE \
+     "libpng version 1.7.0beta06 - March 5, 2013" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2013 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.7.0beta05 - February 27, 2013\
+      return "libpng version 1.7.0beta06 - March 5, 2013\
       Copyright (c) 1998-2013 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -4061,6 +4061,27 @@ png_build_gamma_tables(png_structrp png_ptr, int bit_depth)
   }
 }
 #endif /* READ_GAMMA */
+
+/* HARDWARE OPTION SUPPORT */
+#ifdef PNG_SET_OPTION_SUPPORTED
+int PNGAPI
+png_set_option(png_structrp png_ptr, int option, int onoff)
+{
+   if (png_ptr != NULL && option >= 0 && option < PNG_OPTION_NEXT &&
+      (option & 1) == 0)
+   {
+      int mask = 3 << option;
+      int setting = (2 + (onoff != 0)) << option;
+      int current = png_ptr->options;
+
+      png_ptr->options = (png_byte)((current & ~mask) | setting);
+
+      return (current & mask) >> option;
+   }
+
+   return PNG_OPTION_INVALID;
+}
+#endif
 
 /* sRGB support */
 #if defined(PNG_SIMPLIFIED_READ_SUPPORTED) ||\

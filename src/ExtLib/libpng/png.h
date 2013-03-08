@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.7.0beta05 - March 2, 2013
+ * libpng version 1.7.0beta06 - March 7, 2013
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.7.0beta05 - March 2, 2013: Glenn
+ *   libpng versions 0.97, January 1998, through 1.7.0beta06 - March 7, 2013: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -168,8 +168,7 @@
  *    1.5.7                   15    10507  15.so.15.7[.0]
  *    1.6.0beta01-37          16    10600  16.so.16.0[.0]
  *    1.7.0alpha01-10         17    10700  17.so.17.0[.0]
- *    1.7.0beta01-04          17    10700  17.so.17.0[.0]
- *    1.7.0beta01-05          17    10700  17.so.17.0[.0]
+ *    1.7.0beta01-06          17    10700  17.so.17.0[.0]
  *
  *   Henceforth the source version will match the shared-library major
  *   and minor numbers; the shared-library major version number will be
@@ -201,7 +200,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.7.0beta05, March 2, 2013, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.7.0beta06, March 7, 2013, are
  * Copyright (c) 2004, 2006-2013 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -313,13 +312,13 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    March 2, 2013
+ *    March 7, 2013
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.7.0beta05 are Y2K compliant.  It is my belief that
+ *    upward through 1.7.0beta06 are Y2K compliant.  It is my belief that
  *    earlier versions were also Y2K compliant.
  *
  *    Libpng only has two year fields.  One is a 2-byte unsigned integer
@@ -379,9 +378,9 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.7.0beta05"
+#define PNG_LIBPNG_VER_STRING "1.7.0beta06"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.7.0beta05 - March 2, 2013\n"
+     " libpng version 1.7.0beta06 - March 7, 2013\n"
 
 #define PNG_LIBPNG_VER_SONUM   17
 #define PNG_LIBPNG_VER_DLLNUM  17
@@ -395,7 +394,7 @@
  * PNG_LIBPNG_VER_STRING, omitting any leading zero:
  */
 
-#define PNG_LIBPNG_VER_BUILD  05
+#define PNG_LIBPNG_VER_BUILD  06
 
 /* Release Status */
 #define PNG_LIBPNG_BUILD_ALPHA    1
@@ -525,7 +524,7 @@ extern "C" {
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
-typedef char* png_libpng_version_1_7_0beta05;
+typedef char* png_libpng_version_1_7_0beta06;
 
 /* Basic control structions.  Read libpng-manual.txt or libpng.3 for more info.
  *
@@ -1838,7 +1837,7 @@ PNG_EXPORT(218, png_byte, png_get_current_pass_number, (png_const_structrp));
 #endif
 
 #ifdef PNG_READ_USER_CHUNKS_SUPPORTED
-/* This callback is called only for *unknown* chunks, if
+/* This callback is called only for *unknown* chunks.  If
  * PNG_HANDLE_AS_UNKNOWN_SUPPORTED is set then it is possible to set known
  * chunks to be treated as unknown, however in this case the callback must do
  * any processing required by the chunk (e.g. by calling the appropriate
@@ -1850,11 +1849,13 @@ PNG_EXPORT(218, png_byte, png_get_current_pass_number, (png_const_structrp));
  * The integer return from the callback function is interpreted thus:
  *
  * negative: An error occured, png_chunk_error will be called.
- *     zero: The chunk was not handled, the chunk will be discarded unless
- *           png_set_keep_unknown_chunks has been used to set a 'keep' behavior
- *           for this particular chunk, in which case that will be used.  A
- *           critical chunk will cause an error at this point unless it is to be
- *           saved.
+ *     zero: The chunk was not handled, the default unknown handling is used
+ *           (even if this was a chunk that would otherwise be known.)
+ *           NOTE: prior to libpng 1.7 handling values of
+ *           PNG_HANDLE_CHUNK_AS_DEFAULT and PNG_HANDLE_CHUNK_NEVER were
+ *           converted to PNG_HANDLE_CHUNK_IF_SAFE (libpng 1.6.0 warns if this
+ *           happens) so it was not possible to discard unknown chunk data if a
+ *           user callback was installed.
  * positive: The chunk was handled, libpng will ignore/discard it.
  */
 PNG_EXPORT(88, void, png_set_read_user_chunk_fn, (png_structrp png_ptr,
@@ -2369,8 +2370,13 @@ PNG_EXPORT(171, void, png_set_sCAL_s, (png_const_structrp png_ptr,
  * NOTE: prior to 1.6.0 the handling specified for particular chunks on read was
  * ignored and the default was used, the per-chunk setting only had an effect on
  * write.  If you wish to have chunk-specific handling on read in code that must
- * work on earlier versions you must use a user chunk callback to specify the
+ * work on earlier versions you must use a user chunk callback to implement the
  * desired handling (keep or discard.)
+ * 
+ * NOTE: prior to 1.7.0 when a user callback returned '0', indicating that the
+ * chunk had not been handled, libpng would preserve it regardless of the
+ * default or per-chunk settings.  For compatibility with earlier versions
+ * simply return '1' (handled) from the callback to discard the chunk.
  *
  * The 'keep' parameter is a PNG_HANDLE_CHUNK_ value as listed below.  The
  * parameter is interpreted as follows:
@@ -3094,6 +3100,24 @@ typedef struct
     * slight speed gain.
     */
 
+#define PNG_IMAGE_FLAG_16BIT_sRGB 0x04
+   /* On read if the image is a 16-bit per component image and there is no gAMA
+    * or sRGB chunk assume that the components are sRGB encoded.  Notice that
+    * images output by the simplified API always have gamma information; setting
+    * this flag only affects the interpretation of 16-bit images from an
+    * external source.  It is recommended that the application expose this flag
+    * to the user; the user can normally easily recognize the difference between
+    * linear and sRGB encoding.  This flag has no effect on write - the data
+    * passed to the write APIs must have the correct encoding (as defined
+    * above.)
+    *
+    * If the flag is not set (the default) input 16-bit per component data is
+    * assumed to be linear.
+    *
+    * NOTE: the flag can only be set after the png_image_begin_read_ call,
+    * because that call initializes the 'flags' field.
+    */
+
 #ifdef PNG_SIMPLIFIED_READ_SUPPORTED
 /* READ APIs
  * ---------
@@ -3144,7 +3168,7 @@ PNG_EXPORT(237, int, png_image_finish_read, (png_imagep image,
     *    PNG_FORMAT_FLAG_LINEAR *not* set.
     *
     * For linear output removing the alpha channel is always done by compositing
-    * on black and background is ignored.:
+    * on black and background is ignored.
     *
     * colormap must be supplied when PNG_FORMAT_FLAG_COLORMAP is set.  It must
     * be at least the size (in bytes) returned by PNG_IMAGE_COLORMAP_SIZE.
@@ -3215,6 +3239,47 @@ PNG_EXPORT(243, int, png_get_palette_max, (png_const_structrp png_ptr,
 #  endif
 #endif /* CHECK_FOR_INVALID_INDEX */
 
+/*******************************************************************************
+ *  IMPLEMENTATION OPTIONS
+ *******************************************************************************
+ *
+ * Support for arbitrary implementation-specific optimizations.  The API allows
+ * particular options to be turned on or off.  'Option' is the number of the
+ * option and 'onoff' is 0 (off) or non-0 (on).  The value returned is given
+ * by the PNG_OPTION_ defines below.
+ *
+ * HARDWARE: normally hardware capabilites, such as the Intel SSE instructions,
+ *           are detected at run time, however sometimes it may be impossible
+ *           to do this in user mode, in which case it is necessary to discover
+ *           the capabilities in an OS specific way.  Such capabilities are
+ *           listed here when libpng has support for them and must be turned
+ *           ON by the application if present.
+ *
+ * SOFTWARE: sometimes software optimizations actually result in performance
+ *           decrease on some architectures or systems, or with some sets of
+ *           PNG images.  'Software' options allow such optimizations to be
+ *           selected at run time.
+ */
+#ifdef PNG_SET_OPTION_SUPPORTED
+#ifdef PNG_ARM_NEON_API_SUPPORTED
+#  define PNG_ARM_NEON   0 /* HARDWARE: ARM Neon SIMD instructions supported */
+#endif
+#define PNG_OPTION_NEXT  2 /* Next option - numbers must be even */
+
+/* Return values: NOTE: there are four values and 'off' is *not* zero */
+#define PNG_OPTION_UNSET   0 /* Unset - defaults to off */
+#define PNG_OPTION_INVALID 1 /* Option number out of range */
+#define PNG_OPTION_OFF     2
+#define PNG_OPTION_ON      3
+
+PNG_EXPORT(244, int, png_set_option, (png_structrp png_ptr, int option,
+   int onoff));
+#endif
+
+/*******************************************************************************
+ *  END OF HARDWARE OPTIONS
+ ******************************************************************************/
+
 /* Maintainer: Put new public prototypes here ^, in libpng.3, and project
  * defs
  */
@@ -3224,7 +3289,7 @@ PNG_EXPORT(243, int, png_get_palette_max, (png_const_structrp png_ptr,
  * scripts/symbols.def as well.
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
-  PNG_EXPORT_LAST_ORDINAL(243);
+  PNG_EXPORT_LAST_ORDINAL(244);
 #endif
 
 #ifdef __cplusplus
