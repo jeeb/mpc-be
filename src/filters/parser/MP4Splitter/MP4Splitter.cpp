@@ -553,7 +553,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 					}
 
-					REFERENCE_TIME rtStart	= (REFERENCE_TIME)(UNITS / track->GetMediaTimeScale() * sample.GetCts());
+					REFERENCE_TIME rtStart	= (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetCts());
 					
 					ChapAppend(rtStart, UTF8To16(ChapterName));
 				}
@@ -1532,6 +1532,7 @@ bool CMP4SplitterFilter::DemuxLoop()
 	AP4_Movie* movie = (AP4_Movie*)m_pFile->GetMovie();
 
 	while (SUCCEEDED(hr) && !CheckRequest(NULL) && (!m_pFile->IsStreaming() || SUCCEEDED(m_pFile->WaitAvailable()))) {
+
 		CAtlMap<DWORD, trackpos>::CPair* pPairNext = NULL;
 		REFERENCE_TIME rtNext = 0;
 
@@ -1546,7 +1547,7 @@ bool CMP4SplitterFilter::DemuxLoop()
 				continue;
 			}
 
-			REFERENCE_TIME rt = (REFERENCE_TIME)(UNITS / track->GetMediaTimeScale() * pPair->m_value.ts);
+			REFERENCE_TIME rt = (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * pPair->m_value.ts);
 
 			if (pPair->m_value.index < track->GetSampleCount() && (!pPairNext || rt < rtNext)) {
 				pPairNext = pPair;
@@ -1570,8 +1571,8 @@ bool CMP4SplitterFilter::DemuxLoop()
 
 			CAutoPtr<Packet> p(DNew Packet());
 			p->TrackNumber = (DWORD)track->GetId();
-			p->rtStart = (REFERENCE_TIME)(UNITS / track->GetMediaTimeScale() * sample.GetCts());
-			p->rtStop = p->rtStart + (REFERENCE_TIME)(UNITS / track->GetMediaTimeScale() * sample.GetDuration());
+			p->rtStart = (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetCts());
+			p->rtStop = p->rtStart + (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetDuration());
 			p->bSyncPoint = TRUE;
 
 			// FIXME: slow search & stss->m_Entries is private
@@ -1613,13 +1614,13 @@ bool CMP4SplitterFilter::DemuxLoop()
 
 					if (fFirst) {
 						p->SetData(ptr, size);
-						p->rtStart = p->rtStop = (REFERENCE_TIME)(UNITS / track->GetMediaTimeScale() * sample.GetCts());
+						p->rtStart = p->rtStop = (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetCts());
 						fFirst = false;
 					} else {
 						for (int i = 0; i < size; ++i) p->Add(ptr[i]);
 					}
 
-					p->rtStop += (REFERENCE_TIME)(UNITS / track->GetMediaTimeScale() * sample.GetDuration());
+					p->rtStop += (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetDuration());
 
 					if (pPairNext->m_value.index+1 >= track->GetSampleCount() || (int)p->GetCount() >= nBlockAlign) {
 						break;
@@ -1820,7 +1821,7 @@ STDMETHODIMP CMP4SplitterFilter::GetKeyFrames(const GUID* pFormat, REFERENCE_TIM
 			for (AP4_Cardinal i = 0; i < stss->m_Entries.ItemCount() && nKFsTmp < nKFs; ++i) {
 				AP4_Sample sample;
 				if (AP4_SUCCEEDED(track->GetSample(stss->m_Entries[i]-1, sample))) {
-					pKFs[nKFsTmp++] = REFERENCE_TIME((UNITS * sample.GetCts() + mts/2) / mts);
+					pKFs[nKFsTmp++] = REFERENCE_TIME((10000000ui64 * sample.GetCts() + mts/2) / mts);
 					//pKFs[nKFsTmp++] = REFERENCE_TIME(10000000.0 * sample.GetCts() / track->GetMediaTimeScale() + 0.5);
 				}
 			}
