@@ -168,6 +168,43 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = m_pFile->GetTotalTime();
 
+	{
+		// reindex if needed
+
+		bool fReIndex = false;
+
+		for (DWORD i = 0; i < m_pFile->m_avih.dwStreams && !fReIndex; ++i) {
+			if (!m_pFile->m_strms[i]->cs.GetCount()) {
+				fReIndex = true;
+			}
+		}
+
+		if (fReIndex && m_bSetReindex) {
+			m_pFile->EmptyIndex();
+
+			m_fAbort = false;
+			m_nOpenProgress = 0;
+
+			m_rtDuration = 0;
+
+			CAutoVectorPtr<UINT64> pSize;
+			pSize.Allocate(m_pFile->m_avih.dwStreams);
+			memset((UINT64*)pSize, 0, sizeof(UINT64)*m_pFile->m_avih.dwStreams);
+
+			__int64 pos = m_pFile->GetPos();
+			m_pFile->Seek(0);
+			ReIndex(m_pFile->GetLength(), pSize);
+
+			if (m_fAbort) {
+				m_pFile->EmptyIndex();
+			}
+			m_pFile->Seek(pos);
+
+			m_fAbort = false;
+			m_nOpenProgress = 100;
+		}
+	}
+
 	bool fHasIndex = false;
 
 	for (unsigned int i = 0; !fHasIndex && i < m_pFile->m_strms.GetCount(); ++i)
@@ -226,8 +263,26 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				case FCC('JPGL')://uncommon fourcc
 					mt.subtype = MEDIASUBTYPE_MJPG;
 					break;
+				case FCC('mpg2'):
 				case FCC('MPG2'):
-					mt.subtype = MEDIASUBTYPE_MPEG2_VIDEO;
+				case FCC('MMES'):
+					{
+						size_t scCount = s->cs.GetCount();
+						if (scCount) {
+							__int64 cur_pos = m_pFile->GetPos();
+
+							m_pFile->Seek(s->cs[0].filepos);
+							CBaseSplitterFileEx::seqhdr h;
+							CMediaType mt2;
+							if (m_pFile->Read(h, s->cs[0].size, &mt2)) {
+								mts.Add(mt2);
+								m_pFile->Seek(cur_pos);
+								break;
+							}
+							m_pFile->Seek(cur_pos);
+						}
+						mt.subtype = MEDIASUBTYPE_MPEG2_VIDEO;
+					}
 					break;
 				case FCC('MPEG'):
 					mt.subtype = MEDIASUBTYPE_MPEG1Payload;
@@ -397,38 +452,6 @@ bool CAviSplitterFilter::DemuxInit()
 		return false;
 	}
 
-	// reindex if needed
-
-	bool fReIndex = false;
-
-	for (DWORD i = 0; i < m_pFile->m_avih.dwStreams && !fReIndex; ++i) {
-		if (m_pFile->m_strms[i]->cs.GetCount() == 0 && GetOutputPin(i)) {
-			fReIndex = true;
-		}
-	}
-
-	if (fReIndex && m_bSetReindex) {
-		m_pFile->EmptyIndex();
-
-		m_fAbort = false;
-		m_nOpenProgress = 0;
-
-		m_rtDuration = 0;
-
-		CAutoVectorPtr<UINT64> pSize;
-		pSize.Allocate(m_pFile->m_avih.dwStreams);
-		memset((UINT64*)pSize, 0, sizeof(UINT64)*m_pFile->m_avih.dwStreams);
-		m_pFile->Seek(0);
-		ReIndex(m_pFile->GetLength(), pSize);
-
-		if (m_fAbort) {
-			m_pFile->EmptyIndex();
-		}
-
-		m_fAbort = false;
-		m_nOpenProgress = 100;
-	}
-
 	return true;
 }
 
@@ -589,6 +612,7 @@ bool CAviSplitterFilter::DemuxLoop()
 
 			if (s->cs[f].fChunkHdr) {
 				DWORD id = 0;
+
 				if (S_OK != m_pFile->ReadAvi(id) || id == 0 || minTrack != TRACKNUM(id)
 						|| S_OK != m_pFile->ReadAvi(size)) {
 					fDiscontinuity[minTrack] = true;

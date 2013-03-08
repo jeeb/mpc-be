@@ -408,21 +408,33 @@ HRESULT CAviFile::BuildIndex()
 					return E_FAIL;
 				}
 
-				for (DWORD k = 0; k < p->nEntriesInUse; ++k) {
-					s->cs[frame].size = size;
-					s->cs[frame].filepos = p->qwBaseOffset + p->aIndex[k].dwOffset;
-					s->cs[frame].fKeyFrame = !(p->aIndex[k].dwSize&AVISTDINDEX_DELTAFRAME)
-											 || s->strh.fccType == FCC('auds');
-					s->cs[frame].fChunkHdr = false;
-					s->cs[frame].orgsize = p->aIndex[k].dwSize&AVISTDINDEX_SIZEMASK;
+				if (p->wLongsPerEntry == 6) {
+					// Matrox's MPEG-2 stuff generates bIndexSubType=16 and wLongsPerEntry=6
+					for (DWORD k = 0; k < p->nEntriesInUse * 3; k += 3) {
+						s->cs[frame].filepos = p->qwBaseOffset + p->aIndex[k].dwOffset;
+						s->cs[frame].fKeyFrame = true;
+						s->cs[frame].fChunkHdr = false;
+						s->cs[frame].size = s->cs[frame].orgsize = p->aIndex[k+1].dwOffset;
 
-					if (m_idx1) {
-						s->cs[frame].filepos -= 8;
-						s->cs[frame].fChunkHdr = true;
+						++frame;
 					}
+				} else {
+					for (DWORD k = 0; k < p->nEntriesInUse; ++k) {
+						s->cs[frame].size = size;
+						s->cs[frame].filepos = p->qwBaseOffset + p->aIndex[k].dwOffset;
+						s->cs[frame].fKeyFrame = !(p->aIndex[k].dwSize&AVISTDINDEX_DELTAFRAME)
+												 || s->strh.fccType == FCC('auds');
+						s->cs[frame].fChunkHdr = false;
+						s->cs[frame].orgsize = p->aIndex[k].dwSize&AVISTDINDEX_SIZEMASK;
 
-					++frame;
-					size += s->GetChunkSize(p->aIndex[k].dwSize&AVISTDINDEX_SIZEMASK);
+						if (m_idx1) {
+							s->cs[frame].filepos -= 8;
+							s->cs[frame].fChunkHdr = true;
+						}
+
+						++frame;
+						size += s->GetChunkSize(p->aIndex[k].dwSize&AVISTDINDEX_SIZEMASK);
+					}
 				}
 			}
 
