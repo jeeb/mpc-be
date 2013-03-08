@@ -312,14 +312,14 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 						const CAtlList<GUID>& types = pFGF->GetTypes();
 						if (types.GetCount()) {
-							bool bIsSplitter = true;
+							bool bIsSplitter = false;
 							POSITION pos = types.GetHeadPosition();
 							while (pos) {
 								CLSID major	= types.GetNext(pos);
 								CLSID sub	= types.GetNext(pos);
 
-								if (major != MEDIATYPE_Stream) {
-									bIsSplitter = false;
+								if (major == MEDIATYPE_Stream) {
+									bIsSplitter = true;
 									break;
 								}
 							}

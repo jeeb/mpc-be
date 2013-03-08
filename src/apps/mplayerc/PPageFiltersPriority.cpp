@@ -159,15 +159,15 @@ void CPPageFiltersPriority::Init()
 		}
 
 		bool bIsSource		= (f->guids.GetCount() == 0);
-		bool bIsSplitter	= true;
+		bool bIsSplitter	= false;
 		if (!bIsSource) {
 			POSITION pos = f->guids.GetHeadPosition();
 			while (pos) {
 				CLSID major	= f->guids.GetNext(pos);
 				CLSID sub	= f->guids.GetNext(pos);
 
-				if (major != MEDIATYPE_Stream) {
-					bIsSplitter = false;
+				if (major == MEDIATYPE_Stream) {
+					bIsSplitter = true;
 					break;
 				}
 			}
