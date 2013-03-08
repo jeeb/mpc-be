@@ -22,9 +22,8 @@
  */
 
 #include "stdafx.h"
-#include <atlbase.h>
-#include <atlpath.h>
 #include "MainFrm.h"
+#include <atlpath.h>
 #include "MediaFormats.h"
 #include "OpenImage.h"
 
