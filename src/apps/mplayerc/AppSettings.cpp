@@ -477,7 +477,7 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ZOOM, iZoomLevel);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VOLUME_STEP, nVolumeStep);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPEED_STEP, nSpeedStep);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, iAllowMultipleInst);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, iMultipleInst);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXTSTYLE, iTitleBarTextStyle);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXTTITLE, fTitleBarTextTitle);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ONTOP, iOnTop);
@@ -951,9 +951,9 @@ void CAppSettings::LoadSettings()
 	fBlockVSFilter = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_BLOCKVSFILTER, TRUE);
 	fEnableWorkerThreadForOpening = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEWORKERTHREADFOROPENING, TRUE);
 	fReportFailedPins = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_REPORTFAILEDPINS, TRUE);
-	iAllowMultipleInst = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, 0);
-	if (iAllowMultipleInst < 0 || iAllowMultipleInst > 2) {
-		iAllowMultipleInst = 0;
+	iMultipleInst = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, 1);
+	if (iMultipleInst < 0 || iMultipleInst > 2) {
+		iMultipleInst = 1;
 	}
 	iTitleBarTextStyle = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXTSTYLE, 1);
 	fTitleBarTextTitle = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXTTITLE, FALSE);
@@ -1524,13 +1524,13 @@ void CAppSettings::LoadSettings()
 	fInitialized = true;
 }
 
-int CAppSettings::GetAllowMultiInst()
+int CAppSettings::GetMultiInst()
 {
-	int ami = AfxGetApp()->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, 0);
-	if (ami < 0 || ami > 2) {
-		ami = 0;
+	int multiinst = AfxGetApp()->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, 1);
+	if (multiinst < 0 || multiinst > 2) {
+		multiinst = 1;
 	}
-	return ami;
+	return multiinst;
 }
 
 void CAppSettings::UpdateRenderersData(bool fSave)

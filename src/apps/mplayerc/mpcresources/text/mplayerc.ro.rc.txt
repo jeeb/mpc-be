@@ -366,9 +366,9 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 5		"Opțiuni pentru deschidere"
-6		"Folosește același player pentru fiecare fișier media"
-8		"Deschide un player nou pentru fiecare fișier media redat"
-10		"Force a single process"
+6		"Force a single process"
+8		"Folosește același player pentru fiecare fișier media"
+10		"Deschide un player nou pentru fiecare fișier media redat"
 12		"Bară de titlu"
 13		"Afișează calea completă"
 14		"Doar numele fișierului"

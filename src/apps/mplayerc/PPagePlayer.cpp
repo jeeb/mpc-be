@@ -32,7 +32,7 @@
 IMPLEMENT_DYNAMIC(CPPagePlayer, CPPageBase)
 CPPagePlayer::CPPagePlayer()
 	: CPPageBase(CPPagePlayer::IDD, CPPagePlayer::IDD)
-	, m_iAllowMultipleInst(0)
+	, m_iMultipleInst(1)
 	, m_iAlwaysOnTop(FALSE)
 	, m_fTrayIcon(FALSE)
 	, m_iTitleBarTextStyle(0)
@@ -60,7 +60,7 @@ void CPPagePlayer::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
-	DDX_Radio(pDX, IDC_RADIO1, m_iAllowMultipleInst);
+	DDX_Radio(pDX, IDC_RADIO1, m_iMultipleInst);
 	DDX_Radio(pDX, IDC_RADIO4, m_iTitleBarTextStyle);
 	DDX_Check(pDX, IDC_CHECK13, m_bTitleBarTextTitle);
 	//DDX_Check(pDX, IDC_CHECK2, m_iAlwaysOnTop);
@@ -94,7 +94,7 @@ BOOL CPPagePlayer::OnInitDialog()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	m_iAllowMultipleInst = s.iAllowMultipleInst;
+	m_iMultipleInst = s.iMultipleInst;
 	m_iTitleBarTextStyle = s.iTitleBarTextStyle;
 	m_bTitleBarTextTitle = s.fTitleBarTextTitle;
 	m_iAlwaysOnTop = s.iOnTop;
@@ -127,7 +127,7 @@ BOOL CPPagePlayer::OnApply()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	s.iAllowMultipleInst = m_iAllowMultipleInst;
+	s.iMultipleInst = m_iMultipleInst;
 	s.iTitleBarTextStyle = m_iTitleBarTextStyle;
 	s.fTitleBarTextTitle = !!m_bTitleBarTextTitle;
 	s.iOnTop = m_iAlwaysOnTop;

@@ -89,7 +89,7 @@
 #define IDS_RS_ZOOM							_T("Zoom")
 #define IDS_RS_VOLUME_STEP					_T("VolumeStep")
 #define IDS_RS_SPEED_STEP					_T("SpeedStep")
-#define IDS_RS_MULTIINST					_T("AllowMultipleInstances")
+#define IDS_RS_MULTIINST					_T("MultipleInstances")
 #define IDS_RS_ALWAYSONTOP					_T("AlwaysOnTop")
 #define IDS_RS_AUTOZOOM						_T("AutoZoom")
 #define IDS_RS_FULLSCREENCTRLS				_T("FullScreenCtrls")

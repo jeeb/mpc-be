@@ -36,7 +36,7 @@ public:
 	CPPagePlayer();
 	virtual ~CPPagePlayer();
 
-	int m_iAllowMultipleInst;
+	int m_iMultipleInst;
 	int m_iTitleBarTextStyle;
 	BOOL m_bTitleBarTextTitle;
 	BOOL m_iAlwaysOnTop;

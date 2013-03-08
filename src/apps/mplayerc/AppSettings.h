@@ -438,7 +438,7 @@ public:
 
 
 	// Player
-	int				iAllowMultipleInst;
+	int				iMultipleInst;
 	bool			fTrayIcon;
 	bool			fShowOSD;
 	bool			fLimitWindowProportions;
@@ -764,7 +764,7 @@ public:
 	void			AddFav(favtype ft, CString s);
 	CDVBChannel*	FindChannelByPref(int nPrefNumber);
 
-	int				GetAllowMultiInst();
+	int				GetMultiInst();
 private:
 	void			UpdateRenderersData(bool fSave);
 	friend	void	CRenderersSettings::UpdateData(bool bSave);

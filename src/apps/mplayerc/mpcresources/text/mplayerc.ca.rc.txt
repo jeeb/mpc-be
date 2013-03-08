@@ -366,9 +366,9 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 5		"Opcions d'apertura"
-6		"Use same process for every file"
-8		"New process for every file"
-10		"Force a single process"
+6		"Force a single process"
+8		"Use same process for every file"
+10		"New process for every file"
 12		"Barra del títol"
 13		"Mostrar la ruta completa"
 14		"Només el nom de l'arxiu"

@@ -366,9 +366,9 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 5		"Opzioni di apertura"
-6		"Apri solo un'unica schermata per ogni file aperto."
-8		"Apri una nuova schermata per ogni file aperto."
-10		"Force a single process"
+6		"Force a single process"
+8		"Apri solo un'unica schermata per ogni file aperto."
+10		"Apri una nuova schermata per ogni file aperto."
 12		"Barra del titolo"
 13		"Mostra il percorso completo"
 14		"Solo il nome del file"

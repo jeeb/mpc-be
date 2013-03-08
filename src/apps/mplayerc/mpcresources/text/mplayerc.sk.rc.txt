@@ -366,9 +366,9 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 5		"Otvoriť nastavenia"
-6		"Use same process for every file"
-8		"New process for every file"
-10		"Force a single process"
+6		"Force a single process"
+8		"Use same process for every file"
+10		"New process for every file"
 12		"Titulok"
 13		"Zobrazovať celú cestu k súb."
 14		"Len názov súboru"
