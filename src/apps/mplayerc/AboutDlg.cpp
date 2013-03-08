@@ -22,7 +22,6 @@
 
 #include "stdafx.h"
 #include "AboutDlg.h"
-#include "Version.h"
 
 extern "C" char *GetFFmpegCompiler();
 extern "C" char *GetlibavcodecVersion();

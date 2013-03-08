@@ -22,7 +22,6 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "AuthDlg.h"
 #include "SettingsDefines.h"
 

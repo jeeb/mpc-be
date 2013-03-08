@@ -23,7 +23,6 @@
 
 #include "stdafx.h"
 #include <atlpath.h>
-#include "mplayerc.h"
 #include "OpenDlg.h"
 #include "OpenFileDlg.h"
 

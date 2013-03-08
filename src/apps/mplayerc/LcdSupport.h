@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include <Windows.h>
 #include <lglcd/lglcd.h>
 #include <LCDUI/LCDUI.h>
 

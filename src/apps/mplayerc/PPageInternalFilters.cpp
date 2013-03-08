@@ -22,7 +22,6 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "PPageInternalFilters.h"
 #include "ComPropertySheet.h"
 #include "../../filters/Filters.h"

@@ -22,7 +22,6 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "MainFrm.h"
 #include "PPageFileInfoSheet.h"
 #include "PPageFileMediaInfo.h"

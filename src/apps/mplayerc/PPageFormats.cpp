@@ -22,7 +22,6 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "PPageFormats.h"
 #include "../../DSUtil/WinAPIUtils.h"
 #include <psapi.h>

@@ -22,9 +22,7 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "MainFrm.h"
-#include <afxinet.h>
 #include "PPageLogo.h"
 #include "OpenImage.h"
 

@@ -22,7 +22,6 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "AboutDlg.h"
 #include <Tlhelp32.h>
 #include "MainFrm.h"

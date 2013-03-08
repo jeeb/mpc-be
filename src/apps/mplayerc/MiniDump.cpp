@@ -22,9 +22,7 @@
 
 #include "stdafx.h"
 #include "MiniDump.h"
-#include "resource.h"
 #include <DbgHelp.h>
-#include "Version.h"
 #include "../../DSUtil/WinAPIUtils.h"
 
 CMiniDump	_Singleton;

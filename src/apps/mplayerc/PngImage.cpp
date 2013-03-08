@@ -22,7 +22,6 @@
 
 #include "stdafx.h"
 #include "PngImage.h"
-//#include <afxinet.h>
 //#include "OpenImage.h"
 
 bool MPCPngImage::DecompressPNG(struct png_t* png)

@@ -21,7 +21,6 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "MainFrm.h"
 #include "PPageOutput.h"
 #include <moreuuids.h>

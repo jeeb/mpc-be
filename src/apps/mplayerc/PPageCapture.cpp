@@ -26,7 +26,6 @@
 #include <bdatypes.h>
 #include <bdamedia.h>
 #include <bdaiface.h>
-#include "mplayerc.h"
 #include "PPageCapture.h"
 #include "../../DSUtil/DSUtil.h"
 

@@ -22,9 +22,10 @@
 
 #pragma once
 
-#include "DIB.h"
+#include <afxinet.h>
 #include <libwebp/webp/decode.h>
 #include <stb_image/stb_image.h>
+#include "DIB.h"
 
 using namespace Gdiplus;
 
@@ -51,6 +52,8 @@ static BYTE* ConvertRGBToBMPBuffer(BYTE* Buffer, int width, int height, int bpp,
 	return newbuf;
 }
 
+#define GRAPHIC_FMT _T("*.bmp;*.jpg;*.jpeg;*.png;*.tif;*.tiff;*.emf;*.ico;*.webp;*.webpll;*.psd;*.tga;*.gif")
+
 static bool OpenImageCheck(CString fn)
 {
 	CString tmp_fn(CString(fn).MakeLower());
@@ -59,7 +62,6 @@ static bool OpenImageCheck(CString fn)
 		|| wcsstr(tmp_fn, L".jpg")
 		|| wcsstr(tmp_fn, L".jpeg")
 		|| wcsstr(tmp_fn, L".png")
-		|| wcsstr(tmp_fn, L".gif")
 		|| wcsstr(tmp_fn, L".tif")
 		|| wcsstr(tmp_fn, L".tiff")
 		|| wcsstr(tmp_fn, L".emf")

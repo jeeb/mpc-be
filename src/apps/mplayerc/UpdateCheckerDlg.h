@@ -22,9 +22,8 @@
 
 #pragma once
 
-#include <afxwin.h>
-
 #include "UpdateChecker.h"
+#include "afxdialogex.h"
 
 class UpdateCheckerDlg : public CDialog
 {

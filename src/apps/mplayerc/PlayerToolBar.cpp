@@ -22,10 +22,9 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
+#include "MainFrm.h"
 #include "PlayerToolBar.h"
 #include "IPinHook.h"
-#include "MainFrm.h"
 
 
 // CPlayerToolBar

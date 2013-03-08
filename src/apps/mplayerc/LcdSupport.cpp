@@ -21,17 +21,9 @@
  */
 
 #include "stdafx.h"
-#include <tchar.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <process.h> // _beginthread, _endthread
-#include <time.h>
-#include <locale.h>
 #include "LcdSupport.h"
-#include <LCDUI/LCDUI.h>
-#include "mplayerc.h"
 
-#define LCD_APP_NAME "MPC-BE"
+#define LCD_APP_NAME MPC_WND_CLASS_NAME
 #define LCD_UPD_TIMER 40
 
 

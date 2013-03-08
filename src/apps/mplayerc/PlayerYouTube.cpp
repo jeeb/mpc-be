@@ -21,7 +21,6 @@
  */
 
 #include "stdafx.h"
-#include <afxinet.h>
 #include "PlayerYouTube.h"
 
 CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)

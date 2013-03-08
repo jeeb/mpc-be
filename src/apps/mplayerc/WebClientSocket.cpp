@@ -23,7 +23,6 @@
 
 #include "stdafx.h"
 #include <atlisapi.h>
-#include "mplayerc.h"
 #include "MainFrm.h"
 #include "../../Subtitles/TextFile.h"
 #include "WebClientSocket.h"

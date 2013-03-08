@@ -22,7 +22,6 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "PPageOutput.h"
 #include "../../DSUtil/WinAPIUtils.h"
 #include <moreuuids.h>

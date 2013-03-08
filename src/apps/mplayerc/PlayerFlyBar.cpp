@@ -21,7 +21,6 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "PlayerFlyBar.h"
 #include "MainFrm.h"
 

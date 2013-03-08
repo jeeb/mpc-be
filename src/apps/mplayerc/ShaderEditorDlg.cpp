@@ -22,10 +22,8 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
-#include <PixelShaderCompiler.h>
-#include "ShaderEditorDlg.h"
 #include "MainFrm.h"
+#include "ShaderEditorDlg.h"
 
 #undef SubclassWindow
 

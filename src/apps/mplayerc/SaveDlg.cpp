@@ -22,11 +22,9 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "MainFrm.h"
 #include "SaveDlg.h"
 #include "../../filters/Filters.h"
-#include <afxinet.h>
 #include "OpenImage.h"
 
 // CSaveDlg dialog

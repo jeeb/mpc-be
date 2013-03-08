@@ -22,7 +22,6 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "MainFrm.h"
 #include <math.h>
 #include <atlbase.h>
@@ -34,7 +33,7 @@
 #include <realmedia/rmaevent.h>
 #include <realmedia/rmaprefs.h>
 #include "../../DSUtil/DSUtil.h"
-#include "moreuuids.h"
+#include <moreuuids.h>
 #include "AuthDlg.h"
 
 using namespace DSObjects;

@@ -22,9 +22,8 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
-#include "PPageTweaks.h"
 #include "MainFrm.h"
+#include "PPageTweaks.h"
 #include "MiniDump.h"
 
 // CPPageTweaks dialog

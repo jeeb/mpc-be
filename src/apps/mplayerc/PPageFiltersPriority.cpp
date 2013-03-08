@@ -22,7 +22,6 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "PPageFiltersPriority.h"
 #include "FGFilter.h"
 #include "../DSUtil/DSUtil.h"

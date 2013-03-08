@@ -21,7 +21,6 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "VMROSD.h"
 
 #define SEEKBAR_HEIGHT			60

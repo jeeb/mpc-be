@@ -22,10 +22,9 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
+#include "MainFrm.h"
 #include "PPageInterface.h"
 #include "../../DSUtil/WinAPIUtils.h"
-#include "MainFrm.h"
 
 
 // CPPageInterface dialog

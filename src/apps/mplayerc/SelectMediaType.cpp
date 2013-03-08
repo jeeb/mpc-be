@@ -22,7 +22,6 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "SelectMediaType.h"
 #include "../../DSUtil/DSUtil.h"
 

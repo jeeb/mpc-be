@@ -22,7 +22,6 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "SaveTextFileDialog.h"
 #include "../../DSUtil/WinAPIUtils.h"
 

@@ -22,7 +22,6 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "AppSettings.h"
 #include "MiniDump.h"
 #include "../../DSUtil/WinAPIUtils.h"

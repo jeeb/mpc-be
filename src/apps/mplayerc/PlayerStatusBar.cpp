@@ -22,11 +22,9 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
-#include "PlayerStatusBar.h"
 #include "MainFrm.h"
+#include "PlayerStatusBar.h"
 #include "../../DSUtil/DSUtil.h"
-#include <afxinet.h>
 #include "OpenImage.h"
 //#include "mpciconlib/resource.h"
 

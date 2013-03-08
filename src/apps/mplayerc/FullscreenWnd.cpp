@@ -22,9 +22,8 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
-#include "FullscreenWnd.h"
 #include "MainFrm.h"
+#include "FullscreenWnd.h"
 
 
 // CFullscreenWnd

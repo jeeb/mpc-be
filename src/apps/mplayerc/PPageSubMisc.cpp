@@ -21,7 +21,6 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "PPageSubMisc.h"
 #include "ISDb.h"
 

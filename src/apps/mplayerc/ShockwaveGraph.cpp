@@ -23,7 +23,6 @@
 
 #include "stdafx.h"
 #include "ShockwaveGraph.h"
-#include "resource.h"
 #include "../../DSUtil/DSUtil.h"
 #include <math.h>
 

@@ -22,10 +22,9 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
+#include "MainFrm.h"
 #include "PPageBase.h"
 #include "SettingsDefines.h"
-#include "MainFrm.h"
 
 // CPPageBase dialog
 

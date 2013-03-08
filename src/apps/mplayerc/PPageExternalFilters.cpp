@@ -25,7 +25,6 @@
 #include <atlpath.h>
 #include <InitGuid.h>
 #include <dmoreg.h>
-#include "mplayerc.h"
 #include "PPageExternalFilters.h"
 #include "ComPropertySheet.h"
 #include "RegFilterChooserDlg.h"

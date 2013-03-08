@@ -23,7 +23,6 @@
 
 #include "stdafx.h"
 #include <mpconfig.h>
-#include "mplayerc.h"
 #include "FGManager.h"
 #include "../../DSUtil/DSUtil.h"
 #include "../../filters/Filters.h"

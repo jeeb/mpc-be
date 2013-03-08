@@ -22,9 +22,8 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
-#include "PlayerSeekBar.h"
 #include "MainFrm.h"
+#include "PlayerSeekBar.h"
 
 
 // CPlayerSeekBar

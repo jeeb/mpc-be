@@ -22,9 +22,8 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
-#include "PlayerVolumeCtrl.h"
 #include "MainFrm.h"
+#include "PlayerVolumeCtrl.h"
 
 
 // CVolumeCtrl

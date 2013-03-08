@@ -22,10 +22,8 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "MainFrm.h"
 #include "PlayerChildView.h"
-#include <afxinet.h>
 #include "OpenImage.h"
 
 // CChildView

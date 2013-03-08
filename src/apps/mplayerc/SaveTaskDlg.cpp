@@ -21,11 +21,9 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "MainFrm.h"
 #include "SaveTaskDlg.h"
 #include "../../filters/Filters.h"
-#include <afxinet.h>
 #include "OpenImage.h"
 
 // CSaveTaskDlg dialog

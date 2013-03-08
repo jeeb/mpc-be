@@ -25,10 +25,9 @@
 #include <math.h>
 #include "QuicktimeGraph.h"
 #include <IQTVideoSurface.h>
-#include "mplayerc.h"
 #include "MainFrm.h"
 #include "../../DSUtil/DSUtil.h"
-#include "moreuuids.h"
+#include <moreuuids.h>
 
 using namespace DSObjects;
 

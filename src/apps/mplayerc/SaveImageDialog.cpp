@@ -22,7 +22,6 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "SaveImageDialog.h"
 #include "../../DSUtil/WinAPIUtils.h"
 #include "DialogEventHandler.h"

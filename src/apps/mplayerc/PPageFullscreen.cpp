@@ -22,7 +22,6 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "PPageFullscreen.h"
 #include "../../DSUtil/WinAPIUtils.h"
 #include "Monitors.h"

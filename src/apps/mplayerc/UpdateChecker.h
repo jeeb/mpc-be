@@ -23,6 +23,7 @@
 #pragma once
 
 #include <afxwin.h>
+#include <afxinet.h>
 
 struct Version
 {

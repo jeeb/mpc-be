@@ -24,8 +24,9 @@
 #include "stdafx.h"
 #include <atlbase.h>
 #include <atlpath.h>
+#include "MainFrm.h"
 #include "MediaFormats.h"
-#include "resource.h"
+#include "OpenImage.h"
 
 //
 // CMediaFormatCategory
@@ -355,7 +356,6 @@ CMediaFormatCategory* CMediaFormats::FindMediaByExt(CString ext, bool fAudioOnly
 	return NULL;
 }
 
-#define GRAPHIC_FMT _T("*.bmp;*.jpg;*.jpeg;*.png;*.gif;*.tif;*.tiff;*.emf;*.ico;*.webp;*.webpll;*.psd;*.tga")
 void CMediaFormats::GetFilter(CString& filter, CAtlArray<CString>& mask)
 {
 	CString strTemp;

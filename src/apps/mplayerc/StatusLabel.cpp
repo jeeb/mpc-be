@@ -22,7 +22,6 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "StatusLabel.h"
 #include "../../DSUtil/WinAPIUtils.h"
 

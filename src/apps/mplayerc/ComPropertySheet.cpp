@@ -22,7 +22,6 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "ComPropertySheet.h"
 #include "../../DSUtil/DSUtil.h"
 #include "../../filters/core/InternalPropertyPage.h"

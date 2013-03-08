@@ -22,7 +22,6 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "PlayerInfoBar.h"
 #include "MainFrm.h"
 

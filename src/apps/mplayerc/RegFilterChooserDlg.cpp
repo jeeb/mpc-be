@@ -22,7 +22,6 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include <dmo.h>
 #include "RegFilterChooserDlg.h"
 #include "FGFilter.h"

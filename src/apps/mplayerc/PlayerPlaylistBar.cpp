@@ -24,7 +24,6 @@
 #include "stdafx.h"
 #include <atlrx.h>
 #include <atlutil.h>
-#include "mplayerc.h"
 #include "MainFrm.h"
 #include "../../DSUtil/DSUtil.h"
 #include "../../DSUtil/WinAPIUtils.h"

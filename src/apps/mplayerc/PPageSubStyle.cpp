@@ -23,7 +23,6 @@
 
 #include "stdafx.h"
 #include <math.h>
-#include "mplayerc.h"
 #include "MainFrm.h"
 #include "PPageSubStyle.h"
 

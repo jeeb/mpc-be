@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <afxinet.h>
+
 #define YOUTUBE_URL		_T("youtube.com/watch?")
 #define YOUTU_BE_URL	_T("youtu.be/")
 

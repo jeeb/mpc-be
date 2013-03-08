@@ -22,9 +22,8 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
-#include "ShaderCombineDlg.h"
 #include "MainFrm.h"
+#include "ShaderCombineDlg.h"
 
 // CShaderCombineDlg dialog
 

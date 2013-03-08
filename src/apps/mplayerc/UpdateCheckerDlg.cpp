@@ -22,7 +22,6 @@
 
 #include "stdafx.h"
 #include "UpdateCheckerDlg.h"
-#include "afxdialogex.h"
 
 IMPLEMENT_DYNAMIC(UpdateCheckerDlg, CDialog)
 

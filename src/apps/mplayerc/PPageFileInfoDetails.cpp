@@ -22,7 +22,6 @@
  */
 
 #include "stdafx.h"
-#include "mplayerc.h"
 #include "PPageFileInfoDetails.h"
 #include <atlbase.h>
 #include "../../DSUtil/DSUtil.h"
