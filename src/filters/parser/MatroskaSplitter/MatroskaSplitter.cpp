@@ -734,6 +734,13 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 						mts.Add(mt);
 					}
+				} else if (CodecID == "A_OPUS/EXPERIMENTAL") {
+					wfe->wFormatTag = (WORD)WAVE_FORMAT_OPUS;
+					mt.subtype = MEDIASUBTYPE_OPUS;
+					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
+					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
+					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					mts.Add(mt);
 				}
 			} else if (pTE->TrackType == TrackEntry::TypeSubtitle) {
 				if (iSubtitle == 1) {
