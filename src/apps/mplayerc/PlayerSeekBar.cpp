@@ -841,10 +841,13 @@ void CPlayerSeekBar::UpdateToolTipPosition(CPoint& point)
 		point.x = max(mi.rcWork.left + 5, min(point.x, mi.rcWork.right - r_width - 5));
 
 		if (point.y <= 5) {
-			p1.y = GetChannelRect().TopLeft().y + 30;
-			ClientToScreen(&p1);
+			CRect r = mi.rcWork;
+			if (!r.PtInRect(point)) {
+				p1.y = GetChannelRect().TopLeft().y + 30;
+				ClientToScreen(&p1);
 
-			point.y = p1.y;
+				point.y = p1.y;
+			}
 		}
 
 		pFrame->m_wndView2.MoveWindow(point.x, point.y, r_width, r_height);
