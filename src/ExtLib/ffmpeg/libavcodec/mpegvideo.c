@@ -252,7 +252,7 @@ static void free_frame_buffer(MpegEncContext *s, Picture *pic)
         ff_thread_release_buffer(s->avctx, &pic->f);
     else
         avcodec_default_release_buffer(s->avctx, &pic->f);
-    av_freep(&pic->f.hwaccel_picture_private);
+    av_freep(&pic->hwaccel_picture_private);
 }
 
 int ff_mpv_frame_size_alloc(MpegEncContext *s, int linesize)
@@ -288,10 +288,10 @@ static int alloc_frame_buffer(MpegEncContext *s, Picture *pic)
     int r, ret;
 
     if (s->avctx->hwaccel) {
-        assert(!pic->f.hwaccel_picture_private);
+        assert(!pic->hwaccel_picture_private);
         if (s->avctx->hwaccel->priv_data_size) {
-            pic->f.hwaccel_picture_private = av_mallocz(s->avctx->hwaccel->priv_data_size);
-            if (!pic->f.hwaccel_picture_private) {
+            pic->hwaccel_picture_private = av_mallocz(s->avctx->hwaccel->priv_data_size);
+            if (!pic->hwaccel_picture_private) {
                 av_log(s->avctx, AV_LOG_ERROR, "alloc_frame_buffer() failed (hwaccel private data allocation)\n");
                 return -1;
             }
@@ -308,7 +308,7 @@ static int alloc_frame_buffer(MpegEncContext *s, Picture *pic)
     if (r < 0 || !pic->f.type || !pic->f.data[0]) {
         av_log(s->avctx, AV_LOG_ERROR, "get_buffer() failed (%d %d %p)\n",
                r, pic->f.type, pic->f.data[0]);
-        av_freep(&pic->f.hwaccel_picture_private);
+        av_freep(&pic->hwaccel_picture_private);
         return -1;
     }
 
@@ -3248,6 +3248,7 @@ void ff_MPV_report_decode_progress(MpegEncContext *s)
         ff_thread_report_progress(&s->current_picture_ptr->f, s->mb_y, 0);
 }
 
+#if CONFIG_ERROR_RESILIENCE
 void ff_mpeg_er_frame_start(MpegEncContext *s)
 {
     ERContext *er = &s->er;
@@ -3263,3 +3264,4 @@ void ff_mpeg_er_frame_start(MpegEncContext *s)
 
     ff_er_frame_start(er);
 }
+#endif /* CONFIG_ERROR_RESILIENCE */

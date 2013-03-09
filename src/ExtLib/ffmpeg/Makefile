@@ -1,4 +1,4 @@
-CC = gcc.exe
+	CC = gcc.exe
 
 BIN_DIR  = ../../../bin
 ZLIB_DIR = ../zlib
@@ -374,9 +374,11 @@ SRCS_C = \
     libavresample/x86/audio_mix_init.c \
     libavresample/x86/dither_init.c \
 \
+    libavutil/atomic.c \
     libavutil/audio_fifo.c \
     libavutil/avstring.c \
     libavutil/bprint.c \
+    libavutil/buffer.c \
     libavutil/channel_layout.c \
     libavutil/cpu.c \
     libavutil/crc.c \
@@ -385,6 +387,7 @@ SRCS_C = \
     libavutil/eval.c \
     libavutil/fifo.c \
     libavutil/float_dsp.c \
+    libavutil/frame.c \
     libavutil/imgutils.c \
     libavutil/intfloat_readwrite.c \
     libavutil/intmath.c \

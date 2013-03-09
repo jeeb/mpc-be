@@ -757,18 +757,6 @@ void avcodec_free_frame(AVFrame **frame)
     type av_##name##_get_##field(const str *s) { return s->field; } \
     void av_##name##_set_##field(str *s, type v) { s->field = v; }
 
-MAKE_ACCESSORS(AVFrame, frame, int64_t, best_effort_timestamp)
-MAKE_ACCESSORS(AVFrame, frame, int64_t, pkt_duration)
-MAKE_ACCESSORS(AVFrame, frame, int64_t, pkt_pos)
-MAKE_ACCESSORS(AVFrame, frame, int64_t, channel_layout)
-MAKE_ACCESSORS(AVFrame, frame, int,     channels)
-MAKE_ACCESSORS(AVFrame, frame, int,     sample_rate)
-MAKE_ACCESSORS(AVFrame, frame, AVDictionary *, metadata)
-MAKE_ACCESSORS(AVFrame, frame, int,     decode_error_flags)
-MAKE_ACCESSORS(AVFrame, frame, int,     pkt_size)
-
-AVDictionary **ff_frame_get_metadatap(AVFrame *frame) {return &frame->metadata;};
-
 MAKE_ACCESSORS(AVCodecContext, codec, AVRational, pkt_timebase)
 MAKE_ACCESSORS(AVCodecContext, codec, const AVCodecDescriptor *, codec_descriptor)
 
@@ -1118,12 +1106,23 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
                 if (avctx->sub_charenc_mode == FF_SUB_CHARENC_MODE_AUTOMATIC)
                     avctx->sub_charenc_mode = FF_SUB_CHARENC_MODE_PRE_DECODER;
 
-                if (!CONFIG_ICONV && avctx->sub_charenc_mode == FF_SUB_CHARENC_MODE_PRE_DECODER) {
+                if (avctx->sub_charenc_mode == FF_SUB_CHARENC_MODE_PRE_DECODER) {
+#if CONFIG_ICONV
+                    iconv_t cd = iconv_open("UTF-8", avctx->sub_charenc);
+                    if (cd == (iconv_t)-1) {
+                        av_log(avctx, AV_LOG_ERROR, "Unable to open iconv context "
+                               "with input character encoding \"%s\"\n", avctx->sub_charenc);
+                        ret = AVERROR(errno);
+                        goto free_and_end;
+                    }
+                    iconv_close(cd);
+#else
                     av_log(avctx, AV_LOG_ERROR, "Character encoding subtitles "
                            "conversion needs a libavcodec built with iconv support "
                            "for this codec\n");
                     ret = AVERROR(ENOSYS);
                     goto free_and_end;
+#endif
                 }
             }
         }
@@ -1162,7 +1161,10 @@ int ff_alloc_packet2(AVCodecContext *avctx, AVPacket *avpkt, int size)
     }
 
     if (avpkt->data) {
+        AVBufferRef *buf = avpkt->buf;
+#if FF_API_DESTRUCT_PACKET
         void *destruct = avpkt->destruct;
+#endif
 
         if (avpkt->size < size) {
             av_log(avctx, AV_LOG_ERROR, "User packet is too small (%d < %d)\n", avpkt->size, size);
@@ -1170,7 +1172,10 @@ int ff_alloc_packet2(AVCodecContext *avctx, AVPacket *avpkt, int size)
         }
 
         av_init_packet(avpkt);
+#if FF_API_DESTRUCT_PACKET
         avpkt->destruct = destruct;
+#endif
+        avpkt->buf      = buf;
         avpkt->size     = size;
         return 0;
     } else {
@@ -1318,6 +1323,7 @@ int attribute_align_arg avcodec_encode_audio2(AVCodecContext *avctx,
                 avpkt->size = user_pkt.size;
                 ret = -1;
             }
+            avpkt->buf      = user_pkt.buf;
             avpkt->data     = user_pkt.data;
             avpkt->destruct = user_pkt.destruct;
         } else {
@@ -1329,9 +1335,9 @@ int attribute_align_arg avcodec_encode_audio2(AVCodecContext *avctx,
 
     if (!ret) {
         if (needs_realloc && avpkt->data) {
-            uint8_t *new_data = av_realloc(avpkt->data, avpkt->size + FF_INPUT_BUFFER_PADDING_SIZE);
-            if (new_data)
-                avpkt->data = new_data;
+            ret = av_buffer_realloc(&avpkt->buf, avpkt->size + FF_INPUT_BUFFER_PADDING_SIZE);
+            if (ret >= 0)
+                avpkt->data = avpkt->buf->data;
         }
 
         avctx->frame_number++;
@@ -1515,6 +1521,7 @@ int attribute_align_arg avcodec_encode_video2(AVCodecContext *avctx,
                 avpkt->size = user_pkt.size;
                 ret = -1;
             }
+            avpkt->buf      = user_pkt.buf;
             avpkt->data     = user_pkt.data;
             avpkt->destruct = user_pkt.destruct;
         } else {
@@ -1530,11 +1537,10 @@ int attribute_align_arg avcodec_encode_video2(AVCodecContext *avctx,
         else if (!(avctx->codec->capabilities & CODEC_CAP_DELAY))
             avpkt->pts = avpkt->dts = frame->pts;
 
-        if (needs_realloc && avpkt->data &&
-            avpkt->destruct == av_destruct_packet) {
-            uint8_t *new_data = av_realloc(avpkt->data, avpkt->size + FF_INPUT_BUFFER_PADDING_SIZE);
-            if (new_data)
-                avpkt->data = new_data;
+        if (needs_realloc && avpkt->data) {
+            ret = av_buffer_realloc(&avpkt->buf, avpkt->size + FF_INPUT_BUFFER_PADDING_SIZE);
+            if (ret >= 0)
+                avpkt->data = avpkt->buf->data;
         }
 
         avctx->frame_number++;
@@ -1650,7 +1656,7 @@ static int add_metadata_from_side_data(AVCodecContext *avctx, AVFrame *frame)
     while (side_metadata < end) {
         const uint8_t *key = side_metadata;
         const uint8_t *val = side_metadata + strlen(key) + 1;
-        int ret = av_dict_set(ff_frame_get_metadatap(frame), key, val, 0);
+        int ret = av_dict_set(avpriv_frame_get_metadatap(frame), key, val, 0);
         if (ret < 0)
             break;
         side_metadata = val + strlen(val) + 1;
@@ -1904,12 +1910,7 @@ static int recode_subtitle(AVCodecContext *avctx,
 
 #if CONFIG_ICONV
     cd = iconv_open("UTF-8", avctx->sub_charenc);
-    if (cd == (iconv_t)-1) {
-        av_log(avctx, AV_LOG_ERROR, "Unable to open iconv context "
-               "with input character encoding \"%s\"\n", avctx->sub_charenc);
-        ret = AVERROR(errno);
-        goto end;
-    }
+    av_assert0(cd != (iconv_t)-1);
 
     inb = inpkt->data;
     inl = inpkt->size;
@@ -2161,14 +2162,14 @@ size_t av_get_codec_tag_string(char *buf, size_t buf_size, unsigned int codec_ta
 {
     int i, len, ret = 0;
 
-#define IS_PRINT(x)                                               \
+#define TAG_PRINT(x)                                              \
     (((x) >= '0' && (x) <= '9') ||                                \
      ((x) >= 'a' && (x) <= 'z') || ((x) >= 'A' && (x) <= 'Z') ||  \
      ((x) == '.' || (x) == ' ' || (x) == '-' || (x) == '_'))
 
     for (i = 0; i < 4; i++) {
         len = snprintf(buf, buf_size,
-                       IS_PRINT(codec_tag&0xFF) ? "%c" : "[%d]", codec_tag&0xFF);
+                       TAG_PRINT(codec_tag & 0xFF) ? "%c" : "[%d]", codec_tag & 0xFF);
         buf        += len;
         buf_size    = buf_size > len ? buf_size - len : 0;
         ret        += len;
@@ -2777,10 +2778,10 @@ int avpriv_unlock_avformat(void)
 
 unsigned int avpriv_toupper4(unsigned int x)
 {
-    return av_toupper(x & 0xFF)
-           + (av_toupper((x >> 8) & 0xFF) << 8)
-           + (av_toupper((x >> 16) & 0xFF) << 16)
-           + (av_toupper((x >> 24) & 0xFF) << 24);
+    return av_toupper(x & 0xFF) +
+          (av_toupper((x >>  8) & 0xFF) << 8)  +
+          (av_toupper((x >> 16) & 0xFF) << 16) +
+          (av_toupper((x >> 24) & 0xFF) << 24);
 }
 
 #if !HAVE_THREADS

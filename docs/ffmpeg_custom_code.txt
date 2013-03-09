@@ -23,6 +23,7 @@
 
 * libavutil/attributes.h
 * libavutil/common.h
+* libavutil/frame.h
 * libavutil/eval.c
 * libavutil/internal.h
 * libavutil/mathematics.h
