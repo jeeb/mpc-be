@@ -86,9 +86,13 @@ protected:
 	bool            m_bResync;
 
 	// Mixer
-	CMixer                  m_Mixer;
+	CMixer          m_Mixer;
 
-	ps2_state_t             m_ps2_state;
+	ps2_state_t     m_ps2_state;
+
+	BYTE            m_hdmibuff[24576];
+	int             m_hdmicount;
+	int             m_hdmisize;
 
 	CFFAudioDecoder m_FFAudioDec;
 
