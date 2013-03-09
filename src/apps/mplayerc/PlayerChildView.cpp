@@ -315,8 +315,11 @@ LRESULT CChildView::OnNcHitTest(CPoint point)
 	UINT nHitTest = CWnd::OnNcHitTest(point);
 
 	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
-	//bool fLeftMouseBtnUnassigned = !AssignedToCmd(wmcmd::LDOWN);
-	if (!pFrame->m_fFullScreen && /*(pFrame->IsCaptionHidden() || fLeftMouseBtnUnassigned) && */AfxGetAppSettings().iCaptionMenuMode==MODE_BORDERLESS) {
+
+	WINDOWPLACEMENT wp;
+	pFrame->GetWindowPlacement(&wp);
+
+	if (!pFrame->m_fFullScreen && wp.showCmd != SW_SHOWMAXIMIZED && AfxGetAppSettings().iCaptionMenuMode==MODE_BORDERLESS) {
 		CRect rcClient, rcFrame;
 		GetWindowRect(&rcFrame);
 		rcClient = rcFrame;
