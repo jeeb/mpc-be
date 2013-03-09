@@ -62,7 +62,6 @@
 #include <qnetwork.h>
 #include <psapi.h>
 
-#include "../../DSUtil/DSUtil.h"
 #include "FGManager.h"
 #include "FGManagerBDA.h"
 #include "TextPassThruFilter.h"

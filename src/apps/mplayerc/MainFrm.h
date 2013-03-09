@@ -72,6 +72,7 @@
 #include <sizecbar/scbarg.h>
 #include <afxinet.h>
 
+#define USE_MEDIAINFO_STATIC
 #include <MediaInfo/MediaInfo.h>
 using namespace MediaInfoLib;
 

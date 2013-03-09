@@ -23,7 +23,6 @@
 
 #include "stdafx.h"
 #include "MediaTypesDlg.h"
-#include "../../DSUtil/DSUtil.h"
 #include <moreuuids.h>
 
 

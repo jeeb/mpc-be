@@ -22,12 +22,10 @@
  */
 
 #include "stdafx.h"
-#include <Windows.h>
 #include <commdlg.h>
 #include "MainFrm.h"
 #include "TextPassThruFilter.h"
 #include <moreuuids.h>
-#include "../../DSUtil/DSUtil.h"
 #include "../../Subtitles/SubtitleInputPin.h"
 
 //

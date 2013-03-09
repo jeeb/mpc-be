@@ -22,8 +22,8 @@
  */
 
 #include "stdafx.h"
-#include "PlayerInfoBar.h"
 #include "MainFrm.h"
+#include "PlayerInfoBar.h"
 
 
 // CPlayerInfoBar

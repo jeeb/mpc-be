@@ -23,7 +23,6 @@
 
 #include "stdafx.h"
 #include "ComPropertySheet.h"
-#include "../../DSUtil/DSUtil.h"
 #include "../../filters/core/InternalPropertyPage.h"
 
 // CComPropertyPageSite

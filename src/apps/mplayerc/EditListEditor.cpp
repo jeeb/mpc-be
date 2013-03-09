@@ -22,7 +22,6 @@
 
 #include "stdafx.h"
 #include "EditListEditor.h"
-#include "../../DSUtil/DSUtil.h"
 
 CClip::CClip()
 {

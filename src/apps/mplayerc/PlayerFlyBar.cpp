@@ -21,8 +21,8 @@
  */
 
 #include "stdafx.h"
-#include "PlayerFlyBar.h"
 #include "MainFrm.h"
+#include "PlayerFlyBar.h"
 
 // CPrevView
 

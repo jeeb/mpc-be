@@ -25,7 +25,6 @@
 #include "AboutDlg.h"
 #include <Tlhelp32.h>
 #include "MainFrm.h"
-#include "../../DSUtil/DSUtil.h"
 #include "Struct.h"
 #include "FileVersionInfo.h"
 #include <psapi.h>

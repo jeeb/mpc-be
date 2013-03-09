@@ -27,7 +27,6 @@
 #include <bdamedia.h>
 #include <bdaiface.h>
 #include "PPageCapture.h"
-#include "../../DSUtil/DSUtil.h"
 
 
 static struct cc_t {

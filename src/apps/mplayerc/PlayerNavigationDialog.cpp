@@ -23,7 +23,6 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PlayerNavigationDialog.h"
-#include "../../DSUtil/DSUtil.h"
 #include <moreuuids.h>
 
 

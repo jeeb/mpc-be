@@ -24,7 +24,6 @@
 #include "stdafx.h"
 #include "PPageFiltersPriority.h"
 #include "FGFilter.h"
-#include "../DSUtil/DSUtil.h"
 
 // CPPageFiltersPriority dialog
 

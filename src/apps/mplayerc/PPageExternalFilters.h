@@ -25,7 +25,6 @@
 
 #include "PPageBase.h"
 #include "FloatEdit.h"
-#include "mplayerc.h"
 
 
 // CPPageExternalFilters dialog

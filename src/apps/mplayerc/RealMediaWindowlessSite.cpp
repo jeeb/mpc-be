@@ -26,7 +26,6 @@
 #include <atlbase.h>
 #include <atlcoll.h>
 #include "RealMediaWindowlessSite.h"
-#include "../../DSUtil/DSUtil.h"
 
 using namespace DSObjects;
 

@@ -23,7 +23,6 @@
 
 #include "stdafx.h"
 #include "SelectMediaType.h"
-#include "../../DSUtil/DSUtil.h"
 
 // CSelectMediaType dialog
 

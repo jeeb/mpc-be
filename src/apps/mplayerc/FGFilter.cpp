@@ -25,7 +25,6 @@
 #include <mpconfig.h>
 #include "FGFilter.h"
 #include "MainFrm.h"
-#include "../../DSUtil/DSUtil.h"
 #include <AllocatorCommon7.h>
 #include <AllocatorCommon.h>
 #include <SyncAllocatorPresenter.h>

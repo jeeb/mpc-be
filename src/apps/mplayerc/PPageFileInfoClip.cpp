@@ -24,9 +24,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PPageFileInfoClip.h"
-#include <atlbase.h>
 #include <qnetwork.h>
-#include "../../DSUtil/DSUtil.h"
 #include "../../DSUtil/WinAPIUtils.h"
 
 

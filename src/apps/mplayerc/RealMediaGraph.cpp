@@ -24,7 +24,6 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include <math.h>
-#include <atlbase.h>
 #include <atlcoll.h>
 #include <InitGuid.h>
 #include "RealMediaGraph.h"
@@ -32,7 +31,6 @@
 #include <realmedia/rmavsurf.h>
 #include <realmedia/rmaevent.h>
 #include <realmedia/rmaprefs.h>
-#include "../../DSUtil/DSUtil.h"
 #include <moreuuids.h>
 #include "AuthDlg.h"
 

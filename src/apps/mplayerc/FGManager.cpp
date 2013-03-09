@@ -24,7 +24,6 @@
 #include "stdafx.h"
 #include <mpconfig.h>
 #include "FGManager.h"
-#include "../../DSUtil/DSUtil.h"
 #include "../../filters/Filters.h"
 #include <AllocatorCommon7.h>
 #include <AllocatorCommon.h>
@@ -35,8 +34,6 @@
 #include "../../filters/transform/DeCSSFilter/VobFile.h"
 #include <InitGuid.h>
 #include <dmodshow.h>
-#include <d3d9.h>
-#include <vmr9.h>
 #include <evr.h>
 #include <evr9.h>
 #include <ksproxy.h>

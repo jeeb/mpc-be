@@ -24,7 +24,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PlayerToolBar.h"
-#include "IPinHook.h"
+#include <IPinHook.h>
 
 
 // CPlayerToolBar

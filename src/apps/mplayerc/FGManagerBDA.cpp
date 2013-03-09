@@ -30,7 +30,6 @@
 #include <time.h>
 #include <dvbsiparser.h>
 
-#include "../../DSUtil/DSUtil.h"
 #include "../../DSUtil/GolombBuffer.h"
 #include "../../filters/switcher/AudioSwitcher/AudioSwitcher.h"
 #include <moreuuids.h>
