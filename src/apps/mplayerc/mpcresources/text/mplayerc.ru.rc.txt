@@ -1633,7 +1633,7 @@ STRING IDS_MPEGSPLITTER_SUB_FORCING		"Загружать все субтитры
 STRING IDS_MPEGSPLITTER_SUB_ORDER		"Порядок выбора субтитров:"
 STRING IDS_MPEGSPLITTER_THD_NOSPLIT		"Как есть"
 STRING IDS_MPEGSPLITTER_TRACKS_ORDER		"Изменить порядок дорожек"
-STRING IDS_MPEGSPLITTER_TRUEHD_OUTPUT		"Вывод TrueHD потоков"
+STRING IDS_MPEGSPLITTER_TRUEHD_OUTPUT		"Вывод TrueHD+AC3 потоков"
 STRING IDS_MPEGSPLITTER_WARNING		"Предупреждение"
 STRING IDS_MPEGSPLITTER_WARNING_TEXT		"Включение данной опции может привести к некорректной перемотке. Вы уверены ?"
 STRING IDS_MPLAYERC_0		"Быстро открыть файл"

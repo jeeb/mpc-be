@@ -1638,7 +1638,7 @@ STRING IDS_MPEGSPLITTER_SUB_FORCING		"Αναγκαστική φόρτωση όλ
 STRING IDS_MPEGSPLITTER_SUB_ORDER		"Σειρά γλώσσας υποτίτλων:"
 STRING IDS_MPEGSPLITTER_THD_NOSPLIT		"Ως έχει"
 STRING IDS_MPEGSPLITTER_TRACKS_ORDER		"Αλλαγή σειράς κοματιού"
-STRING IDS_MPEGSPLITTER_TRUEHD_OUTPUT		"Μορφή εξόδου ροών TrueHD"
+STRING IDS_MPEGSPLITTER_TRUEHD_OUTPUT		"Μορφή εξόδου ροών TrueHD+AC3"
 STRING IDS_MPEGSPLITTER_WARNING		"Warning"
 STRING IDS_MPEGSPLITTER_WARNING_TEXT		"Enabling this option can lead to inaccurate seeking. Are you sure?"
 STRING IDS_MPLAYERC_0		"Γρήγορο άνοιγμα αρχείου"

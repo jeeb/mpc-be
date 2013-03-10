@@ -1633,7 +1633,7 @@ STRING IDS_MPEGSPLITTER_SUB_FORCING		"Forcer le chargement de tous les sous-titr
 STRING IDS_MPEGSPLITTER_SUB_ORDER		"Ordre des pistes de sous-titres :"
 STRING IDS_MPEGSPLITTER_THD_NOSPLIT		"Tels quels"
 STRING IDS_MPEGSPLITTER_TRACKS_ORDER		"Modifier l'ordre des pistes"
-STRING IDS_MPEGSPLITTER_TRUEHD_OUTPUT		"Format de sortie des flux TrueHD"
+STRING IDS_MPEGSPLITTER_TRUEHD_OUTPUT		"Format de sortie des flux TrueHD+AC3"
 STRING IDS_MPEGSPLITTER_WARNING		"Warning"
 STRING IDS_MPEGSPLITTER_WARNING_TEXT		"Enabling this option can lead to inaccurate seeking. Are you sure?"
 STRING IDS_MPLAYERC_0		"Ouvrir rapidement"

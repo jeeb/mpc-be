@@ -1633,7 +1633,7 @@ STRING IDS_MPEGSPLITTER_SUB_FORCING		"Примусово завантажува�
 STRING IDS_MPEGSPLITTER_SUB_ORDER		"Порядок вибору субтитрів:"
 STRING IDS_MPEGSPLITTER_THD_NOSPLIT		"Без змін"
 STRING IDS_MPEGSPLITTER_TRACKS_ORDER		"Змінити порядок доріжок"
-STRING IDS_MPEGSPLITTER_TRUEHD_OUTPUT		"Вивід TrueHD потоків"
+STRING IDS_MPEGSPLITTER_TRUEHD_OUTPUT		"Вивід TrueHD+AC3 потоків"
 STRING IDS_MPEGSPLITTER_WARNING		"Попередження"
 STRING IDS_MPEGSPLITTER_WARNING_TEXT		"Ввімкнення цієї опції може призвести до неточного перемотування. Ви впевнені?"
 STRING IDS_MPLAYERC_0		"Швидко відкрити файл"
