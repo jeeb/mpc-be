@@ -452,6 +452,7 @@ SRCS_YASM = \
     libavcodec/x86/mpeg4qpel.asm \
     libavcodec/x86/pngdsp.asm \
     libavcodec/x86/proresdsp.asm \
+    libavcodec/x86/qpelbase.asm \
     libavcodec/x86/rv34dsp.asm \
     libavcodec/x86/rv40dsp.asm \
     libavcodec/x86/sbrdsp.asm \
