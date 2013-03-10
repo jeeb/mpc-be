@@ -239,12 +239,12 @@
 #define IDS_RS_TOGGLESHADERSSCREENSPACE		_T("ToggleShaderScreenSpace")
 
 #define IDS_RS_DEFAULT_CAPTURE				_T("DefaultCapture")
-#define IDS_RS_CAPTURE						_T("Capture")
+#define IDS_R_CAPTURE						_T("Capture")
 #define IDS_RS_VIDEO_DISP_NAME				_T("VidDispName")
 #define IDS_RS_AUDIO_DISP_NAME				_T("AudDispName")
 #define IDS_RS_COUNTRY						_T("Country")
 
-#define IDS_RS_DVB							_T("DVB configuration")
+#define IDS_R_DVB							_T("DVB configuration")
 #define IDS_RS_BDA_NETWORKPROVIDER			_T("BDANetworkProvider")
 #define IDS_RS_BDA_TUNER					_T("BDATuner")
 #define IDS_RS_BDA_RECEIVER					_T("BDAReceiver")
@@ -257,29 +257,29 @@
 #define IDS_RS_BDA_IGNORE_ENCRYPTED_CHANNELS _T("BDAIgnoreEncryptedChannels")
 #define IDS_RS_DVB_LAST_CHANNEL				_T("LastChannel")
 
-#define IDS_D3D9RENDERDEVICE				_T("D3D9RenderDevice")
+#define IDS_RS_D3D9RENDERDEVICE				_T("D3D9RenderDevice")
 
-#define IDS_FASTSEEK_KEYFRAME				_T("FastSeek")
-#define IDS_MINI_DUMP						_T("MiniDump")
+#define IDS_RS_FASTSEEK_KEYFRAME			_T("FastSeek")
+#define IDS_RS_MINI_DUMP					_T("MiniDump")
 
-#define IDS_LCD_SUPPORT						_T("LcdSupport")
-#define IDS_SMARTSEEK						_T("UseSmartSeek")
-#define IDS_CHAPTER_MARKER					_T("ChapterMarker")
+#define IDS_RS_LCD_SUPPORT					_T("LcdSupport")
+#define IDS_RS_SMARTSEEK					_T("UseSmartSeek")
+#define IDS_RS_CHAPTER_MARKER				_T("ChapterMarker")
 
-#define IDS_REMAINING_TIME					_T("RemainingTime")
+#define IDS_RS_REMAINING_TIME				_T("RemainingTime")
 
 #define IDS_RS_GOTO_LAST_USED				_T("gotoluf")
 #define IDS_RS_GOTO_FPS						_T("fps")
 
-#define IDS_R_SHADERS_INITIALIZED			_T("Initialized")
+#define IDS_RS_SHADERS_INITIALIZED			_T("Initialized")
 
 #define IDS_R_DLG_SUBTITLEDL				_T("Dialogs\\SubtitleDl")
 #define IDS_RS_DLG_SUBTITLEDL_COLWIDTH		_T("ColWidth")
 
 #define IDS_R_DLG_ORGANIZE_FAV				_T("Dialogs\\OrganizeFavorites")
 
-#define IDS_USE_FLYBAR						_T("UseFlybar")
-#define IDS_USE_FLYBAR_ONTOP				_T("UseFlybarOnTop")
+#define IDS_RS_USE_FLYBAR					_T("UseFlybar")
+#define IDS_RS_USE_FLYBAR_ONTOP				_T("UseFlybarOnTop")
 
 #define IDS_RS_LAST_OPEN_FILTER_DIR			_T("LastOpenFilterDir")
 #define IDS_RS_LAST_OPEN_SUB_DIR			_T("LastOpenSubDir")
@@ -287,11 +287,11 @@
 #define IDS_RS_YOUTUBE_TAG					_T("YoutubeTag")
 #define IDS_RS_YOUTUBE_SOURCE				_T("YoutubeSourceType")
 
-#define IDS_RS_PERFOMANCE					_T("\\Perfomance")
+#define IDS_R_PERFOMANCE					_T("\\Perfomance")
 #define IDS_RS_PERFOMANCE_CACHE_LENGTH		_T("CacheLen")
 #define IDS_RS_PERFOMANCE_MINQUEUESIZE		_T("MinQueueSize")
 #define IDS_RS_PERFOMANCE_MAXQUEUESIZE		_T("MaxQueueSize")
 #define IDS_RS_PERFOMANCE_MINQUEUEPACKETS	_T("MinQueuePackets")
 #define IDS_RS_PERFOMANCE_MAXQUEUEPACKETS	_T("MaxQueuePackets")
 
-#define IDS_RS_FILTERS_PRIORITY				_T("\\Filters Priority")
+#define IDS_R_FILTERS_PRIORITY				_T("\\Filters Priority")
