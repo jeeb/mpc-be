@@ -214,7 +214,7 @@ BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 18
 14		"MPEG-PS:"
 15		"MP4:"
 16		"FLV:"
-17		"Source Filters"
+17		"Sorgente filtri"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 30
@@ -366,7 +366,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 5		"Opzioni di apertura"
-6		"Force a single process"
+6		"Forza un unico processo"
 8		"Apri solo un'unica schermata per ogni file aperto."
 10		"Apri una nuova schermata per ogni file aperto."
 12		"Barra del titolo"
@@ -1142,7 +1142,7 @@ STRING IDD_PPAGECAPTURE		"Riproduzione::Cattura"
 STRING IDD_PPAGEDVD		"Riproduzione::DVD/OGM"
 STRING IDD_PPAGEEXTERNALFILTERS		"Filtri Esterni"
 STRING IDD_PPAGEFILTERSPERFORMANCE		"Filtri Interni::Performance"
-STRING IDD_PPAGEFILTERSPRIORITY		"Internal Filters::Priority"
+STRING IDD_PPAGEFILTERSPRIORITY		"Filtri Interni::Priorità"
 STRING IDD_PPAGEFORMATS		"Lettore::Formati"
 STRING IDD_PPAGEFULLSCREEN		"Riproduzione::Schermo intero"
 STRING IDD_PPAGEINTERFACE		"Interfaccia"
