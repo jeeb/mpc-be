@@ -328,6 +328,9 @@ void VP8SetSegment(const VP8EncIterator* const it, int segment);
 // Paginated token buffer
 
 // WIP:#define USE_TOKEN_BUFFER
+// ==> Start patch MPC
+#define USE_TOKEN_BUFFER
+// ==> End patch MPC
 
 typedef struct VP8Tokens VP8Tokens;  // struct details in token.c
 
