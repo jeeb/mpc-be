@@ -328,9 +328,6 @@ void VP8SetSegment(const VP8EncIterator* const it, int segment);
 // Paginated token buffer
 
 // WIP:#define USE_TOKEN_BUFFER
-// ==> Start patch MPC
-#define USE_TOKEN_BUFFER
-// ==> End patch MPC
 
 typedef struct VP8Tokens VP8Tokens;  // struct details in token.c
 
@@ -340,8 +337,8 @@ typedef struct {
   VP8Tokens** last_page_;   // last page
   uint16_t* tokens_;        // set to (*last_page_)->tokens_
   int left_;          // how many free tokens left before the page is full.
-  int error_;         // true in case of malloc error
 #endif
+  int error_;         // true in case of malloc error
 } VP8TBuffer;
 
 void VP8TBufferInit(VP8TBuffer* const b);    // initialize an empty buffer

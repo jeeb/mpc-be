@@ -313,7 +313,7 @@ static int j2k_get_num_tp(opj_cp_t *cp,int pino,int tileno){
 }
 
 /**	mem allocation for TLM marker*/
-int j2k_calculate_tp(opj_cp_t *cp,int img_numcomp,opj_image_t *image,opj_j2k_t *j2k ){
+static int j2k_calculate_tp(opj_cp_t *cp,int img_numcomp,opj_image_t *image,opj_j2k_t *j2k ){
 	int pino,tileno,totnum_tp=0;
 
 	OPJ_ARG_NOT_USED(img_numcomp);
@@ -468,6 +468,12 @@ static void j2k_read_siz(opj_j2k_t *j2k) {
 	}
 #endif /* USE_JPWL */
 
+  /* prevent division by zero */
+  if (!(cp->tdx * cp->tdy)) {
+    opj_event_msg(j2k->cinfo, EVT_ERROR, "JPWL: invalid tile size (tdx: %d, tdy: %d)\n", cp->tdx, cp->tdy);
+    return;
+  }
+
 	image->comps = (opj_image_comp_t*) opj_calloc(image->numcomps, sizeof(opj_image_comp_t));
 	for (i = 0; i < image->numcomps; i++) {
 		int tmp, w, h;
@@ -505,6 +511,12 @@ static void j2k_read_siz(opj_j2k_t *j2k) {
 			
 		}
 #endif /* USE_JPWL */
+
+    /* prevent division by zero */
+    if (!(image->comps[i].dx * image->comps[i].dy)) {
+      opj_event_msg(j2k->cinfo, EVT_ERROR, "JPWL: invalid component size (dx: %d, dy: %d)\n", image->comps[i].dx, image->comps[i].dy);
+      return;
+    }
 
 		/* TODO: unused ? */
 		w = int_ceildiv(image->x1 - image->x0, image->comps[i].dx);
@@ -558,7 +570,17 @@ static void j2k_read_siz(opj_j2k_t *j2k) {
 #endif /* USE_JPWL */
 
 	cp->tcps = (opj_tcp_t*) opj_calloc(cp->tw * cp->th, sizeof(opj_tcp_t));
+    if (cp->tcps == NULL)
+    {
+        opj_event_msg(j2k->cinfo, EVT_ERROR, "Out of memory\n");
+        return;
+    }
 	cp->tileno = (int*) opj_malloc(cp->tw * cp->th * sizeof(int));
+    if (cp->tileno == NULL)
+    {
+        opj_event_msg(j2k->cinfo, EVT_ERROR, "Out of memory\n");
+        return;
+    }
 	cp->tileno_size = 0;
 	
 #ifdef USE_JPWL
@@ -684,6 +706,12 @@ static void j2k_read_cox(opj_j2k_t *j2k, int compno) {
 					"of resolutions of this component\nModify the cp_reduce parameter.\n\n", compno);
 		j2k->state |= J2K_STATE_ERR;
 	}
+  if( tccp->numresolutions > J2K_MAXRLVLS ) {
+    opj_event_msg(j2k->cinfo, EVT_ERROR, "Error decoding component %d.\nThe number of resolutions is too big: %d vs max= %d. Truncating.\n\n",
+      compno, tccp->numresolutions, J2K_MAXRLVLS);
+		j2k->state |= J2K_STATE_ERR;
+    tccp->numresolutions = J2K_MAXRLVLS;
+ }
 
 	tccp->cblkw = cio_read(cio, 1) + 2;	/* SPcox (E) */
 	tccp->cblkh = cio_read(cio, 1) + 2;	/* SPcox (F) */
@@ -807,6 +835,12 @@ static void j2k_read_coc(opj_j2k_t *j2k) {
 	
 	len = cio_read(cio, 2);		/* Lcoc */
 	compno = cio_read(cio, image->numcomps <= 256 ? 1 : 2);	/* Ccoc */
+  if (compno >= image->numcomps) {
+    opj_event_msg(j2k->cinfo, EVT_ERROR,
+      "bad component number in COC (%d out of a maximum of %d)\n",
+      compno, image->numcomps);
+    return;
+  }
 	tcp->tccps[compno].csty = cio_read(cio, 1);	/* Scoc */
 	j2k_read_cox(j2k, compno);
 }
@@ -988,8 +1022,15 @@ static void j2k_read_qcc(opj_j2k_t *j2k) {
 
 		/* keep your private count of tiles */
 		backup_compno++;
-	};
+	}
 #endif /* USE_JPWL */
+
+  if ((compno < 0) || (compno >= numcomp)) {
+    opj_event_msg(j2k->cinfo, EVT_ERROR,
+      "bad component number in QCC (%d out of a maximum of %d)\n",
+      compno, j2k->image->numcomps);
+    return;
+  }
 
 	j2k_read_qcx(j2k, compno, len - 2 - (numcomp <= 256 ? 1 : 2));
 }
@@ -1269,7 +1310,7 @@ static void j2k_read_sot(opj_j2k_t *j2k) {
 		static int backup_tileno = 0;
 
 		/* tileno is negative or larger than the number of tiles!!! */
-		if ((tileno < 0) || (tileno > (cp->tw * cp->th))) {
+		if ((tileno < 0) || (tileno >= (cp->tw * cp->th))) {
 			opj_event_msg(j2k->cinfo, EVT_ERROR,
 				"JPWL: bad tile number (%d out of a maximum of %d)\n",
 				tileno, (cp->tw * cp->th));
@@ -1286,8 +1327,18 @@ static void j2k_read_sot(opj_j2k_t *j2k) {
 
 		/* keep your private count of tiles */
 		backup_tileno++;
-	};
+	}
+  else
 #endif /* USE_JPWL */
+  {
+    /* tileno is negative or larger than the number of tiles!!! */
+    if ((tileno < 0) || (tileno >= (cp->tw * cp->th))) {
+      opj_event_msg(j2k->cinfo, EVT_ERROR,
+        "JPWL: bad tile number (%d out of a maximum of %d)\n",
+        tileno, (cp->tw * cp->th));
+      return;
+    }
+  }
 	
 	if (cp->tileno_size == 0) {
 		cp->tileno[cp->tileno_size] = tileno;
@@ -1325,8 +1376,18 @@ static void j2k_read_sot(opj_j2k_t *j2k) {
 				totlen);
 		}
 
-	};
+	}
+  else
 #endif /* USE_JPWL */
+  {
+    /* totlen is negative or larger than the bytes left!!! */
+    if ((totlen < 0) || (totlen > (cio_numbytesleft(cio) + 8))) {
+      opj_event_msg(j2k->cinfo, EVT_ERROR,
+        "JPWL: bad tile byte size (%d bytes against %d bytes left)\n",
+        totlen, cio_numbytesleft(cio) + 8);
+      return;
+    }
+  }
 
 	if (!totlen)
 		totlen = cio_numbytesleft(cio) + 8;
@@ -1477,6 +1538,24 @@ static void j2k_read_sod(opj_j2k_t *j2k) {
 		truncate = 1;		/* Case of a truncate codestream */
 	}	
 
+   {/* chop padding bytes: */
+    unsigned char *s, *e; 
+
+    s = cio_getbp(cio);
+    e = s + len;
+
+  if(len > 8) s = e - 8;
+
+  if(e[-2] == 0x00 && e[-1] == 0x00) /* padding bytes */
+  {
+	while(e > s)
+ {
+	if(e[-2] == 0xff && e[-1] == 0xd9)	break;
+  --len; --e; truncate = 1;
+ }
+  }
+   }
+
 	data = j2k->tile_data[curtileno];
 	data = (unsigned char*) opj_realloc(data, (j2k->tile_len[curtileno] + len) * sizeof(unsigned char));
 
@@ -1536,6 +1615,13 @@ static void j2k_read_rgn(opj_j2k_t *j2k) {
 	};
 #endif /* USE_JPWL */
 
+  if (compno >= numcomps) {
+    opj_event_msg(j2k->cinfo, EVT_ERROR,
+      "bad component number in RGN (%d out of a maximum of %d)\n",
+      compno, j2k->image->numcomps);
+    return;
+  }
+
 	tcp->tccps[compno].roishift = cio_read(cio, 1);				/* SPrgn */
 }
 
@@ -1554,7 +1640,7 @@ static void j2k_write_eoc(opj_j2k_t *j2k) {
 
 static void j2k_read_eoc(opj_j2k_t *j2k) {
 	int i, tileno;
-	opj_bool success;
+	opj_bool success = OPJ_FALSE;
 
 	/* if packets should be decoded */
 	if (j2k->cp->limit_decoding != DECODE_ALL_BUT_PACKETS) {
@@ -1562,11 +1648,16 @@ static void j2k_read_eoc(opj_j2k_t *j2k) {
 		tcd_malloc_decode(tcd, j2k->image, j2k->cp);
 		for (i = 0; i < j2k->cp->tileno_size; i++) {
 			tcd_malloc_decode_tile(tcd, j2k->image, j2k->cp, i, j2k->cstr_info);
-			tileno = j2k->cp->tileno[i];
-			success = tcd_decode_tile(tcd, j2k->tile_data[tileno], j2k->tile_len[tileno], tileno, j2k->cstr_info);
-			opj_free(j2k->tile_data[tileno]);
-			j2k->tile_data[tileno] = NULL;
-			tcd_free_decode_tile(tcd, i);
+			if (j2k->cp->tileno[i] != -1)
+			{
+				tileno = j2k->cp->tileno[i];
+				success = tcd_decode_tile(tcd, j2k->tile_data[tileno], j2k->tile_len[tileno], tileno, j2k->cstr_info);
+				opj_free(j2k->tile_data[tileno]);
+				j2k->tile_data[tileno] = NULL;
+				tcd_free_decode_tile(tcd, i);
+			}
+			else
+				success = OPJ_FALSE;
 			if (success == OPJ_FALSE) {
 				j2k->state |= J2K_STATE_ERR;
 				break;
@@ -1737,6 +1828,14 @@ void j2k_destroy_decompress(opj_j2k_t *j2k) {
 		opj_free(j2k->tile_len);
 	}
 	if(j2k->tile_data != NULL) {
+        if(j2k->cp != NULL) {
+            for (i = 0; i < j2k->cp->tileno_size; i++) {
+                int tileno = j2k->cp->tileno[i];
+                opj_free(j2k->tile_data[tileno]);
+                j2k->tile_data[tileno] = NULL;
+            }
+        }
+
 		opj_free(j2k->tile_data);
 	}
 	if(j2k->default_tcp != NULL) {
@@ -1856,9 +1955,15 @@ opj_image_t* j2k_decode(opj_j2k_t *j2k, opj_cio_t *cio, opj_codestream_info_t *c
 #endif /* USE_JPWL */
 
 		if (id >> 8 != 0xff) {
-			opj_image_destroy(image);
-			opj_event_msg(cinfo, EVT_ERROR, "%.8x: expected a marker instead of %x\n", cio_tell(cio) - 2, id);
-			return 0;
+		if(cio_numbytesleft(cio) != 0) /* not end of file reached and no EOC */
+	   {
+		opj_event_msg(cinfo, EVT_ERROR, "%.8x: expected a marker instead of %x\n", cio_tell(cio) - 2, id);
+		opj_image_destroy(image);
+		return 0;
+	   }
+		opj_event_msg(cinfo, EVT_WARNING, "%.8x: expected a marker instead of %x\n", cio_tell(cio) - 2, id);
+		j2k->state = J2K_STATE_NEOC;
+		break;
 		}
 		e = j2k_dec_mstab_lookup(id);
 		/* Check if the marker is known*/
@@ -1877,7 +1982,10 @@ opj_image_t* j2k_decode(opj_j2k_t *j2k, opj_cio_t *cio, opj_codestream_info_t *c
 			(*e->handler)(j2k);
 		}
 		if (j2k->state & J2K_STATE_ERR) 
+        {
+            opj_image_destroy(image);
 			return NULL;	
+        }
 
 		if (j2k->state == J2K_STATE_MT) {
 			break;
@@ -1949,9 +2057,15 @@ opj_image_t* j2k_decode_jpt_stream(opj_j2k_t *j2k, opj_cio_t *cio,  opj_codestre
 		
 		id = cio_read(cio, 2);
 		if (id >> 8 != 0xff) {
-			opj_image_destroy(image);
-			opj_event_msg(cinfo, EVT_ERROR, "%.8x: expected a marker instead of %x\n", cio_tell(cio) - 2, id);
-			return 0;
+        if(cio_numbytesleft(cio) != 0) /* no end of file reached and no EOC */
+	  {
+		opj_event_msg(cinfo, EVT_ERROR, "%.8x: expected a marker instead of %x\n", cio_tell(cio) - 2, id);
+		opj_image_destroy(image);
+		return 0;
+	  }
+		opj_event_msg(cinfo, EVT_WARNING, "%.8x: expected a marker instead of %x\n", cio_tell(cio) - 2, id);
+		j2k->state = J2K_STATE_NEOC;
+		break;
 		}
 		e = j2k_dec_mstab_lookup(id);
 		if (!(j2k->state & e->states)) {
