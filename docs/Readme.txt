@@ -60,8 +60,11 @@ CSizingControlBar   GPLv2                      http://datamekanix.com/sizecbar/
 Detours             MSR-SSLA                   http://research.microsoft.com/en-us/projects/detours/
 FFmpeg              GPLv3                      http://ffmpeg.org/
 libflac             GPLv2 / New BSD License    http://sourceforge.net/projects/flac/
-libpng              libpng License             http://sourceforge.net/projects/libpng/
+libpng              zlib / libpng License      http://sourceforge.net/projects/libpng/
 libwebp             BSD License                http://code.google.com/p/webp/
+libopenjpeg         New BSD License            http://code.google.com/p/openjpeg/
+libopus             BSD License                http://opus-codec.org/
+libspeex            BSD License                http://speex.org/
 Little CMS          MIT License                http://littlecms.com/
 Logitech SDK        -                          -
 MediaInfoLib        LGPLv3                     http://sourceforge.net/projects/mediainfo/
