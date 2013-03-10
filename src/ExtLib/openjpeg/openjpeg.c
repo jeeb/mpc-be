@@ -59,7 +59,7 @@ DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
 
 
 const char* OPJ_CALLCONV opj_version(void) {
-    return PACKAGE_VERSION;
+    return OPJ_PACKAGE_VERSION;
 }
 
 opj_dinfo_t* OPJ_CALLCONV opj_create_decompress(OPJ_CODEC_FORMAT format) {
@@ -249,7 +249,6 @@ void OPJ_CALLCONV opj_set_default_encoder_parameters(opj_cparameters_t *paramete
     parameters->cp_disto_alloc = 0;
 		parameters->cp_fixed_alloc = 0;
 		parameters->cp_fixed_quality = 0;
-		parameters->jpip_on = OPJ_FALSE;
 /* UniPG>> */
 #ifdef USE_JPWL
 		parameters->jpwl_epc_on = OPJ_FALSE;

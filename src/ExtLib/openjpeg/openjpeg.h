@@ -33,7 +33,6 @@
 #ifndef OPENJPEG_H
 #define OPENJPEG_H
 
-
 /* 
 ==========================================================
    Compiler directives
@@ -41,7 +40,14 @@
 */
 
 #if defined(OPJ_STATIC) || !defined(_WIN32)
+/* http://gcc.gnu.org/wiki/Visibility */
+#if __GNUC__ >= 4
+#define OPJ_API    __attribute__ ((visibility ("default")))
+#define OPJ_LOCAL  __attribute__ ((visibility ("hidden")))
+#else
 #define OPJ_API
+#define OPJ_LOCAL
+#endif
 #define OPJ_CALLCONV
 #else
 #define OPJ_CALLCONV __stdcall
@@ -134,6 +140,10 @@ typedef enum COLOR_SPACE {
 	CLRSPC_GRAY = 2,		/**< grayscale */
 	CLRSPC_SYCC = 3			/**< YUV */
 } OPJ_COLOR_SPACE;
+
+#define ENUMCS_SRGB 16
+#define ENUMCS_GRAY 17
+#define ENUMCS_SYCC 18
 
 /**
 Supported codec
@@ -347,8 +357,6 @@ typedef struct opj_cparameters {
 	char tp_flag;
 	/** MCT (multiple component transform) */
 	char tcp_mct;
-	/** Enable JPIP indexing*/
-	opj_bool jpip_on;
 } opj_cparameters_t;
 
 #define OPJ_DPARAMETERS_IGNORE_PCLR_CMAP_CDEF_FLAG	0x0001
