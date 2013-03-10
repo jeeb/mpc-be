@@ -39,8 +39,7 @@
 #include <ksproxy.h>
 #include <moreuuids.h>
 #include "MediaFormats.h"
-
-#include "../../filters/renderer/VideoRenderers/IPinHook.h"
+#include <IPinHook.h>
 
 //
 // CFGManager
@@ -2197,6 +2196,9 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 			m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(_T("{9852A670-F845-491B-9BE6-EBD841B8A613}")), MERIT64_DO_NOT_USE));
 		}
 	}
+
+	// Blacklist Accusoft PICVideo M-JPEG Codec 2.1 since causes a DEP crash
+	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(_T("{4C4CD9E1-F876-11D2-962F-00500471FDDC}")), MERIT64_DO_NOT_USE));
 
 	// Overrides
 	WORD merit_low = 1;

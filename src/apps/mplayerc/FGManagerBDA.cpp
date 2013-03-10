@@ -21,15 +21,12 @@
  */
 
 #include "stdafx.h"
-
 #include <ks.h>
 #include <ksmedia.h>
 #include <BaseClasses/streams.h>
 #include <mpeg2data.h>
 #include <tuner.h>
-#include <time.h>
 #include <dvbsiparser.h>
-
 #include "../../DSUtil/GolombBuffer.h"
 #include "../../filters/switcher/AudioSwitcher/AudioSwitcher.h"
 #include <moreuuids.h>
