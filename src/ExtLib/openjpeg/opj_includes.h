@@ -128,12 +128,9 @@ static INLINE long lrintf(float f){
 #include "int.h"
 #include "fix.h"
 
-#include "cidx_manager.h"
-#include "indexbox_manager.h"
-
 /* JPWL>> */
 #ifdef USE_JPWL
-#include "./jpwl/jpwl.h"
+#include "jpwl.h"
 #endif /* USE_JPWL */
 /* <<JPWL */
 

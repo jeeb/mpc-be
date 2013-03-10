@@ -20,13 +20,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bio.h" />
-    <ClInclude Include="cidx_manager.h" />
     <ClInclude Include="cio.h" />
     <ClInclude Include="dwt.h" />
     <ClInclude Include="event.h" />
     <ClInclude Include="fix.h" />
     <ClInclude Include="image.h" />
-    <ClInclude Include="indexbox_manager.h" />
     <ClInclude Include="int.h" />
     <ClInclude Include="j2k.h" />
     <ClInclude Include="j2k_lib.h" />
@@ -48,7 +46,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bio.c" />
-    <ClCompile Include="cidx_manager.c" />
     <ClCompile Include="cio.c" />
     <ClCompile Include="dwt.c" />
     <ClCompile Include="event.c" />
@@ -60,17 +57,12 @@
     <ClCompile Include="mct.c" />
     <ClCompile Include="mqc.c" />
     <ClCompile Include="openjpeg.c" />
-    <ClCompile Include="phix_manager.c" />
     <ClCompile Include="pi.c" />
-    <ClCompile Include="ppix_manager.c" />
     <ClCompile Include="raw.c" />
     <ClCompile Include="t1.c" />
-    <ClCompile Include="t1_generate_luts.c" />
     <ClCompile Include="t2.c" />
     <ClCompile Include="tcd.c" />
     <ClCompile Include="tgt.c" />
-    <ClCompile Include="thix_manager.c" />
-    <ClCompile Include="tpix_manager.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1557AA86-976C-4315-8FE8-A138E33F6580}</ProjectGuid>
