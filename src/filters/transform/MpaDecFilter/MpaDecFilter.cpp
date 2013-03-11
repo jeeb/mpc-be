@@ -64,9 +64,15 @@
 #define OPTION_SPDIF_ac3enc _T("SPDIF_ac3enc")
 #endif
 
-#define MAX_JITTER      1400000i64 // +-140ms jitter is allowed for now 
+#define MAX_JITTER          1400000i64 // +-140ms jitter is allowed for now 
 
-#define PADDING_SIZE    FF_INPUT_BUFFER_PADDING_SIZE
+#define PADDING_SIZE        FF_INPUT_BUFFER_PADDING_SIZE
+
+#define BS_HEADER_SIZE          8
+#define BS_AC3_SIZE          6144
+#define BS_EAC3_SIZE        24576 // 6144 for DD Plus * 4 for IEC 60958 frames
+#define BS_MAT_SIZE         61440 // max length of MAT data: 61424 bytes (total=61432+8 header bytes)
+#define BS_DTSHD_SIZE       32768
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	// MPEG Audio
@@ -856,11 +862,15 @@ HRESULT CMpaDecFilter::ProcessEAC3_SPDIF()
 		if ((p[4] & 0xc0) != 0xc0) { /* fscod */
 			repeat = eac3_repeat[(p[4] & 0x30) >> 4]; /* numblkscod */
 		}
-		if (m_hdmicount < repeat && m_hdmisize + size < 24576) {
+		m_hdmicount++;
+		if (m_hdmisize + size <= BS_EAC3_SIZE - BS_HEADER_SIZE) {
 			memcpy(m_hdmibuff + m_hdmisize, p, size);
-			m_hdmicount++;
 			m_hdmisize += size;
 			p += size;
+		} else {
+			ASSERT(0);
+		}
+		if (m_hdmicount < repeat) {
 			break;
 		}
 
@@ -1443,7 +1453,7 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, int size, WORD type, int sa
 
 	switch (type) {
 		case IEC61937_AC3:
-			length = 6144;
+			length = BS_AC3_SIZE;
 			break;
 		case IEC61937_DTS1:
 		case IEC61937_DTS2:
@@ -1456,18 +1466,18 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, int size, WORD type, int sa
 			}
 			break;
 		case IEC61937_DTSHD:
-			length  = 32768;
+			length  = BS_DTSHD_SIZE;
 			subtype = 4;
 			isHDMI  = true;
 			break;
 		case IEC61937_EAC3:
-			length = 24576; // 6144 for DD Plus * 4 for IEC 60958 frames
+			length = BS_EAC3_SIZE;
 			isHDMI = true;
 			break;
-		/*case IEC61937_TRUEHD:
-			length = 61440; // max length of MAT data: 61424 bytes (total=61432+8 header bytes)
+		case IEC61937_TRUEHD:
+			length = BS_MAT_SIZE;
 			isHDMI = true;
-			break;*/
+			break;
 		default:
 			TRACE(_T("CMpaDecFilter::DeliverBitstream() - type is not supported\n"));
 			return E_INVALIDARG;
@@ -1493,7 +1503,7 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, int size, WORD type, int sa
 	if (isDTSWAV) {
 		memcpy(pDataOut, pBuff, size);
 	} else {
-		memset(pDataOut + 8 + size, 0, length - (8 + size)); // Fill after the input buffer with zeros if any extra bytes
+		memset(pDataOut + BS_HEADER_SIZE + size, 0, length - (BS_HEADER_SIZE + size)); // Fill after the input buffer with zeros if any extra bytes
 
 		int index = 0;
 		// Fill the 8 bytes (4 words) of IEC header
@@ -1502,7 +1512,7 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, int size, WORD type, int sa
 		pDataOutW[index++] = 0x4e1f;
 		pDataOutW[index++] = type | subtype << 8;
 		if (type == IEC61937_DTSHD) {
-			pDataOutW[index++] = (size & ~0xf) + 0x18;
+			pDataOutW[index++] = (size & ~0xf) + 0x18; // (size without 12 extra bytes) & 0xf + 0x18
 			// begin dts-hd start code
 			pDataOutW[index++] = 0x0100;
 			pDataOutW[index++] = 0;
@@ -1511,7 +1521,7 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, int size, WORD type, int sa
 			pDataOutW[index++] = 0xfefe;
 			// end dts-hd start code
 			pDataOutW[index++] = size;
-		} else if (type == IEC61937_EAC3) {
+		} else if (type == IEC61937_EAC3 || type == IEC61937_TRUEHD) {
 			pDataOutW[index++] = size;
 		} else {
 			pDataOutW[index++] = size * 8;
