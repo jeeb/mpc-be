@@ -47,6 +47,7 @@ void CPPageFiltersPriority::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO4, m_MPEG);
 	DDX_Control(pDX, IDC_COMBO5, m_MP4);
 	DDX_Control(pDX, IDC_COMBO6, m_FLV);
+	DDX_Control(pDX, IDC_COMBO7, m_WMV);
 }
 
 BEGIN_MESSAGE_MAP(CPPageFiltersPriority, CPPageBase)
@@ -93,6 +94,9 @@ BOOL CPPageFiltersPriority::OnApply()
 	if (POSITION pos = (POSITION)m_FLV.GetItemDataPtr(m_FLV.GetCurSel())) {
 		s.FiltersPrioritySettings.values[_T("flv")] = m_pFilters.GetAt(pos)->clsid;
 	}
+	if (POSITION pos = (POSITION)m_WMV.GetItemDataPtr(m_WMV.GetCurSel())) {
+		s.FiltersPrioritySettings.values[_T("wmv")] = m_pFilters.GetAt(pos)->clsid;
+	}
 
 	return __super::OnApply();
 }
@@ -124,6 +128,10 @@ void CPPageFiltersPriority::Init()
 	m_FLV.ResetContent();
 	m_FLV.AddString(_T("Default"));
 	m_FLV.SetCurSel(0);
+
+	m_WMV.ResetContent();
+	m_WMV.AddString(_T("Default"));
+	m_WMV.SetCurSel(0);
 
 	m_pFilters.RemoveAll();
 
@@ -229,6 +237,14 @@ void CPPageFiltersPriority::Init()
 			m_FLV.SetItemDataPtr(i, pos2);
 			if (s.FiltersPrioritySettings.values[_T("flv")] == clsid) {
 				m_FLV.SetCurSel(i);
+			}
+		}
+
+		if (CLSID_List.Find(MEDIASUBTYPE_Asf) || CLSID_List.Find(MEDIASUBTYPE_NULL)) {
+			int i = m_WMV.AddString(name);
+			m_WMV.SetItemDataPtr(i, pos2);
+			if (s.FiltersPrioritySettings.values[_T("wmv")] == clsid) {
+				m_WMV.SetCurSel(i);
 			}
 		}
 

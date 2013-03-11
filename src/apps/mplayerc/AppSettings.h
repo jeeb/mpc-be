@@ -306,7 +306,7 @@ public:
 		SetDefault();
 	}
 	void SetDefault() {
-		static CString formats[] = {_T("avi"), _T("mkv"), _T("mpegts"), _T("mpeg"), _T("mp4"), _T("flv")};
+		static CString formats[] = {_T("avi"), _T("mkv"), _T("mpegts"), _T("mpeg"), _T("mp4"), _T("flv"), _T("wmv")};
 
 		values.RemoveAll();
 		for (size_t i = 0; i < _countof(formats); i++) {
