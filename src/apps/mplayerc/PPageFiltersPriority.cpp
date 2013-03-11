@@ -24,6 +24,7 @@
 #include "stdafx.h"
 #include "PPageFiltersPriority.h"
 #include "FGFilter.h"
+#include "moreuuids.h"
 
 // CPPageFiltersPriority dialog
 
@@ -156,6 +157,8 @@ void CPPageFiltersPriority::Init()
 			continue;
 		}
 
+		CAtlList<CLSID> CLSID_List;
+
 		bool bIsSource		= (f->guids.GetCount() == 0);
 		bool bIsSplitter	= false;
 		if (!bIsSource) {
@@ -166,9 +169,11 @@ void CPPageFiltersPriority::Init()
 
 				if (major == MEDIATYPE_Stream) {
 					bIsSplitter = true;
-					break;
+					CLSID_List.AddHead(sub);
 				}
 			}
+		} else {
+			CLSID_List.AddHead(MEDIASUBTYPE_NULL);
 		}
 
 		if (!bIsSource && !bIsSplitter) {
@@ -178,41 +183,56 @@ void CPPageFiltersPriority::Init()
 		CLSID clsid = f->clsid;
 		POSITION pos2 = m_pFilters.AddTail(f);
 
-		int i = m_AVI.AddString(name);
-		m_AVI.SetItemDataPtr(i, pos2);
-		if (s.FiltersPrioritySettings.values[_T("avi")] == clsid) {
-			m_AVI.SetCurSel(i);
+		if (CLSID_List.Find(MEDIASUBTYPE_Avi) || CLSID_List.Find(MEDIASUBTYPE_NULL)) {
+			int i = m_AVI.AddString(name);
+			m_AVI.SetItemDataPtr(i, pos2);
+			if (s.FiltersPrioritySettings.values[_T("avi")] == clsid) {
+				m_AVI.SetCurSel(i);
+			}
+		}
+		if (CLSID_List.Find(MEDIASUBTYPE_Matroska) || CLSID_List.Find(MEDIASUBTYPE_NULL)) {
+			int i = m_MKV.AddString(name);
+			m_MKV.SetItemDataPtr(i, pos2);
+			if (s.FiltersPrioritySettings.values[_T("mkv")] == clsid) {
+				m_MKV.SetCurSel(i);
+			}
 		}
 
-		i = m_MKV.AddString(name);
-		m_MKV.SetItemDataPtr(i, pos2);
-		if (s.FiltersPrioritySettings.values[_T("mkv")] == clsid) {
-			m_MKV.SetCurSel(i);
+		if (CLSID_List.Find(MEDIASUBTYPE_MPEG1System)
+			|| CLSID_List.Find(MEDIASUBTYPE_MPEG2_PROGRAM)
+			|| CLSID_List.Find(MEDIASUBTYPE_MPEG2_TRANSPORT)
+			|| CLSID_List.Find(MEDIASUBTYPE_MPEG2_PVA)
+			|| CLSID_List.Find(MEDIASUBTYPE_NULL)) {
+			int i = m_MPEGTS.AddString(name);
+			m_MPEGTS.SetItemDataPtr(i, pos2);
+			if (s.FiltersPrioritySettings.values[_T("mpegts")] == clsid) {
+				m_MPEGTS.SetCurSel(i);
+			}
+
+			i = m_MPEG.AddString(name);
+			m_MPEG.SetItemDataPtr(i, pos2);
+			if (s.FiltersPrioritySettings.values[_T("mpeg")] == clsid) {
+				m_MPEG.SetCurSel(i);
+			}
 		}
 
-		i = m_MPEGTS.AddString(name);
-		m_MPEGTS.SetItemDataPtr(i, pos2);
-		if (s.FiltersPrioritySettings.values[_T("mpegts")] == clsid) {
-			m_MPEGTS.SetCurSel(i);
+		if (CLSID_List.Find(MEDIASUBTYPE_MP4) || CLSID_List.Find(MEDIASUBTYPE_NULL)) {
+			int i = m_MP4.AddString(name);
+			m_MP4.SetItemDataPtr(i, pos2);
+			if (s.FiltersPrioritySettings.values[_T("mp4")] == clsid) {
+				m_MP4.SetCurSel(i);
+			}
 		}
 
-		i = m_MPEG.AddString(name);
-		m_MPEG.SetItemDataPtr(i, pos2);
-		if (s.FiltersPrioritySettings.values[_T("mpeg")] == clsid) {
-			m_MPEG.SetCurSel(i);
+		if (CLSID_List.Find(MEDIASUBTYPE_FLV) || CLSID_List.Find(MEDIASUBTYPE_NULL)) {
+			int i = m_FLV.AddString(name);
+			m_FLV.SetItemDataPtr(i, pos2);
+			if (s.FiltersPrioritySettings.values[_T("flv")] == clsid) {
+				m_FLV.SetCurSel(i);
+			}
 		}
 
-		i = m_MP4.AddString(name);
-		m_MP4.SetItemDataPtr(i, pos2);
-		if (s.FiltersPrioritySettings.values[_T("mp4")] == clsid) {
-			m_MP4.SetCurSel(i);
-		}
-
-		i = m_FLV.AddString(name);
-		m_FLV.SetItemDataPtr(i, pos2);
-		if (s.FiltersPrioritySettings.values[_T("flv")] == clsid) {
-			m_FLV.SetCurSel(i);
-		}
+		CLSID_List.RemoveAll();
 	}
 
 	UpdateData(FALSE);
