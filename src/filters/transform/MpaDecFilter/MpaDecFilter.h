@@ -93,6 +93,8 @@ protected:
 	BYTE            m_hdmibuff[61440];
 	int             m_hdmicount;
 	int             m_hdmisize;
+	int             m_truehd_samplerate;
+	int             m_truehd_framelength;
 
 	CFFAudioDecoder m_FFAudioDec;
 
@@ -108,6 +110,7 @@ protected:
 	HRESULT ProcessHdmvLPCM(bool bAlignOldBuffer);
 	HRESULT ProcessAC3_SPDIF();
 	HRESULT ProcessEAC3_SPDIF();
+	HRESULT ProcessTrueHD_SPDIF();
 	HRESULT ProcessDTS_SPDIF();
 	HRESULT ProcessPS2PCM();
 	HRESULT ProcessPS2ADPCM();
