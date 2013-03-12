@@ -2210,5 +2210,9 @@ HRESULT CMP4SplitterOutputPin::DeliverEndFlush()
 HRESULT CMP4SplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 {
 	CAutoLock cAutoLock(this);
+
+	// hack
+	m_rtPrev = p->rtStart;
+
 	return __super::DeliverPacket(p);
 }
