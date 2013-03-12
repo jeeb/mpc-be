@@ -30,13 +30,15 @@
 // CBaseSplitterFile
 //
 
-CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bool fRandomAccess, bool fStreaming)
+CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bool fRandomAccess, bool fStreaming, bool fStreamingDetect)
 	: m_pAsyncReader(pAsyncReader)
 	, m_fStreaming(false)
 	, m_fRandomAccess(false)
 	, m_pos(0), m_len(0)
 	, m_bitbuff(0), m_bitlen(0)
 	, m_cachepos(0), m_cachelen(0)
+	, m_available(0)
+	, m_hThread(NULL)
 {
 	if (!m_pAsyncReader) {
 		hr = E_UNEXPECTED;
@@ -49,11 +51,20 @@ CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bo
 	m_fStreaming	= (total == 0 && available > 0);
 	m_fRandomAccess	= (total > 0 && total == available);
 
-	m_len = total;
+	m_len		= total;
+	m_available	= available;
 
 	if (FAILED(hr) || (fRandomAccess && !m_fRandomAccess) || (!fStreaming && m_fStreaming) || m_len < 0) {
 		hr = E_FAIL;
 		return;
+	}
+
+	if (!m_fStreaming && fStreamingDetect) {
+		m_evStop.Reset();
+		DWORD ThreadId = 0;
+		m_hThread = ::CreateThread(NULL, 0, StaticThreadProc, (LPVOID)this, CREATE_SUSPENDED, &ThreadId);
+		SetThreadPriority(m_hThread, THREAD_PRIORITY_BELOW_NORMAL);
+		ResumeThread(m_hThread);
 	}
 
 	size_t cachelen = KILOBYTE * max(16, min(KILOBYTE, AfxGetApp()->GetProfileInt(IDS_R_SETTINGS, IDS_RS_PERFOMANCE_CACHE_LENGTH, DEFAULT_CACHE_LENGTH)));
@@ -63,6 +74,46 @@ CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bo
 	}
 
 	hr = S_OK;
+}
+
+CBaseSplitterFile::~CBaseSplitterFile()
+{
+	if (m_hThread != NULL) {
+		m_evStop.Set();
+		if (WaitForSingleObject(m_hThread, 500) == WAIT_TIMEOUT) {
+			TerminateThread (m_hThread, 0xDEAD);
+		}
+	}
+}
+
+DWORD WINAPI CBaseSplitterFile::StaticThreadProc(LPVOID lpParam)
+{
+	return ((CBaseSplitterFile*)lpParam)->ThreadProc();
+}
+
+DWORD CBaseSplitterFile::ThreadProc()
+{
+	HANDLE hEvts[] = {m_evStop};
+
+	for(int i = 0; i < 20; i++) {
+		DWORD dwObject = WaitForMultipleObjects (_countof(hEvts), hEvts, FALSE, 100);
+		if (dwObject == WAIT_OBJECT_0) {
+			return 0;
+		} else {
+			LONGLONG total, available = 0;
+			m_pAsyncReader->Length(&total, &available);
+			UNREFERENCED_PARAMETER(total);
+
+			if (m_available && m_available < available) {
+				ForceMode(Streaming);
+				return 0;
+			}
+
+			m_available = available;
+		}
+	}
+
+	return 0;
 }
 
 bool CBaseSplitterFile::SetCacheSize(size_t cachelen)
@@ -85,9 +136,13 @@ __int64 CBaseSplitterFile::GetPos()
 
 __int64 CBaseSplitterFile::GetAvailable()
 {
-	LONGLONG total, available = 0;
-	m_pAsyncReader->Length(&total, &available);
-	return available;
+	if (!m_fRandomAccess) {
+		LONGLONG total;
+		m_pAsyncReader->Length(&total, &m_available);
+		UNREFERENCED_PARAMETER(total);
+	}
+
+	return m_available;
 }
 
 __int64 CBaseSplitterFile::GetLength(bool fUpdate)

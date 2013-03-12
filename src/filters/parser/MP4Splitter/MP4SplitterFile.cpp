@@ -26,7 +26,7 @@
 #include "Ap4AsyncReaderStream.h"
 
 CMP4SplitterFile::CMP4SplitterFile(IAsyncReader* pReader, HRESULT& hr)
-	: CBaseSplitterFileEx(pReader, hr, false, true)
+	: CBaseSplitterFileEx(pReader, hr, false, true, true)
 	, m_pAp4File(NULL)
 {
 	if (FAILED(hr)) {

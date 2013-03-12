@@ -40,15 +40,6 @@ CAsyncFileReader::CAsyncFileReader(CString fn, HRESULT& hr)
 	hr = Open(fn, modeRead|shareDenyNone|typeBinary|osSequentialScan) ? S_OK : E_FAIL;
 	if (SUCCEEDED(hr)) {
 		m_len = GetLength();
-
-		// detect a file with a variable size
-		for (int i = 0; i < 5; i++) {
-			Sleep(100);
-			if (m_len < GetLength()) {
-				m_len = 0;
-				break;
-			}
-		}
 	}
 }
 

@@ -39,7 +39,7 @@ protected :
 	REFERENCE_TIME m_rtPTSOffset;
 
 public:
-	CBaseSplitterFileEx(IAsyncReader* pReader, HRESULT& hr, bool fRandomAccess = true, bool fStreaming = false);
+	CBaseSplitterFileEx(IAsyncReader* pReader, HRESULT& hr, bool fRandomAccess = true, bool fStreaming = false, bool fStreamingDetect = false);
 	virtual ~CBaseSplitterFileEx();
 
 	// using CBaseSplitterFile::Read;

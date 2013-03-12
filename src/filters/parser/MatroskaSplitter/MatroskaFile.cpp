@@ -62,7 +62,7 @@ static void bswap(BYTE* s, int len)
 //
 
 CMatroskaFile::CMatroskaFile(IAsyncReader* pAsyncReader, HRESULT& hr)
-	: CBaseSplitterFile(pAsyncReader, hr, false, true)
+	: CBaseSplitterFile(pAsyncReader, hr, false, true, true)
 	, m_rtOffset(0)
 {
 	if (FAILED(hr)) {

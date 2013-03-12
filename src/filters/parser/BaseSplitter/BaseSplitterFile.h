@@ -33,6 +33,7 @@ class CBaseSplitterFile
 
 	bool m_fStreaming, m_fRandomAccess;
 	__int64 m_pos, m_len;
+	__int64 m_available;
 
 	virtual HRESULT Read(BYTE* pData, __int64 len); // use ByteRead
 
@@ -42,9 +43,14 @@ protected:
 
 	virtual void OnComplete() {}
 
+	DWORD ThreadProc();
+	static DWORD WINAPI StaticThreadProc(LPVOID lpParam);
+	HANDLE m_hThread;
+	CAMEvent m_evStop;
+
 public:
-	CBaseSplitterFile(IAsyncReader* pReader, HRESULT& hr, bool fRandomAccess = true, bool fStreaming = false);
-	virtual ~CBaseSplitterFile() {}
+	CBaseSplitterFile(IAsyncReader* pReader, HRESULT& hr, bool fRandomAccess = true, bool fStreaming = false, bool fStreamingDetect = false);
+	~CBaseSplitterFile();
 
 	bool SetCacheSize(size_t cachelen);
 

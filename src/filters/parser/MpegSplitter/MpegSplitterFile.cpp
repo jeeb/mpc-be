@@ -54,15 +54,6 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 {
 	HRESULT hr;
 
-	// force set "RandomAccess" mode when opening files with variable size
-	if (IsStreaming()) {
-		ISyncReader *ISR = NULL;
-		if(SUCCEEDED(pAsyncReader->QueryInterface(__uuidof(ISyncReader), (void **)&ISR))) {
-			ForceMode(RandomAccess);
-			ISR->Release();
-		}
-	}
-
 	// get the type first
 
 	m_type = mpeg_us;
