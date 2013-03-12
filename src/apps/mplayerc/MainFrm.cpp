@@ -3453,6 +3453,19 @@ LRESULT CMainFrame::OnXButtonDblClk(WPARAM wParam, LPARAM lParam)
 
 BOOL CMainFrame::OnMouseWheel(UINT nFlags, short zDelta, CPoint point)
 {
+	
+	if (m_wndView2 && m_wndView2.IsWindowVisible()) {
+		CPoint p; GetCursorPos(&p);
+
+		int seek = (nFlags == MK_SHIFT ? 10 :
+			nFlags == MK_CONTROL ? 1 : 5);
+
+		zDelta > 0 ? SetCursorPos(p.x + seek, p.y) : 
+			zDelta < 0 ? SetCursorPos(p.x - seek, p.y) : SetCursorPos(p.x, p.y);
+		
+		return 0;
+	}	
+	
 	ScreenToClient(&point);
 
 	BOOL fRet =
@@ -12167,12 +12180,12 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 		return hr;
 	}
 
-	if (GetPlaybackMode() == PM_FILE) {
-		hr = pFS2 ? pFS2->Step(2, NULL) : E_FAIL;
-		if (SUCCEEDED(hr)) {
-			Sleep(10);
-		}
-	}
+	//if (GetPlaybackMode() == PM_FILE) {
+		//hr = pFS2 ? pFS2->Step(2, NULL) : E_FAIL;
+		//if (SUCCEEDED(hr)) {
+		//	Sleep(10);
+		//}
+	//}
 
 	if (!m_wndView2.IsWindowVisible()) {
 		m_wndView2.ShowWindow(SW_SHOWNOACTIVATE);

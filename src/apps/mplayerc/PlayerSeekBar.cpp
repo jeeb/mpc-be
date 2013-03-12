@@ -292,6 +292,7 @@ BEGIN_MESSAGE_MAP(CPlayerSeekBar, CDialogBar)
 	ON_WM_SETCURSOR()
 	ON_WM_TIMER()
 	ON_WM_RBUTTONDOWN()
+	ON_WM_MBUTTONDOWN()
 	//}}AFX_MSG_MAP
 	ON_COMMAND_EX(ID_PLAY_STOP, OnPlayStop)
 END_MESSAGE_MAP()
@@ -672,7 +673,6 @@ void CPlayerSeekBar::UpdateTooltip(CPoint point)
 
 	if (m_tooltipState == TOOLTIP_VISIBLE && m_tooltipPos != m_tooltipLastPos) {
 		UpdateToolTipText();
-		UpdateToolTipPosition(point);
 
 		m_tooltipTimer = SetTimer(m_tooltipTimer, ((CMainFrame*)GetParentFrame())->CanPreviewUse() ? 10 : AUTOPOP_DELAY, NULL);
 	}
@@ -703,9 +703,8 @@ void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 	OAFilterState fs = pFrame->GetMediaState();
 
 	if (fs != -1) {
-		if (abs(point.x - pt2.x) > 2) { // To prevent false mouse move events, such as hand jerked
-			pt2 = point;
-		}
+		MoveThumb2(point);
+		UpdateToolTipPosition(point);
 	} else {
 		pFrame->PreviewWindowHide();
 	}
@@ -793,7 +792,6 @@ void CPlayerSeekBar::OnTimer(UINT_PTR nIDEvent)
 						m_tooltip.SendMessage(TTM_TRACKACTIVATE, TRUE, (LPARAM)&m_ti);
 					}
 
-					UpdateToolTipPosition(point);
 					m_tooltipState = TOOLTIP_VISIBLE;
 				}
 			}
@@ -801,7 +799,6 @@ void CPlayerSeekBar::OnTimer(UINT_PTR nIDEvent)
 			case TOOLTIP_VISIBLE:
 			{
 				HideToolTip();
-				MoveThumb2(pt2);
 				pFrame->PreviewWindowShow(m_pos2);
 			}
 			break;
@@ -900,5 +897,16 @@ void CPlayerSeekBar::UpdateToolTipText()
 			CString str = _T("               ") + tooltipText + _T("               ");
 			pFrame->m_wndView2.SetWindowText(str);
 		}
+	}
+}
+
+void CPlayerSeekBar::OnMButtonDown(UINT nFlags, CPoint point)
+{
+	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
+
+	if (pFrame->m_wndView2) {
+		pFrame->PreviewWindowHide();
+		AfxGetAppSettings().fSmartSeek = !AfxGetAppSettings().fSmartSeek;
+		OnMouseMove(nFlags,point);
 	}
 }

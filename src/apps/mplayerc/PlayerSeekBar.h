@@ -25,7 +25,7 @@
 
 #include "PngImage.h"
 
-#define SHOW_DELAY 100
+#define SHOW_DELAY 10
 #define AUTOPOP_DELAY 1000
 
 // CPlayerSeekBar
@@ -101,6 +101,7 @@ protected:
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnMButtonDown(UINT nFlags, CPoint point);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 public:
