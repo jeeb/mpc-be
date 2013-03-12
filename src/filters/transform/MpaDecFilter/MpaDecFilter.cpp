@@ -811,10 +811,9 @@ HRESULT CMpaDecFilter::ProcessAC3_SPDIF()
 	BYTE* p = base;
 
 	while (p + 8 <= end) { // 8 =  AC3 header size + 1
-		int size = 0;
 		int samplerate, channels, framelength, bitrate;
 
-		size = ParseAC3Header(p, &samplerate, &channels, &framelength, &bitrate);
+		int size = ParseAC3Header(p, &samplerate, &channels, &framelength, &bitrate);
 
 		if (size == 0) {
 			p++;
@@ -866,21 +865,21 @@ HRESULT CMpaDecFilter::ProcessEAC3_SPDIF()
 		if (m_hdmisize + size <= BS_EAC3_SIZE - BS_HEADER_SIZE) {
 			memcpy(m_hdmibuff + m_hdmisize, p, size);
 			m_hdmisize += size;
-			p += size;
 		} else {
 			ASSERT(0);
 		}
+		p += size;
+
 		if (m_hdmicount < repeat) {
 			break;
 		}
 
-		if (FAILED(hr = DeliverBitstream(m_hdmibuff, m_hdmisize, IEC61937_EAC3, samplerate, framelength))) {
-			return hr;
-		}
+		hr = DeliverBitstream(m_hdmibuff, m_hdmisize, IEC61937_EAC3, samplerate, framelength * repeat);
 		m_hdmicount = 0;
 		m_hdmisize  = 0;
-
-		//p += size;
+		if (FAILED(hr)) {
+			return hr;
+		}
 	}
 
 	memmove(base, p, end - p);
