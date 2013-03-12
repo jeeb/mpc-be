@@ -939,11 +939,11 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				CString FormatDesc = GetMediaTypeDesc(&s.mt, pClipInfo, StreamType, lang_name);
 
 				if (!FormatDesc.IsEmpty()) {
-					str.Format(L"%s (%04x,%02x,%02x)", FormatDesc.GetString(), s.pid, s.pesid, s.ps1id);    // TODO: make this nicer
+					str.Format(L"%s (%04x,%02x,%02x)", FormatDesc.GetString(), s.pid, s.pesid, s.ps1id);
 				} else if (pStreamName) {
-					str.Format(L"%s - %s (%04x,%02x,%02x)", name, pStreamName, s.pid, s.pesid, s.ps1id);    // TODO: make this nicer
+					str.Format(L"%s - %s (%04x,%02x,%02x)", name, pStreamName, s.pid, s.pesid, s.ps1id);
 				} else {
-					str.Format(L"%s (%04x,%02x,%02x)", name, s.pid, s.pesid, s.ps1id);    // TODO: make this nicer
+					str.Format(L"%s (%04x,%02x,%02x)", name, s.pid, s.pesid, s.ps1id);
 				}
 			}
 			CString str_tmp = str;
@@ -1124,15 +1124,15 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				CString FormatDesc = GetMediaTypeDesc(&s.mt, pClipInfo, StreamType, lang_name);
 
 				if (!FormatDesc.IsEmpty()) {
-					str.Format(L"%s (%04x,%02x,%02x)", FormatDesc.GetString(), s.pid, s.pesid, s.ps1id);    // TODO: make this nicer
+					str.Format(L"%s (%04x,%02x,%02x)", FormatDesc.GetString(), s.pid, s.pesid, s.ps1id);
 				} else if (pStreamName) {
-					str.Format(L"%s - %s (%04x,%02x,%02x)", name, pStreamName, s.pid, s.pesid, s.ps1id);    // TODO: make this nicer
+					str.Format(L"%s - %s (%04x,%02x,%02x)", name, pStreamName, s.pid, s.pesid, s.ps1id);
 				} else {
-					str.Format(L"%s (%04x,%02x,%02x)", name, s.pid, s.pesid, s.ps1id);    // TODO: make this nicer
+					str.Format(L"%s (%04x,%02x,%02x)", name, s.pid, s.pesid, s.ps1id);
 				}
 			}
 
-			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CMpegSplitterOutputPin(mts, str, this, this, &hr, m_pFile->m_type, (i != CMpegSplitterFile::video) ? 5 : 1));
+			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CMpegSplitterOutputPin(mts, str, this, this, &hr, m_pFile->m_type, (i != CMpegSplitterFile::video) ? 20 : 1));
 
 			if (i == CMpegSplitterFile::audio) {
 				if (!cs_audioProgram.IsEmpty()) {
@@ -1168,7 +1168,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	if (m_rtPlaylistDuration) {
 		m_rtNewStop = m_rtStop = m_rtDuration = m_rtPlaylistDuration;
 	} else if (m_pFile->IsRandomAccess() && m_pFile->m_rate) {
-		m_rtNewStop = m_rtStop = m_rtDuration = rt_IfoDuration ? rt_IfoDuration : (10000000i64 * m_pFile->GetLength() / m_pFile->m_rate);
+		m_rtNewStop = m_rtStop = m_rtDuration = rt_IfoDuration ? rt_IfoDuration : (UNITS * m_pFile->GetLength() / m_pFile->m_rate);
 	}
 
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
