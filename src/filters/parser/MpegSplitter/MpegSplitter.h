@@ -160,10 +160,11 @@ class CMpegSplitterOutputPin : public CBaseSplitterOutputPin, protected CCritSec
 	CAutoPtr<Packet> m_p;
 	CAutoPtrList<Packet> m_pl;
 	bool	m_fHasAccessUnitDelimiters;
-	bool	m_bFilterDTSMA;
-	bool	DD_reset;
 	bool	m_bFlushed;
 	int		m_type;
+	int		m_truehd_framelength;
+
+	int		m_hdmvLPCM_samplerate, m_hdmvLPCM_channels, m_hdmvLPCM_packetsize;
 
 	int				m_AC3_size;
 	unsigned int	m_AC3_count;

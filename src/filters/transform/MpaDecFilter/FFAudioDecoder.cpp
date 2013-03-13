@@ -297,20 +297,18 @@ void CFFAudioDecoder::SetDRC(bool fDRC)
 
 HRESULT CFFAudioDecoder::Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, int& size, CAtlArray<BYTE>& BuffOut, enum AVSampleFormat& samplefmt)
 {
+	size = 0;
 
 	if (GetCodecId() == AV_CODEC_ID_NONE) {
 		return E_FAIL;
 	}
 
-	size = 0;
-
 	int got_frame = 0;
-	bool b_use_parse = m_pParser && ((nCodecId == AV_CODEC_ID_TRUEHD) ? ((buffsize > 2000) ? true : false) : true); // Dirty hack for use with MPC MPEGSplitter
 
 	AVPacket avpkt;
 	av_init_packet(&avpkt);
 
-	if (b_use_parse) {
+	if (m_pParser) {
 		BYTE* pOut = NULL;
 		int pOut_size = 0;
 

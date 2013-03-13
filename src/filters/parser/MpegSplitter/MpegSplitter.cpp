@@ -1810,12 +1810,11 @@ CMpegSourceFilter::CMpegSourceFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLSID& 
 CMpegSplitterOutputPin::CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int type, int QueueMaxPackets)
 	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr, 0, QueueMaxPackets)
 	, m_fHasAccessUnitDelimiters(false)
-	, m_bFilterDTSMA(false)
 	, m_type(type)
-	, DD_reset(false)
 	, m_bFlushed(false)
-	, m_AC3_size(0)
-	, m_AC3_count(0)
+	, m_AC3_size(0), m_AC3_count(0)
+	, m_truehd_framelength(0)
+	, m_hdmvLPCM_samplerate(0), m_hdmvLPCM_channels(0), m_hdmvLPCM_packetsize(0)
 {
 }
 
@@ -1830,8 +1829,9 @@ HRESULT CMpegSplitterOutputPin::Flush()
 
 	m_p.Free();
 	m_pl.RemoveAll();
-	DD_reset	= true;
-	m_bFlushed	= true;
+
+	m_bFlushed				= true;
+	m_truehd_framelength	= 0;
 
 	return S_OK;
 }
@@ -2210,45 +2210,6 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 
 		return S_OK;
 	}
-	// DTS HD MA data is causing trouble with some filters, lets just remove it
-	else if (m_bFilterDTSMA && ((m_mt.subtype == MEDIASUBTYPE_DTS || m_mt.subtype == MEDIASUBTYPE_WAVE_DTS))) {
-		if (p->GetCount() < 4 && !p->pmt) {
-			return S_OK;    // Should be invalid packet
-		}
-		BYTE* hdr = p->GetData();
-
-		int Type;
-		// 16 bits big endian bitstream
-		if      (hdr[0] == 0x7f && hdr[1] == 0xfe &&
-				 hdr[2] == 0x80 && hdr[3] == 0x01) {
-			Type = 16 + 32;
-		}
-
-		// 16 bits low endian bitstream
-		else if (hdr[0] == 0xfe && hdr[1] == 0x7f &&
-				 hdr[2] == 0x01 && hdr[3] == 0x80) {
-			Type = 16;
-		}
-
-		// 14 bits big endian bitstream
-		else if (hdr[0] == 0x1f && hdr[1] == 0xff &&
-				 hdr[2] == 0xe8 && hdr[3] == 0x00 &&
-				 hdr[4] == 0x07 && (hdr[5] & 0xf0) == 0xf0) {
-			Type = 14 + 32;
-		}
-
-		// 14 bits low endian bitstream
-		else if (hdr[0] == 0xff && hdr[1] == 0x1f &&
-				 hdr[2] == 0x00 && hdr[3] == 0xe8 &&
-				 (hdr[4] & 0xf0) == 0xf0 && hdr[5] == 0x07) {
-			Type = 14;
-		}
-
-		// no sync
-		else if (!p->pmt) {
-			return S_OK;
-		}
-	}
 	// HDMV LPCM
 	else if (m_mt.subtype == MEDIASUBTYPE_HDMV_LPCM_AUDIO) {
 		if (!m_p) {
@@ -2263,11 +2224,25 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 
 		BYTE* start = m_p->GetData();
 		int samplerate, channels;
-		size_t header_size = ParseHdmvLPCMHeader(start, &samplerate, &channels);
-		if (!header_size || header_size > m_p->GetCount()) {
-			if (!header_size) {
+		size_t packet_size = ParseHdmvLPCMHeader(start, &samplerate, &channels);
+
+		if (!packet_size || packet_size > m_p->GetCount()) {
+			if (!packet_size) {
 				m_p.Free();
 			}
+			return S_OK;
+		}
+
+		if (!m_hdmvLPCM_samplerate) {
+			m_hdmvLPCM_samplerate	= samplerate;
+			m_hdmvLPCM_channels		= channels;
+			m_hdmvLPCM_packetsize	= packet_size;
+		}
+
+		if (m_hdmvLPCM_samplerate != samplerate
+			|| m_hdmvLPCM_channels != channels
+			|| m_hdmvLPCM_packetsize != packet_size) {
+			m_p.Free();
 			return S_OK;
 		}
 
@@ -2278,7 +2253,7 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 		p->SetData(start + 4, m_p->GetCount() - 4);
 		m_p.Free();
 	}
-	// Dolby AC3	
+	// Dolby AC3 - core only
 	else if (m_type == mpeg_ts && m_mt.subtype == MEDIASUBTYPE_DOLBY_AC3) {
 		if (!m_p) {
 			m_p.Attach(DNew Packet());
@@ -2309,8 +2284,8 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			MOVE_TO_AC3_START_CODE(start, end);
 
 			if (start <= end-8) {
-				int size, sample_rate, channels, framelength, bitrate;
-				if ((size = ParseAC3Header(start, &sample_rate, &channels, &framelength, &bitrate)) > 0) {
+				int size;
+				if ((size = GetAC3FrameSize(start)) > 0) {
 
 					if (size <= (end-start)) {
 
@@ -2394,26 +2369,126 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 
 		return S_OK;
 	}
-	// TrueHD
-	// TODO - need found better way to skip AC3 core
+	// TrueHD only - skip AC3 core
 	else if (m_mt.subtype == MEDIASUBTYPE_DOLBY_TRUEHD && (static_cast<CMpegSplitterFilter*>(m_pFilter))->GetTrueHD() != 2) {
-		if (p->GetCount() < 8) {
-			return S_OK;    // Should be invalid packet
-		}
-		BYTE* start = p->GetData();
-		if (*(WORD*)start == 0x770b) { // skip AC3
-			return S_OK;
+		if (!m_p) {
+			m_p.Attach(DNew Packet());
+			m_p->TrackNumber	= p->TrackNumber;
+			m_p->bDiscontinuity	= p->bDiscontinuity;
+			p->bDiscontinuity	= FALSE;
+
+			m_p->bSyncPoint	= p->bSyncPoint;
+			p->bSyncPoint	= FALSE;
+
+			m_p->rtStart	= p->rtStart;
+			p->rtStart		= Packet::INVALID_TIME;
+
+			m_p->rtStop	= p->rtStop;
+			p->rtStop	= Packet::INVALID_TIME;
 		}
 
-		if (!p->pmt && m_bFlushed) {
-			p->pmt = CreateMediaType(&m_mt);
-			m_bFlushed = false;
+		m_p->Append(*p);
+
+		if (m_p->GetCount() < 16) {
+			return S_OK;	// Should be invalid packet
 		}
 
-		if (DD_reset || p->rtStart == 0) {
-			p->bDiscontinuity = true;
-			DD_reset = false;
+		BYTE* start	= m_p->GetData();
+		BYTE* end	= start + m_p->GetCount();
+
+		while (start + 16 <= end) {
+			int samplerate, channels, framelength;
+			WORD bitdepth;
+			bool isTrueHD;
+
+			int size = ParseMLPHeader(start, &samplerate, &channels, &framelength, &bitdepth, &isTrueHD);
+			if (size > 0) {
+				// sync frame
+				m_truehd_framelength = framelength;
+			} else {
+				int ac3size = GetAC3FrameSize(start);
+				if (ac3size == 0) {
+					ac3size = GetEAC3FrameSize(start);
+				}
+				if (ac3size > 0) {
+					if (start + ac3size > end) {
+						break;
+					}
+					start += ac3size;
+					continue; // skip ac3 frames
+				}
+			}
+
+			if (size == 0 && m_truehd_framelength > 0) {
+				// get not sync frame size
+				size = ((start[0] << 8 | start[1]) & 0xfff) * 2;
+			}
+
+			if (size < 8) {
+				start++;
+				continue;
+			}
+			if (start + size > end) {
+				break;
+			}
+
+			CAutoPtr<Packet> p2(DNew Packet());
+			p2->TrackNumber		= m_p->TrackNumber;
+			p2->bDiscontinuity	= m_p->bDiscontinuity;
+			m_p->bDiscontinuity	= FALSE;
+
+			p2->bSyncPoint	= m_p->bSyncPoint;
+			m_p->bSyncPoint	= FALSE;
+
+			p2->rtStart		= m_p->rtStart;
+			m_p->rtStart	= Packet::INVALID_TIME;
+
+			p2->rtStop		= m_p->rtStop;
+			m_p->rtStop		= Packet::INVALID_TIME;
+
+			p2->pmt		= m_p->pmt;
+			m_p->pmt	= NULL;
+
+			p2->SetData(start, size);
+
+			if (!p2->pmt && m_bFlushed) {
+				p2->pmt = CreateMediaType(&m_mt);
+				m_bFlushed = false;
+			}
+
+			HRESULT hr = __super::DeliverPacket(p2);
+			if (hr != S_OK) {
+				return hr;
+			}
+
+			if (p->rtStart != Packet::INVALID_TIME) {
+				m_p->rtStart	= p->rtStart;
+				m_p->rtStop		= p->rtStop;
+				p->rtStart		= Packet::INVALID_TIME;
+			}
+			if (p->bDiscontinuity) {
+				m_p->bDiscontinuity	= p->bDiscontinuity;
+				p->bDiscontinuity	= FALSE;
+			}
+			if (p->bSyncPoint) {
+				m_p->bSyncPoint	= p->bSyncPoint;
+				p->bSyncPoint	= FALSE;
+			}
+			if (m_p->pmt) {
+				DeleteMediaType(m_p->pmt);
+			}
+
+			m_p->pmt	= p->pmt;
+			p->pmt		= NULL;
+							
+			start += size;
 		}
+
+		if (start > m_p->GetData()) {
+			m_p->RemoveAt(0, start - m_p->GetData());
+		}
+
+		return S_OK;
 	}
 	// Dirac	
 	else if (m_mt.subtype == MEDIASUBTYPE_DRAC) {
@@ -2543,10 +2618,6 @@ STDMETHODIMP CMpegSplitterOutputPin::Connect(IPin* pReceivePin, const AM_MEDIA_T
 		if (SUCCEEDED (PinInfo.pFilter->GetClassID(&FilterClsid))) {
 			if (FilterClsid == CLSID_DMOWrapperFilter) {
 				(static_cast<CMpegSplitterFilter*>(m_pFilter))->SetPipo(true);
-			}
-			// AC3 Filter did not support DTS-MA
-			else if (FilterClsid == CLSID_AC3Filter) {
-				m_bFilterDTSMA = true;
 			}
 		}
 		PinInfo.pFilter->Release();
