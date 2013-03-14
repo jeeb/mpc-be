@@ -34,11 +34,12 @@
 //
 // CBaseVideoFilter
 //
-bool f_need_set_aspect;
 
 CBaseVideoFilter::CBaseVideoFilter(TCHAR* pName, LPUNKNOWN lpunk, HRESULT* phr, REFCLSID clsid, long cBuffers)
 	: CTransformFilter(pName, lpunk, clsid)
 	, m_cBuffers(cBuffers)
+	, m_bSetAspect(false)
+	, m_bSendMediaType(false)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -65,8 +66,6 @@ CBaseVideoFilter::CBaseVideoFilter(TCHAR* pName, LPUNKNOWN lpunk, HRESULT* phr, 
 	m_hout = m_hin = m_h = 0;
 	m_arxout = m_arxin = m_arx = 0;
 	m_aryout = m_aryin = m_ary = 0;
-
-	f_need_set_aspect = false;
 }
 
 CBaseVideoFilter::~CBaseVideoFilter()
@@ -78,7 +77,7 @@ void CBaseVideoFilter::SetAspect(CSize aspect)
 	if (m_arx != aspect.cx || m_ary != aspect.cy) {
 		m_arx = aspect.cx;
 		m_ary = aspect.cy;
-		f_need_set_aspect = true;
+		m_bSetAspect = true;
 	}
 }
 
@@ -166,13 +165,14 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 	CMediaType& mt = m_pOutput->CurrentMediaType();
 
 	bool m_update_aspect = false;
-	if (f_need_set_aspect) {
+	if (m_bSetAspect) {
 		int wout = 0, hout = 0, arxout = 0, aryout = 0;
 		ExtractDim(&mt, wout, hout, arxout, aryout);
 		if (arxout != m_arx || aryout != m_ary) {
 			m_update_aspect = true;
 		}
 	}
+	m_bSetAspect = false;
 
 	int w_org = m_w;
 	int h_org = m_h;
@@ -221,13 +221,18 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 		bmi->biHeight		= m_h;
 		bmi->biSizeImage	= m_w*m_h*bmi->biBitCount>>3;
 
+		bool bDXVA			= (bmi->biCompression == mmioFOURCC('d','x','v','a'));
 		hr = m_pOutput->GetConnected()->QueryAccept(&mt);
 		ASSERT(SUCCEEDED(hr)); // should better not fail, after all "mt" is the current media type, just with a different resolution
 		HRESULT hr1 = 0;
-		CComPtr<IMediaSample> pOut;
-		if (SUCCEEDED(hr1 = m_pOutput->GetConnected()->ReceiveConnection(m_pOutput, &mt))) {
+
+		if (bDXVA) {
+			m_pOutput->SetMediaType(&mt);
+			m_bSendMediaType = true;
+		} else if (SUCCEEDED(hr1 = m_pOutput->GetConnected()->ReceiveConnection(m_pOutput, &mt))) {
 			if (bSendSample) {
 				HRESULT hr2 = 0;
+				CComPtr<IMediaSample> pOut;
 				if (SUCCEEDED(hr2 = m_pOutput->GetDeliveryBuffer(&pOut, NULL, NULL, 0))) {
 					AM_MEDIA_TYPE* pmt;
 					if (SUCCEEDED(pOut->GetMediaType(&pmt)) && pmt) {
@@ -237,6 +242,7 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 					} else { // stupid overlay mixer won't let us know the new pitch...
 						long size = pOut->GetSize();
 						bmi->biWidth = size ? (size / abs(bmi->biHeight) * 8 / bmi->biBitCount) : bmi->biWidth;
+						m_pOutput->SetMediaType(&mt);
 					}
 				} else {
 					m_w = w_org;
@@ -252,7 +258,9 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 		m_aryout = m_ary;
 
 		// some renderers don't send this
-		NotifyEvent(EC_VIDEO_SIZE_CHANGED, MAKELPARAM(m_w, m_h), 0);
+		if (!bDXVA) {
+			NotifyEvent(EC_VIDEO_SIZE_CHANGED, MAKELPARAM(m_w, m_h), 0);
+		}
 
 		return S_OK;
 	}

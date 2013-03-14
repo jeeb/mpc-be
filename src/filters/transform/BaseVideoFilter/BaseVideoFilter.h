@@ -39,6 +39,8 @@ private:
 	// these are private for a reason, don't bother them
 	int m_win, m_hin, m_arxin, m_aryin;
 	int m_wout, m_hout, m_arxout, m_aryout;
+	bool m_bSetAspect;
+	bool m_bSendMediaType;
 
 	long m_cBuffers;
 
@@ -53,9 +55,7 @@ protected:
 
 	virtual void GetOutputSize(int& w, int& h, int& arx, int& ary, int &RealWidth, int &RealHeight, int& vsfilter) {}
 	virtual HRESULT Transform(IMediaSample* pIn) = 0;
-	virtual bool IsVideoInterlaced() {
-		return false;
-	}
+	virtual bool IsVideoInterlaced() { return false; }
 	virtual void GetOutputFormats (int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats);
 
 public:
@@ -76,6 +76,9 @@ public:
 	HRESULT DoCheckTransform(const CMediaType* mtIn, const CMediaType* mtOut, bool checkReconnection);
 
 	void SetAspect(CSize aspect);
+
+	bool GetSendMediaType()				{ return m_bSendMediaType;  }
+	void SetSendMediaType(bool value)	{ m_bSendMediaType = value; }
 };
 
 class CBaseVideoInputAllocator : public CMemAllocator

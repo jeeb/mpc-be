@@ -71,7 +71,6 @@ void CDXVADecoder::Init(CMPCVideoDecFilter* pFilter, DXVAMode nMode, int nPicEnt
 	m_nPicEntryNumber	= nPicEntryNumber;
 	m_pPictureStore		= DNew PICTURE_STORE[nPicEntryNumber];
 	m_dwNumBuffersInfo	= 0;
-	m_bNeedChangeAspect	= true;
 
 	memset (&m_DXVA1Config, 0, sizeof(m_DXVA1Config));
 	memset (&m_DXVA1BufferDesc, 0, sizeof(m_DXVA1BufferDesc));
@@ -291,10 +290,8 @@ HRESULT CDXVADecoder::GetDeliveryBuffer(REFERENCE_TIME rtStart, REFERENCE_TIME r
 
 	// Change aspect ratio for DXVA2
 	if (m_nEngine == ENGINE_DXVA2) {
-		if (m_bNeedChangeAspect) {
-			m_pFilter->UpdateAspectRatio();
-			m_pFilter->ReconnectOutput(m_pFilter->PictWidth(), m_pFilter->PictHeight());
-		}
+		m_pFilter->UpdateAspectRatio();
+		m_pFilter->ReconnectOutput(m_pFilter->PictWidth(), m_pFilter->PictHeight());
 	}
 	hr = m_pFilter->GetOutputPin()->GetDeliveryBuffer(&pNewSample, 0, 0, 0);
 
@@ -626,7 +623,38 @@ HRESULT CDXVADecoder::DisplayNextFrame()
 					// For DXVA2 media sample is in the picture store
 					m_pPictureStore[nPicIndex].pSample->SetTime (&m_pPictureStore[nPicIndex].rtStart, &m_pPictureStore[nPicIndex].rtStop);
 					SetTypeSpecificFlags(&m_pPictureStore[nPicIndex], m_pPictureStore[nPicIndex].pSample);
+
+					CMediaType& mt = m_pFilter->GetOutputPin()->CurrentMediaType();
+
+					bool bSizeChanged = false;
+					LONG biWidth, biHeight = 0;
+
+					if (m_pFilter->GetSendMediaType()) {
+						AM_MEDIA_TYPE *sendmt = CreateMediaType(&mt);
+						BITMAPINFOHEADER *pBMI = NULL;
+						if (sendmt->formattype == FORMAT_VideoInfo) {
+							VIDEOINFOHEADER *vih	= (VIDEOINFOHEADER *)sendmt->pbFormat;
+							pBMI					= &vih->bmiHeader;
+							SetRect(&vih->rcSource, 0, 0, 0, 0);
+						} else if (sendmt->formattype == FORMAT_VideoInfo2) {
+							VIDEOINFOHEADER2 *vih2	= (VIDEOINFOHEADER2 *)sendmt->pbFormat;
+							pBMI					= &vih2->bmiHeader;
+							SetRect(&vih2->rcSource, 0, 0, 0, 0);
+						}
+
+						biWidth		= pBMI->biWidth;
+						biHeight	= abs(pBMI->biHeight);
+						m_pPictureStore[nPicIndex].pSample->SetMediaType(sendmt);
+						DeleteMediaType(sendmt);
+						m_pFilter->SetSendMediaType(false);
+						bSizeChanged = true;
+					}
+
 					hr = m_pFilter->GetOutputPin()->Deliver(m_pPictureStore[nPicIndex].pSample);
+
+					if (bSizeChanged && biHeight) {
+						m_pFilter->NotifyEvent(EC_VIDEO_SIZE_CHANGED, MAKELPARAM(biWidth, biHeight), 0);
+					}
 					break;
 			}
 
@@ -642,7 +670,6 @@ HRESULT CDXVADecoder::DisplayNextFrame()
 			rtLast = m_pPictureStore[nPicIndex].rtStart;
 #endif
 		}
-		m_bNeedChangeAspect = false;
 
 		m_pPictureStore[nPicIndex].bDisplayed = true;
 		if (!m_pPictureStore[nPicIndex].bRefPicture) {
