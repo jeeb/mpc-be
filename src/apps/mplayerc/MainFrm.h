@@ -692,6 +692,7 @@ public:
 	RECT rc_forceNP;
 	BOOL bWndWasZoomed;
 	RECT rc_NP;
+
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);

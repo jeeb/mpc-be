@@ -25,7 +25,7 @@
 
 #include "PngImage.h"
 
-#define SHOW_DELAY 10
+#define SHOW_DELAY 200
 #define AUTOPOP_DELAY 1000
 
 // CPlayerSeekBar

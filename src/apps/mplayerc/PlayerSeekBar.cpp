@@ -655,7 +655,7 @@ void CPlayerSeekBar::OnRButtonDown(UINT nFlags, CPoint point)
 void CPlayerSeekBar::UpdateTooltip(CPoint point)
 {
 	m_tooltipPos = CalculatePosition(point);
-
+	CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
 	if (m_fEnabled && m_start < m_stop && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
 		if (m_tooltipState == TOOLTIP_HIDDEN && m_tooltipPos != m_tooltipLastPos) {
 
@@ -665,7 +665,7 @@ void CPlayerSeekBar::UpdateTooltip(CPoint point)
 			TrackMouseEvent(&tme);
 
 			m_tooltipState = TOOLTIP_TRIGGERED;
-			m_tooltipTimer = SetTimer(m_tooltipTimer, SHOW_DELAY, NULL);
+			m_tooltipTimer = SetTimer(m_tooltipTimer, pFrame->m_wndView2.IsWindowVisible() ? 10 : SHOW_DELAY, NULL);
 		}
 	} else {
 		HideToolTip();
@@ -673,8 +673,9 @@ void CPlayerSeekBar::UpdateTooltip(CPoint point)
 
 	if (m_tooltipState == TOOLTIP_VISIBLE && m_tooltipPos != m_tooltipLastPos) {
 		UpdateToolTipText();
-
-		m_tooltipTimer = SetTimer(m_tooltipTimer, ((CMainFrame*)GetParentFrame())->CanPreviewUse() ? 10 : AUTOPOP_DELAY, NULL);
+		
+		if (!pFrame->CanPreviewUse()) UpdateToolTipPosition(point);
+		m_tooltipTimer = SetTimer(m_tooltipTimer, pFrame->CanPreviewUse() ? 10 : AUTOPOP_DELAY, NULL);
 	}
 }
 
@@ -704,7 +705,7 @@ void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 
 	if (fs != -1) {
 		MoveThumb2(point);
-		UpdateToolTipPosition(point);
+		if (pFrame->CanPreviewUse()) UpdateToolTipPosition(point);
 	} else {
 		pFrame->PreviewWindowHide();
 	}

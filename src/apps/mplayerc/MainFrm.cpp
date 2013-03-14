@@ -3455,13 +3455,13 @@ BOOL CMainFrame::OnMouseWheel(UINT nFlags, short zDelta, CPoint point)
 {
 	
 	if (m_wndView2 && m_wndView2.IsWindowVisible()) {
-		CPoint p; GetCursorPos(&p);
 
-		int seek = (nFlags == MK_SHIFT ? 10 :
-			nFlags == MK_CONTROL ? 1 : 5);
+		int seek = 
+			nFlags == MK_SHIFT ? 10 : 
+			nFlags == MK_CONTROL ? 1 : 5;
 
-		zDelta > 0 ? SetCursorPos(p.x + seek, p.y) : 
-			zDelta < 0 ? SetCursorPos(p.x - seek, p.y) : SetCursorPos(p.x, p.y);
+		zDelta > 0 ? SetCursorPos(point.x + seek, point.y) : 
+			zDelta < 0 ? SetCursorPos(point.x - seek, point.y) : SetCursorPos(point.x, point.y);
 		
 		return 0;
 	}	
