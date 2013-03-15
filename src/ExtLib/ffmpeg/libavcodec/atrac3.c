@@ -170,7 +170,7 @@ static int decode_bytes(const uint8_t *input, uint8_t *out, int bytes)
         output[i] = c ^ buf[i];
 
     if (off)
-        av_log_ask_for_sample(NULL, "Offset of %d not handled.\n", off);
+        avpriv_request_sample(NULL, "Offset of %d", off);
 
     return off;
 }
@@ -813,10 +813,8 @@ static int atrac3_decode_frame(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = SAMPLES_PER_FRAME;
-    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
-    }
 
     /* Check if we need to descramble and what buffer to pass on. */
     if (q->scrambled_stream) {

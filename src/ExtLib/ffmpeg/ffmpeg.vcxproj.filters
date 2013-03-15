@@ -55,6 +55,9 @@
     <None Include="libavcodec\x86\fmtconvert.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
+    <None Include="libavcodec\x86\fpelbase.asm">
+      <Filter>libavcodec\x86</Filter>
+    </None>
     <None Include="libavcodec\x86\h263_loopfilter.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
@@ -107,6 +110,9 @@
       <Filter>libavcodec\x86</Filter>
     </None>
     <None Include="libavcodec\x86\proresdsp.asm">
+      <Filter>libavcodec\x86</Filter>
+    </None>
+    <None Include="libavcodec\x86\qpelbase.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
     <None Include="libavcodec\x86\rv34dsp.asm">
@@ -473,6 +479,9 @@
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\h264qpel.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="libavcodec\hpeldsp.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\huffman.h">
@@ -931,6 +940,15 @@
     <ClInclude Include="libavutil\x86\timer.h">
       <Filter>libavutil\x86</Filter>
     </ClInclude>
+    <ClInclude Include="libavutil\atomic.h">
+      <Filter>libavutil</Filter>
+    </ClInclude>
+    <ClInclude Include="libavutil\atomic_gcc.h">
+      <Filter>libavutil</Filter>
+    </ClInclude>
+    <ClInclude Include="libavutil\atomic_win32.h">
+      <Filter>libavutil</Filter>
+    </ClInclude>
     <ClInclude Include="libavutil\attributes.h">
       <Filter>libavutil</Filter>
     </ClInclude>
@@ -956,6 +974,12 @@
       <Filter>libavutil</Filter>
     </ClInclude>
     <ClInclude Include="libavutil\bswap.h">
+      <Filter>libavutil</Filter>
+    </ClInclude>
+    <ClInclude Include="libavutil\buffer.h">
+      <Filter>libavutil</Filter>
+    </ClInclude>
+    <ClInclude Include="libavutil\buffer_internal.h">
       <Filter>libavutil</Filter>
     </ClInclude>
     <ClInclude Include="libavutil\channel_layout.h">
@@ -986,6 +1010,9 @@
       <Filter>libavutil</Filter>
     </ClInclude>
     <ClInclude Include="libavutil\float_dsp.h">
+      <Filter>libavutil</Filter>
+    </ClInclude>
+    <ClInclude Include="libavutil\frame.h">
       <Filter>libavutil</Filter>
     </ClInclude>
     <ClInclude Include="libavutil\imgutils.h">
@@ -1086,13 +1113,13 @@
     <ClCompile Include="libavcodec\x86\ac3dsp_init.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
+    <ClCompile Include="libavcodec\x86\constants.c">
+      <Filter>libavcodec\x86</Filter>
+    </ClCompile>
     <ClCompile Include="libavcodec\x86\dirac_dwt.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\diracdsp_mmx.c">
-      <Filter>libavcodec\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="libavcodec\x86\dsputil_avg_template.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\dsputil_mmx.c">
@@ -1125,7 +1152,13 @@
     <ClCompile Include="libavcodec\x86\h264dsp_init.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
-    <ClCompile Include="libavcodec\x86\idct_mmx.c">
+    <ClCompile Include="libavcodec\x86\hpeldsp_avg_template.c">
+      <Filter>libavcodec\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\x86\hpeldsp_init.c">
+      <Filter>libavcodec\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\x86\hpeldsp_rnd_template.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\idct_mmx_xvid.c">
@@ -1546,6 +1579,12 @@
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\hpel_template.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\hpeldsp.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\hpeldsp_template.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\huffman.c">
@@ -2043,6 +2082,9 @@
     <ClCompile Include="libavutil\x86\float_dsp_init.c">
       <Filter>libavutil\x86</Filter>
     </ClCompile>
+    <ClCompile Include="libavutil\atomic.c">
+      <Filter>libavutil</Filter>
+    </ClCompile>
     <ClCompile Include="libavutil\audio_fifo.c">
       <Filter>libavutil</Filter>
     </ClCompile>
@@ -2050,6 +2092,9 @@
       <Filter>libavutil</Filter>
     </ClCompile>
     <ClCompile Include="libavutil\bprint.c">
+      <Filter>libavutil</Filter>
+    </ClCompile>
+    <ClCompile Include="libavutil\buffer.c">
       <Filter>libavutil</Filter>
     </ClCompile>
     <ClCompile Include="libavutil\channel_layout.c">
@@ -2074,6 +2119,9 @@
       <Filter>libavutil</Filter>
     </ClCompile>
     <ClCompile Include="libavutil\float_dsp.c">
+      <Filter>libavutil</Filter>
+    </ClCompile>
+    <ClCompile Include="libavutil\frame.c">
       <Filter>libavutil</Filter>
     </ClCompile>
     <ClCompile Include="libavutil\imgutils.c">
