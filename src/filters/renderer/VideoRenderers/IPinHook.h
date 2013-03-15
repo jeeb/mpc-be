@@ -182,7 +182,7 @@ void HookAMVideoAccelerator(IAMVideoAcceleratorC* pAMVideoAcceleratorC);
 void HookDirectXVideoDecoderService(void* pIDirectXVideoDecoderService);
 
 // common function
-LPCTSTR	GetDXVADecoderDescription();
+CString	GetDXVADecoderDescription();
 LPCTSTR	GetDXVAVersion();
 int		GetDXVAStatus();
 void	ClearDXVAState();

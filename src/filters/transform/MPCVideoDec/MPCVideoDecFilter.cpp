@@ -2378,12 +2378,11 @@ BOOL CMPCVideoDecFilter::IsSupportedDecoderMode(const GUID& mode)
 
 BOOL CMPCVideoDecFilter::IsSupportedDecoderConfig(const D3DFORMAT nD3DFormat, const DXVA2_ConfigPictureDecode& config, bool& bIsPrefered)
 {
-	bool	bRet = false;
+	bool bRet = false;
 
 	bRet = (nD3DFormat == MAKEFOURCC('N', 'V', '1', '2') || nD3DFormat == MAKEFOURCC('I', 'M', 'C', '3'));
 
 	bIsPrefered = (config.ConfigBitstreamRaw == ffCodecs[m_nCodecNb].DXVAModes->PreferedConfigBitstream);
-	TRACE (_T("IsSupportedDecoderConfig() : 0x%08x,  %d\n"), nD3DFormat, bRet);
 	return bRet;
 }
 
@@ -2402,12 +2401,10 @@ HRESULT CMPCVideoDecFilter::FindDXVA2DecoderConfiguration(IDirectXVideoDecoderSe
 
 	// Find the valid render target formats for this decoder GUID.
 	hr = pDecoderService->GetDecoderRenderTargets(guidDecoder, &cFormats, &pFormats);
-	TRACE (_T("FindDXVA2DecoderConfiguration() : GetDecoderRenderTargets => %d\n"), cFormats);
 
 	if (SUCCEEDED(hr)) {
 		// Look for a format that matches our output format.
 		for (UINT iFormat = 0; iFormat < cFormats;  iFormat++) {
-			TRACE (_T("		: Try to negociate => 0x%08x\n"), pFormats[iFormat]);
 
 			// Fill in the video description. Set the width, height, format, and frame rate.
 			FillInVideoDescription(&m_VideoDesc); // Private helper function.
@@ -2501,11 +2498,16 @@ HRESULT CMPCVideoDecFilter::ConfigureDXVA2(IPin *pPin)
 			}
 		}
 		// Look for the decoder GUIDs we want.
+		TRACE(_T("ConfigureDXVA2() : Enumerate DXVA modes\n"));
 		for (UINT iGuid = 0; iGuid < cDecoderGuids; iGuid++) {
+			TRACE(_T("		=> %s\n"), GetDXVAMode(&pDecoderGuids[iGuid]));
+
 			// Do we support this mode?
 			if (!IsSupportedDecoderMode(pDecoderGuids[iGuid])) {
 				continue;
 			}
+
+			TRACE(_T("		=> Try - %s\n"), GetDXVAMode(&pDecoderGuids[iGuid]));
 
 			// Find a configuration that we support.
 			hr = FindDXVA2DecoderConfiguration(pDecoderService, pDecoderGuids[iGuid], &config, &bFoundDXVA2Configuration);
@@ -2522,6 +2524,7 @@ HRESULT CMPCVideoDecFilter::ConfigureDXVA2(IPin *pPin)
 			if (bFoundDXVA2Configuration) {
 				// Found a good configuration. Save the GUID.
 				guidDecoder = pDecoderGuids[iGuid];
+				TRACE(_T("		=> Found - %s\n"), GetDXVAMode(&guidDecoder));
 				if (!bHasIntelGuid) break;
 			}
 		}

@@ -2624,6 +2624,7 @@ static const DXVA2_DECODER DXVA2Decoder[] = {
 	{&DXVA2_ModeH264_C,					_T("H.264 C, IDCT, no FGT")},
 	{&DXVA2_ModeH264_D,					_T("H.264 D, IDCT, FGT")},
 	{&DXVA2_ModeH264_E,					_T("H.264 E, bitstream decoder, no FGT")},
+	{&DXVA2_ModeH264_Flash,				_T("H.264 Flash,  bitstream decoder, FGT")},
 	{&DXVA2_ModeH264_F,					_T("H.264 F, bitstream decoder, FGT")},
 	{&DXVA2_ModeWMV8_A,					_T("WMV8 A, post processing")},
 	{&DXVA2_ModeWMV8_B,					_T("WMV8 B, motion compensation")},
@@ -2640,15 +2641,19 @@ static const DXVA2_DECODER DXVA2Decoder[] = {
 	{&DXVA2_VideoProcSoftwareDevice,	_T("Software processing")}
 };
 
-LPCTSTR GetDXVAMode(const GUID* guidDecoder)
+CString GetDXVAMode(const GUID* guidDecoder)
 {
-	int			nPos = 0;
+	int nPos = 0;
 
 	for (int i=1; i<_countof(DXVA2Decoder); i++) {
 		if (*guidDecoder == *DXVA2Decoder[i].Guid) {
 			nPos = i;
 			break;
 		}
+	}
+
+	if (nPos == 0 && *guidDecoder != GUID_NULL) {
+		return CStringFromGUID(*guidDecoder);
 	}
 
 	return DXVA2Decoder[nPos].Description;
