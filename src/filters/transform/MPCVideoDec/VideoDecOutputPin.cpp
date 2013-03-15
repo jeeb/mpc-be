@@ -42,7 +42,7 @@ CVideoDecOutputPin::~CVideoDecOutputPin(void)
 
 HRESULT CVideoDecOutputPin::InitAllocator(IMemAllocator **ppAlloc)
 {
-	TRACE("CVideoDecOutputPin::InitAllocator");
+	TRACE("CVideoDecOutputPin::InitAllocator\n");
 	if (m_pVideoDecFilter->UseDXVA2()) {
 		HRESULT hr = S_FALSE;
 		m_pDXVA2Allocator = DNew CVideoDecDXVAAllocator(m_pVideoDecFilter, &hr);
@@ -70,7 +70,7 @@ STDMETHODIMP CVideoDecOutputPin::NonDelegatingQueryInterface(REFIID riid, void**
 // === IAMVideoAcceleratorNotify
 STDMETHODIMP CVideoDecOutputPin::GetUncompSurfacesInfo(const GUID *pGuid, LPAMVAUncompBufferInfo pUncompBufferInfo)
 {
-	HRESULT			hr = E_INVALIDARG;
+	HRESULT hr = E_INVALIDARG;
 
 	if (SUCCEEDED (m_pVideoDecFilter->CheckDXVA1Decoder (pGuid))) {
 		CComQIPtr<IAMVideoAccelerator>		pAMVideoAccelerator	= GetConnected();
@@ -125,6 +125,29 @@ STDMETHODIMP CVideoDecOutputPin::GetCreateVideoAcceleratorData(const GUID *pGuid
 		}
 	}
 
+
+	return hr;
+}
+
+HRESULT CVideoDecOutputPin::Recommit()
+{
+	HRESULT hr = S_OK;
+
+	if (m_pDXVA2Allocator) {
+		hr = m_pDXVA2Allocator->Decommit();
+		if (m_pDXVA2Allocator->DecommitInProgress()) {
+			TRACE(_T("CVideoDecOutputPin::Recommit() : WARNING! DXVA2 Allocator is still busy, trying to flush downstream\n"));
+			m_pVideoDecFilter->EndOfStream();
+			m_pVideoDecFilter->BeginFlush();
+			m_pVideoDecFilter->EndFlush();
+			if (m_pDXVA2Allocator->DecommitInProgress()) {
+				TRACE(_T("CVideoDecOutputPin::Recommit() : WARNING! Flush had no effect, decommit of the allocator still not complete\n"));
+			} else {
+				TRACE(_T("CVideoDecOutputPin::Recommit() : Flush was successfull, decommit completed!\n"));
+			}
+		}
+		hr = m_pDXVA2Allocator->Commit();
+	}
 
 	return hr;
 }

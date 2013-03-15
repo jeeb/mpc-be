@@ -85,11 +85,12 @@ public:
 	//	STDMETHODIMP ReleaseBuffer(IMediaSample *pBuffer);
 	//	CAtlList<int>			m_FreeSurface;
 
+	// *** from LAV
+	STDMETHODIMP_(BOOL) DecommitInProgress() { CAutoLock cal(this); return m_bDecommitInProgress; }
 
 protected:
 	HRESULT		Alloc(void);
 	void		Free(void);
-
 
 private :
 	CMPCVideoDecFilter*		m_pVideoDecFilter;

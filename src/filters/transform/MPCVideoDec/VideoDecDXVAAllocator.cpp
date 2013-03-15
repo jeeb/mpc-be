@@ -106,8 +106,8 @@ CVideoDecDXVAAllocator::~CVideoDecDXVAAllocator()
 
 HRESULT CVideoDecDXVAAllocator::Alloc()
 {
-	HRESULT										hr;
-	CComPtr<IDirectXVideoDecoderService>   pDXVA2Service;
+	HRESULT hr;
+	CComPtr<IDirectXVideoDecoderService> pDXVA2Service;
 
 	CheckPointer(m_pVideoDecFilter->m_pDeviceManager, E_UNEXPECTED);
 	hr = m_pVideoDecFilter->m_pDeviceManager->GetVideoService(m_pVideoDecFilter->m_hDevice, IID_IDirectXVideoDecoderService, (void**)&pDXVA2Service);

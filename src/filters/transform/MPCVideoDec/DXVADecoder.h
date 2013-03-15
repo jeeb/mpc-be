@@ -71,41 +71,35 @@ class CDXVADecoder
 {
 public :
 	// === Public functions
-	virtual					~CDXVADecoder();
-	DXVAMode				GetMode()	const {
-		return m_nMode;
-	};
-	DXVA_ENGINE				GetEngine()	const {
-		return m_nEngine;
-	};
-	void					AllocExecuteParams (int nSize);
-	void					SetDirectXVideoDec (IDirectXVideoDecoder* pDirectXVideoDec)  {
-		m_pDirectXVideoDec = pDirectXVideoDec;
-	};
+	virtual						~CDXVADecoder();
+	DXVAMode					GetMode()	const { return m_nMode; }
+	DXVA_ENGINE					GetEngine()	const { return m_nEngine; }
+	void						AllocExecuteParams (int nSize);
+	void						SetDirectXVideoDec (IDirectXVideoDecoder* pDirectXVideoDec) { m_pDirectXVideoDec = pDirectXVideoDec; }
 
-	virtual HRESULT			DecodeFrame  (BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop) = NULL;
-	virtual void			SetExtraData (BYTE* pDataIn, UINT nSize);
-	virtual void			CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
-	virtual void			Flush();
-	virtual void			NewSegment();
-	HRESULT					ConfigureDXVA1();
+	virtual HRESULT				DecodeFrame  (BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop) = NULL;
+	virtual void				SetExtraData (BYTE* pDataIn, UINT nSize);
+	virtual void				CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
+	virtual void				Flush();
+	virtual void				NewSegment();
+	HRESULT						ConfigureDXVA1();
 
-	static CDXVADecoder*	CreateDecoder (CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, const GUID* guidDecoder, int nPicEntryNumber);
-	static CDXVADecoder*	CreateDecoder (CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config);
+	static CDXVADecoder*		CreateDecoder (CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, const GUID* guidDecoder, int nPicEntryNumber);
+	static CDXVADecoder*		CreateDecoder (CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config);
 
-	void					EndOfStream();
+	void						EndOfStream();
 
 protected :
 	CDXVADecoder (CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, DXVAMode nMode, int nPicEntryNumber);
 	CDXVADecoder (CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config);
 
-	CMPCVideoDecFilter*				m_pFilter;
-	bool							m_bFlushed;
-	int								m_nMaxWaiting;
+	CMPCVideoDecFilter*			m_pFilter;
+	bool						m_bFlushed;
+	int							m_nMaxWaiting;
 
-	PICTURE_STORE*					m_pPictureStore;		// Store reference picture, and delayed B-frames
-	int								m_nPicEntryNumber;		// Total number of picture in store
-	int								m_nWaitingPics;			// Number of picture not yet displayed
+	PICTURE_STORE*				m_pPictureStore;		// Store reference picture, and delayed B-frames
+	int							m_nPicEntryNumber;		// Total number of picture in store
+	int							m_nWaitingPics;			// Number of picture not yet displayed
 
 	// === DXVA functions
 	HRESULT						AddExecuteBuffer (DWORD CompressedBufferType, UINT nSize, void* pBuffer, UINT* pRealSize = NULL);
@@ -126,12 +120,12 @@ protected :
 	};
 
 	// === Picture store functions
-	bool					AddToStore (int nSurfaceIndex, IMediaSample* pSample, bool bRefPicture, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop, bool bIsField, FF_FIELD_TYPE nFieldType, FF_SLICE_TYPE nSliceType, int nCodecSpecific, int nOutPoc = 0);
-	void					UpdateStore (int nSurfaceIndex, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-	void					RemoveRefFrame (int nSurfaceIndex);
-	HRESULT					DisplayNextFrame();
-	HRESULT					GetFreeSurfaceIndex(int& nSurfaceIndex, IMediaSample** ppSampleToDeliver, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-	virtual int				FindOldestFrame();
+	bool						AddToStore (int nSurfaceIndex, IMediaSample* pSample, bool bRefPicture, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop, bool bIsField, FF_FIELD_TYPE nFieldType, FF_SLICE_TYPE nSliceType, int nCodecSpecific, int nOutPoc = 0);
+	void						UpdateStore (int nSurfaceIndex, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
+	void						RemoveRefFrame (int nSurfaceIndex);
+	HRESULT						DisplayNextFrame();
+	HRESULT						GetFreeSurfaceIndex(int& nSurfaceIndex, IMediaSample** ppSampleToDeliver, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
+	virtual int					FindOldestFrame();
 
 private :
 	DXVAMode						m_nMode;
@@ -155,7 +149,7 @@ private :
 	DXVA2_ConfigPictureDecode		m_DXVA2Config;
 	DXVA2_DecodeExecuteParams		m_ExecuteParams;
 
-	void					Init(CMPCVideoDecFilter* pFilter, DXVAMode nMode, int nPicEntryNumber);
-	void					FreePictureSlot (int nSurfaceIndex);
-	void					SetTypeSpecificFlags(PICTURE_STORE* pPicture, IMediaSample* pMS);
+	void						Init(CMPCVideoDecFilter* pFilter, DXVAMode nMode, int nPicEntryNumber);
+	void						FreePictureSlot (int nSurfaceIndex);
+	void						SetTypeSpecificFlags(PICTURE_STORE* pPicture, IMediaSample* pMS);
 };

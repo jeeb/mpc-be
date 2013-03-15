@@ -1125,6 +1125,23 @@ void CMPCVideoDecFilter::Cleanup()
 {
 	SAFE_DELETE (m_pDXVADecoder);
 
+	ffmpegCleanup();
+
+	SAFE_DELETE_ARRAY (m_pVideoOutputFormat);
+
+	// Release DXVA ressources
+	if (m_hDevice != INVALID_HANDLE_VALUE) {
+		m_pDeviceManager->CloseDeviceHandle(m_hDevice);
+		m_hDevice = INVALID_HANDLE_VALUE;
+	}
+
+	m_pDeviceManager		= NULL;
+	m_pDecoderService		= NULL;
+	m_pDecoderRenderTarget	= NULL;
+}
+
+void CMPCVideoDecFilter::ffmpegCleanup()
+{
 	// Release FFMpeg
 	if (m_pAVCtx) {
 		if (m_pAVCtx->extradata) {
@@ -1166,17 +1183,6 @@ void CMPCVideoDecFilter::Cleanup()
 	m_nFFBufferSize	= 0;
 	m_nCodecNb		= -1;
 	m_nCodecId		= AV_CODEC_ID_NONE;
-	SAFE_DELETE_ARRAY (m_pVideoOutputFormat);
-
-	// Release DXVA ressources
-	if (m_hDevice != INVALID_HANDLE_VALUE) {
-		m_pDeviceManager->CloseDeviceHandle(m_hDevice);
-		m_hDevice = INVALID_HANDLE_VALUE;
-	}
-
-	m_pDeviceManager		= NULL;
-	m_pDecoderService		= NULL;
-	m_pDecoderRenderTarget	= NULL;
 }
 
 STDMETHODIMP CMPCVideoDecFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -1263,6 +1269,9 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 		}
 
 		if (nNewCodec != m_nCodecNb) {
+			
+			ffmpegCleanup();
+
 			m_nCodecNb	= nNewCodec;
 			m_nCodecId	= ffCodecs[nNewCodec].nFFCodec;
 
@@ -2293,16 +2302,26 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 			break;
 		case MODE_DXVA1 :
 		case MODE_DXVA2 :
-			CheckPointer (m_pDXVADecoder, E_UNEXPECTED);
-			UpdateAspectRatio();
+			{
+				CheckPointer (m_pDXVADecoder, E_UNEXPECTED);
+				UpdateAspectRatio();
 
-			// Change aspect ratio for DXVA1
-			// stupid DXVA1 - size for the output MediaType should be the same that size of DXVA surface
-			if (m_nDXVAMode == MODE_DXVA1 && ReconnectOutput(PictWidthRounded(), PictHeightRounded(), true, false, PictWidth(), PictHeight()) == S_OK) {
-				m_pDXVADecoder->ConfigureDXVA1();
+				// Change aspect ratio for DXVA1
+				// stupid DXVA1 - size for the output MediaType should be the same that size of DXVA surface
+				if (m_nDXVAMode == MODE_DXVA1 && ReconnectOutput(PictWidthRounded(), PictHeightRounded(), true, false, PictWidth(), PictHeight()) == S_OK) {
+					m_pDXVADecoder->ConfigureDXVA1();
+				}
+
+				int width	= PictWidthRounded();
+				int Height	= PictHeightRounded();
+
+				hr = m_pDXVADecoder->DecodeFrame (pDataIn, nSize, rtStart, rtStop);
+
+				if (width != PictWidthRounded() || Height != PictHeightRounded()) {
+					dynamic_cast<CVideoDecOutputPin*>(m_pOutput)->Recommit();
+					ReconnectOutput(PictWidth(), PictHeight());
+				}
 			}
-
-			hr = m_pDXVADecoder->DecodeFrame (pDataIn, nSize, rtStart, rtStop);
 			break;
 		default :
 			ASSERT (FALSE);

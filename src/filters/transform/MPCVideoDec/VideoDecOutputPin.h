@@ -29,7 +29,6 @@
 class CMPCVideoDecFilter;
 class CVideoDecDXVAAllocator;
 
-
 class CVideoDecOutputPin : public CBaseVideoOutputPin
 	, public IAMVideoAcceleratorNotify
 {
@@ -47,6 +46,10 @@ public:
 	STDMETHODIMP	GetUncompSurfacesInfo(const GUID *pGuid, LPAMVAUncompBufferInfo pUncompBufferInfo);
 	STDMETHODIMP	SetUncompSurfacesInfo(DWORD dwActualUncompSurfacesAllocated);
 	STDMETHODIMP	GetCreateVideoAcceleratorData(const GUID *pGuid, LPDWORD pdwSizeMiscData, LPVOID *ppMiscData);
+
+	// *** from LAV
+	// *** Re-Commit the allocator (creates surfaces and new decoder)
+	HRESULT			Recommit();
 
 private :
 	CMPCVideoDecFilter*			m_pVideoDecFilter;

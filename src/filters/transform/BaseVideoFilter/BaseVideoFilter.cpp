@@ -116,8 +116,10 @@ HRESULT CBaseVideoFilter::Receive(IMediaSample* pIn)
 	AM_MEDIA_TYPE* pmt;
 	if (SUCCEEDED(pIn->GetMediaType(&pmt)) && pmt) {
 		CMediaType mt(*pmt);
-		m_pInput->SetMediaType(&mt);
 		DeleteMediaType(pmt);
+		if (mt != m_pInput->CurrentMediaType()) {
+			m_pInput->SetMediaType(&mt);
+		}
 	}
 
 	if (FAILED(hr = Transform(pIn))) {

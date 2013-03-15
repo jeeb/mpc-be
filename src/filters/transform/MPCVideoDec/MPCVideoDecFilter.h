@@ -177,6 +177,7 @@ protected:
 
 	// === Private functions
 	void				Cleanup();
+	void				ffmpegCleanup();
 	int					FindCodec(const CMediaType* mtIn);
 	void				AllocExtradata(AVCodecContext* pAVCtx, const CMediaType* mt);
 	void				GetOutputFormats (int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats);
