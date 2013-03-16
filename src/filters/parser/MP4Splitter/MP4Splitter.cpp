@@ -1622,7 +1622,8 @@ bool CMP4SplitterFilter::DemuxLoop()
 
 					p->rtStop += (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetDuration());
 
-					if (pPairNext->m_value.index + 1 >= track->GetSampleCount()) {
+					if ((pPairNext->m_value.index + 1 >= track->GetSampleCount())
+						|| (nBlockAlign != wfe->nBlockAlign && (int)p->GetCount() >= nBlockAlign)) {
 						break;
 					}
 
