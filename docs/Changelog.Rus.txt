@@ -17,10 +17,10 @@
 * ffmpeg git-361319d0;
 * libopus 1.0.1 git-99e8a935;
 * Little-CMS git-a4847b0b;
-* libwebp 0.2.1 git-be2fd173;
-* libopenjpeg 2.0.0 rev.2301;
+* libwebp 0.2.1 git-69e25906;
+* libopenjpeg 2.0.0 svn rev.2301;
 * MediaInfo 0.7.62+ svn rev.5430;
-* libpng 1.7.0 b6 git-55794013;
+* libpng 1.7.0 b7 git-40a93652;
 * ZenLibs v0.4.28+ svn rev.430;
 
 Исправления (!):
