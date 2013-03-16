@@ -180,11 +180,11 @@ Name: "mpcbeshellext"; Description: "{cm:comp_mpcbeshellext}"; Types: custom; Fl
 Name: desktopicon;              Description: {cm:CreateDesktopIcon};     GroupDescription: {cm:AdditionalIcons}
 Name: desktopicon\user;         Description: {cm:tsk_CurrentUser};       GroupDescription: {cm:AdditionalIcons}; Flags: exclusive
 Name: desktopicon\common;       Description: {cm:tsk_AllUsers};          GroupDescription: {cm:AdditionalIcons}; Flags: unchecked exclusive
-Name: quicklaunchicon;          Description: {cm:CreateQuickLaunchIcon}; GroupDescription: {cm:AdditionalIcons}; Flags: unchecked;             OnlyBelowVersion: 0,6.01
-Name: pintotaskbar;             Description: {cm:PinToTaskBar};          GroupDescription: {cm:AdditionalIcons}; MinVersion: 0,6.01
+Name: quicklaunchicon;          Description: {cm:CreateQuickLaunchIcon}; GroupDescription: {cm:AdditionalIcons}; Flags: unchecked;             OnlyBelowVersion: 6.01
+Name: pintotaskbar;             Description: {cm:PinToTaskBar};          GroupDescription: {cm:AdditionalIcons}; MinVersion: 6.01
 
 ;;ResetSettings
-Name: reset_settings;           Description: {cm:tsk_ResetSettings};     GroupDescription: {cm:tsk_Other};       Flags: checkedonce unchecked; Check: SettingsExistCheck()
+Name: reset_settings;           Description: {cm:tsk_ResetSettings};     GroupDescription: {cm:tsk_Other};       Flags: checkedonce unchecked; Check: SettingsExist()
 
 [Files]
 Source: "{#bindir}\{#mpcbe_exe}";		DestDir: "{app}"; Flags: ignoreversion; Components: main
@@ -196,31 +196,7 @@ Source: "{#bindir}\MPCBEShellExt.dll"; DestDir: "{app}"; Flags: ignoreversion no
 #endif
 
 #ifdef localize
-Source: "{#bindir}\Lang\mpcresources.br.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-Source: "{#bindir}\Lang\mpcresources.by.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-Source: "{#bindir}\Lang\mpcresources.ca.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-Source: "{#bindir}\Lang\mpcresources.cz.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-Source: "{#bindir}\Lang\mpcresources.de.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-Source: "{#bindir}\Lang\mpcresources.el.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-Source: "{#bindir}\Lang\mpcresources.es.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-Source: "{#bindir}\Lang\mpcresources.eu.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-Source: "{#bindir}\Lang\mpcresources.fr.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-Source: "{#bindir}\Lang\mpcresources.he.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-Source: "{#bindir}\Lang\mpcresources.hu.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-Source: "{#bindir}\Lang\mpcresources.hy.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-Source: "{#bindir}\Lang\mpcresources.it.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-Source: "{#bindir}\Lang\mpcresources.ja.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-Source: "{#bindir}\Lang\mpcresources.kr.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-Source: "{#bindir}\Lang\mpcresources.nl.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-Source: "{#bindir}\Lang\mpcresources.pl.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-Source: "{#bindir}\Lang\mpcresources.ro.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-Source: "{#bindir}\Lang\mpcresources.ru.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-Source: "{#bindir}\Lang\mpcresources.sc.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-Source: "{#bindir}\Lang\mpcresources.sk.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-Source: "{#bindir}\Lang\mpcresources.sv.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-Source: "{#bindir}\Lang\mpcresources.tc.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-Source: "{#bindir}\Lang\mpcresources.tr.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
-Source: "{#bindir}\Lang\mpcresources.ua.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
+Source: "{#bindir}\Lang\mpcresources.??.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
 #endif
 Source: "..\docs\COPYING.txt";							DestDir: "{app}"; Flags: ignoreversion; Components: main
 Source: "..\docs\Authors.txt";							DestDir: "{app}"; Flags: ignoreversion; Components: main
@@ -258,11 +234,11 @@ Filename: "{app}\{#mpcbe_exe}"; Parameters: "/regpl"; WorkingDir: "{app}"; Flags
 [InstallDelete]
 Type: files; Name: {userdesktop}\{#app_name}.lnk;   Check: not IsTaskSelected('desktopicon\user')   and IsUpgrade()
 Type: files; Name: {commondesktop}\{#app_name}.lnk; Check: not IsTaskSelected('desktopicon\common') and IsUpgrade()
-Type: files; Name: {#quick_launch}\{#app_name}.lnk; Check: not IsTaskSelected('quicklaunchicon')    and IsUpgrade(); OnlyBelowVersion: 0,6.01
-Type: files; Name: {app}\AUTHORS
-Type: files; Name: {app}\ChangeLog
-Type: files; Name: {app}\ChangeLogRus
-Type: files; Name: {app}\COPYING
+Type: files; Name: {#quick_launch}\{#app_name}.lnk; Check: not IsTaskSelected('quicklaunchicon')    and IsUpgrade(); OnlyBelowVersion: 6.01
+Type: files; Name: {app}\AUTHORS                    Check: IsUpgrade()
+Type: files; Name: {app}\ChangeLog                  Check: IsUpgrade()
+Type: files; Name: {app}\ChangeLogRus               Check: IsUpgrade()
+Type: files; Name: {app}\COPYING                    Check: IsUpgrade()
 #ifdef localize
 ; remove the old language dlls when upgrading
 Type: files; Name: {app}\mpcresources.*.dll
@@ -396,7 +372,7 @@ begin
 end;
 
 // Check if settings exist
-function SettingsExistCheck(): Boolean;
+function SettingsExist(): Boolean;
 begin
   if RegKeyExists(HKEY_CURRENT_USER, 'Software\{#app_name}') or
   FileExists(ExpandConstant('{app}\{#mpcbe_ini}')) then
@@ -453,7 +429,7 @@ begin
     PinToTaskbar(ExpandConstant('{app}\{#mpcbe_exe}'), False);
 
   // When uninstalling, ask the user to delete settings
-  if ((CurUninstallStep = usUninstall) and SettingsExistCheck()) then begin
+  if ((CurUninstallStep = usUninstall) and SettingsExist()) then begin
     if SuppressibleMsgBox(CustomMessage('msg_DeleteSettings'), mbConfirmation, MB_YESNO or MB_DEFBUTTON2, IDNO) = IDYES then
       CleanUpSettingsAndFiles();
   end;
