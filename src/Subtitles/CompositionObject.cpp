@@ -146,7 +146,7 @@ void CompositionObject::RenderHdmv(SubPicDesc& spd)
 		}
 
 		if (nCount>0) {
-			if (nPaletteIndex != 0xFF) {	// Fully transparent (§9.14.4.2.2.1.1)
+			if (nPaletteIndex != 0xFF) {	// Fully transparent (section 9.14.4.2.2.1.1)
 				FillSolidRect (spd, nX, nY, nCount, 1, m_Colors[nPaletteIndex]);
 			}
 			nX += nCount;
@@ -412,8 +412,8 @@ void CompositionObject::RenderXSUB(SubPicDesc& spd)
 			nCount			= gb.BitRead(14 - 4 * (log2 >> 1));
 			nCount			= min(nCount, m_width - (nX - m_horizontal_position));
 			nPaletteIndex	= gb.BitRead(2);
-            // count 0 - means till end of row
-            if (!nCount) {
+			// count 0 - means till end of row
+			if (!nCount) {
 				nCount = m_width - (nX - m_horizontal_position);
 			}
 			FillSolidRect(spd, nX, nY, nCount, 1, m_Colors[nPaletteIndex]);

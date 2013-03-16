@@ -131,7 +131,6 @@ public:
 		return m_bNowNextFlag;
 	};
 
-
 	void			SetName(BYTE* Value);
 	void			SetName(LPCTSTR Value) {
 		m_strName = Value;

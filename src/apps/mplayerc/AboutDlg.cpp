@@ -43,9 +43,7 @@ CAboutDlg::~CAboutDlg()
 
 BOOL CAboutDlg::OnInitDialog()
 {
-	USES_CONVERSION;
-
-	UpdateData();
+	__super::OnInitDialog();
 
 #ifdef _WIN64
 	m_appname += _T(" (64-bit)");
@@ -55,41 +53,51 @@ BOOL CAboutDlg::OnInitDialog()
 
 #if defined(__INTEL_COMPILER)
 #if (__INTEL_COMPILER >= 1210)
-	m_MPCCompiler = _T("ICL ");
-	m_MPCCompiler += MAKE_STR(__INTEL_COMPILER);
+	m_MPCCompiler = _T("ICL ") MAKE_STR(__INTEL_COMPILER) _T(" Build ") MAKE_STR(__INTEL_COMPILER_BUILD_DATE);
 #else
-	m_MPCCompiler = _T("ICL 12");
+#error Compiler is not supported!
 #endif
 #elif defined(_MSC_VER)
-#if (_MSC_VER == 1700)
+#if (_MSC_VER == 1700) // 2012
+#if (_MSC_FULL_VER < 170050727)
+	m_MPCCompiler = _T("MSVC 2012 Beta/RC/PR");
+#else
 	m_MPCCompiler = _T("MSVC 2012");
-#elif (_MSC_VER == 1600)
-	#if (_MSC_FULL_VER >= 160040219)
-		m_MPCCompiler = _T("MSVC 2010 SP1");
-	#else
-		m_MPCCompiler = _T("MSVC 2010");
-	#endif
+#endif
+#elif (_MSC_VER == 1600) // 2010
+#if (_MSC_FULL_VER >= 160040219)
+	m_MPCCompiler = _T("MSVC 2010 SP1");
+#else
+	m_MPCCompiler = _T("MSVC 2010");
+#endif
 #elif (_MSC_VER < 1600)
-	#error Compiler is not supported!
+#error Compiler is not supported!
 #endif
 #else
 #error Please add support for your compiler
 #endif
 
-#if !defined(_M_X64) && defined(_M_IX86_FP)
-#if (_M_IX86_FP == 1) // /arch:SSE was used
-	m_MPCCompiler += _T(" (SSE)");
-#elif (_M_IX86_FP == 2) // /arch:SSE2 was used
+#if (__AVX__)
+	m_MPCCompiler += _T(" (AVX)");
+#elif (__SSSE3__)
+	m_MPCCompiler += _T(" (SSSE3)");
+#elif (__SSE3__)
+	m_MPCCompiler += _T(" (SSE3)");
+#elif !defined(_M_X64) && defined(_M_IX86_FP)
+#if (_M_IX86_FP == 2)   // /arch:SSE2 was used
 	m_MPCCompiler += _T(" (SSE2)");
+#elif (_M_IX86_FP == 1) // /arch:SSE was used
+	m_MPCCompiler += _T(" (SSE)");
 #endif
 #endif
+
 #ifdef _DEBUG
 	m_MPCCompiler += _T(" Debug");
 #endif
 
 	m_strSVNNumber.Format(_T("%d"),MPC_VERSION_REV);
-	m_FFmpegCompiler.Format(A2W(GetFFmpegCompiler()));
-	m_libavcodecVersion.Format(A2W(GetlibavcodecVersion()));
+	m_FFmpegCompiler.Format(CA2CT(GetFFmpegCompiler()));
+	m_libavcodecVersion.Format(CA2CT(GetlibavcodecVersion()));
 
 	GetModuleFileName(AfxGetInstanceHandle(), m_AuthorsPath.GetBuffer(_MAX_PATH), _MAX_PATH);
 	m_AuthorsPath.ReleaseBuffer();
@@ -102,7 +110,7 @@ BOOL CAboutDlg::OnInitDialog()
 	}
 
 	if ( m_hIcon != NULL ) {
-		CStatic *pStat=(CStatic*)GetDlgItem(IDC_MAINFRAME_ICON);
+		CStatic *pStat = (CStatic*)GetDlgItem(IDC_MAINFRAME_ICON);
 		pStat->SetIcon(m_hIcon);
 	}
 

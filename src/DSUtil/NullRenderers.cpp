@@ -406,7 +406,7 @@ HRESULT CNullUAudioRenderer::DoRenderSample(IMediaSample* pSample)
 		BYTE* pMediaBuffer = NULL;
 		HRESULT hr = pSample->GetPointer(&pMediaBuffer);
 		char strFile[MAX_PATH];
-	
+
 		sprintf_s(strFile, "AudioData%02d.bin", nNb++);
 		FILE* hFile = fopen(strFile, "wb");
 		if (hFile) {

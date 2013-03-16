@@ -131,12 +131,10 @@ CString CDVBChannel::ToString()
 
 void CDVBChannel::SetName(BYTE* Value)
 {
-	USES_CONVERSION;
-
-	m_strName = A2W ((LPCSTR)Value);
+	m_strName = CA2W((LPCSTR)Value);
 }
 
-void CDVBChannel::AddStreamInfo (ULONG ulPID, DVB_STREAM_TYPE nType, PES_STREAM_TYPE nPesType, LPCTSTR strLanguage)
+void CDVBChannel::AddStreamInfo(ULONG ulPID, DVB_STREAM_TYPE nType, PES_STREAM_TYPE nPesType, LPCTSTR strLanguage)
 {
 	switch (nType) {
 		case DVB_MPV :

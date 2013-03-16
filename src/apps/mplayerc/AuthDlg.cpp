@@ -85,8 +85,7 @@ BOOL CAuthDlg::OnInitDialog()
 				DWORD pwlen = sizeof(password);
 				DWORD type = REG_SZ;
 
-				if (ERROR_SUCCESS == RegEnumValue(
-							hSecKey, i++, username, &unlen, 0, &type, (BYTE*)password, &pwlen)) {
+				if (ERROR_SUCCESS == RegEnumValue(hSecKey, i++, username, &unlen, 0, &type, (BYTE*)password, &pwlen)) {
 					m_logins[username] = DEncrypt(password);
 					m_usernamectrl.AddString(username);
 				} else {
