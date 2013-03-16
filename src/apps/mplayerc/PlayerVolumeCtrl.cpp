@@ -45,7 +45,7 @@ bool CVolumeCtrl::Create(CWnd* pParentWnd)
 
 	EnableToolTips(TRUE);
 	SetRange(0, 100);
-	SetPosInternal(s.nVolume);
+	SetPos(s.nVolume);
 	SetPageSize(s.nVolumeStep);
 	SetLineSize(0);
 
