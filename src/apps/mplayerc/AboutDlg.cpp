@@ -43,6 +43,8 @@ CAboutDlg::~CAboutDlg()
 
 BOOL CAboutDlg::OnInitDialog()
 {
+	UpdateData();
+
 	__super::OnInitDialog();
 
 #ifdef _WIN64
