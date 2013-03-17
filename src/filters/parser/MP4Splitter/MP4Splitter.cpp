@@ -1362,7 +1362,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 
 		if (AP4_ContainerAtom* ilst = dynamic_cast<AP4_ContainerAtom*>(movie->GetMoovAtom()->FindChild("udta/meta/ilst"))) {
-			CStringW title, artist, writer, album, year, appl, desc, gen, track;
+			CStringW title, artist, writer, album, year, appl, desc, gen, track, copyright;
 
 			for (AP4_List<AP4_Atom>::Item* item = ilst->GetChildren().FirstItem();
 					item;
@@ -1386,6 +1386,12 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								// check for JFIF(0x4649464a) or Exif(0x66697845) sync ...
 								if (sync == 0x4649464a || sync == 0x66697845) {
 									ResAppend(_T("cover.jpg"), _T("cover"), _T("image/jpeg"), (BYTE*)db->GetData(), (DWORD)db->GetDataSize());
+								} else {
+									sync = *(DWORD*)db->GetData();
+									// check for PNG(0x474E5089) sync ...
+									if (sync == 0x474E5089) {
+										ResAppend(_T("cover.png"), _T("cover"), _T("image/png"), (BYTE*)db->GetData(), (DWORD)db->GetDataSize());
+									}
 								}
 							}
 						} else {
@@ -1413,8 +1419,16 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								case AP4_ATOM_TYPE_CMT:
 									desc = str;
 									break;
+								case AP4_ATOM_TYPE_DESC:
+									if (desc.IsEmpty()) {
+										desc = str;
+									}
+									break;
 								case AP4_ATOM_TYPE_GEN:
 									gen = str;
+									break;
+								case AP4_ATOM_TYPE_CPRT:
+									copyright = str;
 									break;
 							}
 						}
@@ -1450,6 +1464,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			if (!desc.IsEmpty()) {
 				SetProperty(L"DESC", desc);
+			}
+
+			if (!copyright.IsEmpty()) {
+				SetProperty(L"CPYR", copyright);
 			}
 		}
 	}

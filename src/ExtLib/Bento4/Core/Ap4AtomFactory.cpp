@@ -344,6 +344,8 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
 		case AP4_ATOM_TYPE_WRT:
 		case AP4_ATOM_TYPE_ALB:
 		case AP4_ATOM_TYPE_DAY:
+		case AP4_ATOM_TYPE_DESC:
+		case AP4_ATOM_TYPE_CPRT:
 		case AP4_ATOM_TYPE_TOO:
 		case AP4_ATOM_TYPE_CMT:
 		case AP4_ATOM_TYPE_GEN:
