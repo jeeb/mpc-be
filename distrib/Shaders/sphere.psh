@@ -1,8 +1,9 @@
+// $ShaderVersion: ps_2_0
+
 sampler s0 : register(s0);
 float4 p0 :  register(c0);
 
 #define clock (p0[3])
-
 #define PI acos(-1)
 
 float4 main(float2 tex : TEXCOORD0) : COLOR {
@@ -27,15 +28,15 @@ float4 main(float2 tex : TEXCOORD0) : COLOR {
 
 	if (D >= 0) {
 		// t2 is the smaller, obviously...
-		// float t1 = (-B + sqrt(D)) / (2*A);
-		// float t2 = (-B - sqrt(D)) / (2*A);
+		// float t1 = (-B + sqrt(D)) / (2 * A);
+		// float t2 = (-B - sqrt(D)) / (2 * A);
 		// float t = min(t1, t2);
 
 		float t = (-B - sqrt(D)) / (2 * A);
 
 		// intersection data
 		float3 p = pc + pd * t;
-		float3 n = normalize(p - ps);
+		float3 n = normalize(p  - ps);
 		float3 l = normalize(pl - p);
 
 		// mapping the image onto the sphere

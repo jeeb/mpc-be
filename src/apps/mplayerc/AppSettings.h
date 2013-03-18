@@ -758,6 +758,8 @@ public:
 	void			SaveSettings();
 	void			SaveExternalFilters();
 	void			LoadSettings();
+	void			SaveShaders();
+	void			LoadShaders();
 
 	void			GetFav(favtype ft, CAtlList<CString>& sl);
 	void			SetFav(favtype ft, CAtlList<CString>& sl);

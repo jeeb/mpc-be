@@ -84,3 +84,5 @@ extern CStringA HtmlSpecialChars(CStringA str, bool bQuotes = false);
 extern DWORD CharSetToCodePage(DWORD dwCharSet);
 extern CAtlList<CString>& MakeLower(CAtlList<CString>& sl);
 extern CAtlList<CString>& MakeUpper(CAtlList<CString>& sl);
+
+void FixFilename(CString& str);

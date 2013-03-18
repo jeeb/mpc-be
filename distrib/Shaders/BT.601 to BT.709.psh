@@ -1,10 +1,12 @@
+// $ShaderVersion: ps_2_0
+
 // (C) 2011 Jan-Willem Krans (janwillem32 <at> hotmail.com) released under GPL v2; see COPYING.txt
 
 // Correct video colorspace BT.601 [SD] to BT.709 [HD] for HD video input
 // Use this shader only if BT.709 [HD] encoded video is incorrectly matrixed to full range RGB with the BT.601 [SD] colorspace.
 
 sampler s0;
-float2 c0;
+float2  c0;
 
 float4 main(float2 tex : TEXCOORD0) : COLOR {
 	float4 si = tex2D(s0, tex); // original pixel

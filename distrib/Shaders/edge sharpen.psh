@@ -1,3 +1,5 @@
+// $ShaderVersion: ps_2_0
+
 sampler s0 : register(s0);
 float4 p0 :  register(c0);
 
@@ -17,9 +19,9 @@ float4 main(float2 tex : TEXCOORD0) : COLOR {
 
 	// Edge detection using Prewitt operator
 	// Get neighbor points
-	//   [ 1, 2, 3 ]
-	//   [ 4, 0, 5 ]
-	//   [ 6, 7, 8 ]
+	// [ 1, 2, 3 ]
+	// [ 4, 0, 5 ]
+	// [ 6, 7, 8 ]
 	float4 c0 = tex2D(s0, tex);
 	float4 c1 = tex2D(s0, tex + float2(-dx, -dy));
 	float4 c2 = tex2D(s0, tex + float2(  0, -dy));

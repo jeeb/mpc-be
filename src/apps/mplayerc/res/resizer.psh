@@ -37,7 +37,7 @@ float4 main_bilinear(PS_INPUT input) : COLOR {
 	return c;
 }
 
-static float4x4	tco = {
+static float4x4 tco = {
 	0, A, -2 * A, A,
 	1, 0, -A - 3, A + 2,
 	0, -A, 2 * A + 3, -A - 2,
@@ -58,8 +58,8 @@ float4 SampleX(float4 tx, float2 t0)
 				tex2D(s0, t0),
 				tex2D(s0, t0 + dx),
 				tex2D(s0, t0 + dx + dx)
-			)
-		   );
+				)
+			);
 }
 
 float4 SampleY(float4 tx, float4 ty, float2 t0)
@@ -71,8 +71,8 @@ float4 SampleY(float4 tx, float4 ty, float2 t0)
 				SampleX(tx, t0),
 				SampleX(tx, t0 + dy),
 				SampleX(tx, t0 + dy + dy)
-			)
-		   );
+				)
+			);
 }
 
 float4 main_bicubic1pass(PS_INPUT input) : COLOR {
@@ -92,8 +92,8 @@ float4 Sample(float4 t, float2 samplePos, float2 sampleD)
 				tex2D(s0, samplePos),
 				tex2D(s0, samplePos + sampleD),
 				tex2D(s0, samplePos + sampleD + sampleD)
-			)
-		   );
+				)
+			);
 }
 
 float4 main_bicubic2pass_pass1(PS_INPUT input) : COLOR {
