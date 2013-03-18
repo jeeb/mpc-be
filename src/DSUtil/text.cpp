@@ -215,6 +215,7 @@ void FixFilename(CString& str)
 	}
 
 	CString tmp;
+	// not support the following file names: "con", "con.txt" "con.name.txt". But supported "name.con" and "name.con.txt".
 	if (str.GetLength() == 3 || str.Find('.') == 3) {
 		tmp = str.Left(3).MakeUpper();
 		if (tmp == _T("CON") || tmp == _T("AUX") || tmp == _T("PRN") || tmp == _T("NUL")) {
