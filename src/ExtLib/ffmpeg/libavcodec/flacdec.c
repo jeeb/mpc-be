@@ -369,7 +369,7 @@ static inline int decode_subframe(FLACContext *s, int channel)
         bps -= wasted;
     }
     if (bps > 32) {
-        avpriv_report_missing_feature(s->avctx, "Decorrelated bit depth > 32");
+        av_log_missing_feature(s->avctx, "Decorrelated bit depth > 32", 0);
         return AVERROR_PATCHWELCOME;
     }
 
@@ -545,8 +545,10 @@ static int flac_decode_frame(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = s->blocksize;
-    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
+    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
+        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
+    }
 
     s->dsp.decorrelate[s->ch_mode](frame->data, s->decoded, s->channels,
                                    s->blocksize, s->sample_shift);

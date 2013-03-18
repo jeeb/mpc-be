@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "channel_layout.h"
+#include "audioconvert.h"
 #include "buffer.h"
 #include "common.h"
 #include "dict.h"
@@ -41,30 +41,6 @@ MAKE_ACCESSORS(AVFrame, frame, int,     decode_error_flags)
 MAKE_ACCESSORS(AVFrame, frame, int,     pkt_size)
 
 AVDictionary **avpriv_frame_get_metadatap(AVFrame *frame) {return &frame->metadata;};
-
-int av_frame_set_qp_table(AVFrame *f, AVBufferRef *buf, int stride, int qp_type)
-{
-    av_buffer_unref(&f->qp_table_buf);
-
-    f->qp_table_buf = buf;
-
-    f->qscale_table = buf->data;
-    f->qstride      = stride;
-    f->qscale_type  = qp_type;
-
-    return 0;
-}
-
-int8_t *av_frame_get_qp_table(AVFrame *f, int *stride, int *type)
-{
-    *stride = f->qstride;
-    *type   = f->qscale_type;
-
-    if (!f->qp_table_buf)
-        return NULL;
-
-    return f->qp_table_buf->data;
-}
 
 static void get_frame_defaults(AVFrame *frame)
 {
@@ -130,11 +106,11 @@ static int get_video_buffer(AVFrame *frame, int align)
     }
 
     for (i = 0; i < 4 && frame->linesize[i]; i++) {
-        int h = FFALIGN(frame->height, 32);
+        int h = frame->height;
         if (i == 1 || i == 2)
             h = -((-h) >> desc->log2_chroma_h);
 
-        frame->buf[i] = av_buffer_alloc(frame->linesize[i] * h + 16);
+        frame->buf[i] = av_buffer_alloc(frame->linesize[i] * h);
         if (!frame->buf[i])
             goto fail;
 
@@ -334,9 +310,6 @@ void av_frame_unref(AVFrame *frame)
     for (i = 0; i < frame->nb_extended_buf; i++)
         av_buffer_unref(&frame->extended_buf[i]);
     av_freep(&frame->extended_buf);
-    av_dict_free(&frame->metadata);
-    av_buffer_unref(&frame->qp_table_buf);
-
     get_frame_defaults(frame);
 }
 
@@ -380,7 +353,6 @@ int av_frame_make_writable(AVFrame *frame)
     tmp.format         = frame->format;
     tmp.width          = frame->width;
     tmp.height         = frame->height;
-    tmp.channels       = frame->channels;
     tmp.channel_layout = frame->channel_layout;
     tmp.nb_samples     = frame->nb_samples;
     ret = av_frame_get_buffer(&tmp, 32);
@@ -423,22 +395,12 @@ int av_frame_copy_props(AVFrame *dst, const AVFrame *src)
     dst->top_field_first     = src->top_field_first;
     dst->sample_rate         = src->sample_rate;
     dst->opaque              = src->opaque;
-#if FF_API_AVFRAME_LAVC
-    dst->type                = src->type;
-#endif
     dst->pkt_pts             = src->pkt_pts;
     dst->pkt_dts             = src->pkt_dts;
     dst->pkt_pos             = src->pkt_pos;
-    dst->pkt_size            = src->pkt_size;
-    dst->pkt_duration        = src->pkt_duration;
-    dst->reordered_opaque    = src->reordered_opaque;
     dst->quality             = src->quality;
-    dst->best_effort_timestamp = src->best_effort_timestamp;
     dst->coded_picture_number = src->coded_picture_number;
     dst->display_picture_number = src->display_picture_number;
-    dst->decode_error_flags  = src->decode_error_flags;
-
-    av_dict_copy(&dst->metadata, src->metadata, 0);
 
     for (i = 0; i < src->nb_side_data; i++) {
         const AVFrameSideData *sd_src = src->side_data[i];
@@ -455,18 +417,6 @@ int av_frame_copy_props(AVFrame *dst, const AVFrame *src)
         }
         memcpy(sd_dst->data, sd_src->data, sd_src->size);
         av_dict_copy(&sd_dst->metadata, sd_src->metadata, 0);
-    }
-
-    dst->qscale_table = NULL;
-    dst->qstride      = 0;
-    dst->qscale_type  = 0;
-    if (src->qp_table_buf) {
-        dst->qp_table_buf = av_buffer_ref(src->qp_table_buf);
-        if (dst->qp_table_buf) {
-            dst->qscale_table = dst->qp_table_buf->data;
-            dst->qstride      = src->qstride;
-            dst->qscale_type  = src->qscale_type;
-        }
     }
 
     return 0;

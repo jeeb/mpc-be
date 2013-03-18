@@ -323,7 +323,7 @@ static int xa_decode(AVCodecContext *avctx, int16_t *out0, int16_t *out1,
         shift  = 12 - (in[4+i*2] & 15);
         filter = in[4+i*2] >> 4;
         if (filter >= FF_ARRAY_ELEMS(xa_adpcm_table)) {
-            avpriv_request_sample(avctx, "unknown XA-ADPCM filter %d", filter);
+            av_log_ask_for_sample(avctx, "unknown XA-ADPCM filter %d\n", filter);
             filter=0;
         }
         f0 = xa_adpcm_table[filter][0];
@@ -352,7 +352,7 @@ static int xa_decode(AVCodecContext *avctx, int16_t *out0, int16_t *out1,
         shift  = 12 - (in[5+i*2] & 15);
         filter = in[5+i*2] >> 4;
         if (filter >= FF_ARRAY_ELEMS(xa_adpcm_table)) {
-            avpriv_request_sample(avctx, "unknown XA-ADPCM filter %d", filter);
+            av_log_ask_for_sample(avctx, "unknown XA-ADPCM filter %d\n", filter);
             filter=0;
         }
 
@@ -637,8 +637,10 @@ static int adpcm_decode_frame(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = nb_samples;
-    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
+    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
+        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
+    }
     samples = (short *)frame->data[0];
     samples_p = (int16_t **)frame->extended_data;
 

@@ -493,7 +493,7 @@ static av_cold int rv10_decode_init(AVCodecContext *avctx)
         break;
     default:
         av_log(s->avctx, AV_LOG_ERROR, "unknown header %X\n", rv->sub_id);
-        avpriv_request_sample(avctx, "RV1/2 version");
+        av_log_missing_feature(avctx, "RV1/2 version", 1);
         return AVERROR_PATCHWELCOME;
     }
 
@@ -680,7 +680,7 @@ static int rv10_decode_frame(AVCodecContext *avctx,
     const uint8_t *buf = avpkt->data;
     int buf_size = avpkt->size;
     MpegEncContext *s = avctx->priv_data;
-    int i, ret;
+    int i;
     AVFrame *pict = data;
     int slice_count;
     const uint8_t *slices_hdr = NULL;
@@ -739,19 +739,14 @@ static int rv10_decode_frame(AVCodecContext *avctx,
         ff_MPV_frame_end(s);
 
         if (s->pict_type == AV_PICTURE_TYPE_B || s->low_delay) {
-            if ((ret = av_frame_ref(pict, &s->current_picture_ptr->f)) < 0)
-                return ret;
-            ff_print_debug_info(s, s->current_picture_ptr, pict);
-            ff_mpv_export_qp_table(s, pict, s->current_picture_ptr, FF_QSCALE_TYPE_MPEG1);
+            *pict = s->current_picture_ptr->f;
         } else if (s->last_picture_ptr != NULL) {
-            if ((ret = av_frame_ref(pict, &s->last_picture_ptr->f)) < 0)
-                return ret;
-            ff_print_debug_info(s, s->last_picture_ptr, pict);
-            ff_mpv_export_qp_table(s, pict,s->last_picture_ptr, FF_QSCALE_TYPE_MPEG1);
+            *pict = s->last_picture_ptr->f;
         }
 
         if(s->last_picture_ptr || s->low_delay){
             *got_frame = 1;
+            ff_print_debug_info(s, pict);
         }
         s->current_picture_ptr= NULL; // so we can detect if frame_end was not called (find some nicer solution...)
     }

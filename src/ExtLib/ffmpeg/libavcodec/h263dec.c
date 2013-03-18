@@ -365,8 +365,7 @@ uint64_t time= rdtsc();
     if (buf_size == 0) {
         /* special case for last picture */
         if (s->low_delay==0 && s->next_picture_ptr) {
-            if ((ret = av_frame_ref(pict, &s->next_picture_ptr->f)) < 0)
-                return ret;
+            *pict = s->next_picture_ptr->f;
             s->next_picture_ptr= NULL;
 
             *got_frame = 1;
@@ -747,19 +746,14 @@ intrax8_decoded:
     assert(s->current_picture.f.pict_type == s->current_picture_ptr->f.pict_type);
     assert(s->current_picture.f.pict_type == s->pict_type);
     if (s->pict_type == AV_PICTURE_TYPE_B || s->low_delay) {
-        if ((ret = av_frame_ref(pict, &s->current_picture_ptr->f)) < 0)
-            return ret;
-        ff_print_debug_info(s, s->current_picture_ptr, pict);
-        ff_mpv_export_qp_table(s, pict, s->current_picture_ptr, FF_QSCALE_TYPE_MPEG1);
+        *pict = s->current_picture_ptr->f;
     } else if (s->last_picture_ptr != NULL) {
-        if ((ret = av_frame_ref(pict, &s->last_picture_ptr->f)) < 0)
-            return ret;
-        ff_print_debug_info(s, s->last_picture_ptr, pict);
-        ff_mpv_export_qp_table(s, pict, s->last_picture_ptr, FF_QSCALE_TYPE_MPEG1);
+        *pict = s->last_picture_ptr->f;
     }
 
     if(s->last_picture_ptr || s->low_delay){
         *got_frame = 1;
+        ff_print_debug_info(s, pict);
     }
 
 #ifdef PRINT_FRAME_TIME

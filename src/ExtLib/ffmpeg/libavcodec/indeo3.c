@@ -33,9 +33,9 @@
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"
 #include "copy_block.h"
+#include "dsputil.h"
 #include "bytestream.h"
 #include "get_bits.h"
-#include "hpeldsp.h"
 #include "internal.h"
 
 #include "indeo3data.h"
@@ -82,7 +82,8 @@ typedef struct Cell {
 
 typedef struct Indeo3DecodeContext {
     AVCodecContext *avctx;
-    HpelDSPContext  hdsp;
+    AVFrame         frame;
+    DSPContext      dsp;
 
     GetBitContext   gb;
     int             need_resync;
@@ -248,12 +249,12 @@ static void copy_cell(Indeo3DecodeContext *ctx, Plane *plane, Cell *cell)
         /* copy using 16xH blocks */
         if (!((cell->xpos << 2) & 15) && w >= 4) {
             for (; w >= 4; src += 16, dst += 16, w -= 4)
-                ctx->hdsp.put_no_rnd_pixels_tab[0][0](dst, src, plane->pitch, h);
+                ctx->dsp.put_no_rnd_pixels_tab[0][0](dst, src, plane->pitch, h);
         }
 
         /* copy using 8xH blocks */
         if (!((cell->xpos << 2) & 7) && w >= 2) {
-            ctx->hdsp.put_no_rnd_pixels_tab[1][0](dst, src, plane->pitch, h);
+            ctx->dsp.put_no_rnd_pixels_tab[1][0](dst, src, plane->pitch, h);
             w -= 2;
             src += 8;
             dst += 8;
@@ -993,12 +994,12 @@ static int decode_frame_headers(Indeo3DecodeContext *ctx, AVCodecContext *avctx,
     }
 
     if (ctx->frame_flags & BS_8BIT_PEL) {
-        avpriv_request_sample(avctx, "8-bit pixel format");
+        av_log_ask_for_sample(avctx, "8-bit pixel format\n");
         return AVERROR_PATCHWELCOME;
     }
 
     if (ctx->frame_flags & BS_MV_X_HALF || ctx->frame_flags & BS_MV_Y_HALF) {
-        avpriv_request_sample(avctx, "Halfpel motion vectors");
+        av_log_ask_for_sample(avctx, "halfpel motion vectors\n");
         return AVERROR_PATCHWELCOME;
     }
 
@@ -1047,10 +1048,11 @@ static av_cold int decode_init(AVCodecContext *avctx)
 
     ctx->avctx     = avctx;
     avctx->pix_fmt = AV_PIX_FMT_YUV410P;
+    avcodec_get_frame_defaults(&ctx->frame);
 
     build_requant_tab();
 
-    ff_hpeldsp_init(&ctx->hdsp, avctx->flags);
+    ff_dsputil_init(&ctx->dsp, avctx);
 
     return allocate_frame_buffers(ctx, avctx, avctx->width, avctx->height);
 }
@@ -1062,7 +1064,6 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     Indeo3DecodeContext *ctx = avctx->priv_data;
     const uint8_t *buf = avpkt->data;
     int buf_size       = avpkt->size;
-    AVFrame *frame     = data;
     int res;
 
     res = decode_frame_headers(ctx, avctx, buf, buf_size);
@@ -1088,8 +1089,14 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     /* use BS_BUFFER flag for buffer switching */
     ctx->buf_sel = (ctx->frame_flags >> BS_BUFFER) & 1;
 
-    if ((res = ff_get_buffer(avctx, frame, 0)) < 0)
+    if (ctx->frame.data[0])
+        avctx->release_buffer(avctx, &ctx->frame);
+
+    ctx->frame.reference = 0;
+    if ((res = ff_get_buffer(avctx, &ctx->frame)) < 0) {
+        av_log(ctx->avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return res;
+    }
 
     /* decode luma plane */
     if ((res = decode_plane(ctx, avctx, ctx->planes, ctx->y_data_ptr, ctx->y_data_size, 40)))
@@ -1103,16 +1110,17 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
         return res;
 
     output_plane(&ctx->planes[0], ctx->buf_sel,
-                 frame->data[0], frame->linesize[0],
+                 ctx->frame.data[0], ctx->frame.linesize[0],
                  avctx->height);
     output_plane(&ctx->planes[1], ctx->buf_sel,
-                 frame->data[1], frame->linesize[1],
+                 ctx->frame.data[1], ctx->frame.linesize[1],
                  (avctx->height + 3) >> 2);
     output_plane(&ctx->planes[2], ctx->buf_sel,
-                 frame->data[2], frame->linesize[2],
+                 ctx->frame.data[2], ctx->frame.linesize[2],
                  (avctx->height + 3) >> 2);
 
     *got_frame = 1;
+    *(AVFrame*)data = ctx->frame;
 
     return buf_size;
 }
@@ -1120,7 +1128,12 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
 
 static av_cold int decode_close(AVCodecContext *avctx)
 {
+    Indeo3DecodeContext *ctx = avctx->priv_data;
+
     free_frame_buffers(avctx->priv_data);
+
+    if (ctx->frame.data[0])
+        avctx->release_buffer(avctx, &ctx->frame);
 
     return 0;
 }

@@ -739,7 +739,7 @@ static int dca_parse_frame_header(DCAContext *s)
 
     if (s->lfe == 3) {
         s->lfe = 0;
-        avpriv_request_sample(s->avctx, "LFE = 3");
+        av_log_ask_for_sample(s->avctx, "LFE is 3\n");
         return AVERROR_PATCHWELCOME;
     }
 
@@ -1012,7 +1012,7 @@ static int dca_subframe_header(DCAContext *s, int base_channel, int block_index)
         /* Scale factor index */
         quant7 = get_bits(&s->gb, 8);
         if (quant7 > 127) {
-            avpriv_request_sample(s->avctx, "LFEScaleIndex larger than 127");
+            av_log_ask_for_sample(s->avctx, "LFEScaleIndex larger than 127\n");
             return AVERROR_INVALIDDATA;
         }
         s->lfe_scale_factor = scale_factor_quant7[quant7];
@@ -1985,15 +1985,14 @@ static void dca_exss_parse_header(DCAContext *s)
 
         num_audiop = get_bits(&s->gb, 3) + 1;
         if (num_audiop > 1) {
-            avpriv_request_sample(s->avctx,
-                                  "Multiple DTS-HD audio presentations");
+            av_log_ask_for_sample(s->avctx, "Multiple DTS-HD audio presentations.");
             /* ignore such streams for now */
             return;
         }
 
         num_assets = get_bits(&s->gb, 3) + 1;
         if (num_assets > 1) {
-            avpriv_request_sample(s->avctx, "Multiple DTS-HD audio assets");
+            av_log_ask_for_sample(s->avctx, "Multiple DTS-HD audio assets.");
             /* ignore such streams for now */
             return;
         }
@@ -2167,7 +2166,7 @@ static int dca_decode_frame(AVCodecContext *avctx, void *data,
                 }
 
                 if (s->xch_base_channel < 2) {
-                    avpriv_request_sample(avctx, "XCh with fewer than 2 base channels");
+                    av_log_ask_for_sample(avctx, "XCh with fewer than 2 base channels is not supported\n");
                     continue;
                 }
 
@@ -2356,8 +2355,10 @@ static int dca_decode_frame(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = 256 * (s->sample_blocks / 8);
-    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
+    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
+        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
+    }
     samples_flt = (float **)frame->extended_data;
 
     /* allocate buffer for extra channels if downmixing */

@@ -331,12 +331,12 @@ static int decode_band_hdr(IVI45DecContext *ctx, IVIBandDesc *band,
             transform_id = get_bits(&ctx->gb, 5);
             if (transform_id >= FF_ARRAY_ELEMS(transforms) ||
                 !transforms[transform_id].inv_trans) {
-                avpriv_request_sample(avctx, "Transform %d", transform_id);
+                av_log_ask_for_sample(avctx, "Unimplemented transform: %d!\n", transform_id);
                 return AVERROR_PATCHWELCOME;
             }
             if ((transform_id >= 7 && transform_id <= 9) ||
                  transform_id == 17) {
-                avpriv_request_sample(avctx, "DCT transform");
+                av_log_ask_for_sample(avctx, "DCT transform not supported yet!\n");
                 return AVERROR_PATCHWELCOME;
             }
 
