@@ -13582,10 +13582,13 @@ void CMainFrame::OpenSetupAudioStream()
 	}
 
 	// if no selected above ...
+	/*
+	AudioSwitcher always select first stream
 	CComQIPtr<IAMStreamSelect> pSS = FindSwitcherFilter();
 	if (pSS) {
 		pSS->Enable(0, AMSTREAMSELECTENABLE_ENABLE);
 	}
+	*/
 }
 
 void CMainFrame::SubFlags(CString strname, bool* forced, bool* def)
@@ -14326,6 +14329,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		// PostMessage instead of SendMessage because the user might call CloseMedia and then we would deadlock
 		PostMessage(WM_COMMAND, ID_PLAY_PAUSE);
 
+		OpenSetupAudioStream();
+
 		m_bfirstPlay = true;
 
 		if (!(AfxGetAppSettings().nCLSwitches&CLSW_OPEN) && (AfxGetAppSettings().nLoops > 0)) {
@@ -14336,8 +14341,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			OnTimer(TIMER_STREAMPOSPOLLER);
 			OnTimer(TIMER_STREAMPOSPOLLER2);
 		}
-
-		OpenSetupAudioStream();
 
 		AfxGetAppSettings().nCLSwitches &= ~CLSW_OPEN;
 
