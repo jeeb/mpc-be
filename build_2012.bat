@@ -274,12 +274,14 @@ IF /I "%NAME%" == "MPC-BE" (
   COPY /Y /V "%~1_%ARCH%\VSFilter.dll"   "%PCKG_NAME%\VSFilter.dll" >NUL
 )
 
-COPY /Y /V "..\docs\COPYING.txt"         "%PCKG_NAME%" >NUL
-COPY /Y /V "..\docs\Authors.txt"         "%PCKG_NAME%" >NUL
-COPY /Y /V "..\docs\Authors mpc-hc team.txt"         "%PCKG_NAME%" >NUL
-COPY /Y /V "..\docs\Changelog.txt"       "%PCKG_NAME%" >NUL
-COPY /Y /V "..\docs\Changelog.Rus.txt"   "%PCKG_NAME%" >NUL
-COPY /Y /V "..\docs\Readme.txt"          "%PCKG_NAME%" >NUL
+COPY /Y /V "..\docs\COPYING.txt"             "%PCKG_NAME%" >NUL
+COPY /Y /V "..\docs\Authors.txt"             "%PCKG_NAME%" >NUL
+COPY /Y /V "..\docs\Authors mpc-hc team.txt" "%PCKG_NAME%" >NUL
+COPY /Y /V "..\docs\Changelog.txt"           "%PCKG_NAME%" >NUL
+COPY /Y /V "..\docs\Changelog.Rus.txt"       "%PCKG_NAME%" >NUL
+COPY /Y /V "..\docs\Readme.txt"              "%PCKG_NAME%" >NUL
+IF NOT EXIST "%PCKG_NAME%\Shaders" MD "%PCKG_NAME%\Shaders"
+COPY /Y /V "..\distrib\Shaders\*.psh"        "%PCKG_NAME%\Shaders\*.psh" >NUL
 
 IF /I "%NAME%" == "MPC-BE" (
 TITLE Creating archive %PCKG_NAME%.zip...
