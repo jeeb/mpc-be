@@ -180,6 +180,7 @@ SRCS_C = \
     libavcodec/h264idct.c \
     libavcodec/h264pred.c \
     libavcodec/h264qpel.c \
+    libavcodec/hpeldsp.c \
     libavcodec/huffman.c \
     libavcodec/imc.c \
     libavcodec/imgconvert.c \
@@ -326,6 +327,7 @@ SRCS_C = \
     libavcodec/wmv2dsp.c \
     libavcodec/xiph.c \
     libavcodec/x86/ac3dsp_init.c \
+    libavcodec/x86/constants.c \
     libavcodec/x86/dirac_dwt.c \
     libavcodec/x86/diracdsp_mmx.c \
     libavcodec/x86/dsputil_mmx.c \
@@ -336,7 +338,7 @@ SRCS_C = \
     libavcodec/x86/h264chroma_init.c \
     libavcodec/x86/h264dsp_init.c \
     libavcodec/x86/h264_qpel.c \
-    libavcodec/x86/idct_mmx.c \
+    libavcodec/x86/hpeldsp_init.c \
     libavcodec/x86/idct_mmx_xvid.c \
     libavcodec/x86/idct_sse2_xvid.c \
     libavcodec/x86/mlpdsp.c \
@@ -434,6 +436,7 @@ SRCS_YASM = \
     libavcodec/x86/dwt_yasm.asm \
     libavcodec/x86/fft.asm \
     libavcodec/x86/fmtconvert.asm \
+    libavcodec/x86/fpelbase.asm \
     libavcodec/x86/h263_loopfilter.asm \
     libavcodec/x86/h264_chromamc.asm \
     libavcodec/x86/h264_chromamc_10bit.asm \

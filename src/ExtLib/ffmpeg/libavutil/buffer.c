@@ -122,7 +122,7 @@ int av_buffer_is_writable(const AVBufferRef *buf)
     if (buf->buffer->flags & AV_BUFFER_FLAG_READONLY)
         return 0;
 
-    return avpriv_atomic_int_add_and_fetch(&buf->buffer->refcount, 0) == 1;
+    return avpriv_atomic_int_get(&buf->buffer->refcount) == 1;
 }
 
 int av_buffer_make_writable(AVBufferRef **pbuf)
@@ -239,14 +239,14 @@ void av_buffer_pool_uninit(AVBufferPool **ppool)
 /* remove the whole buffer list from the pool and return it */
 static BufferPoolEntry *get_pool(AVBufferPool *pool)
 {
-    BufferPoolEntry *cur = NULL, *last = NULL;
+    BufferPoolEntry *cur = *(void * volatile *)&pool->pool, *last = NULL;
 
-    do {
-        FFSWAP(BufferPoolEntry*, cur, last);
+    while (cur != last) {
+        last = cur;
         cur = avpriv_atomic_ptr_cas((void * volatile *)&pool->pool, last, NULL);
         if (!cur)
             return NULL;
-    } while (cur != last);
+    }
 
     return cur;
 }
@@ -263,7 +263,7 @@ static void add_to_pool(BufferPoolEntry *buf)
     while (end->next)
         end = end->next;
 
-    while ((cur = avpriv_atomic_ptr_cas((void * volatile *)&pool->pool, NULL, buf))) {
+    while (avpriv_atomic_ptr_cas((void * volatile *)&pool->pool, NULL, buf)) {
         /* pool is not empty, retrieve it and append it to our list */
         cur = get_pool(pool);
         end->next = cur;
@@ -307,6 +307,7 @@ static AVBufferRef *pool_alloc_buffer(AVBufferPool *pool)
     ret->buffer->free   = pool_release_buffer;
 
     avpriv_atomic_int_add_and_fetch(&pool->refcount, 1);
+    avpriv_atomic_int_add_and_fetch(&pool->nb_allocated, 1);
 
     return ret;
 }
@@ -318,6 +319,12 @@ AVBufferRef *av_buffer_pool_get(AVBufferPool *pool)
 
     /* check whether the pool is empty */
     buf = get_pool(pool);
+    if (!buf && pool->refcount <= pool->nb_allocated) {
+        av_log(NULL, AV_LOG_DEBUG, "Pool race dectected, spining to avoid overallocation and eventual OOM\n");
+        while (!buf && avpriv_atomic_int_get(&pool->refcount) <= avpriv_atomic_int_get(&pool->nb_allocated))
+            buf = get_pool(pool);
+    }
+
     if (!buf)
         return pool_alloc_buffer(pool);
 

@@ -646,7 +646,7 @@ static void fill_coding_method_array (sb_int8_array tone_level_idx, sb_int8_arra
 
     if (!superblocktype_2_3) {
         /* This case is untested, no samples available */
-        av_log_ask_for_sample(NULL, "!superblocktype_2_3");
+        avpriv_request_sample(NULL, "!superblocktype_2_3");
         return;
         for (ch = 0; ch < nb_channels; ch++)
             for (sb = 0; sb < 30; sb++) {
@@ -1985,10 +1985,8 @@ static int qdm2_decode_frame(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = 16 * s->frame_size;
-    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
-    }
     out = (int16_t *)frame->data[0];
 
     for (i = 0; i < 16; i++) {

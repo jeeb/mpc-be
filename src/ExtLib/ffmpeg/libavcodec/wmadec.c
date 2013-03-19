@@ -72,6 +72,11 @@ static int wma_decode_init(AVCodecContext * avctx)
     int i, flags2;
     uint8_t *extradata;
 
+    if (!avctx->block_align) {
+        av_log(avctx, AV_LOG_ERROR, "block_align is not set\n");
+        return AVERROR(EINVAL);
+    }
+
     s->avctx = avctx;
 
     /* extract flag infos */
@@ -837,10 +842,8 @@ static int wma_decode_superframe(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     frame->nb_samples = nb_frames * s->frame_len;
-    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
-    }
     samples = (float **)frame->extended_data;
     samples_offset = 0;
 
