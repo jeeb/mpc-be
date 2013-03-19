@@ -14,9 +14,9 @@
 Изменения (*):
 * Обновлен русский перевод;
 * Обновлен итальянский перевод (автор Lord Maius);
-* ffmpeg git-35135a39;
+* ffmpeg git-17c1881d;
 * libopus 1.0.1 git-99e8a935;
-* Little-CMS git-d504603d;
+* Little-CMS git-b58cb85e;
 * libwebp 0.2.1 git-69e25906;
 * libopenjpeg 2.0.0 svn rev.2301;
 * MediaInfo 0.7.62+ svn rev.5430;
