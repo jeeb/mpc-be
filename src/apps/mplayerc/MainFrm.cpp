@@ -7543,7 +7543,7 @@ void CMainFrame::OnUpdateViewCapture(CCmdUI* pCmdUI)
 void CMainFrame::OnViewShaderEditor()
 {
 	ShowControlBar(&m_wndShaderEditorBar, !m_wndShaderEditorBar.IsWindowVisible(), TRUE);
-	AfxGetAppSettings().fShaderEditorWasOpened = true;
+	AfxGetAppSettings().fShadersNeedSave = true;
 }
 
 void CMainFrame::OnUpdateViewShaderEditor(CCmdUI* pCmdUI)

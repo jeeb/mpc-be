@@ -504,7 +504,7 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 		::RemoveDirectory(oldpath + _T("\\Shaders"));
 	}
 	// Ensure the shaders are properly saved
-	AfxGetAppSettings().fShaderEditorWasOpened = true;
+	AfxGetAppSettings().fShadersNeedSave = true;
 
 	// Write settings immediately
 	m_s.SaveSettings();

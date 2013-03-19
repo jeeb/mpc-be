@@ -408,7 +408,7 @@ class CAppSettings
 public:
 	bool fReset;
 
-	bool fShaderEditorWasOpened;
+	bool fShadersNeedSave;
 
 	// cmdline params
 	UINT nCLSwitches;

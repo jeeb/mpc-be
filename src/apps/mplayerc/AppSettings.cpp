@@ -34,7 +34,7 @@ CAppSettings::CAppSettings()
 	, nCmdlnWebServerPort(-1)
 	, fShowDebugInfo(false)
 	, fIsFSWindow(false)
-	, fShaderEditorWasOpened(false)
+	, fShadersNeedSave(false)
 	, fReset(false)
 {
 	// Internal source filter
@@ -789,9 +789,9 @@ void CAppSettings::SaveSettings()
 		pApp->WriteProfileInt(_T(""), _T(""), pApp->GetProfileInt(_T(""), _T(""), 0)?0:1);
 	}
 
-	if (fShaderEditorWasOpened) { // This is a large data block. Save it only when really necessary.
+	if (fShadersNeedSave) { // This is a large data block. Save it only when really necessary.
 		SaveShaders();
-		fShaderEditorWasOpened = false;
+		fShadersNeedSave = false;
 	}
 }
 
@@ -1432,12 +1432,12 @@ void CAppSettings::LoadSettings()
 void CAppSettings::SaveShaders()
 {
 	if (m_shaders.GetCount() > 0) {
-		CString strShadersPath;
-		if (AfxGetMyApp()->GetAppSavePath(strShadersPath)) {
-			strShadersPath += _T("\\Shaders\\");
+		CString path;
+		if (AfxGetMyApp()->GetAppSavePath(path)) {
+			path += _T("\\Shaders\\");
 			// Only create this folder when needed
-			if (!::PathFileExists(strShadersPath)) {
-				::CreateDirectory(strShadersPath, NULL);
+			if (!::PathFileExists(path)) {
+				::CreateDirectory(path, NULL);
 			}
 
 			POSITION pos = m_shaders.GetHeadPosition();
@@ -1446,7 +1446,7 @@ void CAppSettings::SaveShaders()
 				if (!s.label.IsEmpty()) {
 					CString shname = s.label + _T(".psh");
 					CStdioFile shfile;
-					if (shfile.Open(strShadersPath + shname, CFile::modeCreate | CFile::modeWrite | CFile::shareDenyNone | CFile::typeText)) {
+					if (shfile.Open(path + shname, CFile::modeCreate | CFile::modeWrite | CFile::shareDenyNone | CFile::typeText)) {
 						shfile.WriteString(_T("// $ShaderVersion: ") + s.target + _T("\n"));
 						shfile.WriteString(s.srcdata);
 
@@ -1462,17 +1462,26 @@ void CAppSettings::LoadShaders()
 {
 	m_shaders.RemoveAll();
 
-	CString strShadersPath;
-	if (AfxGetMyApp()->GetAppSavePath(strShadersPath)) {
-		strShadersPath += _T("\\Shaders\\");
+	CString path;
+	if (AfxGetMyApp()->GetAppSavePath(path)) {
+		path += _T("\\Shaders\\");
+		if (!::PathFileExists(path) && !AfxGetMyApp()->IsIniValid()) {
+			// profile does not contain "Shaders" folder. try to take shaders from program folder
+			GetModuleFileName(AfxGetInstanceHandle(), path.GetBuffer(_MAX_PATH), _MAX_PATH);
+			path.ReleaseBuffer();
+			path.Truncate(path.ReverseFind('\\'));
+			path += _T("\\Shaders\\");
+			fShadersNeedSave = true;
+		}
+
 		WIN32_FIND_DATA wfd;
-		HANDLE hFile = FindFirstFile(strShadersPath + _T("*.psh"), &wfd);
+		HANDLE hFile = FindFirstFile(path + _T("*.psh"), &wfd);
 		if (hFile != INVALID_HANDLE_VALUE) {
 			do {
 				CString shname = wfd.cFileName;
 				CStdioFile shfile;
 
-				if (shfile.Open(strShadersPath + shname, CFile::modeRead | CFile::shareDenyWrite | CFile::typeText)) {
+				if (shfile.Open(path + shname, CFile::modeRead | CFile::shareDenyWrite | CFile::typeText)) {
 
 					Shader s;
 					s.label = shname.Left(shname.GetLength() - 4); // filename without extension (.psh)
