@@ -876,16 +876,6 @@ void FFSetThreadNumber (struct AVCodecContext* pAVCtx, enum AVCodecID nCodecId, 
 	pAVCtx->thread_type		= nThreadCount ? FFGetThreadType(nCodecId) : 0;
 }
 
-BOOL FFSoftwareCheckCompatibility (struct AVCodecContext* pAVCtx)
-{
-	if (pAVCtx->codec_id == AV_CODEC_ID_VC1) {
-		VC1Context* vc1 = (VC1Context*) pAVCtx->priv_data;
-		return !vc1->interlace;
-	} else {
-		return TRUE;
-	}
-}
-
 int FFGetCodedPicture (struct AVCodecContext* pAVCtx)
 {
 	MpegEncContext* s = GetMpegEncContext(pAVCtx);

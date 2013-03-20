@@ -1601,7 +1601,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 				m_nDXVAMode  = MODE_DXVA2;
 			}
 		}
-		if (m_nDXVAMode == MODE_SOFTWARE && (!m_bUseFFmpeg || !FFSoftwareCheckCompatibility(m_pAVCtx))) {
+		if (m_nDXVAMode == MODE_SOFTWARE && !m_bUseFFmpeg) {
 			return VFW_E_INVALIDMEDIATYPE;
 		}
 
