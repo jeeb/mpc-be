@@ -13,7 +13,7 @@ Legend:
 Added (+):
 
 Changes (*):
-* ffmpeg git-db8403d0;
+* ffmpeg git-9ea6c148;
 * libopus 1.0.1 git-99e8a935;
 * Little-CMS git-b58cb85e;
 * libwebp 0.2.1 git-69e25906;
