@@ -129,7 +129,7 @@ private:
 	HRESULT					GetAvailableAudioDevices(IMMDeviceCollection **ppMMDevices);
 	HRESULT					GetAudioDevice(IMMDevice **ppMMDevice);
 	HRESULT					CreateAudioClient(IMMDevice *pMMDevice, IAudioClient **ppAudioClient);
-	HRESULT					InitAudioClient(WAVEFORMATEX *pWaveFormatEx, IAudioClient *pAudioClient, IAudioRenderClient **ppRenderClient);
+	HRESULT					InitAudioClient(WAVEFORMATEX *pWaveFormatEx, IAudioClient *pAudioClient, IAudioRenderClient **ppRenderClient, ISimpleAudioVolume **ppAudioVolume);
 	HRESULT					CheckAudioClient(WAVEFORMATEX *pWaveFormatEx);
 	bool					CheckFormatChanged(WAVEFORMATEX *pWaveFormatEx, WAVEFORMATEX **ppNewWaveFormatEx);
 	HRESULT					DoRenderSampleWasapi(IMediaSample *pMediaSample);
@@ -144,6 +144,7 @@ private:
 	IMMDevice				*pMMDevice;
 	IAudioClient			*pAudioClient;
 	IAudioRenderClient		*pRenderClient;
+	ISimpleAudioVolume		*pAudioVolume;
 	UINT32					nFramesInBuffer;
 	REFERENCE_TIME			hnsPeriod, hnsActualDuration;
 	HANDLE					hTask;

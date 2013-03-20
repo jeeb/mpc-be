@@ -104,6 +104,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, pMMDevice			(NULL)
 	, pAudioClient		(NULL )
 	, pRenderClient		(NULL )
+	, pAudioVolume		(NULL )
 	, m_useWASAPI		(1 )
 	, m_bMuteFastForward(false)
 	, m_csSound_Device	(_T(""))
@@ -171,6 +172,7 @@ CMpcAudioRenderer::~CMpcAudioRenderer()
 	SAFE_RELEASE (m_pDSBuffer);
 	SAFE_RELEASE (m_pDS);
 
+	SAFE_RELEASE (pAudioVolume);
 	SAFE_RELEASE (pRenderClient);
 	SAFE_RELEASE (pAudioClient);
 	SAFE_RELEASE (pMMDevice);
@@ -528,7 +530,16 @@ STDMETHODIMP CMpcAudioRenderer::Invoke(DISPID dispidMember, REFIID riid, LCID lc
 STDMETHODIMP CMpcAudioRenderer::put_Volume(long lVolume)
 {
 	m_lVolume = lVolume;
-	if (!m_useWASAPI && m_pDSBuffer) {
+
+	if (m_useWASAPI && m_useWASAPIAfterRestart == 2 && pAudioVolume) {
+		float value = pow(10, lVolume / 4000.0f);
+		if (lVolume == -10000) {
+			value = 0.0f;
+		} else if (lVolume == 0) {
+			value = 1.0f;
+		}
+		return pAudioVolume->SetMasterVolume(value, NULL);
+	} else if (!m_useWASAPI && m_pDSBuffer) {
 		return m_pDSBuffer->SetVolume(lVolume);
 	}
 
@@ -537,7 +548,16 @@ STDMETHODIMP CMpcAudioRenderer::put_Volume(long lVolume)
 
 STDMETHODIMP CMpcAudioRenderer::get_Volume(long *plVolume)
 {
-	if (!m_useWASAPI && m_pDSBuffer) {
+	if (m_useWASAPI && m_useWASAPIAfterRestart == 2 && pAudioVolume) {
+		float pfLevel;
+		HRESULT hr = pAudioVolume->GetMasterVolume(&pfLevel);
+		if (SUCCEEDED(hr)) {
+			if (plVolume) {
+				*plVolume = min((long)(4000 * log10(pfLevel)), 0);
+			}
+		}
+		return hr;
+	} else if (!m_useWASAPI && m_pDSBuffer) {
 		return m_pDSBuffer->GetVolume(plVolume);
 	}
 
@@ -1071,6 +1091,7 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx)
 				pAudioClient->Stop();
 			}
 			isAudioClientStarted = false;
+			SAFE_RELEASE(pAudioVolume);
 			SAFE_RELEASE(pRenderClient);
 			SAFE_RELEASE(pAudioClient);
 			if (SUCCEEDED (hr)) {
@@ -1090,9 +1111,10 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx)
 	}
 
 
+	SAFE_RELEASE(pAudioVolume);
 	SAFE_RELEASE(pRenderClient);
 	if (SUCCEEDED (hr)) {
-		hr = InitAudioClient(pWaveFormatEx, pAudioClient, &pRenderClient);
+		hr = InitAudioClient(pWaveFormatEx, pAudioClient, &pRenderClient, &pAudioVolume);
 	}
 	return hr;
 }
@@ -1253,7 +1275,7 @@ HRESULT CMpcAudioRenderer::GetBufferSize(WAVEFORMATEX *pWaveFormatEx, REFERENCE_
 	return S_OK;
 }
 
-HRESULT CMpcAudioRenderer::InitAudioClient(WAVEFORMATEX *pWaveFormatEx, IAudioClient *pAudioClient, IAudioRenderClient **ppRenderClient)
+HRESULT CMpcAudioRenderer::InitAudioClient(WAVEFORMATEX *pWaveFormatEx, IAudioClient *pAudioClient, IAudioRenderClient **ppRenderClient, ISimpleAudioVolume **ppAudioVolume)
 {
 	TRACE(_T("CMpcAudioRenderer::InitAudioClient()\n"));
 	HRESULT hr = S_OK;
@@ -1338,9 +1360,14 @@ HRESULT CMpcAudioRenderer::InitAudioClient(WAVEFORMATEX *pWaveFormatEx, IAudioCl
 		hr = pAudioClient->GetBufferSize(&nFramesInBuffer);
 	}
 
-	// calculate the new period
+	// enables a client to write output data to a rendering endpoint buffer
 	if (SUCCEEDED (hr)) {
 		hr = pAudioClient->GetService(__uuidof(IAudioRenderClient), (void**)(ppRenderClient));
+	}
+
+	// enables a client to control the master volume level of an audio session
+	if (SUCCEEDED (hr)) {
+		hr = pAudioClient->GetService(__uuidof(ISimpleAudioVolume), (void**)(ppAudioVolume));
 	}
 
 	if (FAILED (hr)) {
