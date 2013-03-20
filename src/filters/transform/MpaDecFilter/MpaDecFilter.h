@@ -95,6 +95,7 @@ protected:
 	int             m_hdmisize;
 	int             m_truehd_samplerate;
 	int             m_truehd_framelength;
+	bool            m_fBitstreamUsed;
 
 	CFFAudioDecoder m_FFAudioDec;
 
