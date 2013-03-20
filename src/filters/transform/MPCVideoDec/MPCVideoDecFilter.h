@@ -134,7 +134,6 @@ protected:
 	int										m_nCountEstimated;		// Number of rtStart estimated since last rtStart received
 	double									m_dRate;
 	REFERENCE_TIME							m_rtPrevStop;
-	bool									m_bFrame_repeat_pict;
 
 	bool									m_bUseDXVA;
 	bool									m_bUseFFmpeg;
