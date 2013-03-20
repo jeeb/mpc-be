@@ -2436,7 +2436,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		}
 	} else {
 		if (IsWinVistaOrLater()) {
-			m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EnhancedVideoRenderer, L"Enhanced Video Renderer", MERIT64_ABOVE_DSHOW+2));
+			m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EnhancedVideoRenderer, L"EVR - Preview Window", MERIT64_ABOVE_DSHOW+2));
 		} else {
 			m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer9, L"VMR9 - Preview window", MERIT64_ABOVE_DSHOW+2));
 		}
@@ -2453,7 +2453,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 			pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
 			m_transform.AddTail(pFGF);
 		} else if (SelAudioRenderer == AUDRNDT_MPC) {
-			pFGF = DNew CFGFilterInternal<CMpcAudioRenderer>(AUDRNDT_MPC, MERIT64_ABOVE_DSHOW+2);
+			pFGF = DNew CFGFilterInternal<CMpcAudioRenderer>(AUDRNDT_MPC, /*MERIT64_ABOVE_DSHOW+2*/m_armerit);
 			pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
 			m_transform.AddTail(pFGF);
 		} else if (SelAudioRenderer!="") {
