@@ -251,7 +251,9 @@ HRESULT	CMpcAudioRenderer::CheckMediaType(const CMediaType *pmt)
 		if (S_OK == hr) {
 			TRACE(_T("CMpcAudioRenderer::CheckMediaType() - WASAPI client accepted the format\n"));
 		} else {
-			if (AUDCLNT_E_UNSUPPORTED_FORMAT == hr) {
+			if (S_FALSE == hr) {
+				TRACE(_T("CMpcAudioRenderer::CheckMediaType() - WASAPI client refused the format with a closest match\n"));
+			} else if (AUDCLNT_E_UNSUPPORTED_FORMAT == hr) {
 				TRACE(_T("CMpcAudioRenderer::CheckMediaType() - WASAPI client refused the format\n"));
 			} else {
 				TRACE(_T("CMpcAudioRenderer::CheckMediaType() - WASAPI failed = 0x%08x\n"), hr);
@@ -1019,7 +1021,7 @@ HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 		}
 
 		if (!isAudioClientStarted) {
-			TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi Starting audio client\n"));
+			TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - Starting audio client\n"));
 			pAudioClient->Start();
 			isAudioClientStarted = true;
 		}
@@ -1097,6 +1099,9 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx)
 			if (SUCCEEDED (hr)) {
 				hr = CreateAudioClient(pMMDevice, &pAudioClient);
 			}
+		} else if (S_FALSE == hr) {
+			TRACE(_T("CMpcAudioRenderer::CheckAudioClient() - WASAPI client refused the format with a closest match\n"));
+			return hr;
 		} else if (AUDCLNT_E_UNSUPPORTED_FORMAT == hr) {
 			TRACE(_T("CMpcAudioRenderer::CheckAudioClient() - WASAPI client refused the format\n"));
 			return hr;
@@ -1254,13 +1259,13 @@ HRESULT CMpcAudioRenderer::GetBufferSize(WAVEFORMATEX *pWaveFormatEx, REFERENCE_
 	WAVEFORMATEXTENSIBLE *wfext=(WAVEFORMATEXTENSIBLE*)pWaveFormatEx;
 
 	if (!bufferSize)
-		if (wfext->SubFormat==KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_MLP) {
+		if (wfext->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_MLP) {
 			bufferSize = 61440;
-		} else if (wfext->SubFormat==KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD) {
+		} else if (wfext->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD) {
 			bufferSize = 32768;
-		} else if (wfext->SubFormat==KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS) {
+		} else if (wfext->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS) {
 			bufferSize = 24576;
-		} else if (wfext->Format.wFormatTag==WAVE_FORMAT_DOLBY_AC3_SPDIF) {
+		} else if (wfext->Format.wFormatTag == WAVE_FORMAT_DOLBY_AC3_SPDIF) {
 			bufferSize = 6144;
 		} else {
 			return S_OK;
@@ -1297,6 +1302,9 @@ HRESULT CMpcAudioRenderer::InitAudioClient(WAVEFORMATEX *pWaveFormatEx, IAudioCl
 
 	if (S_OK == hr) {
 		TRACE(_T("CMpcAudioRenderer::InitAudioClient() - WASAPI client accepted the format\n"));;
+	} else if (S_FALSE == hr) {
+		TRACE(_T("CMpcAudioRenderer::InitAudioClient() - WASAPI client refused the format with a closest match\n"));
+		return hr;
 	} else if (AUDCLNT_E_UNSUPPORTED_FORMAT == hr) {
 		TRACE(_T("CMpcAudioRenderer::InitAudioClient() - WASAPI client refused the format\n"));
 		return hr;
