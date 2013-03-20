@@ -843,7 +843,7 @@ bool CFLVSplitterFilter::DemuxLoop()
 	AudioTag at = {};
 	VideoTag vt = {};
 
-	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
+	while (SUCCEEDED(hr) && !CheckRequest(NULL) && (!m_pFile->IsStreaming() || SUCCEEDED(m_pFile->WaitAvailable(1500, MEGABYTE/8)))) {
 		if (!ReadTag(t)) {
 			break;
 		}
