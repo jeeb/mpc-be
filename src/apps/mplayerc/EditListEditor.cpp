@@ -25,8 +25,8 @@
 
 CClip::CClip()
 {
-	m_rtIn	= _I64_MIN;
-	m_rtOut	= _I64_MIN;
+	m_rtIn	= INVALID_TIME;
+	m_rtOut	= INVALID_TIME;
 }
 
 void CClip::SetIn(LPCTSTR strVal)
@@ -44,7 +44,7 @@ void CClip::SetIn  (REFERENCE_TIME rtVal)
 	m_rtIn  = rtVal;
 
 	if (m_rtIn > m_rtOut) {
-		m_rtOut = _I64_MIN;
+		m_rtOut = INVALID_TIME;
 	}
 };
 
@@ -53,13 +53,13 @@ void CClip::SetOut (REFERENCE_TIME rtVal)
 	m_rtOut = rtVal;
 
 	if (m_rtIn > m_rtOut) {
-		m_rtIn = _I64_MIN;
+		m_rtIn = INVALID_TIME;
 	}
 };
 
 CString CClip::GetIn()
 {
-	if (m_rtIn == _I64_MIN) {
+	if (m_rtIn == INVALID_TIME) {
 		return _T("");
 	} else {
 		return ReftimeToString(m_rtIn);
@@ -68,7 +68,7 @@ CString CClip::GetIn()
 
 CString CClip::GetOut()
 {
-	if (m_rtOut == _I64_MIN) {
+	if (m_rtOut == INVALID_TIME) {
 		return _T("");
 	} else {
 		return ReftimeToString(m_rtOut);

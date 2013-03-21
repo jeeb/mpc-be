@@ -915,7 +915,7 @@ void CMPCVideoDecFilter::UpdateFrameTime (REFERENCE_TIME& rtStart, REFERENCE_TIM
 	bool m_PullDownFlag = (m_nCodecId == AV_CODEC_ID_VC1 && b_repeat_pict && AvgTimePerFrame == 333666);
 	REFERENCE_TIME m_rtFrameDuration = m_PullDownFlag ? AVRTIMEPERFRAME_PULLDOWN : AvgTimePerFrame;
 
-	if ((rtStart == _I64_MIN) || (m_PullDownFlag && m_rtPrevStop && (rtStart <= m_rtPrevStop))) {
+	if ((rtStart == INVALID_TIME) || (m_PullDownFlag && m_rtPrevStop && (rtStart <= m_rtPrevStop))) {
 		rtStart = m_rtLastStart + (m_rtFrameDuration / m_dRate) * m_nCountEstimated;
 		m_nCountEstimated++;
 	} else {
@@ -2086,7 +2086,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			rtStart = m_rtPrevStop;
 		} else if ((m_nCodecId == AV_CODEC_ID_RV30 || m_nCodecId == AV_CODEC_ID_RV40) && avpkt.data) {
 			rtStart = m_pFrame->pkt_pts;
-			rtStart = (rtStart == _I64_MIN) ? m_rtPrevStop : (10000i64*process_rv_timestamp(&rm, m_nCodecId, avpkt.data, (rtStart + m_rtStart)/10000i64) - m_rtStart);
+			rtStart = (rtStart == INVALID_TIME) ? m_rtPrevStop : (10000i64*process_rv_timestamp(&rm, m_nCodecId, avpkt.data, (rtStart + m_rtStart)/10000i64) - m_rtStart);
 		} else if (!PULLDOWN_FLAG) {
 			rtStart = m_pFrame->pkt_pts;
 		}
@@ -2262,8 +2262,8 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 	HRESULT			hr;
 	BYTE*			pDataIn;
 	int				nSize;
-	REFERENCE_TIME	rtStart	= _I64_MIN;
-	REFERENCE_TIME	rtStop	= _I64_MIN;
+	REFERENCE_TIME	rtStart	= INVALID_TIME;
+	REFERENCE_TIME	rtStop	= INVALID_TIME;
 
 	if (FAILED(hr = pIn->GetPointer(&pDataIn))) {
 		return hr;
@@ -2278,7 +2278,7 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 	hr = pIn->GetTime(&rtStart, &rtStop);
 
 	if (FAILED(hr)) {
-		rtStart = rtStop = _I64_MIN;
+		rtStart = rtStop = INVALID_TIME;
 	}
 
 	if (m_nDXVAMode == MODE_SOFTWARE && PULLDOWN_FLAG) {

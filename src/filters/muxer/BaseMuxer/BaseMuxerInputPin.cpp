@@ -191,7 +191,7 @@ HRESULT CBaseMuxerInputPin::CompleteConnect(IPin* pReceivePin)
 
 HRESULT CBaseMuxerInputPin::Active()
 {
-	m_rtMaxStart = _I64_MIN;
+	m_rtMaxStart = INVALID_TIME;
 	m_fEOS = false;
 	m_iPacketIndex = 0;
 	m_evAcceptPacket.Set();

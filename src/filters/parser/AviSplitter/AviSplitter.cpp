@@ -87,7 +87,7 @@ CFilterApp theApp;
 CAviSplitterFilter::CAviSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("CAviSplitterFilter"), pUnk, phr, __uuidof(this))
 	, m_timeformat(TIME_FORMAT_MEDIA_TIME)
-	, m_maxTimeStamp(Packet::INVALID_TIME)
+	, m_maxTimeStamp(INVALID_TIME)
 	, m_bBadInterleavedSuport(false)
 	, m_bSetReindex(true)
 {
@@ -662,7 +662,7 @@ bool CAviSplitterFilter::DemuxLoop()
 		++f;
 	}
 
-	if (m_maxTimeStamp != Packet::INVALID_TIME) {
+	if (m_maxTimeStamp != INVALID_TIME) {
 		m_rtCurrent = m_maxTimeStamp;
 	}
 	return true;

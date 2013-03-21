@@ -397,7 +397,7 @@ void CMpeg2DecFilter::InputTypeChanged()
 	TRACE(_T("ResetMpeg2Decoder()\n"));
 
 	for (int i = 0; i < _countof(m_dec->m_pictures); i++) {
-		m_dec->m_pictures[i].rtStart = m_dec->m_pictures[i].rtStop = _I64_MIN+1;
+		m_dec->m_pictures[i].rtStart = m_dec->m_pictures[i].rtStop = INVALID_TIME+1;
 		m_dec->m_pictures[i].fDelivered = false;
 		m_dec->m_pictures[i].flags &= ~PIC_MASK_CODING_TYPE;
 	}
@@ -530,10 +530,10 @@ HRESULT CMpeg2DecFilter::Transform(IMediaSample* pIn)
 		InputTypeChanged();
 	}
 
-	REFERENCE_TIME rtStart = _I64_MIN, rtStop = _I64_MIN;
+	REFERENCE_TIME rtStart = INVALID_TIME, rtStop = INVALID_TIME;
 	hr = pIn->GetTime(&rtStart, &rtStop);
 	if (FAILED(hr)) {
-		rtStart = rtStop = _I64_MIN;
+		rtStart = rtStop = INVALID_TIME;
 	}
 
 	int nInvalidBufferCount = 0;
@@ -577,7 +577,7 @@ HRESULT CMpeg2DecFilter::Transform(IMediaSample* pIn)
 				break;
 			case STATE_PICTURE:
 				m_dec->m_picture->rtStart = rtStart;
-				rtStart = _I64_MIN;
+				rtStart = INVALID_TIME;
 				m_dec->m_picture->fDelivered = false;
 				m_dec->mpeg2_skip(m_fDropFrames && (m_dec->m_picture->flags&PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_B);
 				break;
@@ -605,7 +605,7 @@ HRESULT CMpeg2DecFilter::Transform(IMediaSample* pIn)
 					// start - end
 
 					m_fb.rtStart = picture->rtStart;
-					if (m_fb.rtStart == _I64_MIN) {
+					if (m_fb.rtStart == INVALID_TIME) {
 						m_fb.rtStart = m_fb.rtStop;
 					}
 					m_fb.rtStop = m_fb.rtStart + m_AvgTimePerFrame * picture->nb_fields / (m_dec->m_info.m_display_picture_2nd ? 1 : 2);

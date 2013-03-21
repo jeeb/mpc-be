@@ -36,11 +36,11 @@ public :
 	CClip();
 
 	bool		HaveIn() {
-		return m_rtIn  != _I64_MIN;
+		return m_rtIn  != INVALID_TIME;
 	};
 
 	bool		HaveOut() {
-		return m_rtOut != _I64_MIN;
+		return m_rtOut != INVALID_TIME;
 	};
 
 	void		SetOut (LPCTSTR strVal);

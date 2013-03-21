@@ -240,7 +240,7 @@ bool CDSMSplitterFilter::DemuxLoop()
 		if (type == DSMP_SAMPLE) {
 			CAutoPtr<Packet> p(DNew Packet());
 			if (m_pFile->Read(len, p)) {
-				if (p->rtStart != Packet::INVALID_TIME) {
+				if (p->rtStart != INVALID_TIME) {
 					p->rtStart -= m_pFile->m_rtFirst;
 					p->rtStop -= m_pFile->m_rtFirst;
 				}

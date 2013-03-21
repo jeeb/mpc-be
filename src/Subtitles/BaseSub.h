@@ -27,8 +27,6 @@
 class CBaseSub
 {
 public:
-	static const REFERENCE_TIME INVALID_TIME = _I64_MIN;
-
 	CBaseSub(SUBTITLE_TYPE nType);
 	virtual ~CBaseSub();
 

@@ -2178,7 +2178,7 @@ bool CMPEG4VideoSplitterFilter::DemuxLoop()
 				p->rtStop = rt + atpf;
 				p->bSyncPoint = FALSE;
 				rt += atpf;
-				// rt = Packet::INVALID_TIME;
+				// rt = INVALID_TIME;
 			}
 
 			BYTE b;

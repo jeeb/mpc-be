@@ -176,7 +176,7 @@ void CDSMMuxerFilter::MuxInit()
 {
 	m_sps.RemoveAll();
 	m_isps.RemoveAll();
-	m_rtPrevSyncPoint = _I64_MIN;
+	m_rtPrevSyncPoint = INVALID_TIME;
 }
 
 void CDSMMuxerFilter::MuxHeader(IBitStream* pBS)
@@ -327,7 +327,7 @@ void CDSMMuxerFilter::MuxPacket(IBitStream* pBS, const MuxerPacket* pPacket)
 
 	ASSERT(!pPacket->IsSyncPoint() || pPacket->IsTimeValid());
 
-	REFERENCE_TIME rtTimeStamp = _I64_MIN, rtDuration = 0;
+	REFERENCE_TIME rtTimeStamp = INVALID_TIME, rtDuration = 0;
 	int iTimeStamp = 0, iDuration = 0;
 
 	if (pPacket->IsTimeValid()) {
@@ -425,7 +425,7 @@ void CDSMMuxerFilter::IndexSyncPoint(const MuxerPacket* p, __int64 fp)
 	{
 		SyncPoint& head = !m_sps.IsEmpty() ? m_sps.GetHead() : sp;
 		SyncPoint& tail = !m_sps.IsEmpty() ? m_sps.GetTail() : sp;
-		REFERENCE_TIME rtfp = !m_isps.IsEmpty() ? m_isps.GetTail().rtfp : _I64_MIN;
+		REFERENCE_TIME rtfp = !m_isps.IsEmpty() ? m_isps.GetTail().rtfp : INVALID_TIME;
 
 		if (head.rtStart > rtfp + 1000000) { // 100ms limit, just in case every stream had only keyframes, then sycnpoints would be too frequent
 			IndexedSyncPoint isp;

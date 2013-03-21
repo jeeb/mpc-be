@@ -31,9 +31,10 @@
 #include "vd.h"
 #include "text.h"
 
-#define LCID_NOSUBTITLES -1
+#define ResStr(id)			CString(MAKEINTRESOURCE(id))
 
-#define ResStr(id) CString(MAKEINTRESOURCE(id))
+#define LCID_NOSUBTITLES	-1
+#define INVALID_TIME		_I64_MIN
 
 extern void DumpStreamConfig(TCHAR* fn, IAMStreamConfig* pAMVSCCap);
 extern int CountPins(IBaseFilter* pBF, int& nIn, int& nOut, int& nInC, int& nOutC);

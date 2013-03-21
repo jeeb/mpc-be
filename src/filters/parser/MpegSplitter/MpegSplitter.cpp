@@ -737,7 +737,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 				p->TrackNumber	= TrackNumber;
 				p->bSyncPoint	= !!h.fpts;
 				p->bAppendable	= !h.fpts;
-				p->rtStart		= h.fpts ? (h.pts - rtStartOffset) : Packet::INVALID_TIME;
+				p->rtStart		= h.fpts ? (h.pts - rtStartOffset) : INVALID_TIME;
 				p->rtStop		= p->rtStart+1;
 				p->SetCount(h.len - (size_t)(m_pFile->GetPos() - pos));
 
@@ -783,12 +783,12 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 
 				p->TrackNumber	= TrackNumber;
 				p->bAppendable	= !h2.fpts;
-				p->rtStart		= h2.fpts ? (h2.pts - rtStartOffset) : Packet::INVALID_TIME;
+				p->rtStart		= h2.fpts ? (h2.pts - rtStartOffset) : INVALID_TIME;
 				if (m_rtDuration && p->rtStart > m_rtDuration) {
-					p->rtStart	= Packet::INVALID_TIME;
+					p->rtStart	= INVALID_TIME;
 				}
-				p->rtStop		= (p->rtStart == Packet::INVALID_TIME) ? Packet::INVALID_TIME : p->rtStart+1;
-				p->bSyncPoint	= !!h2.fpts && (p->rtStart != Packet::INVALID_TIME);
+				p->rtStop		= (p->rtStart == INVALID_TIME) ? INVALID_TIME : p->rtStart+1;
+				p->bSyncPoint	= !!h2.fpts && (p->rtStart != INVALID_TIME);
 #if (DEBUG) && 0
 				if (h2.fpts) {
 					TRACE(_T("h.pid = %d, h2.pts = %ws [%10I64d] ==> %ws [%10I64d]\n"), h.pid, ReftimeToString(h2.pts), h2.pts, ReftimeToString(p->rtStart), p->rtStart);
@@ -820,7 +820,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 			p->TrackNumber	= TrackNumber;
 			p->bSyncPoint	= !!h.fpts;
 			p->bAppendable	= !h.fpts;
-			p->rtStart		= h.fpts ? (h.pts - rtStartOffset) : Packet::INVALID_TIME;
+			p->rtStart		= h.fpts ? (h.pts - rtStartOffset) : INVALID_TIME;
 			p->rtStop		= p->rtStart+1;
 			p->SetCount(h.length);
 
@@ -1914,12 +1914,12 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			p2->bDiscontinuity	|= m_p->bDiscontinuity;
 			m_p->bDiscontinuity	= false;
 
-			p2->bSyncPoint	= m_p->rtStart != Packet::INVALID_TIME;
+			p2->bSyncPoint	= m_p->rtStart != INVALID_TIME;
 			p2->rtStart		= m_p->rtStart;
-			m_p->rtStart	= Packet::INVALID_TIME;
+			m_p->rtStart	= INVALID_TIME;
 
 			p2->rtStop	= m_p->rtStop;
-			m_p->rtStop	= Packet::INVALID_TIME;
+			m_p->rtStop	= INVALID_TIME;
 			p2->pmt		= m_p->pmt;
 			m_p->pmt	= NULL;
 			p2->SetData(s, len);
@@ -1941,7 +1941,7 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			if (!m_p->bSyncPoint) {
 				m_p->bSyncPoint = p->bSyncPoint;
 			}
-			if (m_p->rtStart == Packet::INVALID_TIME) {
+			if (m_p->rtStart == INVALID_TIME) {
 				m_p->rtStart = p->rtStart, m_p->rtStop = p->rtStop;
 			}
 			if (m_p->pmt) {
@@ -1966,10 +1966,10 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			p->bSyncPoint	= FALSE;
 
 			m_p->rtStart	= p->rtStart;
-			p->rtStart		= Packet::INVALID_TIME;
+			p->rtStart		= INVALID_TIME;
 
 			m_p->rtStop	= p->rtStop;
-			p->rtStop	= Packet::INVALID_TIME;
+			p->rtStop	= INVALID_TIME;
 		}
 
 		m_p->Append(*p);
@@ -2028,19 +2028,19 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			m_p->bSyncPoint	= FALSE;
 
 			p2->rtStart		= m_p->rtStart;
-			m_p->rtStart	= Packet::INVALID_TIME;
+			m_p->rtStart	= INVALID_TIME;
 			p2->rtStop		= m_p->rtStop;
-			m_p->rtStop		= Packet::INVALID_TIME;
+			m_p->rtStop		= INVALID_TIME;
 
 			p2->pmt		= m_p->pmt;
 			m_p->pmt	= NULL;
 
 			m_pl.AddTail(p2);
 
-			if (p->rtStart != Packet::INVALID_TIME) {
+			if (p->rtStart != INVALID_TIME) {
 				m_p->rtStart	= p->rtStart;
 				m_p->rtStop		= p->rtStop;
-				p->rtStart		= Packet::INVALID_TIME;
+				p->rtStart		= INVALID_TIME;
 			}
 			if (p->bDiscontinuity) {
 				m_p->bDiscontinuity	= p->bDiscontinuity;
@@ -2061,7 +2061,7 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			m_p->RemoveAt(0, start - m_p->GetData());
 		}
 
-		REFERENCE_TIME rtStart = Packet::INVALID_TIME, rtStop = Packet::INVALID_TIME;
+		REFERENCE_TIME rtStart = INVALID_TIME, rtStop = INVALID_TIME;
 
 		for (POSITION pos = m_pl.GetHeadPosition(); pos; m_pl.GetNext(pos)) {
 			if (pos == m_pl.GetHeadPosition()) {
@@ -2075,8 +2075,8 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 				m_fHasAccessUnitDelimiters = true;
 			}
 
-			if ((pData[4]&0x1f) == 0x09 || (!m_fHasAccessUnitDelimiters && pPacket->rtStart != Packet::INVALID_TIME)) {
-				if (pPacket->rtStart == Packet::INVALID_TIME && rtStart != Packet::INVALID_TIME) {
+			if ((pData[4]&0x1f) == 0x09 || (!m_fHasAccessUnitDelimiters && pPacket->rtStart != INVALID_TIME)) {
+				if (pPacket->rtStart == INVALID_TIME && rtStart != INVALID_TIME) {
 					pPacket->rtStart	= rtStart;
 					pPacket->rtStop		= rtStop;
 				}
@@ -2092,7 +2092,7 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 				if (hr != S_OK) {
 					return hr;
 				}
-			} else if (rtStart == Packet::INVALID_TIME) {
+			} else if (rtStart == INVALID_TIME) {
 				rtStart	= pPacket->rtStart;
 				rtStop	= pPacket->rtStop;
 			}
@@ -2112,10 +2112,10 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			p->bSyncPoint	= FALSE;
 
 			m_p->rtStart	= p->rtStart;
-			p->rtStart		= Packet::INVALID_TIME;
+			p->rtStart		= INVALID_TIME;
 
 			m_p->rtStop	= p->rtStop;
-			p->rtStop	= Packet::INVALID_TIME;
+			p->rtStop	= INVALID_TIME;
 		}
 
 		m_p->Append(*p);
@@ -2165,10 +2165,10 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			m_p->bSyncPoint	= FALSE;
 
 			p2->rtStart		= m_p->rtStart;
-			m_p->rtStart	= Packet::INVALID_TIME;
+			m_p->rtStart	= INVALID_TIME;
 
 			p2->rtStop		= m_p->rtStop;
-			m_p->rtStop		= Packet::INVALID_TIME;
+			m_p->rtStop		= INVALID_TIME;
 
 			p2->pmt		= m_p->pmt;
 			m_p->pmt	= NULL;
@@ -2180,10 +2180,10 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 				return hr;
 			}
 
-			if (p->rtStart != Packet::INVALID_TIME) {
+			if (p->rtStart != INVALID_TIME) {
 				m_p->rtStart = p->rtStop; //p->rtStart; //Sebastiii for enable VC1 decoding in FFDshow (no more shutter)
 				m_p->rtStop	= p->rtStop;
-				p->rtStart	= Packet::INVALID_TIME;
+				p->rtStart	= INVALID_TIME;
 			}
 			if (p->bDiscontinuity) {
 				m_p->bDiscontinuity	= p->bDiscontinuity;
@@ -2265,10 +2265,10 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			p->bSyncPoint	= FALSE;
 
 			m_p->rtStart	= p->rtStart;
-			p->rtStart		= Packet::INVALID_TIME;
+			p->rtStart		= INVALID_TIME;
 
 			m_p->rtStop	= p->rtStop;
-			p->rtStop	= Packet::INVALID_TIME;
+			p->rtStop	= INVALID_TIME;
 		}
 
 		m_p->Append(*p);
@@ -2311,10 +2311,10 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 						m_p->bSyncPoint	= FALSE;
 
 						p2->rtStart		= m_p->rtStart;
-						m_p->rtStart	= Packet::INVALID_TIME;
+						m_p->rtStart	= INVALID_TIME;
 
 						p2->rtStop		= m_p->rtStop;
-						m_p->rtStop		= Packet::INVALID_TIME;
+						m_p->rtStop		= INVALID_TIME;
 
 						p2->pmt		= m_p->pmt;
 						m_p->pmt	= NULL;
@@ -2331,10 +2331,10 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 							return hr;
 						}
 
-						if (p->rtStart != Packet::INVALID_TIME) {
+						if (p->rtStart != INVALID_TIME) {
 							m_p->rtStart	= p->rtStart;
 							m_p->rtStop		= p->rtStop;
-							p->rtStart		= Packet::INVALID_TIME;
+							p->rtStart		= INVALID_TIME;
 						}
 						if (p->bDiscontinuity) {
 							m_p->bDiscontinuity	= p->bDiscontinuity;
@@ -2381,10 +2381,10 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			p->bSyncPoint	= FALSE;
 
 			m_p->rtStart	= p->rtStart;
-			p->rtStart		= Packet::INVALID_TIME;
+			p->rtStart		= INVALID_TIME;
 
 			m_p->rtStop	= p->rtStop;
-			p->rtStop	= Packet::INVALID_TIME;
+			p->rtStop	= INVALID_TIME;
 		}
 
 		m_p->Append(*p);
@@ -2441,10 +2441,10 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			m_p->bSyncPoint	= FALSE;
 
 			p2->rtStart		= m_p->rtStart;
-			m_p->rtStart	= Packet::INVALID_TIME;
+			m_p->rtStart	= INVALID_TIME;
 
 			p2->rtStop		= m_p->rtStop;
-			m_p->rtStop		= Packet::INVALID_TIME;
+			m_p->rtStop		= INVALID_TIME;
 
 			p2->pmt		= m_p->pmt;
 			m_p->pmt	= NULL;
@@ -2461,10 +2461,10 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 				return hr;
 			}
 
-			if (p->rtStart != Packet::INVALID_TIME) {
+			if (p->rtStart != INVALID_TIME) {
 				m_p->rtStart	= p->rtStart;
 				m_p->rtStop		= p->rtStop;
-				p->rtStart		= Packet::INVALID_TIME;
+				p->rtStart		= INVALID_TIME;
 			}
 			if (p->bDiscontinuity) {
 				m_p->bDiscontinuity	= p->bDiscontinuity;
@@ -2557,10 +2557,10 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			p->bSyncPoint	= FALSE;
 
 			m_p->rtStart	= p->rtStart;
-			p->rtStart		= Packet::INVALID_TIME;
+			p->rtStart		= INVALID_TIME;
 
 			m_p->rtStop	= p->rtStop;
-			p->rtStop	= Packet::INVALID_TIME;
+			p->rtStop	= INVALID_TIME;
 		}
 
 		m_p->Append(*p);

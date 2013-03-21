@@ -40,7 +40,6 @@ class Packet : public CAtlArray<BYTE>
 public:
 	DWORD TrackNumber;
 	BOOL bDiscontinuity, bSyncPoint, bAppendable;
-	static const REFERENCE_TIME INVALID_TIME = _I64_MIN;
 	REFERENCE_TIME rtStart, rtStop;
 	AM_MEDIA_TYPE* pmt;
 	Packet() {

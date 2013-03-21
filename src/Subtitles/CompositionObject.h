@@ -24,8 +24,6 @@
 
 #include "Rasterizer.h"
 
-static const REFERENCE_TIME INVALID_TIME = _I64_MIN;
-
 struct HDMV_PALETTE {
 	BYTE	entry_id;
 	BYTE	Y;

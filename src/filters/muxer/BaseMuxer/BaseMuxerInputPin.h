@@ -24,6 +24,7 @@
 #pragma once
 
 #include "BaseMuxerRelatedPin.h"
+#include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/DSMPropertyBag.h"
 
 class CBaseMuxerInputPin;
@@ -37,7 +38,7 @@ struct MuxerPacket {
 	int index;
 	struct MuxerPacket(CBaseMuxerInputPin* pPin) {
 		this->pPin = pPin;
-		rtStart = rtStop = _I64_MIN;
+		rtStart = rtStop = INVALID_TIME;
 		flags = empty;
 		index = -1;
 	}

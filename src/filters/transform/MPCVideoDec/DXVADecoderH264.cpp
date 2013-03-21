@@ -143,7 +143,7 @@ void CDXVADecoderH264::Flush()
 {
 	m_DXVAPicParams.UsedForReferenceFlags	= 0;
 	m_nOutPOC								= INT_MIN;
-	m_rtOutStart							= _I64_MIN;
+	m_rtOutStart							= INVALID_TIME;
 
 	__super::Flush();
 }
@@ -157,7 +157,7 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 	int							nSliceType		= -1;
 	int							nFramePOC		= INT_MIN;
 	int							nOutPOC			= INT_MIN;
-	REFERENCE_TIME				rtOutStart		= _I64_MIN;
+	REFERENCE_TIME				rtOutStart		= INVALID_TIME;
 	CH264Nalu					Nalu;
 	UINT						nNalOffset		= 0;
 	CComPtr<IMediaSample>		pSampleToDeliver;

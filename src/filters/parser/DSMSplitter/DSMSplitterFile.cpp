@@ -72,7 +72,7 @@ HRESULT CDSMSplitterFile::Init(IDSMResourceBagImpl& res, IDSMChapterBagImpl& cha
 			}
 		} else if (type == DSMP_SAMPLE) {
 			Packet p;
-			if (Read(len, &p, false) && p.rtStart != Packet::INVALID_TIME) {
+			if (Read(len, &p, false) && p.rtStart != INVALID_TIME) {
 				m_rtFirst = p.rtStart;
 				break;
 			}
@@ -110,7 +110,7 @@ HRESULT CDSMSplitterFile::Init(IDSMResourceBagImpl& res, IDSMChapterBagImpl& cha
 
 				if (type == DSMP_SAMPLE) {
 					Packet p;
-					if (Read(len, &p, false) && p.rtStart != Packet::INVALID_TIME) {
+					if (Read(len, &p, false) && p.rtStart != INVALID_TIME) {
 						m_rtDuration = max(m_rtDuration, p.rtStop - m_rtFirst); // max isn't really needed, only for safety
 						i = j;
 					}
@@ -193,8 +193,8 @@ bool CDSMSplitterFile::Read(__int64 len, Packet* p, bool fData)
 
 	if (fSign && !iTimeStamp) {
 		ASSERT(!iDuration);
-		p->rtStart = Packet::INVALID_TIME;
-		p->rtStop = Packet::INVALID_TIME + 1;
+		p->rtStart = INVALID_TIME;
+		p->rtStop = INVALID_TIME + 1;
 	} else {
 		p->rtStart = (REFERENCE_TIME)BitRead(iTimeStamp<<3) * (fSign ? -1 : 1);
 		p->rtStop = p->rtStart + BitRead(iDuration<<3);
@@ -338,7 +338,7 @@ __int64 CDSMSplitterFile::FindSyncPoint(REFERENCE_TIME rt)
 
 			if (type == DSMP_SAMPLE) {
 				Packet p;
-				if (Read(len, &p, false) && p.rtStart != Packet::INVALID_TIME) {
+				if (Read(len, &p, false) && p.rtStart != INVALID_TIME) {
 					REFERENCE_TIME dt = (p.rtStart -= m_rtFirst) - rt;
 					if (dt >= 0) {
 						maxpos = max((__int64)syncpos - 65536, minpos);
@@ -366,7 +366,7 @@ __int64 CDSMSplitterFile::FindSyncPoint(REFERENCE_TIME rt)
 
 		if (type == DSMP_SAMPLE) {
 			Packet p;
-			if (Read(len, &p, false) && p.rtStart != Packet::INVALID_TIME) {
+			if (Read(len, &p, false) && p.rtStart != INVALID_TIME) {
 				REFERENCE_TIME dt = (p.rtStart -= m_rtFirst) - rt;
 				if (dt >= 0) {
 					maxpos = (__int64)syncpos;
@@ -406,7 +406,7 @@ __int64 CDSMSplitterFile::FindSyncPoint(REFERENCE_TIME rt)
 
 			if (type == DSMP_SAMPLE) {
 				Packet p;
-				if (Read(len, &p, false) && p.rtStart != Packet::INVALID_TIME && p.bSyncPoint) {
+				if (Read(len, &p, false) && p.rtStart != INVALID_TIME && p.bSyncPoint) {
 					BYTE id = (BYTE)p.TrackNumber, tmp;
 					if (ids.Lookup(id, tmp)) {
 						ids.RemoveKey((BYTE)p.TrackNumber);

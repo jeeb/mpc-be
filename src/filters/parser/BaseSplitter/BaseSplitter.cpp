@@ -44,8 +44,8 @@ void CPacketQueue::Add(CAutoPtr<Packet> p)
 		m_size += p->GetDataSize();
 
 		if (p->bAppendable && !p->bDiscontinuity && !p->pmt
-				&& p->rtStart == Packet::INVALID_TIME
-				&& !IsEmpty() && GetTail()->rtStart != Packet::INVALID_TIME) {
+				&& p->rtStart == INVALID_TIME
+				&& !IsEmpty() && GetTail()->rtStart != INVALID_TIME) {
 			Packet* tail = GetTail();
 			size_t oldsize = tail->GetCount();
 			size_t newsize = tail->GetCount() + p->GetCount();
@@ -206,7 +206,7 @@ CBaseSplitterOutputPin::CBaseSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWS
 	m_mts.Copy(mts);
 	m_nBuffers = max(nBuffers, 1);
 	memset(&m_brs, 0, sizeof(m_brs));
-	m_brs.rtLastDeliverTime = Packet::INVALID_TIME;
+	m_brs.rtLastDeliverTime = INVALID_TIME;
 }
 
 CBaseSplitterOutputPin::CBaseSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int nBuffers, int factor)
@@ -221,7 +221,7 @@ CBaseSplitterOutputPin::CBaseSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilt
 {
 	m_nBuffers = max(nBuffers, 1);
 	memset(&m_brs, 0, sizeof(m_brs));
-	m_brs.rtLastDeliverTime = Packet::INVALID_TIME;
+	m_brs.rtLastDeliverTime = INVALID_TIME;
 }
 
 CBaseSplitterOutputPin::~CBaseSplitterOutputPin()
@@ -368,7 +368,7 @@ HRESULT CBaseSplitterOutputPin::DeliverEndFlush()
 
 HRESULT CBaseSplitterOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
 {
-	m_brs.rtLastDeliverTime = Packet::INVALID_TIME;
+	m_brs.rtLastDeliverTime = INVALID_TIME;
 
 	m_rtPrev	= 0;
 	m_rtOffset	= 0;
@@ -526,11 +526,11 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 		return S_OK;
 	}
 
-	if (p->rtStart != Packet::INVALID_TIME) {
+	if (p->rtStart != INVALID_TIME) {
 		REFERENCE_TIME rt = p->rtStart + m_rtOffset;
 
 		// Filter invalid PTS (if too different from previous packet)
-		if (!IsDiscontinuous() && m_rtPrev != Packet::INVALID_TIME && (p->rtStart >= 0))
+		if (!IsDiscontinuous() && m_rtPrev != INVALID_TIME && (p->rtStart >= 0))
 			if (_abs64(rt - m_rtPrev) > MAX_PTS_SHIFT) {
 				m_rtOffset += m_rtPrev - rt;
 			}
@@ -543,8 +543,8 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 
 	m_brs.nBytesSinceLastDeliverTime += nBytes;
 
-	if (p->rtStart != Packet::INVALID_TIME) {
-		if (m_brs.rtLastDeliverTime == Packet::INVALID_TIME) {
+	if (p->rtStart != INVALID_TIME) {
+		if (m_brs.rtLastDeliverTime == INVALID_TIME) {
 			m_brs.rtLastDeliverTime = p->rtStart;
 			m_brs.nBytesSinceLastDeliverTime = 0;
 		}
@@ -629,7 +629,7 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			m_mts.Add(*p->pmt);
 		}
 
-		bool fTimeValid = p->rtStart != Packet::INVALID_TIME;
+		bool fTimeValid = p->rtStart != INVALID_TIME;
 
 #if defined(_DEBUG) && 0
 		TRACE(_T("[%d]: d%d s%d p%d, b=%d, [%20I64d - %20I64d]\n"),
@@ -801,8 +801,8 @@ CBaseSplitterFilter::CBaseSplitterFilter(LPCTSTR pName, LPUNKNOWN pUnk, HRESULT*
 	, m_dRate(1.0)
 	, m_nOpenProgress(100)
 	, m_fAbort(false)
-	, m_rtLastStart(_I64_MIN)
-	, m_rtLastStop(_I64_MIN)
+	, m_rtLastStart(INVALID_TIME)
+	, m_rtLastStop(INVALID_TIME)
 	, m_priority(THREAD_PRIORITY_NORMAL)
 {
 	if (phr) {
@@ -1056,7 +1056,7 @@ HRESULT CBaseSplitterFilter::DeliverPacket(CAutoPtr<Packet> p)
 		return S_FALSE;
 	}
 
-	if (p->rtStart != Packet::INVALID_TIME) {
+	if (p->rtStart != INVALID_TIME) {
 		m_rtCurrent = p->rtStart;
 
 		p->rtStart -= m_rtStart;
@@ -1085,7 +1085,7 @@ HRESULT CBaseSplitterFilter::DeliverPacket(CAutoPtr<Packet> p)
 #if defined(_DEBUG) && 0
 	TRACE(_T("[%d]: d%d s%d p%d, b=%d, [%20I64d - %20I64d]\n"),
 		  p->TrackNumber,
-		  p->bDiscontinuity, p->bSyncPoint, p->rtStart != Packet::INVALID_TIME && p->rtStart < 0,
+		  p->bDiscontinuity, p->bSyncPoint, p->rtStart != INVALID_TIME && p->rtStart < 0,
 		  p->GetCount(), p->rtStart, p->rtStop);
 #endif
 

@@ -522,7 +522,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 
 	(static_cast<CDeCSSInputPin*>(m_pInput))->StripPacket(pDataIn, len);
 
-	REFERENCE_TIME rtStart = _I64_MIN, rtStop = _I64_MIN;
+	REFERENCE_TIME rtStart = INVALID_TIME, rtStop = INVALID_TIME;
 	hr = pIn->GetTime(&rtStart, &rtStop);
 
 #if 0
@@ -559,7 +559,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 #if ENABLE_AC3_ENCODER
 		m_encbuff.RemoveAll();
 #endif
-		if (rtStart != _I64_MIN) { // LOOKATTHIS
+		if (rtStart != INVALID_TIME) { // LOOKATTHIS
 			m_rtStart = rtStart;
 		}
 		m_bResync = false;
