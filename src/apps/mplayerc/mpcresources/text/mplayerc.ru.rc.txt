@@ -490,7 +490,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 10
 5		"Предпочитаемый формат просмотра"
 7		"Выбрать механизм воспроизведения"
 8		"Встроенный"
-9		"Используя системный File Source(URL)"
+9		"Используя системный File Source (URL)"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
@@ -1626,7 +1626,7 @@ STRING IDS_MPEG2_HUE		"Оттенок"
 STRING IDS_MPEG2_RESET		"Сброс"
 STRING IDS_MPEG2_SATURATION		"Насыщенность"
 STRING IDS_MPEGSPLITTER_ALT_DUR_CALC		"Альтернативный метод расчета длительности"
-STRING IDS_MPEGSPLITTER_FAST_SEEK		"Быстрая(но неточная) перемотка"
+STRING IDS_MPEGSPLITTER_FAST_SEEK		"Быстрая (но неточная) перемотка"
 STRING IDS_MPEGSPLITTER_FSTREAM_CHANGE		"Быстрое переключение дорожек"
 STRING IDS_MPEGSPLITTER_LANG_ORDER		"Порядок выбора аудио:"
 STRING IDS_MPEGSPLITTER_SUB_EMPTY_PIN		"Добавлять 'пустой' вывод субтитров"
