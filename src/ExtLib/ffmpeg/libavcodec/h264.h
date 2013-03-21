@@ -61,19 +61,19 @@
 #define MAX_SLICES 16
 
 #ifdef ALLOW_INTERLACE
-#define MB_MBAFF    h->mb_mbaff
-#define MB_FIELD    h->mb_field_decoding_flag
-#define FRAME_MBAFF h->mb_aff_frame
-#define FIELD_PICTURE (h->picture_structure != PICT_FRAME)
+#define MB_MBAFF(h)    h->mb_mbaff
+#define MB_FIELD(h)    h->mb_field_decoding_flag
+#define FRAME_MBAFF(h) h->mb_aff_frame
+#define FIELD_PICTURE(h) (h->picture_structure != PICT_FRAME)
 #define LEFT_MBS 2
 #define LTOP     0
 #define LBOT     1
 #define LEFT(i)  (i)
 #else
-#define MB_MBAFF      0
-#define MB_FIELD      0
-#define FRAME_MBAFF   0
-#define FIELD_PICTURE 0
+#define MB_MBAFF(h)      0
+#define MB_FIELD(h)      0
+#define FRAME_MBAFF(h)   0
+#define FIELD_PICTURE(h) 0
 #undef  IS_INTERLACED
 #define IS_INTERLACED(mb_type) 0
 #define LEFT_MBS 1
@@ -81,15 +81,15 @@
 #define LBOT     0
 #define LEFT(i)  0
 #endif
-#define FIELD_OR_MBAFF_PICTURE (FRAME_MBAFF || FIELD_PICTURE)
+#define FIELD_OR_MBAFF_PICTURE(h) (FRAME_MBAFF(h) || FIELD_PICTURE(h))
 
 #ifndef CABAC
-#define CABAC h->pps.cabac
+#define CABAC(h) h->pps.cabac
 #endif
 
-#define CHROMA    (h->sps.chroma_format_idc)
-#define CHROMA422 (h->sps.chroma_format_idc == 2)
-#define CHROMA444 (h->sps.chroma_format_idc == 3)
+#define CHROMA(h)    (h->sps.chroma_format_idc)
+#define CHROMA422(h) (h->sps.chroma_format_idc == 2)
+#define CHROMA444(h) (h->sps.chroma_format_idc == 3)
 
 #define EXTENDED_SAR       255
 
@@ -750,7 +750,6 @@ int ff_h264_check_intra4x4_pred_mode(H264Context *h);
 int ff_h264_check_intra_pred_mode(H264Context *h, int mode, int is_chroma);
 
 void ff_h264_hl_decode_mb(H264Context *h);
-int ff_h264_frame_start(H264Context *h);
 int ff_h264_decode_extradata(H264Context *h, const uint8_t *buf, int size);
 int ff_h264_decode_init(AVCodecContext *avctx);
 void ff_h264_decode_init_vlc(void);
@@ -926,7 +925,7 @@ static av_always_inline void write_back_motion_list(H264Context *h,
     AV_COPY128(mv_dst + 1 * b_stride, mv_src + 8 * 1);
     AV_COPY128(mv_dst + 2 * b_stride, mv_src + 8 * 2);
     AV_COPY128(mv_dst + 3 * b_stride, mv_src + 8 * 3);
-    if (CABAC) {
+    if (CABAC(h)) {
         uint8_t (*mvd_dst)[2] = &h->mvd_table[list][FMO ? 8 * h->mb_xy
                                                         : h->mb2br_xy[h->mb_xy]];
         uint8_t(*mvd_src)[2]  = &h->mvd_cache[list][scan8[0]];
@@ -965,7 +964,7 @@ static av_always_inline void write_back_motion(H264Context *h, int mb_type)
     if (USES_LIST(mb_type, 1))
         write_back_motion_list(h, b_stride, b_xy, b8_xy, mb_type, 1);
 
-    if (h->slice_type_nos == AV_PICTURE_TYPE_B && CABAC) {
+    if (h->slice_type_nos == AV_PICTURE_TYPE_B && CABAC(h)) {
         if (IS_8X8(mb_type)) {
             uint8_t *direct_table = &h->direct_table[4 * h->mb_xy];
             direct_table[1] = h->sub_mb_type[1] >> 1;

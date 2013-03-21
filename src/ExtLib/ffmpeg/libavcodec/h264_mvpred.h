@@ -41,7 +41,7 @@ static av_always_inline int fetch_diagonal_mv(H264Context *h, const int16_t **C,
 
     /* there is no consistent mapping of mvs to neighboring locations that will
      * make mbaff happy, so we can't move all this logic to fill_caches */
-    if (FRAME_MBAFF) {
+    if (FRAME_MBAFF(h)) {
 #define SET_DIAG_MV(MV_OP, REF_OP, XY, Y4)                              \
         const int xy = XY, y4 = Y4;                                     \
         const int mb_type = mb_types[xy + (y4 >> 2) * h->mb_stride];    \
@@ -60,11 +60,11 @@ static av_always_inline int fetch_diagonal_mv(H264Context *h, const int16_t **C,
             AV_ZERO32(h->mv_cache[list][scan8[0] - 2]);
             *C = h->mv_cache[list][scan8[0] - 2];
 
-            if (!MB_FIELD && IS_INTERLACED(h->left_type[0])) {
+            if (!MB_FIELD(h) && IS_INTERLACED(h->left_type[0])) {
                 SET_DIAG_MV(* 2, >> 1, h->left_mb_xy[0] + h->mb_stride,
                             (h->mb_y & 1) * 2 + (i >> 5));
             }
-            if (MB_FIELD && !IS_INTERLACED(h->left_type[0])) {
+            if (MB_FIELD(h) && !IS_INTERLACED(h->left_type[0])) {
                 // left shift will turn LIST_NOT_USED into PART_NOT_AVAILABLE, but that's OK.
                 SET_DIAG_MV(/ 2, << 1, h->left_mb_xy[i >= 36], ((i >> 2)) & 3);
             }
@@ -230,8 +230,8 @@ static av_always_inline void pred_8x16_motion(H264Context *const h,
 }
 
 #define FIX_MV_MBAFF(type, refn, mvn, idx)      \
-    if (FRAME_MBAFF) {                          \
-        if (MB_FIELD) {                         \
+    if (FRAME_MBAFF(h)) {                       \
+        if (MB_FIELD(h)) {                      \
             if (!IS_INTERLACED(type)) {         \
                 refn <<= 1;                     \
                 AV_COPY32(mvbuf[idx], mvn);     \
@@ -359,7 +359,7 @@ static void fill_decode_neighbors(H264Context *h, int mb_type)
 
     h->topleft_partition = -1;
 
-    top_xy = mb_xy - (h->mb_stride << MB_FIELD);
+    top_xy = mb_xy - (h->mb_stride << MB_FIELD(h));
 
     /* Wow, what a mess, why didn't they simplify the interlacing & intra
      * stuff, I can't imagine that these complex rules are worth it. */
@@ -368,7 +368,7 @@ static void fill_decode_neighbors(H264Context *h, int mb_type)
     topright_xy   = top_xy + 1;
     left_xy[LBOT] = left_xy[LTOP] = mb_xy - 1;
     h->left_block = left_block_options[0];
-    if (FRAME_MBAFF) {
+    if (FRAME_MBAFF(h)) {
         const int left_mb_field_flag = IS_INTERLACED(h->cur_pic.mb_type[mb_xy - 1]);
         const int curr_mb_field_flag = IS_INTERLACED(mb_type);
         if (h->mb_y & 1) {
@@ -544,7 +544,7 @@ static void fill_decode_caches(H264Context *h, int mb_type)
                 AV_COPY32(&nnz_cache[4 + 8 * 10], &nnz[4 * 9]);
             }
         } else {
-            uint32_t top_empty = CABAC && !IS_INTRA(mb_type) ? 0 : 0x40404040;
+            uint32_t top_empty = CABAC(h) && !IS_INTRA(mb_type) ? 0 : 0x40404040;
             AV_WN32A(&nnz_cache[4 + 8 *  0], top_empty);
             AV_WN32A(&nnz_cache[4 + 8 *  5], top_empty);
             AV_WN32A(&nnz_cache[4 + 8 * 10], top_empty);
@@ -555,12 +555,12 @@ static void fill_decode_caches(H264Context *h, int mb_type)
                 nnz = h->non_zero_count[left_xy[LEFT(i)]];
                 nnz_cache[3 + 8 * 1 + 2 * 8 * i] = nnz[left_block[8 + 0 + 2 * i]];
                 nnz_cache[3 + 8 * 2 + 2 * 8 * i] = nnz[left_block[8 + 1 + 2 * i]];
-                if (CHROMA444) {
+                if (CHROMA444(h)) {
                     nnz_cache[3 + 8 *  6 + 2 * 8 * i] = nnz[left_block[8 + 0 + 2 * i] + 4 * 4];
                     nnz_cache[3 + 8 *  7 + 2 * 8 * i] = nnz[left_block[8 + 1 + 2 * i] + 4 * 4];
                     nnz_cache[3 + 8 * 11 + 2 * 8 * i] = nnz[left_block[8 + 0 + 2 * i] + 8 * 4];
                     nnz_cache[3 + 8 * 12 + 2 * 8 * i] = nnz[left_block[8 + 1 + 2 * i] + 8 * 4];
-                } else if (CHROMA422) {
+                } else if (CHROMA422(h)) {
                     nnz_cache[3 + 8 *  6 + 2 * 8 * i] = nnz[left_block[8 + 0 + 2 * i] - 2 + 4 * 4];
                     nnz_cache[3 + 8 *  7 + 2 * 8 * i] = nnz[left_block[8 + 1 + 2 * i] - 2 + 4 * 4];
                     nnz_cache[3 + 8 * 11 + 2 * 8 * i] = nnz[left_block[8 + 0 + 2 * i] - 2 + 8 * 4];
@@ -575,11 +575,11 @@ static void fill_decode_caches(H264Context *h, int mb_type)
                 nnz_cache[3 + 8 *  6 + 2 * 8 * i] =
                 nnz_cache[3 + 8 *  7 + 2 * 8 * i] =
                 nnz_cache[3 + 8 * 11 + 2 * 8 * i] =
-                nnz_cache[3 + 8 * 12 + 2 * 8 * i] = CABAC && !IS_INTRA(mb_type) ? 0 : 64;
+                nnz_cache[3 + 8 * 12 + 2 * 8 * i] = CABAC(h) && !IS_INTRA(mb_type) ? 0 : 64;
             }
         }
 
-        if (CABAC) {
+        if (CABAC(h)) {
             // top_cbp
             if (top_type)
                 h->top_cbp = h->cbp_table[top_xy];
@@ -677,7 +677,7 @@ static void fill_decode_caches(H264Context *h, int mb_type)
                 }
             }
 
-            if ((mb_type & (MB_TYPE_SKIP | MB_TYPE_DIRECT2)) && !FRAME_MBAFF)
+            if ((mb_type & (MB_TYPE_SKIP | MB_TYPE_DIRECT2)) && !FRAME_MBAFF(h))
                 continue;
 
             if (!(mb_type & (MB_TYPE_SKIP | MB_TYPE_DIRECT2))) {
@@ -688,7 +688,7 @@ static void fill_decode_caches(H264Context *h, int mb_type)
                 AV_ZERO32(mv_cache[2 + 8 * 0]);
                 AV_ZERO32(mv_cache[2 + 8 * 2]);
 
-                if (CABAC) {
+                if (CABAC(h)) {
                     if (USES_LIST(top_type, list)) {
                         const int b_xy = h->mb2br_xy[top_xy];
                         AV_COPY64(mvd_cache[0 - 1 * 8], mvd[b_xy + 0]);
@@ -759,8 +759,8 @@ static void fill_decode_caches(H264Context *h, int mb_type)
     MAP_F2F(scan8[0] - 1 + 2 * 8, left_type[LBOT])                      \
     MAP_F2F(scan8[0] - 1 + 3 * 8, left_type[LBOT])
 
-            if (FRAME_MBAFF) {
-                if (MB_FIELD) {
+            if (FRAME_MBAFF(h)) {
+                if (MB_FIELD(h)) {
 
 #define MAP_F2F(idx, mb_type)                                           \
     if (!IS_INTERLACED(mb_type) && h->ref_cache[list][idx] >= 0) {      \
@@ -800,7 +800,7 @@ static void av_unused decode_mb_skip(H264Context *h)
 
     memset(h->non_zero_count[mb_xy], 0, 48);
 
-    if (MB_FIELD)
+    if (MB_FIELD(h))
         mb_type |= MB_TYPE_INTERLACED;
 
     if (h->slice_type_nos == AV_PICTURE_TYPE_B) {

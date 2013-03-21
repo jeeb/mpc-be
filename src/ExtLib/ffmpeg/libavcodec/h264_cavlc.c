@@ -25,7 +25,7 @@
  * @author Michael Niedermayer <michaelni@gmx.at>
  */
 
-#define CABAC 0
+#define CABAC(h) 0
 #define UNCHECKED_BITSTREAM_READER 1
 
 #include "internal.h"
@@ -709,7 +709,7 @@ int ff_h264_decode_mb_cavlc(H264Context *h){
             h->mb_skip_run= get_ue_golomb(&h->gb);
 
         if (h->mb_skip_run--) {
-            if(FRAME_MBAFF && (h->mb_y&1) == 0){
+            if(FRAME_MBAFF(h) && (h->mb_y&1) == 0){
                 if(h->mb_skip_run==0)
                     h->mb_mbaff = h->mb_field_decoding_flag = get_bits1(&h->gb);
             }
@@ -717,7 +717,7 @@ int ff_h264_decode_mb_cavlc(H264Context *h){
             return 0;
         }
     }
-    if(FRAME_MBAFF){
+    if (FRAME_MBAFF(h)) {
         if( (h->mb_y&1) == 0 )
             h->mb_mbaff = h->mb_field_decoding_flag = get_bits1(&h->gb);
     }
@@ -756,7 +756,7 @@ decode_intra_mb:
         mb_type= i_mb_type_info[mb_type].type;
     }
 
-    if(MB_FIELD)
+    if(MB_FIELD(h))
         mb_type |= MB_TYPE_INTERLACED;
 
     h->slice_table[ mb_xy ]= h->slice_num;
@@ -778,8 +778,8 @@ decode_intra_mb:
         return 0;
     }
 
-    local_ref_count[0] = h->ref_count[0] << MB_MBAFF;
-    local_ref_count[1] = h->ref_count[1] << MB_MBAFF;
+    local_ref_count[0] = h->ref_count[0] << MB_MBAFF(h);
+    local_ref_count[1] = h->ref_count[1] << MB_MBAFF(h);
 
     fill_decode_neighbors(h, mb_type);
     fill_decode_caches(h, mb_type);
@@ -1112,7 +1112,7 @@ decode_intra_mb:
             return -1;
         }
         h->cbp_table[mb_xy] |= ret << 12;
-        if(CHROMA444){
+        if (CHROMA444(h)) {
             if( decode_luma_residual(h, gb, scan, scan8x8, pixel_shift, mb_type, cbp, 1) < 0 ){
                 return -1;
             }
@@ -1126,7 +1126,7 @@ decode_intra_mb:
                 for(chroma_idx=0; chroma_idx<2; chroma_idx++)
                     if (decode_residual(h, gb, h->mb + ((256 + 16*16*chroma_idx) << pixel_shift),
                                         CHROMA_DC_BLOCK_INDEX+chroma_idx,
-                                        CHROMA422 ? chroma422_dc_scan : chroma_dc_scan,
+                                        CHROMA422(h) ? chroma422_dc_scan : chroma_dc_scan,
                                         NULL, 4*num_c8x8) < 0) {
                         return -1;
                     }
