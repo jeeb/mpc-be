@@ -3255,9 +3255,11 @@ void CMainFrame::OnNcLButtonDown(UINT nFlags, CPoint point)
 
 void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 {
+	if (((GetTickCount()-m_nMenuHideTick)<100)) return;
+
 	if (!m_pFullscreenWnd->IsWindow() || !m_OSD.OnLButtonDown (nFlags, point)) {
 		SetFocus();
-
+		
 		bDVDMenuClicked = false;
 		bDVDButtonAtPosition = false;
 
@@ -3301,7 +3303,7 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 			return;
 		}
 
-		if (m_fFullScreen || bFSWnd || ((GetTickCount()-m_nMenuHideTick)<100)) {
+		if (m_fFullScreen || bFSWnd) {
  			return;
 		}
 
@@ -3343,17 +3345,13 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 		}
 
 		bool fLeftDownMouseBtnUnassigned = !AssignedToCmd(wmcmd::LDOWN, m_fFullScreen);
-		if (fLeftDownMouseBtnUnassigned || ((GetTickCount()-m_nMenuHideTick)<100)) {
-			;//if (!m_fFullScreen ) SendMessage(WM_NCLBUTTONUP, HTCAPTION, MAKELPARAM(point.x, point.y));
-		} else if (!fLeftDownMouseBtnUnassigned && !m_fFullScreen && !bFSWnd) {
+		if (!fLeftDownMouseBtnUnassigned && !m_fFullScreen && !bFSWnd) {
 			OnButton(wmcmd::LDOWN, nFlags, point);
 			return;
  		}
 
 		bool fLeftUpMouseBtnUnassigned = !AssignedToCmd(wmcmd::LUP, m_fFullScreen);
-		if (fLeftUpMouseBtnUnassigned || ((GetTickCount()-m_nMenuHideTick)<100)) {
-			;//if (!m_fFullScreen ) SendMessage(WM_NCLBUTTONUP, HTCAPTION, MAKELPARAM(point.x, point.y));
-		} else if (!fLeftUpMouseBtnUnassigned && !m_fFullScreen) {
+		if (!fLeftUpMouseBtnUnassigned && !m_fFullScreen) {
 			OnButton(wmcmd::LUP, nFlags, point);
 			return;
  		}
@@ -3909,7 +3907,7 @@ BOOL CMainFrame::OnMenu(CMenu* pMenu)
 	MSG msg;
 	pMenu->TrackPopupMenu(TPM_RIGHTBUTTON|TPM_NOANIMATION, point.x+1, point.y+1, this);
 	PeekMessage(&msg, this->m_hWnd, WM_LBUTTONDOWN, WM_LBUTTONDOWN, PM_REMOVE); //remove the click LMB, which closes the popup menu
-
+	s_fLDown = false;
 	if (m_fFullScreen) {
 		SetTimer(TIMER_FULLSCREENMOUSEHIDER, 2000, NULL);    //need when working with menus and use the keyboard only
 	}
