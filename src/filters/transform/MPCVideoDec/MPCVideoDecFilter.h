@@ -41,6 +41,7 @@
 
 struct AVCodec;
 struct AVCodecContext;
+struct AVCodecParserContext;
 struct AVFrame;
 struct SwsContext;
 
@@ -110,6 +111,7 @@ protected:
 	// === FFMpeg variables
 	AVCodec*								m_pAVCodec;
 	AVCodecContext*							m_pAVCtx;
+	AVCodecParserContext*					m_pParser;
 	AVFrame*								m_pFrame;
 	int										m_nCodecNb;
 	enum AVCodecID							m_nCodecId;
@@ -127,11 +129,12 @@ protected:
 	// Buffer management for truncated stream (store stream chunks & reference time sent by splitter)
 	BYTE*									m_pFFBuffer;
 	int										m_nFFBufferSize;
+	BYTE*									m_pFFBuffer2;
+	int										m_nFFBufferSize2;
 	BYTE*									m_pAlignedFFBuffer;
 	int										m_nAlignedFFBufferSize;
 
-	REFERENCE_TIME							m_rtLastStart;			// rtStart for last delivered frame
-	int										m_nCountEstimated;		// Number of rtStart estimated since last rtStart received
+	REFERENCE_TIME							m_rtLastStop;			// rtStop for last delivered frame
 	double									m_dRate;
 	REFERENCE_TIME							m_rtPrevStop;
 
@@ -174,6 +177,8 @@ protected:
 
 	HWND									m_nDialogHWND;
 
+	REFERENCE_TIME							m_rtStartCache;
+
 	// === Private functions
 	void				Cleanup();
 	void				ffmpegCleanup();
@@ -207,7 +212,8 @@ public:
 		return m_pOutput;
 	}
 
-	void			UpdateFrameTime (REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop, bool b_repeat_pict = false);
+	REFERENCE_TIME	GetDuration();
+	void			UpdateFrameTime (REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop, bool pulldown_flag = false);
 	bool			IsAVI();
 
 	// === Overriden DirectShow functions
@@ -298,7 +304,6 @@ public:
 	inline bool					IsReorderBFrame()		{ return m_bReorderBFrame; };
 	inline bool					IsEvo()					{ return m_bIsEVO; };
 	inline DWORD				GetPCIVendor()			{ return m_nPCIVendor; };
-	inline REFERENCE_TIME		GetAvrTimePerFrame()	{ return m_rtAvrTimePerFrame; };
 	inline double				GetRate()				{ return m_dRate; };
 	bool						IsDXVASupported();
 	void						UpdateAspectRatio();

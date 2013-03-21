@@ -145,8 +145,8 @@ STDMETHODIMP CFLVSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 
 bool CFLVSplitterFilter::ReadTag(Tag& t)
 {
-	if (FAILED(m_pFile->WaitAvailable(200, 15))) {
-		return false;
+	if (FAILED(m_pFile->WaitAvailable(1000, 15))) {
+		//return false;
 	}
 
 	t.PreviousTagSize	= (UINT32)m_pFile->BitRead(32);
@@ -173,8 +173,8 @@ bool CFLVSplitterFilter::ReadTag(Tag& t)
 
 bool CFLVSplitterFilter::ReadTag(AudioTag& at)
 {
-	if (FAILED(m_pFile->WaitAvailable(200))) {
-		return false;
+	if (FAILED(m_pFile->WaitAvailable(1000))) {
+		//return false;
 	}
 
 	at.SoundFormat = (BYTE)m_pFile->BitRead(4);
@@ -187,8 +187,8 @@ bool CFLVSplitterFilter::ReadTag(AudioTag& at)
 
 bool CFLVSplitterFilter::ReadTag(VideoTag& vt)
 {
-	if (FAILED(m_pFile->WaitAvailable(200))) {
-		return false;
+	if (FAILED(m_pFile->WaitAvailable(1000))) {
+		//return false;
 	}
 
 	vt.FrameType = (BYTE)m_pFile->BitRead(4);
@@ -200,8 +200,8 @@ bool CFLVSplitterFilter::ReadTag(VideoTag& vt)
 #ifndef NOVIDEOTWEAK
 bool CFLVSplitterFilter::ReadTag(VideoTweak& vt)
 {
-	if (FAILED(m_pFile->WaitAvailable(200))) {
-		return false;
+	if (FAILED(m_pFile->WaitAvailable(1000))) {
+		//return false;
 	}
 
 	vt.x = (BYTE)m_pFile->BitRead(4);
@@ -843,7 +843,8 @@ bool CFLVSplitterFilter::DemuxLoop()
 	AudioTag at = {};
 	VideoTag vt = {};
 
-	while (SUCCEEDED(hr) && !CheckRequest(NULL) && (!m_pFile->IsStreaming() || SUCCEEDED(m_pFile->WaitAvailable(1500, MEGABYTE/8)))) {
+	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
+
 		if (!ReadTag(t)) {
 			break;
 		}
@@ -878,6 +879,8 @@ bool CFLVSplitterFilter::DemuxLoop()
 			if (dataSize <= 0) {
 				goto NextTag;
 			}
+
+			m_pFile->WaitAvailable(1500, dataSize);
 			
 			p.Attach(DNew Packet());
 			p->TrackNumber = t.TagType;

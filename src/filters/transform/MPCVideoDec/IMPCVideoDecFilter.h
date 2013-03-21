@@ -53,7 +53,8 @@ typedef enum {
 	MPCVD_BINKV      = 1 << 27,
 	MPCVD_PNG        = 1 << 28,
 	MPCVD_CLLC       = 1 << 29,
-	MPCVD_V210       = 1 << 30
+	MPCVD_V210       = 1 << 30,
+	MPCVD_MPEG2      = 1 << 31
 } MPC_VIDEO_CODEC;
 
 typedef enum MPC_DEINTERLACING_FLAGS {

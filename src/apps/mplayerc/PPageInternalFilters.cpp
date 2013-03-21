@@ -104,8 +104,9 @@ static filter_t s_filters[] = {
 	{_T("Indeo 3/4/5"),           FFMPEG_DECODER, VIDEO,  FFM_INDEO,      IDS_TRA_FFMPEG},
 	{_T("Lagarith"),              FFMPEG_DECODER, VIDEO,  FFM_LAGARITH,   IDS_TRA_FFMPEG},
 	{_T("MJPEG"),                 FFMPEG_DECODER, VIDEO,  FFM_MJPEG,      IDS_TRA_FFMPEG},
-	{_T("MPEG-1 Video"),          DECODER,        VIDEO,  TRA_MPEG1,      IDS_TRA_MPEG2},
-	{_T("MPEG-2 Video"),          DECODER,        VIDEO,  TRA_MPEG2,      IDS_TRA_MPEG2},
+	{_T("MPEG-2 Video (FFmpeg)"), FFMPEG_DECODER, VIDEO,  FFM_MPEG2,      IDS_TRA_FFMPEG},
+	{_T("MPEG-1 Video (libmpeg2)"),     DECODER,        VIDEO,  TRA_MPEG1,      IDS_TRA_MPEG2},
+	{_T("MPEG-2/DVD Video (libmpeg2)"), DECODER,        VIDEO,  TRA_MPEG2,      IDS_TRA_MPEG2},
 	{_T("MS MPEG-4"),             FFMPEG_DECODER, VIDEO,  FFM_MSMPEG4,    IDS_TRA_FFMPEG},
 	{_T("PNG"),                   FFMPEG_DECODER, VIDEO,  FFM_PNG,        IDS_TRA_FFMPEG},
 	{_T("Screen Recorder (Cinepak/CSCD/QTRle/MS/TSCC)"), FFMPEG_DECODER, VIDEO, FFM_SCREC, IDS_TRA_FFMPEG},
@@ -118,7 +119,7 @@ static filter_t s_filters[] = {
 	{_T("WMV1/2/3"),              FFMPEG_DECODER, VIDEO,  FFM_WMV,        IDS_TRA_FFMPEG},
 	{_T("Xvid/MPEG-4"),           FFMPEG_DECODER, VIDEO,  FFM_XVID,       IDS_TRA_FFMPEG},
 	{_T("RealVideo"),             FFMPEG_DECODER, VIDEO,  FFM_RV,         IDS_TRA_RV},
-	{_T("Uncompressed video (v210)"), FFMPEG_DECODER, VIDEO, FFM_V210, IDS_TRA_FFMPEG},
+	{_T("Uncompressed video (v210)"),   FFMPEG_DECODER, VIDEO, FFM_V210, IDS_TRA_FFMPEG},
 
 	// End
 	{NULL, 0, 0, 0, NULL}

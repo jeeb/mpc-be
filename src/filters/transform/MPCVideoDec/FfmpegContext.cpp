@@ -860,15 +860,16 @@ int FFGetThreadType (enum AVCodecID nCodecId)
 		case AV_CODEC_ID_H264			:
 			return FF_THREAD_FRAME|FF_THREAD_SLICE;
 			break;
-		case AV_CODEC_ID_MPEG1VIDEO	:
+		case AV_CODEC_ID_MPEG1VIDEO		:
+		case AV_CODEC_ID_MPEG2VIDEO		:
 		case AV_CODEC_ID_DVVIDEO		:
 		case AV_CODEC_ID_FFV1			:
-		case AV_CODEC_ID_PRORES		:
+		case AV_CODEC_ID_PRORES			:
 			return FF_THREAD_SLICE;
 			break;
 		case AV_CODEC_ID_VP3			:
 		case AV_CODEC_ID_VP8			:
-		case AV_CODEC_ID_THEORA		:
+		case AV_CODEC_ID_THEORA			:
 		case AV_CODEC_ID_RV30			:
 		case AV_CODEC_ID_RV40			:
 		case AV_CODEC_ID_UTVIDEO		:

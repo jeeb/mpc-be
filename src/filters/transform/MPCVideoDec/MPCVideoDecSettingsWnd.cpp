@@ -529,19 +529,20 @@ MPCFILTER_VIDEO_CODECS mpc_codecs[] = {
 	{MPCVD_INDEO,		_T("Indeo 3/4/5")},
 	{MPCVD_LAGARITH,	_T("Lagarith")},
 	{MPCVD_MJPEG,		_T("MJPEG")},
+	{MPCVD_MPEG2,		_T("MPEG2 (FFmpeg)")},
 	{MPCVD_MSMPEG4,		_T("MS-MPEG4")},
 	{MPCVD_PNG,			_T("PNG")},
 	{MPCVD_SCREC,		_T("Screen Recorder (CSCD/TSCC/QTRle)")},
 	{MPCVD_SVQ3,		_T("SVQ1/3")},
 	{MPCVD_THEORA,		_T("Theora")},
 	{MPCVD_UTVD,		_T("Ut video")},
-	{MPCVD_V210,		_T("QT video")},
 	{MPCVD_VC1,			_T("VC1 (FFmpeg)")},
 	{MPCVD_VP356,		_T("VP3/5/6")},
 	{MPCVD_VP8,			_T("VP8")},
 	{MPCVD_WMV,			_T("WMV1/2/3")},
 	{MPCVD_XVID,		_T("Xvid/MPEG-4")},
-	{MPCVD_RV,			_T("Real Video")}
+	{MPCVD_RV,			_T("Real Video")},
+	{MPCVD_V210,		_T("Uncompressed video (v210)")},
 };
 
 bool CMPCVideoDecCodecWnd::OnActivate()
