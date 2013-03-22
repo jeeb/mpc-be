@@ -204,6 +204,7 @@ Source: "..\docs\Authors mpc-hc team.txt";				DestDir: "{app}"; Flags: ignorever
 Source: "..\docs\Changelog.txt";						DestDir: "{app}"; Flags: ignoreversion; Components: main
 Source: "..\docs\Changelog.Rus.txt";					DestDir: "{app}"; Flags: ignoreversion; Components: main
 Source: "..\docs\Readme.txt";							DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "Shaders\0-255 to 16-235.psh";          DestDir: "{userappdata}\MPC-BE\Shaders"; Components: main; Flags: ignoreversion; Check: NOT IniUsed()
 Source: "Shaders\16-235 to 0-255 [SD].psh";     DestDir: "{userappdata}\MPC-BE\Shaders"; Components: main; Flags: ignoreversion; Check: NOT IniUsed()
 Source: "Shaders\16-235 to 0-255 [SD][HD].psh"; DestDir: "{userappdata}\MPC-BE\Shaders"; Components: main; Flags: ignoreversion; Check: NOT IniUsed()
 Source: "Shaders\BT.601 to BT.709.psh";         DestDir: "{userappdata}\MPC-BE\Shaders"; Components: main; Flags: ignoreversion; Check: NOT IniUsed()
@@ -225,6 +226,7 @@ Source: "Shaders\sphere.psh";                   DestDir: "{userappdata}\MPC-BE\S
 Source: "Shaders\spotlight.psh";                DestDir: "{userappdata}\MPC-BE\Shaders"; Components: main; Flags: ignoreversion; Check: NOT IniUsed()
 Source: "Shaders\wave.psh";                     DestDir: "{userappdata}\MPC-BE\Shaders"; Components: main; Flags: ignoreversion; Check: NOT IniUsed()
 Source: "Shaders\YV12 Chroma Upsampling.psh";   DestDir: "{userappdata}\MPC-BE\Shaders"; Components: main; Flags: ignoreversion; Check: NOT IniUsed()
+Source: "Shaders\0-255 to 16-235.psh";          DestDir: "{app}\Shaders"; Components: main; Flags: ignoreversion; Check: IniUsed()
 Source: "Shaders\16-235 to 0-255 [SD].psh";     DestDir: "{app}\Shaders"; Components: main; Flags: ignoreversion; Check: IniUsed()
 Source: "Shaders\16-235 to 0-255 [SD][HD].psh"; DestDir: "{app}\Shaders"; Components: main; Flags: ignoreversion; Check: IniUsed()
 Source: "Shaders\BT.601 to BT.709.psh";         DestDir: "{app}\Shaders"; Components: main; Flags: ignoreversion; Check: IniUsed()
