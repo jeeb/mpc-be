@@ -24,11 +24,6 @@
 
 #include "../../parser/BaseSplitter/BaseSplitter.h"
 
-#include <windows.h>
-#include <initguid.h>
-#include <moreuuids.h>
-#include <mmreg.h>
-
 #include "mpc_file.h"
 #include "bits.h"
 
