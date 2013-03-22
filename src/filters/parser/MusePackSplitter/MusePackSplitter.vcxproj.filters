@@ -16,7 +16,7 @@
     <ClCompile Include="mpc_file.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MusePackSource.cpp">
+    <ClCompile Include="MusePackSplitter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
@@ -24,7 +24,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="MusePackSource.def">
+    <None Include="MusePackSplitter.def">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
@@ -35,7 +35,7 @@
     <ClInclude Include="mpc_file.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MusePackSource.h">
+    <ClInclude Include="MusePackSplitter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
@@ -57,7 +57,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="MusePackSource.rc">
+    <ResourceCompile Include="MusePackSplitter.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

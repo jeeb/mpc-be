@@ -26,23 +26,24 @@
 #include <moreuuids.h>
 #include <mmreg.h>
 
-#include "MusePackSource.h"
+#include "MusePackSplitter.h"
 #include "../DSUtil/ApeTag.h"
 
 #ifdef REGISTER_FILTER
 
-const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
+const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{&MEDIATYPE_Stream, &MEDIASUBTYPE_NULL},
-	{&MEDIATYPE_Audio, &MEDIASUBTYPE_MPC7},
-	{&MEDIATYPE_Audio, &MEDIASUBTYPE_MPC8},
+	{&MEDIATYPE_Stream, &MEDIASUBTYPE_MPC7},
+	{&MEDIATYPE_Stream, &MEDIASUBTYPE_MPC8},
 };
 
-const AMOVIESETUP_PIN sudOpPin[] = {
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut), sudPinTypesOut}
+const AMOVIESETUP_PIN sudpPins[] = {
+	{L"Input", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn), sudPinTypesIn},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, 0, NULL}
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
-	{&__uuidof(CMusePackSplitter), MusePackSplitterName, MERIT_NORMAL, _countof(sudOpPin), sudOpPin, CLSID_LegacyAmFilterCategory}
+	{&__uuidof(CMusePackSplitter), MusePackSplitterName, MERIT_NORMAL+1, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory}
 };
 
 CFactoryTemplate g_Templates[] = {

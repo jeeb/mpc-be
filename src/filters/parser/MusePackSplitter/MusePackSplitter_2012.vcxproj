@@ -36,9 +36,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{3FF8D24A-877C-4957-B377-F20A1527F423}</ProjectGuid>
-    <RootNamespace>MusePackSource</RootNamespace>
+    <RootNamespace>MusePackSplitter</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <ProjectName>MusePackSource</ProjectName>
+    <ProjectName>MusePackSplitter</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -142,7 +142,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>MusePackSource.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>MusePackSplitter.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)bin\lib\Debug_$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ResourceCompile>
@@ -156,7 +156,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>MusePackSource.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>MusePackSplitter.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)bin\lib\Debug_$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ResourceCompile>
@@ -169,7 +169,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>MusePackSource.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>MusePackSplitter.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)bin\lib\Release_$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ResourceCompile>
@@ -182,7 +182,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>MusePackSource.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>MusePackSplitter.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)bin\lib\Release_$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ResourceCompile>
@@ -230,10 +230,10 @@
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="MusePackSource.cpp" />
+    <ClCompile Include="MusePackSplitter.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="MusePackSource.def" />
+    <None Include="MusePackSplitter.def" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bits.h" />
@@ -242,10 +242,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="MusePackSource.h" />
+    <ClInclude Include="MusePackSplitter.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="MusePackSource.rc">
+    <ResourceCompile Include="MusePackSplitter.rc">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ResourceCompile>
   </ItemGroup>

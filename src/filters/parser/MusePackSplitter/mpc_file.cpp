@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: mpc_file.cpp 1647 2012-12-02 21:20:55Z exodus8 $
  *
  * Adaptation for MPC-BE (C) 2012 Dmitry "Vortex" Koteroff (vortex@light-alloy.ru, http://light-alloy.ru)
  *
@@ -22,7 +22,7 @@
 
 #include "stdafx.h"
 #include "mpc_file.h"
-#include "MusepackSource.h"
+#include "MusepackSplitter.h"
 #include <math.h>
 
 #define OLD_GAIN_REF		64.82

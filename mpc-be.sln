@@ -162,7 +162,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WVSplitter", "src\filters\p
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wavpacklib", "src\ExtLib\wavpacklib\wavpacklib.vcxproj", "{99E59C6F-4E0E-40A1-9F16-F1302947516B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MusePackSource", "src\filters\source\MusePackSource\MusePackSource.vcxproj", "{3FF8D24A-877C-4957-B377-F20A1527F423}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MusePackSplitter", "src\filters\parser\MusePackSplitter\MusePackSplitter.vcxproj", "{3FF8D24A-877C-4957-B377-F20A1527F423}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DTSSplitter", "src\filters\parser\DTSSplitter\DTSSplitter.vcxproj", "{F68D02E9-32DE-4EDA-8691-B911DC5317DC}"
 EndProject

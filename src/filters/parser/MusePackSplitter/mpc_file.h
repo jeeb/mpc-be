@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: mpc_file.h 1149 2012-09-16 11:39:29Z szl $
  *
  * Adaptation for MPC-BE (C) 2012 Dmitry "Vortex" Koteroff (vortex@light-alloy.ru, http://light-alloy.ru)
  *

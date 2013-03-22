@@ -36,6 +36,7 @@
 #include "parser/MP4Splitter/MP4Splitter.h"
 #include "parser/MpaSplitter/MpaSplitter.h"
 #include "parser/MpegSplitter/MpegSplitter.h"
+#include "source/MusePackSplitter/MusePackSplitter.h"
 #include "parser/OggSplitter/OggSplitter.h"
 #include "parser/RealMediaSplitter/RealMediaSplitter.h"
 #include "parser/RoQSplitter/RoQSplitter.h"
@@ -55,7 +56,6 @@
 #include "source/DTSAC3Source/DTSAC3Source.h"
 #include "source/FLACSource/FLACSource.h"
 #include "source/FLICSource/FLICSource.h"
-#include "source/MusePackSource/MusePackSource.h"
 #include "source/ShoutcastSource/ShoutcastSource.h"
 #include "source/SubtitleSource/SubtitleSource.h"
 

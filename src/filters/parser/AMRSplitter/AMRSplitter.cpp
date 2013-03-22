@@ -30,17 +30,18 @@
 
 #ifdef REGISTER_FILTER
 
-const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
+const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
+	{&MEDIATYPE_Stream, &MEDIASUBTYPE_NULL},
 	{&MEDIATYPE_Stream, &MEDIASUBTYPE_AMR},
-	{&MEDIATYPE_Audio, &MEDIASUBTYPE_AMR},
 };
 
-const AMOVIESETUP_PIN sudOpPin[] = {
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut), sudPinTypesOut}
+const AMOVIESETUP_PIN sudpPins[] = {
+	{L"Input", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn), sudPinTypesIn},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, 0, NULL}
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
-	{&__uuidof(CAMRSplitter), AMRSplitterName, MERIT_NORMAL, _countof(sudOpPin), sudOpPin, CLSID_LegacyAmFilterCategory}
+	{&__uuidof(CAMRSplitter), AMRSplitterName, MERIT_NORMAL+1, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory}
 };
 
 CFactoryTemplate g_Templates[] = {
@@ -51,24 +52,11 @@ int g_cTemplates = _countof(g_Templates);
 
 STDAPI DllRegisterServer() 
 {
-	CRegKey	r;
-	if (r.Create(HKEY_CLASSES_ROOT, _T("Media Type\\{E436EB83-524F-11CE-9F53-0020AF0BA770}\\{726D6173-0000-0010-8000-00AA00389B71}")) == ERROR_SUCCESS) {
-		r.SetStringValue(_T("0"), _T("0,6,,2321414D520A"));
-		r.SetStringValue(_T("Source Filter"), _T("{E436EBB5-524F-11CE-9F53-0020AF0BA770}"));
-		r.Close();
-	}
-
 	return AMovieDllRegisterServer2(TRUE);
 }
 
 STDAPI DllUnregisterServer()
 {
-	CRegKey	r;
-	if (r.Create(HKEY_CLASSES_ROOT, _T("Media Type\\{E436EB83-524F-11CE-9F53-0020AF0BA770}")) == ERROR_SUCCESS) {
-		r.DeleteSubKey(_T("{726D6173-0000-0010-8000-00AA00389B71}"));
-		r.Close();
-	}
-
 	return AMovieDllRegisterServer2(FALSE);
 }
 

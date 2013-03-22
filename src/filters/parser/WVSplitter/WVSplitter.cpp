@@ -31,16 +31,18 @@
 
 #ifdef REGISTER_FILTER
 
-const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
-	{&MEDIATYPE_Stream, &MEDIASUBTYPE_NULL},
+const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
+	{&MEDIATYPE_Stream, &MEDIASUBTYPE_WAVPACK_Stream},
+	{&MEDIATYPE_Stream, &MEDIASUBTYPE_NULL}
 };
 
-const AMOVIESETUP_PIN sudOpPin[] = {
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut), sudPinTypesOut}
+const AMOVIESETUP_PIN sudpPins[] = {
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn), sudPinTypesIn},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, 0, NULL}
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
-	{&__uuidof(CWavPackSplitterFilter), WavPackSplitterName, MERIT_NORMAL, _countof(sudOpPin), sudOpPin, CLSID_LegacyAmFilterCategory}
+	{&__uuidof(CWavPackSplitterFilter), WavPackSplitterName, MERIT_NORMAL+1, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory}
 };
 
 CFactoryTemplate g_Templates[] = {
