@@ -1587,7 +1587,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_source.AddTail(pFGF);
 	}
 
-	if (src[SRC_FLAC] || IsPreview) {
+	if (src[SRC_FLAC] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CFLACSource>();
 		pFGF->m_chkbytes.AddTail(_T("0,4,,664C6143"));
 		pFGF->m_extensions.AddTail(_T(".flac"));
