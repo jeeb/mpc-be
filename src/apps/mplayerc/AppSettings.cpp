@@ -129,6 +129,7 @@ CAppSettings::CAppSettings()
 	FFMFiltersKeys[FFM_RV] = _T("FFM_RV");
 	FFMFiltersKeys[FFM_V210] = _T("FFM_V210");
 	FFMFiltersKeys[FFM_MPEG2] = _T("FFM_MPEG2");
+	FFMFiltersKeys[FFM_MPEG1] = _T("FFM_MPEG1");
 }
 
 void CAppSettings::CreateCommands()

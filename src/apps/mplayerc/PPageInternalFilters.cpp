@@ -104,6 +104,7 @@ static filter_t s_filters[] = {
 	{_T("Indeo 3/4/5"),           FFMPEG_DECODER, VIDEO,  FFM_INDEO,      IDS_TRA_FFMPEG},
 	{_T("Lagarith"),              FFMPEG_DECODER, VIDEO,  FFM_LAGARITH,   IDS_TRA_FFMPEG},
 	{_T("MJPEG"),                 FFMPEG_DECODER, VIDEO,  FFM_MJPEG,      IDS_TRA_FFMPEG},
+	{_T("MPEG-1 Video (FFmpeg)"), FFMPEG_DECODER, VIDEO,  FFM_MPEG1,      IDS_TRA_FFMPEG},
 	{_T("MPEG-2 Video (FFmpeg)"), FFMPEG_DECODER, VIDEO,  FFM_MPEG2,      IDS_TRA_FFMPEG},
 	{_T("MPEG-1 Video (libmpeg2)"),     DECODER,        VIDEO,  TRA_MPEG1,      IDS_TRA_MPEG2},
 	{_T("MPEG-2/DVD Video (libmpeg2)"), DECODER,        VIDEO,  TRA_MPEG2,      IDS_TRA_MPEG2},

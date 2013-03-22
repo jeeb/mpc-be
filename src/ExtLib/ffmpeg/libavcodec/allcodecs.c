@@ -67,6 +67,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (LAGARITH, lagarith);
     REGISTER_DECODER (MJPEG, mjpeg);
     REGISTER_DECODER (MJPEGB, mjpegb);
+    REGISTER_DECODER (MPEG1VIDEO, mpeg1video);
     REGISTER_DECODER (MPEG2VIDEO, mpeg2video);
     REGISTER_DECODER (MPEG4, mpeg4);
     REGISTER_DECODER (MSA1, msa1);

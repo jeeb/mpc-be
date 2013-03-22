@@ -507,13 +507,13 @@ void CMPCVideoDecCodecWnd::OnDisconnect()
 }
 
 typedef struct {
-	MPC_VIDEO_CODEC	CodecId;
-	LPCTSTR			CodeName;
+	DWORD		CodecId;
+	LPCTSTR		CodeName;
 } MPCFILTER_VIDEO_CODECS;
 
 MPCFILTER_VIDEO_CODECS mpc_codecs[] = {
 	{MPCVD_H264_DXVA,	_T("H.264/AVC (DXVA)")},
-	{MPCVD_MPEG2_DXVA,	_T("MPEG2 (DXVA)")},
+	{MPCVD_MPEG2_DXVA,	_T("MPEG-2 (DXVA)")},
 	{MPCVD_VC1_DXVA,	_T("VC1 (DXVA)")},
 	{MPCVD_WMV3_DXVA,	_T("WMV3 (DXVA)")},
 	{MPCVD_AMVV,		_T("AMV video")},
@@ -529,7 +529,8 @@ MPCFILTER_VIDEO_CODECS mpc_codecs[] = {
 	{MPCVD_INDEO,		_T("Indeo 3/4/5")},
 	{MPCVD_LAGARITH,	_T("Lagarith")},
 	{MPCVD_MJPEG,		_T("MJPEG")},
-	{MPCVD_MPEG2,		_T("MPEG2 (FFmpeg)")},
+	{MPCVD_MPEG1,		_T("MPEG-1 (FFmpeg)")},
+	{MPCVD_MPEG2,		_T("MPEG-2 (FFmpeg)")},
 	{MPCVD_MSMPEG4,		_T("MS-MPEG4")},
 	{MPCVD_PNG,			_T("PNG")},
 	{MPCVD_SCREC,		_T("Screen Recorder (CSCD/TSCC/QTRle)")},
@@ -547,9 +548,9 @@ MPCFILTER_VIDEO_CODECS mpc_codecs[] = {
 
 bool CMPCVideoDecCodecWnd::OnActivate()
 {
-	DWORD				dwStyle	= WS_VISIBLE|WS_CHILD|WS_BORDER;
-	int					nPos	= 0;
-	MPC_VIDEO_CODEC		nActiveCodecs = (MPC_VIDEO_CODEC)(m_pMDF ? m_pMDF->GetActiveCodecs() : 0);
+	DWORD dwStyle		= WS_VISIBLE|WS_CHILD|WS_BORDER;
+	int nPos			= 0;
+	DWORD nActiveCodecs	= m_pMDF ? m_pMDF->GetActiveCodecs() : 0;
 
 	m_grpSelectedCodec.Create (_T("Selected codecs"), WS_VISIBLE|WS_CHILD | BS_GROUPBOX, CRect (10,  10, 330, 280), this, (UINT)IDC_STATIC);
 
@@ -585,7 +586,7 @@ bool CMPCVideoDecCodecWnd::OnApply()
 			}
 		}
 
-		m_pMDF->SetActiveCodecs ((MPC_VIDEO_CODEC)nActiveCodecs);
+		m_pMDF->SetActiveCodecs (nActiveCodecs);
 
 		m_pMDF->Apply();
 	}

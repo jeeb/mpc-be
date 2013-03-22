@@ -173,6 +173,10 @@ FFMPEG_CODECS		ffCodecs[] = {
 	{ &MEDIASUBTYPE_MPEG2_VIDEO, AV_CODEC_ID_MPEG2VIDEO, &DXVA_Mpeg2, FFM_MPEG2, TRA_DXVA_MPEG2 },
 	{ &MEDIASUBTYPE_MPG2,		 AV_CODEC_ID_MPEG2VIDEO, &DXVA_Mpeg2, FFM_MPEG2, TRA_DXVA_MPEG2 },
 
+	// MPEG-1
+	{ &MEDIASUBTYPE_MPEG1Packet,  AV_CODEC_ID_MPEG1VIDEO, NULL, FFM_MPEG1, -1 },
+	{ &MEDIASUBTYPE_MPEG1Payload, AV_CODEC_ID_MPEG1VIDEO, NULL, FFM_MPEG1, -1 },
+
 	// MSMPEG-4
 	{ &MEDIASUBTYPE_DIV3, AV_CODEC_ID_MSMPEG4V3, NULL, FFM_MSMPEG4, -1 },
 	{ &MEDIASUBTYPE_div3, AV_CODEC_ID_MSMPEG4V3, NULL, FFM_MSMPEG4, -1 },
@@ -428,6 +432,10 @@ const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesIn[] = {
 	// MPEG-2
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_MPEG2_VIDEO },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_MPG2        },
+
+	// MPEG-1
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_MPEG1Packet  },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_MPEG1Payload },
 
 	// MSMPEG-4
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_DIV3 },
@@ -704,7 +712,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_nCodecId				= AV_CODEC_ID_NONE;
 	m_bReorderBFrame		= true;
 	m_DXVADecoderGUID		= GUID_NULL;
-	m_nActiveCodecs			= MPCVD_H264|MPCVD_VC1|MPCVD_XVID|MPCVD_DIVX|MPCVD_MSMPEG4|MPCVD_FLASH|MPCVD_WMV|MPCVD_H263|MPCVD_SVQ3|MPCVD_AMVV|MPCVD_THEORA|MPCVD_H264_DXVA|MPCVD_VC1_DXVA|MPCVD_VP356|MPCVD_VP8|MPCVD_MJPEG|MPCVD_INDEO|MPCVD_RV|MPCVD_WMV3_DXVA|MPCVD_MPEG2_DXVA|MPCVD_DIRAC|MPCVD_DV|MPCVD_UTVD|MPCVD_SCREC|MPCVD_LAGARITH|MPCVD_PRORES|MPCVD_BINKV|MPCVD_PNG|MPCVD_CLLC|MPCVD_V210|MPCVD_MPEG2;
+	m_nActiveCodecs			= MPCVD_H264|MPCVD_VC1|MPCVD_XVID|MPCVD_DIVX|MPCVD_MSMPEG4|MPCVD_FLASH|MPCVD_WMV|MPCVD_H263|MPCVD_SVQ3|MPCVD_AMVV|MPCVD_THEORA|MPCVD_H264_DXVA|MPCVD_VC1_DXVA|MPCVD_VP356|MPCVD_VP8|MPCVD_MJPEG|MPCVD_INDEO|MPCVD_RV|MPCVD_WMV3_DXVA|MPCVD_MPEG2_DXVA|MPCVD_DIRAC|MPCVD_DV|MPCVD_UTVD|MPCVD_SCREC|MPCVD_LAGARITH|MPCVD_PRORES|MPCVD_BINKV|MPCVD_PNG|MPCVD_CLLC|MPCVD_V210|MPCVD_MPEG2|MPCVD_MPEG1;
 
 	m_rtAvrTimePerFrame		= 0;
 	m_rtLastStop			= 0;
@@ -909,7 +917,9 @@ bool CMPCVideoDecFilter::IsVideoInterlaced()
 REFERENCE_TIME CMPCVideoDecFilter::GetDuration()
 {
 	REFERENCE_TIME AvgTimePerFrame = m_rtAvrTimePerFrame;
-	if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO || m_rtAvrTimePerFrame < 166666) { // fps > 60 ... try to get fps value from ffmpeg
+	if ((m_nCodecId == AV_CODEC_ID_MPEG2VIDEO || m_nCodecId == AV_CODEC_ID_MPEG1VIDEO)
+		|| m_rtAvrTimePerFrame < 166666) // fps > 60 ... try to get fps value from ffmpeg
+	{
 		if (m_pAVCtx->time_base.den && m_pAVCtx->time_base.num) {
 			AvgTimePerFrame = (UNITS * m_pAVCtx->time_base.num / m_pAVCtx->time_base.den) * m_pAVCtx->ticks_per_frame;
 		}
@@ -1104,6 +1114,9 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn)
 					m_bUseFFmpeg = (m_nActiveCodecs & MPCVD_MPEG2) != 0;
 					bCodecActivated = m_bUseDXVA || m_bUseFFmpeg;
 					bCodecActivated = m_bUseDXVA;
+					break;
+				case AV_CODEC_ID_MPEG1VIDEO :
+					bCodecActivated = (m_nActiveCodecs & MPCVD_MPEG1) != 0;
 					break;
 				case AV_CODEC_ID_PRORES :
 					bCodecActivated = (m_nActiveCodecs & MPCVD_PRORES) != 0;
@@ -1311,7 +1324,7 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 			m_pAVCtx	= avcodec_alloc_context3(m_pAVCodec);
 			CheckPointer (m_pAVCtx, E_POINTER);
 
-			if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO) {
+			if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO || m_nCodecId == AV_CODEC_ID_MPEG1VIDEO) {
 				m_pParser = av_parser_init(m_nCodecId);
 			}
 
@@ -3034,17 +3047,17 @@ STDMETHODIMP_(GUID*) CMPCVideoDecFilter::GetDXVADecoderGuid()
 	}
 }
 
-STDMETHODIMP CMPCVideoDecFilter::SetActiveCodecs(MPC_VIDEO_CODEC nValue)
+STDMETHODIMP CMPCVideoDecFilter::SetActiveCodecs(DWORD nValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
-	m_nActiveCodecs = (int)nValue;
+	m_nActiveCodecs = nValue;
 	return S_OK;
 }
 
-STDMETHODIMP_(MPC_VIDEO_CODEC) CMPCVideoDecFilter::GetActiveCodecs()
+STDMETHODIMP_(DWORD) CMPCVideoDecFilter::GetActiveCodecs()
 {
 	CAutoLock cAutoLock(&m_csProps);
-	return (MPC_VIDEO_CODEC)m_nActiveCodecs;
+	return m_nActiveCodecs;
 }
 
 STDMETHODIMP_(LPCTSTR) CMPCVideoDecFilter::GetVideoCardDescription()

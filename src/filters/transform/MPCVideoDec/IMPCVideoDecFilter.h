@@ -23,39 +23,39 @@
 #pragma once
 
 // Internal codec list (use to enable/disable codec in standalone mode)
-typedef enum {
-	MPCVD_H264       = 1 <<  0,
-	MPCVD_VC1        = 1 <<  1,
-	MPCVD_XVID       = 1 <<  2,
-	MPCVD_DIVX       = 1 <<  3,
-	MPCVD_WMV        = 1 <<  4,
-	MPCVD_MSMPEG4    = 1 <<  5,
-	MPCVD_H263       = 1 <<  6,
-	MPCVD_SVQ3       = 1 <<  7,
-	MPCVD_THEORA     = 1 <<  8,
-	MPCVD_AMVV       = 1 <<  9,
-	MPCVD_FLASH      = 1 << 10,
-	MPCVD_H264_DXVA  = 1 << 11,
-	MPCVD_VC1_DXVA   = 1 << 12,
-	MPCVD_VP356      = 1 << 13,
-	MPCVD_VP8        = 1 << 14,
-	MPCVD_MJPEG      = 1 << 15,
-	MPCVD_INDEO      = 1 << 16,
-	MPCVD_RV         = 1 << 17,
-	MPCVD_WMV3_DXVA  = 1 << 19,
-	MPCVD_MPEG2_DXVA = 1 << 20,
-	MPCVD_DIRAC      = 1 << 21,
-	MPCVD_DV         = 1 << 22,
-	MPCVD_UTVD       = 1 << 23,
-	MPCVD_SCREC      = 1 << 24,
-	MPCVD_LAGARITH   = 1 << 25,
-	MPCVD_PRORES     = 1 << 26,
-	MPCVD_BINKV      = 1 << 27,
-	MPCVD_PNG        = 1 << 28,
-	MPCVD_CLLC       = 1 << 29,
-	MPCVD_V210       = 1 << 30,
-	MPCVD_MPEG2      = 1 << 31
-} MPC_VIDEO_CODEC;
+
+#define MPCVD_H264			(1ULL << 0)
+#define MPCVD_VC1			(1ULL << 1)
+#define MPCVD_XVID			(1ULL << 2)
+#define MPCVD_DIVX			(1ULL << 3)
+#define MPCVD_WMV			(1ULL << 4)
+#define MPCVD_MSMPEG4		(1ULL << 5)
+#define MPCVD_H263			(1ULL << 6)
+#define MPCVD_SVQ3			(1ULL << 7)
+#define MPCVD_THEORA		(1ULL << 8)
+#define MPCVD_AMVV			(1ULL << 9)
+#define MPCVD_FLASH			(1ULL << 10)
+#define MPCVD_H264_DXVA		(1ULL << 11)
+#define MPCVD_VC1_DXVA		(1ULL << 12)
+#define MPCVD_VP356			(1ULL << 13)
+#define MPCVD_VP8			(1ULL << 14)
+#define MPCVD_MJPEG			(1ULL << 15)
+#define MPCVD_INDEO			(1ULL << 16)
+#define MPCVD_RV			(1ULL << 17)
+#define MPCVD_WMV3_DXVA		(1ULL << 18)
+#define MPCVD_MPEG2_DXVA	(1ULL << 19)
+#define MPCVD_DIRAC			(1ULL << 20)
+#define MPCVD_DV			(1ULL << 21)
+#define MPCVD_UTVD			(1ULL << 22)
+#define MPCVD_SCREC			(1ULL << 23)
+#define MPCVD_LAGARITH		(1ULL << 24)
+#define MPCVD_PRORES		(1ULL << 25)
+#define MPCVD_BINKV			(1ULL << 26)
+#define MPCVD_PNG			(1ULL << 27)
+#define MPCVD_CLLC			(1ULL << 28)
+#define MPCVD_V210			(1ULL << 29)
+#define MPCVD_MPEG2			(1ULL << 30)
+#define MPCVD_MPEG1			(1ULL << 31)
 
 typedef enum MPC_DEINTERLACING_FLAGS {
 	AUTO,
@@ -86,8 +86,8 @@ public IUnknown {
 
 	STDMETHOD_(GUID*, GetDXVADecoderGuid()) = 0;
 
-	STDMETHOD(SetActiveCodecs(MPC_VIDEO_CODEC nValue)) = 0;
-	STDMETHOD_(MPC_VIDEO_CODEC, GetActiveCodecs()) = 0;
+	STDMETHOD(SetActiveCodecs(DWORD nValue)) = 0;
+	STDMETHOD_(DWORD, GetActiveCodecs()) = 0;
 
 	STDMETHOD_(LPCTSTR, GetVideoCardDescription()) = 0;
 

@@ -89,7 +89,7 @@ protected:
 	int										m_nIDCTAlgo;
 	MPC_DEINTERLACING_FLAGS					m_nDeinterlacing;
 	bool									m_bDXVACompatible;
-	int										m_nActiveCodecs;
+	DWORD									m_nActiveCodecs;
 	int										m_nARMode;
 	int										m_nDXVACheckCompatibility;
 	int										m_nDXVA_SD;
@@ -248,8 +248,8 @@ public:
 	STDMETHOD(SetDeinterlacing(MPC_DEINTERLACING_FLAGS nValue));
 	STDMETHOD_(MPC_DEINTERLACING_FLAGS, GetDeinterlacing());
 	STDMETHOD_(GUID*, GetDXVADecoderGuid());
-	STDMETHOD(SetActiveCodecs(MPC_VIDEO_CODEC nValue));
-	STDMETHOD_(MPC_VIDEO_CODEC, GetActiveCodecs());
+	STDMETHOD(SetActiveCodecs(DWORD nValue));
+	STDMETHOD_(DWORD, GetActiveCodecs());
 	STDMETHODIMP_(LPCTSTR) GetVideoCardDescription();
 
 	STDMETHOD(SetARMode(int nValue));
