@@ -2039,20 +2039,10 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 
 				if (FlyBarSetPos() == 0) break;
 				
-				if (r_ShowFlybar.PtInRect(p) && !m_fHideCursor) {
-					if (!m_wndFlyBar.IsWindowVisible()) {
-						
-						m_wndFlyBar.ShowWindow(SW_SHOWNOACTIVATE);
-						m_wndFlyBar.Invalidate();
-					}
-					
-				} else if (!r_ShowFlybar.PtInRect(p)) {
-					if (m_wndFlyBar.IsWindowVisible() && !AfxGetAppSettings().fFlybarOnTop) {
-						m_wndFlyBar.ShowWindow(SW_HIDE);
-						m_wndFlyBar.bt_idx = -1;
-					} else if (m_wndFlyBar.IsWindowVisible() && AfxGetAppSettings().fFlybarOnTop) {
-						m_wndFlyBar.Invalidate();
-					}
+				if (r_ShowFlybar.PtInRect(p) && !m_fHideCursor && !m_wndFlyBar.IsWindowVisible()) {
+					m_wndFlyBar.ShowWindow(SW_SHOWNOACTIVATE);
+				} else if (!r_ShowFlybar.PtInRect(p) && m_wndFlyBar.IsWindowVisible() && !AfxGetAppSettings().fFlybarOnTop) {
+					m_wndFlyBar.ShowWindow(SW_HIDE);
 				}
 			
 			} else if (m_wndFlyBar && m_wndFlyBar.IsWindowVisible()) {

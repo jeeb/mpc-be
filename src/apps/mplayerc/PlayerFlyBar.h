@@ -29,13 +29,11 @@ class CFlyBar : public CWnd
 public:
 	CFlyBar();
 	virtual ~CFlyBar();
-
-	int bt_idx;
+	
 	int iw;
 
 	void CalcButtonsRect();
-	void DrawButton(CDC *pDC, int x, int y, int z);
-
+	
 	DECLARE_DYNAMIC(CFlyBar)
 
 private:
@@ -51,6 +49,11 @@ private:
 	CToolTipCtrl m_tooltip;
 	CImageList *m_pButtonsImages;
 
+	int bt_idx;
+
+	void DrawButton(CDC *pDC, int x, int y, int z);
+	void UpdateWnd(CPoint point);
+	void DrawWnd();
 	void Destroy();
 
 protected:
@@ -62,6 +65,6 @@ protected:
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnPaint();
-
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	DECLARE_MESSAGE_MAP()
 };

@@ -83,7 +83,9 @@ BEGIN_MESSAGE_MAP(CFlyBar, CWnd)
 	ON_WM_CREATE()
 	ON_WM_LBUTTONUP()
 	ON_WM_MOUSEMOVE()
+	ON_WM_MOUSELEAVE()
 	ON_WM_PAINT()
+	ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
 // CFlyBar message handlers
@@ -113,7 +115,9 @@ BOOL CFlyBar::PreTranslateMessage(MSG* pMsg)
 LRESULT CFlyBar::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	if (message == WM_MOUSELEAVE) {
-		m_tooltip.UpdateTipText(_T(""), this);
+		CPoint point;
+		GetCursorPos(&point);
+		UpdateWnd(point);
 	}
 
 	return CWnd::WindowProc(message, wParam, lParam);
@@ -213,14 +217,25 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 	} else if (r_LockIcon.PtInRect(p)) {
 		AppSettings& s = AfxGetAppSettings();
 		s.fFlybarOnTop = !s.fFlybarOnTop;
-		OnMouseMove(nFlags, point);
+		UpdateWnd(point);
 	}
 }
 
 void CFlyBar::OnMouseMove(UINT nFlags, CPoint point)
 {
 	SetCursor(LoadCursor(NULL, IDC_HAND));
+	TRACKMOUSEEVENT tme;
+	tme.cbSize = sizeof(tme);
+	tme.hwndTrack = GetSafeHwnd();
+	tme.dwFlags = TME_LEAVE;
+	TrackMouseEvent(&tme);
 
+	UpdateWnd(point);
+	//CWnd::OnMouseMove(nFlags, point);
+}
+
+void CFlyBar::UpdateWnd(CPoint point)
+{
 	ClientToScreen(&point);
 
 	CString str, str2;
@@ -288,13 +303,17 @@ void CFlyBar::OnMouseMove(UINT nFlags, CPoint point)
 	m_tooltip.SetWindowPos(NULL, p.x, point.y + iCursorHeight, r_tooltip.Width(), iCursorHeight, SWP_NOACTIVATE|SWP_NOZORDER);
 
 	Invalidate();
-
-	//CWnd::OnMouseMove(nFlags, point);
 }
 
 void CFlyBar::OnPaint()
 {
 	CPaintDC dc(this);
+	DrawWnd();
+}
+
+void CFlyBar::DrawWnd()
+{
+	CClientDC dc (this);
 
 	if (IsWindowVisible()) {
 
@@ -378,4 +397,9 @@ void CFlyBar::OnPaint()
 	}
 
 	bt_idx = -1;
+}
+
+BOOL CFlyBar::OnEraseBkgnd(CDC* pDC)
+{
+ return TRUE;
 }
