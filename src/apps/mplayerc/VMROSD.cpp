@@ -47,6 +47,7 @@ CVMROSD::CVMROSD(void)
 
 	m_nMessagePos		= OSD_NOMESSAGE;
 	m_bSeekBarVisible	= false;
+	m_bFlyBarVisible	= false;
 	m_bCursorMoving		= false;
 	m_pMFVMB			= NULL;
 	m_pVMB				= NULL;
