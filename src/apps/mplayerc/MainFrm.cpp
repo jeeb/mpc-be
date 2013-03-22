@@ -673,6 +673,7 @@ CMainFrame::CMainFrame() :
 	m_bOpenedThruThread(false),
 	m_nMenuHideTick(0),
 	m_bWasSnapped(false),
+	m_bWndWasZoomed(false),
 	m_nSeekDirection(SEEK_DIRECTION_NONE),
 	m_nWasSetDispMode(0),
 	m_bIsBDPlay(false),
@@ -11085,7 +11086,6 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 	ModifyStyleEx(dwRemoveEx, dwAddEx, SWP_NOZORDER);
 	::SetMenu(m_hWnd, hMenu);
 
-	m_bWndWasZoomed = false;
 	if (IsZoomed() && m_fFullScreen) {
 		m_bWndWasZoomed = true;
 		WINDOWPLACEMENT wp; GetWindowPlacement(&wp);
