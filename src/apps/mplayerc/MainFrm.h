@@ -688,9 +688,9 @@ public:
 	afx_msg void ClipRectToMonitor(LPRECT prc);
 	int snap_Margin, snap_x, snap_y;
 	BOOL isSnapClose( int a, int b );
-	BOOL bWndZoomed;
+	BOOL m_bWndZoomed;
 	RECT rc_forceNP;
-	BOOL bWndWasZoomed;
+	BOOL m_bWndWasZoomed;
 	RECT rc_NP;
 
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);

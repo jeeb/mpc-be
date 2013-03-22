@@ -1503,32 +1503,31 @@ void CMainFrame::DestroyFlyBar()
 
 void CMainFrame::OnEnterSizeMove()
 {
-	bWndZoomed = false;
+	m_bWndZoomed = false;
 	
 	POINT cur_pos;
 	RECT rcWindow;
 	GetWindowRect(&rcWindow);
 	GetCursorPos(&cur_pos);
 
-    MONITORINFO mi;
-    mi.cbSize = sizeof(mi);
-    GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
-    RECT rcWork = mi.rcWork;
+	MONITORINFO mi;
+	mi.cbSize = sizeof(mi);
+	GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
+	RECT rcWork = mi.rcWork;
 
 	if (IsZoomed() // window is maximized
 		|| (rcWindow.top == rcWork.top && rcWindow.bottom == rcWork.bottom) // window is aero snapped (???)
 		|| m_fFullScreen) { // window is fullscreen
 	
-		bWndZoomed = true;
+		m_bWndZoomed = true;
 	}
 
-	if (!bWndZoomed) {
+	if (!m_bWndZoomed) {
 		WINDOWPLACEMENT wp;
 		GetWindowPlacement(&wp);
 		RECT rcNormalPosition = wp.rcNormalPosition;
 		snap_x = cur_pos.x - rcNormalPosition.left;
 		snap_y = cur_pos.y - rcNormalPosition.top;
-		
 	}
 }
 
@@ -1558,22 +1557,21 @@ void CMainFrame::OnMove(int x, int y)
 
 void CMainFrame::ClipRectToMonitor(LPRECT prc)
 {
-    
 	WINDOWPLACEMENT wp;
 	GetWindowPlacement(&wp);
 	RECT rcNormalPosition = wp.rcNormalPosition;
-    
+
 	int w = rcNormalPosition.right - rcNormalPosition.left;
 	int h = rcNormalPosition.bottom - rcNormalPosition.top;
 
-    MONITORINFO mi;
-    mi.cbSize = sizeof(mi);
-    GetMonitorInfo(MonitorFromRect(prc, MONITOR_DEFAULTTONEAREST), &mi);
+	MONITORINFO mi;
+	mi.cbSize = sizeof(mi);
+	GetMonitorInfo(MonitorFromRect(prc, MONITOR_DEFAULTTONEAREST), &mi);
 	RECT rcWork = mi.rcWork;
 
 	POINT cur_pos;
 	GetCursorPos(&cur_pos);
-	
+
 	// by cursor position
 	// prc->left   = max(rcWork.left, min(rcWork.right-w, cur_pos.x - (double)((rnp.right-rnp.left)/((double)(rcWork.right-rcWork.left)/cur_pos.x))));
 	// prc->top    = max(rcWork.top,  min(rcWork.bottom-h, cur_pos.y - (double)((rnp.bottom-rnp.top)/((double)(rcWork.bottom-rcWork.top)/cur_pos.y))));
@@ -1582,10 +1580,11 @@ void CMainFrame::ClipRectToMonitor(LPRECT prc)
 	prc->top    = max(rcWork.top,  min(rcWork.bottom-h, cur_pos.y - (h/2)));
 	prc->right  = prc->left + w;
 	prc->bottom = prc->top  + h;
-	rc_forceNP.left = prc->left;
-	rc_forceNP.right = prc->right;
-	rc_forceNP.top = prc->top;
-	rc_forceNP.bottom = prc->bottom;
+
+	rc_forceNP.left		= prc->left;
+	rc_forceNP.right	= prc->right;
+	rc_forceNP.top		= prc->top;
+	rc_forceNP.bottom	= prc->bottom;
 }
 
 void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)
@@ -1596,12 +1595,12 @@ void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)
 	POINT cur_pos;
 	GetCursorPos(&cur_pos);
 
-	if (bWndZoomed){
+	if (m_bWndZoomed){
 		ClipRectToMonitor(pRect);
 		SetWindowPos(NULL, pRect->left, pRect->top, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
-		bWndZoomed = false;
+		m_bWndZoomed = false;
 		snap_x = cur_pos.x - pRect->left;
-        snap_y = cur_pos.y - pRect->top;
+		snap_y = cur_pos.y - pRect->top;
 
 		return;
 	}
@@ -11086,8 +11085,9 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 	ModifyStyleEx(dwRemoveEx, dwAddEx, SWP_NOZORDER);
 	::SetMenu(m_hWnd, hMenu);
 
+	m_bWndWasZoomed = false;
 	if (IsZoomed() && m_fFullScreen) {
-		bWndWasZoomed = true;
+		m_bWndWasZoomed = true;
 		WINDOWPLACEMENT wp; GetWindowPlacement(&wp);
 		rc_NP = wp.rcNormalPosition;
 		ShowWindow(SW_RESTORE);
@@ -11202,9 +11202,10 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 		SetShaders();
 	}
 
-	 if (bWndWasZoomed && !m_fFullScreen) {
-		bWndWasZoomed = false;
-		WINDOWPLACEMENT wp;	GetWindowPlacement(&wp);
+	if (m_bWndWasZoomed && !m_fFullScreen) {
+		m_bWndWasZoomed = false;
+		WINDOWPLACEMENT wp;
+		GetWindowPlacement(&wp);
 		wp.rcNormalPosition = rc_NP;
 		SetWindowPlacement(&wp);
 		ShowWindow(SW_MAXIMIZE);
