@@ -1013,6 +1013,7 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn)
 			return ((m_bUseDXVA || m_bUseFFmpeg) ? i : -1);
 #else
 			bool	bCodecActivated = false;
+			m_bUseFFmpeg			= true;
 			switch (ffCodecs[i].nFFCodec) {
 				case AV_CODEC_ID_FLV1 :
 				case AV_CODEC_ID_VP6F :
@@ -1132,6 +1133,10 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn)
 				case AV_CODEC_ID_V210 :
 					bCodecActivated = (m_nActiveCodecs & MPCVD_V210) != 0;
 					break;
+			}
+
+			if (!bCodecActivated) {
+				m_bUseFFmpeg = false;
 			}
 			return (bCodecActivated ? i : -1);
 #endif
