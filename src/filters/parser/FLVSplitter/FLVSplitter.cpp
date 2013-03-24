@@ -168,7 +168,7 @@ bool CFLVSplitterFilter::ReadTag(Tag& t)
 		//TRACE(_T("CFLVSplitterFilter::ReadTag() : Detect wrong TimeStamp offset, corrected [%d -> %d]\n"), (t.TimeStamp + m_TimeStampOffset), t.TimeStamp);
 	}
 
-	return (t.DataSize > 0);
+	return m_pFile->IsRandomAccess() ? (m_pFile->GetRemaining() >= t.DataSize) : true;
 }
 
 bool CFLVSplitterFilter::ReadTag(AudioTag& at)
@@ -694,7 +694,7 @@ bool CFLVSplitterFilter::DemuxInit()
 			AudioTag at;
 			VideoTag vt;
 
-			while (ReadTag(t)) {
+			while (ReadTag(t) && m_pFile->GetRemaining()) {
 				UINT64 next = m_pFile->GetPos() + t.DataSize;
 
 				if ((t.TagType == FLV_AUDIODATA && ReadTag(at)) || (t.TagType == FLV_VIDEODATA && ReadTag(vt))) {
