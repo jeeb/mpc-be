@@ -158,7 +158,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	p.y += h25;
 
 	// Read AR from stream
-	m_cbARMode.Create(ResStr(IDS_VDF_AR_MODE), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(340), m_fontheight)), this, IDC_PP_AR);
+	m_cbARMode.Create(ResStr(IDS_VDF_AR_MODE), dwStyle | BS_AUTO3STATE | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(340), m_fontheight)), this, IDC_PP_AR);
 	m_cbARMode.SetCheck(FALSE);
 	p.y += h25;
 
@@ -345,6 +345,8 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	SetClassLongPtr(m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_ARROW));
 	SetClassLongPtr(GetDlgItem(IDC_PP_THREAD_NUMBER)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
 
+	EnableToolTips(TRUE);
+
 	SetDirty(false);
 
 	return true;
@@ -427,12 +429,11 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 
 
 BEGIN_MESSAGE_MAP(CMPCVideoDecSettingsWnd, CInternalPropertyPageWnd)
-
 	// === New swscaler options
 	ON_BN_CLICKED( IDC_PP_SWOUTPUTFORMATUP, OnClickedSwOutputFormatUp)
 	ON_BN_CLICKED( IDC_PP_SWOUTPUTFORMATDOWN, OnClickedSwOutputFormatDown)
 	//
-
+	ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
 END_MESSAGE_MAP()
 
 // === New swscaler options
@@ -476,6 +477,29 @@ void CMPCVideoDecSettingsWnd::OnClickedSwOutputFormatDown()
 	}
 }
 //
+
+BOOL CMPCVideoDecSettingsWnd::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
+{
+	TOOLTIPTEXT* pTTT = (TOOLTIPTEXT*)pNMHDR;
+
+	CToolTipCtrl* pToolTip = AfxGetModuleThreadState()->m_pToolTip;
+	if (pToolTip) {
+		pToolTip->SetMaxTipWidth(SHRT_MAX);
+	}
+
+	UINT_PTR nID = pNMHDR->idFrom;
+	if (pTTT->uFlags & TTF_IDISHWND) {
+		nID = ::GetDlgCtrlID((HWND)nID);
+		if (nID == IDC_PP_AR) {
+			pTTT->lpszText = _T("Checked - will be used AR from stream.\nUnchecked - will be used AR from container.\nIndeterminate - AR from stream will not be used on files with a container AR (recommended).");
+			*pResult = 0;
+
+			return TRUE;
+		}
+	}
+
+	return FALSE;
+}
 
 // ====== Codec filter property page (for standalone filter only)
 

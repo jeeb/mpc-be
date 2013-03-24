@@ -132,6 +132,8 @@ public:
 	// === New swscaler options
 	afx_msg void OnClickedSwOutputFormatUp();
 	afx_msg void OnClickedSwOutputFormatDown();
+
+	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult);
 	//
 
 };

@@ -736,6 +736,9 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 	m_nOutputWidth			= 0;
 	m_nOutputHeight			= 0;
+
+	m_nARX					= 0;
+	m_nARY					= 0;
 	m_pSwsContext			= NULL;
 
 	m_bUseDXVA				= true;
@@ -747,7 +750,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_nVideoOutputCount		= 0;
 	m_hDevice				= INVALID_HANDLE_VALUE;
 
-	m_nARMode					= 1;
+	m_nARMode					= 2; // default state - 3rd
 	m_nDXVACheckCompatibility	= 1; // skip level check by default
 	m_nDXVA_SD					= 0;
 
@@ -1407,6 +1410,10 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction, const CMediaTy
 
 			AllocExtradata (m_pAVCtx, pmt);
 			ExtractAvgTimePerFrame(&m_pInput->CurrentMediaType(), m_rtAvrTimePerFrame);
+			int wout, hout;
+			ExtractDim(&m_pInput->CurrentMediaType(), wout, hout, m_nARX, m_nARY);
+			UNREFERENCED_PARAMETER(wout);
+			UNREFERENCED_PARAMETER(hout);
 
 			if (avcodec_open2(m_pAVCtx, m_pAVCodec, NULL)<0) {
 				return VFW_E_INVALIDMEDIATYPE;
@@ -2552,8 +2559,36 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 
 void CMPCVideoDecFilter::UpdateAspectRatio()
 {
-	if (((m_nARMode) && (m_pAVCtx)) && ((m_pAVCtx->sample_aspect_ratio.num>0) && (m_pAVCtx->sample_aspect_ratio.den>0))) {
-		CSize aspect(m_pAVCtx->sample_aspect_ratio.num * m_pAVCtx->width, m_pAVCtx->sample_aspect_ratio.den * m_pAVCtx->height);
+	if (m_nARMode) {
+		bool bSetAR = true;
+		if (m_nARMode == 2) {
+			CMediaType& mt = m_pInput->CurrentMediaType();
+			if (mt.formattype == FORMAT_VideoInfo2 || mt.formattype == FORMAT_MPEG2_VIDEO || mt.formattype == FORMAT_DiracVideoInfo) {
+				VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.pbFormat;
+				bSetAR = (!vih2->dwPictAspectRatioX && !vih2->dwPictAspectRatioY);
+			}
+			if (!bSetAR && (m_nARX && m_nARY)) {
+				CSize aspect(m_nARX, m_nARY);
+				int lnko = LNKO(aspect.cx, aspect.cy);
+				if (lnko > 1) {
+					aspect.cx /= lnko, aspect.cy /= lnko;
+				}
+				SetAspect(aspect);			
+			}
+		}
+
+		if (bSetAR) {
+			if (m_pAVCtx && (m_pAVCtx->sample_aspect_ratio.num > 0) && (m_pAVCtx->sample_aspect_ratio.den > 0)) {
+				CSize aspect(m_pAVCtx->sample_aspect_ratio.num * m_pAVCtx->width, m_pAVCtx->sample_aspect_ratio.den * m_pAVCtx->height);
+				int lnko = LNKO(aspect.cx, aspect.cy);
+				if (lnko > 1) {
+					aspect.cx /= lnko, aspect.cy /= lnko;
+				}
+				SetAspect(aspect);
+			}
+		}
+	} else if (m_nARX && m_nARY) {
+		CSize aspect(m_nARX, m_nARY);
 		int lnko = LNKO(aspect.cx, aspect.cy);
 		if (lnko > 1) {
 			aspect.cx /= lnko, aspect.cy /= lnko;

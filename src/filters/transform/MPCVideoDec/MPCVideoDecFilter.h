@@ -123,6 +123,7 @@ protected:
 	int										m_nPosB;
 	int										m_nOutputWidth;
 	int										m_nOutputHeight;
+	int										m_nARX, m_nARY;
 
 	bool									m_bIsEVO;
 
