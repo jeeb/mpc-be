@@ -607,8 +607,6 @@ const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesIn[] = {
 	// Canopus Lossless
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_CLLC },
 
-	// IMPORTANT : some of the last MediaTypes present in next group may be not available in
-	// the standalone filter (workaround to prevent GraphEdit crash).
 	// Other MPEG-4
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_MP4V },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_mp4v },
@@ -656,7 +654,9 @@ const int CMPCVideoDecFilter::sudPinTypesInCount = _countof(CMPCVideoDecFilter::
 
 const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesOut[] = {
 	{&MEDIATYPE_Video, &MEDIASUBTYPE_NV12},
-	{&MEDIATYPE_Video, &MEDIASUBTYPE_NV24}
+	{&MEDIATYPE_Video, &MEDIASUBTYPE_YV12},
+	{&MEDIATYPE_Video, &MEDIASUBTYPE_YUY2},
+	{&MEDIATYPE_Video, &MEDIASUBTYPE_RGB32},
 };
 const int CMPCVideoDecFilter::sudPinTypesOutCount = _countof(CMPCVideoDecFilter::sudPinTypesOut);
 
