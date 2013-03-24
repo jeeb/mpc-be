@@ -89,7 +89,7 @@ typedef struct {
 
 // DXVA modes supported for Mpeg2
 DXVA_PARAMS		DXVA_Mpeg2 = {
-	10,		// PicEntryNumber
+	24,		// PicEntryNumber
 	1,		// PreferedConfigBitstream
 	{ &DXVA2_ModeMPEG2_VLD, &GUID_NULL },
 	{ DXVA_RESTRICTED_MODE_UNRESTRICTED, 0 } // Restricted mode for DXVA1?
@@ -112,7 +112,7 @@ DXVA_PARAMS		DXVA_H264_VISTA = {
 
 // DXVA modes supported for VC1
 DXVA_PARAMS		DXVA_VC1 = {
-	10,		// PicEntryNumber
+	24,		// PicEntryNumber
 	1,		// PreferedConfigBitstream
 	{ &DXVA2_ModeVC1_D,				&GUID_NULL },
 	{ DXVA_RESTRICTED_MODE_VC1_D, 0}
@@ -1001,15 +1001,15 @@ static bool IsDXVAEnabled(FFMPEG_CODECS ffcodec, const bool DXVAFilters[TRA_DXVA
 	return false;
 }
 
-int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn)
+int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, bool bForced)
 {
 	m_bUseFFmpeg	= false;
 	m_bUseDXVA		= false;
 	for (int i=0; i<_countof(ffCodecs); i++)
 		if (mtIn->subtype == *ffCodecs[i].clsMinorType) {
 #ifndef REGISTER_FILTER
-			m_bUseFFmpeg	= IsFFMPEGEnabled(ffCodecs[i], m_FFmpegFilters);
-			m_bUseDXVA		= IsDXVAEnabled(ffCodecs[i], m_DXVAFilters);
+			m_bUseFFmpeg	= bForced || IsFFMPEGEnabled(ffCodecs[i], m_FFmpegFilters);
+			m_bUseDXVA		= bForced || IsDXVAEnabled(ffCodecs[i], m_DXVAFilters);
 			return ((m_bUseDXVA || m_bUseFFmpeg) ? i : -1);
 #else
 			bool	bCodecActivated = false;
@@ -1135,10 +1135,10 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn)
 					break;
 			}
 
-			if (!bCodecActivated) {
+			if (!bCodecActivated && !bForced) {
 				m_bUseFFmpeg = false;
 			}
-			return (bCodecActivated ? i : -1);
+			return ((bForced || bCodecActivated) ? i : -1);
 #endif
 		}
 
@@ -1288,13 +1288,15 @@ bool CMPCVideoDecFilter::IsAVI()
 #define AMD_IDENTIFY		_T("AMD ")
 #define RADEON_HD_IDENTIFY	_T("Radeon HD ")
 
-HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaType *pmt)
+HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction, const CMediaType *pmt)
 {
 	if (direction == PINDIR_INPUT) {
 
+		bool bChangeMT = (m_pAVCtx != NULL);
+
 		ffmpegCleanup();
 
-		int nNewCodec = FindCodec(pmt);
+		int nNewCodec = FindCodec(pmt, bChangeMT);
 
 		if (nNewCodec == -1) {
 			return VFW_E_TYPE_NOT_ACCEPTED;
@@ -1472,6 +1474,23 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 			}
 
 			BuildDXVAOutputFormat();
+
+			if (bChangeMT) {
+				if (IsDXVASupported() && SUCCEEDED(FindDecoderConfiguration())) {
+					dynamic_cast<CVideoDecOutputPin*>(m_pOutput)->Recommit();
+					if (m_pDXVADecoder) {
+						m_pDXVADecoder->NewSegment();
+					}
+					m_nDXVAMode = MODE_DXVA2;
+				} else {
+					HRESULT hr;
+					if (FAILED(hr = ReopenVideo())) {
+						return hr;
+					}
+					m_nDXVAMode = MODE_SOFTWARE;
+				}
+				ReconnectOutput(PictWidth(), PictHeight());
+			}
 		}
 	}
 
@@ -1510,6 +1529,84 @@ bool CMPCVideoDecFilter::IsDXVASupported()
 		}
 	}
 	return false;
+}
+
+HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
+{
+	TRACE(_T("CMPCVideoDecFilter::FindDecoderConfiguration()\n"));
+
+	HRESULT hr = E_FAIL;
+
+	m_DXVADecoderGUID = GUID_NULL;
+
+	if (m_pDecoderService) {
+		UINT cDecoderGuids = 0;
+		GUID* pDecoderGuids = NULL;
+		GUID guidDecoder = GUID_NULL;
+		BOOL bFoundDXVA2Configuration = FALSE;
+		BOOL bHasIntelGuid = FALSE;
+		DXVA2_ConfigPictureDecode config;
+		ZeroMemory(&config, sizeof(config));
+
+		hr = m_pDecoderService->GetDecoderDeviceGuids(&cDecoderGuids, &pDecoderGuids);
+
+		if (SUCCEEDED(hr)) {
+
+			//Intel patch for Ivy Bridge and Sandy Bridge
+			if (m_nPCIVendor == PCIV_Intel) {
+				for (UINT iCnt = 0; iCnt < cDecoderGuids; iCnt++) {
+					if (pDecoderGuids[iCnt] == DXVA_Intel_H264_ClearVideo)
+						bHasIntelGuid = TRUE;
+				}
+			}
+			// Look for the decoder GUIDs we want.
+			for (UINT iGuid = 0; iGuid < cDecoderGuids; iGuid++) {
+				TRACE(_T("Enumerate DXVA mode : %s\n"), GetDXVAMode(&pDecoderGuids[iGuid]));
+
+				// Do we support this mode?
+				if (!IsSupportedDecoderMode(pDecoderGuids[iGuid])) {
+					continue;
+				}
+
+				TRACE(_T("	=> trying : %s\n"), GetDXVAMode(&pDecoderGuids[iGuid]));
+
+				// Find a configuration that we support.
+				hr = FindDXVA2DecoderConfiguration(m_pDecoderService, pDecoderGuids[iGuid], &config, &bFoundDXVA2Configuration);
+
+				if (FAILED(hr)) {
+					break;
+				}
+
+				// Patch for the Sandy Bridge (prevent crash on Mode_E, fixme later)
+				if (m_nPCIVendor == PCIV_Intel && pDecoderGuids[iGuid] == DXVA2_ModeH264_E && bHasIntelGuid) {
+					continue;
+				}
+
+				if (bFoundDXVA2Configuration) {
+					// Found a good configuration. Save the GUID.
+					guidDecoder = pDecoderGuids[iGuid];
+					TRACE(_T("	=> Found : %s\n"), GetDXVAMode(&guidDecoder));
+					if (!bHasIntelGuid) {
+						break;
+					}
+				}
+			}
+		}
+
+		if (pDecoderGuids) {
+			CoTaskMemFree(pDecoderGuids);
+		}
+		if (!bFoundDXVA2Configuration) {
+			hr = E_FAIL; // Unable to find a configuration.
+		}
+
+		if (SUCCEEDED(hr)) {
+			m_DXVA2Config		= config;
+			m_DXVADecoderGUID	= guidDecoder;
+		}
+	}
+
+	return hr;
 }
 
 void CMPCVideoDecFilter::BuildDXVAOutputFormat()
@@ -2567,18 +2664,10 @@ HRESULT CMPCVideoDecFilter::FindDXVA2DecoderConfiguration(IDirectXVideoDecoderSe
 HRESULT CMPCVideoDecFilter::ConfigureDXVA2(IPin *pPin)
 {
 	HRESULT hr						 = S_OK;
-	UINT	cDecoderGuids			 = 0;
-	BOOL	bFoundDXVA2Configuration = FALSE;
-	BOOL    bHasIntelGuid			 = FALSE;
-	GUID	guidDecoder				 = GUID_NULL;
-
-	DXVA2_ConfigPictureDecode config;
-	ZeroMemory(&config, sizeof(config));
 
 	CComPtr<IMFGetService>					pGetService;
 	CComPtr<IDirect3DDeviceManager9>		pDeviceManager;
 	CComPtr<IDirectXVideoDecoderService>	pDecoderService;
-	GUID*									pDecoderGuids = NULL;
 	HANDLE									hDevice = INVALID_HANDLE_VALUE;
 
 	// Query the pin for IMFGetService.
@@ -2605,74 +2694,20 @@ HRESULT CMPCVideoDecFilter::ConfigureDXVA2(IPin *pPin)
 				 (void**)&pDecoderService);
 	}
 
-	// Get the decoder GUIDs.
 	if (SUCCEEDED(hr)) {
-		hr = pDecoderService->GetDecoderDeviceGuids(&cDecoderGuids, &pDecoderGuids);
-	}
-
-	if (SUCCEEDED(hr)) {
-
-		//Intel patch for Ivy Bridge and Sandy Bridge
-		if (m_nPCIVendor == PCIV_Intel) {
-			for (UINT iCnt = 0; iCnt < cDecoderGuids; iCnt++) {
-				if (pDecoderGuids[iCnt] == DXVA_Intel_H264_ClearVideo)
-					bHasIntelGuid = TRUE;
-			}
-		}
-		// Look for the decoder GUIDs we want.
-		TRACE(_T("ConfigureDXVA2() : Enumerate DXVA modes\n"));
-		for (UINT iGuid = 0; iGuid < cDecoderGuids; iGuid++) {
-			TRACE(_T("		=> %s\n"), GetDXVAMode(&pDecoderGuids[iGuid]));
-
-			// Do we support this mode?
-			if (!IsSupportedDecoderMode(pDecoderGuids[iGuid])) {
-				continue;
-			}
-
-			TRACE(_T("		=> Try - %s\n"), GetDXVAMode(&pDecoderGuids[iGuid]));
-
-			// Find a configuration that we support.
-			hr = FindDXVA2DecoderConfiguration(pDecoderService, pDecoderGuids[iGuid], &config, &bFoundDXVA2Configuration);
-
-			if (FAILED(hr)) {
-				break;
-			}
-
-			// Patch for the Sandy Bridge (prevent crash on Mode_E, fixme later)
-			if (m_nPCIVendor == PCIV_Intel && pDecoderGuids[iGuid] == DXVA2_ModeH264_E && bHasIntelGuid) {
-				continue;
-			}
-
-			if (bFoundDXVA2Configuration) {
-				// Found a good configuration. Save the GUID.
-				guidDecoder = pDecoderGuids[iGuid];
-				TRACE(_T("		=> Found - %s\n"), GetDXVAMode(&guidDecoder));
-				if (!bHasIntelGuid) break;
-			}
-		}
-	}
-
-	if (pDecoderGuids) {
-		CoTaskMemFree(pDecoderGuids);
-	}
-	if (!bFoundDXVA2Configuration) {
-		hr = E_FAIL; // Unable to find a configuration.
-	}
-
-	if (SUCCEEDED(hr)) {
-		// Store the things we will need later.
 		m_pDeviceManager	= pDeviceManager;
 		m_pDecoderService	= pDecoderService;
-
-		m_DXVA2Config		= config;
-		m_DXVADecoderGUID	= guidDecoder;
 		m_hDevice			= hDevice;
+		hr					= FindDecoderConfiguration();
 	}
 
 	if (FAILED(hr)) {
 		if (hDevice != INVALID_HANDLE_VALUE) {
 			pDeviceManager->CloseDeviceHandle(hDevice);
 		}
+		m_pDeviceManager		= NULL;
+		m_pDecoderService		= NULL;
+		m_hDevice				= INVALID_HANDLE_VALUE;
 	}
 
 	return hr;
@@ -2722,6 +2757,10 @@ HRESULT CMPCVideoDecFilter::CreateDXVA2Decoder(UINT nNumRenderTargets, IDirect3D
 			pDecoderRenderTargets, nNumRenderTargets, &pDirectXVideoDec);
 
 	if (SUCCEEDED (hr)) {
+		if (m_pDXVADecoder) {
+			SAFE_DELETE (m_pDXVADecoder);
+		}
+
 		if (!m_pDXVADecoder) {
 			m_pDXVADecoder	= CDXVADecoder::CreateDecoder (this, pDirectXVideoDec, &m_DXVADecoderGUID, GetPicEntryNumber(), &m_DXVA2Config);
 			if (m_pDXVADecoder) {

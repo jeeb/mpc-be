@@ -182,7 +182,7 @@ protected:
 	// === Private functions
 	void				Cleanup();
 	void				ffmpegCleanup();
-	int					FindCodec(const CMediaType* mtIn);
+	int					FindCodec(const CMediaType* mtIn, bool bForced = false);
 	void				AllocExtradata(AVCodecContext* pAVCtx, const CMediaType* mt);
 	void				GetOutputFormats (int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats);
 	void				DetectVideoCard(HWND hWnd);
@@ -193,6 +193,7 @@ protected:
 	HRESULT				SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
 
 	HRESULT				ReopenVideo();
+	HRESULT				FindDecoderConfiguration();
 
 public:
 
@@ -217,7 +218,7 @@ public:
 	bool			IsAVI();
 
 	// === Overriden DirectShow functions
-	HRESULT			SetMediaType(PIN_DIRECTION direction,const CMediaType *pmt);
+	HRESULT			SetMediaType(PIN_DIRECTION direction, const CMediaType *pmt);
 	HRESULT			CheckInputType(const CMediaType* mtIn);
 	HRESULT			Transform(IMediaSample* pIn);
 	HRESULT			CompleteConnect(PIN_DIRECTION direction,IPin *pReceivePin);

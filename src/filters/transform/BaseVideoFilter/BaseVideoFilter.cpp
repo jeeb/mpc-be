@@ -129,13 +129,13 @@ HRESULT CBaseVideoFilter::Receive(IMediaSample* pIn)
 	return S_OK;
 }
 
-HRESULT CBaseVideoFilter::GetDeliveryBuffer(int w, int h, IMediaSample** ppOut)
+HRESULT CBaseVideoFilter::GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, REFERENCE_TIME AvgTimePerFrame)
 {
 	CheckPointer(ppOut, E_POINTER);
 
 	HRESULT hr;
 
-	if (FAILED(hr = ReconnectOutput(w, h))) {
+	if (FAILED(hr = ReconnectOutput(w, h, true, false, AvgTimePerFrame))) {
 		return hr;
 	}
 
@@ -162,7 +162,7 @@ HRESULT CBaseVideoFilter::GetDeliveryBuffer(int w, int h, IMediaSample** ppOut)
 	return S_OK;
 }
 
-HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool bForce, int RealWidth, int RealHeight)
+HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool bForce, REFERENCE_TIME AvgTimePerFrame, int RealWidth, int RealHeight)
 {
 	CMediaType& mt = m_pOutput->CurrentMediaType();
 
@@ -186,6 +186,30 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 		m_h = h;
 	}
 
+	REFERENCE_TIME nAvgTimePerFrame = 0;
+
+	if (mt.formattype == FORMAT_VideoInfo) {
+		VIDEOINFOHEADER* vih = (VIDEOINFOHEADER*)mt.Format();
+		nAvgTimePerFrame = vih->AvgTimePerFrame;
+		if (!AvgTimePerFrame) {
+			AvgTimePerFrame = nAvgTimePerFrame;
+		}
+
+		if (abs(nAvgTimePerFrame - AvgTimePerFrame) > 10) {
+			fForceReconnection = true;	
+		}
+	} else if (mt.formattype == FORMAT_VideoInfo2) {
+		VIDEOINFOHEADER2* vih = (VIDEOINFOHEADER2*)mt.Format();
+		nAvgTimePerFrame = vih->AvgTimePerFrame;
+		if (!AvgTimePerFrame) {
+			AvgTimePerFrame = nAvgTimePerFrame;
+		}
+
+		if (abs(nAvgTimePerFrame - AvgTimePerFrame) > 10) {
+			fForceReconnection = true;	
+		}
+	}
+
 	HRESULT hr = S_OK;
 
 	if (bForce || m_update_aspect || fForceReconnection || m_w != m_wout || m_h != m_hout || m_arx != m_arxout || m_ary != m_aryout) {
@@ -196,7 +220,10 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 
 		CRect vih_rect(0, 0, RealWidth > 0 ? RealWidth : m_w, RealHeight > 0 ? RealHeight : m_h);
 
-		TRACE(_T("CBaseVideoFilter::ReconnectOutput() : SIZE %d:%d => %d:%d, AR %d:%d => %d:%d\n"), w_org, h_org, vih_rect.Width(), vih_rect.Height(), m_arxout, m_aryout, m_arx, m_ary);
+		TRACE(_T("CBaseVideoFilter::ReconnectOutput()\n"));
+		TRACE(_T("		SIZE : %d:%d => %d:%d\n"), w_org, h_org, vih_rect.Width(), vih_rect.Height());
+		TRACE(_T("		AR   : %d:%d => %d:%d\n"), m_arxout, m_aryout, m_arx, m_ary);
+		TRACE(_T("		FPS  : %I64d => %I64d\n"), nAvgTimePerFrame, AvgTimePerFrame);
 
 		CMediaType& pmtInput	= m_pInput->CurrentMediaType();
 		BITMAPINFOHEADER* bmi	= NULL;
@@ -204,6 +231,7 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 		if (mt.formattype == FORMAT_VideoInfo) {
 			VIDEOINFOHEADER* vih = (VIDEOINFOHEADER*)mt.Format();
 			vih->rcSource = vih->rcTarget = vih_rect;
+			vih->AvgTimePerFrame = AvgTimePerFrame;
 
 			bmi = &vih->bmiHeader;
 			bmi->biXPelsPerMeter = m_w * m_ary;
@@ -211,6 +239,7 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 		} else if (mt.formattype == FORMAT_VideoInfo2) {
 			VIDEOINFOHEADER2* vih = (VIDEOINFOHEADER2*)mt.Format();
 			vih->rcSource = vih->rcTarget = vih_rect;
+			vih->AvgTimePerFrame = AvgTimePerFrame;
 
 			bmi = &vih->bmiHeader;
 			vih->dwPictAspectRatioX = m_arx;

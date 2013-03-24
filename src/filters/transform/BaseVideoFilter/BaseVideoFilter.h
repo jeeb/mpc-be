@@ -49,7 +49,7 @@ protected:
 
 	int m_w, m_h, m_arx, m_ary;
 
-	HRESULT GetDeliveryBuffer(int w, int h, IMediaSample** ppOut);
+	HRESULT GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, REFERENCE_TIME AvgTimePerFrame = 0);
 	HRESULT CopyBuffer(BYTE* pOut, BYTE* pIn, int w, int h, int pitchIn, const GUID& subtype, bool fInterlaced = false);
 	HRESULT CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, int pitchIn, const GUID& subtype, bool fInterlaced = false);
 
@@ -62,7 +62,7 @@ public:
 	CBaseVideoFilter(TCHAR* pName, LPUNKNOWN lpunk, HRESULT* phr, REFCLSID clsid, long cBuffers = 1);
 	virtual ~CBaseVideoFilter();
 
-	HRESULT ReconnectOutput(int w, int h, bool bSendSample = true, bool bForce = false, int RealWidth = -1, int RealHeight = -1);
+	HRESULT ReconnectOutput(int w, int h, bool bSendSample = true, bool bForce = false, REFERENCE_TIME AvgTimePerFrame = 0, int RealWidth = -1, int RealHeight = -1);
 	int GetPinCount();
 	CBasePin* GetPin(int n);
 

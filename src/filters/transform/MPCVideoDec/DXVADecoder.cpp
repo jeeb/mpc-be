@@ -495,6 +495,8 @@ bool CDXVADecoder::AddToStore (int nSurfaceIndex, IMediaSample* pSample, bool bR
 		m_pPictureStore[nSurfaceIndex].nCodecSpecific	= nCodecSpecific;
 		return false;
 	} else {
+		ASSERT (nSurfaceIndex < m_nPicEntryNumber);
+
 		//TRACE ("Add Stor: [%10I64d - %10I64d], Ind = %d, Codec=%d\n", rtStart, rtStop, nSurfaceIndex, nCodecSpecific);
 		/*
 		ASSERT (m_pPictureStore[nSurfaceIndex].pSample == NULL);
@@ -531,6 +533,8 @@ void CDXVADecoder::UpdateStore (int nSurfaceIndex, REFERENCE_TIME rtStart, REFER
 
 void CDXVADecoder::RemoveRefFrame (int nSurfaceIndex)
 {
+	ASSERT (nSurfaceIndex < m_nPicEntryNumber);
+
 	m_pPictureStore[nSurfaceIndex].bRefPicture = false;
 	if (m_pPictureStore[nSurfaceIndex].bDisplayed) {
 		FreePictureSlot (nSurfaceIndex);

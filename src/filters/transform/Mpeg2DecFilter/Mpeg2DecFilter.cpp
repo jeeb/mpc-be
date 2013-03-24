@@ -698,7 +698,7 @@ HRESULT CMpeg2DecFilter::DeliverFast()
 
 	CComPtr<IMediaSample> pOut;
 	BYTE* pDataOut = NULL;
-	if (FAILED(hr = GetDeliveryBuffer(m_fb.w, m_fb.h, &pOut))
+	if (FAILED(hr = GetDeliveryBuffer(m_fb.w, m_fb.h, &pOut, m_AvgTimePerFrame))
 			|| FAILED(hr = pOut->GetPointer(&pDataOut))) {
 		return hr;
 	}
@@ -879,7 +879,7 @@ HRESULT CMpeg2DecFilter::Deliver(bool fRepeatLast)
 
 	CComPtr<IMediaSample> pOut;
 	BYTE* pDataOut = NULL;
-	if (FAILED(hr = GetDeliveryBuffer(m_fb.w, m_fb.h, &pOut))
+	if (FAILED(hr = GetDeliveryBuffer(m_fb.w, m_fb.h, &pOut, m_AvgTimePerFrame))
 			|| FAILED(hr = pOut->GetPointer(&pDataOut))) {
 		return hr;
 	}
