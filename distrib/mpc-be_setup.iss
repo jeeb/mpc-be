@@ -440,9 +440,8 @@ end;
 procedure CleanUpSettingsAndFiles();
 begin
   DeleteFile(ExpandConstant('{app}\{#mpcbe_ini}'));
+  DeleteFile(ExpandConstant('{app}\default.mpcpl'));
   DeleteFile(ExpandConstant('{userappdata}\{#app_name}\default.mpcpl'));
-  DelTree(ExpandConstant('{userappdata}\{#app_name}\Shaders\*.psh'), False, True, False);
-  RemoveDir(ExpandConstant('{userappdata}\{#app_name}\Shaders'));
   RemoveDir(ExpandConstant('{userappdata}\{#app_name}'));
   RegDeleteKeyIncludingSubkeys(HKCU, 'Software\{#app_name} Filters');
   RegDeleteKeyIncludingSubkeys(HKCU, 'Software\{#app_name}');
@@ -482,7 +481,11 @@ begin
   // When uninstalling, ask the user to delete settings
   if ((CurUninstallStep = usUninstall) and SettingsExist()) then begin
     if SuppressibleMsgBox(CustomMessage('msg_DeleteSettings'), mbConfirmation, MB_YESNO or MB_DEFBUTTON2, IDNO) = IDYES then
+    begin
+      DelTree(ExpandConstant('{userappdata}\{#app_name}\Shaders\*.psh'), False, True, False);
+      RemoveDir(ExpandConstant('{userappdata}\{#app_name}\Shaders'));
       CleanUpSettingsAndFiles();
+    end;
   end;
 end;
 
