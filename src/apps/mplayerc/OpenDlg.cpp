@@ -25,6 +25,7 @@
 #include <atlpath.h>
 #include "OpenDlg.h"
 #include "OpenFileDlg.h"
+#include "PlayerYouTube.h"
 
 
 // COpenDlg dialog
@@ -99,6 +100,23 @@ BOOL COpenDlg::OnInitDialog()
 
 	if (m_mrucombo.GetCount() > 0) {
 		m_mrucombo.SetCurSel(0);
+	}
+
+	if (::IsClipboardFormatAvailable(CF_UNICODETEXT) && ::OpenClipboard(m_hWnd)) {
+		HGLOBAL hglb = ::GetClipboardData(CF_UNICODETEXT);
+		if (hglb) {
+			LPCTSTR pText = (LPCTSTR)::GlobalLock(hglb);
+			if (pText) {
+				if (AfxIsValidString(pText)) {
+					CString tmpData(CString(pText).MakeLower());
+					if (tmpData.Find(YOUTUBE_URL) != -1 || tmpData.Find(YOUTU_BE_URL) != -1) {
+						m_mrucombo.SetWindowTextW(pText);
+					}
+				}
+				GlobalUnlock(hglb);
+			}
+		}
+		CloseClipboard();
 	}
 
 	m_fns.RemoveAll();
