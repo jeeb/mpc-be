@@ -1928,6 +1928,11 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			memmove(base, s, e - s);
 			m_p->SetCount(e - s);
 
+			if (!p2->pmt && m_bFlushed) {
+				p2->pmt = CreateMediaType(&m_mt);
+				m_bFlushed = false;
+			}
+
 			HRESULT hr = __super::DeliverPacket(p2);
 			if (hr != S_OK) {
 				return hr;
@@ -2088,6 +2093,11 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 					p->Append(*p2);
 				}
 
+				if (!p->pmt && m_bFlushed) {
+					p->pmt = CreateMediaType(&m_mt);
+					m_bFlushed = false;
+				}
+
 				HRESULT hr = __super::DeliverPacket(p);
 				if (hr != S_OK) {
 					return hr;
@@ -2174,6 +2184,11 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			m_p->pmt	= NULL;
 
 			p2->SetData(start, next - start);
+
+			if (!p2->pmt && m_bFlushed) {
+				p2->pmt = CreateMediaType(&m_mt);
+				m_bFlushed = false;
+			}
 
 			HRESULT hr = __super::DeliverPacket(p2);
 			if (hr != S_OK) {
