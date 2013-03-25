@@ -849,6 +849,14 @@ bool CFLVSplitterFilter::DemuxLoop()
 			break;
 		}
 
+		if (!m_pFile->GetRemaining(m_pFile->IsStreaming())) {
+			m_pFile->WaitAvailable(1500, t.DataSize);
+
+			if (!m_pFile->GetRemaining(m_pFile->IsStreaming())) {
+				break;
+			}
+		}
+
 		__int64 next = m_pFile->GetPos() + t.DataSize;
 
 		if ((t.DataSize > 0) && (t.TagType == FLV_AUDIODATA && ReadTag(at) || t.TagType == FLV_VIDEODATA && ReadTag(vt))) {
