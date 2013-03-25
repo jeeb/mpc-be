@@ -1155,7 +1155,9 @@ Global
 		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Release|x64.ActiveCfg = Release|x64
 		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Release|x64.Build.0 = Release|x64
 		{F22DE3B2-4DE9-4013-BBAB-1BB39F2B7DF7}.Debug Filter|Win32.ActiveCfg = Debug Filter|Win32
+		{F22DE3B2-4DE9-4013-BBAB-1BB39F2B7DF7}.Debug Filter|Win32.Build.0 = Debug Filter|Win32
 		{F22DE3B2-4DE9-4013-BBAB-1BB39F2B7DF7}.Debug Filter|x64.ActiveCfg = Debug Filter|x64
+		{F22DE3B2-4DE9-4013-BBAB-1BB39F2B7DF7}.Debug Filter|x64.Build.0 = Debug Filter|x64
 		{F22DE3B2-4DE9-4013-BBAB-1BB39F2B7DF7}.Debug|Win32.ActiveCfg = Debug|Win32
 		{F22DE3B2-4DE9-4013-BBAB-1BB39F2B7DF7}.Debug|Win32.Build.0 = Debug|Win32
 		{F22DE3B2-4DE9-4013-BBAB-1BB39F2B7DF7}.Debug|x64.ActiveCfg = Debug|x64
@@ -1163,12 +1165,15 @@ Global
 		{F22DE3B2-4DE9-4013-BBAB-1BB39F2B7DF7}.Release Filter|Win32.ActiveCfg = Release Filter|Win32
 		{F22DE3B2-4DE9-4013-BBAB-1BB39F2B7DF7}.Release Filter|Win32.Build.0 = Release Filter|Win32
 		{F22DE3B2-4DE9-4013-BBAB-1BB39F2B7DF7}.Release Filter|x64.ActiveCfg = Release Filter|x64
+		{F22DE3B2-4DE9-4013-BBAB-1BB39F2B7DF7}.Release Filter|x64.Build.0 = Release Filter|x64
 		{F22DE3B2-4DE9-4013-BBAB-1BB39F2B7DF7}.Release|Win32.ActiveCfg = Release|Win32
 		{F22DE3B2-4DE9-4013-BBAB-1BB39F2B7DF7}.Release|Win32.Build.0 = Release|Win32
 		{F22DE3B2-4DE9-4013-BBAB-1BB39F2B7DF7}.Release|x64.ActiveCfg = Release|x64
 		{F22DE3B2-4DE9-4013-BBAB-1BB39F2B7DF7}.Release|x64.Build.0 = Release|x64
 		{99E59C6F-4E0E-40A1-9F16-F1302947516B}.Debug Filter|Win32.ActiveCfg = Debug Filter|Win32
+		{99E59C6F-4E0E-40A1-9F16-F1302947516B}.Debug Filter|Win32.Build.0 = Debug Filter|Win32
 		{99E59C6F-4E0E-40A1-9F16-F1302947516B}.Debug Filter|x64.ActiveCfg = Debug Filter|x64
+		{99E59C6F-4E0E-40A1-9F16-F1302947516B}.Debug Filter|x64.Build.0 = Debug Filter|x64
 		{99E59C6F-4E0E-40A1-9F16-F1302947516B}.Debug|Win32.ActiveCfg = Debug|Win32
 		{99E59C6F-4E0E-40A1-9F16-F1302947516B}.Debug|Win32.Build.0 = Debug|Win32
 		{99E59C6F-4E0E-40A1-9F16-F1302947516B}.Debug|x64.ActiveCfg = Debug|x64
@@ -1176,6 +1181,7 @@ Global
 		{99E59C6F-4E0E-40A1-9F16-F1302947516B}.Release Filter|Win32.ActiveCfg = Release Filter|Win32
 		{99E59C6F-4E0E-40A1-9F16-F1302947516B}.Release Filter|Win32.Build.0 = Release Filter|Win32
 		{99E59C6F-4E0E-40A1-9F16-F1302947516B}.Release Filter|x64.ActiveCfg = Release Filter|x64
+		{99E59C6F-4E0E-40A1-9F16-F1302947516B}.Release Filter|x64.Build.0 = Release Filter|x64
 		{99E59C6F-4E0E-40A1-9F16-F1302947516B}.Release|Win32.ActiveCfg = Release|Win32
 		{99E59C6F-4E0E-40A1-9F16-F1302947516B}.Release|Win32.Build.0 = Release|Win32
 		{99E59C6F-4E0E-40A1-9F16-F1302947516B}.Release|x64.ActiveCfg = Release|x64
