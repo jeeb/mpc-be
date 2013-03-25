@@ -53,11 +53,14 @@ CDXVADecoderVC1::CDXVADecoderVC1 (CMPCVideoDecFilter* pFilter, IDirectXVideoDeco
 
 CDXVADecoderVC1::~CDXVADecoderVC1(void)
 {
+	TRACE(_T("CDXVADecoderVC1::Destroy()\n"));
 	Flush();
 }
 
 void CDXVADecoderVC1::Init()
 {
+	TRACE(_T("CDXVADecoderVC1::Init()\n"));
+
 	memset (&m_PictureParams, 0, sizeof(m_PictureParams));
 	memset (&m_SliceInfo,     0, sizeof(m_SliceInfo));
 

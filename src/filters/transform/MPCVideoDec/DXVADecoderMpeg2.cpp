@@ -51,11 +51,14 @@ CDXVADecoderMpeg2::CDXVADecoderMpeg2 (CMPCVideoDecFilter* pFilter, IDirectXVideo
 
 CDXVADecoderMpeg2::~CDXVADecoderMpeg2(void)
 {
+	TRACE(_T("CDXVADecoderMpeg2::Destroy()\n"));
 	NewSegment();
 }
 
 void CDXVADecoderMpeg2::Init()
 {
+	TRACE(_T("CDXVADecoderMpeg2::Init()\n"));
+
 	memset (&m_PictureParams,	0, sizeof(m_PictureParams));
 	memset (&m_SliceInfo,		0, sizeof(m_SliceInfo));
 	memset (&m_QMatrixData,		0, sizeof(m_QMatrixData));

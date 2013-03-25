@@ -1496,7 +1496,7 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction, const CMediaTy
 					}
 					m_nDXVAMode = MODE_SOFTWARE;
 				}
-				ReconnectOutput(PictWidth(), PictHeight());
+				ReconnectOutput(PictWidth(), PictHeight(), true, false, GetDuration());
 			}
 		}
 	}
@@ -2326,7 +2326,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 		BYTE*					pDataOut = NULL;
 
 		UpdateAspectRatio();
-		if (FAILED(hr = GetDeliveryBuffer(m_pAVCtx->width, m_pAVCtx->height, &pOut)) || FAILED(hr = pOut->GetPointer(&pDataOut))) {
+		if (FAILED(hr = GetDeliveryBuffer(m_pAVCtx->width, m_pAVCtx->height, &pOut, GetDuration())) || FAILED(hr = pOut->GetPointer(&pDataOut))) {
 			continue;//return hr;
 		}
 
@@ -2534,7 +2534,7 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 
 				// Change aspect ratio for DXVA1
 				// stupid DXVA1 - size for the output MediaType should be the same that size of DXVA surface
-				if (m_nDXVAMode == MODE_DXVA1 && ReconnectOutput(PictWidthRounded(), PictHeightRounded(), true, false, PictWidth(), PictHeight()) == S_OK) {
+				if (m_nDXVAMode == MODE_DXVA1 && ReconnectOutput(PictWidthRounded(), PictHeightRounded(), true, false, GetDuration(), PictWidth(), PictHeight()) == S_OK) {
 					m_pDXVADecoder->ConfigureDXVA1();
 				}
 
@@ -2779,6 +2779,8 @@ HRESULT CMPCVideoDecFilter::SetEVRForDXVA2(IPin *pPin)
 
 HRESULT CMPCVideoDecFilter::CreateDXVA2Decoder(UINT nNumRenderTargets, IDirect3DSurface9** pDecoderRenderTargets)
 {
+	TRACE(_T("CMPCVideoDecFilter::CreateDXVA2Decoder()\n"));
+
 	HRESULT							hr;
 	CComPtr<IDirectXVideoDecoder>	pDirectXVideoDec;
 

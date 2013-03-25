@@ -291,7 +291,7 @@ HRESULT CDXVADecoder::GetDeliveryBuffer(REFERENCE_TIME rtStart, REFERENCE_TIME r
 	// Change aspect ratio for DXVA2
 	if (m_nEngine == ENGINE_DXVA2) {
 		m_pFilter->UpdateAspectRatio();
-		m_pFilter->ReconnectOutput(m_pFilter->PictWidth(), m_pFilter->PictHeight());
+		m_pFilter->ReconnectOutput(m_pFilter->PictWidth(), m_pFilter->PictHeight(), true, false, m_pFilter->GetDuration());
 	}
 	hr = m_pFilter->GetOutputPin()->GetDeliveryBuffer(&pNewSample, 0, 0, 0);
 
