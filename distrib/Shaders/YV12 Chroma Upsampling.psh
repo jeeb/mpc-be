@@ -1,4 +1,4 @@
-// $ShaderVersion: ps_2_0
+// $MinimumShaderProfile: ps_2_0
 
 /*
 YV12 chroma upsampling fixer

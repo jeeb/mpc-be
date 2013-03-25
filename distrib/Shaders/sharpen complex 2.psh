@@ -1,4 +1,4 @@
-// $ShaderVersion: ps_2_a
+// $MinimumShaderProfile: ps_2_a
 
 /* Sharpen complex v2 (requires ps >= 2a) */
 

@@ -1449,7 +1449,7 @@ void CAppSettings::SaveShaders()
 					CString shname = s.label + _T(".psh");
 					CStdioFile shfile;
 					if (shfile.Open(path + shname, CFile::modeCreate | CFile::modeWrite | CFile::shareDenyNone | CFile::typeText)) {
-						shfile.WriteString(_T("// $ShaderVersion: ") + s.target + _T("\n"));
+						shfile.WriteString(_T("// $MinimumShaderProfile: ") + s.target + _T("\n"));
 						shfile.WriteString(s.srcdata);
 
 						shfile.Close();
@@ -1490,7 +1490,7 @@ void CAppSettings::LoadShaders()
 
 					CString str;
 					shfile.ReadString(str); // read first string
-					if (str.Left(18) == _T("// $ShaderVersion:")) {
+					if (str.Left(18) == _T("// $MinimumShaderProfile: ")) {
 						s.target = str.Mid(18).Trim(); // shader version property
 					} else {
 						shfile.SeekToBegin();
