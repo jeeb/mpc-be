@@ -2798,6 +2798,8 @@ typedef struct AVCodecContext {
     // ==> Start patch MPC
     int nal_length_size;
     int using_dxva;
+    int volatile entangled_thread_counter;
+    volatile int ff_avcodec_locked;
     // ==> End patch MPC
 
     /**

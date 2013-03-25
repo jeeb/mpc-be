@@ -10,10 +10,13 @@
 * libavcodec/error_resilience.c
 * libavcodec/h264.c
 * libavcodec/h264.h
+* libavcodec/internal.h
 * libavcodec/mpeg12.c
 * libavcodec/mpeg12.h
 * libavcodec/mpegvideo.c
+* libavcodec/options.c
 * libavcodec/pthread.c
+* libavcodec/utils.c
 * libavcodec/vc1dec.c
 * libavcodec/vorbis.c
 

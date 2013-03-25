@@ -1015,7 +1015,9 @@ int attribute_align_arg ff_codec_open2_recursive(AVCodecContext *avctx, const AV
 {
     int ret = 0;
 
-    ff_unlock_avcodec();
+    // ==> Start patch MPC
+    ff_unlock_avcodec(avctx);
+    // ==> End patch MPC
 
     ret = avcodec_open2(avctx, codec, options);
 
@@ -1152,7 +1154,9 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
         av_log(avctx, AV_LOG_WARNING, "Warning: not compiled with thread support, using thread emulation\n");
 
     if (CONFIG_FRAME_THREAD_ENCODER) {
-        ff_unlock_avcodec(); //we will instanciate a few encoders thus kick the counter to prevent false detection of a problem
+        // ==> Start patch MPC
+        ff_unlock_avcodec(avctx); //we will instanciate a few encoders thus kick the counter to prevent false detection of a problem
+        // ==> End patch MPC
         ret = ff_frame_thread_encoder_init(avctx, options ? *options : NULL);
         ff_lock_avcodec(avctx);
         if (ret < 0)
@@ -1349,7 +1353,9 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
         }
     }
 end:
-    ff_unlock_avcodec();
+    // ==> Start patch MPC
+    ff_unlock_avcodec(avctx);
+    // ==> End patch MPC
     if (options) {
         av_dict_free(options);
         *options = tmp;
@@ -2276,7 +2282,9 @@ av_cold int ff_codec_close_recursive(AVCodecContext *avctx)
 {
     int ret = 0;
 
-    ff_unlock_avcodec();
+    // ==> Start patch MPC
+    ff_unlock_avcodec(avctx);
+    // ==> End patch MPC
 
     ret = avcodec_close(avctx);
 
@@ -2295,7 +2303,9 @@ av_cold int avcodec_close(AVCodecContext *avctx)
         int i;
         if (CONFIG_FRAME_THREAD_ENCODER &&
             avctx->internal->frame_thread_encoder && avctx->thread_count > 1) {
-            ff_unlock_avcodec();
+            // ==> Start patch MPC
+            ff_unlock_avcodec(avctx);
+            // ==> End patch MPC
             ff_frame_thread_encoder_free(avctx);
             ff_lock_avcodec(avctx);
         }
@@ -2323,7 +2333,9 @@ av_cold int avcodec_close(AVCodecContext *avctx)
     avctx->codec = NULL;
     avctx->active_thread_type = 0;
 
-    ff_unlock_avcodec();
+    // ==> Start patch MPC
+    ff_unlock_avcodec(avctx);
+    // ==> End patch MPC
     return 0;
 }
 
@@ -2949,35 +2961,39 @@ int av_lockmgr_register(int (*cb)(void **mutex, enum AVLockOp op))
     return 0;
 }
 
+// ==> Start patch MPC
 int ff_lock_avcodec(AVCodecContext *log_ctx)
 {
     if (ff_lockmgr_cb) {
         if ((*ff_lockmgr_cb)(&codec_mutex, AV_LOCK_OBTAIN))
             return -1;
     }
-    entangled_thread_counter++;
-    if (entangled_thread_counter != 1) {
+    log_ctx->entangled_thread_counter++;
+    if (log_ctx->entangled_thread_counter != 1) {
         av_log(log_ctx, AV_LOG_ERROR, "Insufficient thread locking around avcodec_open/close()\n");
-        ff_avcodec_locked = 1;
-        ff_unlock_avcodec();
+        log_ctx->ff_avcodec_locked = 1;
+        ff_unlock_avcodec(log_ctx);
         return AVERROR(EINVAL);
     }
-    av_assert0(!ff_avcodec_locked);
-    ff_avcodec_locked = 1;
+    av_assert0(!log_ctx->ff_avcodec_locked);
+    log_ctx->ff_avcodec_locked = 1;
     return 0;
 }
+// ==> End patch MPC
 
-int ff_unlock_avcodec(void)
+// ==> Start patch MPC
+int ff_unlock_avcodec(AVCodecContext *log_ctx)
 {
-    av_assert0(ff_avcodec_locked);
-    ff_avcodec_locked = 0;
-    entangled_thread_counter--;
+    av_assert0(log_ctx->ff_avcodec_locked);
+    log_ctx->ff_avcodec_locked = 0;
+    log_ctx->entangled_thread_counter--;
     if (ff_lockmgr_cb) {
         if ((*ff_lockmgr_cb)(&codec_mutex, AV_LOCK_RELEASE))
             return -1;
     }
     return 0;
 }
+// ==> End patch MPC
 
 int avpriv_lock_avformat(void)
 {

@@ -146,7 +146,9 @@ void ff_packet_free_side_data(AVPacket *pkt);
 
 extern volatile int ff_avcodec_locked;
 int ff_lock_avcodec(AVCodecContext *log_ctx);
-int ff_unlock_avcodec(void);
+// ==> Start patch MPC
+int ff_unlock_avcodec(AVCodecContext *log_ctx);
+// ==> End patch MPC
 
 int avpriv_lock_avformat(void);
 int avpriv_unlock_avformat(void);
