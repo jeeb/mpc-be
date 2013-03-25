@@ -1490,8 +1490,11 @@ void CAppSettings::LoadShaders()
 
 					CString str;
 					shfile.ReadString(str); // read first string
-					if (str.Left(18) == _T("// $MinimumShaderProfile: ")) {
-						s.target = str.Mid(18).Trim(); // shader version property
+					if (str.Left(25) == _T("// $MinimumShaderProfile:")) {
+						s.target = str.Mid(25).Trim(); // shader version property
+					} else if (str.Left(18) == _T("// $ShaderVersion:")) {
+						// ignore and delete the old properties
+						fShadersNeedSave = true;
 					} else {
 						shfile.SeekToBegin();
 					}
