@@ -80,6 +80,7 @@ void CPPagePlayback::DoDataExchange(CDataExchange* pDX)
 	DDX_CBIndex(pDX, IDC_COMBOSPEEDSTEP, m_nSpeedStep);
 	DDX_Control(pDX, IDC_COMBOSPEEDSTEP, m_nSpeedStepCtrl);
 	DDX_Check(pDX, IDC_CHECK4, m_fUseInternalSelectTrackLogic);
+	DDX_Text(pDX, IDC_EDIT4, m_sAudioPaths);
 }
 
 BEGIN_MESSAGE_MAP(CPPagePlayback, CPPageBase)
@@ -92,6 +93,7 @@ BEGIN_MESSAGE_MAP(CPPagePlayback, CPPageBase)
 	ON_UPDATE_COMMAND_UI(IDC_EDIT3, OnUpdateTrackOrder)
 	ON_STN_DBLCLK(IDC_STATIC_BALANCE, OnBalanceTextDblClk)
 	ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
+	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedButton1)
 END_MESSAGE_MAP()
 
 // CPPagePlayback message handlers
@@ -118,6 +120,7 @@ BOOL CPPagePlayback::OnInitDialog()
 	m_iZoomLevel = s.iZoomLevel;
 	m_iRememberZoomLevel = s.fRememberZoomLevel;
 	m_fAutoloadAudio = s.fAutoloadAudio;
+	m_sAudioPaths = s.strAudioPaths;
 	m_fAutoloadSubtitles = s.fAutoloadSubtitles;
 	m_fEnableWorkerThreadForOpening = s.fEnableWorkerThreadForOpening;
 	m_fReportFailedPins = s.fReportFailedPins;
@@ -172,6 +175,7 @@ BOOL CPPagePlayback::OnApply()
 	s.iZoomLevel = m_iZoomLevel;
 	s.fRememberZoomLevel = !!m_iRememberZoomLevel;
 	s.fAutoloadAudio = !!m_fAutoloadAudio;
+	s.strAudioPaths = m_sAudioPaths;
 	s.fAutoloadSubtitles = !!m_fAutoloadSubtitles;
 	s.fEnableWorkerThreadForOpening = !!m_fEnableWorkerThreadForOpening;
 	s.fReportFailedPins = !!m_fReportFailedPins;
@@ -270,6 +274,15 @@ BOOL CPPagePlayback::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
 	*pResult = 0;
 
 	return TRUE;
+}
+
+void CPPagePlayback::OnBnClickedButton1()
+{
+	m_sAudioPaths = DEFAULT_AUDIO_PATHS;
+
+	UpdateData(FALSE);
+
+	SetModified();
 }
 
 void CPPagePlayback::OnCancel()

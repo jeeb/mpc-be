@@ -32,8 +32,9 @@ class CPPagePlayback : public CPPageBase
 {
 	DECLARE_DYNAMIC(CPPagePlayback)
 
-	//	private:
+	// private:
 	int m_oldVolume; //not very nice solution
+	CString m_sAudioPaths;
 
 public:
 	CPPagePlayback();
@@ -79,5 +80,6 @@ public:
 
 	afx_msg void OnBalanceTextDblClk();
 	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult);
+	afx_msg void OnBnClickedButton1();
 	virtual void OnCancel();
 };

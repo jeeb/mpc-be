@@ -132,6 +132,7 @@ enum MCE_RAW_INPUT {
 
 #define AS_MAX_CHANNELS 18 // from AudioSwitcher.h
 
+#define DEFAULT_AUDIO_PATHS    _T(".;.\\audio;.\\fandub")
 #define DEFAULT_SUBTITLE_PATHS _T(".;.\\subtitles;.\\subs")
 #define DEFAULT_JUMPDISTANCE_1  1000
 #define DEFAULT_JUMPDISTANCE_2  5000
@@ -507,6 +508,7 @@ public:
 	bool			fEnableWorkerThreadForOpening;
 	bool			fReportFailedPins;
 	bool			fAutoloadAudio;
+	CString			strAudioPaths;
 	bool			fAutoloadSubtitles;
 	bool			fBlockVSFilter;
 

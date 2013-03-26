@@ -24,6 +24,7 @@
 #include "stdafx.h"
 #include "PlayerPlaylist.h"
 #include "SettingsDefines.h"
+#include <atlpath.h>
 
 
 //
@@ -142,62 +143,103 @@ bool FindFileInList(CAtlList<CString>& sl, CString fn)
 	return(fFound);
 }
 
+void StringToPaths(const CString& curentdir, CString& str, CAtlArray<CString>& paths)
+{
+	int pos = 0;
+	do {
+		CString s = str.Tokenize(_T(";"), pos);
+		if (s.GetLength() == 0) {
+			continue;
+		}
+		CPath path = curentdir;
+		path.Append(s);
+		path.Canonicalize();
+		path.AddBackslash();
+
+		size_t index = 0;
+		size_t count = paths.GetCount();
+		for (; index < count; index++) {
+			if (path.m_strPath.CompareNoCase(paths[index]) == 0) {
+				break;
+			}
+		}
+		if (index == count) {
+			paths.Add(path);
+		}
+	} while (pos > 0);
+}
+
 void CPlaylistItem::AutoLoadFiles()
 {
 	if (m_fns.IsEmpty()) {
 		return;
 	}
 
-	CString fn = m_fns.GetHead();
+	CString& fn = m_fns.GetHead();
+	if (fn.Find(_T("://")) >= 0) { // skip URLs
+		return;
+	}
 
-	if (AfxGetAppSettings().fAutoloadAudio && fn.Find(_T("://")) < 0) {
-		int i = fn.ReverseFind('.');
-		if (i > 0) {
-			CMediaFormats& mf = AfxGetAppSettings().m_Formats;
+	int n = fn.ReverseFind('\\') + 1;
+	CString curdir = fn.Left(n);
+	CString name   = fn.Mid(n);
+	CString ext;
+	n = name.ReverseFind('.');
+	if (n >= 0) {
+		ext = name.Mid(n + 1).MakeLower();
+		name.Truncate(n);
+	}
 
-			CString ext = fn.Mid(i+1).MakeLower();
+	if (AfxGetAppSettings().fAutoloadAudio) {
+		CAtlArray<CString> paths;
+		StringToPaths(curdir, AfxGetAppSettings().strAudioPaths, paths);
 
-			if (!mf.FindExt(ext, true)) {
-				CString path = fn;
-				path.Replace('/', '\\');
-				path = path.Left(path.ReverseFind('\\')+1);
-
+		CMediaFormats& mf = AfxGetAppSettings().m_Formats;
+		if (!mf.FindExt(ext, true)) {
+			for (size_t i = 0; i < paths.GetCount(); i++) {
 				WIN32_FIND_DATA fd = {0};
-				HANDLE hFind = FindFirstFile(fn.Left(i) + _T("*.*"), &fd);
-				if (hFind != INVALID_HANDLE_VALUE) {
-					do {
-						if (fd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) {
-							continue;
-						}
 
-						CString fullpath = path + fd.cFileName;
-						CString ext2 = fullpath.Mid(fullpath.ReverseFind('.')+1).MakeLower();
-						if (!FindFileInList(m_fns, fullpath) && ext != ext2
-								&& mf.FindExt(ext2, true) && mf.IsUsingEngine(fullpath, DirectShow)) {
-							m_fns.AddTail(fullpath);
-						}
-					} while (FindNextFile(hFind, &fd));
+				HANDLE hFind;
+				for (int j = 1; j <= 2; j++) {
+					if (j == 1) {
+						hFind = FindFirstFile(paths[i] + name + _T(".*"), &fd);
+					} else { // if (j == 2) {
+						hFind = FindFirstFile(paths[i] + name + _T(".*.*"), &fd);
+					}
 
-					FindClose(hFind);
+					if (hFind != INVALID_HANDLE_VALUE) {
+						do {
+							if (fd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) {
+								continue;
+							}
+
+							CString ext2 = fd.cFileName;
+							n = ext2.ReverseFind('.');
+							if (n < 0) {
+								continue;
+							}
+							ext2 = ext2.Mid(n + 1).MakeLower();
+							CString fullpath = paths[i] + fd.cFileName;
+
+							if (ext != ext2 && mf.FindExt(ext2, true) && !FindFileInList(m_fns, fullpath) && mf.IsUsingEngine(fullpath, DirectShow)) {
+								m_fns.AddTail(fullpath);
+							}
+						} while (FindNextFile(hFind, &fd));
+
+						FindClose(hFind);
+					}
 				}
 			}
 		}
 	}
 
 	if (AfxGetAppSettings().fAutoloadSubtitles) {
-		CString& pathList = AfxGetAppSettings().strSubtitlePaths;
-
 		CAtlArray<CString> paths;
-
-		int pos = 0;
-		do {
-			CString path = pathList.Tokenize(_T(";"), pos);
-			paths.Add(path);
-		} while (pos != -1);
+		StringToPaths(curdir, AfxGetAppSettings().strSubtitlePaths, paths);
 
 		CString dir = fn;
 		dir.Replace('\\', '/');
-		int	l = fn.GetLength(), l2 = l;
+		int l = fn.GetLength(), l2 = l;
 		l2 = dir.ReverseFind('.');
 		l = dir.ReverseFind('/') + 1;
 		if (l2 < l) {
