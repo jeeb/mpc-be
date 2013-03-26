@@ -337,7 +337,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 28
 27		"Властивості"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 5		"Аудіо"
 6		"Гучність"
 7		"Мін."
@@ -363,6 +363,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 40
 34		"Аудіо"
 36		"Уподобання користувача щодо вибору:"
 38		"Крок зміни швидкості відтвор."
+41		"Reset"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
