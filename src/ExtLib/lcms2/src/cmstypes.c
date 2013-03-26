@@ -1675,21 +1675,30 @@ cmsBool Write8bitTables(cmsContext ContextID, cmsIOHANDLER* io, cmsUInt32Number 
 
         if (Tables) {
 
-            if (Tables ->TheCurves[i]->nEntries != 256) {
-                cmsSignalError(ContextID, cmsERROR_RANGE, "LUT8 needs 256 entries on prelinearization");
-                return FALSE;
+            // Usual case of identity curves
+            if ((Tables ->TheCurves[i]->nEntries == 2) && 
+                (Tables->TheCurves[i]->Table16[0] == 0) && 
+                (Tables->TheCurves[i]->Table16[1] == 65535)) {
+
+                    for (j=0; j < 256; j++) {
+                        if (!_cmsWriteUInt8Number(io, (cmsUInt8Number) j)) return FALSE;
+                    }
             }
+            else 
+                if (Tables ->TheCurves[i]->nEntries != 256) {
+                    cmsSignalError(ContextID, cmsERROR_RANGE, "LUT8 needs 256 entries on prelinearization");
+                    return FALSE;                
+                }
+                else
+                    for (j=0; j < 256; j++) {
 
-        }
+                        if (Tables != NULL)
+                            val = (cmsUInt8Number) FROM_16_TO_8(Tables->TheCurves[i]->Table16[j]);
+                        else
+                            val = (cmsUInt8Number) j;
 
-        for (j=0; j < 256; j++) {
-
-            if (Tables != NULL)
-                val = (cmsUInt8Number) FROM_16_TO_8(Tables->TheCurves[i]->Table16[j]);
-            else
-                val = (cmsUInt8Number) j;
-
-            if (!_cmsWriteUInt8Number(io, val)) return FALSE;
+                        if (!_cmsWriteUInt8Number(io, val)) return FALSE;
+                    }
         }
     }
     return TRUE;
@@ -5363,7 +5372,9 @@ static _cmsTagLinkedList SupportedTags[] = {
     { cmsSigScreeningTag,           { 1, 1, { cmsSigScreeningType},          NULL }, &SupportedTags[59]},
     { cmsSigVcgtTag,                { 1, 1, { cmsSigVcgtType},               NULL }, &SupportedTags[60]},
     { cmsSigMetaTag,                { 1, 1, { cmsSigDictType},               NULL }, &SupportedTags[61]},
-    { cmsSigProfileSequenceIdTag,   { 1, 1, { cmsSigProfileSequenceIdType},  NULL},  NULL}
+    { cmsSigProfileSequenceIdTag,   { 1, 1, { cmsSigProfileSequenceIdType},  NULL },  &SupportedTags[62]},
+    { cmsSigProfileDescriptionMLTag,{ 1, 1, { cmsSigMultiLocalizedUnicodeType}, NULL}, NULL}
+
 
 };
 
