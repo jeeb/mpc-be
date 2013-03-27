@@ -62,7 +62,7 @@ public:
 	CBaseVideoFilter(TCHAR* pName, LPUNKNOWN lpunk, HRESULT* phr, REFCLSID clsid, long cBuffers = 1);
 	virtual ~CBaseVideoFilter();
 
-	HRESULT ReconnectOutput(int w, int h, bool bSendSample = true, bool bForce = false, REFERENCE_TIME AvgTimePerFrame = 0, int RealWidth = -1, int RealHeight = -1);
+	HRESULT ReconnectOutput(int w, int h, bool bSendSample = true, bool bForce = false, REFERENCE_TIME AvgTimePerFrame = 0, int RealWidth = -1, int RealHeight = -1, bool DXVA1 = false);
 	int GetPinCount();
 	CBasePin* GetPin(int n);
 

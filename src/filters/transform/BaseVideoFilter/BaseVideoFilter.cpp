@@ -162,7 +162,7 @@ HRESULT CBaseVideoFilter::GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, 
 	return S_OK;
 }
 
-HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool bForce, REFERENCE_TIME AvgTimePerFrame, int RealWidth, int RealHeight)
+HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool bForce, REFERENCE_TIME AvgTimePerFrame, int RealWidth, int RealHeight, bool DXVA1)
 {
 	CMediaType& mt = m_pOutput->CurrentMediaType();
 
@@ -252,7 +252,7 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 		bmi->biHeight		= m_h;
 		bmi->biSizeImage	= m_w*m_h*bmi->biBitCount>>3;
 
-		bool bDXVA			= (bmi->biCompression == mmioFOURCC('d','x','v','a'));
+		bool bDXVA			= !DXVA1 && (bmi->biCompression == mmioFOURCC('d','x','v','a'));
 		hr = m_pOutput->GetConnected()->QueryAccept(&mt);
 		ASSERT(SUCCEEDED(hr)); // should better not fail, after all "mt" is the current media type, just with a different resolution
 		HRESULT hr1 = 0;
