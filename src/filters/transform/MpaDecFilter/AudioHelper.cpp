@@ -349,7 +349,7 @@ HRESULT convert_to_float(enum AVSampleFormat avsf, WORD nChannels, DWORD nSample
 		case AV_SAMPLE_FMT_U8P:
 			for (size_t i = 0; i < nSamples; ++i) {
 				for (int ch = 0; ch < nChannels; ++ch) {
-					*pOut++ = (float)(((int8_t*)pIn)[nSamples * ch + i] ^ 0x80) / INT8_PEAK;
+					*pOut++ = (float)(((int8_t*)pIn)[nSamples * ch + i] ^ 0x80)/ INT8_PEAK;
 				}
 			}
 			break;
@@ -395,7 +395,7 @@ HRESULT convert_to_planar_float(enum AVSampleFormat avsf, WORD nChannels, DWORD 
 		case AV_SAMPLE_FMT_U8:
 			for (int ch = 0; ch < nChannels; ++ch) {
 				for (size_t i = 0; i < nSamples; ++i) {
-					*pOut++ = (float)(((int8_t*)pIn)[nChannels * i + ch] ^ 0x80) / INT8_PEAK;
+					*pOut++ = (float)(((int8_t*)pIn)[nChannels * i + ch] ^ 0x80)/ INT8_PEAK;
 				}
 			}
 			break;

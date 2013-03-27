@@ -23,10 +23,13 @@
 #include "stdafx.h"
 #include "Mixer.h"
 
+#pragma warning(disable: 4005)
 extern "C" {
 #include "ffmpeg/libavresample/avresample.h"
+#include "ffmpeg/libavutil/samplefmt.h"
 #include "ffmpeg/libavutil/opt.h"
 }
+#pragma warning(default: 4005)
 #include "AudioHelper.h"
 
 CMixer::CMixer()
@@ -158,7 +161,7 @@ void CMixer::Init(AVSampleFormat in_avsf, DWORD in_layout, DWORD out_layout, flo
 	}
 
 #ifdef _DEBUG
-	CString matrix_str = _T("Mixer: matrix\n");
+	CString matrix_str = _T("Mixer: matrix\n");;
 	for (int j = 0; j < out_ch; j++) {
 		matrix_str.AppendFormat(_T("%d:"), j + 1);
 		for (int i = 0; i < in_ch; i++) {
