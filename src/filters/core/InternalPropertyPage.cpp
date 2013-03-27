@@ -95,7 +95,9 @@ BOOL CInternalPropertyPageWnd::Create(IPropertyPageSite* pPageSite, LPCRECT pRec
 BOOL CInternalPropertyPageWnd::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
 	if (message == WM_COMMAND || message == WM_HSCROLL || message == WM_VSCROLL) {
-		SetDirty(true);
+		if (HIWORD(wParam) != CBN_SETFOCUS && HIWORD(wParam) != CBN_KILLFOCUS) {
+			SetDirty(true);
+		}
 	}
 
 	return __super::OnWndMsg(message, wParam, lParam, pResult);
