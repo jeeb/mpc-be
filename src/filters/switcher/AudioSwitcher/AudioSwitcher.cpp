@@ -26,7 +26,8 @@
 #include <math.h>
 #include <MMReg.h>
 #include "AudioSwitcher.h"
-#include "Audio.h"
+//r/#include "Audio.h"
+#include "../../transform/MpaDecFilter/Mixer.h"
 #include "../../../DSUtil/DSUtil.h"
 
 #ifdef REGISTER_FILTER
@@ -85,7 +86,7 @@ CFilterApp theApp;
 CAudioSwitcherFilter::CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CStreamSwitcherFilter(lpunk, phr, __uuidof(this))
 	, m_fCustomChannelMapping(false)
-	, m_fDownSampleTo441(false)
+	, m_dwResampleFreq(0)
 	, m_rtAudioTimeShift(0)
 	, m_rtNextStart(0)
 	, m_rtNextStop(1)
@@ -341,10 +342,28 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		}
 	}
 
-	if (m_fDownSampleTo441
-			&& wfe->nSamplesPerSec > 44100 && wfeout->nSamplesPerSec == 44100
-			&& wfe->wBitsPerSample <= 16 && fPCM) {
-		if (BYTE* buff = DNew BYTE[len*bps]) {
+	if (m_dwResampleFreq && wfe->nSamplesPerSec != wfeout->nSamplesPerSec && wfe->wBitsPerSample != 24) {
+		AVSampleFormat avsf = AV_SAMPLE_FMT_NONE;
+		if (fFloat) {
+
+			avsf = 
+		} else {
+
+		m_Resample.Update();
+
+		m_Mixer.Update(avsf, dwChannelMask, new_layout, 0.0f, nSamplesPerSec, new_samplerate);
+		int added = m_Mixer.CalcOutSamples(nSamples) * new_channels;
+		m_encbuff.SetCount(remain + added);
+		p = m_encbuff.GetData() + remain;
+
+		added = m_Mixer.Mixing(p, added, pBuff, nSamples) * new_channels;
+		if (added <= 0) {
+			m_encbuff.SetCount(remain);
+			return S_OK;
+		}
+		m_encbuff.SetCount(remain + added);
+
+		/*if (BYTE* buff = DNew BYTE[len*bps]) {
 			for (int ch = 0; ch < wfeout->nChannels; ch++) {
 				memset(buff, 0, len*bps);
 
@@ -352,7 +371,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 					memcpy(buff + i*bps, (char*)pDataOut + (ch + i*wfeout->nChannels)*bps, bps);
 				}
 
-				m_pResamplers[ch]->Downsample(buff, len, buff, lenout);
+				//r/m_pResamplers[ch]->Downsample(buff, len, buff, lenout);
 
 				for (int i = 0; i < lenout; i++) {
 					memcpy((char*)pDataOut + (ch + i*wfeout->nChannels)*bps, buff + i*bps, bps);
@@ -360,7 +379,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 			}
 
 			delete [] buff;
-		}
+		}*/
 	}
 
 	if (m_fNormalize || m_boost_mul > 1) {
@@ -489,11 +508,9 @@ CMediaType CAudioSwitcherFilter::CreateNewOutputMediaType(CMediaType mt, long& c
 
 	WAVEFORMATEX* wfeout = (WAVEFORMATEX*)mt.pbFormat;
 
-	if (m_fDownSampleTo441) {
-		if (wfeout->nSamplesPerSec > 44100 && wfeout->wBitsPerSample <= 16) {
-			wfeout->nSamplesPerSec = 44100;
-			wfeout->nAvgBytesPerSec = wfeout->nBlockAlign*wfeout->nSamplesPerSec;
-		}
+	if (m_dwResampleFreq) {
+		wfeout->nSamplesPerSec = m_dwResampleFreq;
+		wfeout->nAvgBytesPerSec = wfeout->nBlockAlign*wfeout->nSamplesPerSec;
 	}
 
 	int bps = wfe->wBitsPerSample>>3;
@@ -512,11 +529,11 @@ void CAudioSwitcherFilter::OnNewOutputMediaType(const CMediaType& mtIn, const CM
 	const WAVEFORMATEX* wfe = (WAVEFORMATEX*)mtIn.pbFormat;
 	const WAVEFORMATEX* wfeout = (WAVEFORMATEX*)mtOut.pbFormat;
 
-	m_pResamplers.RemoveAll();
+	//r/m_pResamplers.RemoveAll();
 	for (int i = 0; i < wfeout->nChannels; i++) {
-		CAutoPtr<AudioStreamResampler> pResampler;
-		pResampler.Attach(DNew AudioStreamResampler(wfeout->wBitsPerSample>>3, wfe->nSamplesPerSec, wfeout->nSamplesPerSec, true));
-		m_pResamplers.Add(pResampler);
+		//r/CAutoPtr<AudioStreamResampler> pResampler;
+		//r/pResampler.Attach(DNew AudioStreamResampler(wfeout->wBitsPerSample>>3, wfe->nSamplesPerSec, wfeout->nSamplesPerSec, true));
+		//r/m_pResamplers.Add(pResampler);
 	}
 
 	TRACE(_T("CAudioSwitcherFilter::OnNewOutputMediaType\n"));
@@ -601,16 +618,16 @@ STDMETHODIMP_(int) CAudioSwitcherFilter::GetNumberOfInputChannels()
 	return pInPin ? ((WAVEFORMATEX*)pInPin->CurrentMediaType().pbFormat)->nChannels : 0;
 }
 
-STDMETHODIMP_(bool) CAudioSwitcherFilter::IsDownSamplingTo441Enabled()
+STDMETHODIMP_(DWORD) CAudioSwitcherFilter::GetResampling()
 {
-	return m_fDownSampleTo441;
+	return m_dwResampleFreq;
 }
 
-STDMETHODIMP CAudioSwitcherFilter::EnableDownSamplingTo441(bool fEnable)
+STDMETHODIMP CAudioSwitcherFilter::SetResampling(DWORD samplerate)
 {
-	if (m_fDownSampleTo441 != fEnable) {
+	if (m_dwResampleFreq != samplerate) {
 		PauseGraph;
-		m_fDownSampleTo441 = fEnable;
+		m_dwResampleFreq = samplerate;
 		ResumeGraph;
 	}
 

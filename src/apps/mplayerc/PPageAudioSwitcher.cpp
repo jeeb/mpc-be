@@ -184,7 +184,9 @@ BOOL CPPageAudioSwitcher::OnApply()
 
 	if (m_pASF) {
 		m_pASF->SetSpeakerConfig(s.fCustomChannelMapping, s.pSpeakerToChannelMap);
-		m_pASF->EnableDownSamplingTo441(s.fDownSampleTo441);
+		if (s.fDownSampleTo441) {
+			m_pASF->SetResampling(44100);
+		}
 		m_pASF->SetAudioTimeShift(s.fAudioTimeShift ? 10000i64*s.iAudioTimeShift : 0);
 		m_pASF->SetNormalizeBoost(s.fAudioNormalize, s.fAudioNormalizeRecover, s.dAudioBoost_dB);
 	}

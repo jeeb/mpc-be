@@ -22,6 +22,10 @@
 
 #pragma once
 
+#pragma warning(disable: 4005)
+#include "ffmpeg/libavutil/samplefmt.h"
+#pragma warning(default: 4005)
+
 struct AVAudioResampleContext;
 
 class CMixer
