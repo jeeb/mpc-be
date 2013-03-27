@@ -201,7 +201,6 @@ static void unref_picture(H264Context *h, Picture *pic)
     if (!pic->f.data[0])
         return;
 
-    pic->period_since_free = 0;
     ff_thread_release_buffer(h->avctx, &pic->tf);
     av_buffer_unref(&pic->hwaccel_priv_buf);
 
@@ -281,7 +280,6 @@ static int ref_picture(H264Context *h, Picture *dst, Picture *src)
     dst->needs_realloc           = src->needs_realloc;
     dst->reference               = src->reference;
     dst->sync                    = src->sync;
-    dst->period_since_free       = src->period_since_free;
 
     return 0;
 fail:
@@ -400,10 +398,6 @@ fail:
 
 static inline int pic_is_unused(H264Context *h, Picture *pic)
 {
-    if (   (h->avctx->active_thread_type & FF_THREAD_FRAME)
-        && pic->f.qscale_table //check if the frame has anything allocated
-        && pic->period_since_free < h->avctx->thread_count)
-        return 0;
     if (pic->f.data[0] == NULL)
         return 1;
     if (pic->needs_realloc && !(pic->reference & DELAYED_PIC_REF))
@@ -1732,7 +1726,6 @@ static int decode_update_thread_context(AVCodecContext *dst,
     h->low_delay            = h1->low_delay;
 
     for (i = 0; h->DPB && i < MAX_PICTURE_COUNT; i++) {
-        h->DPB[i].period_since_free ++;
         unref_picture(h, &h->DPB[i]);
         if (h1->DPB[i].f.data[0] &&
             (ret = ref_picture(h, &h->DPB[i], &h1->DPB[i])) < 0)
@@ -2082,7 +2075,7 @@ static void decode_postinit(H264Context *h, int setup_finished)
         h->sync |= 2;
     }
 
-    if (setup_finished)
+    if (setup_finished && !h->avctx->hwaccel)
         ff_thread_finish_setup(h->avctx);
 }
 
