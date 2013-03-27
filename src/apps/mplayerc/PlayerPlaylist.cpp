@@ -113,14 +113,7 @@ CString CPlaylistItem::GetLabel(int i)
 			REFERENCE_TIME rt = m_duration;
 
 			if (rt > 0) {
-				rt = (rt + 5000000) / 10000000;
-				int ss = int(rt%60);
-				rt /= 60;
-				int mm = int(rt%60);
-				rt /= 60;
-				int hh = int(rt);
-
-				str.Format(_T("%02d:%02d:%02d"), hh, mm, ss);
+				str = ReftimeToString2(rt);
 			}
 		} else if (m_type == device) {
 			// TODO
