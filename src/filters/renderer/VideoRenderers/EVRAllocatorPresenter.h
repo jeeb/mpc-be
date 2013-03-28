@@ -219,6 +219,8 @@ namespace DSObjects
 		UINT									m_piAvg;
 		UINT									m_piDev;
 
+		bool									m_bChangeMT;
+
 		void									GetMixerThread();
 		static DWORD WINAPI						GetMixerThreadStatic(LPVOID lpParam);
 

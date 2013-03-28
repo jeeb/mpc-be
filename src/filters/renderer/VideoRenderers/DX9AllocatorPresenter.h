@@ -300,6 +300,8 @@ namespace DSObjects
 
 		CString					m_Decoder;
 
+		CString					m_InputVCodec;
+
 	public:
 		CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, bool bIsEVR, CString &_Error);
 		~CDX9AllocatorPresenter();

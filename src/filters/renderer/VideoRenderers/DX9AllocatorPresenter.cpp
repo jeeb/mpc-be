@@ -68,6 +68,7 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_hEvtQuit(NULL)
 	, m_bIsFullscreen(bFullscreen)
 	, m_Decoder(_T(""))
+	, m_InputVCodec(_T(""))
 	, m_nRenderState(Undefined)
 {
 	HINSTANCE		hDll;
@@ -2230,7 +2231,6 @@ void CDX9AllocatorPresenter::DrawStats()
 				}
 			}
 
-
 			strText.Format(L"%-13s: %s", GetDXVAVersion(), GetDXVADecoderDescription());
 			DrawText(rc, strText, 1);
 			OffsetRect (&rc, 0, TextHeight);
@@ -2239,14 +2239,20 @@ void CDX9AllocatorPresenter::DrawStats()
 			DrawText(rc, strText, 1);
 			OffsetRect (&rc, 0, TextHeight);
 
-			if (m_D3D9Device != _T("")) {
+			if (!m_D3D9Device.IsEmpty()) {
 				strText = "Render device: " + m_D3D9Device;
 				DrawText(rc, strText, 1);
 				OffsetRect (&rc, 0, TextHeight);
 			}
 
-			if (m_Decoder != _T("")) {
+			if (!m_Decoder.IsEmpty()) {
 				strText = "Decoder      : " + m_Decoder;
+				DrawText(rc, strText, 1);
+				OffsetRect (&rc, 0, TextHeight);
+			}
+
+			if (!m_InputVCodec.IsEmpty()) {
+				strText = "Input Type   : " + m_InputVCodec;
 				DrawText(rc, strText, 1);
 				OffsetRect (&rc, 0, TextHeight);
 			}

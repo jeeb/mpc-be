@@ -173,6 +173,7 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	ZeroMemory(m_VSyncOffsetHistory, sizeof(m_VSyncOffsetHistory));
 	m_VSyncOffsetHistoryPos = 0;
 	m_bLastSampleOffsetValid	= false;
+	m_bChangeMT					= false;
 }
 
 CEVRAllocatorPresenter::~CEVRAllocatorPresenter(void)
@@ -752,23 +753,14 @@ HRESULT CEVRAllocatorPresenter::CreateProposedOutputType(IMFMediaType* pMixerTyp
 
 	bool bDoneSomething = true;
 
-	if (m_AspectRatio.cx >= 1 && m_AspectRatio.cy >= 1) { //if any of these is 0, it will stuck into a infinite loop
-		while (bDoneSomething) {
-			bDoneSomething = false;
-			INT MinNum = min(m_AspectRatio.cx, m_AspectRatio.cy);
-			INT i;
-			for (i = 2; i < MinNum+1; ++i) {
-				if (m_AspectRatio.cx%i == 0 && m_AspectRatio.cy%i ==0) {
-					break;
-				}
-			}
-			if (i != MinNum + 1) {
-				m_AspectRatio.cx = m_AspectRatio.cx / i;
-				m_AspectRatio.cy = m_AspectRatio.cy / i;
-				bDoneSomething = true;
-			}
+	if (m_AspectRatio.cx >= 1 && m_AspectRatio.cy >= 1) {
+		int lnko = LNKO(m_AspectRatio.cx, m_AspectRatio.cy);
+		if (lnko > 1) {
+			m_AspectRatio.cx /= lnko, m_AspectRatio.cy /= lnko;
 		}
 	}
+
+	AfxGetApp()->m_pMainWnd->PostMessage(WM_REARRANGERENDERLESS);
 
 	pMixerType->FreeRepresentation (FORMAT_MFVideoFormat, (void*)pAMMedia);
 	m_pMediaType->QueryInterface (__uuidof(IMFMediaType), (void**) pType);
@@ -1051,6 +1043,9 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 
 	pMixerType	= NULL;
 	pType		= NULL;
+
+	m_bChangeMT	= true;
+
 	return hr;
 }
 
@@ -1554,16 +1549,16 @@ void CEVRAllocatorPresenter::GetMixerThread()
 					CAutoLock AutoLock(&m_ImageProcessingLock);
 					bDoneSomething = GetImageFromMixer();
 				}
-				if (m_rtTimePerFrame == 0 && bDoneSomething) {
+				if ((m_rtTimePerFrame == 0 && bDoneSomething)
+					|| m_bChangeMT) {
 					//CAutoLock lock(this);
 					//CAutoLock lock2(&m_ImageProcessingLock);
 					//CAutoLock cRenderLock(&m_RenderLock);
 
 					// Use the code from VMR9 to get the movie fps, as this method is reliable.
-					CComPtr<IPin>			pPin;
-					CMediaType				mt;
-					if (
-						SUCCEEDED (m_pOuterEVR->FindPin(L"EVR Input0", &pPin)) &&
+					CComPtr<IPin>	pPin;
+					CMediaType		mt;
+					if (SUCCEEDED (m_pOuterEVR->FindPin(L"EVR Input0", &pPin)) &&
 						SUCCEEDED (pPin->ConnectionMediaType(&mt)) ) {
 
 						ExtractAvgTimePerFrame (&mt, m_rtTimePerFrame);
@@ -1573,6 +1568,11 @@ void CEVRAllocatorPresenter::GetMixerThread()
 						CComPtr<IPin> pPinTo;
 						if (SUCCEEDED(pPin->ConnectedTo(&pPinTo)) && pPinTo) {
 							m_Decoder = GetFilterName(GetFilterFromPin(pPinTo));
+						}
+
+						BITMAPINFOHEADER bih;
+						if (ExtractBIH(&mt, &bih)) {
+							m_InputVCodec = CMediaTypeEx(mt).GetVideoCodecName(mt.subtype, bih.biCompression);
 						}
 					}
 					// If framerate not set by Video Decoder choose 23.97...
@@ -1586,8 +1586,8 @@ void CEVRAllocatorPresenter::GetMixerThread()
 						m_pSubPicQueue->SetFPS(m_fps);
 					}
 
+					m_bChangeMT = false;
 				}
-
 			}
 			break;
 		}

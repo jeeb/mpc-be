@@ -357,9 +357,19 @@ STDMETHODIMP CVMR9AllocatorPresenter::PresentImage(DWORD_PTR dwUserID, VMR9Prese
 				SUCCEEDED (pPin->ConnectionMediaType(&mt)) ) {
 			ExtractAvgTimePerFrame (&mt, m_rtTimePerFrame);
 
+			CComPtr<IPin> pPinTo;
+			if (SUCCEEDED(pPin->ConnectedTo(&pPinTo)) && pPinTo) {
+				m_Decoder = GetFilterName(GetFilterFromPin(pPinTo));
+			}
+
+			BITMAPINFOHEADER bih;
+			if (ExtractBIH(&mt, &bih)) {
+				m_InputVCodec = CMediaTypeEx(mt).GetVideoCodecName(mt.subtype, bih.biCompression);
+			}
+
 			CSize NativeVideoSize = m_NativeVideoSize;
 			CSize AspectRatio = m_AspectRatio;
-			if (mt.formattype==FORMAT_VideoInfo || mt.formattype==FORMAT_MPEGVideo) {
+			if (mt.formattype == FORMAT_VideoInfo || mt.formattype == FORMAT_MPEGVideo) {
 				VIDEOINFOHEADER *vh = (VIDEOINFOHEADER*)mt.pbFormat;
 
 				NativeVideoSize = CSize(vh->bmiHeader.biWidth, abs(vh->bmiHeader.biHeight));
@@ -374,7 +384,7 @@ STDMETHODIMP CVMR9AllocatorPresenter::PresentImage(DWORD_PTR dwUserID, VMR9Prese
 				} else if (vh->rcSource.bottom - vh->rcSource.top > 0) {
 					NativeVideoSize.cy = vh->rcSource.bottom - vh->rcSource.top;
 				}
-			} else if (mt.formattype==FORMAT_VideoInfo2 || mt.formattype==FORMAT_MPEG2Video) {
+			} else if (mt.formattype == FORMAT_VideoInfo2 || mt.formattype == FORMAT_MPEG2Video) {
 				VIDEOINFOHEADER2 *vh = (VIDEOINFOHEADER2*)mt.pbFormat;
 
 				if (vh->dwPictAspectRatioX && vh->dwPictAspectRatioY) {
