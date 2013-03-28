@@ -196,6 +196,8 @@ protected:
 	HRESULT				ReopenVideo();
 	HRESULT				FindDecoderConfiguration();
 
+	HRESULT				InitDecoder(const CMediaType *pmt);
+
 public:
 
 	const static AMOVIESETUP_MEDIATYPE		sudPinTypesIn[];
@@ -307,7 +309,7 @@ public:
 	inline bool					IsEvo()					{ return m_bIsEVO; };
 	inline DWORD				GetPCIVendor()			{ return m_nPCIVendor; };
 	inline double				GetRate()				{ return m_dRate; };
-	bool						IsDXVASupported();
+	bool						IsDXVASupported(bool bForceSoftware = false);
 	void						UpdateAspectRatio();
 	void						ReorderBFrames(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
 	void						FlushDXVADecoder()	{

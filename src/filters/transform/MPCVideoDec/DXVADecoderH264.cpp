@@ -87,6 +87,8 @@ void CDXVADecoderH264::Init()
 		default :
 			ASSERT(FALSE);
 	}
+
+	Flush();
 }
 
 void CDXVADecoderH264::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize)

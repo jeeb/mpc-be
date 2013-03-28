@@ -77,6 +77,8 @@ void CDXVADecoderVC1::Init()
 	}
 
 	m_bFrame_repeat_pict = FALSE;
+
+	Flush();
 }
 
 // === Public functions

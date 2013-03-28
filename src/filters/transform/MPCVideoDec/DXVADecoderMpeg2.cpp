@@ -78,7 +78,8 @@ void CDXVADecoderMpeg2::Init()
 
 	m_pMPEG2Buffer			= NULL;
 	m_nMPEG2BufferSize		= 0;
-	ResetBuffer();
+
+	NewSegment();
 }
 
 HRESULT CDXVADecoderMpeg2::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
@@ -238,13 +239,6 @@ void CDXVADecoderMpeg2::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nS
 void CDXVADecoderMpeg2::Flush()
 {
 	m_nNextCodecIndex = INT_MIN;
-
-	if (m_wRefPictureIndex[0] != NO_REF_FRAME) {
-		RemoveRefFrame (m_wRefPictureIndex[0]);
-	}
-	if (m_wRefPictureIndex[1] != NO_REF_FRAME) {
-		RemoveRefFrame (m_wRefPictureIndex[1]);
-	}
 
 	m_wRefPictureIndex[0]	= NO_REF_FRAME;
 	m_wRefPictureIndex[1]	= NO_REF_FRAME;

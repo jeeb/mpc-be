@@ -81,6 +81,8 @@ void CDXVADecoder::Init(CMPCVideoDecFilter* pFilter, DXVAMode nMode, int nPicEnt
 
 	memset (&m_DXVA1BufferInfo, 0, sizeof(m_DXVA1BufferInfo));
 	memset (&m_ExecuteParams, 0, sizeof(m_ExecuteParams));
+
+	Flush();
 }
 
 // === Public functions
@@ -731,6 +733,8 @@ HRESULT CDXVADecoder::GetFreeSurfaceIndex(int& nSurfaceIndex, IMediaSample** ppS
 
 void CDXVADecoder::FreePictureSlot (int nSurfaceIndex)
 {
+	ASSERT (nSurfaceIndex < m_nPicEntryNumber);
+
 	m_pPictureStore[nSurfaceIndex].dwDisplayCount	= m_dwDisplayCount++;
 	m_pPictureStore[nSurfaceIndex].bInUse			= false;
 	m_pPictureStore[nSurfaceIndex].bDisplayed		= false;

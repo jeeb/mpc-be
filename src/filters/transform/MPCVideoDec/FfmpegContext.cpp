@@ -713,6 +713,9 @@ int	MPEG2CheckCompatibility (struct AVCodecContext* pAVCtx, struct AVFrame* pFra
 	avpkt.flags		= AV_PKT_FLAG_KEY;
 	int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
 
+	// restore codec_id value, it's can be changed to AV_CODEC_ID_MPEG1VIDEO on .wtv/.dvr-ms + StreamBufferSource (possible broken extradata)
+	pAVCtx->codec_id = AV_CODEC_ID_MPEG2VIDEO;
+
 	return (s->chroma_format<2);
 }
 
