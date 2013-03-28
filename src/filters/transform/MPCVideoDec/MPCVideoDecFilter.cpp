@@ -2801,19 +2801,16 @@ HRESULT CMPCVideoDecFilter::CreateDXVA2Decoder(UINT nNumRenderTargets, IDirect3D
 	hr = m_pDecoderService->CreateVideoDecoder (m_DXVADecoderGUID, &m_VideoDesc, &m_DXVA2Config,
 			pDecoderRenderTargets, nNumRenderTargets, &pDirectXVideoDec);
 
-	if (SUCCEEDED (hr)) {
+	if (SUCCEEDED(hr)) {
+		// need recreate dxva decoder after "stop" on Intel HD Graphics
+		SAFE_DELETE (m_pDXVADecoder);
+		m_pDXVADecoder = CDXVADecoder::CreateDecoder(this, pDirectXVideoDec, &m_DXVADecoderGUID, GetPicEntryNumber(), &m_DXVA2Config);
 		if (m_pDXVADecoder) {
-			SAFE_DELETE (m_pDXVADecoder);
+			m_pDXVADecoder->SetExtraData((BYTE*)m_pAVCtx->extradata, m_pAVCtx->extradata_size);
+			m_pDXVADecoder->SetDirectXVideoDec(pDirectXVideoDec);
+		} else {
+			hr = E_FAIL;
 		}
-
-		if (!m_pDXVADecoder) {
-			m_pDXVADecoder	= CDXVADecoder::CreateDecoder (this, pDirectXVideoDec, &m_DXVADecoderGUID, GetPicEntryNumber(), &m_DXVA2Config);
-			if (m_pDXVADecoder) {
-				m_pDXVADecoder->SetExtraData ((BYTE*)m_pAVCtx->extradata, m_pAVCtx->extradata_size);
-			}
-		}
-
-		m_pDXVADecoder->SetDirectXVideoDec (pDirectXVideoDec);
 	}
 
 	return hr;
