@@ -1607,13 +1607,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 				dynamic_cast<CVideoDecOutputPin*>(m_pOutput)->Recommit();
 				m_nDXVAMode = MODE_DXVA2;
 			} else {
-				if (IsDXVASupported() || m_nDXVAMode != MODE_SOFTWARE) {
-					HRESULT hr;
-					if (FAILED(hr = ReopenVideo())) {
-						return hr;
-					}
-				}
-				m_nDXVAMode = MODE_SOFTWARE;
+				SAFE_DELETE (m_pDXVADecoder);
 			}
 		}
 	}
@@ -1868,7 +1862,7 @@ HRESULT CMPCVideoDecFilter::EndOfStream()
 	if (m_nDXVAMode == MODE_SOFTWARE) {
 		REFERENCE_TIME rtStart = 0, rtStop = 0;
 		SoftwareDecode(NULL, NULL, 0, rtStart, rtStop);
-	} else if (m_nDXVAMode == MODE_DXVA2) { // TODO - need check under WinXP on DXVA1
+	} else if (m_nDXVAMode == MODE_DXVA2 && m_pDXVADecoder) { // TODO - need check under WinXP on DXVA1
 		m_pDXVADecoder->EndOfStream();
 	}
 
