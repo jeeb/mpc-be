@@ -136,7 +136,7 @@ bool FindFileInList(CAtlList<CString>& sl, CString fn)
 	return(fFound);
 }
 
-void StringToPaths(const CString& curentdir, CString& str, CAtlArray<CString>& paths)
+void StringToPaths(const CString& curentdir, const CString& str, CAtlArray<CString>& paths)
 {
 	int pos = 0;
 	do {
@@ -160,6 +160,22 @@ void StringToPaths(const CString& curentdir, CString& str, CAtlArray<CString>& p
 			paths.Add(path);
 		}
 	} while (pos > 0);
+}
+
+bool isSubExt(const CString& ext)
+{
+	static const TCHAR* subext[] = {
+		_T("srt"), _T("sub"), _T("smi"), _T("psb"),
+		_T("ssa"), _T("ass"), _T("idx"), _T("usf"),
+		_T("xss"), _T("txt"), _T("rt"), _T("sup")
+	};
+
+	for (size_t i = 0; i < _countof(subext); i++) {
+		if (ext.CompareNoCase(subext[i]) == 0) {
+			return true;
+		}
+	}
+	return false;
 }
 
 void CPlaylistItem::AutoLoadFiles()
@@ -230,23 +246,38 @@ void CPlaylistItem::AutoLoadFiles()
 		CAtlArray<CString> paths;
 		StringToPaths(curdir, AfxGetAppSettings().strSubtitlePaths, paths);
 
-		CString dir = fn;
-		dir.Replace('\\', '/');
-		int l = fn.GetLength(), l2 = l;
-		l2 = dir.ReverseFind('.');
-		l = dir.ReverseFind('/') + 1;
-		if (l2 < l) {
-			l2 = l;
-		}
-		CString title = dir.Mid(l, l2-l);
-		paths.Add(title.GetString());
+		for (size_t i = 0; i < paths.GetCount(); i++) {
+			WIN32_FIND_DATA fd = {0};
 
-		CAtlArray<SubFile> ret;
-		GetSubFileNames(fn, paths, ret);
+			HANDLE hFind;
+			for (int j = 1; j <= 2; j++) {
+				if (j == 1) {
+					hFind = FindFirstFile(paths[i] + name + _T(".*"), &fd);
+				} else { // if (j == 2) {
+					hFind = FindFirstFile(paths[i] + name + _T(".*.*"), &fd);
+				}
 
-		for (size_t i = 0; i < ret.GetCount(); i++) {
-			if (!FindFileInList(m_subs, ret[i].fn)) {
-				m_subs.AddTail(ret[i].fn);
+				if (hFind != INVALID_HANDLE_VALUE) {
+					do {
+						if (fd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) {
+							continue;
+						}
+
+						CString ext2 = fd.cFileName;
+						n = ext2.ReverseFind('.');
+						if (n < 0) {
+							continue;
+						}
+						ext2 = ext2.Mid(n + 1).MakeLower();
+						CString fullpath = paths[i] + fd.cFileName;
+
+						if (ext != ext2 && isSubExt(ext2) && !FindFileInList(m_subs, fullpath)) {
+							m_subs.AddTail(fullpath);
+						}
+					} while (FindNextFile(hFind, &fd));
+
+					FindClose(hFind);
+				}
 			}
 		}
 	}
