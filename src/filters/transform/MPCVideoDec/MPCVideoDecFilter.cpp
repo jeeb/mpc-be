@@ -2552,6 +2552,7 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 				hr = m_pDXVADecoder->DecodeFrame (pDataIn, nSize, rtStart, rtStop);
 
 				if (width != PictWidthRounded() || Height != PictHeightRounded()) {
+					FindDecoderConfiguration();
 					dynamic_cast<CVideoDecOutputPin*>(m_pOutput)->Recommit();
 					ReconnectOutput(PictWidth(), PictHeight());
 				}

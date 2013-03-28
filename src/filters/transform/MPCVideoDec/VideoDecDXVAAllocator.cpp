@@ -106,6 +106,8 @@ CVideoDecDXVAAllocator::~CVideoDecDXVAAllocator()
 
 HRESULT CVideoDecDXVAAllocator::Alloc()
 {
+	TRACE(_T("CVideoDecDXVAAllocator::Alloc()\n"));
+
 	HRESULT hr;
 	CComPtr<IDirectXVideoDecoderService> pDXVA2Service;
 
@@ -180,6 +182,8 @@ HRESULT CVideoDecDXVAAllocator::Alloc()
 
 void CVideoDecDXVAAllocator::Free()
 {
+	TRACE(_T("CVideoDecDXVAAllocator::Free()\n"));
+
 	CMediaSample *pSample = NULL;
 
 	m_pVideoDecFilter->FlushDXVADecoder();
