@@ -710,6 +710,8 @@ Note: when adding a new codec, you have to:
 #define CONFIG_EATGQ_DECODER 0
 #define CONFIG_MPEG4_VDPAU_DECODER 0
 #define CONFIG_H264_VDPAU_DECODER 0
+#define CONFIG_MPEG_VDPAU_DECODER 0
+#define CONFIG_MPEG1_VDPAU_DECODER 0
 #define CONFIG_VDPAU 0
 
 #define CONFIG_SPDIF_MUXER 1
