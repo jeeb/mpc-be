@@ -1601,9 +1601,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		if (bChangeMT) {
 			if (IsDXVASupported(bChangeMT && m_nDXVAMode == MODE_SOFTWARE) && SUCCEEDED(FindDecoderConfiguration())) {
 				dynamic_cast<CVideoDecOutputPin*>(m_pOutput)->Recommit();
-				if (m_pDXVADecoder) {
-					m_pDXVADecoder->NewSegment();
-				}
 				m_nDXVAMode = MODE_DXVA2;
 			} else {
 				if (IsDXVASupported(bChangeMT && m_nDXVAMode == MODE_SOFTWARE) || m_nDXVAMode != MODE_SOFTWARE) {
@@ -1614,7 +1611,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 				}
 				m_nDXVAMode = MODE_SOFTWARE;
 			}
-			ReconnectOutput(PictWidth(), PictHeight(), true, false, GetDuration());
 		}
 	}
 
