@@ -1315,9 +1315,9 @@ VIDEO_OUTPUT_FORMATS SoftwareFormats[] = { // Software
 	{&MEDIASUBTYPE_RGB555, 1, 16, BI_RGB}
 };
 
-bool CMPCVideoDecFilter::IsDXVASupported(bool bForceSoftware)
+bool CMPCVideoDecFilter::IsDXVASupported()
 {
-	if (m_nCodecNb != -1 && !bForceSoftware) {
+	if (m_nCodecNb != -1) {
 		// Does the codec suppport DXVA ?
 		if (ffCodecs[m_nCodecNb].DXVAModes != NULL) {
 			// Enabled by user ?
@@ -1454,9 +1454,13 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 			m_pParser = av_parser_init(m_nCodecId);
 		}
 
+		if (bChangeMT && m_nDXVAMode == MODE_SOFTWARE) {
+			m_bUseDXVA = false;
+		}
+
 		int nThreadNumber = m_nThreadNumber ? m_nThreadNumber : m_pCpuId->GetProcessorNumber() * 3/2;
 		if ((nThreadNumber > 1) && FFGetThreadType(m_nCodecId)) {
-			FFSetThreadNumber(m_pAVCtx, m_nCodecId, IsDXVASupported(bChangeMT && m_nDXVAMode == MODE_SOFTWARE) ? 1 : nThreadNumber);
+			FFSetThreadNumber(m_pAVCtx, m_nCodecId, IsDXVASupported() ? 1 : nThreadNumber);
 		}
 
 		m_pFrame = avcodec_alloc_frame();
@@ -1530,7 +1534,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		UNREFERENCED_PARAMETER(wout);
 		UNREFERENCED_PARAMETER(hout);
 
-		m_pAVCtx->using_dxva = (IsDXVASupported(bChangeMT && m_nDXVAMode == MODE_SOFTWARE) && (m_nCodecId == AV_CODEC_ID_H264 || m_nCodecId == AV_CODEC_ID_MPEG2VIDEO));
+		m_pAVCtx->using_dxva = (IsDXVASupported() && (m_nCodecId == AV_CODEC_ID_H264 || m_nCodecId == AV_CODEC_ID_MPEG2VIDEO));
 
 		if (avcodec_open2(m_pAVCtx, m_pAVCodec, NULL) < 0) {
 			return VFW_E_INVALIDMEDIATYPE;
@@ -1538,7 +1542,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 
 		FFGetOutputSize(m_pAVCtx, m_pFrame, &m_nOutputWidth, &m_nOutputHeight);
 
-		if (IsDXVASupported(bChangeMT && m_nDXVAMode == MODE_SOFTWARE)) {
+		if (IsDXVASupported()) {
 			do {
 				m_bDXVACompatible = false;
 
@@ -1599,11 +1603,11 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		BuildDXVAOutputFormat();
 
 		if (bChangeMT) {
-			if (IsDXVASupported(bChangeMT && m_nDXVAMode == MODE_SOFTWARE) && SUCCEEDED(FindDecoderConfiguration())) {
+			if (IsDXVASupported() && SUCCEEDED(FindDecoderConfiguration())) {
 				dynamic_cast<CVideoDecOutputPin*>(m_pOutput)->Recommit();
 				m_nDXVAMode = MODE_DXVA2;
 			} else {
-				if (IsDXVASupported(bChangeMT && m_nDXVAMode == MODE_SOFTWARE) || m_nDXVAMode != MODE_SOFTWARE) {
+				if (IsDXVASupported() || m_nDXVAMode != MODE_SOFTWARE) {
 					HRESULT hr;
 					if (FAILED(hr = ReopenVideo())) {
 						return hr;

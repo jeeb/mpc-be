@@ -221,7 +221,11 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 		CRect vih_rect(0, 0, RealWidth > 0 ? RealWidth : m_w, RealHeight > 0 ? RealHeight : m_h);
 
 		TRACE(_T("CBaseVideoFilter::ReconnectOutput()\n"));
+		if (m_w != vih_rect.Width() || m_h != vih_rect.Height()) {
+		TRACE(_T("		SIZE : %d:%d => %d:%d(%d:%d)\n"), w_org, h_org, m_w, m_h, vih_rect.Width(), vih_rect.Height());		
+		} else {
 		TRACE(_T("		SIZE : %d:%d => %d:%d\n"), w_org, h_org, vih_rect.Width(), vih_rect.Height());
+		}
 		TRACE(_T("		AR   : %d:%d => %d:%d\n"), m_arxout, m_aryout, m_arx, m_ary);
 		TRACE(_T("		FPS  : %I64d => %I64d\n"), nAvgTimePerFrame, AvgTimePerFrame);
 

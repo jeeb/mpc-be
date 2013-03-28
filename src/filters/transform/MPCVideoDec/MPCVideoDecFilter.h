@@ -309,7 +309,7 @@ public:
 	inline bool					IsEvo()					{ return m_bIsEVO; };
 	inline DWORD				GetPCIVendor()			{ return m_nPCIVendor; };
 	inline double				GetRate()				{ return m_dRate; };
-	bool						IsDXVASupported(bool bForceSoftware = false);
+	bool						IsDXVASupported();
 	void						UpdateAspectRatio();
 	void						ReorderBFrames(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
 	void						FlushDXVADecoder()	{
