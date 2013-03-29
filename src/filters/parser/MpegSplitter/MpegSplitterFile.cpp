@@ -143,19 +143,19 @@ again:
 		SearchPrograms(0, min(GetLength(), MEGABYTE*5)); // max 5Mb for search a valid Program Map Table
 
 		__int64 pfp = 0;
-		const int k = 5;
+		const int k = 20;
 		for (int i = 0; i <= k; i++) {
 			__int64 fp = i * GetLength() / k;
 			fp = min(GetLength() - MEGABYTE/2, fp);
 			fp = max(pfp, fp);
-			__int64 nfp = fp + (pfp == 0 ? 20*MEGABYTE : MEGABYTE/2);
+			__int64 nfp = fp + (pfp == 0 ? 10*MEGABYTE : MEGABYTE/2);
 			if (FAILED(hr = SearchStreams(fp, nfp, pAsyncReader))) {
 				return hr;
 			}
 			pfp = nfp;
 		}
 	} else {
-		if (FAILED(hr = SearchStreams(0, MEGABYTE/8, pAsyncReader))) {
+		if (FAILED(hr = SearchStreams(0, MEGABYTE/2, pAsyncReader))) {
 			return hr;
 		}
 	}
@@ -165,7 +165,7 @@ again:
 			WaitAvailable(5000, MEGABYTE);
 
 			__int64 pfp = 0;
-			const int k = 5;
+			const int k = 20;
 			for (int i = 0; i <= k; i++) {
 				__int64 fp = i * GetLength() / k;
 				fp = min(GetLength() - MEGABYTE/8, fp);
@@ -177,7 +177,7 @@ again:
 				pfp = nfp;
 			}
 		} else {
-			if (FAILED(hr = SearchStreams(0, MEGABYTE/8, pAsyncReader, TRUE))) {
+			if (FAILED(hr = SearchStreams(0, MEGABYTE/2, pAsyncReader, TRUE))) {
 				return hr;
 			}
 		}
