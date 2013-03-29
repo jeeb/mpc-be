@@ -122,7 +122,6 @@
     <ClInclude Include="libavcodec\dcadata.h" />
     <ClInclude Include="libavcodec\dcadsp.h" />
     <ClInclude Include="libavcodec\dcahuff.h" />
-    <ClInclude Include="libavcodec\dca_parser.h" />
     <ClInclude Include="libavcodec\dct.h" />
     <ClInclude Include="libavcodec\dct32.h" />
     <ClInclude Include="libavcodec\dirac.h" />
@@ -543,6 +542,7 @@
     <ClCompile Include="libavcodec\mpc_helper.c" />
     <ClCompile Include="libavcodec\mpeg12.c" />
     <ClCompile Include="libavcodec\mpeg12data.c" />
+    <ClCompile Include="libavcodec\mpeg12dec.c" />
     <ClCompile Include="libavcodec\mpeg4audio.c" />
     <ClCompile Include="libavcodec\mpeg4video.c" />
     <ClCompile Include="libavcodec\mpeg4videodec.c" />
@@ -562,6 +562,7 @@
     <ClCompile Include="libavcodec\mpegvideo_parser.c" />
     <ClCompile Include="libavcodec\msmpeg4.c" />
     <ClCompile Include="libavcodec\msmpeg4data.c" />
+    <ClCompile Include="libavcodec\msmpeg4dec.c" />
     <ClCompile Include="libavcodec\msrle.c" />
     <ClCompile Include="libavcodec\msrledec.c" />
     <ClCompile Include="libavcodec\mss1.c" />

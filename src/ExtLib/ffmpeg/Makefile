@@ -220,6 +220,7 @@ SRCS_C = \
     libavcodec/mpc8.c \
     libavcodec/mpeg12.c \
     libavcodec/mpeg12data.c \
+    libavcodec/mpeg12dec.c \
     libavcodec/mpeg4audio.c \
     libavcodec/mpeg4video.c \
     libavcodec/mpeg4video_parser.c \
@@ -239,6 +240,7 @@ SRCS_C = \
     libavcodec/mpegvideo_parser.c \
     libavcodec/msmpeg4.c \
     libavcodec/msmpeg4data.c \
+    libavcodec/msmpeg4dec.c \
     libavcodec/msrle.c \
     libavcodec/msrledec.c \
     libavcodec/mss1.c \

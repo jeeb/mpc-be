@@ -352,9 +352,6 @@
     <ClInclude Include="libavcodec\dca.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
-    <ClInclude Include="libavcodec\dca_parser.h">
-      <Filter>libavcodec</Filter>
-    </ClInclude>
     <ClInclude Include="libavcodec\dcadata.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
@@ -1719,6 +1716,9 @@
     <ClCompile Include="libavcodec\mpeg12data.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
+    <ClCompile Include="libavcodec\mpeg12dec.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
     <ClCompile Include="libavcodec\mpegaudio.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
@@ -1762,6 +1762,9 @@
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\msmpeg4data.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\msmpeg4dec.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\msrle.c">
