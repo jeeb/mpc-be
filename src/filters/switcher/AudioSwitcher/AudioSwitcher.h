@@ -28,6 +28,8 @@
 
 #include "StreamSwitcher.h"
 
+#include "../../transform/MpaDecFilter/Mixer.h"
+
 interface __declspec(uuid("CEDB2890-53AE-4231-91A3-B0AAFCD1DBDE"))
 IAudioSwitcherFilter :
 public IUnknown {
@@ -35,15 +37,13 @@ public IUnknown {
 	STDMETHOD(GetSpeakerConfig) (bool* pfCustomChannelMapping, DWORD pSpeakerToChannelMap[AS_MAX_CHANNELS][AS_MAX_CHANNELS]) = 0;
 	STDMETHOD(SetSpeakerConfig) (bool fCustomChannelMapping, DWORD pSpeakerToChannelMap[AS_MAX_CHANNELS][AS_MAX_CHANNELS]) = 0;
 	STDMETHOD_(int, GetNumberOfInputChannels) () = 0;
-	STDMETHOD_(bool, IsDownSamplingTo441Enabled) () = 0;
-	STDMETHOD(EnableDownSamplingTo441) (bool fEnable) = 0;
+	STDMETHOD_(DWORD, GetResampling) () = 0;
+	STDMETHOD(SetResampling) (DWORD samplerate) = 0;
 	STDMETHOD_(REFERENCE_TIME, GetAudioTimeShift) () = 0;
 	STDMETHOD(SetAudioTimeShift) (REFERENCE_TIME rtAudioTimeShift) = 0;
 	STDMETHOD(GetNormalizeBoost) (bool& fNormalize, bool& fNormalizeRecover, float& boost) = 0;
 	STDMETHOD(SetNormalizeBoost) (bool fNormalize, bool fNormalizeRecover, float boost) = 0;
 };
-
-class AudioStreamResampler;
 
 class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
 	CAudioSwitcherFilter : public CStreamSwitcherFilter, public IAudioSwitcherFilter
@@ -55,12 +55,13 @@ class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
 
 	bool m_fCustomChannelMapping;
 	DWORD m_pSpeakerToChannelMap[AS_MAX_CHANNELS][AS_MAX_CHANNELS];
-	bool m_fDownSampleTo441;
+	DWORD m_dwResampleFreq;
 	REFERENCE_TIME m_rtAudioTimeShift;
-	CAutoPtrArray<AudioStreamResampler> m_pResamplers;
 	double m_sample_max;
 	bool m_fNormalize, m_fNormalizeRecover;
 	float m_boost_mul;
+
+	CMixer m_Resampler;
 
 	REFERENCE_TIME m_rtNextStart, m_rtNextStop;
 
@@ -83,8 +84,8 @@ public:
 	STDMETHODIMP GetSpeakerConfig(bool* pfCustomChannelMapping, DWORD pSpeakerToChannelMap[AS_MAX_CHANNELS][AS_MAX_CHANNELS]);
 	STDMETHODIMP SetSpeakerConfig(bool fCustomChannelMapping, DWORD pSpeakerToChannelMap[AS_MAX_CHANNELS][AS_MAX_CHANNELS]);
 	STDMETHODIMP_(int) GetNumberOfInputChannels();
-	STDMETHODIMP_(bool) IsDownSamplingTo441Enabled();
-	STDMETHODIMP EnableDownSamplingTo441(bool fEnable);
+	STDMETHODIMP_(DWORD) GetResampling();
+	STDMETHODIMP SetResampling(DWORD samplerate);
 	STDMETHODIMP_(REFERENCE_TIME) GetAudioTimeShift();
 	STDMETHODIMP SetAudioTimeShift(REFERENCE_TIME rtAudioTimeShift);
 	STDMETHODIMP GetNormalizeBoost(bool& fNormalize, bool& fNormalizeRecover, float& boost);
