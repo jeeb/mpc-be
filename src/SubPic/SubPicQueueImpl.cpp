@@ -616,16 +616,18 @@ STDMETHODIMP_(bool) CSubPicQueueNoThread::LookupSubPic(REFERENCE_TIME rtNow, CCo
 		CComPtr<ISubPicProvider> pSubPicProvider;
 		GetSubPicProvider(&pSubPicProvider);
 		if (pSubPicProvider) {
+			SUBTITLE_TYPE sType = pSubPicProvider->GetType(NULL);
+
 			double fps = m_fps;
 
 			for (POSITION pos = pSubPicProvider->GetStartPosition(rtNow, fps);
 					pos; pos = pSubPicProvider->GetNext(pos)) {
-				REFERENCE_TIME rtStart = pSubPicProvider->GetStart(pos, fps);
-				REFERENCE_TIME rtStop = pSubPicProvider->GetStop(pos, fps);
+				REFERENCE_TIME rtStart	= pSubPicProvider->GetStart(pos, fps);
+				REFERENCE_TIME rtStop	= pSubPicProvider->GetStop(pos, fps);
 
 				if (pSubPicProvider->IsAnimated(pos)) {
-					rtStart = rtNow;
-					rtStop = rtNow+1;
+					rtStart	= rtNow;
+					rtStop	= rtNow + 1;
 				}
 
 				if (rtStart <= rtNow && rtNow < rtStop) {
@@ -654,7 +656,7 @@ STDMETHODIMP_(bool) CSubPicQueueNoThread::LookupSubPic(REFERENCE_TIME rtNow, CCo
 						}
 					}
 					if (SUCCEEDED(hr2)) {
-						pSubPic->SetVirtualTextureSize (VirtualSize, VirtualTopLeft);
+						pSubPic->SetVirtualTextureSize(VirtualSize, VirtualTopLeft);
 					}
 				}
 
@@ -662,6 +664,11 @@ STDMETHODIMP_(bool) CSubPicQueueNoThread::LookupSubPic(REFERENCE_TIME rtNow, CCo
 					CAutoLock cAutoLock(&m_csLock);
 
 					m_pSubPic = ppSubPic;
+					break;
+				}
+
+				if (sType == ST_TEXT || sType == ST_VOBSUB) {
+					// All other subtitles need to walk through the all list of subpic ...
 					break;
 				}
 			}
