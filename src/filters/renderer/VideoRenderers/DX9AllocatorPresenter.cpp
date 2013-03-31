@@ -127,22 +127,6 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 		m_pD3D = m_pD3DEx;
 	}
 
-	m_DetectedFrameRate = 0.0;
-	m_DetectedFrameTime = 0.0;
-	m_DetectedFrameTimeStdDev = 0.0;
-	m_DetectedLock = false;
-	ZeroMemory(m_DetectedFrameTimeHistory, sizeof(m_DetectedFrameTimeHistory));
-	ZeroMemory(m_DetectedFrameTimeHistoryHistory, sizeof(m_DetectedFrameTimeHistoryHistory));
-	m_DetectedFrameTimePos = 0;
-	ZeroMemory(&m_VMR9AlphaBitmap, sizeof(m_VMR9AlphaBitmap));
-
-	ZeroMemory(m_ldDetectedRefreshRateList, sizeof(m_ldDetectedRefreshRateList));
-	ZeroMemory(m_ldDetectedScanlineRateList, sizeof(m_ldDetectedScanlineRateList));
-	m_DetectedRefreshRatePos = 0;
-	m_DetectedRefreshTimePrim = 0;
-	m_DetectedScanlineTime = 0;
-	m_DetectedScanlineTimePrim = 0;
-	m_DetectedRefreshRate = 0;
 	CRenderersSettings& s = GetRenderersSettings();
 
 	if (s.m_AdvRendSets.iVMRDisableDesktopComposition) {
@@ -155,17 +139,6 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	}
 
 	hr = CreateDevice(_Error);
-
-	memset (m_pllJitter, 0, sizeof(m_pllJitter));
-	memset (m_pllSyncOffset, 0, sizeof(m_pllSyncOffset));
-	m_nNextJitter		= 0;
-	m_nNextSyncOffset = 0;
-	m_llLastPerf		= 0;
-	m_fAvrFps			= 0.0;
-	m_fJitterStdDev		= 0.0;
-	m_fSyncOffsetStdDev = 0.0;
-	m_fSyncOffsetAvr	= 0.0;
-	m_bSyncStatsAvailable = false;
 }
 
 CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
@@ -663,10 +636,40 @@ bool CDX9AllocatorPresenter::SettingsNeedResetDevice()
 
 HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 {
+	TRACE("CDX9AllocatorPresenter::CreateDevice()\n");
+
 	StopWorkerThreads();
 
 	CRenderersSettings& s = GetRenderersSettings();
 	CRenderersData* renderersData = GetRenderersData();
+
+	m_DetectedFrameRate = 0.0;
+	m_DetectedFrameTime = 0.0;
+	m_DetectedFrameTimeStdDev = 0.0;
+	m_DetectedLock = false;
+	ZeroMemory(m_DetectedFrameTimeHistory, sizeof(m_DetectedFrameTimeHistory));
+	ZeroMemory(m_DetectedFrameTimeHistoryHistory, sizeof(m_DetectedFrameTimeHistoryHistory));
+	m_DetectedFrameTimePos = 0;
+	ZeroMemory(&m_VMR9AlphaBitmap, sizeof(m_VMR9AlphaBitmap));
+
+	ZeroMemory(m_ldDetectedRefreshRateList, sizeof(m_ldDetectedRefreshRateList));
+	ZeroMemory(m_ldDetectedScanlineRateList, sizeof(m_ldDetectedScanlineRateList));
+	m_DetectedRefreshRatePos = 0;
+	m_DetectedRefreshTimePrim = 0;
+	m_DetectedScanlineTime = 0;
+	m_DetectedScanlineTimePrim = 0;
+	m_DetectedRefreshRate = 0;
+
+	memset (m_pllJitter, 0, sizeof(m_pllJitter));
+	memset (m_pllSyncOffset, 0, sizeof(m_pllSyncOffset));
+	m_nNextJitter		= 0;
+	m_nNextSyncOffset = 0;
+	m_llLastPerf		= 0;
+	m_fAvrFps			= 0.0;
+	m_fJitterStdDev		= 0.0;
+	m_fSyncOffsetStdDev = 0.0;
+	m_fSyncOffsetAvr	= 0.0;
+	m_bSyncStatsAvailable = false;
 
 	m_VBlankEndWait = 0;
 	m_VBlankMin = 300000;
@@ -705,9 +708,9 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	ZeroMemory(m_ClockChangeHistory, sizeof(m_ClockChangeHistory));
 	m_ClockTimeChangeHistoryPos = 0;
 
-	m_pD3DDev = NULL;
-	m_pD3DDevEx = NULL;
-	m_pDirectDraw = NULL;
+	m_pD3DDev		= NULL;
+	m_pD3DDevEx		= NULL;
+	m_pDirectDraw	= NULL;
 
 	CleanupRenderingEngine();
 
@@ -1707,10 +1710,18 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 			m_VBlankEndPresent = ScanLine;
 		}
 
+		LONGLONG llPerf2 = GetRenderersData()->GetPerfCounter();
 		while (ScanLine == 0 || bInVBlank) {
-			GetVBlank(ScanLine, bInVBlank, false);
+			if (!GetVBlank(ScanLine, bInVBlank, false)) {
+				break;
+			}
 
+			// to prevent infinite loop when you unplug/disable the output device ... wait no more 1sec.
+			if ((GetRenderersData()->GetPerfCounter() - llPerf2) > UNITS) {
+				break;
+			}
 		}
+
 		m_VBlankStartMeasureTime = pApp->GetPerfCounter();
 		m_VBlankStartMeasure = ScanLine;
 
@@ -1847,7 +1858,7 @@ void CDX9AllocatorPresenter::SendResetRequest()
 
 STDMETHODIMP_(bool) CDX9AllocatorPresenter::ResetDevice()
 {
-	TRACE("ResetDevice\n");
+	TRACE("CDX9AllocatorPresenter::ResetDevice()\n");
 	_ASSERT(m_MainThreadId == GetCurrentThreadId());
 	StopWorkerThreads();
 

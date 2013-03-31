@@ -1859,41 +1859,7 @@ STDMETHODIMP_(bool) CEVRAllocatorPresenter::ResetDevice()
 
 STDMETHODIMP_(bool) CEVRAllocatorPresenter::DisplayChange()
 {
-	CAutoLock lock(this);
-	CAutoLock lock2(&m_ImageProcessingLock);
-	CAutoLock cRenderLock(&m_RenderLock);
-
-	m_DetectedFrameRate = 0.0;
-	m_DetectedFrameTime = 0.0;
-	m_DetectedFrameTimeStdDev = 0.0;
-	m_DetectedLock = false;
-	ZeroMemory(m_DetectedFrameTimeHistory, sizeof(m_DetectedFrameTimeHistory));
-	ZeroMemory(m_DetectedFrameTimeHistoryHistory, sizeof(m_DetectedFrameTimeHistoryHistory));
-	m_DetectedFrameTimePos = 0;
-	ZeroMemory(&m_VMR9AlphaBitmap, sizeof(m_VMR9AlphaBitmap));
-
-	ZeroMemory(m_ldDetectedRefreshRateList, sizeof(m_ldDetectedRefreshRateList));
-	ZeroMemory(m_ldDetectedScanlineRateList, sizeof(m_ldDetectedScanlineRateList));
-	m_DetectedRefreshRatePos = 0;
-	m_DetectedRefreshTimePrim = 0;
-	m_DetectedScanlineTime = 0;
-	m_DetectedScanlineTimePrim = 0;
-	m_DetectedRefreshRate = 0;
-
-	memset (m_pllJitter, 0, sizeof(m_pllJitter));
-	memset (m_pllSyncOffset, 0, sizeof(m_pllSyncOffset));
-	m_nNextJitter		= 0;
-	m_nNextSyncOffset = 0;
-	m_llLastPerf		= 0;
-	m_fAvrFps			= 0.0;
-	m_fJitterStdDev		= 0.0;
-	m_fSyncOffsetStdDev = 0.0;
-	m_fSyncOffsetAvr	= 0.0;
-	m_bSyncStatsAvailable = false;
-
-	bool bResult = __super::DisplayChange();
-
-	return bResult;
+	return __super::DisplayChange();
 }
 
 void CEVRAllocatorPresenter::RenderThread()
@@ -1906,7 +1872,6 @@ void CEVRAllocatorPresenter::RenderThread()
 	LONGLONG			llClockTime;
 	DWORD				dwUser = 0;
 	DWORD				dwObject;
-
 
 	// Tell Vista Multimedia Class Scheduler we are a playback thread (increase priority)
 	HANDLE hAvrt = 0;
