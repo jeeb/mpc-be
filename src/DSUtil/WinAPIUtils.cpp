@@ -354,12 +354,12 @@ bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, 
 	memset(szMonitorName, 0, sizeof(szMonitorName));
 	nMonitorHorRes	= 0;
 	nMonitorVerRes	= 0;
-    
-	DISPLAY_DEVICE DisplayDevice;
-    DisplayDevice.cb = sizeof(DISPLAY_DEVICEW);
 
-    DWORD dwDevNum = 0;
-    for (;;) {
+	DISPLAY_DEVICE DisplayDevice;
+	DisplayDevice.cb = sizeof(DISPLAY_DEVICEW);
+
+	DWORD dwDevNum = 0;
+	for (;;) {
 		if (!EnumDisplayDevices(NULL, dwDevNum, &DisplayDevice, 0)) {
 			ASSERT(0);// device not found
 			break;
@@ -403,52 +403,65 @@ bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, 
 									memcpy(pEnd0 + 1, DisplayDevice.DeviceKey, (cbName << 1) + 2);
 									wchar_t* pEnd1 = pEnd0 + 1 + cbName;
 
-									static wchar_t const szTDriverKeyN[] = L"Driver";
-									cbName = sizeof(DisplayDevice.DeviceKey);// re-use it here
-									ls = RegGetValue(HKEY_LOCAL_MACHINE, DisplayDevice.DeviceName, szTDriverKeyN, RRF_RT_REG_SZ, NULL, DisplayDevice.DeviceKey, &cbName);
-
+									HKEY hKey2;
+									ls = RegOpenKeyEx(HKEY_LOCAL_MACHINE, DisplayDevice.DeviceName, 0, KEY_ENUMERATE_SUB_KEYS | KEY_READ, &hKey2);
 									if (ls == ERROR_SUCCESS) {
-										if (!wcscmp(szDeviceIDshort, DisplayDevice.DeviceKey)) {
-											static wchar_t const szTDevParKeyN[] = L"\\Device Parameters";
-											memcpy(pEnd1, szTDevParKeyN, sizeof(szTDevParKeyN));
 
-											static wchar_t const szkEDIDKeyN[] = L"EDID";
-											cbName = sizeof(DisplayDevice.DeviceKey);// 256, perfectly suited to receive a copy of the 128 or 256 bytes of EDID data
-											ls = RegGetValue(HKEY_LOCAL_MACHINE, DisplayDevice.DeviceName, szkEDIDKeyN, RRF_RT_REG_BINARY, NULL, DisplayDevice.DeviceKey, &cbName);
-											if ((ls == ERROR_SUCCESS) && (cbName > 127)) {
-												UINT8* EDIDdata = (UINT8*)DisplayDevice.DeviceKey;
-												// memo: bytes 25 to 34 contain the default chromaticity coordinates
+										static wchar_t const szTDriverKeyN[] = L"Driver";
+										cbName = sizeof(DisplayDevice.DeviceKey);// re-use it here
+										ls = RegQueryValueEx(hKey2, szTDriverKeyN, NULL, NULL, (LPBYTE)DisplayDevice.DeviceKey, &cbName);
+										if (ls == ERROR_SUCCESS) {
+											if (!wcscmp(szDeviceIDshort, DisplayDevice.DeviceKey)) {
+												static wchar_t const szTDevParKeyN[] = L"\\Device Parameters";
+												memcpy(pEnd1, szTDevParKeyN, sizeof(szTDevParKeyN));
+												static wchar_t const szkEDIDKeyN[] = L"EDID";
+												cbName = sizeof(DisplayDevice.DeviceKey);// 256, perfectly suited to receive a copy of the 128 or 256 bytes of EDID data
 
-												// pixel clock in 10 kHz units (0.01–655.35 MHz)
-												UINT16 u16PixelClock = (UINT16)(EDIDdata + 54);
-												if (u16PixelClock) {// if the descriptor for pixel clock is 0, the descriptor block is invalid
-													// horizontal active pixels
-													nMonitorHorRes = (UINT16(EDIDdata[58] & 0xF0) << 4) | EDIDdata[56];
-													// vertical active pixels
-													nMonitorVerRes = (UINT16(EDIDdata[61] & 0xF0) << 4) | EDIDdata[59];
+												HKEY hKey3;
+												ls = RegOpenKeyEx(HKEY_LOCAL_MACHINE, DisplayDevice.DeviceName, 0, KEY_ENUMERATE_SUB_KEYS | KEY_READ, &hKey3);
+												if (ls == ERROR_SUCCESS) {
 
-													// validate and identify extra descriptor blocks
-													// memo: descriptor block identifier 0xFB is used for additional white point data
-													ptrdiff_t k = 12;
-													if (!*(UINT16*)(EDIDdata + 72) && (EDIDdata[75] == 0xFC)) {// descriptor block 2, the first 16 bits must be zero, else the descriptor contains detailed timing data, identifier 0xFC is used for monitor name
-														do {
-															szMonitorName[k] = gk_au16CodePage437ForEDIDLookup[EDIDdata[77 + k]];
-														} while (--k >= 0);
-													} else if (!*(UINT16*)(EDIDdata + 90) && (EDIDdata[93] == 0xFC)) {// descriptor block 3
-														do {
-															szMonitorName[k] = gk_au16CodePage437ForEDIDLookup[EDIDdata[95 + k]];
-														} while (--k >= 0);
-													} else if (!*(UINT16*)(EDIDdata + 108) && (EDIDdata[111] == 0xFC)) {// descriptor block 4
-														do {
-															szMonitorName[k] = gk_au16CodePage437ForEDIDLookup[EDIDdata[113 + k]];
-														} while (--k >= 0);
+													ls = RegQueryValueEx(hKey3, szkEDIDKeyN, NULL, NULL, (LPBYTE)DisplayDevice.DeviceKey, &cbName);
+													if ((ls == ERROR_SUCCESS) && (cbName > 127)) {
+														UINT8* EDIDdata = (UINT8*)DisplayDevice.DeviceKey;
+														// memo: bytes 25 to 34 contain the default chromaticity coordinates
+
+														// pixel clock in 10 kHz units (0.01–655.35 MHz)
+														UINT16 u16PixelClock = (UINT16)(EDIDdata + 54);
+														if (u16PixelClock) {// if the descriptor for pixel clock is 0, the descriptor block is invalid
+															// horizontal active pixels
+															nMonitorHorRes = (UINT16(EDIDdata[58] & 0xF0) << 4) | EDIDdata[56];
+															// vertical active pixels
+															nMonitorVerRes = (UINT16(EDIDdata[61] & 0xF0) << 4) | EDIDdata[59];
+
+															// validate and identify extra descriptor blocks
+															// memo: descriptor block identifier 0xFB is used for additional white point data
+															ptrdiff_t k = 12;
+															if (!*(UINT16*)(EDIDdata + 72) && (EDIDdata[75] == 0xFC)) {// descriptor block 2, the first 16 bits must be zero, else the descriptor contains detailed timing data, identifier 0xFC is used for monitor name
+																do {
+																	szMonitorName[k] = gk_au16CodePage437ForEDIDLookup[EDIDdata[77 + k]];
+																} while (--k >= 0);
+															} else if (!*(UINT16*)(EDIDdata + 90) && (EDIDdata[93] == 0xFC)) {// descriptor block 3
+																do {
+																	szMonitorName[k] = gk_au16CodePage437ForEDIDLookup[EDIDdata[95 + k]];
+																} while (--k >= 0);
+															} else if (!*(UINT16*)(EDIDdata + 108) && (EDIDdata[111] == 0xFC)) {// descriptor block 4
+																do {
+																	szMonitorName[k] = gk_au16CodePage437ForEDIDLookup[EDIDdata[113 + k]];
+																} while (--k >= 0);
+															}
+														}
+														RegCloseKey(hKey3);
+														RegCloseKey(hKey2);
+														RegCloseKey(hKey1);
+														RegCloseKey(hKey0);
+														goto exit;
 													}
+													RegCloseKey(hKey3);
 												}
-												RegCloseKey(hKey1);
-												RegCloseKey(hKey0);
-												goto exit;
 											}
 										}
+										RegCloseKey(hKey2);
 									}
 								}
 								++j;
@@ -466,7 +479,8 @@ bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, 
     }
 
 exit:
-	if (nMonitorHorRes && nMonitorVerRes) {
+
+	if (wcslen(szMonitorName) && nMonitorHorRes && nMonitorVerRes) {
 		if (MonitorName) {
 			*MonitorName = szMonitorName;
 		}
