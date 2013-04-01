@@ -873,7 +873,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 #endif
 	switch (MPC_VERSION_STATUS) {
 		case 0:
-			m_strTitle.Append(_T(" -alpha"));
+			m_strTitle.AppendFormat(_T(" svn %d -alpha"), MPC_VERSION_REV);
 			break;
 		case 1:
 			m_strTitle.Append(_T(" -beta"));
