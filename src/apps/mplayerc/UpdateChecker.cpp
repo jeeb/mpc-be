@@ -23,7 +23,7 @@
 #include "stdafx.h"
 #include "UpdateChecker.h"
 
-const Version UpdateChecker::MPC_VERSION = {MPC_VERSION_MAJOR, MPC_VERSION_MINOR, MPC_VERSION_STATUS, MPC_VERSION_PATCH};
+const Version UpdateChecker::MPC_VERSION = {MPC_VERSION_MAJOR, MPC_VERSION_MINOR, MPC_VERSION_PATCH, MPC_VERSION_STATUS};
 
 UpdateChecker::UpdateChecker(CString versionFileURL)
 	: versionFileURL(versionFileURL)

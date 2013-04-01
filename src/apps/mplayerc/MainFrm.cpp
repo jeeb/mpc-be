@@ -873,7 +873,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 #endif
 	switch (MPC_VERSION_STATUS) {
 		case 0:
-			m_strTitle.Append(_T(" -dev"));
+			m_strTitle.Append(_T(" -alpha"));
 			break;
 		case 1:
 			m_strTitle.Append(_T(" -beta"));

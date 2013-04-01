@@ -252,7 +252,7 @@ IF NOT EXIST "%PackagesOut%\%MPCBE_VER%" MD "%PackagesOut%\%MPCBE_VER%"
 
 SET "PCKG_NAME=%NAME%.%MPCBE_VER%.%ARCH%"
 
-IF EXIST "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.7z"     DEL "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.7z"
+IF EXIST "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.(VS2012).7z"     DEL "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.(VS2012).7z"
 IF EXIST "%PCKG_NAME%"        RD /Q /S "%PCKG_NAME%"
 
 TITLE Copying %PCKG_NAME%...
@@ -285,14 +285,14 @@ COPY /Y /V "..\distrib\Shaders\*.psh"        "%PCKG_NAME%\Shaders\*.psh" >NUL
 
 IF /I "%NAME%" == "MPC-BE" (
 TITLE Creating archive %PCKG_NAME%.zip...
-START "7z" /B /WAIT "%SEVENZIP%" a -tzip "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%-installer.zip" "%PCKG_NAME%.exe"^
+START "7z" /B /WAIT "%SEVENZIP%" a -tzip "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%-installer.(VS2012).zip" "%PCKG_NAME%.exe"^
  -mx9)
 IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Unable to create %PCKG_NAME%-installer.zip!"
 CALL :SubMsg "INFO" "%PCKG_NAME%-installer.zip successfully created"
 )
 
 TITLE Creating archive %PCKG_NAME%.7z...
-START "7z" /B /WAIT "%SEVENZIP%" a -t7z "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.7z" "%PCKG_NAME%"^
+START "7z" /B /WAIT "%SEVENZIP%" a -t7z "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.(VS2012).7z" "%PCKG_NAME%"^
  -m0=lzma2:d128m -mx9 -mmt -ms=on
 IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Unable to create %PCKG_NAME%.7z!"
 CALL :SubMsg "INFO" "%PCKG_NAME%.7z successfully created"
@@ -309,13 +309,13 @@ FOR /F "tokens=3,4 delims= " %%A IN (
 FOR /F "tokens=3,4 delims= " %%A IN (
   'FINDSTR /I /L /C:"define MPC_VERSION_MINOR" "include\Version.h"') DO (SET "VerMinor=%%A")
 FOR /F "tokens=3,4 delims= " %%A IN (
-  'FINDSTR /I /L /C:"define MPC_VERSION_STATUS" "include\Version.h"') DO (SET "VerStatus=%%A")
-FOR /F "tokens=3,4 delims= " %%A IN (
   'FINDSTR /I /L /C:"define MPC_VERSION_PATCH" "include\Version.h"') DO (SET "VerPatch=%%A")
+FOR /F "tokens=3,4 delims= " %%A IN (
+  'FINDSTR /I /L /C:"define MPC_VERSION_STATUS" "include\Version.h"') DO (SET "VerStatus=%%A")
 FOR /F "tokens=3,4 delims= " %%A IN (
   'FINDSTR /I /L /C:"define MPC_VERSION_REV" "include\Version_rev.h"') DO (SET "VerRev=%%A")
 
-SET MPCBE_VER=%VerMajor%.%VerMinor%.%VerStatus%.%VerPatch%.%VerRev%
+SET MPCBE_VER=%VerMajor%.%VerMinor%.%VerPatch%.%VerStatus%.%VerRev%
 EXIT /B
 
 :SubDetectWinArch

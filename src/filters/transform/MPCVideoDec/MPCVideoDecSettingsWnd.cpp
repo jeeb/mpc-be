@@ -289,7 +289,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	p.y += h25;
 
 	// Software version, useful info for stand-alone filter
-	m_strSwVersion.Format(_T("v%d.%d.%d.%d"),MPC_VERSION_MAJOR,MPC_VERSION_MINOR,MPC_VERSION_STATUS,MPC_VERSION_PATCH);
+	m_strSwVersion.Format(_T("v%d.%d.%d.%d"),MPC_VERSION_MAJOR,MPC_VERSION_MINOR,MPC_VERSION_PATCH,MPC_VERSION_STATUS);
 	m_txtSwVersion.Create(m_strSwVersion, WS_DISABLED|WS_VISIBLE|WS_CHILD|SS_RIGHT|SS_PATHELLIPSIS, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
 	//
 
