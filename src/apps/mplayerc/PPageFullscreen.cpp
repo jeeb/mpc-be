@@ -136,6 +136,7 @@ BOOL CPPageFullscreen::OnInitDialog()
 
  	m_iMonitorTypeCtrl.AddString(ResStr(IDS_FULLSCREENMONITOR_CURRENT));
 	m_MonitorDisplayNames.Add(_T("Current"));
+	m_MonitorDeviceName.Add(_T("Current"));
 	curmonitor = monitors.GetNearestMonitor(AfxGetApp()->m_pMainWnd);
 	curmonitor.GetName(strCurMon);
 	if(m_f_hmonitor == _T("")) {
@@ -165,6 +166,7 @@ BOOL CPPageFullscreen::OnInitDialog()
 				if (str == strCurMon) {
 					m_iMonitorTypeCtrl.AddString(str.Mid(4, 7) + _T("( ") + str.Right(1) + _T(" ) ") + _T("- [id: ") + DeviceID + _T(" *") +  ResStr(IDS_FULLSCREENMONITOR_CURRENT) + _T("] - ") + ddMon.DeviceString);
 					m_MonitorDisplayNames[0] = _T("Current") + strMonID;
+					m_MonitorDeviceName[0] = str;
 					
 					if(m_f_hmonitor == _T("Current") && m_AutoChangeFullscrRes.bEnabled > 0) {
 						m_iMonitorType = m_iMonitorTypeCtrl.GetCount()-1;	
@@ -175,6 +177,7 @@ BOOL CPPageFullscreen::OnInitDialog()
 					m_iMonitorTypeCtrl.AddString(str.Mid(4, 7) + _T("( ") + str.Right(1) + _T(" ) ") + _T("- [id: ") + DeviceID + _T("] - ") + ddMon.DeviceString);	
 				}
 				m_MonitorDisplayNames.Add(str + strMonID);
+				m_MonitorDeviceName.Add(str);
 				if(m_iMonitorType == 0 && m_f_hmonitor == str) {
 					m_iMonitorType = m_iMonitorTypeCtrl.GetCount()-1;
 				}
@@ -542,6 +545,11 @@ void CPPageFullscreen::ModesUpdate()
 	CString strCur;
 	GetCurDispModeString(strCur);
 
+	CString strDevice = m_MonitorDeviceName[m_iMonitorType];
+	CString MonitorName;
+	UINT16 MonitorHorRes, MonitorVerRes;
+	ReadDisplay(strDevice, &MonitorName, &MonitorHorRes, &MonitorVerRes);
+
 	str = m_MonitorDisplayNames[m_iMonitorType];
 	if (str.GetLength() == 14) { m_f_hmonitor = str.Left(7); }
 	if (str.GetLength() == 19) { m_f_hmonitor = str.Left(12); }
@@ -583,6 +591,12 @@ void CPPageFullscreen::ModesUpdate()
 		}
 		if (dm.bpp != 32 || dm.size.cx < 640) {
 			continue; // skip low resolution and non 32bpp mode
+		}
+
+		if ((MonitorHorRes && MonitorVerRes)
+				&& (MonitorHorRes != dm.size.cx)
+				&& (MonitorVerRes != dm.size.cy)) {
+			continue;
 		}
 
 		int j = 0;

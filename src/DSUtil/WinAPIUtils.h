@@ -42,3 +42,5 @@ UINT GetAdapter(IDirect3D9* pD3D, HWND hWnd);
 bool IsFontInstalled(LPCTSTR lpszFont);
 
 bool ExploreToFile(CString path);
+
+bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, UINT16* MonitorVerRes);

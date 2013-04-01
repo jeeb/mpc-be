@@ -30,6 +30,7 @@
 #include "../../../SubPic/SubPicQueueImpl.h"
 #include "IPinHook.h"
 #include <Version.h>
+#include "../DSUtil/WinAPIUtils.h"
 
 CCritSec g_ffdshowReceive;
 bool queue_ffdshow_support = false;
@@ -70,6 +71,8 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_Decoder(_T(""))
 	, m_InputVCodec(_T(""))
 	, m_nRenderState(Undefined)
+	, m_MonitorName(_T(""))
+	, m_nMonitorHorRes(0), m_nMonitorVerRes(0)
 {
 	HINSTANCE		hDll;
 
@@ -1007,39 +1010,20 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	}
 
 	m_pFont = NULL;
-	if (m_pD3DXCreateFont) {
-		int MinSize = 1600;
-		int CurrentSize = min(m_ScreenSize.cx, MinSize);
-		double Scale = double(CurrentSize) / double(MinSize);
-		m_TextScale = Scale;
-		m_pD3DXCreateFont( m_pD3DDev,					// D3D device
-						   (int)(-24.0*Scale),			// Height
-						   (UINT)(-11.0*Scale),					// Width
-						   CurrentSize < 800 ? FW_NORMAL : FW_BOLD,		// Weight
-						   0,							// MipLevels, 0 = autogen mipmaps
-						   FALSE,						// Italic
-						   DEFAULT_CHARSET,				// CharSet
-						   OUT_DEFAULT_PRECIS,			// OutputPrecision
-						   ANTIALIASED_QUALITY,			// Quality
-						   FIXED_PITCH | FF_DONTCARE,	// PitchAndFamily
-						   L"Lucida Console",			// pFaceName
-						   &m_pFont);					// ppFont
-	}
-
-
 	m_pSprite = NULL;
-
-	if (m_pD3DXCreateSprite) {
-		m_pD3DXCreateSprite( m_pD3DDev,					// D3D device
-							 &m_pSprite);
-	}
-
 	m_pLine = NULL;
-	if (m_pD3DXCreateLine) {
-		m_pD3DXCreateLine (m_pD3DDev, &m_pLine);
-	}
 
 	m_LastAdapterCheck = GetRenderersData()->GetPerfCounter();
+
+	m_MonitorName.Empty();
+	m_nMonitorHorRes = m_nMonitorVerRes = 0;
+
+	HMONITOR hMonitor = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
+	MONITORINFOEX mi;
+	mi.cbSize = sizeof(MONITORINFOEX);
+	if (GetMonitorInfo(hMonitor, &mi)) {
+		ReadDisplay(mi.szDevice, &m_MonitorName, &m_nMonitorHorRes, &m_nMonitorVerRes);
+	}
 
 	StartWorkerThreads();
 
@@ -1902,8 +1886,10 @@ void CDX9AllocatorPresenter::DrawText(const RECT &rc, const CString &strText, in
 		return;
 	}
 	int Quality = 1;
-	D3DXCOLOR Color1( 1.0f, 0.2f, 0.2f, 1.0f );
-	D3DXCOLOR Color0( 0.0f, 0.0f, 0.0f, 1.0f );
+	//D3DXCOLOR Color1( 1.0f, 0.2f, 0.2f, 1.0f ); // red
+	//D3DXCOLOR Color1( 1.0f, 1.0f, 1.0f, 1.0f ); // white
+	D3DXCOLOR Color1( 1.0f, 0.8f, 0.0f, 1.0f ); // yellow
+	D3DXCOLOR Color0( 0.0f, 0.0f, 0.0f, 1.0f ); // black
 	RECT Rect1 = rc;
 	RECT Rect2 = rc;
 	if (Quality == 1) {
@@ -1988,10 +1974,56 @@ void CDX9AllocatorPresenter::DrawStats()
 	LONGLONG		llMaxSyncOffset = m_MaxSyncOffset;
 	LONGLONG		llMinSyncOffset = m_MinSyncOffset;
 	RECT			rc = {40, 40, 0, 0 };
+
+	static UINT		TextHeight = 0;
+	static CRect	WindowRect(0, 0, 0, 0);
+
+	if (WindowRect != m_WindowRect) {
+		m_pFont = NULL;	
+	}
+	WindowRect = m_WindowRect;
+
+	if (!m_pFont && m_pD3DXCreateFont) {
+		UINT FontBase = m_WindowRect.Width() >> 6;
+		UINT FontHeight;
+		UINT FontWidth, FontWeight;
+		if (m_WindowRect.Width() < 1100) {
+			FontWidth	= (FontBase >> 1) + (FontBase >> 3);
+			FontHeight	= FontBase + (FontBase >> 2) + (FontBase >> 3);
+			FontWeight	= FW_NORMAL;
+		} else {
+			FontWidth	= (FontBase >> 2) + (FontBase >> 3) + (FontBase >> 4);
+			FontHeight	= FontBase;
+			FontWeight	= FW_BOLD;
+		}
+
+		TextHeight = FontHeight;
+
+		m_pD3DXCreateFont( m_pD3DDev,					// D3D device
+							FontHeight,					// Height
+							FontWidth,					// Width
+							FontWeight,					// Weight
+							0,							// MipLevels, 0 = autogen mipmaps
+							FALSE,						// Italic
+							DEFAULT_CHARSET,			// CharSet
+							OUT_DEFAULT_PRECIS,			// OutputPrecision
+							ANTIALIASED_QUALITY,		// Quality
+							FIXED_PITCH | FF_DONTCARE,	// PitchAndFamily
+							L"Lucida Console",			// pFaceName
+							&m_pFont);					// ppFont
+	}
+
+	if (!m_pSprite && m_pD3DXCreateSprite) {
+		m_pD3DXCreateSprite( m_pD3DDev, &m_pSprite);
+	}
+
+	if (!m_pLine && m_pD3DXCreateLine) {
+		m_pD3DXCreateLine (m_pD3DDev, &m_pLine);
+	}
+
 	if (m_pFont && m_pSprite) {
 		m_pSprite->Begin(D3DXSPRITE_ALPHABLEND);
 		CString		strText;
-		int TextHeight = int(25.0*m_TextScale + 0.5);
 
 		if (bDetailedStats > 1) {
 			double rtMS, rtFPS;
@@ -2252,6 +2284,12 @@ void CDX9AllocatorPresenter::DrawStats()
 
 			if (!m_D3D9Device.IsEmpty()) {
 				strText = "Render device: " + m_D3D9Device;
+				DrawText(rc, strText, 1);
+				OffsetRect (&rc, 0, TextHeight);
+			}
+
+			if (!m_MonitorName.IsEmpty()) {
+				strText.Format(L"Monitor      : %s, Native resolution %ux%u", m_MonitorName, m_nMonitorHorRes, m_nMonitorVerRes);
 				DrawText(rc, strText, 1);
 				OffsetRect (&rc, 0, TextHeight);
 			}

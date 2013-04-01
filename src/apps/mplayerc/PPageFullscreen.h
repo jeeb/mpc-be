@@ -35,7 +35,7 @@ class CPPageFullscreen : public CPPageBase
 	//	private:
 	CAtlArray<dispmode> m_dms;
 	CAtlArray<CString> sl;
-	CStringArray m_MonitorDisplayNames;
+	CStringArray m_MonitorDisplayNames, m_MonitorDeviceName;
 
 public:
 	CPPageFullscreen();
