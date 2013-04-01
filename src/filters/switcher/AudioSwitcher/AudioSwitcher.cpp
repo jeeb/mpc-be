@@ -31,6 +31,15 @@
 #include  "../../transform/MpaDecFilter/AudioHelper.h"
 
 #ifdef REGISTER_FILTER
+
+extern "C" {
+	// Hack to use MinGW64 from 2.x branch
+	void __mingw_raise_matherr(int typ, const char *name, double a1, double a2, double rslt) {}
+}
+	void* __imp_time64 = _time64;
+#if defined(_WIN64)
+	void* __imp__aligned_malloc = _aligned_malloc;
+#endif
 #include <InitGuid.h>
 #endif
 #include <moreuuids.h>
