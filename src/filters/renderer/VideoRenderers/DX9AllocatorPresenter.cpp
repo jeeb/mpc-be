@@ -73,6 +73,7 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_nRenderState(Undefined)
 	, m_MonitorName(_T(""))
 	, m_nMonitorHorRes(0), m_nMonitorVerRes(0)
+	, m_rcMonitor(0, 0, 0, 0)
 {
 	HINSTANCE		hDll;
 
@@ -1023,6 +1024,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	mi.cbSize = sizeof(MONITORINFOEX);
 	if (GetMonitorInfo(hMonitor, &mi)) {
 		ReadDisplay(mi.szDevice, &m_MonitorName, &m_nMonitorHorRes, &m_nMonitorVerRes);
+		m_rcMonitor = mi.rcMonitor;
 	}
 
 	StartWorkerThreads();
@@ -1233,7 +1235,7 @@ bool CDX9AllocatorPresenter::WaitForVBlankRange(int &_RasterStart, int _RasterSi
 		bOneWait = false;
 		// If we are already in the wanted interval we need to wait until we aren't, this improves sync when for example you are playing 23.976 Hz material on a 24 Hz refresh rate
 		int nInVBlank = 0;
-		for (;;) {
+		for (int i = 0; i < 50; i++) { // to prevent infinite loop
 			if (!GetVBlank(ScanLine, InVBlank, _bMeasure)) {
 				break;
 			}
@@ -1261,7 +1263,7 @@ bool CDX9AllocatorPresenter::WaitForVBlankRange(int &_RasterStart, int _RasterSi
 			bWaited = true;
 			// If we are already in the wanted interval we need to wait until we aren't, this improves sync when for example you are playing 23.976 Hz material on a 24 Hz refresh rate
 			int LastLineDiff = ScanLineDiff;
-			for (;;) {
+			for (int i = 0; i < 50; i++) { // to prevent infinite loop
 				if (!GetVBlank(ScanLine, InVBlank, _bMeasure)) {
 					break;
 				}
@@ -1323,7 +1325,7 @@ bool CDX9AllocatorPresenter::WaitForVBlankRange(int &_RasterStart, int _RasterSi
 
 	LONGLONG llPerfLock = 0;
 
-	for (;;) {
+	for (int i = 0; i < 50; i++) { // to prevent infinite loop
 		if (!GetVBlank(ScanLine, InVBlank, _bMeasure)) {
 			break;
 		}
@@ -1694,14 +1696,8 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 			m_VBlankEndPresent = ScanLine;
 		}
 
-		LONGLONG llPerf2 = GetRenderersData()->GetPerfCounter();
-		while (ScanLine == 0 || bInVBlank) {
+		for (int i = 0; i < 50 && (ScanLine == 0 || bInVBlank); i++) { // to prevent infinite loop
 			if (!GetVBlank(ScanLine, bInVBlank, false)) {
-				break;
-			}
-
-			// to prevent infinite loop when you unplug/disable the output device ... wait no more 1sec.
-			if ((GetRenderersData()->GetPerfCounter() - llPerf2) > UNITS) {
 				break;
 			}
 		}
@@ -2323,9 +2319,9 @@ void CDX9AllocatorPresenter::DrawStats()
 
 		int StartX = 0;
 		int StartY = 0;
-		int ScaleX = 1;
-		int ScaleY = 1;
-		int DrawWidth = 625 * ScaleX + 50;
+		float ScaleX = min(1.0f, max(0.4f, 1.4f*m_WindowRect.Width()/m_rcMonitor.Width()));
+		float ScaleY = min(1.0f, max(0.4f, 1.4f*m_WindowRect.Height()/m_rcMonitor.Height()));
+		int DrawWidth = 625 * ScaleX + 50 * ScaleX;
 		int DrawHeight = 250 * ScaleY;
 		int Alpha = 80;
 		StartX = m_WindowRect.Width() - (DrawWidth + 20);
@@ -2333,34 +2329,33 @@ void CDX9AllocatorPresenter::DrawStats()
 
 		DrawRect(RGB(0,0,0), Alpha, CRect(StartX, StartY, StartX + DrawWidth, StartY + DrawHeight));
 		// === Jitter Graduation
-		//m_pLine->SetWidth(2.2);          // Width
-		//m_pLine->SetAntialias(1);
-		m_pLine->SetWidth(2.5);          // Width
+		m_pLine->SetWidth(2.5 * ScaleX);	// Width
 		m_pLine->SetAntialias(1);
 		//m_pLine->SetGLLines(1);
 		m_pLine->Begin();
 
-		for (int i=10; i<250*ScaleY; i+= 10*ScaleY) {
-			Points[0].x = (FLOAT)StartX;
+		for (int i=10; i < 250 * ScaleY; i += 10 * ScaleY) {
+			Points[0].x = (FLOAT)(StartX);
 			Points[0].y = (FLOAT)(StartY + i);
-			Points[1].x = (FLOAT)(StartX + ((i-10)%40 ? 50 : 625 * ScaleX));
+			Points[1].x = (FLOAT)(StartX + ((i-10)%40 ? 50 *ScaleX : 625 * ScaleX));
 			Points[1].y = (FLOAT)(StartY + i);
 			if (i == 130) {
-				Points[1].x += 50;
+				Points[1].x += 50 * ScaleX;
 			}
+
 			m_pLine->Draw (Points, 2, D3DCOLOR_XRGB(100,100,255));
 		}
 
 		// === Jitter curve
 		if (m_rtTimePerFrame) {
-			for (int i=0; i<NB_JITTER; i++) {
-				nIndex = (m_nNextJitter+1+i) % NB_JITTER;
+			for (int i=0; i < NB_JITTER; i++) {
+				nIndex = (m_nNextJitter + 1 + i) % NB_JITTER;
 				if (nIndex < 0) {
 					nIndex += NB_JITTER;
 				}
 				double Jitter = m_pllJitter[nIndex] - m_fJitterMean;
-				Points[i].x  = (FLOAT)(StartX + (i*5*ScaleX+5));
-				Points[i].y  = (FLOAT)(StartY + ((Jitter*ScaleY)/5000.0 + 125.0* ScaleY));
+				Points[i].x  = (FLOAT)(StartX + (i * 5 * ScaleX + 5));
+				Points[i].y  = (FLOAT)(StartY + ((Jitter * ScaleY)/5000.0 + 125.0 * ScaleY));
 			}
 			m_pLine->Draw (Points, NB_JITTER, D3DCOLOR_XRGB(255,100,100));
 
@@ -2370,8 +2365,8 @@ void CDX9AllocatorPresenter::DrawStats()
 					if (nIndex < 0) {
 						nIndex += NB_JITTER;
 					}
-					Points[i].x  = (FLOAT)(StartX + (i*5*ScaleX+5));
-					Points[i].y  = (FLOAT)(StartY + ((m_pllSyncOffset[nIndex]*ScaleY)/5000 + 125*ScaleY));
+					Points[i].x  = (FLOAT)(StartX + (i * 5 * ScaleX + 5));
+					Points[i].y  = (FLOAT)(StartY + ((m_pllSyncOffset[nIndex] * ScaleY)/5000 + 125 * ScaleY));
 				}
 				m_pLine->Draw (Points, NB_JITTER, D3DCOLOR_XRGB(100,200,100));
 			}
