@@ -359,14 +359,13 @@ bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, 
 	DisplayDevice.cb = sizeof(DISPLAY_DEVICEW);
 
 	DWORD dwDevNum = 0;
-	for (;;) {
-		if (!EnumDisplayDevices(NULL, dwDevNum, &DisplayDevice, 0)) {
-			ASSERT(0);// device not found
-			break;
-		}
+	while (EnumDisplayDevices(NULL, dwDevNum++, &DisplayDevice, 0)) {
 
-		if ((DisplayDevice.StateFlags & DISPLAY_DEVICE_ACTIVE) && !(DisplayDevice.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER) && !_wcsicmp(DisplayDevice.DeviceName, szDevice)) {
-			EXECUTE_ASSERT(EnumDisplayDevices(szDevice, 0, &DisplayDevice, 0));
+		if ((DisplayDevice.StateFlags & DISPLAY_DEVICE_ACTIVE)
+			&& !(DisplayDevice.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)
+			&& !_wcsicmp(DisplayDevice.DeviceName, szDevice)
+			&& EnumDisplayDevices(szDevice, 0, &DisplayDevice, 0)) {
+
 			size_t len = wcslen(DisplayDevice.DeviceID);
 			wchar_t* szDeviceIDshort = DisplayDevice.DeviceID + len - 43;// fixed at 43 characters
 
@@ -475,7 +474,6 @@ bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, 
 			}
 			break;
 		}
-		++dwDevNum;
     }
 
 exit:

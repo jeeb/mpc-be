@@ -60,7 +60,8 @@ extern "C" {
 #define MAX_SUPPORTED_MODE 5
 
 typedef struct {
-	const int		PicEntryNumber;
+	const int		PicEntryNumber_DXVA1;
+	const int		PicEntryNumber_DXVA2;
 	const UINT		PreferedConfigBitstream;
 	const GUID*		Decoder[MAX_SUPPORTED_MODE];
 	const WORD		RestrictedMode[MAX_SUPPORTED_MODE];
@@ -89,7 +90,8 @@ typedef struct {
 
 // DXVA modes supported for Mpeg2
 DXVA_PARAMS		DXVA_Mpeg2 = {
-	24,		// PicEntryNumber
+	16,		// PicEntryNumber - DXVA1
+	24,		// PicEntryNumber - DXVA2
 	1,		// PreferedConfigBitstream
 	{ &DXVA2_ModeMPEG2_VLD, &GUID_NULL },
 	{ DXVA_RESTRICTED_MODE_UNRESTRICTED, 0 } // Restricted mode for DXVA1?
@@ -97,14 +99,8 @@ DXVA_PARAMS		DXVA_Mpeg2 = {
 
 // DXVA modes supported for H264
 DXVA_PARAMS		DXVA_H264 = {
-	16,		// PicEntryNumber
-	2,		// PreferedConfigBitstream
-	{ &DXVA2_ModeH264_E, &DXVA2_ModeH264_F, &DXVA_Intel_H264_ClearVideo, &GUID_NULL },
-	{ DXVA_RESTRICTED_MODE_H264_E, 0}
-};
-
-DXVA_PARAMS		DXVA_H264_VISTA = {
-	24,		// PicEntryNumber
+	16,		// PicEntryNumber - DXVA1
+	24,		// PicEntryNumber - DXVA2
 	2,		// PreferedConfigBitstream
 	{ &DXVA2_ModeH264_E, &DXVA2_ModeH264_F, &DXVA_Intel_H264_ClearVideo, &GUID_NULL },
 	{ DXVA_RESTRICTED_MODE_H264_E, 0}
@@ -112,7 +108,8 @@ DXVA_PARAMS		DXVA_H264_VISTA = {
 
 // DXVA modes supported for VC1
 DXVA_PARAMS		DXVA_VC1 = {
-	24,		// PicEntryNumber
+	16,		// PicEntryNumber - DXVA1
+	24,		// PicEntryNumber - DXVA2
 	1,		// PreferedConfigBitstream
 	{ &DXVA2_ModeVC1_D,				&GUID_NULL },
 	{ DXVA_RESTRICTED_MODE_VC1_D, 0}
@@ -679,14 +676,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CBaseVideoFilter(NAME("MPC - Video decoder"), lpunk, phr, __uuidof(this))
 {
 	HWND hWnd = NULL;
-
-	if (IsWinVistaOrLater()) {
-		for (int i=0; i<_countof(ffCodecs); i++) {
-			if (ffCodecs[i].nFFCodec == AV_CODEC_ID_H264) {
-				ffCodecs[i].DXVAModes = &DXVA_H264_VISTA;
-			}
-		}
-	}
 
 	if (phr) {
 		*phr = S_OK;
@@ -1666,7 +1655,9 @@ void CMPCVideoDecFilter::BuildDXVAOutputFormat()
 int CMPCVideoDecFilter::GetPicEntryNumber()
 {
 	if (IsDXVASupported()) {
-		return ffCodecs[m_nCodecNb].DXVAModes->PicEntryNumber;
+		return IsWinVistaOrLater()
+				? ffCodecs[m_nCodecNb].DXVAModes->PicEntryNumber_DXVA2
+				: ffCodecs[m_nCodecNb].DXVAModes->PicEntryNumber_DXVA1;
 	} else {
 		return 0;
 	}
