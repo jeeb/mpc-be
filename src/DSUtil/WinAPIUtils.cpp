@@ -454,7 +454,21 @@ bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, 
 														RegCloseKey(hKey2);
 														RegCloseKey(hKey1);
 														RegCloseKey(hKey0);
-														goto exit;
+
+														if (wcslen(szMonitorName) && nMonitorHorRes && nMonitorVerRes) {
+															if (MonitorName) {
+																*MonitorName = szMonitorName;
+															}
+															if (MonitorHorRes) {
+																*MonitorHorRes = nMonitorHorRes;
+															}
+															if (MonitorVerRes) {
+																*MonitorVerRes = nMonitorVerRes;
+															}
+
+															return true;
+														}														
+														return false;
 													}
 													RegCloseKey(hKey3);
 												}
@@ -475,22 +489,6 @@ bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, 
 			break;
 		}
     }
-
-exit:
-
-	if (wcslen(szMonitorName) && nMonitorHorRes && nMonitorVerRes) {
-		if (MonitorName) {
-			*MonitorName = szMonitorName;
-		}
-		if (MonitorHorRes) {
-			*MonitorHorRes = nMonitorHorRes;
-		}
-		if (MonitorVerRes) {
-			*MonitorVerRes = nMonitorVerRes;
-		}
-
-		return true;
-	}
 
 	return false;
 }
