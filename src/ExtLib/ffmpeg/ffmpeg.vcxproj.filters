@@ -7,9 +7,6 @@
     <Filter Include="libavcodec\x86">
       <UniqueIdentifier>{927d8398-e10f-483b-8cb6-9698fad28e24}</UniqueIdentifier>
     </Filter>
-    <Filter Include="libavformat">
-      <UniqueIdentifier>{3b272c59-13a1-45a9-8ba8-364b58a9d291}</UniqueIdentifier>
-    </Filter>
     <Filter Include="libavresample">
       <UniqueIdentifier>{616c530e-ecc8-4edb-86d1-35c6421cc973}</UniqueIdentifier>
     </Filter>
@@ -876,24 +873,6 @@
     </ClInclude>
     <ClInclude Include="libavcodec\xvmc_internal.h">
       <Filter>libavcodec</Filter>
-    </ClInclude>
-    <ClInclude Include="libavformat\avformat.h">
-      <Filter>libavformat</Filter>
-    </ClInclude>
-    <ClInclude Include="libavformat\avio.h">
-      <Filter>libavformat</Filter>
-    </ClInclude>
-    <ClInclude Include="libavformat\avio_internal.h">
-      <Filter>libavformat</Filter>
-    </ClInclude>
-    <ClInclude Include="libavformat\spdif.h">
-      <Filter>libavformat</Filter>
-    </ClInclude>
-    <ClInclude Include="libavformat\url.h">
-      <Filter>libavformat</Filter>
-    </ClInclude>
-    <ClInclude Include="libavformat\version.h">
-      <Filter>libavformat</Filter>
     </ClInclude>
     <ClInclude Include="libavresample\audio_convert.h">
       <Filter>libavresample</Filter>
@@ -2036,12 +2015,6 @@
     </ClCompile>
     <ClCompile Include="libavcodec\xiph.c">
       <Filter>libavcodec</Filter>
-    </ClCompile>
-    <ClCompile Include="libavformat\spdif.c">
-      <Filter>libavformat</Filter>
-    </ClCompile>
-    <ClCompile Include="libavformat\spdifenc.c">
-      <Filter>libavformat</Filter>
     </ClCompile>
     <ClCompile Include="libavresample\x86\audio_convert_init.c">
       <Filter>libavresample\x86</Filter>
