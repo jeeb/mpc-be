@@ -28,7 +28,7 @@
 #include "AudioSwitcher.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioParser.h"
-#include  "../../transform/MpaDecFilter/AudioHelper.h"
+#include  "AudioHelper.h"
 
 #ifdef REGISTER_FILTER
 

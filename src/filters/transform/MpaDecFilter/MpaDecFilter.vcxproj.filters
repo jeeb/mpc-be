@@ -33,13 +33,7 @@
     <ClCompile Include="..\..\..\ExtLib\mfc\afxglobals.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Mixer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FFAudioDecoder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AudioHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AC3Encoder.cpp">
@@ -62,16 +56,10 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Mixer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="FFAudioDecoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PaddedArray.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AudioHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AC3Encoder.h">

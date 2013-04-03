@@ -28,7 +28,7 @@
 
 #include "StreamSwitcher.h"
 
-#include "../../transform/MpaDecFilter/Mixer.h"
+#include "Mixer.h"
 
 interface __declspec(uuid("CEDB2890-53AE-4231-91A3-B0AAFCD1DBDE"))
 IAudioSwitcherFilter :
