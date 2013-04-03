@@ -1980,17 +1980,11 @@ void CDX9AllocatorPresenter::DrawStats()
 	WindowRect = m_WindowRect;
 
 	if (!m_pFont && m_pD3DXCreateFont) {
-		UINT FontBase = m_WindowRect.Width() >> 6;
-		UINT FontHeight;
-		UINT FontWidth, FontWeight;
-		if (m_WindowRect.Width() < 1100) {
-			FontWidth	= (FontBase >> 1) + (FontBase >> 3);
-			FontHeight	= FontBase + (FontBase >> 2) + (FontBase >> 3);
+		UINT FontWidth	= m_WindowRect.Width()/130;
+		UINT FontHeight	= m_WindowRect.Height()/35;
+		UINT FontWeight = FW_BOLD;
+		if ((m_rcMonitor.Width() - m_WindowRect.Width()) > 100) {
 			FontWeight	= FW_NORMAL;
-		} else {
-			FontWidth	= (FontBase >> 2) + (FontBase >> 3) + (FontBase >> 4);
-			FontHeight	= FontBase;
-			FontWeight	= FW_BOLD;
 		}
 
 		TextHeight = FontHeight;
