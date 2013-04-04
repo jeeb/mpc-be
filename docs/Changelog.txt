@@ -21,6 +21,7 @@ Changes (*):
 * MediaInfo 0.7.62+ svn rev.5458;
 * libpng 1.7.0 b7 git-40a93652;
 * ZenLibs v0.4.28+ svn rev.430;
+* VirtualDub 1.10.4 Test 6;
 
 Fixes (!):
 
