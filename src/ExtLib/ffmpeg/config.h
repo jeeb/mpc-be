@@ -203,10 +203,11 @@
 // MPC custom code for linking with MSVC
 #if defined(__GNUC__) && ARCH_X86_64
   #define EXTERN_PREFIX ""
+  #define EXTERN_ASM
 #else
   #define EXTERN_PREFIX "_"
+  #define EXTERN_ASM _
 #endif
-#define EXTERN_ASM _
 
 #define ARCH_AARCH64 0
 #define ARCH_ALPHA 0
@@ -251,6 +252,11 @@
 #define HAVE_PTHREADS 0
 #define HAVE_W32THREADS 1
 #define HAVE_OS2THREADS 0
+#define HAVE_ATOMICS_GCC 1
+#define HAVE_ATOMICS_WIN32 1
+#define HAVE_ATOMICS_SUNCC 0
+#define HAVE_ATOMIC_CAS_PTR 0
+#define HAVE_ATOMICS_NATIVE 1
 #define HAVE_ACCESS 1
 #define HAVE_ALIGNED_MALLOC 1
 #define HAVE_ALIGNED_STACK 1
