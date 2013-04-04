@@ -38,6 +38,9 @@
     <ClInclude Include="utils\quant_levels_dec.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="webp\mux_types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dec\alpha_dec.c">

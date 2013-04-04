@@ -113,6 +113,7 @@
     <ClInclude Include="utils\quant_levels_dec.h" />
     <ClInclude Include="webp\decode.h" />
     <ClInclude Include="webp\encode.h" />
+    <ClInclude Include="webp\mux_types.h" />
     <ClInclude Include="webp\types.h" />
   </ItemGroup>
   <ItemGroup>
