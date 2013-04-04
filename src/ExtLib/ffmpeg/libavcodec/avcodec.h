@@ -2796,7 +2796,6 @@ typedef struct AVCodecContext {
     int64_t pts_correction_last_dts;       /// DTS of the last frame
 
     // ==> Start patch MPC
-    int nal_length_size;
     int using_dxva;
     int volatile entangled_thread_counter;
     volatile int ff_avcodec_locked;

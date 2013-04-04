@@ -490,7 +490,6 @@
     <ClCompile Include="libavcodec\h264_mc_template.c" />
     <ClCompile Include="libavcodec\h264_parser.c" />
     <ClCompile Include="libavcodec\h264_ps.c" />
-    <ClCompile Include="libavcodec\h264_recov.c" />
     <ClCompile Include="libavcodec\h264_refs.c" />
     <ClCompile Include="libavcodec\h264_sei.c" />
     <ClCompile Include="libavcodec\hpeldsp.c" />

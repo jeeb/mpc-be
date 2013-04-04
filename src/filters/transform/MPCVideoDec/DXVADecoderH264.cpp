@@ -78,7 +78,6 @@ void CDXVADecoderH264::Init()
 
 	m_nNALLength		= 4;
 	m_nMaxSlices		= 0;
-
 	m_nSlices			= 0;
 
 	switch (GetMode()) {
@@ -172,7 +171,7 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 	UINT						nSize_Result		= 0;
 	int							Sync				= 0;
 
-	CHECK_HR_FALSE (FFH264DecodeFrame (m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), pDataIn, nSize, rtStart, &nFramePOC, &nOutPOC, &rtOutStart, &SecondFieldOffset, &Sync));
+	CHECK_HR_FALSE (FFH264DecodeFrame (m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), pDataIn, nSize, rtStart, &nFramePOC, &nOutPOC, &rtOutStart, &SecondFieldOffset, &Sync, &m_nNALLength));
 
 	while (!nSlices && slice_step <= 2) {
 		Nalu.SetBuffer (pDataIn, nSize, slice_step == 1 ? m_nNALLength : 0);
@@ -324,7 +323,6 @@ void CDXVADecoderH264::ClearUnusedRefFrames()
 void CDXVADecoderH264::SetExtraData (BYTE* pDataIn, UINT nSize)
 {
 	AVCodecContext* pAVCtx	= m_pFilter->GetAVCtx();
-	m_nNALLength			= pAVCtx->nal_length_size;
 
 	FFH264SetDxvaSliceLong (pAVCtx, m_pSliceLong);
 }

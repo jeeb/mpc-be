@@ -5173,7 +5173,3 @@ AVCodec ff_h264_vdpau_decoder = {
     .priv_class     = &h264_vdpau_class,
 };
 #endif
-
-// ==> Start patch MPC
-#include "h264_recov.c"
-// ==> End patch MPC

@@ -23,7 +23,7 @@
 #include "stdafx.h"
 #include "H264Nalu.h"
 
-void CH264Nalu::SetBuffer(BYTE* pBuffer, int nSize, int nNALSize)
+void CH264Nalu::SetBuffer(BYTE* pBuffer, size_t nSize, int nNALSize)
 {
 	m_pBuffer		= pBuffer;
 	m_nSize			= nSize;
@@ -44,9 +44,9 @@ bool CH264Nalu::MoveToNextAnnexBStartcode()
 	if (m_nSize < 4) {
 		return false;
 	}
-	int nBuffEnd = m_nSize - 4;
+	size_t nBuffEnd = m_nSize - 4;
 
-	for (int i=m_nCurPos; i<nBuffEnd; i++) {
+	for (size_t i = m_nCurPos; i < nBuffEnd; i++) {
 		if ((*((DWORD*)(m_pBuffer+i)) & 0x00FFFFFF) == 0x00010000) {
 			// Find next AnnexB Nal
 			m_nCurPos = i;
@@ -71,7 +71,7 @@ bool CH264Nalu::MoveToNextRTPStartcode()
 
 bool CH264Nalu::ReadNext()
 {
-	if ((m_nCurPos >= m_nSize) || (m_nCurPos<0)) {
+	if (m_nCurPos >= m_nSize) {
 		return false;
 	}
 

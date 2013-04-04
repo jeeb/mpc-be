@@ -1455,6 +1455,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		m_pFrame = avcodec_alloc_frame();
 		CheckPointer (m_pFrame, E_POINTER);
 
+		m_h264RandomAccess.SetAVCNALSize(0);
 		m_h264RandomAccess.flush(m_pAVCtx->thread_count);
 
 		BITMAPINFOHEADER *pBMI = NULL;
@@ -1474,7 +1475,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 			m_pAVCtx->codec_tag		= pBMI->biCompression ? pBMI->biCompression : pmt->subtype.Data1;
 
 			if ((m_pAVCtx->codec_tag == MAKEFOURCC('a','v','c','1')) || (m_pAVCtx->codec_tag == MAKEFOURCC('A','V','C','1'))) {
-				m_pAVCtx->nal_length_size	= mpg2v->dwFlags;
 				m_bReorderBFrame			= IsAVI() ? true : false;
 			} else if ((m_pAVCtx->codec_tag == MAKEFOURCC('m','p','4','v')) || (m_pAVCtx->codec_tag == MAKEFOURCC('M','P','4','V'))) {
 				m_bReorderBFrame			= false;
@@ -1516,7 +1516,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 			m_pAVCtx->codec_tag = MAKEFOURCC('M','P','E','G');
 		}
 
-		AllocExtradata (m_pAVCtx, pmt);
+		AllocExtradata(m_pAVCtx, pmt);
 		ExtractAvgTimePerFrame(&m_pInput->CurrentMediaType(), m_rtAvrTimePerFrame);
 		int wout, hout;
 		ExtractDim(&m_pInput->CurrentMediaType(), wout, hout, m_nARX, m_nARY);
@@ -1717,6 +1717,7 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 			extra[extralen-1] = 0;
 
 			bH264avc = TRUE;
+			m_h264RandomAccess.SetAVCNALSize(mp2vi->dwFlags);
 		} else {
 			// Just copy extradata for other formats
 			extra = (uint8_t *)av_mallocz(extralen + FF_INPUT_BUFFER_PADDING_SIZE);
@@ -1815,7 +1816,7 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 	CAutoLock cAutoLock(&m_csReceive);
 	
 	if (m_pAVCtx) {
-		avcodec_flush_buffers (m_pAVCtx);
+		avcodec_flush_buffers(m_pAVCtx);
 	}
 
 	if (m_pParser) {
@@ -1828,11 +1829,11 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 	}
 	
 	m_nPosB = 1;
-	memset (&m_BFrames, 0, sizeof(m_BFrames));
+	memset(&m_BFrames, 0, sizeof(m_BFrames));
 	m_rtLastStop		= 0;
 	m_dRate				= dRate;
 
-	m_h264RandomAccess.flush (m_pAVCtx->thread_count);
+	m_h264RandomAccess.flush(m_pAVCtx->thread_count);
 
 	m_bWaitingForKeyFrame = TRUE;
 
@@ -2148,7 +2149,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 	av_init_packet(&avpkt);
 
 	if (!bFlush && m_nCodecId == AV_CODEC_ID_H264) {
-		if (!m_h264RandomAccess.searchRecoveryPoint(m_pAVCtx, pDataIn, nSize)) {
+		if (!m_h264RandomAccess.searchRecoveryPoint(pDataIn, nSize)) {
 			return S_OK;
 		}
 	}

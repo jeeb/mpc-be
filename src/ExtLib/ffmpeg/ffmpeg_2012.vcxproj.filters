@@ -1512,9 +1512,6 @@
     <ClCompile Include="libavcodec\h264_ps.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
-    <ClCompile Include="libavcodec\h264_recov.c">
-      <Filter>libavcodec</Filter>
-    </ClCompile>
     <ClCompile Include="libavcodec\h264_refs.c">
       <Filter>libavcodec</Filter>
     </ClCompile>

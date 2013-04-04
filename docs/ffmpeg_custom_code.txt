@@ -32,6 +32,5 @@
 ======
 The following files are available only in MPC-BE (compared with ffmpeg):
 
-* libavcodec/h264_recov.c
 * libavcodec/mpc_helper.c
 * libavcodec/vc1_dxva.h
