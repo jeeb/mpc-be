@@ -1233,6 +1233,18 @@ STDMETHODIMP CFGManager::IsPinConnected(IPin* pPin)
 	return SUCCEEDED(pPin->ConnectedTo(&pPinTo)) && pPinTo ? S_OK : S_FALSE;
 }
 
+static bool FindMT(IPin* pPin, const GUID majortype)
+{
+	BeginEnumMediaTypes(pPin, pEM, pmt) {
+		if (pmt->majortype == MEDIATYPE_AUXLine21Data) {
+			return true;
+		}
+	}
+	EndEnumMediaTypes(pmt)
+
+	return false;
+}
+
 STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 {
 	CAutoLock cAutoLock(this);
@@ -1254,8 +1266,9 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 					&& s.iDSVideoRendererType != VIDRNDT_DS_EVR
 					&& s.iDSVideoRendererType != VIDRNDT_DS_SYNC
 					&& s.iDSVideoRendererType != VIDRNDT_DS_VMR9WINDOWED) {
-				// Transform filter
-				if (FindPin(pBF, PINDIR_INPUT, MEDIATYPE_Video) && FindPin(pBF, PINDIR_OUTPUT, MEDIATYPE_Video)) {
+
+				// Disable MEDIATYPE_AUXLine21Data - prevent connect Line 21 Decoder
+				if (FindMT(pPin, MEDIATYPE_AUXLine21Data)) {
 					continue;
 				}
 			}
@@ -1263,10 +1276,22 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 			CLSID clsid;
 			pBF->GetClassID(&clsid);
 
+			// Disable MEDIATYPE_AUXLine21Data - prevent connect Line 21 Decoder
+			if (GetPinName(pPin)[0] == '~' && FindMT(pPin, MEDIATYPE_AUXLine21Data)) {
+				if ((clsid == CLSID_CMPEG2VidDecoderDS && (s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM || s.iDSVideoRendererType == VIDRNDT_DS_SYNC))
+					|| clsid == __uuidof(CMpeg2DecFilter) 
+					|| clsid == CLSID_NvidiaVideoDecoder
+					|| clsid == CLSID_SonicCinemasterVideoDecoder) {
+
+					continue;
+				}
+			}
+
+			/*
 			// Disable DVD subtitle mixing in EVR-CP and EVR-Sync for Microsoft DTV-DVD Video Decoder, it's corrupt DVD playback ...
 			if (clsid == CLSID_CMPEG2VidDecoderDS) {
 				if (s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM || s.iDSVideoRendererType == VIDRNDT_DS_SYNC) {
-					if (GetPinName(pPin)[0] == '~') {
+					if (GetPinName(pPin)[0] == '~' && FindMT(pPin, MEDIATYPE_AUXLine21Data)) {
 						continue;
 					}
 				}
@@ -1276,11 +1301,12 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 			else if (clsid == __uuidof(CMpeg2DecFilter)
 					 || clsid == CLSID_NvidiaVideoDecoder
 					 || clsid == CLSID_SonicCinemasterVideoDecoder) {
-				if (GetPinName(pPin)[0] == '~') {
+				if (GetPinName(pPin)[0] == '~' && FindMT(pPin, MEDIATYPE_AUXLine21Data)) {
 					continue;
 				}
 				//TODO: enable multiple pins for the renderer, if the video decoder supports DXVA
 			}
+			*/
 
 			m_streampath.Append(pBF, pPin);
 

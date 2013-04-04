@@ -5167,6 +5167,7 @@ void CMainFrame::OnFileOpendvd()
 				return;
 			}
 
+			psiFolder = NULL;
 			if (SUCCEEDED(openDlgPtr->GetResult(&psiFolder))) {
 				LPWSTR folderpath = NULL;
 				if(SUCCEEDED(psiFolder->GetDisplayName(SIGDN_FILESYSPATH, &folderpath))) {
