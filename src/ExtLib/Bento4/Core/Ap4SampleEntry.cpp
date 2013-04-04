@@ -329,7 +329,7 @@ AP4_AudioSampleEntry::AP4_AudioSampleEntry(AP4_Atom::Type    format,
     m_QtV2BytesPerAudioPacket(0),
     m_QtV2LPCMFramesPerAudioPacket(0),
 // MPC-BE custom code start
-	m_Endian(ENDIAN_NOTSET)
+    m_Endian(ENDIAN_NOTSET)
 // MPC-BE custom code end
 {
     m_Size += 20;
