@@ -11,7 +11,6 @@
 #define IDS_VDF_DBLK_BIDIR              33173
 #define IDS_VDF_DBLK_NONKFRM            33174
 #define IDS_VDF_DBLK_ALL                33175
-#define IDS_VDF_IDCT_AUTO               33182
 #define IDS_VDF_DXVA_SETTING            33187
 #define IDS_VDF_DXVA_MODE               33189
 #define IDS_VDF_VIDEOCARD               33194

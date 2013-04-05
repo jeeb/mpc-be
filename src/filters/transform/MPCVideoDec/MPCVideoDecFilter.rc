@@ -110,7 +110,6 @@ BEGIN
     IDS_VDF_DBLK_BIDIR      "Bidirectional"
     IDS_VDF_DBLK_NONKFRM    "Non keyframes"
     IDS_VDF_DBLK_ALL        "All frames"
-    IDS_VDF_IDCT_AUTO       "Auto"
     IDS_VDF_AR_MODE         "Read AR from stream"
 END
 

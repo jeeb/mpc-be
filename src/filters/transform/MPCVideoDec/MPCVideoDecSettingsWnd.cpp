@@ -49,21 +49,6 @@ int FindDiscardIndex(int nValue)
 	return 1;
 }
 
-int g_AVErrRecognition[] = {
-	AV_EF_CAREFUL,
-	AV_EF_COMPLIANT,
-	AV_EF_AGGRESSIVE,
-};
-
-int FindErrRecognitionIndex(int nValue)
-{
-	for (int i=0; i<_countof (g_AVErrRecognition); i++)
-		if (g_AVErrRecognition[i] == nValue) {
-			return i;
-		}
-	return 1;
-}
-
 CMPCVideoDecSettingsWnd::CMPCVideoDecSettingsWnd()
 {
 }
@@ -111,7 +96,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	// Decoding threads
 	m_txtThreadNumber.Create(ResStr(IDS_VDF_THREADNUMBER), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(220), m_fontheight)), this, (UINT)IDC_STATIC);
 	m_cbThreadNumber.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(IPP_SCALE(230), -4), CSize(IPP_SCALE(110), 200)), this, IDC_PP_THREAD_NUMBER);
-	m_cbThreadNumber.AddString (ResStr (IDS_VDF_IDCT_AUTO));
+	m_cbThreadNumber.AddString (ResStr (IDS_VDF_DEINTER_AUTO));
 	CString ThreadNumberStr;
 	for (int i=0; i<16; i++) {
 		ThreadNumberStr.Format		(_T("%d"), i+1);
