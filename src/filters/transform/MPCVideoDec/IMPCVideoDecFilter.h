@@ -75,12 +75,6 @@ public IUnknown {
 	STDMETHOD(SetDiscardMode(int nValue)) = 0;
 	STDMETHOD_(int, GetDiscardMode()) = 0;
 
-	STDMETHOD(SetErrorRecognition(int nValue)) = 0;
-	STDMETHOD_(int, GetErrorRecognition()) = 0;
-
-	STDMETHOD(SetIDCTAlgo(int nValue)) = 0;
-	STDMETHOD_(int, GetIDCTAlgo()) = 0;
-
 	STDMETHOD(SetDeinterlacing(MPC_DEINTERLACING_FLAGS nValue)) = 0;
 	STDMETHOD_(MPC_DEINTERLACING_FLAGS, GetDeinterlacing()) = 0;
 

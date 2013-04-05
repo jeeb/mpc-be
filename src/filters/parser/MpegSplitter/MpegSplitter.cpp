@@ -535,7 +535,6 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	, m_useFastStreamChange(true)
 	, m_useFastSeek(false)
 	, m_ForcedSub(false)
-	, m_TrackPriority(false)
 	, m_AC3CoreOnly(0)
 	, m_AlternativeDuration(false)
 	, m_SubEmptyPin(false)
@@ -558,10 +557,6 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 
 		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("ForcedSub"), dw)) {
 			m_ForcedSub = !!dw;
-		}
-
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("TrackPriority"), dw)) {
-			m_TrackPriority = !!dw;
 		}
 
 		len = _countof(buff);
@@ -592,7 +587,6 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	m_useFastStreamChange		= !!AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("UseFastStreamChange"), m_useFastStreamChange);
 	m_useFastSeek				= !!AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("UseFastSeek"), m_useFastSeek);
 	m_ForcedSub					= !!AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("ForcedSub"), m_ForcedSub);
-	m_TrackPriority				= !!AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("TrackPriority"), m_TrackPriority);
 
 	bool UseLangOrder			= !!AfxGetApp()->GetProfileInt(IDS_R_SETTINGS, IDS_RS_INTERNALSELECTTRACKLOGIC, TRUE);
 	if (UseLangOrder) {
@@ -851,7 +845,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_pFile.Free();
 
 	ReadClipInfo (GetPartFilename(pAsyncReader));
-	m_pFile.Attach(DNew CMpegSplitterFile(pAsyncReader, hr, m_ClipInfo.IsHdmv(), m_ClipInfo, m_ForcedSub, m_TrackPriority, m_AC3CoreOnly, m_AlternativeDuration, m_SubEmptyPin));
+	m_pFile.Attach(DNew CMpegSplitterFile(pAsyncReader, hr, m_ClipInfo.IsHdmv(), m_ClipInfo, m_ForcedSub, m_AC3CoreOnly, m_AlternativeDuration, m_SubEmptyPin));
 
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
@@ -1493,40 +1487,6 @@ LONGLONG GetMediaTypeQuality(const CMediaType *_pMediaType, int _PresentationFor
 	return 0;
 }
 
-bool CMpegSplitterFile::stream::operator < (const stream &_Other) const
-{
-
-	if (mt.majortype == MEDIATYPE_Audio && _Other.mt.majortype == MEDIATYPE_Audio) {
-		int iProgram0;
-		const CHdmvClipInfo::Stream *pClipInfo0;
-		const CMpegSplitterFile::program * pProgram0 = m_pFile->FindProgram(pid, iProgram0, pClipInfo0);
-		int StreamType0 = pClipInfo0 ? pClipInfo0->m_Type : pProgram0 ? pProgram0->streams[iProgram0].type : 0;
-		int iProgram1;
-		const CHdmvClipInfo::Stream *pClipInfo1;
-		const CMpegSplitterFile::program * pProgram1 = m_pFile->FindProgram(_Other.pid, iProgram1, pClipInfo1);
-		int StreamType1 = pClipInfo1 ? pClipInfo1->m_Type : pProgram1 ? pProgram1->streams[iProgram1].type : 0;
-
-		if (mt.formattype == FORMAT_WaveFormatEx && _Other.mt.formattype != FORMAT_WaveFormatEx) {
-			return true;
-		}
-		if (mt.formattype != FORMAT_WaveFormatEx && _Other.mt.formattype == FORMAT_WaveFormatEx) {
-			return false;
-		}
-
-		LONGLONG Quality0 = GetMediaTypeQuality(&mt, StreamType0);
-		LONGLONG Quality1 = GetMediaTypeQuality(&_Other.mt, StreamType1);
-		if (Quality0 > Quality1) {
-			return true;
-		}
-		if (Quality0 < Quality1) {
-			return false;
-		}
-	}
-	DWORD DefaultFirst = *this;
-	DWORD DefaultSecond = _Other;
-	return DefaultFirst < DefaultSecond;
-}
-
 STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD* pdwFlags, LCID* plcid, DWORD* pdwGroup, WCHAR** ppszName, IUnknown** ppObject, IUnknown** ppUnk)
 {
 	for (int i = 0, j = 0; i < _countof(m_pFile->m_streams); i++) {
@@ -1651,7 +1611,6 @@ STDMETHODIMP CMpegSplitterFilter::Apply()
 		key.SetDWORDValue(_T("UseFastStreamChange"), m_useFastStreamChange);
 		key.SetDWORDValue(_T("UseFastSeek"), m_useFastSeek);
 		key.SetDWORDValue(_T("ForcedSub"), m_ForcedSub);
-		key.SetDWORDValue(_T("TrackPriority"), m_TrackPriority);
 		key.SetStringValue(_T("AudioLanguageOrder"), m_csAudioLanguageOrder);
 		key.SetStringValue(_T("SubtitlesLanguageOrder"), m_csSubtitlesLanguageOrder);
 		key.SetDWORDValue(_T("AC3CoreOnly"), m_AC3CoreOnly);
@@ -1662,7 +1621,6 @@ STDMETHODIMP CMpegSplitterFilter::Apply()
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("UseFastStreamChange"), m_useFastStreamChange);
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("UseFastSeek"), m_useFastSeek);
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("ForcedSub"), m_ForcedSub);
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("TrackPriority"), m_TrackPriority);
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("AC3CoreOnly"), m_AC3CoreOnly);
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("AlternativeDuration"), m_AlternativeDuration);
 	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("SubtitleEmptyOutput"), m_SubEmptyPin);
@@ -1708,19 +1666,6 @@ STDMETHODIMP_(BOOL) CMpegSplitterFilter::GetForcedSub()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_ForcedSub;
-}
-
-STDMETHODIMP CMpegSplitterFilter::SetTrackPriority(BOOL nValue)
-{
-	CAutoLock cAutoLock(&m_csProps);
-	m_TrackPriority = !!nValue;
-	return S_OK;
-}
-
-STDMETHODIMP_(BOOL) CMpegSplitterFilter::GetTrackPriority()
-{
-	CAutoLock cAutoLock(&m_csProps);
-	return m_TrackPriority;
 }
 
 STDMETHODIMP CMpegSplitterFilter::SetAudioLanguageOrder(WCHAR *nValue)

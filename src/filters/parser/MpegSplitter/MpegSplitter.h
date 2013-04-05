@@ -80,7 +80,7 @@ protected:
 
 private:
 	CString m_csAudioLanguageOrder, m_csSubtitlesLanguageOrder;
-	bool m_useFastStreamChange, m_useFastSeek, m_ForcedSub, m_TrackPriority, m_AlternativeDuration, m_SubEmptyPin;
+	bool m_useFastStreamChange, m_useFastSeek, m_ForcedSub, m_AlternativeDuration, m_SubEmptyPin;
 	int m_AC3CoreOnly;
 	CCritSec m_csProps;
 
@@ -123,9 +123,6 @@ public:
 
 	STDMETHODIMP SetForcedSub(BOOL nValue);
 	STDMETHODIMP_(BOOL) GetForcedSub();
-
-	STDMETHODIMP SetTrackPriority(BOOL nValue);
-	STDMETHODIMP_(BOOL) GetTrackPriority();
 
 	STDMETHODIMP SetAudioLanguageOrder(WCHAR *nValue);
 	STDMETHODIMP_(WCHAR *) GetAudioLanguageOrder();

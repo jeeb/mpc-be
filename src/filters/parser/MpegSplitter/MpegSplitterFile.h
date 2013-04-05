@@ -48,7 +48,7 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 
 public:
 	CHdmvClipInfo &m_ClipInfo;
-	CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bool bIsHdmv, CHdmvClipInfo &ClipInfo, bool ForcedSub, bool TrackPriority, int AC3CoreOnly, bool m_AlternativeDuration, bool SubEmptyPin);
+	CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bool bIsHdmv, CHdmvClipInfo &ClipInfo, bool ForcedSub, int AC3CoreOnly, bool m_AlternativeDuration, bool SubEmptyPin);
 
 	REFERENCE_TIME NextPTS(DWORD TrackNum);
 
@@ -61,7 +61,7 @@ public:
 	int m_rate; // byte/sec
 
 	int m_AC3CoreOnly;
-	bool m_ForcedSub, m_TrackPriority, m_AlternativeDuration, m_SubEmptyPin;
+	bool m_ForcedSub, m_AlternativeDuration, m_SubEmptyPin;
 
 	struct stream {
 		CMpegSplitterFile *m_pFile;
@@ -71,7 +71,6 @@ public:
 		char lang[4];
 		bool lang_set;
 
-		bool operator < (const stream &_Other) const;
 		struct stream() {
 			memset(this, 0, sizeof(*this));
 		}
@@ -114,23 +113,12 @@ public:
 
 		void Insert(stream& s, CMpegSplitterFile *_pFile) {
 			s.m_pFile = _pFile;
-			if (_pFile->m_TrackPriority) {
-				for (POSITION pos = GetHeadPosition(); pos; GetNext(pos)) {
-					stream& s2 = GetAt(pos);
-					if (s < s2) {
-						InsertBefore(pos, s);
-						return;
-					}
-				}
-				AddTail(s);
-			} else {
-				AddTail(s);
-				if (GetCount() > 1) {
-					for (size_t j=0; j<GetCount(); j++) {
-						for (size_t i=0; i<GetCount()-1; i++) {
-							if (GetAt(FindIndex(i)) > GetAt(FindIndex(i+1))) {
-								SwapElements(FindIndex(i), FindIndex(i+1));
-							}
+			AddTail(s);
+			if (GetCount() > 1) {
+				for (size_t j=0; j<GetCount(); j++) {
+					for (size_t i=0; i<GetCount()-1; i++) {
+						if (GetAt(FindIndex(i)) > GetAt(FindIndex(i+1))) {
+							SwapElements(FindIndex(i), FindIndex(i+1));
 						}
 					}
 				}

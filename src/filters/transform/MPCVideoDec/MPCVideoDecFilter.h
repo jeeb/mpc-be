@@ -85,8 +85,6 @@ protected:
 	// === Persistants parameters (registry)
 	int										m_nThreadNumber;
 	int										m_nDiscardMode;
-	int										m_nErrorRecognition;
-	int										m_nIDCTAlgo;
 	MPC_DEINTERLACING_FLAGS					m_nDeinterlacing;
 	bool									m_bDXVACompatible;
 	DWORD									m_nActiveCodecs;
@@ -245,10 +243,6 @@ public:
 	STDMETHODIMP_(int) GetThreadNumber();
 	STDMETHOD(SetDiscardMode(int nValue));
 	STDMETHOD_(int, GetDiscardMode());
-	STDMETHOD(SetErrorRecognition(int nValue));
-	STDMETHOD_(int, GetErrorRecognition());
-	STDMETHOD(SetIDCTAlgo(int nValue));
-	STDMETHOD_(int, GetIDCTAlgo());
 	STDMETHOD(SetDeinterlacing(MPC_DEINTERLACING_FLAGS nValue));
 	STDMETHOD_(MPC_DEINTERLACING_FLAGS, GetDeinterlacing());
 	STDMETHOD_(GUID*, GetDXVADecoderGuid());

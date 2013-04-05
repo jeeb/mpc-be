@@ -30,7 +30,7 @@
 #endif
 #include <moreuuids.h>
 
-CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bool bIsHdmv, CHdmvClipInfo &ClipInfo, bool ForcedSub, bool TrackPriority, int AC3CoreOnly, bool AlternativeDuration, bool SubEmptyPin)
+CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bool bIsHdmv, CHdmvClipInfo &ClipInfo, bool ForcedSub, int AC3CoreOnly, bool AlternativeDuration, bool SubEmptyPin)
 	: CBaseSplitterFileEx(pAsyncReader, hr, false, true)
 	, m_type(mpeg_us)
 	, m_rate(0)
@@ -39,7 +39,6 @@ CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bo
 	, m_bIsHdmv(bIsHdmv)
 	, m_ClipInfo(ClipInfo)
 	, m_ForcedSub(ForcedSub)
-	, m_TrackPriority(TrackPriority)
 	, m_AC3CoreOnly(AC3CoreOnly)
 	, m_AlternativeDuration(AlternativeDuration)
 	, m_SubEmptyPin(SubEmptyPin)
