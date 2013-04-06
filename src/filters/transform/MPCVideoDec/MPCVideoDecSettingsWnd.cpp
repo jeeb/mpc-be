@@ -96,7 +96,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	// Decoding threads
 	m_txtThreadNumber.Create(ResStr(IDS_VDF_THREADNUMBER), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(220), m_fontheight)), this, (UINT)IDC_STATIC);
 	m_cbThreadNumber.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(IPP_SCALE(230), -4), CSize(IPP_SCALE(110), 200)), this, IDC_PP_THREAD_NUMBER);
-	m_cbThreadNumber.AddString (ResStr (IDS_VDF_DEINTER_AUTO));
+	m_cbThreadNumber.AddString (ResStr (IDS_VDF_AUTO));
 	CString ThreadNumberStr;
 	for (int i=0; i<16; i++) {
 		ThreadNumberStr.Format		(_T("%d"), i+1);
@@ -118,7 +118,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	// Deinterlacing
 	m_txtDeinterlacing.Create(ResStr(IDS_VDF_DEINTERLACING), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(220), m_fontheight)), this, (UINT)IDC_STATIC);
 	m_cbDeinterlacing.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(IPP_SCALE(230), -4), CSize(IPP_SCALE(110), 200)), this, IDC_PP_DEINTERLACING);
-	m_cbDeinterlacing.AddString (ResStr(IDS_VDF_DEINTER_AUTO));
+	m_cbDeinterlacing.AddString (ResStr(IDS_VDF_AUTO));
 	m_cbDeinterlacing.AddString (ResStr(IDS_VDF_DEINTER_TOP));
 	m_cbDeinterlacing.AddString (ResStr(IDS_VDF_DEINTER_BOTTOM));
 	m_cbDeinterlacing.AddString (ResStr(IDS_VDF_DEINTER_PROGRESSIVE));
@@ -234,7 +234,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbSwColorspace.Create(dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(width_s, 200)), this, IDC_PP_SWCOLORSPACE);
 	m_cbSwColorspace.AddString(_T("SD (BT.601)")); // ResStr(IDS_VDF_COLOR_HD)
 	m_cbSwColorspace.AddString(_T("HD (BT.709)")); // ResStr(IDS_VDF_COLOR_SD)
-	m_cbSwColorspace.AddString(_T("Auto"));        // ResStr(IDS_VDF_COLOR_AUTO)
+	m_cbSwColorspace.AddString(ResStr(IDS_VDF_AUTO));
 	p.y += h25;
 
 	// Input levels
@@ -243,7 +243,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbSwInputLevels.Create(dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(width_s, 200)), this, IDC_PP_SWINPUTLEVELS);
 	m_cbSwInputLevels.AddString(_T("TV (16-235)")); // ResStr(IDS_VDF_RANGE_TV)
 	m_cbSwInputLevels.AddString(_T("PC (0-255)"));  // ResStr(IDS_VDF_RANGE_PC)
-	m_cbSwInputLevels.AddString(_T("Auto"));        // ResStr(IDS_VDF_RANGE_AUTO)
+	m_cbSwInputLevels.AddString(ResStr(IDS_VDF_AUTO));
 	p.y += h25;
 
 	// Output levels
@@ -252,7 +252,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbSwOutputLevels.Create(dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(width_s, 200)), this, IDC_PP_SWOUTPUTLEVELS);
 	m_cbSwOutputLevels.AddString(_T("TV (16-235)")); // ResStr(IDS_VDF_RANGE_TV)
 	m_cbSwOutputLevels.AddString(_T("PC (0-255)"));  // ResStr(IDS_VDF_RANGE_PC)
-	m_cbSwOutputLevels.AddString(_T("Auto"));        // ResStr(IDS_VDF_RANGE_AUTO)
+	m_cbSwOutputLevels.AddString(ResStr(IDS_VDF_AUTO));
 	p.y += h25;
 
 	// Software version, useful info for stand-alone filter

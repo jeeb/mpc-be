@@ -133,7 +133,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_VDF_DEINTERLACING		"Deinterlacing"
-    IDS_VDF_DEINTER_AUTO		"Auto"
+    IDS_VDF_AUTO		"Auto"
     IDS_VDF_DEINTER_TOP			"Top-Field First"
     IDS_VDF_DEINTER_BOTTOM		"Bottom-Field First"
     IDS_VDF_DEINTER_PROGRESSIVE	"Progressive"

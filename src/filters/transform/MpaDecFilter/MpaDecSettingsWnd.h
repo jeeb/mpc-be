@@ -100,11 +100,8 @@ public:
 	bool OnApply();
 
 	static LPCTSTR GetWindowTitle() {
-#ifdef REGISTER_FILTER
 		return _T("Settings");
-#else
-		return MAKEINTRESOURCE(IDS_AG_SETTINGS);
-#endif
+		//return MAKEINTRESOURCE(IDS_FILTER_SETTINGS_CAPTION);
 	}
 	static CSize GetWindowSize()    { return CSize(225, 156); }
 
