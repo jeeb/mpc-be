@@ -3479,6 +3479,13 @@ BEGIN
     IDC_CACH_SIZE                       "Cache size for file operations (in kilobytes)"
 END
 
+STRINGTABLE
+BEGIN
+    IDS_FILTER_SETTINGS_CAPTION     "Settings"
+    IDS_AVISPLITTER_NON_INTERLEAVED "Support ""Bad"" Interleaved files"
+    IDS_AVISPLITTER_REINDEX_BROKEN  "Reindex broken files"
+END
+
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 

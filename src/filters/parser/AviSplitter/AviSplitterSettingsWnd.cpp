@@ -57,10 +57,10 @@ bool CAviSplitterSettingsWnd::OnActivate()
 	DWORD dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP;
 	CPoint p(10, 10);
 
-	m_cbBadInterleavedSuport.Create (_T("Support \"Bad\" Interleaved files"), WS_VISIBLE|WS_CHILD|WS_TABSTOP|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(250), m_fontheight)), this, IDC_PP_INTERLEAVED_SUPPORT);
+	m_cbBadInterleavedSuport.Create (ResStr(IDS_AVISPLITTER_NON_INTERLEAVED), WS_VISIBLE|WS_CHILD|WS_TABSTOP|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(250), m_fontheight)), this, IDC_PP_INTERLEAVED_SUPPORT);
 	p.y += IPP_SCALE(20);
 
-	m_cbSetReindex.Create (_T("Reindex broken files"), WS_VISIBLE|WS_CHILD|WS_TABSTOP|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(250), m_fontheight)), this, IDC_PP_SET_REINDEX);
+	m_cbSetReindex.Create (ResStr(IDS_AVISPLITTER_REINDEX_BROKEN), WS_VISIBLE|WS_CHILD|WS_TABSTOP|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(250), m_fontheight)), this, IDC_PP_SET_REINDEX);
 
 	if (m_pMSF) {
 		m_cbBadInterleavedSuport.SetCheck(m_pMSF->GetBadInterleavedSuport());

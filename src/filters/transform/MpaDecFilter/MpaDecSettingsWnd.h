@@ -99,10 +99,7 @@ public:
 	void OnDeactivate();
 	bool OnApply();
 
-	static LPCTSTR GetWindowTitle() {
-		return _T("Settings");
-		//return MAKEINTRESOURCE(IDS_FILTER_SETTINGS_CAPTION);
-	}
+	static LPCTSTR GetWindowTitle() { return MAKEINTRESOURCE(IDS_FILTER_SETTINGS_CAPTION); }
 	static CSize GetWindowSize()    { return CSize(225, 156); }
 
 	DECLARE_MESSAGE_MAP()
