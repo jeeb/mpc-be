@@ -355,6 +355,14 @@ bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, 
 	nMonitorHorRes	= 0;
 	nMonitorVerRes	= 0;
 
+	if (MonitorHorRes) {
+		*MonitorHorRes = 0;
+	}
+
+	if (MonitorVerRes) {
+		*MonitorVerRes = 0;
+	}
+
 	DISPLAY_DEVICE DisplayDevice;
 	DisplayDevice.cb = sizeof(DISPLAY_DEVICEW);
 
