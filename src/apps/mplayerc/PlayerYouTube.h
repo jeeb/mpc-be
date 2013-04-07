@@ -85,4 +85,5 @@ static DWORD strpos(char* h, char* n)
 	return 0;
 }
 
+bool PlayerYouTubeCheck(CString fn);
 CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author);

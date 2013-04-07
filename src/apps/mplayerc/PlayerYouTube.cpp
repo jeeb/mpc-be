@@ -22,6 +22,18 @@
 
 #include "stdafx.h"
 #include "PlayerYouTube.h"
+#include "PlayerVimeo.h"
+
+bool PlayerYouTubeCheck(CString fn)
+{
+	CString tmp_fn(CString(fn).MakeLower());
+
+	if (tmp_fn.Find(YOUTUBE_URL) != -1 || tmp_fn.Find(YOUTU_BE_URL) != -1) {
+		return 1;
+	}
+
+	return 0;
+}
 
 CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 {
@@ -34,7 +46,14 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 
 	CString tmp_fn(CString(fn).MakeLower());
 
-	if (tmp_fn.Find(YOUTUBE_URL) != -1 || tmp_fn.Find(YOUTU_BE_URL) != -1) {
+	if (tmp_fn.Find(VIMEO_URL) != -1) {
+		if (out_Title) {
+			*out_Title = PlayerVimeoTitle(fn);
+		}
+		return PlayerVimeo(fn);
+	}
+
+	if (PlayerYouTubeCheck(fn)) {
 
 #ifdef _DEBUG
 		LOG2FILE(_T("------"));
@@ -75,7 +94,7 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 						match_start	= strpos(out, MATCH_START);
 					} else {
 						match_len	= strpos(out + match_start + strlen(MATCH_START), MATCH_END);
-					};
+					}
 
 					if (match_start && match_len) {
 						match_start += strlen(MATCH_START);
@@ -306,14 +325,10 @@ again:
 #endif
 
 			Title.Replace(ext, _T(""));
-			url.Append(_T("&title="));
-			url.Append(CString(UrlEncode(UTF16To8(Title))));
-			url.Append(ext);
 
 			if (out_Title) {
 				*out_Title = Title + ext;
 			}
-
 			if (out_Author) {
 				*out_Author = Author;
 			}
@@ -325,8 +340,6 @@ again:
 			match_itag = false;
 			goto again;
 		}
-
-		return fn;
 	}
 
 	return fn;

@@ -5390,13 +5390,8 @@ void CMainFrame::OnFileSaveAs()
 				out = out.Left(out.GetLength()-4) + _T(".vob");
 			}
 		} else {
-			int t_pos = out.Find(_T("&title="));
-			if (t_pos > 0) {
-				out = out.Right(out.GetLength() - t_pos - 7);
-			} else {
-				out = out.Right(find+3);
-				out.Replace(_T("/"), _T("_"));
-			}
+			out = out.Right(find+3);
+			out.Replace(_T("/"), _T("_"));
 		}
 	}
 
@@ -12274,6 +12269,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		if (fn.IsEmpty() && !fFirst) {
 			break;
 		}
+		fn.Replace(_T("https://"), _T("http://"));
 
 		m_strTitleAlt	= _T("");
 		m_strAuthorAlt	= _T("");
@@ -12336,8 +12332,9 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 			if (!extimage) {
 				CString tmpName = PlayerYouTube(fn, &m_strTitleAlt, &m_strAuthorAlt);
+				tmpName.Replace(_T("&amp;"), _T("&"));
 
-				if (s.iYoutubeSource == 0) {
+				if (PlayerYouTubeCheck(fn) && s.iYoutubeSource == 0) {
 					if (!m_strTitleAlt.IsEmpty() && tmpName.Find(_T("http://")) == 0) {
 						m_fYoutubeThreadWork = TH_START;
 						m_YoutubeFile = tmpName;
