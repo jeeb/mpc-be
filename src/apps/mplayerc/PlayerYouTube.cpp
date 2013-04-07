@@ -200,8 +200,11 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 		}
 #endif
 
-		CString tag; tag.Format(_T("itag=%d"), AfxGetAppSettings().iYoutubeTag);
-		boolean match_itag = AfxGetAppSettings().iYoutubeTag != 0;
+		AppSettings& s = AfxGetAppSettings();
+
+		CString tag;
+		tag.Format(_T("itag=%d"), s.iYoutubeTag);
+		boolean match_itag = s.iYoutubeTag != 0;
 
 again:
 
