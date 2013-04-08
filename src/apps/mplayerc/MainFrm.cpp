@@ -4062,8 +4062,10 @@ void CMainFrame::OnFilePostClosemedia()
 	m_wndStatusBar.Clear();
 	m_wndStatusBar.ShowTimer(false);
 	m_wndStatusBar.Relayout();
+
 	m_strFn					= _T("");
 	m_strFnFull				= _T("");
+	m_strUrl				= _T("");
 	m_strTitleAlt			= _T("");
 	m_strAuthorAlt			= _T("");
 
@@ -5372,7 +5374,7 @@ void CMainFrame::OnFileSaveAs()
 {
 	AppSettings& s = AfxGetAppSettings();
 
-	CString ext, ext_list, in = PlayerYouTube(m_wndPlaylistBar.GetCurFileName(), NULL, NULL), out = in;
+	CString ext, ext_list, in = m_strUrl, out = in;
 
 	if (!m_strTitleAlt.IsEmpty()) {
 		out = GetAltFileName();
@@ -12271,8 +12273,10 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		}
 		fn.Replace(_T("https://"), _T("http://"));
 
+		m_strUrl		= _T("");
 		m_strTitleAlt	= _T("");
 		m_strAuthorAlt	= _T("");
+
 		HRESULT hr = S_OK;
 		bool extimage = false;
 
@@ -12327,12 +12331,15 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				if (bitmap) {
 					DeleteObject(bitmap);
 					extimage = true;
+					m_strUrl = fn;
 				}
 			}
 
 			if (!extimage) {
 				CString tmpName = PlayerYouTube(fn, &m_strTitleAlt, &m_strAuthorAlt);
 				tmpName.Replace(_T("&amp;"), _T("&"));
+
+				m_strUrl = tmpName;
 
 				if (PlayerYouTubeCheck(fn) && s.iYoutubeSource == 0) {
 					if (!m_strTitleAlt.IsEmpty() && tmpName.Find(_T("http://")) == 0) {
@@ -12413,7 +12420,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			if (s.fKeepHistory && s.fRememberFilePos && !s.NewFile(fn)) {
 				REFERENCE_TIME	rtPos = s.CurrentFilePosition()->llPosition;
 				if (pMS) {
-					pMS->SetPositions (&rtPos, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
+					pMS->SetPositions(&rtPos, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
 				}
 			}
 		}

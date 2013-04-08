@@ -1064,6 +1064,7 @@ public:
 	CString		m_strTitle;
 	CString		m_strFn;
 	CString		m_strFnFull;
+	CString		m_strUrl;
 	CString		m_strTitleAlt;
 	CString		GetStrForTitle();
 	CString		GetAltFileName();
