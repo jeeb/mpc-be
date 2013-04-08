@@ -23,10 +23,10 @@
 #pragma once
 
 #include <afxinet.h>
-#include "PlayerVimeo.h"
 
 #define YOUTUBE_URL		_T("youtube.com/watch?")
 #define YOUTU_BE_URL	_T("youtu.be/")
+#define VIMEO_URL		_T("://vimeo.com/")
 
 #define MATCH_START		"\"url_encoded_fmt_stream_map\": \""
 #define MATCH_END		"\""

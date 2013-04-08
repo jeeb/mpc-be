@@ -22,8 +22,6 @@
 
 #pragma once
 
-#define VIMEO_URL		_T("://vimeo.com/")
-
 CString PlayerVimeo(CString fn)
 {
 	CString tmp_fn(CString(fn).MakeLower());

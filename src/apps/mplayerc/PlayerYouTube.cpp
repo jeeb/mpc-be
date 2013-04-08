@@ -22,6 +22,7 @@
 
 #include "stdafx.h"
 #include "PlayerYouTube.h"
+#include "PlayerVimeo.h"
 
 bool PlayerYouTubeCheck(CString fn)
 {
