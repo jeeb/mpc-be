@@ -12330,9 +12330,10 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				HBITMAP bitmap = OpenImage(fn);
 				if (bitmap) {
 					DeleteObject(bitmap);
-					extimage = true;
-					m_strUrl = fn;
+				} else {
+					hr = VFW_E_INVALID_FILE_FORMAT;
 				}
+				extimage = true;
 			}
 
 			if (!extimage) {
@@ -12362,7 +12363,11 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 		}
 
-		if (!extimage && FAILED(hr)) {
+		if (m_strUrl.IsEmpty()) {
+			m_strUrl = fn;
+		}
+
+		if (FAILED(hr)) {
 
 			if (fFirst) {
 				if (s.fReportFailedPins) {
