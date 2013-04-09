@@ -173,7 +173,8 @@ CString PlayerVimeoTitle(CString fn)
 
 				Title.Replace(_T("&quot;"), _T("\""));
 				Title.Replace(_T("&amp;"), _T("&"));
-				Title.Replace(_T("&#39;"), _T("\""));
+				Title.Replace(_T("&#39;"), _T("'"));
+				Title.Replace(_T("&#039;"), _T("'"));
 
 				delete [] title;
 			}

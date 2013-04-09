@@ -153,7 +153,8 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 
 				Title.Replace(_T("&quot;"), _T("\""));
 				Title.Replace(_T("&amp;"), _T("&"));
-				Title.Replace(_T("&#39;"), _T("\""));
+				Title.Replace(_T("&#39;"), _T("'"));
+				Title.Replace(_T("&#039;"), _T("'"));
 
 				delete [] title;
 			}
