@@ -233,7 +233,7 @@ namespace utf8
     template <typename u16bit_iterator, typename octet_iterator>
     u16bit_iterator utf8to16 (octet_iterator start, octet_iterator end, u16bit_iterator result)
     {
-        while (start < end) {
+        while (start != end) {
             uint32_t cp = utf8::next(start, end);
             if (cp > 0xffff) { //make a surrogate pair
                 *result++ = static_cast<uint16_t>((cp >> 10)   + internal::LEAD_OFFSET);
@@ -257,7 +257,7 @@ namespace utf8
     template <typename octet_iterator, typename u32bit_iterator>
     u32bit_iterator utf8to32 (octet_iterator start, octet_iterator end, u32bit_iterator result)
     {
-        while (start < end)
+        while (start != end)
             (*result++) = utf8::next(start, end);
 
         return result;
