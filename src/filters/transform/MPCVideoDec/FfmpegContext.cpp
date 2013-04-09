@@ -50,6 +50,7 @@ extern "C" {
 
 	// Hack to use MinGW64 from 2.x branch
 	void __mingw_raise_matherr(int typ, const char *name, double a1, double a2, double rslt) {}
+	void __mingw_get_msvcrt_handle() {}
 }
 
 #ifdef REGISTER_FILTER
