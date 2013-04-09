@@ -14012,22 +14012,18 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		return false;
 	}
 
-	// Clear DXVA state ...
 	ClearDXVAState();
 #ifdef _DEBUG
-	// Debug trace code - Begin
-	// Check for bad / buggy auto loading file code
-	if ( pFileData ) {
+	if (pFileData) {
 		POSITION pos = pFileData->fns.GetHeadPosition();
 		UINT index = 0;
-		while ( pos != NULL ) {
+		while (pos != NULL) {
 			CString path = pFileData->fns.GetNext( pos );
-			TRACE(_T("--> CMainFrame::OpenMediaPrivate() - pFileData->fns[%d]:\n"), index);
-			TRACE(_T("\t%ws\n"), path.GetString()); // %ws - wide character string always
+			DbgLog((LOG_TRACE, 3, _T("--> CMainFrame::OpenMediaPrivate() - pFileData->fns[%d]:"), index));
+			DbgLog((LOG_TRACE, 3, _T("	%s"), path.GetString()));
 			index++;
 		}
 	}
-	// Debug trace code - End
 #endif
 
 	CString mi_fn = _T("");

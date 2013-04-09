@@ -268,6 +268,8 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 						   OPEN_EXISTING, FILE_ATTRIBUTE_READONLY|FILE_FLAG_SEQUENTIAL_SCAN, NULL);
 
 	if (m_hFile != INVALID_HANDLE_VALUE) {
+		DbgLog((LOG_TRACE, 3, _T("CHdmvClipInfo::ReadPlaylist() : %s"), strPlaylistFile));
+
 		ReadBuffer(Buff, 4);
 		if (memcmp (Buff, "MPLS", 4)) {
 			return CloseFile(VFW_E_INVALID_FILE_FORMAT);
@@ -306,11 +308,13 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 			}
 			ReadBuffer(Buff, 3);
 
-			dwTemp	= ReadDword();
-			Item.m_rtIn = 20000i64*dwTemp/90;	// Carefull : 32->33 bits!
+			dwTemp			= ReadDword();
+			Item.m_rtIn		= REFERENCE_TIME(20000.0f*dwTemp/90);
 
-			dwTemp	= ReadDword();
-			Item.m_rtOut = 20000i64*dwTemp/90;	// Carefull : 32->33 bits!
+			dwTemp			= ReadDword();
+			Item.m_rtOut	= REFERENCE_TIME(20000.0f*dwTemp/90);
+
+			Item.m_rtStartTime = rtDuration;
 
 			rtDuration += (Item.m_rtOut - Item.m_rtIn);
 
@@ -319,7 +323,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 			}
 			Playlist.AddTail (Item);
 
-			//TRACE ("File : %S, Duration : %S, Total duration  : %S\n", strTemp, ReftimeToString (rtOut - rtIn), ReftimeToString (rtDuration));
+			DbgLog((LOG_TRACE, 3, _T("	==> %s, Duration : %s [%15I64d], Total duration : %s"), Item.m_strFileName, ReftimeToString(Item.m_rtOut - Item.m_rtIn), Item.m_rtOut - Item.m_rtIn, ReftimeToString (rtDuration)));
 		}
 
 		CloseFile (S_OK);
@@ -442,10 +446,10 @@ HRESULT CHdmvClipInfo::FindMainMovie(LPCTSTR strFolder, CString& strPlaylistFile
 					while (pos) {
 						MainPlaylist.AddTail(Playlist.GetNext(pos));
 					}
-					hr				= S_OK;
+					hr = S_OK;
 				}
 				if (rtCurrent >= (REFERENCE_TIME)MIN_LIMIT*600000000) {
-					PlaylistItem	Item;
+					PlaylistItem Item;
 					Item.m_strFileName	= strCurrentPlaylist;
 					Item.m_rtIn			= 0;
 					Item.m_rtOut		= rtCurrent;

@@ -129,6 +129,14 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		return E_FAIL;
 	}
 
+	if (m_ClipInfo.IsHdmv()) {
+		if (CComQIPtr<ISyncReader> pReader = pAsyncReader) {
+			// To support seamless BD playback, CMultiFiles should update m_rtPTSOffset variable each time when a new part is opened
+			// use this code only if Blu-ray is detected
+			pReader->SetPTSOffset(&m_rtPTSOffset);
+		}
+	}
+
 again:
 	// min/max pts & bitrate
 	m_rtMin = m_posMin = _I64_MAX;
@@ -400,12 +408,12 @@ HRESULT CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, IAsyncRead
 					if (m_rtMin == _I64_MAX) {
 						m_rtMin = h.pts;
 						m_posMin = GetPos();
-						TRACE ("m_rtMin(SearchStreams)=%S\n", ReftimeToString(m_rtMin));
+						TRACE ("m_rtMin(SearchStreams) = %S [%10I64d]\n", ReftimeToString(m_rtMin), m_rtMin);
 					}
 					if (m_rtMin < h.pts && m_rtMax < h.pts) {
 						m_rtMax = h.pts;
 						m_posMax = GetPos();
-						TRACE ("m_rtMax(SearchStreams)=%S\n", ReftimeToString(m_rtMax));
+						TRACE ("m_rtMax(SearchStreams) = %S [%10I64d]\n", ReftimeToString(m_rtMax), m_rtMax);
 					}
 				}
 
@@ -437,30 +445,13 @@ HRESULT CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, IAsyncRead
 						if ((m_rtMin == _I64_MAX)/* || (m_rtMin > h2.pts)*/) {
 							m_rtMin = h2.pts;
 							m_posMin = GetPos();
-							TRACE ("m_rtMin(SearchStreams)=%S, PID=%d\n", ReftimeToString(m_rtMin), h.pid);
+							TRACE ("m_rtMin(SearchStreams) = %S [%10I64d], PID=%d\n", ReftimeToString(m_rtMin), m_rtMin, h.pid);
 						}
 
 						if (m_rtMin < h2.pts && m_rtMax < h2.pts) {
 							m_rtMax = h2.pts;
 							m_posMax = GetPos();
-							TRACE ("m_rtMax(SearchStreams)=%S, PID=%d\n", ReftimeToString(m_rtMax), h.pid);
-							// Ugly code : to support BRD H264 seamless playback, CMultiFiles need to update m_rtPTSOffset variable
-							// each time a new part is open...
-							// use this code only if Blu-ray is detected
-							if (m_ClipInfo.IsHdmv()) {
-								for (size_t i=0; i<m_ClipInfo.GetStreamNumber(); i++) {
-									CHdmvClipInfo::Stream* stream = m_ClipInfo.GetStreamByIndex(i);
-									if (stream->m_Type == VIDEO_STREAM_H264 && m_rtMin == 116506666) {
-										CComQIPtr<ISyncReader>	pReader = pAsyncReader;
-										if (pReader) pReader->SetPTSOffset (&m_rtPTSOffset);
-										//TRACE ("UPDATE m_rtPTSOffset(SearchStreams)=%S\n", ReftimeToString(m_rtPTSOffset));
-										//TRACE ("m_rtMin(Boucle)=%S\n", ReftimeToString(m_rtMin));
-										//TRACE ("stream=%d\n", stream->m_Type);
-										//TRACE ("m_rtMax(Boucle)=%S\n", ReftimeToString(m_rtMax));
-										//TRACE ("m_rtMax - m_rtMin(Boucle)=%S\n", ReftimeToString(m_rtMax - m_rtMin));
-									}
-								}
-							}
+							TRACE ("m_rtMax(SearchStreams) = %S [%10I64d], PID=%d\n", ReftimeToString(m_rtMax), m_rtMax, h.pid);
 						}
 					}
 				} else {

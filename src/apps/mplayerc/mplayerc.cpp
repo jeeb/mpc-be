@@ -896,6 +896,11 @@ BOOL CMPlayerCApp::InitInstance()
 		return FALSE;
 	}
 
+#ifdef DEBUG
+	DbgSetModuleLevel (LOG_TRACE, DWORD_MAX);
+	DbgSetModuleLevel (LOG_ERROR, DWORD_MAX);
+#endif
+
 	WNDCLASS wndcls;
 	memset(&wndcls, 0, sizeof(WNDCLASS));
 	wndcls.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;

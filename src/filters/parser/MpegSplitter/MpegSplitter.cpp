@@ -1205,7 +1205,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		REFERENCE_TIME rtmax = rt - UNITS;
 		REFERENCE_TIME rtmin = rtmax - UNITS/2;
 
-		if (!m_useFastSeek) {
+		if (!m_useFastSeek || m_ClipInfo.IsHdmv()) {
 
 			for (int i = 0; i < _countof(m_pFile->m_streams)-1; i++) {
 
@@ -1224,29 +1224,23 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 						if (m_pFile->m_type == mpeg_ts) {
 
-							REFERENCE_TIME dt2 = 20*UNITS;
+							double div = 1.0;
 							for (;;) {
 								REFERENCE_TIME rt2 = m_pFile->NextPTS(TrackNum);
-
-								if (rt2 < 0) {
-									break;
-								}
-
-								REFERENCE_TIME dt = rt2 - rtmax;
-								dt2 /= 1.1;
-
-								if (dt > 0) {
-									dt = dt2;
-								} else if (dt < 0) {
-									dt = -dt2;
-								}
 
 								if (rtmin <= rt2 && rt2 <= rtmax) {
 									minseekpos = min(minseekpos, curpos);
 									break;
 								}
 
-								if (dt2 < UNITS/2) {
+								REFERENCE_TIME dt = rt2 - rtmax;
+								if (rt2 < 0) {
+									dt = 20*UNITS / div;
+								}
+								dt /= div;
+								div += 0.05;
+
+								if (div >= 5.0) {
 									break;
 								}
 

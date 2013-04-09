@@ -97,6 +97,7 @@ public:
 		CString					m_strFileName;
 		REFERENCE_TIME			m_rtIn;
 		REFERENCE_TIME			m_rtOut;
+		REFERENCE_TIME			m_rtStartTime;
 
 		REFERENCE_TIME Duration() const {
 			return m_rtOut - m_rtIn;

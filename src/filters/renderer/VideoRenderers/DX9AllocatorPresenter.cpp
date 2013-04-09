@@ -642,6 +642,8 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 {
 	TRACE("CDX9AllocatorPresenter::CreateDevice()\n");
 
+	CAutoLock cRenderLock(&m_CreateLock);
+
 	StopWorkerThreads();
 
 	CRenderersSettings& s = GetRenderersSettings();
@@ -769,8 +771,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	}
 #endif
 
-	D3DPRESENT_PARAMETERS pp;
-	ZeroMemory(&pp, sizeof(pp));
+	ZeroMemory(&m_pp, sizeof(m_pp));
 
 	BOOL bCompositionEnabled = false;
 	if (m_pDwmIsCompositionEnabled) {
@@ -806,60 +807,61 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	D3DDISPLAYMODEEX DisplayMode;
 	ZeroMemory(&DisplayMode, sizeof(DisplayMode));
 	DisplayMode.Size = sizeof(DisplayMode);
+
 	D3DDISPLAYMODE d3ddm;
 	ZeroMemory(&d3ddm, sizeof(d3ddm));
 
 	if (m_bIsFullscreen) {
 		if (m_bHighColorResolution) {
-			pp.BackBufferFormat = D3DFMT_A2R10G10B10;
+			m_pp.BackBufferFormat = D3DFMT_A2R10G10B10;
 		} else {
-			pp.BackBufferFormat = D3DFMT_X8R8G8B8;
+			m_pp.BackBufferFormat = D3DFMT_X8R8G8B8;
 		}
-		pp.Windowed = false;
-		pp.BackBufferCount = 3;
-		pp.SwapEffect = D3DSWAPEFFECT_FLIP;
+		m_pp.Windowed = false;
+		m_pp.BackBufferCount = 3;
+		m_pp.SwapEffect = D3DSWAPEFFECT_FLIP;
 		// there's no Desktop composition to take care of alternative vSync in exclusive mode, alternative vSync is therefore unused
-		pp.hDeviceWindow = m_hWnd;
-		pp.Flags = D3DPRESENTFLAG_VIDEO;
+		m_pp.hDeviceWindow = m_hWnd;
+		m_pp.Flags = D3DPRESENTFLAG_VIDEO;
 		if (s.m_AdvRendSets.iVMR9FullscreenGUISupport && !m_bHighColorResolution) {
-			pp.Flags |= D3DPRESENTFLAG_LOCKABLE_BACKBUFFER;
+			m_pp.Flags |= D3DPRESENTFLAG_LOCKABLE_BACKBUFFER;
 		}
 		m_D3DDevExError = L"No m_pD3DEx";
 		if (m_pD3DEx) {
 			m_pD3DEx->GetAdapterDisplayModeEx(m_CurrentAdapter, &DisplayMode, NULL);
 
-			DisplayMode.Format = pp.BackBufferFormat;
+			DisplayMode.Format = m_pp.BackBufferFormat;
 			m_ScreenSize.SetSize(DisplayMode.Width, DisplayMode.Height);
-			pp.FullScreen_RefreshRateInHz = m_RefreshRate = DisplayMode.RefreshRate;
-			pp.BackBufferWidth = m_ScreenSize.cx;
-			pp.BackBufferHeight = m_ScreenSize.cy;
+			m_pp.FullScreen_RefreshRateInHz = m_RefreshRate = DisplayMode.RefreshRate;
+			m_pp.BackBufferWidth = m_ScreenSize.cx;
+			m_pp.BackBufferHeight = m_ScreenSize.cy;
 
 			hr = m_pD3DEx->CreateDeviceEx(
 					 m_CurrentAdapter, D3DDEVTYPE_HAL, m_hWnd,
 					 GetVertexProcessing() | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED | D3DCREATE_ENABLE_PRESENTSTATS, //D3DCREATE_MANAGED
-					 &pp, &DisplayMode, &m_pD3DDevEx);
+					 &m_pp, &DisplayMode, &m_pD3DDevEx);
 
 			m_D3DDevExError = GetWindowsErrorMessage(hr, m_hD3D9);
 			if (m_pD3DDevEx) {
 				m_pD3DDev = m_pD3DDevEx;
-				m_BackbufferType = pp.BackBufferFormat;
+				m_BackbufferType = m_pp.BackBufferFormat;
 				m_DisplayType = DisplayMode.Format;
 			}
 		}
 		if (!m_pD3DDev) {
 			m_pD3D->GetAdapterDisplayMode(m_CurrentAdapter, &d3ddm);
-			d3ddm.Format = pp.BackBufferFormat;
+			d3ddm.Format = m_pp.BackBufferFormat;
 			m_ScreenSize.SetSize(d3ddm.Width, d3ddm.Height);
-			pp.FullScreen_RefreshRateInHz = m_RefreshRate = d3ddm.RefreshRate;
-			pp.BackBufferWidth = m_ScreenSize.cx;
-			pp.BackBufferHeight = m_ScreenSize.cy;
+			m_pp.FullScreen_RefreshRateInHz = m_RefreshRate = d3ddm.RefreshRate;
+			m_pp.BackBufferWidth = m_ScreenSize.cx;
+			m_pp.BackBufferHeight = m_ScreenSize.cy;
 
 			hr = m_pD3D->CreateDevice(
 					 m_CurrentAdapter, D3DDEVTYPE_HAL, m_hWnd,
 					 GetVertexProcessing() | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED, //D3DCREATE_MANAGED
-					 &pp, &m_pD3DDev);
+					 &m_pp, &m_pD3DDev);
 			m_DisplayType = d3ddm.Format;
-			m_BackbufferType = pp.BackBufferFormat;
+			m_BackbufferType = m_pp.BackBufferFormat;
 		}
 		if (m_pD3DDev && s.m_AdvRendSets.iVMR9FullscreenGUISupport && !m_bHighColorResolution) {
 			m_pD3DDev->SetDialogBoxMode(true);
@@ -867,29 +869,29 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 			//	ExitProcess(0);
 		}
 	} else {
-		pp.Windowed = TRUE;
-		pp.hDeviceWindow = m_hWnd;
-		pp.SwapEffect = D3DSWAPEFFECT_COPY;
-		pp.Flags = D3DPRESENTFLAG_VIDEO;
-		pp.BackBufferCount = 1;
+		m_pp.Windowed = TRUE;
+		m_pp.hDeviceWindow = m_hWnd;
+		m_pp.SwapEffect = D3DSWAPEFFECT_COPY;
+		m_pp.Flags = D3DPRESENTFLAG_VIDEO;
+		m_pp.BackBufferCount = 1;
 		if (bCompositionEnabled || m_bAlternativeVSync) {
 			// Desktop composition takes care of the VSYNC
-			pp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+			m_pp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
 		}
 
 		if (m_pD3DEx) {
 			m_pD3DEx->GetAdapterDisplayModeEx(m_CurrentAdapter, &DisplayMode, NULL);
 			m_ScreenSize.SetSize(DisplayMode.Width, DisplayMode.Height);
 			m_RefreshRate = DisplayMode.RefreshRate;
-			pp.BackBufferWidth = m_ScreenSize.cx;
-			pp.BackBufferHeight = m_ScreenSize.cy;
+			m_pp.BackBufferWidth = m_ScreenSize.cx;
+			m_pp.BackBufferHeight = m_ScreenSize.cy;
 
 			// We can get 0x8876086a here when switching from two displays to one display using Win + P (Windows 7)
 			// Cause: We might not reinitialize dx correctly during the switch
 			hr = m_pD3DEx->CreateDeviceEx(
 					 m_CurrentAdapter, D3DDEVTYPE_HAL, m_hWnd,
 					 GetVertexProcessing() | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED | D3DCREATE_ENABLE_PRESENTSTATS, //D3DCREATE_MANAGED
-					 &pp, NULL, &m_pD3DDevEx);
+					 &m_pp, NULL, &m_pD3DDevEx);
 			if (m_pD3DDevEx) {
 				m_pD3DDev = m_pD3DDevEx;
 				m_DisplayType = DisplayMode.Format;
@@ -899,16 +901,16 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 			m_pD3D->GetAdapterDisplayMode(m_CurrentAdapter, &d3ddm);
 			m_ScreenSize.SetSize(d3ddm.Width, d3ddm.Height);
 			m_RefreshRate = d3ddm.RefreshRate;
-			pp.BackBufferWidth = m_ScreenSize.cx;
-			pp.BackBufferHeight = m_ScreenSize.cy;
+			m_pp.BackBufferWidth = m_ScreenSize.cx;
+			m_pp.BackBufferHeight = m_ScreenSize.cy;
 
 			hr = m_pD3D->CreateDevice(
 					 m_CurrentAdapter, D3DDEVTYPE_HAL, m_hWnd,
 					 GetVertexProcessing() | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED, //D3DCREATE_MANAGED
-					 &pp, &m_pD3DDev);
+					 &m_pp, &m_pD3DDev);
 			m_DisplayType = d3ddm.Format;
 		}
-		m_BackbufferType = pp.BackBufferFormat;
+		m_BackbufferType = m_pp.BackBufferFormat;
 	}
 
 	while (hr == D3DERR_DEVICELOST) {
@@ -917,7 +919,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	}
 	if (hr == D3DERR_DEVICENOTRESET) {
 		TRACE("D3DERR_DEVICENOTRESET\n");
-		hr = m_pD3DDev->Reset(&pp);
+		hr = m_pD3DDev->Reset(&m_pp);
 	}
 
 	TRACE("CreateDevice: %d\n", (LONG)hr);
@@ -1838,7 +1840,8 @@ void CDX9AllocatorPresenter::SendResetRequest()
 
 STDMETHODIMP_(bool) CDX9AllocatorPresenter::ResetDevice()
 {
-	TRACE("CDX9AllocatorPresenter::ResetDevice()\n");
+	TRACE(_T("CDX9AllocatorPresenter::ResetDevice()\n"));
+
 	_ASSERT(m_MainThreadId == GetCurrentThreadId());
 	StopWorkerThreads();
 
@@ -1872,8 +1875,65 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::ResetDevice()
 
 STDMETHODIMP_(bool) CDX9AllocatorPresenter::DisplayChange()
 {
-	SendResetRequest();
-	return true;
+	TRACE(_T("CDX9AllocatorPresenter::DisplayChange()\n"));
+
+	CAutoLock cRenderLock(&m_CreateLock);
+
+	if (m_CurrentAdapter != GetAdapter(m_pD3D)) {
+		return false;
+	}
+
+	D3DDISPLAYMODEEX DisplayMode;
+	ZeroMemory(&DisplayMode, sizeof(DisplayMode));
+	DisplayMode.Size = sizeof(DisplayMode);
+
+	D3DDISPLAYMODE d3ddm;
+	ZeroMemory(&d3ddm, sizeof(d3ddm));
+
+	HRESULT hr = E_FAIL;
+
+	if (m_bIsFullscreen) {
+		if (m_pD3DEx) {
+			m_pD3DEx->GetAdapterDisplayModeEx(m_CurrentAdapter, &DisplayMode, NULL);
+
+			DisplayMode.Format = m_pp.BackBufferFormat;
+			m_ScreenSize.SetSize(DisplayMode.Width, DisplayMode.Height);
+			m_pp.FullScreen_RefreshRateInHz = m_RefreshRate = DisplayMode.RefreshRate;
+			m_pp.BackBufferWidth = m_ScreenSize.cx;
+			m_pp.BackBufferHeight = m_ScreenSize.cy;
+
+			hr = m_pD3DDevEx->ResetEx(&m_pp, &DisplayMode);
+		} else {
+			m_pD3D->GetAdapterDisplayMode(m_CurrentAdapter, &d3ddm);
+			d3ddm.Format = m_pp.BackBufferFormat;
+			m_ScreenSize.SetSize(d3ddm.Width, d3ddm.Height);
+			m_pp.FullScreen_RefreshRateInHz = m_RefreshRate = d3ddm.RefreshRate;
+			m_pp.BackBufferWidth = m_ScreenSize.cx;
+			m_pp.BackBufferHeight = m_ScreenSize.cy;
+
+			hr = m_pD3DDev->Reset(&m_pp);
+		}
+	} else {
+		if (m_pD3DEx) {
+			m_pD3DEx->GetAdapterDisplayModeEx(m_CurrentAdapter, &DisplayMode, NULL);
+			m_ScreenSize.SetSize(DisplayMode.Width, DisplayMode.Height);
+			m_RefreshRate = DisplayMode.RefreshRate;
+			m_pp.BackBufferWidth = m_ScreenSize.cx;
+			m_pp.BackBufferHeight = m_ScreenSize.cy;
+
+			hr = m_pD3DDevEx->Reset(&m_pp);
+		} else {
+			m_pD3D->GetAdapterDisplayMode(m_CurrentAdapter, &d3ddm);
+			m_ScreenSize.SetSize(d3ddm.Width, d3ddm.Height);
+			m_RefreshRate = d3ddm.RefreshRate;
+			m_pp.BackBufferWidth = m_ScreenSize.cx;
+			m_pp.BackBufferHeight = m_ScreenSize.cy;
+
+			hr = m_pD3DDev->Reset(&m_pp);
+		}
+	}
+
+	return SUCCEEDED(hr);
 }
 
 void CDX9AllocatorPresenter::DrawText(const RECT &rc, const CString &strText, int _Priority)
