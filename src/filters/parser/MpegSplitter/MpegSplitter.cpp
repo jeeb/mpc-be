@@ -743,11 +743,9 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 		}
 	} else if (m_pFile->m_type == mpeg_ts) {
 		CMpegSplitterFile::trhdr h;
-
-		if (!m_pFile->Read(h)) {
+		if (m_pFile->Read(h) == -1) {
 			return S_FALSE;
 		}
-
 
 		__int64 pos = m_pFile->GetPos();
 
@@ -1199,7 +1197,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	} else {
 		__int64 len			= m_pFile->GetLength();
 		__int64 seekpos		= (__int64)(1.0*rt/m_rtDuration*len);
-		__int64 minseekpos	= _I64_MAX;
+		__int64 minseekpos	= _I64_MIN;
 
 		REFERENCE_TIME rtmax = rt - UNITS;
 		REFERENCE_TIME rtmin = rtmax - UNITS/2;
@@ -1222,13 +1220,12 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 						__int64 curpos = seekpos;
 
 						if (m_pFile->m_type == mpeg_ts) {
-
 							double div = 1.0;
 							for (;;) {
 								REFERENCE_TIME rt2 = m_pFile->NextPTS(TrackNum);
 
 								if (rtmin <= rt2 && rt2 <= rtmax) {
-									minseekpos = min(minseekpos, curpos);
+									minseekpos = curpos;
 									break;
 								}
 
@@ -1257,7 +1254,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 								REFERENCE_TIME dt = rt2 - rtmax;
 
 								if (rtmin <= rt2 && rt2 <= rtmax) {
-									minseekpos = min(minseekpos, curpos);
+									minseekpos = curpos;
 									break;
 								}
 
@@ -1268,14 +1265,14 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 					}
 				}
 
-				if (minseekpos != _I64_MAX) {
+				if (minseekpos != _I64_MIN) {
 					break;
 				}
 
 			}
 		}
 
-		if (minseekpos != _I64_MAX) {
+		if (minseekpos != _I64_MIN) {
 			seekpos			= minseekpos;
 			m_rtStartOffset	= 0;
 		} else {
@@ -1290,7 +1287,9 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 			}
 		}
 
-		m_pFile->Seek(seekpos);
+		if (m_pFile->m_type != mpeg_ts) {
+			m_pFile->Seek(seekpos);
+		}
 	}
 }
 

@@ -422,7 +422,7 @@ public:
 	bool Read(cvdspuhdr& h, CMediaType* pmt = NULL);
 	bool Read(ps2audhdr& h, CMediaType* pmt = NULL);
 	bool Read(ps2subhdr& h, CMediaType* pmt = NULL);
-	bool Read(trhdr& h, bool fSync = true);
+	__int64 Read(trhdr& h, bool fSync = true);
 	bool Read(trsechdr& h);
 	bool Read(pvahdr& h, bool fSync = true);
 	bool Read(avchdr& h, int len, CMediaType* pmt = NULL);

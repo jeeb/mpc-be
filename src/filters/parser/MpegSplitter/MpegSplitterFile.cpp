@@ -64,7 +64,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 			Seek(0x67c);
 		}
 		int cnt = 0, limit = 4;
-		for (trhdr h; cnt < limit && Read(h); cnt++) {
+		for (trhdr h; cnt < limit && (Read(h) != -1); cnt++) {
 			Seek(h.next);
 		}
 		if (cnt >= limit) {
@@ -79,7 +79,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 			Seek(0xE80);
 		}
 		int cnt = 0, limit = 4;
-		for (trhdr h; cnt < limit && Read(h); cnt++) {
+		for (trhdr h; cnt < limit && (Read(h) != -1); cnt++) {
 			Seek(h.next);
 		}
 		if (cnt >= limit) {
@@ -271,8 +271,8 @@ void CMpegSplitterFile::OnComplete(IAsyncReader* pAsyncReader)
 
 REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum)
 {
-	REFERENCE_TIME rt = -1;
-	__int64 rtpos = -1;
+	REFERENCE_TIME rt	= INVALID_TIME;
+	__int64 rtpos		= -1;
 
 	BYTE b;
 
@@ -303,24 +303,17 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum)
 			}
 		} else if (m_type == mpeg_ts) {
 			trhdr h;
-			if (!Read(h)) {
+			__int64 pos = Read(h);
+			if (pos == -1) {
 				continue;
 			}
 
-			rtpos = GetPos()-4;
-
-			if (h.payload && h.payloadstart && ISVALIDPID(h.pid) && h.pid == TrackNum) {
+			if (h.payloadstart && ISVALIDPID(h.pid) && h.pid == TrackNum) {
 				peshdr h2;
 				if (NextMpegStartCode(b, 4) && Read(h2, b) && h2.fpts) { // pes packet
-					rt = h2.pts;
+					rt		= h2.pts;
+					rtpos	= pos;
 					break;
-					/*
-					if (h2.fpts && AddStream(h.pid, b, 0, DWORD(h.bytes - (GetPos() - rtpos)) == TrackNum)) {
-						//ASSERT(h2.pts >= m_rtMin && h2.pts <= m_rtMax);
-						rt = h2.pts;
-						break;
-					}
-					*/
 				}
 			}
 
@@ -341,7 +334,7 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum)
 	if (rtpos >= 0) {
 		Seek(rtpos);
 	}
-	if (rt >= 0) {
+	if (rt != INVALID_TIME) {
 		rt -= m_rtMin;
 	}
 
@@ -359,7 +352,7 @@ void CMpegSplitterFile::SearchPrograms(__int64 start, __int64 stop)
 
 	while (GetPos() < stop) {
 		trhdr h;
-		if (!Read(h)) {
+		if (Read(h) == -1) {
 			continue;
 		}
 
@@ -425,7 +418,7 @@ HRESULT CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, IAsyncRead
 			}
 		} else if (m_type == mpeg_ts) {
 			trhdr h;
-			if (!Read(h)) {
+			if (Read(h) == -1) {
 				continue;
 			}
 
