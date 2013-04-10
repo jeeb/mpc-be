@@ -50,7 +50,7 @@ protected:
 
 public:
 	CAsyncFileReader(CString fn, HRESULT& hr);
-	CAsyncFileReader(CAtlList<CHdmvClipInfo::PlaylistItem>& Items, HRESULT& hr);
+	CAsyncFileReader(CHdmvClipInfo::CPlaylist& Items, HRESULT& hr);
 
 	DECLARE_IUNKNOWN;
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);

@@ -43,7 +43,7 @@ CAsyncFileReader::CAsyncFileReader(CString fn, HRESULT& hr)
 	}
 }
 
-CAsyncFileReader::CAsyncFileReader(CAtlList<CHdmvClipInfo::PlaylistItem>& Items, HRESULT& hr)
+CAsyncFileReader::CAsyncFileReader(CHdmvClipInfo::CPlaylist& Items, HRESULT& hr)
 	: CUnknown(NAME("CAsyncFileReader"), NULL, &hr)
 	, m_len((ULONGLONG)-1)
 	, m_hBreakEvent(NULL)

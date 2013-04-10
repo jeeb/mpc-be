@@ -356,9 +356,9 @@ static CString CombinePath(CPath p, CString fn)
 
 bool CPlayerPlaylistBar::ParseBDMVPlayList(CString fn)
 {
-	CHdmvClipInfo		ClipInfo;
-	CString				strPlaylistFile;
-	CAtlList<CHdmvClipInfo::PlaylistItem>	MainPlaylist;
+	CHdmvClipInfo	ClipInfo;
+	CString			strPlaylistFile;
+	CHdmvClipInfo::CPlaylist MainPlaylist;
 
 	CPath Path(fn);
 	Path.RemoveFileSpec();

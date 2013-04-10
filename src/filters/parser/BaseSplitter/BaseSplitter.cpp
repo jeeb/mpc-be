@@ -1267,8 +1267,8 @@ STDMETHODIMP CBaseSplitterFilter::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYP
 	m_fn = pszFileName;
 	HRESULT hr = E_FAIL;
 	CComPtr<IAsyncReader> pAsyncReader;
-	CAtlList<CHdmvClipInfo::PlaylistItem> Items;
-	CAtlList<CHdmvClipInfo::PlaylistChapter> Chapters;
+	CHdmvClipInfo::CPlaylist Items;
+	CHdmvClipInfo::CPlaylistChapter Chapters;
 
 	if (BuildPlaylist(pszFileName, Items)) {
 		pAsyncReader = (IAsyncReader*)DNew CAsyncFileReader(Items, hr);

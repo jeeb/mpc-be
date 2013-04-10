@@ -70,7 +70,7 @@ public:
 
 	// Operations
 	virtual BOOL Open(LPCTSTR lpszFileName, UINT nOpenFlags);
-	virtual BOOL OpenFiles(CAtlList<CHdmvClipInfo::PlaylistItem>& files, UINT nOpenFlags);
+	virtual BOOL OpenFiles(CHdmvClipInfo::CPlaylist& files, UINT nOpenFlags);
 
 
 	virtual ULONGLONG Seek(LONGLONG lOff, UINT nFrom);

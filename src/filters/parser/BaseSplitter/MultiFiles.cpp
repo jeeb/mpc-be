@@ -50,7 +50,7 @@ BOOL CMultiFiles::Open(LPCTSTR lpszFileName, UINT nOpenFlags)
 	return OpenPart(0);
 }
 
-BOOL CMultiFiles::OpenFiles(CAtlList<CHdmvClipInfo::PlaylistItem>& files, UINT nOpenFlags)
+BOOL CMultiFiles::OpenFiles(CHdmvClipInfo::CPlaylist& files, UINT nOpenFlags)
 {
 	POSITION		pos = files.GetHeadPosition();
 	LARGE_INTEGER	llSize;

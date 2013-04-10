@@ -14090,7 +14090,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			// BD
 			if (ext == _T(".mpls")) {
 				CHdmvClipInfo ClipInfo;
-				CAtlList<CHdmvClipInfo::PlaylistItem> CurPlaylist;
+				CHdmvClipInfo::CPlaylist CurPlaylist;
 				CHdmvClipInfo::PlaylistItem Item;
 				REFERENCE_TIME rtDuration;
 				if (SUCCEEDED (ClipInfo.ReadPlaylist(mi_fn, rtDuration, CurPlaylist))) {
@@ -18839,9 +18839,9 @@ void CMainFrame::EnableShaders2(bool enable)
 
 bool CMainFrame::OpenBD(CString Path)
 {
-	CHdmvClipInfo		ClipInfo;
-	CString				strPlaylistFile;
-	CAtlList<CHdmvClipInfo::PlaylistItem>	MainPlaylist;
+	CHdmvClipInfo	ClipInfo;
+	CString			strPlaylistFile;
+	CHdmvClipInfo::CPlaylist MainPlaylist;
 
 	m_LastOpenBDPath = Path;
 

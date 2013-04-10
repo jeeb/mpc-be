@@ -1156,7 +1156,7 @@ public:
 	void EnableShaders1(bool enable);
 	void EnableShaders2(bool enable);
 
-	CAtlList<CHdmvClipInfo::PlaylistItem> m_MPLSPlaylist;
+	CHdmvClipInfo::CPlaylist m_MPLSPlaylist;
 	bool m_bIsBDPlay;
 	bool OpenBD(CString Path);
 

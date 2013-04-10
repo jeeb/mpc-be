@@ -4332,7 +4332,9 @@ static void decode_finish_row(H264Context *h)
 
     ff_h264_draw_horiz_band(h, top, height);
 
-    if (h->droppable || h->er.error_occurred)
+    // ==> Start patch MPC
+    if (h->droppable)
+    // <== End patch MPC
         return;
 
     ff_thread_report_progress(&h->cur_pic_ptr->tf, top + height - 1,
@@ -4363,6 +4365,8 @@ static int decode_slice(struct AVCodecContext *avctx, void *arg)
                     avctx->codec_id != AV_CODEC_ID_H264 ||
                     (CONFIG_GRAY && (h->flags & CODEC_FLAG_GRAY));
 
+    // ==> Start patch MPC
+    /*
     if (!(h->avctx->active_thread_type & FF_THREAD_SLICE)) {
         const int start_i  = av_clip(h->resync_mb_x + h->resync_mb_y * h->mb_width, 0, h->mb_num - 1);
         if (start_i) {
@@ -4372,6 +4376,8 @@ static int decode_slice(struct AVCodecContext *avctx, void *arg)
                 h->er.error_occurred = 1;
         }
     }
+    */
+    // <== End patch MPC
 
     if (h->pps.cabac) {
         /* realign */
