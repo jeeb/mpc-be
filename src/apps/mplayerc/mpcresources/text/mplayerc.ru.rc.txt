@@ -1541,7 +1541,7 @@ STRING IDS_MAINFRM_9		"Том: %02d/%02d, Раздел: %02d/%02d, Глава: %
 STRING IDS_MAINFRM_90		"Файл не найден"
 STRING IDS_MAINFRM_91		"Неизвестный тип файла"
 STRING IDS_MAINFRM_92		"Неподдерживаемый поток"
-STRING IDS_MAINFRM_93		"Не удаётся найти каталог DVD"
+STRING IDS_MAINFRM_93		"Не удаётся найти каталог DVD/BD"
 STRING IDS_MAINFRM_94		"Не удаётся создать фильтр DVD-навигатора"
 STRING IDS_MAINFRM_96		"Не удаётся создать фильтр видеозахвата"
 STRING IDS_MAINFRM_98		"Фильтры видеозахвата отсутствуют"

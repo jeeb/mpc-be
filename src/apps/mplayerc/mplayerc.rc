@@ -2907,7 +2907,7 @@ BEGIN
     IDS_MAINFRM_90          "File not found"
     IDS_MAINFRM_91          "Unknown file type"
     IDS_MAINFRM_92          "Unsupported stream"
-    IDS_MAINFRM_93          "Cannot find DVD directory"
+    IDS_MAINFRM_93          "Cannot find DVD/BD directory"
     IDS_MAINFRM_94          "Can't create the DVD Navigator filter"
     IDS_AG_FAILED           "Failed"
     IDS_MAINFRM_96          "Can't create video capture filter"
