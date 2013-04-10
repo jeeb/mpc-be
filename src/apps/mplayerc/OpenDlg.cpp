@@ -38,7 +38,7 @@ COpenDlg::COpenDlg(CWnd* pParent /*=NULL*/)
 	, m_fMultipleFiles(false)
 	, m_fAppendPlaylist(FALSE)
 {
-	m_hIcon = (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
+	m_hIcon = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
 }
 
 COpenDlg::~COpenDlg()
@@ -76,7 +76,9 @@ BOOL COpenDlg::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	CRecentFileList& MRU = AfxGetAppSettings().MRU;
+	AppSettings& s = AfxGetAppSettings();
+
+	CRecentFileList& MRU = s.MRU;
 	MRU.ReadList();
 	m_mrucombo.ResetContent();
 
@@ -87,7 +89,7 @@ BOOL COpenDlg::OnInitDialog()
 
 	CorrectComboListWidth(m_mrucombo);
 
-	CRecentFileList& MRUDub = AfxGetAppSettings().MRUDub;
+	CRecentFileList& MRUDub = s.MRUDub;
 	MRUDub.ReadList();
 	m_mrucombo2.ResetContent();
 
@@ -141,7 +143,7 @@ BOOL COpenDlg::OnInitDialog()
 	SetMaxTrackSize(s);
 
 	if ( m_hIcon != NULL ) {
-		CStatic *pStat=(CStatic *)GetDlgItem(IDC_MAINFRAME_ICON);
+		CStatic *pStat = (CStatic*)GetDlgItem(IDC_MAINFRAME_ICON);
 		pStat->SetIcon(m_hIcon);
 	}
 
@@ -160,11 +162,9 @@ void COpenDlg::OnBnClickedBrowsebutton()
 {
 	UpdateData();
 
-	AppSettings& s = AfxGetAppSettings();
-
 	CString filter;
 	CAtlArray<CString> mask;
-	s.m_Formats.GetFilter(filter, mask);
+	AfxGetAppSettings().m_Formats.GetFilter(filter, mask);
 
 	DWORD dwFlags = OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_ALLOWMULTISELECT|OFN_ENABLEINCLUDENOTIFY|OFN_NOCHANGEDIR;
 
@@ -183,12 +183,12 @@ void COpenDlg::OnBnClickedBrowsebutton()
 	POSITION pos = fd.GetStartPosition();
 	while (pos) {
 		/*
-				CString str = fd.GetNextPathName(pos);
-				POSITION insertpos = m_fns.GetTailPosition();
-				while (insertpos && GetFileName(str).CompareNoCase(GetFileName(m_fns.GetAt(insertpos))) <= 0)
-					m_fns.GetPrev(insertpos);
-				if (!insertpos) m_fns.AddHead(str);
-				else m_fns.InsertAfter(insertpos, str);
+		CString str = fd.GetNextPathName(pos);
+		POSITION insertpos = m_fns.GetTailPosition();
+		while (insertpos && GetFileName(str).CompareNoCase(GetFileName(m_fns.GetAt(insertpos))) <= 0)
+			m_fns.GetPrev(insertpos);
+		if (!insertpos) m_fns.AddHead(str);
+		else m_fns.InsertAfter(insertpos, str);
 		*/
 		m_fns.AddTail(fd.GetNextPathName(pos));
 	}
@@ -209,11 +209,9 @@ void COpenDlg::OnBnClickedBrowsebutton2()
 {
 	UpdateData();
 
-	AppSettings& s = AfxGetAppSettings();
-
 	CString filter;
 	CAtlArray<CString> mask;
-	s.m_Formats.GetAudioFilter(filter, mask);
+	AfxGetAppSettings().m_Formats.GetAudioFilter(filter, mask);
 
 	DWORD dwFlags = OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_ENABLEINCLUDENOTIFY|OFN_NOCHANGEDIR;
 
