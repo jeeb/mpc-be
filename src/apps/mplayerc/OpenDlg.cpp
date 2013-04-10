@@ -137,12 +137,12 @@ BOOL COpenDlg::OnInitDialog()
 
 	CRect r;
 	GetWindowRect(r);
-	CSize s = r.Size();
-	SetMinTrackSize(s);
-	s.cx = 1000;
-	SetMaxTrackSize(s);
+	CSize sr = r.Size();
+	SetMinTrackSize(sr);
+	sr.cx = 1000;
+	SetMaxTrackSize(sr);
 
-	if ( m_hIcon != NULL ) {
+	if (m_hIcon != NULL) {
 		CStatic *pStat = (CStatic*)GetDlgItem(IDC_MAINFRAME_ICON);
 		pStat->SetIcon(m_hIcon);
 	}
@@ -162,9 +162,11 @@ void COpenDlg::OnBnClickedBrowsebutton()
 {
 	UpdateData();
 
+	AppSettings& s = AfxGetAppSettings();
+
 	CString filter;
 	CAtlArray<CString> mask;
-	AfxGetAppSettings().m_Formats.GetFilter(filter, mask);
+	s.m_Formats.GetFilter(filter, mask);
 
 	DWORD dwFlags = OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_ALLOWMULTISELECT|OFN_ENABLEINCLUDENOTIFY|OFN_NOCHANGEDIR;
 
@@ -209,9 +211,11 @@ void COpenDlg::OnBnClickedBrowsebutton2()
 {
 	UpdateData();
 
+	AppSettings& s = AfxGetAppSettings();
+
 	CString filter;
 	CAtlArray<CString> mask;
-	AfxGetAppSettings().m_Formats.GetAudioFilter(filter, mask);
+	s.m_Formats.GetAudioFilter(filter, mask);
 
 	DWORD dwFlags = OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_ENABLEINCLUDENOTIFY|OFN_NOCHANGEDIR;
 
