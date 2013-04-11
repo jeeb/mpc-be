@@ -184,10 +184,6 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 		LOG2FILE(_T("Source = \'%s\'"), str);
 #endif
 
-		if (Title.IsEmpty()) {
-			Title = _T("video");
-		}
-
 		CAtlList<CString> sl;
 		Explode(str, sl, '~');
 

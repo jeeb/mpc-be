@@ -24,8 +24,8 @@
 
 #include <afxinet.h>
 
-#define YOUTUBE_URL		_T("youtube.com/watch?")
-#define YOUTU_BE_URL	_T("youtu.be/")
+#define YOUTUBE_URL		_T("://www.youtube.com/watch?v=")
+#define YOUTU_BE_URL	_T("://youtu.be/")
 #define VIMEO_URL		_T("://vimeo.com/")
 
 #define MATCH_START		"\"url_encoded_fmt_stream_map\": \""
