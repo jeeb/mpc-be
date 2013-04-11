@@ -45,11 +45,11 @@ bool CTextFile::isUTF8Valid()
 {
 	SeekToBegin();
 
-	unsigned int len = min(65536, GetLength());
+	UINT len = min(1024*1024, GetLength());
 	char* buf = new char[len + 1];
 	memset(buf, 0, len + 1);
-	Read(buf, len);
-	std::string str(buf);
+	UINT num = Read(buf, len);
+	std::string str(buf, num);
 	bool valid = utf8::is_valid(str.begin(), str.end());
 
 	delete [] buf;
