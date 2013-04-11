@@ -487,6 +487,7 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLS, fShowBarsWhenFullScreen);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLSTIMEOUT, nShowBarsWhenFullScreenTimeOut);
 	pApp->WriteProfileBinary(IDS_R_SETTINGS, IDS_RS_FULLSCREENRES, (BYTE*)&AutoChangeFullscrRes, sizeof(AutoChangeFullscrRes));
+	pApp->WriteProfileBinary(IDS_R_SETTINGS, _T("AccelTblColWidth"), (BYTE*)&AccelTblColWidth, sizeof(AccelTblColWidth));
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATTHEEND, fExitFullScreenAtTheEnd);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATFOCUSLOST, fExitFullScreenAtFocusLost);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_RESTORERESAFTEREXIT, fRestoreResAfterExit);
@@ -981,6 +982,17 @@ void CAppSettings::LoadSettings()
 		delete [] ptr;
 	} else {
 		AutoChangeFullscrRes.bEnabled = 0;
+	}
+
+	if ( pApp->GetProfileBinary(IDS_R_SETTINGS, _T("AccelTblColWidth"), &ptr, &len) ) {
+		if ( len == sizeof(AccelTbl) ) {
+			memcpy( &AccelTblColWidth, ptr, sizeof(AccelTbl) );
+		} else {
+			AccelTblColWidth.bEnable = false;
+		}
+		delete [] ptr;
+	} else {
+		AccelTblColWidth.bEnable = false;
 	}
 
 	fExitFullScreenAtTheEnd = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATTHEEND, 1);

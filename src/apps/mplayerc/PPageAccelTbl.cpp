@@ -166,13 +166,15 @@ void CPPageAccelTbl::SetupList()
 		m_list.SetItemText(row, COL_RMREPCNT, repcnt);
 	}
 
-	int contentSize;
-	for (int nCol = COL_CMD; nCol <= COL_RMREPCNT; nCol++) {
-		m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE);
-		contentSize = m_list.GetColumnWidth(nCol);
-		m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE_USEHEADER);
-		if (contentSize > m_list.GetColumnWidth(nCol)) {
+	if (!AfxGetAppSettings().AccelTblColWidth.bEnable) {
+		int contentSize;
+		for (int nCol = COL_CMD; nCol <= COL_RMREPCNT; nCol++) {
 			m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE);
+			contentSize = m_list.GetColumnWidth(nCol);
+			m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE_USEHEADER);
+			if (contentSize > m_list.GetColumnWidth(nCol)) {
+				m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE);
+			}
 		}
 	}
 }
@@ -1480,7 +1482,7 @@ BOOL CPPageAccelTbl::OnInitDialog()
 
 	m_list.CreateEx(
 		WS_EX_CLIENTEDGE,
-		WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|WS_CLIPCHILDREN|WS_TABSTOP|LVS_REPORT|LVS_AUTOARRANGE|LVS_SHOWSELALWAYS,
+		WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|WS_CLIPCHILDREN|WS_TABSTOP|LVS_REPORT|LVS_SHOWSELALWAYS,
 		r, this, IDC_LIST1);
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle()|LVS_EX_FULLROWSELECT|LVS_EX_DOUBLEBUFFER|LVS_EX_GRIDLINES);
@@ -1488,14 +1490,15 @@ BOOL CPPageAccelTbl::OnInitDialog()
 	for (int i = 0, j = m_list.GetHeaderCtrl()->GetItemCount(); i < j; i++) {
 		m_list.DeleteColumn(0);
 	}
-	m_list.InsertColumn(COL_CMD, ResStr(IDS_AG_COMMAND), LVCFMT_LEFT, 80);
-	m_list.InsertColumn(COL_KEY, ResStr(IDS_AG_KEY), LVCFMT_LEFT, 80);
-	m_list.InsertColumn(COL_ID, _T("ID"), LVCFMT_LEFT, 40);
-	m_list.InsertColumn(COL_MOUSE, ResStr(IDS_AG_MOUSE), LVCFMT_LEFT, 80);
-	m_list.InsertColumn(COL_MOUSE_FS, ResStr(IDS_AG_MOUSE_FS), LVCFMT_LEFT, 80);
-	m_list.InsertColumn(COL_APPCMD, ResStr(IDS_AG_APP_COMMAND), LVCFMT_LEFT, 120);
-	m_list.InsertColumn(COL_RMCMD, _T("RemoteCmd"), LVCFMT_LEFT, 80);
-	m_list.InsertColumn(COL_RMREPCNT, _T("RepCnt"), LVCFMT_CENTER, 60);
+
+	m_list.InsertColumn(COL_CMD, ResStr(IDS_AG_COMMAND), LVCFMT_LEFT, s.AccelTblColWidth.cmd);
+	m_list.InsertColumn(COL_KEY, ResStr(IDS_AG_KEY), LVCFMT_LEFT, s.AccelTblColWidth.key);
+	m_list.InsertColumn(COL_ID, _T("ID"), LVCFMT_LEFT, s.AccelTblColWidth.id);
+	m_list.InsertColumn(COL_MOUSE, ResStr(IDS_AG_MOUSE), LVCFMT_LEFT, s.AccelTblColWidth.mwnd);
+	m_list.InsertColumn(COL_MOUSE_FS, ResStr(IDS_AG_MOUSE_FS), LVCFMT_LEFT, s.AccelTblColWidth.mfs);
+	m_list.InsertColumn(COL_APPCMD, ResStr(IDS_AG_APP_COMMAND), LVCFMT_LEFT, s.AccelTblColWidth.appcmd);
+	m_list.InsertColumn(COL_RMCMD, _T("RemoteCmd"), LVCFMT_LEFT, s.AccelTblColWidth.remcmd);
+	m_list.InsertColumn(COL_RMREPCNT, _T("RepCnt"), LVCFMT_CENTER, s.AccelTblColWidth.repcnt);
 
 	POSITION pos = m_wmcmds.GetHeadPosition();
 	for (int i = 0; pos; i++) {
@@ -1505,10 +1508,6 @@ BOOL CPPageAccelTbl::OnInitDialog()
 	}
 
 	SetupList();
-
-	m_list.SetColumnWidth(COL_CMD, LVSCW_AUTOSIZE);
-	m_list.SetColumnWidth(COL_KEY, LVSCW_AUTOSIZE);
-	m_list.SetColumnWidth(COL_ID, LVSCW_AUTOSIZE_USEHEADER);
 
 	// subclass the keylist control
 	OldControlProc = (WNDPROC) SetWindowLongPtr(m_list.m_hWnd, GWLP_WNDPROC, (LONG_PTR) ControlProc);
@@ -1553,7 +1552,17 @@ BOOL CPPageAccelTbl::OnApply()
 	s.fGlobalMedia = !!m_fGlobalMedia;
 
 	AfxGetMyApp()->RegisterHotkeys();
-
+	
+	s.AccelTblColWidth.bEnable = true;
+	s.AccelTblColWidth.cmd		= m_list.GetColumnWidth(COL_CMD);
+	s.AccelTblColWidth.key		= m_list.GetColumnWidth(COL_KEY);
+	s.AccelTblColWidth.id		= m_list.GetColumnWidth(COL_ID);
+	s.AccelTblColWidth.mwnd		= m_list.GetColumnWidth(COL_MOUSE);
+	s.AccelTblColWidth.mfs		= m_list.GetColumnWidth(COL_MOUSE_FS);
+	s.AccelTblColWidth.appcmd	= m_list.GetColumnWidth(COL_APPCMD);
+	s.AccelTblColWidth.remcmd	= m_list.GetColumnWidth(COL_RMCMD);
+	s.AccelTblColWidth.repcnt	= m_list.GetColumnWidth(COL_RMREPCNT);
+	
 	return __super::OnApply();
 }
 
@@ -1581,7 +1590,7 @@ void CPPageAccelTbl::OnBnClickedButton2()
 		wmcmd& wc = m_wmcmds.GetAt(pi);
 		wc.Restore();
 	}
-
+	AfxGetAppSettings().AccelTblColWidth.bEnable = false;
 	SetupList();
 
 	SetModified();

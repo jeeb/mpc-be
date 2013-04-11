@@ -196,6 +196,19 @@ typedef struct {
 	bool bApplyDefault;
 	bool bSetGlobal;
 }	AChFR; //AutoChangeFullscrRes
+
+typedef struct {
+	bool bEnable;
+	int cmd;
+	int key;
+	int id;
+	int mwnd;
+	int mfs;
+	int appcmd;
+	int remcmd;
+	int repcnt;
+}	AccelTbl; 
+
 #pragma pack(pop)
 
 class wmcmd : public ACCEL
@@ -538,6 +551,7 @@ public:
 	CStringW		strFullScreenMonitor;
 	CStringW		strFullScreenMonitorID;
 	AChFR			AutoChangeFullscrRes;
+	AccelTbl		AccelTblColWidth;
 	bool			fRestoreResAfterExit;
 	dispmode		dm_def;
 	double			dFPS;
