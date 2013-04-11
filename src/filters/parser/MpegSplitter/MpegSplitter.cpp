@@ -1493,7 +1493,7 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 			}
 
 			CMpegSplitterFile::stream& s	= m_pFile->m_streams[i].GetAt(pos);
-			CHdmvClipInfo::Stream* pStream	= m_ClipInfo.FindStream (s.pid);
+			CHdmvClipInfo::Stream* pStream	= m_ClipInfo.FindStream(s.pid);
 
 			if (ppmt) {
 				*ppmt = CreateMediaType(&s.mt);
@@ -1541,11 +1541,11 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 					CString FormatDesc = GetMediaTypeDesc(&s.mt, pClipInfo, StreamType, lang_name);
 
 					if (!FormatDesc.IsEmpty()) {
-						str.Format(L"%s (%04x,%02x,%02x)", FormatDesc.GetString(), s.pid, s.pesid, s.ps1id);    // TODO: make this nicer
+						str.Format(L"%s (%04x,%02x,%02x)", FormatDesc.GetString(), s.pid, s.pesid, s.ps1id);
 					} else if (pStreamName) {
-						str.Format(L"%s - %s (%04x,%02x,%02x)", name, pStreamName, s.pid, s.pesid, s.ps1id);    // TODO: make this nicer
+						str.Format(L"%s - %s (%04x,%02x,%02x)", name, pStreamName, s.pid, s.pesid, s.ps1id);
 					} else {
-						str.Format(L"%s (%04x,%02x,%02x)", name, s.pid, s.pesid, s.ps1id);    // TODO: make this nicer
+						str.Format(L"%s (%04x,%02x,%02x)", name, s.pid, s.pesid, s.ps1id);
 					}
 				}
 
@@ -1556,12 +1556,14 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 
 				wcscpy_s(*ppszName, str.GetLength()+1, str);
 			}
+
+			return S_OK;
 		}
 
 		j += cnt;
 	}
 
-	return S_OK;
+	return S_FALSE;
 }
 
 // ISpecifyPropertyPages2
