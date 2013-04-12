@@ -264,9 +264,24 @@ int CMPCFile::Open(CMusePackReader *reader)
 	// keep a local copy of the reader
 	this->reader = reader;
 
-	// According to stream specification the first 4 bytes should be 'MPCK'
-	uint32	magick;
+	// check ID3 tag
+	uint32 ID3size = 0;
 	reader->Seek(0);
+	char buf[3];
+	if (!reader->Read(buf, 3) && !strncmp(buf, "ID3", 3)) {
+		reader->Seek(3+3); // ID3 tag, Version, Revision, Flags
+		if (!reader->GetMagick(ID3size)) {
+			ID3size = (((ID3size & 0x7F000000) >> 0x03) |
+					   ((ID3size & 0x007F0000) >> 0x02) |
+					   ((ID3size & 0x00007F00) >> 0x01) |
+					   ((ID3size & 0x0000007F)		  ));
+			ID3size += 10;
+		}
+	}
+	reader->Seek(ID3size);
+
+	// According to stream specification the first 4 bytes should be 'MPCK'
+	uint32 magick;
 	ret = reader->GetMagick(magick);
 	if (ret < 0) {
 		return ret;
