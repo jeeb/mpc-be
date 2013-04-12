@@ -11261,10 +11261,7 @@ void CMainFrame::AutoChangeMonitorMode()
 							|| FAILED(pPin->ConnectionMediaType(&mt))) {
 						continue;
 					}
-					ExtractAvgTimePerFrame (&mt, m_rtTimePerFrame);
-					if (m_rtTimePerFrame == 0) {
-						m_rtTimePerFrame=1;
-					}
+					ExtractAvgTimePerFrame(&mt, m_rtTimePerFrame);
 				}
 				EndEnumPins;
 			}
