@@ -764,7 +764,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 				TrackNumber = m_pFile->AddStream(h.pid, b, 0, h.bytes - (DWORD)(m_pFile->GetPos() - pos));
 			}
 
-			if (GetOutputPin(TrackNumber)) {
+			if (GetOutputPin(TrackNumber) && (h.bytes > (m_pFile->GetPos() - pos))) {
 				CAutoPtr<Packet> p(DNew Packet());
 
 				if (h.fPCR) {

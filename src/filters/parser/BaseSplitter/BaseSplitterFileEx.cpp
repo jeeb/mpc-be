@@ -1429,6 +1429,7 @@ __int64 CBaseSplitterFileEx::Read(trhdr& h, bool fSync)
 			return -1;
 		}
 	}
+
 	return h.next - m_tslen;
 }
 
