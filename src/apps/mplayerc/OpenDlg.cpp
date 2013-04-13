@@ -111,7 +111,7 @@ BOOL COpenDlg::OnInitDialog()
 			if (pText) {
 				if (AfxIsValidString(pText)) {
 					CString tmpData(CString(pText).MakeLower());
-					if (PlayerYouTubeCheck(tmpData) || tmpData.Find(VIMEO_URL) != -1) {
+					if (PlayerYouTubeCheck(tmpData) || PlayerYouTubePlaylistCheck(tmpData) || tmpData.Find(VIMEO_URL) != -1) {
 						m_mrucombo.SetWindowTextW(pText);
 					}
 				}
@@ -237,7 +237,7 @@ void COpenDlg::OnBnClickedOk()
 	UpdateData();
 
 	m_fns.RemoveAll();
-	m_fns.AddTail(m_path);
+	m_fns.AddTail(PlayerYouTubePlaylist(m_path));
 
 	if (m_mrucombo2.IsWindowEnabled()) {
 		m_fns.AddTail(m_path2);

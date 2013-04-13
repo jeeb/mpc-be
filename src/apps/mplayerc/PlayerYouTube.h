@@ -24,7 +24,8 @@
 
 #include <afxinet.h>
 
-#define YOUTUBE_URL		_T("://www.youtube.com/watch?v=")
+#define YOUTUBE_PL_URL	_T("://www.youtube.com/playlist?")
+#define YOUTUBE_URL		_T("://www.youtube.com/watch?")
 #define YOUTU_BE_URL	_T("://youtu.be/")
 #define VIMEO_URL		_T("://vimeo.com/")
 
@@ -88,3 +89,6 @@ static DWORD strpos(char* h, char* n)
 
 bool PlayerYouTubeCheck(CString fn);
 CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author);
+bool PlayerYouTubePlaylistCheck(CString fn);
+CString PlayerYouTubePlaylist(CString fn);
+CString PlayerYouTubeTitle(char* title);

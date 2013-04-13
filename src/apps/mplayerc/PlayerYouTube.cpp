@@ -28,7 +28,7 @@ bool PlayerYouTubeCheck(CString fn)
 {
 	CString tmp_fn(CString(fn).MakeLower());
 
-	if (tmp_fn.Find(YOUTUBE_URL) != -1 || tmp_fn.Find(YOUTU_BE_URL) != -1) {
+	if ((tmp_fn.Find(YOUTUBE_URL) != -1 && tmp_fn.Find(_T("&list=")) < 0) || tmp_fn.Find(YOUTU_BE_URL) != -1) {
 		return 1;
 	}
 
@@ -70,7 +70,12 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 		final = NULL;
 		HINTERNET f, s = InternetOpen(L"MPC-BE Youtube Downloader", 0, NULL, NULL, 0);
 		if (s) {
-			f = InternetOpenUrl(s, fn, NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
+			CString link = fn;
+			if (link.Find(YOUTU_BE_URL) != -1) {
+				link.Replace(YOUTU_BE_URL, YOUTUBE_URL);
+				link.Replace(_T("watch?"), _T("watch?v="));
+			}
+			f = InternetOpenUrl(s, link, NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 			if (f) {
 				char *out			= NULL;
 				DWORD dwBytesRead	= 0;
@@ -141,20 +146,8 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 				memset(title, 0, t_stop + 1);
 				memcpy(title, final + t_start, t_stop);
 
-				Title = UTF8To16(title);
-				Title = Title.TrimLeft(_T(".")).TrimRight(_T("."));
-
+				Title = PlayerYouTubeTitle(title);
 				Title.Replace(_T(" - YouTube"), _T(""));
-				Title.Replace(_T(":"), _T(" -"));
-				Title.Replace(_T("|"), _T("-"));
-				Title.Replace(_T("—"), _T("-"));
-				Title.Replace(_T("--"), _T("-"));
-				Title.Replace(_T("  "), _T(" "));
-
-				Title.Replace(_T("&quot;"), _T("\""));
-				Title.Replace(_T("&amp;"), _T("&"));
-				Title.Replace(_T("&#39;"), _T("'"));
-				Title.Replace(_T("&#039;"), _T("'"));
 
 				delete [] title;
 			}
@@ -341,4 +334,165 @@ again:
 	}
 
 	return fn;
+}
+
+bool PlayerYouTubePlaylistCheck(CString fn)
+{
+	CString tmp_fn(CString(fn).MakeLower());
+
+	if ((tmp_fn.Find(YOUTUBE_URL) != -1 && tmp_fn.Find(_T("&list=")) != -1) || tmp_fn.Find(YOUTUBE_PL_URL) != -1) {
+		return 1;
+	}
+
+	return 0;
+}
+
+CString PlayerYouTubePlaylist(CString fn)
+{
+	if (PlayerYouTubePlaylistCheck(fn)) {
+
+		char* final	= NULL;
+
+		HINTERNET f, s = InternetOpen(L"MPC-BE Youtube Downloader", 0, NULL, NULL, 0);
+		if (s) {
+			f = InternetOpenUrl(s, fn, NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
+			if (f) {
+				char *out			= NULL;
+				DWORD dwBytesRead	= 0;
+				DWORD dataSize		= 0;
+
+				do {
+					char buffer[4096];
+					if (InternetReadFile(f, (LPVOID)buffer, _countof(buffer), &dwBytesRead) == FALSE) {
+						break;
+					}
+
+					char *tempData = DNew char[dataSize + dwBytesRead];
+					memcpy(tempData, out, dataSize);
+					memcpy(tempData + dataSize, buffer, dwBytesRead);
+					delete[] out;
+					out = tempData;
+					dataSize += dwBytesRead;
+
+				} while (dwBytesRead);
+
+				final = DNew char[dataSize + 1];
+				memset(final, 0, dataSize + 1);
+				memcpy(final, out, dataSize);
+				delete [] out;
+
+				InternetCloseHandle(f);
+			}
+			InternetCloseHandle(s);
+		}
+
+		if (!final) {
+			return fn;
+		}
+
+		CString Playlist = _T(""), Video = _T(""), Title = _T("");
+		int t_start = 0, t_stop = 0;
+		char sep1[32], sep2[] = "title=\"";
+
+		if (fn.Find(_T("&list=")) < 0) {
+			strcpy(sep1, "<a href=\"/watch?v=");
+		} else {
+			strcpy(sep1, "\" href=\"/watch?v=");
+		}
+
+		while ((final = strstr(final, sep1)) != NULL) {
+
+			final += strlen(sep1);
+
+			t_stop = strpos(final, "&");
+			if (t_stop > 0) {
+				char* str = DNew char[t_stop + 1];
+				memset(str, 0, t_stop + 1);
+				memcpy(str, final, t_stop);
+
+				Video = CString(str);
+
+				delete [] str;
+			}
+
+			final += t_stop;
+
+			t_start = strpos(final, sep2) + strlen(sep2);
+			if (t_start > 0 && t_start < 64) {
+				t_stop = strpos(final + t_start, "\"");
+				if (t_stop > 0) {
+					char* str = DNew char[t_stop + 1];
+					memset(str, 0, t_stop + 1);
+					memcpy(str, final + t_start, t_stop);
+
+					if (str[0] != '[' && str[strlen(str) - 1] != ']') {
+
+						Title = PlayerYouTubeTitle(str);
+					}
+
+					delete [] str;
+				}
+			}
+
+			final += (t_start + t_stop);
+
+			if (!Video.IsEmpty() && !Title.IsEmpty()) {
+
+				Playlist.Append(_T("#EXTINF:-1,"));
+				Playlist.Append(Title);
+				Playlist.Append(_T("\r\nhttp"));
+				Playlist.Append(YOUTUBE_URL);
+				Playlist.Append(_T("v="));
+				Playlist.Append(Video);
+				Playlist.Append(_T("\r\n"));
+
+				Video = _T("");
+				Title = _T("");
+			}
+		}
+
+		TCHAR path[_MAX_PATH], out_file[_MAX_PATH];
+
+		if (GetTempPath(_MAX_PATH, path) && GetTempFileName(path, _T("mpc_youtube"), 0, out_file)) {
+
+			CString out_tmp(out_file);
+			out_tmp.Replace(_T(".tmp"), _T(".m3u"));
+			TCHAR *wchr = out_tmp.GetBuffer();
+			wcsncpy(out_file, wchr, out_tmp.GetLength());
+			out_tmp.ReleaseBuffer();
+
+			CStdioFile fout;
+
+			if (fout.Open(out_file, CFile::modeCreate|CFile::modeWrite|CFile::shareDenyWrite|CFile::typeBinary)) {
+
+				CStringA ptr(Playlist);
+				const char* pt = (LPCSTR)ptr;
+				fout.Write(pt, strlen(pt));
+				fout.Close();
+			}
+		}
+
+		return out_file;
+	}
+
+	return fn;
+}
+
+CString PlayerYouTubeTitle(char* title)
+{
+	CString Title = UTF8To16(title);
+	Title = Title.TrimLeft(_T(".")).TrimRight(_T("."));
+
+	Title.Replace(_T(":"), _T(" -"));
+	Title.Replace(_T("|"), _T("-"));
+	Title.Replace(_T("—"), _T("-"));
+	Title.Replace(_T("--"), _T("-"));
+	Title.Replace(_T("  "), _T(" "));
+
+	Title.Replace(_T("&quot;"), _T("\""));
+	Title.Replace(_T("&amp;"), _T("&"));
+	Title.Replace(_T("&#39;"), _T("'"));
+	Title.Replace(_T("&#039;"), _T("'"));
+
+	return Title;
 }

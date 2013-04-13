@@ -40,9 +40,7 @@ CString PlayerVimeo(CString fn)
 			HINTERNET f, s = InternetOpen(L"MPC-BE Vimeo Downloader", 0, NULL, NULL, 0);
 			if (s) {
 				CString tmp_link = link;
-				char tbuf[16];
-				_itoa((int)time(0), tbuf, 10);
-				tmp_link.Append(CString(tbuf));
+				tmp_link.AppendFormat(_T("%d"), (int)time(0));
 
 				f = InternetOpenUrl(s, tmp_link, NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 				if (f) {
@@ -164,7 +162,6 @@ CString PlayerVimeoTitle(CString fn)
 				Title = UTF8To16(title);
 				Title = Title.TrimLeft(_T(".")).TrimRight(_T("."));
 
-				Title.Replace(_T(" on Vimeo"), _T(""));
 				Title.Replace(_T(":"), _T(" -"));
 				Title.Replace(_T("|"), _T("-"));
 				Title.Replace(_T("—"), _T("-"));
@@ -175,6 +172,8 @@ CString PlayerVimeoTitle(CString fn)
 				Title.Replace(_T("&amp;"), _T("&"));
 				Title.Replace(_T("&#39;"), _T("'"));
 				Title.Replace(_T("&#039;"), _T("'"));
+
+				Title.Replace(_T(" on Vimeo"), _T(""));
 
 				delete [] title;
 			}
