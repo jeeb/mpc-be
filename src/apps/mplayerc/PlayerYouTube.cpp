@@ -451,12 +451,12 @@ CString PlayerYouTubePlaylist(CString fn)
 			}
 		}
 
-		TCHAR path[_MAX_PATH], out_file[_MAX_PATH];
+		TCHAR out_file[_MAX_PATH];
 
-		if (GetTempPath(_MAX_PATH, path) && GetTempFileName(path, _T("mpc_youtube"), 0, out_file)) {
+		if (GetTempPath(_MAX_PATH, out_file)) {
 
 			CString out_tmp(out_file);
-			out_tmp.Replace(_T(".tmp"), _T(".m3u"));
+			out_tmp.Append(_T("mpc_youtube.m3u"));
 			TCHAR *wchr = out_tmp.GetBuffer();
 			wcsncpy(out_file, wchr, out_tmp.GetLength());
 			out_tmp.ReleaseBuffer();
