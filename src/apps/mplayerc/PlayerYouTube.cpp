@@ -428,8 +428,8 @@ CString PlayerYouTubePlaylist(CString fn)
 					memset(str, 0, t_stop + 1);
 					memcpy(str, final + t_start, t_stop);
 
-					if (str[0] != '[' && str[strlen(str) - 1] != ']') {
-
+					if (str[0] == '[' && str[strlen(str) - 1] == ']') {
+					} else {
 						Title = PlayerYouTubeTitle(str);
 					}
 
