@@ -97,10 +97,25 @@ public :
     void          File_ID_OnlyRoot_Set (bool NewValue);
     bool          File_ID_OnlyRoot_Get ();
 
+    #if MEDIAINFO_ADVANCED
+        void          File_IgnoreSequenceFileSize_Set (bool NewValue);
+        bool          File_IgnoreSequenceFileSize_Get ();
+    #endif //MEDIAINFO_ADVANCED
+
+    #if MEDIAINFO_ADVANCED
+        void          File_Source_List_Set (bool NewValue);
+        bool          File_Source_List_Get ();
+    #endif //MEDIAINFO_ADVANCED
+
     #if MEDIAINFO_MD5
-    void          File_Md5_Set (bool NewValue);
-    bool          File_Md5_Get ();
+        void          File_Md5_Set (bool NewValue);
+        bool          File_Md5_Get ();
     #endif //MEDIAINFO_MD5
+
+    #if defined(MEDIAINFO_REFERENCES_YES)
+        void          File_CheckSideCarFiles_Set (bool NewValue);
+        bool          File_CheckSideCarFiles_Get ();
+    #endif //defined(MEDIAINFO_REFERENCES_YES)
 
     void          File_FileName_Set (const Ztring &NewValue);
     Ztring        File_FileName_Get ();
@@ -287,9 +302,16 @@ private :
     bool                    Audio_MergeMonoStreams;
     bool                    File_Demux_Interleave;
     bool                    File_ID_OnlyRoot;
+    #if MEDIAINFO_ADVANCED
+        bool                File_IgnoreSequenceFileSize;
+        bool                File_Source_List;
+    #endif //MEDIAINFO_ADVANCED
     #if MEDIAINFO_MD5
         bool                File_Md5;
     #endif //MEDIAINFO_MD5
+    #if defined(MEDIAINFO_REFERENCES_YES)
+        bool                File_CheckSideCarFiles;
+    #endif //defined(MEDIAINFO_REFERENCES_YES)
     Ztring                  File_FileName;
     Ztring                  File_FileNameFormat;
     float64                 File_TimeToLive;
@@ -398,6 +420,10 @@ private :
     #endif //defined(MEDIAINFO_LIBCURL_YES)
 
     ZenLib::CriticalSection CS;
+
+    //Constructor
+    MediaInfo_Config_MediaInfo (const MediaInfo_Config_MediaInfo&);             // Prevent copy-construction
+    MediaInfo_Config_MediaInfo& operator=(const MediaInfo_Config_MediaInfo&);   // Prevent assignment
 };
 
 } //NameSpace

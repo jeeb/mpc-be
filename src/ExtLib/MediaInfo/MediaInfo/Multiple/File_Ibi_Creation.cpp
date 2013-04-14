@@ -301,7 +301,8 @@ size_t EbmlBlock(int8u* List, size_t List_MaxSize, int64u Code, int8u* Content, 
     {
         List+=int64u2Ebml(List, Code);
         List+=int64u2Ebml(List, Content_Size);
-        std::memcpy(List, Content, Content_Size); List+=Content_Size;//Content
+        std::memcpy(List, Content, Content_Size);
+        //List+=Content_Size; //Content
     }
 
     return Code_EbmlSize+Content_EbmlSize+Content_Size;
@@ -337,20 +338,15 @@ void File_Ibi_Creation::Set(const ibi &Ibi)
         int64s CurrentDate=(int64s)time(NULL)*1000000000LL; //From seconds to nanoseconds
         CurrentDate-=978307200000000000LL; //Count of nanoseconds between January 1, 1970 (time_t base) and January 1, 2001 (EBML base)
 
-        int64s LastModifiedDate;
+        int64s LastModifiedDate=0;
         bool   LastModifiedDate_IsValid=false;
-        int64s FileSize;
+        int64s FileSize=0;
         bool   FileSize_IsValid=false;
 
         #if defined WINDOWS
             HANDLE File_Handle;
             #ifdef UNICODE
-                #ifndef ZENLIB_NO_WIN9X_SUPPORT
-                if (IsWin9X_Fast())
-                    File_Handle=CreateFileW(Ibi.FileName.c_str(), 0, FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
-                else
-                #endif //ZENLIB_NO_WIN9X_SUPPORT
-                    File_Handle=CreateFileW(Ibi.FileName.c_str(), 0, FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+                File_Handle=CreateFileW(Ibi.FileName.c_str(), 0, FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
             #else
                 File_Handle=CreateFile(File_Name.c_str(), 0, FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
             #endif //UNICODE
@@ -378,7 +374,7 @@ void File_Ibi_Creation::Set(const ibi &Ibi)
             BlockSizeWithoutHeader+=1+1+8; //Source file modification date
         if (FileSize_IsValid)
             BlockSizeWithoutHeader+=1+1+8; //Source file size
-            
+
         buffer* Buffer=new buffer;
         Buffer->Content=new int8u[1+int64u2Ebml(NULL, 1+int64u2Ebml(NULL, BlockSizeWithoutHeader))+BlockSizeWithoutHeader];
         Buffer->Size+=int64u2Ebml(Buffer->Content+Buffer->Size, 0x05);                                                  //Source information
@@ -416,7 +412,7 @@ void File_Ibi_Creation::Set(const ibi &Ibi)
         std::memcpy(Buffer->Content+Buffer->Size, Version.c_str(), Version.size()); Buffer->Size+=Version.size(); //Content
         Buffers.push_back(Buffer);
     }
-    
+
     //InformData
     if (!Ibi.Inform_Data.empty())
     {
@@ -555,6 +551,8 @@ Ztring File_Ibi_Creation::Finish()
     std::string Data_Raw((const char*)Buffer.Content, Buffer.Size);
     std::string Data_Base64(Base64::encode(Data_Raw));
 
+    delete[] Main; //Main=NULL;
+    
     return Ztring().From_UTF8(Data_Base64);
 }
 

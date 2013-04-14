@@ -685,7 +685,7 @@ void File_Riff::AIFF_COMM()
         Parser->Codec=Retrieve(Stream_Audio, StreamPos_Last, Audio_CodecID);
         if (Parser->Codec.empty() || Parser->Codec==__T("NONE"))
             Parser->Endianness='B';
-        Parser->BitDepth=sampleSize;
+        Parser->BitDepth=(int8u)sampleSize;
         #if MEDIAINFO_DEMUX
             if (Config->Demux_Unpacketize_Get())
             {
@@ -700,7 +700,7 @@ void File_Riff::AIFF_COMM()
     #endif
     #if MEDIAINFO_DEMUX
         BlockAlign=numChannels*sampleSize/8;
-        AvgBytesPerSec=(int32u)float64_int64s(BlockAlign*sampleRate);
+        AvgBytesPerSec=(int32u)float64_int64s(BlockAlign*(float64)sampleRate);
     #endif //MEDIAINFO_DEMUX
 
     Element_Code=(int64u)-1;
@@ -1224,7 +1224,7 @@ void File_Riff::AVI__hdlr_strl_strf_auds()
         #if defined(MEDIAINFO_SMPTEST0337_YES)
         {
             File_SmpteSt0337* Parser=new File_SmpteSt0337;
-            Parser->Container_Bits=AvgBytesPerSec*8/SamplesPerSec/Channels;
+            Parser->Container_Bits=(int8u)(AvgBytesPerSec*8/SamplesPerSec/Channels);
             Parser->ShouldContinueParsing=true;
             #if MEDIAINFO_DEMUX
                 if (Config->Demux_Unpacketize_Get() && Retrieve(Stream_General, 0, General_Format)==__T("Wave"))
@@ -1286,7 +1286,7 @@ void File_Riff::AVI__hdlr_strl_strf_auds()
         File_Pcm* Parser=new File_Pcm;
         Parser->Codec=Codec;
         Parser->Endianness='L';
-        Parser->BitDepth=BitsPerSample;
+        Parser->BitDepth=(int8u)BitsPerSample;
         #if MEDIAINFO_DEMUX
             if (Config->Demux_Unpacketize_Get() && Retrieve(Stream_General, 0, General_Format)==__T("Wave"))
             {
@@ -1484,7 +1484,7 @@ void File_Riff::AVI__hdlr_strl_strf_auds_ExtensibleWave()
                 Parser->Codec=Ztring().From_GUID(SubFormat);
                 Parser->Endianness='L';
                 Parser->Sign='S';
-                Parser->BitDepth=BitsPerSample;
+                Parser->BitDepth=(int8u)BitsPerSample;
                 #if MEDIAINFO_DEMUX
                     if (Config->Demux_Unpacketize_Get() && Retrieve(Stream_General, 0, General_Format)==__T("Wave"))
                     {
@@ -3184,9 +3184,10 @@ void File_Riff::RMP3_data()
         Parser->CalculateDelay=true;
         Parser->ShouldContinueParsing=true;
         Open_Buffer_Init(Parser);
-        Stream[(int64u)-1].StreamKind=Stream_Audio;
-        Stream[(int64u)-1].StreamPos=0;
-        Stream[(int64u)-1].Parsers.push_back(Parser);
+        stream& StreamItem=Stream[(int32u)-1];
+        StreamItem.StreamKind=Stream_Audio;
+        StreamItem.StreamPos=0;
+        StreamItem.Parsers.push_back(Parser);
     #else //MEDIAINFO_MPEG4_YES
         Fill(Stream_Audio, 0, Audio_Format, "MPEG Audio");
         Skip_XX(Buffer_DataToParse_End-Buffer_DataToParse_Begin, "Data");
@@ -3523,7 +3524,7 @@ void File_Riff::WAVE_fmt_()
     Stream_ID=(int32u)-1;
     stream_Count=1;
 
-    Stream[(int64u)-1].fccType=Elements::AVI__hdlr_strl_strh_auds;
+    Stream[(int32u)-1].fccType=Elements::AVI__hdlr_strl_strh_auds;
     AVI__hdlr_strl_strf();
 }
 

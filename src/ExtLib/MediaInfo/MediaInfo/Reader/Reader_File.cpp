@@ -61,7 +61,7 @@ namespace MediaInfoLib
 const size_t Buffer_NoJump=128*1024;
 
 //---------------------------------------------------------------------------
-size_t Reader_File::Format_Test(MediaInfo_Internal* MI, const String &File_Name)
+size_t Reader_File::Format_Test(MediaInfo_Internal* MI, String File_Name)
 {
     //std::cout<<Ztring(File_Name).To_Local().c_str()<<std::endl;
     #if MEDIAINFO_EVENTS
@@ -140,7 +140,11 @@ size_t Reader_File::Format_Test_PerParser(MediaInfo_Internal* MI, const String &
     MI->Config.File_Current_Size=MI->Config.File_Size;
     MI->Config.File_Sizes.clear();
     MI->Config.File_Sizes.push_back(MI->Config.File_Size);
-    if (MI->Config.File_Names.size()>1)
+    if (MI->Config.File_Names.size()>1
+        #if MEDIAINFO_ADVANCED
+            && !MI->Config.File_IgnoreSequenceFileSize_Get()
+        #endif //MEDIAINFO_ADVANCED
+            )
     {
         for (size_t Pos=1; Pos<MI->Config.File_Names.size(); Pos++)
         {
@@ -263,7 +267,7 @@ size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
                     size_t Pos;
                     for (Pos=0; Pos<MI->Config.File_Sizes.size(); Pos++)
                     {
-                        if (GoTo>=MI->Config.File_Sizes[Pos])
+                        if (GoTo>MI->Config.File_Sizes[Pos])
                         {
                             GoTo-=MI->Config.File_Sizes[Pos];
                             MI->Config.File_Current_Offset+=MI->Config.File_Sizes[Pos];

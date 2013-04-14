@@ -18,7 +18,7 @@ Changes (*):
 * Little-CMS git-cde00fd7;
 * libwebp 0.3.0 git-7ebdf110;
 * libopenjpeg 2.0.0 svn rev.2301;
-* MediaInfo 0.7.62+ svn rev.5458;
+* MediaInfo 0.7.62+ svn rev.5479;
 * libpng 1.7.0 b8 git-25a116f9;
 * ZenLibs v0.4.28+ svn rev.430;
 * VirtualDub 1.10.4 Test 6;

@@ -389,6 +389,7 @@ protected :
     int128u InstanceUID;
     int64u Buffer_Begin;
     int64u Buffer_End;
+    bool   Buffer_End_Unlimited;
     int64u Buffer_Header_Size;
     int16u Code2;
     int16u Length2;
@@ -596,7 +597,7 @@ protected :
             SubSampling_Vertical=(int32u)-1;
             ChannelCount=(int32u)-1;
             BlockAlign=(int16u)-1;
-            QuantizationBits=(int8u)-1;
+            QuantizationBits=(int32u)-1;
             Duration=(int64u)-1;
             ActiveFormat=(int8u)-1;
             FieldTopness=(int8u)-1; //Field x is upper field

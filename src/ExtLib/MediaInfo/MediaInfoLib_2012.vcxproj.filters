@@ -599,6 +599,9 @@
     <ClInclude Include="MediaInfo\Video\File_Aic.h">
       <Filter>Header Files\Video</Filter>
     </ClInclude>
+    <ClInclude Include="ThirdParty\md5\md5.h">
+      <Filter>extra</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
@@ -1140,6 +1143,9 @@
     </ClCompile>
     <ClCompile Include="MediaInfo\Video\File_Aic.cpp">
       <Filter>Source Files\Video</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\md5\md5.c">
+      <Filter>extra</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
