@@ -882,6 +882,51 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 			}
 		}
 
+		if (type == video) {
+			REFERENCE_TIME rtAvgTimePerFrame = 1;
+			if (s.mt.formattype == FORMAT_MPEG2_VIDEO) {
+				rtAvgTimePerFrame = ((MPEG2VIDEOINFO*)s.mt.pbFormat)->hdr.AvgTimePerFrame;
+			} else if (s.mt.formattype == FORMAT_VIDEOINFO2) {
+				rtAvgTimePerFrame = ((VIDEOINFOHEADER2*)s.mt.pbFormat)->AvgTimePerFrame;
+			} else if (s.mt.formattype == FORMAT_VideoInfo) {
+				rtAvgTimePerFrame = ((VIDEOINFOHEADER*)s.mt.pbFormat)->AvgTimePerFrame;
+			}
+
+			if (!rtAvgTimePerFrame) {
+				__int64 _pos = GetPos();
+				REFERENCE_TIME rt_start = NextPTS(s.pid);
+				if (rt_start != INVALID_TIME) {
+					Seek(GetPos() + 188);
+					REFERENCE_TIME rt_end = rt_start;
+					int count = 0;
+					while (count < 30) {
+						rt_end = NextPTS(s.pid);
+						if (rt_end == INVALID_TIME) {
+							break;
+						}
+						count++;
+						Seek(GetPos() + 188);
+					}
+
+					if (count && (rt_start < rt_end)) {
+						rtAvgTimePerFrame = (rt_end - rt_start) / count;
+					}
+
+					if (rtAvgTimePerFrame) {
+						if (s.mt.formattype == FORMAT_MPEG2_VIDEO) {
+							((MPEG2VIDEOINFO*)s.mt.pbFormat)->hdr.AvgTimePerFrame = rtAvgTimePerFrame;
+						} else if (s.mt.formattype == FORMAT_VIDEOINFO2) {
+							((VIDEOINFOHEADER2*)s.mt.pbFormat)->AvgTimePerFrame = rtAvgTimePerFrame;
+						} else if (s.mt.formattype == FORMAT_VideoInfo) {
+							((VIDEOINFOHEADER*)s.mt.pbFormat)->AvgTimePerFrame = rtAvgTimePerFrame;
+						}
+					}
+				}
+
+				Seek(_pos);
+			}
+		}
+
 		m_streams[type].Insert(s, this, type);
 	}
 
