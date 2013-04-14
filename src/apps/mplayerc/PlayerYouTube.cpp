@@ -129,7 +129,7 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 		}
 
 		if (!match_start || !match_len) {
-			if (strpos(final, "http://www.youtube.com")) {
+			if (strstr(final, "http://www.youtube.com")) {
 				// This is looks like Youtube page, but this page doesn't contains necessary information about video, so may be you have to register on google.com to view it.
 				fn.Empty();
 			}
@@ -374,6 +374,9 @@ CString PlayerYouTubePlaylist(CString fn)
 					out = tempData;
 					dataSize += dwBytesRead;
 
+					if (strstr(out, MATCH_START)) {
+						break;
+					}
 				} while (dwBytesRead);
 
 				final = DNew char[dataSize + 1];

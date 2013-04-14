@@ -50,7 +50,7 @@ CString PlayerVimeo(CString fn)
 
 					char buffer[4096];
 					if (InternetReadFile(f, (LPVOID)buffer, _countof(buffer), &dwBytesRead)) {
-						if (strpos(buffer, "</cmd>")) {
+						if (strstr(buffer, "</cmd>")) {
 
 							char *tempData = DNew char[dataSize + dwBytesRead];
 							memcpy(tempData, out, dataSize);
@@ -135,7 +135,7 @@ CString PlayerVimeoTitle(CString fn)
 					out = tempData;
 					dataSize += dwBytesRead;
 
-					if (strpos(out, "</title>")) {
+					if (strstr(out, "</title>")) {
 						break;
 					}
 				} while (dwBytesRead);
