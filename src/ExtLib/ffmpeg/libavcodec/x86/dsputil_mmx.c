@@ -73,7 +73,6 @@ void ff_put_no_rnd_pixels16_l2_mmxext(uint8_t *dst, uint8_t *src1, uint8_t *src2
 void ff_avg_pixels8_mmxext(uint8_t *block, const uint8_t *pixels,
                            ptrdiff_t line_size, int h);
 
-void ff_put_pixels8_mmxext(uint8_t *block, const uint8_t *pixels, ptrdiff_t line_size, int h);
 static void ff_put_pixels16_mmxext(uint8_t *block, const uint8_t *pixels,
                                    ptrdiff_t line_size, int h)
 {
@@ -526,12 +525,7 @@ static void add_hfyu_median_prediction_cmov(uint8_t *dst, const uint8_t *top,
     *left_top = tl;
 }
 #endif
-#endif /* HAVE_INLINE_ASM */
 
-void ff_h263_v_loop_filter_mmx(uint8_t *src, int stride, int qscale);
-void ff_h263_h_loop_filter_mmx(uint8_t *src, int stride, int qscale);
-
-#if HAVE_INLINE_ASM
 /* Draw the edges of width 'w' of an image of size width, height
  * this MMX version can only handle w == 8 || w == 16. */
 static void draw_edges_mmx(uint8_t *buf, int wrap, int width, int height,
@@ -1185,6 +1179,7 @@ static av_always_inline void gmc(uint8_t *dst, uint8_t *src,
     }
 }
 
+
 #if CONFIG_VIDEODSP
 #if HAVE_YASM
 #if ARCH_X86_32
@@ -1216,15 +1211,6 @@ static void gmc_mmx(uint8_t *dst, uint8_t *src,
 }
 #endif
 #endif
-
-#endif /* HAVE_INLINE_ASM */
-
-void ff_put_pixels16_sse2(uint8_t *block, const uint8_t *pixels,
-                          ptrdiff_t line_size, int h);
-void ff_avg_pixels16_sse2(uint8_t *block, const uint8_t *pixels,
-                          ptrdiff_t line_size, int h);
-
-#if HAVE_INLINE_ASM
 
 /* CAVS-specific */
 void ff_put_cavs_qpel8_mc00_mmxext(uint8_t *dst, uint8_t *src, ptrdiff_t stride)
@@ -1358,6 +1344,9 @@ static void vector_clipf_sse(float *dst, const float *src,
 }
 
 #endif /* HAVE_INLINE_ASM */
+
+void ff_h263_v_loop_filter_mmx(uint8_t *src, int stride, int qscale);
+void ff_h263_h_loop_filter_mmx(uint8_t *src, int stride, int qscale);
 
 int32_t ff_scalarproduct_int16_mmxext(const int16_t *v1, const int16_t *v2,
                                       int order);
@@ -1493,9 +1482,9 @@ static av_cold void dsputil_init_mmxext(DSPContext *c, AVCodecContext *avctx,
 static av_cold void dsputil_init_sse(DSPContext *c, AVCodecContext *avctx,
                                      int mm_flags)
 {
+#if HAVE_INLINE_ASM
     const int high_bit_depth = avctx->bits_per_raw_sample > 8;
 
-#if HAVE_INLINE_ASM
     if (!high_bit_depth) {
         if (!(CONFIG_MPEG_XVMC_DECODER && avctx->xvmc_acceleration > 1)) {
             /* XvMCCreateBlocks() may not allocate 16-byte aligned blocks */
@@ -1517,8 +1506,7 @@ static av_cold void dsputil_init_sse(DSPContext *c, AVCodecContext *avctx,
 static av_cold void dsputil_init_sse2(DSPContext *c, AVCodecContext *avctx,
                                       int mm_flags)
 {
-    const int bit_depth      = avctx->bits_per_raw_sample;
-    const int high_bit_depth = bit_depth > 8;
+    const int high_bit_depth = avctx->bits_per_raw_sample > 8;
 
 #if HAVE_SSE2_INLINE
     if (!high_bit_depth && avctx->idct_algo == FF_IDCT_XVIDMMX) {
