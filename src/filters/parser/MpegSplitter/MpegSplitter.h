@@ -37,7 +37,7 @@
 	if(_pMC) _pMC->GetState(1000, &_fs); \
 	if(_fs == State_Running) \
 		_pMC->Pause(); \
- \
+	\
 	HRESULT _hr = E_FAIL; \
 	CComQIPtr<IMediaSeeking> _pMS((IUnknown*)(INonDelegatingUnknown*)m_pGraph); \
 	LONGLONG _rtNow = 0; \
@@ -46,7 +46,7 @@
 #define ResumeGraph \
 	if(SUCCEEDED(_hr) && _pMS && _fs != State_Stopped) \
 		_hr = _pMS->SetPositions(&_rtNow, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning); \
- \
+	\
 	if(_fs == State_Running && _pMS) \
 		_pMC->Run(); \
  

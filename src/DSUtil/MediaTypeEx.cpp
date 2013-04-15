@@ -454,6 +454,65 @@ CString CMediaTypeEx::GetSubtitleCodecName(const GUID& subtype)
 	return str;
 }
 
+CString GetGUIDString(const GUID& guid)
+{
+	CString subtype = CString(GuidNames[guid]);
+	if (subtype == _T("Unknown GUID Name") || guid == GUID_NULL) {
+#define UNPACK_VALUE(VALUE) if (guid == VALUE) return _T( #VALUE );
+		// video
+		UNPACK_VALUE(MEDIASUBTYPE_AVC1);
+		UNPACK_VALUE(MEDIASUBTYPE_avc1);
+		UNPACK_VALUE(MEDIASUBTYPE_H264);
+		UNPACK_VALUE(MEDIASUBTYPE_h264);
+		UNPACK_VALUE(MEDIASUBTYPE_WVC1);
+		UNPACK_VALUE(MEDIASUBTYPE_wvc1);
+		UNPACK_VALUE(MEDIASUBTYPE_XVID);
+		UNPACK_VALUE(MEDIASUBTYPE_xvid);
+		UNPACK_VALUE(MEDIASUBTYPE_DX50);
+		UNPACK_VALUE(MEDIASUBTYPE_dx50);
+		UNPACK_VALUE(MEDIASUBTYPE_DIVX);
+		UNPACK_VALUE(MEDIASUBTYPE_divx);
+		UNPACK_VALUE(MEDIASUBTYPE_MP4V);
+		UNPACK_VALUE(MEDIASUBTYPE_mp4v);
+
+		// audio
+		UNPACK_VALUE(MEDIASUBTYPE_AAC);
+		UNPACK_VALUE(MEDIASUBTYPE_AAC_ADTS);
+		UNPACK_VALUE(MEDIASUBTYPE_LATM_AAC);
+		UNPACK_VALUE(MEDIASUBTYPE_DOLBY_AC3);
+		UNPACK_VALUE(MEDIASUBTYPE_DOLBY_AC3_SPDIF);
+		UNPACK_VALUE(MEDIASUBTYPE_DOLBY_DDPLUS);
+		UNPACK_VALUE(MEDIASUBTYPE_DOLBY_TRUEHD);
+		UNPACK_VALUE(MEDIASUBTYPE_DTS);
+		UNPACK_VALUE(MEDIASUBTYPE_DTS_HD);
+		UNPACK_VALUE(MEDIASUBTYPE_WAVE_DOLBY_AC3);
+		UNPACK_VALUE(MEDIASUBTYPE_WAVE_DTS);
+		UNPACK_VALUE(MEDIASUBTYPE_MP3);
+		UNPACK_VALUE(MEDIASUBTYPE_FLAC);
+
+		// subtitle
+		UNPACK_VALUE(MEDIASUBTYPE_UTF8);
+		UNPACK_VALUE(MEDIASUBTYPE_SSA);
+		UNPACK_VALUE(MEDIASUBTYPE_ASS);
+		UNPACK_VALUE(MEDIASUBTYPE_VOBSUB);
+		UNPACK_VALUE(MEDIASUBTYPE_HDMVSUB);
+		UNPACK_VALUE(MEDIASUBTYPE_XSUB);
+
+		// container
+		UNPACK_VALUE(MEDIASUBTYPE_Avi);
+		UNPACK_VALUE(MEDIASUBTYPE_MP4);
+		UNPACK_VALUE(MEDIASUBTYPE_Matroska);
+		UNPACK_VALUE(MEDIASUBTYPE_FLV);
+
+		UNPACK_VALUE(GUID_NULL);
+#undef UNPACK_VALUE
+		return _T("Unknown GUID Name");
+	} else {
+		return subtype;
+	}
+}
+
+
 void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 {
 	CString str;
@@ -469,11 +528,11 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 	sl.AddTail(ToString() + _T("\n"));
 
 	sl.AddTail(_T("AM_MEDIA_TYPE: "));
-	str.Format(_T("majortype: %s %s"), CString(GuidNames[majortype]), major);
+	str.Format(_T("majortype: %s %s"), GetGUIDString(majortype), major);
 	sl.AddTail(str);
-	str.Format(_T("subtype: %s %s"), CString(GuidNames[subtype]), sub);
+	str.Format(_T("subtype: %s %s"), GetGUIDString(subtype), sub);
 	sl.AddTail(str);
-	str.Format(_T("formattype: %s %s"), CString(GuidNames[formattype]), format);
+	str.Format(_T("formattype: %s %s"), GetGUIDString(formattype), format);
 	sl.AddTail(str);
 	str.Format(_T("bFixedSizeSamples: %d"), bFixedSizeSamples);
 	sl.AddTail(str);
