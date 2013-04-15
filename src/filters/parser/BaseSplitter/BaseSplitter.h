@@ -35,6 +35,8 @@
 #include "../../../DSUtil/FontInstaller.h"
 #include "../apps/mplayerc/SettingsDefines.h"
 
+#define PACKET_PTS_DISCONTINUITY 0x0001
+
 class Packet : public CAtlArray<BYTE>
 {
 public:
@@ -42,9 +44,13 @@ public:
 	BOOL bDiscontinuity, bSyncPoint, bAppendable;
 	REFERENCE_TIME rtStart, rtStop;
 	AM_MEDIA_TYPE* pmt;
+	DWORD flag;
 	Packet() {
+		TrackNumber = 0;	
 		pmt = NULL;
 		bDiscontinuity = bAppendable = FALSE;
+		rtStart = rtStop = INVALID_TIME;
+		flag = 0;
 	}
 	virtual ~Packet() {
 		if (pmt) {

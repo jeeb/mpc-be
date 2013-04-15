@@ -891,12 +891,15 @@ bool CFLVSplitterFilter::DemuxLoop()
 			m_pFile->WaitAvailable(1500, dataSize);
 			
 			p.Attach(DNew Packet());
-			p->TrackNumber = t.TagType;
-			p->rtStart = 10000i64 * (t.TimeStamp + tsOffset);
-			p->rtStop = p->rtStart + 1;
-			p->bSyncPoint = t.TagType == FLV_VIDEODATA ? vt.FrameType == 1 : true;
+			p->TrackNumber	= t.TagType;
+			p->rtStart		= 10000i64 * (t.TimeStamp + tsOffset);
+			p->rtStop		= p->rtStart + 1;
+			p->bSyncPoint	= t.TagType == FLV_VIDEODATA ? vt.FrameType == 1 : true;
+			p->flag			|= PACKET_PTS_DISCONTINUITY;
+
 			p->SetCount((size_t)dataSize);
 			m_pFile->ByteRead(p->GetData(), p->GetCount());
+
 			hr = DeliverPacket(p);
 		}
 NextTag:

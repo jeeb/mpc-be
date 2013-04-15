@@ -734,8 +734,8 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 				p->bAppendable	= !h.fpts;
 				p->rtStart		= h.fpts ? (h.pts - rtStartOffset) : INVALID_TIME;
 				p->rtStop		= p->rtStart+1;
-				p->SetCount(h.len - (size_t)(m_pFile->GetPos() - pos));
 
+				p->SetCount(h.len - (size_t)(m_pFile->GetPos() - pos));
 				m_pFile->ByteRead(p->GetData(), h.len - (m_pFile->GetPos() - pos));
 
 				hr = DeliverPacket(p);
@@ -814,9 +814,10 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 			p->bAppendable	= !h.fpts;
 			p->rtStart		= h.fpts ? (h.pts - rtStartOffset) : INVALID_TIME;
 			p->rtStop		= p->rtStart+1;
+			
 			p->SetCount(h.length);
-
 			m_pFile->ByteRead(p->GetData(), h.length);
+
 			hr = DeliverPacket(p);
 		}
 
@@ -1791,6 +1792,8 @@ HRESULT CMpegSplitterOutputPin::DeliverEndFlush()
 HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 {
 	CAutoLock cAutoLock(this);
+
+	p->flag |= PACKET_PTS_DISCONTINUITY;
 
 	if (p->pmt) {
 		if (*((CMediaType *)p->pmt) != m_mt) {
