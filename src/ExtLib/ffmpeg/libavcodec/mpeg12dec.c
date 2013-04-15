@@ -1,7 +1,7 @@
 /*
  * MPEG-1/2 decoder
  * Copyright (c) 2000, 2001 Fabrice Bellard
- * Copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at>
+ * Copyright (c) 2002-2013 Michael Niedermayer <michaelni@gmx.at>
  *
  * This file is part of FFmpeg.
  *
@@ -1138,7 +1138,7 @@ static enum AVPixelFormat mpeg_get_pixelformat(AVCodecContext *avctx)
         return AV_PIX_FMT_YUV420P;
         // ==> End patch MPC
 
-        return avctx->get_format(avctx,
+        return ff_thread_get_format(avctx,
                                 avctx->codec_id == AV_CODEC_ID_MPEG1VIDEO ?
                                 mpeg1_hwaccel_pixfmt_list_420 :
                                 mpeg2_hwaccel_pixfmt_list_420);

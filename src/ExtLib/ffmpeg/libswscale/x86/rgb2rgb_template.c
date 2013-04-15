@@ -1612,7 +1612,8 @@ static inline void RENAME(uyvytoyv12)(const uint8_t *src, uint8_t *ydst, uint8_t
  */
 static inline void RENAME(rgb24toyv12)(const uint8_t *src, uint8_t *ydst, uint8_t *udst, uint8_t *vdst,
                                        int width, int height,
-                                       int lumStride, int chromStride, int srcStride)
+                                       int lumStride, int chromStride, int srcStride,
+                                       int32_t *rgb2yuv)
 {
     int y;
     const x86_reg chromWidth= width>>1;
@@ -1640,12 +1641,10 @@ static inline void RENAME(rgb24toyv12)(const uint8_t *src, uint8_t *ydst, uint8_
                 "pmaddwd                 %%mm6, %%mm1       \n\t"
                 "pmaddwd                 %%mm6, %%mm2       \n\t"
                 "pmaddwd                 %%mm6, %%mm3       \n\t"
-#ifndef FAST_BGR2YV12
                 "psrad                      $8, %%mm0       \n\t"
                 "psrad                      $8, %%mm1       \n\t"
                 "psrad                      $8, %%mm2       \n\t"
                 "psrad                      $8, %%mm3       \n\t"
-#endif
                 "packssdw                %%mm1, %%mm0       \n\t"
                 "packssdw                %%mm3, %%mm2       \n\t"
                 "pmaddwd                 %%mm5, %%mm0       \n\t"
@@ -1665,12 +1664,10 @@ static inline void RENAME(rgb24toyv12)(const uint8_t *src, uint8_t *ydst, uint8_
                 "pmaddwd                 %%mm6, %%mm1       \n\t"
                 "pmaddwd                 %%mm6, %%mm2       \n\t"
                 "pmaddwd                 %%mm6, %%mm3       \n\t"
-#ifndef FAST_BGR2YV12
                 "psrad                      $8, %%mm4       \n\t"
                 "psrad                      $8, %%mm1       \n\t"
                 "psrad                      $8, %%mm2       \n\t"
                 "psrad                      $8, %%mm3       \n\t"
-#endif
                 "packssdw                %%mm1, %%mm4       \n\t"
                 "packssdw                %%mm3, %%mm2       \n\t"
                 "pmaddwd                 %%mm5, %%mm4       \n\t"
@@ -1751,12 +1748,10 @@ static inline void RENAME(rgb24toyv12)(const uint8_t *src, uint8_t *ydst, uint8_
             "pmaddwd                 %%mm2, %%mm3       \n\t"
             "pmaddwd                 %%mm6, %%mm0       \n\t"
             "pmaddwd                 %%mm6, %%mm2       \n\t"
-#ifndef FAST_BGR2YV12
             "psrad                      $8, %%mm0       \n\t"
             "psrad                      $8, %%mm1       \n\t"
             "psrad                      $8, %%mm2       \n\t"
             "psrad                      $8, %%mm3       \n\t"
-#endif
             "packssdw                %%mm2, %%mm0       \n\t"
             "packssdw                %%mm3, %%mm1       \n\t"
             "pmaddwd                 %%mm5, %%mm0       \n\t"
@@ -1813,12 +1808,10 @@ static inline void RENAME(rgb24toyv12)(const uint8_t *src, uint8_t *ydst, uint8_
             "pmaddwd                 %%mm2, %%mm3       \n\t"
             "pmaddwd                 %%mm6, %%mm4       \n\t"
             "pmaddwd                 %%mm6, %%mm2       \n\t"
-#ifndef FAST_BGR2YV12
             "psrad                      $8, %%mm4       \n\t"
             "psrad                      $8, %%mm1       \n\t"
             "psrad                      $8, %%mm2       \n\t"
             "psrad                      $8, %%mm3       \n\t"
-#endif
             "packssdw                %%mm2, %%mm4       \n\t"
             "packssdw                %%mm3, %%mm1       \n\t"
             "pmaddwd                 %%mm5, %%mm4       \n\t"
@@ -1850,7 +1843,7 @@ static inline void RENAME(rgb24toyv12)(const uint8_t *src, uint8_t *ydst, uint8_
                      SFENCE"     \n\t"
                      :::"memory");
 
-     rgb24toyv12_c(src, ydst, udst, vdst, width, height-y, lumStride, chromStride, srcStride);
+     ff_rgb24toyv12_c(src, ydst, udst, vdst, width, height-y, lumStride, chromStride, srcStride, rgb2yuv);
 }
 #endif /* !COMPILE_TEMPLATE_SSE2 */
 
@@ -2486,7 +2479,7 @@ static inline void RENAME(rgb2rgb_init)(void)
 #if COMPILE_TEMPLATE_MMXEXT || COMPILE_TEMPLATE_AMD3DNOW
     planar2x           = RENAME(planar2x);
 #endif /* COMPILE_TEMPLATE_MMXEXT || COMPILE_TEMPLATE_AMD3DNOW */
-    rgb24toyv12        = RENAME(rgb24toyv12);
+    ff_rgb24toyv12     = RENAME(rgb24toyv12);
 
     yuyvtoyuv420       = RENAME(yuyvtoyuv420);
     uyvytoyuv420       = RENAME(uyvytoyuv420);
