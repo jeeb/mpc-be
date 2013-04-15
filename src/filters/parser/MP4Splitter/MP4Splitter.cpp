@@ -31,6 +31,7 @@
 #include <InitGuid.h>
 #endif
 #include <moreuuids.h>
+#include <basestruct.h>
 
 #include <Bento4/Core/Ap4.h>
 #include <Bento4/Core/Ap4File.h>

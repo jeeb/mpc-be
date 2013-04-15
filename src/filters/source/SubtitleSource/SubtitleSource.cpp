@@ -29,6 +29,7 @@
 #include <InitGuid.h>
 #endif
 #include <moreuuids.h>
+#include <basestruct.h>
 
 static int _WIDTH = 640;
 static int _HEIGHT = 480;

@@ -29,6 +29,7 @@
 #include "Mpeg2Def.h"
 #include "vd.h"
 #include <moreuuids.h>
+#include <basestruct.h>
 #include <emmintrin.h>
 #include <math.h>
 #include <InitGuid.h>

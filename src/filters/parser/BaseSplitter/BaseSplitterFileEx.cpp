@@ -27,6 +27,7 @@
 #include "../../../DSUtil/AudioParser.h"
 #include <InitGuid.h>
 #include <moreuuids.h>
+#include <basestruct.h>
 
 //
 // CBaseSplitterFileEx

@@ -28,17 +28,9 @@
 #include <MMReg.h>
 #include <InitGuid.h>
 #include <moreuuids.h>
+#include <basestruct.h>
 
-#pragma pack(push, 1)
-typedef struct {
-	WAVEFORMATEX Format;
-	BYTE bBigEndian;
-	BYTE bsid;
-	BYTE lfeon;
-	BYTE copyrightb;
-	BYTE nAuxBitsCode;  //  Aux bits per frame
-} DOLBYAC3WAVEFORMAT;
-#pragma pack(pop)
+#include "GUIDString.h"
 
 CMediaTypeEx::CMediaTypeEx()
 {
@@ -438,12 +430,12 @@ CString CMediaTypeEx::GetSubtitleCodecName(const GUID& subtype)
 	static CAtlMap<GUID, CString> names;
 
 	if (names.IsEmpty()) {
-		names[MEDIASUBTYPE_UTF8] = _T("UTF-8");
-		names[MEDIASUBTYPE_SSA] = _T("SubStation Alpha");
-		names[MEDIASUBTYPE_ASS] = _T("Advanced SubStation Alpha");
-		names[MEDIASUBTYPE_ASS2] = _T("Advanced SubStation Alpha");
-		names[MEDIASUBTYPE_USF] = _T("Universal Subtitle Format");
-		names[MEDIASUBTYPE_VOBSUB] = _T("VobSub");
+		names[MEDIASUBTYPE_UTF8]	= _T("UTF-8");
+		names[MEDIASUBTYPE_SSA]		= _T("SubStation Alpha");
+		names[MEDIASUBTYPE_ASS]		= _T("Advanced SubStation Alpha");
+		names[MEDIASUBTYPE_ASS2]	= _T("Advanced SubStation Alpha");
+		names[MEDIASUBTYPE_USF]		= _T("Universal Subtitle Format");
+		names[MEDIASUBTYPE_VOBSUB]	= _T("VobSub");
 		// names[''] = _T("");
 	}
 
@@ -456,62 +448,15 @@ CString CMediaTypeEx::GetSubtitleCodecName(const GUID& subtype)
 
 CString GetGUIDString(const GUID& guid)
 {
-	CString subtype = CString(GuidNames[guid]);
-	if (subtype == _T("Unknown GUID Name") || guid == GUID_NULL) {
-#define UNPACK_VALUE(VALUE) if (guid == VALUE) return _T( #VALUE );
-		// video
-		UNPACK_VALUE(MEDIASUBTYPE_AVC1);
-		UNPACK_VALUE(MEDIASUBTYPE_avc1);
-		UNPACK_VALUE(MEDIASUBTYPE_H264);
-		UNPACK_VALUE(MEDIASUBTYPE_h264);
-		UNPACK_VALUE(MEDIASUBTYPE_WVC1);
-		UNPACK_VALUE(MEDIASUBTYPE_wvc1);
-		UNPACK_VALUE(MEDIASUBTYPE_XVID);
-		UNPACK_VALUE(MEDIASUBTYPE_xvid);
-		UNPACK_VALUE(MEDIASUBTYPE_DX50);
-		UNPACK_VALUE(MEDIASUBTYPE_dx50);
-		UNPACK_VALUE(MEDIASUBTYPE_DIVX);
-		UNPACK_VALUE(MEDIASUBTYPE_divx);
-		UNPACK_VALUE(MEDIASUBTYPE_MP4V);
-		UNPACK_VALUE(MEDIASUBTYPE_mp4v);
-
-		// audio
-		UNPACK_VALUE(MEDIASUBTYPE_AAC);
-		UNPACK_VALUE(MEDIASUBTYPE_AAC_ADTS);
-		UNPACK_VALUE(MEDIASUBTYPE_LATM_AAC);
-		UNPACK_VALUE(MEDIASUBTYPE_DOLBY_AC3);
-		UNPACK_VALUE(MEDIASUBTYPE_DOLBY_AC3_SPDIF);
-		UNPACK_VALUE(MEDIASUBTYPE_DOLBY_DDPLUS);
-		UNPACK_VALUE(MEDIASUBTYPE_DOLBY_TRUEHD);
-		UNPACK_VALUE(MEDIASUBTYPE_DTS);
-		UNPACK_VALUE(MEDIASUBTYPE_DTS_HD);
-		UNPACK_VALUE(MEDIASUBTYPE_WAVE_DOLBY_AC3);
-		UNPACK_VALUE(MEDIASUBTYPE_WAVE_DTS);
-		UNPACK_VALUE(MEDIASUBTYPE_MP3);
-		UNPACK_VALUE(MEDIASUBTYPE_FLAC);
-
-		// subtitle
-		UNPACK_VALUE(MEDIASUBTYPE_UTF8);
-		UNPACK_VALUE(MEDIASUBTYPE_SSA);
-		UNPACK_VALUE(MEDIASUBTYPE_ASS);
-		UNPACK_VALUE(MEDIASUBTYPE_VOBSUB);
-		UNPACK_VALUE(MEDIASUBTYPE_HDMVSUB);
-		UNPACK_VALUE(MEDIASUBTYPE_XSUB);
-
-		// container
-		UNPACK_VALUE(MEDIASUBTYPE_Avi);
-		UNPACK_VALUE(MEDIASUBTYPE_MP4);
-		UNPACK_VALUE(MEDIASUBTYPE_Matroska);
-		UNPACK_VALUE(MEDIASUBTYPE_FLV);
-
-		UNPACK_VALUE(GUID_NULL);
-#undef UNPACK_VALUE
-		return _T("Unknown GUID Name");
-	} else {
-		return subtype;
+	// to prevent print TIME_FORMAT_NONE for GUID_NULL
+	if (guid == GUID_NULL) {
+		return _T("GUID_NULL");
 	}
-}
 
+	CString guidStr = CString(GuidNames[guid]);
+
+	return (guidStr == _T("Unknown GUID Name")) ? CString(m_GuidNames[guid]) : guidStr;
+}
 
 void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 {

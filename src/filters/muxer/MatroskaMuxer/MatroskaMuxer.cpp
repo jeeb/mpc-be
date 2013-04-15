@@ -30,6 +30,7 @@
 #include <InitGuid.h>
 #endif
 #include <moreuuids.h>
+#include <basestruct.h>
 
 using namespace MatroskaWriter;
 

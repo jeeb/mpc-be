@@ -120,6 +120,7 @@
     <ClCompile Include="DSUtil.cpp" />
     <ClCompile Include="FontInstaller.cpp" />
     <ClCompile Include="GolombBuffer.cpp" />
+    <ClCompile Include="GUIDString.cpp" />
     <ClCompile Include="H264Nalu.cpp" />
     <ClCompile Include="HdmvClipInfo.cpp" />
     <ClCompile Include="MediaTypeEx.cpp" />
@@ -145,6 +146,7 @@
     <ClInclude Include="ff_log.h" />
     <ClInclude Include="FontInstaller.h" />
     <ClInclude Include="GolombBuffer.h" />
+    <ClInclude Include="GUIDString.h" />
     <ClInclude Include="H264Nalu.h" />
     <ClInclude Include="HdmvClipInfo.h" />
     <ClInclude Include="MediaTypeEx.h" />

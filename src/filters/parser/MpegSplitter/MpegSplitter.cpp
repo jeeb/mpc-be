@@ -29,6 +29,7 @@
 #include <dmodshow.h>
 #include "MpegSplitter.h"
 #include <moreuuids.h>
+#include <basestruct.h>
 #include "../../../DSUtil/AudioParser.h"
 #include <atlpath.h>
 

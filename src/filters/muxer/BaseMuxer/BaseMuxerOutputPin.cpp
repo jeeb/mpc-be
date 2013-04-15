@@ -30,6 +30,7 @@
 
 #include <InitGuid.h>
 #include <moreuuids.h>
+#include <basestruct.h>
 
 //
 // CBaseMuxerOutputPin

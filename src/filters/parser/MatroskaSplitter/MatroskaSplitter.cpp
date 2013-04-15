@@ -31,6 +31,7 @@
 #include <InitGuid.h>
 #endif
 #include <moreuuids.h>
+#include <basestruct.h>
 #include <vector>
 
 using namespace MatroskaReader;

@@ -44,6 +44,7 @@ extern "C" {
 #endif
 
 #include <moreuuids.h>
+#include <basestruct.h>
 #include <vector>
 
 #include <ffmpeg/libavcodec/avcodec.h>

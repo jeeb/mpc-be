@@ -30,6 +30,7 @@
 #include "../../DSUtil/GolombBuffer.h"
 #include "../../filters/switcher/AudioSwitcher/AudioSwitcher.h"
 #include <moreuuids.h>
+#include <basestruct.h>
 #include "FGManagerBDA.h"
 #include "DVBChannel.h"
 #include "Mpeg2SectionData.h"

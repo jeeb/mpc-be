@@ -30,6 +30,7 @@
 #include <InitGuid.h>
 #include <uuids.h>
 #include <moreuuids.h>
+#include <basestruct.h>
 
 // our first format id
 #define __GAB1__ "GAB1"

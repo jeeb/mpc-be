@@ -31,6 +31,7 @@
 #include <InitGuid.h>
 #endif
 #include <moreuuids.h>
+#include <basestruct.h>
 
 #define MAKE32BITS(x)	(x[0]<<24 | x[1]<<16 | x[2]<<8 | x[3])
 #define MAKE24BITS(x)	(x[0]<<16 | x[1]<<8  | x[2])
