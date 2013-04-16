@@ -425,7 +425,7 @@ CString PlayerYouTubePlaylist(CString fn)
 
 			if (!Video.IsEmpty() && !Title.IsEmpty()) {
 
-				Playlist.Append(_T("#EXTINF:-1,"));
+				Playlist.Append(_T("#EXTINF:"));
 				Playlist.Append(Title);
 				Playlist.Append(_T("\r\nhttp"));
 				Playlist.Append(YOUTUBE_URL);
