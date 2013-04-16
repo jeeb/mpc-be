@@ -120,7 +120,7 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 		}
 
 		if (!match_start || !match_len) {
-			if (strstr(final, "://www.youtube.com")) {
+			if (strstr(final, YOUTUBE_MP_URL)) {
 				// This is looks like Youtube page, but this page doesn't contains necessary information about video, so may be you have to register on google.com to view it.
 				fn.Empty();
 			}
@@ -315,7 +315,13 @@ bool PlayerYouTubePlaylistCheck(CString fn)
 {
 	CString tmp_fn(CString(fn).MakeLower());
 
-	if (tmp_fn.Find(_T("playlist?")) < 0 && tmp_fn.Find(_T("watch?")) < 0 && tmp_fn.Find(_T("://www.youtube.com")) != -1) {
+	tmp_fn.Replace(_T("https"), _T(""));
+	tmp_fn.Replace(_T("http"), _T(""));
+
+	if (tmp_fn.Find(_T("channel/")) != -1 || tmp_fn.Find(_T("user/")) != -1 || tmp_fn == _T(YOUTUBE_MP_URL)) {
+		return 0;
+	}
+	if (tmp_fn.Find(_T("playlist?")) < 0 && tmp_fn.Find(_T("watch?")) < 0 && tmp_fn.Find(_T(YOUTUBE_MP_URL)) != -1) {
 		return 1;
 	}
 	if ((tmp_fn.Find(YOUTUBE_URL) != -1 && tmp_fn.Find(_T("&list=")) != -1) || tmp_fn.Find(YOUTUBE_PL_URL) != -1) {
@@ -373,15 +379,17 @@ CString PlayerYouTubePlaylist(CString fn)
 
 		CString Playlist = _T(""), Video = _T(""), Title = _T("");
 		int t_start = 0, t_stop = 0;
-		char sep1[32], sep2[] = "title=\"";
+		char sep1[32], sep[] = "href=\"/watch?v=", sep2[] = "title=\"";
 
 		if (fn.Find(_T("&list=")) < 0) {
-			strcpy(sep1, "<a href=\"/watch?v=");
+			strcpy(sep1, "<a ");
 		} else {
-			strcpy(sep1, "\" href=\"/watch?v=");
+			strcpy(sep1, "\" ");
 		}
+		strcat(sep1, sep);
+
 		if (fn.Find(_T("playlist?")) < 0 && fn.Find(_T("watch?")) < 0) {
-			strcpy(sep1, "href=\"/watch?v=");
+			strcpy(sep1, sep);
 		}
 
 		while ((final = strstr(final, sep1)) != NULL) {
