@@ -28,7 +28,30 @@ bool PlayerYouTubeCheck(CString fn)
 {
 	CString tmp_fn(CString(fn).MakeLower());
 
-	if ((tmp_fn.Find(YOUTUBE_URL) != -1 && tmp_fn.Find(_T("&list=")) < 0) || tmp_fn.Find(YOUTU_BE_URL) != -1) {
+	if (tmp_fn.Find(_T(YOUTUBE_MP_URL)) != -1 && (tmp_fn.Find(_T("watch?")) < 0 || tmp_fn.Find(_T("playlist?")) != -1 || tmp_fn.Find(_T("&list=")) != -1)) {
+		return 0;
+	}
+	if (tmp_fn.Find(YOUTUBE_URL) != -1 || tmp_fn.Find(YOUTU_BE_URL) != -1) {
+		return 1;
+	}
+
+	return 0;
+}
+
+bool PlayerYouTubePlaylistCheck(CString fn)
+{
+	CString tmp_fn(CString(fn).MakeLower());
+
+	tmp_fn.Replace(_T("https"), _T(""));
+	tmp_fn.Replace(_T("http"), _T(""));
+
+	if (tmp_fn == _T(YOUTUBE_MP_URL) || (tmp_fn.Find(_T(YOUTUBE_MP_URL)) != -1 && tmp_fn.Find(_T("channel/")) != -1)) {
+		return 0;
+	}
+	if (tmp_fn.Find(YOUTUBE_PL_URL) != -1 || (tmp_fn.Find(YOUTUBE_URL) != -1 && tmp_fn.Find(_T("&list=")) != -1)) {
+		return 1;
+	}
+	if (tmp_fn.Find(_T(YOUTUBE_MP_URL)) != -1 && tmp_fn.Find(_T("watch?")) < 0) {
 		return 1;
 	}
 
@@ -311,26 +334,6 @@ again:
 	return fn;
 }
 
-bool PlayerYouTubePlaylistCheck(CString fn)
-{
-	CString tmp_fn(CString(fn).MakeLower());
-
-	tmp_fn.Replace(_T("https"), _T(""));
-	tmp_fn.Replace(_T("http"), _T(""));
-
-	if (tmp_fn.Find(_T("channel/")) != -1 || tmp_fn.Find(_T("user/")) != -1 || tmp_fn == _T(YOUTUBE_MP_URL)) {
-		return 0;
-	}
-	if (tmp_fn.Find(_T("playlist?")) < 0 && tmp_fn.Find(_T("watch?")) < 0 && tmp_fn.Find(_T(YOUTUBE_MP_URL)) != -1) {
-		return 1;
-	}
-	if ((tmp_fn.Find(YOUTUBE_URL) != -1 && tmp_fn.Find(_T("&list=")) != -1) || tmp_fn.Find(YOUTUBE_PL_URL) != -1) {
-		return 1;
-	}
-
-	return 0;
-}
-
 CString PlayerYouTubePlaylist(CString fn)
 {
 	if (PlayerYouTubePlaylistCheck(fn)) {
@@ -388,7 +391,7 @@ CString PlayerYouTubePlaylist(CString fn)
 		}
 		strcat(sep1, sep);
 
-		if (fn.Find(_T("playlist?")) < 0 && fn.Find(_T("watch?")) < 0) {
+		if (fn.Find(_T("playlist?")) < 0 && fn.Find(_T("&list=")) < 0) {
 			strcpy(sep1, sep);
 		}
 
@@ -413,7 +416,7 @@ CString PlayerYouTubePlaylist(CString fn)
 			final += t_stop;
 
 			t_start = strpos(final, sep2) + strlen(sep2);
-			if (t_start > 0 && t_start < 64) {
+			if (t_start > 0 && t_start < 128) {
 				t_stop = strpos(final + t_start, "\"");
 				if (t_stop > 0) {
 					char* str = DNew char[t_stop + 1];
