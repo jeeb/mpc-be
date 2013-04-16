@@ -381,7 +381,7 @@
     <ClCompile Include="PlayerYouTube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PPageYoutube.cpp">
+    <ClCompile Include="PPageYouTube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DialogEventHandler.cpp">
@@ -761,7 +761,7 @@
     <ClInclude Include="PlayerFlyBar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PPageYoutube.h">
+    <ClInclude Include="PPageYouTube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DialogEventHandler.h">
