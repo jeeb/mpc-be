@@ -461,6 +461,7 @@ CStringW GetFilterName(IBaseFilter* pBF)
 	CStringW name = _T("");
 
 	if (pBF) {
+		/*
 		CLSID clsid = GetCLSID(pBF);
 		// system source filters
 		if (clsid == CLSID_AsyncReader) {
@@ -504,7 +505,8 @@ CStringW GetFilterName(IBaseFilter* pBF)
 		} else if (clsid == GUIDFromCString(_T("{B7493763-94F4-4D7F-93EB-18D54C41D1AA}"))) {
 			name = _T("ArcSoft Subtitle Splitter");
 		// other
-		} else {
+		} else */
+		{
 			CFilterInfo fi;
 			if (SUCCEEDED(pBF->QueryFilterInfo(&fi))) {
 				name = fi.achName;
