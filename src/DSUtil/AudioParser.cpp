@@ -486,6 +486,39 @@ int ParseHdmvLPCMHeader(const BYTE* buf, int* samplerate, int* channels)
 	return frame_size;
 }
 
+// ADTS AAc
+
+int ParseADTSAACHeader (const BYTE* buf, int* samplerate, int* channels, int* framelength, int* headersize)
+{
+	static const int mpeg4audio_sample_rates[16] = { 96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025,  8000, 7350, 0, 0, 0 };
+	static const BYTE mpeg4audio_channels[8] = { 0, 1, 2, 3, 4, 5, 6, 8 };
+
+	if ((*(WORD*)buf & 0x0fff) != 0x0fff) { // syncword
+		return 0;
+	}
+
+	if ((buf[1] & 0x06) !=  0) { // Layer: always 0 
+		return 0;
+	}
+
+	int protection_absent = buf[1] & 0x01;
+	*headersize = protection_absent == 1 ? 7 : 9;
+
+	int sfreq_index = (buf[2] & 0x3c) >> 2;
+	*samplerate = mpeg4audio_sample_rates[sfreq_index];
+	if (*samplerate == 0) {
+		return 0;
+	}
+
+	*channels = mpeg4audio_channels[((buf[2] & 0x01) << 2) | ((buf[3] & 0xc0) >> 6)];
+
+	int frame_size = ((buf[3] & 0x03) << 11) | (buf[4] << 3) | ((buf[5] & 0xe0) >> 5);
+
+	*framelength = ((buf[6] & 0x03) + 1) * 1024;
+
+	return frame_size;
+}
+
 // LATM AAC
 
 inline UINT64 LatmGetValue(CGolombBuffer gb) {

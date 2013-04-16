@@ -52,6 +52,7 @@ int ParseEAC3Header    (const BYTE* buf, int* samplerate, int* channels, int* fr
 int ParseMLPHeader     (const BYTE* buf, int* samplerate, int* channels, int* framelength, WORD* bitdepth, bool* isTrueHD); // TrueHD and MLP
 int ParseDTSHeader     (const BYTE* buf, int* samplerate, int* channels, int* framelength, int* tr_bitrate);
 int ParseHdmvLPCMHeader(const BYTE* buf, int* samplerate, int* channels);
+int ParseADTSAACHeader (const BYTE* buf, int* samplerate, int* channels, int* framelength, int* headersize);
 bool ParseAACLatmHeader(const BYTE* buf, int len, int* samplerate, int* channels, BYTE* extra, unsigned int* extralen);
 
 DWORD GetDefChannelMask(WORD nChannels);
