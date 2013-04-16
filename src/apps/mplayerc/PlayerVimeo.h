@@ -1,7 +1,7 @@
 /*
  * $Id: PlayerVimeo.h 2229 2013-03-08 13:27:11Z exodus8 $
  *
- * Copyright (C) 2012 Sergey "Exodus8" (rusguy6@gmail.com)
+ * Copyright (C) 2013 Sergey "Exodus8" (rusguy6@gmail.com)
  *
  * This file is part of MPC-BE.
  *
@@ -34,6 +34,7 @@ CString PlayerVimeo(CString fn)
 		link.Append(_T("&random="));
 
 		char* final	= NULL;
+		CString url;
 
 		for (size_t i = 0; i < 10; i++) {
 
@@ -82,9 +83,7 @@ CString PlayerVimeo(CString fn)
 			return fn;
 		}
 
-		CString url;
-
-		int t_start = strpos(final, "http://");
+		int t_start = strpos(final, "http");
 		if (t_start > 0) {
 			int t_stop = strpos(final + t_start, "</cmd>");
 			if (t_stop > 0) {
@@ -100,86 +99,6 @@ CString PlayerVimeo(CString fn)
 		}
 
 		return url;
-	}
-
-	return fn;
-}
-
-CString PlayerVimeoTitle(CString fn)
-{
-	CString tmp_fn(CString(fn).MakeLower());
-
-	if (tmp_fn.Find(VIMEO_URL) != -1) {
-
-		char* final	= NULL;
-		CString Title;
-
-		HINTERNET f, s = InternetOpen(L"MPC-BE Vimeo Downloader", 0, NULL, NULL, 0);
-		if (s) {
-			f = InternetOpenUrl(s, fn, NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
-			if (f) {
-				char *out			= NULL;
-				DWORD dwBytesRead	= 0;
-				DWORD dataSize		= 0;
-
-				do {
-					char buffer[4096];
-					if (InternetReadFile(f, (LPVOID)buffer, _countof(buffer), &dwBytesRead) == FALSE) {
-						break;
-					}
-
-					char *tempData = DNew char[dataSize + dwBytesRead];
-					memcpy(tempData, out, dataSize);
-					memcpy(tempData + dataSize, buffer, dwBytesRead);
-					delete[] out;
-					out = tempData;
-					dataSize += dwBytesRead;
-
-					if (strstr(out, "</title>")) {
-						break;
-					}
-				} while (dwBytesRead);
-
-				final = DNew char[dataSize + 1];
-				memset(final, 0, dataSize + 1);
-				memcpy(final, out, dataSize);
-				delete [] out;
-
-				InternetCloseHandle(f);
-			}
-			InternetCloseHandle(s);
-		}
-
-		int t_start = strpos(final, "<title>");
-		if (t_start > 0) {
-			t_start += 7;
-			int t_stop = strpos(final + t_start, "</title>");
-			if (t_stop > 0) {
-				char* title = DNew char[t_stop + 1];
-				memset(title, 0, t_stop + 1);
-				memcpy(title, final + t_start, t_stop);
-
-				Title = UTF8To16(title);
-				Title = Title.TrimLeft(_T(".")).TrimRight(_T("."));
-
-				Title.Replace(_T(":"), _T(" -"));
-				Title.Replace(_T("|"), _T("-"));
-				Title.Replace(_T("—"), _T("-"));
-				Title.Replace(_T("--"), _T("-"));
-				Title.Replace(_T("  "), _T(" "));
-
-				Title.Replace(_T("&quot;"), _T("\""));
-				Title.Replace(_T("&amp;"), _T("&"));
-				Title.Replace(_T("&#39;"), _T("'"));
-				Title.Replace(_T("&#039;"), _T("'"));
-
-				Title.Replace(_T(" on Vimeo"), _T(""));
-
-				delete [] title;
-			}
-		}
-
-		return Title + _T(".mp4");
 	}
 
 	return fn;

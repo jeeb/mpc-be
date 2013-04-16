@@ -91,4 +91,6 @@ bool PlayerYouTubeCheck(CString fn);
 CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author);
 bool PlayerYouTubePlaylistCheck(CString fn);
 CString PlayerYouTubePlaylist(CString fn);
-CString PlayerYouTubeTitle(char* title);
+CString PlayerYouTubeGetTitle(CString fn);
+CString PlayerYouTubeSearchTitle(char* final);
+CString PlayerYouTubeReplaceTitle(char* title);

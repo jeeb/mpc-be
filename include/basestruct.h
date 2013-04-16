@@ -93,4 +93,3 @@ typedef struct {
 	BYTE nAuxBitsCode;  //  Aux bits per frame
 } DOLBYAC3WAVEFORMAT;
 #pragma pack(pop)
-
