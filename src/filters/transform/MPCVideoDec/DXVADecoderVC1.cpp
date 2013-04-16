@@ -192,7 +192,7 @@ HRESULT CDXVADecoderVC1::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 	}
 
 	AddToStore (nSurfaceIndex, pSampleToDeliver, (bPicBackwardPrediction != 1), rtStart, rtStop,
-				false,(FF_FIELD_TYPE)nFieldType, (FF_SLICE_TYPE)nSliceType, 0);
+				false, (FF_FIELD_TYPE)nFieldType, (FF_SLICE_TYPE)nSliceType, 0);
 	m_bFlushed = false;
 
 	return DisplayNextFrame();

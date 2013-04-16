@@ -320,28 +320,17 @@ int FFH264CheckCompatibility (int nWidth, int nHeight, struct AVCodecContext* pA
 	return Flags;
 }
 
-void CopyScalingMatrix (DXVA_Qmatrix_H264* pDest, PPS* pps, DWORD nPCIVendor)
+void CopyScalingMatrix (DXVA_Qmatrix_H264* pDest, PPS* pps)
 {
 	int i, j;
 	memset(pDest, 0, sizeof(DXVA_Qmatrix_H264));
-	if (/*nPCIVendor == PCIV_ATI*/0) {
-		for (i = 0; i < 6; i++)
-			for (j = 0; j < 16; j++)
-				pDest->bScalingLists4x4[i][j] = pps->scaling_matrix4[i][j];
+	for (i = 0; i < 6; i++)
+		for (j = 0; j < 16; j++)
+			pDest->bScalingLists4x4[i][j] = pps->scaling_matrix4[i][zigzag_scan[j]];
 
-		for (i = 0; i < 64; i++) {
-			pDest->bScalingLists8x8[0][i] = pps->scaling_matrix8[0][i];
-			pDest->bScalingLists8x8[1][i] = pps->scaling_matrix8[3][i];
-		}
-	} else {
-		for (i = 0; i < 6; i++)
-			for (j = 0; j < 16; j++)
-				pDest->bScalingLists4x4[i][j] = pps->scaling_matrix4[i][zigzag_scan[j]];
-
-		for (i = 0; i < 64; i++) {
-			pDest->bScalingLists8x8[0][i] = pps->scaling_matrix8[0][ff_zigzag_direct[i]];
-			pDest->bScalingLists8x8[1][i] = pps->scaling_matrix8[3][ff_zigzag_direct[i]];
-		}
+	for (i = 0; i < 64; i++) {
+		pDest->bScalingLists8x8[0][i] = pps->scaling_matrix8[0][ff_zigzag_direct[i]];
+		pDest->bScalingLists8x8[1][i] = pps->scaling_matrix8[3][ff_zigzag_direct[i]];
 	}
 }
 
@@ -360,7 +349,7 @@ USHORT FFH264FindRefFrameIndex (USHORT num_frame, DXVA_PicParams_H264* pDXVAPicP
 	return 127;
 }
 
-HRESULT FFH264BuildPicParams (DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_H264* pDXVAScalingMatrix, int* nFieldType, int* nSliceType, struct AVCodecContext* pAVCtx, DWORD nPCIVendor)
+HRESULT FFH264BuildPicParams (DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_H264* pDXVAScalingMatrix, int* nFieldType, int* nSliceType, struct AVCodecContext* pAVCtx)
 {
 	H264Context*			h = (H264Context*) pAVCtx->priv_data;
 	SPS*					cur_sps;
@@ -462,7 +451,7 @@ HRESULT FFH264BuildPicParams (DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_
 			pDXVAPicParams->CurrFieldOrderCnt[1] = current_picture->field_poc[1];
 		}
 
-		CopyScalingMatrix (pDXVAScalingMatrix, cur_pps, nPCIVendor);
+		CopyScalingMatrix (pDXVAScalingMatrix, cur_pps);
 		hr = S_OK;
 	}
 
