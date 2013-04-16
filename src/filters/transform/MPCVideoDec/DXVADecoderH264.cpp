@@ -29,7 +29,7 @@
 #include "FfmpegContext.h"
 #include <ffmpeg/libavcodec/avcodec.h>
 
-#if 1
+#if 0
 	#define TRACE_H264 TRACE
 #else
 	#define TRACE_H264(...)
