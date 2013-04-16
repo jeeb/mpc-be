@@ -801,7 +801,7 @@ static void getSubSampleFactors(int *h, int *v, enum AVPixelFormat format)
 
 static void fill_rgb2yuv_table(SwsContext *c, const int table[4], int dstRange)
 {
-    int64_t W,V,Z;
+    int64_t W, V, Z, Cy, Cu, Cv;
     int64_t vr =  table[0];
     int64_t ub =  table[1];
     int64_t ug = -table[2];
@@ -834,7 +834,18 @@ static void fill_rgb2yuv_table(SwsContext *c, const int table[4], int dstRange)
     RV_IDX, BV_IDX, RV_IDX, BV_IDX, RV_IDX, BV_IDX, RV_IDX, BV_IDX,
     BV_IDX, RV_IDX, BV_IDX, RV_IDX, BV_IDX, RV_IDX, BV_IDX, RV_IDX,
     GV_IDX, -1    , GV_IDX, -1    , GV_IDX, -1    , GV_IDX, -1    ,
-    -1    , GV_IDX, -1    , GV_IDX, -1    , GV_IDX, -1    , GV_IDX,
+    -1    , GV_IDX, -1    , GV_IDX, -1    , GV_IDX, -1    , GV_IDX, //23
+    -1    , -1    , -1    , -1    , -1    , -1    , -1    , -1    , //24
+    -1    , -1    , -1    , -1    , -1    , -1    , -1    , -1    , //25
+    -1    , -1    , -1    , -1    , -1    , -1    , -1    , -1    , //26
+    -1    , -1    , -1    , -1    , -1    , -1    , -1    , -1    , //27
+    -1    , -1    , -1    , -1    , -1    , -1    , -1    , -1    , //28
+    -1    , -1    , -1    , -1    , -1    , -1    , -1    , -1    , //29
+    -1    , -1    , -1    , -1    , -1    , -1    , -1    , -1    , //30
+    -1    , -1    , -1    , -1    , -1    , -1    , -1    , -1    , //31
+    BY_IDX, GY_IDX, RY_IDX, -1    , -1    , -1    , -1    , -1    , //32
+    BU_IDX, GU_IDX, RU_IDX, -1    , -1    , -1    , -1    , -1    , //33
+    BV_IDX, GV_IDX, RV_IDX, -1    , -1    , -1    , -1    , -1    , //34
     };
 
     dstRange = 0; //FIXME range = 1 is handled elsewhere
@@ -847,21 +858,25 @@ static void fill_rgb2yuv_table(SwsContext *c, const int table[4], int dstRange)
         ug = ug * 224 / 255;
         vg = vg * 224 / 255;
     }
-    W = ONE*ug/ub;
-    V = ONE*vg/vr;
-    Z = ONE-W-V;
+    W = ROUNDED_DIV(ONE*ONE*ug, ub);
+    V = ROUNDED_DIV(ONE*ONE*vg, vr);
+    Z = ONE*ONE-W-V;
 
-    c->input_rgb2yuv_table[RY_IDX] = -(1 << RGB2YUV_SHIFT)*ONE*V/(Z*cy);
-    c->input_rgb2yuv_table[GY_IDX] =  (1 << RGB2YUV_SHIFT)*ONE*ONE/(Z*cy);
-    c->input_rgb2yuv_table[BY_IDX] = -(1 << RGB2YUV_SHIFT)*ONE*W/(Z*cy);
+    Cy = ROUNDED_DIV(cy*Z, ONE);
+    Cu = ROUNDED_DIV(ub*Z, ONE);
+    Cv = ROUNDED_DIV(vr*Z, ONE);
 
-    c->input_rgb2yuv_table[RU_IDX] =  (1 << RGB2YUV_SHIFT)*ONE*V/(Z*ub);
-    c->input_rgb2yuv_table[GU_IDX] = -(1 << RGB2YUV_SHIFT)*ONE*ONE/(Z*ub);
-    c->input_rgb2yuv_table[BU_IDX] =  (1 << RGB2YUV_SHIFT)*(ONE + ONE*W/Z)/ub;
+    c->input_rgb2yuv_table[RY_IDX] = -ROUNDED_DIV((1 << RGB2YUV_SHIFT)*V        , Cy);
+    c->input_rgb2yuv_table[GY_IDX] =  ROUNDED_DIV((1 << RGB2YUV_SHIFT)*ONE*ONE  , Cy);
+    c->input_rgb2yuv_table[BY_IDX] = -ROUNDED_DIV((1 << RGB2YUV_SHIFT)*W        , Cy);
 
-    c->input_rgb2yuv_table[RV_IDX] =  (1 << RGB2YUV_SHIFT)*(ONE + ONE*V/Z)/vr;
-    c->input_rgb2yuv_table[GV_IDX] = -(1 << RGB2YUV_SHIFT)*ONE*ONE/(Z*vr);
-    c->input_rgb2yuv_table[BV_IDX] =  (1 << RGB2YUV_SHIFT)*ONE*W/(Z*vr);
+    c->input_rgb2yuv_table[RU_IDX] =  ROUNDED_DIV((1 << RGB2YUV_SHIFT)*V        , Cu);
+    c->input_rgb2yuv_table[GU_IDX] = -ROUNDED_DIV((1 << RGB2YUV_SHIFT)*ONE*ONE  , Cu);
+    c->input_rgb2yuv_table[BU_IDX] =  ROUNDED_DIV((1 << RGB2YUV_SHIFT)*(Z+W)    , Cu);
+
+    c->input_rgb2yuv_table[RV_IDX] =  ROUNDED_DIV((1 << RGB2YUV_SHIFT)*(V+Z)    , Cv);
+    c->input_rgb2yuv_table[GV_IDX] = -ROUNDED_DIV((1 << RGB2YUV_SHIFT)*ONE*ONE  , Cv);
+    c->input_rgb2yuv_table[BV_IDX] =  ROUNDED_DIV((1 << RGB2YUV_SHIFT)*W        , Cv);
 
     if(/*!dstRange && */table == ff_yuv2rgb_coeffs[SWS_CS_DEFAULT]) {
         c->input_rgb2yuv_table[BY_IDX] =  ((int)(0.114 * 219 / 255 * (1 << RGB2YUV_SHIFT) + 0.5));
@@ -874,7 +889,6 @@ static void fill_rgb2yuv_table(SwsContext *c, const int table[4], int dstRange)
         c->input_rgb2yuv_table[RV_IDX] =  ((int)(0.500 * 224 / 255 * (1 << RGB2YUV_SHIFT) + 0.5));
         c->input_rgb2yuv_table[RU_IDX] = (-(int)(0.169 * 224 / 255 * (1 << RGB2YUV_SHIFT) + 0.5));
     }
-
     for(i=0; i<FF_ARRAY_ELEMS(map); i++)
         AV_WL16(p + 16*4 + 2*i, map[i] >= 0 ? c->input_rgb2yuv_table[map[i]] : 0);
 }
