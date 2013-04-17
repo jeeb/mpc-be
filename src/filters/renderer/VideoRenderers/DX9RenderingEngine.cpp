@@ -1661,8 +1661,27 @@ HRESULT CDX9RenderingEngine::SetCustomPixelShader(LPCSTR pSrcData, LPCSTR pTarge
 	}
 
 	CExternalPixelShader Shader;
-	Shader.m_SourceData = pSrcData;
-	Shader.m_SourceTarget = pTarget;
+	Shader.m_SourceData		= pSrcData;
+	Shader.m_SourceTarget	= pTarget;
+
+	if (m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0)) {
+		Shader.m_SourceTarget = "ps_3_0";
+	} else if (m_Caps.PixelShaderVersion >= D3DPS_VERSION(2,0)) {
+		Shader.m_SourceTarget = "ps_2_0";
+		if ((m_Caps.PS20Caps.NumTemps >= 32)
+			&& (m_Caps.PS20Caps.Caps & D3DPS20CAPS_NOTEXINSTRUCTIONLIMIT)) {
+			Shader.m_SourceTarget = "ps_2_b";
+		} else if ((m_Caps.PS20Caps.NumTemps >= 22)
+			&& (m_Caps.PS20Caps.Caps & D3DPS20CAPS_ARBITRARYSWIZZLE)
+			&& (m_Caps.PS20Caps.Caps & D3DPS20CAPS_GRADIENTINSTRUCTIONS)
+			&& (m_Caps.PS20Caps.Caps & D3DPS20CAPS_PREDICATION)
+			&& (m_Caps.PS20Caps.Caps & D3DPS20CAPS_NODEPENDENTREADLIMIT)
+			&& (m_Caps.PS20Caps.Caps & D3DPS20CAPS_NOTEXINSTRUCTIONLIMIT)) {
+			Shader.m_SourceTarget = "ps_2_a";
+		}
+	} else {
+		E_FAIL;
+	}
 
 	CComPtr<IDirect3DPixelShader9> pPixelShader;
 
