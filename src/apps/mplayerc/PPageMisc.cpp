@@ -197,6 +197,7 @@ void CPPageMisc::OnExportSettings()
 	}
 
 	AfxGetMyApp()->ExportSettings();
+	SetFocus();
 }
 
 void CPPageMisc::OnCancel()
