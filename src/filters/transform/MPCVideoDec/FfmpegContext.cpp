@@ -349,7 +349,7 @@ USHORT FFH264FindRefFrameIndex (USHORT num_frame, DXVA_PicParams_H264* pDXVAPicP
 	return 127;
 }
 
-HRESULT FFH264BuildPicParams (DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_H264* pDXVAScalingMatrix, int* nFieldType, int* nSliceType, struct AVCodecContext* pAVCtx)
+HRESULT FFH264BuildPicParams (DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_H264* pDXVAScalingMatrix, int* nFieldType, int* nSliceType, struct AVCodecContext* pAVCtx, int* nPictStruct)
 {
 	H264Context*			h = (H264Context*) pAVCtx->priv_data;
 	SPS*					cur_sps;
@@ -364,6 +364,8 @@ HRESULT FFH264BuildPicParams (DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_
 	cur_pps = &h->pps;
 
 	if (cur_sps && cur_pps) {
+		*nPictStruct = h->picture_structure;
+
 		*nFieldType = current_picture->f.interlaced_frame ? PICT_TOP_FIELD : h->picture_structure;
 		if (h->sps.pic_struct_present_flag) {
 			switch (h->sei_pic_struct) {
@@ -391,13 +393,12 @@ HRESULT FFH264BuildPicParams (DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_
 			return VFW_E_INVALID_FILE_FORMAT;
 		}
 
-		pDXVAPicParams->wFrameWidthInMbsMinus1					= cur_sps->mb_width  - 1;		// pic_width_in_mbs_minus1;
-		pDXVAPicParams->wFrameHeightInMbsMinus1					= cur_sps->mb_height * (2 - cur_sps->frame_mbs_only_flag) - 1;		// pic_height_in_map_units_minus1;
-		pDXVAPicParams->num_ref_frames							= cur_sps->ref_frame_count;		// num_ref_frames;
+		pDXVAPicParams->wFrameWidthInMbsMinus1					= cur_sps->mb_width  - 1;
+		pDXVAPicParams->wFrameHeightInMbsMinus1					= cur_sps->mb_height * (2 - cur_sps->frame_mbs_only_flag) - 1;
+		pDXVAPicParams->num_ref_frames							= cur_sps->ref_frame_count;
 		pDXVAPicParams->field_pic_flag							= field_pic_flag;
-		pDXVAPicParams->MbaffFrameFlag							= (h->sps.mb_aff && (field_pic_flag==0));
+		pDXVAPicParams->MbaffFrameFlag							= (h->sps.mb_aff && (field_pic_flag == 0));
 		pDXVAPicParams->residual_colour_transform_flag			= cur_sps->residual_color_transform_flag;
-		pDXVAPicParams->sp_for_switch_flag						= h->sp_for_switch_flag;
 		pDXVAPicParams->chroma_format_idc						= cur_sps->chroma_format_idc;
 		pDXVAPicParams->RefPicFlag								= h->ref_pic_flag;
 		pDXVAPicParams->constrained_intra_pred_flag				= cur_pps->constrained_intra_pred;
@@ -408,8 +409,8 @@ HRESULT FFH264BuildPicParams (DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_
 		pDXVAPicParams->MinLumaBipredSize8x8Flag				= h->sps.level_idc >= 31;
 		pDXVAPicParams->IntraPicFlag							= (h->slice_type == AV_PICTURE_TYPE_I || h->slice_type == AV_PICTURE_TYPE_SI);
 
-		pDXVAPicParams->bit_depth_luma_minus8					= cur_sps->bit_depth_luma   - 8;	// bit_depth_luma_minus8
-		pDXVAPicParams->bit_depth_chroma_minus8					= cur_sps->bit_depth_chroma - 8;	// bit_depth_chroma_minus8
+		pDXVAPicParams->bit_depth_luma_minus8					= cur_sps->bit_depth_luma   - 8;
+		pDXVAPicParams->bit_depth_chroma_minus8					= cur_sps->bit_depth_chroma - 8;
 
 		//	pDXVAPicParams->StatusReportFeedbackNumber				= SET IN DecodeFrame;
 		//	pDXVAPicParams->CurrFieldOrderCnt						= SET IN UpdateRefFramesList;
@@ -420,24 +421,24 @@ HRESULT FFH264BuildPicParams (DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_
 
 		pDXVAPicParams->frame_num								= h->frame_num;
 
-		pDXVAPicParams->log2_max_frame_num_minus4				= cur_sps->log2_max_frame_num - 4;					// log2_max_frame_num_minus4;
-		pDXVAPicParams->pic_order_cnt_type						= cur_sps->poc_type;								// pic_order_cnt_type;
+		pDXVAPicParams->log2_max_frame_num_minus4				= cur_sps->log2_max_frame_num - 4;
+		pDXVAPicParams->pic_order_cnt_type						= cur_sps->poc_type;
 		if (cur_sps->poc_type == 0)
-			pDXVAPicParams->log2_max_pic_order_cnt_lsb_minus4	= cur_sps->log2_max_poc_lsb - 4;					// log2_max_pic_order_cnt_lsb_minus4;
+			pDXVAPicParams->log2_max_pic_order_cnt_lsb_minus4	= cur_sps->log2_max_poc_lsb - 4;
 		else if (cur_sps->poc_type == 1)
 			pDXVAPicParams->delta_pic_order_always_zero_flag	= cur_sps->delta_pic_order_always_zero_flag;
 		pDXVAPicParams->direct_8x8_inference_flag				= cur_sps->direct_8x8_inference_flag;
-		pDXVAPicParams->entropy_coding_mode_flag				= cur_pps->cabac;									// entropy_coding_mode_flag;
-		pDXVAPicParams->pic_order_present_flag					= cur_pps->pic_order_present;						// pic_order_present_flag;
-		pDXVAPicParams->num_slice_groups_minus1					= cur_pps->slice_group_count - 1;					// num_slice_groups_minus1;
-		pDXVAPicParams->slice_group_map_type					= cur_pps->mb_slice_group_map_type;					// slice_group_map_type;
-		pDXVAPicParams->deblocking_filter_control_present_flag	= cur_pps->deblocking_filter_parameters_present;	// deblocking_filter_control_present_flag;
-		pDXVAPicParams->redundant_pic_cnt_present_flag			= cur_pps->redundant_pic_cnt_present;				// redundant_pic_cnt_present_flag;
+		pDXVAPicParams->entropy_coding_mode_flag				= cur_pps->cabac;
+		pDXVAPicParams->pic_order_present_flag					= cur_pps->pic_order_present;
+		pDXVAPicParams->num_slice_groups_minus1					= cur_pps->slice_group_count - 1;
+		pDXVAPicParams->slice_group_map_type					= cur_pps->mb_slice_group_map_type;
+		pDXVAPicParams->deblocking_filter_control_present_flag	= cur_pps->deblocking_filter_parameters_present;
+		pDXVAPicParams->redundant_pic_cnt_present_flag			= cur_pps->redundant_pic_cnt_present;
 
 		pDXVAPicParams->chroma_qp_index_offset					= cur_pps->chroma_qp_index_offset[0];
 		pDXVAPicParams->second_chroma_qp_index_offset			= cur_pps->chroma_qp_index_offset[1];
-		pDXVAPicParams->num_ref_idx_l0_active_minus1			= cur_pps->ref_count[0]-1;							// num_ref_idx_l0_active_minus1;
-		pDXVAPicParams->num_ref_idx_l1_active_minus1			= cur_pps->ref_count[1]-1;							// num_ref_idx_l1_active_minus1;
+		pDXVAPicParams->num_ref_idx_l0_active_minus1			= cur_pps->ref_count[0] - 1;
+		pDXVAPicParams->num_ref_idx_l1_active_minus1			= cur_pps->ref_count[1] - 1;
 		pDXVAPicParams->pic_init_qp_minus26						= cur_pps->init_qp - 26;
 		pDXVAPicParams->pic_init_qs_minus26						= cur_pps->init_qs - 26;
 

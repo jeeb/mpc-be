@@ -484,9 +484,9 @@ HRESULT CDXVADecoder::EndFrame(int nSurfaceIndex)
 // === Picture store functions
 bool CDXVADecoder::AddToStore (int nSurfaceIndex, IMediaSample* pSample, bool bRefPicture,
 							   REFERENCE_TIME rtStart, REFERENCE_TIME rtStop, bool bIsField,
-							   FF_FIELD_TYPE nFieldType, FF_SLICE_TYPE nSliceType, int nCodecSpecific, int nOutPOC)
+							   FF_FIELD_TYPE nFieldType, FF_SLICE_TYPE nSliceType, int nCodecSpecific)
 {
-	if (bIsField && (m_nFieldSurface == -1 || nOutPOC == INT_MIN)) {
+	if (bIsField && m_nFieldSurface == -1) {
 		m_nFieldSurface = nSurfaceIndex;
 		m_pFieldSample	= pSample;
 		m_pPictureStore[nSurfaceIndex].n1FieldType		= nFieldType;

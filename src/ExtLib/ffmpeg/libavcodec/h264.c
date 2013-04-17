@@ -2937,8 +2937,8 @@ static void fill_dxva_slice_long(H264Context *h)
 	pSlice->slice_type						= h->raw_slice_type; 
 	pSlice->luma_log2_weight_denom			= h->luma_log2_weight_denom;
 	pSlice->chroma_log2_weight_denom		= h->chroma_log2_weight_denom;
-	pSlice->slice_alpha_c0_offset_div2		= h->slice_alpha_c0_offset / 2;
-	pSlice->slice_beta_offset_div2			= h->slice_beta_offset / 2;
+	pSlice->slice_alpha_c0_offset_div2		= h->slice_alpha_c0_offset / 2 - 26;
+	pSlice->slice_beta_offset_div2			= h->slice_beta_offset     / 2 - 26;
 	pSlice->Reserved8Bits					= 0;
 
 	pSlice->num_ref_idx_l0_active_minus1	= 0;
@@ -2990,14 +2990,14 @@ static void fill_dxva_slice_long(H264Context *h)
 	pSlice->cabac_init_idc					= h->cabac_init_idc;
 	pSlice->disable_deblocking_filter_idc	= h->deblocking_filter;
 
-	for(i=0; i<32; i++)
-	{ pSlice->RefPicList[0][i].AssociatedFlag	= 1;
-	  pSlice->RefPicList[0][i].bPicEntry		= 255; 
-	  pSlice->RefPicList[0][i].Index7Bits		= 127;
-	  
-	  pSlice->RefPicList[1][i].AssociatedFlag	= 1; 
-	  pSlice->RefPicList[1][i].bPicEntry		= 255;
-	  pSlice->RefPicList[1][i].Index7Bits		= 127;
+	for(i = 0; i < 32; i++) {
+		pSlice->RefPicList[0][i].AssociatedFlag	= 1;
+		pSlice->RefPicList[0][i].bPicEntry		= 255; 
+		pSlice->RefPicList[0][i].Index7Bits		= 127;
+
+		pSlice->RefPicList[1][i].AssociatedFlag	= 1; 
+		pSlice->RefPicList[1][i].bPicEntry		= 255;
+		pSlice->RefPicList[1][i].Index7Bits		= 127;
 	}
 }
 // <== End patch MPC

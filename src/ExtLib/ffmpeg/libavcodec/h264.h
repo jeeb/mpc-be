@@ -653,7 +653,6 @@ typedef struct H264Context {
     AVBufferPool *ref_index_pool;
 
     // ==> Start patch MPC
-    int				sp_for_switch_flag;
     int				slice_qs_delta;
     int				slice_qp_delta;
     unsigned int	first_mb_in_slice;
