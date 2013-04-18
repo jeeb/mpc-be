@@ -1517,7 +1517,9 @@ void CMainFrame::CreateOSDBar()
 		m_OSD.SetLayeredWindowAttributes(RGB(16,16,16), 255-AfxGetAppSettings().nOSDTransparent, LWA_ALPHA|LWA_COLORKEY);
 
 		m_pOSDWnd = &m_wndView;
-		m_OSD.Start(m_pOSDWnd);
+		if (AfxGetAppSettings().fShowOSD) {
+			m_OSD.Start(m_pOSDWnd);
+		}
 }
 
 bool CMainFrame::OSDBarSetPos()
@@ -14700,7 +14702,9 @@ void CMainFrame::CloseMediaPrivate()
 
 	b_UseVSFilter = false;
 	
-	m_OSD.Start(m_pOSDWnd);
+	if (AfxGetAppSettings().fShowOSD) {
+		m_OSD.Start(m_pOSDWnd);
+	}
 }
 
 void CMainFrame::ParseDirs(CAtlList<CString>& sl)
