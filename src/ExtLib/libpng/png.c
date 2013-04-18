@@ -14,7 +14,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-//typedef png_libpng_version_1_7_0beta08 Your_png_h_is_not_version_1_7_0beta08;
+typedef png_libpng_version_1_7_0beta09 Your_png_h_is_not_version_1_7_0beta09;
 
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
@@ -691,13 +691,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.7.0beta08 - April 14, 2013" PNG_STRING_NEWLINE \
+     "libpng version 1.7.0beta09 - April 18, 2013" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2013 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.7.0beta08 - April 14, 2013\
+      return "libpng version 1.7.0beta09 - April 18, 2013\
       Copyright (c) 1998-2013 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2183,7 +2183,10 @@ png_colorspace_set_ICC(png_const_structrp png_ptr, png_colorspacerp colorspace,
       png_icc_check_tag_table(png_ptr, colorspace, name, profile_length,
          profile))
    {
-      png_icc_set_sRGB(png_ptr, colorspace, profile, 0);
+#     ifdef PNG_sRGB_SUPPORTED
+         /* If no sRGB support, don't try storing sRGB information */
+         png_icc_set_sRGB(png_ptr, colorspace, profile, 0);
+#     endif
       return 1;
    }
 
