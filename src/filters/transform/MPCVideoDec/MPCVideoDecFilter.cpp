@@ -2293,9 +2293,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 
 		ReorderBFrames(rtStart, rtStop);
 
-		if (!PULLDOWN_FLAG) {
-			UpdateFrameTime(rtStart, rtStop, false);
-		}
+		UpdateFrameTime(rtStart, rtStop, PULLDOWN_FLAG);
 
 		m_rtPrevStop = rtStop;
 
@@ -2494,10 +2492,6 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 
 	if (FAILED(hr)) {
 		rtStart = rtStop = INVALID_TIME;
-	}
-
-	if (m_nDXVAMode == MODE_SOFTWARE && PULLDOWN_FLAG) {
-		UpdateFrameTime(rtStart, rtStop, PULLDOWN_FLAG);
 	}
 
 	if (m_pAVCtx->has_b_frames) {
