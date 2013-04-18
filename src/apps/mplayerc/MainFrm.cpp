@@ -727,7 +727,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	// Create flybar-window
 	CreateFlyBar();
-
+	CreateOSDBar();
+	
 	// Create Preview Window
 	DWORD style = WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS;
 	if (!m_wndView2.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL, style, CRect(0, 0, 160, 109), this, 0, NULL)) {
@@ -966,6 +967,7 @@ void CMainFrame::OnClose()
 	// Destroy flybar-window
 	KillTimer(TIMER_FLYBARWINDOWHIDER);
 	KillTimer(TIMER_EXCLUSIVEBARHIDER);
+	DestroyOSDBar();
 	DestroyFlyBar();
 
 	AppSettings& s = AfxGetAppSettings();
@@ -1290,6 +1292,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 	r |= CRect(r.TopLeft(), CSize(r.Width(), mmi.ptMinTrackSize.y));
 	MoveWindow(&r);
 	FlyBarSetPos();
+	OSDBarSetPos();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1406,6 +1409,7 @@ void CMainFrame::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 		lpMMI->ptMinTrackSize.y = 16;
 	}
 	FlyBarSetPos();
+	OSDBarSetPos();
 	__super::OnGetMinMaxInfo( lpMMI );
 }
 
@@ -1468,8 +1472,8 @@ bool CMainFrame::FlyBarSetPos()
 
 	if (AfxGetAppSettings().iCaptionMenuMode == MODE_FRAMEONLY || AfxGetAppSettings().iCaptionMenuMode == MODE_BORDERLESS || m_fFullScreen) {
 
-		int pos = (m_wndFlyBar.iw * 9) + 8;
-		m_wndFlyBar.MoveWindow(r_wndView.right-4-pos, r_wndView.top+4, pos, m_wndFlyBar.iw+8);
+		int pos = (m_wndFlyBar.iw * 9) + 10;
+		m_wndFlyBar.MoveWindow(r_wndView.right-10-pos, r_wndView.top+10, pos, m_wndFlyBar.iw+10);
 		m_wndFlyBar.CalcButtonsRect();
 		if (r_wndView.bottom-r_wndView.top > 40 && r_wndView.right-r_wndView.left > 236) {
 			if (AfxGetAppSettings().fFlybarOnTop && !m_wndFlyBar.IsWindowVisible()) {
@@ -1499,6 +1503,86 @@ void CMainFrame::DestroyFlyBar()
 			m_wndFlyBar.ShowWindow(SW_HIDE);
 		}
 		m_wndFlyBar.DestroyWindow();
+	}
+}
+
+
+void CMainFrame::CreateOSDBar()
+{
+		DWORD exstyle = WS_EX_TOPMOST|WS_EX_TRANSPARENT|WS_EX_LAYERED;
+		if (!m_OSD.CreateEx(exstyle, AfxRegisterWndClass(0), NULL, WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS, CRect(0, 0, 0, 0), this, 0, NULL)) {
+			TRACE(_T("Failed to create OSD Window\n"));
+			return;
+		}
+		m_OSD.SetLayeredWindowAttributes(RGB(16,16,16), 255-AfxGetAppSettings().nOSDTransparent, LWA_ALPHA|LWA_COLORKEY);
+
+		m_pOSDWnd = &m_wndView;
+		m_OSD.Start(m_pOSDWnd);
+}
+
+bool CMainFrame::OSDBarSetPos()
+{
+	if (!m_OSD || !(::IsWindow(m_OSD.GetSafeHwnd()))) {
+		return 0;
+	}
+
+	if (IsMadVRExclusiveMode || !m_wndView.IsWindowVisible()) {
+		if (m_OSD.IsWindowVisible()) {
+			m_OSD.ShowWindow(SW_HIDE);
+		}
+		return 0;		
+	}
+
+	IBaseFilter* pBF = FindFilter(CLSID_madVR, pGB);
+	if (pBF) {
+		CComQIPtr<IMadVRSettings> pMVS = pBF;
+		BOOL boolVal;
+		if (pMVS) pMVS->SettingsGetBoolean(L"enableExclusive", &boolVal);
+		if (m_fFullScreen && boolVal) {
+			if (m_OSD.IsWindowVisible()) {
+				m_OSD.ShowWindow(SW_HIDE);
+			}
+			return 0;
+		}
+
+		CComQIPtr<IMadVRExclusiveModeInfo> pMVEMI = pBF;
+		if (pMVEMI) {
+			if (pMVEMI->IsExclusiveModeActive()) {
+				if (m_OSD.IsWindowVisible()) {
+					m_OSD.ShowWindow(SW_HIDE);
+				}
+
+				return 0;
+			}
+		}
+	}
+
+	CRect r_wndView;
+	m_wndView.GetWindowRect(&r_wndView);
+
+	int pos = m_wndFlyBar.IsWindowVisible() ? (m_wndFlyBar.iw * 9 + 20) : 0;
+	m_OSD.MoveWindow(r_wndView.left+10, r_wndView.top+10, r_wndView.right-r_wndView.left-20-pos, r_wndView.bottom-r_wndView.top-20);
+
+	if (r_wndView.bottom-r_wndView.top > 40 && r_wndView.right-r_wndView.left > 100) {
+		return 1;
+	} else {
+		if (m_OSD.IsWindowVisible()) {
+			m_OSD.ShowWindow(SW_HIDE);
+		}
+		return 0;
+	}
+	
+	return 0;
+}
+
+void CMainFrame::DestroyOSDBar()
+{
+	if (m_OSD) {
+		m_OSD.Stop();
+		if (m_OSD.IsWindowVisible()) {
+			m_OSD.ShowWindow(SW_HIDE);
+		}
+		m_OSD.DestroyWindow();
 	}
 }
 
@@ -1554,6 +1638,7 @@ void CMainFrame::OnMove(int x, int y)
 		m_wndToolBar.Invalidate();
 	}
 	FlyBarSetPos();
+	OSDBarSetPos();
 }
 
 void CMainFrame::ClipRectToMonitor(LPRECT prc)
@@ -1638,14 +1723,16 @@ void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)
 	}
 
 	FlyBarSetPos();
+	OSDBarSetPos();
 }
 
 void CMainFrame::OnSize(UINT nType, int cx, int cy)
 {
 	__super::OnSize(nType, cx, cy);
 
-	m_OSD.OnSize (nType, cx, cy);
-
+	if (m_OSD && m_OSD.IsWindowVisible()) {
+		m_OSD.OnSize (nType, cx, cy);
+	}
 	if (nType == SIZE_RESTORED && m_fTrayIcon) {
 		ShowWindow(SW_SHOW);
 	}
@@ -1674,6 +1761,7 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 	}
 
 	FlyBarSetPos();
+	OSDBarSetPos();
 }
 
 void CMainFrame::OnSizing(UINT fwSide, LPRECT pRect)
@@ -1767,6 +1855,7 @@ void CMainFrame::OnSizing(UINT fwSide, LPRECT pRect)
 		pRect->top = pRect->bottom - wsize.cy;
 	}
 	FlyBarSetPos();
+	OSDBarSetPos();
 }
 
 void CMainFrame::OnDisplayChange() // untested, not sure if it's working...
@@ -2048,6 +2137,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 			} else if (m_wndFlyBar && m_wndFlyBar.IsWindowVisible()) {
 				m_wndFlyBar.ShowWindow(SW_HIDE);
 			}
+			OSDBarSetPos();
 			break;
 		case TIMER_STREAMPOSPOLLER:
 			if (m_iMediaLoadState == MLS_LOADED) {
@@ -7387,6 +7477,7 @@ void CMainFrame::OnViewCaptionmenu()
 
 	MoveVideoWindow();
 	FlyBarSetPos();
+	OSDBarSetPos();
 }
 
 void CMainFrame::OnUpdateViewCaptionmenu(CCmdUI* pCmdUI)
@@ -9285,20 +9376,23 @@ void CMainFrame::OnUpdateMenuNavAudio(CCmdUI* pCmdUI)
 
 void CMainFrame::OnPlayVolume(UINT nID)
 {
+	
+	CString strVolume;
 	if (m_iMediaLoadState == MLS_LOADED) {
-		CString strVolume;
+		
 		pBA->put_Volume(m_wndToolBar.Volume);
 
 		//strVolume.Format (L"Vol : %d dB", m_wndToolBar.Volume / 100);
-		if (m_wndToolBar.Volume == -10000) {
-			strVolume.Format(ResStr(IDS_VOLUME_OSD), 0);
-		} else {
-			strVolume.Format(ResStr(IDS_VOLUME_OSD), m_wndToolBar.m_volctrl.GetPos());
-		}
-		m_OSD.DisplayMessage(OSD_TOPLEFT, strVolume);
 		SendStatusMessage(strVolume, 3000);
 	}
+	
+	if (m_wndToolBar.Volume == -10000) {
+		strVolume.Format(ResStr(IDS_VOLUME_OSD), 0);
+	} else {
+		strVolume.Format(ResStr(IDS_VOLUME_OSD), m_wndToolBar.m_volctrl.GetPos());
+	}
 
+	m_OSD.DisplayMessage(OSD_TOPLEFT, strVolume);
 	m_Lcd.SetVolume((m_wndToolBar.Volume > -10000 ? m_wndToolBar.m_volctrl.GetPos() : 1));
 }
 
@@ -14208,12 +14302,24 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		pMVTO = m_pCAP;
 
 		if (s.fShowOSD || s.fShowDebugInfo) { // Force OSD on when the debug switch is used
-			if (pMVTO) {
-				m_OSD.Start(m_pVideoWnd, pMVTO);
-			} else if (pVMB) {
-				m_OSD.Start(m_pVideoWnd, pVMB);
-			} else if (pMFVMB) {
-				m_OSD.Start(m_pVideoWnd, pMFVMB);
+
+			m_OSD.Stop();
+			if (m_OSD.IsWindowVisible()) m_OSD.ShowWindow(SW_HIDE);
+
+			if (s.IsD3DFullscreen()) {
+				if (pMVTO) {
+					m_OSD.Start(m_pVideoWnd, pMVTO);
+				} else if (pVMB) {
+					m_OSD.Start(m_pVideoWnd, pVMB);
+				} else if (pMFVMB) {
+					m_OSD.Start(m_pVideoWnd, pMFVMB);
+				}
+			} else {
+				if (pMVTO) {
+					m_OSD.Start(m_pVideoWnd, pMVTO);
+				} else {
+					m_OSD.Start(m_pOSDWnd);
+				}
 			}
 		}
 
@@ -14501,7 +14607,6 @@ void CMainFrame::CloseMediaPrivate()
 	m_pMC	 = NULL;
 	m_pMFVP	 = NULL;
 	m_pMFVDC = NULL;
-
 	m_pLN21 = NULL;
 	m_pSyncClock = NULL;
 	m_OSD.Stop();
@@ -14594,6 +14699,8 @@ void CMainFrame::CloseMediaPrivate()
 	m_YoutubeCurrent	= 0;
 
 	b_UseVSFilter = false;
+	
+	m_OSD.Start(m_pOSDWnd);
 }
 
 void CMainFrame::ParseDirs(CAtlList<CString>& sl)
@@ -17390,6 +17497,11 @@ bool CMainFrame::DisplayChange()
 
 void CMainFrame::CloseMedia()
 {
+	
+	if (m_OSD && m_OSD.IsWindowVisible()) {
+		m_OSD.ShowWindow(SW_HIDE);
+	}
+
 	if (m_iMediaLoadState == MLS_CLOSING) {
 		
 		//TRACE(_T("WARNING: CMainFrame::CloseMedia() called twice or more\n"));

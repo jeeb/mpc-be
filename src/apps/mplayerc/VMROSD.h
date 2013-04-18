@@ -28,6 +28,7 @@
 #include <vmr9.h>
 #include <madVRAllocatorPresenter.h>
 #include "PngImage.h"
+//#include <Gdiplus.h>
 
 typedef enum {
 	OSD_TRANSPARENT,
@@ -47,15 +48,15 @@ typedef enum {
 	OSD_DEBUG,
 } OSD_MESSAGEPOS;
 
-class CVMROSD
+class CVMROSD : public CWnd
 {
 public:
 	CVMROSD();
 	~CVMROSD();
-
 	void Start(CWnd* pWnd, IVMRMixerBitmap9* pVMB);
 	void Start(CWnd* pWnd, IMFVideoMixerBitmap* pVMB);
 	void Start(CWnd* pWnd, IMadVRTextOsd* pMVTO);
+	void Start(CWnd* pWnd);
 	void Stop();
 
 	void DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration = 5000, int FontSize = 0, CString OSD_Font = _T(""));
@@ -76,6 +77,10 @@ public:
 	bool OnLButtonUp(UINT nFlags, CPoint point);
 	bool bMouseOverCloseButton;
 	bool bMouseOverExitButton;
+
+	void DrawWnd();
+
+	DECLARE_DYNAMIC(CVMROSD)
 
 private :
 	CComPtr<IVMRMixerBitmap9>		m_pVMB;
@@ -138,8 +143,19 @@ private :
 	void DrawSlider(CRect* rect, __int64 llMin, __int64 llMax, __int64 llPos);
 	void DrawFlyBar(CRect* rect);
 	void DrawRect(CRect* rect, CBrush* pBrush = NULL, CPen* pPen = NULL);
-	void Invalidate();
+	void InvalidateVMROSD();
 	void DrawMessage();
 	void DrawDebug();
 	static void CALLBACK TimerFunc(HWND hWnd, UINT nMsg, UINT_PTR nIDEvent, DWORD dwTime);
+
+	// Gdiplus::GdiplusStartupInput m_gdiplusStartupInput;
+	// ULONG_PTR m_gdiplusToken;
+
+protected:
+	BOOL PreCreateWindow(CREATESTRUCT& cs);
+	BOOL PreTranslateMessage(MSG* pMsg);
+	int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	void OnPaint();
+	BOOL OnEraseBkgnd(CDC* pDC);
+	DECLARE_MESSAGE_MAP()
 };

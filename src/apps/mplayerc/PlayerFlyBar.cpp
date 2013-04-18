@@ -158,19 +158,19 @@ void CFlyBar::CalcButtonsRect()
 	CRect rcBar;
 	GetWindowRect(&rcBar);
 
-	r_ExitIcon		= CRect(rcBar.right-4-(iw),	rcBar.top+4, rcBar.right-4, rcBar.bottom-4);
-	r_MinIcon		= CRect(rcBar.right-4-(iw*3), rcBar.top+4, rcBar.right-4-(iw*2), rcBar.bottom-4);
-	r_RestoreIcon	= CRect(rcBar.right-4-(iw*2), rcBar.top+4, rcBar.right-4-(iw), rcBar.bottom-4);
-	r_SettingsIcon	= CRect(rcBar.right-4-(iw*7), rcBar.top+4, rcBar.right-4-(iw*6), rcBar.bottom-4);
-	r_InfoIcon		= CRect(rcBar.right-4-(iw*6), rcBar.top+4, rcBar.right-4-(iw*5), rcBar.bottom-4);
-	r_FSIcon		= CRect(rcBar.right-4-(iw*4), rcBar.top+4, rcBar.right-4-(iw*3), rcBar.bottom-4);
-	r_LockIcon		= CRect(rcBar.right-4-(iw*9), rcBar.top+4, rcBar.right-4-(iw*8), rcBar.bottom-4);
+	r_ExitIcon		= CRect(rcBar.right-5-(iw),	rcBar.top+5, rcBar.right-5, rcBar.bottom-5);
+	r_MinIcon		= CRect(rcBar.right-5-(iw*3), rcBar.top+5, rcBar.right-5-(iw*2), rcBar.bottom-5);
+	r_RestoreIcon	= CRect(rcBar.right-5-(iw*2), rcBar.top+5, rcBar.right-5-(iw), rcBar.bottom-5);
+	r_SettingsIcon	= CRect(rcBar.right-5-(iw*7), rcBar.top+5, rcBar.right-5-(iw*6), rcBar.bottom-5);
+	r_InfoIcon		= CRect(rcBar.right-5-(iw*6), rcBar.top+5, rcBar.right-5-(iw*5), rcBar.bottom-5);
+	r_FSIcon		= CRect(rcBar.right-5-(iw*4), rcBar.top+5, rcBar.right-5-(iw*3), rcBar.bottom-5);
+	r_LockIcon		= CRect(rcBar.right-5-(iw*9), rcBar.top+5, rcBar.right-5-(iw*8), rcBar.bottom-5);
 }
 
 void CFlyBar::DrawButton(CDC *pDC, int x, int y, int z)
 {
 	HICON hIcon = m_pButtonsImages->ExtractIcon(y);
-	DrawIconEx(pDC->m_hDC, x - 4 - (iw * z), 4, hIcon, 0, 0, 0, NULL, DI_NORMAL);
+	DrawIconEx(pDC->m_hDC, x - 5 - (iw * z), 5, hIcon, 0, 0, 0, NULL, DI_NORMAL);
 	DestroyIcon(hIcon);
 }
 

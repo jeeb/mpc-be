@@ -1023,6 +1023,7 @@ public:
 
 	// Main Window
 	CWnd*			m_pVideoWnd;
+	CWnd*			m_pOSDWnd;
 	CPlayerToolBar	m_wndToolBar;
 	CPlayerListCtrl	m_wndListCtrl;
 	CPlayerPlaylistBar	m_wndPlaylistBar;
@@ -1033,6 +1034,9 @@ public:
 	bool FlyBarSetPos();
 	void DestroyFlyBar();
 
+	void CreateOSDBar();
+	bool OSDBarSetPos();
+	void DestroyOSDBar();
 	// SmartSeek
 	CPreView		m_wndView2;
 
