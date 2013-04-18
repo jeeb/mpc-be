@@ -334,7 +334,7 @@ again:
 	return fn;
 }
 
-CString PlayerYouTubePlaylist(CString fn)
+CString PlayerYouTubePlaylist(CString fn, bool type)
 {
 	if (PlayerYouTubePlaylistCheck(fn)) {
 
@@ -380,9 +380,9 @@ CString PlayerYouTubePlaylist(CString fn)
 			return fn;
 		}
 
-		CString Playlist = _T(""), Video = _T(""), Title = _T("");
+		CString Playlist = _T(""), Video = _T(""), Title = _T(""), tmp_out = _T("");
 		int t_start = 0, t_stop = 0;
-		char sep1[32], sep[] = "href=\"/watch?v=", sep2[] = "title=\"";
+		char sep1[32], sep[] = "href=\"/watch?v=", sep_sub[] = "href=\"/playlist?list=", sep2[] = "title=\"";
 
 		if (fn.Find(_T("&list=")) < 0) {
 			strcpy(sep1, "<a ");
@@ -392,7 +392,12 @@ CString PlayerYouTubePlaylist(CString fn)
 		strcat(sep1, sep);
 
 		if (fn.Find(_T("playlist?")) < 0 && fn.Find(_T("&list=")) < 0) {
-			strcpy(sep1, sep);
+
+			if (strstr(final, sep_sub) && !type) {
+				strcpy(sep1, sep_sub);
+			} else {
+				strcpy(sep1, sep);
+			}
 		}
 
 		while ((final = strstr(final, sep1)) != NULL) {
@@ -413,26 +418,33 @@ CString PlayerYouTubePlaylist(CString fn)
 				delete [] str;
 			}
 
-			final += t_stop;
+			if (strstr(sep1, sep_sub)) {
 
-			t_start = strpos(final, sep2) + strlen(sep2);
-			if (t_start > 0 && t_start < 128) {
-				t_stop = strpos(final + t_start, "\"");
-				if (t_stop > 0) {
-					char* str = DNew char[t_stop + 1];
-					memset(str, 0, t_stop + 1);
-					memcpy(str, final + t_start, t_stop);
+				tmp_out = _T("http");
+				tmp_out.Append(YOUTUBE_PL_URL);
+				tmp_out.Append(_T("list="));
+				tmp_out.Append(Video);
+				Playlist.Append(PlayerYouTubePlaylist(tmp_out, 1));
+			} else {
+				final += t_stop;
 
-					if (str[0] == '[' && str[strlen(str) - 1] == ']') {
-					} else {
-						Title = PlayerYouTubeReplaceTitle(str);
+				t_start = strpos(final, sep2) + strlen(sep2);
+				if (t_start > 0 && t_start < 128) {
+					t_stop = strpos(final + t_start, "\"");
+					if (t_stop > 0) {
+						char* str = DNew char[t_stop + 1];
+						memset(str, 0, t_stop + 1);
+						memcpy(str, final + t_start, t_stop);
+
+						if (str[0] == '[' && str[strlen(str) - 1] == ']') {
+						} else {
+							Title = PlayerYouTubeReplaceTitle(str);
+						}
+
+						delete [] str;
 					}
-
-					delete [] str;
 				}
 			}
-
-			final += (t_start + t_stop);
 
 			if (!Video.IsEmpty() && !Title.IsEmpty()) {
 
@@ -449,14 +461,17 @@ CString PlayerYouTubePlaylist(CString fn)
 			}
 		}
 
+		if (type) {
+			return Playlist;
+		}
+
 		TCHAR out_file[_MAX_PATH];
 
 		if (GetTempPath(_MAX_PATH, out_file)) {
 
 			CString out_tmp(out_file);
 			out_tmp.Append(_T("mpc_youtube.m3u"));
-			TCHAR *wchr = out_tmp.GetBuffer();
-			wcsncpy(out_file, wchr, out_tmp.GetLength());
+			wcsncpy(out_file, out_tmp.GetBuffer(), out_tmp.GetLength());
 			out_tmp.ReleaseBuffer();
 
 			CStdioFile fout;

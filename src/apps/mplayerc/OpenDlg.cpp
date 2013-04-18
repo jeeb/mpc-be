@@ -237,7 +237,7 @@ void COpenDlg::OnBnClickedOk()
 	UpdateData();
 
 	m_fns.RemoveAll();
-	m_fns.AddTail(PlayerYouTubePlaylist(m_path));
+	m_fns.AddTail(PlayerYouTubePlaylist(m_path, 0));
 
 	if (m_mrucombo2.IsWindowEnabled()) {
 		m_fns.AddTail(m_path2);

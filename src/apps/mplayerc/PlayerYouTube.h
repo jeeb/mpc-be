@@ -91,7 +91,7 @@ static DWORD strpos(char* h, char* n)
 bool PlayerYouTubeCheck(CString fn);
 bool PlayerYouTubePlaylistCheck(CString fn);
 CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author);
-CString PlayerYouTubePlaylist(CString fn);
+CString PlayerYouTubePlaylist(CString fn, bool type);
 CString PlayerYouTubeGetTitle(CString fn);
 CString PlayerYouTubeSearchTitle(char* final);
 CString PlayerYouTubeReplaceTitle(char* title);
