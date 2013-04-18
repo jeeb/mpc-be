@@ -1219,6 +1219,11 @@ HRESULT CMPCVideoDecFilter::CheckInputType(const CMediaType* mtIn)
 
 bool CMPCVideoDecFilter::IsAVI()
 {
+	static DWORD SYNC = 0;
+	if (SYNC == MAKEFOURCC('R','I','F','F')) {
+		return true;
+	}
+
 	CString fname;
 
 	BeginEnumFilters(m_pGraph, pEF, pBF) {
@@ -1243,7 +1248,6 @@ bool CMPCVideoDecFilter::IsAVI()
 			return false;
 		}
 
-		DWORD SYNC = 0;
 		if (f.Read(&SYNC, sizeof(SYNC)) != sizeof(SYNC)) {
 			return false;
 		}
@@ -1408,15 +1412,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 			
 		m_nCodecNb	= nNewCodec;
 		m_nCodecId	= ffCodecs[nNewCodec].nFFCodec;
-
-		CLSID ClsidSourceFilter = GetCLSID(m_pInput->GetConnected());
-		if ((ClsidSourceFilter == __uuidof(CMpegSourceFilter)) || (ClsidSourceFilter == __uuidof(CMpegSplitterFilter))) {
-			if (CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected()) ) {
-				if (CComQIPtr<IMpegSplitterFilter> MpegSplitterFilter = pFilter ) {
-					m_bIsEVO = (m_nCodecId == AV_CODEC_ID_VC1 && mpeg_ps == MpegSplitterFilter->GetMPEGType());
-				}
-			}
-		}
 
 		m_bReorderBFrame	= true;
 		m_pAVCodec			= avcodec_find_decoder(m_nCodecId);
@@ -1747,6 +1742,12 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 		CLSID ClsidSourceFilter = GetCLSID(m_pInput->GetConnected());
 		if ((ClsidSourceFilter == __uuidof(CMpegSourceFilter)) || (ClsidSourceFilter == __uuidof(CMpegSplitterFilter))) {
 			m_bReorderBFrame = false;
+
+			if (CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected()) ) {
+				if (CComQIPtr<IMpegSplitterFilter> MpegSplitterFilter = pFilter ) {
+					m_bIsEVO = (m_nCodecId == AV_CODEC_ID_VC1 && mpeg_ps == MpegSplitterFilter->GetMPEGType());
+				}
+			}
 		}
 
 		if (m_nDXVAMode != MODE_SOFTWARE) {
