@@ -61,6 +61,8 @@ CVMROSD::CVMROSD(void)
 	bMouseOverCloseButton	= false;
 	m_bShowMessage			= true;
 
+	rMainWnd.SetRect(0,0,0,0);
+
 	int fp = m_bm.FileExists(CString(_T("flybar")));
 
 	HBITMAP hBmp = m_bm.LoadExternalImage("flybar", IDB_PLAYERFLYBAR_PNG, -1, -1, -1, -1, -1);
@@ -735,7 +737,7 @@ void CVMROSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration,
 		InvalidateVMROSD();
 	} else if (m_pMVTO) {
 		m_pMVTO->OsdDisplayMessage(strMsg, nDuration);
-	} else {
+	} else if (m_pWnd) {
 		if ( nPos != OSD_DEBUG ) {
 			m_nMessagePos	= nPos;
 			m_strMessage	= strMsg;
@@ -773,9 +775,8 @@ void CVMROSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration,
 				
 			}
 		}
-
 		DrawWnd();
-		ShowWindow(SW_SHOWNOACTIVATE);
+		ShowWindow(SW_SHOWNOACTIVATE);	
 	}
 }
 
@@ -884,12 +885,60 @@ void CVMROSD::OnPaint()
 void CVMROSD::DrawWnd()
 {
 	if (m_pWnd == NULL) return;
+
 	CClientDC dc (this);
 
 	AppSettings& s = AfxGetAppSettings();
 
+	CDC temp_DC;
+	temp_DC.CreateCompatibleDC(&dc);
+	CBitmap temp_BM;
+	temp_BM.CreateCompatibleBitmap(&temp_DC, rMainWnd.Width(), rMainWnd.Height());
+	CBitmap* temp_pOldBmt = temp_DC.SelectObject(&temp_BM);
+
+	if (m_MainFont.GetSafeHandle()) {
+		m_MainFont.DeleteObject();
+	}
+
+	LOGFONT lf;
+	memset(&lf, 0, sizeof(lf));
+	lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
+	LPCTSTR fonts[] = {m_OSD_Font};
+	int fonts_size[] = {m_FontSize*10};
+	_tcscpy_s(lf.lfFaceName, fonts[0]);
+	lf.lfHeight = fonts_size[0];
+	lf.lfQuality = AfxGetAppSettings().fFontAA ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY;
+
+	m_MainFont.CreatePointFontIndirect(&lf,&temp_DC);
+	temp_DC.SelectObject(m_MainFont);
+
+	CRect rectText;
+	CRect rectMessages;
+	temp_DC.DrawText (m_strMessage, &rectText, DT_CALCRECT);
+	rectText.InflateRect(0, 0, 10, 10);
+	int w = rMainWnd.right - rMainWnd.left;
+
+	switch (m_nMessagePos) {
+		case OSD_TOPLEFT :
+			rectMessages = CRect  (0, 0, min((rectText.right + 10), w - 20), (rectText.bottom + 2));
+			break;
+		case OSD_TOPRIGHT :
+		default :
+			int imax = max(0, rMainWnd.Width() - rectText.Width() - 30);
+			rectMessages = CRect  (imax, 0, (w - 20) + imax, rectText.bottom + 2);
+			break;
+	}
+
+	temp_DC.SelectObject(temp_pOldBmt);
+	temp_BM.DeleteObject();
+	temp_DC.DeleteDC();
+
+	MoveWindow(rMainWnd.left + 10 + rectMessages.left, rMainWnd.top + 10, rectMessages.Width()-rectMessages.left, rectMessages.Height(), 0);
+
 	CRect rcBar;
 	GetClientRect(&rcBar);
+	//rcBar = rectMessages;
+
 
 	CDC mdc;
 	mdc.CreateCompatibleDC(&dc);
@@ -897,7 +946,7 @@ void CVMROSD::DrawWnd()
 	bm.CreateCompatibleBitmap(&dc, rcBar.Width(), rcBar.Height());
 	CBitmap* pOldBm = mdc.SelectObject(&bm);
 	mdc.SetBkMode(TRANSPARENT);
-	mdc.FillSolidRect(rcBar, RGB(16,16,16)); // transparent color (LWA_COLORKEY)
+	//mdc.FillSolidRect(rcBar, RGB(0,0,0)); // transparent color (LWA_COLORKEY)
 
 	if (m_nMessagePos != OSD_NOMESSAGE) {
 
@@ -905,34 +954,9 @@ void CVMROSD::DrawWnd()
 			m_MainFont.DeleteObject();
 		}
 
-		LOGFONT lf;
-		memset(&lf, 0, sizeof(lf));
-		lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
-		LPCTSTR fonts[] = {m_OSD_Font};
-		int fonts_size[] = {m_FontSize*10};
-		_tcscpy_s(lf.lfFaceName, fonts[0]);
-		lf.lfHeight = fonts_size[0];
-		lf.lfQuality = AfxGetAppSettings().fFontAA ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY;
-
 		m_MainFont.CreatePointFontIndirect(&lf,&mdc);
 		mdc.SelectObject(m_MainFont);
 
-		CRect rectText;
-		CRect rectMessages;
-		mdc.DrawText (m_strMessage, &rectText, DT_CALCRECT);
-		rectText.InflateRect(0, 0, 10, 10);
-
-		switch (m_nMessagePos) {
-			case OSD_TOPLEFT :
-				rectMessages = CRect  (0, 0, min((rectText.right + 10),(rcBar.right - 0)), (rectText.bottom+2));
-				break;
-			case OSD_TOPRIGHT :
-			default :
-				rectMessages = CRect  (max(0,rcBar.right-10-rectText.Width()), 0, rcBar.right-0, rectText.bottom + 2);
-				break;
-		}
-
-		//mdc.FillSolidRect(rectMessages, RGB(0,0,0));
 
 		int R, G, B, R1, G1, B1, R_, G_, B_, R1_, G1_, B1_;
 		R = GetRValue((AfxGetAppSettings().clrGrad1ABGR));
@@ -947,42 +971,42 @@ void CVMROSD::DrawWnd()
 		G1_ = (G1+32>=255?255:G1+32);
 		B_ = (B+32>=255?255:B+32);
 		B1_ = (B1+32>=255?255:B1+32);
-		m_OSD_Transparent	=	AfxGetAppSettings().nOSDTransparent;
+		m_OSD_Transparent	=	255;//AfxGetAppSettings().nOSDTransparent;
 		int iBorder = AfxGetAppSettings().nOSDBorder;
 
 		GRADIENT_RECT gr[1] = {{0, 1}};
 		TRIVERTEX tv[2] = {
-					{rectMessages.left, rectMessages.top, R*256, G*256, B*256, m_OSD_Transparent*256},
-					{rectMessages.right, rectMessages.bottom, R1*256, G1*256, B1*256, m_OSD_Transparent*256},
+					{rcBar.left, rcBar.top, R*256, G*256, B*256, m_OSD_Transparent*256},
+					{rcBar.right, rcBar.bottom, R1*256, G1*256, B1*256, m_OSD_Transparent*256},
 				};
 		mdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 
 		if (iBorder > 0) {
 			GRADIENT_RECT gr2[1] = {{0, 1}};
 			TRIVERTEX tv2[2] = {
-				{rectMessages.left, rectMessages.top, R_*256, G_*256, B_*256, m_OSD_Transparent*256},
-				{rectMessages.left+iBorder, rectMessages.bottom, R1_*256, G1_*256, B1_*256, m_OSD_Transparent*256},
+				{rcBar.left, rcBar.top, R_*256, G_*256, B_*256, m_OSD_Transparent*256},
+				{rcBar.left+iBorder, rcBar.bottom, R1_*256, G1_*256, B1_*256, m_OSD_Transparent*256},
 			};
 			mdc.GradientFill(tv2, 2, gr2, 1, GRADIENT_FILL_RECT_V);
 
 			GRADIENT_RECT gr3[1] = {{0, 1}};
 			TRIVERTEX tv3[2] = {
-				{rectMessages.right, rectMessages.top, R_*256, G_*256, B_*256, m_OSD_Transparent*256},
-				{rectMessages.right-iBorder, rectMessages.bottom, R1_*256, G1_*256, B1_*256, m_OSD_Transparent*256},
+				{rcBar.right, rcBar.top, R_*256, G_*256, B_*256, m_OSD_Transparent*256},
+				{rcBar.right-iBorder, rcBar.bottom, R1_*256, G1_*256, B1_*256, m_OSD_Transparent*256},
 			};
 			mdc.GradientFill(tv3, 2, gr3, 1, GRADIENT_FILL_RECT_V);
 
 			GRADIENT_RECT gr4[1] = {{0, 1}};
 			TRIVERTEX tv4[2] = {
-				{rectMessages.left, rectMessages.top, R_*256, G_*256, B_*256, m_OSD_Transparent*256},
-				{rectMessages.right, rectMessages.top+iBorder, R_*256, G_*256, B_*256, m_OSD_Transparent*256},
+				{rcBar.left, rcBar.top, R_*256, G_*256, B_*256, m_OSD_Transparent*256},
+				{rcBar.right, rcBar.top+iBorder, R_*256, G_*256, B_*256, m_OSD_Transparent*256},
 			};
 			mdc.GradientFill(tv4, 2, gr4, 1, GRADIENT_FILL_RECT_V);
 
 			GRADIENT_RECT gr5[1] = {{0, 1}};
 			TRIVERTEX tv5[2] = {
-				{rectMessages.left, rectMessages.bottom, R1_*256, G1_*256, B1_*256, m_OSD_Transparent*256},
-				{rectMessages.right, rectMessages.bottom-iBorder, R1_*256, G1_*256, B1_*256, m_OSD_Transparent*256},
+				{rcBar.left, rcBar.bottom, R1_*256, G1_*256, B1_*256, m_OSD_Transparent*256},
+				{rcBar.right, rcBar.bottom-iBorder, R1_*256, G1_*256, B1_*256, m_OSD_Transparent*256},
 			};
 			mdc.GradientFill(tv5, 2, gr5, 1, GRADIENT_FILL_RECT_V);
 		}
@@ -992,16 +1016,16 @@ void CVMROSD::DrawWnd()
 		CRect r;
 
 		if (AfxGetAppSettings().fFontShadow) {
-			r = rectMessages;
-			r.left += 12;
-			r.top += 7;
+			r = rcBar;
+			r.left = 12;
+			r.top = 7;
 			mdc.SetTextColor(RGB(16,24,32));
 			mdc.DrawText (m_strMessage, &r, uFormat);
 		}
 		
-		r = rectMessages;
-		r.left += 10;
-		r.top += 5;
+		r = rcBar;
+		r.left = 10;
+		r.top = 5;
 
 		mdc.SetTextColor(AfxGetAppSettings().clrFontABGR);
 		mdc.DrawText(m_strMessage, m_strMessage.GetLength(), &r, uFormat);

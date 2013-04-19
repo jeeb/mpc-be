@@ -1514,7 +1514,7 @@ void CMainFrame::CreateOSDBar()
 			TRACE(_T("Failed to create OSD Window\n"));
 			return;
 		}
-		m_OSD.SetLayeredWindowAttributes(RGB(16,16,16), 255 - AfxGetAppSettings().nOSDTransparent, LWA_ALPHA|LWA_COLORKEY);
+		m_OSD.SetLayeredWindowAttributes(RGB(255,0,255), 255 - AfxGetAppSettings().nOSDTransparent, LWA_ALPHA|LWA_COLORKEY);
 
 		m_pOSDWnd = &m_wndView;
 		if (AfxGetAppSettings().fShowOSD) {
@@ -1563,7 +1563,13 @@ bool CMainFrame::OSDBarSetPos()
 	m_wndView.GetWindowRect(&r_wndView);
 
 	int pos = (m_wndFlyBar && m_wndFlyBar.IsWindowVisible()) ? (m_wndFlyBar.iw * 9 + 20) : 0;
-	m_OSD.MoveWindow(r_wndView.left+10, r_wndView.top+10, r_wndView.right-r_wndView.left-20-pos, r_wndView.bottom-r_wndView.top-20);
+	//m_OSD.MoveWindow(r_wndView.left+10, r_wndView.top+10, r_wndView.right-r_wndView.left-20-pos, r_wndView.bottom-r_wndView.top-20);
+
+	CRect rMainWnd;
+	m_wndView.GetWindowRect(&rMainWnd);
+	rMainWnd.right -= pos;
+	m_OSD.rMainWnd = rMainWnd;
+	if (m_OSD && m_OSD.IsWindowVisible()) m_OSD.DrawWnd();
 
 	if (r_wndView.bottom-r_wndView.top > 40 && r_wndView.right-r_wndView.left > 100) {
 		return 1;
@@ -1732,7 +1738,7 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 {
 	__super::OnSize(nType, cx, cy);
 
-	if (m_OSD && m_OSD.IsWindowVisible()) {
+	if (m_OSD && m_OSD.IsWindowVisible() && AfxGetAppSettings().IsD3DFullscreen()) {
 		m_OSD.OnSize (nType, cx, cy);
 	}
 	if (nType == SIZE_RESTORED && m_fTrayIcon) {
@@ -2139,7 +2145,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 			} else if (m_wndFlyBar && m_wndFlyBar.IsWindowVisible()) {
 				m_wndFlyBar.ShowWindow(SW_HIDE);
 			}
-			//OSDBarSetPos();
+			OSDBarSetPos();
 			break;
 		case TIMER_STREAMPOSPOLLER:
 			if (m_iMediaLoadState == MLS_LOADED) {

@@ -79,6 +79,7 @@ public:
 	bool bMouseOverExitButton;
 
 	void DrawWnd();
+	CRect rMainWnd;
 
 	DECLARE_DYNAMIC(CVMROSD)
 
