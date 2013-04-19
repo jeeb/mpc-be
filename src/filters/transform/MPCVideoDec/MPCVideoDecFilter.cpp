@@ -1831,7 +1831,7 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 	rm.video_after_seek	= true;
 	m_rtStart			= rtStart;
 
-	if (m_nCodecId == AV_CODEC_ID_H264 && m_nFrameType != PICT_FRAME) {
+	if (m_nCodecId == AV_CODEC_ID_H264 && m_nFrameType != PICT_FRAME && m_nPCIVendor == PCIV_ATI) {
 		InitDecoder(&m_pInput->CurrentMediaType());
 	}
 
