@@ -52,6 +52,7 @@ CVMROSD::CVMROSD(void)
 	m_pMFVMB			= NULL;
 	m_pVMB				= NULL;
 	m_pMVTO				= NULL;
+	m_pWnd				= NULL;
 	memset(&m_BitmapInfo, 0, sizeof(m_BitmapInfo));
 
 	m_FontSize				= 0;
@@ -61,7 +62,7 @@ CVMROSD::CVMROSD(void)
 	bMouseOverCloseButton	= false;
 	m_bShowMessage			= true;
 
-	rMainWnd.SetRect(0,0,0,0);
+	m_MainWndRect.SetRect(0,0,0,0);
 
 	int fp = m_bm.FileExists(CString(_T("flybar")));
 
@@ -278,18 +279,18 @@ void CVMROSD::CalcRect()
 void CVMROSD::DrawRect(CRect* rect, CBrush* pBrush, CPen* pPen)
 {
 	if (pPen) {
-		m_MemDC.SelectObject (pPen);
+		m_MemDC.SelectObject(pPen);
 	} else {
 		m_MemDC.SelectStockObject(NULL_PEN);
 	}
 
 	if (pBrush) {
-		m_MemDC.SelectObject (pBrush);
+		m_MemDC.SelectObject(pBrush);
 	} else {
 		m_MemDC.SelectStockObject(HOLLOW_BRUSH);
 	}
 
-	m_MemDC.Rectangle	 (rect);
+	m_MemDC.Rectangle(rect);
 }
 
 void CVMROSD::DrawSlider(CRect* rect, __int64 llMin, __int64 llMax, __int64 llPos)
@@ -775,8 +776,11 @@ void CVMROSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration,
 				
 			}
 		}
-		DrawWnd();
-		ShowWindow(SW_SHOWNOACTIVATE);	
+
+		if (m_pWnd) {
+			DrawWnd();
+			ShowWindow(SW_SHOWNOACTIVATE);	
+		}
 	}
 }
 
@@ -833,19 +837,19 @@ void CVMROSD::EnableShowMessage(bool enabled)
 BOOL CVMROSD::PreTranslateMessage(MSG* pMsg)
 {
 
-	switch (pMsg->message) {
-		case WM_LBUTTONDOWN :
-		case WM_LBUTTONDBLCLK :
-		case WM_MBUTTONDOWN :
-		case WM_MBUTTONUP :
-		case WM_MBUTTONDBLCLK :
-		case WM_RBUTTONDOWN :
-		case WM_RBUTTONUP :
-		case WM_RBUTTONDBLCLK :
-
-		m_pWnd->SetFocus();
-
-		break;
+	if (m_pWnd) {
+		switch (pMsg->message) {
+			case WM_LBUTTONDOWN :
+			case WM_LBUTTONDBLCLK :
+			case WM_MBUTTONDOWN :
+			case WM_MBUTTONUP :
+			case WM_MBUTTONDBLCLK :
+			case WM_RBUTTONDOWN :
+			case WM_RBUTTONUP :
+			case WM_RBUTTONDBLCLK :
+				m_pWnd->SetFocus();
+			break;
+		}
 	}
 
 	return CWnd::PreTranslateMessage(pMsg);
@@ -884,7 +888,9 @@ void CVMROSD::OnPaint()
 
 void CVMROSD::DrawWnd()
 {
-	if (m_pWnd == NULL) return;
+	if (!m_pWnd) {
+		return;
+	}
 
 	CClientDC dc (this);
 
@@ -893,7 +899,7 @@ void CVMROSD::DrawWnd()
 	CDC temp_DC;
 	temp_DC.CreateCompatibleDC(&dc);
 	CBitmap temp_BM;
-	temp_BM.CreateCompatibleBitmap(&temp_DC, rMainWnd.Width(), rMainWnd.Height());
+	temp_BM.CreateCompatibleBitmap(&temp_DC, m_MainWndRect.Width(), m_MainWndRect.Height());
 	CBitmap* temp_pOldBmt = temp_DC.SelectObject(&temp_BM);
 
 	if (m_MainFont.GetSafeHandle()) {
@@ -916,16 +922,15 @@ void CVMROSD::DrawWnd()
 	CRect rectMessages;
 	temp_DC.DrawText (m_strMessage, &rectText, DT_CALCRECT);
 	rectText.InflateRect(0, 0, 10, 10);
-	int w = rMainWnd.right - rMainWnd.left;
 
 	switch (m_nMessagePos) {
 		case OSD_TOPLEFT :
-			rectMessages = CRect  (0, 0, min((rectText.right + 10), w - 20), (rectText.bottom + 2));
+			rectMessages = CRect  (0, 0, min((rectText.right + 10), m_MainWndRect.Width() - 20), (rectText.bottom + 2));
 			break;
 		case OSD_TOPRIGHT :
 		default :
-			int imax = max(0, rMainWnd.Width() - rectText.Width() - 30);
-			rectMessages = CRect  (imax, 0, (w - 20) + imax, rectText.bottom + 2);
+			int imax = max(0, m_MainWndRect.Width() - rectText.Width() - 30);
+			rectMessages = CRect  (imax, 0, (m_MainWndRect.Width() - 20) + imax, rectText.bottom + 2);
 			break;
 	}
 
@@ -933,12 +938,11 @@ void CVMROSD::DrawWnd()
 	temp_BM.DeleteObject();
 	temp_DC.DeleteDC();
 
-	MoveWindow(rMainWnd.left + 10 + rectMessages.left, rMainWnd.top + 10, rectMessages.Width()-rectMessages.left, rectMessages.Height(), 0);
+	MoveWindow(m_MainWndRect.left + 10 + rectMessages.left, m_MainWndRect.top + 10, rectMessages.Width()-rectMessages.left, rectMessages.Height(), 0);
 
 	CRect rcBar;
 	GetClientRect(&rcBar);
 	//rcBar = rectMessages;
-
 
 	CDC mdc;
 	mdc.CreateCompatibleDC(&dc);
@@ -959,26 +963,27 @@ void CVMROSD::DrawWnd()
 
 
 		int R, G, B, R1, G1, B1, R_, G_, B_, R1_, G1_, B1_;
-		R = GetRValue((AfxGetAppSettings().clrGrad1ABGR));
-		G = GetGValue((AfxGetAppSettings().clrGrad1ABGR));
-		B = GetBValue((AfxGetAppSettings().clrGrad1ABGR));
-		R1 = GetRValue((AfxGetAppSettings().clrGrad2ABGR));
-		G1 = GetGValue((AfxGetAppSettings().clrGrad2ABGR));
-		B1 = GetBValue((AfxGetAppSettings().clrGrad2ABGR));
-		R_ = (R+32>=255?255:R+32);
-		R1_ = (R1+32>=255?255:R1+32);
-		G_ = (G+32>=255?255:G+32);
-		G1_ = (G1+32>=255?255:G1+32);
-		B_ = (B+32>=255?255:B+32);
-		B1_ = (B1+32>=255?255:B1+32);
-		m_OSD_Transparent	=	255;//AfxGetAppSettings().nOSDTransparent;
-		int iBorder = AfxGetAppSettings().nOSDBorder;
+		R	= GetRValue((AfxGetAppSettings().clrGrad1ABGR));
+		G	= GetGValue((AfxGetAppSettings().clrGrad1ABGR));
+		B	= GetBValue((AfxGetAppSettings().clrGrad1ABGR));
+		R1	= GetRValue((AfxGetAppSettings().clrGrad2ABGR));
+		G1	= GetGValue((AfxGetAppSettings().clrGrad2ABGR));
+		B1	= GetBValue((AfxGetAppSettings().clrGrad2ABGR));
+		R_	= (R+32  >= 255 ? 255 : R+32);
+		R1_	= (R1+32 >= 255 ? 255 : R1+32);
+		G_	= (G+32  >= 255 ? 255 : G+32);
+		G1_	= (G1+32 >= 255 ? 255 : G1+32);
+		B_	= (B+32  >= 255 ? 255 : B+32);
+		B1_	= (B1+32 >= 255 ? 255 : B1+32);
+		
+		m_OSD_Transparent	= 255;//AfxGetAppSettings().nOSDTransparent;
+		int iBorder			= AfxGetAppSettings().nOSDBorder;
 
 		GRADIENT_RECT gr[1] = {{0, 1}};
 		TRIVERTEX tv[2] = {
-					{rcBar.left, rcBar.top, R*256, G*256, B*256, m_OSD_Transparent*256},
-					{rcBar.right, rcBar.bottom, R1*256, G1*256, B1*256, m_OSD_Transparent*256},
-				};
+			{rcBar.left, rcBar.top, R*256, G*256, B*256, m_OSD_Transparent*256},
+			{rcBar.right, rcBar.bottom, R1*256, G1*256, B1*256, m_OSD_Transparent*256},
+		};
 		mdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 
 		if (iBorder > 0) {
@@ -1016,20 +1021,19 @@ void CVMROSD::DrawWnd()
 		CRect r;
 
 		if (AfxGetAppSettings().fFontShadow) {
-			r = rcBar;
-			r.left = 12;
-			r.top = 7;
+			r		= rcBar;
+			r.left	= 12;
+			r.top	= 7;
 			mdc.SetTextColor(RGB(16,24,32));
 			mdc.DrawText (m_strMessage, &r, uFormat);
 		}
 		
-		r = rcBar;
-		r.left = 10;
-		r.top = 5;
+		r		= rcBar;
+		r.left	= 10;
+		r.top	= 5;
 
 		mdc.SetTextColor(AfxGetAppSettings().clrFontABGR);
 		mdc.DrawText(m_strMessage, m_strMessage.GetLength(), &r, uFormat);
-		
 		
 		/*
 		// GDI+ handling

@@ -79,7 +79,7 @@ public:
 	bool bMouseOverExitButton;
 
 	void DrawWnd();
-	CRect rMainWnd;
+	void SetWndRect(CRect rc) { m_MainWndRect = rc; };
 
 	DECLARE_DYNAMIC(CVMROSD)
 
@@ -127,12 +127,14 @@ private :
 	__int64	m_llSeekMin;
 	__int64	m_llSeekMax;
 	__int64	m_llSeekPos;
-	HICON icoExit;
-	HICON icoExit_a;
-	HICON icoClose;
-	HICON icoClose_a;
+	HICON	icoExit;
+	HICON	icoExit_a;
+	HICON	icoClose;
+	HICON	icoClose_a;
 
 	bool	m_bShowMessage;
+
+	CRect	m_MainWndRect;
 
 	CString			m_strMessage;
 	OSD_MESSAGEPOS	m_nMessagePos;

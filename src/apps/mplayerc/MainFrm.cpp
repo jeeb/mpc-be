@@ -1565,11 +1565,13 @@ bool CMainFrame::OSDBarSetPos()
 	int pos = (m_wndFlyBar && m_wndFlyBar.IsWindowVisible()) ? (m_wndFlyBar.iw * 9 + 20) : 0;
 	//m_OSD.MoveWindow(r_wndView.left+10, r_wndView.top+10, r_wndView.right-r_wndView.left-20-pos, r_wndView.bottom-r_wndView.top-20);
 
-	CRect rMainWnd;
-	m_wndView.GetWindowRect(&rMainWnd);
-	rMainWnd.right -= pos;
-	m_OSD.rMainWnd = rMainWnd;
-	if (m_OSD && m_OSD.IsWindowVisible()) m_OSD.DrawWnd();
+	CRect MainWndRect;
+	m_wndView.GetWindowRect(&MainWndRect);
+	MainWndRect.right -= pos;
+	m_OSD.SetWndRect(MainWndRect);
+	if (m_OSD && m_OSD.IsWindowVisible()) {
+		m_OSD.DrawWnd();
+	}
 
 	if (r_wndView.bottom-r_wndView.top > 40 && r_wndView.right-r_wndView.left > 100) {
 		return 1;
