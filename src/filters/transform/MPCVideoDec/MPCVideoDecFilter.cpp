@@ -1832,7 +1832,7 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 	m_rtStart			= rtStart;
 
 	if (m_nCodecId == AV_CODEC_ID_H264 && m_nFrameType != PICT_FRAME && m_nPCIVendor == PCIV_ATI) {
-		InitDecoder(&m_pInput->CurrentMediaType());
+		;//InitDecoder(&m_pInput->CurrentMediaType());
 	}
 
 	return __super::NewSegment (rtStart, rtStop, dRate);
