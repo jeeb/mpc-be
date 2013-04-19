@@ -499,7 +499,7 @@ void CPPageInterface::OnChngOSDCombo()
 	m_FontType.GetLBText(m_FontType.GetCurSel(),str);
 
 	((CMainFrame*)AfxGetMainWnd())->m_OSD.DisplayMessage(OSD_TOPLEFT, _T("OSD test"), 2000, m_OSD_Size, str);
-	((CMainFrame*)AfxGetMainWnd())->m_OSD.SetLayeredWindowAttributes(RGB(16,16,16), 255-AfxGetAppSettings().nOSDTransparent, LWA_ALPHA|LWA_COLORKEY);
+	((CMainFrame*)AfxGetMainWnd())->m_OSD.SetLayeredWindowAttributes(RGB(16,16,16), 255 - AfxGetAppSettings().nOSDTransparent, LWA_ALPHA|LWA_COLORKEY);
 	
 	SetModified();
 }

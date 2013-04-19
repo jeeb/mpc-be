@@ -1514,7 +1514,7 @@ void CMainFrame::CreateOSDBar()
 			TRACE(_T("Failed to create OSD Window\n"));
 			return;
 		}
-		m_OSD.SetLayeredWindowAttributes(RGB(16,16,16), 255-AfxGetAppSettings().nOSDTransparent, LWA_ALPHA|LWA_COLORKEY);
+		m_OSD.SetLayeredWindowAttributes(RGB(16,16,16), 255 - AfxGetAppSettings().nOSDTransparent, LWA_ALPHA|LWA_COLORKEY);
 
 		m_pOSDWnd = &m_wndView;
 		if (AfxGetAppSettings().fShowOSD) {
@@ -1562,7 +1562,7 @@ bool CMainFrame::OSDBarSetPos()
 	CRect r_wndView;
 	m_wndView.GetWindowRect(&r_wndView);
 
-	int pos = m_wndFlyBar.IsWindowVisible() ? (m_wndFlyBar.iw * 9 + 20) : 0;
+	int pos = (m_wndFlyBar && m_wndFlyBar.IsWindowVisible()) ? (m_wndFlyBar.iw * 9 + 20) : 0;
 	m_OSD.MoveWindow(r_wndView.left+10, r_wndView.top+10, r_wndView.right-r_wndView.left-20-pos, r_wndView.bottom-r_wndView.top-20);
 
 	if (r_wndView.bottom-r_wndView.top > 40 && r_wndView.right-r_wndView.left > 100) {
@@ -1919,7 +1919,7 @@ void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
 		TRACE(_T("SC_SCREENSAVE, nID = %d, lParam = %d\n"), nID, lParam);
 		return;
 	} else if ((nID & 0xFFF0) == SC_MINIMIZE && m_fTrayIcon) {
-		if (m_wndFlyBar.IsWindowVisible()) {
+		if (m_wndFlyBar && m_wndFlyBar.IsWindowVisible()) {
 			m_wndFlyBar.ShowWindow(SW_HIDE);
 		}
 		ShowWindow(SW_HIDE);
@@ -2139,7 +2139,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 			} else if (m_wndFlyBar && m_wndFlyBar.IsWindowVisible()) {
 				m_wndFlyBar.ShowWindow(SW_HIDE);
 			}
-			OSDBarSetPos();
+			//OSDBarSetPos();
 			break;
 		case TIMER_STREAMPOSPOLLER:
 			if (m_iMediaLoadState == MLS_LOADED) {
@@ -4201,7 +4201,7 @@ void CMainFrame::OnUpdateFilePostClosemedia(CCmdUI* pCmdUI)
 
 void CMainFrame::OnBossKey()
 {
-	if (m_wndFlyBar.IsWindowVisible()) {
+	if (m_wndFlyBar && m_wndFlyBar.IsWindowVisible()) {
 		m_wndFlyBar.ShowWindow(SW_HIDE);
 	}
 	// Disable animation

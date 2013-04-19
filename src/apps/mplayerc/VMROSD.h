@@ -61,7 +61,7 @@ public:
 
 	void DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration = 5000, int FontSize = 0, CString OSD_Font = _T(""));
 	void DebugMessage(LPCTSTR format, ...);
-	void ClearMessage(bool hide=false);
+	void ClearMessage(bool hide = false);
 	void HideMessage(bool hide);
 	void HideExclusiveBars();
 	void EnableShowMessage(bool enabled = true);
