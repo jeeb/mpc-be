@@ -1222,6 +1222,8 @@ bool CMPCVideoDecFilter::IsAVI()
 	static DWORD SYNC = 0;
 	if (SYNC == MAKEFOURCC('R','I','F','F')) {
 		return true;
+	} else if (SYNC != 0) {
+		return false;
 	}
 
 	CString fname;
@@ -1244,17 +1246,21 @@ bool CMPCVideoDecFilter::IsAVI()
 		CFile f;
 		CFileException fileException;
 		if (!f.Open(fname, CFile::modeRead|CFile::typeBinary|CFile::shareDenyNone, &fileException)) {
-			TRACE(_T("CMPCVideoDecFilter::IsAVI() : Can't open file %ws, error = %u\n"), fname, fileException.m_cause);
+			DbgLog((LOG_TRACE, 3, _T("CMPCVideoDecFilter::IsAVI() : Can't open file '%s', error = %u"), fname, fileException.m_cause));
 			return false;
 		}
 
 		if (f.Read(&SYNC, sizeof(SYNC)) != sizeof(SYNC)) {
+			DbgLog((LOG_TRACE, 3, _T("CMPCVideoDecFilter::IsAVI() : Can't read SYNC from file '%s'"), fname));
 			return false;
 		}
 
 		if (SYNC == MAKEFOURCC('R','I','F','F')) {
+			DbgLog((LOG_TRACE, 3, _T("CMPCVideoDecFilter::IsAVI() : '%s' is a valid AVI file"), fname));
 			return true;
 		}
+
+		DbgLog((LOG_TRACE, 3, _T("CMPCVideoDecFilter::IsAVI() : '%s' is not valid AVI file"), fname));
 	}
 
 	return false;
@@ -1832,7 +1838,7 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 	m_rtStart			= rtStart;
 
 	if (m_nCodecId == AV_CODEC_ID_H264 && m_nFrameType != PICT_FRAME && m_nPCIVendor == PCIV_ATI) {
-		;//InitDecoder(&m_pInput->CurrentMediaType());
+		InitDecoder(&m_pInput->CurrentMediaType());
 	}
 
 	return __super::NewSegment (rtStart, rtStop, dRate);
