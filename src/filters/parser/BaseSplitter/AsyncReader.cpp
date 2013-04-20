@@ -156,14 +156,14 @@ CAsyncUrlReader::CAsyncUrlReader(CString url, HRESULT& hr)
 
 	hr = Open(m_fn, modeRead|shareDenyRead|typeBinary|osSequentialScan) ? S_OK : E_FAIL;
 
-	DWORD dwLength=32,npos=0;
+	DWORD dwLength = 32, npos = 0;
 	char dwData[sizeof(dwLength)];
-	HINTERNET f,s=InternetOpen(0,0,0,0,0);
+	HINTERNET f, s = InternetOpen(0, 0, 0, 0, 0);
 	if (s) {
-		f=InternetOpenUrlW(s,url,0,0,INTERNET_FLAG_TRANSFER_BINARY|INTERNET_FLAG_EXISTING_CONNECT|INTERNET_FLAG_NO_CACHE_WRITE|INTERNET_FLAG_RELOAD,0);
+		f = InternetOpenUrl(s, url, 0, 0, INTERNET_FLAG_TRANSFER_BINARY|INTERNET_FLAG_EXISTING_CONNECT|INTERNET_FLAG_NO_CACHE_WRITE|INTERNET_FLAG_RELOAD, 0);
 		if (f) {
-			HttpQueryInfo(f,HTTP_QUERY_CONTENT_LENGTH,dwData,&dwLength,0);
-			npos=atoi(dwData);
+			HttpQueryInfo(f, HTTP_QUERY_CONTENT_LENGTH, dwData, &dwLength, 0);
+			npos = atoi(dwData);
 			if (npos) {
 				m_len = (ULONGLONG)npos;
 			}
@@ -214,27 +214,39 @@ DWORD CAsyncUrlReader::ThreadProc()
 		CInternetSession is;
 		CAutoPtr<CStdioFile> fin(is.OpenURL(m_url, 1, INTERNET_FLAG_TRANSFER_BINARY|INTERNET_FLAG_EXISTING_CONNECT|INTERNET_FLAG_NO_CACHE_WRITE|INTERNET_FLAG_RELOAD));
 
-		TCHAR path[_MAX_PATH], fn[_MAX_PATH];
-		CFile fout;
+		TCHAR fn[_MAX_PATH];
 
-		if (GetTempPath(_MAX_PATH, path) && GetTempFileName(path, _T("mpc_http"), 0, fn) && fout.Open(fn, modeCreate|modeWrite|shareDenyWrite|typeBinary)) {
+		if (GetTempPath(_MAX_PATH, fn)) {
 
-			m_fn = fn;
-			Reply(S_OK);
+			CString fn_tmp(fn);
+			fn_tmp.Append(_T("mpc_http.tmp"));
+			wcsncpy(fn, fn_tmp.GetBuffer(), fn_tmp.GetLength());
+			fn_tmp.ReleaseBuffer();
 
-			char buff[8192];
-			while (!CheckRequest(&cmd)) {
-				int len = fin->Read(buff, sizeof(buff));
-				if (!len) {
-					break;
+			CFile fout;
+
+			if (fout.Open(fn, modeCreate|modeWrite|shareDenyWrite|typeBinary)) {
+
+				m_fn = fn;
+				Reply(S_OK);
+
+				char buff[8192];
+				while (!CheckRequest(&cmd)) {
+					int len = fin->Read(buff, sizeof(buff));
+					if (!len) {
+						break;
+					}
+					fout.Write(buff, len);
 				}
-				fout.Write(buff, len);
 			}
-		} else {
+		}
+
+		if (m_fn.IsEmpty()) {
 			Reply((DWORD)E_FAIL);
 		}
 
 		fin->Close(); // must close it because the destructor doesn't seem to do it and we will get an exception when "is" is destroying
+
 	} catch (CInternetException* ie) {
 		ie->Delete();
 		Reply((DWORD)E_FAIL);

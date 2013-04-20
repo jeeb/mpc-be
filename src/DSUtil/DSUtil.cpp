@@ -3172,8 +3172,7 @@ void HexDump(CString fileName, BYTE* buf, int size)
 			file.WriteString(dump_str);
 			file.Close();
 		}
-	}
-	else {
+	} else {
 		TRACE(dump_str);
 	}
 }
@@ -3319,7 +3318,6 @@ bool ParseCUESheet(CString cueData, CAtlList<Chapters> &ChaptersList)
 		}
 	}
 
-
 	if (ChaptersList.GetCount()) {
 		return true;
 	} else {
@@ -3383,22 +3381,27 @@ CString RemoveSlash(LPCTSTR Path)
 //
 BOOL GetTemporaryFilePath(CString strExtension, CString& strFileName)
 {
-	TCHAR lpszTempPath[MAX_PATH] = { 0 };
-	if (!GetTempPath(MAX_PATH, lpszTempPath)) {
+	TCHAR lpszTempPath[_MAX_PATH] = { 0 };
+	if (!GetTempPath(_MAX_PATH, lpszTempPath)) {
 		return FALSE;
 	}
- 
-	TCHAR lpszFilePath[MAX_PATH] = { 0 };
+
+	TCHAR lpszFilePath[_MAX_PATH] = { 0 };
 	do {
 		if (!GetTempFileName(lpszTempPath, _T("mpc"), 0, lpszFilePath)) {
 			return FALSE;
 		}
- 
+
+		CString fn_tmp(lpszTempPath);
+		fn_tmp.Append(_T("mpc.tmp"));
+		wcsncpy(lpszFilePath, fn_tmp.GetBuffer(), fn_tmp.GetLength());
+		fn_tmp.ReleaseBuffer();
+
 		strFileName = lpszFilePath;
 		VERIFY(::DeleteFile(strFileName));
-		strFileName.Replace(_T(".tmp"), strExtension);
+		//strFileName.Replace(_T(".tmp"), strExtension);
 	} while (_taccess(strFileName, 00) != -1);
- 
-	TRACE(_T("GetTemporaryFilePath() : \'%ws\'\n"), strFileName);
+
+	//TRACE(_T("GetTemporaryFilePath() : \'%ws\'\n"), strFileName);
 	return TRUE;
 }

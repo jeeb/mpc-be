@@ -12315,7 +12315,8 @@ UINT CMainFrame::YoutubeThreadProc()
 
 			if (GetTemporaryFilePath(CPath(m_YoutubeFile).GetExtension(), m_YoutubeFile)) {
 				CFile file;
-				if (file.Open(m_YoutubeFile, CFile::modeCreate|CFile::modeWrite|CFile::shareDenyWrite, NULL)) {
+				if (file.Open(m_YoutubeFile, CFile::modeCreate|CFile::modeWrite|CFile::shareDenyWrite|CFile::typeBinary)) {
+
 					AfxGetAppSettings().slTMPFilesList.AddTail(m_YoutubeFile);
 
 					DWORD dwBytesRead	= 0;
@@ -12345,6 +12346,7 @@ UINT CMainFrame::YoutubeThreadProc()
 	}
 
 	m_fYoutubeThreadWork = TH_CLOSE;
+
 	return (UINT)m_fYoutubeThreadWork;
 }
 
@@ -12391,6 +12393,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				if (local.Find(_T("www.")) == 0) {
 					local = _T("http://") + local;
 				}
+
 				CUrl url;
 				url.CrackUrl(local);
 
@@ -12439,8 +12442,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 			if (!extimage) {
 				CString tmpName = PlayerYouTube(fn, &m_strTitleAlt, &m_strAuthorAlt);
-				tmpName.Replace(_T("&amp;"), _T("&"));
-
 				m_strUrl = tmpName;
 
 				if (PlayerYouTubeCheck(fn) && s.iYoutubeSource == 0) {
@@ -12458,6 +12459,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 							tmpName = _T("");
 						}
 					}
+					PlayerYouTubePlaylistDelete();
 				}
 
 				hr = pGB->RenderFile(tmpName, NULL);

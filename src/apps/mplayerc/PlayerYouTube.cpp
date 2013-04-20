@@ -361,7 +361,7 @@ CString PlayerYouTubePlaylist(CString fn, bool type)
 					out = tempData;
 					dataSize += dwBytesRead;
 
-					if (strstr(out, "id=\"player\"") || strstr(out, "class=\"secondary-pane\"")) {
+					if (strstr(out, "id=\"player\"")) {
 						break;
 					}
 				} while (dwBytesRead);
@@ -465,32 +465,48 @@ CString PlayerYouTubePlaylist(CString fn, bool type)
 			return Playlist;
 		}
 
-		TCHAR out_file[_MAX_PATH];
+		CStdioFile fout;
+		TCHAR* file = PlayerYouTubePlaylistCreate();
 
-		if (GetTempPath(_MAX_PATH, out_file)) {
+		if (fout.Open(file, CFile::modeCreate|CFile::modeWrite|CFile::shareDenyWrite|CFile::typeBinary)) {
 
-			CString out_tmp(out_file);
-			out_tmp.Append(_T("mpc_youtube.m3u"));
-			wcsncpy(out_file, out_tmp.GetBuffer(), out_tmp.GetLength());
-			out_tmp.ReleaseBuffer();
+			CStringA ptr(Playlist);
+			const char* pt = (LPCSTR)ptr;
+			fout.Write(pt, strlen(pt));
+			fout.Close();
 
-			CStdioFile fout;
-
-			if (fout.Open(out_file, CFile::modeCreate|CFile::modeWrite|CFile::shareDenyWrite|CFile::typeBinary)) {
-
-				CStringA ptr(Playlist);
-				const char* pt = (LPCSTR)ptr;
-				fout.Write(pt, strlen(pt));
-				fout.Close();
-			} else {
-				return fn;
-			}
+			return file;
 		}
+	}
+
+	return fn;
+}
+
+TCHAR* PlayerYouTubePlaylistCreate()
+{
+	TCHAR *out_file = (TCHAR*)malloc(_MAX_PATH * sizeof(TCHAR));
+
+	if (GetTempPath(_MAX_PATH, out_file)) {
+
+		CString out_tmp(out_file);
+		out_tmp.Append(_T("mpc_youtube.m3u"));
+		wcsncpy(out_file, out_tmp.GetBuffer(), out_tmp.GetLength());
+		out_tmp.ReleaseBuffer();
 
 		return out_file;
 	}
 
-	return fn;
+	return NULL;
+}
+
+void PlayerYouTubePlaylistDelete()
+{
+	CFileFind find;
+	TCHAR* file = PlayerYouTubePlaylistCreate();
+
+	if (file && find.FindFile(file)) {
+		DeleteFile(file);
+	}
 }
 
 CString PlayerYouTubeGetTitle(CString fn)
