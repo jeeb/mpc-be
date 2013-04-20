@@ -621,10 +621,8 @@ int ff_init_buffer_info(AVCodecContext *avctx, AVFrame *frame)
 
     switch (avctx->codec->type) {
     case AVMEDIA_TYPE_VIDEO:
-        if (!frame->width)
-            frame->width               = avctx->width;
-        if (!frame->height)
-            frame->height              = avctx->height;
+        frame->width  = FFMAX(avctx->width , -((-avctx->coded_width )>>avctx->lowres));
+        frame->height = FFMAX(avctx->height, -((-avctx->coded_height)>>avctx->lowres));
         if (frame->format < 0)
             frame->format              = avctx->pix_fmt;
         if (!frame->sample_aspect_ratio.num)
@@ -799,6 +797,9 @@ do {                                                                    \
 
         av_buffer_unref(&dummy_buf);
 
+        frame->width  = avctx->width;
+        frame->height = avctx->height;
+
         return 0;
 
 fail:
@@ -809,7 +810,14 @@ fail:
     }
 #endif
 
-    return avctx->get_buffer2(avctx, frame, flags);
+    ret = avctx->get_buffer2(avctx, frame, flags);
+
+    if (avctx->codec_type == AVMEDIA_TYPE_VIDEO) {
+        frame->width  = avctx->width;
+        frame->height = avctx->height;
+    }
+
+    return ret;
 }
 
 int ff_get_buffer(AVCodecContext *avctx, AVFrame *frame, int flags)
@@ -1778,6 +1786,8 @@ int attribute_align_arg avcodec_encode_video2(AVCodecContext *avctx,
 
     if (ret < 0 || !*got_packet_ptr)
         av_free_packet(avpkt);
+    else
+        av_packet_merge_side_data(avpkt);
 
     emms_c();
     return ret;

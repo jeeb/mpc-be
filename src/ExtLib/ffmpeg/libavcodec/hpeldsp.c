@@ -28,12 +28,13 @@
  */
 
 #include "libavutil/attributes.h"
+#include "libavutil/intreadwrite.h"
 #include "hpeldsp.h"
 
 #define BIT_DEPTH 8
 #include "hpeldsp_template.c"
 
-av_cold void ff_hpeldsp_init(HpelDSPContext* c, int flags)
+av_cold void ff_hpeldsp_init(HpelDSPContext *c, int flags)
 {
 #define hpel_funcs(prefix, idx, num) \
     c->prefix ## _pixels_tab idx [0] = prefix ## _pixels ## num ## _8_c; \
@@ -53,11 +54,18 @@ av_cold void ff_hpeldsp_init(HpelDSPContext* c, int flags)
     hpel_funcs(avg, [3],  2);
     hpel_funcs(avg_no_rnd,, 16);
 
-    if (ARCH_X86)        ff_hpeldsp_init_x86   (c, flags);
-    if (ARCH_ARM)        ff_hpeldsp_init_arm   (c, flags);
-    if (HAVE_VIS)        ff_hpeldsp_init_vis   (c, flags);
-    if (ARCH_ALPHA)      ff_hpeldsp_init_alpha (c, flags);
-    if (ARCH_PPC)        ff_hpeldsp_init_ppc   (c, flags);
-    if (ARCH_SH4)        ff_hpeldsp_init_sh4   (c, flags);
-    if (ARCH_BFIN)       ff_hpeldsp_init_bfin  (c, flags);
+    if (ARCH_ALPHA)
+        ff_hpeldsp_init_alpha(c, flags);
+    if (ARCH_ARM)
+        ff_hpeldsp_init_arm(c, flags);
+    if (ARCH_BFIN)
+        ff_hpeldsp_init_bfin(c, flags);
+    if (ARCH_PPC)
+        ff_hpeldsp_init_ppc(c, flags);
+    if (ARCH_SH4)
+        ff_hpeldsp_init_sh4(c, flags);
+    if (HAVE_VIS)
+        ff_hpeldsp_init_vis(c, flags);
+    if (ARCH_X86)
+        ff_hpeldsp_init_x86(c, flags);
 }

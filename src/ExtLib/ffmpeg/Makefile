@@ -434,7 +434,7 @@ SRCS_YASM = \
     libavcodec/x86/dwt_yasm.asm \
     libavcodec/x86/fft.asm \
     libavcodec/x86/fmtconvert.asm \
-    libavcodec/x86/fpelbase.asm \
+    libavcodec/x86/fpel.asm \
     libavcodec/x86/h263_loopfilter.asm \
     libavcodec/x86/h264_chromamc.asm \
     libavcodec/x86/h264_chromamc_10bit.asm \
@@ -453,7 +453,7 @@ SRCS_YASM = \
     libavcodec/x86/mpeg4qpel.asm \
     libavcodec/x86/pngdsp.asm \
     libavcodec/x86/proresdsp.asm \
-    libavcodec/x86/qpelbase.asm \
+    libavcodec/x86/qpel.asm \
     libavcodec/x86/rv34dsp.asm \
     libavcodec/x86/rv40dsp.asm \
     libavcodec/x86/sbrdsp.asm \
