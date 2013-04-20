@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 3		"О программе"
 7		"MPC-BE"
 8		"Copyright © 2002-2013, смотрите файл Authors.txt"
@@ -377,7 +377,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 15		"не отображать ничего"
 16		"Прочее"
 17		"Значок в панели задач"
-18		"Показать OSD (требуется перезапуск)"
+18		"Показать OSD"
 19		"Запоминать позицию окна"
 20		"Запоминать размер окна"
 21		"Прилипать к границам экрана"
