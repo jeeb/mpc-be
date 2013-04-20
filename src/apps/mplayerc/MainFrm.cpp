@@ -12532,7 +12532,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		}
 		QueryPerformanceCounter(&m_LastSaveTime);
 
-		if (b_UseSmartSeek) {
+		if (b_UseSmartSeek && fFirst) {
 			bool bIsVideo = false;
 			BeginEnumFilters(pGB, pEF, pBF) {
 				// Checks if any Video Renderer is in the graph
