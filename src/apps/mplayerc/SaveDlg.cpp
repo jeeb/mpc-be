@@ -24,7 +24,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "SaveDlg.h"
-#include "../../filters/Filters.h"
+#include "../../filters/filters.h"
 #include "OpenImage.h"
 
 // CSaveDlg dialog
@@ -67,10 +67,14 @@ BOOL CSaveDlg::OnInitDialog()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	m_anim.SendMessage(ACM_OPEN, (WPARAM)AfxGetInstanceHandle(), (LPARAM)IDR_AVI_FILECOPY);
-	m_anim.Play(0, (UINT)-1, (UINT)-1);
-
 	CString str, in = m_name, out = m_out;
+
+	if (in.Find(_T("http://")) != -1 || in.Find(_T("ftp://")) != -1) {
+		m_anim.SendMessage(ACM_OPEN, (WPARAM)AfxGetInstanceHandle(), (LPARAM)IDR_AVI_WEB_FILECOPY);
+	} else {
+		m_anim.SendMessage(ACM_OPEN, (WPARAM)AfxGetInstanceHandle(), (LPARAM)IDR_AVI_FILECOPY);
+	}
+	m_anim.Play(0, (UINT)-1, (UINT)-1);
 
 	if (in.GetLength() > 60) {
 		in = in.Left(17) + _T("..") + in.Right(43);

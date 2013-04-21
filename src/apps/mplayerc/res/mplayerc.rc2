@@ -129,6 +129,7 @@ IDB_DXVA_ON                      PNG                     "res\\gpu.png"
 //
 
 IDR_AVI_FILECOPY                 AVI                     "res\\ani.avi"
+IDR_AVI_WEB_FILECOPY             AVI                     "res\\ani_web.avi"
 
 /////////////////////////////////////////////////////////////////////////////
 //

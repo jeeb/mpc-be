@@ -23,6 +23,7 @@
 #define IDI_AUDIOCD                     303
 #define IDI_UNKNOWN                     304
 #define IDR_AVI_FILECOPY                400
+#define IDR_AVI_WEB_FILECOPY            401
 #define IDR_HTML_INFO                   499
 #define IDR_HTML_INDEX                  500
 #define IDR_HTML_404                    501
