@@ -64,6 +64,7 @@ Update_Status UpdateChecker::isUpdateAvailable(const Version& currentVersion)
 				}
 			}
 
+			versionFile->Close();
 			delete versionFile;
 		} else {
 			updateAvailable = UPDATER_ERROR;
