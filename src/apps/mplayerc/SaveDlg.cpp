@@ -69,7 +69,7 @@ BOOL CSaveDlg::OnInitDialog()
 
 	CString str, in = m_name, out = m_out;
 
-	if (in.Find(_T("http://")) != -1 || in.Find(_T("ftp://")) != -1) {
+	if (m_in.Find(_T("http://")) != -1 || m_in.Find(_T("ftp://")) != -1) {
 		m_anim.SendMessage(ACM_OPEN, (WPARAM)AfxGetInstanceHandle(), (LPARAM)IDR_AVI_WEB_FILECOPY);
 	} else {
 		m_anim.SendMessage(ACM_OPEN, (WPARAM)AfxGetInstanceHandle(), (LPARAM)IDR_AVI_FILECOPY);

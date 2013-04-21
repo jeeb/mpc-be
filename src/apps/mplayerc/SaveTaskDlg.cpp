@@ -23,7 +23,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "SaveTaskDlg.h"
-#include "../../filters/Filters.h"
+#include "../../filters/filters.h"
 #include "OpenImage.h"
 
 // CSaveTaskDlg dialog
