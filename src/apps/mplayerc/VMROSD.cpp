@@ -77,17 +77,21 @@ CVMROSD::CVMROSD(void)
 
 	if (NULL != hBmp) {
 		CBitmap *bmp = DNew CBitmap();
-		bmp->Attach(hBmp);
 
-		if (bm.bmWidth == bm.bmHeight * 25) {
-			m_pButtonsImages = DNew CImageList();
-			m_pButtonsImages->Create(bm.bmHeight, bm.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
-			m_pButtonsImages->Add(bmp, static_cast<CBitmap*>(0));
+		if (bmp) {
+			bmp->Attach(hBmp);
 
-			m_nButtonHeight = bm.bmHeight;
+			if (bm.bmWidth == bm.bmHeight * 25) {
+				m_pButtonsImages = DNew CImageList();
+				m_pButtonsImages->Create(bm.bmHeight, bm.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
+				m_pButtonsImages->Add(bmp, static_cast<CBitmap*>(0));
+
+				m_nButtonHeight = bm.bmHeight;
+			}
+
+			delete bmp;
 		}
 
-		delete bmp;
 		DeleteObject(hBmp);
 	}
 
@@ -97,7 +101,10 @@ CVMROSD::CVMROSD(void)
 CVMROSD::~CVMROSD()
 {
 	Stop();
-	m_MemDC.DeleteDC();
+
+	if (m_MemDC) {
+		m_MemDC.DeleteDC();
+	}
 
 	if (m_pButtonsImages) {
 		delete m_pButtonsImages;
@@ -112,7 +119,21 @@ BEGIN_MESSAGE_MAP(CVMROSD, CWnd)
 	ON_WM_CREATE()
 	ON_WM_PAINT()
 	ON_WM_ERASEBKGND()
+	ON_WM_WINDOWPOSCHANGED()
 END_MESSAGE_MAP()
+
+void CVMROSD::OnWindowPosChanged(WINDOWPOS* lpwndpos)
+{
+	__super::OnWindowPosChanged(lpwndpos);
+
+	if ((lpwndpos->flags & SWP_HIDEWINDOW) && m_pWnd) {
+		CRect rc;
+		GetClientRect(&rc);
+		ClientToScreen(rc);
+
+		MoveWindow(rc.left, rc.top, 0, 0, FALSE);	
+	}
+}
 
 void CVMROSD::OnSize(UINT nType, int cx, int cy)
 {
@@ -669,12 +690,6 @@ void CVMROSD::ClearMessage(bool hide)
 		DrawWnd();
 		if (!hide && IsWindowVisible()) {
 			ShowWindow(SW_HIDE);
-
-			CRect rc;
-			GetClientRect(&rc);
-			ClientToScreen(rc);
-
-			MoveWindow(rc.left, rc.top, 0, 0, FALSE);
 		}
 	}
 }
@@ -716,7 +731,7 @@ void CVMROSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration,
 			m_OSD_Font = OSD_Font;
 		}
 
-		//if ((temp_m_FontSize != m_FontSize) || (temp_m_OSD_Font != m_OSD_Font)) {
+		if (/*(temp_m_FontSize != m_FontSize) || (temp_m_OSD_Font != m_OSD_Font)*/TRUE) {
 			if (m_MainFont.GetSafeHandle()) {
 				m_MainFont.DeleteObject();
 			}
@@ -732,7 +747,7 @@ void CVMROSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration,
 
 			m_MainFont.CreatePointFontIndirect(&lf,&m_MemDC);
 			m_MemDC.SelectObject(m_MainFont);
-		//}
+		}
 
 		if (m_pWnd) {
 			::KillTimer(m_pWnd->m_hWnd, (UINT_PTR)this);

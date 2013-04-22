@@ -160,5 +160,9 @@ protected:
 	int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	void OnPaint();
 	BOOL OnEraseBkgnd(CDC* pDC);
+
 	DECLARE_MESSAGE_MAP()
+
+public:
+	afx_msg void OnWindowPosChanged(WINDOWPOS* lpwndpos);
 };
