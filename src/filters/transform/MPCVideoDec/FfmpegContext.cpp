@@ -57,7 +57,7 @@ extern "C" {
 	void *__imp_time64 = _time64;
 #endif
 
-static const WORD PCID_NVIDIA_VP5[] = {
+static const DWORD PCID_NVIDIA_VP5 [] = {
 	// http://us.download.nvidia.com/XFree86/Linux-x86_64/313.26/README/supportedchips.html
 	// Nvidia VDPAU Feature Set D
 	0x0FC6, // GeForce GTX 650
@@ -116,7 +116,34 @@ static const WORD PCID_NVIDIA_VP5[] = {
 	0x11FA, // Quadro K4000
 };
 
-bool CheckPCID(WORD pcid, const WORD* pPCIDs, size_t len)
+static const DWORD PCID_ATI_UVD [] = {
+	0x94C7, // ATI Radeon HD 2350
+	0x94C1, // ATI Radeon HD 2400 XT
+	0x94CC, // ATI Radeon HD 2400 Series
+	0x958A, // ATI Radeon HD 2600 X2 Series
+	0x9588, // ATI Radeon HD 2600 XT
+	0x9405, // ATI Radeon HD 2900 GT
+	0x9400, // ATI Radeon HD 2900 XT
+	0x9611, // ATI Radeon 3100 Graphics
+	0x9610, // ATI Radeon HD 3200 Graphics
+	0x9614, // ATI Radeon HD 3300 Graphics
+	0x95C0, // ATI Radeon HD 3400 Series (and others)
+	0x95C5, // ATI Radeon HD 3400 Series (and others)
+	0x95C4, // ATI Radeon HD 3400 Series (and others)
+	0x94C3, // ATI Radeon HD 3410
+	0x9589, // ATI Radeon HD 3600 Series (and others)
+	0x9598, // ATI Radeon HD 3600 Series (and others)
+	0x9591, // ATI Radeon HD 3600 Series (and others)
+	0x9501, // ATI Radeon HD 3800 Series (and others)
+	0x9505, // ATI Radeon HD 3800 Series (and others)
+	0x9507, // ATI Radeon HD 3830
+	0x9513, // ATI Radeon HD 3850 X2
+	0x9515, // ATI Radeon HD 3850 AGP
+	0x950F, // ATI Radeon HD 3850 X2
+};
+
+
+bool CheckPCID(DWORD pcid, const DWORD* pPCIDs, size_t len)
 {
 	for (size_t i = 0; i < len; i++) {
 		if (pcid == pPCIDs[i]) {
@@ -127,7 +154,10 @@ bool CheckPCID(WORD pcid, const WORD* pPCIDs, size_t len)
 	return false;
 }
 
-#define CHECK_AVC_L52_SIZE(w, h) ((w) <= 4096 && (h) <= 4096 && (w) * (h) <= 36864 * 16 * 16)
+bool IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice)
+{
+	return (nPCIVendor == PCIV_ATI && CheckPCID(nPCIDevice, PCID_ATI_UVD, _countof(PCID_ATI_UVD)));
+}
 
 inline MpegEncContext* GetMpegEncContext(struct AVCodecContext* pAVCtx)
 {
@@ -320,17 +350,29 @@ int FFH264CheckCompatibility (int nWidth, int nHeight, struct AVCodecContext* pA
 	return Flags;
 }
 
-void CopyScalingMatrix (DXVA_Qmatrix_H264* pDest, PPS* pps)
+void CopyScalingMatrix (DXVA_Qmatrix_H264* pDest, PPS* pps, DWORD nPCIVendor, DWORD nPCIDevice)
 {
 	int i, j;
 	memset(pDest, 0, sizeof(DXVA_Qmatrix_H264));
-	for (i = 0; i < 6; i++)
-		for (j = 0; j < 16; j++)
-			pDest->bScalingLists4x4[i][j] = pps->scaling_matrix4[i][zigzag_scan[j]];
 
-	for (i = 0; i < 64; i++) {
-		pDest->bScalingLists8x8[0][i] = pps->scaling_matrix8[0][ff_zigzag_direct[i]];
-		pDest->bScalingLists8x8[1][i] = pps->scaling_matrix8[3][ff_zigzag_direct[i]];
+	if (IsATIUVD(nPCIVendor, nPCIDevice)) {
+		for (i = 0; i < 6; i++)
+			for (j = 0; j < 16; j++)
+				pDest->bScalingLists4x4[i][j] = pps->scaling_matrix4[i][j];
+
+		for (i = 0; i < 64; i++) {
+			pDest->bScalingLists8x8[0][i] = pps->scaling_matrix8[0][i];
+			pDest->bScalingLists8x8[1][i] = pps->scaling_matrix8[3][i];
+		}
+	} else {
+		for (i = 0; i < 6; i++)
+			for (j = 0; j < 16; j++)
+				pDest->bScalingLists4x4[i][j] = pps->scaling_matrix4[i][zigzag_scan[j]];
+
+		for (i = 0; i < 64; i++) {
+			pDest->bScalingLists8x8[0][i] = pps->scaling_matrix8[0][ff_zigzag_direct[i]];
+			pDest->bScalingLists8x8[1][i] = pps->scaling_matrix8[3][ff_zigzag_direct[i]];
+		}
 	}
 }
 
@@ -349,7 +391,7 @@ USHORT FFH264FindRefFrameIndex (USHORT num_frame, DXVA_PicParams_H264* pDXVAPicP
 	return 127;
 }
 
-HRESULT FFH264BuildPicParams (DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_H264* pDXVAScalingMatrix, int* nFieldType, int* nSliceType, struct AVCodecContext* pAVCtx, int* nPictStruct)
+HRESULT FFH264BuildPicParams (struct AVCodecContext* pAVCtx, DWORD nPCIVendor, DWORD nPCIDevice, DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_H264* pDXVAScalingMatrix, int* nFieldType, int* nSliceType, int* nPictStruct)
 {
 	H264Context*			h = (H264Context*) pAVCtx->priv_data;
 	SPS*					cur_sps;
@@ -452,7 +494,7 @@ HRESULT FFH264BuildPicParams (DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_
 			pDXVAPicParams->CurrFieldOrderCnt[1] = current_picture->field_poc[1];
 		}
 
-		CopyScalingMatrix (pDXVAScalingMatrix, cur_pps);
+		CopyScalingMatrix (pDXVAScalingMatrix, cur_pps, nPCIVendor, nPCIDevice);
 		hr = S_OK;
 	}
 
@@ -953,13 +995,14 @@ void FFGetOutputSize (struct AVCodecContext* pAVCtx, AVFrame* pFrame, int* OutWi
 	}
 }
 
+#define CHECK_AVC_L52_SIZE(w, h) ((w) <= 4096 && (h) <= 4096 && (w) * (h) <= 36864 * 16 * 16)
 BOOL DXVACheckFramesize (int width, int height, DWORD nPCIVendor, DWORD nPCIDevice)
 {
 	width = (width + 15) & ~15; // (width + 15) / 16 * 16;
 	height = (height + 15) & ~15; // (height + 15) / 16 * 16;
 
 	if (nPCIVendor == PCIV_nVidia) {
-		if (CheckPCID((WORD)nPCIDevice, PCID_NVIDIA_VP5, _countof(PCID_NVIDIA_VP5)) && width <= 4096 && height <= 4096 && width * height <= 4080 * 4080) {
+		if (CheckPCID(nPCIDevice, PCID_NVIDIA_VP5, _countof(PCID_NVIDIA_VP5)) && width <= 4096 && height <= 4096 && width * height <= 4080 * 4080) {
 			// tested H.264 on VP5 (GT 610, GTX 660 Ti)
 			// 4080x4080 = 65025 macroblocks
 			return TRUE;

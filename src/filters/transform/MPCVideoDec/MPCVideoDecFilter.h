@@ -302,6 +302,7 @@ public:
 	inline bool					IsReorderBFrame()		{ return m_bReorderBFrame; };
 	inline bool					IsEvo()					{ return m_bIsEVO; };
 	inline DWORD				GetPCIVendor()			{ return m_nPCIVendor; };
+	inline DWORD				GetPCIDevice()			{ return m_nPCIDevice; };
 	inline double				GetRate()				{ return m_dRate; };
 	bool						IsDXVASupported();
 	void						UpdateAspectRatio();
