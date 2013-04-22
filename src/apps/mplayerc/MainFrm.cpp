@@ -656,6 +656,7 @@ CMainFrame::CMainFrame() :
 	m_fTrayIcon(false),
 	m_pFullscreenWnd(NULL),
 	m_pVideoWnd(NULL),
+	m_pOSDWnd(NULL),
 	m_bRemainingTime(false),
 	m_bOSDLocalTime(false),
 	m_bOSDFileName(false),
@@ -692,7 +693,8 @@ CMainFrame::CMainFrame() :
 	m_fYoutubeThreadWork(TH_CLOSE),
 	m_YoutubeThread(NULL),
 	m_YoutubeCurrent(0),
-	m_YoutubeTotal(0)
+	m_YoutubeTotal(0),
+	m_pBFmadVR(NULL)
 {
 	m_Lcd.SetVolumeRange(0, 100);
 	m_LastSaveTime.QuadPart = 0;
@@ -1433,36 +1435,36 @@ void CMainFrame::CreateFlyBar()
 bool CMainFrame::FlyBarSetPos()
 {
 	if (!m_wndFlyBar || !(::IsWindow(m_wndFlyBar.GetSafeHwnd()))) {
-		return 0;
+		return false;
 	}
 
 	if (IsMadVRExclusiveMode || !m_wndView.IsWindowVisible()) {
 		if (m_wndFlyBar.IsWindowVisible()) {
 			m_wndFlyBar.ShowWindow(SW_HIDE);
 		}
-		return 0;		
+		return false;
 	}
 
-	IBaseFilter* pBF = FindFilter(CLSID_madVR, pGB);
-	if (pBF) {
-		CComQIPtr<IMadVRSettings> pMVS = pBF;
-		BOOL boolVal;
-		if (pMVS) pMVS->SettingsGetBoolean(L"enableExclusive", &boolVal);
+	if (m_pBFmadVR) {
+		CComQIPtr<IMadVRSettings> pMVS = m_pBFmadVR;
+		BOOL boolVal = FALSE;
+		if (pMVS) {
+			pMVS->SettingsGetBoolean(L"enableExclusive", &boolVal);
+		}
 		if (m_fFullScreen && boolVal) {
 			if (m_wndFlyBar.IsWindowVisible()) {
 				m_wndFlyBar.ShowWindow(SW_HIDE);
 			}
-			return 0;
+			return false;
 		}
 
-		CComQIPtr<IMadVRExclusiveModeInfo> pMVEMI = pBF;
+		CComQIPtr<IMadVRExclusiveModeInfo> pMVEMI = m_pBFmadVR;
 		if (pMVEMI) {
 			if (pMVEMI->IsExclusiveModeActive()) {
 				if (m_wndFlyBar.IsWindowVisible()) {
 					m_wndFlyBar.ShowWindow(SW_HIDE);
 				}
-
-				return 0;
+				return false;
 			}
 		}
 	}
@@ -1479,20 +1481,19 @@ bool CMainFrame::FlyBarSetPos()
 			if (AfxGetAppSettings().fFlybarOnTop && !m_wndFlyBar.IsWindowVisible()) {
 				m_wndFlyBar.ShowWindow(SW_SHOWNOACTIVATE);
 			}
-			return 1;
+			return true;
 		} else {
 			if (m_wndFlyBar.IsWindowVisible()) {
 				m_wndFlyBar.ShowWindow(SW_HIDE);
 			}
-			return 0;
 		}
 	} else {
 		if (m_wndFlyBar.IsWindowVisible()) {
 			m_wndFlyBar.ShowWindow(SW_HIDE);
 		}
-		return 0;
 	}
-	return 0;
+
+	return false;
 }
 
 void CMainFrame::DestroyFlyBar()
@@ -1509,54 +1510,30 @@ void CMainFrame::DestroyFlyBar()
 
 void CMainFrame::CreateOSDBar()
 {
-		DWORD exstyle = WS_EX_TOPMOST|WS_EX_TRANSPARENT|WS_EX_LAYERED;
-		if (!m_OSD.CreateEx(exstyle, AfxRegisterWndClass(0), NULL, WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS, CRect(0, 0, 0, 0), this, 0, NULL)) {
-			TRACE(_T("Failed to create OSD Window\n"));
-			return;
-		}
-		m_OSD.SetLayeredWindowAttributes(RGB(255,0,255), 255 - AfxGetAppSettings().nOSDTransparent, LWA_ALPHA|LWA_COLORKEY);
+	DWORD exstyle = WS_EX_TOPMOST|WS_EX_TRANSPARENT|WS_EX_LAYERED;
+	if (!m_OSD.CreateEx(exstyle, AfxRegisterWndClass(0), NULL, WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS, CRect(0, 0, 0, 0), this, 0, NULL)) {
+		TRACE(_T("Failed to create OSD Window\n"));
+		return;
+	}
+	m_OSD.SetLayeredWindowAttributes(RGB(255,0,255), 255 - AfxGetAppSettings().nOSDTransparent, LWA_ALPHA|LWA_COLORKEY);
 
-		m_pOSDWnd = &m_wndView;
-		if (AfxGetAppSettings().fShowOSD) {
-			m_OSD.Start(m_pOSDWnd);
-		}
+	m_pOSDWnd = &m_wndView;
+	if (AfxGetAppSettings().fShowOSD) {
+		m_OSD.Start(m_pOSDWnd);
+	}
 }
 
 bool CMainFrame::OSDBarSetPos()
 {
 	if (!m_OSD || !(::IsWindow(m_OSD.GetSafeHwnd()))) {
-		return 0;
+		return false;
 	}
 
-	if (IsMadVRExclusiveMode || !m_wndView.IsWindowVisible()) {
+	if (m_pBFmadVR || !m_wndView.IsWindowVisible()) {
 		if (m_OSD.IsWindowVisible()) {
 			m_OSD.ShowWindow(SW_HIDE);
 		}
-		return 0;		
-	}
-
-	IBaseFilter* pBF = FindFilter(CLSID_madVR, pGB);
-	if (pBF) {
-		CComQIPtr<IMadVRSettings> pMVS = pBF;
-		BOOL boolVal;
-		if (pMVS) pMVS->SettingsGetBoolean(L"enableExclusive", &boolVal);
-		if (m_fFullScreen && boolVal) {
-			if (m_OSD.IsWindowVisible()) {
-				m_OSD.ShowWindow(SW_HIDE);
-			}
-			return 0;
-		}
-
-		CComQIPtr<IMadVRExclusiveModeInfo> pMVEMI = pBF;
-		if (pMVEMI) {
-			if (pMVEMI->IsExclusiveModeActive()) {
-				if (m_OSD.IsWindowVisible()) {
-					m_OSD.ShowWindow(SW_HIDE);
-				}
-
-				return 0;
-			}
-		}
+		return false;
 	}
 
 	CRect r_wndView;
@@ -1569,20 +1546,19 @@ bool CMainFrame::OSDBarSetPos()
 	m_wndView.GetWindowRect(&MainWndRect);
 	MainWndRect.right -= pos;
 	m_OSD.SetWndRect(MainWndRect);
-	if (m_OSD && m_OSD.IsWindowVisible()) {
+	if (m_OSD.IsWindowVisible()) {
 		m_OSD.DrawWnd();
 	}
 
-	if (r_wndView.bottom-r_wndView.top > 40 && r_wndView.right-r_wndView.left > 100) {
-		return 1;
+	if (r_wndView.bottom - r_wndView.top > 40 && r_wndView.right - r_wndView.left > 100) {
+		return true;
 	} else {
 		if (m_OSD.IsWindowVisible()) {
 			m_OSD.ShowWindow(SW_HIDE);
 		}
-		return 0;
 	}
 	
-	return 0;
+	return false;
 }
 
 void CMainFrame::DestroyOSDBar()
@@ -14401,9 +14377,9 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 		IsMadVRExclusiveMode = false;
 		// madVR - register Callback function for detect Entered to ExclusiveMode
-		IBaseFilter* pBF = FindFilter(CLSID_madVR, pGB);
-		if (pBF) {
-			CComQIPtr<IMadVRExclusiveModeCallback> pMVEMC = pBF;
+		m_pBFmadVR = FindFilter(CLSID_madVR, pGB);
+		if (m_pBFmadVR) {
+			CComQIPtr<IMadVRExclusiveModeCallback> pMVEMC = m_pBFmadVR;
 			if (pMVEMC) {
 				pMVEMC->Register(MadVRExclusiveModeCallback, this);
 			}
@@ -14592,9 +14568,8 @@ void CMainFrame::CloseMediaPrivate()
 	SetPlaybackMode(PM_NONE);
 
 	// madVR - unregister Callback function
-	IBaseFilter* pBF = FindFilter(CLSID_madVR, pGB);
-	if (pBF) {
-		CComQIPtr<IMadVRExclusiveModeCallback> pMVEMC = pBF;
+	if (m_pBFmadVR) {
+		CComQIPtr<IMadVRExclusiveModeCallback> pMVEMC = m_pBFmadVR;
 		if (pMVEMC) {
 			pMVEMC->Unregister(MadVRExclusiveModeCallback, this);
 		}
@@ -14650,6 +14625,8 @@ void CMainFrame::CloseMediaPrivate()
 		pGB->RemoveFromROT();
 		pGB.Release();
 	}
+
+	m_pBFmadVR = NULL;
 
 	if (pGB2) {
 		m_pMFVP2	= NULL;
