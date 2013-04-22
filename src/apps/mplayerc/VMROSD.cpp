@@ -132,6 +132,8 @@ void CVMROSD::OnWindowPosChanged(WINDOWPOS* lpwndpos)
 		ClientToScreen(rc);
 
 		MoveWindow(rc.left, rc.top, 0, 0, FALSE);	
+
+		m_strMessage.Empty();
 	}
 }
 
@@ -760,7 +762,7 @@ void CVMROSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration,
 	} else if (m_pMVTO) {
 		m_pMVTO->OsdDisplayMessage(strMsg, nDuration);
 	} else if (m_pWnd) {
-		if ( nPos != OSD_DEBUG ) {
+		if (nPos != OSD_DEBUG) {
 			m_nMessagePos	= nPos;
 			m_strMessage	= strMsg;
 		} else {
@@ -913,6 +915,18 @@ void CVMROSD::DrawWnd()
 		return;
 	}
 
+	static CString	strMessageCashed;
+	static CRect	MainWndRectCashed(0, 0, 0, 0);
+
+	if (strMessageCashed == m_strMessage && MainWndRectCashed == m_MainWndRect) {
+		return;
+	}
+
+	if (IsWindowVisible() && IsWindowEnabled()) {
+		strMessageCashed	= m_strMessage;
+		MainWndRectCashed	= m_MainWndRect;
+	}
+
 	CClientDC dc (this);
 
 	AppSettings& s = AfxGetAppSettings();
@@ -946,12 +960,12 @@ void CVMROSD::DrawWnd()
 
 	switch (m_nMessagePos) {
 		case OSD_TOPLEFT :
-			rectMessages = CRect  (0, 0, min((rectText.right + 10), m_MainWndRect.Width() - 20), (rectText.bottom + 2));
+			rectMessages = CRect(0, 0, min((rectText.right + 10), m_MainWndRect.Width() - 20), min((rectText.bottom + 2), m_MainWndRect.Height() - 20));
 			break;
 		case OSD_TOPRIGHT :
 		default :
 			int imax = max(0, m_MainWndRect.Width() - rectText.Width() - 30);
-			rectMessages = CRect  (imax, 0, (m_MainWndRect.Width() - 20) + imax, rectText.bottom + 2);
+			rectMessages = CRect(imax, 0, (m_MainWndRect.Width() - 20) + imax, min((rectText.bottom + 2), m_MainWndRect.Height() - 20));
 			break;
 	}
 
@@ -959,7 +973,7 @@ void CVMROSD::DrawWnd()
 	temp_BM.DeleteObject();
 	temp_DC.DeleteDC();
 
-	MoveWindow(m_MainWndRect.left + 10 + rectMessages.left, m_MainWndRect.top + 10, rectMessages.Width()-rectMessages.left, rectMessages.Height(), FALSE);
+	MoveWindow(m_MainWndRect.left + 10 + rectMessages.left, m_MainWndRect.top + 10, rectMessages.Width() - rectMessages.left, rectMessages.Height(), FALSE);
 
 	CRect rcBar;
 	GetClientRect(&rcBar);
