@@ -669,6 +669,12 @@ void CVMROSD::ClearMessage(bool hide)
 		DrawWnd();
 		if (!hide && IsWindowVisible()) {
 			ShowWindow(SW_HIDE);
+
+			CRect rc;
+			GetClientRect(&rc);
+			ClientToScreen(rc);
+
+			MoveWindow(rc.left, rc.top, 0, 0, FALSE);
 		}
 	}
 }
@@ -938,7 +944,7 @@ void CVMROSD::DrawWnd()
 	temp_BM.DeleteObject();
 	temp_DC.DeleteDC();
 
-	MoveWindow(m_MainWndRect.left + 10 + rectMessages.left, m_MainWndRect.top + 10, rectMessages.Width()-rectMessages.left, rectMessages.Height(), 0);
+	MoveWindow(m_MainWndRect.left + 10 + rectMessages.left, m_MainWndRect.top + 10, rectMessages.Width()-rectMessages.left, rectMessages.Height(), FALSE);
 
 	CRect rcBar;
 	GetClientRect(&rcBar);
