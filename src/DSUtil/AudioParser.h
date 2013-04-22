@@ -40,20 +40,36 @@
 #define EAC3_FRAME_TYPE_AC3_CONVERT  2
 #define EAC3_FRAME_TYPE_RESERVED     3
 
-int GetAC3FrameSize  (const BYTE* buf); // AC3
-int GetEAC3FrameSize (const BYTE* buf); // E-AC3
-int GetMLPFrameSize  (const BYTE* buf); // TrueHD and MLP
-int GetDTSFrameSize  (const BYTE* buf); // DTS
-int GetDTSHDFrameSize(const BYTE* buf); // DTS-HD
+//int GetAC3FrameSize  (const BYTE* buf); // AC3
+//int GetEAC3FrameSize (const BYTE* buf); // E-AC3
+//int GetMLPFrameSize  (const BYTE* buf); // TrueHD and MLP
+//int GetDTSFrameSize  (const BYTE* buf); // DTS
+int GetDTSHDFrameSize(const BYTE* buf); // DTS-HD, need >= 10 bytes
 int GetADTSFrameSize (const BYTE* buf, int* headersize);
 
-int ParseAC3Header     (const BYTE* buf, int* samplerate, int* channels, int* framelength, int* bitrate);
-int ParseEAC3Header    (const BYTE* buf, int* samplerate, int* channels, int* framelength, int* frametype);
-int ParseMLPHeader     (const BYTE* buf, int* samplerate, int* channels, int* framelength, WORD* bitdepth, bool* isTrueHD); // TrueHD and MLP
-int ParseDTSHeader     (const BYTE* buf, int* samplerate, int* channels, int* framelength, int* tr_bitrate);
-int ParseHdmvLPCMHeader(const BYTE* buf, int* samplerate, int* channels);
-int ParseADTSAACHeader (const BYTE* buf, int* samplerate, int* channels, int* framelength, int* headersize);
+//int ParseAC3Header     (const BYTE* buf, int* samplerate, int* channels, int* framelength, int* bitrate);
+//int ParseEAC3Header    (const BYTE* buf, int* samplerate, int* channels, int* framelength, int* frametype);
+//int ParseMLPHeader     (const BYTE* buf, int* samplerate, int* channels, int* framelength, WORD* bitdepth, bool* isTrueHD); // TrueHD and MLP
+//int ParseDTSHeader     (const BYTE* buf, int* samplerate, int* channels, int* framelength, int* tr_bitrate);
+//int ParseHdmvLPCMHeader(const BYTE* buf, int* samplerate, int* channels);
 bool ParseAACLatmHeader(const BYTE* buf, int len, int* samplerate, int* channels, BYTE* extra, unsigned int* extralen);
 
 DWORD GetDefChannelMask(WORD nChannels);
 DWORD GetVorbisChannelMask(WORD nChannels);
+
+struct audioframe_t {
+	int size;
+	int samplerate;
+	int channels;
+	int samples;
+	int param1;
+	int param2;
+};
+
+int ParseMPAHeader     (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 4 bytes,  param1 = bitrate // not tested!
+int ParseAC3Header     (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 7 bytes,  param1 = bitrate
+int ParseEAC3Header    (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 6 bytes,  param1 = frame type
+int ParseMLPHeader     (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 12 bytes, param1 = bitdepth, param2 = TrueHD flag
+int ParseDTSHeader     (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 10 bytes, param1 = transmission bitrate
+int ParseHdmvLPCMHeader(const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 4 bytes,  param1 = bitdepth
+int ParseADTSAACHeader (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 7 bytes,  param1 = header size // not tested!

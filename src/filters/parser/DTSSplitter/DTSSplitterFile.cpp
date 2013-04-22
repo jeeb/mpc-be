@@ -118,17 +118,17 @@ HRESULT CDTSSplitterFile::Init()
 		}
 
 		// DTS header
-		int channels, targeted_bitrate;
-		int samplerate = 0;
-		m_framesize = ParseDTSHeader(buf, &samplerate, &channels, &m_framelength, &targeted_bitrate);
+		audioframe_t aframe;
+		m_framesize = ParseDTSHeader(buf, &aframe);
 		if (m_framesize == 0) {
 			return E_FAIL;
 		}
+		m_framelength = aframe.samples;
 
 		Seek(dts_offset + m_framesize);
 		if(SUCCEEDED(ByteRead((BYTE*)&id, sizeof(id))) && isDTSSync(id)) {
 
-			int bitrate = int ((m_framesize) * 8i64 * samplerate / m_framelength);
+			int bitrate = int ((m_framesize) * 8i64 * aframe.samplerate / m_framelength);
 
 			m_AvgTimePerFrame = bitrate ? (10000000i64 * m_framesize * 8 / bitrate) : 0;
 
@@ -143,8 +143,8 @@ HRESULT CDTSSplitterFile::Init()
 			m_mt.formattype			= FORMAT_WaveFormatEx;
 			WAVEFORMATEX* wfe		= (WAVEFORMATEX*)m_mt.AllocFormatBuffer(sizeof(WAVEFORMATEX));
 			wfe->wFormatTag			= WAVE_FORMAT_DTS;
-			wfe->nChannels			= channels;
-			wfe->nSamplesPerSec		= samplerate;
+			wfe->nChannels			= aframe.channels;
+			wfe->nSamplesPerSec		= aframe.samplerate;
 			wfe->nAvgBytesPerSec	= (bitrate + 4) /8;
 			wfe->nBlockAlign		= m_framesize < WORD_MAX ? m_framesize : WORD_MAX;
 			wfe->wBitsPerSample		= 0;

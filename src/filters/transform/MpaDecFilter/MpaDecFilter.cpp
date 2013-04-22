@@ -829,9 +829,8 @@ HRESULT CMpaDecFilter::ProcessAC3_SPDIF()
 	BYTE* p = base;
 
 	while (p + 8 <= end) { // 8 =  AC3 header size + 1
-		int samplerate, channels, framelength, bitrate;
-
-		int size = ParseAC3Header(p, &samplerate, &channels, &framelength, &bitrate);
+		audioframe_t aframe;
+		int size = ParseAC3Header(p, &aframe);
 
 		if (size == 0) {
 			p++;
@@ -841,7 +840,7 @@ HRESULT CMpaDecFilter::ProcessAC3_SPDIF()
 			break;
 		}
 
-		if (FAILED(hr = DeliverBitstream(p, size, IEC61937_AC3, samplerate, 1536))) {
+		if (FAILED(hr = DeliverBitstream(p, size, IEC61937_AC3, aframe.samplerate, 1536))) {
 			return hr;
 		}
 
@@ -862,9 +861,8 @@ HRESULT CMpaDecFilter::ProcessEAC3_SPDIF()
 	BYTE* p = base;
 
 	while (p + 8 <= end) {
-		int samplerate, channels, framelength, frametype;
-
-		int size = ParseEAC3Header(p, &samplerate, &channels, &framelength, &frametype);
+		audioframe_t aframe;
+		int size = ParseEAC3Header(p, &aframe);
 
 		if (size == 0) {
 			p++;
@@ -892,7 +890,7 @@ HRESULT CMpaDecFilter::ProcessEAC3_SPDIF()
 			break;
 		}
 
-		hr = DeliverBitstream(m_hdmibuff, m_hdmisize, IEC61937_EAC3, samplerate, framelength * repeat);
+		hr = DeliverBitstream(m_hdmibuff, m_hdmisize, IEC61937_EAC3, aframe.samplerate, aframe.samples * repeat);
 		m_hdmicount = 0;
 		m_hdmisize  = 0;
 		if (FAILED(hr)) {
@@ -918,19 +916,16 @@ HRESULT CMpaDecFilter::ProcessTrueHD_SPDIF()
 	BYTE* p = base;
 
 	while (p + 16 <= end) {
-		int samplerate, channels, framelength;
-		WORD bitdepth;
-		bool isTrueHD;
-
-		int size = ParseMLPHeader(p, &samplerate, &channels, &framelength, &bitdepth, &isTrueHD);
+		audioframe_t aframe;
+		int size = ParseMLPHeader(p, &aframe);
 		if (size > 0) {
 			// sync frame
-			m_truehd_samplerate  = samplerate;
-			m_truehd_framelength = framelength;
+			m_truehd_samplerate  = aframe.samplerate;
+			m_truehd_framelength = aframe.samples;
 		} else {
-			int ac3size = GetAC3FrameSize(p);
+			int ac3size = ParseAC3Header(p);
 			if (ac3size == 0) {
-				ac3size = GetEAC3FrameSize(p);
+				ac3size = ParseEAC3Header(p);
 			}
 			if (ac3size > 0) {
 				if (p + ac3size > end) {
@@ -1003,12 +998,8 @@ HRESULT CMpaDecFilter::ProcessDTS_SPDIF()
 	BYTE* p = base;
 
 	while (p + 16 <= end) {
-		int samplerate, channels, framelength, bitrate;
-
-		int size  = GetDTSFrameSize(p);
-		if (size > 0) {
-			size = ParseDTSHeader(p, &samplerate, &channels, &framelength, &bitrate);
-		}
+		audioframe_t aframe;
+		int size  = ParseDTSHeader(p, &aframe);
 		if (size == 0) {
 			p++;
 			continue;
@@ -1027,12 +1018,12 @@ HRESULT CMpaDecFilter::ProcessDTS_SPDIF()
 
 		bool usehdmi = sizehd &&  GetSPDIF(dtshd);
 		if (usehdmi) {
-			if (FAILED(hr = DeliverBitstream(p, size + sizehd, IEC61937_DTSHD, samplerate, framelength))) {
+			if (FAILED(hr = DeliverBitstream(p, size + sizehd, IEC61937_DTSHD, aframe.samplerate, aframe.samples))) {
 				return hr;
 			}
 		} else {
 			BYTE type;
-			switch (framelength) {
+			switch (aframe.samples) {
 				case  512:
 					type = IEC61937_DTS1;
 					break;
@@ -1046,7 +1037,7 @@ HRESULT CMpaDecFilter::ProcessDTS_SPDIF()
 					TRACE(_T("CMpaDecFilter:ProcessDTS_SPDIF() - framelength is not supported\n"));
 					return E_FAIL;
 			}
-			if (FAILED(hr = DeliverBitstream(p, size, type, samplerate, framelength))) {
+			if (FAILED(hr = DeliverBitstream(p, size, type, aframe.samplerate, aframe.samples))) {
 				return hr;
 			}
 		}

@@ -43,7 +43,7 @@ enum {
 	unknown,
 	AC3,
 	EAC3,
-	//TrueHD,
+	TrueHD,
 	//TrueHDAC3,
 	MLP,
 	DTS,
@@ -283,7 +283,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 			for (UINT i = 1; i + 8 < len; i++) { // looking for DTS or AC3 sync
 				id = *(DWORD*)(buf + i);
-				if (isDTSSync(id) || (WORD)id == AC3_SYNC_WORD && (GetAC3FrameSize(buf + i) > 0 || GetEAC3FrameSize(buf + i) > 0)) {
+				if (isDTSSync(id) || (WORD)id == AC3_SYNC_WORD && (ParseAC3Header(buf + i) > 0 || ParseEAC3Header(buf + i) > 0)) {
 					isFound = true;
 					m_dataOffset += i;
 					break;
@@ -296,41 +296,38 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 		}
 
 		m_file.Seek(m_dataOffset, CFile::begin);
+		BYTE buf[16];
+		if (m_file.Read(&buf, 16) != 16) {
+			break;
+		}
+		audioframe_t aframe;
 
 		// DTS & DTS-HD
-		if (isDTSSync(id)) {
-			BYTE buf[16];
-			if (m_file.Read(&buf, 16) != 16) {
-				break;
-			}
-
+		if (isDTSSync(id) && ParseDTSHeader(buf, &aframe)) {
 			// DTS header
-			int fsize = 0, targeted_bitrate;
-			fsize = ParseDTSHeader(buf, &m_samplerate, &m_channels, &m_framelength, &targeted_bitrate);
-			if (fsize == 0) {
-				break;
-			}
+			int fsize     = aframe.size;
+			m_samplerate  = aframe.samplerate;
+			m_channels    = aframe.channels;
+			m_framelength = aframe.samples;
 			m_streamtype = DTS;
 
 			// DTS-HD header and zero padded
-			unsigned long sync = -1;
-			unsigned int HD_size = 0;
+			DWORD sync = -1;
+			int HD_size = 0;
 			int zero_bytes = 0;
 
-			m_file.Seek(m_dataOffset+fsize, CFile::begin);
-			m_file.Read(&sync, sizeof(sync));
-			if (id == DTS_SYNC_WORD && sync == DTSHD_SYNC_WORD && m_file.Read(&buf, 8)==8) {
-				unsigned char isBlownUpHeader = (buf[1]>>5)&1;
-				if (isBlownUpHeader) {
-					HD_size = ((buf[2]&1)<<19 | buf[3]<<11 | buf[4]<<3 | buf[5]>>5) + 1;
-				} else {
-					HD_size = ((buf[2]&31)<<11 | buf[3]<<3 | buf[4]>>5) + 1;
-				}
+			m_file.Seek(m_dataOffset + fsize, CFile::begin);
+			if (m_file.Read(&buf, 16) == 16) {
+				sync = *(DWORD*)buf;
+				HD_size = GetDTSHDFrameSize(buf);
+			}
+
+			if (HD_size) {
 				//TODO: get more information about DTS-HD
 				m_streamtype = DTSHD;
 				m_fixedframesize = false;
 			} else if (sync == 0 && fsize < 2048) { // zero padded?
-				m_file.Seek(m_dataOffset+2048, CFile::begin);
+				m_file.Seek(m_dataOffset + 2048, CFile::begin);
 				m_file.Read(&sync, sizeof(sync));
 				if (sync == id) {
 					zero_bytes = 2048 - fsize;
@@ -353,49 +350,29 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 		}
 		// AC3 & E-AC3
 		else if ((WORD)id == AC3_SYNC_WORD) {
-			BYTE buf[20];
-			if (m_file.Read(&buf, 8) != 8) {
-				break;
-			}
+			int fsize = 0;
 
-			BYTE bsid = (buf[5] >> 3);
-			int fsize   = 0;
-			//int HD_size = 0;
-
-			// AC3 header
-			if (bsid <= 10) {
-				fsize = ParseAC3Header(buf, &m_samplerate, &m_channels, &m_framelength, &m_bitrate);
-				if (fsize == 0) {
-					break;
-				}
+			if (ParseAC3Header(buf, &aframe)) {
+				// AC3 header
+				fsize         = aframe.size;
+				m_samplerate  = aframe.samplerate;
+				m_channels    = aframe.channels;
+				m_framelength = aframe.samples;
+				m_bitrate     = aframe.param1;
 				m_streamtype = AC3;
 				m_subtype = MEDIASUBTYPE_DOLBY_AC3;
-				/*
-				// TrueHD+AC3
-				m_file.Seek(m_dataOffset+fsize, CFile::begin);
-				if (m_file.Read(&buf, 20) == 20) {
-					int samplerate2, channels2, framelength2;
-					HD_size = ParseTrueHDHeader(buf, &samplerate2, &channels2, &framelength2);
-					if (HD_size > 0) {
-						m_streamtype = TrueHDAC3;
-						m_fixedframesize = false;
-					}
-				}
-				*/
-			}
-			// E-AC3 header
-			else if (bsid <= 16) {
-				int frametype;
-				fsize = ParseEAC3Header(buf, &m_samplerate, &m_channels, &m_framelength, &frametype);
-				if (fsize == 0) {
-					break;
-				}
+			} // E-AC3 header
+			else if (ParseEAC3Header(buf, &aframe)) {
+				fsize         = aframe.size;
+				m_samplerate  = aframe.samplerate;
+				m_channels    = aframe.channels;
+				m_framelength = aframe.samples;
+				int frametype = aframe.param1;
 
 				m_file.Seek(m_dataOffset+fsize, CFile::begin);
 				if (m_file.Read(&buf, 8) == 8) {
-					int samplerate2, channels2, samples2, frametype2;
-					int fsize2 = ParseEAC3Header(buf, &samplerate2, &channels2, &samples2, &frametype2);
-					if (fsize2 > 0 && frametype2 == EAC3_FRAME_TYPE_DEPENDENT) {
+					int fsize2 = ParseEAC3Header(buf, &aframe);
+					if (fsize2 > 0 && aframe.param1 == EAC3_FRAME_TYPE_DEPENDENT) {
 						fsize += fsize2;
 					}
 				}
@@ -415,10 +392,6 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 		}
 		// SPDIF AC3
 		else if (waveheader && id == IEC61937_SYNC_WORD) {
-			BYTE buf[16];
-			if (m_file.Read(&buf, 16) != 16) {
-				break;
-			}
 			m_framesize = ParseAC3IEC61937Header(buf);
 			if (m_framesize == 0) {
 				break;
@@ -435,62 +408,25 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			m_streamtype = SPDIF_AC3;
 		}
 		// MLP
-		else if (id2 == MLP_SYNC_WORD) {
-			BYTE buf[20];
-			if (m_file.Read(&buf, 20) != 20) {
-				break;
+		else if ((id2 == MLP_SYNC_WORD /*|| id2 == TRUEHD_SYNC_WORD*/) && ParseMLPHeader(buf, &aframe)) {
+			m_framesize   = aframe.size;
+			m_samplerate  = aframe.samplerate;
+			m_channels    = aframe.channels;
+			m_framelength = aframe.samples;
+			m_bitdepth    = aframe.param1;
+			/*if (aframe.param2) {
+				m_streamtype = TrueHD;
+				m_subtype    = MEDIASUBTYPE_DOLBY_TRUEHD;
+			} else */{
+				m_streamtype = MLP;
+				m_subtype    = MEDIASUBTYPE_MLP;
 			}
-
-			bool istruehd;
-			m_framesize = ParseMLPHeader(buf, &m_samplerate, &m_channels, &m_framelength, &m_bitdepth, &istruehd);
-			if (m_framesize == 0) {
-				break;
-			}
-
-			m_streamtype = MLP;
 			m_fixedframesize = false;
 
 			m_bitrate = (int)(m_framesize * 8i64 * m_samplerate / m_framelength); // inaccurate, because framesize is not constant
 
 			m_wFormatTag = WAVE_FORMAT_UNKNOWN;
-			m_subtype    = MEDIASUBTYPE_MLP;
-		}
-		/*
-		// TrueHD
-		else if (id2 == TRUEHD_SYNC_WORD) {
-			BYTE buf[20];
-			if (m_file.Read(&buf, 20) != 20)
-				break;
-			int fsize  = 0;
-			int fsize2 = 0;
-			fsize = ParseTrueHDHeader(buf, &m_samplerate, &m_channels, &m_framelength);
-			if (fsize == 0)
-				break;
-			m_streamtype = TrueHD;
-			m_fixedframesize = false;
-
-			// TrueHD+AC3
-			if (m_file.Read(&buf, 8) == 8) {
-				int samplerate2, channels2, framelength2, bitrate2;
-				fsize2 = ParseAC3Header(buf, &samplerate2, &channels2, &framelength2, &bitrate2);
-				if (fsize2 > 0) {
-					m_streamtype = TrueHDAC3;
-
-					if (samplerate2 > 0) {
-						m_samplerate  = samplerate2;
-						m_framelength = framelength2;
-					}
-				}
-			}
-
-			m_framesize = fsize + fsize2;
-			m_bitrate   = int ((m_framesize) * 8i64 * m_samplerate / m_framelength);
-			//m_bitdepth = 24;
-
-			m_wFormatTag = WAVE_FORMAT_UNKNOWN;
-			m_subtype = MEDIASUBTYPE_DOLBY_TRUEHD;
-		*/
-		else {
+		} else {
 			break;
 		}
 

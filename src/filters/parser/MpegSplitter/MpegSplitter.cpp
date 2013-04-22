@@ -2181,8 +2181,8 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 		}
 
 		BYTE* start = m_p->GetData();
-		int samplerate, channels;
-		size_t packet_size = ParseHdmvLPCMHeader(start, &samplerate, &channels);
+		audioframe_t aframe;
+		size_t packet_size = ParseHdmvLPCMHeader(start, &aframe);
 
 		if (!packet_size || packet_size > m_p->GetCount()) {
 			if (!packet_size) {
@@ -2192,13 +2192,13 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 		}
 
 		if (!m_hdmvLPCM_samplerate) {
-			m_hdmvLPCM_samplerate	= samplerate;
-			m_hdmvLPCM_channels		= channels;
+			m_hdmvLPCM_samplerate	= aframe.samplerate;
+			m_hdmvLPCM_channels		= aframe.channels;
 			m_hdmvLPCM_packetsize	= packet_size;
 		}
 
-		if (m_hdmvLPCM_samplerate != samplerate
-			|| m_hdmvLPCM_channels != channels
+		if (m_hdmvLPCM_samplerate != aframe.samplerate
+			|| m_hdmvLPCM_channels != aframe.channels
 			|| m_hdmvLPCM_packetsize != packet_size) {
 			m_p.Free();
 			return S_OK;
@@ -2243,7 +2243,7 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 
 			if (start <= end-8) {
 				int size;
-				if ((size = GetAC3FrameSize(start)) > 0) {
+				if ((size = ParseAC3Header(start)) > 0) {
 
 					if (size <= (end-start)) {
 
@@ -2355,18 +2355,15 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 		BYTE* end	= start + m_p->GetCount();
 
 		while (start + 16 <= end) {
-			int samplerate, channels, framelength;
-			WORD bitdepth;
-			bool isTrueHD;
-
-			int size = ParseMLPHeader(start, &samplerate, &channels, &framelength, &bitdepth, &isTrueHD);
+			audioframe_t aframe;
+			int size = ParseMLPHeader(start, &aframe);
 			if (size > 0) {
 				// sync frame
-				m_truehd_framelength = framelength;
+				m_truehd_framelength = aframe.samples;
 			} else {
-				int ac3size = GetAC3FrameSize(start);
+				int ac3size = ParseAC3Header(start);
 				if (ac3size == 0) {
-					ac3size = GetEAC3FrameSize(start);
+					ac3size = ParseEAC3Header(start);
 				}
 				if (ac3size > 0) {
 					if (start + ac3size > end) {
