@@ -698,7 +698,7 @@ int ParseMPAHeader(const BYTE* buf, audioframe_t* audioframe) // not tested!
 {
 	// http://mpgedit.org/mpgedit/mpeg_format/mpeghdr.htm
 
-	static const short mpa_bitrates[5][16] = {
+	static const short mpa_rates[5][16] = {
 		{ 0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 0 },
 		{ 0, 32, 48, 56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 384, 0 },
 		{ 0, 32, 40, 48,  56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 0 },
@@ -724,23 +724,23 @@ int ParseMPAHeader(const BYTE* buf, audioframe_t* audioframe) // not tested!
 	int bitrate;
 	if (mpaver_id == 0x3) { // MPEG Version 1
 		if (layer_desc == 0x3) { // Layer 1
-			bitrate = mpa_bitrates[0][bitrate_index];
+			bitrate = mpa_rates[0][bitrate_index];
 		} else if (layer_desc == 0x2) { // Layer 2
-			bitrate = mpa_bitrates[1][bitrate_index];
+			bitrate = mpa_rates[1][bitrate_index];
 		} else { // Layer 3
-			bitrate = mpa_bitrates[2][bitrate_index];
+			bitrate = mpa_rates[2][bitrate_index];
 		}
 	} else { // MPEG Version 2, MPEG Version 2.5
 		if (layer_desc == 0x3) { // Layer 1
-			bitrate = mpa_bitrates[3][bitrate_index];
+			bitrate = mpa_rates[3][bitrate_index];
 		} else { // Layer 2, Layer 3
-			bitrate = mpa_bitrates[4][bitrate_index];
+			bitrate = mpa_rates[4][bitrate_index];
 		}
 	}
 	bitrate *= 1000;
 
 	int samplerate = mpa_v1_samplerates[samplerate_index];
-	if (mpaver_id == 0x2) { // MPEG Version 1
+	if (mpaver_id == 0x2) { // MPEG Version 2
 		samplerate /= 2;
 	} else if (mpaver_id == 0x0) { // MPEG Version 2.5
 		samplerate /= 4;
@@ -756,11 +756,10 @@ int ParseMPAHeader(const BYTE* buf, audioframe_t* audioframe) // not tested!
 	if (audioframe) {
 		audioframe->size       = frame_size;
 		audioframe->samplerate = samplerate;
-		int channels;
 		if ((buf[3] & 0xc0) == 0xc0) {
-			channels = 1;
+			audioframe->channels = 1;
 		} else {
-			channels = 2;
+			audioframe->channels = 2;
 		}
 		int samples;
 		if (layer_desc == 0x3) { // Layer 1
@@ -777,9 +776,9 @@ int ParseMPAHeader(const BYTE* buf, audioframe_t* audioframe) // not tested!
 
 int ParseAC3Header(const BYTE* buf, audioframe_t* audioframe)
 {
-	static const short ac3_rates[] = {32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 448, 512, 576, 640};
-	static const BYTE ac3_halfrate[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3};
-	static const BYTE ac3_lfeon[8] = {0x10, 0x10, 0x04, 0x04, 0x04, 0x01, 0x04, 0x01};
+	static const short ac3_rates[19]    = { 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 448, 512, 576, 640 };
+	static const BYTE  ac3_halfrate[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3 };
+	static const BYTE  ac3_lfeon[8]     = { 0x10, 0x10, 0x04, 0x04, 0x04, 0x01, 0x04, 0x01 };
 
 	if (*(WORD*)buf != AC3_SYNC_WORD) { // syncword
 		return 0;
@@ -833,8 +832,8 @@ int ParseAC3Header(const BYTE* buf, audioframe_t* audioframe)
 			case AC3_DOLBY:
 				audioframe->channels = 2;
 				break;
-			case AC3_2F1R:
 			case AC3_3F:
+			case AC3_2F1R:
 				audioframe->channels = 3;
 				break;
 			case AC3_3F1R:
@@ -860,7 +859,7 @@ int ParseAC3Header(const BYTE* buf, audioframe_t* audioframe)
 int ParseEAC3Header(const BYTE* buf, audioframe_t* audioframe)
 {
 	static const int   eac3_samplerates[6] = { 48000, 44100, 32000, 24000, 22050, 16000 };
-	static const BYTE  eac3_channels[8] = { 2, 1, 2, 3, 3, 4, 4, 5 };
+	static const BYTE  eac3_channels[8]    = { 2, 1, 2, 3, 3, 4, 4, 5 };
 	static const short eac3_samples_tbl[4] = { 256, 512, 768, 1536 };
 
 	if (*(WORD*)buf != AC3_SYNC_WORD) { // syncword
@@ -899,13 +898,13 @@ int ParseEAC3Header(const BYTE* buf, audioframe_t* audioframe)
 
 int ParseMLPHeader(const BYTE* buf, audioframe_t* audioframe)
 {
-	static const int mlp_samplerates[16] = { 48000, 96000, 192000, 0, 0, 0, 0, 0, 44100, 88200, 176400, 0, 0, 0, 0, 0 };
-	static const BYTE mlp_bitdepth[16] = { 16, 20, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	static const int  mlp_samplerates[16] = { 48000, 96000, 192000, 0, 0, 0, 0, 0, 44100, 88200, 176400, 0, 0, 0, 0, 0 };
+	static const BYTE mlp_bitdepth[16]    = { 16, 20, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	static const BYTE mlp_channels[32] = {
 		1, 2, 3, 4, 3, 4, 5, 3, 4, 5, 4, 5, 6, 4, 5, 4,
 		5, 6, 5, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 	};
-	static const BYTE channel_count[13] = {
+	static const BYTE thd_channel_count[13] = {
 		//LR    C  LFE  LRs LRvh  LRc LRrs   Cs   Ts LRsd  LRw  Cvh LFE2
 		   2,   1,   1,   2,   2,   2,   2,   1,   1,   2,   2,   1,   1
 	};
@@ -934,7 +933,7 @@ int ParseMLPHeader(const BYTE* buf, audioframe_t* audioframe)
 			int channel_map         = chanmap_substream_2 ? chanmap_substream_2 : chanmap_substream_1;
 			audioframe->channels = 0;
 			for (int i = 0; i < 13; ++i) {
-				audioframe->channels += channel_count[i] * ((channel_map >> i) & 1);
+				audioframe->channels += thd_channel_count[i] * ((channel_map >> i) & 1);
 			}
 			audioframe->param2 = 1; // TrueHD flag
 		} else {
@@ -944,7 +943,6 @@ int ParseMLPHeader(const BYTE* buf, audioframe_t* audioframe)
 			audioframe->channels   = mlp_channels[buf[11] & 0x1f];
 			audioframe->param2     = 0; // TrueHD flag
 		}
-		
 	}
 
 	return frame_size;
@@ -952,14 +950,15 @@ int ParseMLPHeader(const BYTE* buf, audioframe_t* audioframe)
 
 int ParseDTSHeader(const BYTE* buf, audioframe_t* audioframe)
 {
-	static const int dts_channels[16] = {1, 2, 2, 2, 2, 3, 3, 4, 4, 5, 6, 6, 6, 7, 8, 8};
-	static const int dts_samplerates[] = {0, 8000, 16000, 32000, 0, 0, 11025, 22050, 44100, 0, 0, 12000, 24000, 48000, 96000, 192000};
-	static const int dts_transmission_bitrates[32] = {
-		32000,    56000,   64000,   96000,
-		112000,  128000,  192000,  224000,
-		256000,  320000,  384000,  448000,
-		512000,  576000,  640000,  768000,
-		960000, 1024000, 1152000, 1280000,
+	// ETSI TS 102 114 V1.3.1 (2011-08)
+	static const int  dts_samplerates[16] = { 0, 8000, 16000, 32000, 0, 0, 11025, 22050, 44100, 0, 0, 12000, 24000, 48000, 96000, 192000 };
+	static const BYTE dts_channels[16]    = { 1, 2, 2, 2, 2, 3, 3, 4, 4, 5, 6, 6, 6, 7, 8, 8 };
+	static const int  dts_transmission_bitrates[32] = {
+		  32000,   56000,   64000,   96000,
+		 112000,  128000,  192000,  224000,
+		 256000,  320000,  384000,  448000,
+		 512000,  576000,  640000,  768000,
+		 960000, 1024000, 1152000, 1280000,
 		1344000, 1408000, 1411200, 1472000,
 		1536000, 1920000, 2048000, 3072000,
 		3840000, 0, 0, 0 //open, variable, lossless
@@ -1017,11 +1016,11 @@ int ParseDTSHeader(const BYTE* buf, audioframe_t* audioframe)
 		audioframe->size = frame_size;
 
 		audioframe->samples = (((hdr[4] & 1) << 6 | (hdr[5] & 0xfc) >> 2) + 1) * 32;
-		BYTE channel_layout = (hdr[7] & 0x0f) << 2 | (hdr[8] & 0xc0) >> 6;
-		if (channel_layout >= 16) {
+		BYTE channel_index = (hdr[7] & 0x0f) << 2 | (hdr[8] & 0xc0) >> 6;
+		if (channel_index >= 16) {
 			return 0;
 		}
-		audioframe->channels   = dts_channels[channel_layout];
+		audioframe->channels   = dts_channels[channel_index];
 		audioframe->samplerate = dts_samplerates[(hdr[8] & 0x3c) >> 2];
 		audioframe->param1     = dts_transmission_bitrates[(hdr[8] & 3) << 3 | (hdr[9] & 0xe0) >> 5]; // transmission bitrate
 		if ((hdr[10] & 6) >> 1) {
@@ -1039,9 +1038,10 @@ int ParseDTSHeader(const BYTE* buf, audioframe_t* audioframe)
 
 int ParseHdmvLPCMHeader(const BYTE* buf, audioframe_t* audioframe)
 {
-	static const BYTE hdmvlpcm_channels[16] = {0, 1, 0, 2, 3, 3, 4, 4, 5, 6, 7, 8, 0, 0, 0, 0};
-	static const BYTE hdmvlpcm_bitdepth[4] = {0, 16, 20, 24};
-	static const int  hdmvlpcm_samplerates[6] = {0, 48000, 0, 0, 96000, 192000};
+	static const int  hdmvlpcm_samplerates[6] = { 0, 48000, 0, 0, 96000, 192000 };
+	static const BYTE hdmvlpcm_channels[16]   = { 0, 1, 0, 2, 3, 3, 4, 4, 5, 6, 7, 8, 0, 0, 0, 0 };
+	static const BYTE hdmvlpcm_bitdepth[4]    = { 0, 16, 20, 24 };
+
 
 	int frame_size = buf[0] << 8 | buf[1];
 	frame_size += 4; // add header size;
@@ -1055,7 +1055,7 @@ int ParseHdmvLPCMHeader(const BYTE* buf, audioframe_t* audioframe)
 		if (audioframe->channels == 0 || audioframe->samplerate == 0 || audioframe->param1 == 0) {
 			return 0;
 		}
-		audioframe->samples = frame_size * 8 / (audioframe->channels * audioframe->param1);
+		audioframe->samples = frame_size  / (((audioframe->channels + 1) & ~1) * ((audioframe->param1 + 7) / 8));
 		audioframe->param2  = 0;
 	}
 
@@ -1064,18 +1064,8 @@ int ParseHdmvLPCMHeader(const BYTE* buf, audioframe_t* audioframe)
 
 int ParseADTSAACHeader(const BYTE* buf, audioframe_t* audioframe) // not tested!
 {
-	static const int   mp4a_samplerates[16] = { 96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025,  8000, 7350, 0, 0, 0 };
-	static const BYTE  mp4a_channels[8] = { 0, 1, 2, 3, 4, 5, 6, 8 };
-//	static const DWORD mp4a_layouts[8] = {
-//		0,
-//		SPEAKER_FRONT_CENTER,
-//		SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT,
-//		SPEAKER_FRONT_CENTER | SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT,
-//		SPEAKER_FRONT_CENTER | SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT | SPEAKER_BACK_CENTER,
-//		SPEAKER_FRONT_CENTER | SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT | SPEAKER_BACK_LEFT | SPEAKER_BACK_LEFT,
-//		SPEAKER_FRONT_CENTER | SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT | SPEAKER_BACK_LEFT | SPEAKER_BACK_LEFT | SPEAKER_LOW_FREQUENCY,
-//		SPEAKER_FRONT_CENTER | SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT | SPEAKER_SIDE_LEFT | SPEAKER_SIDE_RIGHT | SPEAKER_BACK_LEFT | SPEAKER_BACK_LEFT | SPEAKER_LOW_FREQUENCY
-//	};
+	static const int  mp4a_samplerates[16] = { 96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350, 0, 0, 0 };
+	static const BYTE mp4a_channels[8]     = { 0, 1, 2, 3, 4, 5, 6, 8 };
 
 	if ((*(WORD*)buf & 0x0fff) != 0x0fff) { // syncword
 		return 0;
@@ -1096,7 +1086,7 @@ int ParseADTSAACHeader(const BYTE* buf, audioframe_t* audioframe) // not tested!
 		audioframe->param1     = (buf[1] & 0x01) == 1 ? 7 : 9; // header size
 		audioframe->samplerate = mp4a_samplerates[(buf[2] & 0x3c) >> 2];
 		BYTE channel_index = ((buf[2] & 0x01) << 2) | ((buf[3] & 0xc0) >> 6);
-		if (audioframe->samplerate == 0 || channel_index == 0 || channel_index > 7) {
+		if (audioframe->samplerate == 0 || channel_index == 0 || channel_index >= 8) {
 			return 0;
 		}
 		audioframe->channels   = mp4a_channels[channel_index];
