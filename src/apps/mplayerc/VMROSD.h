@@ -147,10 +147,12 @@ private :
 	bool	m_bVisibleMessage;
 
 	CRect	m_MainWndRect;
+	CRect	m_MainWndRectCashed;
 
 	OSD_TYPE		m_OSDType;
 
 	CString			m_strMessage;
+	CString			m_strMessageCashed;
 	OSD_MESSAGEPOS	m_nMessagePos;
 	CList<CString>	m_debugMessages;
 
@@ -165,6 +167,8 @@ private :
 	void DrawDebug();
 	static void CALLBACK TimerFunc(HWND hWnd, UINT nMsg, UINT_PTR nIDEvent, DWORD dwTime);
 
+	void Reset();
+
 	// Gdiplus::GdiplusStartupInput m_gdiplusStartupInput;
 	// ULONG_PTR m_gdiplusToken;
 
@@ -178,5 +182,6 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
+	afx_msg void OnHide();
 	afx_msg void OnWindowPosChanged(WINDOWPOS* lpwndpos);
 };

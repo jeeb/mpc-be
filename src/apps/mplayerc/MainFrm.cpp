@@ -1570,9 +1570,6 @@ void CMainFrame::DestroyOSDBar()
 {
 	if (m_OSD) {
 		m_OSD.Stop();
-		if (m_OSD.IsWindowVisible()) {
-			m_OSD.ShowWindow(SW_HIDE);
-		}
 		m_OSD.DestroyWindow();
 	}
 }
@@ -14297,7 +14294,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		if (s.fShowOSD || s.fShowDebugInfo) { // Force OSD on when the debug switch is used
 
 			m_OSD.Stop();
-			if (m_OSD.IsWindowVisible()) m_OSD.ShowWindow(SW_HIDE);
 
 			if (s.IsD3DFullscreen()) {
 				if (pMVTO) {
@@ -17493,13 +17489,7 @@ bool CMainFrame::DisplayChange()
 
 void CMainFrame::CloseMedia()
 {
-	
-	if (m_OSD && m_OSD.IsWindowVisible()) {
-		m_OSD.ShowWindow(SW_HIDE);
-	}
-
 	if (m_iMediaLoadState == MLS_CLOSING) {
-		
 		//TRACE(_T("WARNING: CMainFrame::CloseMedia() called twice or more\n"));
 		return;
 	}

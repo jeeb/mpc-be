@@ -23,6 +23,8 @@
 #include "stdafx.h"
 #include "VMROSD.h"
 
+#define WM_HIDE					(WM_USER + 1001)
+
 #define SEEKBAR_HEIGHT			60
 #define SLIDER_BAR_HEIGHT		10
 #define SLIDER_CURSOR_HEIGHT	30
@@ -65,7 +67,7 @@ CVMROSD::CVMROSD(void)
 
 	m_OSDType				= OSD_TYPE_NONE;
 
-	m_MainWndRect.SetRect(0,0,0,0);
+	m_MainWndRect = m_MainWndRectCashed = CRect(0,0,0,0);
 
 	int fp = m_bm.FileExists(CString(_T("flybar")));
 
@@ -119,11 +121,17 @@ CVMROSD::~CVMROSD()
 IMPLEMENT_DYNAMIC(CVMROSD, CWnd)
 
 BEGIN_MESSAGE_MAP(CVMROSD, CWnd)
+	ON_MESSAGE_VOID(WM_HIDE, OnHide)
 	ON_WM_CREATE()
 	ON_WM_PAINT()
 	ON_WM_ERASEBKGND()
 	ON_WM_WINDOWPOSCHANGED()
 END_MESSAGE_MAP()
+
+void CVMROSD::OnHide()
+{
+	ShowWindow(SW_HIDE);
+}
 
 void CVMROSD::OnWindowPosChanged(WINDOWPOS* lpwndpos)
 {
@@ -133,7 +141,6 @@ void CVMROSD::OnWindowPosChanged(WINDOWPOS* lpwndpos)
 		CRect rc;
 		GetClientRect(&rc);
 		ClientToScreen(rc);
-
 		MoveWindow(rc.left, rc.top, 0, 0, FALSE);	
 
 		if (!m_bVisibleMessage) {
@@ -224,6 +231,16 @@ void CVMROSD::UpdateBitmap()
 	::ReleaseDC(m_pWnd->m_hWnd, pDC->m_hDC);
 }
 
+void CVMROSD::Reset()
+{
+	m_bShowMessage	= true;
+
+	m_MainWndRect.SetRectEmpty();
+	m_strMessage.Empty();
+	m_MainWndRectCashed.SetRectEmpty();
+	m_strMessageCashed.Empty();
+}
+
 void CVMROSD::Start(CWnd* pWnd, IVMRMixerBitmap9* pVMB)
 {
 	m_pVMB			= pVMB;
@@ -231,7 +248,8 @@ void CVMROSD::Start(CWnd* pWnd, IVMRMixerBitmap9* pVMB)
 	m_pMVTO			= NULL;
 	m_pWnd			= pWnd;
 	m_OSDType		= OSD_TYPE_BITMAP;
-	m_bShowMessage	= true;
+
+	Reset();
 
 	UpdateBitmap();
 }
@@ -243,7 +261,8 @@ void CVMROSD::Start(CWnd* pWnd, IMFVideoMixerBitmap* pMFVMB)
 	m_pMVTO			= NULL;
 	m_pWnd			= pWnd;
 	m_OSDType		= OSD_TYPE_BITMAP;
-	m_bShowMessage	= true;
+
+	Reset();
 
 	UpdateBitmap();
 }
@@ -255,7 +274,8 @@ void CVMROSD::Start(CWnd* pWnd, IMadVRTextOsd* pMVTO)
 	m_pMVTO			= pMVTO;
 	m_pWnd			= pWnd;
 	m_OSDType		= OSD_TYPE_MADVR;
-	m_bShowMessage	= true;
+
+	Reset();
 }
 
 void CVMROSD::Start(CWnd* pWnd)
@@ -265,11 +285,18 @@ void CVMROSD::Start(CWnd* pWnd)
 	m_pMVTO		= NULL;
 	m_pWnd		= pWnd;
 	m_OSDType	= OSD_TYPE_GDI;
-	m_bShowMessage	= true;
+
+	Reset();
 }
 
 void CVMROSD::Stop()
 {
+	if (m_pWnd) {
+		::KillTimer(m_pWnd->m_hWnd, (UINT_PTR)this);
+	}
+
+	ClearMessage();
+
 	if (m_pVMB) {
 		m_pVMB.Release();
 	}
@@ -282,7 +309,9 @@ void CVMROSD::Stop()
 		m_pMVTO.Release();
 	}
 
-	m_pWnd  = NULL;
+	m_pWnd = NULL;
+
+	Reset();
 }
 
 void CVMROSD::CalcRect()
@@ -672,7 +701,7 @@ void CVMROSD::GetRange(__int64& start, __int64& stop)
 
 void CVMROSD::TimerFunc(HWND hWnd, UINT nMsg, UINT_PTR nIDEvent, DWORD dwTime)
 {
-	CVMROSD*	pVMROSD = (CVMROSD*) nIDEvent;
+	CVMROSD* pVMROSD = (CVMROSD*)nIDEvent;
 
 	if (pVMROSD) {
 		pVMROSD->SetVisible(false);
@@ -703,7 +732,9 @@ void CVMROSD::ClearMessage(bool hide)
 	} else if (m_pMVTO) {
 		m_pMVTO->OsdClearMessage();
 	} else {
-		ShowWindow(SW_HIDE);
+		if (::IsWindow(m_hWnd) && IsWindowVisible()) {
+			PostMessage(WM_HIDE);
+		}
 	}
 }
 
@@ -728,21 +759,13 @@ void CVMROSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration,
 		int temp_m_FontSize		= m_FontSize;
 		CString temp_m_OSD_Font	= m_OSD_Font;
 
-		if (FontSize == 0) {
-			m_FontSize = AfxGetAppSettings().nOSDSize;
-		} else {
-			m_FontSize = FontSize;
+		m_FontSize = FontSize ? FontSize : AfxGetAppSettings().nOSDSize;
+
+		if (m_FontSize < 10 || m_FontSize > 26) {
+			m_FontSize = 20;
 		}
 
-		if (m_FontSize<10 || m_FontSize>26) {
-			m_FontSize=20;
-		}
-
-		if (OSD_Font == _T("")) {
-			m_OSD_Font = AfxGetAppSettings().strOSDFont;
-		} else {
-			m_OSD_Font = OSD_Font;
-		}
+		m_OSD_Font = OSD_Font.IsEmpty() ? AfxGetAppSettings().strOSDFont : OSD_Font;
 
 		if (/*(temp_m_FontSize != m_FontSize) || (temp_m_OSD_Font != m_OSD_Font)*/TRUE) {
 			if (m_MainFont.GetSafeHandle()) {
@@ -787,21 +810,13 @@ void CVMROSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration,
 		int temp_m_FontSize		= m_FontSize;
 		CString temp_m_OSD_Font	= m_OSD_Font;
 
-		if (FontSize == 0) {
-			m_FontSize = AfxGetAppSettings().nOSDSize;
-		} else {
-			m_FontSize = FontSize;
+		m_FontSize = FontSize ? FontSize : AfxGetAppSettings().nOSDSize;
+
+		if (m_FontSize < 10 || m_FontSize > 26) {
+			m_FontSize = 20;
 		}
 
-		if (m_FontSize<10 || m_FontSize>26) {
-			m_FontSize=20;
-		}
-
-		if (OSD_Font == _T("")) {
-			m_OSD_Font = AfxGetAppSettings().strOSDFont;
-		} else {
-			m_OSD_Font = OSD_Font;
-		}
+		m_OSD_Font = OSD_Font.IsEmpty() ? AfxGetAppSettings().strOSDFont : OSD_Font;
 		
 		if (m_pWnd) {
 			::KillTimer(m_pWnd->m_hWnd, (UINT_PTR)this);
@@ -919,23 +934,20 @@ void CVMROSD::OnPaint()
 
 void CVMROSD::DrawWnd()
 {
-	if (!m_pWnd || m_OSDType != OSD_TYPE_GDI) {
+	if (!m_pWnd || m_OSDType != OSD_TYPE_GDI || m_strMessage.IsEmpty() || !IsWindowVisible()) {
 		return;
 	}
 
-	static CString	strMessageCashed;
-	static CRect	MainWndRectCashed(0, 0, 0, 0);
-
-	if (strMessageCashed == m_strMessage && MainWndRectCashed == m_MainWndRect) {
+	if (m_strMessageCashed == m_strMessage && m_MainWndRectCashed == m_MainWndRect) {
 		return;
 	}
 
 	if (IsWindowVisible() && IsWindowEnabled()) {
-		strMessageCashed	= m_strMessage;
-		MainWndRectCashed	= m_MainWndRect;
+		m_strMessageCashed	= m_strMessage;
+		m_MainWndRectCashed	= m_MainWndRect;
 	}
 
-	CClientDC dc (this);
+	CClientDC dc(this);
 
 	AppSettings& s = AfxGetAppSettings();
 
@@ -963,7 +975,7 @@ void CVMROSD::DrawWnd()
 
 	CRect rectText;
 	CRect rectMessages;
-	temp_DC.DrawText (m_strMessage, &rectText, DT_CALCRECT);
+	temp_DC.DrawText(m_strMessage, &rectText, DT_CALCRECT);
 	rectText.InflateRect(0, 0, 10, 10);
 
 	switch (m_nMessagePos) {
