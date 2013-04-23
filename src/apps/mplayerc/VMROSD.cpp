@@ -61,6 +61,9 @@ CVMROSD::CVMROSD(void)
 	bMouseOverExitButton	= false;
 	bMouseOverCloseButton	= false;
 	m_bShowMessage			= true;
+	m_bVisibleMessage		= false;
+
+	m_OSDType				= OSD_TYPE_NONE;
 
 	m_MainWndRect.SetRect(0,0,0,0);
 
@@ -133,7 +136,9 @@ void CVMROSD::OnWindowPosChanged(WINDOWPOS* lpwndpos)
 
 		MoveWindow(rc.left, rc.top, 0, 0, FALSE);	
 
-		m_strMessage.Empty();
+		if (!m_bVisibleMessage) {
+			m_strMessage.Empty();
+		}
 	}
 }
 
@@ -221,38 +226,46 @@ void CVMROSD::UpdateBitmap()
 
 void CVMROSD::Start(CWnd* pWnd, IVMRMixerBitmap9* pVMB)
 {
-	m_pVMB   = pVMB;
-	m_pMFVMB = NULL;
-	m_pMVTO  = NULL;
-	m_pWnd   = pWnd;
+	m_pVMB			= pVMB;
+	m_pMFVMB		= NULL;
+	m_pMVTO			= NULL;
+	m_pWnd			= pWnd;
+	m_OSDType		= OSD_TYPE_BITMAP;
+	m_bShowMessage	= true;
 
 	UpdateBitmap();
 }
 
 void CVMROSD::Start(CWnd* pWnd, IMFVideoMixerBitmap* pMFVMB)
 {
-	m_pMFVMB = pMFVMB;
-	m_pVMB   = NULL;
-	m_pMVTO  = NULL;
-	m_pWnd   = pWnd;
+	m_pMFVMB		= pMFVMB;
+	m_pVMB			= NULL;
+	m_pMVTO			= NULL;
+	m_pWnd			= pWnd;
+	m_OSDType		= OSD_TYPE_BITMAP;
+	m_bShowMessage	= true;
 
 	UpdateBitmap();
 }
 
 void CVMROSD::Start(CWnd* pWnd, IMadVRTextOsd* pMVTO)
 {
-	m_pMFVMB = NULL;
-	m_pVMB   = NULL;
-	m_pMVTO  = pMVTO;
-	m_pWnd   = pWnd;
+	m_pMFVMB		= NULL;
+	m_pVMB			= NULL;
+	m_pMVTO			= pMVTO;
+	m_pWnd			= pWnd;
+	m_OSDType		= OSD_TYPE_MADVR;
+	m_bShowMessage	= true;
 }
 
 void CVMROSD::Start(CWnd* pWnd)
 {
-	m_pMFVMB = NULL;
-	m_pVMB   = NULL;
-	m_pMVTO  = NULL;
-	m_pWnd   = pWnd;
+	m_pMFVMB	= NULL;
+	m_pVMB		= NULL;
+	m_pMVTO		= NULL;
+	m_pWnd		= pWnd;
+	m_OSDType	= OSD_TYPE_GDI;
+	m_bShowMessage	= true;
 }
 
 void CVMROSD::Stop()
@@ -662,6 +675,7 @@ void CVMROSD::TimerFunc(HWND hWnd, UINT nMsg, UINT_PTR nIDEvent, DWORD dwTime)
 	CVMROSD*	pVMROSD = (CVMROSD*) nIDEvent;
 
 	if (pVMROSD) {
+		pVMROSD->SetVisible(false);
 		pVMROSD->ClearMessage();
 	}
 	::KillTimer(hWnd, nIDEvent);
@@ -689,10 +703,7 @@ void CVMROSD::ClearMessage(bool hide)
 	} else if (m_pMVTO) {
 		m_pMVTO->OsdClearMessage();
 	} else {
-		DrawWnd();
-		if (!hide && IsWindowVisible()) {
-			ShowWindow(SW_HIDE);
-		}
+		ShowWindow(SW_HIDE);
 	}
 }
 
@@ -703,12 +714,12 @@ void CVMROSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration,
 	}
 
 	if (m_pVMB || m_pMFVMB) {
-		if ( nPos != OSD_DEBUG ) {
+		if (nPos != OSD_DEBUG) {
 			m_nMessagePos	= nPos;
 			m_strMessage	= strMsg;
 		} else {
 			m_debugMessages.AddTail(strMsg);
-			if ( m_debugMessages.GetCount() > 20 ) {
+			if (m_debugMessages.GetCount() > 20) {
 				m_debugMessages.RemoveHead();
 			}
 			nDuration = -1;
@@ -795,14 +806,14 @@ void CVMROSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration,
 		if (m_pWnd) {
 			::KillTimer(m_pWnd->m_hWnd, (UINT_PTR)this);
 			if (nDuration != -1) {
+				m_bVisibleMessage = true;
 				::SetTimer(m_pWnd->m_hWnd, (UINT_PTR)this, nDuration, (TIMERPROC)TimerFunc);
-				
 			}
 		}
 
 		if (m_pWnd) {
 			DrawWnd();
-			ShowWindow(SW_SHOWNOACTIVATE);	
+			ShowWindow(SW_SHOWNOACTIVATE);
 		}
 	}
 }
@@ -831,6 +842,9 @@ void CVMROSD::HideMessage(bool hide)
 			ClearMessage(true);
 		} else {
 			DrawWnd();
+			if (m_bVisibleMessage) {
+				ShowWindow(SW_SHOWNOACTIVATE);
+			}
 		}
 	}
 }
@@ -850,12 +864,6 @@ void CVMROSD::HideExclusiveBars()
 		}
 	}
 }
-
-void CVMROSD::EnableShowMessage(bool enabled)
-{
-	m_bShowMessage = enabled;
-}
-
 
 BOOL CVMROSD::PreTranslateMessage(MSG* pMsg)
 {
@@ -911,7 +919,7 @@ void CVMROSD::OnPaint()
 
 void CVMROSD::DrawWnd()
 {
-	if (!m_pWnd) {
+	if (!m_pWnd || m_OSDType != OSD_TYPE_GDI) {
 		return;
 	}
 
@@ -1056,16 +1064,19 @@ void CVMROSD::DrawWnd()
 		CRect r;
 
 		if (AfxGetAppSettings().fFontShadow) {
-			r		= rcBar;
-			r.left	= 12;
-			r.top	= 7;
+			r			= rcBar;
+			r.left		= 12;
+			r.top		= 7;
+			r.bottom	+= rectText.Height();
+
 			mdc.SetTextColor(RGB(16,24,32));
-			mdc.DrawText (m_strMessage, &r, uFormat);
+			mdc.DrawText(m_strMessage, &r, uFormat);
 		}
 		
-		r		= rcBar;
-		r.left	= 10;
-		r.top	= 5;
+		r			= rcBar;
+		r.left		= 10;
+		r.top		= 5;
+		r.bottom	+= rectText.Height();
 
 		mdc.SetTextColor(AfxGetAppSettings().clrFontABGR);
 		mdc.DrawText(m_strMessage, m_strMessage.GetLength(), &r, uFormat);

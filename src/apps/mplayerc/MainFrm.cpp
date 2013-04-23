@@ -1475,9 +1475,9 @@ bool CMainFrame::FlyBarSetPos()
 	if (AfxGetAppSettings().iCaptionMenuMode == MODE_FRAMEONLY || AfxGetAppSettings().iCaptionMenuMode == MODE_BORDERLESS || m_fFullScreen) {
 
 		int pos = (m_wndFlyBar.iw * 9) + 10;
-		m_wndFlyBar.MoveWindow(r_wndView.right-10-pos, r_wndView.top+10, pos, m_wndFlyBar.iw+10);
+		m_wndFlyBar.MoveWindow(r_wndView.right - 10 - pos, r_wndView.top + 10, pos, m_wndFlyBar.iw + 10);
 		m_wndFlyBar.CalcButtonsRect();
-		if (r_wndView.bottom-r_wndView.top > 40 && r_wndView.right-r_wndView.left > 236) {
+		if (r_wndView.Height() > 40 && r_wndView.Width() > 236) {
 			if (AfxGetAppSettings().fFlybarOnTop && !m_wndFlyBar.IsWindowVisible()) {
 				m_wndFlyBar.ShowWindow(SW_SHOWNOACTIVATE);
 			}
@@ -1529,6 +1529,10 @@ bool CMainFrame::OSDBarSetPos()
 		return false;
 	}
 
+	if (m_OSD.GetOSDType() != OSD_TYPE_GDI) {
+		return false;
+	}
+
 	if (m_pBFmadVR || !m_wndView.IsWindowVisible()) {
 		if (m_OSD.IsWindowVisible()) {
 			m_OSD.ShowWindow(SW_HIDE);
@@ -1550,12 +1554,13 @@ bool CMainFrame::OSDBarSetPos()
 		m_OSD.DrawWnd();
 	}
 
-	if (r_wndView.bottom - r_wndView.top > 40 && r_wndView.right - r_wndView.left > 100) {
+	if (r_wndView.Height() > 40 && r_wndView.Width() > 100) {
+		m_OSD.EnableShowMessage();
+		m_OSD.HideMessage(false);
 		return true;
 	} else {
-		if (m_OSD.IsWindowVisible()) {
-			m_OSD.ShowWindow(SW_HIDE);
-		}
+		m_OSD.EnableShowMessage(false);
+		m_OSD.HideMessage(true);
 	}
 	
 	return false;

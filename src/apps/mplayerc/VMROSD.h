@@ -48,6 +48,13 @@ typedef enum {
 	OSD_DEBUG,
 } OSD_MESSAGEPOS;
 
+typedef enum {
+	OSD_TYPE_NONE,
+	OSD_TYPE_BITMAP,
+	OSD_TYPE_MADVR,
+	OSD_TYPE_GDI
+} OSD_TYPE;
+
 class CVMROSD : public CWnd
 {
 public:
@@ -64,7 +71,9 @@ public:
 	void ClearMessage(bool hide = false);
 	void HideMessage(bool hide);
 	void HideExclusiveBars();
-	void EnableShowMessage(bool enabled = true);
+
+	void EnableShowMessage(bool bValue = true)	{ m_bShowMessage = bValue; };
+	void SetVisible(bool bValue)				{ m_bVisibleMessage = bValue; };
 
 	__int64 GetPos() const;
 	void SetPos(__int64 pos);
@@ -80,6 +89,8 @@ public:
 
 	void DrawWnd();
 	void SetWndRect(CRect rc) { m_MainWndRect = rc; };
+
+	OSD_TYPE GetOSDType() { return m_OSDType; };
 
 	DECLARE_DYNAMIC(CVMROSD)
 
@@ -133,8 +144,11 @@ private :
 	HICON	icoClose_a;
 
 	bool	m_bShowMessage;
+	bool	m_bVisibleMessage;
 
 	CRect	m_MainWndRect;
+
+	OSD_TYPE		m_OSDType;
 
 	CString			m_strMessage;
 	OSD_MESSAGEPOS	m_nMessagePos;
