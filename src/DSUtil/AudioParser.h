@@ -45,7 +45,7 @@
 //int GetMLPFrameSize  (const BYTE* buf); // TrueHD and MLP
 //int GetDTSFrameSize  (const BYTE* buf); // DTS
 int GetDTSHDFrameSize(const BYTE* buf); // DTS-HD, need >= 10 bytes
-int GetADTSFrameSize (const BYTE* buf, int* headersize);
+//int GetADTSFrameSize (const BYTE* buf, int* headersize);
 
 //int ParseAC3Header     (const BYTE* buf, int* samplerate, int* channels, int* framelength, int* bitrate);
 //int ParseEAC3Header    (const BYTE* buf, int* samplerate, int* channels, int* framelength, int* frametype);
@@ -72,4 +72,4 @@ int ParseEAC3Header    (const BYTE* buf, audioframe_t* audioframe = NULL); // ne
 int ParseMLPHeader     (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 12 bytes, param1 = bitdepth, param2 = TrueHD flag
 int ParseDTSHeader     (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 10 bytes, param1 = transmission bitrate
 int ParseHdmvLPCMHeader(const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 4 bytes,  param1 = bitdepth
-int ParseADTSAACHeader (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 7 bytes,  param1 = header size // not tested!
+int ParseADTSAACHeader (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 7 bytes,  param1 = header size

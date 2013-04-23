@@ -147,7 +147,7 @@ int GetDTSHDFrameSize(const BYTE* buf)
 	return frame_size;
 }
 
-int GetADTSFrameSize(const BYTE* buf, int* headersize)
+/*int GetADTSFrameSize(const BYTE* buf, int* headersize)
 {
 	if ((*(WORD*)buf & 0x0fff) != 0x0fff) { // syncword
 		return 0;
@@ -161,7 +161,7 @@ int GetADTSFrameSize(const BYTE* buf, int* headersize)
 	*headersize = protection_absent == 1 ? 7 : 9;
 
 	return ((buf[3] & 0x03) << 11) | (buf[4] << 3) | ((buf[5] & 0xe0) >> 5);
-}
+}*/
 
 /*int ParseAC3Header(const BYTE* buf, int* samplerate, int* channels, int* framelength, int* bitrate)
 {
@@ -1061,12 +1061,12 @@ int ParseHdmvLPCMHeader(const BYTE* buf, audioframe_t* audioframe)
 	return frame_size;
 }
 
-int ParseADTSAACHeader(const BYTE* buf, audioframe_t* audioframe) // not tested!
+int ParseADTSAACHeader(const BYTE* buf, audioframe_t* audioframe)
 {
 	static const int  mp4a_samplerates[16] = { 96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350, 0, 0, 0 };
 	static const BYTE mp4a_channels[8]     = { 0, 1, 2, 3, 4, 5, 6, 8 };
 
-	if ((*(WORD*)buf & 0x0fff) != 0x0fff) { // syncword
+	if ((*(WORD*)buf & 0xf0ff) != 0xf0ff) { // syncword
 		return 0;
 	}
 
@@ -1082,7 +1082,7 @@ int ParseADTSAACHeader(const BYTE* buf, audioframe_t* audioframe) // not tested!
 
 	if (audioframe) {
 		audioframe->size       = frame_size;
-		audioframe->param1     = (buf[1] & 0x01) == 1 ? 7 : 9; // header size
+		audioframe->param1     = headersize; // header size
 		audioframe->samplerate = mp4a_samplerates[(buf[2] & 0x3c) >> 2];
 		BYTE channel_index = ((buf[2] & 0x01) << 2) | ((buf[3] & 0xc0) >> 6);
 		if (audioframe->samplerate == 0 || channel_index == 0 || channel_index >= 8) {
