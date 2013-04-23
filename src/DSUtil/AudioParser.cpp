@@ -694,16 +694,16 @@ DWORD GetVorbisChannelMask(WORD nChannels)
 	}
 }
 
-int ParseMPAHeader(const BYTE* buf, audioframe_t* audioframe) // not tested!
+int ParseMPAHeader(const BYTE* buf, audioframe_t* audioframe)
 {
 	// http://mpgedit.org/mpgedit/mpeg_format/mpeghdr.htm
 
 	static const short mpa_rates[5][16] = {
-		{ 0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 0 },
-		{ 0, 32, 48, 56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 384, 0 },
-		{ 0, 32, 40, 48,  56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 0 },
-		{ 0, 32, 48, 56,  64,  80,  96, 112, 128, 144, 160, 176, 192, 224, 256, 0 },
-		{ 0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160, 0 },
+		{ 0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 0 }, // MPEG 1 Layer 1
+		{ 0, 32, 48, 56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 384, 0 }, // MPEG 1 Layer 2
+		{ 0, 32, 40, 48,  56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 0 }, // MPEG 1 Layer 3
+		{ 0, 32, 48, 56,  64,  80,  96, 112, 128, 144, 160, 176, 192, 224, 256, 0 }, // MPEG 2/2.5 Layer 1
+		{ 0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160, 0 }, // MPEG 2/2.5 Layer 2/3
 	};
 	static const int mpa_v1_samplerates[] = { 44100, 48000, 32000, 0 };
 
@@ -712,7 +712,7 @@ int ParseMPAHeader(const BYTE* buf, audioframe_t* audioframe) // not tested!
 		return 0;
 	}
 
-	BYTE mpaver_id        = (buf[1] & 0x1e) >> 1;
+	BYTE mpaver_id        = (buf[1] & 0x18) >> 3;
 	BYTE layer_desc       = (buf[1] & 0x06) >> 1;
 	BYTE bitrate_index    = buf[2] >> 4;
 	BYTE samplerate_index = (buf[2] & 0x0c) >> 2;
@@ -761,14 +761,13 @@ int ParseMPAHeader(const BYTE* buf, audioframe_t* audioframe) // not tested!
 		} else {
 			audioframe->channels = 2;
 		}
-		int samples;
 		if (layer_desc == 0x3) { // Layer 1
-			samples = 384;
+			audioframe->samples = 384;
 		} else { // Layer 2, Layer 3
-			samples = 1152;
+			audioframe->samples = 1152;
 		}
-		int param1 = bitrate;
-		int param2 = bitrate;
+		audioframe->param1 = bitrate;
+		audioframe->param2 = 0;
 	}
 
 	return frame_size;
