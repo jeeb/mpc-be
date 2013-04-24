@@ -9339,7 +9339,6 @@ void CMainFrame::OnMenuNavJumpTo()
 	OnMenu(&m_navchapters);
 }
 
-
 void CMainFrame::OnUpdateMenuNavSubtitle(CCmdUI* pCmdUI)
 {
 	bool fEnable = false;
@@ -9347,7 +9346,7 @@ void CMainFrame::OnUpdateMenuNavSubtitle(CCmdUI* pCmdUI)
 	if (/*IsSomethingLoaded() && */m_iMediaLoadState == MLS_LOADED && !m_fAudioOnly) {
 		fEnable = true;
 	}
-	
+
 	pCmdUI->Enable(fEnable);
 }
 
@@ -9358,19 +9357,20 @@ void CMainFrame::OnUpdateMenuNavAudio(CCmdUI* pCmdUI)
 	if (/*IsSomethingLoaded() && */m_iMediaLoadState == MLS_LOADED/* && !m_fAudioOnly*/) {
 		fEnable = true;
 	}
-	
+
 	pCmdUI->Enable(fEnable);
 }
 
 void CMainFrame::OnPlayVolume(UINT nID)
 {
 	CString strVolume;
+
 	if (m_iMediaLoadState == MLS_LOADED) {
 		pBA->put_Volume(m_wndToolBar.Volume);
 		//strVolume.Format (L"Vol : %d dB", m_wndToolBar.Volume / 100);
 		SendStatusMessage(strVolume, 3000);
 	}
-	
+
 	if (m_wndToolBar.Volume == -10000) {
 		strVolume.Format(ResStr(IDS_VOLUME_OSD_MUTE), m_wndToolBar.m_volctrl.GetPos());
 	} else {
@@ -9401,6 +9401,7 @@ void CMainFrame::OnPlayVolumeBoost(UINT nID)
 			i = 100;
 			break;
 	}
+
 	s.dAudioBoost_dB = i/10.f;
 	SetVolumeBoost(s.dAudioBoost_dB);
 }
@@ -9881,7 +9882,6 @@ void CMainFrame::OnNavigateSubpic(UINT nID)
 
 void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 {
-
 	bool bSplitterMenu = false;
 	int splsubcnt = 0;
 	int i = (int)id;
@@ -9902,7 +9902,7 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 				}
 			}
 		}
-		
+
 		return;
 	}
 
@@ -9937,7 +9937,7 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 						if (m_iSubtitleSel != 0) {
 							m_iSubtitleSel = 0;
 							UpdateSubtitle();
-					    }
+						}
 						pSS->Enable(m, AMSTREAMSELECTENABLE_ENABLE);
 						SelSub2 = m_iSubtitleSel;
 						
@@ -9953,7 +9953,7 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 						}
 						return;
 					}
-						
+
 					id--;
 				}
 			}
@@ -9962,7 +9962,6 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 		pDVDC->SelectSubpictureStream(id, DVD_CMD_FLAG_Block, NULL);
 		return;
 	}
-
 
 	if (i == -1) {
 		AfxGetAppSettings().fEnableSubtitles = !AfxGetAppSettings().fEnableSubtitles;
@@ -9973,12 +9972,11 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 		} else {
 			m_iSubtitleSel = SelSub2;
 		}
-
 		UpdateSubtitle();
 	} else if (i >= 0) {
 		int m = splsubcnt - (splsubcnt > 0 ? 1 : 0);
 		m = i - m;
-		
+
 		m_iSubtitleSel = m;
 		SelSub2 = m_iSubtitleSel;
 		if (!AfxGetAppSettings().fEnableSubtitles) {
