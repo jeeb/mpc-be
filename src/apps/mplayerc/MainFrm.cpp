@@ -9388,17 +9388,16 @@ void CMainFrame::OnUpdateMenuNavAudio(CCmdUI* pCmdUI)
 void CMainFrame::OnPlayVolume(UINT nID)
 {
 	CString strVolume;
+	if (AfxGetAppSettings().fMute) {
+		strVolume.Format(ResStr(IDS_VOLUME_OSD_MUTE), m_wndToolBar.m_volctrl.GetPos());
+	} else {
+		strVolume.Format(ResStr(IDS_VOLUME_OSD), m_wndToolBar.m_volctrl.GetPos());
+	}
 
 	if (m_iMediaLoadState == MLS_LOADED) {
 		pBA->put_Volume(m_wndToolBar.Volume);
 		//strVolume.Format (L"Vol : %d dB", m_wndToolBar.Volume / 100);
 		SendStatusMessage(strVolume, 3000);
-	}
-
-	if (AfxGetAppSettings().fMute) {
-		strVolume.Format(ResStr(IDS_VOLUME_OSD_MUTE), m_wndToolBar.m_volctrl.GetPos());
-	} else {
-		strVolume.Format(ResStr(IDS_VOLUME_OSD), m_wndToolBar.m_volctrl.GetPos());
 	}
 
 	m_OSD.DisplayMessage(OSD_TOPLEFT, strVolume, 3000);
