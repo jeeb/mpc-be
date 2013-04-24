@@ -2883,6 +2883,7 @@ BEGIN
     IDS_PPSDB_BADURL        "Bad URL, could not locate subtitle database there!"
     IDS_AG_CHAPTER2         "Chapter: "
     IDS_VOLUME_OSD          "Vol: %d%%"
+    IDS_VOLUME_OSD_MUTE     "Vol: %d%% [Mute]"
     IDS_BOOST_OSD           "Boost: +%.1f dB"
     IDS_BALANCE_OSD         "Balance: %s"
     IDS_FULLSCREENMONITOR_CURRENT "Current"

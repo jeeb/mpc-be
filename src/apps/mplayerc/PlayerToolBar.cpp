@@ -409,10 +409,12 @@ int CPlayerToolBar::GetVolume()
 		iMute = 0;
 	}
 
+/*
 	if (type) {
 		OnVolumeMute(0);
 		SendMessage(WM_COMMAND, ID_VOLUME_MUTE);
 	}
+*/
 
 	if (IsMuted() || volume < 1) {
 		volume = -10000;
