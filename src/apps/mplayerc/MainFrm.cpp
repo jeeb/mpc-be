@@ -9378,7 +9378,7 @@ void CMainFrame::OnPlayVolume(UINT nID)
 		SendStatusMessage(strVolume, 3000);
 	}
 
-	if (m_wndToolBar.Volume == -10000) {
+	if (AfxGetAppSettings().fMute) {
 		strVolume.Format(ResStr(IDS_VOLUME_OSD_MUTE), m_wndToolBar.m_volctrl.GetPos());
 	} else {
 		strVolume.Format(ResStr(IDS_VOLUME_OSD), m_wndToolBar.m_volctrl.GetPos());
