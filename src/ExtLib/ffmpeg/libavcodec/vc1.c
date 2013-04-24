@@ -576,6 +576,27 @@ int ff_vc1_decode_entry_point(AVCodecContext *avctx, VC1Context *v, GetBitContex
     return 0;
 }
 
+/* fill lookup tables for intensity compensation */
+#define INIT_LUT(lumscale, lumshift, luty, lutuv)   do {\
+    int scale, shift, i;                            \
+    if (!lumscale) {                                \
+        scale = -64;                                \
+        shift = (255 - lumshift * 2) << 6;          \
+        if (lumshift > 31)                          \
+            shift += 128 << 6;                      \
+    } else {                                        \
+        scale = lumscale + 32;                      \
+        if (lumshift > 31)                          \
+            shift = (lumshift - 64) << 6;           \
+        else                                        \
+            shift = lumshift << 6;                  \
+    }                                               \
+    for (i = 0; i < 256; i++) {                     \
+        luty[i]  = av_clip_uint8((scale * i + shift + 32) >> 6);           \
+        lutuv[i] = av_clip_uint8((scale * (i - 128) + 128*64 + 32) >> 6);  \
+    } \
+    }while(0)
+
 int ff_vc1_parse_frame_header(VC1Context *v, GetBitContext* gb)
 {
     int pqindex, lowquant, status;
@@ -676,28 +697,12 @@ int ff_vc1_parse_frame_header(VC1Context *v, GetBitContext* gb)
         lowquant = (v->pq > 12) ? 0 : 1;
         v->mv_mode = ff_vc1_mv_pmode_table[lowquant][get_unary(gb, 1, 4)];
         if (v->mv_mode == MV_PMODE_INTENSITY_COMP) {
-            int scale, shift, i;
             v->mv_mode2 = ff_vc1_mv_pmode_table2[lowquant][get_unary(gb, 1, 3)];
             v->lumscale = get_bits(gb, 6);
             v->lumshift = get_bits(gb, 6);
             v->use_ic   = 1;
             /* fill lookup tables for intensity compensation */
-            if (!v->lumscale) {
-                scale = -64;
-                shift = (255 - v->lumshift * 2) << 6;
-                if (v->lumshift > 31)
-                    shift += 128 << 6;
-            } else {
-                scale = v->lumscale + 32;
-                if (v->lumshift > 31)
-                    shift = (v->lumshift - 64) << 6;
-                else
-                    shift = v->lumshift << 6;
-            }
-            for (i = 0; i < 256; i++) {
-                v->luty[i]  = av_clip_uint8((scale * i + shift + 32) >> 6);
-                v->lutuv[i] = av_clip_uint8((scale * (i - 128) + 128*64 + 32) >> 6);
-            }
+            INIT_LUT(v->lumscale, v->lumshift, v->luty, v->lutuv);
         }
         v->qs_last = v->s.quarter_sample;
         if (v->mv_mode == MV_PMODE_1MV_HPEL || v->mv_mode == MV_PMODE_1MV_HPEL_BILIN)
@@ -808,31 +813,11 @@ int ff_vc1_parse_frame_header(VC1Context *v, GetBitContext* gb)
     return 0;
 }
 
-/* fill lookup tables for intensity compensation */
-#define INIT_LUT(lumscale, lumshift, luty, lutuv)   \
-    if (!lumscale) {                                \
-        scale = -64;                                \
-        shift = (255 - lumshift * 2) << 6;          \
-        if (lumshift > 31)                          \
-            shift += 128 << 6;                      \
-    } else {                                        \
-        scale = lumscale + 32;                      \
-        if (lumshift > 31)                          \
-            shift = (lumshift - 64) << 6;           \
-        else                                        \
-            shift = lumshift << 6;                  \
-    }                                               \
-    for (i = 0; i < 256; i++) {                     \
-        luty[i]  = av_clip_uint8((scale * i + shift + 32) >> 6);           \
-        lutuv[i] = av_clip_uint8((scale * (i - 128) + 128*64 + 32) >> 6);  \
-    }
-
 int ff_vc1_parse_frame_header_adv(VC1Context *v, GetBitContext* gb)
 {
     int pqindex, lowquant;
     int status;
     int mbmodetab, imvtab, icbptab, twomvbptab, fourmvbptab; /* useful only for debugging */
-    int scale, shift, i; /* for initializing LUT for intensity compensation */
     int field_mode, fcm;
 
     v->numref=0;

@@ -28,7 +28,7 @@
     <None Include="libavcodec\x86\dwt_yasm.asm" />
     <None Include="libavcodec\x86\fft.asm" />
     <None Include="libavcodec\x86\fmtconvert.asm" />
-    <None Include="libavcodec\x86\fpelbase.asm" />
+    <None Include="libavcodec\x86\fpel.asm" />
     <None Include="libavcodec\x86\h263_loopfilter.asm" />
     <None Include="libavcodec\x86\h264_chromamc.asm" />
     <None Include="libavcodec\x86\h264_chromamc_10bit.asm" />
@@ -47,7 +47,7 @@
     <None Include="libavcodec\x86\mpeg4qpel.asm" />
     <None Include="libavcodec\x86\pngdsp.asm" />
     <None Include="libavcodec\x86\proresdsp.asm" />
-    <None Include="libavcodec\x86\qpelbase.asm" />
+    <None Include="libavcodec\x86\qpel.asm" />
     <None Include="libavcodec\x86\rv34dsp.asm" />
     <None Include="libavcodec\x86\rv40dsp.asm" />
     <None Include="libavcodec\x86\sbrdsp.asm" />
@@ -149,7 +149,6 @@
     <ClInclude Include="libavcodec\get_bits.h" />
     <ClInclude Include="libavcodec\golomb.h" />
     <ClInclude Include="libavcodec\h261.h" />
-    <ClInclude Include="libavcodec\h261data.h" />
     <ClInclude Include="libavcodec\h263.h" />
     <ClInclude Include="libavcodec\h263data.h" />
     <ClInclude Include="libavcodec\h263_parser.h" />

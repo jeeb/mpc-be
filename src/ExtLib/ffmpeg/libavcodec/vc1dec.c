@@ -384,32 +384,20 @@ static void vc1_mc_1mv(VC1Context *v, int dir)
         uvmx = uvmx + ((uvmx < 0) ? (uvmx & 1) : -(uvmx & 1));
         uvmy = uvmy + ((uvmy < 0) ? (uvmy & 1) : -(uvmy & 1));
     }
-    if (v->field_mode) { // interlaced field picture
-        if (!dir) {
-            if ((v->cur_field_type != v->ref_field_type[dir]) && v->second_field) {
-                srcY = s->current_picture.f.data[0];
-                srcU = s->current_picture.f.data[1];
-                srcV = s->current_picture.f.data[2];
-            } else {
-                srcY = s->last_picture.f.data[0];
-                srcU = s->last_picture.f.data[1];
-                srcV = s->last_picture.f.data[2];
-            }
+    if (!dir) {
+        if (v->field_mode && (v->cur_field_type != v->ref_field_type[dir]) && v->second_field) {
+            srcY = s->current_picture.f.data[0];
+            srcU = s->current_picture.f.data[1];
+            srcV = s->current_picture.f.data[2];
         } else {
-            srcY = s->next_picture.f.data[0];
-            srcU = s->next_picture.f.data[1];
-            srcV = s->next_picture.f.data[2];
-        }
-    } else {
-        if (!dir) {
             srcY = s->last_picture.f.data[0];
             srcU = s->last_picture.f.data[1];
             srcV = s->last_picture.f.data[2];
-        } else {
-            srcY = s->next_picture.f.data[0];
-            srcU = s->next_picture.f.data[1];
-            srcV = s->next_picture.f.data[2];
         }
+    } else {
+        srcY = s->next_picture.f.data[0];
+        srcU = s->next_picture.f.data[1];
+        srcV = s->next_picture.f.data[2];
     }
 
     if(!srcY)
@@ -574,11 +562,8 @@ static void vc1_mc_4mv_luma(VC1Context *v, int n, int dir, int avg)
     my = s->mv[dir][n][1];
 
     if (!dir) {
-        if (v->field_mode) {
-            if ((v->cur_field_type != v->ref_field_type[dir]) && v->second_field)
-                srcY = s->current_picture.f.data[0];
-            else
-                srcY = s->last_picture.f.data[0];
+        if (v->field_mode && (v->cur_field_type != v->ref_field_type[dir]) && v->second_field) {
+            srcY = s->current_picture.f.data[0];
         } else
             srcY = s->last_picture.f.data[0];
     } else
@@ -864,14 +849,9 @@ static void vc1_mc_4mv_chroma(VC1Context *v, int dir)
     }
 
     if (!dir) {
-        if (v->field_mode) {
-            if ((v->cur_field_type != chroma_ref_type) && v->cur_field_type) {
-                srcU = s->current_picture.f.data[1];
-                srcV = s->current_picture.f.data[2];
-            } else {
-                srcU = s->last_picture.f.data[1];
-                srcV = s->last_picture.f.data[2];
-            }
+        if (v->field_mode && (v->cur_field_type != chroma_ref_type) && v->second_field) {
+            srcU = s->current_picture.f.data[1];
+            srcV = s->current_picture.f.data[2];
         } else {
             srcU = s->last_picture.f.data[1];
             srcV = s->last_picture.f.data[2];
@@ -6008,20 +5988,11 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
         v->bits = buf_size * 8;
         v->end_mb_x = s->mb_width;
         if (v->field_mode) {
-            uint8_t *tmp[2];
             s->current_picture.f.linesize[0] <<= 1;
             s->current_picture.f.linesize[1] <<= 1;
             s->current_picture.f.linesize[2] <<= 1;
             s->linesize                      <<= 1;
             s->uvlinesize                    <<= 1;
-            tmp[0]          = v->mv_f_last[0];
-            tmp[1]          = v->mv_f_last[1];
-            v->mv_f_last[0] = v->mv_f_next[0];
-            v->mv_f_last[1] = v->mv_f_next[1];
-            v->mv_f_next[0] = v->mv_f[0];
-            v->mv_f_next[1] = v->mv_f[1];
-            v->mv_f[0] = tmp[0];
-            v->mv_f[1] = tmp[1];
         }
         mb_height = s->mb_height >> v->field_mode;
         for (i = 0; i <= n_slices; i++) {
@@ -6081,15 +6052,22 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
         }
         if (v->field_mode) {
             v->second_field = 0;
-            if (s->pict_type == AV_PICTURE_TYPE_B) {
-                memcpy(v->mv_f_base, v->mv_f_next_base,
-                       2 * (s->b8_stride * (s->mb_height * 2 + 1) + s->mb_stride * (s->mb_height + 1) * 2));
-            }
             s->current_picture.f.linesize[0] >>= 1;
             s->current_picture.f.linesize[1] >>= 1;
             s->current_picture.f.linesize[2] >>= 1;
             s->linesize                      >>= 1;
             s->uvlinesize                    >>= 1;
+            if (v->s.pict_type != AV_PICTURE_TYPE_BI && v->s.pict_type != AV_PICTURE_TYPE_B) {
+                uint8_t *tmp[2];
+                tmp[0]          = v->mv_f_last[0];
+                tmp[1]          = v->mv_f_last[1];
+                v->mv_f_last[0] = v->mv_f_next[0];
+                v->mv_f_last[1] = v->mv_f_next[1];
+                v->mv_f_next[0] = v->mv_f[0];
+                v->mv_f_next[1] = v->mv_f[1];
+                v->mv_f[0] = tmp[0];
+                v->mv_f[1] = tmp[1];
+            }
         }
         av_dlog(s->avctx, "Consumed %i/%i bits\n",
                 get_bits_count(&s->gb), s->gb.size_in_bits);

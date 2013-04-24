@@ -111,60 +111,6 @@ void ff_put_no_rnd_mpeg4_qpel8_v_lowpass_mmxext(uint8_t *dst, uint8_t *src,
 
 #if HAVE_INLINE_ASM
 
-#define JUMPALIGN()     __asm__ volatile (".p2align 3"::)
-#define MOVQ_ZERO(regd) __asm__ volatile ("pxor %%"#regd", %%"#regd ::)
-
-#define MOVQ_BFE(regd)                                  \
-    __asm__ volatile (                                  \
-        "pcmpeqd %%"#regd", %%"#regd"   \n\t"           \
-        "paddb   %%"#regd", %%"#regd"   \n\t" ::)
-
-#ifndef PIC
-#define MOVQ_BONE(regd) __asm__ volatile ("movq %0, %%"#regd" \n\t" :: "m"(ff_bone))
-#define MOVQ_WTWO(regd) __asm__ volatile ("movq %0, %%"#regd" \n\t" :: "m"(ff_wtwo))
-#else
-// for shared library it's better to use this way for accessing constants
-// pcmpeqd -> -1
-#define MOVQ_BONE(regd)                                 \
-    __asm__ volatile (                                  \
-        "pcmpeqd  %%"#regd", %%"#regd"  \n\t"           \
-        "psrlw          $15, %%"#regd"  \n\t"           \
-        "packuswb %%"#regd", %%"#regd"  \n\t" ::)
-
-#define MOVQ_WTWO(regd)                                 \
-    __asm__ volatile (                                  \
-        "pcmpeqd %%"#regd", %%"#regd"   \n\t"           \
-        "psrlw         $15, %%"#regd"   \n\t"           \
-        "psllw          $1, %%"#regd"   \n\t"::)
-
-#endif
-
-// using regr as temporary and for the output result
-// first argument is unmodifed and second is trashed
-// regfe is supposed to contain 0xfefefefefefefefe
-#define PAVGB_MMX(rega, regb, regr, regfe)                       \
-    "movq   "#rega", "#regr"            \n\t"                    \
-    "por    "#regb", "#regr"            \n\t"                    \
-    "pxor   "#rega", "#regb"            \n\t"                    \
-    "pand  "#regfe", "#regb"            \n\t"                    \
-    "psrlq       $1, "#regb"            \n\t"                    \
-    "psubb  "#regb", "#regr"            \n\t"
-
-// mm6 is supposed to contain 0xfefefefefefefefe
-#define PAVGBP_MMX(rega, regb, regr, regc, regd, regp)           \
-    "movq  "#rega", "#regr"             \n\t"                    \
-    "movq  "#regc", "#regp"             \n\t"                    \
-    "por   "#regb", "#regr"             \n\t"                    \
-    "por   "#regd", "#regp"             \n\t"                    \
-    "pxor  "#rega", "#regb"             \n\t"                    \
-    "pxor  "#regc", "#regd"             \n\t"                    \
-    "pand    %%mm6, "#regb"             \n\t"                    \
-    "pand    %%mm6, "#regd"             \n\t"                    \
-    "psrlq      $1, "#regd"             \n\t"                    \
-    "psrlq      $1, "#regb"             \n\t"                    \
-    "psubb "#regb", "#regr"             \n\t"                    \
-    "psubb "#regd", "#regp"             \n\t"
-
 /***********************************/
 /* MMX rounding */
 
@@ -1211,22 +1157,22 @@ static void gmc_mmx(uint8_t *dst, uint8_t *src,
 #endif
 
 /* CAVS-specific */
-void ff_put_cavs_qpel8_mc00_mmxext(uint8_t *dst, uint8_t *src, ptrdiff_t stride)
+void ff_put_cavs_qpel8_mc00_mmx(uint8_t *dst, uint8_t *src, ptrdiff_t stride)
 {
     put_pixels8_mmx(dst, src, stride, 8);
 }
 
-void ff_avg_cavs_qpel8_mc00_mmxext(uint8_t *dst, uint8_t *src, ptrdiff_t stride)
+void ff_avg_cavs_qpel8_mc00_mmx(uint8_t *dst, uint8_t *src, ptrdiff_t stride)
 {
     avg_pixels8_mmx(dst, src, stride, 8);
 }
 
-void ff_put_cavs_qpel16_mc00_mmxext(uint8_t *dst, uint8_t *src, ptrdiff_t stride)
+void ff_put_cavs_qpel16_mc00_mmx(uint8_t *dst, uint8_t *src, ptrdiff_t stride)
 {
     put_pixels16_mmx(dst, src, stride, 16);
 }
 
-void ff_avg_cavs_qpel16_mc00_mmxext(uint8_t *dst, uint8_t *src, ptrdiff_t stride)
+void ff_avg_cavs_qpel16_mc00_mmx(uint8_t *dst, uint8_t *src, ptrdiff_t stride)
 {
     avg_pixels16_mmx(dst, src, stride, 16);
 }
@@ -1416,9 +1362,9 @@ void ff_vector_clip_int32_sse4    (int32_t *dst, const int32_t *src,
 static av_cold void dsputil_init_mmx(DSPContext *c, AVCodecContext *avctx,
                                      int mm_flags)
 {
+#if HAVE_INLINE_ASM
     const int high_bit_depth = avctx->bits_per_raw_sample > 8;
 
-#if HAVE_INLINE_ASM
     c->put_pixels_clamped        = ff_put_pixels_clamped_mmx;
     c->put_signed_pixels_clamped = ff_put_signed_pixels_clamped_mmx;
     c->add_pixels_clamped        = ff_add_pixels_clamped_mmx;
@@ -1443,15 +1389,13 @@ static av_cold void dsputil_init_mmx(DSPContext *c, AVCodecContext *avctx,
     }
 
     c->vector_clip_int32 = ff_vector_clip_int32_mmx;
-#endif
-
+#endif /* HAVE_YASM */
 }
 
 static av_cold void dsputil_init_mmxext(DSPContext *c, AVCodecContext *avctx,
                                         int mm_flags)
 {
-
-#if HAVE_YASM
+#if HAVE_MMXEXT_EXTERNAL
     SET_QPEL_FUNCS(avg_qpel,        0, 16, mmxext, );
     SET_QPEL_FUNCS(avg_qpel,        1,  8, mmxext, );
 
@@ -1459,9 +1403,7 @@ static av_cold void dsputil_init_mmxext(DSPContext *c, AVCodecContext *avctx,
     SET_QPEL_FUNCS(put_qpel,        1,  8, mmxext, );
     SET_QPEL_FUNCS(put_no_rnd_qpel, 0, 16, mmxext, );
     SET_QPEL_FUNCS(put_no_rnd_qpel, 1,  8, mmxext, );
-#endif /* HAVE_YASM */
 
-#if HAVE_MMXEXT_EXTERNAL
     /* slower than cmov version on AMD */
     if (!(mm_flags & AV_CPU_FLAG_3DNOW))
         c->add_hfyu_median_prediction = ff_add_hfyu_median_prediction_mmxext;
@@ -1504,9 +1446,9 @@ static av_cold void dsputil_init_sse(DSPContext *c, AVCodecContext *avctx,
 static av_cold void dsputil_init_sse2(DSPContext *c, AVCodecContext *avctx,
                                       int mm_flags)
 {
+#if HAVE_SSE2_INLINE
     const int high_bit_depth = avctx->bits_per_raw_sample > 8;
 
-#if HAVE_SSE2_INLINE
     if (!high_bit_depth && avctx->idct_algo == FF_IDCT_XVIDMMX) {
         c->idct_put              = ff_idct_xvid_sse2_put;
         c->idct_add              = ff_idct_xvid_sse2_add;
