@@ -602,6 +602,12 @@
     <ClInclude Include="ThirdParty\md5\md5.h">
       <Filter>extra</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Text\File_SubRip.h">
+      <Filter>Header Files\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaInfo\Text\File_Ttml.h">
+      <Filter>Header Files\Text</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
@@ -1146,6 +1152,12 @@
     </ClCompile>
     <ClCompile Include="ThirdParty\md5\md5.c">
       <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Text\File_SubRip.cpp">
+      <Filter>Source Files\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Text\File_Ttml.cpp">
+      <Filter>Source Files\Text</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

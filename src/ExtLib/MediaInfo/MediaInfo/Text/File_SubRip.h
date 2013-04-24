@@ -1,4 +1,4 @@
-// File_Vc3 - Info for VC-3 streams
+// File_SubRip - Info for SubRip files
 // Copyright (C) 2010-2012 MediaArea.net SARL, Info@MediaArea.net
 //
 // This library is free software: you can redistribute it and/or modify it
@@ -17,74 +17,31 @@
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
-// Information about VC-3 video streams
+// Information about SubRip files
 //
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifndef MediaInfo_Vc3H
-#define MediaInfo_Vc3H
+#ifndef MediaInfo_File_SubRipH
+#define MediaInfo_File_SubRipH
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Analyze.h"
-#include "MediaInfo/Multiple/File_Mpeg4.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
 {
 
 //***************************************************************************
-// Class File_Avs
+// Class File_SubRip
 //***************************************************************************
 
-class File_Vc3 : public File__Analyze
+class File_SubRip : public File__Analyze
 {
-public :
-    //In
-    int64u Frame_Count_Valid;
-    float  FrameRate;
-
-    //constructor/Destructor
-    File_Vc3();
-
 private :
-    //Streams management
-    void Streams_Fill();
-
-    //Buffer - Synchro
-    bool Synchronize();
-    bool Synched_Test();
-
-    //Buffer - Demux
-    #if MEDIAINFO_DEMUX
-    bool Demux_UnpacketizeContainer_Test();
-    #endif //MEDIAINFO_DEMUX
-
-    //Buffer - Per element
-    bool Header_Begin ();
-    void Header_Parse ();
-    void Data_Parse ();
-
-    //Elements
-    void HeaderPrefix();
-    void CodingControlA();
-    void ImageGeometry();
-    void CompressionID();
-    void CodingControlB();
-    void TimeCode();
-    void UserData();
-    void MacroblockScanIndices();
-
-    //Temp
-    int64u  Data_ToParse;
-    int32u  CID;
-    bool    CRCF;
-    int16u  ALPF;
-    int16u  SPL;
-    int8u   SBD;
-    int8u   FFC_FirstFrame;
-    bool    SST;
+    //Buffer - Global
+    void Read_Buffer_Continue();
 };
 
 } //NameSpace
