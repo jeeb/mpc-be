@@ -889,8 +889,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	SetWindowText(m_strTitle);
 	m_Lcd.SetMediaTitle(LPCTSTR(m_strTitle));
 
-	m_OpenFile = false;
-
 	SendAPICommand (CMD_CONNECT, L"%d", GetSafeHwnd());
 
 	m_hWnd_toolbar = m_wndToolBar.GetSafeHwnd();
@@ -8125,51 +8123,54 @@ void CMainFrame::OnPlayPlay()
 
 	MoveVideoWindow();
 	m_Lcd.SetStatusMessage(ResStr(IDS_CONTROLS_PLAYING), 3000);
-	SetPlayState (PS_PLAY);
+	SetPlayState(PS_PLAY);
 
 	OnTimer(TIMER_STREAMPOSPOLLER);
 
-	m_OpenFile = false;
-
 	SetupEVRColorControl(); // can be configured when streaming begins
 
+	CString strOSD;
 	if (m_bfirstPlay) {
 		m_bfirstPlay = false;
-		CString m_strOSD;
 
 		if (!m_strTitleAlt.IsEmpty()) {
-			m_strOSD = m_strTitleAlt.Left(m_strTitleAlt.GetLength() - 4);
+			strOSD = m_strTitleAlt.Left(m_strTitleAlt.GetLength() - 4);
 		}
 
-		if (m_strOSD.IsEmpty()) {
+		if (strOSD.IsEmpty()) {
 			if (GetPlaybackMode() == PM_FILE) {
-				m_strOSD =  m_wndPlaylistBar.GetCurFileName();
+				strOSD = m_wndPlaylistBar.GetCurFileName();
 				if (!m_LastOpenBDPath.IsEmpty()) {
-					m_strOSD = ResStr(ID_PLAY_PLAY);
-					int i = m_strOSD.Find(_T("\n"));
+					strOSD = ResStr(ID_PLAY_PLAY);
+					int i = strOSD.Find(_T("\n"));
 					if (i > 0) {
-						m_strOSD.Delete(i, m_strOSD.GetLength()-i);
+						strOSD.Delete(i, strOSD.GetLength()-i);
 					}
-					m_strOSD += _T(" BD");
-				} else if (m_strOSD != _T("")) {
-					m_strOSD.TrimRight('/');
-					m_strOSD.Replace('\\', '/');
-					m_strOSD = m_strOSD.Mid(m_strOSD.ReverseFind('/')+1);
+					strOSD += _T(" BD");
+				} else if (strOSD != _T("")) {
+					strOSD.TrimRight('/');
+					strOSD.Replace('\\', '/');
+					strOSD = strOSD.Mid(strOSD.ReverseFind('/')+1);
 				}
 			} else if (GetPlaybackMode() == PM_DVD) {
-				m_strOSD = ResStr(ID_PLAY_PLAY);
-				int i = m_strOSD.Find(_T("\n"));
+				strOSD = ResStr(ID_PLAY_PLAY);
+				int i = strOSD.Find(_T("\n"));
 				if (i > 0) {
-					m_strOSD.Delete(i, m_strOSD.GetLength()-i);
+					strOSD.Delete(i, strOSD.GetLength()-i);
 				}
-				m_strOSD += _T(" DVD");
+				strOSD += _T(" DVD");
 			}
 		}
+	}
 
-		if (m_strOSD != _T("")) {
-			m_OSD.DisplayMessage(OSD_TOPLEFT, m_strOSD, 3000);
+	if (strOSD.IsEmpty()) {
+		strOSD = ResStr(ID_PLAY_PLAY);
+		int i = strOSD.Find(_T("\n"));
+		if (i > 0) {
+			strOSD.Delete(i, strOSD.GetLength() - i);
 		}
 	}
+	m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 3000);
 }
 
 void CMainFrame::OnPlayPauseI()
@@ -8189,8 +8190,15 @@ void CMainFrame::OnPlayPauseI()
 	}
 
 	MoveVideoWindow();
+
+	CString strOSD = ResStr(ID_PLAY_PAUSE);
+	int i = strOSD.Find(_T("\n"));
+	if (i > 0) {
+		strOSD.Delete(i, strOSD.GetLength() - i);
+	}
+	m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 3000);
 	m_Lcd.SetStatusMessage(ResStr(IDS_CONTROLS_PAUSED), 3000);
-	SetPlayState (PS_PAUSE);
+	SetPlayState(PS_PAUSE);
 }
 
 void CMainFrame::OnPlayPause()
@@ -8263,8 +8271,6 @@ void CMainFrame::OnPlayStop()
 			m_fFrameSteppingActive = false;
 			pBA->put_Volume(m_VolumeBeforeFrameStepping);
 		}
-
-		m_fEndOfStream = false;
 	}
 
 	m_nLoops = 0;
@@ -8278,7 +8284,7 @@ void CMainFrame::OnPlayStop()
 			m_wndSeekBar.GetRange(start, stop);
 			GUID tf;
 			pMS->GetTimeFormat(&tf);
-			if	(GetPlaybackMode() != PM_CAPTURE) {
+			if (GetPlaybackMode() != PM_CAPTURE) {
 				m_wndStatusBar.SetStatusTimer(m_wndSeekBar.GetPosReal(), stop, !!m_wndSubresyncBar.IsWindowVisible(), &tf);
 			}
 
@@ -8286,8 +8292,19 @@ void CMainFrame::OnPlayStop()
 		}
 	}
 
-	m_Lcd.SetStatusMessage(ResStr(IDS_CONTROLS_STOPPED), 3000);
-	SetPlayState (PS_STOP);
+	if (!m_fEndOfStream) {
+		CString strOSD = ResStr(ID_PLAY_STOP);
+		int i = strOSD.Find(_T("\n"));
+		if (i > 0) {
+			strOSD.Delete(i, strOSD.GetLength() - i);
+		}
+		m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 3000);
+		m_Lcd.SetStatusMessage(ResStr(IDS_CONTROLS_STOPPED), 3000);
+	} else {
+		m_fEndOfStream = false;
+	}
+
+	SetPlayState(PS_STOP);
 }
 
 void CMainFrame::OnUpdatePlayPauseStop(CCmdUI* pCmdUI)
@@ -14396,10 +14413,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			m_wndEditListEditor.OpenFile(pOMD->title);
 		}
 
-		if (pFileData) {
-			m_OpenFile = true;
-		}
-
 		if (::GetCurrentThreadId() == AfxGetApp()->m_nThreadID) {
 			OnFilePostOpenmedia();
 		} else {
@@ -14561,6 +14574,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 void CMainFrame::CloseMediaPrivate()
 {
 	SetLoadState (MLS_CLOSING);
+	m_OSD.Stop();
 
 	OnPlayStop();
 
@@ -14603,7 +14617,6 @@ void CMainFrame::CloseMediaPrivate()
 	m_pMFVDC = NULL;
 	m_pLN21 = NULL;
 	m_pSyncClock = NULL;
-	m_OSD.Stop();
 	pAMXBar.Release();
 	pAMTuner.Release();
 	pAMDF.Release();

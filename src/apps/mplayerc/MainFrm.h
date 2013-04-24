@@ -1057,7 +1057,6 @@ public:
 	CComPtr<IAMLine21Decoder_2>		m_pLN21;
 	CVMROSD		m_OSD;
 
-	bool		m_OpenFile;
 	bool		m_bRemainingTime;
 	bool		m_bOSDLocalTime;
 	bool		m_bOSDFileName;

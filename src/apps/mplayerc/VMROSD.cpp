@@ -934,7 +934,7 @@ void CVMROSD::OnPaint()
 
 void CVMROSD::DrawWnd()
 {
-	if (!m_pWnd || m_OSDType != OSD_TYPE_GDI || m_strMessage.IsEmpty() || !IsWindowVisible()) {
+	if (!IsWindowVisible() || !m_pWnd || m_OSDType != OSD_TYPE_GDI || m_strMessage.IsEmpty()) {
 		return;
 	}
 
