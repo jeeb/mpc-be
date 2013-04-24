@@ -16,7 +16,7 @@ Changes (*):
 * ffmpeg git-6d7ec4fc;
 * libopus 1.0.1 git-a8f04b23;
 * Little-CMS git-5bf9e436;
-* libwebp 0.3.0 git-5369a80f;
+* libwebp 0.3.0 git-0ece07dc;
 * libopenjpeg 2.0.0 svn rev.2301;
 * MediaInfo 0.7.62+ svn rev.5479;
 * libpng 1.7.0 b9 git-57d6907d;
