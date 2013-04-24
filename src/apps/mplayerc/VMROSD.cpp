@@ -827,8 +827,8 @@ void CVMROSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration,
 		}
 
 		if (m_pWnd) {
-			DrawWnd();
 			ShowWindow(SW_SHOWNOACTIVATE);
+			DrawWnd();
 		}
 	}
 }
@@ -856,10 +856,10 @@ void CVMROSD::HideMessage(bool hide)
 		if (hide) {
 			ClearMessage(true);
 		} else {
-			DrawWnd();
 			if (m_bVisibleMessage) {
 				ShowWindow(SW_SHOWNOACTIVATE);
 			}
+			DrawWnd();
 		}
 	}
 }

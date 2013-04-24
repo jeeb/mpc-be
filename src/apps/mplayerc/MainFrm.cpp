@@ -1554,6 +1554,8 @@ bool CMainFrame::OSDBarSetPos()
 		m_OSD.DrawWnd();
 	}
 
+	/*
+	// we need to auto-hide or not ???
 	if (r_wndView.Height() > 40 && r_wndView.Width() > 100) {
 		m_OSD.EnableShowMessage();
 		m_OSD.HideMessage(false);
@@ -1562,6 +1564,7 @@ bool CMainFrame::OSDBarSetPos()
 		m_OSD.EnableShowMessage(false);
 		m_OSD.HideMessage(true);
 	}
+	*/
 	
 	return false;
 }
@@ -3234,7 +3237,9 @@ LRESULT CMainFrame::OnResetDevice( WPARAM wParam, LPARAM lParam )
 		pMC->Pause();
 	}
 
-	m_OSD.HideMessage(true);
+	if (m_OSD.GetOSDType() != OSD_TYPE_GDI) {
+		m_OSD.HideMessage(true);
+	}
 
 	BOOL bResult = false;
 	if (m_bOpenedThruThread) {
@@ -3245,7 +3250,9 @@ LRESULT CMainFrame::OnResetDevice( WPARAM wParam, LPARAM lParam )
 		ResetDevice();
 	}
 
-	m_OSD.HideMessage(false);
+	if (m_OSD.GetOSDType() != OSD_TYPE_GDI) {
+		m_OSD.HideMessage(false);
+	}
 
 	if (fs == State_Running) {
 		pMC->Run();
@@ -11217,7 +11224,9 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 
 	// Temporarily hide the OSD message if there is one, it will
 	// be restored after. This avoid positioning problems.
-	m_OSD.HideMessage(true);
+	if (m_OSD.GetOSDType() != OSD_TYPE_GDI) {
+		m_OSD.HideMessage(true);
+	}
 
 	if (m_fFirstFSAfterLaunchOnFS) { //Play started in Fullscreen
 		if (s.fRememberWindowSize || s.fRememberWindowPos) {
@@ -11261,7 +11270,9 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 
 	MoveVideoWindow();
 
-	m_OSD.HideMessage(false);
+	if (m_OSD.GetOSDType() != OSD_TYPE_GDI) {
+		m_OSD.HideMessage(false);
+	}
 
 	if ((m_Change_Monitor) && (!m_bToggleShader || !m_bToggleShaderScreenSpace)) { // Enabled shader ...
 		SetShaders();
