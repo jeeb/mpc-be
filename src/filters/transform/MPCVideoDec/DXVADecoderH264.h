@@ -61,8 +61,6 @@ private:
 	HRESULT					DisplayStatus();
 
 	// DXVA functions
-	void					RemoveUndisplayedFrame(int nPOC);
-	void					ClearRefFramesList();
 	void					ClearUnusedRefFrames();
 
 	int						m_nPictStruct;

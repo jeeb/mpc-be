@@ -309,18 +309,6 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 	return hr;
 }
 
-void CDXVADecoderH264::RemoveUndisplayedFrame(int nPOC)
-{
-	// Find frame with given POC, and free the slot
-	for (int i=0; i<m_nPicEntryNumber; i++) {
-		if (m_pPictureStore[i].bInUse && m_pPictureStore[i].nCodecSpecific == nPOC) {
-			m_pPictureStore[i].bDisplayed = true;
-			RemoveRefFrame (i);
-			return;
-		}
-	}
-}
-
 void CDXVADecoderH264::ClearUnusedRefFrames()
 {
 	// Remove old reference frames (not anymore a short or long ref frame)
@@ -338,16 +326,6 @@ void CDXVADecoderH264::SetExtraData (BYTE* pDataIn, UINT nSize)
 	AVCodecContext* pAVCtx	= m_pFilter->GetAVCtx();
 
 	FFH264SetDxvaSliceLong (pAVCtx, m_pSliceLong);
-}
-
-void CDXVADecoderH264::ClearRefFramesList()
-{
-	for (int i=0; i<m_nPicEntryNumber; i++) {
-		if (m_pPictureStore[i].bInUse) {
-			m_pPictureStore[i].bDisplayed = true;
-			RemoveRefFrame (i);
-		}
-	}
 }
 
 HRESULT CDXVADecoderH264::DisplayStatus()

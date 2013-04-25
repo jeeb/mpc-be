@@ -8175,6 +8175,8 @@ void CMainFrame::OnPlayPlay()
 
 void CMainFrame::OnPlayPauseI()
 {
+	OAFilterState fs = GetMediaState();
+
 	if (m_iMediaLoadState == MLS_LOADED) {
 
 		if (GetPlaybackMode() == PM_FILE) {
@@ -8191,13 +8193,15 @@ void CMainFrame::OnPlayPauseI()
 
 	MoveVideoWindow();
 
-	CString strOSD = ResStr(ID_PLAY_PAUSE);
-	int i = strOSD.Find(_T("\n"));
-	if (i > 0) {
-		strOSD.Delete(i, strOSD.GetLength() - i);
+	if (fs == State_Running) {
+		CString strOSD = ResStr(ID_PLAY_PAUSE);
+		int i = strOSD.Find(_T("\n"));
+		if (i > 0) {
+			strOSD.Delete(i, strOSD.GetLength() - i);
+		}
+		m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 3000);
+		m_Lcd.SetStatusMessage(ResStr(IDS_CONTROLS_PAUSED), 3000);
 	}
-	m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 3000);
-	m_Lcd.SetStatusMessage(ResStr(IDS_CONTROLS_PAUSED), 3000);
 	SetPlayState(PS_PAUSE);
 }
 
@@ -11238,12 +11242,6 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 
 	m_fAudioOnly = fAudioOnly;
 
-	// Temporarily hide the OSD message if there is one, it will
-	// be restored after. This avoid positioning problems.
-	if (m_OSD.GetOSDType() != OSD_TYPE_GDI) {
-		m_OSD.HideMessage(true);
-	}
-
 	if (m_fFirstFSAfterLaunchOnFS) { //Play started in Fullscreen
 		if (s.fRememberWindowSize || s.fRememberWindowPos) {
 			r = s.rcLastWindowPos;
@@ -11285,10 +11283,6 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 	SetAlwaysOnTop(s.iOnTop);
 
 	MoveVideoWindow();
-
-	if (m_OSD.GetOSDType() != OSD_TYPE_GDI) {
-		m_OSD.HideMessage(false);
-	}
 
 	if ((m_Change_Monitor) && (!m_bToggleShader || !m_bToggleShaderScreenSpace)) { // Enabled shader ...
 		SetShaders();
