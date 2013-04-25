@@ -14566,6 +14566,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 void CMainFrame::CloseMediaPrivate()
 {
 	SetLoadState (MLS_CLOSING);
+	m_OSD.Stop();
 	OnPlayStop();
 
 	if (pMC) {
@@ -14602,7 +14603,6 @@ void CMainFrame::CloseMediaPrivate()
 	m_pMFVDC = NULL;
 	m_pLN21 = NULL;
 	m_pSyncClock = NULL;
-	m_OSD.Stop();
 
 	pAMXBar.Release();
 	pAMTuner.Release();
