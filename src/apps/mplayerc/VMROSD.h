@@ -30,6 +30,9 @@
 #include "PngImage.h"
 //#include <Gdiplus.h>
 
+#define WM_HIDE			(WM_USER + 1001)
+#define WM_OSD_DRAW		(WM_USER + 1002)
+
 typedef enum {
 	OSD_TRANSPARENT,
 	OSD_BACKGROUND,
@@ -87,7 +90,6 @@ public:
 	bool bMouseOverCloseButton;
 	bool bMouseOverExitButton;
 
-	void DrawWnd();
 	void SetWndRect(CRect rc) { m_MainWndRect = rc; };
 
 	OSD_TYPE GetOSDType() { return m_OSDType; };
@@ -169,6 +171,8 @@ private :
 
 	void Reset();
 
+	void DrawWnd();
+
 	// Gdiplus::GdiplusStartupInput m_gdiplusStartupInput;
 	// ULONG_PTR m_gdiplusToken;
 
@@ -183,5 +187,6 @@ protected:
 
 public:
 	afx_msg void OnHide();
+	afx_msg void OnDrawWnd();
 	afx_msg void OnWindowPosChanged(WINDOWPOS* lpwndpos);
 };

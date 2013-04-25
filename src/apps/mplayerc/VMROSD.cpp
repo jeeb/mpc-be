@@ -23,7 +23,7 @@
 #include "stdafx.h"
 #include "VMROSD.h"
 
-#define WM_HIDE					(WM_USER + 1001)
+#define DEFFLAGS				SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOREDRAW | SWP_ASYNCWINDOWPOS
 
 #define SEEKBAR_HEIGHT			60
 #define SLIDER_BAR_HEIGHT		10
@@ -58,7 +58,6 @@ CVMROSD::CVMROSD(void)
 	memset(&m_BitmapInfo, 0, sizeof(m_BitmapInfo));
 
 	m_FontSize				= 0;
-	m_OSD_Font				= _T("");
 	m_OSD_Transparent		= 0;
 	bMouseOverExitButton	= false;
 	bMouseOverCloseButton	= false;
@@ -122,6 +121,7 @@ IMPLEMENT_DYNAMIC(CVMROSD, CWnd)
 
 BEGIN_MESSAGE_MAP(CVMROSD, CWnd)
 	ON_MESSAGE_VOID(WM_HIDE, OnHide)
+	ON_MESSAGE_VOID(WM_OSD_DRAW, OnDrawWnd)
 	ON_WM_CREATE()
 	ON_WM_PAINT()
 	ON_WM_ERASEBKGND()
@@ -133,15 +133,17 @@ void CVMROSD::OnHide()
 	ShowWindow(SW_HIDE);
 }
 
+void CVMROSD::OnDrawWnd()
+{
+	DrawWnd();
+}
+
 void CVMROSD::OnWindowPosChanged(WINDOWPOS* lpwndpos)
 {
 	__super::OnWindowPosChanged(lpwndpos);
 
 	if ((lpwndpos->flags & SWP_HIDEWINDOW) && m_pWnd) {
-		CRect rc;
-		GetClientRect(&rc);
-		ClientToScreen(rc);
-		MoveWindow(rc.left, rc.top, 0, 0, FALSE);	
+		SetWindowPos(NULL, 0, 0, 0, 0, DEFFLAGS | SWP_NOMOVE);
 
 		if (!m_bVisibleMessage) {
 			m_strMessage.Empty();
@@ -160,7 +162,7 @@ void CVMROSD::OnSize(UINT nType, int cx, int cy)
 		InvalidateVMROSD();
 		UpdateBitmap();
 	} else if (m_pWnd) {
-		DrawWnd();
+		PostMessage(WM_OSD_DRAW);
 	}
 }
 
@@ -827,8 +829,8 @@ void CVMROSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration,
 		}
 
 		if (m_pWnd) {
-			ShowWindow(SW_SHOWNOACTIVATE);
-			DrawWnd();
+			SetWindowPos(NULL, 0, 0, 0, 0, DEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+			PostMessage(WM_OSD_DRAW);
 		}
 	}
 }
@@ -857,9 +859,9 @@ void CVMROSD::HideMessage(bool hide)
 			ClearMessage(true);
 		} else {
 			if (m_bVisibleMessage) {
-				ShowWindow(SW_SHOWNOACTIVATE);
+				SetWindowPos(NULL, 0, 0, 0, 0, DEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 			}
-			DrawWnd();
+			PostMessage(WM_OSD_DRAW);
 		}
 	}
 }
@@ -929,11 +931,13 @@ BOOL CVMROSD::OnEraseBkgnd(CDC* pDC)
 void CVMROSD::OnPaint()
 {
 	CPaintDC dc(this);
-	DrawWnd();
+	PostMessage(WM_OSD_DRAW);
 }
 
 void CVMROSD::DrawWnd()
 {
+	CAutoLock Lock(&m_Lock);
+
 	if (!IsWindowVisible() || !m_pWnd || m_OSDType != OSD_TYPE_GDI || m_strMessage.IsEmpty()) {
 		return;
 	}
@@ -949,8 +953,6 @@ void CVMROSD::DrawWnd()
 
 	CClientDC dc(this);
 
-	AppSettings& s = AfxGetAppSettings();
-
 	CDC temp_DC;
 	temp_DC.CreateCompatibleDC(&dc);
 	CBitmap temp_BM;
@@ -964,11 +966,11 @@ void CVMROSD::DrawWnd()
 	LOGFONT lf;
 	memset(&lf, 0, sizeof(lf));
 	lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
-	LPCTSTR fonts[] = {m_OSD_Font};
-	int fonts_size[] = {m_FontSize*10};
+	LPCTSTR fonts[]		= {m_OSD_Font};
+	int fonts_size[]	= {m_FontSize*10};
+	lf.lfHeight			= fonts_size[0];
+	lf.lfQuality		= AfxGetAppSettings().fFontAA ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY;
 	_tcscpy_s(lf.lfFaceName, fonts[0]);
-	lf.lfHeight = fonts_size[0];
-	lf.lfQuality = AfxGetAppSettings().fFontAA ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY;
 
 	m_MainFont.CreatePointFontIndirect(&lf,&temp_DC);
 	temp_DC.SelectObject(m_MainFont);
@@ -993,7 +995,8 @@ void CVMROSD::DrawWnd()
 	temp_BM.DeleteObject();
 	temp_DC.DeleteDC();
 
-	MoveWindow(m_MainWndRect.left + 10 + rectMessages.left, m_MainWndRect.top + 10, rectMessages.Width() - rectMessages.left, rectMessages.Height(), FALSE);
+	CRect wr(m_MainWndRect.left + 10 + rectMessages.left, m_MainWndRect.top + 10, rectMessages.Width() - rectMessages.left, rectMessages.Height());
+	SetWindowPos(NULL, wr.left, wr.top, wr.right, wr.bottom, DEFFLAGS);
 
 	CRect rcBar;
 	GetClientRect(&rcBar);

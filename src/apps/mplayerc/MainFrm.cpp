@@ -1542,14 +1542,13 @@ bool CMainFrame::OSDBarSetPos()
 	m_wndView.GetWindowRect(&r_wndView);
 
 	int pos = (m_wndFlyBar && m_wndFlyBar.IsWindowVisible()) ? (m_wndFlyBar.iw * 9 + 20) : 0;
-	//m_OSD.MoveWindow(r_wndView.left+10, r_wndView.top+10, r_wndView.right-r_wndView.left-20-pos, r_wndView.bottom-r_wndView.top-20);
 
 	CRect MainWndRect;
 	m_wndView.GetWindowRect(&MainWndRect);
 	MainWndRect.right -= pos;
 	m_OSD.SetWndRect(MainWndRect);
 	if (m_OSD.IsWindowVisible()) {
-		m_OSD.DrawWnd();
+		::PostMessage(m_OSD.m_hWnd, WM_OSD_DRAW, WPARAM(0), LPARAM(0));
 	}
 
 	/*
@@ -14567,8 +14566,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 void CMainFrame::CloseMediaPrivate()
 {
 	SetLoadState (MLS_CLOSING);
-	m_OSD.Stop();
-
 	OnPlayStop();
 
 	if (pMC) {
@@ -14589,15 +14586,10 @@ void CMainFrame::CloseMediaPrivate()
 		}
 	}
 	IsMadVRExclusiveMode = false;
-
 	m_fLiveWM = false;
-
 	m_fEndOfStream = false;
-
 	m_rtDurationOverride = -1;
-
 	m_kfs.RemoveAll();
-
 	m_pCB = NULL;
 
 	//if (pVW) pVW->put_Visible(OAFALSE);
@@ -14610,6 +14602,8 @@ void CMainFrame::CloseMediaPrivate()
 	m_pMFVDC = NULL;
 	m_pLN21 = NULL;
 	m_pSyncClock = NULL;
+	m_OSD.Stop();
+
 	pAMXBar.Release();
 	pAMTuner.Release();
 	pAMDF.Release();
