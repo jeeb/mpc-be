@@ -905,13 +905,7 @@ void CPlayerSeekBar::UpdateToolTipText()
 		m_ti.lpszText = (LPTSTR)(LPCTSTR)tooltipText;
 		m_tooltip.SendMessage(TTM_SETTOOLINFO, 0, (LPARAM)&m_ti);
 	} else {
-		if (AfxGetAppSettings().fDisableXPToolbars) {
-			pFrame->m_wndView2.SetWindowText(tooltipText);
-		} else {
-			// TODO - Center Caption
-			CString str = _T("               ") + tooltipText + _T("               ");
-			pFrame->m_wndView2.SetWindowText(str);
-		}
+		pFrame->m_wndView2.SetWindowText(tooltipText);
 	}
 
 	{
