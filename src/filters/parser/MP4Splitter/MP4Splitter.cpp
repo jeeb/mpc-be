@@ -475,7 +475,6 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_framesize.SetSize(640, 480);
 
 	int nRotation		= 0;
-	int ChapterTrackId	= 0;
 
 	if (AP4_Movie* movie = (AP4_Movie*)m_pFile->GetMovie()) {
 		// looking for main video track (skip tracks with motionless frames)
@@ -523,47 +522,45 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 
 			if (AP4_ChapAtom* chap = dynamic_cast<AP4_ChapAtom*>(track->GetTrakAtom()->FindChild("tref/chap"))) {
-				ChapterTrackId = chap->GetChapterTrackId();
-			}
+				if (track->GetId() == chap->GetChapterTrackId()) { // Hmm...
 
-			if (track->GetId() == ChapterTrackId) {
+					for (AP4_Cardinal i = 0; i < track->GetSampleCount(); i++) {
+						AP4_Sample sample;
+						AP4_DataBuffer data;
+						track->ReadSample(i, sample, data);
 
-				for (AP4_Cardinal i = 0; i < track->GetSampleCount(); i++) {
-					AP4_Sample sample;
-					AP4_DataBuffer data;
-					track->ReadSample(i, sample, data);
+						const AP4_Byte* ptr	= data.GetData();
+						AP4_Size avail		= data.GetDataSize();
+						CStringA ChapterName;
 
-					const AP4_Byte* ptr	= data.GetData();
-					AP4_Size avail		= data.GetDataSize();
-					CStringA ChapterName;
+						if (avail > 2) {
+							AP4_UI16 size = (ptr[0] << 8) | ptr[1];
 
-					if (avail > 2) {
-						AP4_UI16 size = (ptr[0] << 8) | ptr[1];
+							if (size <= avail-2) {
 
-						if (size <= avail-2) {
-
-							if (size >= 2 && ptr[2] == 0xfe && ptr[3] == 0xff) {
-								CStringW wstr = CStringW((LPCWSTR)&ptr[2], size/2);
-								for (int i = 0; i < wstr.GetLength(); ++i) {
-									wstr.SetAt(i, ((WORD)wstr[i] >> 8) | ((WORD)wstr[i] << 8));
+								if (size >= 2 && ptr[2] == 0xfe && ptr[3] == 0xff) {
+									CStringW wstr = CStringW((LPCWSTR)&ptr[2], size/2);
+									for (int i = 0; i < wstr.GetLength(); ++i) {
+										wstr.SetAt(i, ((WORD)wstr[i] >> 8) | ((WORD)wstr[i] << 8));
+									}
+									ChapterName = UTF16To8(wstr);
+								} else {
+									ChapterName = CStringA((LPCSTR)&ptr[2], size);
 								}
-								ChapterName = UTF16To8(wstr);
-							} else {
-								ChapterName = CStringA((LPCSTR)&ptr[2], size);
 							}
 						}
+
+						REFERENCE_TIME rtStart	= (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetCts());
+						
+						ChapAppend(rtStart, UTF8To16(ChapterName));
 					}
 
-					REFERENCE_TIME rtStart	= (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetCts());
-					
-					ChapAppend(rtStart, UTF8To16(ChapterName));
-				}
+					if (ChapGetCount()) {
+						ChapSort();
+					}
 
-				if (ChapGetCount()) {
-					ChapSort();
+					continue;
 				}
-
-				continue;
 			}
 
 			if (track->GetType() == AP4_Track::TYPE_VIDEO && !nRotation) {
