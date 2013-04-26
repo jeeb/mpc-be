@@ -64,6 +64,19 @@ void CDXVADecoderVC1::Init()
 	memset (&m_PictureParams, 0, sizeof(m_PictureParams));
 	memset (&m_SliceInfo,     0, sizeof(m_SliceInfo));
 
+	m_PictureParams.bMacroblockWidthMinus1			= 15;
+	m_PictureParams.bMacroblockHeightMinus1			= 15;
+	m_PictureParams.bBlockWidthMinus1				= 7;
+	m_PictureParams.bBlockHeightMinus1				= 7;
+	m_PictureParams.bBPPminus1						= 7;
+
+	m_PictureParams.bChromaFormat					= VC1_CHROMA_420;
+
+	// iWMV9 - i9IRU - iOHIT - iINSO - iWMVA - 0 - 0 - 0			| Section 3.2.5
+	m_PictureParams.bBidirectionalAveragingMode		= (1 << 7) |
+						(GetConfigIntraResidUnsigned()   << 6) |	// i9IRU
+						(GetConfigResidDiffAccelerator() << 5);		// iOHIT
+
 	m_nMaxWaiting		  = 5;
 	m_wRefPictureIndex[0] = NO_REF_FRAME;
 	m_wRefPictureIndex[1] = NO_REF_FRAME;
@@ -194,30 +207,6 @@ HRESULT CDXVADecoderVC1::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 	m_bFlushed = false;
 
 	return DisplayNextFrame();
-}
-
-void CDXVADecoderVC1::SetExtraData (BYTE* pDataIn, UINT nSize)
-{
-	m_PictureParams.bMacroblockWidthMinus1			= 15;
-	m_PictureParams.bMacroblockHeightMinus1			= 15;
-	m_PictureParams.bBlockWidthMinus1				= 7;
-	m_PictureParams.bBlockHeightMinus1				= 7;
-	m_PictureParams.bBPPminus1						= 7;
-
-	m_PictureParams.bChromaFormat					= VC1_CHROMA_420;
-
-	m_PictureParams.bPicScanFixed					= 0;	// Use for status reporting sections 3.8.1 and 3.8.2
-	m_PictureParams.bPicReadbackRequests			= 0;
-
-	m_PictureParams.bPicBinPB						= 0;	// TODO
-	m_PictureParams.bMV_RPS							= 0;	// TODO
-
-	m_PictureParams.bReservedBits					= 0;
-
-	// iWMV9 - i9IRU - iOHIT - iINSO - iWMVA - 0 - 0 - 0		| Section 3.2.5
-	m_PictureParams.bBidirectionalAveragingMode		= (1 << 7) |
-			(GetConfigIntraResidUnsigned()   << 6) |	// i9IRU
-			(GetConfigResidDiffAccelerator() << 5);		// iOHIT
 }
 
 BYTE* CDXVADecoderVC1::FindNextStartCode(BYTE* pBuffer, UINT nSize, UINT& nPacketSize)

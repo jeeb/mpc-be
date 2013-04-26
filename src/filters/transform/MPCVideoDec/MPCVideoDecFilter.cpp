@@ -2775,7 +2775,7 @@ HRESULT CMPCVideoDecFilter::CreateDXVA2Decoder(UINT nNumRenderTargets, IDirect3D
 	m_pDecoderRenderTarget	= NULL;
 
 	if (m_pDXVADecoder) {
-		m_pDXVADecoder->SetDirectXVideoDec (NULL);
+		m_pDXVADecoder->SetDirectXVideoDec(NULL);
 	}
 
 	hr = m_pDecoderService->CreateVideoDecoder (m_DXVADecoderGUID, &m_VideoDesc, &m_DXVA2Config,
@@ -2786,7 +2786,6 @@ HRESULT CMPCVideoDecFilter::CreateDXVA2Decoder(UINT nNumRenderTargets, IDirect3D
 		SAFE_DELETE (m_pDXVADecoder);
 		m_pDXVADecoder = CDXVADecoder::CreateDecoder(this, pDirectXVideoDec, &m_DXVADecoderGUID, GetPicEntryNumber(), &m_DXVA2Config);
 		if (m_pDXVADecoder) {
-			m_pDXVADecoder->SetExtraData((BYTE*)m_pAVCtx->extradata, m_pAVCtx->extradata_size);
 			m_pDXVADecoder->SetDirectXVideoDec(pDirectXVideoDec);
 		} else {
 			hr = E_FAIL;
@@ -2870,9 +2869,6 @@ HRESULT CMPCVideoDecFilter::CreateDXVA1Decoder(IAMVideoAccelerator*  pAMVideoAcc
 	m_nDXVAMode			= MODE_DXVA1;
 	m_DXVADecoderGUID	= *pDecoderGuid;
 	m_pDXVADecoder		= CDXVADecoder::CreateDecoder (this, pAMVideoAccelerator, &m_DXVADecoderGUID, dwSurfaceCount);
-	if (m_pDXVADecoder) {
-		m_pDXVADecoder->SetExtraData ((BYTE*)m_pAVCtx->extradata, m_pAVCtx->extradata_size);
-	}
 
 	return S_OK;
 }
@@ -2959,12 +2955,12 @@ HRESULT CMPCVideoDecFilter::DetectVideoCard_EVR(IPin *pPin)
 							hr = pD3D9->GetAdapterIdentifier(DevPar9.AdapterOrdinal, 0, &AdapID9);
 							if (SUCCEEDED(hr)) {
 								// copy adapter description
-								m_nPCIVendor = AdapID9.VendorId;
-								m_nPCIDevice = AdapID9.DeviceId;
-								m_VideoDriverVersion.QuadPart = AdapID9.DriverVersion.QuadPart;
-								m_strDeviceDescription = AdapID9.Description;
+								m_nPCIVendor					= AdapID9.VendorId;
+								m_nPCIDevice					= AdapID9.DeviceId;
+								m_VideoDriverVersion.QuadPart	= AdapID9.DriverVersion.QuadPart;
+								m_strDeviceDescription			= AdapID9.Description;
 								m_strDeviceDescription.AppendFormat(_T(" (%04hX:%04hX)"), m_nPCIVendor, m_nPCIDevice);
-								}
+							}
 						}
 						pD3D9->Release();
 					}

@@ -63,6 +63,15 @@ void CDXVADecoderMpeg2::Init()
 	memset (&m_SliceInfo,		0, sizeof(m_SliceInfo));
 	memset (&m_QMatrixData,		0, sizeof(m_QMatrixData));
 
+	m_PictureParams.bMacroblockWidthMinus1			= 15;	// This is equal to "15" for MPEG-1, MPEG-2, H.263, and MPEG-4
+	m_PictureParams.bMacroblockHeightMinus1			= 15;	// This is equal to "15" for MPEG-1, MPEG-2, H.261, H.263, and MPEG-4
+	m_PictureParams.bBlockWidthMinus1				= 7;	// This is equal to "7" for MPEG-1, MPEG-2, H.261, H.263, and MPEG-4
+	m_PictureParams.bBlockHeightMinus1				= 7;	// This is equal to "7" for MPEG-1, MPEG-2, H.261, H.263, and MPEG-4
+	m_PictureParams.bBPPminus1						= 7;	// It is equal to "7" for MPEG-1, MPEG-2, H.261, and H.263
+
+	m_PictureParams.bChromaFormat					= 0x01;	// For MPEG-1, MPEG-2 "Main Profile," H.261 and H.263 bitstreams, this value shall always be set to "01", indicating "4:2:0" format
+
+
 	m_nMaxWaiting			= 5;
 	m_wRefPictureIndex[0]	= NO_REF_FRAME;
 	m_wRefPictureIndex[1]	= NO_REF_FRAME;

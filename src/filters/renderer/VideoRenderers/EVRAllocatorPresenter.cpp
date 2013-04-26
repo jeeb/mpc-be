@@ -1573,7 +1573,11 @@ void CEVRAllocatorPresenter::GetMixerThread()
 						BITMAPINFOHEADER bih;
 						if (ExtractBIH(&mt, &bih)) {
 							m_InputVCodec = GetMediaTypeName (mt.subtype);
-							m_InputVCodec.Replace(L"MEDIASUBTYPE_", L"");
+							if (!m_InputVCodec.Find(L"MEDIASUBTYPE_")) {
+								m_InputVCodec.Replace(L"MEDIASUBTYPE_", L"");
+							} else {
+								m_InputVCodec = GetDXVAMode(&mt.subtype);
+							}
 						}
 					}
 					// If framerate not set by Video Decoder choose 23.97...

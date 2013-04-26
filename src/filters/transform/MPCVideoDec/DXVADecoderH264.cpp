@@ -77,7 +77,6 @@ void CDXVADecoderH264::Init()
 		m_DXVAPicParams.RefFrameList[i].bPicEntry		= 255;
 	}
 
-
 	m_nNALLength		= 4;
 	m_nMaxSlices		= 0;
 	m_nSlices			= 0;
@@ -89,6 +88,9 @@ void CDXVADecoderH264::Init()
 		default :
 			ASSERT(FALSE);
 	}
+
+	AVCodecContext* pAVCtx = m_pFilter->GetAVCtx();
+	FFH264SetDxvaSliceLong (pAVCtx, m_pSliceLong);
 
 	Flush();
 }
@@ -319,13 +321,6 @@ void CDXVADecoderH264::ClearUnusedRefFrames()
 			}
 		}
 	}
-}
-
-void CDXVADecoderH264::SetExtraData (BYTE* pDataIn, UINT nSize)
-{
-	AVCodecContext* pAVCtx	= m_pFilter->GetAVCtx();
-
-	FFH264SetDxvaSliceLong (pAVCtx, m_pSliceLong);
 }
 
 HRESULT CDXVADecoderH264::DisplayStatus()

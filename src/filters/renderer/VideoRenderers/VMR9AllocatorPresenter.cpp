@@ -365,7 +365,12 @@ STDMETHODIMP CVMR9AllocatorPresenter::PresentImage(DWORD_PTR dwUserID, VMR9Prese
 			BITMAPINFOHEADER bih;
 			if (ExtractBIH(&mt, &bih)) {
 				m_InputVCodec = GetMediaTypeName (mt.subtype);
-				m_InputVCodec.Replace(L"MEDIASUBTYPE_", L"");
+				m_InputVCodec = GetMediaTypeName (mt.subtype);
+				if (!m_InputVCodec.Find(L"MEDIASUBTYPE_")) {
+					m_InputVCodec.Replace(L"MEDIASUBTYPE_", L"");
+				} else {
+					m_InputVCodec = GetDXVAMode(&mt.subtype);
+				}
 			}
 
 			CSize NativeVideoSize = m_NativeVideoSize;

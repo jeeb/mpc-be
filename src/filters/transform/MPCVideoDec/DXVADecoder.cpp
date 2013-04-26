@@ -93,13 +93,6 @@ void CDXVADecoder::AllocExecuteParams (int nSize)
 	}
 }
 
-void CDXVADecoder::SetExtraData (BYTE* pDataIn, UINT nSize)
-{
-	// Extradata is codec dependant
-	UNREFERENCED_PARAMETER (pDataIn);
-	UNREFERENCED_PARAMETER (nSize);
-}
-
 void CDXVADecoder::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize)
 {
 	memcpy_sse (pDXVABuffer, (BYTE*)pBuffer, nSize);

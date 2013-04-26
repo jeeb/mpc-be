@@ -35,7 +35,6 @@ public:
 	virtual ~CDXVADecoderH264();
 
 	virtual HRESULT DecodeFrame   (BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-	virtual void	SetExtraData  (BYTE* pDataIn, UINT nSize);
 	virtual void	CopyBitstream (BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
 	virtual void	Flush();
 
