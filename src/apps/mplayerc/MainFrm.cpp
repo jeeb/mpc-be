@@ -219,10 +219,10 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_UPDATE_COMMAND_UI(IDC_PLAYERSTATUS, OnUpdatePlayerStatus)
 
-	ON_COMMAND(ID_FILE_POST_OPENMEDIA, OnFilePostOpenmedia)
-	ON_UPDATE_COMMAND_UI(ID_FILE_POST_OPENMEDIA, OnUpdateFilePostOpenmedia)
-	ON_COMMAND(ID_FILE_POST_CLOSEMEDIA, OnFilePostClosemedia)
-	ON_UPDATE_COMMAND_UI(ID_FILE_POST_CLOSEMEDIA, OnUpdateFilePostClosemedia)
+	ON_COMMAND(ID_FILE_POST_OPENMEDIA, OnFilePostOpenMedia)
+	ON_UPDATE_COMMAND_UI(ID_FILE_POST_OPENMEDIA, OnUpdateFilePostOpenMedia)
+	ON_COMMAND(ID_FILE_POST_CLOSEMEDIA, OnFilePostCloseMedia)
+	ON_UPDATE_COMMAND_UI(ID_FILE_POST_CLOSEMEDIA, OnUpdateFilePostCloseMedia)
 
 	ON_COMMAND(ID_BOSS, OnBossKey)
 
@@ -238,7 +238,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_COMMAND(ID_FILE_OPENQUICK, OnFileOpenQuick)
 	ON_UPDATE_COMMAND_UI(ID_FILE_OPENQUICK, OnUpdateFileOpen)
-	ON_COMMAND(ID_FILE_OPENMEDIA, OnFileOpenmedia)
+	ON_COMMAND(ID_FILE_OPENMEDIA, OnFileOpenMedia)
 	ON_UPDATE_COMMAND_UI(ID_FILE_OPENMEDIA, OnUpdateFileOpen)
 	ON_WM_COPYDATA()
 	ON_COMMAND(ID_FILE_OPENDVD, OnFileOpendvd)
@@ -2551,7 +2551,6 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 				}
 
 				m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_LOCATION), Location);
-				CreateChapterTimeArray();
 
 				// Video
 
@@ -2895,18 +2894,14 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 					DvdPos->lTitle = (DWORD)evParam1;
 				}
 
-				if (GetPlaybackMode() == PM_FILE) {
-					SetupChapters();
-				} else if (GetPlaybackMode() == PM_DVD) {
-					m_iDVDTitle = (DWORD)evParam1;
+				m_iDVDTitle = (DWORD)evParam1;
 
-					if (m_iDVDDomain == DVD_DOMAIN_Title) {
-						CString Domain;
-						Domain.Format(ResStr(IDS_AG_TITLE), m_iDVDTitle);
-						m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_DOMAIN), Domain);
-					}
-					CreateChapterTimeArray();
+				if (m_iDVDDomain == DVD_DOMAIN_Title) {
+					CString Domain;
+					Domain.Format(ResStr(IDS_AG_TITLE), m_iDVDTitle);
+					m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_DOMAIN), Domain);
 				}
+				SetupChapters();
 			}
 			break;
 			case EC_DVD_DOMAIN_CHANGE: {
@@ -3093,6 +3088,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 #endif
 
 				MoveVideoWindow(); // AR might have changed
+				SetupChapters();
 			}
 			break;
 			case EC_DVD_CURRENT_HMSF_TIME: {
@@ -4049,7 +4045,7 @@ void CMainFrame::OnUpdatePlayerStatus(CCmdUI* pCmdUI)
 	}
 }
 
-void CMainFrame::OnFilePostOpenmedia()
+void CMainFrame::OnFilePostOpenMedia()
 {
 	OpenSetupInfoBar();
 
@@ -4120,15 +4116,15 @@ void CMainFrame::OnFilePostOpenmedia()
 	}
 	SendNowPlayingToApi();
 
-	CreateChapterTimeArray();
+	SetupChapters();
 }
 
-void CMainFrame::OnUpdateFilePostOpenmedia(CCmdUI* pCmdUI)
+void CMainFrame::OnUpdateFilePostOpenMedia(CCmdUI* pCmdUI)
 {
 	pCmdUI->Enable(m_iMediaLoadState == MLS_LOADING);
 }
 
-void CMainFrame::OnFilePostClosemedia()
+void CMainFrame::OnFilePostCloseMedia()
 {
 	if (IsD3DFullScreenMode()) {
 		KillTimer(TIMER_FULLSCREENMOUSEHIDER);
@@ -4184,7 +4180,7 @@ void CMainFrame::OnFilePostClosemedia()
 	SetupRecentFilesSubMenu();
 }
 
-void CMainFrame::OnUpdateFilePostClosemedia(CCmdUI* pCmdUI)
+void CMainFrame::OnUpdateFilePostCloseMedia(CCmdUI* pCmdUI)
 {
 	pCmdUI->Enable(!!m_hWnd && m_iMediaLoadState == MLS_CLOSING);
 }
@@ -4957,7 +4953,7 @@ void CMainFrame::OnFileOpenQuick()
 	OpenCurPlaylistItem();
 }
 
-void CMainFrame::OnFileOpenmedia()
+void CMainFrame::OnFileOpenMedia()
 {
 	if (m_iMediaLoadState == MLS_LOADING || !IsWindow(m_wndPlaylistBar) || m_pFullscreenWnd->IsWindow()) {
 		return;
@@ -9693,6 +9689,8 @@ void CMainFrame::OnNavigateSkip(UINT nID)
 			SendMessage(WM_COMMAND, ID_NAVIGATE_SKIPFORWARDFILE);
 		}
 	} else if (GetPlaybackMode() == PM_DVD) {
+		SetupChapters();
+
 		m_iSpeedLevel = 0;
 		m_iSpeedRate = 10;
 
@@ -9758,7 +9756,6 @@ void CMainFrame::OnNavigateSkip(UINT nID)
 			m_OSD.DisplayMessage(OSD_TOPLEFT, m_strOSD, 3000);
 		}
 
-		CreateChapterTimeArray();
 		/*
 				if (nID == ID_NAVIGATE_SKIPBACK)
 					pDVDC->PlayPrevChapter(DVD_CMD_FLAG_Block, NULL);
@@ -12626,138 +12623,162 @@ void CMainFrame::SetupChapters()
 {
 	ASSERT(m_pCB);
 
-	m_pCB->ChapRemoveAll();
+	if (GetPlaybackMode() == PM_FILE) {
+		m_pCB->ChapRemoveAll();
 
-	CInterfaceList<IBaseFilter> pBFs;
-	BeginEnumFilters(pGB, pEF, pBF)
-	pBFs.AddTail(pBF);
-	EndEnumFilters;
+		CInterfaceList<IBaseFilter> pBFs;
+		BeginEnumFilters(pGB, pEF, pBF)
+		pBFs.AddTail(pBF);
+		EndEnumFilters;
 
-	POSITION pos;
+		POSITION pos;
 
-	pos = pBFs.GetHeadPosition();
-	while (pos && !m_pCB->ChapGetCount()) {
-		IBaseFilter* pBF = pBFs.GetNext(pos);
+		pos = pBFs.GetHeadPosition();
+		while (pos && !m_pCB->ChapGetCount()) {
+			IBaseFilter* pBF = pBFs.GetNext(pos);
 
-		CComQIPtr<IDSMChapterBag> pCB = pBF;
-		if (!pCB) {
-			continue;
-		}
-
-		for (DWORD i = 0, cnt = pCB->ChapGetCount(); i < cnt; i++) {
-			REFERENCE_TIME rt;
-			CComBSTR name;
-			if (SUCCEEDED(pCB->ChapGet(i, &rt, &name))) {
-				m_pCB->ChapAppend(rt, name);
+			CComQIPtr<IDSMChapterBag> pCB = pBF;
+			if (!pCB) {
+				continue;
 			}
-		}
-	}
 
-	pos = pBFs.GetHeadPosition();
-	while (pos && !m_pCB->ChapGetCount()) {
-		IBaseFilter* pBF = pBFs.GetNext(pos);
-
-		CComQIPtr<IChapterInfo> pCI = pBF;
-		if (!pCI) {
-			continue;
-		}
-
-		CHAR iso6391[3];
-		::GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SISO639LANGNAME, iso6391, 3);
-		CStringA iso6392 = ISO6391To6392(iso6391);
-		if (iso6392.GetLength() < 3) {
-			iso6392 = "eng";
-		}
-
-		UINT cnt = pCI->GetChapterCount(CHAPTER_ROOT_ID);
-		for (UINT i = 1; i <= cnt; i++) {
-			UINT cid = pCI->GetChapterId(CHAPTER_ROOT_ID, i);
-
-			ChapterElement ce;
-			if (pCI->GetChapterInfo(cid, &ce)) {
-				char pl[3] = {iso6392[0], iso6392[1], iso6392[2]};
-				char cc[] = "  ";
+			for (DWORD i = 0, cnt = pCB->ChapGetCount(); i < cnt; i++) {
+				REFERENCE_TIME rt;
 				CComBSTR name;
-				name.Attach(pCI->GetChapterStringInfo(cid, pl, cc));
-				m_pCB->ChapAppend(ce.rtStart, name);
-			}
-		}
-	}
-
-	pos = pBFs.GetHeadPosition();
-	while (pos && !m_pCB->ChapGetCount()) {
-		IBaseFilter* pBF = pBFs.GetNext(pos);
-
-		CComQIPtr<IAMExtendedSeeking, &IID_IAMExtendedSeeking> pES = pBF;
-		if (!pES) {
-			continue;
-		}
-
-		long MarkerCount = 0;
-		if (SUCCEEDED(pES->get_MarkerCount(&MarkerCount))) {
-			for (long i = 1; i <= MarkerCount; i++) {
-				double MarkerTime = 0;
-				if (SUCCEEDED(pES->GetMarkerTime(i, &MarkerTime))) {
-					CStringW name;
-					name.Format(L"Chapter %d", i);
-
-					CComBSTR bstr;
-					if (S_OK == pES->GetMarkerName(i, &bstr)) {
-						name = bstr;
-					}
-
-					m_pCB->ChapAppend(REFERENCE_TIME(MarkerTime*10000000), name);
+				if (SUCCEEDED(pCB->ChapGet(i, &rt, &name))) {
+					m_pCB->ChapAppend(rt, name);
 				}
 			}
 		}
-	}
 
-	pos = pBFs.GetHeadPosition();
-	while (pos && !m_pCB->ChapGetCount()) {
-		IBaseFilter* pBF = pBFs.GetNext(pos);
+		pos = pBFs.GetHeadPosition();
+		while (pos && !m_pCB->ChapGetCount()) {
+			IBaseFilter* pBF = pBFs.GetNext(pos);
 
-		if (GetCLSID(pBF) != CLSID_OggSplitter) {
-			continue;
-		}
-
-		BeginEnumPins(pBF, pEP, pPin) {
-			if (m_pCB->ChapGetCount()) {
-				break;
+			CComQIPtr<IChapterInfo> pCI = pBF;
+			if (!pCI) {
+				continue;
 			}
 
-			if (CComQIPtr<IPropertyBag> pPB = pPin) {
-				for (int i = 1; ; i++) {
+			CHAR iso6391[3];
+			::GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SISO639LANGNAME, iso6391, 3);
+			CStringA iso6392 = ISO6391To6392(iso6391);
+			if (iso6392.GetLength() < 3) {
+				iso6392 = "eng";
+			}
+
+			UINT cnt = pCI->GetChapterCount(CHAPTER_ROOT_ID);
+			for (UINT i = 1; i <= cnt; i++) {
+				UINT cid = pCI->GetChapterId(CHAPTER_ROOT_ID, i);
+
+				ChapterElement ce;
+				if (pCI->GetChapterInfo(cid, &ce)) {
+					char pl[3] = {iso6392[0], iso6392[1], iso6392[2]};
+					char cc[] = "  ";
+					CComBSTR name;
+					name.Attach(pCI->GetChapterStringInfo(cid, pl, cc));
+					m_pCB->ChapAppend(ce.rtStart, name);
+				}
+			}
+		}
+
+		pos = pBFs.GetHeadPosition();
+		while (pos && !m_pCB->ChapGetCount()) {
+			IBaseFilter* pBF = pBFs.GetNext(pos);
+
+			CComQIPtr<IAMExtendedSeeking, &IID_IAMExtendedSeeking> pES = pBF;
+			if (!pES) {
+				continue;
+			}
+
+			long MarkerCount = 0;
+			if (SUCCEEDED(pES->get_MarkerCount(&MarkerCount))) {
+				for (long i = 1; i <= MarkerCount; i++) {
+					double MarkerTime = 0;
+					if (SUCCEEDED(pES->GetMarkerTime(i, &MarkerTime))) {
+						CStringW name;
+						name.Format(L"Chapter %d", i);
+
+						CComBSTR bstr;
+						if (S_OK == pES->GetMarkerName(i, &bstr)) {
+							name = bstr;
+						}
+
+						m_pCB->ChapAppend(REFERENCE_TIME(MarkerTime*10000000), name);
+					}
+				}
+			}
+		}
+
+		pos = pBFs.GetHeadPosition();
+		while (pos && !m_pCB->ChapGetCount()) {
+			IBaseFilter* pBF = pBFs.GetNext(pos);
+
+			if (GetCLSID(pBF) != CLSID_OggSplitter) {
+				continue;
+			}
+
+			BeginEnumPins(pBF, pEP, pPin) {
+				if (m_pCB->ChapGetCount()) {
+					break;
+				}
+
+				if (CComQIPtr<IPropertyBag> pPB = pPin) {
+					for (int i = 1; ; i++) {
+						CStringW str;
+						CComVariant var;
+
+						var.Clear();
+						str.Format(L"CHAPTER%02d", i);
+						if (S_OK != pPB->Read(str, &var, NULL)) {
+							break;
+						}
+
+						int h, m, s, ms;
+						WCHAR wc;
+						if (7 != swscanf_s(CStringW(var), L"%d%c%d%c%d%c%d", &h, &wc, sizeof(WCHAR), &m, &wc, sizeof(WCHAR), &s, &wc, sizeof(WCHAR), &ms)) {
+							break;
+						}
+
+						CStringW name;
+						name.Format(L"Chapter %d", i);
+						var.Clear();
+						str += L"NAME";
+						if (S_OK == pPB->Read(str, &var, NULL)) {
+							name = var;
+						}
+
+						m_pCB->ChapAppend(10000i64*(((h*60 + m)*60 + s)*1000 + ms), name);
+					}
+				}
+			}
+			EndEnumPins;
+		}
+	} else if (GetPlaybackMode() == PM_DVD) {
+		m_pCB->ChapRemoveAll();
+
+ 		WCHAR buff[_MAX_PATH];
+ 		ULONG len = 0;
+ 		DVD_PLAYBACK_LOCATION2 loc;
+ 		if (SUCCEEDED(pDVDI->GetDVDDirectory(buff, _countof(buff), &len)) && SUCCEEDED(pDVDI->GetCurrentLocation(&loc))) {
+ 			CStringW path;
+ 			path.Format(L"%s\\VTS_%02d_0.IFO", buff, loc.TitleNum);
+ 			CVobFile vob;
+ 			CAtlList<CString> files;
+ 			if(vob.Open(path, files)) {
+ 				for(int i = 0; i < vob.GetChaptersCount(); i++) {
+ 					REFERENCE_TIME rt = vob.GetChapterOffset(i);
 					CStringW str;
-					CComVariant var;
-
-					var.Clear();
-					str.Format(L"CHAPTER%02d", i);
-					if (S_OK != pPB->Read(str, &var, NULL)) {
-						break;
-					}
-
-					int h, m, s, ms;
-					WCHAR wc;
-					if (7 != swscanf_s(CStringW(var), L"%d%c%d%c%d%c%d", &h, &wc, sizeof(WCHAR), &m, &wc, sizeof(WCHAR), &s, &wc, sizeof(WCHAR), &ms)) {
-						break;
-					}
-
-					CStringW name;
-					name.Format(L"Chapter %d", i);
-					var.Clear();
-					str += L"NAME";
-					if (S_OK == pPB->Read(str, &var, NULL)) {
-						name = var;
-					}
-
-					m_pCB->ChapAppend(10000i64*(((h*60 + m)*60 + s)*1000 + ms), name);
-				}
+					str.Format(IDS_AG_CHAPTER, i + 1);
+					m_pCB->ChapAppend(rt, str);
+ 				}
 			}
 		}
-		EndEnumPins;
+		m_wndSeekBar.SetChapterBag(m_pCB);
 	}
 
 	m_pCB->ChapSort();
+	m_wndSeekBar.SetChapterBag(m_pCB);
 }
 
 CString CMainFrame::OpenDVD(OpenDVDData* pODD)
@@ -12835,8 +12856,6 @@ CString CMainFrame::OpenDVD(OpenDVDData* pODD)
 	}
 
 	m_iDVDDomain = DVD_DOMAIN_Stop;
-
-	CreateChapterTimeArray();
 
 	SetPlaybackMode(PM_DVD);
 
@@ -14406,7 +14425,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		}
 
 		if (::GetCurrentThreadId() == AfxGetApp()->m_nThreadID) {
-			OnFilePostOpenmedia();
+			OnFilePostOpenMedia();
 		} else {
 			PostMessage(WM_COMMAND, ID_FILE_POST_OPENMEDIA);
 		}
@@ -17531,7 +17550,7 @@ void CMainFrame::CloseMedia()
 
 	SetLoadState (MLS_CLOSING);
 
-	OnFilePostClosemedia();
+	OnFilePostCloseMedia();
 
 	if (m_pGraphThread && m_bOpenedThruThread) {
 		CAMEvent e;
@@ -19117,51 +19136,6 @@ bool CMainFrame::CanPreviewUse()
 			&& !m_fAudioOnly
 			&& AfxGetAppSettings().fSmartSeek
 			&& m_wndView2) ? 1 : 0;
-}
-
-void CMainFrame::CreateChapterTimeArray()
-{
-	chaptersarray.RemoveAll();
-	if (GetPlaybackMode() == PM_FILE) {
-		__int64 rtDur = 0;
-		if (pMS) {
-			pMS->GetDuration(&rtDur);
-		}
-
-		if (m_pCB->ChapGetCount()) {
-			REFERENCE_TIME rt;
-			
-			for (size_t idx = 0; idx < m_pCB->ChapGetCount(); idx++) {
-				rt = 0;
-				CComBSTR bstr = NULL;
-				if (FAILED(m_pCB->ChapGet(idx, &rt, &bstr))) {
-					continue;
-				}
-
-				if (rt <= 0 || (rtDur && rt >= rtDur)) {
-					continue;
-				}
-
-				chaptersarray.Add(rt);
-			}
-		}
-	} else if (GetPlaybackMode() == PM_DVD) {
- 		WCHAR buff[_MAX_PATH];
- 		ULONG len = 0;
- 		DVD_PLAYBACK_LOCATION2 loc;
- 		if (SUCCEEDED(pDVDI->GetDVDDirectory(buff, _countof(buff), &len)) && SUCCEEDED(pDVDI->GetCurrentLocation(&loc))) {
- 			CStringW path;
- 			path.Format(L"%s\\VTS_%02d_0.IFO", buff, loc.TitleNum);
- 			CVobFile vob;
- 			CAtlList<CString> files;
- 			if(vob.Open(path, files)) {
- 				for(int i=0; i<vob.GetChaptersCount(); i++) {
- 					REFERENCE_TIME rt = vob.GetChapterOffset(i);
-					chaptersarray.Add(rt);
- 				}
-			}
-		}
-	}
 }
 
 bool CheckCoverImgExist(CString &path, CString name) {

@@ -24,6 +24,7 @@
 #pragma once
 
 #include "PngImage.h"
+#include "../../DSUtil/DSMPropertyBag.h"
 
 #define SHOW_DELAY 200
 #define AUTOPOP_DELAY 1000
@@ -57,7 +58,9 @@ private:
 	__int64 CalculatePosition2(CPoint point);
 	void SetPosInternal2(__int64 pos);
 
-
+	CCritSec m_CBLock;
+	CComPtr<IDSMChapterBag> m_pChapterBag;
+	CString strChap;
 	void UpdateTooltip(CPoint point);
 
 	CRect GetChannelRect();
@@ -79,6 +82,8 @@ public:
 	void HideToolTip();
 	void UpdateToolTipPosition(CPoint& point);
 	void UpdateToolTipText();
+
+	void SetChapterBag(CComPtr<IDSMChapterBag>& pCB);
 
 	// Overrides
 	// ClassWizard generated virtual function overrides

@@ -51,8 +51,6 @@ CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bo
 
 HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 {
-	HRESULT hr;
-
 	// get the type first
 
 	m_type = mpeg_us;
@@ -156,15 +154,11 @@ again:
 			fp = min(GetLength() - MEGABYTE/2, fp);
 			fp = max(pfp, fp);
 			__int64 nfp = fp + (pfp == 0 ? 10*MEGABYTE : MEGABYTE/2);
-			if (FAILED(hr = SearchStreams(fp, nfp, pAsyncReader))) {
-				return hr;
-			}
+			SearchStreams(fp, nfp, pAsyncReader);
 			pfp = nfp;
 		}
 	} else {
-		if (FAILED(hr = SearchStreams(0, MEGABYTE/2, pAsyncReader))) {
-			return hr;
-		}
+		SearchStreams(0, MEGABYTE/2, pAsyncReader);
 	}
 
 	if (m_type == mpeg_ts) {
@@ -178,15 +172,11 @@ again:
 				fp = min(GetLength() - MEGABYTE/8, fp);
 				fp = max(pfp, fp);
 				__int64 nfp = fp + (pfp == 0 ? 10*MEGABYTE : MEGABYTE/8);
-				if (FAILED(hr = SearchStreams(fp, nfp, pAsyncReader, TRUE))) {
-					return hr;
-				}
+				SearchStreams(fp, nfp, pAsyncReader, TRUE);
 				pfp = nfp;
 			}
 		} else {
-			if (FAILED(hr = SearchStreams(0, MEGABYTE/2, pAsyncReader, TRUE))) {
-				return hr;
-			}
+			SearchStreams(0, MEGABYTE/2, pAsyncReader, TRUE);
 		}
 	}
 
@@ -250,7 +240,8 @@ void CMpegSplitterFile::OnComplete(IAsyncReader* pAsyncReader)
 {
 	__int64 pos = GetPos();
 
-	if (SUCCEEDED(SearchStreams(GetLength() - 500*1024, GetLength(), pAsyncReader, TRUE))) {
+	{
+		SearchStreams(GetLength() - 500*1024, GetLength(), pAsyncReader, TRUE);
 		int indicated_rate = m_rate;
 		int detected_rate = int(m_rtMax > m_rtMin ? 10000000i64 * (m_posMax - m_posMin) / (m_rtMax - m_rtMin) : 0);
 
@@ -361,7 +352,7 @@ void CMpegSplitterFile::SearchPrograms(__int64 start, __int64 stop)
 	}
 }
 
-HRESULT CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, IAsyncReader* pAsyncReader, BOOL CalcDuration)
+void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, IAsyncReader* pAsyncReader, BOOL CalcDuration)
 {
 	Seek(start);
 	stop = min(stop, GetLength());
@@ -393,8 +384,7 @@ HRESULT CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, IAsyncRead
 				}
 
 				if (h.type == mpeg2 && h.scrambling) {
-					ASSERT(0);
-					return E_FAIL;
+					Seek(GetPos() + h.len);
 				}
 
 				if (h.fpts) {
@@ -430,8 +420,7 @@ HRESULT CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, IAsyncRead
 				peshdr h2;
 				if (h.payloadstart && NextMpegStartCode(b, 4) && Read(h2, b)) { // pes packet
 					if (h2.type == mpeg2 && h2.scrambling) {
-						ASSERT(0);
-						return E_FAIL;
+						Seek(h.next);
 					}
 
 					if (h2.fpts && CalcDuration && (m_AlternativeDuration || (GetMasterStream() && GetMasterStream()->GetHead() == h.pid))) {
@@ -489,16 +478,15 @@ HRESULT CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, IAsyncRead
 		}
 	}
 
-	return S_OK;
+	return;
 }
 
 #define IsMpegAudio(stream_type)	(stream_type == AUDIO_STREAM_MPEG1 || stream_type == AUDIO_STREAM_MPEG2)
 #define IsAACAudio(stream_type)		(stream_type == AUDIO_STREAM_AAC)
 #define IsAACLATMAudio(stream_type)	(stream_type == AUDIO_STREAM_AAC_LATM)
-#define IsAC3Audio(stream_type)		(\
-									stream_type == AUDIO_STREAM_AC3 || stream_type == AUDIO_STREAM_AC3_PLUS || \
-									stream_type == AUDIO_STREAM_AC3_TRUE_HD || stream_type == SECONDARY_AUDIO_AC3_PLUS || \
-									stream_type == PES_PRIVATE)
+#define IsAC3Audio(stream_type)		(stream_type == AUDIO_STREAM_AC3 || stream_type == AUDIO_STREAM_AC3_PLUS || \
+									 stream_type == AUDIO_STREAM_AC3_TRUE_HD || stream_type == SECONDARY_AUDIO_AC3_PLUS || \
+									 stream_type == PES_PRIVATE)
 #define IsMPEG2Video(stream_type)	(stream_type == VIDEO_STREAM_MPEG2)
 #define IsH264Video(stream_type)	(stream_type == VIDEO_STREAM_H264)
 #define IsVC1Video(stream_type)		(stream_type == VIDEO_STREAM_VC1)

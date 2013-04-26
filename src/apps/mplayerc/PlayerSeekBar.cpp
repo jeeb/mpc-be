@@ -25,7 +25,6 @@
 #include "MainFrm.h"
 #include "PlayerSeekBar.h"
 
-
 // CPlayerSeekBar
 
 IMPLEMENT_DYNAMIC(CPlayerSeekBar, CDialogBar)
@@ -57,12 +56,12 @@ BOOL CPlayerSeekBar::Create(CWnd* pParentWnd)
 	m_tooltip.SetDelayTime(TTDT_RESHOW, 0);
 
 	memset(&m_ti, 0, sizeof(TOOLINFO));
-	m_ti.cbSize = sizeof(TOOLINFO);
-	m_ti.uFlags = TTF_IDISHWND | TTF_TRACK | TTF_ABSOLUTE;
-	m_ti.hwnd = m_hWnd;
-	m_ti.hinst = AfxGetInstanceHandle();
-	m_ti.lpszText = NULL;
-	m_ti.uId = (UINT)m_hWnd;
+	m_ti.cbSize		= sizeof(TOOLINFO);
+	m_ti.uFlags		= TTF_IDISHWND | TTF_TRACK | TTF_ABSOLUTE;
+	m_ti.hwnd		= m_hWnd;
+	m_ti.hinst		= AfxGetInstanceHandle();
+	m_ti.lpszText	= NULL;
+	m_ti.uId		= (UINT)m_hWnd;
 
 	m_tooltip.SendMessage(TTM_ADDTOOL, 0, (LPARAM)&m_ti);
 
@@ -312,7 +311,6 @@ void CPlayerSeekBar::OnPaint()
 	if (s.fDisableXPToolbars) {
 		CRect rt;
 		CString str = ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->GetStrForTitle();
-
 		CDC memdc;
 		CBitmap m_bmPaint;
 		CRect r,rf,rc;
@@ -418,15 +416,26 @@ void CPlayerSeekBar::OnPaint()
 			memdc.LineTo(nposx, rc.top);
 
 			// рисуем маркеры глав
-
 			if (s.fChapterMarker) {
-				CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
-				if (pFrame->chaptersarray.GetCount()) {
-					CRect rc2 = rc;
-					for (size_t idx = 0; idx < pFrame->chaptersarray.GetCount(); idx++) {
-						CRect r = GetChannelRect();
+				CAutoLock lock(&m_CBLock);
 
-						int x = r.left + (int)((m_start < m_stop) ? (__int64)r.Width() * (pFrame->chaptersarray[idx]/*.rtChapter*/ - m_start) / (m_stop - m_start) : 0);
+				CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
+				if (m_pChapterBag && m_pChapterBag->ChapGetCount()) {
+					CRect rc2 = rc;
+					for (DWORD idx = 0; idx < m_pChapterBag->ChapGetCount(); idx++) {
+						CRect r = GetChannelRect();
+						REFERENCE_TIME rt;
+						CComBSTR name;
+
+						if (FAILED(m_pChapterBag->ChapGet(idx, &rt, &name))) {
+							continue;
+						}
+
+						if (rt <= 0 || (rt >= m_stop)) {
+							continue;
+						}
+
+						int x = r.left + (int)((m_start < m_stop) ? (__int64)r.Width() * (rt - m_start) / (m_stop - m_start) : 0);
 			
 						// можно вместо рисования руками иконку как маркер подтянуть
 						// HICON appIcon = (HICON)::LoadImage(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MARKERS), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
@@ -446,7 +455,7 @@ void CPlayerSeekBar::OnPaint()
 			}
 		}
 
-		if (s.fFileNameOnSeekBar || !s.bStatusBarIsVisible) {
+		if (s.fFileNameOnSeekBar || !s.bStatusBarIsVisible || !strChap.IsEmpty()) {
 			CFont font2;
 			ThemeRGB(135, 140, 145, R, G, B);
 			memdc.SetTextColor(RGB(R,G,B));
@@ -472,15 +481,19 @@ void CPlayerSeekBar::OnPaint()
 
 			LONG xt = s.bStatusBarIsVisible ? 0 : s.strTimeOnSeekBar.GetLength() <= 21 ? 150 : 160;
 
-			if (s.fFileNameOnSeekBar) {
-				// draw filename
+			if (s.fFileNameOnSeekBar || !strChap.IsEmpty()) {
+				if (!strChap.IsEmpty()) {
+					str = strChap;
+				}
+
+				// draw filename || chapter name.
 				rt = rc;
 				rt.left  += 6;
 				rt.top   -= 2;
 				rt.right -= xt;
 				memdc.DrawText(str, str.GetLength(), &rt, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS|DT_NOPREFIX);
 
-				// highlights filename
+				// highlights string
 				ThemeRGB(205, 210, 215, R, G, B);
 				memdc.SetTextColor(RGB(R,G,B));
 				if (nposx > rt.right - 15) {
@@ -708,8 +721,7 @@ void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 		if (pFrame->CanPreviewUse()) UpdateToolTipPosition(point);
 	} else {
 		pFrame->PreviewWindowHide();
-	}
-
+	}	
 	CDialogBar::OnMouseMove(nFlags, point);
 }
 
@@ -718,6 +730,8 @@ LRESULT CPlayerSeekBar::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	if (message == WM_MOUSELEAVE) {
 		HideToolTip();
 		((CMainFrame*)GetParentFrame())->PreviewWindowHide();
+		strChap.Empty();
+		Invalidate();
 	}
 
 	return CWnd::WindowProc(message, wParam, lParam);
@@ -899,6 +913,26 @@ void CPlayerSeekBar::UpdateToolTipText()
 			pFrame->m_wndView2.SetWindowText(str);
 		}
 	}
+
+	{
+		CAutoLock lock(&m_CBLock);
+
+		strChap.Empty();
+		if (AfxGetAppSettings().fDisableXPToolbars
+			&& AfxGetAppSettings().fChapterMarker
+			/*&& AfxGetAppSettings().fFileNameOnSeekBar*/
+			&& m_pChapterBag && m_pChapterBag->ChapGetCount()) {
+
+			CComBSTR chapterName;
+			REFERENCE_TIME rt = m_tooltipPos;
+			m_pChapterBag->ChapLookup(&rt, &chapterName);
+
+			if (chapterName.Length() > 0) {
+				strChap.Format(_T("%s%s"), ResStr(IDS_AG_CHAPTER2), chapterName);
+				Invalidate();
+			}
+		}
+	}
 }
 
 void CPlayerSeekBar::OnMButtonDown(UINT nFlags, CPoint point)
@@ -910,4 +944,15 @@ void CPlayerSeekBar::OnMButtonDown(UINT nFlags, CPoint point)
 		AfxGetAppSettings().fSmartSeek = !AfxGetAppSettings().fSmartSeek;
 		OnMouseMove(nFlags,point);
 	}
+}
+
+void CPlayerSeekBar::SetChapterBag(CComPtr<IDSMChapterBag>& pCB)
+{
+	CAutoLock lock(&m_CBLock);
+
+	if (pCB) {
+		m_pChapterBag.Release();
+		strChap.Empty();
+		pCB.CopyTo(&m_pChapterBag);
+    }
 }

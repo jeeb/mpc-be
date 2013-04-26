@@ -732,10 +732,10 @@ public:
 
 	afx_msg void OnUpdatePlayerStatus(CCmdUI* pCmdUI);
 
-	afx_msg void OnFilePostOpenmedia();
-	afx_msg void OnUpdateFilePostOpenmedia(CCmdUI* pCmdUI);
-	afx_msg void OnFilePostClosemedia();
-	afx_msg void OnUpdateFilePostClosemedia(CCmdUI* pCmdUI);
+	afx_msg void OnFilePostOpenMedia();
+	afx_msg void OnUpdateFilePostOpenMedia(CCmdUI* pCmdUI);
+	afx_msg void OnFilePostCloseMedia();
+	afx_msg void OnUpdateFilePostCloseMedia(CCmdUI* pCmdUI);
 
 	afx_msg void OnBossKey();
 
@@ -752,7 +752,7 @@ public:
 	// menu item handlers
 
 	afx_msg void OnFileOpenQuick();
-	afx_msg void OnFileOpenmedia();
+	afx_msg void OnFileOpenMedia();
 	afx_msg void OnUpdateFileOpen(CCmdUI* pCmdUI);
 	afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
 	afx_msg void OnFileOpendvd();
@@ -1043,9 +1043,6 @@ public:
 	HRESULT PreviewWindowHide();
 	HRESULT PreviewWindowShow(REFERENCE_TIME rtCur2);
 	bool CanPreviewUse();
-
-	CAtlArray<REFERENCE_TIME> chaptersarray;
-	void CreateChapterTimeArray();
 
 	SIZE			m_fullWndSize;
 	CFullscreenWnd*	m_pFullscreenWnd;
