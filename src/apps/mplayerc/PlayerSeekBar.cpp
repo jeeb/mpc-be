@@ -482,7 +482,7 @@ void CPlayerSeekBar::OnPaint()
 			LONG xt = s.bStatusBarIsVisible ? 0 : s.strTimeOnSeekBar.GetLength() <= 21 ? 150 : 160;
 
 			if (s.fFileNameOnSeekBar || !strChap.IsEmpty()) {
-				if (!strChap.IsEmpty()) {
+				if (!strChap.IsEmpty() && fEnabled) {
 					str = strChap;
 				}
 
@@ -946,7 +946,6 @@ void CPlayerSeekBar::SetChapterBag(CComPtr<IDSMChapterBag>& pCB)
 
 	if (pCB) {
 		m_pChapterBag.Release();
-		strChap.Empty();
 		pCB.CopyTo(&m_pChapterBag);
     }
 }
