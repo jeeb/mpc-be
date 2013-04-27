@@ -18,4 +18,10 @@ REM
 REM You should have received a copy of the GNU General Public License
 REM along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-CALL build_2010.bat rebuild
+SETLOCAL
+
+SET "VS="
+SET "VSB=2010"
+SET "VSCOMNTOOLS=%VS100COMNTOOLS%"
+
+build_script.bat
