@@ -24,4 +24,4 @@ SET "VS="
 SET "VSB=2010"
 SET "VSCOMNTOOLS=%VS100COMNTOOLS%"
 
-build_script.bat
+build_script.bat %1 %2 %3 %4 %5 %6 %7 %8 %9
