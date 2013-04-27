@@ -18,7 +18,7 @@
 * libopus 1.0.1 git-a8f04b23;
 * Little-CMS git-5bf9e436;
 * libwebp 0.3.0 git-6393fe4b;
-* libopenjpeg 2.0.0 svn rev.2301;
+* libopenjpeg 2.0.0 svn rev.2343;
 * MediaInfo 0.7.62+ svn rev.5492;
 * libpng 1.7.0 b12 git-b780b64f;
 * ZenLibs v0.4.28+ svn rev.430;
