@@ -41,10 +41,11 @@ private:
 	MPCPngImage	m_logobm;
 	__int64		iDisableXPToolbars;
 	int			iMute;
-	CImageList	*m_pButtonsImages;
 
+	CImageList	*m_pButtonsImages;
 	CImageList	*m_pButtonDXVA;
 	HICON		m_hDXVAIcon;
+
 	int iDXVAIconHeight;
 	int iDXVAIconWidth;
 
@@ -59,14 +60,12 @@ protected:
 
 public:
 	void SwitchRemmapedImgList(UINT bmID, int nRemapState);
+	void SwitchTheme();
 	bool fDisableImgListRemap;
 	int GetVolume();
 	int GetMinWidth();
 	void SetVolume(int volume);
 	__declspec(property(get=GetVolume, put=SetVolume)) int Volume;
-
-	void SwitchTheme();
-	void ArrangeControls();
 
 	int m_nButtonHeight;
 	CVolumeCtrl m_volctrl;
