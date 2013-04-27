@@ -1101,9 +1101,6 @@
     <ClCompile Include="libavcodec\x86\dsputil_qns_template.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
-    <ClCompile Include="libavcodec\x86\dsputil_rnd_template.c">
-      <Filter>libavcodec\x86</Filter>
-    </ClCompile>
     <ClCompile Include="libavcodec\x86\fdct.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
@@ -2201,6 +2198,9 @@
     </ClCompile>
     <ClCompile Include="libswscale\yuv2rgb.c">
       <Filter>libswscale</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\x86\rnd_template.c">
+      <Filter>libavcodec\x86</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
