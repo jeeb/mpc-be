@@ -19,9 +19,10 @@ REM You should have received a copy of the GNU General Public License
 REM along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 SETLOCAL
+CD /D %~dp0
 
-SET "VS=_2012"
-SET "VSB=2012"
+SET "SLN=_2012"
+SET "BUILD=VS2012"
 SET "VSCOMNTOOLS=%VS110COMNTOOLS%"
 
-build_script.bat %1 %2 %3 %4 %5 %6 %7 %8 %9
+build_script.bat %*

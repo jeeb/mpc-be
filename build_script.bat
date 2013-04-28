@@ -169,27 +169,27 @@ EXIT /B
 TITLE Compiling MPC-BE Filters - %BUILDCFG% Filter^|%1...
 REM Call update_version.bat before building the filters
 CALL "update_version.bat"
-"%MSBUILD%" mpc-be%VS%.sln %MSBUILD_SWITCHES%^
+"%MSBUILD%" mpc-be%SLN%.sln %MSBUILD_SWITCHES%^
  /target:%BUILDTYPE% /property:Configuration="%BUILDCFG% Filter";Platform=%1^
  /flp1:LogFile=%LOG_DIR%\filters_errors_%BUILDCFG%_%1.log;errorsonly;Verbosity=diagnostic^
  /flp2:LogFile=%LOG_DIR%\filters_warnings_%BUILDCFG%_%1.log;warningsonly;Verbosity=diagnostic
 IF %ERRORLEVEL% NEQ 0 (
-  CALL :SubMsg "ERROR" "mpc-be%VS%.sln %BUILDCFG% Filter %1 - Compilation failed!"
+  CALL :SubMsg "ERROR" "mpc-be%SLN%.sln %BUILDCFG% Filter %1 - Compilation failed!"
 ) ELSE (
-  CALL :SubMsg "INFO" "mpc-be%VS%.sln %BUILDCFG% Filter %1 compiled successfully"
+  CALL :SubMsg "INFO" "mpc-be%SLN%.sln %BUILDCFG% Filter %1 compiled successfully"
 )
 EXIT /B
 
 :SubMPCBE
 TITLE Compiling MPC-BE - %BUILDCFG%^|%1...
-"%MSBUILD%" mpc-be%VS%.sln %MSBUILD_SWITCHES%^
+"%MSBUILD%" mpc-be%SLN%.sln %MSBUILD_SWITCHES%^
  /target:%BUILDTYPE% /property:Configuration=%BUILDCFG%;Platform=%1^
  /flp1:LogFile=%LOG_DIR%\mpc-be_errors_%BUILDCFG%_%1.log;errorsonly;Verbosity=diagnostic^
  /flp2:LogFile=%LOG_DIR%\mpc-be_warnings_%BUILDCFG%_%1.log;warningsonly;Verbosity=diagnostic
 IF %ERRORLEVEL% NEQ 0 (
-  CALL :SubMsg "ERROR" "mpc-be%VS%.sln %BUILDCFG% %1 - Compilation failed!"
+  CALL :SubMsg "ERROR" "mpc-be%SLN%.sln %BUILDCFG% %1 - Compilation failed!"
 ) ELSE (
-  CALL :SubMsg "INFO" "mpc-be%VS%.sln %BUILDCFG% %1 compiled successfully"
+  CALL :SubMsg "INFO" "mpc-be%SLN%.sln %BUILDCFG% %1 compiled successfully"
 )
 EXIT /B
 
@@ -205,7 +205,7 @@ FOR %%A IN ("Armenian" "Basque" "Belarusian" "Catalan" "Chinese Simplified"
  "Swedish" "Turkish" "Ukrainian"
 ) DO (
  TITLE Compiling mpcresources - %%~A^|%1...
- "%MSBUILD%" mpcresources%VS%.sln %MSBUILD_SWITCHES%^
+ "%MSBUILD%" mpcresources%SLN%.sln %MSBUILD_SWITCHES%^
  /target:%BUILDTYPE% /property:Configuration="Release %%~A";Platform=%1
  IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Compilation failed!"
 )
@@ -252,7 +252,7 @@ IF NOT EXIST "%PackagesOut%\%MPCBE_VER%" MD "%PackagesOut%\%MPCBE_VER%"
 
 SET "PCKG_NAME=%NAME%.%MPCBE_VER%.%ARCH%"
 
-IF EXIST "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.(VS%VSB%).7z"     DEL "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.(VS%VSB%).7z"
+IF EXIST "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.(%BUILD%).7z"     DEL "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.(%BUILD%).7z"
 IF EXIST "%PCKG_NAME%"        RD /Q /S "%PCKG_NAME%"
 
 TITLE Copying %PCKG_NAME%...
@@ -285,14 +285,14 @@ COPY /Y /V "..\distrib\Shaders\*.psh"        "%PCKG_NAME%\Shaders\*.psh" >NUL
 
 IF /I "%NAME%" == "MPC-BE" (
 TITLE Creating archive %PCKG_NAME%.zip...
-START "7z" /B /WAIT "%SEVENZIP%" a -tzip "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%-installer.(VS%VSB%).zip" "%PCKG_NAME%.exe"^
+START "7z" /B /WAIT "%SEVENZIP%" a -tzip "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%-installer.(%BUILD%).zip" "%PCKG_NAME%.exe"^
  -mx9)
 IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Unable to create %PCKG_NAME%-installer.zip!"
 CALL :SubMsg "INFO" "%PCKG_NAME%-installer.zip successfully created"
 )
 
 TITLE Creating archive %PCKG_NAME%.7z...
-START "7z" /B /WAIT "%SEVENZIP%" a -t7z "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.(VS%VSB%).7z" "%PCKG_NAME%"^
+START "7z" /B /WAIT "%SEVENZIP%" a -t7z "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.(%BUILD%).7z" "%PCKG_NAME%"^
  -m0=lzma2:d128m -mx9 -mmt -ms=on
 IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Unable to create %PCKG_NAME%.7z!"
 CALL :SubMsg "INFO" "%PCKG_NAME%.7z successfully created"
@@ -366,7 +366,7 @@ ECHO Usage:
 ECHO %~nx0 [Clean^|Build^|Rebuild] [x86^|x64^|Both] [Main^|Resources^|MPCBE^|Filters^|All] [Debug^|Release] [Packages^|Installer^|Zip]
 ECHO.
 ECHO Notes: You can also prefix the commands with "-", "--" or "/".
-ECHO        Debug only applies to mpc-be%VS%.sln.
+ECHO        Debug only applies to mpc-be%SLN%.sln.
 ECHO        The arguments are not case sensitive and can be ommitted.
 ECHO. & ECHO.
 ECHO Executing %~nx0 without any arguments will use the default ones:
