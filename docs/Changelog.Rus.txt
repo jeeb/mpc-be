@@ -23,6 +23,7 @@
 * libpng 1.7.0 b12 git-b780b64f;
 * ZenLibs v0.4.28+ svn rev.430;
 * VirtualDub 1.10.4 Test 6;
+* zlib 1.2.8;
 
 Исправления (!):
 
