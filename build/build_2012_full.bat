@@ -18,6 +18,6 @@ REM
 REM You should have received a copy of the GNU General Public License
 REM along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-..\build_2012.bat clean All
-..\build_2012.bat All Packages
+CALL ..\build_2012.bat clean All
+CALL ..\build_2012.bat All Packages
 pause
