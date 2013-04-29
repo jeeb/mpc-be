@@ -29,6 +29,7 @@
 #include <InitGuid.h>
 #include <moreuuids.h>
 #include <basestruct.h>
+#include <dxva.h>
 
 #include "GUIDString.h"
 
@@ -446,16 +447,70 @@ CString CMediaTypeEx::GetSubtitleCodecName(const GUID& subtype)
 	return str;
 }
 
+#define ADDENTRY(mode) DXVA_names[mode] = _T(#mode)
 CString GetGUIDString(const GUID& guid)
 {
+	static CAtlMap<GUID, CString> DXVA_names;
+	{
+		DXVA_ModeNone;
+
+		ADDENTRY(DXVA_ModeNone);
+		ADDENTRY(DXVA_ModeH261_A);
+		ADDENTRY(DXVA_ModeH261_B);
+
+		ADDENTRY(DXVA_ModeH263_A);
+		ADDENTRY(DXVA_ModeH263_B);
+		ADDENTRY(DXVA_ModeH263_C);
+		ADDENTRY(DXVA_ModeH263_D);
+		ADDENTRY(DXVA_ModeH263_E);
+		ADDENTRY(DXVA_ModeH263_F);
+
+		ADDENTRY(DXVA_ModeMPEG1_A);
+
+		ADDENTRY(DXVA_ModeMPEG2_A);
+		ADDENTRY(DXVA_ModeMPEG2_B);
+		ADDENTRY(DXVA_ModeMPEG2_C);
+		ADDENTRY(DXVA_ModeMPEG2_D);
+
+		ADDENTRY(DXVA_ModeH264_A);
+		ADDENTRY(DXVA_ModeH264_B);
+		ADDENTRY(DXVA_ModeH264_C);
+		ADDENTRY(DXVA_ModeH264_D);
+		ADDENTRY(DXVA_ModeH264_E);
+		ADDENTRY(DXVA_ModeH264_F);
+
+		ADDENTRY(DXVA_ModeWMV8_A);
+		ADDENTRY(DXVA_ModeWMV8_B);
+
+		ADDENTRY(DXVA_ModeWMV9_A);
+		ADDENTRY(DXVA_ModeWMV9_B);
+		ADDENTRY(DXVA_ModeWMV9_C);
+
+		ADDENTRY(DXVA_ModeVC1_A);
+		ADDENTRY(DXVA_ModeVC1_B);
+		ADDENTRY(DXVA_ModeVC1_C);
+		ADDENTRY(DXVA_ModeVC1_D);
+
+		ADDENTRY(DXVA_NoEncrypt);
+	}
+
 	// to prevent print TIME_FORMAT_NONE for GUID_NULL
 	if (guid == GUID_NULL) {
 		return _T("GUID_NULL");
 	}
 
 	CString guidStr = CString(GuidNames[guid]);
+	if (guidStr == _T("Unknown GUID Name")) {
+		guidStr = CString(m_GuidNames[guid]);
+	}
+	if (guidStr == _T("Unknown GUID Name")) {
+		CString str;
+		if (DXVA_names.Lookup(guid, str)) {
+			guidStr = str;
+		}
+	}
 
-	return (guidStr == _T("Unknown GUID Name")) ? CString(m_GuidNames[guid]) : guidStr;
+	return guidStr;
 }
 
 void CMediaTypeEx::Dump(CAtlList<CString>& sl)

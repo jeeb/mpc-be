@@ -275,6 +275,8 @@ bool HookNewSegmentAndReceive(IPinC* pPinC, IMemInputPinC* pMemInputPinC)
 
 // === DXVA1 hooks
 
+IAMVideoAcceleratorCVtbl* g_pIAMVideoAcceleratorCVtbl = NULL;
+
 #ifdef _DEBUG
 #define MAX_BUFFER_TYPE		15
 BYTE*		g_ppBuffer[MAX_BUFFER_TYPE]; // Only used for debug logging
@@ -1040,7 +1042,6 @@ static HRESULT STDMETHODCALLTYPE ExecuteMine(IAMVideoAcceleratorC* This, DWORD d
 
 static HRESULT STDMETHODCALLTYPE QueryRenderStatusMine(IAMVideoAcceleratorC * This, DWORD dwTypeIndex, DWORD dwBufferIndex, DWORD dwFlags)
 {
-
 	HRESULT hr = QueryRenderStatusOrg(This, dwTypeIndex, dwBufferIndex, dwFlags);
 	LOG(_T("\nQueryRenderStatus  Type=%d   Index=%d  hr = %08x"), dwTypeIndex, dwBufferIndex, hr);
 
@@ -1066,64 +1067,71 @@ void HookAMVideoAccelerator(IAMVideoAcceleratorC* pAMVideoAcceleratorC)
 
 	BOOL res;
 	DWORD flOldProtect = 0;
-	res = VirtualProtect(pAMVideoAcceleratorC->lpVtbl, sizeof(IAMVideoAcceleratorC), PAGE_WRITECOPY, &flOldProtect);
 
+	// unhook previous VTables 
+	
+	if (g_pIAMVideoAcceleratorCVtbl) {
+		res = VirtualProtect(g_pIAMVideoAcceleratorCVtbl, sizeof(g_pIAMVideoAcceleratorCVtbl), PAGE_WRITECOPY, &flOldProtect);
 #ifdef _DEBUG
-	if (GetVideoAcceleratorGUIDsOrg == NULL) {
-		GetVideoAcceleratorGUIDsOrg = pAMVideoAcceleratorC->lpVtbl->GetVideoAcceleratorGUIDs;
-	}
-	if (GetUncompFormatsSupportedOrg == NULL) {
-		GetUncompFormatsSupportedOrg = pAMVideoAcceleratorC->lpVtbl->GetUncompFormatsSupported;
-	}
-	if (GetInternalMemInfoOrg == NULL) {
-		GetInternalMemInfoOrg = pAMVideoAcceleratorC->lpVtbl->GetInternalMemInfo;
-	}
+		if (g_pIAMVideoAcceleratorCVtbl->GetVideoAcceleratorGUIDs == GetVideoAcceleratorGUIDsMine) {
+			g_pIAMVideoAcceleratorCVtbl->GetVideoAcceleratorGUIDs = GetVideoAcceleratorGUIDsOrg;
+		}
+		if (g_pIAMVideoAcceleratorCVtbl->GetUncompFormatsSupported == GetUncompFormatsSupportedMine) {
+			g_pIAMVideoAcceleratorCVtbl->GetUncompFormatsSupported = GetUncompFormatsSupportedOrg;
+		}
+		if (g_pIAMVideoAcceleratorCVtbl->GetInternalMemInfo == GetInternalMemInfoMine) {
+			g_pIAMVideoAcceleratorCVtbl->GetInternalMemInfo = GetInternalMemInfoOrg;
+		}
 #endif
-	if (GetCompBufferInfoOrg == NULL) {
-		GetCompBufferInfoOrg = pAMVideoAcceleratorC->lpVtbl->GetCompBufferInfo;
-	}
+		if (g_pIAMVideoAcceleratorCVtbl->GetCompBufferInfo == GetCompBufferInfoMine) {
+			g_pIAMVideoAcceleratorCVtbl->GetCompBufferInfo = GetCompBufferInfoOrg;
+		}
 #ifdef _DEBUG
-	if (GetInternalCompBufferInfoOrg == NULL) {
-		GetInternalCompBufferInfoOrg = pAMVideoAcceleratorC->lpVtbl->GetInternalCompBufferInfo;
-	}
-	if (BeginFrameOrg == NULL) {
-		BeginFrameOrg = pAMVideoAcceleratorC->lpVtbl->BeginFrame;
-	}
-	if (EndFrameOrg == NULL) {
-		EndFrameOrg = pAMVideoAcceleratorC->lpVtbl->EndFrame;
-	}
-	if (GetBufferOrg == NULL) {
-		GetBufferOrg = pAMVideoAcceleratorC->lpVtbl->GetBuffer;
-	}
-	if (ReleaseBufferOrg == NULL) {
-		ReleaseBufferOrg = pAMVideoAcceleratorC->lpVtbl->ReleaseBuffer;
-	}
-	if (ExecuteOrg == NULL) {
-		ExecuteOrg = pAMVideoAcceleratorC->lpVtbl->Execute;
-	}
-	if (QueryRenderStatusOrg == NULL) {
-		QueryRenderStatusOrg = pAMVideoAcceleratorC->lpVtbl->QueryRenderStatus;
-	}
-	if (DisplayFrameOrg == NULL) {
-		DisplayFrameOrg = pAMVideoAcceleratorC->lpVtbl->DisplayFrame;
-	}
-
-	pAMVideoAcceleratorC->lpVtbl->GetVideoAcceleratorGUIDs = GetVideoAcceleratorGUIDsMine;
-	pAMVideoAcceleratorC->lpVtbl->GetUncompFormatsSupported = GetUncompFormatsSupportedMine;
-	pAMVideoAcceleratorC->lpVtbl->GetInternalMemInfo = GetInternalMemInfoMine;
+		if (g_pIAMVideoAcceleratorCVtbl->GetInternalCompBufferInfo == GetInternalCompBufferInfoMine) {
+			g_pIAMVideoAcceleratorCVtbl->GetInternalCompBufferInfo = GetInternalCompBufferInfoOrg;
+		}
+		if (g_pIAMVideoAcceleratorCVtbl->BeginFrame == BeginFrameMine) {
+			g_pIAMVideoAcceleratorCVtbl->BeginFrame = BeginFrameOrg;
+		}
+		if (g_pIAMVideoAcceleratorCVtbl->EndFrame == EndFrameMine) {
+			g_pIAMVideoAcceleratorCVtbl->EndFrame = EndFrameOrg;
+		}
+		if (g_pIAMVideoAcceleratorCVtbl->GetBuffer == GetBufferMine) {
+			g_pIAMVideoAcceleratorCVtbl->GetBuffer = GetBufferOrg;
+		}
+		if (g_pIAMVideoAcceleratorCVtbl->ReleaseBuffer == ReleaseBufferMine) {
+			g_pIAMVideoAcceleratorCVtbl->ReleaseBuffer = ReleaseBufferOrg;
+		}
+		if (g_pIAMVideoAcceleratorCVtbl->Execute == ExecuteMine) {
+			g_pIAMVideoAcceleratorCVtbl->Execute = ExecuteOrg;
+		}
+		if (g_pIAMVideoAcceleratorCVtbl->QueryRenderStatus == QueryRenderStatusMine) {
+			g_pIAMVideoAcceleratorCVtbl->QueryRenderStatus = QueryRenderStatusOrg;
+		}
+		if (g_pIAMVideoAcceleratorCVtbl->DisplayFrame == DisplayFrameMine) {
+			g_pIAMVideoAcceleratorCVtbl->DisplayFrame = DisplayFrameOrg;
+		}
 #endif
-	pAMVideoAcceleratorC->lpVtbl->GetCompBufferInfo = GetCompBufferInfoMine; // Function sets global variable(s)
-#ifdef _DEBUG
-	pAMVideoAcceleratorC->lpVtbl->GetInternalCompBufferInfo = GetInternalCompBufferInfoMine;
-	pAMVideoAcceleratorC->lpVtbl->BeginFrame = BeginFrameMine;
-	pAMVideoAcceleratorC->lpVtbl->EndFrame = EndFrameMine;
-	pAMVideoAcceleratorC->lpVtbl->GetBuffer = GetBufferMine;
-	pAMVideoAcceleratorC->lpVtbl->ReleaseBuffer = ReleaseBufferMine;
-	pAMVideoAcceleratorC->lpVtbl->Execute = ExecuteMine;
-	pAMVideoAcceleratorC->lpVtbl->QueryRenderStatus = QueryRenderStatusMine;
-	pAMVideoAcceleratorC->lpVtbl->DisplayFrame = DisplayFrameMine;
+		res = VirtualProtect(g_pIAMVideoAcceleratorCVtbl, sizeof(g_pIAMVideoAcceleratorCVtbl), flOldProtect, &flOldProtect);
 
-	res = VirtualProtect(pAMVideoAcceleratorC->lpVtbl, sizeof(IAMVideoAcceleratorC), PAGE_EXECUTE, &flOldProtect);
+#ifdef _DEBUG
+		GetVideoAcceleratorGUIDsOrg		= NULL;
+		GetUncompFormatsSupportedOrg	= NULL;
+		GetInternalMemInfoOrg			= NULL;
+#endif
+		GetCompBufferInfoOrg			= NULL;
+#ifdef _DEBUG
+		GetInternalCompBufferInfoOrg	= NULL;
+		BeginFrameOrg					= NULL;
+		EndFrameOrg						= NULL;
+		GetBufferOrg					= NULL;
+		ReleaseBufferOrg				= NULL;
+		ExecuteOrg						= NULL;
+		QueryRenderStatusOrg			= NULL;
+		DisplayFrameOrg					= NULL;
+#endif
+		g_pIAMVideoAcceleratorCVtbl		= NULL;
+	}
 
 #if DXVA_LOGFILE_A
 	::DeleteFile (LOG_FILE_DXVA);
@@ -1132,7 +1140,45 @@ void HookAMVideoAccelerator(IAMVideoAcceleratorC* pAMVideoAcceleratorC)
 	::DeleteFile (LOG_FILE_SLICESHORT);
 	::DeleteFile (LOG_FILE_BITSTREAM);
 #endif
+
+	if (!g_pIAMVideoAcceleratorCVtbl && pAMVideoAcceleratorC) {
+
+		res = VirtualProtect(pAMVideoAcceleratorC->lpVtbl, sizeof(IAMVideoAcceleratorC), PAGE_WRITECOPY, &flOldProtect);
+
+#ifdef _DEBUG
+		GetVideoAcceleratorGUIDsOrg = pAMVideoAcceleratorC->lpVtbl->GetVideoAcceleratorGUIDs;
+		GetUncompFormatsSupportedOrg = pAMVideoAcceleratorC->lpVtbl->GetUncompFormatsSupported;
+		GetInternalMemInfoOrg = pAMVideoAcceleratorC->lpVtbl->GetInternalMemInfo;
+
+		pAMVideoAcceleratorC->lpVtbl->GetVideoAcceleratorGUIDs = GetVideoAcceleratorGUIDsMine;
+		pAMVideoAcceleratorC->lpVtbl->GetUncompFormatsSupported = GetUncompFormatsSupportedMine;
+		pAMVideoAcceleratorC->lpVtbl->GetInternalMemInfo = GetInternalMemInfoMine;
 #endif
+		GetCompBufferInfoOrg = pAMVideoAcceleratorC->lpVtbl->GetCompBufferInfo;
+		pAMVideoAcceleratorC->lpVtbl->GetCompBufferInfo = GetCompBufferInfoMine; // Function sets global variable(s)
+#ifdef _DEBUG
+		GetInternalCompBufferInfoOrg = pAMVideoAcceleratorC->lpVtbl->GetInternalCompBufferInfo;
+		BeginFrameOrg = pAMVideoAcceleratorC->lpVtbl->BeginFrame;
+		EndFrameOrg = pAMVideoAcceleratorC->lpVtbl->EndFrame;
+		GetBufferOrg = pAMVideoAcceleratorC->lpVtbl->GetBuffer;
+		ReleaseBufferOrg = pAMVideoAcceleratorC->lpVtbl->ReleaseBuffer;
+		ExecuteOrg = pAMVideoAcceleratorC->lpVtbl->Execute;
+		QueryRenderStatusOrg = pAMVideoAcceleratorC->lpVtbl->QueryRenderStatus;
+		DisplayFrameOrg = pAMVideoAcceleratorC->lpVtbl->DisplayFrame;
+
+		pAMVideoAcceleratorC->lpVtbl->GetInternalCompBufferInfo = GetInternalCompBufferInfoMine;
+		pAMVideoAcceleratorC->lpVtbl->BeginFrame = BeginFrameMine;
+		pAMVideoAcceleratorC->lpVtbl->EndFrame = EndFrameMine;
+		pAMVideoAcceleratorC->lpVtbl->GetBuffer = GetBufferMine;
+		pAMVideoAcceleratorC->lpVtbl->ReleaseBuffer = ReleaseBufferMine;
+		pAMVideoAcceleratorC->lpVtbl->Execute = ExecuteMine;
+		pAMVideoAcceleratorC->lpVtbl->QueryRenderStatus = QueryRenderStatusMine;
+		pAMVideoAcceleratorC->lpVtbl->DisplayFrame = DisplayFrameMine;
+#endif
+		res = VirtualProtect(pAMVideoAcceleratorC->lpVtbl, sizeof(IAMVideoAcceleratorC), /*PAGE_EXECUTE*/flOldProtect, &flOldProtect);
+
+		g_pIAMVideoAcceleratorCVtbl = pAMVideoAcceleratorC->lpVtbl;
+	}
 }
 
 

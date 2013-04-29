@@ -90,7 +90,7 @@ STDMETHODIMP CVMR9AllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 
 	*ppRenderer = NULL;
 
-	HRESULT hr;
+	HRESULT hr = E_FAIL;
 
 	do {
 		CMacrovisionKicker* pMK = DNew CMacrovisionKicker(NAME("CMacrovisionKicker"), NULL);
@@ -98,17 +98,12 @@ STDMETHODIMP CVMR9AllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 
 		COuterVMR9 *pOuter = DNew COuterVMR9(NAME("COuterVMR9"), pUnk, &m_VMR9AlphaBitmap, this);
 
-
 		pMK->SetInner((IUnknown*)(INonDelegatingUnknown*)pOuter);
 		CComQIPtr<IBaseFilter> pBF = pUnk;
 
 		CComPtr<IPin> pPin = GetFirstPin(pBF);
 		CComQIPtr<IMemInputPin> pMemInputPin = pPin;
 		m_fUseInternalTimer = HookNewSegmentAndReceive((IPinC*)(IPin*)pPin, (IMemInputPinC*)(IMemInputPin*)pMemInputPin);
-
-		if (CComQIPtr<IAMVideoAccelerator> pAMVA = pPin) {
-			HookAMVideoAccelerator((IAMVideoAcceleratorC*)(IAMVideoAccelerator*)pAMVA);
-		}
 
 		CComQIPtr<IVMRFilterConfig9> pConfig = pBF;
 		if (!pConfig) {
@@ -143,6 +138,7 @@ STDMETHODIMP CVMR9AllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 
 		CComQIPtr<IVMRSurfaceAllocatorNotify9> pSAN = pBF;
 		if (!pSAN) {
+			hr = E_FAIL;
 			break;
 		}
 
@@ -152,11 +148,9 @@ STDMETHODIMP CVMR9AllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 		}
 
 		*ppRenderer = (IUnknown*)pBF.Detach();
-
-		return S_OK;
 	} while (0);
 
-	return E_FAIL;
+	return hr;
 }
 
 STDMETHODIMP_(void) CVMR9AllocatorPresenter::SetTime(REFERENCE_TIME rtNow)
@@ -364,13 +358,8 @@ STDMETHODIMP CVMR9AllocatorPresenter::PresentImage(DWORD_PTR dwUserID, VMR9Prese
 
 			BITMAPINFOHEADER bih;
 			if (ExtractBIH(&mt, &bih)) {
-				m_InputVCodec = GetMediaTypeName (mt.subtype);
-				m_InputVCodec = GetMediaTypeName (mt.subtype);
-				if (!m_InputVCodec.Find(L"MEDIASUBTYPE_")) {
-					m_InputVCodec.Replace(L"MEDIASUBTYPE_", L"");
-				} else {
-					m_InputVCodec = GetDXVAMode(&mt.subtype);
-				}
+				m_InputVCodec = GetGUIDString(mt.subtype);
+				m_InputVCodec.Replace(L"MEDIASUBTYPE_", L"");
 			}
 
 			CSize NativeVideoSize = m_NativeVideoSize;

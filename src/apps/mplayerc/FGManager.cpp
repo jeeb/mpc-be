@@ -1039,6 +1039,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 					}
 
 					TRACE(_T("FGM: '%s' Successfully connected\n"), pFGF->GetName());
+
 					return hr;
 				}
 			}
@@ -1437,6 +1438,12 @@ STDMETHODIMP CFGManager::ConnectFilterDirect(IPin* pPinOut, IBaseFilter* pBF, co
 			if (clsid == CLSID_Line21Decoder || clsid == CLSID_Line21Decoder2) {
 				if (!FindFilter(CLSID_DVDNavigator, this)) {
 					continue;
+				}
+			}
+
+			if (!m_IsPreview && pPin && !GetDXVAStatus()) {
+				if (CComQIPtr<IAMVideoAccelerator> pAMVA = pPin) {
+					HookAMVideoAccelerator((IAMVideoAcceleratorC*)(IAMVideoAccelerator*)pAMVA);
 				}
 			}
 

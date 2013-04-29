@@ -265,7 +265,7 @@ STDMETHODIMP CEVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 
 	*ppRenderer = NULL;
 
-	HRESULT					hr = E_FAIL;
+	HRESULT hr = E_FAIL;
 
 	do {
 		CMacrovisionKicker*		pMK  = DNew CMacrovisionKicker(NAME("CMacrovisionKicker"), NULL);
@@ -285,31 +285,25 @@ STDMETHODIMP CEVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 		CComPtr<IMFVideoPresenter>		pVP;
 		CComPtr<IMFVideoRenderer>		pMFVR;
 		CComQIPtr<IMFGetService, &__uuidof(IMFGetService)> pMFGS = pBF;
-		CComQIPtr<IEVRFilterConfig> pConfig = pBF;
+		CComQIPtr<IEVRFilterConfig>		pConfig = pBF;
 		if (SUCCEEDED(hr)) {
 			if (FAILED(pConfig->SetNumberOfStreams(3))) { // TODO - maybe need other number of input stream ...
 				break;
 			}
 		}
 
-		hr = pMFGS->GetService (MR_VIDEO_RENDER_SERVICE, IID_IMFVideoRenderer, (void**)&pMFVR);
+		hr = pMFGS->GetService(MR_VIDEO_RENDER_SERVICE, IID_IMFVideoRenderer, (void**)&pMFVR);
 
 		if (SUCCEEDED(hr)) {
-			hr = QueryInterface (__uuidof(IMFVideoPresenter), (void**)&pVP);
+			hr = QueryInterface(__uuidof(IMFVideoPresenter), (void**)&pVP);
 		}
 		if (SUCCEEDED(hr)) {
-			hr = pMFVR->InitializeRenderer (NULL, pVP);
+			hr = pMFVR->InitializeRenderer(NULL, pVP);
 		}
 
-#if 1
 		CComPtr<IPin>			pPin = GetFirstPin(pBF);
 		CComQIPtr<IMemInputPin> pMemInputPin = pPin;
-
-		// No NewSegment : no chocolate :o)
 		m_fUseInternalTimer = HookNewSegmentAndReceive((IPinC*)(IPin*)pPin, (IMemInputPinC*)(IMemInputPin*)pMemInputPin);
-#else
-		m_fUseInternalTimer = false;
-#endif
 
 		if (FAILED(hr)) {
 			*ppRenderer = NULL;
@@ -1572,12 +1566,8 @@ void CEVRAllocatorPresenter::GetMixerThread()
 
 						BITMAPINFOHEADER bih;
 						if (ExtractBIH(&mt, &bih)) {
-							m_InputVCodec = GetMediaTypeName (mt.subtype);
-							if (!m_InputVCodec.Find(L"MEDIASUBTYPE_")) {
-								m_InputVCodec.Replace(L"MEDIASUBTYPE_", L"");
-							} else {
-								m_InputVCodec = GetDXVAMode(&mt.subtype);
-							}
+							m_InputVCodec = GetGUIDString(mt.subtype);
+							m_InputVCodec.Replace(L"MEDIASUBTYPE_", L"");
 						}
 					}
 					// If framerate not set by Video Decoder choose 23.97...

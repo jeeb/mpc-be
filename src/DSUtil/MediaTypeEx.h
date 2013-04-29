@@ -30,14 +30,14 @@ public:
 	CMediaTypeEx(const CMediaType& mt) {
 		CMediaType::operator = (mt);
 	}
-
 	CString ToString(IPin* pPin = NULL);
-
-	static CString GetVideoCodecName(const GUID& subtype, DWORD biCompression);
-	static CString GetAudioCodecName(const GUID& subtype, WORD wFormatTag);
-	static CString GetSubtitleCodecName(const GUID& subtype);
-
 	void Dump(CAtlList<CString>& sl);
-
 	bool ValidateSubtitle();
+
+private:
+	CString GetVideoCodecName(const GUID& subtype, DWORD biCompression);
+	CString GetAudioCodecName(const GUID& subtype, WORD wFormatTag);
+	CString GetSubtitleCodecName(const GUID& subtype);
 };
+
+CString GetGUIDString(const GUID& guid);
