@@ -439,6 +439,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						wfe = (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX) + configSize);
 						memset(wfe, 0, mt.FormatLength());
+						wfe->wFormatTag		= WAVE_FORMAT_AAC;
 						wfe->nSamplesPerSec = sampleRates[iSampleRate];
 						wfe->wBitsPerSample = 16;
 						wfe->nChannels      = channels[iChannels];
