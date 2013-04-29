@@ -341,7 +341,7 @@ void CShaderEditorDlg::OnCbnSelchangeCombo1()
 
 	if (i < 0) {
 		CStringA srcdata;
-		if (!LoadResource(IDF_SHADER_EMPTY, srcdata, _T("SHADER"))) {
+		if (!LoadResource(IDF_SHADER_EMPTY, srcdata, _T("FILE"))) {
 			return;
 		}
 
