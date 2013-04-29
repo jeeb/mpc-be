@@ -52,6 +52,8 @@ private:
 	static CString GetOpenCommand();
 	static CString GetEnqueueCommand();
 
+	CAtlList<CString> m_lUnRegisterExts;
+
 public:
 	CPPageFormats();
 	virtual ~CPPageFormats();

@@ -387,7 +387,7 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, bool fAudioOnly, 
 	}
 
 	if (!IsRegistered(ext)) {
-		SetFileAssociation (ext, strProgID, true);
+		SetFileAssociation(ext, strProgID, true);
 	}
 
 	return true;
@@ -643,7 +643,6 @@ BOOL CPPageFormats::OnInitDialog()
 
 	CreateToolTip();
 
-
 	if (IsWinVistaOrLater() && !IsUserAnAdmin()) {
 		GetDlgItem(IDC_BUTTON1)->ShowWindow (SW_HIDE);
 		GetDlgItem(IDC_BUTTON3)->ShowWindow (SW_HIDE);
@@ -666,7 +665,6 @@ BOOL CPPageFormats::OnInitDialog()
 	} else {
 		GetDlgItem(IDC_BUTTON5)->ShowWindow (SW_HIDE);
 	}
-
 
 	CRegKey key;
 	TCHAR   buff[_MAX_PATH];
@@ -716,7 +714,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool f
 
 			WCHAR*		pszCurrentAssociation;
 			// Save current application associated
-			if (SUCCEEDED (m_pAAR->QueryCurrentDefault (strExt, AT_FILEEXTENSION, AL_EFFECTIVE, &pszCurrentAssociation))) {
+			if (SUCCEEDED (m_pAAR->QueryCurrentDefault(strExt, AT_FILEEXTENSION, AL_EFFECTIVE, &pszCurrentAssociation))) {
 
 				if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID)) {
 					return false;
@@ -737,7 +735,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool f
 					}
 				}
 				*/
-				CoTaskMemFree (pszCurrentAssociation);
+				CoTaskMemFree(pszCurrentAssociation);
 			}
 			strNewApp = GetRegisteredAppName();
 		} else {
@@ -817,6 +815,35 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool f
 	return SUCCEEDED (hr);
 }
 
+void GetUnRegisterExts(CString saved_ext, CString new_ext, CAtlList<CString>& UnRegisterExts)
+{
+	if (saved_ext.CompareNoCase(new_ext) != 0) {
+		CAtlList<CString> saved_exts;
+		Explode(saved_ext, saved_exts, ' ');
+		CAtlList<CString> new_exts;
+		Explode(new_ext, new_exts, ' ');
+
+		POSITION pos = saved_exts.GetHeadPosition();
+		while (pos) {
+			saved_ext = saved_exts.GetNext(pos);
+			bool bMatch = false;
+
+			POSITION pos2 = new_exts.GetHeadPosition();
+			while (pos2) {
+				new_ext = new_exts.GetNext(pos2);
+				if (new_ext.CompareNoCase(saved_ext) == 0) {
+					bMatch = true;
+					continue;
+				}
+			}
+
+			if (!bMatch) {
+				UnRegisterExts.AddTail(saved_ext);
+			}
+		}
+	}
+}
+
 BOOL CPPageFormats::OnApply()
 {
 	UpdateData();
@@ -828,9 +855,20 @@ BOOL CPPageFormats::OnApply()
 		}
 		if (i >= 0) {
 			CMediaFormats& mf = AfxGetAppSettings().m_Formats;
+
+			if (i > 0) {
+				GetUnRegisterExts(mf[i].GetExtsWithPeriod(), m_exts, m_lUnRegisterExts);
+			}
 			mf[i].SetExts(m_exts);
 			m_exts = mf[i].GetExtsWithPeriod();
 			UpdateData(FALSE);
+		}
+	}
+
+	if (m_lUnRegisterExts.GetCount()) {
+		POSITION pos = m_lUnRegisterExts.GetHeadPosition();
+		while (pos) {
+			UnRegisterExt(m_lUnRegisterExts.GetNext(pos));
 		}
 	}
 
@@ -905,6 +943,8 @@ BOOL CPPageFormats::OnApply()
 	SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
 
 	m_bFileExtChanged = false;
+
+	m_lUnRegisterExts.RemoveAll();
 
 	return __super::OnApply();
 }
@@ -1107,10 +1147,18 @@ void CPPageFormats::OnBnClickedButton12()
 	}
 	i = (int)m_list.GetItemData(i);
 	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
+
 	mf[i].RestoreDefaultExts();
+
+	if (i > 0) {
+		GetUnRegisterExts(m_exts, mf[i].GetExtsWithPeriod(), m_lUnRegisterExts);
+	}
+
 	m_exts = mf[i].GetExtsWithPeriod();
-	SetListItemState(m_list.GetSelectionMark());
+	//SetListItemState(m_list.GetSelectionMark());
 	UpdateData(FALSE);
+
+	m_bFileExtChanged = true;
 
 	SetModified();
 }
@@ -1124,10 +1172,17 @@ void CPPageFormats::OnBnClickedButton11()
 	}
 	i = (int)m_list.GetItemData(i);
 	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
+
+	if (i > 0) {
+		GetUnRegisterExts(mf[i].GetExtsWithPeriod(), m_exts, m_lUnRegisterExts);
+	}
+
 	mf[i].SetExts(m_exts);
 	m_exts = mf[i].GetExtsWithPeriod();
-	SetListItemState(m_list.GetSelectionMark());
+	//SetListItemState(m_list.GetSelectionMark());
 	UpdateData(FALSE);
+
+	m_bFileExtChanged = true;
 
 	SetModified();
 }
@@ -1168,6 +1223,10 @@ void CPPageFormats::OnUpdateButtonSet(CCmdUI* pCmdUI)
 	GetDlgItem(IDC_EDIT1)->GetWindowText(newexts);
 	newexts.Trim();
 	orgexts = AfxGetAppSettings().m_Formats[i].GetExtsWithPeriod();
+
+	if (!!newexts.CompareNoCase(orgexts)) {
+		m_bFileExtChanged = true;
+	}
 
 	pCmdUI->Enable(!!newexts.CompareNoCase(orgexts));
 }
