@@ -610,6 +610,7 @@ void CPlayerPlaylistBar::Append(CAtlList<CString>& fns, bool fMulti, CAtlList<CS
 	}
 
 	Refresh();
+	EnsureVisible(m_pl.GetTailPosition());
 	SavePlaylist();
 }
 
@@ -643,6 +644,7 @@ void CPlayerPlaylistBar::Append(CStringW vdn, CStringW adn, int vinput, int vcha
 	m_pl.AddTail(pli);
 
 	Refresh();
+	EnsureVisible(m_pl.GetTailPosition());
 	SavePlaylist();
 }
 
@@ -671,15 +673,15 @@ void CPlayerPlaylistBar::UpdateList()
 	}
 }
 
-void CPlayerPlaylistBar::EnsureVisible(POSITION pos)
+void CPlayerPlaylistBar::EnsureVisible(POSITION pos, bool bMatchPos)
 {
-	int i = FindItem(m_pl.GetPos());
+	int i = FindItem(pos);
 	if (i < 0) {
 		return;
 	}
 
-	m_list.EnsureVisible(i - 1, TRUE);
 	m_list.SetItemState(-1, 0, LVIS_SELECTED);
+	m_list.EnsureVisible(i - 1 + bMatchPos, TRUE);
 	m_list.SetItemState(i, LVIS_SELECTED, LVIS_SELECTED);
 
 	m_list.Invalidate();
@@ -904,7 +906,7 @@ bool CPlayerPlaylistBar::SelectFileInPlaylist(LPCTSTR filename)
 		CPlaylistItem& pli = m_pl.GetAt(pos);
 		if (pli.FindFile(filename)) {
 			m_pl.SetPos(pos);
-			EnsureVisible(pos);
+			EnsureVisible(pos, false);
 			return true;
 		}
 		m_pl.GetNext(pos);
@@ -1183,7 +1185,8 @@ BOOL CPlayerPlaylistBar::OnPlayPlay(UINT nID)
 
 void CPlayerPlaylistBar::OnDropFiles(HDROP hDropInfo)
 {
-	SetActiveWindow();
+	SetForegroundWindow();
+	m_list.SetFocus();
 
 	CAtlList<CString> sl;
 

@@ -59,7 +59,7 @@ private:
 
 	void SetupList();
 	void UpdateList();
-	void EnsureVisible(POSITION pos);
+	void EnsureVisible(POSITION pos, bool bMatchPos = true);
 	int FindItem(POSITION pos);
 	POSITION FindPos(int i);
 
