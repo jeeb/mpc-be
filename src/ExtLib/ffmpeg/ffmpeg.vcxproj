@@ -664,7 +664,7 @@
     <ClCompile Include="libavcodec\x86\idct_sse2_xvid.c" />
     <ClCompile Include="libavcodec\x86\mlpdsp.c" />
     <ClCompile Include="libavcodec\x86\motion_est.c" />
-    <ClCompile Include="libavcodec\x86\mpegaudiodec.c" />
+    <ClCompile Include="libavcodec\x86\mpegaudiodsp.c" />
     <ClCompile Include="libavcodec\x86\mpegvideo.c" />
     <ClCompile Include="libavcodec\x86\mpegvideoenc_template.c" />
     <ClCompile Include="libavcodec\x86\pngdsp_init.c" />

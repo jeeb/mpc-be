@@ -344,7 +344,7 @@ SRCS_C = \
     libavcodec/x86/idct_sse2_xvid.c \
     libavcodec/x86/mlpdsp.c \
     libavcodec/x86/motion_est.c \
-    libavcodec/x86/mpegaudiodec.c \
+    libavcodec/x86/mpegaudiodsp.c \
     libavcodec/x86/mpegvideo.c \
     libavcodec/x86/pngdsp_init.c \
     libavcodec/x86/proresdsp_init.c \

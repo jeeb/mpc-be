@@ -1143,7 +1143,7 @@
     <ClCompile Include="libavcodec\x86\motion_est.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
-    <ClCompile Include="libavcodec\x86\mpegaudiodec.c">
+    <ClCompile Include="libavcodec\x86\mpegaudiodsp.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\mpegvideo.c">
@@ -1156,6 +1156,9 @@
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\proresdsp_init.c">
+      <Filter>libavcodec\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\x86\rnd_template.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\rv34dsp_init.c">
@@ -2198,9 +2201,6 @@
     </ClCompile>
     <ClCompile Include="libswscale\yuv2rgb.c">
       <Filter>libswscale</Filter>
-    </ClCompile>
-    <ClCompile Include="libavcodec\x86\rnd_template.c">
-      <Filter>libavcodec\x86</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
