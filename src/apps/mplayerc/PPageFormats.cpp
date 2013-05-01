@@ -566,13 +566,13 @@ BEGIN_MESSAGE_MAP(CPPageFormats, CPPageBase)
 	ON_NOTIFY(LVN_BEGINLABELEDIT, IDC_LIST1, OnBeginlabeleditList)
 	ON_NOTIFY(LVN_DOLABELEDIT, IDC_LIST1, OnDolabeleditList)
 	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_LIST1, OnEndlabeleditList)
-	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedButton1)
-	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedButton12)
-	ON_BN_CLICKED(IDC_BUTTON_EXT_SET, OnBnClickedButton11)
-	ON_BN_CLICKED(IDC_BUTTON4, OnBnClickedButton14)
-	ON_BN_CLICKED(IDC_BUTTON3, OnBnClickedButton13)
+	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedAll)
+	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedDefault)
+	ON_BN_CLICKED(IDC_BUTTON_EXT_SET, OnBnClickedSet)
+	ON_BN_CLICKED(IDC_BUTTON4, OnBnClickedVideo)
+	ON_BN_CLICKED(IDC_BUTTON3, OnBnClickedAudio)
 	ON_BN_CLICKED(IDC_BUTTON5, OnBnVistaModify)
-	ON_BN_CLICKED(IDC_BUTTON6, OnBnClickedButton6)
+	ON_BN_CLICKED(IDC_BUTTON6, OnBnClickedNone)
 	ON_BN_CLICKED(IDC_CHECK7, OnFilesAssocModified)
 	ON_BN_CLICKED(IDC_CHECK8, OnFilesAssocModified)
 	ON_UPDATE_COMMAND_UI(IDC_BUTTON2, OnUpdateButtonDefault)
@@ -1056,7 +1056,7 @@ void CPPageFormats::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 	}
 }
 
-void CPPageFormats::OnBnClickedButton1()
+void CPPageFormats::OnBnClickedAll()
 {
 	for (int i = 0, j = m_list.GetItemCount(); i < j; i++) {
 		SetChecked(i, 1);
@@ -1071,7 +1071,7 @@ void CPPageFormats::OnBnClickedButton1()
 	SetModified();
 }
 
-void CPPageFormats::OnBnClickedButton14()
+void CPPageFormats::OnBnClickedVideo()
 {
 	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
 
@@ -1092,7 +1092,7 @@ void CPPageFormats::OnBnClickedButton14()
 	SetModified();
 }
 
-void CPPageFormats::OnBnClickedButton13()
+void CPPageFormats::OnBnClickedAudio()
 {
 	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
 
@@ -1124,7 +1124,7 @@ void CPPageFormats::OnBnVistaModify()
 	}
 }
 
-void CPPageFormats::OnBnClickedButton6()
+void CPPageFormats::OnBnClickedNone()
 {
 	for (int i = 0, j = m_list.GetItemCount(); i < j; i++) {
 		SetChecked(i, 0);
@@ -1139,7 +1139,7 @@ void CPPageFormats::OnBnClickedButton6()
 	SetModified();
 }
 
-void CPPageFormats::OnBnClickedButton12()
+void CPPageFormats::OnBnClickedDefault()
 {
 	int i = m_list.GetSelectionMark();
 	if (i < 0) {
@@ -1163,7 +1163,7 @@ void CPPageFormats::OnBnClickedButton12()
 	SetModified();
 }
 
-void CPPageFormats::OnBnClickedButton11()
+void CPPageFormats::OnBnClickedSet()
 {
 	UpdateData();
 	int i = m_list.GetSelectionMark();

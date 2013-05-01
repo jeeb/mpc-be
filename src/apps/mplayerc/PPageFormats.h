@@ -94,12 +94,12 @@ public:
 	afx_msg void OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
-	afx_msg void OnBnClickedButton1();
-	afx_msg void OnBnClickedButton14();
-	afx_msg void OnBnClickedButton13();
-	afx_msg void OnBnClickedButton12();
-	afx_msg void OnBnClickedButton11();
-	afx_msg void OnBnClickedButton6();
+	afx_msg void OnBnClickedAll();
+	afx_msg void OnBnClickedVideo();
+	afx_msg void OnBnClickedAudio();
+	afx_msg void OnBnClickedDefault();
+	afx_msg void OnBnClickedSet();
+	afx_msg void OnBnClickedNone();
 	afx_msg void OnBnVistaModify();
 	afx_msg void OnFilesAssocModified();
 	afx_msg void OnUpdateButtonDefault(CCmdUI* pCmdUI);
