@@ -19,7 +19,6 @@ REM You should have received a copy of the GNU General Public License
 REM along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 SETLOCAL
-
 PUSHD %~dp0
 
 IF EXIST "SubWCRev.exe" SET "SUBWCREV=SubWCRev.exe"

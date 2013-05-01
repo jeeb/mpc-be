@@ -1,5 +1,5 @@
 @ECHO OFF
-REM $Id: build.bat 1789 2013-01-06 18:31:43Z exodus8 $
+REM $Id$
 REM
 REM (C) 2009-2013 see Authors.txt
 REM

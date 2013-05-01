@@ -2,190 +2,190 @@
 #define FFMPEG_CONFIG_H
 
 #ifdef __GNUC__
-  #define HAVE_MMX2 HAVE_MMXEXT
-  #define ARCH_X86 1
-  #define HAVE_INLINE_ASM 1
-  #define HAVE_AMD3DNOW 1
-  #define HAVE_AMD3DNOWEXT 1
-  #define HAVE_AVX 1
-  #define HAVE_FMA4 1
-  #define HAVE_MMX 1
-  #define HAVE_MMXEXT 1
-  #define HAVE_SSE 1
-  #define HAVE_SSE2 1
-  #define HAVE_SSE3 1
-  #define HAVE_SSE4 1
-  #define HAVE_SSE42 1
-  #define HAVE_SSSE3 1
-  #define HAVE_AMD3DNOW_EXTERNAL 1
-  #define HAVE_AMD3DNOWEXT_EXTERNAL 1
-  #define HAVE_AVX_EXTERNAL 1
-  #define HAVE_FMA4_EXTERNAL 1
-  #define HAVE_MMX_EXTERNAL 1
-  #define HAVE_MMXEXT_EXTERNAL 1
-  #define HAVE_SSE_EXTERNAL 1
-  #define HAVE_SSE2_EXTERNAL 1
-  #define HAVE_SSE3_EXTERNAL 1
-  #define HAVE_SSE4_EXTERNAL 1
-  #define HAVE_SSE42_EXTERNAL 1
-  #define HAVE_SSSE3_EXTERNAL 1
-  #define HAVE_ALTIVEC_EXTERNAL 0
-  #define HAVE_ARMV5TE_EXTERNAL 0
-  #define HAVE_ARMV6_EXTERNAL 0
-  #define HAVE_ARMV6T2_EXTERNAL 0
-  #define HAVE_ARMVFP_EXTERNAL 0
-  #define HAVE_MMI_EXTERNAL 0
-  #define HAVE_NEON_EXTERNAL 0
-  #define HAVE_PPC4XX_EXTERNAL 0
-  #define HAVE_VFPV3_EXTERNAL 0
-  #define HAVE_VIS_EXTERNAL 0
-  #define HAVE_MIPSFPU_EXTERNAL 0
-  #define HAVE_MIPS32R2_EXTERNAL 0
-  #define HAVE_MIPSDSPR1_EXTERNAL 0
-  #define HAVE_MIPSDSPR2_EXTERNAL 0
-  #define HAVE_AMD3DNOW_INLINE 1
-  #define HAVE_AMD3DNOWEXT_INLINE 1
-  #define HAVE_AVX_INLINE 1
-  #define HAVE_FMA4_INLINE 1
-  #define HAVE_MMX_INLINE 1
-  #define HAVE_MMXEXT_INLINE 1
-  #define HAVE_SSE_INLINE 1
-  #define HAVE_SSE2_INLINE 1
-  #define HAVE_SSE3_INLINE 1
-  #define HAVE_SSE4_INLINE 1
-  #define HAVE_SSE42_INLINE 1
-  #define HAVE_SSSE3_INLINE 1
-  #define HAVE_ALTIVEC_INLINE 0
-  #define HAVE_ARMV5TE_INLINE 0
-  #define HAVE_ARMV6_INLINE 0
-  #define HAVE_ARMV6T2_INLINE 0
-  #define HAVE_ARMVFP_INLINE 0
-  #define HAVE_MMI_INLINE 0
-  #define HAVE_NEON_INLINE 0
-  #define HAVE_PPC4XX_INLINE 0
-  #define HAVE_VFPV3_INLINE 0
-  #define HAVE_VIS_INLINE 0
-  #define HAVE_MIPSFPU_INLINE 0
-  #define HAVE_MIPS32R2_INLINE 0
-  #define HAVE_MIPSDSPR1_INLINE 0
-  #define HAVE_MIPSDSPR2_INLINE 0
+	#define HAVE_MMX2 HAVE_MMXEXT
+	#define ARCH_X86 1
+	#define HAVE_INLINE_ASM 1
+	#define HAVE_AMD3DNOW 1
+	#define HAVE_AMD3DNOWEXT 1
+	#define HAVE_AVX 1
+	#define HAVE_FMA4 1
+	#define HAVE_MMX 1
+	#define HAVE_MMXEXT 1
+	#define HAVE_SSE 1
+	#define HAVE_SSE2 1
+	#define HAVE_SSE3 1
+	#define HAVE_SSE4 1
+	#define HAVE_SSE42 1
+	#define HAVE_SSSE3 1
+	#define HAVE_AMD3DNOW_EXTERNAL 1
+	#define HAVE_AMD3DNOWEXT_EXTERNAL 1
+	#define HAVE_AVX_EXTERNAL 1
+	#define HAVE_FMA4_EXTERNAL 1
+	#define HAVE_MMX_EXTERNAL 1
+	#define HAVE_MMXEXT_EXTERNAL 1
+	#define HAVE_SSE_EXTERNAL 1
+	#define HAVE_SSE2_EXTERNAL 1
+	#define HAVE_SSE3_EXTERNAL 1
+	#define HAVE_SSE4_EXTERNAL 1
+	#define HAVE_SSE42_EXTERNAL 1
+	#define HAVE_SSSE3_EXTERNAL 1
+	#define HAVE_ALTIVEC_EXTERNAL 0
+	#define HAVE_ARMV5TE_EXTERNAL 0
+	#define HAVE_ARMV6_EXTERNAL 0
+	#define HAVE_ARMV6T2_EXTERNAL 0
+	#define HAVE_ARMVFP_EXTERNAL 0
+	#define HAVE_MMI_EXTERNAL 0
+	#define HAVE_NEON_EXTERNAL 0
+	#define HAVE_PPC4XX_EXTERNAL 0
+	#define HAVE_VFPV3_EXTERNAL 0
+	#define HAVE_VIS_EXTERNAL 0
+	#define HAVE_MIPSFPU_EXTERNAL 0
+	#define HAVE_MIPS32R2_EXTERNAL 0
+	#define HAVE_MIPSDSPR1_EXTERNAL 0
+	#define HAVE_MIPSDSPR2_EXTERNAL 0
+	#define HAVE_AMD3DNOW_INLINE 1
+	#define HAVE_AMD3DNOWEXT_INLINE 1
+	#define HAVE_AVX_INLINE 1
+	#define HAVE_FMA4_INLINE 1
+	#define HAVE_MMX_INLINE 1
+	#define HAVE_MMXEXT_INLINE 1
+	#define HAVE_SSE_INLINE 1
+	#define HAVE_SSE2_INLINE 1
+	#define HAVE_SSE3_INLINE 1
+	#define HAVE_SSE4_INLINE 1
+	#define HAVE_SSE42_INLINE 1
+	#define HAVE_SSSE3_INLINE 1
+	#define HAVE_ALTIVEC_INLINE 0
+	#define HAVE_ARMV5TE_INLINE 0
+	#define HAVE_ARMV6_INLINE 0
+	#define HAVE_ARMV6T2_INLINE 0
+	#define HAVE_ARMVFP_INLINE 0
+	#define HAVE_MMI_INLINE 0
+	#define HAVE_NEON_INLINE 0
+	#define HAVE_PPC4XX_INLINE 0
+	#define HAVE_VFPV3_INLINE 0
+	#define HAVE_VIS_INLINE 0
+	#define HAVE_MIPSFPU_INLINE 0
+	#define HAVE_MIPS32R2_INLINE 0
+	#define HAVE_MIPSDSPR1_INLINE 0
+	#define HAVE_MIPSDSPR2_INLINE 0
 
-  #ifdef ARCH_X86_64
-    #define BROKEN_RELOCATIONS 1
-    #define ARCH_X86_32 0
-    #define ARCH_X86_64 1
-    #define HAVE_FAST_64BIT 1
-    #define HAVE_CMOV 1
-    #define HAVE_FAST_CMOV 1
-    #define HAVE_MM_EMPTY 1
-    #define HAVE_XMM_CLOBBERS 1
-    #define CONFIG_PIC 1
-  #else
-    #define ARCH_X86_32 1
-    #define ARCH_X86_64 0
-    #define HAVE_FAST_64BIT 0
-    #define HAVE_CMOV 0
-    #define HAVE_FAST_CMOV 0
-    #define HAVE_MM_EMPTY 0
-    #define HAVE_XMM_CLOBBERS 0
-    #define CONFIG_PIC 0
-  #endif
+	#ifdef ARCH_X86_64
+		#define BROKEN_RELOCATIONS 1
+		#define ARCH_X86_32 0
+		#define ARCH_X86_64 1
+		#define HAVE_FAST_64BIT 1
+		#define HAVE_CMOV 1
+		#define HAVE_FAST_CMOV 1
+		#define HAVE_MM_EMPTY 1
+		#define HAVE_XMM_CLOBBERS 1
+		#define CONFIG_PIC 1
+	#else
+		#define ARCH_X86_32 1
+		#define ARCH_X86_64 0
+		#define HAVE_FAST_64BIT 0
+		#define HAVE_CMOV 0
+		#define HAVE_FAST_CMOV 0
+		#define HAVE_MM_EMPTY 0
+		#define HAVE_XMM_CLOBBERS 0
+		#define CONFIG_PIC 0
+	#endif
 
-  #ifndef av_restrict
-  #define av_restrict restrict
-  #endif
+	#ifndef av_restrict
+	#define av_restrict restrict
+	#endif
 #else
-  #define HAVE_INLINE_ASM 0
-  #define HAVE_AMD3DNOW 0
-  #define HAVE_AMD3DNOWEXT 0
-  #define HAVE_AVX 0
-  #define HAVE_FMA4 0
-  #define HAVE_MMX 0
-  #define HAVE_MMXEXT 0
-  #define HAVE_SSE 0
-  #define HAVE_SSE2 0
-  #define HAVE_SSE3 0
-  #define HAVE_SSE4 0
-  #define HAVE_SSE42 0
-  #define HAVE_SSSE3 0
-  #define HAVE_ALTIVEC 0
-  #define HAVE_ARMV5TE 0
-  #define HAVE_ARMV6 0
-  #define HAVE_ARMV6T2 0
-  #define HAVE_ARMVFP 0
-  #define HAVE_MMI 0
-  #define HAVE_NEON 0
-  #define HAVE_PPC4XX 0
-  #define HAVE_VFPV3 0
-  #define HAVE_VIS 0
-  #define HAVE_MIPSFPU 0
-  #define HAVE_MIPS32R2 0
-  #define HAVE_MIPSDSPR0 0
-  #define HAVE_MIPSDSPR2 0
-  #define HAVE_AMD3DNOW_EXTERNAL 0
-  #define HAVE_AMD3DNOWEXT_EXTERNAL 0
-  #define HAVE_AVX_EXTERNAL 0
-  #define HAVE_FMA4_EXTERNAL 0
-  #define HAVE_MMX_EXTERNAL 0
-  #define HAVE_MMXEXT_EXTERNAL 0
-  #define HAVE_SSE_EXTERNAL 0
-  #define HAVE_SSE2_EXTERNAL 0
-  #define HAVE_SSE3_EXTERNAL 0
-  #define HAVE_SSE4_EXTERNAL 0
-  #define HAVE_SSE42_EXTERNAL 0
-  #define HAVE_SSSE3_EXTERNAL 0
-  #define HAVE_ALTIVEC_EXTERNAL 0
-  #define HAVE_ARMV5TE_EXTERNAL 0
-  #define HAVE_ARMV6_EXTERNAL 0
-  #define HAVE_ARMV6T2_EXTERNAL 0
-  #define HAVE_ARMVFP_EXTERNAL 0
-  #define HAVE_MMI_EXTERNAL 0
-  #define HAVE_NEON_EXTERNAL 0
-  #define HAVE_PPC4XX_EXTERNAL 0
-  #define HAVE_VFPV3_EXTERNAL 0
-  #define HAVE_VIS_EXTERNAL 0
-  #define HAVE_MIPSFPU_EXTERNAL 0
-  #define HAVE_MIPS32R2_EXTERNAL 0
-  #define HAVE_MIPSDSPR0_EXTERNAL 0
-  #define HAVE_MIPSDSPR2_EXTERNAL 0
-  #define HAVE_AMD3DNOW_INLINE 0
-  #define HAVE_AMD3DNOWEXT_INLINE 0
-  #define HAVE_AVX_INLINE 0
-  #define HAVE_FMA4_INLINE 0
-  #define HAVE_MMX_INLINE 0
-  #define HAVE_MMXEXT_INLINE 0
-  #define HAVE_SSE_INLINE 0
-  #define HAVE_SSE2_INLINE 0
-  #define HAVE_SSE3_INLINE 0
-  #define HAVE_SSE4_INLINE 0
-  #define HAVE_SSE42_INLINE 0
-  #define HAVE_SSSE3_INLINE 0
-  #define HAVE_ALTIVEC_INLINE 0
-  #define HAVE_ARMV5TE_INLINE 0
-  #define HAVE_ARMV6_INLINE 0
-  #define HAVE_ARMV6T2_INLINE 0
-  #define HAVE_ARMVFP_INLINE 0
-  #define HAVE_MMI_INLINE 0
-  #define HAVE_NEON_INLINE 0
-  #define HAVE_PPC4XX_INLINE 0
-  #define HAVE_VFPV3_INLINE 0
-  #define HAVE_VIS_INLINE 0
-  #define HAVE_MIPSFPU_INLINE 0
-  #define HAVE_MIPS32R2_INLINE 0
-  #define HAVE_MIPSDSPR0_INLINE 0
-  #define HAVE_MIPSDSPR2_INLINE 0
-  #define ARCH_X86 0
-  #define ARCH_X86_32 0
-  #define ARCH_X86_64 0
-  #define HAVE_FAST_64BIT 0
-  #define HAVE_CMOV 0
-  #define HAVE_FAST_CMOV 0
-  #define HAVE_MM_EMPTY 0
-  #define HAVE_XMM_CLOBBERS 0
-  #define CONFIG_PIC 0
+	#define HAVE_INLINE_ASM 0
+	#define HAVE_AMD3DNOW 0
+	#define HAVE_AMD3DNOWEXT 0
+	#define HAVE_AVX 0
+	#define HAVE_FMA4 0
+	#define HAVE_MMX 0
+	#define HAVE_MMXEXT 0
+	#define HAVE_SSE 0
+	#define HAVE_SSE2 0
+	#define HAVE_SSE3 0
+	#define HAVE_SSE4 0
+	#define HAVE_SSE42 0
+	#define HAVE_SSSE3 0
+	#define HAVE_ALTIVEC 0
+	#define HAVE_ARMV5TE 0
+	#define HAVE_ARMV6 0
+	#define HAVE_ARMV6T2 0
+	#define HAVE_ARMVFP 0
+	#define HAVE_MMI 0
+	#define HAVE_NEON 0
+	#define HAVE_PPC4XX 0
+	#define HAVE_VFPV3 0
+	#define HAVE_VIS 0
+	#define HAVE_MIPSFPU 0
+	#define HAVE_MIPS32R2 0
+	#define HAVE_MIPSDSPR0 0
+	#define HAVE_MIPSDSPR2 0
+	#define HAVE_AMD3DNOW_EXTERNAL 0
+	#define HAVE_AMD3DNOWEXT_EXTERNAL 0
+	#define HAVE_AVX_EXTERNAL 0
+	#define HAVE_FMA4_EXTERNAL 0
+	#define HAVE_MMX_EXTERNAL 0
+	#define HAVE_MMXEXT_EXTERNAL 0
+	#define HAVE_SSE_EXTERNAL 0
+	#define HAVE_SSE2_EXTERNAL 0
+	#define HAVE_SSE3_EXTERNAL 0
+	#define HAVE_SSE4_EXTERNAL 0
+	#define HAVE_SSE42_EXTERNAL 0
+	#define HAVE_SSSE3_EXTERNAL 0
+	#define HAVE_ALTIVEC_EXTERNAL 0
+	#define HAVE_ARMV5TE_EXTERNAL 0
+	#define HAVE_ARMV6_EXTERNAL 0
+	#define HAVE_ARMV6T2_EXTERNAL 0
+	#define HAVE_ARMVFP_EXTERNAL 0
+	#define HAVE_MMI_EXTERNAL 0
+	#define HAVE_NEON_EXTERNAL 0
+	#define HAVE_PPC4XX_EXTERNAL 0
+	#define HAVE_VFPV3_EXTERNAL 0
+	#define HAVE_VIS_EXTERNAL 0
+	#define HAVE_MIPSFPU_EXTERNAL 0
+	#define HAVE_MIPS32R2_EXTERNAL 0
+	#define HAVE_MIPSDSPR0_EXTERNAL 0
+	#define HAVE_MIPSDSPR2_EXTERNAL 0
+	#define HAVE_AMD3DNOW_INLINE 0
+	#define HAVE_AMD3DNOWEXT_INLINE 0
+	#define HAVE_AVX_INLINE 0
+	#define HAVE_FMA4_INLINE 0
+	#define HAVE_MMX_INLINE 0
+	#define HAVE_MMXEXT_INLINE 0
+	#define HAVE_SSE_INLINE 0
+	#define HAVE_SSE2_INLINE 0
+	#define HAVE_SSE3_INLINE 0
+	#define HAVE_SSE4_INLINE 0
+	#define HAVE_SSE42_INLINE 0
+	#define HAVE_SSSE3_INLINE 0
+	#define HAVE_ALTIVEC_INLINE 0
+	#define HAVE_ARMV5TE_INLINE 0
+	#define HAVE_ARMV6_INLINE 0
+	#define HAVE_ARMV6T2_INLINE 0
+	#define HAVE_ARMVFP_INLINE 0
+	#define HAVE_MMI_INLINE 0
+	#define HAVE_NEON_INLINE 0
+	#define HAVE_PPC4XX_INLINE 0
+	#define HAVE_VFPV3_INLINE 0
+	#define HAVE_VIS_INLINE 0
+	#define HAVE_MIPSFPU_INLINE 0
+	#define HAVE_MIPS32R2_INLINE 0
+	#define HAVE_MIPSDSPR0_INLINE 0
+	#define HAVE_MIPSDSPR2_INLINE 0
+	#define ARCH_X86 0
+	#define ARCH_X86_32 0
+	#define ARCH_X86_64 0
+	#define HAVE_FAST_64BIT 0
+	#define HAVE_CMOV 0
+	#define HAVE_FAST_CMOV 0
+	#define HAVE_MM_EMPTY 0
+	#define HAVE_XMM_CLOBBERS 0
+	#define CONFIG_PIC 0
 
-  #define av_restrict
-  #define __asm__ __asm
+	#define av_restrict
+	#define __asm__ __asm
 #endif
 
 // Use DPRINTF instead of av_log. To be used for debug purpose because DPRINTF will be always called (the
@@ -202,11 +202,11 @@
 
 // MPC custom code for linking with MSVC
 #if defined(__GNUC__) && ARCH_X86_64
-  #define EXTERN_PREFIX ""
-  #define EXTERN_ASM
+	#define EXTERN_PREFIX ""
+	#define EXTERN_ASM
 #else
-  #define EXTERN_PREFIX "_"
-  #define EXTERN_ASM _
+	#define EXTERN_PREFIX "_"
+	#define EXTERN_ASM _
 #endif
 
 #define ARCH_AARCH64 0
@@ -393,29 +393,29 @@
 #define HAVE_YASM 1
 
 #ifdef __GNUC__
-  #define HAVE_ATTRIBUTE_MAY_ALIAS 1
-  #define HAVE_ATTRIBUTE_PACKED 1
-  #define HAVE_EXP2 1
-  #define HAVE_EXP2F 1
-  #define HAVE_LLRINT 1
-  #define HAVE_LRINT 1
-  #define HAVE_LRINTF 1
-  #define HAVE_RDTSC 1
-  #define HAVE_ROUND 1
+	#define HAVE_ATTRIBUTE_MAY_ALIAS 1
+	#define HAVE_ATTRIBUTE_PACKED 1
+	#define HAVE_EXP2 1
+	#define HAVE_EXP2F 1
+	#define HAVE_LLRINT 1
+	#define HAVE_LRINT 1
+	#define HAVE_LRINTF 1
+	#define HAVE_RDTSC 1
+	#define HAVE_ROUND 1
 
 #else
-  #define HAVE_ATTRIBUTE_MAY_ALIAS 0
-  #define HAVE_ATTRIBUTE_PACKED 0
-  #define EMULATE_FAST_INT
-  #define HAVE_EXP2 1
-  #define HAVE_EXP2F 1
-  #define HAVE_LLRINT 0
-  #define HAVE_LRINT 0
-  #define HAVE_LRINTF 0
-  #define HAVE_RDTSC 0
-  #define HAVE_ROUND 0
-  #define rint(x) (int)(x+0.5)
-  #define cbrtf(x) pow((float)x, (float)1.0/3)
+	#define HAVE_ATTRIBUTE_MAY_ALIAS 0
+	#define HAVE_ATTRIBUTE_PACKED 0
+	#define EMULATE_FAST_INT
+	#define HAVE_EXP2 1
+	#define HAVE_EXP2F 1
+	#define HAVE_LLRINT 0
+	#define HAVE_LRINT 0
+	#define HAVE_LRINTF 0
+	#define HAVE_RDTSC 0
+	#define HAVE_ROUND 0
+	#define rint(x) (int)(x+0.5)
+	#define cbrtf(x) pow((float)x, (float)1.0/3)
 #endif
 
 #define CONFIG_DCT 1
@@ -455,14 +455,14 @@
 #define CONFIG_SWSCALE_ALPHA 1
 #define CONFIG_POSTPROC 0
 
-/* 
+/*
 Note: when adding a new codec, you have to:
-1)  Add a
-    #define CONFIG_<codec suffix>_<ENCODER|DECODER|PARSER>
-    depending on the type of codec you are adding
-2)  Add a
-    REGISTER_<ENCODER|DECODER|PARSER> (<codec suffix>, <codec suffix lowercase>);
-    line to libavcodec/allcodecs.c
+1)	Add a
+	#define CONFIG_<codec suffix>_<ENCODER|DECODER|PARSER>
+	depending on the type of codec you are adding
+2)	Add a
+	REGISTER_<ENCODER|DECODER|PARSER> (<codec suffix>, <codec suffix lowercase>);
+	line to libavcodec/allcodecs.c
 */
 
 #define CONFIG_AASC_DECODER 0

@@ -1,5 +1,5 @@
 @ECHO OFF
-REM $Id: build.bat 1789 2013-01-06 18:31:43Z exodus8 $
+REM $Id$
 REM
 REM (C) 2009-2013 see Authors.txt
 REM
@@ -18,8 +18,11 @@ REM
 REM You should have received a copy of the GNU General Public License
 REM along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-IF EXIST "%~dp0..\build.user.bat" (
-  CALL "%~dp0..\build.user.bat"
+SETLOCAL
+CD /D %~dp0
+
+IF EXIST "..\build.user.bat" (
+  CALL ..\build.user.bat
 ) ELSE (
   IF DEFINED MSYS SET MPCBE_MSYS=%MSYS%
 )

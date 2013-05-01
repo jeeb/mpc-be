@@ -66,24 +66,24 @@
 %define HAVE_MIPSDSPR2_INLINE 0
 
 %ifdef ARCH_X86_64
-    %define BROKEN_RELOCATIONS 1
-    %define ARCH_X86_32 0
-    %define ARCH_X86_64 1
-    %define HAVE_FAST_64BIT 1
-    %define HAVE_CMOV 1
-    %define HAVE_FAST_CMOV 1
-    %define HAVE_MM_EMPTY 1
-    %define HAVE_XMM_CLOBBERS 1
-    %define CONFIG_PIC 1
+	%define BROKEN_RELOCATIONS 1
+	%define ARCH_X86_32 0
+	%define ARCH_X86_64 1
+	%define HAVE_FAST_64BIT 1
+	%define HAVE_CMOV 1
+	%define HAVE_FAST_CMOV 1
+	%define HAVE_MM_EMPTY 1
+	%define HAVE_XMM_CLOBBERS 1
+	%define CONFIG_PIC 1
 %else
-    %define ARCH_X86_32 1
-    %define ARCH_X86_64 0
-    %define HAVE_FAST_64BIT 0
-    %define HAVE_CMOV 0
-    %define HAVE_FAST_CMOV 0
-    %define HAVE_MM_EMPTY 0
-    %define HAVE_XMM_CLOBBERS 0
-    %define CONFIG_PIC 0
+	%define ARCH_X86_32 1
+	%define ARCH_X86_64 0
+	%define HAVE_FAST_64BIT 0
+	%define HAVE_CMOV 0
+	%define HAVE_FAST_CMOV 0
+	%define HAVE_MM_EMPTY 0
+	%define HAVE_XMM_CLOBBERS 0
+	%define CONFIG_PIC 0
 %endif
 
 %define ARCH_AARCH64 0

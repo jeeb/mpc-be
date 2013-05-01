@@ -21,8 +21,8 @@ REM along with this program.  If not, see <http://www.gnu.org/licenses/>.
 SETLOCAL
 CD /D %~dp0
 
-SET "SLN=_2012"
-SET "BUILD=VS2012"
-SET "VSCOMNTOOLS=%VS110COMNTOOLS%"
+SET SLN=_2012
+SET BUILD=VS2012
+SET VSCOMNTOOLS=%VS110COMNTOOLS%
 
 build_script.bat %*
