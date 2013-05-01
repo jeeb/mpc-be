@@ -171,7 +171,7 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	m_MaxSampleDuration			= 0;
 	m_LastSampleOffset			= 0;
 	ZeroMemory(m_VSyncOffsetHistory, sizeof(m_VSyncOffsetHistory));
-	m_VSyncOffsetHistoryPos = 0;
+	m_VSyncOffsetHistoryPos		= 0;
 	m_bLastSampleOffsetValid	= false;
 	m_bChangeMT					= false;
 }
@@ -205,7 +205,7 @@ HRESULT CEVRAllocatorPresenter::CheckShutdown() const
 
 void CEVRAllocatorPresenter::StartWorkerThreads()
 {
-	DWORD		dwThreadId;
+	DWORD dwThreadId;
 
 	if (m_nRenderState == Shutdown) {
 		m_hEvtQuit		= CreateEvent (NULL, TRUE, FALSE, NULL);
@@ -216,7 +216,7 @@ void CEVRAllocatorPresenter::StartWorkerThreads()
 		m_hGetMixerThread = ::CreateThread(NULL, 0, GetMixerThreadStatic, (LPVOID)this, 0, &dwThreadId);
 		SetThreadPriority(m_hGetMixerThread, THREAD_PRIORITY_HIGHEST);
 
-		m_nRenderState		= Stopped;
+		m_nRenderState	= Stopped;
 		TRACE_EVR ("EVR: Worker threads started...\n");
 	}
 }
@@ -237,22 +237,21 @@ void CEVRAllocatorPresenter::StopWorkerThreads()
 			TerminateThread (m_hGetMixerThread, 0xDEAD);
 		}
 
-		if (m_hThread		 != INVALID_HANDLE_VALUE) {
+		if (m_hThread != INVALID_HANDLE_VALUE) {
 			CloseHandle (m_hThread);
 		}
-		if (m_hGetMixerThread		 != INVALID_HANDLE_VALUE) {
+		if (m_hGetMixerThread != INVALID_HANDLE_VALUE) {
 			CloseHandle (m_hGetMixerThread);
 		}
-		if (m_hEvtFlush		 != INVALID_HANDLE_VALUE) {
+		if (m_hEvtFlush != INVALID_HANDLE_VALUE) {
 			CloseHandle (m_hEvtFlush);
 		}
-		if (m_hEvtQuit		 != INVALID_HANDLE_VALUE) {
+		if (m_hEvtQuit != INVALID_HANDLE_VALUE) {
 			CloseHandle (m_hEvtQuit);
 		}
 
-		m_bEvtFlush = false;
-		m_bEvtQuit = false;
-
+		m_bEvtFlush	= false;
+		m_bEvtQuit	= false;
 
 		TRACE_EVR ("EVR: Worker threads stopped...\n");
 	}
@@ -358,11 +357,11 @@ STDMETHODIMP CEVRAllocatorPresenter::NonDelegatingQueryInterface(REFIID riid, vo
 // IMFClockStateSink
 STDMETHODIMP CEVRAllocatorPresenter::OnClockStart(MFTIME hnsSystemTime,  LONGLONG llClockStartOffset)
 {
-	m_nRenderState		= Started;
-
 	TRACE_EVR ("EVR: OnClockStart  hnsSystemTime = %I64d,   llClockStartOffset = %I64d\n", hnsSystemTime, llClockStartOffset);
-	m_ModeratedTimeLast = -1;
-	m_ModeratedClockLast = -1;
+
+	m_nRenderState			= Started;
+	m_ModeratedTimeLast		= -1;
+	m_ModeratedClockLast	= -1;
 
 	return S_OK;
 }
@@ -370,31 +369,34 @@ STDMETHODIMP CEVRAllocatorPresenter::OnClockStart(MFTIME hnsSystemTime,  LONGLON
 STDMETHODIMP CEVRAllocatorPresenter::OnClockStop(MFTIME hnsSystemTime)
 {
 	TRACE_EVR ("EVR: OnClockStop  hnsSystemTime = %I64d\n", hnsSystemTime);
-	m_nRenderState		= Stopped;
 
-	m_ModeratedClockLast = -1;
-	m_ModeratedTimeLast = -1;
+	m_nRenderState			= Stopped;
+	m_ModeratedClockLast	= -1;
+	m_ModeratedTimeLast		= -1;
+
 	return S_OK;
 }
 
 STDMETHODIMP CEVRAllocatorPresenter::OnClockPause(MFTIME hnsSystemTime)
 {
 	TRACE_EVR ("EVR: OnClockPause  hnsSystemTime = %I64d\n", hnsSystemTime);
+
 	if (!m_bSignaledStarvation) {
 		m_nRenderState		= Paused;
 	}
-	m_ModeratedTimeLast = -1;
-	m_ModeratedClockLast = -1;
+	m_ModeratedTimeLast		= -1;
+	m_ModeratedClockLast	= -1;
+
 	return S_OK;
 }
 
 STDMETHODIMP CEVRAllocatorPresenter::OnClockRestart(MFTIME hnsSystemTime)
 {
-	m_nRenderState	= Started;
-
-	m_ModeratedTimeLast = -1;
-	m_ModeratedClockLast = -1;
 	TRACE_EVR ("EVR: OnClockRestart  hnsSystemTime = %I64d\n", hnsSystemTime);
+
+	m_nRenderState			= Started;
+	m_ModeratedTimeLast		= -1;
+	m_ModeratedClockLast	= -1;
 
 	return S_OK;
 }
@@ -425,7 +427,7 @@ bool CEVRAllocatorPresenter::GetState( DWORD dwMilliSecsTimeout, FILTER_STATE *S
 // IQualProp
 STDMETHODIMP CEVRAllocatorPresenter::get_FramesDroppedInRenderer(int *pcFrames)
 {
-	*pcFrames	= m_pcFrames;
+	*pcFrames = m_pcFrames;
 	return S_OK;
 }
 STDMETHODIMP CEVRAllocatorPresenter::get_FramesDrawn(int *pcFramesDrawn)
@@ -561,7 +563,7 @@ void CEVRAllocatorPresenter::CompleteFrameStep(bool bCancel)
 // IMFVideoPresenter
 STDMETHODIMP CEVRAllocatorPresenter::ProcessMessage(MFVP_MESSAGE_TYPE eMessage, ULONG_PTR ulParam)
 {
-	HRESULT						hr = S_OK;
+	HRESULT hr = S_OK;
 
 	switch (eMessage) {
 		case MFVP_MESSAGE_BEGINSTREAMING :			// The EVR switched from stopped to paused. The presenter should allocate resources
@@ -941,7 +943,7 @@ LPCTSTR CEVRAllocatorPresenter::GetMediaTypeFormatDesc(IMFMediaType* pMediaType)
 
 HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 {
-	HRESULT			hr = S_OK;
+	HRESULT hr = S_OK;
 
 	CComPtr<IMFMediaType>	pMixerType;
 	CComPtr<IMFMediaType>	pType;
@@ -1038,7 +1040,9 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 	pMixerType	= NULL;
 	pType		= NULL;
 
-	m_bChangeMT	= true;
+	if (m_nRenderState == Started || m_nRenderState == Paused) {
+		m_bChangeMT	= true;
+	}
 
 	return hr;
 }
@@ -1570,9 +1574,9 @@ void CEVRAllocatorPresenter::GetMixerThread()
 							m_InputVCodec.Replace(L"MEDIASUBTYPE_", L"");
 						}
 					}
-					// If framerate not set by Video Decoder choose 23.97...
+					// If framerate not set by Video Decoder - choose 23.976
 					if (m_rtTimePerFrame == 1) {
-						m_rtTimePerFrame = 417166;
+						m_rtTimePerFrame = 417083;
 					}
 
 					// Update internal subtitle clock
