@@ -25,6 +25,8 @@
 #include "ShockwaveGraph.h"
 #include <math.h>
 
+IMPLEMENT_DYNCREATE(CShockwaveFlash, CWnd)
+
 using namespace DSObjects;
 
 CShockwaveGraph::CShockwaveGraph(HWND hParent, HRESULT& hr)

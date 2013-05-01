@@ -183,7 +183,6 @@
     <ClCompile Include="PPageInterface.cpp" />
     <ClCompile Include="PPageYouTube.cpp" />
     <ClCompile Include="SaveTaskDlg.cpp" />
-    <ClCompile Include="ShockwaveFlash.cpp" />
     <ClCompile Include="DeinterlacerFilter.cpp" />
     <ClCompile Include="DVBChannel.cpp" />
     <ClCompile Include="EditListEditor.cpp" />

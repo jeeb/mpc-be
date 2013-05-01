@@ -39,9 +39,6 @@
     <ClCompile Include="ComPropertySheet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ShockwaveFlash.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DeinterlacerFilter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
