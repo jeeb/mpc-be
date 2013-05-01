@@ -28,13 +28,13 @@ IF /I "%~1"=="-help"  GOTO SHOWHELP
 IF /I "%~1"=="--help" GOTO SHOWHELP
 IF /I "%~1"=="/?"     GOTO SHOWHELP
 
-IF DEFINED MINGW64 GOTO VarOk
-ECHO ERROR: Please define MINGW64 (and/or MSYS) environment variable(s)
+IF DEFINED MINGW GOTO VarOk
+ECHO ERROR: Please define MINGW (and/or MSYS) environment variable(s)
 ENDLOCAL
 EXIT /B
 
 :VarOk
-SET PATH=%MSYS%\bin;%MINGW64%\bin;%PATH%
+SET PATH=%MSYS%\bin;%MINGW%\bin;%PATH%
 
 IF /I "%~2" == "Debug" SET "DEBUG=DEBUG=yes"
 
@@ -67,6 +67,7 @@ IF "%~1" == "" (
   ECHO Unsupported commandline switch!
   ECHO Run "%~nx0 help" for details about the commandline switches.
   ENDLOCAL
+  SET "BUILDTYPE=Rebuild"
   EXIT /B
 )
 
@@ -84,9 +85,9 @@ IF "%BUILDTYPE%" == "clean" (
 
 SET "JOBS=-j%JOBS%"
 
-TITLE "make %JOBS% 64BIT=yes %DEBUG% %*"
-ECHO make %JOBS% 64BIT=yes %DEBUG% %*
-make.exe %JOBS% 64BIT=yes %DEBUG% %*
+TITLE "make %JOBS% %BIT% %DEBUG% %*"
+ECHO make %JOBS% %BIT% %DEBUG% %*
+make.exe %JOBS% %BIT% %DEBUG% %*
 
 ENDLOCAL
 EXIT /B
