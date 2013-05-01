@@ -1155,6 +1155,11 @@ void CPPageFormats::OnBnClickedDefault()
 	}
 
 	m_exts = mf[i].GetExtsWithPeriod();
+
+	CString label;
+	label.Format(_T("%s (%s)"), mf[i].GetDescription(), mf[i].GetExts());
+	m_list.SetItemText(i, COL_CATEGORY, label);
+
 	//SetListItemState(m_list.GetSelectionMark());
 	UpdateData(FALSE);
 
@@ -1179,6 +1184,11 @@ void CPPageFormats::OnBnClickedSet()
 
 	mf[i].SetExts(m_exts);
 	m_exts = mf[i].GetExtsWithPeriod();
+
+	CString label;
+	label.Format(_T("%s (%s)"), mf[i].GetDescription(), mf[i].GetExts());
+	m_list.SetItemText(i, COL_CATEGORY, label);
+
 	//SetListItemState(m_list.GetSelectionMark());
 	UpdateData(FALSE);
 
