@@ -228,6 +228,10 @@ static bool SearchFiles(CString mask, CAtlList<CString>& sl)
 		if (h != INVALID_HANDLE_VALUE) {
 			do {
 				if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+					if (CString(fd.cFileName).MakeUpper() == _T("VIDEO_TS")
+						|| CString(fd.cFileName).MakeUpper() == _T("BDMV")) {
+						SearchFiles(dir + fd.cFileName, sl);
+					}
 					continue;
 				}
 
@@ -306,14 +310,32 @@ void CPlayerPlaylistBar::ParsePlayList(CAtlList<CString>& fns, CAtlList<CString>
 
 	CAtlList<CString> sl;
 	if (SearchFiles(fns.GetHead(), sl)) {
-		if (sl.GetCount() > 1) {
-			subs = NULL;
+
+		bool bDVD_BD = false;
+		{
+			POSITION pos = sl.GetHeadPosition();
+			while (pos) {
+				CString fn = sl.GetNext(pos);
+				if (CString(fn).MakeUpper().Right(13) == _T("\\VIDEO_TS.IFO")
+					|| CString(fn).MakeUpper().Right(11) == _T("\\INDEX.BDMV")) {
+					fns.RemoveAll();
+					fns.AddHead(fn);
+					bDVD_BD = true;
+					break;
+				}
+			}
 		}
-		POSITION pos = sl.GetHeadPosition();
-		while (pos) {
-			ParsePlayList(sl.GetNext(pos), subs);
+
+		if (!bDVD_BD) {
+			if (sl.GetCount() > 1) {
+				subs = NULL;
+			}
+			POSITION pos = sl.GetHeadPosition();
+			while (pos) {
+				ParsePlayList(sl.GetNext(pos), subs);
+			}
+			return;
 		}
-		return;
 	}
 
 	CAtlList<CString> redir;
