@@ -1141,60 +1141,52 @@ void CPPageFormats::OnBnClickedNone()
 
 void CPPageFormats::OnBnClickedDefault()
 {
-	int i = m_list.GetSelectionMark();
-	if (i < 0) {
-		return;
-	}
-	i = (int)m_list.GetItemData(i);
-	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
+	int iItem = m_list.GetSelectionMark();
+	if (iItem >= 0) {
+		DWORD_PTR i = m_list.GetItemData(iItem);
+		CMediaFormats& mf = AfxGetAppSettings().m_Formats;
 
-	mf[i].RestoreDefaultExts();
-
-	if (i > 0) {
+		mf[i].RestoreDefaultExts();
 		GetUnRegisterExts(m_exts, mf[i].GetExtsWithPeriod(), m_lUnRegisterExts);
+		m_exts = mf[i].GetExtsWithPeriod();
+
+		CString label;
+		label.Format(_T("%s (%s)"), mf[i].GetDescription(), mf[i].GetExts());
+		m_list.SetItemText(iItem, COL_CATEGORY, label);
+
+		//SetListItemState(m_list.GetSelectionMark());
+		UpdateData(FALSE);
+
+		m_bFileExtChanged = true;
+
+		SetModified();
 	}
-
-	m_exts = mf[i].GetExtsWithPeriod();
-
-	CString label;
-	label.Format(_T("%s (%s)"), mf[i].GetDescription(), mf[i].GetExts());
-	m_list.SetItemText(i, COL_CATEGORY, label);
-
-	//SetListItemState(m_list.GetSelectionMark());
-	UpdateData(FALSE);
-
-	m_bFileExtChanged = true;
-
-	SetModified();
 }
 
 void CPPageFormats::OnBnClickedSet()
 {
 	UpdateData();
-	int i = m_list.GetSelectionMark();
-	if (i < 0) {
-		return;
-	}
-	i = (int)m_list.GetItemData(i);
-	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
 
-	if (i > 0) {
+	int iItem = m_list.GetSelectionMark();
+	if (iItem >= 0) {
+		DWORD_PTR i = m_list.GetItemData(iItem);
+		CMediaFormats& mf = AfxGetAppSettings().m_Formats;
+
 		GetUnRegisterExts(mf[i].GetExtsWithPeriod(), m_exts, m_lUnRegisterExts);
+		mf[i].SetExts(m_exts);
+		m_exts = mf[i].GetExtsWithPeriod();
+
+		CString label;
+		label.Format(_T("%s (%s)"), mf[i].GetDescription(), mf[i].GetExts());
+		m_list.SetItemText(iItem, COL_CATEGORY, label);
+
+		//SetListItemState(m_list.GetSelectionMark());
+		UpdateData(FALSE);
+
+		m_bFileExtChanged = true;
+
+		SetModified();
 	}
-
-	mf[i].SetExts(m_exts);
-	m_exts = mf[i].GetExtsWithPeriod();
-
-	CString label;
-	label.Format(_T("%s (%s)"), mf[i].GetDescription(), mf[i].GetExts());
-	m_list.SetItemText(i, COL_CATEGORY, label);
-
-	//SetListItemState(m_list.GetSelectionMark());
-	UpdateData(FALSE);
-
-	m_bFileExtChanged = true;
-
-	SetModified();
 }
 
 void CPPageFormats::OnFilesAssocModified()
