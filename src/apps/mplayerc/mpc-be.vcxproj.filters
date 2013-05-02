@@ -19,9 +19,6 @@
     <Filter Include="Resource Files\shaders">
       <UniqueIdentifier>{662236d7-ad89-4026-bb57-bb27667da2e6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\Flybar">
-      <UniqueIdentifier>{e16a5b23-6bf8-4bcd-b8ce-571b93bc2e39}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AppSettings.cpp">
@@ -796,16 +793,10 @@
     <None Include="res\mono.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\multi.ico">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="res\noaudio.bmp">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\onoff.bmp">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="res\single.ico">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\stereo.bmp">
@@ -946,81 +937,6 @@
     <None Include="res\web\vbs.gif">
       <Filter>Resource Files\web</Filter>
     </None>
-    <None Include="res\shaders\BT601BT709.psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="res\shaders\contour.psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="res\shaders\deinterlace (blend).psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="res\shaders\denoise.psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="res\shaders\EdgeSharpen.psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="res\shaders\emboss.psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="res\shaders\empty.psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="res\shaders\final.psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="res\shaders\grayscale.psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="res\shaders\invert.psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="res\shaders\letterbox.psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="res\shaders\levels.psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="res\shaders\levels2.psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="res\shaders\levels3.psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="res\shaders\nightvision.psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="res\shaders\procamp.psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="res\shaders\resizer.psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="res\shaders\sharpen.psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="res\shaders\SharpenComplex.psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="res\shaders\SharpenComplex2.psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="res\shaders\sphere.psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="res\shaders\spotlight.psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="res\shaders\wave.psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="res\shaders\YV12ChromaUpsampling.psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="res\shaders\LCDAngleCorrection.psh">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
     <None Include="res\toolbar.bmp">
       <Filter>Resource Files</Filter>
     </None>
@@ -1033,7 +949,24 @@
     <None Include="res\gpu.png">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\flybar.png" />
+    <None Include="res\empty.psh">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="res\final.psh">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="res\resizer.psh">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="res\flybar.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\ani_web.avi">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\audio.png">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="mplayerc.rc">
