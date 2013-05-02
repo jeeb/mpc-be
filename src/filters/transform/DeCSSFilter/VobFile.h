@@ -97,7 +97,7 @@ class CVobFile : public CDVDSession
 
 	CAtlMap<DWORD, CString> m_pStream_Lang;
 
-	int m_ChaptersCount;
+	UINT m_ChaptersCount;
 	CAtlMap<BYTE, LONGLONG> m_pChapters;
 
 	REFERENCE_TIME m_rtDuration;
@@ -120,7 +120,7 @@ public:
 
 	BSTR GetTrackName(UINT aTrackIdx);
 
-	int			GetChaptersCount() {return m_ChaptersCount;}
+	UINT		GetChaptersCount() {return m_ChaptersCount;}
 	LONGLONG	GetChapterOffset(UINT ChapterNumber);
 
 	REFERENCE_TIME	GetDuration() {return m_rtDuration;}

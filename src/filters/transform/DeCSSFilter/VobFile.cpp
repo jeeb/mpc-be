@@ -378,7 +378,7 @@ bool CLBAFile::Read(BYTE* buff)
 CVobFile::CVobFile()
 {
 	Close();
-	m_ChaptersCount = -1;
+	m_ChaptersCount = 0;
 	m_rtDuration	= 0;
 }
 

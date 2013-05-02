@@ -241,13 +241,13 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_FILE_OPENMEDIA, OnFileOpenMedia)
 	ON_UPDATE_COMMAND_UI(ID_FILE_OPENMEDIA, OnUpdateFileOpen)
 	ON_WM_COPYDATA()
-	ON_COMMAND(ID_FILE_OPENDVD, OnFileOpendvd)
+	ON_COMMAND(ID_FILE_OPENDVD, OnFileOpenDVD)
 	ON_UPDATE_COMMAND_UI(ID_FILE_OPENDVD, OnUpdateFileOpen)
-	ON_COMMAND(ID_FILE_OPENDEVICE, OnFileOpendevice)
+	ON_COMMAND(ID_FILE_OPENDEVICE, OnFileOpenDevice)
 	ON_UPDATE_COMMAND_UI(ID_FILE_OPENDEVICE, OnUpdateFileOpen)
 	ON_COMMAND_RANGE(ID_FILE_OPEN_CD_START, ID_FILE_OPEN_CD_END, OnFileOpenCD)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_FILE_OPEN_CD_START, ID_FILE_OPEN_CD_END, OnUpdateFileOpen)
-	ON_COMMAND(ID_FILE_REOPEN, OnFileReopen)
+	ON_COMMAND(ID_FILE_REOPEN, OnFileReOpen)
 	ON_WM_DROPFILES()
 	ON_COMMAND(ID_FILE_SAVE_COPY, OnFileSaveAs)
 	ON_UPDATE_COMMAND_UI(ID_FILE_SAVE_COPY, OnUpdateFileSaveAs)
@@ -257,11 +257,11 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_FILE_SAVE_IMAGE_AUTO, OnUpdateFileSaveImage)
 	ON_COMMAND(ID_FILE_SAVE_THUMBNAILS, OnFileSaveThumbnails)
 	ON_UPDATE_COMMAND_UI(ID_FILE_SAVE_THUMBNAILS, OnUpdateFileSaveThumbnails)
-	ON_COMMAND(ID_FILE_LOAD_SUBTITLE, OnFileLoadsubtitle)
-	ON_UPDATE_COMMAND_UI(ID_FILE_LOAD_SUBTITLE, OnUpdateFileLoadsubtitle)
-	ON_COMMAND(ID_FILE_SAVE_SUBTITLE, OnFileSavesubtitle)
-	ON_UPDATE_COMMAND_UI(ID_FILE_SAVE_SUBTITLE, OnUpdateFileSavesubtitle)
-	ON_COMMAND(ID_FILE_LOAD_AUDIO, OnFileLoadaudio)
+	ON_COMMAND(ID_FILE_LOAD_SUBTITLE, OnFileLoadSubtitle)
+	ON_UPDATE_COMMAND_UI(ID_FILE_LOAD_SUBTITLE, OnUpdateFileLoadSubtitle)
+	ON_COMMAND(ID_FILE_SAVE_SUBTITLE, OnFileSaveSubtitle)
+	ON_UPDATE_COMMAND_UI(ID_FILE_SAVE_SUBTITLE, OnUpdateFileSaveSubtitle)
+	ON_COMMAND(ID_FILE_LOAD_AUDIO, OnFileLoadAudio)
 	ON_COMMAND(ID_FILE_ISDB_SEARCH, OnFileISDBSearch)
 	ON_UPDATE_COMMAND_UI(ID_FILE_ISDB_SEARCH, OnUpdateFileISDBSearch)
 	ON_COMMAND(ID_FILE_ISDB_UPLOAD, OnFileISDBUpload)
@@ -307,7 +307,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_VIEW_FULLSCREEN, OnViewFullscreen)
 
 	ON_COMMAND(ID_WINDOW_TO_PRIMARYSCREEN, OnMoveWindowToPrimaryScreen)
-	
 
 	ON_UPDATE_COMMAND_UI(ID_VIEW_FULLSCREEN, OnUpdateViewFullscreen)
 	ON_COMMAND_RANGE(ID_VIEW_ZOOM_50, ID_VIEW_ZOOM_200, OnViewZoom)
@@ -5200,7 +5199,7 @@ int CALLBACK BrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lp, LPARAM pData)
 	return 0;
 }
 
-void CMainFrame::OnFileOpendvd()
+void CMainFrame::OnFileOpenDVD()
 {
 	if ((m_iMediaLoadState == MLS_LOADING) || m_pFullscreenWnd->IsWindow()) {
 		return;
@@ -5294,7 +5293,7 @@ void CMainFrame::OnFileOpendvd()
 	}
 }
 
-void CMainFrame::OnFileOpendevice()
+void CMainFrame::OnFileOpenDevice()
 {
 	AppSettings& s = AfxGetAppSettings();
 
@@ -5353,7 +5352,7 @@ void CMainFrame::OnFileOpenCD(UINT nID)
 	}
 }
 
-void CMainFrame::OnFileReopen()
+void CMainFrame::OnFileReOpen()
 {
 	if (m_iMediaLoadState == MLS_LOADING) {
 		return;
@@ -5445,6 +5444,11 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 	}
 
 	m_wndPlaylistBar.Open(sl, true);
+
+	if (OpenBD(sl.GetHead())) {
+		return;
+	}
+
 	OpenCurPlaylistItem();
 }
 
@@ -6293,7 +6297,7 @@ void CMainFrame::OnUpdateFileSaveThumbnails(CCmdUI* pCmdUI)
 	}
 }
 
-void CMainFrame::OnFileLoadsubtitle()
+void CMainFrame::OnFileLoadSubtitle()
 {
 	if (!m_pCAP && !b_UseVSFilter) {
 		AfxMessageBox(ResStr(IDS_MAINFRM_60)+
@@ -6336,12 +6340,12 @@ void CMainFrame::OnFileLoadsubtitle()
 	}
 }
 
-void CMainFrame::OnUpdateFileLoadsubtitle(CCmdUI *pCmdUI)
+void CMainFrame::OnUpdateFileLoadSubtitle(CCmdUI *pCmdUI)
 {
 	pCmdUI->Enable(m_iMediaLoadState == MLS_LOADED && /*m_pCAP &&*/ !m_fAudioOnly);
 }
 
-void CMainFrame::OnFileLoadaudio()
+void CMainFrame::OnFileLoadAudio()
 {
 	if (m_iMediaLoadState == MLS_LOADING || !IsWindow(m_wndPlaylistBar) || m_pFullscreenWnd->IsWindow()) {
 		return;
@@ -6381,7 +6385,7 @@ void CMainFrame::OnFileLoadaudio()
 	OpenCurPlaylistItem();
 }
 
-void CMainFrame::OnFileSavesubtitle()
+void CMainFrame::OnFileSaveSubtitle()
 {
 	int i = m_iSubtitleSel;
 
@@ -6447,7 +6451,7 @@ void CMainFrame::OnFileSavesubtitle()
 	}
 }
 
-void CMainFrame::OnUpdateFileSavesubtitle(CCmdUI* pCmdUI)
+void CMainFrame::OnUpdateFileSaveSubtitle(CCmdUI* pCmdUI)
 {
 	pCmdUI->Enable(m_iSubtitleSel >= 0);
 }
@@ -8997,7 +9001,7 @@ void CMainFrame::OnPlayAudioOption(UINT nID)
 	if (i == -1) {
  		ShowOptions(CPPageAudioSwitcher::IDD);
 	} else if (i == 0) {
-		OnFileLoadaudio();
+		OnFileLoadAudio();
  	}
 }
 
@@ -9050,7 +9054,7 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 		// options
 		ShowOptions(CPPageSubtitles::IDD);
 	} else if (i == -6) {
-		OnFileLoadsubtitle();
+		OnFileLoadSubtitle();
 	} else if (i == -5) {
 		// styles
 		int i = m_iSubtitleSel;
@@ -12760,13 +12764,16 @@ void CMainFrame::SetupChapters()
  		WCHAR buff[_MAX_PATH];
  		ULONG len = 0;
  		DVD_PLAYBACK_LOCATION2 loc;
- 		if (SUCCEEDED(pDVDI->GetDVDDirectory(buff, _countof(buff), &len)) && SUCCEEDED(pDVDI->GetCurrentLocation(&loc))) {
+		ULONG ulNumOfChapters = 0;
+ 		if (SUCCEEDED(pDVDI->GetDVDDirectory(buff, _countof(buff), &len))
+			&& SUCCEEDED(pDVDI->GetCurrentLocation(&loc))
+			&& SUCCEEDED(pDVDI->GetNumberOfChapters(loc.TitleNum, &ulNumOfChapters))) {
  			CStringW path;
  			path.Format(L"%s\\VTS_%02d_0.IFO", buff, loc.TitleNum);
  			CVobFile vob;
  			CAtlList<CString> files;
- 			if(vob.Open(path, files)) {
- 				for(int i = 0; i < vob.GetChaptersCount(); i++) {
+ 			if(vob.Open(path, files) && ulNumOfChapters == vob.GetChaptersCount()) {
+ 				for(size_t i = 0; i < vob.GetChaptersCount(); i++) {
  					REFERENCE_TIME rt = vob.GetChapterOffset(i);
 					CStringW str;
 					str.Format(IDS_AG_CHAPTER, i + 1);
@@ -13444,10 +13451,14 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 
 	if (!fn.IsEmpty()) {
 		if (GetPlaybackMode() == PM_FILE) {
-			fn.Replace('\\', '/');
-			CString fn2 = fn.Mid(fn.ReverseFind('/')+1);
-			if (!fn2.IsEmpty()) {
-				fn = fn2;
+			if (m_bIsBDPlay) {
+				fn = _T("BD");
+			} else {
+				fn.Replace('\\', '/');
+				CString fn2 = fn.Mid(fn.ReverseFind('/')+1);
+				if (!fn2.IsEmpty()) {
+					fn = fn2;
+				}
 			}
 		} else if (GetPlaybackMode() == PM_DVD) {
 			fn = _T("DVD");

@@ -58,7 +58,7 @@ public:
 	void Unlock();
 
 	BSTR			GetTrackName(UINT aTrackIdx);
-	int				GetChaptersCount();
+	UINT			GetChaptersCount();
 	REFERENCE_TIME	GetChapterOffset(UINT ChapterNumber);
 
 	REFERENCE_TIME	GetDuration();

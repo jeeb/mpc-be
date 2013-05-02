@@ -755,10 +755,10 @@ public:
 	afx_msg void OnFileOpenMedia();
 	afx_msg void OnUpdateFileOpen(CCmdUI* pCmdUI);
 	afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
-	afx_msg void OnFileOpendvd();
-	afx_msg void OnFileOpendevice();
+	afx_msg void OnFileOpenDVD();
+	afx_msg void OnFileOpenDevice();
 	afx_msg void OnFileOpenCD(UINT nID);
-	afx_msg void OnFileReopen();
+	afx_msg void OnFileReOpen();
 	afx_msg void OnDropFiles(HDROP hDropInfo); // no menu item
 	afx_msg void OnFileSaveAs();
 	afx_msg void OnUpdateFileSaveAs(CCmdUI* pCmdUI);
@@ -767,11 +767,11 @@ public:
 	afx_msg void OnUpdateFileSaveImage(CCmdUI* pCmdUI);
 	afx_msg void OnFileSaveThumbnails();
 	afx_msg void OnUpdateFileSaveThumbnails(CCmdUI* pCmdUI);
-	afx_msg void OnFileLoadsubtitle();
-	afx_msg void OnUpdateFileLoadsubtitle(CCmdUI* pCmdUI);
-	afx_msg void OnFileSavesubtitle();
-	afx_msg void OnUpdateFileSavesubtitle(CCmdUI* pCmdUI);
-	afx_msg void OnFileLoadaudio();
+	afx_msg void OnFileLoadSubtitle();
+	afx_msg void OnUpdateFileLoadSubtitle(CCmdUI* pCmdUI);
+	afx_msg void OnFileSaveSubtitle();
+	afx_msg void OnUpdateFileSaveSubtitle(CCmdUI* pCmdUI);
+	afx_msg void OnFileLoadAudio();
 	afx_msg void OnFileISDBSearch();
 	afx_msg void OnUpdateFileISDBSearch(CCmdUI* pCmdUI);
 	afx_msg void OnFileISDBUpload();
