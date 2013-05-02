@@ -271,9 +271,9 @@ Name: {group}\{cm:ProgramOnTheWeb,{#app_name}};  Filename: {#app_url}
 Filename: "{app}\{#mpcbe_exe}"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent unchecked; Description: "{cm:LaunchProgram,{#app_name}}"
 Filename: "{app}\Changelog.txt"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent unchecked shellexec; Description: "{cm:ViewChangelog}"; Check: IsInactiveLang('ru')
 Filename: "{app}\Changelog.Rus.txt"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent unchecked shellexec; Description: "{cm:ViewChangelog}"; Languages: ru
-Filename: "{app}\{#mpcbe_exe}"; Parameters: "/regvid"; WorkingDir: "{app}"; Flags: runasoriginaluser runhidden; Components: mpcberegvid
-Filename: "{app}\{#mpcbe_exe}"; Parameters: "/regaud"; WorkingDir: "{app}"; Flags: runasoriginaluser runhidden; Components: mpcberegaud
-Filename: "{app}\{#mpcbe_exe}"; Parameters: "/regpl"; WorkingDir: "{app}"; Flags: runasoriginaluser runhidden; Components: mpcberegpl
+;Filename: "{app}\{#mpcbe_exe}"; Parameters: "/regvid"; WorkingDir: "{app}"; Flags: runasoriginaluser runhidden; Components: mpcberegvid
+;Filename: "{app}\{#mpcbe_exe}"; Parameters: "/regaud"; WorkingDir: "{app}"; Flags: runasoriginaluser runhidden; Components: mpcberegaud
+;Filename: "{app}\{#mpcbe_exe}"; Parameters: "/regpl"; WorkingDir: "{app}"; Flags: runasoriginaluser runhidden; Components: mpcberegpl
 
 [InstallDelete]
 Type: files; Name: {userdesktop}\{#app_name}.lnk;   Check: not IsTaskSelected('desktopicon\user')   and IsUpgrade()
@@ -288,8 +288,8 @@ Type: files; Name: {app}\COPYING                    Check: IsUpgrade()
 Type: files; Name: {app}\mpcresources.*.dll
 #endif
 
-[UninstallRun]
-Filename: "{app}\{#mpcbe_exe}"; Parameters: "/unregall"; WorkingDir: "{app}"; Flags: runhidden
+;[UninstallRun]
+;Filename: "{app}\{#mpcbe_exe}"; Parameters: "/unregall"; WorkingDir: "{app}"; Flags: runhidden
 
 [Registry]
 Root: "HKCU"; Subkey: "Software\{#app_name}\ShellExt"; ValueType: string; ValueName: "MpcPath"; ValueData: "{app}\{#mpcbe_exe}"; Flags: uninsdeletekey; Components: mpcbeshellext
@@ -438,19 +438,25 @@ begin
 end;
 
 procedure CleanUpSettingsAndFiles();
+Var
+	resCode: integer;  
 begin
-  DeleteFile(ExpandConstant('{app}\{#mpcbe_ini}'));
-  DeleteFile(ExpandConstant('{app}\default.mpcpl'));
-  DeleteFile(ExpandConstant('{userappdata}\{#app_name}\default.mpcpl'));
-  RemoveDir(ExpandConstant('{userappdata}\{#app_name}'));
-  RegDeleteKeyIncludingSubkeys(HKCU, 'Software\{#app_name} Filters');
-  RegDeleteKeyIncludingSubkeys(HKCU, 'Software\{#app_name}');
-  RegDeleteKeyIncludingSubkeys(HKLM, 'SOFTWARE\{#app_name}');
+	// Unregister all extensions, include custom
+	Exec(ExpandConstant('{app}\{#mpcbe_exe}'), ' /unregall', ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, resCode);
+
+	DeleteFile(ExpandConstant('{app}\{#mpcbe_ini}'));
+	DeleteFile(ExpandConstant('{app}\default.mpcpl'));
+	DeleteFile(ExpandConstant('{userappdata}\{#app_name}\default.mpcpl'));
+	RemoveDir(ExpandConstant('{userappdata}\{#app_name}'));
+	RegDeleteKeyIncludingSubkeys(HKCU, 'Software\{#app_name} Filters');
+	RegDeleteKeyIncludingSubkeys(HKCU, 'Software\{#app_name}');
+	RegDeleteKeyIncludingSubkeys(HKLM, 'SOFTWARE\{#app_name}');
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
 var
   sLanguage: String;
+  resCode: integer;  
 begin
   if CurStep = ssPostInstall then begin
   
@@ -467,6 +473,15 @@ begin
       SetIniString('Settings', 'Language', sLanguage, ExpandConstant('{app}\{#mpcbe_ini}'))
     else
       RegWriteStringValue(HKCU, 'Software\{#app_name}\Settings', 'Language', sLanguage);
+      
+    if IsComponentSelected('mpcberegvid') then
+      Exec(ExpandConstant('{app}\{#mpcbe_exe}'), ' /regvid', ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, resCode);
+      
+    if IsComponentSelected('mpcberegaud') then
+      Exec(ExpandConstant('{app}\{#mpcbe_exe}'), ' /regaud', ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, resCode);
+
+    if IsComponentSelected('mpcberegpl') then
+      Exec(ExpandConstant('{app}\{#mpcbe_exe}'), ' /regpl', ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, resCode);
   end;
 
   if (CurStep = ssDone) and not WizardSilent() and not D3DX9DLLExists() then
