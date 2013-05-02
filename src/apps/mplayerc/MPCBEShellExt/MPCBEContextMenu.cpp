@@ -105,7 +105,7 @@ bool IsVistaOrAbove()
 
 	if (::GetVersionEx(&osver) && 
 		osver.dwPlatformId == VER_PLATFORM_WIN32_NT && 
-		(osver.dwMajorVersion >= 6 )) {
+		(osver.dwMajorVersion >= 6)) {
 		return TRUE;
 	}
 
@@ -175,27 +175,27 @@ int compare(const void* arg1, const void* arg2)
 
 STDMETHODIMP CMPCBEContextMenu::Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJECT lpdobj, HKEY hkeyProgID)
 {
-	HRESULT				hres = E_FAIL;
-	FORMATETC			fmte = { CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
-	STGMEDIUM			medium;
-	int					nFileCount = 0, i;
-	TCHAR				strFilePath[MAX_PATH];
+	HRESULT		hr		= E_FAIL;
+	FORMATETC	fmte	= { CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+	STGMEDIUM	medium;
+	UINT		nFileCount = 0;
+	TCHAR		strFilePath[MAX_PATH];
 
 	// No data object
 	if (lpdobj == NULL) {
-		return E_FAIL;
+		return hr;
 	}
 
 	// Use the given IDataObject to get a list of filenames (CF_HDROP).
-	hres = lpdobj->GetData(&fmte, &medium);
+	hr = lpdobj->GetData(&fmte, &medium);
 
-	if (FAILED(hres)) {
-		return E_FAIL;
+	if (FAILED(hr)) {
+		return hr;
 	}
 
 	// Make sure HDROP contains at least one file.
 	if ((nFileCount = DragQueryFile((HDROP)medium.hGlobal, (UINT)(-1), NULL, 0)) >= 1) {
-		for (i = 0; i < nFileCount; i++) {
+		for (UINT i = 0; i < nFileCount; i++) {
 			DragQueryFile((HDROP)medium.hGlobal, i, strFilePath, MAX_PATH);
 			if (::GetFileAttributes(strFilePath) & FILE_ATTRIBUTE_DIRECTORY) {
 				size_t nLen = _tcslen(strFilePath);
@@ -206,7 +206,7 @@ STDMETHODIMP CMPCBEContextMenu::Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJEC
 			// Add the file name to the list
 			m_listFileNames.AddTail(strFilePath);
 		}
-		hres = S_OK;
+		hr = S_OK;
 		
 		// sort list by path
 		pStrCmpLogicalW = NULL;
@@ -217,8 +217,9 @@ STDMETHODIMP CMPCBEContextMenu::Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJEC
 				CAtlArray<plsort_t> a;
 				a.SetCount(m_listFileNames.GetCount());
 				POSITION pos = m_listFileNames.GetHeadPosition();
-				for(int i = 0; pos; i++, m_listFileNames.GetNext(pos))
+				for(size_t i = 0; pos; i++, m_listFileNames.GetNext(pos)) {
 					a[i].str = m_listFileNames.GetAt(pos), a[i].pos = pos;
+				}
 				qsort(a.GetData(), a.GetCount(), sizeof(plsort_t), compare);
 				for(size_t i = 0; i < a.GetCount(); i++) {
 					m_listFileNames.AddTail(m_listFileNames.GetAt(a[i].pos));
@@ -228,13 +229,13 @@ STDMETHODIMP CMPCBEContextMenu::Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJEC
 			FreeLibrary(h);
 		}
 	} else {
-		hres = E_FAIL;
+		hr = E_FAIL;
 	}
 
 	// Release the data.
 	ReleaseStgMedium(&medium);
 
-	return hres;
+	return hr;
 }
 
 STDMETHODIMP CMPCBEContextMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
