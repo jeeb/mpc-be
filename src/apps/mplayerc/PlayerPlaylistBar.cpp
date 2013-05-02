@@ -215,7 +215,7 @@ static bool SearchFiles(CString mask, CAtlList<CString>& sl)
 
 	WIN32_FILE_ATTRIBUTE_DATA fad;
 	bool fFilterKnownExts = (GetFileAttributesEx(mask, GetFileExInfoStandard, &fad)
-							 && (fad.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY));
+							 && (fad.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
 	if (fFilterKnownExts) {
 		mask = CString(mask).TrimRight(_T("\\/")) + _T("\\*.*");
 	}
@@ -227,7 +227,7 @@ static bool SearchFiles(CString mask, CAtlList<CString>& sl)
 		HANDLE h = FindFirstFile(mask, &fd);
 		if (h != INVALID_HANDLE_VALUE) {
 			do {
-				if (fd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) {
+				if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 					continue;
 				}
 
@@ -599,8 +599,17 @@ void CPlayerPlaylistBar::Open(CAtlList<CString>& fns, bool fMulti, CAtlList<CStr
 
 void CPlayerPlaylistBar::Append(CAtlList<CString>& fns, bool fMulti, CAtlList<CString>* subs)
 {
+	INT_PTR idx = -1;
+
+	POSITION pos = m_pl.GetHeadPosition();
+	while (pos) {
+		idx++;
+		m_pl.GetNext(pos);
+	}
+
 	if (fMulti) {
 		ASSERT(subs == NULL || subs->GetCount() == 0);
+
 		POSITION pos = fns.GetHeadPosition();
 		while (pos) {
 			ParsePlayList(fns.GetNext(pos), NULL);
@@ -610,7 +619,7 @@ void CPlayerPlaylistBar::Append(CAtlList<CString>& fns, bool fMulti, CAtlList<CS
 	}
 
 	Refresh();
-	EnsureVisible(m_pl.GetTailPosition());
+	EnsureVisible(m_pl.FindIndex(idx + 1));
 	SavePlaylist();
 }
 
