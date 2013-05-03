@@ -988,6 +988,12 @@ BOOL CMPlayerCApp::InitInstance()
 
 			CPPageFormats::RegisterApp();
 
+			BOOL bIs64 = IsW64();
+			CPPageFormats::UnRegisterShellExt(GetModulePath(false) + _T("\\MPCBEShellExt.dll"));
+			if (bIs64) {
+				CPPageFormats::UnRegisterShellExt(GetModulePath(false) + _T("\\MPCBEShellExt64.dll"));
+			}
+
 			CMediaFormats& mf = m_s.m_Formats;
 			mf.UpdateData(false);
 
@@ -1013,6 +1019,11 @@ BOOL CMPlayerCApp::InitInstance()
 				}
 			}
 
+			CPPageFormats::RegisterShellExt(GetModulePath(false) + _T("\\MPCBEShellExt.dll"));
+			if (bIs64) {
+				CPPageFormats::RegisterShellExt(GetModulePath(false) + _T("\\MPCBEShellExt64.dll"));
+			}
+
 			if (IsWinEight()) {
 				HRESULT hr = CPPageFormats::RegisterUI();
 				UNREFERENCED_PARAMETER(hr);
@@ -1030,6 +1041,12 @@ BOOL CMPlayerCApp::InitInstance()
 
 			AfxGetMyApp()->RunAsAdministrator (strApp, m_lpCmdLine, false);
 		} else {
+			BOOL bIs64 = IsW64();
+			CPPageFormats::UnRegisterShellExt(GetModulePath(false) + _T("\\MPCBEShellExt.dll"));
+			if (bIs64) {
+				CPPageFormats::UnRegisterShellExt(GetModulePath(false) + _T("\\MPCBEShellExt64.dll"));
+			}
+
 			CMediaFormats& mf = m_s.m_Formats;
 			mf.UpdateData(false);
 
