@@ -104,6 +104,34 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 	return _AtlModule.DllGetClassObject(rclsid, riid, ppv);
 }
 
+CString GetFileOnly(LPCTSTR Path)
+{
+	// Strip off the path and return just the filename part
+	CString temp = (LPCTSTR) Path; // Force CString to make a copy
+	::PathStripPath(temp.GetBuffer(0));
+	temp.ReleaseBuffer(-1);
+	return temp;
+}
+
+CString GetKeyName()
+{
+	CString KeyName;
+	TCHAR path_buff[MAX_PATH];
+	memset(path_buff, 0, sizeof(path_buff));
+	ULONG len = sizeof(path_buff);
+
+	CRegKey key;
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
+		if (ERROR_SUCCESS == key.QueryStringValue(_T("MpcPath"), path_buff, &len) && ::PathFileExists(path_buff)) {
+			KeyName = GetFileOnly(path_buff);
+			KeyName.Truncate(KeyName.GetLength() - 4);
+		}
+		key.Close();
+	}
+
+	return KeyName;
+}
+
 // DllRegisterServer - Adds entries to the system registry
 #define	IS_KEY_LEN 256
 STDAPI DllRegisterServer(void)
@@ -113,6 +141,11 @@ STDAPI DllRegisterServer(void)
 
 	if (SUCCEEDED(hr)) {
 		//DllConfig(NULL);
+
+		CString KeyName = GetKeyName();
+		if (KeyName.IsEmpty()) {
+			return hr;
+		}
 
 		if (::StringFromGUID2(CLSID_MPCBEContextMenu, strWideCLSID, 50) > 0) {
 			CRegKey key;
@@ -128,8 +161,7 @@ STDAPI DllRegisterServer(void)
 				while ((lRet = reg.EnumKey(dwIndex, szSubKeyName, &cbName)) != ERROR_NO_MORE_ITEMS) {
 					if (lRet == ERROR_SUCCESS) {
 						CString key_name = szSubKeyName;
-						if(!key_name.Find(_T("mpc-be.")))
-						{
+						if (!key_name.Find(KeyName)) {
 							key_name.Append(_T("\\shellex\\ContextMenuHandlers\\MPCBEShellExt\\"));
 							key.SetValue(HKEY_CLASSES_ROOT, key_name, strWideCLSID);
 						}
@@ -157,6 +189,11 @@ STDAPI DllUnregisterServer(void)
 			key.DeleteSubKey(_T("MPCBEShellExt"));
 		}
 
+		CString KeyName = GetKeyName();
+		if (KeyName.IsEmpty()) {
+			return hr;
+		}
+
 		CRegKey reg;
 		if (reg.Open(HKEY_CLASSES_ROOT, NULL, KEY_READ) == ERROR_SUCCESS) {
 			DWORD dwIndex = 0;
@@ -167,13 +204,18 @@ STDAPI DllUnregisterServer(void)
 			while ((lRet = reg.EnumKey(dwIndex, szSubKeyName, &cbName)) != ERROR_NO_MORE_ITEMS) {
 				if (lRet == ERROR_SUCCESS) {
 					CString key_name = szSubKeyName;
-					if(!key_name.Find(_T("mpc-be."))) {
+					if (!key_name.Find(KeyName)) {
+						if (key.Open(HKEY_CLASSES_ROOT, key_name) == ERROR_SUCCESS) {
+							key.RecurseDeleteKey(_T("shellex"));
+						}
+						/*
 						key_name.Append(_T("\\shellex\\ContextMenuHandlers\\"));
 
 						if (key.Open(HKEY_CLASSES_ROOT, key_name) == ERROR_SUCCESS) {
 							key.DeleteValue(NULL);
 							key.DeleteSubKey(_T("MPCBEShellExt"));
 						}
+						*/
 					}
 				}
 				dwIndex++;

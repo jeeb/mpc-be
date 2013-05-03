@@ -23,7 +23,7 @@
 ; If you want to compile the 64-bit version define "x64build" (uncomment the define below or use build_2010.bat)
 #define localize
 #define sse_required
-;#define x64Build
+; #define x64Build
 
 ; Don't forget to update the DirectX SDK number in "include\Version.h" (not updated so often)
 
@@ -46,6 +46,9 @@
 #define app_version      str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_PATCH) + "." + str(MPC_VERSION_STATUS)
 #define app_version_out  str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_PATCH) + "." + str(MPC_VERSION_STATUS)+ "." + str(MPC_VERSION_REV)
 #define quick_launch     "{userappdata}\Microsoft\Internet Explorer\Quick Launch"
+
+#define bindir_x64 = "..\bin\mpc-be_x64"
+#define bindir_x86 = "..\bin\mpc-be_x86"
 
 #ifdef x64Build
   #define bindir       = "..\bin\mpc-be_x64"
@@ -170,11 +173,11 @@ Name: "mpciconlib"; Description: "{cm:comp_mpciconlib}";       Types: default cu
 Name: "mpcresources"; Description: "{cm:comp_mpcresources}"; Types: default custom; Flags: disablenouninstallwarning
 #endif
 
-Name: "mpcberegvid"; Description: "{cm:AssociationVideo}"; Types: custom; Flags: disablenouninstallwarning;
-Name: "mpcberegaud"; Description: "{cm:AssociationAudio}"; Types: custom; Flags: disablenouninstallwarning;
-Name: "mpcberegpl"; Description: "{cm:AssociationPlaylist}"; Types: custom; Flags: disablenouninstallwarning;
+Name: "mpcberegvid";    Description: "{cm:AssociationVideo}";     Types: custom; Flags: disablenouninstallwarning;
+Name: "mpcberegaud";    Description: "{cm:AssociationAudio}";     Types: custom; Flags: disablenouninstallwarning;
+Name: "mpcberegpl";     Description: "{cm:AssociationPlaylist}";  Types: custom; Flags: disablenouninstallwarning;
 
-Name: "mpcbeshellext"; Description: "{cm:comp_mpcbeshellext}"; Types: custom; Flags: disablenouninstallwarning
+Name: "mpcbeshellext";  Description: "{cm:comp_mpcbeshellext}";   Types: custom; Flags: disablenouninstallwarning
 
 [Tasks]
 Name: desktopicon;              Description: {cm:CreateDesktopIcon};     GroupDescription: {cm:AdditionalIcons}
@@ -189,21 +192,23 @@ Name: reset_settings;           Description: {cm:tsk_ResetSettings};     GroupDe
 [Files]
 Source: "{#bindir}\{#mpcbe_exe}";		DestDir: "{app}"; Flags: ignoreversion; Components: main
 Source: "{#bindir}\mpciconlib.dll"; 	DestDir: "{app}"; Flags: ignoreversion; Components: mpciconlib
-#ifdef x64Build
-Source: "{#bindir}\MPCBEShellExt64.dll"; DestDir: "{app}"; Flags: ignoreversion noregerror regserver restartreplace uninsrestartdelete; Components: mpcbeshellext
-#else
-Source: "{#bindir}\MPCBEShellExt.dll"; DestDir: "{app}"; Flags: ignoreversion noregerror regserver restartreplace uninsrestartdelete; Components: mpcbeshellext
-#endif
+;#ifdef x64Build
+;Source: "{#bindir}\MPCBEShellExt64.dll"; DestDir: "{app}"; Flags: ignoreversion noregerror regserver restartreplace uninsrestartdelete; Components: mpcbeshellext
+;#else
+;Source: "{#bindir}\MPCBEShellExt.dll"; DestDir: "{app}"; Flags: ignoreversion noregerror regserver restartreplace uninsrestartdelete; Components: mpcbeshellext
+;#endif
+Source: "{#bindir_x64}\MPCBEShellExt64.dll"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Components: mpcbeshellext; Check : IsWin64
+Source: "{#bindir_x86}\MPCBEShellExt.dll";   DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Components: mpcbeshellext;
 
 #ifdef localize
 Source: "{#bindir}\Lang\mpcresources.??.dll"; DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
 #endif
-Source: "..\docs\COPYING.txt";							DestDir: "{app}"; Flags: ignoreversion; Components: main
-Source: "..\docs\Authors.txt";							DestDir: "{app}"; Flags: ignoreversion; Components: main
-Source: "..\docs\Authors mpc-hc team.txt";				DestDir: "{app}"; Flags: ignoreversion; Components: main
-Source: "..\docs\Changelog.txt";						DestDir: "{app}"; Flags: ignoreversion; Components: main
-Source: "..\docs\Changelog.Rus.txt";					DestDir: "{app}"; Flags: ignoreversion; Components: main
-Source: "..\docs\Readme.txt";							DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "..\docs\COPYING.txt";							    DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "..\docs\Authors.txt";							    DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "..\docs\Authors mpc-hc team.txt";			DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "..\docs\Changelog.txt";					      DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "..\docs\Changelog.Rus.txt";				    DestDir: "{app}"; Flags: ignoreversion; Components: main
+Source: "..\docs\Readme.txt";					          DestDir: "{app}"; Flags: ignoreversion; Components: main
 Source: "Shaders\0-255 to 16-235.psh";          DestDir: "{userappdata}\{#app_name}\Shaders"; Components: main; Flags: ignoreversion; Check: NOT IniUsed()
 Source: "Shaders\16-235 to 0-255 [SD].psh";     DestDir: "{userappdata}\{#app_name}\Shaders"; Components: main; Flags: ignoreversion; Check: NOT IniUsed()
 Source: "Shaders\16-235 to 0-255 [SD][HD].psh"; DestDir: "{userappdata}\{#app_name}\Shaders"; Components: main; Flags: ignoreversion; Check: NOT IniUsed()
@@ -255,7 +260,7 @@ Name: {group}\{#app_name} x64;                   			Filename: {app}\{#mpcbe_exe}
 Name: {commondesktop}\{#app_name} x64;           			Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\common
 Name: {userdesktop}\{#app_name} x64;             			Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\user
 Name: {#quick_launch}\{#app_name} x64;           			Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version} x64; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: quicklaunchicon
-Name: {group}\{cm:UninstallProgram,{#app_name} x64};		Filename: {uninstallexe};     Comment: {cm:UninstallProgram,{#app_name} x64};  WorkingDir: {app}
+Name: {group}\{cm:UninstallProgram,{#app_name} x64};	Filename: {uninstallexe};     Comment: {cm:UninstallProgram,{#app_name} x64};  WorkingDir: {app}
 #else
 Name: {group}\{#app_name};                       Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version}; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0
 Name: {commondesktop}\{#app_name};               Filename: {app}\{#mpcbe_exe}; Comment: {#app_name} {#app_version}; WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\common
@@ -291,8 +296,8 @@ Type: files; Name: {app}\mpcresources.*.dll
 ;[UninstallRun]
 ;Filename: "{app}\{#mpcbe_exe}"; Parameters: "/unregall"; WorkingDir: "{app}"; Flags: runhidden
 
-[Registry]
-Root: "HKCU"; Subkey: "Software\{#app_name}\ShellExt"; ValueType: string; ValueName: "MpcPath"; ValueData: "{app}\{#mpcbe_exe}"; Flags: uninsdeletekey; Components: mpcbeshellext
+;[Registry]
+;Root: "HKCU"; Subkey: "Software\{#app_name}\ShellExt"; ValueType: string; ValueName: "MpcPath"; ValueData: "{app}\{#mpcbe_exe}"; Flags: uninsdeletekey; Components: mpcbeshellext
 
 [Code]
 #if defined(sse_required) || defined(sse2_required)
