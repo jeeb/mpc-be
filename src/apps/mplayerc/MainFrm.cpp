@@ -14138,7 +14138,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 	OpenFileData *pFileData = dynamic_cast<OpenFileData *>(pOMD.m_p);
 	OpenDVDData* pDVDData = dynamic_cast<OpenDVDData*>(pOMD.m_p);
 	OpenDeviceData* pDeviceData = dynamic_cast<OpenDeviceData*>(pOMD.m_p);
-	if (!pFileData && !pDVDData  && !pDeviceData) {
+	if (!pFileData && !pDVDData && !pDeviceData) {
 		ASSERT(0);
 		return false;
 	}
@@ -14928,7 +14928,7 @@ void CMainFrame::SetupFiltersSubMenu()
 		pSub->CreatePopupMenu();
 	} else while (pSub->RemoveMenu(0, MF_BYPOSITION)) {
 			;
-		}
+	}
 
 	m_filterpopups.RemoveAll();
 
@@ -14990,23 +14990,10 @@ void CMainFrame::SetupFiltersSubMenu()
 			int nPPages = 0;
 
 			CComQIPtr<ISpecifyPropertyPages> pSPP = pBF;
-
-			/*			if (pSPP)
-						{
-							CAUUID caGUID;
-							caGUID.pElems = NULL;
-							if (SUCCEEDED(pSPP->GetPages(&caGUID)) && caGUID.cElems > 0)
-							{
-			*/
 			m_pparray.Add(pBF);
 			pSubSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, ids, ResStr(IDS_MAINFRM_116));
-			/*
-								if (caGUID.pElems) CoTaskMemFree(caGUID.pElems);
-			*/
 			nPPages++;
-			/*				}
-						}
-			*/
+
 			BeginEnumPins(pBF, pEP, pPin) {
 				CString name = GetPinName(pPin);
 				name.Replace(_T("&"), _T("&&"));
@@ -15059,7 +15046,9 @@ void CMainFrame::SetupFiltersSubMenu()
 					prevgroup = group;
 
 					if (flags & AMSTREAMSELECTINFO_EXCLUSIVE) {
+						;
 					} else if (flags & AMSTREAMSELECTINFO_ENABLED) {
+						;
 					}
 
 					if (!wname) {
@@ -15077,7 +15066,7 @@ void CMainFrame::SetupFiltersSubMenu()
 					CoTaskMemFree(wname);
 				}
 
-				if (nStreams == 0) {
+				if (!nStreams) {
 					pSS.Release();
 				}
 			}

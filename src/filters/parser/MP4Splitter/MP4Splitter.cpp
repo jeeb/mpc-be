@@ -448,6 +448,20 @@ void SetTrackName(CString *TrackName, CString Suffix)
 	} \
 	SetTrackName(&TrackName, tname); \
 
+void SetAspect(VIDEOINFOHEADER2* vih2, CSize Aspect, LONG w, LONG h)
+{
+	if (!Aspect.cx || !Aspect.cy) {
+		Aspect.SetSize(w, h);
+		int lnko = LNKO(Aspect.cx, Aspect.cy);
+		if (lnko > 1) {
+			Aspect.cx /= lnko, Aspect.cy /= lnko;
+		}					
+	}
+
+	vih2->dwPictAspectRatioX = Aspect.cx;
+	vih2->dwPictAspectRatioY = Aspect.cy;
+}
+
 HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 {
 	CheckPointer(pAsyncReader, E_POINTER);
@@ -577,6 +591,19 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			}
 
+			CSize Aspect(0, 0);
+			if (AP4_TkhdAtom* tkhd = dynamic_cast<AP4_TkhdAtom*>(track->GetTrakAtom()->GetChild(AP4_ATOM_TYPE_TKHD))) {
+				AP4_UI32 w = tkhd->GetWidth()>>16;
+				AP4_UI32 h = tkhd->GetHeight()>>16;
+				if (w && h) {
+					Aspect.SetSize(w, h);
+					int lnko = LNKO(Aspect.cx, Aspect.cy);
+					if (lnko > 1) {
+						Aspect.cx /= lnko, Aspect.cy /= lnko;
+					}
+				}
+			}
+
 			CStringW TrackName = UTF8ToStringW(track->GetTrackName().c_str());
 			if (TrackName.IsEmpty()) {
 				TrackName = LocalToStringW(track->GetTrackName().c_str()); //Trying Local...
@@ -593,8 +620,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			CMediaType mt;
 			mt.SetSampleSize(1);
 
-			VIDEOINFOHEADER* vih = NULL;
-			WAVEFORMATEX* wfe = NULL;
+			VIDEOINFOHEADER2* vih2	= NULL;
+			WAVEFORMATEX* wfe		= NULL;
 
 			AP4_DataBuffer empty;
 
@@ -637,18 +664,22 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 
 					mt.majortype	= MEDIATYPE_Video;
-					mt.formattype	= FORMAT_VideoInfo;
+					mt.formattype	= FORMAT_VideoInfo2;
 
-					vih						= (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + di->GetDataSize());
-					memset(vih, 0, mt.FormatLength());
-					vih->dwBitRate			= video_desc->GetAvgBitrate()/8;
-					vih->bmiHeader.biSize	= sizeof(vih->bmiHeader);
-					vih->bmiHeader.biWidth	= biWidth;
-					vih->bmiHeader.biHeight	= biHeight;
+					vih2						= (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2) + di->GetDataSize());
+					memset(vih2, 0, mt.FormatLength());
+					vih2->dwBitRate				= video_desc->GetAvgBitrate()/8;
+					vih2->bmiHeader.biSize		= sizeof(vih2->bmiHeader);
+					vih2->bmiHeader.biWidth		= biWidth;
+					vih2->bmiHeader.biHeight	= biHeight;
+					vih2->rcSource				= vih2->rcTarget = CRect(0, 0, biWidth, biHeight);
 					if (item->GetData()->GetSampleCount()) {
-						vih->AvgTimePerFrame = item->GetData()->GetDurationMs()*10000 / (item->GetData()->GetSampleCount()); 
+						vih2->AvgTimePerFrame = item->GetData()->GetDurationMs()*10000 / (item->GetData()->GetSampleCount()); 
 					}
-					memcpy(vih + 1, di->GetData(), di->GetDataSize());
+
+					SetAspect(vih2, Aspect, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight); 
+
+					memcpy(vih2 + 1, di->GetData(), di->GetDataSize());
 
 					switch (video_desc->GetObjectTypeId()) {
 						case AP4_MPEG4_VISUAL_OTI:
@@ -1003,22 +1034,26 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 
 						mt.majortype	= MEDIATYPE_Video;
-						mt.formattype	= FORMAT_VideoInfo;
+						mt.formattype	= FORMAT_VideoInfo2;
 
-						vih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER)+db.GetDataSize());
-						memset(vih, 0, mt.FormatLength());
-						vih->bmiHeader.biSize			= sizeof(vih->bmiHeader);
-						vih->bmiHeader.biWidth			= (LONG)vse->GetWidth();
-						vih->bmiHeader.biHeight			= (LONG)vse->GetHeight();
-						vih->bmiHeader.biCompression	= fourcc;
-						vih->bmiHeader.biBitCount		= (LONG)vse->GetDepth();
+						vih2							= (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2)+db.GetDataSize());
+						memset(vih2, 0, mt.FormatLength());
+						vih2->bmiHeader.biSize			= sizeof(vih2->bmiHeader);
+						vih2->bmiHeader.biWidth			= (LONG)vse->GetWidth();
+						vih2->bmiHeader.biHeight		= (LONG)vse->GetHeight();
+						vih2->bmiHeader.biCompression	= fourcc;
+						vih2->bmiHeader.biBitCount		= (LONG)vse->GetDepth();
+						vih2->rcSource					= vih2->rcTarget = CRect(0, 0, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight);
 						if (item->GetData()->GetSampleCount()) {
-							vih->AvgTimePerFrame		= item->GetData()->GetDurationMs()*10000 / (item->GetData()->GetSampleCount());
+							vih2->AvgTimePerFrame		= item->GetData()->GetDurationMs()*10000 / (item->GetData()->GetSampleCount());
 						}
-						memcpy(vih+1, db.GetData(), db.GetDataSize());
+
+						SetAspect(vih2, Aspect, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight); 
+
+						memcpy(vih2 + 1, db.GetData(), db.GetDataSize());
 
 						if (fourcc == BI_RGB) {
-							WORD &bitcount = vih->bmiHeader.biBitCount;
+							WORD &bitcount = vih2->bmiHeader.biBitCount;
 							if (bitcount == 16) {
 								mt.subtype = MEDIASUBTYPE_RGB555;
 							} else if (bitcount == 24) {
@@ -1038,7 +1073,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						AP4_Atom::Type typelwr = *(AP4_Atom::Type*)buff;
 
 						if (typelwr != fourcc) {
-							mt.subtype = FOURCCMap(vih->bmiHeader.biCompression = typelwr);
+							mt.subtype = FOURCCMap(vih2->bmiHeader.biCompression = typelwr);
 							mts.Add(mt);
 							//b_HasVideo = true;
 						}
@@ -1047,7 +1082,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						AP4_Atom::Type typeupr = *(AP4_Atom::Type*)buff;
 
 						if (typeupr != fourcc) {
-							mt.subtype = FOURCCMap(vih->bmiHeader.biCompression = typeupr);
+							mt.subtype = FOURCCMap(vih2->bmiHeader.biCompression = typeupr);
 							mts.Add(mt);
 							//b_HasVideo = true;
 						}
