@@ -191,6 +191,21 @@ IF %ERRORLEVEL% NEQ 0 (
 ) ELSE (
   CALL :SubMsg "INFO" "mpc-be%SLN%.sln %BUILDCFG% %1 compiled successfully"
 )
+TITLE Compiling MPCBEShellExt - %BUILDCFG%...
+"%MSBUILD%" MPCBEShellExt%SLN%.sln %MSBUILD_SWITCHES%^
+ /target:%BUILDTYPE% /property:Configuration=%BUILDCFG%;Platform=Win32
+IF %ERRORLEVEL% NEQ 0 (
+  CALL :SubMsg "ERROR" "MPCBEShellExt%SLN%.sln %BUILDCFG% Win32 - Compilation failed!"
+) ELSE (
+  CALL :SubMsg "INFO" "MPCBEShellExt%SLN%.sln %BUILDCFG% Win32 compiled successfully"
+)
+"%MSBUILD%" MPCBEShellExt%SLN%.sln %MSBUILD_SWITCHES%^
+ /target:%BUILDTYPE% /property:Configuration=%BUILDCFG%;Platform=x64
+IF %ERRORLEVEL% NEQ 0 (
+  CALL :SubMsg "ERROR" "MPCBEShellExt%SLN%.sln %BUILDCFG% x64 - Compilation failed!"
+) ELSE (
+  CALL :SubMsg "INFO" "MPCBEShellExt%SLN%.sln %BUILDCFG% x64 compiled successfully"
+)
 EXIT /B
 
 :SubResources
