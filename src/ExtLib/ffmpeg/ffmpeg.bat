@@ -21,7 +21,93 @@ REM along with this program.  If not, see <http://www.gnu.org/licenses/>.
 SETLOCAL
 PUSHD %~dp0
 
-SET BIT=
-SET MINGW=%MINGW32%
+rem Check for the help switches
+IF /I "%~1"=="help"   GOTO SHOWHELP
+IF /I "%~1"=="/help"  GOTO SHOWHELP
+IF /I "%~1"=="-help"  GOTO SHOWHELP
+IF /I "%~1"=="--help" GOTO SHOWHELP
+IF /I "%~1"=="/?"     GOTO SHOWHELP
 
-ffmpeg_script.bat %*
+IF "%~1" == "32" (
+  SET BIT=
+  SET MINGW=%MINGW32%
+)
+IF "%~1" == "64" (
+  SET BIT=64BIT=yes
+  SET MINGW=%MINGW64%
+)
+
+IF DEFINED MINGW GOTO VarOk
+ECHO ERROR: Please define MINGW (and/or MSYS) environment variable(s)
+ENDLOCAL
+EXIT /B
+
+:VarOk
+SET PATH=%MSYS%\bin;%MINGW%\bin;%PATH%
+
+IF /I "%~3" == "Debug" SET "DEBUG=DEBUG=yes"
+
+IF "%~2" == "" (
+  SET "BUILDTYPE=build"
+  CALL :SubMake
+  EXIT /B
+) ELSE (
+  IF /I "%~2" == "Build" (
+    SET "BUILDTYPE=build"
+    CALL :SubMake
+    EXIT /B
+  )
+
+  IF /I "%~2" == "Clean" (
+    SET "BUILDTYPE=clean"
+    CALL :SubMake clean
+    EXIT /B
+  )
+
+  IF /I "%~2" == "Rebuild" (
+    SET "BUILDTYPE=clean"
+    CALL :SubMake clean
+    SET "BUILDTYPE=build"
+    CALL :SubMake
+    EXIT /B
+  )
+
+  ECHO.
+  ECHO Unsupported commandline switch!
+  ECHO Run "%~nx0 help" for details about the commandline switches.
+  ENDLOCAL
+  EXIT /B
+)
+
+:SubMake
+IF "%BUILDTYPE%" == "clean" (
+  SET JOBS=1
+) ELSE (
+  IF DEFINED NUMBER_OF_PROCESSORS (
+    SET JOBS=%NUMBER_OF_PROCESSORS%
+  ) ELSE (
+    REM Default number of jobs
+    SET JOBS=4
+  )
+)
+
+SET "JOBS=-j%JOBS%"
+
+TITLE "make %JOBS% %BIT% %DEBUG% %*"
+ECHO make %JOBS% %BIT% %DEBUG% %*
+make.exe %JOBS% %BIT% %DEBUG% %*
+
+ENDLOCAL
+EXIT /B
+
+:SHOWHELP
+TITLE "%~nx0 %1"
+ECHO. & ECHO.
+ECHO Usage:   %~nx0 [32^|64] [Clean^|Build^|Rebuild] [Debug]
+ECHO.
+ECHO Notes:   The arguments are not case sensitive.
+ECHO. & ECHO.
+ECHO Executing "%~nx0" will use the defaults: "%~nx0 32 build"
+ECHO.
+ENDLOCAL
+EXIT /B

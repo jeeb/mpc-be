@@ -13,7 +13,7 @@
     <YASM>
       <CommandLineTemplate>"$(SolutionDir)src\YASM.bat" -X vc -f $(Platform) [Debug] [Defines] [IncludePaths] -o "$(IntDir)%(Filename).obj" "%(FullPath)"</CommandLineTemplate>
       <Outputs>$(IntDir)%(Filename).obj</Outputs>
-      <ExecutionDescription>YASM: Assembling %(Filename)%(Extension)</ExecutionDescription>
+      <ExecutionDescription>%(Filename)%(Extension)</ExecutionDescription>
       <Debug>False</Debug>
     </YASM>
   </ItemDefinitionGroup>

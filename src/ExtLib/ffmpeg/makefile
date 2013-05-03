@@ -1,4 +1,4 @@
-CC = gcc.exe
+GCC = gcc.exe
 
 BIN_DIR  = ../../../bin
 ZLIB_DIR = ../zlib
@@ -472,11 +472,11 @@ OBJS = \
 
 # Commands
 $(OBJ_DIR)%.o: %.c
-	@echo CC $<
-	@$(FFMPEG_PREFIX)$(CC) -c $(CFLAGS) $(OPTFLAGS) -MMD -o $@ $<
+	@echo $<
+	@$(FFMPEG_PREFIX)$(GCC) -c $(CFLAGS) $(OPTFLAGS) -MMD -o $@ $<
 
 $(OBJ_DIR)%.o: %.asm
-	@echo YASM: Assembling $<
+	@echo $<
 	@yasm $(YASMFLAGS) -I$(<D)/ -o $@ $<
 
 $(TARGET_LIB): $(OBJS)
