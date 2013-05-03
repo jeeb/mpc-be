@@ -25,10 +25,10 @@
 #include "MainFrm.h"
 #include "PlayerInfoBar.h"
 
-
 // CPlayerInfoBar
 
 IMPLEMENT_DYNAMIC(CPlayerInfoBar, CDialogBar)
+
 CPlayerInfoBar::CPlayerInfoBar(int nFirstColWidth) : m_nFirstColWidth(nFirstColWidth)
 {
 }

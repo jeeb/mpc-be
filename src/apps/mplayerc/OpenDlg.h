@@ -25,12 +25,11 @@
 
 #include <ResizableLib/ResizableDialog.h>
 
-
 // COpenDlg dialog
 
 class COpenDlg : public CResizableDialog
 {
-	//	DECLARE_DYNAMIC(COpenDlg)
+	//DECLARE_DYNAMIC(COpenDlg)
 
 public:
 	COpenDlg(CWnd* pParent = NULL);

@@ -26,7 +26,6 @@
 #include <atlcoll.h>
 #include "BaseGraph.h"
 
-
 class CMediaFormatCategory
 {
 protected:

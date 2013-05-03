@@ -25,10 +25,10 @@
 #include "PlayerNavigationBar.h"
 #include <afxwin.h>
 
-
 // CPlayerCaptureBar
 
-IMPLEMENT_DYNAMIC(CPlayerNavigationBar, baseCPlayerNavigationBar)
+IMPLEMENT_DYNAMIC(CPlayerNavigationBar, CPlayerBar)
+
 CPlayerNavigationBar::CPlayerNavigationBar()
 {
 }
@@ -39,7 +39,7 @@ CPlayerNavigationBar::~CPlayerNavigationBar()
 
 BOOL CPlayerNavigationBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 {
-	if (!baseCPlayerNavigationBar::Create(ResStr(IDS_NAVIGATION_BAR), pParentWnd, ID_VIEW_NAVIGATION, defDockBarID, _T("Navigation Bar"))) {
+	if (!CPlayerBar::Create(ResStr(IDS_NAVIGATION_BAR), pParentWnd, ID_VIEW_NAVIGATION, defDockBarID, _T("Navigation Bar"))) {
 		return FALSE;
 	}
 
@@ -69,7 +69,7 @@ BOOL CPlayerNavigationBar::PreTranslateMessage(MSG* pMsg)
 	return __super::PreTranslateMessage(pMsg);
 }
 
-BEGIN_MESSAGE_MAP(CPlayerNavigationBar, baseCPlayerNavigationBar)
+BEGIN_MESSAGE_MAP(CPlayerNavigationBar, CPlayerBar)
 	ON_WM_SIZE()
 	ON_WM_NCLBUTTONUP()
 END_MESSAGE_MAP()
@@ -106,7 +106,6 @@ void CPlayerNavigationBar::OnSize(UINT nType, int cx, int cy)
 		m_navdlg.m_ButtonScan.SetWindowPos(NULL, r.left + sizeComboAudio + sizeButtonInfo + 2 * separation, r.bottom +5, 0,0, SWP_NOSIZE | SWP_NOZORDER);
 		m_navdlg.m_ButtonFilterStations.SetWindowPos(NULL, r.left,r.bottom +30, totalsize, 20, SWP_NOZORDER);
 	}
-
 }
 
 void CPlayerNavigationBar::OnNcLButtonUp(UINT nHitTest, CPoint point)
@@ -117,7 +116,6 @@ void CPlayerNavigationBar::OnNcLButtonUp(UINT nHitTest, CPoint point)
 		AfxGetAppSettings().fHideNavigation = 1;
 	}
 }
-
 
 void CPlayerNavigationBar::ShowControls(CWnd* pMainfrm, bool bShow)
 {

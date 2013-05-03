@@ -23,8 +23,7 @@
 #pragma once
 
 #include "DVBChannel.h"
-#include "IGraphBuilder2.h"
-
+#include "BaseGraph.h"
 
 #pragma pack(1)
 typedef struct {
@@ -77,7 +76,7 @@ public :
 	HRESULT		ParseEIT(ULONG ulSID, PresentFollowing &NowNext);
 	HRESULT		ParsePMT(CDVBChannel& Channel);
 
-	static CString ConvertString (BYTE* pBuffer, int nLength);
+	static CString ConvertString(BYTE* pBuffer, int nLength);
 
 	CAtlMap<int,CDVBChannel>	Channels;
 
@@ -86,9 +85,7 @@ private :
 	CComQIPtr<IMpeg2Data>		m_pData;
 	MPEG2_FILTER				m_Filter;
 
-
 	DVB_STREAM_TYPE	ConvertToDVBType(PES_STREAM_TYPE nType);
 	HRESULT			ParseSIHeader(CGolombBuffer& gb, DVB_SI SIType, WORD& wSectionLength, WORD& wTSID);
 	HRESULT			SetTime(CGolombBuffer& gb, PresentFollowing &NowNext);
-
 };

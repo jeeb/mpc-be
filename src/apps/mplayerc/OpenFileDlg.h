@@ -25,7 +25,6 @@
 
 #include <afxwin.h>
 
-
 // COpenFileDlg
 
 class COpenFileDlg : public CFileDialog

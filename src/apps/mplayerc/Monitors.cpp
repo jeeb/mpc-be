@@ -25,7 +25,6 @@
 #include "stdafx.h"
 #include "Monitors.h"
 
-
 // CMonitors
 
 CMonitors::CMonitors()

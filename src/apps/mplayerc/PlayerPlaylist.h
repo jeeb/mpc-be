@@ -25,7 +25,6 @@
 
 #include <afxcoll.h>
 
-
 class CPlaylistItem
 {
 	static UINT m_globalid;

@@ -29,7 +29,6 @@
 #include "../../filters/muxer/MatroskaMuxer/MatroskaMuxer.h"
 #include "../../filters/muxer/DSMMuxer/DSMMuxer.h"
 
-
 static bool LoadMediaType(CStringW DisplayName, AM_MEDIA_TYPE** ppmt)
 {
 	bool fRet = false;
@@ -1698,7 +1697,7 @@ void CPlayerCaptureDialog::OnBnClickedVidAudPreview()
 
 void CPlayerCaptureDialog::OnBnClickedCheck7()
 {
-	//	UpdateMuxer();
+	//UpdateMuxer();
 }
 
 void CPlayerCaptureDialog::OnCbnSelchangeCombo14()

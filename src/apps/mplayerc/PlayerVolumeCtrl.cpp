@@ -25,10 +25,10 @@
 #include "MainFrm.h"
 #include "PlayerVolumeCtrl.h"
 
-
 // CVolumeCtrl
 
 IMPLEMENT_DYNAMIC(CVolumeCtrl, CSliderCtrl)
+
 CVolumeCtrl::CVolumeCtrl(bool fSelfDrawn) : m_fSelfDrawn(fSelfDrawn)
 {
 }

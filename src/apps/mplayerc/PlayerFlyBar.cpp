@@ -401,5 +401,5 @@ void CFlyBar::DrawWnd()
 
 BOOL CFlyBar::OnEraseBkgnd(CDC* pDC)
 {
- return TRUE;
+	return TRUE;
 }

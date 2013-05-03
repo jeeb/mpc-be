@@ -32,6 +32,7 @@
 #include "OpenFileDlg.h"
 
 IMPLEMENT_DYNAMIC(CPlayerPlaylistBar, CPlayerBar)
+
 CPlayerPlaylistBar::CPlayerPlaylistBar()
 	: m_list(0)
 	, m_nTimeColWidth(0)

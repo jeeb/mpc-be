@@ -26,7 +26,6 @@
 #include "OpenDirHelper.h"
 #include "../../DSUtil/WinAPIUtils.h"
 
-
 WNDPROC COpenDirHelper::CBProc;
 bool COpenDirHelper::m_incl_subdir;
 CString COpenDirHelper::strLastOpenDir;

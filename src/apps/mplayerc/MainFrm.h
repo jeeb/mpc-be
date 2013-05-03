@@ -46,8 +46,8 @@
 
 #include "../../DSUtil/DSMPropertyBag.h"
 #include "../../SubPic/ISubPic.h"
-#include "IGraphBuilder2.h"
 
+#include "BaseGraph.h"
 #include "RealMediaGraph.h"
 #ifndef _WIN64
 #include "QuicktimeGraph.h"
@@ -1024,10 +1024,13 @@ public:
 	// Main Window
 	CWnd*			m_pVideoWnd;
 	CWnd*			m_pOSDWnd;
-	CPlayerToolBar	m_wndToolBar;
-	CPlayerListCtrl	m_wndListCtrl;
+
+	CPlayerToolBar		m_wndToolBar;
+	CPlayerListCtrl		m_wndListCtrl;
 	CPlayerPlaylistBar	m_wndPlaylistBar;
-	CFlyBar			m_wndFlyBar;
+	CFlyBar				m_wndFlyBar;
+	CPreView			m_wndView2; // SmartSeek
+
 	bool			IsMadVRExclusiveMode;
 
 	void CreateFlyBar();
@@ -1037,8 +1040,6 @@ public:
 	void CreateOSDBar();
 	bool OSDBarSetPos();
 	void DestroyOSDBar();
-	// SmartSeek
-	CPreView		m_wndView2;
 
 	HRESULT PreviewWindowHide();
 	HRESULT PreviewWindowShow(REFERENCE_TIME rtCur2);

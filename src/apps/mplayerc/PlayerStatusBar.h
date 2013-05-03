@@ -26,7 +26,6 @@
 #include "PngImage.h"
 #include "StatusLabel.h"
 
-
 // CPlayerStatusBar
 
 class CPlayerStatusBar : public CDialogBar

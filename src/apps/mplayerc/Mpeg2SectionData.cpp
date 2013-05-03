@@ -26,7 +26,6 @@
 #include "../../DSUtil/GolombBuffer.h"
 #include "Mpeg2SectionData.h"
 
-
 #define BeginEnumDescriptors(gb, nType, nLength)								\
 	{																			\
 		BYTE	DescBuffer[256];												\
@@ -43,7 +42,6 @@
 
 #define EndEnumDescriptors	}}
 
-
 CMpeg2DataParser::CMpeg2DataParser(IBaseFilter* pFilter)
 {
 	m_pData = pFilter;
@@ -54,7 +52,7 @@ CMpeg2DataParser::CMpeg2DataParser(IBaseFilter* pFilter)
 	m_Filter.fSpecifySectionNumber	= TRUE;
 }
 
-CString CMpeg2DataParser::ConvertString (BYTE* pBuffer, int nLength)
+CString CMpeg2DataParser::ConvertString(BYTE* pBuffer, int nLength)
 {
 	static const UINT16 codepages[0x20] = {
 		28591,	// 00 - ISO 8859-1 Latin I

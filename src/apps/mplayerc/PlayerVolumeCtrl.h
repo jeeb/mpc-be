@@ -25,7 +25,6 @@
 
 #include "PngImage.h"
 
-
 // CVolumeCtrl
 
 class CVolumeCtrl : public CSliderCtrl

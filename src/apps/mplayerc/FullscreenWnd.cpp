@@ -25,10 +25,10 @@
 #include "MainFrm.h"
 #include "FullscreenWnd.h"
 
-
 // CFullscreenWnd
 
 IMPLEMENT_DYNAMIC(CFullscreenWnd, CWnd)
+
 CFullscreenWnd::CFullscreenWnd(CMainFrame* pMainFrame)
 {
 	m_pMainFrame		= pMainFrame;

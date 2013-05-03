@@ -5306,6 +5306,7 @@ void CMainFrame::OnFileOpenDevice()
 
 	ShowWindow(SW_SHOW);
 
+	ShowControlBar(&m_wndPlaylistBar, FALSE, TRUE);
 	m_wndPlaylistBar.Empty();
 
 	CAutoPtr<OpenDeviceData> p(DNew OpenDeviceData());
@@ -5344,7 +5345,9 @@ void CMainFrame::OnFileOpenCD(UINT nID)
 
 			ShowWindow(SW_SHOW);
 
+			ShowControlBar(&m_wndPlaylistBar, TRUE, TRUE);
 			m_wndPlaylistBar.Open(sl, true);
+
 			OpenCurPlaylistItem();
 
 			break;
@@ -7733,7 +7736,8 @@ void CMainFrame::OnUpdateViewDefaultVideoFrame(CCmdUI* pCmdUI)
 
 void CMainFrame::OnViewSwitchVideoFrame()
 {
-	int vs = AfxGetAppSettings().iDefaultVideoSize;
+	AppSettings& s = AfxGetAppSettings();
+	int vs = s.iDefaultVideoSize;
 	if (vs <= DVS_DOUBLE || vs == DVS_FROMOUTSIDE) {
 		vs = DVS_STRETCH;
 	} else if (vs == DVS_FROMINSIDE) {
@@ -7745,22 +7749,22 @@ void CMainFrame::OnViewSwitchVideoFrame()
 	}
 	switch (vs) { // TODO: Read messages from resource file
 		case DVS_STRETCH:
-			m_OSD.DisplayMessage (OSD_TOPLEFT, ResStr(IDS_STRETCH_TO_WINDOW));
+			m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_STRETCH_TO_WINDOW));
 			break;
 		case DVS_FROMINSIDE:
-			m_OSD.DisplayMessage (OSD_TOPLEFT, ResStr(IDS_TOUCH_WINDOW_FROM_INSIDE));
+			m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_TOUCH_WINDOW_FROM_INSIDE));
 			break;
 		case DVS_ZOOM1:
-			m_OSD.DisplayMessage (OSD_TOPLEFT, ResStr(IDS_ZOOM1));
+			m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_ZOOM1));
 			break;
 		case DVS_ZOOM2:
-			m_OSD.DisplayMessage (OSD_TOPLEFT, ResStr(IDS_ZOOM2));
+			m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_ZOOM2));
 			break;
 		case DVS_FROMOUTSIDE:
-			m_OSD.DisplayMessage (OSD_TOPLEFT, ResStr(IDS_TOUCH_WINDOW_FROM_OUTSIDE));
+			m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_TOUCH_WINDOW_FROM_OUTSIDE));
 			break;
 	}
-	AfxGetAppSettings().iDefaultVideoSize = vs;
+	s.iDefaultVideoSize = vs;
 	m_ZoomX = m_ZoomY = 1;
 	m_PosX = m_PosY = 0.5;
 	MoveVideoWindow();
@@ -7768,7 +7772,8 @@ void CMainFrame::OnViewSwitchVideoFrame()
 
 void CMainFrame::OnViewKeepaspectratio()
 {
-	AfxGetAppSettings().fKeepAspectRatio = !AfxGetAppSettings().fKeepAspectRatio;
+	AppSettings& s = AfxGetAppSettings();
+	s.fKeepAspectRatio = !s.fKeepAspectRatio;
 	MoveVideoWindow();
 }
 
@@ -7780,7 +7785,8 @@ void CMainFrame::OnUpdateViewKeepaspectratio(CCmdUI* pCmdUI)
 
 void CMainFrame::OnViewCompMonDeskARDiff()
 {
-	AfxGetAppSettings().fCompMonDeskARDiff = !AfxGetAppSettings().fCompMonDeskARDiff;
+	AppSettings& s = AfxGetAppSettings();
+	s.fCompMonDeskARDiff = !s.fCompMonDeskARDiff;
 	MoveVideoWindow();
 }
 
@@ -7957,8 +7963,7 @@ void CMainFrame::OnViewPanNScanPresets(UINT nID)
 void CMainFrame::OnUpdateViewPanNScanPresets(CCmdUI* pCmdUI)
 {
 	int nID = pCmdUI->m_nID - ID_PANNSCAN_PRESETS_START;
-	AppSettings& s = AfxGetAppSettings();
-	pCmdUI->Enable(m_iMediaLoadState == MLS_LOADED && !m_fAudioOnly && nID >= 0 && nID <= s.m_pnspresets.GetCount());
+	pCmdUI->Enable(m_iMediaLoadState == MLS_LOADED && !m_fAudioOnly && nID >= 0 && nID <= AfxGetAppSettings().m_pnspresets.GetCount());
 }
 
 void CMainFrame::OnViewRotate(UINT nID)
@@ -9183,8 +9188,10 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 	UINT nID = pCmdUI->m_nID;
 	int i = (int)nID - (7 + ID_SUBTITLES_SUBITEM_START);
 
+	AppSettings& s = AfxGetAppSettings();
+
 	pCmdUI->Enable(m_pCAP && !m_fAudioOnly && GetPlaybackMode() != PM_DVD);
-	
+
 	if (i == -7) {
 		pCmdUI->Enable(GetPlaybackMode() == PM_NONE || (m_pCAP && !b_UseVSFilter && !m_fAudioOnly)) ;
 	} else if (i == -6) {
@@ -9232,7 +9239,7 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 			pCmdUI->SetCheck(!fHideSubtitles);
 			return;
 		}
-		pCmdUI->SetCheck(AfxGetAppSettings().fEnableSubtitles);
+		pCmdUI->SetCheck(s.fEnableSubtitles);
 	} else if (i == -2) {
 		// override
 		if (b_UseVSFilter) {
@@ -9242,8 +9249,8 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 		}
 
 		// TODO: foxX - default subtitles style toggle here; still wip
-		pCmdUI->SetCheck(AfxGetAppSettings().fUseDefaultSubtitlesStyle);
-		pCmdUI->Enable(AfxGetAppSettings().fEnableSubtitles && m_pCAP && !m_fAudioOnly && GetPlaybackMode() != PM_DVD);
+		pCmdUI->SetCheck(s.fUseDefaultSubtitlesStyle);
+		pCmdUI->Enable(s.fEnableSubtitles && m_pCAP && !m_fAudioOnly && GetPlaybackMode() != PM_DVD);
 	} else if (i == -1) {
 		if (b_UseVSFilter) {
 			CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
@@ -9258,8 +9265,8 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 			return;
 		}
 
-		pCmdUI->SetCheck(AfxGetAppSettings().fForcedSubtitles);
-		pCmdUI->Enable(AfxGetAppSettings().fEnableSubtitles && m_pCAP && !m_fAudioOnly && GetPlaybackMode() != PM_DVD);
+		pCmdUI->SetCheck(s.fForcedSubtitles);
+		pCmdUI->Enable(s.fEnableSubtitles && m_pCAP && !m_fAudioOnly && GetPlaybackMode() != PM_DVD);
 	}
 }
 

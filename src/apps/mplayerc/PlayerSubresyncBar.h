@@ -29,7 +29,6 @@
 #include "../../Subtitles/RTS.h"
 #include "../../Subtitles/VobSubFile.h"
 
-
 // CPlayerSubresyncBar
 
 class CPlayerSubresyncBar : public CPlayerBar
@@ -64,7 +63,7 @@ private:
 	} SubTime;
 	CAtlArray<SubTime> m_subtimes;
 
-	//	CRenderedTextSubtitle m_sts;
+	//CRenderedTextSubtitle m_sts;
 	CSimpleTextSubtitle m_sts;
 
 	int GetStartTime(int iItem), GetEndTime(int iItem);

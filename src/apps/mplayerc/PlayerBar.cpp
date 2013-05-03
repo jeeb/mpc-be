@@ -23,8 +23,8 @@
 #include "stdafx.h"
 #include "PlayerBar.h"
 
-
 IMPLEMENT_DYNAMIC(CPlayerBar, CSizingControlBarG)
+
 CPlayerBar::CPlayerBar(void)
 {
 }

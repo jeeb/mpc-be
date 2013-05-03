@@ -29,16 +29,15 @@
 #include "DVBChannel.h"
 #include <ResizableLib/ResizableDialog.h>
 
-
 #define MAX_CHANNELS_ALLOWED 200
 
 // CPlayerNavigationDialog dialog
 
-class CPlayerNavigationDialog : public CResizableDialog //CDialog
+class CPlayerNavigationDialog : public CResizableDialog
 {
 
 public:
-	CPlayerNavigationDialog();   // standard constructor
+	CPlayerNavigationDialog();
 	virtual ~CPlayerNavigationDialog();
 
 	BOOL Create(CWnd* pParent = NULL);
@@ -58,11 +57,11 @@ public:
 	CButton m_ButtonScan;
 	CButton m_ButtonFilterStations;
 	CWnd* m_pParent;
-	//	CMenu m_subtitles, m_audios;
+	//CMenu m_subtitles, m_audios;
 
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual BOOL OnInitDialog();
 

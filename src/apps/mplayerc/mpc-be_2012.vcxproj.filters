@@ -407,9 +407,6 @@
     <ClInclude Include="ComPropertySheet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ShockwaveFlash.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DeinterlacerFilter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -456,9 +453,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Ifo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IGraphBuilder2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ISDb.h">

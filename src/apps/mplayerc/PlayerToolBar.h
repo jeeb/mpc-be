@@ -26,7 +26,6 @@
 #include "PngImage.h"
 #include "PlayerVolumeCtrl.h"
 
-
 // CPlayerToolBar
 
 class CPlayerToolBar : public CToolBar

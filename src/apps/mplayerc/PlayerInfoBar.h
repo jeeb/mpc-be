@@ -26,7 +26,6 @@
 #include <atlcoll.h>
 #include "StatusLabel.h"
 
-
 // CPlayerInfoBar
 
 class CPlayerInfoBar : public CDialogBar

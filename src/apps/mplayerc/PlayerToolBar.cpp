@@ -26,12 +26,12 @@
 #include "PlayerToolBar.h"
 #include <IPinHook.h>
 
-
 // CPlayerToolBar
 
 typedef HRESULT (__stdcall * SetWindowThemeFunct)(HWND hwnd, LPCWSTR pszSubAppName, LPCWSTR pszSubIdList);
 
 IMPLEMENT_DYNAMIC(CPlayerToolBar, CToolBar)
+
 CPlayerToolBar::CPlayerToolBar()
 	: fDisableImgListRemap(false)
 	, m_pButtonsImages(NULL)

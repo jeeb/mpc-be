@@ -28,7 +28,6 @@
 #include "PlayerListCtrl.h"
 #include "PlayerPlaylist.h"
 
-
 class OpenMediaData;
 
 class CPlayerPlaylistBar : public CPlayerBar

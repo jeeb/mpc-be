@@ -27,10 +27,10 @@
 #include "OpenFileDlg.h"
 #include "PlayerYouTube.h"
 
-
 // COpenDlg dialog
 
 //IMPLEMENT_DYNAMIC(COpenDlg, CResizableDialog)
+
 COpenDlg::COpenDlg(CWnd* pParent /*=NULL*/)
 	: CResizableDialog(COpenDlg::IDD, pParent)
 	, m_path(_T(""))

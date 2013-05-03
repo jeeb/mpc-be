@@ -48,6 +48,7 @@ END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CInPlaceHotKey message handlers
+
 BOOL CInPlaceWinHotkey::PreTranslateMessage(MSG* pMsg)
 {
 	if (pMsg->message == WM_KEYDOWN) {

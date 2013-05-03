@@ -25,10 +25,10 @@
 #include "MainFrm.h"
 #include "PlayerSubresyncBar.h"
 
-
 // CPlayerSubresyncBar
 
 IMPLEMENT_DYNAMIC(CPlayerSubresyncBar, CPlayerBar)
+
 CPlayerSubresyncBar::CPlayerSubresyncBar()
 {
 	m_rt = 0;

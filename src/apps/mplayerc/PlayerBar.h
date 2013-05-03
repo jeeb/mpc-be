@@ -25,7 +25,6 @@
 
 #include <sizecbar/scbarg.h>
 
-
 class CPlayerBar : public CSizingControlBarG
 {
 	DECLARE_DYNAMIC(CPlayerBar)

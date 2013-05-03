@@ -29,7 +29,6 @@
 #include "FloatEdit.h"
 #include <ResizableLib/ResizableDialog.h>
 
-
 //
 
 template<class T>
@@ -348,7 +347,7 @@ typedef CAtlArray<Codec> CCodecArray;
 
 // CPlayerCaptureDialog dialog
 
-class CPlayerCaptureDialog : public CResizableDialog //CDialog
+class CPlayerCaptureDialog : public CResizableDialog
 {
 	//DECLARE_DYNAMIC(CPlayerCaptureDialog)
 

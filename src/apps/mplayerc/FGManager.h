@@ -24,10 +24,10 @@
 #pragma once
 
 #include "FGFilter.h"
-#include "IGraphBuilder2.h"
+#include "BaseGraph.h"
 
 #define LowMeritSuffix L" (low merit)"
-#define LowMerit(x)    (CStringW(x) + LowMeritSuffix)
+#define LowMerit(x) (CStringW(x) + LowMeritSuffix)
 
 class CFGManager
 	: public CUnknown

@@ -947,5 +947,5 @@ void CPlayerSeekBar::SetChapterBag(CComPtr<IDSMChapterBag>& pCB)
 	if (pCB) {
 		m_pChapterBag.Release();
 		pCB.CopyTo(&m_pChapterBag);
-    }
+	}
 }

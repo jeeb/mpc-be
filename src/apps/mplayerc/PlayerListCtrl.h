@@ -27,7 +27,6 @@
 
 #define LVN_DOLABELEDIT (LVN_FIRST+1)
 
-
 class CInPlaceWinHotkey : public CWinHotkeyCtrl
 {
 private:

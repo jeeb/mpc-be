@@ -25,10 +25,10 @@
 #include "PlayerNavigationDialog.h"
 #include <moreuuids.h>
 
-
 // CPlayerNavigationDialog dialog
 
-// IMPLEMENT_DYNAMIC(CPlayerNavigationDialog, CResizableDialog)
+//IMPLEMENT_DYNAMIC(CPlayerNavigationDialog, CResizableDialog)
+
 CPlayerNavigationDialog::CPlayerNavigationDialog()
 	: CResizableDialog(CPlayerNavigationDialog::IDD, NULL)
 {

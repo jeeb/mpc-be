@@ -26,7 +26,6 @@
 #include "SettingsDefines.h"
 #include <atlpath.h>
 
-
 //
 // CPlaylistItem
 //

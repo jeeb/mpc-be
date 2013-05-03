@@ -25,7 +25,6 @@
 
 #include "PPageBase.h"
 
-
 // CPPageYoutube dialog
 
 class CPPageYoutube : public CPPageBase

@@ -23,7 +23,6 @@
 #include "stdafx.h"
 #include "PlayerPreView.h"
 
-
 // CPrevView
 
 CPreView::CPreView() : tooltipstr(_T(""))

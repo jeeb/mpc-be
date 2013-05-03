@@ -25,7 +25,7 @@
 
 #include <afxwin.h>
 #include <atlcoll.h>
-#include "IGraphBuilder2.h"
+#include "BaseGraph.h"
 #include <ResizableLib/ResizableDialog.h>
 
 
