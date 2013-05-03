@@ -25,9 +25,21 @@
 #include "dllmain.h"
 #include "ConfigDlg.h"
 
-// config dialog
-STDAPI DllConfig(void)
+// config & dialog
+extern "C" __declspec(dllexport) HRESULT DllConfig(LPCTSTR lpszPath)
 {
+	if (wcslen(lpszPath)) {
+		if (::PathFileExists(lpszPath)) {
+			CRegKey key;
+			if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
+				key.SetStringValue(_T("MpcPath"), lpszPath);
+				key.Close();
+				return S_OK;
+			}
+		}
+		return E_FAIL;
+	}
+
 	// ѕровер€ем - надо ли показывать диалог выбора
 	CRegKey key;
 	TCHAR path_buff[MAX_PATH];
@@ -36,7 +48,7 @@ STDAPI DllConfig(void)
 	unsigned count = 0;
 
 	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\MPC-BE"))) {
-		if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && CPath(path_buff).FileExists()) {
+		if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && ::PathFileExists(path_buff)) {
 			count++;
 		}
 		key.Close();
@@ -46,38 +58,37 @@ STDAPI DllConfig(void)
 	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\Wow6432Node\\MPC-BE"))) {
 		len = sizeof(path_buff);
 		memset(path_buff, 0, sizeof(path_buff));
-		if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && CPath(path_buff).FileExists()) {
+		if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && ::PathFileExists(path_buff)) {
 			count++;
 		}
 		key.Close();
 	}
 #endif
-
 	//
 
 	if (count == 2) {
 		CConfigDlg dlg;
 		dlg.DoModal();
+		return S_OK;
 	} else {
-		CRegKey key;
-		TCHAR path_buff[MAX_PATH];
 		memset(path_buff, 0, sizeof(path_buff));
-		ULONG len = sizeof(path_buff);
+		len = sizeof(path_buff);
 
 		if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\MPC-BE"))) {
-			if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && CPath(path_buff).FileExists()) {
+			if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && ::PathFileExists(path_buff)) {
 				CString path(path_buff);
 				key.Close();
 
 				if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
 					key.SetStringValue(_T("MpcPath"), path);
 					key.Close();
+					return S_OK;
 				}
 			}
 		}
 	}
 
-	return S_OK;
+	return E_FAIL;
 }
 
 // Used to determine whether the DLL can be unloaded by OLE
@@ -101,7 +112,7 @@ STDAPI DllRegisterServer(void)
 	HRESULT hr = _AtlModule.DllRegisterServer();
 
 	if (SUCCEEDED(hr)) {
-		DllConfig();
+		//DllConfig(NULL);
 
 		if (::StringFromGUID2(CLSID_MPCBEContextMenu, strWideCLSID, 50) > 0) {
 			CRegKey key;

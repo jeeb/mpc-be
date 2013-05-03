@@ -108,28 +108,12 @@ void CPPageFormats::SetChecked(int iItem, int iChecked)
 
 CString CPPageFormats::GetEnqueueCommand()
 {
-	CString path;
-
-	TCHAR buff[_MAX_PATH];
-	if (::GetModuleFileName(AfxGetInstanceHandle(), buff, _MAX_PATH) == 0) {
-		return _T("");
-	}
-
-	path = buff;
-	return _T("\"") + path + _T("\" /add \"%1\"");
+	return _T("\"") + GetModulePath() + _T("\" /add \"%1\"");
 }
 
 CString CPPageFormats::GetOpenCommand()
 {
-	CString path;
-	TCHAR buff[_MAX_PATH];
-
-	if (::GetModuleFileName(AfxGetInstanceHandle(), buff, _MAX_PATH) == 0) {
-		return _T("");
-	}
-
-	path = buff;
-	return _T("\"") + path + _T("\" \"%1\"");
+	return _T("\"") + GetModulePath() + _T("\" \"%1\"");
 }
 
 bool CPPageFormats::IsRegistered(CString ext)
@@ -199,16 +183,6 @@ bool CPPageFormats::IsRegistered(CString ext)
 	return !!bIsDefault;
 }
 
-CString GetProgramDir()
-{
-	CString	RtnVal;
-	TCHAR	FileName[_MAX_PATH];
-	::GetModuleFileName(AfxGetInstanceHandle(), FileName, _MAX_PATH);
-	RtnVal = FileName;
-	RtnVal = RtnVal.Left(RtnVal.ReverseFind('\\'));
-	return RtnVal;
-}
-
 int FileExists(const TCHAR *fileName)
 {
 	if (0xFFFFFFFF == ::GetFileAttributes(fileName)) {
@@ -247,14 +221,11 @@ bool CPPageFormats::RegisterApp()
 	}
 
 	if (m_pAAR) {
-		CString AppIcon = _T("");
-		TCHAR buff[_MAX_PATH];
+		CString AppIcon;
 
-		if (::GetModuleFileName(AfxGetInstanceHandle(), buff, _MAX_PATH)) {
-			AppIcon = buff;
-			AppIcon = "\""+AppIcon+"\"";
-			AppIcon += _T(",0");
-		}
+		AppIcon = GetModulePath();
+		AppIcon = "\""+AppIcon+"\"";
+		AppIcon += _T(",0");
 
 		// Register MPC for the windows "Default application" manager
 		CRegKey key;
@@ -343,16 +314,15 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, bool fAudioOnly, 
 
 	if (setAssociatedWithIcon) {
 		CString AppIcon;
-		TCHAR buff[_MAX_PATH];
 
 		// first look for the icon
-		CString ext_icon = GetProgramDir();
+		CString ext_icon = GetModulePath(false);
 		ext_icon.AppendFormat(_T("\\icons\\%s.ico"), CString(ext).TrimLeft(_T(".")));
 		if (FileExists(ext_icon)) {
 			AppIcon.Format(_T("\"%s\",0"), ext_icon);
 		} else {
 			// then look for the iconlib
-			CString mpciconlib = GetProgramDir() + _T("\\mpciconlib.dll");
+			CString mpciconlib = GetModulePath(false) + _T("\\mpciconlib.dll");
 			if (FileExists(mpciconlib)) {
 				int icon_index = GetIconIndex(ext);
 				if (icon_index < 0) {
@@ -369,8 +339,8 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, bool fAudioOnly, 
 		}
 
 		/* no icon was found for the file extension, so use MPC's icon */
-		if ((AppIcon.IsEmpty()) && (::GetModuleFileName(AfxGetInstanceHandle(), buff, _MAX_PATH))) {
-			AppIcon = buff;
+		if ((AppIcon.IsEmpty())) {
+			AppIcon = GetModulePath();
 			AppIcon = "\""+AppIcon+"\"";
 			AppIcon += _T(",0");
 		}
@@ -425,6 +395,97 @@ HRESULT CPPageFormats::RegisterUI()
 	return hr;
 }
 
+void Execute(LPCTSTR lpszCommand, LPCTSTR lpszParameters)
+{
+	SHELLEXECUTEINFO ShExecInfo = {0};
+	ShExecInfo.cbSize		= sizeof(SHELLEXECUTEINFO);
+	ShExecInfo.fMask		= SEE_MASK_NOCLOSEPROCESS;
+	ShExecInfo.hwnd			= NULL;
+	ShExecInfo.lpVerb		= NULL;
+	ShExecInfo.lpFile		= lpszCommand;
+	ShExecInfo.lpParameters	= lpszParameters;
+	ShExecInfo.lpDirectory	= NULL;
+	ShExecInfo.nShow		= SWP_HIDEWINDOW;
+	ShExecInfo.hInstApp		= NULL;
+
+	ShellExecuteEx(&ShExecInfo);
+	WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
+}
+
+typedef HRESULT (*_DllConfigFunc)(LPCTSTR);
+typedef HRESULT (*_DllRegisterServer)(void);
+typedef HRESULT (*_DllUnRegisterServer)(void);
+bool CPPageFormats::RegisterShellExt(LPCTSTR lpszLibrary)
+{
+	HINSTANCE hDLL = LoadLibrary(lpszLibrary);
+	if (hDLL == NULL) {
+		if (::PathFileExists(lpszLibrary)) {
+			CRegKey key;
+			if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
+				key.SetStringValue(_T("MpcPath"), GetModulePath());
+				key.Close();
+			}
+
+			CString strParameters;
+			//strParameters.Format(_T(" \"%s\",DllRegisterServer"), lpszLibrary);
+			//Execute(_T("rundll32.exe"), strParameters);
+			strParameters.Format(_T(" /s \"%s\""), lpszLibrary);
+			Execute(_T("regsvr32.exe"), strParameters);
+
+			return true;
+		}
+		return false;
+	}
+
+	_DllConfigFunc _dllConfigFunc			= (_DllConfigFunc)GetProcAddress(hDLL, "DllConfig");
+	_DllRegisterServer _dllRegisterServer	= (_DllRegisterServer)GetProcAddress(hDLL, "DllRegisterServer");
+	if (_dllConfigFunc == NULL || _dllRegisterServer == NULL) {
+		FreeLibrary(hDLL);
+		return false;
+	}
+
+	HRESULT hr = _dllConfigFunc(GetModulePath());
+	if (FAILED(hr)) {
+		FreeLibrary(hDLL);
+		return false;
+	}
+
+	hr = _dllRegisterServer();
+
+	FreeLibrary(hDLL);
+
+	return SUCCEEDED(hr);
+}
+
+bool CPPageFormats::UnRegisterShellExt(LPCTSTR lpszLibrary)
+{
+	HINSTANCE hDLL = LoadLibrary(lpszLibrary);
+	if (hDLL == NULL) {
+		if (::PathFileExists(lpszLibrary)) {
+			CString strParameters;
+			//strParameters.Format(_T(" \"%s\",DllUnregisterServer"), lpszLibrary);
+			//Execute(_T("rundll32.exe"), strParameters);
+			strParameters.Format(_T(" /s /u \"%s\""), lpszLibrary);
+			Execute(_T("regsvr32.exe"), strParameters);
+
+			return true;
+		}
+		return false;
+	}
+
+	_DllUnRegisterServer _dllUnRegisterServer = (_DllRegisterServer)GetProcAddress(hDLL, "DllUnregisterServer");
+	if (_dllUnRegisterServer == NULL) {
+		FreeLibrary(hDLL);
+		return false;
+	}
+
+	HRESULT hr = _dllUnRegisterServer();
+
+	FreeLibrary(hDLL);
+
+	return SUCCEEDED(hr);
+}
+
 static struct {
 	LPCSTR verb, cmd;
 	UINT action;
@@ -437,11 +498,7 @@ static struct {
 
 void CPPageFormats::AddAutoPlayToRegistry(autoplay_t ap, bool fRegister)
 {
-	TCHAR buff[_MAX_PATH];
-	if (::GetModuleFileName(AfxGetInstanceHandle(), buff, _MAX_PATH) == 0) {
-		return;
-	}
-	CString exe = buff;
+	CString exe = GetModulePath();
 
 	int i = (int)ap;
 	if (i < 0 || i >= _countof(handlers)) {
@@ -492,12 +549,9 @@ void CPPageFormats::AddAutoPlayToRegistry(autoplay_t ap, bool fRegister)
 
 bool CPPageFormats::IsAutoPlayRegistered(autoplay_t ap)
 {
-	ULONG len;
-	TCHAR buff[_MAX_PATH];
-	if (::GetModuleFileName(AfxGetInstanceHandle(), buff, _MAX_PATH) == 0) {
-		return false;
-	}
-	CString exe = buff;
+    ULONG len;
+    TCHAR buff[_MAX_PATH];
+	CString exe = GetModulePath();
 
 	int i = (int)ap;
 	if (i < 0 || i >= _countof(handlers)) {
@@ -880,6 +934,13 @@ BOOL CPPageFormats::OnApply()
 	m_fsetAssociatedWithIcon	= !!m_fAssociatedWithIcons.GetCheck();
 
 	if (m_bFileExtChanged) {
+		BOOL bIs64 = IsW64();
+
+		UnRegisterShellExt(GetModulePath(false) + _T("\\MPCBEShellExt.dll"));
+		if (bIs64) {
+			UnRegisterShellExt(GetModulePath(false) + _T("\\MPCBEShellExt64.dll"));
+		}
+
 		for (int i = 0; i < m_list.GetItemCount(); i++) {
 			int iChecked = GetChecked(i);
 			if (iChecked == 2) {
@@ -897,6 +958,11 @@ BOOL CPPageFormats::OnApply()
 					UnRegisterExt(exts.GetNext(pos));
 				}
 			}
+		}
+
+		RegisterShellExt(GetModulePath(false) + _T("\\MPCBEShellExt.dll"));
+		if (bIs64) {
+			RegisterShellExt(GetModulePath(false) + _T("\\MPCBEShellExt64.dll"));
 		}
 	}
 	CRegKey key;

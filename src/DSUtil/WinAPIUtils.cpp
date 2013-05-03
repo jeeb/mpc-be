@@ -500,3 +500,39 @@ bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, 
 
 	return false;
 }
+
+CString GetModulePath(bool bInclModuleName)
+{
+	static CString path;
+	if (path.IsEmpty()) {
+		::GetModuleFileName(AfxGetInstanceHandle(), path.GetBuffer(_MAX_PATH), _MAX_PATH);
+		path.ReleaseBuffer(-1);
+	}
+
+	if (!bInclModuleName) {
+		return path.Left(path.ReverseFind('\\'));
+	}
+
+	return path;
+}
+
+BOOL IsWow64()
+{ 
+	typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL); 
+	LPFN_ISWOW64PROCESS fnIsWow64Process; 
+	BOOL bIsWow64 = FALSE; 
+	fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(GetModuleHandle(_T("kernel32")), "IsWow64Process"); 
+	if (NULL != fnIsWow64Process) {
+		fnIsWow64Process(GetCurrentProcess(), &bIsWow64); 
+	} 
+	return bIsWow64; 
+}
+
+BOOL IsW64()
+{
+#ifdef _WIN64
+	return TRUE;
+#endif
+
+	return IsWow64();
+}

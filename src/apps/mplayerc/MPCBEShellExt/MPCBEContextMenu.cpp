@@ -296,7 +296,7 @@ void CMPCBEContextMenu::SendData(bool add_pl)
 		CString mpc_path;
 		
 		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
-			if (ERROR_SUCCESS == key.QueryStringValue(_T("MpcPath"), path_buff, &len) && CPath(path_buff).FileExists()) {
+			if (ERROR_SUCCESS == key.QueryStringValue(_T("MpcPath"), path_buff, &len) && ::PathFileExists(path_buff)) {
 				mpc_path = path_buff;
 			}
 			key.Close();
@@ -306,7 +306,7 @@ void CMPCBEContextMenu::SendData(bool add_pl)
 			if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\MPC-BE"))) {
 				memset(path_buff, 0, sizeof(path_buff));
 				len = sizeof(path_buff);
-				if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && CPath(path_buff).FileExists()) {
+				if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && ::PathFileExists(path_buff)) {
 					mpc_path = path_buff;
 				}
 				key.Close();
@@ -318,7 +318,7 @@ void CMPCBEContextMenu::SendData(bool add_pl)
 			if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\Wow6432Node\\MPC-BE"))) {
 				memset(path_buff, 0, sizeof(path_buff));
 				len = sizeof(path_buff);
-				if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && CPath(path_buff).FileExists()) {
+				if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && ::PathFileExists(path_buff)) {
 					mpc_path = path_buff;
 				}
 				key.Close();

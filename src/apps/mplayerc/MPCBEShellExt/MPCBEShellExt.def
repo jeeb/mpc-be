@@ -4,4 +4,3 @@ EXPORTS
 	DllRegisterServer	PRIVATE
 	DllUnregisterServer	PRIVATE
 	DllInstall		PRIVATE
-	DllConfig		PRIVATE

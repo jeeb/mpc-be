@@ -63,6 +63,8 @@ public:
 	static bool		RegisterExt(CString ext, CString strLabel, bool fAudioOnly, bool setAssociatedWithIcon = true);
 	static bool		UnRegisterExt(CString ext);
 	static HRESULT	RegisterUI();
+	static bool		RegisterShellExt(LPCTSTR lpszLibrary);
+	static bool		UnRegisterShellExt(LPCTSTR lpszLibrary);
 
 	static LPCTSTR	GetRegisteredAppName()	{return _T("MPC-BE");}
 	static LPCTSTR	GetOldAssoc()			{return _T("PreviousRegistration");}

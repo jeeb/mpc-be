@@ -65,7 +65,7 @@ void CConfigDlg::OnBnClickedOk()
 	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
 		CString path;
 		m_MPCPath.GetLBText(m_MPCPath.GetCurSel(), path);
-		if (CPath(path).FileExists()) {
+		if (::PathFileExists(path)) {
 			key.SetStringValue(_T("MpcPath"), path);
 		}
 		key.Close();
@@ -98,7 +98,7 @@ BOOL CConfigDlg::OnInitDialog()
 	ULONG len = sizeof(path_buff);
 
 	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\MPC-BE"))) {
-		if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && CPath(path_buff).FileExists()) {
+		if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && ::PathFileExists(path_buff)) {
 			m_MPCPath.AddString(path_buff);
 		}
 		key.Close();
@@ -108,7 +108,7 @@ BOOL CConfigDlg::OnInitDialog()
 	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\Wow6432Node\\MPC-BE"))) {
 		len = sizeof(path_buff);
 		memset(path_buff, 0, sizeof(path_buff));
-		if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && CPath(path_buff).FileExists()) {
+		if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && ::PathFileExists(path_buff)) {
 			m_MPCPath.AddString(path_buff);
 		}
 		key.Close();
@@ -119,7 +119,7 @@ BOOL CConfigDlg::OnInitDialog()
 	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
 		len = sizeof(path_buff);
 		memset(path_buff, 0, sizeof(path_buff));
-		if (ERROR_SUCCESS == key.QueryStringValue(_T("MpcPath"), path_buff, &len) && CPath(path_buff).FileExists()) {
+		if (ERROR_SUCCESS == key.QueryStringValue(_T("MpcPath"), path_buff, &len) && ::PathFileExists(path_buff)) {
 			mpc_path = CString(path_buff).Trim();
 		}
 		key.Close();
