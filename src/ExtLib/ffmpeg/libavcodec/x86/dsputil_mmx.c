@@ -255,68 +255,6 @@ void ff_add_pixels_clamped_mmx(const int16_t *block, uint8_t *pixels,
     } while (--i);
 }
 
-static void put_pixels8_mmx(uint8_t *block, const uint8_t *pixels,
-                            ptrdiff_t line_size, int h)
-{
-    __asm__ volatile (
-        "lea   (%3, %3), %%"REG_a"      \n\t"
-        ".p2align     3                 \n\t"
-        "1:                             \n\t"
-        "movq  (%1    ), %%mm0          \n\t"
-        "movq  (%1, %3), %%mm1          \n\t"
-        "movq     %%mm0, (%2)           \n\t"
-        "movq     %%mm1, (%2, %3)       \n\t"
-        "add  %%"REG_a", %1             \n\t"
-        "add  %%"REG_a", %2             \n\t"
-        "movq  (%1    ), %%mm0          \n\t"
-        "movq  (%1, %3), %%mm1          \n\t"
-        "movq     %%mm0, (%2)           \n\t"
-        "movq     %%mm1, (%2, %3)       \n\t"
-        "add  %%"REG_a", %1             \n\t"
-        "add  %%"REG_a", %2             \n\t"
-        "subl        $4, %0             \n\t"
-        "jnz         1b                 \n\t"
-        : "+g"(h), "+r"(pixels),  "+r"(block)
-        : "r"((x86_reg)line_size)
-        : "%"REG_a, "memory"
-        );
-}
-
-static void put_pixels16_mmx(uint8_t *block, const uint8_t *pixels,
-                             ptrdiff_t line_size, int h)
-{
-    __asm__ volatile (
-        "lea   (%3, %3), %%"REG_a"      \n\t"
-        ".p2align     3                 \n\t"
-        "1:                             \n\t"
-        "movq  (%1    ), %%mm0          \n\t"
-        "movq 8(%1    ), %%mm4          \n\t"
-        "movq  (%1, %3), %%mm1          \n\t"
-        "movq 8(%1, %3), %%mm5          \n\t"
-        "movq     %%mm0,  (%2)          \n\t"
-        "movq     %%mm4, 8(%2)          \n\t"
-        "movq     %%mm1,  (%2, %3)      \n\t"
-        "movq     %%mm5, 8(%2, %3)      \n\t"
-        "add  %%"REG_a", %1             \n\t"
-        "add  %%"REG_a", %2             \n\t"
-        "movq  (%1    ), %%mm0          \n\t"
-        "movq 8(%1    ), %%mm4          \n\t"
-        "movq  (%1, %3), %%mm1          \n\t"
-        "movq 8(%1, %3), %%mm5          \n\t"
-        "movq     %%mm0,  (%2)          \n\t"
-        "movq     %%mm4, 8(%2)          \n\t"
-        "movq     %%mm1,  (%2, %3)      \n\t"
-        "movq     %%mm5, 8(%2, %3)      \n\t"
-        "add  %%"REG_a", %1             \n\t"
-        "add  %%"REG_a", %2             \n\t"
-        "subl        $4, %0             \n\t"
-        "jnz         1b                 \n\t"
-        : "+g"(h), "+r"(pixels),  "+r"(block)
-        : "r"((x86_reg)line_size)
-        : "%"REG_a, "memory"
-        );
-}
-
 #define CLEAR_BLOCKS(name, n)                           \
 static void name(int16_t *blocks)                       \
 {                                                       \
@@ -1107,7 +1045,6 @@ static av_always_inline void gmc(uint8_t *dst, uint8_t *src,
     }
 }
 
-
 #if CONFIG_VIDEODSP
 #if HAVE_YASM
 #if ARCH_X86_32
@@ -1140,34 +1077,6 @@ static void gmc_mmx(uint8_t *dst, uint8_t *src,
 #endif
 #endif
 
-/* CAVS-specific */
-void ff_put_cavs_qpel8_mc00_mmx(uint8_t *dst, uint8_t *src, ptrdiff_t stride)
-{
-    put_pixels8_mmx(dst, src, stride, 8);
-}
-
-void ff_avg_cavs_qpel8_mc00_mmx(uint8_t *dst, uint8_t *src, ptrdiff_t stride)
-{
-    avg_pixels8_mmx(dst, src, stride, 8);
-}
-
-void ff_put_cavs_qpel16_mc00_mmx(uint8_t *dst, uint8_t *src, ptrdiff_t stride)
-{
-    put_pixels16_mmx(dst, src, stride, 16);
-}
-
-void ff_avg_cavs_qpel16_mc00_mmx(uint8_t *dst, uint8_t *src, ptrdiff_t stride)
-{
-    avg_pixels16_mmx(dst, src, stride, 16);
-}
-
-/* VC-1-specific */
-void ff_put_vc1_mspel_mc00_mmx(uint8_t *dst, const uint8_t *src,
-                               ptrdiff_t stride, int rnd)
-{
-    put_pixels8_mmx(dst, src, stride, 8);
-}
-
 #if CONFIG_DIRAC_DECODER
 #define DIRAC_PIXOP(OPNAME2, OPNAME, EXT)\
 void ff_ ## OPNAME2 ## _dirac_pixels8_ ## EXT(uint8_t *dst, const uint8_t *src[5], int stride, int h)\
@@ -1195,8 +1104,8 @@ void ff_ ## OPNAME2 ## _dirac_pixels32_ ## EXT(uint8_t *dst, const uint8_t *src[
 }
 
 #if HAVE_MMX_INLINE
-DIRAC_PIXOP(put, put, mmx)
-DIRAC_PIXOP(avg, avg, mmx)
+DIRAC_PIXOP(put, ff_put, mmx)
+DIRAC_PIXOP(avg, ff_avg, mmx)
 #endif
 
 #if HAVE_YASM

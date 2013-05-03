@@ -2557,12 +2557,16 @@ typedef struct AVCodecContext {
      */
     int bits_per_raw_sample;
 
+#if FF_API_LOWRES
     /**
      * low resolution decoding, 1-> 1/2 size, 2->1/4 size
      * - encoding: unused
      * - decoding: Set by user.
+     * Code outside libavcodec should access this field using:
+     * av_codec_{get,set}_lowres(avctx)
      */
      int lowres;
+#endif
 
     /**
      * the picture in the bitstream
@@ -2812,6 +2816,17 @@ typedef struct AVCodecContext {
      */
     const AVCodecDescriptor *codec_descriptor;
 
+#if !FF_API_LOWRES
+    /**
+     * low resolution decoding, 1-> 1/2 size, 2->1/4 size
+     * - encoding: unused
+     * - decoding: Set by user.
+     * Code outside libavcodec should access this field using:
+     * av_codec_{get,set}_lowres(avctx)
+     */
+     int lowres;
+#endif
+
     /**
      * Current statistics for PTS correction.
      * - decoding: maintained and used by libavcodec, not intended to be used by user apps
@@ -2845,6 +2860,7 @@ typedef struct AVCodecContext {
 #define FF_SUB_CHARENC_MODE_DO_NOTHING  -1  ///< do nothing (demuxer outputs a stream supposed to be already in UTF-8, or the codec is bitmap for instance)
 #define FF_SUB_CHARENC_MODE_AUTOMATIC    0  ///< libavcodec will select the mode itself
 #define FF_SUB_CHARENC_MODE_PRE_DECODER  1  ///< the AVPacket data needs to be recoded to UTF-8 before being fed to the decoder, requires iconv
+
 } AVCodecContext;
 
 AVRational av_codec_get_pkt_timebase         (const AVCodecContext *avctx);
@@ -2852,6 +2868,9 @@ void       av_codec_set_pkt_timebase         (AVCodecContext *avctx, AVRational 
 
 const AVCodecDescriptor *av_codec_get_codec_descriptor(const AVCodecContext *avctx);
 void                     av_codec_set_codec_descriptor(AVCodecContext *avctx, const AVCodecDescriptor *desc);
+
+int  av_codec_get_lowres(const AVCodecContext *avctx);
+void av_codec_set_lowres(AVCodecContext *avctx, int val);
 
 /**
  * AVProfile.
@@ -3895,6 +3914,8 @@ typedef struct AVCodecParserContext {
      * For all other types, this is in units of AVCodecContext.time_base.
      */
     int duration;
+
+    enum AVFieldOrder field_order;
 } AVCodecParserContext;
 
 typedef struct AVCodecParser {

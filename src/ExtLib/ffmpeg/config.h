@@ -269,6 +269,7 @@
 #define HAVE_ATAN2F 1
 #define HAVE_CBRT 1
 #define HAVE_CBRTF 1
+#define HAVE_CL_CL_H 0
 #define HAVE_CLOCK_GETTIME 0
 #define HAVE_CLOSESOCKET 0
 #define HAVE_COSF 1

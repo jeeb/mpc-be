@@ -155,6 +155,15 @@ void ff_add_pixels_clamped_mmx(const int16_t *block, uint8_t *pixels, int line_s
 void ff_put_pixels_clamped_mmx(const int16_t *block, uint8_t *pixels, int line_size);
 void ff_put_signed_pixels_clamped_mmx(const int16_t *block, uint8_t *pixels, int line_size);
 
+
+void ff_avg_pixels8_mmx(uint8_t *block, const uint8_t *pixels,
+                        ptrdiff_t line_size, int h);
+void ff_avg_pixels16_mmx(uint8_t *block, const uint8_t *pixels,
+                         ptrdiff_t line_size, int h);
+void ff_put_pixels8_mmx(uint8_t *block, const uint8_t *pixels,
+                        ptrdiff_t line_size, int h);
+void ff_put_pixels16_mmx(uint8_t *block, const uint8_t *pixels,
+                         ptrdiff_t line_size, int h);
 void ff_avg_pixels8_mmxext(uint8_t *block, const uint8_t *pixels,
                            ptrdiff_t line_size, int h);
 void ff_put_pixels8_mmxext(uint8_t *block, const uint8_t *pixels,
@@ -163,13 +172,6 @@ void ff_avg_pixels16_sse2(uint8_t *block, const uint8_t *pixels,
                           ptrdiff_t line_size, int h);
 void ff_put_pixels16_sse2(uint8_t *block, const uint8_t *pixels,
                           ptrdiff_t line_size, int h);
-
-void ff_put_cavs_qpel8_mc00_mmx(uint8_t *dst, uint8_t *src, ptrdiff_t stride);
-void ff_avg_cavs_qpel8_mc00_mmx(uint8_t *dst, uint8_t *src, ptrdiff_t stride);
-void ff_put_cavs_qpel16_mc00_mmx(uint8_t *dst, uint8_t *src, ptrdiff_t stride);
-void ff_avg_cavs_qpel16_mc00_mmx(uint8_t *dst, uint8_t *src, ptrdiff_t stride);
-
-void ff_put_vc1_mspel_mc00_mmx(uint8_t *dst, const uint8_t *src, ptrdiff_t stride, int rnd);
 
 void ff_put_rv40_qpel8_mc33_mmx(uint8_t *block, uint8_t *pixels, ptrdiff_t stride);
 void ff_put_rv40_qpel16_mc33_mmx(uint8_t *block, uint8_t *pixels, ptrdiff_t stride);
