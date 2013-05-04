@@ -857,7 +857,7 @@ static int reget_buffer_internal(AVCodecContext *avctx, AVFrame *frame)
         return ret;
     }
 
-    av_image_copy(frame->data, frame->linesize, tmp.data, tmp.linesize,
+    av_image_copy(frame->data, frame->linesize, (const uint8_t**)tmp.data, tmp.linesize,
                   frame->format, frame->width, frame->height);
 
     av_frame_unref(&tmp);

@@ -252,7 +252,7 @@ int av_frame_ref(AVFrame *dst, AVFrame *src)
             av_samples_copy(dst->extended_data, src->extended_data, 0, 0,
                             dst->nb_samples, ch, dst->format);
         } else {
-            av_image_copy(dst->data, dst->linesize, src->data, src->linesize,
+            av_image_copy(dst->data, dst->linesize, (const uint8_t**)src->data, src->linesize,
                           dst->format, dst->width, dst->height);
         }
         return 0;
@@ -402,7 +402,7 @@ int av_frame_make_writable(AVFrame *frame)
         av_samples_copy(tmp.extended_data, frame->extended_data, 0, 0,
                         frame->nb_samples, ch, frame->format);
     } else {
-        av_image_copy(tmp.data, tmp.linesize, frame->data, frame->linesize,
+        av_image_copy(tmp.data, tmp.linesize, (const uint8_t**)frame->data, frame->linesize,
                       frame->format, frame->width, frame->height);
     }
 
