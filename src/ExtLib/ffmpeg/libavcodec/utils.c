@@ -856,8 +856,9 @@ static int reget_buffer_internal(AVCodecContext *avctx, AVFrame *frame)
         av_frame_unref(&tmp);
         return ret;
     }
-
+    // ==> Start patch MPC
     av_image_copy(frame->data, frame->linesize, (const uint8_t**)tmp.data, tmp.linesize,
+    // ==> End patch MPC
                   frame->format, frame->width, frame->height);
 
     av_frame_unref(&tmp);

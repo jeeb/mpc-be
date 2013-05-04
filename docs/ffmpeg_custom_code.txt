@@ -4,6 +4,8 @@
 * config.asm
 * makefile
 
+* libavcodec/aacps.c
+* libavcodec/aacsbr.c
 * libavcodec/allcodecs.c
 * libavcodec/avcodec.h
 * libavcodec/dv_tablegen.c
@@ -24,10 +26,12 @@
 
 * libavutil/attributes.h
 * libavutil/common.h
+* libavutil/frame.c
 * libavutil/frame.h
 * libavutil/eval.c
 * libavutil/internal.h
 * libavutil/mathematics.h
+* libavutil/utils.c
 
 ======
 The following files are available only in MPC-BE (compared with ffmpeg):
