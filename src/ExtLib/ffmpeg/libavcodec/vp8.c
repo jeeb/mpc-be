@@ -2103,7 +2103,9 @@ static unsigned apply_padding(unsigned size) { return size + (size & 1); }
 static int webp_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
                              AVPacket *avpkt)
 {
+    // ==> Start patch MPC
     uint8_t *buf = avpkt->data;
+    // ==> End patch MP
     int buf_size       = avpkt->size;
     AVPacket pkt       = *avpkt;
 
