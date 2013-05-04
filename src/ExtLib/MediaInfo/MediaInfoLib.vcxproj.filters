@@ -608,6 +608,9 @@
     <ClInclude Include="MediaInfo\Text\File_Ttml.h">
       <Filter>Header Files\Text</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Text\File_TimedText.h">
+      <Filter>Header Files\Text</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
@@ -1157,6 +1160,9 @@
       <Filter>Source Files\Text</Filter>
     </ClCompile>
     <ClCompile Include="MediaInfo\Text\File_Ttml.cpp">
+      <Filter>Source Files\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Text\File_TimedText.cpp">
       <Filter>Source Files\Text</Filter>
     </ClCompile>
   </ItemGroup>

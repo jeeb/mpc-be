@@ -1316,6 +1316,7 @@ void MediaInfo_Config_CodecID_Video_Matroska (InfoMap &Info)
     "V_REAL/RV40;RealVideo 4;;RealVideo 4.0 aka RealVideo 9;http://www.real.com\n"
     "V_THEORA;Theora;;;http://www.theora.org\n"
     "V_VP8;VP8;;;http://www.webmproject.org/\n"
+    "V_VP9;VP9;;;http://www.webmproject.org/\n"
     ));
     Info.Separator_Set(0, ZenLib::EOL);
 }
@@ -1382,6 +1383,9 @@ void MediaInfo_Config_CodecID_Video_Mpeg4 (InfoMap &Info)
     "DVVT;Digital Voodoo;;Digital Voodoo intermediate v210;http://www.digitalvoodoo.net/;;;\n"
     "encv;(Encrypted);;;http://www.apple.com/quicktime/download/standalone.html;;;\n"
     "gif ;M-GIF;;;;;;\n"
+    "Hap1;Hap;;Hap Video Codec;https://github.com/Vidvox/hap;;;\n"
+    "Hap5;Hap Alpha;;Hap Video Codec;https://github.com/Vidvox/hap;;;\n"
+    "HapY;Hap Q;;Hap Video Codec;https://github.com/Vidvox/hap;;;\n"
     "h261;H.261;;;http://www.apple.com/quicktime/download/standalone.html;;;\n"
     "h263;H.263;;;http://www.apple.com/quicktime/download/standalone.html;;;\n"
     "H263;H.263;;;http://www.apple.com/quicktime/download/standalone.html;;;\n"

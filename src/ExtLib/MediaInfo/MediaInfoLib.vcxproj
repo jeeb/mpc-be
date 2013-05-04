@@ -140,6 +140,7 @@
     <ClInclude Include="MediaInfo\Image\File_Psd.h" />
     <ClInclude Include="MediaInfo\Text\File_AribStdB24B37.h" />
     <ClInclude Include="MediaInfo\Text\File_SubRip.h" />
+    <ClInclude Include="MediaInfo\Text\File_TimedText.h" />
     <ClInclude Include="MediaInfo\Text\File_Ttml.h" />
     <ClInclude Include="MediaInfo\Video\File_Aic.h" />
     <ClInclude Include="MediaInfo\Video\File_ProRes.h" />
@@ -372,6 +373,7 @@
     </ClCompile>
     <ClCompile Include="MediaInfo\Text\File_AribStdB24B37.cpp" />
     <ClCompile Include="MediaInfo\Text\File_SubRip.cpp" />
+    <ClCompile Include="MediaInfo\Text\File_TimedText.cpp" />
     <ClCompile Include="MediaInfo\Text\File_Ttml.cpp" />
     <ClCompile Include="MediaInfo\TimeCode.cpp" />
     <ClCompile Include="MediaInfo\Multiple\File_Ancillary.cpp" />
