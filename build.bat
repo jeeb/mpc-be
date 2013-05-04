@@ -21,23 +21,6 @@ REM along with this program.  If not, see <http://www.gnu.org/licenses/>.
 SETLOCAL
 CD /D %~dp0
 
-IF "%BUILD%" == "VS2010" (
-  SET SLN=
-  SET VSCOMNTOOLS=%VS100COMNTOOLS%
-)
-IF "%BUILD%" == "VS2012" (
-  SET SLN=_2012
-  SET VSCOMNTOOLS=%VS110COMNTOOLS%
-)
-
-REM pre-build checks
-
-  IF DEFINED MINGW32 (SET MPCBE_MINGW32=%MINGW32%) ELSE (GOTO MissingVar)
-  IF DEFINED MINGW64 (SET MPCBE_MINGW64=%MINGW64%) ELSE (GOTO MissingVar)
-  IF DEFINED MSYS    (SET MPCBE_MSYS=%MSYS%)       ELSE (GOTO MissingVar)
-
-IF NOT DEFINED VSCOMNTOOLS GOTO MissingVar
-
 SET ARG=%*
 SET ARG=%ARG:/=%
 SET ARG=%ARG:-=%
@@ -78,7 +61,24 @@ FOR %%A IN (%ARG%) DO (
   IF /I "%%A" == "Packages"   SET "PACKAGES=True"     & SET /A ARGPA+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
   IF /I "%%A" == "Installer"  SET "INSTALLER=True"    & SET /A ARGIN+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
   IF /I "%%A" == "Zip"        SET "ZIP=True"          & SET /A ARGZI+=1 & SET /A ARGCL+=1 & SET /A ARGM+=1
+
+  IF "%%A" == "VS2010" (
+    SET SLN=
+    SET VSCOMNTOOLS=%VS100COMNTOOLS%
+  )
+  IF "%%A" == "VS2012" (
+    SET SLN=_2012
+    SET VSCOMNTOOLS=%VS110COMNTOOLS%
+  )
 )
+
+REM pre-build checks
+
+  IF DEFINED MINGW32 (SET MPCBE_MINGW32=%MINGW32%) ELSE (GOTO MissingVar)
+  IF DEFINED MINGW64 (SET MPCBE_MINGW64=%MINGW64%) ELSE (GOTO MissingVar)
+  IF DEFINED MSYS    (SET MPCBE_MSYS=%MSYS%)       ELSE (GOTO MissingVar)
+
+IF NOT DEFINED VSCOMNTOOLS GOTO MissingVar
 
 FOR %%X IN (%*) DO SET /A INPUT+=1
 SET /A VALID=%ARGB%+%ARGPL%+%ARGC%+%ARGBC%+%ARGPA%+%ARGIN%+%ARGZI%

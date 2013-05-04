@@ -18,6 +18,4 @@ REM
 REM You should have received a copy of the GNU General Public License
 REM along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SET BUILD=VS2012
-
-CALL ..\build.bat clean All
+CALL ..\build.bat clean All VS2012
