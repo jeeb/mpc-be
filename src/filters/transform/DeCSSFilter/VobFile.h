@@ -27,6 +27,8 @@
 #include <atlcoll.h>
 #include <winddk/ntddcdvd.h>
 
+#include "../../../DSUtil/DSUtil.h"
+
 class CDVDSession
 {
 protected:
@@ -100,7 +102,9 @@ class CVobFile : public CDVDSession
 	UINT m_ChaptersCount;
 	CAtlMap<BYTE, LONGLONG> m_pChapters;
 
-	REFERENCE_TIME m_rtDuration;
+	REFERENCE_TIME	m_rtDuration;
+	AV_Rational		m_Aspect;
+
 public:
 	CVobFile();
 	virtual ~CVobFile();
@@ -120,10 +124,12 @@ public:
 
 	BSTR GetTrackName(UINT aTrackIdx);
 
-	UINT		GetChaptersCount() {return m_ChaptersCount;}
-	LONGLONG	GetChapterOffset(UINT ChapterNumber);
+	UINT			GetChaptersCount() { return m_ChaptersCount; }
+	LONGLONG		GetChapterOffset(UINT ChapterNumber);
 
-	REFERENCE_TIME	GetDuration() {return m_rtDuration;}
+	REFERENCE_TIME	GetDuration() { return m_rtDuration; }
+
+	AV_Rational		GetAspect() { return m_Aspect; }
 
 private:
 	CFile		m_ifoFile;

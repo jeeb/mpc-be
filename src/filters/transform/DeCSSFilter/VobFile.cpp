@@ -29,9 +29,9 @@
 #include "udf.h"
 
 #include "../../../DSUtil/GolombBuffer.h"
-#include "../../../DSUtil/DSUtil.h"
 
 #define Audio_block_size 66
+#define Video_block_size 2
 #define Subtitle_block_size 194
 
 //
@@ -380,6 +380,8 @@ CVobFile::CVobFile()
 	Close();
 	m_ChaptersCount = 0;
 	m_rtDuration	= 0;
+
+	memset(&m_Aspect, 0, sizeof(m_Aspect));
 }
 
 CVobFile::~CVobFile()
@@ -457,6 +459,13 @@ static REFERENCE_TIME FormatTime(BYTE *bytes)
 	return REFERENCE_TIME(10000i64*(((hours*60 + minutes)*60 + seconds)*1000 + mmseconds));
 }
 
+static const AV_Rational IFO_Aspect[4] = {
+	{4,  3},
+	{0,  0},
+	{0,  0},
+	{16, 9}
+};
+
 bool CVobFile::Open(CString fn, CAtlList<CString>& vobs)
 {
 	if(!m_ifoFile.Open(fn, CFile::modeRead|CFile::typeBinary|CFile::shareDenyNone)) {
@@ -480,14 +489,25 @@ bool CVobFile::Open(CString fn, CAtlList<CString>& vobs)
 		}
 	} audio_streams[8];
 
-	m_ifoFile.Seek(0x202, CFile::begin);
 	BYTE buffer[Subtitle_block_size];
+
+	m_ifoFile.Seek(0x200, CFile::begin);
+	m_ifoFile.Read(buffer, Video_block_size);
+	CGolombBuffer gb_v(buffer, Video_block_size);
+	gb_v.BitRead(2);				// Coding mode
+	gb_v.BitRead(2);				// Standart
+	BYTE aspect = gb_v.BitRead(2);	// Aspect ratio
+	if (aspect >= 0 && aspect <= 3) {
+		m_Aspect = IFO_Aspect[aspect];
+	}
+
+	m_ifoFile.Seek(0x202, CFile::begin);
 	m_ifoFile.Read(buffer, Audio_block_size);
-	CGolombBuffer gb(buffer, Audio_block_size);
-	int stream_count = gb.ReadShort();
+	CGolombBuffer gb_a(buffer, Audio_block_size);
+	int stream_count = gb_a.ReadShort();
 	for (int i = 0; i< min(stream_count,8); i++) {
-		BYTE Coding_mode = (BYTE)gb.BitRead(3);
-		gb.BitRead(5);
+		BYTE Coding_mode = (BYTE)gb_a.BitRead(3);
+		gb_a.BitRead(5);
 		int ToAdd = 0;
 		switch(Coding_mode) {
 			case 0:
@@ -502,10 +522,10 @@ bool CVobFile::Open(CString fn, CAtlList<CString>& vobs)
 			default:
 				break;
 		}
-		gb.ReadByte();
+		gb_a.ReadByte();
 		char lang[2];
-		gb.ReadBuffer((BYTE *)lang, 2);
-		gb.ReadDword();
+		gb_a.ReadBuffer((BYTE *)lang, 2);
+		gb_a.ReadDword();
 		if(ToAdd) {
 			audio_streams[i].ToAdd	= ToAdd;
 			audio_streams[i].Lang	= ISO6391ToLanguage(lang);

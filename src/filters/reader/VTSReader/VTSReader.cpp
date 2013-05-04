@@ -204,6 +204,12 @@ STDMETHODIMP_(REFERENCE_TIME) CVTSReader::GetDuration()
 	return m_stream.GetDuration();
 }
 
+STDMETHODIMP_(AV_Rational) CVTSReader::GetAspect()
+{
+	return m_stream.GetAspect();
+}
+
+
 // CVTSStream
 
 CVTSStream::CVTSStream() : m_off(0)
@@ -305,4 +311,9 @@ REFERENCE_TIME CVTSStream::GetChapterOffset(UINT ChapterNumber)
 REFERENCE_TIME CVTSStream::GetDuration()
 {
 	return m_vob->GetDuration();
+}
+
+AV_Rational CVTSStream::GetAspect()
+{
+	return m_vob->GetAspect();
 }

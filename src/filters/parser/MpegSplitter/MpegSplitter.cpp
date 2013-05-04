@@ -855,14 +855,16 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		return hr;
 	}
 
-	REFERENCE_TIME rt_IfoDuration = 0;
+	REFERENCE_TIME	rt_IfoDuration	= 0;
+	AV_Rational		IfoASpect		= {0, 0};
 	if (m_pFile->m_type == mpeg_ps) {
 		if (m_pInput && m_pInput->IsConnected() && (GetCLSID(m_pInput->GetConnected()) == __uuidof(CVTSReader))) { // MPC VTS Reader
 			pTI = GetFilterFromPin(m_pInput->GetConnected());
 
 			if (CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected()) ) {
 				if (CComQIPtr<IVTSReader> VTSREader = pFilter) {
-					rt_IfoDuration = VTSREader->GetDuration();
+					rt_IfoDuration	= VTSREader->GetDuration();
+					IfoASpect		= VTSREader->GetAspect();
 				}
 			}
 		}
@@ -991,6 +993,14 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		while (pos) {
 			CMpegSplitterFile::stream& s = m_pFile->m_streams[i].GetNext(pos);
 			CAtlArray<CMediaType> mts;
+
+			// correct Aspect Ratio for DVD structure.
+			if (s.mt.subtype == MEDIASUBTYPE_MPEG2_VIDEO && IfoASpect.num && IfoASpect.den) {
+				VIDEOINFOHEADER2& vih2 = *(VIDEOINFOHEADER2*)s.mt.pbFormat;
+				vih2.dwPictAspectRatioX = IfoASpect.num;
+				vih2.dwPictAspectRatioY = IfoASpect.den;
+			}
+
 			mts.Add(s.mt);
 
 			// Get resolution for first video track
