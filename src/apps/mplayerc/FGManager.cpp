@@ -1744,6 +1744,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->m_chkbytes.AddTail(_T("0,8,fffffc00ffe00000,4156000055000000"));
 		pFGF->m_chkbytes.AddTail(_T("0,8,,4D504C5330323030"));	// MPLS0200
 		pFGF->m_chkbytes.AddTail(_T("0,8,,4D504C5330313030"));	// MPLS0100
+		pFGF->m_extensions.AddTail(_T(".mpg"));
 		pFGF->m_extensions.AddTail(_T(".ts"));
 		pFGF->m_extensions.AddTail(_T(".m2ts"));
 		pFGF->m_extensions.AddTail(_T(".tp"));
