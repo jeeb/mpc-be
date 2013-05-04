@@ -36,6 +36,7 @@ SET ARGPA=0
 SET ARGIN=0
 SET ARGZI=0
 SET INPUT=0
+SET ARGVS=0
 
 IF /I "%ARG%" == "?"          GOTO ShowHelp
 
@@ -61,15 +62,16 @@ FOR %%A IN (%ARG%) DO (
   IF /I "%%A" == "Packages"   SET "PACKAGES=True"     & SET /A ARGPA+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
   IF /I "%%A" == "Installer"  SET "INSTALLER=True"    & SET /A ARGIN+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
   IF /I "%%A" == "Zip"        SET "ZIP=True"          & SET /A ARGZI+=1 & SET /A ARGCL+=1 & SET /A ARGM+=1
-
-  IF "%%A" == "VS2010" (
+  IF /I "%%A" == "VS2010" (
     SET SLN=
-    SET VSCOMNTOOLS=%VS100COMNTOOLS%
-  )
-  IF "%%A" == "VS2012" (
+    SET BUILD=VS2010
+    SET "VSCOMNTOOLS=%VS100COMNTOOLS%"
+  ) & SET /A ARGVS+=1
+  IF /I "%%A" == "VS2012" (
     SET SLN=_2012
-    SET VSCOMNTOOLS=%VS110COMNTOOLS%
-  )
+    SET BUILD=VS2012
+    SET "VSCOMNTOOLS=%VS110COMNTOOLS%"
+  ) & SET /A ARGVS+=1
 )
 
 REM pre-build checks
@@ -81,7 +83,7 @@ REM pre-build checks
 IF NOT DEFINED VSCOMNTOOLS GOTO MissingVar
 
 FOR %%X IN (%*) DO SET /A INPUT+=1
-SET /A VALID=%ARGB%+%ARGPL%+%ARGC%+%ARGBC%+%ARGPA%+%ARGIN%+%ARGZI%
+SET /A VALID=%ARGB%+%ARGPL%+%ARGC%+%ARGBC%+%ARGPA%+%ARGIN%+%ARGZI%+%ARGVS%
 
 IF %VALID% NEQ %INPUT% GOTO UnsupportedSwitch
 
@@ -96,6 +98,7 @@ IF %ARGCL% GTR 1 (GOTO UnsupportedSwitch)
 IF %ARGD%  GTR 1 (GOTO UnsupportedSwitch)
 IF %ARGF%  GTR 1 (GOTO UnsupportedSwitch)
 IF %ARGM%  GTR 1 (GOTO UnsupportedSwitch)
+IF %ARGVS% GTR 1 (GOTO UnsupportedSwitch)
 
 IF /I "%PACKAGES%" == "True" SET "INSTALLER=True" & SET "ZIP=True"
 
@@ -387,7 +390,7 @@ EXIT /B
 TITLE %~nx0 Help
 ECHO.
 ECHO Usage:
-ECHO %~nx0 [Clean^|Build^|Rebuild] [x86^|x64^|Both] [Main^|Resources^|MPCBE^|Filters^|All] [Debug^|Release] [Packages^|Installer^|Zip]
+ECHO %~nx0 [Clean^|Build^|Rebuild] [x86^|x64^|Both] [Main^|Resources^|MPCBE^|Filters^|All] [Debug^|Release] [Packages^|Installer^|Zip] [VS2010^|VS2012]
 ECHO.
 ECHO Notes: You can also prefix the commands with "-", "--" or "/".
 ECHO        Debug only applies to mpc-be%SLN%.sln.
@@ -397,13 +400,13 @@ ECHO Executing %~nx0 without any arguments will use the default ones:
 ECHO "%~nx0 Build Both MPCBE Release"
 ECHO. & ECHO.
 ECHO Examples:
-ECHO %~nx0 x86 Resources -Builds the x86 resources
-ECHO %~nx0 Resources     -Builds both x86 and x64 resources
-ECHO %~nx0 x86           -Builds x86 Main exe and the x86 resources
-ECHO %~nx0 x86 Debug     -Builds x86 Main Debug exe and x86 resources
-ECHO %~nx0 x86 Filters   -Builds x86 Filters
-ECHO %~nx0 x86 All       -Builds x86 Main exe, x86 Filters and the x86 resources
-ECHO %~nx0 x86 Packages  -Builds x86 Main exe, x86 resources and creates the installer and the .7z package
+ECHO %~nx0 x86 Resources VS2010 -Builds the x86 resources
+ECHO %~nx0 Resources VS2010     -Builds both x86 and x64 resources
+ECHO %~nx0 x86 VS2010           -Builds x86 Main exe and the x86 resources
+ECHO %~nx0 x86 Debug VS2010     -Builds x86 Main Debug exe and x86 resources
+ECHO %~nx0 x86 Filters VS2010   -Builds x86 Filters
+ECHO %~nx0 x86 All VS2010       -Builds x86 Main exe, x86 Filters and the x86 resources
+ECHO %~nx0 x86 Packages VS2010  -Builds x86 Main exe, x86 resources and creates the installer and the .7z package
 ECHO.
 ENDLOCAL
 EXIT /B
