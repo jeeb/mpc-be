@@ -86,7 +86,7 @@ IF "%BUILDTYPE%" == "clean" (
   )
 )
 
-make.exe -j%JOBS% %BIT% %DEBUG% %*
+make.exe -f ffmpeg.make -j%JOBS% %BIT% %DEBUG% %*
 
 ENDLOCAL
 EXIT /B
