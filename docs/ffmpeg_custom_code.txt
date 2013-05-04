@@ -2,7 +2,7 @@
 
 * config.h
 * config.asm
-* makefile
+* ffmpeg.make
 
 * libavcodec/aacps.c
 * libavcodec/aacsbr.c
@@ -32,6 +32,8 @@
 * libavutil/internal.h
 * libavutil/mathematics.h
 * libavutil/utils.c
+
+* libswscale/swscale.c
 
 ======
 The following files are available only in MPC-BE (compared with ffmpeg):

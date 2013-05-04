@@ -989,7 +989,9 @@ int attribute_align_arg sws_scale(struct SwsContext *c,
 
         base = srcStride[0] < 0 ? rgb0_tmp - srcStride[0] * (srcSliceH-1) : rgb0_tmp;
 
+    // ==> Start patch MPC
         xyz12Torgb48(c, (uint16_t*)base, (const uint16_t*)src2[0], srcStride[0]/2, srcSliceH);
+    // ==> End patch MPC
         src2[0] = base;
     }
 
