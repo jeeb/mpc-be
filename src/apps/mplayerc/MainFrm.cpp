@@ -14230,6 +14230,21 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 					Item = CurPlaylist.GetHead();
 					mi_fn = Item.m_strFileName;
 				}
+			} else if (ext == _T(".IFO")) {
+				// DVD structure
+				CString sVOB = mi_fn;
+
+				for (int i = 0; i < 100; i++) {
+					sVOB = mi_fn;
+					CString vob;
+					vob.Format(_T("%d.VOB"), i);
+					sVOB.Replace(_T("0.IFO"), vob);
+
+					if (::PathFileExists(sVOB)) {
+						mi_fn = sVOB;
+						break;
+					}
+				}
 			}
 		}
 
@@ -14244,16 +14259,23 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			if (strFPS == _T("") || wcstod(strFPS, NULL) > 200.0) {
 				strFPS =  MI.Get(Stream_Video, 0, _T("FrameRate_Original"), Info_Text, Info_Name).c_str();
 			}
-			// 3:2 pulldown
 			CString strST = MI.Get(Stream_Video, 0, _T("ScanType"), Info_Text, Info_Name).c_str();
 			CString strSO = MI.Get(Stream_Video, 0, _T("ScanOrder"), Info_Text, Info_Name).c_str();
 
+			int nFactor = 1;
+
+			// 2:3 pulldown
 			if (strFPS == _T("29.970") && (strSO == _T("2:3 Pulldown") || strST == _T("Progressive") && (strSO == _T("TFF") || strSO  == _T("BFF") || strSO  == _T("2:3 Pulldown"))) ) {
 
 				strFPS = _T("23.976");
+			} else if (strST == _T("Interlaced") || strST == _T("MBAFF")) {
+				// double fps for Interlaced video.
+				nFactor = 2;
 			}
 			miFPS = wcstod(strFPS, NULL);
-			s.dFPS = wcstod(strFPS, NULL);
+			miFPS *= nFactor;
+			s.dFPS = miFPS;
+
 			AutoChangeMonitorMode();
 
 			if (s.fLaunchfullscreen && !s.IsD3DFullscreen() ) {
