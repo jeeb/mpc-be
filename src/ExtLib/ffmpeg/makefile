@@ -1,5 +1,3 @@
-GCC = gcc.exe
-
 BIN_DIR  = ../../../bin
 ZLIB_DIR = ../zlib
 OPENJPEG_DIR = ../openjpeg
@@ -69,7 +67,6 @@ $(OBJ_DIRS):
 	$(shell test -d $(@) || mkdir -p $(@))
 
 clean:
-	@echo Cleaning...
 	rm -f $(TARGET_LIB)
 	rm -rf $(OBJ_DIR)
 
@@ -473,14 +470,14 @@ OBJS = \
 # Commands
 $(OBJ_DIR)%.o: %.c
 	@echo $<
-	@$(FFMPEG_PREFIX)$(GCC) -c $(CFLAGS) $(OPTFLAGS) -MMD -o $@ $<
+	@$(FFMPEG_PREFIX)gcc -c $(CFLAGS) $(OPTFLAGS) -MMD -o $@ $<
 
 $(OBJ_DIR)%.o: %.asm
 	@echo $<
 	@yasm $(YASMFLAGS) -I$(<D)/ -o $@ $<
 
 $(TARGET_LIB): $(OBJS)
-	@echo AR $@
+	@echo $@
 	@$(FFMPEG_PREFIX)ar rc $@ $(OBJS)
 
 -include $(SRCS_C:%.c=$(OBJ_DIR)%.d)
