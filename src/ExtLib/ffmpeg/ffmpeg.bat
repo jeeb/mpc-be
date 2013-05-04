@@ -21,7 +21,6 @@ REM along with this program.  If not, see <http://www.gnu.org/licenses/>.
 SETLOCAL
 PUSHD %~dp0
 
-rem Check for the help switches
 IF /I "%~1"=="help"   GOTO SHOWHELP
 IF /I "%~1"=="/help"  GOTO SHOWHELP
 IF /I "%~1"=="-help"  GOTO SHOWHELP
@@ -57,13 +56,11 @@ IF "%~2" == "" (
     CALL :SubMake
     EXIT /B
   )
-
   IF /I "%~2" == "Clean" (
     SET "BUILDTYPE=clean"
     CALL :SubMake clean
     EXIT /B
   )
-
   IF /I "%~2" == "Rebuild" (
     SET "BUILDTYPE=clean"
     CALL :SubMake clean
@@ -71,7 +68,6 @@ IF "%~2" == "" (
     CALL :SubMake
     EXIT /B
   )
-
   ECHO.
   ECHO Unsupported commandline switch!
   ECHO Run "%~nx0 help" for details about the commandline switches.
@@ -86,16 +82,11 @@ IF "%BUILDTYPE%" == "clean" (
   IF DEFINED NUMBER_OF_PROCESSORS (
     SET JOBS=%NUMBER_OF_PROCESSORS%
   ) ELSE (
-    REM Default number of jobs
     SET JOBS=4
   )
 )
 
-SET "JOBS=-j%JOBS%"
-
-TITLE "make %JOBS% %BIT% %DEBUG% %*"
-ECHO make %JOBS% %BIT% %DEBUG% %*
-make.exe %JOBS% %BIT% %DEBUG% %*
+make.exe -j%JOBS% %BIT% %DEBUG% %*
 
 ENDLOCAL
 EXIT /B
@@ -107,7 +98,7 @@ ECHO Usage:   %~nx0 [32^|64] [Clean^|Build^|Rebuild] [Debug]
 ECHO.
 ECHO Notes:   The arguments are not case sensitive.
 ECHO. & ECHO.
-ECHO Executing "%~nx0" will use the defaults: "%~nx0 32 build"
+ECHO Executing "%~nx0" will use the defaults: "%~nx0 32"
 ECHO.
 ENDLOCAL
 EXIT /B
