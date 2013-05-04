@@ -322,14 +322,14 @@ static void hybrid2_re(float (*in)[2], float (*out)[32][2], const float filter[8
 }
 
 /** Split one subband into 6 subsubbands with a complex filter */
-static void hybrid6_cx(PSDSPContext *dsp, float (*in)[2], float (*out)[32][2], const float (*filter)[8][2], int len)
+static void hybrid6_cx(PSDSPContext *dsp, float (*in)[2], float (*out)[32][2], float (*filter)[8][2], int len)
 {
     int i;
     int N = 8;
     LOCAL_ALIGNED_16(float, temp, [8], [2]);
 
     for (i = 0; i < len; i++, in++) {
-        dsp->hybrid_analysis(temp, in, filter, 1, N);
+        dsp->hybrid_analysis(temp, in, (const float (*)[8][2])filter, 1, N);
         out[0][i][0] = temp[6][0];
         out[0][i][1] = temp[6][1];
         out[1][i][0] = temp[7][0];
@@ -345,12 +345,12 @@ static void hybrid6_cx(PSDSPContext *dsp, float (*in)[2], float (*out)[32][2], c
     }
 }
 
-static void hybrid4_8_12_cx(PSDSPContext *dsp, float (*in)[2], float (*out)[32][2], const float (*filter)[8][2], int N, int len)
+static void hybrid4_8_12_cx(PSDSPContext *dsp, float (*in)[2], float (*out)[32][2], float (*filter)[8][2], int N, int len)
 {
     int i;
 
     for (i = 0; i < len; i++, in++) {
-        dsp->hybrid_analysis(out[0] + i, in, filter, 32, N);
+        dsp->hybrid_analysis(out[0] + i, in, (const float (*)[8][2])filter, 32, N);
     }
 }
 
@@ -622,7 +622,7 @@ static void map_val_20_to_34(float par[PS_MAX_NR_IIDICC])
     par[ 1] = (par[ 0] + par[ 1]) * 0.5f;
 }
 
-static void decorrelation(PSContext *ps, float (*out)[32][2], const float (*s)[32][2], int is34)
+static void decorrelation(PSContext *ps, float (*out)[32][2], float (*s)[32][2], int is34)
 {
     LOCAL_ALIGNED_16(float, power, [34], [PS_QMF_TIME_SLOTS]);
     LOCAL_ALIGNED_16(float, transient_gain, [34], [PS_QMF_TIME_SLOTS]);
@@ -650,7 +650,7 @@ static void decorrelation(PSContext *ps, float (*out)[32][2], const float (*s)[3
 
     for (k = 0; k < NR_BANDS[is34]; k++) {
         int i = k_to_i[k];
-        ps->dsp.add_squares(power[i], s[k], nL - n0);
+        ps->dsp.add_squares(power[i], (const float (*)[2])s[k], nL - n0);
     }
 
     //Transient detection
@@ -763,7 +763,7 @@ static void stereo_processing(PSContext *ps, float (*l)[32][2], float (*r)[32][2
     int8_t (*ipd_mapped)[PS_MAX_NR_IIDICC] = ipd_mapped_buf;
     int8_t (*opd_mapped)[PS_MAX_NR_IIDICC] = opd_mapped_buf;
     const int8_t *k_to_i = is34 ? k_to_i_34 : k_to_i_20;
-    const float (*H_LUT)[8][4] = (PS_BASELINE || ps->icc_mode < 3) ? HA : HB;
+    float (*H_LUT)[8][4] = (PS_BASELINE || ps->icc_mode < 3) ? HA : HB;
 
     //Remapping
     if (ps->num_env_old) {
