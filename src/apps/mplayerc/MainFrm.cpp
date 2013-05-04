@@ -475,6 +475,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_MENU_NAVIGATE_AUDIO, OnMenuNavAudio)
 	ON_COMMAND(ID_MENU_NAVIGATE_SUBTITLES, OnMenuNavSubtitle)
 	ON_COMMAND(ID_MENU_NAVIGATE_JUMPTO, OnMenuNavJumpTo)
+	ON_COMMAND(ID_MENU_RECENT_FILES, OnMenuRecentFiles)
 
 	ON_UPDATE_COMMAND_UI_RANGE(ID_AUDIO_SUBITEM_START, ID_AUDIO_SUBITEM_END, OnUpdatePlayAudio)
 	ON_COMMAND_RANGE(ID_SUBTITLES_SUBITEM_START, ID_SUBTITLES_SUBITEM_END, OnPlaySubtitles)
@@ -9371,6 +9372,12 @@ void CMainFrame::OnMenuNavJumpTo()
 {
 	SetupNavChaptersSubMenu();
 	OnMenu(&m_navchapters);
+}
+
+void CMainFrame::OnMenuRecentFiles()
+{
+	SetupRecentFilesSubMenu();
+	OnMenu(&m_recentfiles);
 }
 
 void CMainFrame::OnUpdateMenuNavSubtitle(CCmdUI* pCmdUI)

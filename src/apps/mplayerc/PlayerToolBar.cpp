@@ -854,7 +854,7 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 		}
 
 	} else if (pNMHDR->idFrom == ID_FILE_OPENQUICK) {
-		m_strTipText = ResStr(IDS_MPLAYERC_0);
+		m_strTipText = ResStr(IDS_MPLAYERC_0) + _T(" | ") + ResStr(IDS_RECENT_FILES);
 
 	} else if (pNMHDR->idFrom == ID_NAVIGATE_SKIPFORWARD) {
 		m_strTipText = ResStr(IDS_AG_NEXT);
@@ -884,6 +884,8 @@ void CPlayerToolBar::OnRButtonDown(UINT nFlags, CPoint point)
 		pFrame->PostMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 	} else if (Idx == 5) {
 		pFrame->OnMenuNavJumpTo();
+	} else if (Idx == 6) {
+		pFrame->OnMenuRecentFiles();
 	} else if (Idx == 8) {
 		pFrame->OnMenuNavAudioOptions();
 	} else if (Idx == 9) {
