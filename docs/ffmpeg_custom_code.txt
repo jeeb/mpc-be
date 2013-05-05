@@ -38,5 +38,5 @@
 ======
 The following files are available only in MPC-BE (compared with ffmpeg):
 
-* libavcodec/mpc_helper.c
+* config.c
 * libavcodec/vc1_dxva.h

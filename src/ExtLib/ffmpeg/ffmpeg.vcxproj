@@ -375,6 +375,7 @@
     <ClInclude Include="libswscale\version.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="config.c" />
     <ClCompile Include="libavcodec\aacadtsdec.c" />
     <ClCompile Include="libavcodec\aacdec.c" />
     <ClCompile Include="libavcodec\aacps.c" />
@@ -531,7 +532,6 @@
     <ClCompile Include="libavcodec\mpc.c" />
     <ClCompile Include="libavcodec\mpc7.c" />
     <ClCompile Include="libavcodec\mpc8.c" />
-    <ClCompile Include="libavcodec\mpc_helper.c" />
     <ClCompile Include="libavcodec\mpeg12.c" />
     <ClCompile Include="libavcodec\mpeg12data.c" />
     <ClCompile Include="libavcodec\mpeg12dec.c" />

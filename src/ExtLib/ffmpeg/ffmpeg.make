@@ -72,6 +72,7 @@ clean:
 
 # Objects
 SRCS_C = \
+	config.c \
 	libavcodec/aac_ac3_parser.c \
 	libavcodec/aac_parser.c \
 	libavcodec/aacadtsdec.c \
@@ -205,7 +206,6 @@ SRCS_C = \
 	libavcodec/mlp_parser.c \
 	libavcodec/mlpdec.c \
 	libavcodec/mlpdsp.c \
-	libavcodec/mpc_helper.c \
 	libavcodec/mpc.c \
 	libavcodec/mpc7.c \
 	libavcodec/mpc8.c \

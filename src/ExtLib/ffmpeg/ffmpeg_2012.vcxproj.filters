@@ -1083,6 +1083,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="config.c" />
     <ClCompile Include="libavcodec\x86\ac3dsp_init.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
@@ -1663,9 +1664,6 @@
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\mpc.c">
-      <Filter>libavcodec</Filter>
-    </ClCompile>
-    <ClCompile Include="libavcodec\mpc_helper.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\mpc7.c">

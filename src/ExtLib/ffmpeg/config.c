@@ -1,5 +1,5 @@
 /*
- * (C) 2008-2012 see Authors.txt
+ * (C) 2009-2013 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -18,8 +18,8 @@
  *
  */
 
-#include "avcodec.h"
-#include "internal.h"
+#include "libavcodec/avcodec.h"
+#include "libavcodec/internal.h"
 
 #ifdef __GNUC__
 #define _aligned_malloc  __mingw_aligned_malloc
@@ -66,7 +66,7 @@ static char g_libavcodec_Version[31];
 
 char* GetFFmpegCompiler()
 {
-	snprintf(g_Gcc_Compiler, sizeof(g_Gcc_Compiler), "MinGW-w64 GCC %d.%d.%d%s%s", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__, COMPILER, COMPILER_SSE);
+	snprintf(g_Gcc_Compiler, sizeof(g_Gcc_Compiler), "GCC %d.%d.%d%s%s", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__, COMPILER, COMPILER_SSE);
 	return g_Gcc_Compiler;
 }
 
