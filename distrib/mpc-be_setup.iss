@@ -247,7 +247,7 @@ Type: files; Name: {app}\ChangeLogRus               Check: IsUpgrade()
 Type: files; Name: {app}\COPYING                    Check: IsUpgrade()
 #ifdef localize
 ; remove the old language dlls when upgrading
-Type: files; Name: {app}\mpcresources.*.dll
+Type: files; Name: {app}\mpcresources.??.dll
 #endif
 
 ;[UninstallRun]
