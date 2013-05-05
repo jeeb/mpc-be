@@ -1768,7 +1768,9 @@ void ff_sbr_apply(AACContext *ac, SpectralBandReplication *sbr, int id_aac,
 
 static void aacsbr_func_ptr_init(AACSBRContext *c)
 {
-    c->sbr_lf_gen            = sbr_lf_gen;
+    // ==> Start patch MPC
+    c->sbr_lf_gen            = (void*)&sbr_lf_gen;
+    // ==> End patch MPC
     c->sbr_hf_assemble       = sbr_hf_assemble;
     c->sbr_x_gen             = sbr_x_gen;
     c->sbr_hf_inverse_filter = sbr_hf_inverse_filter;
