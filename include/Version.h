@@ -30,19 +30,19 @@
 #include "Version_rev.h"
 #endif
 
-#define DO_MAKE_STR(x)	#x
-#define MAKE_STR(x)		DO_MAKE_STR(x)
+#define DO_MAKE_STR(x) #x
+#define MAKE_STR(x)    DO_MAKE_STR(x)
 
-#define MPC_VERSION_MAJOR	1
-#define MPC_VERSION_MINOR	1
-#define MPC_VERSION_PATCH	1
-#define MPC_VERSION_STATUS	0
+#define MPC_VERSION_MAJOR  1
+#define MPC_VERSION_MINOR  1
+#define MPC_VERSION_PATCH  1
+#define MPC_VERSION_STATUS 0
 
 // MPC_VERSION_STATUS: 0 - alfa; 1 - beta; 2 - RC; 3 - stable
 
-#define MPC_WND_CLASS_NAME		"MPC-BE"
-#define MPC_YEAR_COMMENTS		"2002-2013"
-#define MPC_VERSION_COMMENTS	"http://sourceforge.net/projects/mpcbe/"
+#define MPC_WND_CLASS_NAME   "MPC-BE"
+#define MPC_YEAR_COMMENTS    "2002-2013"
+#define MPC_VERSION_COMMENTS "http://sourceforge.net/projects/mpcbe/"
 
 #ifndef ISPP_INVOKED
 
@@ -67,7 +67,7 @@
 #define MPC_VERSION_ARCH "x86"
 #endif
 
-#define DIRECTX_SDK_DATE	"June 2010"
-#define DIRECTX_SDK_NUMBER	"43"
+#define DIRECTX_SDK_DATE   "June 2010"
+#define DIRECTX_SDK_NUMBER "43"
 
 #endif
