@@ -160,7 +160,7 @@ void CPPageFileInfoRes::OnUpdateSaveAs(CCmdUI* pCmdUI)
 	pCmdUI->Enable(m_list.GetSelectedCount());
 }
 
-void CPPageFileInfoRes::OnSize(UINT nType, int cx, int cy) 
+void CPPageFileInfoRes::OnSize(UINT nType, int cx, int cy)
 {
 	int dx = cx - m_rCrt.Width();
 	int dy = cy - m_rCrt.Height();

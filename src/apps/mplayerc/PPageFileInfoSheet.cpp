@@ -144,7 +144,7 @@ int CALLBACK CPPageFileInfoSheet::XmnPropSheetCallback(HWND hWnd, UINT message, 
 {
 	extern int CALLBACK AfxPropSheetCallback(HWND, UINT message, LPARAM lParam);
 	int nRes = AfxPropSheetCallback(hWnd, message, lParam);
-	
+
 	switch (message)
 	{
 	case PSCB_PRECREATE:
@@ -154,7 +154,7 @@ int CALLBACK CPPageFileInfoSheet::XmnPropSheetCallback(HWND hWnd, UINT message, 
 	return nRes;
 }
 
-INT_PTR CPPageFileInfoSheet::DoModal() 
+INT_PTR CPPageFileInfoSheet::DoModal()
 {
 	m_psh.dwFlags |= PSH_USECALLBACK;
 	m_psh.pfnCallback = XmnPropSheetCallback;
@@ -162,22 +162,21 @@ INT_PTR CPPageFileInfoSheet::DoModal()
 	return CPropertySheet::DoModal();
 }
 
-void CPPageFileInfoSheet::OnSize(UINT nType, int cx, int cy) 
+void CPPageFileInfoSheet::OnSize(UINT nType, int cx, int cy)
 {
-	
 	CPropertySheet::OnSize(nType, cx, cy);
 
-	CRect r; 
+	CRect r;
 
 	if (m_bNeedInit) return;
 
 	CTabCtrl *pTab = GetTabControl();
 	ASSERT(NULL != pTab && IsWindow(pTab->m_hWnd));
-    
+
 	int dx = cx - m_rCrt.Width();
 	int dy = cy - m_rCrt.Height();
 	GetClientRect(&m_rCrt);
-	
+
 	HDWP hDWP = ::BeginDeferWindowPos(5);
 
 	pTab->GetClientRect(&r); 
@@ -213,7 +212,7 @@ void CPPageFileInfoSheet::OnSize(UINT nType, int cx, int cy)
 	GetWindowRect(&m_rWnd);
 }
 
-void CPPageFileInfoSheet::OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI) 
+void CPPageFileInfoSheet::OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI)
 {
 	CPropertySheet::OnGetMinMaxInfo(lpMMI);
 	lpMMI->ptMinTrackSize.x = m_nMinCX;

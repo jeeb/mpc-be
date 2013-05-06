@@ -327,7 +327,7 @@ void CPPageFileInfoDetails::InitEncoding()
 	m_encoding.SetWindowText(text);
 }
 
-void CPPageFileInfoDetails::OnSize(UINT nType, int cx, int cy) 
+void CPPageFileInfoDetails::OnSize(UINT nType, int cx, int cy)
 {
 	int dx = cx - m_rCrt.Width();
 	int dy = cy - m_rCrt.Height();

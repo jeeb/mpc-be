@@ -128,7 +128,7 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 			m_location_str = m_fn;
 		}
 	}
-	
+
 	if (m_location_str.IsEmpty() || m_location_str == ResStr(IDS_AG_NONE)) {
 		int i = max(m_fn.ReverseFind('\\'), m_fn.ReverseFind('/'));
 
@@ -207,7 +207,7 @@ LRESULT CPPageFileInfoClip::OnSetPageFocus(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-void CPPageFileInfoClip::OnSize(UINT nType, int cx, int cy) 
+void CPPageFileInfoClip::OnSize(UINT nType, int cx, int cy)
 {
 	int dx = cx - m_rCrt.Width();
 	int dy = cy - m_rCrt.Height();
