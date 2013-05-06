@@ -115,9 +115,11 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 
 	MediaInfo MI;
 
-	MI.Open(((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strFnFull.GetString());
-	MI.Option(_T("Complete"));
+	
+	
 	MI.Option(_T("Language"), mi_get_lang_file());
+	MI.Option(_T("Complete"));
+	MI.Open(((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strFnFull.GetString());
 	MI_Text = MI.Inform().c_str();
 	MI.Close();
 
