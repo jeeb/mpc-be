@@ -33,7 +33,6 @@
 
 
 CComPtr<IApplicationAssociationRegistration> CPPageFormats::m_pAAR;
-CAtlList<CString> CPPageFormats::m_lUnRegisterExts;
 bool CPPageFormats::m_bSetContextFiles = false;
 
 // TODO: change this along with the root key for settings and the mutex name to
@@ -943,8 +942,14 @@ BOOL CPPageFormats::OnApply()
 			UnRegisterShellExt(GetModulePath(false) + _T("\\MPCBEShellExt64.dll"));
 		}
 
+		int nRegExtCount = 0;
 		for (int i = 0; i < m_list.GetItemCount(); i++) {
 			int iChecked = GetChecked(i);
+
+			if (iChecked) {
+				nRegExtCount++;
+			}
+
 			if (iChecked == 2) {
 				continue;
 			}
@@ -962,9 +967,11 @@ BOOL CPPageFormats::OnApply()
 			}
 		}
 
-		RegisterShellExt(GetModulePath(false) + _T("\\MPCBEShellExt.dll"));
-		if (bIs64) {
-			RegisterShellExt(GetModulePath(false) + _T("\\MPCBEShellExt64.dll"));
+		if (nRegExtCount) {
+			RegisterShellExt(GetModulePath(false) + _T("\\MPCBEShellExt.dll"));
+			if (bIs64) {
+				RegisterShellExt(GetModulePath(false) + _T("\\MPCBEShellExt64.dll"));
+			}
 		}
 	}
 	CRegKey key;

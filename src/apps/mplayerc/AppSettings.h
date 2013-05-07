@@ -407,7 +407,9 @@ public:
 
 class CAppSettings
 {
-	bool fInitialized;
+	bool	fInitialized;
+
+	CWnd*	p_MainWnd;
 
 	class CRecentFileAndURLList : public CRecentFileList
 	{
@@ -420,6 +422,10 @@ class CAppSettings
 	};
 
 public:
+
+	void		SetMainWnd(CWnd* p_CWnd)	{ p_MainWnd = p_CWnd; };
+	const CWnd*	GetMainWnd()				{ return p_MainWnd; };
+
 	bool fReset;
 
 	bool fShadersNeedSave;

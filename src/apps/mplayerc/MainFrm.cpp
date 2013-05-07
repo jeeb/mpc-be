@@ -914,6 +914,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		}
 	}
 
+	s.SetMainWnd(this);
+
 	return 0;
 }
 

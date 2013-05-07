@@ -58,9 +58,9 @@ private:
 	static CString GetEnqueueCommand();
 
 	static CComPtr<IApplicationAssociationRegistration>	m_pAAR;
-	static CAtlList<CString>							m_lUnRegisterExts;
 	static bool											m_bSetContextFiles;
 
+	CAtlList<CString>									m_lUnRegisterExts;
 	bool												m_bSetAssociatedWithIcon;
 
 public:

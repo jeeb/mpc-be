@@ -102,8 +102,12 @@ void CPPageBase::OnDestroy()
 
 BOOL CPPageBase::OnApply()
 {
-	((CMainFrame*)AfxGetMainWnd())->CreateThumbnailToolbar();
-	((CMainFrame*)AfxGetMainWnd())->UpdateThumbarButton();
+	const CWnd* p_MainWnd = AfxGetAppSettings().GetMainWnd();
+
+	if (p_MainWnd) {
+		((CMainFrame*)p_MainWnd)->CreateThumbnailToolbar();
+		((CMainFrame*)p_MainWnd)->UpdateThumbarButton();
+	}
 
 	return __super::OnApply();
 }
