@@ -29,12 +29,12 @@ IF /I "%~1"=="/?"     GOTO SHOWHELP
 
 IF "%~1" == "32" (
   SET BIT=
-  SET MINGW=%MINGW32%
 )
 IF "%~1" == "64" (
   SET BIT=64BIT=yes
-  SET MINGW=%MINGW64%
 )
+
+SET MINGW=%MINGW32%
 
 IF DEFINED MINGW GOTO VarOk
 ECHO ERROR: Please define MINGW (and/or MSYS) environment variable(s)

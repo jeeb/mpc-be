@@ -470,7 +470,7 @@ OBJS = \
 # Commands
 $(OBJ_DIR)%.o: %.c
 	@echo $<
-	@$(FFMPEG_PREFIX)gcc -c $(CFLAGS) $(OPTFLAGS) -MMD -Wno-deprecated-declarations -o $@ $<
+	@$(FFMPEG_PREFIX)gcc -c $(CFLAGS) $(OPTFLAGS) -MMD -Wno-deprecated-declarations -Wno-pointer-to-int-cast -o $@ $<
 
 $(OBJ_DIR)%.o: %.asm
 	@echo $<
