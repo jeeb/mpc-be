@@ -33,6 +33,8 @@
 
 
 CComPtr<IApplicationAssociationRegistration> CPPageFormats::m_pAAR;
+CAtlList<CString> CPPageFormats::m_lUnRegisterExts;
+bool CPPageFormats::m_bSetContextFiles = false;
 
 // TODO: change this along with the root key for settings and the mutex name to
 //       avoid possible risks of conflict with the old MPC (non BE version).
@@ -42,8 +44,6 @@ CComPtr<IApplicationAssociationRegistration> CPPageFormats::m_pAAR;
 	#define PROGID _T("mpc-be")
 #endif // _WIN64
 
-bool m_fsetContextFiles = false;
-
 IMPLEMENT_DYNAMIC(CPPageFormats, CPPageBase)
 CPPageFormats::CPPageFormats()
 	: CPPageBase(CPPageFormats::IDD, CPPageFormats::IDD)
@@ -52,7 +52,7 @@ CPPageFormats::CPPageFormats()
 	, m_iRtspHandler(0)
 	, m_fRtspFileExtFirst(FALSE)
 	, m_bInsufficientPrivileges(false)
-	, m_fsetAssociatedWithIcon(true)
+	, m_bSetAssociatedWithIcon(true)
 {
 	if (m_pAAR == NULL) {
 		// Default manager (requires at least Vista)
@@ -151,7 +151,7 @@ bool CPPageFormats::IsRegistered(CString ext)
 
 		bIsDefault = (buff == strProgID);
 	}
-	if (!m_fsetContextFiles) {
+	if (!m_bSetContextFiles) {
 		CRegKey key;
 		TCHAR   buff[_MAX_PATH];
 		ULONG   len = _countof(buff);
@@ -159,7 +159,7 @@ bool CPPageFormats::IsRegistered(CString ext)
 		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, strProgID + _T("\\shell\\open"), KEY_READ)) {
 			CString strCommand = ResStr(IDS_OPEN_WITH_MPC);
 			if (ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len)) {
-				m_fsetContextFiles = (strCommand.CompareNoCase(CString(buff)) == 0);
+				m_bSetContextFiles = (strCommand.CompareNoCase(CString(buff)) == 0);
 			}
 		}
 	}
@@ -264,7 +264,7 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, bool fAudioOnly, 
 	}
 
 	// Add to playlist option
-	if (m_fsetContextFiles) {
+	if (m_bSetContextFiles) {
 		if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID + _T("\\shell\\enqueue"))) {
 			return false;
 		}
@@ -288,7 +288,7 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, bool fAudioOnly, 
 	if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID + _T("\\shell\\open"))) {
 		return false;
 	}
-	if (m_fsetContextFiles) {
+	if (m_bSetContextFiles) {
 		if (ERROR_SUCCESS != key.SetStringValue(NULL, ResStr(IDS_OPEN_WITH_MPC))) {
 			return false;
 		}
@@ -688,7 +688,7 @@ BOOL CPPageFormats::OnInitDialog()
 	for (int i = 0; i < m_list.GetItemCount(); i++) {
 		SetListItemState(i);
 	}
-	m_fContextFiles.SetCheck(m_fsetContextFiles);
+	m_fContextFiles.SetCheck(m_bSetContextFiles);
 
 	m_apvideo.SetCheck(IsAutoPlayRegistered(AP_VIDEO));
 	m_apmusic.SetCheck(IsAutoPlayRegistered(AP_MUSIC));
@@ -733,6 +733,8 @@ BOOL CPPageFormats::OnInitDialog()
 	}
 	m_fContextDir.SetCheck(fContextDir);
 	m_fAssociatedWithIcons.SetCheck(s.fAssociatedWithIcons);
+
+	m_lUnRegisterExts.RemoveAll();
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -930,8 +932,8 @@ BOOL CPPageFormats::OnApply()
 
 	RegisterApp();
 
-	m_fsetContextFiles			= !!m_fContextFiles.GetCheck();
-	m_fsetAssociatedWithIcon	= !!m_fAssociatedWithIcons.GetCheck();
+	m_bSetContextFiles			= !!m_fContextFiles.GetCheck();
+	m_bSetAssociatedWithIcon	= !!m_fAssociatedWithIcons.GetCheck();
 
 	if (m_bFileExtChanged) {
 		BOOL bIs64 = IsW64();
@@ -953,7 +955,7 @@ BOOL CPPageFormats::OnApply()
 			POSITION pos = exts.GetHeadPosition();
 			while (pos) {
 				if (iChecked) {
-					RegisterExt(exts.GetNext(pos), mf[(int)m_list.GetItemData(i)].GetDescription(), mf[i].IsAudioOnly(), m_fsetAssociatedWithIcon);
+					RegisterExt(exts.GetNext(pos), mf[(int)m_list.GetItemData(i)].GetDescription(), mf[i].IsAudioOnly(), m_bSetAssociatedWithIcon);
 				} else {
 					UnRegisterExt(exts.GetNext(pos));
 				}

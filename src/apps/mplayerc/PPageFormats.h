@@ -42,21 +42,32 @@ private:
 	int GetChecked(int iItem);
 	void SetChecked(int iItem, int fChecked);
 
-	typedef enum {AP_VIDEO=0,AP_MUSIC,AP_AUDIOCD,AP_DVDMOVIE} autoplay_t;
+	typedef enum {
+		AP_VIDEO = 0,
+		AP_MUSIC,
+		AP_AUDIOCD,
+		AP_DVDMOVIE
+	} autoplay_t;
+
 	void AddAutoPlayToRegistry(autoplay_t ap, bool fRegister);
 	bool IsAutoPlayRegistered(autoplay_t ap);
 
 	void SetListItemState(int nItem);
-	static CComPtr<IApplicationAssociationRegistration> m_pAAR;
 	static BOOL SetFileAssociation(CString strExt, CString extfile, bool fRegister);
 	static CString GetOpenCommand();
 	static CString GetEnqueueCommand();
 
-	CAtlList<CString> m_lUnRegisterExts;
+	static CComPtr<IApplicationAssociationRegistration>	m_pAAR;
+	static CAtlList<CString>							m_lUnRegisterExts;
+	static bool											m_bSetContextFiles;
+
+	bool												m_bSetAssociatedWithIcon;
 
 public:
 	CPPageFormats();
 	virtual ~CPPageFormats();
+
+	enum {COL_CATEGORY, COL_ENGINE};
 
 	static bool		RegisterApp();
 	static bool		IsRegistered(CString ext);
@@ -70,7 +81,6 @@ public:
 	static LPCTSTR	GetOldAssoc()			{return _T("PreviousRegistration");}
 	static LPCTSTR	GetRegisteredKey()		{return _T("Software\\Clients\\Media\\MPC-BE\\Capabilities");}
 
-	enum {COL_CATEGORY, COL_ENGINE};
 	CPlayerListCtrl m_list;
 	CString m_exts;
 	CStatic m_autoplay;
@@ -78,8 +88,12 @@ public:
 	CButton m_apmusic;
 	CButton m_apaudiocd;
 	CButton m_apdvd;
-	int m_iRtspHandler;
-	BOOL m_fRtspFileExtFirst;
+	CButton m_fContextDir;
+	CButton m_fContextFiles;
+	CButton m_fAssociatedWithIcons;
+
+	int		m_iRtspHandler;
+	BOOL	m_fRtspFileExtFirst;
 
 	enum { IDD = IDD_PPAGEFORMATS };
 
@@ -106,9 +120,4 @@ public:
 	afx_msg void OnFilesAssocModified();
 	afx_msg void OnUpdateButtonDefault(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateButtonSet(CCmdUI* pCmdUI);
-	CButton m_fContextDir;
-	CButton m_fContextFiles;
-	CButton m_fAssociatedWithIcons;
-
-	bool		m_fsetAssociatedWithIcon;
 };
