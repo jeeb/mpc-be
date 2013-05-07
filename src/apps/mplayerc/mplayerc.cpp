@@ -519,8 +519,13 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 
 void CMPlayerCApp::ExportSettings()
 {
-	CString ext = IsIniValid() ? _T("ini") : _T("reg");
-	CFileDialog fileSaveDialog(FALSE, ext, _T("mpc-be-settings.")+ext);
+	CString ext = IsIniValid() ? _T(".ini") : _T(".reg");
+	CString ext_list;
+	ext_list.Format(_T("Export files (*%ws)|*%ws|"), ext, ext);
+
+	CFileDialog fileSaveDialog(FALSE, 0, _T("mpc-be-settings") + ext,
+							   OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_PATHMUSTEXIST|OFN_NOCHANGEDIR,
+							   ext_list);
 
 	if (fileSaveDialog.DoModal() == IDOK) {
 		CString savePath = fileSaveDialog.GetPathName();
