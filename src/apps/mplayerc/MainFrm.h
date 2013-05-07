@@ -1152,6 +1152,8 @@ protected:
 	bool			b_UseVSFilter;
 
 	CComPtr<IBaseFilter> m_pBFmadVR;
+
+	HMODULE			m_hWtsLib;
 public:
 	afx_msg UINT OnPowerBroadcast(UINT nPowerEvent, UINT nEventData);
 	afx_msg void OnSessionChange(UINT nSessionState, UINT nId);

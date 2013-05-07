@@ -27,9 +27,6 @@ extern "C" char *GetFFmpegCompiler();
 extern "C" char *GetlibavcodecVersion();
 
 CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD), m_appname(_T(""))
-	, m_strVersionNumber(_T(""))
-	, m_MPCCompiler(_T(""))
-	, m_FFmpegCompiler(_T(""))
 {
 	m_hIcon = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
 }
@@ -116,8 +113,7 @@ BOOL CAboutDlg::OnInitDialog()
 	}
 
 	if ( m_hIcon != NULL ) {
-		CStatic *pStat = (CStatic*)GetDlgItem(IDC_MAINFRAME_ICON);
-		pStat->SetIcon(m_hIcon);
+		((CStatic*)GetDlgItem(IDC_MAINFRAME_ICON))->SetIcon(m_hIcon);
 	}
 
 	UpdateData(FALSE);

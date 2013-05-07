@@ -694,10 +694,15 @@ CMainFrame::CMainFrame() :
 	m_YoutubeThread(NULL),
 	m_YoutubeCurrent(0),
 	m_YoutubeTotal(0),
-	m_pBFmadVR(NULL)
+	m_pBFmadVR(NULL),
+	m_hDWMAPI(0),
+	m_hWtsLib(0),
+	m_CaptureWndBitmap(NULL),
+	m_ThumbCashedBitmap(NULL)
 {
 	m_Lcd.SetVolumeRange(0, 100);
 	m_LastSaveTime.QuadPart = 0;
+	m_ThumbCashedSize.SetSize(0, 0);
 }
 
 CMainFrame::~CMainFrame()
@@ -717,7 +722,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	AppSettings& s = AfxGetAppSettings();
 
-	// create a preview-window
+	// create a Main View Window
 	if (!m_wndView.Create(NULL, NULL, AFX_WS_DEFAULT_VIEW|WS_CLIPCHILDREN|WS_CLIPSIBLINGS,
 						  CRect(0, 0, 0, 0), this, AFX_IDW_PANE_FIRST, NULL)) {
 		TRACE(_T("Failed to create Main View Window\n"));
@@ -727,8 +732,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// Should never be RTLed
 	m_wndView.ModifyStyleEx(WS_EX_LAYOUTRTL, WS_EX_NOINHERITLAYOUT);
 
-	// Create flybar-window
+	// Create FlyBar Window
 	CreateFlyBar();
+	// Create OSD Window
 	CreateOSDBar();
 	
 	// Create Preview Window
@@ -907,10 +913,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 			(FARPROC &)m_DwmInvalidateIconicBitmapsFnc		= GetProcAddress(m_hDWMAPI, "DwmInvalidateIconicBitmaps");
 		}
 	}
-
-	m_CaptureWndBitmap	= NULL;
-	m_ThumbCashedBitmap	= NULL;
-	m_ThumbCashedSize.SetSize(0, 0);
 
 	return 0;
 }
@@ -18875,9 +18877,9 @@ UINT CMainFrame::OnPowerBroadcast(UINT nPowerEvent, UINT nEventData)
 	static BOOL bWasPausedBeforeSuspention;
 	OAFilterState mediaState;
 
-	switch ( nPowerEvent ) {
+	switch (nPowerEvent) {
 		case PBT_APMSUSPEND: // System is suspending operation.
-			TRACE("OnPowerBroadcast - suspending\n"); // For user tracking
+			TRACE("OnPowerBroadcast() - suspending\n"); // For user tracking
 
 			bWasPausedBeforeSuspention = FALSE; // Reset value
 
@@ -18888,7 +18890,7 @@ UINT CMainFrame::OnPowerBroadcast(UINT nPowerEvent, UINT nEventData)
 			}
 			break;
 		case PBT_APMRESUMEAUTOMATIC: // Operation is resuming automatically from a low-power state. This message is sent every time the system resumes.
-			TRACE("OnPowerBroadcast - resuming\n"); // For user tracking
+			TRACE("OnPowerBroadcast() - resuming\n"); // For user tracking
 
 			// Resume if we paused before suspension.
 			if ( bWasPausedBeforeSuspention ) {
@@ -18900,16 +18902,13 @@ UINT CMainFrame::OnPowerBroadcast(UINT nPowerEvent, UINT nEventData)
 	return __super::OnPowerBroadcast(nPowerEvent, nEventData);
 }
 
-#define NOTIFY_FOR_THIS_SESSION     0
-
 void CMainFrame::OnSessionChange(UINT nSessionState, UINT nId)
 {
 	static BOOL bWasPausedBeforeSessionChange;
 
-	switch (nSessionState)
-	{
+	switch (nSessionState) {
 		case WTS_SESSION_LOCK:
-			TRACE(_T("OnSessionChange - Lock session\n"));
+			TRACE(_T("OnSessionChange() - Lock session\n"));
 
 			bWasPausedBeforeSessionChange = FALSE;
 			if (GetMediaState() == State_Running && !m_fAudioOnly) {
@@ -18918,7 +18917,7 @@ void CMainFrame::OnSessionChange(UINT nSessionState, UINT nId)
 			}
 			break;
 		case WTS_SESSION_UNLOCK:
-			TRACE(_T("OnSessionChange - UnLock session\n"));
+			TRACE(_T("OnSessionChange() - UnLock session\n"));
 
 			if (bWasPausedBeforeSessionChange) {
 				SendMessage( WM_COMMAND, ID_PLAY_PLAY );
@@ -18927,43 +18926,38 @@ void CMainFrame::OnSessionChange(UINT nSessionState, UINT nId)
 	}
 }
 
+#define NOTIFY_FOR_THIS_SESSION 0
 void CMainFrame::WTSRegisterSessionNotification()
 {
 	typedef BOOL (WINAPI *WTSREGISTERSESSIONNOTIFICATION)(HWND, DWORD);
-	HINSTANCE hWtsLib = LoadLibrary( _T("wtsapi32.dll") );
 
-	if ( hWtsLib )
-	{
+	m_hWtsLib = LoadLibrary(L"wtsapi32.dll");
+
+	if (m_hWtsLib) {
 		WTSREGISTERSESSIONNOTIFICATION fnWtsRegisterSessionNotification;
 
-		fnWtsRegisterSessionNotification = (WTSREGISTERSESSIONNOTIFICATION)GetProcAddress(hWtsLib, "WTSRegisterSessionNotification");
+		fnWtsRegisterSessionNotification = (WTSREGISTERSESSIONNOTIFICATION)GetProcAddress(m_hWtsLib, "WTSRegisterSessionNotification");
 
-		if ( fnWtsRegisterSessionNotification ) {
+		if (fnWtsRegisterSessionNotification) {
 			fnWtsRegisterSessionNotification(m_hWnd, NOTIFY_FOR_THIS_SESSION);
 		}
-
-		FreeLibrary( hWtsLib );
-		hWtsLib = NULL;
 	}
 }
 
 void CMainFrame::WTSUnRegisterSessionNotification()
 {
 	typedef BOOL (WINAPI *WTSUNREGISTERSESSIONNOTIFICATION)(HWND);
-	HINSTANCE hWtsLib = LoadLibrary( _T("wtsapi32.dll") );
 
-	if ( hWtsLib )
-	{
+	if (m_hWtsLib) {
 		WTSUNREGISTERSESSIONNOTIFICATION fnWtsUnRegisterSessionNotification;
 
-		fnWtsUnRegisterSessionNotification = (WTSUNREGISTERSESSIONNOTIFICATION)GetProcAddress(hWtsLib, "WTSUnRegisterSessionNotification");
+		fnWtsUnRegisterSessionNotification = (WTSUNREGISTERSESSIONNOTIFICATION)GetProcAddress(m_hWtsLib, "WTSUnRegisterSessionNotification");
 
-		if ( fnWtsUnRegisterSessionNotification ) {
-			fnWtsUnRegisterSessionNotification( m_hWnd );
+		if (fnWtsUnRegisterSessionNotification) {
+			fnWtsUnRegisterSessionNotification(m_hWnd);
 		}
 
-		FreeLibrary( hWtsLib );
-		hWtsLib = NULL;
+		FreeLibrary(m_hWtsLib);
 	}
 }
 
@@ -19040,7 +19034,6 @@ bool CMainFrame::OpenBD(CString Path)
 void CMainFrame::SetStatusMessage(CString m_msg)
 {
 	if (m_OldMessage != m_msg) {
-		//TRACE(_T("Change msg = %ws\n"), m_msg);
 		m_wndStatusBar.SetStatusMessage(m_msg);
 	}
 	m_OldMessage = m_msg;
