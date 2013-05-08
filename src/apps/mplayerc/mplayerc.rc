@@ -2848,7 +2848,7 @@ BEGIN
     IDS_MAINFRM_55          "Failed to get video frame size"
     IDS_MAINFRM_56          "Out of memory, go buy some more!"
     IDS_MAINFRM_57          "Invalid image format, cannot create thumbnails out of %d bpp dibs."
-    IDS_MAINFRM_58          "File Size: %s (%I64d bytes)\\N"
+    IDS_MAINFRM_58          "File Size: %s (%s bytes)\\N"
     IDS_MAINFRM_59          "{\\an7\\1c&H000000&\\fs16\\b0\\bord0\\shad0}File Name: %s\\N%sResolution: %dx%d %s\\NDuration: %02d:%02d:%02d"
     IDS_MAINFRM_60          "To load subtitles you have to change the video renderer type and reopen the file.\n"
     IDS_MAINFRM_61          "- DirectShow: VMR-7/VMR-9 (renderless), EVR Custom, EVR Sync, or Haali\n"
