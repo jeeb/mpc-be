@@ -27,10 +27,10 @@
 #include <vfwmsgs.h>
 #include <sys/timeb.h>
 #include <time.h> // for the _time64 workaround
+#include "../../../DSUtil/SysVersion.h"
 #include "FfmpegContext.h"
 
-extern BOOL IsWinVistaOrLater(); // requires linking with DSUtils which is always the case
-extern unsigned __int64 GetFileVersion(LPCTSTR fn);
+extern unsigned __int64 GetFileVersion(LPCTSTR fn);	// requires linking with DSUtils which is always the case
 
 extern "C" {
 	#include <ffmpeg/libavcodec/dsputil.h>

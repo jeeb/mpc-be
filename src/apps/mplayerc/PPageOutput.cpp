@@ -23,7 +23,7 @@
 
 #include "stdafx.h"
 #include "PPageOutput.h"
-#include "../../DSUtil/WinAPIUtils.h"
+#include "../../DSUtil/SysVersion.h"
 #include <moreuuids.h>
 #include "Monitors.h"
 #include "ComPropertySheet.h"

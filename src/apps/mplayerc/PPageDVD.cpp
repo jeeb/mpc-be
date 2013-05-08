@@ -24,7 +24,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PPageDVD.h"
-#include "../../DSUtil/WinAPIUtils.h"
+#include "../../DSUtil/SysVersion.h"
 
 
 struct {

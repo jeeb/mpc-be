@@ -25,7 +25,7 @@
 #include <atlrx.h>
 #include <atlutil.h>
 #include "MainFrm.h"
-#include "../../DSUtil/WinAPIUtils.h"
+#include "../../DSUtil/SysVersion.h"
 #include "SaveTextFileDialog.h"
 #include "PlayerPlaylistBar.h"
 #include "SettingsDefines.h"

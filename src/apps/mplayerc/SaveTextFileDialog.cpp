@@ -23,7 +23,7 @@
 
 #include "stdafx.h"
 #include "SaveTextFileDialog.h"
-#include "../../DSUtil/WinAPIUtils.h"
+#include "../../DSUtil/SysVersion.h"
 
 // CSaveTextFileDialog
 

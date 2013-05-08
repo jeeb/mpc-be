@@ -22,14 +22,7 @@
 
 #pragma once
 
-#include <Windows.h>
-
 struct IDirect3D9;
-
-BOOL IsWinXPOrLater();
-BOOL IsWinVistaOrLater();
-BOOL IsWinSevenOrLater();
-BOOL IsWinEight();
 
 BOOL IsCompositionEnabled();
 
@@ -46,6 +39,3 @@ bool ExploreToFile(CString path);
 bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, UINT16* MonitorVerRes);
 
 CString GetModulePath(bool bInclModuleName = true);
-
-BOOL IsWow64();
-BOOL IsW64();

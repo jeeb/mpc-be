@@ -22,11 +22,10 @@
 
 #pragma once
 
-// modified code from wxdebug.h
+BOOL IsWinXPOrLater();
+BOOL IsWinVistaOrLater();
+BOOL IsWinSevenOrLater();
+BOOL IsWinEight();
 
-class C_MPCGuidNameList {
-public:
-	CHAR *operator [] (const GUID& guid);
-};
-
-extern C_MPCGuidNameList m_GuidNames;
+BOOL IsWow64();
+BOOL IsW64();

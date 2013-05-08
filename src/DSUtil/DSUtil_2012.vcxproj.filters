@@ -71,6 +71,9 @@
     <ClCompile Include="GUIDString.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SysVersion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DSMPropertyBag.h">
@@ -140,6 +143,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GUIDString.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SysVersion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

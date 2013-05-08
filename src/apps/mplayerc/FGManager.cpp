@@ -30,7 +30,7 @@
 #include <SyncAllocatorPresenter.h>
 #include <madVRAllocatorPresenter.h>
 #include "DeinterlacerFilter.h"
-#include "../../DSUtil/WinAPIUtils.h"
+#include "../../DSUtil/SysVersion.h"
 #include "../../filters/transform/DeCSSFilter/VobFile.h"
 #include <InitGuid.h>
 #include <dmodshow.h>

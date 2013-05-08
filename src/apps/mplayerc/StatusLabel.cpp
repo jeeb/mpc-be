@@ -23,7 +23,7 @@
 
 #include "stdafx.h"
 #include "StatusLabel.h"
-#include "../../DSUtil/WinAPIUtils.h"
+#include "../../DSUtil/SysVersion.h"
 
 // CStatusLabel
 

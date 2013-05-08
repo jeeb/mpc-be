@@ -23,7 +23,7 @@
 
 #include "stdafx.h"
 #include "SaveThumbnailsDialog.h"
-#include "../../DSUtil/WinAPIUtils.h"
+#include "../../DSUtil/SysVersion.h"
 #include "DialogEventHandler.h"
 
 // CSaveThumbnailsDialog

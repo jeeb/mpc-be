@@ -23,76 +23,7 @@
 #include "stdafx.h"
 #include <d3dx9.h>
 #include "WinAPIUtils.h"
-
-BOOL IsWinXPOrLater()
-{
-	OSVERSIONINFOEX osvi = {0};
-	DWORDLONG dwlConditionMask = 0;
-
-	// Initialize the OSVERSIONINFOEX structure.
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-	osvi.dwMajorVersion = 5;
-	osvi.dwMinorVersion = 1;
-
-	// Initialize the condition mask.
-	VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, VER_GREATER_EQUAL);
-	VER_SET_CONDITION(dwlConditionMask, VER_MINORVERSION, VER_GREATER_EQUAL);
-
-	// Perform the test.
-
-	return VerifyVersionInfo(&osvi, VER_MAJORVERSION|VER_MINORVERSION, dwlConditionMask);
-}
-
-BOOL IsWinVistaOrLater()
-{
-	OSVERSIONINFOEX osvi = {0};
-	DWORDLONG dwlConditionMask = 0;
-
-	// Initialize the OSVERSIONINFOEX structure.
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-	osvi.dwMajorVersion = 6;
-
-	// Initialize the condition mask.
-	VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, VER_GREATER_EQUAL);
-
-	// Perform the test.
-	return VerifyVersionInfo(&osvi, VER_MAJORVERSION, dwlConditionMask);
-}
-
-BOOL IsWinSevenOrLater()
-{
-	OSVERSIONINFOEX osvi = {0};
-	DWORDLONG dwlConditionMask = 0;
-
-	// Initialize the OSVERSIONINFOEX structure.
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-	osvi.dwMajorVersion = 6;
-	osvi.dwMinorVersion = 1;
-
-	// Initialize the condition mask.
-	VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, VER_GREATER_EQUAL);
-	VER_SET_CONDITION(dwlConditionMask, VER_MINORVERSION, VER_GREATER_EQUAL);
-
-	// Perform the test.
-	return VerifyVersionInfo(&osvi, VER_MAJORVERSION|VER_MINORVERSION, dwlConditionMask);
-}
-
-BOOL IsWinEight()
-{
-	OSVERSIONINFOEX osvi = {0};
-	DWORDLONG dwlConditionMask = 0;
-
-	// Initialize the OSVERSIONINFOEX structure.
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-	osvi.dwMajorVersion = 6;
-	osvi.dwMinorVersion = 2;
-
-	// Initialize the condition mask.
-	VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION|VER_MINORVERSION, VER_EQUAL);
-
-	// Perform the test.
-	return VerifyVersionInfo(&osvi, VER_MAJORVERSION|VER_MINORVERSION, dwlConditionMask);
-}
+#include "SysVersion.h"
 
 BOOL IsCompositionEnabled()
 {
@@ -514,25 +445,4 @@ CString GetModulePath(bool bInclModuleName)
 	}
 
 	return path;
-}
-
-BOOL IsWow64()
-{ 
-	typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL); 
-	LPFN_ISWOW64PROCESS fnIsWow64Process; 
-	BOOL bIsWow64 = FALSE; 
-	fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(GetModuleHandle(_T("kernel32")), "IsWow64Process"); 
-	if (NULL != fnIsWow64Process) {
-		fnIsWow64Process(GetCurrentProcess(), &bIsWow64); 
-	} 
-	return bIsWow64; 
-}
-
-BOOL IsW64()
-{
-#ifdef _WIN64
-	return TRUE;
-#endif
-
-	return IsWow64();
 }

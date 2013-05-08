@@ -39,6 +39,7 @@
 #include "FfmpegContext.h"
 
 #include "../../../DSUtil/DSUtil.h"
+#include "../../../DSUtil/SysVersion.h"
 #include "../../../DSUtil/MediaTypes.h"
 #include "../../parser/MpegSplitter/MpegSplitter.h"
 #include "../../parser/OggSplitter/OggSplitter.h"

@@ -26,6 +26,7 @@
 #include "OuterVMR.h"
 #include "IPinHook.h"
 #include "MacrovisionKicker.h"
+#include "../../../DSUtil/SysVersion.h"
 
 // ISubPicAllocatorPresenter
 

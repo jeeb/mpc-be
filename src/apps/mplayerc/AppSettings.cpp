@@ -24,7 +24,7 @@
 #include "stdafx.h"
 #include "AppSettings.h"
 #include "MiniDump.h"
-#include "../../DSUtil/WinAPIUtils.h"
+#include "../../DSUtil/SysVersion.h"
 
 CAppSettings::CAppSettings()
 	: fInitialized(false)

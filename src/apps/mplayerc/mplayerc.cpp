@@ -32,6 +32,7 @@
 #include "Monitors.h"
 #define NO_VERSION_REV_NEEDED
 #include "../../DSUtil/WinAPIUtils.h"
+#include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/MPCSocket.h"
 #include <winddk/ntddcdvd.h>
 #include <detours/detours.h>

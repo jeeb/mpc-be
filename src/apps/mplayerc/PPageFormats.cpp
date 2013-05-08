@@ -24,6 +24,7 @@
 #include "stdafx.h"
 #include "PPageFormats.h"
 #include "../../DSUtil/WinAPIUtils.h"
+#include "../../DSUtil/SysVersion.h"
 #include <psapi.h>
 #include <string>
 #include <atlimage.h>

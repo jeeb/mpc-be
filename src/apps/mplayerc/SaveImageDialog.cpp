@@ -23,7 +23,7 @@
 
 #include "stdafx.h"
 #include "SaveImageDialog.h"
-#include "../../DSUtil/WinAPIUtils.h"
+#include "../../DSUtil/SysVersion.h"
 #include "DialogEventHandler.h"
 
 // CSaveImageDialog
