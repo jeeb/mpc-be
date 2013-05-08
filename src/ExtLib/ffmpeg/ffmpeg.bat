@@ -27,23 +27,15 @@ IF /I "%~1"=="-help"  GOTO SHOWHELP
 IF /I "%~1"=="--help" GOTO SHOWHELP
 IF /I "%~1"=="/?"     GOTO SHOWHELP
 
-IF "%~1" == "32" (
-  SET BIT=
-)
-IF "%~1" == "64" (
-  SET BIT=64BIT=yes
-)
-
-SET MINGW=%MINGW32%
-
-IF DEFINED MINGW GOTO VarOk
-ECHO ERROR: Please define MINGW (and/or MSYS) environment variable(s)
+IF DEFINED MINGW32 GOTO VarOk
+ECHO ERROR: Please define MINGW32 (and/or MSYS) environment variable(s)
 ENDLOCAL
 EXIT /B
 
 :VarOk
-SET PATH=%MSYS%\bin;%MINGW%\bin;%PATH%
+SET PATH=%MSYS%\bin;%MINGW32%\bin;%PATH%
 
+IF "%~1" == "64" SET "BIT=64BIT=yes"
 IF /I "%~3" == "Debug" SET "DEBUG=DEBUG=yes"
 
 IF "%~2" == "" (
@@ -98,7 +90,7 @@ ECHO Usage:   %~nx0 [32^|64] [Clean^|Build^|Rebuild] [Debug]
 ECHO.
 ECHO Notes:   The arguments are not case sensitive.
 ECHO. & ECHO.
-ECHO Executing "%~nx0" will use the defaults: "%~nx0 32"
+ECHO Executing "%~nx0" will use the defaults: "%~nx0"
 ECHO.
 ENDLOCAL
 EXIT /B
