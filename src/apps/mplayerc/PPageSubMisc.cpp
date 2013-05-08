@@ -32,8 +32,6 @@ CPPageSubMisc::CPPageSubMisc()
 	: CPPageBase(CPPageSubMisc::IDD, CPPageSubMisc::IDD)
 	, m_fPrioritizeExternalSubtitles(FALSE)
 	, m_fDisableInternalSubtitles(FALSE)
-	, m_szAutoloadPaths("")
-	, m_ISDb(_T(""))
 {
 
 }

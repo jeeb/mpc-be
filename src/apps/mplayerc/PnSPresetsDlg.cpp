@@ -30,7 +30,6 @@
 IMPLEMENT_DYNAMIC(CPnSPresetsDlg, CCmdUIDialog)
 CPnSPresetsDlg::CPnSPresetsDlg(CWnd* pParent /*=NULL*/)
 	: CCmdUIDialog(CPnSPresetsDlg::IDD, pParent)
-	, m_label(_T(""))
 {
 }
 

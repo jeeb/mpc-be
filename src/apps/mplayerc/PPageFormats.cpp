@@ -48,7 +48,6 @@ IMPLEMENT_DYNAMIC(CPPageFormats, CPPageBase)
 CPPageFormats::CPPageFormats()
 	: CPPageBase(CPPageFormats::IDD, CPPageFormats::IDD)
 	, m_list(0)
-	, m_exts(_T(""))
 	, m_iRtspHandler(0)
 	, m_fRtspFileExtFirst(FALSE)
 	, m_bInsufficientPrivileges(false)
@@ -183,14 +182,6 @@ bool CPPageFormats::IsRegistered(CString ext)
 	return !!bIsDefault;
 }
 
-int FileExists(const TCHAR *fileName)
-{
-	if (0xFFFFFFFF == ::GetFileAttributes(fileName)) {
-		return false;
-	}
-	return true;
-}
-
 typedef int (*GetIconIndexFunc)(LPCTSTR);
 int GetIconIndex(CString ext)
 {
@@ -318,12 +309,12 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, bool fAudioOnly, 
 		// first look for the icon
 		CString ext_icon = GetModulePath(false);
 		ext_icon.AppendFormat(_T("\\icons\\%s.ico"), CString(ext).TrimLeft(_T(".")));
-		if (FileExists(ext_icon)) {
+		if (::PathFileExists(ext_icon)) {
 			AppIcon.Format(_T("\"%s\",0"), ext_icon);
 		} else {
 			// then look for the iconlib
 			CString mpciconlib = GetModulePath(false) + _T("\\mpciconlib.dll");
-			if (FileExists(mpciconlib)) {
+			if (::PathFileExists(mpciconlib)) {
 				int icon_index = GetIconIndex(ext);
 				if (icon_index < 0) {
 					if (fAudioOnly) {

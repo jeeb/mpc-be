@@ -25,7 +25,7 @@
 
 // CPrevView
 
-CPreView::CPreView() : tooltipstr(_T(""))
+CPreView::CPreView()
 {
 }
 

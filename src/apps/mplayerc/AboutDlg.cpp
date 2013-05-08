@@ -22,11 +22,12 @@
 
 #include "stdafx.h"
 #include "AboutDlg.h"
+#include "../../DSUtil/WinAPIUtils.h"
 
 extern "C" char *GetFFmpegCompiler();
 extern "C" char *GetlibavcodecVersion();
 
-CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD), m_appname(_T(""))
+CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD)
 {
 	m_hIcon = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
 }
@@ -104,17 +105,13 @@ BOOL CAboutDlg::OnInitDialog()
 	m_FFmpegCompiler.Format(CA2CT(GetFFmpegCompiler()));
 	m_libavcodecVersion.Format(CA2CT(GetlibavcodecVersion()));
 
-	GetModuleFileName(AfxGetInstanceHandle(), m_AuthorsPath.GetBuffer(_MAX_PATH), _MAX_PATH);
-	m_AuthorsPath.ReleaseBuffer();
-	m_AuthorsPath = m_AuthorsPath.Left(m_AuthorsPath.ReverseFind('\\') + 1) + _T("Authors.txt");
+	m_AuthorsPath = GetModulePath(false) + _T("\\Authors.txt");
 
-	CFileStatus fs;
-
-	if (CFile::GetStatus(m_AuthorsPath, fs)) {
+	if (::PathFileExists(m_AuthorsPath)) {
 		m_Credits.Replace(_T("Authors.txt"), _T("<a>Authors.txt</a>"));
 	}
 
-	if ( m_hIcon != NULL ) {
+	if (m_hIcon != NULL) {
 		((CStatic*)GetDlgItem(IDC_MAINFRAME_ICON))->SetIcon(m_hIcon);
 	}
 

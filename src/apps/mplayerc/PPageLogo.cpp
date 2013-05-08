@@ -33,8 +33,6 @@ IMPLEMENT_DYNAMIC(CPPageLogo, CPPageBase)
 CPPageLogo::CPPageLogo()
 	: CPPageBase(CPPageLogo::IDD, CPPageLogo::IDD)
 	, m_intext(0)
-	, m_logofn(_T(""))
-	, m_author(_T(""))
 {
 	m_logoids.AddTail(IDF_LOGO0);
 	m_logoids.AddTail(IDF_LOGO1);

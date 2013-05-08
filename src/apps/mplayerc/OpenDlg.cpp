@@ -33,8 +33,6 @@
 
 COpenDlg::COpenDlg(CWnd* pParent /*=NULL*/)
 	: CResizableDialog(COpenDlg::IDD, pParent)
-	, m_path(_T(""))
-	, m_path2(_T(""))
 	, m_fMultipleFiles(false)
 	, m_fAppendPlaylist(FALSE)
 {
