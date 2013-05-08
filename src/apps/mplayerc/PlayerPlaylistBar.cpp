@@ -1108,7 +1108,7 @@ void CPlayerPlaylistBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 
 		CRect r;
 		GetClientRect(&r);
-		FillRect(pLVCD->nmcd.hdc, &r, CBrush(s.fDisableXPToolbars ? RGB(R, G, B) : GetSysColor(COLOR_BTNFACE)));
+		FillRect(pLVCD->nmcd.hdc, &r, CBrush(s.fDisableXPToolbars ? RGB(R, G, B) : RGB(255, 255, 255)));
 
 		*pResult = CDRF_NOTIFYPOSTPAINT | CDRF_NOTIFYITEMDRAW;
 
@@ -1168,7 +1168,7 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 		if (s.fDisableXPToolbars) {
 			ThemeRGB(30, 35, 40, R, G, B);
 		}
-		FillRect(pDC->m_hDC, rcItem, CBrush(s.fDisableXPToolbars ? RGB(R, G, B) : GetSysColor(COLOR_BTNFACE)));
+		FillRect(pDC->m_hDC, rcItem, CBrush(s.fDisableXPToolbars ? RGB(R, G, B) : RGB(255, 255, 255)));
 	}
 
 	COLORREF textcolor = fSelected ? 0xff : 0;
@@ -1177,6 +1177,7 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 		ThemeRGB(135, 140, 145, R, G, B);
 		textcolor = fSelected ? s.clrFaceABGR : RGB(R, G, B);
 	}
+
 	if (pli.m_fInvalid) {
 		textcolor |= 0xA0A0A0;
 	}
@@ -1453,7 +1454,7 @@ BOOL CPlayerPlaylistBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResul
 
 	*pResult = 0;
 
-	return TRUE;    // message was handled
+	return TRUE;
 }
 
 void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
