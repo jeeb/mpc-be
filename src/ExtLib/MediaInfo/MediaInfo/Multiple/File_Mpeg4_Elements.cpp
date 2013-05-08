@@ -54,6 +54,9 @@
 #if defined(MEDIAINFO_H263_YES)
     #include "MediaInfo/Video/File_H263.h"
 #endif
+#if defined(MEDIAINFO_HEVC_YES)
+    #include "MediaInfo/Video/File_Hevc.h"
+#endif
 #if defined(MEDIAINFO_MPEGV_YES)
     #include "MediaInfo/Video/File_Mpegv.h"
 #endif
@@ -687,6 +690,7 @@ namespace Elements
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_esds=0x65736473;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_fiel=0x6669656C;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_glbl=0x676C626C;
+    const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_hvcC=0x68766343;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_idfm=0x6964666D;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_idfm_atom=0x61746F6D;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_idfm_qtat=0x71746174;
@@ -1001,6 +1005,7 @@ void File_Mpeg4::Data_Parse()
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_esds)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_fiel)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_glbl)
+                                ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_hvcC)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_idfm)
                                 LIST(moov_trak_mdia_minf_stbl_stsd_xxxx_jp2h)
                                     ATOM_BEGIN
@@ -5086,6 +5091,46 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_glbl()
     //Parsing
     for (size_t Pos=0; Pos<Streams[moov_trak_tkhd_TrackID].Parsers.size(); Pos++)
         Open_Buffer_Continue(Streams[moov_trak_tkhd_TrackID].Parsers[Pos]);
+}
+
+//---------------------------------------------------------------------------
+void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_hvcC()
+{
+    Element_Name("HEVCDecoderConfigurationRecord");
+
+    //Parsing
+    int8u Version;
+    Get_B1 (Version,                                            "Version");
+    if (moov_trak_mdia_minf_stbl_stsd_Pos>1)
+    {
+        Skip_XX(Element_Size-Element_Offset,                    "Data not analyzed");
+        return; //Handling only the first description
+    }
+    else if (Version==1)
+    {
+        #ifdef MEDIAINFO_HEVC_YES
+            for (size_t Pos=0; Pos<Streams[moov_trak_tkhd_TrackID].Parsers.size(); Pos++) //Removing any previous parser (in case of multiple streams in one track, or dummy parser for demux)
+                delete Streams[moov_trak_tkhd_TrackID].Parsers[Pos];
+            Streams[moov_trak_tkhd_TrackID].Parsers.clear();
+
+            File_Hevc* Parser=new File_Hevc;
+            Parser->FrameIsAlwaysComplete=true;
+            Open_Buffer_Init(Parser);
+            Parser->MustParse_SPS_PPS=true;
+            Parser->MustSynchronize=false;
+            Streams[moov_trak_tkhd_TrackID].Parsers.push_back(Parser);
+            mdat_MustParse=true; //Data is in MDAT
+
+            //Parsing
+            Open_Buffer_Continue(Parser);
+
+            Parser->SizedBlocks=true;  //Now this is SizeBlocks
+        #else
+            Skip_XX(Element_Size,                               "HEVC Data");
+        #endif
+    }
+    else
+        Skip_XX(Element_Size,                                   "Data");
 }
 
 //---------------------------------------------------------------------------

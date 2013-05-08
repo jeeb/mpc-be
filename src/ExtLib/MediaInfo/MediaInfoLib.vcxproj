@@ -143,6 +143,7 @@
     <ClInclude Include="MediaInfo\Text\File_TimedText.h" />
     <ClInclude Include="MediaInfo\Text\File_Ttml.h" />
     <ClInclude Include="MediaInfo\Video\File_Aic.h" />
+    <ClInclude Include="MediaInfo\Video\File_Hevc.h" />
     <ClInclude Include="MediaInfo\Video\File_ProRes.h" />
     <ClInclude Include="ThirdParty\base64\base64.h" />
     <ClInclude Include="ThirdParty\md5\md5.h" />
@@ -452,6 +453,7 @@
     <ClCompile Include="MediaInfo\Video\File_Flic.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Fraps.cpp" />
     <ClCompile Include="MediaInfo\Video\File_H263.cpp" />
+    <ClCompile Include="MediaInfo\Video\File_Hevc.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Lagarith.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Mpeg4v.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Mpegv.cpp" />
