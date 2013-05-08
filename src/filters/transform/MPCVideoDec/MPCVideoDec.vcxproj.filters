@@ -33,7 +33,7 @@
     <ClCompile Include="ffImgfmt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MPCFfmpegDec.cpp">
+    <ClCompile Include="ffmpegDec.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MPCVideoDecFilter.cpp">
@@ -63,7 +63,7 @@
     <ClCompile Include="H264RandomAccess.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FfmpegContext.cpp">
+    <ClCompile Include="ffmpegContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\DSUtil\WinAPIUtils.cpp">
@@ -86,7 +86,7 @@
     <ClInclude Include="DXVADecoderVC1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FfmpegContext.h">
+    <ClInclude Include="ffmpegContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IMPCVideoDecFilter.h">
@@ -122,7 +122,7 @@
     <ClInclude Include="array_allocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\ExtLib\ffmpeg\PODtypes.h">
+    <ClInclude Include="..\..\..\DSUtil\PODtypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

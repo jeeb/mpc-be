@@ -263,12 +263,12 @@ update_version.bat</Command>
     <ClCompile Include="DXVADecoderMpeg2.cpp" />
     <ClCompile Include="DXVADecoderVC1.cpp" />
     <ClCompile Include="ffImgfmt.cpp" />
-    <ClCompile Include="FfmpegContext.cpp">
+    <ClCompile Include="ffmpegContext.cpp">
       <WarningLevel>Level1</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="H264RandomAccess.cpp" />
-    <ClCompile Include="MPCFfmpegDec.cpp">
+    <ClCompile Include="ffmpegDec.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="MPCVideoDecFilter.cpp" />
@@ -288,12 +288,12 @@ update_version.bat</Command>
     <ClInclude Include="DXVADecoderMpeg2.h" />
     <ClInclude Include="DXVADecoderVC1.h" />
     <ClInclude Include="ffImgfmt.h" />
-    <ClInclude Include="FfmpegContext.h" />
+    <ClInclude Include="ffmpegContext.h" />
     <ClInclude Include="H264RandomAccess.h" />
     <ClInclude Include="IMPCVideoDecFilter.h" />
     <ClInclude Include="MPCVideoDecFilter.h" />
     <ClInclude Include="MPCVideoDecSettingsWnd.h" />
-    <ClInclude Include="..\..\..\ExtLib\ffmpeg\PODtypes.h" />
+    <ClInclude Include="..\..\..\DSUtil\PODtypes.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>
