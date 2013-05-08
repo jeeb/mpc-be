@@ -28,6 +28,7 @@
 #include "pixdesc.h"
 
 #include "intreadwrite.h"
+#include "avstring.h"
 
 void av_read_image_line(uint16_t *dst,
                         const uint8_t *data[4], const int linesize[4],
@@ -1906,4 +1907,23 @@ void ff_check_pixfmt_descriptors(void){
             av_write_image_line(tmp, data, linesize, d, 0, 0, j, 2);
         }
     }
+}
+
+
+enum AVPixelFormat av_pix_fmt_swap_endianness(enum AVPixelFormat pix_fmt)
+{
+    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(pix_fmt);
+    char name[16];
+    int i;
+
+    if (!desc || strlen(desc->name) < 2)
+        return AV_PIX_FMT_NONE;
+    av_strlcpy(name, desc->name, sizeof(name));
+    i = strlen(name) - 2;
+    if (strcmp(name + i, "be") && strcmp(name + i, "le"))
+        return AV_PIX_FMT_NONE;
+
+    name[i] ^= 'b' ^ 'l';
+
+    return get_pix_fmt_internal(name);
 }

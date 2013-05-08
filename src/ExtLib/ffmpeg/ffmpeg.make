@@ -333,6 +333,7 @@ SRCS_C = \
 	libavcodec/x86/h264dsp_init.c \
 	libavcodec/x86/h264_qpel.c \
 	libavcodec/x86/hpeldsp_init.c \
+	libavcodec/x86/hpeldsp_mmx.c \
 	libavcodec/x86/idct_mmx_xvid.c \
 	libavcodec/x86/idct_sse2_xvid.c \
 	libavcodec/x86/mlpdsp.c \

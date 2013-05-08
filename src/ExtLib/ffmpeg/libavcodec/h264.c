@@ -1483,6 +1483,7 @@ av_cold int ff_h264_decode_init(AVCodecContext *avctx)
     ff_h264_pred_init(&h->hpc, h->avctx->codec_id, 8, 1);
 
     h->dequant_coeff_pps = -1;
+    h->current_sps_id = -1;
 
     /* needed so that IDCT permutation is known early */
     if (CONFIG_ERROR_RESILIENCE)
@@ -3398,7 +3399,10 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
                      || h->avctx->bits_per_raw_sample != h->sps.bit_depth_luma
                      || h->cur_chroma_format_idc != h->sps.chroma_format_idc));
                      // ==> Start patch MPC
-                     /*|| av_cmp_q(h->sps.sar, h->avctx->sample_aspect_ratio)))*/
+                     /*|| av_cmp_q(h->sps.sar, h->avctx->sample_aspect_ratio)
+                     || h->mb_width  != h->sps.mb_width
+                     || h->mb_height != h->sps.mb_height * (2 - h->sps.frame_mbs_only_flag)
+                    ));	*/
                      // ==> End patch MPC
     if (h0->avctx->pix_fmt != get_pixel_format(h0, 0))
         must_reinit = 1;
