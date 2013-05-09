@@ -14,7 +14,7 @@ Added (+):
 
 Changes (*):
 * ffmpeg git-fc37cd43;
-* libopus 1.0.1 git-c973a596;
+* libopus 1.0.1 git-c9f857ef;
 * Little-CMS git-61d73f83;
 * libwebp 0.3.0 git-8eae188a;
 * libopenjpeg 2.0.0 svn rev.2343;
