@@ -1132,6 +1132,9 @@
     <ClCompile Include="libavcodec\x86\hpeldsp_init.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
+    <ClCompile Include="libavcodec\x86\hpeldsp_mmx.c">
+      <Filter>libavcodec\x86</Filter>
+    </ClCompile>
     <ClCompile Include="libavcodec\x86\hpeldsp_rnd_template.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
@@ -1160,6 +1163,9 @@
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\proresdsp_init.c">
+      <Filter>libavcodec\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\x86\rnd_mmx.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\rnd_template.c">

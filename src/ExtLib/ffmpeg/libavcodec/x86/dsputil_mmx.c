@@ -30,31 +30,13 @@
 #include "libavcodec/mpegvideo.h"
 #include "libavcodec/simple_idct.h"
 #include "libavcodec/videodsp.h"
+#include "constants.h"
 #include "dsputil_mmx.h"
 #include "idct_xvid.h"
 #include "diracdsp_mmx.h"
 
 //#undef NDEBUG
 //#include <assert.h>
-
-/* pixel operations */
-DECLARE_ALIGNED(8,  const uint64_t, ff_pw_15)   =   0x000F000F000F000FULL;
-DECLARE_ALIGNED(16, const xmm_reg,  ff_pw_17)   = { 0x0011001100110011ULL, 0x0011001100110011ULL };
-DECLARE_ALIGNED(8,  const uint64_t, ff_pw_20)   =   0x0014001400140014ULL;
-DECLARE_ALIGNED(8,  const uint64_t, ff_pw_42)   =   0x002A002A002A002AULL;
-DECLARE_ALIGNED(8,  const uint64_t, ff_pw_53)   =   0x0035003500350035ULL;
-DECLARE_ALIGNED(8,  const uint64_t, ff_pw_96)   =   0x0060006000600060ULL;
-DECLARE_ALIGNED(8,  const uint64_t, ff_pw_128)  =   0x0080008000800080ULL;
-DECLARE_ALIGNED(8,  const uint64_t, ff_pw_255)  =   0x00ff00ff00ff00ffULL;
-DECLARE_ALIGNED(16, const xmm_reg,  ff_pw_512)  = { 0x0200020002000200ULL, 0x0200020002000200ULL };
-DECLARE_ALIGNED(16, const xmm_reg,  ff_pw_1019) = { 0x03FB03FB03FB03FBULL, 0x03FB03FB03FB03FBULL };
-
-DECLARE_ALIGNED(8,  const uint64_t, ff_pb_3F)   =   0x3F3F3F3F3F3F3F3FULL;
-DECLARE_ALIGNED(8,  const uint64_t, ff_pb_FC)   =   0xFCFCFCFCFCFCFCFCULL;
-
-DECLARE_ALIGNED(16, const double, ff_pd_1)[2] = { 1.0, 1.0 };
-DECLARE_ALIGNED(16, const double, ff_pd_2)[2] = { 2.0, 2.0 };
-
 
 void ff_put_pixels8_l2_mmxext(uint8_t *dst, uint8_t *src1, uint8_t *src2,
                               int dstStride, int src1Stride, int h);
@@ -100,23 +82,6 @@ void ff_put_no_rnd_mpeg4_qpel8_v_lowpass_mmxext(uint8_t *dst, uint8_t *src,
 
 
 #if HAVE_INLINE_ASM
-
-/***********************************/
-/* MMX rounding */
-
-#define DEF(x, y) x ## _ ## y ## _mmx
-#define SET_RND  MOVQ_WTWO
-#define PAVGBP(a, b, c, d, e, f)        PAVGBP_MMX(a, b, c, d, e, f)
-#define PAVGB(a, b, c, e)               PAVGB_MMX(a, b, c, e)
-#define OP_AVG(a, b, c, e)              PAVGB_MMX(a, b, c, e)
-
-#include "rnd_template.c"
-
-#undef DEF
-#undef SET_RND
-#undef PAVGBP
-#undef PAVGB
-#undef OP_AVG
 
 /***********************************/
 /* standard MMX */
@@ -510,7 +475,7 @@ static void ff_put_pixels16_mmxext(uint8_t *block, const uint8_t *pixels,
     ff_put_pixels8_mmxext(block + 8, pixels + 8, line_size, h);
 }
 
-#define QPEL_OP(OPNAME, ROUNDER, RND, MMX)                              \
+#define QPEL_OP(OPNAME, RND, MMX)                                       \
 static void OPNAME ## qpel8_mc00_ ## MMX (uint8_t *dst, uint8_t *src,   \
                                           ptrdiff_t stride)             \
 {                                                                       \
@@ -891,30 +856,13 @@ static void OPNAME ## qpel16_mc22_ ## MMX(uint8_t *dst, uint8_t *src,   \
                                                     stride, 16);        \
 }
 
-QPEL_OP(put_,          ff_pw_16, _,        mmxext)
-QPEL_OP(avg_,          ff_pw_16, _,        mmxext)
-QPEL_OP(put_no_rnd_,   ff_pw_15, _no_rnd_, mmxext)
+QPEL_OP(put_,        _,        mmxext)
+QPEL_OP(avg_,        _,        mmxext)
+QPEL_OP(put_no_rnd_, _no_rnd_, mmxext)
 #endif /* HAVE_YASM */
 
 
 #if HAVE_INLINE_ASM
-void ff_put_rv40_qpel8_mc33_mmx(uint8_t *dst, uint8_t *src, ptrdiff_t stride)
-{
-  put_pixels8_xy2_mmx(dst, src, stride, 8);
-}
-void ff_put_rv40_qpel16_mc33_mmx(uint8_t *dst, uint8_t *src, ptrdiff_t stride)
-{
-  put_pixels16_xy2_mmx(dst, src, stride, 16);
-}
-void ff_avg_rv40_qpel8_mc33_mmx(uint8_t *dst, uint8_t *src, ptrdiff_t stride)
-{
-  avg_pixels8_xy2_mmx(dst, src, stride, 8);
-}
-void ff_avg_rv40_qpel16_mc33_mmx(uint8_t *dst, uint8_t *src, ptrdiff_t stride)
-{
-  avg_pixels16_xy2_mmx(dst, src, stride, 16);
-}
-
 typedef void emulated_edge_mc_func(uint8_t *dst, const uint8_t *src,
                                    ptrdiff_t linesize, int block_w, int block_h,
                                    int src_x, int src_y, int w, int h);

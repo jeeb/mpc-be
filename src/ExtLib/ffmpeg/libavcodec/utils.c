@@ -203,6 +203,7 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
     case AV_PIX_FMT_YUV422P:
     case AV_PIX_FMT_YUV440P:
     case AV_PIX_FMT_YUV444P:
+    case AV_PIX_FMT_GBRAP:
     case AV_PIX_FMT_GBRP:
     case AV_PIX_FMT_GRAY8:
     case AV_PIX_FMT_GRAY16BE:
@@ -2092,13 +2093,6 @@ int attribute_align_arg avcodec_decode_audio4(AVCodecContext *avctx,
                 av_frame_set_channels(frame, avctx->channels);
             if (!frame->sample_rate)
                 frame->sample_rate = avctx->sample_rate;
-            if (!avctx->refcounted_frames) {
-                avci->to_free = *frame;
-                avci->to_free.extended_data = avci->to_free.data;
-                memset(frame->buf, 0, sizeof(frame->buf));
-                frame->extended_buf    = NULL;
-                frame->nb_extended_buf = 0;
-            }
         }
 
         side= av_packet_get_side_data(avctx->pkt, AV_PKT_DATA_SKIP_SAMPLES, &side_size);
@@ -2111,8 +2105,6 @@ int attribute_align_arg avcodec_decode_audio4(AVCodecContext *avctx,
             if(frame->nb_samples <= avctx->internal->skip_samples){
                 *got_frame_ptr = 0;
                 avctx->internal->skip_samples -= frame->nb_samples;
-                if (avctx->refcounted_frames)
-                    av_frame_unref(frame);
                 av_log(avctx, AV_LOG_DEBUG, "skip whole frame, skip left: %d\n",
                        avctx->internal->skip_samples);
             } else {
@@ -2145,7 +2137,15 @@ int attribute_align_arg avcodec_decode_audio4(AVCodecContext *avctx,
                 ret = avpkt->size;
         }
 
-        if (ret < 0 && frame->data[0])
+        if (ret >= 0 && *got_frame_ptr) {
+            if (!avctx->refcounted_frames) {
+                avci->to_free = *frame;
+                avci->to_free.extended_data = avci->to_free.data;
+                memset(frame->buf, 0, sizeof(frame->buf));
+                frame->extended_buf    = NULL;
+                frame->nb_extended_buf = 0;
+            }
+        } else if (frame->data[0])
             av_frame_unref(frame);
     }
 

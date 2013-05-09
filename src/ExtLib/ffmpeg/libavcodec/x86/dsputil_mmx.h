@@ -27,45 +27,7 @@
 
 #include "libavcodec/dsputil.h"
 #include "libavutil/x86/asm.h"
-
-extern const uint64_t ff_bone;
-extern const uint64_t ff_wtwo;
-
-extern const xmm_reg  ff_pw_3;
-extern const xmm_reg  ff_pw_4;
-extern const xmm_reg  ff_pw_5;
-extern const xmm_reg  ff_pw_8;
-extern const uint64_t ff_pw_15;
-extern const xmm_reg  ff_pw_16;
-extern const xmm_reg  ff_pw_18;
-extern const uint64_t ff_pw_20;
-extern const xmm_reg  ff_pw_32;
-extern const uint64_t ff_pw_42;
-extern const uint64_t ff_pw_53;
-extern const xmm_reg  ff_pw_64;
-extern const uint64_t ff_pw_96;
-extern const uint64_t ff_pw_128;
-extern const uint64_t ff_pw_255;
-
-extern const xmm_reg  ff_pb_1;
-extern const xmm_reg  ff_pb_3;
-extern const uint64_t ff_pb_3F;
-extern const xmm_reg  ff_pb_F8;
-extern const uint64_t ff_pb_FC;
-
-extern const double ff_pd_1[2];
-extern const double ff_pd_2[2];
-
-#define SBUTTERFLY(a,b,t,n,m)\
-    "mov" #m " " #a ", " #t "         \n\t" /* abcd */\
-    "punpckl" #n " " #b ", " #a "     \n\t" /* aebf */\
-    "punpckh" #n " " #b ", " #t "     \n\t" /* cgdh */\
-
-#define TRANSPOSE4(a,b,c,d,t)\
-    SBUTTERFLY(a,b,t,wd,q) /* a=aebf t=cgdh */\
-    SBUTTERFLY(c,d,b,wd,q) /* c=imjn b=kolp */\
-    SBUTTERFLY(a,c,d,dq,q) /* a=aeim d=bfjn */\
-    SBUTTERFLY(t,b,c,dq,q) /* t=cgko c=dhlp */
+#include "constants.h"
 
 #define MOVQ_WONE(regd) \
     __asm__ volatile ( \
@@ -81,17 +43,10 @@ extern const double ff_pd_2[2];
         "paddb   %%"#regd", %%"#regd"   \n\t" ::)
 
 #ifndef PIC
-#define MOVQ_BONE(regd) __asm__ volatile ("movq %0, %%"#regd" \n\t" :: "m"(ff_bone))
 #define MOVQ_WTWO(regd) __asm__ volatile ("movq %0, %%"#regd" \n\t" :: "m"(ff_wtwo))
 #else
 // for shared library it's better to use this way for accessing constants
 // pcmpeqd -> -1
-#define MOVQ_BONE(regd)                                 \
-    __asm__ volatile (                                  \
-        "pcmpeqd  %%"#regd", %%"#regd"  \n\t"           \
-        "psrlw          $15, %%"#regd"  \n\t"           \
-        "packuswb %%"#regd", %%"#regd"  \n\t" ::)
-
 #define MOVQ_WTWO(regd)                                 \
     __asm__ volatile (                                  \
         "pcmpeqd %%"#regd", %%"#regd"   \n\t"           \
@@ -176,14 +131,19 @@ void ff_put_pixels16_sse2(uint8_t *block, const uint8_t *pixels,
 void ff_avg_pixels8_x2_mmx(uint8_t *block, const uint8_t *pixels,
                            ptrdiff_t line_size, int h);
 
-void ff_put_rv40_qpel8_mc33_mmx(uint8_t *block, uint8_t *pixels, ptrdiff_t stride);
-void ff_put_rv40_qpel16_mc33_mmx(uint8_t *block, uint8_t *pixels, ptrdiff_t stride);
-void ff_avg_rv40_qpel8_mc33_mmx(uint8_t *block, uint8_t *pixels, ptrdiff_t stride);
-void ff_avg_rv40_qpel16_mc33_mmx(uint8_t *block, uint8_t *pixels, ptrdiff_t stride);
+void ff_avg_pixels8_xy2_mmx(uint8_t *block, const uint8_t *pixels,
+                            ptrdiff_t line_size, int h);
+void ff_avg_pixels16_xy2_mmx(uint8_t *block, const uint8_t *pixels,
+                             ptrdiff_t line_size, int h);
+
+void ff_put_pixels8_xy2_mmx(uint8_t *block, const uint8_t *pixels,
+                            ptrdiff_t line_size, int h);
+void ff_put_pixels16_xy2_mmx(uint8_t *block, const uint8_t *pixels,
+                             ptrdiff_t line_size, int h);
+
 
 void ff_mmx_idct(int16_t *block);
 void ff_mmxext_idct(int16_t *block);
-
 
 void ff_deinterlace_line_mmx(uint8_t *dst,
                              const uint8_t *lum_m4, const uint8_t *lum_m3,

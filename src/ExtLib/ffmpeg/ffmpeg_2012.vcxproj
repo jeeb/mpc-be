@@ -660,6 +660,7 @@
     <ClCompile Include="libavcodec\x86\h264_qpel.c" />
     <ClCompile Include="libavcodec\x86\hpeldsp_avg_template.c" />
     <ClCompile Include="libavcodec\x86\hpeldsp_init.c" />
+    <ClCompile Include="libavcodec\x86\hpeldsp_mmx.c" />
     <ClCompile Include="libavcodec\x86\hpeldsp_rnd_template.c" />
     <ClCompile Include="libavcodec\x86\idct_mmx_xvid.c" />
     <ClCompile Include="libavcodec\x86\idct_sse2_xvid.c" />
@@ -670,6 +671,7 @@
     <ClCompile Include="libavcodec\x86\mpegvideoenc_template.c" />
     <ClCompile Include="libavcodec\x86\pngdsp_init.c" />
     <ClCompile Include="libavcodec\x86\proresdsp_init.c" />
+    <ClCompile Include="libavcodec\x86\rnd_mmx.c" />
     <ClCompile Include="libavcodec\x86\rnd_template.c" />
     <ClCompile Include="libavcodec\x86\rv34dsp_init.c" />
     <ClCompile Include="libavcodec\x86\rv40dsp_init.c" />

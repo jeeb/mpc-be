@@ -24,8 +24,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <stddef.h>
+#include <stdint.h>
+
 // put_pixels
-static void DEF(put, pixels8_xy2)(uint8_t *block, const uint8_t *pixels, ptrdiff_t line_size, int h)
+STATIC void DEF(put, pixels8_xy2)(uint8_t *block, const uint8_t *pixels,
+                                  ptrdiff_t line_size, int h)
 {
     MOVQ_ZERO(mm7);
     SET_RND(mm6); // =2 for rnd  and  =1 for no_rnd version
@@ -93,7 +97,8 @@ static void DEF(put, pixels8_xy2)(uint8_t *block, const uint8_t *pixels, ptrdiff
 
 // avg_pixels
 // this routine is 'slightly' suboptimal but mostly unused
-static void DEF(avg, pixels8_xy2)(uint8_t *block, const uint8_t *pixels, ptrdiff_t line_size, int h)
+STATIC void DEF(avg, pixels8_xy2)(uint8_t *block, const uint8_t *pixels,
+                                  ptrdiff_t line_size, int h)
 {
     MOVQ_ZERO(mm7);
     SET_RND(mm6); // =2 for rnd  and  =1 for no_rnd version
@@ -132,7 +137,7 @@ static void DEF(avg, pixels8_xy2)(uint8_t *block, const uint8_t *pixels, ptrdiff
         "packuswb  %%mm5, %%mm4         \n\t"
                 "pcmpeqd %%mm2, %%mm2   \n\t"
                 "paddb %%mm2, %%mm2     \n\t"
-                OP_AVG(%%mm3, %%mm4, %%mm5, %%mm2)
+                PAVGB_MMX(%%mm3, %%mm4, %%mm5, %%mm2)
                 "movq   %%mm5, (%2, %%"REG_a")  \n\t"
         "add    %3, %%"REG_a"                \n\t"
 
@@ -156,7 +161,7 @@ static void DEF(avg, pixels8_xy2)(uint8_t *block, const uint8_t *pixels, ptrdiff
         "packuswb  %%mm1, %%mm0         \n\t"
                 "pcmpeqd %%mm2, %%mm2   \n\t"
                 "paddb %%mm2, %%mm2     \n\t"
-                OP_AVG(%%mm3, %%mm0, %%mm1, %%mm2)
+                PAVGB_MMX(%%mm3, %%mm0, %%mm1, %%mm2)
                 "movq   %%mm1, (%2, %%"REG_a")  \n\t"
         "add    %3, %%"REG_a"           \n\t"
 
@@ -168,12 +173,16 @@ static void DEF(avg, pixels8_xy2)(uint8_t *block, const uint8_t *pixels, ptrdiff
 }
 
 //FIXME optimize
-static void DEF(put, pixels16_xy2)(uint8_t *block, const uint8_t *pixels, ptrdiff_t line_size, int h){
+STATIC void DEF(put, pixels16_xy2)(uint8_t *block, const uint8_t *pixels,
+                                   ptrdiff_t line_size, int h)
+{
     DEF(put, pixels8_xy2)(block  , pixels  , line_size, h);
     DEF(put, pixels8_xy2)(block+8, pixels+8, line_size, h);
 }
 
-static void DEF(avg, pixels16_xy2)(uint8_t *block, const uint8_t *pixels, ptrdiff_t line_size, int h){
+STATIC void DEF(avg, pixels16_xy2)(uint8_t *block, const uint8_t *pixels,
+                                   ptrdiff_t line_size, int h)
+{
     DEF(avg, pixels8_xy2)(block  , pixels  , line_size, h);
     DEF(avg, pixels8_xy2)(block+8, pixels+8, line_size, h);
 }

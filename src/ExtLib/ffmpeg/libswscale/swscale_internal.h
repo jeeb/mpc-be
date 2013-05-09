@@ -504,12 +504,13 @@ typedef struct SwsContext {
 
     /**
      * Functions to read planar input, such as planar RGB, and convert
-     * internally to Y/UV.
+     * internally to Y/UV/A.
      */
     /** @{ */
     void (*readLumPlanar)(uint8_t *dst, const uint8_t *src[4], int width, int32_t *rgb2yuv);
     void (*readChrPlanar)(uint8_t *dstU, uint8_t *dstV, const uint8_t *src[4],
                           int width, int32_t *rgb2yuv);
+    void (*readAlpPlanar)(uint8_t *dst, const uint8_t *src[4], int width, int32_t *rgb2yuv);
     /** @} */
 
     /**
@@ -734,16 +735,7 @@ static av_always_inline int isRGB(enum AVPixelFormat pix_fmt)
     (           \
           isRGBinInt(x)       ||    \
           isBGRinInt(x)       ||    \
-          isRGB(x)            ||    \
-          (x)==AV_PIX_FMT_GBRP9LE  || \
-          (x)==AV_PIX_FMT_GBRP9BE  || \
-          (x)==AV_PIX_FMT_GBRP10LE || \
-          (x)==AV_PIX_FMT_GBRP10BE || \
-          (x)==AV_PIX_FMT_GBRP12LE || \
-          (x)==AV_PIX_FMT_GBRP12BE || \
-          (x)==AV_PIX_FMT_GBRP14LE || \
-          (x)==AV_PIX_FMT_GBRP14BE || \
-          (x)==AV_PIX_FMT_GBR24P     \
+          isRGB(x)      \
     )
 
 static av_always_inline int isALPHA(enum AVPixelFormat pix_fmt)
