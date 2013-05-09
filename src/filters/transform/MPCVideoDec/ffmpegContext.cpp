@@ -28,7 +28,7 @@
 #include <sys/timeb.h>
 #include <time.h> // for the _time64 workaround
 #include "../../../DSUtil/SysVersion.h"
-#include "FfmpegContext.h"
+#include "ffmpegContext.h"
 
 extern unsigned __int64 GetFileVersion(LPCTSTR fn);	// requires linking with DSUtils which is always the case
 
