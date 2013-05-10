@@ -520,16 +520,19 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 
 void CMPlayerCApp::ExportSettings()
 {
-	CString ext = IsIniValid() ? _T(".ini") : _T(".reg");
+	CString ext = IsIniValid() ? _T("ini") : _T("reg");
 	CString ext_list;
-	ext_list.Format(_T("Export files (*%ws)|*%ws|"), ext, ext);
+	ext_list.Format(_T("Export files (*.%ws)|*.%ws|"), ext, ext);
 
-	CFileDialog fileSaveDialog(FALSE, 0, _T("mpc-be-settings") + ext,
+	CFileDialog fileSaveDialog(FALSE, 0, _T("mpc-be-settings.") + ext,
 							   OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_PATHMUSTEXIST|OFN_NOCHANGEDIR,
 							   ext_list);
 
 	if (fileSaveDialog.DoModal() == IDOK) {
 		CString savePath = fileSaveDialog.GetPathName();
+		if (ext.CompareNoCase(fileSaveDialog.GetFileExt()) != 0) {
+			savePath.Append(_T(".") + ext);
+		}
 		bool success;
 
 		AfxGetAppSettings().SaveSettings();
