@@ -90,6 +90,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (TSCC, tscc);
     REGISTER_DECODER (TSCC2, tscc2);
     REGISTER_DECODER (VC1, vc1);
+    REGISTER_DECODER (VMNC, vmnc);
     REGISTER_DECODER (VP3, vp3);
     REGISTER_DECODER (VP5, vp5);
     REGISTER_DECODER (VP6, vp6);

@@ -235,6 +235,8 @@ FFMPEG_CODECS		ffCodecs[] = {
 	{ &MEDIASUBTYPE_TSCC, AV_CODEC_ID_TSCC,		   NULL, FFM_SCREC, -1 },
 	// TSCC2
 	{ &MEDIASUBTYPE_TSCC2, AV_CODEC_ID_TSCC2,	   NULL, FFM_SCREC, -1 },
+	// VMnc
+	{ &MEDIASUBTYPE_VMnc, AV_CODEC_ID_VMNC,		   NULL, FFM_SCREC, -1 },
 	// QTRLE
 	{ &MEDIASUBTYPE_QTRle, AV_CODEC_ID_QTRLE,	   NULL, FFM_SCREC, -1 },
 	// CINEPAK
@@ -497,6 +499,9 @@ const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesIn[] = {
 
 	// TSCC2
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_TSCC2 },
+
+	// VMnc
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_VMnc },
 
 	// QTRLE
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_QTRle },
@@ -1073,14 +1078,15 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, bool bForced)
 				case AV_CODEC_ID_INDEO5 :
 					bCodecActivated = (m_nActiveCodecs & MPCVD_INDEO) != 0;
 					break;
-				case AV_CODEC_ID_UTVIDEO  :
+				case AV_CODEC_ID_UTVIDEO :
 					bCodecActivated = (m_nActiveCodecs & MPCVD_UTVD) != 0;
 					break;
-				case AV_CODEC_ID_CSCD     :
-				case AV_CODEC_ID_QTRLE    :
-				case AV_CODEC_ID_TSCC     :
-				case AV_CODEC_ID_TSCC2	  :
-				case AV_CODEC_ID_CINEPAK  :
+				case AV_CODEC_ID_CSCD    :
+				case AV_CODEC_ID_QTRLE   :
+				case AV_CODEC_ID_TSCC    :
+				case AV_CODEC_ID_TSCC2   :
+				case AV_CODEC_ID_VMNC    :
+				case AV_CODEC_ID_CINEPAK :
 					bCodecActivated = (m_nActiveCodecs & MPCVD_SCREC) != 0;
 					break;
 				case AV_CODEC_ID_RV10 :

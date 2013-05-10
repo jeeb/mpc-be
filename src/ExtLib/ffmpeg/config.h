@@ -548,6 +548,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_VC1_DECODER 1
 #define CONFIG_VC1IMAGE_DECODER 0
 #define CONFIG_VCR1_DECODER 0
+#define CONFIG_VMNC_DECODER 1
 #define CONFIG_VP3_DECODER 1
 #define CONFIG_VP5_DECODER 1
 #define CONFIG_VP6_DECODER 1
