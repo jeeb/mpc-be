@@ -66,6 +66,7 @@ bool CAviSplitterSettingsWnd::OnActivate()
 		m_cbBadInterleavedSuport.SetCheck(m_pMSF->GetBadInterleavedSuport());
 		m_cbSetReindex.SetCheck(m_pMSF->GetReindex());
 	}
+	m_cbBadInterleavedSuport.EnableWindow(FALSE);
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
 		pWnd->SetFont(&m_font, FALSE);
