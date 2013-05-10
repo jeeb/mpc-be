@@ -603,7 +603,7 @@ bool CAviSplitterFilter::DemuxLoop()
 				if (expectedsize != s->GetChunkSize(size)) {
 					fDiscontinuity[curTrack] = true;
 					//ASSERT(0);
-					break; // Why so, why break ??? If anyone knows - please describe ...
+					//break; // Why so, why break ??? If anyone knows - please describe ...
 				}
 			} else {
 				size = s->cs[f].orgsize;
