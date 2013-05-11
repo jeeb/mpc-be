@@ -139,7 +139,7 @@ BOOL CPPageFullscreen::OnInitDialog()
 	m_MonitorDeviceName.Add(_T("Current"));
 	curmonitor = monitors.GetNearestMonitor(AfxGetApp()->m_pMainWnd);
 	curmonitor.GetName(strCurMon);
-	if(m_f_hmonitor == _T("")) {
+	if(m_f_hmonitor.IsEmpty()) {
 		m_f_hmonitor = _T("Current");
 		m_iMonitorType = 0;
  	}

@@ -28,7 +28,7 @@ BOOL IsCompositionEnabled();
 
 bool SetPrivilege(LPCTSTR privilege, bool bEnable=true);
 
-bool ExportRegistryKey(CStdioFile& file, HKEY hKeyRoot, CString keyName=_T(""));
+bool ExportRegistryKey(CStdioFile& file, HKEY hKeyRoot, CString keyName = _T(""));
 
 UINT GetAdapter(IDirect3D9* pD3D, HWND hWnd);
 

@@ -12594,7 +12594,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		}
 
 		if (fFirst) {
-			pOFD->title = (m_strTitleAlt == _T("") ? fn : m_strTitleAlt);
+			pOFD->title = (m_strTitleAlt.IsEmpty() ? fn : m_strTitleAlt);
 		}
 
 		fFirst = false;
@@ -14221,7 +14221,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			mi_fn = pDVDData->path;
 			CPath path(mi_fn);
 			CString ext = path.GetExtension();
-			if (ext == _T("")) {
+			if (ext.IsEmpty()) {
 				if (mi_fn.Right(10) == _T("\\VIDEO_TS\\")) {
 					mi_fn = mi_fn + _T("VTS_01_1.VOB");
 				} else {
@@ -14270,7 +14270,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 		if (MI.Open(mi_fn.GetString())) {
 			CString strFPS =  MI.Get(Stream_Video, 0, _T("FrameRate"), Info_Text, Info_Name).c_str();
-			if (strFPS == _T("") || wcstod(strFPS, NULL) > 200.0) {
+			if (strFPS.IsEmpty() || wcstod(strFPS, NULL) > 200.0) {
 				strFPS =  MI.Get(Stream_Video, 0, _T("FrameRate_Original"), Info_Text, Info_Name).c_str();
 			}
 			CString strST = MI.Get(Stream_Video, 0, _T("ScanType"), Info_Text, Info_Name).c_str();

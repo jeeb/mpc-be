@@ -1582,7 +1582,7 @@ void GetCurDispMode(dispmode& dm, CString& DisplayName)
 {
 	HDC hDC;
 	CString DisplayName1 = DisplayName;
-	if ((DisplayName == _T("Current")) || (DisplayName == _T(""))) {
+	if (DisplayName == _T("Current") || DisplayName.IsEmpty()) {
 		CMonitor monitor;
 		CMonitors monitors;
 		monitor = monitors.GetNearestMonitor(AfxGetApp()->m_pMainWnd);
@@ -1603,7 +1603,7 @@ bool GetDispMode(int i, dispmode& dm, CString& DisplayName)
 	DEVMODE devmode;
 	CString DisplayName1 = DisplayName;
 	devmode.dmSize = sizeof(DEVMODE);
-	if ((DisplayName == _T("Current")) || (DisplayName == _T(""))) {
+	if (DisplayName == _T("Current") || DisplayName.IsEmpty()) {
 		CMonitor monitor;
 		CMonitors monitors;
 		monitor = monitors.GetNearestMonitor(AfxGetApp()->m_pMainWnd);
@@ -1642,7 +1642,7 @@ void SetDispMode(dispmode& dm, CString& DisplayName)
 	dmScreenSettings.dmDisplayFlags = dm.dmDisplayFlags;
 	dmScreenSettings.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL | DM_DISPLAYFREQUENCY  | DM_DISPLAYFLAGS;
 	CString DisplayName1 = DisplayName;
-	if ((DisplayName == _T("Current")) || (DisplayName == _T(""))) {
+	if (DisplayName == _T("Current") || DisplayName.IsEmpty()) {
 		CMonitor monitor;
 		CMonitors monitors;
 		monitor = monitors.GetNearestMonitor(AfxGetApp()->m_pMainWnd);
@@ -1919,7 +1919,7 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 				}
 			}
 
-			if (ct == _T("") || ct == _T("application/octet-stream")) {
+			if (ct.IsEmpty() || ct == _T("application/octet-stream")) {
 				CPath p(fn);
 				CString ext = p.GetExtension().MakeLower();
 				if (ext == _T(".asx")) {

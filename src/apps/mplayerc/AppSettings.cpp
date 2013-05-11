@@ -1044,7 +1044,7 @@ void CAppSettings::LoadSettings()
 	{
 		CString temp = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SPLOGFONT, _T(""));
 		subdefstyle <<= temp;
-		if (temp == _T("")) {
+		if (temp.IsEmpty()) {
 			subdefstyle.relativeTo = 1;    //default "Position subtitles relative to the video frame" option is checked
 		}
 	}
