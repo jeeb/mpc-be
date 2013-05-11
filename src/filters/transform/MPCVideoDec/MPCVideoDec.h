@@ -27,7 +27,7 @@
 #include <dxva.h>
 #include <dxva2api.h>	// DXVA2
 #include "../BaseVideoFilter/BaseVideoFilter.h"
-#include "IMPCVideoDecFilter.h"
+#include "IMPCVideoDec.h"
 #include "MPCVideoDecSettingsWnd.h"
 #include "DXVADecoder.h"
 #include "H264RandomAccess.h"

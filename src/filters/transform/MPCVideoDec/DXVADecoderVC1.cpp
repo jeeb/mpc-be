@@ -22,7 +22,7 @@
 
 #include "stdafx.h"
 #include "DXVADecoderVC1.h"
-#include "MPCVideoDecFilter.h"
+#include "MPCVideoDec.h"
 #include "FfmpegContext.h"
 #include <ffmpeg/libavcodec/avcodec.h>
 

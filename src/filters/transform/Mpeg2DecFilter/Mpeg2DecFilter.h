@@ -28,7 +28,7 @@
 #include "../DeCSSFilter/DeCSSInputPin.h"
 #include "../BaseVideoFilter/BaseVideoFilter.h"
 #include "IMpeg2DecFilter.h"
-#include "Mpeg2DecSettingsWnd.h"
+#include "Mpeg2DecFilterSettingsWnd.h"
 
 #ifdef MPEG2ONLY
 #define Mpeg2DecFilterName L"MPC MPEG-2 Video Decoder"

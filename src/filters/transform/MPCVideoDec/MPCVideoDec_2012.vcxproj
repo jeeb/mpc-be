@@ -284,7 +284,7 @@ update_version.bat</Command>
     <ClCompile Include="ffmpegDec.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="MPCVideoDecFilter.cpp" />
+    <ClCompile Include="MPCVideoDec.cpp" />
     <ClCompile Include="MPCVideoDecSettingsWnd.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -303,8 +303,8 @@ update_version.bat</Command>
     <ClInclude Include="ffImgfmt.h" />
     <ClInclude Include="ffmpegContext.h" />
     <ClInclude Include="H264RandomAccess.h" />
-    <ClInclude Include="IMPCVideoDecFilter.h" />
-    <ClInclude Include="MPCVideoDecFilter.h" />
+    <ClInclude Include="IMPCVideoDec.h" />
+    <ClInclude Include="MPCVideoDec.h" />
     <ClInclude Include="MPCVideoDecSettingsWnd.h" />
     <ClInclude Include="..\..\..\DSUtil\PODtypes.h" />
     <ClInclude Include="resource.h">
@@ -315,7 +315,7 @@ update_version.bat</Command>
     <ClInclude Include="VideoDecOutputPin.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="MPCVideoDecFilter.rc">
+    <ResourceCompile Include="MPCVideoDec.rc">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ResourceCompile>
   </ItemGroup>

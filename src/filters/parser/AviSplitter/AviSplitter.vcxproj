@@ -223,7 +223,7 @@
     <ClInclude Include="AviFile.h" />
     <ClInclude Include="AviSplitter.h" />
     <ClInclude Include="AviSplitterSettingsWnd.h" />
-    <ClInclude Include="IAviSplitterFilter.h" />
+    <ClInclude Include="IAviSplitter.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>

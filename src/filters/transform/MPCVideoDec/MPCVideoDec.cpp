@@ -31,7 +31,7 @@
 	#include <InitGuid.h>
 #endif
 
-#include "MPCVideoDecFilter.h"
+#include "MPCVideoDec.h"
 #include "VideoDecOutputPin.h"
 #include "CpuId.h"
 

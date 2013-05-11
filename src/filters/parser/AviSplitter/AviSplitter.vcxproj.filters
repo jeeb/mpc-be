@@ -58,7 +58,7 @@
     <ClInclude Include="AviSplitterSettingsWnd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IAviSplitterFilter.h">
+    <ClInclude Include="IAviSplitter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -34,7 +34,7 @@
 
 #include "../DeCSSFilter/DeCSSInputPin.h"
 #include "IMpaDecFilter.h"
-#include "MpaDecSettingsWnd.h"
+#include "MpaDecFilterSettingsWnd.h"
 #include "Mixer.h"
 #include "PaddedArray.h"
 #include "FFAudioDecoder.h"

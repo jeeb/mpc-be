@@ -26,7 +26,7 @@
 #include "DXVADecoderH264.h"
 #include "DXVADecoderVC1.h"
 #include "DXVADecoderMpeg2.h"
-#include "MPCVideoDecFilter.h"
+#include "MPCVideoDec.h"
 #include "VideoDecDXVAAllocator.h"
 #include "FfmpegContext.h"
 

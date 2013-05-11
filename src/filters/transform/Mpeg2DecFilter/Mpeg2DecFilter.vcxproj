@@ -223,7 +223,7 @@
     <ClCompile Include="libmpeg2.cpp" />
     <ClCompile Include="mc_sse2.cpp" />
     <ClCompile Include="Mpeg2DecFilter.cpp" />
-    <ClCompile Include="Mpeg2DecSettingsWnd.cpp" />
+    <ClCompile Include="Mpeg2DecFilterSettingsWnd.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -234,7 +234,7 @@
     <ClInclude Include="IMpeg2DecFilter.h" />
     <ClInclude Include="libmpeg2.h" />
     <ClInclude Include="Mpeg2DecFilter.h" />
-    <ClInclude Include="Mpeg2DecSettingsWnd.h" />
+    <ClInclude Include="Mpeg2DecFilterSettingsWnd.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>

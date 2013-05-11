@@ -36,7 +36,7 @@
     <ClCompile Include="ffmpegDec.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MPCVideoDecFilter.cpp">
+    <ClCompile Include="MPCVideoDec.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MPCVideoDecSettingsWnd.cpp">
@@ -89,10 +89,10 @@
     <ClInclude Include="ffmpegContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IMPCVideoDecFilter.h">
+    <ClInclude Include="IMPCVideoDec.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MPCVideoDecFilter.h">
+    <ClInclude Include="MPCVideoDec.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MPCVideoDecSettingsWnd.h">
@@ -127,7 +127,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="MPCVideoDecFilter.rc">
+    <ResourceCompile Include="MPCVideoDec.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

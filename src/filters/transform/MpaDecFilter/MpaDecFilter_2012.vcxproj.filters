@@ -18,7 +18,7 @@
     <ClCompile Include="MpaDecFilter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MpaDecSettingsWnd.cpp">
+    <ClCompile Include="MpaDecFilterSettingsWnd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
@@ -47,7 +47,7 @@
     <ClInclude Include="MpaDecFilter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MpaDecSettingsWnd.h">
+    <ClInclude Include="MpaDecFilterSettingsWnd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">

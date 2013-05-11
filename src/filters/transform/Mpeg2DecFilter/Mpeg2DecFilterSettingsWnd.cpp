@@ -22,7 +22,7 @@
  */
 
 #include "stdafx.h"
-#include "Mpeg2DecSettingsWnd.h"
+#include "Mpeg2DecFilterSettingsWnd.h"
 #include "../../../DSUtil/DSUtil.h"
 
 //

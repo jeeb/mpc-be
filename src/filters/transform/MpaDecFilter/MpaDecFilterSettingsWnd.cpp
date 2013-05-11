@@ -22,7 +22,7 @@
  */
 
 #include "stdafx.h"
-#include "MpaDecSettingsWnd.h"
+#include "MpaDecFilterSettingsWnd.h"
 #include "../../../DSUtil/DSUtil.h"
 
 //

@@ -23,7 +23,7 @@
 #pragma once
 
 #include "../../core/InternalPropertyPage.h"
-#include "IAviSplitterFilter.h"
+#include "IAviSplitter.h"
 #include "resource.h"
 #include <afxcmn.h>
 
