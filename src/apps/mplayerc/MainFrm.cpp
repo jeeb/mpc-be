@@ -853,7 +853,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		int			curPos= 0;
 
 		strRes = strList.Tokenize (_T("|"), curPos);
-		while (strRes != _T("")) {
+		while (strRes.GetLength() > 0) {
 			m_shaderlabels.AddTail (strRes);
 			strRes = strList.Tokenize(_T("|"),curPos);
 		}
@@ -864,7 +864,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		int			curPos= 0;
 
 		strRes = strList.Tokenize (_T("|"), curPos);
-		while (strRes != _T("")) {
+		while (strRes.GetLength() > 0) {
 			m_shaderlabelsScreenSpace.AddTail (strRes);
 			strRes = strList.Tokenize(_T("|"),curPos);
 		}
@@ -2293,13 +2293,13 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 
 					if (m_bOSDLocalTime) str_temp = GetSystemLocalTime();
 
-					if (m_bRemainingTime) str_temp != _T("") ? str_temp +=  _T("\n") + m_wndStatusBar.GetStatusTimer() : str_temp = m_wndStatusBar.GetStatusTimer();
+					if (m_bRemainingTime) str_temp.GetLength() > 0 ? str_temp +=  _T("\n") + m_wndStatusBar.GetStatusTimer() : str_temp = m_wndStatusBar.GetStatusTimer();
 
-					if (m_bOSDFileName) str_temp != _T("") ? str_temp +=  _T("\n") + m_strFn : str_temp = m_strFn;
+					if (m_bOSDFileName) str_temp.GetLength() > 0 ? str_temp +=  _T("\n") + m_strFn : str_temp = m_strFn;
 
 					if (bmadvr) str_temp.Replace(_T("\n"), _T(" / ")); // MadVR only singleline
 
-					if (str_temp != _T("")) {
+					if (str_temp.GetLength() > 0) {
 						m_OSD.DisplayMessage(OSD_TOPLEFT, str_temp);
 					}
 				}
@@ -8159,7 +8159,7 @@ void CMainFrame::OnPlayPlay()
 						strOSD.Delete(i, strOSD.GetLength()-i);
 					}
 					strOSD += _T(" BD");
-				} else if (strOSD != _T("")) {
+				} else if (strOSD.GetLength() > 0) {
 					strOSD.TrimRight('/');
 					strOSD.Replace('\\', '/');
 					strOSD = strOSD.Mid(strOSD.ReverseFind('/')+1);

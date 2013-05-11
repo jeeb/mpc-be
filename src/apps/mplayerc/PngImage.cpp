@@ -277,7 +277,7 @@ HBITMAP MPCPngImage::LoadExternalImage(CString fn, int resid, int type, int br, 
 	int width, height, bpp;
 
 	FILE* fp = NULL;
-	if (fn != _T("")) {
+	if (fn.GetLength() > 0) {
 		_tfopen_s(&fp, path + fn + _T(".png"), _T("rb"));
 	}
 	if (fp) {
@@ -288,7 +288,7 @@ HBITMAP MPCPngImage::LoadExternalImage(CString fn, int resid, int type, int br, 
 		//	return OpenImage(path + fn + _T(".png"));
 		//}
 	} else {
-		if (fn != _T("")) {
+		if (fn.GetLength() > 0) {
 			_tfopen_s(&fp, path + fn + _T(".bmp"), _T("rb"));
 		}
 		if (fp) {

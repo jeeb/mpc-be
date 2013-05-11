@@ -2538,7 +2538,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 			pFGF = DNew CFGFilterInternal<CMpcAudioRenderer>(AUDRNDT_MPC, /*MERIT64_ABOVE_DSHOW+2*/m_armerit);
 			pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
 			m_transform.AddTail(pFGF);
-		} else if (SelAudioRenderer!="") {
+		} else if (SelAudioRenderer.GetLength() > 0) {
 			pFGF = DNew CFGFilterRegistry(SelAudioRenderer, m_armerit);
 			pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
 			m_transform.AddTail(pFGF);

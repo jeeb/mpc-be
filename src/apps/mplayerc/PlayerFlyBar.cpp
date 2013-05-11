@@ -284,7 +284,7 @@ void CFlyBar::UpdateWnd(CPoint point)
 		}
 		bt_idx = 6;
 	} else {
-		if (str != _T("")) {
+		if (str.GetLength() > 0) {
 			m_tooltip.UpdateTipText(_T(""), this);
 		}
 		SetCursor(LoadCursor(NULL, IDC_ARROW));

@@ -355,8 +355,8 @@ bool CAppSettings::IsD3DFullscreen() const
 
 CString CAppSettings::SelectedAudioRenderer() const
 {
-	CString	strResult;
-	if (AfxGetMyApp()->m_AudioRendererDisplayName_CL != _T("")) {
+	CString strResult;
+	if (AfxGetMyApp()->m_AudioRendererDisplayName_CL.GetLength() > 0) {
 		strResult = AfxGetMyApp()->m_AudioRendererDisplayName_CL;
 	} else {
 		strResult = AfxGetAppSettings().strAudioRendererDisplayName;
