@@ -71,9 +71,9 @@
 
 extern HANDLE (__stdcall * Real_CreateFileW)(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile);
 
-unsigned __int32 get4bytes (const BYTE* buf)
+uint32_t get4bytes (const BYTE* buf)
 {
-	return be2me_32 (*((unsigned __int32 *)buf));
+	return be2me_32 (*((uint32_t*)buf));
 }
 
 // VMG files

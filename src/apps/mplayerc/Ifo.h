@@ -23,11 +23,13 @@
 
 #pragma once
 
-#pragma pack(1)
+// TODO: remove this when it's fixed in MSVC
+// Work around warning C4005: 'XXXX' : macro redefinition
+#pragma warning(disable: 4005)
+#include <stdint.h>
+#pragma warning(default: 4005)
 
-typedef unsigned __int8   uint8_t;
-typedef unsigned __int16  uint16_t;
-typedef unsigned __int32  uint32_t;
+#pragma pack(1)
 
 class CIfo
 {
