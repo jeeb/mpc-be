@@ -1316,18 +1316,31 @@ HRESULT COggTheoraOutputPin::UnpackInitPage(OggPage& page)
 	while (m_packets.GetCount()) {
 		Packet* p = m_packets.GetHead();
 
-		CMediaType& mt = m_mts[0];
-		int size = p->GetCount();
-		//ASSERT(size <= 0xffff);
-		MPEG2VIDEOINFO* vih = (MPEG2VIDEOINFO*)mt.ReallocFormatBuffer(
-							   FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) +
-							   ((MPEG2VIDEOINFO*)mt.Format())->cbSequenceHeader +
-							   2 + size);
-		*(WORD*)((BYTE*)vih->dwSequenceHeader + vih->cbSequenceHeader) = (size>>8)|(size<<8);
-		memcpy((BYTE*)vih->dwSequenceHeader + vih->cbSequenceHeader + 2, p->GetData(), size);
-		vih->cbSequenceHeader += 2 + size;
+		if (p->GetCount() == 0) {
+			m_packets.RemoveHead();
+			continue;
+		}
+		
+		BYTE* data = p->GetData();
+		BYTE type = *data++;
 
-		m_initpackets.AddTail(m_packets.RemoveHead());
+		if (type >= 0x80 && type <= 0x82 && !memcmp(data, "theora", 6)) {
+
+			CMediaType& mt = m_mts[0];
+			int size = p->GetCount();
+			//ASSERT(size <= 0xffff);
+			MPEG2VIDEOINFO* vih = (MPEG2VIDEOINFO*)mt.ReallocFormatBuffer(
+								   FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) +
+								   ((MPEG2VIDEOINFO*)mt.Format())->cbSequenceHeader +
+								   2 + size);
+			*(WORD*)((BYTE*)vih->dwSequenceHeader + vih->cbSequenceHeader) = (size>>8)|(size<<8);
+			memcpy((BYTE*)vih->dwSequenceHeader + vih->cbSequenceHeader + 2, p->GetData(), size);
+			vih->cbSequenceHeader += 2 + size;
+
+			m_initpackets.AddTail(m_packets.RemoveHead());
+		} else {
+			m_packets.RemoveHead();
+		}
 	}
 
 	return hr;

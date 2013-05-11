@@ -168,6 +168,8 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 		return;
 	}
 
+	m_info_edit.LockWindowUpdate();
+
 	CString str;
 
 	PIN_INFO	PinInfo;
@@ -211,10 +213,12 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 		if (SUCCEEDED(pPin->ConnectionMediaType(&cmt))) {
 			CAtlList<CString> sl;
 			cmt.Dump(sl);
+			CString tmp;
 			POSITION pos = sl.GetHeadPosition();
 			while (pos) {
-				AddLine(sl.GetNext(pos) + '\n');
+				tmp += (sl.GetNext(pos) + '\n');
 			}
+			AddLine(tmp);
 		}
 	} else {
 		str = _T("- Not connected\n\n");
@@ -233,13 +237,16 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 		} else {
 			CAtlList<CString> sl;
 			mt.Dump(sl);
+			CString tmp;
 			POSITION pos = sl.GetHeadPosition();
 			while (pos) {
-				AddLine(sl.GetNext(pos) + '\n');
+				tmp += (sl.GetNext(pos) + '\n');
 			}
+			AddLine(tmp);
 		}
 	}
 	EndEnumMediaTypes(pmt)
 
 	m_info_edit.SetSel(0, 0);
+	m_info_edit.UnlockWindowUpdate();
 }

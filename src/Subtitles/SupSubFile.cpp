@@ -26,8 +26,6 @@
 CSupSubFile::CSupSubFile(CCritSec* pLock)
 	: CSubPicProviderImpl(pLock)
 {
-	m_fname		= _T("");
-	m_Subname	= _T("");
 	m_Thread	= NULL;
 	m_pSub		= NULL;
 }
