@@ -577,6 +577,13 @@ bool CAviSplitterFilter::DemuxLoop()
 				continue;
 			}
 
+			if (s->IsRawSubtitleStream()) {
+				// TODO: get subtitle time from index
+				minTime = 0;
+				curTrack = j;
+				break; // read all subtitles at once
+			}
+
 			REFERENCE_TIME start = s->GetRefTime(f, s->cs[f].size);
 			if (start < minTime) {
 				minTime = start;
