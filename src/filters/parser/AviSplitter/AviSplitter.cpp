@@ -573,7 +573,7 @@ bool CAviSplitterFilter::DemuxLoop()
 			CAviFile::strm_t* s = m_pFile->m_strms[j];
 			DWORD f = m_tFrame[j];
 
-			if (f >= (DWORD)s->cs.GetCount() || s->IsRawSubtitleStream()) {
+			if (f >= (DWORD)s->cs.GetCount()) {
 				continue;
 			}
 
