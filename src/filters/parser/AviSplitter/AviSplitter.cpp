@@ -171,37 +171,43 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	{
 		// reindex if needed
 
-		bool fReIndex = false;
+		int fReIndex = 0;
 
-		for (DWORD i = 0; i < m_pFile->m_avih.dwStreams && !fReIndex; ++i) {
+		for (DWORD i = 0; i < m_pFile->m_avih.dwStreams; ++i) {
 			if (!m_pFile->m_strms[i]->cs.GetCount()) {
-				fReIndex = true;
+				fReIndex++;
 			}
 		}
 
 		if (fReIndex && m_bSetReindex) {
-			m_pFile->EmptyIndex();
+			if (fReIndex == m_pFile->m_avih.dwStreams) {
+				m_pFile->EmptyIndex();
 
-			m_fAbort = false;
-			m_nOpenProgress = 0;
-
-			m_rtDuration = 0;
+				m_rtDuration = 0;
+			}
 
 			CAutoVectorPtr<UINT64> pSize;
-			pSize.Allocate(m_pFile->m_avih.dwStreams);
-			memset((UINT64*)pSize, 0, sizeof(UINT64)*m_pFile->m_avih.dwStreams);
+			pSize.Allocate(fReIndex);
+			memset((UINT64*)pSize, 0, sizeof(UINT64) * fReIndex);
 
-			__int64 pos = m_pFile->GetPos();
-			m_pFile->Seek(0);
-			ReIndex(m_pFile->GetLength(), pSize);
+			for (DWORD i = 0; i < m_pFile->m_avih.dwStreams; ++i) {
+				if (!m_pFile->m_strms[i]->cs.GetCount()) {
 
-			if (m_fAbort) {
-				m_pFile->EmptyIndex();
+					m_fAbort = false;
+
+					__int64 pos = m_pFile->GetPos();
+					m_pFile->Seek(0);
+					ReIndex(m_pFile->GetLength(), pSize, i);
+
+					if (m_fAbort) {
+						m_pFile->EmptyIndex();
+					}
+					m_pFile->Seek(pos);
+
+					m_fAbort = false;
+					m_nOpenProgress = 100;
+				}
 			}
-			m_pFile->Seek(pos);
-
-			m_fAbort = false;
-			m_nOpenProgress = 100;
 		}
 	}
 
@@ -455,7 +461,7 @@ bool CAviSplitterFilter::DemuxInit()
 	return true;
 }
 
-HRESULT CAviSplitterFilter::ReIndex(__int64 end, UINT64* pSize)
+HRESULT CAviSplitterFilter::ReIndex(__int64 end, UINT64* pSize, DWORD TrackNumber)
 {
 	HRESULT hr = S_OK;
 
@@ -475,17 +481,17 @@ HRESULT CAviSplitterFilter::ReIndex(__int64 end, UINT64* pSize)
 			size += (size&1) + 8;
 
 			if (id == FCC('AVI ') || id == FCC('AVIX') || id == FCC('movi') || id == FCC('rec ')) {
-				hr = ReIndex(pos + size, pSize);
+				hr = ReIndex(pos + size, pSize, TrackNumber);
 			}
 		} else {
 			if (S_OK != m_pFile->ReadAvi(size)) {
 				return E_FAIL;
 			}
 
-			DWORD TrackNumber = TRACKNUM(id);
+			DWORD nTrackNumber = TRACKNUM(id);
 
-			if (TrackNumber < m_pFile->m_strms.GetCount()) {
-				CAviFile::strm_t* s = m_pFile->m_strms[TrackNumber];
+			if (nTrackNumber == TrackNumber) {
+				CAviFile::strm_t* s = m_pFile->m_strms[nTrackNumber];
 
 				WORD type = TRACKTYPE(id);
 
@@ -493,15 +499,15 @@ HRESULT CAviSplitterFilter::ReIndex(__int64 end, UINT64* pSize)
 						|| type == 'iv' || type == '__' || type == 'xx') {
 					CAviFile::strm_t::chunk c;
 					c.filepos = pos;
-					c.size = pSize[TrackNumber];
+					c.size = pSize[nTrackNumber];
 					c.orgsize = size;
 					c.fKeyFrame = size > 0; // TODO: find a better way...
 					c.fChunkHdr = true;
 					s->cs.Add(c);
 
-					pSize[TrackNumber] += s->GetChunkSize(size);
+					pSize[nTrackNumber] += s->GetChunkSize(size);
 
-					REFERENCE_TIME rt = s->GetRefTime((DWORD)s->cs.GetCount()-1, pSize[TrackNumber]);
+					REFERENCE_TIME rt = s->GetRefTime((DWORD)s->cs.GetCount()-1, pSize[nTrackNumber]);
 					m_rtDuration = max(rt, m_rtDuration);
 				}
 			}
