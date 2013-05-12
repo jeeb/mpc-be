@@ -498,10 +498,19 @@ HRESULT CAviFile::BuildIndex()
 	return S_OK;
 }
 
-void CAviFile::EmptyIndex()
+void CAviFile::EmptyIndex(LONG TrackNum)
 {
-	for (DWORD i = 0; i < m_avih.dwStreams; ++i) {
-		strm_t* s = m_strms[i];
+	if (TrackNum > -1) {
+		if ((DWORD)TrackNum < m_avih.dwStreams) {
+			strm_t* s = m_strms[TrackNum];
+			s->cs.RemoveAll();
+			s->totalsize = 0;
+		}
+		return;
+	}
+
+	for (DWORD track = 0; track < m_avih.dwStreams; track++) {
+		strm_t* s = m_strms[track];
 		s->cs.RemoveAll();
 		s->totalsize = 0;
 	}

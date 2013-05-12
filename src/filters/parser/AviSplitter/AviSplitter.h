@@ -61,7 +61,7 @@ protected:
 	void DemuxSeek(REFERENCE_TIME rt);
 	bool DemuxLoop();
 
-	HRESULT ReIndex(__int64 end, UINT64* pSize, DWORD TrackNumber);
+	HRESULT ReIndex(__int64 end, UINT64& Size, DWORD TrackNumber);
 
 	REFERENCE_TIME m_maxTimeStamp;
 public:

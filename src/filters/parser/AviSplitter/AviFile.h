@@ -83,9 +83,9 @@ public:
 
 	REFERENCE_TIME GetTotalTime();
 	HRESULT BuildIndex();
-	void EmptyIndex();
+	void EmptyIndex(LONG TrackNum = -1);
 	bool IsInterleaved(bool fKeepInfo = false);
 };
 
-#define TRACKNUM(fcc) (10*((fcc&0xff)-0x30) + (((fcc>>8)&0xff)-0x30))
-#define TRACKTYPE(fcc) ((WORD)((((DWORD)fcc>>24)&0xff)|((fcc>>8)&0xff00)))
+#define TRACKNUM(fcc)	(10*((fcc&0xff)-0x30) + (((fcc>>8)&0xff)-0x30))
+#define TRACKTYPE(fcc)	((WORD)((((DWORD)fcc>>24)&0xff)|((fcc>>8)&0xff00)))

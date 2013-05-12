@@ -173,34 +173,31 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		int fReIndex = 0;
 
-		for (DWORD i = 0; i < m_pFile->m_avih.dwStreams; ++i) {
-			if (!m_pFile->m_strms[i]->cs.GetCount()) {
+		for (DWORD track = 0; track < m_pFile->m_avih.dwStreams; track++) {
+			if (!m_pFile->m_strms[track]->cs.GetCount()) {
 				fReIndex++;
 			}
 		}
 
 		if (fReIndex && m_bSetReindex) {
 			if (fReIndex == m_pFile->m_avih.dwStreams) {
-				m_pFile->EmptyIndex();
-
 				m_rtDuration = 0;
 			}
 
-			CAutoVectorPtr<UINT64> pSize;
-			pSize.Allocate(fReIndex);
-			memset((UINT64*)pSize, 0, sizeof(UINT64) * fReIndex);
+			for (DWORD track = 0; track < m_pFile->m_avih.dwStreams; track++) {
+				if (!m_pFile->m_strms[track]->cs.GetCount()) {
 
-			for (DWORD i = 0; i < m_pFile->m_avih.dwStreams; ++i) {
-				if (!m_pFile->m_strms[i]->cs.GetCount()) {
+					m_pFile->EmptyIndex(track);
 
 					m_fAbort = false;
 
 					__int64 pos = m_pFile->GetPos();
 					m_pFile->Seek(0);
-					ReIndex(m_pFile->GetLength(), pSize, i);
+					UINT64 Size = 0;
+					ReIndex(m_pFile->GetLength(), Size, track);
 
 					if (m_fAbort) {
-						m_pFile->EmptyIndex();
+						m_pFile->EmptyIndex(track);
 					}
 					m_pFile->Seek(pos);
 
@@ -213,12 +210,12 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	bool fHasIndex = false;
 
-	for (unsigned int i = 0; !fHasIndex && i < m_pFile->m_strms.GetCount(); ++i)
+	for (size_t i = 0; !fHasIndex && i < m_pFile->m_strms.GetCount(); i++)
 		if (m_pFile->m_strms[i]->cs.GetCount() > 0) {
 			fHasIndex = true;
 		}
 
-	for (unsigned int i = 0; i < m_pFile->m_strms.GetCount(); ++i) {
+	for (size_t i = 0; i < m_pFile->m_strms.GetCount(); i++) {
 		CAviFile::strm_t* s = m_pFile->m_strms[i];
 
 		if (fHasIndex && s->cs.GetCount() == 0) {
@@ -243,8 +240,8 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			DWORD dwBitRate = 0;
 			if (s->cs.GetCount() && AvgTimePerFrame > 0) {
 				UINT64 size = 0;
-				for (unsigned int i = 0; i < s->cs.GetCount(); ++i) {
-					size += s->cs[i].orgsize;
+				for (size_t j = 0; j < s->cs.GetCount(); j++) {
+					size += s->cs[j].orgsize;
 				}
 				dwBitRate = (DWORD)(10000000.0 * size * 8 / (s->cs.GetCount() * AvgTimePerFrame) + 0.5);
 				// need calculate in double, because the (10000000ui64 * size * 8) can give overflow
@@ -461,9 +458,13 @@ bool CAviSplitterFilter::DemuxInit()
 	return true;
 }
 
-HRESULT CAviSplitterFilter::ReIndex(__int64 end, UINT64* pSize, DWORD TrackNumber)
+HRESULT CAviSplitterFilter::ReIndex(__int64 end, UINT64& Size, DWORD TrackNumber)
 {
 	HRESULT hr = S_OK;
+
+	if (TrackNumber >= m_pFile->m_avih.dwStreams) {
+		return E_FAIL;
+	}
 
 	while (S_OK == hr && m_pFile->GetPos() < end && SUCCEEDED(hr) && !m_fAbort) {
 		__int64 pos = m_pFile->GetPos();
@@ -481,7 +482,7 @@ HRESULT CAviSplitterFilter::ReIndex(__int64 end, UINT64* pSize, DWORD TrackNumbe
 			size += (size&1) + 8;
 
 			if (id == FCC('AVI ') || id == FCC('AVIX') || id == FCC('movi') || id == FCC('rec ')) {
-				hr = ReIndex(pos + size, pSize, TrackNumber);
+				hr = ReIndex(pos + size, Size, TrackNumber);
 			}
 		} else {
 			if (S_OK != m_pFile->ReadAvi(size)) {
@@ -498,17 +499,17 @@ HRESULT CAviSplitterFilter::ReIndex(__int64 end, UINT64* pSize, DWORD TrackNumbe
 				if (type == 'db' || type == 'dc' || /*type == 'pc' ||*/ type == 'wb'
 						|| type == 'iv' || type == '__' || type == 'xx') {
 					CAviFile::strm_t::chunk c;
-					c.filepos = pos;
-					c.size = pSize[nTrackNumber];
-					c.orgsize = size;
-					c.fKeyFrame = size > 0; // TODO: find a better way...
-					c.fChunkHdr = true;
+					c.filepos	= pos;
+					c.size		= Size;
+					c.orgsize	= size;
+					c.fKeyFrame	= size > 0; // TODO: find a better way...
+					c.fChunkHdr	= true;
 					s->cs.Add(c);
 
-					pSize[nTrackNumber] += s->GetChunkSize(size);
+					Size += s->GetChunkSize(size);
 
-					REFERENCE_TIME rt = s->GetRefTime((DWORD)s->cs.GetCount()-1, pSize[nTrackNumber]);
-					m_rtDuration = max(rt, m_rtDuration);
+					REFERENCE_TIME rt	= s->GetRefTime((DWORD)s->cs.GetCount()-1, Size);
+					m_rtDuration		= max(rt, m_rtDuration);
 				}
 			}
 
@@ -542,15 +543,15 @@ void CAviSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	DbgLog((LOG_TRACE, 0, _T("Seek: %I64d"), rt / 10000));
 
 	if (rt > 0) {
-		for (size_t j = 0; j < nTracks; ++j) {
-			CAviFile::strm_t* s = m_pFile->m_strms[j];
+		for (size_t i = 0; i < nTracks; i++) {
+			CAviFile::strm_t* s = m_pFile->m_strms[i];
 
 			if (s->IsRawSubtitleStream() || s->cs.IsEmpty()) {
 				continue;
 			}
 
 			//ASSERT(s->GetFrame(rt) == s->GetKeyFrame(rt)); // fast seek test
-			m_tFrame[j] = s->GetKeyFrame(rt);
+			m_tFrame[i] = s->GetKeyFrame(rt);
 		}
 	}
 }
@@ -566,12 +567,12 @@ bool CAviSplitterFilter::DemuxLoop()
 	memset(fDiscontinuity.GetData(), 0, nTracks * sizeof(BOOL));
 
 	while (SUCCEEDED(hr) && !CheckRequest(nullptr)) {
-		DWORD curTrack = DWORD_MAX;;
+		DWORD curTrack = DWORD_MAX;
 
 		REFERENCE_TIME minTime = INT64_MAX;
-		for (size_t j = 0; j < nTracks; ++j) {
-			CAviFile::strm_t* s = m_pFile->m_strms[j];
-			DWORD f = m_tFrame[j];
+		for (size_t i = 0; i < nTracks; i++) {
+			CAviFile::strm_t* s = m_pFile->m_strms[i];
+			DWORD f = m_tFrame[i];
 
 			if (f >= (DWORD)s->cs.GetCount()) {
 				continue;
@@ -579,15 +580,15 @@ bool CAviSplitterFilter::DemuxLoop()
 
 			if (s->IsRawSubtitleStream()) {
 				// TODO: get subtitle time from index
-				minTime = 0;
-				curTrack = (DWORD)j;
+				minTime		= 0;
+				curTrack	= (DWORD)i;
 				break; // read all subtitles at once
 			}
 
 			REFERENCE_TIME start = s->GetRefTime(f, s->cs[f].size);
 			if (start < minTime) {
-				minTime = start;
-				curTrack = (DWORD)j;
+				minTime		= start;
+				curTrack	= (DWORD)i;
 			}
 		}
 
@@ -621,11 +622,11 @@ bool CAviSplitterFilter::DemuxLoop()
 
 			CAutoPtr<Packet> p(DEBUG_NEW Packet());
 
-			p->TrackNumber    = (DWORD)curTrack;
-			p->bSyncPoint     = (BOOL)s->cs[f].fKeyFrame;
-			p->bDiscontinuity = fDiscontinuity[curTrack];
-			p->rtStart        = s->GetRefTime(f, s->cs[f].size);
-			p->rtStop         = s->GetRefTime(f + 1, f + 1 < (DWORD)s->cs.GetCount() ? s->cs[f + 1].size : s->totalsize);
+			p->TrackNumber		= (DWORD)curTrack;
+			p->bSyncPoint		= (BOOL)s->cs[f].fKeyFrame;
+			p->bDiscontinuity	= fDiscontinuity[curTrack];
+			p->rtStart			= s->GetRefTime(f, s->cs[f].size);
+			p->rtStop			= s->GetRefTime(f + 1, f + 1 < (DWORD)s->cs.GetCount() ? s->cs[f + 1].size : s->totalsize);
 			p->SetCount(size);
 			if (S_OK != (hr = m_pFile->ByteRead(p->GetData(), p->GetCount()))) {
 				return true;    // break;
@@ -662,7 +663,7 @@ STDMETHODIMP CAviSplitterFilter::GetDuration(LONGLONG* pDuration)
 	CheckPointer(m_pFile, VFW_E_NOT_CONNECTED);
 
 	if (m_timeformat == TIME_FORMAT_FRAME) {
-		for (unsigned int i = 0; i < m_pFile->m_strms.GetCount(); ++i) {
+		for (size_t i = 0; i < m_pFile->m_strms.GetCount(); i++) {
 			CAviFile::strm_t* s = m_pFile->m_strms[i];
 			if (s->strh.fccType == FCC('vids')) {
 				*pDuration = s->cs.GetCount();
@@ -738,7 +739,7 @@ STDMETHODIMP CAviSplitterFilter::ConvertTimeFormat(LONGLONG* pTarget, const GUID
 		*pTarget = Source;
 		return S_OK;
 	} else if (TargetFormat == TIME_FORMAT_FRAME && SourceFormat == TIME_FORMAT_MEDIA_TIME) {
-		for (unsigned int i = 0; i < m_pFile->m_strms.GetCount(); ++i) {
+		for (size_t i = 0; i < m_pFile->m_strms.GetCount(); i++) {
 			CAviFile::strm_t* s = m_pFile->m_strms[i];
 			if (s->strh.fccType == FCC('vids')) {
 				*pTarget = s->GetFrame(Source);
@@ -746,7 +747,7 @@ STDMETHODIMP CAviSplitterFilter::ConvertTimeFormat(LONGLONG* pTarget, const GUID
 			}
 		}
 	} else if (TargetFormat == TIME_FORMAT_MEDIA_TIME && SourceFormat == TIME_FORMAT_FRAME) {
-		for (unsigned int i = 0; i < m_pFile->m_strms.GetCount(); ++i) {
+		for (size_t i = 0; i < m_pFile->m_strms.GetCount(); i++) {
 			CAviFile::strm_t* s = m_pFile->m_strms[i];
 			if (s->strh.fccType == FCC('vids')) {
 				if (Source < 0 || Source >= (LONGLONG)s->cs.GetCount()) {
@@ -862,13 +863,13 @@ STDMETHODIMP CAviSplitterFilter::GetKeyFrameCount(UINT& nKFs)
 
 	nKFs = 0;
 
-	for (unsigned int i = 0; i < m_pFile->m_strms.GetCount(); ++i) {
+	for (size_t i = 0; i < m_pFile->m_strms.GetCount(); i++) {
 		CAviFile::strm_t* s = m_pFile->m_strms[i];
 		if (s->strh.fccType != FCC('vids')) {
 			continue;
 		}
 
-		for (unsigned int j = 0; j < s->cs.GetCount(); ++j) {
+		for (size_t j = 0; j < s->cs.GetCount(); j++) {
 			CAviFile::strm_t::chunk& c = s->cs[j];
 			if (c.fKeyFrame) {
 				++nKFs;
@@ -897,7 +898,7 @@ STDMETHODIMP CAviSplitterFilter::GetKeyFrames(const GUID* pFormat, REFERENCE_TIM
 		return E_INVALIDARG;
 	}
 
-	for (unsigned int i = 0; i < m_pFile->m_strms.GetCount(); ++i) {
+	for (size_t i = 0; i < m_pFile->m_strms.GetCount(); i++) {
 		CAviFile::strm_t* s = m_pFile->m_strms[i];
 		if (s->strh.fccType != FCC('vids')) {
 			continue;
@@ -906,7 +907,7 @@ STDMETHODIMP CAviSplitterFilter::GetKeyFrames(const GUID* pFormat, REFERENCE_TIM
 
 		UINT nKFsTmp = 0;
 
-		for (unsigned int j = 0; j < s->cs.GetCount() && nKFsTmp < nKFs; ++j) {
+		for (size_t j = 0; j < s->cs.GetCount() && nKFsTmp < nKFs; j++) {
 			if (s->cs[j].fKeyFrame) {
 				pKFs[nKFsTmp++] = fConvertToRefTime ? s->GetRefTime(j, s->cs[j].size) : j;
 			}
