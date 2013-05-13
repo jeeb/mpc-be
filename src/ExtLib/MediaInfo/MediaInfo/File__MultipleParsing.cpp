@@ -1,21 +1,8 @@
-// File__MultipleParsing - Info for MultipleParsing files
-// Copyright (C) 2007-2012 MediaArea.net SARL, Info@MediaArea.net
-//
-// This library is free software: you can redistribute it and/or modify it
-// under the terms of the GNU Library General Public License as published by
-// the Free Software Foundation, either version 2 of the License, or
-// any later version.
-//
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU Library General Public License for more details.
-//
-// You should have received a copy of the GNU Library General Public License
-// along with this library. If not, see <http://www.gnu.org/licenses/>.
-//
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+/*  Copyright (c) MediaArea.net SARL. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license that can
+ *  be found in the License.html file in the root of the source tree.
+ */
 
 //---------------------------------------------------------------------------
 // Pre-compilation
@@ -92,6 +79,9 @@
 #endif
 #if defined(MEDIAINFO_P2_YES)
     #include "MediaInfo/Multiple/File_P2_Clip.h"
+#endif
+#if defined(MEDIAINFO_PMP_YES)
+    #include "MediaInfo/Multiple/File_Pmp.h"
 #endif
 #if defined(MEDIAINFO_RIFF_YES)
     #include "MediaInfo/Multiple/File_Riff.h"
@@ -413,6 +403,9 @@ File__MultipleParsing::File__MultipleParsing()
     #endif
     #if defined(MEDIAINFO_P2_YES)
         Parser.push_back(new File_P2_Clip());
+    #endif
+    #if defined(MEDIAINFO_PMP_YES)
+        Parser.push_back(new File_Pmp());
     #endif
     #if defined(MEDIAINFO_RIFF_YES)
         Parser.push_back(new File_Riff());

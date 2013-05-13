@@ -1,21 +1,8 @@
-// File_Hevc - Info for HEVC files
-// Copyright (C) 2013-2012 MediaArea.net SARL, Info@MediaArea.net
-//
-// This library is free software: you can redistribute it and/or modify it
-// under the terms of the GNU Library General Public License as published by
-// the Free Software Foundation, either version 2 of the License, or
-// any later version.
-//
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU Library General Public License for more details.
-//
-// You should have received a copy of the GNU Library General Public License
-// along with this library. If not, see <http://www.gnu.org/licenses/>.
-//
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+/*  Copyright (c) MediaArea.net SARL. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license that can
+ *  be found in the License.html file in the root of the source tree.
+ */
 
 //---------------------------------------------------------------------------
 #ifndef MediaInfo_HevcH
@@ -62,6 +49,77 @@ private :
     //Structures - seq_parameter_set
     struct seq_parameter_set_struct
     {
+        struct vui_parameters_struct
+        {
+            struct xxl
+            {
+                struct xxl_data
+                {
+                    //HRD configuration
+                    int32u bit_rate_value;
+                    int32u cpb_size_value;
+                    bool   cbr_flag;
+
+                    //sei_message_buffering_period
+                    int32u initial_cpb_removal_delay;
+                    int32u initial_cpb_removal_delay_offset;
+
+                    xxl_data()
+                    {
+                        //HRD configuration
+                        bit_rate_value=(int32u)-1;
+                        cpb_size_value=(int32u)-1;
+                        cbr_flag=true;
+
+                        //sei_message_buffering_period
+                        initial_cpb_removal_delay=(int32u)-1;
+                        initial_cpb_removal_delay_offset=(int32u)-1;
+                    }
+                };
+                vector<xxl_data> SchedSel;
+                int8u   initial_cpb_removal_delay_length_minus1;
+                int8u   cpb_removal_delay_length_minus1;
+                int8u   dpb_output_delay_length_minus1;
+                int8u   time_offset_length;
+            };
+            xxl*    NAL;
+            xxl*    VCL;
+            int32u  num_units_in_tick;
+            int32u  time_scale;
+            int16u  sar_width;
+            int16u  sar_height;
+            int8u   aspect_ratio_idc;
+            int8u   video_format;
+            int8u   colour_primaries;
+            int8u   transfer_characteristics;
+            int8u   matrix_coefficients;
+            bool    aspect_ratio_info_present_flag;
+            bool    video_signal_type_present_flag;
+            bool    colour_description_present_flag;
+            bool    timing_info_present_flag;
+            bool    fixed_frame_rate_flag;
+            bool    pic_struct_present_flag;
+
+            vui_parameters_struct()
+            {
+                NAL=NULL;
+                VCL=NULL;
+                aspect_ratio_info_present_flag=false;
+                video_signal_type_present_flag=false;
+                colour_description_present_flag=false;
+                timing_info_present_flag=false;
+                fixed_frame_rate_flag=false;
+                pic_struct_present_flag=false;
+            }
+
+            ~vui_parameters_struct()
+            {
+                delete NAL; //NAL=NULL;
+                delete VCL; //VCL=NULL;
+            }
+        };
+        vui_parameters_struct* vui_parameters;
+        int32u  profile_space;
         int32u  profile_idc;
         int32u  level_idc;
         int32u  pic_width_in_luma_samples;
@@ -71,6 +129,9 @@ private :
         int8u   log2_max_pic_order_cnt_lsb_minus4;
         int8u   bit_depth_luma_minus8;
         int8u   bit_depth_chroma_minus8;
+        bool    general_progressive_source_flag;
+        bool    general_interlaced_source_flag;
+        bool    general_frame_only_constraint_flag;
         bool    IsSynched; //Computed value
     };
     typedef vector<seq_parameter_set_struct*> seq_parameter_set_structs;
@@ -131,7 +192,9 @@ private :
     //Packets - SubElements
     void slice_segment_header();
     void profile_tier_level(int8u maxNumSubLayersMinus1);
-    void short_term_ref_pic_set(int8u stRpsIdx, int8u num_short_term_ref_pic_sets);
+    void short_term_ref_pic_sets(int8u num_short_term_ref_pic_sets);
+    void vui_parameters(void* &vui_parameters_Item);
+    void hrd_parameters(void* &hrd_parameters_Item);
 
     //Packets - Specific
     void SPS_PPS();
@@ -162,8 +225,15 @@ private :
 
     //Temp
     int32u  chroma_format_idc;
+    int32u  slice_pic_parameter_set_id;
+    int32u  slice_type;
+    int8u   nuh_layer_id;
+    int8u   profile_space;
     int8u   profile_idc;
     int8u   level_idc;
+    bool    general_progressive_source_flag;
+    bool    general_interlaced_source_flag;
+    bool    general_frame_only_constraint_flag;
     bool    RapPicFlag;
     bool    first_slice_segment_in_pic_flag;
 };

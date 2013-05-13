@@ -6,15 +6,15 @@
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
-// Information about RKAU files
+// Information about PMP files
 //
 // Contributor: Lionel Duchateau, kurtnoise@free.fr
 //
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifndef MediaInfo_File_RkauH
-#define MediaInfo_File_RkauH
+#ifndef MediaInfo_File_PmpH
+#define MediaInfo_File_PmpH
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -25,29 +25,18 @@ namespace MediaInfoLib
 {
 
 //***************************************************************************
-// Class File_Rkau
+// Class File_Pmp
 //***************************************************************************
 
-class File_Rkau : public File__Analyze, public File__Tags_Helper
+class File_Pmp : public File__Analyze
 {
 public :
-    //Constructor/Destructor
-    File_Rkau();
-
+    //In
+    int64u Frame_Count_Valid;
 private :
-    //Streams management
-    void Streams_Finish();
-
-    //Buffer - File header
+    //Buffer
     bool FileHeader_Begin();
     void FileHeader_Parse();
-
-    //Buffer - Global
-    void Read_Buffer_Continue()                                                 {File__Tags_Helper::Read_Buffer_Continue();}
-
-    //Temp
-    int64u Duration;
-    int64u UncompressedSize;
 };
 
 } //NameSpace
