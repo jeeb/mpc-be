@@ -5166,11 +5166,15 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 					OpenCurPlaylistItem();
 				}
 			} else {
+				UINT nCLSwitches = s.nCLSwitches;	// backup cmdline params
+
 				SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 				fSetForegroundWindow = true;
 
+				s.nCLSwitches = nCLSwitches;		// restore cmdline params
 				m_wndPlaylistBar.Open(sl, fMulti, &s.slSubs);
-				OpenCurPlaylistItem((s.nCLSwitches&CLSW_STARTVALID) ? s.rtStart : 0);
+
+				OpenCurPlaylistItem((s.nCLSwitches&CLSW_STARTVALID) ? s.rtStart : INVALID_TIME);
 
 				s.nCLSwitches &= ~CLSW_STARTVALID;
 				s.rtStart = 0;
@@ -10681,7 +10685,7 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 	}
 
 	m_wndPlaylistBar.Open(fns, false);
-	OpenCurPlaylistItem(max(rtStart, 0));
+	OpenCurPlaylistItem(rtStart);
 }
 
 void CMainFrame::OnUpdateFavoritesFile(CCmdUI* pCmdUI)
@@ -10700,7 +10704,7 @@ void CMainFrame::OnRecentFile(UINT nID)
 		fns.AddTail(str);
 		m_wndPlaylistBar.Open(fns, false);
 	}
-	OpenCurPlaylistItem(0);
+	OpenCurPlaylistItem();
 }
 
 void CMainFrame::OnUpdateRecentFile(CCmdUI* pCmdUI)
@@ -14536,7 +14540,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			EndEnumFilters;
 			//
 
-			if (pFileData->rtStart > 0) {
+			if (pFileData->rtStart >= 0) {
 				PostMessage(WM_RESUMEFROMSTATE, (WPARAM)PM_FILE, (LPARAM)(pFileData->rtStart/10000));    // REFERENCE_TIME doesn't fit in LPARAM under a 32bit env.
 			}
 		} else if (pDVDData) {

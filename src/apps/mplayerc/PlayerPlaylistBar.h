@@ -110,7 +110,7 @@ public:
 	void Open(CStringW vdn, CStringW adn, int vinput, int vchannel, int ainput);
 	void Append(CStringW vdn, CStringW adn, int vinput, int vchannel, int ainput);
 
-	OpenMediaData* GetCurOMD(REFERENCE_TIME rtStart = 0);
+	OpenMediaData* GetCurOMD(REFERENCE_TIME rtStart = INVALID_TIME);
 
 	void LoadPlaylist(LPCTSTR filename);
 	void SavePlaylist();

@@ -96,7 +96,7 @@ public:
 class OpenFileData : public OpenMediaData
 {
 public:
-	OpenFileData() : rtStart(0) {}
+	OpenFileData() : rtStart(INVALID_TIME) {}
 	CAtlList<CString> fns;
 	REFERENCE_TIME rtStart;
 };
@@ -528,7 +528,7 @@ protected:
 	DWORD	m_nLastRunTicket;
 
 public:
-	void OpenCurPlaylistItem(REFERENCE_TIME rtStart = 0);
+	void OpenCurPlaylistItem(REFERENCE_TIME rtStart = INVALID_TIME);
 	void OpenMedia(CAutoPtr<OpenMediaData> pOMD);
 	void PlayFavoriteFile(CString fav);
 	void PlayFavoriteDVD(CString fav);

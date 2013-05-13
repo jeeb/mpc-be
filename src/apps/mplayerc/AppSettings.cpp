@@ -1792,7 +1792,7 @@ void CAppSettings::ParseCommandLine(CAtlList<CString>& cmdln)
 	slDubs.RemoveAll();
 	slSubs.RemoveAll();
 	slFilters.RemoveAll();
-	rtStart = 0;
+	rtStart = INVALID_TIME;
 	rtShift = 0;
 	lDVDTitle = 0;
 	lDVDChapter = 0;
@@ -1812,6 +1812,7 @@ void CAppSettings::ParseCommandLine(CAtlList<CString>& cmdln)
 
 		if ((param[0] == '-' || param[0] == '/') && param.GetLength() > 1) {
 			CString sw = param.Mid(1).MakeLower();
+
 			if (sw == _T("open")) {
 				nCLSwitches |= CLSW_OPEN;
 			} else if (sw == _T("play")) {
