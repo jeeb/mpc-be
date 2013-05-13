@@ -646,6 +646,10 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 
 	StopWorkerThreads();
 
+	// extern variable
+	g_bGetFrameType	= FALSE;
+	g_nFrameType	= PICT_NONE;
+
 	CRenderersSettings& s = GetRenderersSettings();
 	CRenderersData* renderersData = GetRenderersData();
 
@@ -1584,7 +1588,10 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	}
 
 	if (pApp->m_fDisplayStats) {
+		g_bGetFrameType = TRUE;
 		DrawStats();
+	} else {
+		g_bGetFrameType = FALSE;
 	}
 
 	if (m_pOSDTexture) {

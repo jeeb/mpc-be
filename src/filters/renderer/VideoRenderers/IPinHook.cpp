@@ -55,7 +55,8 @@ IMemInputPinCVtbl*	g_pMemInputPinCVtbl = NULL;
 // Aleksoid : validate Pin
 IPinC*				g_pPin				= NULL;
 
-FF_FIELD_TYPE		g_nFrameType		= PICT_FRAME;
+BOOL				g_bGetFrameType		= FALSE;
+FF_FIELD_TYPE		g_nFrameType		= PICT_NONE;
 
 typedef struct {
 	const int     Format;
@@ -173,19 +174,20 @@ static HRESULT STDMETHODCALLTYPE ReceiveMineI(IMemInputPinC * This, IMediaSample
 		g_tSampleStart = rtStart;
 
 		// Get frame type
-		g_nFrameType = PICT_NONE;
-		if (CComQIPtr<IMediaSample2> pMS2 = pSample) {
-			AM_SAMPLE2_PROPERTIES props;
-			if(SUCCEEDED(pMS2->GetProperties(sizeof(props), (BYTE*)&props))) {
-				g_nFrameType = PICT_BOTTOM_FIELD;
-				if (props.dwTypeSpecificFlags & AM_VIDEO_FLAG_WEAVE) {
-					g_nFrameType = PICT_FRAME;
-				} else if (props.dwTypeSpecificFlags & AM_VIDEO_FLAG_FIELD1FIRST) {
-					g_nFrameType = PICT_TOP_FIELD;
-				} else {
-					// TODO
+		if (g_bGetFrameType) {
+			g_nFrameType = PICT_NONE;
+			if (CComQIPtr<IMediaSample2> pMS2 = pSample) {
+				AM_SAMPLE2_PROPERTIES props;
+				if(SUCCEEDED(pMS2->GetProperties(sizeof(props), (BYTE*)&props))) {
+					g_nFrameType = PICT_BOTTOM_FIELD;
+					if (props.dwTypeSpecificFlags & AM_VIDEO_FLAG_WEAVE) {
+						g_nFrameType = PICT_FRAME;
+					} else if (props.dwTypeSpecificFlags & AM_VIDEO_FLAG_FIELD1FIRST) {
+						g_nFrameType = PICT_TOP_FIELD;
+					} else {
+						// TODO
+					}
 				}
-				
 			}
 		}
 	}
