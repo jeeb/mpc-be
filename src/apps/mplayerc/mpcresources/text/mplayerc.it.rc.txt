@@ -278,7 +278,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 24		"Mostra nome file nella barra di ricerca"
 25		"Abilita l'anteprima video nella barra di ricerca"
 26		"Abilita i marcatori capitoli nella barra di ricerca"
-27		"Utilizza la taskbar di Windows 7/8"
+27		"Use Windows 7 (and above) Taskbar features"
 28		"Font:"
 31		"Abilita la Flybar"
 32		"Transparenza:"

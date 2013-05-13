@@ -278,7 +278,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 24		"File name on SeekBar"
 25		"Use the preview in the search"
 26		"Use chapters marker"
-27		"Use Windows 7 Taskbar features"
+27		"Use Windows 7 (and above) Taskbar features"
 28		"Font:"
 31		"Use flybar"
 32		"Transparent:"

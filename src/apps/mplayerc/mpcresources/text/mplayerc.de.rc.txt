@@ -278,7 +278,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 24		"Dateiname auf der Suchleiste"
 25		"Die Vorschau in der Suche benutzen"
 26		"Kapitelmarker verwenden"
-27		"Windows 7 Taskbar Funktionen aktivieren"
+27		"Use Windows 7 (and above) Taskbar features"
 28		"Schrift:"
 31		"Flybar verwenden"
 32		"Transparent:"
