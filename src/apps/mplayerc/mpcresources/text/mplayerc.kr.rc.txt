@@ -278,7 +278,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 24		"탐색바 위에 파일이름표시"
 25		"탐색바에서 미리보기 사용"
 26		"chapters 구분표지 사용"
-27		"Use Windows 7 (and above) Taskbar features"
+27		"Windows 7(이상) 작업표시줄기능 사용"
 28		"OSD 글꼴:"
 31		"flybar 사용"
 32		"투명도:"
