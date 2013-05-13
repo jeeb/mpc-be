@@ -20,7 +20,7 @@ Changes (*):
 * libopenjpeg 2.0.0 svn rev.2343;
 * MediaInfo 0.7.62+ svn rev.5540;
 * libpng 1.7.0 b13 git-6a02eb6d;
-* ZenLibs v0.4.28+ svn rev.430;
+* ZenLibs v0.4.28+ svn rev.440;
 * VirtualDub 1.10.4 Test 6;
 * zlib 1.2.8;
 
