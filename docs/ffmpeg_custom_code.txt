@@ -33,8 +33,6 @@
 * libavutil/mathematics.h
 * libavutil/utils.c
 
-* libswscale/swscale.c
-
 ======
 The following files are available only in MPC-BE (compared with ffmpeg):
 

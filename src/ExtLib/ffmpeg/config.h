@@ -74,8 +74,8 @@
 		#define BROKEN_RELOCATIONS 1
 		#define ARCH_X86_32 0
 		#define ARCH_X86_64 1
+		#define HAVE_I686 1
 		#define HAVE_FAST_64BIT 1
-		#define HAVE_CMOV 1
 		#define HAVE_FAST_CMOV 1
 		#define HAVE_MM_EMPTY 1
 		#define HAVE_XMM_CLOBBERS 1
@@ -83,8 +83,8 @@
 	#else
 		#define ARCH_X86_32 1
 		#define ARCH_X86_64 0
+		#define HAVE_I686 0
 		#define HAVE_FAST_64BIT 0
-		#define HAVE_CMOV 0
 		#define HAVE_FAST_CMOV 0
 		#define HAVE_MM_EMPTY 0
 		#define HAVE_XMM_CLOBBERS 0
@@ -178,7 +178,6 @@
 	#define ARCH_X86_32 0
 	#define ARCH_X86_64 0
 	#define HAVE_FAST_64BIT 0
-	#define HAVE_CMOV 0
 	#define HAVE_FAST_CMOV 0
 	#define HAVE_MM_EMPTY 0
 	#define HAVE_XMM_CLOBBERS 0
@@ -274,7 +273,7 @@
 #define HAVE_CLOSESOCKET 0
 #define HAVE_COSF 1
 #define HAVE_COMMANDLINETOARGVW 1
-#define HAVE_CPUNOP 1
+#define HAVE_CPUNOP 0
 #define HAVE_CRYPTGENRANDOM 1
 #define HAVE_DCBZL 0
 #define HAVE_DEV_BKTR_IOCTL_BT848_H 0
@@ -640,6 +639,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_ADPCM_ADX_DECODER 1
 #define CONFIG_ADPCM_AFC_DECODER 1
 #define CONFIG_ADPCM_CT_DECODER 1
+#define CONFIG_ADPCM_DTK_DECODER 1
 #define CONFIG_ADPCM_EA_DECODER 1
 #define CONFIG_ADPCM_EA_MAXIS_XA_DECODER 1
 #define CONFIG_ADPCM_EA_R1_DECODER 1
@@ -657,6 +657,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_ADPCM_IMA_ISS_DECODER 1
 #define CONFIG_ADPCM_IMA_OKI_DECODER 1
 #define CONFIG_ADPCM_IMA_QT_DECODER 1
+#define CONFIG_ADPCM_IMA_RAD_DECODER 1
 #define CONFIG_ADPCM_IMA_SMJPEG_DECODER 1
 #define CONFIG_ADPCM_IMA_WAV_DECODER 1
 #define CONFIG_ADPCM_IMA_WS_DECODER 1
