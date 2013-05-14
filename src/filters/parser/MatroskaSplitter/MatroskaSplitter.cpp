@@ -124,6 +124,31 @@ STDMETHODIMP CMatroskaSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 	return S_OK;
 }
 
+static int compare(const void* a, const void* b) 
+{
+	return (*(INT64*)a - *(INT64*)b);
+}
+
+// code from MediaInfo
+static double Video_FrameRate_Rounding(double FrameRate)
+{
+	     if (FrameRate> 9.990 && FrameRate<=10.010)		FrameRate=10.000;
+	else if (FrameRate>14.990 && FrameRate<=15.010)		FrameRate=15.000;
+	else if (FrameRate>23.964 && FrameRate<=23.988)		FrameRate=23.976;
+	else if (FrameRate>23.988 && FrameRate<=24.012)		FrameRate=24.000;
+	else if (FrameRate>24.988 && FrameRate<=25.012)		FrameRate=25.000;
+	else if (FrameRate>29.955 && FrameRate<=29.985)		FrameRate=29.970;
+	else if (FrameRate>29.985 && FrameRate<=30.015)		FrameRate=30.000;
+	else if (FrameRate>23.964*2 && FrameRate<=23.988*2)	FrameRate=23.976*2;
+	else if (FrameRate>23.988*2 && FrameRate<=24.012*2)	FrameRate=24.000*2;
+	else if (FrameRate>24.988*2 && FrameRate<=25.012*2)	FrameRate=25.000*2;
+	else if (FrameRate>29.955*2 && FrameRate<=29.985*2)	FrameRate=29.970*2;
+	else if (FrameRate>29.985*2 && FrameRate<=30.015*2)	FrameRate=30.000*2;
+
+	return FrameRate;
+}
+
+
 HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 {
 	CheckPointer(pAsyncReader, E_POINTER);
@@ -390,20 +415,48 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				} else if (pTE->DefaultDuration > 0) {
 					AvgTimePerFrame = (REFERENCE_TIME)pTE->DefaultDuration / 100;
 				} 
-				if (!AvgTimePerFrame || AvgTimePerFrame < 166666) { // fps > 60 ... need to make additional checks
+
+				if (!AvgTimePerFrame || AvgTimePerFrame < 166666) { // incorrect fps - calculate avarage value
+					DbgLog((LOG_TRACE, 3, _T("CMatroskaSplitterFilter::CreateOutputs() : calculate AvgTimePerFrame")));
+
 					CMatroskaNode Root(m_pFile);
 					m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
 					m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 
 					MatroskaReader::QWORD lastCueClusterPosition = (MatroskaReader::QWORD)-1;
-					UINT64 timecode1 = 0;
-					UINT64 timecode2 = 0;
-					unsigned int framecount = 0;
+
+					CAtlArray<INT64> timecodes;
 					bool readmore = true;
 
-					POSITION pos1 = m_pFile->m_segment.Cues.GetHeadPosition();
+					CNode<Cue>* pCues;
+					CNode<Cue>  Cues;
+					if (m_pFile->m_segment.Cues.GetCount()) {
+						pCues = &m_pFile->m_segment.Cues;
+					} else {
+						UINT64 TrackNumber = m_pFile->m_segment.GetMasterTrack();
+
+						CAutoPtr<Cue> pCue(DNew Cue());
+
+						do {
+							Cluster c;
+							c.ParseTimeCode(m_pCluster);
+
+							CAutoPtr<CuePoint> pCuePoint(DNew CuePoint());
+							CAutoPtr<CueTrackPosition> pCueTrackPosition(DNew CueTrackPosition());
+							pCuePoint->CueTime.Set(c.TimeCode);
+							pCueTrackPosition->CueTrack.Set(TrackNumber);
+							pCueTrackPosition->CueClusterPosition.Set(m_pCluster->m_filepos - m_pSegment->m_start);
+							pCuePoint->CueTrackPositions.AddTail(pCueTrackPosition);
+							pCue->CuePoints.AddTail(pCuePoint);
+						} while (m_pCluster->Next(true) && pCue->CuePoints.GetCount() < 2);
+
+						Cues.AddTail(pCue);
+						pCues = &Cues;
+					}
+
+					POSITION pos1 = pCues->GetHeadPosition();
 					while (readmore && pos1) {
-						Cue* pCue = m_pFile->m_segment.Cues.GetNext(pos1);
+						Cue* pCue = pCues->GetNext(pos1);
 						POSITION pos2 = pCue->CuePoints.GetHeadPosition();
 						while (readmore && pos2) {
 							CuePoint* pCuePoint = pCue->CuePoints.GetNext(pos2);
@@ -446,41 +499,92 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 											if (bg->Block.TrackNumber != pTE->TrackNumber) {
 												continue;
 											}
-											UINT64 tc = c.TimeCode + bg->Block.TimeCode;
-											TRACE(_T("Frame: %d, TimeCode %I64d\n"), framecount, tc);
+											INT64 tc = c.TimeCode + bg->Block.TimeCode;
 
-											if (framecount == 0) {
-												timecode1 = tc;
-												timecode2 = tc;
-											} else if (tc == timecode2) { // hmm
+											if (tc < 0) {
 												continue;
-											} else if (tc > timecode2) { // I and P frames
-												if (framecount > 24) {
-													// good for 23.976, 24, 25, 30, 50, 60 fps.
-													// for 29.97 and 59,94 can give a small inaccuracy
-													readmore = false;
-													break;
-												}
-												timecode2 = tc;
-											} //else if (tc < timecode2) {} // B-Frames
+											}
 
-											framecount++;
+											timecodes.Add(tc);
+											DbgLog((LOG_TRACE, 3, _T("	=> Frame: %02d, TimeCode: %5I64d = %10I64d"), timecodes.GetCount(), tc, m_pFile->m_segment.GetRefTime(tc)));
+
+											if (timecodes.GetCount() >= 50) {
+												readmore = false;
+												break;
+											}
 										}
 									} while (readmore && pBlock->NextBlock());
 								}
 							}
 						}
 					}
-					if (framecount > 1) {
-						AvgTimePerFrame = m_pFile->m_segment.SegmentInfo.TimeCodeScale * (timecode2 - timecode1) / (100 * (framecount - 1));
-						if (interlaced) {
-							AvgTimePerFrame *= 2;
+
+					m_pCluster.Free();
+
+					if (Cues.GetCount()) {
+						Cues.RemoveAll();
+					}
+
+					if (timecodes.GetCount()) {
+						qsort(timecodes.GetData(), timecodes.GetCount(), sizeof(INT64), compare);
+
+						CAtlArray<INT64> timecodes_diff;
+						for (size_t i = 1; i < timecodes.GetCount(); i++) {
+							if ((timecodes[i] - timecodes[i-1]) > 0) {
+								timecodes_diff.Add(timecodes[i] - timecodes[i-1]);
+							}
+						}
+
+						INT64 matchTC	= 0;
+						UINT count		= 0;
+						for (size_t i = 0; i < timecodes_diff.GetCount(); i++) {
+							if (timecodes_diff[i] == 0 || timecodes_diff[i] == matchTC) {
+								continue;
+							}
+							INT64 tc	= timecodes_diff[i];
+							UINT count2	= 0;
+							for (size_t j = 0; j < timecodes_diff.GetCount(); j++) {
+								if ((timecodes_diff[j] >= tc * 0.9) && (timecodes_diff[j] <= tc * 1.1)) {
+									count2++;
+								}
+							}
+							if (count2 > count) {
+								matchTC	= tc;
+								count	= count2;
+							}
+						}
+
+						if (matchTC) {
+
+							for (size_t i = 0; i < timecodes_diff.GetCount();) {
+								if ((timecodes_diff[i] < matchTC * 0.9) || (timecodes_diff[i] > matchTC * 1.1)) {
+									timecodes_diff.RemoveAt(i);
+								} else {
+									i++;
+								}
+							}
+
+							INT64 timecode = 0;
+							count = 0;
+							for (size_t i = 0; i < timecodes_diff.GetCount(); i++) {
+								timecode += timecodes_diff[i];
+								count++;
+								DbgLog((LOG_TRACE, 3, _T("	=> TimeCode_Diff: %02d : %5I64d"), count, timecodes_diff[i]));
+							}
+
+							AvgTimePerFrame = m_pFile->m_segment.SegmentInfo.TimeCodeScale * (timecode) / (count * 100);
+
+							double fps = 10000000.0 / AvgTimePerFrame;
+							fps = Video_FrameRate_Rounding(fps);
+							AvgTimePerFrame = 10000000.0 / fps;
+							if (interlaced) {
+								;//AvgTimePerFrame *= 2; // TODO - it is necessary or not ???
+							}
 						}
 					}
 
 					m_pCluster.Free();
 				}
-				//if (AvgTimePerFrame < 0) AvgTimePerFrame = 0;
 
 				for (size_t i = 0; i < mts.GetCount(); i++) {
 					if (mts[i].formattype == FORMAT_VideoInfo
@@ -1082,7 +1186,6 @@ bool CMatroskaSplitterFilter::DemuxInit()
 	}
 
 	// reindex if needed
-
 	if (m_pFile->IsRandomAccess() && m_pFile->m_segment.Cues.GetCount() == 0) {
 		m_nOpenProgress = 0;
 		m_pFile->m_segment.SegmentInfo.Duration.Set(0);
@@ -1124,6 +1227,12 @@ bool CMatroskaSplitterFilter::DemuxInit()
 		}
 
 		m_fAbort = false;
+
+		if (m_pFile->m_segment.Cues.GetCount()) {
+			Info& info		= m_pFile->m_segment.SegmentInfo;
+			m_rtDuration	= (REFERENCE_TIME)(info.Duration * info.TimeCodeScale / 100);
+			m_rtNewStop		= m_rtStop = m_rtDuration;
+		}
 	}
 
 	m_pCluster.Free();
@@ -1549,6 +1658,7 @@ HRESULT CMatroskaSplitterOutputPin::DeliverBlock(MatroskaPacket* p)
 		} else {
 			tmp->Copy(*p->bg->Block.BlockData.GetNext(pos));
 		}
+
 		if (S_OK != (hr = DeliverPacket(tmp))) {
 			break;
 		}

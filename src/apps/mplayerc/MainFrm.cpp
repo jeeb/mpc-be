@@ -14809,7 +14809,7 @@ void CMainFrame::ParseDirs(CAtlList<CString>& sl)
 typedef struct {
 	CString fn;
 } fileName;
-int compare(const void* arg1, const void* arg2)
+static int compare(const void* arg1, const void* arg2)
 {
 	return StrCmpLogicalW(((fileName*)arg1)->fn, ((fileName*)arg2)->fn);
 }
