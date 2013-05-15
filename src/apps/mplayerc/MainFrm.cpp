@@ -4049,6 +4049,8 @@ void CMainFrame::OnUpdatePlayerStatus(CCmdUI* pCmdUI)
 		pCmdUI->SetText(m_closingmsg);
 
 		SetStatusMessage(m_closingmsg);
+
+		m_wndToolBar.SwitchTheme();
 	}
 }
 

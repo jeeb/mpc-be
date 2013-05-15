@@ -239,22 +239,17 @@ void CPlayerToolBar::SwitchTheme()
 	CMainFrame* pFrame	= (CMainFrame*)GetParentFrame();
 	OAFilterState fs	= pFrame->GetMediaState();
 
-	if (fs == State_Running || fs == State_Stopped) {
+	TBBUTTONINFO bi;
+	bi.cbSize = sizeof(bi);
+	bi.dwMask = TBIF_IMAGE;
 
-		TBBUTTONINFO bi;
-		bi.cbSize = sizeof(bi);
-		bi.dwMask = TBIF_IMAGE;
-
-		if (fs == State_Running) {
-			bi.iImage = 1;
-		}
-
-		if (fs == State_Stopped) {
-			bi.iImage = 0;
-		}
-
-		tb.SetButtonInfo(ID_PLAY_PLAY, &bi);
+	if (fs == State_Running) {
+		bi.iImage = 1;
+	} else {
+		bi.iImage = 0;
 	}
+
+	tb.SetButtonInfo(ID_PLAY_PLAY, &bi);
 }
 
 BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
