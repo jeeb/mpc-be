@@ -25,7 +25,6 @@
 #include <videoacc.h>
 #include "../BaseVideoFilter/BaseVideoFilter.h"
 
-
 class CMPCVideoDecFilter;
 class CVideoDecDXVAAllocator;
 

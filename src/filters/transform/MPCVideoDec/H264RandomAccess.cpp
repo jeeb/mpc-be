@@ -22,7 +22,6 @@
 
 #include "stdafx.h"
 #include "H264RandomAccess.h"
-
 #include "../../DSUtil/H264Nalu.h"
 #include "../../DSUtil/GolombBuffer.h"
 

@@ -21,8 +21,8 @@
  */
 
 #include "stdafx.h"
-#include "VideoDecOutputPin.h"
-#include "VideoDecDXVAAllocator.h"
+#include "MPCVideoDecOutputPin.h"
+#include "DXVAAllocator.h"
 #include "MPCVideoDec.h"
 #include "../../../DSUtil/DSUtil.h"
 
@@ -42,7 +42,7 @@ CVideoDecOutputPin::~CVideoDecOutputPin(void)
 
 HRESULT CVideoDecOutputPin::InitAllocator(IMemAllocator **ppAlloc)
 {
-	TRACE("CVideoDecOutputPin::InitAllocator\n");
+	//TRACE("CVideoDecOutputPin::InitAllocator\n");
 	if (m_pVideoDecFilter->UseDXVA2()) {
 		HRESULT hr = S_FALSE;
 		m_pDXVA2Allocator = DNew CVideoDecDXVAAllocator(m_pVideoDecFilter, &hr);
@@ -86,6 +86,7 @@ STDMETHODIMP CVideoDecOutputPin::GetUncompSurfacesInfo(const GUID *pGuid, LPAMVA
 			}
 		}
 	}
+
 	return hr;
 }
 
@@ -124,7 +125,6 @@ STDMETHODIMP CVideoDecOutputPin::GetCreateVideoAcceleratorData(const GUID *pGuid
 			}
 		}
 	}
-
 
 	return hr;
 }

@@ -33,7 +33,7 @@
     <ClCompile Include="ffImgfmt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ffmpegDec.cpp">
+    <ClCompile Include="IMPCVideoDec.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MPCVideoDec.cpp">
@@ -45,10 +45,10 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VideoDecDXVAAllocator.cpp">
+    <ClCompile Include="DXVAAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VideoDecOutputPin.cpp">
+    <ClCompile Include="MPCVideoDecOutputPin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\ExtLib\mfc\winmdi.cpp">
@@ -104,10 +104,10 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VideoDecDXVAAllocator.h">
+    <ClInclude Include="DXVAAllocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VideoDecOutputPin.h">
+    <ClInclude Include="MPCVideoDecOutputPin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="H264RandomAccess.h">

@@ -32,7 +32,7 @@
 #endif
 
 #include "MPCVideoDec.h"
-#include "VideoDecOutputPin.h"
+#include "MPCVideoDecOutputPin.h"
 #include "CpuId.h"
 
 #include "ffImgfmt.h"

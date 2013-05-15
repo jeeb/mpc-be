@@ -21,9 +21,8 @@
  */
 
 #include "stdafx.h"
-#include "VideoDecDXVAAllocator.h"
+#include "DXVAAllocator.h"
 #include "MPCVideoDec.h"
-
 
 CDXVA2Sample::CDXVA2Sample(CVideoDecDXVAAllocator *pAlloc, HRESULT *phr)
 	: CMediaSample(NAME("CDXVA2Sample"), (CBaseAllocator*)pAlloc, phr, NULL, 0)
@@ -106,7 +105,7 @@ CVideoDecDXVAAllocator::~CVideoDecDXVAAllocator()
 
 HRESULT CVideoDecDXVAAllocator::Alloc()
 {
-	TRACE(_T("CVideoDecDXVAAllocator::Alloc()\n"));
+	//TRACE(_T("CVideoDecDXVAAllocator::Alloc()\n"));
 
 	HRESULT hr;
 	CComPtr<IDirectXVideoDecoderService> pDXVA2Service;
@@ -182,7 +181,7 @@ HRESULT CVideoDecDXVAAllocator::Alloc()
 
 void CVideoDecDXVAAllocator::Free()
 {
-	TRACE(_T("CVideoDecDXVAAllocator::Free()\n"));
+	//TRACE(_T("CVideoDecDXVAAllocator::Free()\n"));
 
 	CMediaSample *pSample = NULL;
 

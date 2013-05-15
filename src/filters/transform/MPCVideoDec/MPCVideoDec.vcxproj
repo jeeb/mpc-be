@@ -268,7 +268,7 @@ update_version.bat</Command>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="H264RandomAccess.cpp" />
-    <ClCompile Include="ffmpegDec.cpp">
+    <ClCompile Include="IMPCVideoDec.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="MPCVideoDec.cpp" />
@@ -276,8 +276,8 @@ update_version.bat</Command>
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="VideoDecDXVAAllocator.cpp" />
-    <ClCompile Include="VideoDecOutputPin.cpp" />
+    <ClCompile Include="DXVAAllocator.cpp" />
+    <ClCompile Include="MPCVideoDecOutputPin.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="array_allocator.h" />
@@ -298,8 +298,8 @@ update_version.bat</Command>
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="VideoDecDXVAAllocator.h" />
-    <ClInclude Include="VideoDecOutputPin.h" />
+    <ClInclude Include="DXVAAllocator.h" />
+    <ClInclude Include="MPCVideoDecOutputPin.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MPCVideoDec.rc">
