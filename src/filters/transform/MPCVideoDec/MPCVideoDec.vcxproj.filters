@@ -33,9 +33,6 @@
     <ClCompile Include="ffImgfmt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IMPCVideoDec.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MPCVideoDec.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

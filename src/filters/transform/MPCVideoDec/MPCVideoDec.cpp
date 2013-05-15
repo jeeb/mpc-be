@@ -378,7 +378,7 @@ FFMPEG_CODECS		ffCodecs[] = {
 };
 
 /* Important: the order should be exactly the same as in ffCodecs[] */
-const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesIn[] = {
+const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	// Flash video
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_FLV1 },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_flv1 },
@@ -653,15 +653,47 @@ const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_wv1f }
 };
 
-const int CMPCVideoDecFilter::sudPinTypesInCount = _countof(CMPCVideoDecFilter::sudPinTypesIn);
-
-const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesOut[] = {
+const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 	{&MEDIATYPE_Video, &MEDIASUBTYPE_NV12},
 	{&MEDIATYPE_Video, &MEDIASUBTYPE_YV12},
 	{&MEDIATYPE_Video, &MEDIASUBTYPE_YUY2},
 	{&MEDIATYPE_Video, &MEDIASUBTYPE_RGB32},
 };
-const int CMPCVideoDecFilter::sudPinTypesOutCount = _countof(CMPCVideoDecFilter::sudPinTypesOut);
+
+#ifdef REGISTER_FILTER
+
+const AMOVIESETUP_PIN sudpPins[] = {
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn),  sudPinTypesIn},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut), sudPinTypesOut}
+};
+
+const AMOVIESETUP_FILTER sudFilters[] = {
+	{&__uuidof(CMPCVideoDecFilter), MPCVideoDecName, MERIT_NORMAL + 1, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory}
+};
+
+CFactoryTemplate g_Templates[] = {
+	{sudFilters[0].strName, &__uuidof(CMPCVideoDecFilter), CreateInstance<CMPCVideoDecFilter>, NULL, &sudFilters[0]},
+	{L"CMPCVideoDecPropertyPage", &__uuidof(CMPCVideoDecSettingsWnd), CreateInstance<CInternalPropertyPageTempl<CMPCVideoDecSettingsWnd> >},
+	{L"CMPCVideoDecPropertyPage2", &__uuidof(CMPCVideoDecCodecWnd), CreateInstance<CInternalPropertyPageTempl<CMPCVideoDecCodecWnd> >},
+};
+
+int g_cTemplates = _countof(g_Templates);
+
+STDAPI DllRegisterServer()
+{
+	return AMovieDllRegisterServer2(TRUE);
+}
+
+STDAPI DllUnregisterServer()
+{
+	return AMovieDllRegisterServer2(FALSE);
+}
+
+#include "../../core/FilterApp.h"
+
+CFilterApp theApp;
+
+#endif
 
 BOOL CALLBACK EnumFindProcessWnd (HWND hwnd, LPARAM lParam)
 {
