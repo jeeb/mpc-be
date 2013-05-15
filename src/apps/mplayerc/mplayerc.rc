@@ -2733,7 +2733,7 @@ BEGIN
     IDS_MPLAYERC_95         "Next Subtitle (DVD)"
     IDS_MPLAYERC_96         "Prev Subtitle (DVD)"
     IDS_MPLAYERC_97         "On/Off Subtitle (DVD)"
-    IDS_MPLAYERC_98         "Remaining Time"
+    IDS_MPLAYERC_98         "OSD: Remaining Time"
 END
 
 STRINGTABLE
