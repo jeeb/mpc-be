@@ -17630,6 +17630,8 @@ void CMainFrame::CloseMedia()
 	}
 
 	SetDwmPreview(FALSE);
+
+	m_wndToolBar.SwitchTheme();
 }
 
 void CMainFrame::StartTunerScan(CAutoPtr<TunerScanData> pTSD)

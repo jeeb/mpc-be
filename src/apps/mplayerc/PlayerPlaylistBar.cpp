@@ -1066,10 +1066,6 @@ void CPlayerPlaylistBar::OnLvnKeyDown(NMHDR* pNMHDR, LRESULT* pResult)
 
 		*pResult = TRUE;
 	}
-
-	if (pLVKeyDown->wVKey == VK_DELETE) {
-		((CMainFrame*)AfxGetMainWnd())->m_wndToolBar.SwitchTheme();
-	}
 }
 
 void CPlayerPlaylistBar::OnNMDblclkList(NMHDR* pNMHDR, LRESULT* pResult)
