@@ -184,13 +184,16 @@
     <ClInclude Include="libavcodec\x86\cabac.h">
       <Filter>libavcodec\x86</Filter>
     </ClInclude>
+    <ClInclude Include="libavcodec\x86\constants.h">
+      <Filter>libavcodec\x86</Filter>
+    </ClInclude>
     <ClInclude Include="libavcodec\x86\dirac_dwt.h">
       <Filter>libavcodec\x86</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\x86\diracdsp_mmx.h">
       <Filter>libavcodec\x86</Filter>
     </ClInclude>
-    <ClInclude Include="libavcodec\x86\dsputil_mmx.h">
+    <ClInclude Include="libavcodec\x86\dsputil_x86.h">
       <Filter>libavcodec\x86</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\x86\fft.h">
@@ -1096,6 +1099,9 @@
     <ClCompile Include="libavcodec\x86\diracdsp_mmx.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
+    <ClCompile Include="libavcodec\x86\dsputil_init.c">
+      <Filter>libavcodec\x86</Filter>
+    </ClCompile>
     <ClCompile Include="libavcodec\x86\dsputil_mmx.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
@@ -1124,9 +1130,6 @@
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\h264dsp_init.c">
-      <Filter>libavcodec\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="libavcodec\x86\hpeldsp_avg_template.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\hpeldsp_init.c">

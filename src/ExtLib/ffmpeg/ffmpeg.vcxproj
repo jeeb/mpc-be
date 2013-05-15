@@ -292,9 +292,10 @@
     <ClInclude Include="libavcodec\wmv2.h" />
     <ClInclude Include="libavcodec\wmv2dsp.h" />
     <ClInclude Include="libavcodec\x86\cabac.h" />
+    <ClInclude Include="libavcodec\x86\constants.h" />
     <ClInclude Include="libavcodec\x86\diracdsp_mmx.h" />
     <ClInclude Include="libavcodec\x86\dirac_dwt.h" />
-    <ClInclude Include="libavcodec\x86\dsputil_mmx.h" />
+    <ClInclude Include="libavcodec\x86\dsputil_x86.h" />
     <ClInclude Include="libavcodec\x86\fft.h" />
     <ClInclude Include="libavcodec\x86\h264_i386.h" />
     <ClInclude Include="libavcodec\x86\idct_xvid.h" />
@@ -649,6 +650,7 @@
     <ClCompile Include="libavcodec\x86\constants.c" />
     <ClCompile Include="libavcodec\x86\diracdsp_mmx.c" />
     <ClCompile Include="libavcodec\x86\dirac_dwt.c" />
+    <ClCompile Include="libavcodec\x86\dsputil_init.c" />
     <ClCompile Include="libavcodec\x86\dsputil_mmx.c" />
     <ClCompile Include="libavcodec\x86\dsputil_qns_template.c" />
     <ClCompile Include="libavcodec\x86\fdct.c" />
@@ -659,7 +661,6 @@
     <ClCompile Include="libavcodec\x86\h264dsp_init.c" />
     <ClCompile Include="libavcodec\x86\h264_intrapred_init.c" />
     <ClCompile Include="libavcodec\x86\h264_qpel.c" />
-    <ClCompile Include="libavcodec\x86\hpeldsp_avg_template.c" />
     <ClCompile Include="libavcodec\x86\hpeldsp_init.c" />
     <ClCompile Include="libavcodec\x86\hpeldsp_mmx.c" />
     <ClCompile Include="libavcodec\x86\hpeldsp_rnd_template.c" />

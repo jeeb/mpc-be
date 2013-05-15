@@ -324,6 +324,7 @@ SRCS_C = \
 	libavcodec/x86/constants.c \
 	libavcodec/x86/dirac_dwt.c \
 	libavcodec/x86/diracdsp_mmx.c \
+	libavcodec/x86/dsputil_init.c \
 	libavcodec/x86/dsputil_mmx.c \
 	libavcodec/x86/fdct.c \
 	libavcodec/x86/fft_init.c \

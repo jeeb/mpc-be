@@ -762,13 +762,13 @@ yuv2rgba64_2_c_template(SwsContext *c, const int32_t *buf[2],
     int  yalpha1 = 4096 - yalpha;
     int uvalpha1 = 4096 - uvalpha;
     int i;
+    int A1 = 0, A2 = 0; // Init to avoid compiler warnings
 
     for (i = 0; i < ((dstW + 1) >> 1); i++) {
         int Y1 = (buf0[i * 2]     * yalpha1  + buf1[i * 2]     * yalpha) >> 14;
         int Y2 = (buf0[i * 2 + 1] * yalpha1  + buf1[i * 2 + 1] * yalpha) >> 14;
         int U  = (ubuf0[i]        * uvalpha1 + ubuf1[i]        * uvalpha + (-128 << 23)) >> 14;
         int V  = (vbuf0[i]        * uvalpha1 + vbuf1[i]        * uvalpha + (-128 << 23)) >> 14;
-        int A1, A2;
         int R, G, B;
 
         Y1 -= c->yuv2rgb_y_offset;
@@ -1717,7 +1717,7 @@ yuv2gbrp_full_X_c(SwsContext *c, const int16_t *lumFilter,
 {
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(c->dstFormat);
     int i;
-    int hasAlpha = (desc->flags & PIX_FMT_ALPHA) && alpSrc;
+    int hasAlpha = (desc->flags & AV_PIX_FMT_FLAG_ALPHA) && alpSrc;
     uint16_t **dest16 = (uint16_t**)dest;
     int SH = 22 + 7 - desc->comp[0].depth_minus1;
     int A = 0; // init to silence warning
