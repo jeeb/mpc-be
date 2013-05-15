@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta13 - April 30, 2013
+Libpng 1.7.0beta14 - May 13, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta13.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta13.tar.gz
+   1.7.0beta14.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta14.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b13.7z  (LZMA-compressed, recommended)
-   lp170b13.zip
+   lp170b14.7z  (LZMA-compressed, recommended)
+   lp170b14.zip
 
 Other information:
 
-   1.7.0beta13-README.txt
-   1.7.0beta13-LICENSE.txt
+   1.7.0beta14-README.txt
+   1.7.0beta14-LICENSE.txt
 
 Changes since the last public release (1.6.0):
 
@@ -275,7 +275,36 @@ Version 1.7.0beta12 [April 30, 2013]
   Avoid dereferencing NULL pointer possibly returned from
      png_create_write_struct() (Andrew Church).
 
-Version 1.7.0beta13 [April 30, 2013]
+Version 1.7.0beta13 [May 12, 2013]
+  Revised contrib/pngminim/*/makefile to generate pnglibconf.h with the
+    right zlib header files.
+  Separated CPPFLAGS and CFLAGS in contrib/pngminim/*/makefile
+  Updated contrib/pngminus/pnm2png.c (Paul Stewart):
+    Check for EOF
+    Ignore "#" delimited comments in input file to pnm2png.c.
+    Fixed whitespace handling
+    Added a call to png_set_packing()
+    Initialize dimension values so if sscanf fails at least we have known
+      invalid values.
+  Calculate our own zlib windowBits when decoding rather than trusting the
+    CMF bytes in the PNG datastream.
+  Added an option to force maximum window size for inflating, which was
+    the behavior of libpng15 and earlier.
+  Added png-fix-itxt and png-fix-too-far-back to the built programs and
+    removed warnings from the source code and timepng that are revealed as
+    a result.
+  Detect wrong libpng versions linked to png-fix-too-far-back, which currently
+    only works with libpng versions that can be made to reliably fail when
+    the deflate data contains an out-of-window reference.  This means only
+    1.6 and later.
+  Attempt to detect configuration issues with png-fix-too-far-back, which
+    requires both the correct libpng and the correct zlib to function
+    correctly.
+  Check ZLIB_VERNUM for mismatches, enclose #error in quotes
+  Added information in the documentation about problems with and fixes for
+    the bad CRC and bad iTXt chunk situations.
+
+Version 1.7.0beta14 [May 13, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
