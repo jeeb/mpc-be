@@ -2,7 +2,7 @@
 
 * config.h
 * config.asm
-* ffmpeg.make
+* ffmpeg.mak
 
 * libavcodec/aacps.c
 * libavcodec/aacsbr.c
