@@ -59,9 +59,138 @@
 #define FLV_VIDEO_SCREEN2 6 // Screen video version 2
 #define FLV_VIDEO_AVC     7 // AVC
 
-#define AMF_DATA_TYPE_STRING		0x02
-#define AMF_DATA_TYPE_NUMBER		0x00
-#define AMF_DATA_TYPE_MIXEDARRAY	0x08
+enum AMF_DATA_TYPE {
+	AMF_DATA_TYPE_EMPTY			= -1,
+	AMF_DATA_TYPE_NUMBER		= 0x00,
+	AMF_DATA_TYPE_BOOL			= 0x01,
+	AMF_DATA_TYPE_STRING		= 0x02,
+	AMF_DATA_TYPE_OBJECT		= 0x03,
+	AMF_DATA_TYPE_NULL			= 0x05,
+	AMF_DATA_TYPE_UNDEFINED		= 0x06,
+	AMF_DATA_TYPE_REFERENCE		= 0x07,
+	AMF_DATA_TYPE_MIXEDARRAY	= 0x08,
+	AMF_DATA_TYPE_ARRAY			= 0x0a,
+	AMF_DATA_TYPE_DATE			= 0x0b,
+	AMF_DATA_TYPE_LONG_STRING	= 0x0c,
+	AMF_DATA_TYPE_UNSUPPORTED	= 0x0d,
+};
+
+#define AMF_END_OF_OBJECT		0x09
+
+struct AMF0 {
+	AMF_DATA_TYPE type;
+	CString	name;
+	CString value_s;
+	double	value_d;
+	bool	value_b;
+
+	AMF0() {
+		type	= AMF_DATA_TYPE_EMPTY;
+		value_d	= 0;
+		value_b	= 0;
+	}
+
+	operator CString() const {
+		return value_s;
+	}
+	operator double() const {
+		return value_d;
+	}
+	operator bool() const {
+		return value_b;
+	}
+};
+
+static double int64toDouble(__int64 value)
+{
+	union
+	{
+		__int64	i;
+		double	f;
+	} intfloat64;
+	
+	intfloat64.i = value;
+
+	return intfloat64.f;
+}
+
+static bool ParseAMF0(CBaseSplitterFileEx* pFile, UINT64 end, const char *key, CAtlArray<AMF0> &AMF0Array)
+{
+	if (UINT64(pFile->GetPos()) >= (end - 2)) {
+		return false;
+	}
+
+	AMF0 amf0;
+	char name[65535];
+
+	AMF_DATA_TYPE amf_type = (AMF_DATA_TYPE)pFile->BitRead(8);
+
+	switch (amf_type) {
+		case AMF_DATA_TYPE_NUMBER:
+			{
+				UINT64 value = pFile->BitRead(64);
+
+				amf0.type		= amf_type;
+				amf0.name		= CString(key);
+				amf0.value_d	= int64toDouble(value);
+			}
+			break;
+		case AMF_DATA_TYPE_BOOL:
+			{
+				BYTE value = pFile->BitRead(8);
+
+				amf0.type		= amf_type;
+				amf0.name		= CString(key);
+				amf0.value_b	= !!value;
+			}
+			break;
+		case AMF_DATA_TYPE_STRING:
+			{
+				SHORT length = pFile->BitRead(16);
+				memset(name, 0, sizeof(name));
+				pFile->ByteRead((BYTE*)name, length);
+
+				amf0.type		= amf_type;
+				amf0.name		= CString(key);
+				amf0.value_s	= CString(name);
+			}
+			break;
+		case AMF_DATA_TYPE_OBJECT:
+			break; // TODO ...
+		case AMF_DATA_TYPE_NULL:
+		case AMF_DATA_TYPE_UNDEFINED:
+		case AMF_DATA_TYPE_UNSUPPORTED:
+			return true;
+        case AMF_DATA_TYPE_MIXEDARRAY:
+			{
+				pFile->BitRead(32);
+				for (;;) {
+					SHORT length = pFile->BitRead(16);
+					memset(name, 0, sizeof(name));
+					if (FAILED(pFile->ByteRead((BYTE*)name, length))) {
+						return false;
+					}
+					if (ParseAMF0(pFile, end, name, AMF0Array) == false) {
+						return false;
+					}
+				}
+
+				return (pFile->BitRead(8) == AMF_END_OF_OBJECT);
+			}
+		case AMF_DATA_TYPE_ARRAY:
+			break; // TODO ...
+		case AMF_DATA_TYPE_DATE:
+			pFile->Seek(pFile->GetPos() + 8 + 2);
+			return true;
+	}
+
+	if (amf0.type != AMF_DATA_TYPE_EMPTY) {
+		AMF0Array.Add(amf0);
+		return true;
+	}
+
+	return false;
+}
 
 
 #ifdef REGISTER_FILTER
@@ -178,10 +307,10 @@ bool CFLVSplitterFilter::ReadTag(AudioTag& at)
 		//return false;
 	}
 
-	at.SoundFormat = (BYTE)m_pFile->BitRead(4);
-	at.SoundRate = (BYTE)m_pFile->BitRead(2);
-	at.SoundSize = (BYTE)m_pFile->BitRead(1);
-	at.SoundType = (BYTE)m_pFile->BitRead(1);
+	at.SoundFormat	= (BYTE)m_pFile->BitRead(4);
+	at.SoundRate	= (BYTE)m_pFile->BitRead(2);
+	at.SoundSize	= (BYTE)m_pFile->BitRead(1);
+	at.SoundType	= (BYTE)m_pFile->BitRead(1);
 
 	return true;
 }
@@ -192,8 +321,8 @@ bool CFLVSplitterFilter::ReadTag(VideoTag& vt)
 		//return false;
 	}
 
-	vt.FrameType = (BYTE)m_pFile->BitRead(4);
-	vt.CodecID = (BYTE)m_pFile->BitRead(4);
+	vt.FrameType	= (BYTE)m_pFile->BitRead(4);
+	vt.CodecID		= (BYTE)m_pFile->BitRead(4);
 
 	return true;
 }
@@ -258,19 +387,6 @@ bool CFLVSplitterFilter::Sync(__int64& pos)
 	return false;
 }
 
-static double int64toDouble(__int64 value)
-{
-	union
-	{
-		__int64	i;
-		double	f;
-	} intfloat64;
-	
-	intfloat64.i = value;
-
-	return intfloat64.f;
-}
-
 HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 {
 	CheckPointer(pAsyncReader, E_POINTER);
@@ -320,7 +436,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		UINT64 next = m_pFile->GetPos() + t.DataSize;
 
-		CStringW name;
+		CString name;
 
 		CMediaType mt;
 		mt.subtype = GUID_NULL;
@@ -334,23 +450,16 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			BYTE type = m_pFile->BitRead(8);
 			SHORT length = m_pFile->BitRead(16);
 			if (type == AMF_DATA_TYPE_STRING && length <= 11) {
-				char name[256];
-				memset(name, 0, 256);
+				char name[11];
+				memset(name, 0, 11);
 				m_pFile->ByteRead((BYTE*)name, length);
 				if (!strncmp(name, "onTextData", length) || (!strncmp(name, "onMetaData", length))) {
+					CAtlArray<AMF0> AMF0Array;
+					ParseAMF0(m_pFile, next, name, AMF0Array);
 
-					BYTE amf_type = m_pFile->BitRead(8);
-					if (amf_type == AMF_DATA_TYPE_MIXEDARRAY) {
-						m_pFile->BitRead(32); // skip 32-bit max array index
-
-						length = m_pFile->BitRead(16);
-						memset(name, 0, 256);
-						m_pFile->ByteRead((BYTE*)name, length);
-						if (!strncmp(name, "duration", length)) {
-							amf_type = m_pFile->BitRead(8);
-							if (amf_type == AMF_DATA_TYPE_NUMBER) {
-								metaDataDuration = UNITS * (REFERENCE_TIME)int64toDouble(m_pFile->BitRead(64));
-							}
+					for (size_t i = 0; i < AMF0Array.GetCount(); i++) {
+						if (AMF0Array[i].type == AMF_DATA_TYPE_NUMBER && AMF0Array[i].name == L"duration") {
+							metaDataDuration = (REFERENCE_TIME)(UNITS * (double)AMF0Array[i]);
 						}
 					}
 				}
@@ -689,7 +798,6 @@ bool CFLVSplitterFilter::DemuxInit()
 
 	if (m_pFile->IsRandomAccess()) {
 		__int64 pos = max(m_DataOffset, m_pFile->GetAvailable() - 256 * 1024);
-		REFERENCE_TIME rtDuration = 0;
 		
 		if (Sync(pos)) {
 			Tag t;
@@ -699,16 +807,18 @@ bool CFLVSplitterFilter::DemuxInit()
 			while (ReadTag(t) && m_pFile->GetRemaining()) {
 				UINT64 next = m_pFile->GetPos() + t.DataSize;
 
+				CBaseSplitterOutputPin* pOutPin = dynamic_cast<CBaseSplitterOutputPin*>(GetOutputPin(t.TagType));
+				if (!pOutPin) {
+					m_pFile->Seek(next);
+					continue;
+				}
+
 				if ((t.TagType == FLV_AUDIODATA && ReadTag(at)) || (t.TagType == FLV_VIDEODATA && ReadTag(vt))) {
-					rtDuration = max(rtDuration, 10000i64 * t.TimeStamp);
+					m_rtDuration = max(m_rtDuration, 10000i64 * t.TimeStamp + pOutPin->GetOffset());
 				}
 
 				m_pFile->Seek(next);
 			}
-		}
-
-		if (rtDuration) {
-			m_rtDuration = rtDuration;
 		}
 	}
 
