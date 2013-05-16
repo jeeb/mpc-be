@@ -5357,7 +5357,7 @@ void CMainFrame::OnFileOpenCD(UINT nID)
 
 			ShowWindow(SW_SHOW);
 
-			ShowControlBar(&m_wndPlaylistBar, TRUE, TRUE);
+			//ShowControlBar(&m_wndPlaylistBar, TRUE, TRUE); // why open playlist ???
 			m_wndPlaylistBar.Open(sl, true);
 
 			OpenCurPlaylistItem();
