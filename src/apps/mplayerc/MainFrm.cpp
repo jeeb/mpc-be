@@ -17944,7 +17944,7 @@ void CMainFrame::SetColorControl(DWORD flags, int& brightness, int& contrast, in
 		ClrControl.Hue        = (float)hue;
 		ClrControl.Saturation = (float)(saturation+100)/100;
 
-		m_pMC->SetProcAmpControl (0, &ClrControl);
+		m_pMC->SetProcAmpControl(0, &ClrControl);
 	} else if (m_pMFVP) {
 		ClrValues.Brightness = IntToFixed(brightness);
 		ClrValues.Contrast   = IntToFixed(contrast+100, 100);
@@ -17987,7 +17987,6 @@ LPCTSTR CMainFrame::GetDVDAudioFormatName (DVD_AudioAttributes& ATR) const
 
 afx_msg void CMainFrame::OnGotoSubtitle(UINT nID)
 {
-	OnPlayPause();
 	m_rtCurSubPos		= m_wndSeekBar.GetPosReal();
 	m_lSubtitleShift	= 0;
 	m_nCurSubtitle		= m_wndSubresyncBar.FindNearestSub (m_rtCurSubPos, (nID == ID_GOTO_NEXT_SUB));
