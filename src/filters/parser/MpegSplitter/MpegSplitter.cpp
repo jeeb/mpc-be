@@ -598,6 +598,8 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	m_AC3CoreOnly				= AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("AC3CoreOnly"), m_AC3CoreOnly);
 	m_AlternativeDuration		= !!AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("AlternativeDuration"), m_AlternativeDuration);
 	m_SubEmptyPin				= !!AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("SubtitleEmptyOutput"), m_SubEmptyPin);
+
+	m_nFlag					   |= PACKET_PTS_DISCONTINUITY;
 #endif
 }
 
@@ -1802,8 +1804,6 @@ HRESULT CMpegSplitterOutputPin::DeliverEndFlush()
 HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 {
 	CAutoLock cAutoLock(this);
-
-	p->flag |= PACKET_PTS_DISCONTINUITY;
 
 	if (p->pmt) {
 		if (*((CMediaType *)p->pmt) != m_mt) {

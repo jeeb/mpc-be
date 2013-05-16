@@ -526,13 +526,13 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 		return S_OK;
 	}
 
-	if (p->rtStart != INVALID_TIME && (p->flag & PACKET_PTS_DISCONTINUITY)) {
+	if (p->rtStart != INVALID_TIME && ((static_cast<CBaseSplitterFilter*>(m_pFilter))->GetFlag() & PACKET_PTS_DISCONTINUITY)) {
 		// Filter invalid PTS value (if too different from previous packet)
-		if (!IsDiscontinuous() && m_rtPrev != INVALID_TIME && p->rtStart > 0) {
+		if (!IsDiscontinuous() && m_rtPrev != INVALID_TIME) {
 			REFERENCE_TIME rt = p->rtStart + m_rtOffset;
 			if (_abs64(rt - m_rtPrev) > MAX_PTS_SHIFT) {
 				m_rtOffset += m_rtPrev - rt;
-				DbgLog((LOG_TRACE, 3, _T("CBaseSplitterOutputPin::DeliverPacket() : Packet discontinuity detected, adjusting offset to %I64d"), m_rtOffset));
+				DbgLog((LOG_TRACE, 3, L"CBaseSplitterOutputPin::DeliverPacket() : Packet discontinuity detected, adjusting offset to %I64d", m_rtOffset));
 			}
 		}
 
@@ -805,6 +805,7 @@ CBaseSplitterFilter::CBaseSplitterFilter(LPCTSTR pName, LPUNKNOWN pUnk, HRESULT*
 	, m_rtLastStart(INVALID_TIME)
 	, m_rtLastStop(INVALID_TIME)
 	, m_priority(THREAD_PRIORITY_NORMAL)
+	, m_nFlag(0)
 {
 	if (phr) {
 		*phr = S_OK;

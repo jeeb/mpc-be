@@ -44,13 +44,11 @@ public:
 	BOOL bDiscontinuity, bSyncPoint, bAppendable;
 	REFERENCE_TIME rtStart, rtStop;
 	AM_MEDIA_TYPE* pmt;
-	DWORD flag;
 	Packet() {
 		TrackNumber = 0;	
 		pmt = NULL;
 		bDiscontinuity = bAppendable = FALSE;
 		rtStart = rtStop = INVALID_TIME;
-		flag = 0;
 	}
 	virtual ~Packet() {
 		if (pmt) {
@@ -290,6 +288,8 @@ protected:
 
 	CFontInstaller m_fontinst;
 
+	DWORD m_nFlag;
+
 protected:
 	enum {CMD_EXIT, CMD_SEEK};
 	DWORD ThreadProc();
@@ -413,4 +413,6 @@ public:
 
 	DWORD GetMinQueuePackets() { return m_MinQueuePackets; }
 	DWORD GetMaxQueuePackets() { return m_MaxQueuePackets; }
+
+	DWORD GetFlag() { return m_nFlag; }
 };

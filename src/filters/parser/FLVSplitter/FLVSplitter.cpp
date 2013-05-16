@@ -123,6 +123,7 @@ CFLVSplitterFilter::CFLVSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	, m_TimeStampOffset(0)
 	, m_DetectWrongTimeStamp(true)
 {
+	m_nFlag |= PACKET_PTS_DISCONTINUITY;
 }
 
 STDMETHODIMP CFLVSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
@@ -165,7 +166,7 @@ bool CFLVSplitterFilter::ReadTag(Tag& t)
 
 	if (m_TimeStampOffset > 0) {
 		t.TimeStamp -= m_TimeStampOffset;
-		//TRACE(_T("CFLVSplitterFilter::ReadTag() : Detect wrong TimeStamp offset, corrected [%d -> %d]\n"), (t.TimeStamp + m_TimeStampOffset), t.TimeStamp);
+		DbgLog((LOG_TRACE, 3, L"CFLVSplitterFilter::ReadTag() : Detect wrong TimeStamp offset, corrected [%d -> %d]",  (t.TimeStamp + m_TimeStampOffset), t.TimeStamp));
 	}
 
 	return m_pFile->IsRandomAccess() ? (m_pFile->GetRemaining() >= t.DataSize) : true;
@@ -746,10 +747,14 @@ void CFLVSplitterFilter::NormalSeek(REFERENCE_TIME rt)
 	VideoTag vt;
 
 	while (ReadTag(t)) {
+		pos = m_pFile->GetPos() + t.DataSize;
+
 		CBaseSplitterOutputPin* pOutPin = dynamic_cast<CBaseSplitterOutputPin*>(GetOutputPin(t.TagType));
 		if (!pOutPin) {
+			m_pFile->Seek(pos);
 			continue;
 		}
+
 		t.TimeStamp += (pOutPin->GetOffset() / 10000i64);
 
 		if (10000i64 * t.TimeStamp >= rt) {
@@ -757,7 +762,7 @@ void CFLVSplitterFilter::NormalSeek(REFERENCE_TIME rt)
 			break;
 		}
 
-		m_pFile->Seek(m_pFile->GetPos() + t.DataSize);
+		m_pFile->Seek(pos);
 	}
 
 	while (m_pFile->GetPos() >= m_DataOffset && (fAudio || fVideo) && ReadTag(t)) {
@@ -765,6 +770,7 @@ void CFLVSplitterFilter::NormalSeek(REFERENCE_TIME rt)
 
 		CBaseSplitterOutputPin* pOutPin = dynamic_cast<CBaseSplitterOutputPin*>(GetOutputPin(t.TagType));
 		if (!pOutPin) {
+			m_pFile->Seek(prev);
 			continue;
 		}
 
@@ -896,7 +902,6 @@ bool CFLVSplitterFilter::DemuxLoop()
 			p->rtStart		= 10000i64 * (t.TimeStamp + tsOffset);
 			p->rtStop		= p->rtStart + 1;
 			p->bSyncPoint	= t.TagType == FLV_VIDEODATA ? vt.FrameType == 1 : true;
-			p->flag			|= PACKET_PTS_DISCONTINUITY;
 
 			p->SetCount((size_t)dataSize);
 			m_pFile->ByteRead(p->GetData(), p->GetCount());
