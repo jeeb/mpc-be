@@ -115,6 +115,7 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 
 	MediaInfo MI;
 
+	MI.Option(_T("ParseSpeed"), _T("0"));
 	MI.Option(_T("Language"), mi_get_lang_file());
 	MI.Option(_T("Complete"));
 	MI.Open(((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strFnFull.GetString());
