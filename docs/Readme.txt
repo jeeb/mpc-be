@@ -16,8 +16,6 @@ MPC-BE имеет внушительный набор аудио-видео фи
   Полный пакет:     http://www.microsoft.com/download/en/details.aspx?id=8109
 
 
-
-
 MPC-BE is a free and open source audio and video player for Windows.
 MPC-BE is based on the original Guliverkli project and "Media Player Classic Home Cinema" project, contains additional features and bug fixes.
 
@@ -59,15 +57,15 @@ CLineNumberEdit     -                          -
 CSizingControlBar   GPLv2                      http://datamekanix.com/sizecbar/
 Detours             MSR-SSLA                   http://research.microsoft.com/en-us/projects/detours/
 FFmpeg              GPLv3                      http://ffmpeg.org/
-libflac             GPLv2 / New BSD License    http://sourceforge.net/projects/flac/
+libflac             GPLv2 / BSD License        http://sourceforge.net/projects/flac/
 libpng              zlib / libpng License      http://sourceforge.net/projects/libpng/
 libwebp             BSD License                http://code.google.com/p/webp/
-libopenjpeg         New BSD License            http://code.google.com/p/openjpeg/
+libopenjpeg         BSD License                http://code.google.com/p/openjpeg/
 libopus             BSD License                http://opus-codec.org/
 libspeex            BSD License                http://speex.org/
 Little CMS          MIT License                http://littlecms.com/
 Logitech SDK        -                          -
-MediaInfoLib        LGPLv3                     http://sourceforge.net/projects/mediainfo/
+MediaInfo           BSD License                http://sourceforge.net/projects/mediainfo/
 MusePack            GPL                        http://musepack.net/
 QuickTime SDK       -                          -
 RealMedia SDK       -                          -
@@ -76,6 +74,6 @@ SoundTouch          LGPLv2.1                   http://surina.net/soundtouch/
 TreePropSheet       -                          -
 VirtualDub          GPLv2                      http://virtualdub.org/
 WavPackLib          BSD License                http://wavpack.com/
-ZenLib              Simplified BSD License     http://sourceforge.net/projects/zenlib/
+ZenLib              zlib / libpng License      http://sourceforge.net/projects/zenlib/
 zlib                zlib License               http://zlib.net/
 utfcpp              -                          http://sourceforge.net/projects/utfcpp/
