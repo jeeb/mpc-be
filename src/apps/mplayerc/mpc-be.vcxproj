@@ -740,7 +740,7 @@
       <Project>{46068841-6391-408F-9573-988ADD619379}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\ExtLib\MediaInfo\MediaInfoLib.vcxproj">
+    <ProjectReference Include="..\..\ExtLib\MediaInfo\MediaInfo.vcxproj">
       <Project>{20e0f8d6-213c-460b-b361-9c725cb375c7}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

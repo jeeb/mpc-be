@@ -147,7 +147,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mpeg2DecFilter", "src\filte
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lcms2", "src\ExtLib\lcms2\lcms2_2012.vcxproj", "{ACF5C64B-78AA-4730-91A2-24F4910FBAD9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MediaInfoLib", "src\ExtLib\MediaInfo\MediaInfoLib_2012.vcxproj", "{20E0F8D6-213C-460B-B361-9C725CB375C7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MediaInfo", "src\ExtLib\MediaInfo\MediaInfo_2012.vcxproj", "{20E0F8D6-213C-460B-B361-9C725CB375C7}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZenLib", "src\ExtLib\ZenLib\ZenLib_2012.vcxproj", "{0DA1DA7D-F393-4E7C-A7CE-CB5C6A67BC94}"
 EndProject
