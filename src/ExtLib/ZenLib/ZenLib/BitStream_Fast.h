@@ -1,23 +1,9 @@
-// ZenLib::bitStream - Read bit per bit
-// Copyright (C) 2006-2012 MediaArea.net SARL, Info@MediaArea.net
-//
-// This software is provided 'as-is', without any express or implied
-// warranty.  In no event will the authors be held liable for any damages
-// arising from the use of this software.
-//
-// Permission is granted to anyone to use this software for any purpose,
-// including commercial applications, and to alter it and redistribute it
-// freely, subject to the following restrictions:
-//
-// 1. The origin of this software must not be misrepresented; you must not
-//    claim that you wrote the original software. If you use this software
-//    in a product, an acknowledgment in the product documentation would be
-//    appreciated but is not required.
-// 2. Altered source versions must be plainly marked as such, and must not be
-//    misrepresented as being the original software.
-// 3. This notice may not be removed or altered from any source distribution.
-//
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+/*  Copyright (c) MediaArea.net SARL. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a zlib-style license that can
+ *  be found in the License.txt file in the root of the source tree.
+ */
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
 // Read a stream bit per bit
@@ -50,14 +36,14 @@ public:
     BitStream_Fast (const int8u* Buffer_, size_t Size_)                         {Buffer=Buffer_;
                                                                                  Buffer_Size=Buffer_Size_Init=Size_*8; //Size is in bits
                                                                                  BufferUnderRun=false;}
-    ~BitStream_Fast ()                                                          {};
+    ~BitStream_Fast ()                                                          {}
 
     void Attach(const int8u* Buffer_, size_t Size_)
     {
         Buffer=Buffer_;
         Buffer_Size=Buffer_Size_Init=Size_*8; //Size is in bits
         BufferUnderRun=false;
-    };
+    }
 
     bool  GetB ()
     {
@@ -249,7 +235,7 @@ public:
         LastByte=*Buffer;
         Buffer++;
         Buffer_Size-=HowMany;
-    };
+    }
 
     bool   PeekB()
     {
@@ -396,30 +382,30 @@ public:
         return (int64u)Peek4(HowMany); //Not yet implemented
     }
 
-    inline size_t Remain () //How many bits remain?
+    inline size_t Remain () const //How many bits remain?
     {
         return Buffer_Size;
-    };
+    }
 
     inline void Byte_Align()
     {
         Skip (Buffer_Size%8);
-    };
+    }
 
-    inline size_t Offset_Get()
+    inline size_t Offset_Get() const
     {
         return (Buffer_Size_Init-Buffer_Size)/8;
-    };
+    }
 
-    inline size_t BitOffset_Get()
+    inline size_t BitOffset_Get() const
     {
         return Buffer_Size%8;
-    };
+    }
 
-    inline size_t OffsetBeforeLastCall_Get() //No more valid
+    inline size_t OffsetBeforeLastCall_Get()  const //No more valid
     {
         return Buffer_Size%8;
-    };
+    }
 
 private :
     const int8u*    Buffer;

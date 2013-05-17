@@ -1,23 +1,9 @@
-// ZenLib::Ztring - std::(w)string is better
-// Copyright (C) 2002-2012 MediaArea.net SARL, Info@MediaArea.net
-//
-// This software is provided 'as-is', without any express or implied
-// warranty.  In no event will the authors be held liable for any damages
-// arising from the use of this software.
-//
-// Permission is granted to anyone to use this software for any purpose,
-// including commercial applications, and to alter it and redistribute it
-// freely, subject to the following restrictions:
-//
-// 1. The origin of this software must not be misrepresented; you must not
-//    claim that you wrote the original software. If you use this software
-//    in a product, an acknowledgment in the product documentation would be
-//    appreciated but is not required.
-// 2. Altered source versions must be plainly marked as such, and must not be
-//    misrepresented as being the original software.
-// 3. This notice may not be removed or altered from any source distribution.
-//
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+/*  Copyright (c) MediaArea.net SARL. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a zlib-style license that can
+ *  be found in the License.txt file in the root of the source tree.
+ */
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
 // More methods for std::(w)string
@@ -1009,7 +995,7 @@ Ztring& Ztring::From_Number (const int64u I, int8u Radix)
             clear();
             return *this;
         }
-        Char* C1=new Char[65];
+        Char* C1=new Char[65]; C1[0] = 0;
         #ifdef __MINGW32__
             _ui64tot (I, C1, Radix);
         #else
@@ -1551,11 +1537,12 @@ std::string Ztring::To_UTF8 () const
             int32u wc; // must be unsigned.
 
             #if defined(_MSC_VER)
+                #pragma warning(push)
                 #pragma warning(disable:4127)
             #endif //defined(__VISUALC__)
             if (sizeof(wchar_t) == 2)
             #if defined(_MSC_VER)
-                #pragma warning(default:4127)
+                #pragma warning(pop)
             #endif //defined(__VISUALC__)
                 wc = (int16u) *Z; // avoid a cast problem if wchar_t is signed.
             else
