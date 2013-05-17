@@ -651,9 +651,10 @@ int ff_thread_decode_frame(AVCodecContext *avctx,
      * If we're still receiving the initial packets, don't return a frame.
      */
 
-    if (fctx->delaying) {
-        if (fctx->next_decoding >= (avctx->thread_count-1-(avctx->codec_id == AV_CODEC_ID_FFV1))) fctx->delaying = 0;
+    if (fctx->next_decoding > (avctx->thread_count-1-(avctx->codec_id == AV_CODEC_ID_FFV1)))
+        fctx->delaying = 0;
 
+    if (fctx->delaying) {
         *got_picture_ptr=0;
         if (avpkt->size)
             return avpkt->size;
@@ -1145,23 +1146,16 @@ static void validate_thread_parameters(AVCodecContext *avctx)
 
 int ff_thread_init(AVCodecContext *avctx)
 {
-    if (avctx->thread_opaque) {
-        av_log(avctx, AV_LOG_ERROR, "avcodec_thread_init is ignored after avcodec_open\n");
-        return -1;
-    }
-
 #if HAVE_W32THREADS
     w32thread_init();
 #endif
 
-    if (avctx->codec) {
-        validate_thread_parameters(avctx);
+    validate_thread_parameters(avctx);
 
-        if (avctx->active_thread_type&FF_THREAD_SLICE)
-            return thread_init(avctx);
-        else if (avctx->active_thread_type&FF_THREAD_FRAME)
-            return frame_thread_init(avctx);
-    }
+    if (avctx->active_thread_type&FF_THREAD_SLICE)
+        return thread_init(avctx);
+    else if (avctx->active_thread_type&FF_THREAD_FRAME)
+        return frame_thread_init(avctx);
 
     return 0;
 }

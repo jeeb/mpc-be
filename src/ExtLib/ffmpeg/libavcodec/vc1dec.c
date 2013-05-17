@@ -624,7 +624,7 @@ static void vc1_mc_4mv_luma(VC1Context *v, int n, int dir, int avg)
             ty = (chosen_mv[f][0][1] + chosen_mv[f][1][1]) / 2;
             break;
         default:
-            av_assert2(0);
+            av_assert0(0);
         }
         s->current_picture.motion_val[1][s->block_index[0] + v->blocks_off][0] = tx;
         s->current_picture.motion_val[1][s->block_index[0] + v->blocks_off][1] = ty;
@@ -1666,7 +1666,7 @@ static inline void vc1_pred_mv_intfr(VC1Context *v, int n, int dmv_x, int dmv_y,
     MpegEncContext *s = &v->s;
     int xy, wrap, off = 0;
     int A[2], B[2], C[2];
-    int px, py;
+    int px = 0, py = 0;
     int a_valid = 0, b_valid = 0, c_valid = 0;
     int field_a, field_b, field_c; // 0: same, 1: opposit
     int total_valid, num_samefield, num_oppfield;
@@ -1804,8 +1804,7 @@ static inline void vc1_pred_mv_intfr(VC1Context *v, int n, int dmv_x, int dmv_y,
                 else if (b_valid) { px = B[0]; py = B[1]; }
                 else if (c_valid) { px = C[0]; py = C[1]; }
                 else av_assert2(0);
-            } else
-                px = py = 0;
+            }
         }
     } else {
         if (a_valid)
@@ -1858,13 +1857,12 @@ static inline void vc1_pred_mv_intfr(VC1Context *v, int n, int dmv_x, int dmv_y,
                 } else if (c_valid) {
                     px = C[0];
                     py = C[1];
-                } else px = py = 0;
+                }
             }
         } else if (total_valid == 1) {
             px = (a_valid) ? A[0] : ((b_valid) ? B[0] : C[0]);
             py = (a_valid) ? A[1] : ((b_valid) ? B[1] : C[1]);
-        } else
-            px = py = 0;
+        }
     }
 
     /* store MV using signed modulus of MV range defined in 4.11 */
@@ -4246,7 +4244,7 @@ static void vc1_decode_b_mb_intfi(VC1Context *v)
     int fwd;
     int dmv_x[2], dmv_y[2], pred_flag[2];
     int bmvtype = BMV_TYPE_BACKWARD;
-    int idx_mbmode, interpmvp;
+    int idx_mbmode;
 
     mquant      = v->pq; /* Lossy initialization */
     s->mb_intra = 0;
@@ -4299,6 +4297,7 @@ static void vc1_decode_b_mb_intfi(VC1Context *v)
         else
             fwd = v->forward_mb_plane[mb_pos];
         if (idx_mbmode <= 5) { // 1-MV
+            int interpmvp = 0;
             dmv_x[0]     = dmv_x[1] = dmv_y[0] = dmv_y[1] = 0;
             pred_flag[0] = pred_flag[1] = 0;
             if (fwd)
@@ -4321,7 +4320,7 @@ static void vc1_decode_b_mb_intfi(VC1Context *v)
             if (bmvtype != BMV_TYPE_DIRECT && idx_mbmode & 1) {
                 get_mvdata_interlaced(v, &dmv_x[bmvtype == BMV_TYPE_BACKWARD], &dmv_y[bmvtype == BMV_TYPE_BACKWARD], &pred_flag[bmvtype == BMV_TYPE_BACKWARD]);
             }
-            if (bmvtype == BMV_TYPE_INTERPOLATED && interpmvp) {
+            if (interpmvp) {
                 get_mvdata_interlaced(v, &dmv_x[1], &dmv_y[1], &pred_flag[1]);
             }
             if (bmvtype == BMV_TYPE_DIRECT) {
@@ -4414,8 +4413,7 @@ static int vc1_decode_b_mb_intfr(VC1Context *v)
 
     if (!skipped) {
         idx_mbmode = get_vlc2(gb, v->mbmode_vlc->table, VC1_INTFR_NON4MV_MBMODE_VLC_BITS, 2);
-        if (ff_vc1_mbmode_intfrp[0][idx_mbmode][0] == MV_PMODE_INTFR_2MV_FIELD)
-        {
+        if (ff_vc1_mbmode_intfrp[0][idx_mbmode][0] == MV_PMODE_INTFR_2MV_FIELD) {
             twomv = 1;
             v->blk_mv_type[s->block_index[0]] = 1;
             v->blk_mv_type[s->block_index[1]] = 1;
@@ -4446,7 +4444,7 @@ static int vc1_decode_b_mb_intfr(VC1Context *v)
             s->mv[1][2][0] = s->current_picture.motion_val[1][s->block_index[2]][0] = scale_mv(s->next_picture.motion_val[1][s->block_index[2]][0], v->bfraction, 1, s->quarter_sample);
             s->mv[1][2][1] = s->current_picture.motion_val[1][s->block_index[2]][1] = scale_mv(s->next_picture.motion_val[1][s->block_index[2]][1], v->bfraction, 1, s->quarter_sample);
 
-            for (i = 1; i < 4; i+=2) {
+            for (i = 1; i < 4; i += 2) {
                 s->mv[0][i][0] = s->current_picture.motion_val[0][s->block_index[i]][0] = s->mv[0][i-1][0];
                 s->mv[0][i][1] = s->current_picture.motion_val[0][s->block_index[i]][1] = s->mv[0][i-1][1];
                 s->mv[1][i][0] = s->current_picture.motion_val[1][s->block_index[i]][0] = s->mv[1][i-1][0];
@@ -4469,7 +4467,7 @@ static int vc1_decode_b_mb_intfr(VC1Context *v)
             s->mv[1][i][0] = s->current_picture.motion_val[1][s->block_index[i]][0] = 0;
             s->mv[1][i][1] = s->current_picture.motion_val[1][s->block_index[i]][1] = 0;
         }
-        s->current_picture.mb_type[mb_pos]                     = MB_TYPE_INTRA;
+        s->current_picture.mb_type[mb_pos] = MB_TYPE_INTRA;
         s->mb_intra = v->is_intra[s->mb_x] = 1;
         for (i = 0; i < 6; i++)
             v->mb_type[0][s->block_index[i]] = 1;
@@ -4497,7 +4495,8 @@ static int vc1_decode_b_mb_intfr(VC1Context *v)
 
             vc1_decode_intra_block(v, s->block[i], i, val, mquant,
                                    (i & 4) ? v->codingset2 : v->codingset);
-            if ((i>3) && (s->flags & CODEC_FLAG_GRAY)) continue;
+            if (i > 3 && (s->flags & CODEC_FLAG_GRAY))
+                continue;
             v->vc1dsp.vc1_inv_trans_8x8(s->block[i]);
             if (i < 4) {
                 stride_y = s->linesize << fieldtx;
@@ -4536,8 +4535,7 @@ static int vc1_decode_b_mb_intfr(VC1Context *v)
             if (!direct) {
                 if (bmvtype == BMV_TYPE_INTERPOLATED & twomv) {
                     v->fourmvbp = get_vlc2(gb, v->fourmvbp_vlc->table, VC1_4MV_BLOCK_PATTERN_VLC_BITS, 1);
-                }
-                else if (bmvtype == BMV_TYPE_INTERPOLATED | twomv) {
+                } else if (bmvtype == BMV_TYPE_INTERPOLATED | twomv) {
                     v->twomvbp = get_vlc2(gb, v->twomvbp_vlc->table, VC1_2MV_BLOCK_PATTERN_VLC_BITS, 1);
                 }
             }
@@ -4565,9 +4563,8 @@ static int vc1_decode_b_mb_intfr(VC1Context *v)
                     dir = i==1 || i==3;
                     dmv_x = dmv_y = 0;
                     val = ((mvbp >> (3 - i)) & 1);
-                    if (val) {
+                    if (val)
                         get_mvdata_interlaced(v, &dmv_x, &dmv_y, 0);
-                    }
                     j = i > 1 ? 2 : 0;
                     vc1_pred_mv_intfr(v, j, dmv_x, dmv_y, 2, v->range_x, v->range_y, v->mb_type[0], dir);
                     vc1_mc_4mv_luma(v, j, dir, dir);
@@ -4579,17 +4576,15 @@ static int vc1_decode_b_mb_intfr(VC1Context *v)
             } else if (bmvtype == BMV_TYPE_INTERPOLATED) {
                 mvbp = v->twomvbp;
                 dmv_x = dmv_y = 0;
-                if (mvbp & 2) {
+                if (mvbp & 2)
                     get_mvdata_interlaced(v, &dmv_x, &dmv_y, 0);
-                }
 
                 vc1_pred_mv_intfr(v, 0, dmv_x, dmv_y, 1, v->range_x, v->range_y, v->mb_type[0], 0);
                 vc1_mc_1mv(v, 0);
 
                 dmv_x = dmv_y = 0;
-                if (mvbp & 1) {
+                if (mvbp & 1)
                     get_mvdata_interlaced(v, &dmv_x, &dmv_y, 0);
-                }
 
                 vc1_pred_mv_intfr(v, 0, dmv_x, dmv_y, 1, v->range_x, v->range_y, v->mb_type[0], 1);
                 vc1_interp_mc(v);
@@ -4600,19 +4595,17 @@ static int vc1_decode_b_mb_intfr(VC1Context *v)
                     dir2 = !dir;
                 mvbp = v->twomvbp;
                 dmv_x = dmv_y = 0;
-                if (mvbp & 2) {
+                if (mvbp & 2)
                     get_mvdata_interlaced(v, &dmv_x, &dmv_y, 0);
-                }
                 vc1_pred_mv_intfr(v, 0, dmv_x, dmv_y, 2, v->range_x, v->range_y, v->mb_type[0], dir);
 
                 dmv_x = dmv_y = 0;
-                if (mvbp & 1) {
+                if (mvbp & 1)
                     get_mvdata_interlaced(v, &dmv_x, &dmv_y, 0);
-                }
                 vc1_pred_mv_intfr(v, 2, dmv_x, dmv_y, 2, v->range_x, v->range_y, v->mb_type[0], dir2);
 
                 if (mvsw) {
-                    for (i = 0; i<2; i++) {
+                    for (i = 0; i < 2; i++) {
                         s->mv[dir][i+2][0] = s->mv[dir][i][0] = s->current_picture.motion_val[dir][s->block_index[i+2]][0] = s->current_picture.motion_val[dir][s->block_index[i]][0];
                         s->mv[dir][i+2][1] = s->mv[dir][i][1] = s->current_picture.motion_val[dir][s->block_index[i+2]][1] = s->current_picture.motion_val[dir][s->block_index[i]][1];
                         s->mv[dir2][i+2][0] = s->mv[dir2][i][0] = s->current_picture.motion_val[dir2][s->block_index[i]][0] = s->current_picture.motion_val[dir2][s->block_index[i+2]][0];
@@ -4633,9 +4626,8 @@ static int vc1_decode_b_mb_intfr(VC1Context *v)
 
                 mvbp = ff_vc1_mbmode_intfrp[0][idx_mbmode][2];
                 dmv_x = dmv_y = 0;
-                if (mvbp) {
+                if (mvbp)
                     get_mvdata_interlaced(v, &dmv_x, &dmv_y, 0);
-                }
 
                 vc1_pred_mv_intfr(v, 0, dmv_x, dmv_y, 1, v->range_x, v->range_y, v->mb_type[0], dir);
                 v->blk_mv_type[s->block_index[0]] = 1;
@@ -4643,7 +4635,7 @@ static int vc1_decode_b_mb_intfr(VC1Context *v)
                 v->blk_mv_type[s->block_index[2]] = 1;
                 v->blk_mv_type[s->block_index[3]] = 1;
                 vc1_pred_mv_intfr(v, 0, 0, 0, 2, v->range_x, v->range_y, 0, !dir);
-                for (i = 0; i<2; i++) {
+                for (i = 0; i < 2; i++) {
                     s->mv[!dir][i+2][0] = s->mv[!dir][i][0] = s->current_picture.motion_val[!dir][s->block_index[i+2]][0] = s->current_picture.motion_val[!dir][s->block_index[i]][0];
                     s->mv[!dir][i+2][1] = s->mv[!dir][i][1] = s->current_picture.motion_val[!dir][s->block_index[i+2]][1] = s->current_picture.motion_val[!dir][s->block_index[i]][1];
                 }
@@ -4699,7 +4691,7 @@ static int vc1_decode_b_mb_intfr(VC1Context *v)
                         int dir2 = dir;
                         if (mvsw)
                             dir2 = !dir;
-                        for (i = 0; i<2; i++) {
+                        for (i = 0; i < 2; i++) {
                             s->mv[dir][i+2][0] = s->mv[dir][i][0] = s->current_picture.motion_val[dir][s->block_index[i+2]][0] = s->current_picture.motion_val[dir][s->block_index[i]][0];
                             s->mv[dir][i+2][1] = s->mv[dir][i][1] = s->current_picture.motion_val[dir][s->block_index[i+2]][1] = s->current_picture.motion_val[dir][s->block_index[i]][1];
                             s->mv[dir2][i+2][0] = s->mv[dir2][i][0] = s->current_picture.motion_val[dir2][s->block_index[i]][0] = s->current_picture.motion_val[dir2][s->block_index[i+2]][0];
@@ -4711,7 +4703,7 @@ static int vc1_decode_b_mb_intfr(VC1Context *v)
                         v->blk_mv_type[s->block_index[2]] = 1;
                         v->blk_mv_type[s->block_index[3]] = 1;
                         vc1_pred_mv_intfr(v, 0, 0, 0, 2, v->range_x, v->range_y, 0, !dir);
-                        for (i = 0; i<2; i++) {
+                        for (i = 0; i < 2; i++) {
                             s->mv[!dir][i+2][0] = s->mv[!dir][i][0] = s->current_picture.motion_val[!dir][s->block_index[i+2]][0] = s->current_picture.motion_val[!dir][s->block_index[i]][0];
                             s->mv[!dir][i+2][1] = s->mv[!dir][i][1] = s->current_picture.motion_val[!dir][s->block_index[i+2]][1] = s->current_picture.motion_val[!dir][s->block_index[i]][1];
                         }
@@ -4726,7 +4718,7 @@ static int vc1_decode_b_mb_intfr(VC1Context *v)
         }
     }
     if (s->mb_x == s->mb_width - 1)
-        memmove(v->is_intra_base, v->is_intra, sizeof(v->is_intra_base[0])*s->mb_stride);
+        memmove(v->is_intra_base, v->is_intra, sizeof(v->is_intra_base[0]) * s->mb_stride);
     v->cbp[s->mb_x]      = block_cbp;
     v->ttblk[s->mb_x]    = block_tt;
     return 0;
