@@ -18,7 +18,7 @@
 * ffmpeg git-849bb62c;
 * libopus 1.0.1 git-c9f857ef;
 * Little-CMS git-dd44baf1;
-* libwebp 0.3.0 git-2d6ac422;
+* libwebp 0.3.0 git-0d25876b;
 * libopenjpeg 2.0.0 svn rev.2343;
 * MediaInfo 0.7.63+ svn rev.5579;
 * libpng 1.7.0 b14 git-e1ded944;
