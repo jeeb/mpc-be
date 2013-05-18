@@ -34,7 +34,6 @@ CPPageAudioSwitcher::CPPageAudioSwitcher(IFilterGraph* pFG)
 	: CPPageBase(CPPageAudioSwitcher::IDD, CPPageAudioSwitcher::IDD)
 	, m_fAudioNormalize(FALSE)
 	, m_fAudioNormalizeRecover(FALSE)
-	, m_fDownSampleTo441(FALSE)
 	, m_fCustomChannelMapping(FALSE)
 	, m_nChannels(0)
 	, m_fEnableAudioSwitcher(FALSE)
@@ -58,14 +57,12 @@ void CPPageAudioSwitcher::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK6, m_fAudioNormalizeRecover);
 	DDX_Slider(pDX, IDC_SLIDER1, m_AudioBoostPos);
 	DDX_Control(pDX, IDC_SLIDER1, m_AudioBoostCtrl);
-	DDX_Check(pDX, IDC_CHECK3, m_fDownSampleTo441);
 	DDX_Check(pDX, IDC_CHECK1, m_fCustomChannelMapping);
 	DDX_Control(pDX, IDC_EDIT1, m_nChannelsCtrl);
 	DDX_Text(pDX, IDC_EDIT1, m_nChannels);
 	DDX_Control(pDX, IDC_SPIN1, m_nChannelsSpinCtrl);
 	DDX_Control(pDX, IDC_LIST1, m_list);
 	DDX_Check(pDX, IDC_CHECK2, m_fEnableAudioSwitcher);
-	DDX_Control(pDX, IDC_CHECK3, m_fDownSampleTo441Ctrl);
 	DDX_Control(pDX, IDC_CHECK1, m_fCustomChannelMappingCtrl);
 	DDX_Control(pDX, IDC_EDIT2, m_tAudioTimeShiftCtrl);
 	DDX_Control(pDX, IDC_SPIN2, m_tAudioTimeShiftSpin);
@@ -109,7 +106,6 @@ BOOL CPPageAudioSwitcher::OnInitDialog()
 	m_fAudioNormalizeRecover = s.fAudioNormalizeRecover;
 	m_AudioBoostPos = (int)(s.dAudioBoost_dB*10+0.1);
 	m_AudioBoostCtrl.SetRange(0, 100);
-	m_fDownSampleTo441 = s.fDownSampleTo441;
 	m_fAudioTimeShift = s.fAudioTimeShift;
 	m_tAudioTimeShift = s.iAudioTimeShift;
 	m_tAudioTimeShiftSpin.SetRange32(-1000*60*60*24, 1000*60*60*24);
@@ -176,7 +172,6 @@ BOOL CPPageAudioSwitcher::OnApply()
 	s.fAudioNormalize = !!m_fAudioNormalize;
 	s.fAudioNormalizeRecover = !!m_fAudioNormalizeRecover;
 	s.dAudioBoost_dB = (float)m_AudioBoostPos/10;
-	s.fDownSampleTo441 = !!m_fDownSampleTo441;
 	s.fAudioTimeShift = !!m_fAudioTimeShift;
 	s.iAudioTimeShift = m_tAudioTimeShift;
 	s.fCustomChannelMapping = !!m_fCustomChannelMapping;
@@ -184,7 +179,6 @@ BOOL CPPageAudioSwitcher::OnApply()
 
 	if (m_pASF) {
 		m_pASF->SetSpeakerConfig(s.fCustomChannelMapping, s.pSpeakerToChannelMap);
-		m_pASF->SetResampling(s.fDownSampleTo441 ? 44100 : 0);
 		m_pASF->SetAudioTimeShift(s.fAudioTimeShift ? 10000i64*s.iAudioTimeShift : 0);
 		m_pASF->SetNormalizeBoost(s.fAudioNormalize, s.fAudioNormalizeRecover, s.dAudioBoost_dB);
 	}

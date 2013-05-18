@@ -139,17 +139,16 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Reiniciar Sel."
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 23
+BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 22
 5		"Activar interruptor del filtre d'àudio intern (requereix reiniciar)"
-8		"Resamplejar a 44100 Hz"
-9		"Desplaçament de l'àudio (ms):"
-12		"Activar mapeig de canals editable"
-13		"Configuració dels altaveus"
-16		"canals d'entrada:"
-18		"Prem la tecla ""shift"" per aplicar els canvis al moment"
-19		"Normalitzar"
-20		"Augment:"
-22		"Guany de volumen"
+8		"Desplaçament de l'àudio (ms):"
+11		"Activar mapeig de canals editable"
+12		"Configuració dels altaveus"
+15		"canals d'entrada:"
+17		"Prem la tecla ""shift"" per aplicar els canvis al moment"
+18		"Normalitzar"
+19		"Augment:"
+21		"Guany de volumen"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22

@@ -139,17 +139,16 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"선택 초기화"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 23
+BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 22
 5		"내장 오디오 스위칭 필터 사용 (재시작 필요)"
-8		"44100Hz로 다운샘플"
-9		"오디오 시간 조절 (ms):"
-12		"사용자정의 채널/스피커배치기능 사용"
-13		"스피커 채널 설정 "
-16		"입력 채널:"
-18		"Shift키를 누른채로 설정을 바꾸면 즉시 설정이 반영됩니다."
-19		"노멀라이즈"
-20		"증폭:"
-22		"볼륨 복원"
+8		"오디오 시간 조절 (ms):"
+11		"사용자정의 채널/스피커배치기능 사용"
+12		"스피커 채널 설정 "
+15		"입력 채널:"
+17		"Shift키를 누른채로 설정을 바꾸면 즉시 설정이 반영됩니다."
+18		"노멀라이즈"
+19		"증폭:"
+21		"볼륨 복원"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22

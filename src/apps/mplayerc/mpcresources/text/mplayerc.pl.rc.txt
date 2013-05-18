@@ -139,17 +139,16 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Resetuj wybrane"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 23
+BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 22
 5		"Włączenie (wymagany restart programu)"
-8		"Obniżenie częstotliwości próbkowania do 44100 Hz"
-9		"Opóźnienie dźwięku (ms):"
-12		"Własne mapowanie kanałów"
-13		"Konfiguracja dla "
-16		"kanałów wejściowych:"
-18		"Aby natychmiastowo wprowadzić zmiany, należy klikając przytrzymać klawisz Shift."
-19		"Normalizowanie"
-20		"Wzmocnienie:"
-22		"Utrzymuj głośność (regain)"
+8		"Opóźnienie dźwięku (ms):"
+11		"Własne mapowanie kanałów"
+12		"Konfiguracja dla "
+15		"kanałów wejściowych:"
+17		"Aby natychmiastowo wprowadzić zmiany, należy klikając przytrzymać klawisz Shift."
+18		"Normalizowanie"
+19		"Wzmocnienie:"
+21		"Utrzymuj głośność (regain)"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22

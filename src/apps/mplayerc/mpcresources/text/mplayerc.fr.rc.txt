@@ -139,17 +139,16 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Rétablir"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 23
+BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 22
 5		"Activer le filtre de sélection audio (redémarrage nécessaire)"
-8		"Sous-échantillonnage à 44100 Hz"
-9		"Décalage audio (en ms) :"
-12		"Activer la répartition personnalisée des canaux"
-13		"Configuration des HP pour "
-16		"canaux en entrée :"
-18		"Maintenez la touche MAJ pour la modification immédiate en cliquant sur un élément"
-19		"Normaliser"
-20		"Amplification :"
-22		"Gain de volume"
+8		"Décalage audio (en ms) :"
+11		"Activer la répartition personnalisée des canaux"
+12		"Configuration des HP pour "
+15		"canaux en entrée :"
+17		"Maintenez la touche MAJ pour la modification immédiate en cliquant sur un élément"
+18		"Normaliser"
+19		"Amplification :"
+21		"Gain de volume"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22

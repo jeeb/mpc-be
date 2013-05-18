@@ -28,7 +28,6 @@
 #include "AudioSwitcher.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioParser.h"
-#include  "AudioHelper.h"
 
 #ifdef REGISTER_FILTER
 
@@ -96,7 +95,6 @@ CFilterApp theApp;
 CAudioSwitcherFilter::CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CStreamSwitcherFilter(lpunk, phr, __uuidof(this))
 	, m_fCustomChannelMapping(false)
-	, m_dwResampleFreq(0)
 	, m_rtAudioTimeShift(0)
 	, m_rtNextStart(0)
 	, m_rtNextStop(1)
@@ -352,46 +350,6 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		}
 	}
 
-	if (m_dwResampleFreq && wfe->nSamplesPerSec > wfeout->nSamplesPerSec) {
-		AVSampleFormat avsf = AV_SAMPLE_FMT_NONE;
-		if (fPCM){
-			if (wfe->wBitsPerSample == 16) {
-				avsf = AV_SAMPLE_FMT_S16;
-			} else if (wfe->wBitsPerSample == 32) {
-				avsf = AV_SAMPLE_FMT_S32;
-			}
-		} else if (fFloat) {
-			if (wfe->wBitsPerSample == 32) {
-				avsf = AV_SAMPLE_FMT_FLT;
-			}
-		}
-
-		if (avsf != AV_SAMPLE_FMT_NONE) {
-			DWORD gagmask = GetDefChannelMask(wfeout->nChannels);
-
-			m_Resampler.Update(avsf, gagmask, gagmask, 0.0f, wfe->nSamplesPerSec, wfeout->nSamplesPerSec);
-			int outsamples = m_Resampler.CalcOutSamples(len);
-
-			float* buff = DNew float[outsamples * wfeout->nChannels];
-			outsamples = m_Resampler.Mixing(buff, outsamples, pDataOut, len);
-			if (outsamples > 0) {
-				switch (avsf) {
-					case AV_SAMPLE_FMT_S16:
-						convert_to_int16(AV_SAMPLE_FMT_FLT, wfeout->nChannels, outsamples, (BYTE*)buff, (int16_t*)pDataOut);
-						break;
-					case AV_SAMPLE_FMT_S32:
-						convert_to_int32(AV_SAMPLE_FMT_FLT, wfeout->nChannels, outsamples, (BYTE*)buff, (int32_t*)pDataOut);
-						break;
-					case AV_SAMPLE_FMT_FLT:
-						convert_to_float(AV_SAMPLE_FMT_FLT, wfeout->nChannels, outsamples, (BYTE*)buff, (float*)pDataOut);
-						break;
-				}
-				lenout = outsamples;
-			}
-			delete [] buff;
-		}
-	}
-
 	if (m_fNormalize || m_boost_mul > 1) {
 		int samples = lenout*wfeout->nChannels;
 
@@ -518,11 +476,6 @@ CMediaType CAudioSwitcherFilter::CreateNewOutputMediaType(CMediaType mt, long& c
 
 	WAVEFORMATEX* wfeout = (WAVEFORMATEX*)mt.pbFormat;
 
-	if (m_dwResampleFreq) {
-		wfeout->nSamplesPerSec = m_dwResampleFreq;
-		wfeout->nAvgBytesPerSec = wfeout->nBlockAlign*wfeout->nSamplesPerSec;
-	}
-
 	int bps = wfe->wBitsPerSample>>3;
 	int len = cbBuffer / (bps*wfe->nChannels);
 	int lenout = (UINT64)len * wfeout->nSamplesPerSec / wfe->nSamplesPerSec;
@@ -536,8 +489,6 @@ CMediaType CAudioSwitcherFilter::CreateNewOutputMediaType(CMediaType mt, long& c
 
 void CAudioSwitcherFilter::OnNewOutputMediaType(const CMediaType& mtIn, const CMediaType& mtOut)
 {
-	m_Resampler.FlushBuffers();
-
 	TRACE(_T("CAudioSwitcherFilter::OnNewOutputMediaType\n"));
 	m_sample_max = 0.1f;
 }
@@ -546,7 +497,7 @@ HRESULT CAudioSwitcherFilter::DeliverEndFlush()
 {
 	TRACE(_T("CAudioSwitcherFilter::DeliverEndFlush\n"));
 	m_sample_max = 0.1f;
-	m_Resampler.FlushBuffers();
+
 	return __super::DeliverEndFlush();
 }
 
@@ -619,22 +570,6 @@ STDMETHODIMP_(int) CAudioSwitcherFilter::GetNumberOfInputChannels()
 {
 	CStreamSwitcherInputPin* pInPin = GetInputPin();
 	return pInPin ? ((WAVEFORMATEX*)pInPin->CurrentMediaType().pbFormat)->nChannels : 0;
-}
-
-STDMETHODIMP_(DWORD) CAudioSwitcherFilter::GetResampling()
-{
-	return m_dwResampleFreq;
-}
-
-STDMETHODIMP CAudioSwitcherFilter::SetResampling(DWORD samplerate)
-{
-	if (m_dwResampleFreq != samplerate) {
-		PauseGraph;
-		m_dwResampleFreq = samplerate;
-		ResumeGraph;
-	}
-
-	return S_OK;
 }
 
 STDMETHODIMP_(REFERENCE_TIME) CAudioSwitcherFilter::GetAudioTimeShift()

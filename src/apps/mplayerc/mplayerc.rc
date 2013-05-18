@@ -117,7 +117,6 @@ BEGIN
     CONTROL         "Enable built-in audio switcher filter (requires restart)",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,5,286,8
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,17,284,1
-    CONTROL         "Down-sample to 44100 Hz",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,51,286,8
     CONTROL         "Audio time shift (ms):",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,65,115,8
     EDITTEXT        IDC_EDIT2,124,63,46,13,ES_AUTOHSCROLL,WS_EX_RIGHT
     CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,158,63,12,13

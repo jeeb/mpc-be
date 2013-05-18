@@ -126,7 +126,6 @@
 #define IDS_RS_SPEAKERTOCHANNELMAPPING		_T("SpeakerToChannelMapping")
 #define IDS_RS_SPEAKERCHANNELS				_T("SpeakerChannels")
 #define IDS_RS_CUSTOMCHANNELMAPPING			_T("CustomChannelMapping")
-#define IDS_RS_DOWNSAMPLETO441				_T("DownSampleTo441")
 #define IDS_RS_ENABLEAUDIOSWITCHER			_T("EnableAudioSwitcher")
 #define IDS_RS_HIDECAPTIONMENU				_T("HideCaptionMenu")
 #define IDS_RS_HIDENAVIGATION				_T("HideNavigation")

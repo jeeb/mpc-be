@@ -139,17 +139,16 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Resetează selectate"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 23
+BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 22
 5		"Activează filtrul comutator audio încorporat (necesită repornire player)"
-8		"Normalizare"
-9		"Restabilire volum"
-12		"Amplificare:"
-13		"Reeșantionează la 44100 Hz"
-16		"Decalare timp audio (ms):"
-18		"Activează repartizarea particularizată a canalelor "
-19		"Configurație difuzoare pentru "
-20		"canale de intrare:"
-22		"Țineți Shift apăsat pentru aplicarea imediată a schimbărilor când dați clic pe ceva "
+8		"Restabilire volum"
+11		"Amplificare:"
+12		"Reeșantionează la 44100 Hz"
+15		"Decalare timp audio (ms):"
+17		"Activează repartizarea particularizată a canalelor "
+18		"Configurație difuzoare pentru "
+19		"canale de intrare:"
+21		"Țineți Shift apăsat pentru aplicarea imediată a schimbărilor când dați clic pe ceva "
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22

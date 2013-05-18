@@ -139,17 +139,16 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Kijelöltek visszaállítása"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 23
+BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 22
 5		"Beépített audió-váltó szűrő engedélyezése (újraindítást igényel)"
-8		"Mintavételezés csökkentése 44100 Hz-re"
-9		"Audió időzítés-eltolása:\n(ezredmásodpercben)"
-12		"Egyedi csatornaleképezés engedélyezése"
-13		"Hangszórók konfigurálása "
-16		"bemeneti csatornához:"
-18		"Tartsa lenyomva a shift billentyűt a változtatások azonnali érvénybeléptetéséhez"
-19		"Normalizálás"
-20		"Erősítés:"
-22		"Hangerő visszanyerés"
+8		"Audió időzítés-eltolása:\n(ezredmásodpercben)"
+11		"Egyedi csatornaleképezés engedélyezése"
+12		"Hangszórók konfigurálása "
+15		"bemeneti csatornához:"
+17		"Tartsa lenyomva a shift billentyűt a változtatások azonnali érvénybeléptetéséhez"
+18		"Normalizálás"
+19		"Erősítés:"
+21		"Hangerő visszanyerés"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22

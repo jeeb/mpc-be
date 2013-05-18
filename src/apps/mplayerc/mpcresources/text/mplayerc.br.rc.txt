@@ -139,17 +139,16 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Reiniciar selecionado"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 23
+BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 22
 5		"Ativar filtro interno de troca de áudio (precisa reiniciar)"
-8		"Re-samplear para 44100 Hz"
-9		"Mudança tempo do áudio (ms):"
-12		"Habilitar mapeamento de canal editavel"
-13		"Configuração de auto-falantes para"
-16		"Canais de entrada:"
-18		"Pressione ""shift"" para aplicar alterações imediatamente quando clicar em algo"
-19		"Normalizar"
-20		"Aumento:"
-22		"Ganho de volume"
+8		"Mudança tempo do áudio (ms):"
+11		"Habilitar mapeamento de canal editavel"
+12		"Configuração de auto-falantes para"
+15		"Canais de entrada:"
+17		"Pressione ""shift"" para aplicar alterações imediatamente quando clicar em algo"
+18		"Normalizar"
+19		"Aumento:"
+21		"Ganho de volume"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22

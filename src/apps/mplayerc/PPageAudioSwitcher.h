@@ -50,8 +50,6 @@ public:
 	BOOL m_fAudioNormalizeRecover;
 	int m_AudioBoostPos;
 	CSliderCtrl m_AudioBoostCtrl;
-	BOOL m_fDownSampleTo441;
-	CButton m_fDownSampleTo441Ctrl;
 	BOOL m_fCustomChannelMapping;
 	CButton m_fCustomChannelMappingCtrl;
 	CEdit m_nChannelsCtrl;

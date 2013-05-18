@@ -594,7 +594,6 @@ public:
 	bool			fAudioNormalize;
 	bool			fAudioNormalizeRecover;
 	float			dAudioBoost_dB;
-	bool			fDownSampleTo441;
 	bool			fAudioTimeShift;
 	int				iAudioTimeShift;
 	bool			fCustomChannelMapping;

@@ -139,17 +139,16 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Berrezarri Hautatutakoa"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 23
+BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 22
 5		"Gaitu barneraiketa audio aldaketa iragazkia (beharrezkoa berrabiaraztea)"
-8		"Beheratu-lagina 44100 Hz-ra"
-9		"Audio denbora aldaketa (sm):"
-12		"Gaitu norbere bide mapaketa"
-13		"Hotsgorailu itxurapena "
-16		"sarrera bideak:"
-18		"Sakatu shift berehalako aldaketarako zerbait klikatzerakoan "
-19		"Normalkuntza"
-20		"Bultzada:"
-22		"Berrirabazi bolumena"
+8		"Audio denbora aldaketa (sm):"
+11		"Gaitu norbere bide mapaketa"
+12		"Hotsgorailu itxurapena "
+15		"sarrera bideak:"
+17		"Sakatu shift berehalako aldaketarako zerbait klikatzerakoan "
+18		"Normalkuntza"
+19		"Bultzada:"
+21		"Berrirabazi bolumena"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22

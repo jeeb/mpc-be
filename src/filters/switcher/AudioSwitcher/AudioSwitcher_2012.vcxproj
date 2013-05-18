@@ -138,10 +138,10 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Filter|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;..\..\..\ExtLib\ffmpeg;..\..\..\AudioTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libgcc.a;libmingwex.a;Winmm.lib;vfw32.lib;Version.lib;ffmpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgcc.a;libmingwex.a;Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>AudioSwitcher.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)lib;$(SolutionDir)bin\lib\Debug_$(PlatformName)\</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
@@ -152,10 +152,10 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Filter|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;..\..\..\ExtLib\ffmpeg;..\..\..\AudioTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libgcc.a;libmingwex.a;Winmm.lib;vfw32.lib;Version.lib;ffmpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgcc.a;libmingwex.a;Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>AudioSwitcher.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)lib64;$(SolutionDir)bin\lib\Debug_$(PlatformName)\</AdditionalLibraryDirectories>
     </Link>
@@ -165,10 +165,10 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Filter|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;..\..\..\ExtLib\ffmpeg;..\..\..\AudioTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libgcc.a;libmingwex.a;Winmm.lib;vfw32.lib;Version.lib;ffmpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgcc.a;libmingwex.a;Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>AudioSwitcher.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)lib;$(SolutionDir)bin\lib\Release_$(PlatformName)\</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
@@ -179,10 +179,10 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Filter|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;..\..\..\ExtLib\ffmpeg;..\..\..\AudioTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libgcc.a;libmingwex.a;Winmm.lib;vfw32.lib;Version.lib;ffmpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgcc.a;libmingwex.a;Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>AudioSwitcher.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)lib64;$(SolutionDir)bin\lib\Release_$(PlatformName)\</AdditionalLibraryDirectories>
     </Link>
@@ -192,25 +192,25 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;..\..\..\ExtLib\ffmpeg;..\..\..\AudioTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;..\..\..\ExtLib\ffmpeg;..\..\..\AudioTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;..\..\..\ExtLib\ffmpeg;..\..\..\AudioTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;..\..\..\ExtLib\ffmpeg;..\..\..\AudioTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -247,15 +247,8 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\AudioTools\AudioTools_2012.vcxproj">
-      <Project>{1B6DE4C0-9D27-4150-A327-E7F3B492B5F0}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\DSUtil\DSUtil_2012.vcxproj">
       <Project>{fc70988b-1ae5-4381-866d-4f405e28ac42}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\ExtLib\ffmpeg\ffmpeg_2012.vcxproj">
-      <Project>{438286b7-a9f4-411d-bcc5-948c40e37d8f}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="..\..\..\ExtLib\VirtualDub\Kasumi\Kasumi_2012.vcxproj">
