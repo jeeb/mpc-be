@@ -22,8 +22,6 @@
  *
  */
 
-// CMonitor
-
 #pragma once
 
 class CMonitor : public CObject
@@ -75,4 +73,61 @@ public:
 
 private:
 	HMONITOR m_hMonitor;
+};
+
+class CMonitors : public CObject
+{
+public:
+	CMonitors();
+	virtual ~CMonitors();
+
+	CMonitor GetMonitor( const int index ) const;
+
+	int GetCount() const {
+		return (int)m_MonitorArray.GetCount();
+	}
+
+	static CMonitor GetNearestMonitor( const LPRECT lprc );
+	static CMonitor GetNearestMonitor( const POINT pt );
+	static CMonitor GetNearestMonitor( const CWnd* pWnd );
+
+	static BOOL IsOnScreen( const POINT pt );
+	static BOOL IsOnScreen( const CWnd* pWnd );
+	static BOOL IsOnScreen( const LPRECT lprc );
+
+	static void GetVirtualDesktopRect( LPRECT lprc );
+
+	static BOOL IsMonitor( const HMONITOR hMonitor );
+
+	static CMonitor GetPrimaryMonitor();
+	static BOOL AllMonitorsShareDisplayFormat();
+
+	static int GetMonitorCount();
+
+private:
+	CObArray m_MonitorArray;
+
+	typedef struct tagMATCHMONITOR {
+		HMONITOR target;
+		BOOL foundMatch;
+	} MATCHMONITOR, *LPMATCHMONITOR;
+
+	static BOOL CALLBACK FindMatchingMonitorHandle(
+		HMONITOR hMonitor,
+		HDC hdcMonitor,
+		LPRECT lprcMonitor,
+		LPARAM dwData
+	);
+
+	typedef struct tagADDMONITOR {
+		CObArray* pMonitors;
+		int currentIndex;
+	} ADDMONITOR, *LPADDMONITOR;
+
+	static BOOL CALLBACK AddMonitorsCallBack(
+		HMONITOR hMonitor,
+		HDC hdcMonitor,
+		LPRECT lprcMonitor,
+		LPARAM dwData
+	);
 };

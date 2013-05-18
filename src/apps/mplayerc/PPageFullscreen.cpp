@@ -24,7 +24,6 @@
 #include "stdafx.h"
 #include "PPageFullscreen.h"
 #include "../../DSUtil/WinAPIUtils.h"
-#include "Monitors.h"
 #include "MultiMonitor.h"
 
 // CPPagePlayer dialog

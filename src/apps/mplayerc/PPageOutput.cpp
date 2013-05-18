@@ -25,7 +25,7 @@
 #include "PPageOutput.h"
 #include "../../DSUtil/SysVersion.h"
 #include <moreuuids.h>
-#include "Monitors.h"
+#include "MultiMonitor.h"
 #include "ComPropertySheet.h"
 #include "../../filters/Filters.h"
 

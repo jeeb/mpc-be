@@ -105,9 +105,6 @@
     <ClCompile Include="MiniDump.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Monitors.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Mpeg2SectionData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -465,9 +462,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MiniDump.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Monitors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MpcApi.h">

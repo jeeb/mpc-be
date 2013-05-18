@@ -24,9 +24,6 @@
 
 #include "stdafx.h"
 #include "MultiMonitor.h"
-#include "Monitors.h"
-
-// CMonitor
 
 CMonitor::CMonitor() : m_hMonitor( NULL )
 {
@@ -213,4 +210,149 @@ BOOL CMonitor::IsPrimaryMonitor() const
 BOOL CMonitor::IsMonitor() const
 {
 	return CMonitors::IsMonitor( m_hMonitor );
+}
+
+CMonitors::CMonitors()
+{
+	// WARNING : GetSystemMetrics(SM_CMONITORS) return only visible display monitors, and  EnumDisplayMonitors
+	// enumerate visible and pseudo invisible monitors !!!
+	// m_MonitorArray.SetSize( GetMonitorCount() );
+
+	ADDMONITOR addMonitor;
+	addMonitor.pMonitors = &m_MonitorArray;
+	addMonitor.currentIndex = 0;
+
+	::EnumDisplayMonitors( NULL, NULL, AddMonitorsCallBack, (LPARAM)&addMonitor );
+}
+
+CMonitors::~CMonitors()
+{
+	for ( int i = 0; i < m_MonitorArray.GetSize(); i++ ) {
+		delete m_MonitorArray.GetAt( i );
+	}
+}
+
+BOOL CALLBACK CMonitors::AddMonitorsCallBack( HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData )
+{
+	LPADDMONITOR pAddMonitor = (LPADDMONITOR)dwData;
+
+	CMonitor* pMonitor = DNew CMonitor;
+	pMonitor->Attach( hMonitor );
+
+	pAddMonitor->pMonitors->Add( pMonitor );
+	pAddMonitor->currentIndex++;
+
+	return TRUE;
+}
+
+CMonitor CMonitors::GetPrimaryMonitor()
+{
+	HMONITOR hMonitor = ::MonitorFromPoint( CPoint( 0,0 ), MONITOR_DEFAULTTOPRIMARY );
+	ASSERT( IsMonitor( hMonitor ) );
+
+	CMonitor monitor;
+	monitor.Attach( hMonitor );
+	ASSERT( monitor.IsPrimaryMonitor() );
+
+	return monitor;
+}
+
+BOOL CMonitors::IsMonitor( const HMONITOR hMonitor )
+{
+	if ( hMonitor == NULL ) {
+		return FALSE;
+	}
+
+	MATCHMONITOR match;
+	match.target = hMonitor;
+	match.foundMatch = FALSE;
+
+	::EnumDisplayMonitors( NULL, NULL, FindMatchingMonitorHandle, (LPARAM)&match );
+
+	return match.foundMatch;
+}
+
+BOOL CALLBACK CMonitors::FindMatchingMonitorHandle( HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData )
+{
+	LPMATCHMONITOR pMatch = (LPMATCHMONITOR)dwData;
+
+	if ( hMonitor == pMatch->target ) {
+
+		pMatch->foundMatch = TRUE;
+		return FALSE;
+	}
+
+	pMatch->foundMatch = FALSE;
+	return TRUE;
+}
+
+BOOL CMonitors::AllMonitorsShareDisplayFormat()
+{
+	return ::GetSystemMetrics( SM_SAMEDISPLAYFORMAT );
+}
+
+int CMonitors::GetMonitorCount()
+{
+	return ::GetSystemMetrics(SM_CMONITORS);
+}
+
+CMonitor CMonitors::GetMonitor( const int index ) const
+{
+	ASSERT( index >= 0 && index < m_MonitorArray.GetCount() );
+
+	CMonitor* pMonitor = static_cast<CMonitor*>(m_MonitorArray.GetAt( index ));
+
+	return *pMonitor;
+}
+
+void CMonitors::GetVirtualDesktopRect( LPRECT lprc )
+{
+	::SetRect( lprc,
+			   ::GetSystemMetrics( SM_XVIRTUALSCREEN ),
+			   ::GetSystemMetrics( SM_YVIRTUALSCREEN ),
+			   ::GetSystemMetrics( SM_CXVIRTUALSCREEN ),
+			   ::GetSystemMetrics( SM_CYVIRTUALSCREEN ) );
+
+}
+
+BOOL CMonitors::IsOnScreen( const LPRECT lprc )
+{
+	return ::MonitorFromRect( lprc, MONITOR_DEFAULTTONULL ) != NULL;
+}
+
+BOOL CMonitors::IsOnScreen( const POINT pt )
+{
+	return ::MonitorFromPoint( pt, MONITOR_DEFAULTTONULL ) != NULL;
+}
+
+BOOL CMonitors::IsOnScreen( const CWnd* pWnd )
+{
+	return ::MonitorFromWindow( pWnd->GetSafeHwnd(), MONITOR_DEFAULTTONULL ) != NULL;
+}
+
+CMonitor CMonitors::GetNearestMonitor( const LPRECT lprc )
+{
+	CMonitor monitor;
+	monitor.Attach( ::MonitorFromRect( lprc, MONITOR_DEFAULTTONEAREST ) );
+
+	return monitor;
+}
+
+CMonitor CMonitors::GetNearestMonitor( const POINT pt )
+{
+	CMonitor monitor;
+	monitor.Attach( ::MonitorFromPoint( pt, MONITOR_DEFAULTTONEAREST ) );
+
+	return monitor;
+}
+
+CMonitor CMonitors::GetNearestMonitor( const CWnd* pWnd )
+{
+	ASSERT( pWnd );
+	ASSERT( ::IsWindow( pWnd->m_hWnd ) );
+
+	CMonitor monitor;
+	monitor.Attach( ::MonitorFromWindow( pWnd->GetSafeHwnd(), MONITOR_DEFAULTTONEAREST ) );
+
+	return monitor;
 }

@@ -199,7 +199,6 @@
     <ClCompile Include="MediaFormats.cpp" />
     <ClCompile Include="MediaTypesDlg.cpp" />
     <ClCompile Include="MiniDump.cpp" />
-    <ClCompile Include="Monitors.cpp" />
     <ClCompile Include="Mpeg2SectionData.cpp" />
     <ClCompile Include="mplayerc.cpp" />
     <ClCompile Include="MultiMonitor.cpp" />
@@ -322,7 +321,6 @@
     <ClInclude Include="MediaFormats.h" />
     <ClInclude Include="MediaTypesDlg.h" />
     <ClInclude Include="MiniDump.h" />
-    <ClInclude Include="Monitors.h" />
     <ClInclude Include="MpcApi.h" />
     <ClInclude Include="Mpeg2SectionData.h" />
     <ClInclude Include="mplayerc.h" />

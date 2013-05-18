@@ -85,7 +85,6 @@
 #include "../../Subtitles/SupSubFile.h"
 #include "../../Subtitles/XSUBSubtitle.h"
 
-#include "Monitors.h"
 #include "MultiMonitor.h"
 #include "FileVersionInfo.h"
 #include <mvrInterfaces.h>
