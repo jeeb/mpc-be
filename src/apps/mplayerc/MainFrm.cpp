@@ -49,7 +49,6 @@
 #include "SubtitleDlDlg.h"
 #include "ISDb.h"
 #include "UpdateChecker.h"
-#include "UpdateCheckerDlg.h"
 
 #include <BaseClasses/mtype.h>
 #include <Mpconfig.h>

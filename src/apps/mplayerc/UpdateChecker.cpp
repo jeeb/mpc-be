@@ -138,3 +138,77 @@ int UpdateChecker::compareVersion(const Version& v1, const Version& v2) const
 		return 0;
 	}
 }
+
+IMPLEMENT_DYNAMIC(UpdateCheckerDlg, CDialog)
+
+UpdateCheckerDlg::UpdateCheckerDlg(Update_Status updateStatus, const Version& latestVersion, CWnd* pParent)
+	: CDialog(UpdateCheckerDlg::IDD, pParent), m_updateStatus(updateStatus)
+{
+	switch (updateStatus) {
+		case UPDATER_UPDATE_AVAILABLE:
+			m_text.Format(IDS_NEW_UPDATE_AVAILABLE, latestVersion.major, latestVersion.minor, latestVersion.status, latestVersion.patch);
+			break;
+		case UPDATER_LATEST_STABLE:
+			m_text.LoadString(IDS_USING_LATEST_STABLE);
+			break;
+		case UPDATER_NEWER_VERSION:
+			m_text.Format(IDS_USING_NEWER_VERSION, UpdateChecker::MPC_VERSION.major, UpdateChecker::MPC_VERSION.minor, UpdateChecker::MPC_VERSION.status, UpdateChecker::MPC_VERSION.patch,
+						latestVersion.major, latestVersion.minor, latestVersion.status, latestVersion.patch);
+			break;
+		case UPDATER_ERROR:
+			m_text.LoadString(IDS_UPDATE_ERROR);
+			break;
+		default:
+			ASSERT(0);
+	}
+}
+
+UpdateCheckerDlg::~UpdateCheckerDlg()
+{
+}
+
+void UpdateCheckerDlg::DoDataExchange(CDataExchange* pDX)
+{
+	CDialog::DoDataExchange(pDX);
+
+	DDX_Text(pDX, IDC_UPDATE_DLG_TEXT, m_text);
+	DDX_Control(pDX, IDC_UPDATE_ICON, m_icon);
+	DDX_Control(pDX, IDOK, m_okButton);
+	DDX_Control(pDX, IDCANCEL, m_cancelButton);
+}
+
+BEGIN_MESSAGE_MAP(UpdateCheckerDlg, CDialog)
+END_MESSAGE_MAP()
+
+BOOL UpdateCheckerDlg::OnInitDialog()
+{
+	__super::OnInitDialog();
+
+	switch (m_updateStatus) {
+		case UPDATER_UPDATE_AVAILABLE:
+			m_icon.SetIcon(LoadIcon(NULL, IDI_QUESTION));
+			break;
+		case UPDATER_LATEST_STABLE:
+		case UPDATER_NEWER_VERSION:
+		case UPDATER_ERROR:
+			m_icon.SetIcon(LoadIcon(NULL, (m_updateStatus == UPDATER_ERROR) ? IDI_WARNING : IDI_INFORMATION));
+			m_okButton.ShowWindow(SW_HIDE);
+			m_cancelButton.SetWindowText(ResStr(IDS_UPDATE_CLOSE));
+			m_cancelButton.SetFocus();
+			break;
+		default:
+			ASSERT(0);
+	}
+
+	return TRUE;
+}
+
+void UpdateCheckerDlg::OnOK()
+{
+	if (m_updateStatus == UPDATER_UPDATE_AVAILABLE) {
+//		ShellExecute(NULL, _T("open"), _T("http://sourceforge.net/p/mpcbe/download-media-player-classic-hc.html"), NULL, NULL, SW_SHOWNORMAL);
+		ShellExecute(NULL, _T("open"), _T("http://www.xvidvideo.ru/media-player-classic-home-cinema-x86-x64/"), NULL, NULL, SW_SHOWNORMAL);
+	}
+
+	__super::OnOK();
+}

@@ -25,7 +25,7 @@
 #include <atlisapi.h>
 #include "MainFrm.h"
 #include "../../Subtitles/TextFile.h"
-#include "WebClientSocket.h"
+#include "WebClient.h"
 #include "DIB.h"
 
 CWebClientSocket::CWebClientSocket(CWebServer* pWebServer, CMainFrame* pMainFrame)

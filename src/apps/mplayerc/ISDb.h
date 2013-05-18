@@ -25,7 +25,7 @@
 
 #include <atlcoll.h>
 #include <afxinet.h>
-#include "PlayerPlaylist.h"
+#include "PlayerPlaylistBar.h"
 
 #define ISDb_PROTOCOL_VERSION 1
 

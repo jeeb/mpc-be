@@ -26,7 +26,58 @@
 #include <afxcoll.h>
 #include "PlayerBar.h"
 #include "PlayerListCtrl.h"
-#include "PlayerPlaylist.h"
+
+class CPlaylistItem
+{
+	static UINT m_globalid;
+
+public:
+	UINT m_id;
+	CString m_label;
+	CAtlList<CString> m_fns;
+	CAtlList<CString> m_subs;
+	enum type_t {file, device} m_type;
+	REFERENCE_TIME m_duration;
+	int m_vinput, m_vchannel;
+	int m_ainput;
+	long m_country;
+
+	bool m_fInvalid;
+
+public:
+	CPlaylistItem();
+	virtual ~CPlaylistItem();
+
+	CPlaylistItem(const CPlaylistItem& pli);
+	CPlaylistItem& operator = (const CPlaylistItem& pli);
+
+	POSITION FindFile(LPCTSTR path);
+	void AutoLoadFiles();
+
+	CString GetLabel(int i = 0);
+};
+
+class CPlaylist : public CList<CPlaylistItem>
+{
+protected:
+	POSITION m_pos;
+
+public:
+	CPlaylist();
+	virtual ~CPlaylist();
+
+	bool RemoveAll();
+	bool RemoveAt(POSITION pos);
+
+	void SortById(), SortByName(), SortByPath(), Randomize();
+
+	POSITION GetPos() const;
+	void SetPos(POSITION pos);
+	CPlaylistItem& GetNextWrap(POSITION& pos);
+	CPlaylistItem& GetPrevWrap(POSITION& pos);
+
+	POSITION Shuffle();
+};
 
 class OpenMediaData;
 

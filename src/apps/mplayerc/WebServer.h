@@ -33,6 +33,20 @@
 #define CMD_SETPOS "-1"
 #define CMD_SETVOLUME "-2"
 
+class CWebServer;
+
+class CWebServerSocket : public CAsyncSocket
+{
+	CWebServer* m_pWebServer;
+
+protected:
+	void OnAccept(int nErrorCode);
+
+public:
+	CWebServerSocket(CWebServer* pWebServer, int port = 13579);
+	virtual ~CWebServerSocket();
+};
+
 class CWebServerSocket;
 class CWebClientSocket;
 class CMainFrame;

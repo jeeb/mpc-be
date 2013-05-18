@@ -24,6 +24,7 @@
 
 #include <afxwin.h>
 #include <afxinet.h>
+#include "afxdialogex.h"
 
 struct Version
 {
@@ -59,4 +60,28 @@ private :
 
 	bool parseVersion(const CString& versionStr);
 	int compareVersion(const Version& v1, const Version& v2) const;
+};
+
+class UpdateCheckerDlg : public CDialog
+{
+	DECLARE_DYNAMIC(UpdateCheckerDlg)
+
+public:
+	UpdateCheckerDlg(Update_Status updateStatus, const Version& latestVersion, CWnd* pParent = NULL);
+	virtual ~UpdateCheckerDlg();
+
+	enum { IDD = IDD_UPDATE_DIALOG };
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);
+	afx_msg virtual BOOL OnInitDialog();
+	afx_msg virtual void OnOK();
+
+	DECLARE_MESSAGE_MAP()
+private:
+	Update_Status m_updateStatus;
+	CString m_text;
+	CStatic m_icon;
+	CButton m_okButton;
+	CButton m_cancelButton;
 };

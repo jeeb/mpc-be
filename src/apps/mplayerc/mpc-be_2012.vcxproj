@@ -229,7 +229,6 @@
     <ClCompile Include="PlayerStatusBar.cpp" />
     <ClCompile Include="PlayerSubresyncBar.cpp" />
     <ClCompile Include="PlayerToolBar.cpp" />
-    <ClCompile Include="PlayerPlaylist.cpp" />
     <ClCompile Include="PlayerVolumeCtrl.cpp" />
     <ClCompile Include="PngImage.cpp" />
     <ClCompile Include="PnSPresetsDlg.cpp" />
@@ -283,12 +282,10 @@
     <ClCompile Include="TextPassThruFilter.cpp" />
     <ClCompile Include="TunerScanDlg.cpp" />
     <ClCompile Include="UpdateChecker.cpp" />
-    <ClCompile Include="UpdateCheckerDlg.cpp" />
     <ClCompile Include="vkCodes.cpp" />
     <ClCompile Include="VMROSD.cpp" />
-    <ClCompile Include="WebClientSocket.cpp" />
+    <ClCompile Include="WebClient.cpp" />
     <ClCompile Include="WebServer.cpp" />
-    <ClCompile Include="WebServerSocket.cpp" />
     <ClCompile Include="WinHotkeyCtrl.cpp" />
     <ClCompile Include="..\..\ExtLib\stb_image\stb_image.cpp" />
   </ItemGroup>
@@ -356,7 +353,6 @@
     <ClInclude Include="PlayerStatusBar.h" />
     <ClInclude Include="PlayerSubresyncBar.h" />
     <ClInclude Include="PlayerToolBar.h" />
-    <ClInclude Include="PlayerPlaylist.h" />
     <ClInclude Include="PlayerVolumeCtrl.h" />
     <ClInclude Include="PngImage.h" />
     <ClInclude Include="PnSPresetsDlg.h" />
@@ -412,12 +408,10 @@
     <ClInclude Include="TunerScanDlg.h" />
     <ClInclude Include="..\..\..\include\Version.h" />
     <ClInclude Include="UpdateChecker.h" />
-    <ClInclude Include="UpdateCheckerDlg.h" />
     <ClInclude Include="vkCodes.h" />
     <ClInclude Include="VMROSD.h" />
-    <ClInclude Include="WebClientSocket.h" />
+    <ClInclude Include="WebClient.h" />
     <ClInclude Include="WebServer.h" />
-    <ClInclude Include="WebServerSocket.h" />
     <ClInclude Include="WinHotkeyCtrl.h" />
   </ItemGroup>
   <ItemGroup>

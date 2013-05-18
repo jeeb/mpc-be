@@ -25,8 +25,28 @@
 #include "MainFrm.h"
 #include <atlisapi.h>
 #include <zlib/zlib.h>
-#include "WebServerSocket.h"
-#include "WebClientSocket.h"
+#include "WebServer.h"
+#include "WebClient.h"
+
+CWebServerSocket::CWebServerSocket(CWebServer* pWebServer, int port)
+	: m_pWebServer(pWebServer)
+{
+	Create(port);
+	Listen();
+}
+
+CWebServerSocket::~CWebServerSocket()
+{
+}
+
+void CWebServerSocket::OnAccept(int nErrorCode)
+{
+	if (nErrorCode == 0 && m_pWebServer) {
+		m_pWebServer->OnAccept(this);
+	}
+
+	__super::OnAccept(nErrorCode);
+}
 
 CAtlStringMap<CWebServer::RequestHandler> CWebServer::m_internalpages;
 CAtlStringMap<UINT> CWebServer::m_downloads;
