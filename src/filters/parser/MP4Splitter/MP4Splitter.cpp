@@ -1121,7 +1121,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							SetTrackName(&TrackName, _T("NellyMoser Audio"));
 						} else if (type == AP4_ATOM_TYPE_ALAC) {
 							fourcc = MAKEFOURCC('a','l','a','c');
-							SetTrackName(&TrackName, _T("Alac Audio"));
+							SetTrackName(&TrackName, _T("ALAC Audio"));
 						} else if (type == AP4_ATOM_TYPE_QDM2) {
 							SetTrackName(&TrackName, _T("QDesign Music 2"));
 						} else if (type == AP4_ATOM_TYPE_SPEX) {
