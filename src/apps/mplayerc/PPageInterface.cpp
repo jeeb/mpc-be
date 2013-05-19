@@ -255,6 +255,7 @@ void CPPageInterface::OnCancel()
 	s.nOSDTransparent	= m_nOSDTransparent_Old;
 	s.nOSDBorder = m_OSDBorder_Old;
 	s.fFontShadow = !!m_fFontShadow_Old;
+
 	OnThemeChange();
 }
 
@@ -314,22 +315,21 @@ void CPPageInterface::OnUpdateCheck3(CCmdUI* pCmdUI)
 void CPPageInterface::OnCheckShadow()
 {
 	UpdateData();
-	AppSettings& s = AfxGetAppSettings();
-	s.fFontShadow		= !!m_fFontShadow;
+	AfxGetAppSettings().fFontShadow		= !!m_fFontShadow;
 	OnChngOSDCombo();
 }
 
 void CPPageInterface::OnCheckAA()
 {
 	UpdateData();
-	AppSettings& s = AfxGetAppSettings();
-	s.fFontAA			= !!m_fFontAA;
+	AfxGetAppSettings().fFontAA			= !!m_fFontAA;
 	OnChngOSDCombo();
 }
 
 void CPPageInterface::OnUpdateOSDBorder(CCmdUI* pCmdUI)
 {
 	AppSettings& s = AfxGetAppSettings();
+
 	if (s.nOSDBorder != m_OSDBorder) {
 		UpdateData();
 		s.nOSDBorder = m_OSDBorder;
@@ -370,7 +370,7 @@ void CPPageInterface::OnClickClrDefault()
 void CPPageInterface::OnClickClrFace()
 {
 	CColorDialog clrpicker;	
-	clrpicker.m_cc.Flags |= CC_FULLOPEN;
+	clrpicker.m_cc.Flags |= CC_FULLOPEN|CC_RGBINIT;
 	clrpicker.m_cc.rgbResult = m_clrFaceABGR;
 
 	if (clrpicker.DoModal() == IDOK) {
@@ -385,7 +385,7 @@ void CPPageInterface::OnClickClrFace()
 void CPPageInterface::OnClickClrOutline()
 {
 	CColorDialog clrpicker;	
-	clrpicker.m_cc.Flags |= CC_FULLOPEN;
+	clrpicker.m_cc.Flags |= CC_FULLOPEN|CC_RGBINIT;
 	clrpicker.m_cc.rgbResult = m_clrOutlineABGR;
 
 	if (clrpicker.DoModal() == IDOK) {
@@ -399,9 +399,8 @@ void CPPageInterface::OnClickClrOutline()
 
 void CPPageInterface::OnClickClrFont()
 {
-	AppSettings& s = AfxGetAppSettings();
 	CColorDialog clrpicker;	
-	clrpicker.m_cc.Flags |= CC_FULLOPEN;
+	clrpicker.m_cc.Flags |= CC_FULLOPEN|CC_RGBINIT;
 	clrpicker.m_cc.rgbResult = m_clrFontABGR;
 
 	if (clrpicker.DoModal() == IDOK) {
@@ -409,15 +408,14 @@ void CPPageInterface::OnClickClrFont()
 	}
 
 	UpdateData();
-	s.clrFontABGR		= m_clrFontABGR;
+	AfxGetAppSettings().clrFontABGR		= m_clrFontABGR;
 	OnChngOSDCombo();
 }
 
 void CPPageInterface::OnClickClrGrad1()
 {
-	AppSettings& s = AfxGetAppSettings();
 	CColorDialog clrpicker;	
-	clrpicker.m_cc.Flags |= CC_FULLOPEN;
+	clrpicker.m_cc.Flags |= CC_FULLOPEN|CC_RGBINIT;
 	clrpicker.m_cc.rgbResult = m_clrGrad1ABGR;
 
 	if (clrpicker.DoModal() == IDOK) {
@@ -425,15 +423,14 @@ void CPPageInterface::OnClickClrGrad1()
 	}
 
 	UpdateData();
-	s.clrGrad1ABGR		= m_clrGrad1ABGR;
+	AfxGetAppSettings().clrGrad1ABGR		= m_clrGrad1ABGR;
 	OnChngOSDCombo();
 }
 
 void CPPageInterface::OnClickClrGrad2()
 {
-	AppSettings& s = AfxGetAppSettings();
 	CColorDialog clrpicker;	
-	clrpicker.m_cc.Flags |= CC_FULLOPEN;
+	clrpicker.m_cc.Flags |= CC_FULLOPEN|CC_RGBINIT;
 	clrpicker.m_cc.rgbResult = m_clrGrad2ABGR;
 
 	if (clrpicker.DoModal() == IDOK) {
@@ -441,7 +438,7 @@ void CPPageInterface::OnClickClrGrad2()
 	}
 
 	UpdateData();
-	s.clrGrad2ABGR		= m_clrGrad2ABGR;
+	AfxGetAppSettings().clrGrad2ABGR		= m_clrGrad2ABGR;
 	OnChngOSDCombo();
 }
 

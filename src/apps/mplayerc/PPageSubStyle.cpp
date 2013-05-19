@@ -71,7 +71,7 @@ void CPPageSubStyle::InitStyle(CString title, STSStyle& stss)
 void CPPageSubStyle::AskColor(int i)
 {
 	CColorDialog dlg(m_stss.colors[i]);
-	dlg.m_cc.Flags |= CC_FULLOPEN;
+	dlg.m_cc.Flags |= CC_FULLOPEN|CC_RGBINIT;
 
 	if (dlg.DoModal() == IDOK) {
 		m_stss.colors[i] = dlg.m_cc.rgbResult;
