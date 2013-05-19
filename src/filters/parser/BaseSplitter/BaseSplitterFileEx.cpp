@@ -456,11 +456,14 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, int len, CMediaType* pmt)
 	return true;
 }
 
+#define AGAIN Seek(pos); BitRead(8); goto _again;
 bool CBaseSplitterFileEx::Read(mpahdr& h, int len, bool fAllowV25, CMediaType* pmt)
 {
 	memset(&h, 0, sizeof(h));
 
 	int syncbits = fAllowV25 ? 11 : 12;
+
+_again:
 
 	for (; len >= 4 && BitRead(syncbits, true) != (1<<syncbits) - 1; len--) {
 		BitRead(8);
@@ -469,6 +472,8 @@ bool CBaseSplitterFileEx::Read(mpahdr& h, int len, bool fAllowV25, CMediaType* p
 	if (len < 4) {
 		return false;
 	}
+
+	__int64 pos = GetPos();
 
 	h.sync = BitRead(11);
 	h.version = BitRead(2);
@@ -485,46 +490,51 @@ bool CBaseSplitterFileEx::Read(mpahdr& h, int len, bool fAllowV25, CMediaType* p
 	h.emphasis = BitRead(2);
 
 	if (h.version == 1 || h.layer == 0 || h.freq == 3 || h.bitrate == 15 || h.emphasis == 2) {
-		return false;
+		AGAIN
 	}
 
 	if (h.version == 3 && h.layer == 2) {
 		if ((h.bitrate == 1 || h.bitrate == 2 || h.bitrate == 3 || h.bitrate == 5) && h.channels != 3
 				&& (h.bitrate >= 11 && h.bitrate <= 14) && h.channels == 3) {
-			return false;
+			AGAIN
 		}
 	}
 
 	h.layer = 4 - h.layer;
 
-	//
-
 	static int brtbl[][5] = {
-		{0,0,0,0,0},
-		{32,32,32,32,8},
-		{64,48,40,48,16},
-		{96,56,48,56,24},
-		{128,64,56,64,32},
-		{160,80,64,80,40},
-		{192,96,80,96,48},
-		{224,112,96,112,56},
-		{256,128,112,128,64},
-		{288,160,128,144,80},
-		{320,192,160,160,96},
-		{352,224,192,176,112},
-		{384,256,224,192,128},
-		{416,320,256,224,144},
-		{448,384,320,256,160},
-		{0,0,0,0,0},
+		{  0,  0,    0,   0,   0},
+		{ 32,  32,  32,  32,   8},
+		{ 64,  48,  40,  48,  16},
+		{ 96,  56,  48,  56,  24},
+		{128,  64,  56,  64,  32},
+		{160,  80,  64,  80,  40},
+		{192,  96,  80,  96,  48},
+		{224, 112,  96, 112,  56},
+		{256, 128, 112, 128,  64},
+		{288, 160, 128, 144,  80},
+		{320, 192, 160, 160,  96},
+		{352, 224, 192, 176, 112},
+		{384, 256, 224, 192, 128},
+		{416, 320, 256, 224, 144},
+		{448, 384, 320, 256, 160},
+		{  0,   0,   0,   0,   0},
 	};
 
-	static int brtblcol[][4] = {{0,3,4,4},{0,0,1,2}};
-	int bitrate = 1000*brtbl[h.bitrate][brtblcol[h.version&1][h.layer]];
+	static int brtblcol[][4] = {
+		{0, 3, 4, 4},
+		{0, 0, 1, 2}
+	};
+	int bitrate = 1000 * brtbl[h.bitrate][brtblcol[h.version&1][h.layer]];
 	if (bitrate == 0) {
-		return false;
+		AGAIN
 	}
 
-	static int freq[][4] = {{11025,0,22050,44100},{12000,0,24000,48000},{8000,0,16000,32000}};
+	static int freq[][4] = {
+		{11025, 0, 22050, 44100},
+		{12000, 0, 24000, 48000},
+		{ 8000, 0, 16000, 32000}
+	};
 
 	bool l3ext = h.layer == 3 && !(h.version&1);
 
@@ -555,28 +565,28 @@ bool CBaseSplitterFileEx::Read(mpahdr& h, int len, bool fAllowV25, CMediaType* p
 				f->fdwFlags = h.padding ? MPEGLAYER3_FLAG_PADDING_ON : MPEGLAYER3_FLAG_PADDING_OFF; // _OFF or _ISO ?
 		*/
 	} else {
-		MPEG1WAVEFORMAT* f = (MPEG1WAVEFORMAT*)wfe;
-		f->wfx.wFormatTag = WAVE_FORMAT_MPEG;
-		f->fwHeadMode = 1 << h.channels;
-		f->fwHeadModeExt = 1 << h.modeext;
-		f->wHeadEmphasis = h.emphasis+1;
+		MPEG1WAVEFORMAT* f	= (MPEG1WAVEFORMAT*)wfe;
+		f->wfx.wFormatTag	= WAVE_FORMAT_MPEG;
+		f->fwHeadMode		= 1 << h.channels;
+		f->fwHeadModeExt	= 1 << h.modeext;
+		f->wHeadEmphasis	= h.emphasis+1;
 		if (h.privatebit) {
-			f->fwHeadFlags |= ACM_MPEG_PRIVATEBIT;
+			f->fwHeadFlags	|= ACM_MPEG_PRIVATEBIT;
 		}
 		if (h.copyright) {
-			f->fwHeadFlags |= ACM_MPEG_COPYRIGHT;
+			f->fwHeadFlags	|= ACM_MPEG_COPYRIGHT;
 		}
 		if (h.original) {
-			f->fwHeadFlags |= ACM_MPEG_ORIGINALHOME;
+			f->fwHeadFlags	|= ACM_MPEG_ORIGINALHOME;
 		}
 		if (h.crc == 0) {
-			f->fwHeadFlags |= ACM_MPEG_PROTECTIONBIT;
+			f->fwHeadFlags	|= ACM_MPEG_PROTECTIONBIT;
 		}
 		if (h.version == 3) {
-			f->fwHeadFlags |= ACM_MPEG_ID_MPEG1;
+			f->fwHeadFlags	|= ACM_MPEG_ID_MPEG1;
 		}
-		f->fwHeadLayer = 1 << (h.layer-1);
-		f->dwHeadBitrate = bitrate;
+		f->fwHeadLayer		= 1 << (h.layer-1);
+		f->dwHeadBitrate	= bitrate;
 	}
 
 	wfe->nChannels = h.channels == 3 ? 1 : 2;
