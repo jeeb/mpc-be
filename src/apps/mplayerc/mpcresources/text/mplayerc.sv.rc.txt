@@ -422,9 +422,13 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 48		"Botten"
 51		"Färger && Genomskinlighet"
 52		"Primary"
+53		"PRI"
 55		"Sekundär"
+56		"SEC"
 58		"Kontur"
+59		"OUTL"
 61		"Skugga"
+62		"SHAD"
 64		"Länka alfa kanaler"
 67		"Positionera undertexter relativt till video bilden"
 END

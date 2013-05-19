@@ -422,9 +422,13 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 48		"Jos"
 51		"Poziționează subtitrările relativ la cadrul video"
 52		"Culori && transparență"
+53		"PRI"
 55		"Primar"
+56		"SEC"
 58		"Secundar"
+59		"OUTL"
 61		"Contur"
+62		"SHAD"
 64		"Umbră"
 67		"Unește canalele alpha"
 END

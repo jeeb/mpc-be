@@ -22,7 +22,6 @@
  */
 
 #include "stdafx.h"
-#include <math.h>
 #include "MainFrm.h"
 #include "PPageSubStyle.h"
 
@@ -76,7 +75,6 @@ void CPPageSubStyle::AskColor(int i)
 
 	if (dlg.DoModal() == IDOK) {
 		m_stss.colors[i] = dlg.m_cc.rgbResult;
-		m_color[i].Invalidate();
 	}
 }
 
@@ -109,10 +107,6 @@ void CPPageSubStyle::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SPIN8, m_margintopspin);
 	DDX_Text(pDX, IDC_EDIT10, m_margin.bottom);
 	DDX_Control(pDX, IDC_SPIN9, m_marginbottomspin);
-	DDX_Control(pDX, IDC_COLORPRI, m_color[0]);
-	DDX_Control(pDX, IDC_COLORSEC, m_color[1]);
-	DDX_Control(pDX, IDC_COLOROUTL, m_color[2]);
-	DDX_Control(pDX, IDC_COLORSHAD, m_color[3]);
 	DDX_Slider(pDX, IDC_SLIDER1, m_alpha[0]);
 	DDX_Slider(pDX, IDC_SLIDER2, m_alpha[1]);
 	DDX_Slider(pDX, IDC_SLIDER3, m_alpha[2]);
@@ -127,10 +121,14 @@ void CPPageSubStyle::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CPPageSubStyle, CPPageBase)
 	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedButton1)
-	ON_STN_CLICKED(IDC_COLORPRI, OnStnClickedColorpri)
-	ON_STN_CLICKED(IDC_COLORSEC, OnStnClickedColorsec)
-	ON_STN_CLICKED(IDC_COLOROUTL, OnStnClickedColoroutl)
-	ON_STN_CLICKED(IDC_COLORSHAD, OnStnClickedColorshad)
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_COLORPRI, OnCustomDrawBtns)
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_COLORSEC, OnCustomDrawBtns)
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_COLOROUTL, OnCustomDrawBtns)
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_COLORSHAD, OnCustomDrawBtns)
+	ON_BN_CLICKED(IDC_COLORPRI, OnStnClickedColorpri)
+	ON_BN_CLICKED(IDC_COLORSEC, OnStnClickedColorsec)
+	ON_BN_CLICKED(IDC_COLOROUTL, OnStnClickedColoroutl)
+	ON_BN_CLICKED(IDC_COLORSHAD, OnStnClickedColorshad)
 	ON_BN_CLICKED(IDC_CHECK1, OnBnClickedCheck1)
 	ON_WM_HSCROLL()
 END_MESSAGE_MAP()
@@ -187,7 +185,6 @@ BOOL CPPageSubStyle::OnInitDialog()
 	m_relativeTo = m_stss.relativeTo;
 
 	for (int i = 0; i < 4; i++) {
-		m_color[i].SetColorPtr(&m_stss.colors[i]);
 		m_alpha[i] = 255-m_stss.alpha[i];
 		m_alphasliders[i].SetRange(0, 255);
 	}
@@ -307,6 +304,51 @@ void CPPageSubStyle::OnBnClickedCheck1()
 	}
 
 	SetModified();
+}
+
+void CPPageSubStyle::OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
+	*pResult = CDRF_DODEFAULT;
+
+	if (pNMCD->dwItemSpec == IDC_COLORPRI
+		|| pNMCD->dwItemSpec == IDC_COLORSEC
+		|| pNMCD->dwItemSpec == IDC_COLOROUTL
+		|| pNMCD->dwItemSpec == IDC_COLORSHAD) {
+		if (pNMCD->dwDrawStage == CDDS_PREPAINT) {
+			CDC dc;
+			dc.Attach(pNMCD->hdc);
+			CRect r;
+			CopyRect(&r,&pNMCD->rc);
+			CPen penFrEnabled (PS_SOLID, 0, GetSysColor(COLOR_BTNTEXT));
+			CPen penFrDisabled (PS_SOLID, 0, GetSysColor(COLOR_BTNSHADOW));
+			CPen *penOld = dc.SelectObject(&penFrEnabled);
+
+			if (CDIS_HOT == pNMCD->uItemState || CDIS_HOT + CDIS_FOCUS == pNMCD->uItemState || CDIS_DISABLED == pNMCD->uItemState) { 
+				dc.SelectObject(&penFrDisabled);
+			}
+
+			dc.RoundRect(r.left, r.top, r.right, r.bottom, 6, 4);		
+			r.DeflateRect(2,2,2,2);
+			if (pNMCD->dwItemSpec == IDC_COLORPRI) {
+				dc.FillSolidRect(&r, m_stss.colors[0]);
+			}
+			if (pNMCD->dwItemSpec == IDC_COLORSEC) {
+				dc.FillSolidRect(&r, m_stss.colors[1]);
+			}
+			if (pNMCD->dwItemSpec == IDC_COLOROUTL) {
+				dc.FillSolidRect(&r, m_stss.colors[2]);
+			}
+			if (pNMCD->dwItemSpec == IDC_COLORSHAD) {
+				dc.FillSolidRect(&r, m_stss.colors[3]);
+			}
+
+			dc.SelectObject(&penOld);
+			dc.Detach();
+
+			*pResult = CDRF_SKIPDEFAULT;
+		}
+	}
 }
 
 void CPPageSubStyle::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)

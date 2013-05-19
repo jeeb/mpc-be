@@ -422,9 +422,13 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 48		"Baix"
 51		"Colors i Transparència"
 52		"Primari"
+53		"PRI"
 55		"Secundari"
+56		"SEC"
 58		"Contorn"
+59		"OUTL"
 61		"Ombra"
+62		"SHAD"
 64		"Vincular canals alfa"
 67		"Posició subtítols relativa a la imatge"
 END

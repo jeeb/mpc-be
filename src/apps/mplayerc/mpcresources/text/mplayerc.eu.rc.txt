@@ -422,9 +422,13 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 48		"Behe"
 51		"Margoak eta Gardentasuna"
 52		"Lehena"
+53		"PRI"
 55		"Bigarrena"
+56		"SEC"
 58		"Ingurua"
+59		"OUTL"
 61		"Itzala"
+62		"SHAD"
 64		"Elkartu alfa bideak"
 67		"Azpidatzien kokapen bideo framearekiko"
 END

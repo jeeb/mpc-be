@@ -370,7 +370,7 @@ void CPPageInterface::OnClickClrDefault()
 void CPPageInterface::OnClickClrFace()
 {
 	CColorDialog clrpicker;	
-	clrpicker.m_cc.Flags |= CC_SOLIDCOLOR|CC_RGBINIT;
+	clrpicker.m_cc.Flags |= CC_FULLOPEN;
 	clrpicker.m_cc.rgbResult = m_clrFaceABGR;
 
 	if (clrpicker.DoModal() == IDOK) {
@@ -385,7 +385,7 @@ void CPPageInterface::OnClickClrFace()
 void CPPageInterface::OnClickClrOutline()
 {
 	CColorDialog clrpicker;	
-	clrpicker.m_cc.Flags |= CC_SOLIDCOLOR|CC_RGBINIT;
+	clrpicker.m_cc.Flags |= CC_FULLOPEN;
 	clrpicker.m_cc.rgbResult = m_clrOutlineABGR;
 
 	if (clrpicker.DoModal() == IDOK) {
@@ -399,15 +399,15 @@ void CPPageInterface::OnClickClrOutline()
 
 void CPPageInterface::OnClickClrFont()
 {
-	
 	AppSettings& s = AfxGetAppSettings();
 	CColorDialog clrpicker;	
-	clrpicker.m_cc.Flags |= CC_SOLIDCOLOR|CC_RGBINIT;
+	clrpicker.m_cc.Flags |= CC_FULLOPEN;
 	clrpicker.m_cc.rgbResult = m_clrFontABGR;
 
 	if (clrpicker.DoModal() == IDOK) {
 		m_clrFontABGR = clrpicker.GetColor();
 	}
+
 	UpdateData();
 	s.clrFontABGR		= m_clrFontABGR;
 	OnChngOSDCombo();
@@ -417,7 +417,7 @@ void CPPageInterface::OnClickClrGrad1()
 {
 	AppSettings& s = AfxGetAppSettings();
 	CColorDialog clrpicker;	
-	clrpicker.m_cc.Flags |= CC_SOLIDCOLOR|CC_RGBINIT;
+	clrpicker.m_cc.Flags |= CC_FULLOPEN;
 	clrpicker.m_cc.rgbResult = m_clrGrad1ABGR;
 
 	if (clrpicker.DoModal() == IDOK) {
@@ -427,14 +427,13 @@ void CPPageInterface::OnClickClrGrad1()
 	UpdateData();
 	s.clrGrad1ABGR		= m_clrGrad1ABGR;
 	OnChngOSDCombo();
-
 }
 
 void CPPageInterface::OnClickClrGrad2()
 {
 	AppSettings& s = AfxGetAppSettings();
 	CColorDialog clrpicker;	
-	clrpicker.m_cc.Flags |= CC_SOLIDCOLOR|CC_RGBINIT;
+	clrpicker.m_cc.Flags |= CC_FULLOPEN;
 	clrpicker.m_cc.rgbResult = m_clrGrad2ABGR;
 
 	if (clrpicker.DoModal() == IDOK) {
@@ -444,7 +443,6 @@ void CPPageInterface::OnClickClrGrad2()
 	UpdateData();
 	s.clrGrad2ABGR		= m_clrGrad2ABGR;
 	OnChngOSDCombo();
-
 }
 
 void CPPageInterface::OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult)
@@ -452,10 +450,10 @@ void CPPageInterface::OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
 	*pResult = CDRF_DODEFAULT;
 
-	if (pNMCD->dwItemSpec == IDC_BUTTON_CLRFACE 
+	if (pNMCD->dwItemSpec == IDC_BUTTON_CLRFACE
 		|| pNMCD->dwItemSpec == IDC_BUTTON_CLROUTLINE
-		|| pNMCD->dwItemSpec == IDC_BUTTON_CLRFONT 
-		|| pNMCD->dwItemSpec == IDC_BUTTON_CLRGRAD1 
+		|| pNMCD->dwItemSpec == IDC_BUTTON_CLRFONT
+		|| pNMCD->dwItemSpec == IDC_BUTTON_CLRGRAD1
 		|| pNMCD->dwItemSpec == IDC_BUTTON_CLRGRAD2) {
 		if (pNMCD->dwDrawStage == CDDS_PREPAINT) {
 			CDC dc;
@@ -472,24 +470,28 @@ void CPPageInterface::OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult)
 
 			dc.RoundRect(r.left, r.top, r.right, r.bottom, 6, 4);		
 			r.DeflateRect(2,2,2,2);
-			if (pNMCD->dwItemSpec == IDC_BUTTON_CLRFACE) 
+			if (pNMCD->dwItemSpec == IDC_BUTTON_CLRFACE) {
 				dc.FillSolidRect(&r, m_clrFaceABGR);
-			if (pNMCD->dwItemSpec == IDC_BUTTON_CLROUTLINE) 
+			}
+			if (pNMCD->dwItemSpec == IDC_BUTTON_CLROUTLINE) {
 				dc.FillSolidRect(&r, m_clrOutlineABGR);
-			if (pNMCD->dwItemSpec == IDC_BUTTON_CLRFONT) 
+			}
+			if (pNMCD->dwItemSpec == IDC_BUTTON_CLRFONT) {
 				dc.FillSolidRect(&r, m_clrFontABGR);
-			if (pNMCD->dwItemSpec == IDC_BUTTON_CLRGRAD1) 
+			}
+			if (pNMCD->dwItemSpec == IDC_BUTTON_CLRGRAD1) {
 				dc.FillSolidRect(&r, m_clrGrad1ABGR);
-			if (pNMCD->dwItemSpec == IDC_BUTTON_CLRGRAD2) 
+			}
+			if (pNMCD->dwItemSpec == IDC_BUTTON_CLRGRAD2) {
 				dc.FillSolidRect(&r, m_clrGrad2ABGR);
-			
+			}
+
 			dc.SelectObject(&penOld);
 			dc.Detach();
 
 			*pResult = CDRF_SKIPDEFAULT;
 		}
 	}
-
 }
 
 void CPPageInterface::OnChngOSDCombo()
@@ -502,7 +504,7 @@ void CPPageInterface::OnChngOSDCombo()
 		((CMainFrame*)AfxGetMainWnd())->m_OSD.DisplayMessage(OSD_TOPLEFT, _T("OSD test"), 2000, m_OSD_Size, str);
 		((CMainFrame*)AfxGetMainWnd())->m_OSD.SetLayeredWindowAttributes(RGB(255,0,255), 255 - AfxGetAppSettings().nOSDTransparent, LWA_ALPHA|LWA_COLORKEY);
 	}
-	
+
 	SetModified();
 }
 

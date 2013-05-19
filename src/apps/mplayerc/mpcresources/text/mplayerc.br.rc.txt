@@ -422,9 +422,13 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 48		"Abaixo"
 51		"Cores e transparência"
 52		"Primario"
+53		"PRI"
 55		"Secundário"
+56		"SEC"
 58		"Delinear"
+59		"OUTL"
 61		"Sombra"
+62		"SHAD"
 64		"Vincular canais alpha"
 67		"Posição das legendas relativo aos quadros vídeo"
 END

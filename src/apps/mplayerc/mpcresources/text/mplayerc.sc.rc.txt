@@ -422,9 +422,13 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 48		"底部"
 51		"颜色与透明度"
 52		"主要"
+53		"PRI"
 55		"次要"
+56		"SEC"
 58		"轮廓"
+59		"OUTL"
 61		"阴影"
+62		"SHAD"
 64		"使用 alpha 通道"
 67		"相对于视频帧的字幕位置"
 END

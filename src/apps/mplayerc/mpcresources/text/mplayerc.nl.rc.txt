@@ -422,9 +422,13 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 48		"Onder"
 51		"Kleuren && Transparantie"
 52		"Primair"
+53		"PRI"
 55		"Secundair"
+56		"SEC"
 58		"Omlijning"
+59		"OUTL"
 61		"Schaduw"
+62		"SHAD"
 64		"Alpha channels verbinden"
 67		"Ondertiteling relatief aan beeld plaatsen"
 END

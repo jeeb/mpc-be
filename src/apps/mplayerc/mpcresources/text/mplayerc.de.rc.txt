@@ -422,9 +422,13 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 48		"Unten"
 51		"Farben && Transparenz"
 52		"Primär"
+53		"PRI"
 55		"Sekundär"
+56		"SEC"
 58		"Umrandung"
+59		"OUTL"
 61		"Schatten"
+62		"SHAD"
 64		"Alpha-Kanäle verbinden"
 67		"Untertitel relativ zum Video-Bild platzieren"
 END

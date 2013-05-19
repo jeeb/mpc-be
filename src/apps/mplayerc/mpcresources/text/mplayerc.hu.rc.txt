@@ -422,9 +422,13 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 48		"Alsó"
 51		"Színek && Átlátszóság"
 52		"Elsődleges"
+53		"PRI"
 55		"Másodlagos"
+56		"SEC"
 58		"Keret"
+59		"OUTL"
 61		"Árnyék"
+62		"SHAD"
 64		"Alfacsatornák összekötése"
 67		"A feliratok relatív pozícionálása  a képkockákhoz"
 END

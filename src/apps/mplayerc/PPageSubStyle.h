@@ -29,7 +29,7 @@
 
 class CColorStatic : public CStatic
 {
-	//	DECLARE_DYNAMIC(CColorStatic)
+	//DECLARE_DYNAMIC(CColorStatic)
 
 	COLORREF* m_pColor;
 
@@ -41,7 +41,7 @@ public:
 		m_pColor = pColor;
 	}
 
-	//	DECLARE_MESSAGE_MAP()
+	//DECLARE_MESSAGE_MAP()
 
 protected:
 	virtual void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct) {
@@ -96,7 +96,6 @@ public:
 	CSpinButtonCtrl m_marginrightspin;
 	CSpinButtonCtrl m_margintopspin;
 	CSpinButtonCtrl m_marginbottomspin;
-	CColorStatic m_color[4];
 	int m_alpha[4];
 	CSliderCtrl m_alphasliders[4];
 	BOOL m_linkalphasliders;
@@ -114,6 +113,6 @@ protected:
 	afx_msg void OnStnClickedColoroutl();
 	afx_msg void OnStnClickedColorshad();
 	afx_msg void OnBnClickedCheck1();
+	afx_msg void OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
-public:
 };

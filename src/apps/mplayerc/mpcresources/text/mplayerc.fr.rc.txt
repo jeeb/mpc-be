@@ -422,9 +422,13 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 48		"Bas"
 51		"Couleurs && Transparence"
 52		"Primaire"
+53		"PRI"
 55		"Secondaire"
+56		"SEC"
 58		"Contour"
+59		"OUTL"
 61		"Ombre"
+62		"SHAD"
 64		"Lier les couches alpha"
 67		"Position des sous-titres relative à l'image"
 END

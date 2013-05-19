@@ -422,9 +422,13 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 48		"Bottom"
 51		"Colors && Transparency"
 52		"Primary"
+53		"PRI"
 55		"Secondary"
+56		"SEC"
 58		"Outline"
+59		"OUTL"
 61		"Shadow"
+62		"SHAD"
 64		"Link alpha channels"
 67		"Position subtitles relative to the video frame"
 END

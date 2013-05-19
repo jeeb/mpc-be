@@ -422,9 +422,13 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 48		"Dole"
 51		"Farby && priesvitnosť"
 52		"Primárne"
+53		"PRI"
 55		"Sekundárne"
+56		"SEC"
 58		"Obrys"
+59		"OUTL"
 61		"Tieň"
+62		"SHAD"
 64		"Prepájať alfa-kanály"
 67		"Relatívne umiestnenie titulkov voči videu"
 END

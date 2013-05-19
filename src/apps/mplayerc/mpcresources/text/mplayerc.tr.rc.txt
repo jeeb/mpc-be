@@ -422,9 +422,13 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 48		"Aşağı"
 51		"Renkler && Şeffaflık"
 52		"Birincil"
+53		"PRI"
 55		"İkincil"
+56		"SEC"
 58		"Çizgi"
+59		"OUTL"
 61		"Gölge"
+62		"SHAD"
 64		"Alfa kanallarını bağla"
 67		"Alt yazıları video çerçevesine bağla"
 END

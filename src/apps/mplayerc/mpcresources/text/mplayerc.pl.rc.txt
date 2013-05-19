@@ -422,9 +422,13 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 48		"Dół:"
 51		"Kolory i przezroczystość"
 52		"Podstawowy:"
+53		"PRI"
 55		"Drugorzędny:"
+56		"SEC"
 58		"Zarys:"
+59		"OUTL"
 61		"Cień:"
+62		"SHAD"
 64		"Połączenie kanałów alfa"
 67		"Pozycja napisów względem klatki obrazu"
 END

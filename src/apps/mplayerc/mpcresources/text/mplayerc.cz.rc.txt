@@ -422,9 +422,13 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 48		"Spodní:"
 51		"Barvy a průhlednost"
 52		"Primární:"
+53		"PRI"
 55		"Sekundární:"
+56		"SEC"
 58		"Obtažení:"
+59		"OUTL"
 61		"Stín:"
+62		"SHAD"
 64		"Propojit alfa kanály"
 67		"Umísťovat titulky v závislosti na poloze videa"
 END

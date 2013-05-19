@@ -422,9 +422,13 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 48		"下"
 51		"顏色與透明度"
 52		"主要"
+53		"PRI"
 55		"次要"
+56		"SEC"
 58		"邊線"
+59		"OUTL"
 61		"陰影"
+62		"SHAD"
 64		"連結 Alpha 通道"
 67		"放置字幕於視訊畫面相對位置"
 END
