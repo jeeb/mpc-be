@@ -1488,22 +1488,12 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 				style->fontWeight = GetInt(buff) ? FW_BOLD : FW_NORMAL;
 				style->fItalic = GetInt(buff);
 				if (sver >= 5)	{
-					style->fUnderline = GetInt(buff);
-				}
-				if (sver >= 5)	{
-					style->fStrikeOut = GetInt(buff);
-				}
-				if (sver >= 5)	{
-					style->fontScaleX = GetFloat(buff);
-				}
-				if (sver >= 5)	{
-					style->fontScaleY = GetFloat(buff);
-				}
-				if (sver >= 5)	{
+					style->fUnderline  = GetInt(buff);
+					style->fStrikeOut  = GetInt(buff);
+					style->fontScaleX  = GetFloat(buff);
+					style->fontScaleY  = GetFloat(buff);
 					style->fontSpacing = GetFloat(buff);
-				}
-				if (sver >= 5)	{
-					style->fontAngleZ = GetFloat(buff);
+					style->fontAngleZ  = GetFloat(buff);
 				}
 				if (sver >= 4)	{
 					style->borderStyle = GetInt(buff);
@@ -1527,24 +1517,18 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 
 				if (sver <= 4)	{
 					style->colors[2] = style->colors[3];    // style->colors[2] is used for drawing the outline
-				}
-				if (sver <= 4)	{
 					alpha = max(min(alpha, 0xff), 0);
-				}
-				if (sver <= 4) {
 					for (size_t i = 0; i < 3; i++) {
 						style->alpha[i] = alpha;
 					}
 					style->alpha[3] = 0x80;
 				}
-				if (sver >= 5)	for (size_t i = 0; i < 4; i++) {
+				if (sver >= 5)	{
+					for (size_t i = 0; i < 4; i++) {
 						style->alpha[i] = (BYTE)(style->colors[i] >> 24);
 						style->colors[i] &= 0xffffff;
 					}
-				if (sver >= 5)	{
 					style->fontScaleX = max(style->fontScaleX, 0);
-				}
-				if (sver >= 5)	{
 					style->fontScaleY = max(style->fontScaleY, 0);
 				}
 				style->fontAngleX = style->fontAngleY = 0;
@@ -1553,9 +1537,11 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 				style->outlineWidthY = max(style->outlineWidthY, 0);
 				style->shadowDepthX = max(style->shadowDepthX, 0);
 				style->shadowDepthY = max(style->shadowDepthY, 0);
-				if (sver <= 4)	style->scrAlignment = (style->scrAlignment & 4) ? ((style->scrAlignment & 3) + 6) // top
-														  : (style->scrAlignment & 8) ? ((style->scrAlignment & 3) + 3) // mid
-														  : (style->scrAlignment & 3); // bottom
+				if (sver <= 4)	{
+					style->scrAlignment = (style->scrAlignment & 4) ? ((style->scrAlignment & 3) + 6) // top
+										: (style->scrAlignment & 8) ? ((style->scrAlignment & 3) + 3) // mid
+										: (style->scrAlignment & 3); // bottom
+				}
 
 				StyleName.TrimLeft('*');
 
