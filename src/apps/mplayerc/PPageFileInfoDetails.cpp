@@ -212,12 +212,7 @@ BOOL CPPageFileInfoDetails::OnInitDialog()
 
 	if (wh.cx > 0 && wh.cy > 0) {
 		m_res.Format(_T("%dx%d"), wh.cx, wh.cy);
-
-		int lnko = LNKO(arxy.cx, arxy.cy);
-
-		if (lnko > 1) {
-			arxy.cx /= lnko, arxy.cy /= lnko;
-		}
+		ReduceDim(arxy);
 
 		if (arxy.cx > 0 && arxy.cy > 0 && arxy.cx*wh.cy != arxy.cy*wh.cx) {
 			CString ar;

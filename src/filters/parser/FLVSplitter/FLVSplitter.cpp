@@ -757,11 +757,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						pbmi.biBitCount		= 24;
 
 						CSize aspect(h.width * h.sar.num, h.height * h.sar.den);
-						int lnko = LNKO(aspect.cx, aspect.cy);
-						if (lnko > 1) {
-							aspect.cx /= lnko, aspect.cy /= lnko;
-						}
-
+						ReduceDim(aspect);
 						CreateMPEG2VIfromAVC(&mt, &pbmi, AvgTimePerFrame, aspect, headerData, headerSize); 
 
 						delete[] headerData;

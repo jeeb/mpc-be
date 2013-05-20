@@ -651,10 +651,7 @@ void CMpeg2DecFilter::UpdateAspectRatio()
 	if (m_bReadARFromStream && m_dec->m_info.m_sequence->pixel_width && m_dec->m_info.m_sequence->pixel_height) {
 		CSize dar(m_dec->m_info.m_sequence->picture_width * m_dec->m_info.m_sequence->pixel_width,
 				  m_dec->m_info.m_sequence->picture_height * m_dec->m_info.m_sequence->pixel_height);
-		int lnko = LNKO(dar.cx, dar.cy);
-		if (lnko > 1) {
-			dar.cx /= lnko, dar.cy /= lnko;
-		}
+		ReduceDim(dar);
 		SetAspect(dar);
 	}
 }

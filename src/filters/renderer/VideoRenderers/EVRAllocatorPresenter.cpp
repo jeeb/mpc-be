@@ -750,10 +750,7 @@ HRESULT CEVRAllocatorPresenter::CreateProposedOutputType(IMFMediaType* pMixerTyp
 	bool bDoneSomething = true;
 
 	if (m_AspectRatio.cx >= 1 && m_AspectRatio.cy >= 1) {
-		int lnko = LNKO(m_AspectRatio.cx, m_AspectRatio.cy);
-		if (lnko > 1) {
-			m_AspectRatio.cx /= lnko, m_AspectRatio.cy /= lnko;
-		}
+		ReduceDim(m_AspectRatio);
 	}
 
 	AfxGetApp()->m_pMainWnd->PostMessage(WM_REARRANGERENDERLESS);

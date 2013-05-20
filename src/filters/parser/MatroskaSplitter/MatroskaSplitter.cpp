@@ -257,10 +257,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					pbmi.biBitCount		= 24;
 
 					CSize aspect(pbmi.biWidth, pbmi.biHeight);
-					int lnko = LNKO(aspect.cx, aspect.cy);
-					if (lnko > 1) {
-						aspect.cx /= lnko, aspect.cy /= lnko;
-					}
+					ReduceDim(aspect);
 					CreateMPEG2VIfromAVC(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount()); 
 
 					if (!bHasVideo)
@@ -624,19 +621,13 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							memcpy(mt.Format() + vih2, mts[i].Format() + vih1, bmi);
 
 							CSize aspect((int)pTE->v.DisplayWidth, (int)pTE->v.DisplayHeight);
-							int lnko = LNKO(aspect.cx, aspect.cy);
-							if (lnko > 1) {
-								aspect.cx /= lnko, aspect.cy /= lnko;
-							}
+							ReduceDim(aspect);
 							((VIDEOINFOHEADER2*)mt.Format())->dwPictAspectRatioX = aspect.cx;
 							((VIDEOINFOHEADER2*)mt.Format())->dwPictAspectRatioY = aspect.cy;
 							mts.InsertAt(i++, mt);
 						} else if (mts[i].formattype == FORMAT_MPEG2Video) {
 							CSize aspect((int)pTE->v.DisplayWidth, (int)pTE->v.DisplayHeight);
-							int lnko = LNKO(aspect.cx, aspect.cy);
-							if (lnko > 1) {
-								aspect.cx /= lnko, aspect.cy /= lnko;
-							}
+							ReduceDim(aspect);
 							((MPEG2VIDEOINFO*)mts[i].Format())->hdr.dwPictAspectRatioX = aspect.cx;
 							((MPEG2VIDEOINFO*)mts[i].Format())->hdr.dwPictAspectRatioY = aspect.cy;
 						}

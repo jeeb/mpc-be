@@ -266,6 +266,14 @@ inline int LNKO(int a, int b)
 	return a;
 }
 
+inline void ReduceDim(CSize &dim)
+{
+	int lnko = LNKO(dim.cx, dim.cy);
+	if (lnko > 1) {
+		dim.cx /= lnko, dim.cy /= lnko;
+	}
+}
+
 struct AV_Rational {
 	int num;
 	int den;

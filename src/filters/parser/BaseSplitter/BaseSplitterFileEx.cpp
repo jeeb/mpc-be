@@ -1678,10 +1678,7 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt)
 		vi->hdr.AvgTimePerFrame = h.hdr.AvgTimePerFrame;
 		
 		CSize aspect(h.hdr.width * h.hdr.sar.num, h.hdr.height * h.hdr.sar.den);
-		int lnko = LNKO(aspect.cx, aspect.cy);
-		if (lnko > 1) {
-			aspect.cx /= lnko, aspect.cy /= lnko;
-		}
+		ReduceDim(aspect);
 
 		if (aspect.cx * 2 < aspect.cy) {
 			delete[] vi;
@@ -1861,10 +1858,7 @@ bool CBaseSplitterFileEx::Read(vc1hdr& h, int len, CMediaType* pmt)
 		if (h.width == h.sar.num && h.height == h.sar.den) {
 			aspect = CSize(h.width, h.height);
 		}
-		int lnko = LNKO(aspect.cx, aspect.cy);
-		if (lnko > 1) {
-			aspect.cx /= lnko, aspect.cy /= lnko;
-		}
+		ReduceDim(aspect);
 
 		vi->dwPictAspectRatioX = aspect.cx;
 		vi->dwPictAspectRatioY = aspect.cy;

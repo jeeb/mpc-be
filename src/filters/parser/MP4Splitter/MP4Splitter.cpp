@@ -452,10 +452,7 @@ void SetAspect(VIDEOINFOHEADER2* vih2, CSize Aspect, LONG w, LONG h)
 {
 	if (!Aspect.cx || !Aspect.cy) {
 		Aspect.SetSize(w, h);
-		int lnko = LNKO(Aspect.cx, Aspect.cy);
-		if (lnko > 1) {
-			Aspect.cx /= lnko, Aspect.cy /= lnko;
-		}					
+		ReduceDim(Aspect);
 	}
 
 	vih2->dwPictAspectRatioX = Aspect.cx;
@@ -597,10 +594,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				AP4_UI32 h = tkhd->GetHeight()>>16;
 				if (w && h) {
 					Aspect.SetSize(w, h);
-					int lnko = LNKO(Aspect.cx, Aspect.cy);
-					if (lnko > 1) {
-						Aspect.cx /= lnko, Aspect.cy /= lnko;
-					}
+					ReduceDim(Aspect);
 				}
 			}
 
@@ -963,10 +957,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					REFERENCE_TIME AvgTimePerFrame = item->GetData()->GetSampleCount() ? item->GetData()->GetDurationMs()*10000 / (item->GetData()->GetSampleCount()) : 0;
 
 					CSize aspect(pbmi.biWidth * num, pbmi.biHeight * den);
-					int lnko = LNKO(aspect.cx, aspect.cy);
-					if (lnko > 1) {
-						aspect.cx /= lnko, aspect.cy /= lnko;
-					}
+					ReduceDim(aspect);
 					CreateMPEG2VIfromAVC(&mt, &pbmi, AvgTimePerFrame, aspect, (BYTE*)data, size); 
 
 					mts.Add(mt);

@@ -303,10 +303,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				BYTE* extra		= s->strf.GetData() + (s->strf.GetCount() - extralen);
 
 				CSize aspect(pbmi->biWidth, pbmi->biHeight);
-				int lnko = LNKO(aspect.cx, aspect.cy);
-				if (lnko > 1) {
-					aspect.cx /= lnko, aspect.cy /= lnko;
-				}
+				ReduceDim(aspect);
 				CreateMPEG2VIfromAVC(&mt, pbmi, AvgTimePerFrame, aspect, extra, extralen); 
 
 				mts.Add(mt);
