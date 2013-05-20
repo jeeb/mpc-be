@@ -648,18 +648,17 @@ HRESULT FFVC1UpdatePictureParam (DXVA_PictureParameters* pPicParams, struct AVCo
 
 	if (vc1->profile == PROFILE_ADVANCED) {
 		/* It is the cropped width/height -1 of the frame */
-		pPicParams->wPicWidthInMBminus1	= pAVCtx->width  - 1;
-		pPicParams->wPicHeightInMBminus1= pAVCtx->height - 1;
+		pPicParams->wPicWidthInMBminus1		= pAVCtx->width  - 1;
+		pPicParams->wPicHeightInMBminus1	= pAVCtx->height - 1;
 	} else {
 		/* It is the coded width/height in macroblock -1 of the frame */
-		pPicParams->wPicWidthInMBminus1 = vc1->s.mb_width  - 1;
-		pPicParams->wPicHeightInMBminus1= vc1->s.mb_height - 1;
+		pPicParams->wPicWidthInMBminus1		= vc1->s.mb_width  - 1;
+		pPicParams->wPicHeightInMBminus1	= vc1->s.mb_height - 1;
 	}
 
 	pPicParams->bSecondField			= (vc1->interlace && vc1->fcm == ILACE_FIELD && vc1->second_field);
 	pPicParams->bPicIntra               = vc1->s.pict_type == AV_PICTURE_TYPE_I;
 	pPicParams->bPicBackwardPrediction  = vc1->s.pict_type == AV_PICTURE_TYPE_B;
-
 
 	// Init    Init    Init    Todo
 	// iWMV9 - i9IRU - iOHIT - iINSO - iWMVA - 0 - 0 - 0		| Section 3.2.5
@@ -683,7 +682,6 @@ HRESULT FFVC1UpdatePictureParam (DXVA_PictureParameters* pPicParams, struct AVCo
 									  (vc1->interlace    << 5) | (vc1->tfcntrflag << 4) |
 									  (vc1->finterpflag  << 3) | // (refpic << 2) set in DecodeFrame !
 									  (vc1->psf << 1)		   | vc1->extended_dmv;
-
 
 	pPicParams->bPicStructure = 0;
 	if (vc1->s.picture_structure & PICT_TOP_FIELD) {
@@ -725,10 +723,9 @@ HRESULT FFVC1UpdatePictureParam (DXVA_PictureParameters* pPicParams, struct AVCo
 	// Cf section 7.1.1.25 in VC1 specification, section 3.2.14.3 in DXVA spec
 	pPicParams->bRcontrol	= vc1->rnd;
 
-	pPicParams->bPicDeblocked	= ((vc1->profile == PROFILE_ADVANCED && vc1->overlap == 1 &&
-									pPicParams->bPicBackwardPrediction == 0)				<< 6) |
-								  ((vc1->profile != PROFILE_ADVANCED && vc1->rangeredfrm)	<< 5) |
-								  (vc1->s.loop_filter										<< 1);
+	pPicParams->bPicDeblocked	= ((vc1->overlap == 1 && pPicParams->bPicBackwardPrediction == 0)	<< 6) |
+								  ((vc1->profile != PROFILE_ADVANCED && vc1->rangeredfrm)			<< 5) |
+								  (vc1->s.loop_filter												<< 1);
 
 	if (vc1->profile == PROFILE_ADVANCED && (vc1->rff || vc1->rptfrm)) {
 		*b_repeat_pict = TRUE;

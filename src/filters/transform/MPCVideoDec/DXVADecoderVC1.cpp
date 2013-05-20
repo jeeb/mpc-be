@@ -135,7 +135,7 @@ HRESULT CDXVADecoderVC1::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 	m_PictureParams.bPic4MVallowed				= (m_PictureParams.wBackwardRefPictureIndex == NO_REF_FRAME && m_PictureParams.bPicStructure == 3) ? 1 : 0;
 	m_PictureParams.bPicDeblockConfined			|= (m_PictureParams.wBackwardRefPictureIndex == NO_REF_FRAME) ? 0x04 : 0;
 
-	m_PictureParams.bPicScanMethod++;					// Use for status reporting sections 3.8.1 and 3.8.2
+	m_PictureParams.bPicScanMethod++;			// Use for status reporting sections 3.8.1 and 3.8.2
 
 	TRACE_VC1 ("CDXVADecoderVC1::DecodeFrame() : Decode frame %i\n", m_PictureParams.bPicScanMethod);
 
@@ -214,7 +214,7 @@ BYTE* CDXVADecoderVC1::FindNextStartCode(BYTE* pBuffer, UINT nSize, UINT& nPacke
 	BYTE*		pStart	= pBuffer;
 	BYTE		bCode	= 0;
 	for (UINT i=0; i<nSize-4; i++) {
-		if ( ((*((DWORD*)(pBuffer+i)) & 0x00FFFFFF) == 0x00010000) || (i >= nSize-5) ) {
+		if (((*((DWORD*)(pBuffer+i)) & 0x00FFFFFF) == 0x00010000) || (i >= nSize-5)) {
 			if (bCode == 0) {
 				bCode = pBuffer[i+3];
 				if ((nSize == 5) && (bCode == 0x0D)) {
@@ -228,8 +228,8 @@ BYTE* CDXVADecoderVC1::FindNextStartCode(BYTE* pBuffer, UINT nSize, UINT& nPacke
 					return pStart;
 				} else {
 					// Other stuff, ignore it
-					pStart = pBuffer + i;
-					bCode  = pBuffer[i+3];
+					pStart	= pBuffer + i;
+					bCode	= pBuffer[i+3];
 				}
 			}
 		}
@@ -245,13 +245,13 @@ void CDXVADecoderVC1::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSiz
 	if (m_PictureParams.bSecondField) {
 		memcpy_sse (pDXVABuffer, (BYTE*)pBuffer, nSize);
 	} else {
-		if ( (*((DWORD*)pBuffer) & 0x00FFFFFF) != 0x00010000) {
+		if ((*((DWORD*)pBuffer) & 0x00FFFFFF) != 0x00010000) {
 			if (m_pFilter->GetCodec() == AV_CODEC_ID_WMV3) {
 				memcpy_sse (pDXVABuffer, (BYTE*)pBuffer, nSize);
 			} else {
-				pDXVABuffer[0]=pDXVABuffer[1]=0;
-				pDXVABuffer[2]=1;
-				pDXVABuffer[3]=0x0D;
+				pDXVABuffer[0] = pDXVABuffer[1] = 0;
+				pDXVABuffer[2] = 1;
+				pDXVABuffer[3] = 0x0D;
 				memcpy_sse (pDXVABuffer + 4, (BYTE*)pBuffer, nSize);
 				nSize  +=4;
 			}
@@ -274,7 +274,7 @@ void CDXVADecoderVC1::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSiz
 		
 		pDXVABuffer += nSize;
 		memset (pDXVABuffer, 0, nDummy);
-		nSize  += nDummy;
+		nSize += nDummy;
 	}
 }
 

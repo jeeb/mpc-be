@@ -112,7 +112,7 @@ DXVA_PARAMS		DXVA_VC1 = {
 	16,		// PicEntryNumber - DXVA1
 	24,		// PicEntryNumber - DXVA2
 	1,		// PreferedConfigBitstream
-	{ &DXVA2_ModeVC1_D,				&GUID_NULL },
+	{ &DXVA2_ModeVC1_D, &GUID_NULL },
 	{ DXVA_RESTRICTED_MODE_VC1_D, 0}
 };
 
