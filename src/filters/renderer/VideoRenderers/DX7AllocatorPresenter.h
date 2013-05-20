@@ -37,9 +37,10 @@ namespace DSObjects
 	protected:
 		CSize	m_ScreenSize;
 
-		CComPtr<IDirectDraw7>	m_pDD;
+		HMODULE									m_hDDrawLib;
+		CComPtr<IDirectDraw7>					m_pDD;
 		CComQIPtr<IDirect3D7, &IID_IDirect3D7>	m_pD3D;
-		CComPtr<IDirect3DDevice7>	m_pD3DDev;
+		CComPtr<IDirect3DDevice7>				m_pD3DDev;
 
 		CComPtr<IDirectDrawSurface7>	m_pPrimary;
 		CComPtr<IDirectDrawSurface7>	m_pBackBuffer;
@@ -54,6 +55,7 @@ namespace DSObjects
 
 	public:
 		CDX7AllocatorPresenter(HWND hWnd, HRESULT& hr);
+		~CDX7AllocatorPresenter();
 
 		// ISubPicAllocatorPresenter
 		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer);
