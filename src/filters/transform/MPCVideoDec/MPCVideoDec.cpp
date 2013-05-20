@@ -1305,10 +1305,6 @@ bool CMPCVideoDecFilter::IsAVI()
 	return false;
 }
 
-#define ATI_IDENTIFY		_T("ATI ")
-#define AMD_IDENTIFY		_T("AMD ")
-#define RADEON_HD_IDENTIFY	_T("Radeon HD ")
-
 HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction, const CMediaType *pmt)
 {
 	if (direction == PINDIR_INPUT) {
@@ -1433,6 +1429,11 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 
 	return hr;
 }
+
+#define ATI_IDENTIFY					_T("ATI ")
+#define AMD_IDENTIFY					_T("AMD ")
+#define RADEON_HD_IDENTIFY				_T("Radeon HD ")
+#define RADEON_MOBILITY_HD_IDENTIFY		_T("Mobility Radeon HD ")
 
 HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 {
@@ -1574,10 +1575,13 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 					if (m_nPCIVendor == PCIV_ATI) {
 						if (!m_strDeviceDescription.Find(ATI_IDENTIFY) || !m_strDeviceDescription.Find(AMD_IDENTIFY)) {
 							m_strDeviceDescription.Delete(0, 4);
+							TCHAR ati_version = '0';
 							if (!m_strDeviceDescription.Find(RADEON_HD_IDENTIFY)) {
-								TCHAR ati_version = m_strDeviceDescription.GetAt(CString(RADEON_HD_IDENTIFY).GetLength());
-								IsAtiDXVACompatible = (atoi(&ati_version) >= 4); // HD4xxx and above AMD/ATI cards support level 5.1 and ref = 16
+								ati_version = m_strDeviceDescription.GetAt(CString(RADEON_HD_IDENTIFY).GetLength());
+							} else if (!m_strDeviceDescription.Find(RADEON_MOBILITY_HD_IDENTIFY)) {
+								ati_version = m_strDeviceDescription.GetAt(CString(RADEON_MOBILITY_HD_IDENTIFY).GetLength());
 							}
+							IsAtiDXVACompatible = (atoi(&ati_version) >= 4); // HD4xxx/Mobility and above AMD/ATI cards support level 5.1 and ref = 16
 						}
 					} else if (m_nPCIVendor == PCIV_Intel && !IsWinVistaOrLater() && m_nPCIDevice == 0x8108) {
 						break; // Disable support H.264 DXVA on Intel GMA500 in WinXP
@@ -1587,12 +1591,23 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 					if ((nCompat & DXVA_PROFILE_HIGHER_THAN_HIGH) || (nCompat & DXVA_HIGH_BIT)) { // DXVA unsupported
 						break;
 					}
-					if (nCompat && (
-							m_nDXVACheckCompatibility == 0 ||										// full check
-							m_nDXVACheckCompatibility == 1 && nCompat != DXVA_UNSUPPORTED_LEVEL ||	// skip level check
-							m_nDXVACheckCompatibility == 2 && nCompat != DXVA_TOO_MANY_REF_FRAMES)	// skip reference frame check
-						) {
-						break;
+					
+					if (nCompat) {
+						bool bDXVACompatible = true;
+						switch (m_nDXVACheckCompatibility) {
+							case 0:
+								bDXVACompatible = false;
+								break;
+							case 1:
+								bDXVACompatible = (nCompat == DXVA_UNSUPPORTED_LEVEL);
+								break;
+							case 2:
+								bDXVACompatible = (nCompat == DXVA_TOO_MANY_REF_FRAMES);
+								break;
+						}
+						if (!bDXVACompatible) {
+							break;
+						}
 					}
 				} else if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO) {
 					if (!MPEG2CheckCompatibility(m_pAVCtx, m_pFrame)) {

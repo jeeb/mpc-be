@@ -291,7 +291,8 @@ int FFH264CheckCompatibility (int nWidth, int nHeight, struct AVCodecContext* pA
 					no_level51_support = 0;
 
 					// max ref frames is 16 for HD and 11 otherwise
-					max_ref_frames = (nWidth >= 1280) ? 16 : 11;
+					// max_ref_frames = (nWidth >= 1280) ? 16 : 11;
+					max_ref_frames = 16;
 				}
 			} else {
 				if (DriverVersionCheck(VideoDriverVersion, 6, 14, 11, 7800)) {
