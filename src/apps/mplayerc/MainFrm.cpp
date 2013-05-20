@@ -14665,27 +14665,35 @@ void CMainFrame::CloseMediaPrivate()
 		if (pMVEMC) {
 			pMVEMC->Unregister(MadVRExclusiveModeCallback, this);
 		}
+		m_pBFmadVR.Release();
 	}
 	IsMadVRExclusiveMode = false;
+
 	m_fLiveWM = false;
 	m_fEndOfStream = false;
 	m_rtDurationOverride = -1;
 	m_kfs.RemoveAll();
-	m_pCB = NULL;
+	m_pCB.Release(); 
+
+	{
+		CAutoLock cAutoLock(&m_csSubLock);
+		m_pSubStreams.RemoveAll();
+	}
+	m_pSubClock.Release();
 
 	//if (pVW) pVW->put_Visible(OAFALSE);
 	//if (pVW) pVW->put_MessageDrain((OAHWND)NULL), pVW->put_Owner((OAHWND)NULL);
 
-	m_pCAP	 = NULL; // IMPORTANT: IVMRSurfaceAllocatorNotify/IVMRSurfaceAllocatorNotify9 has to be released before the VMR/VMR9, otherwise it will crash in Release()
-	m_pCAP2  = NULL;
-	m_pMC	 = NULL;
-	m_pMFVP	 = NULL;
-	m_pMFVDC = NULL;
-	m_pLN21 = NULL;
-	m_pSyncClock = NULL;
+	// IMPORTANT: IVMRSurfaceAllocatorNotify/IVMRSurfaceAllocatorNotify9 has to be released before the VMR/VMR9, otherwise it will crash in Release()
+	m_pCAP2.Release();
+	m_pCAP.Release();
+	m_pMC.Release();
+	m_pMFVP.Release();
+	m_pMFVDC.Release();
+	m_pLN21.Release();
+	m_pSyncClock.Release();
 
 	pAMXBar.Release();
-	pAMTuner.Release();
 	pAMDF.Release();
 	pAMVCCap.Release();
 	pAMVCPrev.Release();
@@ -14694,37 +14702,37 @@ void CMainFrame::CloseMediaPrivate()
 	pAMASC.Release();
 	pVidCap.Release();
 	pAudCap.Release();
+	pAMTuner.Release();
 	pCGB.Release();
+
 	pDVDC.Release();
 	pDVDI.Release();
-	pQP.Release();
-	pBI.Release();
 	pAMOP.Release();
+	pBI.Release();
+	pQP.Release();
 	pFS.Release();
-	pMC.Release();
-	pME.Release();
 	pMS.Release();
-	pVW.Release();
-	pBV.Release();
 	pBA.Release();
+	pBV.Release();
+	pVW.Release();
+	pME.Release();
+	pMC.Release();
 
 	if (pGB) {
 		pGB->RemoveFromROT();
 		pGB.Release();
 	}
 
-	m_pBFmadVR = NULL;
-
 	if (pGB2) {
-		m_pMFVP2	= NULL;
-		m_pMFVDC2	= NULL;
+		m_pMFVP2.Release();
+		m_pMFVDC2.Release();
 
-		pMC2.Release();
-		pME2.Release();
-		pMS2.Release();
-		pVW2.Release();
-		pBV2.Release();
 		pFS2.Release();
+		pMS2.Release();
+		pBV2.Release();
+		pVW2.Release();
+		pME2.Release();
+		pMC2.Release();
 
 		if (pDVDC2) {
 			pDVDC2.Release();
@@ -14735,20 +14743,13 @@ void CMainFrame::CloseMediaPrivate()
 		pGB2.Release();
 	}
 
+	m_pProv.Release();
+
 	if (m_pFullscreenWnd->IsWindow()) {
 		m_pFullscreenWnd->DestroyWindow();    // TODO : still freezing sometimes...
 	}
 
 	m_fRealMediaGraph = m_fShockwaveGraph = m_fQuicktimeGraph = false;
-
-	m_pSubClock = NULL;
-
-	m_pProv.Release();
-
-	{
-		CAutoLock cAutoLock(&m_csSubLock);
-		m_pSubStreams.RemoveAll();
-	}
 
 	m_VidDispName.Empty();
 	m_AudDispName.Empty();
@@ -14759,6 +14760,7 @@ void CMainFrame::CloseMediaPrivate()
 	AfxGetAppSettings().ResetPositions();
 
 	SetLoadState (MLS_CLOSED);
+
 
 	if (IsWindow(m_wndToolBar.m_hWnd) && m_wndToolBar.IsVisible()) {
 		m_wndToolBar.Invalidate();
