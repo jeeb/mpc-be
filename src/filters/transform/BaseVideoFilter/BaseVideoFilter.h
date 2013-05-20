@@ -31,6 +31,12 @@ typedef struct {
 	DWORD			biCompression;
 } VIDEO_OUTPUT_FORMATS;
 
+typedef enum {
+	MODE_SOFTWARE,
+	MODE_DXVA1,
+	MODE_DXVA2
+} DECODER_MODE;
+
 class CBaseVideoFilter : public CTransformFilter
 {
 private:
@@ -39,7 +45,6 @@ private:
 	// these are private for a reason, don't bother them
 	int m_win, m_hin, m_arxin, m_aryin;
 	int m_wout, m_hout, m_arxout, m_aryout;
-	bool m_bSetAspect;
 	bool m_bSendMediaType;
 
 	long m_cBuffers;
@@ -48,6 +53,8 @@ protected:
 	CCritSec m_csReceive;
 
 	int m_w, m_h, m_arx, m_ary;
+
+	DECODER_MODE m_nDecoderMode;
 
 	HRESULT GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, REFERENCE_TIME AvgTimePerFrame = 0);
 	HRESULT CopyBuffer(BYTE* pOut, BYTE* pIn, int w, int h, int pitchIn, const GUID& subtype, bool fInterlaced = false);
@@ -62,7 +69,7 @@ public:
 	CBaseVideoFilter(TCHAR* pName, LPUNKNOWN lpunk, HRESULT* phr, REFCLSID clsid, long cBuffers = 1);
 	virtual ~CBaseVideoFilter();
 
-	HRESULT ReconnectOutput(int w, int h, bool bSendSample = true, bool bForce = false, REFERENCE_TIME AvgTimePerFrame = 0, int RealWidth = -1, int RealHeight = -1, bool DXVA1 = false);
+	HRESULT ReconnectOutput(int w, int h, bool bSendSample = true, bool bForce = false, REFERENCE_TIME AvgTimePerFrame = 0, int RealWidth = -1, int RealHeight = -1);
 	int GetPinCount();
 	CBasePin* GetPin(int n);
 

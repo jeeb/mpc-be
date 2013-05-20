@@ -38,8 +38,8 @@
 CBaseVideoFilter::CBaseVideoFilter(TCHAR* pName, LPUNKNOWN lpunk, HRESULT* phr, REFCLSID clsid, long cBuffers)
 	: CTransformFilter(pName, lpunk, clsid)
 	, m_cBuffers(cBuffers)
-	, m_bSetAspect(false)
 	, m_bSendMediaType(false)
+	, m_nDecoderMode(MODE_SOFTWARE)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -77,7 +77,6 @@ void CBaseVideoFilter::SetAspect(CSize aspect)
 	if (m_arx != aspect.cx || m_ary != aspect.cy) {
 		m_arx = aspect.cx;
 		m_ary = aspect.cy;
-		m_bSetAspect = true;
 	}
 }
 
@@ -162,19 +161,18 @@ HRESULT CBaseVideoFilter::GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, 
 	return S_OK;
 }
 
-HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool bForce, REFERENCE_TIME AvgTimePerFrame, int RealWidth, int RealHeight, bool DXVA1)
+HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool bForce, REFERENCE_TIME AvgTimePerFrame, int RealWidth, int RealHeight)
 {
 	CMediaType& mt = m_pOutput->CurrentMediaType();
 
 	bool m_update_aspect = false;
-	if (m_bSetAspect) {
+	{
 		int wout = 0, hout = 0, arxout = 0, aryout = 0;
 		ExtractDim(&mt, wout, hout, arxout, aryout);
 		if (arxout != m_arx || aryout != m_ary) {
 			m_update_aspect = true;
 		}
 	}
-	m_bSetAspect = false;
 
 	int w_org = m_w;
 	int h_org = m_h;
@@ -256,12 +254,11 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 		bmi->biHeight		= m_h;
 		bmi->biSizeImage	= m_w*m_h*bmi->biBitCount>>3;
 
-		bool bDXVA			= !DXVA1 && (bmi->biCompression == mmioFOURCC('d','x','v','a'));
 		hr = m_pOutput->GetConnected()->QueryAccept(&mt);
 		ASSERT(SUCCEEDED(hr)); // should better not fail, after all "mt" is the current media type, just with a different resolution
 		HRESULT hr1 = 0;
 
-		if (bDXVA) {
+		if (m_nDecoderMode == MODE_DXVA2) {
 			m_pOutput->SetMediaType(&mt);
 			m_bSendMediaType = true;
 		} else if (SUCCEEDED(hr1 = m_pOutput->GetConnected()->ReceiveConnection(m_pOutput, &mt))) {
@@ -293,7 +290,7 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 		m_aryout = m_ary;
 
 		// some renderers don't send this
-		if (!bDXVA) {
+		if (m_nDecoderMode != MODE_DXVA2) {
 			NotifyEvent(EC_VIDEO_SIZE_CHANGED, MAKELPARAM(m_w, m_h), 0);
 		}
 

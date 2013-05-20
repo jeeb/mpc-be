@@ -769,7 +769,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_bUseDXVA				= true;
 	m_bUseFFmpeg			= true;
 
-	m_nDXVAMode				= MODE_SOFTWARE;
 	m_pDXVADecoder			= NULL;
 	m_pVideoOutputFormat	= NULL;
 	m_nVideoOutputCount		= 0;
@@ -1470,7 +1469,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 			m_pParser = av_parser_init(m_nCodecId);
 		}
 
-		if (bChangeMT && m_nDXVAMode == MODE_SOFTWARE) {
+		if (bChangeMT && m_nDecoderMode == MODE_SOFTWARE) {
 			m_bUseDXVA = false;
 		}
 
@@ -1635,7 +1634,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		if (bChangeMT) {
 			if (IsDXVASupported() && SUCCEEDED(FindDecoderConfiguration())) {
 				dynamic_cast<CVideoDecOutputPin*>(m_pOutput)->Recommit();
-				m_nDXVAMode = MODE_DXVA2;
+				m_nDecoderMode = MODE_DXVA2;
 			} else {
 				SAFE_DELETE (m_pDXVADecoder);
 			}
@@ -1782,17 +1781,17 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 		DetectVideoCard_EVR(pReceivePin);
 
 		if (IsDXVASupported()) {
-			if (m_nDXVAMode == MODE_DXVA1) {
+			if (m_nDecoderMode == MODE_DXVA1) {
 				m_pDXVADecoder->ConfigureDXVA1();
 			} else if (SUCCEEDED (ConfigureDXVA2 (pReceivePin)) && SUCCEEDED (SetEVRForDXVA2 (pReceivePin)) ) {
-				m_nDXVAMode  = MODE_DXVA2;
+				m_nDecoderMode  = MODE_DXVA2;
 			}
 		}
-		if (m_nDXVAMode == MODE_SOFTWARE && !m_bUseFFmpeg) {
+		if (m_nDecoderMode == MODE_SOFTWARE && !m_bUseFFmpeg) {
 			return VFW_E_INVALIDMEDIATYPE;
 		}
 
-		if (m_nDXVAMode == MODE_SOFTWARE && IsDXVASupported()) {
+		if (m_nDecoderMode == MODE_SOFTWARE && IsDXVASupported()) {
 			HRESULT hr;
 			if FAILED(hr = ReopenVideo()) {
 				return hr;
@@ -1810,7 +1809,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 			}
 		}
 
-		if (m_nDXVAMode != MODE_SOFTWARE) {
+		if (m_nDecoderMode != MODE_SOFTWARE) {
 			m_nOutCsp = FF_CSP_UNSUPPORTED;
 		}
 		
@@ -1891,7 +1890,7 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 	rm.video_after_seek	= true;
 	m_rtStart			= rtStart;
 
-	if (m_nCodecId == AV_CODEC_ID_H264 && m_nFrameType != PICT_FRAME && m_nPCIVendor == PCIV_ATI && m_nDXVAMode == MODE_DXVA2) {
+	if (m_nCodecId == AV_CODEC_ID_H264 && m_nFrameType != PICT_FRAME && m_nPCIVendor == PCIV_ATI && m_nDecoderMode == MODE_DXVA2) {
 		if (SUCCEEDED(FindDecoderConfiguration())) {
 			dynamic_cast<CVideoDecOutputPin*>(m_pOutput)->Recommit();
 		}
@@ -1904,10 +1903,10 @@ HRESULT CMPCVideoDecFilter::EndOfStream()
 {
 	CAutoLock cAutoLock(&m_csReceive);
 
-	if (m_nDXVAMode == MODE_SOFTWARE) {
+	if (m_nDecoderMode == MODE_SOFTWARE) {
 		REFERENCE_TIME rtStart = 0, rtStop = 0;
 		SoftwareDecode(NULL, NULL, 0, rtStart, rtStop);
-	} else if (m_nDXVAMode == MODE_DXVA2 && m_pDXVADecoder) { // TODO - need check under WinXP on DXVA1
+	} else if (m_nDecoderMode == MODE_DXVA2 && m_pDXVADecoder) { // TODO - need check under WinXP on DXVA1
 		m_pDXVADecoder->EndOfStream();
 	}
 
@@ -2563,7 +2562,7 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 		m_nPosB						= 1-m_nPosB;
 	}
 
-	switch (m_nDXVAMode) {
+	switch (m_nDecoderMode) {
 		case MODE_SOFTWARE :
 			hr = SoftwareDecode (pIn, pDataIn, nSize, rtStart, rtStop);
 			break;
@@ -2575,7 +2574,7 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 
 				// Change aspect ratio for DXVA1
 				// stupid DXVA1 - size for the output MediaType should be the same that size of DXVA surface
-				if (m_nDXVAMode == MODE_DXVA1 && ReconnectOutput(PictWidthRounded(), PictHeightRounded(), true, false, GetDuration(), PictWidth(), PictHeight(), true) == S_OK) {
+				if (m_nDecoderMode == MODE_DXVA1 && ReconnectOutput(PictWidthRounded(), PictHeightRounded(), true, false, GetDuration(), PictWidth(), PictHeight()) == S_OK) {
 					m_pDXVADecoder->ConfigureDXVA1();
 				}
 
@@ -2920,7 +2919,7 @@ HRESULT CMPCVideoDecFilter::CreateDXVA1Decoder(IAMVideoAccelerator*  pAMVideoAcc
 		return E_FAIL;
 	}
 
-	m_nDXVAMode			= MODE_DXVA1;
+	m_nDecoderMode			= MODE_DXVA1;
 	m_DXVADecoderGUID	= *pDecoderGuid;
 	m_pDXVADecoder		= CDXVADecoder::CreateDecoder (this, pAMVideoAccelerator, &m_DXVADecoderGUID, dwSurfaceCount);
 

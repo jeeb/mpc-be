@@ -47,12 +47,6 @@ struct SwsContext;
 
 class CCpuId;
 
-typedef enum {
-	MODE_SOFTWARE,
-	MODE_DXVA1,
-	MODE_DXVA2
-} DXVA_MODE;
-
 typedef struct {
 	REFERENCE_TIME	rtStart;
 	REFERENCE_TIME	rtStop;
@@ -147,7 +141,6 @@ protected:
 	// === DXVA common variables
 	VIDEO_OUTPUT_FORMATS*					m_pVideoOutputFormat;
 	int										m_nVideoOutputCount;
-	DXVA_MODE								m_nDXVAMode;
 	CDXVADecoder*							m_pDXVADecoder;
 	GUID									m_DXVADecoderGUID;
 
@@ -290,10 +283,10 @@ public:
 	int							PictWidthRounded();
 	int							PictHeightRounded();
 
-	inline bool					UseDXVA2()				{ return (m_nDXVAMode == MODE_DXVA2); };
+	inline bool					UseDXVA2()				{ return (m_nDecoderMode == MODE_DXVA2); };
 	inline AVCodecContext*		GetAVCtx()				{ return m_pAVCtx; };
 	inline AVFrame*				GetFrame()				{ return m_pFrame; };
-	inline enum AVCodecID			GetCodec()				{ return m_nCodecId; };
+	inline enum AVCodecID		GetCodec()				{ return m_nCodecId; };
 	inline bool					IsReorderBFrame()		{ return m_bReorderBFrame; };
 	inline bool					IsEvo()					{ return m_bIsEVO; };
 	inline DWORD				GetPCIVendor()			{ return m_nPCIVendor; };
