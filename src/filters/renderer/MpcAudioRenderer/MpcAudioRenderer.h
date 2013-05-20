@@ -36,10 +36,11 @@
 #include "MpcAudioRendererSettingsWnd.h"
 #include <SoundTouch/include/SoundTouch.h>
 
+#include "Mixer.h"
+
 #define MpcAudioRendererName L"MPC Audio Renderer"
 
 // REFERENCE_TIME time units per second and per millisecond
-#define REFTIMES_PER_SEC		10000000
 #define REFTIMES_PER_MILLISEC	10000
 
 // if you get a compilation error on AUDCLNT_E_BUFFER_SIZE_NOT_ALIGNED,
@@ -52,6 +53,8 @@ class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 	, public ISpecifyPropertyPages2
 	, public IMpcAudioRendererFilter
 {
+	CMixer m_Resampler;
+
 public:
 	CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr);
 	virtual ~CMpcAudioRenderer();
@@ -118,6 +121,7 @@ private:
 	LPDIRECTSOUNDBUFFER		m_pDSBuffer;
 	DWORD					m_dwDSWriteOff;
 	WAVEFORMATEX			*m_pWaveFileFormat;
+	WAVEFORMATEX			*m_pWaveFileFormatOutput;
 	int						m_nDSBufSize;
 	CBaseReferenceClock*	m_pReferenceClock;
 	double					m_dRate;
@@ -131,10 +135,16 @@ private:
 	HRESULT					CreateAudioClient(IMMDevice *pMMDevice, IAudioClient **ppAudioClient);
 	HRESULT					InitAudioClient(WAVEFORMATEX *pWaveFormatEx, IAudioClient *pAudioClient, IAudioRenderClient **ppRenderClient, ISimpleAudioVolume **ppAudioVolume);
 	HRESULT					CheckAudioClient(WAVEFORMATEX *pWaveFormatEx);
-	bool					CheckFormatChanged(WAVEFORMATEX *pWaveFormatEx, WAVEFORMATEX **ppNewWaveFormatEx);
 	HRESULT					DoRenderSampleWasapi(IMediaSample *pMediaSample);
 	HRESULT					GetBufferSize(WAVEFORMATEX *pWaveFormatEx, REFERENCE_TIME *pHnsBufferPeriod);
 
+	bool					IsFormatChanged(const WAVEFORMATEX *pWaveFormatEx, const WAVEFORMATEX *pNewWaveFormatEx);
+	bool					CheckFormatChanged(WAVEFORMATEX *pWaveFormatEx, WAVEFORMATEX **ppNewWaveFormatEx);
+	bool					CopyWaveFormat(WAVEFORMATEX *pSrcWaveFormatEx, WAVEFORMATEX **ppDestWaveFormatEx);
+
+	bool					IsBitstream(WAVEFORMATEX *pWaveFormatEx);
+
+	HRESULT					StopAudioClient();
 
 	// WASAPI variables
 	int						m_useWASAPI;
@@ -146,7 +156,8 @@ private:
 	IAudioRenderClient		*pRenderClient;
 	ISimpleAudioVolume		*pAudioVolume;
 	UINT32					nFramesInBuffer;
-	REFERENCE_TIME			hnsPeriod, hnsActualDuration;
+	REFERENCE_TIME			hnsPeriod;
+	DWORD					hnsActualDuration;
 	HANDLE					hTask;
 	CCritSec				m_csCheck;
 	UINT32					bufferSize;
