@@ -120,9 +120,6 @@
     <ClCompile Include="OpenDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OpenFileDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PlayerCaptureBar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -471,9 +468,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="OpenDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OpenFileDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PlayerCaptureBar.h">

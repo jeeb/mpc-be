@@ -30,7 +30,7 @@
 #include "SaveTextFileDialog.h"
 #include "PlayerPlaylistBar.h"
 #include "SettingsDefines.h"
-#include "OpenFileDlg.h"
+#include "OpenDlg.h"
 
 UINT CPlaylistItem::m_globalid  = 0;
 

@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <afxwin.h>
 #include <ResizableLib/ResizableDialog.h>
 
 // COpenDlg dialog
@@ -60,4 +61,39 @@ public:
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnUpdateDub(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateOk(CCmdUI* pCmdUI);
+};
+
+// COpenFileDlg
+
+class COpenFileDlg : public CFileDialog
+{
+	DECLARE_DYNAMIC(COpenFileDlg)
+
+private:
+	TCHAR* m_buff;
+	TCHAR* m_InitialDir; 
+	CAtlArray<CString>& m_mask;
+
+public:
+	COpenFileDlg(CAtlArray<CString>& mask, bool fAllowDirSelection,
+				 LPCTSTR lpszDefExt = NULL,
+				 LPCTSTR lpszFileName = NULL,
+				 DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
+				 LPCTSTR lpszFilter = NULL,
+				 CWnd* pParentWnd = NULL);
+	virtual ~COpenFileDlg();
+
+	static bool m_fAllowDirSelection;
+	static WNDPROC m_wndProc;
+	static LRESULT CALLBACK WindowProcNew(HWND hwnd,UINT message, WPARAM wParam, LPARAM lParam);
+
+	virtual BOOL OnInitDialog();
+
+protected:
+	DECLARE_MESSAGE_MAP()
+	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
+	virtual BOOL OnIncludeItem(OFNOTIFYEX* pOFNEx, LRESULT* pResult);
+
+public:
+	afx_msg void OnDestroy();
 };
