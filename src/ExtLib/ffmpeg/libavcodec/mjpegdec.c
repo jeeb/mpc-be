@@ -280,15 +280,18 @@ int ff_mjpeg_decode_sof(MJpegDecodeContext *s)
             s->h_max = h_count[i];
         if (v_count[i] > s->v_max)
             s->v_max = v_count[i];
-        if (!h_count[i] || !v_count[i]) {
-            av_log(s->avctx, AV_LOG_ERROR, "h/v_count is 0\n");
-            return -1;
-        }
         s->quant_index[i] = get_bits(&s->gb, 8);
         if (s->quant_index[i] >= 4) {
             av_log(s->avctx, AV_LOG_ERROR, "quant_index is invalid\n");
             return AVERROR_INVALIDDATA;
         }
+        if (!h_count[i] || !v_count[i]) {
+            av_log(s->avctx, AV_LOG_ERROR,
+                   "Invalid sampling factor in component %d %d:%d\n",
+                   i, h_count[i], v_count[i]);
+            return AVERROR_INVALIDDATA;
+        }
+
         av_log(s->avctx, AV_LOG_DEBUG, "component %d %d:%d id: %d quant:%d\n",
                i, h_count[i], v_count[i],
                s->component_id[i], s->quant_index[i]);
@@ -425,7 +428,7 @@ int ff_mjpeg_decode_sof(MJpegDecodeContext *s)
         s->avctx->color_range = s->cs_itu601 ? AVCOL_RANGE_MPEG : AVCOL_RANGE_JPEG;
         break;
     case 0x41111100:
-        s->avctx->pix_fmt = AV_PIX_FMT_YUV411P;
+        s->avctx->pix_fmt = s->cs_itu601 ? AV_PIX_FMT_YUV411P : AV_PIX_FMT_YUVJ411P;
         s->avctx->color_range = s->cs_itu601 ? AVCOL_RANGE_MPEG : AVCOL_RANGE_JPEG;
         break;
     default:
@@ -850,8 +853,8 @@ static int ljpeg_decode_rgb_scan(MJpegDecodeContext *s, int nb_components, int p
     return 0;
 }
 
-static int ljpeg_decode_yuv_scan(MJpegDecodeContext *s, int nb_components, int predictor,
-                                 int point_transform)
+static int ljpeg_decode_yuv_scan(MJpegDecodeContext *s, int predictor,
+                                 int point_transform, int nb_components)
 {
     int i, mb_x, mb_y;
     int bits= (s->bits+7)&~7;
@@ -1131,8 +1134,9 @@ static int mjpeg_decode_scan_progressive_ac(MJpegDecodeContext *s, int ss,
     int last_scan = 0;
     int16_t *quant_matrix = s->quant_matrixes[s->quant_index[c]];
 
-    if (se > 63) {
-        av_log(s->avctx, AV_LOG_ERROR, "SE %d is too large\n", se);
+    av_assert0(ss>=0 && Ah>=0 && Al>=0);
+    if (se < ss || se > 63) {
+        av_log(s->avctx, AV_LOG_ERROR, "SS/SE %d/%d is invalid\n", ss, se);
         return AVERROR_INVALIDDATA;
     }
 
@@ -1294,7 +1298,9 @@ next_field:
                 if ((ret = ljpeg_decode_rgb_scan(s, nb_components, predictor, point_transform)) < 0)
                     return ret;
             } else {
-                if ((ret = ljpeg_decode_yuv_scan(s, nb_components, predictor, point_transform)) < 0)
+                if ((ret = ljpeg_decode_yuv_scan(s, predictor,
+                                                 point_transform,
+                                                 nb_components)) < 0)
                     return ret;
             }
         }
@@ -1501,12 +1507,14 @@ static int mjpeg_decode_com(MJpegDecodeContext *s)
                 av_log(s->avctx, AV_LOG_INFO, "comment: '%s'\n", cbuf);
 
             /* buggy avid, it puts EOI only at every 10th frame */
-            if (!strcmp(cbuf, "AVID")) {
+            if (!strncmp(cbuf, "AVID", 4)) {
                 s->buggy_avid = 1;
+                if (len > 14 && cbuf[12] == 1) /* 1 - NTSC, 2 - PAL */
+                    s->interlace_polarity = 1;
             } else if (!strcmp(cbuf, "CS=ITU601"))
                 s->cs_itu601 = 1;
-            else if ((len > 31 && !strncmp(cbuf, "Intel(R) JPEG Library, version 1", 32)) ||
-                     (len > 19 && !strncmp(cbuf, "Metasoft MJPEG Codec", 20)))
+            else if ((!strncmp(cbuf, "Intel(R) JPEG Library, version 1", 32)) ||
+                     (!strncmp(cbuf, "Metasoft MJPEG Codec", 20)))
                 s->flipped = 1;
 
             av_free(cbuf);

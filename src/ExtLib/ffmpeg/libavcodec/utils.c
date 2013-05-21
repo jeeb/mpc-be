@@ -239,6 +239,18 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
     case AV_PIX_FMT_YUV444P12BE:
     case AV_PIX_FMT_YUV444P14LE:
     case AV_PIX_FMT_YUV444P14BE:
+    case AV_PIX_FMT_YUVA420P9LE:
+    case AV_PIX_FMT_YUVA420P9BE:
+    case AV_PIX_FMT_YUVA420P10LE:
+    case AV_PIX_FMT_YUVA420P10BE:
+    case AV_PIX_FMT_YUVA422P9LE:
+    case AV_PIX_FMT_YUVA422P9BE:
+    case AV_PIX_FMT_YUVA422P10LE:
+    case AV_PIX_FMT_YUVA422P10BE:
+    case AV_PIX_FMT_YUVA444P9LE:
+    case AV_PIX_FMT_YUVA444P9BE:
+    case AV_PIX_FMT_YUVA444P10LE:
+    case AV_PIX_FMT_YUVA444P10BE:
     case AV_PIX_FMT_GBRP9LE:
     case AV_PIX_FMT_GBRP9BE:
     case AV_PIX_FMT_GBRP10LE:
@@ -251,6 +263,7 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
         h_align = 16 * 2; // interlaced needs 2 macroblocks height
         break;
     case AV_PIX_FMT_YUV411P:
+    case AV_PIX_FMT_YUVJ411P:
     case AV_PIX_FMT_UYYVYY411:
         w_align = 32;
         h_align = 8;
@@ -2406,6 +2419,7 @@ static enum AVCodecID remap_deprecated_codec_id(enum AVCodecID id)
 //         case AV_CODEC_ID_UTVIDEO_DEPRECATED: return AV_CODEC_ID_UTVIDEO;
         case AV_CODEC_ID_OPUS_DEPRECATED: return AV_CODEC_ID_OPUS;
         case AV_CODEC_ID_TAK_DEPRECATED : return AV_CODEC_ID_TAK;
+        case AV_CODEC_ID_ESCAPE130_DEPRECATED : return AV_CODEC_ID_ESCAPE130;
         default                         : return id;
     }
 }
