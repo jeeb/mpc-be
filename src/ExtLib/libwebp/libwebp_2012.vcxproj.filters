@@ -43,13 +43,13 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dec\alpha_dec.c">
+    <ClCompile Include="dec\alpha.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dec\buffer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dec\frame_dec.c">
+    <ClCompile Include="dec\frame.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dec\idec.c">
@@ -58,19 +58,19 @@
     <ClCompile Include="dec\io.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dec\layer_dec.c">
+    <ClCompile Include="dec\layer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dec\quant_dec.c">
+    <ClCompile Include="dec\quant.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dec\tree_dec.c">
+    <ClCompile Include="dec\tree.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dec\vp8.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dec\vp8l_dec.c">
+    <ClCompile Include="dec\vp8l.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dec\webp.c">
