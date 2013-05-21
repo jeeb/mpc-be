@@ -167,14 +167,12 @@
     <ClCompile Include="BaseGraph.cpp" />
     <ClCompile Include="ComPropertyPage.cpp" />
     <ClCompile Include="ComPropertySheet.cpp" />
-    <ClCompile Include="DialogEventHandler.cpp" />
     <ClCompile Include="PlayerFlyBar.cpp" />
     <ClCompile Include="PlayerYouTube.cpp" />
     <ClCompile Include="PPageFiltersPerformance.cpp" />
     <ClCompile Include="PPageFiltersPriority.cpp" />
     <ClCompile Include="PPageInterface.cpp" />
     <ClCompile Include="PPageYouTube.cpp" />
-    <ClCompile Include="SaveTaskDlg.cpp" />
     <ClCompile Include="DeinterlacerFilter.cpp" />
     <ClCompile Include="DVBChannel.cpp" />
     <ClCompile Include="EditListEditor.cpp" />
@@ -258,7 +256,6 @@
     <ClCompile Include="SaveDlg.cpp" />
     <ClCompile Include="SaveTextFileDialog.cpp" />
     <ClCompile Include="SaveImageDialog.cpp" />
-    <ClCompile Include="SaveThumbnailsDialog.cpp" />
     <ClCompile Include="SelectMediaType.cpp" />
     <ClCompile Include="ShaderAutoCompleteDlg.cpp" />
     <ClCompile Include="ShaderCombineDlg.cpp" />
@@ -288,14 +285,12 @@
     <ClInclude Include="BaseGraph.h" />
     <ClInclude Include="ComPropertyPage.h" />
     <ClInclude Include="ComPropertySheet.h" />
-    <ClInclude Include="DialogEventHandler.h" />
     <ClInclude Include="PlayerFlyBar.h" />
     <ClInclude Include="PlayerYouTube.h" />
     <ClInclude Include="PPageFiltersPerformance.h" />
     <ClInclude Include="PPageFiltersPriority.h" />
     <ClInclude Include="PPageInterface.h" />
     <ClInclude Include="PPageYouTube.h" />
-    <ClInclude Include="SaveTaskDlg.h" />
     <ClInclude Include="DeinterlacerFilter.h" />
     <ClInclude Include="DVBChannel.h" />
     <ClInclude Include="EditListEditor.h" />
@@ -382,7 +377,6 @@
     <ClInclude Include="SaveDlg.h" />
     <ClInclude Include="SaveTextFileDialog.h" />
     <ClInclude Include="SaveImageDialog.h" />
-    <ClInclude Include="SaveThumbnailsDialog.h" />
     <ClInclude Include="SelectMediaType.h" />
     <ClInclude Include="SettingsDefines.h" />
     <ClInclude Include="ShaderAutoCompleteDlg.h" />

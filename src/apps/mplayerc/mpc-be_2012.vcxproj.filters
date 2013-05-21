@@ -276,9 +276,6 @@
     <ClCompile Include="SaveImageDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SaveThumbnailsDialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SelectMediaType.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -354,9 +351,6 @@
     <ClCompile Include="PPageInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SaveTaskDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PlayerFlyBar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -367,9 +361,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PPageYouTube.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DialogEventHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PPageFiltersPerformance.cpp">
@@ -641,9 +632,6 @@
     <ClInclude Include="SaveImageDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SaveThumbnailsDialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SelectMediaType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -719,9 +707,6 @@
     <ClInclude Include="PPageInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SaveTaskDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PlayerYouTube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -729,9 +714,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PPageYouTube.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DialogEventHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PPageFiltersPerformance.h">

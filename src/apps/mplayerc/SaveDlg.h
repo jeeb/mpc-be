@@ -25,6 +25,7 @@
 
 #include <afxcmn.h>
 #include <afxwin.h>
+#include <afxtaskdialog.h>
 #include <ResizableLib/ResizableDialog.h>
 
 // CSaveDlg dialog
@@ -60,4 +61,30 @@ public:
 	afx_msg void OnBnClickedCancel();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg LRESULT OnGraphNotify(WPARAM wParam, LPARAM lParam);
+};
+
+// CSaveTaskDlg dialog
+
+class CSaveTaskDlg : public CTaskDialog
+{
+	DECLARE_DYNAMIC(CSaveTaskDlg)
+
+private:
+	CString m_in, m_out;
+	CComPtr<IGraphBuilder> pGB;
+	CComQIPtr<IMediaControl> pMC;
+	CComQIPtr<IMediaEventEx> pME;
+	CComQIPtr<IMediaSeeking> pMS;
+	HICON	m_hIcon;
+	HWND	m_TaskDlgHwnd;
+
+public:
+	CSaveTaskDlg(CString in, CString name, CString out);
+	virtual ~CSaveTaskDlg();
+
+protected:
+	virtual HRESULT OnInit();
+	virtual HRESULT OnTimer(_In_ long lTime);
+
+	HRESULT InitFileCopy();
 };
