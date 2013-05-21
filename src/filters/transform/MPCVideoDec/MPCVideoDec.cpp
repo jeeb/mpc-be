@@ -1436,11 +1436,11 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 
 HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 {
-	bool bChangeMT = (m_pAVCtx != NULL);
+	bool bReinit = ((m_pAVCtx != NULL) && (m_nDecoderMode != MODE_DXVA1));
 
 	ffmpegCleanup();
 
-	int nNewCodec = FindCodec(pmt, bChangeMT);
+	int nNewCodec = FindCodec(pmt, bReinit);
 
 	if (nNewCodec == -1) {
 		return VFW_E_TYPE_NOT_ACCEPTED;
@@ -1467,7 +1467,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		m_pParser = av_parser_init(m_nCodecId);
 	}
 
-	if (bChangeMT && m_nDecoderMode == MODE_SOFTWARE) {
+	if (bReinit && m_nDecoderMode == MODE_SOFTWARE) {
 		m_bUseDXVA = false;
 	}
 
@@ -1629,7 +1629,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 
 	BuildDXVAOutputFormat();
 
-	if (bChangeMT) {
+	if (bReinit) {
 		if (IsDXVASupported() && SUCCEEDED(FindDecoderConfiguration())) {
 			dynamic_cast<CVideoDecOutputPin*>(m_pOutput)->Recommit();
 			m_nDecoderMode = MODE_DXVA2;
