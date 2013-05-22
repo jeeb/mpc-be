@@ -632,9 +632,6 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Struct.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SubtitleDlDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
