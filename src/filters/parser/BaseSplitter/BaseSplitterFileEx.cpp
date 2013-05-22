@@ -494,16 +494,21 @@ _again:
 	}
 
 	if (h.version == 3 && h.layer == 2) {
-		if ((h.bitrate == 1 || h.bitrate == 2 || h.bitrate == 3 || h.bitrate == 5) && h.channels != 3
-				&& (h.bitrate >= 11 && h.bitrate <= 14) && h.channels == 3) {
-			AGAIN
+		if (h.channels == 3) {
+			if (h.bitrate >= 11 && h.bitrate <= 14) {
+				AGAIN
+			}
+		} else {
+			if (h.bitrate == 1 || h.bitrate == 2 || h.bitrate == 3 || h.bitrate == 5) {
+				AGAIN
+			}
 		}
 	}
 
 	h.layer = 4 - h.layer;
 
 	static int brtbl[][5] = {
-		{  0,  0,    0,   0,   0},
+		{  0,   0,   0,   0,   0},
 		{ 32,  32,  32,  32,   8},
 		{ 64,  48,  40,  48,  16},
 		{ 96,  56,  48,  56,  24},
