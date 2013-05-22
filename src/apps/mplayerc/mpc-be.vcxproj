@@ -166,7 +166,6 @@
     <ClCompile Include="AuthDlg.cpp" />
     <ClCompile Include="BaseGraph.cpp" />
     <ClCompile Include="ComPropertyPage.cpp" />
-    <ClCompile Include="ComPropertySheet.cpp" />
     <ClCompile Include="PlayerFlyBar.cpp" />
     <ClCompile Include="PlayerYouTube.cpp" />
     <ClCompile Include="PPageFiltersPerformance.cpp" />
@@ -204,13 +203,11 @@
     <ClCompile Include="OpenDlg.cpp" />
     <ClCompile Include="PlayerBar.cpp" />
     <ClCompile Include="PlayerCaptureBar.cpp" />
-    <ClCompile Include="PlayerCaptureDialog.cpp" />
     <ClCompile Include="PlayerChildView.cpp" />
     <ClCompile Include="PlayerPreView.cpp" />
     <ClCompile Include="PlayerInfoBar.cpp" />
     <ClCompile Include="PlayerListCtrl.cpp" />
     <ClCompile Include="PlayerNavigationBar.cpp" />
-    <ClCompile Include="PlayerNavigationDialog.cpp" />
     <ClCompile Include="PlayerPlaylistBar.cpp" />
     <ClCompile Include="PlayerSeekBar.cpp" />
     <ClCompile Include="PlayerShaderEditorBar.cpp" />
@@ -283,7 +280,6 @@
     <ClInclude Include="AuthDlg.h" />
     <ClInclude Include="BaseGraph.h" />
     <ClInclude Include="ComPropertyPage.h" />
-    <ClInclude Include="ComPropertySheet.h" />
     <ClInclude Include="PlayerFlyBar.h" />
     <ClInclude Include="PlayerYouTube.h" />
     <ClInclude Include="PPageFiltersPerformance.h" />
@@ -323,13 +319,11 @@
     <ClInclude Include="OpenDlg.h" />
     <ClInclude Include="PlayerBar.h" />
     <ClInclude Include="PlayerCaptureBar.h" />
-    <ClInclude Include="PlayerCaptureDialog.h" />
     <ClInclude Include="PlayerChildView.h" />
     <ClInclude Include="PlayerPreView.h" />
     <ClInclude Include="PlayerInfoBar.h" />
     <ClInclude Include="PlayerListCtrl.h" />
     <ClInclude Include="PlayerNavigationBar.h" />
-    <ClInclude Include="PlayerNavigationDialog.h" />
     <ClInclude Include="PlayerPlaylistBar.h" />
     <ClInclude Include="PlayerSeekBar.h" />
     <ClInclude Include="PlayerShaderEditorBar.h" />

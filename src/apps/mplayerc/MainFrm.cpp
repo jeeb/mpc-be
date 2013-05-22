@@ -62,12 +62,12 @@
 #include "FGManager.h"
 #include "FGManagerBDA.h"
 #include "TextPassThruFilter.h"
-#include "../../filters/Filters.h"
+#include "../../filters/filters.h"
 #include "../../filters/core/PinInfoWnd.h"
 #include <AllocatorCommon7.h>
 #include <AllocatorCommon.h>
 #include <SyncAllocatorPresenter.h>
-#include "ComPropertySheet.h"
+#include "ComPropertyPage.h"
 #include "LcdSupport.h"
 #include "SettingsDefines.h"
 #include <IPinHook.h>

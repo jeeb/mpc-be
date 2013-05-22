@@ -23,8 +23,8 @@
 
 #include "stdafx.h"
 #include "PPageInternalFilters.h"
-#include "ComPropertySheet.h"
-#include "../../filters/Filters.h"
+#include "ComPropertyPage.h"
+#include "../../filters/filters.h"
 
 
 static filter_t s_filters[] = {

@@ -26,8 +26,8 @@
 #include "../../DSUtil/SysVersion.h"
 #include <moreuuids.h>
 #include "MultiMonitor.h"
-#include "ComPropertySheet.h"
-#include "../../filters/Filters.h"
+#include "ComPropertyPage.h"
+#include "../../filters/filters.h"
 
 // CPPageOutput dialog
 

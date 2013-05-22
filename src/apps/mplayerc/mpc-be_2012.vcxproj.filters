@@ -36,9 +36,6 @@
     <ClCompile Include="ComPropertyPage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ComPropertySheet.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DeinterlacerFilter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -126,9 +123,6 @@
     <ClCompile Include="PlayerCaptureBar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PlayerCaptureDialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PlayerChildView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -142,9 +136,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PlayerNavigationBar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerNavigationDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PlayerPlaylistBar.cpp">
@@ -380,9 +371,6 @@
     <ClInclude Include="ComPropertyPage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ComPropertySheet.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DeinterlacerFilter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -476,9 +464,6 @@
     <ClInclude Include="PlayerCaptureBar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PlayerCaptureDialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PlayerChildView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -492,9 +477,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PlayerNavigationBar.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerNavigationDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PlayerPlaylistBar.h">

@@ -67,7 +67,6 @@ typedef struct {
 class CMpeg2DataParser
 {
 public :
-
 	CMpeg2DataParser(IBaseFilter* pFilter);
 
 	HRESULT		ParseSDT(ULONG ulFreq);
@@ -81,7 +80,6 @@ public :
 	CAtlMap<int,CDVBChannel>	Channels;
 
 private :
-
 	CComQIPtr<IMpeg2Data>		m_pData;
 	MPEG2_FILTER				m_Filter;
 
