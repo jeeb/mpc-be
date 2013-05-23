@@ -60,15 +60,13 @@ bool CALLBACK DSEnumProc(LPGUID lpGUID,
 	ASSERT ( pCombo );
 	LPGUID lpTemp = NULL;
 
-	if (lpGUID != NULL) // NULL only for "Primary Sound Driver".
-	{
-		if ((lpTemp = (LPGUID)malloc(sizeof(GUID))) == NULL)
-		{
+	if (lpGUID != NULL) {// NULL only for "Primary Sound Driver".
+		if ((lpTemp = (LPGUID)malloc(sizeof(GUID))) == NULL) {
 			return TRUE;
 		}
 		memcpy(lpTemp, lpGUID, sizeof(GUID));
 	}
-	pCombo->AddString ( lpszDesc );
+	pCombo->AddString(lpszDesc);
 	free(lpTemp);
 	return TRUE;
 }
@@ -81,35 +79,56 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 	DWORD dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP;
 	CPoint p(10, 10);
 
-	m_txtWasapiMode.Create (ResStr (IDS_ARS_WASAPI_MODE), WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_txtWasapiMode.Create(ResStr(IDS_ARS_WASAPI_MODE), WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h20;
-	m_cbWasapiMode.Create (WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(IPP_SCALE(320), 200)), this, IDC_PP_WASAPI_MODE);
+	m_cbWasapiMode.Create(WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(IPP_SCALE(320), 200)), this, IDC_PP_WASAPI_MODE);
 	m_cbWasapiMode.AddString(_T("Do not use WASAPI"));
 	m_cbWasapiMode.AddString(_T("Exclusive Mode"));
 	m_cbWasapiMode.AddString(_T("Shared Mode"));
 	p.y += h30;
 
-	m_txtSoundDevice.Create (ResStr (IDS_ARS_SOUND_DEVICE), WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_txtSoundDevice.Create(ResStr(IDS_ARS_SOUND_DEVICE), WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h20;
-	m_cbSoundDevice.Create (WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(IPP_SCALE(320), 200)), this, IDC_PP_SOUND_DEVICE);
+	m_cbSoundDevice.Create(WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(IPP_SCALE(320), 200)), this, IDC_PP_SOUND_DEVICE);
 	p.y += h30;
 
-	m_cbMuteFastForward.Create (ResStr (IDS_ARS_MUTE_FAST_FORWARD), WS_VISIBLE|WS_CHILD|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, IDC_PP_MUTE_FAST_FORWARD);
+	m_cbMuteFastForward.Create(ResStr(IDS_ARS_MUTE_FAST_FORWARD), WS_VISIBLE|WS_CHILD|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, IDC_PP_MUTE_FAST_FORWARD);
+	p.y += h30;
+
+	m_txtModeText.Create(ResStr(IDS_ARS_WASAPI_MODE_STATUS), WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, IDC_PP_WASAPI_MODE_STATUS);
 
 	DirectSoundEnumerate((LPDSENUMCALLBACK)DSEnumProc, (VOID*)&m_cbSoundDevice);
 
 	if (m_pMAR) {
-		if ( m_cbSoundDevice.GetCount() > 0 ) {
+		if (m_cbSoundDevice.GetCount() > 0) {
 			int idx = m_cbSoundDevice.FindString(0, m_pMAR->GetSoundDevice());
-			if ( idx < 0) {
+			if (idx < 0) {
 				m_cbSoundDevice.SetCurSel(0);
-			}
-			else {
+			} else {
 				m_cbSoundDevice.SetCurSel(m_cbSoundDevice.FindString(0, m_pMAR->GetSoundDevice()));
 			}
 		}
 		m_cbWasapiMode.SetCurSel(m_pMAR->GetWasapiMode());
 		m_cbMuteFastForward.SetCheck(m_pMAR->GetMuteFastForward());
+
+		UINT status = m_pMAR->GetMode();
+		CString statusTxt = ResStr(IDS_ARS_WASAPI_MODE_STATUS); 
+		switch (status) {
+			case MODE_NONE :
+			default:
+				statusTxt.AppendFormat(L" %s", ResStr(IDS_ARS_WASAPI_MODE_STATUS_1));
+				break;
+			case MODE_WASAPI_EXCLUSIVE :
+				statusTxt.AppendFormat(L" %s", ResStr(IDS_ARS_WASAPI_MODE_STATUS_2));
+				break;
+			case MODE_WASAPI_SHARED :
+				statusTxt.AppendFormat(L" %s", ResStr(IDS_ARS_WASAPI_MODE_STATUS_3));
+				break;
+			case MODE_DIRECTSOUND :
+				statusTxt.AppendFormat(L" %s", ResStr(IDS_ARS_WASAPI_MODE_STATUS_4));
+				break;
+		}
+		m_txtModeText.SetWindowText(statusTxt);
 	}
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
@@ -137,8 +156,8 @@ bool CMpcAudioRendererSettingsWnd::OnApply()
 		m_pMAR->SetMuteFastForward(m_cbMuteFastForward.GetCheck());
 		CString str;
 		int idx = m_cbSoundDevice.GetCurSel();
-		if ( !(idx < 0) ) {
-			m_cbSoundDevice.GetLBText( idx, str );
+		if (idx >= 0) {
+			m_cbSoundDevice.GetLBText(idx, str);
 			m_pMAR->SetSoundDevice(str);
 		}
 		m_pMAR->Apply();

@@ -41,10 +41,13 @@ private :
 	CStatic   m_txtSoundDevice;
 	CComboBox m_cbSoundDevice;
 
+	CStatic   m_txtModeText;
+
 	enum {
 		IDC_PP_WASAPI_MODE = 10000,
 		IDC_PP_MUTE_FAST_FORWARD,
 		IDC_PP_SOUND_DEVICE,
+		IDC_PP_WASAPI_MODE_STATUS
 	};
 
 public:
@@ -60,7 +63,7 @@ public:
 	HRESULT GetAvailableAudioDevices();
 
 	static LPCTSTR GetWindowTitle() { return MAKEINTRESOURCE(IDS_FILTER_SETTINGS_CAPTION); }
-	static CSize GetWindowSize() { return CSize(340, 133); }
+	static CSize GetWindowSize() { return CSize(340, 160); }
 
 	DECLARE_MESSAGE_MAP()
 };

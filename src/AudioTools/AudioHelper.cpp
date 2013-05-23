@@ -21,9 +21,6 @@
 #include "stdafx.h"
 #include "AudioHelper.h"
 
-#define INT24_MAX       8388607i32
-#define INT24_MIN     (-8388607i32 - 1)
-
 #define INT8_PEAK       128
 #define INT16_PEAK      32768
 #define INT24_PEAK      8388608

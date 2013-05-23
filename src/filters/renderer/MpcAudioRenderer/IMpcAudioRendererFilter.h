@@ -22,6 +22,13 @@
 
 #pragma once
 
+enum {
+	MODE_NONE = 0,
+	MODE_WASAPI_EXCLUSIVE,
+	MODE_WASAPI_SHARED,
+	MODE_DIRECTSOUND
+};
+
 interface __declspec(uuid("495D2C66-D430-439b-9DEE-40F9B7929BBA"))
 IMpcAudioRendererFilter :
 public IUnknown {
@@ -33,4 +40,5 @@ public IUnknown {
 	STDMETHOD_(BOOL, GetMuteFastForward()) = 0;
 	STDMETHOD(SetSoundDevice(CString nValue)) = 0;
 	STDMETHOD_(CString, GetSoundDevice()) = 0;
+	STDMETHOD_(UINT, GetMode()) = 0;
 };

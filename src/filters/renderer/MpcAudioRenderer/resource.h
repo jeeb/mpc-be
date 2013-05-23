@@ -6,6 +6,11 @@
 #define IDS_ARS_WASAPI_MODE             7600
 #define IDS_ARS_MUTE_FAST_FORWARD       7601
 #define IDS_ARS_SOUND_DEVICE            7602
+#define IDS_ARS_WASAPI_MODE_STATUS      7603
+#define IDS_ARS_WASAPI_MODE_STATUS_1    7604
+#define IDS_ARS_WASAPI_MODE_STATUS_2    7605
+#define IDS_ARS_WASAPI_MODE_STATUS_3    7606
+#define IDS_ARS_WASAPI_MODE_STATUS_4    7607
 
 // Next default values for new objects
 //

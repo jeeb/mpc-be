@@ -26,6 +26,9 @@ extern "C" {
 }
 #pragma warning(default: 4005 4244)
 
+#define INT24_MAX       8388607i32
+#define INT24_MIN     (-8388607i32 - 1)
+
 #ifdef _MSC_VER
 #define bswap_16(x) _byteswap_ushort((unsigned short)(x))
 #define bswap_32(x) _byteswap_ulong ((unsigned long)(x))
@@ -56,8 +59,8 @@ HRESULT convert_to_planar_float(enum AVSampleFormat avsf, WORD nChannels, DWORD 
 inline void convert_int24_to_int32(size_t allsamples, BYTE* pIn, int32_t* pOut)
 {
     for (size_t i = 0; i < allsamples; ++i) {
-        pOut[i] = (uint32_t)pIn[3 * i]     << 8  |
-                  (uint32_t)pIn[3 * i + 1] << 16 |
-                  (uint32_t)pIn[3 * i + 2] << 24;
+		pOut[i] = static_cast<uint32_t>(pIn[3 * i])		<< 8  |
+				  static_cast<uint32_t>(pIn[3 * i + 1])	<< 16 |
+				  static_cast<uint32_t>(pIn[3 * i + 2])	<< 24;
     }
 }

@@ -71,7 +71,6 @@ public:
 
 	HRESULT EndOfStream(void);
 
-
 	DECLARE_IUNKNOWN
 
 	STDMETHODIMP				NonDelegatingQueryInterface(REFIID riid, void **ppv);
@@ -105,6 +104,7 @@ public:
 	STDMETHODIMP_(BOOL)			GetMuteFastForward();
 	STDMETHODIMP				SetSoundDevice(CString nValue);
 	STDMETHODIMP_(CString)		GetSoundDevice();
+	STDMETHODIMP_(UINT)			GetMode();
 
 	// CMpcAudioRenderer
 private:
@@ -163,6 +163,7 @@ private:
 	UINT32					bufferSize;
 	bool					isAudioClientStarted;
 	DWORD					lastBufferTime;
+	double					m_dVolume;
 
 	// AVRT.dll (Vista or greater
 	typedef HANDLE	(__stdcall *PTR_AvSetMmThreadCharacteristicsW)(LPCWSTR TaskName, LPDWORD TaskIndex);
@@ -170,5 +171,4 @@ private:
 
 	PTR_AvSetMmThreadCharacteristicsW		pfAvSetMmThreadCharacteristicsW;
 	PTR_AvRevertMmThreadCharacteristics		pfAvRevertMmThreadCharacteristics;
-
 };
