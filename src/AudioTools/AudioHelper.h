@@ -59,8 +59,8 @@ HRESULT convert_to_planar_float(enum AVSampleFormat avsf, WORD nChannels, DWORD 
 inline void convert_int24_to_int32(size_t allsamples, BYTE* pIn, int32_t* pOut)
 {
     for (size_t i = 0; i < allsamples; ++i) {
-		pOut[i] = static_cast<uint32_t>(pIn[3 * i])		<< 8  |
-				  static_cast<uint32_t>(pIn[3 * i + 1])	<< 16 |
-				  static_cast<uint32_t>(pIn[3 * i + 2])	<< 24;
+        pOut[i] = (uint32_t)pIn[3 * i]     << 8  |
+                  (uint32_t)pIn[3 * i + 1] << 16 |
+                  (uint32_t)pIn[3 * i + 2] << 24;
     }
 }
