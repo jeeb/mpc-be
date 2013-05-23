@@ -38,7 +38,7 @@
     <ProjectGuid>{D0620EF4-1313-40D5-9069-A82F6FE26994}</ProjectGuid>
     <RootNamespace>MpcAudioRenderer</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <ProjectName>MpcAudioRendererFilter</ProjectName>
+    <ProjectName>MpcAudioRenderer</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -241,7 +241,7 @@
     <None Include="MpcAudioRenderer.def" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="IMpcAudioRendererFilter.h" />
+    <ClInclude Include="IMpcAudioRenderer.h" />
     <ClInclude Include="MpcAudioRenderer.h" />
     <ClInclude Include="MpcAudioRendererSettingsWnd.h" />
     <ClInclude Include="resource.h">

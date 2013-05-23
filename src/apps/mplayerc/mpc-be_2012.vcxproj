@@ -646,7 +646,7 @@
       <Project>{664e726b-eeee-403a-ac15-345d9c9e1375}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\filters\renderer\MpcAudioRenderer\MpcAudioRendererFilter_2012.vcxproj">
+    <ProjectReference Include="..\..\filters\renderer\MpcAudioRenderer\MpcAudioRenderer_2012.vcxproj">
       <Project>{d0620ef4-1313-40d5-9069-a82f6fe26994}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

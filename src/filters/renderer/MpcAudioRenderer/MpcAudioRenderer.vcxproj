@@ -232,7 +232,7 @@
     <None Include="MpcAudioRenderer.def" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="IMpcAudioRendererFilter.h" />
+    <ClInclude Include="IMpcAudioRenderer.h" />
     <ClInclude Include="MpcAudioRenderer.h" />
     <ClInclude Include="MpcAudioRendererSettingsWnd.h" />
     <ClInclude Include="resource.h">

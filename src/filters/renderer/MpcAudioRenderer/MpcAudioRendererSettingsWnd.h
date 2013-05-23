@@ -23,7 +23,7 @@
 #pragma once
 
 #include "../../core/InternalPropertyPage.h"
-#include "IMpcAudioRendererFilter.h"
+#include "IMpcAudioRenderer.h"
 #include "resource.h"
 #include <afxcmn.h>
 

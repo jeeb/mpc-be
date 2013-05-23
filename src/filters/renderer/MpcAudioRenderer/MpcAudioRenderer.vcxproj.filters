@@ -52,7 +52,7 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IMpcAudioRendererFilter.h">
+    <ClInclude Include="IMpcAudioRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MpcAudioRendererSettingsWnd.h">
