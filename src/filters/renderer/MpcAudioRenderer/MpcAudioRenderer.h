@@ -40,12 +40,9 @@
 
 #define MpcAudioRendererName L"MPC Audio Renderer"
 
-// REFERENCE_TIME time units per second and per millisecond
-#define REFTIMES_PER_MILLISEC	10000
-
 // if you get a compilation error on AUDCLNT_E_BUFFER_SIZE_NOT_ALIGNED,
 // uncomment the #define below
-#define AUDCLNT_E_BUFFER_SIZE_NOT_ALIGNED	AUDCLNT_ERR(0x019)
+// #define AUDCLNT_E_BUFFER_SIZE_NOT_ALIGNED	AUDCLNT_ERR(0x019)
 
 class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 	CMpcAudioRenderer : public CBaseRenderer
@@ -53,7 +50,9 @@ class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 	, public ISpecifyPropertyPages2
 	, public IMpcAudioRendererFilter
 {
-	CMixer m_Resampler;
+	CCritSec		m_csRender;
+	CMixer			m_Resampler;
+	CAtlArray<BYTE>	m_WasapiBuf;
 
 public:
 	CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr);
@@ -70,6 +69,9 @@ public:
 	virtual HRESULT			CompleteConnect			(IPin *pReceivePin);
 
 	HRESULT EndOfStream(void);
+
+	virtual HRESULT			BeginFlush();
+	virtual HRESULT			EndFlush();
 
 	DECLARE_IUNKNOWN
 
@@ -133,7 +135,7 @@ private:
 	HRESULT					GetAvailableAudioDevices(IMMDeviceCollection **ppMMDevices);
 	HRESULT					GetAudioDevice(IMMDevice **ppMMDevice);
 	HRESULT					CreateAudioClient(IMMDevice *pMMDevice, IAudioClient **ppAudioClient);
-	HRESULT					InitAudioClient(WAVEFORMATEX *pWaveFormatEx, IAudioClient *pAudioClient, IAudioRenderClient **ppRenderClient, ISimpleAudioVolume **ppAudioVolume);
+	HRESULT					InitAudioClient(WAVEFORMATEX *pWaveFormatEx, IAudioClient *pAudioClient, IAudioRenderClient **ppRenderClient);
 	HRESULT					CheckAudioClient(WAVEFORMATEX *pWaveFormatEx);
 	HRESULT					DoRenderSampleWasapi(IMediaSample *pMediaSample);
 	HRESULT					GetBufferSize(WAVEFORMATEX *pWaveFormatEx, REFERENCE_TIME *pHnsBufferPeriod);
@@ -154,13 +156,12 @@ private:
 	IMMDevice				*pMMDevice;
 	IAudioClient			*pAudioClient;
 	IAudioRenderClient		*pRenderClient;
-	ISimpleAudioVolume		*pAudioVolume;
 	UINT32					nFramesInBuffer;
 	REFERENCE_TIME			hnsPeriod;
 	DWORD					hnsActualDuration;
 	HANDLE					hTask;
 	CCritSec				m_csCheck;
-	UINT32					bufferSize;
+	UINT32					m_nBufferSize;
 	bool					isAudioClientStarted;
 	DWORD					lastBufferTime;
 	double					m_dVolume;
@@ -171,4 +172,24 @@ private:
 
 	PTR_AvSetMmThreadCharacteristicsW		pfAvSetMmThreadCharacteristicsW;
 	PTR_AvRevertMmThreadCharacteristics		pfAvRevertMmThreadCharacteristics;
+
+	// Rendering thread
+	static DWORD WINAPI		RenderThreadEntryPoint(LPVOID lpParameter);
+	DWORD					RenderThread();
+	DWORD					m_nThreadId;
+ 
+	BOOL					m_bThreadPaused;
+
+	HRESULT					StopRendererThread();
+	HRESULT					StartRendererThread();
+	HRESULT					PauseRendererThread();
+
+	HANDLE					m_hRenderThread;
+
+	HANDLE					m_hDataEvent;
+	HANDLE					m_hPauseEvent;
+	HANDLE					m_hResumeEvent;
+	HANDLE					m_hWaitPauseEvent;
+	HANDLE					m_hWaitResumeEvent;
+	HANDLE					m_hStopRenderThreadEvent;
 };
