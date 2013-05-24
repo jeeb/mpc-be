@@ -23,6 +23,7 @@
 #pragma once
 
 #include <WinDef.h>
+#include <MMReg.h>
 
 #define RIFF_DWORD          0x46464952
 
@@ -56,6 +57,7 @@ struct audioframe_t {
 };
 
 int ParseMPAHeader     (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 4 bytes,  param1 = bitrate
+int ParseMPEG1Header   (const BYTE* buf, MPEG1WAVEFORMAT* mpeg1wf); // need >= 4 bytes
 int ParseAC3Header     (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 7 bytes,  param1 = bitrate
 int ParseEAC3Header    (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 6 bytes,  param1 = eac3 frame type
 int ParseMLPHeader     (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 12 bytes, param1 = bitdepth, param2 = TrueHD flag

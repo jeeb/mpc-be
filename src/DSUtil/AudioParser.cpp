@@ -23,7 +23,6 @@
 #include "stdafx.h"
 #include "AudioParser.h"
 #include "GolombBuffer.h"
-#include <MMReg.h>
 
 #define AC3_CHANNEL                  0
 #define AC3_MONO                     1
@@ -333,20 +332,20 @@ DWORD GetVorbisChannelMask(WORD nChannels)
 	}
 }
 
+// http://mpgedit.org/mpgedit/mpeg_format/mpeghdr.htm
+static const short mpeg1_rates[3][16] = {
+	{ 0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 0 }, // MPEG 1 Layer 1
+	{ 0, 32, 48, 56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 384, 0 }, // MPEG 1 Layer 2
+	{ 0, 32, 40, 48,  56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 0 }, // MPEG 1 Layer 3
+};
+static const short mpeg2_rates[2][16] = {
+	{ 0, 32, 48, 56,  64,  80,  96, 112, 128, 144, 160, 176, 192, 224, 256, 0 }, // MPEG 2/2.5 Layer 1
+	{ 0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160, 0 }, // MPEG 2/2.5 Layer 2/3
+};
+static const int mpeg1_samplerates[] = { 44100, 48000, 32000, 0 };
+
 int ParseMPAHeader(const BYTE* buf, audioframe_t* audioframe)
 {
-	// http://mpgedit.org/mpgedit/mpeg_format/mpeghdr.htm
-
-	static const short mpa_rates[5][16] = {
-		{ 0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 0 }, // MPEG 1 Layer 1
-		{ 0, 32, 48, 56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 384, 0 }, // MPEG 1 Layer 2
-		{ 0, 32, 40, 48,  56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 0 }, // MPEG 1 Layer 3
-		{ 0, 32, 48, 56,  64,  80,  96, 112, 128, 144, 160, 176, 192, 224, 256, 0 }, // MPEG 2/2.5 Layer 1
-		{ 0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160, 0 }, // MPEG 2/2.5 Layer 2/3
-	};
-	static const int mpa_v1_samplerates[] = { 44100, 48000, 32000, 0 };
-
-
 	if ((*(WORD*)buf & 0xe0ff) != 0xe0ff) { // sync
 		return 0;
 	}
@@ -362,23 +361,17 @@ int ParseMPAHeader(const BYTE* buf, audioframe_t* audioframe)
 
 	int bitrate;
 	if (mpaver_id == 0x3) { // MPEG Version 1
-		if (layer_desc == 0x3) { // Layer 1
-			bitrate = mpa_rates[0][bitrate_index];
-		} else if (layer_desc == 0x2) { // Layer 2
-			bitrate = mpa_rates[1][bitrate_index];
-		} else { // Layer 3
-			bitrate = mpa_rates[2][bitrate_index];
-		}
+		bitrate = mpeg1_rates[3 - layer_desc][bitrate_index];
 	} else { // MPEG Version 2, MPEG Version 2.5
 		if (layer_desc == 0x3) { // Layer 1
-			bitrate = mpa_rates[3][bitrate_index];
+			bitrate = mpeg2_rates[3][bitrate_index];
 		} else { // Layer 2, Layer 3
-			bitrate = mpa_rates[4][bitrate_index];
+			bitrate = mpeg2_rates[4][bitrate_index];
 		}
 	}
 	bitrate *= 1000;
 
-	int samplerate = mpa_v1_samplerates[samplerate_index];
+	int samplerate = mpeg1_samplerates[samplerate_index];
 	if (mpaver_id == 0x2) { // MPEG Version 2
 		samplerate /= 2;
 	} else if (mpaver_id == 0x0) { // MPEG Version 2.5
@@ -410,6 +403,57 @@ int ParseMPAHeader(const BYTE* buf, audioframe_t* audioframe)
 	}
 
 	return frame_size;
+}
+
+int ParseMPEG1Header(const BYTE* buf, MPEG1WAVEFORMAT* mpeg1wf)
+{
+	// http://msdn.microsoft.com/en-us/library/windows/desktop/dd390701%28v=vs.85%29.aspx
+
+	if ((*(WORD*)buf & 0xf8ff) != 0xf8ff) { // sync + (mpaver_id = MPEG Version 1)
+		return 0;
+	}
+
+	BYTE layer_desc       = (buf[1] & 0x06) >> 1;
+	BYTE protection_bit   = buf[1] & 0x01;
+	BYTE bitrate_index    = buf[2] >> 4;
+	BYTE samplerate_index = (buf[2] & 0x0c) >> 2;
+	if (layer_desc == 0x0 || bitrate_index == 0 || bitrate_index == 15 || samplerate_index == 3) {
+		return 0;
+	}
+	BYTE pading_bit       = (buf[2] & 0x02) >> 1;
+	BYTE private_bit      = buf[2] & 0x01;
+	BYTE channel_mode     = (buf[3] & 0xc0) >> 6;
+	BYTE mode_extension   = (buf[3] & 0x30) >> 4;
+	BYTE copyright_bit    = (buf[3] & 0x08) >> 3;
+	BYTE original_bit     = (buf[3] & 0x04) >> 2;
+	BYTE emphasis         = buf[3] & 0x03;
+
+	mpeg1wf->fwHeadLayer   = 8 >> layer_desc;
+	mpeg1wf->dwHeadBitrate = mpeg1_rates[3 - layer_desc][bitrate_index] * 1000;
+	mpeg1wf->fwHeadMode    = 1 << channel_mode;
+	mpeg1wf->fwHeadModeExt = 1 << mode_extension;
+	mpeg1wf->wHeadEmphasis = emphasis + 1;
+	mpeg1wf->fwHeadFlags   = ACM_MPEG_ID_MPEG1;
+	if (private_bit)    { mpeg1wf->fwHeadFlags |= ACM_MPEG_PRIVATEBIT;    }
+	if (copyright_bit)  { mpeg1wf->fwHeadFlags |= ACM_MPEG_COPYRIGHT;     }
+	if (original_bit)   { mpeg1wf->fwHeadFlags |= ACM_MPEG_ORIGINALHOME;  }
+	if (protection_bit) { mpeg1wf->fwHeadFlags |= ACM_MPEG_PROTECTIONBIT; }
+	mpeg1wf->dwPTSLow      = 0;
+	mpeg1wf->dwPTSHigh     = 0;
+
+	mpeg1wf->wfx.wFormatTag      = WAVE_FORMAT_MPEG;
+	mpeg1wf->wfx.nChannels       = channel_mode == 0x3 ? 1 : 2;
+	mpeg1wf->wfx.nSamplesPerSec  = mpeg1_samplerates[samplerate_index];
+	mpeg1wf->wfx.nAvgBytesPerSec = mpeg1wf->dwHeadBitrate / 8;
+	if (layer_desc == 0x3) { // Layer 1
+		mpeg1wf->wfx.nBlockAlign = (12 * mpeg1wf->dwHeadBitrate / mpeg1wf->wfx.nAvgBytesPerSec) * 4; // without pading_bit
+	} else { // Layer 2, Layer 3
+		mpeg1wf->wfx.nBlockAlign = 144 * mpeg1wf->dwHeadBitrate / mpeg1wf->wfx.nAvgBytesPerSec; // without pading_bit
+	}
+	mpeg1wf->wfx.wBitsPerSample  = 0;
+	mpeg1wf->wfx.cbSize          = 22;
+
+	return (mpeg1wf->wfx.nBlockAlign + pading_bit);
 }
 
 int ParseAC3Header(const BYTE* buf, audioframe_t* audioframe)
