@@ -72,6 +72,7 @@
     <None Include="libswscale\x86\scale.asm" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="compat\w32pthreads.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="libavcodec\aac.h" />
     <ClInclude Include="libavcodec\aacadtsdec.h" />
@@ -283,7 +284,6 @@
     <ClInclude Include="libavcodec\vp8.h" />
     <ClInclude Include="libavcodec\vp8data.h" />
     <ClInclude Include="libavcodec\vp8dsp.h" />
-    <ClInclude Include="libavcodec\w32pthreads.h" />
     <ClInclude Include="libavcodec\wma.h" />
     <ClInclude Include="libavcodec\wmadata.h" />
     <ClInclude Include="libavcodec\wmaprodata.h" />

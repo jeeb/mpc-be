@@ -25,6 +25,9 @@
     <Filter Include="libswscale\x86">
       <UniqueIdentifier>{9d4ec9b5-51c2-46df-9b8a-0a7003ddd49f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="compat">
+      <UniqueIdentifier>{f50612a0-0140-4c19-aed5-1416ee87cbe9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="config.asm" />
@@ -181,6 +184,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
+    <ClInclude Include="compat\w32pthreads.h">
+      <Filter>compat</Filter>
+    </ClInclude>
     <ClInclude Include="libavcodec\x86\cabac.h">
       <Filter>libavcodec\x86</Filter>
     </ClInclude>
@@ -842,9 +848,6 @@
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\vp56dsp.h">
-      <Filter>libavcodec</Filter>
-    </ClInclude>
-    <ClInclude Include="libavcodec\w32pthreads.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\wma.h">
