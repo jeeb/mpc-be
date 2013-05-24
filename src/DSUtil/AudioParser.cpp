@@ -429,7 +429,7 @@ int ParseMPEG1Header(const BYTE* buf, MPEG1WAVEFORMAT* mpeg1wf)
 	BYTE emphasis         = buf[3] & 0x03;
 
 	mpeg1wf->fwHeadLayer   = 8 >> layer_desc;
-	mpeg1wf->dwHeadBitrate = mpeg1_rates[3 - layer_desc][bitrate_index] * 1000;
+	mpeg1wf->dwHeadBitrate = (DWORD)mpeg1_rates[3 - layer_desc][bitrate_index] * 1000;
 	mpeg1wf->fwHeadMode    = 1 << channel_mode;
 	mpeg1wf->fwHeadModeExt = 1 << mode_extension;
 	mpeg1wf->wHeadEmphasis = emphasis + 1;
@@ -446,14 +446,49 @@ int ParseMPEG1Header(const BYTE* buf, MPEG1WAVEFORMAT* mpeg1wf)
 	mpeg1wf->wfx.nSamplesPerSec  = mpeg1_samplerates[samplerate_index];
 	mpeg1wf->wfx.nAvgBytesPerSec = mpeg1wf->dwHeadBitrate / 8;
 	if (layer_desc == 0x3) { // Layer 1
-		mpeg1wf->wfx.nBlockAlign = (12 * mpeg1wf->dwHeadBitrate / mpeg1wf->wfx.nAvgBytesPerSec) * 4; // without pading_bit
+		mpeg1wf->wfx.nBlockAlign = (12 * mpeg1wf->dwHeadBitrate / mpeg1wf->wfx.nSamplesPerSec) * 4; // without pading_bit
 	} else { // Layer 2, Layer 3
-		mpeg1wf->wfx.nBlockAlign = 144 * mpeg1wf->dwHeadBitrate / mpeg1wf->wfx.nAvgBytesPerSec; // without pading_bit
+		mpeg1wf->wfx.nBlockAlign = 144 * mpeg1wf->dwHeadBitrate / mpeg1wf->wfx.nSamplesPerSec; // without pading_bit
 	}
 	mpeg1wf->wfx.wBitsPerSample  = 0;
 	mpeg1wf->wfx.cbSize          = 22;
 
 	return (mpeg1wf->wfx.nBlockAlign + pading_bit);
+}
+
+int ParseMP3Header(const BYTE* buf, MPEGLAYER3WAVEFORMAT* mp3wf) // experimental
+{
+	// http://msdn.microsoft.com/en-us/library/windows/desktop/dd390710%28v=vs.85%29.aspx
+
+	if ((*(WORD*)buf & 0xfeff) != 0xfaff) { // sync + (mpaver_id = MPEG Version 1 = 11b) + (layer_desc = Layer 3 = 01b)
+		return 0;
+	}
+
+	BYTE bitrate_index    = buf[2] >> 4;
+	BYTE samplerate_index = (buf[2] & 0x0c) >> 2;
+	if (bitrate_index == 0 || bitrate_index == 15 || samplerate_index == 3) {
+		return 0;
+	}
+	BYTE pading_bit       = (buf[2] & 0x02) >> 1;
+	BYTE channel_mode     = (buf[3] & 0xc0) >> 6;
+
+	DWORD bitrate = (DWORD)mpeg1_rates[2][bitrate_index] * 1000;
+
+	mp3wf->wfx.wFormatTag      = WAVE_FORMAT_MPEGLAYER3;
+	mp3wf->wfx.nChannels       = channel_mode == 0x3 ? 1 : 2;
+	mp3wf->wfx.nSamplesPerSec  = mpeg1_samplerates[samplerate_index];
+	mp3wf->wfx.nAvgBytesPerSec = bitrate / 8;
+	mp3wf->wfx.nBlockAlign     = 144 * bitrate / mp3wf->wfx.nSamplesPerSec; // without pading_bit ?
+	mp3wf->wfx.wBitsPerSample  = 0;
+	mp3wf->wfx.cbSize          = MPEGLAYER3_WFX_EXTRA_BYTES;
+
+	mp3wf->wID             = MPEGLAYER3_ID_MPEG;
+	mp3wf->fdwFlags        = MPEGLAYER3_FLAG_PADDING_ISO; // clarify on average bitrate.
+	mp3wf->nBlockSize      = 144 * bitrate / mp3wf->wfx.nSamplesPerSec + pading_bit;
+	mp3wf->nFramesPerBlock = 1152;
+	mp3wf->nCodecDelay     = 0;
+
+	return mp3wf->nBlockSize;
 }
 
 int ParseAC3Header(const BYTE* buf, audioframe_t* audioframe)
