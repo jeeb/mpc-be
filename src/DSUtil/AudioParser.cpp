@@ -38,7 +38,7 @@
 #define AC3_CHANNEL_MASK            15
 #define AC3_LFE                     16
 
-// DTS
+// DTS-HD
 
 int GetDTSHDFrameSize(const BYTE* buf)
 {
@@ -55,69 +55,6 @@ int GetDTSHDFrameSize(const BYTE* buf)
 	}
 
 	return frame_size;
-}
-
-void dts14be_to_dts16be(const BYTE* source, BYTE* destination, int size)
-{
-	unsigned short* src = (unsigned short*)source;
-	unsigned short* dst = (unsigned short*)destination;
-
-	for (int i = 0, n = size / 16; i < n; i++) {
-		unsigned short src_0 = (src[0] >> 8) | (src[0] << 8);
-		unsigned short src_1 = (src[1] >> 8) | (src[1] << 8);
-		unsigned short src_2 = (src[2] >> 8) | (src[2] << 8);
-		unsigned short src_3 = (src[3] >> 8) | (src[3] << 8);
-		unsigned short src_4 = (src[4] >> 8) | (src[4] << 8);
-		unsigned short src_5 = (src[5] >> 8) | (src[5] << 8);
-		unsigned short src_6 = (src[6] >> 8) | (src[6] << 8);
-		unsigned short src_7 = (src[7] >> 8) | (src[7] << 8);
-
-		dst[0] = (src_0 << 2)  | ((src_1 & 0x3fff) >> 12); // 14 + 2
-		dst[1] = (src_1 << 4)  | ((src_2 & 0x3fff) >> 10); // 12 + 4
-		dst[2] = (src_2 << 6)  | ((src_3 & 0x3fff) >> 8);  // 10 + 6
-		dst[3] = (src_3 << 8)  | ((src_4 & 0x3fff) >> 6);  // 8  + 8
-		dst[4] = (src_4 << 10) | ((src_5 & 0x3fff) >> 4);  // 6  + 10
-		dst[5] = (src_5 << 12) | ((src_6 & 0x3fff) >> 2);  // 4  + 12
-		dst[6] = (src_6 << 14) |  (src_7 & 0x3fff);        // 2  + 14
-
-		dst[0] = (dst[0] >> 8) | (dst[0] << 8);
-		dst[1] = (dst[1] >> 8) | (dst[1] << 8);
-		dst[2] = (dst[2] >> 8) | (dst[2] << 8);
-		dst[3] = (dst[3] >> 8) | (dst[3] << 8);
-		dst[4] = (dst[4] >> 8) | (dst[4] << 8);
-		dst[5] = (dst[5] >> 8) | (dst[5] << 8);
-		dst[6] = (dst[6] >> 8) | (dst[6] << 8);
-
-		src += 8;
-		dst += 7;
-	}
-}
-
-void dts14le_to_dts16be(const BYTE* source, BYTE* destination, int size)
-{
-	unsigned short* src = (unsigned short*)source;
-	unsigned short* dst = (unsigned short*)destination;
-
-	for (int i = 0, n = size / 16; i < n; i++) {
-		dst[0] = (src[0] << 2)  | ((src[1] & 0x3fff) >> 12); // 14 + 2
-		dst[1] = (src[1] << 4)  | ((src[2] & 0x3fff) >> 10); // 12 + 4
-		dst[2] = (src[2] << 6)  | ((src[3] & 0x3fff) >> 8);  // 10 + 6
-		dst[3] = (src[3] << 8)  | ((src[4] & 0x3fff) >> 6);  // 8  + 8
-		dst[4] = (src[4] << 10) | ((src[5] & 0x3fff) >> 4);  // 6  + 10
-		dst[5] = (src[5] << 12) | ((src[6] & 0x3fff) >> 2);  // 4  + 12
-		dst[6] = (src[6] << 14) |  (src[7] & 0x3fff);        // 2  + 14
-
-		dst[0] = (dst[0] >> 8) | (dst[0] << 8);
-		dst[1] = (dst[1] >> 8) | (dst[1] << 8);
-		dst[2] = (dst[2] >> 8) | (dst[2] << 8);
-		dst[3] = (dst[3] >> 8) | (dst[3] << 8);
-		dst[4] = (dst[4] >> 8) | (dst[4] << 8);
-		dst[5] = (dst[5] >> 8) | (dst[5] << 8);
-		dst[6] = (dst[6] >> 8) | (dst[6] << 8);
-
-		src += 8;
-		dst += 7;
-	}
 }
 
 // LATM AAC
@@ -332,6 +269,8 @@ DWORD GetVorbisChannelMask(WORD nChannels)
 	}
 }
 
+// MPEG Audio
+
 // http://mpgedit.org/mpgedit/mpeg_format/mpeghdr.htm
 static const short mpeg1_rates[3][16] = {
 	{ 0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 0 }, // MPEG 1 Layer 1
@@ -491,6 +430,8 @@ int ParseMP3Header(const BYTE* buf, MPEGLAYER3WAVEFORMAT* mp3wf) // experimental
 	return mp3wf->nBlockSize;
 }
 
+// AC-3
+
 int ParseAC3Header(const BYTE* buf, audioframe_t* audioframe)
 {
 	static const short ac3_rates[19]    = { 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 448, 512, 576, 640 };
@@ -573,6 +514,8 @@ int ParseAC3Header(const BYTE* buf, audioframe_t* audioframe)
 	return frame_size;
 }
 
+// E-AC3
+
 int ParseEAC3Header(const BYTE* buf, audioframe_t* audioframe)
 {
 	static const int   eac3_samplerates[6] = { 48000, 44100, 32000, 24000, 22050, 16000 };
@@ -612,6 +555,8 @@ int ParseEAC3Header(const BYTE* buf, audioframe_t* audioframe)
 
 	return frame_size;
 }
+
+// MLP and TrueHD
 
 int ParseMLPHeader(const BYTE* buf, audioframe_t* audioframe)
 {
@@ -663,6 +608,71 @@ int ParseMLPHeader(const BYTE* buf, audioframe_t* audioframe)
 	}
 
 	return frame_size;
+}
+
+// DTS
+
+void dts14be_to_dts16be(const BYTE* source, BYTE* destination, int size)
+{
+	unsigned short* src = (unsigned short*)source;
+	unsigned short* dst = (unsigned short*)destination;
+
+	for (int i = 0, n = size / 16; i < n; i++) {
+		unsigned short src_0 = (src[0] >> 8) | (src[0] << 8);
+		unsigned short src_1 = (src[1] >> 8) | (src[1] << 8);
+		unsigned short src_2 = (src[2] >> 8) | (src[2] << 8);
+		unsigned short src_3 = (src[3] >> 8) | (src[3] << 8);
+		unsigned short src_4 = (src[4] >> 8) | (src[4] << 8);
+		unsigned short src_5 = (src[5] >> 8) | (src[5] << 8);
+		unsigned short src_6 = (src[6] >> 8) | (src[6] << 8);
+		unsigned short src_7 = (src[7] >> 8) | (src[7] << 8);
+
+		dst[0] = (src_0 << 2)  | ((src_1 & 0x3fff) >> 12); // 14 + 2
+		dst[1] = (src_1 << 4)  | ((src_2 & 0x3fff) >> 10); // 12 + 4
+		dst[2] = (src_2 << 6)  | ((src_3 & 0x3fff) >> 8);  // 10 + 6
+		dst[3] = (src_3 << 8)  | ((src_4 & 0x3fff) >> 6);  // 8  + 8
+		dst[4] = (src_4 << 10) | ((src_5 & 0x3fff) >> 4);  // 6  + 10
+		dst[5] = (src_5 << 12) | ((src_6 & 0x3fff) >> 2);  // 4  + 12
+		dst[6] = (src_6 << 14) |  (src_7 & 0x3fff);        // 2  + 14
+
+		dst[0] = (dst[0] >> 8) | (dst[0] << 8);
+		dst[1] = (dst[1] >> 8) | (dst[1] << 8);
+		dst[2] = (dst[2] >> 8) | (dst[2] << 8);
+		dst[3] = (dst[3] >> 8) | (dst[3] << 8);
+		dst[4] = (dst[4] >> 8) | (dst[4] << 8);
+		dst[5] = (dst[5] >> 8) | (dst[5] << 8);
+		dst[6] = (dst[6] >> 8) | (dst[6] << 8);
+
+		src += 8;
+		dst += 7;
+	}
+}
+
+void dts14le_to_dts16be(const BYTE* source, BYTE* destination, int size)
+{
+	unsigned short* src = (unsigned short*)source;
+	unsigned short* dst = (unsigned short*)destination;
+
+	for (int i = 0, n = size / 16; i < n; i++) {
+		dst[0] = (src[0] << 2)  | ((src[1] & 0x3fff) >> 12); // 14 + 2
+		dst[1] = (src[1] << 4)  | ((src[2] & 0x3fff) >> 10); // 12 + 4
+		dst[2] = (src[2] << 6)  | ((src[3] & 0x3fff) >> 8);  // 10 + 6
+		dst[3] = (src[3] << 8)  | ((src[4] & 0x3fff) >> 6);  // 8  + 8
+		dst[4] = (src[4] << 10) | ((src[5] & 0x3fff) >> 4);  // 6  + 10
+		dst[5] = (src[5] << 12) | ((src[6] & 0x3fff) >> 2);  // 4  + 12
+		dst[6] = (src[6] << 14) |  (src[7] & 0x3fff);        // 2  + 14
+
+		dst[0] = (dst[0] >> 8) | (dst[0] << 8);
+		dst[1] = (dst[1] >> 8) | (dst[1] << 8);
+		dst[2] = (dst[2] >> 8) | (dst[2] << 8);
+		dst[3] = (dst[3] >> 8) | (dst[3] << 8);
+		dst[4] = (dst[4] >> 8) | (dst[4] << 8);
+		dst[5] = (dst[5] >> 8) | (dst[5] << 8);
+		dst[6] = (dst[6] >> 8) | (dst[6] << 8);
+
+		src += 8;
+		dst += 7;
+	}
 }
 
 int ParseDTSHeader(const BYTE* buf, audioframe_t* audioframe)
@@ -753,6 +763,8 @@ int ParseDTSHeader(const BYTE* buf, audioframe_t* audioframe)
 	return frame_size;
 }
 
+// HDMV LPCM
+
 int ParseHdmvLPCMHeader(const BYTE* buf, audioframe_t* audioframe)
 {
 	static const int  hdmvlpcm_samplerates[6] = { 0, 48000, 0, 0, 96000, 192000 };
@@ -778,6 +790,8 @@ int ParseHdmvLPCMHeader(const BYTE* buf, audioframe_t* audioframe)
 
 	return frame_size;
 }
+
+// ADTS AAC
 
 int ParseADTSAACHeader(const BYTE* buf, audioframe_t* audioframe)
 {
