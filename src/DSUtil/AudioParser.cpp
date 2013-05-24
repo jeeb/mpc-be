@@ -338,7 +338,7 @@ int ParseMPAHeader(const BYTE* buf, audioframe_t* audioframe)
 			audioframe->samples = 1152;
 		}
 		audioframe->param1 = bitrate;
-		audioframe->param2 = 0;
+		audioframe->param2 = (mpaver_id == 0x3 && layer_desc == 0x1) ? 1 : 0;
 	}
 
 	return frame_size;

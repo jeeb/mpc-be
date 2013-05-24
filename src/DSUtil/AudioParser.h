@@ -56,7 +56,7 @@ struct audioframe_t {
 	int param2;
 };
 
-int ParseMPAHeader     (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 4 bytes,  param1 = bitrate
+int ParseMPAHeader     (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 4 bytes,  param1 = bitrate, param2 = MP3 flag
 int ParseMPEG1Header   (const BYTE* buf, MPEG1WAVEFORMAT* mpeg1wf);        // need >= 4 bytes
 int ParseMP3Header     (const BYTE* buf, MPEGLAYER3WAVEFORMAT* mp3wf);     // need >= 4 bytes (experimental)
 int ParseAC3Header     (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 7 bytes,  param1 = bitrate
