@@ -290,8 +290,6 @@ update_version.bat</Command>
     <ClCompile Include="MPCVideoDecOutputPin.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="array_allocator.h" />
-    <ClInclude Include="char_t.h" />
     <ClInclude Include="CpuId.h" />
     <ClInclude Include="DXVADecoder.h" />
     <ClInclude Include="DXVADecoderH264.h" />
@@ -303,7 +301,6 @@ update_version.bat</Command>
     <ClInclude Include="IMPCVideoDec.h" />
     <ClInclude Include="MPCVideoDec.h" />
     <ClInclude Include="MPCVideoDecSettingsWnd.h" />
-    <ClInclude Include="..\..\..\DSUtil\PODtypes.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>

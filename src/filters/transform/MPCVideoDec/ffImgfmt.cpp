@@ -22,11 +22,9 @@
  */
 
 #include "stdafx.h"
-#include <vector>
 #include <ffmpeg/libavcodec/avcodec.h>
 #include <uuids.h>
 #include <moreuuids.h>
-#include "char_t.h"
 #include "ffImgfmt.h"
 
 const TcspInfo cspInfos[]= {

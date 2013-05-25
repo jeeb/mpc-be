@@ -21,10 +21,8 @@
  */
 
 #include "stdafx.h"
-#include <math.h>
 #include <atlbase.h>
 #include <MMReg.h>
-#include "../../../DSUtil/PODtypes.h"
 #include "../../../DSUtil/ff_log.h"
 
 #ifdef REGISTER_FILTER
@@ -34,7 +32,6 @@
 #include "MPCVideoDec.h"
 #include "MPCVideoDecOutputPin.h"
 #include "CpuId.h"
-
 #include "ffImgfmt.h"
 #include "FfmpegContext.h"
 
@@ -48,7 +45,6 @@
 #include <moreuuids.h>
 
 #include "../../../DSUtil/WinAPIUtils.h"
-
 #include "Version.h"
 
 #pragma warning(disable: 4005)

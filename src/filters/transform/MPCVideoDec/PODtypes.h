@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: PODtypes.h 1775 2013-01-05 14:19:34Z szl $
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2013 see Authors.txt
@@ -30,11 +30,9 @@ template<class T> struct isPOD {
 template<> struct isPOD<bool> {
 	enum {is=true};
 };
-
 template<> struct isPOD<char> {
 	enum {is=true};
 };
-
 template<> struct isPOD<signed char> {
 	enum {is=true};
 };
@@ -50,7 +48,6 @@ template<> struct isPOD<long int> {
 template<> struct isPOD<__int64> {
 	enum {is=true};
 };
-
 template<> struct isPOD<unsigned char> {
 	enum {is=true};
 };
@@ -66,7 +63,6 @@ template<> struct isPOD<unsigned long int> {
 template<> struct isPOD<unsigned __int64> {
 	enum {is=true};
 };
-
 template<> struct isPOD<float> {
 	enum {is=true};
 };

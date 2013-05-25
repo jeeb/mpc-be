@@ -25,7 +25,6 @@
 #include "DXVADecoderH264.h"
 #include "MPCVideoDec.h"
 #include "DXVAAllocator.h"
-#include "../../../DSUtil/PODtypes.h"
 #include "FfmpegContext.h"
 #include <ffmpeg/libavcodec/avcodec.h>
 

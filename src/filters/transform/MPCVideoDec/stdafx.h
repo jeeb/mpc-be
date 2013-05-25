@@ -34,5 +34,6 @@
 #include <atlcoll.h>
 #include <vector>
 #include "memcpy_sse.h"
+#include "PODtypes.h"
 
 #pragma warning(disable:4005)
