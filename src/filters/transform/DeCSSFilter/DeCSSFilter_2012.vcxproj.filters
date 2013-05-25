@@ -20,9 +20,6 @@
     <ClCompile Include="CSSscramble.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DeCSSFilterInputPin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DeCSSFilter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -58,9 +55,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CSSscramble.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DeCSSFilterInputPin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DeCSSFilter.h">
