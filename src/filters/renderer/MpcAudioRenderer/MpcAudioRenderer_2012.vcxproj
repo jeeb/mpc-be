@@ -230,7 +230,6 @@
     <ClCompile Include="..\..\..\ExtLib\mfc\winmdi.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\core\FilterApp.cpp" />
     <ClCompile Include="MpcAudioRenderer.cpp" />
     <ClCompile Include="MpcAudioRendererSettingsWnd.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -266,7 +265,7 @@
       <Project>{e8a3f6fa-ae1c-4c8e-a0b6-9c8480324eaa}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\core\Filters_2012.vcxproj">
+    <ProjectReference Include="..\..\filters\Filters_2012.vcxproj">
       <Project>{273b3149-3192-4b75-a791-470320b90812}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

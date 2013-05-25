@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "../../core/InternalPropertyPage.h"
+#include "../../filters/InternalPropertyPage.h"
 #include "IMpeg2DecFilter.h"
 #include "resource.h"
 #include <afxcmn.h>

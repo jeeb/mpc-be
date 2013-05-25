@@ -104,7 +104,7 @@ STDAPI DllUnregisterServer()
 	return AMovieDllRegisterServer2(FALSE);
 }
 
-#include "../../core/FilterApp.h"
+#include "../../filters/Filters.h"
 
 CFilterApp theApp;
 

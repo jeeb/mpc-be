@@ -56,7 +56,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TreePropSheet", "src\ExtLib
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BaseClasses", "src\ExtLib\BaseClasses\BaseClasses_2012.vcxproj", "{E8A3F6FA-AE1C-4C8E-A0B6-9C8480324EAA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Filters", "src\filters\core\Filters_2012.vcxproj", "{273B3149-3192-4B75-A791-470320B90812}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Filters", "src\filters\filters\Filters_2012.vcxproj", "{273B3149-3192-4B75-A791-470320B90812}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ffmpeg", "src\ExtLib\ffmpeg\ffmpeg_2012.vcxproj", "{438286B7-A9F4-411D-BCC5-948C40E37D8F}"
 EndProject

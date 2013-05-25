@@ -23,7 +23,7 @@
 
 #include "stdafx.h"
 #include "ComPropertyPage.h"
-#include "../../filters/core/InternalPropertyPage.h"
+#include "../../filters/filters/InternalPropertyPage.h"
 
 // CComPropertyPage dialog
 

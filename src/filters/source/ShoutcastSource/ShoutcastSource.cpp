@@ -162,7 +162,7 @@ STDAPI DllUnregisterServer()
 	return AMovieDllRegisterServer2(FALSE);
 }
 
-#include "../../core/FilterApp.h"
+#include "../../filters/Filters.h"
 
 class CShoutcastSourceApp : public CFilterApp
 {

@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\core\FilterApp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MpcAudioRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

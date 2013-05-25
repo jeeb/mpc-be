@@ -63,7 +63,7 @@
 #include "FGManagerBDA.h"
 #include "TextPassThruFilter.h"
 #include "../../filters/filters.h"
-#include "../../filters/core/PinInfoWnd.h"
+#include "../../filters/filters/InternalPropertyPage.h"
 #include <AllocatorCommon7.h>
 #include <AllocatorCommon.h>
 #include <SyncAllocatorPresenter.h>

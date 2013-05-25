@@ -22,7 +22,7 @@
  */
 
 #include "stdafx.h"
-#include "../SyncClock/Interfaces.h"
+#include "../SyncClock/ISyncClock.h"
 #include <atlbase.h>
 #include <atlcoll.h>
 #include "../../../apps/mplayerc/resource.h"

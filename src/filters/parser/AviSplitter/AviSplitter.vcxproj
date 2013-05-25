@@ -251,7 +251,7 @@
       <Project>{e8a3f6fa-ae1c-4c8e-a0b6-9c8480324eaa}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\core\Filters.vcxproj">
+    <ProjectReference Include="..\..\filters\Filters.vcxproj">
       <Project>{273b3149-3192-4b75-a791-470320b90812}</Project>
     </ProjectReference>
     <ProjectReference Include="..\BaseSplitter\BaseSplitter.vcxproj">

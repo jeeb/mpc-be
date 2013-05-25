@@ -32,7 +32,7 @@
 #include <stdint.h>
 #pragma warning(default: 4005)
 
-#include "../DeCSSFilter/DeCSSInputPin.h"
+#include "../DeCSSFilter/DeCSSFilterInputPin.h"
 #include "IMpaDecFilter.h"
 #include "MpaDecFilterSettingsWnd.h"
 #include "Mixer.h"
