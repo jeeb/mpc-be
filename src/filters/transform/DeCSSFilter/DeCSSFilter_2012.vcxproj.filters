@@ -20,7 +20,7 @@
     <ClCompile Include="CSSscramble.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DeCSSInputPin.cpp">
+    <ClCompile Include="DeCSSFilterInputPin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DeCSSFilter.cpp">
@@ -60,7 +60,7 @@
     <ClInclude Include="CSSscramble.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DeCSSInputPin.h">
+    <ClInclude Include="DeCSSFilterInputPin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DeCSSFilter.h">

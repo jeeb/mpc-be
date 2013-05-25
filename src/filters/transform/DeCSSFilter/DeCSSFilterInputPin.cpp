@@ -27,7 +27,7 @@
 #include <dvdmedia.h>
 #include <ks.h>
 #include <ksmedia.h>
-#include "DeCSSInputPin.h"
+#include "DeCSSFilterInputPin.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "CSSauth.h"
 #include "CSSscramble.h"

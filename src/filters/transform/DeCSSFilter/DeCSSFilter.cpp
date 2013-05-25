@@ -24,7 +24,7 @@
 #include "stdafx.h"
 #include <atlbase.h>
 #include "DeCSSFilter.h"
-#include "DeCSSInputPin.h"
+#include "DeCSSFilterInputPin.h"
 #include "../../../DSUtil/DSUtil.h"
 
 #ifdef REGISTER_FILTER
