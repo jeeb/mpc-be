@@ -93,14 +93,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BaseVideoFilter.cpp" />
-    <ClCompile Include="BitBltFunction.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseVideoFilter.h" />
-    <ClInclude Include="BitBltFunction.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>

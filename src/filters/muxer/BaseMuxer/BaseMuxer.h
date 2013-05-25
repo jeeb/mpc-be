@@ -23,8 +23,186 @@
 
 #pragma once
 
-#include "BaseMuxerInputPin.h"
-#include "BaseMuxerOutputPin.h"
+#include "../../../DSUtil/DSUtil.h"
+#include "../../../DSUtil/DSMPropertyBag.h"
+
+interface __declspec(uuid("30AB78C7-5259-4594-AEFE-9C0FC2F08A5E"))
+IBitStream :
+public IUnknown {
+	STDMETHOD_(UINT64, GetPos) () = 0;
+	STDMETHOD_(UINT64, Seek) (UINT64 pos) = 0; // it's a _stream_, please don't seek if you don't have to
+	STDMETHOD(ByteWrite) (const void* pData, int len) = 0;
+	STDMETHOD(BitWrite) (UINT64 data, int len) = 0;
+	STDMETHOD(BitFlush) () = 0;
+	STDMETHOD(StrWrite) (LPCSTR pData, BOOL bFixNewLine) = 0;
+};
+
+class CBitStream : public CUnknown, public IBitStream
+{
+	CComPtr<IStream> m_pStream;
+	bool m_fThrowError;
+	UINT64 m_bitbuff;
+	int m_bitlen;
+
+public:
+	CBitStream(IStream* pStream, bool m_fThrowError = false);
+	virtual ~CBitStream();
+
+	DECLARE_IUNKNOWN;
+	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
+
+	// IBitStream
+
+	STDMETHODIMP_(UINT64) GetPos();
+	STDMETHODIMP_(UINT64) Seek(UINT64 pos);
+	STDMETHODIMP ByteWrite(const void* pData, int len);
+	STDMETHODIMP BitWrite(UINT64 data, int len);
+	STDMETHODIMP BitFlush();
+	STDMETHODIMP StrWrite(LPCSTR pData, BOOL bFixNewLine);
+};
+
+interface __declspec(uuid("EE6F2741-7DB4-4AAD-A3CB-545208EE4C0A"))
+IBaseMuxerRelatedPin :
+public IUnknown {
+	STDMETHOD(SetRelatedPin) (CBasePin* pPin) = 0;
+	STDMETHOD_(CBasePin*, GetRelatedPin) () = 0;
+};
+
+class CBaseMuxerRelatedPin : public IBaseMuxerRelatedPin
+{
+	CBasePin* m_pRelatedPin; // should not hold a reference because it would be circular
+
+public:
+	CBaseMuxerRelatedPin();
+	virtual ~CBaseMuxerRelatedPin();
+
+	// IBaseMuxerRelatedPin
+
+	STDMETHODIMP SetRelatedPin(CBasePin* pPin);
+	STDMETHODIMP_(CBasePin*) GetRelatedPin();
+};
+
+class CBaseMuxerInputPin;
+
+struct MuxerPacket {
+	CBaseMuxerInputPin* pPin;
+	REFERENCE_TIME rtStart, rtStop;
+	CAtlArray<BYTE> pData;
+	enum flag_t {empty = 0, timevalid = 1, syncpoint = 2, discontinuity = 4, eos = 8, bogus = 16};
+	DWORD flags;
+	int index;
+	struct MuxerPacket(CBaseMuxerInputPin* pPin) {
+		this->pPin = pPin;
+		rtStart = rtStop = INVALID_TIME;
+		flags = empty;
+		index = -1;
+	}
+	bool IsTimeValid() const {
+		return !!(flags & timevalid);
+	}
+	bool IsSyncPoint() const {
+		return !!(flags & syncpoint);
+	}
+	bool IsDiscontinuity() const {
+		return !!(flags & discontinuity);
+	}
+	bool IsEOS() const {
+		return !!(flags & eos);
+	}
+	bool IsBogus() const {
+		return !!(flags & bogus);
+	}
+};
+
+class CBaseMuxerInputPin : public CBaseInputPin, public CBaseMuxerRelatedPin, public IDSMPropertyBagImpl
+{
+private:
+	int m_iID;
+
+	CCritSec m_csReceive;
+	REFERENCE_TIME m_rtMaxStart, m_rtDuration;
+	bool m_fEOS;
+	int m_iPacketIndex;
+
+	CCritSec m_csQueue;
+	CAutoPtrList<MuxerPacket> m_queue;
+	void PushPacket(CAutoPtr<MuxerPacket> pPacket);
+	CAutoPtr<MuxerPacket> PopPacket();
+	CAMEvent m_evAcceptPacket;
+
+	friend class CBaseMuxerFilter;
+
+public:
+	CBaseMuxerInputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
+	virtual ~CBaseMuxerInputPin();
+
+	DECLARE_IUNKNOWN;
+	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
+
+	REFERENCE_TIME GetDuration() {
+		return m_rtDuration;
+	}
+	int GetID() {
+		return m_iID;
+	}
+	CMediaType& CurrentMediaType() {
+		return m_mt;
+	}
+	bool IsSubtitleStream();
+
+	HRESULT CheckMediaType(const CMediaType* pmt);
+	HRESULT BreakConnect();
+	HRESULT CompleteConnect(IPin* pReceivePin);
+
+	HRESULT Active();
+	HRESULT Inactive();
+
+	STDMETHODIMP NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
+	STDMETHODIMP Receive(IMediaSample* pSample);
+	STDMETHODIMP EndOfStream();
+};
+
+class CBaseMuxerOutputPin : public CBaseOutputPin
+{
+	CComPtr<IBitStream> m_pBitStream;
+
+public:
+	CBaseMuxerOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
+	virtual ~CBaseMuxerOutputPin() {}
+
+	IBitStream* GetBitStream();
+
+	HRESULT BreakConnect();
+
+	HRESULT DecideBufferSize(IMemAllocator* pAlloc, ALLOCATOR_PROPERTIES* pProperties);
+
+	HRESULT CheckMediaType(const CMediaType* pmt);
+	HRESULT GetMediaType(int iPosition, CMediaType* pmt);
+
+	HRESULT DeliverEndOfStream();
+
+	STDMETHODIMP Notify(IBaseFilter* pSender, Quality q);
+};
+
+class CBaseMuxerRawOutputPin : public CBaseMuxerOutputPin, public CBaseMuxerRelatedPin
+{
+	struct idx_t {
+		REFERENCE_TIME rt;
+		__int64 fp;
+	};
+	CAtlList<idx_t> m_idx;
+
+public:
+	CBaseMuxerRawOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
+	virtual ~CBaseMuxerRawOutputPin() {}
+
+	DECLARE_IUNKNOWN;
+	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
+
+	virtual void MuxHeader(const CMediaType& mt);
+	virtual void MuxPacket(const CMediaType& mt, const MuxerPacket* pPacket);
+	virtual void MuxFooter(const CMediaType& mt);
+};
 
 class CBaseMuxerFilter
 	: public CBaseFilter
