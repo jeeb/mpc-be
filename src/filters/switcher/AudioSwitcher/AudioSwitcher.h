@@ -52,8 +52,8 @@ class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
 	bool m_fCustomChannelMapping;
 	DWORD m_pSpeakerToChannelMap[AS_MAX_CHANNELS][AS_MAX_CHANNELS];
 	REFERENCE_TIME m_rtAudioTimeShift;
-	double m_sample_max;
 	bool m_fNormalize, m_fNormalizeRecover;
+	double m_normalizeFactor;
 	float m_boost_mul;
 
 	REFERENCE_TIME m_rtNextStart, m_rtNextStop;
