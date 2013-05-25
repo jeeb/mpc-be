@@ -22,7 +22,7 @@
  */
 
 #include "stdafx.h"
-#include "FilterApp.h"
+#include "Filters.h"
 
 extern "C" BOOL WINAPI DllEntryPoint(HINSTANCE, ULONG, LPVOID);
 

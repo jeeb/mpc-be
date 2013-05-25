@@ -11,13 +11,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="FilterApp.cpp">
+    <ClCompile Include="Filters.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="InternalPropertyPage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PinInfoWnd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
@@ -25,13 +22,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FilterApp.h">
+    <ClInclude Include="Filters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="InternalPropertyPage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PinInfoWnd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
