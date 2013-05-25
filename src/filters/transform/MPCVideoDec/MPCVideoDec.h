@@ -326,3 +326,36 @@ public:
 	// === EVR functions
 	HRESULT						DetectVideoCard_EVR(IPin *pPin);
 };
+
+class CMPCVideoDecFilter;
+class CVideoDecDXVAAllocator;
+
+class CVideoDecOutputPin : public CBaseVideoOutputPin
+	, public IAMVideoAcceleratorNotify
+{
+public:
+	CVideoDecOutputPin(TCHAR* pObjectName, CBaseVideoFilter* pFilter, HRESULT* phr, LPCWSTR pName);
+
+	~CVideoDecOutputPin();
+
+	HRESULT			InitAllocator(IMemAllocator **ppAlloc);
+
+	DECLARE_IUNKNOWN
+	STDMETHODIMP	NonDelegatingQueryInterface(REFIID riid, void** ppv);
+
+	// IAMVideoAcceleratorNotify
+	STDMETHODIMP	GetUncompSurfacesInfo(const GUID *pGuid, LPAMVAUncompBufferInfo pUncompBufferInfo);
+	STDMETHODIMP	SetUncompSurfacesInfo(DWORD dwActualUncompSurfacesAllocated);
+	STDMETHODIMP	GetCreateVideoAcceleratorData(const GUID *pGuid, LPDWORD pdwSizeMiscData, LPVOID *ppMiscData);
+
+	// *** from LAV
+	// *** Re-Commit the allocator (creates surfaces and new decoder)
+	HRESULT			Recommit();
+
+private :
+	CMPCVideoDecFilter*			m_pVideoDecFilter;
+	CVideoDecDXVAAllocator*		m_pDXVA2Allocator;
+	DWORD						m_dwDXVA1SurfaceCount;
+	GUID						m_GuidDecoderDXVA1;
+	DDPIXELFORMAT				m_ddUncompPixelFormat;
+};

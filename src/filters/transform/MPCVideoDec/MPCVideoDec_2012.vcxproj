@@ -287,7 +287,6 @@ update_version.bat</Command>
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="DXVAAllocator.cpp" />
-    <ClCompile Include="MPCVideoDecOutputPin.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CpuId.h" />
@@ -306,7 +305,6 @@ update_version.bat</Command>
     </ClInclude>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="DXVAAllocator.h" />
-    <ClInclude Include="MPCVideoDecOutputPin.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MPCVideoDec.rc">
