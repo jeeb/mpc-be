@@ -24,7 +24,7 @@
 
 #include <atlbase.h>
 #include <atlutil.h>
-#include "Interfaces.h"
+#include "ISyncClock.h"
 
 class CSyncClockFilter;
 
