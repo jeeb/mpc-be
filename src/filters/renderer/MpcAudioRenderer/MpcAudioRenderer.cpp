@@ -533,11 +533,13 @@ HRESULT CMpcAudioRenderer::CompleteConnect(IPin *pReceivePin)
 
 HRESULT CMpcAudioRenderer::BeginFlush()
 {
+	TRACE(_T("CMpcAudioRenderer::BeginFlush()\n"));
 	return __super::BeginFlush();
 }
 
 HRESULT CMpcAudioRenderer::EndFlush()
 {
+	TRACE(_T("CMpcAudioRenderer::EndFlush()\n"));
 	CAutoLock cRenderLock(&m_csRender);
 
 	StopAudioClient(&m_pAudioClient);
@@ -648,19 +650,24 @@ DWORD CMpcAudioRenderer::RenderThread()
 		DWORD result = WaitForMultipleObjects(3, renderHandles, FALSE, INFINITE);
 		switch (result) {
 			case WAIT_OBJECT_0:
+				TRACE(_T("CMpcAudioRenderer::RenderThread() - exit events\n"));
 				return 0;
 			case WAIT_OBJECT_0 + 1: 
 				{
+					TRACE(_T("CMpcAudioRenderer::RenderThread() - pause events\n"));
+
 					m_bThreadPaused = TRUE;
 					ResetEvent(m_hResumeEvent);
 					SetEvent(m_hWaitPauseEvent);
 
 					DWORD resultResume = WaitForMultipleObjects(2, resumeHandles, FALSE, INFINITE);
 					if (resultResume == WAIT_OBJECT_0) { // exit event
+						TRACE(_T("CMpcAudioRenderer::RenderThread() - exit events\n"));
 						return 0;
 					}
 
 					if (resultResume == WAIT_OBJECT_0 + 1) { // resume event
+						TRACE(_T("CMpcAudioRenderer::RenderThread() - resume events\n"));
 						m_bThreadPaused = FALSE;
 						SetEvent(m_hWaitResumeEvent);
 					}
@@ -670,80 +677,78 @@ DWORD CMpcAudioRenderer::RenderThread()
 				{
 					TRACE(_T("CMpcAudioRenderer::RenderThread() - Data Event, Audio client state = %s\n"), isAudioClientStarted ? _T("Started") : _T("Stoped"));
 
-					{
-						CAutoLock cRenderLock(&m_csRender);
-						//hr = pAudioClient->GetBufferSize(&nFramesInBuffer);
+					CAutoLock cRenderLock(&m_csRender);
+					//hr = pAudioClient->GetBufferSize(&nFramesInBuffer);
 
-						UINT32 numFramesPadding = 0;
-						if (m_useWASAPIAfterRestart == 2 && !IsBitstream(m_pWaveFileFormatOutput)) { // EXCLUSIVE
-							m_pAudioClient->GetCurrentPadding(&numFramesPadding);
-						}
-						UINT32 numFramesAvailable	= nFramesInBuffer - numFramesPadding;
-						UINT32 nAvailableBytes		= numFramesAvailable * m_pWaveFileFormatOutput->nBlockAlign;
+					UINT32 numFramesPadding = 0;
+					if (m_useWASAPIAfterRestart == 2 && !IsBitstream(m_pWaveFileFormatOutput)) { // EXCLUSIVE
+						m_pAudioClient->GetCurrentPadding(&numFramesPadding);
+					}
+					UINT32 numFramesAvailable	= nFramesInBuffer - numFramesPadding;
+					UINT32 nAvailableBytes		= numFramesAvailable * m_pWaveFileFormatOutput->nBlockAlign;
 
-						BYTE* pData = NULL;
-						hr = m_pRenderClient->GetBuffer(numFramesAvailable, &pData);
-						if (FAILED(hr)) {
-							TRACE(_T("CMpcAudioRenderer::RenderThread() - GetBuffer failed with size %ld : (error %lx)\n"), nFramesInBuffer, hr);
-							break;
-						}
+					BYTE* pData = NULL;
+					hr = m_pRenderClient->GetBuffer(numFramesAvailable, &pData);
+					if (FAILED(hr)) {
+						TRACE(_T("CMpcAudioRenderer::RenderThread() - GetBuffer failed with size %ld : (error %lx)\n"), nFramesInBuffer, hr);
+						break;
+					}
 
-						DWORD bufferFlags = 0;
-						if (nAvailableBytes > m_WasapiBuf.GetCount()) {
-							TRACE(_T("CMpcAudioRenderer::RenderThread() - Data Event, not enough data, requested: %u, available: %u\n"), nAvailableBytes, m_WasapiBuf.GetCount());
-							bufferFlags = AUDCLNT_BUFFERFLAGS_SILENT;
-						} else {
-							TRACE(_T("CMpcAudioRenderer::RenderThread() - Data Event, requested: %u, available: %u\n"), nAvailableBytes, m_WasapiBuf.GetCount());
+					DWORD bufferFlags = 0;
+					if (nAvailableBytes > m_WasapiBuf.GetCount()) {
+						TRACE(_T("CMpcAudioRenderer::RenderThread() - Data Event, not enough data, requested: %u, available: %u\n"), nAvailableBytes, m_WasapiBuf.GetCount());
+						bufferFlags = AUDCLNT_BUFFERFLAGS_SILENT;
+					} else {
+						TRACE(_T("CMpcAudioRenderer::RenderThread() - Data Event, requested: %u, available: %u\n"), nAvailableBytes, m_WasapiBuf.GetCount());
 
-							BYTE* const base = m_WasapiBuf.GetData();
-							BYTE* const end = base + m_WasapiBuf.GetCount();
-							BYTE* p = base;
+						BYTE* const base = m_WasapiBuf.GetData();
+						BYTE* const end = base + m_WasapiBuf.GetCount();
+						BYTE* p = base;
 
-							if (pData != NULL) {
-								memcpy(&pData[0], p, nAvailableBytes);
+						if (pData != NULL) {
+							memcpy(&pData[0], p, nAvailableBytes);
 								
-								if (!IsBitstream(m_pWaveFileFormat) && (m_dVolume >= 0.0 && m_dVolume < 1.0)) {
-									// Adjusting volume ...
-									WAVEFORMATEX* wfeOutput				= (WAVEFORMATEX*)m_pWaveFileFormatOutput;
-									WAVEFORMATEXTENSIBLE* wfexOutput	= (WAVEFORMATEXTENSIBLE*)wfeOutput;
+							if (!IsBitstream(m_pWaveFileFormat) && (m_dVolume >= 0.0 && m_dVolume < 1.0)) {
+								// Adjusting volume ...
+								WAVEFORMATEX* wfeOutput				= (WAVEFORMATEX*)m_pWaveFileFormatOutput;
+								WAVEFORMATEXTENSIBLE* wfexOutput	= (WAVEFORMATEXTENSIBLE*)wfeOutput;
 
-									WORD tag	= wfeOutput->wFormatTag;
-									bool fPCM	= tag == WAVE_FORMAT_PCM || tag == WAVE_FORMAT_EXTENSIBLE && wfexOutput->SubFormat == KSDATAFORMAT_SUBTYPE_PCM;
-									bool fFloat	= tag == WAVE_FORMAT_IEEE_FLOAT || tag == WAVE_FORMAT_EXTENSIBLE && wfexOutput->SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
+								WORD tag	= wfeOutput->wFormatTag;
+								bool fPCM	= tag == WAVE_FORMAT_PCM || tag == WAVE_FORMAT_EXTENSIBLE && wfexOutput->SubFormat == KSDATAFORMAT_SUBTYPE_PCM;
+								bool fFloat	= tag == WAVE_FORMAT_IEEE_FLOAT || tag == WAVE_FORMAT_EXTENSIBLE && wfexOutput->SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
 
-									size_t samples = nAvailableBytes / (wfeOutput->wBitsPerSample >> 3);
+								size_t samples = nAvailableBytes / (wfeOutput->wBitsPerSample >> 3);
 
-									if (fPCM) {
-										if (wfeOutput->wBitsPerSample == 8) {
-											gain_uint8(m_dVolume, samples, (uint8_t*)pData);
-										} else if (wfeOutput->wBitsPerSample == 16) {
-											gain_int16(m_dVolume, samples, (int16_t*)pData);
-										} else if (wfeOutput->wBitsPerSample == 24) {
-											gain_int24(m_dVolume, samples, pData);
-										} else if (wfeOutput->wBitsPerSample == 32) {
-											gain_int32(m_dVolume, samples, (int32_t*)pData);
-										}
-									} else if (fFloat) {
-										if (wfeOutput->wBitsPerSample == 32) {
-											gain_float(m_dVolume, samples, (float*)pData);
-										} else if (wfeOutput->wBitsPerSample == 64) {
-											gain_double(m_dVolume, samples, (double*)pData);
-										}
+								if (fPCM) {
+									if (wfeOutput->wBitsPerSample == 8) {
+										gain_uint8(m_dVolume, samples, (uint8_t*)pData);
+									} else if (wfeOutput->wBitsPerSample == 16) {
+										gain_int16(m_dVolume, samples, (int16_t*)pData);
+									} else if (wfeOutput->wBitsPerSample == 24) {
+										gain_int24(m_dVolume, samples, pData);
+									} else if (wfeOutput->wBitsPerSample == 32) {
+										gain_int32(m_dVolume, samples, (int32_t*)pData);
+									}
+								} else if (fFloat) {
+									if (wfeOutput->wBitsPerSample == 32) {
+										gain_float(m_dVolume, samples, (float*)pData);
+									} else if (wfeOutput->wBitsPerSample == 64) {
+										gain_double(m_dVolume, samples, (double*)pData);
 									}
 								}
-
-								p += nAvailableBytes;
-
-								memmove(base, p, end - p);
-								m_WasapiBuf.SetCount(end - p);
 							}
+
+							p += nAvailableBytes;
+
+							memmove(base, p, end - p);
+							m_WasapiBuf.SetCount(end - p);
 						}
+					}
 				
-						hr = m_pRenderClient->ReleaseBuffer(numFramesAvailable, bufferFlags);
-						if (FAILED(hr)) {
-							TRACE(_T("CMpcAudioRenderer::RenderThread() - ReleaseBuffer failed with size %ld (error %lx)\n"), nFramesInBuffer, hr);
-							break;
-						}
+					hr = m_pRenderClient->ReleaseBuffer(numFramesAvailable, bufferFlags);
+					if (FAILED(hr)) {
+						TRACE(_T("CMpcAudioRenderer::RenderThread() - ReleaseBuffer failed with size %ld (error %lx)\n"), nFramesInBuffer, hr);
+						break;
 					}
 				}
 				break;
@@ -807,26 +812,30 @@ STDMETHODIMP CMpcAudioRenderer::Stop()
 {
 	TRACE(_T("CMpcAudioRenderer::Stop()\n"));
 
+	HRESULT hr = CBaseRenderer::Stop();
+
 	if (m_pDSBuffer) {
 		m_pDSBuffer->Stop();
 	}
 
 	StopAudioClient(&m_pAudioClient);
 
-	return CBaseRenderer::Stop();
+	return hr;
 };
 
 STDMETHODIMP CMpcAudioRenderer::Pause()
 {
 	TRACE(_T("CMpcAudioRenderer::Pause()\n"));
 
+	HRESULT hr = CBaseRenderer::Pause();
+
 	if (m_pDSBuffer) {
 		m_pDSBuffer->Stop();
 	}
 
 	StopAudioClient(&m_pAudioClient);
 
-	return CBaseRenderer::Pause();
+	return hr;
 };
 
 // === IDispatch

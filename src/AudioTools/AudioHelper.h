@@ -26,9 +26,6 @@ extern "C" {
 }
 #pragma warning(default: 4005 4244)
 
-#define INT24_MAX       8388607i32
-#define INT24_MIN     (-8388607i32 - 1)
-
 #ifdef _MSC_VER
 #define bswap_16(x) _byteswap_ushort((unsigned short)(x))
 #define bswap_32(x) _byteswap_ulong ((unsigned long)(x))
