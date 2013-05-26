@@ -878,11 +878,12 @@ STDMETHODIMP CMpcAudioRenderer::put_Volume(long lVolume)
 	m_lVolume = lVolume;
 
 	if (m_useWASAPI) {
-		m_dVolume = pow(10, m_lVolume / 4000.0f);
-		if (m_lVolume == -10000) {
+		if (m_lVolume <= -10000) {
 			m_dVolume = 0.0;
-		} else if (m_lVolume == 0) {
+		} else if (m_lVolume >= 0) {
 			m_dVolume = 1.0;
+		} else {
+			m_dVolume = pow(10.0, m_lVolume / 2000.0);
 		}
 	} else if (m_pDSBuffer) {
 		return m_pDSBuffer->SetVolume(lVolume);
