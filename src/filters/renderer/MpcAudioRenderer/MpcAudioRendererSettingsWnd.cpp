@@ -127,6 +127,9 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 			case MODE_DIRECTSOUND :
 				statusTxt.AppendFormat(L" %s", ResStr(IDS_ARS_WASAPI_MODE_STATUS_4));
 				break;
+			case MODE_WASAPI_EXCLUSIVE_BITSTREAM :
+				statusTxt.AppendFormat(L" %s", ResStr(IDS_ARS_WASAPI_MODE_STATUS_5));
+				break;
 		}
 		m_txtModeText.SetWindowText(statusTxt);
 	}

@@ -135,7 +135,7 @@ private:
 	HRESULT					GetAvailableAudioDevices(IMMDeviceCollection **ppMMDevices);
 	HRESULT					GetAudioDevice(IMMDevice **ppMMDevice);
 	HRESULT					CreateAudioClient(IMMDevice *pMMDevice, IAudioClient **ppAudioClient);
-	HRESULT					InitAudioClient(WAVEFORMATEX *pWaveFormatEx, IAudioClient *pAudioClient, IAudioRenderClient **ppRenderClient);
+	HRESULT					InitAudioClient(WAVEFORMATEX *pWaveFormatEx, IAudioClient **pAudioClient, IAudioRenderClient **ppRenderClient);
 	HRESULT					CheckAudioClient(WAVEFORMATEX *pWaveFormatEx);
 	HRESULT					DoRenderSampleWasapi(IMediaSample *pMediaSample);
 	HRESULT					GetBufferSize(WAVEFORMATEX *pWaveFormatEx, REFERENCE_TIME *pHnsBufferPeriod);
@@ -146,7 +146,8 @@ private:
 
 	bool					IsBitstream(WAVEFORMATEX *pWaveFormatEx);
 
-	HRESULT					StopAudioClient();
+	HRESULT					StartAudioClient(IAudioClient **ppAudioClient);
+	HRESULT					StopAudioClient(IAudioClient **ppAudioClient);
 
 	// WASAPI variables
 	int						m_useWASAPI;
@@ -154,11 +155,10 @@ private:
 	bool					m_bMuteFastForward;
 	CString					m_csSound_Device;
 	IMMDevice				*pMMDevice;
-	IAudioClient			*pAudioClient;
-	IAudioRenderClient		*pRenderClient;
+	IAudioClient			*m_pAudioClient;
+	IAudioRenderClient		*m_pRenderClient;
 	UINT32					nFramesInBuffer;
 	REFERENCE_TIME			hnsPeriod;
-	DWORD					hnsActualDuration;
 	HANDLE					hTask;
 	CCritSec				m_csCheck;
 	UINT32					m_nBufferSize;

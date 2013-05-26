@@ -1095,9 +1095,9 @@ bool CBaseSplitterFileEx::Read(hdmvlpcmhdr& h, CMediaType* pmt)
 	h.samplerate	= (BYTE)BitRead(4);
 	h.bitpersample	= (BYTE)BitRead(2);
 
-	if (h.channels==0 || h.channels==2 ||
-			(h.samplerate != 1 && h.samplerate!= 4  && h.samplerate!= 5) ||
-			h.bitpersample > 3) {
+	if (h.channels > 11
+			|| h.samplerate > 5
+			|| h.bitpersample > 3) {
 		return false;
 	}
 
@@ -1110,13 +1110,22 @@ bool CBaseSplitterFileEx::Read(hdmvlpcmhdr& h, CMediaType* pmt)
 
 	static int channels[] = {0, 1, 0, 2, 3, 3, 4, 4, 5, 6, 7, 8};
 	wfe.nChannels	 = channels[h.channels];
+	if (wfe.nChannels == 0) {
+		return false;
+	}
 	wfe.channel_conf = h.channels;
 
 	static int freq[] = {0, 48000, 0, 0, 96000, 192000};
 	wfe.nSamplesPerSec = freq[h.samplerate];
+	if (wfe.nSamplesPerSec == 0) {
+		return false;
+	}
 
 	static int bitspersample[] = {0, 16, 20, 24};
 	wfe.wBitsPerSample = bitspersample[h.bitpersample];
+	if (wfe.wBitsPerSample == 0) {
+		return false;
+	}
 
 	wfe.nBlockAlign		= wfe.nChannels*wfe.wBitsPerSample>>3;
 	wfe.nAvgBytesPerSec = wfe.nBlockAlign*wfe.nSamplesPerSec;

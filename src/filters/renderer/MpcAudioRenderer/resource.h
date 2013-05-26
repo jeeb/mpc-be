@@ -11,6 +11,7 @@
 #define IDS_ARS_WASAPI_MODE_STATUS_2    7605
 #define IDS_ARS_WASAPI_MODE_STATUS_3    7606
 #define IDS_ARS_WASAPI_MODE_STATUS_4    7607
+#define IDS_ARS_WASAPI_MODE_STATUS_5    7608
 
 // Next default values for new objects
 //

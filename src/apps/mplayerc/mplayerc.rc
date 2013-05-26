@@ -3209,6 +3209,7 @@ BEGIN
     IDS_ARS_WASAPI_MODE_STATUS_2 "use WASAPI, Exclusive mode"
     IDS_ARS_WASAPI_MODE_STATUS_3 "use WASAPI, Shared mode"
     IDS_ARS_WASAPI_MODE_STATUS_4 "use DirectSound"
+    IDS_ARS_WASAPI_MODE_STATUS_5 "use WASAPI, Exclusive mode, Bitstream"
 END
 
 STRINGTABLE
