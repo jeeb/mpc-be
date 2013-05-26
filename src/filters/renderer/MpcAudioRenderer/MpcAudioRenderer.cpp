@@ -28,6 +28,7 @@
 #include <moreuuids.h>
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioParser.h"
+#include "../../../DSUtil/AudioTools.h"
 #include <ks.h>
 #include <ksmedia.h>
 #include "AudioHelper.h"
@@ -710,46 +711,23 @@ DWORD CMpcAudioRenderer::RenderThread()
 									bool fPCM	= tag == WAVE_FORMAT_PCM || tag == WAVE_FORMAT_EXTENSIBLE && wfexOutput->SubFormat == KSDATAFORMAT_SUBTYPE_PCM;
 									bool fFloat	= tag == WAVE_FORMAT_IEEE_FLOAT || tag == WAVE_FORMAT_EXTENSIBLE && wfexOutput->SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
 
-									int samples	= nAvailableBytes / (wfeOutput->wBitsPerSample >> 3);
+									size_t samples = nAvailableBytes / (wfeOutput->wBitsPerSample >> 3);
 
-									if (fPCM && wfeOutput->wBitsPerSample == 8) {
-										for (int i = 0; i < samples; i++) {
-											double s = reinterpret_cast<double*>(pData)[i] / UCHAR_MAX;
-											s *= m_dVolume;
-											pData[i] = clamp<BYTE>(s, 0, UCHAR_MAX);
+									if (fPCM) {
+										if (wfeOutput->wBitsPerSample == 8) {
+											gain_uint8(m_dVolume, samples, (uint8_t*)pData);
+										} else if (wfeOutput->wBitsPerSample == 16) {
+											gain_int16(m_dVolume, samples, (int16_t*)pData);
+										} else if (wfeOutput->wBitsPerSample == 24) {
+											gain_int24(m_dVolume, samples, pData);
+										} else if (wfeOutput->wBitsPerSample == 32) {
+											gain_int32(m_dVolume, samples, (int32_t*)pData);
 										}
-									} else if (fPCM && wfeOutput->wBitsPerSample == 16) {
-										for (int i = 0; i < samples; i++) {
-											double s = static_cast<double>(reinterpret_cast<short*>(pData)[i]) / SHRT_MAX;
-											s *= m_dVolume;
-											reinterpret_cast<short*>(pData)[i] = clamp<short>(s, SHRT_MIN, SHRT_MAX);
-										}
-									} else if (fPCM && wfeOutput->wBitsPerSample == 24) {
-										for (int i = 0; i < samples; i++) {
-											int tmp;
-											memcpy((reinterpret_cast<BYTE*>(&tmp))+1, &pData[i*3], 3);
-											double s = static_cast<double>(static_cast<float>(tmp >> 8) / INT24_MAX);
-											s *= m_dVolume;
-											tmp = clamp<int>(s, INT24_MIN, INT24_MAX);
-											memcpy(&pData[i*3], reinterpret_cast<BYTE*>(&tmp), 3);
-										}
-									} else if (fPCM && wfeOutput->wBitsPerSample == 32) {
-										for (int i = 0; i < samples; i++) {
-											double s = static_cast<double>(reinterpret_cast<int*>(pData)[i]) / INT_MAX;
-											s *= m_dVolume;
-											reinterpret_cast<int*>(pData)[i] = clamp<int>(s, INT_MIN, INT_MAX);
-										}
-									} else if (fFloat && wfeOutput->wBitsPerSample == 32) {
-										for (int i = 0; i < samples; i++) {
-											double s = static_cast<double>(reinterpret_cast<float*>(pData)[i]);
-											s *= m_dVolume;
-											reinterpret_cast<float*>(pData)[i] = clamp<float>(s, -1, +1);
-										}
-									} else if (fFloat && wfeOutput->wBitsPerSample == 64) {
-										for (int i = 0; i < samples; i++) {
-											double s = reinterpret_cast<double*>(pData)[i];
-											s *= m_dVolume;
-											reinterpret_cast<double*>(pData)[i] = clamp<double>(s, -1, +1);
+									} else if (fFloat) {
+										if (wfeOutput->wBitsPerSample == 32) {
+											gain_float(m_dVolume, samples, (float*)pData);
+										} else if (wfeOutput->wBitsPerSample == 64) {
+											gain_double(m_dVolume, samples, (double*)pData);
 										}
 									}
 								}
