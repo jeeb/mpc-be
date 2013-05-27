@@ -34,6 +34,14 @@
 #include "AudioHelper.h"
 #include "MpcAudioRenderer.h"
 
+// options names
+#define OPT_REGKEY_AudRend  _T("Software\\MPC-BE Filters\\MPC Audio Renderer")
+#define OPT_SECTION_AudRend _T("Filters\\MPC Audio Renderer")
+#define OPT_DeviceMode      _T("UseWasapi")
+#define OPT_MuteFastForward _T("MuteFastForward")
+#define OPT_AudioDevice     _T("SoundDevice")
+// TODO: rename option values
+
 #ifdef REGISTER_FILTER
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
@@ -152,27 +160,27 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	TCHAR buff[256];
 	ULONG len;
 
-	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\MPC-BE Filters\\MPC Audio Renderer"), KEY_READ)) {
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, OPT_REGKEY_AudRend, KEY_READ)) {
 		DWORD dw;
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("UseWasapi"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_DeviceMode, dw)) {
 			m_useWASAPI = dw;
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("MuteFastForward"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_MuteFastForward, dw)) {
 			m_bMuteFastForward = !!dw;
 		}
 		len = _countof(buff);
 		memset(buff, 0, sizeof(buff));
-		if (ERROR_SUCCESS == key.QueryStringValue(_T("SoundDevice"), buff, &len)) {
+		if (ERROR_SUCCESS == key.QueryStringValue(OPT_AudioDevice, buff, &len)) {
 			m_csSound_Device = CString(buff);
 		}
 	}
 #else
-	m_useWASAPI			= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Audio Renderer"), _T("UseWasapi"), m_useWASAPI);
-	m_bMuteFastForward	= !!AfxGetApp()->GetProfileInt(_T("Filters\\MPC Audio Renderer"), _T("MuteFastForward"), m_bMuteFastForward);
-	m_csSound_Device	= AfxGetApp()->GetProfileString(_T("Filters\\MPC Audio Renderer"), _T("SoundDevice"), m_csSound_Device);
+	m_useWASAPI			= AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_DeviceMode, m_useWASAPI);
+	m_bMuteFastForward	= !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_MuteFastForward, m_bMuteFastForward);
+	m_csSound_Device	= AfxGetApp()->GetProfileString(OPT_SECTION_AudRend, OPT_AudioDevice, m_csSound_Device);
 #endif
 
-	m_useWASAPI				= (max(0, min(m_useWASAPI, 2)));
+	m_useWASAPI				= min(max(m_useWASAPI, 0), 2);
 	m_useWASAPIAfterRestart	= m_useWASAPI;
 
 	// Load Vista & above specifics DLLs
@@ -943,15 +951,15 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 {
 #ifdef REGISTER_FILTER
 	CRegKey key;
-	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, _T("Software\\MPC-BE Filters\\MPC Audio Renderer"))) {
-		key.SetDWORDValue(_T("UseWasapi"), m_useWASAPIAfterRestart);
-		key.SetDWORDValue(_T("MuteFastForward"), m_bMuteFastForward);
-		key.SetStringValue(_T("SoundDevice"), m_csSound_Device);
+	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_AudRend)) {
+		key.SetDWORDValue(OPT_DeviceMode, m_useWASAPIAfterRestart);
+		key.SetDWORDValue(OPT_MuteFastForward, m_bMuteFastForward);
+		key.SetStringValue(OPT_AudioDevice, m_csSound_Device);
 	}
 #else
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Audio Renderer"), _T("UseWasapi"), m_useWASAPIAfterRestart);
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Audio Renderer"), _T("MuteFastForward"), m_bMuteFastForward);
-	AfxGetApp()->WriteProfileString(_T("Filters\\MPC Audio Renderer"), _T("SoundDevice"), m_csSound_Device);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_DeviceMode, m_useWASAPIAfterRestart);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_MuteFastForward, m_bMuteFastForward);
+	AfxGetApp()->WriteProfileString(OPT_SECTION_AudRend, OPT_AudioDevice, m_csSound_Device);
 #endif
 
 	return S_OK;
