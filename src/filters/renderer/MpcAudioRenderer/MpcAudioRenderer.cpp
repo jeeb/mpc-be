@@ -1287,6 +1287,21 @@ HRESULT CMpcAudioRenderer::WriteSampleToDSBuffer(IMediaSample *pMediaSample, boo
 #pragma region
 // ==== WASAPI
 
+
+const TCHAR *GetAVSampleFormatString(AVSampleFormat value)
+{
+#define UNPACK_VALUE(VALUE) case VALUE: return _T( #VALUE );
+	switch (value) {
+		UNPACK_VALUE(AV_SAMPLE_FMT_U8);
+		UNPACK_VALUE(AV_SAMPLE_FMT_S16);
+		UNPACK_VALUE(AV_SAMPLE_FMT_S32);
+		UNPACK_VALUE(AV_SAMPLE_FMT_FLT);
+		UNPACK_VALUE(AV_SAMPLE_FMT_DBL);
+	};
+#undef UNPACK_VALUE
+	return L"Error value";
+};
+
 HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 {
 	TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi()\n"));
@@ -1336,8 +1351,7 @@ HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 	bool bFormatChanged = !IsBitstream(m_pWaveFileFormat) && IsFormatChanged(m_pWaveFileFormat, m_pWaveFileFormatOutput);
 
 	if (bFormatChanged) {
-		TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - use Mixer\n"));
-		// prepare for resample
+		// prepare for resample ... if needed
 		WAVEFORMATEX* wfe = (WAVEFORMATEX*)m_pWaveFileFormat;
 		bool isfloat = false;
 		if (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfe->cbSize == (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX))) {
@@ -1405,7 +1419,6 @@ HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 	}
 
 	if (bFormatChanged) {
-		// Use mixer ...
 		BYTE* in_buff = NULL;
 		if (isInt24) {
 			in_buff = DNew BYTE[lSize / 3 * 4];
@@ -1414,55 +1427,99 @@ HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 			in_buff = &pMediaBuffer[0];
 		}
 
-		m_Resampler.Update(in_avsf, in_layout, out_layout, 0.0f, in_samplerate, out_samplerate);
-		int out_samples	= m_Resampler.CalcOutSamples(in_samples);
-		buff			= DNew float[out_samples * out_channels];
-		if (!buff) {
+		bool bUseMixer		= false;
+		int out_samples		= in_samples;
+		AVSampleFormat avsf	= in_avsf;
+
+		if (in_layout != out_layout || in_samplerate != out_samplerate) {
+			TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - use Mixer\n"));
+			TRACE(_T("	input:\n"));
+			TRACE(_T("		layout		= 0x%08x\n"), in_layout);
+			TRACE(_T("		channels	= %d\n"), in_channels);
+			TRACE(_T("		samplerate	= %d\n"), in_samplerate);
+			TRACE(_T("	output:\n"));
+			TRACE(_T("		layout		= 0x%08x\n"), out_layout);
+			TRACE(_T("		channels	= %d\n"), out_channels);
+			TRACE(_T("		samplerate	= %d\n"), out_samplerate);
+
+			m_Resampler.Update(in_avsf, in_layout, out_layout, 0.0f, in_samplerate, out_samplerate);
+			out_samples	= m_Resampler.CalcOutSamples(in_samples);
+			buff		= DNew float[out_samples * out_channels];
+			if (!buff) {
+				if (isInt24) {
+					SAFE_DELETE_ARRAY(in_buff);
+				}
+				return E_OUTOFMEMORY;
+			}
+			out_samples = m_Resampler.Mixing(buff, out_samples, in_buff, in_samples);
+
+			if (isInt24) {
+				isInt24 = false;
+				SAFE_DELETE_ARRAY(in_buff);
+			}
+
+			bUseMixer	= true;
+			avsf		= AV_SAMPLE_FMT_FLT;
+		} else {
+			buff = (float*)in_buff;
+		}
+
+		{
+			WAVEFORMATEX* wfeOutput				= (WAVEFORMATEX*)m_pWaveFileFormatOutput;
+			WAVEFORMATEXTENSIBLE* wfexOutput	= (WAVEFORMATEXTENSIBLE*)wfeOutput;
+
+			WORD tag	= wfeOutput->wFormatTag;
+			bool fPCM	= tag == WAVE_FORMAT_PCM || tag == WAVE_FORMAT_EXTENSIBLE && wfexOutput->SubFormat == KSDATAFORMAT_SUBTYPE_PCM;
+			bool fFloat	= tag == WAVE_FORMAT_IEEE_FLOAT || tag == WAVE_FORMAT_EXTENSIBLE && wfexOutput->SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
+
+			if (fPCM) {
+				if (wfeOutput->wBitsPerSample == 8) {
+					TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - unsupported convert from '%s' to 8bit PCM\n"), GetAVSampleFormatString(avsf));
+					;// TODO ...
+				} else if (wfeOutput->wBitsPerSample == 16) {
+					TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - convert from '%s' to 16bit PCM\n"), GetAVSampleFormatString(avsf));
+
+					lSize	= out_samples * out_channels * sizeof(int16_t);
+					out_buf	= DNew BYTE[lSize];
+					convert_to_int16(avsf, out_channels, out_samples, (BYTE*)buff, (int16_t*)out_buf);
+				} else if (wfeOutput->wBitsPerSample == 24) {
+					TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - convert from '%s' to 24bit PCM\n"), GetAVSampleFormatString(avsf));
+
+					lSize	= out_samples * out_channels * sizeof(BYTE) * 3;
+					out_buf	= DNew BYTE[lSize];
+					convert_to_int24(avsf, out_channels, out_samples, (BYTE*)buff, out_buf);
+				} else if (wfeOutput->wBitsPerSample == 32) {
+					TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - convert from '%s' to 32bit PCM\n"), GetAVSampleFormatString(avsf));
+
+					lSize	= out_samples * out_channels * sizeof(int32_t);
+					out_buf	= DNew BYTE[lSize];
+					convert_to_int32(avsf, out_channels, out_samples, (BYTE*)buff, (int32_t*)out_buf);
+				}
+			} else if (fFloat) {
+				if (wfeOutput->wBitsPerSample == 32) {
+					TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - convert from '%s' to 32bit FLOAT\n"), GetAVSampleFormatString(avsf));
+					
+					lSize	= out_samples * out_channels * sizeof(float);
+					out_buf	= DNew BYTE[lSize];
+					convert_to_float(avsf, out_channels, out_samples, (BYTE*)buff, (float*)out_buf);
+				} else if (wfeOutput->wBitsPerSample == 64) {
+					TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - unsupported convert from '%s' to 64bit FLOAT\n"), GetAVSampleFormatString(avsf));
+					;// TODO ...
+				}
+			}
+
 			if (isInt24) {
 				SAFE_DELETE_ARRAY(in_buff);
 			}
-			return E_OUTOFMEMORY;
-		}
-		out_samples = m_Resampler.Mixing(buff, out_samples, in_buff, in_samples);
 
-		if (isInt24) {
-			SAFE_DELETE_ARRAY(in_buff);
-		}
-
-		if (out_IsFloat) {
-			TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - output is float\n"));
-			out_buf = (BYTE*)buff;
-		} else {
-			switch (out_BitsPerSample) {
-				case 16: {
-						TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - convert from float to int16 PCM\n"));
-
-						lSize	= out_samples * out_channels * sizeof(int16_t);
-						out_buf	= DNew BYTE[lSize];
-						convert_to_int16(AV_SAMPLE_FMT_FLT, out_channels, out_samples, (BYTE*)buff, (int16_t*)out_buf);
-					}
-					break;
-				case 24: {
-						TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - convert from float to int24 PCM\n"));
-
-						lSize	= out_samples * out_channels * sizeof(BYTE) * 3;
-						out_buf	= DNew BYTE[lSize];
-						convert_to_int24(AV_SAMPLE_FMT_FLT, out_channels, out_samples, (BYTE*)buff, out_buf);
-					}
-					break;
-				case 32: {
-						TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - convert from float to int32 PCM\n"));
-						lSize	= out_samples * out_channels * sizeof(int32_t);
-						out_buf	= DNew BYTE[lSize];
-						convert_to_int32(AV_SAMPLE_FMT_FLT, out_channels, out_samples, (BYTE*)buff, (int32_t*)out_buf);
-					}
-					break;
-				default:
-					TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - invalid output int%d PCM\n"), out_BitsPerSample);
-					SAFE_DELETE_ARRAY(buff);
-					return E_INVALIDARG;
+			if (bUseMixer) {
+				SAFE_DELETE_ARRAY(buff);
 			}
-			SAFE_DELETE_ARRAY(buff);
+
+			if (!out_buf) {
+				return E_INVALIDARG;
+			}
+
 		}
 
 		pInputBufferPointer	= &out_buf[0];
