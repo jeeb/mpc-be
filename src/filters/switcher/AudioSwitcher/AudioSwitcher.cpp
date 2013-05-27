@@ -26,6 +26,7 @@
 #include "AudioSwitcher.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioTools.h"
+#include <math.h>
 
 #define NORMALIZATION_REGAIN_STEP      0.06 // +6%/s
 #define NORMALIZATION_REGAIN_THRESHOLD 0.75
