@@ -334,9 +334,21 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 	// hack for StreamBufferSource - we need override merit from registry.
 	if (ext == _T(".dvr-ms") || ext == _T(".wtv")) {
-		CFGFilter* pFGF = LookupFilterRegistry(CLSID_StreamBufferSource, m_override);
-		pFGF->SetMerit(MERIT64_PREFERRED);
-		fl.Insert(pFGF, 3);
+		BOOL bIsBlocked = FALSE;
+		POSITION pos = m_override.GetHeadPosition();
+		while (pos) {
+			CFGFilter* pFGF = m_override.GetNext(pos);
+			if (pFGF->GetCLSID() == CLSID_StreamBufferSource && pFGF->GetMerit() == MERIT64_DO_NOT_USE) {
+				bIsBlocked = TRUE;
+				break;
+			}
+		}
+
+		if (!bIsBlocked) {
+			CFGFilter* pFGF = LookupFilterRegistry(CLSID_StreamBufferSource, m_override);
+			pFGF->SetMerit(MERIT64_DO_USE);
+			fl.Insert(pFGF, 9);
+		}
 	}
 
 	// external
@@ -2308,7 +2320,9 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 			fo->iLoadType == FilterOverride::MERIT ? MERIT64(fo->dwMerit) :
 			MERIT64_DO_NOT_USE; // fo->iLoadType == FilterOverride::BLOCKED
 
-		merit += merit_low++;
+		if (merit != MERIT64_DO_NOT_USE) {
+			merit += merit_low++;
+		}
 
 		CFGFilter* pFGF = NULL;
 
@@ -2540,7 +2554,8 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 			m_transform.AddTail(pFGF);
 		} else if (SelAudioRenderer == AUDRNDT_MPC) {
 			pFGF = DNew CFGFilterInternal<CMpcAudioRenderer>(AUDRNDT_MPC, /*MERIT64_ABOVE_DSHOW+2*/m_armerit);
-			pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
+			pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_PCM);
+			pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_IEEE_FLOAT);
 			m_transform.AddTail(pFGF);
 		} else if (SelAudioRenderer.GetLength() > 0) {
 			pFGF = DNew CFGFilterRegistry(SelAudioRenderer, m_armerit);
