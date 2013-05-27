@@ -156,20 +156,25 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 			CComBSTR bstr;
 			if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
 				m_clip = bstr.m_str;
+				bstr.Empty();
 			}
 			if (SUCCEEDED(pAMMC->get_AuthorName(&bstr)) && bstr.Length()) {
 				m_author = bstr.m_str;
+				bstr.Empty();
 			}
 			if (SUCCEEDED(pAMMC->get_Copyright(&bstr)) && bstr.Length()) {
 				m_copyright = bstr.m_str;
+				bstr.Empty();
 			}
 			if (SUCCEEDED(pAMMC->get_Rating(&bstr)) && bstr.Length()) {
 				m_rating = bstr.m_str;
+				bstr.Empty();
 			}
 			if (SUCCEEDED(pAMMC->get_Description(&bstr)) && bstr.Length()) {
 				CString desc(bstr.m_str);
 				desc.Replace(_T(";"), _T("\r\n"));
 				m_desc.SetWindowText(desc);
+				bstr.Empty();
 			}
 		}
 	}

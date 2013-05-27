@@ -13319,36 +13319,36 @@ void CMainFrame::OpenSetupInfoBar()
 					if (bstr.Length()) {
 						fEmpty = false;
 					}
+					bstr.Empty();
 				}
-				bstr.Empty();
 				if (SUCCEEDED(pAMMC->get_AuthorName(&bstr))) {
 					m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_AUTHOR), bstr.m_str);
 					if (bstr.Length()) {
 						fEmpty = false;
 					}
+					bstr.Empty();
 				}
-				bstr.Empty();
 				if (SUCCEEDED(pAMMC->get_Copyright(&bstr))) {
 					m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_COPYRIGHT), bstr.m_str);
 					if (bstr.Length()) {
 						fEmpty = false;
 					}
+					bstr.Empty();
 				}
-				bstr.Empty();
 				if (SUCCEEDED(pAMMC->get_Rating(&bstr))) {
 					m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_RATING), bstr.m_str);
 					if (bstr.Length()) {
 						fEmpty = false;
 					}
+					bstr.Empty();
 				}
-				bstr.Empty();
 				if (SUCCEEDED(pAMMC->get_Description(&bstr))) {
 					m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_DESCRIPTION), bstr.m_str);
 					if (bstr.Length()) {
 						fEmpty = false;
 					}
+					bstr.Empty();
 				}
-				bstr.Empty();
 				if (!fEmpty) {
 					RecalcLayout();
 					break;
@@ -13505,6 +13505,7 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 					CComBSTR bstr;
 					if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
 						fn = CString(bstr.m_str);
+						bstr.Empty();
 						break;
 					}
 				}
@@ -19572,8 +19573,9 @@ CString CMainFrame::GetStrForTitle()
 					if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
 						CComBSTR bstr;
 						if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
-							return CString(bstr.m_str);
-							break;
+							CString title(bstr.m_str);
+							bstr.Empty();
+							return title;
 						}
 					}
 				}

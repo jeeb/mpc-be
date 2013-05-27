@@ -425,9 +425,8 @@ void CPlayerSeekBar::OnPaint()
 					for (DWORD idx = 0; idx < m_pChapterBag->ChapGetCount(); idx++) {
 						CRect r = GetChannelRect();
 						REFERENCE_TIME rt;
-						CComBSTR name;
 
-						if (FAILED(m_pChapterBag->ChapGet(idx, &rt, &name))) {
+						if (FAILED(m_pChapterBag->ChapGet(idx, &rt, NULL))) {
 							continue;
 						}
 
