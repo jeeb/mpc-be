@@ -24,7 +24,6 @@
 #include "stdafx.h"
 #include "VobSubImage.h"
 #include "RTS.h"
-#include <math.h>
 
 CVobSubImage::CVobSubImage()
 {

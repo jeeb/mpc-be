@@ -23,7 +23,6 @@
 
 #include "stdafx.h"
 #include "StreamSwitcher.h"
-
 #include "../../../DSUtil/DSUtil.h"
 
 #ifdef REGISTER_FILTER

@@ -22,7 +22,6 @@
  */
 
 #include "stdafx.h"
-#include <math.h>
 #include "CoordGeom.h"
 
 #define EPSILON (1e-7)

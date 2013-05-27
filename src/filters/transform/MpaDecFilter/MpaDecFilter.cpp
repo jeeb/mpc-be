@@ -22,7 +22,6 @@
  */
  
 #include "stdafx.h"
-#include <math.h>
 #include <atlbase.h>
 #include <MMReg.h>
 #include <Ks.h>
@@ -31,7 +30,6 @@
 
 #include "MpaDecFilter.h"
 #include "AudioHelper.h"
-
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioParser.h"
 

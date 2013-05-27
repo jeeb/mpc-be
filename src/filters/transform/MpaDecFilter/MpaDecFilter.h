@@ -23,9 +23,10 @@
 
 #pragma once
 
+#include <atlcoll.h>
+
 #define ENABLE_AC3_ENCODER 1
 
-#include <atlcoll.h>
 // TODO: remove this when it's fixed in MSVC
 // Work around warning C4005: 'XXXX' : macro redefinition
 #pragma warning(disable: 4005)

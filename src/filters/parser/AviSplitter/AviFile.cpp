@@ -23,7 +23,6 @@
 
 #include "stdafx.h"
 #include "AviFile.h"
-#include <math.h>
 
 //
 // CAviFile

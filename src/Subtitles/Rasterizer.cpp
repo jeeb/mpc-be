@@ -23,7 +23,6 @@
 
 #include "stdafx.h"
 #include <string.h>
-#include <math.h>
 #include <vector>
 #include <algorithm>
 #include <xmmintrin.h>

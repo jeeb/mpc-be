@@ -22,7 +22,6 @@
  */
 
 #include "stdafx.h"
-#include <math.h>
 #include <atlbase.h>
 #include <ks.h>
 #include <ksmedia.h>

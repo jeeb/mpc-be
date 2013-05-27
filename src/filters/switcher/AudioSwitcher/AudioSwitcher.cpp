@@ -22,8 +22,6 @@
  */
 
 #include "stdafx.h"
-
-#include <math.h>
 #include <MMReg.h>
 #include "AudioSwitcher.h"
 #include "../../../DSUtil/DSUtil.h"
