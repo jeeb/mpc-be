@@ -33,8 +33,11 @@ inline void ff_log(void* par, int level, const char *fmt, va_list valist)
 	if (level <= AV_LOG_VERBOSE) {
 		char Msg [500];
 		memset(Msg, 0, sizeof(Msg));
-		vsnprintf_s(Msg, sizeof(Msg), _TRUNCATE, fmt, valist);
-		TRACE(_T("FF_LOG : %ws"), CString(Msg));
+
+		CStringA fmtStr(fmt);
+		fmtStr.Replace("%td", "%ld");
+		vsnprintf_s(Msg, sizeof(Msg), _TRUNCATE, fmtStr, valist);
+		TRACE(_T("FF_LOG : %s"), CString(Msg));
 	}
 #endif
 }

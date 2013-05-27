@@ -332,6 +332,13 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 		}
 	}
 
+	// hack for StreamBufferSource - we need override merit from registry.
+	if (ext == _T(".dvr-ms") || ext == _T(".wtv")) {
+		CFGFilter* pFGF = LookupFilterRegistry(CLSID_StreamBufferSource, m_override);
+		pFGF->SetMerit(MERIT64_PREFERRED);
+		fl.Insert(pFGF, 3);
+	}
+
 	// external
 	{
 		if (hFile == INVALID_HANDLE_VALUE) {
@@ -448,8 +455,6 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 		CFGFilter* pFGF = LookupFilterRegistry(CLSID_AsyncReader, m_override, MERIT64_ABOVE_DSHOW - 1);
 		pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_NULL);
 		fl.Insert(pFGF, 3);
-	} else if (ext == _T(".dvr-ms") || ext == _T(".wtv")) {
-		fl.Insert(LookupFilterRegistry(CLSID_StreamBufferSource, m_override, MERIT64_PREFERRED), 9);
 	} else {
 		CFGFilter* pFGF = LookupFilterRegistry(CLSID_AsyncReader, m_override);
 		pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_NULL);
