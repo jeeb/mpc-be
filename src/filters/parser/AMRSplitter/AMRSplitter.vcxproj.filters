@@ -10,9 +10,6 @@
     <ClCompile Include="..\..\..\ExtLib\mfc\afxglobals.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="amr_file.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AMRSplitter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -26,9 +23,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="amr_file.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="AMRSplitter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
