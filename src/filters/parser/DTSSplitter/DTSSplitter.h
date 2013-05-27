@@ -23,9 +23,42 @@
 #pragma once
 
 #include "../BaseSplitter/BaseSplitter.h"
-#include "DTSSplitterFile.h"
 
 #define DTSSplitterName L"MPC DTS AudioCD Splitter"
+
+class CDTSSplitterFile : public CBaseSplitterFileEx
+{
+	CMediaType m_mt;
+
+	__int64 m_startpos, m_endpos;
+
+	int m_framesize;
+	int m_framelength;
+
+	REFERENCE_TIME m_rtDuration;
+	REFERENCE_TIME m_AvgTimePerFrame;
+
+	HRESULT Init();
+
+public:
+	CDTSSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr);
+
+	const CMediaType& GetMediaType() {
+		return m_mt;
+	}
+	REFERENCE_TIME GetDuration() {
+		return IsRandomAccess() ? m_rtDuration : 0;
+	}
+
+	__int64 GetStartPos() {
+		return m_startpos;
+	}
+	__int64 GetEndPos() {
+		return m_endpos;
+	}
+
+	bool GetInfo(int& FrameSize, REFERENCE_TIME& rtDuration);
+};
 
 class __declspec(uuid("316A424F-0B92-41BC-87F4-56BD5196B808"))
 	CDTSSplitterFilter : public CBaseSplitterFilter
@@ -51,5 +84,4 @@ public:
 	// CBaseFilter
 
 	STDMETHODIMP QueryFilterInfo(FILTER_INFO* pInfo);
-
 };

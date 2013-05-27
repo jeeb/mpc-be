@@ -219,7 +219,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="DTSSplitter.cpp" />
-    <ClCompile Include="DTSSplitterFile.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -229,7 +228,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DTSSplitter.h" />
-    <ClInclude Include="DTSSplitterFile.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>
