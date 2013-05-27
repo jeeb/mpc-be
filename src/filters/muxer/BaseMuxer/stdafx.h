@@ -34,7 +34,6 @@
 
 #include <afx.h>
 #include <afxwin.h>			// MFC core and standard components
-
 #include <atlbase.h>
 #include <atlcoll.h>
 

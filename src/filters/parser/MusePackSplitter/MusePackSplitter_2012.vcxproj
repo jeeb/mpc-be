@@ -225,7 +225,6 @@
     <ClCompile Include="..\..\..\ExtLib\mfc\winmdi.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="bits.cpp" />
     <ClCompile Include="mpc_file.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -236,7 +235,6 @@
     <None Include="MusePackSplitter.def" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bits.h" />
     <ClInclude Include="mpc_file.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
