@@ -329,6 +329,7 @@ CString CMediaTypeEx::GetAudioCodecName(const GUID& subtype, WORD wFormatTag)
 		names[WAVE_FORMAT_MEDIASONIC_G723]       = _T("MediaSonic G723");
 		names[WAVE_FORMAT_ZYXEL_ADPCM]           = _T("ZyXEL ADPCM");
 		names[WAVE_FORMAT_RAW_AAC1]              = _T("AAC"); // = WAVE_FORMAT_AAC
+		names[WAVE_FORMAT_AAC_ADTS]              = _T("AAC");
 		names[WAVE_FORMAT_RHETOREX_ADPCM]        = _T("Rhetorex ADPCM");
 		names[WAVE_FORMAT_VIVO_G723]             = _T("Vivo G723");
 		names[WAVE_FORMAT_VIVO_SIREN]            = _T("Vivo Siren");
