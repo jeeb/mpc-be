@@ -10,6 +10,9 @@
     <ClCompile Include="..\..\..\ExtLib\mfc\afxglobals.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="bits.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="mpc_file.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -21,6 +24,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="mpc_file.h">
       <Filter>Header Files</Filter>
     </ClInclude>

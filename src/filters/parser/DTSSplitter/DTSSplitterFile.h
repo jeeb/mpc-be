@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: DTSSplitterFile.h 1136 2012-09-14 05:13:52Z szl $
  *
  * Copyright (C) 2012 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
  *
@@ -23,33 +23,37 @@
 #pragma once
 
 #include "../BaseSplitter/BaseSplitter.h"
-#include "DTSSplitterFile.h"
 
-#define DTSSplitterName L"MPC DTS AudioCD Splitter"
-
-class __declspec(uuid("316A424F-0B92-41BC-87F4-56BD5196B808"))
-	CDTSSplitterFilter : public CBaseSplitterFilter
+class CDTSSplitterFile : public CBaseSplitterFileEx
 {
-	REFERENCE_TIME m_rtStart;
+	CMediaType m_mt;
 
-protected:
-	CAutoPtr<CDTSSplitterFile> m_pFile;
-	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
+	__int64 m_startpos, m_endpos;
 
-	STDMETHODIMP GetDuration(LONGLONG* pDuration);
+	int m_framesize;
+	int m_framelength;
 
-	bool DemuxInit();
-	void DemuxSeek(REFERENCE_TIME rt);
-	bool DemuxLoop();
+	REFERENCE_TIME m_rtDuration;
+	REFERENCE_TIME m_AvgTimePerFrame;
+
+	HRESULT Init();
 
 public:
-	CDTSSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr);
+	CDTSSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr);
 
-	DECLARE_IUNKNOWN
-	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
+	const CMediaType& GetMediaType() {
+		return m_mt;
+	}
+	REFERENCE_TIME GetDuration() {
+		return IsRandomAccess() ? m_rtDuration : 0;
+	}
 
-	// CBaseFilter
+	__int64 GetStartPos() {
+		return m_startpos;
+	}
+	__int64 GetEndPos() {
+		return m_endpos;
+	}
 
-	STDMETHODIMP QueryFilterInfo(FILTER_INFO* pInfo);
-
+	bool GetInfo(int& FrameSize, REFERENCE_TIME& rtDuration);
 };

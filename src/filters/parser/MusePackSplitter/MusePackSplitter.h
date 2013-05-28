@@ -23,7 +23,9 @@
 #pragma once
 
 #include "../../parser/BaseSplitter/BaseSplitter.h"
+
 #include "mpc_file.h"
+#include "bits.h"
 
 #define MusePackSplitterName	L"MPC MusePack Source"
 

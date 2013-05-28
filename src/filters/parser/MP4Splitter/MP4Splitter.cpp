@@ -33,6 +33,8 @@
 #include <moreuuids.h>
 #include <basestruct.h>
 
+#include <Bento4/Core/Ap4.h>
+#include <Bento4/Core/Ap4File.h>
 #include <Bento4/Core/Ap4StssAtom.h>
 #include <Bento4/Core/Ap4StsdAtom.h>
 #include <Bento4/Core/Ap4IsmaCryp.h>
@@ -105,127 +107,6 @@ STDAPI DllUnregisterServer()
 CFilterApp theApp;
 
 #endif
-
-AP4_AsyncReaderStream::AP4_AsyncReaderStream(CBaseSplitterFile* pFile)
-	: m_refs(1)
-	, m_pFile(pFile)
-{
-	ASSERT(pFile);
-}
-
-AP4_AsyncReaderStream::~AP4_AsyncReaderStream()
-{
-	ASSERT(m_refs == 0);
-}
-
-void AP4_AsyncReaderStream::AddReference()
-{
-	ASSERT(m_refs > 0);
-	++m_refs;
-}
-
-void AP4_AsyncReaderStream::Release()
-{
-	ASSERT(m_refs > 0);
-	if (--m_refs == 0) {
-		delete this;
-	}
-}
-
-AP4_Result AP4_AsyncReaderStream::Read(void* buffer, AP4_Size bytesToRead, AP4_Size* bytesRead)
-{
-	m_pFile->WaitAvailable(1500, bytesToRead);
-
-	__int64 bytesAvail = m_pFile->GetRemaining();
-
-	if (bytesAvail < (long long)bytesToRead) {
-		if (bytesRead) {
-			*bytesRead = bytesAvail;
-		}
-		bytesToRead = bytesAvail;
-	}
-
-	if (bytesAvail == 0) {
-		return AP4_ERROR_EOS;
-	}
-
-	if (FAILED(m_pFile->ByteRead((BYTE*)buffer, bytesToRead))) {
-		if (bytesRead) {
-			*bytesRead = 0;
-		}
-		return AP4_ERROR_READ_FAILED;
-	}
-
-	if (bytesRead) {
-		*bytesRead = bytesToRead;
-	}
-
-	return AP4_SUCCESS;
-}
-
-AP4_Result AP4_AsyncReaderStream::Write(const void* buffer, AP4_Size bytesToWrite, AP4_Size* bytesWritten)
-{
-	return AP4_ERROR_WRITE_FAILED;
-}
-
-AP4_Result AP4_AsyncReaderStream::Seek(AP4_Offset offset)
-{
-	m_pFile->Seek(offset);
-	return m_pFile->GetPos() == offset ? AP4_SUCCESS : AP4_FAILURE;
-}
-
-AP4_Result AP4_AsyncReaderStream::Tell(AP4_Offset& offset)
-{
-	offset = (AP4_Offset)m_pFile->GetPos();
-	return AP4_SUCCESS;
-}
-
-AP4_Result AP4_AsyncReaderStream::GetSize(AP4_Size& size)
-{
-	size = (AP4_Size)m_pFile->GetLength();
-	return AP4_SUCCESS;
-}
-
-CMP4SplitterFile::CMP4SplitterFile(IAsyncReader* pReader, HRESULT& hr)
-	: CBaseSplitterFileEx(pReader, hr, false, true, true)
-	, m_pAp4File(NULL)
-{
-	if (FAILED(hr)) {
-		return;
-	}
-
-	hr = Init();
-}
-
-CMP4SplitterFile::~CMP4SplitterFile()
-{
-	delete (AP4_File*)m_pAp4File;
-}
-
-void* CMP4SplitterFile::GetMovie()
-{
-	ASSERT(m_pAp4File);
-	return m_pAp4File ? ((AP4_File*)m_pAp4File)->GetMovie() : NULL;
-}
-
-HRESULT CMP4SplitterFile::Init()
-{
-	Seek(0);
-
-	WaitAvailable(2000, MEGABYTE/2);
-
-	delete (AP4_File*)m_pAp4File;
-
-	AP4_ByteStream* stream = DNew AP4_AsyncReaderStream(this);
-
-	m_pAp4File = DNew AP4_File(*stream);
-
-	AP4_Movie* movie = ((AP4_File*)m_pAp4File)->GetMovie();
-
-	stream->Release();
-
-	return movie ? S_OK : E_FAIL;
-}
 
 struct SSACharacter {
 	CString pre, post;

@@ -15,6 +15,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="OggFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="OggSplitter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -37,6 +40,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="OggFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="OggSplitter.h">
       <Filter>Header Files</Filter>
     </ClInclude>

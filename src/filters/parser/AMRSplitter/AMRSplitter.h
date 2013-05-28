@@ -22,69 +22,13 @@
 
 #pragma once
 
-#include "../../../DSUtil/DSUtil.h"
+#include "amr_file.h"
 
 #define AMRSplitterName	L"MPC AMR Splitter"
 
 // {24FA7933-FE18-46a9-914A-C2AA0DBACE93}
 static const GUID CLSID_AMRSplitter = 
 	{ 0x24fa7933, 0xfe18, 0x46a9, { 0x91, 0x4a, 0xc2, 0xaa, 0xd, 0xba, 0xce, 0x93 } };
-
-class CAMRReader;
-
-//-----------------------------------------------------------------------------
-//
-//	CAMRPacket
-//
-//-----------------------------------------------------------------------------
-
-class CAMRPacket
-{
-public:
-	int64		file_position;		// absolute file position (in bytes)
-	uint8		packet[64];			// we own this one
-	int32		packet_size;		// whole packet size
-	REFERENCE_TIME tStart, tStop;
-
-public:
-	CAMRPacket();
-	virtual ~CAMRPacket();
-
-	// loading packets
-	int Load(CAMRReader *reader);
-};
-
-//-----------------------------------------------------------------------------
-//
-//	CAMRFile class
-//
-//-----------------------------------------------------------------------------
-
-class CAMRFile
-{
-public:
-	int64			duration_10mhz;			// total file duration
-	int64			total_frames;			// total number of AMR frames
-
-	// internals
-	CAMRReader		*reader;				// file reader interface
-
-	// current position
-	int64			total_samples;
-	int64			current_sample;
-	CArray<int64>	seek_table;
-
-public:
-	CAMRFile();
-	virtual ~CAMRFile();
-
-	// I/O for AMR file
-	int Open(CAMRReader *reader);
-
-	// parsing out packets
-	int ReadAudioPacket(CAMRPacket *packet, int64 *cur_sample);
-	int Seek(int64 seek_sample);
-};
 
 class CAMRSplitter;
 
@@ -93,7 +37,6 @@ class CAMRSplitter;
 //	CAMRInputPin class
 //
 //-----------------------------------------------------------------------------
-
 class CAMRInputPin : public CBaseInputPin
 {
 public:
@@ -131,7 +74,6 @@ public:
 //	DataPacketAMR class
 //
 //-----------------------------------------------------------------------------
-
 class DataPacketAMR
 {
 public:
@@ -163,7 +105,6 @@ typedef CArray<CMediaType> CMediaTypes;
 //	CAMROutputPin class
 //
 //-----------------------------------------------------------------------------
-
 class CAMROutputPin : 
 	public CBaseOutputPin, 
 	public IMediaSeeking, 
@@ -285,7 +226,6 @@ public:
 //	CAMRSplitter class
 //
 //-----------------------------------------------------------------------------
-
 class __declspec(uuid("24FA7933-FE18-46a9-914A-C2AA0DBACE93"))
     CAMRSplitter : 
 	public CBaseFilter,

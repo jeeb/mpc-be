@@ -1,7 +1,8 @@
 /*
- * $Id$
+ * $Id: MP4SplitterFile.h 1775 2013-01-05 14:19:34Z szl $
  *
- * Copyright (C) 2012 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
+ * (C) 2003-2006 Gabest
+ * (C) 2006-2013 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,33 +24,16 @@
 #pragma once
 
 #include "../BaseSplitter/BaseSplitter.h"
-#include "DTSSplitterFile.h"
 
-#define DTSSplitterName L"MPC DTS AudioCD Splitter"
-
-class __declspec(uuid("316A424F-0B92-41BC-87F4-56BD5196B808"))
-	CDTSSplitterFilter : public CBaseSplitterFilter
+class CMP4SplitterFile : public CBaseSplitterFileEx
 {
-	REFERENCE_TIME m_rtStart;
+	void* m_pAp4File;
 
-protected:
-	CAutoPtr<CDTSSplitterFile> m_pFile;
-	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
-
-	STDMETHODIMP GetDuration(LONGLONG* pDuration);
-
-	bool DemuxInit();
-	void DemuxSeek(REFERENCE_TIME rt);
-	bool DemuxLoop();
+	HRESULT Init();
 
 public:
-	CDTSSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr);
+	CMP4SplitterFile(IAsyncReader* pReader, HRESULT& hr);
+	virtual ~CMP4SplitterFile();
 
-	DECLARE_IUNKNOWN
-	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
-
-	// CBaseFilter
-
-	STDMETHODIMP QueryFilterInfo(FILTER_INFO* pInfo);
-
+	void* GetMovie();
 };

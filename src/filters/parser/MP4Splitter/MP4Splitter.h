@@ -25,46 +25,11 @@
 
 #include <atlbase.h>
 #include <atlcoll.h>
+#include "MP4SplitterFile.h"
 #include "../BaseSplitter/BaseSplitter.h"
-
-#include <Bento4/Core/Ap4.h>
-#include <Bento4/Core/Ap4File.h>
-#include <Bento4/Core/Ap4ByteStream.h>
 
 #define MP4SplitterName L"MPC MP4/MOV Splitter"
 #define MP4SourceName   L"MPC MP4/MOV Source"
-
-class AP4_AsyncReaderStream : public AP4_ByteStream
-{
-	int m_refs;
-	CBaseSplitterFile* m_pFile;
-
-public:
-	AP4_AsyncReaderStream(CBaseSplitterFile* pFile);
-	virtual ~AP4_AsyncReaderStream();
-
-	void AddReference();
-	void Release();
-
-	AP4_Result Read(void* buffer, AP4_Size bytesToRead, AP4_Size* bytesRead);
-	AP4_Result Write(const void* buffer, AP4_Size bytesToWrite, AP4_Size* bytesWritten);
-	AP4_Result Seek(AP4_Offset offset);
-	AP4_Result Tell(AP4_Offset& offset);
-	AP4_Result GetSize(AP4_Size& size);
-};
-
-class CMP4SplitterFile : public CBaseSplitterFileEx
-{
-	void* m_pAp4File;
-
-	HRESULT Init();
-
-public:
-	CMP4SplitterFile(IAsyncReader* pReader, HRESULT& hr);
-	virtual ~CMP4SplitterFile();
-
-	void* GetMovie();
-};
 
 class __declspec(uuid("61F47056-E400-43d3-AF1E-AB7DFFD4C4AD"))
 	CMP4SplitterFilter : public CBaseSplitterFilter

@@ -209,6 +209,7 @@
     <ClCompile Include="..\..\..\ExtLib\mfc\winmdi.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="OggFile.cpp" />
     <ClCompile Include="OggSplitter.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -218,6 +219,7 @@
     <None Include="OggSplitter.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="OggFile.h" />
     <ClInclude Include="OggSplitter.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>

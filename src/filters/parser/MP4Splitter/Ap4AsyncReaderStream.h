@@ -1,7 +1,8 @@
 /*
- * $Id$
+ * $Id: Ap4AsyncReaderStream.h 1775 2013-01-05 14:19:34Z szl $
  *
- * Copyright (C) 2012 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
+ * (C) 2003-2006 Gabest
+ * (C) 2006-2013 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,33 +24,26 @@
 #pragma once
 
 #include "../BaseSplitter/BaseSplitter.h"
-#include "DTSSplitterFile.h"
 
-#define DTSSplitterName L"MPC DTS AudioCD Splitter"
+#include <Bento4/Core/Ap4.h>
+#include <Bento4/Core/Ap4File.h>
+#include <Bento4/Core/Ap4ByteStream.h>
 
-class __declspec(uuid("316A424F-0B92-41BC-87F4-56BD5196B808"))
-	CDTSSplitterFilter : public CBaseSplitterFilter
+class AP4_AsyncReaderStream : public AP4_ByteStream
 {
-	REFERENCE_TIME m_rtStart;
-
-protected:
-	CAutoPtr<CDTSSplitterFile> m_pFile;
-	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
-
-	STDMETHODIMP GetDuration(LONGLONG* pDuration);
-
-	bool DemuxInit();
-	void DemuxSeek(REFERENCE_TIME rt);
-	bool DemuxLoop();
+	int m_refs;
+	CBaseSplitterFile* m_pFile;
 
 public:
-	CDTSSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr);
+	AP4_AsyncReaderStream(CBaseSplitterFile* pFile);
+	virtual ~AP4_AsyncReaderStream();
 
-	DECLARE_IUNKNOWN
-	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
+	void AddReference();
+	void Release();
 
-	// CBaseFilter
-
-	STDMETHODIMP QueryFilterInfo(FILTER_INFO* pInfo);
-
+	AP4_Result Read(void* buffer, AP4_Size bytesToRead, AP4_Size* bytesRead);
+	AP4_Result Write(const void* buffer, AP4_Size bytesToWrite, AP4_Size* bytesWritten);
+	AP4_Result Seek(AP4_Offset offset);
+	AP4_Result Tell(AP4_Offset& offset);
+	AP4_Result GetSize(AP4_Size& size);
 };
