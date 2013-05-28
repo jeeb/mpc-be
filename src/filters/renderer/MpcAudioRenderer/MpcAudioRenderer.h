@@ -149,6 +149,8 @@ private:
 	HRESULT					StartAudioClient(IAudioClient **ppAudioClient);
 	HRESULT					StopAudioClient(IAudioClient **ppAudioClient);
 
+	HRESULT					RenderWasapiBuffer();
+
 	// WASAPI variables
 	int						m_useWASAPI;
 	int						m_useWASAPIAfterRestart;
@@ -161,7 +163,6 @@ private:
 	REFERENCE_TIME			hnsPeriod;
 	HANDLE					hTask;
 	CCritSec				m_csCheck;
-	UINT32					m_nBufferSize;
 	bool					isAudioClientStarted;
 	DWORD					lastBufferTime;
 	double					m_dVolume;
