@@ -361,7 +361,7 @@ CString PlayerYouTubePlaylist(CString fn, bool type)
 					out = tempData;
 					dataSize += dwBytesRead;
 
-					if (strstr(out, "id=\"player\"") || strstr(out, "id=\"footer\"")) {
+					if (/*strstr(out, "id=\"player\"") || */strstr(out, "id=\"footer\"")) {
 						break;
 					}
 				} while (dwBytesRead);
