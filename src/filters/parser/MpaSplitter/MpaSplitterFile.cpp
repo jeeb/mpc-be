@@ -374,21 +374,48 @@ HRESULT CMpaSplitterFile::Init()
 		}
 	}
 
-	int searchlen    = 0;
-	__int64 startpos = 0;
+	int searchlen		= 0;
+	__int64 startpos	= 0;
+	__int64 syncpos		= 0;
 
-	searchlen = (int)min(m_endpos - m_startpos, MP3_find ? (m_endpos - m_startpos) : 2048);
-	Seek(m_startpos);
+	__int64 startpos_mp3 = m_startpos;
+	while (m_mode == none) {
+		if (!MP3_find && GetPos() >= 2048) {
+			break;
+		}
+		searchlen = (int)min(m_endpos - startpos_mp3, 512);
+		Seek(startpos_mp3);
 
-	if (m_mode == none && Read(m_mpahdr, searchlen, true, &m_mt)) {
-		m_mode = mpa;
+		// If we fail to see sync bytes, we reposition here and search again
+		syncpos = startpos_mp3 + searchlen;
 
-		startpos = GetPos() - 4;
+		// Check for a valid MPA header
+		if (Read(m_mpahdr, searchlen, true, &m_mt)) {
+			m_mode = mpa;
 
-		// make sure the first frame is followed by another of the same kind (validates m_mpahdr basically)
-		Seek(startpos + m_mpahdr.FrameSize);
-		if (!Sync(4)) {
-			m_mode = none;
+			// check multiple frame to ensure that the data is correct
+			__int64 savepos = GetPos() - 4;
+			for (int i = 0; i < 5; i++) {
+				syncpos = GetPos();
+				startpos = i ? syncpos : (syncpos - 4);
+				Seek(startpos + m_mpahdr.FrameSize);
+				if (!Sync(4)) {
+					m_mode = none;
+					break;
+				}
+			}
+
+			if (m_mode == mpa) {
+				startpos = savepos;
+				break;
+			}
+		}
+
+		// If we have enough room to search for a valid header, then skip ahead and try again
+		if (m_endpos - syncpos >= 8) {
+			startpos_mp3 = syncpos;
+		} else {
+			break;
 		}
 	}
 
@@ -495,6 +522,8 @@ bool CMpaSplitterFile::Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limi
 
 					FrameSize = h.FrameSize;
 					rtDuration = h.rtDuration;
+
+					memcpy(&m_mpahdr, &h, sizeof(mpahdr));
 
 					return true;
 				}
