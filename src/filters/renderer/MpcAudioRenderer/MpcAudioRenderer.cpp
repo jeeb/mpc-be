@@ -42,6 +42,9 @@
 #define OPT_AudioDevice     _T("SoundDevice")
 // TODO: rename option values
 
+// set to 1 to enable more detail debug log
+#define DBGLOG_LEVEL 0
+
 #ifdef REGISTER_FILTER
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
@@ -136,7 +139,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_bMuteFastForward(false)
 	, nFramesInBuffer	(0)
 	, hnsPeriod			(0)
-	, hTask				(NULL)
+	, m_hTask			(NULL)
 	, isAudioClientStarted (false)
 	, lastBufferTime	(0)
 	, m_lVolume			(DSBVOLUME_MIN)
@@ -251,10 +254,6 @@ CMpcAudioRenderer::~CMpcAudioRenderer()
 
 	SAFE_DELETE_ARRAY(m_pWaveFileFormat);
 	SAFE_DELETE_ARRAY(m_pWaveFileFormatOutput);
-
-	if (hTask != NULL && pfAvRevertMmThreadCharacteristics != NULL) {
-		pfAvRevertMmThreadCharacteristics(hTask);
-	}
 }
 
 HRESULT CMpcAudioRenderer::CheckInputType(const CMediaType *pmt)
@@ -637,6 +636,8 @@ T clamp(double s, T smin, T smax)
 
 DWORD CMpcAudioRenderer::RenderThread()
 {
+	TRACE(L"CMpcAudioRenderer::RenderThread() - start, thread ID = 0x%x\n", m_nThreadId);
+
 	HRESULT hr = S_OK;
 
 	// These are wait handles for the thread stopping, new sample arrival and pausing redering
@@ -652,6 +653,8 @@ DWORD CMpcAudioRenderer::RenderThread()
 		m_hResumeEvent
 	};
 
+	EnableMMCSS();
+
 	while (true) {
 		// 1) Waiting for the next WASAPI buffer to be available to be filled
 		// 2) Exit requested for the thread
@@ -660,6 +663,7 @@ DWORD CMpcAudioRenderer::RenderThread()
 		switch (result) {
 			case WAIT_OBJECT_0:
 				TRACE(_T("CMpcAudioRenderer::RenderThread() - exit events\n"));
+				RevertMMCSS();
 				return 0;
 			case WAIT_OBJECT_0 + 1: 
 				{
@@ -672,6 +676,7 @@ DWORD CMpcAudioRenderer::RenderThread()
 					DWORD resultResume = WaitForMultipleObjects(2, resumeHandles, FALSE, INFINITE);
 					if (resultResume == WAIT_OBJECT_0) { // exit event
 						TRACE(_T("CMpcAudioRenderer::RenderThread() - exit events\n"));
+						RevertMMCSS();
 						return 0;
 					}
 
@@ -684,15 +689,23 @@ DWORD CMpcAudioRenderer::RenderThread()
 				break;
 			case WAIT_OBJECT_0 + 2:
 				{
+#if defined(_DEBUG) && DBGLOG_LEVEL > 0
 					TRACE(_T("CMpcAudioRenderer::RenderThread() - Data Event, Audio client state = %s\n"), isAudioClientStarted ? _T("Started") : _T("Stoped"));
+#endif
 					RenderWasapiBuffer();
 				}
 				break;
 			default:
+#if defined(_DEBUG) && DBGLOG_LEVEL > 0
 				TRACE(L"CMpcAudioRenderer::RenderThread() - WaitForMultipleObjects() failed: %d\n", GetLastError());
+#endif
 				break;
 		}
 	}
+
+	RevertMMCSS();
+
+	TRACE(L"CMpcAudioRenderer::RenderThread() - close, thread ID = 0x%x\n", m_nThreadId);
 
 	return 0;
 }
@@ -1107,19 +1120,6 @@ HRESULT CMpcAudioRenderer::InitCoopLevel()
 	ATLASSERT(hWnd != NULL);
 	if (!m_useWASAPI) {
 		hr = m_pDS->SetCooperativeLevel(hWnd, DSSCL_PRIORITY);
-	} else if (hTask == NULL) {
-		// Ask MMCSS to temporarily boost the thread priority
-		// to reduce glitches while the low-latency stream plays.
-		DWORD taskIndex = 0;
-
-		if (pfAvSetMmThreadCharacteristicsW) {
-			hTask = pfAvSetMmThreadCharacteristicsW(_T("Pro Audio"), &taskIndex);
-			TRACE(_T("CMpcAudioRenderer::InitCoopLevel() - Putting thread in higher priority for Wasapi mode (lowest latency)\n"));
-			hr = GetLastError();
-			if (hTask == NULL) {
-				return hr;
-			}
-		}
 	}
 
 	return hr;
@@ -1258,7 +1258,9 @@ const TCHAR *GetAVSampleFormatString(AVSampleFormat value)
 
 HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 {
+#if defined(_DEBUG) && DBGLOG_LEVEL > 0
 	TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi()\n"));
+#endif
 
 	HRESULT	hr					= S_OK;
 	BYTE *pMediaBuffer			= NULL;
@@ -1287,7 +1289,9 @@ HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 			hr = CheckAudioClient((WAVEFORMATEX*)mt.Format());
 		}
 		if (FAILED(hr)) {
+#if defined(_DEBUG) && DBGLOG_LEVEL > 0
 			TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - Error while checking audio client with input media type\n"));
+#endif
 			return hr;
 		}
 		DeleteMediaType(pmt);
@@ -1381,6 +1385,7 @@ HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 		AVSampleFormat avsf	= in_avsf;
 
 		if (in_layout != out_layout || in_samplerate != out_samplerate) {
+#if defined(_DEBUG) && DBGLOG_LEVEL > 0
 			TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - use Mixer\n"));
 			TRACE(_T("	input:\n"));
 			TRACE(_T("		layout		= 0x%08x\n"), in_layout);
@@ -1390,6 +1395,7 @@ HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 			TRACE(_T("		layout		= 0x%08x\n"), out_layout);
 			TRACE(_T("		channels	= %d\n"), out_channels);
 			TRACE(_T("		samplerate	= %d\n"), out_samplerate);
+#endif
 
 			m_Resampler.Update(in_avsf, in_layout, out_layout, 0.0f, in_samplerate, out_samplerate);
 			out_samples	= m_Resampler.CalcOutSamples(in_samples);
@@ -1423,36 +1429,44 @@ HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 
 			if (fPCM) {
 				if (wfeOutput->wBitsPerSample == 8) {
+#if defined(_DEBUG) && DBGLOG_LEVEL > 0
 					TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - unsupported convert from '%s' to 8bit PCM\n"), GetAVSampleFormatString(avsf));
+#endif
 					;// TODO ...
 				} else if (wfeOutput->wBitsPerSample == 16) {
-					TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - convert from '%s' to 16bit PCM\n"), GetAVSampleFormatString(avsf));
-
+#if defined(_DEBUG) && DBGLOG_LEVEL > 0
+					TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - convert from '%s' to 16bit PCM\n"), GetAVSampleFormatString(avsf))
+#endif
 					lSize	= out_samples * out_channels * sizeof(int16_t);
 					out_buf	= DNew BYTE[lSize];
 					convert_to_int16(avsf, out_channels, out_samples, (BYTE*)buff, (int16_t*)out_buf);
 				} else if (wfeOutput->wBitsPerSample == 24) {
+#if defined(_DEBUG) && DBGLOG_LEVEL > 0
 					TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - convert from '%s' to 24bit PCM\n"), GetAVSampleFormatString(avsf));
-
+#endif
 					lSize	= out_samples * out_channels * sizeof(BYTE) * 3;
 					out_buf	= DNew BYTE[lSize];
 					convert_to_int24(avsf, out_channels, out_samples, (BYTE*)buff, out_buf);
 				} else if (wfeOutput->wBitsPerSample == 32) {
+#if defined(_DEBUG) && DBGLOG_LEVEL > 0
 					TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - convert from '%s' to 32bit PCM\n"), GetAVSampleFormatString(avsf));
-
+#endif
 					lSize	= out_samples * out_channels * sizeof(int32_t);
 					out_buf	= DNew BYTE[lSize];
 					convert_to_int32(avsf, out_channels, out_samples, (BYTE*)buff, (int32_t*)out_buf);
 				}
 			} else if (fFloat) {
 				if (wfeOutput->wBitsPerSample == 32) {
+#if defined(_DEBUG) && DBGLOG_LEVEL > 0
 					TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - convert from '%s' to 32bit FLOAT\n"), GetAVSampleFormatString(avsf));
-					
+#endif					
 					lSize	= out_samples * out_channels * sizeof(float);
 					out_buf	= DNew BYTE[lSize];
 					convert_to_float(avsf, out_channels, out_samples, (BYTE*)buff, (float*)out_buf);
 				} else if (wfeOutput->wBitsPerSample == 64) {
+#if defined(_DEBUG) && DBGLOG_LEVEL > 0
 					TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - unsupported convert from '%s' to 64bit FLOAT\n"), GetAVSampleFormatString(avsf));
+#endif
 					;// TODO ...
 				}
 			}
@@ -1890,17 +1904,22 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 	BYTE* pData = NULL;
 	hr = m_pRenderClient->GetBuffer(numFramesAvailable, &pData);
 	if (FAILED(hr)) {
+#if defined(_DEBUG) && DBGLOG_LEVEL > 0
 		TRACE(_T("CMpcAudioRenderer::RenderWasapiBuffer() - GetBuffer failed with size %ld : (error %lx)\n"), numFramesAvailable, hr);
+#endif
 		return hr;
 	}
 
 	DWORD bufferFlags = 0;
 	if (nAvailableBytes > m_WasapiBuf.GetCount()) {
+#if defined(_DEBUG) && DBGLOG_LEVEL > 0
 		TRACE(_T("CMpcAudioRenderer::RenderWasapiBuffer() - Data Event, not enough data, requested: %u[%u], available: %u\n"), nAvailableBytes, numFramesAvailable, m_WasapiBuf.GetCount());
+#endif
 		bufferFlags = AUDCLNT_BUFFERFLAGS_SILENT;
 	} else {
+#if defined(_DEBUG) && DBGLOG_LEVEL > 0
 		TRACE(_T("CMpcAudioRenderer::RenderWasapiBuffer() - Data Event, requested: %u[%u], available: %u\n"), nAvailableBytes, numFramesAvailable, m_WasapiBuf.GetCount());
-
+#endif
 		BYTE* const base = m_WasapiBuf.GetData();
 		BYTE* const end = base + m_WasapiBuf.GetCount();
 		BYTE* p = base;
@@ -1947,7 +1966,9 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 				
 	hr = m_pRenderClient->ReleaseBuffer(numFramesAvailable, bufferFlags);
 	if (FAILED(hr)) {
+#if defined(_DEBUG) && DBGLOG_LEVEL > 0
 		TRACE(_T("CMpcAudioRenderer::RenderWasapiBuffer() - ReleaseBuffer failed with size %ld (error %lx)\n"), numFramesAvailable, hr);
+#endif
 		return hr;
 	}
 
@@ -2151,4 +2172,39 @@ HRESULT CMpcAudioRenderer::CreateAudioClient(IMMDevice *pMMDevice, IAudioClient 
 		TRACE(_T("CMpcAudioRenderer::CreateAudioClient() - success\n"));
 	}
 	return hr;
+}
+
+HRESULT CMpcAudioRenderer::EnableMMCSS()
+{
+	HRESULT hr = S_OK;
+
+	if (m_hTask == NULL) {
+		// Ask MMCSS to temporarily boost the thread priority
+		// to reduce glitches while the low-latency stream plays.
+		DWORD taskIndex = 0;
+
+		if (pfAvSetMmThreadCharacteristicsW) {
+			m_hTask = pfAvSetMmThreadCharacteristicsW(_T("Pro Audio"), &taskIndex);
+			TRACE(L"CMpcAudioRenderer::EnableMMCSS - Putting thread 0x%x in higher priority for Wasapi mode (lowest latency)\n", ::GetCurrentThreadId());
+			if (m_hTask == NULL) {
+				return HRESULT_FROM_WIN32(GetLastError());
+			}
+		}
+	}
+	return S_OK;
+}
+
+HRESULT CMpcAudioRenderer::RevertMMCSS()
+{
+	HRESULT hr = S_OK;
+
+	if (m_hTask != NULL && pfAvRevertMmThreadCharacteristics != NULL) {
+		if (pfAvRevertMmThreadCharacteristics(m_hTask)) {
+			return hr; 
+		} else {
+			return HRESULT_FROM_WIN32(GetLastError());
+		}
+	}
+
+	return S_FALSE;
 }

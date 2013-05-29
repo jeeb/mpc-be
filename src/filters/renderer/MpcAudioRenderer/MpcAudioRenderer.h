@@ -162,18 +162,21 @@ private:
 	IAudioRenderClient		*m_pRenderClient;
 	UINT32					nFramesInBuffer;
 	REFERENCE_TIME			hnsPeriod;
-	HANDLE					hTask;
+	HANDLE					m_hTask;
 	CCritSec				m_csCheck;
 	bool					isAudioClientStarted;
 	DWORD					lastBufferTime;
 	double					m_dVolume;
 
 	// AVRT.dll (Vista or greater
-	typedef HANDLE	(__stdcall *PTR_AvSetMmThreadCharacteristicsW)(LPCWSTR TaskName, LPDWORD TaskIndex);
-	typedef BOOL	(__stdcall *PTR_AvRevertMmThreadCharacteristics)(HANDLE AvrtHandle);
+	typedef HANDLE							(__stdcall *PTR_AvSetMmThreadCharacteristicsW)(LPCWSTR TaskName, LPDWORD TaskIndex);
+	typedef BOOL							(__stdcall *PTR_AvRevertMmThreadCharacteristics)(HANDLE AvrtHandle);
 
 	PTR_AvSetMmThreadCharacteristicsW		pfAvSetMmThreadCharacteristicsW;
 	PTR_AvRevertMmThreadCharacteristics		pfAvRevertMmThreadCharacteristics;
+	
+	HRESULT					EnableMMCSS();
+	HRESULT					RevertMMCSS();
 
 	// Rendering thread
 	static DWORD WINAPI		RenderThreadEntryPoint(LPVOID lpParameter);
