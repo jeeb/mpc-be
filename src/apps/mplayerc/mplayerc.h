@@ -36,6 +36,7 @@
 #include <vmr9.h>
 #include <dxva2api.h> //#include <evr9.h>
 #include "Version.h"
+#include "WinDebugMonitor.h"
 
 #define DEF_LOGO IDF_LOGO1
 
@@ -182,3 +183,42 @@ public:
 #define AfxGetMyApp() static_cast<CMPlayerCApp*>(AfxGetApp())
 #define AfxGetAppSettings() static_cast<CMPlayerCApp*>(AfxGetApp())->m_s
 #define AppSettings CAppSettings
+
+class CDebugMonitor : public CWinDebugMonitor
+{
+	FILE* m_File;
+
+public:
+	CDebugMonitor(DWORD dwProcessId) : CWinDebugMonitor(dwProcessId) {
+		m_File = NULL;
+		if (bIsInitialize) {
+			m_File = _tfopen(_T("mpc-be_debug.log"), _T("at, ccs=UTF-8"));
+			if (m_File) {
+				fseek(m_File, 0, 2);
+
+				time_t now(time(0));
+				CTime ct(now);
+				_ftprintf_s(m_File, _T("=== Start MPC-BE Debug log [%s] ===\n"), ct.Format(L"%Y.%m.%d %H:%M:%S"));
+			}
+		}
+	}
+
+	~CDebugMonitor() {
+		if (m_File) {
+			time_t now(time(0));
+			CTime ct(now);
+			_ftprintf_s(m_File, _T("=== End MPC-BE Debug log [%s] ===\n"), ct.Format(L"%Y.%m.%d %H:%M:%S"));
+
+			fclose(m_File);
+		}
+	}
+
+	virtual void OutputWinDebugString(const char *str) {
+		if (m_File) {
+			time_t now(time(0));
+			CTime ct(now);
+			_ftprintf_s(m_File, _T("%s:	%s"), ct.Format(L"%Y.%m.%d %H:%M:%S"), CString(str));
+		}
+	};
+};
+

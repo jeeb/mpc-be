@@ -691,7 +691,8 @@ CMainFrame::CMainFrame() :
 	m_hDWMAPI(0),
 	m_hWtsLib(0),
 	m_CaptureWndBitmap(NULL),
-	m_ThumbCashedBitmap(NULL)
+	m_ThumbCashedBitmap(NULL),
+	m_DebugMonitor(::GetCurrentProcessId())
 {
 	m_Lcd.SetVolumeRange(0, 100);
 	m_LastSaveTime.QuadPart = 0;

@@ -270,6 +270,7 @@
     <ClCompile Include="VMROSD.cpp" />
     <ClCompile Include="WebClient.cpp" />
     <ClCompile Include="WebServer.cpp" />
+    <ClCompile Include="WinDebugMonitor.cpp" />
     <ClCompile Include="WinHotkeyCtrl.cpp" />
     <ClCompile Include="..\..\ExtLib\stb_image\stb_image.cpp" />
   </ItemGroup>
@@ -387,6 +388,7 @@
     <ClInclude Include="VMROSD.h" />
     <ClInclude Include="WebClient.h" />
     <ClInclude Include="WebServer.h" />
+    <ClInclude Include="WinDebugMonitor.h" />
     <ClInclude Include="WinHotkeyCtrl.h" />
   </ItemGroup>
   <ItemGroup>
