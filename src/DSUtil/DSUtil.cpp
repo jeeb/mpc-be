@@ -3095,7 +3095,7 @@ void CreateMPEG2VIfromAVC(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_TIME
 		}
 	}
 
-	mt->subtype = FOURCCMap(mvih->hdr.bmiHeader.biCompression/* = '1CVA'*/);
+	mt->subtype = FOURCCMap(mvih->hdr.bmiHeader.biCompression);
 	mt->SetSampleSize(pbmi->biWidth * pbmi-> biHeight * 4);
 }
 

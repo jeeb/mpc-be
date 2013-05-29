@@ -302,6 +302,8 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				size_t extralen	= s->strf.GetCount() - sizeof(BITMAPINFOHEADER);
 				BYTE* extra		= s->strf.GetData() + (s->strf.GetCount() - extralen);
 
+				pbmi->biCompression = '1CVA';
+
 				CSize aspect(pbmi->biWidth, pbmi->biHeight);
 				ReduceDim(aspect);
 				CreateMPEG2VIfromAVC(&mt, pbmi, AvgTimePerFrame, aspect, extra, extralen); 
