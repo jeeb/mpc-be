@@ -59,6 +59,7 @@ const AMOVIESETUP_FILTER sudFilter[] = {
 CFactoryTemplate g_Templates[] = {
 	{sudFilter[0].strName, &__uuidof(CMpcAudioRenderer), CreateInstance<CMpcAudioRenderer>, NULL, &sudFilter[0]},
 	{L"CMpcAudioRendererPropertyPage", &__uuidof(CMpcAudioRendererSettingsWnd), CreateInstance<CInternalPropertyPageTempl<CMpcAudioRendererSettingsWnd> >},
+	{L"CMpcAudioRendererPropertyPageStatus", &__uuidof(CMpcAudioRendererStatusWnd), CreateInstance<CInternalPropertyPageTempl<CMpcAudioRendererStatusWnd> >},
 };
 
 int g_cTemplates = _countof(g_Templates);
@@ -848,10 +849,16 @@ STDMETHODIMP CMpcAudioRenderer::GetPages(CAUUID* pPages)
 {
 	CheckPointer(pPages, E_POINTER);
 
-	pPages->cElems		= 1;
+	BOOL bShowStatusPage	= m_pInputPin && m_pInputPin->IsConnected();
 
-	pPages->pElems		= (GUID*)CoTaskMemAlloc(sizeof(GUID) * pPages->cElems);
-	pPages->pElems[0]	= __uuidof(CMpcAudioRendererSettingsWnd);
+	pPages->cElems			= bShowStatusPage ? 2 : 1;
+	pPages->pElems			= (GUID*)CoTaskMemAlloc(sizeof(GUID) * pPages->cElems);
+	CheckPointer(pPages->pElems, E_OUTOFMEMORY);
+
+	pPages->pElems[0]		= __uuidof(CMpcAudioRendererSettingsWnd);
+	if (bShowStatusPage) {
+		pPages->pElems[1]	= __uuidof(CMpcAudioRendererStatusWnd);
+	}
 
 	return S_OK;
 }
@@ -868,6 +875,8 @@ STDMETHODIMP CMpcAudioRenderer::CreatePage(const GUID& guid, IPropertyPage** ppP
 
 	if (guid == __uuidof(CMpcAudioRendererSettingsWnd)) {
 		(*ppPage = DNew CInternalPropertyPageTempl<CMpcAudioRendererSettingsWnd>(NULL, &hr))->AddRef();
+	} else if (guid == __uuidof(CMpcAudioRendererStatusWnd)) {
+		(*ppPage = DNew CInternalPropertyPageTempl<CMpcAudioRendererStatusWnd>(NULL, &hr))->AddRef();
 	}
 
 	return *ppPage ? S_OK : E_FAIL;
@@ -949,6 +958,16 @@ STDMETHODIMP_(UINT) CMpcAudioRenderer::GetMode()
 	}
 
 	return MODE_NONE;
+}
+
+STDMETHODIMP CMpcAudioRenderer::GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX** ppWfxOut)
+{
+	CAutoLock cAutoLock(&m_csProps);
+
+	*ppWfxIn	= m_pWaveFileFormat;
+	*ppWfxOut	= m_pWaveFileFormatOutput;
+
+	return S_OK;
 }
 
 HRESULT CMpcAudioRenderer::GetReferenceClockInterface(REFIID riid, void **ppv)

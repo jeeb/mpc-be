@@ -1341,7 +1341,7 @@ STRING IDS_APP_DESCRIPTION		"Uno tra i più potenti e configurabili lettori mult
 STRING IDS_ARS_MUTE_FAST_FORWARD		"Muto nell'avanti veloce"
 STRING IDS_ARS_SOUND_DEVICE		"Dispositivo audio:"
 STRING IDS_ARS_WASAPI_MODE		"Usa WASAPI (richiede riavvio riproduzione)"
-STRING IDS_ARS_WASAPI_MODE_STATUS		"Stato:"
+STRING IDS_ARS_WASAPI_MODE_STATUS		"Status"
 STRING IDS_ARS_WASAPI_MODE_STATUS_1		"Non in funzione"
 STRING IDS_ARS_WASAPI_MODE_STATUS_2		"usa WASAPI, modalità esclusiva"
 STRING IDS_ARS_WASAPI_MODE_STATUS_3		"usa WASAPI, modalità condivisa"

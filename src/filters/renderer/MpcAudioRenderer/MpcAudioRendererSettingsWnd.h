@@ -41,8 +41,6 @@ private :
 	CStatic   m_txtSoundDevice;
 	CComboBox m_cbSoundDevice;
 
-	CStatic   m_txtModeText;
-
 	enum {
 		IDC_PP_WASAPI_MODE = 10000,
 		IDC_PP_MUTE_FAST_FORWARD,
@@ -53,7 +51,6 @@ private :
 public:
 	CMpcAudioRendererSettingsWnd(void);
 
-
 	bool OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks);
 	void OnDisconnect();
 	bool OnActivate();
@@ -63,7 +60,48 @@ public:
 	HRESULT GetAvailableAudioDevices();
 
 	static LPCTSTR GetWindowTitle() { return MAKEINTRESOURCE(IDS_FILTER_SETTINGS_CAPTION); }
-	static CSize GetWindowSize() { return CSize(340, 160); }
+	static CSize GetWindowSize() { return CSize(340, 135); }
+
+	DECLARE_MESSAGE_MAP()
+};
+
+class __declspec(uuid("E3D0704B-1579-4E9E-8674-2674CB90D07A"))
+	CMpcAudioRendererStatusWnd : public CInternalPropertyPageWnd
+{
+private :
+	CComQIPtr<IMpcAudioRendererFilter> m_pMAR;
+
+	CButton		m_gInput;
+	CButton		m_gOutput;
+
+	CStatic		m_InputFormatLabel;
+	CStatic		m_InputFormatText;
+	CStatic		m_OutputFormatLabel;
+	CStatic		m_OutputFormatText;
+
+	CStatic		m_InputChannelLabel;
+	CStatic		m_InputChannelText;
+	CStatic		m_OutputChannelLabel;
+	CStatic		m_OutputChannelText;
+
+	CStatic		m_InputRateLabel;
+	CStatic		m_InputRateText;
+	CStatic		m_OutputRateLabel;
+	CStatic		m_OutputRateText;
+
+	CStatic		m_txtModeText;
+
+public:
+	CMpcAudioRendererStatusWnd(void);
+
+
+	bool OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks);
+	void OnDisconnect();
+	bool OnActivate();
+	void OnDeactivate();
+
+	static LPCTSTR GetWindowTitle() { return MAKEINTRESOURCE(IDS_ARS_WASAPI_MODE_STATUS); }
+	static CSize GetWindowSize() { return CSize(340, 135); }
 
 	DECLARE_MESSAGE_MAP()
 };

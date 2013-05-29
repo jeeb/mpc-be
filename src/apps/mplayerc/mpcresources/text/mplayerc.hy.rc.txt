@@ -1341,7 +1341,7 @@ STRING IDS_APP_DESCRIPTION		"Ամենահզոր և բազմաֆունկցիոն�
 STRING IDS_ARS_MUTE_FAST_FORWARD		"Անձայն՝ առաջ տալիս"
 STRING IDS_ARS_SOUND_DEVICE		"Ձայնի սարքը."
 STRING IDS_ARS_WASAPI_MODE		"Օգտագործել WASAPI (վերամեկնարկել վերարտադրումը)"
-STRING IDS_ARS_WASAPI_MODE_STATUS		"Status:"
+STRING IDS_ARS_WASAPI_MODE_STATUS		"Status"
 STRING IDS_ARS_WASAPI_MODE_STATUS_1		"Not running"
 STRING IDS_ARS_WASAPI_MODE_STATUS_2		"use WASAPI, Exclusive mode"
 STRING IDS_ARS_WASAPI_MODE_STATUS_3		"use WASAPI, Shared mode"

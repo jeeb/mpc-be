@@ -1340,7 +1340,7 @@ STRING IDS_APP_DESCRIPTION		"W pełni konfigurowalny odtwarzacz multimedialny st
 STRING IDS_ARS_MUTE_FAST_FORWARD		"Wycisz podczas przewijania"
 STRING IDS_ARS_SOUND_DEVICE		"Urządzenie dźwiękowe:"
 STRING IDS_ARS_WASAPI_MODE		"Użyj WASAPI (reset odtwarzania)"
-STRING IDS_ARS_WASAPI_MODE_STATUS		"Status:"
+STRING IDS_ARS_WASAPI_MODE_STATUS		"Status"
 STRING IDS_ARS_WASAPI_MODE_STATUS_1		"Not running"
 STRING IDS_ARS_WASAPI_MODE_STATUS_2		"use WASAPI, Exclusive mode"
 STRING IDS_ARS_WASAPI_MODE_STATUS_3		"use WASAPI, Shared mode"

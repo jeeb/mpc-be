@@ -42,4 +42,5 @@ public IUnknown {
 	STDMETHOD(SetSoundDevice(CString nValue)) = 0;
 	STDMETHOD_(CString, GetSoundDevice()) = 0;
 	STDMETHOD_(UINT, GetMode()) = 0;
+	STDMETHOD(GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX** ppWfxOut)) = 0;
 };

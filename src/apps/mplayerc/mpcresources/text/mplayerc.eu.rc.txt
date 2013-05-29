@@ -1341,7 +1341,7 @@ STRING IDS_APP_DESCRIPTION		"Windows sistema eragilerako multimedia irakurgailu 
 STRING IDS_ARS_MUTE_FAST_FORWARD		"Mututu aurrera azkarrean"
 STRING IDS_ARS_SOUND_DEVICE		"Soinu Gailua:"
 STRING IDS_ARS_WASAPI_MODE		"Erabili WASAPI (Berrabiarazi irakurketa)"
-STRING IDS_ARS_WASAPI_MODE_STATUS		"Status:"
+STRING IDS_ARS_WASAPI_MODE_STATUS		"Status"
 STRING IDS_ARS_WASAPI_MODE_STATUS_1		"Not running"
 STRING IDS_ARS_WASAPI_MODE_STATUS_2		"use WASAPI, Exclusive mode"
 STRING IDS_ARS_WASAPI_MODE_STATUS_3		"use WASAPI, Shared mode"

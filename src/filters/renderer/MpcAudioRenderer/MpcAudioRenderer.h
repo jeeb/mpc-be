@@ -107,6 +107,7 @@ public:
 	STDMETHODIMP				SetSoundDevice(CString nValue);
 	STDMETHODIMP_(CString)		GetSoundDevice();
 	STDMETHODIMP_(UINT)			GetMode();
+	STDMETHODIMP				GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX** ppWfxOut);
 
 	// CMpcAudioRenderer
 private:
