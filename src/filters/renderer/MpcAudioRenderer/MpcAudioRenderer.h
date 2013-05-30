@@ -70,9 +70,6 @@ public:
 
 	HRESULT EndOfStream(void);
 
-	virtual HRESULT			BeginFlush();
-	virtual HRESULT			EndFlush();
-
 	DECLARE_IUNKNOWN
 
 	STDMETHODIMP				NonDelegatingQueryInterface(REFIID riid, void **ppv);
@@ -145,7 +142,7 @@ private:
 	bool					CheckFormatChanged(WAVEFORMATEX *pWaveFormatEx, WAVEFORMATEX **ppNewWaveFormatEx);
 	bool					CopyWaveFormat(WAVEFORMATEX *pSrcWaveFormatEx, WAVEFORMATEX **ppDestWaveFormatEx);
 
-	bool					IsBitstream(WAVEFORMATEX *pWaveFormatEx);
+	BOOL					IsBitstream(WAVEFORMATEX *pWaveFormatEx);
 
 	HRESULT					StartAudioClient(IAudioClient **ppAudioClient);
 	HRESULT					StopAudioClient(IAudioClient **ppAudioClient);
@@ -153,6 +150,8 @@ private:
 	HRESULT					RenderWasapiBuffer();
 
 	// WASAPI variables
+	HMODULE					m_hModule;
+	HANDLE					m_hTask;
 	int						m_useWASAPI;
 	int						m_useWASAPIAfterRestart;
 	bool					m_bMuteFastForward;
@@ -162,11 +161,11 @@ private:
 	IAudioRenderClient		*m_pRenderClient;
 	UINT32					nFramesInBuffer;
 	REFERENCE_TIME			hnsPeriod;
-	HANDLE					m_hTask;
 	CCritSec				m_csCheck;
 	bool					isAudioClientStarted;
 	DWORD					lastBufferTime;
 	double					m_dVolume;
+	BOOL					m_bIsBitstream;
 
 	// AVRT.dll (Vista or greater
 	typedef HANDLE							(__stdcall *PTR_AvSetMmThreadCharacteristicsW)(LPCWSTR TaskName, LPDWORD TaskIndex);
