@@ -936,7 +936,7 @@ REFERENCE_TIME CMPCVideoDecFilter::GetDuration()
 		}
 	}
 
-	return AvgTimePerFrame;
+	return max(AvgTimePerFrame, m_rtAvrTimePerFrame);
 }
 
 #define AVRTIMEPERFRAME_PULLDOWN 417083
