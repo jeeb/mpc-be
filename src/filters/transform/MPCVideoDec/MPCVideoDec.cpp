@@ -658,6 +658,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 
 #ifdef REGISTER_FILTER
 
+#include "../../filters/ffmpeg_fix.cpp"
+
 const AMOVIESETUP_PIN sudpPins[] = {
 	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn),  sudPinTypesIn},
 	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut), sudPinTypesOut}

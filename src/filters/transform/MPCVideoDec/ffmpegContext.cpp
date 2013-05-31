@@ -47,15 +47,7 @@ extern "C" {
 	#include <ffmpeg/libavcodec/h264data.h>
 	#include <ffmpeg/libavcodec/vc1.h>
 	#include <ffmpeg/libavcodec/mpeg12.h>
-
-	// Hack to use MinGW64 from 2.x branch
-	void __mingw_raise_matherr(int typ, const char *name, double a1, double a2, double rslt) {}
-	void __mingw_get_msvcrt_handle() {}
 }
-
-#ifdef REGISTER_FILTER
-	void *__imp_time64 = _time64;
-#endif
 
 static const DWORD PCID_NVIDIA_VP5 [] = {
 	// http://us.download.nvidia.com/XFree86/Linux-x86_64/313.26/README/supportedchips.html

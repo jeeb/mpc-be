@@ -35,10 +35,7 @@
 
 #ifdef REGISTER_FILTER
 	#include <InitGuid.h>
-	void* __imp_time64 = _time64;
-extern "C" {
-	void __mingw_get_msvcrt_handle() {}
-}
+	#include "../../filters/ffmpeg_fix.cpp"
 #endif
 
 #include <moreuuids.h>

@@ -47,8 +47,11 @@
 
 #ifdef REGISTER_FILTER
 
+#include "../../filters/ffmpeg_fix.cpp"
+
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
-	{&GUID_NULL},
+	{&MEDIATYPE_Audio, &MEDIASUBTYPE_PCM},
+	{&MEDIATYPE_Audio, &MEDIASUBTYPE_IEEE_FLOAT}
 };
 
 const AMOVIESETUP_PIN sudpPins[] = {
@@ -56,7 +59,7 @@ const AMOVIESETUP_PIN sudpPins[] = {
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
-	{&__uuidof(CMpcAudioRenderer), MpcAudioRendererName, 0x40000001, _countof(sudpPins), sudpPins, CLSID_AudioRendererCategory},
+	{&__uuidof(CMpcAudioRenderer), MpcAudioRendererName, /*0x40000001*/MERIT_UNLIKELY + 1, _countof(sudpPins), sudpPins, CLSID_AudioRendererCategory},
 };
 
 CFactoryTemplate g_Templates[] = {
@@ -83,7 +86,7 @@ CFilterApp theApp;
 
 #endif
 
-static GUID lpSoundGUID = DSDEVID_DefaultPlayback;
+static GUID lpSoundGUID = {0xdef00000, 0x9c6d, 0x47ed, {0xaa, 0xf1, 0x4d, 0xda, 0x8f, 0x2b, 0x5c, 0x03}}; //DSDEVID_DefaultPlayback from dsound.h
 
 bool CALLBACK DSEnumProc2(LPGUID lpGUID,
 						  LPCTSTR lpszDesc,
