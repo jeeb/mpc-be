@@ -667,6 +667,11 @@
 #define IDS_FAVFILES                    14190
 #define IDS_FAVDVDS                     14191
 #define IDS_SHADERS_SELECT_SCREENSPACE  14193
+#define IDS_STATSBAR_SYNC_OFFSET        14194
+#define IDS_STATSBAR_SYNC_OFFSET_FORMAT 14195
+#define IDS_STATSBAR_JITTER             14196
+#define IDS_STATSBAR_BITRATE            14197
+#define IDS_STATSBAR_BITRATE_AVG_CUR    14198
 #define IDD_TUNER_SCAN                  20002
 #define IDS_AG_RESET_STATS              20005
 #define IDD_NAVIGATION_DLG              20005
