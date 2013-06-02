@@ -242,7 +242,7 @@ BEGIN
     CONTROL         "Limit window proportions on resize",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,171,160,8
     GROUPBOX        "History",IDC_STATIC,124,5,167,125
     CONTROL         "Remember last Pan-n-Scan Zoom",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,77,156,8
-    CONTROL         "Remember last playlist",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,89,87,10
+    CONTROL         "Remember last playlist",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,89,156,8
 END
 
 IDD_PPAGEDVD DIALOGEX 0, 0, 296, 241
@@ -865,7 +865,7 @@ IDD_PPAGEWEBSERVER DIALOGEX 0, 0, 296, 241
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "Listen on port:",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,7,85,8
+    CONTROL         "Listen on port:",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,7,95,8
     EDITTEXT        IDC_EDIT1,100,5,30,13,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "Launch in web browser...",IDC_STATIC1,150,26,120,8
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,22,284,1
@@ -2788,8 +2788,6 @@ BEGIN
     IDS_MPEG2_CONTRAST      "Contrast"
     IDS_MPEG2_HUE           "Hue"
     IDS_MPEG2_SATURATION    "Saturation"
-    IDS_MPEG2_NOTE2 
-                            "can degrade performance. ""Auto"" deinterlacer will switch to ""Blend"" when necessary."
     IDS_ADD_TO_PLAYLIST     "Add to MPC-BE Playlist"
     IDS_OPEN_WITH_MPC       "Play with MPC-BE"
     IDS_CANNOT_CHANGE_FORMAT 
@@ -2992,8 +2990,7 @@ BEGIN
     IDS_MPEG2_DEINTERLACING "Deinterlacing"
     IDS_MPEG2_BRIGHTNESS    "Brightness"
     IDS_MPEG2_RESET         "Reset"
-    IDS_MPEG2_NOTE1 
-                            "Note: Using a non-planar output format, bob deinterlacer, or adjusting color properies "
+    IDS_MPEG2_NOTE1         "Note: Using a non-planar output format, bob deinterlacer, or adjusting color properies can degrade performance. ""Auto"" deinterlacer will switch to ""Blend"" when necessary."
 END
 
 STRINGTABLE

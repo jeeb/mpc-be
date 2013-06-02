@@ -167,7 +167,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 	// === New swscaler options
 	p = CPoint(IPP_SCALE(360), 10);
-	int width_s  = IPP_SCALE(88);
+	int width_s  = IPP_SCALE(90);
 
 	// Software output formats
 	static wchar_t *SwOutputFormatNames[] = { _T("NV12 (default)"), _T("YV12"), _T("YUY2"), _T("RGB32"), _T("RGB16"), _T("RGB15") };
