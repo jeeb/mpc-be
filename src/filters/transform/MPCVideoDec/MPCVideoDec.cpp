@@ -54,6 +54,22 @@ extern "C" {
 }
 #pragma warning(default: 4005)
 
+// options names
+#define OPT_REGKEY_VideoDec  _T("Software\\MPC-BE Filters\\MPC Video Decoder")
+#define OPT_SECTION_VideoDec _T("Filters\\MPC Video Decoder")
+#define OPT_ThreadNumber     _T("ThreadNumber")
+#define OPT_DiscardMode      _T("DiscardMode")
+#define OPT_Deinterlacing    _T("Deinterlacing")
+#define OPT_ARMode           _T("ARMode")
+#define OPT_DXVACheck        _T("DXVACheckCompatibility")
+#define OPT_DisableDXVA_SD   _T("DisableDXVA_SD")
+#define OPT_SwOutputFormats  _T("SwOutputFormats")
+#define OPT_SwChromaToRGB    _T("SwChromaToRGB")
+#define OPT_SwResizeMethodBE _T("SwResizeMethodBE")
+#define OPT_SwColorspace     _T("SwColorspace")
+#define OPT_SwInputLevels    _T("SwInputLevels")
+#define OPT_SwOutputLevels   _T("SwOutputLevels")
+
 #define MAX_SUPPORTED_MODE 5
 
 typedef struct {
@@ -805,66 +821,66 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_rtStartCache			= INVALID_TIME;
 #ifdef REGISTER_FILTER
 	CRegKey key;
-	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\MPC-BE Filters\\MPC Video Decoder"), KEY_READ)) {
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, OPT_REGKEY_VideoDec, KEY_READ)) {
 		DWORD dw;
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("ThreadNumber"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_ThreadNumber, dw)) {
 			m_nThreadNumber = dw;
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("DiscardMode"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_DiscardMode, dw)) {
 			m_nDiscardMode = dw;
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("Deinterlacing"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_Deinterlacing, dw)) {
 			m_nDeinterlacing = (MPC_DEINTERLACING_FLAGS)dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("ActiveCodecs"), dw)) {
 			m_nActiveCodecs = dw;
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("ARMode"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_ARMode, dw)) {
 			m_nARMode = dw;
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("DXVACheckCompatibility"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_DXVACheck, dw)) {
 			m_nDXVACheckCompatibility = dw;
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("DisableDXVA_SD"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_DisableDXVA_SD, dw)) {
 			m_nDXVA_SD = dw;
 		}
 
 		// === New swscaler options
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("SwOutputFormats"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SwOutputFormats, dw)) {
 			m_nSwOutputFormats = dw;
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("SwChromaToRGB"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SwChromaToRGB, dw)) {
 			m_nSwChromaToRGB = dw;
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("SwResizeMethodBE"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SwResizeMethodBE, dw)) {
 			m_nSwResizeMethodBE = dw;
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("SwColorspace"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SwColorspace, dw)) {
 			m_nSwColorspace = dw;
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("SwInputLevels"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SwInputLevels, dw)) {
 			m_nSwInputLevels = dw;
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("SwOutputLevels"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SwOutputLevels, dw)) {
 			m_nSwOutputLevels = dw;
 		}
 		//
 	}
 #else
-	m_nThreadNumber				= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("ThreadNumber"), m_nThreadNumber);
-	m_nDiscardMode				= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("DiscardMode"), m_nDiscardMode);
-	m_nDeinterlacing			= (MPC_DEINTERLACING_FLAGS)AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("Deinterlacing"), m_nDeinterlacing);
-	m_nARMode					= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("ARMode"), m_nARMode);
-	m_nDXVACheckCompatibility	= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("DXVACheckCompatibility"), m_nDXVACheckCompatibility);
-	m_nDXVA_SD					= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("DisableDXVA_SD"), m_nDXVA_SD);
+	m_nThreadNumber				= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_ThreadNumber, m_nThreadNumber);
+	m_nDiscardMode				= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_DiscardMode, m_nDiscardMode);
+	m_nDeinterlacing			= (MPC_DEINTERLACING_FLAGS)AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_Deinterlacing, m_nDeinterlacing);
+	m_nARMode					= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_ARMode, m_nARMode);
+	m_nDXVACheckCompatibility	= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_DXVACheck, m_nDXVACheckCompatibility);
+	m_nDXVA_SD					= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_DisableDXVA_SD, m_nDXVA_SD);
 
 	// === New swscaler options
-	m_nSwOutputFormats			= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("SwOutputFormats"), m_nSwOutputFormats);
-	m_nSwChromaToRGB			= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("SwChromaToRGB"), m_nSwChromaToRGB);
-	m_nSwResizeMethodBE			= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("SwResizeMethodBE"), m_nSwResizeMethodBE);
-	m_nSwColorspace				= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("SwColorspace"), m_nSwColorspace);
-	m_nSwInputLevels			= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("SwInputLevels"), m_nSwInputLevels);
-	m_nSwOutputLevels			= AfxGetApp()->GetProfileInt(_T("Filters\\MPC Video Decoder"), _T("SwOutputLevels"), m_nSwOutputLevels);
+	m_nSwOutputFormats			= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwOutputFormats, m_nSwOutputFormats);
+	m_nSwChromaToRGB			= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwChromaToRGB, m_nSwChromaToRGB);
+	m_nSwResizeMethodBE			= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwResizeMethodBE, m_nSwResizeMethodBE);
+	m_nSwColorspace				= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwColorspace, m_nSwColorspace);
+	m_nSwInputLevels			= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwInputLevels, m_nSwInputLevels);
+	m_nSwOutputLevels			= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwOutputLevels, m_nSwOutputLevels);
 	//
 #endif
 
@@ -3020,46 +3036,46 @@ STDMETHODIMP CMPCVideoDecFilter::Apply()
 {
 #ifdef REGISTER_FILTER
 	CRegKey key;
-	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, _T("Software\\MPC-BE Filters\\MPC Video Decoder"))) {
-		key.SetDWORDValue(_T("ThreadNumber"), m_nThreadNumber);
-		key.SetDWORDValue(_T("DiscardMode"), m_nDiscardMode);
-		key.SetDWORDValue(_T("Deinterlacing"), (int)m_nDeinterlacing);
+	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_VideoDec)) {
+		key.SetDWORDValue(OPT_ThreadNumber, m_nThreadNumber);
+		key.SetDWORDValue(OPT_DiscardMode, m_nDiscardMode);
+		key.SetDWORDValue(OPT_Deinterlacing, (int)m_nDeinterlacing);
 		key.SetDWORDValue(_T("ActiveCodecs"), m_nActiveCodecs);
-		key.SetDWORDValue(_T("ARMode"), m_nARMode);
-		key.SetDWORDValue(_T("DXVACheckCompatibility"), m_nDXVACheckCompatibility);
-		key.SetDWORDValue(_T("DisableDXVA_SD"), m_nDXVA_SD);
+		key.SetDWORDValue(OPT_ARMode, m_nARMode);
+		key.SetDWORDValue(OPT_DXVACheck, m_nDXVACheckCompatibility);
+		key.SetDWORDValue(OPT_DisableDXVA_SD, m_nDXVA_SD);
 
 		// === New swscaler options
 		if (m_nSwRefresh > 0) {
-			key.SetDWORDValue(_T("SwChromaToRGB"), m_nSwChromaToRGB);
-			key.SetDWORDValue(_T("SwResizeMethodBE"), m_nSwResizeMethodBE);
-			key.SetDWORDValue(_T("SwColorspace"), m_nSwColorspace);
-			key.SetDWORDValue(_T("SwInputLevels"), m_nSwInputLevels);
-			key.SetDWORDValue(_T("SwOutputLevels"), m_nSwOutputLevels);
+			key.SetDWORDValue(OPT_SwChromaToRGB, m_nSwChromaToRGB);
+			key.SetDWORDValue(OPT_SwResizeMethodBE, m_nSwResizeMethodBE);
+			key.SetDWORDValue(OPT_SwColorspace, m_nSwColorspace);
+			key.SetDWORDValue(OPT_SwInputLevels, m_nSwInputLevels);
+			key.SetDWORDValue(OPT_SwOutputLevels, m_nSwOutputLevels);
 		}
 		if (m_nSwRefresh > 1) {
-			key.SetDWORDValue(_T("SwOutputFormats"), m_nSwOutputFormats);
+			key.SetDWORDValue(OPT_SwOutputFormats, m_nSwOutputFormats);
 		}
 		//
 	}
 #else
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Video Decoder"), _T("ThreadNumber"), m_nThreadNumber);
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Video Decoder"), _T("DiscardMode"), m_nDiscardMode);
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Video Decoder"), _T("Deinterlacing"), (int)m_nDeinterlacing);
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Video Decoder"), _T("ARMode"), m_nARMode);
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Video Decoder"), _T("DXVACheckCompatibility"), m_nDXVACheckCompatibility);
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Video Decoder"), _T("DisableDXVA_SD"), m_nDXVA_SD);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_ThreadNumber, m_nThreadNumber);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_DiscardMode, m_nDiscardMode);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_Deinterlacing, (int)m_nDeinterlacing);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_ARMode, m_nARMode);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_DXVACheck, m_nDXVACheckCompatibility);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_DisableDXVA_SD, m_nDXVA_SD);
 
 	// === New swscaler options
 	if (m_nSwRefresh > 0) {
-		AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Video Decoder"), _T("SwChromaToRGB"), m_nSwChromaToRGB);
-		AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Video Decoder"), _T("SwResizeMethodBE"), m_nSwResizeMethodBE);
-		AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Video Decoder"), _T("SwColorspace"), m_nSwColorspace);
-		AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Video Decoder"), _T("SwInputLevels"), m_nSwInputLevels);
-		AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Video Decoder"), _T("SwOutputLevels"), m_nSwOutputLevels);
+		AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwChromaToRGB, m_nSwChromaToRGB);
+		AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwResizeMethodBE, m_nSwResizeMethodBE);
+		AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwColorspace, m_nSwColorspace);
+		AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwInputLevels, m_nSwInputLevels);
+		AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwOutputLevels, m_nSwOutputLevels);
 	}
 	if (m_nSwRefresh > 1) {
-		AfxGetApp()->WriteProfileInt(_T("Filters\\MPC Video Decoder"), _T("SwOutputFormats"), m_nSwOutputFormats);
+		AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwOutputFormats, m_nSwOutputFormats);
 	}
 	//
 #endif
