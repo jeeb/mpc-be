@@ -155,7 +155,7 @@ private:
 	int						m_useWASAPI;
 	int						m_useWASAPIAfterRestart;
 	bool					m_bMuteFastForward;
-	CString					m_csSound_Device;
+	CString					m_DeviceName;
 	IMMDevice				*pMMDevice;
 	IAudioClient			*m_pAudioClient;
 	IAudioRenderClient		*m_pRenderClient;

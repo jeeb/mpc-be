@@ -179,13 +179,13 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		len = _countof(buff);
 		memset(buff, 0, sizeof(buff));
 		if (ERROR_SUCCESS == key.QueryStringValue(OPT_AudioDevice, buff, &len)) {
-			m_csSound_Device = CString(buff);
+			m_DeviceName = CString(buff);
 		}
 	}
 #else
 	m_useWASAPI			= AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_DeviceMode, m_useWASAPI);
 	m_bMuteFastForward	= !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_MuteFastForward, m_bMuteFastForward);
-	m_csSound_Device	= AfxGetApp()->GetProfileString(OPT_SECTION_AudRend, OPT_AudioDevice, m_csSound_Device);
+	m_DeviceName		= AfxGetApp()->GetProfileString(OPT_SECTION_AudRend, OPT_AudioDevice, m_DeviceName);
 #endif
 
 	m_useWASAPI				= min(max(m_useWASAPI, 0), 2);
@@ -201,7 +201,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	}
 
 	if (!m_useWASAPI) {
-		DirectSoundEnumerate((LPDSENUMCALLBACK)DSEnumProc2, (VOID*)&m_csSound_Device);
+		DirectSoundEnumerate((LPDSENUMCALLBACK)DSEnumProc2, (VOID*)&m_DeviceName);
 		m_pSoundTouch = DNew soundtouch::SoundTouch();
 		*phr = DirectSoundCreate8 (&lpSoundGUID, &m_pDS, NULL);
 	}
@@ -570,7 +570,7 @@ HRESULT CMpcAudioRenderer::StopRendererThread()
 HRESULT CMpcAudioRenderer::StartRendererThread()
 {
 	if (!m_hRenderThread) {
-		m_hRenderThread = ::CreateThread(NULL, 0, RenderThreadEntryPoint, (LPVOID)this, /*CREATE_SUSPENDED*/0, &m_nThreadId);
+		m_hRenderThread = ::CreateThread(NULL, 0, RenderThreadEntryPoint, (LPVOID)this, 0, &m_nThreadId);
 
 		if (m_hRenderThread) {
 			SetThreadPriority(m_hRenderThread, /*THREAD_PRIORITY_HIGHEST*/THREAD_PRIORITY_TIME_CRITICAL);
@@ -888,12 +888,12 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_AudRend)) {
 		key.SetDWORDValue(OPT_DeviceMode, m_useWASAPIAfterRestart);
 		key.SetDWORDValue(OPT_MuteFastForward, m_bMuteFastForward);
-		key.SetStringValue(OPT_AudioDevice, m_csSound_Device);
+		key.SetStringValue(OPT_AudioDevice, m_DeviceName);
 	}
 #else
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_DeviceMode, m_useWASAPIAfterRestart);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_MuteFastForward, m_bMuteFastForward);
-	AfxGetApp()->WriteProfileString(OPT_SECTION_AudRend, OPT_AudioDevice, m_csSound_Device);
+	AfxGetApp()->WriteProfileString(OPT_SECTION_AudRend, OPT_AudioDevice, m_DeviceName);
 #endif
 
 	return S_OK;
@@ -926,13 +926,13 @@ STDMETHODIMP_(BOOL) CMpcAudioRenderer::GetMuteFastForward()
 STDMETHODIMP CMpcAudioRenderer::SetSoundDevice(CString nValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
-	m_csSound_Device = nValue;
+	m_DeviceName = nValue;
 	return S_OK;
 }
 STDMETHODIMP_(CString) CMpcAudioRenderer::GetSoundDevice()
 {
 	CAutoLock cAutoLock(&m_csProps);
-	return m_csSound_Device;
+	return m_DeviceName;
 }
 
 STDMETHODIMP_(UINT) CMpcAudioRenderer::GetMode()
@@ -1678,7 +1678,7 @@ HRESULT CMpcAudioRenderer::GetAudioDevice(IMMDevice **ppMMDevice)
 		return hr;
 	}
 
-	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetAudioDevice() - Target end point: '%s'", m_csSound_Device));
+	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetAudioDevice() - Target end point: '%s'", m_DeviceName));
 
 	if (GetAvailableAudioDevices(&devices) == S_OK && devices) {
 		UINT count(0);
@@ -1701,7 +1701,7 @@ HRESULT CMpcAudioRenderer::GetAudioDevice(IMMDevice **ppMMDevice)
 						PropVariantInit(&varName);
 
 						// Found the configured audio endpoint
-						if ((pProps->GetValue(PKEY_Device_FriendlyName, &varName) == S_OK) && (m_csSound_Device == varName.pwszVal)) {
+						if ((pProps->GetValue(PKEY_Device_FriendlyName, &varName) == S_OK) && (m_DeviceName == varName.pwszVal)) {
 							DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetAudioDevice() - devices->GetId OK, num: (%d), pwszVal: '%s', pwszID: '%s'", i, varName.pwszVal, pwszID));
 							enumerator->GetDevice(pwszID, ppMMDevice);
 							SAFE_RELEASE(devices);

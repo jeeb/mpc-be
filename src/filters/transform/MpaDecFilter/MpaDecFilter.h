@@ -99,6 +99,8 @@ protected:
 
 	CFFAudioDecoder m_FFAudioDec;
 
+	BOOL			m_bIsBitstreamOutputSupported;
+
 #if ENABLE_AC3_ENCODER
 	CAC3Encoder m_AC3Enc;
 	CAtlArray<float> m_encbuff;
