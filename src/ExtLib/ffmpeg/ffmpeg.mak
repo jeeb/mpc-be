@@ -284,6 +284,7 @@ SRCS_C = \
 	libavcodec/tscc.c \
 	libavcodec/tscc2.c \
 	libavcodec/tta.c \
+	libavcodec/ttadata.c \
 	libavcodec/utvideo.c \
 	libavcodec/utvideodec.c \
 	libavcodec/utils.c \

@@ -1008,6 +1008,17 @@ enum AVPacketSideDataType {
      * by data.
      */
     AV_PKT_DATA_MATROSKA_BLOCKADDITIONAL,
+
+    /**
+     * The optional first identifier line of a WebVTT cue.
+     */
+    AV_PKT_DATA_WEBVTT_IDENTIFIER,
+
+    /**
+     * The optional settings (rendering instructions) that immediately
+     * follow the timestamp specifier of a WebVTT cue.
+     */
+    AV_PKT_DATA_WEBVTT_SETTINGS,
 };
 
 /**
@@ -2810,7 +2821,7 @@ typedef struct AVCodecContext {
      * Code outside libavcodec should access this field using:
      * av_codec_{get,set}_pkt_timebase(avctx)
      * - encoding unused.
-     * - decodimg set by user
+     * - decoding set by user.
      */
     AVRational pkt_timebase;
 
