@@ -59,6 +59,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (FLASHSV2, flashsv2);
     REGISTER_DECODER (FLV, flv);
     REGISTER_DECODER (FRAPS, fraps);
+    REGISTER_DECODER(G2M, g2m);
     REGISTER_DECODER (H263, h263);
     REGISTER_DECODER (H264, h264);
     REGISTER_DECODER (INDEO3, indeo3);

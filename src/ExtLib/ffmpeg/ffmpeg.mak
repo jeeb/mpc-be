@@ -154,6 +154,7 @@ SRCS_C = \
 	libavcodec/fmtconvert.c \
 	libavcodec/frame_thread_encoder.c \
 	libavcodec/fraps.c \
+	libavcodec/g2meet.c \
 	libavcodec/golomb.c \
 	libavcodec/h263.c \
 	libavcodec/h263_parser.c \

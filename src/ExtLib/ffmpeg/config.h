@@ -486,6 +486,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_FLASHSV2_DECODER 0
 #define CONFIG_FLV_DECODER 1
 #define CONFIG_FRAPS_DECODER 1
+#define CONFIG_G2M_DECODER 1
 #define CONFIG_H261_DECODER 0
 #define CONFIG_H263_DECODER 1
 #define CONFIG_H263I_DECODER 1
