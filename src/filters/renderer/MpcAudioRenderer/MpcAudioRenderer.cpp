@@ -34,7 +34,7 @@
 #include "AudioHelper.h"
 #include "MpcAudioRenderer.h"
 
-// options names
+// option names
 #define OPT_REGKEY_AudRend  _T("Software\\MPC-BE Filters\\MPC Audio Renderer")
 #define OPT_SECTION_AudRend _T("Filters\\MPC Audio Renderer")
 #define OPT_DeviceMode      _T("UseWasapi")

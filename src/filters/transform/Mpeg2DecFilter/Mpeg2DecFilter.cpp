@@ -42,7 +42,7 @@
 #include <moreuuids.h>
 #include <IFilterVersion.h>
 
-// options names
+// option names
 #define OPT_REGKEY_MPEGDec  _T("Software\\MPC-BE Filters\\MPEG Video Decoder")
 #define OPT_SECTION_MPEGDec _T("Filters\\MPEG Video Decoder")
 #define OPT_DeintMethod     _T("DeinterlaceMethod")

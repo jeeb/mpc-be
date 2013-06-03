@@ -44,7 +44,7 @@
 
 #include <ffmpeg/libavcodec/avcodec.h>
 
-// options names
+// option names
 #define OPT_REGKEY_MpaDec   _T("Software\\MPC-BE Filters\\MPEG Audio Decoder")
 #define OPT_SECTION_MpaDec  _T("Filters\\MPEG Audio Decoder")
 #define OPTION_SFormat_i16  _T("SampleFormat_int16")

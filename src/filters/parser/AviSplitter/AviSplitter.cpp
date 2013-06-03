@@ -26,6 +26,7 @@
 #include "AviFile.h"
 #include "AviSplitter.h"
 
+// option names
 #define OPT_REGKEY_AVISplit  _T("Software\\MPC-BE Filters\\AVI Splitter")
 #define OPT_SECTION_AVISplit _T("Filters\\AVI Splitter")
 //#define OPT_BadInterleaved   _T("BadInterleavedSuport")

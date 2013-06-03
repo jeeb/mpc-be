@@ -54,7 +54,7 @@ extern "C" {
 }
 #pragma warning(default: 4005)
 
-// options names
+// option names
 #define OPT_REGKEY_VideoDec  _T("Software\\MPC-BE Filters\\MPC Video Decoder")
 #define OPT_SECTION_VideoDec _T("Filters\\MPC Video Decoder")
 #define OPT_ThreadNumber     _T("ThreadNumber")
