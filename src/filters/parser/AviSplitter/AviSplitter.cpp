@@ -26,6 +26,11 @@
 #include "AviFile.h"
 #include "AviSplitter.h"
 
+#define OPT_REGKEY_AVISplit  _T("Software\\MPC-BE Filters\\AVI Splitter")
+#define OPT_SECTION_AVISplit _T("Filters\\AVI Splitter")
+//#define OPT_BadInterleaved   _T("BadInterleavedSuport")
+#define OPT_NeededReindex    _T("NeededReindex")
+
 #ifdef REGISTER_FILTER
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
@@ -94,20 +99,20 @@ CAviSplitterFilter::CAviSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 #ifdef REGISTER_FILTER
 	CRegKey key;
 
-	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\MPC-BE Filters\\AVI Splitter"), KEY_READ)) {
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, OPT_REGKEY_AVISplit, KEY_READ)) {
 		DWORD dw;
 
-		//if (ERROR_SUCCESS == key.QueryDWORDValue(_T("BadInterleavedSuport"), dw)) {
+		//if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_BadInterleaved, dw)) {
 		//	m_bBadInterleavedSuport = !!dw;
 		//}
 
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("NeededReindex"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_NeededReindex, dw)) {
 			m_bSetReindex = !!dw;
 		}
 	}
 #else
-	//m_bBadInterleavedSuport	= !!AfxGetApp()->GetProfileInt(_T("Filters\\AVI Splitter"), _T("BadInterleavedSuport"), m_bBadInterleavedSuport);
-	m_bSetReindex			= !!AfxGetApp()->GetProfileInt(_T("Filters\\AVI Splitter"), _T("NeededReindex"), m_bSetReindex);
+	//m_bBadInterleavedSuport	= !!AfxGetApp()->GetProfileInt(OPT_SECTION_AVISplit, OPT_BadInterleaved, m_bBadInterleavedSuport);
+	m_bSetReindex			= !!AfxGetApp()->GetProfileInt(OPT_SECTION_AVISplit, OPT_NeededReindex, m_bSetReindex);
 #endif
 }
 
@@ -953,13 +958,13 @@ STDMETHODIMP CAviSplitterFilter::Apply()
 {
 #ifdef REGISTER_FILTER
 	CRegKey key;
-	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, _T("Software\\MPC-BE Filters\\AVI Splitter"))) {
-		//key.SetDWORDValue(_T("BadInterleavedSuport"), m_bBadInterleavedSuport);
-		key.SetDWORDValue(_T("NeededReindex"), m_bSetReindex);
+	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_AVISplit)) {
+		//key.SetDWORDValue(OPT_BadInterleaved, m_bBadInterleavedSuport);
+		key.SetDWORDValue(OPT_NeededReindex, m_bSetReindex);
 	}
 #else
-	//AfxGetApp()->WriteProfileInt(_T("Filters\\AVI Splitter"), _T("BadInterleavedSuport"), m_bBadInterleavedSuport);
-	AfxGetApp()->WriteProfileInt(_T("Filters\\AVI Splitter"), _T("NeededReindex"), m_bSetReindex);
+	//AfxGetApp()->WriteProfileInt(OPT_SECTION_AVISplit, OPT_BadInterleaved, m_bBadInterleavedSuport);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_AVISplit, OPT_NeededReindex, m_bSetReindex);
 #endif
 	return S_OK;
 }
