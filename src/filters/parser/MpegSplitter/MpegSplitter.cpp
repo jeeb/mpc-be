@@ -36,6 +36,18 @@
 #include "../../../apps/mplayerc/SettingsDefines.h"
 #include "../../reader/VTSReader/VTSReader.h"
 
+// option names
+#define OPT_REGKEY_MPEGSplit  _T("Software\\MPC-BE Filters\\MPEG Splitter")
+#define OPT_SECTION_MPEGSplit _T("Filters\\MPEG Splitter")
+#define OPT_FastStreamChange  _T("UseFastStreamChange")
+#define OPT_FastSeek          _T("UseFastSeek")
+#define OPT_ForcedSub         _T("ForcedSub")
+#define OPT_AudioLangOrder    _T("AudioLanguageOrder")
+#define OPT_SubLangOrder      _T("SubtitlesLanguageOrder")
+#define OPT_AC3CoreOnly       _T("AC3CoreOnly")
+#define OPT_AltDuration       _T("AlternativeDuration")
+#define OPT_SubEmptyOutput    _T("SubtitleEmptyOutput")
+
 TCHAR* MPEG2_Profile[]=
 {
 	L"0",
@@ -545,49 +557,49 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	TCHAR buff[256];
 	ULONG len;
 
-	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\MPC-BE Filters\\MPEG Splitter"), KEY_READ)) {
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, OPT_REGKEY_MPEGSplit, KEY_READ)) {
 		DWORD dw;
 
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("UseFastStreamChange"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_FastStreamChange, dw)) {
 			m_useFastStreamChange = !!dw;
 		}
 
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("UseFastSeek"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_FastSeek, dw)) {
 			m_useFastSeek = !!dw;
 		}
 
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("ForcedSub"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_ForcedSub, dw)) {
 			m_ForcedSub = !!dw;
 		}
 
 		len = _countof(buff);
 		memset(buff, 0, sizeof(buff));
-		if (ERROR_SUCCESS == key.QueryStringValue(_T("AudioLanguageOrder"), buff, &len)) {
+		if (ERROR_SUCCESS == key.QueryStringValue(OPT_AudioLangOrder, buff, &len)) {
 			m_csAudioLanguageOrder = CString(buff);
 		}
 
 		len = _countof(buff);
 		memset(buff, 0, sizeof(buff));
-		if (ERROR_SUCCESS == key.QueryStringValue(_T("SubtitlesLanguageOrder"), buff, &len)) {
+		if (ERROR_SUCCESS == key.QueryStringValue(OPT_SubLangOrder, buff, &len)) {
 			m_csSubtitlesLanguageOrder = CString(buff);
 		}
 
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("AC3CoreOnly"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_AC3CoreOnly, dw)) {
 			m_AC3CoreOnly = dw;
 		}
 
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("AlternativeDuration"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_AltDuration, dw)) {
 			m_AlternativeDuration = !!dw;
 		}
 
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("SubtitleEmptyOutput"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SubEmptyOutput, dw)) {
 			m_SubEmptyPin = !!dw;
 		}
 	}
 #else
-	m_useFastStreamChange		= !!AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("UseFastStreamChange"), m_useFastStreamChange);
-	m_useFastSeek				= !!AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("UseFastSeek"), m_useFastSeek);
-	m_ForcedSub					= !!AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("ForcedSub"), m_ForcedSub);
+	m_useFastStreamChange		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGSplit, OPT_FastStreamChange, m_useFastStreamChange);
+	m_useFastSeek				= !!AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGSplit, OPT_FastSeek, m_useFastSeek);
+	m_ForcedSub					= !!AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGSplit, OPT_ForcedSub, m_ForcedSub);
 
 	bool UseLangOrder			= !!AfxGetApp()->GetProfileInt(IDS_R_SETTINGS, IDS_RS_INTERNALSELECTTRACKLOGIC, TRUE);
 	if (UseLangOrder) {
@@ -595,9 +607,9 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 		m_csAudioLanguageOrder		= AfxGetApp()->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOSLANGORDER, _T(""));
 	}
 
-	m_AC3CoreOnly				= AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("AC3CoreOnly"), m_AC3CoreOnly);
-	m_AlternativeDuration		= !!AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("AlternativeDuration"), m_AlternativeDuration);
-	m_SubEmptyPin				= !!AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Splitter"), _T("SubtitleEmptyOutput"), m_SubEmptyPin);
+	m_AC3CoreOnly				= AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGSplit, OPT_AC3CoreOnly, m_AC3CoreOnly);
+	m_AlternativeDuration		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGSplit, OPT_AltDuration, m_AlternativeDuration);
+	m_SubEmptyPin				= !!AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGSplit, OPT_SubEmptyOutput, m_SubEmptyPin);
 
 	m_nFlag					   |= PACKET_PTS_DISCONTINUITY;
 #endif
@@ -1615,23 +1627,23 @@ STDMETHODIMP CMpegSplitterFilter::Apply()
 {
 #ifdef REGISTER_FILTER
 	CRegKey key;
-	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, _T("Software\\MPC-BE Filters\\MPEG Splitter"))) {
-		key.SetDWORDValue(_T("UseFastStreamChange"), m_useFastStreamChange);
-		key.SetDWORDValue(_T("UseFastSeek"), m_useFastSeek);
-		key.SetDWORDValue(_T("ForcedSub"), m_ForcedSub);
-		key.SetStringValue(_T("AudioLanguageOrder"), m_csAudioLanguageOrder);
-		key.SetStringValue(_T("SubtitlesLanguageOrder"), m_csSubtitlesLanguageOrder);
-		key.SetDWORDValue(_T("AC3CoreOnly"), m_AC3CoreOnly);
-		key.SetDWORDValue(_T("AlternativeDuration"), m_AlternativeDuration);
-		key.SetDWORDValue(_T("SubtitleEmptyOutput"), m_SubEmptyPin);
+	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_MPEGSplit)) {
+		key.SetDWORDValue(OPT_FastStreamChange, m_useFastStreamChange);
+		key.SetDWORDValue(OPT_FastSeek, m_useFastSeek);
+		key.SetDWORDValue(OPT_ForcedSub, m_ForcedSub);
+		key.SetStringValue(OPT_AudioLangOrder, m_csAudioLanguageOrder);
+		key.SetStringValue(OPT_SubLangOrder, m_csSubtitlesLanguageOrder);
+		key.SetDWORDValue(OPT_AC3CoreOnly, m_AC3CoreOnly);
+		key.SetDWORDValue(OPT_AltDuration, m_AlternativeDuration);
+		key.SetDWORDValue(OPT_SubEmptyOutput, m_SubEmptyPin);
 	}
 #else
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("UseFastStreamChange"), m_useFastStreamChange);
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("UseFastSeek"), m_useFastSeek);
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("ForcedSub"), m_ForcedSub);
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("AC3CoreOnly"), m_AC3CoreOnly);
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("AlternativeDuration"), m_AlternativeDuration);
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Splitter"), _T("SubtitleEmptyOutput"), m_SubEmptyPin);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGSplit, OPT_FastStreamChange, m_useFastStreamChange);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGSplit, OPT_FastSeek, m_useFastSeek);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGSplit, OPT_ForcedSub, m_ForcedSub);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGSplit, OPT_AC3CoreOnly, m_AC3CoreOnly);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGSplit, OPT_AltDuration, m_AlternativeDuration);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGSplit, OPT_SubEmptyOutput, m_SubEmptyPin);
 #endif
 
 	return S_OK;
