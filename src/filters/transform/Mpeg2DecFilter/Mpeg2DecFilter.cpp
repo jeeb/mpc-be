@@ -42,6 +42,19 @@
 #include <moreuuids.h>
 #include <IFilterVersion.h>
 
+// options names
+#define OPT_REGKEY_MPEGDec  _T("Software\\MPC-BE Filters\\MPEG Video Decoder")
+#define OPT_SECTION_MPEGDec _T("Filters\\MPEG Video Decoder")
+#define OPT_DeintMethod     _T("DeinterlaceMethod")
+#define OPT_Brightness      _T("Brightness")
+#define OPT_Contrast        _T("Contrast")
+#define OPT_Hue             _T("Hue")
+#define OPT_Saturation      _T("Saturation")
+#define OPT_ForcedSubs      _T("ForcedSubtitles")
+#define OPT_PlanarYUV       _T("PlanarYUV")
+#define OPT_Interlaced      _T("Interlaced")
+#define OPT_ReadStreamAR    _T("ReadARFromStream")
+
 #define EPSILON 1e-4
 
 #ifdef REGISTER_FILTER
@@ -235,55 +248,55 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 #ifdef REGISTER_FILTER
 	CRegKey key;
-	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\MPC-BE Filters\\MPEG Video Decoder"), KEY_READ)) {
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, OPT_REGKEY_MPEGDec, KEY_READ)) {
 		DWORD dw;
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("DeinterlaceMethod"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_DeintMethod, dw)) {
 			SetDeinterlaceMethod((ditype)dw);
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("Brightness"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_Brightness, dw)) {
 			SetBrightness(*(float*)&dw);
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("Contrast"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_Contrast, dw)) {
 			SetContrast(*(float*)&dw);
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("Hue"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_Hue, dw)) {
 			SetHue(*(float*)&dw);
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("Saturation"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_Saturation, dw)) {
 			SetSaturation(*(float*)&dw);
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("ForcedSubtitles"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_ForcedSubs, dw)) {
 			EnableForcedSubtitles(!!dw);
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("PlanarYUV"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_PlanarYUV, dw)) {
 			EnablePlanarYUV(!!dw);
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("Interlaced"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_Interlaced, dw)) {
 			EnableInterlaced(!!dw);
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("ReadARFromStream"), dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_ReadStreamAR, dw)) {
 			EnableReadARFromStream(!!dw);
 		}
 	}
 #else
 	DWORD dw;
-	dw = AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Video Decoder"), _T("DeinterlaceMethod"), m_ditype);
+	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_DeintMethod, m_ditype);
 	SetDeinterlaceMethod((ditype)dw);
-	dw = AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Video Decoder"), _T("Brightness"), *(DWORD*)&m_bright);
+	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_Brightness, *(DWORD*)&m_bright);
 	SetBrightness(*(float*)&dw);
-	dw = AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Video Decoder"), _T("Contrast"), *(DWORD*)&m_cont);
+	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_Contrast, *(DWORD*)&m_cont);
 	SetContrast(*(float*)&dw);
-	dw = AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Video Decoder"), _T("Hue"), *(DWORD*)&m_hue);
+	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_Hue, *(DWORD*)&m_hue);
 	SetHue(*(float*)&dw);
-	dw = AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Video Decoder"), _T("Saturation"), *(DWORD*)&m_sat);
+	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_Saturation, *(DWORD*)&m_sat);
 	SetSaturation(*(float*)&dw);
-	dw = AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Video Decoder"), _T("ForcedSubtitles"), m_fForcedSubs);
+	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_ForcedSubs, m_fForcedSubs);
 	EnableForcedSubtitles(!!dw);
-	dw = AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Video Decoder"), _T("PlanarYUV"), m_fPlanarYUV);
+	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_PlanarYUV, m_fPlanarYUV);
 	EnablePlanarYUV(!!dw);
-	dw = AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Video Decoder"), _T("Interlaced"), m_fInterlaced);
+	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_Interlaced, m_fInterlaced);
 	EnableInterlaced(!!dw);
-	dw = AfxGetApp()->GetProfileInt(_T("Filters\\MPEG Video Decoder"), _T("ReadARFromStream"), m_bReadARFromStream);
+	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_ReadStreamAR, m_bReadARFromStream);
 	EnableReadARFromStream(!!dw);
 
 #endif
@@ -302,27 +315,27 @@ STDMETHODIMP CMpeg2DecFilter::Apply()
 {
 #ifdef REGISTER_FILTER
 	CRegKey key;
-	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, _T("Software\\MPC-BE Filters\\MPEG Video Decoder"))) {
-		key.SetDWORDValue(_T("DeinterlaceMethod"), m_ditype);
-		key.SetDWORDValue(_T("Brightness"), *(DWORD*)&m_bright);
-		key.SetDWORDValue(_T("Contrast"), *(DWORD*)&m_cont);
-		key.SetDWORDValue(_T("Hue"), *(DWORD*)&m_hue);
-		key.SetDWORDValue(_T("Saturation"), *(DWORD*)&m_sat);
-		key.SetDWORDValue(_T("ForcedSubtitles"), m_fForcedSubs);
-		key.SetDWORDValue(_T("PlanarYUV"), m_fPlanarYUV);
-		key.SetDWORDValue(_T("Interlaced"), m_fInterlaced);
-		key.SetDWORDValue(_T("ReadARFromStream"), m_bReadARFromStream);
+	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_MPEGDec)) {
+		key.SetDWORDValue(OPT_DeintMethod, m_ditype);
+		key.SetDWORDValue(OPT_Brightness, *(DWORD*)&m_bright);
+		key.SetDWORDValue(OPT_Contrast, *(DWORD*)&m_cont);
+		key.SetDWORDValue(OPT_Hue, *(DWORD*)&m_hue);
+		key.SetDWORDValue(OPT_Saturation, *(DWORD*)&m_sat);
+		key.SetDWORDValue(OPT_ForcedSubs, m_fForcedSubs);
+		key.SetDWORDValue(OPT_PlanarYUV, m_fPlanarYUV);
+		key.SetDWORDValue(OPT_Interlaced, m_fInterlaced);
+		key.SetDWORDValue(OPT_ReadStreamAR, m_bReadARFromStream);
 	}
 #else
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Video Decoder"), _T("DeinterlaceMethod"), m_ditype);
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Video Decoder"), _T("Brightness"), *(DWORD*)&m_bright);
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Video Decoder"), _T("Contrast"), *(DWORD*)&m_cont);
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Video Decoder"), _T("Hue"), *(DWORD*)&m_hue);
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Video Decoder"), _T("Saturation"), *(DWORD*)&m_sat);
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Video Decoder"), _T("ForcedSubtitles"), m_fForcedSubs);
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Video Decoder"), _T("PlanarYUV"), m_fPlanarYUV);
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Video Decoder"), _T("Interlaced"), m_fInterlaced);
-	AfxGetApp()->WriteProfileInt(_T("Filters\\MPEG Video Decoder"), _T("ReadARFromStream"), m_bReadARFromStream);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_DeintMethod, m_ditype);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_Brightness, *(DWORD*)&m_bright);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_Contrast, *(DWORD*)&m_cont);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_Hue, *(DWORD*)&m_hue);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_Saturation, *(DWORD*)&m_sat);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_ForcedSubs, m_fForcedSubs);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_PlanarYUV, m_fPlanarYUV);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_Interlaced, m_fInterlaced);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_ReadStreamAR, m_bReadARFromStream);
 #endif
 
 	return S_OK;
