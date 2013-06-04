@@ -132,6 +132,7 @@
       <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;..\..\..\ExtLib\ffmpeg;..\..\..\AudioTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
+      <AdditionalOptions>/ignore:4049 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>libgcc.a;libmingwex.a;dsound.lib;Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>MpcAudioRenderer.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -146,6 +147,7 @@
       <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;..\..\..\ExtLib\ffmpeg;..\..\..\AudioTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
+      <AdditionalOptions>/ignore:4049 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>libgcc.a;libmingwex.a;dsound.lib;Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>MpcAudioRenderer.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -160,6 +162,7 @@
       <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;..\..\..\ExtLib\ffmpeg;..\..\..\AudioTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
+      <AdditionalOptions>/ignore:4049 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>libgcc.a;libmingwex.a;dsound.lib;Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>MpcAudioRenderer.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -174,6 +177,7 @@
       <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;..\..\..\ExtLib\ffmpeg;..\..\..\AudioTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
+      <AdditionalOptions>/ignore:4049 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>libgcc.a;libmingwex.a;dsound.lib;Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>MpcAudioRenderer.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>

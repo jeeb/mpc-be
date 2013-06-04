@@ -1,4 +1,4 @@
-#include "wavpack\wputils.h"
+#include "wavpack/wputils.h"
 #include "wavpack_common.h"
 #include "wavpack_buffer_decoder.h"
 

@@ -31,6 +31,8 @@
 #include "../../../SubPic/SubPicQueueImpl.h"
 #include "vfr.h"
 
+#pragma warning(disable: 4706)
+
 //
 // Generic interface
 //

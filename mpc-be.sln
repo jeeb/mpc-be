@@ -789,6 +789,7 @@ Global
 		{D0620EF4-1313-40D5-9069-A82F6FE26994}.Release Filter|Win32.ActiveCfg = Release Filter|Win32
 		{D0620EF4-1313-40D5-9069-A82F6FE26994}.Release Filter|Win32.Build.0 = Release Filter|Win32
 		{D0620EF4-1313-40D5-9069-A82F6FE26994}.Release Filter|x64.ActiveCfg = Release Filter|x64
+		{D0620EF4-1313-40D5-9069-A82F6FE26994}.Release Filter|x64.Build.0 = Release Filter|x64
 		{D0620EF4-1313-40D5-9069-A82F6FE26994}.Release|Win32.ActiveCfg = Release|Win32
 		{D0620EF4-1313-40D5-9069-A82F6FE26994}.Release|Win32.Build.0 = Release|Win32
 		{D0620EF4-1313-40D5-9069-A82F6FE26994}.Release|x64.ActiveCfg = Release|x64

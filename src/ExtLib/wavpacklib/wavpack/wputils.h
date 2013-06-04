@@ -16,6 +16,8 @@
 
 #include <sys/types.h>
 
+#pragma warning(disable: 4244)
+
 #if defined(_WIN32) && !defined(__MINGW32__)
 #include <stdlib.h>
 typedef unsigned __int64 uint64_t;
