@@ -33,6 +33,7 @@
 #endif
 
 #include "wavpack_local.h"
+#pragma warning(disable: 4244)
 
 #ifdef WIN32
 #define stricmp(x,y) _stricmp(x,y)
