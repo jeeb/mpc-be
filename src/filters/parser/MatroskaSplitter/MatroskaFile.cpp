@@ -229,14 +229,14 @@ HRESULT Segment::ParseMinimal(CMatroskaNode* pMN0)
 
 	while (MatroskaReader::QWORD pos = pMN->FindPos(MATROSKA_ID_SEEKHEAD, pMN->GetPos())) {
 		pMN->SeekTo(pos);
-		if (FAILED(pMN->Parse()) || (pMN->m_filepos + pMN->m_len) >= (pMN0->m_filepos + pMN0->m_len)) {
+		if (FAILED(pMN->Parse()) || (pMN->m_filepos + pMN->m_len) > pMN->GetLength()) {
 			break; // a broken file
 		}
 		MetaSeekInfo.Parse(pMN);
 	}
 
 	if (k != 31) {
-		if (Cues.IsEmpty() && (pMN = pMN0->Child(MATROSKA_ID_CUES, true))) {
+		if (Cues.IsEmpty() && (pMN = pMN0->Child(MATROSKA_ID_CUES, false))) {
 			do {
 				Cues.Parse(pMN);
 			} while (pMN->Next(true));
