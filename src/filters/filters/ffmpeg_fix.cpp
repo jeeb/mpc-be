@@ -30,5 +30,8 @@ extern "C" {
 }
 
 #ifdef REGISTER_FILTER
-	void *__imp_time64 = _time64;
+	void *__imp_time64				= _time64;
+	void *__imp__aligned_malloc		= _aligned_malloc;
+	void *__imp__aligned_realloc	= _aligned_realloc;
+	void *__imp__aligned_free		= _aligned_free;
 #endif
