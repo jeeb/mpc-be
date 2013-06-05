@@ -49,7 +49,7 @@ extern "C" {
 	#include <ffmpeg/libavcodec/mpeg12.h>
 }
 
-static const DWORD PCID_NVIDIA_VP5 [] = {
+static const WORD PCID_NVIDIA_VP5 [] = {
 	// http://us.download.nvidia.com/XFree86/Linux-x86_64/313.26/README/supportedchips.html
 	// Nvidia VDPAU Feature Set D
 	0x0FC6, // GeForce GTX 650
@@ -108,7 +108,7 @@ static const DWORD PCID_NVIDIA_VP5 [] = {
 	0x11FA, // Quadro K4000
 };
 
-static const DWORD PCID_ATI_UVD [] = {
+static const WORD PCID_ATI_UVD [] = {
 	0x94C7, // ATI Radeon HD 2350
 	0x94C1, // ATI Radeon HD 2400 XT
 	0x94CC, // ATI Radeon HD 2400 Series
@@ -134,11 +134,25 @@ static const DWORD PCID_ATI_UVD [] = {
 	0x950F, // ATI Radeon HD 3850 X2
 };
 
+static const WORD PCID_INTEL_4K [] = {
+	// IvyBridge
+	0x0152, // Intel HD Graphics 2500        (4k tested)
+	0x0162, // Intel HD Graphics 4000        (fully tested)
+	0x0166, // Intel HD Graphics 4000 Mobile (not tested)
+	0x016A, // Intel HD Graphics P4000       (not tested)
+	// Haswell (not tested)
+	0x0412, // Intel HD Graphics HD4600
+	0x0416, // Intel HD Graphics HD4600 Mobile
+	0x0A16, // Intel HD Graphics Family
+	0x0A26, // Intel HD Graphics 5000
+	0x0A2E, // Intel HD Graphics 5100
+};
 
-bool CheckPCID(DWORD pcid, const DWORD* pPCIDs, size_t len)
+bool CheckPCID(DWORD pcid, const WORD* pPCIDs, size_t len)
 {
+	WORD wPCID = (WORD)pcid;
 	for (size_t i = 0; i < len; i++) {
-		if (pcid == pPCIDs[i]) {
+		if (wPCID == pPCIDs[i]) {
 			return true;
 		}
 	}
@@ -1003,7 +1017,7 @@ BOOL DXVACheckFramesize (int width, int height, DWORD nPCIVendor, DWORD nPCIDevi
 			// complete test was performed
 			return TRUE;
 		}
-	} else if (nPCIVendor == PCIV_Intel && nPCIDevice == PCID_Intel_HD2500) {
+	} else if (nPCIVendor == PCIV_Intel && CheckPCID(nPCIDevice, PCID_INTEL_4K, _countof(PCID_INTEL_4K))) {
 		if (CHECK_AVC_L52_SIZE(width, height)) {
 			// tested some media files with AVC Livel 5.1
 			// complete test was NOT performed
