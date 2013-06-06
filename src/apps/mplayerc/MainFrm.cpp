@@ -14385,27 +14385,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		pGB->FindInterface(__uuidof(IMFVideoMixerBitmap),		 (void**)&pMFVMB,  TRUE);
 		pMVTO = m_pCAP;
 
-		if (s.fShowOSD || s.fShowDebugInfo) { // Force OSD on when the debug switch is used
-
-			m_OSD.Stop();
-
-			if (s.IsD3DFullscreen()) {
-				if (pMVTO) {
-					m_OSD.Start(m_pVideoWnd, pMVTO);
-				} else if (pVMB) {
-					m_OSD.Start(m_pVideoWnd, pVMB);
-				} else if (pMFVMB) {
-					m_OSD.Start(m_pVideoWnd, pMFVMB);
-				}
-			} else {
-				if (pMVTO) {
-					m_OSD.Start(m_pVideoWnd, pMVTO);
-				} else {
-					m_OSD.Start(m_pOSDWnd);
-				}
-			}
-		}
-
 		SetupVMR9ColorControl();
 
 		// === EVR !
@@ -14455,6 +14434,27 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		OpenSetupVideo();
 		if (m_fOpeningAborted) {
 			BREAK(aborted)
+		}
+
+		if (s.fShowOSD || s.fShowDebugInfo) { // Force OSD on when the debug switch is used
+
+			m_OSD.Stop();
+
+			if (s.IsD3DFullscreen() && !m_fAudioOnly) {
+				if (pMVTO) {
+					m_OSD.Start(m_pVideoWnd, pMVTO);
+				} else if (pVMB) {
+					m_OSD.Start(m_pVideoWnd, pVMB);
+				} else if (pMFVMB) {
+					m_OSD.Start(m_pVideoWnd, pMFVMB);
+				}
+			} else {
+				if (pMVTO) {
+					m_OSD.Start(m_pVideoWnd, pMVTO);
+				} else {
+					m_OSD.Start(m_pOSDWnd);
+				}
+			}
 		}
 
 		OpenSetupAudio();
