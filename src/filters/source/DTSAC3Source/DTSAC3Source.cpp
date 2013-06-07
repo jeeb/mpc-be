@@ -24,6 +24,7 @@
 #include "stdafx.h"
 #include <MMReg.h>
 #include <ks.h>
+#include <aviriff.h>
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
 #endif
@@ -64,23 +65,55 @@ bool isDTSSync(const DWORD sync)
 }
 }
 
-DWORD ParseWAVECDHeader(const BYTE wh[44])
+DWORD ParseWAVECDHeader(CFile &file)
 {
-	if (*(DWORD*)wh != 0x46464952 //"RIFF"
-	 || *(DWORDLONG*)(wh+8) != 0x20746d6645564157 //"WAVEfmt "
-	 || *(DWORD*)(wh+36) != 0x61746164) { //"data"
+	union {
+		struct {
+			DWORD id;
+			DWORD size;
+			DWORD fmt; // for 'RIFF'
+		};
+		BYTE data[12];
+	} Chunk;
+	PCMWAVEFORMAT pcmwf;
+
+	file.SeekToBegin();
+	if (file.Read(&Chunk.data, 12) != 12
+			|| Chunk.id   != FCC('RIFF')
+			|| Chunk.size < (4 + 8 + sizeof(pcmwf) + 8) // 'WAVE' + ('fmt ' + fmt.size) + PCMWAVEFORMAT + (data + data.size)
+			|| Chunk.fmt  != FCC('WAVE')) {
 		return 0;
 	}
-	PCMWAVEFORMAT pcmwf = *(PCMWAVEFORMAT*)(wh+20);
-	if (pcmwf.wf.wFormatTag != 1
-	 || pcmwf.wf.nChannels != 2
-	 || pcmwf.wf.nSamplesPerSec != 44100 && pcmwf.wf.nSamplesPerSec != 48000
-	 || pcmwf.wf.nBlockAlign != 4
-	 || pcmwf.wf.nAvgBytesPerSec != pcmwf.wf.nSamplesPerSec * pcmwf.wf.nBlockAlign
-	 || pcmwf.wBitsPerSample != 16) {
+	DWORD filesize = Chunk.size + 8;
+
+	if (file.Read(&Chunk.data, 8) != 8
+			|| Chunk.id   != FCC('fmt ')
+			|| Chunk.size < sizeof(pcmwf)) {
 		return 0;
 	}
-	return *(DWORD*)(wh+40); //return size of "data"
+
+	if (file.Read(&pcmwf, sizeof(pcmwf)) != sizeof(pcmwf)
+			|| pcmwf.wf.wFormatTag != WAVE_FORMAT_PCM
+			|| pcmwf.wf.nChannels != 2
+			|| pcmwf.wf.nSamplesPerSec != 44100 && pcmwf.wf.nSamplesPerSec != 48000
+			|| pcmwf.wf.nBlockAlign != 4
+			|| pcmwf.wf.nAvgBytesPerSec != pcmwf.wf.nSamplesPerSec * pcmwf.wf.nBlockAlign
+			|| pcmwf.wBitsPerSample != 16) {
+		return 0;
+	}
+	file.Seek(Chunk.size - sizeof(pcmwf), CFile::current); // skip extra
+
+	while (file.Read(&Chunk.data, 8) == 8
+			&& (Chunk.id == FCC('fact') || Chunk.id == FCC('PAD ')) // skip 'fact' and 'PAD '
+			&& (file.GetPosition() + Chunk.size) < filesize) {
+		file.Seek(Chunk.size, CFile::current);
+	}
+
+	if (Chunk.id != FCC('data') || (file.GetPosition() + Chunk.size) > filesize) {
+		return 0;
+	}
+
+	return Chunk.size;
 }
 
 int ParseAC3IEC61937Header(const BYTE *buf)
@@ -245,34 +278,26 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			if (ext != _T(".dtswav") && ext != _T(".dts") && ext != _T(".wav")) { //check only specific extensions
 				break;
 			}
-			BYTE buf[44];
-			m_file.SeekToBegin();
-			if (m_file.Read(&buf, 44) != 44
-			 || ParseWAVECDHeader(buf) == 0
-			 || m_file.Read(&id, sizeof(id)) != sizeof(id)) {
+			if (ParseWAVECDHeader(m_file) == 0) {
 				break;
 			}
 			waveheader = true;
+			m_dataOffset = m_file.GetPosition();
+		} else {
+			m_dataOffset = m_file.GetPosition() - sizeof(id) - sizeof(id2);
 		}
-
-		m_dataOffset = m_file.GetPosition() - sizeof(id) - (!waveheader ? sizeof(id2) : 0);
 
 		bool isFound = isDTSSync(id) || (WORD)id==AC3_SYNC_WORD || id==IEC61937_SYNC_WORD || id2==MLP_SYNC_WORD /*|| id2!=TRUEHD_SYNC_WORD*/;
 
 		// search DTS and AC3 headers (skip garbage in the beginning)
 		if (!isFound) {
-			UINT buflen = 0;
-			if (waveheader && ext == _T(".wav") && PathFileExists(path.Left(path.GetLength() - ext.GetLength()) + _T(".cue"))) {
-				buflen = 64 * 1024; // for .wav+.cue sometimes need to use a more deep search
-			} else if (ext == _T(".dtswav") || ext == _T(".dts") || ext == _T(".wav") || ext == _T(".ac3") || ext == _T(".eac3")) { //check only specific extensions
-				buflen = 6 * 1024;
-			} else {
+			if (ext != _T(".dtswav") && ext != _T(".dts") && ext != _T(".wav") && ext != _T(".ac3") && ext != _T(".eac3")) { //check only specific extensions
 				break;
 			}
 
-			if (m_dataOffset < buflen) {
-				buflen -= (UINT)m_dataOffset;    // tiny optimization
-			}
+			UINT buflen = 64 * 1024;
+			buflen -= (UINT)(m_dataOffset % 4096); // tiny optimization
+
 			m_file.Seek(m_dataOffset, CFile::begin);
 
 			BYTE* buf = DNew BYTE[buflen];
@@ -286,6 +311,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 				if (isDTSSync(id) || (WORD)id == AC3_SYNC_WORD && (ParseAC3Header(buf + i) > 0 || ParseEAC3Header(buf + i) > 0)) {
 					isFound = true;
 					m_dataOffset += i;
+					TRACE(_T("DTSAC3Source: header found after %I64d bytes\n"), m_dataOffset);
 					break;
 				}
 			}
@@ -359,7 +385,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 				m_channels    = aframe.channels;
 				m_framelength = aframe.samples;
 				m_bitrate     = aframe.param1;
-				m_streamtype = AC3;
+				m_streamtype  = AC3;
 				m_subtype = MEDIASUBTYPE_DOLBY_AC3;
 			} // E-AC3 header
 			else if (ParseEAC3Header(buf, &aframe)) {
