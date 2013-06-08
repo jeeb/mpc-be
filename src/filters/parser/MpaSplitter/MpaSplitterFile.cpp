@@ -82,10 +82,8 @@ CMpaSplitterFile::CMpaSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr)
 	, m_mode(none)
 	, m_rtDuration(0)
 	, m_startpos(0)
-	, m_endpos(0)
 	, m_totalbps(0)
 	, m_bIsVBR(false)
-	, m_CoverMime(_T(""))
 {
 	if (SUCCEEDED(hr)) {
 		hr = Init();
@@ -161,7 +159,7 @@ CString CMpaSplitterFile::ReadField(DWORD &size, BYTE encoding)
 HRESULT CMpaSplitterFile::Init()
 {
 	m_startpos = 0;
-	m_endpos = GetLength();
+	__int64 endpos = GetLength();
 
 	Seek(0);
 
@@ -172,11 +170,11 @@ HRESULT CMpaSplitterFile::Init()
 		return E_FAIL;
 	}
 
-	if (m_endpos > 128 && IsRandomAccess()) {
-		Seek(m_endpos - 128);
+	if (endpos > 128 && IsRandomAccess()) {
+		Seek(endpos - 128);
 
 		if (BitRead(24) == 'TAG') {
-			m_endpos -= 128;
+			endpos -= 128;
 
 			CStringA str;
 
@@ -369,7 +367,7 @@ HRESULT CMpaSplitterFile::Init()
 
 		Seek(m_startpos);
 
-		for (int i = 0; i < (1<<20) && m_startpos < m_endpos && BitRead(8, true) == 0; i++) {
+		for (int i = 0; i < (1<<20) && m_startpos < endpos && BitRead(8, true) == 0; i++) {
 			BitRead(8), m_startpos++;
 		}
 	}
@@ -383,7 +381,7 @@ HRESULT CMpaSplitterFile::Init()
 		if (!MP3_find && GetPos() >= 2048) {
 			break;
 		}
-		searchlen = (int)min(m_endpos - startpos_mp3, 512);
+		searchlen = (int)min(endpos - startpos_mp3, 512);
 		Seek(startpos_mp3);
 
 		// If we fail to see sync bytes, we reposition here and search again
@@ -412,14 +410,14 @@ HRESULT CMpaSplitterFile::Init()
 		}
 
 		// If we have enough room to search for a valid header, then skip ahead and try again
-		if (m_endpos - syncpos >= 8) {
+		if (endpos - syncpos >= 8) {
 			startpos_mp3 = syncpos;
 		} else {
 			break;
 		}
 	}
 
-	searchlen = (int)min(m_endpos - m_startpos, 512);
+	searchlen = (int)min(endpos - m_startpos, 512);
 	Seek(m_startpos);
 
 	if (m_mode == none && Read(m_aachdr, searchlen, &m_mt)) {
@@ -503,9 +501,7 @@ bool CMpaSplitterFile::Sync(int limit)
 
 bool CMpaSplitterFile::Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limit)
 {
-	m_endpos = GetLength();
-
-	__int64 endpos = min(m_endpos, GetPos() + limit);
+	__int64 endpos = min(GetLength(), GetPos() + limit);
 
 	if (m_mode == mpa) {
 		while (GetPos() <= endpos - 4) {
@@ -570,7 +566,7 @@ void CMpaSplitterFile::AdjustDuration(int nBytesPerSec)
 			}
 			m_pos2bps.SetAt(GetPos(), nBytesPerSec);
 			__int64 avgbps = m_totalbps / m_pos2bps.GetCount();
-			m_rtDuration = 10000000i64 * (m_endpos - m_startpos) / avgbps;
+			m_rtDuration = 10000000i64 * (GetLength() - m_startpos) / avgbps;
 		}
 	}
 }

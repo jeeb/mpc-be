@@ -34,7 +34,7 @@ class CMpaSplitterFile : public CBaseSplitterFileEx
 
 	mpahdr m_mpahdr;
 	aachdr m_aachdr;
-	__int64 m_startpos, m_endpos;
+	__int64 m_startpos;
 
 	__int64 m_totalbps;
 	CRBMap<__int64, int> m_pos2bps;
@@ -63,9 +63,6 @@ public:
 
 	__int64 GetStartPos() {
 		return m_startpos;
-	}
-	__int64 GetEndPos() {
-		return m_endpos;
 	}
 
 	bool Sync(int limit = 0x2000);

@@ -431,8 +431,10 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	REFERENCE_TIME AvgTimePerFrame	= 0;
 	REFERENCE_TIME metaDataDuration	= 0;
 
-	for (int i = 0; ReadTag(t) && (fTypeFlagsVideo || fTypeFlagsAudio); i++) {
-		if (!t.DataSize) continue; // skip empty Tag
+	for (int i = 0; i < 100 && ReadTag(t) && (fTypeFlagsVideo || fTypeFlagsAudio); i++) {
+		if (!t.DataSize) {
+			continue; // skip empty Tag
+		}
 
 		UINT64 next = m_pFile->GetPos() + t.DataSize;
 
