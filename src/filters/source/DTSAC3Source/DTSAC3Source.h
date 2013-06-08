@@ -44,7 +44,8 @@ public:
 class CDTSAC3Stream : public CBaseStream
 {
 	CFile m_file;
-	LONGLONG m_dataOffset;
+	__int64 m_dataStart;
+	__int64 m_dataEnd;
 
 	GUID m_subtype;
 	WORD m_wFormatTag;
@@ -55,7 +56,7 @@ class CDTSAC3Stream : public CBaseStream
 	bool m_fixedframesize; // constant frame size
 	int  m_framelength;    // samples per frame
 	WORD m_bitdepth;       // bits per sample
-	BYTE m_streamtype;
+	int  m_streamtype;
 
 public:
 	CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr);
