@@ -12,7 +12,6 @@
 
 #include "stdafx.h"
 #include "WinDebugMonitor.h"
-#include <stdio.h>
 
 // set to 1 to enable dump debug log to file
 #define DBGLOG_FILE 0

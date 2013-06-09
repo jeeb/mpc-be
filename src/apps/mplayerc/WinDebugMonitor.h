@@ -13,10 +13,6 @@
 #ifndef __WIN_DEBUG_BUFFER_H__
 #define __WIN_DEBUG_BUFFER_H__
 
-//#include <windows.h>
-//#include <atlbase.h>
-//#include <atlstr.h>
-
 class CWinDebugMonitor
 {
 private:

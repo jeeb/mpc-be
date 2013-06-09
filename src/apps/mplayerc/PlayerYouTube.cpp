@@ -594,6 +594,8 @@ CString PlayerYouTubeReplaceTitle(char* title)
 	Title.Replace(_T("--"), _T("-"));
 	Title.Replace(_T("  "), _T(" "));
 	Title.Replace(_T("\""), _T(""));
+	Title.Replace(_T("* "), _T(""));
+	Title.Replace(_T("*"), _T(""));
 
 	Title.Replace(_T("&quot;"), _T(""));
 	Title.Replace(_T("&amp;"), _T("&"));
