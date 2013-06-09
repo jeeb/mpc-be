@@ -25,6 +25,7 @@
 #include "GoToDlg.h"
 #include <atlrx.h>
 #include "SettingsDefines.h"
+#include <math.h>
 
 
 // CGoToDlg dialog
