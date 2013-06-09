@@ -297,7 +297,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			m_dataEnd   = m_dataStart + datasize;
 		}
 
-		if (m_file.GetLength() < m_dataEnd) {
+		if ((__int64)m_file.GetLength() < m_dataEnd) {
 			m_dataEnd = m_file.GetLength();
 		}
 
