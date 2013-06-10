@@ -67,7 +67,7 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 	m_TextScale(1.0),
 	m_dMainThreadId(0),
 	m_bNeedCheckSample(true),
-	m_hEvtQuit(INVALID_HANDLE_VALUE),
+	m_hEvtQuit(NULL),
 	m_bIsFullscreen(bFullscreen),
 	m_uSyncGlitches(0),
 	m_pGenlock(NULL),
@@ -2395,14 +2395,14 @@ CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error): CBa
 	HMODULE		hLib;
 	CRenderersSettings& s = GetRenderersSettings();
 
-	m_nResetToken = 0;
-	m_hRenderThread  = INVALID_HANDLE_VALUE;
-	m_hMixerThread= INVALID_HANDLE_VALUE;
-	m_hEvtFlush = INVALID_HANDLE_VALUE;
-	m_hEvtQuit = INVALID_HANDLE_VALUE;
-	m_hEvtSkip = INVALID_HANDLE_VALUE;
-	m_bEvtQuit = 0;
-	m_bEvtFlush = 0;
+	m_nResetToken   = 0;
+	m_hRenderThread = NULL;
+	m_hMixerThread  = NULL;
+	m_hEvtFlush     = NULL;
+	m_hEvtQuit      = NULL;
+	m_hEvtSkip      = NULL;
+	m_bEvtQuit      = 0;
+	m_bEvtFlush     = 0;
 
 	if (FAILED (hr)) {
 		_Error += L"SyncAP failed\n";
@@ -2517,28 +2517,28 @@ void CSyncAP::StopWorkerThreads()
 		m_bEvtQuit = true;
 		SetEvent(m_hEvtSkip);
 		m_bEvtSkip = true;
-		if ((m_hRenderThread != INVALID_HANDLE_VALUE) && (WaitForSingleObject (m_hRenderThread, 10000) == WAIT_TIMEOUT)) {
+		if (m_hRenderThread && WaitForSingleObject (m_hRenderThread, 10000) == WAIT_TIMEOUT) {
 			ASSERT (FALSE);
 			TerminateThread (m_hRenderThread, 0xDEAD);
 		}
-		if (m_hRenderThread != INVALID_HANDLE_VALUE) {
+		if (m_hRenderThread) {
 			CloseHandle (m_hRenderThread);
 		}
-		if ((m_hMixerThread != INVALID_HANDLE_VALUE) && (WaitForSingleObject (m_hMixerThread, 10000) == WAIT_TIMEOUT)) {
+		if (m_hMixerThread && WaitForSingleObject (m_hMixerThread, 10000) == WAIT_TIMEOUT) {
 			ASSERT (FALSE);
 			TerminateThread (m_hMixerThread, 0xDEAD);
 		}
-		if (m_hMixerThread != INVALID_HANDLE_VALUE) {
+		if (m_hMixerThread) {
 			CloseHandle (m_hMixerThread);
 		}
 
-		if (m_hEvtFlush != INVALID_HANDLE_VALUE) {
+		if (m_hEvtFlush) {
 			CloseHandle(m_hEvtFlush);
 		}
-		if (m_hEvtQuit != INVALID_HANDLE_VALUE) {
+		if (m_hEvtQuit) {
 			CloseHandle(m_hEvtQuit);
 		}
-		if (m_hEvtSkip != INVALID_HANDLE_VALUE) {
+		if (m_hEvtSkip) {
 			CloseHandle(m_hEvtSkip);
 		}
 

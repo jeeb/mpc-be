@@ -71,15 +71,15 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	HMODULE		hLib;
 	CRenderersSettings& s = GetRenderersSettings();
 
-	m_nResetToken	 = 0;
-	m_hThread		 = INVALID_HANDLE_VALUE;
-	m_hGetMixerThread= INVALID_HANDLE_VALUE;
-	m_hEvtFlush		 = INVALID_HANDLE_VALUE;
-	m_hEvtQuit		 = INVALID_HANDLE_VALUE;
-	m_bEvtQuit = 0;
-	m_bEvtFlush = 0;
-	m_ModeratedTime = 0;
-	m_ModeratedTimeLast = -1;
+	m_nResetToken        = 0;
+	m_hThread            = NULL;
+	m_hGetMixerThread    = NULL;
+	m_hEvtFlush          = NULL;
+	m_hEvtQuit           = NULL;
+	m_bEvtQuit           = 0;
+	m_bEvtFlush          = 0;
+	m_ModeratedTime      = 0;
+	m_ModeratedTimeLast  = -1;
 	m_ModeratedClockLast = -1;
 
 	if (FAILED (hr)) {
@@ -228,25 +228,25 @@ void CEVRAllocatorPresenter::StopWorkerThreads()
 		m_bEvtFlush = true;
 		SetEvent (m_hEvtQuit);
 		m_bEvtQuit = true;
-		if ((m_hThread != INVALID_HANDLE_VALUE) && (WaitForSingleObject (m_hThread, 10000) == WAIT_TIMEOUT)) {
+		if (m_hThread && WaitForSingleObject (m_hThread, 10000) == WAIT_TIMEOUT) {
 			ASSERT (FALSE);
 			TerminateThread (m_hThread, 0xDEAD);
 		}
-		if ((m_hGetMixerThread != INVALID_HANDLE_VALUE) && (WaitForSingleObject (m_hGetMixerThread, 10000) == WAIT_TIMEOUT)) {
+		if (m_hGetMixerThread && WaitForSingleObject (m_hGetMixerThread, 10000) == WAIT_TIMEOUT) {
 			ASSERT (FALSE);
 			TerminateThread (m_hGetMixerThread, 0xDEAD);
 		}
 
-		if (m_hThread != INVALID_HANDLE_VALUE) {
+		if (m_hThread) {
 			CloseHandle (m_hThread);
 		}
-		if (m_hGetMixerThread != INVALID_HANDLE_VALUE) {
+		if (m_hGetMixerThread) {
 			CloseHandle (m_hGetMixerThread);
 		}
-		if (m_hEvtFlush != INVALID_HANDLE_VALUE) {
+		if (m_hEvtFlush) {
 			CloseHandle (m_hEvtFlush);
 		}
-		if (m_hEvtQuit != INVALID_HANDLE_VALUE) {
+		if (m_hEvtQuit) {
 			CloseHandle (m_hEvtQuit);
 		}
 
