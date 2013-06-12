@@ -46,6 +46,7 @@ Update_Status UpdateChecker::isUpdateAvailable(const Version& currentVersion)
 	Str.Replace(_T("-"), _T(""));
 	Str.Replace(_T("/"), _T(""));
 	Str.Replace(_T(" "), _T(""));
+	Str.Replace(_T("\t"), _T(""));
 	Str.Replace(_T("\r"), _T(""));
 	Str.Replace(_T("\n"), _T(""));
 
