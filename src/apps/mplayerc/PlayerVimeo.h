@@ -33,7 +33,7 @@ CString PlayerVimeo(CString fn)
 		link.Append(fn);
 		link.Append(_T("&random="));
 
-		char* final	= NULL;
+		char* final = NULL;
 		CString url;
 
 		for (size_t i = 0; i < 10; i++) {

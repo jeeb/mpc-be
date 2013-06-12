@@ -83,7 +83,7 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 		LOG2FILE(_T("Youtube parser"));
 #endif
 
-		char* final	= NULL;
+		char* final = NULL;
 		int match_start = 0, match_len = 0;
 
 		CString str, Author;
@@ -338,7 +338,7 @@ CString PlayerYouTubePlaylist(CString fn, bool type)
 {
 	if (PlayerYouTubePlaylistCheck(fn)) {
 
-		char* final	= NULL;
+		char* final = NULL;
 
 		HINTERNET f, s = InternetOpen(L"MPC-BE Youtube Downloader", 0, NULL, NULL, 0);
 		if (s) {
@@ -382,7 +382,7 @@ CString PlayerYouTubePlaylist(CString fn, bool type)
 
 		CString Playlist = _T(""), Video = _T(""), Title = _T(""), tmp_out = _T("");
 		int t_start = 0, t_stop = 0;
-		char sep1[32], sep[] = "href=\"/watch?v=", sep_sub[] = "href=\"/playlist?list=", sep2[] = "title=\"";
+		char *str = NULL, sep1[32], sep[] = "href=\"/watch?v=", sep_sub[] = "href=\"/playlist?list=", sep2[] = "title=\"";
 
 		if (fn.Find(_T("&list=")) < 0) {
 			strcpy(sep1, "<a ");
@@ -405,17 +405,20 @@ CString PlayerYouTubePlaylist(CString fn, bool type)
 			final += strlen(sep1);
 
 			t_stop = strpos(final, "&");
+
 			if (t_stop > 0) {
+
 				if (t_stop > 32) {
 					t_stop = strpos(final, "\"");
 				}
-				char* str = DNew char[t_stop + 1];
-				memset(str, 0, t_stop + 1);
-				memcpy(str, final, t_stop);
 
-				Video = CString(str);
+				char* st = DNew char[t_stop + 1];
+				memset(st, 0, t_stop + 1);
+				memcpy(st, final, t_stop);
 
-				delete [] str;
+				Video = CString(st);
+
+				delete [] st;
 			}
 
 			if (strstr(sep1, sep_sub)) {
@@ -429,19 +432,25 @@ CString PlayerYouTubePlaylist(CString fn, bool type)
 				final += t_stop;
 
 				t_start = strpos(final, sep2) + strlen(sep2);
+
 				if (t_start > 0 && t_start < 128) {
-					t_stop = strpos(final + t_start, "\"");
-					if (t_stop > 0) {
-						char* str = DNew char[t_stop + 1];
+
+					final += t_start;
+
+					t_stop = strpos(final, "\"");
+
+					bool active = (str == NULL ? 1 : (strstr(final, str) ? 0 : 1));
+
+					if (t_stop > 0 && active) {
+
+						str = DNew char[t_stop + 1];
 						memset(str, 0, t_stop + 1);
-						memcpy(str, final + t_start, t_stop);
+						memcpy(str, final, t_stop);
 
 						if (str[0] == '[' && str[strlen(str) - 1] == ']') {
 						} else {
 							Title = PlayerYouTubeReplaceTitle(str);
 						}
-
-						delete [] str;
 					}
 				}
 			}
@@ -511,7 +520,7 @@ void PlayerYouTubePlaylistDelete()
 
 CString PlayerYouTubeGetTitle(CString fn)
 {
-	char* final	= NULL;
+	char* final = NULL;
 
 	HINTERNET f, s = InternetOpen(L"MPC-BE Youtube Downloader", 0, NULL, NULL, 0);
 	if (s) {
