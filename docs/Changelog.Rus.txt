@@ -21,7 +21,7 @@
 * Little-CMS 2.5 rc1 git-1b5e2fda;
 * libwebp 0.3.0 git-3fa595a5;
 * libopenjpeg 2.0.0 svn rev.2343;
-* MediaInfo 0.7.63+ svn rev.5617;
+* MediaInfo 0.7.63+ svn rev.5683;
 * libpng 1.7.0 b15 git-1bc57477;
 * ZenLib 0.4.29+ svn rev.443;
 * VirtualDub 1.10.4 Test 6;

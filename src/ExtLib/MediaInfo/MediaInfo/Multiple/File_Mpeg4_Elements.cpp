@@ -789,7 +789,7 @@ namespace Elements
     const int64u moov_udta_WLOC=0x574C4F43;
     const int64u moov_udta_XMP_=0x584D505F;
     const int64u moov_udta_yrrc=0x79727263;
-    const int64u pdin=0x7064696E;	
+    const int64u pdin=0x7064696E;
     const int64u PICT=0x50494354;
     const int64u pckg=0x70636B67;
     const int64u pnot=0x706E6F74;
@@ -1139,7 +1139,7 @@ void File_Mpeg4::Data_Parse()
             ATOM_DEFAULT (moov_udta_xxxx); //User data
             ATOM_END_DEFAULT
         ATOM_END
-    ATOM(pdin)			
+    ATOM(pdin)
     ATOM(PICT)
     ATOM(RDAO)
     ATOM(RDAS)
@@ -1299,7 +1299,14 @@ void File_Mpeg4::free()
         if (Trace_Activated)
             Param("Data", Ztring("(")+Ztring::ToZtring(Element_TotalSize_Get())+Ztring(" bytes)"));
     #endif //MEDIAINFO_TRACE
-    GoTo(File_Offset+Buffer_Offset+Element_TotalSize_Get()); //Not using Skip_XX() because we want to skip data we don't have, and Skip_XX() does a test on size of buffer
+    #if MEDIAINFO_MD5
+        if (MD5==NULL || (!IsSecondPass && FirstMdatPos<FirstMoovPos))
+    #endif //MEDIAINFO_MD5
+            GoTo(File_Offset+Buffer_Offset+Element_TotalSize_Get()); //Not using Skip_XX() because we want to skip data we don't have, and Skip_XX() does a test on size of buffer
+    #if MEDIAINFO_MD5
+        else
+            Element_Offset=Element_TotalSize_Get();
+    #endif //MEDIAINFO_MD5
 
     //ISM
     if (moof_traf_base_data_offset==(int64u)-1 && !data_offset_present)
@@ -1515,6 +1522,7 @@ void File_Mpeg4::mdat()
     if (IsSecondPass && !mdat_Pos.empty() && mdat_Pos.begin()->first<File_Offset+Buffer_Offset+Element_TotalSize_Get())
     {
         //Next piece of data
+        mdat_Pos_Temp=mdat_Pos.begin();
         IsParsing_mdat=true;
         mdat_StreamJump();
 
@@ -1540,7 +1548,14 @@ void File_Mpeg4::mdat()
         if (Trace_Activated)
             Param("Data", Ztring("(")+Ztring::ToZtring(Element_TotalSize_Get())+Ztring(" bytes)"));
     #endif //MEDIAINFO_TRACE
-    GoTo(File_Offset+Buffer_Offset+Element_TotalSize_Get()); //Not using Skip_XX() because we want to skip data we don't have, and Skip_XX() does a test on size of buffer
+    #if MEDIAINFO_MD5
+        if (MD5==NULL || (!IsSecondPass && FirstMdatPos<FirstMoovPos))
+    #endif //MEDIAINFO_MD5
+            GoTo(File_Offset+Buffer_Offset+Element_TotalSize_Get()); //Not using Skip_XX() because we want to skip data we don't have, and Skip_XX() does a test on size of buffer
+    #if MEDIAINFO_MD5
+        else
+            Element_Offset=Element_TotalSize_Get();
+    #endif //MEDIAINFO_MD5
 
     //ISM
     if (moof_traf_base_data_offset==(int64u)-1 && !data_offset_present)
@@ -1564,7 +1579,11 @@ void File_Mpeg4::mdat_xxxx()
 
     std::map<int32u, stream>::iterator Stream=Streams.find((int32u)Element_Code);
     if (Stream==Streams.end())
+    {
+        Skip_XX(Element_Size,                                   "Unknown");
+        mdat_StreamJump();
         return;
+    }
     #if MEDIAINFO_DEMUX
         if (Streams[(int32u)Element_Code].StreamKind!=Stream_Other && Streams[(int32u)Element_Code].StreamKind!=Stream_Max)
         {
@@ -1684,10 +1703,7 @@ void File_Mpeg4::mdat_xxxx()
     //Next piece of data
     Element_Offset=Element_Size;
     Element_Show();
-    #if MEDIAINFO_MD5
-        if (MD5==NULL)
-    #endif //MEDIAINFO_MD5
-        mdat_StreamJump();
+    mdat_StreamJump();
 }
 
 //---------------------------------------------------------------------------
@@ -1716,7 +1732,12 @@ void File_Mpeg4::mdat_StreamJump()
     {
         if (!Status[IsAccepted])
             Data_Accept("MPEG-4");
-        Data_GoTo(ToJump, "MPEG-4"); //Not just after
+        #if MEDIAINFO_MD5
+            if (Config->File_Md5_Get() && ((IsSecondPass && mdat_Pos_NormalParsing) || FirstMoovPos<FirstMdatPos))
+                Md5_ParseUpTo=ToJump;
+            else
+        #endif //MEDIAINFO_MD5
+                Data_GoTo(ToJump, "MPEG-4"); //Not just after
     }
 }
 
@@ -1796,7 +1817,14 @@ void File_Mpeg4::moof()
             if (Trace_Activated)
                 Param("Data", Ztring("(")+Ztring::ToZtring(Element_TotalSize_Get())+Ztring(" bytes)"));
         #endif //MEDIAINFO_TRACE
-        GoTo(File_Offset+Buffer_Offset+Element_TotalSize_Get()); //Not using Skip_XX() because we want to skip data we don't have, and Skip_XX() does a test on size of buffer
+        #if MEDIAINFO_MD5
+            if (MD5==NULL || (!IsSecondPass && FirstMdatPos<FirstMoovPos))
+        #endif //MEDIAINFO_MD5
+                GoTo(File_Offset+Buffer_Offset+Element_TotalSize_Get()); //Not using Skip_XX() because we want to skip data we don't have, and Skip_XX() does a test on size of buffer
+        #if MEDIAINFO_MD5
+            else
+                Element_Offset=Element_TotalSize_Get();
+        #endif //MEDIAINFO_MD5
         return;
     }
 
@@ -1970,7 +1998,14 @@ void File_Mpeg4::moov()
             if (Trace_Activated)
                 Param("Data", Ztring("(")+Ztring::ToZtring(Element_TotalSize_Get())+Ztring(" bytes)"));
         #endif //MEDIAINFO_TRACE
-        GoTo(File_Offset+Buffer_Offset+Element_TotalSize_Get()); //Not using Skip_XX() because we want to skip data we don't have, and Skip_XX() does a test on size of buffer
+        #if MEDIAINFO_MD5
+            if (MD5==NULL || (!IsSecondPass && FirstMdatPos<FirstMoovPos))
+        #endif //MEDIAINFO_MD5
+                GoTo(File_Offset+Buffer_Offset+Element_TotalSize_Get()); //Not using Skip_XX() because we want to skip data we don't have, and Skip_XX() does a test on size of buffer
+        #if MEDIAINFO_MD5
+            else
+                Element_Offset=Element_TotalSize_Get();
+        #endif //MEDIAINFO_MD5
         return;
     }
 
@@ -2078,7 +2113,9 @@ void File_Mpeg4::moov_cmov_cmvd_zlib()
         FirstMoovPos=(int64u)-1;
 
         //Parsing
-        Open_Buffer_Continue(Dest, Dest_Size);
+        Buffer=Dest;
+        Buffer_Size=Dest_Size;
+        while (Open_Buffer_Continue_Loop());
         delete[] Dest; //Dest=NULL;
 
         //Resetting file info
@@ -2097,7 +2134,7 @@ void File_Mpeg4::moov_cmov_cmvd_zlib()
         while(Element_Level)
             Element_End0();
         Element_Level++;
-        Header_Fill_Size(File_Size);
+        Header_Fill_Size(File_Size-(File_Offset+Buffer_Offset));
         Element_Level--;
         while(Element_Level<Element_Level_Sav)
         {
@@ -2445,7 +2482,7 @@ void File_Mpeg4::moov_meta_ilst_xxxx_data()
                             Parameter.clear(); //Set as already filled
                         }
                     }
-                    if (Parameter=="Compilation")
+                    if (Parameter=="Compilation" || Parameter=="HDVideo" || Parameter=="iTunesU" || Parameter=="Podcast")
                     {
                         if (Value==__T("1"))
                             Value=__T("Yes");
@@ -2456,6 +2493,61 @@ void File_Mpeg4::moov_meta_ilst_xxxx_data()
                     {
                         if (Value==__T("0"))
                             Value.clear();
+                    }
+                    if (Parameter=="ContentType")
+                    {
+                             if (Value==__T("0"))  Value=__T("Movie");
+                        else if (Value==__T("1"))  Value=__T("Music");
+                        else if (Value==__T("2"))  Value=__T("Audiobook");
+                        else if (Value==__T("5"))  Value=__T("Whacked Bookmark");
+                        else if (Value==__T("6"))  Value=__T("Music Video");
+                        else if (Value==__T("9"))  Value=__T("Short Film");
+                        else if (Value==__T("10")) Value=__T("TV Show");
+                        else if (Value==__T("11")) Value=__T("Booklet");
+                        else if (Value==__T("14")) Value=__T("Ringtone");
+                        else if (Value==__T("21")) Value=__T("Podcast");
+                        else Value=__T("Unknown Type");
+                        Fill(Stream_General, 0, General_ContentType, Value);
+                    }
+                    if (Parameter=="AppleStoreAccountType")
+                    {
+                        if (Value==__T("0")) 
+                            Value=__T("iTunes");
+                        else
+                            Value=__T("AOL");
+                        Fill(Stream_General, 0, General_ServiceName, Value);
+                    }
+                    if (Parameter=="Rating")
+                    {
+                             if (Value==__T("0")) Value=__T("None");
+                        else if (Value==__T("2")) Value=__T("Clean");
+                        else Value=__T("Explicit");
+                    }
+                    if (Parameter=="AppleStoreCountry")
+                    {
+                             if (Value==__T("143441")) Value=__T("United States");
+                        else if (Value==__T("143442")) Value=__T("France");
+                        else if (Value==__T("143443")) Value=__T("Germany");
+                        else if (Value==__T("143444")) Value=__T("United Kingdom");
+                        else if (Value==__T("143445")) Value=__T("Austria");
+                        else if (Value==__T("143446")) Value=__T("Belgium");
+                        else if (Value==__T("143447")) Value=__T("Finland");
+                        else if (Value==__T("143448")) Value=__T("Greece");
+                        else if (Value==__T("143449")) Value=__T("Ireland");
+                        else if (Value==__T("143450")) Value=__T("Italy");
+                        else if (Value==__T("143451")) Value=__T("Luxembourg");
+                        else if (Value==__T("143452")) Value=__T("Netherlands");
+                        else if (Value==__T("143453")) Value=__T("Portugal");
+                        else if (Value==__T("143454")) Value=__T("Spain");
+                        else if (Value==__T("143455")) Value=__T("Canada");
+                        else if (Value==__T("143456")) Value=__T("Sweden");
+                        else if (Value==__T("143457")) Value=__T("Norway");
+                        else if (Value==__T("143458")) Value=__T("Denmark");
+                        else if (Value==__T("143459")) Value=__T("Switzerland");
+                        else if (Value==__T("143460")) Value=__T("Australia");
+                        else if (Value==__T("143461")) Value=__T("New Zealand");
+                        else if (Value==__T("143462")) Value=__T("Japan");
+                        else Value=__T("Unknown Country");
                     }
                     if (!Parameter.empty())
                     {
@@ -4016,6 +4108,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxSound()
                                     std::string Data_Raw((const char*)(Buffer+Buffer_Offset+Element_Offset-(18+Data_Size)), (size_t)(18+Data_Size));
                                     std::string Data_Base64(Base64::encode(Data_Raw));
                                     Fill(Stream_Audio, StreamPos_Last, "Demux_InitBytes", Data_Base64);
+                                    (*Stream_More)[Stream_Audio][0](Ztring().From_Local("Demux_InitBytes"), Info_Options)=__T("N NT");
                                     }
                                     break;
                         default :   ;
@@ -5132,7 +5225,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_hvcC()
             File_Hevc* Parser=new File_Hevc;
             Parser->FrameIsAlwaysComplete=true;
             Open_Buffer_Init(Parser);
-            Parser->MustParse_SPS_PPS=true;
+            Parser->MustParse_VPS_SPS_PPS=true;
             Parser->MustSynchronize=false;
             Streams[moov_trak_tkhd_TrackID].Parsers.push_back(Parser);
             mdat_MustParse=true; //Data is in MDAT
@@ -6536,11 +6629,11 @@ void File_Mpeg4::pdin()
     NAME_VERSION_FLAG("Progressive Download Information");
 
     //Parsing
-	while (Element_Offset<Element_Size) 
-	{
-		Skip_B4(                                                "Rate");
-		Skip_B4(                                                "Initial Delay");
-	}
+    while (Element_Offset<Element_Size)
+    {
+        Skip_B4(                                                "Rate");
+        Skip_B4(                                                "Initial Delay");
+    }
 }
 
 //---------------------------------------------------------------------------

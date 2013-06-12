@@ -1360,7 +1360,7 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
         Stream_Prepare(StreamKind);
 
     //Specific stuff
-    Ztring Width_Temp, Height_Temp, PixelAspectRatio_Temp, DisplayAspectRatio_Temp, FrameRate_Temp, FrameRate_Mode_Temp, ScanType_Temp, ScanOrder_Temp, Delay_Temp, Delay_DropFrame_Temp, Delay_Source_Temp, Delay_Settings_Temp, Source_Temp, Source_Kind_Temp, Source_Info_Temp;
+    Ztring Width_Temp, Height_Temp, PixelAspectRatio_Temp, DisplayAspectRatio_Temp, FrameRate_Temp, FrameRate_Mode_Temp, ScanType_Temp, ScanOrder_Temp, Channels_Temp, Delay_Temp, Delay_DropFrame_Temp, Delay_Source_Temp, Delay_Settings_Temp, Source_Temp, Source_Kind_Temp, Source_Info_Temp;
     if (StreamKind==Stream_Video)
     {
         Width_Temp=Retrieve(Stream_Video, StreamPos_To, Video_Width);
@@ -1371,6 +1371,10 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
         FrameRate_Mode_Temp=Retrieve(Stream_Video, StreamPos_To, Video_FrameRate_Mode); //We want to keep the FrameRate_Mode of AVI 120 fps
         ScanType_Temp=Retrieve(Stream_Video, StreamPos_To, Video_ScanType);
         ScanOrder_Temp=Retrieve(Stream_Video, StreamPos_To, Video_ScanOrder);
+    }
+    if (StreamKind==Stream_Audio)
+    {
+        Channels_Temp=Retrieve(Stream_Audio, StreamPos_To, Audio_Channel_s_);
     }
     if (ToAdd.Retrieve(StreamKind, StreamPos_From, Fill_Parameter(StreamKind, Generic_Delay_Source))==__T("Container"))
     {
@@ -1469,6 +1473,28 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
                 Fill(Stream_Video, StreamPos_To, Video_ScanOrder, ScanOrder_Temp, true);
         }
     }
+    if (StreamKind==Stream_Audio)
+    {
+        if (!Channels_Temp.empty())
+        {    
+            //Test with legacy streams information
+            bool IsOk=(Channels_Temp==Retrieve(Stream_Audio, StreamPos_To, Audio_Channel_s_));
+            if (!IsOk)
+            {
+                ZtringList Temp; Temp.Separator_Set(0, __T(" / "));
+                Temp.Write(Retrieve(Stream_Audio, StreamPos_To, Audio_Channel_s_));
+                for (size_t Pos=0; Pos<Temp.size(); Pos++)
+                    if (Channels_Temp==Temp[Pos])
+                        IsOk=true;
+            }
+            
+            if (!IsOk)
+            {
+                Fill(Stream_Audio, StreamPos_To, Audio_Channel_s__Original, (*Stream)[Stream_Audio][StreamPos_To][Audio_Channel_s_], true);
+                Fill(Stream_Audio, StreamPos_To, Audio_Channel_s_, Channels_Temp, true);
+            }
+        }
+    }
     if (!Delay_Source_Temp.empty() && Delay_Source_Temp!=Retrieve(StreamKind, StreamPos_To, "Delay_Source"))
     {
         Fill(StreamKind, StreamPos_To, "Delay_Original", Retrieve(StreamKind, StreamPos_To, "Delay"), true);
@@ -1506,16 +1532,16 @@ void File__Analyze::Video_FrameRate_Rounding(size_t Pos, video Parameter)
 
          if (FrameRate> 9.990 && FrameRate<=10.010) FrameRate=10.000;
     else if (FrameRate>14.990 && FrameRate<=15.010) FrameRate=15.000;
-    else if (FrameRate>23.964 && FrameRate<=23.988) FrameRate=23.976;
-    else if (FrameRate>23.988 && FrameRate<=24.012) FrameRate=24.000;
-    else if (FrameRate>24.988 && FrameRate<=25.012) FrameRate=25.000;
-    else if (FrameRate>29.955 && FrameRate<=29.985) FrameRate=29.970;
-    else if (FrameRate>29.985 && FrameRate<=30.015) FrameRate=30.000;
-    else if (FrameRate>23.964*2 && FrameRate<=23.988*2) FrameRate=23.976*2;
-    else if (FrameRate>23.988*2 && FrameRate<=24.012*2) FrameRate=24.000*2;
-    else if (FrameRate>24.988*2 && FrameRate<=25.012*2) FrameRate=25.000*2;
-    else if (FrameRate>29.955*2 && FrameRate<=29.985*2) FrameRate=29.970*2;
-    else if (FrameRate>29.985*2 && FrameRate<=30.015*2) FrameRate=30.000*2;
+    else if (FrameRate>23.952 && FrameRate<=23.988) FrameRate=23.976;
+    else if (FrameRate>23.988 && FrameRate<=24.024) FrameRate=24.000;
+    else if (FrameRate>24.975 && FrameRate<=25.025) FrameRate=25.000;
+    else if (FrameRate>29.940 && FrameRate<=29.985) FrameRate=29.970;
+    else if (FrameRate>29.970 && FrameRate<=30.030) FrameRate=30.000;
+    else if (FrameRate>23.952*2 && FrameRate<=23.988*2) FrameRate=23.976*2;
+    else if (FrameRate>23.988*2 && FrameRate<=24.024*2) FrameRate=24.000*2;
+    else if (FrameRate>24.975*2 && FrameRate<=25.025*2) FrameRate=25.000*2;
+    else if (FrameRate>29.940*2 && FrameRate<=29.985*2) FrameRate=29.970*2;
+    else if (FrameRate>29.970*2 && FrameRate<=30.030*2) FrameRate=30.000*2;
 
     if (FrameRate!=FrameRate_Sav)
         Fill(Stream_Video, Pos, Parameter, FrameRate, 3, true);

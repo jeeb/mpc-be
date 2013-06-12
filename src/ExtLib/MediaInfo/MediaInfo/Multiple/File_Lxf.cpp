@@ -436,7 +436,7 @@ void File_Lxf::Read_Buffer_Continue()
     #if MEDIAINFO_DEMUX
         if (DemuxParser)
         {
-            Open_Buffer_Continue(DemuxParser, Buffer+Buffer_Offset, 0);
+            Open_Buffer_Continue(DemuxParser, Buffer+Buffer_Offset, 0, false);
             if (!Config->Demux_EventWasSent)
                 DemuxParser=NULL; //No more need of it
         }
@@ -1631,6 +1631,9 @@ void File_Lxf::Video_Stream_1()
         #endif
     }
     Skip_XX((Lines_Allocated-Lines_Used)*BytesPerLine,          "Unused lines");
+
+    if (Element_Offset<Element_Size)
+        Skip_XX(Element_Size-Element_Offset,                    "Unknown");
 }
 
 //---------------------------------------------------------------------------
