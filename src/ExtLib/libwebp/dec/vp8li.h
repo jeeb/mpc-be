@@ -1,8 +1,10 @@
 // Copyright 2012 Google Inc. All Rights Reserved.
 //
-// This code is licensed under the same terms as WebM:
-//  Software License Agreement:  http://www.webmproject.org/license/software/
-//  Additional IP Rights Grant:  http://www.webmproject.org/license/additional/
+// Use of this source code is governed by a BSD-style license
+// that can be found in the COPYING file in the root of the source
+// tree. An additional intellectual property rights grant can be found
+// in the file PATENTS. All contributing project authors may
+// be found in the AUTHORS file in the root of the source tree.
 // -----------------------------------------------------------------------------
 //
 // Lossless decoder: internal header.
@@ -72,6 +74,9 @@ typedef struct {
   int              width_;
   int              height_;
   int              last_row_;      // last input row decoded so far.
+  int              last_pixel_;    // last pixel decoded so far. However, it may
+                                   // not be transformed, scaled and
+                                   // color-converted yet.
   int              last_out_row_;  // last row output so far.
 
   VP8LMetadata     hdr_;

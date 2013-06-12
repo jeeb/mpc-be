@@ -1,8 +1,10 @@
 // Copyright 2011 Google Inc. All Rights Reserved.
 //
-// This code is licensed under the same terms as WebM:
-//  Software License Agreement:  http://www.webmproject.org/license/software/
-//  Additional IP Rights Grant:  http://www.webmproject.org/license/additional/
+// Use of this source code is governed by a BSD-style license
+// that can be found in the COPYING file in the root of the source
+// tree. An additional intellectual property rights grant can be found
+// in the file PATENTS. All contributing project authors may
+// be found in the AUTHORS file in the root of the source tree.
 // -----------------------------------------------------------------------------
 //
 // Alpha-plane decompression.
@@ -73,10 +75,10 @@ static int DecodeAlpha(const uint8_t* data, size_t data_size,
     if (unfilter_func != NULL) {
       // TODO(vikas): Implement on-the-fly decoding & filter mechanism to decode
       // and apply filter per image-row.
-      unfilter_func(width, height, width, output);
+      unfilter_func(width, height, width, 0, height, output);
     }
     if (pre_processing == ALPHA_PREPROCESSED_LEVELS) {
-      ok = DequantizeLevels(output, width, height);
+      ok = DequantizeLevels(output, width, height, 0, height);
     }
   }
 
