@@ -784,8 +784,8 @@ int ParseHdmvLPCMHeader(const BYTE* buf, audioframe_t* audioframe)
 		if (audioframe->channels == 0 || audioframe->samplerate == 0 || audioframe->param1 == 0) {
 			return 0;
 		}
-		audioframe->samples = (frame_size - 4) / (((audioframe->channels + 1) & ~1) * ((audioframe->param1 + 7) / 8));
-		audioframe->param2  = 0;
+		audioframe->param2  = ((audioframe->channels + 1) & ~1) * ((audioframe->param1 + 7) / 8); // bytes per frame
+		audioframe->samples = (frame_size - 4) / audioframe->param2;
 	}
 
 	return frame_size;

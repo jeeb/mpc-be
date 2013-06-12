@@ -63,5 +63,5 @@ int ParseAC3Header     (const BYTE* buf, audioframe_t* audioframe = NULL); // ne
 int ParseEAC3Header    (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 6 bytes,  param1 = eac3 frame type
 int ParseMLPHeader     (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 12 bytes, param1 = bitdepth, param2 = TrueHD flag
 int ParseDTSHeader     (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 10 bytes, param1 = transmission bitrate
-int ParseHdmvLPCMHeader(const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 4 bytes,  param1 = bitdepth
+int ParseHdmvLPCMHeader(const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 4 bytes,  param1 = bitdepth, param2 = bytes per frame
 int ParseADTSAACHeader (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 7 bytes,  param1 = header size
