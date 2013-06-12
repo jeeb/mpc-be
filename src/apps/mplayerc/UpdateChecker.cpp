@@ -51,7 +51,7 @@ Update_Status UpdateChecker::isUpdateAvailable(const Version& currentVersion)
 
 	Update_Status updateAvailable = UPDATER_NEWER_VERSION;
 
-	if (!parseVersion(latestVersionStr)) {
+	if (!parseVersion(Str)) {
 		updateAvailable = UPDATER_ERROR;
 	} else {
 		if (compareVersion(currentVersion, latestVersion)) {
