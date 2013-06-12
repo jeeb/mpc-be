@@ -41,8 +41,8 @@ Update_Status UpdateChecker::isUpdateAvailable(const Version& currentVersion)
 
 	latestVersionStr.Replace(_T("WebSVN"), _T(""));
 	latestVersionStr.Replace(_T("MPC-BE Team"), _T(""));
-	latestVersionStr.Replace(_T("Журнал"), _T(""));
-	latestVersionStr.Replace(_T("Редакция"), _T(""));
+	latestVersionStr.Replace(_T("Log"), _T(""));
+	latestVersionStr.Replace(_T("Rev"), _T(""));
 	latestVersionStr.Replace(_T("-"), _T(""));
 	latestVersionStr.Replace(_T("/"), _T(""));
 	latestVersionStr.Trim(_T(" "));
@@ -52,9 +52,7 @@ Update_Status UpdateChecker::isUpdateAvailable(const Version& currentVersion)
 	if (!parseVersion(latestVersionStr)) {
 		updateAvailable = UPDATER_ERROR;
 	} else {
-		int comp = compareVersion(currentVersion, latestVersion);
-
-		if (comp) {
+		if (compareVersion(currentVersion, latestVersion)) {
 			updateAvailable = UPDATER_UPDATE_AVAILABLE;
 		}
 	}

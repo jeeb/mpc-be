@@ -10786,7 +10786,7 @@ void CMainFrame::OnHelpHomepage()
 
 UINT CMainFrame::CheckForUpdate(LPVOID pParam)
 {
-	UpdateChecker updateChecker(_T("http://svnlog.mpc-next.ru/log.php?repname=MPC-BE+Team"));
+	UpdateChecker updateChecker(_T("http://svnlog.mpc-next.ru/log.php?repname=MPC-BE+Team&language=en"));
 	UpdateCheckerDlg dlg(updateChecker.isUpdateAvailable(), updateChecker.getLatestVersion());
 	dlg.DoModal();
 
