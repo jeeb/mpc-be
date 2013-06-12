@@ -23,21 +23,16 @@
 #pragma once
 
 #include <afxwin.h>
-#include <afxinet.h>
 #include "afxdialogex.h"
 
 struct Version
 {
-	UINT major;
-	UINT minor;
-	UINT status;
-	UINT patch;
+	UINT rev;
 };
 
 enum Update_Status
 {
 	UPDATER_ERROR = -1,
-	UPDATER_LATEST_STABLE,
 	UPDATER_NEWER_VERSION,
 	UPDATER_UPDATE_AVAILABLE
 };

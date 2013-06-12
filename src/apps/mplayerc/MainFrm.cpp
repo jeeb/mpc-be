@@ -528,7 +528,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_RECENT_FILE_START, ID_RECENT_FILE_END, OnUpdateRecentFile)
 
 	ON_COMMAND(ID_HELP_HOMEPAGE, OnHelpHomepage)
-	//ON_COMMAND(ID_HELP_CHECKFORUPDATE, OnHelpCheckForUpdate)
+	ON_COMMAND(ID_HELP_CHECKFORUPDATE, OnHelpCheckForUpdate)
 	//ON_COMMAND(ID_HELP_DOCUMENTATION, OnHelpDocumentation)
 	ON_COMMAND(ID_HELP_TOOLBARIMAGES, OnHelpToolbarImages)
 	//ON_COMMAND(ID_HELP_DONATE, OnHelpDonate)
@@ -10786,14 +10786,12 @@ void CMainFrame::OnHelpHomepage()
 
 UINT CMainFrame::CheckForUpdate(LPVOID pParam)
 {
-//	UpdateChecker updateChecker(_T("http://sourceforge.net/projects/mpcbe/version.txt"));
-	UpdateChecker updateChecker(_T("http://www.xvidvideo.ru/updates/mpc_be.txt"));
+	UpdateChecker updateChecker(_T("http://svnlog.mpc-next.ru/log.php?repname=MPC-BE+Team"));
 	UpdateCheckerDlg dlg(updateChecker.isUpdateAvailable(), updateChecker.getLatestVersion());
 	dlg.DoModal();
 
 	return 0;
 }
-
 
 void CMainFrame::OnHelpCheckForUpdate()
 {
@@ -10803,7 +10801,7 @@ void CMainFrame::OnHelpCheckForUpdate()
 /*
 void CMainFrame::OnHelpDocumentation()
 {
-	ShellExecute(m_hWnd, _T("open"), _T("http://sourceforge.net/project/showfiles.php?group_id=82303&package_id=144472"), NULL, NULL, SW_SHOWDEFAULT);
+	ShellExecute(m_hWnd, _T("open"), _T(""), NULL, NULL, SW_SHOWDEFAULT);
 }
 */
 
@@ -10815,7 +10813,7 @@ void CMainFrame::OnHelpToolbarImages()
 /*
 void CMainFrame::OnHelpDonate()
 {
-	ShellExecute(m_hWnd, _T("open"), _T("http://sourceforge.net/donate/index.php?group_id=170561"), NULL, NULL, SW_SHOWDEFAULT);
+	ShellExecute(m_hWnd, _T("open"), _T(""), NULL, NULL, SW_SHOWDEFAULT);
 }
 */
 

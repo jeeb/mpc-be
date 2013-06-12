@@ -1454,7 +1454,6 @@
 #define IDS_RESET_COLOR                 41319
 #define ID_MENU_LANGUAGE                41320
 #define ID_HELP_CHECKFORUPDATE          41321
-#define IDS_USING_LATEST_STABLE         41322
 #define IDS_USING_NEWER_VERSION         41323
 #define IDS_NEW_UPDATE_AVAILABLE        41324
 #define IDS_UPDATE_ERROR                41325
