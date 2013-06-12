@@ -37,15 +37,17 @@ UpdateChecker::~UpdateChecker(void)
 
 Update_Status UpdateChecker::isUpdateAvailable(const Version& currentVersion)
 {
-	CString latestVersionStr = PlayerYouTubeGetTitle(versionFileURL);
+	CString Str = PlayerYouTubeGetTitle(versionFileURL);
 
-	latestVersionStr.Replace(_T("WebSVN"), _T(""));
-	latestVersionStr.Replace(_T("MPC-BE Team"), _T(""));
-	latestVersionStr.Replace(_T("Log"), _T(""));
-	latestVersionStr.Replace(_T("Rev"), _T(""));
-	latestVersionStr.Replace(_T("-"), _T(""));
-	latestVersionStr.Replace(_T("/"), _T(""));
-	latestVersionStr.Trim(_T(" "));
+	Str.Replace(_T("WebSVN"), _T(""));
+	Str.Replace(_T("MPC-BE Team"), _T(""));
+	Str.Replace(_T("Log"), _T(""));
+	Str.Replace(_T("Rev"), _T(""));
+	Str.Replace(_T("-"), _T(""));
+	Str.Replace(_T("/"), _T(""));
+	Str.Replace(_T(" "), _T(""));
+	Str.Replace(_T("\r"), _T(""));
+	Str.Replace(_T("\n"), _T(""));
 
 	Update_Status updateAvailable = UPDATER_NEWER_VERSION;
 
