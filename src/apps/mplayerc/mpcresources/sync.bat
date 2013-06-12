@@ -23,6 +23,7 @@ del $$TEMP$$.old
 echo ----------------------
 
 copy newrc\*.rc .
+rmdir /s /q newrc
 echo ----------------------
 
 echo Generating new string files...
@@ -36,6 +37,7 @@ goto END
 echo You'll need svn command line tool to use this script.
 echo Or you can just checkout the head revision of mplayerc.rc file by yourself,
 echo put it somewhere and then use the -b option to point to it.
+del $$TEMP$$.old
 
 :END
 pause

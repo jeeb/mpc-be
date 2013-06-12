@@ -28,6 +28,8 @@
 struct Version
 {
 	UINT rev;
+	CString version;
+	CString url;
 };
 
 enum Update_Status
@@ -73,10 +75,13 @@ protected:
 	afx_msg virtual void OnOK();
 
 	DECLARE_MESSAGE_MAP()
+
 private:
 	Update_Status m_updateStatus;
 	CString m_text;
 	CStatic m_icon;
 	CButton m_okButton;
 	CButton m_cancelButton;
+
+	CString latestURL;
 };

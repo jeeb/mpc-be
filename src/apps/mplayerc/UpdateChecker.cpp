@@ -37,22 +37,85 @@ UpdateChecker::~UpdateChecker(void)
 
 Update_Status UpdateChecker::isUpdateAvailable(const Version& currentVersion)
 {
-	CString Str = PlayerYouTubeGetTitle(versionFileURL);
+	char* final = NULL;
 
-	Str.Replace(_T("WebSVN"), _T(""));
-	Str.Replace(_T("MPC-BE Team"), _T(""));
-	Str.Replace(_T("Log"), _T(""));
-	Str.Replace(_T("Rev"), _T(""));
-	Str.Replace(_T("-"), _T(""));
-	Str.Replace(_T("/"), _T(""));
-	Str.Replace(_T(" "), _T(""));
-	Str.Replace(_T("\t"), _T(""));
-	Str.Replace(_T("\r"), _T(""));
-	Str.Replace(_T("\n"), _T(""));
+	HINTERNET f, s = InternetOpen(L"MPC-BE Update Checker", 0, NULL, NULL, 0);
+	if (s) {
+		f = InternetOpenUrl(s, versionFileURL, NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
+		if (f) {
+			char *out			= NULL;
+			DWORD dwBytesRead	= 0;
+			DWORD dataSize		= 0;
+
+			do {
+				char buffer[4096];
+				if (InternetReadFile(f, (LPVOID)buffer, _countof(buffer), &dwBytesRead) == FALSE) {
+					break;
+				}
+
+				char *tempData = DNew char[dataSize + dwBytesRead];
+				memcpy(tempData, out, dataSize);
+				memcpy(tempData + dataSize, buffer, dwBytesRead);
+				delete[] out;
+				out = tempData;
+				dataSize += dwBytesRead;
+
+				if (strstr(out, "dev build ")) {
+					break;
+				}
+			} while (dwBytesRead);
+
+			final = DNew char[dataSize + 1];
+			memset(final, 0, dataSize + 1);
+			memcpy(final, out, dataSize);
+			delete [] out;
+
+			InternetCloseHandle(f);
+		}
+		InternetCloseHandle(s);
+	}
 
 	Update_Status updateAvailable = UPDATER_NEWER_VERSION;
 
-	if (!parseVersion(Str)) {
+	if (!final || !f || !s) {
+		updateAvailable = UPDATER_ERROR;
+		return updateAvailable;
+	}
+
+	char *str = NULL;
+	int t_start = 0, t_stop = 0;
+
+	t_start = strpos(final, "MPC-BE v") + strlen("MPC-BE ");
+	final += t_start;
+	t_stop = strpos(final, "<");
+	str = DNew char[t_stop + 1];
+	memset(str, 0, t_stop + 1);
+	memcpy(str, final, t_stop);
+
+	CString versionStr = CString(str);
+
+	t_start = strpos(final, "build") + strlen("build ");
+	final += t_start;
+	t_stop = strpos(final, "<");
+	str = DNew char[t_stop + 1];
+	memset(str, 0, t_stop + 1);
+	memcpy(str, final, t_stop);
+
+	latestVersion.rev = (UINT)atoi(str);
+
+	final -= 160;
+	t_start = strpos(final, "http");
+	final += t_start;
+	t_stop = strpos(final, "\"");
+	str = DNew char[t_stop + 1];
+	memset(str, 0, t_stop + 1);
+	memcpy(str, final, t_stop);
+
+	latestVersion.url = CString(str);
+
+	delete [] str;
+
+	if (!parseVersion(versionStr)) {
 		updateAvailable = UPDATER_ERROR;
 	} else {
 		if (compareVersion(currentVersion, latestVersion)) {
@@ -74,7 +137,7 @@ bool UpdateChecker::parseVersion(const CString& versionStr)
 
 	if (!versionStr.IsEmpty()) {
 
-		latestVersion.rev = (UINT)_ttoi((LPCTSTR)versionStr);
+		latestVersion.version = versionStr;
 
 		success = true;
 	}
@@ -96,12 +159,16 @@ IMPLEMENT_DYNAMIC(UpdateCheckerDlg, CDialog)
 UpdateCheckerDlg::UpdateCheckerDlg(Update_Status updateStatus, const Version& latestVersion, CWnd* pParent)
 	: CDialog(UpdateCheckerDlg::IDD, pParent), m_updateStatus(updateStatus)
 {
+	CString VersionStr;
+
 	switch (updateStatus) {
 		case UPDATER_UPDATE_AVAILABLE:
-			m_text.Format(IDS_NEW_UPDATE_AVAILABLE, latestVersion.rev);
+			latestURL = latestVersion.url;
+			m_text.Format(IDS_NEW_UPDATE_AVAILABLE, latestVersion.version);
 			break;
 		case UPDATER_NEWER_VERSION:
-			m_text.Format(IDS_USING_NEWER_VERSION, UpdateChecker::MPC_VERSION.rev);
+			VersionStr.Format(_T("v%u.%u.%u.%u -dev build %u"), MPC_VERSION_MAJOR, MPC_VERSION_MINOR, MPC_VERSION_PATCH, MPC_VERSION_STATUS, MPC_VERSION_REV);
+			m_text.Format(IDS_USING_NEWER_VERSION, VersionStr);
 			break;
 		case UPDATER_ERROR:
 			m_text.LoadString(IDS_UPDATE_ERROR);
@@ -153,7 +220,7 @@ BOOL UpdateCheckerDlg::OnInitDialog()
 void UpdateCheckerDlg::OnOK()
 {
 	if (m_updateStatus == UPDATER_UPDATE_AVAILABLE) {
-		ShellExecute(NULL, _T("open"), _T("http://dev.mpc-next.ru/index.php?board=29.0"), NULL, NULL, SW_SHOWDEFAULT);
+		ShellExecute(NULL, _T("open"), latestURL, NULL, NULL, SW_SHOWDEFAULT);
 	}
 
 	__super::OnOK();
