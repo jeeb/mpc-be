@@ -3230,7 +3230,11 @@ LRESULT CMainFrame::OnResetDevice( WPARAM wParam, LPARAM lParam )
 	OAFilterState fs = State_Stopped;
 	pMC->GetState(0, &fs);
 	if (fs == State_Running) {
-		pMC->Pause();
+		if (GetPlaybackMode() != PM_CAPTURE) {
+			pMC->Pause();
+		} else {
+			pMC->Stop(); // Capture mode doesn't support pause
+		}
 	}
 
 	if (m_OSD.GetOSDType() != OSD_TYPE_GDI) {
