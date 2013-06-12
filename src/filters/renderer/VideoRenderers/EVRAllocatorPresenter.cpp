@@ -41,7 +41,6 @@ typedef enum {
 // Guid to tag IMFSample with DirectX surface index
 static const GUID GUID_SURFACE_INDEX = { 0x30c8e9f6, 0x415, 0x4b81, { 0xa3, 0x15, 0x1, 0xa, 0xc6, 0xa9, 0xda, 0x19 } };
 
-
 // === Helper functions
 #define CheckHR(exp) {if (FAILED(hr = exp)) return hr;}
 
@@ -1150,7 +1149,6 @@ STDMETHODIMP CEVRAllocatorPresenter::InitServicePointers(/* [in] */ __in  IMFTop
 	hr = pLookup->LookupService (MF_SERVICE_LOOKUP_GLOBAL, 0, MR_VIDEO_RENDER_SERVICE,
 								 __uuidof (IMFClock ), (void**)&m_pClock, &dwObjects);
 
-
 	StartWorkerThreads();
 	return S_OK;
 }
@@ -1331,7 +1329,6 @@ STDMETHODIMP CEVRAllocatorPresenter::GetFullscreen(BOOL *pfFullscreen)
 	return E_NOTIMPL;
 }
 
-
 // IEVRTrustedVideoPlugin
 STDMETHODIMP CEVRAllocatorPresenter::IsInTrustedVideoMode(BOOL *pYes)
 {
@@ -1356,7 +1353,6 @@ STDMETHODIMP CEVRAllocatorPresenter::DisableImageExport(BOOL bDisable)
 {
 	return S_OK;
 }
-
 
 // IDirect3DDeviceManager9
 STDMETHODIMP CEVRAllocatorPresenter::ResetDevice(IDirect3DDevice9 *pDevice,UINT resetToken)
@@ -1675,7 +1671,7 @@ LONGLONG CEVRAllocatorPresenter::GetClockTime(LONGLONG PerformanceCounter)
 				}
 			}
 			ModerateFloat(m_ModeratedTimeSpeed, ClockSpeedTarget, m_ModeratedTimeSpeedPrim, ChangeSpeed);
-			//			m_ModeratedTimeSpeed = TimeChange / ClockChange;
+			//m_ModeratedTimeSpeed = TimeChange / ClockChange;
 		}
 		m_TimeChangeHistory[Pos] = (double)llPerf;
 		m_ClockChangeHistory[Pos] = (double)llClockTime;
@@ -1689,7 +1685,7 @@ LONGLONG CEVRAllocatorPresenter::GetClockTime(LONGLONG PerformanceCounter)
 	// > 5 ms just set it
 	if ((fabs(Diff) > 50000.0 || bReset)) {
 
-		//		TRACE_EVR("EVR: Reset clock at diff: %f ms\n", (m_ModeratedTime - Target) /10000.0);
+		//TRACE_EVR("EVR: Reset clock at diff: %f ms\n", (m_ModeratedTime - Target) /10000.0);
 		if (State == MFCLOCK_STATE_RUNNING) {
 			if (bReset) {
 				m_ModeratedTimeSpeed = 1.0;
@@ -1802,7 +1798,7 @@ void CEVRAllocatorPresenter::OnVBlankFinished(bool fAll, LONGLONG PerformanceCou
 		LONGLONG SyncOffset = nsSampleTime - llClockTime;
 
 		m_pllSyncOffset[m_nNextSyncOffset] = SyncOffset;
-		//		TRACE_EVR("EVR: SyncOffset(%d, %d): %8I64d     %8I64d     %8I64d \n", m_nCurSurface, m_VSyncMode, m_LastPredictedSync, -SyncOffset, m_LastPredictedSync - (-SyncOffset));
+		//TRACE_EVR("EVR: SyncOffset(%d, %d): %8I64d     %8I64d     %8I64d \n", m_nCurSurface, m_VSyncMode, m_LastPredictedSync, -SyncOffset, m_LastPredictedSync - (-SyncOffset));
 
 		m_MaxSyncOffset = MINLONG64;
 		m_MinSyncOffset = MAXLONG64;
@@ -1825,13 +1821,13 @@ void CEVRAllocatorPresenter::OnVBlankFinished(bool fAll, LONGLONG PerformanceCou
 		m_fSyncOffsetAvr = MeanOffset;
 		m_bSyncStatsAvailable = true;
 		m_fSyncOffsetStdDev = StdDev;
-
-
 	}
 }
 
 STDMETHODIMP_(bool) CEVRAllocatorPresenter::ResetDevice()
 {
+	StopWorkerThreads();
+
 	CAutoLock lock(this);
 	CAutoLock lock2(&m_ImageProcessingLock);
 	CAutoLock cRenderLock(&m_RenderLock);
@@ -1850,6 +1846,11 @@ STDMETHODIMP_(bool) CEVRAllocatorPresenter::ResetDevice()
 		}
 		ASSERT (SUCCEEDED (hr));
 	}
+
+	if (bResult) {
+		StartWorkerThreads();
+	}
+
 	return bResult;
 }
 
@@ -2178,7 +2179,6 @@ void CEVRAllocatorPresenter::RenderThread()
 										}
 									}
 								}
-
 							}
 						}
 
@@ -2286,7 +2286,6 @@ void CEVRAllocatorPresenter::MoveToFreeList(IMFSample* pSample, bool bTail)
 
 void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, bool _bSorted)
 {
-
 	if (_bSorted) {
 		CAutoLock lock(&m_SampleQueueLock);
 		// Insert sorted
@@ -2474,7 +2473,7 @@ void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, bool _bSort
 			}
 		}
 
-		//		TRACE_EVR("EVR: Time: %f %f %f\n", Time / 10000000.0, SetDuration / 10000000.0, m_DetectedFrameRate);
+		//TRACE_EVR("EVR: Time: %f %f %f\n", Time / 10000000.0, SetDuration / 10000000.0, m_DetectedFrameRate);
 		if (!m_bCorrectedFrameTime && m_FrameTimeCorrection) {
 			--m_FrameTimeCorrection;
 		}
@@ -2513,7 +2512,6 @@ void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, bool _bSort
 		m_LastScheduledSampleTime = Time;
 
 		m_ScheduledSamples.AddTail(pSample);
-
 	}
 }
 
