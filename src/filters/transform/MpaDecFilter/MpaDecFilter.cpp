@@ -703,7 +703,7 @@ HRESULT CMpaDecFilter::ProcessHdmvLPCM(bool bAlignOldBuffer) // Blu ray LPCM
 
 	scmap_t* remap     = &s_scmap_hdmv [wfein->channel_conf];
 	int nChannels      = wfein->nChannels;
-	int xChannels      = nChannels + (nChannels % 2);
+	int xChannels      = nChannels + (nChannels & 1);
 	int BytesPerSample = (wfein->wBitsPerSample + 7) / 8;
 	int BytesPerFrame  = BytesPerSample * xChannels;
 
@@ -713,7 +713,7 @@ HRESULT CMpaDecFilter::ProcessHdmvLPCM(bool bAlignOldBuffer) // Blu ray LPCM
 	if (bAlignOldBuffer) {
 		m_buff.SetCount(len);
 	}
-	int nFrames = len/xChannels/BytesPerSample;
+	int nFrames = len / BytesPerFrame;
 
 	AVSampleFormat out_avsf = AV_SAMPLE_FMT_NONE;
 	int outSize = nFrames * nChannels * (wfein->wBitsPerSample <= 16 ? 2 : 4); // convert to 16 and 32-bit
@@ -731,13 +731,13 @@ HRESULT CMpaDecFilter::ProcessHdmvLPCM(bool bAlignOldBuffer) // Blu ray LPCM
 					*pDataOut = (int16_t)(pDataIn[nRemap * 2] << 8 | pDataIn[nRemap * 2 + 1]);
 					pDataOut++;
 				}
-				pDataIn += xChannels*2;
+				pDataIn += BytesPerFrame;
 			}
 		}
 		break;
 		case 24 :
 		case 20: {
-			out_avsf = AV_SAMPLE_FMT_S32;
+			out_avsf = AV_SAMPLE_FMT_S32; // convert to 32-bit
 			int32_t* pDataOut = (int32_t*)outBuff.GetData();
 
 			for (int i=0; i<nFrames; i++) {
@@ -746,7 +746,7 @@ HRESULT CMpaDecFilter::ProcessHdmvLPCM(bool bAlignOldBuffer) // Blu ray LPCM
 					*pDataOut = (int32_t)(pDataIn[nRemap * 3] << 24 | pDataIn[nRemap * 3 + 1] << 16 | pDataIn[nRemap * 3 + 2] << 8);
 					pDataOut++;
 				}
-				pDataIn += xChannels*3;
+				pDataIn += BytesPerFrame;
 			}
 		}
 		break;
