@@ -16,7 +16,7 @@
 * Обновлен русский перевод;
 * Обновлен итальянский перевод (автор Lord Maius);
 * Обновлен Китайский (Simplified) перевод  (автор insolo)
-* ffmpeg 1.2.1 git-7cb5467a;
+* ffmpeg 1.2.1 git-8aea2f05;
 * libopus 1.0.1 git-b518b56f;
 * Little-CMS 2.5 rc1 git-1b5e2fda;
 * libwebp 0.3.0 git-3fa595a5;

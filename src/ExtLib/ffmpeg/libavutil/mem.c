@@ -180,6 +180,22 @@ void *av_realloc_f(void *ptr, size_t nelem, size_t elsize)
     return r;
 }
 
+void *av_realloc_array(void *ptr, size_t nmemb, size_t size)
+{
+    if (size <= 0 || nmemb >= INT_MAX / size)
+        return NULL;
+    return av_realloc(ptr, nmemb * size);
+}
+
+int av_reallocp_array(void *ptr, size_t nmemb, size_t size)
+{
+    void **ptrptr = ptr;
+    *ptrptr = av_realloc_f(*ptrptr, nmemb, size);
+    if (!*ptrptr && !(nmemb && size))
+        return AVERROR(ENOMEM);
+    return 0;
+}
+
 void av_free(void *ptr)
 {
 #if CONFIG_MEMALIGN_HACK
