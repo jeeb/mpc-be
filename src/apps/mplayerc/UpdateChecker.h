@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * (C) 2013 see Authors.txt
+ * Copyright (C) 2013 Sergey "Exodus8" (rusguy6@gmail.com)
  *
  * This file is part of MPC-BE.
  *
