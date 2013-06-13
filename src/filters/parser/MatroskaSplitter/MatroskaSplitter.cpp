@@ -666,7 +666,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mt.subtype = MEDIASUBTYPE_DOLBY_TRUEHD;
 					mts.Add(mt);
 				} else if (CodecID == "A_DTS") {
-					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_DVD_DTS);
+					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_DTS2);
 					mts.Add(mt);
 				} else if (CodecID == "A_TTA1") {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_TTA1);
@@ -680,7 +680,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					memset(p + 14, 0, 30 - 14);
 					mts.Add(mt);
 				} else if (CodecID == "A_AAC") {
-					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_AAC);
+					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_RAW_AAC1);
 					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
 					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
 					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
@@ -783,7 +783,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					vf->nMinBitsPerSec = vf->nMaxBitsPerSec = vf->nAvgBitsPerSec = (DWORD)-1;
 					mts.Add(mt);
 				} else if (CodecID.Find("A_AAC/") == 0) {
-					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_AAC);
+					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_RAW_AAC1);
 					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 5);
 					wfe->cbSize = 2;
 

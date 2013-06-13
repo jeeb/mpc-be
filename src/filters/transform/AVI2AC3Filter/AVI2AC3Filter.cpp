@@ -23,6 +23,7 @@
 
 #include "stdafx.h"
 #include <atlbase.h>
+#include <MMReg.h>
 #include "AVI2AC3Filter.h"
 #include "../../../DSUtil/DSUtil.h"
 
@@ -35,7 +36,7 @@
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{&MEDIATYPE_Audio, &MEDIASUBTYPE_WAVE_DOLBY_AC3},
-	{&MEDIATYPE_Audio, &MEDIASUBTYPE_WAVE_DTS},
+	{&MEDIATYPE_Audio, &MEDIASUBTYPE_DTS2},
 };
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
@@ -352,9 +353,9 @@ bool CAVI2AC3Filter::CheckWAVEAC3(const CMediaType* pmt)
 bool CAVI2AC3Filter::CheckWAVEDTS(const CMediaType* pmt)
 {
 	return pmt->majortype == MEDIATYPE_Audio
-		   && pmt->subtype == MEDIASUBTYPE_WAVE_DTS
+		   && pmt->subtype == MEDIASUBTYPE_DTS2
 		   && pmt->formattype == FORMAT_WaveFormatEx
-		   && ((WAVEFORMATEX*)pmt->pbFormat)->wFormatTag == WAVE_FORMAT_DVD_DTS;
+		   && ((WAVEFORMATEX*)pmt->pbFormat)->wFormatTag == WAVE_FORMAT_DTS2;
 }
 
 HRESULT CAVI2AC3Filter::CheckInputType(const CMediaType* mtIn)
@@ -441,8 +442,8 @@ HRESULT CAVI2AC3Filter::GetMediaType(int iPosition, CMediaType* pMediaType)
 			pMediaType->subtype = MEDIASUBTYPE_WAVE_DOLBY_AC3;
 			wfe->wFormatTag = WAVE_FORMAT_DOLBY_AC3;
 		} else if (subtype == MEDIASUBTYPE_DTS) {
-			pMediaType->subtype = MEDIASUBTYPE_WAVE_DTS;
-			wfe->wFormatTag = WAVE_FORMAT_DVD_DTS;
+			pMediaType->subtype = MEDIASUBTYPE_DTS2;
+			wfe->wFormatTag = WAVE_FORMAT_DTS2;
 		} else {
 			return E_INVALIDARG;
 		}
@@ -468,7 +469,7 @@ HRESULT CAVI2AC3Filter::GetMediaType(int iPosition, CMediaType* pMediaType)
 			wfe->wfx.nSamplesPerSec = 48000;
 			wfe->wfx.nChannels = 6;
 			wfe->bBigEndian = TRUE;
-		} else if (subtype == MEDIASUBTYPE_WAVE_DTS) {
+		} else if (subtype == MEDIASUBTYPE_DTS2) {
 			pMediaType->subtype = MEDIASUBTYPE_DTS;
 
 			pMediaType->formattype = FORMAT_WaveFormatEx;

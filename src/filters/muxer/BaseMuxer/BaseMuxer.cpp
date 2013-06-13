@@ -1113,7 +1113,7 @@ void CBaseMuxerRawOutputPin::MuxPacket(const CMediaType& mt, const MuxerPacket* 
 	const BYTE* pData = pPacket->pData.GetData();
 	const int DataSize = int(pPacket->pData.GetCount());
 
-	if (mt.subtype == MEDIASUBTYPE_AAC && mt.formattype == FORMAT_WaveFormatEx) {
+	if (mt.subtype == MEDIASUBTYPE_RAW_AAC1 && mt.formattype == FORMAT_WaveFormatEx) {
 		WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.Format();
 
 		int profile = 0;

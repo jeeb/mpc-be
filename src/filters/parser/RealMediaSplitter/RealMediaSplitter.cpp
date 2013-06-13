@@ -130,7 +130,7 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn3[] = {
 	{&MEDIATYPE_Audio, &MEDIASUBTYPE_COOK},
 	{&MEDIATYPE_Audio, &MEDIASUBTYPE_DNET},
 	{&MEDIATYPE_Audio, &MEDIASUBTYPE_SIPR},
-	{&MEDIATYPE_Audio, &MEDIASUBTYPE_AAC},
+	{&MEDIATYPE_Audio, &MEDIASUBTYPE_RAW_AAC1},
 	{&MEDIATYPE_Audio, &MEDIASUBTYPE_RAAC},
 	{&MEDIATYPE_Audio, &MEDIASUBTYPE_RACP},
 };
@@ -418,7 +418,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mt.subtype = FOURCCMap(pwfe->wFormatTag = WAVE_FORMAT_DOLBY_AC3);
 					mts.InsertAt(0, mt);
 				} else if (fcc == 'RAAC' || fcc == 'RACP') {
-					mt.subtype = FOURCCMap(pwfe->wFormatTag = WAVE_FORMAT_AAC);
+					mt.subtype = FOURCCMap(pwfe->wFormatTag = WAVE_FORMAT_RAW_AAC1);
 					int extralen = *(DWORD*)extra;
 					extra += 4;
 					::bswap(extralen);
@@ -997,7 +997,7 @@ HRESULT CRealMediaSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			}
 		}
 	} else if (m_mt.subtype == MEDIASUBTYPE_RAAC || m_mt.subtype == MEDIASUBTYPE_RACP
-			   || m_mt.subtype == MEDIASUBTYPE_AAC) {
+			   || m_mt.subtype == MEDIASUBTYPE_RAW_AAC1) {
 		BYTE* ptr = p->GetData()+2;
 
 		CAtlList<WORD> sizes;
@@ -2166,7 +2166,7 @@ HRESULT CRealAudioDecoder::InitRA(const CMediaType* pmt)
 
 	CAutoVectorPtr<BYTE> pBuff;
 
-	if (pmt->subtype == MEDIASUBTYPE_AAC) {
+	if (pmt->subtype == MEDIASUBTYPE_RAW_AAC1) {
 		pBuff.Allocate(cbSize+1);
 		pBuff[0] = 0x02;
 		memcpy(pBuff+1, pwfe+1, cbSize);
@@ -2283,7 +2283,7 @@ HRESULT CRealAudioDecoder::Receive(IMediaSample* pIn)
 
 	if (m_pInput->CurrentMediaType().subtype == MEDIASUBTYPE_RAAC
 			|| m_pInput->CurrentMediaType().subtype == MEDIASUBTYPE_RACP
-			|| m_pInput->CurrentMediaType().subtype == MEDIASUBTYPE_AAC) {
+			|| m_pInput->CurrentMediaType().subtype == MEDIASUBTYPE_RAW_AAC1) {
 		src = pDataIn;
 		dst = pDataIn + len;
 		w = len;
@@ -2416,7 +2416,7 @@ HRESULT CRealAudioDecoder::CheckInputType(const CMediaType* mtIn)
 			&& mtIn->subtype != MEDIASUBTYPE_SIPR
 			&& mtIn->subtype != MEDIASUBTYPE_RAAC
 			&& mtIn->subtype != MEDIASUBTYPE_RACP
-			&& mtIn->subtype != MEDIASUBTYPE_AAC) {
+			&& mtIn->subtype != MEDIASUBTYPE_RAW_AAC1) {
 		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
 
@@ -2539,7 +2539,7 @@ HRESULT CRealAudioDecoder::CheckTransform(const CMediaType* mtIn, const CMediaTy
 			|| mtIn->subtype == MEDIASUBTYPE_SIPR
 			|| mtIn->subtype == MEDIASUBTYPE_RAAC
 			|| mtIn->subtype == MEDIASUBTYPE_RACP
-			|| mtIn->subtype == MEDIASUBTYPE_AAC)
+			|| mtIn->subtype == MEDIASUBTYPE_RAW_AAC1)
 		   && mtOut->majortype == MEDIATYPE_Audio && mtOut->subtype == MEDIASUBTYPE_PCM
 		   ? S_OK
 		   : VFW_E_TYPE_NOT_ACCEPTED;

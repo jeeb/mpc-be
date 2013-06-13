@@ -135,7 +135,7 @@ typedef struct {
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 	{&MEDIATYPE_Audio, &MEDIASUBTYPE_MP3},
-	{&MEDIATYPE_Audio, &MEDIASUBTYPE_AAC},
+	{&MEDIATYPE_Audio, &MEDIASUBTYPE_RAW_AAC1},
 };
 
 const AMOVIESETUP_PIN sudOpPin[] = {
@@ -548,12 +548,12 @@ HRESULT CShoutcastStream::GetMediaType(int iPosition, CMediaType* pmt)
 		wfe->wBitsPerSample		= 0;
 	} else if (m_socket.m_Format == AUDIO_AAC) {
 		pmt->SetType(&MEDIATYPE_Audio);
-		pmt->SetSubtype(&MEDIASUBTYPE_AAC);
+		pmt->SetSubtype(&MEDIASUBTYPE_RAW_AAC1);
 		pmt->SetFormatType(&FORMAT_WaveFormatEx);
 
 		WAVEFORMATEX* wfe		= (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX)+5];
 		memset(wfe, 0, sizeof(WAVEFORMATEX)+5);
-		wfe->wFormatTag			= WAVE_FORMAT_AAC;
+		wfe->wFormatTag			= WAVE_FORMAT_RAW_AAC1;
 		wfe->nChannels			= m_socket.m_aachdr.channels <= 6 ? m_socket.m_aachdr.channels : 2;
 		wfe->nSamplesPerSec		= aacfreq[m_socket.m_aachdr.freq];
 		wfe->nBlockAlign		= m_socket.m_aachdr.aac_frame_length;
@@ -574,7 +574,7 @@ HRESULT CShoutcastStream::CheckMediaType(const CMediaType* pmt)
 {
 	if (pmt->majortype == MEDIATYPE_Audio
 			&& ((pmt->subtype == MEDIASUBTYPE_MP3 && m_socket.m_Format == AUDIO_MPEG) ||
-				(pmt->subtype == MEDIASUBTYPE_AAC && m_socket.m_Format == AUDIO_AAC))
+				(pmt->subtype == MEDIASUBTYPE_RAW_AAC1 && m_socket.m_Format == AUDIO_AAC))
 			&& pmt->formattype == FORMAT_WaveFormatEx) {
 		return S_OK;
 	}

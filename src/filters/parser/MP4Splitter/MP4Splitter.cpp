@@ -795,7 +795,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									break;
 								}
 							}
-							mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_AAC);
+							mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_RAW_AAC1);
 							if (wfe->cbSize >= 2) {
 								WORD Channels = (((BYTE*)(wfe+1))[1]>>3) & 0xf;
 								if (Channels) {
@@ -821,7 +821,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						case AP4_DTSC_AUDIO_OTI:
 						case AP4_DTSH_AUDIO_OTI:
 						case AP4_DTSL_AUDIO_OTI:
-							mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_DVD_DTS);
+							mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_DTS2);
 							{
 								m_pFile->Seek(sample.GetOffset());
 								CBaseSplitterFileEx::dtshdr h;
@@ -1105,7 +1105,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								SetTrackName(&TrackName, _T("AC-3 Audio"));
 							}
 						} else if (type == AP4_ATOM_TYPE_MP4A) {
-							fourcc = WAVE_FORMAT_AAC;
+							fourcc = WAVE_FORMAT_RAW_AAC1;
 							SetTrackName(&TrackName, _T("MPEG-2 Audio AAC"));
 						} else if (type == AP4_ATOM_TYPE_NMOS) {
 							fourcc = MAKEFOURCC('N','E','L','L');

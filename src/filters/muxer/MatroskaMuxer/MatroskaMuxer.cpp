@@ -920,7 +920,7 @@ HRESULT CMatroskaMuxerInputPin::CompleteConnect(IPin* pPin)
 		m_pTE->TrackType.Set(TrackEntry::TypeAudio);
 
 		if (m_mt.formattype == FORMAT_WaveFormatEx
-				&& ((WAVEFORMATEX*)m_mt.pbFormat)->wFormatTag == WAVE_FORMAT_AAC
+				&& ((WAVEFORMATEX*)m_mt.pbFormat)->wFormatTag == WAVE_FORMAT_RAW_AAC1
 				&& m_mt.cbFormat >= sizeof(WAVEFORMATEX)+2) {
 			WAVEFORMATEX* wfe = (WAVEFORMATEX*)m_mt.pbFormat;
 			BYTE* p = (BYTE*)(wfe+1);
@@ -987,7 +987,7 @@ HRESULT CMatroskaMuxerInputPin::CompleteConnect(IPin* pPin)
 
 			hr = S_OK;
 		} else if (m_mt.formattype == FORMAT_WaveFormatEx
-				   && ((WAVEFORMATEX*)m_mt.pbFormat)->wFormatTag == WAVE_FORMAT_DVD_DTS) {
+				   && ((WAVEFORMATEX*)m_mt.pbFormat)->wFormatTag == WAVE_FORMAT_DTS2) {
 			m_pTE->CodecID.Set("A_DTS");
 
 			WAVEFORMATEX* wfe = (WAVEFORMATEX*)m_mt.pbFormat;

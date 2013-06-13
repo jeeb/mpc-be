@@ -45,7 +45,7 @@ static const FFMPEG_AUDIO_CODECS ffAudioCodecs[] = {
 	{ &MEDIASUBTYPE_SAMR,              AV_CODEC_ID_AMR_NB },
 	{ &MEDIASUBTYPE_SAWB,              AV_CODEC_ID_AMR_WB },
 	// AAC
-	{ &MEDIASUBTYPE_AAC,               AV_CODEC_ID_AAC },
+	{ &MEDIASUBTYPE_RAW_AAC1,          AV_CODEC_ID_AAC },
 	{ &MEDIASUBTYPE_MP4A,              AV_CODEC_ID_AAC },
 	{ &MEDIASUBTYPE_mp4a,              AV_CODEC_ID_AAC },
 	{ &MEDIASUBTYPE_AAC_ADTS,          AV_CODEC_ID_AAC },
@@ -88,7 +88,7 @@ static const FFMPEG_AUDIO_CODECS ffAudioCodecs[] = {
 	{ &MEDIASUBTYPE_MLP,               AV_CODEC_ID_MLP    },
 	// DTS
 	{ &MEDIASUBTYPE_DTS,               AV_CODEC_ID_DTS },
-	{ &MEDIASUBTYPE_WAVE_DTS,          AV_CODEC_ID_DTS },
+	{ &MEDIASUBTYPE_DTS2,              AV_CODEC_ID_DTS },
 	// FLAC
 	{ &MEDIASUBTYPE_FLAC_FRAMED,       AV_CODEC_ID_FLAC },
 	// QDM2

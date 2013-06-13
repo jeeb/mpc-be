@@ -328,7 +328,7 @@ CString CMediaTypeEx::GetAudioCodecName(const GUID& subtype, WORD wFormatTag)
 		names[WAVE_FORMAT_G729A]                 = _T("G729A");
 		names[WAVE_FORMAT_MEDIASONIC_G723]       = _T("MediaSonic G723");
 		names[WAVE_FORMAT_ZYXEL_ADPCM]           = _T("ZyXEL ADPCM");
-		names[WAVE_FORMAT_RAW_AAC1]              = _T("AAC"); // = WAVE_FORMAT_AAC
+		names[WAVE_FORMAT_RAW_AAC1]              = _T("AAC");
 		names[WAVE_FORMAT_RHETOREX_ADPCM]        = _T("Rhetorex ADPCM");
 		names[WAVE_FORMAT_VIVO_G723]             = _T("Vivo G723");
 		names[WAVE_FORMAT_VIVO_SIREN]            = _T("Vivo Siren");
@@ -342,7 +342,7 @@ CString CMediaTypeEx::GetAudioCodecName(const GUID& subtype, WORD wFormatTag)
 		names[WAVE_FORMAT_CREATIVE_FASTSPEECH8]  = _T("Creative Fastspeech 8");
 		names[WAVE_FORMAT_CREATIVE_FASTSPEECH10] = _T("Creative Fastspeech 10");
 		names[WAVE_FORMAT_UHER_ADPCM]            = _T("UHER ADPCM");
-		names[WAVE_FORMAT_DTS2]                  = _T("DTS"); // = WAVE_FORMAT_DVD_DTS
+		names[WAVE_FORMAT_DTS2]                  = _T("DTS");
 		// other
 		names[WAVE_FORMAT_DOLBY_AC3]             = _T("Dolby AC3");
 		names[WAVE_FORMAT_LATM_AAC]              = _T("AAC(LATM)");

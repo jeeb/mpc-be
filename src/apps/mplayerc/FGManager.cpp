@@ -1771,7 +1771,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	// hmmm, shouldn't there be an option in the GUI to enable/disable this filter?
 	pFGF = DNew CFGFilterInternal<CAVI2AC3Filter>(AVI2AC3FilterName, MERIT64(0x00680000)+1);
 	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_WAVE_DOLBY_AC3);
-	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_WAVE_DTS);
+	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_DTS2);
 	m_transform.AddTail(pFGF);
 
 	if (!IsPreview) {
@@ -1987,15 +1987,15 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->AddType(MEDIATYPE_MPEG2_PACK, MEDIASUBTYPE_DTS);
 		pFGF->AddType(MEDIATYPE_MPEG2_PES, MEDIASUBTYPE_DTS);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_DTS);
-		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_WAVE_DTS);
+		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_DTS2);
 		m_transform.AddTail(pFGF);
 
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 					(ffmpeg_filters[FFM_AAC]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 					(ffmpeg_filters[FFM_AAC]) ? MERIT64_ABOVE_DSHOW+1 : MERIT64_DO_USE);
-		pFGF->AddType(MEDIATYPE_MPEG2_PACK, MEDIASUBTYPE_AAC);
-		pFGF->AddType(MEDIATYPE_MPEG2_PES, MEDIASUBTYPE_AAC);
-		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_AAC);
+		pFGF->AddType(MEDIATYPE_MPEG2_PACK, MEDIASUBTYPE_RAW_AAC1);
+		pFGF->AddType(MEDIATYPE_MPEG2_PES, MEDIASUBTYPE_RAW_AAC1);
+		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_RAW_AAC1);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_LATM_AAC);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_AAC_ADTS);
 		pFGF->AddType(MEDIATYPE_MPEG2_PACK, MEDIASUBTYPE_MP4A);

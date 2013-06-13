@@ -718,7 +718,7 @@ bool CBaseSplitterFileEx::Read(aachdr& h, int len, CMediaType* pmt, bool find_sy
 
 	WAVEFORMATEX* wfe = (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX)+5];
 	memset(wfe, 0, sizeof(WAVEFORMATEX)+5);
-	wfe->wFormatTag = WAVE_FORMAT_AAC;
+	wfe->wFormatTag = WAVE_FORMAT_RAW_AAC1;
 	wfe->nChannels = h.channels <= 6 ? h.channels : 2;
 	wfe->nSamplesPerSec = freq[h.freq];
 	wfe->nBlockAlign = h.aac_frame_length;
@@ -726,7 +726,7 @@ bool CBaseSplitterFileEx::Read(aachdr& h, int len, CMediaType* pmt, bool find_sy
 	wfe->cbSize = MakeAACInitData((BYTE*)(wfe+1), h.profile, wfe->nSamplesPerSec, wfe->nChannels);
 
 	pmt->majortype = MEDIATYPE_Audio;
-	pmt->subtype = MEDIASUBTYPE_AAC;
+	pmt->subtype = MEDIASUBTYPE_RAW_AAC1;
 	pmt->formattype = FORMAT_WaveFormatEx;
 	pmt->SetFormat((BYTE*)wfe, sizeof(WAVEFORMATEX)+wfe->cbSize);
 
@@ -938,7 +938,7 @@ bool CBaseSplitterFileEx::Read(dtshdr& h, int len, CMediaType* pmt, bool find_sy
 
 	WAVEFORMATEX wfe;
 	memset(&wfe, 0, sizeof(wfe));
-	wfe.wFormatTag = WAVE_FORMAT_DVD_DTS;
+	wfe.wFormatTag = WAVE_FORMAT_DTS2;
 
 	static int channels[] = {1, 2, 2, 2, 2, 3, 3, 4, 4, 5, 6, 6, 6, 7, 8, 8};
 

@@ -405,7 +405,7 @@ CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipInfo::Str
 						Infos.AddTail(L"PS2 ADPCM");
 					}
 					break;
-					case WAVE_FORMAT_DVD_DTS: {
+					case WAVE_FORMAT_DTS2: {
 						if (pPresentationDesc) {
 							Infos.AddTail(pPresentationDesc);
 						} else {
@@ -421,7 +421,7 @@ CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipInfo::Str
 						}
 					}
 					break;
-					case WAVE_FORMAT_AAC: {
+					case WAVE_FORMAT_RAW_AAC1: {
 						Infos.AddTail(L"AAC");
 					}
 					break;
@@ -1468,7 +1468,7 @@ LONGLONG GetMediaTypeQuality(const CMediaType *_pMediaType, int _PresentationFor
 						TypePriority = 4;
 					}
 					break;
-					case WAVE_FORMAT_DVD_DTS: {
+					case WAVE_FORMAT_DTS2: {
 						TypePriority = 9;
 					}
 					break;
@@ -1476,7 +1476,7 @@ LONGLONG GetMediaTypeQuality(const CMediaType *_pMediaType, int _PresentationFor
 						TypePriority = 8;
 					}
 					break;
-					case WAVE_FORMAT_AAC: {
+					case WAVE_FORMAT_RAW_AAC1: {
 						TypePriority = 7;
 					}
 					break;
@@ -1826,7 +1826,7 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 	}
 
 	// AAC
-	if (m_mt.subtype == MEDIASUBTYPE_AAC) { // special code for aac, the currently available decoders only like whole frame samples
+	if (m_mt.subtype == MEDIASUBTYPE_RAW_AAC1) { // special code for aac, the currently available decoders only like whole frame samples
 		if (m_p && m_p->GetCount() == 1 && m_p->GetAt(0) == 0xff && !(!p->IsEmpty() && (p->GetAt(0) & 0xf6) == 0xf0)) {
 			m_p.Free();
 		}

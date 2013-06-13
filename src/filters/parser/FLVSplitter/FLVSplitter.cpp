@@ -524,7 +524,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							fTypeFlagsAudio = true;
 							break;
 						}
-						mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_AAC);
+						mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_RAW_AAC1);
 						name += L" AAC";
 
 						__int64 configOffset = m_pFile->GetPos();
@@ -551,7 +551,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						wfe = (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX) + configSize);
 						memset(wfe, 0, mt.FormatLength());
-						wfe->wFormatTag		= WAVE_FORMAT_AAC;
+						wfe->wFormatTag     = WAVE_FORMAT_RAW_AAC1;
 						wfe->nSamplesPerSec = sampleRates[iSampleRate];
 						wfe->wBitsPerSample = 16;
 						wfe->nChannels      = channels[iChannels];
