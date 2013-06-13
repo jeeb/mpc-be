@@ -764,7 +764,8 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId)
 	BYTE* end = base + m_buff.GetCount();
 	BYTE* p = base;
 
-	if (m_FFAudioDec.GetCodecId() != nCodecId) {
+	if ((m_FFAudioDec.GetCodecId() != nCodecId)
+			&& (nCodecId != AV_CODEC_ID_AC3 && nCodecId != AV_CODEC_ID_EAC3)) { // disable check for AC3/EAC3 stream.
 		m_FFAudioDec.Init(nCodecId, m_pInput);
 		m_FFAudioDec.SetDRC(GetDynamicRangeControl());
 	}
