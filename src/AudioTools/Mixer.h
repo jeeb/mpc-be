@@ -29,22 +29,27 @@ class CMixer
 protected:
 	AVAudioResampleContext* m_pAVRCxt;
 	double* m_matrix_dbl;
+	bool    m_ActualContext;
 
 	enum AVSampleFormat m_in_avsf;
+	enum AVSampleFormat m_out_avsf;
 	DWORD   m_in_layout;
 	DWORD   m_out_layout;
 	float   m_matrix_norm;
 	int     m_in_samplerate;
 	int     m_out_samplerate;
 
-	void Init(AVSampleFormat in_avsf, DWORD in_layout, DWORD out_layout, float matrix_norm = 0.0f, int in_samplerate = 48000, int out_samplerate = 48000);
+	bool Init();
 
 public:
 	CMixer();
 	~CMixer();
 
-	void Update(AVSampleFormat in_avsf, DWORD in_layout, DWORD out_layout, float matrix_norm = 0.0f, int in_samplerate = 48000, int out_samplerate = 48000);
-	int  Mixing(float* pOutput, int out_samples, BYTE* pInput, int in_samples);
+	void UpdateInput(AVSampleFormat in_avsf, DWORD in_layout, int in_samplerate = 48000);
+	void UpdateOutput(AVSampleFormat out_avsf, DWORD out_layout, int out_samplerate = 48000);
+	void SetOptions(float matrix_norm = 0.0f);
+
+	int  Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples);
 
 	int  CalcOutSamples(int in_samples); // needed when using resampling
 	void FlushBuffers(); // needed when using resampling

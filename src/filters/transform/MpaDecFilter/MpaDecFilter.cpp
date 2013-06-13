@@ -1444,9 +1444,11 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, int size, AVSampleFormat avsf, DWORD
 
 		if (dwChannelMask != mixed_mask) {
 			mixData.SetCount(nSamples * mixed_channels);
-			m_Mixer.Update(avsf, dwChannelMask, mixed_mask);
 
-			if (m_Mixer.Mixing(mixData.GetData(), nSamples, pDataIn, nSamples) > 0) {
+			m_Mixer.UpdateInput(avsf, dwChannelMask);
+			m_Mixer.UpdateOutput(AV_SAMPLE_FMT_FLT, mixed_mask);
+
+			if (m_Mixer.Mixing((BYTE*)mixData.GetData(), nSamples, pDataIn, nSamples) > 0) {
 				pDataIn       = (BYTE*)mixData.GetData();
 				avsf          = AV_SAMPLE_FMT_FLT; // float after mixing
 				size          = nSamples * mixed_channels * sizeof(float);
@@ -1672,12 +1674,13 @@ HRESULT CMpaDecFilter::AC3Encode(BYTE* pBuff, int size, AVSampleFormat avsf, DWO
 
 		convert_to_float(avsf, nChannels, nSamples, pBuff, p);
 	} else {
-		m_Mixer.Update(avsf, dwChannelMask, new_layout, 0.0f, nSamplesPerSec, new_samplerate);
+		m_Mixer.UpdateInput(avsf, dwChannelMask, nSamplesPerSec);
+		m_Mixer.UpdateOutput(AV_SAMPLE_FMT_FLT, new_layout, new_samplerate);
 		int added = m_Mixer.CalcOutSamples(nSamples) * new_channels;
 		m_encbuff.SetCount(remain + added);
 		p = m_encbuff.GetData() + remain;
 
-		added = m_Mixer.Mixing(p, added, pBuff, nSamples) * new_channels;
+		added = m_Mixer.Mixing((BYTE*)p, added, pBuff, nSamples) * new_channels;
 		if (added <= 0) {
 			m_encbuff.SetCount(remain);
 			return S_OK;

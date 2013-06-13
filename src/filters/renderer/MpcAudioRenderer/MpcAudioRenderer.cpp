@@ -1382,7 +1382,8 @@ HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 			TRACE(_T("		samplerate	= %d\n"), out_samplerate);
 #endif
 
-			m_Resampler.Update(in_avsf, in_layout, out_layout, 0.0f, in_samplerate, out_samplerate);
+			m_Resampler.UpdateInput(in_avsf, in_layout, in_samplerate);
+			m_Resampler.UpdateOutput(AV_SAMPLE_FMT_FLT, out_layout, out_samplerate);
 			out_samples	= m_Resampler.CalcOutSamples(in_samples);
 			buff		= DNew float[out_samples * out_channels];
 			if (!buff) {
@@ -1391,7 +1392,7 @@ HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 				}
 				return E_OUTOFMEMORY;
 			}
-			out_samples = m_Resampler.Mixing(buff, out_samples, in_buff, in_samples);
+			out_samples = m_Resampler.Mixing((BYTE*)buff, out_samples, in_buff, in_samples);
 
 			if (isInt24) {
 				isInt24 = false;
