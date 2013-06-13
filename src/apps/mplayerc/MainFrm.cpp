@@ -692,7 +692,9 @@ CMainFrame::CMainFrame() :
 	m_hWtsLib(0),
 	m_CaptureWndBitmap(NULL),
 	m_ThumbCashedBitmap(NULL),
-	m_DebugMonitor(::GetCurrentProcessId())
+	m_DebugMonitor(::GetCurrentProcessId()),
+	m_nSubtitleId(NULL),
+	m_nSelSub2(-1)
 {
 	m_Lcd.SetVolumeRange(0, 100);
 	m_LastSaveTime.QuadPart = 0;
@@ -9942,7 +9944,7 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 	bool bSplitterMenu = false;
 	int splsubcnt = 0;
 	int i = (int)id;
-	//SelSub2 = m_iSubtitleSel;
+	//m_nSelSub2 = m_iSubtitleSel;
 
 	if (GetPlaybackMode() == PM_FILE && b_UseVSFilter) {
 		CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
@@ -9996,7 +9998,7 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 							UpdateSubtitle();
 						}
 						pSS->Enable(m, AMSTREAMSELECTENABLE_ENABLE);
-						SelSub2 = m_iSubtitleSel;
+						m_nSelSub2 = m_iSubtitleSel;
 						
 						if (!AfxGetAppSettings().fEnableSubtitles) {
 							m_iSubtitleSel = -1;
@@ -10025,9 +10027,10 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 		// enable
 
 		if (!AfxGetAppSettings().fEnableSubtitles) {
-			m_iSubtitleSel = -1;
+			m_nSelSub2		= m_iSubtitleSel;
+			m_iSubtitleSel	= -1;
 		} else {
-			m_iSubtitleSel = SelSub2;
+			m_iSubtitleSel = m_nSelSub2;
 		}
 		UpdateSubtitle();
 	} else if (i >= 0) {
@@ -10035,7 +10038,7 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 		m = i - m;
 
 		m_iSubtitleSel = m;
-		SelSub2 = m_iSubtitleSel;
+		m_nSelSub2 = m_iSubtitleSel;
 		if (!AfxGetAppSettings().fEnableSubtitles) {
 			m_iSubtitleSel = -1;
 		}
@@ -16617,6 +16620,8 @@ bool CMainFrame::LoadSubtitle(CString fn, ISubStream **actualStream)
 		if (actualStream != NULL) {
 			*actualStream = r;
 		}
+
+		AfxGetAppSettings().fEnableSubtitles = true;
 	}
 
 	return(!!pSubStream);
@@ -16742,7 +16747,7 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, bool fApplyDefStyle)
 		}
 	}
 
-	m_nSubtitleId	= (DWORD_PTR)pSubStream;
+	m_nSubtitleId = (DWORD_PTR)pSubStream;
 
 	if (m_pCAP) {
 		m_pCAP->SetSubPicProvider(CComQIPtr<ISubPicProvider>(pSubStream));

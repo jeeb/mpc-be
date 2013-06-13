@@ -352,7 +352,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	void SubFlags(CString strname, bool* forced, bool* def);
 	size_t GetSubSelIdx();
 	int cntintsub;
-	int SelSub2;
+	int m_nSelSub2;
 	// chapters (file mode)
 	CComPtr<IDSMChapterBag> m_pCB;
 	void SetupChapters();
