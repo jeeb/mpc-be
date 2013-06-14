@@ -51,11 +51,18 @@ CMixer::CMixer()
 CMixer::~CMixer()
 {
 	avresample_free(&m_pAVRCxt);
-	av_free(m_matrix_dbl);
+
+	if (m_matrix_dbl) {
+		av_free(m_matrix_dbl);
+	}
 }
 
 bool CMixer::Init()
 {
+	if (m_matrix_dbl) {
+		av_freep(m_matrix_dbl);
+	}
+
 	// Close Resample Context
 	avresample_close(m_pAVRCxt);
 
@@ -242,6 +249,11 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples)
 
 int CMixer::CalcOutSamples(int in_samples)
 {
+	if (!m_ActualContext && !Init()) {
+		TRACE(_T("Mixer: Init() failed\n"));
+		return 0;
+	}
+
 	if (m_in_samplerate == m_out_samplerate) {
 		return in_samples;
 	} else {

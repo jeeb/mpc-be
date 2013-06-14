@@ -1916,8 +1916,10 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 
 		if (pData != NULL) {
 			memcpy(&pData[0], p, nAvailableBytes);
-								
-			if (!IsBitstream(m_pWaveFileFormat) && (m_dVolume >= 0.0 && m_dVolume < 1.0)) {
+
+			if (m_dVolume == 0.0) {
+				bufferFlags = AUDCLNT_BUFFERFLAGS_SILENT;
+			} else if (!IsBitstream(m_pWaveFileFormat) && (m_dVolume > 0.0 && m_dVolume < 1.0)) {
 				// Adjusting volume ...
 				WAVEFORMATEX* wfeOutput				= (WAVEFORMATEX*)m_pWaveFileFormatOutput;
 				WAVEFORMATEXTENSIBLE* wfexOutput	= (WAVEFORMATEXTENSIBLE*)wfeOutput;
