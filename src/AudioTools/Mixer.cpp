@@ -57,7 +57,9 @@ CMixer::~CMixer()
 
 bool CMixer::Init()
 {
-	av_freep(m_matrix_dbl); // If ptr is a NULL pointer, this function simply performs no actions.
+	if (m_matrix_dbl) {
+		av_freep(m_matrix_dbl);
+	}
 
 	// Close Resample Context
 	avresample_close(m_pAVRCxt);
