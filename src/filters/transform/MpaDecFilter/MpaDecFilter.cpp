@@ -1548,7 +1548,7 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, int size, WORD type, int sa
 		case IEC61937_DTS1:
 		case IEC61937_DTS2:
 		case IEC61937_DTS3:
-			if (size == 4096 && sample_rate == 44100 && samples == 1024) { // DTSWAV
+			if (sample_rate == 44100 && size == samples * 4) { // DTSWAV
 				length = size;
 				isDTSWAV = true;
 			} else while (length < size + 16) {
