@@ -188,6 +188,17 @@ class CDebugMonitor : public CWinDebugMonitor
 {
 	FILE* m_File;
 
+private:
+	CString GetLocalTime() {
+		SYSTEMTIME st;
+		::GetLocalTime(&st);
+
+		CString lt;
+		lt.Format(L"%04d.%02d.%02d %02d:%02d:%02d.%03d", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wMinute, st.wMilliseconds);
+	
+		return lt;
+	}
+
 public:
 	CDebugMonitor(DWORD dwProcessId) : CWinDebugMonitor(dwProcessId) {
 		m_File = NULL;
@@ -196,18 +207,14 @@ public:
 			if (m_File) {
 				fseek(m_File, 0, 2);
 
-				time_t now(time(0));
-				CTime ct(now);
-				_ftprintf_s(m_File, _T("=== Start MPC-BE Debug log [%s] ===\n"), ct.Format(L"%Y.%m.%d %H:%M:%S"));
+				_ftprintf_s(m_File, _T("=== Start MPC-BE Debug log [%s] ===\n"), GetLocalTime());
 			}
 		}
 	}
 
 	~CDebugMonitor() {
 		if (m_File) {
-			time_t now(time(0));
-			CTime ct(now);
-			_ftprintf_s(m_File, _T("=== End MPC-BE Debug log [%s] ===\n"), ct.Format(L"%Y.%m.%d %H:%M:%S"));
+			_ftprintf_s(m_File, _T("=== End MPC-BE Debug log [%s] ===\n"), GetLocalTime());
 
 			fclose(m_File);
 		}
@@ -215,9 +222,7 @@ public:
 
 	virtual void OutputWinDebugString(const char *str) {
 		if (m_File) {
-			time_t now(time(0));
-			CTime ct(now);
-			_ftprintf_s(m_File, _T("%s:	%s"), ct.Format(L"%Y.%m.%d %H:%M:%S"), CString(str));
+			_ftprintf_s(m_File, _T("%s : %s"), GetLocalTime(), CString(str));
 		}
 	};
 };
