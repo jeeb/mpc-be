@@ -100,6 +100,7 @@ protected:
 	CFFAudioDecoder m_FFAudioDec;
 
 	BOOL			m_bIsBitstreamOutputSupported;
+	BOOL			m_bHasVideo;
 
 #if ENABLE_AC3_ENCODER
 	CAC3Encoder m_AC3Enc;

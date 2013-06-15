@@ -526,9 +526,11 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 		return S_OK;
 	}
 
-	if (p->rtStart != INVALID_TIME && ((static_cast<CBaseSplitterFilter*>(m_pFilter))->GetFlag() & PACKET_PTS_DISCONTINUITY)) {
+	DWORD nFlag = (static_cast<CBaseSplitterFilter*>(m_pFilter))->GetFlag();
+
+	if (p->rtStart != INVALID_TIME && (nFlag & PACKET_PTS_DISCONTINUITY)) {
 		// Filter invalid PTS value (if too different from previous packet)
-		if (!IsDiscontinuous() && m_rtPrev != INVALID_TIME && p->rtStart > 0) {
+		if (!IsDiscontinuous() && !((nFlag & PACKET_PTS_VALIDATE_POSITIVE)) && p->rtStart < 0) {
 			REFERENCE_TIME rt = p->rtStart + m_rtOffset;
 			if (_abs64(rt - m_rtPrev) > MAX_PTS_SHIFT) {
 				m_rtOffset += m_rtPrev - rt;

@@ -63,7 +63,7 @@
 #define OPTION_SPDIF_ac3enc _T("SPDIF_ac3enc")
 #endif
 
-#define MAX_JITTER          1400000i64 // +-140ms jitter is allowed for now 
+#define MAX_JITTER          1000000i64 // +-100ms jitter is allowed for now 
 
 #define PADDING_SIZE        FF_INPUT_BUFFER_PADDING_SIZE
 
@@ -314,6 +314,7 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_truehd_samplerate(0)
 	, m_truehd_framelength(0)
 	, m_bIsBitstreamOutputSupported(FALSE)
+	, m_bHasVideo(TRUE)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -547,9 +548,17 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	}
 
 	const GUID& subtype = m_pInput->CurrentMediaType().subtype;
+	enum AVCodecID nCodecId = FindCodec(subtype);
 
-	if (subtype == MEDIASUBTYPE_COOK && S_OK == pIn->IsSyncPoint() ||
-			_abs64(m_rtStart - rtStart) > MAX_JITTER && subtype != MEDIASUBTYPE_COOK && subtype != MEDIASUBTYPE_ATRC && subtype != MEDIASUBTYPE_SIPR) {
+	REFERENCE_TIME jitterLimit = MAX_JITTER;
+	if (subtype == MEDIASUBTYPE_COOK || subtype == MEDIASUBTYPE_ATRC || subtype == MEDIASUBTYPE_SIPR || !m_bHasVideo) {
+		jitterLimit = INT64_MAX;
+	} else if (nCodecId == AV_CODEC_ID_DTS) {
+		jitterLimit = MAX_JITTER * 2;
+	}
+
+	if ((subtype == MEDIASUBTYPE_COOK && S_OK == pIn->IsSyncPoint())
+			|| (_abs64(m_rtStart - rtStart) > jitterLimit)) {
 		m_bResync = true;
 	}
 
@@ -584,7 +593,6 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 		}
 	}
 
-	enum AVCodecID nCodecId = FindCodec(subtype);
 	if (nCodecId != AV_CODEC_ID_NONE) {
 		return ProcessFFmpeg(nCodecId);
 	}
@@ -2087,6 +2095,31 @@ HRESULT CMpaDecFilter::StartStreaming()
 
 			FreeMediaType(outputMT);
 		}
+	}
+
+	{
+		BOOL b_HasVideo = FALSE;
+		if (CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected()) ) {
+			if (GetCLSID(pFilter) == GUIDFromCString(_T("{09144FD6-BB29-11DB-96F1-005056C00008}"))) { // PBDA DTFilter
+				b_HasVideo = TRUE;
+			} else {
+				BeginEnumPins(pFilter, pEP, pPin) {
+					BeginEnumMediaTypes(pPin, pEM, pmt) {
+						if (pmt->majortype == MEDIATYPE_Video || pmt->subtype == MEDIASUBTYPE_MPEG2_VIDEO) {
+							b_HasVideo = TRUE;
+							break;
+						}
+					}
+					EndEnumMediaTypes(pmt)
+					if (b_HasVideo) {
+						break;
+					}
+				}
+				EndEnumFilters
+			}
+		}
+
+		m_bHasVideo = b_HasVideo;
 	}
 
 	return S_OK;

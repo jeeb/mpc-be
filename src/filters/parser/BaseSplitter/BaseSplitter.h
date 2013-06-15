@@ -35,7 +35,8 @@
 #include "../../../DSUtil/FontInstaller.h"
 #include "../apps/mplayerc/SettingsDefines.h"
 
-#define PACKET_PTS_DISCONTINUITY 0x0001
+#define PACKET_PTS_DISCONTINUITY		0x0001
+#define PACKET_PTS_VALIDATE_POSITIVE	0x0002
 
 class Packet : public CAtlArray<BYTE>
 {

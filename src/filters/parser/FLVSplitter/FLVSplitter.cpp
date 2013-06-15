@@ -253,6 +253,7 @@ CFLVSplitterFilter::CFLVSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	, m_DetectWrongTimeStamp(true)
 {
 	m_nFlag |= PACKET_PTS_DISCONTINUITY;
+	m_nFlag |= PACKET_PTS_VALIDATE_POSITIVE;
 }
 
 STDMETHODIMP CFLVSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
