@@ -24,8 +24,7 @@
 + Поддержку проигрывания AAC потока в ShoutCastSource;
 + Получение описания (Description) в ShoutCastSource;
 + Поддержку DVB субтитров в .wtv (Windows Media Center TV File);
-+ MPEG-1 декодер на основе ffmpeg;
-+ MPEG-2 программный декодер на основе ffmpeg;
++ MPEG-1/MPEG-2 программные декодеры на основе ffmpeg;
 + Полная поддержка MPEG2 от Apple в MP4/MOV Splitter ;
 + Парсинг TrueHD в MPEGSplitter;
 + Декодирование VC1-I в режиме без DXVA;
@@ -43,7 +42,7 @@
 + Возможность задавать качество изображения, при сохранение изображения (кадра) и миниатюр;
 + Поддержка Speex в OggSplitter;
 + Поддержка MPEG1 в AviSplitter;
-+ Поддержка .avi, созданных с помощью Matrox's MPEG-2, в AviSplitter;
++ Поддержка .avi, созданных с помощью Matrox's MPEG-2 в AviSplitter;
 + Поддержка OPUS в MatroskaSplitter;
 + Поддержка ALAC в MatroskaSplitter;
 + Поддержка MEDIASUBTYPE_Divx ('Divx');
@@ -54,6 +53,7 @@
 
 
 Изменения (*):
+* MpaDecFilter - не используем A/V синхронизацию(корректировку TimeStamp) при проигрывании аудио файлов и только аудио-потоков.
 * Улучшен механизм определения Interlaced кадров в H.264 DXVA декодере;
 * Для VP5 видеокарт обновлены ограничения на размер кадра;
 * Улучшена поддержка H.264 в AVISplitter;
