@@ -65,6 +65,17 @@ struct ps2_state_t {
 	}
 };
 
+struct DD_stats_t {
+protected:
+	int mode;
+	unsigned int ac3_frames;
+	unsigned int eac3_frames;
+
+public:
+	void Reset();
+	bool Desired(int type);
+};
+
 class __declspec(uuid("3D446B6F-71DE-4437-BE15-8CE47174340F"))
 	CMpaDecFilter
 	: public CTransformFilter
@@ -90,6 +101,7 @@ protected:
 	CMixer          m_Mixer;
 
 	ps2_state_t     m_ps2_state;
+	DD_stats_t      m_DDstats;
 
 	BYTE            m_hdmibuff[61440];
 	int             m_hdmicount;
@@ -112,6 +124,7 @@ protected:
 
 	HRESULT ProcessLPCM();
 	HRESULT ProcessHdmvLPCM(bool bAlignOldBuffer);
+	HRESULT ProcessAC3();
 	HRESULT ProcessAC3_SPDIF();
 	HRESULT ProcessEAC3_SPDIF();
 	HRESULT ProcessTrueHD_SPDIF();
