@@ -63,7 +63,8 @@
 #define OPTION_SPDIF_ac3enc _T("SPDIF_ac3enc")
 #endif
 
-#define MAX_JITTER          1000000i64 // +-100ms jitter is allowed for now 
+#define MAX_JITTER          1000000i64 // +-100ms jitter is allowed
+#define MAX_DTS_JITTER      2000000i64 // +-200ms jitter is allowed for DTS
 
 #define PADDING_SIZE        FF_INPUT_BUFFER_PADDING_SIZE
 
@@ -554,7 +555,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	if (subtype == MEDIASUBTYPE_COOK || subtype == MEDIASUBTYPE_ATRC || subtype == MEDIASUBTYPE_SIPR || !m_bHasVideo) {
 		jitterLimit = INT64_MAX;
 	} else if (nCodecId == AV_CODEC_ID_DTS) {
-		jitterLimit = MAX_JITTER * 2;
+		jitterLimit = MAX_DTS_JITTER;
 	}
 
 	if ((subtype == MEDIASUBTYPE_COOK && S_OK == pIn->IsSyncPoint())
