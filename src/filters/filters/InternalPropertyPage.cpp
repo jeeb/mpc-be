@@ -499,9 +499,27 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 			} else {
 				strName = FilterInfo.achName;
 			}
-			str.Format (_T("Filter : %s - CLSID : %s\n\n"), strName, CStringFromGUID(FilterClsid));
+			str.Format (_T("Filter : %s - CLSID : %s\n"), strName, CStringFromGUID(FilterClsid));
 			AddLine(str);
 			FilterInfo.pGraph->Release();
+
+			{
+				CRegKey key;
+				CString clsid = CStringFromGUID(FilterClsid);
+
+				TCHAR buff[256];
+				ULONG len = sizeof(buff);
+				memset(buff, 0, len);
+
+				if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, _T("CLSID\\") + clsid + _T("\\InprocServer32"), KEY_READ)
+						&& ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len)) {
+					str.Format(_T("Module : %s\n"), buff);
+					AddLine(str);
+					key.Close();
+				}
+			}
+
+			AddLine(_T("\n"));
 		}
 		PinInfo.pFilter->Release();
 	}
