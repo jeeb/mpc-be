@@ -4090,6 +4090,10 @@ void CMainFrame::OnFilePostOpenMedia()
 	// still running and the renderer window was created on
 	// the same worker-thread
 
+	if (s.fLaunchfullscreen && !s.IsD3DFullscreen() && !m_fFullScreen) {
+		ToggleFullscreen(true, true);
+	}
+
 	{
 		WINDOWPLACEMENT wp;
 		wp.length = sizeof(wp);
@@ -14304,8 +14308,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			AutoChangeMonitorMode();
 
 			if (s.fLaunchfullscreen && !s.IsD3DFullscreen() ) {
-				if (!m_fFullScreen) { 
-					ToggleFullscreen(true, true); 
+				if (!m_fFullScreen) {
+					ToggleFullscreen(true, true);
 				}
 			}
 		}
