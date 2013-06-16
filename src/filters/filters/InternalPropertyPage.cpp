@@ -512,7 +512,8 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 				memset(buff, 0, len);
 
 				if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, _T("CLSID\\") + clsid + _T("\\InprocServer32"), KEY_READ)
-						&& ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len)) {
+						&& ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len)
+						&& ::PathFileExists(buff)) {
 					str.Format(_T("Module : %s\n"), buff);
 					AddLine(str);
 					key.Close();
