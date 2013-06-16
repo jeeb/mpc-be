@@ -25,9 +25,9 @@
 
 enum MPCSampleFormat {
 	SF_PCM16 = 0,
+	SF_PCM24,
 	SF_PCM32,
 	SF_FLOAT,
-	SF_PCM24,
 	sfcount
 };
 
