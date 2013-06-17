@@ -830,8 +830,10 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId)
 	BYTE* end = base + m_buff.GetCount();
 	BYTE* p = base;
 
-	if (m_FFAudioDec.GetCodecId() != nCodecId 
-			&& (nCodecId != AV_CODEC_ID_MP1 && nCodecId != AV_CODEC_ID_MP2)) {
+	enum AVCodecID ffCodecId = m_FFAudioDec.GetCodecId();
+
+	if (ffCodecId != nCodecId 
+			&& (ffCodecId != AV_CODEC_ID_MP1 && ffCodecId != AV_CODEC_ID_MP2)) {
 		m_FFAudioDec.Init(nCodecId, m_pInput);
 		m_FFAudioDec.SetDRC(GetDynamicRangeControl());
 	}
