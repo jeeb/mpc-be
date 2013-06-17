@@ -55,7 +55,7 @@ struct audioframe_t {
 	int param1;
 	int param2;
 
-	audioframe_t() {
+	void clear() {
 		memset(this, 0, sizeof(*this));
 	}
 };

@@ -2264,11 +2264,10 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			MOVE_TO_AC3_START_CODE(start, end);
 
 			if (start <= end-8) {
-				int size;
 				audioframe_t af;
-				if ((size = ParseAC3Header(start, &af)) > 0) {
+				if (ParseAC3Header(start, &af) > 0) {
 
-					if (size <= (end-start)) {
+					if (af.size <= (end - start)) {
 
 						if (af.samples == m_AC3_frame.samples
 								&& af.samplerate == m_AC3_frame.samplerate
@@ -2309,7 +2308,7 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 						p2->pmt		= m_p->pmt;
 						m_p->pmt	= NULL;
 
-						p2->SetData(start, size);
+						p2->SetData(start, af.size);
 
 						if (!p2->pmt && m_bFlushed) {
 							p2->pmt = CreateMediaType(&m_mt);
@@ -2341,7 +2340,7 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 						m_p->pmt	= p->pmt;
 						p->pmt		= NULL;
 							
-						start += size;
+						start += af.size;
 					} else {
 						break;
 					}
