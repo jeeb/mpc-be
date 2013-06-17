@@ -1780,6 +1780,7 @@ CMpegSplitterOutputPin::CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWS
 	, m_truehd_framelength(0)
 	, m_hdmvLPCM_samplerate(0), m_hdmvLPCM_channels(0), m_hdmvLPCM_packetsize(0)
 {
+	m_AC3_frame.clear();
 }
 
 CMpegSplitterOutputPin::~CMpegSplitterOutputPin()
