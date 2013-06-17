@@ -770,12 +770,16 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 
 			CMpegSplitterFile::peshdr h2;
 
-			if (h.payloadstart && m_pFile->NextMpegStartCode(b, 4) && m_pFile->Read(h2, b)) { // pes packet
-				if (h2.type == CMpegSplitterFile::mpeg2 && h2.scrambling) {
-					ASSERT(0);
-					return E_FAIL;
+			if (h.payloadstart && m_pFile->NextMpegStartCode(b, 4)) { // pes packet
+				if (m_pFile->Read(h2, b)) {
+					if (h2.type == CMpegSplitterFile::mpeg2 && h2.scrambling) {
+						ASSERT(0);
+						return E_FAIL;
+					}
+					TrackNumber = m_pFile->AddStream(h.pid, b, 0, h.bytes - (DWORD)(m_pFile->GetPos() - pos));
+				} else {
+					m_pFile->Seek(h.next);
 				}
-				TrackNumber = m_pFile->AddStream(h.pid, b, 0, h.bytes - (DWORD)(m_pFile->GetPos() - pos));
 			}
 
 			if (GetOutputPin(TrackNumber) && (h.bytes > (m_pFile->GetPos() - pos))) {

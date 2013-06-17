@@ -12,8 +12,8 @@ Legend:
 
 Added (+):
 	+ SPEEX decoder (Speex Audio);
-	+ MPC Audio Renderer - completely revised, fully supports WASAPI Exclusive/Shared modes. Uses event mode for rendering. Added internal volume control. Mute also works for Bitstream;
-	+ MPC Video Decoder: support for changing video streams, dynamically changing AR (aspect ratio) and video frame size during playback for DXVA decoder;
+	+ MPC Audio Renderer - completely rewritten, now it fully supports WASAPI Exclusive/Shared modes. Uses event mode for rendering. Added internal volume control. Sound mute is also possible for Bitstream;
+	+ MPC Video Decoder: dynamic video stream / aspect ratio / frame size changing during playback is supported now;
 	+ MP4Splitter - Speex (Speex Audio) support;
 	+ MPEGSplitter - added (improved) support for Blu-ray with Seamless branching;
 	+ G2M video decoder (Go2Webinar);
@@ -24,16 +24,16 @@ Added (+):
 	+ Opening and saving links from Vimeo.com;
 	+ Ability to set paths (templates) for automatic audio tracks loading;
 	+ Support for AAC stream playback in ShoutCastSource;
-	+ Getting Description from ShoutCastSource;
+	+ Support for description tag in ShoutCastSource;
 	+ Support for DVB subtitles in .wtv (Windows Media Center TV File);
 	+ MPEG-1/MPEG-2 software decoders based on ffmpeg;
 	+ Full support for Apple's MPEG2 in MP4/MOV Splitter ;
 	+ Parsing TrueHD in MPEGSplitter;
 	+ VC1-I decoding without DXVA;
-	+ Ability to open the dialog for adding files from the playlist;
+	+ Ability to open the file open dialog for adding files from the playlist;
 	+ Forced one-window mode;
-	+ Filter priority management system - choosing filters for specificfile formats;
-	+ Alternate handling of Youtube video: the stream is downloaded into a temporary file in the current user's TMP folder, and then played; the temporary file is deleted after playback;
+	+ Filter priority management system - choosing filters for specific file formats;
+	+ Alternate handling of Youtube video: the stream is downloaded into a temporary file in the current user's TEMP folder, and then played; the temporary file is deleted after playback;
 	+ Ability to choose desired format for Youtube clips;
 	+ Support for bitstreaming DTS-HD/E-AC3 (DDPlus)/TrueHD through HDMI;
 	+ Tag Specifications support. The information on the author, track's title, etc. is read and displayed;
@@ -54,13 +54,13 @@ Added (+):
 	 ... and many more.
 
 Changes (*):
-	* MpaDecFilter - A/V sync (TimeStamp correction) is disabled whenplaying audio files and audio-only streams;
+	* MpaDecFilter - A/V sync (TimeStamp correction) is disabled when playing audio files and audio-only streams;
 	* Improved Interlaced frame detection in H.264 DXVA decoder;
 	* Updated frame size restrictions for VP5 video cards;
 	* Improved H.264 support in AVISplitter;
 	* Added support for AVC1-style video inside .avi;
 	* Added validity check for PTS;
-	* Improved .avi detection in MPCVideoDecFilter: they are now detected by header only, extension check is removed;
+	* Improved .avi detection in MPCVideoDecFilter: it's now detected by header only, extension check is removed;
 	* Youtube parser: detecting video format by itag value;
 	* Before opening http/https/www links their validity is checked;
 	* Improved ShoutCast handling, links to playlists are handled better;
@@ -157,7 +157,7 @@ Changes (*):
 	* AudioSwitcher: removed the "Down-sample to 44100 Hz" option;
 	* MPCVideoDec sets the restriction ref frames = 16 for nVIDIA, both for HD and SD video;
 	* DXVA decoder: improved WMV9/VC-1 handling;
-	* BaseVideoFilter and MPCVideoDec: improved getting decoder status (SOFT/DXVA1/DXVA2);
+	* BaseVideoFilter and MPCVideoDec: decoder status (SOFT/DXVA1/DXVA2) now determined better;
 	* Updated Russian translation;
 	* Updated Italian translation (by Lord Maius);
 	* Updated Chinese (Simplified) translation (by insolo);
@@ -194,7 +194,7 @@ Fixes (!):
 	! Fixed connecting own external filters when the internal ones are locked;
 	! Fixed the connection of Low Merit video decoder;
 	! Fixed a hang on WinXP upon resizing/moving the playlist;
-	! Black screen for OGG+Theora;
+	! Black screen on OGG+Theora;
 	! The command assigned to the left mouse click did not work with Minimal preset;
 	! Fixed MUTE icon displacement on the toolbar upon using it;
 	! Several file opening dialogs were not displayed on Windows XP;

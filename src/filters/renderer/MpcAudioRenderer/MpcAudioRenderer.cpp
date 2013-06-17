@@ -1517,14 +1517,11 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx)
 	}
 
 	// Compare the exisiting WAVEFORMATEX with the one provided
-	WAVEFORMATEX *pNewWaveFormatEx = NULL;
-	if (CheckFormatChanged(pWaveFormatEx, &pNewWaveFormatEx)) {
+	if (CheckFormatChanged(pWaveFormatEx, &m_pWaveFileFormat)) {
 		// Format has changed, audio client has to be reinitialized
 		TRACE(_T("CMpcAudioRenderer::CheckAudioClient() - Format changed, reinitialize the audio client\n"));
 
-		m_pWaveFileFormat = pNewWaveFormatEx;
-
-		CopyWaveFormat(pNewWaveFormatEx, &m_pWaveFileFormatOutput);
+		CopyWaveFormat(m_pWaveFileFormat, &m_pWaveFileFormatOutput);
 		
 		WAVEFORMATEX *pFormat		= NULL;
 		WAVEFORMATEX* pDeviceFormat	= NULL;
