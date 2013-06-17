@@ -81,8 +81,14 @@ bool CMixer::Init()
 	// Open Resample Context
 	ret = avresample_open(m_pAVRCxt);
 	if (ret < 0) {
-		TRACE(_T("Mixer: avresample_open failed\n"));
-		return false;
+		// try again ...
+		av_opt_set_int(m_pAVRCxt, "internal_sample_fmt", AV_SAMPLE_FMT_FLTP, 0);
+		ret = avresample_open(m_pAVRCxt);
+
+		if (ret < 0) {
+			TRACE(_T("Mixer: avresample_open failed\n"));
+			return false;
+		}
 	}
 
 	// Create Matrix
