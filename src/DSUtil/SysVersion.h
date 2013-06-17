@@ -23,7 +23,9 @@
 #pragma once
 
 BOOL IsWinXPOrLater();
+BOOL IsWinVista();
 BOOL IsWinVistaOrLater();
+BOOL IsWinSeven();
 BOOL IsWinSevenOrLater();
 BOOL IsWinEight();
 

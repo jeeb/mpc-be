@@ -6825,7 +6825,7 @@ void CMainFrame::OnUpdateViewDisableDesktopComposition(CCmdUI* pCmdUI)
 					   s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS ||
 					   s.iDSVideoRendererType == VIDRNDT_DS_SYNC) &&
 					  r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D &&
-					  IsWinVistaOrLater());
+					  (IsWinVista() || IsWinSeven()));
 
 	pCmdUI->Enable(supported);
 	pCmdUI->SetCheck(r.m_AdvRendSets.iVMRDisableDesktopComposition);

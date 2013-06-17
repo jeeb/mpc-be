@@ -43,9 +43,19 @@ BOOL IsWinXPOrLater()
 	return (GetSysVersion() >= 0x0501);
 }
 
+BOOL IsWinVista()
+{
+	return (GetSysVersion() == 0x0600);
+}
+
 BOOL IsWinVistaOrLater()
 {
 	return (GetSysVersion() >= 0x0600);
+}
+
+BOOL IsWinSeven()
+{
+	return (GetSysVersion() == 0x0601);
 }
 
 BOOL IsWinSevenOrLater()
