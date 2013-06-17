@@ -30,7 +30,6 @@
 #include "MpegSplitter.h"
 #include <moreuuids.h>
 #include <basestruct.h>
-#include "../../../DSUtil/AudioParser.h"
 #include <atlpath.h>
 
 #include "../../../apps/mplayerc/SettingsDefines.h"
@@ -1777,7 +1776,7 @@ CMpegSplitterOutputPin::CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWS
 	, m_fHasAccessUnitDelimiters(false)
 	, m_type(type)
 	, m_bFlushed(false)
-	, m_AC3_size(0), m_AC3_count(0)
+	, m_AC3_count(0)
 	, m_truehd_framelength(0)
 	, m_hdmvLPCM_samplerate(0), m_hdmvLPCM_channels(0), m_hdmvLPCM_packetsize(0)
 {
@@ -1820,7 +1819,8 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 	if (p->pmt) {
 		if (*((CMediaType *)p->pmt) != m_mt) {
 			SetMediaType ((CMediaType*)p->pmt);
-			m_AC3_size = m_AC3_count = 0;
+			memset(&m_AC3_frame, 0, sizeof(m_AC3_frame));
+			m_AC3_count = 0;
 			Flush();
 		}
 	}
@@ -2199,7 +2199,7 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 
 		if (m_p->GetCount() < 4) {
 			m_p.Free();
-			return S_OK;    // Should be invalid packet
+			return S_OK;	// Should be invalid packet
 		}
 
 		BYTE* start = m_p->GetData();
@@ -2265,19 +2265,29 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 
 			if (start <= end-8) {
 				int size;
-				if ((size = ParseAC3Header(start)) > 0) {
+				audioframe_t af;
+				if ((size = ParseAC3Header(start, &af)) > 0) {
 
 					if (size <= (end-start)) {
 
-						// TODO - found better way to detect valid AC3 frame(core) in TrueHD stream ...
-						if (size == m_AC3_size) {
+						if (af.samples == m_AC3_frame.samples
+								&& af.samplerate == m_AC3_frame.samplerate
+								&& af.channels == m_AC3_frame.channels
+								&& af.param1 == m_AC3_frame.param1) {
 							m_AC3_count++;
 						} else if (m_AC3_count < 10) {
-							m_AC3_size	= size;
+							m_AC3_frame.samples		= af.samples;
+							m_AC3_frame.samplerate	= af.samplerate;
+							m_AC3_frame.channels	= af.channels;
+							m_AC3_frame.param1		= af.param1;
 							m_AC3_count	= 0;
 						}
 
-						if (m_AC3_count >= 10 && size != m_AC3_size) {
+						if (m_AC3_count >= 10
+								&& (af.samples != m_AC3_frame.samples
+									|| af.samplerate != m_AC3_frame.samplerate
+									|| af.channels != m_AC3_frame.channels
+									|| af.param1 != m_AC3_frame.param1)) {
 							start++;
 							continue;
 						}

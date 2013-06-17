@@ -26,6 +26,7 @@
 #include "../BaseSplitter/BaseSplitter.h"
 #include "MpegSplitterFile.h"
 #include "MpegSplitterSettingsWnd.h"
+#include "../../../DSUtil/AudioParser.h"
 #include <ITrackInfo.h>
 
 #define MpegSplitterName L"MPC MPEG Splitter"
@@ -163,8 +164,8 @@ class CMpegSplitterOutputPin : public CBaseSplitterOutputPin, protected CCritSec
 
 	int		m_hdmvLPCM_samplerate, m_hdmvLPCM_channels, m_hdmvLPCM_packetsize;
 
-	int				m_AC3_size;
-	unsigned int	m_AC3_count;
+	audioframe_t	m_AC3_frame;
+	UINT			m_AC3_count;
 
 protected:
 	HRESULT DeliverPacket(CAutoPtr<Packet> p);

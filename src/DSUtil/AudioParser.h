@@ -54,6 +54,10 @@ struct audioframe_t {
 	int samples;
 	int param1;
 	int param2;
+
+	audioframe_t() {
+		memset(this, 0, sizeof(*this));
+	}
 };
 
 int ParseMPAHeader     (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 4 bytes,  param1 = bitrate, param2 = MP3 flag

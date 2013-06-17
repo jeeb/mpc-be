@@ -904,7 +904,7 @@ HRESULT CMpaDecFilter::ProcessAC3()
 
 		AVCodecID ftype;
 		int size;
-		if ((size =ParseAC3Header(p)) > 0) {
+		if ((size = ParseAC3Header(p)) > 0) {
 			ftype = AV_CODEC_ID_AC3;
 		} else if ((size = ParseEAC3Header(p)) > 0) {
 			ftype = AV_CODEC_ID_EAC3;
