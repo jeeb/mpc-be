@@ -1820,7 +1820,7 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 	if (p->pmt) {
 		if (*((CMediaType *)p->pmt) != m_mt) {
 			SetMediaType ((CMediaType*)p->pmt);
-			memset(&m_AC3_frame, 0, sizeof(m_AC3_frame));
+			m_AC3_frame.clear();
 			m_AC3_count = 0;
 			Flush();
 		}
