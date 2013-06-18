@@ -730,7 +730,6 @@ BEGIN MENU IDR_MAINFRAME LINES 247
 235		"F&avorites"
 236		"&Help"
 238		"&Home Page"
-239		"Check for &updates"
 240		"&Command Line Switches"
 242		"Download &Toolbar Images"
 245		"&About..."

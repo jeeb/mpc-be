@@ -730,7 +730,6 @@ BEGIN MENU IDR_MAINFRAME LINES 247
 235		"Oblíbené"
 236		"Nápo&věda"
 238		"&Domovská stránka"
-239		"Check for &updates"
 240		"&Parametry příkazového řádku"
 242		"Download &Toolbar Images"
 245		"&O programu..."

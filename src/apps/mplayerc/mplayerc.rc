@@ -1680,7 +1680,7 @@ BEGIN
     POPUP "&Help"
     BEGIN
         MENUITEM "&Home Page",                  ID_HELP_HOMEPAGE
-        MENUITEM "Check for &updates",          ID_HELP_CHECKFORUPDATE
+//      MENUITEM "Check for &updates",          ID_HELP_CHECKFORUPDATE
         MENUITEM "&Command Line Switches",      ID_HELP_SHOWCOMMANDLINESWITCHES
 //      MENUITEM "Documentation (sf.net)",      ID_HELP_DOCUMENTATION
         MENUITEM "Download &Toolbar Images",    ID_HELP_TOOLBARIMAGES

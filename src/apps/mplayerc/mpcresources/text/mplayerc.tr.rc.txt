@@ -730,7 +730,6 @@ BEGIN MENU IDR_MAINFRAME LINES 247
 235		"S&ık Kullanılanlar"
 236		"&Yardım"
 238		"Ana Sayfa"
-239		"Check for &updates"
 240		"Komut Satırı Anahtarları"
 242		"Download &Toolbar Images"
 245		"&Hakkında..."

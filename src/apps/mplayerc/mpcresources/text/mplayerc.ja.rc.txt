@@ -730,7 +730,6 @@ BEGIN MENU IDR_MAINFRAME LINES 247
 235		"お気に入り(&A)"
 236		"ヘルプ(&H)"
 238		"ホームページ"
-239		"Check for &updates"
 240		"コマンドライン スイッチ"
 242		"Download &Toolbar Images"
 245		"バージョン情報(&A)..."

@@ -730,7 +730,6 @@ BEGIN MENU IDR_MAINFRAME LINES 246
 235		"F&avorite"
 236		"&Ajutor"
 238		"&Pagină de pornire"
-239		"Check for &updates"
 240		"&Comutatoare în linie de comandă"
 241		"Descarcă imagini pentru bara de ins&trumente"
 242		"&Donează"

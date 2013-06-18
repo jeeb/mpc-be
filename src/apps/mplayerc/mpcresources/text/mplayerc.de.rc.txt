@@ -730,7 +730,6 @@ BEGIN MENU IDR_MAINFRAME LINES 247
 235		"&Favoriten"
 236		"&Hilfe"
 238		"&MPC-BE Homepage"
-239		"Check for &updates"
 240		"&Kommandozeilen-Parameter"
 242		"Toolbarbilder herunterladen"
 245		"&Über..."

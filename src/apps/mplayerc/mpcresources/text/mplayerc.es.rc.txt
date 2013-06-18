@@ -730,7 +730,6 @@ BEGIN MENU IDR_MAINFRAME LINES 247
 235		"&Favoritos"
 236		"A&yuda"
 238		"Página del Programa"
-239		"Check for &updates"
 240		"Switches de Linea de Comandos"
 242		"Download &Toolbar Images"
 245		"&Acerca De..."

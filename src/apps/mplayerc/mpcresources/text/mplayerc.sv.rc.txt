@@ -730,7 +730,6 @@ BEGIN MENU IDR_MAINFRAME LINES 247
 235		"F&avoriter"
 236		"&Hjälp"
 238		"Hemsida"
-239		"Check for &updates"
 240		"Kommandolinje parametrar"
 242		"Download &Toolbar Images"
 245		"&Om..."

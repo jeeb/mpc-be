@@ -730,7 +730,6 @@ BEGIN MENU IDR_MAINFRAME LINES 247
 235		"&Абранае"
 236		"&Дапамога"
 238		"Хатняя старонка"
-239		"Check for &updates"
 240		"Параметры каманднага радка"
 242		"Download &Toolbar Images"
 245		"&Пра праграму..."

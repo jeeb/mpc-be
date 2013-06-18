@@ -730,7 +730,6 @@ BEGIN MENU IDR_MAINFRAME LINES 247
 235		"P&referiti"
 236		"&Aiuto"
 238		"Home Page"
-239		"Cerca &aggiornamenti"
 240		"Opzioni a riga di comando"
 242		"Download &Toolbar"
 245		"&Informazioni..."

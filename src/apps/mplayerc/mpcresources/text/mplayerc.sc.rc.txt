@@ -730,7 +730,6 @@ BEGIN MENU IDR_MAINFRAME LINES 247
 235		"收藏(&A)"
 236		"帮助(&H)"
 238		"主页"
-239		"Check for &updates"
 240		"命令行开关"
 242		"下载工具栏图像(&T)"
 245		"关于(&A)..."

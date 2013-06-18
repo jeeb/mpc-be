@@ -730,7 +730,6 @@ BEGIN MENU IDR_MAINFRAME LINES 247
 235		"מועדפים"
 236		"עזרה"
 238		"אתר הבית"
-239		"Check for &updates"
 240		"פרמטרים שורת פקודה"
 242		"Download &Toolbar Images"
 245		"אודות..."

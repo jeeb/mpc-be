@@ -730,7 +730,6 @@ BEGIN MENU IDR_MAINFRAME LINES 247
 235		"F&avoris"
 236		"&Aide"
 238		"Site Web de &MPC Home Cinema"
-239		"Check for &updates"
 240		"Options de la ligne de commandes"
 242		"Download &Toolbar Images"
 245		"&A propos de MPC Home Cinema..."

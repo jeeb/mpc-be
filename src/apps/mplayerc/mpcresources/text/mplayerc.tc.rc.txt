@@ -730,7 +730,6 @@ BEGIN MENU IDR_MAINFRAME LINES 247
 235		"我的最愛(&A)"
 236		"說明(&H)"
 238		"網站首頁"
-239		"Check for &updates"
 240		"命令列選項"
 242		"Download &Toolbar Images"
 245		"關於(&A)..."
