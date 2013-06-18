@@ -16623,9 +16623,9 @@ bool CMainFrame::LoadSubtitle(CString fn, ISubStream **actualStream)
 		ISubStream *r = InsertSubStream(&m_pSubStreams, pSubStream);
 		if (actualStream != NULL) {
 			*actualStream = r;
-		}
 
-		AfxGetAppSettings().fEnableSubtitles = true;
+			AfxGetAppSettings().fEnableSubtitles = true;
+		}
 	}
 
 	return(!!pSubStream);
