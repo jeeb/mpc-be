@@ -64,7 +64,7 @@
 #endif
 
 #define MAX_JITTER          1000000i64 // +-100ms jitter is allowed
-#define MAX_DTS_JITTER      2000000i64 // +-200ms jitter is allowed for DTS
+#define MAX_DTS_JITTER      1400000i64 // +-140ms jitter is allowed for DTS
 
 #define PADDING_SIZE        FF_INPUT_BUFFER_PADDING_SIZE
 
