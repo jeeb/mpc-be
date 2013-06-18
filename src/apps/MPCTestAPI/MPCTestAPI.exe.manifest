@@ -3,7 +3,7 @@
   <assemblyIdentity
     name="MPC-BE Test API"
     processorArchitecture="*"
-    version="1.2.0.3"
+    version="1.2.1.0"
     type="win32"
   />
   <description>MPC-BE Test API</description>
