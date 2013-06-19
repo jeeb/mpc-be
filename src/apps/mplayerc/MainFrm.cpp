@@ -13678,7 +13678,7 @@ void CMainFrame::OpenSetupAudioStream()
 				TRACE(_T("\nAudio Track list :\n"));
 				for (size_t i = 0; i < MixAS.GetCount(); i++) {
 					CString Name = MixAS[i].Name;
-					TRACE(_T("	%ws, type = %ws\n"), MixAS[i].Name, MixAS[i].iFilter == 1 ? _T("Splitter") : _T("AudioSwitcher"));
+					DbgLog((LOG_TRACE, 3, L"	%ws, type = %ws", MixAS[i].Name, MixAS[i].iFilter == 1 ? _T("Splitter") : _T("AudioSwitcher")));
 				}
 #endif
 
