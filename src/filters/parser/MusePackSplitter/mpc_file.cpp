@@ -1,5 +1,5 @@
 /*
- * $Id: mpc_file.cpp 1647 2012-12-02 21:20:55Z exodus8 $
+ * $Id$
  *
  * Adaptation for MPC-BE (C) 2012 Dmitry "Vortex" Koteroff (vortex@light-alloy.ru, http://light-alloy.ru)
  *

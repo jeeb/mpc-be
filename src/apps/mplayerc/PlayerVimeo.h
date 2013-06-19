@@ -1,5 +1,5 @@
 /*
- * $Id: PlayerVimeo.h 2229 2013-03-08 13:27:11Z exodus8 $
+ * $Id$
  *
  * Copyright (C) 2013 Sergey "Exodus8" (rusguy6@gmail.com)
  *

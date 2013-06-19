@@ -1,5 +1,5 @@
 /*
- * $Id: MP4SplitterFile.cpp 2266 2013-03-12 00:32:04Z aleksoid $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2013 see Authors.txt

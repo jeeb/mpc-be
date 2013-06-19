@@ -1,4 +1,5 @@
-﻿Here is a quick how-to release a new stable build:
+﻿* $Id$
+Here is a quick how-to release a new stable build:
 
 1) Make sure you have a clean source tree, no modified files included
 2) Update the revision number and the date in Changelog.txt

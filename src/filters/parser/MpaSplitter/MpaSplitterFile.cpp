@@ -1,5 +1,5 @@
 /*
- * $Id: MpaSplitterFile.cpp 2757 2013-05-22 05:54:39Z aleksoid $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2013 see Authors.txt

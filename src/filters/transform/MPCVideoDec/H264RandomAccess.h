@@ -1,4 +1,6 @@
 /*
+ * $Id$
+ * 
  *      Copyright (C) 2010-2013 Hendrik Leppkes
  *      http://www.1f0.de
  *

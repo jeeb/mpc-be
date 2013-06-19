@@ -1,5 +1,5 @@
 /*
- * $Id: MPCBEContextMenu.cpp 1713 2012-12-23 01:10:54Z aleksoid $
+ * $Id$
  *
  * Copyright (C) 2012 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
  *

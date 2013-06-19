@@ -1,5 +1,7 @@
 //////////////////////////////////////////////////////////////
 //
+// $Id$
+//
 //         File: WinDebugMonitor.h
 //  Description: Interface of class CWinDebugMonitor
 //      Created: 2007-12-6

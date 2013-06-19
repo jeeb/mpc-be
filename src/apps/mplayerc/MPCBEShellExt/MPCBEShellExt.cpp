@@ -1,5 +1,5 @@
 /*
- * $Id: MPCBEShellExt.cpp 1220 2012-09-24 23:27:01Z aleksoid $
+ * $Id$
  *
  * Copyright (C) 2012 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
  *

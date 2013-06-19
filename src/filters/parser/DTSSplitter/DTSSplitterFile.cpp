@@ -1,5 +1,5 @@
 /*
- * $Id: DTSSplitterFile.cpp 2533 2013-04-22 14:48:19Z v0lt $
+ * $Id$
  *
  * Copyright (C) 2012 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
  *

@@ -1,4 +1,5 @@
-﻿The following files have MPC-BE specific custom code (compared to libflac from http://git.xiph.org/?p=flac.git;a=summary):
+﻿* $Id$
+The following files have MPC-BE specific custom code (compared to libflac from http://git.xiph.org/?p=flac.git;a=summary):
 
 * src/ExtLib/libflac/src/libflac/bitreader.c
 * src/ExtLib/libflac/src/libflac/metadata_iterators.c

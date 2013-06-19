@@ -1,5 +1,5 @@
 /*
- * $Id: Ap4AsyncReaderStream.cpp 1956 2013-01-25 07:09:01Z aleksoid $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2013 see Authors.txt

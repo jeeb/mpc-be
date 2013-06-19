@@ -1,4 +1,6 @@
 /*
+ * $Id$
+ * 
  *	Copyright (C) 2007 Niels Martin Hansen
  *	http://aegisub.net/
  *

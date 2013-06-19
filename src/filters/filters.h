@@ -1,5 +1,5 @@
 /*
- * $Id: Filters.h 654 2012-07-07 22:53:41Z exodus8 $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2013 see Authors.txt

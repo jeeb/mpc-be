@@ -1,5 +1,5 @@
 /*
- * $Id: OggFile.cpp 2163 2013-02-24 23:54:04Z aleksoid $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2013 see Authors.txt

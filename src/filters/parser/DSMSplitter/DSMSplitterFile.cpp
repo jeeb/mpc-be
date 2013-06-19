@@ -1,5 +1,5 @@
 /*
- * $Id: DSMSplitterFile.cpp 2326 2013-03-21 12:41:26Z aleksoid $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2013 see Authors.txt

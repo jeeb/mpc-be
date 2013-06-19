@@ -1,5 +1,5 @@
 /*
- * $Id: WinAPIUtils.h 485 2012-06-03 15:17:19Z exodus8 $
+ * $Id$
  *
  * (C) 2011-2013 see Authors.txt
  *

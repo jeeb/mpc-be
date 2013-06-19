@@ -1,4 +1,5 @@
-﻿Based on the original version (C) 2002-2006 by Gabest (e-mail unknown)
+﻿* $Id$
+Based on the original version (C) 2002-2006 by Gabest (e-mail unknown)
 On the basis of the source code of the "Media Player Classic Home Cinema", Casimir666 (casimir666@users.sourceforge.net).
 The GUI on the basis of the original patch bobdynlan (bobdynlan@users.sourceforge.net), with the adaptation of Leo1000 (leothousan@users.sourceforge.net).
 

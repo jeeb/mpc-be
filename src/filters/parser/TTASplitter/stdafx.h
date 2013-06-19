@@ -1,5 +1,5 @@
 /*
- * $Id: stdafx.h 498 2012-06-05 23:09:29Z Aleksoid $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2013 see Authors.txt

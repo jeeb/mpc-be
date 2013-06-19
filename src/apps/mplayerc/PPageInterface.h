@@ -1,5 +1,5 @@
 /*
- * $Id: PPageTweaks.h 778 2012-07-31 12:26:37Z alexins $
+ * $Id$
  *
  * (C) 2003-2006 Gabest
  * (C) 2006-2013 see Authors.txt

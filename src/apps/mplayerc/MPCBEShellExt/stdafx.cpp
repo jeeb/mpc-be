@@ -1,5 +1,5 @@
 /*
- * $Id: stdafx.cpp 1136 2012-09-14 05:13:52Z szl $
+ * $Id$
  *
  * Copyright (C) 2012 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
  *

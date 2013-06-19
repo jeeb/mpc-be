@@ -1,5 +1,5 @@
 /*
- * $Id: PreView.cpp 807 2012-08-03 02:32:56Z Aleksoid $
+ * $Id$
  *
  * Copyright (C) 2012 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
  *
