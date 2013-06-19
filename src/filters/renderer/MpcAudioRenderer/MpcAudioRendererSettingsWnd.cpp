@@ -94,6 +94,9 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 	m_cbSoundDevice.Create(WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(IPP_SCALE(320), 200)), this, IDC_PP_SOUND_DEVICE);
 	p.y += h30;
 
+	m_cbUseBitExactOutput.Create(ResStr(IDS_ARS_USE_BITEXACT_OUTPUT), WS_VISIBLE|WS_CHILD|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, IDC_PP_USE_BITEXACT_OUTPUT);
+	p.y += h30;
+
 	m_cbMuteFastForward.Create(ResStr(IDS_ARS_MUTE_FAST_FORWARD), WS_VISIBLE|WS_CHILD|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, IDC_PP_MUTE_FAST_FORWARD);
 	p.y += h30;
 
@@ -109,6 +112,7 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 			}
 		}
 		m_cbWasapiMode.SetCurSel(m_pMAR->GetWasapiMode());
+		m_cbUseBitExactOutput.SetCheck(m_pMAR->GetBitExactOutput());
 		m_cbMuteFastForward.SetCheck(m_pMAR->GetMuteFastForward());
 	}
 
@@ -120,6 +124,8 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 
 	SetClassLongPtr(m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_ARROW));
 	SetClassLongPtr(GetDlgItem(IDC_PP_SOUND_DEVICE)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
+
+	OnClickedWasapiMode();
 
 	return true;
 }
@@ -134,6 +140,7 @@ bool CMpcAudioRendererSettingsWnd::OnApply()
 
 	if (m_pMAR) {
 		m_pMAR->SetWasapiMode(m_cbWasapiMode.GetCurSel());
+		m_pMAR->SetBitExactOutput(m_cbUseBitExactOutput.GetCheck());
 		m_pMAR->SetMuteFastForward(m_cbMuteFastForward.GetCheck());
 		CString str;
 		int idx = m_cbSoundDevice.GetCurSel();
@@ -148,7 +155,15 @@ bool CMpcAudioRendererSettingsWnd::OnApply()
 }
 
 BEGIN_MESSAGE_MAP(CMpcAudioRendererSettingsWnd, CInternalPropertyPageWnd)
+	ON_CBN_SELCHANGE(IDC_PP_WASAPI_MODE, OnClickedWasapiMode)
 END_MESSAGE_MAP()
+
+
+void CMpcAudioRendererSettingsWnd::OnClickedWasapiMode()
+{
+	int selected = m_cbWasapiMode.GetCurSel();
+	m_cbUseBitExactOutput.EnableWindow(selected == 1);
+}
 
 CMpcAudioRendererStatusWnd::CMpcAudioRendererStatusWnd(void)
 {

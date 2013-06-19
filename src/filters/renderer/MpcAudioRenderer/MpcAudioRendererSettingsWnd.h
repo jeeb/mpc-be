@@ -33,18 +33,20 @@ class __declspec(uuid("1E53BA32-3BCC-4dff-9342-34E46BE3F5A5"))
 private :
 	CComQIPtr<IMpcAudioRendererFilter> m_pMAR;
 
-	CStatic   m_txtWasapiMode;
-	CComboBox m_cbWasapiMode;
+	CStatic		m_txtWasapiMode;
+	CComboBox	m_cbWasapiMode;
 
-	CButton   m_cbMuteFastForward;
+	CButton		m_cbUseBitExactOutput;
+	CButton		m_cbMuteFastForward;
 
-	CStatic   m_txtSoundDevice;
-	CComboBox m_cbSoundDevice;
+	CStatic		m_txtSoundDevice;
+	CComboBox	m_cbSoundDevice;
 
 	enum {
 		IDC_PP_WASAPI_MODE = 10000,
 		IDC_PP_MUTE_FAST_FORWARD,
-		IDC_PP_SOUND_DEVICE
+		IDC_PP_SOUND_DEVICE,
+		IDC_PP_USE_BITEXACT_OUTPUT
 	};
 
 public:
@@ -62,6 +64,8 @@ public:
 	static CSize GetWindowSize() { return CSize(340, 135); }
 
 	DECLARE_MESSAGE_MAP()
+
+	afx_msg void OnClickedWasapiMode();
 };
 
 class __declspec(uuid("E3D0704B-1579-4E9E-8674-2674CB90D07A"))

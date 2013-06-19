@@ -12,6 +12,7 @@
 #define IDS_ARS_WASAPI_MODE_STATUS_3    7606
 #define IDS_ARS_WASAPI_MODE_STATUS_4    7607
 #define IDS_ARS_WASAPI_MODE_STATUS_5    7608
+#define IDS_ARS_USE_BITEXACT_OUTPUT     7609
 
 // Next default values for new objects
 //

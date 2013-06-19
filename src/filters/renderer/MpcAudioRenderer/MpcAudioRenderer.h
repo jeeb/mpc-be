@@ -105,6 +105,8 @@ public:
 	STDMETHODIMP_(CString)		GetSoundDevice();
 	STDMETHODIMP_(UINT)			GetMode();
 	STDMETHODIMP				GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX** ppWfxOut);
+	STDMETHODIMP				SetBitExactOutput(BOOL nValue);
+	STDMETHODIMP_(BOOL)			GetBitExactOutput();
 
 	// CMpcAudioRenderer
 private:
@@ -143,6 +145,7 @@ private:
 	bool					CopyWaveFormat(WAVEFORMATEX *pSrcWaveFormatEx, WAVEFORMATEX **ppDestWaveFormatEx);
 
 	BOOL					IsBitstream(WAVEFORMATEX *pWaveFormatEx);
+	void					SelectFormat(WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE& wfex);
 
 	HRESULT					StartAudioClient(IAudioClient **ppAudioClient);
 	HRESULT					StopAudioClient(IAudioClient **ppAudioClient);
@@ -166,6 +169,7 @@ private:
 	DWORD					lastBufferTime;
 	double					m_dVolume;
 	BOOL					m_bIsBitstream;
+	BOOL					m_bUseBitExactOutput;
 
 	// AVRT.dll (Vista or greater
 	typedef HANDLE							(__stdcall *PTR_AvSetMmThreadCharacteristicsW)(LPCWSTR TaskName, LPDWORD TaskIndex);
