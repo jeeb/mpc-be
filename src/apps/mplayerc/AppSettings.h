@@ -642,6 +642,7 @@ public:
 	bool			fUseWin7TaskBar;
 	int				nOSDSize;
 	CString			strOSDFont;
+	double			scalefont;
 
 	int				iDlgPropX;
 	int				iDlgPropY;

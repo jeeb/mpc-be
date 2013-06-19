@@ -36,6 +36,7 @@ CAppSettings::CAppSettings()
 	, fIsFSWindow(false)
 	, fShadersNeedSave(false)
 	, fReset(false)
+	, scalefont(1.0)
 	, p_MainWnd(NULL)
 {
 	// Internal source filter

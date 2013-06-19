@@ -32,22 +32,21 @@ CStatusLabel::CStatusLabel(bool fRightAlign, bool fAddEllipses)
 	: m_fRightAlign(fRightAlign)
 	, m_fAddEllipses(fAddEllipses)
 {
-	HDC hdc = ::GetDC(NULL);
-	double scale = 1.0*GetDeviceCaps(hdc, LOGPIXELSY) / 96.0;
-	::ReleaseDC(0, hdc);
 
 	m_font.m_hObject = NULL;
 
-	if (AfxGetAppSettings().fDisableXPToolbars) {
+	AppSettings& s = AfxGetAppSettings();
+
+	if (s.fDisableXPToolbars) {
 		int size = IsWinVistaOrLater() ? 13 : 14;
 		CString face = IsWinVistaOrLater() ? _T("Tahoma") : _T("Microsoft Sans Serif");
-		m_font.CreateFont(int(size * scale), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
+		m_font.CreateFont(int(size * s.scalefont), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
  					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH|FF_DONTCARE,
 					  face);
 	} else {
 		int size = IsWinVistaOrLater() ? 16 : 14;
 		CString face = IsWinVistaOrLater() ? _T("Segoe UI") : _T("Microsoft Sans Serif");
-		m_font.CreateFont(int(size * scale), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
+		m_font.CreateFont(int(size * s.scalefont), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
  					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH|FF_DONTCARE,
  					  face);
 	}

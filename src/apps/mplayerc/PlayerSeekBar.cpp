@@ -355,8 +355,8 @@ void CPlayerSeekBar::OnPaint()
 		ThemeRGB(80, 85, 90, R, G, B);
 		CPen penPlayed2(PS_SOLID,0,RGB(R,G,B));
 		memdc.SelectObject(&penPlayed2);
-		memdc.MoveTo(rc.left -1, rc.top +19);
-		memdc.LineTo(rc.right+2, rc.top +19);
+		memdc.MoveTo(rc.left -1, rc.bottom-1);
+		memdc.LineTo(rc.right+2, rc.bottom-1);
 
 		// buffer
 		r_Lock.SetRect(-1,-1,-1,-1);
@@ -458,22 +458,9 @@ void CPlayerSeekBar::OnPaint()
 			CFont font2;
 			ThemeRGB(135, 140, 145, R, G, B);
 			memdc.SetTextColor(RGB(R,G,B));
-			font2.CreateFont(
-							13,           // nHeight
-							0,            // nWidth
-							0,            // nEscapement
-							0,            // nOrientation
-							FW_NORMAL,    // nWeight
-							FALSE,        // bItalic
-							FALSE,        // bUnderline
-							0,            // cStrikeOut
-							ANSI_CHARSET, // nCharSet
-							OUT_RASTER_PRECIS,          // nOutPrecision
-							CLIP_DEFAULT_PRECIS,        // nClipPrecision
-							ANTIALIASED_QUALITY,        // nQuality
-							VARIABLE_PITCH | FF_MODERN, // nPitchAndFamily
-							_T("Tahoma")                // lpszFacename
-							);
+
+			font2.CreateFont(int(13 * s.scalefont), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
+ 					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH|FF_DONTCARE, _T("Tahoma"));
 
 			CFont* oldfont2 = memdc.SelectObject(&font2);
 			SetBkMode(memdc, TRANSPARENT);
