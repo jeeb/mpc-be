@@ -88,7 +88,7 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 
 		CString str, Author;
 
-		HINTERNET f, s = InternetOpen(L"MPC-BE Youtube Downloader", 0, NULL, NULL, 0);
+		HINTERNET f, s = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
 		if (s) {
 			CString link = fn;
 			if (link.Find(YOUTU_BE_URL) != -1) {
@@ -340,7 +340,7 @@ CString PlayerYouTubePlaylist(CString fn, bool type)
 
 		char* final = NULL;
 
-		HINTERNET f, s = InternetOpen(L"MPC-BE Youtube Downloader", 0, NULL, NULL, 0);
+		HINTERNET f, s = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
 		if (s) {
 			f = InternetOpenUrl(s, fn, NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 			if (f) {
@@ -522,7 +522,7 @@ CString PlayerYouTubeGetTitle(CString fn)
 {
 	char* final = NULL;
 
-	HINTERNET f, s = InternetOpen(L"MPC-BE Youtube Downloader", 0, NULL, NULL, 0);
+	HINTERNET f, s = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
 	if (s) {
 		f = InternetOpenUrl(s, fn, NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 		if (f) {
