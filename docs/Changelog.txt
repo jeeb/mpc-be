@@ -14,6 +14,7 @@ Legend:
 Added (+):
 
 Changes (*):
+	* ffmpeg git-9ead0605;
 
 Fixes (!):
 
