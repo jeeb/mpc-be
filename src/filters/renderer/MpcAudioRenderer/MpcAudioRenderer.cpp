@@ -333,6 +333,18 @@ HRESULT	CMpcAudioRenderer::CheckMediaType(const CMediaType *pmt)
 					hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfexAsIs, NULL);
 					if (S_OK == hr) {
 						pFormat = (WAVEFORMATEX*)&wfexAsIs;
+					} else if (AUDCLNT_E_UNSUPPORTED_FORMAT == hr && pwfx->wBitsPerSample > 16) {
+						SelectFormat(pwfx, wfexAsIs, 24);
+						hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfexAsIs, NULL);
+						if (S_OK == hr) {
+							pFormat = (WAVEFORMATEX*)&wfexAsIs;
+						} else if (AUDCLNT_E_UNSUPPORTED_FORMAT == hr) {
+							SelectFormat(pwfx, wfexAsIs, 32);
+							hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfexAsIs, NULL);
+							if (S_OK == hr) {
+								pFormat = (WAVEFORMATEX*)&wfexAsIs;
+							}						
+						}
 					}
 				}
 
@@ -898,7 +910,7 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 		key.SetDWORDValue(OPT_DeviceMode, m_useWASAPIAfterRestart);
 		key.SetDWORDValue(OPT_MuteFastForward, m_bMuteFastForward);
 		key.SetStringValue(OPT_AudioDevice, m_DeviceName);
-		key.SetDWORDValue(OPT_UseSystemFormat, m_bUseSystemFormat);
+		key.SetDWORDValue(OPT_UseBitExactOutput, m_bUseBitExactOutput);
 	}
 #else
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_DeviceMode, m_useWASAPIAfterRestart);
@@ -1563,6 +1575,18 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx)
 					hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfexAsIs, NULL);
 					if (S_OK == hr) {
 						pFormat = (WAVEFORMATEX*)&wfexAsIs;
+					} else if (AUDCLNT_E_UNSUPPORTED_FORMAT == hr && pWaveFormatEx->wBitsPerSample > 16) {
+						SelectFormat(pWaveFormatEx, wfexAsIs, 24);
+						hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfexAsIs, NULL);
+						if (S_OK == hr) {
+							pFormat = (WAVEFORMATEX*)&wfexAsIs;
+						} else if (AUDCLNT_E_UNSUPPORTED_FORMAT == hr) {
+							SelectFormat(pWaveFormatEx, wfexAsIs, 32);
+							hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfexAsIs, NULL);
+							if (S_OK == hr) {
+								pFormat = (WAVEFORMATEX*)&wfexAsIs;
+							}						
+						}
 					}
 				}
 
@@ -1852,11 +1876,25 @@ BOOL CMpcAudioRenderer::IsBitstream(WAVEFORMATEX *pWaveFormatEx)
 	return FALSE;
 }
 
-void CMpcAudioRenderer::SelectFormat(WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE& wfex)
+void CMpcAudioRenderer::SelectFormat(WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE& wfex, WORD wBitsPerSample24_32)
 {
 	// trying to create an output media type similar to input media type ...
 	DWORD nSamplesPerSec	= pwfx->nSamplesPerSec;
 	WORD nChannels			= pwfx->nChannels;
+
+	switch (nChannels) {
+		case 1:
+		case 3:
+			nChannels = 2;
+			break;
+		case 4:
+		case 5:
+			nChannels = 6;
+			break;
+		case 7:
+			nChannels = 8;
+			break;
+	}
 	DWORD dwChannelMask		= GetDefChannelMask(nChannels);
 	/*
 	if (pwfx->wFormatTag == WAVE_FORMAT_EXTENSIBLE && pwfx->cbSize == sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX)) {
@@ -1868,8 +1906,9 @@ void CMpcAudioRenderer::SelectFormat(WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE& w
 	wfe.nChannels			= nChannels;
 	wfe.nSamplesPerSec		= nSamplesPerSec;
 	wfe.wBitsPerSample		= pwfx->wBitsPerSample;
-	if (wfe.wBitsPerSample == 24) {
-		wfe.wBitsPerSample	= 32;
+	if ((wfe.wBitsPerSample == 24 || wfe.wBitsPerSample == 32)
+			&& wBitsPerSample24_32) {
+		wfe.wBitsPerSample	= wBitsPerSample24_32;
 	}
 					
 	wfe.nBlockAlign			= nChannels * wfe.wBitsPerSample / 8;

@@ -145,7 +145,7 @@ private:
 	bool					CopyWaveFormat(WAVEFORMATEX *pSrcWaveFormatEx, WAVEFORMATEX **ppDestWaveFormatEx);
 
 	BOOL					IsBitstream(WAVEFORMATEX *pWaveFormatEx);
-	void					SelectFormat(WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE& wfex);
+	void					SelectFormat(WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE& wfex, WORD wBitsPerSample24_32 = 0);
 
 	HRESULT					StartAudioClient(IAudioClient **ppAudioClient);
 	HRESULT					StopAudioClient(IAudioClient **ppAudioClient);
