@@ -1824,6 +1824,11 @@ bool CMpcAudioRenderer::IsFormatChanged(const WAVEFORMATEX *pWaveFormatEx, const
 			(wfex->SubFormat != wfexNew->SubFormat
 			|| wfex->dwChannelMask != wfexNew->dwChannelMask
 			/*|| wfex->Samples.wValidBitsPerSample != wfexNew->Samples.wValidBitsPerSample*/)) {
+
+		if (wfex->SubFormat == wfexNew->SubFormat
+				&& (wfex->dwChannelMask == 0x3f && wfexNew->dwChannelMask == 0x60f)) {
+			return false;
+		}
 		return true;
 	}
 
