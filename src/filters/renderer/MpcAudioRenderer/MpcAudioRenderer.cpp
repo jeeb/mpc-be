@@ -314,8 +314,8 @@ HRESULT	CMpcAudioRenderer::CheckMediaType(const CMediaType *pmt)
 			return VFW_E_CANNOT_CONNECT;
 		}
 
-		WAVEFORMATEX *pFormat		= NULL;
-		WAVEFORMATEX* pDeviceFormat	= NULL;
+		WAVEFORMATEX *pFormat				= NULL;
+		WAVEFORMATEX* pDeviceFormat			= NULL;
 
 		WAVEFORMATEX *sharedClosestMatch	= NULL;
 
@@ -404,15 +404,19 @@ HRESULT	CMpcAudioRenderer::CheckMediaType(const CMediaType *pmt)
 				TRACE(_T("	=> ppClosestMatch:\n"));
 				DumpWaveFormatEx(sharedClosestMatch);
 
+				WAVEFORMATEX *wfe = NULL;
+				CopyWaveFormat(sharedClosestMatch, &wfe);
 				CoTaskMemFree(sharedClosestMatch);
 
-				hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_SHARED, m_pWaveFileFormatOutput, &sharedClosestMatch);
+				hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_SHARED, wfe, &sharedClosestMatch);
+				if (sharedClosestMatch) {
+					CoTaskMemFree(sharedClosestMatch);
+				}
+				SAFE_DELETE_ARRAY(wfe);
+
 				if (S_OK == hr) {
 					TRACE(_T("CMpcAudioRenderer::CheckMediaType() - WASAPI client accepted the closest match format\n"));
 					return hr;
-				}
-				if (sharedClosestMatch) {
-					CoTaskMemFree(sharedClosestMatch);
 				}
 			}
 
