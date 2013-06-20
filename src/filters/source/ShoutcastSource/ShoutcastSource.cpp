@@ -771,7 +771,7 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 		if (1 == __super::Receive(&b, 1) && b && b*16 == __super::Receive(buff, b*16)) {
 			CStringA str = (LPCSTR)buff;
 
-			TRACE(_T("CShoutcastStream(): Metainfo: %ws\n"), CString(str));
+			DbgLog((LOG_TRACE, 3, L"CShoutcastStream(): Metainfo: %s", CString(str)));
 
 			CStringA title("StreamTitle='"), url("StreamUrl='");
 
@@ -888,7 +888,7 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 		str.Empty();
 		BYTE cur = 0, prev = 0;
 #if DEBUG & 1
-		TRACE(_T("\nCShoutcastStream(): began to receive data:\n"));
+		DbgLog((LOG_TRACE, 3, L"\nCShoutcastStream(): began to receive data:"));
 #endif
 		while (Receive(&cur, 1) == 1 && cur && !(cur == '\n' && prev == '\n')) {
 			if (cur == '\r') {
@@ -897,7 +897,7 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 
 			if (cur == '\n') {
 #if DEBUG & 1
-				TRACE(_T("	%ws\n"), CString(str));
+				DbgLog((LOG_TRACE, 3, L"	%s", CString(str)));
 #endif
 				CStringA dup(str);
 				str.MakeLower();
@@ -907,13 +907,13 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 					str = str.Mid(13).Trim();
 					if (str.Find("audio/mpeg") == 0) {
 						m_Format = AUDIO_MPEG;
-						TRACE(_T("		detected MPEG Audio format\n"));
+						DbgLog((LOG_TRACE, 3, L"		detected MPEG Audio format"));
 					} else if (str.Find("audio/aacp") == 0) {
 						m_Format = AUDIO_AAC;
-						TRACE(_T("		detected AAC Audio format\n"));
+						DbgLog((LOG_TRACE, 3, L"		detected AAC Audio format"));
 					} else if (str.Find("audio/x-scpls") == 0) {
 						m_Format = AUDIO_PLAYLIST;
-						TRACE(_T("		detected Playlist format\n"));
+						DbgLog((LOG_TRACE, 3, L"		detected Playlist format"));
 					}
 				} else if (1 == sscanf_s(str, "icy-br:%d", &m_bitrate)) {
 					m_bitrate *= 1000;
@@ -942,7 +942,7 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 			cur = 0;
 		}
 #if DEBUG & 1
-		TRACE(_T("CShoutcastStream(): finished receiving data\n"));
+		DbgLog((LOG_TRACE, 3, L"CShoutcastStream(): finished receiving data"));
 #endif
 
 		if (!fOK && GetLastError() == WSAECONNRESET && !fTryAgain) {

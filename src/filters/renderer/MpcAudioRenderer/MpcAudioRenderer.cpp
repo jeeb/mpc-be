@@ -281,7 +281,7 @@ HRESULT	CMpcAudioRenderer::CheckMediaType(const CMediaType *pmt)
 	CAutoLock cAutoLock(&m_csCheck);
 
 	if (pmt == NULL) {
-		return E_INVALIDARG;
+		return E_POINTER;
 	}
 
 	if ((pmt->majortype != MEDIATYPE_Audio) || (pmt->formattype != FORMAT_WaveFormatEx)) {
@@ -300,129 +300,6 @@ HRESULT	CMpcAudioRenderer::CheckMediaType(const CMediaType *pmt)
 	WAVEFORMATEX *pwfx = (WAVEFORMATEX *)pmt->Format();
 
 	if (pwfx == NULL) {
-		return VFW_E_TYPE_NOT_ACCEPTED;
-	}
-
-	if (m_useWASAPI) {
-		hr = CheckAudioClient((WAVEFORMATEX *)NULL);
-		if (FAILED(hr)) {
-			TRACE(_T("CMpcAudioRenderer::CheckMediaType() - Error on check audio client\n"));
-			return hr;
-		}
-		if (!m_pAudioClient) {
-			TRACE(_T("CMpcAudioRenderer::CheckMediaType() - Error, audio client not loaded\n"));
-			return VFW_E_CANNOT_CONNECT;
-		}
-
-		WAVEFORMATEX *pFormat				= NULL;
-		WAVEFORMATEX* pDeviceFormat			= NULL;
-
-		WAVEFORMATEX *sharedClosestMatch	= NULL;
-
-		IPropertyStore *pProps = NULL;
-		PROPVARIANT varConfig;
-
-		WAVEFORMATEXTENSIBLE wfexAsIs = {0};
-
-		if (m_useWASAPI == 1 || IsBitstream(pwfx)) { // EXCLUSIVE
-			if (IsBitstream(pwfx)) {
-				pFormat = pwfx;
-			} else {
-				if (m_bUseBitExactOutput) {
-					SelectFormat(pwfx, wfexAsIs);
-					hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfexAsIs, NULL);
-					if (S_OK == hr) {
-						pFormat = (WAVEFORMATEX*)&wfexAsIs;
-					} else if (AUDCLNT_E_UNSUPPORTED_FORMAT == hr && pwfx->wBitsPerSample > 16) {
-						SelectFormat(pwfx, wfexAsIs, 24);
-						hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfexAsIs, NULL);
-						if (S_OK == hr) {
-							pFormat = (WAVEFORMATEX*)&wfexAsIs;
-						} else if (AUDCLNT_E_UNSUPPORTED_FORMAT == hr) {
-							SelectFormat(pwfx, wfexAsIs, 32);
-							hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfexAsIs, NULL);
-							if (S_OK == hr) {
-								pFormat = (WAVEFORMATEX*)&wfexAsIs;
-							}						
-						}
-					}
-				}
-
-				if (!pFormat) {
-					pMMDevice->OpenPropertyStore(STGM_READ, &pProps);
-					PropVariantInit(&varConfig);
-					hr = pProps->GetValue(PKEY_AudioEngine_DeviceFormat, &varConfig);
-					if (SUCCEEDED(hr) && varConfig.vt == VT_BLOB && varConfig.blob.pBlobData != NULL) {
-						pFormat = (WAVEFORMATEX*)varConfig.blob.pBlobData;
-					}
-				}
-			}
-
-			hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, pFormat, NULL);
-		} else if (m_useWASAPI == 2) { // SHARED
-			pFormat = pwfx;
-			hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_SHARED, pFormat, &sharedClosestMatch);
-			if (FAILED(hr)) {
-				hr = m_pAudioClient->GetMixFormat(&pDeviceFormat);
-				if (FAILED(hr)) {
-					TRACE(_T("CMpcAudioRenderer::CheckMediaType() - GetMixFormat() failed\n"));
-					return hr;
-				}
-
-				pFormat = pDeviceFormat;
-				hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_SHARED, pFormat, &sharedClosestMatch);
-			}
-		}
-		TRACE(_T("CMpcAudioRenderer::CheckMediaType() - IsFormatSupported()\n"));
-		TRACE(_T("	Input format:\n"));
-		DumpWaveFormatEx(pwfx);
-
-		TRACE(_T("	Output format:\n"));
-		DumpWaveFormatEx(pFormat);
-
-		if (pProps) {
-			PropVariantClear(&varConfig);
-			SAFE_RELEASE(pProps);
-		}
-
-		if (pDeviceFormat) {
-			CoTaskMemFree(pDeviceFormat);
-		}
-
-		if (S_OK == hr) {
-			TRACE(_T("CMpcAudioRenderer::CheckMediaType() - WASAPI client accepted the format\n"));
-		} else {
-			if (S_FALSE == hr) {
-				TRACE(_T("CMpcAudioRenderer::CheckMediaType() - WASAPI client refused the format with a closest match\n"));
-			} else if (AUDCLNT_E_UNSUPPORTED_FORMAT == hr) {
-				TRACE(_T("CMpcAudioRenderer::CheckMediaType() - WASAPI client refused the format\n"));
-			} else {
-				TRACE(_T("CMpcAudioRenderer::CheckMediaType() - WASAPI failed = 0x%08x\n"), hr);
-			}
-
-			if (sharedClosestMatch) {
-				TRACE(_T("	=> ppClosestMatch:\n"));
-				DumpWaveFormatEx(sharedClosestMatch);
-
-				WAVEFORMATEX *wfe = NULL;
-				CopyWaveFormat(sharedClosestMatch, &wfe);
-				CoTaskMemFree(sharedClosestMatch);
-
-				hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_SHARED, wfe, &sharedClosestMatch);
-				if (sharedClosestMatch) {
-					CoTaskMemFree(sharedClosestMatch);
-				}
-				SAFE_DELETE_ARRAY(wfe);
-
-				if (S_OK == hr) {
-					TRACE(_T("CMpcAudioRenderer::CheckMediaType() - WASAPI client accepted the closest match format\n"));
-					return hr;
-				}
-			}
-
-			return VFW_E_TYPE_NOT_ACCEPTED;
-		}
-	} else if (pwfx->wFormatTag != WAVE_FORMAT_PCM && pwfx->wFormatTag != WAVE_FORMAT_IEEE_FLOAT) {
 		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
 
@@ -514,32 +391,51 @@ STDMETHODIMP CMpcAudioRenderer::NonDelegatingQueryInterface(REFIID riid, void **
 
 HRESULT CMpcAudioRenderer::SetMediaType(const CMediaType *pmt)
 {
-	if (!pmt) {
+	if (pmt == NULL) {
 		return E_POINTER;
 	}
-	TRACE(_T("CMpcAudioRenderer::SetMediaType\n"));
+
+	WAVEFORMATEX *pwf = (WAVEFORMATEX *)pmt->Format();
+	if (pwf == NULL) {
+		return VFW_E_TYPE_NOT_ACCEPTED;
+	}
+
+	TRACE(_T("CMpcAudioRenderer::SetMediaType()\n"));
 
 	if (m_useWASAPI) {
-		// New media type set but render client already initialized => reset it
-		if (m_pRenderClient != NULL) {
-			WAVEFORMATEX *pNewWf = (WAVEFORMATEX *)pmt->Format();
+		HRESULT hr = S_OK;
+
+		if (!m_pAudioClient) {
+			hr = CheckAudioClient((WAVEFORMATEX *)NULL);
+			if (FAILED(hr)) {
+				TRACE(_T("CMpcAudioRenderer::SetMediaType() - Error on check audio client\n"));
+				return hr;
+			}
+			if (!m_pAudioClient) {
+				TRACE(_T("CMpcAudioRenderer::SetMediaType() - Error, audio client not loaded\n"));
+				return VFW_E_CANNOT_CONNECT;
+			}
+		}
+
+		if (m_pRenderClient) {
 			TRACE(_T("CMpcAudioRenderer::SetMediaType() : Render client already initialized. Reinitialization...\n"));
-			CheckAudioClient(pNewWf);
+		} else {
+			TRACE(_T("CMpcAudioRenderer::SetMediaType() : Render client initialization\n"));
+		}
+		hr = CheckAudioClient(pwf);
+
+		if (FAILED(hr)) {
+			return hr;
 		}
 	}
 
-	SAFE_DELETE_ARRAY(m_pWaveFileFormat);
+	CopyWaveFormat(pwf, &m_pWaveFileFormat);
 
-	WAVEFORMATEX *pwf = (WAVEFORMATEX *)pmt->Format();
-	if (pwf != NULL) {
-		CopyWaveFormat(pwf, &m_pWaveFileFormat);
-
-		if (!m_useWASAPI && m_pSoundTouch && (pwf->nChannels <= 2)) {
-			m_pSoundTouch->setSampleRate (pwf->nSamplesPerSec);
-			m_pSoundTouch->setChannels (pwf->nChannels);
-			m_pSoundTouch->setTempoChange (0);
-			m_pSoundTouch->setPitchSemiTones(0);
-		}
+	if (!m_useWASAPI && m_pSoundTouch && (pwf->nChannels <= 2)) {
+		m_pSoundTouch->setSampleRate (pwf->nSamplesPerSec);
+		m_pSoundTouch->setChannels (pwf->nChannels);
+		m_pSoundTouch->setTempoChange (0);
+		m_pSoundTouch->setPitchSemiTones(0);
 	}
 
 	return CBaseRenderer::SetMediaType(pmt);
@@ -1575,22 +1471,17 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx)
 			} else {
 
 				if (m_bUseBitExactOutput) {
-					SelectFormat(pWaveFormatEx, wfexAsIs);
-					hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfexAsIs, NULL);
-					if (S_OK == hr) {
-						pFormat = (WAVEFORMATEX*)&wfexAsIs;
-					} else if (AUDCLNT_E_UNSUPPORTED_FORMAT == hr && pWaveFormatEx->wBitsPerSample > 16) {
-						SelectFormat(pWaveFormatEx, wfexAsIs, 24);
+					WORD wBitPerSampleValues[] = {0, 24, 32, 16};
+					for (int i = 0; i < _countof(wBitPerSampleValues); i++) {
+						SelectFormat(pWaveFormatEx, wfexAsIs, wBitPerSampleValues[i]);
 						hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfexAsIs, NULL);
 						if (S_OK == hr) {
 							pFormat = (WAVEFORMATEX*)&wfexAsIs;
-						} else if (AUDCLNT_E_UNSUPPORTED_FORMAT == hr) {
-							SelectFormat(pWaveFormatEx, wfexAsIs, 32);
-							hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfexAsIs, NULL);
-							if (S_OK == hr) {
-								pFormat = (WAVEFORMATEX*)&wfexAsIs;
-							}						
+						} else if (AUDCLNT_E_UNSUPPORTED_FORMAT == hr && pWaveFormatEx->wBitsPerSample > 16) {
+							continue;
 						}
+
+						break;
 					}
 				}
 
@@ -1887,6 +1778,8 @@ BOOL CMpcAudioRenderer::IsBitstream(WAVEFORMATEX *pWaveFormatEx)
 
 void CMpcAudioRenderer::SelectFormat(WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE& wfex, WORD wBitsPerSample24_32)
 {
+	memset(&wfex, 0, sizeof(wfex));
+
 	// trying to create an output media type similar to input media type ...
 	DWORD nSamplesPerSec	= pwfx->nSamplesPerSec;
 	WORD nChannels			= pwfx->nChannels;
