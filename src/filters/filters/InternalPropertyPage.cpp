@@ -24,6 +24,7 @@
 #include "stdafx.h"
 #include "InternalPropertyPage.h"
 #include "../../DSUtil/DSUtil.h"
+#include "../../apps/mplayerc/mplayerc.h"
 
 //
 // CInternalPropertyPageWnd
@@ -481,14 +482,14 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 
 	CString str;
 
-	PIN_INFO	PinInfo;
+	PIN_INFO PinInfo;
 	if (SUCCEEDED (pPin->QueryPinInfo(&PinInfo))) {
 		CString		strName;
 		CLSID		FilterClsid;
 		FILTER_INFO	FilterInfo;
 
 		if (SUCCEEDED (PinInfo.pFilter->QueryFilterInfo (&FilterInfo))) {
-			CRegKey		key;
+			CRegKey key;
 			PinInfo.pFilter->GetClassID(&FilterClsid);
 			if (ERROR_SUCCESS == key.Open (HKEY_CLASSES_ROOT, _T("CLSID\\{083863F1-70DE-11D0-BD40-00A0C911CE86}\\Instance\\") + CStringFromGUID(FilterClsid), KEY_READ)) {
 				ULONG len;
@@ -499,7 +500,7 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 			} else {
 				strName = FilterInfo.achName;
 			}
-			str.Format (_T("Filter : %s - CLSID : %s\n"), strName, CStringFromGUID(FilterClsid));
+			str.Format(_T("Filter : %s - CLSID : %s\n"), strName, CStringFromGUID(FilterClsid));
 			AddLine(str);
 			FilterInfo.pGraph->Release();
 
@@ -517,6 +518,17 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 					str.Format(_T("Module : %s\n"), buff);
 					AddLine(str);
 					key.Close();
+				} else { // Search filter in an external filter list ...
+					const AppSettings& s = AfxGetAppSettings();
+					POSITION pos = s.m_filters.GetHeadPosition();
+					while (pos) {
+						FilterOverride* fo = s.m_filters.GetNext(pos);
+						if (fo->clsid == FilterClsid && ::PathFileExists(fo->path)) {
+							str.Format(_T("Module : %s\n"), fo->path);
+							AddLine(str);
+							break;
+						}
+					}
 				}
 			}
 
