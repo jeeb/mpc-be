@@ -1826,7 +1826,7 @@ bool CMpcAudioRenderer::IsFormatChanged(const WAVEFORMATEX *pWaveFormatEx, const
 			/*|| wfex->Samples.wValidBitsPerSample != wfexNew->Samples.wValidBitsPerSample*/)) {
 
 		if (wfex->SubFormat == wfexNew->SubFormat
-				&& (wfex->dwChannelMask == 0x3f && wfexNew->dwChannelMask == 0x60f)) {
+				&& (wfex->dwChannelMask == KSAUDIO_SPEAKER_5POINT1 && wfexNew->dwChannelMask == KSAUDIO_SPEAKER_5POINT1_SURROUND)) {
 			return false;
 		}
 		return true;
