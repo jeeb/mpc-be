@@ -45,4 +45,6 @@ public IUnknown {
 	STDMETHOD(GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX** ppWfxOut)) PURE;
 	STDMETHOD(SetBitExactOutput(BOOL nValue)) PURE;
 	STDMETHOD_(BOOL, GetBitExactOutput()) PURE;
+	STDMETHOD(SetSystemLayoutChannels(BOOL nValue)) PURE;
+	STDMETHOD_(BOOL, GetSystemLayoutChannels()) PURE;
 };

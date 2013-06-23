@@ -1341,6 +1341,7 @@ STRING IDS_APP_DESCRIPTION		"Адзін з найболей магутных н�
 STRING IDS_ARS_MUTE_FAST_FORWARD		"Адкл. гук пры паскораным прайграванні"
 STRING IDS_ARS_SOUND_DEVICE		"Прыл. гуку:"
 STRING IDS_ARS_USE_BITEXACT_OUTPUT		"Allow bit-exact output"
+STRING IDS_ARS_USE_SYSTEM_LAYOUT_CHANNELS		"Use system layout channels"
 STRING IDS_ARS_WASAPI_MODE		"Выкарыстаць WASAPI (перазапускае прайграванне)"
 STRING IDS_ARS_WASAPI_MODE_STATUS		"Status"
 STRING IDS_ARS_WASAPI_MODE_STATUS_1		"Not running"

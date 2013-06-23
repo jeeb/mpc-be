@@ -1341,6 +1341,7 @@ STRING IDS_APP_DESCRIPTION		"Один из наиболее мощных и на
 STRING IDS_ARS_MUTE_FAST_FORWARD		"Отключить звук при быстрой перемотке"
 STRING IDS_ARS_SOUND_DEVICE		"Звуковое устройство:"
 STRING IDS_ARS_USE_BITEXACT_OUTPUT		"Использовать побитовый вывод"
+STRING IDS_ARS_USE_SYSTEM_LAYOUT_CHANNELS		"Использовать системную раскаладку каналов"
 STRING IDS_ARS_WASAPI_MODE		"Использовать WASAPI (требуется перезапуск):"
 STRING IDS_ARS_WASAPI_MODE_STATUS		"Статус"
 STRING IDS_ARS_WASAPI_MODE_STATUS_1		"не запущен"

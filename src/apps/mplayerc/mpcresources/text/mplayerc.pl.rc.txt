@@ -1340,6 +1340,7 @@ STRING IDS_APP_DESCRIPTION		"W pełni konfigurowalny odtwarzacz multimedialny st
 STRING IDS_ARS_MUTE_FAST_FORWARD		"Wycisz podczas przewijania"
 STRING IDS_ARS_SOUND_DEVICE		"Urządzenie dźwiękowe:"
 STRING IDS_ARS_USE_BITEXACT_OUTPUT		"Allow bit-exact output"
+STRING IDS_ARS_USE_SYSTEM_LAYOUT_CHANNELS		"Use system layout channels"
 STRING IDS_ARS_WASAPI_MODE		"Użyj WASAPI (reset odtwarzania)"
 STRING IDS_ARS_WASAPI_MODE_STATUS		"Status"
 STRING IDS_ARS_WASAPI_MODE_STATUS_1		"Not running"

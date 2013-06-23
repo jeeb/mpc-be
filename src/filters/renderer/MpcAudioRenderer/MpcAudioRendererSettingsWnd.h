@@ -37,6 +37,8 @@ private :
 	CComboBox	m_cbWasapiMode;
 
 	CButton		m_cbUseBitExactOutput;
+	CButton		m_cbUseSystemLayoutChannels;
+
 	CButton		m_cbMuteFastForward;
 
 	CStatic		m_txtSoundDevice;
@@ -46,7 +48,8 @@ private :
 		IDC_PP_WASAPI_MODE = 10000,
 		IDC_PP_MUTE_FAST_FORWARD,
 		IDC_PP_SOUND_DEVICE,
-		IDC_PP_USE_BITEXACT_OUTPUT
+		IDC_PP_USE_BITEXACT_OUTPUT,
+		IDC_PP_USE_SYSTEM_LAYOUT_CHANNELS
 	};
 
 public:
@@ -66,6 +69,7 @@ public:
 	DECLARE_MESSAGE_MAP()
 
 	afx_msg void OnClickedWasapiMode();
+	afx_msg void OnClickedBitExact();
 };
 
 class __declspec(uuid("E3D0704B-1579-4E9E-8674-2674CB90D07A"))

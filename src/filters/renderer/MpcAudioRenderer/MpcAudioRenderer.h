@@ -107,6 +107,8 @@ public:
 	STDMETHODIMP				GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX** ppWfxOut);
 	STDMETHODIMP				SetBitExactOutput(BOOL nValue);
 	STDMETHODIMP_(BOOL)			GetBitExactOutput();
+	STDMETHODIMP				SetSystemLayoutChannels(BOOL nValue);
+	STDMETHODIMP_(BOOL)			GetSystemLayoutChannels();
 
 	// CMpcAudioRenderer
 private:
@@ -145,7 +147,8 @@ private:
 	bool					CopyWaveFormat(WAVEFORMATEX *pSrcWaveFormatEx, WAVEFORMATEX **ppDestWaveFormatEx);
 
 	BOOL					IsBitstream(WAVEFORMATEX *pWaveFormatEx);
-	void					SelectFormat(WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE& wfex, WORD wBitsPerSample24_32 = 0);
+	void					SelectFormat(WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE& wfex);
+	void					CreateFormat(WAVEFORMATEXTENSIBLE& wfex, WORD wBitsPerSample, WORD nChannels, DWORD dwChannelMask, DWORD nSamplesPerSec);
 
 	HRESULT					StartAudioClient(IAudioClient **ppAudioClient);
 	HRESULT					StopAudioClient(IAudioClient **ppAudioClient);
@@ -170,6 +173,7 @@ private:
 	double					m_dVolume;
 	BOOL					m_bIsBitstream;
 	BOOL					m_bUseBitExactOutput;
+	BOOL					m_bUseSystemLayoutChannels;
 
 	// AVRT.dll (Vista or greater
 	typedef HANDLE							(__stdcall *PTR_AvSetMmThreadCharacteristicsW)(LPCWSTR TaskName, LPDWORD TaskIndex);
@@ -200,4 +204,9 @@ private:
 	HANDLE					m_hWaitPauseEvent;
 	HANDLE					m_hWaitResumeEvent;
 	HANDLE					m_hStopRenderThreadEvent;
+
+	CSimpleArray<WORD>		m_wBitsPerSampleList;
+	CSimpleArray<WORD>		m_nChannelsList;
+	CSimpleArray<DWORD>		m_dwChannelMaskList;
+	CSimpleArray<DWORD>		m_nSamplesPerSecList;
 };

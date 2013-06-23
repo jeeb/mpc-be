@@ -1341,6 +1341,7 @@ STRING IDS_APP_DESCRIPTION		"Jeden z najvýkonnejších, konfigurovateľných mu
 STRING IDS_ARS_MUTE_FAST_FORWARD		"Stlmiť zvuk pri rýchlo prevíjaní vpred"
 STRING IDS_ARS_SOUND_DEVICE		"Zvuk. zariadenie:"
 STRING IDS_ARS_USE_BITEXACT_OUTPUT		"Allow bit-exact output"
+STRING IDS_ARS_USE_SYSTEM_LAYOUT_CHANNELS		"Use system layout channels"
 STRING IDS_ARS_WASAPI_MODE		"Použiť WASAPI (reštartovať prehrávanie)"
 STRING IDS_ARS_WASAPI_MODE_STATUS		"Status"
 STRING IDS_ARS_WASAPI_MODE_STATUS_1		"Not running"

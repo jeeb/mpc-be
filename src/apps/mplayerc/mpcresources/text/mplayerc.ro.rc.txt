@@ -1345,6 +1345,7 @@ STRING IDS_APP_DESCRIPTION		"Unul dintre cele mai puternice și configurabile le
 STRING IDS_ARS_MUTE_FAST_FORWARD		"Fără sunet la derulare rapidă înainte"
 STRING IDS_ARS_SOUND_DEVICE		"Dispozitiv de sunet:"
 STRING IDS_ARS_USE_BITEXACT_OUTPUT		"Allow bit-exact output"
+STRING IDS_ARS_USE_SYSTEM_LAYOUT_CHANNELS		"Use system layout channels"
 STRING IDS_ARS_WASAPI_MODE		"Folosește WASAPI (necesită reponirea redării)"
 STRING IDS_ARS_WASAPI_MODE_STATUS		"Status"
 STRING IDS_ARS_WASAPI_MODE_STATUS_1		"Not running"

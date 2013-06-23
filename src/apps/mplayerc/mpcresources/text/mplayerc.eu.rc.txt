@@ -1341,6 +1341,7 @@ STRING IDS_APP_DESCRIPTION		"Windows sistema eragilerako multimedia irakurgailu 
 STRING IDS_ARS_MUTE_FAST_FORWARD		"Mututu aurrera azkarrean"
 STRING IDS_ARS_SOUND_DEVICE		"Soinu Gailua:"
 STRING IDS_ARS_USE_BITEXACT_OUTPUT		"Allow bit-exact output"
+STRING IDS_ARS_USE_SYSTEM_LAYOUT_CHANNELS		"Use system layout channels"
 STRING IDS_ARS_WASAPI_MODE		"Erabili WASAPI (Berrabiarazi irakurketa)"
 STRING IDS_ARS_WASAPI_MODE_STATUS		"Status"
 STRING IDS_ARS_WASAPI_MODE_STATUS_1		"Not running"
