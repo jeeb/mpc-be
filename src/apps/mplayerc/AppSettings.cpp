@@ -1438,9 +1438,9 @@ void CAppSettings::LoadSettings()
 	iYoutubeTag				= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_TAG, 0);
 	iYoutubeSource			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_SOURCE, 0);
 
-	if (fLaunchfullscreen && !IsD3DFullscreen()) {
-		nCLSwitches |= CLSW_FULLSCREEN;
-	}
+//	if (fLaunchfullscreen && !IsD3DFullscreen()) {
+//		nCLSwitches |= CLSW_FULLSCREEN;
+//	}
 
 	fInitialized = true;
 }
