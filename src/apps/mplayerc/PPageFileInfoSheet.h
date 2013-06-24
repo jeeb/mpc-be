@@ -31,9 +31,39 @@
 
 class CMainFrame;
 
+class CMPCPropertySheet: public CPropertySheet
+{
+	DECLARE_DYNAMIC(CMPCPropertySheet)
+
+public:
+	CMPCPropertySheet(LPCTSTR pszCaption, CWnd* pParentWnd = NULL, UINT iSelectPage = 0);
+	
+	template <class T>
+	void AddPage(T* pPage) {
+		CPropertySheet::AddPage(pPage);
+		m_IdMap[GetPageIndex(pPage)] = T::IDD;
+	}
+
+	void RemovePage(CPropertyPage* pPage) {
+		m_IdMap.RemoveKey(GetPageIndex(pPage));
+		CPropertySheet::RemovePage(pPage);
+	}
+	void RemovePage(int nPage) {
+		m_IdMap.RemoveKey(nPage);
+		CPropertySheet::RemovePage(nPage);
+	}
+
+	DWORD GetResourceId(int nPage) {
+		return m_IdMap[nPage];
+	}
+
+protected:
+	CAtlMap<int, DWORD> m_IdMap;
+};
+
 // CPPageFileInfoSheet
 
-class CPPageFileInfoSheet : public CPropertySheet
+class CPPageFileInfoSheet : public CMPCPropertySheet
 {
 	DECLARE_DYNAMIC(CPPageFileInfoSheet)
 
@@ -58,6 +88,7 @@ protected:
 	static int CALLBACK XmnPropSheetCallback(HWND hWnd, UINT message, LPARAM lParam);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI);
+	afx_msg void OnDestroy();
 
 	DECLARE_MESSAGE_MAP()
 

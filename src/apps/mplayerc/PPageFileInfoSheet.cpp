@@ -26,11 +26,17 @@
 #include "PPageFileInfoSheet.h"
 #include "PPageFileMediaInfo.h"
 
+IMPLEMENT_DYNAMIC(CMPCPropertySheet, CPropertySheet)
+CMPCPropertySheet::CMPCPropertySheet(LPCTSTR pszCaption, CWnd* pParentWnd, UINT iSelectPage)
+	: CPropertySheet(pszCaption, pParentWnd, iSelectPage)
+{
+}
+
 // CPPageFileInfoSheet
 
-IMPLEMENT_DYNAMIC(CPPageFileInfoSheet, CPropertySheet)
+IMPLEMENT_DYNAMIC(CPPageFileInfoSheet, CMPCPropertySheet)
 CPPageFileInfoSheet::CPPageFileInfoSheet(CString fn, CMainFrame* pMainFrame, CWnd* pParentWnd)
-	: CPropertySheet(ResStr(IDS_PROPSHEET_PROPERTIES), pParentWnd, 0)
+	: CMPCPropertySheet(ResStr(IDS_PROPSHEET_PROPERTIES), pParentWnd, 0)
 	, m_clip(fn, pMainFrame->pGB)
 	, m_details(fn, pMainFrame->pGB, pMainFrame->m_pCAP)
 	, m_res(fn, pMainFrame->pGB)
@@ -59,11 +65,14 @@ CPPageFileInfoSheet::CPPageFileInfoSheet(CString fn, CMainFrame* pMainFrame, CWn
 
 CPPageFileInfoSheet::~CPPageFileInfoSheet()
 {
-	AfxGetAppSettings().iDlgPropX = m_rWnd.Width()	- m_nMinCX;
-	AfxGetAppSettings().iDlgPropY = m_rWnd.Height()	- m_nMinCY;
+	AppSettings& s = AfxGetAppSettings();
+
+	s.iDlgPropX = m_rWnd.Width() - m_nMinCX;
+	s.iDlgPropY = m_rWnd.Height() - m_nMinCY;
 }
 
-BEGIN_MESSAGE_MAP(CPPageFileInfoSheet, CPropertySheet)
+BEGIN_MESSAGE_MAP(CPPageFileInfoSheet, CMPCPropertySheet)
+	ON_WM_DESTROY()
 	ON_WM_GETMINMAXINFO()
 	ON_WM_SIZE()
 	ON_BN_CLICKED(IDC_BUTTON_MI, OnSaveAs)
@@ -117,7 +126,16 @@ BOOL CPPageFileInfoSheet::OnInitDialog()
 
 	CenterWindow();
 
-	ModifyStyle(0,WS_MAXIMIZEBOX);
+	ModifyStyle(0, WS_MAXIMIZEBOX);
+
+	const AppSettings& s = AfxGetAppSettings();
+	for (int i = 0; i < GetPageCount(); i++) {
+		DWORD nID = GetResourceId(i);
+		if (nID == s.nLastFileInfoPage) {
+			SetActivePage(i);
+			break;
+		}
+	}
 
 	return bResult;
 }
@@ -145,12 +163,12 @@ int CALLBACK CPPageFileInfoSheet::XmnPropSheetCallback(HWND hWnd, UINT message, 
 	extern int CALLBACK AfxPropSheetCallback(HWND, UINT message, LPARAM lParam);
 	int nRes = AfxPropSheetCallback(hWnd, message, lParam);
 
-	switch (message)
-	{
-	case PSCB_PRECREATE:
-		((LPDLGTEMPLATE)lParam)->style |= (DS_3DLOOK | DS_SETFONT | WS_THICKFRAME | WS_SYSMENU | DS_MODALFRAME | WS_VISIBLE | WS_CAPTION);
-		break;
+	switch (message) {
+		case PSCB_PRECREATE:
+			((LPDLGTEMPLATE)lParam)->style |= (DS_3DLOOK | DS_SETFONT | WS_THICKFRAME | WS_SYSMENU | DS_MODALFRAME | WS_VISIBLE | WS_CAPTION);
+			break;
 	}
+
 	return nRes;
 }
 
@@ -217,4 +235,11 @@ void CPPageFileInfoSheet::OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI)
 	CPropertySheet::OnGetMinMaxInfo(lpMMI);
 	lpMMI->ptMinTrackSize.x = m_nMinCX;
 	lpMMI->ptMinTrackSize.y = m_nMinCY;
+}
+
+void CPPageFileInfoSheet::OnDestroy() 
+{
+	AfxGetAppSettings().nLastFileInfoPage = GetResourceId(GetActiveIndex());
+
+	CPropertySheet::OnDestroy();
 }

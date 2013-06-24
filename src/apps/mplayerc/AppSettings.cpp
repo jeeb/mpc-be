@@ -789,6 +789,8 @@ void CAppSettings::SaveSettings()
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REMAINING_TIME, fRemainingTime);
 
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, nLastFileInfoPage);
+
 	if (pApp->m_pszRegistryKey) {
 		// WINBUG: on win2k this would crash WritePrivateProfileString
 		pApp->WriteProfileInt(_T(""), _T(""), pApp->GetProfileInt(_T(""), _T(""), 0)?0:1);
@@ -1437,6 +1439,8 @@ void CAppSettings::LoadSettings()
 
 	iYoutubeTag				= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_TAG, 0);
 	iYoutubeSource			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_SOURCE, 0);
+
+	nLastFileInfoPage		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, 0);
 
 //	if (fLaunchfullscreen && !IsD3DFullscreen()) {
 //		nCLSwitches |= CLSW_FULLSCREEN;

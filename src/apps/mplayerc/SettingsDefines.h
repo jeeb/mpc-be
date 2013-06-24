@@ -295,3 +295,5 @@
 #define IDS_RS_PERFOMANCE_MAXQUEUEPACKETS	_T("MaxQueuePackets")
 
 #define IDS_R_FILTERS_PRIORITY				_T("\\Filters Priority")
+
+#define IDS_RS_LASTFILEINFOPAGE				_T("LastFileInfoPage")
