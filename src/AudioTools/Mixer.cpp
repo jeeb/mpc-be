@@ -58,7 +58,8 @@ CMixer::~CMixer()
 bool CMixer::Init()
 {
 	if (m_matrix_dbl) {
-		av_freep(m_matrix_dbl);
+		av_free(m_matrix_dbl);
+		m_matrix_dbl = NULL;
 	}
 
 	// Close Resample Context
@@ -130,7 +131,8 @@ bool CMixer::Init()
 		ret = avresample_build_matrix(m_in_layout, m_out_layout, center_mix_level, surround_mix_level, lfe_mix_level, normalize, m_matrix_dbl, in_ch, AV_MATRIX_ENCODING_NONE);
 		if (ret < 0) {
 			TRACE(_T("Mixer: avresample_build_matrix failed\n"));
-			av_freep(m_matrix_dbl);
+			av_free(m_matrix_dbl);
+			m_matrix_dbl = NULL;
 			return false;
 		}
 
@@ -186,7 +188,8 @@ bool CMixer::Init()
 	ret = avresample_set_matrix(m_pAVRCxt, m_matrix_dbl, in_ch);
 	if (ret < 0) {
 		TRACE(_T("Mixer: avresample_set_matrix failed\n"));
-		av_freep(m_matrix_dbl);
+		av_free(m_matrix_dbl);
+		m_matrix_dbl = NULL;
 		return false;
 	}
 
