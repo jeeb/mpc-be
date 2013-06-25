@@ -36,13 +36,15 @@ CMixer::CMixer()
 	: m_pAVRCxt(NULL)
 	, m_matrix_dbl(NULL)
 	, m_ActualContext(false)
-	, m_in_avsf(AV_SAMPLE_FMT_NONE)
-	, m_out_avsf(AV_SAMPLE_FMT_NONE)
+	, m_in_sf(SAMPLE_FMT_NONE)
+	, m_out_sf(SAMPLE_FMT_NONE)
 	, m_in_layout(0)
 	, m_out_layout(0)
 	, m_in_samplerate(0)
 	, m_out_samplerate(0)
 	, m_matrix_norm(0.0f)
+	, m_in_avsf(AV_SAMPLE_FMT_NONE)
+	, m_out_avsf(AV_SAMPLE_FMT_NONE)
 {
 	// Allocate Resample Context
 	m_pAVRCxt = avresample_alloc_context();
@@ -57,6 +59,14 @@ CMixer::~CMixer()
 
 bool CMixer::Init()
 {
+	if (sample_fmt_is_planar(m_out_sf)) {
+		TRACE(_T("Mixer: planar formats are not supported in the output.\n"));
+		return false;
+	}
+
+	m_in_avsf  = m_in_sf == SAMPLE_FMT_S24 ? AV_SAMPLE_FMT_S32 : (AVSampleFormat)m_in_sf;
+	m_out_avsf = m_out_sf == SAMPLE_FMT_S24 ? AV_SAMPLE_FMT_S32 : (AVSampleFormat)m_out_sf;
+
 	if (m_matrix_dbl) {
 		av_free(m_matrix_dbl);
 		m_matrix_dbl = NULL;
@@ -64,11 +74,6 @@ bool CMixer::Init()
 
 	// Close Resample Context
 	avresample_close(m_pAVRCxt);
-
-	if (av_sample_fmt_is_planar(m_out_avsf)) {
-		TRACE(_T("Mixer: planar formats are not supported in the output.\n"));
-		return false;
-	}
 
 	int ret = 0;
 	// Set options
@@ -197,21 +202,21 @@ bool CMixer::Init()
 	return true;
 }
 
-void CMixer::UpdateInput(AVSampleFormat in_avsf, DWORD in_layout, int in_samplerate)
+void CMixer::UpdateInput(SampleFormat in_sf, DWORD in_layout, int in_samplerate)
 {
-	if (in_avsf != m_in_avsf || in_layout != m_in_layout || in_samplerate != m_in_samplerate) {
+	if (in_sf != m_in_sf || in_layout != m_in_layout || in_samplerate != m_in_samplerate) {
 		m_in_layout     = in_layout;
-		m_in_avsf       = in_avsf;
+		m_in_sf         = in_sf;
 		m_in_samplerate = in_samplerate;
 		m_ActualContext = false;
 	}
 }
 
-void CMixer::UpdateOutput(AVSampleFormat out_avsf, DWORD out_layout, int out_samplerate)
+void CMixer::UpdateOutput(SampleFormat out_sf, DWORD out_layout, int out_samplerate)
 {
-	if (out_avsf != m_out_avsf || out_layout != m_out_layout || out_samplerate != m_out_samplerate) {
+	if (out_sf != m_out_sf || out_layout != m_out_layout || out_samplerate != m_out_samplerate) {
 		m_out_layout     = out_layout;
-		m_out_avsf       = out_avsf;
+		m_out_sf         = out_sf;
 		m_out_samplerate = out_samplerate;
 		m_ActualContext  = false;
 	}
@@ -235,6 +240,24 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples)
 	int in_ch  = av_popcount(m_in_layout);
 	int out_ch = av_popcount(m_out_layout);
 
+	int32_t* buf1 = NULL;
+	if (m_in_sf == SAMPLE_FMT_S24) {
+		ASSERT(m_in_avsf == AV_SAMPLE_FMT_S32);
+		buf1 = new int32_t[in_samples * in_ch];
+		convert_int24_to_int32(in_samples * in_ch, pInput, buf1);
+		pInput = (BYTE*)buf1;
+	}
+
+	BYTE* output;
+	int32_t* buf2 = NULL;
+	if (m_out_sf == SAMPLE_FMT_S24) {
+		ASSERT(m_out_avsf == AV_SAMPLE_FMT_S32);
+		buf2 = new int32_t[out_samples * out_ch];
+		output = (BYTE*)buf2;
+	} else {
+		output = pOutput;
+	}
+
 	int in_plane_nb   = av_sample_fmt_is_planar(m_in_avsf) ? in_ch : 1;
 	int in_plane_size = in_samples * (av_sample_fmt_is_planar(m_in_avsf) ? 1 : in_ch) * av_get_bytes_per_sample(m_in_avsf);
 
@@ -243,12 +266,20 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples)
 		ppInput[i] = pInput + i * in_plane_size;
 	}
 
-	int out_plane_size = out_samples * out_ch * av_get_bytes_per_sample(m_out_avsf);;
+	int out_plane_size = out_samples * out_ch * av_get_bytes_per_sample(m_out_avsf);
 
-	out_samples = avresample_convert(m_pAVRCxt, (uint8_t**)&pOutput, out_plane_size, out_samples, ppInput, in_plane_size, in_samples);
+	out_samples = avresample_convert(m_pAVRCxt, (uint8_t**)&output, out_plane_size, out_samples, ppInput, in_plane_size, in_samples);
 	if (out_samples < 0) {
 		TRACE(_T("Mixer: avresample_convert failed\n"));
-		return 0;
+		out_samples = 0;
+	}
+
+	if (buf1) {
+		delete[] buf1;
+	}
+	if (buf2) {
+		convert_int32_to_int24(out_samples * out_ch, buf2, pOutput);
+		delete[] buf2;
 	}
 
 	return out_samples;

@@ -297,7 +297,7 @@ void CFFAudioDecoder::SetDRC(bool fDRC)
 	}
 }
 
-HRESULT CFFAudioDecoder::Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, int& size, CAtlArray<BYTE>& BuffOut, enum AVSampleFormat& samplefmt)
+HRESULT CFFAudioDecoder::Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, int& size, CAtlArray<BYTE>& BuffOut, SampleFormat& samplefmt)
 {
 	size = 0;
 
@@ -368,11 +368,11 @@ HRESULT CFFAudioDecoder::Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, 
 			} else {
 				dwChannelMask = GetDefChannelMask(nChannels);
 			}*/
-			samplefmt = m_pAVCtx->sample_fmt;
-			size_t monosize = nSamples * av_get_bytes_per_sample(samplefmt);
+			samplefmt = (SampleFormat)m_pAVCtx->sample_fmt;
+			size_t monosize = nSamples * av_get_bytes_per_sample(m_pAVCtx->sample_fmt);
 			BuffOut.SetCount(monosize * nChannels);
 
-			if (av_sample_fmt_is_planar(samplefmt)) {
+			if (av_sample_fmt_is_planar(m_pAVCtx->sample_fmt)) {
 				BYTE* pOut = BuffOut.GetData();
 				for (int ch = 0; ch < nChannels; ++ch) {
 					memcpy(pOut, m_pFrame->extended_data[ch], monosize);
@@ -562,9 +562,9 @@ enum AVCodecID CFFAudioDecoder::GetCodecId()
 	return AV_CODEC_ID_NONE;
 }
 
-enum AVSampleFormat CFFAudioDecoder::GetSampleFmt()
+SampleFormat CFFAudioDecoder::GetSampleFmt()
 {
-	return m_pAVCtx->sample_fmt;
+	return (SampleFormat)m_pAVCtx->sample_fmt;
 }
 
 DWORD CFFAudioDecoder::GetSampleRate()

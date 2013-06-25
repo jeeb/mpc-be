@@ -24,6 +24,7 @@
 #pragma once
 
 #include <atlcoll.h>
+#include "SampleFormat.h"
 
 #define ENABLE_AC3_ENCODER 1
 
@@ -117,7 +118,7 @@ protected:
 #if ENABLE_AC3_ENCODER
 	CAC3Encoder m_AC3Enc;
 	CAtlArray<float> m_encbuff;
-	HRESULT AC3Encode(BYTE* pBuff, int size, AVSampleFormat avsf, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask = 0);
+	HRESULT AC3Encode(BYTE* pBuff, int size, SampleFormat sfmt, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask = 0);
 #endif
 
 	HRESULT ProcessFFmpeg(enum AVCodecID nCodecId);
@@ -138,7 +139,7 @@ protected:
 	HRESULT ProcessPCMfloatLE();
 
 	HRESULT GetDeliveryBuffer(IMediaSample** pSample, BYTE** pData);
-	HRESULT Deliver(BYTE* pBuff, int size, AVSampleFormat avsf, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask = 0);
+	HRESULT Deliver(BYTE* pBuff, int size, SampleFormat sfmt, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask = 0);
 	HRESULT DeliverBitstream(BYTE* pBuff, int size, WORD type, int sample_rate, int frame_length);
 	HRESULT ReconnectOutput(int nSamples, CMediaType& mt);
 	CMediaType CreateMediaType(MPCSampleFormat sf, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask = 0);
