@@ -3179,14 +3179,30 @@ void HexDump(CString fileName, BYTE* buf, int size)
 
 void LOG2FILE(LPCTSTR fmt, ...)
 {
+	static CString sDesktop;
+	if (sDesktop.IsEmpty()) {
+		TCHAR szPath[MAX_PATH];
+		if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_DESKTOP, NULL, 0, szPath))) {
+			sDesktop = CString(szPath) + L"\\";
+		}
+	}
+
 	va_list args;
 	va_start(args, fmt);
 	size_t len = _vsctprintf(fmt, args) + 1;
 	if (TCHAR* buff = DNew TCHAR[len]) {
 		_vstprintf(buff, len, fmt, args);
-		if (FILE* f = _tfopen(_T("mpc-be.log"), _T("at, ccs=UTF-8"))) {
+		CString fname = sDesktop + L"mpc-be.log";
+		if (FILE* f = _tfopen(fname, L"at, ccs=UTF-8")) {
 			fseek(f, 0, 2);
-			_ftprintf_s(f, _T("%s\n"), buff);
+
+			SYSTEMTIME st;
+			::GetLocalTime(&st);
+
+			CString lt;
+			lt.Format(L"%04d.%02d.%02d %02d:%02d:%02d.%03d", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+
+			_ftprintf_s(f, _T("%s : %s\n"), lt, buff);
 			fclose(f);
 		}
 		delete [] buff;

@@ -895,8 +895,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	SetWindowText(m_strTitle);
 	m_Lcd.SetMediaTitle(LPCTSTR(m_strTitle));
 
-	SendAPICommand (CMD_CONNECT, L"%d", GetSafeHwnd());
-
 	m_hWnd_toolbar = m_wndToolBar.GetSafeHwnd();
 
 	WTSRegisterSessionNotification();
@@ -5025,19 +5023,19 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 
 	AppSettings& s = AfxGetAppSettings();
 
-	if (s.hMasterWnd) {
-		ProcessAPICommand(pCDS);
-		return TRUE;
+	if (pCDS->dwData != 0x6ABE51 || pCDS->cbData < sizeof(DWORD)) {
+		if (s.hMasterWnd) {
+			ProcessAPICommand(pCDS);
+			return TRUE;
+		} else {
+			return FALSE;
+		}
 	}
 
 	/*
 	if (m_iMediaLoadState == MLS_LOADING || !IsWindow(m_wndPlaylistBar))
 		return FALSE;
 	*/
-
-	if (pCDS->dwData != 0x6ABE51 || pCDS->cbData < sizeof(DWORD)) {
-		return FALSE;
-	}
 
 	DWORD len = *((DWORD*)pCDS->lpData);
 	TCHAR* pBuff = (TCHAR*)((DWORD*)pCDS->lpData + 1);
@@ -5057,7 +5055,7 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 	s.ParseCommandLine(cmdln);
 
 	if (s.nCLSwitches&CLSW_SLAVE) {
-		SendAPICommand (CMD_CONNECT, L"%d", GetSafeHwnd());
+		SendAPICommand(CMD_CONNECT, L"%d", PtrToInt(GetSafeHwnd()));
 	}
 
 	POSITION pos = s.slFilters.GetHeadPosition();

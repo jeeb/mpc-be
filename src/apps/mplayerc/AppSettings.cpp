@@ -1831,8 +1831,8 @@ void CAppSettings::ParseCommandLine(CAtlList<CString>& cmdln)
 			} else if (sw == _T("dub") && pos) {
 				slDubs.AddTail(ParseFileName(cmdln.GetNext(pos)));
 			} else if (sw == _T("dubdelay") && pos) {
-				CString		strFile = ParseFileName(cmdln.GetNext(pos));
-				int			nPos  = strFile.Find (_T("DELAY"));
+				CString strFile	= ParseFileName(cmdln.GetNext(pos));
+				int nPos		= strFile.Find (_T("DELAY"));
 				if (nPos != -1) {
 					rtShift = 10000 * _tstol(strFile.Mid(nPos + 6));
 				}
@@ -1887,10 +1887,10 @@ void CAppSettings::ParseCommandLine(CAtlList<CString>& cmdln)
 				nCLSwitches |= CLSW_D3DFULLSCREEN;
 			} else if (sw == _T("adminoption")) {
 				nCLSwitches |= CLSW_ADMINOPTION;
-				iAdminOption = _ttoi (cmdln.GetNext(pos));
-			} else if (sw == _T("slave")) {
+				iAdminOption = _ttoi(cmdln.GetNext(pos));
+			} else if (sw == _T("slave") && pos) {
 				nCLSwitches |= CLSW_SLAVE;
-				hMasterWnd = (HWND)_ttol (cmdln.GetNext(pos));
+				hMasterWnd = (HWND)IntToPtr(_ttoi(cmdln.GetNext(pos)));
 			} else if (sw == _T("fixedsize") && pos) {
 				CAtlList<CString> sl;
 				Explode(cmdln.GetNext(pos), sl, ',', 2);
