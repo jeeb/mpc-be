@@ -209,4 +209,6 @@ private:
 	CSimpleArray<WORD>		m_nChannelsList;
 	CSimpleArray<DWORD>		m_dwChannelMaskList;
 	CSimpleArray<DWORD>		m_nSamplesPerSecList;
+
+	void					WasapiFlush();
 };

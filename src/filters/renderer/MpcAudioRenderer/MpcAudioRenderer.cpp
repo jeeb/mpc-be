@@ -640,8 +640,8 @@ STDMETHODIMP CMpcAudioRenderer::Run(REFERENCE_TIME tStart)
 	}
 
 	if (m_useWASAPI) {
-		m_Resampler.FlushBuffers();
-		m_WasapiBuf.RemoveAll();
+
+		WasapiFlush();
 
 		hr = CheckAudioClient(m_pWaveFileFormat);
 		if (FAILED(hr)) {
@@ -1453,6 +1453,9 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx)
 
 	// Compare the exisiting WAVEFORMATEX with the one provided
 	if (CheckFormatChanged(pWaveFormatEx, &m_pWaveFileFormat) || !m_pWaveFileFormatOutput) {
+		
+		WasapiFlush();
+
 		// Format has changed, audio client has to be reinitialized
 		TRACE(_T("CMpcAudioRenderer::CheckAudioClient() - Format changed, reinitialize the audio client\n"));
 
@@ -2297,4 +2300,12 @@ HRESULT CMpcAudioRenderer::RevertMMCSS()
 	}
 
 	return S_FALSE;
+}
+
+void CMpcAudioRenderer::WasapiFlush()
+{
+	CAutoLock cRenderLock(&m_csRender);
+
+	m_Resampler.FlushBuffers();
+	m_WasapiBuf.RemoveAll();
 }
