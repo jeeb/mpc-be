@@ -32,11 +32,6 @@
 #define INT24_MAX       8388607
 #define INT24_MIN     (-8388608)
 
-#define INT8_PEAK       128
-#define INT16_PEAK      32768
-#define INT24_PEAK      8388608
-#define INT32_PEAK      2147483648
-
 void gain_uint8 (const double factor, const size_t allsamples, uint8_t* pData);
 void gain_int16 (const double factor, const size_t allsamples, int16_t* pData);
 void gain_int24 (const double factor, const size_t allsamples, BYTE*    pData);

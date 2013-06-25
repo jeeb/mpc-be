@@ -29,7 +29,7 @@
 #define INT32_PEAK      2147483648
 
 #define F16MAX ( float(INT16_MAX) / INT16_PEAK)
-#define F24MAX ( float(INT24_MAX) / INT24_PEAK)
+#define D24MAX (double(INT24_MAX) / INT24_PEAK)
 #define D32MAX (double(INT32_MAX) / INT32_PEAK)
 
 #define round_f(x) ((x) > 0 ? (x) + 0.5f : (x) - 0.5f)

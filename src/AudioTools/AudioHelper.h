@@ -63,12 +63,25 @@ inline void convert_int24_to_int32(size_t allsamples, BYTE* pIn, int32_t* pOut)
     }
 }
 
+//inline void convert_int24_to_int32(size_t allsamples, BYTE* pIn, int32_t* pOut)
+//{
+//    for (size_t i = 0; i < allsamples; ++i) {
+//        BYTE* p = (BYTE*)&pOut[i];
+//        p[0] = 0;
+//        p[1] = *pIn++;
+//        p[2] = *pIn++;
+//        p[3] = *pIn++;
+//    }
+//}
+//need perfomance tests
+
 inline void convert_int32_to_int24(size_t allsamples, int32_t* pIn, BYTE* pOut)
 {
-    for (size_t i = 1; i < allsamples; ++i) {
+    for (size_t i = 0; i < allsamples; ++i) {
         BYTE* p = (BYTE*)&pIn[i];
         *pOut++ = p[1];
         *pOut++ = p[2];
         *pOut++ = p[3];
     }
 }
+
