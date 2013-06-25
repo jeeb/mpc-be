@@ -1214,8 +1214,7 @@ HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 	int in_channels, out_channels;
 	int in_samplerate, out_samplerate;
 	int in_samples;
-	bool isInt24			= false;
-	float* buff				= NULL;
+	BYTE* buff				= NULL;
 
 	WORD out_BitsPerSample	= 0;
 	BOOL out_IsFloat		= FALSE;
@@ -1277,7 +1276,8 @@ HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 					in_sf = SAMPLE_FMT_S16;
 					break;
 				case 24:
-					isInt24 = true;
+					in_sf = SAMPLE_FMT_S24;
+					break;
 				case 32:
 					in_sf = SAMPLE_FMT_S32;
 					break;
@@ -1310,13 +1310,7 @@ HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 	}
 
 	if (bFormatChanged) {
-		BYTE* in_buff = NULL;
-		if (isInt24) {
-			in_buff = DNew BYTE[lSize / 3 * 4];
-			convert_int24_to_int32(in_samples * in_channels, &pMediaBuffer[0], (int32_t*)in_buff);
-		} else {
-			in_buff = &pMediaBuffer[0];
-		}
+		BYTE* in_buff = &pMediaBuffer[0];
 
 		bool bUseMixer		= false;
 		int out_samples		= in_samples;
@@ -1338,24 +1332,16 @@ HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 			m_Resampler.UpdateInput(in_sf, in_layout, in_samplerate);
 			m_Resampler.UpdateOutput(SAMPLE_FMT_FLT, out_layout, out_samplerate);
 			out_samples	= m_Resampler.CalcOutSamples(in_samples);
-			buff		= DNew float[out_samples * out_channels];
+			buff		= DNew BYTE[out_samples * out_channels * get_bytes_per_sample(SAMPLE_FMT_FLT)];
 			if (!buff) {
-				if (isInt24) {
-					SAFE_DELETE_ARRAY(in_buff);
-				}
 				return E_OUTOFMEMORY;
 			}
-			out_samples = m_Resampler.Mixing((BYTE*)buff, out_samples, in_buff, in_samples);
-
-			if (isInt24) {
-				isInt24 = false;
-				SAFE_DELETE_ARRAY(in_buff);
-			}
+			out_samples = m_Resampler.Mixing(buff, out_samples, in_buff, in_samples);
 
 			bUseMixer	= true;
 			sfmt		= SAMPLE_FMT_FLT;
 		} else {
-			buff = (float*)in_buff;
+			buff = in_buff;
 		}
 
 		{
@@ -1378,21 +1364,21 @@ HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 #endif
 					lSize	= out_samples * out_channels * sizeof(int16_t);
 					out_buf	= DNew BYTE[lSize];
-					convert_to_int16(sfmt, out_channels, out_samples, (BYTE*)buff, (int16_t*)out_buf);
+					convert_to_int16(sfmt, out_channels, out_samples, buff, (int16_t*)out_buf);
 				} else if (wfeOutput->wBitsPerSample == 24) {
 #if defined(_DEBUG) && DBGLOG_LEVEL > 0
 					TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - convert from '%s' to 24bit PCM\n"), GetAVSampleFormatString(avsf));
 #endif
 					lSize	= out_samples * out_channels * sizeof(BYTE) * 3;
 					out_buf	= DNew BYTE[lSize];
-					convert_to_int24(sfmt, out_channels, out_samples, (BYTE*)buff, out_buf);
+					convert_to_int24(sfmt, out_channels, out_samples, buff, out_buf);
 				} else if (wfeOutput->wBitsPerSample == 32) {
 #if defined(_DEBUG) && DBGLOG_LEVEL > 0
 					TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - convert from '%s' to 32bit PCM\n"), GetAVSampleFormatString(avsf));
 #endif
 					lSize	= out_samples * out_channels * sizeof(int32_t);
 					out_buf	= DNew BYTE[lSize];
-					convert_to_int32(sfmt, out_channels, out_samples, (BYTE*)buff, (int32_t*)out_buf);
+					convert_to_int32(sfmt, out_channels, out_samples, buff, (int32_t*)out_buf);
 				}
 			} else if (fFloat) {
 				if (wfeOutput->wBitsPerSample == 32) {
@@ -1401,17 +1387,13 @@ HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 #endif					
 					lSize	= out_samples * out_channels * sizeof(float);
 					out_buf	= DNew BYTE[lSize];
-					convert_to_float(sfmt, out_channels, out_samples, (BYTE*)buff, (float*)out_buf);
+					convert_to_float(sfmt, out_channels, out_samples, buff, (float*)out_buf);
 				} else if (wfeOutput->wBitsPerSample == 64) {
 #if defined(_DEBUG) && DBGLOG_LEVEL > 0
 					TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - unsupported convert from '%s' to 64bit FLOAT\n"), GetAVSampleFormatString(avsf));
 #endif
 					;// TODO ...
 				}
-			}
-
-			if (isInt24) {
-				SAFE_DELETE_ARRAY(in_buff);
 			}
 
 			if (bUseMixer) {
