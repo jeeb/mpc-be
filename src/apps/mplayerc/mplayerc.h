@@ -201,9 +201,18 @@ private:
 
 public:
 	CDebugMonitor(DWORD dwProcessId) : CWinDebugMonitor(dwProcessId) {
+		static CString sDesktop;
+		if (sDesktop.IsEmpty()) {
+			TCHAR szPath[MAX_PATH];
+			if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_DESKTOP, NULL, 0, szPath))) {
+				sDesktop = CString(szPath) + L"\\";
+			}
+		}
+
 		m_File = NULL;
 		if (bIsInitialize) {
-			m_File = _tfopen(_T("mpc-be_debug.log"), _T("at, ccs=UTF-8"));
+			CString fname = sDesktop + L"mpc-be_debug.log";
+			m_File = _tfopen(fname, L"at, ccs=UTF-8");
 			if (m_File) {
 				fseek(m_File, 0, 2);
 
