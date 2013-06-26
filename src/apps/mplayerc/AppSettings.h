@@ -614,6 +614,7 @@ public:
 	// Misc
 	bool			fPrioritizeExternalSubtitles;
 	bool			fDisableInternalSubtitles;
+	bool			fAutoReloadExtSubtitles;
 	CString			strSubtitlePaths;
 	CString			strISDb;
 

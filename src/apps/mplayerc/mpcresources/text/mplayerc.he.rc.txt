@@ -393,7 +393,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Remember last playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 16
+BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 17
 5		"העדף כתוביות חיצוניות אם קיימות"
 7		"אל תטען כתוביות מובנות מהקונטיינר"
 9		"נתיבים לטעינה אוטומטית"
@@ -401,6 +401,7 @@ BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 16
 11		"כתובת למסד נתונים ברשת:"
 13		"בדוק"
 15		"מסד נתונים ברשת"
+16		"Auto-reload subtitle files after detecting modification"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69

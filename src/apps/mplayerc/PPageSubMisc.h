@@ -38,6 +38,7 @@ public:
 	enum { IDD = IDD_PPAGESUBMISC };
 	BOOL m_fPrioritizeExternalSubtitles;
 	BOOL m_fDisableInternalSubtitles;
+	BOOL m_fAutoReloadExtSubtitles;
 	CString m_szAutoloadPaths;
 	CComboBox m_ISDbCombo;
 	CString m_ISDb;

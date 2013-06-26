@@ -393,7 +393,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Remember last playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 16
+BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 17
 5		"Prefer external subtitles over embedded subtitles"
 7		"Ignore embedded subtitles"
 9		"Autoload paths"
@@ -401,6 +401,7 @@ BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 16
 11		"Base URL of the online subtitle database:"
 13		"Test"
 15		"Online database"
+16		"Auto-reload subtitle files after detecting modification"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69

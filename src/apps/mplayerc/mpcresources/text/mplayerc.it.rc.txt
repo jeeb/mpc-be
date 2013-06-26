@@ -393,7 +393,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Ricorda l'ultima playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 16
+BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 17
 5		"Usa sempre i sottotitoli esterni se disponibili"
 7		"Non caricare i sottotitoli interni al video"
 9		"Percorsi di caricamento automatico"
@@ -401,6 +401,7 @@ BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 16
 11		"Indirizzo del database di sottotitoli online:"
 13		"Prova"
 15		"Database online"
+16		"Auto-reload subtitle files after detecting modification"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69

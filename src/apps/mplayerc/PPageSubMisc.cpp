@@ -32,6 +32,7 @@ CPPageSubMisc::CPPageSubMisc()
 	: CPPageBase(CPPageSubMisc::IDD, CPPageSubMisc::IDD)
 	, m_fPrioritizeExternalSubtitles(FALSE)
 	, m_fDisableInternalSubtitles(FALSE)
+	, m_fAutoReloadExtSubtitles(FALSE)
 {
 
 }
@@ -46,6 +47,7 @@ void CPPageSubMisc::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Check(pDX, IDC_CHECK1, m_fPrioritizeExternalSubtitles);
 	DDX_Check(pDX, IDC_CHECK2, m_fDisableInternalSubtitles);
+	DDX_Check(pDX, IDC_CHECK3, m_fAutoReloadExtSubtitles);
 	DDX_Text(pDX, IDC_EDIT1, m_szAutoloadPaths);
 	DDX_Control(pDX, IDC_COMBO1, m_ISDbCombo);
 	DDX_CBString(pDX, IDC_COMBO1, m_ISDb);
@@ -57,9 +59,10 @@ BOOL CPPageSubMisc::OnInitDialog()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	m_fPrioritizeExternalSubtitles = s.fPrioritizeExternalSubtitles;
-	m_fDisableInternalSubtitles = s.fDisableInternalSubtitles;
-	m_szAutoloadPaths = s.strSubtitlePaths;
+	m_fPrioritizeExternalSubtitles	= s.fPrioritizeExternalSubtitles;
+	m_fDisableInternalSubtitles		= s.fDisableInternalSubtitles;
+	m_fAutoReloadExtSubtitles		= s.fAutoReloadExtSubtitles;
+	m_szAutoloadPaths				= s.strSubtitlePaths;
 
 	m_ISDb = s.strISDb;
 	m_ISDbCombo.AddString(m_ISDb);
@@ -79,9 +82,10 @@ BOOL CPPageSubMisc::OnApply()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	s.fPrioritizeExternalSubtitles = !!m_fPrioritizeExternalSubtitles;
-	s.fDisableInternalSubtitles = !!m_fDisableInternalSubtitles;
-	s.strSubtitlePaths = m_szAutoloadPaths;
+	s.fPrioritizeExternalSubtitles	= !!m_fPrioritizeExternalSubtitles;
+	s.fDisableInternalSubtitles		= !!m_fDisableInternalSubtitles;
+	s.fAutoReloadExtSubtitles		= !!m_fAutoReloadExtSubtitles;
+	s.strSubtitlePaths				= m_szAutoloadPaths;
 
 	s.strISDb = m_ISDb;
 	s.strISDb.TrimRight('/');

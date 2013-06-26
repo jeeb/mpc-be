@@ -1156,6 +1156,17 @@ protected:
 	HMODULE			m_hWtsLib;
 
 	CDebugMonitor	m_DebugMonitor;
+
+	static DWORD WINAPI		NotifyRenderThreadEntryPoint(LPVOID lpParameter);
+	DWORD					NotifyRenderThread();
+
+	CStringArray			m_ExtSubFiles;
+	CAtlArray<CTime>		m_ExtSubFilesTime;
+	CStringArray			m_ExtSubPaths;
+	CAtlArray<HANDLE>		m_ExtSubPathsHandles;
+	HANDLE					m_hNotifyRenderThread;
+	HANDLE					m_hStopNotifyRenderThreadEvent;
+	HANDLE					m_hRefreshNotifyRenderThreadEvent;
 public:
 	afx_msg UINT OnPowerBroadcast(UINT nPowerEvent, UINT nEventData);
 	afx_msg void OnSessionChange(UINT nSessionState, UINT nId);

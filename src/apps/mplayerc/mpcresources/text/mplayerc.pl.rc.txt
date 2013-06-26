@@ -393,7 +393,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Remember last playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 16
+BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 17
 5		"Wczytywanie zewnętrznych napisów zamiast zawartych w kontenerze"
 7		"Zaniechanie wczytywania napisów zawartych w kontenerze"
 9		"Położenia napisów"
@@ -401,6 +401,7 @@ BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 16
 11		"Adres internetowej bazy napisów:"
 13		"Przetestuj"
 15		"Internetowa baza napisów"
+16		"Auto-reload subtitle files after detecting modification"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69

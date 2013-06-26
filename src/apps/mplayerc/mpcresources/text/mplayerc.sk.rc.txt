@@ -393,7 +393,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Remember last playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 16
+BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 17
 5		"Uprednostniť externé titulky, ak sú dostupné"
 7		"Nenačítavať vložené titulky"
 9		"Cesty pre automotické načítavanie"
@@ -401,6 +401,7 @@ BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 16
 11		"Základná URL adresa webovej databázy titulkov:"
 13		"Otestovať"
 15		"Online-databáza"
+16		"Auto-reload subtitle files after detecting modification"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69

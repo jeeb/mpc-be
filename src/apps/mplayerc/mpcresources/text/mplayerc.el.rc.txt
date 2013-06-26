@@ -393,7 +393,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Απομνημ. τελευτ. ζούμ πανορ/κής && σάρωσης"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 16
+BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 17
 5		"Προτίμηση εξωτερικών υπότιτλων πάνω στους ενσωματωμένους υπότιτλους"
 7		"Παράβλεψη ενσωματωμένων υπότιτλων"
 9		"Κατάλογοι αυτόματης φόρτωσης"
@@ -401,6 +401,7 @@ BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 16
 11		"Βάση δεδομένων σε σύνδεση"
 13		"Βασική διεύθυνση URL της βάσης δεδομένων υποτίτλων:"
 15		"Έλεγχος"
+16		"Auto-reload subtitle files after detecting modification"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69

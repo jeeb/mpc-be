@@ -393,7 +393,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Letzte Wiedergabeliste merken"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 16
+BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 17
 5		"Externe Untertitel bevorzugen (wenn verfügbar)"
 7		"Interne Untertitel nicht benutzen"
 9		"Pfade, in denen automatisch nach verfügbaren Untertiteln gesucht werden soll"
@@ -401,6 +401,7 @@ BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 16
 11		"URL zur Online-Untertitel Datenbank:"
 13		"Testen"
 15		"Online-Untertitel Datenbank"
+16		"Auto-reload subtitle files after detecting modification"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69

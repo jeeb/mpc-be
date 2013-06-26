@@ -694,7 +694,10 @@ CMainFrame::CMainFrame() :
 	m_ThumbCashedBitmap(NULL),
 	m_DebugMonitor(::GetCurrentProcessId()),
 	m_nSubtitleId(NULL),
-	m_nSelSub2(-1)
+	m_nSelSub2(-1),
+	m_hNotifyRenderThread(NULL),
+	m_hStopNotifyRenderThreadEvent(NULL),
+	m_hRefreshNotifyRenderThreadEvent(NULL)
 {
 	m_Lcd.SetVolumeRange(0, 100);
 	m_LastSaveTime.QuadPart = 0;
@@ -705,6 +708,11 @@ CMainFrame::~CMainFrame()
 {
 	//m_owner.DestroyWindow();
 	//delete m_pFullscreenWnd; // double delete see CMainFrame::OnDestroy
+}
+
+DWORD WINAPI CMainFrame::NotifyRenderThreadEntryPoint(LPVOID lpParameter)
+{
+	return ((CMainFrame*)lpParameter)->NotifyRenderThread();
 }
 
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -919,6 +927,20 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		CreateThumbnailToolbar();
 	}
 
+	m_hStopNotifyRenderThreadEvent		= CreateEvent(NULL, FALSE, FALSE, NULL);
+	m_hRefreshNotifyRenderThreadEvent	= CreateEvent(NULL, FALSE, FALSE, NULL);
+	m_ExtSubPathsHandles.Add(m_hStopNotifyRenderThreadEvent);
+	m_ExtSubPathsHandles.Add(m_hRefreshNotifyRenderThreadEvent);
+
+	DWORD ThreadId;
+	m_hNotifyRenderThread = ::CreateThread(NULL, 0, NotifyRenderThreadEntryPoint, (LPVOID)this, 0, &ThreadId);
+	if (m_hNotifyRenderThread) {
+		SetThreadPriority(m_hNotifyRenderThread, THREAD_PRIORITY_LOWEST);
+		return S_OK;
+	} else {
+		return S_FALSE;
+	}
+
 	return 0;
 }
 
@@ -963,6 +985,25 @@ void CMainFrame::OnDestroy()
 		GetModuleFileName(NULL, strAppPath.GetBuffer(MAX_PATH), MAX_PATH);
 		ShellExecute(NULL, _T("open"), strAppPath, _T("/reset"), NULL, SW_SHOWNORMAL) ;
 	}
+
+	if (m_hNotifyRenderThread) {
+		SetEvent(m_hStopNotifyRenderThreadEvent);
+		if (WaitForSingleObject(m_hNotifyRenderThread, 10000) == WAIT_TIMEOUT) {
+			TerminateThread(m_hNotifyRenderThread, 0xDEAD);
+		}
+
+		CloseHandle(m_hNotifyRenderThread);
+		m_hNotifyRenderThread = NULL;
+	}
+
+	m_ExtSubFiles.RemoveAll();
+	m_ExtSubFilesTime.RemoveAll();
+	m_ExtSubPaths.RemoveAll();
+	for (size_t i = 2; i < m_ExtSubPathsHandles.GetCount(); i++) {
+		FindCloseChangeNotification(m_ExtSubPathsHandles[i]);
+	}
+
+	m_ExtSubPathsHandles.RemoveAll();
 
 	__super::OnDestroy();
 }
@@ -14181,6 +14222,19 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		return false;
 	}
 
+	m_ExtSubFiles.RemoveAll();
+	m_ExtSubFilesTime.RemoveAll();
+	m_ExtSubPaths.RemoveAll();
+	for (size_t i = 2; i < m_ExtSubPathsHandles.GetCount(); i++) {
+		FindCloseChangeNotification(m_ExtSubPathsHandles[i]);
+	}
+
+	m_ExtSubPathsHandles.RemoveAll();
+	m_ExtSubPathsHandles.Add(m_hStopNotifyRenderThreadEvent);
+	m_ExtSubPathsHandles.Add(m_hRefreshNotifyRenderThreadEvent);
+
+	SetEvent(m_hRefreshNotifyRenderThreadEvent);
+
 	ClearDXVAState();
 #ifdef _DEBUG
 	if (pFileData) {
@@ -14789,6 +14843,19 @@ void CMainFrame::CloseMediaPrivate()
 	if (AfxGetAppSettings().fShowOSD) {
 		m_OSD.Start(m_pOSDWnd);
 	}
+
+	m_ExtSubFiles.RemoveAll();
+	m_ExtSubFilesTime.RemoveAll();
+	m_ExtSubPaths.RemoveAll();
+	for (size_t i = 2; i < m_ExtSubPathsHandles.GetCount(); i++) {
+		FindCloseChangeNotification(m_ExtSubPathsHandles[i]);
+	}
+
+	m_ExtSubPathsHandles.RemoveAll();
+	m_ExtSubPathsHandles.Add(m_hStopNotifyRenderThreadEvent);
+	m_ExtSubPathsHandles.Add(m_hRefreshNotifyRenderThreadEvent);
+
+	SetEvent(m_hRefreshNotifyRenderThreadEvent);
 }
 
 void CMainFrame::ParseDirs(CAtlList<CString>& sl)
@@ -16626,6 +16693,47 @@ bool CMainFrame::LoadSubtitle(CString fn, ISubStream **actualStream)
 
 			AfxGetAppSettings().fEnableSubtitles = true;
 		}
+
+		if (m_hNotifyRenderThread) {
+			BOOL bExists = FALSE;
+			for (INT_PTR idx = 0; idx < m_ExtSubFiles.GetCount(); idx++) {
+				if (fn == m_ExtSubFiles[idx]) {
+					bExists = TRUE;
+					break;
+				}
+			}
+
+			if (!bExists) {
+				m_ExtSubFiles.Add(fn);
+				CFileStatus status;
+				if (CFileGetStatus(fn, status)) {
+					m_ExtSubFilesTime.Add(status.m_mtime);
+				} else {
+					m_ExtSubFilesTime.Add(CTime(0));
+				}
+			}
+
+			fn.Replace('\\', '/');
+			fn = fn.Left(fn.ReverseFind('/')+1);
+
+			bExists = FALSE;
+			for (INT_PTR idx = 0; idx < m_ExtSubPaths.GetCount(); idx++) {
+				if (fn == m_ExtSubPaths[idx]) {
+					bExists = TRUE;
+					break;
+				}
+			}
+
+			if (!bExists) {
+				HANDLE h = FindFirstChangeNotification(fn, FALSE, FILE_NOTIFY_CHANGE_LAST_WRITE);
+				if (h != INVALID_HANDLE_VALUE) {
+					m_ExtSubPaths.Add(fn);
+					m_ExtSubPathsHandles.Add(h);
+
+					SetEvent(m_hRefreshNotifyRenderThreadEvent);
+				}
+			}
+		}
 	}
 
 	return(!!pSubStream);
@@ -16783,6 +16891,8 @@ void CMainFrame::InvalidateSubtitle(DWORD_PTR nSubtitleId, REFERENCE_TIME rtInva
 
 void CMainFrame::ReloadSubtitle()
 {
+	CAutoLock cAutoLock(&m_csSubLock);
+
 	POSITION pos = m_pSubStreams.GetHeadPosition();
 	while (pos) {
 		m_pSubStreams.GetNext(pos)->Reload();
@@ -19631,4 +19741,39 @@ IBaseFilter* CMainFrame::GetVSFilter()
 	EndEnumFilters;
 
 	return _pDVS;
+}
+
+DWORD CMainFrame::NotifyRenderThread()
+{
+	while (true) {
+		DWORD idx = WaitForMultipleObjects(m_ExtSubPathsHandles.GetCount(), m_ExtSubPathsHandles.GetData(), FALSE, INFINITE);
+		if (idx == WAIT_OBJECT_0) { // m_hStopNotifyRenderThreadEvent
+			break;
+		} else if (idx == (WAIT_OBJECT_0 + 1)) { // m_hRefreshNotifyRenderThreadEvent
+			continue;
+		} else if (idx > (WAIT_OBJECT_0 + 1) && idx < (WAIT_OBJECT_0 + m_ExtSubPathsHandles.GetCount())) {
+			if (FindNextChangeNotification(m_ExtSubPathsHandles[idx - WAIT_OBJECT_0]) == FALSE) {
+				break;
+			}
+
+			if (AfxGetAppSettings().fAutoReloadExtSubtitles) {
+
+				BOOL bChanged = FALSE;
+				for (INT_PTR idx = 0; idx < m_ExtSubFiles.GetCount(); idx++) {
+					CFileStatus status;
+					CString fn = m_ExtSubFiles[idx];
+					if (CFileGetStatus(fn, status) && m_ExtSubFilesTime[idx] != status.m_mtime) {
+						m_ExtSubFilesTime[idx] = status.m_mtime;
+						bChanged = TRUE;
+					}
+				}
+
+				if (bChanged) {
+					ReloadSubtitle();
+				}
+			}
+		}
+	}
+
+	return 0;
 }
