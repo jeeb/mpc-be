@@ -85,3 +85,25 @@ inline void convert_int32_to_int24(size_t allsamples, int32_t* pIn, BYTE* pOut)
     }
 }
 
+inline void convert_int24_to_float(size_t allsamples, BYTE* pIn, float* pOut)
+{
+    for (size_t i = 0; i < allsamples; ++i) {
+        int32_t i32 = (uint32_t)pIn[3 * i]     << 8  |
+                      (uint32_t)pIn[3 * i + 1] << 16 |
+                      (uint32_t)pIn[3 * i + 2] << 24;
+        pOut[i] = (float)((double)i32 / INT32_MAX);
+    }
+}
+
+inline void convert_float_to_int24(size_t allsamples, float* pIn, BYTE* pOut)
+{
+    for (size_t i = 0; i < allsamples; ++i) {
+        double d = (double)pIn[i] * INT32_MAX;
+        if (d < INT32_MIN) { d = INT32_MIN; } else if (d > INT32_MAX) { d = INT32_MAX; }
+        int32_t i32 = (int32_t)d;
+        BYTE* p = (BYTE*)i32;
+        *pOut++ = p[1];
+        *pOut++ = p[2];
+        *pOut++ = p[3];
+    }
+}
