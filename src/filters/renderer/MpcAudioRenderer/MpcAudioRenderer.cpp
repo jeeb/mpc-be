@@ -1167,7 +1167,7 @@ const TCHAR *GetSampleFormatString(SampleFormat value)
 	return L"Error value";
 };
 
-HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
+HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 {
 #if defined(_DEBUG) && DBGLOG_LEVEL > 0
 	TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi()\n"));
@@ -1180,15 +1180,18 @@ HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 	long lSize					= pMediaSample->GetActualDataLength();
 
 	SampleFormat in_sf;
-	DWORD in_layout, out_layout;
-	int in_channels, out_channels;
-	int in_samplerate, out_samplerate;
-	int in_samples;
-	BYTE* buff				= NULL;
+	DWORD in_layout;
+	int   in_channels;
+	int   in_samplerate;
+	int   in_samples;
+	
+	SampleFormat out_sf;
+	DWORD out_layout;
+	int   out_channels;
+	int   out_samplerate;
 
-	WORD out_BitsPerSample	= 0;
-	BOOL out_IsFloat		= FALSE;
-	BYTE* out_buf			= NULL;
+	BYTE* buff    = NULL;
+	BYTE* out_buf = NULL;
 
 	AM_MEDIA_TYPE *pmt;
 	if (SUCCEEDED(pMediaSample->GetMediaType(&pmt)) && pmt != NULL) {
@@ -1213,18 +1216,17 @@ HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 	if (bFormatChanged) {
 		// prepare for resample ... if needed
 		WAVEFORMATEX* wfe = (WAVEFORMATEX*)m_pWaveFileFormat;
-		bool isfloat = false;
-		if (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfe->cbSize == (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX))) {
+		in_channels   = wfe->nChannels;
+		in_samplerate = wfe->nSamplesPerSec;
+		in_samples    = lSize / wfe->nBlockAlign;
+		bool isfloat  = false;
+		if (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfe->cbSize >= 22) {
 			WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)m_pWaveFileFormat;
 			in_layout = wfex->dwChannelMask;
-			if (wfex->SubFormat == MEDIASUBTYPE_IEEE_FLOAT) {
-				isfloat = true;
-			}
+			isfloat   = (wfex->SubFormat == MEDIASUBTYPE_IEEE_FLOAT);
 		} else {
 			in_layout = GetDefChannelMask(wfe->nChannels);
-			if (wfe->wFormatTag == WAVE_FORMAT_IEEE_FLOAT) {
-				isfloat = true;
-			}
+			isfloat   = (wfe->wFormatTag == WAVE_FORMAT_IEEE_FLOAT);
 		}
 		if (isfloat) {
 			switch (wfe->wBitsPerSample) {
@@ -1255,23 +1257,40 @@ HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 					return E_INVALIDARG;
 			}
 		}
-		in_channels    = wfe->nChannels;
-		in_samplerate  = wfe->nSamplesPerSec;
-		in_samples     = lSize / wfe->nBlockAlign;
 
 		WAVEFORMATEX* wfeOutput = (WAVEFORMATEX*)m_pWaveFileFormatOutput;
-		if (wfeOutput->wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfeOutput->cbSize == (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX))) {
+		out_channels   = wfeOutput->nChannels;;
+		out_samplerate = wfeOutput->nSamplesPerSec;
+		isfloat        = false;
+		if (wfeOutput->wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfeOutput->cbSize >= 22) {
 			WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)m_pWaveFileFormatOutput;
-			out_IsFloat	= (wfex->SubFormat == MEDIASUBTYPE_IEEE_FLOAT);
-			out_layout	= wfex->dwChannelMask;
+			out_layout = wfex->dwChannelMask;
+			isfloat    = (wfex->SubFormat == MEDIASUBTYPE_IEEE_FLOAT);
 		} else {
-			out_IsFloat	= (wfeOutput->wFormatTag == WAVE_FORMAT_IEEE_FLOAT);
-			out_layout	= GetDefChannelMask(wfeOutput->nChannels);
+			out_layout = GetDefChannelMask(wfeOutput->nChannels);
+			isfloat    = (wfeOutput->wFormatTag == WAVE_FORMAT_IEEE_FLOAT);
 		}
-
-		out_BitsPerSample	= wfeOutput->wBitsPerSample;
-		out_channels		= wfeOutput->nChannels;
-		out_samplerate		= wfeOutput->nSamplesPerSec;
+		if (isfloat) {
+			if (wfe->wBitsPerSample == 32) {
+				out_sf = SAMPLE_FMT_FLT;
+			} else {
+				return E_INVALIDARG;
+			}
+		} else {
+			switch (wfe->wBitsPerSample) {
+				case 16:
+					out_sf = SAMPLE_FMT_S16;
+					break;
+				case 24:
+					out_sf = SAMPLE_FMT_S24;
+					break;
+				case 32:
+					out_sf = SAMPLE_FMT_S32;
+					break;
+				default:
+					return E_INVALIDARG;
+			}
+		}
 	}
 
 	hr = pMediaSample->GetPointer(&pMediaBuffer);
@@ -1300,16 +1319,15 @@ HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 #endif
 
 			m_Resampler.UpdateInput(in_sf, in_layout, in_samplerate);
-			m_Resampler.UpdateOutput(SAMPLE_FMT_FLT, out_layout, out_samplerate);
-			out_samples	= m_Resampler.CalcOutSamples(in_samples);
-			buff		= DNew BYTE[out_samples * out_channels * get_bytes_per_sample(SAMPLE_FMT_FLT)];
+			m_Resampler.UpdateOutput(out_sf, out_layout, out_samplerate);
+			out_samples = m_Resampler.CalcOutSamples(in_samples);
+			buff        = DNew BYTE[out_samples * out_channels * get_bytes_per_sample(out_sf)];
 			if (!buff) {
 				return E_OUTOFMEMORY;
 			}
 			out_samples = m_Resampler.Mixing(buff, out_samples, in_buff, in_samples);
-
-			bUseMixer	= true;
-			sfmt		= SAMPLE_FMT_FLT;
+			bUseMixer   = true;
+			sfmt        = out_sf;
 		} else {
 			buff = in_buff;
 		}
@@ -1323,12 +1341,7 @@ HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 			bool fFloat	= tag == WAVE_FORMAT_IEEE_FLOAT || tag == WAVE_FORMAT_EXTENSIBLE && wfexOutput->SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
 
 			if (fPCM) {
-				if (wfeOutput->wBitsPerSample == 8) {
-#if defined(_DEBUG) && DBGLOG_LEVEL > 0
-					TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - unsupported convert from '%s' to 8bit PCM\n"), GetSampleFormatString(sfmt));
-#endif
-					;// TODO ...
-				} else if (wfeOutput->wBitsPerSample == 16) {
+				if (wfeOutput->wBitsPerSample == 16) {
 #if defined(_DEBUG) && DBGLOG_LEVEL > 0
 					TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - convert from '%s' to 16bit PCM\n"), GetSampleFormatString(sfmt));
 #endif
@@ -1349,6 +1362,10 @@ HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 					lSize	= out_samples * out_channels * sizeof(int32_t);
 					out_buf	= DNew BYTE[lSize];
 					convert_to_int32(sfmt, out_channels, out_samples, buff, (int32_t*)out_buf);
+				} else {
+#if defined(_DEBUG) && DBGLOG_LEVEL > 0
+					TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - unsupported format\n"));
+#endif
 				}
 			} else if (fFloat) {
 				if (wfeOutput->wBitsPerSample == 32) {
@@ -1358,11 +1375,10 @@ HRESULT	CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 					lSize	= out_samples * out_channels * sizeof(float);
 					out_buf	= DNew BYTE[lSize];
 					convert_to_float(sfmt, out_channels, out_samples, buff, (float*)out_buf);
-				} else if (wfeOutput->wBitsPerSample == 64) {
+				} else {
 #if defined(_DEBUG) && DBGLOG_LEVEL > 0
-					TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - unsupported convert from '%s' to 64bit FLOAT\n"), GetSampleFormatString(sfmt));
+					TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi() - unsupported format\n"));
 #endif
-					;// TODO ...
 				}
 			}
 
