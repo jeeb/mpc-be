@@ -1280,13 +1280,13 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 			isfloat    = !!(wfeOutput->wFormatTag == WAVE_FORMAT_IEEE_FLOAT);
 		}
 		if (isfloat) {
-			if (wfe->wBitsPerSample == 32) {
+			if (wfeOutput->wBitsPerSample == 32) {
 				out_sf = SAMPLE_FMT_FLT;
 			} else {
 				return E_INVALIDARG;
 			}
 		} else {
-			switch (wfe->wBitsPerSample) {
+			switch (wfeOutput->wBitsPerSample) {
 				case 16:
 					out_sf = SAMPLE_FMT_S16;
 					break;
