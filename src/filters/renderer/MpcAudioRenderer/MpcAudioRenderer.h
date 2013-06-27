@@ -174,6 +174,7 @@ private:
 	BOOL					m_bIsBitstream;
 	BOOL					m_bUseBitExactOutput;
 	BOOL					m_bUseSystemLayoutChannels;
+	FILTER_STATE			m_filterState;
 
 	// AVRT.dll (Vista or greater
 	typedef HANDLE							(__stdcall *PTR_AvSetMmThreadCharacteristicsW)(LPCWSTR TaskName, LPDWORD TaskIndex);
