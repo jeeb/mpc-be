@@ -71,7 +71,7 @@
     #include "MediaInfo/Image/File_Jpeg.h"
 #endif
 #if defined(MEDIAINFO_SUBRIP_YES)
-    #include "MediaInfo/Text/File_Subrip.h"
+    #include "MediaInfo/Text/File_SubRip.h"
 #endif
 #if defined(MEDIAINFO_OTHERTEXT_YES)
     #include "MediaInfo/Text/File_OtherText.h"
@@ -681,7 +681,6 @@ void File_Riff::AIFF_COMM()
     {
         File_SmpteSt0337* Parser=new File_SmpteSt0337;
         Parser->Endianness='B';
-        Parser->Aligned=true;
         Parser->Container_Bits=(int8u)sampleSize;
         Parser->ShouldContinueParsing=true;
         #if MEDIAINFO_DEMUX
