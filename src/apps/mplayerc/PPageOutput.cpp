@@ -457,9 +457,6 @@ void CPPageOutput::OnDSRendererChange()
 				GetDlgItem(IDC_DX_SURFACE)->EnableWindow(TRUE);
 			}
 			break;
-		case VIDRNDT_DS_MADVR:
-			GetDlgItem(IDC_FULLSCREEN_MONITOR_CHECK)->EnableWindow(TRUE);
-			break;
 		case VIDRNDT_DS_SYNC:
 			GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(TRUE);
 			GetDlgItem(IDC_EVR_BUFFERS_TXT)->EnableWindow(TRUE);
