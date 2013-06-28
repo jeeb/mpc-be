@@ -8731,6 +8731,13 @@ void CMainFrame::OnPlayChangeRate(UINT nID)
 		return;
 	}
 
+	BeginEnumFilters(pGB, pEF, pBF) {
+		if (CComQIPtr<IMpcAudioRendererFilter> pARF = pBF) {
+			return;
+		}
+	}
+	EndEnumFilters;
+
 	if (GetPlaybackMode() == PM_CAPTURE) {
 		if (GetMediaState() != State_Running) {
 			SendMessage(WM_COMMAND, ID_PLAY_PLAY);
@@ -8888,7 +8895,16 @@ void CMainFrame::OnUpdatePlayChangeRate(CCmdUI* pCmdUI)
 {
 	bool fEnable = false;
 
-	if (m_iMediaLoadState == MLS_LOADED) {
+	bool bUseMPCAudioRenderer = false;
+	BeginEnumFilters(pGB, pEF, pBF) {
+		if (CComQIPtr<IMpcAudioRendererFilter> pARF = pBF) {
+			bUseMPCAudioRenderer = true;
+			break;
+		}
+	}
+	EndEnumFilters;
+
+	if (m_iMediaLoadState == MLS_LOADED && !bUseMPCAudioRenderer) {
 		bool fInc = pCmdUI->m_nID == ID_PLAY_INCRATE;
 
 		fEnable = true;
@@ -8935,6 +8951,13 @@ void CMainFrame::OnPlayResetRate()
 		return;
 	}
 
+	BeginEnumFilters(pGB, pEF, pBF) {
+		if (CComQIPtr<IMpcAudioRendererFilter> pARF = pBF) {
+			return;
+		}
+	}
+	EndEnumFilters;
+
 	HRESULT hr = E_FAIL;
 
 	if (GetMediaState() != State_Running) {
@@ -8959,7 +8982,16 @@ void CMainFrame::OnPlayResetRate()
 
 void CMainFrame::OnUpdatePlayResetRate(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(m_iMediaLoadState == MLS_LOADED);
+	bool bUseMPCAudioRenderer = false;
+	BeginEnumFilters(pGB, pEF, pBF) {
+		if (CComQIPtr<IMpcAudioRendererFilter> pARF = pBF) {
+			bUseMPCAudioRenderer = true;
+			break;
+		}
+	}
+	EndEnumFilters;
+
+	pCmdUI->Enable(m_iMediaLoadState == MLS_LOADED && !bUseMPCAudioRenderer);
 }
 
 void CMainFrame::SetAudioDelay(REFERENCE_TIME rtShift)
