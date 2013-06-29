@@ -401,7 +401,7 @@ BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 17
 11		"온라인 자막 데이터베이스 URL:"
 13		"테스트"
 15		"온라인 데이터베이스"
-16		"Auto-reload subtitle files after detecting modification"
+16		"변경사항 탐지후 자막 파일 자동 다시 불러오기"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
