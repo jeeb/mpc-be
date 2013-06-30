@@ -406,6 +406,7 @@ SRCS_C = \
 	libavutil/utils.c \
 	libavutil/x86/cpu.c \
 	libavutil/x86/float_dsp_init.c \
+	libavutil/x86/lls_init.c \
 	libswscale/input.c \
 	libswscale/options.c \
 	libswscale/output.c \
@@ -465,6 +466,7 @@ SRCS_YASM = \
 	libavutil/x86/cpuid.asm \
 	libavutil/x86/emms.asm \
 	libavutil/x86/float_dsp.asm \
+	libavutil/x86/lls.asm \
 	libswscale/x86/input.asm \
 	libswscale/x86/output.asm \
 	libswscale/x86/scale.asm

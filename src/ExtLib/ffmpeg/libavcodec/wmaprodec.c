@@ -726,6 +726,7 @@ static int decode_channel_transform(WMAProDecodeCtx* s)
                     if (get_bits1(&s->gb)) {
                         avpriv_request_sample(s->avctx,
                                               "Unknown channel transform type");
+                        return AVERROR_PATCHWELCOME;
                     }
                 } else {
                     chgroup->transform = 1;
@@ -1128,11 +1129,12 @@ static int decode_subframe(WMAProDecodeCtx *s)
     cur_subwoofer_cutoff = s->subwoofer_cutoffs[s->table_idx];
 
     /** configure the decoder for the current subframe */
+    offset += s->samples_per_frame >> 1;
+
     for (i = 0; i < s->channels_for_cur_subframe; i++) {
         int c = s->channel_indexes_for_cur_subframe[i];
 
-        s->channel[c].coeffs = &s->channel[c].out[(s->samples_per_frame >> 1)
-                                                  + offset];
+        s->channel[c].coeffs = &s->channel[c].out[offset];
     }
 
     s->subframe_len = subframe_len;
@@ -1188,6 +1190,7 @@ static int decode_subframe(WMAProDecodeCtx *s)
                     av_log(s->avctx, AV_LOG_ERROR, "num_vec_coeffs %d is too large\n", num_vec_coeffs);
                     return AVERROR_INVALIDDATA;
                 }
+                av_assert0(num_vec_coeffs + offset <= FF_ARRAY_ELEMS(s->channel[c].out));
                 s->channel[c].num_vec_coeffs = num_vec_coeffs;
             }
         } else {
@@ -1468,6 +1471,8 @@ static void save_bits(WMAProDecodeCtx *s, GetBitContext* gb, int len,
         s->packet_loss = 1;
         return;
     }
+
+    av_assert0(len <= put_bits_left(&s->pb));
 
     s->num_saved_bits += len;
     if (!append) {
