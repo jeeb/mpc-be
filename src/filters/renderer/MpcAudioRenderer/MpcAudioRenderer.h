@@ -209,7 +209,12 @@ private:
 	CSimpleArray<WORD>		m_wBitsPerSampleList;
 	CSimpleArray<WORD>		m_nChannelsList;
 	CSimpleArray<DWORD>		m_dwChannelMaskList;
-	CSimpleArray<DWORD>		m_nSamplesPerSecList;
+
+	typedef struct {
+		WORD	wBitsPerSample;
+		DWORD	nSamplesPerSec;
+	} AudioParams;
+	CSimpleArray<AudioParams>	m_AudioParamsList;
 
 	void					WasapiFlush();
 };

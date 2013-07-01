@@ -1775,9 +1775,27 @@ BOOL CMpcAudioRenderer::IsBitstream(WAVEFORMATEX *pWaveFormatEx)
 void CMpcAudioRenderer::SelectFormat(WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE& wfex)
 {
 	// trying to create an output media type similar to input media type ...
+	WORD wBitsPerSample		= pwfx->wBitsPerSample;
+	if (m_wBitsPerSampleList.Find(wBitsPerSample) == -1) {
+		wBitsPerSample		= m_wBitsPerSampleList[m_wBitsPerSampleList.GetSize() - 1];
+	}
+
 	DWORD nSamplesPerSec	= pwfx->nSamplesPerSec;
-	if (m_nSamplesPerSecList.Find(nSamplesPerSec) == -1) {
-		nSamplesPerSec		= m_nSamplesPerSecList[m_nSamplesPerSecList.GetSize() - 1];
+	BOOL bExists = FALSE;
+	for (int i = 0; i < m_AudioParamsList.GetSize() - 1; i++) {
+		if (m_AudioParamsList[i].wBitsPerSample == wBitsPerSample && m_AudioParamsList[i].nSamplesPerSec == nSamplesPerSec) {
+			bExists = TRUE;
+			break;
+		}
+	}
+	if (!bExists) {
+		nSamplesPerSec		= 0;
+		for (int i = m_AudioParamsList.GetSize() - 1; i >= 0; i--) {
+			if (m_AudioParamsList[i].wBitsPerSample == wBitsPerSample) {
+				nSamplesPerSec = m_AudioParamsList[i].nSamplesPerSec;
+				break;
+			}
+		}
 	}
 
 	WORD nChannels			= 0;
@@ -1827,11 +1845,7 @@ void CMpcAudioRenderer::SelectFormat(WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE& w
 	WAVEFORMATEX& wfe		= wfex.Format;
 	wfe.nChannels			= nChannels;
 	wfe.nSamplesPerSec		= nSamplesPerSec;
-	wfe.wBitsPerSample		= pwfx->wBitsPerSample;
-	if (m_wBitsPerSampleList.Find(wfe.wBitsPerSample) == -1) {
-		wfe.wBitsPerSample	= m_wBitsPerSampleList[m_wBitsPerSampleList.GetSize() - 1];
-	}
-					
+	wfe.wBitsPerSample		= wBitsPerSample;
 	wfe.nBlockAlign			= nChannels * wfe.wBitsPerSample / 8;
 	wfe.nAvgBytesPerSec		= nSamplesPerSec * wfe.nBlockAlign;
 
@@ -1873,10 +1887,6 @@ HRESULT CMpcAudioRenderer::StartAudioClient(IAudioClient **ppAudioClient)
 
 	if (!isAudioClientStarted && (*ppAudioClient)) {
 		TRACE(_T("CMpcAudioRenderer::StartAudioClient()\n"));
-
-		// To reduce latency, load the first buffer with data
-		// from the audio source before starting the stream.
-		RenderWasapiBuffer();
 
 		if (FAILED(hr = (*ppAudioClient)->Start())) {
 			TRACE(_T("CMpcAudioRenderer::StartAudioClient() - start audio client failed\n"));
@@ -2182,7 +2192,7 @@ HRESULT CMpcAudioRenderer::CreateAudioClient(IMMDevice *pMMDevice, IAudioClient 
 	m_wBitsPerSampleList.RemoveAll();
 	m_nChannelsList.RemoveAll();
 	m_dwChannelMaskList.RemoveAll();
-	m_nSamplesPerSecList.RemoveAll();
+	m_AudioParamsList.RemoveAll();
 
 	if (*ppAudioClient) {
 		if (isAudioClientStarted) {
@@ -2233,11 +2243,14 @@ HRESULT CMpcAudioRenderer::CreateAudioClient(IMMDevice *pMMDevice, IAudioClient 
 			}
 
 			// 3 - m_nSamplesPerSec
-			DWORD nSamplesPerSecValues[] = {44100, 48000, 88200, 96000, 192000};
-			for (int i = 0; i < _countof(nSamplesPerSecValues); i++) {
-				CreateFormat(wfex, wBitsPerSampleValues[0], nChannelsValues[0], dwChannelMaskValues[0], nSamplesPerSecValues[i]);
-				if (S_OK == m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfex, NULL)) {
-					m_nSamplesPerSecList.Add(nSamplesPerSecValues[i]);
+			DWORD nSamplesPerSecValues[] = {44100, 48000, 88200, 96000, 176400, 192000};
+			for (int k = 0; k < m_wBitsPerSampleList.GetSize(); k++) {
+				for (int i = 0; i < _countof(nSamplesPerSecValues); i++) {
+					CreateFormat(wfex, m_wBitsPerSampleList[k], nChannelsValues[0], dwChannelMaskValues[0], nSamplesPerSecValues[i]);
+					if (S_OK == m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfex, NULL)) {
+						AudioParams t = {m_wBitsPerSampleList[k], nSamplesPerSecValues[i]};
+						m_AudioParamsList.Add(t);
+					}
 				}
 			}
 
@@ -2246,6 +2259,12 @@ HRESULT CMpcAudioRenderer::CreateAudioClient(IMMDevice *pMMDevice, IAudioClient 
 			TRACE(_T("		BitsPerSample:\n"));
 			for (int i = 0; i < m_wBitsPerSampleList.GetSize(); i++) {
 				TRACE(_T("			%d\n"), m_wBitsPerSampleList[i]);
+				TRACE(_T("			SamplesPerSec:\n"));
+				for (int k = 0; k < m_AudioParamsList.GetSize(); k++) {
+					if (m_AudioParamsList[k].wBitsPerSample == m_wBitsPerSampleList[i]) {
+						TRACE(_T("				%d\n"), m_AudioParamsList[k].nSamplesPerSec);
+					}
+				}
 			}
 
 			#define ADDENTRY(mode) ChannelMaskStr[mode] = _T(#mode)
@@ -2261,11 +2280,6 @@ HRESULT CMpcAudioRenderer::CreateAudioClient(IMMDevice *pMMDevice, IAudioClient 
 			TRACE(_T("		Channels:\n"));
 			for (int i = 0; i < m_nChannelsList.GetSize(); i++) {
 				TRACE(_T("			%d[0x%x	- %s]\n"), m_nChannelsList[i], m_dwChannelMaskList[i], ChannelMaskStr[m_dwChannelMaskList[i]]);
-			}
-
-			TRACE(_T("		SamplesPerSec:\n"));
-			for (int i = 0; i < m_nSamplesPerSecList.GetSize(); i++) {
-				TRACE(_T("			%d\n"), m_nSamplesPerSecList[i]);
 			}
 #endif
 		}
