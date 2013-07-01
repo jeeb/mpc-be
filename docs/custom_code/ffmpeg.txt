@@ -22,7 +22,6 @@ The following files have MPC-BE specific custom code (compared to ffmpeg):
 * libavcodec/utils.c
 * libavcodec/vc1dec.c
 * libavcodec/vorbis.c
-* libavcodec/vorbisdec.c
 
 * libavresample/x86/audio_mix_init.c
 

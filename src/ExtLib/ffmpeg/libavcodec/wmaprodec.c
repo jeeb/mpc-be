@@ -106,6 +106,7 @@
 
 #define WMAPRO_BLOCK_MIN_BITS  6                                           ///< log2 of min block size
 #define WMAPRO_BLOCK_MAX_BITS 13                                           ///< log2 of max block size
+#define WMAPRO_BLOCK_MIN_SIZE (1 << WMAPRO_BLOCK_MIN_BITS)                 ///< minimum block size
 #define WMAPRO_BLOCK_MAX_SIZE (1 << WMAPRO_BLOCK_MAX_BITS)                 ///< maximum block size
 #define WMAPRO_BLOCK_SIZES    (WMAPRO_BLOCK_MAX_BITS - WMAPRO_BLOCK_MIN_BITS + 1) ///< possible block sizes
 
@@ -336,7 +337,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
         return AVERROR_INVALIDDATA;
     }
 
-    if (s->min_samples_per_subframe < (1<<WMAPRO_BLOCK_MIN_BITS)) {
+    if (s->min_samples_per_subframe < WMAPRO_BLOCK_MIN_SIZE) {
         av_log(avctx, AV_LOG_ERROR, "min_samples_per_subframe of %d too small\n",
                s->min_samples_per_subframe);
         return AVERROR_INVALIDDATA;
@@ -438,8 +439,10 @@ static av_cold int decode_init(AVCodecContext *avctx)
                            + s->sfb_offsets[i][b + 1] - 1) << i) >> 1;
             for (x = 0; x < num_possible_block_sizes; x++) {
                 int v = 0;
-                while (s->sfb_offsets[x][v + 1] << x < offset)
-                    ++v;
+                while (s->sfb_offsets[x][v + 1] << x < offset) {
+                    v++;
+                    av_assert0(v < MAX_BANDS);
+                }
                 s->sf_offsets[i][x][b] = v;
             }
         }

@@ -422,15 +422,6 @@ static int vorbis_parse_setup_hdr_codebooks(vorbis_context *vc)
         }
 
 // Initialize VLC table
-// ==> Start patch MPC
-/**
-        if (entries <= 0) {
-            av_log(vc->avctx, AV_LOG_ERROR, "Invalid codebook entry count\n");
-            ret = AVERROR_INVALIDDATA;
-            goto error;
-        }
-*/
-// ==> End patch MPC
         if (ff_vorbis_len2vlc(tmp_vlc_bits, tmp_vlc_codes, entries)) {
             av_log(vc->avctx, AV_LOG_ERROR, " Invalid code lengths while generating vlcs. \n");
             ret = AVERROR_INVALIDDATA;
@@ -1239,8 +1230,11 @@ static int vorbis_floor1_decode(vorbis_context *vc,
 
             cval = cval >> cbits;
             if (book > -1) {
-                floor1_Y[offset+j] = get_vlc2(gb, vc->codebooks[book].vlc.table,
-                vc->codebooks[book].nb_bits, 3);
+                int v = get_vlc2(gb, vc->codebooks[book].vlc.table,
+                                 vc->codebooks[book].nb_bits, 3);
+                if (v < 0)
+                    return AVERROR_INVALIDDATA;
+                floor1_Y[offset+j] = v;
             } else {
                 floor1_Y[offset+j] = 0;
             }
@@ -1334,6 +1328,9 @@ static av_always_inline int setup_classifs(vorbis_context *vc,
 
             av_dlog(NULL, "Classword: %u\n", temp);
 
+            if ((int)temp < 0)
+                return temp;
+
             av_assert0(vr->classifications > 1); //needed for inverse[]
 
             if (temp <= 65536) {
@@ -1401,7 +1398,9 @@ static av_always_inline int vorbis_residue_decode_internal(vorbis_context *vc,
         voffset = vr->begin;
         for (partition_count = 0; partition_count < ptns_to_read;) {  // SPEC        error
             if (!pass) {
-                setup_classifs(vc, vr, do_not_decode, ch_used, partition_count);
+                int ret;
+                if ((ret = setup_classifs(vc, vr, do_not_decode, ch_used, partition_count)) < 0)
+                    return ret;
             }
             for (i = 0; (i < c_p_c) && (partition_count < ptns_to_read); ++i) {
                 for (j_times_ptns_to_read = 0, j = 0; j < ch_used; ++j) {
