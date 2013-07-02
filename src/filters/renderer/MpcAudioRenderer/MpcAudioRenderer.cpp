@@ -1781,14 +1781,8 @@ void CMpcAudioRenderer::SelectFormat(WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE& w
 	}
 
 	DWORD nSamplesPerSec	= pwfx->nSamplesPerSec;
-	BOOL bExists = FALSE;
-	for (int i = 0; i < m_AudioParamsList.GetSize() - 1; i++) {
-		if (m_AudioParamsList[i].wBitsPerSample == wBitsPerSample && m_AudioParamsList[i].nSamplesPerSec == nSamplesPerSec) {
-			bExists = TRUE;
-			break;
-		}
-	}
-	if (!bExists) {
+	AudioParams ap(wBitsPerSample, nSamplesPerSec);
+	if (m_AudioParamsList.Find(ap) == -1) {
 		nSamplesPerSec		= 0;
 		for (int i = m_AudioParamsList.GetSize() - 1; i >= 0; i--) {
 			if (m_AudioParamsList[i].wBitsPerSample == wBitsPerSample) {
@@ -2248,8 +2242,8 @@ HRESULT CMpcAudioRenderer::CreateAudioClient(IMMDevice *pMMDevice, IAudioClient 
 				for (int i = 0; i < _countof(nSamplesPerSecValues); i++) {
 					CreateFormat(wfex, m_wBitsPerSampleList[k], nChannelsValues[0], dwChannelMaskValues[0], nSamplesPerSecValues[i]);
 					if (S_OK == m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfex, NULL)) {
-						AudioParams t = {m_wBitsPerSampleList[k], nSamplesPerSecValues[i]};
-						m_AudioParamsList.Add(t);
+						AudioParams ap(m_wBitsPerSampleList[k], nSamplesPerSecValues[i]);
+						m_AudioParamsList.Add(ap);
 					}
 				}
 			}

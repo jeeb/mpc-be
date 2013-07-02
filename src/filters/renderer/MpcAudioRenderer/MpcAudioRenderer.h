@@ -210,10 +210,20 @@ private:
 	CSimpleArray<WORD>		m_nChannelsList;
 	CSimpleArray<DWORD>		m_dwChannelMaskList;
 
-	typedef struct {
+	struct AudioParams {
 		WORD	wBitsPerSample;
 		DWORD	nSamplesPerSec;
-	} AudioParams;
+
+		struct AudioParams(WORD v1, DWORD v2) {
+			wBitsPerSample = v1;
+			nSamplesPerSec = v2;
+		}
+
+		bool operator == (const struct AudioParams& ap) const {
+			return ((*this).wBitsPerSample == ap.wBitsPerSample
+					&& (*this).nSamplesPerSec == ap.nSamplesPerSec);
+		}
+	};
 	CSimpleArray<AudioParams>	m_AudioParamsList;
 
 	void					WasapiFlush();
