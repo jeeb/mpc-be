@@ -14,7 +14,7 @@ Legend:
 Added (+):
 
 Changes (*):
-	* MediaInfo 0.7.63+ svn rev.5735;
+	* MediaInfo 0.7.63+ svn rev.5764;
 	* Little-CMS 2.5 git-3d38474e;
 	* ffmpeg git-a478e99a;
 
