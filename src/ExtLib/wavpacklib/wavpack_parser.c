@@ -155,7 +155,6 @@ WavPack_parser* wavpack_parser_new(stream_reader* io, int is_correction)
 {
 	uint32_t bcount = 0;
 	int is_final_block = FALSE;
-    int striped_header_len = 0;
 
     WavPack_parser* wpp = wp_alloc(sizeof(WavPack_parser));
     if(!wpp)
@@ -235,8 +234,8 @@ WavPack_parser* wavpack_parser_new(stream_reader* io, int is_correction)
 
         wpp->channel_count += wpp->block_channel_count;
 
-        striped_header_len = strip_wavpack_block(wpp->fb, &wpp->wphdr, wpp->io, bcount,
-            !wpp->is_correction, wpp->several_blocks);
+		frame_append_data(wpp->fb, (char*)&wpp->wphdr, sizeof(wpp->wphdr));
+		frame_append_data2(wpp->fb, wpp->io, bcount);
 
         /*
         // check metadata to know if it's a correction block
@@ -281,8 +280,6 @@ unsigned long wavpack_parser_read_frame(
 
 	if(wpp->fb->len > 0)
 	{
-		*FrameIndex = wpp->wphdr.block_index;
-		*FrameLen = wpp->wphdr.block_samples;        
 		wp_memcpy(dst, wpp->fb->data, wpp->fb->len);
 	}
 	else
@@ -304,16 +301,17 @@ unsigned long wavpack_parser_read_frame(
 			}
 			// ==> End patch MPC
 
-            strip_wavpack_block(wpp->fb, &wpp->wphdr, wpp->io, bcount,
-                !wpp->is_correction,  wpp->several_blocks);
+			frame_append_data(wpp->fb, (char*)&wpp->wphdr, sizeof(wpp->wphdr));
+			frame_append_data2(wpp->fb, wpp->io, bcount);
 		} while(is_final_block == FALSE);
 
-		*FrameIndex = wpp->wphdr.block_index;
-		*FrameLen = wpp->wphdr.block_samples;
 		wp_memcpy(dst, wpp->fb->data, wpp->fb->len);
 	}
 
 	frame_len_bytes = wpp->fb->len;
+
+	*FrameIndex = wpp->wphdr.block_index;
+	*FrameLen = wpp->fb->len;
 
     frame_reset(wpp->fb);
 
