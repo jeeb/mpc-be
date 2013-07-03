@@ -276,7 +276,11 @@ int FFH264CheckCompatibility (int nWidth, int nHeight, struct AVCodecContext* pA
 		int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
 	}
 
-	SPS* cur_sps		= &pContext->sps;
+	PPS* cur_pps		= &pContext->pps;
+	SPS* cur_sps		= NULL;
+	if (cur_pps != NULL) {
+		cur_sps			= pContext->sps_buffers[cur_pps->sps_id];
+	}
 
 	if (cur_sps != NULL) {
 		if (cur_sps->bit_depth_luma > 8 || cur_sps->chroma_format_idc > 1) {
