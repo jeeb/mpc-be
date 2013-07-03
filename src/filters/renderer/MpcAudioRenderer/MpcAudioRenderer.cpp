@@ -1882,6 +1882,10 @@ HRESULT CMpcAudioRenderer::StartAudioClient(IAudioClient **ppAudioClient)
 	if (!isAudioClientStarted && (*ppAudioClient)) {
 		TRACE(_T("CMpcAudioRenderer::StartAudioClient()\n"));
 
+		// To reduce latency, load the first buffer with data
+		// from the audio source before starting the stream.
+		RenderWasapiBuffer();
+
 		if (FAILED(hr = (*ppAudioClient)->Start())) {
 			TRACE(_T("CMpcAudioRenderer::StartAudioClient() - start audio client failed\n"));
 			return hr;
