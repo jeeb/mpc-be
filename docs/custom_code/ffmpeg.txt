@@ -39,3 +39,8 @@ The following files are available only in MPC-BE (compared with ffmpeg):
 
 * config.c
 * libavcodec/vc1_dxva.h
+
+======
+Следующие файлы остаются как есть, без последних изменений из ffmpeg:
+
+* vc1dec.c
