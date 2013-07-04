@@ -135,16 +135,14 @@ HRESULT convert_to_int24(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE
 			for (size_t i = 0; i < allsamples; ++i) {
 				*pOut++ = 0;
 				*pOut++ = 0;
-				*pOut++ = *(pIn) ^ 0x80;
-				pIn += sizeof(uint8_t);
+				*pOut++ = (*pIn++) ^ 0x80;
 			}
 			break;
 		case SAMPLE_FMT_S16:
 			for (size_t i = 0; i < allsamples; ++i) {
 				*pOut++ = 0;
-				*pOut++ = *(pIn);
-				*pOut++ = *(pIn + 1);
-				pIn += sizeof(int16_t);
+				*pOut++ = *pIn++;
+				*pOut++ = *pIn++;
 			}
 			break;
 		case SAMPLE_FMT_S24:
@@ -152,10 +150,10 @@ HRESULT convert_to_int24(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE
 			break;
 		case SAMPLE_FMT_S32:
 			for (size_t i = 0; i < allsamples; ++i) {
-				*pOut++ = *(pIn + 1);
-				*pOut++ = *(pIn + 2);
-				*pOut++ = *(pIn + 3);
-				pIn += sizeof(int32_t);
+				pIn++;
+				*pOut++ = *pIn++;
+				*pOut++ = *pIn++;
+				*pOut++ = *pIn++;
 			}
 			break;
 		case SAMPLE_FMT_FLT:
@@ -193,18 +191,20 @@ HRESULT convert_to_int24(SampleFormat sfmt, WORD nChannels, DWORD nSamples, BYTE
 		case SAMPLE_FMT_S16P:
 			for (size_t i = 0; i < nSamples; ++i) {
 				for (int ch = 0; ch < nChannels; ++ch) {
+					uint16_t u16 = ((uint16_t*)pIn)[nSamples * ch + i];
 					*pOut++ = 0;
-					*pOut++ = pIn[nSamples * ch + i];
-					*pOut++ = pIn[nSamples * ch + i + 1];
+					*pOut++ = (BYTE)(u16);
+					*pOut++ = (BYTE)(u16 >> 8);
 				}
 			}
 			break;
 		case SAMPLE_FMT_S32P:
 			for (size_t i = 0; i < nSamples; ++i) {
 				for (int ch = 0; ch < nChannels; ++ch) {
-					*pOut++ = pIn[nSamples * ch + i + 1];
-					*pOut++ = pIn[nSamples * ch + i + 2];
-					*pOut++ = pIn[nSamples * ch + i + 3];
+					uint32_t u32 = ((uint32_t*)pIn)[nSamples * ch + i];
+					*pOut++ = (BYTE)(u32 >> 8);
+					*pOut++ = (BYTE)(u32 >> 16);
+					*pOut++ = (BYTE)(u32 >> 24);
 				}
 			}
 			break;
