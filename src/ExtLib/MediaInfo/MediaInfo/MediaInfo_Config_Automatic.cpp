@@ -28,7 +28,7 @@ void MediaInfo_Config_DefaultLanguage (Translation &Info)
     Info.Separator_Set(0, __T("\n"));
     Info.Write(Ztring().From_UTF8(
     "  Language_ISO639;en\n"
-    "  Author_Email;Zen@mediaarea.net\n"
+    "  Author_Email;Info@MediaArea.net\n"
     "  Author_Name;Zen\n"
     "  Author_OldNames;Initial translator\n"
     "  Language_Name;English\n"
@@ -1045,7 +1045,7 @@ void MediaInfo_Config_DefaultLanguage (Translation &Info)
     "WebSite_General_More;Go to the web site of a player for this file\n"
     "WebSite_Text;Go to the web site of this text codec\n"
     "WebSite_Text_More;Go to the web site (%Url%) to find this text codec\n"
-    "WebSite_Url;http://mediainfo.sourceforge.net\n"
+    "WebSite_Url;http://MediaArea.net/MediaInfo\n"
     "WebSite_Video;Go to the web site of this video codec\n"
     "WebSite_Video_More;Go to the web site (%Url%) to find this video codec\n"
     "Width;Width\n"

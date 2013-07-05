@@ -2514,7 +2514,7 @@ void File_Mpeg4::moov_meta_ilst_xxxx_data()
                     }
                     if (Parameter=="AppleStoreAccountType")
                     {
-                        if (Value==__T("0")) 
+                        if (Value==__T("0"))
                             Value=__T("iTunes");
                         else
                             Value=__T("AOL");
@@ -3671,7 +3671,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_tmcd()
             Streams[moov_trak_tkhd_TrackID].StreamKind=Stream_Other;
             Streams[moov_trak_tkhd_TrackID].StreamPos=StreamPos_Last;
         }
- 
+
         //Filling
         Streams[moov_trak_tkhd_TrackID].TimeCode=tc;
 
@@ -4589,6 +4589,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_avcC()
             //Parsing
             Open_Buffer_Continue(Parser);
 
+            Parser->MustParse_SPS_PPS=false;
             Parser->SizedBlocks=true;  //Now this is SizeBlocks
         #else
             Skip_XX(Element_Size,                               "AVC Data");
@@ -5794,7 +5795,10 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stts_Common(int32u SampleCount, int32u
             if (Stts.SampleDuration>Stream->second.stts_Max) Stream->second.stts_Max=Stts.SampleDuration;
         }
         Stream->second.stts_FrameCount+=Stts.SampleCount;
-        Stream->second.stts_Duration+=Stts.SampleCount*Stts.SampleDuration;
+        if (Stts.SampleDuration<0x80000000)
+            Stream->second.stts_Duration+=Stts.SampleCount*Stts.SampleDuration;
+        else
+            Stream->second.stts_Duration-=Stts.SampleCount*(((int32u)-1)-Stts.SampleDuration+1); //Negative value
 
         #if MEDIAINFO_DEMUX
             stream::stts_duration stts_Duration;
