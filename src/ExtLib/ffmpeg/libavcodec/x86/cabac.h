@@ -27,6 +27,13 @@
 #include "libavutil/internal.h"
 #include "config.h"
 
+#if   (defined(__i386) && defined(__clang__) && (__clang_major__<2 || (__clang_major__==2 && __clang_minor__<10)))\
+   || (                  !defined(__clang__) && defined(__llvm__) && __GNUC__==4 && __GNUC_MINOR__==2 && __GNUC_PATCHLEVEL__<=1)
+#       define BROKEN_COMPILER 1
+#else
+#       define BROKEN_COMPILER 0
+#endif
+
 #if HAVE_INLINE_ASM
 
 #ifdef BROKEN_RELOCATIONS
@@ -149,9 +156,7 @@
 
 #endif /* BROKEN_RELOCATIONS */
 
-
-#if HAVE_7REGS && !(defined(__i386) && defined(__clang__) && (__clang_major__<2 || (__clang_major__==2 && __clang_minor__<10)))\
-               && !(                  !defined(__clang__) && defined(__llvm__) && __GNUC__==4 && __GNUC_MINOR__==2 && __GNUC_PATCHLEVEL__<=1)
+#if HAVE_7REGS && !BROKEN_COMPILER
 #define get_cabac_inline get_cabac_inline_x86
 static av_always_inline int get_cabac_inline_x86(CABACContext *c,
                                                  uint8_t *const state)
@@ -225,6 +230,7 @@ static av_always_inline int get_cabac_bypass_sign_x86(CABACContext *c, int val)
     return val;
 }
 
+#if !BROKEN_COMPILER
 #define get_cabac_bypass get_cabac_bypass_x86
 static av_always_inline int get_cabac_bypass_x86(CABACContext *c)
 {
@@ -264,6 +270,7 @@ static av_always_inline int get_cabac_bypass_x86(CABACContext *c)
     );
     return res;
 }
+#endif /* !BROKEN_COMPILER */
 
 #endif /* HAVE_INLINE_ASM */
 #endif /* AVCODEC_X86_CABAC_H */
