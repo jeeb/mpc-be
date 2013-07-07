@@ -548,7 +548,7 @@ HRESULT CWavPackSplitterFilterInputPin::DeliverOneFrame(WavPack_parser* wpp)
 	pSample->SetActualDataLength(FrameLenBytes);
 
 	REFERENCE_TIME rtStart, rtStop;
-	rtStart = FrameIndex;
+	rtStart = FrameIndex - wpp->first_wphdr.block_index;
 	rtStop = rtStart + FrameLenSamples;
 	rtStart = (rtStart * 10000000) / wpp->sample_rate;
 	rtStop = (rtStop * 10000000) / wpp->sample_rate;

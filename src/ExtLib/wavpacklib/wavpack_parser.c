@@ -225,7 +225,7 @@ WavPack_parser* wavpack_parser_new(stream_reader* io, int is_correction)
                 uint32_t final_index = seek_final_index (wpp->io, wpp->io);
                 if (final_index != (uint32_t)-1)
                 {
-                    wpp->first_wphdr.total_samples = final_index;// - wpp->first_wphdr.block_index;
+                    wpp->first_wphdr.total_samples = final_index - wpp->first_wphdr.block_index;
                 }                
                 // restaure position
                 wpp->io->set_pos_abs(wpp->io, curr_pos);
