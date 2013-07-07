@@ -164,7 +164,7 @@ WavPack_parser* wavpack_parser_new(stream_reader* io, int is_correction)
 
     wpp->io = io;
     wpp->is_correction = is_correction;
-	
+
     // TODO :we could determinate if it's a correction file by parsing first block metadata
 
     wpp->fb = frame_buffer_new();
@@ -174,16 +174,16 @@ WavPack_parser* wavpack_parser_new(stream_reader* io, int is_correction)
         return NULL;
     }
 
+	wpp->io->set_pos_abs(wpp->io, 0);
 	// ==> Start patch MPC
 	// check header ...
 	{
 		char ckID[4];
-		uint32_t curr_pos = wpp->io->get_pos(wpp->io);
 		if ((wpp->io->read_bytes (wpp->io, &ckID, sizeof(ckID)) != sizeof(ckID)) || (strncmp (ckID, "wvpk", 4))) {
 			wavpack_parser_free(wpp);
 			return NULL;
 		}
-		wpp->io->set_pos_abs(wpp->io, curr_pos);
+		wpp->io->set_pos_abs(wpp->io, 0);
 	}
 	// ==> End patch MPC
 
