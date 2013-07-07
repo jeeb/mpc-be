@@ -323,7 +323,7 @@ unsigned long wavpack_parser_read_frame(
 
 void wavpack_parser_seek(WavPack_parser* wpp, uint64 seek_pos_100ns)
 {
-    uint32_t sample_pos = (uint32_t)((seek_pos_100ns / 10000000.0) * wpp->sample_rate);
+    uint32_t sample_pos = (uint32_t)((seek_pos_100ns / 10000000.0) * wpp->sample_rate) + wpp->first_wphdr.block_index;
     uint32_t newpos = find_sample(wpp, 0, sample_pos);
 
     if(wpp->io->set_pos_abs(wpp->io, newpos) == 0)
