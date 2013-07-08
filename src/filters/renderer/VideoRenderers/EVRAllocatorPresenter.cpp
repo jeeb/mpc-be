@@ -746,8 +746,6 @@ HRESULT CEVRAllocatorPresenter::CreateProposedOutputType(IMFMediaType* pMixerTyp
 	m_AspectRatio.cx	*= VideoFormat->videoInfo.dwWidth;
 	m_AspectRatio.cy	*= VideoFormat->videoInfo.dwHeight;
 
-	bool bDoneSomething = true;
-
 	if (m_AspectRatio.cx >= 1 && m_AspectRatio.cy >= 1) {
 		ReduceDim(m_AspectRatio);
 	}
