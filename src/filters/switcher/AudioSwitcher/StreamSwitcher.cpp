@@ -796,8 +796,6 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 		}
 #endif
 
-		TRACE(_T("&^$#@ : a stupid fix for this stupid problem\n"));
-		//Sleep(32);
 		return E_FAIL; // a stupid fix for this stupid problem
 	}
 

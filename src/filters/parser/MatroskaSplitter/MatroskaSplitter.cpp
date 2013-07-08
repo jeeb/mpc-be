@@ -1246,6 +1246,8 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 		UINT64 TrackNumber = s.GetMasterTrack();
 
+		REFERENCE_TIME seek_rt = 0;
+
 		POSITION pos1 = s.Cues.GetHeadPosition();
 		while (pos1) {
 			Cue* pCue = s.Cues.GetNext(pos1);
@@ -1280,7 +1282,7 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 					{
 						Cluster c;
 						c.ParseTimeCode(m_pCluster);
-						REFERENCE_TIME seek_rt = s.GetRefTime(c.TimeCode);
+						seek_rt = s.GetRefTime(c.TimeCode);
 
 						bool fPassedCueTime = false;
 						if (CAutoPtr<CMatroskaNode> pBlock = m_pCluster->GetFirstBlock()) {
@@ -1317,32 +1319,59 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 						}
 					}
 				}
+
 				Cluster c;
 				c.ParseTimeCode(m_pCluster);
-				REFERENCE_TIME seek_rt = s.GetRefTime(c.TimeCode);
+				REFERENCE_TIME seek_rt2 = s.GetRefTime(c.TimeCode);
 
-				if (seek_rt > 0) {
-					TRACE(_T("CMatroskaSplitterFilter::DemuxSeek() : Seek Two - %ws => %ws, [%10I64d - %10I64d]\n"), ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt);
+				if (seek_rt2 > 0) {
+					TRACE(_T("CMatroskaSplitterFilter::DemuxSeek() : Seek Two - %ws => %ws, [%10I64d - %10I64d]\n"), ReftimeToString(rt), ReftimeToString(seek_rt2), rt, seek_rt2);
 					return;
 				}
 			}
-		}
 
-		// Plan B ))
-		m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
-
-		do {
-			Cluster c;
-			if (FAILED(c.ParseTimeCode(m_pCluster))) {
-				continue;
-			}
-			REFERENCE_TIME seek_rt = s.GetRefTime(c.TimeCode);
-
-			if (seek_rt >= rt && seek_rt <= m_rtDuration) {
-				TRACE(_T("CMatroskaSplitterFilter::DemuxSeek(), plan B : %ws => %ws, [%10I64d - %10I64d]\n"), ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt);
+			if (seek_rt > 0 && seek_rt < rt) {
+				TRACE(_T("CMatroskaSplitterFilter::DemuxSeek() : Seek Three - %ws => %ws, [%10I64d - %10I64d]\n"), ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt);
 				return;
 			}
-		} while (m_pCluster->Next());
+		}
+
+		{
+			// Plan B
+			m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
+			seek_rt = 0;
+
+			do {
+				Cluster c;
+				if (FAILED(c.ParseTimeCode(m_pCluster))) {
+					continue;
+				}
+				REFERENCE_TIME seek_rt2 = s.GetRefTime(c.TimeCode);
+
+				if (seek_rt2 > rt) {
+					break;
+				}
+
+				seek_rt = seek_rt2;
+			} while (m_pCluster->Next());
+
+			if (seek_rt > 0 && seek_rt < m_rtDuration) {
+				m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
+
+				do {
+					Cluster c;
+					if (FAILED(c.ParseTimeCode(m_pCluster))) {
+						continue;
+					}
+					REFERENCE_TIME seek_rt2 = s.GetRefTime(c.TimeCode);
+
+					if (s.GetRefTime(c.TimeCode) == seek_rt) {
+						TRACE(_T("CMatroskaSplitterFilter::DemuxSeek(), plan B : %ws => %ws, [%10I64d - %10I64d]\n"), ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt);
+						return;
+					}
+				} while (m_pCluster->Next());
+			}
+		}
 
 		// epic fail ...
 		m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
