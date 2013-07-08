@@ -60,6 +60,7 @@ public:
 
 	static const AMOVIESETUP_FILTER sudASFilter;
 
+	HRESULT					Receive					(IMediaSample* pSample);
 	HRESULT					CheckInputType			(const CMediaType* mtIn);
 	virtual HRESULT			CheckMediaType			(const CMediaType *pmt);
 	virtual HRESULT			DoRenderSample			(IMediaSample *pMediaSample);
@@ -67,6 +68,9 @@ public:
 	BOOL					ScheduleSample			(IMediaSample *pMediaSample);
 	virtual HRESULT			SetMediaType			(const CMediaType *pmt);
 	virtual HRESULT			CompleteConnect			(IPin *pReceivePin);
+
+	virtual HRESULT			BeginFlush();
+	virtual HRESULT			EndFlush();
 
 	HRESULT EndOfStream(void);
 
@@ -154,6 +158,8 @@ private:
 	HRESULT					StopAudioClient(IAudioClient **ppAudioClient);
 
 	HRESULT					RenderWasapiBuffer();
+	void					CheckBufferStatus();
+	void					WasapiFlush();
 
 	// WASAPI variables
 	HMODULE					m_hModule;
@@ -206,6 +212,9 @@ private:
 	HANDLE					m_hWaitResumeEvent;
 	HANDLE					m_hStopRenderThreadEvent;
 
+	HANDLE					m_hRendererNeedMoreData;
+	HANDLE					m_hStopWaitingRenderer;
+
 	CSimpleArray<WORD>		m_wBitsPerSampleList;
 	CSimpleArray<WORD>		m_nChannelsList;
 	CSimpleArray<DWORD>		m_dwChannelMaskList;
@@ -225,6 +234,4 @@ private:
 		}
 	};
 	CSimpleArray<AudioParams>	m_AudioParamsList;
-
-	void					WasapiFlush();
 };

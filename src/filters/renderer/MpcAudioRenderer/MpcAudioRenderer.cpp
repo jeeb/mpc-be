@@ -165,6 +165,8 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_bUseBitExactOutput(FALSE)
 	, m_bUseSystemLayoutChannels(FALSE)
 	, m_filterState(State_Stopped)
+	, m_hRendererNeedMoreData(NULL)
+	, m_hStopWaitingRenderer(NULL)
 {
 	TRACE(_T("CMpcAudioRenderer::CMpcAudioRenderer()\n"));
 
@@ -227,6 +229,9 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		m_hResumeEvent				= CreateEvent(NULL, FALSE, FALSE, NULL);
 		m_hWaitResumeEvent			= CreateEvent(NULL, FALSE, FALSE, NULL);
 		m_hStopRenderThreadEvent	= CreateEvent(NULL, FALSE, FALSE, NULL);
+
+		m_hRendererNeedMoreData		= CreateEvent(NULL, TRUE, FALSE, NULL);
+		m_hStopWaitingRenderer		= CreateEvent(NULL, FALSE, FALSE, NULL);
 	}
 }
 
@@ -255,6 +260,13 @@ CMpcAudioRenderer::~CMpcAudioRenderer()
 	}
 	if (m_hWaitResumeEvent) {
 		CloseHandle(m_hWaitResumeEvent);
+	}
+
+	if (m_hRendererNeedMoreData) {
+		CloseHandle(m_hRendererNeedMoreData);
+	}
+	if (m_hStopWaitingRenderer) {
+		CloseHandle(m_hStopWaitingRenderer);
 	}
 
 	SAFE_DELETE  (m_pSoundTouch);
@@ -318,6 +330,10 @@ void CMpcAudioRenderer::OnReceiveFirstSample(IMediaSample *pMediaSample)
 
 BOOL CMpcAudioRenderer::ScheduleSample(IMediaSample *pMediaSample)
 {
+	if (m_useWASAPI) {
+		return CBaseRenderer::ScheduleSample(pMediaSample);
+	}
+
 	REFERENCE_TIME	StartSample;
 	REFERENCE_TIME	EndSample;
 
@@ -362,13 +378,63 @@ BOOL CMpcAudioRenderer::ScheduleSample(IMediaSample *pMediaSample)
 	return FALSE;
 }
 
+HRESULT CMpcAudioRenderer::Receive(IMediaSample* pSample)
+{
+	if (!m_useWASAPI) {
+		return CBaseRenderer::Receive(pSample);
+	}
+
+	ASSERT(pSample);
+
+	// It may return VFW_E_SAMPLE_REJECTED code to say don't bother
+	HRESULT hr = PrepareReceive(pSample);
+	ASSERT(m_bInReceive == SUCCEEDED(hr));
+	if (FAILED(hr)) {
+		if (hr == VFW_E_SAMPLE_REJECTED) {
+			return NOERROR;
+		}
+
+		return hr;
+	}
+
+	if (m_State == State_Paused) {
+		{
+			CAutoLock cRendererLock(&m_InterfaceLock);
+			if (m_State == State_Stopped) {
+				m_bInReceive = FALSE;
+				return NOERROR;
+			}
+		}
+		Ready();
+	}
+
+	// http://blogs.msdn.com/b/mediasdkstuff/archive/2008/09/19/custom-directshow-audio-renderer-hangs-playback-in-windows-media-player-11.aspx
+	DoRenderSampleWasapi(pSample);
+
+	m_bInReceive = FALSE;
+
+	CAutoLock cRendererLock(&m_InterfaceLock);
+	if (m_State == State_Stopped) {
+		return NOERROR;
+	}
+
+	CAutoLock cSampleLock(&m_RendererLock);
+
+	ClearPendingSample();
+	SendEndOfStream();
+	CancelNotification();
+
+	return NOERROR;
+}
+
+
 HRESULT	CMpcAudioRenderer::DoRenderSample(IMediaSample *pMediaSample)
 {
-	if (m_useWASAPI) {
-		return DoRenderSampleWasapi(pMediaSample);
-	} else {
+	if (!m_useWASAPI) {
 		return DoRenderSampleDirectSound(pMediaSample);
 	}
+
+	return S_OK;
 }
 
 STDMETHODIMP CMpcAudioRenderer::NonDelegatingQueryInterface(REFIID riid, void **ppv)
@@ -550,6 +616,8 @@ DWORD CMpcAudioRenderer::RenderThread()
 	EnableMMCSS();
 
 	while (true) {
+		CheckBufferStatus();
+
 		// 1) Waiting for the next WASAPI buffer to be available to be filled
 		// 2) Exit requested for the thread
 		// 3) For a pause request
@@ -615,9 +683,6 @@ STDMETHODIMP CMpcAudioRenderer::Run(REFERENCE_TIME tStart)
 	}
 
 	if (m_useWASAPI) {
-
-		WasapiFlush();
-
 		hr = CheckAudioClient(m_pWaveFileFormat);
 		if (FAILED(hr)) {
 			TRACE(_T("CMpcAudioRenderer::Run() - Error on check audio client\n"));
@@ -648,6 +713,7 @@ STDMETHODIMP CMpcAudioRenderer::Run(REFERENCE_TIME tStart)
 
 		ClearBuffer();
 	}
+
 	hr = CBaseRenderer::Run(tStart);
 
 	return hr;
@@ -659,6 +725,10 @@ STDMETHODIMP CMpcAudioRenderer::Stop()
 
 	if (m_pDSBuffer) {
 		m_pDSBuffer->Stop();
+	}
+
+	if (m_hStopWaitingRenderer) {
+		SetEvent(m_hStopWaitingRenderer);
 	}
 
 	m_filterState = State_Stopped;
@@ -673,6 +743,10 @@ STDMETHODIMP CMpcAudioRenderer::Pause()
 
 	if (m_pDSBuffer) {
 		m_pDSBuffer->Stop();
+	}
+
+	if (m_hStopWaitingRenderer) {
+		SetEvent(m_hStopWaitingRenderer);
 	}
 
 	m_filterState = State_Paused;
@@ -935,13 +1009,13 @@ HRESULT CMpcAudioRenderer::EndOfStream(void)
 {
 	HRESULT hr = S_OK;
 
+	if (m_hStopWaitingRenderer) {
+		SetEvent(m_hStopWaitingRenderer);
+	}
+
 	if (m_pDSBuffer) {
 		hr = m_pDSBuffer->Stop();
 	}
-#if !FILEWRITER
-	hr = StopAudioClient(&m_pAudioClient);
-#endif
-	isAudioClientStarted = false;
 
 	return CBaseRenderer::EndOfStream();
 }
@@ -1178,6 +1252,15 @@ const TCHAR *GetSampleFormatString(SampleFormat value)
 
 HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 {
+	CheckBufferStatus();
+
+	HANDLE handles[2] = {
+		m_hRendererNeedMoreData,
+		m_hStopWaitingRenderer
+	};
+
+	DWORD result = WaitForMultipleObjects(2, handles, FALSE, INFINITE);
+
 #if defined(_DEBUG) && DBGLOG_LEVEL > 0
 	TRACE(_T("CMpcAudioRenderer::DoRenderSampleWasapi()\n"));
 #endif
@@ -1449,8 +1532,6 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx)
 	// Compare the exisiting WAVEFORMATEX with the one provided
 	if (CheckFormatChanged(pWaveFormatEx, &m_pWaveFileFormat) || !m_pWaveFileFormatOutput) {
 		
-		WasapiFlush();
-
 		// Format has changed, audio client has to be reinitialized
 		TRACE(_T("CMpcAudioRenderer::CheckAudioClient() - Format changed, reinitialize the audio client\n"));
 
@@ -1586,6 +1667,7 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx)
 	if (SUCCEEDED(hr)) {
 		hr = InitAudioClient(m_pWaveFileFormatOutput, &m_pAudioClient, &m_pRenderClient);
 	}
+
 	return hr;
 }
 
@@ -1893,14 +1975,13 @@ HRESULT CMpcAudioRenderer::StartAudioClient(IAudioClient **ppAudioClient)
 
 		// To reduce latency, load the first buffer with data
 		// from the audio source before starting the stream.
-		RenderWasapiBuffer();
+		// RenderWasapiBuffer();
 
 		if (FAILED(hr = (*ppAudioClient)->Start())) {
 			TRACE(_T("CMpcAudioRenderer::StartAudioClient() - start audio client failed\n"));
 			return hr;
 		}
 		isAudioClientStarted = true;
-		StartRendererThread();
 	} else {
 		TRACE(_T("CMpcAudioRenderer::StartAudioClient() - already started\n"));
 	}
@@ -1937,6 +2018,10 @@ HRESULT CMpcAudioRenderer::StopAudioClient(IAudioClient **ppAudioClient)
 
 HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 {
+	if (!m_pRenderClient) {
+		return S_OK;
+	}
+
 	HRESULT hr = S_OK;
 	
 	UINT32 numFramesPadding = 0;
@@ -2037,6 +2122,24 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 	return hr;
 }
 
+void CMpcAudioRenderer::CheckBufferStatus()
+{
+	if (!m_pWaveFileFormatOutput) {
+		return;
+	}
+
+	UINT32 nAvailableBytes = nFramesInBuffer * m_pWaveFileFormatOutput->nBlockAlign;
+
+	CAutoLock cRenderLock(&m_csRender);
+	size_t WasapiBufLen = m_WasapiBuf.GetCount();
+
+	if (WasapiBufLen < (nAvailableBytes * 10)) {
+		SetEvent(m_hRendererNeedMoreData);
+	} else {
+		ResetEvent(m_hRendererNeedMoreData);
+	}
+}
+
 HRESULT CMpcAudioRenderer::GetBufferSize(WAVEFORMATEX *pWaveFormatEx, REFERENCE_TIME *pHnsBufferPeriod)
 {
 	CheckPointer(pWaveFormatEx, S_OK);
@@ -2067,7 +2170,7 @@ HRESULT CMpcAudioRenderer::GetBufferSize(WAVEFORMATEX *pWaveFormatEx, REFERENCE_
 						1.0 * pWaveFormatEx->nSamplesPerSec) /*+ 0.5*/);
 	*pHnsBufferPeriod *= 1000;
 
-	TRACE(_T("CMpcAudioRenderer::GetBufferSize() - set a %lld period for a %ld buffer size\n"), *pHnsBufferPeriod, nBufferSize);
+	TRACE(_T("CMpcAudioRenderer::GetBufferSize() - set a %I64u period for a %u buffer size\n"), *pHnsBufferPeriod, nBufferSize);
 
 	return S_OK;
 }
@@ -2077,7 +2180,6 @@ HRESULT CMpcAudioRenderer::InitAudioClient(WAVEFORMATEX *pWaveFormatEx, IAudioCl
 	TRACE(_T("CMpcAudioRenderer::InitAudioClient()\n"));
 	HRESULT hr = S_OK;
 
-	// Initialize the stream to play at the minimum latency.
 	hnsPeriod = 0;
 
 	REFERENCE_TIME hnsDefaultDevicePeriod = 0;
@@ -2184,6 +2286,10 @@ HRESULT CMpcAudioRenderer::InitAudioClient(WAVEFORMATEX *pWaveFormatEx, IAudioCl
 
 	if (SUCCEEDED(hr)) {
 		hr = (*pAudioClient)->SetEventHandle(m_hDataEvent);
+	}
+
+	if (SUCCEEDED(hr)) {
+		StartRendererThread();
 	}
 
 	return hr;
@@ -2320,7 +2426,6 @@ HRESULT CMpcAudioRenderer::CreateAudioClient(IMMDevice *pMMDevice, IAudioClient 
 #endif
 		}
 	}
-
 	return hr;
 }
 
@@ -2361,8 +2466,32 @@ HRESULT CMpcAudioRenderer::RevertMMCSS()
 
 void CMpcAudioRenderer::WasapiFlush()
 {
+	TRACE(L"CMpcAudioRenderer::WasapiFlush()\n");
+
 	CAutoLock cRenderLock(&m_csRender);
 
 	m_Resampler.FlushBuffers();
 	m_WasapiBuf.RemoveAll();
+}
+
+HRESULT CMpcAudioRenderer::BeginFlush()
+{
+	TRACE(L"CMpcAudioRenderer::BeginFlush()\n");
+
+	if (m_hStopWaitingRenderer) {
+		SetEvent(m_hStopWaitingRenderer);
+	}
+	
+	return CBaseRenderer::BeginFlush();
+}
+
+HRESULT	CMpcAudioRenderer::EndFlush()
+{
+	TRACE(L"CMpcAudioRenderer::EndFlush()\n");
+
+	if (m_useWASAPI) {
+		WasapiFlush();
+	}
+
+	return CBaseRenderer::EndFlush();
 }
