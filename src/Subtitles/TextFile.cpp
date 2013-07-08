@@ -57,6 +57,26 @@ bool CTextFile::isUTF8Valid()
 	return valid;
 }
 
+void CTextFile::SkipBOM(const BYTE bom[3], UINT sizeBOM)
+{
+	BYTE buf[3] = {0};
+
+	for (;;) {
+		ULONGLONG pos = GetPosition();
+		if (Read(&buf, sizeBOM) != sizeBOM) {
+			return;
+		}
+		
+		if (memcmp(buf, bom, sizeBOM) != 0) {
+			Seek(pos, SeekPosition::begin);
+			return;
+		}
+
+		m_offset += sizeBOM;
+	}
+
+}
+
 bool CTextFile::Open(LPCTSTR lpszFileName)
 {
 	if (!__super::Open(lpszFileName, modeRead|typeBinary|shareDenyNone)) {
@@ -75,9 +95,15 @@ bool CTextFile::Open(LPCTSTR lpszFileName)
 		if (w == 0xfeff) {
 			m_encoding = LE16;
 			m_offset = 2;
+
+			const BYTE BOM[3] = {0xFF, 0xFE, '\0'};
+			SkipBOM(BOM, m_offset);
 		} else if (w == 0xfffe) {
 			m_encoding = BE16;
 			m_offset = 2;
+
+			const BYTE BOM[3] = {0xFE, 0xFF, '\0'};
+			SkipBOM(BOM, m_offset);
 		} else if (w == 0xbbef && __super::GetLength() >= 3) {
 			BYTE b;
 			if (sizeof(b) != Read(&b, sizeof(b))) {
@@ -87,6 +113,9 @@ bool CTextFile::Open(LPCTSTR lpszFileName)
 			if (b == 0xbf) {
 				m_encoding = UTF8;
 				m_offset = 3;
+
+				const BYTE BOM[3] = {0xEF, 0xBB, 0xBF};
+				SkipBOM(BOM, m_offset);
 			}
 		} else {
 			// trying detect UTF-8 without BOM

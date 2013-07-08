@@ -35,6 +35,7 @@ private:
 	int m_offset;
 
 	bool isUTF8Valid();
+	void SkipBOM(const BYTE bom[3], UINT sizeBOM);
 
 public:
 	CTextFile(enc e = ASCII);
