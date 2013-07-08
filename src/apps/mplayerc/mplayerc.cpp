@@ -2004,6 +2004,8 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 					ct = _T("application/x-quicktimeplayer");
 				} else if (ext == _T(".mpcpl")) {
 					ct = _T("application/x-mpc-playlist");
+				} else if (ext == _T(".ram")) {
+					ct = _T("audio/x-pn-realaudio");
 				} else if (ext == _T(".bdmv")) {
 					ct = _T("application/x-bdmv-playlist");
 				} else if (ext == _T(".xspf")) {
@@ -2060,6 +2062,8 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 			ct = _T("application/x-quicktimeplayer");
 		} else if (ext == _T(".mpcpl")) {
 			ct = _T("application/x-mpc-playlist");
+		} else if (ext == _T(".ram")) {
+			ct = _T("audio/x-pn-realaudio");
 		} else if (ext == _T(".bdmv")) {
 			ct = _T("application/x-bdmv-playlist");
 		} else if (ext == _T(".xspf")) {
