@@ -16,7 +16,7 @@ Added (+):
 Changes (*):
 	* MediaInfo 0.7.64 svn rev.5803;
 	* Little-CMS 2.5 git-3d38474e;
-	* ffmpeg git-19d41633;
+	* ffmpeg git-694550f1;
 
 Fixes (!):
 
