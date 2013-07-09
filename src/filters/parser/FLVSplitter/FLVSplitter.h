@@ -77,6 +77,55 @@ class __declspec(uuid("47E792CF-0BBE-4F7A-859C-194B0768650A"))
 	void NormalSeek(REFERENCE_TIME rt);
 	void AlternateSeek(REFERENCE_TIME rt);
 
+	enum AMF_DATA_TYPE {
+		AMF_DATA_TYPE_EMPTY			= -1,
+		AMF_DATA_TYPE_NUMBER		= 0x00,
+		AMF_DATA_TYPE_BOOL			= 0x01,
+		AMF_DATA_TYPE_STRING		= 0x02,
+		AMF_DATA_TYPE_OBJECT		= 0x03,
+		AMF_DATA_TYPE_NULL			= 0x05,
+		AMF_DATA_TYPE_UNDEFINED		= 0x06,
+		AMF_DATA_TYPE_REFERENCE		= 0x07,
+		AMF_DATA_TYPE_MIXEDARRAY	= 0x08,
+		AMF_DATA_TYPE_ARRAY			= 0x0a,
+		AMF_DATA_TYPE_DATE			= 0x0b,
+		AMF_DATA_TYPE_LONG_STRING	= 0x0c,
+		AMF_DATA_TYPE_UNSUPPORTED	= 0x0d,
+	};
+
+	struct AMF0 {
+		AMF_DATA_TYPE type;
+		CString	name;
+		CString value_s;
+		double	value_d;
+		bool	value_b;
+
+		AMF0() {
+			type	= AMF_DATA_TYPE_EMPTY;
+			value_d	= 0;
+			value_b	= 0;
+		}
+
+		operator CString() const {
+			return value_s;
+		}
+		operator double() const {
+			return value_d;
+		}
+		operator bool() const {
+			return value_b;
+		}
+	};
+
+	struct SyncPoint {
+		REFERENCE_TIME rt;
+		__int64 fp;
+	};
+	CAtlArray<SyncPoint> m_sps;
+
+	CString AMF0GetString(CBaseSplitterFileEx* pFile, UINT64 end);
+	bool ParseAMF0(CBaseSplitterFileEx* pFile, UINT64 end, const CString key, CAtlArray<AMF0> &AMF0Array);
+
 protected:
 	CAutoPtr<CBaseSplitterFileEx> m_pFile;
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
@@ -91,6 +140,9 @@ public:
 	// CBaseFilter
 	STDMETHODIMP_(HRESULT) QueryFilterInfo(FILTER_INFO* pInfo);
 
+	// IKeyFrameInfo
+	STDMETHODIMP_(HRESULT) GetKeyFrameCount(UINT& nKFs);
+	STDMETHODIMP_(HRESULT) GetKeyFrames(const GUID* pFormat, REFERENCE_TIME* pKFs, UINT& nKFs);
 };
 
 class __declspec(uuid("C9ECE7B3-1D8E-41F5-9F24-B255DF16C087"))

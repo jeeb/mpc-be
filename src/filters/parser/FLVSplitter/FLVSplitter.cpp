@@ -59,139 +59,11 @@
 #define FLV_VIDEO_SCREEN2 6 // Screen video version 2
 #define FLV_VIDEO_AVC     7 // AVC
 
-enum AMF_DATA_TYPE {
-	AMF_DATA_TYPE_EMPTY			= -1,
-	AMF_DATA_TYPE_NUMBER		= 0x00,
-	AMF_DATA_TYPE_BOOL			= 0x01,
-	AMF_DATA_TYPE_STRING		= 0x02,
-	AMF_DATA_TYPE_OBJECT		= 0x03,
-	AMF_DATA_TYPE_NULL			= 0x05,
-	AMF_DATA_TYPE_UNDEFINED		= 0x06,
-	AMF_DATA_TYPE_REFERENCE		= 0x07,
-	AMF_DATA_TYPE_MIXEDARRAY	= 0x08,
-	AMF_DATA_TYPE_ARRAY			= 0x0a,
-	AMF_DATA_TYPE_DATE			= 0x0b,
-	AMF_DATA_TYPE_LONG_STRING	= 0x0c,
-	AMF_DATA_TYPE_UNSUPPORTED	= 0x0d,
-};
+#define AMF_END_OF_OBJECT			0x09
 
-#define AMF_END_OF_OBJECT		0x09
-
-struct AMF0 {
-	AMF_DATA_TYPE type;
-	CString	name;
-	CString value_s;
-	double	value_d;
-	bool	value_b;
-
-	AMF0() {
-		type	= AMF_DATA_TYPE_EMPTY;
-		value_d	= 0;
-		value_b	= 0;
-	}
-
-	operator CString() const {
-		return value_s;
-	}
-	operator double() const {
-		return value_d;
-	}
-	operator bool() const {
-		return value_b;
-	}
-};
-
-static double int64toDouble(__int64 value)
-{
-	union
-	{
-		__int64	i;
-		double	f;
-	} intfloat64;
-	
-	intfloat64.i = value;
-
-	return intfloat64.f;
-}
-
-static bool ParseAMF0(CBaseSplitterFileEx* pFile, UINT64 end, const char *key, CAtlArray<AMF0> &AMF0Array)
-{
-	if (UINT64(pFile->GetPos()) >= (end - 2)) {
-		return false;
-	}
-
-	AMF0 amf0;
-	char name[65535];
-
-	AMF_DATA_TYPE amf_type = (AMF_DATA_TYPE)pFile->BitRead(8);
-
-	switch (amf_type) {
-		case AMF_DATA_TYPE_NUMBER:
-			{
-				UINT64 value = pFile->BitRead(64);
-
-				amf0.type		= amf_type;
-				amf0.name		= CString(key);
-				amf0.value_d	= int64toDouble(value);
-			}
-			break;
-		case AMF_DATA_TYPE_BOOL:
-			{
-				BYTE value = pFile->BitRead(8);
-
-				amf0.type		= amf_type;
-				amf0.name		= CString(key);
-				amf0.value_b	= !!value;
-			}
-			break;
-		case AMF_DATA_TYPE_STRING:
-			{
-				SHORT length = pFile->BitRead(16);
-				memset(name, 0, sizeof(name));
-				pFile->ByteRead((BYTE*)name, length);
-
-				amf0.type		= amf_type;
-				amf0.name		= CString(key);
-				amf0.value_s	= CString(name);
-			}
-			break;
-		case AMF_DATA_TYPE_OBJECT:
-			break; // TODO ...
-		case AMF_DATA_TYPE_NULL:
-		case AMF_DATA_TYPE_UNDEFINED:
-		case AMF_DATA_TYPE_UNSUPPORTED:
-			return true;
-        case AMF_DATA_TYPE_MIXEDARRAY:
-			{
-				pFile->BitRead(32);
-				for (;;) {
-					SHORT length = pFile->BitRead(16);
-					memset(name, 0, sizeof(name));
-					if (FAILED(pFile->ByteRead((BYTE*)name, length))) {
-						return false;
-					}
-					if (ParseAMF0(pFile, end, name, AMF0Array) == false) {
-						return false;
-					}
-				}
-
-				return (pFile->BitRead(8) == AMF_END_OF_OBJECT);
-			}
-		case AMF_DATA_TYPE_ARRAY:
-			break; // TODO ...
-		case AMF_DATA_TYPE_DATE:
-			pFile->Seek(pFile->GetPos() + 8 + 2);
-			return true;
-	}
-
-	if (amf0.type != AMF_DATA_TYPE_EMPTY) {
-		AMF0Array.Add(amf0);
-		return true;
-	}
-
-	return false;
-}
-
+#define KEYFRAMES_TAG				L"keyframes"
+#define KEYFRAMES_TIMESTAMP_TAG		L"times"
+#define KEYFRAMES_BYTEOFFSET_TAG	L"filepositions"
 
 #ifdef REGISTER_FILTER
 
@@ -272,6 +144,146 @@ STDMETHODIMP CFLVSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 	}
 
 	return S_OK;
+}
+
+static double int64toDouble(__int64 value)
+{
+	union
+	{
+		__int64	i;
+		double	f;
+	} intfloat64;
+	
+	intfloat64.i = value;
+
+	return intfloat64.f;
+}
+
+CString CFLVSplitterFilter::AMF0GetString(CBaseSplitterFileEx* pFile, UINT64 end)
+{
+	char name[256] = {0};
+
+	SHORT length = pFile->BitRead(16);
+	if (UINT64(pFile->GetPos() + length) > end) {
+		return L"";
+	}
+
+	memset(name, 0, sizeof(name));
+	pFile->ByteRead((BYTE*)name, length);
+
+	return CString(name);
+}
+
+bool CFLVSplitterFilter::ParseAMF0(CBaseSplitterFileEx* pFile, UINT64 end, const CString key, CAtlArray<AMF0> &AMF0Array)
+{
+	if (UINT64(pFile->GetPos()) >= (end - 2)) {
+		return false;
+	}
+
+	AMF0 amf0;
+
+	AMF_DATA_TYPE amf_type = (AMF_DATA_TYPE)pFile->BitRead(8);
+
+	switch (amf_type) {
+		case AMF_DATA_TYPE_NUMBER:
+			{
+				UINT64 value = pFile->BitRead(64);
+
+				amf0.type		= amf_type;
+				amf0.name		= key;
+				amf0.value_d	= int64toDouble(value);
+			}
+			break;
+		case AMF_DATA_TYPE_BOOL:
+			{
+				BYTE value = pFile->BitRead(8);
+
+				amf0.type		= amf_type;
+				amf0.name		= key;
+				amf0.value_b	= !!value;
+			}
+			break;
+		case AMF_DATA_TYPE_STRING:
+			{
+				amf0.type		= amf_type;
+				amf0.name		= key;
+				amf0.value_s	= AMF0GetString(pFile, end);
+			}
+			break;
+		case AMF_DATA_TYPE_OBJECT:
+			{
+				if (key == KEYFRAMES_TAG && m_sps.GetCount() == 0) {
+					CAtlArray<double> times;
+					CAtlArray<double> filepositions;
+					for (;;) {
+						CString name	= AMF0GetString(pFile, end);
+						if (name.IsEmpty()) {
+							break;
+						}
+						BYTE value		= pFile->BitRead(8);
+						if (value != AMF_DATA_TYPE_ARRAY) {
+							break;
+						}
+						WORD arraylen	= pFile->BitRead(32);
+						CAtlArray<double>* array = NULL;
+						if (name == KEYFRAMES_BYTEOFFSET_TAG) {
+							array		= &filepositions;
+						} else if (name == KEYFRAMES_TIMESTAMP_TAG) {
+							array		= &times;
+						} else {
+							break;
+						}
+
+						for (int i = 0; i < arraylen; i++) {
+							BYTE value = pFile->BitRead(8);
+							if (value != AMF_DATA_TYPE_NUMBER) {
+								break;
+							}
+							array->Add(int64toDouble(pFile->BitRead(64)));
+						}
+					}
+
+					if (times.GetCount() && times.GetCount() == filepositions.GetCount()) {
+						for (size_t i = 0; i < times.GetCount(); i++) {
+							SyncPoint sp = {REFERENCE_TIME(times[i] * UNITS), __int64(filepositions[i])};
+							m_sps.Add(sp);
+						}
+					}
+				}
+			}
+			break;
+		case AMF_DATA_TYPE_NULL:
+		case AMF_DATA_TYPE_UNDEFINED:
+		case AMF_DATA_TYPE_UNSUPPORTED:
+			return true;
+        case AMF_DATA_TYPE_MIXEDARRAY:
+			{
+				pFile->BitRead(32);
+				for (;;) {
+					CString name = AMF0GetString(pFile, end);
+					if (name.IsEmpty()) {
+						return false;
+					}
+					if (ParseAMF0(pFile, end, name, AMF0Array) == false) {
+						return false;
+					}
+				}
+
+				return (pFile->BitRead(8) == AMF_END_OF_OBJECT);
+			}
+		case AMF_DATA_TYPE_ARRAY:
+			break; // TODO ...
+		case AMF_DATA_TYPE_DATE:
+			pFile->Seek(pFile->GetPos() + 8 + 2);
+			return true;
+	}
+
+	if (amf0.type != AMF_DATA_TYPE_EMPTY) {
+		AMF0Array.Add(amf0);
+		return true;
+	}
+
+	return false;
 }
 
 bool CFLVSplitterFilter::ReadTag(Tag& t)
@@ -432,6 +444,8 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	REFERENCE_TIME AvgTimePerFrame	= 0;
 	REFERENCE_TIME metaDataDuration	= 0;
 
+	m_sps.RemoveAll();
+
 	for (int i = 0; i < 100 && ReadTag(t) && (fTypeFlagsVideo || fTypeFlagsAudio); i++) {
 		if (!t.DataSize) {
 			continue; // skip empty Tag
@@ -458,7 +472,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				m_pFile->ByteRead((BYTE*)name, length);
 				if (!strncmp(name, "onTextData", length) || (!strncmp(name, "onMetaData", length))) {
 					CAtlArray<AMF0> AMF0Array;
-					ParseAMF0(m_pFile, next, name, AMF0Array);
+					ParseAMF0(m_pFile, next, CString(name), AMF0Array);
 
 					for (size_t i = 0; i < AMF0Array.GetCount(); i++) {
 						if (AMF0Array[i].type == AMF_DATA_TYPE_NUMBER && AMF0Array[i].name == L"duration") {
@@ -840,7 +854,16 @@ void CFLVSplitterFilter::NormalSeek(REFERENCE_TIME rt)
 	bool fAudio = !!GetOutputPin(FLV_AUDIODATA);
 	bool fVideo = !!GetOutputPin(FLV_VIDEODATA);
 
-	__int64 pos = m_DataOffset + (__int64)(double(m_pFile->GetLength() - m_DataOffset) * rt / m_rtDuration);
+	__int64 pos	= 0;
+
+	if (m_sps.GetCount() > 1) {
+		int i	= range_bsearch(m_sps, rt);
+		pos		= i >= 0 ? m_sps[i].fp : 0;
+	}
+
+	if (!pos) {
+		__int64 pos = m_DataOffset + (__int64)(double(m_pFile->GetLength() - m_DataOffset) * rt / m_rtDuration);
+	}
 
 	if (pos > m_pFile->GetAvailable()) {
 		return;
@@ -890,6 +913,7 @@ void CFLVSplitterFilter::NormalSeek(REFERENCE_TIME rt)
 				fAudio = false;
 			} else if (t.TagType == FLV_VIDEODATA && ReadTag(vt) && vt.FrameType == 1) {
 				fVideo = false;
+				fAudio = false;
 			}
 		}
 
@@ -1022,6 +1046,32 @@ NextTag:
 	}
 
 	return true;
+}
+
+// IKeyFrameInfo
+
+STDMETHODIMP CFLVSplitterFilter::GetKeyFrameCount(UINT& nKFs)
+{
+	CheckPointer(m_pFile, E_UNEXPECTED);
+	nKFs = m_sps.GetCount();
+	return S_OK;
+}
+
+STDMETHODIMP CFLVSplitterFilter::GetKeyFrames(const GUID* pFormat, REFERENCE_TIME* pKFs, UINT& nKFs)
+{
+	CheckPointer(pFormat, E_POINTER);
+	CheckPointer(pKFs, E_POINTER);
+	CheckPointer(m_pFile, E_UNEXPECTED);
+
+	if (*pFormat != TIME_FORMAT_MEDIA_TIME) {
+		return E_INVALIDARG;
+	}
+
+	for (nKFs = 0; nKFs < m_sps.GetCount(); nKFs++) {
+		pKFs[nKFs] = m_sps[nKFs].rt;
+	}
+
+	return S_OK;
 }
 
 //
