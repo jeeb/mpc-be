@@ -6,7 +6,7 @@ MPC-BE имеет внушительный набор аудио-видео фи
 
 Поддерживаемые Операционные Системы:
 -----------------------------
-* Windows XP SP2, Vista, 7 32bit/64bit
+* Windows XP SP2, Windows Vista 32bit/64bit, Windows 7 32bit/64bit, Windows 8 32bit/64bit
 
 
 Системные Требования:
@@ -23,7 +23,7 @@ MPC-BE is based on the original Guliverkli project and "Media Player Classic Hom
 
 Supported Operating Systems:
 -----------------------------
-* Windows XP SP2, Vista, 7 32bit/64bit
+* Windows XP SP2, Windows Vista 32bit/64bit, Windows 7 32bit/64bit, Windows 8 32bit/64bit
 
 
 System Requirements:
@@ -39,6 +39,9 @@ Links:
 -------
 Project Page:        http://sourceforge.net/projects/mpcbe/
 Help and Support:    http://dev.mpc-next.ru
+Get code:            svn://mpc-next.ru/mpc-be
+Add-ons:             http://dev.mpc-next.ru/index.php/board,42.0.html
+Nightly Builds:      http://sourceforge.net/projects/mpcbe/files/MPC-BE/Nightly Builds (from svn trunk)/
 
 
 For the people involved in the development, see Authors.txt.
