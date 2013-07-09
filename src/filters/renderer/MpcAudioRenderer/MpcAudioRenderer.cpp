@@ -1854,6 +1854,21 @@ BOOL CMpcAudioRenderer::IsBitstream(WAVEFORMATEX *pWaveFormatEx)
 	return FALSE;
 }
 
+static DWORD FindClosestInArray(CSimpleArray<DWORD> array, DWORD val)
+{
+	LONG diff = abs(LONG(val - array[0]));
+	DWORD Num = array[0];
+	for (int idx = 0; idx < array.GetSize(); idx++) {
+		DWORD val1 = array[idx];
+		LONG diff1 = abs(LONG(val - array[idx]));
+		if (diff > abs(LONG(val - array[idx]))) {
+			diff = abs(LONG(val - array[idx]));
+			Num = array[idx];
+		}
+	}
+	return Num;
+}
+
 HRESULT CMpcAudioRenderer::SelectFormat(WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE& wfex)
 {
 	// first - check variables ...
@@ -1864,18 +1879,33 @@ HRESULT CMpcAudioRenderer::SelectFormat(WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE
 	}
 
 	// trying to create an output media type similar to input media type ...
-	WORD wBitsPerSample		= pwfx->wBitsPerSample;
-	if (m_wBitsPerSampleList.Find(wBitsPerSample) == -1) {
-		wBitsPerSample		= m_wBitsPerSampleList[m_wBitsPerSampleList.GetSize() - 1];
-	}
 
 	DWORD nSamplesPerSec	= pwfx->nSamplesPerSec;
+	BOOL bExists			= FALSE;
+	for (int i = 0; i < m_AudioParamsList.GetSize(); i++) {
+		if (m_AudioParamsList[i].nSamplesPerSec == nSamplesPerSec) {
+			bExists			= TRUE;
+			break;
+		}
+	}
+
+	if (!bExists) {
+		CSimpleArray<DWORD> array;
+		for (int i = 0; i < m_AudioParamsList.GetSize(); i++) {
+			if (array.Find(m_AudioParamsList[i].nSamplesPerSec) == -1) {
+				array.Add(m_AudioParamsList[i].nSamplesPerSec);
+			}
+		}
+		nSamplesPerSec		= FindClosestInArray(array, nSamplesPerSec);
+	}
+
+	WORD wBitsPerSample		= pwfx->wBitsPerSample;
 	AudioParams ap(wBitsPerSample, nSamplesPerSec);
 	if (m_AudioParamsList.Find(ap) == -1) {
-		nSamplesPerSec		= 0;
+		wBitsPerSample		= 0;
 		for (int i = m_AudioParamsList.GetSize() - 1; i >= 0; i--) {
-			if (m_AudioParamsList[i].wBitsPerSample == wBitsPerSample) {
-				nSamplesPerSec = m_AudioParamsList[i].nSamplesPerSec;
+			if (m_AudioParamsList[i].nSamplesPerSec == nSamplesPerSec) {
+				wBitsPerSample = m_AudioParamsList[i].wBitsPerSample;
 				break;
 			}
 		}
