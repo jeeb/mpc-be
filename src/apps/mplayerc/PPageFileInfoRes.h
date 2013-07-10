@@ -54,6 +54,9 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
+	virtual BOOL OnSetActive();
+	virtual LRESULT OnSetPageFocus(WPARAM wParam, LPARAM lParam);
+
 	DECLARE_MESSAGE_MAP()
 	CRect  m_rCrt;
 public:

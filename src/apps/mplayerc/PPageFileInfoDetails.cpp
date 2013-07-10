@@ -256,6 +256,8 @@ LRESULT CPPageFileInfoDetails::OnSetPageFocus(WPARAM wParam, LPARAM lParam)
 	CPropertySheet* psheet = (CPropertySheet*) GetParent();
 	psheet->GetTabControl()->SetFocus();
 
+	SendDlgItemMessage(IDC_EDIT1, EM_SETSEL, 0, 1);
+
 	return 0;
 }
 

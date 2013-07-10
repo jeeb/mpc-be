@@ -198,7 +198,6 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 BOOL CPPageFileInfoClip::OnSetActive()
 {
 	BOOL ret = __super::OnSetActive();
-
 	PostMessage(SETPAGEFOCUS, 0, 0L);
 
 	return ret;
@@ -208,6 +207,8 @@ LRESULT CPPageFileInfoClip::OnSetPageFocus(WPARAM wParam, LPARAM lParam)
 {
 	CPropertySheet* psheet = (CPropertySheet*) GetParent();
 	psheet->GetTabControl()->SetFocus();
+
+	SendDlgItemMessage(IDC_EDIT1, EM_SETSEL, 0, 1);
 
 	return 0;
 }

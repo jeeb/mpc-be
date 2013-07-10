@@ -51,10 +51,12 @@ void CPPageFileInfoRes::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LIST1, m_list);
 }
 
+#define SETPAGEFOCUS WM_APP+252 // arbitrary number, can be changed if necessary
 BEGIN_MESSAGE_MAP(CPPageFileInfoRes, CPPageBase)
 	ON_WM_SIZE()
 	ON_BN_CLICKED(IDC_BUTTON1, OnSaveAs)
 	ON_UPDATE_COMMAND_UI(IDC_BUTTON1, OnUpdateSaveAs)
+	ON_MESSAGE(SETPAGEFOCUS, OnSetPageFocus)
 END_MESSAGE_MAP()
 
 // CPPageFileInfoRes message handlers
@@ -191,4 +193,22 @@ void CPPageFileInfoRes::OnSize(UINT nType, int cx, int cy)
 		}
 	}
 	::EndDeferWindowPos(hDWP);
+}
+
+BOOL CPPageFileInfoRes::OnSetActive()
+{
+	BOOL ret = __super::OnSetActive();
+	PostMessage(SETPAGEFOCUS, 0, 0L);
+
+	return ret;
+}
+
+LRESULT CPPageFileInfoRes::OnSetPageFocus(WPARAM wParam, LPARAM lParam)
+{
+	CPropertySheet* psheet = (CPropertySheet*) GetParent();
+	psheet->GetTabControl()->SetFocus();
+
+	SendDlgItemMessage(IDC_EDIT1, EM_SETSEL, 0, 1);
+
+	return 0;
 }
