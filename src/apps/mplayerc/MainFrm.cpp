@@ -4525,13 +4525,16 @@ void CMainFrame::OnStreamSub(UINT nID)
 			subcnt++;
 		}
 		while (pos) {
-			subcnt += m_pSubStreams.GetNext(pos)->GetStreamCount();
-			ss.iFilter	= 2;
-			ss.iIndex	= subcnt;
-			ss.iNum++;
-			if (m_iSubtitleSel == subcnt) iSel = MixSS.GetCount();
-			ss.iSel		= iSel;
-			MixSS.Add(ss);
+			CComPtr<ISubStream> pSubStream = m_pSubStreams.GetNext(pos);
+			for (int i = 0; i < pSubStream->GetStreamCount(); i++) {
+				subcnt++;
+				ss.iFilter	= 2;
+				ss.iIndex	= subcnt;
+				ss.iNum++;
+				if (m_iSubtitleSel == subcnt) iSel = MixSS.GetCount();
+				ss.iSel		= iSel;
+				MixSS.Add(ss);
+			}
 		}
 
 		int cnt = MixSS.GetCount();
@@ -14018,7 +14021,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			tPos++;
 			if (!pSubStream) continue;
 		
-			for (int i=0; i<pSubStream->GetStreamCount(); i++) {
+			for (int i = 0; i < pSubStream->GetStreamCount(); i++) {
 				WCHAR* pName = NULL;
 				LCID lcid;
 				if (SUCCEEDED(pSubStream->GetStreamInfo(i, &pName, &lcid))) {
@@ -14027,7 +14030,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 					substream.Extsub	= true;
 					substream.iFilter	= 2;
 					substream.iNum		= iNum++;
-					substream.iIndex	= tPos+ (extcnt<0?0:extcnt+1);
+					substream.iIndex	= tPos+ (extcnt<0 ? 0 : extcnt+1);
 
 					bool Forced, Def;
 					SubFlags(name, &Forced, &Def);
@@ -15584,18 +15587,21 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 		pos = m_pSubStreams.GetHeadPosition();
 		CComPtr<ISubStream> pSubStream;
 		int tPos = -1;
-		if (splcnt>0 && pos) {
+		if (splcnt > 0 && pos) {
 			pSubStream = m_pSubStreams.GetNext(pos);
 			tPos++;
 		}
 		
 		while (pos) {
 			pSubStream = m_pSubStreams.GetNext(pos);
-			tPos++;
-			if (!pSubStream) continue;
+			if (!pSubStream) {
+				continue;
+			}
 			//bool sep = false;
 		
-			for (int i = 0; i< pSubStream->GetStreamCount(); i++) {
+			for (int i = 0; i < pSubStream->GetStreamCount(); i++) {
+				tPos++;
+
 				WCHAR* pName = NULL;
 				if (SUCCEEDED(pSubStream->GetStreamInfo(i, &pName, NULL))) {
 					CString name(pName);
@@ -15611,7 +15617,9 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 					if (m_iSubtitleSel == tPos) {
 						flags |= MF_CHECKED|MFT_RADIOCHECK;
 					}
-					if (cntintsub <= intsub) name = _T("* ") + name;
+					if (cntintsub <= intsub) {
+						name = _T("* ") + name;
+					}
 					pSub->AppendMenu(flags, id++, name);
 					intsub++;
 					CoTaskMemFree(pName);
@@ -15622,7 +15630,9 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 						flags |= MF_CHECKED|MFT_RADIOCHECK;
 					}
 					CString sname;
-					if (cntintsub <= intsub) sname = _T("* ") + ResStr(IDS_AG_UNKNOWN);
+					if (cntintsub <= intsub) {
+						sname = _T("* ") + ResStr(IDS_AG_UNKNOWN);
+					}
 					pSub->AppendMenu(flags, id++, sname);
 					intsub++;
 				}
@@ -16790,7 +16800,7 @@ void CMainFrame::UpdateSubtitle(bool fDisplayMessage, bool fApplyDefStyle)
 
 			if (fDisplayMessage) {
 				WCHAR* pName = NULL;
-				if (SUCCEEDED(pSubStream->GetStreamInfo(0, &pName, NULL))) {
+				if (SUCCEEDED(pSubStream->GetStreamInfo(i, &pName, NULL))) {
 					CString	strMessage;
 					strMessage.Format(ResStr(IDS_SUBTITLE_STREAM), pName);
 					m_OSD.DisplayMessage (OSD_TOPLEFT, strMessage);
