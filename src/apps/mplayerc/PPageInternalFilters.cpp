@@ -366,6 +366,7 @@ void CPPageInternalFilters::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_TAB1, m_Tab);
 	DDX_Control(pDX, IDC_BUTTON5, m_btnAviCfg);
 	DDX_Control(pDX, IDC_BUTTON1, m_btnMpegCfg);
+	DDX_Control(pDX, IDC_BUTTON6, m_btnMatroskaCfg);
 	DDX_Control(pDX, IDC_BUTTON2, m_btnVideoCfg);
 	DDX_Control(pDX, IDC_BUTTON3, m_btnMPEG2Cfg);
 	DDX_Control(pDX, IDC_BUTTON4, m_btnAudioCfg);
@@ -381,6 +382,7 @@ BEGIN_MESSAGE_MAP(CPPageInternalFilters, CPPageBase)
 	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB1, &CPPageInternalFilters::OnTcnSelchangeTab1)
 	ON_BN_CLICKED(IDC_BUTTON5, OnAviSplitterConfig)
 	ON_BN_CLICKED(IDC_BUTTON1, OnMpegSplitterConfig)
+	ON_BN_CLICKED(IDC_BUTTON6, OnMatroskaSplitterConfig)
 	ON_BN_CLICKED(IDC_BUTTON2, OnVideoDecConfig)
 	ON_BN_CLICKED(IDC_BUTTON3, OnMPEG2DecConfig)
 	ON_BN_CLICKED(IDC_BUTTON4, OnAudioDecConfig)
@@ -458,6 +460,8 @@ BOOL CPPageInternalFilters::OnInitDialog()
 	SetClassLongPtr(GetDlgItem(IDC_BUTTON2)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
 	SetClassLongPtr(GetDlgItem(IDC_BUTTON3)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
 	SetClassLongPtr(GetDlgItem(IDC_BUTTON4)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
+	SetClassLongPtr(GetDlgItem(IDC_BUTTON5)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
+	SetClassLongPtr(GetDlgItem(IDC_BUTTON6)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
 
 	UpdateData(FALSE);
 
@@ -545,6 +549,7 @@ void CPPageInternalFilters::OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
 
 			m_btnAviCfg.ShowWindow(SW_SHOW);
 			m_btnMpegCfg.ShowWindow(SW_SHOW);
+			m_btnMatroskaCfg.ShowWindow(SW_SHOW);
 			m_btnVideoCfg.ShowWindow(SW_HIDE);
 			m_btnMPEG2Cfg.ShowWindow(SW_HIDE);
 			m_btnAudioCfg.ShowWindow(SW_HIDE);
@@ -556,6 +561,7 @@ void CPPageInternalFilters::OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
 
 			m_btnAviCfg.ShowWindow(SW_HIDE);
 			m_btnMpegCfg.ShowWindow(SW_HIDE);
+			m_btnMatroskaCfg.ShowWindow(SW_HIDE);
 			m_btnVideoCfg.ShowWindow(SW_SHOW);
 			m_btnMPEG2Cfg.ShowWindow(SW_SHOW);
 			m_btnAudioCfg.ShowWindow(SW_HIDE);
@@ -567,6 +573,7 @@ void CPPageInternalFilters::OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
 
 			m_btnAviCfg.ShowWindow(SW_HIDE);
 			m_btnMpegCfg.ShowWindow(SW_HIDE);
+			m_btnMatroskaCfg.ShowWindow(SW_HIDE);
 			m_btnVideoCfg.ShowWindow(SW_HIDE);
 			m_btnMPEG2Cfg.ShowWindow(SW_HIDE);
 			m_btnAudioCfg.ShowWindow(SW_SHOW);
@@ -586,6 +593,11 @@ void CPPageInternalFilters::OnAviSplitterConfig()
 void CPPageInternalFilters::OnMpegSplitterConfig()
 {
 	ShowPPage(CreateInstance<CMpegSplitterFilter>);
+}
+
+void CPPageInternalFilters::OnMatroskaSplitterConfig()
+{
+	ShowPPage(CreateInstance<CMatroskaSplitterFilter>);
 }
 
 void CPPageInternalFilters::OnVideoDecConfig()

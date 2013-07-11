@@ -291,13 +291,14 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"Anti-Aliasing"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 15
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 16
 6		"Wenn Sie die Standalone-Version eines Filters, oder einen anderen externen Filter verwenden möchten, haken Sie ihn hier nicht an. Eigenschaften der fett gedruckten Filter können durch einen Doppel-Klick angezeigt werden."
 10		"AVI Splitter\nEinstellungen"
 11		"MPEG Splitter\nEinstellungen"
 12		"Video Dekoder\nEinstellungen"
 13		"MPEG-2 Dekoder\nEinstellungen"
 14		"Audio Dekoder\nEinstellungen"
+15		"Matroska Splitter\nconfiguration"
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
@@ -1562,6 +1563,7 @@ STRING IDS_MAINFRM_DIR_CHECK		"Unterverzeichnis einbeziehen"
 STRING IDS_MAINFRM_DIR_TITLE		"Verzeichnis auswählen"
 STRING IDS_MAINFRM_PPOFFSCR		"Post-Resize Pixel Shaders: ausgeschalten"
 STRING IDS_MAINFRM_PPONSCR		"Post-Resize Pixel Shaders: eingeschalten"
+STRING IDS_MATROSKAPLITTER_LOAD_EMBEDDED_FONTS		"Load Embedded Fonts"
 STRING IDS_MB_SHOW_EDL_EDITOR		"Wollen Sie den EDL Editor aktivieren?"
 STRING IDS_MENU_VIDEO_ANGLE		"Video Blickwinkel"
 STRING IDS_MENU_VIDEO_STREAM		"Video S&tream"

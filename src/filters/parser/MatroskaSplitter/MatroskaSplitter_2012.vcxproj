@@ -220,6 +220,7 @@
     </ClCompile>
     <ClCompile Include="MatroskaFile.cpp" />
     <ClCompile Include="MatroskaSplitter.cpp" />
+    <ClCompile Include="MatroskaSplitterSettingsWnd.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -228,8 +229,10 @@
     <None Include="MatroskaSplitter.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="IMatroskaSplitter.h" />
     <ClInclude Include="MatroskaFile.h" />
     <ClInclude Include="MatroskaSplitter.h" />
+    <ClInclude Include="MatroskaSplitterSettingsWnd.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>

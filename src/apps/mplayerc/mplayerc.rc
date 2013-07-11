@@ -745,6 +745,7 @@ BEGIN
     PUSHBUTTON      "Video decoder\nconfiguration",IDC_BUTTON2,220,47,70,25,BS_MULTILINE
     PUSHBUTTON      "MPEG-2 decoder\nconfiguration",IDC_BUTTON3,220,77,70,25,BS_MULTILINE
     PUSHBUTTON      "Audio decoder\nconfiguration",IDC_BUTTON4,220,47,70,25,BS_MULTILINE
+    PUSHBUTTON      "Matroska Splitter\nconfiguration",IDC_BUTTON6,220,107,70,25,BS_MULTILINE
 END
 
 IDD_PPAGEFILTERSPERFORMANCE DIALOGEX 0, 0, 296, 241
@@ -3494,6 +3495,7 @@ BEGIN
     IDS_FILTER_SETTINGS_CAPTION     "Settings"
     IDS_AVISPLITTER_NON_INTERLEAVED "Support ""Bad"" Interleaved files"
     IDS_AVISPLITTER_REINDEX_BROKEN  "Reindex broken files"
+    IDS_MATROSKAPLITTER_LOAD_EMBEDDED_FONTS "Load Embedded Fonts"
 END
 
 #endif    // English (United States) resources

@@ -291,13 +291,14 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"Anti-aliasing"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 15
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 16
 6		"If you would like to use the stand-alone version from these filters or a some other replacement, disable them here. Filters written in bold can be double-clicked to show their property pages."
 10		"AVI Splitter\nconfiguration"
 11		"MPEG Splitter\nconfiguration"
 12		"Video decoder\nconfiguration"
 13		"MPEG-2 decoder\nconfiguration"
 14		"Audio decoder\nconfiguration"
+15		"Matroska Splitter\nconfiguration"
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
@@ -1562,6 +1563,7 @@ STRING IDS_MAINFRM_DIR_CHECK		"Azpizuzenbideak barne"
 STRING IDS_MAINFRM_DIR_TITLE		"Hautatu Zuzenbidea"
 STRING IDS_MAINFRM_PPOFFSCR		"Birneurriratze-Ondorengo Pixel Itzalak: etenda"
 STRING IDS_MAINFRM_PPONSCR		"Birneurriratze-Ondorengo Pixel Itzalak: eraginda"
+STRING IDS_MATROSKAPLITTER_LOAD_EMBEDDED_FONTS		"Load Embedded Fonts"
 STRING IDS_MB_SHOW_EDL_EDITOR		"EDL editatzailea eragitea nahi duzu?"
 STRING IDS_MENU_VIDEO_ANGLE		"Bideo &Angelua"
 STRING IDS_MENU_VIDEO_STREAM		"Bideo &Jarioa"

@@ -26,6 +26,7 @@
 #include <atlbase.h>
 #include <atlcoll.h>
 #include "MatroskaFile.h"
+#include "MatroskaSplitterSettingsWnd.h"
 #include "../BaseSplitter/BaseSplitter.h"
 #include <ITrackInfo.h>
 
@@ -77,13 +78,21 @@ public:
 };
 
 class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
-	CMatroskaSplitterFilter : public CBaseSplitterFilter, public ITrackInfo
+	CMatroskaSplitterFilter
+	: public CBaseSplitterFilter
+	, public ITrackInfo
+	, public IMatroskaSplitterFilter
+	, public ISpecifyPropertyPages2
 {
 	void SetupChapters(LPCSTR lng, MatroskaReader::ChapterAtom* parent, int level = 0);
 	void InstallFonts();
 	void SendVorbisHeaderSample();
 
 	CAutoPtr<MatroskaReader::CMatroskaNode> m_pSegment, m_pCluster, m_pBlock;
+
+private:
+	CCritSec m_csProps;
+	bool m_bLoadEmbeddedFonts;
 
 protected:
 	CAutoPtr<MatroskaReader::CMatroskaFile> m_pFile;
@@ -123,6 +132,17 @@ public:
 	STDMETHODIMP_(BSTR) GetTrackCodecName(UINT aTrackIdx);
 	STDMETHODIMP_(BSTR) GetTrackCodecInfoURL(UINT aTrackIdx);
 	STDMETHODIMP_(BSTR) GetTrackCodecDownloadURL(UINT aTrackIdx);
+
+	// ISpecifyPropertyPages2
+
+	STDMETHODIMP GetPages(CAUUID* pPages);
+	STDMETHODIMP CreatePage(const GUID& guid, IPropertyPage** ppPage);
+
+	// IMatroskaSplitterFilter
+	STDMETHODIMP Apply();
+
+	STDMETHODIMP SetLoadEmbeddedFonts(BOOL nValue);
+	STDMETHODIMP_(BOOL) GetLoadEmbeddedFonts();
 };
 
 class __declspec(uuid("0A68C3B5-9164-4a54-AFAF-995B2FF0E0D4"))

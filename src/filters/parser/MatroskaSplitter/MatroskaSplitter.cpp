@@ -34,6 +34,11 @@
 #include <basestruct.h>
 #include <vector>
 
+// option names
+#define OPT_REGKEY_MATROSKASplit	_T("Software\\MPC-BE Filters\\Matroska Splitter")
+#define OPT_SECTION_MATROSKASplit	_T("Filters\\Matroska Splitter")
+#define OPT_LoadEmbeddedFonts		_T("LoadEmbeddedFonts")
+
 using namespace MatroskaReader;
 
 #ifdef REGISTER_FILTER
@@ -90,7 +95,21 @@ CFilterApp theApp;
 
 CMatroskaSplitterFilter::CMatroskaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("CMatroskaSplitterFilter"), pUnk, phr, __uuidof(this))
+	, m_bLoadEmbeddedFonts(true)
 {
+#ifdef REGISTER_FILTER
+	CRegKey key;
+
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, OPT_REGKEY_MATROSKASplit, KEY_READ)) {
+		DWORD dw;
+
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_LoadEmbeddedFonts, dw)) {
+			m_bLoadEmbeddedFonts = !!dw;
+		}
+	}
+#else
+	m_bLoadEmbeddedFonts = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MATROSKASplit, OPT_LoadEmbeddedFonts, m_bLoadEmbeddedFonts);
+#endif
 }
 
 CMatroskaSplitterFilter::~CMatroskaSplitterFilter()
@@ -103,6 +122,9 @@ STDMETHODIMP CMatroskaSplitterFilter::NonDelegatingQueryInterface(REFIID riid, v
 
 	return
 		QI(ITrackInfo)
+		QI(IMatroskaSplitterFilter)
+		QI(ISpecifyPropertyPages)
+		QI(ISpecifyPropertyPages2)
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
 
@@ -852,7 +874,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mts.Add(mt);
 				}
 			} else if (pTE->TrackType == TrackEntry::TypeSubtitle) {
-				if (iSubtitle == 1) {
+				if (iSubtitle == 1 && m_bLoadEmbeddedFonts) {
 					InstallFonts();
 				}
 
@@ -1818,4 +1840,62 @@ STDMETHODIMP_(BSTR) CMatroskaSplitterFilter::GetTrackCodecDownloadURL(UINT aTrac
 		return NULL;
 	}
 	return pTE->CodecDownloadURL.AllocSysString();
+}
+
+// ISpecifyPropertyPages2
+
+STDMETHODIMP CMatroskaSplitterFilter::GetPages(CAUUID* pPages)
+{
+	CheckPointer(pPages, E_POINTER);
+
+	pPages->cElems = 1;
+	pPages->pElems = (GUID*)CoTaskMemAlloc(sizeof(GUID) * pPages->cElems);
+	pPages->pElems[0] = __uuidof(CMatroskaSplitterSettingsWnd);
+
+	return S_OK;
+}
+
+STDMETHODIMP CMatroskaSplitterFilter::CreatePage(const GUID& guid, IPropertyPage** ppPage)
+{
+	CheckPointer(ppPage, E_POINTER);
+
+	if (*ppPage != NULL) {
+		return E_INVALIDARG;
+	}
+
+	HRESULT hr;
+
+	if (guid == __uuidof(CMatroskaSplitterSettingsWnd)) {
+		(*ppPage = DNew CInternalPropertyPageTempl<CMatroskaSplitterSettingsWnd>(NULL, &hr))->AddRef();
+	}
+
+	return *ppPage ? S_OK : E_FAIL;
+}
+
+// IMpegSplitterFilter
+STDMETHODIMP CMatroskaSplitterFilter::Apply()
+{
+#ifdef REGISTER_FILTER
+	CRegKey key;
+	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_MATROSKASplit)) {
+		key.SetDWORDValue(OPT_LoadEmbeddedFonts, m_bLoadEmbeddedFonts);
+	}
+#else
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MATROSKASplit, OPT_LoadEmbeddedFonts, m_bLoadEmbeddedFonts);
+#endif
+
+	return S_OK;
+}
+
+STDMETHODIMP CMatroskaSplitterFilter::SetLoadEmbeddedFonts(BOOL nValue)
+{
+	CAutoLock cAutoLock(&m_csProps);
+	m_bLoadEmbeddedFonts = !!nValue;
+	return S_OK;
+}
+
+STDMETHODIMP_(BOOL) CMatroskaSplitterFilter::GetLoadEmbeddedFonts()
+{
+	CAutoLock cAutoLock(&m_csProps);
+	return m_bLoadEmbeddedFonts;
 }

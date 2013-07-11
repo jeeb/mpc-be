@@ -58,6 +58,11 @@ BEGIN
     END
 END
 
+STRINGTABLE
+BEGIN
+    IDS_FILTER_SETTINGS_CAPTION     "Settings"
+    IDS_MATROSKAPLITTER_LOAD_EMBEDDED_FONTS "Load Embedded Fonts"
+END
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
