@@ -55,6 +55,7 @@ enum SOURCE_FILTER {
 	SRC_MPAC,
 	SRC_AMR,
 	SRC_TTA,
+	SRC_UDP,
 
 	SRC_LAST
 };

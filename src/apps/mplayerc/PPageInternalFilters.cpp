@@ -53,6 +53,7 @@ static filter_t s_filters[] = {
 	{_T("SHOUTcast"),             SOURCE_FILTER,  SOURCE, SRC_SHOUTCAST,  0},
 	{_T("TTA"),                   SOURCE_FILTER,  SOURCE, SRC_TTA,        0},
 	{_T("WavPack"),               SOURCE_FILTER,  SOURCE, SRC_WPAC,       0},
+	{_T("UDP"),                   SOURCE_FILTER,  SOURCE, SRC_UDP,        0},
 
 	// Audio decoder
 	{_T("AAC"),                   FFMPEG_DECODER, AUDIO,  FFM_AAC,        IDS_TRA_FFMPEG,},

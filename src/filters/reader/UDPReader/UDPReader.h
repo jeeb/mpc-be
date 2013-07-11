@@ -59,6 +59,8 @@ private:
 	enum {CMD_EXIT, CMD_RUN};
 	DWORD ThreadProc();
 
+	void CheckBuffer();
+
 public:
 	CUDPStream();
 	virtual ~CUDPStream();

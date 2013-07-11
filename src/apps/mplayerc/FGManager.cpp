@@ -1620,8 +1620,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_source.AddTail(pFGF);
 	}
 
-	// if (src[SRC_UDP])
-	if (!IsPreview) {
+	if (src[SRC_UDP] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CUDPReader>();
 		pFGF->m_protocols.AddTail(_T("udp"));
 		m_source.AddTail(pFGF);
