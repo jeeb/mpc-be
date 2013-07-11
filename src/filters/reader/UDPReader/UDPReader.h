@@ -48,9 +48,10 @@ private:
 	int m_port;
 	CString m_ip;
 	SOCKET m_socket;
+	sockaddr_in m_addr;
+	WSAEVENT m_WSAEvent[1];
 	GUID m_subtype;
 	__int64 m_pos, m_len;
-	bool m_drop;
 	CAtlList<packet_t*> m_packets;
 
 	void Clear();

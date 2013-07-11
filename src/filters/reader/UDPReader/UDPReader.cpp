@@ -150,6 +150,8 @@ CUDPStream::CUDPStream()
 	m_port = 0;
 	m_socket = INVALID_SOCKET;
 	m_subtype = MEDIASUBTYPE_NULL;
+
+	m_WSAEvent[0] = NULL;
 }
 
 CUDPStream::~CUDPStream()
@@ -159,6 +161,10 @@ CUDPStream::~CUDPStream()
 
 void CUDPStream::Clear()
 {
+	if (m_WSAEvent[0] != NULL) {
+		WSACloseEvent(m_WSAEvent[0]);
+	}
+
 	if (m_socket != INVALID_SOCKET) {
 		closesocket(m_socket);
 		m_socket = INVALID_SOCKET;
@@ -176,7 +182,6 @@ void CUDPStream::Clear()
 	}
 
 	m_pos = m_len = 0;
-	m_drop = false;
 }
 
 void CUDPStream::Append(BYTE* buff, int len)
@@ -213,6 +218,79 @@ bool CUDPStream::Load(const WCHAR* fnw)
 
 	if (sl.GetCount() != 2 || FAILED(GUIDFromCString(CString(sl.GetTail()), m_subtype))) {
 		m_subtype = MEDIASUBTYPE_NULL; // TODO: detect subtype
+	}
+
+	WSADATA wsaData;
+	WSAStartup(MAKEWORD(2, 2), &wsaData);
+
+	memset(&m_addr, 0, sizeof(m_addr));
+	m_addr.sin_family		= AF_INET;
+	m_addr.sin_port			= htons((u_short)m_port);
+	m_addr.sin_addr.s_addr	= htonl(INADDR_ANY);
+
+	ip_mreq imr;
+	imr.imr_multiaddr.s_addr	= inet_addr(CStringA(m_ip));
+	imr.imr_interface.s_addr	= INADDR_ANY;
+
+	if ((m_socket = socket(AF_INET, SOCK_DGRAM, 0)) != INVALID_SOCKET) {
+		m_WSAEvent[0] = WSACreateEvent();
+		WSAEventSelect(m_socket, m_WSAEvent[0], FD_READ);
+
+		DWORD dw = TRUE;
+		if (setsockopt(m_socket, SOL_SOCKET, SO_REUSEADDR, (const char*)&dw, sizeof(dw)) == SOCKET_ERROR) {
+			closesocket(m_socket);
+			m_socket = INVALID_SOCKET;
+		}
+
+		if (bind(m_socket, (struct sockaddr*)&m_addr, sizeof(m_addr)) == SOCKET_ERROR) {
+			closesocket(m_socket);
+			m_socket = INVALID_SOCKET;
+		}
+
+		if (IN_MULTICAST(htonl(imr.imr_multiaddr.s_addr))) {
+			int ret = setsockopt(m_socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char*)&imr, sizeof(imr));
+			if (ret < 0) {
+				closesocket(m_socket);
+				m_socket = INVALID_SOCKET;
+			}
+		}
+
+		dw = MAXBUFSIZE;
+		if (setsockopt(m_socket, SOL_SOCKET, SO_RCVBUF, (const char*)&dw, sizeof(dw)) == SOCKET_ERROR) {
+			;
+		}
+
+		// set non-blocking mode
+		u_long param = 1;
+		int res = ioctlsocket(m_socket, FIONBIO, &param);
+	}
+
+	if (m_socket == INVALID_SOCKET) {
+		return false;
+	}
+
+	UINT timeout = 0;
+	while (timeout < 500) {
+		int res = WSAWaitForMultipleEvents(1, m_WSAEvent, FALSE, 100, FALSE);
+		if (res == WSA_WAIT_EVENT_0) {
+			int fromlen = sizeof(m_addr);
+			char buf[MAXBUFSIZE];
+			int len = recvfrom(m_socket, buf, MAXBUFSIZE, 0, (SOCKADDR*)&m_addr, &fromlen);
+			if (len <= 0) {
+				timeout += 100;
+				continue;
+			}
+			break;
+		} else {
+			timeout += 100;
+			continue;
+		}
+
+		break;
+	}
+
+	if (timeout == 500) {
+		return false;
 	}
 
 	CAMThread::Create();
@@ -325,50 +403,6 @@ void CUDPStream::CheckBuffer()
 
 DWORD CUDPStream::ThreadProc()
 {
-	WSADATA wsaData;
-	WSAStartup(MAKEWORD(2, 2), &wsaData);
-
-	sockaddr_in addr;
-	memset(&addr, 0, sizeof(addr));
-	addr.sin_family			= AF_INET;
-	addr.sin_port			= htons((u_short)m_port);
-	addr.sin_addr.s_addr	= htonl(INADDR_ANY);
-
-	ip_mreq imr;
-	imr.imr_multiaddr.s_addr	= inet_addr(CStringA(m_ip));
-	imr.imr_interface.s_addr	= INADDR_ANY;
-
-	if ((m_socket = socket(AF_INET, SOCK_DGRAM, 0)) != INVALID_SOCKET) {
-		DWORD dw = TRUE;
-		if (setsockopt(m_socket, SOL_SOCKET, SO_REUSEADDR, (const char*)&dw, sizeof(dw)) == SOCKET_ERROR) {
-			closesocket(m_socket);
-			m_socket =  INVALID_SOCKET;
-		}
-
-		if (bind(m_socket, (struct sockaddr*)&addr, sizeof(addr)) == SOCKET_ERROR) {
-			closesocket(m_socket);
-			m_socket =  INVALID_SOCKET;
-		}
-
-		if (IN_MULTICAST(htonl(imr.imr_multiaddr.s_addr))) {
-			int ret = setsockopt(m_socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char*)&imr, sizeof(imr));
-			if (ret < 0) {
-				ret = ::WSAGetLastError();
-			}
-			ret = ret;
-		}
-
-		dw = MAXBUFSIZE;
-		if (setsockopt(m_socket, SOL_SOCKET, SO_RCVBUF, (const char*)&dw, sizeof(dw)) == SOCKET_ERROR) {
-			;
-		}
-
-		/*
-		u_long param = 1;
-		int res = ioctlsocket(m_socket, FIONBIO, &param);
-		*/
-	}
-
 	SetThreadPriority(m_hThread, THREAD_PRIORITY_TIME_CRITICAL);
 
 #ifdef _DEBUG
@@ -406,19 +440,27 @@ DWORD CUDPStream::ThreadProc()
 					char buff[MAXBUFSIZE * 2];
 					int buffsize = 0;
 
-					for (unsigned int i = 0; ; i++) {
-						if (!(i&0xff)) {
-							if (CheckRequest(NULL)) {
-								break;
-							}
-						}
+					UINT timeout = 0;
+					while (!CheckRequest(NULL) && timeout < 1000) {
+						int len =  0;
 
-						int fromlen = sizeof(addr);
-						int len = recvfrom(m_socket, &buff[buffsize], MAXBUFSIZE, 0, (SOCKADDR*)&addr, &fromlen);
-						if (len <= 0) {
-							Sleep(1);
+						int res = WSAWaitForMultipleEvents(1, m_WSAEvent, FALSE, 100, FALSE);
+						if (res == WSA_WAIT_EVENT_0) {
+							int fromlen = sizeof(m_addr);
+							len = recvfrom(m_socket, &buff[buffsize], MAXBUFSIZE, 0, (SOCKADDR*)&m_addr, &fromlen);
+							if (len <= 0) {
+								int err = WSAGetLastError();
+								if (err != WSAEWOULDBLOCK) {
+									timeout += 100;
+								}
+								continue;
+							}
+						} else {
+							timeout += 100;
 							continue;
 						}
+
+						timeout = 0;
 
 #ifdef _DEBUG
 						if (log) {
@@ -462,6 +504,8 @@ DWORD CUDPStream::ThreadProc()
 						}
 					}
 				}
+				WSAResetEvent(m_WSAEvent[0]);
+
 				break;
 		}
 	}
