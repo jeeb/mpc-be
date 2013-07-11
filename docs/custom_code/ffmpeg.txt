@@ -13,6 +13,7 @@ The following files have MPC-BE specific custom code (compared to ffmpeg):
 * libavcodec/error_resilience.c
 * libavcodec/h264.c
 * libavcodec/h264.h
+* libavcodec/h264_ps.c
 * libavcodec/internal.h
 * libavcodec/mpeg12.h
 * libavcodec/mpeg12dec.c
