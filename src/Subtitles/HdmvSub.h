@@ -36,16 +36,14 @@ public:
 	HDMV_WindowDefinition() {
 		Reset();
 
-		for (int i = 0; i<MAX_WINDOWS; i++) {
-			Objects[i]	= NULL;
+		for (int i = 0; i < MAX_WINDOWS; i++) {
+			Objects[i] = NULL;
 		}
 	}
 
 	~HDMV_WindowDefinition() {
-		for (int i = 0; i<MAX_WINDOWS; i++) {
-			if (Objects[i]) {
-				delete Objects[i];
-			}
+		for (int i = 0; i < MAX_WINDOWS; i++) {
+			SAFE_DELETE(Objects[i]);
 		}
 	}
 
@@ -90,6 +88,16 @@ public:
 		BYTE		bReserved : 8;
 	};
 
+	struct HDMV_CLUT {
+		int				pSize;
+		HDMV_PALETTE*	Palette;
+
+		HDMV_CLUT() {
+			pSize	= 0;
+			Palette	= NULL;
+		}
+	};
+
 	CHdmvSub();
 	~CHdmvSub();
 
@@ -104,12 +112,12 @@ public:
 
 	virtual REFERENCE_TIME	GetStart(POSITION nPos) {
 		CompositionObject* pObject = m_pObjects.GetAt(nPos);
-		return pObject!=NULL ? pObject->m_rtStart : INVALID_TIME;
+		return pObject != NULL ? pObject->m_rtStart : INVALID_TIME;
 	};
 
 	virtual REFERENCE_TIME	GetStop(POSITION nPos) {
 		CompositionObject* pObject = m_pObjects.GetAt(nPos);
-		return pObject!=NULL ? pObject->m_rtStop : INVALID_TIME;
+		return pObject != NULL ? pObject->m_rtStop : INVALID_TIME;
 	};
 
 	virtual void			Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox);
@@ -131,9 +139,9 @@ private :
 	CAtlList<CompositionObject*>	m_pObjects;
 	HDMV_WindowDefinition*			m_pCurrentWindow;
 	CompositionObject				m_ParsedObjects[MAX_WINDOWS];
-
-	HDMV_PALETTE*					m_pDefaultPalette;
-	int								m_nDefaultPaletteNbEntry;
+	
+	HDMV_CLUT						m_CLUT[256];
+	HDMV_CLUT						m_DefaultCLUT;
 
 	int								m_nColorNumber;
 
