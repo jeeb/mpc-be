@@ -105,6 +105,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="dec\alphai.h" />
     <ClInclude Include="dsp\dsp.h" />
     <ClInclude Include="enc\cost.h" />
     <ClInclude Include="enc\vp8enci.h" />

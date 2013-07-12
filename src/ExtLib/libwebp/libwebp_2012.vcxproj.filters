@@ -41,6 +41,9 @@
     <ClInclude Include="webp\mux_types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="dec\alphai.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dec\alpha.c">

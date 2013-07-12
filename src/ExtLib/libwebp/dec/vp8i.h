@@ -30,7 +30,7 @@ extern "C" {
 // version numbers
 #define DEC_MAJ_VERSION 0
 #define DEC_MIN_VERSION 3
-#define DEC_REV_VERSION 0
+#define DEC_REV_VERSION 1
 
 #define ONLY_KEYFRAME_CODE      // to remove any code related to P-Frames
 
@@ -193,6 +193,11 @@ typedef struct {
   VP8Io io_;          // copy of the VP8Io to pass to put()
 } VP8ThreadContext;
 
+// Saved top samples, per macroblock. Fits into a cache-line.
+typedef struct {
+  uint8_t y[16], u[8], v[8];
+} VP8TopSamples;
+
 //------------------------------------------------------------------------------
 // VP8Decoder: the main opaque structure handed over to user
 
@@ -250,17 +255,17 @@ struct VP8Decoder {
 #endif
 
   // Boundary data cache and persistent buffers.
-  uint8_t* intra_t_;     // top intra modes values: 4 * mb_w_
-  uint8_t  intra_l_[4];  // left intra modes values
-  uint8_t* y_t_;         // top luma samples: 16 * mb_w_
-  uint8_t* u_t_, *v_t_;  // top u/v samples: 8 * mb_w_ each
-  uint8_t segment_;      // segment of the currently parsed block
+  uint8_t* intra_t_;      // top intra modes values: 4 * mb_w_
+  uint8_t  intra_l_[4];   // left intra modes values
 
-  VP8MB* mb_info_;       // contextual macroblock info (mb_w_ + 1)
-  VP8FInfo* f_info_;     // filter strength info
-  uint8_t* yuv_b_;       // main block for Y/U/V (size = YUV_SIZE)
+  uint8_t segment_;       // segment of the currently parsed block
+  VP8TopSamples* yuv_t_;  // top y/u/v samples
 
-  uint8_t* cache_y_;     // macroblock row for storing unfiltered samples
+  VP8MB* mb_info_;        // contextual macroblock info (mb_w_ + 1)
+  VP8FInfo* f_info_;      // filter strength info
+  uint8_t* yuv_b_;        // main block for Y/U/V (size = YUV_SIZE)
+
+  uint8_t* cache_y_;      // macroblock row for storing unfiltered samples
   uint8_t* cache_u_;
   uint8_t* cache_v_;
   int cache_y_stride_;
@@ -279,12 +284,14 @@ struct VP8Decoder {
   int filter_row_;                           // per-row flag
   VP8FInfo fstrengths_[NUM_MB_SEGMENTS][2];  // precalculated per-segment/type
 
-  // extensions
-  const uint8_t* alpha_data_;   // compressed alpha data (if present)
+  // Alpha
+  struct ALPHDecoder* alph_dec_;  // alpha-plane decoder object
+  const uint8_t* alpha_data_;     // compressed alpha data (if present)
   size_t alpha_data_size_;
   int is_alpha_decoded_;  // true if alpha_data_ is decoded in alpha_plane_
   uint8_t* alpha_plane_;        // output. Persistent, contains the whole data.
 
+  // extensions
   int layer_colorspace_;
   const uint8_t* layer_data_;   // compressed layer data (if present)
   size_t layer_data_size_;
