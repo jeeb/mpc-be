@@ -367,7 +367,7 @@ inline void check_sse()
 
 inline void* memcpy_sse(void* d, const void* s, size_t size)
 {
-	if (d == NULL || s == NULL)
+	if (d == NULL || s == NULL || size == 0)
 	{
 		return NULL;
 	}

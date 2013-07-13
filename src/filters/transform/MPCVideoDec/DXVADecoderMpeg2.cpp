@@ -242,7 +242,7 @@ void CDXVADecoderMpeg2::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nS
 		}
 	}
 
-	memcpy_sse (pDXVABuffer, pBuffer, nSize);
+	memcpy_sse(pDXVABuffer, pBuffer, nSize);
 }
 
 void CDXVADecoderMpeg2::Flush()
@@ -268,7 +268,7 @@ int CDXVADecoderMpeg2::FindOldestFrame()
 {
 	int nPos = -1;
 
-	for (int i=0; i<m_nPicEntryNumber; i++) {
+	for (int i = 0; i < m_nPicEntryNumber; i++) {
 		if (!m_pPictureStore[i].bDisplayed && m_pPictureStore[i].bInUse &&
 			(m_pPictureStore[i].nCodecSpecific == m_nNextCodecIndex)) {
 			m_nNextCodecIndex	= INT_MIN;
@@ -301,7 +301,7 @@ bool CDXVADecoderMpeg2::FindPicture(int nIndex, int nStartCode)
 
 	CheckPointer(m_pMPEG2Buffer, false);
 
-	for (int i=0; i<m_nMPEG2BufferPos-nIndex; i++) {
+	for (int i = 0; i < m_nMPEG2BufferPos-nIndex; i++) {
 		dw = (dw<<8) + m_pMPEG2Buffer[i+nIndex];
 		if (i >= 4) {
 			if (m_nMPEG2PicEnd == INT_MIN) {
@@ -347,7 +347,7 @@ void CDXVADecoderMpeg2::PopBufferTime(int nPos)
 	int i			= 0;
 
 	// Shift buffer time list
-	while (i<MAX_BUFF_TIME && m_MPEG2BufferTime[i].nBuffPos!=INT_MIN) {
+	while (i < MAX_BUFF_TIME && m_MPEG2BufferTime[i].nBuffPos != INT_MIN) {
 		if (m_MPEG2BufferTime[i].nBuffPos >= nPos) {
 			m_MPEG2BufferTime[nDestPos].nBuffPos	= m_MPEG2BufferTime[i].nBuffPos - nPos;
 			m_MPEG2BufferTime[nDestPos].rtStart		= m_MPEG2BufferTime[i].rtStart;
@@ -358,7 +358,7 @@ void CDXVADecoderMpeg2::PopBufferTime(int nPos)
 	}
 
 	// Free unused slots
-	for (i=nDestPos; i<MAX_BUFF_TIME; i++) {
+	for (i = nDestPos; i < MAX_BUFF_TIME; i++) {
 		m_MPEG2BufferTime[i].nBuffPos	= INT_MIN;
 		m_MPEG2BufferTime[i].rtStart	= INVALID_TIME;
 		m_MPEG2BufferTime[i].rtStop		= INVALID_TIME;
@@ -367,7 +367,7 @@ void CDXVADecoderMpeg2::PopBufferTime(int nPos)
 
 void CDXVADecoderMpeg2::PushBufferTime(int nPos, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
 {
-	for (int i=0; i<MAX_BUFF_TIME; i++) {
+	for (int i = 0; i < MAX_BUFF_TIME; i++) {
 		if (m_MPEG2BufferTime[i].nBuffPos == INT_MIN) {
 			m_MPEG2BufferTime[i].nBuffPos	= nPos;
 			m_MPEG2BufferTime[i].rtStart	= rtStart;
@@ -390,7 +390,7 @@ void CDXVADecoderMpeg2::ResetBuffer()
 	m_nMPEG2BufferPos	= 0;
 	m_nMPEG2PicEnd		= INT_MIN;
 
-	for (int i=0; i<MAX_BUFF_TIME; i++) {
+	for (int i = 0; i < MAX_BUFF_TIME; i++) {
 		m_MPEG2BufferTime[i].nBuffPos	= INT_MIN;
 		m_MPEG2BufferTime[i].rtStart	= INVALID_TIME;
 		m_MPEG2BufferTime[i].rtStop		= INVALID_TIME;

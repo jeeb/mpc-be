@@ -789,7 +789,7 @@ HRESULT FFMpeg2DecodeFrame (DXVA_PictureParameters* pPicParams, DXVA_QmatrixData
 		av_log(pAVCtx, AV_LOG_INFO, "FFMpeg2DecodeFrame() : %d, %d\n", used_bytes, got_picture);
 #endif
 
-		if (used_bytes < 0) {
+		if (used_bytes < 0 || !s1->slice_count) {
 			return hr;
 		}
 
