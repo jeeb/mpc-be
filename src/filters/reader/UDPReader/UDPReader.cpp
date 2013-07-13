@@ -262,7 +262,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 
 		// set non-blocking mode
 		u_long param = 1;
-		int res = ioctlsocket(m_socket, FIONBIO, &param);
+		ioctlsocket(m_socket, FIONBIO, &param);
 	}
 
 	if (m_socket == INVALID_SOCKET) {
@@ -292,6 +292,10 @@ bool CUDPStream::Load(const WCHAR* fnw)
 	if (timeout == 500) {
 		return false;
 	}
+
+	// set non-blocking mode
+	u_long param = 0;
+	ioctlsocket(m_socket, FIONBIO, &param);
 
 	CAMThread::Create();
 	if (FAILED(CAMThread::CallWorker(CMD_RUN))) {
@@ -442,21 +446,12 @@ DWORD CUDPStream::ThreadProc()
 
 					UINT timeout = 0;
 					while (!CheckRequest(NULL) && timeout < 1000) {
-						int len =  0;
 
-						int res = WSAWaitForMultipleEvents(1, m_WSAEvent, FALSE, 100, FALSE);
-						if (res == WSA_WAIT_EVENT_0) {
-							int fromlen = sizeof(m_addr);
-							len = recvfrom(m_socket, &buff[buffsize], MAXBUFSIZE, 0, (SOCKADDR*)&m_addr, &fromlen);
-							if (len <= 0) {
-								int err = WSAGetLastError();
-								if (err != WSAEWOULDBLOCK) {
-									timeout += 100;
-								}
-								continue;
-							}
-						} else {
-							timeout += 100;
+						int fromlen = sizeof(m_addr);
+						int len = recvfrom(m_socket, &buff[buffsize], MAXBUFSIZE, 0, (SOCKADDR*)&m_addr, &fromlen);
+						if (len <= 0) {
+							Sleep(50);
+							timeout += 50;
 							continue;
 						}
 
