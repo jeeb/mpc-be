@@ -18,6 +18,7 @@ Changes (*):
 	* Little-CMS 2.5 git-fefaaa43;
 	* ffmpeg git-786b0968;
 	* libwebp 0.3.1 git-b7346a1e;
+	* libpng 1.7.0 b17 git-bb065520;
 
 Fixes (!):
 

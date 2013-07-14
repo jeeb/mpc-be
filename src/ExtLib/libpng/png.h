@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.7.0beta15 - June 8, 2013
+ * libpng version 1.7.0beta17 - July 5, 2013
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.7.0beta15 - June 8, 2013: Glenn
+ *   libpng versions 0.97, January 1998, through 1.7.0beta17 - July 5, 2013: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -168,7 +168,7 @@
  *    1.5.7                   15    10507  15.so.15.7[.0]
  *    1.6.0beta01-37          16    10600  16.so.16.0[.0]
  *    1.7.0alpha01-10         17    10700  17.so.17.0[.0]
- *    1.7.0beta01-15          17    10700  17.so.17.0[.0]
+ *    1.7.0beta01-17          17    10700  17.so.17.0[.0]
  *
  *   Henceforth the source version will match the shared-library major
  *   and minor numbers; the shared-library major version number will be
@@ -200,7 +200,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.7.0beta15, June 8, 2013, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.7.0beta17, July 5, 2013, are
  * Copyright (c) 2004, 2006-2013 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -312,13 +312,13 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    June 8, 2013
+ *    July 5, 2013
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.7.0beta15 are Y2K compliant.  It is my belief that
+ *    upward through 1.7.0beta17 are Y2K compliant.  It is my belief that
  *    earlier versions were also Y2K compliant.
  *
  *    Libpng only has two year fields.  One is a 2-byte unsigned integer
@@ -378,9 +378,9 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.7.0beta15"
+#define PNG_LIBPNG_VER_STRING "1.7.0beta17"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.7.0beta15 - June 8, 2013\n"
+     " libpng version 1.7.0beta17 - July 5, 2013\n"
 
 #define PNG_LIBPNG_VER_SONUM   17
 #define PNG_LIBPNG_VER_DLLNUM  17
@@ -394,7 +394,7 @@
  * PNG_LIBPNG_VER_STRING, omitting any leading zero:
  */
 
-#define PNG_LIBPNG_VER_BUILD  15
+#define PNG_LIBPNG_VER_BUILD  17
 
 /* Release Status */
 #define PNG_LIBPNG_BUILD_ALPHA    1
@@ -527,7 +527,7 @@
  * For historical reasons these constants have the form png_<name>; i.e.
  * the prefix is lower case.  Please use decimal values as the parameters to
  * match the ISO PNG specification and to avoid relying on the C locale
- * interpretation of character values.
+ * interpretation of character values.  Please keep the list sorted.
  *
  * Notice that PNG_U32 is used to define a 32-bit value for the 4 byte chunk
  * type.  In fact the specification does not express chunk types this way,
@@ -544,21 +544,25 @@
  * In 1.7.0 the definitions were made public in png.h to avoid having to
  * duplicate the same definitions in application code.
  */
-#define png_IHDR PNG_U32( 73,  72,  68,  82)
 #define png_IDAT PNG_U32( 73,  68,  65,  84)
 #define png_IEND PNG_U32( 73,  69,  78,  68)
+#define png_IHDR PNG_U32( 73,  72,  68,  82)
 #define png_PLTE PNG_U32( 80,  76,  84,  69)
 #define png_bKGD PNG_U32( 98,  75,  71,  68)
 #define png_cHRM PNG_U32( 99,  72,  82,  77)
+#define png_fRAc PNG_U32(102,  82,  65,  99) /* registered, not defined */
 #define png_gAMA PNG_U32(103,  65,  77,  65)
+#define png_gIFg PNG_U32(103,  73,  70, 103)
+#define png_gIFt PNG_U32(103,  73,  70, 116) /* deprecated */
+#define png_gIFx PNG_U32(103,  73,  70, 120)
 #define png_hIST PNG_U32(104,  73,  83,  84)
 #define png_iCCP PNG_U32(105,  67,  67,  80)
 #define png_iTXt PNG_U32(105,  84,  88, 116)
 #define png_oFFs PNG_U32(111,  70,  70, 115)
 #define png_pCAL PNG_U32(112,  67,  65,  76)
-#define png_sCAL PNG_U32(115,  67,  65,  76)
 #define png_pHYs PNG_U32(112,  72,  89, 115)
 #define png_sBIT PNG_U32(115,  66,  73,  84)
+#define png_sCAL PNG_U32(115,  67,  65,  76)
 #define png_sPLT PNG_U32(115,  80,  76,  84)
 #define png_sRGB PNG_U32(115,  82,  71,  66)
 #define png_sTER PNG_U32(115,  84,  69,  82)
@@ -636,7 +640,7 @@ extern "C" {
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
-typedef char* png_libpng_version_1_7_0beta15;
+typedef char* png_libpng_version_1_7_0beta17;
 
 /* Basic control structions.  Read libpng-manual.txt or libpng.3 for more info.
  *
