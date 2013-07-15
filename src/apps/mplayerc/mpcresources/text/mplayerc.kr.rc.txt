@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 16
 12		"Video 디코더\n설정"
 13		"MPEG-2 디코더\n설정"
 14		"Audio 디코더\n설정"
-15		"Matroska Splitter\nconfiguration"
+15		"Matroska 스플리터\n설정"
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
