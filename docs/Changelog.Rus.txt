@@ -28,7 +28,7 @@
 	* MediaInfo 0.7.64+ svn rev.5842;
 	* Little-CMS 2.5 git-fefaaa43;
 	* ffmpeg git-b24e8f56;
-	* libwebp 0.3.1 git-b7346a1e;
+	* libwebp 0.3.1 git-66740140;
 	* libpng 1.7.0 b17 git-bb065520;
 
 Исправления (!):
