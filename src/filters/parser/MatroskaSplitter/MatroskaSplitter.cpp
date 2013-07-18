@@ -1659,6 +1659,89 @@ HRESULT CMatroskaSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 	return S_OK;
 }
 
+static WORD RL16(BYTE* p)
+{
+	return ((WORD)p[0] | (WORD)p[1] << 8);
+}
+
+static void WL16(BYTE* p, WORD d)
+{
+	p[0] = (d);
+	p[1] = (d) >> 8;
+}
+
+static void WL32(BYTE* p, DWORD d)
+{
+	p[0] = (d);
+	p[1] = (d) >> 8;
+	p[2] = (d) >> 16;
+	p[3] = (d) >> 24;
+}
+
+// reconstruct full wavpack blocks from mangled matroska ones.
+// From LAV's ffmpeg
+static bool ParseWavpack(CMediaType* mt, CGolombBuffer gb, CAutoPtr<Packet>& p)
+{
+	if (gb.GetSize() < 12) {
+		return false;
+	}
+
+	DWORD samples	= gb.ReadDwordLE();
+	WORD ver		= 0;
+	int dstlen		= 0;
+	int offset		= 0;
+
+	if (mt->formattype == FORMAT_WaveFormatEx) {
+		WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt->Format();
+		if (wfe->cbSize >= 2) {
+			ver = RL16(mt->pbFormat);
+		}
+	}
+
+	CAutoPtr<CBinary> ptr(DNew CBinary());
+
+	while (gb.RemainingSize() >= 8) {
+		DWORD flags		= gb.ReadDwordLE();
+		DWORD crc		= gb.ReadDwordLE();
+		DWORD blocksize	= gb.RemainingSize();
+
+		int multiblock	= (flags & 0x1800) != 0x1800;
+		if (multiblock) {
+			if (gb.RemainingSize() < 4) {
+				return false;
+			}
+			blocksize = gb.ReadDwordLE();
+		}
+
+		if (blocksize > (DWORD)gb.RemainingSize()) {
+			return false;
+		}
+
+		ptr->SetCount(dstlen + blocksize + 32);
+		BYTE *dst = ptr->GetData();
+
+		dstlen += blocksize + 32;
+
+		WL32(dst + offset, MAKEFOURCC('w', 'v', 'p', 'k'));			// tag
+		WL32(dst + offset + 4,  blocksize + 24);					// blocksize - 8
+		WL16(dst + offset + 8,  ver);								// version
+		WL16(dst + offset + 10, 0);									// track/index_no
+		WL32(dst + offset + 12, 0);									// total samples
+		WL32(dst + offset + 16, 0);									// block index
+		WL32(dst + offset + 20, samples);							// number of samples
+		WL32(dst + offset + 24, flags);								// flags
+		WL32(dst + offset + 28, crc);								// crc
+		memcpy(dst + offset + 32, gb.GetBufferPos(), blocksize);	// block data
+				
+		gb.SkipBytes(blocksize);
+		offset += blocksize + 32;
+	}
+
+	p->Copy(*ptr);
+
+	return true;
+}
+
 HRESULT CMatroskaSplitterOutputPin::DeliverBlock(MatroskaPacket* p)
 {
 	HRESULT hr = S_FALSE;
@@ -1672,24 +1755,27 @@ HRESULT CMatroskaSplitterOutputPin::DeliverBlock(MatroskaPacket* p)
 			  QueueCount());
 #endif
 
-		p->rtStart = to.rtStart;
-		p->rtStop = to.rtStop;
+		p->rtStart	= to.rtStart;
+		p->rtStop	= to.rtStop;
 	}
 
 	REFERENCE_TIME
-	rtStart = p->rtStart,
-	rtDelta = (p->rtStop - p->rtStart) / p->bg->Block.BlockData.GetCount(),
-	rtStop = p->rtStart + rtDelta;
+	rtStart	= p->rtStart,
+	rtDelta	= (p->rtStop - p->rtStart) / p->bg->Block.BlockData.GetCount(),
+	rtStop	= p->rtStart + rtDelta;
 
 	POSITION pos = p->bg->Block.BlockData.GetHeadPosition();
 	while (pos) {
 		CAutoPtr<Packet> tmp(DNew Packet());
-		tmp->TrackNumber = p->TrackNumber;
-		tmp->bDiscontinuity = p->bDiscontinuity;
-		tmp->bSyncPoint = p->bSyncPoint;
-		tmp->rtStart = rtStart;
-		tmp->rtStop = rtStop;
-		if (m_mt.subtype == MEDIASUBTYPE_DVB_SUBTITLES) { // Add DBV subtitle missing start code - 0x20 0x00 (in Matroska DVB packets start with 0x0F ...)
+
+		tmp->TrackNumber	= p->TrackNumber;
+		tmp->bDiscontinuity	= p->bDiscontinuity;
+		tmp->bSyncPoint		= p->bSyncPoint;
+		tmp->rtStart		= rtStart;
+		tmp->rtStop			= rtStop;
+
+		if (m_mt.subtype == MEDIASUBTYPE_DVB_SUBTITLES) {
+			// Add DBV subtitle missing start code - 0x20 0x00 (in Matroska DVB packets start with 0x0F ...)
 			CAutoPtr<CBinary> ptr(DNew CBinary());
 			ptr->SetCount(2);
 			BYTE *pData = ptr->GetData();
@@ -1697,6 +1783,13 @@ HRESULT CMatroskaSplitterOutputPin::DeliverBlock(MatroskaPacket* p)
 			pData[1] = 0x00;
 			tmp->Copy(*ptr);
 			tmp->Append(*p->bg->Block.BlockData.GetNext(pos));
+		} else if (m_mt.subtype == MEDIASUBTYPE_WAVPACK4) {
+			CAutoPtr <MatroskaReader::CBinary> mr = p->bg->Block.BlockData.GetNext(pos);
+			CGolombBuffer gb(mr->GetData(), mr->GetCount());
+
+			if (!ParseWavpack(&m_mt, gb, tmp)) {
+				continue;
+			}
 		} else {
 			tmp->Copy(*p->bg->Block.BlockData.GetNext(pos));
 		}
@@ -1708,21 +1801,27 @@ HRESULT CMatroskaSplitterOutputPin::DeliverBlock(MatroskaPacket* p)
 		rtStart += rtDelta;
 		rtStop += rtDelta;
 
-		p->bSyncPoint = false;
-		p->bDiscontinuity = false;
+		p->bSyncPoint		= false;
+		p->bDiscontinuity	= false;
 	}
 
-	if (m_mt.subtype == FOURCCMap(WAVE_FORMAT_WAVPACK4)) {
+	if (m_mt.subtype == MEDIASUBTYPE_WAVPACK4) {
 		POSITION pos = p->bg->ba.bm.GetHeadPosition();
 		while (pos) {
 			const BlockMore* bm = p->bg->ba.bm.GetNext(pos);
 			CAutoPtr<Packet> tmp(DNew Packet());
-			tmp->TrackNumber = p->TrackNumber;
-			tmp->bDiscontinuity = false;
-			tmp->bSyncPoint = false;
-			tmp->rtStart = p->rtStart;
-			tmp->rtStop = p->rtStop;
-			tmp->Copy(bm->BlockAdditional);
+
+			tmp->TrackNumber	= p->TrackNumber;
+			tmp->bDiscontinuity	= false;
+			tmp->bSyncPoint		= false;
+			tmp->rtStart		= p->rtStart;
+			tmp->rtStop			= p->rtStop;
+
+			CGolombBuffer gb((BYTE*)bm->BlockAdditional.GetData(), bm->BlockAdditional.GetCount());
+			if (!ParseWavpack(&m_mt, gb, tmp)) {
+				continue;
+			}
+
 			if (S_OK != (hr = DeliverPacket(tmp))) {
 				break;
 			}
