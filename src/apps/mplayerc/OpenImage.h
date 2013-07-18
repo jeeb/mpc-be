@@ -52,28 +52,28 @@ static BYTE* ConvertRGBToBMPBuffer(BYTE* Buffer, int width, int height, int bpp,
 	return newbuf;
 }
 
-#define GRAPHIC_FMT _T("*.bmp;*.jpg;*.jpeg;*.png;*.tif;*.tiff;*.emf;*.ico;*.webp;*.webpll;*.psd;*.tga;*.gif")
+#define GRAPHIC_FMT L"*.bmp;*.jpg;*.jpeg;*.png;*.tif;*.tiff;*.emf;*.ico;*.webp;*.webpll;*.psd;*.tga;*.gif"
+
+static TCHAR* extimages[] = {
+	L".bmp",  L".jpg",    L".jpeg", L".png",
+	L".tif",  L".tiff",   L".emf",  L".ico",
+	L".webp", L".webpll", L".psd",  L".tga"
+};
 
 static bool OpenImageCheck(CString fn)
 {
-	CString tmp_fn(CString(fn).MakeLower());
-
-	if (wcsstr(tmp_fn, L".bmp")
-		|| wcsstr(tmp_fn, L".jpg")
-		|| wcsstr(tmp_fn, L".jpeg")
-		|| wcsstr(tmp_fn, L".png")
-		|| wcsstr(tmp_fn, L".tif")
-		|| wcsstr(tmp_fn, L".tiff")
-		|| wcsstr(tmp_fn, L".emf")
-		|| wcsstr(tmp_fn, L".ico")
-		|| wcsstr(tmp_fn, L".webp")
-		|| wcsstr(tmp_fn, L".webpll")
-		|| wcsstr(tmp_fn, L".psd")
-		|| wcsstr(tmp_fn, L".tga")) {
-		return 1;
+	CString ext = CPath(fn).GetExtension().MakeLower();
+	if (ext.IsEmpty()) {
+		return false;
 	}
 
-	return 0;
+	for (size_t i = 0; i < _countof(extimages); i++) {
+		if (ext == extimages[i]) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 static HBITMAP SaveImageDIB(CString out, ULONG quality, bool mode, BYTE* pBuf, size_t pSize)
@@ -96,15 +96,15 @@ static HBITMAP SaveImageDIB(CString out, ULONG quality, bool mode, BYTE* pBuf, s
 		bm->GetHBITMAP(0, &hB);
 	} else {
 		CStringW format;
-		CString tmp_out(CString(out).MakeLower());
+		CString ext = CPath(out).GetExtension().MakeLower();
 
-		if (wcsstr(tmp_out, L".bmp")) {
+		if (ext == L".bmp") {
 			format = L"image/bmp";
-		} else if (wcsstr(tmp_out, L".jpg")) {
+		} else if (ext == L".jpg") {
 			format = L"image/jpeg";
-		} else if (wcsstr(tmp_out, L".png")) {
+		} else if (ext == L".png") {
 			format = L"image/png";
-		} else if (wcsstr(tmp_out, L".tif")) {
+		} else if (ext == L".tif") {
 			format = L"image/tiff";
 		}
 		GdiplusConvert(bm, out, format, quality, 0, NULL, 0);
@@ -122,9 +122,9 @@ static HBITMAP SaveImageDIB(CString out, ULONG quality, bool mode, BYTE* pBuf, s
 
 static HBITMAP OpenImageDIB(CString fn, CString out, ULONG quality, bool mode)
 {
-	CString tmp_fn(CString(fn).MakeLower());
-
 	if (OpenImageCheck(fn)) {
+
+		CString ext = CPath(fn).GetExtension().MakeLower();
 
 		HBITMAP hB = NULL;
 		FILE *fp;
@@ -189,7 +189,7 @@ static HBITMAP OpenImageDIB(CString fn, CString out, ULONG quality, bool mode)
 			bfh.bfReserved1 = bfh.bfReserved2 = 0;
 		}
 
-		if (wcsstr(tmp_fn, L".webp") || wcsstr(tmp_fn, L".webpll")) {
+		if (ext == L".webp" || ext == L".webpll") {
 
 			WebPDecoderConfig config;
 			WebPDecBuffer* const out_buf = &config.output;
@@ -219,7 +219,7 @@ static HBITMAP OpenImageDIB(CString fn, CString out, ULONG quality, bool mode)
 
 			WebPFreeDecBuffer(out_buf);
 
-		} else if (wcsstr(tmp_fn, L".psd") || wcsstr(tmp_fn, L".tga")) {
+		} else if (ext == L".psd" || ext == L".tga") {
 
 			int width, height, n, bpp = 4;
 			BYTE *lpBits = (BYTE*)stbi_load_from_memory((const stbi_uc*)data, fs, &width, &height, &n, bpp);
