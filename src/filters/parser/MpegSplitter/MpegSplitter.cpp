@@ -1802,6 +1802,8 @@ HRESULT CMpegSplitterOutputPin::Flush()
 	m_bFlushed				= true;
 	m_truehd_framelength	= 0;
 
+	m_hdmvLPCM_samplerate = m_hdmvLPCM_channels = m_hdmvLPCM_packetsize = 0;
+
 	return S_OK;
 }
 
