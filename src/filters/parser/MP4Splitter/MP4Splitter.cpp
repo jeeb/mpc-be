@@ -448,7 +448,7 @@ void SetTrackName(CString *TrackName, CString Suffix)
 	} \
 	SetTrackName(&TrackName, tname); \
 
-void SetAspect(VIDEOINFOHEADER2* vih2, CSize Aspect, LONG w, LONG h)
+static void SetAspect(VIDEOINFOHEADER2* vih2, CSize Aspect, LONG w, LONG h)
 {
 	if (!Aspect.cx || !Aspect.cy) {
 		Aspect.SetSize(w, h);
@@ -457,6 +457,16 @@ void SetAspect(VIDEOINFOHEADER2* vih2, CSize Aspect, LONG w, LONG h)
 
 	vih2->dwPictAspectRatioX = Aspect.cx;
 	vih2->dwPictAspectRatioY = Aspect.cy;
+}
+
+static CString ConvertStr(const char* S)
+{
+	CString str = UTF8ToStringW(S);
+	if (str.IsEmpty()) {
+		str = LocalToStringW(S); //Trying Local...
+	}
+
+	return str;
 }
 
 HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
@@ -558,10 +568,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			}
 
-			CStringW TrackName = UTF8ToStringW(track->GetTrackName().c_str());
-			if (TrackName.IsEmpty()) {
-				TrackName = LocalToStringW(track->GetTrackName().c_str()); //Trying Local...
-			}
+			CString TrackName = ConvertStr(track->GetTrackName().c_str());
 			if (TrackName.GetLength() && TrackName[0] < 0x20) {
 				TrackName.Delete(0);
 			}
@@ -1341,12 +1348,9 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			for (AP4_Cardinal i = 0; i < chapters.ItemCount(); ++i) {
 				AP4_ChplAtom::AP4_Chapter& chapter = chapters[i];
 
-				CStringW ChapName = UTF8ToStringW(chapter.Name.c_str());
-				if (ChapName.IsEmpty()) {
-					ChapName = LocalToStringW(chapter.Name.c_str());
-				}
+				CString ChapterName = ConvertStr(chapter.Name.c_str());
 
-				ChapAppend(chapter.Time, ChapName);
+				ChapAppend(chapter.Time, ChapterName);
 			}
 		} else if (ChapterTrackId != INT_MIN) {
 			for (AP4_List<AP4_Track>::Item* item = movie->GetTracks().FirstItem();
@@ -1364,28 +1368,17 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						const AP4_Byte* ptr	= data.GetData();
 						AP4_Size avail		= data.GetDataSize();
-						CStringA ChapterName;
+						CString ChapterName;
 
 						if (avail > 2) {
 							AP4_UI16 size = (ptr[0] << 8) | ptr[1];
 
-							if (size <= avail-2) {
-
-								if (size >= 2 && ptr[2] == 0xfe && ptr[3] == 0xff) {
-									CStringW wstr = CStringW((LPCWSTR)&ptr[2], size/2);
-									for (int i = 0; i < wstr.GetLength(); ++i) {
-										wstr.SetAt(i, ((WORD)wstr[i] >> 8) | ((WORD)wstr[i] << 8));
-									}
-									ChapterName = UTF16To8(wstr);
-								} else {
-									ChapterName = CStringA((LPCSTR)&ptr[2], size);
-								}
-							}
+							ChapterName = ConvertStr((const char*)&ptr[2]);
 						}
 
 						REFERENCE_TIME rtStart	= (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetCts());
 					
-						ChapAppend(rtStart, UTF8To16(ChapterName));
+						ChapAppend(rtStart, ChapterName);
 					}
 
 					break;
