@@ -5487,6 +5487,9 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 			if (b_UseVSFilter) {
 				CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
 				if (pDVS && SUCCEEDED(pDVS->put_FileName((LPWSTR)(LPCWSTR)sl.GetHead()))) {
+					pDVS->put_HideSubtitles(true);
+					pDVS->put_HideSubtitles(false);
+
 					b_SubLoaded = true;
 				}
 			} else {
@@ -6400,8 +6403,9 @@ void CMainFrame::OnFileLoadSubtitle()
 
 	if (b_UseVSFilter) {
 		CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
-		if (pDVS) {
-			pDVS->put_FileName((LPWSTR)(LPCWSTR)fd.GetPathName());
+		if (pDVS && SUCCEEDED(pDVS->put_FileName((LPWSTR)(LPCWSTR)fd.GetPathName()))) {
+			pDVS->put_HideSubtitles(true);
+			pDVS->put_HideSubtitles(false);
 		}
 		return;
 	}
