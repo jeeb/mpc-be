@@ -34,6 +34,7 @@
 #include "../../DSUtil/WinAPIUtils.h"
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/MPCSocket.h"
+#include <moreuuids.h>
 #include <winddk/ntddcdvd.h>
 #include <detours/detours.h>
 #include <afxsock.h>
@@ -2386,7 +2387,7 @@ void CMPlayerCApp::SetLanguage(int nLanguage)
 
 bool CMPlayerCApp::IsVSFilterInstalled()
 {
-	return IsCLSIDRegistered(_T("{9852A670-F845-491B-9BE6-EBD841B8A613}"));
+	return IsCLSIDRegistered(CLSID_VSFilter);
 }
 
 bool CMPlayerCApp::HasEVR()
