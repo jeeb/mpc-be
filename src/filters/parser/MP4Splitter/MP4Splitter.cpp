@@ -537,46 +537,6 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				ChapterTrackId = chap->GetChapterTrackId();
 			}
 
-			if (ChapterTrackId != INT_MIN && track->GetId() == ChapterTrackId) {
-
-				for (AP4_Cardinal i = 0; i < track->GetSampleCount(); i++) {
-					AP4_Sample sample;
-					AP4_DataBuffer data;
-					track->ReadSample(i, sample, data);
-
-					const AP4_Byte* ptr	= data.GetData();
-					AP4_Size avail		= data.GetDataSize();
-					CStringA ChapterName;
-
-					if (avail > 2) {
-						AP4_UI16 size = (ptr[0] << 8) | ptr[1];
-
-						if (size <= avail-2) {
-
-							if (size >= 2 && ptr[2] == 0xfe && ptr[3] == 0xff) {
-								CStringW wstr = CStringW((LPCWSTR)&ptr[2], size/2);
-								for (int i = 0; i < wstr.GetLength(); ++i) {
-									wstr.SetAt(i, ((WORD)wstr[i] >> 8) | ((WORD)wstr[i] << 8));
-								}
-								ChapterName = UTF16To8(wstr);
-							} else {
-								ChapterName = CStringA((LPCSTR)&ptr[2], size);
-							}
-						}
-					}
-
-					REFERENCE_TIME rtStart	= (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetCts());
-					
-					ChapAppend(rtStart, UTF8To16(ChapterName));
-				}
-
-				if (ChapGetCount()) {
-					ChapSort();
-				}
-
-				continue;
-			}
-
 			if (track->GetType() == AP4_Track::TYPE_VIDEO && !nRotation) {
 				if (AP4_TkhdAtom* tkhd = dynamic_cast<AP4_TkhdAtom*>(track->GetTrakAtom()->GetChild(AP4_ATOM_TYPE_TKHD))) {
 					nRotation = tkhd->GetRotation();
@@ -1375,17 +1335,66 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 		}
 
-		if (!ChapGetCount()) {
-			if (AP4_ChplAtom* chpl = dynamic_cast<AP4_ChplAtom*>(movie->GetMoovAtom()->FindChild("udta/chpl"))) {
-				AP4_Array<AP4_ChplAtom::AP4_Chapter>& chapters = chpl->GetChapters();
+		if (AP4_ChplAtom* chpl = dynamic_cast<AP4_ChplAtom*>(movie->GetMoovAtom()->FindChild("udta/chpl"))) {
+			AP4_Array<AP4_ChplAtom::AP4_Chapter>& chapters = chpl->GetChapters();
 
-				for (AP4_Cardinal i = 0; i < chapters.ItemCount(); ++i) {
-					AP4_ChplAtom::AP4_Chapter& chapter = chapters[i];
-					ChapAppend(chapter.Time, UTF8To16(ConvertMBCS(chapter.Name.c_str(), ANSI_CHARSET, CP_UTF8))); // this is b0rked, thx to nero :P
+			for (AP4_Cardinal i = 0; i < chapters.ItemCount(); ++i) {
+				AP4_ChplAtom::AP4_Chapter& chapter = chapters[i];
+
+				CStringW ChapName = UTF8ToStringW(chapter.Name.c_str());
+				if (ChapName.IsEmpty()) {
+					ChapName = LocalToStringW(chapter.Name.c_str());
 				}
 
-				ChapSort();
+				ChapAppend(chapter.Time, ChapName);
 			}
+		} else if (ChapterTrackId != INT_MIN) {
+			for (AP4_List<AP4_Track>::Item* item = movie->GetTracks().FirstItem();
+					item;
+					item = item->GetNext()) {
+				
+				AP4_Track* track = item->GetData();
+
+				if (ChapterTrackId == track->GetId()) {
+
+					for (AP4_Cardinal i = 0; i < track->GetSampleCount(); i++) {
+						AP4_Sample sample;
+						AP4_DataBuffer data;
+						track->ReadSample(i, sample, data);
+
+						const AP4_Byte* ptr	= data.GetData();
+						AP4_Size avail		= data.GetDataSize();
+						CStringA ChapterName;
+
+						if (avail > 2) {
+							AP4_UI16 size = (ptr[0] << 8) | ptr[1];
+
+							if (size <= avail-2) {
+
+								if (size >= 2 && ptr[2] == 0xfe && ptr[3] == 0xff) {
+									CStringW wstr = CStringW((LPCWSTR)&ptr[2], size/2);
+									for (int i = 0; i < wstr.GetLength(); ++i) {
+										wstr.SetAt(i, ((WORD)wstr[i] >> 8) | ((WORD)wstr[i] << 8));
+									}
+									ChapterName = UTF16To8(wstr);
+								} else {
+									ChapterName = CStringA((LPCSTR)&ptr[2], size);
+								}
+							}
+						}
+
+						REFERENCE_TIME rtStart	= (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetCts());
+					
+						ChapAppend(rtStart, UTF8To16(ChapterName));
+					}
+
+					break;
+				}
+			}
+		}
+
+		if (ChapGetCount()) {
+			ChapSort();
 		}
 
 		if (AP4_ContainerAtom* ilst = dynamic_cast<AP4_ContainerAtom*>(movie->GetMoovAtom()->FindChild("udta/meta/ilst"))) {
@@ -1410,13 +1419,13 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						} else if (atom->GetType() == AP4_ATOM_TYPE_COVR) {
 							if (db->GetDataSize() > 10) {
 								DWORD sync = *(DWORD*)(db->GetData()+6);
-								// check for JFIF(0x4649464a) or Exif(0x66697845) sync ...
-								if (sync == 0x4649464a || sync == 0x66697845) {
+								// check for JFIF or Exif sync ...
+								if (sync == MAKEFOURCC('J', 'F', 'I', 'F') || sync == MAKEFOURCC('E', 'x', 'i', 'f')) {
 									ResAppend(_T("cover.jpg"), _T("cover"), _T("image/jpeg"), (BYTE*)db->GetData(), (DWORD)db->GetDataSize());
 								} else {
 									sync = *(DWORD*)db->GetData();
-									// check for PNG(0x474E5089) sync ...
-									if (sync == 0x474E5089) {
+									// check for PNG sync ...
+									if (sync == MAKEFOURCC(0x89, 'P', 'N', 'G')) {
 										ResAppend(_T("cover.png"), _T("cover"), _T("image/png"), (BYTE*)db->GetData(), (DWORD)db->GetDataSize());
 									}
 								}
