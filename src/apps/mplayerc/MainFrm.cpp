@@ -17173,9 +17173,13 @@ void CMainFrame::CleanGraph()
 			continue;
 		}
 
+		if (GetCLSID(pBF) == CLSID_XySubFilter) {
+			continue;
+		}
+
 		int nIn, nOut, nInC, nOutC;
-		if (CountPins(pBF, nIn, nOut, nInC, nOutC) > 0 && (nInC+nOutC) == 0) {
-			TRACE(CStringW(L"Removing: ") + GetFilterName(pBF) + '\n');
+		if (CountPins(pBF, nIn, nOut, nInC, nOutC) > 0 && (nInC + nOutC) == 0) {
+			TRACE(L"Removing from graph : %s\n", GetFilterName(pBF));
 
 			pGB->RemoveFilter(pBF);
 			pEF->Reset();
