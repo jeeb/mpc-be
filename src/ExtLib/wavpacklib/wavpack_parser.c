@@ -153,19 +153,17 @@ int is_correction_block(uchar* blockbuff, uint32_t len)
 
 WavPack_parser* wavpack_parser_new(stream_reader* io, int is_correction)
 {
-	uint32_t bcount = 0;
-	int is_final_block = FALSE;
+    uint32_t bcount = 0;
+    int is_final_block = FALSE;
 
     WavPack_parser* wpp = wp_alloc(sizeof(WavPack_parser));
     if(!wpp)
-	{
+    {
         return NULL;
-	}
+    }
 
     wpp->io = io;
     wpp->is_correction = is_correction;
-
-    // TODO :we could determinate if it's a correction file by parsing first block metadata
 
     wpp->fb = frame_buffer_new();
     if(!wpp->fb)
@@ -174,38 +172,29 @@ WavPack_parser* wavpack_parser_new(stream_reader* io, int is_correction)
         return NULL;
     }
 
-	wpp->io->set_pos_abs(wpp->io, 0);
-	// ==> Start patch MPC
-	// check header ...
-	{
-		char ckID[4];
-		if ((wpp->io->read_bytes (wpp->io, &ckID, sizeof(ckID)) != sizeof(ckID)) || (strncmp (ckID, "wvpk", 4))) {
-			wavpack_parser_free(wpp);
-			return NULL;
-		}
-		wpp->io->set_pos_abs(wpp->io, 0);
-	}
-	// ==> End patch MPC
+    // ==> Start patch MPC
+    wpp->io->set_pos_abs(wpp->io, 0);
+    // ==> End patch MPC
 
-	// Read the first frame
-	do {
-		// Get next WavPack block info
-		bcount = get_wp_block(wpp, &is_final_block);
-		if(bcount == -1)
-		{
-			break;
-		}
+    // Read the first frame
+    do {
+        // Get next WavPack block info
+        bcount = get_wp_block(wpp, &is_final_block);
+        if(bcount == -1)
+        {
+            break;
+        }
 
-		// ==> Start patch MPC
-		// If found non audio block - skip it, instead of breaking
-		if(bcount == -2)
-		{
-			continue;
-		}
-		// ==> End patch MPC
+        // ==> Start patch MPC
+        // If found non audio block - skip it, instead of breaking
+        if(bcount == -2)
+        {
+            continue;
+        }
+        // ==> End patch MPC
 
-		if(wpp->fb->nb_block == 0)
-		{
+        if(wpp->fb->nb_block == 0)
+        {
             // Store the first header
             wpp->first_wphdr = wpp->wphdr;
             wpp->several_blocks = !is_final_block;
@@ -230,12 +219,12 @@ WavPack_parser* wavpack_parser_new(stream_reader* io, int is_correction)
                 // restaure position
                 wpp->io->set_pos_abs(wpp->io, curr_pos);
             }
-		}
+        }
 
         wpp->channel_count += wpp->block_channel_count;
 
-		frame_append_data(wpp->fb, (char*)&wpp->wphdr, sizeof(wpp->wphdr));
-		frame_append_data2(wpp->fb, wpp->io, bcount);
+        frame_append_data(wpp->fb, (char*)&wpp->wphdr, sizeof(wpp->wphdr));
+        frame_append_data2(wpp->fb, wpp->io, bcount);
 
         /*
         // check metadata to know if it's a correction block
@@ -248,22 +237,22 @@ WavPack_parser* wavpack_parser_new(stream_reader* io, int is_correction)
         }
         */
 
-	} while(is_final_block == FALSE);
+    } while((is_final_block == FALSE) && (wpp->io->get_pos(wpp->io) < 1024*1024));
     
-	if(wpp->fb->len > 0)
-	{
+    if(wpp->fb->len > 0)
+    {
         // Calculate the suggested buffer size, we use the size of the RAW
         // decoded data as reference and add 10% to be safer
         wpp->suggested_buffer_size = (int)(wpp->samples_per_block * 4 *
             wpp->channel_count * 1.1);        
         wpp->suggested_buffer_size += (sizeof(WavpackHeader) * wpp->fb->nb_block);
-		return wpp;
-	}
-	else
-	{
-		wavpack_parser_free(wpp);
-		return NULL;
-	}
+        return wpp;
+    }
+    else
+    {
+        wavpack_parser_free(wpp);
+        return NULL;
+    }
 }
 
 // ----------------------------------------------------------------------------
