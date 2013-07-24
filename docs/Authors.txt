@@ -26,6 +26,8 @@ Korean - kuh3h3
 German - Markus Gaugg(gaugg@gmx.at)
 Italian - Lord Maius
 Chinese (Simplified) - insolo
+Chinese (Traditional) - beter
+Turkish - Thingol
 
 Official Beta testers:
 ----------------------
