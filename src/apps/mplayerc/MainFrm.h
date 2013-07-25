@@ -1201,4 +1201,7 @@ private:
 
 public:
 	UINT		YoutubeThreadProc();
+
+private:
+	int			GetStreamCount(DWORD dwSelGroup);
 };
