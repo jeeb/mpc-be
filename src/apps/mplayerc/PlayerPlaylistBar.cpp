@@ -629,7 +629,7 @@ void CPlayerPlaylistBar::AddItem(CAtlList<CString>& fns, CAtlList<CString>* subs
 	while (pos) {
 		CString fn = fns.GetNext(pos);
 		if (!fn.Trim().IsEmpty()) {
-			pli.m_fns.AddTail(fn);
+			pli.m_fns.AddTail(MakeFullPath(fn));
 		}
 	}
 
@@ -878,7 +878,7 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn)
 			} else if (key == _T("time")) {
 				pli[i].m_duration = StringToReftime2(value);
 			} else if (key == _T("filename")) {
-				value = CombinePath(base, value);
+				value = MakeFullPath(CombinePath(base, value));
 				pli[i].m_fns.AddTail(value);
 			} else if (key == _T("subtitle")) {
 				value = CombinePath(base, value);
@@ -1028,7 +1028,7 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 				pli->m_label = str.Trim();
 			}
 		} else {
-			pli->m_fns.AddTail(CombinePath(base, str));
+			pli->m_fns.AddTail(MakeFullPath(CombinePath(base, str)));
 			m_pl.AddTail(*pli);
 
 			delete pli;

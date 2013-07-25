@@ -1597,6 +1597,10 @@ void UnloadExternalObjects()
 CString MakeFullPath(LPCTSTR path)
 {
 	CString full(path);
+	if (full.Find(_T("://")) >= 0) { // skip URLs
+		return full;
+	}
+
 	full.Replace('/', '\\');
 
 	CString fn;
