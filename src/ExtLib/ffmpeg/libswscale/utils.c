@@ -299,7 +299,7 @@ static av_cold int initFilter(int16_t **outFilter, int32_t **filterPos,
         FF_ALLOC_OR_GOTO(NULL, filter,
                          dstW * sizeof(*filter) * filterSize, fail);
 
-        xDstInSrc = ((srcPos*xInc)>>8) - ((dstPos*0x8000)>>7);
+        xDstInSrc = ((dstPos*xInc)>>8) - ((srcPos*0x8000)>>7);
         for (i = 0; i < dstW; i++) {
             int xx = (xDstInSrc - ((filterSize - 1) << 15) + (1 << 15)) >> 16;
 
@@ -315,7 +315,7 @@ static av_cold int initFilter(int16_t **outFilter, int32_t **filterPos,
         FF_ALLOC_OR_GOTO(NULL, filter,
                          dstW * sizeof(*filter) * filterSize, fail);
 
-        xDstInSrc = ((srcPos*xInc)>>8) - ((dstPos*0x8000)>>7);
+        xDstInSrc = ((dstPos*xInc)>>8) - ((srcPos*0x8000)>>7);
         for (i = 0; i < dstW; i++) {
             int xx = (xDstInSrc - ((filterSize - 1) << 15) + (1 << 15)) >> 16;
             int j;
@@ -366,7 +366,7 @@ static av_cold int initFilter(int16_t **outFilter, int32_t **filterPos,
         FF_ALLOC_OR_GOTO(NULL, filter,
                          dstW * sizeof(*filter) * filterSize, fail);
 
-        xDstInSrc = ((srcPos*xInc)>>7) - ((dstPos*0x10000)>>7);
+        xDstInSrc = ((dstPos*xInc)>>7) - ((srcPos*0x10000)>>7);
         for (i = 0; i < dstW; i++) {
             int xx = (xDstInSrc - ((filterSize - 2) << 16)) / (1 << 17);
             int j;
@@ -1006,7 +1006,7 @@ int sws_getColorspaceDetails(struct SwsContext *c, int **inv_table,
                              int *srcRange, int **table, int *dstRange,
                              int *brightness, int *contrast, int *saturation)
 {
-    if (!c || isYUV(c->dstFormat) || isGray(c->dstFormat))
+    if (!c )
         return -1;
 
     *inv_table  = c->srcColorspaceTable;
