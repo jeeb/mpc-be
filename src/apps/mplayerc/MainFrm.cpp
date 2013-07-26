@@ -8323,11 +8323,14 @@ void CMainFrame::OnPlayPlay()
 				strOSD = m_wndPlaylistBar.GetCurFileName();
 				if (!m_LastOpenBDPath.IsEmpty()) {
 					strOSD = ResStr(ID_PLAY_PLAY);
-					int i = strOSD.Find(_T("\n"));
+					int i = strOSD.Find('\n');
 					if (i > 0) {
 						strOSD.Delete(i, strOSD.GetLength()-i);
 					}
-					strOSD += _T(" BD");
+					strOSD += L" Blu-ray";
+					if (!m_BDLabel.IsEmpty()) {
+						strOSD.AppendFormat(L" \"%s\"", m_BDLabel);
+					}
 				} else if (strOSD.GetLength() > 0) {
 					strOSD.TrimRight('/');
 					strOSD.Replace('\\', '/');
@@ -8335,18 +8338,18 @@ void CMainFrame::OnPlayPlay()
 				}
 			} else if (GetPlaybackMode() == PM_DVD) {
 				strOSD = ResStr(ID_PLAY_PLAY);
-				int i = strOSD.Find(_T("\n"));
+				int i = strOSD.Find('\n');
 				if (i > 0) {
 					strOSD.Delete(i, strOSD.GetLength()-i);
 				}
-				strOSD += _T(" DVD");
+				strOSD += L" DVD";
 			}
 		}
 	}
 
 	if (strOSD.IsEmpty()) {
 		strOSD = ResStr(ID_PLAY_PLAY);
-		int i = strOSD.Find(_T("\n"));
+		int i = strOSD.Find('\n');
 		if (i > 0) {
 			strOSD.Delete(i, strOSD.GetLength() - i);
 		}
@@ -13719,7 +13722,10 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 	if (!fn.IsEmpty()) {
 		if (GetPlaybackMode() == PM_FILE) {
 			if (m_bIsBDPlay) {
-				fn = _T("BD");
+				fn = L"Blu-ray";
+				if (!m_BDLabel.IsEmpty()) {
+					fn.AppendFormat(L" \"%s\"", m_BDLabel);
+				}
 			} else {
 				fn.Replace('\\', '/');
 				CString fn2 = fn.Mid(fn.ReverseFind('/')+1);
@@ -13728,7 +13734,7 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 				}
 			}
 		} else if (GetPlaybackMode() == PM_DVD) {
-			fn = _T("DVD");
+			fn = L"DVD";
 		} else if (GetPlaybackMode() == PM_CAPTURE) {
 			fn = ResStr(IDS_CAPTURE_LIVE);
 		}
@@ -13754,9 +13760,9 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 			}
 			EndEnumFilters;
 		}
-		title = fn + _T(" - ") + m_strTitle;
+		title = fn + L" - " + m_strTitle;
 	} else if (i == 0) {
-		title = fname + _T(" - ") + m_strTitle;
+		title = fname + L" - " + m_strTitle;
 	}
 
 	SetWindowText(title);
@@ -19411,6 +19417,7 @@ bool CMainFrame::OpenBD(CString Path)
 	CHdmvClipInfo::CPlaylist MainPlaylist;
 
 	m_LastOpenBDPath = Path;
+	m_BDLabel.Empty();
 
 	CString ext = CPath(Path).GetExtension();
 	ext.MakeLower();
@@ -19424,7 +19431,23 @@ bool CMainFrame::OpenBD(CString Path)
 		} else if (Path.Find(_T("\\BDMV"))) {
 			Path.Replace(_T("\\BDMV"), _T("\\"));
 		}
-		if (SUCCEEDED (ClipInfo.FindMainMovie (Path, strPlaylistFile, MainPlaylist, m_MPLSPlaylist))) {
+		if (SUCCEEDED (ClipInfo.FindMainMovie(Path, strPlaylistFile, MainPlaylist, m_MPLSPlaylist))) {
+			CString infFile = Path + L"\\disc.inf";
+			if (::PathFileExists(infFile)) {
+				CTextFile cf;
+				if (cf.Open(infFile)) {
+					CString line;
+					while (cf.ReadString(line)) {
+						CAtlList<CString> sl;
+						Explode(line, sl, '=');
+						if (sl.GetCount() == 2 && CString(sl.GetHead().Trim()).MakeLower() == L"label") {
+							m_BDLabel = sl.GetTail();
+							break;
+						}
+					}
+				}
+			}
+
 			bool InternalMpegSplitter = AfxGetAppSettings().SrcFilters[SRC_MPEG];
 			m_bIsBDPlay = true;
 			if (!InternalMpegSplitter && ext == _T(".bdmv")) {
@@ -19444,7 +19467,7 @@ bool CMainFrame::OpenBD(CString Path)
 		}
 	}
 
-	m_LastOpenBDPath = _T("");
+	m_LastOpenBDPath.Empty();
 	return false;
 }
 
