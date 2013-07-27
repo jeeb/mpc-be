@@ -146,7 +146,8 @@ static void mpeg_er_decode_mb(void *opaque, int ref, int mv_dir, int mv_type,
     s->dest[1] = s->current_picture.f.data[1] + (s->mb_y * (16 >> s->chroma_y_shift) * s->uvlinesize) + s->mb_x * (16 >> s->chroma_x_shift);
     s->dest[2] = s->current_picture.f.data[2] + (s->mb_y * (16 >> s->chroma_y_shift) * s->uvlinesize) + s->mb_x * (16 >> s->chroma_x_shift);
 
-    assert(ref == 0);
+    if (ref)
+        av_log(s->avctx, AV_LOG_DEBUG, "Interlaced error concealment is not fully implemented\n");
     ff_MPV_decode_mb(s, s->block);
 }
 
@@ -385,10 +386,10 @@ int ff_alloc_picture(MpegEncContext *s, Picture *pic, int shared)
             free_picture_tables(pic);
 
     if (shared) {
-        assert(pic->f.data[0]);
+        av_assert0(pic->f.data[0]);
         pic->shared = 1;
     } else {
-        assert(!pic->f.data[0]);
+        av_assert0(!pic->f.data[0]);
 
         if (alloc_frame_buffer(s, pic) < 0)
             return -1;
