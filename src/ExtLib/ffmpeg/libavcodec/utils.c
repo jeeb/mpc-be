@@ -2344,7 +2344,10 @@ int avcodec_decode_subtitle2(AVCodecContext *avctx, AVSubtitle *sub,
 
                 av_free_packet(&pkt_recoded);
             }
-            sub->format = !(avctx->codec_descriptor->props & AV_CODEC_PROP_BITMAP_SUB);
+            if (avctx->codec_descriptor->props & AV_CODEC_PROP_BITMAP_SUB)
+                sub->format = 0;
+            else if (avctx->codec_descriptor->props & AV_CODEC_PROP_TEXT_SUB)
+                sub->format = 1;
             avctx->pkt = NULL;
         }
 
@@ -3090,6 +3093,8 @@ int ff_lock_avcodec(AVCodecContext *log_ctx)
     log_ctx->entangled_thread_counter++;
     if (log_ctx->entangled_thread_counter != 1) {
         av_log(log_ctx, AV_LOG_ERROR, "Insufficient thread locking around avcodec_open/close()\n");
+        if (!lockmgr_cb)
+            av_log(log_ctx, AV_LOG_ERROR, "No lock manager is set, please see av_lockmgr_register()\n");
         log_ctx->ff_avcodec_locked = 1;
         ff_unlock_avcodec(log_ctx);
         return AVERROR(EINVAL);
