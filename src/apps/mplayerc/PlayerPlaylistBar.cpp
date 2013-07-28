@@ -32,6 +32,19 @@
 #include "SettingsDefines.h"
 #include "OpenDlg.h"
 
+static CString MakePath(CString path)
+{
+	if (path.Find(L"://") >= 0) { // skip URLs
+		return path;
+	}
+
+	path.Replace('/', '\\');
+
+	CPath c(path);
+	c.Canonicalize();
+	return CString(c);
+}
+
 UINT CPlaylistItem::m_globalid  = 0;
 
 CPlaylistItem::CPlaylistItem()
@@ -629,7 +642,7 @@ void CPlayerPlaylistBar::AddItem(CAtlList<CString>& fns, CAtlList<CString>* subs
 	while (pos) {
 		CString fn = fns.GetNext(pos);
 		if (!fn.Trim().IsEmpty()) {
-			pli.m_fns.AddTail(MakeFullPath(fn));
+			pli.m_fns.AddTail(MakePath(fn));
 		}
 	}
 
@@ -878,7 +891,7 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn)
 			} else if (key == _T("time")) {
 				pli[i].m_duration = StringToReftime2(value);
 			} else if (key == _T("filename")) {
-				value = MakeFullPath(CombinePath(base, value));
+				value = MakePath(CombinePath(base, value));
 				pli[i].m_fns.AddTail(value);
 			} else if (key == _T("subtitle")) {
 				value = CombinePath(base, value);

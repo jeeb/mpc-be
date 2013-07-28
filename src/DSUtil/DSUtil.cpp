@@ -1597,10 +1597,6 @@ void UnloadExternalObjects()
 CString MakeFullPath(LPCTSTR path)
 {
 	CString full(path);
-	if (full.Find(L"://") >= 0) { // skip URLs
-		return full;
-	}
-
 	full.Replace('/', '\\');
 
 	CString fn;
@@ -1610,7 +1606,7 @@ CString MakeFullPath(LPCTSTR path)
 	if (full.GetLength() >= 2 && full[0] == '\\' && full[1] != '\\') {
 		p.StripToRoot();
 		full = CString(p) + full.Mid(1);
-	} else if (full.Find(_T(":\\")) < 0 && full.Find(L"\\\\") < 0) {
+	} else if (full.Find(_T(":\\")) < 0) {
 		p.RemoveFileSpec();
 		p.AddBackslash();
 		full = CString(p) + full;
