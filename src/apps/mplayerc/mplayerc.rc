@@ -3449,6 +3449,7 @@ BEGIN
     IDS_SUBDL_DLG_PARSING               "Parsing list..."
     IDS_SUBDL_DLG_NOT_FOUND             "No subtitles found."
     IDS_SUBDL_DLG_SUBS_AVAIL            " %d subtitle(s) available."
+    IDS_DOWNLOAD_SUBS                   "Download subtitles"	
 END
 
 STRINGTABLE
