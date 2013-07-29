@@ -289,6 +289,8 @@ void CSubtitleDlDlg::OnOK()
 
 	if (pSubStreamToSet) {
 		pMF->SetSubtitle(pSubStreamToSet);
+
+		AfxGetAppSettings().fEnableSubtitles = true;
 	}
 
 	__super::OnOK();
