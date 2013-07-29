@@ -4197,12 +4197,6 @@ void CMainFrame::OnFilePostCloseMedia()
 	m_wndStatusBar.ShowTimer(false);
 	m_wndStatusBar.Relayout();
 
-	m_strFn					= _T("");
-	m_strFnFull				= _T("");
-	m_strUrl				= _T("");
-	m_strTitleAlt			= _T("");
-	m_strAuthorAlt			= _T("");
-
 	if (AfxGetAppSettings().fEnableEDLEditor) {
 		m_wndEditListEditor.CloseFile();
 	}
@@ -12640,9 +12634,9 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		}
 		fn.Replace(_T("https://"), _T("http://"));
 
-		m_strUrl		= _T("");
-		m_strTitleAlt	= _T("");
-		m_strAuthorAlt	= _T("");
+		m_strUrl.Empty();
+		m_strTitleAlt.Empty();
+		m_strAuthorAlt.Empty();
 
 		HRESULT hr = S_OK;
 		bool extimage = false;
@@ -14861,6 +14855,13 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			SetAudioDelay (s.rtShift);
 			s.rtShift = 0;
 		}
+
+		if (!m_strTitleAlt.IsEmpty()) {
+			CPlaylistItem pli;
+			if (m_wndPlaylistBar.GetCur(pli)) {
+				m_wndPlaylistBar.SetCurLabel(m_strTitleAlt.Left(m_strTitleAlt.GetLength() - 4));
+			}
+		}
 	}
 
 	m_flastnID = 0;
@@ -14878,7 +14879,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 	if (!m_bIsBDPlay) {
 		m_MPLSPlaylist.RemoveAll();
-		m_LastOpenBDPath = _T("");
+		m_LastOpenBDPath.Empty();
 	}
 	m_bIsBDPlay = false;
 
@@ -14890,19 +14891,19 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		m_wndToolBar.Invalidate();
 	}
 
-	if (!m_strTitleAlt.IsEmpty()) {
-		CPlaylistItem pli;
-		if (m_wndPlaylistBar.GetCur(pli)) {
-			m_wndPlaylistBar.SetCurLabel(m_strTitleAlt.Left(m_strTitleAlt.GetLength() - 4));
-		}
-	}
-
 	return(err.IsEmpty());
 }
 
 void CMainFrame::CloseMediaPrivate()
 {
-	SetLoadState (MLS_CLOSING);
+	SetLoadState(MLS_CLOSING);
+
+	m_strFn.Empty();
+	m_strFnFull.Empty();
+	m_strUrl.Empty();
+	m_strTitleAlt.Empty();
+	m_strAuthorAlt.Empty();
+
 	m_OSD.Stop();
 	OnPlayStop();
 
