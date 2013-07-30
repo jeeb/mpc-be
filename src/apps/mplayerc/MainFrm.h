@@ -1150,9 +1150,6 @@ protected:
 
 	bool	m_fValidDVDOpen;
 
-	IBaseFilter*	GetVSFilter();
-	bool			b_UseVSFilter;
-
 	CComPtr<IBaseFilter> m_pBFmadVR;
 
 	HMODULE			m_hWtsLib;
@@ -1169,6 +1166,7 @@ protected:
 	HANDLE					m_hNotifyRenderThread;
 	HANDLE					m_hStopNotifyRenderThreadEvent;
 	HANDLE					m_hRefreshNotifyRenderThreadEvent;
+
 public:
 	afx_msg UINT OnPowerBroadcast(UINT nPowerEvent, UINT nEventData);
 	afx_msg void OnSessionChange(UINT nSessionState, UINT nId);
@@ -1179,6 +1177,9 @@ public:
 	CHdmvClipInfo::CPlaylist m_MPLSPlaylist;
 	bool m_bIsBDPlay;
 	bool OpenBD(CString Path);
+
+	IBaseFilter*	GetVSFilter();
+	bool			b_UseVSFilter;
 
 private:
 	typedef enum TH_STATE {TH_START, TH_WORK, TH_CLOSE};

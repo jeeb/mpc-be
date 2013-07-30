@@ -25,9 +25,10 @@
 #include <afxwin.h>
 #include "MainFrm.h"
 #include "SubtitleDlDlg.h"
+#include "../../filters/transform/VSFilter/IDirectVobSub.h"
 
-#define UWM_PARSE (WM_USER + 100)
-#define UWM_FAILED (WM_USER + 101)
+#define UWM_PARSE	(WM_USER + 100)
+#define UWM_FAILED	(WM_USER + 101)
 
 CSubtitleDlDlg::CSubtitleDlDlg(CWnd* pParent, const CStringA& url)
 	: CResizableDialog(CSubtitleDlDlg::IDD, pParent),
@@ -275,6 +276,37 @@ void CSubtitleDlDlg::OnOK()
 		url.Append(args);
 
 		if (OpenUrl(is, CString(url), str)) {
+
+			if (pMF->b_UseVSFilter) {
+				if (CComQIPtr<IDirectVobSub> pDVS = pMF->GetVSFilter()) {
+					TCHAR lpszTempPath[_MAX_PATH] = { 0 };
+					if (::GetTempPath(_MAX_PATH, lpszTempPath)) {
+						CString subFileName(lpszTempPath);
+						subFileName.Append(CString(sub.name));
+						if (::PathFileExists(subFileName)) {
+							::DeleteFile(subFileName);
+						}
+
+						CFile cf;
+						if (cf.Open(subFileName, CFile::modeCreate|CFile::modeWrite|CFile::shareDenyNone)) {
+							cf.Write(str.GetString(), str.GetLength());
+							cf.Close();
+
+							if (SUCCEEDED(pDVS->put_FileName((LPWSTR)(LPCWSTR)subFileName))) {
+								pDVS->put_SelectedLanguage(0);
+								pDVS->put_HideSubtitles(true);
+								pDVS->put_HideSubtitles(false);
+							}
+
+							::DeleteFile(subFileName);
+						}
+					}
+
+					__super::OnOK();
+					return;
+				}
+			}
+
 			CAutoPtr<CRenderedTextSubtitle> pRTS(DNew CRenderedTextSubtitle(&pMF->m_csSubLock, &s.subdefstyle, s.fUseDefaultSubtitlesStyle));
 			if (pRTS && pRTS->Open((BYTE*)(LPCSTR)str, str.GetLength(), DEFAULT_CHARSET, CString(sub.name)) && pRTS->GetStreamCount() > 0) {
 				CComPtr<ISubStream> pSubStream = pRTS.Detach();

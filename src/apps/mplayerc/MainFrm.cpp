@@ -6680,7 +6680,7 @@ void CMainFrame::OnFileISDBDownload()
 
 void CMainFrame::OnUpdateFileISDBDownload(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(m_iMediaLoadState == MLS_LOADED && GetPlaybackMode() != PM_CAPTURE && m_pCAP && !m_fAudioOnly);
+	pCmdUI->Enable(m_iMediaLoadState == MLS_LOADED && GetPlaybackMode() != PM_CAPTURE && (m_pCAP || b_UseVSFilter) && !m_fAudioOnly);
 }
 
 void CMainFrame::OnFileProperties()

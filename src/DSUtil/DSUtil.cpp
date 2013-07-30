@@ -3418,6 +3418,5 @@ BOOL GetTemporaryFilePath(CString strExtension, CString& strFileName)
 		//strFileName.Replace(_T(".tmp"), strExtension);
 	} while (_taccess(strFileName, 00) != -1);
 
-	//TRACE(_T("GetTemporaryFilePath() : \'%ws\'\n"), strFileName);
 	return TRUE;
 }
