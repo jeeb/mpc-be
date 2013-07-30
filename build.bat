@@ -62,16 +62,8 @@ FOR %%A IN (%ARG%) DO (
   IF /I "%%A" == "Packages"   SET "PACKAGES=True"     & SET /A ARGPA+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
   IF /I "%%A" == "Installer"  SET "INSTALLER=True"    & SET /A ARGIN+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
   IF /I "%%A" == "Zip"        SET "ZIP=True"          & SET /A ARGZI+=1 & SET /A ARGCL+=1 & SET /A ARGM+=1
-  IF /I "%%A" == "VS2010" (
-    SET SLN=
-    SET BUILD=VS2010
-    SET "VSCOMNTOOLS=%VS100COMNTOOLS%"
-  ) & SET /A ARGVS+=1
-  IF /I "%%A" == "VS2012" (
-    SET SLN=_2012
-    SET BUILD=VS2012
-    SET "VSCOMNTOOLS=%VS110COMNTOOLS%"
-  ) & SET /A ARGVS+=1
+  IF /I "%%A" == "VS2010"     SET "COMPILER=VS2010"   & SET /A ARGVS+=1
+  IF /I "%%A" == "VS2012"     SET "COMPILER=VS2012"   & SET /A ARGVS+=1
 )
 
 REM pre-build checks
@@ -81,8 +73,6 @@ IF NOT EXIST "include\version_rev.h" CALL "update_version.bat"
 IF DEFINED MINGW32 (SET MPCBE_MINGW32=%MINGW32%) ELSE (GOTO MissingVar)
 IF DEFINED MINGW64 (SET MPCBE_MINGW64=%MINGW64%) ELSE (GOTO MissingVar)
 IF DEFINED MSYS    (SET MPCBE_MSYS=%MSYS%)       ELSE (GOTO MissingVar)
-
-IF NOT DEFINED VSCOMNTOOLS GOTO MissingVar
 
 FOR %%X IN (%*) DO SET /A INPUT+=1
 SET /A VALID=%ARGB%+%ARGPL%+%ARGC%+%ARGBC%+%ARGPA%+%ARGIN%+%ARGZI%+%ARGVS%
@@ -96,13 +86,25 @@ IF %ARGBC% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGBC% == 0 (SET "BUILDCFG=Re
 IF %ARGPA% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGPA% == 0 (SET "PACKAGES=False")
 IF %ARGIN% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGIN% == 0 (SET "INSTALLER=False")
 IF %ARGZI% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGZI% == 0 (SET "ZIP=False")
+IF %ARGVS% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGVS% == 0 (SET "COMPILER=VS2010")
 IF %ARGCL% GTR 1 (GOTO UnsupportedSwitch)
 IF %ARGD%  GTR 1 (GOTO UnsupportedSwitch)
 IF %ARGF%  GTR 1 (GOTO UnsupportedSwitch)
 IF %ARGM%  GTR 1 (GOTO UnsupportedSwitch)
-IF %ARGVS% GTR 1 (GOTO UnsupportedSwitch)
 
 IF /I "%PACKAGES%" == "True" SET "INSTALLER=True" & SET "ZIP=True"
+
+IF /I "%COMPILER%" == "VS2012" (
+  SET SLN=_2012
+  SET BUILD=VS2012
+  SET "VSCOMNTOOLS=%VS110COMNTOOLS%"
+) ELSE (
+  SET SLN=
+  SET BUILD=VS2010
+  SET "VSCOMNTOOLS=%VS100COMNTOOLS%"
+)
+
+IF NOT DEFINED VSCOMNTOOLS GOTO MissingVar
 
 :Start
 REM Check if the %LOG_DIR% folder exists otherwise MSBuild will fail
