@@ -2338,10 +2338,6 @@ void CDX9AllocatorPresenter::DrawStats()
 			DrawText(rc, strText, 1);
 			OffsetRect (&rc, 0, TextHeight);
 
-			strText.Format(L"DirectX SDK  : %u", GetRenderersData()->GetDXSdkRelease());
-			DrawText(rc, strText, 1);
-			OffsetRect (&rc, 0, TextHeight);
-
 			if (!m_D3D9Device.IsEmpty()) {
 				strText = "Render device: " + m_D3D9Device;
 				DrawText(rc, strText, 1);

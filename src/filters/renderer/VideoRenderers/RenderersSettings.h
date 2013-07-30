@@ -155,7 +155,6 @@ public:
 
 	LONGLONG	GetPerfCounter();
 	HINSTANCE	GetD3X9Dll();
-	UINT		GetDXSdkRelease() {return m_nDXSdkRelease;};
 };
 
 extern CRenderersData*		GetRenderersData();
