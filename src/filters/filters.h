@@ -52,7 +52,6 @@
 #include "renderer/MpcAudioRenderer/MpcAudioRenderer.h"
 #include "renderer/SyncClock/SyncClock.h"
 
-#include "source/D2VSource/D2VSource.h"
 #include "source/DTSAC3Source/DTSAC3Source.h"
 #include "source/FLACSource/FLACSource.h"
 #include "source/FLICSource/FLICSource.h"

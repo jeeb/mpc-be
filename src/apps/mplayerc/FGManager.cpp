@@ -1709,18 +1709,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_source.AddTail(pFGF);
 	}
 
-	// TODOX64 : fix DVSource internal filter
-#ifndef _WIN64
-	__if_exists(CD2VSource) {
-		if (src[SRC_D2V] || IsPreview) {
-			pFGF = DNew CFGFilterInternal<CD2VSource>();
-			pFGF->m_chkbytes.AddTail(_T("0,18,,4456443241564950726F6A65637446696C65"));
-			pFGF->m_extensions.AddTail(_T(".d2v"));
-			m_source.AddTail(pFGF);
-		}
-	}
-#endif
-
 	if (src[SRC_OGG] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<COggSourceFilter>();
 		pFGF->m_chkbytes.AddTail(_T("0,4,,4F676753"));

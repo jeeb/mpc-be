@@ -38,7 +38,6 @@ static filter_t s_filters[] = {
 	{_T("DTS AudioCD"),           SOURCE_FILTER,  SOURCE, SRC_DTS,        IDS_SRC_DTS},
 	{_T("DTS/AC3"),               SOURCE_FILTER,  SOURCE, SRC_DTSAC3,     0},
 	{_T("DVD Video Title Set"),   SOURCE_FILTER,  SOURCE, SRC_VTS,        IDS_SRC_VTS},
-	{_T("DVD2AVI Project File"),  SOURCE_FILTER,  SOURCE, SRC_D2V,        0},
 	{_T("FLI/FLC"),               SOURCE_FILTER,  SOURCE, SRC_FLIC,       0},
 	{_T("FLAC"),                  SOURCE_FILTER,  SOURCE, SRC_FLAC,       0},
 	{_T("FLV"),                   SOURCE_FILTER,  SOURCE, SRC_FLV,        0},
