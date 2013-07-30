@@ -1927,9 +1927,6 @@
     <ClCompile Include="libavcodec\vc1.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
-    <ClCompile Include="libavcodec\vc1_dxva.c">
-      <Filter>libavcodec</Filter>
-    </ClCompile>
     <ClCompile Include="libavcodec\vc1data.c">
       <Filter>libavcodec</Filter>
     </ClCompile>

@@ -5750,6 +5750,10 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
 
     v->second_field = 0;
 
+    // ==> Start patch MPC
+    v->second_field_offset = 0;
+    // <== End patch MPC
+
     if(s->flags & CODEC_FLAG_LOW_DELAY)
         s->low_delay = 1;
 
@@ -5791,14 +5795,22 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
                 switch (AV_RB32(start)) {
                 case VC1_CODE_FRAME:
                     if (avctx->hwaccel ||
-                        s->avctx->codec->capabilities&CODEC_CAP_HWACCEL_VDPAU)
+                        s->avctx->codec->capabilities&CODEC_CAP_HWACCEL_VDPAU
+                        // ==> Start patch MPC
+                        || avctx->using_dxva
+                        // <== End patch MPC
+                        )
                         buf_start = start;
                     buf_size2 = vc1_unescape_buffer(start + 4, size, buf2);
                     break;
                 case VC1_CODE_FIELD: {
                     int buf_size3;
                     if (avctx->hwaccel ||
-                        s->avctx->codec->capabilities&CODEC_CAP_HWACCEL_VDPAU)
+                        s->avctx->codec->capabilities&CODEC_CAP_HWACCEL_VDPAU
+                        // ==> Start patch MPC
+                        || avctx->using_dxva
+                        // <== End patch MPC
+                        )
                         buf_start_second_field = start;
                     tmp = av_realloc(slices, sizeof(*slices) * (n_slices+1));
                     if (!tmp)
@@ -5852,7 +5864,11 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
                 goto err;
             } else { // found field marker, unescape second field
                 if (avctx->hwaccel ||
-                    s->avctx->codec->capabilities&CODEC_CAP_HWACCEL_VDPAU)
+                    s->avctx->codec->capabilities&CODEC_CAP_HWACCEL_VDPAU
+                    // ==> Start patch MPC
+                    || s->avctx->using_dxva
+                    // <== End patch MPC
+                    )
                     buf_start_second_field = divider;
                 tmp = av_realloc(slices, sizeof(*slices) * (n_slices+1));
                 if (!tmp)
@@ -6039,7 +6055,11 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
             if (avctx->hwaccel->end_frame(avctx) < 0)
                 goto err;
         }
-    } else {
+    } else
+        // ==> Start patch MPC
+        if (!avctx->using_dxva)
+        // <== End patch MPC
+        {
         int header_ret = 0;
 
 
@@ -6161,6 +6181,15 @@ image:
             *got_frame = 1;
         }
     }
+
+    // ==> Start patch MPC
+    if (v->field_mode && buf_start_second_field) {
+        s->picture_structure   = PICT_BOTTOM_FIELD - v->tff;
+        v->second_field_offset = buf_start_second_field - buf;
+    } else {
+        s->picture_structure = PICT_FRAME;
+    }
+    // <== End patch MPC
 
 end:
     av_free(buf2);
@@ -6295,7 +6324,3 @@ AVCodec ff_vc1image_decoder = {
     .pix_fmts       = ff_pixfmt_list_420
 };
 #endif
-
-// ==> Start patch MPC
-#include "vc1_dxva.c"
-// ==> End patch MPC

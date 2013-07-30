@@ -178,7 +178,9 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 
 	int							nPictStruct			= PICT_NONE;
 
-	CHECK_HR_FALSE (FFH264DecodeFrame (m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), pDataIn, nSize, rtStart, &nFramePOC, &nOutPOC, &rtOutStart, &SecondFieldOffset, &Sync, &m_nNALLength));
+	CHECK_HR_FALSE (FFH264DecodeFrame (m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), pDataIn, nSize, rtStart, 
+					&nFramePOC, &nOutPOC, &rtOutStart, 
+					&SecondFieldOffset, &Sync, &m_nNALLength));
 
 	while (!nSlices && slice_step <= 2) {
 		Nalu.SetBuffer (pDataIn, nSize, slice_step == 1 ? m_nNALLength : 0);

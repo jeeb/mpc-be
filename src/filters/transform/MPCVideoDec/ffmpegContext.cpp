@@ -183,7 +183,9 @@ inline MpegEncContext* GetMpegEncContext(struct AVCodecContext* pAVCtx)
 	return s;
 }
 
-HRESULT FFH264DecodeFrame (struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize, REFERENCE_TIME rtStart, int* pFramePOC, int* pOutPOC, REFERENCE_TIME* pOutrtStart, UINT* SecondFieldOffset, int* Sync, int* NALLength)
+HRESULT FFH264DecodeFrame (struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize, REFERENCE_TIME rtStart,
+						   int* pFramePOC, int* pOutPOC, REFERENCE_TIME* pOutrtStart,
+						   UINT* SecondFieldOffset, int* Sync, int* NALLength)
 {
 	HRESULT hr = E_FAIL;
 	if (pBuffer != NULL) {
@@ -257,7 +259,8 @@ BOOL DriverVersionCheck (LARGE_INTEGER VideoDriverVersion, int A, int B, int C, 
 	return FALSE;
 }
 
-int FFH264CheckCompatibility (int nWidth, int nHeight, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion, bool nIsAtiDXVACompatible)
+int FFH264CheckCompatibility (int nWidth, int nHeight, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
+							  DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion, bool nIsAtiDXVACompatible)
 {
 	H264Context*	pContext = (H264Context*) pAVCtx->priv_data;
 
@@ -624,14 +627,35 @@ void FFH264SetDxvaSliceLong (struct AVCodecContext* pAVCtx, void* pSliceLong)
 	h->dxva_slice_long	= pSliceLong;
 }
 
-HRESULT FFVC1UpdatePictureParam (DXVA_PictureParameters* pPicParams, struct AVCodecContext* pAVCtx, int* nFieldType, int* nSliceType, BYTE* pBuffer, UINT nSize, UINT* nFrameSize, BOOL b_SecondField, BOOL* b_repeat_pict)
+HRESULT FFVC1DecodeFrame (DXVA_PictureParameters* pPicParams, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, REFERENCE_TIME rtStart,
+						  BYTE* pBuffer, UINT nSize,
+						  int* nFieldType, int* nSliceType, BOOL* b_repeat_pict,
+						  UINT* nFrameSize, BOOL b_SecondField)
 {
+	HRESULT	hr			= E_FAIL;
 	VC1Context* vc1		= (VC1Context*) pAVCtx->priv_data;
 	int out_nFrameSize	= 0;
 
 	if (pBuffer && !b_SecondField) {
-		av_vc1_decode_frame (pAVCtx, pBuffer, nSize, &out_nFrameSize);
+		int				got_picture	= 0;
+		AVPacket		avpkt;
+		av_init_packet(&avpkt);
+		avpkt.data		= pBuffer;
+		avpkt.size		= nSize;
+		avpkt.pts		= rtStart;
+		avpkt.flags		= AV_PKT_FLAG_KEY;
+		int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
+		
+#if defined(_DEBUG) && 0
+		av_log(pAVCtx, AV_LOG_INFO, "FFVC1DecodeFrame() : %d, %d\n", used_bytes, got_picture);
+#endif
+
+		if (used_bytes < 0) {
+			return hr;
+		}
 	}
+
+	hr = S_OK;
 
 	// WARNING : vc1->interlace is not reliable (always set for progressive video on HD-DVD material)
 	if (vc1->fcm == 0) {
@@ -653,7 +677,7 @@ HRESULT FFVC1UpdatePictureParam (DXVA_PictureParameters* pPicParams, struct AVCo
 	}
 
 	if (nFrameSize) {
-		*nFrameSize = out_nFrameSize;
+		*nFrameSize = vc1->second_field_offset;
 	}
 
 	if (vc1->profile == PROFILE_ADVANCED) {
@@ -763,8 +787,9 @@ int	MPEG2CheckCompatibility (struct AVCodecContext* pAVCtx, struct AVFrame* pFra
 	return (s->chroma_format<2);
 }
 
-HRESULT FFMpeg2DecodeFrame (DXVA_PictureParameters* pPicParams, DXVA_QmatrixData* pQMatrixData, DXVA_SliceInfo* pSliceInfo, int* nSliceCount,
-							struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int* nNextCodecIndex, int* nFieldType, int* nSliceType, BYTE* pBuffer, UINT nSize,
+HRESULT FFMpeg2DecodeFrame (DXVA_PictureParameters* pPicParams, DXVA_QmatrixData* pQMatrixData, DXVA_SliceInfo* pSliceInfo,
+							struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize,
+							int* nSliceCount, int* nNextCodecIndex, int* nFieldType, int* nSliceType, 
 							bool* bIsField, int* b_repeat_pict)
 {
 	HRESULT			hr = E_FAIL;

@@ -135,8 +135,10 @@ HRESULT CDXVADecoderMpeg2::DecodeFrameInternal (BYTE* pDataIn, UINT nSize, REFER
 	bool					bIsField			= false;
 	int						bFrame_repeat_pict	= 0;
 
-	CHECK_HR_FALSE (FFMpeg2DecodeFrame (&m_PictureParams, &m_QMatrixData, m_SliceInfo, &m_nSliceCount, m_pFilter->GetAVCtx(),
-					m_pFilter->GetFrame(), &m_nNextCodecIndex, &nFieldType, &nSliceType, pDataIn, nSize, &bIsField, &bFrame_repeat_pict));
+	CHECK_HR_FALSE (FFMpeg2DecodeFrame (&m_PictureParams, &m_QMatrixData, m_SliceInfo,
+						m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), pDataIn, nSize,
+						&m_nSliceCount, &m_nNextCodecIndex, &nFieldType, &nSliceType,
+						&bIsField, &bFrame_repeat_pict));
 
 	// Wait I frame after a flush
 	if (m_bFlushed && (!m_PictureParams.bPicIntra || (bIsField && m_PictureParams.bSecondField))) {

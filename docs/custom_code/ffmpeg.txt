@@ -21,6 +21,7 @@ The following files have MPC-BE specific custom code (compared to ffmpeg):
 * libavcodec/options.c
 * libavcodec/pthread.c
 * libavcodec/utils.c
+* libavcodec/vc1.h
 * libavcodec/vc1dec.c
 * libavcodec/vorbis.c
 
@@ -39,7 +40,6 @@ The following files have MPC-BE specific custom code (compared to ffmpeg):
 The following files are available only in MPC-BE (compared with ffmpeg):
 
 * config.c
-* libavcodec/vc1_dxva.h
 
 ======
 Следующие файлы остаются как есть, без последних изменений из ffmpeg:

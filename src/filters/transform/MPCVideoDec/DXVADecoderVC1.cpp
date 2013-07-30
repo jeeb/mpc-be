@@ -103,7 +103,10 @@ HRESULT CDXVADecoderVC1::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 	int							nFieldType, nSliceType;
 	UINT						nFrameSize, nSize_Result;
 
-	FFVC1UpdatePictureParam (&m_PictureParams, m_pFilter->GetAVCtx(), &nFieldType, &nSliceType, pDataIn, nSize, &nFrameSize, FALSE, &m_bFrame_repeat_pict);
+	CHECK_HR_FALSE (FFVC1DecodeFrame (&m_PictureParams, m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), rtStart, 
+										pDataIn, nSize, 
+										&nFieldType, &nSliceType, &m_bFrame_repeat_pict, 
+										&nFrameSize, FALSE));
 
 	// Wait I frame after a flush
 	if (m_bFlushed && ! m_PictureParams.bPicIntra) {
@@ -155,7 +158,10 @@ HRESULT CDXVADecoderVC1::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 
 	// ***************
 	if (nFrameSize) { // Decoding Second Field
-		FFVC1UpdatePictureParam (&m_PictureParams, m_pFilter->GetAVCtx(), NULL, NULL, pDataIn, nSize, NULL, TRUE, &m_bFrame_repeat_pict);
+		FFVC1DecodeFrame (&m_PictureParams, m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), rtStart,
+							pDataIn, nSize,
+							NULL, NULL, &m_bFrame_repeat_pict,
+							NULL, TRUE);
 
 		CHECK_HR (BeginFrame(nSurfaceIndex, pSampleToDeliver));
 

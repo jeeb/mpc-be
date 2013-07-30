@@ -617,7 +617,6 @@
     <ClCompile Include="libavcodec\vc1data.c" />
     <ClCompile Include="libavcodec\vc1dec.c" />
     <ClCompile Include="libavcodec\vc1dsp.c" />
-    <ClCompile Include="libavcodec\vc1_dxva.c" />
     <ClCompile Include="libavcodec\videodsp.c" />
     <ClCompile Include="libavcodec\videodsp_template.c" />
     <ClCompile Include="libavcodec\vmnc.c" />

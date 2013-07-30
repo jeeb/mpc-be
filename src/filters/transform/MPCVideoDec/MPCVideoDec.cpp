@@ -1566,7 +1566,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	UNREFERENCED_PARAMETER(wout);
 	UNREFERENCED_PARAMETER(hout);
 
-	m_pAVCtx->using_dxva = (IsDXVASupported() && (m_nCodecId == AV_CODEC_ID_H264 || m_nCodecId == AV_CODEC_ID_MPEG2VIDEO));
+	m_pAVCtx->using_dxva = (IsDXVASupported() && (m_nCodecId == AV_CODEC_ID_H264 || m_nCodecId == AV_CODEC_ID_MPEG2VIDEO || m_nCodecId == AV_CODEC_ID_VC1 || m_nCodecId == AV_CODEC_ID_WMV3));
 
 	if (avcodec_open2(m_pAVCtx, m_pAVCodec, NULL) < 0) {
 		return VFW_E_INVALIDMEDIATYPE;
