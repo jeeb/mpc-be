@@ -86,13 +86,21 @@ IF %ARGBC% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGBC% == 0 (SET "BUILDCFG=Re
 IF %ARGPA% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGPA% == 0 (SET "PACKAGES=False")
 IF %ARGIN% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGIN% == 0 (SET "INSTALLER=False")
 IF %ARGZI% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGZI% == 0 (SET "ZIP=False")
-IF %ARGVS% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGVS% == 0 (SET "COMPILER=VS2010")
+IF %ARGVS% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGVS% == 0 (SET "COMPILER=AUTODETECT")
 IF %ARGCL% GTR 1 (GOTO UnsupportedSwitch)
 IF %ARGD%  GTR 1 (GOTO UnsupportedSwitch)
 IF %ARGF%  GTR 1 (GOTO UnsupportedSwitch)
 IF %ARGM%  GTR 1 (GOTO UnsupportedSwitch)
 
 IF /I "%PACKAGES%" == "True" SET "INSTALLER=True" & SET "ZIP=True"
+
+IF /I "%COMPILER%" == "AUTODETECT" (
+  IF DEFINED VS110COMNTOOLS (
+    SET "COMPILER=VS2012"
+  ) ELSE IF DEFINED VS100COMNTOOLS (
+    SET "COMPILER=VS2010"
+  ) ELSE GOTO MissingVar
+)
 
 IF /I "%COMPILER%" == "VS2012" (
   SET SLN=_2012
