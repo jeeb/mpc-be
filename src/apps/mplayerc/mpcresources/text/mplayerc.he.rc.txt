@@ -337,7 +337,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 28
 27		"Properties"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"שמע"
 6		"עצמת קול"
 7		"מינימום"
@@ -357,13 +357,12 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 26		"השתמש בתהליך נפרד בכדי לבנות את גרף הפילטרים"
 28		"דווח על תקעים שלא מתנגנים"
 29		"טען אוטומטית קבצי אודיו"
-30		"טען אוטומטית כתוביות"
-32		"כתוביות:"
-33		"(דוגמה: eng jap swe)"
-34		"שמע:"
-36		"תעדוף ברירת מחדל"
-38		"Speed Step"
-41		"Reset"
+31		"כתוביות:"
+32		"(דוגמה: eng jap swe)"
+33		"שמע:"
+35		"תעדוף ברירת מחדל"
+37		"Speed Step"
+40		"Reset"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
@@ -394,15 +393,22 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Remember last playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 17
-5		"העדף כתוביות חיצוניות אם קיימות"
-7		"אל תטען כתוביות מובנות מהקונטיינר"
-9		"נתיבים לטעינה אוטומטית"
-10		"אפס"
-11		"כתובת למסד נתונים ברשת:"
-13		"בדוק"
-15		"מסד נתונים ברשת"
-16		"Auto-reload subtitle files after detecting modification"
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+6		"קבע מיקום"
+7		"אופקי:"
+11		"אנכי:"
+15		"קפיצות הסנכרון הידני"
+16		"מילישניות"
+18		"הגדרות המראה (פתח את הוידאו מחדש בכדי לצפות בשינויים)"
+19		"תת-תמונות לשמור במאגר:"
+22		"רזולוצייה מקסימלית עבור תת-תמונה:"
+23		"הצגת כתוביות ב-DirectShow זמינה כאשר מציג הוידאו מוגדר כ-""VMR-7 (renderless)"" או  ""VMR-9 (renderless)"". VMR-7 דורש Windows XP, VMR-9 דורש DirectX 9, ושניהם דורשים כרטיס מסך המסוגל להציץ D3D."
+24		"לפני שאתה שואל"
+25		"אם אתה מבצע מעקף בהגדרות כרטיס המסך ומפעיל את החלקת הקצוות במסך מלא, הכתוביות לא יראו טוב יותר, אך המעבד שלך יעבוד שעות נוספות."
+27		"אזהרה"
+28		"אפשר להציג כתוביות עבור פורמטי ה-RealMedia וה-QuickTime ע""י הפעלה מציגי הוידאו המבוססי DirectX 7 או DirectX 9 שלהם."
+29		"תעגל כלפי מעלה לכפולות של 2"
+30		"אפשר אנימציית כתוביות כאשר מבוצע שימוש במאגר"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
@@ -435,22 +441,16 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"מקם כתוביות ביחס למסגרת הוידאו"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
-6		"קבע מיקום"
-7		"אופקי:"
-11		"אנכי:"
-15		"קפיצות הסנכרון הידני"
-16		"מילישניות"
-18		"הגדרות המראה (פתח את הוידאו מחדש בכדי לצפות בשינויים)"
-19		"תת-תמונות לשמור במאגר:"
-22		"רזולוצייה מקסימלית עבור תת-תמונה:"
-23		"הצגת כתוביות ב-DirectShow זמינה כאשר מציג הוידאו מוגדר כ-""VMR-7 (renderless)"" או  ""VMR-9 (renderless)"". VMR-7 דורש Windows XP, VMR-9 דורש DirectX 9, ושניהם דורשים כרטיס מסך המסוגל להציץ D3D."
-24		"לפני שאתה שואל"
-25		"אם אתה מבצע מעקף בהגדרות כרטיס המסך ומפעיל את החלקת הקצוות במסך מלא, הכתוביות לא יראו טוב יותר, אך המעבד שלך יעבוד שעות נוספות."
-27		"אזהרה"
-28		"אפשר להציג כתוביות עבור פורמטי ה-RealMedia וה-QuickTime ע""י הפעלה מציגי הוידאו המבוססי DirectX 7 או DirectX 9 שלהם."
-29		"תעגל כלפי מעלה לכפולות של 2"
-30		"אפשר אנימציית כתוביות כאשר מבוצע שימוש במאגר"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+5		"טען אוטומטית כתוביות"
+6		"העדף כתוביות חיצוניות אם קיימות"
+8		"אל תטען כתוביות מובנות מהקונטיינר"
+10		"נתיבים לטעינה אוטומטית"
+11		"אפס"
+12		"כתובת למסד נתונים ברשת:"
+14		"בדוק"
+16		"מסד נתונים ברשת"
+17		"Auto-reload subtitle files after detecting modification"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

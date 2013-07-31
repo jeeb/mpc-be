@@ -299,7 +299,6 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,166,276,8
     CONTROL         "Report pins which fail to render",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,178,276,8
     CONTROL         "Auto-load audio files",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,190,276,8
-    CONTROL         "Auto-load subtitles",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,219,276,8
     EDITTEXT        IDC_EDIT2,190,108,94,13,ES_AUTOHSCROLL
     LTEXT           "Subtitles:",IDC_STATIC,142,110,44,8
     LTEXT           "(Example: eng jap swe)",IDC_STATIC,147,138,132,8
@@ -1089,6 +1088,7 @@ IDD_PPAGESUBTITLES DIALOGEX 0, 0, 296, 241
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
+    CONTROL         "Auto-load subtitles",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,219,276,8
     CONTROL         "Prefer external subtitles over embedded subtitles",IDC_CHECK1,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,5,285,8
     CONTROL         "Ignore embedded subtitles",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,17,285,8

@@ -337,7 +337,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 28
 27		"Properties"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Audio"
 6		"Volume"
 7		"Min"
@@ -357,13 +357,12 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 26		"Processus d'aide à la construction des filtres"
 28		"Indiquer les connexions échouées lors du rendu"
 29		"Lecture automatique des fichiers audio"
-30		"Lecture automatique des sous-titres"
-32		"Sous-titres"
-33		"(Exemple : fre eng jap)"
-34		"Audio"
-36		"Ordre préféré des pistes"
-38		"Speed Step"
-41		"Reset"
+31		"Sous-titres"
+32		"(Exemple : fre eng jap)"
+33		"Audio"
+35		"Ordre préféré des pistes"
+37		"Speed Step"
+40		"Reset"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
@@ -394,15 +393,22 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Remember last playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 17
-5		"Préférer les sous-titres externes aux sous-titres internes"
-7		"Ignorer les sous-titres internes"
-9		"Dossiers à utiliser pour le chargement automatique"
-10		"Reset"
-11		"Racine du site de la base de données de sous-titres :"
-13		"Tester"
-15		"Base de données en ligne"
-16		"Auto-reload subtitle files after detecting modification"
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+6		"Modifier la position"
+7		"Horizontale :"
+11		"Verticale :"
+15		"Interval synchro"
+16		"ms"
+18		"Paramètres de texture (réouvrir la vidéo pour voir les modifications)"
+19		"Nombre de sous-titres à précharger :"
+22		"Résolution maximum :"
+23		"Le sous-titrage pour DirectShow n'est disponible qu'avec les rendus vidéo ""VMR-7 (sans rendu)"" ou ""VMR-9 (sans rendu)"". VMR-7 requiert Windows XP, VMR-9 requiert DirectX 9, et les deux nécessitent une carte vidéo D3D supportant l'accélération matérielle."
+24		"Avant de poser la question"
+25		"Attention : Si vous activez le positionnement manuel et activez l'anticrénelage en mode plein écran dans les paramètres de votre carte vidéo, cela n'améliorera pas l'affichage des sous-titres mais consommera davantage de ressources système."
+27		"Attention"
+28		"Pour que les formats RealMedia et QuickTime puissent afficher des sous-titres, il faut sélectionner leurs rendus spéciaux DirectX 7 ou DirectX 9."
+29		"Arrondir à la puissance deux"
+30		"Permettre l'animation pendant la mise en cache"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
@@ -435,22 +441,16 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Position des sous-titres relative à l'image"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
-6		"Modifier la position"
-7		"Horizontale :"
-11		"Verticale :"
-15		"Interval synchro"
-16		"ms"
-18		"Paramètres de texture (réouvrir la vidéo pour voir les modifications)"
-19		"Nombre de sous-titres à précharger :"
-22		"Résolution maximum :"
-23		"Le sous-titrage pour DirectShow n'est disponible qu'avec les rendus vidéo ""VMR-7 (sans rendu)"" ou ""VMR-9 (sans rendu)"". VMR-7 requiert Windows XP, VMR-9 requiert DirectX 9, et les deux nécessitent une carte vidéo D3D supportant l'accélération matérielle."
-24		"Avant de poser la question"
-25		"Attention : Si vous activez le positionnement manuel et activez l'anticrénelage en mode plein écran dans les paramètres de votre carte vidéo, cela n'améliorera pas l'affichage des sous-titres mais consommera davantage de ressources système."
-27		"Attention"
-28		"Pour que les formats RealMedia et QuickTime puissent afficher des sous-titres, il faut sélectionner leurs rendus spéciaux DirectX 7 ou DirectX 9."
-29		"Arrondir à la puissance deux"
-30		"Permettre l'animation pendant la mise en cache"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+5		"Lecture automatique des sous-titres"
+6		"Préférer les sous-titres externes aux sous-titres internes"
+8		"Ignorer les sous-titres internes"
+10		"Dossiers à utiliser pour le chargement automatique"
+11		"Reset"
+12		"Racine du site de la base de données de sous-titres :"
+14		"Tester"
+16		"Base de données en ligne"
+17		"Auto-reload subtitle files after detecting modification"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

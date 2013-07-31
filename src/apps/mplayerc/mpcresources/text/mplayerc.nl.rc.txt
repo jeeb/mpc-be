@@ -337,7 +337,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 28
 27		"Properties"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Audio"
 6		"Volume"
 7		"Min"
@@ -357,13 +357,12 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 26		"Filter graph in aparte CPU-thread samenstellen"
 28		"Rapporteer pins die niet renderen"
 29		"Geluidsbestanden autom. laden"
-30		"Ondertiteling autom. laden"
-32		"Ondertitelings"
-33		"(Bijv.: nl eng jap )"
-34		"Audio"
-36		"Default track preference"
-38		"Speed Step"
-41		"Reset"
+31		"Ondertitelings"
+32		"(Bijv.: nl eng jap )"
+33		"Audio"
+35		"Default track preference"
+37		"Speed Step"
+40		"Reset"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
@@ -394,15 +393,22 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Remember last playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 17
-5		"Prefereer externe ondertiteling over interne ondertiteling"
-7		"Geintegreerde ondertiteling niet laden"
-9		"Autoload paths"
-10		"Reset"
-11		"URL naar de online ondertitelings-database:"
-13		"Test"
-15		"Online database"
-16		"Auto-reload subtitle files after detecting modification"
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+6		"Positie aanpassen"
+7		"Horizontaal:"
+11		"Verticaal:"
+15		"Tijdsvertraging"
+16		"ms"
+18		"Texture instellingen (vereist heropening van de video)"
+19		"Aantal beeldplaatjes in buffer:"
+22		"Maximale texture resolutie:"
+23		"Ondertiteling voor DirectShow is mogelijk bij ""VMR-7 (renderless)"" of ""VMR-9 (renderless)"". VMR-7 vereist Windows XP, VMR-9 vereist DirectX 9 en beide vereisen een grafische kaart met hardwareversnelling."
+24		"Informatie"
+25		"Als u de ondertitelingspositie aanpast en ergens in de instellingen van uw grafische kaart full-screen antialiasing aanzet, zal de ondertiteling er niet beter uitzien, maar de CPU wordt wel zwaar belast."
+27		"Waaschuwing"
+28		"RealMedia en QuickTime kunnen worden ondertiteld als u hun speciale DirectX 7 of DirectX 9 renderers instelt."
+29		"Aanpassen als niet mogelijk"
+30		"Animatie toestaan tijdens bufferen"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
@@ -435,22 +441,16 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Ondertiteling relatief aan beeld plaatsen"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
-6		"Positie aanpassen"
-7		"Horizontaal:"
-11		"Verticaal:"
-15		"Tijdsvertraging"
-16		"ms"
-18		"Texture instellingen (vereist heropening van de video)"
-19		"Aantal beeldplaatjes in buffer:"
-22		"Maximale texture resolutie:"
-23		"Ondertiteling voor DirectShow is mogelijk bij ""VMR-7 (renderless)"" of ""VMR-9 (renderless)"". VMR-7 vereist Windows XP, VMR-9 vereist DirectX 9 en beide vereisen een grafische kaart met hardwareversnelling."
-24		"Informatie"
-25		"Als u de ondertitelingspositie aanpast en ergens in de instellingen van uw grafische kaart full-screen antialiasing aanzet, zal de ondertiteling er niet beter uitzien, maar de CPU wordt wel zwaar belast."
-27		"Waaschuwing"
-28		"RealMedia en QuickTime kunnen worden ondertiteld als u hun speciale DirectX 7 of DirectX 9 renderers instelt."
-29		"Aanpassen als niet mogelijk"
-30		"Animatie toestaan tijdens bufferen"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+5		"Ondertiteling autom. laden"
+6		"Prefereer externe ondertiteling over interne ondertiteling"
+8		"Geintegreerde ondertiteling niet laden"
+10		"Autoload paths"
+11		"Reset"
+12		"URL naar de online ondertitelings-database:"
+14		"Test"
+16		"Online database"
+17		"Auto-reload subtitle files after detecting modification"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

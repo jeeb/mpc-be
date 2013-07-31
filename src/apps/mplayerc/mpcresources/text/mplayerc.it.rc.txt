@@ -337,7 +337,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 28
 27		"Proprietà"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Audio"
 6		"Volume"
 7		"Min"
@@ -357,13 +357,12 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 26		"Usa il worker thread per costruire il grafico filtri"
 28		"Mostra i pin che falliscono il rendering"
 29		"Auto-carica i file audio"
-30		"Auto-carica i sottotitoli"
-32		"Sottotitoli"
-33		"(Esempio: ita eng)"
-34		"Audio"
-36		"Preferenze traccia predefinita"
-38		"Velocità Step"
-41		"Resetta"
+31		"Sottotitoli"
+32		"(Esempio: ita eng)"
+33		"Audio"
+35		"Preferenze traccia predefinita"
+37		"Velocità Step"
+40		"Resetta"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
@@ -394,15 +393,22 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Ricorda l'ultima playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 17
-5		"Usa sempre i sottotitoli esterni se disponibili"
-7		"Non caricare i sottotitoli interni al video"
-9		"Percorsi di caricamento automatico"
-10		"Reimposta"
-11		"Indirizzo del database di sottotitoli online:"
-13		"Prova"
-15		"Database online"
-16		"Ricarica file sottotitoli se rilevate modifiche"
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+6		"Modifica posizione"
+7		"Orizzontale:"
+11		"Verticale:"
+15		"Intervallo di ritardo"
+16		"ms"
+18		"Impostazioni texture (richiedono la riapertura del video)"
+19		"Num. di subpictures prima del buffer:"
+22		"Massima risoluzione texture:"
+23		"I sottotitoli in DirectShow sono disponibili quando è impostato come renderer video ""VMR-7 (renderless)"" oppure ""VMR-9 (renderless)"". VMR-7 richiede Windows XP, VMR-9 richiede DirectX 9, ed entrambi richiedono una scheda video accelerata D3D."
+24		"Nota bene"
+25		"Se imposti l'antialiasing a schermo intero nella GPU, i sottotitoli NON si vedranno meglio, tuttavia la CPU avrà un carico maggiore."
+27		"Attenzione"
+28		"I formati RealMedia e QuickTime possono essere sottotitolati impostandone il render DirectX 7 o DirectX 9."
+29		"Approssima alla potenza di 2"
+30		"Abilita animazioni durante il buffering"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
@@ -435,22 +441,16 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Posizione sottotitoli relativa al frame video"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
-6		"Modifica posizione"
-7		"Orizzontale:"
-11		"Verticale:"
-15		"Intervallo di ritardo"
-16		"ms"
-18		"Impostazioni texture (richiedono la riapertura del video)"
-19		"Num. di subpictures prima del buffer:"
-22		"Massima risoluzione texture:"
-23		"I sottotitoli in DirectShow sono disponibili quando è impostato come renderer video ""VMR-7 (renderless)"" oppure ""VMR-9 (renderless)"". VMR-7 richiede Windows XP, VMR-9 richiede DirectX 9, ed entrambi richiedono una scheda video accelerata D3D."
-24		"Nota bene"
-25		"Se imposti l'antialiasing a schermo intero nella GPU, i sottotitoli NON si vedranno meglio, tuttavia la CPU avrà un carico maggiore."
-27		"Attenzione"
-28		"I formati RealMedia e QuickTime possono essere sottotitolati impostandone il render DirectX 7 o DirectX 9."
-29		"Approssima alla potenza di 2"
-30		"Abilita animazioni durante il buffering"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+5		"Auto-carica i sottotitoli"
+6		"Usa sempre i sottotitoli esterni se disponibili"
+8		"Non caricare i sottotitoli interni al video"
+10		"Percorsi di caricamento automatico"
+11		"Reimposta"
+12		"Indirizzo del database di sottotitoli online:"
+14		"Prova"
+16		"Database online"
+17		"Ricarica file sottotitoli se rilevate modifiche"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

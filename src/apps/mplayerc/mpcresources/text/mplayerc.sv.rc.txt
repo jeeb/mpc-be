@@ -337,7 +337,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 28
 27		"Properties"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Ljud"
 6		"Volym"
 7		"Min"
@@ -357,13 +357,12 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 26		"Använd arbets tråd för att bygga filter diagrammet"
 28		"Rapportera stift som misslyckas att rendera"
 29		"Auto-ladda ljudfiler"
-30		"Auto-ladda undertexter"
-32		"Subtitles:"
-33		"(Example: eng jap swe)"
-34		"Audio:"
-36		"Default track preference"
-38		"Speed Step"
-41		"Reset"
+31		"Subtitles:"
+32		"(Example: eng jap swe)"
+33		"Audio:"
+35		"Default track preference"
+37		"Speed Step"
+40		"Reset"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
@@ -394,15 +393,22 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Remember last playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 17
-5		"Always default to external subtitles if available"
-7		"Do not load embedded subtitles"
-9		"Autoload paths"
-10		"Reset"
-11		"Bas webbadressen till online undertext databasen:"
-13		"Testa"
-15		"Online database"
-16		"Auto-reload subtitle files after detecting modification"
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+6		"Överskugga placering"
+7		"Horisontal:"
+11		"Vertikal:"
+15		"Fördröjnings intervallet"
+16		"ms"
+18		"Textur inställningar (öppna videon igen för att se förändringarna)"
+19		"Sub bilder att buffra:"
+22		"Högsta textur upplösningen:"
+23		"Undertextning för DirectShow är tillgängligt när video renderaren är inställd på ""VMR-7 (renderlös)"" eller ""VMR-9 (renderlös)"". VMR-7 kräver Windows XP, VMR-9 kräver DirectX 9, och båda kräver en HW accelererad D3D grafikkortet."
+24		"Innan du frågar"
+25		"Om du överskuggar och aktivera helskärms antialiasing någonstans på ditt grafikkorts inställningar, undertexter kommer inte att se något bättre ut men det kommer säkert att belasta din CPU."
+27		"Varning"
+28		"RealMedia och QuickTime format kan bli undertextade genom att ställa in deras särskilda DirectX 7 eller DirectX 9 renderare."
+29		"Runda upp till kraften av två"
+30		"Tillåt animering när buffrande"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
@@ -435,22 +441,16 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Positionera undertexter relativt till video bilden"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
-6		"Överskugga placering"
-7		"Horisontal:"
-11		"Vertikal:"
-15		"Fördröjnings intervallet"
-16		"ms"
-18		"Textur inställningar (öppna videon igen för att se förändringarna)"
-19		"Sub bilder att buffra:"
-22		"Högsta textur upplösningen:"
-23		"Undertextning för DirectShow är tillgängligt när video renderaren är inställd på ""VMR-7 (renderlös)"" eller ""VMR-9 (renderlös)"". VMR-7 kräver Windows XP, VMR-9 kräver DirectX 9, och båda kräver en HW accelererad D3D grafikkortet."
-24		"Innan du frågar"
-25		"Om du överskuggar och aktivera helskärms antialiasing någonstans på ditt grafikkorts inställningar, undertexter kommer inte att se något bättre ut men det kommer säkert att belasta din CPU."
-27		"Varning"
-28		"RealMedia och QuickTime format kan bli undertextade genom att ställa in deras särskilda DirectX 7 eller DirectX 9 renderare."
-29		"Runda upp till kraften av två"
-30		"Tillåt animering när buffrande"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+5		"Auto-ladda undertexter"
+6		"Always default to external subtitles if available"
+8		"Do not load embedded subtitles"
+10		"Autoload paths"
+11		"Reset"
+12		"Bas webbadressen till online undertext databasen:"
+14		"Testa"
+16		"Online database"
+17		"Auto-reload subtitle files after detecting modification"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

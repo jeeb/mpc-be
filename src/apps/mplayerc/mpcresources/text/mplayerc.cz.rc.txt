@@ -337,7 +337,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 28
 27		"Properties"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Zvuk"
 6		"Hlasitost"
 7		"Min"
@@ -357,13 +357,12 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 26		"Filtry načítat v samostatném podprocesu"
 28		"Vypisovat podrobné informace o chybějících kodecích"
 29		"Automaticky načíst zvukové stopy"
-30		"Automaticky načíst titulky"
-32		"Titulky:"
-33		"(Příklad: eng jap swe)"
-34		"Zvuk:"
-36		"Preferované výchozí stopy"
-38		"Speed Step"
-41		"Reset"
+31		"Titulky:"
+32		"(Příklad: eng jap swe)"
+33		"Zvuk:"
+35		"Preferované výchozí stopy"
+37		"Speed Step"
+40		"Reset"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
@@ -394,15 +393,22 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Remember last playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 17
-5		"Pokud jsou dostupné, upřednostňovat externí titulky"
-7		"Nenačítat vložené titulky"
-9		"Místa pro automatické načítání"
-10		"Výchozí"
-11		"Adresa online databáze titulků:"
-13		"Otestovat"
-15		"Online databáze"
-16		"Auto-reload subtitle files after detecting modification"
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+6		"Změnit polohu"
+7		"Horizontální:"
+11		"Vertikální:"
+15		"Zpoždění"
+16		"ms"
+18		"Možnosti textury (změny se projeví až po znovuotevření videa)"
+19		"Počet snímků ve vyrovnávací paměti:"
+22		"Maximální rozlišení textury:"
+23		"Titulkovač pro DirectShow je dostupný pouze pokud je použit renderer ""VMR-7 (renderless)"" nebo ""VMR-9 (renderless)"". VMR-7 vyžaduje Windows XP, VMR-9 vyžaduje DirectX 9 a oba vyžadují grafické karty s HW akcelerací D3D."
+24		"Než se zeptáte"
+25		"Pokud změníte polohu titulků a zapnete full-screen antialiasing, titulky určitě nebudou vypadat lépe, zato však zaberou veškerý výkon vašeho procesoru."
+27		"Varování"
+28		"U formátů RealMedia a QuickTime můžete použít titulky pokud použijete jejich speciální DirectX 7 nebo DirectX 9 renderery."
+29		"Zaokrouhlovat na mocniny dvou"
+30		"Povolit animaci s využitím vyrovnávací paměti"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
@@ -435,22 +441,16 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Umísťovat titulky v závislosti na poloze videa"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
-6		"Změnit polohu"
-7		"Horizontální:"
-11		"Vertikální:"
-15		"Zpoždění"
-16		"ms"
-18		"Možnosti textury (změny se projeví až po znovuotevření videa)"
-19		"Počet snímků ve vyrovnávací paměti:"
-22		"Maximální rozlišení textury:"
-23		"Titulkovač pro DirectShow je dostupný pouze pokud je použit renderer ""VMR-7 (renderless)"" nebo ""VMR-9 (renderless)"". VMR-7 vyžaduje Windows XP, VMR-9 vyžaduje DirectX 9 a oba vyžadují grafické karty s HW akcelerací D3D."
-24		"Než se zeptáte"
-25		"Pokud změníte polohu titulků a zapnete full-screen antialiasing, titulky určitě nebudou vypadat lépe, zato však zaberou veškerý výkon vašeho procesoru."
-27		"Varování"
-28		"U formátů RealMedia a QuickTime můžete použít titulky pokud použijete jejich speciální DirectX 7 nebo DirectX 9 renderery."
-29		"Zaokrouhlovat na mocniny dvou"
-30		"Povolit animaci s využitím vyrovnávací paměti"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+5		"Automaticky načíst titulky"
+6		"Pokud jsou dostupné, upřednostňovat externí titulky"
+8		"Nenačítat vložené titulky"
+10		"Místa pro automatické načítání"
+11		"Výchozí"
+12		"Adresa online databáze titulků:"
+14		"Otestovat"
+16		"Online databáze"
+17		"Auto-reload subtitle files after detecting modification"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

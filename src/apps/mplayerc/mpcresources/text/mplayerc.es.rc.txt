@@ -337,7 +337,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 28
 27		"Properties"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Audio"
 6		"Vol."
 7		"Mín"
@@ -357,13 +357,12 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 26		"Usar proceso funcional para construir extr. de filtros"
 28		"Reportar conectores que no quieran funcionar"
 29		"Auto-carga de audio"
-30		"Auto-carga de subtítulos"
-32		"Subtítulos"
-33		"(Ejemplo: eng jap swe)"
-34		"Audio"
-36		"Default track preference"
-38		"Speed Step"
-41		"Reset"
+31		"Subtítulos"
+32		"(Ejemplo: eng jap swe)"
+33		"Audio"
+35		"Default track preference"
+37		"Speed Step"
+40		"Reset"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
@@ -394,15 +393,22 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Remember last playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 17
-5		"Always default to external subtitles if available"
-7		"Do not load embedded subtitles"
-9		"Autoload paths"
-10		"Reset"
-11		"La URL base de la base de datos de subtítulos:"
-13		"Probar"
-15		"Online database"
-16		"Auto-reload subtitle files after detecting modification"
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+6		"Fijar ubicación"
+7		"Horizontal:"
+11		"Vertical:"
+15		"Intervalo de Retrazo"
+16		"ms"
+18		"Opciones de textura (es necesario re-abrir el archivo para notar los cambios)"
+19		"Numero de subtítulos para almacenar previamente:"
+22		"Resolución maxima de la textura:"
+23		"Los subtítulos para DirectShow estarán disponibles cuando se usen los métodos de renderización ""VMR-7 (sin render)"" o ""VMR-9 (sin render)"". VMR-7 req. Windows XP, VMR-9 req. DirectX 9, y ambos req. de una tarjeta grafica con D3D por HW."
+24		"Antes de preguntar"
+25		"Si activa el modo de antialiasing a pantalla completa en la configuración de su tarjeta gráfica, los subtítulos no lucirán mejor pero se tragarán su cpu."
+27		"Advertencia"
+28		"Los formatos de RealMedia y QuickTime pueden ofrecer subtítulos al configurar su renderización especial DirectX 7 o DirectX 9."
+29		"Redondear"
+30		"Permitir animación (uso mem. intermedia)"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
@@ -435,22 +441,16 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Posición de los subtítulos relativa al tamaño del cuadro de video"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
-6		"Fijar ubicación"
-7		"Horizontal:"
-11		"Vertical:"
-15		"Intervalo de Retrazo"
-16		"ms"
-18		"Opciones de textura (es necesario re-abrir el archivo para notar los cambios)"
-19		"Numero de subtítulos para almacenar previamente:"
-22		"Resolución maxima de la textura:"
-23		"Los subtítulos para DirectShow estarán disponibles cuando se usen los métodos de renderización ""VMR-7 (sin render)"" o ""VMR-9 (sin render)"". VMR-7 req. Windows XP, VMR-9 req. DirectX 9, y ambos req. de una tarjeta grafica con D3D por HW."
-24		"Antes de preguntar"
-25		"Si activa el modo de antialiasing a pantalla completa en la configuración de su tarjeta gráfica, los subtítulos no lucirán mejor pero se tragarán su cpu."
-27		"Advertencia"
-28		"Los formatos de RealMedia y QuickTime pueden ofrecer subtítulos al configurar su renderización especial DirectX 7 o DirectX 9."
-29		"Redondear"
-30		"Permitir animación (uso mem. intermedia)"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+5		"Auto-carga de subtítulos"
+6		"Always default to external subtitles if available"
+8		"Do not load embedded subtitles"
+10		"Autoload paths"
+11		"Reset"
+12		"La URL base de la base de datos de subtítulos:"
+14		"Probar"
+16		"Online database"
+17		"Auto-reload subtitle files after detecting modification"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

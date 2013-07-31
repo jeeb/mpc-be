@@ -337,7 +337,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 28
 27		"選項"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"音訊"
 6		"音量"
 7		"小"
@@ -357,13 +357,12 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 26		"使用工作執行緒建立篩選器圖 (Filter Graph)"
 28		"回報繪製失敗的 Pin"
 29		"自動載入音訊檔案"
-30		"自動載入字幕"
-32		"字幕"
-33		"(範例: eng jap swe)"
-34		"音訊"
-36		"預設軌道"
-38		"速度步進幅度:"
-41		"重設"
+31		"字幕"
+32		"(範例: eng jap swe)"
+33		"音訊"
+35		"預設軌道"
+37		"速度步進幅度:"
+40		"重設"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
@@ -394,15 +393,22 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"記憶上次的播放清單"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 17
-5		"存在時預設總是使用外部字幕檔案"
-7		"不載入內嵌字幕"
-9		"自動載入路徑"
-10		"重設"
-11		"線上字幕資料庫的基礎網址:"
-13		"測試"
-15		"線上資料庫"
-16		"偵測到變更後自動重新載入字幕檔案"
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+6		"覆寫放置位置"
+7		"水平:"
+11		"垂直:"
+15		"延遲間隔"
+16		"ms"
+18		"材質設定 (再次開啟視訊即可看見變更)"
+19		"預先緩衝的子畫面數目:"
+22		"最大材質解析度:"
+23		"只有在使用名為 ""VMR-7 (無轉換)"" 、 ""VMR-9 (無轉換)"" 、 ""EVR 自訂呈現"" 、 ""EVR 同步繪製器"" 、 ""Haali 繪製器"" 或 ""madVR""的視訊繪製器時能用 DirectShow 顯示字幕。VMR-7 需要 Windows XP, VMR-9 需要 DirectX 9, 同時兩者都需要有硬體加速的 D3D 顯示卡。"
+24		"問問題之前"
+25		"如果您覆寫並啟用在顯示卡裡的全螢幕反鋸齒 (FSAA) 設定, 字幕不會變得比較好看, 卻會吃更多的 CPU 資源。"
+27		"警告"
+28		"只要設定特定的 DirectX 7 或 DirectX 9 繪製器, RealMedia 與 QuickTime 格式也可以使用字幕。"
+29		"進位到 2 的乘方"
+30		"緩衝時允許動畫"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
@@ -435,22 +441,16 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"放置字幕於視訊畫面相對位置"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
-6		"覆寫放置位置"
-7		"水平:"
-11		"垂直:"
-15		"延遲間隔"
-16		"ms"
-18		"材質設定 (再次開啟視訊即可看見變更)"
-19		"預先緩衝的子畫面數目:"
-22		"最大材質解析度:"
-23		"只有在使用名為 ""VMR-7 (無轉換)"" 、 ""VMR-9 (無轉換)"" 、 ""EVR 自訂呈現"" 、 ""EVR 同步繪製器"" 、 ""Haali 繪製器"" 或 ""madVR""的視訊繪製器時能用 DirectShow 顯示字幕。VMR-7 需要 Windows XP, VMR-9 需要 DirectX 9, 同時兩者都需要有硬體加速的 D3D 顯示卡。"
-24		"問問題之前"
-25		"如果您覆寫並啟用在顯示卡裡的全螢幕反鋸齒 (FSAA) 設定, 字幕不會變得比較好看, 卻會吃更多的 CPU 資源。"
-27		"警告"
-28		"只要設定特定的 DirectX 7 或 DirectX 9 繪製器, RealMedia 與 QuickTime 格式也可以使用字幕。"
-29		"進位到 2 的乘方"
-30		"緩衝時允許動畫"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+5		"自動載入字幕"
+6		"存在時預設總是使用外部字幕檔案"
+8		"不載入內嵌字幕"
+10		"自動載入路徑"
+11		"重設"
+12		"線上字幕資料庫的基礎網址:"
+14		"測試"
+16		"線上資料庫"
+17		"偵測到變更後自動重新載入字幕檔案"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

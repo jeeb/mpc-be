@@ -36,6 +36,7 @@ public:
 	virtual ~CPPageSubtitles();
 
 	enum { IDD = IDD_PPAGESUBTITLES };
+	BOOL m_fAutoloadSubtitles;
 	BOOL m_fPrioritizeExternalSubtitles;
 	BOOL m_fDisableInternalSubtitles;
 	BOOL m_fAutoReloadExtSubtitles;

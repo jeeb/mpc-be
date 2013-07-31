@@ -337,7 +337,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 28
 27		"Eigenschaften"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Audio"
 6		"Lautstärke"
 7		"Min"
@@ -357,13 +357,12 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 26		"Filter-Graph in separatem &Thread erstellen"
 28		"Fehlerhafte Pins im Graph &melden"
 29		"&Audio-Dateien automatisch laden"
-30		"&Untertitel automatisch laden"
-32		"Untertitel"
-33		"(Beispiel: eng jap swe)"
-34		"Audio"
-36		"Standard DVD-Spur Sprache:"
-38		"Geschwindigkeitsstufe"
-41		"Reset"
+31		"Untertitel"
+32		"(Beispiel: eng jap swe)"
+33		"Audio"
+35		"Standard DVD-Spur Sprache:"
+37		"Geschwindigkeitsstufe"
+40		"Reset"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
@@ -394,15 +393,22 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Letzte Wiedergabeliste merken"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 17
-5		"Externe Untertitel bevorzugen (wenn verfügbar)"
-7		"Interne Untertitel nicht benutzen"
-9		"Pfade, in denen automatisch nach verfügbaren Untertiteln gesucht werden soll"
-10		"Zurücksetzen"
-11		"URL zur Online-Untertitel Datenbank:"
-13		"Testen"
-15		"Online-Untertitel Datenbank"
-16		"Auto-reload subtitle files after detecting modification"
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+6		"Position anpassen"
+7		"Horizontal:"
+11		"Vertikal:"
+15		"Zeitverzögerung"
+16		"ms"
+18		"Textur-Einstellungen (Neuladen des Videos erforderlich)"
+19		"Anzahl der im Voraus gelesenen Bilder:"
+22		"Maximale Textur Auflösung:"
+23		"Untertitel sind in DirectShow verfügbar, wenn als Video-Renderer ""VMR-7\n(renderless)"", oder ""VMR-9 (renderless)"" ausgewählt wurde. VMR-7 benötigt WinXP, VMR-9\nDirectX 9. Beide benötigen eine D3D-Grafikkarte mit Hardware-Beschleunigung."
+24		"Hinweis"
+25		"Wenn Sie die Untertitel-Position anpassen und in den Einstellungen der Grafikkarte\nVollbild-Antialiasing auswählen, sehen die Untertitel zwar besser aus, aber die\nCPU-Belastung steigt extrem an."
+27		"Warnung"
+28		"Untertitel für RealMedia und QuickTime sind möglich, wenn Sie deren spezielle\nDirectX 7 oder DirectX 9 Renderer einstellen."
+29		"Aufrunden zur 2er Potenz"
+30		"Aktiviere Animation beim Buffern"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
@@ -435,22 +441,16 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Untertitel relativ zum Video-Bild platzieren"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
-6		"Position anpassen"
-7		"Horizontal:"
-11		"Vertikal:"
-15		"Zeitverzögerung"
-16		"ms"
-18		"Textur-Einstellungen (Neuladen des Videos erforderlich)"
-19		"Anzahl der im Voraus gelesenen Bilder:"
-22		"Maximale Textur Auflösung:"
-23		"Untertitel sind in DirectShow verfügbar, wenn als Video-Renderer ""VMR-7\n(renderless)"", oder ""VMR-9 (renderless)"" ausgewählt wurde. VMR-7 benötigt WinXP, VMR-9\nDirectX 9. Beide benötigen eine D3D-Grafikkarte mit Hardware-Beschleunigung."
-24		"Hinweis"
-25		"Wenn Sie die Untertitel-Position anpassen und in den Einstellungen der Grafikkarte\nVollbild-Antialiasing auswählen, sehen die Untertitel zwar besser aus, aber die\nCPU-Belastung steigt extrem an."
-27		"Warnung"
-28		"Untertitel für RealMedia und QuickTime sind möglich, wenn Sie deren spezielle\nDirectX 7 oder DirectX 9 Renderer einstellen."
-29		"Aufrunden zur 2er Potenz"
-30		"Aktiviere Animation beim Buffern"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+5		"&Untertitel automatisch laden"
+6		"Externe Untertitel bevorzugen (wenn verfügbar)"
+8		"Interne Untertitel nicht benutzen"
+10		"Pfade, in denen automatisch nach verfügbaren Untertiteln gesucht werden soll"
+11		"Zurücksetzen"
+12		"URL zur Online-Untertitel Datenbank:"
+14		"Testen"
+16		"Online-Untertitel Datenbank"
+17		"Auto-reload subtitle files after detecting modification"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

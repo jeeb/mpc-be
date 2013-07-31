@@ -337,7 +337,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 28
 27		"Properties"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"音声"
 6		"音量"
 7		"低"
@@ -357,13 +357,12 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 26		"フィルタ グラフの構築にワーカー スレッドを使用する"
 28		"再生に失敗したピンを報告する"
 29		"音声ファイルを自動で読み込む"
-30		"字幕を自動で読み込む"
-32		"字幕"
-33		"(例: eng jap swe)"
-34		"音声"
-36		"デフォルト トラックの優先順序"
-38		"Speed Step"
-41		"Reset"
+31		"字幕"
+32		"(例: eng jap swe)"
+33		"音声"
+35		"デフォルト トラックの優先順序"
+37		"Speed Step"
+40		"Reset"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
@@ -394,15 +393,22 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Remember last playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 17
-5		"外部字幕ファイルを優先する"
-7		"内蔵された字幕を読み込まない"
-9		"字幕ファイルパス指定"
-10		"リセット"
-11		"オンライン字幕データベースの基本 URL:"
-13		"テスト"
-15		"オンラインデータベース"
-16		"Auto-reload subtitle files after detecting modification"
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+6		"配置を強制指定する"
+7		"水平位置:"
+11		"垂直位置:"
+15		"遅延間隔"
+16		"ms"
+18		"テクスチャ設定 (変更を有効にするにはビデオを開き直してください)"
+19		"先読みサブピクチャ数:"
+22		"テクスチャの最大解像度:"
+23		"DirectShow での字幕表示はビデオ レンダラに VMR-7 (レンダーレス) か VMR-9 (レンダーレス) が設定されている場合に有効です。VMR-7 には Windows XP、VMR-9 には DirectX 9 が必要で、どちらも Direct3D ハードウェア アクセラレーションに対応したビデオカードが必要です。"
+24		"質問する前に"
+25		"ビデオカードの設定でフルスクリーン時のアンチ エイリアシングを有効にした場合、CPU 負荷が大きくなるだけで字幕は少しも綺麗にならないでしょう。"
+27		"警告"
+28		"RealMedia と QuickTime 形式は、専用の DirectX 7 または DirectX 9 のレンダラに設定することで字幕を表示できます。"
+29		"2の累乗で切り上げる"
+30		"バッファリング中のアニメーションを許可する"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
@@ -435,22 +441,16 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"ビデオ フレームに合わせて字幕を配置する"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
-6		"配置を強制指定する"
-7		"水平位置:"
-11		"垂直位置:"
-15		"遅延間隔"
-16		"ms"
-18		"テクスチャ設定 (変更を有効にするにはビデオを開き直してください)"
-19		"先読みサブピクチャ数:"
-22		"テクスチャの最大解像度:"
-23		"DirectShow での字幕表示はビデオ レンダラに VMR-7 (レンダーレス) か VMR-9 (レンダーレス) が設定されている場合に有効です。VMR-7 には Windows XP、VMR-9 には DirectX 9 が必要で、どちらも Direct3D ハードウェア アクセラレーションに対応したビデオカードが必要です。"
-24		"質問する前に"
-25		"ビデオカードの設定でフルスクリーン時のアンチ エイリアシングを有効にした場合、CPU 負荷が大きくなるだけで字幕は少しも綺麗にならないでしょう。"
-27		"警告"
-28		"RealMedia と QuickTime 形式は、専用の DirectX 7 または DirectX 9 のレンダラに設定することで字幕を表示できます。"
-29		"2の累乗で切り上げる"
-30		"バッファリング中のアニメーションを許可する"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+5		"字幕を自動で読み込む"
+6		"外部字幕ファイルを優先する"
+8		"内蔵された字幕を読み込まない"
+10		"字幕ファイルパス指定"
+11		"リセット"
+12		"オンライン字幕データベースの基本 URL:"
+14		"テスト"
+16		"オンラインデータベース"
+17		"Auto-reload subtitle files after detecting modification"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

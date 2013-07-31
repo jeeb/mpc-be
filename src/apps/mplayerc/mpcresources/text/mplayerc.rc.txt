@@ -337,7 +337,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 28
 27		"Properties"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Audio"
 6		"Volume"
 7		"Min"
@@ -357,13 +357,12 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 26		"Use worker thread to construct the filter graph"
 28		"Report pins which fail to render"
 29		"Auto-load audio files"
-30		"Auto-load subtitles"
-32		"Subtitles:"
-33		"(Example: eng jap swe)"
-34		"Audio:"
-36		"Default track preference"
-38		"Speed Step"
-41		"Reset"
+31		"Subtitles:"
+32		"(Example: eng jap swe)"
+33		"Audio:"
+35		"Default track preference"
+37		"Speed Step"
+40		"Reset"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
@@ -394,15 +393,22 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Remember last playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 17
-5		"Prefer external subtitles over embedded subtitles"
-7		"Ignore embedded subtitles"
-9		"Autoload paths"
-10		"Reset"
-11		"Base URL of the online subtitle database:"
-13		"Test"
-15		"Online database"
-16		"Auto-reload subtitle files after detecting modification"
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+6		"Override placement"
+7		"Horizontal:"
+11		"Vertical:"
+15		"Delay interval"
+16		"ms"
+18		"Texture settings (open the video again to see the changes)"
+19		"Sub pictures to buffer:"
+22		"Maximum texture resolution:"
+23		"The internal subtitle functionality is only available when a compatible video renderer is used. You can select the desired video renderer on the Output page under Playback options. Compatible renderers are marked with '**' behind their name."
+24		"Before you ask"
+25		"If you override and enable full-screen antialiasing somewhere at your videocard's settings, subtitles aren't going to look any better but it will surely eat your cpu."
+27		"Warning"
+28		"RealMedia and QuickTime formats can be subtitled by setting their special DirectX 7 or DirectX 9 renderers."
+29		"Round up to power of two"
+30		"Allow animation when buffering"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
@@ -435,22 +441,16 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Position subtitles relative to the video frame"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
-6		"Override placement"
-7		"Horizontal:"
-11		"Vertical:"
-15		"Delay interval"
-16		"ms"
-18		"Texture settings (open the video again to see the changes)"
-19		"Sub pictures to buffer:"
-22		"Maximum texture resolution:"
-23		"The internal subtitle functionality is only available when a compatible video renderer is used. You can select the desired video renderer on the Output page under Playback options. Compatible renderers are marked with '**' behind their name."
-24		"Before you ask"
-25		"If you override and enable full-screen antialiasing somewhere at your videocard's settings, subtitles aren't going to look any better but it will surely eat your cpu."
-27		"Warning"
-28		"RealMedia and QuickTime formats can be subtitled by setting their special DirectX 7 or DirectX 9 renderers."
-29		"Round up to power of two"
-30		"Allow animation when buffering"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+5		"Auto-load subtitles"
+6		"Prefer external subtitles over embedded subtitles"
+8		"Ignore embedded subtitles"
+10		"Autoload paths"
+11		"Reset"
+12		"Base URL of the online subtitle database:"
+14		"Test"
+16		"Online database"
+17		"Auto-reload subtitle files after detecting modification"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

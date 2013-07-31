@@ -337,7 +337,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 28
 27		"Properties"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Audioa"
 6		"Bolumena"
 7		"Gutx"
@@ -357,13 +357,12 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 26		"Erabili langile hariak iragazki grafika eraikitzeko"
 28		"Jakinarazi aurkezlean huts egiten duten pin-ak"
 29		"Berez-gertatu audio agiriak"
-30		"Berez-gertatu azpidatziak"
-32		"Azpidatziak:"
-33		"(Azpidatziak: eng jap baq)"
-34		"Audioa:"
-36		"Berezko bide hobespena"
-38		"Speed Step"
-41		"Reset"
+31		"Azpidatziak:"
+32		"(Azpidatziak: eng jap baq)"
+33		"Audioa:"
+35		"Berezko bide hobespena"
+37		"Speed Step"
+40		"Reset"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
@@ -394,15 +393,22 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Remember last playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 17
-5		"Hobetsi kanpoko azpidatziak barneko azpidatziei"
-7		"Ezikusi barneratutako azpidatziak"
-9		"Berez-gertatu helburuak"
-10		"Berrezarri"
-11		"Onlineko azpidatzi datubaseko URL-a:"
-13		"Azterketa"
-15		"Online datubasea"
-16		"Auto-reload subtitle files after detecting modification"
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+6		"Ezeztatu kokapena"
+7		"Etzana:"
+11		"Zutia:"
+15		"Atzerapen aldia"
+16		"sm"
+18		"Egitura ezarpenak (ireki bideo berriro aldaketak ikusteko)"
+19		"Azp irudiak bufferrera:"
+22		"Gehienezko egitura bereizmena:"
+23		"Barneko azpidatzi eginkizuna erabilgarria da bakarrik bideo aurkezle bateragarri bat erabiltzen denean. Gogoko duzun bideo aurkezlea hautatu dezakezu Irteera orrialdean Irakurketa aukeren barnean. Aurkezle bateragarriek '**' ezaugarria dute."
+24		"Galdetu aurretik"
+25		"Ezeztatzen baduzu eta gaitu ikusleiho-osoko hertzlehunketa zure bideotxartelaren ezarpenetan, azpidatziak ez dira hobeto ikusiko baina zure cpu-a jango dute."
+27		"Kontuz"
+28		"RealMedia eta QuickTime heuskarriak azpidatzituak izan daitezke beren DirectX 7 edo DirectX 9 aukezle bereziak ezarriz."
+29		"Round up to power of two"
+30		"Ahalbidetu animazioa bufferreratzean"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
@@ -435,22 +441,16 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Azpidatzien kokapen bideo framearekiko"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
-6		"Ezeztatu kokapena"
-7		"Etzana:"
-11		"Zutia:"
-15		"Atzerapen aldia"
-16		"sm"
-18		"Egitura ezarpenak (ireki bideo berriro aldaketak ikusteko)"
-19		"Azp irudiak bufferrera:"
-22		"Gehienezko egitura bereizmena:"
-23		"Barneko azpidatzi eginkizuna erabilgarria da bakarrik bideo aurkezle bateragarri bat erabiltzen denean. Gogoko duzun bideo aurkezlea hautatu dezakezu Irteera orrialdean Irakurketa aukeren barnean. Aurkezle bateragarriek '**' ezaugarria dute."
-24		"Galdetu aurretik"
-25		"Ezeztatzen baduzu eta gaitu ikusleiho-osoko hertzlehunketa zure bideotxartelaren ezarpenetan, azpidatziak ez dira hobeto ikusiko baina zure cpu-a jango dute."
-27		"Kontuz"
-28		"RealMedia eta QuickTime heuskarriak azpidatzituak izan daitezke beren DirectX 7 edo DirectX 9 aukezle bereziak ezarriz."
-29		"Round up to power of two"
-30		"Ahalbidetu animazioa bufferreratzean"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+5		"Berez-gertatu azpidatziak"
+6		"Hobetsi kanpoko azpidatziak barneko azpidatziei"
+8		"Ezikusi barneratutako azpidatziak"
+10		"Berez-gertatu helburuak"
+11		"Berrezarri"
+12		"Onlineko azpidatzi datubaseko URL-a:"
+14		"Azterketa"
+16		"Online datubasea"
+17		"Auto-reload subtitle files after detecting modification"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

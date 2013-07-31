@@ -337,7 +337,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 28
 27		"Properties"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Audió"
 6		"Hangerő"
 7		"Min"
@@ -357,13 +357,12 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 26		"Szűrő-Gráf felépítése külön eljárással"
 28		"Hibás, nem átalakítható csatlakozók jelentése"
 29		"Audiófájlok auto betöltése"
-30		"Feliratok auto betöltése"
-32		"Subtitles:"
-33		"(Example: eng jap swe)"
-34		"Audio:"
-36		"Default track preference"
-38		"Speed Step"
-41		"Reset"
+31		"Subtitles:"
+32		"(Example: eng jap swe)"
+33		"Audio:"
+35		"Default track preference"
+37		"Speed Step"
+40		"Reset"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
@@ -394,15 +393,22 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Remember last playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 17
-5		"Always default to external subtitles if available"
-7		"Do not load embedded subtitles"
-9		"Autoload paths"
-10		"Reset"
-11		"Az internetről elérhető felirat adatbázis bázis URL címe:"
-13		"Tesztelés"
-15		"Online database"
-16		"Auto-reload subtitle files after detecting modification"
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+6		"Elhelyezés felülbírálása"
+7		"Vízszintes:"
+11		"Függőleges:"
+15		"Késleltetés"
+16		"ms"
+18		"Textúra beállítások (nyissa meg újra a videót, hogy láthassa a különbségeket)"
+19		"Előre olvasandó feliratképek száma:"
+22		"Legnagyobb textúra felbontás:"
+23		"DirectShow alatti feliratozás akkor érhető el, ha a ""VMR-7 (renderless)"" vagy a ""VMR-9 (renderless)"" videó átalakítót állítjuk be. A VMR-7-hez Windows XP, a VMR-9-hez DirectX9 szükséges. Mindkettőhöz hardveres gyorsítású D3D videokártya szükséges."
+24		"Mielőtt megkérdezné"
+25		"Ha felülbírálva engedélyezi a videokártyája beállításainál a teljes képernyős vonalsimítást, a feliratok akkor sem lesznek szebbek, viszont a processzorát teljesen leterheli vele."
+27		"Figyelmeztetés"
+28		"A RealMedia és QuickTime formátumokat úgy lehet feliratozni, ha beállítjuk a speciális DirectX 7 vagy DirectX 9 átalakítóikat."
+29		"Felkerekítés kettő hatványaira"
+30		"Animálás engedélyezése előre olvasáskor"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
@@ -435,22 +441,16 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"A feliratok relatív pozícionálása  a képkockákhoz"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
-6		"Elhelyezés felülbírálása"
-7		"Vízszintes:"
-11		"Függőleges:"
-15		"Késleltetés"
-16		"ms"
-18		"Textúra beállítások (nyissa meg újra a videót, hogy láthassa a különbségeket)"
-19		"Előre olvasandó feliratképek száma:"
-22		"Legnagyobb textúra felbontás:"
-23		"DirectShow alatti feliratozás akkor érhető el, ha a ""VMR-7 (renderless)"" vagy a ""VMR-9 (renderless)"" videó átalakítót állítjuk be. A VMR-7-hez Windows XP, a VMR-9-hez DirectX9 szükséges. Mindkettőhöz hardveres gyorsítású D3D videokártya szükséges."
-24		"Mielőtt megkérdezné"
-25		"Ha felülbírálva engedélyezi a videokártyája beállításainál a teljes képernyős vonalsimítást, a feliratok akkor sem lesznek szebbek, viszont a processzorát teljesen leterheli vele."
-27		"Figyelmeztetés"
-28		"A RealMedia és QuickTime formátumokat úgy lehet feliratozni, ha beállítjuk a speciális DirectX 7 vagy DirectX 9 átalakítóikat."
-29		"Felkerekítés kettő hatványaira"
-30		"Animálás engedélyezése előre olvasáskor"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+5		"Feliratok auto betöltése"
+6		"Always default to external subtitles if available"
+8		"Do not load embedded subtitles"
+10		"Autoload paths"
+11		"Reset"
+12		"Az internetről elérhető felirat adatbázis bázis URL címe:"
+14		"Tesztelés"
+16		"Online database"
+17		"Auto-reload subtitle files after detecting modification"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

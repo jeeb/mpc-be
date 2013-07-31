@@ -337,7 +337,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 28
 27		"Properties"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Áudio"
 6		"Volume"
 7		"Min"
@@ -357,13 +357,12 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 26		"Usar processo funcional para construir filtro gráfico"
 28		"Reportar conectores que não queiram funcionar"
 29		"Auto-carregamento de áudio"
-30		"Auto-carregamento de legendas"
-32		"Legenda"
-33		"(Exemplo: eng jap swe)"
-34		"Áudio"
-36		"Preferência de faixa padrão"
-38		"Speed Step"
-41		"Reset"
+31		"Legenda"
+32		"(Exemplo: eng jap swe)"
+33		"Áudio"
+35		"Preferência de faixa padrão"
+37		"Speed Step"
+40		"Reset"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
@@ -394,15 +393,22 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Remember last playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 17
-5		"Sempre padronizar para legendas externas se disponível"
-7		"Não carregar legendas incorporadas"
-9		"Carregar automaticamente os caminhos"
-10		"Reiniciar"
-11		"Digite a URL da base de dados de legendas:"
-13		"Testar"
-15		"Base de dados online"
-16		"Auto-reload subtitle files after detecting modification"
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+6		"Forçar posicionamento"
+7		"Horizontal:"
+11		"Vertical:"
+15		"Intervalo de atraso"
+16		"ms"
+18		"Opções de textura (é necessário re-abrir o arquivo para aplicar as alterações)"
+19		"Sub telas para armazenar em buffer:"
+22		"Resolução máxima da textura:"
+23		"As legendas para DirectShow estarão disponiveis quando se usar os métodos de renderização ""VMR-7 (sem render)"" ou ""VMR-9 (sem render)"". VMR-7 requer Windows XP, VMR-9 requer DirectX 9, e ambos requerem um placa de vídeo com D3D por Hardware."
+24		"Antes de perguntar"
+25		"Se voce forçar e habilitar o modo de antialiasing em tela cheia nas configurações da sua placa de vídeo, não irá melhorar a qualidade das legendas mas certamente irá consumir muito o trabalho da CPU"
+27		"Aviso"
+28		"Os formatos RealMedia e QuickTime pode oferecer legendas ao configurar sua renderização especial em DirectX 7 ou DirectX 9."
+29		"Elevar á potência de dois"
+30		"Permitir animação quando em carregamento (buffering)"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
@@ -435,22 +441,16 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Posição das legendas relativo aos quadros vídeo"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
-6		"Forçar posicionamento"
-7		"Horizontal:"
-11		"Vertical:"
-15		"Intervalo de atraso"
-16		"ms"
-18		"Opções de textura (é necessário re-abrir o arquivo para aplicar as alterações)"
-19		"Sub telas para armazenar em buffer:"
-22		"Resolução máxima da textura:"
-23		"As legendas para DirectShow estarão disponiveis quando se usar os métodos de renderização ""VMR-7 (sem render)"" ou ""VMR-9 (sem render)"". VMR-7 requer Windows XP, VMR-9 requer DirectX 9, e ambos requerem um placa de vídeo com D3D por Hardware."
-24		"Antes de perguntar"
-25		"Se voce forçar e habilitar o modo de antialiasing em tela cheia nas configurações da sua placa de vídeo, não irá melhorar a qualidade das legendas mas certamente irá consumir muito o trabalho da CPU"
-27		"Aviso"
-28		"Os formatos RealMedia e QuickTime pode oferecer legendas ao configurar sua renderização especial em DirectX 7 ou DirectX 9."
-29		"Elevar á potência de dois"
-30		"Permitir animação quando em carregamento (buffering)"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+5		"Auto-carregamento de legendas"
+6		"Sempre padronizar para legendas externas se disponível"
+8		"Não carregar legendas incorporadas"
+10		"Carregar automaticamente os caminhos"
+11		"Reiniciar"
+12		"Digite a URL da base de dados de legendas:"
+14		"Testar"
+16		"Base de dados online"
+17		"Auto-reload subtitle files after detecting modification"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

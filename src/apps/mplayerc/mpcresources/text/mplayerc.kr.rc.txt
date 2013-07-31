@@ -337,7 +337,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 28
 27		"등록정보"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"오디오"
 6		"볼륨"
 7		"최소"
@@ -357,13 +357,12 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 26		"필터그래프를 생성하는 작업자 쓰레드 사용"
 28		"렌더링에 실패하면 핀 보고"
 29		"오디오파일을 자동으로 열기"
-30		"자막파일을 자동으로 열기"
-32		"자막언어"
-33		"(예: eng kor jap)"
-34		"오디오언어"
-36		"기본 선호 트랙"
-38		"Speed Step"
-41		"초기화"
+31		"자막언어"
+32		"(예: eng kor jap)"
+33		"오디오언어"
+35		"기본 선호 트랙"
+37		"Speed Step"
+40		"초기화"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
@@ -394,15 +393,22 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"지난 재생목록 기억"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 17
-5		"항상 외부 자막보기(사용가능한경우)"
-7		"내장 자막 불러오지않음"
-9		"자동 불러오기 경로"
-10		"초기화"
-11		"온라인 자막 데이터베이스 URL:"
-13		"테스트"
-15		"온라인 데이터베이스"
-16		"변경사항 탐지후 자막 파일 자동 다시 불러오기"
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+6		"자막 표시 위치"
+7		"수평:"
+11		"수직:"
+15		"딜레이설정"
+16		"밀리초"
+18		"텍스쳐 설정 (파일을 다시 열어야함)"
+19		"버퍼로 읽어올 서브픽쳐 갯수:"
+22		"최대 텍스쳐 해상도:"
+23		"자막표시기능은 환경설정의 '재생-출력' 페이지에서 비디오 렌더링 모드를 ""VMR-7 (렌더리스)"" 또는 ""VMR-9 (렌더리스)"" 로 선택했을때만 가능합니다. VMR-7은 윈도우XP, VMR-9은 DirectX 9를 필요로하며, 모두 하드웨어 가속이 가능한 D3D 비디오카드가 필요합니다."
+24		"알아두기"
+25		"만약 비디오카드 설정에서 위치설정 및 전체화면 안티앨리어싱을 설정했다면 자막이 잘 표시되지 않을수도 있습니다."
+27		"경고"
+28		"RealMedia 와 QuickTime 형식은 '재생-출력' 페이지에서 DirectX 7 또는 DirectX 9 렌더러를 사용하도록 설정한 경우에만 자막을 표시할수 있습니다."
+29		"2의 배수로 맞춤"
+30		"버퍼링중 자막 애니메이션"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
@@ -435,22 +441,16 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"비디오 프레임에 따라 자막위치를 지정"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
-6		"자막 표시 위치"
-7		"수평:"
-11		"수직:"
-15		"딜레이설정"
-16		"밀리초"
-18		"텍스쳐 설정 (파일을 다시 열어야함)"
-19		"버퍼로 읽어올 서브픽쳐 갯수:"
-22		"최대 텍스쳐 해상도:"
-23		"자막표시기능은 환경설정의 '재생-출력' 페이지에서 비디오 렌더링 모드를 ""VMR-7 (렌더리스)"" 또는 ""VMR-9 (렌더리스)"" 로 선택했을때만 가능합니다. VMR-7은 윈도우XP, VMR-9은 DirectX 9를 필요로하며, 모두 하드웨어 가속이 가능한 D3D 비디오카드가 필요합니다."
-24		"알아두기"
-25		"만약 비디오카드 설정에서 위치설정 및 전체화면 안티앨리어싱을 설정했다면 자막이 잘 표시되지 않을수도 있습니다."
-27		"경고"
-28		"RealMedia 와 QuickTime 형식은 '재생-출력' 페이지에서 DirectX 7 또는 DirectX 9 렌더러를 사용하도록 설정한 경우에만 자막을 표시할수 있습니다."
-29		"2의 배수로 맞춤"
-30		"버퍼링중 자막 애니메이션"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+5		"자막파일을 자동으로 열기"
+6		"항상 외부 자막보기(사용가능한경우)"
+8		"내장 자막 불러오지않음"
+10		"자동 불러오기 경로"
+11		"초기화"
+12		"온라인 자막 데이터베이스 URL:"
+14		"테스트"
+16		"온라인 데이터베이스"
+17		"변경사항 탐지후 자막 파일 자동 다시 불러오기"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

@@ -337,7 +337,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 28
 27		"属性"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"音频"
 6		"音量"
 7		"小"
@@ -357,13 +357,12 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 26		"使用工作线程来创建滤镜图像"
 28		"报告渲染失败的接口(pin)"
 29		"自动加载外部音轨"
-30		"自动加载字幕"
-32		"字幕"
-33		"(例如: eng jap swe)"
-34		"音轨:"
-36		"缺省设置"
-38		"速度步进"
-41		"重置"
+31		"字幕"
+32		"(例如: eng jap swe)"
+33		"音轨:"
+35		"缺省设置"
+37		"速度步进"
+40		"重置"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
@@ -394,15 +393,22 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"记住最后的播放列表"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 17
-5		"当外部字幕存在时优先使用外部字幕"
-7		"不载入内嵌字幕"
-9		"自动载入路径"
-10		"重置"
-11		"在线字幕数据库的地址: "
-13		"测试"
-15		"在线数据库"
-16		"Auto-reload subtitle files after detecting modification"
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+6		"覆盖位置"
+7		"水平: "
+11		"垂直: "
+15		"延迟间隔"
+16		"毫秒"
+18		"纹理设置(重新打开视频来查看更改效果)"
+19		"字幕图像缓冲数量: "
+22		"最大纹理分辨率: "
+23		"当视频渲染器被设置为 “VMR-7 (未渲染)”或 “VMR-9 (未渲染)”时，DirectShow 字幕可用。VMR-7 适用于 Windows XP，VMR-9 需要 DirectX 9 并支持硬件加速的 D3D 显卡。"
+24		"友情提示"
+25		"如果您使用了纹理覆盖并打开您显卡全屏抗锯齿功能的话，它将不会使字幕变得比以前好看，但却一定会大量吞噬您的 CPU 资源。"
+27		"警告"
+28		"RealMedia 和 QuickTime 格式可以单独设置它们各自渲染方式为 DirectX 7 或 DirectX 9 后显示字幕。"
+29		"二次幂只入不舍"
+30		"允许使用字幕动画效果"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
@@ -435,22 +441,16 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"相对于视频帧的字幕位置"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
-6		"覆盖位置"
-7		"水平: "
-11		"垂直: "
-15		"延迟间隔"
-16		"毫秒"
-18		"纹理设置(重新打开视频来查看更改效果)"
-19		"字幕图像缓冲数量: "
-22		"最大纹理分辨率: "
-23		"当视频渲染器被设置为 “VMR-7 (未渲染)”或 “VMR-9 (未渲染)”时，DirectShow 字幕可用。VMR-7 适用于 Windows XP，VMR-9 需要 DirectX 9 并支持硬件加速的 D3D 显卡。"
-24		"友情提示"
-25		"如果您使用了纹理覆盖并打开您显卡全屏抗锯齿功能的话，它将不会使字幕变得比以前好看，但却一定会大量吞噬您的 CPU 资源。"
-27		"警告"
-28		"RealMedia 和 QuickTime 格式可以单独设置它们各自渲染方式为 DirectX 7 或 DirectX 9 后显示字幕。"
-29		"二次幂只入不舍"
-30		"允许使用字幕动画效果"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+5		"自动加载字幕"
+6		"当外部字幕存在时优先使用外部字幕"
+8		"不载入内嵌字幕"
+10		"自动载入路径"
+11		"重置"
+12		"在线字幕数据库的地址: "
+14		"测试"
+16		"在线数据库"
+17		"Auto-reload subtitle files after detecting modification"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

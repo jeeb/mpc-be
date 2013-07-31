@@ -30,6 +30,7 @@ IMPLEMENT_DYNAMIC(CPPageSubtitles, CPPageBase)
 
 CPPageSubtitles::CPPageSubtitles()
 	: CPPageBase(CPPageSubtitles::IDD, CPPageSubtitles::IDD)
+	, m_fAutoloadSubtitles(FALSE)
 	, m_fPrioritizeExternalSubtitles(FALSE)
 	, m_fDisableInternalSubtitles(FALSE)
 	, m_fAutoReloadExtSubtitles(FALSE)
@@ -45,6 +46,7 @@ void CPPageSubtitles::DoDataExchange(CDataExchange* pDX)
 {
 	CPPageBase::DoDataExchange(pDX);
 
+	DDX_Check(pDX, IDC_CHECK4, m_fAutoloadSubtitles);
 	DDX_Check(pDX, IDC_CHECK1, m_fPrioritizeExternalSubtitles);
 	DDX_Check(pDX, IDC_CHECK2, m_fDisableInternalSubtitles);
 	DDX_Check(pDX, IDC_CHECK3, m_fAutoReloadExtSubtitles);
@@ -59,6 +61,7 @@ BOOL CPPageSubtitles::OnInitDialog()
 
 	AppSettings& s = AfxGetAppSettings();
 
+	m_fAutoloadSubtitles			= s.fAutoloadSubtitles;
 	m_fPrioritizeExternalSubtitles	= s.fPrioritizeExternalSubtitles;
 	m_fDisableInternalSubtitles		= s.fDisableInternalSubtitles;
 	m_fAutoReloadExtSubtitles		= s.fAutoReloadExtSubtitles;
@@ -82,6 +85,7 @@ BOOL CPPageSubtitles::OnApply()
 
 	AppSettings& s = AfxGetAppSettings();
 
+	s.fAutoloadSubtitles			= !!m_fAutoloadSubtitles;
 	s.fPrioritizeExternalSubtitles	= !!m_fPrioritizeExternalSubtitles;
 	s.fDisableInternalSubtitles		= !!m_fDisableInternalSubtitles;
 	s.fAutoReloadExtSubtitles		= !!m_fAutoReloadExtSubtitles;

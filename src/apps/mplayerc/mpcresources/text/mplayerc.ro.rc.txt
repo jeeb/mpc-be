@@ -337,7 +337,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 28
 27		"DXVA"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Audio"
 6		"Volum"
 7		"Min"
@@ -357,13 +357,12 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 26		"Subtitrări:"
 28		"Audio:"
 29		"(Exemplu: rum eng jap swe)"
-30		"Deschide setările"
-32		"Folosește un fir de execuţie secundar pentru a construi graficul filtrelor"
-33		"Raportează pinii care eșuează să randeze"
-34		"Încarcă automat fișierele audio"
-36		"Încarcă automat subtitrările"
-38		"Control"
-41		"Reset"
+31		"Folosește un fir de execuţie secundar pentru a construi graficul filtrelor"
+32		"Raportează pinii care eșuează să randeze"
+33		"Încarcă automat fișierele audio"
+35		"Încarcă automat subtitrările"
+37		"Control"
+40		"Reset"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
@@ -394,15 +393,22 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Ține minte ultima focalizare a Pan-n-Scan"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 17
-5		"Preferă subtitrările externe în locul celor integrate"
-7		"Ignoră subtitrările integrate"
-9		"Căi de încărcare automată"
-10		"Resetează"
-11		"Bază de date online"
-13		"URL de bază pentru baza de date cu subtitrări online:"
-15		"Testează"
-16		"Auto-reload subtitle files after detecting modification"
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+6		"Suprascrie așezarea"
+7		"Orizontal:"
+11		"Vertical:"
+15		"Interval întârziere"
+16		"ms"
+18		"Setările texturei (deschideți fișierul video din nou pentru a vedea schimbările)"
+19		"Imagini subtitrare de preîncărcat:"
+22		"Rezoluție maximă pentru textură :"
+23		"Permite animații când se încarcă în avans"
+24		"Rotunjește la puteri ale lui 2"
+25		"Avertisment"
+27		"Dacă suprascrieţi și activați dezimțuire (antialiasing) pentru ecran complet în setările plăcii grafice, subtitrările nu o să arate mai bine, dar cu siguranță se va consuma din puterea procesorului."
+28		"RealMedia and QuickTime formats can be subtitled by setting their special DirectX 7 or DirectX 9 renderers."
+29		"Round up to power of two"
+30		"Allow animation when buffering"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
@@ -435,22 +441,16 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Unește canalele alpha"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
-6		"Suprascrie așezarea"
-7		"Orizontal:"
-11		"Vertical:"
-15		"Interval întârziere"
-16		"ms"
-18		"Setările texturei (deschideți fișierul video din nou pentru a vedea schimbările)"
-19		"Imagini subtitrare de preîncărcat:"
-22		"Rezoluție maximă pentru textură :"
-23		"Permite animații când se încarcă în avans"
-24		"Rotunjește la puteri ale lui 2"
-25		"Avertisment"
-27		"Dacă suprascrieţi și activați dezimțuire (antialiasing) pentru ecran complet în setările plăcii grafice, subtitrările nu o să arate mai bine, dar cu siguranță se va consuma din puterea procesorului."
-28		"RealMedia and QuickTime formats can be subtitled by setting their special DirectX 7 or DirectX 9 renderers."
-29		"Round up to power of two"
-30		"Allow animation when buffering"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+5		"Deschide setările"
+6		"Preferă subtitrările externe în locul celor integrate"
+8		"Ignoră subtitrările integrate"
+10		"Căi de încărcare automată"
+11		"Resetează"
+12		"Bază de date online"
+14		"URL de bază pentru baza de date cu subtitrări online:"
+16		"Testează"
+17		"Auto-reload subtitle files after detecting modification"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

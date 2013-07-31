@@ -337,7 +337,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 28
 27		"Özellikler"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 5		"Ses"
 6		"Ses"
 7		"Alçak"
@@ -357,13 +357,12 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 26		"Süzgeç grafiği kurulumu için oynatıcı önceliğini kullan"
 28		"Çevrilemeyen ilişkilendirmeleri rapor et"
 29		"Ses dosyalarını oto-yükle"
-30		"Altyazıları oto-yükle"
-32		"Altyazı :"
-33		"(Örnek: tur eng jap)"
-34		"Ses :"
-36		"Varsayılan parça seçimi"
-38		"Speed Step"
-41		"Reset"
+31		"Altyazı :"
+32		"(Örnek: tur eng jap)"
+33		"Ses :"
+35		"Varsayılan parça seçimi"
+37		"Speed Step"
+40		"Reset"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
@@ -394,15 +393,22 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Remember last playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 17
-5		"Her zaman harici alt yazıları tercih et"
-7		"Gömülü altyazıları yükleme"
-9		"Yükleme konumları"
-10		"Sıfırla"
-11		"Çevrimiçi altyazı veritabanı adresi:"
-13		"Dene"
-15		"Çevrimiçi veritabanı"
-16		"Auto-reload subtitle files after detecting modification"
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
+6		"Özel yerleşim"
+7		"Yatay:"
+11		"Dikey:"
+15		"Gecikme süresi"
+16		"ms"
+18		"Kaplama ayarları (değişiklikleri görmek için video'yu tekrar açınız)"
+19		"Tamponlanarak okunacak resim sayısı:"
+22		"En fazla doku çözünürlüğü:"
+23		"DirectShow için altyazılar video ayırıcısından ""VMR-7 (çevrilmeden)"" veya ""VMR-9 (çevrilmeden)"" seçenekleri işaretlenerek kullanılabilir. VMR-7 ===> Windows XP, VMR-9 ===> DirectX 9, ve ikisi de HW hızlandırmalı bir D3D ekran kartı gerektirir."
+24		"Bilgi"
+25		"Ekran kartınızın ayarlarından Tam ekran keskinlik yumuşatması seçeneğini açarsanız, altyazılar düzgün görülmeyecek ve daha fazla işlemci kullanımına neden olacaktır."
+27		"Uyarı"
+28		"RealMedia ve QuickTime biçimleri kendilerine özel DirectX 7 ve 9 çeviricileri ile altyazılı olarak görüntülenebilirler."
+29		"Dokuyu çiftli olarak topla"
+30		"Tamponlarken animasyonlara izin ver"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
@@ -435,22 +441,16 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Alt yazıları video çerçevesine bağla"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
-6		"Özel yerleşim"
-7		"Yatay:"
-11		"Dikey:"
-15		"Gecikme süresi"
-16		"ms"
-18		"Kaplama ayarları (değişiklikleri görmek için video'yu tekrar açınız)"
-19		"Tamponlanarak okunacak resim sayısı:"
-22		"En fazla doku çözünürlüğü:"
-23		"DirectShow için altyazılar video ayırıcısından ""VMR-7 (çevrilmeden)"" veya ""VMR-9 (çevrilmeden)"" seçenekleri işaretlenerek kullanılabilir. VMR-7 ===> Windows XP, VMR-9 ===> DirectX 9, ve ikisi de HW hızlandırmalı bir D3D ekran kartı gerektirir."
-24		"Bilgi"
-25		"Ekran kartınızın ayarlarından Tam ekran keskinlik yumuşatması seçeneğini açarsanız, altyazılar düzgün görülmeyecek ve daha fazla işlemci kullanımına neden olacaktır."
-27		"Uyarı"
-28		"RealMedia ve QuickTime biçimleri kendilerine özel DirectX 7 ve 9 çeviricileri ile altyazılı olarak görüntülenebilirler."
-29		"Dokuyu çiftli olarak topla"
-30		"Tamponlarken animasyonlara izin ver"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+5		"Altyazıları oto-yükle"
+6		"Her zaman harici alt yazıları tercih et"
+8		"Gömülü altyazıları yükleme"
+10		"Yükleme konumları"
+11		"Sıfırla"
+12		"Çevrimiçi altyazı veritabanı adresi:"
+14		"Dene"
+16		"Çevrimiçi veritabanı"
+17		"Auto-reload subtitle files after detecting modification"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
