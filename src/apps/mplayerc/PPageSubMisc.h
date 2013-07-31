@@ -1,6 +1,7 @@
 /*
  * $Id$
  *
+ * (C) 2003-2006 Gabest
  * (C) 2006-2013 see Authors.txt
  *
  * This file is part of MPC-BE.
@@ -22,7 +23,7 @@
 
 #pragma once
 
-#include "PPageBase.h"
+#include "../../Subtitles/STS.h"
 
 
 // CPPageSubMisc dialog
@@ -35,23 +36,31 @@ public:
 	CPPageSubMisc();
 	virtual ~CPPageSubMisc();
 
+	BOOL m_fOverridePlacement;
+	int m_nHorPos;
+	CEdit m_nHorPosEdit;
+	CSpinButtonCtrl m_nHorPosCtrl;
+	int m_nVerPos;
+	CEdit m_nVerPosEdit;
+	CSpinButtonCtrl m_nVerPosCtrl;
+	int m_nSPCSize;
+	CSpinButtonCtrl m_nSPCSizeCtrl;
+	CComboBox m_spmaxres;
+	BOOL m_fSPCPow2Tex;
+	BOOL m_fSPCAllowAnimationWhenBuffering;
+	int m_nSubDelayInterval;
+
 	enum { IDD = IDD_PPAGESUBMISC };
-	BOOL m_fPrioritizeExternalSubtitles;
-	BOOL m_fDisableInternalSubtitles;
-	BOOL m_fAutoReloadExtSubtitles;
-	CString m_szAutoloadPaths;
-	CComboBox m_ISDbCombo;
-	CString m_ISDb;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
+	void	OnSubDelayInterval();
 
 	DECLARE_MESSAGE_MAP()
+
 public:
 	afx_msg void OnBnClickedButton1();
-	afx_msg void OnBnClickedButton2();
-	afx_msg void OnUpdateButton2(CCmdUI* pCmdUI);
-	afx_msg void OnURLModified();
+	afx_msg void OnUpdatePosOverride(CCmdUI* pCmdUI);
 };

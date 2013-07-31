@@ -394,7 +394,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Remember last playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 17
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 17
 5		"Her zaman harici alt yazıları tercih et"
 7		"Gömülü altyazıları yükleme"
 9		"Yükleme konumları"
@@ -435,7 +435,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Alt yazıları video çerçevesine bağla"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 32
 6		"Özel yerleşim"
 7		"Yatay:"
 11		"Dikey:"

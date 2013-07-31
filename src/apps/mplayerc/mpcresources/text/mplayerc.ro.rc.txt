@@ -394,7 +394,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Ține minte ultima focalizare a Pan-n-Scan"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 17
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 17
 5		"Preferă subtitrările externe în locul celor integrate"
 7		"Ignoră subtitrările integrate"
 9		"Căi de încărcare automată"
@@ -435,7 +435,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Unește canalele alpha"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 32
 6		"Suprascrie așezarea"
 7		"Orizontal:"
 11		"Vertical:"

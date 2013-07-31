@@ -394,7 +394,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Letzte Wiedergabeliste merken"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 17
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 17
 5		"Externe Untertitel bevorzugen (wenn verfügbar)"
 7		"Interne Untertitel nicht benutzen"
 9		"Pfade, in denen automatisch nach verfügbaren Untertiteln gesucht werden soll"
@@ -435,7 +435,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Untertitel relativ zum Video-Bild platzieren"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 32
 6		"Position anpassen"
 7		"Horizontal:"
 11		"Vertikal:"

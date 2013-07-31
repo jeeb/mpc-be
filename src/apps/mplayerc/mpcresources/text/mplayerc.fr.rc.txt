@@ -394,7 +394,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Remember last playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 17
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 17
 5		"Préférer les sous-titres externes aux sous-titres internes"
 7		"Ignorer les sous-titres internes"
 9		"Dossiers à utiliser pour le chargement automatique"
@@ -435,7 +435,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Position des sous-titres relative à l'image"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 32
 6		"Modifier la position"
 7		"Horizontale :"
 11		"Verticale :"

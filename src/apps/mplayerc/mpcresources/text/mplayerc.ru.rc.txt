@@ -394,7 +394,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 33		"Запоминать плейлист"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 17
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 17
 5		"Всегда использовать внешние субтитры как основные"
 7		"Не использовать встроенные субтитры"
 9		"Путь для внешних субтитров"
@@ -435,7 +435,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Позиционировать относительно кадра"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 32
 6		"Изменить положение"
 7		"Горизонталь:"
 11		"Вертикаль:"

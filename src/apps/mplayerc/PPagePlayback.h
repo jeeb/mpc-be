@@ -51,7 +51,6 @@ public:
 	int m_iZoomLevel;
 	BOOL m_iRememberZoomLevel;
 	BOOL m_fAutoloadAudio;
-	BOOL m_fAutoloadSubtitles;
 	BOOL m_fEnableWorkerThreadForOpening;
 	BOOL m_fReportFailedPins;
 	CString m_subtitlesLanguageOrder;
