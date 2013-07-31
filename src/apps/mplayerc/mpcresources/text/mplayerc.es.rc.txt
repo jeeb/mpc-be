@@ -435,7 +435,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Posición de los subtítulos relativa al tamaño del cuadro de video"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 6		"Fijar ubicación"
 7		"Horizontal:"
 11		"Vertical:"
@@ -1160,7 +1160,7 @@ STRING IDD_PPAGEOUTPUT		"Reproducción::Salida"
 STRING IDD_PPAGEPLAYBACK		"Reproducción"
 STRING IDD_PPAGEPLAYER		"Reproductor"
 STRING IDD_PPAGESUBDB		"Subtítulos::Base de Datos"
-STRING IDD_PPAGESUBMISC		"Subtítulos::Misc"
+STRING IDD_PPAGESUBRENDERING		"Subtítulos::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Subtítulos::Estilo Predeterminado"
 STRING IDD_PPAGESUBTITLES		"Subtítulos"
 STRING IDD_PPAGESYNC		"Reproducción::Opciones de sincronización de EVR"

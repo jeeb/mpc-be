@@ -677,7 +677,7 @@
 #define IDD_TUNER_SCAN                  20002
 #define IDS_AG_RESET_STATS              20005
 #define IDD_NAVIGATION_DLG              20005
-#define IDD_PPAGESUBMISC                20006
+#define IDD_PPAGESUBRENDERING           20006
 #define IDS_VIEW_BORDERLESS             20007
 #define IDS_VIEW_FRAMEONLY              20008
 #define IDS_VIEW_CAPTIONMENU            20009

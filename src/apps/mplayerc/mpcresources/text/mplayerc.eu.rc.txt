@@ -435,7 +435,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Azpidatzien kokapen bideo framearekiko"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 6		"Ezeztatu kokapena"
 7		"Etzana:"
 11		"Zutia:"
@@ -1160,7 +1160,7 @@ STRING IDD_PPAGEOUTPUT		"Irakurketa::Irteera"
 STRING IDD_PPAGEPLAYBACK		"Irakurketa"
 STRING IDD_PPAGEPLAYER		"Irakurgailua"
 STRING IDD_PPAGESUBDB		"Azpidatziak::Datubasea"
-STRING IDD_PPAGESUBMISC		"Azpidatziak::Askotarikoa"
+STRING IDD_PPAGESUBRENDERING		"Azpidatziak::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Azpidatziak::Berezko Estiloa"
 STRING IDD_PPAGESUBTITLES		"Azpidatziak"
 STRING IDD_PPAGESYNC		"Irakurketa::EVR Aldiberetze Ezarpenak"

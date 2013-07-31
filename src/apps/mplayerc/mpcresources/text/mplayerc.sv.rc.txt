@@ -435,7 +435,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Positionera undertexter relativt till video bilden"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 6		"Överskugga placering"
 7		"Horisontal:"
 11		"Vertikal:"
@@ -1160,7 +1160,7 @@ STRING IDD_PPAGEOUTPUT		"Uppspelning::Utmatning"
 STRING IDD_PPAGEPLAYBACK		"Uppspelning"
 STRING IDD_PPAGEPLAYER		"Spelare"
 STRING IDD_PPAGESUBDB		"Undertexter::Databas"
-STRING IDD_PPAGESUBMISC		"Undertexter::Misc"
+STRING IDD_PPAGESUBRENDERING		"Undertexter::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Undertexter::Standard Stil"
 STRING IDD_PPAGESUBTITLES		"Undertexter"
 STRING IDD_PPAGESYNC		"Uppspelning::EVR Sync Settings"

@@ -435,7 +435,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Ondertiteling relatief aan beeld plaatsen"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 6		"Positie aanpassen"
 7		"Horizontaal:"
 11		"Verticaal:"
@@ -1160,7 +1160,7 @@ STRING IDD_PPAGEOUTPUT		"Weergave::Output"
 STRING IDD_PPAGEPLAYBACK		"Weergave"
 STRING IDD_PPAGEPLAYER		"Speler"
 STRING IDD_PPAGESUBDB		"Ondertiteling::Database"
-STRING IDD_PPAGESUBMISC		"Ondertiteling::Misc"
+STRING IDD_PPAGESUBRENDERING		"Ondertiteling::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Ondertiteling::Standaard Stijl"
 STRING IDD_PPAGESUBTITLES		"Ondertiteling"
 STRING IDD_PPAGESYNC		"Weergave::EVR Sync Instellingen"

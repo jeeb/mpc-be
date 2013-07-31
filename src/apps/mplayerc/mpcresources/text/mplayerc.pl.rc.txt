@@ -435,7 +435,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Pozycja napisów względem klatki obrazu"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 6		"Nadpisanie położenia"
 7		"Poziomo:"
 11		"Pionowo:"
@@ -1159,7 +1159,7 @@ STRING IDD_PPAGEOUTPUT		"Odtwarzanie::Strumień wyjściowy"
 STRING IDD_PPAGEPLAYBACK		"Odtwarzanie"
 STRING IDD_PPAGEPLAYER		"Program"
 STRING IDD_PPAGESUBDB		"Napisy::Baza napisów"
-STRING IDD_PPAGESUBMISC		"Napisy::Różne"
+STRING IDD_PPAGESUBRENDERING		"Napisy::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Napisy::Domyślny styl"
 STRING IDD_PPAGESUBTITLES		"Napisy"
 STRING IDD_PPAGESYNC		"Odtwarzanie::Synchronizacja EVR"

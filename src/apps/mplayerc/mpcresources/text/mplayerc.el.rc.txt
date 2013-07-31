@@ -435,7 +435,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Σύνδεση καναλιών άλφα"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 6		"Παράκαμψη τοποθέτησης"
 7		"Οριζόντια:"
 11		"Κάθετα:"
@@ -1164,7 +1164,7 @@ STRING IDD_PPAGEOUTPUT		"Αναπαραγωγή::Έξοδος"
 STRING IDD_PPAGEPLAYBACK		"Αναπαραγωγή"
 STRING IDD_PPAGEPLAYER		"Αναπαραγωγός"
 STRING IDD_PPAGESUBDB		"Υπότιτλοι::Βάση δεδομένων"
-STRING IDD_PPAGESUBMISC		"Υπότιτλοι::Διάφορα"
+STRING IDD_PPAGESUBRENDERING		"Υπότιτλοι::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Υπότιτλοι::Προεπιλεγμένο στυλ"
 STRING IDD_PPAGESUBTITLES		"Υπότιτλοι"
 STRING IDD_PPAGESYNC		"Αναπαραγωγή::Ρυθμίσεις συγχρ. απόδοσης"

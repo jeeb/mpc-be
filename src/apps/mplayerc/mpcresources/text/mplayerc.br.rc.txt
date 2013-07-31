@@ -435,7 +435,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Posição das legendas relativo aos quadros vídeo"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 6		"Forçar posicionamento"
 7		"Horizontal:"
 11		"Vertical:"
@@ -1160,7 +1160,7 @@ STRING IDD_PPAGEOUTPUT		"Reprodução::Saída"
 STRING IDD_PPAGEPLAYBACK		"Reprodução"
 STRING IDD_PPAGEPLAYER		"Tocador"
 STRING IDD_PPAGESUBDB		"Legendas::Base de Dados"
-STRING IDD_PPAGESUBMISC		"Legendas::Miscelaneas"
+STRING IDD_PPAGESUBRENDERING		"Legendas::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Legendas::Estilo Pré-determinado"
 STRING IDD_PPAGESUBTITLES		"Legendas"
 STRING IDD_PPAGESYNC		"Reprodução::Ajuste Sincr. EVR"

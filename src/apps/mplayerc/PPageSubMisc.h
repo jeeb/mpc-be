@@ -50,7 +50,7 @@ public:
 	BOOL m_fSPCAllowAnimationWhenBuffering;
 	int m_nSubDelayInterval;
 
-	enum { IDD = IDD_PPAGESUBMISC };
+	enum { IDD = IDD_PPAGESUBRENDERING };
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);

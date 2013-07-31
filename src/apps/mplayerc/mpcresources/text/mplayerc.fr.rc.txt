@@ -435,7 +435,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Position des sous-titres relative à l'image"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 6		"Modifier la position"
 7		"Horizontale :"
 11		"Verticale :"
@@ -1160,7 +1160,7 @@ STRING IDD_PPAGEOUTPUT		"Lecture::Sortie"
 STRING IDD_PPAGEPLAYBACK		"Lecture"
 STRING IDD_PPAGEPLAYER		"Lecteur"
 STRING IDD_PPAGESUBDB		"Sous-titres::Base de données"
-STRING IDD_PPAGESUBMISC		"Sous-titres::Divers"
+STRING IDD_PPAGESUBRENDERING		"Sous-titres::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Sous-titres::Style par défaut"
 STRING IDD_PPAGESUBTITLES		"Sous-titres"
 STRING IDD_PPAGESYNC		"Lecture::Paramètre EVR Sync"

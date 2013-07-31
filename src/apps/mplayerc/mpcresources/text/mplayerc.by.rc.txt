@@ -435,7 +435,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Пазіцыянаваць адносна кадра"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 6		"Змяніць становішча"
 7		"Гарызант:"
 11		"Верт:"
@@ -1160,7 +1160,7 @@ STRING IDD_PPAGEOUTPUT		"Прайграванне::Вывад"
 STRING IDD_PPAGEPLAYBACK		"Прайграванне"
 STRING IDD_PPAGEPLAYER		"Прайгравальнік"
 STRING IDD_PPAGESUBDB		"Субтытры::База"
-STRING IDD_PPAGESUBMISC		"Субтытры::Рознае"
+STRING IDD_PPAGESUBRENDERING		"Субтытры::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Субтытры::Стандартны стыль"
 STRING IDD_PPAGESUBTITLES		"Субтытры"
 STRING IDD_PPAGESYNC		"Прайграванне::Налады EVR Sync"

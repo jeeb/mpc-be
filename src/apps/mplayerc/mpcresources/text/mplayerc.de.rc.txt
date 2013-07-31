@@ -435,7 +435,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Untertitel relativ zum Video-Bild platzieren"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 6		"Position anpassen"
 7		"Horizontal:"
 11		"Vertikal:"
@@ -1160,7 +1160,7 @@ STRING IDD_PPAGEOUTPUT		"Wiedergabe::Ausgabe"
 STRING IDD_PPAGEPLAYBACK		"Wiedergabe"
 STRING IDD_PPAGEPLAYER		"Player"
 STRING IDD_PPAGESUBDB		"Untertitel::Datenbank"
-STRING IDD_PPAGESUBMISC		"Untertitel::Verschiedenes"
+STRING IDD_PPAGESUBRENDERING		"Untertitel::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Untertitel::Standard Layout"
 STRING IDD_PPAGESUBTITLES		"Untertitel"
 STRING IDD_PPAGESYNC		"Wiedergabe::Sync Renderer"

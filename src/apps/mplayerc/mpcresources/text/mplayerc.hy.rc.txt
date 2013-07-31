@@ -435,7 +435,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Դիրքավորել՝ կադրին հարաբերված"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 6		"Փոխել դիրքը"
 7		"Հորիզոնական."
 11		"Ուղղհ."
@@ -1160,7 +1160,7 @@ STRING IDD_PPAGEOUTPUT		"Վերարտադրիչը::Արտածումը"
 STRING IDD_PPAGEPLAYBACK		"Վերարտադրում"
 STRING IDD_PPAGEPLAYER		"Վերարտադրիչը"
 STRING IDD_PPAGESUBDB		"Տողագրերը::Բազան"
-STRING IDD_PPAGESUBMISC		"Տողագրերը::Լրացուցիչ"
+STRING IDD_PPAGESUBRENDERING		"Տողագրերը::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Տողագրերը::Ծրագրային ոճը"
 STRING IDD_PPAGESUBTITLES		"Տողագրերը"
 STRING IDD_PPAGESYNC		"Վերարտադրում::EVR Sync-ի կարգավորումներ"

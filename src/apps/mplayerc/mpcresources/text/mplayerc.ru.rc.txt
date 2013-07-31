@@ -435,7 +435,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"Позиционировать относительно кадра"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 6		"Изменить положение"
 7		"Горизонталь:"
 11		"Вертикаль:"
@@ -1160,7 +1160,7 @@ STRING IDD_PPAGEOUTPUT		"Воспроизведение::Вывод"
 STRING IDD_PPAGEPLAYBACK		"Воспроизведение"
 STRING IDD_PPAGEPLAYER		"Проигрыватель"
 STRING IDD_PPAGESUBDB		"Субтитры::База"
-STRING IDD_PPAGESUBMISC		"Субтитры::Дополнительно"
+STRING IDD_PPAGESUBRENDERING		"Субтитры::Отрисовка"
 STRING IDD_PPAGESUBSTYLE		"Субтитры::Стандартный стиль"
 STRING IDD_PPAGESUBTITLES		"Субтитры"
 STRING IDD_PPAGESYNC		"Воспроизведение::Настройка EVR Sync"

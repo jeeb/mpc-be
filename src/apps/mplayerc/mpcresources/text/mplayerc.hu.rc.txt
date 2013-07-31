@@ -435,7 +435,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 67		"A feliratok relatív pozícionálása  a képkockákhoz"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBMISC LINES 32
+BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 6		"Elhelyezés felülbírálása"
 7		"Vízszintes:"
 11		"Függőleges:"
@@ -1160,7 +1160,7 @@ STRING IDD_PPAGEOUTPUT		"Lejátszás::Kimenet"
 STRING IDD_PPAGEPLAYBACK		"Lejátszás"
 STRING IDD_PPAGEPLAYER		"Lejátszó"
 STRING IDD_PPAGESUBDB		"Feliratok::Adatbázis"
-STRING IDD_PPAGESUBMISC		"Feliratok::Misc"
+STRING IDD_PPAGESUBRENDERING		"Feliratok::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Feliratok::Alapstílus"
 STRING IDD_PPAGESUBTITLES		"Feliratok"
 STRING IDD_PPAGESYNC		"Lejátszás::EVR Sync Beállítások"
