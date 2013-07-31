@@ -3053,7 +3053,7 @@ void audioFormatTypeHandler(const BYTE *format, const GUID *formattype, DWORD *p
 		*pnBytesPerSec = nBytesPerSec;
 }
 
-void CreateMPEG2VIfromAVC(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_TIME AvgTimePerFrame, CSize aspect, BYTE* extra, size_t extralen)
+HRESULT CreateMPEG2VIfromAVC(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_TIME AvgTimePerFrame, CSize aspect, BYTE* extra, size_t extralen)
 {
 	RECT rc = {0, 0, pbmi->biWidth, abs(pbmi->biHeight)};
 
@@ -3069,34 +3069,45 @@ void CreateMPEG2VIfromAVC(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_TIME
 	mvih->hdr.AvgTimePerFrame		= AvgTimePerFrame;
 	mvih->hdr.rcSource				= mvih->hdr.rcTarget = rc;
 
-	mvih->dwProfile	= extra[1];
-	mvih->dwLevel	= extra[3];
-	mvih->dwFlags	= (extra[4] & 3) + 1;
-
 	mvih->cbSequenceHeader = 0;
 
-	BYTE* src = (BYTE*)extra + 5;
-	BYTE* dst = (BYTE*)mvih->dwSequenceHeader;
+	HRESULT hr = S_OK;
 
-	BYTE* src_end = (BYTE*)extra + extralen;
-	BYTE* dst_end = (BYTE*)mvih->dwSequenceHeader + extralen;
+	if (extra[1]) {
+		mvih->dwProfile	= extra[1];
+		mvih->dwLevel	= extra[3];
+		mvih->dwFlags	= (extra[4] & 3) + 1;
 
-	for (int i = 0; i < 2; ++i) {
-		for (int n = *src++ & 0x1f; n > 0; --n) {
-			int len = ((src[0] << 8) | src[1]) + 2;
-			if (src + len > src_end || dst + len > dst_end) {
-				ASSERT(0);
-				break;
+		BYTE* src = (BYTE*)extra + 5;
+		BYTE* dst = (BYTE*)mvih->dwSequenceHeader;
+
+		BYTE* src_end = (BYTE*)extra + extralen;
+		BYTE* dst_end = (BYTE*)mvih->dwSequenceHeader + extralen;
+
+		for (int i = 0; i < 2; ++i) {
+			for (int n = *src++ & 0x1f; n > 0; --n) {
+				int len = ((src[0] << 8) | src[1]) + 2;
+				if (src + len > src_end || dst + len > dst_end) {
+					ASSERT(0);
+					break;
+				}
+				memcpy(dst, src, len);
+				src += len;
+				dst += len;
+				mvih->cbSequenceHeader += len;
 			}
-			memcpy(dst, src, len);
-			src += len;
-			dst += len;
-			mvih->cbSequenceHeader += len;
 		}
+	} else {
+		hr = E_FAIL;
+
+		mvih->cbSequenceHeader = extralen;
+		memcpy(&mvih->dwSequenceHeader[0], extra, extralen);
 	}
 
 	mt->subtype = FOURCCMap(mvih->hdr.bmiHeader.biCompression);
 	mt->SetSampleSize(pbmi->biWidth * pbmi-> biHeight * 4);
+
+	return hr;
 }
 
 // log function

@@ -312,9 +312,13 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 				CSize aspect(pbmi->biWidth, pbmi->biHeight);
 				ReduceDim(aspect);
-				CreateMPEG2VIfromAVC(&mt, pbmi, AvgTimePerFrame, aspect, extra, extralen); 
+				
+				CMediaType mt2;
+				if (SUCCEEDED(CreateMPEG2VIfromAVC(&mt2, pbmi, AvgTimePerFrame, aspect, extra, extralen))) {
+					mts.Add(mt2);
+				}
 
-				mts.Add(mt);
+				pbmi->biCompression = FCC('H264');
 			}
 
 			mt.formattype			= FORMAT_VideoInfo;
