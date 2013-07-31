@@ -12505,7 +12505,6 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 					}
 				}
 			}
-			Sleep(50);
 		} else {
 			hr = pDVDC2->PlayAtTime(&dvdTo, DVD_CMD_FLAG_Flush, NULL);
 			if (FAILED(hr)) {
@@ -12526,12 +12525,14 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 		return hr;
 	}
 
-	//if (GetPlaybackMode() == PM_FILE) {
-		//hr = pFS2 ? pFS2->Step(2, NULL) : E_FAIL;
-		//if (SUCCEEDED(hr)) {
-		//	Sleep(10);
-		//}
-	//}
+	/*
+	if (GetPlaybackMode() == PM_FILE) {
+		hr = pFS2 ? pFS2->Step(2, NULL) : E_FAIL;
+		if (SUCCEEDED(hr)) {
+			Sleep(10);
+		}
+	}
+	*/
 
 	if (!m_wndView2.IsWindowVisible()) {
 		m_wndView2.ShowWindow(SW_SHOWNOACTIVATE);
@@ -13551,6 +13552,11 @@ void CMainFrame::OpenSetupInfoBar()
 	if (GetPlaybackMode() == PM_FILE) {
 		bool fEmpty = true;
 		BeginEnumFilters(pGB, pEF, pBF) {
+
+			if (!CheckMainFilter(pBF)) {
+				continue;
+			}
+
 			if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
 				CComBSTR bstr;
 				if (SUCCEEDED(pAMMC->get_Title(&bstr))) {
@@ -13744,6 +13750,10 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 
 			BeginEnumFilters(pGB, pEF, pBF) {
 				if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
+					if (!CheckMainFilter(pBF)) {
+						continue;
+					}
+
 					CComBSTR bstr;
 					if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
 						fn = CString(bstr.m_str);
@@ -19999,6 +20009,10 @@ CString CMainFrame::GetStrForTitle()
 			} else {
 				BeginEnumFilters(pGB, pEF, pBF) {
 					if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
+						if (!CheckMainFilter(pBF)) {
+							continue;
+						}
+
 						CComBSTR bstr;
 						if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
 							CString title(bstr.m_str);
@@ -20114,4 +20128,40 @@ int CMainFrame::GetStreamCount(DWORD dwSelGroup)
 	}
 
 	return streamcount;
+}
+
+BOOL CMainFrame::CheckMainFilter(IBaseFilter* pBF)
+{
+	if (m_fAudioOnly) {
+		return TRUE;
+	}
+
+	BOOL bIsVideo = FALSE;
+	int nIn, nOut, nInC, nOutC;
+	CountPins(pBF, nIn, nOut, nInC, nOutC);
+	if (nOutC) {
+		BeginEnumPins(pBF, pEP, pPin) {
+			PIN_DIRECTION dir;
+			if (SUCCEEDED(pPin->QueryDirection(&dir))) {
+				if (dir == PINDIR_OUTPUT) {
+					CComPtr<IPin> pPinConnectedTo;
+					pPin->ConnectedTo(&pPinConnectedTo);
+
+					AM_MEDIA_TYPE mt;
+					if (S_OK != pPin->ConnectionMediaType(&mt)) {
+						continue;
+					}
+					FreeMediaType(mt);
+
+					if (mt.majortype == MEDIATYPE_Video) {
+						bIsVideo = TRUE;
+						break;
+					}
+				}
+			}
+		}
+		EndEnumPins
+	}
+
+	return bIsVideo;
 }

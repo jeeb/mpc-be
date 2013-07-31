@@ -1207,4 +1207,7 @@ public:
 
 private:
 	int			GetStreamCount(DWORD dwSelGroup);
+
+public:
+	BOOL		CheckMainFilter(IBaseFilter* pBF);
 };

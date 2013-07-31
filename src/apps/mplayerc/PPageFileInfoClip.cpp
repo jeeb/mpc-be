@@ -145,6 +145,11 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 	m_location.SetWindowText(m_location_str);
 
 	BeginEnumFilters(m_pFG, pEF, pBF) {
+		
+		if (!((CMainFrame*)AfxGetMainWnd())->CheckMainFilter(pBF)) {
+			continue;
+		}
+
 		if (CComQIPtr<IPropertyBag> pPB = pBF) {
 			CComVariant var;
 			if (SUCCEEDED(pPB->Read(CComBSTR(_T("ALBUM")), &var, NULL))) {
