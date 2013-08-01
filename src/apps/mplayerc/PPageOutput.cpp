@@ -144,7 +144,7 @@ BOOL CPPageOutput::OnInitDialog()
 
 	m_DualAudioOutput.SetCheck(s.fDualAudioOutput);
 	m_iSecAudioRendererTypeCtrl.SetRedraw(FALSE);
-	//m_iSecAudioRendererTypeCtrl.AddString(_T("1: ") + ResStr(IDS_PPAGE_OUTPUT_SYS_DEF));
+	m_iSecAudioRendererTypeCtrl.AddString(_T("1: ") + ResStr(IDS_PPAGE_OUTPUT_SYS_DEF));
 	m_iSecAudioRendererType = 0;
 
 	OnDualAudioOutputCheck();
@@ -184,9 +184,14 @@ BOOL CPPageOutput::OnInitDialog()
 		CString Cbstr;
 		Cbstr.Format(_T("%d: %s"), i++, fstr);
 		m_iAudioRendererTypeCtrl.AddString(Cbstr);
+		m_iSecAudioRendererTypeCtrl.AddString(Cbstr);
 
 		if (s.strAudioRendererDisplayName == str && m_iAudioRendererType == 0) {
 			m_iAudioRendererType = m_iAudioRendererTypeCtrl.GetCount()-1;
+		}
+
+		if (s.strSecondAudioRenderer == str && m_iSecAudioRendererType == 0) {
+			m_iSecAudioRendererType = m_iSecAudioRendererTypeCtrl.GetCount()-1;
 		}
 	}
 	EndEnumSysDev
@@ -197,6 +202,10 @@ BOOL CPPageOutput::OnInitDialog()
 	if (s.strAudioRendererDisplayName == AUDRNDT_NULL_COMP && m_iAudioRendererType == 0) {
 		m_iAudioRendererType = m_iAudioRendererTypeCtrl.GetCount()-1;
 	}
+	m_iSecAudioRendererTypeCtrl.AddString(fstr);
+	if (s.strSecondAudioRenderer == AUDRNDT_NULL_COMP && m_iSecAudioRendererType == 0) {
+		m_iSecAudioRendererType = m_iSecAudioRendererTypeCtrl.GetCount()-1;
+	}
 
 	m_AudioRendererDisplayNames.Add(AUDRNDT_NULL_UNCOMP);
 	fstr.Format(_T("%d: %s"), i++, AUDRNDT_NULL_UNCOMP);
@@ -204,14 +213,22 @@ BOOL CPPageOutput::OnInitDialog()
 	if (s.strAudioRendererDisplayName == AUDRNDT_NULL_UNCOMP && m_iAudioRendererType == 0) {
 		m_iAudioRendererType = m_iAudioRendererTypeCtrl.GetCount()-1;
 	}
+	m_iSecAudioRendererTypeCtrl.AddString(fstr);
+	if (s.strSecondAudioRenderer == AUDRNDT_NULL_UNCOMP && m_iSecAudioRendererType == 0) {
+		m_iSecAudioRendererType = m_iSecAudioRendererTypeCtrl.GetCount()-1;
+	}
 
 	m_AudioRendererDisplayNames.Add(AUDRNDT_MPC);
 	fstr.Format(_T("%d: %s"), i, AUDRNDT_MPC);
 	m_iAudioRendererTypeCtrl.AddString(fstr);
-
 	if (s.strAudioRendererDisplayName == AUDRNDT_MPC && m_iAudioRendererType == 0) {
 		m_iAudioRendererType = m_iAudioRendererTypeCtrl.GetCount()-1;
 	}
+	m_iSecAudioRendererTypeCtrl.AddString(fstr);
+	if (s.strSecondAudioRenderer == AUDRNDT_MPC && m_iSecAudioRendererType == 0) {
+		m_iSecAudioRendererType = m_iSecAudioRendererTypeCtrl.GetCount()-1;
+	}
+
 	CorrectComboListWidth(m_iAudioRendererTypeCtrl);
 	m_iAudioRendererTypeCtrl.SetRedraw(TRUE);
 	m_iAudioRendererTypeCtrl.Invalidate();
