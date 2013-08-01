@@ -178,12 +178,6 @@ void StringToPaths(const CString& curentdir, const CString& str, CAtlArray<CStri
 
 bool isSubExt(const CString& ext)
 {
-	static const TCHAR* subext[] = {
-		_T("srt"), _T("sub"), _T("smi"), _T("psb"),
-		_T("ssa"), _T("ass"), _T("idx"), _T("usf"),
-		_T("xss"), _T("txt"), _T("rt"), _T("sup")
-	};
-
 	for (size_t i = 0; i < _countof(subext); i++) {
 		if (ext.CompareNoCase(subext[i]) == 0) {
 			return true;

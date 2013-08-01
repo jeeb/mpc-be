@@ -185,48 +185,32 @@ BOOL CPPageOutput::OnInitDialog()
 		Cbstr.Format(_T("%d: %s"), i++, fstr);
 		m_iAudioRendererTypeCtrl.AddString(Cbstr);
 		m_iSecAudioRendererTypeCtrl.AddString(Cbstr);
+	}
+	EndEnumSysDev;
 
-		if (s.strAudioRendererDisplayName == str && m_iAudioRendererType == 0) {
-			m_iAudioRendererType = m_iAudioRendererTypeCtrl.GetCount()-1;
+
+	static CString AudioDevAddon[] = {
+		AUDRNDT_NULL_COMP,
+		AUDRNDT_NULL_UNCOMP,
+		AUDRNDT_MPC
+	};
+
+	for (size_t idx = 0; idx < _countof(AudioDevAddon); idx++) {
+		m_AudioRendererDisplayNames.Add(AudioDevAddon[idx]);
+
+		fstr.Format(_T("%d: %s"), i++, AudioDevAddon[idx]);
+		m_iAudioRendererTypeCtrl.AddString(fstr);
+		m_iSecAudioRendererTypeCtrl.AddString(fstr);
+	}
+
+	for (INT_PTR idx = 0; idx < m_AudioRendererDisplayNames.GetCount(); idx++) {
+		if (s.strAudioRendererDisplayName == m_AudioRendererDisplayNames[idx]) {
+			m_iAudioRendererType = idx;
 		}
 
-		if (s.strSecondAudioRenderer == str && m_iSecAudioRendererType == 0) {
-			m_iSecAudioRendererType = m_iSecAudioRendererTypeCtrl.GetCount()-1;
+		if (s.strSecondAudioRendererDisplayName == m_AudioRendererDisplayNames[idx]) {
+			m_iSecAudioRendererType = idx;
 		}
-	}
-	EndEnumSysDev
-
-	m_AudioRendererDisplayNames.Add(AUDRNDT_NULL_COMP);
-	fstr.Format(_T("%d: %s"), i++, AUDRNDT_NULL_COMP);
-	m_iAudioRendererTypeCtrl.AddString(fstr);
-	if (s.strAudioRendererDisplayName == AUDRNDT_NULL_COMP && m_iAudioRendererType == 0) {
-		m_iAudioRendererType = m_iAudioRendererTypeCtrl.GetCount()-1;
-	}
-	m_iSecAudioRendererTypeCtrl.AddString(fstr);
-	if (s.strSecondAudioRenderer == AUDRNDT_NULL_COMP && m_iSecAudioRendererType == 0) {
-		m_iSecAudioRendererType = m_iSecAudioRendererTypeCtrl.GetCount()-1;
-	}
-
-	m_AudioRendererDisplayNames.Add(AUDRNDT_NULL_UNCOMP);
-	fstr.Format(_T("%d: %s"), i++, AUDRNDT_NULL_UNCOMP);
-	m_iAudioRendererTypeCtrl.AddString(fstr);
-	if (s.strAudioRendererDisplayName == AUDRNDT_NULL_UNCOMP && m_iAudioRendererType == 0) {
-		m_iAudioRendererType = m_iAudioRendererTypeCtrl.GetCount()-1;
-	}
-	m_iSecAudioRendererTypeCtrl.AddString(fstr);
-	if (s.strSecondAudioRenderer == AUDRNDT_NULL_UNCOMP && m_iSecAudioRendererType == 0) {
-		m_iSecAudioRendererType = m_iSecAudioRendererTypeCtrl.GetCount()-1;
-	}
-
-	m_AudioRendererDisplayNames.Add(AUDRNDT_MPC);
-	fstr.Format(_T("%d: %s"), i, AUDRNDT_MPC);
-	m_iAudioRendererTypeCtrl.AddString(fstr);
-	if (s.strAudioRendererDisplayName == AUDRNDT_MPC && m_iAudioRendererType == 0) {
-		m_iAudioRendererType = m_iAudioRendererTypeCtrl.GetCount()-1;
-	}
-	m_iSecAudioRendererTypeCtrl.AddString(fstr);
-	if (s.strSecondAudioRenderer == AUDRNDT_MPC && m_iSecAudioRendererType == 0) {
-		m_iSecAudioRendererType = m_iSecAudioRendererTypeCtrl.GetCount()-1;
 	}
 
 	CorrectComboListWidth(m_iAudioRendererTypeCtrl);
@@ -243,7 +227,7 @@ BOOL CPPageOutput::OnInitDialog()
 	if (pD3D) {
 		TCHAR strGUID[50];
 		CString cstrGUID;
-		CString d3ddevice_str = _T("");
+		CString d3ddevice_str;
 		CStringArray adapterList;
 
 		D3DADAPTER_IDENTIFIER9 adapterIdentifier;
@@ -405,7 +389,7 @@ BOOL CPPageOutput::OnApply()
 
 	renderersSettings.m_AdvRendSets.fVMR9AlterativeVSync	= m_fVMR9AlterativeVSync != 0;
 	s.strAudioRendererDisplayName                           = m_AudioRendererDisplayNames[m_iAudioRendererType];
-	s.strSecondAudioRenderer                                = m_iSecAudioRendererType == -1 ? L"" : m_AudioRendererDisplayNames[m_iSecAudioRendererType];
+	s.strSecondAudioRendererDisplayName                     = m_iSecAudioRendererType == -1 ? L"" : m_AudioRendererDisplayNames[m_iSecAudioRendererType];
 	s.fDualAudioOutput                                      = !!m_DualAudioOutput.GetCheck();
 	s.fD3DFullscreen			                            = m_fD3DFullscreen ? true : false;
 

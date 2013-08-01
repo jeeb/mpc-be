@@ -5528,12 +5528,6 @@ void CMainFrame::OnFileReOpen()
 	OpenCurPlaylistItem();
 }
 
-static TCHAR* extsubtitles[] = {
-	_T(".srt"), _T(".sub"), _T(".smi"), _T(".psb"),
-	_T(".ssa"), _T(".ass"), _T(".idx"), _T(".usf"),
-	_T(".xss"), _T(".txt"), _T(".rt"),  _T(".sup")
-};
-
 void CMainFrame::OnDropFiles(HDROP hDropInfo)
 {
 	SetForegroundWindow();
@@ -5572,8 +5566,8 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 	if (sl.GetCount() == 1 && m_iMediaLoadState == MLS_LOADED && m_pCAP) {
 		CString ext			= CPath(sl.GetHead()).GetExtension().MakeLower();
 		bool validate_ext	= false;
-		for (size_t i = 0; i < _countof(extsubtitles); i++) {
-			if (ext == extsubtitles[i]) {
+		for (size_t i = 0; i < _countof(subext); i++) {
+			if (ext == subext[i]) {
 				validate_ext = true;
 				break;
 			}

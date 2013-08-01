@@ -545,8 +545,9 @@ public:
 	int				iQTVideoRendererType;
 
 	bool			fDualAudioOutput;
-	CStringW		strAudioRendererDisplayName;
-	CStringW		strSecondAudioRenderer;
+	CString			strAudioRendererDisplayName;
+	CString			strSecondAudioRendererDisplayName;
+
 	bool			fD3DFullscreen;
 	bool			fIsFSWindow;
 
