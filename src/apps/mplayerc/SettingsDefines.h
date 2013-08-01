@@ -124,6 +124,8 @@
 #define IDS_RS_REMEMBERWINDOWPOS			_T("RememberWindowPos")
 #define IDS_RS_LASTWINDOWRECT				_T("LastWindowRect")
 #define IDS_RS_AUDIORENDERERTYPE			_T("AudioRendererType")
+#define IDS_RS_SECONDAUDIORENDERER			_T("SecondAudioRenderer")
+#define IDS_RS_DUALAUDIOOUTPUT				_T("DualAudioOtput")
 #define IDS_RS_SPEAKERTOCHANNELMAPPING		_T("SpeakerToChannelMapping")
 #define IDS_RS_SPEAKERCHANNELS				_T("SpeakerChannels")
 #define IDS_RS_CUSTOMCHANNELMAPPING			_T("CustomChannelMapping")

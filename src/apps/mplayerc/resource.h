@@ -1077,7 +1077,6 @@
 #define IDS_PPSDB_BADURL                33200
 #define IDS_AG_CHAPTER2                 33201
 #define IDS_VOLUME_OSD                  33202
-#define IDS_VOLUME_OSD_MUTE             33449
 #define IDS_BOOST_OSD                   33203
 #define IDS_BALANCE_OSD                 33204
 #define IDS_FULLSCREENMONITOR_CURRENT   33205
@@ -1211,6 +1210,7 @@
 #define IDS_TEXTFILE_ENC                33446
 #define IDS_SAVE_FILE                   33447
 #define IDS_AG_VIDEOFILES               33448
+#define IDS_VOLUME_OSD_MUTE             33449
 #define IDS_MFMT_AVI                    39001
 #define IDS_MFMT_MPEG                   39002
 #define IDS_MFMT_MPEGTS                 39003

@@ -36,13 +36,16 @@ private:
 	CStringArray m_AudioRendererDisplayNames;
 	CStringArray m_D3D9GUIDNames;
 
-	CComboBox m_iDSVideoRendererTypeCtrl;
 	CComboBox m_iAudioRendererTypeCtrl;
+	CComboBox m_iSecAudioRendererTypeCtrl;
+
+	CComboBox m_iDSVideoRendererTypeCtrl;
 	CComboBox m_iRMVideoRendererTypeCtrl;
 	CComboBox m_iQTVideoRendererTypeCtrl;
 	CComboBox m_iD3D9RenderDeviceCtrl;
 
 	CButton m_audRendPropButton;
+	CButton m_DualAudioOutput;
 
 	int m_iDSVideoRendererType_store;
 public:
@@ -55,6 +58,7 @@ public:
 	int m_iQTVideoRendererType;
 	int m_iAPSurfaceUsage;
 	int m_iAudioRendererType;
+	int m_iSecAudioRendererType;
 	int m_iDX9Resizer;
 	BOOL m_fVMR9MixerMode;
 	BOOL m_fVMR9MixerYUV;
@@ -83,4 +87,5 @@ public:
 	afx_msg void OnD3D9DeviceCheck();
 	afx_msg void OnAudioRendererChange();
 	afx_msg void OnAudioRenderPropClick();
+	afx_msg void OnDualAudioOutputCheck();
 };
