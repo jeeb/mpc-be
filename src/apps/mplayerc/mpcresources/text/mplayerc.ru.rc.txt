@@ -335,7 +335,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 30
 24		"YUV Mixing"
 25		"Буферы EVR:"
 27		"Свойства"
-28		"Dual output"
+28		"2-ой вывод"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41

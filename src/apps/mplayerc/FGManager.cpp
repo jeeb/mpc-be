@@ -274,17 +274,6 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 		while (pos) {
 			CFGFilter* pFGF = m_override.GetNext(pos);
 			if (pFGF->GetMerit() >= MERIT64_ABOVE_DSHOW) { // FilterOverride::PREFERRED
-				/*
-				if (ext == _T(".avi")) {
-					CLSID clsid = pFGF->GetCLSID();
-					if (clsid == GUIDFromCString(_T("{55DA30FC-F16B-49FC-BAA5-AE59FC65F82D}")) || clsid == GUIDFromCString(_T("{564FD788-86C9-4444-971E-CC4A243DA150}"))) {
-						// skip Haali Source for .avi files
-						TRACE(_T("FGM: EnumSourceFilters() : skip '%ws' on file '%ws'\n"), CStringFromGUID(pFGF->GetCLSID()), lpcwstrFileName);
-						continue;
-					}
-				}
-				*/
-
 				fl.Insert(pFGF, 0, false, false);
 			}
 		}
@@ -478,7 +467,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 HRESULT CFGManager::AddSourceFilter(CFGFilter* pFGF, LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrFilterName, IBaseFilter** ppBF)
 {
-	TRACE(_T("FGM: AddSourceFilter() trying '%ws'\n"), CStringFromGUID(pFGF->GetCLSID()));
+	DbgLog((LOG_TRACE, 3, L"FGM: AddSourceFilter() trying '%s'", CStringFromGUID(pFGF->GetCLSID())));
 
 	CheckPointer(lpcwstrFileName, E_POINTER);
 	CheckPointer(ppBF, E_POINTER);
@@ -858,7 +847,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 				if (!fname.IsEmpty()) {
 					CComPtr<IBaseFilter> pBFVR;
 					if (SUCCEEDED(FindFilterByName(fname, &pBFVR)) && pBFVR) {
-						TRACE(_T("FGM: Skip '%s' - already in graph\n"), pFGF->GetName());
+						DbgLog((LOG_TRACE, 3, L"FGM: Skip '%s' - already in graph", pFGF->GetName()));
 						continue;
 					}
 				}
@@ -871,7 +860,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 				pFGF = pMadVRAllocatorPresenter;
 			}
 
-			TRACE(_T("FGM: Connecting '%s'\n"), pFGF->GetName());
+			DbgLog((LOG_TRACE, 3, L"FGM: Connecting '%s'", pFGF->GetName()));
 
 			CComPtr<IBaseFilter> pBF;
 			CInterfaceList<IUnknown, &IID_IUnknown> pUnks;
@@ -932,8 +921,15 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 
 			if (FAILED(hr)) {
 				if (pFGF->GetMerit() == MERIT64_PRIORITY) {
-					TRACE(_T("FGM: Connecting priority filter '%s' FAILED!\n"), pFGF->GetName());
+					DbgLog((LOG_TRACE, 3, L"FGM: Connecting priority filter '%s' FAILED!", pFGF->GetName()));
 					return 0xDEAD;
+				}
+			}
+
+			if (IsAudioWaveRenderer(pBF)) {
+				POSITION pos = m_transform.Find(pFGF);
+				if (pos != NULL) {
+					m_transform.RemoveAt(pos);
 				}
 			}
 
@@ -1055,14 +1051,14 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 
 					}
 
-					TRACE(_T("FGM: '%s' Successfully connected\n"), pFGF->GetName());
+					DbgLog((LOG_TRACE, 3, L"FGM: '%s' Successfully connected", pFGF->GetName()));
 
 					return hr;
 				}
 			}
 
 			EXECUTE_ASSERT(SUCCEEDED(RemoveFilter(pBF)));
-			TRACE(_T("FGM: Connecting '%s' FAILED!\n"), pFGF->GetName());
+			DbgLog((LOG_TRACE, 3, L"FGM: Connecting '%s' FAILED!", pFGF->GetName()));
 			pBF.Release();
 		}
 	}
@@ -1095,7 +1091,7 @@ STDMETHODIMP CFGManager::Render(IPin* pPinOut)
 
 STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlayList)
 {
-	TRACE("--> CFGManager::RenderFile on thread: %d\n", GetCurrentThreadId());
+	DbgLog((LOG_TRACE, 3, L"--> CFGManager::RenderFile on thread: %d", GetCurrentThreadId()));
 	CAutoLock cAutoLock(this);
 
 	m_streampath.RemoveAll();
@@ -1375,10 +1371,42 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 			*/
 
 			m_streampath.Append(pBF, pPin);
+			HRESULT hr = S_OK;
 
-			HRESULT hr = Connect(pPin, pPinIn);
-			if (hr == 0xDEAD) {
-				return hr;
+			BOOL bInfPinTeeConnected = FALSE;
+			if (s.fDualAudioOutput) {
+				if (CComQIPtr<IAudioSwitcherFilter> pASF = pBF) {
+					BeginEnumMediaTypes(pPin, pEM, pmt) {
+						// Find the Audio out pin
+						if (pmt->majortype == MEDIATYPE_Audio && pPinIn == NULL) {
+							// Add infinite Pin Tee Filter
+							CComPtr<IBaseFilter> pInfPinTee;
+							pInfPinTee.CoCreateInstance(CLSID_InfTee);
+							AddFilter(pInfPinTee, L"Infinite Pin Tee");
+						
+							hr = ConnectFilterDirect(pPin, pInfPinTee, NULL);
+							if (SUCCEEDED(hr)) {
+								bInfPinTeeConnected = TRUE;
+								for (int audioRendererId = 0; audioRendererId < 2; audioRendererId++) {
+									IPin *infTeeFilterOutPin = GetFirstDisconnectedPin(pInfPinTee, PINDIR_OUTPUT);
+									hr = Connect(infTeeFilterOutPin, pPinIn);
+									if (SUCCEEDED(hr)) {
+										; // TODO
+									}
+								}
+							}
+							break;
+						}
+					}
+					EndEnumMediaTypes(pmt)
+				}
+			}
+
+			if (!bInfPinTeeConnected) {
+				hr = Connect(pPin, pPinIn);
+				if (hr == 0xDEAD) {
+					return hr;
+				}
 			}
 
 			if (SUCCEEDED(hr)) {
@@ -2429,7 +2457,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	, m_vrmerit(MERIT64(MERIT_PREFERRED))
 	, m_armerit(MERIT64(MERIT_PREFERRED))
 {
-	TRACE("--> CFGManagerPlayer::CFGManagerPlayer on thread: %d\n", GetCurrentThreadId());
+	DbgLog((LOG_TRACE, 3, L"--> CFGManagerPlayer::CFGManagerPlayer on thread: %d", GetCurrentThreadId()));
 	CFGFilter* pFGF;
 
 	AppSettings& s = AfxGetAppSettings();
@@ -2479,7 +2507,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	// Switchers
 	if (s.fEnableAudioSwitcher && !m_IsPreview) {
-		pFGF = DNew CFGFilterInternal<CAudioSwitcherFilter>(L"Audio Switcher", m_armerit + 0x100);
+		pFGF = DNew CFGFilterInternal<CAudioSwitcherFilter>(L"Audio Switcher", m_armerit + 0x2000);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
 		m_transform.AddTail(pFGF);
 
@@ -2544,23 +2572,30 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	if (!m_IsPreview) {
 		CString SelAudioRenderer = s.SelectedAudioRenderer();
-		if (SelAudioRenderer == AUDRNDT_NULL_COMP) {
-			pFGF = DNew CFGFilterInternal<CNullAudioRenderer>(AUDRNDT_NULL_COMP, MERIT64_ABOVE_DSHOW+2);
-			pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
-			m_transform.AddTail(pFGF);
-		} else if (SelAudioRenderer == AUDRNDT_NULL_UNCOMP) {
-			pFGF = DNew CFGFilterInternal<CNullUAudioRenderer>(AUDRNDT_NULL_UNCOMP, MERIT64_ABOVE_DSHOW+2);
-			pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
-			m_transform.AddTail(pFGF);
-		} else if (SelAudioRenderer == AUDRNDT_MPC) {
-			pFGF = DNew CFGFilterInternal<CMpcAudioRenderer>(AUDRNDT_MPC, /*MERIT64_ABOVE_DSHOW+2*/m_armerit);
-			pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_PCM);
-			pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_IEEE_FLOAT);
-			m_transform.AddTail(pFGF);
-		} else if (SelAudioRenderer.GetLength() > 0) {
-			pFGF = DNew CFGFilterRegistry(SelAudioRenderer, m_armerit);
-			pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
-			m_transform.AddTail(pFGF);
+		m_armerit += 0x1000;
+		
+		for (int ar = 0; ar < (s.fDualAudioOutput ? 2 : 1); ar++) {
+			if (SelAudioRenderer == AUDRNDT_NULL_COMP) {
+				pFGF = DNew CFGFilterInternal<CNullAudioRenderer>(AUDRNDT_NULL_COMP, MERIT64_ABOVE_DSHOW + 2);
+				pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
+				m_transform.AddTail(pFGF);
+			} else if (SelAudioRenderer == AUDRNDT_NULL_UNCOMP) {
+				pFGF = DNew CFGFilterInternal<CNullUAudioRenderer>(AUDRNDT_NULL_UNCOMP, MERIT64_ABOVE_DSHOW + 2);
+				pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
+				m_transform.AddTail(pFGF);
+			} else if (SelAudioRenderer == AUDRNDT_MPC) {
+				pFGF = DNew CFGFilterInternal<CMpcAudioRenderer>(AUDRNDT_MPC, m_armerit);
+				pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_PCM);
+				pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_IEEE_FLOAT);
+				m_transform.AddTail(pFGF);
+			} else if (SelAudioRenderer.GetLength() > 0) {
+				pFGF = DNew CFGFilterRegistry(SelAudioRenderer, m_armerit);
+				pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
+				m_transform.AddTail(pFGF);
+			}
+		
+			SelAudioRenderer = s.strSecondAudioRendererDisplayName;
+			m_armerit -= 0x100;
 		}
 	}
 }
