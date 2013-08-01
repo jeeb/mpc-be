@@ -1037,7 +1037,7 @@ HRESULT CStreamSwitcherOutputPin::CheckConnect(IPin* pPin)
 	CComPtr<IBaseFilter> pBF = GetFilterFromPin(pPin);
 
 	return
-		IsAudioWaveRenderer(pBF) || GetCLSID(pBF) == __uuidof(MatrixMixer)
+		IsAudioWaveRenderer(pBF) || GetCLSID(pBF) == __uuidof(MatrixMixer) || GetCLSID(pBF) == CLSID_InfTee
 		? __super::CheckConnect(pPin)
 		: E_FAIL;
 

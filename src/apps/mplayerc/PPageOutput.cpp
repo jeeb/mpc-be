@@ -85,7 +85,7 @@ void CPPageOutput::DoDataExchange(CDataExchange* pDX)
 	DDX_CBIndex(pDX, IDC_RMRND_COMBO, m_iRMVideoRendererType);
 	DDX_CBIndex(pDX, IDC_QTRND_COMBO, m_iQTVideoRendererType);
 	DDX_CBIndex(pDX, IDC_AUDRND_COMBO, m_iAudioRendererType);
-	DDX_CBIndex(pDX, IDC_AUDRND_COMBO, m_iSecAudioRendererType);
+	DDX_CBIndex(pDX, IDC_COMBO1, m_iSecAudioRendererType);
 	DDX_CBIndex(pDX, IDC_DX_SURFACE, m_iAPSurfaceUsage);
 	DDX_CBIndex(pDX, IDC_DX9RESIZER_COMBO, m_iDX9Resizer);
 	DDX_CBIndex(pDX, IDC_D3D9DEVICE_COMBO, m_iD3D9RenderDevice);
@@ -388,7 +388,7 @@ BOOL CPPageOutput::OnApply()
 
 	renderersSettings.m_AdvRendSets.fVMR9AlterativeVSync	= m_fVMR9AlterativeVSync != 0;
 	s.strAudioRendererDisplayName                           = m_AudioRendererDisplayNames[m_iAudioRendererType];
-	s.strSecondAudioRenderer                                = m_AudioRendererDisplayNames[m_iSecAudioRendererType];
+	s.strSecondAudioRenderer                                = m_iSecAudioRendererType == -1 ? L"" : m_AudioRendererDisplayNames[m_iSecAudioRendererType];
 	s.fDualAudioOutput                                      = !!m_DualAudioOutput.GetCheck();
 	s.fD3DFullscreen			                            = m_fD3DFullscreen ? true : false;
 
