@@ -146,11 +146,11 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 
 	BeginEnumFilters(m_pFG, pEF, pBF) {
 		
-		if (!((CMainFrame*)AfxGetMainWnd())->CheckMainFilter(pBF)) {
-			continue;
-		}
-
 		if (CComQIPtr<IPropertyBag> pPB = pBF) {
+			if (!((CMainFrame*)AfxGetMainWnd())->CheckMainFilter(pBF)) {
+				continue;
+			}
+
 			CComVariant var;
 			if (SUCCEEDED(pPB->Read(CComBSTR(_T("ALBUM")), &var, NULL))) {
 				m_album = var.bstrVal;
@@ -158,6 +158,10 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 		}
 
 		if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
+			if (!((CMainFrame*)AfxGetMainWnd())->CheckMainFilter(pBF)) {
+				continue;
+			}
+
 			CComBSTR bstr;
 			if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
 				m_clip = bstr.m_str;

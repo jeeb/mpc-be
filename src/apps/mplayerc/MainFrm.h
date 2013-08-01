@@ -1208,6 +1208,7 @@ public:
 private:
 	int			GetStreamCount(DWORD dwSelGroup);
 
+	DWORD_PTR	m_nMainFilterId;
 public:
 	BOOL		CheckMainFilter(IBaseFilter* pBF);
 };

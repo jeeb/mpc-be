@@ -697,7 +697,8 @@ CMainFrame::CMainFrame() :
 	m_nSelSub2(-1),
 	m_hNotifyRenderThread(NULL),
 	m_hStopNotifyRenderThreadEvent(NULL),
-	m_hRefreshNotifyRenderThreadEvent(NULL)
+	m_hRefreshNotifyRenderThreadEvent(NULL),
+	m_nMainFilterId(NULL)
 {
 	m_Lcd.SetVolumeRange(0, 100);
 	m_LastSaveTime.QuadPart = 0;
@@ -12621,6 +12622,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	m_YoutubeTotal			= 0;
 	m_YoutubeCurrent		= 0;
 
+	m_nMainFilterId			= NULL;
+
 	AppSettings& s = AfxGetAppSettings();
 
 	bool fFirst = true;
@@ -13553,11 +13556,11 @@ void CMainFrame::OpenSetupInfoBar()
 		bool fEmpty = true;
 		BeginEnumFilters(pGB, pEF, pBF) {
 
-			if (!CheckMainFilter(pBF)) {
-				continue;
-			}
-
 			if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
+				if (!CheckMainFilter(pBF)) {
+					continue;
+				}
+
 				CComBSTR bstr;
 				if (SUCCEEDED(pAMMC->get_Title(&bstr))) {
 					m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_TITLE), bstr.m_str);
@@ -20137,6 +20140,14 @@ BOOL CMainFrame::CheckMainFilter(IBaseFilter* pBF)
 		return TRUE;
 	}
 
+	if (m_nMainFilterId) {
+		if (m_nMainFilterId == (DWORD_PTR)pBF) {
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
 	while (pBF) {
 		if (CComQIPtr<IFileSourceFilter> pFSF = pBF) {
 			LPOLESTR pszFileName = NULL;
@@ -20146,6 +20157,7 @@ BOOL CMainFrame::CheckMainFilter(IBaseFilter* pBF)
 				CoTaskMemFree(pszFileName);
 
 				if (fileName == fName) {
+					m_nMainFilterId = (DWORD_PTR)pBF;
 					return TRUE;
 				}
 			}
