@@ -12572,7 +12572,7 @@ UINT CMainFrame::YoutubeThreadProc()
 				m_YoutubeTotal = 0;
 			}
 
-			if (GetTemporaryFilePath(CPath(m_YoutubeFile).GetExtension(), m_YoutubeFile)) {
+			if (GetTemporaryFilePath(CString(CPath(GetAltFileName()).GetExtension()).MakeLower(), m_YoutubeFile)) {
 				CFile file;
 				if (file.Open(m_YoutubeFile, CFile::modeCreate|CFile::modeWrite|CFile::shareDenyWrite|CFile::typeBinary)) {
 
@@ -19717,7 +19717,7 @@ HRESULT CMainFrame::SetDwmPreview(BOOL show)
 		// load image from DSMResource to show in preview & logo;
 		BeginEnumFilters(pGB, pEF, pBF) {
 			if (CComQIPtr<IDSMResourceBag> pRB = pBF)
-				if (pRB && pRB->ResGetCount() > 0) {
+				if (pRB && CheckMainFilter(pBF) && pRB->ResGetCount() > 0) {
 					for (DWORD i = 0; i < pRB->ResGetCount(); i++) {
 						CComBSTR name, desc, mime;
 						BYTE* pData = NULL;
@@ -20132,36 +20132,34 @@ int CMainFrame::GetStreamCount(DWORD dwSelGroup)
 
 BOOL CMainFrame::CheckMainFilter(IBaseFilter* pBF)
 {
-	if (m_fAudioOnly) {
+	CString fName = m_wndPlaylistBar.GetCurFileName();
+	if (CString(fName).MakeLower().Find(L"youtube") >= 0) {
 		return TRUE;
 	}
 
-	BOOL bIsVideo = FALSE;
-	int nIn, nOut, nInC, nOutC;
-	CountPins(pBF, nIn, nOut, nInC, nOutC);
-	if (nOutC) {
-		BeginEnumPins(pBF, pEP, pPin) {
-			PIN_DIRECTION dir;
-			if (SUCCEEDED(pPin->QueryDirection(&dir))) {
-				if (dir == PINDIR_OUTPUT) {
-					CComPtr<IPin> pPinConnectedTo;
-					pPin->ConnectedTo(&pPinConnectedTo);
+	while (pBF) {
+		if (CComQIPtr<IFileSourceFilter> pFSF = pBF) {
+			LPOLESTR pszFileName = NULL;
+			AM_MEDIA_TYPE mt;
+			if (SUCCEEDED(pFSF->GetCurFile(&pszFileName, &mt)) && pszFileName) {
+				CString fileName(pszFileName);
+				CoTaskMemFree(pszFileName);
 
-					AM_MEDIA_TYPE mt;
-					if (S_OK != pPin->ConnectionMediaType(&mt)) {
-						continue;
-					}
-					FreeMediaType(mt);
-
-					if (mt.majortype == MEDIATYPE_Video) {
-						bIsVideo = TRUE;
-						break;
-					}
+				if (fileName == fName) {
+					return TRUE;
 				}
 			}
+
+			break;
 		}
-		EndEnumPins
+
+		IPin* pPin = GetFirstPin(pBF);
+
+		pPin = GetUpStreamPin(pBF, pPin);
+		if (pPin) {
+			pBF = GetFilterFromPin(pPin);
+		}
 	}
 
-	return bIsVideo;
+	return FALSE;
 }

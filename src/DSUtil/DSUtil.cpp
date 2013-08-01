@@ -3419,14 +3419,10 @@ BOOL GetTemporaryFilePath(CString strExtension, CString& strFileName)
 			return FALSE;
 		}
 
-		CString fn_tmp(lpszTempPath);
-		fn_tmp.Append(_T("mpc.tmp"));
-		wcsncpy(lpszFilePath, fn_tmp.GetBuffer(), fn_tmp.GetLength());
-		fn_tmp.ReleaseBuffer();
-
 		strFileName = lpszFilePath;
-		VERIFY(::DeleteFile(strFileName));
-		//strFileName.Replace(_T(".tmp"), strExtension);
+		strFileName.Replace(_T(".tmp"), strExtension);
+		
+		DeleteFile(strFileName);
 	} while (_taccess(strFileName, 00) != -1);
 
 	return TRUE;
