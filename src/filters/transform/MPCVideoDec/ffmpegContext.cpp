@@ -50,7 +50,7 @@ extern "C" {
 }
 
 static const WORD PCID_NVIDIA_VP5 [] = {
-	// http://us.download.nvidia.com/XFree86/Linux-x86_64/313.26/README/supportedchips.html
+	// http://us.download.nvidia.com/XFree86/Linux-x86_64/319.32/README/supportedchips.html
 	// Nvidia VDPAU Feature Set D
 	0x0FC6, // GeForce GTX 650
 	0x0FD1, // GeForce GT 650M
@@ -59,8 +59,12 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x0FD5, // GeForce GT 650M
 	0x0FD8, // GeForce GT 640M
 	0x0FD9, // GeForce GT 645M
+	0x0FDF, // GeForce GT 740M
 	0x0FE0, // GeForce GTX 660M
 	0x0FE1, // GeForce GT 730M
+	0x0FE2, // GeForce GT 745M
+	0x0FE3, // GeForce GT 745M
+	0x0FE4, // GeForce GT 750M
 	0x0FF2, // GRID K1
 	0x0FF9, // Quadro K2000D
 	0x0FFA, // Quadro K600
@@ -69,6 +73,7 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x0FFD, // NVS 510
 	0x0FFE, // Quadro K2000
 	0x0FFF, // Quadro 410
+	0x1004, // GeForce GTX 780
 	0x1005, // GeForce GTX TITAN
 	0x1021, // Tesla K20Xm
 	0x1022, // Tesla K20c
@@ -88,10 +93,14 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x107D, // NVS 310
 	0x1180, // GeForce GTX 680
 	0x1183, // GeForce GTX 660 Ti (fully tested)
+	0x1184, // GeForce GTX 770
 	0x1185, // GeForce GTX 660
+	0x1187, // GeForce GTX 760
 	0x1188, // GeForce GTX 690
 	0x1189, // GeForce GTX 670
 	0x118F, // Tesla K10
+	0x119D, // GeForce GTX 775M
+	0x119F, // GeForce GTX 780M
 	0x11A0, // GeForce GTX 680M
 	0x11A1, // GeForce GTX 670MX
 	0x11A2, // GeForce GTX 675MX
@@ -103,9 +112,20 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x11BE, // Quadro K3000M
 	0x11BF, // VGX K2
 	0x11C0, // GeForce GTX 660
+	0x11C2, // GeForce GTX 650 Ti BOOST
 	0x11C3, // GeForce GTX 650 Ti
 	0x11C6, // GeForce GTX 650 Ti
+	0x11E0, // GeForce GTX 770M
+	0x11E1, // GeForce GTX 765M
+	0x11E2, // GeForce GTX 765M
+	0x11E3, // GeForce GTX 760M
 	0x11FA, // Quadro K4000
+	0x1280, // GeForce GT 635
+	0x1290, // GeForce GT 730M
+	0x1291, // GeForce GT 735M
+	0x1292, // GeForce GT 740M
+	0x1293, // GeForce GT 730M
+
 };
 
 static const WORD PCID_ATI_UVD [] = {
