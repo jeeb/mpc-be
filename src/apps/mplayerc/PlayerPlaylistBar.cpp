@@ -260,6 +260,12 @@ void CPlaylistItem::AutoLoadFiles()
 		CAtlArray<CString> paths;
 		StringToPaths(curdir, AfxGetAppSettings().strSubtitlePaths, paths);
 
+		CAtlList<CString>* p_strSubtitlePathsAddons = ((CMainFrame*)AfxGetMainWnd())->GetSubtitlePathsAddons();
+		POSITION pos = p_strSubtitlePathsAddons->GetHeadPosition();
+		while (pos) {
+			paths.Add(p_strSubtitlePathsAddons->GetNext(pos));
+		}
+
 		for (size_t i = 0; i < paths.GetCount(); i++) {
 			WIN32_FIND_DATA fd = {0};
 

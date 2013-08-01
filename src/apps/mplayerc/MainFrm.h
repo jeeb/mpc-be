@@ -1208,7 +1208,10 @@ public:
 private:
 	int			GetStreamCount(DWORD dwSelGroup);
 
-	DWORD_PTR	m_nMainFilterId;
+	DWORD_PTR			m_nMainFilterId;
+	CAtlList<CString>	m_strSubtitlePathsAddons;
+
 public:
-	BOOL		CheckMainFilter(IBaseFilter* pBF);
+	BOOL				CheckMainFilter(IBaseFilter* pBF);
+	CAtlList<CString>*	GetSubtitlePathsAddons() { return &m_strSubtitlePathsAddons; }
 };

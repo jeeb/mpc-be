@@ -5595,6 +5595,15 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 				if (LoadSubtitle(sl.GetHead(), &pSubStream)) {
 					SetSubtitle(pSubStream); // the subtitle at the insert position according to LoadSubtitle()
 					b_SubLoaded = true;
+
+					{
+						CPath p(sl.GetHead());
+						p.RemoveFileSpec();
+						POSITION pos = m_strSubtitlePathsAddons.Find(CString(p).MakeUpper());
+						if (!pos) {
+							m_strSubtitlePathsAddons.AddTail(CString(p).MakeUpper() + L"\\");
+						}
+					}
 				}
 			}
 
@@ -6512,6 +6521,15 @@ void CMainFrame::OnFileLoadSubtitle()
 	ISubStream *pSubStream = NULL;
 	if (LoadSubtitle(fd.GetPathName(), &pSubStream)) {
 		SetSubtitle(pSubStream);    // the subtitle at the insert position according to LoadSubtitle()
+
+		{
+			CPath p(fd.GetPathName());
+			p.RemoveFileSpec();
+			POSITION pos = m_strSubtitlePathsAddons.Find(CString(p).MakeUpper());
+			if (!pos) {
+				m_strSubtitlePathsAddons.AddTail(CString(p).MakeUpper() + L"\\");
+			}
+		}
 	}
 }
 
