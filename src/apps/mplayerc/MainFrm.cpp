@@ -5567,7 +5567,7 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 		CString ext			= CPath(sl.GetHead()).GetExtension().MakeLower();
 		bool validate_ext	= false;
 		for (size_t i = 0; i < _countof(subext); i++) {
-			if (ext == subext[i]) {
+			if (ext == L"." + CString(subext[i])) {
 				validate_ext = true;
 				break;
 			}
@@ -6485,9 +6485,16 @@ void CMainFrame::OnFileLoadSubtitle()
 		return;
 	}
 
-	static TCHAR szFilter[] =
-		_T(".srt .sub .ssa .ass .smi .psb .txt .idx .usf .xss .sup|")
-		_T("*.srt;*.sub;*.ssa;*.ass;*smi;*.psb;*.txt;*.idx;*.usf;*.xss;*.sup||");
+	static CString szFilter;
+	for (size_t idx = 0; idx < _countof(subext); idx++) {
+		szFilter += (idx == 0 ? L"." : L" .") + CString(subext[idx]);
+	}
+	szFilter += L"|";
+
+	for (size_t idx = 0; idx < _countof(subext); idx++) {
+		szFilter += (idx == 0 ? L"*." : L";*.") + CString(subext[idx]);
+	}
+	szFilter += L"||";
 
 	AppSettings& s = AfxGetAppSettings();
 
