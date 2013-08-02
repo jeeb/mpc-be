@@ -211,6 +211,12 @@ void CPlaylistItem::AutoLoadFiles()
 		CAtlArray<CString> paths;
 		StringToPaths(curdir, AfxGetAppSettings().strAudioPaths, paths);
 
+		CAtlList<CString>* p_strAudioPathsAddons = ((CMainFrame*)AfxGetMainWnd())->GetAudioPathsAddons();
+		POSITION pos = p_strAudioPathsAddons->GetHeadPosition();
+		while (pos) {
+			paths.Add(p_strAudioPathsAddons->GetNext(pos));
+		}
+
 		CMediaFormats& mf = AfxGetAppSettings().m_Formats;
 		if (!mf.FindExt(ext, true)) {
 			for (size_t i = 0; i < paths.GetCount(); i++) {

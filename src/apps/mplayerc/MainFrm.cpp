@@ -5590,14 +5590,7 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 					SetSubtitle(pSubStream); // the subtitle at the insert position according to LoadSubtitle()
 					b_SubLoaded = true;
 
-					{
-						CPath p(sl.GetHead());
-						p.RemoveFileSpec();
-						POSITION pos = m_strSubtitlePathsAddons.Find(CString(p).MakeUpper());
-						if (!pos) {
-							m_strSubtitlePathsAddons.AddTail(CString(p).MakeUpper() + L"\\");
-						}
-					}
+					AddSubtitlePathsAddons(sl.GetHead());
 				}
 			}
 
@@ -6523,14 +6516,7 @@ void CMainFrame::OnFileLoadSubtitle()
 	if (LoadSubtitle(fd.GetPathName(), &pSubStream)) {
 		SetSubtitle(pSubStream);    // the subtitle at the insert position according to LoadSubtitle()
 
-		{
-			CPath p(fd.GetPathName());
-			p.RemoveFileSpec();
-			POSITION pos = m_strSubtitlePathsAddons.Find(CString(p).MakeUpper());
-			if (!pos) {
-				m_strSubtitlePathsAddons.AddTail(CString(p).MakeUpper() + L"\\");
-			}
-		}
+		AddSubtitlePathsAddons(fd.GetPathName());
 	}
 }
 
@@ -6572,6 +6558,8 @@ void CMainFrame::OnFileLoadAudio()
 	
 	ShowWindow(SW_SHOW);
 	SetForegroundWindow();
+
+	AddAudioPathsAddons(fd.GetPathName());
 
 	m_fns.AddTail(fd.GetPathName());
 	m_wndPlaylistBar.Open(m_fns, FALSE);
@@ -20150,6 +20138,26 @@ int CMainFrame::GetStreamCount(DWORD dwSelGroup)
 	}
 
 	return streamcount;
+}
+
+void CMainFrame::AddSubtitlePathsAddons(CString FileName)
+{
+	CPath p(FileName);
+	p.RemoveFileSpec();
+	POSITION pos = m_strSubtitlePathsAddons.Find(CString(p).MakeUpper());
+	if (!pos) {
+		m_strSubtitlePathsAddons.AddTail(CString(p).MakeUpper() + L"\\");
+	}
+}
+
+void CMainFrame::AddAudioPathsAddons(CString FileName)
+{
+	CPath p(FileName);
+	p.RemoveFileSpec();
+	POSITION pos = m_strAudioPathsAddons.Find(CString(p).MakeUpper());
+	if (!pos) {
+		m_strAudioPathsAddons.AddTail(CString(p).MakeUpper() + L"\\");
+	}
 }
 
 BOOL CMainFrame::CheckMainFilter(IBaseFilter* pBF)
