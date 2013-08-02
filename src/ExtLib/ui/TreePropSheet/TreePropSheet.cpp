@@ -758,13 +758,18 @@ BOOL CTreePropSheet::OnInitDialog()
 	pTab->GetWindowRect(rectFrame);
 	ScreenToClient(rectFrame);
 
+	CRect	rectFrame2(rectFrame);
+	rectFrame2.bottom += 1;
+	pTab->MoveWindow(rectFrame2);
+
 	m_pFrame = CreatePageFrame();
 	if (!m_pFrame)
 	{
 		ASSERT(FALSE);
 		AfxThrowMemoryException();
 	}
-	m_pFrame->Create(WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS, rectFrame, this, 0xFFFF);
+
+	m_pFrame->Create(WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS, rectFrame2, this, 0xFFFF);
 	m_pFrame->ShowCaption(m_bPageCaption);
 
 	// Lets make place for the tree ctrl
