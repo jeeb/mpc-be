@@ -1,5 +1,4 @@
-﻿* $Id$
-The following files have MPC-BE specific custom code (compared to VirtualDub):
+﻿The following files have MPC-BE specific custom code (compared to VirtualDub):
 
 * src/ExtLib/VirtualDub/h/vd2/system/vdstl_vector.h
 * src/ExtLib/VirtualDub/h/vd2/system/vdtypes.h

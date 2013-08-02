@@ -1,4 +1,3 @@
-* $Id$
 People with Git commit rights (sorted by name):
 --------
 Armada                  <armada651@users.sourceforge.net>       Code

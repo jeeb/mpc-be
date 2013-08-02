@@ -1,5 +1,4 @@
-﻿* $Id$
-Part A: Preparing the Visual Studio environment
+﻿Part A: Preparing the Visual Studio environment
 
  Visual Studio 2010
   1. Install Visual C++ 2010, part of Visual Studio 2010 Professional (Express won't work, other editions work fine).
