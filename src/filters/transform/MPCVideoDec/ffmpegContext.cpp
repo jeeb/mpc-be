@@ -157,15 +157,21 @@ static const WORD PCID_ATI_UVD [] = {
 static const WORD PCID_INTEL_4K [] = {
 	// IvyBridge
 	0x0152, // Intel HD Graphics 2500        (4k tested)
+	0x0156, // Intel HD Graphics 2500 Mobile
+	0x015A, // Intel HD Graphics P2500
 	0x0162, // Intel HD Graphics 4000        (fully tested)
 	0x0166, // Intel HD Graphics 4000 Mobile (not tested)
 	0x016A, // Intel HD Graphics P4000       (not tested)
 	// Haswell (not tested)
 	0x0412, // Intel HD Graphics HD4600
 	0x0416, // Intel HD Graphics HD4600 Mobile
+	0x041A, // Intel HD Graphics P4600/P4700
 	0x0A16, // Intel HD Graphics Family
+	0x0A1E, // Intel HD Graphics Family
 	0x0A26, // Intel HD Graphics 5000
-	0x0A2E, // Intel HD Graphics 5100
+	0x0A2E, // Intel Iris Graphics 5100
+	0x0D22, // Intel Iris Graphics 5200
+	0x0D26, // Intel Iris Graphics 5200
 };
 
 bool CheckPCID(DWORD pcid, const WORD* pPCIDs, size_t len)
