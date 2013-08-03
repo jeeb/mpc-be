@@ -547,6 +547,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				ChapterTrackId = chap->GetChapterTrackId();
 			}
 
+			if (ChapterTrackId == track->GetId()) {
+				continue;
+			}
+
 			if (track->GetType() == AP4_Track::TYPE_VIDEO && !nRotation) {
 				if (AP4_TkhdAtom* tkhd = dynamic_cast<AP4_TkhdAtom*>(track->GetTrakAtom()->GetChild(AP4_ATOM_TYPE_TKHD))) {
 					nRotation = tkhd->GetRotation();
