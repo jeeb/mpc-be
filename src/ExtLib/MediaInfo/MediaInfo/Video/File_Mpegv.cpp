@@ -200,6 +200,7 @@ const char* Mpegv_profile_and_level_indication_level[]=
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Video/File_Mpegv.h"
+#include "MediaInfo/TimeCode.h"
 #include "ZenLib/BitStream.h"
 #include "ZenLib/Utils.h"
 #if defined(MEDIAINFO_DTVCCTRANSPORT_YES)
@@ -1261,13 +1262,13 @@ void File_Mpegv::Streams_Fill()
         Fill(Stream_Video, 0, Video_ScanType, "Progressive");
         Fill(Stream_Video, 0, Video_Interlacement, "PPF");
     }
-    else if (progressive_frame_Count && progressive_frame_Count!=Frame_Count)
+    else if (progressive_frame_Count && progressive_frame_Count!=Frame_Count && progressive_frame_Count!=Frame_Count+1) //In case the stream is cut before a slice
     {
         //This is mixed
     }
     else if (Frame_Count>0) //Only if we have at least one progressive_frame definition
     {
-        if (progressive_sequence || progressive_frame_Count==Frame_Count)
+        if (progressive_sequence || progressive_frame_Count==Frame_Count || progressive_frame_Count==Frame_Count+1)
         {
             Fill(Stream_Video, 0, Video_ScanType, "Progressive");
             Fill(Stream_Video, 0, Video_Interlacement, "PPF");
@@ -1476,29 +1477,32 @@ void File_Mpegv::Streams_Finish()
     //Duration
     if (PTS_End>PTS_Begin)
         Fill(Stream_Video, 0, Video_Duration, float64_int64s(((float64)(PTS_End-PTS_Begin))/1000000));
-    else if (!TimeCodeIsNotTrustable && Time_End_Seconds!=Error)
-    {
-        float32 Time_Begin=((float32)Time_Begin_Seconds)*1000;
-        float32 Time_End =((float32)Time_End_Seconds)*1000;
-        if (FrameRate)
-        {
-            float32 FrameRate_Corrected=FrameRate;
-            if (FrameRate>=29.970 && FrameRate<=29.971 && !group_start_drop_frame_flag)
-                FrameRate_Corrected=30;
-            Time_Begin+=Time_Begin_Frames*1000/FrameRate_Corrected;
-            Time_End  +=Time_End_Frames  *1000/FrameRate_Corrected;
-        }
-        float32 Duration=Time_End-Time_Begin;
-        if (FrameRate>=29.970 && FrameRate<=29.971 && !group_start_drop_frame_flag)
-        {
-            Duration*=1001;
-            Duration/=1000;
-        }
-        Fill(Stream_Video, 0, Video_Duration, Duration, 0);
-    }
     else if (Frame_Count_NotParsedIncluded!=(int64u)-1)
     {
         Fill(Stream_Video, 0, Video_FrameCount, Frame_Count_NotParsedIncluded);
+        if (FrameRate)
+            Fill(Stream_Video, 0, Video_Duration, Frame_Count_NotParsedIncluded/FrameRate*1000, 0);
+    }
+    else if (!TimeCodeIsNotTrustable && Time_End_Seconds!=Error && FrameRate)
+    {
+        TimeCode Time_Begin_TC;
+        Time_Begin_TC.FramesPerSecond=(int8u)ceil(FrameRate);
+        Time_Begin_TC.DropFrame=(FrameRate-ceil(FrameRate))?true:false;
+        Time_Begin_TC.Hours=(int8u)(Time_Begin_Seconds/3600);
+        Time_Begin_TC.Minutes=(int8u)((Time_Begin_Seconds%3600)/60);
+        Time_Begin_TC.Seconds=(int8u)(Time_Begin_Seconds%60);
+        Time_Begin_TC.Frames=(int8u)Time_Begin_Frames;
+        TimeCode Time_End_TC;
+        Time_End_TC.FramesPerSecond=(int8u)ceil(FrameRate);
+        Time_End_TC.DropFrame=(FrameRate-ceil(FrameRate))?true:false;
+        Time_End_TC.Hours=(int8u)(Time_End_Seconds/3600);
+        Time_End_TC.Minutes=(int8u)((Time_End_Seconds%3600)/60);
+        Time_End_TC.Seconds=(int8u)(Time_End_Seconds%60);
+        Time_End_TC.Frames=(int8u)Time_End_Frames;
+        int32u Time_Begin_FrameCount=Time_Begin_TC.ToFrames();
+        int32u Time_End_FrameCount=Time_End_TC.ToFrames();
+        Fill(Stream_Video, 0, Video_FrameCount, Time_End_FrameCount-Time_Begin_FrameCount, 0);
+        Fill(Stream_Video, 0, Video_Duration, (Time_End_FrameCount-Time_Begin_FrameCount)/FrameRate*1000, 0);
     }
 
     //picture_coding_types
@@ -2279,7 +2283,7 @@ void File_Mpegv::picture_start()
             picture_coding_types_Current+=Mpegv_picture_coding_type[picture_coding_type];
 
         //Detecting streams with only I-Frames
-        if (picture_coding_type==1 && picture_coding_type_Old==1)
+        if (picture_coding_type==1 && picture_coding_type_Old==1 && !FirstFieldFound)
             temporal_reference_Old=(int16u)-1; //Resetting temporal_reference_Old
 
         //NextCode
