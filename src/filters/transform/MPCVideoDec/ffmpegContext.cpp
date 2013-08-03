@@ -51,7 +51,7 @@ extern "C" {
 
 static const WORD PCID_NVIDIA_VP5 [] = {
 	// http://us.download.nvidia.com/XFree86/Linux-x86_64/319.32/README/supportedchips.html
-	// Nvidia VDPAU Feature Set D
+	// VP5, Nvidia VDPAU Feature Set D: GF119, GK104, GK106, GK107, GK110, GK208
 	0x0FC2, // GeForce GT 630 (GK107) (not officially supported or typo, 4k tested)
 	0x0FC6, // GeForce GTX 650
 	0x0FD1, // GeForce GT 650M
