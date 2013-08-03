@@ -926,13 +926,6 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 				}
 			}
 
-			if (IsAudioWaveRenderer(pBF)) {
-				POSITION pos = m_transform.Find(pFGF);
-				if (pos != NULL) {
-					m_transform.RemoveAt(pos);
-				}
-			}
-
 			/*
 			if (FAILED(hr))
 			{
@@ -1052,6 +1045,14 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 					}
 
 					DbgLog((LOG_TRACE, 3, L"FGM: '%s' Successfully connected", pFGF->GetName()));
+
+					if (IsAudioWaveRenderer(pBF)) {
+						POSITION pos = m_transform.Find(pFGF);
+						if (pos != NULL) {
+							delete m_transform.GetAt(pos);
+							m_transform.RemoveAt(pos);
+						}
+					}
 
 					return hr;
 				}

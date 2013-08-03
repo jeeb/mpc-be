@@ -530,7 +530,7 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 
 	if (p->rtStart != INVALID_TIME && (nFlag & PACKET_PTS_DISCONTINUITY)) {
 		// Filter invalid PTS value (if too different from previous packet)
-		if (!IsDiscontinuous() && !((nFlag & PACKET_PTS_VALIDATE_POSITIVE)) && p->rtStart < 0) {
+		if (!IsDiscontinuous() && !((nFlag & PACKET_PTS_VALIDATE_POSITIVE) && p->rtStart < 0)) {
 			REFERENCE_TIME rt = p->rtStart + m_rtOffset;
 			if (_abs64(rt - m_rtPrev) > MAX_PTS_SHIFT) {
 				m_rtOffset += m_rtPrev - rt;
