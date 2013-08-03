@@ -52,6 +52,7 @@ extern "C" {
 static const WORD PCID_NVIDIA_VP5 [] = {
 	// http://us.download.nvidia.com/XFree86/Linux-x86_64/319.32/README/supportedchips.html
 	// Nvidia VDPAU Feature Set D
+	0x0FC2, // GeForce GT 630 (GK107) (not officially supported or typo, 4k tested)
 	0x0FC6, // GeForce GTX 650
 	0x0FD1, // GeForce GT 650M
 	0x0FD2, // GeForce GT 640M
@@ -79,7 +80,7 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x1022, // Tesla K20c
 	0x1026, // Tesla K20s
 	0x1028, // Tesla K20m
-	0x1040, // GeForce GT 520 (not officially supported or typo) (4k tested)
+	0x1040, // GeForce GT 520 (GF119) (not officially supported or typo, 4k tested)
 	0x1042, // GeForce 510
 	0x1048, // GeForce 605
 	0x104A, // GeForce GT 610 (fully tested)
@@ -125,7 +126,6 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x1291, // GeForce GT 735M
 	0x1292, // GeForce GT 740M
 	0x1293, // GeForce GT 730M
-
 };
 
 static const WORD PCID_ATI_UVD [] = {
