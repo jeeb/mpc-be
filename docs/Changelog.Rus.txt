@@ -35,6 +35,7 @@
 	* ffmpeg 2.0 git-62f616ed;
 	* libwebp 0.3.1 git-1aed8f2a;
 	* libpng 1.7.0 b17 git-bb065520;
+	* libopus 1.1 git-e4550929;
 
 Исправления (!):
 	! Некорректное отображение UTF-8 глав (чаптеров) из MP4/MOV
