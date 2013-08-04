@@ -3073,7 +3073,7 @@ HRESULT CreateMPEG2VIfromAVC(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_T
 
 	HRESULT hr = S_OK;
 
-	if (extra[1]) {
+	if (extra[0] == 1) {
 		mvih->dwProfile	= extra[1];
 		mvih->dwLevel	= extra[3];
 		mvih->dwFlags	= (extra[4] & 3) + 1;
