@@ -32,15 +32,15 @@
 IMPLEMENT_DYNAMIC(CPPageAudioSwitcher, CPPageBase)
 CPPageAudioSwitcher::CPPageAudioSwitcher(IFilterGraph* pFG)
 	: CPPageBase(CPPageAudioSwitcher::IDD, CPPageAudioSwitcher::IDD)
+	, m_fEnableAudioSwitcher(FALSE)
 	, m_fAudioNormalize(FALSE)
 	, m_fAudioNormalizeRecover(FALSE)
+	, m_AudioBoostPos(0)
+	, m_fAudioTimeShift(FALSE)
+	, m_tAudioTimeShift(0)
 	, m_fCustomChannelMapping(FALSE)
 	, m_nChannels(0)
-	, m_fEnableAudioSwitcher(FALSE)
 	, m_dwChannelMask(0)
-	, m_tAudioTimeShift(0)
-	, m_fAudioTimeShift(FALSE)
-	, m_AudioBoostPos(0)
 {
 	m_pASF = FindFilter(__uuidof(CAudioSwitcherFilter), pFG);
 }
@@ -53,22 +53,22 @@ void CPPageAudioSwitcher::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
+	DDX_Check(pDX, IDC_CHECK2, m_fEnableAudioSwitcher);
 	DDX_Check(pDX, IDC_CHECK5, m_fAudioNormalize);
 	DDX_Check(pDX, IDC_CHECK6, m_fAudioNormalizeRecover);
 	DDX_Slider(pDX, IDC_SLIDER1, m_AudioBoostPos);
 	DDX_Control(pDX, IDC_SLIDER1, m_AudioBoostCtrl);
+	DDX_Check(pDX, IDC_CHECK4, m_fAudioTimeShift);
+	DDX_Control(pDX, IDC_CHECK4, m_fAudioTimeShiftCtrl);
+	DDX_Text(pDX, IDC_EDIT2, m_tAudioTimeShift);
+	DDX_Control(pDX, IDC_EDIT2, m_tAudioTimeShiftCtrl);
+	DDX_Control(pDX, IDC_SPIN2, m_tAudioTimeShiftSpin);
 	DDX_Check(pDX, IDC_CHECK1, m_fCustomChannelMapping);
 	DDX_Control(pDX, IDC_EDIT1, m_nChannelsCtrl);
 	DDX_Text(pDX, IDC_EDIT1, m_nChannels);
 	DDX_Control(pDX, IDC_SPIN1, m_nChannelsSpinCtrl);
 	DDX_Control(pDX, IDC_LIST1, m_list);
-	DDX_Check(pDX, IDC_CHECK2, m_fEnableAudioSwitcher);
 	DDX_Control(pDX, IDC_CHECK1, m_fCustomChannelMappingCtrl);
-	DDX_Control(pDX, IDC_EDIT2, m_tAudioTimeShiftCtrl);
-	DDX_Control(pDX, IDC_SPIN2, m_tAudioTimeShiftSpin);
-	DDX_Text(pDX, IDC_EDIT2, m_tAudioTimeShift);
-	DDX_Check(pDX, IDC_CHECK4, m_fAudioTimeShift);
-	DDX_Control(pDX, IDC_CHECK4, m_fAudioTimeShiftCtrl);
 }
 
 BEGIN_MESSAGE_MAP(CPPageAudioSwitcher, CPPageBase)
@@ -101,15 +101,15 @@ BOOL CPPageAudioSwitcher::OnInitDialog()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	m_fEnableAudioSwitcher = s.fEnableAudioSwitcher;
-	m_fAudioNormalize = s.fAudioNormalize;
+	m_fEnableAudioSwitcher   = s.fEnableAudioSwitcher;
+	m_fAudioNormalize        = s.fAudioNormalize;
 	m_fAudioNormalizeRecover = s.fAudioNormalizeRecover;
-	m_AudioBoostPos = (int)(s.dAudioBoost_dB*10+0.1);
+	m_AudioBoostPos          = (int)(s.dAudioBoost_dB*10+0.1);
 	m_AudioBoostCtrl.SetRange(0, 100);
-	m_fAudioTimeShift = s.fAudioTimeShift;
-	m_tAudioTimeShift = s.iAudioTimeShift;
+	m_fAudioTimeShift        = s.fAudioTimeShift;
+	m_tAudioTimeShift        = s.iAudioTimeShift;
 	m_tAudioTimeShiftSpin.SetRange32(-1000*60*60*24, 1000*60*60*24);
-	m_fCustomChannelMapping = s.fCustomChannelMapping;
+	m_fCustomChannelMapping  = s.fCustomChannelMapping;
 	memcpy(m_pSpeakerToChannelMap, s.pSpeakerToChannelMap, sizeof(s.pSpeakerToChannelMap));
 
 	if (m_pASF) {
@@ -168,13 +168,13 @@ BOOL CPPageAudioSwitcher::OnApply()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	s.fEnableAudioSwitcher = !!m_fEnableAudioSwitcher;
-	s.fAudioNormalize = !!m_fAudioNormalize;
+	s.fEnableAudioSwitcher   = !!m_fEnableAudioSwitcher;
+	s.fAudioNormalize        = !!m_fAudioNormalize;
 	s.fAudioNormalizeRecover = !!m_fAudioNormalizeRecover;
-	s.dAudioBoost_dB = (float)m_AudioBoostPos/10;
-	s.fAudioTimeShift = !!m_fAudioTimeShift;
-	s.iAudioTimeShift = m_tAudioTimeShift;
-	s.fCustomChannelMapping = !!m_fCustomChannelMapping;
+	s.dAudioBoost_dB         = (float)m_AudioBoostPos/10;
+	s.fAudioTimeShift        = !!m_fAudioTimeShift;
+	s.iAudioTimeShift        = m_tAudioTimeShift;
+	s.fCustomChannelMapping  = !!m_fCustomChannelMapping;
 	memcpy(s.pSpeakerToChannelMap, m_pSpeakerToChannelMap, sizeof(m_pSpeakerToChannelMap));
 
 	if (m_pASF) {
@@ -357,7 +357,7 @@ void CPPageAudioSwitcher::OnCancel()
 {
 	AppSettings& s = AfxGetAppSettings();
 
-	if (m_AudioBoostPos !=  (int)(s.dAudioBoost_dB*10+0.1)) {
+	if (m_AudioBoostPos != (int)(s.dAudioBoost_dB*10+0.1)) {
 		((CMainFrame*)GetParentFrame())->SetVolumeBoost(s.dAudioBoost_dB);
 	}
 

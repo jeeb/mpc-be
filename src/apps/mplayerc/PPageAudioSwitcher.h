@@ -50,17 +50,17 @@ public:
 	BOOL m_fAudioNormalizeRecover;
 	int m_AudioBoostPos;
 	CSliderCtrl m_AudioBoostCtrl;
+	BOOL m_fAudioTimeShift;
+	CButton m_fAudioTimeShiftCtrl;
+	int m_tAudioTimeShift;
+	CIntEdit m_tAudioTimeShiftCtrl;
+	CSpinButtonCtrl m_tAudioTimeShiftSpin;
 	BOOL m_fCustomChannelMapping;
 	CButton m_fCustomChannelMappingCtrl;
 	CEdit m_nChannelsCtrl;
 	int m_nChannels;
 	CSpinButtonCtrl m_nChannelsSpinCtrl;
 	CListCtrl m_list;
-	int m_tAudioTimeShift;
-	CButton m_fAudioTimeShiftCtrl;
-	CIntEdit m_tAudioTimeShiftCtrl;
-	CSpinButtonCtrl m_tAudioTimeShiftSpin;
-	BOOL m_fAudioTimeShift;
 
 	CToolTipCtrl m_tooltip;
 
