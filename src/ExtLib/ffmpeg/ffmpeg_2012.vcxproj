@@ -36,7 +36,6 @@
     <None Include="libavcodec\x86\h264_deblock_10bit.asm" />
     <None Include="libavcodec\x86\h264_idct.asm" />
     <None Include="libavcodec\x86\h264_idct_10bit.asm" />
-    <None Include="libavcodec\x86\h264_intrapred.asm" />
     <None Include="libavcodec\x86\h264_intrapred_10bit.asm" />
     <None Include="libavcodec\x86\h264_qpel_10bit.asm" />
     <None Include="libavcodec\x86\h264_qpel_8bit.asm" />
@@ -65,6 +64,7 @@
     <None Include="libavutil\x86\cpuid.asm" />
     <None Include="libavutil\x86\emms.asm" />
     <None Include="libavutil\x86\float_dsp.asm" />
+    <None Include="libavutil\x86\lls.asm" />
     <None Include="libavutil\x86\x86inc.asm" />
     <None Include="libavutil\x86\x86util.asm" />
     <None Include="libswscale\x86\input.asm" />
@@ -141,6 +141,7 @@
     <ClInclude Include="libavcodec\faanidct.h" />
     <ClInclude Include="libavcodec\fft-internal.h" />
     <ClInclude Include="libavcodec\fft.h" />
+    <ClInclude Include="libavcodec\fft_table.h" />
     <ClInclude Include="libavcodec\flac.h" />
     <ClInclude Include="libavcodec\flacdata.h" />
     <ClInclude Include="libavcodec\flacdsp.h" />
@@ -262,6 +263,7 @@
     <ClInclude Include="libavcodec\thread.h" />
     <ClInclude Include="libavcodec\truespeech_data.h" />
     <ClInclude Include="libavcodec\tscc2data.h" />
+    <ClInclude Include="libavcodec\ttadata.h" />
     <ClInclude Include="libavcodec\unary.h" />
     <ClInclude Include="libavcodec\utvideo.h" />
     <ClInclude Include="libavcodec\v210dec.h" />
@@ -453,6 +455,10 @@
     <ClCompile Include="libavcodec\faandct.c" />
     <ClCompile Include="libavcodec\faanidct.c" />
     <ClCompile Include="libavcodec\fft.c" />
+    <ClCompile Include="libavcodec\fft_fixed.c" />
+    <ClCompile Include="libavcodec\fft_fixed_32.c" />
+    <ClCompile Include="libavcodec\fft_float.c" />
+    <ClCompile Include="libavcodec\fft_init_table.c" />
     <ClCompile Include="libavcodec\flac.c" />
     <ClCompile Include="libavcodec\flacdata.c" />
     <ClCompile Include="libavcodec\flacdec.c" />
@@ -464,6 +470,7 @@
     <ClCompile Include="libavcodec\fmtconvert.c" />
     <ClCompile Include="libavcodec\frame_thread_encoder.c" />
     <ClCompile Include="libavcodec\fraps.c" />
+    <ClCompile Include="libavcodec\g2meet.c" />
     <ClCompile Include="libavcodec\golomb.c" />
     <ClCompile Include="libavcodec\h261.c" />
     <ClCompile Include="libavcodec\h261data.c" />
@@ -489,6 +496,7 @@
     <ClCompile Include="libavcodec\h264_loopfilter.c" />
     <ClCompile Include="libavcodec\h264_mb_template.c" />
     <ClCompile Include="libavcodec\h264_mc_template.c" />
+    <ClCompile Include="libavcodec\h264_mp4toannexb_bsf.c" />
     <ClCompile Include="libavcodec\h264_parser.c" />
     <ClCompile Include="libavcodec\h264_ps.c" />
     <ClCompile Include="libavcodec\h264_refs.c" />
@@ -523,6 +531,9 @@
     <ClCompile Include="libavcodec\lsp.c" />
     <ClCompile Include="libavcodec\mathtables.c" />
     <ClCompile Include="libavcodec\mdct.c" />
+    <ClCompile Include="libavcodec\mdct_fixed.c" />
+    <ClCompile Include="libavcodec\mdct_fixed_32.c" />
+    <ClCompile Include="libavcodec\mdct_float.c" />
     <ClCompile Include="libavcodec\mjpeg.c" />
     <ClCompile Include="libavcodec\mjpegbdec.c" />
     <ClCompile Include="libavcodec\mjpegdec.c" />
@@ -609,6 +620,7 @@
     <ClCompile Include="libavcodec\tscc.c" />
     <ClCompile Include="libavcodec\tscc2.c" />
     <ClCompile Include="libavcodec\tta.c" />
+    <ClCompile Include="libavcodec\ttadata.c" />
     <ClCompile Include="libavcodec\utils.c" />
     <ClCompile Include="libavcodec\utvideo.c" />
     <ClCompile Include="libavcodec\utvideodec.c" />
@@ -737,6 +749,7 @@
     <ClCompile Include="libavutil\utils.c" />
     <ClCompile Include="libavutil\x86\cpu.c" />
     <ClCompile Include="libavutil\x86\float_dsp_init.c" />
+    <ClCompile Include="libavutil\x86\lls_init.c" />
     <ClCompile Include="libswscale\input.c" />
     <ClCompile Include="libswscale\options.c" />
     <ClCompile Include="libswscale\output.c" />

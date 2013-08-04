@@ -166,6 +166,9 @@
     <None Include="libavutil\x86\float_dsp.asm">
       <Filter>libavutil\x86</Filter>
     </None>
+    <None Include="libavutil\x86\lls.asm">
+      <Filter>libavutil\x86</Filter>
+    </None>
     <None Include="libavutil\x86\x86inc.asm">
       <Filter>libavutil\x86</Filter>
     </None>
@@ -416,6 +419,9 @@
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\fft.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="libavcodec\fft_table.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\fft-internal.h">
@@ -782,6 +788,9 @@
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\tscc2data.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="libavcodec\ttadata.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\unary.h">
@@ -1444,6 +1453,18 @@
     <ClCompile Include="libavcodec\fft.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
+    <ClCompile Include="libavcodec\fft_fixed.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\fft_fixed_32.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\fft_float.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\fft_init_table.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
     <ClCompile Include="libavcodec\flac.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
@@ -1475,6 +1496,9 @@
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\fraps.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\g2meet.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\golomb.c">
@@ -1517,6 +1541,9 @@
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\h264_mc_template.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\h264_mp4toannexb_bsf.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\h264_parser.c">
@@ -1652,6 +1679,15 @@
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\mdct.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\mdct_fixed.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\mdct_fixed_32.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\mdct_float.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\mjpeg.c">
@@ -1912,6 +1948,9 @@
     <ClCompile Include="libavcodec\tta.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
+    <ClCompile Include="libavcodec\ttadata.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
     <ClCompile Include="libavcodec\utils.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
@@ -2063,6 +2102,9 @@
       <Filter>libavutil\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavutil\x86\float_dsp_init.c">
+      <Filter>libavutil\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="libavutil\x86\lls_init.c">
       <Filter>libavutil\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavutil\atomic.c">

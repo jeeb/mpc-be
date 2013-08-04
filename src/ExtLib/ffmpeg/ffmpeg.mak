@@ -49,6 +49,7 @@ endif
 
 # Object directories
 OBJ_DIRS = $(OBJ_DIR) \
+	$(OBJ_DIR)compat \
 	$(OBJ_DIR)libavcodec \
 	$(OBJ_DIR)libavcodec/x86 \
 	$(OBJ_DIR)libavresample \
@@ -144,6 +145,10 @@ SRCS_C = \
 	libavcodec/faandct.c \
 	libavcodec/faanidct.c \
 	libavcodec/fft.c \
+	libavcodec/fft_fixed.c \
+	libavcodec/fft_fixed_32.c \
+	libavcodec/fft_float.c \
+	libavcodec/fft_init_table.c \
 	libavcodec/flac.c \
 	libavcodec/flacdata.c \
 	libavcodec/flacdec.c \
@@ -201,6 +206,9 @@ SRCS_C = \
 	libavcodec/lsp.c \
 	libavcodec/mathtables.c \
 	libavcodec/mdct.c \
+	libavcodec/mdct_fixed.c \
+	libavcodec/mdct_fixed_32.c \
+	libavcodec/mdct_float.c \
 	libavcodec/mjpeg.c \
 	libavcodec/mjpegbdec.c \
 	libavcodec/mjpegdec.c \
