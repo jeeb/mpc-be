@@ -919,30 +919,6 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 
 			hr = ConnectFilterDirect(pPinOut, pBF, NULL);
 
-			if (FAILED(hr)) {
-				if (pFGF->GetMerit() == MERIT64_PRIORITY) {
-					DbgLog((LOG_TRACE, 3, L"FGM: Connecting priority filter '%s' FAILED!", pFGF->GetName()));
-					return 0xDEAD;
-				}
-			}
-
-			/*
-			if (FAILED(hr))
-			{
-				if (types.GetCount() >= 2 && types[0] == MEDIATYPE_Stream && types[1] != GUID_NULL)
-				{
-					CMediaType mt;
-
-					mt.majortype = types[0];
-					mt.subtype = types[1];
-					mt.formattype = FORMAT_None;
-					if (FAILED(hr)) hr = ConnectFilterDirect(pPinOut, pBF, &mt);
-
-					mt.formattype = GUID_NULL;
-					if (FAILED(hr)) hr = ConnectFilterDirect(pPinOut, pBF, &mt);
-				}
-			}
-			*/
 			if (SUCCEEDED(hr)) {
 				if (!IsStreamEnd(pBF)) {
 					fDeadEnd = false;
@@ -1050,9 +1026,20 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 				}
 			}
 
+			BOOL bIsEnd = FALSE;
+			if (pFGF->GetMerit() == MERIT64_PRIORITY) {
+				DbgLog((LOG_TRACE, 3, L"FGM: Connecting priority filter '%s' FAILED!", pFGF->GetName()));
+				bIsEnd = TRUE;
+			} else {
+				DbgLog((LOG_TRACE, 3, L"FGM: Connecting '%s' FAILED!", pFGF->GetName()));
+			}
+
 			EXECUTE_ASSERT(SUCCEEDED(RemoveFilter(pBF)));
-			DbgLog((LOG_TRACE, 3, L"FGM: Connecting '%s' FAILED!", pFGF->GetName()));
 			pBF.Release();
+
+			if (bIsEnd) {
+				return 0xDEAD;
+			}
 		}
 	}
 
@@ -1316,6 +1303,12 @@ HRESULT CFGManager::ConnectFilterDirect(IPin* pPinOut, CFGFilter* pFGF)
 	}
 
 	hr = ConnectFilterDirect(pPinOut, pBF, NULL);
+
+	if (FAILED(hr)) {
+		EXECUTE_ASSERT(SUCCEEDED(RemoveFilter(pBF)));
+		DbgLog((LOG_TRACE, 3, L"FGM: Connecting '%s' FAILED!", pFGF->GetName()));
+		pBF.Release();
+	}
 
 	return hr;
 }
