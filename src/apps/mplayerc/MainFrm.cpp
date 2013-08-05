@@ -5589,6 +5589,8 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 				if (LoadSubtitle(sl.GetHead(), &pSubStream)) {
 					SetSubtitle(pSubStream); // the subtitle at the insert position according to LoadSubtitle()
 					b_SubLoaded = true;
+
+					AddSubtitlePathsAddons(sl.GetHead());
 				}
 			}
 
@@ -6513,6 +6515,8 @@ void CMainFrame::OnFileLoadSubtitle()
 	ISubStream *pSubStream = NULL;
 	if (LoadSubtitle(fd.GetPathName(), &pSubStream)) {
 		SetSubtitle(pSubStream);    // the subtitle at the insert position according to LoadSubtitle()
+
+		AddSubtitlePathsAddons(fd.GetPathName());
 	}
 }
 
@@ -6554,6 +6558,8 @@ void CMainFrame::OnFileLoadAudio()
 	
 	ShowWindow(SW_SHOW);
 	SetForegroundWindow();
+
+	AddAudioPathsAddons(fd.GetPathName());
 
 	m_fns.AddTail(fd.GetPathName());
 	m_wndPlaylistBar.Open(m_fns, FALSE);
@@ -20132,6 +20138,28 @@ int CMainFrame::GetStreamCount(DWORD dwSelGroup)
 	}
 
 	return streamcount;
+}
+
+void CMainFrame::AddSubtitlePathsAddons(CString FileName)
+{
+	CPath p(FileName);
+	p.RemoveFileSpec();
+	AppSettings& s = AfxGetAppSettings();
+	POSITION pos = s.slSubtitlePathsAddons.Find(CString(p).MakeUpper());
+	if (!pos) {
+		s.slSubtitlePathsAddons.AddTail(CString(p).MakeUpper() + L"\\");
+	}
+}
+
+void CMainFrame::AddAudioPathsAddons(CString FileName)
+{
+	CPath p(FileName);
+	p.RemoveFileSpec();
+	AppSettings& s = AfxGetAppSettings();
+	POSITION pos = s.slAudioPathsAddons.Find(CString(p).MakeUpper());
+	if (!pos) {
+		s.slAudioPathsAddons.AddTail(CString(p).MakeUpper() + L"\\");
+	}
 }
 
 BOOL CMainFrame::CheckMainFilter(IBaseFilter* pBF)

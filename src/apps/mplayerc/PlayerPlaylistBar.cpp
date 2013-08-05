@@ -207,11 +207,19 @@ void CPlaylistItem::AutoLoadFiles()
 		name.Truncate(n);
 	}
 
-	if (AfxGetAppSettings().fAutoloadAudio) {
-		CAtlArray<CString> paths;
-		StringToPaths(curdir, AfxGetAppSettings().strAudioPaths, paths);
+	AppSettings& s = AfxGetAppSettings();
 
-		CMediaFormats& mf = AfxGetAppSettings().m_Formats;
+	if (s.fAutoloadAudio) {
+		CAtlArray<CString> paths;
+		StringToPaths(curdir, s.strAudioPaths, paths);
+
+		CAtlList<CString>* sl = &s.slAudioPathsAddons;
+		POSITION pos = sl->GetHeadPosition();
+		while (pos) {
+			paths.Add(sl->GetNext(pos));
+		}
+
+		CMediaFormats& mf = s.m_Formats;
 		if (!mf.FindExt(ext, true)) {
 			for (size_t i = 0; i < paths.GetCount(); i++) {
 				WIN32_FIND_DATA fd = {0};
@@ -250,9 +258,15 @@ void CPlaylistItem::AutoLoadFiles()
 		}
 	}
 
-	if (AfxGetAppSettings().fAutoloadSubtitles) {
+	if (s.fAutoloadSubtitles) {
 		CAtlArray<CString> paths;
-		StringToPaths(curdir, AfxGetAppSettings().strSubtitlePaths, paths);
+		StringToPaths(curdir, s.strSubtitlePaths, paths);
+
+		CAtlList<CString>* sl = &s.slSubtitlePathsAddons;
+		POSITION pos = sl->GetHeadPosition();
+		while (pos) {
+			paths.Add(sl->GetNext(pos));
+		}
 
 		for (size_t i = 0; i < paths.GetCount(); i++) {
 			WIN32_FIND_DATA fd = {0};

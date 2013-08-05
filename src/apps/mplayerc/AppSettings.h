@@ -803,4 +803,6 @@ public:
 	CPerfomanceSettings			PerfomanceSettings;
 	CFiltersPrioritySettings	FiltersPrioritySettings;
 
+	CAtlList<CString>			slSubtitlePathsAddons;
+	CAtlList<CString>			slAudioPathsAddons;
 };
