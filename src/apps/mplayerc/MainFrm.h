@@ -1209,15 +1209,7 @@ private:
 	int			GetStreamCount(DWORD dwSelGroup);
 
 	DWORD_PTR			m_nMainFilterId;
-	
-	CAtlList<CString>	m_strSubtitlePathsAddons;
-	CAtlList<CString>	m_strAudioPathsAddons;
 
 public:
 	BOOL				CheckMainFilter(IBaseFilter* pBF);
-
-	void				AddSubtitlePathsAddons(CString FileName);
-	CAtlList<CString>*	GetSubtitlePathsAddons() { return &m_strSubtitlePathsAddons; }
-	void				AddAudioPathsAddons(CString FileName);
-	CAtlList<CString>*	GetAudioPathsAddons() { return &m_strAudioPathsAddons; }
 };

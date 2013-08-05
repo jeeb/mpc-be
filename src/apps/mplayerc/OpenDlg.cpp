@@ -241,10 +241,6 @@ void COpenDlg::OnBnClickedOk()
 
 	if (m_mrucombo2.IsWindowEnabled()) {
 		m_fns.AddTail(m_path2);
-
-		if (::PathFileExists(m_path2)) {
-			((CMainFrame*)AfxGetMainWnd())->AddAudioPathsAddons(m_path2);
-		}
 	}
 
 	m_fMultipleFiles = false;
