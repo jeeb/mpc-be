@@ -1046,14 +1046,6 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 
 					DbgLog((LOG_TRACE, 3, L"FGM: '%s' Successfully connected", pFGF->GetName()));
 
-					if (IsAudioWaveRenderer(pBF)) {
-						POSITION pos = m_transform.Find(pFGF);
-						if (pos != NULL) {
-							delete m_transform.GetAt(pos);
-							m_transform.RemoveAt(pos);
-						}
-					}
-
 					return hr;
 				}
 			}
@@ -1308,6 +1300,26 @@ static bool FindMT(IPin* pPin, const GUID majortype)
 	return false;
 }
 
+HRESULT CFGManager::ConnectFilterDirect(IPin* pPinOut, CFGFilter* pFGF)
+{
+	HRESULT hr = S_OK;
+
+	CComPtr<IBaseFilter> pBF;
+	CInterfaceList<IUnknown, &IID_IUnknown> pUnks;
+	if (FAILED(hr = pFGF->Create(&pBF, pUnks))) {
+		return hr;
+	}
+
+	if (FAILED(hr = AddFilter(pBF, pFGF->GetName()))) {
+		pBF.Release();
+		return hr;
+	}
+
+	hr = ConnectFilterDirect(pPinOut, pBF, NULL);
+
+	return hr;
+}
+
 STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 {
 	CAutoLock cAutoLock(this);
@@ -1388,12 +1400,76 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 							hr = ConnectFilterDirect(pPin, pInfPinTee, NULL);
 							if (SUCCEEDED(hr)) {
 								bInfPinTeeConnected = TRUE;
+								CString SelAudioRenderer = s.SelectedAudioRenderer();
 								for (int audioRendererId = 0; audioRendererId < 2; audioRendererId++) {
 									IPin *infTeeFilterOutPin = GetFirstDisconnectedPin(pInfPinTee, PINDIR_OUTPUT);
-									hr = Connect(infTeeFilterOutPin, pPinIn);
-									if (SUCCEEDED(hr)) {
-										; // TODO
+
+									BOOL bIsConnected = FALSE;
+
+									if (!SelAudioRenderer.IsEmpty()) {
+
+										// looking at the list of filters
+										POSITION pos = m_transform.GetHeadPosition();
+										while (pos) {
+											CFGFilter* pFGF = m_transform.GetNext(pos);
+											if (SelAudioRenderer == pFGF->GetName()) {
+												
+												hr = ConnectFilterDirect(infTeeFilterOutPin, pFGF);
+												if (SUCCEEDED(hr)) {
+													DbgLog((LOG_TRACE, 3, L"FGM: Connect Direct to '%s'", pFGF->GetName()));
+													bIsConnected = TRUE;
+													break;
+												}
+											}
+										}
+
+										if (!bIsConnected) {
+
+											// looking at the list of AudioRenderer
+											BeginEnumSysDev(CLSID_AudioRendererCategory, pMoniker) {
+												CFGFilterRegistry f(pMoniker);
+
+												if (SelAudioRenderer == f.GetDisplayName()) {
+													hr = ConnectFilterDirect(infTeeFilterOutPin, &f);
+													if (SUCCEEDED(hr)) {
+														DbgLog((LOG_TRACE, 3, L"FGM: Connect Direct to '%s'", f.GetName()));
+														bIsConnected = TRUE;
+														break;
+													}
+												}
+											}
+											EndEnumSysDev
+										}
+									} else {
+
+										// connect to 'Default DirectSound Device'
+										CComPtr<IEnumMoniker> pEM;
+										GUID guids[] = {MEDIATYPE_Audio, MEDIASUBTYPE_NULL};
+
+										if (SUCCEEDED(m_pFM->EnumMatchingFilters(&pEM, 0, FALSE, MERIT_DO_NOT_USE+1,
+													  TRUE, 1, guids, NULL, NULL, TRUE, FALSE, 0, NULL, NULL, NULL))) {
+											for (CComPtr<IMoniker> pMoniker; S_OK == pEM->Next(1, &pMoniker, NULL); pMoniker = NULL) {
+												CFGFilterRegistry f(pMoniker);
+
+												if (f.GetName() == L"Default DirectSound Device") {
+													hr = ConnectFilterDirect(infTeeFilterOutPin, &f);
+													if (SUCCEEDED(hr)) {
+														DbgLog((LOG_TRACE, 3, L"FGM: Connect Direct to '%s'", f.GetName()));
+														bIsConnected = TRUE;
+														break;
+													}
+												}
+											}
+										}
+
+									
 									}
+
+									if (!bIsConnected) {
+										hr = Connect(infTeeFilterOutPin, pPinIn);
+									}
+
+									SelAudioRenderer = s.strSecondAudioRendererDisplayName;
 								}
 							}
 							break;
@@ -2577,11 +2653,11 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		
 		for (int ar = 0; ar < (s.fDualAudioOutput ? 2 : 1); ar++) {
 			if (SelAudioRenderer == AUDRNDT_NULL_COMP) {
-				pFGF = DNew CFGFilterInternal<CNullAudioRenderer>(AUDRNDT_NULL_COMP, MERIT64_ABOVE_DSHOW + 2);
+				pFGF = DNew CFGFilterInternal<CNullAudioRenderer>(AUDRNDT_NULL_COMP, m_armerit);
 				pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
 				m_transform.AddTail(pFGF);
 			} else if (SelAudioRenderer == AUDRNDT_NULL_UNCOMP) {
-				pFGF = DNew CFGFilterInternal<CNullUAudioRenderer>(AUDRNDT_NULL_UNCOMP, MERIT64_ABOVE_DSHOW + 2);
+				pFGF = DNew CFGFilterInternal<CNullUAudioRenderer>(AUDRNDT_NULL_UNCOMP, m_armerit);
 				pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
 				m_transform.AddTail(pFGF);
 			} else if (SelAudioRenderer == AUDRNDT_MPC) {

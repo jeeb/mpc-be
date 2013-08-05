@@ -119,6 +119,10 @@ protected:
 	//
 	HWND m_hWnd;
 
+	//
+	HRESULT ConnectFilterDirect(IPin* pPinOut, CFGFilter* pFGF);
+
+
 public:
 	CFGManager(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd = 0, bool IsPreview = false);
 	virtual ~CFGManager();
