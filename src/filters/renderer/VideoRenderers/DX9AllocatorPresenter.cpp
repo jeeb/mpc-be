@@ -2369,13 +2369,11 @@ void CDX9AllocatorPresenter::DrawStats()
 				}
 			}
 
-			static ULONGLONG lastRun	= 0;
-			static short cpuUsage	= 0;
-			if (GetTickCount64() - lastRun >= 1000
-					|| cpuUsage == 0) {
-				
+			static ULONGLONG lastTick	= 0;
+			static short cpuUsage		= 0;
+			if ((GetTickCount64() - lastTick) >= 1000) {
 				cpuUsage = m_CpuUsage.GetUsage();
-				lastRun = GetTickCount64();
+				lastTick = GetTickCount64();
 			}
 
 			{
