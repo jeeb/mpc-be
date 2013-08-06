@@ -100,14 +100,6 @@ POSITION CPlaylistItem::FindFile(LPCTSTR path)
 	return(NULL);
 }
 
-static CString StripPath(CString path)
-{
-	CString p = path;
-	p.Replace('\\', '/');
-	p = p.Mid(p.ReverseFind('/')+1);
-	return(p.IsEmpty() ? path : p);
-}
-
 CString CPlaylistItem::GetLabel(int i)
 {
 	CString str;
@@ -116,7 +108,7 @@ CString CPlaylistItem::GetLabel(int i)
 		if (!m_label.IsEmpty()) {
 			str = m_label;
 		} else if (!m_fns.IsEmpty()) {
-			str = StripPath(m_fns.GetHead());
+			str = GetFileOnly(m_fns.GetHead());
 		}
 	} else if (i == 1) {
 		if (m_fInvalid) {

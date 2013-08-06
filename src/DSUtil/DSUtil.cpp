@@ -3404,6 +3404,26 @@ CString RemoveSlash(LPCTSTR Path)
 }
 
 //
+// Returns just the .ext part of the file path
+//
+CString GetFileExt(LPCTSTR Path)
+{
+	CString cs;
+	cs = ::PathFindExtension(Path);
+	return cs;
+}
+
+//
+// Exchanges one file extension for another and returns the new fiel path
+//
+CString RenameFileExt(LPCTSTR Path, LPCTSTR Ext)
+{
+	CString cs = Path;
+	::PathRenameExtension(cs.GetBuffer(_MAX_PATH), Ext);
+	return cs;
+}
+
+//
 // Generate temporary files with any extension
 //
 BOOL GetTemporaryFilePath(CString strExtension, CString& strFileName)

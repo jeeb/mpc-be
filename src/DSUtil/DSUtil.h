@@ -310,6 +310,8 @@ extern CString GetFileOnly(LPCTSTR Path);
 extern CString GetFolderOnly(LPCTSTR Path);
 extern CString AddSlash(LPCTSTR Path);
 extern CString RemoveSlash(LPCTSTR Path);
+extern CString GetFileExt(LPCTSTR Path);
+extern CString RenameFileExt(LPCTSTR Path, LPCTSTR Ext);
 
 extern BOOL GetTemporaryFilePath(CString strExtension, CString& strFileName);
 

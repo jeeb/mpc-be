@@ -2017,13 +2017,8 @@ void CMainFrame::OnActivateApp(BOOL bActive, DWORD dwThreadID)
 				CloseHandle(hProcess);
 			}
 
-			CPath p(module);
-			p.StripPath();
-			module = (LPCTSTR)p;
-			module.MakeLower();
-
 			CString str;
-			str.Format(ResStr(IDS_MAINFRM_2), module, title);
+			str.Format(ResStr(IDS_MAINFRM_2), GetFileOnly(module).MakeLower(), title);
 			SendStatusMessage(str, 5000);
 		}
 
@@ -4613,6 +4608,17 @@ void CMainFrame::OnStreamSub(UINT nID)
 				}
 			}
 		}
+
+		BOOL bIsHaali = FALSE;
+		CComQIPtr<IBaseFilter> pBF = pSSs;
+		if (GetCLSID(pBF) == CLSID_HaaliSplitterAR || GetCLSID(pBF) == CLSID_HaaliSplitter) {
+			bIsHaali = TRUE;
+
+			if (MixSS.GetCount()) {
+				MixSS.RemoveAt(MixSS.GetCount() - 1);
+			}
+		}
+
 		splcnt = MixSS.GetCount();
 
 		int subcnt = -1;
@@ -5203,10 +5209,7 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 	while (pos) {
 		CString fullpath = MakeFullPath(s.slFilters.GetNext(pos));
 
-		CPath tmp(fullpath);
-		tmp.RemoveFileSpec();
-		tmp.AddBackslash();
-		CString path = tmp;
+		CString path = AddSlash(GetFolderOnly(fullpath));
 
 		WIN32_FIND_DATA fd = {0};
 		HANDLE hFind = FindFirstFile(fullpath, &fd);
@@ -5563,9 +5566,13 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 		return;
 	}
 
-	if (sl.GetCount() == 1 && m_iMediaLoadState == MLS_LOADED && m_pCAP) {
-		CString ext			= CPath(sl.GetHead()).GetExtension().MakeLower();
-		bool validate_ext	= false;
+	BOOL bIsValidSubExtAll = TRUE;
+	
+	POSITION pos = sl.GetHeadPosition();
+	while (pos) {
+		CString ext = GetFileExt(sl.GetNext(pos).MakeLower());
+
+		bool validate_ext = false;
 		for (size_t i = 0; i < _countof(subext); i++) {
 			if (ext == L"." + CString(subext[i])) {
 				validate_ext = true;
@@ -5573,34 +5580,47 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 			}
 		}
 
-		if (validate_ext) {
-			bool b_SubLoaded = false;
+		if (!validate_ext) {
+			bIsValidSubExtAll = FALSE;
+			break;
+		}
+	}
+
+	if (bIsValidSubExtAll && m_iMediaLoadState == MLS_LOADED && (m_pCAP || b_UseVSFilter)) {
+
+		POSITION pos = sl.GetHeadPosition();
+		while (pos) {
+			CString fname = sl.GetNext(pos);
+			BOOL b_SubLoaded = FALSE;
+
 			if (b_UseVSFilter) {
 				CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
-				if (pDVS && SUCCEEDED(pDVS->put_FileName((LPWSTR)(LPCWSTR)sl.GetHead()))) {
+				if (pDVS && SUCCEEDED(pDVS->put_FileName((LPWSTR)(LPCWSTR)fname))) {
 					pDVS->put_SelectedLanguage(0);
 					pDVS->put_HideSubtitles(true);
 					pDVS->put_HideSubtitles(false);
 
-					b_SubLoaded = true;
+					b_SubLoaded = TRUE;
 				}
 			} else {
 				ISubStream *pSubStream = NULL;
-				if (LoadSubtitle(sl.GetHead(), &pSubStream)) {
+				if (LoadSubtitle(fname, &pSubStream)) {
 					SetSubtitle(pSubStream); // the subtitle at the insert position according to LoadSubtitle()
-					b_SubLoaded = true;
+					b_SubLoaded = TRUE;
 
-					AddSubtitlePathsAddons(sl.GetHead());
+					AddSubtitlePathsAddons(fname);
 				}
 			}
 
 			if (b_SubLoaded) {
-				CPath p(sl.GetHead());
-				p.StripPath();
-				SendStatusMessage(CString((LPCTSTR)p) + ResStr(IDS_MAINFRM_47), 3000);
-				return;
+				SendStatusMessage(GetFileOnly(fname) + ResStr(IDS_MAINFRM_47), 3000);
+				if (b_UseVSFilter) {
+					return;
+				}
 			}
 		}
+
+		return;
 	}
 
 	if (m_iMediaLoadState == MLS_LOADING) {
@@ -5624,14 +5644,12 @@ void CMainFrame::OnFileSaveAs()
 
 	if (!m_strTitleAlt.IsEmpty()) {
 		out = GetAltFileName();
-		ext = CString(CPath(out).GetExtension()).MakeLower();
+		ext = GetFileExt(out).MakeLower();
 	} else {
 		int find = out.Find(_T("://"));
 		if (find < 0) {
-			ext = CString(CPath(out).GetExtension()).MakeLower();
-			CPath p(out);
-			p.StripPath();
-			out = CString(p);
+			ext = GetFileExt(out).MakeLower();
+			out = GetFileOnly(out);
 			if (ext == _T(".cda")) {
 				out = out.Left(out.GetLength()-4) + _T(".wav");
 			} else if (ext == _T(".ifo")) {
@@ -5853,7 +5871,7 @@ void CMainFrame::SaveDIB(LPCTSTR fn, BYTE* pData, long size)
 {
 	AppSettings& s = AfxGetAppSettings();
 
-	CString ext = CString(CPath(fn).GetExtension()).MakeLower();
+	CString ext = GetFileExt(fn).MakeLower();
 
 	if (ext == _T(".bmp")) {
 		BMPDIB(fn, pData, L"", 0, 0, 0, 0);
@@ -6139,14 +6157,10 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 
 		DVD_HMSF_TIMECODE hmsf = RT2HMS_r(rtDur);
 
-		CPath path(m_wndPlaylistBar.GetCurFileName());
-		path.StripPath();
-
+		CStringW fn = GetFileOnly(m_wndPlaylistBar.GetCurFileName());
 		if (!m_strTitleAlt.IsEmpty()) {
-			path = CPath(GetAltFileName());
+			fn = GetAltFileName();
 		}
-
-		CStringW fn = (LPCTSTR)path;
 
 		CStringW fs;
 		WIN32_FIND_DATA wfd;
@@ -6275,12 +6289,11 @@ void CMainFrame::OnFileSaveImage()
 
 	CStringW prefix = _T("snapshot");
 	if (GetPlaybackMode() == PM_FILE) {
-		CPath path(m_wndPlaylistBar.GetCurFileName());
-		path.StripPath();
-
+		CString path = GetFileOnly(m_wndPlaylistBar.GetCurFileName());
 		if (!m_strTitleAlt.IsEmpty()) {
-			path = CPath(GetAltFileName());
+			path = GetAltFileName();
 		}
+
 		prefix.Format(_T("%s_snapshot_%s"), path, GetVidPos());
 	} else if (GetPlaybackMode() == PM_DVD) {
 		prefix.Format(_T("snapshot_dvd_%s"), GetVidPos());
@@ -6327,15 +6340,13 @@ void CMainFrame::OnFileSaveImage()
 	s.iThumbQuality		= fd.m_quality;
 	s.iThumbLevelPNG	= fd.m_levelPNG;
 
-	CPath pdst(fd.GetPathName());
-	if (pdst.GetExtension().MakeLower() != s.strSnapShotExt) {
-		pdst.RenameExtension(s.strSnapShotExt);
+	CString pdst = fd.GetPathName();
+	if (GetFileExt(pdst).MakeLower() != s.strSnapShotExt) {
+		pdst = RenameFileExt(pdst, s.strSnapShotExt);
 	}
-	CString path = (LPCTSTR)pdst;
-	pdst.RemoveFileSpec();
-	s.strSnapShotPath = (LPCTSTR)pdst;
 
-	SaveImage(path);
+	s.strSnapShotPath = GetFolderOnly(pdst);
+	SaveImage(pdst);
 }
 
 void CMainFrame::OnFileSaveImageAuto()
@@ -6349,9 +6360,7 @@ void CMainFrame::OnFileSaveImageAuto()
 
 	CStringW prefix = _T("snapshot");
 	if (GetPlaybackMode() == PM_FILE) {
-		CPath path(m_wndPlaylistBar.GetCurFileName());
-		path.StripPath();
-		prefix.Format(_T("%s_snapshot_%s"), path, GetVidPos());
+		prefix.Format(_T("%s_snapshot_%s"), GetFileOnly(m_wndPlaylistBar.GetCurFileName()), GetVidPos());
 	} else if (GetPlaybackMode() == PM_DVD) {
 		prefix.Format(_T("snapshot_dvd_%s"), GetVidPos());
 	}
@@ -6379,12 +6388,11 @@ void CMainFrame::OnFileSaveThumbnails()
 	CPath psrc(s.strSnapShotPath);
 	CStringW prefix = _T("thumbs");
 	if (GetPlaybackMode() == PM_FILE) {
-		CPath path(m_wndPlaylistBar.GetCurFileName());
-		path.StripPath();
-
+		CString path = GetFileOnly(m_wndPlaylistBar.GetCurFileName());
 		if (!m_strTitleAlt.IsEmpty()) {
-			path = CPath(GetAltFileName());
+			path = GetAltFileName();
 		}
+
 		prefix.Format(_T("%s_thumbs"), path);
 	}
 	psrc.Combine(s.strSnapShotPath, MakeSnapshotFileName(prefix));
@@ -6432,15 +6440,13 @@ void CMainFrame::OnFileSaveThumbnails()
 	s.iThumbQuality		= fd.m_quality;
 	s.iThumbLevelPNG	= fd.m_levelPNG;
 
-	CPath pdst(fd.GetPathName());
-	if (pdst.GetExtension().MakeLower() != s.strSnapShotExt) {
-		pdst.RenameExtension(s.strSnapShotExt);
+	CString pdst = fd.GetPathName();
+	if (GetFileExt(pdst).MakeLower() != s.strSnapShotExt) {
+		pdst = RenameFileExt(pdst, s.strSnapShotExt);
 	}
-	CString path = (LPCTSTR)pdst;
-	pdst.RemoveFileSpec();
-	s.strSnapShotPath = (LPCTSTR)pdst;
 
-	SaveThumbnails(path);
+	s.strSnapShotPath = GetFolderOnly(pdst);
+	SaveThumbnails(pdst);
 }
 
 void CMainFrame::OnUpdateFileSaveThumbnails(CCmdUI* pCmdUI)
@@ -6492,10 +6498,7 @@ void CMainFrame::OnFileLoadSubtitle()
 	CFileDialog fd(TRUE, NULL, NULL,
 				   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY|OFN_NOCHANGEDIR,
 				   szFilter, GetModalParent(), 0);
-	CPath p(m_wndPlaylistBar.GetCurFileName());
-	p.RemoveFileSpec();
-
-	fd.m_ofn.lpstrInitialDir = CString(p);
+	fd.m_ofn.lpstrInitialDir = GetFolderOnly(m_wndPlaylistBar.GetCurFileName()).AllocSysString();
 
 	if (fd.DoModal() != IDOK) {
 		return;
@@ -10904,26 +10907,26 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 	if ( bRelativeDrive ) {
 		// Get the drive MPC-BE is on and apply it to the path list
 		CString exePath;
-		DWORD dwLength = GetModuleFileName( AfxGetInstanceHandle(), exePath.GetBuffer(_MAX_PATH), _MAX_PATH );
-		exePath.ReleaseBuffer( dwLength );
+		DWORD dwLength = GetModuleFileName(AfxGetInstanceHandle(), exePath.GetBuffer(_MAX_PATH), _MAX_PATH);
+		exePath.ReleaseBuffer(dwLength);
 
-		CPath exeDrive( exePath );
+		CPath exeDrive(exePath);
 
-		if ( exeDrive.StripToRoot() ) {
+		if (exeDrive.StripToRoot()) {
 			POSITION pos = fns.GetHeadPosition();
 
-			while ( pos != NULL ) {
-				CString &stringPath = fns.GetNext( pos );
-				CPath path( stringPath );
+			while (pos != NULL) {
+				CString &stringPath = fns.GetNext(pos);
+				CPath path(stringPath);
 
 				int rootLength = path.SkipRoot();
 
-				if ( path.StripToRoot() ) {
-					if ( _tcsicmp(exeDrive, path) != 0 ) { // Do we need to replace the drive letter ?
+				if (path.StripToRoot()) {
+					if (_tcsicmp(exeDrive, path) != 0) { // Do we need to replace the drive letter ?
 						// Replace drive letter
-						CString newPath( exeDrive );
+						CString newPath(exeDrive);
 
-						newPath += stringPath.Mid( rootLength );//newPath += stringPath.Mid( 3 );
+						newPath += stringPath.Mid(rootLength);//newPath += stringPath.Mid( 3 );
 
 						stringPath = newPath;
 					}
@@ -12579,7 +12582,7 @@ UINT CMainFrame::YoutubeThreadProc()
 				m_YoutubeTotal = 0;
 			}
 
-			if (GetTemporaryFilePath(CString(CPath(GetAltFileName()).GetExtension()).MakeLower(), m_YoutubeFile)) {
+			if (GetTemporaryFilePath(GetFileExt(GetAltFileName()).MakeLower(), m_YoutubeFile)) {
 				CFile file;
 				if (file.Open(m_YoutubeFile, CFile::modeCreate|CFile::modeWrite|CFile::shareDenyWrite|CFile::typeBinary)) {
 
@@ -14118,6 +14121,15 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 					}
 				}
 			}
+
+			BOOL bIsHaali = FALSE;
+			CComQIPtr<IBaseFilter> pBF = pSSs;
+			if (GetCLSID(pBF) == CLSID_HaaliSplitterAR || GetCLSID(pBF) == CLSID_HaaliSplitter) {
+				bIsHaali = TRUE;
+
+				subarray.RemoveAt(subarray.GetCount() - 1);
+				cntintsub--;
+			}
 		}
 
 		if (AfxGetAppSettings().fDisableInternalSubtitles) {
@@ -14498,8 +14510,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		// DVD
 		if (pDVDData) {
 			mi_fn = pDVDData->path;
-			CPath path(mi_fn);
-			CString ext = path.GetExtension();
+			CString ext = GetFileExt(mi_fn);
 			if (ext.IsEmpty()) {
 				if (mi_fn.Right(10) == _T("\\VIDEO_TS\\")) {
 					mi_fn = mi_fn + _T("VTS_01_1.VOB");
@@ -14507,12 +14518,10 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 					mi_fn = mi_fn + _T("\\VIDEO_TS\\VTS_01_1.VOB");
 				}
 			} else if (ext == _T(".IFO")) {
-				path.RemoveFileSpec();
-				mi_fn = path + _T("\\VTS_01_1.VOB");
+				mi_fn = GetFolderOnly(mi_fn) + _T("\\VTS_01_1.VOB");
 			}
 		} else {
-			CPath path(mi_fn);
-			CString ext = path.GetExtension();
+			CString ext = GetFileExt(mi_fn);
 			// BD
 			if (ext == _T(".mpls")) {
 				CHdmvClipInfo ClipInfo;
@@ -15806,12 +15815,8 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 						continue;
 					}
 
-					if (dwPrevGroup != -1 && dwPrevGroup != dwGroup) {
-						pSub->AppendMenu(MF_SEPARATOR);
-					}
-
 					dwPrevGroup = dwGroup;
-					CString str = _T("");
+					CString str;
 
 					if (lcname.Find(_T(" off")) >= 0) {
 						str = ResStr(IDS_AG_DISABLED);
@@ -15844,6 +15849,16 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 					splcnt++;
 				}
 			}
+		}
+
+		BOOL bIsHaali = FALSE;
+		CComQIPtr<IBaseFilter> pBF = pSSS;
+		if (GetCLSID(pBF) == CLSID_HaaliSplitterAR || GetCLSID(pBF) == CLSID_HaaliSplitter) {
+			bIsHaali = TRUE;
+
+			intsub--;
+			splcnt--;
+			pSub->RemoveMenu(pSub->GetMenuItemCount() - 1, MF_BYPOSITION);
 		}
 
 		pos = m_pSubStreams.GetHeadPosition();
@@ -15899,7 +15914,8 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 					intsub++;
 				}
 			}
-		}	
+		}
+
 		if ((pSub->GetMenuItemCount() < 2) || (!m_pSubStreams.GetHeadPosition() && pSub->GetMenuItemCount() <= 3)) {
 			while (pSub->RemoveMenu(0, MF_BYPOSITION)) {
 				;
@@ -16141,10 +16157,10 @@ IBaseFilter* CMainFrame::FindSourceSelectableFilter()
 		pSF = FindFilter(L"{B98D13E7-55DB-4385-A33D-09FD1BA26338}", pGB); // LAV Splitter Source
 	}
 	if (!pSF) {
-		pSF = FindFilter(L"{55DA30FC-F16B-49fc-BAA5-AE59FC65F82D}", pGB); // Haali Media Source
+		pSF = FindFilter(CLSID_HaaliSplitterAR, pGB);
 	}
 	if (!pSF) {
-		pSF = FindFilter(L"{564FD788-86C9-4444-971E-CC4A243DA150}", pGB); // Haali Media Splitter with previous file source (like rarfilesource)
+		pSF = FindFilter(CLSID_HaaliSplitter, pGB);
 	}
 	if (!pSF) {
 		pSF = FindFilter(L"{529A00DB-0C43-4f5b-8EF2-05004CBE0C6F}", pGB); // AV Splitter
@@ -16419,9 +16435,7 @@ void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSe
 				CStringW fn;
 				bool fnsame = false;
 				if (!str.IsEmpty()) {
-					CPath path(str);
-					path.StripPath();
-					fn = (LPCTSTR)path;
+					fn = GetFileOnly(str);
 					if (fn == name) {
 						fnsame = true;
 					}
@@ -16963,7 +16977,7 @@ bool CMainFrame::LoadSubtitle(CString fn, ISubStream **actualStream)
 	try {
 		if (!pSubStream) {
 			CAutoPtr<CSupSubFile> pSSF(DNew CSupSubFile(&m_csSubLock));
-			if (pSSF && CString(CPath(fn).GetExtension()).MakeLower() == _T(".sup")) {
+			if (pSSF && GetFileExt(fn).MakeLower() == _T(".sup")) {
 
 				if (pSSF->Open(fn, GetSubName(fn, m_wndPlaylistBar.GetCurFileName()))) {
 					pSubStream = pSSF.Detach();
@@ -16973,7 +16987,7 @@ bool CMainFrame::LoadSubtitle(CString fn, ISubStream **actualStream)
 
 		if (!pSubStream) {
 			CAutoPtr<CVobSubFile> pVSF(DNew CVobSubFile(&m_csSubLock));
-			if (CString(CPath(fn).GetExtension()).MakeLower() == _T(".idx") && pVSF && pVSF->Open(fn) && pVSF->GetStreamCount() > 0) {
+			if (GetFileExt(fn).MakeLower() == _T(".idx") && pVSF && pVSF->Open(fn) && pVSF->GetStreamCount() > 0) {
 				pSubStream = pVSF.Detach();
 			}
 		}
@@ -19439,15 +19453,12 @@ bool CMainFrame::OpenBD(CString Path)
 	m_LastOpenBDPath = Path;
 	m_BDLabel.Empty();
 
-	CString ext = CPath(Path).GetExtension();
-	ext.MakeLower();
+	CString ext = GetFileExt(Path).MakeLower();
 
-	if ((CPath(Path).IsDirectory() && Path.Find(_T("\\BDMV"))) || CPath(Path + _T("\\BDMV")).IsDirectory() || (!ext.IsEmpty() && ext == _T(".bdmv"))) {
-		if (!ext.IsEmpty() && ext == _T(".bdmv")) {
+	if ((CPath(Path).IsDirectory() && Path.Find(_T("\\BDMV"))) || CPath(Path + _T("\\BDMV")).IsDirectory() || ext == _T(".bdmv")) {
+		if (ext == _T(".bdmv")) {
 			Path.Replace(_T("\\BDMV\\"), _T("\\"));
-			CPath _Path(Path);
-			_Path.RemoveFileSpec();
-			Path = CString(_Path);
+			Path = GetFolderOnly(Path);
 		} else if (Path.Find(_T("\\BDMV"))) {
 			Path.Replace(_T("\\BDMV"), _T("\\"));
 		}
@@ -20141,23 +20152,23 @@ int CMainFrame::GetStreamCount(DWORD dwSelGroup)
 
 void CMainFrame::AddSubtitlePathsAddons(CString FileName)
 {
-	CPath p(FileName);
-	p.RemoveFileSpec();
+	CString tmp(GetFolderOnly(FileName).MakeUpper());
 	AppSettings& s = AfxGetAppSettings();
-	POSITION pos = s.slSubtitlePathsAddons.Find(CString(p).MakeUpper());
+
+	POSITION pos = s.slSubtitlePathsAddons.Find(tmp);
 	if (!pos) {
-		s.slSubtitlePathsAddons.AddTail(CString(p).MakeUpper() + L"\\");
+		s.slSubtitlePathsAddons.AddTail(tmp);
 	}
 }
 
 void CMainFrame::AddAudioPathsAddons(CString FileName)
 {
-	CPath p(FileName);
-	p.RemoveFileSpec();
+	CString tmp(GetFolderOnly(FileName).MakeUpper());
 	AppSettings& s = AfxGetAppSettings();
-	POSITION pos = s.slAudioPathsAddons.Find(CString(p).MakeUpper());
+
+	POSITION pos = s.slAudioPathsAddons.Find(tmp);
 	if (!pos) {
-		s.slAudioPathsAddons.AddTail(CString(p).MakeUpper() + L"\\");
+		s.slAudioPathsAddons.AddTail(tmp);
 	}
 }
 
