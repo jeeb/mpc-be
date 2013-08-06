@@ -6489,18 +6489,17 @@ void CMainFrame::OnFileLoadSubtitle()
 	}
 	szFilter += L"||";
 
-	AppSettings& s = AfxGetAppSettings();
-
 	CFileDialog fd(TRUE, NULL, NULL,
 				   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY|OFN_NOCHANGEDIR,
 				   szFilter, GetModalParent(), 0);
-	fd.m_ofn.lpstrInitialDir = s.strLastOpenSubDir;
+	CPath p(m_wndPlaylistBar.GetCurFileName());
+	p.RemoveFileSpec();
+
+	fd.m_ofn.lpstrInitialDir = CString(p);
 
 	if (fd.DoModal() != IDOK) {
 		return;
 	}
-
-	s.strLastOpenSubDir = AddSlash(GetFolderOnly(fd.GetPathName()));
 
 	if (b_UseVSFilter) {
 		CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();

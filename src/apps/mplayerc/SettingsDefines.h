@@ -285,7 +285,6 @@
 #define IDS_RS_USE_FLYBAR_ONTOP				_T("UseFlybarOnTop")
 
 #define IDS_RS_LAST_OPEN_FILTER_DIR			_T("LastOpenFilterDir")
-#define IDS_RS_LAST_OPEN_SUB_DIR			_T("LastOpenSubDir")
 
 #define IDS_RS_YOUTUBE_TAG					_T("YoutubeTag")
 #define IDS_RS_YOUTUBE_SOURCE				_T("YoutubeSourceType")

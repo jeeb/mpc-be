@@ -757,7 +757,6 @@ public:
 	CAtlList<CString> slTMPFilesList;
 
 	CString			strLastOpenFilterDir;
-	CString			strLastOpenSubDir;
 
 	int				iYoutubeTag;
 	int				iYoutubeSource;
