@@ -75,7 +75,7 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_nMonitorHorRes(0), m_nMonitorVerRes(0)
 	, m_rcMonitor(0, 0, 0, 0)
 {
-	HINSTANCE		hDll;
+	HINSTANCE hDll;
 
 	if (FAILED(hr)) {
 		_Error += L"ISubPicAllocatorPresenterImpl failed\n";
@@ -2367,6 +2367,21 @@ void CDX9AllocatorPresenter::DrawStats()
 					DrawText(rc, m_strStatsMsg[i], 1);
 					OffsetRect (&rc, 0, TextHeight);
 				}
+			}
+
+			static ULONGLONG lastRun	= 0;
+			static short cpuUsage	= 0;
+			if (GetTickCount64() - lastRun >= 1000
+					|| cpuUsage == 0) {
+				
+				cpuUsage = m_CpuUsage.GetUsage();
+				lastRun = GetTickCount64();
+			}
+
+			{
+				strText.Format(L"CPU Usage    : %2d%%", cpuUsage);
+				DrawText(rc, strText, 1);
+				OffsetRect (&rc, 0, TextHeight);
 			}
 		}
 		m_pSprite->End();

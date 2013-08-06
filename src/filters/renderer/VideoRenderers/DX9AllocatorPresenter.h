@@ -24,6 +24,7 @@
 #pragma once
 
 #include "DX9RenderingEngine.h"
+#include "CpuUsage.h"
 
 #define VMRBITMAP_UPDATE			0x80000000
 
@@ -308,6 +309,8 @@ namespace DSObjects
 		CRect					m_rcMonitor;
 
 		D3DPRESENT_PARAMETERS	m_pp;
+
+		CpuUsage				m_CpuUsage;
 
 	public:
 		CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, bool bIsEVR, CString &_Error);
