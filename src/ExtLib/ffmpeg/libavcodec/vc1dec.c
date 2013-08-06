@@ -38,7 +38,6 @@
 #include "msmpeg4data.h"
 #include "unary.h"
 #include "mathops.h"
-#include "vdpau_internal.h"
 #include "libavutil/avassert.h"
 
 #undef NDEBUG
@@ -409,8 +408,10 @@ static void vc1_mc_1mv(VC1Context *v, int dir)
         use_ic = v->next_use_ic;
     }
 
-    if(!srcY)
+    if (!srcY || !srcU) {
+        av_log(v->s.avctx, AV_LOG_ERROR, "Referenced frame missing.\n");
         return;
+    }
 
     src_x   = s->mb_x * 16 + (mx   >> 2);
     src_y   = s->mb_y * 16 + (my   >> 2);
@@ -588,8 +589,10 @@ static void vc1_mc_4mv_luma(VC1Context *v, int n, int dir, int avg)
         use_ic = v->next_use_ic;
     }
 
-    if(!srcY)
+    if (!srcY) {
+        av_log(v->s.avctx, AV_LOG_ERROR, "Referenced frame missing.\n");
         return;
+    }
 
     if (v->field_mode) {
         if (v->cur_field_type != v->ref_field_type[dir])
@@ -889,8 +892,10 @@ static void vc1_mc_4mv_chroma(VC1Context *v, int dir)
         use_ic = v->next_use_ic;
     }
 
-    if(!srcU)
+    if (!srcU) {
+        av_log(v->s.avctx, AV_LOG_ERROR, "Referenced frame missing.\n");
         return;
+    }
 
     srcU += uvsrc_y * s->uvlinesize + uvsrc_x;
     srcV += uvsrc_y * s->uvlinesize + uvsrc_x;
@@ -1001,16 +1006,20 @@ static void vc1_mc_4mv_chroma4(VC1Context *v, int dir, int dir2, int avg)
         uvsrc_x = av_clip(uvsrc_x, -8, s->avctx->coded_width  >> 1);
         uvsrc_y = av_clip(uvsrc_y, -8, s->avctx->coded_height >> 1);
         if (i < 2 ? dir : dir2) {
-            srcU = s->next_picture.f.data[1] + uvsrc_y * s->uvlinesize + uvsrc_x;
-            srcV = s->next_picture.f.data[2] + uvsrc_y * s->uvlinesize + uvsrc_x;
+            srcU = s->next_picture.f.data[1];
+            srcV = s->next_picture.f.data[2];
             lutuv  = v->next_lutuv;
             use_ic = v->next_use_ic;
         } else {
-            srcU = s->last_picture.f.data[1] + uvsrc_y * s->uvlinesize + uvsrc_x;
-            srcV = s->last_picture.f.data[2] + uvsrc_y * s->uvlinesize + uvsrc_x;
+            srcU = s->last_picture.f.data[1];
+            srcV = s->last_picture.f.data[2];
             lutuv  = v->last_lutuv;
             use_ic = v->last_use_ic;
         }
+        if (!srcU)
+            return;
+        srcU += uvsrc_y * s->uvlinesize + uvsrc_x;
+        srcV += uvsrc_y * s->uvlinesize + uvsrc_x;
         uvmx_field[i] = (uvmx_field[i] & 3) << 1;
         uvmy_field[i] = (uvmy_field[i] & 3) << 1;
 
@@ -1843,21 +1852,23 @@ static inline void vc1_pred_mv_intfr(VC1Context *v, int n, int dmv_x, int dmv_y,
                 } else if (!field_b && b_valid) {
                     px = B[0];
                     py = B[1];
-                } else if (c_valid) {
+                } else /*if (c_valid)*/ {
+                    av_assert1(c_valid);
                     px = C[0];
                     py = C[1];
-                } else px = py = 0;
+                } /*else px = py = 0;*/
             } else {
                 if (field_a && a_valid) {
                     px = A[0];
                     py = A[1];
-                } else if (field_b && b_valid) {
+                } else /*if (field_b && b_valid)*/ {
+                    av_assert1(field_b && b_valid);
                     px = B[0];
                     py = B[1];
-                } else if (c_valid) {
+                } /*else if (c_valid) {
                     px = C[0];
                     py = C[1];
-                }
+                }*/
             }
         } else if (total_valid == 1) {
             px = (a_valid) ? A[0] : ((b_valid) ? B[0] : C[0]);
@@ -5771,17 +5782,12 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
         return buf_size;
     }
 
-    if (s->avctx->codec->capabilities&CODEC_CAP_HWACCEL_VDPAU) {
-        if (v->profile < PROFILE_ADVANCED)
-            avctx->pix_fmt = AV_PIX_FMT_VDPAU_WMV3;
-        else
-            avctx->pix_fmt = AV_PIX_FMT_VDPAU_VC1;
-    }
-
     //for advanced profile we may need to parse and unescape data
     if (avctx->codec_id == AV_CODEC_ID_VC1 || avctx->codec_id == AV_CODEC_ID_VC1IMAGE) {
         int buf_size2 = 0;
         buf2 = av_mallocz(buf_size + FF_INPUT_BUFFER_PADDING_SIZE);
+        if (!buf2)
+            return AVERROR(ENOMEM);
 
         if (IS_MARKER(AV_RB32(buf))) { /* frame starts with marker and needs to be parsed */
             const uint8_t *start, *end, *next;
@@ -5794,8 +5800,7 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
                 if (size <= 0) continue;
                 switch (AV_RB32(start)) {
                 case VC1_CODE_FRAME:
-                    if (avctx->hwaccel ||
-                        s->avctx->codec->capabilities&CODEC_CAP_HWACCEL_VDPAU
+                    if (avctx->hwaccel
                         // ==> Start patch MPC
                         || avctx->using_dxva
                         // <== End patch MPC
@@ -6010,15 +6015,7 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
     s->me.qpel_put = s->dsp.put_qpel_pixels_tab;
     s->me.qpel_avg = s->dsp.avg_qpel_pixels_tab;
 
-    if ((CONFIG_VC1_VDPAU_DECODER)
-        &&s->avctx->codec->capabilities&CODEC_CAP_HWACCEL_VDPAU) {
-        if (v->field_mode && buf_start_second_field) {
-            ff_vdpau_vc1_decode_picture(s, buf_start, buf_start_second_field - buf_start);
-            ff_vdpau_vc1_decode_picture(s, buf_start_second_field, (buf + buf_size) - buf_start_second_field);
-        } else {
-            ff_vdpau_vc1_decode_picture(s, buf_start, (buf + buf_size) - buf_start);
-        }
-    } else if (avctx->hwaccel) {
+    if (avctx->hwaccel) {
         if (v->field_mode && buf_start_second_field) {
             // decode first field
             s->picture_structure = PICT_BOTTOM_FIELD - v->tff;
@@ -6075,6 +6072,9 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
             s->uvlinesize                    <<= 1;
         }
         mb_height = s->mb_height >> v->field_mode;
+
+        av_assert0 (mb_height > 0);
+
         for (i = 0; i <= n_slices; i++) {
             if (i > 0 &&  slices[i - 1].mby_start >= mb_height) {
                 if (v->field_mode <= 0) {
@@ -6257,38 +6257,6 @@ AVCodec ff_wmv3_decoder = {
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_DELAY,
     .long_name      = NULL_IF_CONFIG_SMALL("Windows Media Video 9"),
     .pix_fmts       = vc1_hwaccel_pixfmt_list_420,
-    .profiles       = NULL_IF_CONFIG_SMALL(profiles)
-};
-#endif
-
-#if CONFIG_WMV3_VDPAU_DECODER
-AVCodec ff_wmv3_vdpau_decoder = {
-    .name           = "wmv3_vdpau",
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_WMV3,
-    .priv_data_size = sizeof(VC1Context),
-    .init           = vc1_decode_init,
-    .close          = ff_vc1_decode_end,
-    .decode         = vc1_decode_frame,
-    .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_DELAY | CODEC_CAP_HWACCEL_VDPAU,
-    .long_name      = NULL_IF_CONFIG_SMALL("Windows Media Video 9 VDPAU"),
-    .pix_fmts       = (const enum AVPixelFormat[]){ AV_PIX_FMT_VDPAU_WMV3, AV_PIX_FMT_NONE },
-    .profiles       = NULL_IF_CONFIG_SMALL(profiles)
-};
-#endif
-
-#if CONFIG_VC1_VDPAU_DECODER
-AVCodec ff_vc1_vdpau_decoder = {
-    .name           = "vc1_vdpau",
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_VC1,
-    .priv_data_size = sizeof(VC1Context),
-    .init           = vc1_decode_init,
-    .close          = ff_vc1_decode_end,
-    .decode         = vc1_decode_frame,
-    .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_DELAY | CODEC_CAP_HWACCEL_VDPAU,
-    .long_name      = NULL_IF_CONFIG_SMALL("SMPTE VC-1 VDPAU"),
-    .pix_fmts       = (const enum AVPixelFormat[]){ AV_PIX_FMT_VDPAU_VC1, AV_PIX_FMT_NONE },
     .profiles       = NULL_IF_CONFIG_SMALL(profiles)
 };
 #endif
