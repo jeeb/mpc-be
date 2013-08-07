@@ -100,7 +100,7 @@ short CpuUsage::GetUsage()
 		m_ftPrevProcKernel	= ftProcKernel;
 		m_ftPrevProcUser	= ftProcUser;
 		
-		m_dwLastRun = GetTickCount64();
+		m_dwLastRun = GetTickCount();
 
 		nCpuCopy = m_nCpuUsage;
 	}
@@ -126,6 +126,5 @@ bool CpuUsage::EnoughTimePassed()
 {
 	const int minElapsedMS = 250;//milliseconds
 
-	ULONGLONG dwCurrentTickCount = GetTickCount64();
-	return (dwCurrentTickCount - m_dwLastRun) > minElapsedMS; 
+	return (GetTickCount() - m_dwLastRun) > minElapsedMS; 
 }

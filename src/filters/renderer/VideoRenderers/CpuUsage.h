@@ -45,7 +45,7 @@ private:
 	FILETIME m_ftPrevProcUser;
 
 	short m_nCpuUsage;
-	ULONGLONG m_dwLastRun;
+	DWORD m_dwLastRun;
 	
 	volatile LONG m_lRunCount;
 };
