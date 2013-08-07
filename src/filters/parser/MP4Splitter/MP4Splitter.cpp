@@ -108,297 +108,6 @@ CFilterApp theApp;
 
 #endif
 
-struct SSACharacter {
-	CString pre, post;
-	WCHAR c;
-};
-
-static CStringW ConvertTX3GToSSA(
-	CStringW str,
-	const AP4_Tx3gSampleEntry::AP4_Tx3gDescription& desc,
-	CStringW font,
-	const AP4_Byte* mods,
-	int size,
-	CSize framesize,
-	CPoint translation,
-	int durationms,
-	CRect& rbox)
-{
-	int str_len = str.GetLength();
-
-	SSACharacter* chars = DNew SSACharacter[str_len];
-	for (int i = 0; i < str_len; ++i) {
-		chars[i].c = str[i];
-	}
-	str.Empty();
-
-	//
-
-	rbox.SetRect(desc.TextBox.Left, desc.TextBox.Top, desc.TextBox.Right, desc.TextBox.Bottom);
-
-	int align = 2;
-	signed char h = (signed char)desc.HorizontalJustification;
-	signed char v = (signed char)desc.VerticalJustification;
-	if (h == 0 && v < 0) {
-		align = 1;
-	} else if (h > 0 && v < 0) {
-		align = 2;
-	} else if (h < 0 && v < 0) {
-		align = 3;
-	} else if (h == 0 && v > 0) {
-		align = 4;
-	} else if (h > 0 && v > 0) {
-		align = 5;
-	} else if (h < 0 && v > 0) {
-		align = 6;
-	} else if (h == 0 && v == 0) {
-		align = 7;
-	} else if (h > 0 && v == 0) {
-		align = 8;
-	} else if (h < 0 && v == 0) {
-		align = 9;
-	}
-	str.Format(L"{\\an%d}%s", align, CStringW(str));
-
-	if (!font.CompareNoCase(L"serif")) {
-		font = L"Times New Roman";
-	} else if (!font.CompareNoCase(L"sans-serif")) {
-		font = L"Arial";
-	} else if (!font.CompareNoCase(L"monospace")) {
-		font = L"Courier New";
-	}
-	str.Format(L"{\\fn%s}%s", font, CStringW(str));
-
-	const AP4_Byte* fclr = (const AP4_Byte*)&desc.Style.Font.Color;
-
-	CStringW font_color;
-	font_color.Format(L"{\\1c%02x%02x%02x\\1a%02x}", fclr[2], fclr[1], fclr[0], 255 - fclr[3]);
-	str = font_color + str;
-
-	str.Format(L"%s{\\2c%02x%02x%02x\\2a%02x}", CString(str), fclr[2], fclr[1], fclr[0], 255 - fclr[3]);
-
-	CStringW font_size;
-	font_size.Format(L"{\\fs%d}", desc.Style.Font.Size);
-	str = font_size + str;
-
-	CStringW font_flags;
-	font_flags.Format(L"{\\b%d\\i%d\\u%d}",
-					  (desc.Style.Font.Face&1) ? 1 : 0,
-					  (desc.Style.Font.Face&2) ? 1 : 0,
-					  (desc.Style.Font.Face&4) ? 1 : 0);
-	str = font_flags + str;
-
-	//
-
-	const AP4_Byte* hclr = (const AP4_Byte*)&desc.BackgroundColor;
-
-	while (size > 8) {
-		DWORD tag_size = (mods[0]<<24)|(mods[1]<<16)|(mods[2]<<8)|(mods[3]);
-		mods += 4;
-		DWORD tag = (mods[0]<<24)|(mods[1]<<16)|(mods[2]<<8)|(mods[3]);
-		mods += 4;
-
-		size -= tag_size;
-		tag_size -= 8;
-		const AP4_Byte* next = mods + tag_size;
-
-		if (tag == 'styl') {
-			WORD styl_count = (mods[0]<<8)|(mods[1]);
-			mods += 2;
-
-			while (styl_count-- > 0) {
-				WORD start = (mods[0]<<8)|(mods[1]);
-				mods += 2;
-				WORD end = (mods[0]<<8)|(mods[1]);
-				mods += 2;
-				WORD font_id = (mods[0]<<8)|(mods[1]);
-				mods += 2;
-				WORD flags = mods[0];
-				mods += 1;
-				WORD size = mods[0];
-				mods += 1;
-				const AP4_Byte* color = mods;
-				mods += 4;
-
-				if (end > str_len) {
-					end = str_len;
-				}
-
-				if (start < end) {
-					CStringW s;
-
-					s.Format(L"{\\1c%02x%02x%02x\\1a%02x}", color[2], color[1], color[0], 255 - color[3]);
-					chars[start].pre += s;
-					chars[end-1].post += font_color;
-
-					s.Format(L"{\\fs%d}", size);
-					chars[start].pre += s;
-					chars[end-1].post += font_size;
-
-					s.Format(L"{\\b%d\\i%d\\u%d}", (flags&1) ? 1 : 0, (flags&2) ? 1 : 0, (flags&4) ? 1 : 0);
-					chars[start].pre += s;
-					chars[end-1].post += font_flags;
-				}
-			}
-		} else if (tag == 'hclr') {
-			hclr = mods;
-		} else if (tag == 'hlit') {
-			WORD start = (mods[0]<<8)|(mods[1]);
-			mods += 2;
-			WORD end = (mods[0]<<8)|(mods[1]);
-			mods += 2;
-
-			if (end > str_len) {
-				end = str_len;
-			}
-
-			if (start < end) {
-				CStringW s;
-
-				s.Format(L"{\\3c%02x%02x%02x\\3a%02x}", hclr[2], hclr[1], hclr[0], 255 - hclr[3]);
-				chars[start].pre += s;
-				chars[end-1].post += font_color;
-
-				chars[start].pre += L"{\\bord0.1}";
-				chars[end-1].post += L"{\\bord}";
-			}
-		} else if (tag == 'blnk') {
-			WORD start = (mods[0]<<8)|(mods[1]);
-			mods += 2;
-			WORD end = (mods[0]<<8)|(mods[1]);
-			mods += 2;
-
-			if (end > str_len) {
-				end = str_len;
-			}
-
-			if (start < end) {
-				// cheap...
-
-				for (int i = 0, alpha = 255; i < durationms; i += 750, alpha = 255 - alpha) {
-					CStringW s;
-					s.Format(L"{\\t(%d, %d, \\alpha&H%02x&)}", i, i + 750, alpha);
-					chars[start].pre += s;
-				}
-
-				chars[end-1].post += L"{\\alpha}";
-			}
-		} else if (tag == 'tbox') {
-			rbox.top = (mods[0]<<8)|(mods[1]);
-			mods += 2;
-			rbox.left = (mods[0]<<8)|(mods[1]);
-			mods += 2;
-			rbox.bottom = (mods[0]<<8)|(mods[1]);
-			mods += 2;
-			rbox.right = (mods[0]<<8)|(mods[1]);
-			mods += 2;
-		} else if (tag == 'krok' && !(desc.DisplayFlags & 0x800)) {
-			DWORD start_time = (mods[0]<<24)|(mods[1]<<16)|(mods[2]<<8)|(mods[3]);
-			mods += 4;
-			WORD krok_count = (mods[0]<<8)|(mods[1]);
-			mods += 2;
-
-			while (krok_count-- > 0) {
-				DWORD end_time = (mods[0]<<24)|(mods[1]<<16)|(mods[2]<<8)|(mods[3]);
-				mods += 4;
-				WORD start = (mods[0]<<8)|(mods[1]);
-				mods += 2;
-				WORD end = (mods[0]<<8)|(mods[1]);
-				mods += 2;
-
-				if (end > str_len) {
-					end = str_len;
-				}
-
-				if (start < end) {
-					CStringW s;
-
-					s.Format(L"{\\kt%d\\kf%d}", start_time/10, (end_time - start_time)/10);
-					chars[start].pre += s;
-					s.Format(L"{\\1c%02x%02x%02x\\1a%02x}", hclr[2], hclr[1], hclr[0], 255 - hclr[3]);
-					chars[start].pre += s;
-					chars[end-1].post += L"{\\kt}" + font_color;
-				}
-
-				start_time = end_time;
-			}
-		}
-
-		mods = next;
-	}
-
-	// continous karaoke
-
-	if (desc.DisplayFlags & 0x800) {
-		CStringW s;
-
-		s.Format(L"{\\1c%02x%02x%02x\\1a%02x}", hclr[2], hclr[1], hclr[0], 255 - hclr[3]);
-		str += s;
-
-		int breaks = 0;
-
-		for (int i = 0, j = 0; i <= str_len; ++i) {
-			if (chars[i].c == '\n' /*|| chars[i].c == ' '*/) {
-				++breaks;
-			}
-		}
-
-		if (str_len > breaks) {
-			float dur = (float)max(durationms - 500, 0) / 10;
-
-			for (int i = 0, j = 0; i <= str_len; ++i) {
-				if (i == str_len || chars[i].c == '\n' /*|| chars[i].c == ' '*/) {
-					s.Format(L"{\\kf%d}", (int)(dur * (i - j) / (str_len - breaks)));
-					chars[j].pre += s;
-					j = i+1;
-				}
-			}
-		}
-	}
-
-	//
-
-	for (int i = 0; i < str_len; ++i) {
-		str += chars[i].pre;
-		str += chars[i].c;
-		if (desc.DisplayFlags & 0x20000) {
-			str += L"\\N";
-		}
-		str += chars[i].post;
-	}
-
-	delete [] chars;
-
-	//
-
-	if (rbox.IsRectEmpty()) {
-		rbox.SetRect(0, 0, framesize.cx, framesize.cy);
-	}
-	rbox.OffsetRect(translation);
-
-	CRect rbox2 = rbox;
-	rbox2.DeflateRect(2, 2);
-
-	CRect r(0,0,0,0);
-	if (rbox2.Height() > 0) {
-		r.top = rbox2.top;
-		r.bottom = framesize.cy - rbox2.bottom;
-	}
-	if (rbox2.Width() > 0) {
-		r.left = rbox2.left;
-		r.right = framesize.cx - rbox2.right;
-	}
-
-	CStringW hdr;
-	hdr.Format(L"0,0,Text,,%d,%d,%d,%d,,{\\clip(%d,%d,%d,%d)}",
-			   r.left, r.right, r.top, r.bottom,
-			   rbox.left, rbox.top, rbox.right, rbox.bottom);
-
-	//
-
-	return hdr + str;
-}
-
 //
 // CMP4SplitterFilter
 //
@@ -871,26 +580,13 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					if (dynamic_cast<AP4_TextSampleEntry*>(sample_entry)
 							|| dynamic_cast<AP4_Tx3gSampleEntry*>(sample_entry)) {
 						mt.majortype = MEDIATYPE_Subtitle;
-						mt.subtype = MEDIASUBTYPE_ASS2;
+						mt.subtype = MEDIASUBTYPE_UTF8;
 						mt.formattype = FORMAT_SubtitleInfo;
-						CStringA hdr;
-						hdr.Format(
-							"[Script Info]\n"
-							"ScriptType: v4.00++\n"
-							"ScaledBorderAndShadow: yes\n"
-							"PlayResX: %d\n"
-							"PlayResY: %d\n"
-							"[V4++ Styles]\n"
-							"Style: Text,Arial,12,&H00ffffff,&H0000ffff,&H00000000,&H80000000,0,0,0,0,100,100,0,0.00,3,0,0,2,0,0,0,0,1,1\n",
-							// "Style: Text,Arial,12,&H00ffffff,&H0000ffff,&H00000000,&H80000000,0,0,0,0,100,100,0,0.00,1,0,0,2,0,0,0,0,1,1\n",
-							m_framesize.cx,
-							m_framesize.cy);
-						SUBTITLEINFO* si = (SUBTITLEINFO*)mt.AllocFormatBuffer(sizeof(SUBTITLEINFO) + hdr.GetLength());
+						SUBTITLEINFO* si = (SUBTITLEINFO*)mt.AllocFormatBuffer(sizeof(SUBTITLEINFO));
 						memset(si, 0, mt.FormatLength());
 						si->dwOffset = sizeof(SUBTITLEINFO);
 						strcpy_s(si->IsoLang, _countof(si->IsoLang), CStringA(TrackLanguage));
 						wcscpy_s(si->TrackName, _countof(si->TrackName), TrackName);
-						memcpy(si + 1, (LPCSTR)hdr, hdr.GetLength());
 						mts.Add(mt);
 					}
 				}
@@ -1322,28 +1018,6 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(id, pPinOut)));
 
 			m_trackpos[id] = trackpos();
-
-			if (mts.GetCount() == 1 && mts[0].subtype == MEDIASUBTYPE_ASS2) {
-				LPCWSTR postfix = L" (plain text)";
-
-				mts[0].subtype = MEDIASUBTYPE_UTF8;
-
-				SUBTITLEINFO* si = (SUBTITLEINFO*)mts[0].ReallocFormatBuffer(sizeof(SUBTITLEINFO));
-				wcscat_s(si->TrackName, postfix);
-
-				id ^= 0x80402010; // FIXME: until fixing, let's hope there won't be another track like this...
-
-				CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CMP4SplitterOutputPin(mts, name + postfix, this, this, &hr));
-
-				if (!TrackName.IsEmpty()) {
-					pPinOut->SetProperty(L"NAME", TrackName + postfix);
-				}
-				if (!TrackLanguage.IsEmpty()) {
-					pPinOut->SetProperty(L"LANG", CStringW(TrackLanguage));
-				}
-
-				EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(id, pPinOut)));
-			}
 		}
 
 		if (AP4_ChplAtom* chpl = dynamic_cast<AP4_ChplAtom*>(movie->GetMoovAtom()->FindChild("udta/chpl"))) {
@@ -1680,8 +1354,6 @@ bool CMP4SplitterFilter::DemuxLoop()
 					pPairNext->m_value.index++;
 				}
 			} else if (track->GetType() == AP4_Track::TYPE_TEXT) {
-				CStringA dlgln_bkg, dlgln_plaintext;
-
 				const AP4_Byte* ptr = data.GetData();
 				AP4_Size avail = data.GetDataSize();
 
@@ -1702,93 +1374,11 @@ bool CMP4SplitterFilter::DemuxLoop()
 						}
 
 						CStringA dlgln = str;
-
-						if (mt.subtype == MEDIASUBTYPE_ASS2) {
-							AP4_SampleDescription* desc = track->GetSampleDescription(sample.GetDescriptionIndex());
-
-							dlgln = "0,0,Text,,0000,0000,0000,0000,," + str;
-							dlgln_plaintext = str;
-
-							CPoint translation(0, 0);
-							if (AP4_TkhdAtom* tkhd = dynamic_cast<AP4_TkhdAtom*>(track->GetTrakAtom()->GetChild(AP4_ATOM_TYPE_TKHD))) {
-								AP4_Float x, y;
-								tkhd->GetTranslation(x, y);
-								translation.SetPoint((int)x, (int)y);
-							}
-
-							if (AP4_UnknownSampleDescription* unknown_desc = dynamic_cast<AP4_UnknownSampleDescription*>(desc)) { // TEMP
-								AP4_SampleEntry* sample_entry = unknown_desc->GetSampleEntry();
-
-								if (AP4_TextSampleEntry* text = dynamic_cast<AP4_TextSampleEntry*>(sample_entry)) {
-									const AP4_TextSampleEntry::AP4_TextDescription& d = text->GetDescription();
-
-									// TODO
-								} else if (AP4_Tx3gSampleEntry* tx3g = dynamic_cast<AP4_Tx3gSampleEntry*>(sample_entry)) {
-									const AP4_Tx3gSampleEntry::AP4_Tx3gDescription& desc = tx3g->GetDescription();
-
-									CStringW font = L"Arial";
-
-									if (AP4_FtabAtom* ftab = dynamic_cast<AP4_FtabAtom*>(tx3g->GetChild(AP4_ATOM_TYPE_FTAB))) {
-										AP4_String Name;
-										if (AP4_SUCCEEDED(ftab->LookupFont(desc.Style.Font.Id, Name))) {
-											font = Name.c_str();
-										}
-									}
-
-									CRect rbox;
-									CStringW ssa = ConvertTX3GToSSA(
-													   UTF8To16(str), desc, font,
-													   ptr + (2 + size), avail - (2 + size),
-													   m_framesize, translation,
-													   (p->rtStop - p->rtStart)/10000,
-													   rbox);
-									dlgln = UTF16To8(ssa);
-
-									const AP4_Byte* bclr = (const AP4_Byte*)&desc.BackgroundColor;
-
-									if (bclr[3]) {
-										CPoint tl = rbox.TopLeft();
-										rbox.OffsetRect(-tl.x, -tl.y);
-
-										dlgln_bkg.Format(
-											"0,-1,Text,,0,0,0,0,,{\\an7\\pos(%d,%d)\\1c%02x%02x%02x\\1a%02x\\bord0\\shad0}{\\p1}m %d %d l %d %d l %d %d l %d %d {\\p0}",
-											tl.x, tl.y,
-											bclr[2], bclr[1], bclr[0],
-											255 - bclr[3],
-											rbox.left, rbox.top,
-											rbox.right, rbox.top,
-											rbox.right, rbox.bottom,
-											rbox.left, rbox.bottom);
-									}
-								}
-							}
-						}
-
 						dlgln.Replace("\r", "");
 						dlgln.Replace("\n", "\\N");
 
 						p->SetData((LPCSTR)dlgln, dlgln.GetLength());
 					}
-				}
-
-				if (!dlgln_bkg.IsEmpty()) {
-					CAutoPtr<Packet> p2(DNew Packet());
-					p2->TrackNumber = p->TrackNumber;
-					p2->rtStart = p->rtStart;
-					p2->rtStop = p->rtStop;
-					p2->bSyncPoint = p->bSyncPoint;
-					p2->SetData((LPCSTR)dlgln_bkg, dlgln_bkg.GetLength());
-					hr = DeliverPacket(p2);
-				}
-
-				if (!dlgln_plaintext.IsEmpty()) {
-					CAutoPtr<Packet> p2(DNew Packet());
-					p2->TrackNumber = p->TrackNumber ^ 0x80402010;
-					p2->rtStart = p->rtStart;
-					p2->rtStop = p->rtStop;
-					p2->bSyncPoint = p->bSyncPoint;
-					p2->SetData((LPCSTR)dlgln_plaintext, dlgln_plaintext.GetLength());
-					hr = DeliverPacket(p2);
 				}
 			} else {
 				p->SetData(data.GetData(), data.GetDataSize());
