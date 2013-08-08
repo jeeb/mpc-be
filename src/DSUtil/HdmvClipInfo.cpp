@@ -296,7 +296,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 
 		Pos.QuadPart += 10;
 		for (size_t i=0; i<nPlaylistItems; i++) {
-			PlaylistItem	Item;
+			PlaylistItem Item;
 			SetFilePointerEx(m_hFile, Pos, NULL, FILE_BEGIN);
 			Pos.QuadPart += ReadShort() + 2;
 			ReadBuffer(Buff, 5);
@@ -305,6 +305,11 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 			ReadBuffer(Buff, 4);
 			if (memcmp (Buff, "M2TS", 4)) {
 				return CloseFile(VFW_E_INVALID_FILE_FORMAT);
+			}
+
+			if (!::PathFileExists(Item.m_strFileName)) {
+				DbgLog((LOG_TRACE, 3, _T("		==> %s is missing, skip it"), Item.m_strFileName));
+				continue;
 			}
 			ReadBuffer(Buff, 3);
 
