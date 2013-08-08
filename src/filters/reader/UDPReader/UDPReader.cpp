@@ -29,7 +29,7 @@
 #ifdef REGISTER_FILTER
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
-	{&MEDIATYPE_Stream, &MEDIASUBTYPE_NULL},
+	{&MEDIATYPE_Stream, &MEDIASUBTYPE_MPEG2_TRANSPORT},
 };
 
 const AMOVIESETUP_PIN sudOpPin[] = {
@@ -121,7 +121,7 @@ STDMETHODIMP CUDPReader::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYPE* pmt)
 
 	CMediaType mt;
 	mt.majortype = MEDIATYPE_Stream;
-	mt.subtype = m_stream.GetSubType();
+	mt.subtype = MEDIASUBTYPE_MPEG2_TRANSPORT;
 	m_mt = mt;
 
 	return S_OK;
@@ -149,9 +149,6 @@ CUDPStream::CUDPStream()
 {
 	m_port = 0;
 	m_socket = INVALID_SOCKET;
-	m_subtype = MEDIASUBTYPE_NULL;
-
-	m_WSAEvent[0] = NULL;
 }
 
 CUDPStream::~CUDPStream()
@@ -161,10 +158,6 @@ CUDPStream::~CUDPStream()
 
 void CUDPStream::Clear()
 {
-	if (m_WSAEvent[0] != NULL) {
-		WSACloseEvent(m_WSAEvent[0]);
-	}
-
 	if (m_socket != INVALID_SOCKET) {
 		closesocket(m_socket);
 		m_socket = INVALID_SOCKET;
@@ -216,10 +209,6 @@ bool CUDPStream::Load(const WCHAR* fnw)
 	}
 	m_port = port;
 
-	if (sl.GetCount() != 2 || FAILED(GUIDFromCString(CString(sl.GetTail()), m_subtype))) {
-		m_subtype = MEDIASUBTYPE_NULL; // TODO: detect subtype
-	}
-
 	WSADATA wsaData;
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
 
@@ -232,9 +221,10 @@ bool CUDPStream::Load(const WCHAR* fnw)
 	imr.imr_multiaddr.s_addr	= inet_addr(CStringA(m_ip));
 	imr.imr_interface.s_addr	= INADDR_ANY;
 
+	WSAEVENT WSAEvent[1] = {0};
 	if ((m_socket = socket(AF_INET, SOCK_DGRAM, 0)) != INVALID_SOCKET) {
-		m_WSAEvent[0] = WSACreateEvent();
-		WSAEventSelect(m_socket, m_WSAEvent[0], FD_READ);
+		WSAEvent[0] = WSACreateEvent();
+		WSAEventSelect(m_socket, WSAEvent[0], FD_READ);
 
 		DWORD dw = TRUE;
 		if (setsockopt(m_socket, SOL_SOCKET, SO_REUSEADDR, (const char*)&dw, sizeof(dw)) == SOCKET_ERROR) {
@@ -271,7 +261,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 
 	UINT timeout = 0;
 	while (timeout < 500) {
-		int res = WSAWaitForMultipleEvents(1, m_WSAEvent, FALSE, 100, FALSE);
+		int res = WSAWaitForMultipleEvents(1, WSAEvent, FALSE, 100, FALSE);
 		if (res == WSA_WAIT_EVENT_0) {
 			int fromlen = sizeof(m_addr);
 			char buf[MAXBUFSIZE];
@@ -287,6 +277,10 @@ bool CUDPStream::Load(const WCHAR* fnw)
 		}
 
 		break;
+	}
+
+	if (WSAEvent[0] != NULL) {
+		WSACloseEvent(WSAEvent[0]);
 	}
 
 	if (timeout == 500) {
@@ -499,7 +493,6 @@ DWORD CUDPStream::ThreadProc()
 						}
 					}
 				}
-				WSAResetEvent(m_WSAEvent[0]);
 
 				break;
 		}

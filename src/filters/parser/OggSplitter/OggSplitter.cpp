@@ -148,11 +148,11 @@ public:
 
 COggSplitterFilter::COggSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("COggSplitterFilter"), pUnk, phr, __uuidof(this))
-	, m_rtMin(0)
-	, m_rtMax(0)
 	, m_bitstream_serial_number_start(0)
 	, m_bitstream_serial_number_last(0)
 {
+	m_nFlag |= PACKET_PTS_DISCONTINUITY;
+	m_nFlag |= PACKET_PTS_VALIDATE_POSITIVE;
 }
 
 COggSplitterFilter::~COggSplitterFilter()
@@ -369,6 +369,7 @@ start:
 	}
 
 	// get min pts to calculate duration
+	REFERENCE_TIME rtMin = 0;
 	m_pFile->Seek(start_pos);
 	for (int i = 0; m_pFile->Read(page), i<10; i++) {
 		COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
@@ -377,8 +378,8 @@ start:
 		}
 		REFERENCE_TIME rt = pOggPin->GetRefTime(page.m_hdr.granule_position);
 		if (rt > 0) {
-			if ((rt - m_rtMin) > MAX_PTS_SHIFT) {
-				m_rtMin = rt;
+			if ((rt - rtMin) > MAX_PTS_SHIFT) {
+				rtMin = rt;
 			} else {
 				break;
 			}
@@ -387,10 +388,10 @@ start:
 
 	m_pFile->Seek(start_pos);
 
-	m_rtDuration	-= m_rtMin;
+	m_rtDuration	-= rtMin;
 	m_rtDuration	= max(0, m_rtDuration);
 
-	m_rtMax = m_rtNewStop = m_rtStop = m_rtDuration;
+	m_rtNewStop = m_rtStop = m_rtDuration;
 
 	// comments
 	{
@@ -468,10 +469,6 @@ bool COggSplitterFilter::DemuxInit()
 
 void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
-	if (rt > m_rtDuration) {
-		rt -= m_rtMin;
-	}
-
 	if (rt <= 0 ) {
 		m_pFile->Seek(0);
 	} else if (m_rtDuration > 0) {
@@ -497,7 +494,7 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 					continue;
 				}
 
-				rtPos = pOggPin->GetRefTime(page.m_hdr.granule_position) - m_rtMin;
+				rtPos = pOggPin->GetRefTime(page.m_hdr.granule_position) + pOggPin->GetOffset();
 				endpos = m_pFile->GetPos();
 
 				break;
@@ -553,35 +550,6 @@ bool COggSplitterFilter::DemuxLoop()
 
 		if(!m_pFile->Read(page, true, GetRequestHandle())) {
 			break;
-		}
-
-		if (page.m_hdr.header_type_flag & OggPageHeader::first) {
-			if (m_pOutputs.GetCount() == 1 && m_bitstream_serial_number_last && m_bitstream_serial_number_last != page.m_hdr.bitstream_serial_number) {
-
-				TRACE(_T("COggSplitterFilter::DemuxLoop() : Page change [%d => %d]\n"), m_bitstream_serial_number_last, page.m_hdr.bitstream_serial_number);
-
-				DWORD bitstream_serial_number = page.m_hdr.bitstream_serial_number;
-				__int64 start_pos = m_pFile->GetPos();
-				m_rtMin = 0;
-
-				for (int i = 0; m_pFile->Read(page), bitstream_serial_number == page.m_hdr.bitstream_serial_number, i<10; i++) {
-					COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
-					page.m_hdr.bitstream_serial_number = m_bitstream_serial_number_start;
-					if (!pOggPin || page.m_hdr.granule_position == -1 || page.m_hdr.header_type_flag & OggPageHeader::first) {
-						continue;
-					}
-					REFERENCE_TIME rt = pOggPin->GetRefTime(page.m_hdr.granule_position);
-					if (rt > 0) {
-						if ((rt - m_rtMin) > MAX_PTS_SHIFT) {
-							m_rtMin = rt;
-						} else {
-							break;
-						}
-					}
-				}
-				m_pFile->Seek(start_pos);
-				continue;
-			}
 		}
 
 		if (m_pOutputs.GetCount() == 1 && m_bitstream_serial_number_start && m_bitstream_serial_number_start != page.m_hdr.bitstream_serial_number) {
@@ -746,7 +714,7 @@ HRESULT COggSplitterOutputPin::UnpackPage(OggPage& page)
 
 				if (last == pos && page.m_hdr.granule_position != -1) {
 					REFERENCE_TIME rtLast = m_rtLast;
-					m_rtLast = GetRefTime(page.m_hdr.granule_position) - (dynamic_cast<COggSplitterFilter*>(m_pFilter))->m_rtMin;
+					m_rtLast = GetRefTime(page.m_hdr.granule_position);
 
 					// some bad encodings have a +/-1 frame difference from the normal timeline,
 					// but these seem to cancel eachother out nicely so we can just ignore them

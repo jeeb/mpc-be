@@ -242,8 +242,6 @@ public:
 	// CBaseFilter
 
 	STDMETHODIMP_(HRESULT) QueryFilterInfo(FILTER_INFO* pInfo);
-
-	REFERENCE_TIME m_rtMin, m_rtMax;
 };
 
 class __declspec(uuid("6D3688CE-3E9D-42F4-92CA-8A11119D25CD"))

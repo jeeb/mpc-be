@@ -49,7 +49,6 @@ private:
 	CString m_ip;
 	SOCKET m_socket;
 	sockaddr_in m_addr;
-	WSAEVENT m_WSAEvent[1];
 	GUID m_subtype;
 	__int64 m_pos, m_len;
 	CAtlList<packet_t*> m_packets;
