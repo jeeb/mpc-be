@@ -39,6 +39,7 @@ IFileHandle :
 public IUnknown {
 	STDMETHOD_(HANDLE, GetFileHandle)() = 0;
 	STDMETHOD_(LPCTSTR, GetFileName)() = 0;
+	STDMETHOD_(bool, IsValidFilename)() = 0;	
 };
 
 class CAsyncFileReader : public CUnknown, public CMultiFiles, public IAsyncReader, public ISyncReader, public IFileHandle
@@ -97,7 +98,7 @@ public:
 
 	STDMETHODIMP_(HANDLE) GetFileHandle();
 	STDMETHODIMP_(LPCTSTR) GetFileName();
-
+	STDMETHODIMP_(bool) IsValidFilename();
 };
 
 class CAsyncUrlReader : public CAsyncFileReader, protected CAMThread

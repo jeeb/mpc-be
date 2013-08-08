@@ -137,6 +137,11 @@ STDMETHODIMP_(LPCTSTR) CAsyncFileReader::GetFileName()
 	return m_nCurPart != -1 ? m_strFiles[m_nCurPart] : m_strFiles[0];
 }
 
+STDMETHODIMP_(bool) CAsyncFileReader::IsValidFilename()
+{
+	return m_strFiles.IsEmpty() ? false : true;
+}
+
 //
 // CAsyncUrlReader
 //
