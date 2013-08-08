@@ -355,7 +355,7 @@ start:
 
 	// get max pts to calculate duration
 	if (m_pFile->IsRandomAccess()) {
-		m_pFile->Seek(max(m_pFile->GetLength()-MAX_PAGE_SIZE, 0));
+		m_pFile->Seek(max(m_pFile->GetLength() - MAX_PAGE_SIZE, 0));
 
 		OggPage page;
 		while (m_pFile->Read(page)) {
@@ -366,30 +366,31 @@ start:
 			REFERENCE_TIME rt = pOggPin->GetRefTime(page.m_hdr.granule_position);
 			m_rtDuration = max(rt, m_rtDuration);
 		}
-	}
 
-	// get min pts to calculate duration
-	REFERENCE_TIME rtMin = 0;
-	m_pFile->Seek(start_pos);
-	for (int i = 0; m_pFile->Read(page), i<10; i++) {
-		COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
-		if (!pOggPin || page.m_hdr.granule_position == -1 || page.m_hdr.header_type_flag & OggPageHeader::first) {
-			continue;
-		}
-		REFERENCE_TIME rt = pOggPin->GetRefTime(page.m_hdr.granule_position);
-		if (rt > 0) {
-			if ((rt - rtMin) > MAX_PTS_SHIFT) {
-				rtMin = rt;
-			} else {
-				break;
+		// get min pts to calculate duration
+		REFERENCE_TIME rtMin = 0;
+		m_pFile->Seek(start_pos);
+		for (int i = 0; m_pFile->Read(page), i<10; i++) {
+			COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
+			if (!pOggPin || page.m_hdr.granule_position == -1 || page.m_hdr.header_type_flag & OggPageHeader::first) {
+				continue;
+			}
+			REFERENCE_TIME rt = pOggPin->GetRefTime(page.m_hdr.granule_position);
+			if (rt > 0) {
+				if ((rt - rtMin) > MAX_PTS_SHIFT) {
+					rtMin = rt;
+				} else {
+					break;
+				}
 			}
 		}
+
+		m_rtDuration	-= rtMin;
+		m_rtDuration	= max(0, m_rtDuration);
+
 	}
 
 	m_pFile->Seek(start_pos);
-
-	m_rtDuration	-= rtMin;
-	m_rtDuration	= max(0, m_rtDuration);
 
 	m_rtNewStop = m_rtStop = m_rtDuration;
 

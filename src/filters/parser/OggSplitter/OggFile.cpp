@@ -40,12 +40,6 @@ HRESULT COggFile::Init()
 		return E_FAIL;
 	}
 
-	if (IsStreaming()) {
-		for (int i = 0; i < 20 || i < 50 && S_OK != HasMoreData(MAX_PAGE_SIZE, 100); i++) {
-			;
-		}
-	}
-
 	if (!Sync()) {
 		return E_FAIL;
 	}
@@ -57,11 +51,7 @@ bool COggFile::Sync(HANDLE hBreak)
 {
 	__int64 start = GetPos();
 
-	if (IsStreaming()) {
-		for (int i = 0; i < 20 || i < 50 && S_OK != HasMoreData(MAX_PAGE_SIZE, 100); i++) {
-			;
-		}
-	}
+	WaitAvailable(1500, MAX_PAGE_SIZE);
 
 	DWORD dw;
 	for (__int64 i = 0, j = hBreak ? GetLength() - start : MAX_PAGE_SIZE;
