@@ -342,13 +342,16 @@ void File__Analyze::Open_Buffer_Continue (const int8u* ToAdd, size_t ToAdd_Size)
 
     //MD5
     #if MEDIAINFO_MD5
-        if (!IsSub && !Buffer_Temp_Size && File_Offset==Config->File_Current_Offset && Config->File_Md5_Get())
+        if (ToAdd_Size)
         {
-            delete MD5; MD5=new struct MD5Context;
-            MD5Init(MD5);
+            if (!IsSub && !Buffer_Temp_Size && File_Offset==Config->File_Current_Offset && Config->File_Md5_Get())
+            {
+                delete MD5; MD5=new struct MD5Context;
+                MD5Init(MD5);
+            }
+            if (MD5)
+                MD5Update(MD5, ToAdd, (unsigned int)ToAdd_Size);
         }
-        if (MD5)
-            MD5Update(MD5, ToAdd, (unsigned int)ToAdd_Size);
     #endif //MEDIAINFO_MD5
 
     //Integrity
@@ -1621,13 +1624,25 @@ bool File__Analyze::FileHeader_Manage()
         return false; //Wait for more data
     }
 
+    //Positionning
+    if ((Buffer_Size && Buffer_Offset+Element_Offset>Buffer_Size) || (sizeof(size_t)<sizeof(int64u) && Buffer_Offset+Element_Offset>=(int64u)(size_t)-1))
+    {
+        GoTo(File_Offset+Buffer_Offset+Element_Offset);
+        return false;
+    }
+    else
+    {
+        Buffer_Offset+=(size_t)Element_Offset;
+        Element_Offset=0;
+    }
+
     #if MEDIAINFO_DEMUX
         if (Config->Demux_EventWasSent)
             return false;
     #endif //MEDIAINFO_DEMUX
 
     //From the parser
-    Element_Size=Buffer_Size;
+    Element_Size=Buffer_Size-Buffer_Offset;
     Element_Begin1("File Header");
     FileHeader_Parse();
     if (Element_Offset==0)
