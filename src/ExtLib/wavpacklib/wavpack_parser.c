@@ -165,6 +165,14 @@ WavPack_parser* wavpack_parser_new(stream_reader* io, int is_correction)
     wpp->io = io;
     wpp->is_correction = is_correction;
 
+    // ==> Start patch MPC
+	if (wpp->io->get_length(io) == 0)
+	{
+        wavpack_parser_free(wpp);
+        return NULL;
+    }
+    // ==> End patch MPC
+
     wpp->fb = frame_buffer_new();
     if(!wpp->fb)
     {
