@@ -5570,11 +5570,13 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 	
 	POSITION pos = sl.GetHeadPosition();
 	while (pos) {
-		CString ext = GetFileExt(sl.GetNext(pos)).MakeLower();
+		CString ext = GetFileExt(sl.GetNext(pos));
+		ext.Delete(0, 1); // remove dot
+		ext.MakeLower();
 
 		bool validate_ext = false;
 		for (size_t i = 0; i < _countof(subext); i++) {
-			if (ext == L"." + CString(subext[i])) {
+			if (ext == subext[i]) {
 				validate_ext = true;
 				break;
 			}
