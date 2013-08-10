@@ -853,7 +853,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 						mts.Add(mt);
 					}
-				} else if (CodecID == "A_OPUS/EXPERIMENTAL") {
+				} else if (CodecID == "A_OPUS" || CodecID == "A_OPUS/EXPERIMENTAL") {
 					wfe->wFormatTag = (WORD)WAVE_FORMAT_OPUS;
 					mt.subtype = MEDIASUBTYPE_OPUS;
 					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
