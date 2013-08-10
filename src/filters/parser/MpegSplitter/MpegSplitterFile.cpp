@@ -135,7 +135,6 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		}
 	}
 
-again:
 	// min/max pts & bitrate
 	m_rtMin = m_posMin = _I64_MAX;
 	m_rtMax = m_posMax = 0;
@@ -161,6 +160,12 @@ again:
 		SearchStreams(0, MEGABYTE/2, pAsyncReader);
 	}
 
+
+	bool bAlternativeDuration = m_AlternativeDuration;
+	int step = 1;
+
+again:
+
 	if (m_type == mpeg_ts) {
 		if (IsRandomAccess() || IsStreaming()) {
 			WaitAvailable(5000, MEGABYTE);
@@ -178,15 +183,20 @@ again:
 		} else {
 			SearchStreams(0, MEGABYTE/2, pAsyncReader, TRUE);
 		}
+
 	}
 
 	if (m_posMax - m_posMin <= 0 || m_rtMax - m_rtMin <= 0) {
-		if (m_AlternativeDuration) {
-			m_AlternativeDuration = false;
+		if (m_type == mpeg_ts && step == 1) {
+			step++;
+			m_AlternativeDuration = !m_AlternativeDuration;
 			goto again;
 		}
+
 		return E_FAIL;
 	}
+
+	m_AlternativeDuration = bAlternativeDuration;
 
 	m_init = false;
 
@@ -264,6 +274,7 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum)
 {
 	REFERENCE_TIME rt	= INVALID_TIME;
 	__int64 rtpos		= -1;
+	__int64 pos			= GetPos();
 
 	BYTE b;
 
@@ -327,6 +338,8 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum)
 	}
 	if (rt != INVALID_TIME) {
 		rt -= m_rtMin;
+	} else {
+		Seek(pos);
 	}
 
 	return rt;

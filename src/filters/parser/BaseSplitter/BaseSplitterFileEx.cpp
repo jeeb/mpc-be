@@ -201,16 +201,18 @@ bool CBaseSplitterFileEx::Read(peshdr& h, BYTE code)
 		h.extension = (BYTE)BitRead(1);
 		h.hdrlen = (BYTE)BitRead(8);
 	} else {
-		if (h.len) while (h.len-- > 0) {
+		if (h.len) {
+			while (h.len-- > 0) {
 				BitRead(8);
 			}
-		return false;
+		}
+		goto error;
 	}
 
 	if (h.fpts) {
 		if (h.type == mpeg2) {
 			BYTE b = (BYTE)BitRead(4);
-			if (!(h.fdts && b == 3 || !h.fdts && b == 2)) {/*ASSERT(0); */return false;} // TODO
+			if (!(h.fdts && b == 3 || !h.fdts && b == 2)) {/*ASSERT(0); */goto error;} // TODO
 		}
 
 		h.pts = 0;
@@ -241,7 +243,7 @@ bool CBaseSplitterFileEx::Read(peshdr& h, BYTE code)
 
 	if (h.type == mpeg1) {
 		if (!h.fpts && !h.fdts && BitRead(4) != 0xf) {
-			/*ASSERT(0);*/ return false;
+			/*ASSERT(0);*/ goto error;
 		}
 
 		if (h.len) {
@@ -299,6 +301,11 @@ bool CBaseSplitterFileEx::Read(peshdr& h, BYTE code)
 	}
 
 	return true;
+
+error:
+	memset(&h, 0, sizeof(h));
+
+	return false;
 }
 
 bool CBaseSplitterFileEx::Read(seqhdr& h, int len, CMediaType* pmt)

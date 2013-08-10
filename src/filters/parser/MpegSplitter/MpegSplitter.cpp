@@ -777,8 +777,6 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 						return E_FAIL;
 					}
 					TrackNumber = m_pFile->AddStream(h.pid, b, 0, h.bytes - (DWORD)(m_pFile->GetPos() - pos));
-				} else {
-					m_pFile->Seek(h.next);
 				}
 			}
 
@@ -1252,6 +1250,9 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 							double div = 1.0;
 							for (;;) {
 								REFERENCE_TIME rt2 = m_pFile->NextPTS(TrackNum);
+								if (rt2 == INVALID_TIME) {
+									break;
+								}
 
 								if (rtmin <= rt2 && rt2 <= rtmax) {
 									minseekpos = curpos;
@@ -1309,7 +1310,10 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 			seekpos	= (__int64)(1.0*rt/m_rtDuration*len);
 			m_pFile->Seek(seekpos);
-			m_rtStartOffset = m_pFile->m_rtMin + m_pFile->NextPTS(pMasterStream->GetHead()) - rt;
+			REFERENCE_TIME rtPTS = m_pFile->NextPTS(pMasterStream->GetHead());
+			if (rtPTS != INVALID_TIME) {
+				m_rtStartOffset = m_pFile->m_rtMin + rtPTS - rt;
+			}
 
 			if (m_rtStartOffset > m_pFile->m_rtMax)  {
 				m_rtStartOffset = 0;
