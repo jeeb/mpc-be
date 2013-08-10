@@ -5570,8 +5570,7 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 	
 	POSITION pos = sl.GetHeadPosition();
 	while (pos) {
-		CString ext = GetFileExt(sl.GetNext(pos));
-		ext.Delete(0, 1); // remove dot
+		CString ext = GetFileExt(sl.GetNext(pos)).Mid(1); // extension without a dot
 		ext.MakeLower();
 
 		bool validate_ext = false;
