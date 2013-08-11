@@ -206,21 +206,21 @@ BOOL CPPageSubStyle::OnApply()
 		m_stss.charSet = m_charset.GetItemData(m_iCharset);
 	}
 
-	m_stss.fontSpacing = m_spacing;
-	m_stss.fontAngleZ = m_angle;
-	m_stss.fontScaleX = m_scalex;
-	m_stss.fontScaleY = m_scaley;
+	m_stss.fontSpacing   = m_spacing;
+	m_stss.fontAngleZ    = m_angle;
+	m_stss.fontScaleX    = m_scalex;
+	m_stss.fontScaleY    = m_scaley;
 
-	m_stss.borderStyle = m_borderstyle;
+	m_stss.borderStyle   = m_borderstyle;
 	m_stss.outlineWidthX = m_stss.outlineWidthY = m_borderwidth;
-	m_stss.shadowDepthX = m_stss.shadowDepthY = m_shadowdepth;
+	m_stss.shadowDepthX  = m_stss.shadowDepthY  = m_shadowdepth;
 
-	m_stss.scrAlignment = m_screenalignment+1;
-	m_stss.marginRect = m_margin;
-	m_stss.relativeTo = m_relativeTo;
+	m_stss.scrAlignment  = m_screenalignment + 1;
+	m_stss.marginRect    = m_margin;
+	m_stss.relativeTo    = m_relativeTo;
 
 	for (int i = 0; i < 4; i++) {
-		m_stss.alpha[i] = 255-m_alpha[i];
+		m_stss.alpha[i] = 255 - m_alpha[i];
 	}
 
 	if (m_fUseDefaultStyle) {
@@ -328,7 +328,7 @@ void CPPageSubStyle::OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult)
 				dc.SelectObject(&penFrDisabled);
 			}
 
-			dc.RoundRect(r.left, r.top, r.right, r.bottom, 6, 4);		
+			dc.RoundRect(r.left, r.top, r.right, r.bottom, 6, 4);
 			r.DeflateRect(2,2,2,2);
 			if (pNMCD->dwItemSpec == IDC_COLORPRI) {
 				dc.FillSolidRect(&r, m_stss.colors[0]);
