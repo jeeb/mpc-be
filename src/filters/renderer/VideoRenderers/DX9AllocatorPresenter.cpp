@@ -2041,7 +2041,7 @@ void CDX9AllocatorPresenter::DrawStats()
 	LONGLONG		llMinSyncOffset = m_MinSyncOffset;
 	RECT			rc = {40, 40, 0, 0 };
 
-	static UINT		TextHeight = 0;
+	static int		TextHeight = 0;
 	static CRect	WindowRect(0, 0, 0, 0);
 
 	if (WindowRect != m_WindowRect) {
@@ -2050,8 +2050,8 @@ void CDX9AllocatorPresenter::DrawStats()
 	WindowRect = m_WindowRect;
 
 	if (!m_pFont && m_pD3DXCreateFont) {
-		UINT FontWidth  = max(m_WindowRect.Width()/130, 4);
-		UINT FontHeight = max(m_WindowRect.Height()/35, 6);
+		int  FontHeight = max(m_WindowRect.Height()/35, 6); // must be equal to 5 or more
+		UINT FontWidth  = max(m_WindowRect.Width()/130, 4); // 0 = auto
 		UINT FontWeight = FW_BOLD;
 		if ((m_rcMonitor.Width() - m_WindowRect.Width()) > 100) {
 			FontWeight  = FW_NORMAL;
