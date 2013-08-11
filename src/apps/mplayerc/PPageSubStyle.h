@@ -68,8 +68,8 @@ public:
 	CPPageSubStyle();
 	virtual ~CPPageSubStyle();
 
-	void InitStyle(CString title, STSStyle& stss);
-	void GetStyle(STSStyle& stss) {
+	void InitSubStyle(CString title, STSStyle& stss);
+	void GetSubStyle(STSStyle& stss) {
 		stss = m_stss;
 	}
 

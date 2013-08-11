@@ -9304,7 +9304,7 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 						pRTS->m_styles.GetNextAssoc(pos, key, val);
 
 						CAutoPtr<CPPageSubStyle> page(DNew CPPageSubStyle());
-						page->InitStyle(key, *val);
+						page->InitSubStyle(key, *val);
 						pages.Add(page);
 						styles.Add(val);
 					}
@@ -9321,7 +9321,7 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 
 					if (dlg.DoModal() == IDOK) {
 						for (int j = 0; j < (int)pages.GetCount(); j++) {
-							pages[j]->GetStyle(*styles[j]);
+							pages[j]->GetSubStyle(*styles[j]);
 						}
 						UpdateSubtitle(false, false);
 					}
