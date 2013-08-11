@@ -324,7 +324,7 @@ void CPPageSubStyle::OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult)
 			CPen penFrDisabled (PS_SOLID, 0, GetSysColor(COLOR_BTNSHADOW));
 			CPen *penOld = dc.SelectObject(&penFrEnabled);
 
-			if (CDIS_HOT == pNMCD->uItemState || CDIS_HOT + CDIS_FOCUS == pNMCD->uItemState || CDIS_DISABLED == pNMCD->uItemState) { 
+			if (CDIS_HOT == pNMCD->uItemState || CDIS_HOT + CDIS_FOCUS == pNMCD->uItemState || CDIS_DISABLED == pNMCD->uItemState) {
 				dc.SelectObject(&penFrDisabled);
 			}
 

@@ -583,7 +583,7 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 						for (int nItem = 0; nItem < m_list.GetItemCount(); nItem++) {
 							m_list.SetItemState(nItem, ~m_list.GetItemState(nItem, LVIS_SELECTED), LVIS_SELECTED);
 						}
-					}					   
+					}
 					break;
 			}
 		}

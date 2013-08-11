@@ -179,9 +179,9 @@ CRect CPlayerSeekBar::GetChannelRect()
 {
 	CRect r;
 	GetClientRect(&r);
-	
+
 	if (AfxGetAppSettings().fDisableXPToolbars) {
-		//r.DeflateRect(1,1,1,1); 
+		//r.DeflateRect(1,1,1,1);
 	} else {
 		r.DeflateRect(8, 9, 9, 0);
 		r.bottom = r.top + 5;
@@ -341,11 +341,11 @@ void CPlayerSeekBar::OnPaint()
 
 		CPen penPlayed(s.clrFaceABGR == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, s.clrFaceABGR);
 		CPen penPlayedOutline(s.clrOutlineABGR == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, s.clrOutlineABGR);
-		
+
 		rc = GetChannelRect();
 		int nposx = GetThumbRect().right-2;
 		int nposy = r.top;
-		
+
 		ThemeRGB(30, 35, 40, R, G, B);
 		CPen penPlayed1(PS_SOLID,0,RGB(R,G,B));
 		memdc.SelectObject(&penPlayed1);
@@ -435,7 +435,7 @@ void CPlayerSeekBar::OnPaint()
 						}
 
 						int x = r.left + (int)((m_start < m_stop) ? (__int64)r.Width() * (rt - m_start) / (m_stop - m_start) : 0);
-			
+
 						// можно вместо рисования руками иконку как маркер подтянуть
 						// HICON appIcon = (HICON)::LoadImage(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MARKERS), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 						// ::DrawIconEx(memdc, x, rc2.top + 10, appIcon, 0,0, 0, NULL, DI_NORMAL);
@@ -619,7 +619,7 @@ void CPlayerSeekBar::OnLButtonUp(UINT nFlags, CPoint point)
 	__int64 pos = CalculatePosition(point);
 
 	if (((CMainFrame*)GetParentFrame())->ValidateSeek(pos, m_stop)) {
-	
+
 		if (AfxGetAppSettings().fDisableXPToolbars && m_fEnabled) {
 			GetParent()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
 		}
@@ -672,7 +672,7 @@ void CPlayerSeekBar::UpdateTooltip(CPoint point)
 
 	if (m_tooltipState == TOOLTIP_VISIBLE && m_tooltipPos != m_tooltipLastPos) {
 		UpdateToolTipText();
-		
+
 		if (!pFrame->CanPreviewUse()) UpdateToolTipPosition(point);
 		m_tooltipTimer = SetTimer(m_tooltipTimer, pFrame->CanPreviewUse() ? 10 : AUTOPOP_DELAY, NULL);
 	}
@@ -707,7 +707,7 @@ void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 		if (pFrame->CanPreviewUse()) UpdateToolTipPosition(point);
 	} else {
 		pFrame->PreviewWindowHide();
-	}	
+	}
 	CDialogBar::OnMouseMove(nFlags, point);
 }
 
@@ -742,7 +742,6 @@ BOOL CPlayerSeekBar::OnEraseBkgnd(CDC* pDC)
 
 BOOL CPlayerSeekBar::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 {
-	
 	CPoint p;
 	GetCursorPos(&p);
 	ScreenToClient(&p);
@@ -751,8 +750,8 @@ BOOL CPlayerSeekBar::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 
 		return TRUE;
 	}
-	
-	
+
+
 	if (m_fEnabled && m_start < m_stop && m_stop != 100) {
 		::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_HAND));
 

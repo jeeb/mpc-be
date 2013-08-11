@@ -372,7 +372,7 @@ HRESULT CPPageFormats::RegisterUI()
 {
 	IApplicationAssociationRegistrationUI *pUI = NULL;
 
-	HRESULT hr = CoCreateInstance(CLSID_ApplicationAssociationRegistrationUI, 
+	HRESULT hr = CoCreateInstance(CLSID_ApplicationAssociationRegistrationUI,
 					NULL,
 					CLSCTX_INPROC,
 					__uuidof(IApplicationAssociationRegistrationUI),

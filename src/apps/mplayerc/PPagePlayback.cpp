@@ -129,9 +129,9 @@ BOOL CPPagePlayback::OnInitDialog()
 	m_nVolumeStep = s.nVolumeStep - 1;
 
 	for (int idx = 0; idx <= 10; idx++) {
-		CString str; 
+		CString str;
 		if (idx == 0) {
-			str = _T("Auto"); 
+			str = _T("Auto");
 			m_nSpeedStepCtrl.AddString(str);
 			continue;
 		}

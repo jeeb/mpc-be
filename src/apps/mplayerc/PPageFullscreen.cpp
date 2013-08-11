@@ -143,9 +143,9 @@ BOOL CPPageFullscreen::OnInitDialog()
 		m_iMonitorType = 0;
  	}
 
-	DISPLAY_DEVICE dd; 
-	dd.cb = sizeof(dd); 
-	DWORD dev = 0; // device index 
+	DISPLAY_DEVICE dd;
+	dd.cb = sizeof(dd);
+	DWORD dev = 0; // device index
 	int id = 0;
 	CString str2;
 	CString DeviceID;
@@ -166,25 +166,25 @@ BOOL CPPageFullscreen::OnInitDialog()
 					m_iMonitorTypeCtrl.AddString(str.Mid(4, 7) + _T("( ") + str.Right(1) + _T(" ) ") + _T("- [id: ") + DeviceID + _T(" *") +  ResStr(IDS_FULLSCREENMONITOR_CURRENT) + _T("] - ") + ddMon.DeviceString);
 					m_MonitorDisplayNames[0] = _T("Current") + strMonID;
 					m_MonitorDeviceName[0] = str;
-					
+
 					if(m_f_hmonitor == _T("Current") && m_AutoChangeFullscrRes.bEnabled > 0) {
-						m_iMonitorType = m_iMonitorTypeCtrl.GetCount()-1;	
+						m_iMonitorType = m_iMonitorTypeCtrl.GetCount()-1;
 						m_f_hmonitor = strCurMon;
 					}
 					iCurMon = m_iMonitorTypeCtrl.GetCount()-1;
 				} else {
-					m_iMonitorTypeCtrl.AddString(str.Mid(4, 7) + _T("( ") + str.Right(1) + _T(" ) ") + _T("- [id: ") + DeviceID + _T("] - ") + ddMon.DeviceString);	
+					m_iMonitorTypeCtrl.AddString(str.Mid(4, 7) + _T("( ") + str.Right(1) + _T(" ) ") + _T("- [id: ") + DeviceID + _T("] - ") + ddMon.DeviceString);
 				}
 				m_MonitorDisplayNames.Add(str + strMonID);
 				m_MonitorDeviceName.Add(str);
 				if(m_iMonitorType == 0 && m_f_hmonitor == str) {
 					m_iMonitorType = m_iMonitorTypeCtrl.GetCount()-1;
 				}
- 
+
 				if (m_f_hmonitorID == strMonID  && m_f_hmonitor != _T("Current")) {
 					id = m_iMonitorType = m_iMonitorTypeCtrl.GetCount()-1;
-					str2 = str; 
-				}	
+					str2 = str;
+				}
             }
             devMon++;
             ZeroMemory(&ddMon, sizeof(ddMon));
@@ -192,13 +192,13 @@ BOOL CPPageFullscreen::OnInitDialog()
         }
         ZeroMemory(&dd, sizeof(dd));
         dd.cb = sizeof(dd);
-        dev++; 
+        dev++;
 	}
-			
+
 	if(m_iMonitorTypeCtrl.GetCount() > 2) {
 		if (m_MonitorDisplayNames[m_iMonitorType] != m_f_hmonitor + m_f_hmonitorID) {
-			if ( id > 0 ) { 
-				m_iMonitorType = id; 
+			if ( id > 0 ) {
+				m_iMonitorType = id;
 				m_f_hmonitor = str2;
  			}
  		}
@@ -297,13 +297,13 @@ BOOL CPPageFullscreen::OnApply()
 	if (str.GetLength() == 14) { m_f_hmonitor = str.Left(7); }
 	if (str.GetLength() == 19) { m_f_hmonitor = str.Left(12); }
 	m_f_hmonitorID = str.Right(7);
-	if (m_AutoChangeFullscrRes.bEnabled > 0 && m_f_hmonitor == _T("Current")) {		
+	if (m_AutoChangeFullscrRes.bEnabled > 0 && m_f_hmonitor == _T("Current")) {
 		CMonitors monitors;
 		CMonitor curmonitor;
 		curmonitor = monitors.GetNearestMonitor(AfxGetApp()->m_pMainWnd);
 		curmonitor.GetName(strCurMon);
 		m_f_hmonitor = strCurMon;
-	} 
+	}
 	if (m_AutoChangeFullscrRes.bEnabled == false && m_f_hmonitor == _T("Current")) {
 		m_f_hmonitor = _T("Current");
 	}

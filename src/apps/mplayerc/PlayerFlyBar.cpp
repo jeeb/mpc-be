@@ -26,7 +26,7 @@
 
 // CPrevView
 
-CFlyBar::CFlyBar() : 
+CFlyBar::CFlyBar() :
 	bt_idx(-1),
 	r_ExitIcon(0,0,0,0),
 	r_MinIcon(0,0,0,0),
@@ -242,7 +242,7 @@ void CFlyBar::UpdateWnd(CPoint point)
 	m_tooltip.GetText(str,this);
 
 	CMainFrame* pFrame = (CMainFrame*)GetParentFrame();
-	
+
 	if (r_ExitIcon.PtInRect(point)) {
 		if (str != ResStr(IDS_AG_EXIT)) {
 			m_tooltip.UpdateTipText(ResStr(IDS_AG_EXIT), this);

@@ -116,7 +116,7 @@ BOOL CPPageFileInfoSheet::OnInitDialog()
 
 	m_bNeedInit = FALSE;
 	GetClientRect(&m_rCrt);
-	ScreenToClient(&m_rCrt); 
+	ScreenToClient(&m_rCrt);
 
 	GetWindowRect (&r);
 	ScreenToClient (&r);
@@ -197,29 +197,29 @@ void CPPageFileInfoSheet::OnSize(UINT nType, int cx, int cy)
 
 	HDWP hDWP = ::BeginDeferWindowPos(5);
 
-	pTab->GetClientRect(&r); 
-	r.right += dx; 
+	pTab->GetClientRect(&r);
+	r.right += dx;
 	r.bottom += dy;
 	::DeferWindowPos(hDWP, pTab->m_hWnd, NULL, 0, 0, r.Width(), r.Height(), SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
 
 	for (CWnd *pChild = GetWindow(GW_CHILD); pChild != NULL; pChild = pChild->GetWindow(GW_HWNDNEXT)) {
 		if ((pChild->SendMessage(WM_GETDLGCODE) & DLGC_BUTTON) && pChild == GetDlgItem(IDOK)) {
-			pChild->GetWindowRect(&r); 
-			ScreenToClient(&r); 
-			r.top += dy; 
-			r.bottom += dy; 
-			r.left+= dx; 
+			pChild->GetWindowRect(&r);
+			ScreenToClient(&r);
+			r.top += dy;
+			r.bottom += dy;
+			r.left+= dx;
 			r.right += dx;
 			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, r.left, r.top, 0, 0, SWP_NOACTIVATE|SWP_NOSIZE|SWP_NOZORDER);
 		} else if ((pChild->SendMessage(WM_GETDLGCODE) & DLGC_BUTTON) && pChild == GetDlgItem(IDC_BUTTON_MI)) {
-			pChild->GetWindowRect(&r); 
-			ScreenToClient(&r); 
-			r.top += dy; 
+			pChild->GetWindowRect(&r);
+			ScreenToClient(&r);
+			r.top += dy;
 			r.bottom += dy;
 			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, r.left, r.top, 0, 0, SWP_NOACTIVATE|SWP_NOSIZE|SWP_NOZORDER);
 		} else {
-			pChild->GetClientRect(&r); 
-			r.right += dx; 
+			pChild->GetClientRect(&r);
+			r.right += dx;
 			r.bottom += dy;
 			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, 0, 0, r.Width(), r.Height(),SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
 		}
@@ -237,7 +237,7 @@ void CPPageFileInfoSheet::OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI)
 	lpMMI->ptMinTrackSize.y = m_nMinCY;
 }
 
-void CPPageFileInfoSheet::OnDestroy() 
+void CPPageFileInfoSheet::OnDestroy()
 {
 	AfxGetAppSettings().nLastFileInfoPage = GetResourceId(GetActiveIndex());
 

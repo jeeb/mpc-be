@@ -3205,7 +3205,7 @@ BEGIN
     IDS_DVB_CHANNEL_START_SCAN  "Start"
     IDS_DVB_CHANNEL_STOP_SCAN   "Stop"
     IDS_DVB_TVNAV_SEERADIO      "Radio stations"
-    IDS_DVB_TVNAV_SEETV         "TV stations"    
+    IDS_DVB_TVNAV_SEETV         "TV stations"
     IDS_ARS_WASAPI_MODE         "Use WASAPI (restart playback):"
     IDS_ARS_MUTE_FAST_FORWARD   "Mute on fast forward"
     IDS_ARS_SOUND_DEVICE        "Sound Device:"
@@ -3450,7 +3450,7 @@ BEGIN
     IDS_SUBDL_DLG_PARSING               "Parsing list..."
     IDS_SUBDL_DLG_NOT_FOUND             "No subtitles found."
     IDS_SUBDL_DLG_SUBS_AVAIL            " %d subtitle(s) available."
-    IDS_DOWNLOAD_SUBS                   "Download subtitles"	
+    IDS_DOWNLOAD_SUBS                   "Download subtitles"
 END
 
 STRINGTABLE

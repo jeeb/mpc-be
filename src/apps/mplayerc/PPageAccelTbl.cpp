@@ -1552,7 +1552,7 @@ BOOL CPPageAccelTbl::OnApply()
 	s.fGlobalMedia = !!m_fGlobalMedia;
 
 	AfxGetMyApp()->RegisterHotkeys();
-	
+
 	s.AccelTblColWidth.bEnable = true;
 	s.AccelTblColWidth.cmd		= m_list.GetColumnWidth(COL_CMD);
 	s.AccelTblColWidth.key		= m_list.GetColumnWidth(COL_KEY);
@@ -1562,7 +1562,7 @@ BOOL CPPageAccelTbl::OnApply()
 	s.AccelTblColWidth.appcmd	= m_list.GetColumnWidth(COL_APPCMD);
 	s.AccelTblColWidth.remcmd	= m_list.GetColumnWidth(COL_RMCMD);
 	s.AccelTblColWidth.repcnt	= m_list.GetColumnWidth(COL_RMREPCNT);
-	
+
 	return __super::OnApply();
 }
 

@@ -281,7 +281,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 	{
 		// Filters Priority
-		AppSettings& s = AfxGetAppSettings();	
+		AppSettings& s = AfxGetAppSettings();
 		CMediaFormatCategory* mfc = AfxGetAppSettings().m_Formats.FindMediaByExt(ext);
 		if (mfc) {
 			CString type = mfc->GetLabel();
@@ -1109,7 +1109,7 @@ STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlay
 			if (hr == 0xDEAD) {
 				; // TODO
 			} else if (SUCCEEDED(hr)) {
-				return hr;			
+				return hr;
 			}
 
 			NukeDownstream(pBF);
@@ -1347,7 +1347,7 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 			// Disable MEDIATYPE_AUXLine21Data - prevent connect Line 21 Decoder
 			if (GetPinName(pPin)[0] == '~' && FindMT(pPin, MEDIATYPE_AUXLine21Data)) {
 				if ((clsid == CLSID_CMPEG2VidDecoderDS && (s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM || s.iDSVideoRendererType == VIDRNDT_DS_SYNC))
-					|| clsid == __uuidof(CMpeg2DecFilter) 
+					|| clsid == __uuidof(CMpeg2DecFilter)
 					|| clsid == CLSID_NvidiaVideoDecoder
 					|| clsid == CLSID_SonicCinemasterVideoDecoder) {
 
@@ -1389,7 +1389,7 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 							CComPtr<IBaseFilter> pInfPinTee;
 							pInfPinTee.CoCreateInstance(CLSID_InfTee);
 							AddFilter(pInfPinTee, L"Infinite Pin Tee");
-						
+
 							hr = ConnectFilterDirect(pPin, pInfPinTee, NULL);
 							if (SUCCEEDED(hr)) {
 								bInfPinTeeConnected = TRUE;
@@ -1406,7 +1406,7 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 										while (pos) {
 											CFGFilter* pFGF = m_transform.GetNext(pos);
 											if (SelAudioRenderer == pFGF->GetName()) {
-												
+
 												hr = ConnectFilterDirect(infTeeFilterOutPin, pFGF);
 												if (SUCCEEDED(hr)) {
 													DbgLog((LOG_TRACE, 3, L"FGM: Connect Direct to '%s'", pFGF->GetName()));
@@ -1455,7 +1455,7 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 											}
 										}
 
-									
+
 									}
 
 									if (!bIsConnected) {
@@ -2204,12 +2204,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 					(ffmpeg_filters[FFM_QDM2]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_QDM2);
 		m_transform.AddTail(pFGF);
-	
+
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 					(ffmpeg_filters[FFM_WPAC]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 					(ffmpeg_filters[FFM_WPAC]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_WAVPACK4);
-		m_transform.AddTail(pFGF);	
+		m_transform.AddTail(pFGF);
 
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 					(ffmpeg_filters[FFM_MPAC]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
@@ -2643,7 +2643,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	if (!m_IsPreview) {
 		CString SelAudioRenderer = s.SelectedAudioRenderer();
 		m_armerit += 0x1000;
-		
+
 		for (int ar = 0; ar < (s.fDualAudioOutput ? 2 : 1); ar++) {
 			if (SelAudioRenderer == AUDRNDT_NULL_COMP) {
 				pFGF = DNew CFGFilterInternal<CNullAudioRenderer>(AUDRNDT_NULL_COMP, m_armerit);
@@ -2663,7 +2663,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 				pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
 				m_transform.AddTail(pFGF);
 			}
-		
+
 			SelAudioRenderer = s.strSecondAudioRendererDisplayName;
 			m_armerit -= 0x100;
 		}

@@ -138,7 +138,7 @@ BOOL CSaveImageDialog::OnFileNameOK()
 				m_levelPNG = level;
 			}
 			CoTaskMemFree(result);
-	
+
 			pfdc->Release();
 		}
 	} else {

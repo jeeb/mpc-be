@@ -489,7 +489,7 @@ void CVMROSD::DrawMessage()
 		if (rectText.right +10 >= (rectMessages.right)) {
 			uFormat = uFormat|DT_END_ELLIPSIS;
 		}
-	
+
 		CRect r;
 		if (AfxGetAppSettings().fFontShadow) {
 			r = rectMessages;
@@ -498,12 +498,12 @@ void CVMROSD::DrawMessage()
 			m_MemDC.SetTextColor(RGB(16,24,32));
 			m_MemDC.DrawText (m_strMessage, &r, uFormat);
 		}
-		
+
 		r = rectMessages;
 		r.left += 10;
 		r.top += 5;
 		m_MemDC.SetTextColor(AfxGetAppSettings().clrFontABGR);
-		m_MemDC.DrawText (m_strMessage, &r, uFormat);	
+		m_MemDC.DrawText (m_strMessage, &r, uFormat);
 	}
 }
 
@@ -675,7 +675,7 @@ bool CVMROSD::OnLButtonUp(UINT nFlags, CPoint point)
 
 		bRet = (m_rectCursor.PtInRect (point) || m_rectSeekBar.PtInRect(point));
 	}
-	
+
 	return bRet;
 }
 
@@ -716,7 +716,7 @@ void CVMROSD::ClearMessage(bool hide)
 {
 	CAutoLock Lock(&m_Lock);
 
-	if (m_bSeekBarVisible || m_bFlyBarVisible) { 
+	if (m_bSeekBarVisible || m_bFlyBarVisible) {
 		return;
 	}
 
@@ -819,7 +819,7 @@ void CVMROSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration,
 		}
 
 		m_OSD_Font = OSD_Font.IsEmpty() ? AfxGetAppSettings().strOSDFont : OSD_Font;
-		
+
 		if (m_pWnd) {
 			::KillTimer(m_pWnd->m_hWnd, (UINT_PTR)this);
 			if (nDuration != -1) {
@@ -869,7 +869,7 @@ void CVMROSD::HideMessage(bool hide)
 void CVMROSD::HideExclusiveBars()
 {
 	if (m_pVMB || m_pMFVMB) {
-			
+
 		if (m_bFlyBarVisible || m_bSeekBarVisible) {
 			m_bFlyBarVisible	= false;
 			m_bSeekBarVisible	= false;
@@ -1033,7 +1033,7 @@ void CVMROSD::DrawWnd()
 		G1_	= (G1+32 >= 255 ? 255 : G1+32);
 		B_	= (B+32  >= 255 ? 255 : B+32);
 		B1_	= (B1+32 >= 255 ? 255 : B1+32);
-		
+
 		m_OSD_Transparent	= 255;//AfxGetAppSettings().nOSDTransparent;
 		int iBorder			= AfxGetAppSettings().nOSDBorder;
 
@@ -1075,7 +1075,7 @@ void CVMROSD::DrawWnd()
 		}
 
 		DWORD uFormat = DT_LEFT|DT_TOP|DT_END_ELLIPSIS|DT_NOPREFIX;
-	
+
 		CRect r;
 
 		if (AfxGetAppSettings().fFontShadow) {
@@ -1087,7 +1087,7 @@ void CVMROSD::DrawWnd()
 			mdc.SetTextColor(RGB(16,24,32));
 			mdc.DrawText(m_strMessage, &r, uFormat);
 		}
-		
+
 		r			= rcBar;
 		r.left		= 10;
 		r.top		= 5;
@@ -1095,7 +1095,7 @@ void CVMROSD::DrawWnd()
 
 		mdc.SetTextColor(AfxGetAppSettings().clrFontABGR);
 		mdc.DrawText(m_strMessage, m_strMessage.GetLength(), &r, uFormat);
-		
+
 		/*
 		// GDI+ handling
 
@@ -1107,23 +1107,23 @@ void CVMROSD::DrawWnd()
 		CString ss(message);
 		CString f(m_OSD_Font);
 		Font font(mdc);
-	
+
 		FontFamily fontFamily;
 		font.GetFamily(&fontFamily);
-	
+
 		StringFormat strformat;
 		//strformat.SetAlignment((StringAlignment) 0);
 		//strformat.SetLineAlignment(StringAlignmentCenter);
 		strformat.SetFormatFlags(StringFormatFlagsNoWrap);
 		strformat.SetTrimming(StringTrimmingEllipsisCharacter);//SetFormatFlags(StringFormatFlagsLineLimit );
 		RectF p(r.left+10, r.top, r.Width(), r.Height());
-	
+
 		REAL enSize = font.GetSize();
 
 		GraphicsPath path;
-		path.AddString(ss.AllocSysString(), ss.GetLength(), &fontFamily, 
+		path.AddString(ss.AllocSysString(), ss.GetLength(), &fontFamily,
 		FontStyleRegular, enSize, p, &strformat );
-   
+
 		Pen pen(Color(76,80,86), 5);
 		pen.SetLineJoin(LineJoinRound);
 		graphics.DrawPath(&pen, &path);
@@ -1136,12 +1136,12 @@ void CVMROSD::DrawWnd()
 		//}
 
 
-		LinearGradientBrush brush(Gdiplus::Rect(r.left, r.top, r.Width(), r.Height()), 
+		LinearGradientBrush brush(Gdiplus::Rect(r.left, r.top, r.Width(), r.Height()),
 			Color(255,255,255), Color(217,229,247), LinearGradientModeVertical);
 		graphics.FillPath(&brush, &path);
-		*/		
+		*/
 	}
-		
+
 	dc.BitBlt(0, 0, rcBar.Width(), rcBar.Height(), &mdc, 0, 0, SRCCOPY);
 
 	mdc.SelectObject(pOldBm);

@@ -230,7 +230,7 @@ BOOL CPPageInterface::OnApply()
 
 	if (s.fFlybar && !pFrame->m_wndFlyBar) {
 		pFrame->CreateFlyBar();
-		
+
 	} else if (!s.fFlybar && pFrame->m_wndFlyBar){
 		pFrame->DestroyFlyBar();
 	}
@@ -369,7 +369,7 @@ void CPPageInterface::OnClickClrDefault()
 
 void CPPageInterface::OnClickClrFace()
 {
-	CColorDialog clrpicker;	
+	CColorDialog clrpicker;
 	clrpicker.m_cc.Flags |= CC_FULLOPEN|CC_RGBINIT;
 	clrpicker.m_cc.rgbResult = m_clrFaceABGR;
 
@@ -384,7 +384,7 @@ void CPPageInterface::OnClickClrFace()
 
 void CPPageInterface::OnClickClrOutline()
 {
-	CColorDialog clrpicker;	
+	CColorDialog clrpicker;
 	clrpicker.m_cc.Flags |= CC_FULLOPEN|CC_RGBINIT;
 	clrpicker.m_cc.rgbResult = m_clrOutlineABGR;
 
@@ -399,7 +399,7 @@ void CPPageInterface::OnClickClrOutline()
 
 void CPPageInterface::OnClickClrFont()
 {
-	CColorDialog clrpicker;	
+	CColorDialog clrpicker;
 	clrpicker.m_cc.Flags |= CC_FULLOPEN|CC_RGBINIT;
 	clrpicker.m_cc.rgbResult = m_clrFontABGR;
 
@@ -414,7 +414,7 @@ void CPPageInterface::OnClickClrFont()
 
 void CPPageInterface::OnClickClrGrad1()
 {
-	CColorDialog clrpicker;	
+	CColorDialog clrpicker;
 	clrpicker.m_cc.Flags |= CC_FULLOPEN|CC_RGBINIT;
 	clrpicker.m_cc.rgbResult = m_clrGrad1ABGR;
 
@@ -429,7 +429,7 @@ void CPPageInterface::OnClickClrGrad1()
 
 void CPPageInterface::OnClickClrGrad2()
 {
-	CColorDialog clrpicker;	
+	CColorDialog clrpicker;
 	clrpicker.m_cc.Flags |= CC_FULLOPEN|CC_RGBINIT;
 	clrpicker.m_cc.rgbResult = m_clrGrad2ABGR;
 
@@ -461,11 +461,11 @@ void CPPageInterface::OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult)
 			CPen penFrDisabled (PS_SOLID, 0, GetSysColor(COLOR_BTNSHADOW));
 			CPen *penOld = dc.SelectObject(&penFrEnabled);
 
-			if (CDIS_HOT == pNMCD->uItemState || CDIS_HOT + CDIS_FOCUS == pNMCD->uItemState || CDIS_DISABLED == pNMCD->uItemState) { 
+			if (CDIS_HOT == pNMCD->uItemState || CDIS_HOT + CDIS_FOCUS == pNMCD->uItemState || CDIS_DISABLED == pNMCD->uItemState) {
 				dc.SelectObject(&penFrDisabled);
 			}
 
-			dc.RoundRect(r.left, r.top, r.right, r.bottom, 6, 4);		
+			dc.RoundRect(r.left, r.top, r.right, r.bottom, 6, 4);
 			r.DeflateRect(2,2,2,2);
 			if (pNMCD->dwItemSpec == IDC_BUTTON_CLRFACE) {
 				dc.FillSolidRect(&r, m_clrFaceABGR);
@@ -545,7 +545,7 @@ void CPPageInterface::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 		s.nOSDTransparent	= m_nOSDTransparent;
 		OnChngOSDCombo();
 	}
-	
+
 	SetModified();
 
 	__super::OnHScroll(nSBCode, nPos, pScrollBar);

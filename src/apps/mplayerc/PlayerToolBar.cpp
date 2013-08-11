@@ -840,7 +840,7 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 		bi.dwMask = TBIF_IMAGE;
 
 		GetToolBarCtrl().GetButtonInfo(ID_VOLUME_MUTE, &bi);
-	
+
 		if (bi.iImage == 12) {
 			m_strTipText = ResStr(ID_VOLUME_MUTE);
 		} else if (bi.iImage == 13) {
@@ -848,7 +848,7 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 		} else if (bi.iImage == 14) {
 			m_strTipText = ResStr(ID_VOLUME_MUTE_DISABLED);
 		}
-		
+
 		int i = m_strTipText.Find('\n'); // TODO: remove it
 
 		if (i > 0) {

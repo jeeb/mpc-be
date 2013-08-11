@@ -475,7 +475,7 @@ protected:
 
 	dispmode m_dmBeforeFullscreen;
 	CString m_LastOpenFile;
-	
+
 	CString m_LastOpenBDPath, m_BDLabel;
 	HMONITOR m_LastWindow_HM;
 
@@ -1130,7 +1130,7 @@ public:
 	void		CreateCaptureWindow();
 	MPCPngImage	m_InternalImage, m_InternalImageSmall;
 	bool		m_bInternalImageRes;
-	
+
 	HBITMAP		m_ThumbCashedBitmap;
 	CSize		m_ThumbCashedSize;
 
@@ -1209,7 +1209,7 @@ private:
 	int			GetStreamCount(DWORD dwSelGroup);
 
 	DWORD_PTR			m_nMainFilterId;
-	
+
 public:
 	BOOL				CheckMainFilter(IBaseFilter* pBF);
 

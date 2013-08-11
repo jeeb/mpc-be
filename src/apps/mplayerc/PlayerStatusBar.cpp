@@ -453,7 +453,7 @@ void CPlayerStatusBar::OnPaint()
 		CPen penPlayed1(PS_SOLID,0,RGB(0,0,0));
 		memdc.SelectObject(&penPlayed1);
 		memdc.MoveTo(r.left, r.top +1);
-		memdc.LineTo(r.right, r.top +1);	
+		memdc.LineTo(r.right, r.top +1);
 		memdc.MoveTo(r.left, r.top +2);
 		memdc.LineTo(r.right, r.top +2);
 

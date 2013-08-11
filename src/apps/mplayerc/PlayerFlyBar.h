@@ -29,11 +29,11 @@ class CFlyBar : public CWnd
 public:
 	CFlyBar();
 	virtual ~CFlyBar();
-	
+
 	int iw;
 
 	void CalcButtonsRect();
-	
+
 	DECLARE_DYNAMIC(CFlyBar)
 
 private:

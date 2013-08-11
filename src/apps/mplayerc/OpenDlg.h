@@ -71,7 +71,7 @@ class COpenFileDlg : public CFileDialog
 
 private:
 	TCHAR* m_buff;
-	TCHAR* m_InitialDir; 
+	TCHAR* m_InitialDir;
 	CAtlArray<CString>& m_mask;
 
 public:

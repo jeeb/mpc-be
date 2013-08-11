@@ -145,7 +145,7 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 	m_location.SetWindowText(m_location_str);
 
 	BeginEnumFilters(m_pFG, pEF, pBF) {
-		
+
 		if (CComQIPtr<IPropertyBag> pPB = pBF) {
 			if (!((CMainFrame*)AfxGetMainWnd())->CheckMainFilter(pBF)) {
 				continue;
@@ -240,8 +240,8 @@ void CPPageFileInfoClip::OnSize(UINT nType, int cx, int cy)
 	HDWP hDWP = ::BeginDeferWindowPos(1);
 	for (CWnd *pChild = GetWindow(GW_CHILD); pChild != NULL; pChild = pChild->GetWindow(GW_HWNDNEXT)) {
 		if (pChild != GetDlgItem(IDC_EDIT7) && pChild != GetDlgItem(IDC_DEFAULTICON)) {
-			pChild->GetWindowRect(&r); 
-			ScreenToClient(&r); 
+			pChild->GetWindowRect(&r);
+			ScreenToClient(&r);
 			r.right += dx;
 			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, 0, 0, r.Width(), r.Height(), SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
 		}

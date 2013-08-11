@@ -187,7 +187,7 @@ HICON LoadIcon(CString fn, bool fSmall)
 
 	SHFILEINFO sfi;
 	ZeroMemory(&sfi, sizeof(sfi));
-	
+
 	if (SUCCEEDED(SHGetFileInfo(buff, 0, &sfi, sizeof(sfi), (fSmall ? SHGFI_SMALLICON : SHGFI_LARGEICON) |SHGFI_ICON)) && sfi.hIcon) {
 		return sfi.hIcon;
 	}
@@ -2011,7 +2011,7 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 					ct = _T("application/x-bdmv-playlist");
 				} else if (ext == _T(".xspf")) {
 					ct = _T("application/xspf+xml");
-				}			
+				}
 			}
 
 			while (body.GetLength() < 256) {

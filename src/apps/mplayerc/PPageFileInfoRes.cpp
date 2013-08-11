@@ -180,14 +180,14 @@ void CPPageFileInfoRes::OnSize(UINT nType, int cx, int cy)
 	HDWP hDWP = ::BeginDeferWindowPos(1);
 	for (CWnd *pChild = GetWindow(GW_CHILD); pChild != NULL; pChild = pChild->GetWindow(GW_HWNDNEXT)) {
 		if (pChild->SendMessage(WM_GETDLGCODE) & DLGC_BUTTON) {
-			pChild->GetWindowRect(&r); 
-			ScreenToClient(&r); 
-			r.top += dy; 
-			r.bottom += dy; 
+			pChild->GetWindowRect(&r);
+			ScreenToClient(&r);
+			r.top += dy;
+			r.bottom += dy;
 			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, r.left, r.top, 0, 0, SWP_NOACTIVATE|SWP_NOSIZE|SWP_NOZORDER);
 		} else if (pChild != GetDlgItem(IDC_LIST1) && pChild != GetDlgItem(IDC_DEFAULTICON)) {
-			pChild->GetWindowRect(&r); 
-			ScreenToClient(&r); 
+			pChild->GetWindowRect(&r);
+			ScreenToClient(&r);
 			r.right += dx;
 			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, 0, 0, r.Width(), r.Height(), SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
 		}

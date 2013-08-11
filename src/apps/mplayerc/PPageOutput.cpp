@@ -573,13 +573,13 @@ void CPPageOutput::OnAudioRenderPropClick()
 					if (SUCCEEDED(hr)) {
 						// Get the filter's name and IUnknown pointer.
 						FILTER_INFO FilterInfo;
-						hr = pBF->QueryFilterInfo(&FilterInfo); 
+						hr = pBF->QueryFilterInfo(&FilterInfo);
 						if (SUCCEEDED(hr)) {
 							IUnknown *pFilterUnk;
 							hr = pBF->QueryInterface(IID_IUnknown, (void **)&pFilterUnk);
 							if (SUCCEEDED(hr)) {
 
-								// Show the page. 
+								// Show the page.
 								CAUUID caGUID;
 								pProp->GetPages(&caGUID);
 								pProp->Release();
@@ -589,7 +589,7 @@ void CPPageOutput::OnAudioRenderPropClick()
 									0, 0,					// Reserved
 									FilterInfo.achName,		// Caption for the dialog box
 									1,						// Number of objects (just the filter)
-									&pFilterUnk,			// Array of object pointers. 
+									&pFilterUnk,			// Array of object pointers.
 									caGUID.cElems,			// Number of property pages
 									caGUID.pElems,			// Array of property page CLSIDs
 									0,						// Locale identifier

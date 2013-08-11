@@ -207,7 +207,7 @@ typedef struct {
 	int appcmd;
 	int remcmd;
 	int repcnt;
-}	AccelTbl; 
+}	AccelTbl;
 
 #pragma pack(pop)
 

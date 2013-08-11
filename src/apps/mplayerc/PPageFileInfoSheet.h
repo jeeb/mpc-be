@@ -37,7 +37,7 @@ class CMPCPropertySheet: public CPropertySheet
 
 public:
 	CMPCPropertySheet(LPCTSTR pszCaption, CWnd* pParentWnd = NULL, UINT iSelectPage = 0);
-	
+
 	template <class T>
 	void AddPage(T* pPage) {
 		CPropertySheet::AddPage(pPage);
