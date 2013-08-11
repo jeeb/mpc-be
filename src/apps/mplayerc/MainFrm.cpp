@@ -4577,8 +4577,16 @@ void CMainFrame::OnStreamSub(UINT nID)
 		CComQIPtr<IAMStreamSelect> pSSs = FindSourceSelectableFilter();
 		if (pSSs && !AfxGetAppSettings().fDisableInternalSubtitles) {
 			DWORD cStreamsS = 0;
+
 			if (SUCCEEDED(pSSs->Count(&cStreamsS)) && cStreamsS > 0) {
-				for (int i = 0; i < (int)cStreamsS; i++) {
+				BOOL bIsHaali = FALSE;
+				CComQIPtr<IBaseFilter> pBF = pSSs;
+				if (GetCLSID(pBF) == CLSID_HaaliSplitterAR || GetCLSID(pBF) == CLSID_HaaliSplitter) {
+					bIsHaali = TRUE;
+					cStreamsS--;
+				}
+
+				for (DWORD i = 0; i < cStreamsS; i++) {
 					AM_MEDIA_TYPE* pmt	= NULL;
 					DWORD dwFlags		= 0;
 					LCID lcid			= 0;
@@ -4589,7 +4597,7 @@ void CMainFrame::OnStreamSub(UINT nID)
 					}
 
 					if (dwGroup == 2) {
-						if (dwFlags&(AMSTREAMSELECTINFO_ENABLED|AMSTREAMSELECTINFO_EXCLUSIVE)) {
+						if (dwFlags & (AMSTREAMSELECTINFO_ENABLED|AMSTREAMSELECTINFO_EXCLUSIVE)) {
 							iSel = MixSS.GetCount();
 						}
 						ss.iFilter	= 1;
@@ -4606,16 +4614,6 @@ void CMainFrame::OnStreamSub(UINT nID)
 						CoTaskMemFree(pszName);
 					}
 				}
-			}
-		}
-
-		BOOL bIsHaali = FALSE;
-		CComQIPtr<IBaseFilter> pBF = pSSs;
-		if (GetCLSID(pBF) == CLSID_HaaliSplitterAR || GetCLSID(pBF) == CLSID_HaaliSplitter) {
-			bIsHaali = TRUE;
-
-			if (MixSS.GetCount()) {
-				MixSS.RemoveAt(MixSS.GetCount() - 1);
 			}
 		}
 
@@ -10215,7 +10213,15 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 		if (pSS) {
 			DWORD cStreams = 0;
 			if (!FAILED(pSS->Count(&cStreams))) {
-				for (int m = 0, j = cStreams; m < j; m++) {
+				
+				BOOL bIsHaali = FALSE;
+				CComQIPtr<IBaseFilter> pBF = pSS;
+				if (GetCLSID(pBF) == CLSID_HaaliSplitterAR || GetCLSID(pBF) == CLSID_HaaliSplitter) {
+					bIsHaali = TRUE;
+					cStreams--;
+				}
+
+				for (DWORD m = 0, j = cStreams; m < j; m++) {
 					DWORD dwFlags, dwGroup;
 					LCID lcid;
 					WCHAR* pszName = NULL;
@@ -14073,10 +14079,16 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 		if (pSSs && !s.fDisableInternalSubtitles) {
 
 			DWORD cStreams;
-			if (!FAILED(pSSs->Count(&cStreams))) {
-				DWORD dwPrevGroup = (DWORD)-1;
+			if (SUCCEEDED(pSSs->Count(&cStreams))) {
 
-				for (int i = 0, j = cStreams; i < j; i++) {
+				BOOL bIsHaali = FALSE;
+				CComQIPtr<IBaseFilter> pBF = pSSs;
+				if (GetCLSID(pBF) == CLSID_HaaliSplitterAR || GetCLSID(pBF) == CLSID_HaaliSplitter) {
+					bIsHaali = TRUE;
+					cStreams--;
+				}
+
+				for (DWORD i = 0, j = cStreams; i < j; i++) {
 					DWORD dwFlags, dwGroup;
 					LCID lcid;
 					WCHAR* pName = NULL;
@@ -14121,15 +14133,6 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 						}
 					}
 				}
-			}
-
-			BOOL bIsHaali = FALSE;
-			CComQIPtr<IBaseFilter> pBF = pSSs;
-			if (GetCLSID(pBF) == CLSID_HaaliSplitterAR || GetCLSID(pBF) == CLSID_HaaliSplitter) {
-				bIsHaali = TRUE;
-
-				subarray.RemoveAt(subarray.GetCount() - 1);
-				cntintsub--;
 			}
 		}
 
@@ -15793,9 +15796,15 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 		if (pSSS && !AfxGetAppSettings().fDisableInternalSubtitles) {
 			DWORD cStreams;
 			if (!FAILED(pSSS->Count(&cStreams))) {
-				DWORD dwPrevGroup = (DWORD)-1;
 
-				for (int i = 0, j = cStreams; i < j; i++) {
+				BOOL bIsHaali = FALSE;
+				CComQIPtr<IBaseFilter> pBF = pSSS;
+				if (GetCLSID(pBF) == CLSID_HaaliSplitterAR || GetCLSID(pBF) == CLSID_HaaliSplitter) {
+					bIsHaali = TRUE;
+					cStreams--;
+				}
+
+				for (DWORD i = 0, j = cStreams; i < j; i++) {
 					DWORD dwFlags, dwGroup;
 					LCID lcid;
 					WCHAR* pszName = NULL;
@@ -15816,7 +15825,6 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 						continue;
 					}
 
-					dwPrevGroup = dwGroup;
 					CString str;
 
 					if (lcname.Find(_T(" off")) >= 0) {
@@ -15850,16 +15858,6 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 					splcnt++;
 				}
 			}
-		}
-
-		BOOL bIsHaali = FALSE;
-		CComQIPtr<IBaseFilter> pBF = pSSS;
-		if (GetCLSID(pBF) == CLSID_HaaliSplitterAR || GetCLSID(pBF) == CLSID_HaaliSplitter) {
-			bIsHaali = TRUE;
-
-			intsub--;
-			splcnt--;
-			pSub->RemoveMenu(pSub->GetMenuItemCount() - 1, MF_BYPOSITION);
 		}
 
 		pos = m_pSubStreams.GetHeadPosition();
