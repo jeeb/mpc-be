@@ -74,6 +74,9 @@ void CPPageSubStyle::AskColor(int i)
 	dlg.m_cc.Flags |= CC_FULLOPEN|CC_RGBINIT;
 
 	if (dlg.DoModal() == IDOK) {
+		if (m_stss.colors[i] != dlg.m_cc.rgbResult) {
+			SetModified();
+		}
 		m_stss.colors[i] = dlg.m_cc.rgbResult;
 	}
 }
@@ -231,9 +234,7 @@ BOOL CPPageSubStyle::OnApply()
 			stss = m_stss;
 
 			if (CMainFrame* pFrame = dynamic_cast<CMainFrame*>(AfxGetMainWnd())) {
-				if (s.fUseDefaultSubtitlesStyle) {
-					pFrame->UpdateSubtitle();
-				}
+				pFrame->ReloadSubtitle();
 			}
 		}
 	}
