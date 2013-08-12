@@ -82,7 +82,7 @@ HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
 		}
 		CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)(ISubStream*)m_pSubStream;
 		pRTS->m_name = CString(GetPinName(pReceivePin)) + _T(" (embeded)");
-		pRTS->m_dstScreenSize = CSize(384, 288);
+		pRTS->m_dstScreenSize = DEFSCREENSIZE;
 		pRTS->CreateDefaultStyle(DEFAULT_CHARSET);
 	} else if (IsHdmvSub(&m_mt)
 			|| m_mt.majortype == MEDIATYPE_Subtitle
@@ -130,7 +130,7 @@ HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
 			CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)(ISubStream*)m_pSubStream;
 			pRTS->m_name = name;
 			pRTS->m_lcid = lcid;
-			pRTS->m_dstScreenSize = CSize(384, 288);
+			pRTS->m_dstScreenSize = DEFSCREENSIZE;
 			pRTS->CreateDefaultStyle(DEFAULT_CHARSET);
 
 			if (dwOffset > 0 && m_mt.cbFormat - dwOffset > 0) {

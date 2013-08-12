@@ -2343,7 +2343,7 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 	// but where no style is given, those defaults are taken - 384, 288
 	CSize dstScreenSize(m_dstScreenSize);
 	if (m_doOverrideStyle && m_pStyleOverride) {
-		dstScreenSize = CSize(384, 288);
+		dstScreenSize = DEFSCREENSIZE;
 	}
 	
 	sub->m_scalex = dstScreenSize.cx > 0 ? 1.0 * (stss.relativeTo == 1 ? m_vidrect.Width() : m_size.cx) / (dstScreenSize.cx*8) : 1.0;

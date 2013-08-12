@@ -2654,7 +2654,7 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
 		ChangeUnknownStylesToDefault();
 
 		if (m_dstScreenSize == CSize(0, 0)) {
-			m_dstScreenSize = CSize(384, 288);
+			m_dstScreenSize = DEFSCREENSIZE;
 		}
 
 		return true;

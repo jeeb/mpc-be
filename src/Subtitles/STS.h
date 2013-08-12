@@ -28,6 +28,8 @@
 #include "TextFile.h"
 #include "GFN.h"
 
+#define DEFSCREENSIZE CSize(384, 288)
+
 typedef enum {TIME, FRAME} tmode; // the meaning of STSEntry::start/end
 
 class STSStyle
