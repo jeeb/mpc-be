@@ -27,10 +27,6 @@
 #include "mem.h"
 #include "samplefmt.h"
 
-#define MAKE_ACCESSORS(str, name, type, field) \
-    type av_##name##_get_##field(const str *s) { return s->field; } \
-    void av_##name##_set_##field(str *s, type v) { s->field = v; }
-
 MAKE_ACCESSORS(AVFrame, frame, int64_t, best_effort_timestamp)
 MAKE_ACCESSORS(AVFrame, frame, int64_t, pkt_duration)
 MAKE_ACCESSORS(AVFrame, frame, int64_t, pkt_pos)

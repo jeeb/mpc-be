@@ -37,7 +37,6 @@
     <None Include="libavcodec\x86\h264_idct.asm" />
     <None Include="libavcodec\x86\h264_idct_10bit.asm" />
     <None Include="libavcodec\x86\h264_intrapred.asm" />
-    <None Include="libavcodec\x86\h264_intrapred_10bit.asm" />
     <None Include="libavcodec\x86\h264_qpel_10bit.asm" />
     <None Include="libavcodec\x86\h264_qpel_8bit.asm" />
     <None Include="libavcodec\x86\h264_weight.asm" />
@@ -73,6 +72,7 @@
     <None Include="libswscale\x86\scale.asm" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="compat\va_copy.h" />
     <ClInclude Include="compat\w32pthreads.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="libavcodec\aac.h" />
@@ -272,7 +272,6 @@
     <ClInclude Include="libavcodec\vc1acdata.h" />
     <ClInclude Include="libavcodec\vc1data.h" />
     <ClInclude Include="libavcodec\vc1dsp.h" />
-    <ClInclude Include="libavcodec\vdpau_internal.h" />
     <ClInclude Include="libavcodec\version.h" />
     <ClInclude Include="libavcodec\videodsp.h" />
     <ClInclude Include="libavcodec\vorbis.h" />

@@ -79,6 +79,9 @@
     <None Include="libavcodec\x86\h264_idct_10bit.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
+    <None Include="libavcodec\x86\h264_intrapred.asm">
+      <Filter>libavcodec\x86</Filter>
+    </None>
     <None Include="libavcodec\x86\h264_intrapred_10bit.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
@@ -184,6 +187,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
+    <ClInclude Include="compat\va_copy.h">
+      <Filter>compat</Filter>
+    </ClInclude>
     <ClInclude Include="compat\w32pthreads.h">
       <Filter>compat</Filter>
     </ClInclude>
@@ -809,9 +815,6 @@
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\vc1dsp.h">
-      <Filter>libavcodec</Filter>
-    </ClInclude>
-    <ClInclude Include="libavcodec\vdpau_internal.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\version.h">

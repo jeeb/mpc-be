@@ -747,7 +747,7 @@ static int get_buffer_internal(AVCodecContext *avctx, AVFrame *frame, int flags)
 #if FF_API_GET_BUFFER
 FF_DISABLE_DEPRECATION_WARNINGS
     /*
-     * Wrap an old get_buffer()-allocated buffer in an bunch of AVBuffers.
+     * Wrap an old get_buffer()-allocated buffer in a bunch of AVBuffers.
      * We wrap each plane in its own AVBuffer. Each of those has a reference to
      * a dummy AVBuffer as its private data, unreffing it on free.
      * When all the planes are freed, the dummy buffer's free callback calls
@@ -1029,10 +1029,6 @@ void avcodec_free_frame(AVFrame **frame)
 
     av_freep(frame);
 }
-
-#define MAKE_ACCESSORS(str, name, type, field) \
-    type av_##name##_get_##field(const str *s) { return s->field; } \
-    void av_##name##_set_##field(str *s, type v) { s->field = v; }
 
 MAKE_ACCESSORS(AVCodecContext, codec, AVRational, pkt_timebase)
 MAKE_ACCESSORS(AVCodecContext, codec, const AVCodecDescriptor *, codec_descriptor)
@@ -1723,7 +1719,7 @@ int attribute_align_arg avcodec_encode_audio(AVCodecContext *avctx,
         avctx->coded_frame->key_frame = !!(pkt.flags & AV_PKT_FLAG_KEY);
     }
     /* free any side data since we cannot return it */
-    ff_packet_free_side_data(&pkt);
+    av_packet_free_side_data(&pkt);
 
     if (frame && frame->extended_data != frame->data)
         av_freep(&frame->extended_data);
@@ -2012,7 +2008,7 @@ int attribute_align_arg avcodec_decode_video2(AVCodecContext *avctx, AVFrame *pi
 
         avctx->pkt = NULL;
         if (did_split) {
-            ff_packet_free_side_data(&tmp);
+            av_packet_free_side_data(&tmp);
             if(ret == tmp.size)
                 ret = avpkt->size;
         }
@@ -2188,7 +2184,7 @@ int attribute_align_arg avcodec_decode_audio4(AVCodecContext *avctx,
 
         avctx->pkt = NULL;
         if (did_split) {
-            ff_packet_free_side_data(&tmp);
+            av_packet_free_side_data(&tmp);
             if(ret == tmp.size)
                 ret = avpkt->size;
         }
@@ -2363,7 +2359,7 @@ int avcodec_decode_subtitle2(AVCodecContext *avctx, AVSubtitle *sub,
         }
 
         if (did_split) {
-            ff_packet_free_side_data(&tmp);
+            av_packet_free_side_data(&tmp);
             if(ret == tmp.size)
                 ret = avpkt->size;
         }
