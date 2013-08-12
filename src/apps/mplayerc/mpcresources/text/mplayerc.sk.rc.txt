@@ -412,7 +412,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 30		"Povoliť animáciu počas načítavanie do vyr. pamäti"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
+BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 5		"Písmo"
 6		"Písmo"
 8		"Umiestnenie"
@@ -440,6 +440,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 62		"SHAD"
 64		"Prepájať alfa-kanály"
 67		"Relatívne umiestnenie titulkov voči videu"
+69		"Reset"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18

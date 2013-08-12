@@ -412,7 +412,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 30		"Tillåt animering när buffrande"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
+BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 5		"Teckensnitt"
 6		"Teckensnitt"
 8		"Mellanrum"
@@ -440,6 +440,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 62		"SHAD"
 64		"Länka alfa kanaler"
 67		"Positionera undertexter relativt till video bilden"
+69		"Reset"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18

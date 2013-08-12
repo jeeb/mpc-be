@@ -412,7 +412,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 30		"Abilita animazioni durante il buffering"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
+BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 5		"Carattere"
 6		"Carattere"
 8		"Spaziatura"
@@ -440,6 +440,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 62		"SHAD"
 64		"Blocca canali alpha"
 67		"Posizione sottotitoli relativa al frame video"
+69		"Reset"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18

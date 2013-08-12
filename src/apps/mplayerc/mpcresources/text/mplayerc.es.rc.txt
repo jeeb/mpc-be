@@ -412,7 +412,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 30		"Permitir animación (uso mem. intermedia)"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
+BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 5		"Fuente"
 6		"Font"
 8		"Espaciado"
@@ -440,6 +440,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 62		"SHAD"
 64		"Vincular canales alpha"
 67		"Posición de los subtítulos relativa al tamaño del cuadro de video"
+69		"Reset"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18

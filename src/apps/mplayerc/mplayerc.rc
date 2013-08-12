@@ -728,6 +728,7 @@ BEGIN
     LTEXT           "0%",IDC_STATIC,190,81,20,8
     CONTROL         "Position subtitles relative to the video frame",IDC_CHECK_RELATIVETO,
                     "Button",BS_AUTO3STATE | WS_TABSTOP,119,53,170,8
+    PUSHBUTTON      "Reset",IDC_RESET,242,192,50,14
 END
 
 IDD_PPAGEINTERNALFILTERS DIALOGEX 0, 0, 296, 241

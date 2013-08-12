@@ -456,12 +456,12 @@ BOOL CPPageInternalFilters::OnInitDialog()
 
 	SendMessage (WM_NOTIFY, m_Tab.GetDlgCtrlID(), (LPARAM)&hdr);
 
-	SetClassLongPtr(GetDlgItem(IDC_BUTTON1)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
-	SetClassLongPtr(GetDlgItem(IDC_BUTTON2)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
-	SetClassLongPtr(GetDlgItem(IDC_BUTTON3)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
-	SetClassLongPtr(GetDlgItem(IDC_BUTTON4)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
-	SetClassLongPtr(GetDlgItem(IDC_BUTTON5)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
-	SetClassLongPtr(GetDlgItem(IDC_BUTTON6)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
+	SetHandCursor(m_hWnd, IDC_BUTTON1);
+	SetHandCursor(m_hWnd, IDC_BUTTON2);
+	SetHandCursor(m_hWnd, IDC_BUTTON3);
+	SetHandCursor(m_hWnd, IDC_BUTTON4);
+	SetHandCursor(m_hWnd, IDC_BUTTON5);
+	SetHandCursor(m_hWnd, IDC_BUTTON6);
 
 	UpdateData(FALSE);
 

@@ -412,7 +412,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 30		"Animatie toestaan tijdens bufferen"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
+BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 5		"Lettertype"
 6		"Lettertype"
 8		"Ruimte"
@@ -440,6 +440,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 69
 62		"SHAD"
 64		"Alpha channels verbinden"
 67		"Ondertiteling relatief aan beeld plaatsen"
+69		"Reset"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18

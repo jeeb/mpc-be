@@ -108,6 +108,7 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnBnClickedButton1();
+	afx_msg void OnBnClickedButton2();
 	afx_msg void OnStnClickedColorpri();
 	afx_msg void OnStnClickedColorsec();
 	afx_msg void OnStnClickedColoroutl();
@@ -115,4 +116,6 @@ protected:
 	afx_msg void OnBnClickedCheck1();
 	afx_msg void OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+
+	void Init();
 };

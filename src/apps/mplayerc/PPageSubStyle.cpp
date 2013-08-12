@@ -124,6 +124,7 @@ void CPPageSubStyle::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CPPageSubStyle, CPPageBase)
 	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedButton1)
+	ON_BN_CLICKED(IDC_RESET, OnBnClickedButton2)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_COLORPRI, OnCustomDrawBtns)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_COLORSEC, OnCustomDrawBtns)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_COLOROUTL, OnCustomDrawBtns)
@@ -142,8 +143,23 @@ BOOL CPPageSubStyle::OnInitDialog()
 {
 	__super::OnInitDialog();
 
+	if (!m_fUseDefaultStyle) {
+		GetDlgItem(IDC_RESET)->ShowWindow(SW_HIDE);
+	}
+
+	SetHandCursor(m_hWnd, IDC_BUTTON1);
+	SetHandCursor(m_hWnd, IDC_RESET);
 	SetHandCursor(m_hWnd, IDC_COMBO1);
 
+	Init();
+
+	CreateToolTip();
+
+	return TRUE;
+}
+
+void CPPageSubStyle::Init()
+{
 	m_font.SetWindowText(m_stss.fontName);
 	m_iCharset = -1;
 
@@ -195,10 +211,6 @@ BOOL CPPageSubStyle::OnInitDialog()
 	m_linkalphasliders = FALSE;
 
 	UpdateData(FALSE);
-
-	CreateToolTip();
-
-	return TRUE;
 }
 
 BOOL CPPageSubStyle::OnApply()
@@ -269,6 +281,14 @@ void CPPageSubStyle::OnBnClickedButton1()
 
 		SetModified();
 	}
+}
+
+void CPPageSubStyle::OnBnClickedButton2()
+{
+	m_stss.SetDefault();
+
+	Init();
+	SetModified();
 }
 
 void CPPageSubStyle::OnStnClickedColorpri()
