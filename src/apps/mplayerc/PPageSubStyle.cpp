@@ -224,13 +224,16 @@ BOOL CPPageSubStyle::OnApply()
 	}
 
 	if (m_fUseDefaultStyle) {
-		STSStyle& stss = AfxGetAppSettings().subdefstyle;
+		AppSettings& s = AfxGetAppSettings();
+		STSStyle& stss = s.subdefstyle;
 
 		if (!(stss == m_stss)) {
 			stss = m_stss;
 
 			if (CMainFrame* pFrame = dynamic_cast<CMainFrame*>(AfxGetMainWnd())) {
-				pFrame->UpdateSubtitle(false, true);
+				if (s.fUseDefaultSubtitlesStyle) {
+					pFrame->UpdateSubtitle();
+				}
 			}
 		}
 	}
