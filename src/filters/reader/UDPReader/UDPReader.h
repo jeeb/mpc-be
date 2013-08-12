@@ -49,7 +49,7 @@ private:
 	CString m_ip;
 	SOCKET m_socket;
 	sockaddr_in m_addr;
-	GUID m_subtype;
+	WSAEVENT m_WSAEvent[1];
 	__int64 m_pos, m_len;
 	CAtlList<packet_t*> m_packets;
 
@@ -66,9 +66,6 @@ public:
 	virtual ~CUDPStream();
 
 	bool Load(const WCHAR* fnw);
-	const GUID& GetSubType() {
-		return m_subtype;
-	}
 
 	HRESULT SetPointer(LONGLONG llPos);
 	HRESULT Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWORD pdwBytesRead);

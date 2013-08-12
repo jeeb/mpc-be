@@ -120,8 +120,8 @@ STDMETHODIMP CUDPReader::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYPE* pmt)
 	m_fn = pszFileName;
 
 	CMediaType mt;
-	mt.majortype = MEDIATYPE_Stream;
-	mt.subtype = MEDIASUBTYPE_MPEG2_TRANSPORT;
+	mt.majortype	= MEDIATYPE_Stream;
+	mt.subtype		= MEDIASUBTYPE_MPEG2_TRANSPORT;
 	m_mt = mt;
 
 	return S_OK;
@@ -149,6 +149,8 @@ CUDPStream::CUDPStream()
 {
 	m_port = 0;
 	m_socket = INVALID_SOCKET;
+
+	m_WSAEvent[0] = NULL;
 }
 
 CUDPStream::~CUDPStream()
@@ -158,6 +160,10 @@ CUDPStream::~CUDPStream()
 
 void CUDPStream::Clear()
 {
+	if (m_WSAEvent[0] != NULL) {
+		WSACloseEvent(m_WSAEvent[0]);
+	}
+
 	if (m_socket != INVALID_SOCKET) {
 		closesocket(m_socket);
 		m_socket = INVALID_SOCKET;
@@ -221,10 +227,9 @@ bool CUDPStream::Load(const WCHAR* fnw)
 	imr.imr_multiaddr.s_addr	= inet_addr(CStringA(m_ip));
 	imr.imr_interface.s_addr	= INADDR_ANY;
 
-	WSAEVENT WSAEvent[1] = {0};
 	if ((m_socket = socket(AF_INET, SOCK_DGRAM, 0)) != INVALID_SOCKET) {
-		WSAEvent[0] = WSACreateEvent();
-		WSAEventSelect(m_socket, WSAEvent[0], FD_READ);
+		m_WSAEvent[0] = WSACreateEvent();
+		WSAEventSelect(m_socket, m_WSAEvent[0], FD_READ);
 
 		DWORD dw = TRUE;
 		if (setsockopt(m_socket, SOL_SOCKET, SO_REUSEADDR, (const char*)&dw, sizeof(dw)) == SOCKET_ERROR) {
@@ -252,7 +257,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 
 		// set non-blocking mode
 		u_long param = 1;
-		ioctlsocket(m_socket, FIONBIO, &param);
+		int res = ioctlsocket(m_socket, FIONBIO, &param);
 	}
 
 	if (m_socket == INVALID_SOCKET) {
@@ -261,7 +266,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 
 	UINT timeout = 0;
 	while (timeout < 500) {
-		int res = WSAWaitForMultipleEvents(1, WSAEvent, FALSE, 100, FALSE);
+		DWORD res = WSAWaitForMultipleEvents(1, m_WSAEvent, FALSE, 100, FALSE);
 		if (res == WSA_WAIT_EVENT_0) {
 			int fromlen = sizeof(m_addr);
 			char buf[MAXBUFSIZE];
@@ -279,17 +284,9 @@ bool CUDPStream::Load(const WCHAR* fnw)
 		break;
 	}
 
-	if (WSAEvent[0] != NULL) {
-		WSACloseEvent(WSAEvent[0]);
-	}
-
 	if (timeout == 500) {
 		return false;
 	}
-
-	// set non-blocking mode
-	u_long param = 0;
-	ioctlsocket(m_socket, FIONBIO, &param);
 
 	CAMThread::Create();
 	if (FAILED(CAMThread::CallWorker(CMD_RUN))) {
@@ -405,9 +402,7 @@ DWORD CUDPStream::ThreadProc()
 
 #ifdef _DEBUG
 	FILE* dump = NULL;
-	//dump = _tfopen(_T("c:\\udp.ts"), _T("wb"));
-	FILE* log = NULL;
-	//log = _tfopen(_T("c:\\udp.txt"), _T("wt"));
+	//dump = _tfopen(_T("c:\\udp_dump.ts"), _T("wb"));
 #endif
 
 	for (;;) {
@@ -425,9 +420,6 @@ DWORD CUDPStream::ThreadProc()
 				if (dump) {
 					fclose(dump);
 				}
-				if (log) {
-					fclose(log);
-				}
 #endif
 				Reply(S_OK);
 				return 0;
@@ -440,26 +432,26 @@ DWORD CUDPStream::ThreadProc()
 
 					UINT timeout = 0;
 					while (!CheckRequest(NULL) && timeout < 1000) {
+						int len =  0;
 
-						int fromlen = sizeof(m_addr);
-						int len = recvfrom(m_socket, &buff[buffsize], MAXBUFSIZE, 0, (SOCKADDR*)&m_addr, &fromlen);
-						if (len <= 0) {
-							Sleep(50);
-							timeout += 50;
+						DWORD res = WSAWaitForMultipleEvents(1, m_WSAEvent, FALSE, 100, FALSE);
+						if (res == WSA_WAIT_EVENT_0) {
+							WSAResetEvent(m_WSAEvent[0]);
+							int fromlen = sizeof(m_addr);
+							len = recvfrom(m_socket, &buff[buffsize], MAXBUFSIZE, 0, (SOCKADDR*)&m_addr, &fromlen);
+							if (len <= 0) {
+								int err = WSAGetLastError();
+								if (err != WSAEWOULDBLOCK) {
+									timeout += 100;
+								}
+								continue;
+							}
+						} else {
+							timeout += 100;
 							continue;
 						}
 
 						timeout = 0;
-
-#ifdef _DEBUG
-						if (log) {
-							if (buffsize >= len && !memcmp(&buff[buffsize-len], &buff[buffsize], len)) {
-								DWORD pid = ((buff[buffsize+1]<<8)|buff[buffsize+2])&0x1fff;
-								DWORD counter = buff[buffsize+3]&0xf;
-								_ftprintf_s(log, _T("%04d %2d DUP\n"), pid, counter);
-							}
-						}
-#endif
 
 						buffsize += len;
 
@@ -468,26 +460,7 @@ DWORD CUDPStream::ThreadProc()
 							if (dump) {
 								fwrite(buff, buffsize, 1, dump);
 							}
-
-							if (log) {
-								static BYTE pid2counter[0x2000];
-								static bool init = false;
-								if (!init) {
-									memset(pid2counter, 0, sizeof(pid2counter));
-									init = true;
-								}
-
-								for (int i = 0; i < buffsize; i += 188) {
-									DWORD pid = ((buff[i+1]<<8)|buff[i+2])&0x1fff;
-									BYTE counter = buff[i+3]&0xf;
-									if (pid2counter[pid] != ((counter-1+16)&15)) {
-										_ftprintf_s(log, _T("%04x %2d -> %2d\n"), pid, pid2counter[pid], counter);
-									}
-									pid2counter[pid] = counter;
-								}
-							}
 #endif
-
 							Append((BYTE*)buff, buffsize);
 							buffsize = 0;
 						}
