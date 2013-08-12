@@ -2341,17 +2341,13 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 	// in CSimpleTextSubtitle::Open, we have m_dstScreenSize = CSize(384, 288)
 	// now, files containing embedded subtitles (and with styles) set m_dstScreenSize to a correct value
 	// but where no style is given, those defaults are taken - 384, 288
-	/*
+	CSize dstScreenSize(m_dstScreenSize);
 	if (m_doOverrideStyle && m_pStyleOverride) {
-		// so mind the default values, stated here to increase comprehension
-		sub->m_scalex = m_size.cx / (384 * 8);
-		sub->m_scaley = m_size.cy / (288 * 8);
-	} else 
-	*/
-	{
-		sub->m_scalex = m_dstScreenSize.cx > 0 ? 1.0 * (stss.relativeTo == 1 ? m_vidrect.Width() : m_size.cx) / (m_dstScreenSize.cx*8) : 1.0;
-		sub->m_scaley = m_dstScreenSize.cy > 0 ? 1.0 * (stss.relativeTo == 1 ? m_vidrect.Height() : m_size.cy) / (m_dstScreenSize.cy*8) : 1.0;
+		dstScreenSize = CSize(384, 288);
 	}
+	
+	sub->m_scalex = dstScreenSize.cx > 0 ? 1.0 * (stss.relativeTo == 1 ? m_vidrect.Width() : m_size.cx) / (dstScreenSize.cx*8) : 1.0;
+	sub->m_scaley = dstScreenSize.cy > 0 ? 1.0 * (stss.relativeTo == 1 ? m_vidrect.Height() : m_size.cy) / (dstScreenSize.cy*8) : 1.0;
 
 	m_animStart = m_animEnd = 0;
 	m_animAccel = 1;
