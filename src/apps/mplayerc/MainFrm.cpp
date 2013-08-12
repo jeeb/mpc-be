@@ -16140,20 +16140,18 @@ IBaseFilter* CMainFrame::FindSourceSelectableFilter()
 {
 	IBaseFilter* pSF = NULL;
 
-	// splitters for video files (mpeg files with only audio track is very rare)
 	pSF = FindFilter(__uuidof(CMpegSplitterFilter), pGB);
 	if (!pSF) {
 		pSF = FindFilter(__uuidof(CMpegSourceFilter), pGB);
 	}
-	// universal splitters
 	if (!pSF) {
 		pSF = FindFilter(CLSID_OggSplitter, pGB);
 	}
 	if (!pSF) {
-		pSF = FindFilter(L"{171252A0-8820-4AFE-9DF8-5C92B2D66B04}", pGB); // LAV Splitter
+		pSF = FindFilter(CLSID_LAVSplitter, pGB);
 	}
 	if (!pSF) {
-		pSF = FindFilter(L"{B98D13E7-55DB-4385-A33D-09FD1BA26338}", pGB); // LAV Splitter Source
+		pSF = FindFilter(CLSID_LAVSource, pGB);
 	}
 	if (!pSF) {
 		pSF = FindFilter(CLSID_HaaliSplitterAR, pGB);
