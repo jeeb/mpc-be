@@ -142,6 +142,7 @@ SRCS_C = \
 	libavcodec/eac3enc.c \
 	libavcodec/eac3dec.c \
 	libavcodec/error_resilience.c \
+	libavcodec/exif.c \
 	libavcodec/faandct.c \
 	libavcodec/faanidct.c \
 	libavcodec/fft.c \
@@ -290,6 +291,9 @@ SRCS_C = \
 	libavcodec/svq1dec.c \
 	libavcodec/svq3.c \
 	libavcodec/synth_filter.c \
+	libavcodec/tiff.c \
+	libavcodec/tiff_common.c \
+	libavcodec/tiff_data.c \
 	libavcodec/truespeech.c \
 	libavcodec/tscc.c \
 	libavcodec/tscc2.c \
