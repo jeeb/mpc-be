@@ -26,9 +26,9 @@
 #include "../../../DSUtil/DSUtil.h"
 #include <zlib/zlib.h>
 
-#define DOCTYPE _T("matroska")
-#define DOCTYPE_WEBM _T("webm")
-#define DOCTYPEVERSION 2
+#define DOCTYPE			L"matroska"
+#define DOCTYPE_WEBM	L"webm"
+#define DOCTYPEVERSION	2
 
 using namespace MatroskaReader;
 
@@ -1629,12 +1629,14 @@ bool CMatroskaNode::NextBlock()
 	return false;
 }
 
+#define MAXFAILEDCOUNT (1024*1024*10)
 bool CMatroskaNode::Resync()
 {
 	if (m_pParent->m_id == MATROSKA_ID_SEGMENT) {
 		SeekTo(m_filepos);
 
-		for (BYTE b = 0; S_OK == Read(b); b = 0) {
+		int failedCount = 0;
+		for (BYTE b = 0; S_OK == Read(b) && failedCount < MAXFAILEDCOUNT; b = 0, failedCount++) {
 			if ((b&0xf0) != 0x10) {
 				continue;
 			}
