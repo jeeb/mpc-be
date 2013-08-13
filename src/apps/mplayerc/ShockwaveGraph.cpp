@@ -25,9 +25,8 @@
 #include "ShockwaveGraph.h"
 #include <math.h>
 
-IMPLEMENT_DYNCREATE(CShockwaveFlash, CWnd)
-
 using namespace DSObjects;
+
 
 CShockwaveGraph::CShockwaveGraph(HWND hParent, HRESULT& hr)
 	: m_fs(State_Stopped)
@@ -175,10 +174,10 @@ STDMETHODIMP CShockwaveGraph::GetCurrentPosition(LONGLONG* pCurrent)
 	return S_OK;
 }
 
-STDMETHODIMP CShockwaveGraph::SetPositions(LONGLONG* pCurrent, DWORD dwCurrentFlags, LONGLONG* pStop, DWORD dwStopFlags)
+STDMETHODIMP CShockwaveGraph::SetPositions(const LONGLONG* pCurrent, DWORD dwCurrentFlags, LONGLONG* pStop, DWORD dwStopFlags)
 {
 	if (dwCurrentFlags&AM_SEEKING_AbsolutePositioning) {
-		m_wndDestFrame.put_FrameNum(*pCurrent);
+		m_wndDestFrame.put_FrameNum((long)*pCurrent);
 
 		if (m_fs == State_Running && !m_wndDestFrame.IsPlaying()) {
 			m_wndDestFrame.Play();

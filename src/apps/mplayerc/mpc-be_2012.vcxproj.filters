@@ -36,6 +36,9 @@
     <ClCompile Include="ComPropertyPage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CShockwaveFlash.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="DeinterlacerFilter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -372,6 +375,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ComPropertyPage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CShockwaveFlash.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DeinterlacerFilter.h">
