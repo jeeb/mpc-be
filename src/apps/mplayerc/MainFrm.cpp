@@ -3065,10 +3065,10 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 								{
 									m_iDVDTitle = DvdPos->lTitle;
 								}
-							} else if (s.fStartMainTitle){
+							} else if (s.fStartMainTitle && s.fNormalStartDVD) {
 								pDVDC->ShowMenu(DVD_MENU_Title, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 							}
-							AppSettings& s = AfxGetAppSettings();
+							s.fNormalStartDVD = true;
 							if (s.fRememberZoomLevel && !m_fFullScreen && !s.IsD3DFullscreen()) { // Hack to the normal initial zoom for DVD + DXVA ...
 								ZoomVideoWindow();
 							}
@@ -11008,6 +11008,8 @@ void CMainFrame::PlayFavoriteDVD(CString fav)
 	CComPtr<IDvdState> pDvdState;
 	HRESULT hr = OleLoadFromStream((IStream*)&stream, IID_IDvdState, (void**)&pDvdState);
 	UNREFERENCED_PARAMETER(hr);
+
+	AfxGetAppSettings().fNormalStartDVD = false;
 
 	CAutoPtr<OpenDVDData> p(DNew OpenDVDData());
 	if (p) {

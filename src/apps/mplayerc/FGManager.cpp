@@ -41,6 +41,8 @@
 #include "MediaFormats.h"
 #include <IPinHook.h>
 
+#define DBOXVersion 0
+
 //
 // CFGManager
 //
@@ -1381,6 +1383,49 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 
 			BOOL bInfPinTeeConnected = FALSE;
 			if (s.fDualAudioOutput) {
+#if DBOXVersion
+				// for D-Box users :)
+				if (clsid == CLSID_LAVSplitter || clsid == CLSID_LAVSource) {
+					BeginEnumMediaTypes(pPin, pEM, pmt) {
+						// Find the Audio out pin
+						if (pmt->majortype == MEDIATYPE_Audio && pPinIn == NULL) {
+							// Add infinite Pin Tee Filter
+							CComPtr<IBaseFilter> pInfPinTee;
+							pInfPinTee.CoCreateInstance(CLSID_InfTee);
+							AddFilter(pInfPinTee, L"Infinite Pin Tee");
+
+							hr = ConnectFilterDirect(pPin, pInfPinTee, NULL);
+							if (SUCCEEDED(hr)) {
+								bInfPinTeeConnected = TRUE;
+								// remove AudioSwitcher from filter list ...
+								POSITION pos = m_transform.GetHeadPosition();
+								while (pos) {
+									CFGFilter* pFGF = m_transform.GetAt(pos);
+									if (pFGF->GetCLSID() == __uuidof(CAudioSwitcherFilter)) {
+										m_transform.MoveToTail(pos);
+										delete m_transform.RemoveTail();
+										break;
+									}
+									m_transform.GetNext(pos);
+								}
+
+								for (int ar = 0; ar < 2; ar++) {
+									IPin *infTeeFilterOutPin = GetFirstDisconnectedPin(pInfPinTee, PINDIR_OUTPUT);
+									hr = Connect(infTeeFilterOutPin, pPinIn);
+									if(SUCCEEDED(hr)){
+										// do something
+									}
+								}
+							}
+
+							if (bInfPinTeeConnected) {
+								break;
+							}
+						}
+					}
+					EndEnumMediaTypes(pmt)
+				} else
+#endif
 				if (CComQIPtr<IAudioSwitcherFilter> pASF = pBF) {
 					BeginEnumMediaTypes(pPin, pEM, pmt) {
 						// Find the Audio out pin
@@ -1394,7 +1439,7 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 							if (SUCCEEDED(hr)) {
 								bInfPinTeeConnected = TRUE;
 								CString SelAudioRenderer = s.SelectedAudioRenderer();
-								for (int audioRendererId = 0; audioRendererId < 2; audioRendererId++) {
+								for (int ar = 0; ar < 2; ar++) {
 									IPin *infTeeFilterOutPin = GetFirstDisconnectedPin(pInfPinTee, PINDIR_OUTPUT);
 
 									BOOL bIsConnected = FALSE;

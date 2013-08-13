@@ -441,6 +441,7 @@ public:
 	ULONG				lDVDChapter;
 	DVD_HMSF_TIMECODE	DVDPosition;
 	bool				fStartMainTitle;
+	bool				fNormalStartDVD;
 	bool				fmadVRchange;
 
 	CSize sizeFixedWindow;
