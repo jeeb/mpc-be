@@ -620,6 +620,9 @@
     <ClInclude Include="MediaInfo\Video\File_Canopus.h">
       <Filter>Header Files\Video</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Multiple\File_DashMpd.h">
+      <Filter>Header Files\Multiple</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
@@ -1182,6 +1185,9 @@
     </ClCompile>
     <ClCompile Include="MediaInfo\Video\File_Canopus.cpp">
       <Filter>Source Files\Video</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Multiple\File_DashMpd.cpp">
+      <Filter>Source Files\Multiple</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
