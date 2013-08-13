@@ -139,8 +139,10 @@
     <ClInclude Include="libavcodec\eac3enc.h" />
     <ClInclude Include="libavcodec\eac3_data.h" />
     <ClInclude Include="libavcodec\error_resilience.h" />
+    <ClInclude Include="libavcodec\exif.h" />
     <ClInclude Include="libavcodec\faandct.h" />
     <ClInclude Include="libavcodec\faanidct.h" />
+    <ClInclude Include="libavcodec\faxcompr.h" />
     <ClInclude Include="libavcodec\fft-internal.h" />
     <ClInclude Include="libavcodec\fft.h" />
     <ClInclude Include="libavcodec\fft_table.h" />
@@ -184,6 +186,7 @@
     <ClInclude Include="libavcodec\libopus.h" />
     <ClInclude Include="libavcodec\lpc.h" />
     <ClInclude Include="libavcodec\lsp.h" />
+    <ClInclude Include="libavcodec\lzw.h" />
     <ClInclude Include="libavcodec\mathops.h" />
     <ClInclude Include="libavcodec\mjpeg.h" />
     <ClInclude Include="libavcodec\mjpegdec.h" />
@@ -263,6 +266,9 @@
     <ClInclude Include="libavcodec\synth_filter.h" />
     <ClInclude Include="libavcodec\tableprint.h" />
     <ClInclude Include="libavcodec\thread.h" />
+    <ClInclude Include="libavcodec\tiff.h" />
+    <ClInclude Include="libavcodec\tiff_common.h" />
+    <ClInclude Include="libavcodec\tiff_data.h" />
     <ClInclude Include="libavcodec\truespeech_data.h" />
     <ClInclude Include="libavcodec\tscc2data.h" />
     <ClInclude Include="libavcodec\ttadata.h" />
@@ -453,6 +459,7 @@
     <ClCompile Include="libavcodec\eac3enc.c" />
     <ClCompile Include="libavcodec\eac3_data.c" />
     <ClCompile Include="libavcodec\error_resilience.c" />
+    <ClCompile Include="libavcodec\exif.c" />
     <ClCompile Include="libavcodec\faandct.c" />
     <ClCompile Include="libavcodec\faanidct.c" />
     <ClCompile Include="libavcodec\fft.c" />
@@ -617,6 +624,9 @@
     <ClCompile Include="libavcodec\svq1dec.c" />
     <ClCompile Include="libavcodec\svq3.c" />
     <ClCompile Include="libavcodec\synth_filter.c" />
+    <ClCompile Include="libavcodec\tiff.c" />
+    <ClCompile Include="libavcodec\tiff_common.c" />
+    <ClCompile Include="libavcodec\tiff_data.c" />
     <ClCompile Include="libavcodec\truespeech.c" />
     <ClCompile Include="libavcodec\tscc.c" />
     <ClCompile Include="libavcodec\tscc2.c" />
