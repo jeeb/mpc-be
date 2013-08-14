@@ -435,23 +435,42 @@ HWND g_hWnd = NULL;
 
 bool CMPlayerCApp::StoreSettingsToIni()
 {
-	CString ini = GetIniPath();
-	/*
-		FILE* f;
-		if (!(f = _tfopen(ini, _T("r+"))) && !(f = _tfopen(ini, _T("w"))))
-			return StoreSettingsToRegistry();
-		fclose(f);
-	*/
 	free((void*)m_pszRegistryKey);
 	m_pszRegistryKey = NULL;
 	free((void*)m_pszProfileName);
-	m_pszProfileName = _tcsdup(ini);
+	m_pszProfileName = _tcsdup(GetIniPath());
+
+	// Validate .ini file
+	if (::PathFileExists(m_pszProfileName)) {
+		FILE* fp = _tfopen(m_pszProfileName, _T("r, ccs=UNICODE"));
+		if (fp) {
+			CStdioFile cf(fp);
+			CString str;
+			BOOL bIsValid = FALSE;
+			while (cf.ReadString(str)) {
+				str.Trim();
+				if (str.IsEmpty()) {
+					continue;
+				}
+				if (str.Find(L";") >= 0 || (str.Find(L"[") >= 0 && str.Find(L"]") > 0)) {
+					bIsValid = TRUE;
+					break;
+				}
+				break;
+			}
+
+			fclose(fp);
+			if (!bIsValid) {
+				::DeleteFile(m_pszProfileName);
+			}
+		}
+	}
 
 	// We can only use UTF16-LE for unicode ini files in windows. UTF8/UTF16-BE do not work.
 	// So to ensure we have correct encoding for ini files, create a file with right BOM first,
 	// then add some comments in first line to make sure it's not empty.
 	if (!::PathFileExists(m_pszProfileName)) { // don't overwrite existing ini file
-		LPTSTR pszComments = _T("; MPC-BE");
+		LPTSTR pszComments = L"; MPC-BE";
 		WORD wBOM = 0xFEFF; // UTF16-LE BOM (FFFE)
 		DWORD nBytes;
 
