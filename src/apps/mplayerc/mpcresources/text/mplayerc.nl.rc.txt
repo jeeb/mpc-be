@@ -262,7 +262,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
-6		"Gebruik """
+6		"Gebruik ""Dark"" thema (standaard)"
 7		"Helderheid :"
 9		"Standaard"
 10		"B"
@@ -403,7 +403,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 32
 18		"Texture instellingen (vereist heropening van de video)"
 19		"Aantal beeldplaatjes in buffer:"
 22		"Maximale texture resolutie:"
-23		"Ondertiteling voor DirectShow is mogelijk bij ""VMR-7 (renderless)""VMR-9 (renderless)""EVR custom presenter""EVR Sync""Haali Renderer"" of ""madVR"". VMR-7 vereist Windows XP, VMR-9 vereist DirectX 9 en beide vereisen een grafische kaart met hardwareversnelling."
+23		"Ondertiteling voor DirectShow is mogelijk bij “VMR-7 (renderless)”, “VMR-9 (renderless)”, “EVR custom presenter”, “EVR Sync”, “Haali Renderer” of “madVR”. VMR-7 vereist Windows XP, VMR-9 vereist DirectX 9 en beide vereisen een grafische kaart met hardwareversnelling."
 24		"Informatie"
 25		"Als u de ondertitelingspositie aanpast en ergens in de instellingen van uw grafische kaart full-screen antialiasing aanzet, zal de ondertiteling er niet beter uitzien, maar de CPU wordt wel zwaar belast."
 27		"Waarschuwing"
