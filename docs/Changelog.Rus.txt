@@ -35,7 +35,7 @@
 	* WVSplitter - игнорируем открытие live streaming потоков(без окончательной длины);
 	* Реорганизация кода UDPReader, что теперь позволяет смотреть IPTV (udp multicast);
 	* UDPReader - перевел на использование non-blocked(асинхронного) режима работы;
-	* MediaInfo 0.7.64+ svn rev.5879;
+	* MediaInfo 0.7.64+ svn rev.5885;
 	* Little-CMS 2.5 git-1d2643cb;
 	* ffmpeg 2.0 git-1057390d;
 	* libwebp 0.3.1 git-e081f2f3;

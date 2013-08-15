@@ -342,7 +342,7 @@ size_t MediaInfo_Internal::Open(const String &File_Name_)
                     return 1;
 
                 //Nothing interesting
-                delete Info; Info=NULL;
+                Close();
             }
         }
     #endif //MEDIAINFO_IBI_YES
@@ -519,6 +519,18 @@ void MediaInfo_Internal::Entry()
                         Test.Extension_Set(__T("ttml"));
                         if (File::Exists(Test))
                             Dxw+=" <clip file=\""+Test.Name_Get().To_UTF8()+".ttml\" />\r\n";
+                    }
+                    if (FileExtension!=__T("ssa"))
+                    {
+                        Test.Extension_Set(__T("ssa"));
+                        if (File::Exists(Test))
+                            Dxw+=" <clip file=\""+Test.Name_Get().To_UTF8()+".ssa\" />\r\n";
+                    }
+                    if (FileExtension!=__T("ass"))
+                    {
+                        Test.Extension_Set(__T("ass"));
+                        if (File::Exists(Test))
+                            Dxw+=" <clip file=\""+Test.Name_Get().To_UTF8()+".ass\" />\r\n";
                     }
 
                     Ztring Name=Test.Name_Get();
