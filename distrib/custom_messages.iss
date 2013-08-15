@@ -94,8 +94,8 @@ kr.WelcomeLabel2=이 설치프로그램은 [name] 를(을) 당신의 컴퓨터�
 kr.WinVersionTooLowError=[name] 는(은) Windows XP Service Pack 3  또는 그 이상의 버전에서만 설치할 수 있습니다.
 
 ;Dutch
-nl.WelcomeLabel2=This will install [name] on your computer.%n%nIt is recommended that you close all other applications before continuing.
-nl.WinVersionTooLowError=[name] requires Windows XP Service Pack 3 or newer to run.
+nl.WelcomeLabel2=Dit programma zal [name] op uw computer installeren.%n%nHet wordt aanbevolen dat u alle andere toepassingen sluit voordat u verder gaat.
+nl.WinVersionTooLowError=[name] vereist Windows XP Service Pack 3 of hoger om uit te voeren.
 
 ;Polish
 pl.WelcomeLabel2=Ten instalator zainstaluje [name] na Twoim komputerze.%n%nZaleca się zamknięcie wszystkich innych aplikacji przed kontynuowaniem.
@@ -110,8 +110,8 @@ ru.WelcomeLabel2=Программа установит [name] на ваш ком
 ru.WinVersionTooLowError=[name] Эта программа требует Windows XP Service Pack 3 или выше.
 
 ;Chinese Simplified
-sc.WelcomeLabel2=This will install [name] on your computer.%n%nIt is recommended that you close all other applications before continuing.
-sc.WinVersionTooLowError=[name] requires Windows XP Service Pack 3 or newer to run.
+sc.WelcomeLabel2=这将会安装 [name] 到你的系统中。%n%n建议您关闭所有其它应用程序然後再继续。
+sc.WinVersionTooLowError=运行 [name] 需要 Windows XP Service Pack 3 或更高的版本。
 
 ;Swedish
 sv.WelcomeLabel2=Detta kommer att installera [name] på din dator.%n%nDet rekommenderas att du stänger alla andra program innan du fortsätter.
@@ -122,7 +122,7 @@ sk.WelcomeLabel2=This will install [name] on your computer.%n%nIt is recommended
 sk.WinVersionTooLowError=[name] requires Windows XP Service Pack 3 or newer to run.
 
 ;Chinese Traditional
-tc.WelcomeLabel2=這將會安裝 [name] 在你的電腦中。%n%n建議您關閉所有其它應用程序然後再繼續。
+tc.WelcomeLabel2=這將會安裝 [name] 在你的電腦中。%n%n建議您關閉所有其它應用程式然後再繼續。
 tc.WinVersionTooLowError=執行 [name] 需要 Windows XP Service Pack 3 或更新的版本。
 
 ;Turkish
@@ -759,27 +759,27 @@ nl.msg_simd_sse=Deze versie van MPC-BE heeft een processor nodig die SSE onderst
 nl.msg_simd_sse2=Deze versie van MPC-BE heeft een processor nodig die SSE2 ondersteunt.%n%nJouw processor ondersteund dit niet.
 #endif
 nl.tsk_AllUsers=Voor alle gebruikers
-nl.tsk_CurrentUser=Allen voor de huidige gebruiker
+nl.tsk_CurrentUser=Alleen voor de huidige gebruiker
 nl.tsk_Other=Andere taken:
 nl.tsk_ResetSettings=Instellingen resetten
 nl.types_DefaultInstallation=Standaard installatie
 nl.types_CustomInstallation=Aangepaste installatie
 nl.ViewChangelog=Bekijk Wijzigingsoverzicht
-nl.AssociationFormatsAV=Configuring associations with video and audio files:
-nl.AssociationFormats=Association with video and audio files
-nl.AssociationVideo=Association with video files
-nl.AssociationAudio=Association with audio files
-nl.AssociationPlaylist=Association with playlists
-nl.AutoPlayType=Auto play:
-nl.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+nl.AssociationFormatsAV=Bestandsassociaties met video en audio bestanden aanpassen:
+nl.AssociationFormats=Associatie met video en audio bestanden
+nl.AssociationVideo=Associatie met video bestanden
+nl.AssociationAudio=Associatie met audio bestanden
+nl.AssociationPlaylist=Associatie met afspeellijsten
+nl.AutoPlayType=Automatisch afspelen:
+nl.AssociationMPCPlayCDAudioOnArrivalF=Audio CD Afspelen
 nl.AssociationMPCPlayCDAudioS=Audio CD
-nl.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
-nl.AssociationMPCPlayDVDMovieS=DVD Movie
-nl.AssociationMPCPlayMusicFilesF=Play Music
-nl.AssociationMPCPlayMusicFilesS=Music Files
-nl.AssociationMPCPlayVideoFilesF=Play Video
-nl.AssociationMPCPlayVideoFilesS=Video Files
-nl.PinToTaskBar=Pin to TaskBar
+nl.AssociationMPCPlayDVDMovieArrivalF=DVD Film Afspelen
+nl.AssociationMPCPlayDVDMovieS=DVD Film
+nl.AssociationMPCPlayMusicFilesF=Muziek Afspelen
+nl.AssociationMPCPlayMusicFilesS=Muziek Bestanden
+nl.AssociationMPCPlayVideoFilesF=Video Afspelen
+nl.AssociationMPCPlayVideoFilesS=Video Bestanden
+nl.PinToTaskBar=Aan de taakbalk vastmaken
 
 
 ;Polish
@@ -899,7 +899,7 @@ sc.langid=00002052
 sc.langcode=sc
 sc.comp_mpciconlib=图标库
 sc.comp_mpcresources=翻译
-sc.comp_mpcbeshellext=Install the shell extension
+sc.comp_mpcbeshellext=安装 shell extension
 sc.msg_DeleteSettings=是否同时删除 MPC-BE 设置?%n%n如果您打算再次安装 MPC-BE 则无需删除。
 sc.msg_NoD3DX9DLL_found=还没安装最新版本的 DirectX 运行库!%n%n不论您所使用的作业系统请下载及更新至最新版本的 DirectX 运行库 ({#DIRECTX_SDK_DATE})。
 sc.msg_SetupIsRunningWarning=MPC-BE 安装程序已在运行中！
@@ -915,21 +915,21 @@ sc.tsk_ResetSettings=重置设置
 sc.types_DefaultInstallation=默认安装
 sc.types_CustomInstallation=自定义安装
 sc.ViewChangelog=查看更新日志
-sc.AssociationFormatsAV=Configuring associations with video and audio files:
-sc.AssociationFormats=Association with video and audio files
-sc.AssociationVideo=Association with video files
-sc.AssociationAudio=Association with audio files
-sc.AssociationPlaylist=Association with playlists
-sc.AutoPlayType=Auto play:
-sc.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
-sc.AssociationMPCPlayCDAudioS=Audio CD
-sc.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
-sc.AssociationMPCPlayDVDMovieS=DVD Movie
-sc.AssociationMPCPlayMusicFilesF=Play Music
-sc.AssociationMPCPlayMusicFilesS=Music Files
-sc.AssociationMPCPlayVideoFilesF=Play Video
-sc.AssociationMPCPlayVideoFilesS=Video Files
-sc.PinToTaskBar=Pin to TaskBar
+sc.AssociationFormatsAV=视频及音频文件关联配置:
+sc.AssociationFormats=关联视频及音频文件
+sc.AssociationVideo=关联视频文件
+sc.AssociationAudio=关联音频文件
+sc.AssociationPlaylist=关联播放列表
+sc.AutoPlayType=自动播放:
+sc.AssociationMPCPlayCDAudioOnArrivalF=播放音频 CD
+sc.AssociationMPCPlayCDAudioS=音频 CD
+sc.AssociationMPCPlayDVDMovieArrivalF=播放 DVD 影片
+sc.AssociationMPCPlayDVDMovieS=DVD 影片
+sc.AssociationMPCPlayMusicFilesF=播放音乐
+sc.AssociationMPCPlayMusicFilesS=音乐文件
+sc.AssociationMPCPlayVideoFilesF=播放视频
+sc.AssociationMPCPlayVideoFilesS=视频文件
+sc.PinToTaskBar=锁定到任务栏
 
 
 ;Swedish
@@ -1013,14 +1013,14 @@ tc.langid=00003076
 tc.langcode=tc
 tc.comp_mpciconlib=圖示庫
 tc.comp_mpcresources=翻譯
-tc.comp_mpcbeshellext=Install the shell extension
+tc.comp_mpcbeshellext=安裝 shell extension
 tc.msg_DeleteSettings=您是否也要刪除 MPC-BE 設定？%n%n如果您打算再次安裝 MPC-BE 則無需刪除。
 tc.msg_NoD3DX9DLL_found=未安裝最新版本的 DirectX Runtime！%n%n不論您使用的作業系統為何，請下載並更新至最新版本的 DirectX Runtime ({#DIRECTX_SDK_DATE})。
 tc.msg_SetupIsRunningWarning=已在執行 MPC-BE 安裝程式！
 #if defined(sse_required)
 tc.msg_simd_sse=此版的 MPC-BE 需要有支援 SSE 延伸指令集的 CPU。%n%n您的 CPU 並未相容這些功能。
 #elif defined(sse2_required)
-tc.msg_simd_sse2=此版的 MPC-BE 須要有支援 SSE2 延伸指令集的 CPU。%n%n您的 CPU 並未相容這些功能。
+tc.msg_simd_sse2=此版的 MPC-BE 需要有支援 SSE2 延伸指令集的 CPU。%n%n您的 CPU 並未相容這些功能。
 #endif
 tc.tsk_AllUsers=安裝給所有使用者
 tc.tsk_CurrentUser=僅安裝給目前使用者
@@ -1029,21 +1029,21 @@ tc.tsk_ResetSettings=重設設定
 tc.types_DefaultInstallation=預設安裝
 tc.types_CustomInstallation=自訂安裝
 tc.ViewChangelog=檢視更新日誌
-tc.AssociationFormatsAV=Configuring associations with video and audio files:
-tc.AssociationFormats=Association with video and audio files
-tc.AssociationVideo=Association with video files
-tc.AssociationAudio=Association with audio files
-tc.AssociationPlaylist=Association with playlists
-tc.AutoPlayType=Auto play:
-tc.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
-tc.AssociationMPCPlayCDAudioS=Audio CD
-tc.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
-tc.AssociationMPCPlayDVDMovieS=DVD Movie
-tc.AssociationMPCPlayMusicFilesF=Play Music
-tc.AssociationMPCPlayMusicFilesS=Music Files
-tc.AssociationMPCPlayVideoFilesF=Play Video
-tc.AssociationMPCPlayVideoFilesS=Video Files
-tc.PinToTaskBar=Pin to TaskBar
+tc.AssociationFormatsAV=視訊及音訊檔案關聯設定:
+tc.AssociationFormats=建立視訊及音訊檔案關聯
+tc.AssociationVideo=建立視訊檔案關聯
+tc.AssociationAudio=建立音訊檔案關聯
+tc.AssociationPlaylist=建立播放清單關聯
+tc.AutoPlayType=自動播放:
+tc.AssociationMPCPlayCDAudioOnArrivalF=播放音訊 CD
+tc.AssociationMPCPlayCDAudioS=音訊 CD
+tc.AssociationMPCPlayDVDMovieArrivalF=播放 DVD 影片
+tc.AssociationMPCPlayDVDMovieS=DVD 影片
+tc.AssociationMPCPlayMusicFilesF=播放音樂
+tc.AssociationMPCPlayMusicFilesS=音樂檔案
+tc.AssociationMPCPlayVideoFilesF=播放視訊
+tc.AssociationMPCPlayVideoFilesS=視訊檔案
+tc.PinToTaskBar=釘選到工作列
 
 
 ;Turkish
