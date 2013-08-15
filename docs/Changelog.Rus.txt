@@ -37,7 +37,7 @@
 	* UDPReader - перевел на использование non-blocked(асинхронного) режима работы;
 	* MediaInfo 0.7.64+ svn rev.5885;
 	* Little-CMS 2.5 git-1d2643cb;
-	* ffmpeg 2.0 git-1057390d;
+	* ffmpeg 2.0 git-2c959ecc;
 	* libwebp 0.3.1 git-e081f2f3;
 	* libpng 1.7.0 b17 git-bb065520;
 	* libopus 1.1 git-03e82037;
