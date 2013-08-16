@@ -35,7 +35,7 @@
 #include "swscale_internal.h"
 #include "swscale.h"
 
-DECLARE_ALIGNED(8, const uint8_t, dither_8x8_128)[8][8] = {
+DECLARE_ALIGNED(8, const uint8_t, ff_dither_8x8_128)[][8] = {
     {  36, 68,  60, 92,  34, 66,  58, 90, },
     { 100,  4, 124, 28,  98,  2, 122, 26, },
     {  52, 84,  44, 76,  50, 82,  42, 74, },
@@ -46,7 +46,7 @@ DECLARE_ALIGNED(8, const uint8_t, dither_8x8_128)[8][8] = {
     { 112, 16, 104,  8, 118, 22, 110, 14, },
 };
 
-DECLARE_ALIGNED(8, const uint8_t, ff_sws_pb_64)[8] = {
+DECLARE_ALIGNED(8, static const uint8_t, sws_pb_64)[8] = {
     64, 64, 64, 64, 64, 64, 64, 64
 };
 
@@ -448,7 +448,7 @@ static int swScale(SwsContext *c, const uint8_t *src[],
     }
 
     if (!should_dither) {
-        c->chrDither8 = c->lumDither8 = ff_sws_pb_64;
+        c->chrDither8 = c->lumDither8 = sws_pb_64;
     }
     lastDstY = dstY;
 
@@ -557,8 +557,8 @@ static int swScale(SwsContext *c, const uint8_t *src[],
                               lastInLumBuf, lastInChrBuf);
 #endif
         if (should_dither) {
-            c->chrDither8 = dither_8x8_128[chrDstY & 7];
-            c->lumDither8 = dither_8x8_128[dstY    & 7];
+            c->chrDither8 = ff_dither_8x8_128[chrDstY & 7];
+            c->lumDither8 = ff_dither_8x8_128[dstY    & 7];
         }
         if (dstY >= dstH - 2) {
             /* hmm looks like we can't use MMX here without overwriting
@@ -1051,7 +1051,7 @@ int attribute_align_arg sws_scale(struct SwsContext *c,
         src2[0] = base;
     }
 
-    if (!srcSliceY && (c->flags & SWS_BITEXACT) && (c->flags & SWS_ERROR_DIFFUSION) && c->dither_error[0])
+    if (!srcSliceY && (c->flags & SWS_BITEXACT) && c->dither == SWS_DITHER_ED && c->dither_error[0])
         for (i = 0; i < 4; i++)
             memset(c->dither_error[i], 0, sizeof(c->dither_error[0][0]) * (c->dstW+2));
 

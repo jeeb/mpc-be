@@ -613,9 +613,6 @@
     <ClInclude Include="libavcodec\mpeg12data.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
-    <ClInclude Include="libavcodec\mpeg12decdata.h">
-      <Filter>libavcodec</Filter>
-    </ClInclude>
     <ClInclude Include="libavcodec\mpegaudio.h">
       <Filter>libavcodec</Filter>
     </ClInclude>

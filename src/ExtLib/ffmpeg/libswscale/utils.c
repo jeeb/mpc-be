@@ -226,8 +226,6 @@ int sws_isSupportedEndiannessConversion(enum AVPixelFormat pix_fmt)
            format_entries[pix_fmt].is_supported_endianness : 0;
 }
 
-extern const int32_t ff_yuv2rgb_coeffs[8][4];
-
 #if FF_API_SWS_FORMAT_NAME
 const char *sws_format_name(enum AVPixelFormat format)
 {
@@ -1196,23 +1194,27 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
         }
     }
 
+    if (c->dither == SWS_DITHER_AUTO) {
+        if (flags & SWS_ERROR_DIFFUSION)
+            c->dither = SWS_DITHER_ED;
+    }
+
     if(dstFormat == AV_PIX_FMT_BGR4_BYTE ||
        dstFormat == AV_PIX_FMT_RGB4_BYTE ||
        dstFormat == AV_PIX_FMT_BGR8 ||
        dstFormat == AV_PIX_FMT_RGB8) {
-        if (flags & SWS_ERROR_DIFFUSION && !(flags & SWS_FULL_CHR_H_INT)) {
+        if (c->dither == SWS_DITHER_ED && !(flags & SWS_FULL_CHR_H_INT)) {
             av_log(c, AV_LOG_DEBUG,
                 "Error diffusion dither is only supported in full chroma interpolation for destination format '%s'\n",
                 av_get_pix_fmt_name(dstFormat));
             flags   |= SWS_FULL_CHR_H_INT;
             c->flags = flags;
         }
-        if (!(flags & SWS_ERROR_DIFFUSION) && (flags & SWS_FULL_CHR_H_INT)) {
+        if (c->dither != SWS_DITHER_ED && (flags & SWS_FULL_CHR_H_INT)) {
             av_log(c, AV_LOG_DEBUG,
                 "Ordered dither is not supported in full chroma interpolation for destination format '%s'\n",
                 av_get_pix_fmt_name(dstFormat));
-            flags   |= SWS_ERROR_DIFFUSION;
-            c->flags = flags;
+            c->dither = SWS_DITHER_ED;
         }
     }
     if (isPlanarRGB(dstFormat)) {

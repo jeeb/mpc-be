@@ -201,7 +201,6 @@
     <ClInclude Include="libavcodec\mpcdata.h" />
     <ClInclude Include="libavcodec\mpeg12.h" />
     <ClInclude Include="libavcodec\mpeg12data.h" />
-    <ClInclude Include="libavcodec\mpeg12decdata.h" />
     <ClInclude Include="libavcodec\mpeg4audio.h" />
     <ClInclude Include="libavcodec\mpeg4data.h" />
     <ClInclude Include="libavcodec\mpeg4video.h" />
