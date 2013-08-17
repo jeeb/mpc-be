@@ -335,7 +335,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 30
 24		"YUV мікшування"
 25		"Буфери EVR:"
 27		"Властивості"
-28		"Dual output"
+28		"Подвійний вивід"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
@@ -440,7 +440,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 62		"ТІНЬ"
 64		"Зв'язати альфа-канали"
 67		"Позиціонувати по кадру"
-69		"Reset"
+69		"Скинути"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
@@ -1162,7 +1162,7 @@ STRING IDD_PPAGEOUTPUT		"Відтворення::Вивід"
 STRING IDD_PPAGEPLAYBACK		"Відтворення"
 STRING IDD_PPAGEPLAYER		"Програвач"
 STRING IDD_PPAGESUBDB		"Субтитри::База"
-STRING IDD_PPAGESUBRENDERING		"Субтитри::Rendering"
+STRING IDD_PPAGESUBRENDERING		"Субтитри::Візуалізація"
 STRING IDD_PPAGESUBSTYLE		"Субтитри::Стандартний стиль"
 STRING IDD_PPAGESUBTITLES		"Субтитри"
 STRING IDD_PPAGESYNC		"Відтворення::Налаштування EVR Sync"
@@ -1413,7 +1413,7 @@ STRING IDS_D3DFS_WARNING		"Ця опція призначена для усун�
 STRING IDS_DISABLE_ALL_FILTERS		"&Вимкнути всі фільтри"
 STRING IDS_DISABLE_DXVA_FILTERS		"Вимкнути DXVA фільтри"
 STRING IDS_DISABLE_FFMPEG_FILTERS		"Вимкнути FFMpeg фільтри"
-STRING IDS_DOWNLOAD_SUBS		"Download subtitles"
+STRING IDS_DOWNLOAD_SUBS		"Завантажити субтитри"
 STRING IDS_DVB_CHANNEL_ENCRYPTED		"Так"
 STRING IDS_DVB_CHANNEL_ENCRYPTION		"Зашифровано"
 STRING IDS_DVB_CHANNEL_FREQUENCY		"Частота"
