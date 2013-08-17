@@ -225,7 +225,7 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 30
 11		"RealMedia"
 12		"QuickTime"
 13		"DirectShow"
-14		"优先使用文件扩展类型"
+14		"先检查文件扩展类型"
 15		"视频"
 16		"音乐"
 17		"DVD"
@@ -235,7 +235,7 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 30
 21		"修改(&M)"
 22		"全部(&L)"
 23		"自动播放"
-24		"资源管理器上下文菜单"
+24		"资源管理器右键菜单"
 25		"目录"
 26		"文件"
 27		"关联"
@@ -440,7 +440,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 62		"阴影"
 64		"使用 alpha 通道"
 67		"相对于视频帧的字幕位置"
-69		"Reset"
+69		"重置"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
