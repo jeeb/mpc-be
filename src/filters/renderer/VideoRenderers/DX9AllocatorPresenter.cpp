@@ -1459,11 +1459,11 @@ void CDX9AllocatorPresenter::UpdateAlphaBitmap()
 	m_VMR9AlphaBitmapData.Free();
 
 	if ((m_VMR9AlphaBitmap.dwFlags & VMRBITMAP_DISABLE) == 0) {
-		HBITMAP			hBitmap = (HBITMAP)GetCurrentObject (m_VMR9AlphaBitmap.hdc, OBJ_BITMAP);
+		HBITMAP hBitmap = (HBITMAP)GetCurrentObject (m_VMR9AlphaBitmap.hdc, OBJ_BITMAP);
 		if (!hBitmap) {
 			return;
 		}
-		DIBSECTION		info = {0};
+		DIBSECTION info = {0};
 		if (!::GetObject(hBitmap, sizeof( DIBSECTION ), &info )) {
 			return;
 		}
@@ -2198,9 +2198,6 @@ void CDX9AllocatorPresenter::DrawStats()
 			DrawText(rc, strText, 1);
 			OffsetRect (&rc, 0, TextHeight);
 
-		}
-
-		if (bDetailedStats > 1) {
 			strText.Format(L"Formats      : Surface %s    Backbuffer %s    Display %s     Device %s      D3DExError: %s", GetD3DFormatStr(m_SurfaceType), GetD3DFormatStr(m_BackbufferType), GetD3DFormatStr(m_DisplayType), m_pD3DDevEx ? L"D3DDevEx" : L"D3DDev", m_D3DDevExError.GetString());
 			DrawText(rc, strText, 1);
 			OffsetRect (&rc, 0, TextHeight);

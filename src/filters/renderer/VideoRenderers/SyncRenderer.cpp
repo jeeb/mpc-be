@@ -1127,8 +1127,7 @@ HRESULT CBaseAP::InitResizers(float bicubicA, bool bNeedScreenSizeTexture)
 			ASSERT(0);
 			m_pScreenSizeTemporaryTexture[0] = NULL; // will do 1 pass then
 		}
-	}
-	if (m_bicubicA || bNeedScreenSizeTexture) {
+
 		if (FAILED(m_pD3DDev->CreateTexture(
 					   min(m_ScreenSize.cx, (int)m_caps.MaxTextureWidth), min(max(m_ScreenSize.cy, m_NativeVideoSize.cy), (int)m_caps.MaxTextureHeight), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8,
 					   D3DPOOL_DEFAULT, &m_pScreenSizeTemporaryTexture[1], NULL))) {
