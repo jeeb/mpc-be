@@ -1729,6 +1729,7 @@ void ff_MPV_frame_end(MpegEncContext *s)
               !s->avctx->using_dxva &&
               // <== End patch MPC
               !s->avctx->hwaccel &&
+              !(s->avctx->codec->capabilities & CODEC_CAP_HWACCEL_VDPAU) &&
               s->unrestricted_mv &&
               s->current_picture.reference &&
               !s->intra_only &&
@@ -2935,6 +2936,7 @@ void ff_draw_horiz_band(AVCodecContext *avctx, DSPContext *dsp, Picture *cur,
     }
 
     if (!avctx->hwaccel &&
+        !(avctx->codec->capabilities & CODEC_CAP_HWACCEL_VDPAU) &&
        // ==> Start patch MPC
        !avctx->using_dxva &&
        // <== End patch MPC

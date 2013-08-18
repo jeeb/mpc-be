@@ -861,11 +861,27 @@ void ff_er_frame_end(ERContext *s)
         s->avctx->using_dxva                                           ||
         // <== End patch MPC
         s->avctx->hwaccel                                              ||
+        s->avctx->codec->capabilities&CODEC_CAP_HWACCEL_VDPAU          ||
         !s->cur_pic || s->cur_pic->field_picture                               ||
         s->error_count == 3 * s->mb_width *
                           (s->avctx->skip_top + s->avctx->skip_bottom)) {
         return;
     }
+    for (mb_x = 0; mb_x < s->mb_width; mb_x++) {
+        int status = s->error_status_table[mb_x + (s->mb_height - 1) * s->mb_stride];
+        if (status != 0x7F)
+            break;
+    }
+
+    if (   mb_x == s->mb_width
+        && s->avctx->codec_id == AV_CODEC_ID_MPEG2VIDEO
+        && (s->avctx->height&16)
+        && s->error_count == 3 * s->mb_width * (s->avctx->skip_top + s->avctx->skip_bottom + 1)
+    ) {
+        av_log(s->avctx, AV_LOG_DEBUG, "ignoring last missing slice\n");
+        return;
+    }
+
     if (s->last_pic) {
         if (s->last_pic->f.width  != s->cur_pic->f.width  ||
             s->last_pic->f.height != s->cur_pic->f.height ||
