@@ -26,15 +26,15 @@
 #include "../../Subtitles/STS.h"
 
 
-// CPPageSubMisc dialog
+// CPPageSubRend dialog
 
-class CPPageSubMisc : public CPPageBase
+class CPPageSubRend : public CPPageBase
 {
-	DECLARE_DYNAMIC(CPPageSubMisc)
+	DECLARE_DYNAMIC(CPPageSubRend)
 
 public:
-	CPPageSubMisc();
-	virtual ~CPPageSubMisc();
+	CPPageSubRend();
+	virtual ~CPPageSubRend();
 
 	BOOL m_fOverridePlacement;
 	int m_nHorPos;

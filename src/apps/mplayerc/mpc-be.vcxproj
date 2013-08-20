@@ -238,7 +238,7 @@
     <ClCompile Include="PPagePlayback.cpp" />
     <ClCompile Include="PPagePlayer.cpp" />
     <ClCompile Include="PPageSheet.cpp" />
-    <ClCompile Include="PPageSubMisc.cpp" />
+    <ClCompile Include="PPageSubRend.cpp" />
     <ClCompile Include="PPageSubStyle.cpp" />
     <ClCompile Include="PPageSubtitles.cpp" />
     <ClCompile Include="PPageSync.cpp" />
@@ -356,7 +356,7 @@
     <ClInclude Include="PPagePlayback.h" />
     <ClInclude Include="PPagePlayer.h" />
     <ClInclude Include="PPageSheet.h" />
-    <ClInclude Include="PPageSubMisc.h" />
+    <ClInclude Include="PPageSubRend.h" />
     <ClInclude Include="PPageSubStyle.h" />
     <ClInclude Include="PPageSubtitles.h" />
     <ClInclude Include="PPageSync.h" />

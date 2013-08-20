@@ -23,14 +23,14 @@
 
 #include "stdafx.h"
 #include "MainFrm.h"
-#include "PPageSubMisc.h"
+#include "PPageSubRend.h"
 
 
-// CPPageSubMisc dialog
+// CPPageSubRend dialog
 
-IMPLEMENT_DYNAMIC(CPPageSubMisc, CPPageBase)
-CPPageSubMisc::CPPageSubMisc()
-	: CPPageBase(CPPageSubMisc::IDD, CPPageSubMisc::IDD)
+IMPLEMENT_DYNAMIC(CPPageSubRend, CPPageBase)
+CPPageSubRend::CPPageSubRend()
+	: CPPageBase(CPPageSubRend::IDD, CPPageSubRend::IDD)
 	, m_fOverridePlacement(FALSE)
 	, m_nHorPos(0)
 	, m_nVerPos(0)
@@ -41,11 +41,11 @@ CPPageSubMisc::CPPageSubMisc()
 {
 }
 
-CPPageSubMisc::~CPPageSubMisc()
+CPPageSubRend::~CPPageSubRend()
 {
 }
 
-void CPPageSubMisc::DoDataExchange(CDataExchange* pDX)
+void CPPageSubRend::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
@@ -64,7 +64,7 @@ void CPPageSubMisc::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT4, m_nSubDelayInterval);
 }
 
-BEGIN_MESSAGE_MAP(CPPageSubMisc, CPPageBase)
+BEGIN_MESSAGE_MAP(CPPageSubRend, CPPageBase)
 	ON_UPDATE_COMMAND_UI(IDC_EDIT2, OnUpdatePosOverride)
 	ON_UPDATE_COMMAND_UI(IDC_SPIN2, OnUpdatePosOverride)
 	ON_UPDATE_COMMAND_UI(IDC_EDIT3, OnUpdatePosOverride)
@@ -76,7 +76,7 @@ BEGIN_MESSAGE_MAP(CPPageSubMisc, CPPageBase)
 	ON_EN_CHANGE(IDC_EDIT4, OnSubDelayInterval)
 END_MESSAGE_MAP()
 
-// CPPageSubMisc message handlers
+// CPPageSubRend message handlers
 
 int TranslateResIn(int _In)
 {
@@ -120,7 +120,7 @@ int TranslateResOut(int _In)
 	return _In;
 }
 
-BOOL CPPageSubMisc::OnInitDialog()
+BOOL CPPageSubRend::OnInitDialog()
 {
 	__super::OnInitDialog();
 
@@ -157,7 +157,7 @@ BOOL CPPageSubMisc::OnInitDialog()
 	return TRUE;
 }
 
-BOOL CPPageSubMisc::OnApply()
+BOOL CPPageSubRend::OnApply()
 {
 	UpdateData();
 
@@ -188,14 +188,14 @@ BOOL CPPageSubMisc::OnApply()
 	return __super::OnApply();
 }
 
-void CPPageSubMisc::OnUpdatePosOverride(CCmdUI* pCmdUI)
+void CPPageSubRend::OnUpdatePosOverride(CCmdUI* pCmdUI)
 {
 	UpdateData();
 
 	pCmdUI->Enable(m_fOverridePlacement);
 }
 
-void CPPageSubMisc::OnSubDelayInterval()
+void CPPageSubRend::OnSubDelayInterval()
 {
 	// If incorrect number, revert modifications
 
