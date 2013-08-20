@@ -23,6 +23,7 @@
 
 #include "stdafx.h"
 #include "UDPReader.h"
+#include <atlutil.h>
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../apps/mplayerc/SettingsDefines.h"
 
@@ -49,7 +50,6 @@ int g_cTemplates = _countof(g_Templates);
 STDAPI DllRegisterServer()
 {
 	SetRegKeyValue(_T("udp"), 0, _T("Source Filter"), CStringFromGUID(__uuidof(CUDPReader)));
-	SetRegKeyValue(_T("tévé"), 0, _T("Source Filter"), CStringFromGUID(__uuidof(CUDPReader)));
 
 	return AMovieDllRegisterServer2(TRUE);
 }
@@ -195,25 +195,16 @@ bool CUDPStream::Load(const WCHAR* fnw)
 {
 	Clear();
 
-	CString url = CString(fnw);
-
-	CAtlList<CString> sl;
-	Explode(url, sl, ':');
-	if (sl.GetCount() != 3) {
+	CUrl url;
+	if (!url.CrackUrl(fnw)) {
 		return false;
 	}
 
-	CString protocol = sl.RemoveHead();
-	// if(protocol != L"udp") return false;
+	m_protocol = url.GetSchemeName();
+	// if(m_protocol != L"udp") return false;
 
-	m_ip = CString(sl.RemoveHead()).TrimLeft('/');
-	m_ip.Replace(L"@", L"");
-
-	int port = _wtoi(Explode(sl.RemoveHead(), sl, '/', 2));
-	if (port < 0 || port > 0xffff) {
-		return false;
-	}
-	m_port = port;
+	m_host = url.GetHostName();
+	m_port = url.GetPortNumber();
 
 	WSADATA wsaData;
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -224,7 +215,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 	m_addr.sin_addr.s_addr	= htonl(INADDR_ANY);
 
 	ip_mreq imr;
-	imr.imr_multiaddr.s_addr	= inet_addr(CStringA(m_ip));
+	imr.imr_multiaddr.s_addr	= inet_addr(CStringA(m_host));
 	imr.imr_interface.s_addr	= INADDR_ANY;
 
 	if ((m_socket = socket(AF_INET, SOCK_DGRAM, 0)) != INVALID_SOCKET) {

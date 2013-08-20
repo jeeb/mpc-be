@@ -37,20 +37,22 @@ private:
 	class packet_t
 	{
 	public:
-		BYTE* m_buff;
+		BYTE*   m_buff;
 		__int64 m_start, m_end;
+
 		packet_t(BYTE* p, __int64 start, __int64 end);
 		virtual ~packet_t() {
 			delete [] m_buff;
 		}
 	};
 
-	int m_port;
-	CString m_ip;
-	SOCKET m_socket;
+	CString     m_protocol;
+	CString     m_host;
+	int         m_port;
+	SOCKET      m_socket;
 	sockaddr_in m_addr;
-	WSAEVENT m_WSAEvent[1];
-	__int64 m_pos, m_len;
+	WSAEVENT    m_WSAEvent[1];
+	__int64     m_pos, m_len;
 	CAtlList<packet_t*> m_packets;
 
 	void Clear();
@@ -81,7 +83,7 @@ class __declspec(uuid("0E4221A9-9718-48D5-A5CF-4493DAD4A015"))
 	, public IFileSourceFilter
 {
 	CUDPStream m_stream;
-	CStringW m_fn;
+	CStringW   m_fn;
 
 public:
 	CUDPReader(IUnknown* pUnk, HRESULT* phr);
