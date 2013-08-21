@@ -20186,6 +20186,7 @@ BOOL CMainFrame::CheckMainFilter(IBaseFilter* pBF)
 		return FALSE;
 	}
 
+	m_nMainFilterId = (DWORD_PTR)pBF;
 	while (pBF) {
 		if (CComQIPtr<IFileSourceFilter> pFSF = pBF) {
 			LPOLESTR pszFileName = NULL;
@@ -20195,7 +20196,6 @@ BOOL CMainFrame::CheckMainFilter(IBaseFilter* pBF)
 				CoTaskMemFree(pszFileName);
 
 				if (fileName == fName) {
-					m_nMainFilterId = (DWORD_PTR)pBF;
 					return TRUE;
 				}
 			}
@@ -20211,5 +20211,6 @@ BOOL CMainFrame::CheckMainFilter(IBaseFilter* pBF)
 		}
 	}
 
+	m_nMainFilterId = NULL;
 	return FALSE;
 }
