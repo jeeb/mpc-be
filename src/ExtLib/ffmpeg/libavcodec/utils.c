@@ -3258,8 +3258,9 @@ const uint8_t *avpriv_find_start_code(const uint8_t *av_restrict p,
                                       uint32_t *av_restrict state)
 {
     int i;
-
-    av_assert0(p <= end);
+    // ==> Start patch MP
+    //av_assert0(p <= end);
+    // ==> End patch MPC
     if (p >= end)
         return end;
 

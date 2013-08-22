@@ -322,18 +322,18 @@ static void hybrid2_re(float (*in)[2], float (*out)[32][2], const float filter[8
 }
 
 /** Split one subband into 6 subsubbands with a complex filter */
-    // ==> Start patch MPC
+// ==> Start patch MPC
 static void hybrid6_cx(PSDSPContext *dsp, float (*in)[2], float (*out)[32][2], float (*filter)[8][2], int len)
-    // ==> End patch MPC
+// ==> End patch MPC
 {
     int i;
     int N = 8;
     LOCAL_ALIGNED_16(float, temp, [8], [2]);
 
     for (i = 0; i < len; i++, in++) {
-    // ==> Start patch MPC
+        // ==> Start patch MPC
         dsp->hybrid_analysis(temp, in, (const float (*)[8][2])filter, 1, N);
-    // ==> End patch MPC
+        // ==> End patch MPC
         out[0][i][0] = temp[6][0];
         out[0][i][1] = temp[6][1];
         out[1][i][0] = temp[7][0];
@@ -348,16 +348,16 @@ static void hybrid6_cx(PSDSPContext *dsp, float (*in)[2], float (*out)[32][2], f
         out[5][i][1] = temp[3][1] + temp[4][1];
     }
 }
-    // ==> Start patch MPC
+// ==> Start patch MPC
 static void hybrid4_8_12_cx(PSDSPContext *dsp, float (*in)[2], float (*out)[32][2], float (*filter)[8][2], int N, int len)
-    // ==> End patch MPC
+// ==> End patch MPC
 {
     int i;
 
     for (i = 0; i < len; i++, in++) {
-    // ==> Start patch MP
+        // ==> Start patch MP
         dsp->hybrid_analysis(out[0] + i, in, (const float (*)[8][2])filter, 32, N);
-    // ==> End patch MPC
+        // ==> End patch MPC
     }
 }
 
@@ -628,9 +628,9 @@ static void map_val_20_to_34(float par[PS_MAX_NR_IIDICC])
     par[ 2] =  par[ 1];
     par[ 1] = (par[ 0] + par[ 1]) * 0.5f;
 }
-    // ==> Start patch MPC
+// ==> Start patch MPC
 static void decorrelation(PSContext *ps, float (*out)[32][2], float (*s)[32][2], int is34)
-    // ==> End patch MPC
+// ==> End patch MPC
 {
     LOCAL_ALIGNED_16(float, power, [34], [PS_QMF_TIME_SLOTS]);
     LOCAL_ALIGNED_16(float, transient_gain, [34], [PS_QMF_TIME_SLOTS]);
@@ -658,9 +658,9 @@ static void decorrelation(PSContext *ps, float (*out)[32][2], float (*s)[32][2],
 
     for (k = 0; k < NR_BANDS[is34]; k++) {
         int i = k_to_i[k];
-    // ==> Start patch MPC
+        // ==> Start patch MPC
         ps->dsp.add_squares(power[i], (const float (*)[2])s[k], nL - n0);
-    // ==> End patch MPC
+        // ==> End patch MPC
     }
 
     //Transient detection
