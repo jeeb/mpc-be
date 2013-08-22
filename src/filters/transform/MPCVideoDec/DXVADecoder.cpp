@@ -477,12 +477,11 @@ HRESULT CDXVADecoder::EndFrame(int nSurfaceIndex)
 // === Picture store functions
 bool CDXVADecoder::AddToStore(int nSurfaceIndex, IMediaSample* pSample, bool bRefPicture,
 							  REFERENCE_TIME rtStart, REFERENCE_TIME rtStop, bool bIsField,
-							  FF_FIELD_TYPE nFieldType, FF_SLICE_TYPE nSliceType, int nCodecSpecific)
+							  int nCodecSpecific)
 {
 	if (bIsField && m_nFieldSurface == -1) {
 		m_nFieldSurface = nSurfaceIndex;
 		m_pFieldSample	= pSample;
-		m_pPictureStore[nSurfaceIndex].n1FieldType		= nFieldType;
 		m_pPictureStore[nSurfaceIndex].rtStart			= rtStart;
 		m_pPictureStore[nSurfaceIndex].rtStop			= rtStop;
 		m_pPictureStore[nSurfaceIndex].nCodecSpecific	= nCodecSpecific;
@@ -501,12 +500,10 @@ bool CDXVADecoder::AddToStore(int nSurfaceIndex, IMediaSample* pSample, bool bRe
 		m_pPictureStore[nSurfaceIndex].bInUse			= true;
 		m_pPictureStore[nSurfaceIndex].bDisplayed		= false;
 		m_pPictureStore[nSurfaceIndex].pSample			= pSample;
-		m_pPictureStore[nSurfaceIndex].nSliceType		= nSliceType;
 
 		if (!bIsField) {
 			m_pPictureStore[nSurfaceIndex].rtStart			= rtStart;
 			m_pPictureStore[nSurfaceIndex].rtStop			= rtStop;
-			m_pPictureStore[nSurfaceIndex].n1FieldType		= nFieldType;
 			m_pPictureStore[nSurfaceIndex].nCodecSpecific	= nCodecSpecific;
 		}
 
@@ -553,49 +550,7 @@ int CDXVADecoder::FindOldestFrame()
 
 void CDXVADecoder::SetTypeSpecificFlags(PICTURE_STORE* pPicture, IMediaSample* pMS)
 {
-	if (CComQIPtr<IMediaSample2> pMS2 = pMS) {
-		AM_SAMPLE2_PROPERTIES props;
-		if (SUCCEEDED(pMS2->GetProperties(sizeof(props), (BYTE*)&props))) {
-			props.dwTypeSpecificFlags &= ~0x7f;
-
-			switch (m_pFilter->GetDeinterlacing()) {
-				case AUTO :
-					m_pFilter->SetFrameType(pPicture->n1FieldType);
-					if (pPicture->n1FieldType == PICT_FRAME) {
-						props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
-					} else if (pPicture->n1FieldType == PICT_TOP_FIELD) {
-						props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_FIELD1FIRST;
-					}
-					break;
-				case PROGRESSIVE :
-					m_pFilter->SetFrameType(PICT_FRAME);
-					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
-					break;
-				case TOPFIELD :
-					m_pFilter->SetFrameType(PICT_TOP_FIELD);
-					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_FIELD1FIRST;
-					break;
-				case BOTTOMFIELD :
-					m_pFilter->SetFrameType(PICT_BOTTOM_FIELD);
-			}
-
-			switch (pPicture->nSliceType) {
-				case I_TYPE:
-				case SI_TYPE:
-					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_I_SAMPLE;
-					break;
-				case P_TYPE:
-				case SP_TYPE:
-					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_P_SAMPLE;
-					break;
-				default:
-					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_B_SAMPLE;
-				break;
-			}
-
-			pMS2->SetProperties(sizeof(props), (BYTE*)&props);
-		}
-	}
+	m_pFilter->SetTypeSpecificFlags(pMS, m_pFilter->GetFrame());
 	pMS->SetTime(&pPicture->rtStart, &pPicture->rtStop);
 }
 

@@ -52,7 +52,7 @@ HRESULT			FFH264DecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFram
 								  UINT* SecondFieldOffset, int* Sync, int* NALLength);
 HRESULT			FFH264BuildPicParams(struct AVCodecContext* pAVCtx, DWORD nPCIVendor, DWORD nPCIDevice,
 									 DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_H264* pDXVAScalingMatrix,
-									 int* nFieldType, int* nSliceType, int* nPictStruct);
+									 int* nPictStruct);
 int				FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
 										 DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion, bool nIsAtiDXVACompatible);
 void			FFH264SetCurrentPicture(int nIndex, DXVA_PicParams_H264* pDXVAPicParams, struct AVCodecContext* pAVCtx);
@@ -64,14 +64,13 @@ void			FFH264SetDxvaSliceLong(struct AVCodecContext* pAVCtx, void* pSliceLong);
 // === VC1 functions
 HRESULT			FFVC1DecodeFrame(DXVA_PictureParameters* pPicParams, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, REFERENCE_TIME rtStart,
 								 BYTE* pBuffer, UINT nSize,
-								 int* nFieldType, int* nSliceType, BOOL* b_repeat_pict,
-								 UINT* nFrameSize, BOOL b_SecondField);
+								 BOOL* b_repeat_pict, UINT* nFrameSize, BOOL b_SecondField);
 
 // === Mpeg2 functions
 int				MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame);
 HRESULT			FFMpeg2DecodeFrame(DXVA_PictureParameters* pPicParams, DXVA_QmatrixData* m_QMatrixData, DXVA_SliceInfo* pSliceInfo,
 									struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize,
-									int* nSliceCount, int* nNextCodecIndex, int* nFieldType, int* nSliceType, 
+									int* nSliceCount, int* nNextCodecIndex,
 									bool* bIsField, int* b_repeat_pict);
 
 // === Common functions

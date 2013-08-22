@@ -163,8 +163,6 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 	HRESULT						hr				= S_FALSE;
 	UINT						nSlices			= 0;
 	int							nSurfaceIndex	= -1;
-	int							nFieldType		= -1;
-	int							nSliceType		= -1;
 	int							nFramePOC		= INT_MIN;
 	int							nOutPOC			= INT_MIN;
 	REFERENCE_TIME				rtOutStart		= INVALID_TIME;
@@ -214,7 +212,7 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 	}
 
 	// If parsing fail (probably no PPS/SPS), continue anyway it may arrived later (happen on truncated streams)
-	CHECK_HR_FALSE (FFH264BuildPicParams(m_pFilter->GetAVCtx(), m_pFilter->GetPCIVendor(), m_pFilter->GetPCIDevice(), &m_DXVAPicParams, &m_DXVAScalingMatrix, &nFieldType, &nSliceType, &nPictStruct));
+	CHECK_HR_FALSE (FFH264BuildPicParams(m_pFilter->GetAVCtx(), m_pFilter->GetPCIVendor(), m_pFilter->GetPCIDevice(), &m_DXVAPicParams, &m_DXVAScalingMatrix, &nPictStruct));
 
 	TRACE_H264 ("CDXVADecoderH264::DecodeFrame() : nFramePOC = %11d, nOutPOC = %11d[%11d], [%d - %d], rtOutStart = [%20I64d]\n", nFramePOC, nOutPOC, m_nOutPOC, m_DXVAPicParams.field_pic_flag, m_DXVAPicParams.RefPicFlag, rtOutStart);
 
@@ -282,13 +280,11 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 			CHECK_HR (EndFrame(nSurfaceIndex));
 
 			bAdded = AddToStore (nSurfaceIndex, pSampleToDeliver, m_DXVAPicParams.RefPicFlag, rtStart, rtStop,
-								0, (FF_FIELD_TYPE)nFieldType,
-								(FF_SLICE_TYPE)nSliceType, nFramePOC);
+								false, nFramePOC);
 
 		} else {
 			bAdded = AddToStore (nSurfaceIndex, pSampleToDeliver, m_DXVAPicParams.RefPicFlag, rtStart, rtStop,
-								m_DXVAPicParams.field_pic_flag, (FF_FIELD_TYPE)nFieldType,
-								(FF_SLICE_TYPE)nSliceType, nFramePOC);
+								m_DXVAPicParams.field_pic_flag, nFramePOC);
 		}
 	}
 

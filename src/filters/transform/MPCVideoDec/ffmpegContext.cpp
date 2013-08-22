@@ -212,9 +212,9 @@ inline MpegEncContext* GetMpegEncContext(struct AVCodecContext* pAVCtx)
 	return s;
 }
 
-HRESULT FFH264DecodeFrame (struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize, REFERENCE_TIME rtStart,
-						   int* pFramePOC, int* pOutPOC, REFERENCE_TIME* pOutrtStart,
-						   UINT* SecondFieldOffset, int* Sync, int* NALLength)
+HRESULT FFH264DecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize, REFERENCE_TIME rtStart,
+						  int* pFramePOC, int* pOutPOC, REFERENCE_TIME* pOutrtStart,
+						  UINT* SecondFieldOffset, int* Sync, int* NALLength)
 {
 	HRESULT hr = E_FAIL;
 	if (pBuffer != NULL) {
@@ -434,7 +434,7 @@ USHORT FFH264FindRefFrameIndex (USHORT num_frame, DXVA_PicParams_H264* pDXVAPicP
 	return 127;
 }
 
-HRESULT FFH264BuildPicParams (struct AVCodecContext* pAVCtx, DWORD nPCIVendor, DWORD nPCIDevice, DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_H264* pDXVAScalingMatrix, int* nFieldType, int* nSliceType, int* nPictStruct)
+HRESULT FFH264BuildPicParams (struct AVCodecContext* pAVCtx, DWORD nPCIVendor, DWORD nPCIDevice, DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_H264* pDXVAScalingMatrix, int* nPictStruct)
 {
 	H264Context*			h = (H264Context*) pAVCtx->priv_data;
 	SPS*					cur_sps;
@@ -450,29 +450,6 @@ HRESULT FFH264BuildPicParams (struct AVCodecContext* pAVCtx, DWORD nPCIVendor, D
 
 	if (cur_sps && cur_pps) {
 		*nPictStruct = h->picture_structure;
-
-		*nFieldType = current_picture->f.interlaced_frame ? PICT_TOP_FIELD : h->picture_structure;
-		if (h->sps.pic_struct_present_flag) {
-			switch (h->sei_pic_struct) {
-				case SEI_PIC_STRUCT_TOP_FIELD:
-				case SEI_PIC_STRUCT_TOP_BOTTOM:
-				case SEI_PIC_STRUCT_TOP_BOTTOM_TOP:
-					*nFieldType = PICT_TOP_FIELD;
-					break;
-				case SEI_PIC_STRUCT_BOTTOM_FIELD:
-				case SEI_PIC_STRUCT_BOTTOM_TOP:
-				case SEI_PIC_STRUCT_BOTTOM_TOP_BOTTOM:
-					*nFieldType = PICT_BOTTOM_FIELD;
-					break;
-				case SEI_PIC_STRUCT_FRAME_DOUBLING:
-				case SEI_PIC_STRUCT_FRAME_TRIPLING:
-				case SEI_PIC_STRUCT_FRAME:
-					*nFieldType = PICT_FRAME;
-					break;
-			}
-		}
-
-		*nSliceType = h->slice_type;
 
 		if (cur_sps->mb_width == 0 || cur_sps->mb_height == 0) {
 			return VFW_E_INVALID_FILE_FORMAT;
@@ -658,8 +635,7 @@ void FFH264SetDxvaSliceLong (struct AVCodecContext* pAVCtx, void* pSliceLong)
 
 HRESULT FFVC1DecodeFrame (DXVA_PictureParameters* pPicParams, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, REFERENCE_TIME rtStart,
 						  BYTE* pBuffer, UINT nSize,
-						  int* nFieldType, int* nSliceType, BOOL* b_repeat_pict,
-						  UINT* nFrameSize, BOOL b_SecondField)
+						  BOOL* b_repeat_pict, UINT* nFrameSize, BOOL b_SecondField)
 {
 	HRESULT	hr			= E_FAIL;
 	VC1Context* vc1		= (VC1Context*) pAVCtx->priv_data;
@@ -685,17 +661,6 @@ HRESULT FFVC1DecodeFrame (DXVA_PictureParameters* pPicParams, struct AVCodecCont
 	}
 
 	hr = S_OK;
-
-	// WARNING : vc1->interlace is not reliable (always set for progressive video on HD-DVD material)
-	if (vc1->fcm == 0) {
-		if (nFieldType) {
-			*nFieldType = PICT_FRAME;
-		}
-	} else {	// fcm : 2 or 3 frame or field interlaced
-		if (nFieldType) {
-			*nFieldType = (vc1->tff ? PICT_TOP_FIELD : PICT_BOTTOM_FIELD);
-		}
-	}
 
 	if (b_SecondField) {
 		vc1->second_field = 1;
@@ -778,11 +743,6 @@ HRESULT FFVC1DecodeFrame (DXVA_PictureParameters* pPicParams, struct AVCodecCont
 							   (vc1->range_mapuv          );
 	}
 
-	// Section 3.2.16
-	if (nSliceType) {
-		*nSliceType = vc1->s.pict_type;
-	}
-
 	// Cf section 7.1.1.25 in VC1 specification, section 3.2.14.3 in DXVA spec
 	pPicParams->bRcontrol	= vc1->rnd;
 
@@ -818,7 +778,7 @@ int	MPEG2CheckCompatibility (struct AVCodecContext* pAVCtx, struct AVFrame* pFra
 
 HRESULT FFMpeg2DecodeFrame (DXVA_PictureParameters* pPicParams, DXVA_QmatrixData* pQMatrixData, DXVA_SliceInfo* pSliceInfo,
 							struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize,
-							int* nSliceCount, int* nNextCodecIndex, int* nFieldType, int* nSliceType, 
+							int* nSliceCount, int* nNextCodecIndex,
 							bool* bIsField, int* b_repeat_pict)
 {
 	HRESULT			hr = E_FAIL;
@@ -849,8 +809,6 @@ HRESULT FFMpeg2DecodeFrame (DXVA_PictureParameters* pPicParams, DXVA_QmatrixData
 
 		hr				= S_OK;
 		*nSliceCount	= s1->slice_count;
-		*nFieldType		= s->progressive_frame ? PICT_FRAME : s->current_picture.f.top_field_first ? PICT_TOP_FIELD : PICT_BOTTOM_FIELD;
-		*nSliceType		= s->pict_type;
 	}
 
 	// pPicParams->wDecodedPictureIndex;			set in DecodeFrame

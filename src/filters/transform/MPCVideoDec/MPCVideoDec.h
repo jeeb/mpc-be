@@ -181,7 +181,6 @@ protected:
 	unsigned __int64	GetCspFromMediaType(GUID& subtype);
 	void				InitSwscale();
 
-	void				SetTypeSpecificFlags(IMediaSample* pMS);
 	HRESULT				SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
 
 	HRESULT				ReopenVideo();
@@ -301,7 +300,7 @@ public:
 		}
 	}
 
-	void						SetFrameType(FF_FIELD_TYPE nFrameType);
+	void						SetTypeSpecificFlags(IMediaSample* pMS, AVFrame* pFrame);
 
 	// === DXVA1 functions
 	DDPIXELFORMAT*				GetPixelFormat()		{ return &m_PixelFormat; }

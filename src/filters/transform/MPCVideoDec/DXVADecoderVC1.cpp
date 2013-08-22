@@ -100,13 +100,11 @@ HRESULT CDXVADecoderVC1::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 	HRESULT						hr;
 	int							nSurfaceIndex;
 	CComPtr<IMediaSample>		pSampleToDeliver;
-	int							nFieldType, nSliceType;
 	UINT						nFrameSize, nSize_Result;
 
 	CHECK_HR_FALSE (FFVC1DecodeFrame (&m_PictureParams, m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), rtStart, 
 										pDataIn, nSize, 
-										&nFieldType, &nSliceType, &m_bFrame_repeat_pict, 
-										&nFrameSize, FALSE));
+										&m_bFrame_repeat_pict, &nFrameSize, FALSE));
 
 	// Wait I frame after a flush
 	if (m_bFlushed && ! m_PictureParams.bPicIntra) {
@@ -160,8 +158,7 @@ HRESULT CDXVADecoderVC1::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 	if (nFrameSize) { // Decoding Second Field
 		FFVC1DecodeFrame (&m_PictureParams, m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), rtStart,
 							pDataIn, nSize,
-							NULL, NULL, &m_bFrame_repeat_pict,
-							NULL, TRUE);
+							&m_bFrame_repeat_pict, NULL, TRUE);
 
 		CHECK_HR (BeginFrame(nSurfaceIndex, pSampleToDeliver));
 
@@ -208,7 +205,7 @@ HRESULT CDXVADecoderVC1::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 	}
 
 	AddToStore (nSurfaceIndex, pSampleToDeliver, (bPicBackwardPrediction != 1), rtStart, rtStop,
-				false, (FF_FIELD_TYPE)nFieldType, (FF_SLICE_TYPE)nSliceType, 0);
+				false, 0);
 
 	m_bFlushed = false;
 

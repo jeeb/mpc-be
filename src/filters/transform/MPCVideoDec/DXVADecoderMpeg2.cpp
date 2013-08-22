@@ -130,14 +130,12 @@ HRESULT CDXVADecoderMpeg2::DecodeFrameInternal (BYTE* pDataIn, UINT nSize, REFER
 	HRESULT					hr					= S_FALSE;
 	int						nSurfaceIndex		= -1;
 	CComPtr<IMediaSample>	pSampleToDeliver;
-	int						nFieldType			= -1;
-	int						nSliceType			= -1;
 	bool					bIsField			= false;
 	int						bFrame_repeat_pict	= 0;
 
 	CHECK_HR_FALSE (FFMpeg2DecodeFrame (&m_PictureParams, &m_QMatrixData, m_SliceInfo,
 						m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), pDataIn, nSize,
-						&m_nSliceCount, &m_nNextCodecIndex, &nFieldType, &nSliceType,
+						&m_nSliceCount, &m_nNextCodecIndex,
 						&bIsField, &bFrame_repeat_pict));
 
 	// Wait I frame after a flush
@@ -171,7 +169,7 @@ HRESULT CDXVADecoderMpeg2::DecodeFrameInternal (BYTE* pDataIn, UINT nSize, REFER
 	}
 
 	bool bAdded = AddToStore (nSurfaceIndex, pSampleToDeliver, (m_PictureParams.bPicBackwardPrediction != 1), rtStart, rtStop,
-							  bIsField, (FF_FIELD_TYPE)nFieldType, (FF_SLICE_TYPE)nSliceType, FFGetCodedPicture(m_pFilter->GetAVCtx()));
+							  bIsField, FFGetCodedPicture(m_pFilter->GetAVCtx()));
 
 	if (bAdded) {
 		hr = DisplayNextFrame();
