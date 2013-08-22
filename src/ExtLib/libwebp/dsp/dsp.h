@@ -23,7 +23,8 @@ extern "C" {
 //------------------------------------------------------------------------------
 // CPU detection
 
-#if defined(_MSC_VER) && (defined(_M_X64) || defined(_M_IX86))
+#if defined(_MSC_VER) && _MSC_VER > 1310 && \
+    (defined(_M_X64) || defined(_M_IX86))
 #define WEBP_MSC_SSE2  // Visual C++ SSE2 targets
 #endif
 
@@ -146,6 +147,8 @@ void VP8DspInit(void);
 
 #define FANCY_UPSAMPLING   // undefined to remove fancy upsampling support
 
+// Convert a pair of y/u/v lines together to the output rgb/a colorspace.
+// bottom_y can be NULL if only one line of output is needed (at top/bottom).
 typedef void (*WebPUpsampleLinePairFunc)(
     const uint8_t* top_y, const uint8_t* bottom_y,
     const uint8_t* top_u, const uint8_t* top_v,
