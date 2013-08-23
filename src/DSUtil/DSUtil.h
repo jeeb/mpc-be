@@ -103,6 +103,7 @@ extern CString ConvertStr(LPCSTR lpMultiByteStr, UINT CodePage);
 extern CString UTF8ToString(LPCSTR lpMultiByteStr);
 extern CStringA StringToUTF8(LPCWSTR lpWideCharStr);
 extern CString LocalToString(LPCSTR lpMultiByteStr);
+extern CStringW AltUTF8ToStringW(const char* S); // Use if MultiByteToWideChar() function does not work.
 extern CString ISO6391ToLanguage(LPCSTR code);
 extern CString ISO6392ToLanguage(LPCSTR code);
 extern LCID    ISO6391ToLcid(LPCSTR code);

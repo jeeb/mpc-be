@@ -168,11 +168,11 @@ static void SetAspect(VIDEOINFOHEADER2* vih2, CSize Aspect, LONG w, LONG h)
 	vih2->dwPictAspectRatioY = Aspect.cy;
 }
 
-static CString ConvertStr(LPCSTR S)
+static CString ConvertStr(const char* S)
 {
-	CString str = UTF8ToString(S);
+	CString str = AltUTF8ToStringW(S);
 	if (str.IsEmpty()) {
-		str = LocalToString(S); // Trying Local...
+		str = LocalToString(S); //Trying Local...
 	}
 
 	return str;
