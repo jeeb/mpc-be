@@ -550,7 +550,7 @@ int CDXVADecoder::FindOldestFrame()
 
 void CDXVADecoder::SetTypeSpecificFlags(PICTURE_STORE* pPicture, IMediaSample* pMS)
 {
-	m_pFilter->SetTypeSpecificFlags(pMS, m_pFilter->GetFrame());
+	m_pFilter->SetTypeSpecificFlags(pMS);
 	pMS->SetTime(&pPicture->rtStart, &pPicture->rtStop);
 }
 
@@ -611,7 +611,7 @@ HRESULT CDXVADecoder::DisplayNextFrame()
 			}
 
 #if defined(_DEBUG) && 0
-			static REFERENCE_TIME	rtLast = 0;
+			static REFERENCE_TIME rtLast = 0;
 			TRACE ("Deliver : %10I64d - %10I64d, (Dur = %10I64d), {Delta = %10I64d}, Ind = %02d, Codec = %d, Ref = %d\n",
 				   m_pPictureStore[nPicIndex].rtStart,
 				   m_pPictureStore[nPicIndex].rtStop,

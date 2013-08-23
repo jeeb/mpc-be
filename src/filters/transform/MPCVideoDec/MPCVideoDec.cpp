@@ -1940,7 +1940,7 @@ HRESULT CMPCVideoDecFilter::BreakConnect(PIN_DIRECTION dir)
 	return __super::BreakConnect (dir);
 }
 
-void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS, AVFrame* pFrame)
+void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 {
 	if (CComQIPtr<IMediaSample2> pMS2 = pMS) {
 		AM_SAMPLE2_PROPERTIES props;
@@ -1950,11 +1950,11 @@ void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS, AVFrame* pFrame
 			switch (m_nDeinterlacing) {
 				case AUTO :
 					m_nFrameType = PICT_BOTTOM_FIELD;
-					if (!pFrame->interlaced_frame) {
+					if (!m_pFrame->interlaced_frame) {
 						props.dwTypeSpecificFlags		|= AM_VIDEO_FLAG_WEAVE;
 						m_nFrameType					= PICT_FRAME;
 					} else {
-						if (pFrame->top_field_first) {
+						if (m_pFrame->top_field_first) {
 							props.dwTypeSpecificFlags	|= AM_VIDEO_FLAG_FIELD1FIRST;
 							m_nFrameType				= PICT_TOP_FIELD;
 						}
@@ -1972,7 +1972,7 @@ void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS, AVFrame* pFrame
 					m_nFrameType = PICT_BOTTOM_FIELD;
 			}
 
-			switch (pFrame->pict_type) {
+			switch (m_pFrame->pict_type) {
 				case AV_PICTURE_TYPE_I :
 				case AV_PICTURE_TYPE_SI :
 					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_I_SAMPLE;
@@ -2523,7 +2523,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 		rtLast = rtStart;
 #endif
 
-		SetTypeSpecificFlags(pOut, m_pFrame);
+		SetTypeSpecificFlags(pOut);
 		hr = m_pOutput->Deliver(pOut);
 	}
 

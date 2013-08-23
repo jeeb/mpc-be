@@ -300,7 +300,7 @@ public:
 		}
 	}
 
-	void						SetTypeSpecificFlags(IMediaSample* pMS, AVFrame* pFrame);
+	void						SetTypeSpecificFlags(IMediaSample* pMS);
 
 	// === DXVA1 functions
 	DDPIXELFORMAT*				GetPixelFormat()		{ return &m_PixelFormat; }
