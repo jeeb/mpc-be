@@ -27,8 +27,8 @@
 #include <atlcoll.h>
 #include <atlpath.h>
 
-#define UTF8(str) UTF16To8(TToW(str))
-#define UTF8Arg(str) UrlEncode(UTF8(str), true)
+#define UTF8(str)		StringToUTF8(TToW(str))
+#define UTF8Arg(str)	UrlEncode(UTF8(str), true)
 
 #define CMD_SETPOS "-1"
 #define CMD_SETVOLUME "-2"

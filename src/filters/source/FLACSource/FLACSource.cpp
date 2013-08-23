@@ -388,7 +388,7 @@ HRESULT CFLACStream::CheckMediaType(const CMediaType* pmt)
 }
 
 static bool ParseVorbisComment(const LPCSTR field_name, const FLAC__StreamMetadata_VorbisComment_Entry *entry, CString* TagValue){
-	*TagValue = _T("");
+	TagValue->Empty();
 
 	if (CStringA(entry->entry).MakeLower().Find(CStringA(field_name) + "=") < 0) {
 		return false;
@@ -396,7 +396,7 @@ static bool ParseVorbisComment(const LPCSTR field_name, const FLAC__StreamMetada
 	
 	CStringA vorbis_data(entry->entry);
 	vorbis_data.Delete(0, vorbis_data.Find("=") + 1);
-	*TagValue = CA2CT(vorbis_data, CP_UTF8);
+	*TagValue = UTF8ToString(vorbis_data);
 
 	return true;
 }

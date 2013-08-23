@@ -161,7 +161,7 @@ void CWebClientSocket::Header()
 							CAtlList<CString> sl2;
 							Explode(sl.GetNext(pos), sl2, '=', 2);
 							if (sl2.GetCount() == 2) {
-								m_post[sl2.GetHead().MakeLower()] = UTF8To16(UrlDecode(TToA(sl2.GetTail())));
+								m_post[sl2.GetHead().MakeLower()] = UTF8ToString(UrlDecode(TToA(sl2.GetTail())));
 							} else {
 								m_post[sl2.GetHead().MakeLower()] = _T("");
 							}
@@ -200,7 +200,7 @@ void CWebClientSocket::Header()
 				CAtlList<CString> sl2;
 				Explode(sl.GetNext(pos), sl2, '=', 2);
 				if (sl2.GetCount() == 2) {
-					m_get[sl2.GetHead()] = UTF8To16(UrlDecode(TToA(sl2.GetTail())));
+					m_get[sl2.GetHead()] = UTF8ToString(UrlDecode(TToA(sl2.GetTail())));
 				} else {
 					m_get[sl2.GetHead()] = _T("");
 				}

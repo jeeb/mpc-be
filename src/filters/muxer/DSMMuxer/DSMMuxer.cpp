@@ -129,7 +129,7 @@ void CDSMMuxerFilter::MuxFileInfo(IBitStream* pBS)
 	CSimpleMap<CStringA, CStringA> si;
 
 	for (int i = 0; i < GetSize(); i++) {
-		CStringA key = CStringA(CString(GetKeyAt(i))), value = UTF16To8(GetValueAt(i));
+		CStringA key = CStringA(CString(GetKeyAt(i))), value = StringToUTF8(GetValueAt(i));
 		if (key.GetLength() != 4) {
 			continue;
 		}
@@ -153,7 +153,7 @@ void CDSMMuxerFilter::MuxStreamInfo(IBitStream* pBS, CBaseMuxerInputPin* pPin)
 	CSimpleMap<CStringA, CStringA> si;
 
 	for (int i = 0; i < pPin->GetSize(); i++) {
-		CStringA key = CStringA(CString(pPin->GetKeyAt(i))), value = UTF16To8(pPin->GetValueAt(i));
+		CStringA key = CStringA(CString(pPin->GetKeyAt(i))), value = StringToUTF8(pPin->GetValueAt(i));
 		if (key.GetLength() != 4) {
 			continue;
 		}
@@ -245,9 +245,9 @@ void CDSMMuxerFilter::MuxHeader(IBitStream* pBS)
 			BYTE* pData = NULL;
 			DWORD len = 0;
 			if (SUCCEEDED(pRB->ResGet(i, &name, &desc, &mime, &pData, &len, NULL))) {
-				CStringA utf8_name = UTF16To8(name);
-				CStringA utf8_desc = UTF16To8(desc);
-				CStringA utf8_mime = UTF16To8(mime);
+				CStringA utf8_name = StringToUTF8(name);
+				CStringA utf8_desc = StringToUTF8(desc);
+				CStringA utf8_mime = StringToUTF8(mime);
 
 				MuxPacketHeader(pBS, DSMP_RESOURCE,
 								1 +
@@ -285,7 +285,7 @@ void CDSMMuxerFilter::MuxHeader(IBitStream* pBS)
 				rtPrev = c.rt;
 				c.rt = rtDiff;
 				c.name = name;
-				len += 1 + GetByteLength(myabs(c.rt)) + UTF16To8(c.name).GetLength()+1;
+				len += 1 + GetByteLength(myabs(c.rt)) + StringToUTF8(c.name).GetLength()+1;
 				chapters.AddTail(c);
 			}
 		}
@@ -296,7 +296,7 @@ void CDSMMuxerFilter::MuxHeader(IBitStream* pBS)
 			pos = chapters.GetHeadPosition();
 			while (pos) {
 				CDSMChapter& c = chapters.GetNext(pos);
-				CStringA name = UTF16To8(c.name);
+				CStringA name = StringToUTF8(c.name);
 				int irt = GetByteLength(myabs(c.rt));
 				pBS->BitWrite(c.rt < 0, 1);
 				pBS->BitWrite(irt, 3);

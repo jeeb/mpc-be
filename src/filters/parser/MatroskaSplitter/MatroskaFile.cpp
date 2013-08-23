@@ -1198,7 +1198,7 @@ HRESULT CUTF8::Parse(CMatroskaNode* pMN)
 		return E_FAIL;
 	}
 	buff[pMN->m_len] = 0;
-	CStringW::operator = (UTF8To16((LPCSTR)(BYTE*)buff));
+	CString::operator = (UTF8ToString((LPCSTR)(BYTE*)buff));
 	return S_OK;
 }
 

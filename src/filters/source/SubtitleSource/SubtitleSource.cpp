@@ -514,7 +514,7 @@ HRESULT CSubtitleStream::FillBuffer(IMediaSample* pSample)
 			}
 
 			if (m_mt.majortype == MEDIATYPE_Subtitle && m_mt.subtype == MEDIASUBTYPE_UTF8) {
-				CStringA str = UTF16To8(m_rts.GetStrW(m_nPosition, false));
+				CStringA str = StringToUTF8(m_rts.GetStrW(m_nPosition, false));
 				memcpy((char*)pData, str, len = str.GetLength());
 			} else if (m_mt.majortype == MEDIATYPE_Subtitle && (m_mt.subtype == MEDIASUBTYPE_SSA || m_mt.subtype == MEDIASUBTYPE_ASS)) {
 				CStringW line;
@@ -523,7 +523,7 @@ HRESULT CSubtitleStream::FillBuffer(IMediaSample* pSample)
 							stse.marginRect.left, stse.marginRect.right, (stse.marginRect.top+stse.marginRect.bottom)/2,
 							CStringW(stse.effect), m_rts.GetStrW(m_nPosition, true));
 
-				CStringA str = UTF16To8(line);
+				CStringA str = StringToUTF8(line);
 				memcpy((char*)pData, str, len = str.GetLength());
 			} else if (m_mt.majortype == MEDIATYPE_Text && m_mt.subtype == MEDIASUBTYPE_NULL) {
 				CStringA str = m_rts.GetStrA(m_nPosition, false);

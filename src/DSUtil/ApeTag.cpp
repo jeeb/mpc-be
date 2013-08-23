@@ -22,6 +22,7 @@
 
 #include "stdafx.h"
 #include "ApeTag.h"
+#include "DSUtil.h"
 
 #define APE_TAG_FOOTER_BYTES			32
 #define APE_TAG_VERSION					2000
@@ -88,7 +89,7 @@ bool CApeTagItem::Load(CGolombBuffer &gb){
 		BYTE* value = DNew BYTE[tag_size + 1];
 		memset(value, 0, tag_size + 1);
 		gb.ReadBuffer(value, tag_size);
-		m_value	= CA2CT(CStringA(value), CP_UTF8);
+		m_value	= UTF8ToString((LPCSTR)value);
 		m_key	= CString(key);
 		delete [] value;
 	}

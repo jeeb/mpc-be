@@ -118,7 +118,7 @@ CString CMpaSplitterFile::ReadText(DWORD &size, BYTE encoding)
 		return wstr.Trim();
 	} else {
 		ByteRead((BYTE*)str.GetBufferSetLength(size), size);
-		return (encoding > 0 ? UTF8To16(str) : CStringW(str)).Trim();
+		return (encoding > 0 ? UTF8ToString(str) : CStringW(str)).Trim();
 	}
 }
 

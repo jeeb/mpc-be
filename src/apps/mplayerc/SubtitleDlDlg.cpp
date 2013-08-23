@@ -128,13 +128,13 @@ bool CSubtitleDlDlg::Parse()
 
 		CStringA titlesA = Implode(m.titles, '|');
 		titlesA.Replace("|", ", ");
-		p.titles = UTF8To16(titlesA);
+		p.titles = UTF8ToString(titlesA);
 		p.checked = false;
 
 		POSITION pos2 = m.subs.GetHeadPosition();
 		while (pos2) {
 			const isdb_subtitle& s = m.subs.GetNext(pos2);
-			p.name = UTF8To16(s.name);
+			p.name = UTF8ToString(s.name);
 			p.language = s.language;
 			p.format = s.format;
 			p.disc.Format(_T("%d/%d"), s.disc_no, s.discs);

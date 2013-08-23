@@ -164,7 +164,7 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 			}
 		}
 
-		str = UTF8To16(UrlDecode(UrlDecode(CStringA(tmp))));
+		str = UTF8ToString(UrlDecode(UrlDecode(CStringA(tmp))));
 		delete [] tmp;
 
 		// Character Representation
@@ -593,7 +593,7 @@ CString PlayerYouTubeSearchTitle(char* final)
 
 CString PlayerYouTubeReplaceTitle(char* title)
 {
-	CString Title = UTF8To16(title);
+	CString Title = UTF8ToString(title);
 	Title = Title.TrimLeft(_T(".")).TrimRight(_T("."));
 
 	Title.Replace(_T(":"), _T(" -"));

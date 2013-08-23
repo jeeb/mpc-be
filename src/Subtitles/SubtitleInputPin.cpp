@@ -353,7 +353,7 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 		if (m_mt.subtype == MEDIASUBTYPE_UTF8) {
 			CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)(ISubStream*)m_pSubStream;
 
-			CStringW str = UTF8To16(CStringA((LPCSTR)pData, len)).Trim();
+			CStringW str = UTF8ToString(CStringA((LPCSTR)pData, len)).Trim();
 			if (!str.IsEmpty()) {
 				pRTS->Add(str, true, (int)(tStart / 10000), (int)(tStop / 10000));
 				fInvalidate = true;
@@ -361,7 +361,7 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 		} else if (m_mt.subtype == MEDIASUBTYPE_SSA || m_mt.subtype == MEDIASUBTYPE_ASS || m_mt.subtype == MEDIASUBTYPE_ASS2) {
 			CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)(ISubStream*)m_pSubStream;
 
-			CStringW str = UTF8To16(CStringA((LPCSTR)pData, len)).Trim();
+			CStringW str = UTF8ToString(CStringA((LPCSTR)pData, len)).Trim();
 			if (!str.IsEmpty()) {
 				STSEntry stse;
 
