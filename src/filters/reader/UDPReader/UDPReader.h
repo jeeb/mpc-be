@@ -24,6 +24,7 @@
 #pragma once
 
 #include <atlbase.h>
+#include <atlutil.h>
 #include <AsyncReader/asyncio.h>
 #include <AsyncReader/asyncrdr.h>
 
@@ -46,16 +47,17 @@ private:
 		}
 	};
 
-	CString     m_protocol;
-	CString     m_host;
-	int         m_port;
+	CString     m_url_str;
+	CUrl        m_url;
+	int         m_protocol;
+	enum {PR_NONE, PR_UDP, PR_HTTP};
+
 	SOCKET      m_socket;
 	sockaddr_in m_addr;
 	WSAEVENT    m_WSAEvent[1];
 	__int64     m_pos, m_len;
 	CAtlList<packet_t*> m_packets;
 
-	CString m_url_str;
 	GUID    m_subtype;
 
 	void Clear();

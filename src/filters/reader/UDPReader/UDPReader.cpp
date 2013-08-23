@@ -24,7 +24,6 @@
 #include "stdafx.h"
 #include "UDPReader.h"
 #include <WinInet.h> //TODO: remove it
-#include <atlutil.h>
 #include <moreuuids.h>
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/MPCSocket.h"
@@ -155,9 +154,9 @@ STDMETHODIMP CUDPReader::GetCurFile(LPOLESTR* ppszFileName, AM_MEDIA_TYPE* pmt)
 
 CUDPStream::CUDPStream()
 {
-	m_port    = 0;
-	m_socket  = INVALID_SOCKET;
-	m_subtype = MEDIASUBTYPE_NULL;
+	m_protocol = PR_NONE;
+	m_socket   = INVALID_SOCKET;
+	m_subtype  = MEDIASUBTYPE_NULL;
 
 	m_WSAEvent[0] = NULL;
 }
@@ -183,7 +182,7 @@ void CUDPStream::Clear()
 		CAMThread::Close();
 	}
 
-	if (m_protocol == L"udp") { // ?
+	if (m_protocol == PR_UDP) { // ?
 		WSACleanup();
 	}
 
@@ -208,28 +207,27 @@ bool CUDPStream::Load(const WCHAR* fnw)
 
 	m_url_str = CString(fnw);
 
-	CUrl url;
-	if (!url.CrackUrl(fnw)) {
+	if (!m_url.CrackUrl(fnw)) {
 		return false;
 	}
 
-	m_protocol = url.GetSchemeName();
-	m_protocol.MakeLower();
-	m_host = url.GetHostName();
-	m_port = url.GetPortNumber();
+	CString str_protocol = m_url.GetSchemeName();
+	str_protocol.MakeLower();
 
-	if (m_protocol == L"udp") {
+	if (str_protocol == L"udp") {
+		m_protocol = PR_UDP;
+
 		WSADATA wsaData;
 		WSAStartup(MAKEWORD(2, 2), &wsaData);
 
 		memset(&m_addr, 0, sizeof(m_addr));
-		m_addr.sin_family		= AF_INET;
-		m_addr.sin_port			= htons((u_short)m_port);
-		m_addr.sin_addr.s_addr	= htonl(INADDR_ANY);
+		m_addr.sin_family      = AF_INET;
+		m_addr.sin_port        = htons((u_short)m_url.GetPortNumber());
+		m_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 		ip_mreq imr;
-		imr.imr_multiaddr.s_addr	= inet_addr(CStringA(m_host));
-		imr.imr_interface.s_addr	= INADDR_ANY;
+		imr.imr_multiaddr.s_addr = inet_addr(CStringA(m_url.GetHostName()));
+		imr.imr_interface.s_addr = INADDR_ANY;
 
 		if ((m_socket = socket(AF_INET, SOCK_DGRAM, 0)) != INVALID_SOCKET) {
 			m_WSAEvent[0] = WSACreateEvent();
@@ -296,14 +294,15 @@ bool CUDPStream::Load(const WCHAR* fnw)
 		//u_long param = 0;
 		//ioctlsocket(m_socket, FIONBIO, &param);
 
-	} else if (m_protocol == L"http") {
-		if (url.GetUrlPathLength() == 0) {
-			url.SetUrlPath(_T("/"));
+	} else if (str_protocol == L"http") {
+		m_protocol = PR_HTTP;
+
+		if (m_url.GetUrlPathLength() == 0) {
+			m_url.SetUrlPath(_T("/"));
 		}
 
-		if (url.GetPortNumber() == ATL_URL_INVALID_PORT_NUMBER) {
-			url.SetPortNumber(ATL_URL_DEFAULT_HTTP_PORT);
-			m_port = ATL_URL_DEFAULT_HTTP_PORT;
+		if (m_url.GetPortNumber() == ATL_URL_INVALID_PORT_NUMBER) {
+			m_url.SetPortNumber(ATL_URL_DEFAULT_HTTP_PORT);
 		}
 
 		CMPCSocket socket;
@@ -313,15 +312,15 @@ bool CUDPStream::Load(const WCHAR* fnw)
 		BOOL connected = TRUE;
 
 		socket.SetTimeOut(3000);
-		connected = socket.Connect(url.GetHostName(), url.GetPortNumber());
+		connected = socket.Connect(m_url.GetHostName(), m_url.GetPortNumber());
 		socket.KillTimeOut();
 		if (connected) {
-			CStringA host = CStringA(url.GetHostName());
-			CStringA path = CStringA(url.GetUrlPath()) + CStringA(url.GetExtraInfo());
+			CStringA host = CStringA(m_url.GetHostName());
+			CStringA path = CStringA(m_url.GetUrlPath()) + CStringA(m_url.GetExtraInfo());
 			CStringA hdr;
 			hdr.Format(
 				"GET %s HTTP/1.0\r\n"
-				"User-Agent: Media Player Classic\r\n"
+				"User-Agent: MPC UDP/HTTP Reader\r\n"
 				"Host: %s\r\n"
 				"Accept: */*\r\n"
 				"\r\n", path, host);
@@ -386,6 +385,8 @@ bool CUDPStream::Load(const WCHAR* fnw)
 		if (!connected) {
 			return false;
 		}
+	} else {
+		return false; // not supported protocol
 	}
 
 	CAMThread::Create();
@@ -501,8 +502,8 @@ DWORD CUDPStream::ThreadProc()
 	SetThreadPriority(m_hThread, THREAD_PRIORITY_TIME_CRITICAL);
 
 	HINTERNET f = NULL;
-	if (m_protocol == L"http") {
-		HINTERNET s = InternetOpen(L"Media Player Classic", 0, NULL, NULL, 0);
+	if (m_protocol == PR_HTTP) {
+		HINTERNET s = InternetOpen(L"MPC UDP/HTTP Reader", 0, NULL, NULL, 0);
 		if (s) {
 			f = InternetOpenUrl(s, m_url_str, NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 			if (f) {
@@ -555,7 +556,7 @@ DWORD CUDPStream::ThreadProc()
 					while (!CheckRequest(NULL) && timeout < 1000) {
 						int len =  0;
 
-						if (m_protocol == L"udp") {
+						if (m_protocol == PR_UDP) {
 							DWORD res = WSAWaitForMultipleEvents(1, m_WSAEvent, FALSE, 100, FALSE);
 								if (res == WSA_WAIT_EVENT_0) {
 								WSAResetEvent(m_WSAEvent[0]);
@@ -573,7 +574,7 @@ DWORD CUDPStream::ThreadProc()
 								continue;
 							}
 
-						} else { // if (m_protocol == L"http") {
+						} else if (m_protocol == PR_HTTP) {
 							DWORD dwBytesRead = 0;
 							if (!InternetReadFile(f, (LPVOID)&buff[buffsize], MAXBUFSIZE, &dwBytesRead) || !dwBytesRead) {
 								Sleep(50);
@@ -626,7 +627,7 @@ DWORD CUDPStream::ThreadProc()
 						}
 					}
 				}
-				if (m_protocol == L"udp") { // ?
+				if (m_protocol == PR_UDP) { // ?
 					WSAResetEvent(m_WSAEvent[0]);
 				}
 
