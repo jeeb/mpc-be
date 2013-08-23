@@ -27,7 +27,7 @@
 #include <AsyncReader/asyncio.h>
 #include <AsyncReader/asyncrdr.h>
 
-#define UDPReaderName L"MPC UDP Reader"
+#define UDPReaderName L"MPC UDP/HTTP Reader"
 
 class CUDPStream : public CAsyncStream, public CAMThread
 {
@@ -55,6 +55,9 @@ private:
 	__int64     m_pos, m_len;
 	CAtlList<packet_t*> m_packets;
 
+	CString m_url_str;
+	GUID    m_subtype;
+
 	void Clear();
 	void Append(BYTE* buff, int len);
 
@@ -75,6 +78,8 @@ public:
 	DWORD Alignment();
 	void Lock();
 	void Unlock();
+
+	GUID GetSubtype() { return m_subtype; }
 };
 
 class __declspec(uuid("0E4221A9-9718-48D5-A5CF-4493DAD4A015"))
