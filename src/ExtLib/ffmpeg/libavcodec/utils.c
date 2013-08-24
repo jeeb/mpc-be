@@ -184,7 +184,7 @@ void avcodec_set_dimensions(AVCodecContext *s, int width, int height)
     s->height       = FF_CEIL_RSHIFT(height, s->lowres);
 }
 
-#if (ARCH_ARM && HAVE_NEON) || ARCH_PPC || HAVE_MMX
+#if HAVE_NEON || ARCH_PPC || HAVE_MMX
 #   define STRIDE_ALIGN 16
 #else
 #   define STRIDE_ALIGN 8
@@ -3258,7 +3258,7 @@ const uint8_t *avpriv_find_start_code(const uint8_t *av_restrict p,
                                       uint32_t *av_restrict state)
 {
     int i;
-    // ==> Start patch MP
+    // ==> Start patch MPC
     //av_assert0(p <= end);
     // ==> End patch MPC
     if (p >= end)

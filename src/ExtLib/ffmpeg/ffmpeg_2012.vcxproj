@@ -56,7 +56,7 @@
     <None Include="libavcodec\x86\videodsp.asm" />
     <None Include="libavcodec\x86\vorbisdsp.asm" />
     <None Include="libavcodec\x86\vp3dsp.asm" />
-    <None Include="libavcodec\x86\vp56dsp.asm" />
+    <None Include="libavcodec\x86\vp6dsp.asm" />
     <None Include="libavcodec\x86\vp8dsp.asm" />
     <None Include="libavresample\x86\audio_convert.asm" />
     <None Include="libavresample\x86\audio_mix.asm" />
@@ -278,6 +278,7 @@
     <ClInclude Include="libavcodec\vc1acdata.h" />
     <ClInclude Include="libavcodec\vc1data.h" />
     <ClInclude Include="libavcodec\vc1dsp.h" />
+    <ClInclude Include="libavcodec\vdpau_internal.h" />
     <ClInclude Include="libavcodec\version.h" />
     <ClInclude Include="libavcodec\videodsp.h" />
     <ClInclude Include="libavcodec\vorbis.h" />
@@ -670,6 +671,7 @@
     <ClCompile Include="libavcodec\wmv2dsp.c" />
     <ClCompile Include="libavcodec\x86\ac3dsp_init.c" />
     <ClCompile Include="libavcodec\x86\constants.c" />
+    <ClCompile Include="libavcodec\x86\dct_init.c" />
     <ClCompile Include="libavcodec\x86\diracdsp_mmx.c" />
     <ClCompile Include="libavcodec\x86\dirac_dwt.c" />
     <ClCompile Include="libavcodec\x86\dsputil_init.c" />
@@ -708,7 +710,7 @@
     <ClCompile Include="libavcodec\x86\videodsp_init.c" />
     <ClCompile Include="libavcodec\x86\vorbisdsp_init.c" />
     <ClCompile Include="libavcodec\x86\vp3dsp_init.c" />
-    <ClCompile Include="libavcodec\x86\vp56dsp_init.c" />
+    <ClCompile Include="libavcodec\x86\vp6dsp_init.c" />
     <ClCompile Include="libavcodec\x86\vp8dsp_init.c" />
     <ClCompile Include="libavcodec\xiph.c" />
     <ClCompile Include="libavresample\audio_convert.c" />

@@ -355,7 +355,7 @@ static void hybrid4_8_12_cx(PSDSPContext *dsp, float (*in)[2], float (*out)[32][
     int i;
 
     for (i = 0; i < len; i++, in++) {
-        // ==> Start patch MP
+        // ==> Start patch MPC
         dsp->hybrid_analysis(out[0] + i, in, (const float (*)[8][2])filter, 32, N);
         // ==> End patch MPC
     }

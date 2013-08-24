@@ -139,10 +139,10 @@
     <None Include="libavcodec\x86\vp3dsp.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
-    <None Include="libavcodec\x86\vp8dsp.asm">
+    <None Include="libavcodec\x86\vp6dsp.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
-    <None Include="libavcodec\x86\vp56dsp.asm">
+    <None Include="libavcodec\x86\vp8dsp.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
     <None Include="libavresample\x86\audio_convert.asm">
@@ -832,6 +832,9 @@
     <ClInclude Include="libavcodec\vc1dsp.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
+    <ClInclude Include="libavcodec\vdpau_internal.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
     <ClInclude Include="libavcodec\version.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
@@ -872,6 +875,9 @@
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\vp56dsp.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="libavcodec\wavpack.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\wma.h">
@@ -1111,9 +1117,6 @@
     <ClInclude Include="libswscale\version.h">
       <Filter>libswscale</Filter>
     </ClInclude>
-    <ClInclude Include="libavcodec\wavpack.h">
-      <Filter>libavcodec</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="config.c" />
@@ -1121,6 +1124,9 @@
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\constants.c">
+      <Filter>libavcodec\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\x86\dct_init.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\dirac_dwt.c">
@@ -1237,10 +1243,10 @@
     <ClCompile Include="libavcodec\x86\vp3dsp_init.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
-    <ClCompile Include="libavcodec\x86\vp8dsp_init.c">
+    <ClCompile Include="libavcodec\x86\vp6dsp_init.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
-    <ClCompile Include="libavcodec\x86\vp56dsp_init.c">
+    <ClCompile Include="libavcodec\x86\vp8dsp_init.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\aac_ac3_parser.c">

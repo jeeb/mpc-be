@@ -337,6 +337,7 @@ SRCS_C = \
 	libavcodec/xiph.c \
 	libavcodec/x86/ac3dsp_init.c \
 	libavcodec/x86/constants.c \
+	libavcodec/x86/dct_init.c \
 	libavcodec/x86/dirac_dwt.c \
 	libavcodec/x86/diracdsp_mmx.c \
 	libavcodec/x86/dsputil_init.c \
@@ -371,7 +372,7 @@ SRCS_C = \
 	libavcodec/x86/videodsp_init.c \
 	libavcodec/x86/vorbisdsp_init.c \
 	libavcodec/x86/vp3dsp_init.c \
-	libavcodec/x86/vp56dsp_init.c \
+	libavcodec/x86/vp6dsp_init.c \
 	libavcodec/x86/vp8dsp_init.c \
 	libavresample/audio_convert.c \
 	libavresample/audio_data.c \
@@ -470,7 +471,7 @@ SRCS_YASM = \
 	libavcodec/x86/videodsp.asm \
 	libavcodec/x86/vorbisdsp.asm \
 	libavcodec/x86/vp3dsp.asm \
-	libavcodec/x86/vp56dsp.asm \
+	libavcodec/x86/vp6dsp.asm \
 	libavcodec/x86/vp8dsp.asm \
 	libavresample/x86/audio_convert.asm \
 	libavresample/x86/audio_mix.asm \
