@@ -23,23 +23,35 @@
 #pragma once
 
 #include <afxsock.h>
+#include <atlutil.h>
 
 class CMPCSocket : public CSocket
 {
 protected:
 	int m_nTimerID;
 
+	BOOL m_bProxyEnable;
+	CString m_sProxyServer;
+	DWORD m_nProxyPort;
+
+	CUrl m_url;
+	CStringA m_hdr;
+
 	virtual BOOL OnMessagePending();
 
 public:
-	CMPCSocket() {
-		m_nTimerID = 0;
-	}
+	CMPCSocket();
 
 	virtual ~CMPCSocket() {
 		KillTimeOut();
 	}
 
+	BOOL Connect(CString url, BOOL bConnectOnly = FALSE);
+	BOOL Connect(CUrl url, BOOL bConnectOnly = FALSE);
+
 	BOOL SetTimeOut(UINT uTimeOut);
 	BOOL KillTimeOut();
+
+	BOOL SendRequest();
+	void SetProxy(CString ProxyServer, DWORD ProxyPort);
 };

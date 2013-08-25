@@ -851,7 +851,7 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 
 bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl)
 {
-	if (!__super::Connect(url.GetHostName(), url.GetPortNumber())) {
+	if (!__super::Connect(url)) {
 		return false;
 	}
 	KillTimeOut();
@@ -862,14 +862,6 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 	SetTimeOut(15000);
 
 	CStringA str;
-	str.Format(
-		"GET %s HTTP/1.0\r\n"
-		"Icy-MetaData:1\r\n"
-		"User-Agent: shoutcastsource\r\n"
-		"Host: %s\r\n"
-		"Accept: */*\r\n"
-		"Connection: Keep-Alive\r\n"
-		"\r\n", CStringA(url.GetUrlPath()), CStringA(url.GetHostName()));
 
 	bool fOK = false;
 	bool fTryAgain = false;
@@ -878,9 +870,6 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 	int ContentLength = 0;
 
 	do {
-		int len = Send((BYTE*)(LPCSTR)str, str.GetLength());
-		UNREFERENCED_PARAMETER(len);
-
 		m_nBytesRead = 0;
 		m_metaint = metaint = 0;
 		m_bitrate = 0;
@@ -946,14 +935,7 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 #endif
 
 		if (!fOK && GetLastError() == WSAECONNRESET && !fTryAgain) {
-			str.Format(
-				"GET %s HTTP/1.0\r\n"
-				"Icy-MetaData:1\r\n"
-				"Host: %s\r\n"
-				"Accept: */*\r\n"
-				"Connection: Keep-Alive\r\n"
-				"\r\n", CStringA(url.GetUrlPath()), CStringA(url.GetHostName()));
-
+			SendRequest();
 			fTryAgain = true;
 		} else {
 			fTryAgain = false;

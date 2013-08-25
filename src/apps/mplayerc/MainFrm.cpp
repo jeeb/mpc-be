@@ -12696,8 +12696,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				}
 
 				socket.SetTimeOut(3000);
-
-				if (!socket.Connect(url.GetHostName(), url.GetPortNumber())) {
+				if (!socket.Connect(url, TRUE)) {
 					validateUrl = false;
 				}
 

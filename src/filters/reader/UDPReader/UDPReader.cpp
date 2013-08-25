@@ -206,8 +206,13 @@ bool CUDPStream::Load(const WCHAR* fnw)
 	Clear();
 
 	m_url_str = CString(fnw);
+	if (m_url_str.GetAt(m_url_str.GetLength()-1) != '/') {
+		m_url_str += '/';
+	}
 
-	if (!m_url.CrackUrl(fnw)) {
+start:
+
+	if (!m_url.CrackUrl(m_url_str)) {
 		return false;
 	}
 
@@ -312,70 +317,67 @@ bool CUDPStream::Load(const WCHAR* fnw)
 		BOOL connected = TRUE;
 
 		socket.SetTimeOut(3000);
-		connected = socket.Connect(m_url.GetHostName(), m_url.GetPortNumber());
+		connected = socket.Connect(m_url);
 		socket.KillTimeOut();
 		if (connected) {
-			CStringA host = CStringA(m_url.GetHostName());
-			CStringA path = CStringA(m_url.GetUrlPath()) + CStringA(m_url.GetExtraInfo());
+			connected = FALSE;
 			CStringA hdr;
-			hdr.Format(
-				"GET %s HTTP/1.0\r\n"
-				"User-Agent: MPC UDP/HTTP Reader\r\n"
-				"Host: %s\r\n"
-				"Accept: */*\r\n"
-				"\r\n", path, host);
 
-			if (socket.Send((LPCSTR)hdr, hdr.GetLength()) < hdr.GetLength()) {
-				connected = FALSE;
-			} else {
-				hdr.Empty();
-
-				while (hdr.GetLength() < 4096) {
-					CStringA str;
-					str.ReleaseBuffer(socket.Receive(str.GetBuffer(4096), 4096)); // SOCKET_ERROR == -1, also suitable for ReleaseBuffer
-					if (str.IsEmpty()) {
-						break;
-					}
-					hdr += str;
-					int hdrend = hdr.Find("\r\n\r\n");
-					if (hdrend >= 0) {
-						hdr.Truncate(hdrend);
-						break;
-					}
+			while (hdr.GetLength() < 4096) {
+				CStringA str;
+				str.ReleaseBuffer(socket.Receive(str.GetBuffer(4096), 4096)); // SOCKET_ERROR == -1, also suitable for ReleaseBuffer
+				if (str.IsEmpty()) {
+					break;
 				}
-				hdr.MakeLower();
+				hdr += str;
+				int hdrend = hdr.Find("\r\n\r\n");
+				if (hdrend >= 0) {
+					hdr.Truncate(hdrend);
+					break;
+				}
+			}
 
-				CAtlList<CStringA> sl;
-				Explode(hdr, sl, "\n");
-				POSITION pos = sl.GetHeadPosition();
-				while (pos) {
-					CStringA& str = sl.GetNext(pos);
-					str.Trim();
-					int k = str.Find(":");
-					if (k < 1) {
-						continue;
+			connected = !hdr.IsEmpty();
+			hdr.MakeLower();
+
+			CAtlList<CStringA> sl;
+			Explode(hdr, sl, "\n");
+			POSITION pos = sl.GetHeadPosition();
+			while (pos) {
+				CStringA& str = sl.GetNext(pos);
+				str.Trim();
+				int k = str.Find(":");
+				if (k < 1) {
+					continue;
+				}
+				CStringA param = str.Left(k);
+				CStringA value = str.Mid(k + 1).TrimLeft();
+
+				if (param == "content-type") {
+					if (value == "application/octet-stream") {
+						// TODO: make real stream type detector
+						m_subtype = MEDIASUBTYPE_MPEG2_TRANSPORT;
+					} else if (value == "application/ogg") {
+						m_subtype = MEDIASUBTYPE_Ogg;
+					} else if (value == "video/webm") {
+						m_subtype = MEDIASUBTYPE_Matroska;
+					} else if (value == "video/mp4" || value == "video/x-flv" || value == "video/3gpp") {
+						m_subtype = MEDIASUBTYPE_NULL;
+					} else { // "text/html..." and other
+						connected = FALSE; // not supported content-type
+						//break;
 					}
-					CStringA param = str.Left(k);
-					CStringA value = str.Mid(k + 1).TrimLeft();
-
-					if (param == "content-type") {
-						if (value == "application/octet-stream") {
-							// TODO: make real stream type detector
-							m_subtype = MEDIASUBTYPE_MPEG2_TRANSPORT;
-						} else if (value == "application/ogg") {
-							m_subtype = MEDIASUBTYPE_Ogg;
-						} else if (value == "video/webm") {
-							m_subtype = MEDIASUBTYPE_Matroska;
-						} else if (value == "video/mp4" || value == "video/x-flv" || value == "video/3gpp") {
-							m_subtype = MEDIASUBTYPE_NULL;
-						} else { // "text/html..." and other
-							connected = FALSE; // not supported content-type
-							break;
-						}
-					} else if (param == "content-length") {
-						// Not stream. This downloadable file. Here it is better to use "File Source (URL)".
-						connected = FALSE;
-						break;
+				} else if (param == "content-length") {
+					// Not stream. This downloadable file. Here it is better to use "File Source (URL)".
+					connected = FALSE;
+					//break;
+				} else if (param == "location") {
+					if (value.GetAt(value.GetLength()-1) != '/') {
+						value += '/';
+					}
+					if (m_url_str != CString(value)) {
+						m_url_str = value;
+						goto start;
 					}
 				}
 			}

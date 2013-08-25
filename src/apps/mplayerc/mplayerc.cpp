@@ -1917,67 +1917,13 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 			return "";
 		}
 
-		DWORD ProxyEnable = 0;
-		CString ProxyServer;
-		DWORD ProxyPort = 0;
-
-		ULONG len = 256+1;
-		CRegKey key;
-		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings"), KEY_READ)
-				&& ERROR_SUCCESS == key.QueryDWORDValue(_T("ProxyEnable"), ProxyEnable) && ProxyEnable
-				&& ERROR_SUCCESS == key.QueryStringValue(_T("ProxyServer"), ProxyServer.GetBufferSetLength(256), &len)) {
-			ProxyServer.ReleaseBufferSetLength(len);
-
-			CAtlList<CString> sl;
-			ProxyServer = Explode(ProxyServer, sl, ';');
-			if (sl.GetCount() > 1) {
-				POSITION pos = sl.GetHeadPosition();
-				while (pos) {
-					CAtlList<CString> sl2;
-					if (!Explode(sl.GetNext(pos), sl2, '=', 2).CompareNoCase(_T("http"))
-							&& sl2.GetCount() == 2) {
-						ProxyServer = sl2.GetTail();
-						break;
-					}
-				}
-			}
-
-			ProxyServer = Explode(ProxyServer, sl, ':');
-			if (sl.GetCount() > 1) {
-				ProxyPort = _tcstol(sl.GetTail(), NULL, 10);
-			}
-		}
-
 		CMPCSocket s;
 		s.Create();
-		s.SetTimeOut(3000);
-		if (s.Connect(
-					ProxyEnable ? ProxyServer : url.GetHostName(),
-					ProxyEnable ? ProxyPort : url.GetPortNumber())) {
+		s.SetTimeOut(1500);
+		if (s.Connect(fn)) {
 			s.KillTimeOut();
 
-			CStringA host = CStringA(url.GetHostName());
-			CStringA path = CStringA(url.GetUrlPath()) + CStringA(url.GetExtraInfo());
-
-			if (ProxyEnable) {
-				path = "http://" + host + path;
-			}
-
 			CStringA hdr;
-			hdr.Format(
-				"GET %s HTTP/1.0\r\n"
-				"User-Agent: Media Player Classic\r\n"
-				"Host: %s\r\n"
-				"Accept: */*\r\n"
-				"\r\n", path, host);
-
-			// MessageBox(NULL, CString(hdr), _T("Sending..."), MB_OK);
-
-			if (s.Send((LPCSTR)hdr, hdr.GetLength()) < hdr.GetLength()) {
-				return "";
-			}
-
-			hdr.Empty();
 			for (;;) {
 				CStringA str;
 				str.ReleaseBuffer(s.Receive(str.GetBuffer(256), 256)); // SOCKET_ERROR == -1, also suitable for ReleaseBuffer
@@ -1992,8 +1938,6 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 					break;
 				}
 			}
-
-			// MessageBox(NULL, CString(hdr), _T("Received..."), MB_OK);
 
 			CAtlList<CStringA> sl;
 			Explode(hdr, sl, '\n');
@@ -2055,6 +1999,9 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 				}
 				if (!strncmp((LPCSTR)str+4, "moov", 4)) {
 					return "video/quicktime";
+				}
+				if (ct.Find(L"text/plain") == 0 && str.Find("#EXTM3U") == 0) {
+					ct = L"audio/x-mpegurl";
 				}
 			}
 
