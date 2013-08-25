@@ -125,7 +125,7 @@ UINT CSupSubFile::ThreadProc()
 	while (m_sub.GetPosition() < (m_sub.GetLength() - 10)) {
 		sync = (WORD)ReadByte(&m_sub, 2);
 		if (sync == 'PG') {
-			rtStart = UINT64(ReadByte(&m_sub, 4) * (1000 / 9));
+			rtStart = UINT64(ReadByte(&m_sub, 4) * 1000 / 9);
 			m_sub.Seek(4 + 1, CFile::current);	// rtStop + Segment type
 			size = ReadByte(&m_sub, 2) + 3;		// Segment size
 			m_sub.Seek(-3, CFile::current);
