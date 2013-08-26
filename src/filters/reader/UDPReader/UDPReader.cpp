@@ -206,9 +206,6 @@ bool CUDPStream::Load(const WCHAR* fnw)
 	Clear();
 
 	m_url_str = CString(fnw);
-	if (m_url_str.GetAt(m_url_str.GetLength()-1) != '/') {
-		m_url_str += '/';
-	}
 
 start:
 
@@ -304,6 +301,7 @@ start:
 
 		if (m_url.GetUrlPathLength() == 0) {
 			m_url.SetUrlPath(_T("/"));
+			m_url_str += '/';
 		}
 
 		if (m_url.GetPortNumber() == ATL_URL_INVALID_PORT_NUMBER) {
