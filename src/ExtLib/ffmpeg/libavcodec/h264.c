@@ -48,7 +48,6 @@
 #include "thread.h"
 #include "vdpau_internal.h"
 
-// #undef NDEBUG
 #include <assert.h>
 
 // ==> Start patch MPC
@@ -1687,6 +1686,10 @@ static int decode_init_thread_copy(AVCodecContext *avctx)
     memset(h->sps_buffers, 0, sizeof(h->sps_buffers));
     memset(h->pps_buffers, 0, sizeof(h->pps_buffers));
 
+    h->rbsp_buffer[0] = NULL;
+    h->rbsp_buffer[1] = NULL;
+    h->rbsp_buffer_size[0] = 0;
+    h->rbsp_buffer_size[1] = 0;
     h->context_initialized = 0;
 
     return 0;
@@ -1769,6 +1772,8 @@ static int decode_update_thread_context(AVCodecContext *dst,
         for (i = 0; i < MAX_PPS_COUNT; i++)
             av_freep(h->pps_buffers + i);
 
+        av_freep(&h->rbsp_buffer[0]);
+        av_freep(&h->rbsp_buffer[1]);
         memcpy(h, h1, offsetof(H264Context, intra_pcm_ptr));
         memcpy(&h->cabac, &h1->cabac,
                sizeof(H264Context) - offsetof(H264Context, cabac));
@@ -1789,6 +1794,10 @@ static int decode_update_thread_context(AVCodecContext *dst,
         h->mb_type_pool      = NULL;
         h->ref_index_pool    = NULL;
         h->motion_val_pool   = NULL;
+        for (i = 0; i < 2; i++) {
+            h->rbsp_buffer[i] = NULL;
+            h->rbsp_buffer_size[i] = 0;
+        }
 
         if (h1->context_initialized) {
         h->context_initialized = 0;
@@ -1809,10 +1818,6 @@ static int decode_update_thread_context(AVCodecContext *dst,
         }
         }
 
-        for (i = 0; i < 2; i++) {
-            h->rbsp_buffer[i]      = NULL;
-            h->rbsp_buffer_size[i] = 0;
-        }
         h->bipred_scratchpad = NULL;
         h->edge_emu_buffer   = NULL;
 
