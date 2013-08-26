@@ -207,8 +207,6 @@ bool CUDPStream::Load(const WCHAR* fnw)
 
 	m_url_str = CString(fnw);
 
-start:
-
 	if (!m_url.CrackUrl(m_url_str)) {
 		return false;
 	}
@@ -304,39 +302,47 @@ start:
 			m_url_str += '/';
 		}
 
-		if (m_url.GetPortNumber() == ATL_URL_INVALID_PORT_NUMBER) {
-			m_url.SetPortNumber(ATL_URL_DEFAULT_HTTP_PORT);
-		}
+		BOOL connected = FALSE;
+		for (int i = 1; i <=5; i++) {
+			bool redir = false;
 
-		CMPCSocket socket;
-		if (!socket.Create()) {
-			return false;
-		}
-		BOOL connected = TRUE;
-
-		socket.SetTimeOut(3000);
-		connected = socket.Connect(m_url);
-		socket.KillTimeOut();
-		if (connected) {
-			connected = FALSE;
-			CStringA hdr;
-
-			while (hdr.GetLength() < 4096) {
-				CStringA str;
-				str.ReleaseBuffer(socket.Receive(str.GetBuffer(4096), 4096)); // SOCKET_ERROR == -1, also suitable for ReleaseBuffer
-				if (str.IsEmpty()) {
-					break;
-				}
-				hdr += str;
-				int hdrend = hdr.Find("\r\n\r\n");
-				if (hdrend >= 0) {
-					hdr.Truncate(hdrend);
-					break;
-				}
+			if (m_url.GetPortNumber() == ATL_URL_INVALID_PORT_NUMBER) {
+				m_url.SetPortNumber(ATL_URL_DEFAULT_HTTP_PORT);
 			}
 
-			connected = !hdr.IsEmpty();
-			hdr.MakeLower();
+			CMPCSocket socket;
+			if (!socket.Create()) {
+				return false;
+			}
+
+			CStringA hdr;
+
+			socket.SetTimeOut(3000);
+			connected = socket.Connect(m_url);
+			socket.KillTimeOut();
+			if (connected) {
+				while (hdr.GetLength() < 4096) {
+					CStringA str;
+					str.ReleaseBuffer(socket.Receive(str.GetBuffer(4096), 4096)); // SOCKET_ERROR == -1, also suitable for ReleaseBuffer
+					if (str.IsEmpty()) {
+						break;
+					}
+					hdr += str;
+					int hdrend = hdr.Find("\r\n\r\n");
+					if (hdrend >= 0) {
+						hdr.Truncate(hdrend);
+						break;
+					}
+				}
+
+				connected = !hdr.IsEmpty();
+				hdr.MakeLower();
+			}
+			socket.Close();
+
+			if (!connected) {
+				return false;
+			}
 
 			CAtlList<CStringA> sl;
 			Explode(hdr, sl, "\n");
@@ -362,25 +368,30 @@ start:
 					} else if (value == "video/mp4" || value == "video/x-flv" || value == "video/3gpp") {
 						m_subtype = MEDIASUBTYPE_NULL;
 					} else { // "text/html..." and other
-						connected = FALSE; // not supported content-type
-						//break;
+						 // not supported content-type
+						connected = FALSE;
 					}
 				} else if (param == "content-length") {
 					// Not stream. This downloadable file. Here it is better to use "File Source (URL)".
-					connected = FALSE;
-					//break;
+					connected = FALSE; 
 				} else if (param == "location") {
-					if (value.GetAt(value.GetLength()-1) != '/') {
-						value += '/';
-					}
-					if (m_url_str != CString(value)) {
-						m_url_str = value;
-						goto start;
+					if (value.Left(7) == "http://") {
+						if (value.Find('/', 8) == -1) { // looking for the beginning of URL path (find '/' after 'http://x')
+							value += '/'; // if not found, set minimum URL path
+						}
+						if (m_url_str != CString(value)) {
+							m_url_str = value;
+							m_url.CrackUrl(m_url_str);
+							redir = true;
+						}
 					}
 				}
 			}
+
+			if (!redir) {
+				break;
+			}
 		}
-		socket.Close();
 
 		if (!connected) {
 			return false;
