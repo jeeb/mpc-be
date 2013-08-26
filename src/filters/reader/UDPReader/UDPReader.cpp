@@ -335,6 +335,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 						break;
 					}
 				}
+				TRACE("CUDPStream: hdr:\n%s\n", hdr);
 
 				connected = !hdr.IsEmpty();
 				hdr.MakeLower();
