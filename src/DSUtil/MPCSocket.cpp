@@ -28,6 +28,7 @@ CMPCSocket::CMPCSocket()
 	: m_nTimerID(0)
 	, m_bProxyEnable(FALSE)
 	, m_nProxyPort(0)
+	, m_sUserAgent("MPC-BE")
 {
 	CRegKey key;
 	ULONG len			= MAX_PATH;
@@ -73,7 +74,7 @@ BOOL CMPCSocket::Connect(CString url, BOOL bConnectOnly)
 
 BOOL CMPCSocket::Connect(CUrl url, BOOL bConnectOnly)
 {
-	if (!__super::Connect(	
+	if (!__super::Connect(
 				m_bProxyEnable ? m_sProxyServer : url.GetHostName(),
 				m_bProxyEnable ? m_nProxyPort : url.GetPortNumber())) {
 		KillTimeOut();
@@ -91,10 +92,10 @@ BOOL CMPCSocket::Connect(CUrl url, BOOL bConnectOnly)
 
 	m_hdr.Format(
 		"GET %s HTTP/1.0\r\n"
-		"User-Agent: MPC-BE\r\n"
+		"User-Agent: %s\r\n"
 		"Host: %s\r\n"
 		"Accept: */*\r\n"
-		"\r\n", path, host);
+		"\r\n", path, m_sUserAgent, host);
 
 	if (!bConnectOnly) {
 		SendRequest();
@@ -144,4 +145,9 @@ void CMPCSocket::SetProxy(CString ProxyServer, DWORD ProxyPort)
 		m_sProxyServer	= ProxyServer;
 		m_nProxyPort	= ProxyPort;
 	}
+}
+
+void CMPCSocket::SetUserAgent(CStringA UserAgent)
+{
+	m_sUserAgent = UserAgent;
 }

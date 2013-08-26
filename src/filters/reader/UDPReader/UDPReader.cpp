@@ -317,6 +317,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 
 			CStringA hdr;
 
+			socket.SetUserAgent("MPC UDP/HTTP Reader");
 			socket.SetTimeOut(3000);
 			connected = socket.Connect(m_url);
 			socket.KillTimeOut();

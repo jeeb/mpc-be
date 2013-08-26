@@ -364,6 +364,7 @@ redirect:
 		return;
 	}
 
+	m_socket.SetUserAgent("MPC ShoutCast Source");
 	// set 5 sec. timeout for connect
 	if (!m_socket.SetTimeOut(5000)) {
 		TRACE(_T("CShoutcastStream(): Unable to set Timeout\n"));
