@@ -284,15 +284,6 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
             return __T("Disabled due to compilation options");
         #endif //MEDIAINFO_MD5
     }
-    else if (Option_Lower==__T("file_ignoresequencefilesize"))
-    {
-        #if MEDIAINFO_MD5
-            File_IgnoreSequenceFileSize_Set(!(Value==__T("0") || Value.empty()));
-            return Ztring();
-        #else //MEDIAINFO_MD5
-            return __T("Disabled due to compilation options");
-        #endif //MEDIAINFO_MD5
-    }
     else if (Option_Lower==__T("file_source_list"))
     {
         #if MEDIAINFO_MD5
@@ -305,7 +296,7 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
     else if (Option_Lower==__T("file_demux_unpacketize_streamlayoutchange_skip"))
     {
         #if MEDIAINFO_DEMUX
-		    #if MEDIAINFO_ADVANCED
+            #if MEDIAINFO_ADVANCED
                 File_Demux_Unpacketize_StreamLayoutChange_Skip_Set(!(Value==__T("0") || Value.empty()));
                 return Ztring();
             #else //MEDIAINFO_ADVANCED
