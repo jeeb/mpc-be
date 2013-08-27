@@ -30,10 +30,6 @@ class CMPCSocket : public CSocket
 protected:
 	int m_nTimerID;
 
-	BOOL     m_bProxyEnable;
-	CString  m_sProxyServer;
-	DWORD    m_nProxyPort;
-
 	CUrl     m_url;
 	CStringA m_sUserAgent;
 	CStringA m_hdr;
@@ -54,6 +50,5 @@ public:
 	BOOL KillTimeOut();
 
 	BOOL SendRequest();
-	void SetProxy(CString ProxyServer, DWORD ProxyPort);
 	void SetUserAgent(CStringA UserAgent);
 };
