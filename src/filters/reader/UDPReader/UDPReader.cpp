@@ -514,9 +514,10 @@ DWORD CUDPStream::ThreadProc()
 {
 	SetThreadPriority(m_hThread, THREAD_PRIORITY_TIME_CRITICAL);
 
+	HINTERNET s = NULL;
 	HINTERNET f = NULL;
 	if (m_protocol == PR_HTTP) {
-		HINTERNET s = InternetOpen(L"MPC UDP/HTTP Reader", 0, NULL, NULL, 0);
+		s = InternetOpen(L"MPC UDP/HTTP Reader", 0, NULL, NULL, 0);
 		if (s) {
 			f = InternetOpenUrl(s, m_url_str, NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 			if (f) {
@@ -556,6 +557,10 @@ DWORD CUDPStream::ThreadProc()
 				}
 #endif
 				Reply(S_OK);
+
+				InternetCloseHandle(f);
+				InternetCloseHandle(s);
+
 				return 0;
 			case CMD_RUN:
 				//Reply(m_socket != INVALID_SOCKET ? S_OK : E_FAIL);
@@ -649,6 +654,10 @@ DWORD CUDPStream::ThreadProc()
 	}
 
 	ASSERT(0);
+
+	InternetCloseHandle(f);
+	InternetCloseHandle(s);
+
 	return (DWORD)-1;
 }
 
