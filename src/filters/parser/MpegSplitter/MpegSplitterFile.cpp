@@ -998,19 +998,23 @@ void CMpegSplitterFile::UpdatePrograms(const trhdr& h, bool UpdateLang)
 				int len = h2.section_length;
 				len -= 5+4;
 
-				BYTE buffer[1024];
-				ByteRead(buffer, len);
+				if (len) {
+					BYTE* buffer = DNew BYTE[len];
+					ByteRead(buffer, len);
 
-				int max_len = h.bytes - 9;
+					int max_len = h.bytes - 9;
 
-				if (len > max_len) {
-					memset(pPair->m_value.ts_buffer, 0, sizeof(pPair->m_value.ts_buffer));
-					pPair->m_value.ts_len_cur = max_len;
-					pPair->m_value.ts_len_packet = len;
-					memcpy(pPair->m_value.ts_buffer, buffer, max_len);
-				} else {
-					CGolombBuffer gb(buffer, len);
-					UpdatePrograms(gb, h.pid, UpdateLang);
+					if (len > max_len) {
+						memset(pPair->m_value.ts_buffer, 0, sizeof(pPair->m_value.ts_buffer));
+						pPair->m_value.ts_len_cur = max_len;
+						pPair->m_value.ts_len_packet = len;
+						memcpy(pPair->m_value.ts_buffer, buffer, max_len);
+					} else {
+						CGolombBuffer gb(buffer, len);
+						UpdatePrograms(gb, h.pid, UpdateLang);
+					}
+
+					delete [] buffer;
 				}
 			}
 		} else {
