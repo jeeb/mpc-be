@@ -62,11 +62,18 @@ typedef struct pthread_cond_t {
 } pthread_cond_t;
 
 /* function pointers to conditional variable API on windows 6.0+ kernels */
+#if _WIN32_WINNT < 0x0600
 static void (WINAPI *cond_broadcast)(pthread_cond_t *cond);
 static void (WINAPI *cond_init)(pthread_cond_t *cond);
 static void (WINAPI *cond_signal)(pthread_cond_t *cond);
 static BOOL (WINAPI *cond_wait)(pthread_cond_t *cond, pthread_mutex_t *mutex,
                                 DWORD milliseconds);
+#else
+#define cond_init      InitializeConditionVariable
+#define cond_broadcast WakeAllConditionVariable
+#define cond_signal    WakeConditionVariable
+#define cond_wait      SleepConditionVariableCS
+#endif
 
 static unsigned __stdcall attribute_align_arg win32thread_worker(void *arg)
 {
@@ -130,7 +137,7 @@ typedef struct  win32_cond_t {
 static void pthread_cond_init(pthread_cond_t *cond, const void *unused_attr)
 {
     win32_cond_t *win32_cond = NULL;
-    if (_WIN32_WINNT >= 0x0600 || cond_init) {
+    if (cond_init) {
         cond_init(cond);
         return;
     }
@@ -155,7 +162,7 @@ static void pthread_cond_destroy(pthread_cond_t *cond)
 {
     win32_cond_t *win32_cond = cond->ptr;
     /* native condition variables do not destroy */
-    if (_WIN32_WINNT >= 0x0600 || cond_init)
+    if (cond_init)
         return;
 
     /* non native condition variables */
@@ -172,7 +179,7 @@ static void pthread_cond_broadcast(pthread_cond_t *cond)
     win32_cond_t *win32_cond = cond->ptr;
     int have_waiter;
 
-    if (_WIN32_WINNT >= 0x0600 || cond_broadcast) {
+    if (cond_broadcast) {
         cond_broadcast(cond);
         return;
     }
@@ -202,7 +209,7 @@ static int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex)
 {
     win32_cond_t *win32_cond = cond->ptr;
     int last_waiter;
-    if (_WIN32_WINNT >= 0x0600 || cond_wait) {
+    if (cond_wait) {
         cond_wait(cond, mutex, INFINITE);
         return 0;
     }
@@ -234,7 +241,7 @@ static void pthread_cond_signal(pthread_cond_t *cond)
 {
     win32_cond_t *win32_cond = cond->ptr;
     int have_waiter;
-    if (_WIN32_WINNT >= 0x0600 || cond_signal) {
+    if (cond_signal) {
         cond_signal(cond);
         return;
     }
@@ -268,11 +275,6 @@ static void w32thread_init(void)
         (void*)GetProcAddress(kernel_dll, "WakeConditionVariable");
     cond_wait      =
         (void*)GetProcAddress(kernel_dll, "SleepConditionVariableCS");
-#else
-    cond_init      = InitializeConditionVariable;
-    cond_broadcast = WakeAllConditionVariable;
-    cond_signal    = WakeConditionVariable;
-    cond_wait      = SleepConditionVariableCS;
 #endif
 
 }
