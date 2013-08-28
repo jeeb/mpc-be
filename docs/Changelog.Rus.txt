@@ -38,13 +38,13 @@
 	* WVSplitter - игнорируем открытие live streaming потоков(без окончательной длины);
 	* Реорганизация кода UDPReader, что теперь позволяет смотреть IPTV (udp multicast);
 	* UDPReader - перевел на использование non-blocked(асинхронного) режима работы;
-	* MediaInfo 0.7.64+ svn rev.5896;
+	* MediaInfo 0.7.64+ svn rev.5900;
 	* Little-CMS 2.5 git-4eb01404;
 	* ffmpeg 2.0 git-b74213db;
 	* libwebp 0.3.1 git-bef7e9cc;
 	* libpng 1.7.0 b17 git-bb065520;
 	* libopus 1.1 git-03e82037;
-	* ZenLib 0.4.29+ svn rev.445;
+	* ZenLib 0.4.29+ svn rev.447;
 
 Исправления (!):
 	! MpegSplitter - исправил невозможность открытия, перемотки и нормального проигрывание потоков, в которых у видео дорожки полностью отсутствуют временные метки (TimeStamp). Такое попадается на спутниковом TV и IPTV;
