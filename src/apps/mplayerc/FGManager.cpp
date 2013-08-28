@@ -1024,6 +1024,16 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 
 					DbgLog((LOG_TRACE, 3, L"FGM: '%s' Successfully connected", pFGF->GetName()));
 
+#if DBOXVersion
+					if (IsAudioWaveRenderer(pBF)) {
+						POSITION pos = m_transform.Find(pFGF);
+						if (pos != NULL) {
+							m_transform.MoveToTail(pos);
+							delete m_transform.RemoveTail();
+						}
+					}
+#endif
+
 					return hr;
 				}
 			}
@@ -1451,7 +1461,6 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 										while (pos) {
 											CFGFilter* pFGF = m_transform.GetNext(pos);
 											if (SelAudioRenderer == pFGF->GetName()) {
-
 												hr = ConnectFilterDirect(infTeeFilterOutPin, pFGF);
 												if (SUCCEEDED(hr)) {
 													DbgLog((LOG_TRACE, 3, L"FGM: Connect Direct to '%s'", pFGF->GetName()));
