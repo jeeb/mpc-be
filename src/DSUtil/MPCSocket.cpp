@@ -24,6 +24,8 @@
 #include "MPCSocket.h"
 #include "DSUtil.h"
 
+#define PROXY_TIMEOUT_FACTOR 0
+
 CMPCSocket::CMPCSocket()
 	: m_nTimerID(0)
 	, m_uConnectTimeOut(0)
@@ -86,6 +88,13 @@ BOOL CMPCSocket::Connect(CUrl url, BOOL bConnectOnly)
 	if (url.GetPortNumber() == ATL_URL_INVALID_PORT_NUMBER) {
 		url.SetPortNumber(ATL_URL_DEFAULT_HTTP_PORT);
 	}
+
+#if PROXY_TIMEOUT_FACTOR
+	if (m_bProxyEnable) {
+		m_uConnectTimeOut *= PROXY_TIMEOUT_FACTOR;
+		m_uReceiveTimeOut *= PROXY_TIMEOUT_FACTOR;
+	}
+#endif
 
 	if (m_uConnectTimeOut) {
 		SetTimeOut(m_uConnectTimeOut);
