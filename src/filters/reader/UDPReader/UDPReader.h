@@ -23,10 +23,9 @@
 
 #pragma once
 
-#include <atlbase.h>
-#include <atlutil.h>
 #include <AsyncReader/asyncio.h>
 #include <AsyncReader/asyncrdr.h>
+#include "../../../DSUtil/MPCSocket.h"
 
 #define UDPReaderName L"MPC UDP/HTTP Reader"
 
@@ -47,18 +46,22 @@ private:
 		}
 	};
 
-	CString     m_url_str;
-	CUrl        m_url;
-	int         m_protocol;
+	CString		m_url_str;
+	CUrl		m_url;
+	int			m_protocol;
 	enum {PR_NONE, PR_UDP, PR_HTTP};
 
-	SOCKET      m_socket;
-	sockaddr_in m_addr;
-	WSAEVENT    m_WSAEvent[1];
-	__int64     m_pos, m_len;
+	SOCKET		m_UdpSocket;
+	sockaddr_in	m_addr;
+	WSAEVENT	m_WSAEvent[1];
+
+	CMPCSocket	m_HttpSocket;
+	SOCKET		m_HttpSocketTread;
+
+	__int64		m_pos, m_len;
 	CAtlList<packet_t*> m_packets;
 
-	GUID    m_subtype;
+	GUID		m_subtype;
 
 	void Clear();
 	void Append(BYTE* buff, int len);

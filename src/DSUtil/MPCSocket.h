@@ -28,11 +28,20 @@
 class CMPCSocket : public CSocket
 {
 protected:
-	int m_nTimerID;
+	int			m_nTimerID;
 
-	CUrl     m_url;
-	CStringA m_sUserAgent;
-	CStringA m_hdr;
+	BOOL		m_bProxyEnable;
+	CString		m_sProxyServer;
+	DWORD		m_nProxyPort;
+
+	CUrl		m_url;
+	CStringA	m_sUserAgent;
+	
+	CStringA	m_RequestHdr;
+	CStringA	m_Hdr;
+
+	UINT		m_uConnectTimeOut;
+	UINT		m_uReceiveTimeOut;
 
 	virtual BOOL OnMessagePending();
 
@@ -46,9 +55,24 @@ public:
 	BOOL Connect(CString url, BOOL bConnectOnly = FALSE);
 	BOOL Connect(CUrl url, BOOL bConnectOnly = FALSE);
 
+	void SetTimeOut(UINT uConnectTimeOut, UINT uReceiveTimeOut);
 	BOOL SetTimeOut(UINT uTimeOut);
 	BOOL KillTimeOut();
 
 	BOOL SendRequest();
+	CStringA GetHeader() { return m_Hdr; };
+
+	void SetProxy(CString ProxyServer, DWORD ProxyPort);
 	void SetUserAgent(CStringA UserAgent);
+
+	CMPCSocket& operator = (const CMPCSocket& soc) {
+		m_bProxyEnable	= soc.m_bProxyEnable;
+		m_sProxyServer	= soc.m_sProxyServer;
+		m_nProxyPort	= soc.m_nProxyPort;
+		m_url			= soc.m_url;
+		m_sUserAgent	= soc.m_sUserAgent;
+		m_RequestHdr	= soc.m_RequestHdr;
+
+		return *this;
+	}
 };

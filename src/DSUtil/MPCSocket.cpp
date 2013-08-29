@@ -26,35 +26,110 @@
 
 CMPCSocket::CMPCSocket()
 	: m_nTimerID(0)
+	, m_uConnectTimeOut(0)
+	, m_uReceiveTimeOut(0)
+	, m_bProxyEnable(FALSE)
+	, m_nProxyPort(0)
 	, m_sUserAgent("MPC-BE")
 {
+	CRegKey key;
+	ULONG len			= MAX_PATH;
+	DWORD ProxyEnable	= 0;
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings", KEY_READ)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(L"ProxyEnable", ProxyEnable) && ProxyEnable
+				&& ERROR_SUCCESS == key.QueryStringValue(L"ProxyServer", m_sProxyServer.GetBufferSetLength(MAX_PATH), &len)) {
+			m_sProxyServer.ReleaseBufferSetLength(len);
+
+			CAtlList<CString> sl;
+			m_sProxyServer = Explode(m_sProxyServer, sl, ';');
+			if (sl.GetCount() > 1) {
+				POSITION pos = sl.GetHeadPosition();
+				while (pos) {
+					CAtlList<CString> sl2;
+					if (!Explode(sl.GetNext(pos), sl2, '=', 2).CompareNoCase(L"http")
+							&& sl2.GetCount() == 2) {
+						m_sProxyServer = sl2.GetTail();
+						break;
+					}
+				}
+			}
+
+			m_sProxyServer = Explode(m_sProxyServer, sl, ':');
+			if (sl.GetCount() > 1) {
+				m_nProxyPort = _tcstol(sl.GetTail(), NULL, 10);
+			}
+
+			m_bProxyEnable = (ProxyEnable && !m_sProxyServer.IsEmpty() && m_nProxyPort);
+		}
+
+		key.Close();
+	}
 }
 
 BOOL CMPCSocket::Connect(CString url, BOOL bConnectOnly)
 {
 	CUrl Url;
-	
+
 	return (Url.CrackUrl(url) && Connect(Url, bConnectOnly));
 }
 
 BOOL CMPCSocket::Connect(CUrl url, BOOL bConnectOnly)
 {
-	if (!__super::Connect(url.GetHostName(), url.GetPortNumber())) {
+	m_Hdr.Empty();
+
+	if (url.GetScheme() != ATL_URL_SCHEME_HTTP) {
+		return FALSE;
+	}
+	if (url.GetUrlPathLength() == 0) {
+		url.SetUrlPath(_T("/"));
+	}
+	if (url.GetPortNumber() == ATL_URL_INVALID_PORT_NUMBER) {
+		url.SetPortNumber(ATL_URL_DEFAULT_HTTP_PORT);
+	}
+
+	if (m_uConnectTimeOut) {
+		SetTimeOut(m_uConnectTimeOut);
+	}
+
+	if (!__super::Connect(
+			m_bProxyEnable ? m_sProxyServer : url.GetHostName(),
+			m_bProxyEnable ? m_nProxyPort : url.GetPortNumber())) {
 		KillTimeOut();
 		return FALSE;
 	}
 
+	if (m_uConnectTimeOut) {
+		KillTimeOut();
+	}
+
 	m_url = url;
 
-	m_hdr.Format(
-		"GET %s HTTP/1.1\r\n"
-		"User-Agent: %s\r\n"
-		"Host: %s\r\n"
-		"Accept: */*\r\n"
-		"\r\n", CStringA(url.GetUrlPath()), m_sUserAgent, CStringA(url.GetHostName()));
+	CStringA host = CStringA(url.GetHostName());
+	CStringA path = CStringA(url.GetUrlPath()) + CStringA(url.GetExtraInfo());
 
-	if (!bConnectOnly) {
-		SendRequest();
+	if (m_bProxyEnable) {
+		DWORD dwUrlLen = url.GetUrlLength() + 1;
+		TCHAR* szUrl = new TCHAR[dwUrlLen];
+
+		// Retrieve the contents of the CUrl object
+		url.CreateUrl(szUrl, &dwUrlLen);
+		path = CStringA(szUrl);
+
+		delete[] szUrl;
+	}
+
+	m_RequestHdr.Format(
+		"GET %s HTTP/1.0\r\n"
+		"Accept: */*\r\n"
+		"User-Agent: %s\r\n"
+		"%s"
+		"Host: %s:%d\r\n"
+		"\r\n", path, m_sUserAgent, m_bProxyEnable ? "Proxy-Connection: Keep-Alive\r\n" : "", host, url.GetPortNumber());
+
+	if (!bConnectOnly || m_bProxyEnable) {
+		if (!SendRequest()) {
+			return FALSE;
+		}
 	}
 
 	return TRUE;
@@ -78,6 +153,12 @@ BOOL CMPCSocket::OnMessagePending()
 	return __super::OnMessagePending();
 }
 
+void CMPCSocket::SetTimeOut(UINT uConnectTimeOut, UINT uReceiveTimeOut)
+{
+	m_uConnectTimeOut = uConnectTimeOut;
+	m_uReceiveTimeOut = uReceiveTimeOut;
+}
+
 BOOL CMPCSocket::SetTimeOut(UINT uTimeOut)
 {
 	m_nTimerID = SetTimer(NULL, 0, uTimeOut, NULL);
@@ -91,7 +172,40 @@ BOOL CMPCSocket::KillTimeOut()
 
 BOOL CMPCSocket::SendRequest()
 {
-	return (Send((LPCSTR)m_hdr, m_hdr.GetLength()) < m_hdr.GetLength());
+	if (m_uReceiveTimeOut) {
+		SetTimeOut(m_uReceiveTimeOut);
+	}
+
+	BOOL ret = (Send((LPCSTR)m_RequestHdr, m_RequestHdr.GetLength()) == m_RequestHdr.GetLength());
+
+	m_Hdr.Empty();
+	if (ret) {
+		while (m_Hdr.Find("\r\n\r\n") == -1 && m_Hdr.GetLength() < 4096) {
+			CStringA str;
+			str.ReleaseBuffer(Receive(str.GetBuffer(1), 1)); // SOCKET_ERROR == -1, also suitable for ReleaseBuffer
+			if (str.IsEmpty()) {
+				break;
+			}
+			m_Hdr += str;
+		}
+
+		m_Hdr.Replace("\r\n\r\n", "");
+	}
+
+	if (m_uReceiveTimeOut) {
+		KillTimeOut();
+	}
+
+	return ret;
+}
+
+void CMPCSocket::SetProxy(CString ProxyServer, DWORD ProxyPort)
+{
+	if (!ProxyServer.IsEmpty() && ProxyPort) {
+		m_bProxyEnable	= TRUE;
+		m_sProxyServer	= ProxyServer;
+		m_nProxyPort	= ProxyPort;
+	}
 }
 
 void CMPCSocket::SetUserAgent(CStringA UserAgent)

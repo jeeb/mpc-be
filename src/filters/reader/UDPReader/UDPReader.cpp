@@ -23,10 +23,8 @@
 
 #include "stdafx.h"
 #include "UDPReader.h"
-#include <WinInet.h> //TODO: remove it
 #include <moreuuids.h>
 #include "../../../DSUtil/DSUtil.h"
-#include "../../../DSUtil/MPCSocket.h"
 #include "../../../apps/mplayerc/SettingsDefines.h"
 
 #ifdef REGISTER_FILTER
@@ -127,8 +125,8 @@ STDMETHODIMP CUDPReader::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYPE* pmt)
 	m_fn = pszFileName;
 
 	CMediaType mt;
-	mt.majortype = MEDIATYPE_Stream;
-	mt.subtype   = m_stream.GetSubtype();
+	mt.majortype	= MEDIATYPE_Stream;
+	mt.subtype		= m_stream.GetSubtype();
 	m_mt = mt;
 
 	return S_OK;
@@ -153,11 +151,11 @@ STDMETHODIMP CUDPReader::GetCurFile(LPOLESTR* ppszFileName, AM_MEDIA_TYPE* pmt)
 // CUDPStream
 
 CUDPStream::CUDPStream()
+	: m_protocol(PR_NONE)
+	, m_UdpSocket(INVALID_SOCKET)
+	, m_HttpSocketTread(INVALID_SOCKET)
+	, m_subtype(MEDIASUBTYPE_NULL)
 {
-	m_protocol = PR_NONE;
-	m_socket   = INVALID_SOCKET;
-	m_subtype  = MEDIASUBTYPE_NULL;
-
 	m_WSAEvent[0] = NULL;
 }
 
@@ -168,19 +166,24 @@ CUDPStream::~CUDPStream()
 
 void CUDPStream::Clear()
 {
-	if (m_WSAEvent[0] != NULL) {
-		WSACloseEvent(m_WSAEvent[0]);
-	}
-
-	if (m_socket != INVALID_SOCKET) {
-		closesocket(m_socket);
-		m_socket = INVALID_SOCKET;
-	}
-
 	if (CAMThread::ThreadExists()) {
 		CAMThread::CallWorker(CMD_EXIT);
 		CAMThread::Close();
 	}
+
+	if (m_WSAEvent[0] != NULL) {
+		WSACloseEvent(m_WSAEvent[0]);
+	}
+
+	if (m_UdpSocket != INVALID_SOCKET) {
+		closesocket(m_UdpSocket);
+		m_UdpSocket = INVALID_SOCKET;
+	}
+
+	if (m_HttpSocketTread != INVALID_SOCKET) {
+		m_HttpSocket.Attach(m_HttpSocketTread);
+	}
+	m_HttpSocket.Close();
 
 	if (m_protocol == PR_UDP) { // ?
 		WSACleanup();
@@ -229,40 +232,40 @@ bool CUDPStream::Load(const WCHAR* fnw)
 		imr.imr_multiaddr.s_addr = inet_addr(CStringA(m_url.GetHostName()));
 		imr.imr_interface.s_addr = INADDR_ANY;
 
-		if ((m_socket = socket(AF_INET, SOCK_DGRAM, 0)) != INVALID_SOCKET) {
+		if ((m_UdpSocket = socket(AF_INET, SOCK_DGRAM, 0)) != INVALID_SOCKET) {
 			m_WSAEvent[0] = WSACreateEvent();
-			WSAEventSelect(m_socket, m_WSAEvent[0], FD_READ);
+			WSAEventSelect(m_UdpSocket, m_WSAEvent[0], FD_READ);
 
 			DWORD dw = TRUE;
-			if (setsockopt(m_socket, SOL_SOCKET, SO_REUSEADDR, (const char*)&dw, sizeof(dw)) == SOCKET_ERROR) {
-				closesocket(m_socket);
-				m_socket = INVALID_SOCKET;
+			if (setsockopt(m_UdpSocket, SOL_SOCKET, SO_REUSEADDR, (const char*)&dw, sizeof(dw)) == SOCKET_ERROR) {
+				closesocket(m_UdpSocket);
+				m_UdpSocket = INVALID_SOCKET;
 			}
 
-			if (bind(m_socket, (struct sockaddr*)&m_addr, sizeof(m_addr)) == SOCKET_ERROR) {
-				closesocket(m_socket);
-				m_socket = INVALID_SOCKET;
+			if (bind(m_UdpSocket, (struct sockaddr*)&m_addr, sizeof(m_addr)) == SOCKET_ERROR) {
+				closesocket(m_UdpSocket);
+				m_UdpSocket = INVALID_SOCKET;
 			}
 
 			if (IN_MULTICAST(htonl(imr.imr_multiaddr.s_addr))) {
-				int ret = setsockopt(m_socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char*)&imr, sizeof(imr));
+				int ret = setsockopt(m_UdpSocket, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char*)&imr, sizeof(imr));
 				if (ret < 0) {
-					closesocket(m_socket);
-					m_socket = INVALID_SOCKET;
+					closesocket(m_UdpSocket);
+					m_UdpSocket = INVALID_SOCKET;
 				}
 			}
 
 			dw = MAXBUFSIZE;
-			if (setsockopt(m_socket, SOL_SOCKET, SO_RCVBUF, (const char*)&dw, sizeof(dw)) == SOCKET_ERROR) {
+			if (setsockopt(m_UdpSocket, SOL_SOCKET, SO_RCVBUF, (const char*)&dw, sizeof(dw)) == SOCKET_ERROR) {
 				;
 			}
 
 			// set non-blocking mode
 			u_long param = 1;
-			ioctlsocket(m_socket, FIONBIO, &param);
+			ioctlsocket(m_UdpSocket, FIONBIO, &param);
 		}
 
-		if (m_socket == INVALID_SOCKET) {
+		if (m_UdpSocket == INVALID_SOCKET) {
 			return false;
 		}
 
@@ -272,7 +275,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 			if (res == WSA_WAIT_EVENT_0) {
 				int fromlen = sizeof(m_addr);
 				char buf[MAXBUFSIZE];
-				int len = recvfrom(m_socket, buf, MAXBUFSIZE, 0, (SOCKADDR*)&m_addr, &fromlen);
+				int len = recvfrom(m_UdpSocket, buf, MAXBUFSIZE, 0, (SOCKADDR*)&m_addr, &fromlen);
 				if (len <= 0) {
 					timeout += 100;
 					continue;
@@ -290,10 +293,6 @@ bool CUDPStream::Load(const WCHAR* fnw)
 			return false;
 		}
 
-		// set non-blocking mode // ?
-		//u_long param = 0;
-		//ioctlsocket(m_socket, FIONBIO, &param);
-
 	} else if (str_protocol == L"http") {
 		m_protocol = PR_HTTP;
 
@@ -306,58 +305,40 @@ bool CUDPStream::Load(const WCHAR* fnw)
 		for (int i = 1; i <=5; i++) {
 			bool redir = false;
 
-			if (m_url.GetPortNumber() == ATL_URL_INVALID_PORT_NUMBER) {
-				m_url.SetPortNumber(ATL_URL_DEFAULT_HTTP_PORT);
-			}
-
-			CMPCSocket socket;
-			if (!socket.Create()) {
-				return false;
-			}
-
 			CStringA hdr;
 
-			socket.SetUserAgent("MPC UDP/HTTP Reader");
-			socket.SetTimeOut(3000);
-			connected = socket.Connect(m_url);
-			socket.KillTimeOut();
+			if (!m_HttpSocket.Create()) {
+				return false;
+			}
+			
+			m_HttpSocket.SetUserAgent("MPC UDP/HTTP Reader");
+			m_HttpSocket.SetTimeOut(3000, 3000);
+			connected = m_HttpSocket.Connect(m_url);
 			if (connected) {
-				while (hdr.GetLength() < 4096) {
-					CStringA str;
-					str.ReleaseBuffer(socket.Receive(str.GetBuffer(4096), 4096)); // SOCKET_ERROR == -1, also suitable for ReleaseBuffer
-					if (str.IsEmpty()) {
-						break;
-					}
-					hdr += str;
-					int hdrend = hdr.Find("\r\n\r\n");
-					if (hdrend >= 0) {
-						hdr.Truncate(hdrend);
-						break;
-					}
-				}
-				TRACE("CUDPStream: hdr:\n%s\n", hdr);
+				hdr = m_HttpSocket.GetHeader();
+				DbgLog((LOG_TRACE, 3, "\nCUDPStream::Load() - HTTP hdr:\n%s", hdr));
 
 				connected = !hdr.IsEmpty();
 				hdr.MakeLower();
 			}
-			socket.Close();
-
+			
 			if (!connected) {
 				return false;
 			}
 
 			CAtlList<CStringA> sl;
-			Explode(hdr, sl, "\n");
+			Explode(hdr, sl, '\n');
 			POSITION pos = sl.GetHeadPosition();
 			while (pos) {
-				CStringA& str = sl.GetNext(pos);
-				str.Trim();
-				int k = str.Find(":");
-				if (k < 1) {
+				CStringA& hdrline = sl.GetNext(pos);
+				CAtlList<CStringA> sl2;
+				Explode(hdrline, sl2, ':', 2);
+				if (sl2.GetCount() != 2) {
 					continue;
 				}
-				CStringA param = str.Left(k);
-				CStringA value = str.Mid(k + 1).TrimLeft();
+
+				CStringA param = sl2.GetHead();
+				CStringA value = sl2.GetTail();
 
 				if (param == "content-type") {
 					if (value == "application/octet-stream") {
@@ -393,11 +374,15 @@ bool CUDPStream::Load(const WCHAR* fnw)
 			if (!redir) {
 				break;
 			}
+
+			m_HttpSocket.Close();
 		}
 
 		if (!connected) {
 			return false;
 		}
+
+		m_HttpSocketTread = m_HttpSocket.Detach();
 	} else {
 		return false; // not supported protocol
 	}
@@ -409,7 +394,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 	}
 
 	clock_t start = clock();
-	while (clock() - start < 3000 && m_len < MEGABYTE) {
+	while (clock() - start < 5000 && m_len < MEGABYTE * 2) {
 		Sleep(100);
 	}
 
@@ -514,27 +499,17 @@ DWORD CUDPStream::ThreadProc()
 {
 	SetThreadPriority(m_hThread, THREAD_PRIORITY_TIME_CRITICAL);
 
-	HINTERNET s = NULL;
-	HINTERNET f = NULL;
+	CMPCSocket soc;
 	if (m_protocol == PR_HTTP) {
-		s = InternetOpen(L"MPC UDP/HTTP Reader", 0, NULL, NULL, 0);
-		if (s) {
-			f = InternetOpenUrl(s, m_url_str, NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
-			if (f) {
-				DWORD cb = sizeof(DWORD);
-				DWORD len = 0;
-				if (!HttpQueryInfo(f, HTTP_QUERY_CONTENT_LENGTH|HTTP_QUERY_FLAG_NUMBER, &len, &cb, 0)) {
-					len = 0;
-				}
-			}
-		}
+		AfxSocketInit();
+
+		soc.Attach(m_HttpSocketTread);
+		soc = m_HttpSocket;
 	}
 
 #ifdef _DEBUG
 	FILE* dump = NULL;
 	//dump = _tfopen(_T("c:\\http.ts"), _T("wb"));
-	FILE* log = NULL;
-	//log = _tfopen(_T("c:\\http.txt"), _T("wt"));
 #endif
 
 	for (;;) {
@@ -543,27 +518,19 @@ DWORD CUDPStream::ThreadProc()
 		switch (cmd) {
 			default:
 			case CMD_EXIT:
-				if (m_socket != INVALID_SOCKET) {
-					closesocket(m_socket);
-					m_socket = INVALID_SOCKET;
+
+				if (m_protocol == PR_HTTP) {
+					m_HttpSocketTread = soc.Detach();
 				}
-				//WSACleanup();
+
 #ifdef _DEBUG
 				if (dump) {
 					fclose(dump);
 				}
-				if (log) {
-					fclose(log);
-				}
 #endif
 				Reply(S_OK);
-
-				InternetCloseHandle(f);
-				InternetCloseHandle(s);
-
 				return 0;
 			case CMD_RUN:
-				//Reply(m_socket != INVALID_SOCKET ? S_OK : E_FAIL);
 				Reply(S_OK);
 
 				{
@@ -576,10 +543,10 @@ DWORD CUDPStream::ThreadProc()
 
 						if (m_protocol == PR_UDP) {
 							DWORD res = WSAWaitForMultipleEvents(1, m_WSAEvent, FALSE, 100, FALSE);
-								if (res == WSA_WAIT_EVENT_0) {
+							if (res == WSA_WAIT_EVENT_0) {
 								WSAResetEvent(m_WSAEvent[0]);
 								int fromlen = sizeof(m_addr);
-								len = recvfrom(m_socket, &buff[buffsize], MAXBUFSIZE, 0, (SOCKADDR*)&m_addr, &fromlen);
+								len = recvfrom(m_UdpSocket, &buff[buffsize], MAXBUFSIZE, 0, (SOCKADDR*)&m_addr, &fromlen);
 								if (len <= 0) {
 									int err = WSAGetLastError();
 									if (err != WSAEWOULDBLOCK) {
@@ -593,26 +560,14 @@ DWORD CUDPStream::ThreadProc()
 							}
 
 						} else if (m_protocol == PR_HTTP) {
-							DWORD dwBytesRead = 0;
-							if (!InternetReadFile(f, (LPVOID)&buff[buffsize], MAXBUFSIZE, &dwBytesRead) || !dwBytesRead) {
-								Sleep(50);
-								timeout += 50;
+							len = soc.Receive(&buff[buffsize], MAXBUFSIZE);
+							if (len <= 0) {
+								timeout += 100;
 								continue;
 							}
-							len = dwBytesRead;
 
 							timeout = 0;
 						}
-
-#ifdef _DEBUG
-						if (log) {
-							if (buffsize >= len && !memcmp(&buff[buffsize-len], &buff[buffsize], len)) {
-								DWORD pid = ((buff[buffsize+1]<<8)|buff[buffsize+2])&0x1fff;
-								DWORD counter = buff[buffsize+3]&0xf;
-								_ftprintf_s(log, _T("%04d %2d DUP\n"), pid, counter);
-							}
-						}
-#endif
 
 						buffsize += len;
 
@@ -621,43 +576,17 @@ DWORD CUDPStream::ThreadProc()
 							if (dump) {
 								fwrite(buff, buffsize, 1, dump);
 							}
-
-							if (log) {
-								static BYTE pid2counter[0x2000];
-								static bool init = false;
-								if (!init) {
-									memset(pid2counter, 0, sizeof(pid2counter));
-									init = true;
-								}
-
-								for (int i = 0; i < buffsize; i += 188) {
-									DWORD pid = ((buff[i+1]<<8)|buff[i+2])&0x1fff;
-									BYTE counter = buff[i+3]&0xf;
-									if (pid2counter[pid] != ((counter-1+16)&15)) {
-										_ftprintf_s(log, _T("%04x %2d -> %2d\n"), pid, pid2counter[pid], counter);
-									}
-									pid2counter[pid] = counter;
-								}
-							}
 #endif
 							Append((BYTE*)buff, buffsize);
 							buffsize = 0;
 						}
 					}
 				}
-				if (m_protocol == PR_UDP) { // ?
-					WSAResetEvent(m_WSAEvent[0]);
-				}
-
 				break;
 		}
 	}
 
 	ASSERT(0);
-
-	InternetCloseHandle(f);
-	InternetCloseHandle(s);
-
 	return (DWORD)-1;
 }
 

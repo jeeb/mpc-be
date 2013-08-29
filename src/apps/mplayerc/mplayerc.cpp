@@ -1913,31 +1913,17 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 			return "video/x-ms-asf";
 		}
 
-		if (_tcsicmp(url.GetSchemeName(), _T("http")) != 0) {
+		if (url.GetScheme() != ATL_URL_SCHEME_HTTP) {
 			return "";
 		}
 
 		CMPCSocket s;
-		s.Create();
-		s.SetTimeOut(1500);
-		if (s.Connect(fn)) {
-			s.KillTimeOut();
-
-			CStringA hdr;
-			for (;;) {
-				CStringA str;
-				str.ReleaseBuffer(s.Receive(str.GetBuffer(256), 256)); // SOCKET_ERROR == -1, also suitable for ReleaseBuffer
-				if (str.IsEmpty()) {
-					break;
-				}
-				hdr += str;
-				int hdrend = hdr.Find("\r\n\r\n");
-				if (hdrend >= 0) {
-					body = hdr.Mid(hdrend+4);
-					hdr = hdr.Left(hdrend);
-					break;
-				}
-			}
+		if (!s.Create()) {
+			return "";
+		}
+		s.SetTimeOut(3000, 3000);
+		if (s.Connect(url)) {
+			CStringA hdr = s.GetHeader();
 
 			CAtlList<CStringA> sl;
 			Explode(hdr, sl, '\n');

@@ -12674,33 +12674,16 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 					local = _T("http://") + local;
 				}
 
-				CUrl url;
-				url.CrackUrl(local);
-
-				if (url.GetUrlPathLength() == 0) {
-					url.SetUrlPath(_T("/"));
-				}
-
-				if (url.GetPortNumber() == ATL_URL_INVALID_PORT_NUMBER) {
-					url.SetPortNumber(ATL_URL_DEFAULT_HTTP_PORT);
-				}
-
-				if (url.GetScheme() != ATL_URL_SCHEME_HTTP && url.GetScheme() != ATL_URL_SCHEME_HTTPS) {
-					break;
-				}
-
 				CMPCSocket socket;
-
 				if (!socket.Create()) {
 					break;
 				}
 
-				socket.SetTimeOut(3000);
-				if (!socket.Connect(url, TRUE)) {
+				socket.SetTimeOut(3000, 3000);
+				if (!socket.Connect(local, TRUE)) {
 					validateUrl = false;
 				}
 
-				socket.KillTimeOut();
 				socket.Close();
 			}
 			break;
