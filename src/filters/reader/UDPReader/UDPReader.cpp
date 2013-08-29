@@ -344,7 +344,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 					if (value == "application/octet-stream") {
 						// TODO: make real stream type detector
 						m_subtype = MEDIASUBTYPE_MPEG2_TRANSPORT;
-					} else if (value == "application/ogg") {
+					} else if (value == "application/x-ogg" || value == "application/ogg" || value == "audio/ogg") {
 						m_subtype = MEDIASUBTYPE_Ogg;
 					} else if (value == "video/webm") {
 						m_subtype = MEDIASUBTYPE_Matroska;
