@@ -924,7 +924,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	s.SetMainWnd(this);
 
 	// Windows 8 - if app is not pinned on the taskbar, it's not receive "TaskbarButtonCreated" message. Bug ???
-	if (IsWinEight()) {
+	if (IsWinEightOrLater()) {
 		CreateThumbnailToolbar();
 	}
 

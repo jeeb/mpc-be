@@ -1125,7 +1125,7 @@ BOOL CMPlayerCApp::InitInstance()
 				CPPageFormats::RegisterShellExt(GetModulePath(false) + _T("\\MPCBEShellExt64.dll"));
 			}
 
-			if (IsWinEight()) {
+			if (IsWinEightOrLater()) {
 				HRESULT hr = CPPageFormats::RegisterUI();
 				UNREFERENCED_PARAMETER(hr);
 			}
@@ -1159,7 +1159,7 @@ BOOL CMPlayerCApp::InitInstance()
 				}
 			}
 
-			if (IsWinEight()) {
+			if (IsWinEightOrLater()) {
 				HRESULT hr = CPPageFormats::RegisterUI();
 				UNREFERENCED_PARAMETER(hr);
 			}

@@ -1002,7 +1002,7 @@ BOOL CPPageFormats::OnApply()
 	s.m_Formats.SetRtspHandler(m_iRtspHandler==0?RealMedia:m_iRtspHandler==1?QuickTime:DirectShow, !!m_fRtspFileExtFirst);
 	s.fAssociatedWithIcons = !!m_fAssociatedWithIcons.GetCheck();
 
-	if (m_bFileExtChanged && IsWinEight()) {
+	if (m_bFileExtChanged && IsWinEightOrLater()) {
 		HRESULT hr = RegisterUI();
 		UNREFERENCED_PARAMETER(hr);
 	}

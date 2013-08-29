@@ -28,6 +28,7 @@ BOOL IsWinVistaOrLater();
 BOOL IsWinSeven();
 BOOL IsWinSevenOrLater();
 BOOL IsWinEight();
+BOOL IsWinEightOrLater();
 
 BOOL IsWow64();
 BOOL IsW64();
