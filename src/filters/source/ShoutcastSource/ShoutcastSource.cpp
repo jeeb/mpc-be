@@ -362,7 +362,7 @@ redirect:
 
 		m_socket.Close();
 
-		if (!redirectUrl.IsEmpty() && redirectTry < 2) {
+		if (!redirectUrl.IsEmpty() && redirectTry < 5) {
 			redirectTry++;
 			if (redirectUrl[1] == '/') {
 				fn += redirectUrl;
