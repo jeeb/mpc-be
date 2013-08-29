@@ -127,13 +127,25 @@ BOOL CMPCSocket::Connect(CUrl url, BOOL bConnectOnly)
 		delete[] szUrl;
 	}
 
+	CStringA sAddHeader;
+	POSITION pos = m_AddHeaderParams.GetHeadPosition();
+	while (pos) {
+		sAddHeader += (m_AddHeaderParams.GetNext(pos) + "\r\n");
+	}
+
 	m_RequestHdr.Format(
 		"GET %s HTTP/1.0\r\n"
 		"Accept: */*\r\n"
 		"User-Agent: %s\r\n"
 		"%s"
+		"%s"
 		"Host: %s:%d\r\n"
-		"\r\n", path, m_sUserAgent, m_bProxyEnable ? "Proxy-Connection: Keep-Alive\r\n" : "", host, url.GetPortNumber());
+		"\r\n",
+		path,
+		m_sUserAgent,
+		m_bProxyEnable ? "Proxy-Connection: Keep-Alive\r\n" : "",
+		sAddHeader,
+		host, url.GetPortNumber());
 
 	if (!bConnectOnly || m_bProxyEnable) {
 		if (!SendRequest()) {
@@ -220,4 +232,14 @@ void CMPCSocket::SetProxy(CString ProxyServer, DWORD ProxyPort)
 void CMPCSocket::SetUserAgent(CStringA UserAgent)
 {
 	m_sUserAgent = UserAgent;
+}
+
+void CMPCSocket::AddHeaderParams(CStringA sHeaderParam)
+{
+	m_AddHeaderParams.AddTail(sHeaderParam);
+}
+
+void CMPCSocket::ClearHeaderParams()
+{
+	m_AddHeaderParams.RemoveAll();
 }

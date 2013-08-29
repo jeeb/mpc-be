@@ -832,11 +832,14 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 
 bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl)
 {
+	redirectUrl.Empty();
+
+	ClearHeaderParams();
+	AddHeaderParams("Icy-MetaData:1");
+
 	if (!__super::Connect(url)) {
 		return false;
 	}
-
-	redirectUrl = _T("");
 
 	bool fOK = false;
 	bool fTryAgain = false;

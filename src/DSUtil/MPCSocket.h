@@ -40,6 +40,8 @@ protected:
 	CStringA	m_RequestHdr;
 	CStringA	m_Hdr;
 
+	CAtlList<CStringA>	m_AddHeaderParams;
+
 	UINT		m_uConnectTimeOut;
 	UINT		m_uReceiveTimeOut;
 
@@ -64,6 +66,9 @@ public:
 
 	void SetProxy(CString ProxyServer, DWORD ProxyPort);
 	void SetUserAgent(CStringA UserAgent);
+
+	void AddHeaderParams(CStringA sHeaderParam);
+	void ClearHeaderParams();
 
 	CMPCSocket& operator = (const CMPCSocket& soc) {
 		m_bProxyEnable	= soc.m_bProxyEnable;
