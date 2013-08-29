@@ -316,6 +316,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			WAVEFORMATEX* pwfe = (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX) + pmp->typeSpecData.GetCount());
 			memset(mt.Format(), 0, mt.FormatLength());
 			memcpy(pwfe + 1, pmp->typeSpecData.GetData(), pmp->typeSpecData.GetCount());
+			pwfe->cbSize = pmp->typeSpecData.GetCount();
 
 			union {
 				DWORD fcc;

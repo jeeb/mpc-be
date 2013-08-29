@@ -44,6 +44,7 @@ protected:
 	struct {
 		int flavor;
 		int coded_frame_size;
+		int audio_framesize;
 		int sub_packet_h;
 		int sub_packet_size;
 		unsigned int deint_id;

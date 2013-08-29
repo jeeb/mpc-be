@@ -445,6 +445,7 @@ HRESULT CFFAudioDecoder::ParseRealAudioHeader(const BYTE* extra, const int extra
 		fmt += 12; // byte[12] - unknown
 		m_raData.sub_packet_h = AV_RB16(fmt);
 		fmt += 2;  // word - sub packet h
+		m_raData.audio_framesize = AV_RB16(fmt);
 		fmt += 2;  // word - frame size
 		m_raData.sub_packet_size = m_pAVCtx->block_align = AV_RB16(fmt);
 		fmt += 2;  // word - subpacket size
@@ -490,7 +491,7 @@ HRESULT CFFAudioDecoder::RealPrepare(BYTE* p, int buffsize, CPaddedArray& BuffOu
 {
 	if (m_raData.deint_id == MAKEFOURCC('r', 'n', 'e', 'g') || m_raData.deint_id == MAKEFOURCC('r', 'p', 'i', 's')) {
 
-		int w   = m_raData.coded_frame_size;
+		int w   = m_raData.audio_framesize;
 		int h   = m_raData.sub_packet_h;
 		int len = w * h;
 
