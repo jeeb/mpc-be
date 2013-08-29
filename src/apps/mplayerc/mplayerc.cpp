@@ -1925,6 +1925,8 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 		if (s.Connect(url)) {
 			CStringA hdr = s.GetHeader();
 
+			int ContentLength = 0;
+
 			CAtlList<CStringA> sl;
 			Explode(hdr, sl, '\n');
 			POSITION pos = sl.GetHeadPosition();
@@ -1938,6 +1940,11 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 				}
 				if (field == "content-type" && !sl2.IsEmpty()) {
 					ct = sl2.GetHead();
+				}
+
+				hdrline.MakeLower();
+				if (1 == sscanf_s(hdrline, "content-length:%d", &ContentLength)) {
+					ContentLength = ContentLength;
 				}
 			}
 
@@ -1963,10 +1970,15 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 				}
 			}
 
-			while (body.GetLength() < 256) {
+			int nMinSize = 256;
+			if (ContentLength) {
+				nMinSize = min(nMinSize, ContentLength);
+			}
+
+			while (body.GetLength() < nMinSize) {
 				CStringA str;
 				s.SetTimeOut(1500);
-				str.ReleaseBuffer(s.Receive(str.GetBuffer(256), 256)); // SOCKET_ERROR == -1, also suitable for ReleaseBuffer
+				str.ReleaseBuffer(s.Receive(str.GetBuffer(nMinSize), nMinSize)); // SOCKET_ERROR == -1, also suitable for ReleaseBuffer
 				s.KillTimeOut();
 				if (str.IsEmpty()) {
 					break;
@@ -1994,10 +2006,15 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 			}
 
 			if (redir && (ct == _T("audio/x-scpls") || ct == _T("audio/x-mpegurl") || ct == _T("application/xspf+xml"))) {
-				while (body.GetLength() < 16*1024) { // should be enough for a playlist...
+				int nMaxSize = 16*1024;
+				if (ContentLength) {
+					nMaxSize = min(ContentLength, nMaxSize);
+				}
+				
+				while (body.GetLength() < nMaxSize) { // should be enough for a playlist...
 					CStringA str;
 					s.SetTimeOut(1500);
-					str.ReleaseBuffer(s.Receive(str.GetBuffer(256), 256)); // SOCKET_ERROR == -1, also suitable for ReleaseBuffer
+					str.ReleaseBuffer(s.Receive(str.GetBuffer(nMinSize), nMinSize)); // SOCKET_ERROR == -1, also suitable for ReleaseBuffer
 					s.KillTimeOut();
 					if (str.IsEmpty()) {
 						break;
