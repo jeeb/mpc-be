@@ -1965,7 +1965,9 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 
 			while (body.GetLength() < 256) {
 				CStringA str;
+				s.SetTimeOut(1500);
 				str.ReleaseBuffer(s.Receive(str.GetBuffer(256), 256)); // SOCKET_ERROR == -1, also suitable for ReleaseBuffer
+				s.KillTimeOut();
 				if (str.IsEmpty()) {
 					break;
 				}
@@ -1994,7 +1996,9 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 			if (redir && (ct == _T("audio/x-scpls") || ct == _T("audio/x-mpegurl") || ct == _T("application/xspf+xml"))) {
 				while (body.GetLength() < 16*1024) { // should be enough for a playlist...
 					CStringA str;
+					s.SetTimeOut(1500);
 					str.ReleaseBuffer(s.Receive(str.GetBuffer(256), 256)); // SOCKET_ERROR == -1, also suitable for ReleaseBuffer
+					s.KillTimeOut();
 					if (str.IsEmpty()) {
 						break;
 					}
