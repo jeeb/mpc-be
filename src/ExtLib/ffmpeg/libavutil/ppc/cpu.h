@@ -16,19 +16,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#ifndef AVUTIL_PPC_CPU_H
+#define AVUTIL_PPC_CPU_H
+
 #include "config.h"
-#include "libavutil/attributes.h"
-#include "vorbisdsp.h"
-#include "vorbis.h"
+#include "libavutil/cpu.h"
+#include "libavutil/cpu_internal.h"
 
-av_cold void ff_vorbisdsp_init(VorbisDSPContext *dsp)
-{
-    dsp->vorbis_inverse_coupling = ff_vorbis_inverse_coupling;
+#define PPC_ALTIVEC(flags) CPUEXT(flags, ALTIVEC)
 
-    if (ARCH_ARM)
-        ff_vorbisdsp_init_arm(dsp);
-    if (ARCH_PPC)
-        ff_vorbisdsp_init_ppc(dsp);
-    if (ARCH_X86)
-        ff_vorbisdsp_init_x86(dsp);
-}
+#endif /* AVUTIL_PPC_CPU_H */

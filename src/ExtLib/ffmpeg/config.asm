@@ -4,6 +4,7 @@
 %define HAVE_AMD3DNOWEXT 1
 %define HAVE_AVX 1
 %define HAVE_FMA4 1
+%define HAVE_I686 1
 %define HAVE_MMX 1
 %define HAVE_MMXEXT 1
 %define HAVE_SSE 1
@@ -16,6 +17,7 @@
 %define HAVE_AMD3DNOWEXT_EXTERNAL 1
 %define HAVE_AVX_EXTERNAL 1
 %define HAVE_FMA4_EXTERNAL 1
+%define HAVE_I686_EXTERNAL 0
 %define HAVE_MMX_EXTERNAL 1
 %define HAVE_MMXEXT_EXTERNAL 1
 %define HAVE_SSE_EXTERNAL 1
@@ -42,6 +44,7 @@
 %define HAVE_AMD3DNOWEXT_INLINE 1
 %define HAVE_AVX_INLINE 1
 %define HAVE_FMA4_INLINE 1
+%define HAVE_I686_INLINE 0
 %define HAVE_MMX_INLINE 1
 %define HAVE_MMXEXT_INLINE 1
 %define HAVE_SSE_INLINE 1
@@ -69,7 +72,6 @@
 	%define BROKEN_RELOCATIONS 1
 	%define ARCH_X86_32 0
 	%define ARCH_X86_64 1
-	%define HAVE_I686 1
 	%define HAVE_FAST_64BIT 1
 	%define HAVE_FAST_CMOV 1
 	%define HAVE_MM_EMPTY 1
@@ -78,7 +80,6 @@
 %else
 	%define ARCH_X86_32 1
 	%define ARCH_X86_64 0
-	%define HAVE_I686 0
 	%define HAVE_FAST_64BIT 0
 	%define HAVE_FAST_CMOV 0
 	%define HAVE_MM_EMPTY 0

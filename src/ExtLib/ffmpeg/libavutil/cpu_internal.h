@@ -16,19 +16,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "config.h"
-#include "libavutil/attributes.h"
-#include "vorbisdsp.h"
-#include "vorbis.h"
+#ifndef AVUTIL_CPU_INTERNAL_H
+#define AVUTIL_CPU_INTERNAL_H
 
-av_cold void ff_vorbisdsp_init(VorbisDSPContext *dsp)
-{
-    dsp->vorbis_inverse_coupling = ff_vorbis_inverse_coupling;
+#include "cpu.h"
 
-    if (ARCH_ARM)
-        ff_vorbisdsp_init_arm(dsp);
-    if (ARCH_PPC)
-        ff_vorbisdsp_init_ppc(dsp);
-    if (ARCH_X86)
-        ff_vorbisdsp_init_x86(dsp);
-}
+#define CPUEXT_SUFFIX(flags, suffix, cpuext)                            \
+    (HAVE_ ## cpuext ## suffix && ((flags) & AV_CPU_FLAG_ ## cpuext))
+
+#define CPUEXT(flags, cpuext) CPUEXT_SUFFIX(flags, , cpuext)
+
+int ff_get_cpu_flags_arm(void);
+int ff_get_cpu_flags_ppc(void);
+int ff_get_cpu_flags_x86(void);
+
+#endif /* AVUTIL_CPU_INTERNAL_H */

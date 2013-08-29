@@ -340,6 +340,7 @@
     <ClInclude Include="libavutil\colorspace.h" />
     <ClInclude Include="libavutil\common.h" />
     <ClInclude Include="libavutil\cpu.h" />
+    <ClInclude Include="libavutil\cpu_internal.h" />
     <ClInclude Include="libavutil\crc.h" />
     <ClInclude Include="libavutil\dict.h" />
     <ClInclude Include="libavutil\error.h" />
@@ -366,6 +367,7 @@
     <ClInclude Include="libavutil\parseutils.h" />
     <ClInclude Include="libavutil\pixdesc.h" />
     <ClInclude Include="libavutil\pixfmt.h" />
+    <ClInclude Include="libavutil\ppc\cpu.h" />
     <ClInclude Include="libavutil\random_seed.h" />
     <ClInclude Include="libavutil\rational.h" />
     <ClInclude Include="libavutil\samplefmt.h" />

@@ -28,6 +28,9 @@
     <Filter Include="compat">
       <UniqueIdentifier>{bec01aa5-b1ea-425d-9cea-5a7795907ee5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="libavutil\ppc">
+      <UniqueIdentifier>{00d55032-9d2e-4b3b-a44e-f66126bebf82}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="config.asm" />
@@ -931,6 +934,9 @@
     <ClInclude Include="libavresample\version.h">
       <Filter>libavresample</Filter>
     </ClInclude>
+    <ClInclude Include="libavutil\ppc\cpu.h">
+      <Filter>libavutil\ppc</Filter>
+    </ClInclude>
     <ClInclude Include="libavutil\x86\asm.h">
       <Filter>libavutil\x86</Filter>
     </ClInclude>
@@ -1001,6 +1007,9 @@
       <Filter>libavutil</Filter>
     </ClInclude>
     <ClInclude Include="libavutil\cpu.h">
+      <Filter>libavutil</Filter>
+    </ClInclude>
+    <ClInclude Include="libavutil\cpu_internal.h">
       <Filter>libavutil</Filter>
     </ClInclude>
     <ClInclude Include="libavutil\crc.h">
