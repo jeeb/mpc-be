@@ -377,10 +377,17 @@ HRESULT CMpaSplitterFile::Init()
 	__int64 syncpos		= 0;
 
 	__int64 startpos_mp3 = m_startpos;
+
+	__int64 len = min(GetLength(), 5 * MEGABYTE);
 	while (m_mode == none) {
 		if (!MP3_find && GetPos() >= 2048) {
 			break;
 		}
+
+		if ((len - GetPos()) < 512) {
+			break;
+		}
+
 		searchlen = (int)min(endpos - startpos_mp3, 512);
 		Seek(startpos_mp3);
 
