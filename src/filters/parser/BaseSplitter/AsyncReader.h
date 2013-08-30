@@ -100,20 +100,3 @@ public:
 	STDMETHODIMP_(LPCTSTR) GetFileName();
 	STDMETHODIMP_(bool) IsValidFilename();
 };
-
-class CAsyncUrlReader : public CAsyncFileReader, protected CAMThread
-{
-	CString m_url, m_fn;
-
-protected:
-	enum {CMD_EXIT, CMD_INIT};
-	DWORD ThreadProc();
-
-public:
-	CAsyncUrlReader(CString url, HRESULT& hr);
-	virtual ~CAsyncUrlReader();
-
-	// IAsyncReader
-
-	STDMETHODIMP Length(LONGLONG* pTotal, LONGLONG* pAvailable);
-};
