@@ -29,7 +29,9 @@
 #include <InitGuid.h>
 #include <moreuuids.h>
 #include <basestruct.h>
+#include <d3d9types.h>
 #include <dxva.h>
+#include <dxva2api.h>
 
 #include "GUIDString.h"
 
@@ -473,6 +475,9 @@ CString GetGUIDString(const GUID& guid)
 		ADDENTRY(DXVA_ModeMPEG2_B);
 		ADDENTRY(DXVA_ModeMPEG2_C);
 		ADDENTRY(DXVA_ModeMPEG2_D);
+		ADDENTRY(DXVA2_ModeMPEG2_MoComp);
+		ADDENTRY(DXVA2_ModeMPEG2_IDCT);
+		ADDENTRY(DXVA2_ModeMPEG2_VLD);
 
 		ADDENTRY(DXVA_ModeH264_A);
 		ADDENTRY(DXVA_ModeH264_B);
@@ -492,6 +497,11 @@ CString GetGUIDString(const GUID& guid)
 		ADDENTRY(DXVA_ModeVC1_B);
 		ADDENTRY(DXVA_ModeVC1_C);
 		ADDENTRY(DXVA_ModeVC1_D);
+
+		ADDENTRY(DXVA_Intel_H264_ClearVideo);
+		ADDENTRY(DXVA_Intel_VC1_ClearVideo);
+		ADDENTRY(DXVA_Intel_VC1_ClearVideo_2);
+		ADDENTRY(DXVA_MPEG4_ASP);
 
 		ADDENTRY(DXVA_NoEncrypt);
 	}
