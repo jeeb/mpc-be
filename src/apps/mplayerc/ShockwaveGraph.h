@@ -37,6 +37,8 @@ namespace DSObjects
 
 		FILTER_STATE m_fs;
 
+		CSize vsize;
+
 	public:
 		CShockwaveGraph(HWND hParent, HRESULT& hr);
 		virtual ~CShockwaveGraph();
