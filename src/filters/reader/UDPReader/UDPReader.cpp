@@ -344,16 +344,29 @@ bool CUDPStream::Load(const WCHAR* fnw)
 					if (value == "application/octet-stream") {
 						m_subtype = MEDIASUBTYPE_NULL; // "universal" subtype for most splitters
 
-						BYTE buf [4096];
+						BYTE buf[1024];
 						int len = m_HttpSocket.Receive((LPVOID)&buf, sizeof(buf));
 						if (len) {
 							if (len >= 188 && buf[0] == 0x47) {
-								m_subtype = MEDIASUBTYPE_MPEG2_TRANSPORT;
+								BOOL bIsMPEGTS = TRUE;
+								// verify MPEG Stream
+								for (int i = 188; i < len; i += 188) {
+									if (buf[i] != 0x47) {
+										bIsMPEGTS = FALSE;
+										break;
+									}
+								}
+
+								if (bIsMPEGTS) {
+									m_subtype = MEDIASUBTYPE_MPEG2_TRANSPORT;
+								}
 							} else if (len > 4 && *(DWORD*)&buf == 'SggO') {
 								m_subtype = MEDIASUBTYPE_Ogg;
 							} else if (len > 4 && *(DWORD*)&buf == 0xA3DF451A) {
 								m_subtype = MEDIASUBTYPE_Matroska;
 							}
+
+							Append(buf, len);
 						}
 					} else if (value == "application/x-ogg" || value == "application/ogg" || value == "audio/ogg") {
 						m_subtype = MEDIASUBTYPE_Ogg;
@@ -582,7 +595,7 @@ DWORD CUDPStream::ThreadProc()
 
 						buffsize += len;
 
-						if (buffsize >= MAXBUFSIZE || m_len == 0) {
+						if (buffsize >= MAXBUFSIZE) {
 #ifdef _DEBUG
 							if (dump) {
 								fwrite(buff, buffsize, 1, dump);
