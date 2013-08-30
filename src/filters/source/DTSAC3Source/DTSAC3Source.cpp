@@ -53,18 +53,6 @@ enum {
 	SPDIF_AC3,
 };
 
-bool isDTSSync(const DWORD sync)
-{
-	if (sync == 0x0180fe7f || // '7FFE8001' 16 bits and big endian bitstream
-		sync == 0x80017ffe || // 'FE7F0180' 16 bits and little endian bitstream
-		sync == 0x00e8ff1f || // '1FFFE800' 14 bits and big endian bitstream
-		sync == 0xe8001fff) { // 'FF1F00E8' 14 bits and little endian bitstream
-			return true;
-	} else {
-		return false;
-}
-}
-
 DWORD ParseWAVECDHeader(CFile &file)
 {
 	union {
@@ -186,10 +174,18 @@ STDAPI DllRegisterServer()
 
 	SetRegKeyValue(
 		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"),
+		_T("0"), _T("0,8,,4454534844484452")); // DTSHDHDR
+
+	SetRegKeyValue(
+		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"),
 		_T("Source Filter"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"));
 
 	SetRegKeyValue(
 		_T("Media Type\\Extensions"), _T(".dts"),
+		_T("Source Filter"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"));
+
+	SetRegKeyValue(
+		_T("Media Type\\Extensions"), _T(".dtshd"),
 		_T("Source Filter"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"));
 
 	SetRegKeyValue(
@@ -207,6 +203,7 @@ STDAPI DllUnregisterServer()
 {
 	DeleteRegKey(_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"));
 	DeleteRegKey(_T("Media Type\\Extensions"), _T(".dts"));
+	DeleteRegKey(_T("Media Type\\Extensions"), _T(".dtshd"));
 	DeleteRegKey(_T("Media Type\\Extensions"), _T(".ac3"));
 	DeleteRegKey(_T("Media Type\\Extensions"), _T(".eac3"));
 
@@ -303,7 +300,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 		{ // search first audio frame
 			bool deepsearch = false;
-			if (ext == _T(".dtswav") || ext == _T(".dts") || ext == _T(".wav") || ext == _T(".ac3") || ext == _T(".eac3")) { //check only specific extensions
+			if (ext == _T(".dtswav") || ext == _T(".dts") || ext == _T(".dtshd") || ext == _T(".wav") || ext == _T(".ac3") || ext == _T(".eac3")) { //check only specific extensions
 				deepsearch = true; // deep search for specific extensions only
 			}
 

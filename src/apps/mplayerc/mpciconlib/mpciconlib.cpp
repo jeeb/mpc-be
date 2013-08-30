@@ -88,6 +88,8 @@ extern "C" __declspec(dllexport) int get_icon_index(LPCTSTR ext)
 		iconindex = IDI_DSV_ICON;
 	} else if (_tcsicmp(ext, _T(".dts")) == 0) {
 		iconindex = IDI_DTS_ICON;
+	} else if (_tcsicmp(ext, _T(".dtshd")) == 0) {
+		iconindex = IDI_DTS_ICON;
 	} else if (_tcsicmp(ext, _T(".evo")) == 0) {
 		iconindex = IDI_EVO_ICON;
 	} else if (_tcsicmp(ext, _T(".f4v")) == 0) {
