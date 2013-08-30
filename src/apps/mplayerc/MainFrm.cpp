@@ -676,7 +676,6 @@ CMainFrame::CMainFrame() :
 	m_bIsBDPlay(false),
 	m_fClosingState(false),
 	b_UseSmartSeek(false),
-	previous_renderer(-1),
 	m_flastnID(0),
 	bDVDMenuClicked(false),
 	m_bfirstPlay(false),
@@ -12174,64 +12173,6 @@ void CMainFrame::SetBalance(int balance)
 	}
 }
 
-void CMainFrame::SetupIViAudReg()
-{
-	if (!AfxGetAppSettings().fAutoSpeakerConf) {
-		return;
-	}
-
-	DWORD spc = 0, defchnum = 0;
-
-	if (AfxGetAppSettings().fAutoSpeakerConf) {
-		CComPtr<IDirectSound> pDS;
-		if (SUCCEEDED(DirectSoundCreate(NULL, &pDS, NULL))
-				&& SUCCEEDED(pDS->SetCooperativeLevel(m_hWnd, DSSCL_NORMAL))) {
-			if (SUCCEEDED(pDS->GetSpeakerConfig(&spc))) {
-				switch (spc) {
-					case DSSPEAKER_DIRECTOUT:
-						defchnum = 6;
-						break;
-					case DSSPEAKER_HEADPHONE:
-						defchnum = 2;
-						break;
-					case DSSPEAKER_MONO:
-						defchnum = 1;
-						break;
-					case DSSPEAKER_QUAD:
-						defchnum = 4;
-						break;
-					default:
-					case DSSPEAKER_STEREO:
-						defchnum = 2;
-						break;
-					case DSSPEAKER_SURROUND:
-						defchnum = 2;
-						break;
-					case DSSPEAKER_5POINT1:
-						defchnum = 5;
-						break;
-					case DSSPEAKER_7POINT1:
-						defchnum = 5;
-						break;
-				}
-			}
-		}
-	} else {
-		defchnum = 2;
-	}
-
-	CRegKey iviaud;
-	if (ERROR_SUCCESS == iviaud.Create(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\InterVideo\\Common\\AudioDec"))) {
-		DWORD chnum = 0;
-		if (FAILED(iviaud.QueryDWORDValue(_T("AUDIO"), chnum))) {
-			chnum = 0;
-		}
-		if (chnum <= defchnum) { // check if the user has already set it..., but we won't skip if it's lower than sensible :P
-			iviaud.SetDWORDValue(_T("AUDIO"), defchnum);
-		}
-	}
-}
-
 //
 // Open/Close
 //
@@ -14592,16 +14533,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			BREAK(aborted)
 		}
 
-		if (pDVDData && s.iDSVideoRendererType == VIDRNDT_DS_MADVR && s.fmadVRchange) {
-			previous_renderer = s.iDSVideoRendererType;
-
-			if (IsWinVistaOrLater()) {
-				s.iDSVideoRendererType = VIDRNDT_DS_EVR;
-			} else {
-				s.iDSVideoRendererType = VIDRNDT_DS_VMR7WINDOWED;
-			}
-		}
-
 		err = OpenCreateGraphObject(pOMD);
 		if (!err.IsEmpty()) {
 			break;
@@ -14610,8 +14541,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		if (m_fOpeningAborted) {
 			BREAK(aborted)
 		}
-
-		SetupIViAudReg();
 
 		if (m_fOpeningAborted) {
 			BREAK(aborted)
@@ -18045,11 +17974,6 @@ void CMainFrame::CloseMedia()
 
 	if (m_pFullscreenWnd->IsWindow()) {
 		m_pFullscreenWnd->ShowWindow (SW_HIDE);
-	}
-
-	if (previous_renderer != -1) {
-		AfxGetAppSettings().iDSVideoRendererType = previous_renderer;
-		previous_renderer = -1;
 	}
 
 	SetDwmPreview(FALSE);

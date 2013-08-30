@@ -442,7 +442,6 @@ public:
 	DVD_HMSF_TIMECODE	DVDPosition;
 	bool				fStartMainTitle;
 	bool				fNormalStartDVD;
-	bool				fmadVRchange;
 
 	CSize sizeFixedWindow;
 	bool HasFixedWindowSize() const { return sizeFixedWindow.cx > 0 || sizeFixedWindow.cy > 0; }
@@ -536,7 +535,6 @@ public:
 	bool			fUseDVDPath;
 	CString			strDVDPath;
 	LCID			idMenuLang, idAudioLang, idSubtitlesLang;
-	bool			fAutoSpeakerConf;
 	bool			fClosedCaptions;
 
 	// Output

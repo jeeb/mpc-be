@@ -165,7 +165,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"דיגיטלי"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"מיקום כונן הדי.וי.די או תיקית ה-""VIDEO_TS"""
 6		"ברירת מחדל"
 7		"נתיב שהוגדר ע""י המשתמש:"
@@ -174,10 +174,8 @@ BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
 12		"שמע"
 13		"כתוביות"
 15		"Additional settings"
-16		"קבע מספר רמקולים בצורה אוטומטית עבור מפענח ה-AC3 של  ivideo"
-18		"Allow closed captions in 'Line 21 Decoder'"
-20		"Start playback from Main Title"
-22		"Switch from madVR to another renderer"
+16		"Allow closed captions in 'Line 21 Decoder'"
+18		"Start playback from Main Title"
 END
 
 BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20

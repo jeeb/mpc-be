@@ -165,7 +165,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"Digital"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"Ubicación de la unidad de DVD o de la carpeta ""VIDEO_TS"""
 6		"Predeterminada"
 7		"Usar ruta definida:"
@@ -174,10 +174,8 @@ BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
 12		"Audio"
 13		"Subtítulos"
 15		"Additional settings"
-16		"Fijar automaticamente cantidad de bocinas (altavoces) para el dec. ""ivideo ac3"""
-18		"Allow closed captions in 'Line 21 Decoder'"
-20		"Start playback from Main Title"
-22		"Switch from madVR to another renderer"
+16		"Allow closed captions in 'Line 21 Decoder'"
+18		"Start playback from Main Title"
 END
 
 BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20

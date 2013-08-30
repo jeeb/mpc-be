@@ -165,7 +165,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"Digitaal"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"Pad naar de DVD-speler of de ""VIDEO_TS""-map"
 6		"Standaard"
 7		"Door gebruiker bepaald:"
@@ -174,10 +174,8 @@ BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
 12		"Audio"
 13		"Ondertiteling"
 15		"Aanvullende instellingen"
-16		"Aantal luidsprekers voor Intervideo AC3-Decoder automatisch bepalen"
-18		"Closed Caption-ondertiteling in 'Line 21 Decoder' toestaan"
-20		"Weergave vanaf hoofdtitel starten"
-22		"Van madVR naar andere renderer veranderen"
+16		"Closed Caption-ondertiteling in 'Line 21 Decoder' toestaan"
+18		"Weergave vanaf hoofdtitel starten"
 END
 
 BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20

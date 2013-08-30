@@ -165,7 +165,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"цифровое"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"Расположение DVD-привода или папки ""VIDEO_TS"""
 6		"По умолчанию"
 7		"Путь, определенный пользователем:"
@@ -174,10 +174,8 @@ BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
 12		"Аудио"
 13		"Субтитры"
 15		"Дополнительные настройки"
-16		"Автоустановка числа колонок для ivideo AC3 декодера"
-18		"Разрешить субтитры для слабослышащих в 'Line 21 Decoder'"
-20		"Начать проигрывание с Главного Меню"
-22		"Сменить madVR на другой вывод"
+16		"Разрешить субтитры для слабослышащих в 'Line 21 Decoder'"
+18		"Начать проигрывание с Главного Меню"
 END
 
 BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20

@@ -165,7 +165,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"Digital"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"Pfad zum DVD-Laufwerk, oder einem ""VIDEO_TS""-Ordner"
 6		"&Standard"
 7		"&Benutzerdefiniert:"
@@ -174,10 +174,8 @@ BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
 12		"&Audio"
 13		"&Untertitel"
 15		"Weitere Einstellungen"
-16		"&Lautsprecher-Anzahl für Intervideo AC3-Dekoder automatisch ermitteln"
-18		"Untertitel im 'Line 21 Decoder' erlauben"
-20		"Die Wiedergabe vom Haupttitel an starten"
-22		"Vom madVR zu einem anderen Renderer wechseln"
+16		"Untertitel im 'Line 21 Decoder' erlauben"
+18		"Die Wiedergabe vom Haupttitel an starten"
 END
 
 BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20

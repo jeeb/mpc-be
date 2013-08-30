@@ -165,7 +165,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"数字"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"指定 DVD 驱动器盘符或“VIDEO_TS”文件夹路径"
 6		"默认"
 7		"用户指定的路径: "
@@ -174,10 +174,8 @@ BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
 12		"音频"
 13		"字幕"
 15		"其他设置"
-16		"自动为 ivideo AC3 解码器设置声道数"
-18		"允许'Line 21 解码器'中的隐藏式字幕"
-20		"从主标题开始播放"
-22		"从 madVR 转换到其它渲染器"
+16		"允许'Line 21 解码器'中的隐藏式字幕"
+18		"从主标题开始播放"
 END
 
 BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20

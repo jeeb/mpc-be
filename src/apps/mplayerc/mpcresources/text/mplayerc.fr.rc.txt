@@ -165,7 +165,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"Numérique"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"Emplacement du lecteur DVD ou du dossier ""VIDEO_TS"""
 6		"Par défaut"
 7		"Personnalisé :"
@@ -174,10 +174,8 @@ BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
 12		"Audio"
 13		"Sous-titres"
 15		"Réglages complémentaires"
-16		"Auto-configuration du nombre de haut-parleurs pour ivideo ac3"
-18		"Autoriser les sous-titres malentendants pour le décodeur ""Line 21"""
-20		"Start playback from Main Title"
-22		"Switch from madVR to another renderer"
+16		"Autoriser les sous-titres malentendants pour le décodeur ""Line 21"""
+18		"Start playback from Main Title"
 END
 
 BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20

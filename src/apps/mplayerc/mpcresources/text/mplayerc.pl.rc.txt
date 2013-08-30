@@ -165,7 +165,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"Cyfrowe"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"Położenie napędu DVD lub folderu „VIDEO_TS”"
 6		"Domyślne"
 7		"Własne:"
@@ -174,10 +174,8 @@ BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
 12		"Ścieżka dźwięk."
 13		"Napisy"
 15		"Dodatkowe ustawienia"
-16		"Automatyczne ustawienie liczby głośników dla dekodera ivideo AC3"
-18		"Uwzględnianie napisów w „Dekoderze Line 21”"
-20		"Start playback from Main Title"
-22		"Switch from madVR to another renderer"
+16		"Uwzględnianie napisów w „Dekoderze Line 21”"
+18		"Start playback from Main Title"
 END
 
 BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20

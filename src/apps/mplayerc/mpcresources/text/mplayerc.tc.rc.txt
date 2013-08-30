@@ -165,7 +165,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"數位"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"DVD 光碟機或是 ""VIDEO_TS"" 資料夾的位置"
 6		"預設值"
 7		"使用者自訂路徑:"
@@ -174,10 +174,8 @@ BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
 12		"發音"
 13		"字幕"
 15		"額外設定"
-16		"自動為 InterVideo AC3 解碼器設定揚聲器個數"
-18		"容許 Line 21 Decoder 中的隱藏式字幕"
-20		"由主標題開始播放"
-22		"由 madVR 轉換至其它繪製器"
+16		"容許 Line 21 Decoder 中的隱藏式字幕"
+18		"由主標題開始播放"
 END
 
 BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20

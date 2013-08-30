@@ -165,7 +165,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"디지털"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"DVD드라이브의 위치 또는 ""VIDEO_TS"" 폴더의 위치"
 6		"기본값"
 7		"사용자정의 위치:"
@@ -174,10 +174,8 @@ BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
 12		"오디오"
 13		"자막"
 15		"추가 설정"
-16		"인터비디오 AC3디코더의 스피커채널옵션을 자동설정"
-18		"Line 21 디코더에서 자막 닫기 허용"
-20		"메인 타이틀부터 재생시작"
-22		"madVR에서 다른 렌더러로 전환"
+16		"Line 21 디코더에서 자막 닫기 허용"
+18		"메인 타이틀부터 재생시작"
 END
 
 BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20

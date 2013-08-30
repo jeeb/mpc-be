@@ -165,7 +165,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"Digital"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"Acţiuni pentru ""Deschide DVD/BD"""
 6		"Solicită locaţia"
 7		"Deschide întotdeauna locaţia implicită:"
@@ -174,10 +174,8 @@ BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
 12		"Audio"
 13		"Subtitrări"
 15		"Setări adiționale"
-16		"Definește automat numărul de difuzoare pentru decodorul ivideo AC3"
-18		"Permite subtitrări pentru persoane cu dizabilități în ""Line 21 Decoder"""
-20		"Start playback from Main Title"
-22		"Switch from madVR to another renderer"
+16		"Permite subtitrări pentru persoane cu dizabilități în ""Line 21 Decoder"""
+18		"Start playback from Main Title"
 END
 
 BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20

@@ -359,8 +359,6 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 
 	//
 
-	void SetupIViAudReg();
-
 	void AddTextPassThruFilter();
 
 	int m_nLoops;
@@ -1145,8 +1143,6 @@ protected:
 
 	DWORD m_nMenuHideTick;
 	UINT m_nSeekDirection;
-
-	int		previous_renderer; // MadVR + DVD fix.
 
 	bool	m_fValidDVDOpen;
 

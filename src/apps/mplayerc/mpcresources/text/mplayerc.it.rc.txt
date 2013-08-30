@@ -165,7 +165,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"Digitale"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"Percorso del drive DVD o della cartella ""VIDEO_TS"""
 6		"Predefiniti"
 7		"Percorso scelto dall'utente:"
@@ -174,10 +174,8 @@ BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
 12		"Audio"
 13		"Sottotitoli"
 15		"Impostazioni aggiuntive"
-16		"Imposta automaticamente il numero degli speaker per il decoder AC3"
-18		"Consenti i sottotitoli nel 'Line 21 Decoder'"
-20		"Inizia riproduzione dal titolo principale"
-22		"Passa da madVR ad un altro renderer"
+16		"Consenti i sottotitoli nel 'Line 21 Decoder'"
+18		"Inizia riproduzione dal titolo principale"
 END
 
 BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20

@@ -165,7 +165,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"Digitala"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"DVD gidagailuaren edo ""VIDEO_TS"" agiritegiaren helbidea"
 6		"Berezkoa"
 7		"Erabiltzaileak adierazitako helburua:"
@@ -174,10 +174,8 @@ BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
 12		"Audioa"
 13		"Azpidatziak"
 15		"Ezarpen gehigarriak"
-16		"Berezgaitasunez ezarri hotsgorailu zenbatekoa ivideo AC3 dekodeatzailearentzat"
-18		"Ahalbidetu giro azpidatziak 'Line 21 Dekodeatzailean'"
-20		"Hasi irakurketa Izenburu Nagusitik"
-22		"Aldatu madVR-tik beste aurkezle batera"
+16		"Ahalbidetu giro azpidatziak 'Line 21 Dekodeatzailean'"
+18		"Hasi irakurketa Izenburu Nagusitik"
 END
 
 BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20

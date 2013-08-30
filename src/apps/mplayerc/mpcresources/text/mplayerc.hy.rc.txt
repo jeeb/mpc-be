@@ -165,7 +165,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"Թվային"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"DVD սարքավարի կամ ""VIDEO_TS"" թղթապանակի տեղը"" folder"
 6		"Ըստ ծրագրայինի"
 7		"Օգտագործողի կողմից նշված ճանապարհը."
@@ -174,10 +174,8 @@ BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
 12		"Ձայնը"
 13		"Տողագրերը"
 15		"Լրացուցիչ կարգավորումներ"
-16		"Սյուների քանակը ivideo ac3 ապակոդավորիչի համար"
-18		"Թույլատրել փակված կադրերը 'Line 21 Decoder'-ում"
-20		"Start playback from Main Title"
-22		"Switch from madVR to another renderer"
+16		"Թույլատրել փակված կադրերը 'Line 21 Decoder'-ում"
+18		"Start playback from Main Title"
 END
 
 BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20

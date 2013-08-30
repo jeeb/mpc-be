@@ -165,7 +165,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"Digitális"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"A DVD meghajtó vagy a ""VIDEO_TS"" mappa elérési útja"
 6		"Alapértelmezés"
 7		"Felhasználó által definiált elérési út:"
@@ -174,10 +174,8 @@ BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
 12		"Audió"
 13		"Feliratok"
 15		"Additional settings"
-16		"Hangszórószám automatikus megadása az ivideo AC3 dekódolónak"
-18		"Allow closed captions in 'Line 21 Decoder'"
-20		"Start playback from Main Title"
-22		"Switch from madVR to another renderer"
+16		"Allow closed captions in 'Line 21 Decoder'"
+18		"Start playback from Main Title"
 END
 
 BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20

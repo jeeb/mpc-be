@@ -165,7 +165,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"Digitálne"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"Umiestnenie priečinka ""VIDEO_TS"" na disku DVD"
 6		"Štandard"
 7		"Určuje používateľ:"
@@ -174,10 +174,8 @@ BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
 12		"Zvuk"
 13		"Titulky"
 15		"Ďalšie nastavenia"
-16		"Automaticky nastaviť počet reproduktorov pri dekodéri ivideo ac3"
-18		"Povoliť uzatvorené kapitoly 'dekodéri Line 21'"
-20		"Start playback from Main Title"
-22		"Switch from madVR to another renderer"
+16		"Povoliť uzatvorené kapitoly 'dekodéri Line 21'"
+18		"Start playback from Main Title"
 END
 
 BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20

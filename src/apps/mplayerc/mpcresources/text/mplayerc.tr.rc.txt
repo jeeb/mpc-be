@@ -165,7 +165,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 21		"Sayısal"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
 5		"DVD sürücüsü veya ""VIDEO_TS"" klasörü yolu"
 6		"Varsayılan"
 7		"Kullanıcı tanımlı yol:"
@@ -174,10 +174,8 @@ BEGIN DIALOGEX IDD_PPAGEDVD LINES 24
 12		"Ses"
 13		"Altyazılar"
 15		"Diğer ayarlar"
-16		"Ivideo AC3 çözücüsü için hoparlör sayısını otomatik olarak seç"
-18		"Line 21 Çözücüsü için görüntü almaya izin ver"
-20		"Oynatıma Ana Başlık'tan başla"
-22		"madVR'dan başka bir işleyiciye geç"
+16		"Line 21 Çözücüsü için görüntü almaya izin ver"
+18		"Oynatıma Ana Başlık'tan başla"
 END
 
 BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20
