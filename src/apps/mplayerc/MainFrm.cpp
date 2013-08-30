@@ -8323,20 +8323,31 @@ void CMainFrame::OnPlayPlay()
 		if (strOSD.IsEmpty()) {
 			if (GetPlaybackMode() == PM_FILE) {
 				strOSD = m_wndPlaylistBar.GetCurFileName();
-				if (!m_LastOpenBDPath.IsEmpty()) {
+				if (m_LastOpenBDPath.GetLength() > 0) {
 					strOSD = ResStr(ID_PLAY_PLAY);
 					int i = strOSD.Find('\n');
 					if (i > 0) {
 						strOSD.Delete(i, strOSD.GetLength()-i);
 					}
 					strOSD += L" Blu-ray";
-					if (!m_BDLabel.IsEmpty()) {
+					if (m_BDLabel.GetLength() > 0) {
 						strOSD.AppendFormat(L" \"%s\"", m_BDLabel);
+					} else {
+						CString fn = m_wndPlaylistBar.GetCurFileName();
+						fn.Replace('\\', '/');
+						int pos = fn.Find(L"/BDMV");
+						if (pos > 1) {
+							fn.Delete(pos, fn.GetLength() - pos);
+							CString fn3 = fn.Mid(fn.ReverseFind('/')+1);
+							if (!fn3.IsEmpty()) {
+								strOSD.AppendFormat(L" \"%s\"", fn3);
+							}
+						}				
 					}
 				} else if (strOSD.GetLength() > 0) {
 					strOSD.TrimRight('/');
 					strOSD.Replace('\\', '/');
-					strOSD = strOSD.Mid(strOSD.ReverseFind('/')+1);
+					strOSD = strOSD.Mid(strOSD.ReverseFind('/') + 1);
 				}
 			} else if (GetPlaybackMode() == PM_DVD) {
 				strOSD = ResStr(ID_PLAY_PLAY);
@@ -8345,6 +8356,20 @@ void CMainFrame::OnPlayPlay()
 					strOSD.Delete(i, strOSD.GetLength()-i);
 				}
 				strOSD += L" DVD";
+				WCHAR buff[MAX_PATH];
+				ULONG len = 0;
+				if (SUCCEEDED(pDVDI->GetDVDDirectory(buff, _countof(buff), &len))) {
+					CString DVDPath(buff);
+					DVDPath.Replace('\\', '/');
+					int pos = DVDPath.Find(L"/VIDEO_TS");
+					if (pos > 1) {
+						DVDPath.Delete(pos, DVDPath.GetLength() - pos);
+						CString fn2 = DVDPath.Mid(DVDPath.ReverseFind('/') + 1);
+						if (!fn2.IsEmpty()) {
+							strOSD.AppendFormat(L" \"%s\"", fn2);
+						}
+					}
+				}
 			}
 		}
 	}
@@ -13665,20 +13690,46 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 
 	if (!fn.IsEmpty()) {
 		if (GetPlaybackMode() == PM_FILE) {
-			if (m_bIsBDPlay) {
-				fn = L"Blu-ray";
-				if (!m_BDLabel.IsEmpty()) {
-					fn.AppendFormat(L" \"%s\"", m_BDLabel);
+			if (m_LastOpenBDPath.GetLength() > 0) {
+				CString fn2 = L"Blu-ray";
+				if (m_BDLabel.GetLength() > 0) {
+					fn2.AppendFormat(L" \"%s\"", m_BDLabel);
+				} else {
+					fn.Replace('\\', '/');
+					int pos = fn.Find(L"/BDMV");
+					if (pos > 1) {
+						fn.Delete(pos, fn.GetLength() - pos);
+						CString fn3 = fn.Mid(fn.ReverseFind('/')+1);
+						if (!fn3.IsEmpty()) {
+							fn2.AppendFormat(L" \"%s\"", fn3);
+						}
+					}				
 				}
+				fn = fn2;
 			} else {
 				fn.Replace('\\', '/');
-				CString fn2 = fn.Mid(fn.ReverseFind('/')+1);
+				CString fn2 = fn.Mid(fn.ReverseFind('/') + 1);
 				if (!fn2.IsEmpty()) {
 					fn = fn2;
 				}
 			}
 		} else if (GetPlaybackMode() == PM_DVD) {
 			fn = L"DVD";
+
+			WCHAR buff[MAX_PATH];
+			ULONG len = 0;
+			if (SUCCEEDED(pDVDI->GetDVDDirectory(buff, _countof(buff), &len))) {
+				CString DVDPath(buff);
+				DVDPath.Replace('\\', '/');
+				int pos = DVDPath.Find(L"/VIDEO_TS");
+				if (pos > 1) {
+					DVDPath.Delete(pos, DVDPath.GetLength() - pos);
+					CString fn2 = DVDPath.Mid(DVDPath.ReverseFind('/') + 1);
+					if (!fn2.IsEmpty()) {
+						fn.AppendFormat(L" \"%s\"", fn2);
+					}
+				}
+			}
 		} else if (GetPlaybackMode() == PM_CAPTURE) {
 			fn = ResStr(IDS_CAPTURE_LIVE);
 		}
@@ -14361,7 +14412,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 	SetDwmPreview(FALSE);
 
-	m_fValidDVDOpen = false;
+	m_fValidDVDOpen	= false;
 
 	OpenFileData *pFileData = dynamic_cast<OpenFileData *>(pOMD.m_p);
 	OpenDVDData* pDVDData = dynamic_cast<OpenDVDData*>(pOMD.m_p);
@@ -14826,7 +14877,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		m_MPLSPlaylist.RemoveAll();
 		m_LastOpenBDPath.Empty();
 	}
-	m_bIsBDPlay = false;
 
 	SetDwmPreview();
 
@@ -14848,6 +14898,8 @@ void CMainFrame::CloseMediaPrivate()
 	m_strUrl.Empty();
 	m_strTitleAlt.Empty();
 	m_strAuthorAlt.Empty();
+
+	m_bIsBDPlay = false;
 
 	m_OSD.Stop();
 	OnPlayStop();
@@ -19355,8 +19407,8 @@ bool CMainFrame::OpenBD(CString Path)
 	CString			strPlaylistFile;
 	CHdmvClipInfo::CPlaylist MainPlaylist;
 
-	m_LastOpenBDPath = Path;
 	m_BDLabel.Empty();
+	m_LastOpenBDPath = Path;
 
 	CString ext = GetFileExt(Path).MakeLower();
 
