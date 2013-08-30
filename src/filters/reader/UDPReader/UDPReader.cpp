@@ -342,8 +342,19 @@ bool CUDPStream::Load(const WCHAR* fnw)
 
 				if (param == "content-type") {
 					if (value == "application/octet-stream") {
-						// TODO: make real stream type detector
-						m_subtype = MEDIASUBTYPE_MPEG2_TRANSPORT;
+						m_subtype = MEDIASUBTYPE_NULL; // "universal" subtype for most splitters
+
+						BYTE buf [4096];
+						int len = m_HttpSocket.Receive((LPVOID)&buf, sizeof(buf));
+						if (len) {
+							if (len >= 188 && buf[0] == 0x47) {
+								m_subtype = MEDIASUBTYPE_MPEG2_TRANSPORT;
+							} else if (len > 4 && *(DWORD*)&buf == 'SggO') {
+								m_subtype = MEDIASUBTYPE_Ogg;
+							} else if (len > 4 && *(DWORD*)&buf == 0xA3DF451A) {
+								m_subtype = MEDIASUBTYPE_Matroska;
+							}
+						}
 					} else if (value == "application/x-ogg" || value == "application/ogg" || value == "audio/ogg") {
 						m_subtype = MEDIASUBTYPE_Ogg;
 					} else if (value == "video/webm") {
