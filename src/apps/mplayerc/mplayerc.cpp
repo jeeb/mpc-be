@@ -1823,7 +1823,30 @@ bool FindRedir(CUrl& src, CString ct, CString& body, CAtlList<CString>& urls, CA
 			}
 
 			CUrl dst;
-			dst.CrackUrl(CString(url));
+			dst.CrackUrl(url);
+
+			if (url.Find(L"://") < 0) {
+				DWORD dwUrlLen = src.GetUrlLength() + 1;
+				TCHAR* szUrl = new TCHAR[dwUrlLen];
+
+				// Retrieve the contents of the CUrl object
+				src.CreateUrl(szUrl, &dwUrlLen);
+				CString path(szUrl);
+				delete[] szUrl;
+
+				int pos = path.ReverseFind('/');
+				if (pos > 0) {
+					path.Delete(pos + 1, path.GetLength() - pos - 1);
+				}
+
+				if (url[0] == '/') {
+					path.Delete(path.GetLength() - 1, 1);
+				}
+
+				url = path + url;
+				dst.CrackUrl(url);
+			}
+
 			if (_tcsicmp(src.GetSchemeName(), dst.GetSchemeName())
 					|| _tcsicmp(src.GetHostName(), dst.GetHostName())
 					|| _tcsicmp(src.GetUrlPath(), dst.GetUrlPath())) {
@@ -2000,7 +2023,7 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 				if (!strncmp((LPCSTR)str+4, "moov", 4)) {
 					return "video/quicktime";
 				}
-				if (ct.Find(L"text/plain") == 0 && str.Find("#EXTM3U") == 0) {
+				if ((ct.Find(L"text/plain") == 0 || ct.Find(L"application/vnd.apple.mpegurl") == 0) && str.Find("#EXTM3U") == 0) {
 					ct = L"audio/x-mpegurl";
 				}
 			}
