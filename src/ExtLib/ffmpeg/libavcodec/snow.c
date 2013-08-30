@@ -462,10 +462,14 @@ av_cold int ff_snow_common_init(AVCodecContext *avctx){
         for(j=0; j<MAX_REF_FRAMES; j++)
             ff_scale_mv_ref[i][j] = 256*(i+1)/(j+1);
         s->last_picture[i] = av_frame_alloc();
+        if (!s->last_picture[i])
+            goto fail;
     }
 
     s->mconly_picture = av_frame_alloc();
     s->current_picture = av_frame_alloc();
+    if (!s->mconly_picture || !s->current_picture)
+        goto fail;
 
     return 0;
 fail:
@@ -491,7 +495,7 @@ int ff_snow_common_init_after_header(AVCodecContext *avctx) {
         return AVERROR_INVALIDDATA;
     }
 
-    for(plane_index=0; plane_index<3; plane_index++){
+    for(plane_index=0; plane_index < s->nb_planes; plane_index++){
         int w= s->avctx->width;
         int h= s->avctx->height;
 
@@ -549,7 +553,7 @@ fail:
 static int halfpel_interpol(SnowContext *s, uint8_t *halfpel[4][4], AVFrame *frame){
     int p,x,y;
 
-    for(p=0; p<3; p++){
+    for(p=0; p < s->nb_planes; p++){
         int is_chroma= !!p;
         int w= is_chroma ? s->avctx->width >>s->chroma_h_shift : s->avctx->width;
         int h= is_chroma ? s->avctx->height>>s->chroma_v_shift : s->avctx->height;
@@ -614,12 +618,14 @@ int ff_snow_frame_start(SnowContext *s){
         s->dsp.draw_edges(s->current_picture->data[0],
                           s->current_picture->linesize[0], w   , h   ,
                           EDGE_WIDTH  , EDGE_WIDTH  , EDGE_TOP | EDGE_BOTTOM);
-        s->dsp.draw_edges(s->current_picture->data[1],
-                          s->current_picture->linesize[1], w>>s->chroma_h_shift, h>>s->chroma_v_shift,
-                          EDGE_WIDTH>>s->chroma_h_shift, EDGE_WIDTH>>s->chroma_v_shift, EDGE_TOP | EDGE_BOTTOM);
-        s->dsp.draw_edges(s->current_picture->data[2],
-                          s->current_picture->linesize[2], w>>s->chroma_h_shift, h>>s->chroma_v_shift,
-                          EDGE_WIDTH>>s->chroma_h_shift, EDGE_WIDTH>>s->chroma_v_shift, EDGE_TOP | EDGE_BOTTOM);
+        if (s->current_picture->data[2]) {
+            s->dsp.draw_edges(s->current_picture->data[1],
+                            s->current_picture->linesize[1], w>>s->chroma_h_shift, h>>s->chroma_v_shift,
+                            EDGE_WIDTH>>s->chroma_h_shift, EDGE_WIDTH>>s->chroma_v_shift, EDGE_TOP | EDGE_BOTTOM);
+            s->dsp.draw_edges(s->current_picture->data[2],
+                            s->current_picture->linesize[2], w>>s->chroma_h_shift, h>>s->chroma_v_shift,
+                            EDGE_WIDTH>>s->chroma_h_shift, EDGE_WIDTH>>s->chroma_v_shift, EDGE_TOP | EDGE_BOTTOM);
+        }
     }
 
     ff_snow_release_buffer(s->avctx);
@@ -686,7 +692,7 @@ av_cold void ff_snow_common_end(SnowContext *s)
         av_frame_free(&s->last_picture[i]);
     }
 
-    for(plane_index=0; plane_index<3; plane_index++){
+    for(plane_index=0; plane_index < s->nb_planes; plane_index++){
         for(level=s->spatial_decomposition_count-1; level>=0; level--){
             for(orientation=level ? 1 : 0; orientation<4; orientation++){
                 SubBand *b= &s->plane[plane_index].band[level][orientation];
