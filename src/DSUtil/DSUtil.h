@@ -313,8 +313,9 @@ extern CString AddSlash(LPCTSTR Path);
 extern CString RemoveSlash(LPCTSTR Path);
 extern CString GetFileExt(LPCTSTR Path);
 extern CString RenameFileExt(LPCTSTR Path, LPCTSTR Ext);
-
 extern BOOL GetTemporaryFilePath(CString strExtension, CString& strFileName);
+
+extern CString RemoveForbiddenChar(CString fName);
 
 static const TCHAR* subext[] = {
 	L"srt", L"sub", L"smi", L"psb",

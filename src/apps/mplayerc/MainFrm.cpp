@@ -5654,8 +5654,15 @@ void CMainFrame::OnFileSaveAs()
 				out = out.Left(out.GetLength()-4) + _T(".vob");
 			}
 		} else {
-			out = out.Right(find+3);
-			out.Replace(_T("/"), _T("_"));
+			CString fname = L"streaming_saved";
+
+			CUrl url;
+			url.CrackUrl(out);
+			if (url.GetUrlPathLength() > 1) {
+				fname = url.GetUrlPath();
+			}
+
+			out = RemoveForbiddenChar(fname.Mid(fname.ReverseFind('/')+1));
 		}
 	}
 
@@ -20011,15 +20018,7 @@ CString CMainFrame::GetAltFileName()
 {
 	CString ret;
 	if (!m_strTitleAlt.IsEmpty()) {
-		ret = m_strTitleAlt;
-
-		CString ignoreFileNameCharlist = _T("< > : \" / \\ | ? *");
-		CAtlList<CString> sl;
-		Explode(ignoreFileNameCharlist, sl, ' ');
-		POSITION pos = sl.GetHeadPosition();
-		while (pos) {
-			ret.Replace(sl.GetNext(pos), _T(" "));
-		}
+		ret = RemoveForbiddenChar(m_strTitleAlt);
 	}
 
 	return ret;

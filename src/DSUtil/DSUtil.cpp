@@ -3443,3 +3443,16 @@ BOOL GetTemporaryFilePath(CString strExtension, CString& strFileName)
 
 	return TRUE;
 }
+
+CString RemoveForbiddenChar(CString fName)
+{
+	static CString ForbiddenFileNameCharlist = _T("< > : \" / \\ | ? *");
+	CAtlList<CString> sl;
+	Explode(ForbiddenFileNameCharlist, sl, ' ');
+	POSITION pos = sl.GetHeadPosition();
+	while (pos) {
+		fName.Replace(sl.GetNext(pos), _T(" "));
+	}
+
+	return fName;
+}
