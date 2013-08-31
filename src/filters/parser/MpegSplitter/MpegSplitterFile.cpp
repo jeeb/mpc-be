@@ -51,8 +51,9 @@ CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bo
 
 HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 {
-	// get the type first
+	WaitAvailable(3000, MEGABYTE);
 
+	// get the type first
 	m_type = mpeg_us;
 
 	Seek(0);
@@ -142,9 +143,9 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	m_init = true;
 
 	if (IsRandomAccess() || IsStreaming()) {
-		WaitAvailable(5000, MEGABYTE*5);
-
-		SearchPrograms(0, min(GetLength(), MEGABYTE*5)); // max 5Mb for search a valid Program Map Table
+		
+		WaitAvailable(5000, MEGABYTE*2);
+		SearchPrograms(0, min(GetLength(), IsStreaming() ? MEGABYTE*2 : MEGABYTE*5)); // max 5Mb for search a valid Program Map Table
 
 		__int64 pfp = 0;
 		const int k = 20;
@@ -164,36 +165,38 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	bool bAlternativeDuration = m_AlternativeDuration;
 	int step = 1;
 
-again:
+	for (;;) {
+		if (m_type == mpeg_ts) {
+			if (IsRandomAccess() || IsStreaming()) {
+				WaitAvailable(3000, MEGABYTE);
 
-	if (m_type == mpeg_ts) {
-		if (IsRandomAccess() || IsStreaming()) {
-			WaitAvailable(5000, MEGABYTE);
-
-			__int64 pfp = 0;
-			const int k = 20;
-			for (int i = 0; i <= k; i++) {
-				__int64 fp = i * GetLength() / k;
-				fp = min(GetLength() - MEGABYTE/8, fp);
-				fp = max(pfp, fp);
-				__int64 nfp = fp + (pfp == 0 ? 10*MEGABYTE : MEGABYTE/8);
-				SearchStreams(fp, nfp, pAsyncReader, TRUE);
-				pfp = nfp;
+				__int64 pfp = 0;
+				const int k = 20;
+				for (int i = 0; i <= k; i++) {
+					__int64 fp = i * GetLength() / k;
+					fp = min(GetLength() - MEGABYTE/8, fp);
+					fp = max(pfp, fp);
+					__int64 nfp = fp + (pfp == 0 ? 10*MEGABYTE : MEGABYTE/8);
+					SearchStreams(fp, nfp, pAsyncReader, TRUE);
+					pfp = nfp;
+				}
+			} else {
+				SearchStreams(0, MEGABYTE/2, pAsyncReader, TRUE);
 			}
-		} else {
-			SearchStreams(0, MEGABYTE/2, pAsyncReader, TRUE);
+
 		}
 
-	}
+		if (m_posMax - m_posMin <= 0 || m_rtMax - m_rtMin <= 0) {
+			if (m_type == mpeg_ts && step == 1) {
+				step++;
+				m_AlternativeDuration = !m_AlternativeDuration;
+				continue;
+			}
 
-	if (m_posMax - m_posMin <= 0 || m_rtMax - m_rtMin <= 0) {
-		if (m_type == mpeg_ts && step == 1) {
-			step++;
-			m_AlternativeDuration = !m_AlternativeDuration;
-			goto again;
+			return E_FAIL;
 		}
 
-		return E_FAIL;
+		break;
 	}
 
 	m_AlternativeDuration = bAlternativeDuration;

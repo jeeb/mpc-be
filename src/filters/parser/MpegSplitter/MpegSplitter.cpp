@@ -1330,8 +1330,19 @@ bool CMpegSplitterFilter::DemuxLoop()
 {
 	REFERENCE_TIME rtStartOffset = m_rtStartOffset ? m_rtStartOffset : m_pFile->m_rtMin;
 
+	CAtlList<CMpegSplitterFile::stream>* pMasterStream = m_pFile->GetMasterStream();
+	if (!pMasterStream) {
+		ASSERT(0);
+		return false;
+	}
+
+	const CMpegSplitterFile::stream st = pMasterStream->GetHead();
+	BOOL bMainIsVideo	= (st.mt.majortype == MEDIATYPE_Video);
+	__int64 AvailBytes	= bMainIsVideo ? 256 * KILOBYTE : 16 * KILOBYTE;
+
 	HRESULT hr = S_OK;
-	while (SUCCEEDED(hr) && !CheckRequest(NULL) && SUCCEEDED(m_pFile->WaitAvailable(3000, MEGABYTE/4))) {
+	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
+		m_pFile->WaitAvailable(2000, AvailBytes);
 		if ((hr = DemuxNextPacket(rtStartOffset)) == S_FALSE) {
 			Sleep(1);
 		}
