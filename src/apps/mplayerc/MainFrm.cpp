@@ -2294,8 +2294,20 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 				m_wndSeekBar.GetRange(start, stop);
 				pos = min(max(m_wndSeekBar.GetPos(), start), stop);
 
-				if (AfxGetAppSettings().fUseWin7TaskBar && m_pTaskbarList && stop) {
-					m_pTaskbarList->SetProgressValue (m_hWnd, pos, stop);
+				if (AfxGetAppSettings().fUseWin7TaskBar && m_pTaskbarList) {
+					static TBPFLAG lastState = TBPF_NOPROGRESS;
+					if (stop) {
+						if (lastState != TBPF_NORMAL) {
+							m_pTaskbarList->SetProgressState(m_hWnd, TBPF_NORMAL);
+							lastState = TBPF_NORMAL;
+						}
+						m_pTaskbarList->SetProgressValue(m_hWnd, pos, stop);
+					} else {
+						if (lastState != TBPF_NOPROGRESS) {
+							m_pTaskbarList->SetProgressState(m_hWnd, TBPF_NOPROGRESS);
+							lastState = TBPF_NOPROGRESS;
+						}
+					}
 				}
 			}
 			break;
@@ -4054,7 +4066,7 @@ void CMainFrame::OnUpdatePlayerStatus(CCmdUI* pCmdUI)
 {
 	if (m_iMediaLoadState == MLS_LOADING) {
 		pCmdUI->SetText(ResStr(IDS_CONTROLS_OPENING));
-		if ((AfxGetAppSettings().fUseWin7TaskBar) && (m_pTaskbarList)) {
+		if (AfxGetAppSettings().fUseWin7TaskBar && m_pTaskbarList) {
 			m_pTaskbarList->SetProgressState(m_hWnd, TBPF_INDETERMINATE);
 		}
 
@@ -4080,7 +4092,7 @@ void CMainFrame::OnUpdatePlayerStatus(CCmdUI* pCmdUI)
 		SetStatusMessage(UI_Text);
 	} else if (m_iMediaLoadState == MLS_CLOSING) {
 		pCmdUI->SetText(ResStr(IDS_CONTROLS_CLOSING));
-		if ((AfxGetAppSettings().fUseWin7TaskBar) && (m_pTaskbarList)) {
+		if (AfxGetAppSettings().fUseWin7TaskBar && m_pTaskbarList) {
 			m_pTaskbarList->SetProgressState(m_hWnd, TBPF_INDETERMINATE);
 		}
 
@@ -19105,13 +19117,13 @@ HRESULT CMainFrame::CreateThumbnailToolbar()
 
 HRESULT CMainFrame::UpdateThumbarButton()
 {
-	if ( !m_pTaskbarList ) {
+	if (!m_pTaskbarList) {
 		return E_FAIL;
 	}
 
-	if ( !AfxGetAppSettings().fUseWin7TaskBar ) {
-		m_pTaskbarList->SetOverlayIcon( m_hWnd, NULL, L"" );
-		m_pTaskbarList->SetProgressState( m_hWnd, TBPF_NOPROGRESS );
+	if (!AfxGetAppSettings().fUseWin7TaskBar) {
+		m_pTaskbarList->SetOverlayIcon(m_hWnd, NULL, L"");
+		m_pTaskbarList->SetProgressState(m_hWnd, TBPF_NOPROGRESS);
 
 		THUMBBUTTON buttons[5] = {};
 
@@ -19135,7 +19147,7 @@ HRESULT CMainFrame::UpdateThumbarButton()
 		buttons[4].dwFlags = THBF_HIDDEN;
 		buttons[4].iId = IDTB_BUTTON5;
 
-		HRESULT hr = m_pTaskbarList->ThumbBarUpdateButtons( m_hWnd, ARRAYSIZE(buttons), buttons );
+		HRESULT hr = m_pTaskbarList->ThumbBarUpdateButtons(m_hWnd, ARRAYSIZE(buttons), buttons);
 		return hr;
 	}
 
@@ -19145,29 +19157,29 @@ HRESULT CMainFrame::UpdateThumbarButton()
 	buttons[0].dwFlags = (AfxGetAppSettings().fDontUseSearchInFolder && m_wndPlaylistBar.GetCount() <= 1 && (m_pCB && m_pCB->ChapGetCount() <= 1)) ? THBF_DISABLED : THBF_ENABLED;
 	buttons[0].iId = IDTB_BUTTON3;
 	buttons[0].iBitmap = 0;
-	StringCchCopy( buttons[0].szTip, _countof(buttons[0].szTip), ResStr(IDS_AG_PREVIOUS) );
+	StringCchCopy(buttons[0].szTip, _countof(buttons[0].szTip), ResStr(IDS_AG_PREVIOUS));
 
 	buttons[1].dwMask = THB_BITMAP | THB_TOOLTIP | THB_FLAGS;
 	buttons[1].iId = IDTB_BUTTON1;
 	buttons[1].iBitmap = 1;
-	StringCchCopy( buttons[1].szTip, _countof(buttons[1].szTip), ResStr(IDS_AG_STOP) );
+	StringCchCopy(buttons[1].szTip, _countof(buttons[1].szTip), ResStr(IDS_AG_STOP));
 
 	buttons[2].dwMask = THB_BITMAP | THB_TOOLTIP | THB_FLAGS;
 	buttons[2].iId = IDTB_BUTTON2;
 	buttons[2].iBitmap = 3;
-	StringCchCopy( buttons[2].szTip, _countof(buttons[2].szTip), ResStr(IDS_AG_PLAYPAUSE) );
+	StringCchCopy(buttons[2].szTip, _countof(buttons[2].szTip), ResStr(IDS_AG_PLAYPAUSE));
 
 	buttons[3].dwMask = THB_BITMAP | THB_TOOLTIP | THB_FLAGS;
 	buttons[3].dwFlags = (AfxGetAppSettings().fDontUseSearchInFolder && m_wndPlaylistBar.GetCount() <= 1 && (m_pCB && m_pCB->ChapGetCount() <= 1)) ? THBF_DISABLED : THBF_ENABLED;
 	buttons[3].iId = IDTB_BUTTON4;
 	buttons[3].iBitmap = 4;
-	StringCchCopy( buttons[3].szTip, _countof(buttons[3].szTip), ResStr(IDS_AG_NEXT) );
+	StringCchCopy(buttons[3].szTip, _countof(buttons[3].szTip), ResStr(IDS_AG_NEXT));
 
 	buttons[4].dwMask = THB_BITMAP | THB_TOOLTIP | THB_FLAGS;
 	buttons[4].dwFlags = THBF_ENABLED;
 	buttons[4].iId = IDTB_BUTTON5;
 	buttons[4].iBitmap = 5;
-	StringCchCopy( buttons[4].szTip, _countof(buttons[4].szTip), ResStr(IDS_AG_FULLSCREEN) );
+	StringCchCopy(buttons[4].szTip, _countof(buttons[4].szTip), ResStr(IDS_AG_FULLSCREEN));
 
 	HICON hIcon = NULL;
 
@@ -19179,21 +19191,21 @@ HRESULT CMainFrame::UpdateThumbarButton()
 			buttons[2].iBitmap = 2;
 
 			hIcon = (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_TB_PLAY), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
-			m_pTaskbarList->SetProgressState( m_hWnd, TBPF_NORMAL );
+			m_pTaskbarList->SetProgressState(m_hWnd, TBPF_NORMAL);
 		} else if ( fs == State_Stopped ) {
 			buttons[1].dwFlags = THBF_DISABLED;
 			buttons[2].dwFlags = THBF_ENABLED;
 			buttons[2].iBitmap = 3;
 
 			hIcon = (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_TB_STOP), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
-			m_pTaskbarList->SetProgressState( m_hWnd, TBPF_NOPROGRESS );
+			m_pTaskbarList->SetProgressState(m_hWnd, TBPF_NOPROGRESS);
 		} else if ( fs == State_Paused ) {
 			buttons[1].dwFlags = THBF_ENABLED;
 			buttons[2].dwFlags = THBF_ENABLED;
 			buttons[2].iBitmap = 3;
 
 			hIcon = (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_TB_PAUSE), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
-			m_pTaskbarList->SetProgressState( m_hWnd, TBPF_PAUSED );
+			m_pTaskbarList->SetProgressState(m_hWnd, TBPF_PAUSED);
 		}
 
 		if ( m_fAudioOnly ) {
@@ -19207,7 +19219,7 @@ HRESULT CMainFrame::UpdateThumbarButton()
 			buttons[3].dwFlags = THBF_DISABLED;
 		}
 
-		m_pTaskbarList->SetOverlayIcon( m_hWnd, hIcon, L"" );
+		m_pTaskbarList->SetOverlayIcon(m_hWnd, hIcon, L"");
 
 		if ( hIcon != NULL ) {
 			DestroyIcon( hIcon );
@@ -19219,11 +19231,11 @@ HRESULT CMainFrame::UpdateThumbarButton()
 		buttons[3].dwFlags = THBF_DISABLED;
 		buttons[4].dwFlags = THBF_DISABLED;
 
-		m_pTaskbarList->SetOverlayIcon( m_hWnd, NULL, L"" );
-		m_pTaskbarList->SetProgressState( m_hWnd, TBPF_NOPROGRESS );
+		m_pTaskbarList->SetOverlayIcon(m_hWnd, NULL, L"");
+		m_pTaskbarList->SetProgressState(m_hWnd, TBPF_NOPROGRESS);
 	}
 
-	HRESULT hr = m_pTaskbarList->ThumbBarUpdateButtons( m_hWnd, ARRAYSIZE(buttons), buttons );
+	HRESULT hr = m_pTaskbarList->ThumbBarUpdateButtons(m_hWnd, ARRAYSIZE(buttons), buttons);
 
 	UpdateThumbnailClip();
 
@@ -19249,7 +19261,7 @@ HRESULT CMainFrame::UpdateThumbnailClip()
 	result_rect.top		= (AfxGetAppSettings().iCaptionMenuMode == MODE_SHOWCAPTIONMENU) ? 22 : 2;
 	result_rect.bottom	= result_rect.top + (vid_rect.bottom - vid_rect.top) - 4;
 
-	return m_pTaskbarList->SetThumbnailClip( m_hWnd, &result_rect );
+	return m_pTaskbarList->SetThumbnailClip(m_hWnd, &result_rect);
 }
 
 LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
