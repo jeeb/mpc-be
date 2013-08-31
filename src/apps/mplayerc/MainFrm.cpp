@@ -5674,7 +5674,8 @@ void CMainFrame::OnFileSaveAs()
 				fname = url.GetUrlPath();
 			}
 
-			out = RemoveForbiddenChar(fname.Mid(fname.ReverseFind('/')+1));
+			out = fname.Mid(fname.ReverseFind('/') + 1);
+			FixFilename(out);
 		}
 	}
 
@@ -20030,7 +20031,8 @@ CString CMainFrame::GetAltFileName()
 {
 	CString ret;
 	if (!m_strTitleAlt.IsEmpty()) {
-		ret = RemoveForbiddenChar(m_strTitleAlt);
+		ret = m_strTitleAlt;
+		FixFilename(ret);
 	}
 
 	return ret;
