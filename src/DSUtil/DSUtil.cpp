@@ -28,6 +28,7 @@
 #include "DSUtil.h"
 #include "Mpeg2Def.h"
 #include "vd.h"
+#include "AudioParser.h"
 #include <moreuuids.h>
 #include <basestruct.h>
 #include <emmintrin.h>
@@ -3442,4 +3443,23 @@ BOOL GetTemporaryFilePath(CString strExtension, CString& strFileName)
 	} while (_taccess(strFileName, 00) != -1);
 
 	return TRUE;
+}
+
+void CorrectWaveFormatEx(CMediaType *pmt)
+{
+	if (pmt == NULL) {
+		return;
+	}
+
+	WAVEFORMATEX* wfe = (WAVEFORMATEX*)pmt->pbFormat;
+	if (wfe && wfe->nChannels > 2 && wfe->cbSize == 0) {
+		pmt->ReallocFormatBuffer(sizeof(WAVEFORMATEXTENSIBLE));
+		wfe									= (WAVEFORMATEX*)pmt->pbFormat;
+		WAVEFORMATEXTENSIBLE* wfex			= (WAVEFORMATEXTENSIBLE*)pmt->pbFormat;
+		wfex->Format.cbSize					= sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX);
+		wfex->Samples.wValidBitsPerSample	= wfe->wBitsPerSample;
+		wfex->SubFormat						= wfe->wFormatTag == WAVE_FORMAT_IEEE_FLOAT ? KSDATAFORMAT_SUBTYPE_IEEE_FLOAT : KSDATAFORMAT_SUBTYPE_PCM;
+		wfex->dwChannelMask					= GetDefChannelMask(wfe->nChannels);
+		wfex->Format.wFormatTag				= WAVE_FORMAT_EXTENSIBLE;
+	}
 }

@@ -320,3 +320,5 @@ static const TCHAR* subext[] = {
 	L"ssa", L"ass", L"idx", L"usf",
 	L"xss", L"txt", L"rt",  L"sup"
 };
+
+extern void CorrectWaveFormatEx(CMediaType *pmt);

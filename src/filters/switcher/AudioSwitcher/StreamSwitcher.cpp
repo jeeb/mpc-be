@@ -1085,6 +1085,9 @@ HRESULT CStreamSwitcherOutputPin::GetMediaType(int iPosition, CMediaType* pmt)
 
 	CopyMediaType(pmt, tmp);
 	DeleteMediaType(tmp);
+
+	CorrectWaveFormatEx(pmt);
+
 	/*
 		if(iPosition < 0) return E_INVALIDARG;
 	    if(iPosition > 0) return VFW_S_NO_MORE_ITEMS;

@@ -113,12 +113,6 @@ STDMETHODIMP CAudioSwitcherFilter::NonDelegatingQueryInterface(REFIID riid, void
 
 HRESULT CAudioSwitcherFilter::CheckMediaType(const CMediaType* pmt)
 {
-	if (pmt->formattype == FORMAT_WaveFormatEx
-			&& ((WAVEFORMATEX*)pmt->pbFormat)->nChannels > 2
-			&& ((WAVEFORMATEX*)pmt->pbFormat)->wFormatTag != WAVE_FORMAT_EXTENSIBLE) {
-		return VFW_E_INVALIDMEDIATYPE;    // stupid iviaudio tries to fool us
-	}
-
 	return (pmt->majortype == MEDIATYPE_Audio
 			&& pmt->formattype == FORMAT_WaveFormatEx
 			&& (((WAVEFORMATEX*)pmt->pbFormat)->wBitsPerSample == 8
@@ -499,12 +493,14 @@ CMediaType CAudioSwitcherFilter::CreateNewOutputMediaType(CMediaType mt, long& c
 		}
 	}
 
+	CorrectWaveFormatEx(&mt);
+
 	WAVEFORMATEX* wfeout = (WAVEFORMATEX*)mt.pbFormat;
 
-	int bps = wfe->wBitsPerSample>>3;
-	int len = cbBuffer / (bps*wfe->nChannels);
-	int lenout = (UINT64)len * wfeout->nSamplesPerSec / wfe->nSamplesPerSec;
-	cbBuffer = lenout*bps*wfeout->nChannels;
+	int bps		= wfe->wBitsPerSample>>3;
+	int len		= cbBuffer / (bps*wfe->nChannels);
+	int lenout	= (UINT64)len * wfeout->nSamplesPerSec / wfe->nSamplesPerSec;
+	cbBuffer	= lenout*bps*wfeout->nChannels;
 
 	//	mt.lSampleSize = (ULONG)max(mt.lSampleSize, wfe->nAvgBytesPerSec * rtLen / 10000000i64);
 	//	mt.lSampleSize = (mt.lSampleSize + (wfe->nBlockAlign-1)) & ~(wfe->nBlockAlign-1);
