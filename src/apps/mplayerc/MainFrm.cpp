@@ -673,7 +673,7 @@ CMainFrame::CMainFrame() :
 	m_bWndWasZoomed(false),
 	m_nSeekDirection(SEEK_DIRECTION_NONE),
 	m_nWasSetDispMode(0),
-	m_bIsBDPlay(false),
+	m_bIsBDPlay(FALSE),
 	m_fClosingState(false),
 	b_UseSmartSeek(false),
 	m_flastnID(0),
@@ -5109,6 +5109,7 @@ void CMainFrame::OnFileOpenQuick()
 	ShowWindow(SW_SHOW);
 	SetForegroundWindow();
 
+	m_bIsBDPlay = FALSE;
 	if (fns.GetCount() == 1) {
 		if (OpenBD(fns.GetHead())) {
 			return;
@@ -5146,6 +5147,7 @@ void CMainFrame::OnFileOpenMedia()
 	ShowWindow(SW_SHOW);
 	SetForegroundWindow();
 
+	m_bIsBDPlay = FALSE;
 	if (!dlg.m_fMultipleFiles) {
 		if (OpenBD(dlg.m_fns.GetHead())) {
 			return;
@@ -5553,6 +5555,7 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 
 	UINT nFiles = ::DragQueryFile(hDropInfo, (UINT)-1, NULL, 0);
 
+	m_bIsBDPlay = FALSE;
 	if (nFiles == 1) {
 		CString path;
 		path.ReleaseBuffer(::DragQueryFile(hDropInfo, 0, path.GetBuffer(_MAX_PATH), _MAX_PATH));
@@ -5639,6 +5642,7 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 
 	m_wndPlaylistBar.Open(sl, true);
 
+	m_bIsBDPlay = FALSE;
 	if (OpenBD(sl.GetHead())) {
 		return;
 	}
@@ -10370,7 +10374,7 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 			while (pos) {
 				CHdmvClipInfo::PlaylistItem Item = m_MPLSPlaylist.GetNext(pos);
 				if (idx == id) {
-					m_bIsBDPlay = true;
+					m_bIsBDPlay = TRUE;
 					m_wndPlaylistBar.Empty();
 					CAtlList<CString> sl;
 					sl.AddTail(CString(Item.m_strFileName));
@@ -14893,7 +14897,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 	PostMessage(WM_KICKIDLE); // calls main thread to update things
 
-	if (!m_bIsBDPlay) {
+	if (m_bIsBDPlay == FALSE) {
 		m_MPLSPlaylist.RemoveAll();
 		m_LastOpenBDPath.Empty();
 	}
@@ -14918,8 +14922,6 @@ void CMainFrame::CloseMediaPrivate()
 	m_strUrl.Empty();
 	m_strTitleAlt.Empty();
 	m_strAuthorAlt.Empty();
-
-	m_bIsBDPlay = false;
 
 	m_OSD.Stop();
 	OnPlayStop();
@@ -19421,7 +19423,7 @@ void CMainFrame::EnableShaders2(bool enable)
 	}
 }
 
-bool CMainFrame::OpenBD(CString Path)
+BOOL CMainFrame::OpenBD(CString Path)
 {
 	CHdmvClipInfo	ClipInfo;
 	CString			strPlaylistFile;
@@ -19457,7 +19459,7 @@ bool CMainFrame::OpenBD(CString Path)
 			}
 
 			bool InternalMpegSplitter = AfxGetAppSettings().SrcFilters[SRC_MPEG];
-			m_bIsBDPlay = true;
+			m_bIsBDPlay = TRUE;
 			if (!InternalMpegSplitter && ext == _T(".bdmv")) {
 				return false;
 			} else {
@@ -19476,7 +19478,7 @@ bool CMainFrame::OpenBD(CString Path)
 	}
 
 	m_LastOpenBDPath.Empty();
-	return false;
+	return FALSE;
 }
 
 void CMainFrame::SetStatusMessage(CString m_msg)

@@ -1171,8 +1171,8 @@ public:
 	void EnableShaders2(bool enable);
 
 	CHdmvClipInfo::CPlaylist m_MPLSPlaylist;
-	bool m_bIsBDPlay;
-	bool OpenBD(CString Path);
+	BOOL m_bIsBDPlay;
+	BOOL OpenBD(CString Path);
 
 	IBaseFilter*	GetVSFilter();
 	bool			b_UseVSFilter;
