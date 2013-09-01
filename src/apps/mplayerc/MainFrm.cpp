@@ -14873,24 +14873,30 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			if (pFileData) {
 				m_wndPlaylistBar.SetCurValid(false);
 
-				if (m_wndPlaylistBar.IsAtEnd()) {
-					m_nLoops++;
+				if (GetAsyncKeyState(VK_ESCAPE)) {
+					err = aborted;
 				}
 
-				if (s.fLoopForever || m_nLoops < s.nLoops) {
-					bool hasValidFile = false;
-
-					if (m_flastnID == ID_NAVIGATE_SKIPBACK) {
-						hasValidFile = m_wndPlaylistBar.SetPrev();
-					} else {
-						hasValidFile = m_wndPlaylistBar.SetNext();
+				if (err != aborted) {
+					if (m_wndPlaylistBar.IsAtEnd()) {
+						m_nLoops++;
 					}
 
-					if (hasValidFile && OpenCurPlaylistItem()) {
-						return true;
+					if (s.fLoopForever || m_nLoops < s.nLoops) {
+						bool hasValidFile = false;
+
+						if (m_flastnID == ID_NAVIGATE_SKIPBACK) {
+							hasValidFile = m_wndPlaylistBar.SetPrev();
+						} else {
+							hasValidFile = m_wndPlaylistBar.SetNext();
+						}
+
+						if (hasValidFile && OpenCurPlaylistItem()) {
+							return true;
+						}
+					} else if (m_wndPlaylistBar.GetCount() > 1) {
+						DoAfterPlaybackEvent();
 					}
-				} else if (m_wndPlaylistBar.GetCount() > 1) {
-					DoAfterPlaybackEvent();
 				}
 			} else {
 				OnNavigateSkip(ID_NAVIGATE_SKIPFORWARD);
