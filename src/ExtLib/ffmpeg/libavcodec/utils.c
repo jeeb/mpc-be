@@ -2604,13 +2604,35 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
     switch (enc->codec_type) {
     case AVMEDIA_TYPE_VIDEO:
         if (enc->pix_fmt != AV_PIX_FMT_NONE) {
+            char detail[256] = "(";
             snprintf(buf + strlen(buf), buf_size - strlen(buf),
                      ", %s",
                      av_get_pix_fmt_name(enc->pix_fmt));
             if (enc->bits_per_raw_sample &&
                 enc->bits_per_raw_sample <= av_pix_fmt_desc_get(enc->pix_fmt)->comp[0].depth_minus1)
-                snprintf(buf + strlen(buf), buf_size - strlen(buf),
-                         " (%d bpc)", enc->bits_per_raw_sample);
+                av_strlcatf(detail, sizeof(detail), "%d bpc, ", enc->bits_per_raw_sample);
+            if (enc->color_range != AVCOL_RANGE_UNSPECIFIED)
+                av_strlcatf(detail, sizeof(detail),
+                            enc->color_range == AVCOL_RANGE_MPEG ? "tv, ": "pc, ");
+            if (enc->colorspace<9U) {
+                static const char *name[] =  {
+                    "GBR",
+                    "bt709",
+                    NULL,
+                    NULL,
+                    "fcc",
+                    "bt470bg",
+                    "smpte170m",
+                    "smpte240m",
+                    "YCgCo",
+                };
+                if (name[enc->colorspace])
+                    av_strlcatf(detail, sizeof(detail), "%s, ", name[enc->colorspace]);
+            }
+            if (strlen(detail) > 1) {
+                detail[strlen(detail) - 2] = 0;
+                av_strlcatf(buf, buf_size, "%s)", detail);
+            }
         }
         if (enc->width) {
             snprintf(buf + strlen(buf), buf_size - strlen(buf),
