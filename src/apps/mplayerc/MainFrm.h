@@ -245,6 +245,8 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	CComPtr<ISubPicAllocatorPresenter> m_pCAP;
 	CComPtr<ISubPicAllocatorPresenter2> m_pCAP2;
 
+	CComQIPtr<IBaseFilter> m_pMainSourceFilter;
+
 	void SetVolumeBoost(float fAudioBoost_dB);
 	void SetBalance(int balance);
 
@@ -290,7 +292,6 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	void SetupRecentFilesSubMenu();
 	void SetupLanguageMenu();
 
-	IBaseFilter* FindSourceSelectableFilter();
 	IBaseFilter* FindSwitcherFilter();
 	void SetupNavStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup);
 	void OnNavStreamSelectSubMenu(UINT id, DWORD dwSelGroup);
@@ -1204,11 +1205,11 @@ public:
 private:
 	int			GetStreamCount(DWORD dwSelGroup);
 
-	DWORD_PTR			m_nMainFilterId;
+	DWORD_PTR	m_nMainFilterId;
 
 public:
-	BOOL				CheckMainFilter(IBaseFilter* pBF);
+	BOOL		CheckMainFilter(IBaseFilter* pBF);
 
-	void				AddSubtitlePathsAddons(CString FileName);
-	void				AddAudioPathsAddons(CString FileName);
+	void		AddSubtitlePathsAddons(CString FileName);
+	void		AddAudioPathsAddons(CString FileName);
 };

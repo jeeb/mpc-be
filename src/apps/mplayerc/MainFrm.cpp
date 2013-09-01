@@ -4281,10 +4281,10 @@ void CMainFrame::OnStreamAudio(UINT nID)
 		int iSel	= -1;
 		as.iNum		= -1;
 
-		CComQIPtr<IAMStreamSelect> pSSs = FindSourceSelectableFilter();
-		if (pSSs) {
+		CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
+		if (pSS) {
 			DWORD cStreamsS = 0;
-			if (SUCCEEDED(pSSs->Count(&cStreamsS)) && cStreamsS > 0) {
+			if (SUCCEEDED(pSS->Count(&cStreamsS)) && cStreamsS > 0) {
 				for (int i = 0; i < (int)cStreamsS; i++) {
 					//iSel = 0;
 					AM_MEDIA_TYPE* pmt	= NULL;
@@ -4292,7 +4292,7 @@ void CMainFrame::OnStreamAudio(UINT nID)
 					LCID lcid			= 0;
 					DWORD dwGroup		= 0;
 					WCHAR* pszName		= NULL;
-					if (FAILED(pSSs->Info(i, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))) {
+					if (FAILED(pSS->Info(i, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))) {
 						return;
 					}
 
@@ -4398,9 +4398,9 @@ void CMainFrame::OnStreamAudio(UINT nID)
 				if (ExtStream) { // return from external audiotrack (of the AudioSwitcher) to internal audiotrack (of Splitter) without bug
 					pSSa->Enable(0, AMSTREAMSELECTENABLE_ENABLE);
 				}
-				pSSs->Enable(nNewStream, AMSTREAMSELECTENABLE_ENABLE);
+				pSS->Enable(nNewStream, AMSTREAMSELECTENABLE_ENABLE);
 
-				if (SUCCEEDED(pSSs->Info(nNewStream, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))) {
+				if (SUCCEEDED(pSS->Info(nNewStream, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))) {
 					CString	strMessage;
 					CString audio_stream = pszName;
 					int k = audio_stream.Find(_T("Audio - "));
@@ -4459,7 +4459,7 @@ void CMainFrame::OnStreamSub(UINT nID)
 				if (!fHideSubtitles) {
 					int subcount = GetStreamCount(2);
 					if (subcount) {
-						CComQIPtr<IAMStreamSelect> pSS = FindSourceSelectableFilter();
+						CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
 						DWORD cStreams = 0;
 						pSS->Count(&cStreams);
 
@@ -4585,13 +4585,13 @@ void CMainFrame::OnStreamSub(UINT nID)
 		int iSel	= -1;
 		ss.iNum		= -1;
 
-		CComQIPtr<IAMStreamSelect> pSSs = FindSourceSelectableFilter();
-		if (pSSs && !AfxGetAppSettings().fDisableInternalSubtitles) {
+		CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
+		if (pSS && !AfxGetAppSettings().fDisableInternalSubtitles) {
 			DWORD cStreamsS = 0;
 
-			if (SUCCEEDED(pSSs->Count(&cStreamsS)) && cStreamsS > 0) {
+			if (SUCCEEDED(pSS->Count(&cStreamsS)) && cStreamsS > 0) {
 				BOOL bIsHaali = FALSE;
-				CComQIPtr<IBaseFilter> pBF = pSSs;
+				CComQIPtr<IBaseFilter> pBF = pSS;
 				if (GetCLSID(pBF) == CLSID_HaaliSplitterAR || GetCLSID(pBF) == CLSID_HaaliSplitter) {
 					bIsHaali = TRUE;
 					cStreamsS--;
@@ -4603,7 +4603,7 @@ void CMainFrame::OnStreamSub(UINT nID)
 					LCID lcid			= 0;
 					DWORD dwGroup		= 0;
 					WCHAR* pszName		= NULL;
-					if (FAILED(pSSs->Info(i, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))) {
+					if (FAILED(pSS->Info(i, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))) {
 						return;
 					}
 
@@ -4685,9 +4685,9 @@ void CMainFrame::OnStreamSub(UINT nID)
 					m_iSubtitleSel = 0;
 					UpdateSubtitle();
 				}
-				pSSs->Enable(nNewStream, AMSTREAMSELECTENABLE_ENABLE);
+				pSS->Enable(nNewStream, AMSTREAMSELECTENABLE_ENABLE);
 
-				if (SUCCEEDED(pSSs->Info(nNewStream, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))) {
+				if (SUCCEEDED(pSS->Info(nNewStream, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))) {
 					CString	strMessage;
 					CString sub_stream = pszName;
 					int k = sub_stream.Find(_T("Subtitle - "));
@@ -4783,7 +4783,7 @@ void CMainFrame::OnOgmAudio(UINT nID)
 		return;
 	}
 
-	CComQIPtr<IAMStreamSelect> pSS = FindSourceSelectableFilter();
+	CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
 	if (!pSS) {
 		return;
 	}
@@ -4858,7 +4858,7 @@ void CMainFrame::OnOgmSub(UINT nID)
 		return;
 	}
 
-	CComQIPtr<IAMStreamSelect> pSS = FindSourceSelectableFilter();
+	CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
 	if (!pSS) {
 		return;
 	}
@@ -10204,7 +10204,7 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 
 					int subcount = GetStreamCount(2);
 					if (subcount) {
-						CComQIPtr<IAMStreamSelect> pSS = FindSourceSelectableFilter();
+						CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
 						DWORD cStreams = 0;
 						pSS->Count(&cStreams);
 
@@ -10257,7 +10257,7 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1) && i>=0) {
 
-		CComQIPtr<IAMStreamSelect> pSS = FindSourceSelectableFilter();
+		CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
 		if (pSS) {
 			DWORD cStreams = 0;
 			if (!FAILED(pSS->Count(&cStreams))) {
@@ -12832,6 +12832,33 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 		if (fFirst) {
 			pOFD->title = (m_strTitleAlt.IsEmpty() ? fn : m_strTitleAlt);
+			{
+				m_pMainSourceFilter = FindFilter(__uuidof(CMpegSplitterFilter), pGB);
+				if (!m_pMainSourceFilter) {
+					m_pMainSourceFilter = FindFilter(__uuidof(CMpegSourceFilter), pGB);
+				}
+				if (!m_pMainSourceFilter) {
+					m_pMainSourceFilter = FindFilter(CLSID_OggSplitter, pGB);
+				}
+				if (!m_pMainSourceFilter) {
+					m_pMainSourceFilter = FindFilter(CLSID_LAVSplitter, pGB);
+				}
+				if (!m_pMainSourceFilter) {
+					m_pMainSourceFilter = FindFilter(CLSID_LAVSource, pGB);
+				}
+				if (!m_pMainSourceFilter) {
+					m_pMainSourceFilter = FindFilter(CLSID_HaaliSplitterAR, pGB);
+				}
+				if (!m_pMainSourceFilter) {
+					m_pMainSourceFilter = FindFilter(CLSID_HaaliSplitter, pGB);
+				}
+				if (!m_pMainSourceFilter) {
+					m_pMainSourceFilter = FindFilter(L"{529A00DB-0C43-4f5b-8EF2-05004CBE0C6F}", pGB); // AV Splitter
+				}
+				if (!m_pMainSourceFilter) {
+					m_pMainSourceFilter = FindFilter(L"{D8980E15-E1F6-4916-A10F-D7EB4E9E10B8}", pGB); // AV Source
+				}
+			}
 		}
 
 		fFirst = false;
@@ -13811,11 +13838,11 @@ void CMainFrame::OpenSetupAudioStream()
 			int iSel	= -1;
 			as.iNum		= -1;
 
-			CComQIPtr<IAMStreamSelect> pSSs = FindSourceSelectableFilter();
-			if (pSSs) {
-				CComQIPtr<ITrackInfo> pInfo = pSSs;
+			CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
+			if (pSS) {
+				CComQIPtr<ITrackInfo> pInfo = pSS;
 				DWORD cStreamsS = 0;
-				if (SUCCEEDED(pSSs->Count(&cStreamsS)) && cStreamsS > 0) {
+				if (SUCCEEDED(pSS->Count(&cStreamsS)) && cStreamsS > 0) {
 					for (int i = 0; i < (int)cStreamsS; i++) {
 						//iSel = 0;
 						AM_MEDIA_TYPE* pmt	= NULL;
@@ -13823,7 +13850,7 @@ void CMainFrame::OpenSetupAudioStream()
 						LCID lcid			= 0;
 						DWORD dwGroup		= 0;
 						WCHAR* pszName		= NULL;
-						if (FAILED(pSSs->Info(i, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))) {
+						if (FAILED(pSS->Info(i, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))) {
 							continue;
 						}
 
@@ -13993,7 +14020,7 @@ void CMainFrame::OpenSetupAudioStream()
 				if (bLangMatch) {
 					AudStreams as = MixAS[bLangIdx];
 					if (as.iFilter == 1) {
-						pSSs->Enable(as.iIndex, AMSTREAMSELECTENABLE_ENABLE);
+						pSS->Enable(as.iIndex, AMSTREAMSELECTENABLE_ENABLE);
 					} else if (as.iFilter == 2) {
 						pSSa->Enable(as.iIndex, AMSTREAMSELECTENABLE_ENABLE);
 					}
@@ -14074,15 +14101,17 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 		int iNum			= 0;
 		cntintsub			= 0;
 
-		CComQIPtr<IAMStreamSelect> pSSs = FindSourceSelectableFilter();
-		if (!pSSs) pSSs = pGB;
-		if (pSSs && !s.fDisableInternalSubtitles) {
+		CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
+		if (!pSS) {
+			pSS = pGB;
+		}
+		if (pSS && !s.fDisableInternalSubtitles) {
 
 			DWORD cStreams;
-			if (SUCCEEDED(pSSs->Count(&cStreams))) {
+			if (SUCCEEDED(pSS->Count(&cStreams))) {
 
 				BOOL bIsHaali = FALSE;
-				CComQIPtr<IBaseFilter> pBF = pSSs;
+				CComQIPtr<IBaseFilter> pBF = pSS;
 				if (GetCLSID(pBF) == CLSID_HaaliSplitterAR || GetCLSID(pBF) == CLSID_HaaliSplitter) {
 					bIsHaali = TRUE;
 					cStreams--;
@@ -14093,7 +14122,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 					LCID lcid;
 					WCHAR* pName = NULL;
 
-					if (FAILED(pSSs->Info(i, NULL, &dwFlags, &lcid, &dwGroup, &pName, NULL, NULL))	|| !pName) {
+					if (FAILED(pSS->Info(i, NULL, &dwFlags, &lcid, &dwGroup, &pName, NULL, NULL))	|| !pName) {
 						continue;
 					}
 
@@ -14263,7 +14292,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			int cnt = subarray.GetCount();
 			size_t defsub = GetSubSelIdx();
 
-			if (FindSourceSelectableFilter() && s.fDisableInternalSubtitles) {
+			if (m_pMainSourceFilter && s.fDisableInternalSubtitles) {
 				defsub++;
 			}
 
@@ -15022,6 +15051,8 @@ void CMainFrame::CloseMediaPrivate()
 
 	m_pProv.Release();
 
+	m_pMainSourceFilter.Release();
+
 	if (m_pFullscreenWnd->IsWindow()) {
 		m_pFullscreenWnd->DestroyWindow();    // TODO : still freezing sometimes...
 	}
@@ -15655,8 +15686,8 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
 
 		if (b_UseVSFilter) {
-			CComQIPtr<IDirectVobSub>	pDVS = GetVSFilter();
-			CComQIPtr<IAMStreamSelect>	pSSS = FindSourceSelectableFilter();
+			CComQIPtr<IDirectVobSub> pDVS	= GetVSFilter();
+			CComQIPtr<IAMStreamSelect> pSS	= m_pMainSourceFilter;
 			if (pDVS) {
 				int nLangs;
 				if (SUCCEEDED(pDVS->get_LanguageCount(&nLangs)) && nLangs) {
@@ -15691,7 +15722,7 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 						}
 
 						DWORD cStreams;
-						pSSS->Count(&cStreams);
+						pSS->Count(&cStreams);
 						UINT baseid = id;
 
 						for (int i = 0, j = cStreams; i < j; i++) {
@@ -15699,7 +15730,7 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 							LCID lcid;
 							WCHAR* pszName = NULL;
 
-							if (FAILED(pSSS->Info(i, NULL, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))
+							if (FAILED(pSS->Info(i, NULL, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))
 									|| !pszName) {
 								continue;
 							}
@@ -15779,13 +15810,13 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 		UINT baseid = id;
 		int intsub = 0;
 
-		CComQIPtr<IAMStreamSelect> pSSS = FindSourceSelectableFilter();
-		if (pSSS && !AfxGetAppSettings().fDisableInternalSubtitles) {
+		CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
+		if (pSS && !AfxGetAppSettings().fDisableInternalSubtitles) {
 			DWORD cStreams;
-			if (!FAILED(pSSS->Count(&cStreams))) {
+			if (!FAILED(pSS->Count(&cStreams))) {
 
 				BOOL bIsHaali = FALSE;
-				CComQIPtr<IBaseFilter> pBF = pSSS;
+				CComQIPtr<IBaseFilter> pBF = pSS;
 				if (GetCLSID(pBF) == CLSID_HaaliSplitterAR || GetCLSID(pBF) == CLSID_HaaliSplitter) {
 					bIsHaali = TRUE;
 					cStreams--;
@@ -15796,7 +15827,7 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 					LCID lcid;
 					WCHAR* pszName = NULL;
 
-					if (FAILED(pSSS->Info(i, NULL, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))
+					if (FAILED(pSS->Info(i, NULL, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))
 							|| !pszName) {
 						continue;
 					}
@@ -16123,39 +16154,6 @@ void CMainFrame::SetupNavChaptersSubMenu()
 	}
 }
 
-IBaseFilter* CMainFrame::FindSourceSelectableFilter()
-{
-	IBaseFilter* pSF = NULL;
-
-	pSF = FindFilter(__uuidof(CMpegSplitterFilter), pGB);
-	if (!pSF) {
-		pSF = FindFilter(__uuidof(CMpegSourceFilter), pGB);
-	}
-	if (!pSF) {
-		pSF = FindFilter(CLSID_OggSplitter, pGB);
-	}
-	if (!pSF) {
-		pSF = FindFilter(CLSID_LAVSplitter, pGB);
-	}
-	if (!pSF) {
-		pSF = FindFilter(CLSID_LAVSource, pGB);
-	}
-	if (!pSF) {
-		pSF = FindFilter(CLSID_HaaliSplitterAR, pGB);
-	}
-	if (!pSF) {
-		pSF = FindFilter(CLSID_HaaliSplitter, pGB);
-	}
-	if (!pSF) {
-		pSF = FindFilter(L"{529A00DB-0C43-4f5b-8EF2-05004CBE0C6F}", pGB); // AV Splitter
-	}
-	if (!pSF) {
-		pSF = FindFilter(L"{D8980E15-E1F6-4916-A10F-D7EB4E9E10B8}", pGB); // AV Source
-	}
-
-	return pSF;
-}
-
 IBaseFilter* CMainFrame::FindSwitcherFilter()
 {
 	IBaseFilter* pSF = NULL;
@@ -16172,7 +16170,7 @@ void CMainFrame::SetupNavStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGr
 {
 	UINT baseid = id;
 
-	CComQIPtr<IAMStreamSelect> pSS = FindSourceSelectableFilter();
+	CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
 	if (!pSS) {
 		pSS = pGB;
 	}
@@ -16246,7 +16244,7 @@ void CMainFrame::SetupNavStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGr
 
 void CMainFrame::OnNavStreamSelectSubMenu(UINT id, DWORD dwSelGroup)
 {
-	CComQIPtr<IAMStreamSelect> pSS = FindSourceSelectableFilter();
+	CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
 	if (!pSS) {
 		pSS = pGB;
 	}
@@ -16314,11 +16312,11 @@ void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSe
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
 
 		UINT baseid = id;
-		CComQIPtr<IAMStreamSelect> pSSS = FindSourceSelectableFilter();
+		CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
 
-		if (pSSS) {
+		if (pSS) {
 			DWORD cStreams;
-			if (!FAILED(pSSS->Count(&cStreams))) {
+			if (!FAILED(pSS->Count(&cStreams))) {
 				DWORD dwPrevGroup = (DWORD)-1;
 
 				for (int i = 0, j = cStreams; i < j; i++) {
@@ -16326,7 +16324,7 @@ void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSe
 					LCID lcid;
 					WCHAR* pszName = NULL;
 
-					if (FAILED(pSSS->Info(i, NULL, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))
+					if (FAILED(pSS->Info(i, NULL, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))
 							|| !pszName) {
 						continue;
 					}
@@ -16347,7 +16345,7 @@ void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSe
 					}
 
 					dwPrevGroup = dwGroup;
-					CString str = _T("");
+					CString str;
 
 					if (lcname.Find(_T(" off")) >= 0) {
 						str = ResStr(IDS_AG_DISABLED);
@@ -16540,7 +16538,7 @@ void CMainFrame::OnNavMixStreamSelectSubMenu(UINT id, DWORD dwSelGroup)
 
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
 
-		CComQIPtr<IAMStreamSelect> pSS = FindSourceSelectableFilter();
+		CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
 		if (pSS) {
 			DWORD cStreams = 0;
 			if (!FAILED(pSS->Count(&cStreams))) {
@@ -19491,7 +19489,7 @@ void CMainFrame::SetStatusMessage(CString m_msg)
 
 CString CMainFrame::FillMessage()
 {
-	CString msg = _T("");
+	CString msg;
 
 	if (!m_playingmsg.IsEmpty()) {
 		msg = m_playingmsg;
@@ -20093,15 +20091,15 @@ DWORD CMainFrame::NotifyRenderThread()
 int CMainFrame::GetStreamCount(DWORD dwSelGroup)
 {
 	int streamcount = 0;
-	if (CComQIPtr<IAMStreamSelect> pSSS = FindSourceSelectableFilter()) {
+	if (CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter) {
 		DWORD cStreams;
-		if (!FAILED(pSSS->Count(&cStreams))) {
+		if (!FAILED(pSS->Count(&cStreams))) {
 			for (int i = 0, j = cStreams; i < j; i++) {
 				DWORD dwFlags, dwGroup;
 				LCID lcid;
 				WCHAR* pszName = NULL;
 
-				if (FAILED(pSSS->Info(i, NULL, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))
+				if (FAILED(pSS->Info(i, NULL, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))
 						|| !pszName) {
 					continue;
 				}
