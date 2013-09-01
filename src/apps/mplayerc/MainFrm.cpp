@@ -14886,8 +14886,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 						hasValidFile = m_wndPlaylistBar.SetNext();
 					}
 
-					if (hasValidFile) {
-						OpenCurPlaylistItem();
+					if (hasValidFile && OpenCurPlaylistItem()) {
+						return true;
 					}
 				} else if (m_wndPlaylistBar.GetCount() > 1) {
 					DoAfterPlaybackEvent();
@@ -17894,10 +17894,10 @@ void CMainFrame::SendStatusMessage(CString msg, int nTimeOut)
 	m_Lcd.SetStatusMessage(msg, nTimeOut);
 }
 
-void CMainFrame::OpenCurPlaylistItem(REFERENCE_TIME rtStart)
+BOOL CMainFrame::OpenCurPlaylistItem(REFERENCE_TIME rtStart)
 {
 	if (m_wndPlaylistBar.GetCount() == 0) {
-		return;
+		return FALSE;
 	}
 
 	CPlaylistItem pli;
@@ -17905,13 +17905,15 @@ void CMainFrame::OpenCurPlaylistItem(REFERENCE_TIME rtStart)
 		m_wndPlaylistBar.SetFirstSelected();
 	}
 	if (!m_wndPlaylistBar.GetCur(pli)) {
-		return;
+		return FALSE;
 	}
 
 	CAutoPtr<OpenMediaData> p(m_wndPlaylistBar.GetCurOMD(rtStart));
 	if (p) {
 		OpenMedia(p);
 	}
+
+	return TRUE;
 }
 
 void CMainFrame::AddCurDevToPlaylist()
@@ -19469,8 +19471,9 @@ BOOL CMainFrame::OpenBD(CString Path)
 					sl.AddTail(CString(Path + _T("\\BDMV\\index.bdmv")));
 				}
 				m_wndPlaylistBar.Append(sl, false);
-				OpenCurPlaylistItem();
-				return true;
+				if (OpenCurPlaylistItem()) {
+					return TRUE;
+				}
 			}
 		}
 	}

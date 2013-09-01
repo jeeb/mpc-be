@@ -529,7 +529,7 @@ protected:
 	DWORD	m_nLastRunTicket;
 
 public:
-	void OpenCurPlaylistItem(REFERENCE_TIME rtStart = INVALID_TIME);
+	BOOL OpenCurPlaylistItem(REFERENCE_TIME rtStart = INVALID_TIME);
 	void OpenMedia(CAutoPtr<OpenMediaData> pOMD);
 	void PlayFavoriteFile(CString fav);
 	void PlayFavoriteDVD(CString fav);
