@@ -304,7 +304,9 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mt.subtype = FOURCCMap(pbmi->biCompression);
 			}
 
-			if (pbmi->biCompression == FCC('H264') && s->strf.GetCount() > sizeof(BITMAPINFOHEADER)) {
+			if ((pbmi->biCompression == FCC('H264') || pbmi->biCompression == FCC('avc1')) && s->strf.GetCount() > sizeof(BITMAPINFOHEADER)) {
+				DWORD biCompression = pbmi->biCompression;
+
 				size_t extralen	= s->strf.GetCount() - sizeof(BITMAPINFOHEADER);
 				BYTE* extra		= s->strf.GetData() + (s->strf.GetCount() - extralen);
 
@@ -318,7 +320,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mts.Add(mt2);
 				}
 
-				pbmi->biCompression = FCC('H264');
+				pbmi->biCompression = biCompression;
 			}
 
 			mt.formattype			= FORMAT_VideoInfo;
