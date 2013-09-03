@@ -515,7 +515,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						{
 							CBaseSplitterFileEx::mpahdr h;
 							CMediaType mt2;
-							if (m_pFile->Read(h, 4, false, &mt2)) {
+							if (m_pFile->Read(h, 4, &mt2)) {
 								mt = mt2;
 							}
 						}

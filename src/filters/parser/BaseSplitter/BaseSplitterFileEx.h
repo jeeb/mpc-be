@@ -125,6 +125,14 @@ public:
 
 		int nSamplesPerSec, FrameSize, nBytesPerSec;
 		REFERENCE_TIME rtDuration;
+
+		bool operator == (const struct mpahdr& h) const {
+			return (sync == h.sync
+					&& version == h.version
+					&& layer == h.layer
+					&& freq == h.freq
+					&& channels == h.channels);
+		}
 	};
 
 	struct aachdr
@@ -150,12 +158,25 @@ public:
 
 		int FrameSize, nBytesPerSec;
 		REFERENCE_TIME rtDuration;
+
+		bool operator == (const struct aachdr& h) const {
+			return (sync == h.sync
+					&& version == h.version
+					&& profile == h.profile
+					&& freq == h.freq
+					&& channels == h.channels);
+		}
 	};
 
 	struct latm_aachdr
 	{
 		int samplerate;
 		int channels;
+
+		bool operator == (const struct latm_aachdr& h) const {
+			return (samplerate == h.samplerate
+					&& channels == h.channels);
+		}
 	};
 
 	struct ac3hdr
@@ -407,7 +428,7 @@ public:
 	bool Read(pssyshdr& h);
 	bool Read(peshdr& h, BYTE code);
 	bool Read(seqhdr& h, int len, CMediaType* pmt = NULL);
-	bool Read(mpahdr& h, int len, bool fAllowV25, CMediaType* pmt = NULL);
+	bool Read(mpahdr& h, int len, CMediaType* pmt = NULL, bool fAllowV25 = false);
 	bool Read(aachdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true);
 	bool Read(latm_aachdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(ac3hdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true, bool AC3CoreOnly = true);

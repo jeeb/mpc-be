@@ -498,8 +498,8 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, IAsyncReader*
 }
 
 #define IsMpegAudio(stream_type)	(stream_type == AUDIO_STREAM_MPEG1 || stream_type == AUDIO_STREAM_MPEG2)
-#define IsAACAudio(stream_type)		(stream_type == AUDIO_STREAM_AAC)
-#define IsAACLATMAudio(stream_type)	(stream_type == AUDIO_STREAM_AAC_LATM)
+#define IsAACAudio(stream_type)		(stream_type == AUDIO_STREAM_AAC || stream_type == AUDIO_STREAM_AAC_LATM)
+//#define IsAACLATMAudio(stream_type)	(stream_type == AUDIO_STREAM_AAC_LATM)
 #define IsAC3Audio(stream_type)		(stream_type == AUDIO_STREAM_AC3 || stream_type == AUDIO_STREAM_AC3_PLUS || \
 									 stream_type == AUDIO_STREAM_AC3_TRUE_HD || stream_type == SECONDARY_AUDIO_AC3_PLUS || \
 									 stream_type == PES_PRIVATE)
@@ -548,74 +548,108 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 			Seek(start);
 			// PPS and SPS can be present on differents packets
 			// and can also be split into multiple packets
-			if (!avch.Lookup(pid))
+			if (!avch.Lookup(pid)) {
 				memset(&avch[pid], 0, sizeof(CMpegSplitterFile::avchdr));
-#if MVC_SUPPORT
-			if (!m_streams[video].Find(s) && !m_streams[stereo].Find(s) && Read(avch[pid], len, &s.mt))
-			{
-				if (avch[pid].spspps[index_subsetsps].complete)
-					type = stereo;
-				else
-					type = video;
 			}
-#else
-			if (!m_streams[video].Find(s) && Read(avch[pid], len, &s.mt)) {
-				PES_STREAM_TYPE stream_type = INVALID;
-				if (GetStreamType(s.pid, stream_type)) {
-					if (IsH264Video(stream_type)) {
+
+			if (!m_streams[video].Find(s) && !m_streams[stereo].Find(s) && Read(avch[pid], len, &s.mt)) {
+				if (avch[pid].spspps[index_subsetsps].complete) {
+					type = stereo;
+				} else {
+					PES_STREAM_TYPE stream_type = INVALID;
+					if (GetStreamType(s.pid, stream_type)) {
+						if (IsH264Video(stream_type)) {
+							type = video;
+						}
+					} else {
 						type = video;
 					}
-				} else {
-					type = video;
 				}
 			}
-#endif
 		}
 	} else if (pesid >= 0xc0 && pesid < 0xe0) { // mpeg audio
 
 		// AAC_LATM
 		if (type == unknown) {
+			static CMpegSplitterFile::latm_aachdr h2 = {0};
+			static BOOL bIsAACLatmValid = FALSE;
+
+			Seek(start);
 			CMpegSplitterFile::latm_aachdr h;
-			if (!m_streams[audio].Find(s) && Read(h, len, &s.mt) && m_type == mpeg_ts) {
-				PES_STREAM_TYPE stream_type = INVALID;
-				if (GetStreamType(s.pid, stream_type)) {
-					if (IsAACLATMAudio(stream_type)) {
-						type = audio;
+
+			if (!m_streams[audio].Find(s)) {
+				if (Read(h, len, &s.mt) && m_type == mpeg_ts) {
+					if (bIsAACLatmValid) {
+						PES_STREAM_TYPE stream_type = INVALID;
+						if (GetStreamType(s.pid, stream_type)) {
+							if (IsAACAudio(stream_type)) {
+								type = audio;
+							}
+						} else {
+							type = audio;
+						}
+					} else {
+						if (h2 == h) {
+							bIsAACLatmValid = TRUE;
+						}
+						memcpy(&h2, &h, sizeof(h));
 					}
-				} else {
-					type = audio;
 				}
 			}
 		}
 
 		// AAC
 		if (type == unknown) {
+			static CMpegSplitterFile::aachdr h2 = {0};
+			static BOOL bIsAACValid = FALSE;
+
 			Seek(start);
 			CMpegSplitterFile::aachdr h;
-			if (!m_streams[audio].Find(s) && Read(h, len, &s.mt)) {
-				PES_STREAM_TYPE stream_type = INVALID;
-				if (GetStreamType(s.pid, stream_type)) {
-					if (IsAACAudio(stream_type)) {
-						type = audio;
+			if (!m_streams[audio].Find(s)) {
+				if (Read(h, len, &s.mt)) {
+					if (bIsAACValid) {
+						PES_STREAM_TYPE stream_type = INVALID;
+						if (GetStreamType(s.pid, stream_type)) {
+							if (IsAACAudio(stream_type)) {
+								type = audio;
+							}
+						} else {
+							type = audio;
+						}
+					} else {
+						if (h2 == h) {
+							bIsAACValid = TRUE;
+						}
+						memcpy(&h2, &h, sizeof(h));
 					}
-				} else {
-					type = audio;
 				}
 			}
 		}
 
 		// MPEG Audio
 		if (type == unknown) {
+			static CMpegSplitterFile::mpahdr h2 = {0};
+			static BOOL bIsMPAValid = FALSE;
+
 			Seek(start);
 			CMpegSplitterFile::mpahdr h;
-			if (!m_streams[audio].Find(s) && Read(h, len, false, &s.mt)) {
-				PES_STREAM_TYPE stream_type = INVALID;
-				if (GetStreamType(s.pid, stream_type)) {
-					if (IsMpegAudio(stream_type)) {
-						type = audio;
+			if (!m_streams[audio].Find(s)) {
+				if (Read(h, len, &s.mt)) {
+					if (bIsMPAValid) {
+						PES_STREAM_TYPE stream_type = INVALID;
+						if (GetStreamType(s.pid, stream_type)) {
+							if (IsMpegAudio(stream_type)) {
+								type = audio;
+							}
+						} else {
+							type = audio;
+						}
+					} else {
+						if (h2 == h) {
+							bIsMPAValid = TRUE;
+						}
+						memcpy(&h2, &h, sizeof(h));
 					}
-				} else {
-					type = audio;
 				}
 			}
 		}
@@ -956,9 +990,7 @@ CAtlList<CMpegSplitterFile::stream>* CMpegSplitterFile::GetMasterStream()
 		!m_streams[video].IsEmpty()		? &m_streams[video] :
 		!m_streams[audio].IsEmpty()		? &m_streams[audio] :
 		!m_streams[subpic].IsEmpty()	? &m_streams[subpic] :
-#if MVC_SUPPORT
 		!m_streams[stereo].IsEmpty()	? &m_streams[stereo] :
-#endif
 		NULL;
 }
 

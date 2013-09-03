@@ -395,7 +395,7 @@ HRESULT CMpaSplitterFile::Init()
 		syncpos = startpos_mp3 + searchlen;
 
 		// Check for a valid MPA header
-		if (Read(m_mpahdr, searchlen, true, &m_mt)) {
+		if (Read(m_mpahdr, searchlen, &m_mt, true)) {
 			m_mode = mpa;
 
 			// check multiple frame to ensure that the data is correct
@@ -514,17 +514,13 @@ bool CMpaSplitterFile::Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limi
 		while (GetPos() <= endpos - 4) {
 			mpahdr h;
 
-			if (Read(h, (int)(endpos - GetPos()), true)) {
-				if (m_mpahdr.version == h.version
-						&& m_mpahdr.layer == h.layer
-						&& m_mpahdr.channels == h.channels
-						&& m_mpahdr.nSamplesPerSec == h.nSamplesPerSec
-						&& m_mpahdr.sync == h.sync) {
+			if (Read(h, (int)(endpos - GetPos(), NULL, true))) {
+				if (m_mpahdr == h) {
 					Seek(GetPos() - 4);
 					AdjustDuration(h.nBytesPerSec);
 
-					FrameSize = h.FrameSize;
-					rtDuration = h.rtDuration;
+					FrameSize	= h.FrameSize;
+					rtDuration	= h.rtDuration;
 
 					memcpy(&m_mpahdr, &h, sizeof(mpahdr));
 
@@ -539,15 +535,13 @@ bool CMpaSplitterFile::Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limi
 			aachdr h;
 
 			if (Read(h, (int)(endpos - GetPos()))) {
-				if (m_aachdr.version == h.version
-						&& m_aachdr.layer == h.layer
-						&& m_aachdr.channels == h.channels) {
+				if (m_aachdr == h) {
 					Seek(GetPos() - (h.fcrc?7:9));
 					AdjustDuration(h.nBytesPerSec);
 					Seek(GetPos() + (h.fcrc?7:9));
 
-					FrameSize = h.FrameSize;
-					rtDuration = h.rtDuration;
+					FrameSize	= h.FrameSize;
+					rtDuration	= h.rtDuration;
 
 					return true;
 				}

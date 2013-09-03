@@ -464,7 +464,7 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, int len, CMediaType* pmt)
 }
 
 #define AGAIN Seek(pos); BitRead(8); goto _again;
-bool CBaseSplitterFileEx::Read(mpahdr& h, int len, bool fAllowV25, CMediaType* pmt)
+bool CBaseSplitterFileEx::Read(mpahdr& h, int len, CMediaType* pmt, bool fAllowV25)
 {
 	memset(&h, 0, sizeof(h));
 

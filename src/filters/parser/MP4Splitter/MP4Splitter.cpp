@@ -492,7 +492,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								m_pFile->Seek(sample.GetOffset());
 								CBaseSplitterFileEx::mpahdr h;
 								CMediaType mt2;
-								if (m_pFile->Read(h, sample.GetSize(), false, &mt2)) {
+								if (m_pFile->Read(h, sample.GetSize(), &mt2)) {
 									mt = mt2;
 								}
 							}
