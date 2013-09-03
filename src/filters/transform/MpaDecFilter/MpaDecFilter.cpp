@@ -266,9 +266,9 @@ enum {
 
 #pragma warning(disable : 4245)
 static struct scmap_t {
-	WORD nChannels;
-	BYTE ch[8];
-	DWORD dwChannelMask;
+	const WORD nChannels;
+	const BYTE ch[8];
+	const DWORD dwChannelMask;
 }
 // dshow: left, right, center, LFE, left surround, right surround
 // lets see how we can map these things to dshow (oh the joy!)
@@ -291,9 +291,9 @@ s_scmap_hdmv[] = {
 #pragma warning(default : 4245)
 
 static struct channel_mode_t {
-	WORD channels;
-	DWORD ch_layout;
-	LPCTSTR op_value;
+	const WORD channels;
+	const DWORD ch_layout;
+	const LPCTSTR op_value;
 }
 channel_mode[] = {
 	//n  libavcodec                           ID          Name
