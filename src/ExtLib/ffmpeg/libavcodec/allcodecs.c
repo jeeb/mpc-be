@@ -141,6 +141,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (WMAV2, wmav2);
     REGISTER_DECODER (WMAVOICE, wmavoice);
     REGISTER_DECODER (TTA, tta);
+    REGISTER_DECODER(TAK, tak);
 
     REGISTER_ENCDEC  (AC3, ac3);
     REGISTER_ENCDEC  (EAC3, eac3);
@@ -165,13 +166,14 @@ void avcodec_register_all(void)
     REGISTER_DECODER (ADPCM_YAMAHA, adpcm_yamaha);
 
     /* parsers */
-    REGISTER_PARSER  (AAC_LATM, aac_latm);
-    REGISTER_PARSER  (AC3, ac3);
-    REGISTER_PARSER  (DCA, dca);
-    REGISTER_PARSER  (MLP, mlp);
-    REGISTER_PARSER  (MPEGAUDIO, mpegaudio);
-    REGISTER_PARSER  (H264, h264);
-    REGISTER_PARSER  (MPEGVIDEO, mpegvideo);
+    REGISTER_PARSER (AAC_LATM, aac_latm);
+    REGISTER_PARSER (AC3, ac3);
+    REGISTER_PARSER (DCA, dca);
+    REGISTER_PARSER (MLP, mlp);
+    REGISTER_PARSER (MPEGAUDIO, mpegaudio);
+    REGISTER_PARSER (H264, h264);
+    REGISTER_PARSER (MPEGVIDEO, mpegvideo);
+    REGISTER_PARSER (TAK, tak);
 
     /* external libraries */
     REGISTER_DECODER (LIBOPENJPEG, libopenjpeg);

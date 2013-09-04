@@ -291,6 +291,9 @@ SRCS_C = \
 	libavcodec/svq1dec.c \
 	libavcodec/svq3.c \
 	libavcodec/synth_filter.c \
+	libavcodec/tak.c \
+	libavcodec/tak_parser.c \
+	libavcodec/takdec.c \
 	libavcodec/tiff.c \
 	libavcodec/tiff_common.c \
 	libavcodec/tiff_data.c \

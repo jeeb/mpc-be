@@ -609,6 +609,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_RA_288_DECODER 1
 #define CONFIG_RALF_DECODER 1
 #define CONFIG_SIPR_DECODER 1
+#define CONFIG_TAK_DECODER 1
 #define CONFIG_TRUEHD_DECODER 1
 #define CONFIG_TRUESPEECH_DECODER 1
 #define CONFIG_TTA_DECODER 1
@@ -723,6 +724,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_MPEG4VIDEO_PARSER 0
 #define CONFIG_MLP_PARSER 1
 #define CONFIG_MPEGVIDEO_PARSER 1
+#define CONFIG_TAK_PARSER 1
 
 #define CONFIG_AMRNB_DECODER 1
 #define CONFIG_AMRWB_DECODER 1

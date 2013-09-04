@@ -264,6 +264,7 @@
     <ClInclude Include="libavcodec\svq3.h" />
     <ClInclude Include="libavcodec\synth_filter.h" />
     <ClInclude Include="libavcodec\tableprint.h" />
+    <ClInclude Include="libavcodec\tak.h" />
     <ClInclude Include="libavcodec\thread.h" />
     <ClInclude Include="libavcodec\tiff.h" />
     <ClInclude Include="libavcodec\tiff_common.h" />
@@ -627,6 +628,9 @@
     <ClCompile Include="libavcodec\svq1dec.c" />
     <ClCompile Include="libavcodec\svq3.c" />
     <ClCompile Include="libavcodec\synth_filter.c" />
+    <ClCompile Include="libavcodec\tak.c" />
+    <ClCompile Include="libavcodec\takdec.c" />
+    <ClCompile Include="libavcodec\tak_parser.c" />
     <ClCompile Include="libavcodec\tiff.c" />
     <ClCompile Include="libavcodec\tiff_common.c" />
     <ClCompile Include="libavcodec\tiff_data.c" />
