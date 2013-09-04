@@ -3452,14 +3452,20 @@ void CorrectWaveFormatEx(CMediaType *pmt)
 	}
 
 	WAVEFORMATEX* wfe = (WAVEFORMATEX*)pmt->pbFormat;
-	if (wfe && wfe->nChannels > 2 && wfe->cbSize == 0) {
-		pmt->ReallocFormatBuffer(sizeof(WAVEFORMATEXTENSIBLE));
-		wfe									= (WAVEFORMATEX*)pmt->pbFormat;
+	if (wfe == NULL) {
+		return;
+	}
+
+	if (wfe->cbSize == 0 && wfe->nChannels > 2) {
+		wfe									= (WAVEFORMATEX*)pmt->ReallocFormatBuffer(sizeof(WAVEFORMATEXTENSIBLE));
 		WAVEFORMATEXTENSIBLE* wfex			= (WAVEFORMATEXTENSIBLE*)pmt->pbFormat;
 		wfex->Format.cbSize					= sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX);
 		wfex->Samples.wValidBitsPerSample	= wfe->wBitsPerSample;
 		wfex->SubFormat						= wfe->wFormatTag == WAVE_FORMAT_IEEE_FLOAT ? KSDATAFORMAT_SUBTYPE_IEEE_FLOAT : KSDATAFORMAT_SUBTYPE_PCM;
 		wfex->dwChannelMask					= GetDefChannelMask(wfe->nChannels);
 		wfex->Format.wFormatTag				= WAVE_FORMAT_EXTENSIBLE;
+	} else if (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && ((WAVEFORMATEXTENSIBLE*)wfe)->dwChannelMask == 0) {
+		// fix for DC-Bass Source Mod 1.5.2.0 bug
+		((WAVEFORMATEXTENSIBLE*)wfe)->dwChannelMask = GetDefChannelMask(wfe->nChannels);
 	}
 }
