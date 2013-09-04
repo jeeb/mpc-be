@@ -41,7 +41,7 @@
 	* MediaInfo 0.7.64+ svn rev.5904;
 	* Little-CMS 2.5 git-4eb01404;
 	* ffmpeg 2.0 git-4aeb996f;
-	* libwebp 0.3.1 git-733a7faa;
+	* libwebp 0.3.1 git-b11c9d62;
 	* libpng 1.7.0 b17 git-bb065520;
 	* libopus 1.1 git-02fed471;
 	* ZenLib 0.4.29+ svn rev.447;
