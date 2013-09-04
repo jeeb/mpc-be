@@ -150,6 +150,7 @@ COggSplitterFilter::COggSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("COggSplitterFilter"), pUnk, phr, __uuidof(this))
 	, m_bitstream_serial_number_start(0)
 	, m_bitstream_serial_number_last(0)
+	, bIsTheoraPresent(FALSE)
 {
 	m_nFlag |= PACKET_PTS_DISCONTINUITY;
 	m_nFlag |= PACKET_PTS_VALIDATE_POSITIVE;
@@ -313,6 +314,7 @@ start:
 		if (COggTheoraOutputPin* p = dynamic_cast<COggTheoraOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
 			p->UnpackInitPage(page);
 			if (p->IsInitialized()) {
+				bIsTheoraPresent = TRUE;
 				nWaitForMore--;
 			}
 		}
@@ -470,75 +472,71 @@ bool COggSplitterFilter::DemuxInit()
 
 void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
-	if (rt <= 0 ) {
+	if (rt <= 0) {
 		m_pFile->Seek(0);
 	} else if (m_rtDuration > 0) {
 
-		__int64 len = m_pFile->GetLength();
-		__int64 startpos = len * rt/m_rtDuration;
+		__int64 len			= m_pFile->GetLength();
+		__int64 seekpos		= (__int64)(1.0*rt/m_rtDuration*len);
+		__int64 minseekpos	= _I64_MIN;
 
-		REFERENCE_TIME rtMinDiff = _I64_MAX;
+		REFERENCE_TIME rtmax = rt - UNITS * (bIsTheoraPresent ? 2 : 0);
+		REFERENCE_TIME rtmin = rtmax - UNITS / 2;
 
+		__int64 curpos = seekpos;
+		double div = 1.0;
 		for (;;) {
-			__int64 endpos = startpos;
-			REFERENCE_TIME rtPos = -1;
+			REFERENCE_TIME rt2 = INVALID_TIME;
 
-			OggPage page;
-			m_pFile->Seek(startpos);
-			while (m_pFile->Read(page, false)) {
-				if (page.m_hdr.granule_position == -1) {
-					continue;
-				}
+			{
+				OggPage page;
+				m_pFile->Seek(curpos);
+				while (m_pFile->Read(page, false)) {
+					if (page.m_hdr.granule_position == -1) {
+						continue;
+					}
 
-				COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
-				if (!pOggPin) {
-					continue;
-				}
+					COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
+					if (!pOggPin) {
+						continue;
+					}
 
-				rtPos = pOggPin->GetRefTime(page.m_hdr.granule_position) + pOggPin->GetOffset();
-				endpos = m_pFile->GetPos();
+					COggTheoraOutputPin* pOggPinTh = dynamic_cast<COggTheoraOutputPin*>(pOggPin);
+					if (bIsTheoraPresent && !pOggPinTh) {
+						continue;
+					}
 
-				break;
-			}
-
-			__int64 rtDiff = rtPos - rt;
-
-			if (rtDiff < 0) {
-				rtDiff = -rtDiff;
-
-				if (rtDiff < 500000 || rtDiff >= rtMinDiff) {
-					m_pFile->Seek(startpos);
+					rt2 = pOggPin->GetRefTime(page.m_hdr.granule_position) + pOggPin->GetOffset();
 					break;
 				}
-
-				rtMinDiff = rtDiff;
+			
 			}
 
-			__int64 newpos = startpos;
-
-			if (rtPos < rt && rtPos < m_rtDuration) {
-				newpos = startpos + (__int64)((1.0*(rt - rtPos)/(m_rtDuration - rtPos)) * (len - startpos)) + 1024;
-				if (newpos < endpos) {
-					newpos = endpos + 1024;
-				}
-			} else if (rtPos > rt && rtPos > 0) {
-				newpos = startpos - (__int64)((1.0*(rtPos - rt)/(rtPos - 0)) * (startpos - 0)) - 1024;
-				if (newpos >= startpos) {
-					newpos = startpos - 1024;
-				}
-			} else if (rtPos == rt) {
-				m_pFile->Seek(startpos);
-				break;
-			} else {
-				ASSERT(0);
-				m_pFile->Seek(0);
+			if (rt2 == INVALID_TIME) {
 				break;
 			}
 
-			startpos = max(min(newpos, len), 0);
+			if (rtmin <= rt2 && rt2 <= rtmax) {
+				m_pFile->Seek(curpos);
+				return;
+			}
+
+			REFERENCE_TIME dt = rt2 - rtmax;
+			if (rt2 < 0) {
+				dt = UNITS / div;
+			}
+			dt /= div;
+			div += 0.05;
+
+			if (div >= 5.0) {
+				break;
+			}
+
+			curpos -= (__int64)(1.0*dt/m_rtDuration*len);
+			m_pFile->Seek(curpos);
 		}
 
-		m_pFile->Seek(startpos);
+		m_pFile->Seek(0);
 	}
 }
 

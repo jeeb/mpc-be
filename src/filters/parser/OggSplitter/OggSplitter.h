@@ -235,6 +235,8 @@ protected:
 
 	DWORD m_bitstream_serial_number_start, m_bitstream_serial_number_last;
 
+	BOOL bIsTheoraPresent;
+
 public:
 	COggSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr);
 	virtual ~COggSplitterFilter();
