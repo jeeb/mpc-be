@@ -648,6 +648,7 @@ bool CBaseSplitterFileEx::Read(latm_aachdr& h, int len, CMediaType* pmt)
 	aachdr aac_h;
 	Seek(pos);
 	if (Read(aac_h, len_start, pmt, false)) {
+		memset(&h, 0, sizeof(h));
 		return true;
 	}
 

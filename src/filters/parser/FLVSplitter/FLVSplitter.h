@@ -23,9 +23,7 @@
 
 #pragma once
 
-#include <atlcoll.h>
 #include "../BaseSplitter/BaseSplitter.h"
-#include "../../transform/BaseVideoFilter/BaseVideoFilter.h"
 
 #define FlvSplitterName L"MPC FLV Splitter"
 #define FlvSourceName   L"MPC FLV Source"

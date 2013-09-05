@@ -77,10 +77,6 @@ const AMOVIESETUP_PIN sudpPins[] = {
 	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, 0, NULL}
 };
 
-const AMOVIESETUP_MEDIATYPE sudPinTypesOut2[] = {
-	{&MEDIATYPE_Video, &MEDIASUBTYPE_NULL},
-};
-
 const AMOVIESETUP_FILTER sudFilter[] = {
 	{&__uuidof(CFLVSplitterFilter), FlvSplitterName, MERIT_NORMAL, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
 	{&__uuidof(CFLVSourceFilter), FlvSourceName, MERIT_NORMAL, 0, NULL, CLSID_LegacyAmFilterCategory},

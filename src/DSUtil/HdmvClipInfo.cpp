@@ -28,8 +28,8 @@ extern LCID	ISO6392ToLcid(LPCSTR code);
 
 CHdmvClipInfo::CHdmvClipInfo(void)
 {
-	m_hFile			= INVALID_HANDLE_VALUE;
-	m_bIsHdmv		= false;
+	m_hFile		= INVALID_HANDLE_VALUE;
+	m_bIsHdmv	= false;
 }
 
 CHdmvClipInfo::~CHdmvClipInfo()
@@ -354,7 +354,7 @@ HRESULT CHdmvClipInfo::ReadChapters(CString strPlaylistFile, CPlaylist& Playlist
 	if (m_hFile != INVALID_HANDLE_VALUE) {
 		REFERENCE_TIME*		rtOffset = DNew REFERENCE_TIME[PlaylistItems.GetCount()];
 		REFERENCE_TIME		rtSum	 = 0;
-		int					nIndex   = 0;
+		USHORT				nIndex   = 0;
 
 		POSITION pos = PlaylistItems.GetHeadPosition();
 		while (pos) {
@@ -387,7 +387,7 @@ HRESULT CHdmvClipInfo::ReadChapters(CString strPlaylistFile, CPlaylist& Playlist
 		SetFilePointerEx(m_hFile, Pos, NULL, FILE_BEGIN);
 		ReadDword();				// length
 		nMarkCount = ReadShort();	// number_of_PlayList_marks
-		for (size_t i = 0; i < nMarkCount; i++) {
+		for (size_t i = 0; i < min(nIndex, nMarkCount); i++) {
 			PlaylistChapter	Chapter;
 
 			ReadByte();															// reserved_for_future_use
@@ -397,9 +397,11 @@ HRESULT CHdmvClipInfo::ReadChapters(CString strPlaylistFile, CPlaylist& Playlist
 			Chapter.m_nEntryPID		= ReadShort();								// entry_ES_PID
 			Chapter.m_rtDuration	= REFERENCE_TIME(20000.0f*ReadDword()/90);	// duration
 
-			Chapters.AddTail (Chapter);
+			if (Chapter.m_rtTimestamp < 0 || Chapter.m_rtTimestamp > rtSum) {
+				continue;
+			}
 
-			// TRACE ("Chapter %d : %S\n", i, ReftimeToString (Chapter.m_rtTimestamp));
+			Chapters.AddTail (Chapter);
 		}
 
 		CloseFile (S_OK);

@@ -37,7 +37,6 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 {
 	CAtlMap<WORD, BYTE> m_pid2pes;
 	CAtlMap<WORD, CMpegSplitterFile::avchdr> avch;
-	bool m_bIsHdmv;
 	bool m_init;
 
 	HRESULT Init(IAsyncReader* pAsyncReader);
@@ -45,8 +44,9 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 	void OnComplete(IAsyncReader* pAsyncReader);
 
 public:
+	bool m_bIsBD;
 	CHdmvClipInfo &m_ClipInfo;
-	CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bool bIsHdmv, CHdmvClipInfo &ClipInfo, bool ForcedSub, int AC3CoreOnly, bool m_AlternativeDuration, bool SubEmptyPin);
+	CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool m_AlternativeDuration, bool SubEmptyPin);
 
 	REFERENCE_TIME NextPTS(DWORD TrackNum);
 
@@ -157,7 +157,7 @@ public:
 	void  AddHdmvPGStream(WORD pid, const char* language_code);
 	CAtlList<stream>* GetMasterStream();
 	bool IsHdmv() {
-		return m_bIsHdmv;
+		return m_ClipInfo.IsHdmv();
 	};
 
 	struct program {

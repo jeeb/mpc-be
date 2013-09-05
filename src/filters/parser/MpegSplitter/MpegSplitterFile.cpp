@@ -30,14 +30,14 @@
 #endif
 #include <moreuuids.h>
 
-CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bool bIsHdmv, CHdmvClipInfo &ClipInfo, bool ForcedSub, int AC3CoreOnly, bool AlternativeDuration, bool SubEmptyPin)
+CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool AlternativeDuration, bool SubEmptyPin)
 	: CBaseSplitterFileEx(pAsyncReader, hr, false, true)
 	, m_type(mpeg_us)
 	, m_rate(0)
 	, m_rtMin(0), m_rtMax(0)
 	, m_posMin(0), m_posMax(0)
-	, m_bIsHdmv(bIsHdmv)
 	, m_ClipInfo(ClipInfo)
+	, m_bIsBD(bIsBD)
 	, m_ForcedSub(ForcedSub)
 	, m_AC3CoreOnly(AC3CoreOnly)
 	, m_AlternativeDuration(AlternativeDuration)
@@ -51,6 +51,14 @@ CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bo
 
 HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 {
+	if (m_ClipInfo.IsHdmv()) {
+		if (CComQIPtr<ISyncReader> pReader = pAsyncReader) {
+			// To support seamless BD playback, CMultiFiles should update m_rtPTSOffset variable each time when a new part is opened
+			// use this code only if Blu-ray is detected
+			pReader->SetPTSOffset(&m_rtPTSOffset);
+		}
+	}
+
 	WaitAvailable(3000, MEGABYTE);
 
 	// get the type first
@@ -128,14 +136,6 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		return E_FAIL;
 	}
 
-	if (m_ClipInfo.IsHdmv()) {
-		if (CComQIPtr<ISyncReader> pReader = pAsyncReader) {
-			// To support seamless BD playback, CMultiFiles should update m_rtPTSOffset variable each time when a new part is opened
-			// use this code only if Blu-ray is detected
-			pReader->SetPTSOffset(&m_rtPTSOffset);
-		}
-	}
-
 	// min/max pts & bitrate
 	m_rtMin = m_posMin = _I64_MAX;
 	m_rtMax = m_posMax = 0;
@@ -162,66 +162,71 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	}
 
 
-	bool bAlternativeDuration = m_AlternativeDuration;
-	int step = 1;
+	if (!m_bIsBD) {
+		bool bAlternativeDuration = m_AlternativeDuration;
+		int step = 1;
 
-	for (;;) {
-		if (m_type == mpeg_ts) {
-			if (IsRandomAccess() || IsStreaming()) {
-				WaitAvailable(3000, MEGABYTE);
+		for (;;) {
+			if (m_type == mpeg_ts) {
+				if (IsRandomAccess() || IsStreaming()) {
+					WaitAvailable(3000, MEGABYTE);
 
-				__int64 pfp = 0;
-				const int k = 20;
-				for (int i = 0; i <= k; i++) {
-					__int64 fp = i * GetLength() / k;
-					fp = min(GetLength() - MEGABYTE/8, fp);
-					fp = max(pfp, fp);
-					__int64 nfp = fp + (pfp == 0 ? 10*MEGABYTE : MEGABYTE/8);
-					SearchStreams(fp, nfp, pAsyncReader, TRUE);
-					pfp = nfp;
+					__int64 pfp = 0;
+					const int k = 20;
+					for (int i = 0; i <= k; i++) {
+						__int64 fp = i * GetLength() / k;
+						fp = min(GetLength() - MEGABYTE/8, fp);
+						fp = max(pfp, fp);
+						__int64 nfp = fp + (pfp == 0 ? 10*MEGABYTE : MEGABYTE/8);
+						SearchStreams(fp, nfp, pAsyncReader, TRUE);
+						pfp = nfp;
+					}
+				} else {
+					SearchStreams(0, MEGABYTE/2, pAsyncReader, TRUE);
 				}
-			} else {
-				SearchStreams(0, MEGABYTE/2, pAsyncReader, TRUE);
+
 			}
 
-		}
+			if (m_posMax - m_posMin <= 0 || m_rtMax - m_rtMin <= 0) {
+				if (m_type == mpeg_ts && step == 1) {
+					step++;
+					m_AlternativeDuration = !m_AlternativeDuration;
+					continue;
+				}
 
-		if (m_posMax - m_posMin <= 0 || m_rtMax - m_rtMin <= 0) {
-			if (m_type == mpeg_ts && step == 1) {
-				step++;
-				m_AlternativeDuration = !m_AlternativeDuration;
-				continue;
+				return E_FAIL;
 			}
 
-			return E_FAIL;
+			break;
 		}
 
-		break;
+		m_AlternativeDuration = bAlternativeDuration;
+
+		int indicated_rate = m_rate;
+		int detected_rate = int(m_rtMax > m_rtMin ? 10000000i64 * (m_posMax - m_posMin) / (m_rtMax - m_rtMin) : 0);
+
+		m_rate = detected_rate ? detected_rate : m_rate;
+#if (0)
+		// normally "detected" should always be less than "indicated", but sometimes it can be a few percent higher (+10% is allowed here)
+		// (update: also allowing +/-50k/s)
+		if (indicated_rate == 0 || ((float)detected_rate / indicated_rate) < 1.1 || abs(detected_rate - indicated_rate) < 50*1024) {
+			m_rate = detected_rate;
+		} else {
+			;    // TODO: in this case disable seeking, or try doing something less drastical...
+		}
+#endif
+	} else {
+		m_rtMin = m_posMin = 0;
+		m_rtMax = m_posMax = 0;
 	}
-
-	m_AlternativeDuration = bAlternativeDuration;
 
 	m_init = false;
-
-	int indicated_rate = m_rate;
-	int detected_rate = int(m_rtMax > m_rtMin ? 10000000i64 * (m_posMax - m_posMin) / (m_rtMax - m_rtMin) : 0);
-
-	m_rate = detected_rate ? detected_rate : m_rate;
-#if (0)
-	// normally "detected" should always be less than "indicated", but sometimes it can be a few percent higher (+10% is allowed here)
-	// (update: also allowing +/-50k/s)
-	if (indicated_rate == 0 || ((float)detected_rate / indicated_rate) < 1.1 || abs(detected_rate - indicated_rate) < 50*1024) {
-		m_rate = detected_rate;
-	} else {
-		;    // TODO: in this case disable seeking, or try doing something less drastical...
-	}
-#endif
 
 	if (m_SubEmptyPin) {
 		// Add fake Subtitle stream ...
 		if (m_type == mpeg_ts) {
 			if (m_streams[video].GetCount()) {
-				if (!m_bIsHdmv && m_streams[subpic].GetCount()) {
+				if (!m_ClipInfo.IsHdmv() && m_streams[subpic].GetCount()) {
 					stream s;
 					s.pid = NO_SUBTITLE_PID;
 					s.mt.majortype	= m_streams[subpic].GetHead().mt.majortype;
@@ -572,14 +577,14 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 		// AAC_LATM
 		if (type == unknown) {
 			static CMpegSplitterFile::latm_aachdr h2 = {0};
-			static BOOL bIsAACLatmValid = FALSE;
+			static BYTE bIsAACLatmValid = 0;
 
 			Seek(start);
 			CMpegSplitterFile::latm_aachdr h;
 
 			if (!m_streams[audio].Find(s)) {
 				if (Read(h, len, &s.mt) && m_type == mpeg_ts) {
-					if (bIsAACLatmValid) {
+					if (bIsAACLatmValid == 3) {
 						PES_STREAM_TYPE stream_type = INVALID;
 						if (GetStreamType(s.pid, stream_type)) {
 							if (IsAACAudio(stream_type)) {
@@ -590,7 +595,9 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 						}
 					} else {
 						if (h2 == h) {
-							bIsAACLatmValid = TRUE;
+							bIsAACLatmValid++;
+						} else {
+							bIsAACLatmValid = 0;
 						}
 						memcpy(&h2, &h, sizeof(h));
 					}
@@ -601,13 +608,13 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 		// AAC
 		if (type == unknown) {
 			static CMpegSplitterFile::aachdr h2 = {0};
-			static BOOL bIsAACValid = FALSE;
+			static BYTE bIsAACValid = 0;
 
 			Seek(start);
 			CMpegSplitterFile::aachdr h;
 			if (!m_streams[audio].Find(s)) {
 				if (Read(h, len, &s.mt)) {
-					if (bIsAACValid) {
+					if (bIsAACValid == 3) {
 						PES_STREAM_TYPE stream_type = INVALID;
 						if (GetStreamType(s.pid, stream_type)) {
 							if (IsAACAudio(stream_type)) {
@@ -618,7 +625,9 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 						}
 					} else {
 						if (h2 == h) {
-							bIsAACValid = TRUE;
+							bIsAACValid++;
+						} else {
+							bIsAACValid = 0;
 						}
 						memcpy(&h2, &h, sizeof(h));
 					}
@@ -629,13 +638,13 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 		// MPEG Audio
 		if (type == unknown) {
 			static CMpegSplitterFile::mpahdr h2 = {0};
-			static BOOL bIsMPAValid = FALSE;
+			static BYTE bIsMPAValid = 0;
 
 			Seek(start);
 			CMpegSplitterFile::mpahdr h;
 			if (!m_streams[audio].Find(s)) {
 				if (Read(h, len, &s.mt)) {
-					if (bIsMPAValid) {
+					if (bIsMPAValid == 3) {
 						PES_STREAM_TYPE stream_type = INVALID;
 						if (GetStreamType(s.pid, stream_type)) {
 							if (IsMpegAudio(stream_type)) {
@@ -646,7 +655,9 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 						}
 					} else {
 						if (h2 == h) {
-							bIsMPAValid = TRUE;
+							bIsMPAValid++;
+						} else {
+							bIsMPAValid = 0;
 						}
 						memcpy(&h2, &h, sizeof(h));
 					}
@@ -741,7 +752,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 						break;
 						case PRESENTATION_GRAPHICS_STREAM : {
 							CMpegSplitterFile::hdmvsubhdr h;
-							if (!m_bIsHdmv && !m_streams[subpic].Find(s) && Read(h, &s.mt, pClipInfo ? pClipInfo->m_LanguageCode : NULL)) {
+							if (!m_ClipInfo.IsHdmv() && !m_streams[subpic].Find(s) && Read(h, &s.mt, pClipInfo ? pClipInfo->m_LanguageCode : NULL)) {
 								type = subpic;
 							}
 						}

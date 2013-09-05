@@ -758,7 +758,8 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 	} else if (m_pFile->m_type == mpeg_ts) {
 		CMpegSplitterFile::trhdr h;
 		if (m_pFile->Read(h) == -1) {
-			return S_FALSE;
+			m_pFile->Seek(h.next > m_pFile->GetPos() ? h.next : m_pFile->GetPos() + 1);
+			return S_OK;
 		}
 
 		__int64 pos = m_pFile->GetPos();
@@ -798,7 +799,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 				p->bSyncPoint	= !!h2.fpts && (p->rtStart != INVALID_TIME);
 #if (DEBUG) && 0
 				if (h2.fpts) {
-					TRACE(_T("h.pid = %d, h2.pts = %ws [%10I64d] ==> %ws [%10I64d]\n"), h.pid, ReftimeToString(h2.pts), h2.pts, ReftimeToString(p->rtStart), p->rtStart);
+					TRACE(_T("h.pid = %d, m_rtPTSOffset = [%10I64d], h2.pts = %ws [%10I64d] ==> %ws [%10I64d]\n"), h.pid, rtStartOffset, ReftimeToString(h2.pts), h2.pts, ReftimeToString(p->rtStart), p->rtStart);
 				}
 #endif
 
@@ -859,7 +860,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_pFile.Free();
 
 	ReadClipInfo (GetPartFilename(pAsyncReader));
-	m_pFile.Attach(DNew CMpegSplitterFile(pAsyncReader, hr, m_ClipInfo.IsHdmv(), m_ClipInfo, m_ForcedSub, m_AC3CoreOnly, m_AlternativeDuration, m_SubEmptyPin));
+	m_pFile.Attach(DNew CMpegSplitterFile(pAsyncReader, hr, m_ClipInfo, m_rtPlaylistDuration > 0, m_ForcedSub, m_AC3CoreOnly, m_AlternativeDuration, m_SubEmptyPin));
 
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
@@ -885,8 +886,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	CString cs_audioProgram		= _T("");
-	CString cs_subpicProgram	= _T("");
+	CString cs_audioProgram, cs_subpicProgram;
 
 	// Create
 	if (m_ClipInfo.IsHdmv()) {
@@ -898,7 +898,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	CString lang = _T("");
+	CString lang;
 	CAtlList<CString> lang_list_audio;
 	CAtlList<CString> lang_list_subpic;
 	int	Idx_audio  = 99;
