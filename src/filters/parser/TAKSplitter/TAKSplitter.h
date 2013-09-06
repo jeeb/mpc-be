@@ -33,29 +33,18 @@ extern "C" {
 #define TAKSourceName   L"MPC TAK Source"
 
 enum TAKCodecType {
-	TAK_CODEC_MONO_STEREO	= 2,
-	TAK_CODEC_MULTICHANNEL	= 4,
-};
-
-enum TAKMetaDataType {
-	TAK_METADATA_END = 0,
-	TAK_METADATA_STREAMINFO,
-	TAK_METADATA_SEEKTABLE,
-	TAK_METADATA_SIMPLE_WAVE_DATA,
-	TAK_METADATA_ENCODER,
-	TAK_METADATA_PADDING,
-	TAK_METADATA_MD5,
-	TAK_METADATA_LAST_FRAME,
+	TAK_CODEC_MONO_STEREO   = 2,
+	TAK_CODEC_MULTICHANNEL  = 4,
 };
 
 struct TAKStreamInfo {
-	enum TAKCodecType	codec;
-	int					data_type;
-	int					sample_rate;
-	int					channels;
-	int					bps;
-	uint64_t			ch_layout;
-	uint64_t			samples;
+	enum TAKCodecType   codec;
+	int                 data_type;
+	int                 sample_rate;
+	int                 channels;
+	int                 bps;
+	DWORD               ch_layout;
+	uint64_t            samples;
 
 	TAKStreamInfo() {
 		memset(this, 0, sizeof(*this));

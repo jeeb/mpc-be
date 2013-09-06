@@ -28,6 +28,17 @@
 #include <moreuuids.h>
 #include "../DSUtil/ApeTag.h"
 
+enum TAKMetaDataType {
+	TAK_METADATA_END = 0,
+	TAK_METADATA_STREAMINFO,
+	TAK_METADATA_SEEKTABLE,
+	TAK_METADATA_SIMPLE_WAVE_DATA,
+	TAK_METADATA_ENCODER,
+	TAK_METADATA_PADDING,
+	TAK_METADATA_MD5,
+	TAK_METADATA_LAST_FRAME,
+};
+
 #ifdef REGISTER_FILTER
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
@@ -218,61 +229,58 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								size_t tag_size = APETag->GetTagSize();
 								m_pFile->Seek(file_size - tag_size);
 								BYTE *p = DNew BYTE[tag_size];
-								if (SUCCEEDED(m_pFile->ByteRead(p, tag_size))) {
-									if (APETag->ReadTags(p, tag_size)) {
-										POSITION pos = APETag->TagItems.GetHeadPosition();
-										while (pos) {
-											CApeTagItem* item = APETag->TagItems.GetAt(pos);
-											CString TagKey = item->GetKey();
-											TagKey.MakeLower();
+								if (SUCCEEDED(m_pFile->ByteRead(p, tag_size)) && APETag->ReadTags(p, tag_size)) {
+									POSITION pos = APETag->TagItems.GetHeadPosition();
+									while (pos) {
+										CApeTagItem* item = APETag->TagItems.GetAt(pos);
+										CString TagKey = item->GetKey();
+										TagKey.MakeLower();
 
-											if (item->GetType() == CApeTagItem::APE_TYPE_BINARY) {
-												if (!TagKey.IsEmpty()) {
-													CString ext = TagKey.Mid(TagKey.ReverseFind('.')+1);
-													if (ext == _T("jpeg") || ext == _T("jpg")) {
-														CoverMime = _T("image/jpeg");
-													} else if (ext == _T("png")) {
-														CoverMime = _T("image/png");
-													}
+										if (item->GetType() == CApeTagItem::APE_TYPE_BINARY) {
+											if (!TagKey.IsEmpty()) {
+												CString ext = TagKey.Mid(TagKey.ReverseFind('.')+1);
+												if (ext == _T("jpeg") || ext == _T("jpg")) {
+													CoverMime = _T("image/jpeg");
+												} else if (ext == _T("png")) {
+													CoverMime = _T("image/png");
 												}
-
-												if (!CoverData.GetCount() && !CoverMime.IsEmpty()) {
-													CoverFileName = TagKey;
-													CoverData.SetCount(tag_size);
-													memcpy(CoverData.GetData(), item->GetData(), item->GetDataLen());
-												}
-
-												ResAppend(CoverFileName, _T("cover"), CoverMime, CoverData.GetData(), (DWORD)CoverData.GetCount());
-							
-											} else {
-												CString TagValue = item->GetValue();
-												if (TagKey == _T("cuesheet")) {
-													CAtlList<Chapters> ChaptersList;
-													if (ParseCUESheet(TagValue, ChaptersList)) {
-														ChapRemoveAll();
-														while (ChaptersList.GetCount()) {
-															Chapters cp = ChaptersList.RemoveHead();
-															ChapAppend(cp.rt, cp.name);
-														}
-													}
-												}
-
-												if (TagKey == _T("artist")) {
-													SetProperty(L"AUTH", TagValue);
-												} else if (TagKey == _T("comment")) {
-													SetProperty(L"DESC", TagValue);
-												} else if (TagKey == _T("title")) {
-													SetProperty(L"TITL", TagValue);
-												} else if (TagKey == _T("year")) {
-													SetProperty(L"YEAR", TagValue);
-												} else if (TagKey == _T("album")) {
-													SetProperty(L"ALBUM", TagValue);
-												}
-							
 											}
 
-											APETag->TagItems.GetNext(pos);
+											if (!CoverData.GetCount() && !CoverMime.IsEmpty()) {
+												CoverFileName = TagKey;
+												CoverData.SetCount(tag_size);
+												memcpy(CoverData.GetData(), item->GetData(), item->GetDataLen());
+											}
+
+											ResAppend(CoverFileName, _T("cover"), CoverMime, CoverData.GetData(), (DWORD)CoverData.GetCount());
+
+										} else {
+											CString TagValue = item->GetValue();
+											if (TagKey == _T("cuesheet")) {
+												CAtlList<Chapters> ChaptersList;
+												if (ParseCUESheet(TagValue, ChaptersList)) {
+													ChapRemoveAll();
+													while (ChaptersList.GetCount()) {
+														Chapters cp = ChaptersList.RemoveHead();
+														ChapAppend(cp.rt, cp.name);
+													}
+												}
+											}
+
+											if (TagKey == _T("artist")) {
+												SetProperty(L"AUTH", TagValue);
+											} else if (TagKey == _T("comment")) {
+												SetProperty(L"DESC", TagValue);
+											} else if (TagKey == _T("title")) {
+												SetProperty(L"TITL", TagValue);
+											} else if (TagKey == _T("year")) {
+												SetProperty(L"YEAR", TagValue);
+											} else if (TagKey == _T("album")) {
+												SetProperty(L"ALBUM", TagValue);
+											}
 										}
+
+										APETag->TagItems.GetNext(pos);
 									}
 								}
 
@@ -284,7 +292,7 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						m_pFile->Seek(cur_pos);
 					}
-					
+
 					bIsEnd = TRUE;
 				}
 				break;
@@ -419,37 +427,44 @@ void CTAKSplitterFilter::ParseTAKStreamInfo(BYTE* buf, int size, TAKStreamInfo& 
 	};
 
 	if (size >= 10) {
-		uint64_t ChannelMask	= 0;
+		uint8_t  Codec          = buf[0] & 0x3F;
+		uint16_t Profile        = *(uint16_t*)&buf[0] >> 6 & 0xF;
 
-		uint8_t  Codec			= buf[0] & 0x3F;
-		uint16_t Profile		= *(uint16_t*)&buf[0] >> 6 & 0xF;
+		uint8_t  FrameSizeType  = buf[1] >> 2 & 0xF;
+		uint64_t SampleNum      = *(uint64_t*)&buf[1] >> 6 & 0x1FFFFFFFFF;
 
-		uint8_t  FrameSizeType	= buf[1] >> 2 & 0xF;
-		uint64_t SampleNum		= *(uint64_t*)&buf[1] >> 6 & 0x1FFFFFFFFF;
+		uint8_t  DataType       = (buf[6] >> 1 & 0x7); // 0 - PCM
+		uint32_t SampleRate     = (*(uint32_t*)&buf[6] >> 4 & 0x3FFFF) + 6000;
+		uint16_t SampleBits     = (*(uint16_t*)&buf[8] >> 6 & 0x1F) + 8;
+		uint8_t  ChannelNum     = (buf[9] >> 3 & 0xF) + 1;
+		uint8_t  HasExtension   = buf[9] >> 7;
 
-		uint8_t  DataType		= (buf[6] >> 1 & 0x7); // 0 - PCM
-		uint32_t SampleRate		= (*(uint32_t*)&buf[6] >> 4 & 0x3FFFF) + 6000;
-		uint16_t SampleBits		= (*(uint16_t*)&buf[8] >> 6 & 0x1F) + 8;
-		uint8_t  ChannelNum		= (buf[9] >> 3 & 0xF) + 1;
-		uint8_t  HasExtension	= buf[9] >> 7;
-
-		uint8_t ValidBitsPerSample		= 0;
-		uint8_t HasSpeakerAssignment	= 0;
+		uint8_t ValidBitsPerSample      = 0;
+		uint8_t HasSpeakerAssignment    = 0;
+		DWORD   ChannelMask             = 0;
 		if (HasExtension && size >= 11) {
-			ValidBitsPerSample			= (buf[10] & 0x1F) + 1;
-			HasSpeakerAssignment		= (buf[10] >> 5 & 0x1);
-			if (HasSpeakerAssignment && size >=  11 + (ChannelNum * 6 - 2) / 8) {
-				// TODO get channel layuot
+			ValidBitsPerSample      = (buf[10] & 0x1F) + 1;
+			HasSpeakerAssignment    = (buf[10] >> 5 & 0x1);
+			if (HasSpeakerAssignment && size >= (80 + ChannelNum * 6 + 7) / 8) {
+				int ch = 1;
+				int bytepos = 10;
+				do {
+					ChannelMask |= (ch++ <= ChannelNum) ? tak_channels[*(uint16_t*)&buf[bytepos + 0] >> 6 & 0x3F] : 0;
+					ChannelMask |= (ch++ <= ChannelNum) ? tak_channels[*(uint16_t*)&buf[bytepos + 1] >> 4 & 0x3F] : 0;
+					ChannelMask |= (ch++ <= ChannelNum) ? tak_channels[buf[bytepos + 2] >> 2 & 0x3F]              : 0;
+					ChannelMask |= (ch++ <= ChannelNum) ? tak_channels[buf[bytepos + 3] & 0x3F]                   : 0;
+					bytepos += 3;
+				} while (ch <= ChannelNum);
 			}
 		}
 
-		si.codec				= (TAKCodecType)Codec;
-		si.data_type			= DataType;
-		si.sample_rate			= SampleRate;
-		si.channels				= ChannelNum;
-		si.bps					= SampleBits;
-		si.ch_layout			= ChannelMask;
-		si.samples				= SampleNum;
+		si.codec        = (TAKCodecType)Codec;
+		si.data_type    = DataType;
+		si.sample_rate  = SampleRate;
+		si.channels     = ChannelNum;
+		si.bps          = SampleBits;
+		si.ch_layout    = ChannelMask;
+		si.samples      = SampleNum;
 	}
 }
 
