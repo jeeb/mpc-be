@@ -32,37 +32,22 @@ extern "C" {
 #define TAKSplitterName L"MPC TAK Splitter"
 #define TAKSourceName   L"MPC TAK Source"
 
-enum TAKCodecType {
-	TAK_CODEC_Integer24bit_TAK10 = 0,
-	TAK_CODEC_Experimental,
-	TAK_CODEC_Integer24bit_TAK20,
-	TAK_CODEC_LossyWav_TAK21Beta,
-	TAK_CODEC_Integer24bit_MC_TAK22
-};
-
-struct TAKStreamInfo {
-	enum TAKCodecType   codec_type;
-	int                 frame_size;
-	int                 data_type;
-	int                 sample_rate;
-	int                 channels;
-	int                 bps;
-	DWORD               ch_layout;
-	uint64_t            samples;
-
-	TAKStreamInfo() {
-		memset(this, 0, sizeof(*this));
-	}
-};
-
 class __declspec(uuid("AA04C78C-3671-43F6-ABFE-6C265BAB2345"))
 	CTAKSplitterFilter : public CBaseSplitterFilter
 {
+	__int64 m_startpos;
+	__int64 m_endpos;
+	
 	REFERENCE_TIME m_rtStart;
 	DWORD m_nAvgBytesPerSec;
 
-	__int64 m_startpos;
-	__int64 m_endpos;
+	int     m_samplerate;
+	int     m_bitdepth;
+	int     m_channels;
+	DWORD   m_layout;
+	__int64 m_samples;
+
+	bool ParseTAKStreamInfo(BYTE* buff, int size);
 
 protected:
 	CAutoPtr<CBaseSplitterFileEx> m_pFile;
@@ -71,8 +56,6 @@ protected:
 	bool DemuxInit();
 	void DemuxSeek(REFERENCE_TIME rt);
 	bool DemuxLoop();
-
-	void ParseTAKStreamInfo(BYTE* buff, int size, TAKStreamInfo& si);
 
 public:
 	CTAKSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr);

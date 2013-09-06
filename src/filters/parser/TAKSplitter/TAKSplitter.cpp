@@ -39,6 +39,14 @@ enum TAKMetaDataType {
 	TAK_METADATA_LAST_FRAME,
 };
 
+enum TAKCodecType {
+	TAK_CODEC_Integer24bit_TAK10 = 0,
+	TAK_CODEC_Experimental,
+	TAK_CODEC_Integer24bit_TAK20,
+	TAK_CODEC_LossyWav_TAK21Beta,
+	TAK_CODEC_Integer24bit_MC_TAK22
+};
+
 enum TAKFrameType {
 	TAK_FRAME_94ms = 0,
 	TAK_FRAME_125ms,
@@ -316,10 +324,7 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 
 		if (type == TAK_METADATA_STREAMINFO) {
-			TAKStreamInfo si;
-			ParseTAKStreamInfo(buf, size - 3, si);
-
-			if (si.data_type || !si.channels || !si.frame_size) {
+			if (!ParseTAKStreamInfo(buf, size - 3)) {
 				delete [] buf;
 				return E_FAIL;
 			}
@@ -330,9 +335,9 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			mt.subtype				= MEDIASUBTYPE_TAK;
 			WAVEFORMATEX* wfe		= (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX) + size);
 			memset(wfe, 0, sizeof(WAVEFORMATEX));
-			wfe->nSamplesPerSec		= si.sample_rate;
-			wfe->wBitsPerSample		= si.bps;
-			wfe->nChannels			= si.channels;
+			wfe->nSamplesPerSec		= m_samplerate;
+			wfe->wBitsPerSample		= m_bitdepth;
+			wfe->nChannels			= m_channels;
 
 			wfe->nBlockAlign		= wfe->nChannels * wfe->wBitsPerSample >> 3;
 			wfe->nAvgBytesPerSec	= wfe->nSamplesPerSec * wfe->nBlockAlign;
@@ -349,7 +354,7 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 
 			m_nAvgBytesPerSec		= wfe->nAvgBytesPerSec;
-			m_rtDuration			= si.samples / si.sample_rate * UNITS;
+			m_rtDuration			= m_samples * UNITS / m_samplerate;
 		} else if (type == TAK_METADATA_LAST_FRAME) {
 			bLastFrame				= TRUE;
 			uint64_t LastFramePos	= *(uint64_t*)buf & 0xFFFFFFFFFF;
@@ -422,7 +427,7 @@ bool CTAKSplitterFilter::DemuxLoop()
 	return true;
 }
 
-void CTAKSplitterFilter::ParseTAKStreamInfo(BYTE* buf, int size, TAKStreamInfo& si)
+bool CTAKSplitterFilter::ParseTAKStreamInfo(BYTE* buf, int size)
 {
 	static const uint16_t frame_duration_type_quants[] = { 3, 4, 6, 8, 4096, 8192, 16384, 512, 1024, 2048 };
 	static const DWORD tak_channels[] = {
@@ -447,59 +452,71 @@ void CTAKSplitterFilter::ParseTAKStreamInfo(BYTE* buf, int size, TAKStreamInfo& 
 		SPEAKER_TOP_BACK_RIGHT,
 	};
 
-	if (size >= 10) {
-		uint8_t  Codec          = buf[0] & 0x3F;
-		uint16_t Profile        = *(uint16_t*)&buf[0] >> 6 & 0xF;
-
-		uint8_t  FrameSizeType  = buf[1] >> 2 & 0xF;
-		uint64_t SampleNum      = *(uint64_t*)&buf[1] >> 6 & 0x1FFFFFFFFF;
-
-		uint8_t  DataType       = (buf[6] >> 1 & 0x7); // 0 - PCM
-		uint32_t SampleRate     = (*(uint32_t*)&buf[6] >> 4 & 0x3FFFF) + 6000;
-		uint16_t SampleBits     = (*(uint16_t*)&buf[8] >> 6 & 0x1F) + 8;
-		uint8_t  ChannelNum     = (buf[9] >> 3 & 0xF) + 1;
-		uint8_t  HasExtension   = buf[9] >> 7;
-
-		uint8_t ValidBitsPerSample      = 0;
-		uint8_t HasSpeakerAssignment    = 0;
-		DWORD   ChannelMask             = 0;
-		if (HasExtension && size >= 11) {
-			ValidBitsPerSample      = (buf[10] & 0x1F) + 1;
-			HasSpeakerAssignment    = (buf[10] >> 5 & 0x1);
-			if (HasSpeakerAssignment && size >= (80 + ChannelNum * 6 + 7) / 8) {
-				int ch = 1;
-				int bytepos = 10;
-				do {
-					ChannelMask |= (ch++ <= ChannelNum) ? tak_channels[*(uint16_t*)&buf[bytepos + 0] >> 6 & 0x3F] : 0;
-					ChannelMask |= (ch++ <= ChannelNum) ? tak_channels[*(uint16_t*)&buf[bytepos + 1] >> 4 & 0x3F] : 0;
-					ChannelMask |= (ch++ <= ChannelNum) ? tak_channels[buf[bytepos + 2] >> 2 & 0x3F]              : 0;
-					ChannelMask |= (ch++ <= ChannelNum) ? tak_channels[buf[bytepos + 3] & 0x3F]                   : 0;
-					bytepos += 3;
-				} while (ch <= ChannelNum);
-			}
-		}
-
-		int nb_samples, max_nb_samples;
-		if (FrameSizeType <= TAK_FRAME_250ms) {
-			nb_samples     = SampleRate * frame_duration_type_quants[FrameSizeType] >> 5;
-			max_nb_samples = 16384;
-		} else if (FrameSizeType < _countof(frame_duration_type_quants)) {
-			nb_samples     = frame_duration_type_quants[FrameSizeType];
-			max_nb_samples = SampleRate * frame_duration_type_quants[TAK_FRAME_250ms] >> 5;
-		} else {
-			nb_samples     = 0;
-			max_nb_samples = 0;
-		}
-
-		si.codec_type   = (TAKCodecType)Codec;
-		si.frame_size   = nb_samples;
-		si.data_type    = DataType;
-		si.sample_rate  = SampleRate;
-		si.channels     = ChannelNum;
-		si.bps          = SampleBits;
-		si.ch_layout    = ChannelMask;
-		si.samples      = SampleNum;
+	if (size < 10) {
+		return false;
 	}
+
+	// Encoder info
+	uint8_t  Codec          = buf[0] & 0x3F;
+	uint16_t Profile        = *(uint16_t*)&buf[0] >> 6 & 0xF;
+
+	// Frame size information
+	uint8_t  FrameSizeType  = buf[1] >> 2 & 0xF;
+	uint64_t SampleNum      = *(uint64_t*)&buf[1] >> 6 & 0x1FFFFFFFFF;
+	if (FrameSizeType > TAK_FRAME_2048) {
+		return false;
+	}
+
+	// Audio format 
+	uint8_t  DataType       = (buf[6] >> 1 & 0x7); // 0 - PCM
+	uint32_t SampleRate     = (*(uint32_t*)&buf[6] >> 4 & 0x3FFFF) + 6000;
+	uint16_t SampleBits     = (*(uint16_t*)&buf[8] >> 6 & 0x1F) + 8;
+	uint8_t  ChannelNum     = (buf[9] >> 3 & 0xF) + 1;
+	uint8_t  HasExtension   = buf[9] >> 7;
+	if (DataType != 0) {
+		return false;
+	}
+	uint8_t ValidBitsPerSample      = 0;
+	uint8_t HasSpeakerAssignment    = 0;
+	DWORD   ChannelMask             = 0;
+	if (HasExtension && size >= 11) {
+		ValidBitsPerSample      = (buf[10] & 0x1F) + 1;
+		HasSpeakerAssignment    = (buf[10] >> 5 & 0x1);
+		if (HasSpeakerAssignment && size >= (80 + ChannelNum * 6 + 7) / 8) {
+			int ch = 1;
+			int bytepos = 10;
+			do {
+				ChannelMask |= (ch++ <= ChannelNum) ? tak_channels[*(uint16_t*)&buf[bytepos + 0] >> 6 & 0x3F] : 0;
+				ChannelMask |= (ch++ <= ChannelNum) ? tak_channels[*(uint16_t*)&buf[bytepos + 1] >> 4 & 0x3F] : 0;
+				ChannelMask |= (ch++ <= ChannelNum) ? tak_channels[buf[bytepos + 2] >> 2 & 0x3F]              : 0;
+				ChannelMask |= (ch++ <= ChannelNum) ? tak_channels[buf[bytepos + 3] & 0x3F]                   : 0;
+				bytepos += 3;
+			} while (ch <= ChannelNum);
+		}
+	}
+	//if (ChannelMask == 0) {
+	//	ChannelMask = GetDefChannelMask(ChannelNum);
+	//}
+
+	//int nb_samples, max_nb_samples;
+	//if (FrameSizeType <= TAK_FRAME_250ms) {
+	//	nb_samples     = SampleRate * frame_duration_type_quants[FrameSizeType] >> 5;
+	//	max_nb_samples = 16384;
+	//} else if (FrameSizeType < _countof(frame_duration_type_quants)) {
+	//	nb_samples     = frame_duration_type_quants[FrameSizeType];
+	//	max_nb_samples = SampleRate * frame_duration_type_quants[TAK_FRAME_250ms] >> 5;
+	//} else {
+	//	nb_samples     = 0;
+	//	max_nb_samples = 0;
+	//}
+
+	m_samplerate = SampleRate;
+	m_bitdepth   = SampleBits;
+	m_channels   = ChannelNum;
+	m_layout     = ChannelMask;
+	m_samples    = SampleNum;
+
+	return true;
 }
 
 //
