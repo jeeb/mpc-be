@@ -304,7 +304,7 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			TAKStreamInfo si;
 			ParseTAKStreamInfo(buf, size - 3, si);
 
-			if (si.data_type || !si.channels || (si.codec == TAK_CODEC_MONO_STEREO && si.channels > 2)) {
+			if (si.data_type || !si.channels || si.frame_type > TAK_FRAME_2048) {
 				delete [] buf;
 				return E_FAIL;
 			}
@@ -458,7 +458,8 @@ void CTAKSplitterFilter::ParseTAKStreamInfo(BYTE* buf, int size, TAKStreamInfo& 
 			}
 		}
 
-		si.codec        = (TAKCodecType)Codec;
+		si.codec_type   = (TAKCodecType)Codec;
+		si.frame_type   = (TAKFrameType)FrameSizeType;
 		si.data_type    = DataType;
 		si.sample_rate  = SampleRate;
 		si.channels     = ChannelNum;
