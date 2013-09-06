@@ -39,6 +39,19 @@ enum TAKMetaDataType {
 	TAK_METADATA_LAST_FRAME,
 };
 
+enum TAKFrameType {
+	TAK_FRAME_94ms = 0,
+	TAK_FRAME_125ms,
+	TAK_FRAME_188ms,
+	TAK_FRAME_250ms,
+	TAK_FRAME_4096,
+	TAK_FRAME_8192,
+	TAK_FRAME_16384,
+	TAK_FRAME_512,
+	TAK_FRAME_1024,
+	TAK_FRAME_2048,
+};
+
 #ifdef REGISTER_FILTER
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
@@ -304,7 +317,7 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			TAKStreamInfo si;
 			ParseTAKStreamInfo(buf, size - 3, si);
 
-			if (si.data_type || !si.channels || si.frame_type > TAK_FRAME_2048) {
+			if (si.data_type || !si.channels || !si.frame_size) {
 				delete [] buf;
 				return E_FAIL;
 			}
@@ -404,6 +417,7 @@ bool CTAKSplitterFilter::DemuxLoop()
 
 void CTAKSplitterFilter::ParseTAKStreamInfo(BYTE* buf, int size, TAKStreamInfo& si)
 {
+	static const uint16_t frame_duration_type_quants[] = { 3, 4, 6, 8, 4096, 8192, 16384, 512, 1024, 2048 };
 	static const DWORD tak_channels[] = {
 		0,
 		SPEAKER_FRONT_LEFT,
@@ -458,8 +472,20 @@ void CTAKSplitterFilter::ParseTAKStreamInfo(BYTE* buf, int size, TAKStreamInfo& 
 			}
 		}
 
+		int nb_samples, max_nb_samples;
+		if (FrameSizeType <= TAK_FRAME_250ms) {
+			nb_samples     = SampleRate * frame_duration_type_quants[FrameSizeType] >> 5;
+			max_nb_samples = 16384;
+		} else if (FrameSizeType < _countof(frame_duration_type_quants)) {
+			nb_samples     = frame_duration_type_quants[FrameSizeType];
+			max_nb_samples = SampleRate * frame_duration_type_quants[TAK_FRAME_250ms] >> 5;
+		} else {
+			nb_samples     = 0;
+			max_nb_samples = 0;
+		}
+
 		si.codec_type   = (TAKCodecType)Codec;
-		si.frame_type   = (TAKFrameType)FrameSizeType;
+		si.frame_size   = nb_samples;
 		si.data_type    = DataType;
 		si.sample_rate  = SampleRate;
 		si.channels     = ChannelNum;
