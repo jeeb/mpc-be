@@ -151,8 +151,6 @@ STDMETHODIMP CTAKSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 }
 
 #define BSWAP24(x) { x = (((x & 0xff) << 16) | (x >> 16) | (x & 0xff00)); }
-#define BSWAP32(x) { x = (((x & 0xff00ff) << 8) | ((x >> 8) & 0xff00ff)); \
-					 x = (x << 16) | (x >> 16); }
 
 #define CRC24_INIT 0xb704ceL
 #define CRC24_POLY 0x1864cfbL
