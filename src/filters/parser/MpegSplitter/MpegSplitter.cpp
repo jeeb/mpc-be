@@ -1346,6 +1346,9 @@ bool CMpegSplitterFilter::DemuxLoop()
 		if ((hr = DemuxNextPacket(rtStartOffset)) == S_FALSE) {
 			Sleep(1);
 		}
+		if (m_pFile->IsRandomAccess() && !m_pFile->GetRemaining()) {
+			hr = E_FAIL;
+		}
 	}
 
 	return true;
