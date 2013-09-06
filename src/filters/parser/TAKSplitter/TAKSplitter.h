@@ -61,6 +61,7 @@ class __declspec(uuid("AA04C78C-3671-43F6-ABFE-6C265BAB2345"))
 	REFERENCE_TIME m_rtStart;
 	DWORD m_nAvgBytesPerSec;
 
+	__int64 m_startpos;
 	__int64 m_endpos;
 
 protected:

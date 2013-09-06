@@ -110,6 +110,7 @@ CFilterApp theApp;
 
 CTAKSplitterFilter::CTAKSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("CTAKSplitterFilter"), pUnk, phr, __uuidof(this))
+	, m_startpos(0)
 	, m_endpos(0)
 	, m_nAvgBytesPerSec(0)
 {
@@ -311,6 +312,7 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				break;
 			default:
 				m_pFile->Seek(m_pFile->GetPos() + size);
+				m_startpos = m_pFile->GetPos() + 4;
 		}
 
 		if (type == TAK_METADATA_STREAMINFO) {
@@ -363,7 +365,12 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		m_endpos = m_pFile->GetLength();
 	}
 
-	m_pFile->Seek(0);
+	if (m_startpos > m_endpos) {
+		ASSERT(0);
+		m_startpos = m_endpos;
+	}
+
+	m_pFile->Seek(m_startpos);
 
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
 }
@@ -381,10 +388,10 @@ bool CTAKSplitterFilter::DemuxInit()
 void CTAKSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
 	if (rt <= 0 || m_rtDuration <= 0) {
-		m_pFile->Seek(0);
+		m_pFile->Seek(m_startpos);
 		m_rtStart = 0;
 	} else {
-		m_pFile->Seek((__int64)((1.0 * rt / m_rtDuration) * (m_endpos)));
+		m_pFile->Seek((__int64)((1.0 * rt / m_rtDuration) * (m_endpos - m_startpos)));
 		m_rtStart = rt;
 	}
 }
