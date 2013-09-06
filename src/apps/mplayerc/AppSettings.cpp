@@ -64,6 +64,7 @@ CAppSettings::CAppSettings()
 	SrcFiltersKeys[SRC_AMR]			= _T("SRC_AMR");
 	SrcFiltersKeys[SRC_TTA]			= _T("SRC_TTA");
 	SrcFiltersKeys[SRC_UDP]			= _T("SRC_UDP");
+	SrcFiltersKeys[SRC_TAK]			= _T("SRC_TAK");
 
 	// Internal decoders
 	TraFiltersKeys[TRA_MPEG1]		= _T("TRA_MPEG1");
@@ -114,6 +115,7 @@ CAppSettings::CAppSettings()
 	FFMFiltersKeys[FFM_MPAC]		= _T("FFM_MPAC");
 	FFMFiltersKeys[FFM_QDM2]		= _T("FFM_QDM2");
 	FFMFiltersKeys[FFM_APE]			= _T("FFM_APE");
+	FFMFiltersKeys[FFM_TAK]			= _T("FFM_TAK");
 	FFMFiltersKeys[FFM_TTA]			= _T("FFM_TTA");
 	FFMFiltersKeys[FFM_PRORES]		= _T("FFM_PRORES");
 	FFMFiltersKeys[FFM_TRUESPEECH]	= _T("FFM_TRUESPEECH");

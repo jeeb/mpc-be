@@ -1892,6 +1892,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_source.AddTail(pFGF);
 	}
 
+	if (src[SRC_TAK] && !IsPreview) {
+		pFGF = DNew CFGFilterInternal<CTAKSourceFilter>();
+		pFGF->m_chkbytes.AddTail(_T("0,4,,7442614B"));
+		m_source.AddTail(pFGF);
+	}
+
 	// add CMpegSourceFilter last since it can parse the stream for a long time
 	if (src[SRC_MPEG] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CMpegSourceFilter>();
@@ -2050,6 +2056,17 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_FLV);
 	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
 	m_transform.AddTail(pFGF);
+
+	if (!IsPreview) {
+		if (src[SRC_TAK]) {
+			pFGF = DNew CFGFilterInternal<CTAKSplitterFilter>(TAKSplitterName, MERIT64_ABOVE_DSHOW);
+		} else {
+			pFGF = DNew CFGFilterInternal<CTAKSplitterFilter>(LowMerit(TAKSplitterName), MERIT64_DO_USE);
+		}
+		pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_TAK_Stream);
+		pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
+		m_transform.AddTail(pFGF);
+	}
 
 	// add CMpegSplitterFilter last since it can parse the stream for a long time
 	if (src[SRC_MPEG] || IsPreview) {
@@ -2280,6 +2297,13 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 					(ffmpeg_filters[FFM_APE]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 					(ffmpeg_filters[FFM_APE]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_APE);
+		m_transform.AddTail(pFGF);
+
+		// TAK
+		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
+					(ffmpeg_filters[FFM_TAK]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
+					(ffmpeg_filters[FFM_TAK]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_TAK);
 		m_transform.AddTail(pFGF);
 
 		// TTA

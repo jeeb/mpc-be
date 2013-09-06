@@ -68,7 +68,7 @@ void CTextFile::SkipBOM(const BYTE bom[3], UINT sizeBOM)
 		}
 		
 		if (memcmp(buf, bom, sizeBOM) != 0) {
-			Seek(pos, SeekPosition::begin);
+			Seek(pos, begin);
 			return;
 		}
 

@@ -102,6 +102,8 @@ static const FFMPEG_AUDIO_CODECS ffAudioCodecs[] = {
 	{ &MEDIASUBTYPE_MPC8,              AV_CODEC_ID_MUSEPACK8 },
 	// APE
 	{ &MEDIASUBTYPE_APE,               AV_CODEC_ID_APE },
+	// TAK
+	{ &MEDIASUBTYPE_TAK,               AV_CODEC_ID_TAK },
 	// TTA
 	{ &MEDIASUBTYPE_TTA1,              AV_CODEC_ID_TTA },
 	// TRUESPEECH

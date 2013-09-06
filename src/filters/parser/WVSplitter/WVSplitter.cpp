@@ -382,12 +382,6 @@ HRESULT CWavPackSplitterFilterInputPin::BreakConnect(void)
 	return S_OK;
 }
 
-#define APE_TAG_FOOTER_BYTES			32
-#define APE_TAG_VERSION					2000
-
-#define APE_TAG_FLAG_IS_HEADER			(1 << 29)
-#define APE_TAG_FLAG_IS_BINARY			(1 << 1)
-
 HRESULT CWavPackSplitterFilterInputPin::CompleteConnect(IPin *pReceivePin)
 {
 	HRESULT hr = CBaseInputPin::CompleteConnect(pReceivePin);
