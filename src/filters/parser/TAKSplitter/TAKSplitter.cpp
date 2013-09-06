@@ -31,6 +31,7 @@
 #ifdef REGISTER_FILTER
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
+	{&MEDIATYPE_Stream, &MEDIASUBTYPE_TAK_Stream},
 	{&MEDIATYPE_Stream, &MEDIASUBTYPE_NULL},
 };
 
@@ -170,8 +171,7 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		int size				= m_pFile->BitRead(24);
 		BSWAP24(size);
 
-		BYTE* buf = NULL;
-		CGolombBuffer gb(NULL, 0);
+		BYTE* buf				= NULL;
 
 		switch (type) {
 			case TAK_METADATA_STREAMINFO:
@@ -194,15 +194,11 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						delete [] buf;
 						return E_FAIL;
 					}
-
-					gb.Reset(buf, size - 3);
-
-					//HexDump(L"", buf, size - 3);
 				}
 				break;
 			case TAK_METADATA_END:
 				{
-					//m_endpos += m_pFile->GetPos();
+					m_endpos += m_pFile->GetPos();
 
 					// parse APE Tag Header
 					BYTE buf[APE_TAG_FOOTER_BYTES];
@@ -297,10 +293,14 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 
 		if (type == TAK_METADATA_STREAMINFO) {
-			TAKStreamInfo si = {0};
-			ParseTAKStreamInfo(gb, si);
+			TAKStreamInfo si;
+			ParseTAKStreamInfo(buf, size - 3, si);
 
-			// fake ... for test, work on STEREO
+			if (si.data_type || !si.channels || (si.codec == TAK_CODEC_MONO_STEREO && si.channels > 2)) {
+				delete [] buf;
+				return E_FAIL;
+			}
+
 			CMediaType mt;
 			mt.majortype			= MEDIATYPE_Audio;
 			mt.formattype			= FORMAT_WaveFormatEx;
@@ -308,15 +308,15 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			WAVEFORMATEX* wfe		= (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX) + size);
 			memset(wfe, 0, sizeof(WAVEFORMATEX));
 			wfe->nSamplesPerSec		= si.sample_rate;
-			wfe->wBitsPerSample		= 16;
+			wfe->wBitsPerSample		= si.bps;
 			wfe->nChannels			= si.channels;
 
-			wfe->nBlockAlign		= wfe->nChannels * wfe->wBitsPerSample / 8;
+			wfe->nBlockAlign		= wfe->nChannels * wfe->wBitsPerSample >> 3;
 			wfe->nAvgBytesPerSec	= wfe->nSamplesPerSec * wfe->nBlockAlign;
-			mt.SetSampleSize(/*wfe->wBitsPerSample * wfe->nChannels / 8*/256000);
-
 			wfe->cbSize				= size;
 			memcpy(wfe + 1, buf, size);
+
+			mt.SetSampleSize(256000);
 
 			if (mt.subtype != GUID_NULL) {
 				CAtlArray<CMediaType> mts;
@@ -326,10 +326,13 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 
 			m_nAvgBytesPerSec		= wfe->nAvgBytesPerSec;
-			m_rtDuration			= si.samples;
+			m_rtDuration			= si.samples / si.sample_rate * UNITS;
 		} else if (type == TAK_METADATA_LAST_FRAME) {
-			//bLastFrame	= TRUE;
-			//m_endpos	= gb.BitRead(TAK_LAST_FRAME_POS_BITS) + gb.BitRead(TAK_LAST_FRAME_SIZE_BITS);
+			bLastFrame				= TRUE;
+			uint64_t LastFramePos	= *(uint64_t*)buf & 0xFFFFFFFFFF;
+			uint64_t LastFrameSize	= *(uint32_t*)&buf[4] >> 8;
+
+			m_endpos				= LastFramePos + LastFrameSize;
 		}
 
 		SAFE_DELETE_ARRAY(buf);
@@ -391,90 +394,63 @@ bool CTAKSplitterFilter::DemuxLoop()
 	return true;
 }
 
-static int tak_get_nb_samples(int sample_rate, enum TAKFrameSizeType type)
+void CTAKSplitterFilter::ParseTAKStreamInfo(BYTE* buf, int size, TAKStreamInfo& si)
 {
-    int nb_samples, max_nb_samples;
+	static const DWORD tak_channels[] = {
+		0,
+		SPEAKER_FRONT_LEFT,
+		SPEAKER_FRONT_RIGHT,
+		SPEAKER_FRONT_CENTER,
+		SPEAKER_LOW_FREQUENCY,
+		SPEAKER_BACK_LEFT,
+		SPEAKER_BACK_RIGHT,
+		SPEAKER_FRONT_LEFT_OF_CENTER,
+		SPEAKER_FRONT_RIGHT_OF_CENTER,
+		SPEAKER_BACK_CENTER,
+		SPEAKER_SIDE_LEFT,
+		SPEAKER_SIDE_RIGHT,
+		SPEAKER_TOP_CENTER,
+		SPEAKER_TOP_FRONT_LEFT,
+		SPEAKER_TOP_FRONT_CENTER,
+		SPEAKER_TOP_FRONT_RIGHT,
+		SPEAKER_TOP_BACK_LEFT,
+		SPEAKER_TOP_BACK_CENTER,
+		SPEAKER_TOP_BACK_RIGHT,
+	};
 
-    if (type <= TAK_FST_250ms) {
-        nb_samples     = sample_rate * frame_duration_type_quants[type] >>
-                         TAK_FRAME_DURATION_QUANT_SHIFT;
-        max_nb_samples = 16384;
-    } else if (type < _countof(frame_duration_type_quants)) {
-        nb_samples     = frame_duration_type_quants[type];
-        max_nb_samples = sample_rate *
-                         frame_duration_type_quants[TAK_FST_250ms] >>
-                         TAK_FRAME_DURATION_QUANT_SHIFT;
-    } else {
-        return 0;
-    }
+	if (size >= 9) {
+		uint64_t ChannelMask	= 0;
 
-    if (nb_samples <= 0 || nb_samples > max_nb_samples)
-        return 0;
+		uint8_t  Codec			= buf[0] & 0x3F;
+		uint16_t Profile		= *(uint16_t*)&buf[0] >> 6 & 0xF;
 
-    return nb_samples;
-}
+		uint8_t  FrameSizeType	= buf[1] >> 2 & 0xF;
+		uint64_t SampleNum		= *(uint64_t*)&buf[1] >> 6 & 0x1FFFFFFFFF;
 
-void CTAKSplitterFilter::ParseTAKStreamInfo(CGolombBuffer gb, TAKStreamInfo& si)
-{
-	// this code work but only mono/stereo information
-	gb.BitRead(8);
+		uint8_t  DataType		= (buf[6] >> 1 & 0x7); // 0 - PCM
+		uint32_t SampleRate		= (*(uint32_t*)&buf[6] >> 4 & 0x3FFFF) + 6000;
+		uint16_t SampleBits		= (*(uint16_t*)&buf[8] >> 6 & 0x1F) + 8;
+		uint8_t  ChannelNum		= (buf[9] >> 3 & 0xF) + 1;
+		uint8_t  HasExtension	= buf[9] >> 7;
 
-	int num_samples_lo		= gb.BitRead(2);
-	int framesizecode		= gb.BitRead(3);
-	gb.BitRead(2);
-
-	gb.BitByteAlign();
-	UINT32 num_samples_hi	= gb.BitRead(32);
-	BSWAP32(num_samples_hi);
-	UINT32 sample_rate		= gb.BitRead(24);
-	BSWAP24(sample_rate);
-
-	gb.BitByteAlign();
-	gb.BitRead(4);
-	int channels			= gb.BitRead(1);
-	int samplesize			= gb.BitRead(2);
-	gb.BitRead(1);
-
-	gb.BitByteAlign();
-	gb.BitRead(24);
-
-	UINT64 Samples			= ((UINT64)num_samples_hi)<<2 | num_samples_lo;
-    UINT SamplingRate		= (sample_rate >> 4) + 6000;
-
-	si.channels				= channels ? 2 : 1;
-	si.sample_rate			= SamplingRate;
-	si.samples				= (Samples / SamplingRate) * UNITS;
-
-	/*
-	UINT64 channel_mask = 0;
-
-	si.codec = (TAKCodecType)gb.BitRead(TAK_ENCODER_CODEC_BITS);
-	gb.BitRead(TAK_ENCODER_PROFILE_BITS);
-
-	enum TAKFrameSizeType frame_type = (TAKFrameSizeType)gb.BitRead(TAK_SIZE_FRAME_DURATION_BITS);
-	si.samples = gb.BitRead(TAK_SIZE_SAMPLES_NUM_BITS);
-
-	si.data_type = gb.BitRead(TAK_FORMAT_DATA_TYPE_BITS);
-	si.sample_rate = gb.BitRead(TAK_FORMAT_SAMPLE_RATE_BITS) + TAK_SAMPLE_RATE_MIN;
-	si.bps = gb.BitRead(TAK_FORMAT_BPS_BITS) + TAK_BPS_MIN;
-	si.channels = gb.BitRead(TAK_FORMAT_CHANNEL_BITS) + TAK_CHANNELS_MIN;
-
-	if (gb.BitRead(1)) {
-		gb.BitRead(TAK_FORMAT_VALID_BITS);
-		if (gb.BitRead(1)) {
-			for (int i = 0; i < si.channels; i++) {
-				int value = gb.BitRead(TAK_FORMAT_CH_LAYOUT_BITS);
-
-				if (value < _countof(tak_channel_layouts)) {
-					channel_mask |= tak_channel_layouts[value];
-				}
+		uint8_t ValidBitsPerSample		= 0;
+		uint8_t HasSpeakerAssignment	= 0;
+		if (HasExtension && size >= 11) {
+			ValidBitsPerSample			= (buf[10] & 0x1F) + 1;
+			HasSpeakerAssignment		= (buf[10] >> 5 & 0x1);
+			if (HasSpeakerAssignment && size >=  11 + (ChannelNum * 6 - 2) / 8) {
+				// TODO get channel layuot
 			}
 		}
-	}
 
-    si.ch_layout     = channel_mask;
-    si.frame_samples = tak_get_nb_samples(si.sample_rate, frame_type);
-	*/
+		si.codec				= (TAKCodecType)Codec;
+		si.data_type			= DataType;
+		si.sample_rate			= SampleRate;
+		si.channels				= ChannelNum;
+		si.bps					= SampleBits;
+		si.ch_layout			= ChannelMask;
+		si.samples				= SampleNum;
+	}
 }
 
 //

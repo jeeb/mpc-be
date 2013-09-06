@@ -221,16 +221,17 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput)
 		m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
 		CheckPointer(m_pAVCtx, false);
 
-		m_pAVCtx->sample_rate           = nSamples;
-		m_pAVCtx->channels              = nChannels;
-		m_pAVCtx->bit_rate              = nBytesPerSec << 3;
-		m_pAVCtx->bits_per_coded_sample = nBitsPerSample;
-		m_pAVCtx->block_align           = nBlockAlign;
-
-		m_pAVCtx->err_recognition       = AV_EF_CAREFUL;
-		m_pAVCtx->codec_id              = nCodecId;
+		m_pAVCtx->sample_rate			= nSamples;
+		m_pAVCtx->channels				= nChannels;
+		m_pAVCtx->bit_rate				= nBytesPerSec << 3;
+		m_pAVCtx->bits_per_coded_sample	= nBitsPerSample;
+		m_pAVCtx->block_align			= nBlockAlign;
+		m_pAVCtx->err_recognition		= AV_EF_CAREFUL;
+		m_pAVCtx->thread_count			= 1;
+		m_pAVCtx->thread_type			= 0;
+		m_pAVCtx->codec_id				= nCodecId;
 		if (m_pAVCodec->capabilities & CODEC_CAP_TRUNCATED) {
-			m_pAVCtx->flags            |= CODEC_FLAG_TRUNCATED;
+			m_pAVCtx->flags				|= CODEC_FLAG_TRUNCATED;
 		}
 
 		if (nCodecId != AV_CODEC_ID_AAC) {
