@@ -418,7 +418,7 @@ void CTAKSplitterFilter::ParseTAKStreamInfo(BYTE* buf, int size, TAKStreamInfo& 
 		SPEAKER_TOP_BACK_RIGHT,
 	};
 
-	if (size >= 9) {
+	if (size >= 10) {
 		uint64_t ChannelMask	= 0;
 
 		uint8_t  Codec			= buf[0] & 0x3F;
