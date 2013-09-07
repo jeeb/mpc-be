@@ -303,9 +303,9 @@ int ParseMPAHeader(const BYTE* buf, audioframe_t* audioframe)
 		bitrate = mpeg1_rates[3 - layer_desc][bitrate_index];
 	} else { // MPEG Version 2, MPEG Version 2.5
 		if (layer_desc == 0x3) { // Layer 1
-			bitrate = mpeg2_rates[3][bitrate_index];
+			bitrate = mpeg2_rates[0][bitrate_index];
 		} else { // Layer 2, Layer 3
-			bitrate = mpeg2_rates[4][bitrate_index];
+			bitrate = mpeg2_rates[1][bitrate_index];
 		}
 	}
 	bitrate *= 1000;
