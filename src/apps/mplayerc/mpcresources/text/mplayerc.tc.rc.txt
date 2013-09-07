@@ -5,7 +5,7 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 10		"版本 :"
 11		"SVN 組建版本 :"
 12		"確認"
-13		"本程式是自由軟體, 並依 GNU General Public License 發行。"
+13		"本程式是自由軟體, 並依 GNU 通用公共授權 (GPL) 發行。"
 14		"MPC-BE 編譯器 :"
 15		"FFmpeg 編譯器 :"
 20		"本翻譯版本建基於 Kene Lin 之譯本，特此鳴謝。"
@@ -193,8 +193,8 @@ BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGEFILTERSPERFORMANCE LINES 23
-14		"最小佇列封包："
-15		"最大佇列封包："
+14		"最小佇列封包數量："
+15		"最大佇列封包數量："
 16		"最小佇列大小："
 17		"最大佇列大小："
 18		"緩衝大小："
@@ -360,7 +360,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 32		"(範例: eng jap swe)"
 33		"音訊"
 35		"預設軌道"
-37		"速度步進幅度:"
+37		"速度步進幅度"
 40		"重設"
 END
 
@@ -460,8 +460,8 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 9		"毫秒"
 11		"頻率調整:"
 13		"頻率調整:"
-14		"行"
-16		"列"
+14		"列 (Ln)"
+16		"欄 (Col)"
 18		"控制限制:"
 19		"毫秒"
 23		"於最近的垂直同步呈現"
@@ -1375,7 +1375,7 @@ STRING IDS_BOOST_OSD		"增益: +%.1f dB"
 STRING IDS_BRIGHTNESS_DEC		"減少亮度"
 STRING IDS_BRIGHTNESS_INC		"增加亮度"
 STRING IDS_CANCEL		"取消"
-STRING IDS_CANNOT_CHANGE_FORMAT		"MPC-BE 沒有足夠的權力變更檔案關聯。請按 ""Modify"" 按鈕取得管理者權限。"
+STRING IDS_CANNOT_CHANGE_FORMAT		"MPC-BE 沒有足夠的權限變更檔案關聯。請按 ""修改"" 按鈕取得管理員權限。"
 STRING IDS_CAPTURE_ERROR		"擷取錯誤"
 STRING IDS_CAPTURE_ERROR_ADD_BUFFER		"無法加入 %s 緩衝篩選器至圖表中。"
 STRING IDS_CAPTURE_ERROR_ADD_ENCODER		"無法加入 %s 編碼篩選器至圖表中。"
