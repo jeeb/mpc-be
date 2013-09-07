@@ -182,17 +182,17 @@ HRESULT COggSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 {
 	CheckPointer(pAsyncReader, E_POINTER);
 
-	HRESULT hr = E_FAIL;
+	HRESULT hres = E_FAIL;
 
 	m_pFile.Free();
 
-	m_pFile.Attach(DNew COggFile(pAsyncReader, hr));
+	m_pFile.Attach(DNew COggFile(pAsyncReader, hres));
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
 	}
-	if (FAILED(hr)) {
+	if (FAILED(hres)) {
 		m_pFile.Free();
-		return hr;
+		return hres;
 	}
 
 	m_rtNewStart = m_rtCurrent = 0;
@@ -302,26 +302,26 @@ start:
 			}
 		}
 
-		if (COggDiracOutputPin* p = dynamic_cast<COggDiracOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
-			if (!p->IsInitialized()) {
-				p->UnpackInitPage(page);
-				if (p->IsInitialized()) {
+		if (COggDiracOutputPin* pPin = dynamic_cast<COggDiracOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
+			if (!pPin->IsInitialized()) {
+				pPin->UnpackInitPage(page);
+				if (pPin->IsInitialized()) {
 					nWaitForMore--;
 				}
 			}
 		}
 
-		if (COggTheoraOutputPin* p = dynamic_cast<COggTheoraOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
-			p->UnpackInitPage(page);
-			if (p->IsInitialized()) {
+		if (COggTheoraOutputPin* pPin = dynamic_cast<COggTheoraOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
+			pPin->UnpackInitPage(page);
+			if (pPin->IsInitialized()) {
 				bIsTheoraPresent = TRUE;
 				nWaitForMore--;
 			}
 		}
 
-		if (COggVorbisOutputPin* p = dynamic_cast<COggVorbisOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
-			p->UnpackInitPage(page);
-			if (p->IsInitialized()) {
+		if (COggVorbisOutputPin* pPin = dynamic_cast<COggVorbisOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
+			pPin->UnpackInitPage(page);
+			if (pPin->IsInitialized()) {
 				nWaitForMore--;
 			}
 		}
@@ -359,25 +359,25 @@ start:
 	if (m_pFile->IsRandomAccess()) {
 		m_pFile->Seek(max(m_pFile->GetLength() - MAX_PAGE_SIZE, 0));
 
-		OggPage page;
-		while (m_pFile->Read(page)) {
-			COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
-			if (!pOggPin || page.m_hdr.granule_position == -1) {
+		OggPage page2;
+		while (m_pFile->Read(page2)) {
+			COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page2.m_hdr.bitstream_serial_number));
+			if (!pOggPin || page2.m_hdr.granule_position == -1) {
 				continue;
 			}
-			REFERENCE_TIME rt = pOggPin->GetRefTime(page.m_hdr.granule_position);
+			REFERENCE_TIME rt = pOggPin->GetRefTime(page2.m_hdr.granule_position);
 			m_rtDuration = max(rt, m_rtDuration);
 		}
 
 		// get min pts to calculate duration
 		REFERENCE_TIME rtMin = 0;
 		m_pFile->Seek(start_pos);
-		for (int i = 0; m_pFile->Read(page), i<10; i++) {
-			COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
-			if (!pOggPin || page.m_hdr.granule_position == -1 || page.m_hdr.header_type_flag & OggPageHeader::first) {
+		for (int i = 0; m_pFile->Read(page2), i<10; i++) {
+			COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page2.m_hdr.bitstream_serial_number));
+			if (!pOggPin || page2.m_hdr.granule_position == -1 || page2.m_hdr.header_type_flag & OggPageHeader::first) {
 				continue;
 			}
-			REFERENCE_TIME rt = pOggPin->GetRefTime(page.m_hdr.granule_position);
+			REFERENCE_TIME rt = pOggPin->GetRefTime(page2.m_hdr.granule_position);
 			if (rt > 0) {
 				if ((rt - rtMin) > MAX_PTS_SHIFT) {
 					rtMin = rt;
@@ -606,7 +606,7 @@ void COggSplitterOutputPin::AddComment(BYTE* p, int len)
 	bs.getbits(bs.getbits(32)*8);
 	for (int n = bs.getbits(32); n-- > 0; ) {
 		CStringA str;
-		for (int len = bs.getbits(32); len-- > 0; ) {
+		for (int cnt = bs.getbits(32); cnt-- > 0; ) {
 			str += (CHAR)bs.getbits(8);
 		}
 
@@ -618,24 +618,24 @@ void COggSplitterOutputPin::AddComment(BYTE* p, int len)
 		CStringA TagKey		= str.Left(sepPos);
 		CStringA TagValue	= str.Mid(sepPos + 1);
 
-		CAutoPtr<CComment> p(DNew CComment(UTF8ToString(TagKey), UTF8ToString(TagValue)));
+		CAutoPtr<CComment> pComment(DNew CComment(UTF8ToString(TagKey), UTF8ToString(TagValue)));
 
-		if (p->m_key == L"LANGUAGE") {
-			CString lang = ISO6392ToLanguage(TagValue), iso6392 = LanguageToISO6392(CString(p->m_value));
+		if (pComment->m_key == L"LANGUAGE") {
+			CString lang = ISO6392ToLanguage(TagValue), iso6392 = LanguageToISO6392(CString(pComment->m_value));
 
-			if (p->m_value.GetLength() == 3 && !lang.IsEmpty()) {
+			if (pComment->m_value.GetLength() == 3 && !lang.IsEmpty()) {
 				SetName(CStringW(lang));
-				SetProperty(L"LANG", p->m_value);
+				SetProperty(L"LANG", pComment->m_value);
 			} else if (!iso6392.IsEmpty()) {
-				SetName(p->m_value);
+				SetName(pComment->m_value);
 				SetProperty(L"LANG", CStringW(iso6392));
 			} else {
-				SetName(p->m_value);
-				SetProperty(L"NAME", p->m_value);
+				SetName(pComment->m_value);
+				SetProperty(L"NAME", pComment->m_value);
 			}
 		}
 
-		m_pComments.AddTail(p);
+		m_pComments.AddTail(pComment);
 	}
 }
 

@@ -202,18 +202,18 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		int size				= m_pFile->BitRead(24);
 		BSWAP24(size);
 
-		BYTE* buf				= NULL;
+		BYTE* buffer			= NULL;
 
 		switch (type) {
 			case TAK_METADATA_STREAMINFO:
 			case TAK_METADATA_LAST_FRAME:
 				{
-					buf = DNew BYTE[size];
-					if (!buf) {
+					buffer = DNew BYTE[size];
+					if (!buffer) {
 						return E_FAIL;
 					}
-					if (FAILED(m_pFile->ByteRead(buf, size))) {
-						delete [] buf;
+					if (FAILED(m_pFile->ByteRead(buffer, size))) {
+						delete [] buffer;
 						return E_FAIL;
 					}
 
@@ -221,8 +221,8 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					m_pFile->Seek(m_pFile->GetPos() - 3);
 					int crc		= m_pFile->BitRead(24);
 					BSWAP24(crc);
-					if (crc != crc_octets(buf, size - 3)) {
-						delete [] buf;
+					if (crc != crc_octets(buffer, size - 3)) {
+						delete [] buffer;
 						return E_FAIL;
 					}
 				}
@@ -322,8 +322,8 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 
 		if (type == TAK_METADATA_STREAMINFO) {
-			if (!ParseTAKStreamInfo(buf, size - 3)) {
-				delete [] buf;
+			if (!ParseTAKStreamInfo(buffer, size - 3)) {
+				delete [] buffer;
 				return E_FAIL;
 			}
 
@@ -340,7 +340,7 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			wfe->nBlockAlign		= wfe->nChannels * wfe->wBitsPerSample >> 3;
 			wfe->nAvgBytesPerSec	= wfe->nSamplesPerSec * wfe->nBlockAlign;
 			wfe->cbSize				= size;
-			memcpy(wfe + 1, buf, size);
+			memcpy(wfe + 1, buffer, size);
 
 			mt.SetSampleSize(256000);
 
@@ -355,13 +355,13 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			m_rtDuration			= m_samples * UNITS / m_samplerate;
 		} else if (type == TAK_METADATA_LAST_FRAME) {
 			bLastFrame				= TRUE;
-			uint64_t LastFramePos	= *(uint64_t*)buf & 0xFFFFFFFFFF;
-			uint64_t LastFrameSize	= *(uint32_t*)&buf[4] >> 8;
+			uint64_t LastFramePos	= *(uint64_t*)buffer & 0xFFFFFFFFFF;
+			uint64_t LastFrameSize	= *(uint32_t*)&buffer[4] >> 8;
 
 			m_endpos				= LastFramePos + LastFrameSize;
 		}
 
-		SAFE_DELETE_ARRAY(buf);
+		SAFE_DELETE_ARRAY(buffer);
 	}
 
 	if (!bLastFrame) {
