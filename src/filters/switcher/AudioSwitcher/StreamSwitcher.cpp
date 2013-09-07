@@ -1291,12 +1291,12 @@ HRESULT CStreamSwitcherFilter::CompleteConnect(PIN_DIRECTION dir, CBasePin* pPin
 			name.Format(L"Channel %d", ++m_PinVersion);
 
 			HRESULT hr = S_OK;
-			CStreamSwitcherInputPin* pPin = DNew CStreamSwitcherInputPin(this, &hr, name);
-			if (!pPin || FAILED(hr)) {
-				delete pPin;
+			CStreamSwitcherInputPin* pInputPin = DNew CStreamSwitcherInputPin(this, &hr, name);
+			if (!pInputPin || FAILED(hr)) {
+				delete pInputPin;
 				return E_FAIL;
 			}
-			m_pInputs.AddTail(pPin);
+			m_pInputs.AddTail(pInputPin);
 		}
 	}
 
