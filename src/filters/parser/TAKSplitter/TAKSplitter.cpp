@@ -250,6 +250,8 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								m_pFile->Seek(file_size - tag_size);
 								BYTE *p = DNew BYTE[tag_size];
 								if (SUCCEEDED(m_pFile->ByteRead(p, tag_size)) && APETag->ReadTags(p, tag_size)) {
+									CString Artist, Comment, Title, Year, Album;
+
 									POSITION pos = APETag->TagItems.GetHeadPosition();
 									while (pos) {
 										CApeTagItem* item = APETag->TagItems.GetAt(pos);
@@ -275,10 +277,19 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 											ResAppend(CoverFileName, _T("cover"), CoverMime, CoverData.GetData(), (DWORD)CoverData.GetCount());
 
 										} else {
+											CString sTitle, sPerformer;
+
 											CString TagValue = item->GetValue();
 											if (TagKey == _T("cuesheet")) {
 												CAtlList<Chapters> ChaptersList;
-												if (ParseCUESheet(TagValue, ChaptersList)) {
+												if (ParseCUESheet(TagValue, ChaptersList, sTitle, sPerformer)) {
+													if (sTitle.GetLength() > 0 && Title.IsEmpty()) {
+														Title = sTitle;
+													}
+													if (sPerformer.GetLength() > 0 && Artist.IsEmpty()) {
+														Artist = sPerformer;
+													}
+
 													ChapRemoveAll();
 													while (ChaptersList.GetCount()) {
 														Chapters cp = ChaptersList.RemoveHead();
@@ -287,21 +298,29 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 												}
 											}
 
-											if (TagKey == _T("artist")) {
-												SetProperty(L"AUTH", TagValue);
-											} else if (TagKey == _T("comment")) {
-												SetProperty(L"DESC", TagValue);
-											} else if (TagKey == _T("title")) {
-												SetProperty(L"TITL", TagValue);
-											} else if (TagKey == _T("year")) {
-												SetProperty(L"YEAR", TagValue);
-											} else if (TagKey == _T("album")) {
-												SetProperty(L"ALBUM", TagValue);
+											if (TagValue.GetLength() > 0) {
+												if (TagKey == _T("artist")) {
+													Artist = TagValue;
+												} else if (TagKey == _T("comment")) {
+													Comment = TagValue;
+												} else if (TagKey == _T("title")) {
+													Title = TagValue;
+												} else if (TagKey == _T("year")) {
+													Year = TagValue;
+												} else if (TagKey == _T("album")) {
+													Album = TagValue;
+												}
 											}
 										}
 
 										APETag->TagItems.GetNext(pos);
 									}
+
+									SetProperty(L"AUTH", Artist);
+									SetProperty(L"DESC", Comment);
+									SetProperty(L"TITL", Title);
+									SetProperty(L"YEAR", Year);
+									SetProperty(L"ALBUM", Album);
 								}
 
 								delete [] p;
