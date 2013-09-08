@@ -140,7 +140,6 @@ extern void		audioFormatTypeHandler(const BYTE *format, const GUID *formattype, 
 extern HRESULT	CreateMPEG2VIfromAVC(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_TIME AvgTimePerFrame, CSize aspect, BYTE* extra, size_t extralen);
 
 // log function
-extern void		DumpBuffer(BYTE* pBuffer, int nSize);
 extern void		HexDump(CString fName, BYTE* buf, int size);
 extern void		LOG2FILE(LPCTSTR fmt, ...);
 

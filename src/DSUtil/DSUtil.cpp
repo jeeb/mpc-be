@@ -3108,36 +3108,6 @@ HRESULT CreateMPEG2VIfromAVC(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_T
 }
 
 // log function
-void DumpBuffer(BYTE* pBuffer, int nSize)
-{
-	CString	strMsg;
-	int		nPos = 0;
-	strMsg.AppendFormat (L"Size : %d\n", nSize);
-	for (int i=0; i<3; i++) {
-		for (int j=0; j<32; j++) {
-			nPos = i*32 + j;
-			if (nPos >= nSize) {
-				break;
-			}
-			strMsg.AppendFormat (L"%02x ", pBuffer[nPos]);
-		}
-		if (nPos >= nSize) {
-			break;
-		}
-		strMsg.Append(L"\n");
-	}
-
-	if (nSize > 32*3) {
-		strMsg.Append(L".../...\n");
-		for (int j=32; j>0; j--) {
-			strMsg.AppendFormat (L"%02x ", pBuffer[nSize - j]);
-		}
-	}
-	strMsg.AppendFormat(L"\n");
-
-	TRACE (strMsg);
-}
-
 void HexDump(CString fileName, BYTE* buf, int size)
 {
 	if (size<=0) {
@@ -3148,13 +3118,13 @@ void HexDump(CString fileName, BYTE* buf, int size)
 	dump_str.Format(_T("Dump size = %d\n"), size);
 	int len, i, j, c;
 
-	for (i=0; i<size; i+=16) {
+	for (i = 0; i < size; i +=1 6) {
 		len = size - i;
 		if (len > 16) {
 			len = 16;
 		}
 		dump_str.AppendFormat(_T("%08x "), i);
-		for (j=0; j<16; j++) {
+		for (j = 0; j < 16; j++) {
 			if (j < len) {
 				dump_str.AppendFormat(_T(" %02x"), buf[i+j]);
 			}
@@ -3163,7 +3133,7 @@ void HexDump(CString fileName, BYTE* buf, int size)
 			}
 		}
 		dump_str.Append(_T(" "));
-		for (j=0; j<len; j++) {
+		for (j = 0; j < len; j++) {
 			c = buf[i+j];
 			if (c < ' ' || c > '~') {
 				c = '.';
