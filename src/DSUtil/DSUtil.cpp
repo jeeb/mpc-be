@@ -3118,7 +3118,7 @@ void HexDump(CString fileName, BYTE* buf, int size)
 	dump_str.Format(_T("Dump size = %d\n"), size);
 	int len, i, j, c;
 
-	for (i = 0; i < size; i +=1 6) {
+	for (i = 0; i < size; i +=16) {
 		len = size - i;
 		if (len > 16) {
 			len = 16;
