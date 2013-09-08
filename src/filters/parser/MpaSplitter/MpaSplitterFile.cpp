@@ -514,7 +514,7 @@ bool CMpaSplitterFile::Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limi
 		while (GetPos() <= endpos - 4) {
 			mpahdr h;
 
-			if (Read(h, (int)(endpos - GetPos(), NULL, true))) {
+			if (Read(h, (int)(endpos - GetPos()), NULL, true)) {
 				if (m_mpahdr == h) {
 					Seek(GetPos() - 4);
 					AdjustDuration(h.nBytesPerSec);
