@@ -23,26 +23,15 @@
 #include "stdafx.h"
 #include "ApeTag.h"
 #include "DSUtil.h"
+#include "DSMPropertyBag.h"
 
 //
 // ApeTagItem class
 //
 
 CApeTagItem::CApeTagItem()
-	: m_key(_T(""))
-	, m_value(_T(""))
-	, m_type(APE_TYPE_STRING)
-	, m_buf(NULL)
-	, m_len(0)
+	: m_type(APE_TYPE_STRING)
 {
-}
-
-CApeTagItem::~CApeTagItem()
-{
-	if (m_buf) {
-		delete [] m_buf;
-		m_buf = NULL;
-	}
 }
 
 bool CApeTagItem::Load(CGolombBuffer &gb){
@@ -74,12 +63,10 @@ bool CApeTagItem::Load(CGolombBuffer &gb){
 
 		if (tag_size) {
 			m_key	= key;
-			m_len	= tag_size;
-			m_buf	= DNew BYTE[tag_size];
-			gb.ReadBuffer(m_buf, tag_size);
+			m_Data.SetCount(tag_size);
+			gb.ReadBuffer(m_Data.GetData(), tag_size);
 		}
 	} else {
-
 		BYTE* value = DNew BYTE[tag_size + 1];
 		memset(value, 0, tag_size + 1);
 		gb.ReadBuffer(value, tag_size);
@@ -172,17 +159,102 @@ bool CAPETag::ReadTags(BYTE *buf, size_t len)
 	return true;
 }
 
+void CAPETag::ParseTags(IBaseFilter* pBF)
+{
+	CAtlArray<BYTE>		CoverData;
+	CString				CoverMime;
+	CString				CoverFileName;
+
+	CString Artist, Comment, Title, Year, Album;
+
+	POSITION pos = TagItems.GetHeadPosition();
+	while (pos) {
+		CApeTagItem* item	= TagItems.GetAt(pos);
+		CString TagKey		= item->GetKey();
+		TagKey.MakeLower();
+
+		if (item->GetType() == CApeTagItem::APE_TYPE_BINARY) {
+			CoverMime.Empty();
+			if (!TagKey.IsEmpty()) {
+				CString ext = TagKey.Mid(TagKey.ReverseFind('.')+1);
+				if (ext == _T("jpeg") || ext == _T("jpg")) {
+					CoverMime = _T("image/jpeg");
+				} else if (ext == _T("png")) {
+					CoverMime = _T("image/png");
+				}
+			}
+
+			if (!CoverData.GetCount() && CoverMime.GetLength() > 0) {
+				CoverFileName = TagKey;
+				CoverData.SetCount(item->GetDataLen());
+				memcpy(CoverData.GetData(), item->GetData(), item->GetDataLen());
+			}
+		} else {
+			CString sTitle, sPerformer;
+
+			CString TagValue = item->GetValue();
+			if (TagKey == _T("cuesheet")) {
+				CAtlList<Chapters> ChaptersList;
+				if (ParseCUESheet(TagValue, ChaptersList, sTitle, sPerformer)) {
+					if (sTitle.GetLength() > 0 && Title.IsEmpty()) {
+						Title = sTitle;
+					}
+					if (sPerformer.GetLength() > 0 && Artist.IsEmpty()) {
+						Artist = sPerformer;
+					}
+
+					if (CComQIPtr<IDSMChapterBag> pCB = pBF) {
+						pCB->ChapRemoveAll();
+						while (ChaptersList.GetCount()) {
+							Chapters cp = ChaptersList.RemoveHead();
+							pCB->ChapAppend(cp.rt, cp.name);
+						}
+					}
+				}
+			}
+
+			if (TagValue.GetLength() > 0) {
+				if (TagKey == _T("artist")) {
+					Artist = TagValue;
+				} else if (TagKey == _T("comment")) {
+					Comment = TagValue;
+				} else if (TagKey == _T("title")) {
+					Title = TagValue;
+				} else if (TagKey == _T("year")) {
+					Year = TagValue;
+				} else if (TagKey == _T("album")) {
+					Album = TagValue;
+				}
+			}
+		}
+		
+		TagItems.GetNext(pos);
+	}
+
+	if (CComQIPtr<IDSMPropertyBag> pPB = pBF) {
+		pPB->SetProperty(L"AUTH", Artist);
+		pPB->SetProperty(L"DESC", Comment);
+		pPB->SetProperty(L"TITL", Title);
+		pPB->SetProperty(L"YEAR", Year);
+		pPB->SetProperty(L"ALBUM", Album);
+	}
+
+	if (CComQIPtr<IDSMResourceBag> pRB = pBF) {
+		if (CoverData.GetCount()) {
+			pRB->ResAppend(CoverFileName, L"cover", CoverMime, CoverData.GetData(), (DWORD)CoverData.GetCount(), 0);
+		}
+	}
+}
+
 CApeTagItem* CAPETag::Find(CString key)
 {
 	CString key_lc = key;
 	key_lc.MakeLower();
 
-
 	POSITION pos = TagItems.GetHeadPosition();
-
 	while (pos) {
-		CApeTagItem* item = TagItems.GetAt(pos);
-		CString TagKey = item->GetKey();
+		CApeTagItem* item	= TagItems.GetAt(pos);
+		CString TagKey		= item->GetKey();
 		TagKey.MakeLower();
 		if (TagKey == key_lc) {
 			return item;

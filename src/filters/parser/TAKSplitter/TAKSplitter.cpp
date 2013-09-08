@@ -202,6 +202,8 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		int size				= m_pFile->BitRead(24);
 		BSWAP24(size);
 
+		m_startpos				= min(m_pFile->GetPos() + size, m_pFile->GetLength());
+
 		BYTE* buffer			= NULL;
 
 		switch (type) {
@@ -250,77 +252,7 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								m_pFile->Seek(file_size - tag_size);
 								BYTE *p = DNew BYTE[tag_size];
 								if (SUCCEEDED(m_pFile->ByteRead(p, tag_size)) && APETag->ReadTags(p, tag_size)) {
-									CString Artist, Comment, Title, Year, Album;
-
-									POSITION pos = APETag->TagItems.GetHeadPosition();
-									while (pos) {
-										CApeTagItem* item = APETag->TagItems.GetAt(pos);
-										CString TagKey = item->GetKey();
-										TagKey.MakeLower();
-
-										if (item->GetType() == CApeTagItem::APE_TYPE_BINARY) {
-											if (!TagKey.IsEmpty()) {
-												CString ext = TagKey.Mid(TagKey.ReverseFind('.')+1);
-												if (ext == _T("jpeg") || ext == _T("jpg")) {
-													CoverMime = _T("image/jpeg");
-												} else if (ext == _T("png")) {
-													CoverMime = _T("image/png");
-												}
-											}
-
-											if (!CoverData.GetCount() && !CoverMime.IsEmpty()) {
-												CoverFileName = TagKey;
-												CoverData.SetCount(tag_size);
-												memcpy(CoverData.GetData(), item->GetData(), item->GetDataLen());
-											}
-
-											ResAppend(CoverFileName, _T("cover"), CoverMime, CoverData.GetData(), (DWORD)CoverData.GetCount());
-
-										} else {
-											CString sTitle, sPerformer;
-
-											CString TagValue = item->GetValue();
-											if (TagKey == _T("cuesheet")) {
-												CAtlList<Chapters> ChaptersList;
-												if (ParseCUESheet(TagValue, ChaptersList, sTitle, sPerformer)) {
-													if (sTitle.GetLength() > 0 && Title.IsEmpty()) {
-														Title = sTitle;
-													}
-													if (sPerformer.GetLength() > 0 && Artist.IsEmpty()) {
-														Artist = sPerformer;
-													}
-
-													ChapRemoveAll();
-													while (ChaptersList.GetCount()) {
-														Chapters cp = ChaptersList.RemoveHead();
-														ChapAppend(cp.rt, cp.name);
-													}
-												}
-											}
-
-											if (TagValue.GetLength() > 0) {
-												if (TagKey == _T("artist")) {
-													Artist = TagValue;
-												} else if (TagKey == _T("comment")) {
-													Comment = TagValue;
-												} else if (TagKey == _T("title")) {
-													Title = TagValue;
-												} else if (TagKey == _T("year")) {
-													Year = TagValue;
-												} else if (TagKey == _T("album")) {
-													Album = TagValue;
-												}
-											}
-										}
-
-										APETag->TagItems.GetNext(pos);
-									}
-
-									SetProperty(L"AUTH", Artist);
-									SetProperty(L"DESC", Comment);
-									SetProperty(L"TITL", Title);
-									SetProperty(L"YEAR", Year);
-									SetProperty(L"ALBUM", Album);
+									APETag->ParseTags(this);
 								}
 
 								delete [] p;
@@ -337,7 +269,6 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				break;
 			default:
 				m_pFile->Seek(m_pFile->GetPos() + size);
-				m_startpos = m_pFile->GetPos() + 4;
 		}
 
 		if (type == TAK_METADATA_STREAMINFO) {

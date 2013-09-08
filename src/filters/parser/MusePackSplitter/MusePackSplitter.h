@@ -322,10 +322,6 @@ public:
 
 	virtual HRESULT DoNewSeek();
 
-	// IDSMResourceBag
-	STDMETHODIMP_(DWORD) ResGetCount();
-	STDMETHODIMP ResGet(DWORD iIndex, BSTR* ppName, BSTR* ppDesc, BSTR* ppMime, BYTE** ppData, DWORD* pDataLen, DWORD_PTR* pTag);
-
 	// IDispatch
 	STDMETHODIMP GetTypeInfoCount(UINT* pctinfo) {return E_NOTIMPL;}
 	STDMETHODIMP GetTypeInfo(UINT itinfo, LCID lcid, ITypeInfo** pptinfo) {return E_NOTIMPL;}
@@ -346,9 +342,4 @@ public:
 	STDMETHODIMP get_MoreInfoBannerImage(BSTR* pbstrMoreInfoBannerImage) {return E_NOTIMPL;}
 	STDMETHODIMP get_MoreInfoBannerURL(BSTR* pbstrMoreInfoBannerURL) {return E_NOTIMPL;}
 	STDMETHODIMP get_MoreInfoText(BSTR* pbstrMoreInfoText) {return E_NOTIMPL;}
-
-protected:
-	CAtlArray<BYTE>		m_Cover;
-	CString				m_CoverMime;
-	CString				m_CoverFileName;
 };

@@ -230,50 +230,6 @@ STDMETHODIMP CWavPackSplitterFilter::JoinFilterGraph(IFilterGraph *pGraph, LPCWS
 	return CBaseFilter::JoinFilterGraph(pGraph,pName);
 }
 
-// IDSMResourceBag
-STDMETHODIMP_(DWORD) CWavPackSplitterFilter::ResGetCount()
-{
-	return m_pInputPin ? (m_pInputPin->m_Cover.IsEmpty() ? 0 : 1) : 0;
-}
-
-STDMETHODIMP CWavPackSplitterFilter::ResGet(DWORD iIndex, BSTR* ppName, BSTR* ppDesc, BSTR* ppMime, BYTE** ppData, DWORD* pDataLen, DWORD_PTR* pTag)
-{
-	if (ppData) {
-		CheckPointer(pDataLen, E_POINTER);
-	}
-
-	if (iIndex) {
-		return E_INVALIDARG;
-	}
-
-	CheckPointer(m_pInputPin, E_NOTIMPL);
-
-	if (m_pInputPin->m_Cover.IsEmpty()) {
-		return E_NOTIMPL;
-	}
-
-	if (ppName) {
-		*ppName = m_pInputPin->m_CoverFileName.AllocSysString();
-	}
-	if (ppDesc) {
-		CString str = _T("cover");
-		*ppDesc = str.AllocSysString();
-	}
-	if (ppMime) {
-		CString str = m_pInputPin->m_CoverMime;
-		*ppMime = str.AllocSysString();
-	}
-	if (ppData) {
-		*pDataLen = (DWORD)m_pInputPin->m_Cover.GetCount();
-		memcpy(*ppData = (BYTE*)CoTaskMemAlloc(*pDataLen), m_pInputPin->m_Cover.GetData(), *pDataLen);
-	}
-	if (pTag) {
-		*pTag = 0;
-	}
-
-	return S_OK;
-}
-
 // IAMMediaContent
 
 STDMETHODIMP CWavPackSplitterFilter::get_AuthorName(BSTR* pbstrAuthorName)
@@ -419,78 +375,8 @@ HRESULT CWavPackSplitterFilterInputPin::CompleteConnect(IPin *pReceivePin)
 				size_t tag_size = APETag->GetTagSize();
 				io->set_pos_rel(io, file_size - tag_size, SEEK_SET);
 				BYTE *p = DNew BYTE[tag_size];
-				if (io->read_bytes(io, p, tag_size) == tag_size) {
-					if (APETag->ReadTags(p, tag_size)) {
-						CString Artist, Comment, Title, Year, Album;
-
-						POSITION pos = APETag->TagItems.GetHeadPosition();
-						while (pos) {
-							CApeTagItem* item = APETag->TagItems.GetAt(pos);
-							CString TagKey = item->GetKey();
-							TagKey.MakeLower();
-
-							if (item->GetType() == CApeTagItem::APE_TYPE_BINARY) {
-								m_CoverMime = _T("");
-								if (!TagKey.IsEmpty()) {
-									CString ext = TagKey.Mid(TagKey.ReverseFind('.')+1);
-									if (ext == _T("jpeg") || ext == _T("jpg")) {
-										m_CoverMime = _T("image/jpeg");
-									} else if (ext == _T("png")) {
-										m_CoverMime = _T("image/png");
-									}
-								}
-
-								if (!m_Cover.GetCount() && !m_CoverMime.IsEmpty()) {
-									m_CoverFileName = TagKey;
-									m_Cover.SetCount(tag_size);
-									memcpy(m_Cover.GetData(), item->GetData(), item->GetDataLen());
-								}
-							} else {
-								CString sTitle, sPerformer;
-
-								CString TagValue = item->GetValue();
-								if (TagKey == _T("cuesheet")) {
-									CAtlList<Chapters> ChaptersList;
-									if (ParseCUESheet(TagValue, ChaptersList, sTitle, sPerformer)) {
-										if (sTitle.GetLength() > 0 && Title.IsEmpty()) {
-											Title = sTitle;
-										}
-										if (sPerformer.GetLength() > 0 && Artist.IsEmpty()) {
-											Artist = sPerformer;
-										}
-
-										m_pParentFilter->ChapRemoveAll();
-										while (ChaptersList.GetCount()) {
-											Chapters cp = ChaptersList.RemoveHead();
-											m_pParentFilter->ChapAppend(cp.rt, cp.name);
-										}
-									}
-								}
-
-								if (TagValue.GetLength() > 0) {
-									if (TagKey == _T("artist")) {
-										Artist = TagValue;
-									} else if (TagKey == _T("comment")) {
-										Comment = TagValue;
-									} else if (TagKey == _T("title")) {
-										Title = TagValue;
-									} else if (TagKey == _T("year")) {
-										Year = TagValue;
-									} else if (TagKey == _T("album")) {
-										Album = TagValue;
-									}
-								}
-							}
-
-							APETag->TagItems.GetNext(pos);
-						}
-
-						m_pParentFilter->SetProperty(L"AUTH", Artist);
-						m_pParentFilter->SetProperty(L"DESC", Comment);
-						m_pParentFilter->SetProperty(L"TITL", Title);
-						m_pParentFilter->SetProperty(L"YEAR", Year);
-						m_pParentFilter->SetProperty(L"ALBUM", Album);
-					}
+				if (io->read_bytes(io, p, tag_size) == tag_size && APETag->ReadTags(p, tag_size)) {
+					APETag->ParseTags(m_pParentFilter);
 				}
 
 				delete [] p;

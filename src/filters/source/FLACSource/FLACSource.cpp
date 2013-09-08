@@ -154,52 +154,6 @@ STDMETHODIMP CFLACSource::QueryFilterInfo(FILTER_INFO* pInfo)
 	return S_OK;
 }
 
-// IDSMResourceBag
-STDMETHODIMP_(DWORD) CFLACSource::ResGetCount()
-{
-	return (static_cast<CFLACStream*>(m_paStreams[0]))->m_Cover.IsEmpty() ? 0 : 1;
-}
-
-STDMETHODIMP CFLACSource::ResGet(DWORD iIndex, BSTR* ppName, BSTR* ppDesc, BSTR* ppMime, BYTE** ppData, DWORD* pDataLen, DWORD_PTR* pTag)
-{
-	if (ppData) {
-		CheckPointer(pDataLen, E_POINTER);
-	}
-
-	if (iIndex) {
-		return E_INVALIDARG;
-	}
-
-	CFLACStream* stream = (static_cast<CFLACStream*>(m_paStreams[0]));
-	CheckPointer(stream, E_NOTIMPL);
-
-	if (stream->m_Cover.IsEmpty()) {
-		return E_NOTIMPL;
-	}
-
-	if (ppName) {
-		CString str = _T("cover.jpg");
-		*ppName = str.AllocSysString();
-	}
-	if (ppDesc) {
-		CString str = _T("cover");
-		*ppDesc = str.AllocSysString();
-	}
-	if (ppMime) {
-		CString str = stream->m_CoverMime;
-		*ppMime = str.AllocSysString();
-	}
-	if (ppData) {
-		*pDataLen = (DWORD)stream->m_Cover.GetCount();
-		memcpy(*ppData = (BYTE*)CoTaskMemAlloc(*pDataLen), stream->m_Cover.GetData(), *pDataLen);
-	}
-	if (pTag) {
-		*pTag = 0;
-	}
-
-	return S_OK;
-}
-
 // CFLACStream
 
 CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
@@ -249,7 +203,6 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 		FLAC__stream_decoder_get_decode_position(_DECODER_, &m_llOffset);
 
-		// IDSMPropertyBagImpl
 		if (file_info.got_vorbis_comments) {
 			CString Title	= file_info.title;
 			CString Year	= file_info.year;
@@ -261,6 +214,10 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			((CFLACSource*)m_pFilter)->SetProperty(L"AUTH", file_info.artist);
 			((CFLACSource*)m_pFilter)->SetProperty(L"DESC", file_info.comment);
 			((CFLACSource*)m_pFilter)->SetProperty(L"ALBUM", file_info.album);
+		}
+
+		if (m_Cover.GetCount()) {
+			((CFLACSource*)m_pFilter)->ResAppend(L"cover.jpg", L"cover", m_CoverMime, m_Cover.GetData(), (DWORD)m_Cover.GetCount(), 0);
 		}
 
 		hr = S_OK;

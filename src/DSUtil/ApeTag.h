@@ -43,28 +43,26 @@ public:
 	};
 
 	CApeTagItem();
-	virtual ~CApeTagItem();
 
 	// load
 	bool Load(CGolombBuffer &gb);
 
-	CString GetKey()	const { return m_key; }
-	CString GetValue()	const { return m_value; }
-	BYTE* GetData()		const { return m_buf; }
-	size_t GetDataLen()	const { return m_len; }
-	ApeType GetType()	const { return m_type; }
+	CString GetKey()		const { return m_key; }
+	CString GetValue()		const { return m_value; }
+	const BYTE* GetData()	const { return m_Data.GetData(); }
+	size_t GetDataLen()		const { return m_Data.GetCount(); }
+	ApeType GetType()		const { return m_type; }
 
 protected:
-	CString		m_key;
+	CString			m_key;
 
 	// text value
-	CString		m_value;		
+	CString			m_value;		
 
 	// binary value
-	BYTE		*m_buf;
-	size_t		m_len;
+	CAtlArray<BYTE>	m_Data;
 
-	ApeType		m_type;
+	ApeType			m_type;
 };
 
 //
@@ -88,6 +86,7 @@ public:
 	// tag reading
 	bool ReadFooter(BYTE *buf, size_t len);
 	bool ReadTags(BYTE *buf, size_t len);
+	void ParseTags(IBaseFilter* pBF);
 
 	size_t GetTagSize() const { return m_TagSize; }
 	CApeTagItem* Find(CString key);

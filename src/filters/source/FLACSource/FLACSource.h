@@ -77,10 +77,6 @@ public:
 
 	// CBaseFilter
 	STDMETHODIMP QueryFilterInfo(FILTER_INFO* pInfo);
-
-	// IDSMResourceBag
-	STDMETHODIMP_(DWORD) ResGetCount();
-	STDMETHODIMP ResGet(DWORD iIndex, BSTR* ppName, BSTR* ppDesc, BSTR* ppMime, BYTE** ppData, DWORD* pDataLen, DWORD_PTR* pTag);
 };
 
 class CGolombBuffer;
