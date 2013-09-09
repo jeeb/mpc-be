@@ -135,7 +135,7 @@ public:
 	typedef CAtlList<PlaylistItem>		CPlaylist;
 	typedef CAtlList<PlaylistChapter>	CPlaylistChapter;
 
-	CHdmvClipInfo(void);
+	CHdmvClipInfo();
 	~CHdmvClipInfo();
 
 	HRESULT		ReadInfo(LPCTSTR strFile);

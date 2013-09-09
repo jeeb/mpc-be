@@ -704,6 +704,10 @@ STDMETHODIMP CMpegSplitterFilter::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYP
 
 HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 {
+	if (m_pFile->IsRandomAccess() && !m_pFile->GetRemaining()) {
+		return E_FAIL;
+	}
+
 	HRESULT hr;
 	BYTE b;
 
@@ -758,8 +762,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 	} else if (m_pFile->m_type == mpeg_ts) {
 		CMpegSplitterFile::trhdr h;
 		if (m_pFile->Read(h) == -1) {
-			m_pFile->Seek(h.next > m_pFile->GetPos() ? h.next : m_pFile->GetPos() + 1);
-			return S_OK;
+			return S_FALSE;
 		}
 
 		__int64 pos = m_pFile->GetPos();
@@ -1342,12 +1345,11 @@ bool CMpegSplitterFilter::DemuxLoop()
 
 	HRESULT hr = S_OK;
 	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
-		m_pFile->WaitAvailable(2000, AvailBytes);
+		if (m_pFile->IsStreaming()) {
+			m_pFile->WaitAvailable(2000, AvailBytes);
+		}
 		if ((hr = DemuxNextPacket(rtStartOffset)) == S_FALSE) {
 			Sleep(1);
-		}
-		if (m_pFile->IsRandomAccess() && !m_pFile->GetRemaining()) {
-			hr = E_FAIL;
 		}
 	}
 
@@ -1837,6 +1839,11 @@ HRESULT CMpegSplitterOutputPin::DeliverEndFlush()
 #define MOVE_TO_H264_START_CODE(b, e)	while(b <= e-4 && !((*(DWORD *)b == 0x01000000) || ((*(DWORD *)b & 0x00FFFFFF) == 0x00010000))) b++; if((b <= e-4) && *(DWORD *)b == 0x01000000) b++;
 #define MOVE_TO_AC3_START_CODE(b, e)	while(b <= e-8 && (*(WORD*)b != 0x770b)) b++;
 
+#define BSWAP32(x)	((x >> 24) & 0x000000ff) | \
+					((x >>  8) & 0x0000ff00) | \
+					((x <<  8) & 0x00ff0000) | \
+					((x << 24) & 0xff000000);
+
 HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 {
 	CAutoLock cAutoLock(this);
@@ -1991,17 +1998,14 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			CAutoPtr<Packet> p2;
 
 			while (Nalu.ReadNext()) {
-				DWORD	dwNalLength =
-					((Nalu.GetDataLength() >> 24) & 0x000000ff) |
-					((Nalu.GetDataLength() >>  8) & 0x0000ff00) |
-					((Nalu.GetDataLength() <<  8) & 0x00ff0000) |
-					((Nalu.GetDataLength() << 24) & 0xff000000);
+				DWORD dwNalLength = Nalu.GetDataLength();
+				dwNalLength = BSWAP32(dwNalLength);
 
 				CAutoPtr<Packet> p3(DNew Packet());
 
-				p3->SetCount (Nalu.GetDataLength()+sizeof(dwNalLength));
-				memcpy (p3->GetData(), &dwNalLength, sizeof(dwNalLength));
-				memcpy (p3->GetData()+sizeof(dwNalLength), Nalu.GetDataBuffer(), Nalu.GetDataLength());
+				p3->SetCount(Nalu.GetDataLength() + sizeof(dwNalLength));
+				memcpy(p3->GetData(), &dwNalLength, sizeof(dwNalLength));
+				memcpy(p3->GetData() + sizeof(dwNalLength), Nalu.GetDataBuffer(), Nalu.GetDataLength());
 
 				if (p2 == NULL) {
 					p2 = p3;
@@ -2066,11 +2070,11 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			Packet* pPacket = m_pl.GetAt(pos);
 			BYTE* pData = pPacket->GetData();
 
-			if ((pData[4]&0x1f) == 0x09) {
+			if ((pData[4] & 0x1f) == 0x09) {
 				m_fHasAccessUnitDelimiters = true;
 			}
 
-			if ((pData[4]&0x1f) == 0x09 || (!m_fHasAccessUnitDelimiters && pPacket->rtStart != INVALID_TIME)) {
+			if ((pData[4] & 0x1f) == 0x09 || (!m_fHasAccessUnitDelimiters && pPacket->rtStart != INVALID_TIME)) {
 				if (pPacket->rtStart == INVALID_TIME && rtStart != INVALID_TIME) {
 					pPacket->rtStart	= rtStart;
 					pPacket->rtStop		= rtStop;
