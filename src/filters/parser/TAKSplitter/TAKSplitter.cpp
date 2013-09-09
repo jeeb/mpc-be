@@ -344,7 +344,7 @@ void CTAKSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		m_pFile->Seek(m_startpos);
 		m_rtStart = 0;
 	} else {
-		m_pFile->Seek((__int64)((1.0 * rt / m_rtDuration) * (m_endpos - m_startpos)));
+		m_pFile->Seek(m_startpos + (__int64)((double)rt / m_rtDuration * (m_endpos - m_startpos)));
 		m_rtStart = rt;
 	}
 }
