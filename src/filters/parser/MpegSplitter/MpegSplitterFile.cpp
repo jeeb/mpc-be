@@ -216,8 +216,10 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		}
 #endif
 	} else {
-		m_rtMin = m_posMin = 0;
-		m_rtMax = m_posMax = 0;
+		m_rtMin = m_rtMax = 0;
+
+		m_posMin = 0;
+		m_posMax = GetLength();
 	}
 
 	m_init = false;

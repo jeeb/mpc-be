@@ -542,8 +542,8 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	: CBaseSplitterFilter(NAME("CMpegSplitterFilter"), pUnk, phr, clsid)
 	, m_pPipoBimbo(false)
 	, m_rtPlaylistDuration(0)
-	, m_csAudioLanguageOrder(_T(""))
-	, m_csSubtitlesLanguageOrder(_T(""))
+	, m_rtMin(0)
+	, m_rtMax(0)
 	, m_useFastStreamChange(true)
 	, m_useFastSeek(false)
 	, m_ForcedSub(false)
@@ -872,6 +872,11 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	if (FAILED(hr)) {
 		m_pFile.Free();
 		return hr;
+	}
+
+	if (m_rtMin && m_rtMax && m_rtMax > m_rtMin) {
+		m_pFile->m_rtMin = m_rtMin;
+		m_pFile->m_rtMax = m_rtMax;
 	}
 
 	REFERENCE_TIME	rt_IfoDuration	= 0;
@@ -1348,9 +1353,8 @@ bool CMpegSplitterFilter::DemuxLoop()
 		if (m_pFile->IsStreaming()) {
 			m_pFile->WaitAvailable(2000, AvailBytes);
 		}
-		if ((hr = DemuxNextPacket(rtStartOffset)) == S_FALSE) {
-			Sleep(1);
-		}
+
+		hr = DemuxNextPacket(rtStartOffset);
 	}
 
 	return true;
@@ -1359,7 +1363,22 @@ bool CMpegSplitterFilter::DemuxLoop()
 bool CMpegSplitterFilter::BuildPlaylist(LPCTSTR pszFileName, CHdmvClipInfo::CPlaylist& Items)
 {
 	m_rtPlaylistDuration = 0;
-	return SUCCEEDED (m_ClipInfo.ReadPlaylist (pszFileName, m_rtPlaylistDuration, Items)) ? true : false;
+
+	bool res = SUCCEEDED (m_ClipInfo.ReadPlaylist (pszFileName, m_rtPlaylistDuration, Items));
+	if (res) {
+		m_rtMin = Items.GetHead().m_rtIn;
+		REFERENCE_TIME rtDur = 0;
+
+		POSITION pos = Items.GetHeadPosition();
+		while (pos) {
+			CHdmvClipInfo::PlaylistItem& s = Items.GetNext(pos);
+			rtDur += s.Duration();
+		}
+
+		m_rtMax = m_rtMin + rtDur;
+	}
+	
+	return res;
 }
 
 bool CMpegSplitterFilter::BuildChapters(LPCTSTR pszFileName, CHdmvClipInfo::CPlaylist& PlaylistItems, CHdmvClipInfo::CPlaylistChapter& Items)

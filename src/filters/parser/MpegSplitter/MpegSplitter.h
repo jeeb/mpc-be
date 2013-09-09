@@ -78,6 +78,7 @@ protected:
 	HRESULT DemuxNextPacket(REFERENCE_TIME rtStartOffset);
 
 	REFERENCE_TIME m_rtPlaylistDuration;
+	REFERENCE_TIME m_rtMin, m_rtMax;
 
 private:
 	CString m_csAudioLanguageOrder, m_csSubtitlesLanguageOrder;
