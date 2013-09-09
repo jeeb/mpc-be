@@ -418,7 +418,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 	}
 
 	CAMThread::Create();
-	if (FAILED(CAMThread::CallWorker(CMD_RUN))) {
+	if (FAILED(CAMThread::CallWorker(CMD_INIT))) {
 		Clear();
 		return false;
 	}
@@ -529,12 +529,8 @@ DWORD CUDPStream::ThreadProc()
 {
 	SetThreadPriority(m_hThread, THREAD_PRIORITY_TIME_CRITICAL);
 
-	CMPCSocket soc;
 	if (m_protocol == PR_HTTP) {
 		AfxSocketInit();
-
-		soc.Attach(m_HttpSocketTread);
-		soc = m_HttpSocket;
 	}
 
 #ifdef _DEBUG
@@ -548,29 +544,28 @@ DWORD CUDPStream::ThreadProc()
 		switch (cmd) {
 			default:
 			case CMD_EXIT:
-
+				Reply(S_OK);
 				if (m_protocol == PR_HTTP) {
-					m_HttpSocketTread = soc.Detach();
+					m_HttpSocketTread = m_HttpSocket.Detach();
 				}
-
 #ifdef _DEBUG
-				if (dump) {
-					fclose(dump);
-				}
+				if (dump) { fclose(dump); }
 #endif
-				Reply(S_OK);
 				return 0;
-			case CMD_RUN:
+			case CMD_INIT:
 				Reply(S_OK);
+				if (m_protocol == PR_HTTP) {
+					m_HttpSocket.Attach(m_HttpSocketTread);
+				}
 
 				{
-					char buff[MAXBUFSIZE * 2];
-					int buffsize = 0;
-
-					UINT timeout = 0;
-					while (!CheckRequest(NULL) && timeout < 1000) {
+					char  buff[MAXBUFSIZE * 2];
+					int   buffsize = 0;
+					UINT  attempts = 0;
+				
+					do {
 						int len =  0;
-
+				
 						if (m_protocol == PR_UDP) {
 							DWORD res = WSAWaitForMultipleEvents(1, m_WSAEvent, FALSE, 100, FALSE);
 							if (res == WSA_WAIT_EVENT_0) {
@@ -580,38 +575,37 @@ DWORD CUDPStream::ThreadProc()
 								if (len <= 0) {
 									int err = WSAGetLastError();
 									if (err != WSAEWOULDBLOCK) {
-										timeout += 100;
+										attempts++;
 									}
 									continue;
 								}
 							} else {
-								timeout += 100;
+								attempts++;
 								continue;
 							}
-
+				
 						} else if (m_protocol == PR_HTTP) {
-							len = soc.Receive(&buff[buffsize], MAXBUFSIZE);
+							len = m_HttpSocket.Receive(&buff[buffsize], MAXBUFSIZE);
 							if (len <= 0) {
-								timeout += 100;
+								attempts++;
 								continue;
 							}
-
-							timeout = 0;
+				
+							attempts = 0;
 						}
-
+				
 						buffsize += len;
-
+				
 						if (buffsize >= MAXBUFSIZE) {
 #ifdef _DEBUG
-							if (dump) {
-								fwrite(buff, buffsize, 1, dump);
-							}
+							if (dump) { fwrite(buff, buffsize, 1, dump); }
 #endif
 							Append((BYTE*)buff, buffsize);
 							buffsize = 0;
 						}
-					}
+					} while (!CheckRequest(NULL) && attempts < 10);
 				}
+
 				break;
 		}
 	}

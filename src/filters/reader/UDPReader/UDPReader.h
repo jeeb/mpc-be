@@ -66,7 +66,7 @@ private:
 	void Clear();
 	void Append(BYTE* buff, int len);
 
-	enum {CMD_EXIT, CMD_RUN};
+	enum {CMD_INIT, CMD_EXIT};
 	DWORD ThreadProc();
 
 	void CheckBuffer();
