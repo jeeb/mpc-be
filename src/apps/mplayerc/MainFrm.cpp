@@ -11002,9 +11002,25 @@ void CMainFrame::OnUpdateFavoritesFile(CCmdUI* pCmdUI)
 
 void CMainFrame::OnRecentFile(UINT nID)
 {
+	CRecentFileList& MRU = AfxGetAppSettings().MRU;
+	MRU.ReadList();
+
 	nID -= ID_RECENT_FILE_START;
 	CString str;
-	m_recentfiles.GetMenuString(nID+2, str, MF_BYPOSITION);
+	UINT ID = 0;
+	for (int i = 0; i < MRU.GetSize(); i++) {
+		if (!MRU[i].IsEmpty()) {
+			if (ID == nID) {
+				str = MRU[i];
+				break;
+			}
+			ID++;
+		}
+	}
+
+	if (str.IsEmpty()) {
+		return;
+	}
 	if (!m_wndPlaylistBar.SelectFileInPlaylist(str)) {
 		CAtlList<CString> fns;
 		fns.AddTail(str);
@@ -12776,7 +12792,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 		}
 
-		if ((CString(fn).MakeLower().Find(_T("://"))) < 0) {
+		if ((CString(fn).MakeLower().Find(_T("://"))) < 0 && fFirst) {
 			if (s.fKeepHistory && s.fRememberFilePos && !s.NewFile(fn)) {
 				REFERENCE_TIME	rtPos = s.CurrentFilePosition()->llPosition;
 				if (pMS) {
@@ -13127,6 +13143,12 @@ CString CMainFrame::OpenDVD(OpenDVDData* pODD)
 	if (SUCCEEDED(hr = pDVDI->GetDVDDirectory(buff, _countof(buff), &len))) {
 		pODD->title = CString(CStringW(buff));
 	}
+
+	CRecentFileList* pMRU = &s.MRU;
+	pMRU->ReadList();
+	pMRU->Add(pODD->title);
+	pMRU->WriteList();
+	SHAddToRecentDocs(SHARD_PATH, pODD->title);
 
 	// TODO: resetdvd
 	pDVDC->SetOption(DVD_ResetOnStop, FALSE);
@@ -16650,7 +16672,15 @@ void CMainFrame::SetupRecentFilesSubMenu()
 	for (int i = 0; i < MRU.GetSize(); i++) {
 		UINT flags = MF_BYCOMMAND|MF_STRING|MF_ENABLED;
 		if (!MRU[i].IsEmpty()) {
-			pSub->AppendMenu(flags, id, MRU[i]);
+			CString path(MRU[i]);
+			if (::PathIsDirectory(path)) {
+				CString tmp = path + L"\\VIDEO_TS.IFO";
+				if (::PathFileExists(tmp)) {
+					path = L"DVD - " + path;
+				}
+			}
+
+			pSub->AppendMenu(flags, id, path);
 		}
 		id++;
 	}
