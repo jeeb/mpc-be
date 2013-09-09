@@ -114,6 +114,24 @@ STDMETHODIMP CUDPReader::QueryFilterInfo(FILTER_INFO* pInfo)
 	return S_OK;
 }
 
+STDMETHODIMP CUDPReader::Stop()
+{
+	m_stream.CallWorker(m_stream.CMD_STOP);
+	return S_OK;
+}
+
+STDMETHODIMP CUDPReader::Pause()
+{
+	m_stream.CallWorker(m_stream.CMD_PAUSE);
+	return S_OK;
+}
+
+STDMETHODIMP CUDPReader::Run(REFERENCE_TIME tStart)
+{
+	m_stream.CallWorker(m_stream.CMD_RUN);
+	return S_OK;
+}
+
 // IFileSourceFilter
 
 STDMETHODIMP CUDPReader::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYPE* pmt)
@@ -552,12 +570,16 @@ DWORD CUDPStream::ThreadProc()
 				if (dump) { fclose(dump); }
 #endif
 				return 0;
-			case CMD_INIT:
+			case CMD_STOP:
+			case CMD_PAUSE:
 				Reply(S_OK);
+				break;
+			case CMD_INIT:
 				if (m_protocol == PR_HTTP) {
 					m_HttpSocket.Attach(m_HttpSocketTread);
 				}
-
+			case CMD_RUN:
+				Reply(S_OK);
 				{
 					char  buff[MAXBUFSIZE * 2];
 					int   buffsize = 0;

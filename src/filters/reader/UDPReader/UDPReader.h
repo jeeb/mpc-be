@@ -66,7 +66,6 @@ private:
 	void Clear();
 	void Append(BYTE* buff, int len);
 
-	enum {CMD_INIT, CMD_EXIT};
 	DWORD ThreadProc();
 
 	void CheckBuffer();
@@ -74,6 +73,9 @@ private:
 public:
 	CUDPStream();
 	virtual ~CUDPStream();
+
+	enum {CMD_INIT, CMD_PAUSE, CMD_RUN, CMD_STOP, CMD_EXIT};
+
 
 	bool Load(const WCHAR* fnw);
 
@@ -104,6 +106,9 @@ public:
 
 	// CBaseFilter
 	STDMETHODIMP QueryFilterInfo(FILTER_INFO* pInfo);
+	STDMETHODIMP Stop();
+	STDMETHODIMP Pause();
+	STDMETHODIMP Run(REFERENCE_TIME tStart);
 
 	// IFileSourceFilter
 	STDMETHODIMP Load(LPCOLESTR pszFileName, const AM_MEDIA_TYPE* pmt);
