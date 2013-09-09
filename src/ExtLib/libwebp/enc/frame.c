@@ -292,31 +292,20 @@ static int GetResidualCost(int ctx0, const VP8Residual* const res) {
   if (res->last < 0) {
     return VP8BitCost(0, p0);
   }
-  cost = 0;
-  while (n < res->last) {
-    int v = res->coeffs[n];
+  cost = VP8BitCost(1, p0);
+  for (; n < res->last; ++n) {
+    const int v = abs(res->coeffs[n]);
     const int b = VP8EncBands[n + 1];
-    ++n;
-    if (v == 0) {
-      // short-case for VP8LevelCost(t, 0) (note: VP8LevelFixedCosts[0] == 0):
-      cost += t[0];
-      t = res->cost[b][0];
-      continue;
-    }
-    v = abs(v);
-    cost += VP8BitCost(1, p0);
+    const int ctx = (v >= 2) ? 2 : v;
     cost += VP8LevelCost(t, v);
-    {
-      const int ctx = (v == 1) ? 1 : 2;
-      p0 = res->prob[b][ctx][0];
-      t = res->cost[b][ctx];
-    }
+    t = res->cost[b][ctx];
+    // the masking trick is faster than "if (v) cost += ..." with clang
+    cost += (v ? ~0U : 0) & VP8BitCost(1, res->prob[b][ctx][0]);
   }
   // Last coefficient is always non-zero
   {
     const int v = abs(res->coeffs[n]);
     assert(v != 0);
-    cost += VP8BitCost(1, p0);
     cost += VP8LevelCost(t, v);
     if (n < 15) {
       const int b = VP8EncBands[n + 1];
@@ -731,7 +720,7 @@ static int OneStatPass(VP8Encoder* const enc, float q, VP8RDLevel rd_opt,
     distortion += info.D;
     if (percent_delta && !VP8IteratorProgress(&it, percent_delta))
       return 0;
-    VP8IteratorSaveBoundary(&it, it.yuv_out_);
+    VP8IteratorSaveBoundary(&it);
   } while (VP8IteratorNext(&it) && --nb_mbs > 0);
   size += FinalizeSkipProba(enc);
   size += FinalizeTokenProbas(&enc->proba_);
@@ -895,7 +884,7 @@ int VP8EncLoop(VP8Encoder* const enc) {
     VP8StoreFilterStats(&it);
     VP8IteratorExport(&it);
     ok = VP8IteratorProgress(&it, 20);
-    VP8IteratorSaveBoundary(&it, it.yuv_out_);
+    VP8IteratorSaveBoundary(&it);
   } while (ok && VP8IteratorNext(&it));
 
   return PostLoopFinalize(&it, ok);
@@ -958,7 +947,7 @@ int VP8EncTokenLoop(VP8Encoder* const enc) {
         VP8IteratorExport(&it);
         ok = VP8IteratorProgress(&it, 20);
       }
-      VP8IteratorSaveBoundary(&it, it.yuv_out_);
+      VP8IteratorSaveBoundary(&it);
     } while (ok && VP8IteratorNext(&it));
   }
   ok = ok && WebPReportProgress(enc->pic_, enc->percent_ + 20, &enc->percent_);
