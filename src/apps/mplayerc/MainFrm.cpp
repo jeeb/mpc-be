@@ -11021,6 +11021,11 @@ void CMainFrame::OnRecentFile(UINT nID)
 	if (str.IsEmpty()) {
 		return;
 	}
+
+	if (OpenBD(str)) {
+		return;
+	}
+
 	if (!m_wndPlaylistBar.SelectFileInPlaylist(str)) {
 		CAtlList<CString> fns;
 		fns.AddTail(str);
@@ -12838,7 +12843,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 		}
 
-		if (s.fKeepHistory) {
+		if (s.fKeepHistory && m_LastOpenBDPath.IsEmpty()) {
 			CRecentFileList* pMRU = fFirst ? &s.MRU : &s.MRUDub;
 			pMRU->ReadList();
 			pMRU->Add(fn);
@@ -13142,6 +13147,7 @@ CString CMainFrame::OpenDVD(OpenDVDData* pODD)
 	ULONG len = 0;
 	if (SUCCEEDED(hr = pDVDI->GetDVDDirectory(buff, _countof(buff), &len))) {
 		pODD->title = CString(CStringW(buff));
+		pODD->title.Trim('\\');
 	}
 
 	CRecentFileList* pMRU = &s.MRU;
@@ -13173,7 +13179,7 @@ CString CMainFrame::OpenDVD(OpenDVDData* pODD)
 
 	SetPlaybackMode(PM_DVD);
 
-	return _T("");
+	return L"";
 }
 
 HRESULT CMainFrame::OpenBDAGraph()
@@ -16677,6 +16683,11 @@ void CMainFrame::SetupRecentFilesSubMenu()
 				CString tmp = path + L"\\VIDEO_TS.IFO";
 				if (::PathFileExists(tmp)) {
 					path = L"DVD - " + path;
+				} else {
+					tmp = path + L"\\BDMV\\index.bdmv";
+					if (::PathFileExists(tmp)) {
+						path = L"Blu-ray - " + path;
+					}
 				}
 			}
 
@@ -19477,6 +19488,8 @@ BOOL CMainFrame::OpenBD(CString Path)
 		} else if (Path.Find(_T("\\BDMV"))) {
 			Path.Replace(_T("\\BDMV"), _T("\\"));
 		}
+		Path.Trim('\\');
+
 		if (SUCCEEDED (ClipInfo.FindMainMovie(Path, strPlaylistFile, MainPlaylist, m_MPLSPlaylist))) {
 			CString infFile = Path + L"\\disc.inf";
 			if (::PathFileExists(infFile)) {
@@ -19496,6 +19509,15 @@ BOOL CMainFrame::OpenBD(CString Path)
 
 			bool InternalMpegSplitter = AfxGetAppSettings().SrcFilters[SRC_MPEG];
 			m_bIsBDPlay = TRUE;
+
+			{
+				CRecentFileList* pMRU = &AfxGetAppSettings().MRU;
+				pMRU->ReadList();
+				pMRU->Add(Path);
+				pMRU->WriteList();
+				SHAddToRecentDocs(SHARD_PATH, Path);
+			}
+
 			if (!InternalMpegSplitter && ext == _T(".bdmv")) {
 				return false;
 			} else {
