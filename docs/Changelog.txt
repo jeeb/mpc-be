@@ -15,7 +15,7 @@ Added (+):
 Changes (*):
 	* MediaInfo 0.7.64+ svn rev.5911;
 	* Little-CMS 2.5 git-ad2cb04b;
-	* ffmpeg 2.0 git-bcd1c206;
+	* ffmpeg 2.0 git-723cf4b2;
 	* libwebp 0.3.1 git-c663bb21;
 	* libpng 1.7.0 b17 git-bb065520;
 	* libopus 1.1 git-02fed471;
