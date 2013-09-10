@@ -76,7 +76,7 @@ public:
 	virtual ULONGLONG Seek(LONGLONG lOff, UINT nFrom);
 	virtual ULONGLONG GetLength() const;
 
-	virtual UINT Read(void* lpBuf, UINT nCount);
+	virtual UINT Read(BYTE* lpBuf, UINT nCount);
 	virtual void Close();
 
 	// Implementation

@@ -13147,7 +13147,7 @@ CString CMainFrame::OpenDVD(OpenDVDData* pODD)
 	ULONG len = 0;
 	if (SUCCEEDED(hr = pDVDI->GetDVDDirectory(buff, _countof(buff), &len))) {
 		pODD->title = CString(CStringW(buff));
-		pODD->title.Trim('\\');
+		pODD->title.TrimRight('\\');
 	}
 
 	CRecentFileList* pMRU = &s.MRU;
@@ -19488,7 +19488,7 @@ BOOL CMainFrame::OpenBD(CString Path)
 		} else if (Path.Find(_T("\\BDMV"))) {
 			Path.Replace(_T("\\BDMV"), _T("\\"));
 		}
-		Path.Trim('\\');
+		Path.TrimRight('\\');
 
 		if (SUCCEEDED (ClipInfo.FindMainMovie(Path, strPlaylistFile, MainPlaylist, m_MPLSPlaylist))) {
 			CString infFile = Path + L"\\disc.inf";
