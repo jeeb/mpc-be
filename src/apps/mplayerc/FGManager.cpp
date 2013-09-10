@@ -2026,7 +2026,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	} else {
 		pFGF = DNew CFGFilterInternal<CAMRSplitter>(LowMerit(AMRSplitterName), MERIT64_DO_USE);
 	}
-	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_AMR_Stream);
 	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
 	m_transform.AddTail(pFGF);
 
@@ -2270,7 +2269,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		/* todo: this should not depend on PCM */
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_IMA4);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_ADPCM_SWF);
-		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_ADPCM_AMV);
+		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_IMA_AMV);
 		m_transform.AddTail(pFGF);
 
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(

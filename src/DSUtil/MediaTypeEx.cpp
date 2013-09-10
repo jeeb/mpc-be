@@ -398,7 +398,7 @@ CString CMediaTypeEx::GetAudioCodecName(const GUID& subtype, WORD wFormatTag)
 			str = _T("QT PCM");
 		} else if (subtype == MEDIASUBTYPE_IMA4      ||
 				   subtype == MEDIASUBTYPE_ADPCM_SWF ||
-				   subtype == MEDIASUBTYPE_ADPCM_AMV) {
+				   subtype == MEDIASUBTYPE_IMA_AMV) {
 			str = _T("ADPCM");
 		} else if (subtype == MEDIASUBTYPE_ALAC) {
 			str = _T("ALAC");

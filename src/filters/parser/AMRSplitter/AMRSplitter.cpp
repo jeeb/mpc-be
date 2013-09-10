@@ -162,10 +162,6 @@ HRESULT CAMRSplitter::CheckConnect(PIN_DIRECTION Dir, IPin *pPin)
 HRESULT CAMRSplitter::CheckInputType(const CMediaType* mtIn)
 {
 	if (mtIn->majortype == MEDIATYPE_Stream) {
-		// we are sure we can accept this type
-		if (mtIn->subtype == MEDIASUBTYPE_AMR_Stream) return NOERROR;
-
-		// and we may accept unknown type as well
 		if (mtIn->subtype == MEDIASUBTYPE_None ||
 			mtIn->subtype == MEDIASUBTYPE_NULL ||
 			mtIn->subtype == GUID_NULL
