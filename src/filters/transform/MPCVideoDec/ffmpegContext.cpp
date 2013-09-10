@@ -50,11 +50,12 @@ extern "C" {
 }
 
 static const WORD PCID_NVIDIA_VP5 [] = {
-	// http://us.download.nvidia.com/XFree86/Linux-x86_64/319.32/README/supportedchips.html
+	// http://us.download.nvidia.com/XFree86/Linux-x86_64/319.49/README/supportedchips.html
 	// http://pci-ids.ucw.cz/read/PC/10de
 	// VP5, Nvidia VDPAU Feature Set D: GF119, GK104, GK106, GK107, GK110, GK208
 	0x0FC2, // GeForce GT 630 (GK107) (not officially supported or typo, 4k tested)
 	0x0FC6, // GeForce GTX 650
+	0x0FCD, // GeForce GT 755M
 	0x0FD1, // GeForce GT 650M
 	0x0FD2, // GeForce GT 640M
 	0x0FD4, // GeForce GTX 660M
@@ -67,7 +68,9 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x0FE2, // GeForce GT 745M
 	0x0FE3, // GeForce GT 745M
 	0x0FE4, // GeForce GT 750M
+	0x0FEF, // GRID K340
 	0x0FF2, // GRID K1
+	0x0FF8, // Quadro K500M
 	0x0FF9, // Quadro K2000D
 	0x0FFA, // Quadro K600
 	0x0FFB, // Quadro K2000M
@@ -81,6 +84,7 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x1022, // Tesla K20c
 	0x1026, // Tesla K20s
 	0x1028, // Tesla K20m
+	0x103A, // Quadro K6000
 	0x1040, // GeForce GT 520 (GF119) (not officially supported or typo, 4k tested)
 	0x1042, // GeForce 510
 	0x1048, // GeForce 605
@@ -94,6 +98,7 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x1056, // NVS 4200M
 	0x1057, // NVS 4200M
 	0x105B, // GeForce 705M
+	0x107C, // NVS 315
 	0x107D, // NVS 310
 	0x1180, // GeForce GTX 680
 	0x1183, // GeForce GTX 660 Ti (fully tested)
@@ -102,6 +107,7 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x1187, // GeForce GTX 760
 	0x1188, // GeForce GTX 690
 	0x1189, // GeForce GTX 670
+	0x118A, // GRID K520
 	0x118F, // Tesla K10
 	0x119D, // GeForce GTX 775M
 	0x119F, // GeForce GTX 780M
@@ -114,11 +120,13 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x11BC, // Quadro K5000M
 	0x11BD, // Quadro K4000M
 	0x11BE, // Quadro K3000M
-	0x11BF, // VGX K2
+	0x11BF, // GRID K2
 	0x11C0, // GeForce GTX 660
 	0x11C2, // GeForce GTX 650 Ti BOOST
 	0x11C3, // GeForce GTX 650 Ti
+	0x11C4, // GeForce GTX 645
 	0x11C6, // GeForce GTX 650 Ti
+	0x11C8, // GeForce GTX 650
 	0x11E0, // GeForce GTX 770M
 	0x11E1, // GeForce GTX 765M
 	0x11E2, // GeForce GTX 765M
