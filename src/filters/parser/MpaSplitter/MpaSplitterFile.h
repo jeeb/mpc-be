@@ -58,7 +58,7 @@ public:
 		return m_mt;
 	}
 	REFERENCE_TIME GetDuration() {
-		return IsRandomAccess() ? m_rtDuration : 0;
+		return m_rtDuration;
 	}
 
 	__int64 GetStartPos() {

@@ -558,7 +558,7 @@ void CMpaSplitterFile::AdjustDuration(int nBytesPerSec)
 {
 	ASSERT(nBytesPerSec);
 
-	if (!m_bIsVBR && !IsStreaming()) {
+	if (!m_bIsVBR) {
 		int rValue;
 		if (!m_pos2bps.Lookup(GetPos(), rValue)) {
 			m_totalbps += nBytesPerSec;
@@ -567,7 +567,7 @@ void CMpaSplitterFile::AdjustDuration(int nBytesPerSec)
 			}
 			m_pos2bps.SetAt(GetPos(), nBytesPerSec);
 			__int64 avgbps = m_totalbps / m_pos2bps.GetCount();
-			m_rtDuration = 10000000i64 * (GetLength() - m_startpos) / avgbps;
+			m_rtDuration = 10000000i64 * (GetTotal() - m_startpos) / avgbps;
 		}
 	}
 }
