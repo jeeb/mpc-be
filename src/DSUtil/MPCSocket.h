@@ -25,6 +25,8 @@
 #include <afxsock.h>
 #include <atlutil.h>
 
+#define SOCKET_DUMPLOGFILE	0
+
 class CMPCSocket : public CSocket
 {
 protected:

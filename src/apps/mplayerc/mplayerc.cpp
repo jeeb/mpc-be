@@ -2045,6 +2045,23 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 					body += str;
 				}
 			}
+
+#if (SOCKET_DUMPLOGFILE)
+			{
+				if (body.GetLength() > 0) {
+					LOG2FILE(L"===");
+					LOG2FILE(L"%s", fn);
+					LOG2FILE(L"Body:");
+					CAtlList<CString> sl;
+					Explode(body, sl, '\n');
+					POSITION pos = sl.GetHeadPosition();
+					while (pos) {
+						CString& hdrline = sl.GetNext(pos);
+						LOG2FILE(L"%s", hdrline);
+					}
+				}
+			}
+#endif
 		}
 	} else if (!fn.IsEmpty()) {
 		CPath p(fn);

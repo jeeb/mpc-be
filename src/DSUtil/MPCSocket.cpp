@@ -117,14 +117,14 @@ BOOL CMPCSocket::Connect(CUrl url, BOOL bConnectOnly)
 	CStringA path = CStringA(url.GetUrlPath()) + CStringA(url.GetExtraInfo());
 
 	if (m_bProxyEnable) {
-		DWORD dwUrlLen = url.GetUrlLength() + 1;
-		TCHAR* szUrl = new TCHAR[dwUrlLen];
+		DWORD dwUrlLen	= url.GetUrlLength() + 1;
+		TCHAR* szUrl	= new TCHAR[dwUrlLen];
 
 		// Retrieve the contents of the CUrl object
 		url.CreateUrl(szUrl, &dwUrlLen);
 		path = CStringA(szUrl);
 
-		delete[] szUrl;
+		delete [] szUrl;
 	}
 
 	CStringA sAddHeader;
@@ -212,6 +212,29 @@ BOOL CMPCSocket::SendRequest()
 
 		m_Hdr.Replace("\r\n\r\n", "");
 	}
+
+#if (SOCKET_DUMPLOGFILE)
+	{
+		DWORD dwUrlLen	= m_url.GetUrlLength() + 1;
+		TCHAR* szUrl	= new TCHAR[dwUrlLen];
+		// Retrieve the contents of the CUrl object
+		m_url.CreateUrl(szUrl, &dwUrlLen);
+		CString path = szUrl;
+		delete [] szUrl;
+
+		LOG2FILE(L"===");
+		LOG2FILE(L"Request URL = %s", path);
+		LOG2FILE(L"Header:");
+		CAtlList<CStringA> sl;
+		CStringA hdr = GetHeader();
+		Explode(hdr, sl, '\n');
+		POSITION pos = sl.GetHeadPosition();
+		while (pos) {
+			CStringA& hdrline = sl.GetNext(pos);
+			LOG2FILE(L"%s", CString(hdrline));
+		}
+	}
+#endif
 
 	if (m_uReceiveTimeOut) {
 		KillTimeOut();
