@@ -323,9 +323,9 @@ void CPlayerStatusBar::SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur
 #endif
 
 		if (fHighPrecision) {
-			posstr.AppendFormat(_T(".%03d"), (rtNow/10000)%1000);
-			durstr.AppendFormat(_T(".%03d"), (rtDur/10000)%1000);
-			rstr.AppendFormat(_T(".%03d"), ((rtDur - rtNow)/10000)%1000);
+			posstr.AppendFormat(_T(".%03I64d"), (rtNow/10000)%1000);
+			durstr.AppendFormat(_T(".%03I64d"), (rtDur/10000)%1000);
+			rstr.AppendFormat(_T(".%03I64d"), ((rtDur - rtNow)/10000)%1000);
 		}
 	} else if (*pTimeFormat == TIME_FORMAT_FRAME) {
 		posstr.Format(_T("%I64d"), rtNow);

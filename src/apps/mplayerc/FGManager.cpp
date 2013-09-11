@@ -422,7 +422,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 				ULONG len = _countof(buff);
 				memset(buff, 0, sizeof(buff));
 				LONG ret = key.QueryStringValue(_T("Source Filter"), buff, &len); // QueryStringValue can return ERROR_INVALID_DATA on bogus strings (radlight mpc v1003, fixed in v1004)
-				if (ERROR_SUCCESS == ret || ERROR_INVALID_DATA == ret && GUIDFromCString(buff) != GUID_NULL) {
+				if (ERROR_SUCCESS == ret || (ERROR_INVALID_DATA == ret && GUIDFromCString(buff) != GUID_NULL)) {
 					GUID clsid = GUIDFromCString(buff);
 					GUID majortype = GUID_NULL;
 					GUID subtype = GUID_NULL;
@@ -2488,7 +2488,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 			bOverrideBroadcom = true;
 		}
 
-		if (fo->fDisabled || fo->type == FilterOverride::EXTERNAL && !CPath(MakeFullPath(fo->path)).FileExists()) {
+		if (fo->fDisabled || (fo->type == FilterOverride::EXTERNAL && !CPath(MakeFullPath(fo->path)).FileExists())) {
 			continue;
 		}
 

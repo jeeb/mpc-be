@@ -1810,7 +1810,7 @@ HBRUSH CPPageAccelTbl::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 		status = AfxGetAppSettings().UIceClient.GetStatus();
 	}
 
-	if (status == 0 || status == 2 && (m_counter&1)) {
+	if (status == 0 || (status == 2 && (m_counter&1))) {
 		pDC->SetTextColor(0x0000ff);
 	} else if (status == 1) {
 		pDC->SetTextColor(0x008000);

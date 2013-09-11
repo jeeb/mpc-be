@@ -826,9 +826,7 @@ void CVMROSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration,
 				m_bVisibleMessage = true;
 				::SetTimer(m_pWnd->m_hWnd, (UINT_PTR)this, nDuration, (TIMERPROC)TimerFunc);
 			}
-		}
 
-		if (m_pWnd) {
 			SetWindowPos(NULL, 0, 0, 0, 0, DEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 			PostMessage(WM_OSD_DRAW);
 		}

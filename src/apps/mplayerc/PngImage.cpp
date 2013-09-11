@@ -133,10 +133,10 @@ BYTE* MPCPngImage::BrightnessRGB(int type, BYTE* lpBits, int width, int height, 
 
 	if (br >= 0 && rc >= 0 && gc >= 0 && bc >= 0) {
 
-		brn = (br * 10) / (kbr + (br * 4)) * 0.8;
-		rcn = rc / (70 + kbr - br) + brn;
-		gcn = gc / (75 + kbr - br) + brn;
-		bcn = bc / (80 + kbr - br) + brn;
+		brn = (double)((br * 10) / (kbr + (br * 4)) * 0.8);
+		rcn = (double)(rc / (70 + kbr - br) + brn);
+		gcn = (double)(gc / (75 + kbr - br) + brn);
+		bcn = (double)(bc / (80 + kbr - br) + brn);
 
 		if (rcn < 0.5) {
 			rcn = 0.5;

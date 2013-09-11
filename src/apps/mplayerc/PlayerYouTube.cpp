@@ -261,7 +261,7 @@ again:
 			if (_stscanf_s(itagValueStr, _T("%d"), &itagValue) == 1) {
 				YOUTUBE_PROFILES youtubePtofile = getProfile(itagValue);
 				if (youtubePtofile.iTag == 0
-					|| (youtubePtofile.Container == _T("WebM") && !match_itag)
+					|| ((youtubePtofile.Container == _T("WebM") && !match_itag))
 					|| youtubePtofile.Profile == _T("3D")) {
 					continue;
 				}

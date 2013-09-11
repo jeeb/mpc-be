@@ -302,15 +302,17 @@ COpenFileDlg::COpenFileDlg(CAtlArray<CString>& mask, bool fAllowDirSelection, LP
 
 	str = GetFolderOnly(str);
 
-	m_InitialDir = DNew TCHAR[max(1000, str.GetLength() + 1)];
-	memset(m_InitialDir, 0, sizeof(m_InitialDir));
+	int size = max(1000, str.GetLength() + 1);
+	m_InitialDir = DNew TCHAR[size];
+	memset(m_InitialDir, 0, size * sizeof(TCHAR));
 	_tcscpy(m_InitialDir, str);
 	m_pOFN->lpstrInitialDir = m_InitialDir;
 
-	m_buff = DNew TCHAR[10000];
-	memset(m_buff, 0, sizeof(m_buff));
-	m_pOFN->lpstrFile = m_buff;
-	m_pOFN->nMaxFile = 10000;
+	size = 10000;
+	m_buff = DNew TCHAR[size];
+	memset(m_buff, 0, size * sizeof(TCHAR));
+	m_pOFN->lpstrFile	= m_buff;
+	m_pOFN->nMaxFile	= size;
 }
 
 COpenFileDlg::~COpenFileDlg()

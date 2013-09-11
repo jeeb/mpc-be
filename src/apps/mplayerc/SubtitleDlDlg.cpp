@@ -272,7 +272,7 @@ void CSubtitleDlDlg::OnOK()
 		CInternetSession is;
 		CStringA url = "http://" + s.strISDb + "/dl.php?";
 		CStringA args, ticket, str;
-		args.Format("id=%d&ticket=%s", sub.id, UrlEncode(ticket), true);
+		args.Format("id=%d&ticket=%s", sub.id, UrlEncode(ticket));
 		url.Append(args);
 
 		if (OpenUrl(is, CString(url), str)) {

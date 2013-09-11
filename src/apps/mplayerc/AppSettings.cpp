@@ -1196,14 +1196,14 @@ void CAppSettings::LoadSettings()
 	}
 
 	if (m_pnspresets.IsEmpty()) {
-		double _4p3 = 4.0/3.0;
-		double _16p9 = 16.0/9.0;
-		double _185p1 = 1.85/1.0;
-		double _235p1 = 2.35/1.0;
-		UNREFERENCED_PARAMETER(_185p1);
+		double _4p3		= 4.0/3.0;
+		double _16p9	= 16.0/9.0;
+		double _235p1	= 2.35/1.0;
+		//double _185p1	= 1.85/1.0;
+		//UNREFERENCED_PARAMETER(_185p1);
 
 		CString str;
-		str.Format(ResStr(IDS_SCALE_16_9), 0.5, 0.5, _4p3/_4p3, _16p9/_4p3);
+		str.Format(ResStr(IDS_SCALE_16_9), 0.5, 0.5, 1, _16p9/_4p3);
 		m_pnspresets.Add(str);
 		str.Format(ResStr(IDS_SCALE_WIDESCREEN), 0.5, 0.5, _16p9/_4p3, _16p9/_4p3);
 		m_pnspresets.Add(str);

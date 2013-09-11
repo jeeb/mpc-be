@@ -1881,9 +1881,9 @@ void CMainFrame::OnSizing(UINT fwSide, LPRECT pRect)
 
 	wsize += fsize;
 
-	if (fwSide == WMSZ_TOP || fwSide == WMSZ_BOTTOM || !fWider && (fwSide == WMSZ_TOPRIGHT || fwSide == WMSZ_BOTTOMRIGHT)) {
+	if (fwSide == WMSZ_TOP || fwSide == WMSZ_BOTTOM || (!fWider && (fwSide == WMSZ_TOPRIGHT || fwSide == WMSZ_BOTTOMRIGHT))) {
 		pRect->right = pRect->left + wsize.cx;
-	} else if (fwSide == WMSZ_LEFT || fwSide == WMSZ_RIGHT || fWider && (fwSide == WMSZ_BOTTOMLEFT || fwSide == WMSZ_BOTTOMRIGHT)) {
+	} else if (fwSide == WMSZ_LEFT || fwSide == WMSZ_RIGHT || (fWider && (fwSide == WMSZ_BOTTOMLEFT || fwSide == WMSZ_BOTTOMRIGHT))) {
 		pRect->bottom = pRect->top + wsize.cy;
 	} else if (!fWider && (fwSide == WMSZ_TOPLEFT || fwSide == WMSZ_BOTTOMLEFT)) {
 		pRect->left = pRect->right - wsize.cx;
@@ -3935,9 +3935,9 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 	for (__int64 i = 0; i < uiMenuCount; ++i) {  //temp inst UINT -> __int64
 		__int64 nID = pPopupMenu->GetMenuItemID(i); //temp ren UINT -> __int64
 		if (nID == ID_SEPARATOR || nID == -1
-				|| nID >= ID_FAVORITES_FILE_START && nID <= ID_FAVORITES_FILE_END
-				|| nID >= ID_RECENT_FILE_START && nID <= ID_RECENT_FILE_END
-				|| nID >= ID_NAVIGATE_CHAP_SUBITEM_START && nID <= ID_NAVIGATE_CHAP_SUBITEM_END) {
+				|| (nID >= ID_FAVORITES_FILE_START && nID <= ID_FAVORITES_FILE_END)
+				|| (nID >= ID_RECENT_FILE_START && nID <= ID_RECENT_FILE_END)
+				|| (nID >= ID_NAVIGATE_CHAP_SUBITEM_START && nID <= ID_NAVIGATE_CHAP_SUBITEM_END)) {
 			continue;
 		}
 
@@ -9542,7 +9542,7 @@ void CMainFrame::OnPlayLanguage(UINT nID)
 		i--;
 	}
 
-	DWORD iGr;
+	DWORD iGr = 0;
 	DWORD cStreams;
 	if (!FAILED(pAMSS->Count(&cStreams))) {
 		DWORD dwGroup;
@@ -10255,7 +10255,7 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 		return;
 	}
 
-	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1) && i>=0) {
+	if (GetPlaybackMode() == PM_FILE || ((GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1) && i >= 0)) {
 
 		CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
 		if (pSS) {
@@ -11799,7 +11799,7 @@ void CMainFrame::MoveVideoWindow(bool fShowStats)
 		CRect vr = CRect(0,0,0,0);
 
 		OAFilterState fs = GetMediaState();
-		if (fs == State_Paused || fs == State_Running || fs == State_Stopped && (m_fShockwaveGraph || m_fQuicktimeGraph)) {
+		if (fs == State_Paused || fs == State_Running || (fs == State_Stopped && (m_fShockwaveGraph || m_fQuicktimeGraph))) {
 			CSize arxy = GetVideoSize();
 
 			dvstype iDefaultVideoSize = (dvstype)AfxGetAppSettings().iDefaultVideoSize;
@@ -14544,7 +14544,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			CString drive = fn.Left(i+2);
 			UINT type = GetDriveType(drive);
 			CAtlList<CString> sl;
-			if (type == DRIVE_REMOVABLE || type == DRIVE_CDROM && GetCDROMType(drive[0], sl) != CDROM_Audio) {
+			if (type == DRIVE_REMOVABLE || (type == DRIVE_CDROM && GetCDROMType(drive[0], sl) != CDROM_Audio)) {
 				int ret = IDRETRY;
 				while (ret == IDRETRY) {
 					WIN32_FIND_DATA findFileData;
@@ -14628,7 +14628,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			int nFactor = 1;
 
 			// 2:3 pulldown
-			if (strFPS == _T("29.970") && (strSO == _T("2:3 Pulldown") || strST == _T("Progressive") && (strSO == _T("TFF") || strSO  == _T("BFF") || strSO  == _T("2:3 Pulldown"))) ) {
+			if (strFPS == _T("29.970") && (strSO == _T("2:3 Pulldown") || (strST == _T("Progressive") && (strSO == _T("TFF") || strSO  == _T("BFF") || strSO  == _T("2:3 Pulldown"))))) {
 
 				strFPS = _T("23.976");
 			} else if (strST == _T("Interlaced") || strST == _T("MBAFF")) {
@@ -15935,7 +15935,7 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 					CString name(pName);
 					name.Replace(_T("&"), _T("&&"));
 
-					if ((splcnt>0 || cntintsub == intsub && cntintsub !=0) && !sep) {
+					if ((splcnt > 0 || (cntintsub == intsub && cntintsub != 0)) && !sep) {
 						pSub->AppendMenu(MF_SEPARATOR);
 						sep = true;
 					}
@@ -16567,6 +16567,7 @@ void CMainFrame::SetupNavMixAudioSubMenu()
 void CMainFrame::OnNavMixStreamSelectSubMenu(UINT id, DWORD dwSelGroup)
 {
 	bool bSplitterMenu = false;
+	int nID = (int)id;
 
 	CComQIPtr<IAMStreamSelect> pSSA = FindSwitcherFilter();
 
@@ -16595,7 +16596,7 @@ void CMainFrame::OnNavMixStreamSelectSubMenu(UINT id, DWORD dwSelGroup)
 					}
 
 					bSplitterMenu = true;
-					if (id == 0) {
+					if (nID == 0) {
 
 						bool bExternalTrack = false;
 						if (pSSA) {
@@ -16622,7 +16623,7 @@ void CMainFrame::OnNavMixStreamSelectSubMenu(UINT id, DWORD dwSelGroup)
 						return;
 					}
 
-					id--;
+					nID--;
 				}
 			}
 		}
@@ -16631,7 +16632,7 @@ void CMainFrame::OnNavMixStreamSelectSubMenu(UINT id, DWORD dwSelGroup)
 		return;
 	}
 
-	if (id >=0 && pSSA) {
+	if (nID >= 0 && pSSA) {
 		DWORD cStreamsA = 0;
 		if (SUCCEEDED(pSSA->Count(&cStreamsA)) && cStreamsA > 0) {
 			UINT i = id;
@@ -19681,8 +19682,8 @@ bool CheckCoverImgExist(CString &path, CString name) {
 	coverpath.Combine(path, name);
 
 	if (coverpath.FileExists() ||
-		coverpath.RenameExtension(_T(".jpeg")) && coverpath.FileExists() ||
-		coverpath.RenameExtension(_T(".png"))  && coverpath.FileExists()) {
+		(coverpath.RenameExtension(_T(".jpeg")) && coverpath.FileExists()) ||
+		(coverpath.RenameExtension(_T(".png"))  && coverpath.FileExists())) {
 			path.SetString(coverpath);
 			return true;
 	}

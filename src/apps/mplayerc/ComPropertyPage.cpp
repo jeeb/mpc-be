@@ -204,7 +204,7 @@ int CComPropertySheet::AddPages(ISpecifyPropertyPages* pSPP)
 
 		HRESULT hr = E_FAIL;
 
-		if (FAILED(hr) && !pPage && pSPP2) {
+		if (!pPage && pSPP2) {
 			hr = pSPP2->CreatePage(caGUID.pElems[i], &pPage);
 		}
 

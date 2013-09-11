@@ -351,8 +351,6 @@ void CFlyBar::DrawWnd()
 			if (!i || bt_idx == 2) { // restore
 				if (wp.showCmd == SW_SHOWMAXIMIZED) {
 					DrawButton(&mdc, x, sep[2][i], 2);
-				} else if (pFrame->m_fFullScreen) {
-					DrawButton(&mdc, x, sep[4][i], 2);
 				} else {
 					DrawButton(&mdc, x, sep[4][i], 2);
 				}
@@ -373,8 +371,6 @@ void CFlyBar::DrawWnd()
 			if (!i || bt_idx == 5) { // fs
 				if (pFrame->m_fFullScreen) {
 					DrawButton(&mdc, x, sep[8][i], 4);
-				} else if (wp.showCmd == SW_SHOWMAXIMIZED || (s.IsD3DFullscreen() && fs != -1)) {
-					DrawButton(&mdc, x, sep[10][i], 4);
 				} else {
 					DrawButton(&mdc, x, sep[10][i], 4);
 				}

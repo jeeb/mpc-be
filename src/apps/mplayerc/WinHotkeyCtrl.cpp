@@ -189,8 +189,8 @@ LRESULT CWinHotkeyCtrl::OnKey(WPARAM wParam, LPARAM lParam)
 				|| wParam == VK_LWIN || wParam == VK_RWIN                                    // skip "Win"
 				|| wParam == VK_SNAPSHOT                                                     // skip "PrintScreen"
 				//|| wParam == VK_APPS                                                         // skip "Menu key"
-				|| wParam == VK_ESCAPE && (m_fModSet == MOD_CONTROL || m_fModSet == MOD_ALT) // skip "Ctrl+Esc", "Alt+Esc"
-				|| wParam == VK_TAB && m_fModSet == MOD_ALT) {                               // skip "Alt+Tab"
+				|| (wParam == VK_ESCAPE && (m_fModSet == MOD_CONTROL || m_fModSet == MOD_ALT)) // skip "Ctrl+Esc", "Alt+Esc"
+				|| (wParam == VK_TAB && m_fModSet == MOD_ALT)) {                               // skip "Alt+Tab"
 			m_fModSet = m_fModRel = 0;
 			m_vkCode = 0;
 			m_fIsPressed = FALSE;
