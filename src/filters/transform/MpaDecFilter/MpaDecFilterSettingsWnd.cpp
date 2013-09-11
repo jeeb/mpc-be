@@ -82,23 +82,23 @@ bool CMpaDecSettingsWnd::OnActivate()
 	CPoint p(10, 10);
 	CRect r;
 
-	m_outfmt_group.Create(ResStr(IDS_MPADEC_SAMPLE_FMT), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(215), h20 + h20)), this, (UINT)IDC_STATIC);
+	m_outfmt_group.Create(ResStr(IDS_MPADEC_SAMPLE_FMT), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(230), h20 + h20)), this, (UINT)IDC_STATIC);
 	p.y += h20;
-	m_outfmt_i16_check.Create(_T("Int16"), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_CHECK_I16);
-	m_outfmt_i24_check.Create(_T("Int24"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(IPP_SCALE(50), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_CHECK_I24);
-	m_outfmt_i32_check.Create(_T("Int32"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(IPP_SCALE(100), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_CHECK_I32);
-	m_outfmt_flt_check.Create(_T("Float"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(IPP_SCALE(150), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_CHECK_FLT);
+	m_outfmt_i16_check.Create(_T("Int16"), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(50), m_fontheight)), this, IDC_PP_CHECK_I16);
+	m_outfmt_i24_check.Create(_T("Int24"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(IPP_SCALE(55), 0), CSize(IPP_SCALE(50), m_fontheight)), this, IDC_PP_CHECK_I24);
+	m_outfmt_i32_check.Create(_T("Int32"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(IPP_SCALE(110), 0), CSize(IPP_SCALE(50), m_fontheight)), this, IDC_PP_CHECK_I32);
+	m_outfmt_flt_check.Create(_T("Float"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(IPP_SCALE(165), 0), CSize(IPP_SCALE(50), m_fontheight)), this, IDC_PP_CHECK_FLT);
 	m_outfmt_i16_check.SetCheck(m_outfmt_i16);
 	m_outfmt_i24_check.SetCheck(m_outfmt_i24);
 	m_outfmt_i32_check.SetCheck(m_outfmt_i32);
 	m_outfmt_flt_check.SetCheck(m_outfmt_flt);
 	p.y += h25;
 
-	m_drc_check.Create(ResStr(IDS_MPADEC_DRC), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(210), m_fontheight)), this, IDC_PP_CHECK_DRC);
+	m_drc_check.Create(ResStr(IDS_MPADEC_DRC), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(220), m_fontheight)), this, IDC_PP_CHECK_DRC);
 	m_drc_check.SetCheck(m_drc);
 	p.y += h25;
 
-	m_mixer_group.Create(_T(""), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(215), h20 + h25)), this, (UINT)IDC_STATIC);
+	m_mixer_group.Create(_T(""), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(230), h20 + h25)), this, (UINT)IDC_STATIC);
 	m_mixer_check.Create(ResStr(IDS_MPADEC_MIXER), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(60), m_fontheight)), this, IDC_PP_CHECK_MIXER);
 	m_mixer_check.SetCheck(m_mixer);
 	p.y += h20;
@@ -120,15 +120,15 @@ bool CMpaDecSettingsWnd::OnActivate()
 	ScreenToClient(r);
 	p.y += h30;
 
-	m_spdif_group.Create(ResStr(IDS_MPADEC_SPDIF), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(215), h20 + h20 * 4)), this, (UINT)IDC_STATIC);
+	m_spdif_group.Create(ResStr(IDS_MPADEC_SPDIF), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(230), h20 + h20 * 4)), this, (UINT)IDC_STATIC);
 	p.y += h20;
-	m_spdif_ac3_check.Create(_T("AC-3"), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_CHECK_SPDIF_AC3);
-	m_spdif_dts_check.Create(_T("DTS"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(IPP_SCALE(100), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_CHECK_SPDIF_DTS);
+	m_spdif_ac3_check.Create(_T("AC-3"), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(50), m_fontheight)), this, IDC_PP_CHECK_SPDIF_AC3);
+	m_spdif_dts_check.Create(_T("DTS"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(IPP_SCALE(110), 0), CSize(IPP_SCALE(50), m_fontheight)), this, IDC_PP_CHECK_SPDIF_DTS);
 	p.y += h20;
 	m_spdif_eac3_check.Create(_T("E-AC3"), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(50), m_fontheight)), this, IDC_PP_CHECK_SPDIF_EAC3);
-	m_spdif_dtshd_check.Create(_T("DTS-HD"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(IPP_SCALE(100), 0), CSize(IPP_SCALE(60), m_fontheight)), this, IDC_PP_CHECK_SPDIF_DTSHD);
+	m_spdif_dtshd_check.Create(_T("DTS-HD"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(IPP_SCALE(110), 0), CSize(IPP_SCALE(65), m_fontheight)), this, IDC_PP_CHECK_SPDIF_DTSHD);
 	p.y += h20;
-	m_spdif_truehd_check.Create(_T("TrueHD"), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(55), m_fontheight)), this, IDC_PP_CHECK_SPDIF_TRUEHD);
+	m_spdif_truehd_check.Create(_T("TrueHD"), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(60), m_fontheight)), this, IDC_PP_CHECK_SPDIF_TRUEHD);
 	m_spdif_ac3_check.SetCheck(m_spdif_ac3);
 	m_spdif_eac3_check.SetCheck(m_spdif_eac3);
 	m_spdif_truehd_check.SetCheck(m_spdif_truehd);
