@@ -224,6 +224,8 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
     case AV_PIX_FMT_YUV420P12BE:
     case AV_PIX_FMT_YUV420P14LE:
     case AV_PIX_FMT_YUV420P14BE:
+    case AV_PIX_FMT_YUV420P16LE:
+    case AV_PIX_FMT_YUV420P16BE:
     case AV_PIX_FMT_YUV422P9LE:
     case AV_PIX_FMT_YUV422P9BE:
     case AV_PIX_FMT_YUV422P10LE:
@@ -232,6 +234,8 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
     case AV_PIX_FMT_YUV422P12BE:
     case AV_PIX_FMT_YUV422P14LE:
     case AV_PIX_FMT_YUV422P14BE:
+    case AV_PIX_FMT_YUV422P16LE:
+    case AV_PIX_FMT_YUV422P16BE:
     case AV_PIX_FMT_YUV444P9LE:
     case AV_PIX_FMT_YUV444P9BE:
     case AV_PIX_FMT_YUV444P10LE:
@@ -240,18 +244,26 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
     case AV_PIX_FMT_YUV444P12BE:
     case AV_PIX_FMT_YUV444P14LE:
     case AV_PIX_FMT_YUV444P14BE:
+    case AV_PIX_FMT_YUV444P16LE:
+    case AV_PIX_FMT_YUV444P16BE:
     case AV_PIX_FMT_YUVA420P9LE:
     case AV_PIX_FMT_YUVA420P9BE:
     case AV_PIX_FMT_YUVA420P10LE:
     case AV_PIX_FMT_YUVA420P10BE:
+    case AV_PIX_FMT_YUVA420P16LE:
+    case AV_PIX_FMT_YUVA420P16BE:
     case AV_PIX_FMT_YUVA422P9LE:
     case AV_PIX_FMT_YUVA422P9BE:
     case AV_PIX_FMT_YUVA422P10LE:
     case AV_PIX_FMT_YUVA422P10BE:
+    case AV_PIX_FMT_YUVA422P16LE:
+    case AV_PIX_FMT_YUVA422P16BE:
     case AV_PIX_FMT_YUVA444P9LE:
     case AV_PIX_FMT_YUVA444P9BE:
     case AV_PIX_FMT_YUVA444P10LE:
     case AV_PIX_FMT_YUVA444P10BE:
+    case AV_PIX_FMT_YUVA444P16LE:
+    case AV_PIX_FMT_YUVA444P16BE:
     case AV_PIX_FMT_GBRP9LE:
     case AV_PIX_FMT_GBRP9BE:
     case AV_PIX_FMT_GBRP10LE:
@@ -2119,6 +2131,7 @@ int attribute_align_arg avcodec_decode_audio4(AVCodecContext *avctx,
     if ((avctx->codec->capabilities & CODEC_CAP_DELAY) || avpkt->size || (avctx->active_thread_type & FF_THREAD_FRAME)) {
         uint8_t *side;
         int side_size;
+        uint32_t discard_padding = 0;
         // copy to ensure we do not change avpkt
         AVPacket tmp = *avpkt;
         int did_split = av_packet_split_side_data(&tmp);
@@ -2153,6 +2166,7 @@ int attribute_align_arg avcodec_decode_audio4(AVCodecContext *avctx,
             avctx->internal->skip_samples = AV_RL32(side);
             av_log(avctx, AV_LOG_DEBUG, "skip %d samples due to side data\n",
                    avctx->internal->skip_samples);
+            discard_padding = AV_RL32(side + 4);
         }
         if (avctx->internal->skip_samples && *got_frame_ptr) {
             if(frame->nb_samples <= avctx->internal->skip_samples){
@@ -2180,6 +2194,25 @@ int attribute_align_arg avcodec_decode_audio4(AVCodecContext *avctx,
                        avctx->internal->skip_samples, frame->nb_samples);
                 frame->nb_samples -= avctx->internal->skip_samples;
                 avctx->internal->skip_samples = 0;
+            }
+        }
+
+        if (discard_padding > 0 && discard_padding <= frame->nb_samples && *got_frame_ptr) {
+            if (discard_padding == frame->nb_samples) {
+                *got_frame_ptr = 0;
+            } else {
+                if(avctx->pkt_timebase.num && avctx->sample_rate) {
+                    int64_t diff_ts = av_rescale_q(frame->nb_samples - discard_padding,
+                                                   (AVRational){1, avctx->sample_rate},
+                                                   avctx->pkt_timebase);
+                    if (av_frame_get_pkt_duration(frame) >= diff_ts)
+                        av_frame_set_pkt_duration(frame, av_frame_get_pkt_duration(frame) - diff_ts);
+                } else {
+                    av_log(avctx, AV_LOG_WARNING, "Could not update timestamps for discarded samples.\n");
+                }
+                av_log(avctx, AV_LOG_DEBUG, "discard %d/%d samples\n",
+                       discard_padding, frame->nb_samples);
+                frame->nb_samples -= discard_padding;
             }
         }
 
