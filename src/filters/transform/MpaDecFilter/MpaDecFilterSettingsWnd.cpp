@@ -94,7 +94,7 @@ bool CMpaDecSettingsWnd::OnActivate()
 	m_outfmt_flt_check.SetCheck(m_outfmt_flt);
 	p.y += h25;
 
-	m_drc_check.Create(ResStr(IDS_MPADEC_DRC), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(205), m_fontheight)), this, IDC_PP_CHECK_DRC);
+	m_drc_check.Create(ResStr(IDS_MPADEC_DRC), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(210), m_fontheight)), this, IDC_PP_CHECK_DRC);
 	m_drc_check.SetCheck(m_drc);
 	p.y += h25;
 
