@@ -439,6 +439,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	REFERENCE_TIME AvgTimePerFrame	= 0;
 	REFERENCE_TIME metaDataDuration	= 0;
+	DWORD nSamplesPerSec			= 0;
 
 	m_sps.RemoveAll();
 
@@ -474,6 +475,18 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						if (AMF0Array[i].type == AMF_DATA_TYPE_NUMBER && AMF0Array[i].name == L"duration") {
 							metaDataDuration = (REFERENCE_TIME)(UNITS * (double)AMF0Array[i]);
 						}
+						if (AMF0Array[i].type == AMF_DATA_TYPE_NUMBER && AMF0Array[i].name == L"framerate") {
+							double value = AMF0Array[i];
+							if (value != 0 && value != 1000) {
+								AvgTimePerFrame = (REFERENCE_TIME)(UNITS / (int)value);
+							}
+						}
+						if (AMF0Array[i].type == AMF_DATA_TYPE_NUMBER && AMF0Array[i].name == L"audiosamplerate") {
+							double value = AMF0Array[i];
+							if (value != 0) {
+								nSamplesPerSec = value;
+							}
+						}
 					}
 				}
 			}
@@ -491,9 +504,9 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				mt.formattype			= FORMAT_WaveFormatEx;
 				WAVEFORMATEX* wfe		= (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX));
 				memset(wfe, 0, sizeof(WAVEFORMATEX));
-				wfe->nSamplesPerSec		= 44100*(1<<at.SoundRate)/8;
-				wfe->wBitsPerSample		= 8*(at.SoundSize+1);
-				wfe->nChannels			= at.SoundType+1;
+				wfe->nSamplesPerSec		= nSamplesPerSec ? nSamplesPerSec : 44100*(1<<at.SoundRate)/8;
+				wfe->wBitsPerSample		= 8 * (at.SoundSize + 1);
+				wfe->nChannels			= at.SoundType + 1;
 
 				switch (at.SoundFormat) {
 					case FLV_AUDIO_PCM:
@@ -529,6 +542,10 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					case FLV_AUDIO_NELLY:
 						mt.subtype = FOURCCMap(MAKEFOURCC('N','E','L','L'));
 						name += L" Nellimoser";
+						break;
+					case FLV_AUDIO_SPEEX:
+						mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_SPEEX);
+						name += L" Speex";
 						break;
 					case FLV_AUDIO_AAC: {
 						if (dataSize < 1 || m_pFile->BitRead(8) != 0) { // packet type 0 == aac header
@@ -609,7 +626,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						while ((frame_cnt < 30) && ReadTag(tag) && !CheckRequest(NULL) && m_pFile->GetRemaining(true)) {
 							__int64 _next = m_pFile->GetPos() + tag.DataSize;
 
-							if ((tag.DataSize > 0) && (tag.TagType == FLV_VIDEODATA && ReadTag(vtag))) {
+							if ((tag.DataSize > 0) && (tag.TagType == FLV_VIDEODATA && ReadTag(vtag) && tag.TimeStamp > 0)) {
 
 								if (tag.TimeStamp != current_ts) {
 									frame_cnt++;
@@ -617,14 +634,16 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 								current_ts = tag.TimeStamp;
 
-								if (!frame_cnt) {
+								if (!first_ts && current_ts) {
 									first_ts = current_ts;
 								}
+
+								current_ts = tag.TimeStamp;
 							}
 							m_pFile->Seek(_next);
 						}
 
-						AvgTimePerFrame = 10000 * (current_ts - first_ts)/frame_cnt;
+						AvgTimePerFrame = 10000 * (current_ts - first_ts)/(frame_cnt - 1);
 					}
 
 					m_pFile->Seek(pos);

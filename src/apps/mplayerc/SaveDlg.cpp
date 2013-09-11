@@ -408,7 +408,7 @@ HRESULT CSaveTaskDlg::InitFileCopy()
 		CComPtr<IUnknown> pUnk;
 		pUnk.CoCreateInstance(CLSID_AsyncReader);
 
-		if (FAILED(hr) || !(pReader = pUnk) || FAILED(pReader->Load(fnw, NULL))) {
+		if (!(pReader = pUnk) || FAILED(pReader->Load(fnw, NULL))) {
 			pReader.Release();
 		}
 	}
@@ -421,7 +421,7 @@ HRESULT CSaveTaskDlg::InitFileCopy()
 		if (CComQIPtr<IBaseFilter> pSrc = pUnk) {
 			pGB->AddFilter(pSrc, fnw);
 
-			if (FAILED(hr) || !(pReader = pUnk) || FAILED(hr = pReader->Load(fnw, NULL))) {
+			if (!(pReader = pUnk) || FAILED(hr = pReader->Load(fnw, NULL))) {
 				pReader.Release();
 				pGB->RemoveFilter(pSrc);
 			}
