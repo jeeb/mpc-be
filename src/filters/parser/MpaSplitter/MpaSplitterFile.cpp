@@ -443,11 +443,7 @@ HRESULT CMpaSplitterFile::Init()
 		return E_FAIL;
 	}
 
-	if (IsStreaming()) {
-		for (int i = 0; i < 20 || i < 50 && S_OK != HasMoreData(1024*100, 100); i++) {
-			;
-		}
-	}
+	WaitAvailable(1500, 64 * KILOBYTE);
 
 	m_startpos = startpos;
 

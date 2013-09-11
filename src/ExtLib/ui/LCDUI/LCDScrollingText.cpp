@@ -56,7 +56,6 @@ HRESULT CLCDScrollingText::Initialize(void)
     m_dwStartDelay  = 1000;
     m_dwSpeed       = 20;
     m_nScrollingDistance = -1;
-    m_dwLastUpdate = 0;
     m_dwEllapsedTime = 0;
     m_dwLastUpdate = GetTickCount();
     m_fTotalDistance = 0;

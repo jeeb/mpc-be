@@ -13270,22 +13270,6 @@ CString CMainFrame::OpenCapture(OpenDeviceData* pODD)
 		if (FAILED(pCGB->FindInterface(&LOOK_UPSTREAM_ONLY, NULL, pVidCap, IID_IAMTVTuner, (void**)&pAMTuner))) {
 			TRACE(_T("Warning: No IAMTVTuner interface was found\n"));
 		}
-		/*
-				if (pAMVSCCap)
-				{
-					//DumpStreamConfig(_T("c:\\mpclog.txt"), pAMVSCCap);
-		            CComQIPtr<IAMVfwCaptureDialogs> pVfwCD = pVidCap;
-					if (!pAMXBar && pVfwCD)
-					{
-						m_wndCaptureBar.m_capdlg.SetupVideoControls(viddispname, pAMVSCCap, pVfwCD);
-					}
-					else
-					{
-						m_wndCaptureBar.m_capdlg.SetupVideoControls(viddispname, pAMVSCCap, pAMXBar, pAMTuner);
-					}
-				}
-		*/
-		// TODO: init pAMXBar
 
 		if (pAMTuner) { // load saved channel
 			pAMTuner->put_CountryCode(AfxGetApp()->GetProfileInt(_T("Capture"), _T("Country"), 1));

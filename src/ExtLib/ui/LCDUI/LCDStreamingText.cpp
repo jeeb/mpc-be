@@ -69,7 +69,6 @@ HRESULT CLCDStreamingText::Initialize(void)
     m_dwStartDelay  = 2000;
     m_dwSpeed       = 7;
 	m_dwStepInPixels = 7;
-    m_dwLastUpdate = 0;
     m_dwEllapsedTime = 0;
     m_dwLastUpdate = GetTickCount();
     m_bRecalcExtent = FALSE;

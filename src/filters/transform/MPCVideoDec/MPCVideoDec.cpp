@@ -47,12 +47,13 @@
 #include "../../../DSUtil/WinAPIUtils.h"
 #include "Version.h"
 
+#pragma warning(push)
 #pragma warning(disable: 4005)
 extern "C" {
 	#include <ffmpeg/libavcodec/avcodec.h>
 	#include <ffmpeg/libswscale/swscale.h>
 }
-#pragma warning(default: 4005)
+#pragma warning(pop)
 
 // option names
 #define OPT_REGKEY_VideoDec  _T("Software\\MPC-BE Filters\\MPC Video Decoder")

@@ -41,96 +41,6 @@
 // flag for display only forced subtitles (PGS/VOBSUB)
 bool g_bForcedSubtitle = false;
 
-void DumpStreamConfig(TCHAR* fn, IAMStreamConfig* pAMVSCCap)
-{
-	CString s;
-	CStdioFile f;
-	if (!f.Open(fn, CFile::modeCreate|CFile::modeWrite|CFile::typeText)) {
-		return;
-	}
-
-	int cnt = 0, size = 0;
-	if (FAILED(pAMVSCCap->GetNumberOfCapabilities(&cnt, &size))) {
-		return;
-	}
-
-	s.Format(_T("cnt %d, size %d\n"), cnt, size);
-	f.WriteString(s);
-
-	if (size == sizeof(VIDEO_STREAM_CONFIG_CAPS)) {
-		for (int i = 0; i < cnt; i++) {
-			AM_MEDIA_TYPE* pmt = NULL;
-
-			VIDEO_STREAM_CONFIG_CAPS caps;
-			memset(&caps, 0, sizeof(caps));
-
-			s.Format(_T("%d\n"), i);
-			f.WriteString(s);
-
-			if (FAILED(pAMVSCCap->GetStreamCaps(i, &pmt, (BYTE*)&caps))) {
-				continue;
-			}
-
-			{
-				s = _T("VIDEO_STREAM_CONFIG_CAPS\n");
-				s.AppendFormat(_T("\tVideoStandard 0x%08x\n"), caps.VideoStandard);
-				s.AppendFormat(_T("\tInputSize %dx%d\n"), caps.InputSize);
-				s.AppendFormat(_T("\tCroppingSize %dx%d - %dx%d\n"), caps.MinCroppingSize, caps.MaxCroppingSize);
-				s.AppendFormat(_T("\tCropGranularity %d, %d\n"), caps.CropGranularityX, caps.CropGranularityY);
-				s.AppendFormat(_T("\tCropAlign %d, %d\n"), caps.CropAlignX, caps.CropAlignY);
-				s.AppendFormat(_T("\tOutputSize %dx%d - %dx%d\n"), caps.MinOutputSize, caps.MaxOutputSize);
-				s.AppendFormat(_T("\tOutputGranularity %d, %d\n"), caps.OutputGranularityX, caps.OutputGranularityY);
-				s.AppendFormat(_T("\tStretchTaps %d, %d\n"), caps.StretchTapsX, caps.StretchTapsY);
-				s.AppendFormat(_T("\tShrinkTaps %d, %d\n"), caps.ShrinkTapsX, caps.ShrinkTapsY);
-				s.AppendFormat(_T("\tFrameInterval %I64d, %I64d (%.4f, %.4f)\n"),
-							   caps.MinFrameInterval, caps.MaxFrameInterval,
-							   (float)10000000/caps.MinFrameInterval, (float)10000000/caps.MaxFrameInterval);
-				s.AppendFormat(_T("\tBitsPerSecond %d - %d\n"), caps.MinBitsPerSecond, caps.MaxBitsPerSecond);
-				f.WriteString(s);
-			}
-
-			BITMAPINFOHEADER* pbh;
-			if (pmt->formattype == FORMAT_VideoInfo) {
-				VIDEOINFOHEADER* vih = (VIDEOINFOHEADER*)pmt->pbFormat;
-				pbh = &vih->bmiHeader;
-
-				s = _T("FORMAT_VideoInfo\n");
-				s.AppendFormat(_T("\tAvgTimePerFrame %I64d, %.4f\n"), vih->AvgTimePerFrame, (float)10000000/vih->AvgTimePerFrame);
-				s.AppendFormat(_T("\trcSource %d,%d,%d,%d\n"), vih->rcSource);
-				s.AppendFormat(_T("\trcTarget %d,%d,%d,%d\n"), vih->rcTarget);
-				f.WriteString(s);
-			} else if (pmt->formattype == FORMAT_VideoInfo2) {
-				VIDEOINFOHEADER2* vih = (VIDEOINFOHEADER2*)pmt->pbFormat;
-				pbh = &vih->bmiHeader;
-
-				s  = _T("FORMAT_VideoInfo2\n");
-				s.AppendFormat(_T("\tAvgTimePerFrame %I64d, %.4f\n"), vih->AvgTimePerFrame, (float)10000000/vih->AvgTimePerFrame);
-				s.AppendFormat(_T("\trcSource %d,%d,%d,%d\n"), vih->rcSource);
-				s.AppendFormat(_T("\trcTarget %d,%d,%d,%d\n"), vih->rcTarget);
-				s.AppendFormat(_T("\tdwInterlaceFlags 0x%x\n"), vih->dwInterlaceFlags);
-				s.AppendFormat(_T("\tdwPictAspectRatio %d:%d\n"), vih->dwPictAspectRatioX, vih->dwPictAspectRatioY);
-				f.WriteString(s);
-			} else {
-				DeleteMediaType(pmt);
-				continue;
-			}
-
-			s = _T("BITMAPINFOHEADER\n");
-			s.AppendFormat(_T("\tbiCompression %x\n"), pbh->biCompression);
-			s.AppendFormat(_T("\tbiWidth %d\n"), pbh->biWidth);
-			s.AppendFormat(_T("\tbiHeight %d\n"), pbh->biHeight);
-			s.AppendFormat(_T("\tbiBitCount %d\n"), pbh->biBitCount);
-			s.AppendFormat(_T("\tbiPlanes %d\n"), pbh->biPlanes);
-			s.AppendFormat(_T("\tbiSizeImage %d\n"), pbh->biSizeImage);
-			f.WriteString(s);
-
-			DeleteMediaType(pmt);
-		}
-	} else if (size == sizeof(AUDIO_STREAM_CONFIG_CAPS)) {
-		// TODO
-	}
-}
-
 int CountPins(IBaseFilter* pBF, int& nIn, int& nOut, int& nInC, int& nOutC)
 {
 	nIn = nOut = 0;
@@ -1057,7 +967,7 @@ bool GetKeyFrames(CString fn, CUIntArray& kfs)
 				} else {
 					for (LONG kf = 0; ; kf++) {
 						kf = pavi->FindSample(kf, FIND_KEY|FIND_NEXT);
-						if (kf < 0 || kfs.GetCount() > 0 && kfs[kfs.GetCount()-1] >= (UINT)kf) {
+						if (kf < 0 || (kfs.GetCount() > 0 && kfs[kfs.GetCount()-1] >= (UINT)kf)) {
 							break;
 						}
 						kfs.Add(kf);
@@ -1489,7 +1399,7 @@ CStringW GetFriendlyName(CStringW DisplayName)
 	CComPtr<IMoniker> pMoniker;
 	ULONG chEaten;
 	if (S_OK != MkParseDisplayName(pBindCtx, CComBSTR(DisplayName), &chEaten, &pMoniker)) {
-		return false;
+		return L"";
 	}
 
 	CComPtr<IPropertyBag> pPB;

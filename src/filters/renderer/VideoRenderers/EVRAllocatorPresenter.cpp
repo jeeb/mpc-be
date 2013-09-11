@@ -2058,7 +2058,7 @@ void CEVRAllocatorPresenter::RenderThread()
 								}
 
 								LONGLONG MinMargin;
-								if (m_FrameTimeCorrection && 0) {
+								if (m_FrameTimeCorrection == 0) {
 									MinMargin = 15000;
 								} else {
 									MinMargin = 15000 + min(LONGLONG(m_DetectedFrameTimeStdDev), 20000);

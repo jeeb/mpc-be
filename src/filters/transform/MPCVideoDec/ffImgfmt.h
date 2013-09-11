@@ -92,6 +92,7 @@ template<class T,size_t a> struct allocator_traits<array_allocator<T,a> > {
 #include <time.h>
 #include <wchar.h>
 
+#pragma warning(push)
 #pragma warning(disable:4995 4996)
 
 #undef _l
@@ -360,7 +361,7 @@ template<> template<> inline text<char>::text(const wchar_t *in,int inlen,char *
 
 #endif
 
-#pragma warning(default:4995 4996)
+#pragma warning(pop)
 
 #endif
 

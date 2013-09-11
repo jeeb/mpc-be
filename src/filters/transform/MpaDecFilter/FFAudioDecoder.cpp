@@ -434,7 +434,7 @@ HRESULT CFFAudioDecoder::ParseRealAudioHeader(const BYTE* extra, const int extra
 	if (version == 3) {
 		TRACE(_T("FFAudioDecoder: RealAudio Header version 3 unsupported\n"));
 		return VFW_E_UNSUPPORTED_AUDIO;
-	} else if (version == 4 || version == 5 && extralen > 50) {
+	} else if (version == 4 || (version == 5 && extralen > 50)) {
 		// main format block
 		fmt += 2;  // word - unused (always 0)
 		fmt += 4;  // byte[4] - .ra4/.ra5 signature

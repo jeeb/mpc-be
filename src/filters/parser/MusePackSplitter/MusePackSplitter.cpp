@@ -184,11 +184,10 @@ HRESULT CMusePackSplitter::CheckInputType(const CMediaType* mtIn)
 
 		// and we may accept unknown type as well
 		if (mtIn->subtype == MEDIASUBTYPE_None ||
-			mtIn->subtype == MEDIASUBTYPE_NULL ||
-			mtIn->subtype == GUID_NULL) {
+			mtIn->subtype == MEDIASUBTYPE_NULL) {
 			return S_OK;
 		}
-	} else if (mtIn->majortype == GUID_NULL) {
+	} else if (mtIn->majortype == MEDIASUBTYPE_NULL) {
 		return S_OK;
 	}
 

@@ -22,9 +22,10 @@
 
 #pragma once
 
+#pragma warning(push)
 #pragma warning(disable: 4005)
 #include <stdint.h>
-#pragma warning(default: 4005)
+#pragma warning(pop)
 #include "SampleFormat.h"
 
 #ifdef _MSC_VER

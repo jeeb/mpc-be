@@ -1371,10 +1371,8 @@ HRESULT COggTheoraOutputPin::UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int 
 COggDiracOutputPin::COggDiracOutputPin(BYTE* p, int nCount, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: COggSplitterOutputPin(pName, pFilter, pLock, phr)
 {
-	m_bOldDirac		= false;
 	m_IsInitialized	= false;
-
-	m_bOldDirac = !memcmp(p, "KW-DIRAC\x00", 9);
+	m_bOldDirac		= !memcmp(p, "KW-DIRAC\x00", 9);
 }
 
 HRESULT COggDiracOutputPin::UnpackInitPage(OggPage& page)

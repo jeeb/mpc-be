@@ -235,8 +235,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		return hr;
 	}
 
-	m_rtNewStart = m_rtCurrent = 0;
-	m_rtNewStop = m_rtStop = 0;
+	m_rtNewStart = m_rtCurrent = m_rtNewStop = 0;
 
 	m_rtStop = 10000i64*m_pFile->m_p.tDuration;
 
@@ -1481,7 +1480,7 @@ void GetDimensions_X10(unsigned char* p, unsigned int* wi, unsigned int* hi,
 			*repeat_field = true;
 		}
 
-		c = GetBits(1);
+		GetBits(1);
 		c = GetBits(1);
 		if (c) {
 			GetBits(2);

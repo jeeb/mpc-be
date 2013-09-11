@@ -1691,7 +1691,7 @@ CRect Rasterizer::Draw(SubPicDesc& spd, CRect& clipRect, byte* pAlphaMask, int x
 {
 	CRect bbox(0, 0, 0, 0);
 
-	if (!switchpts || !fBody && !fBorder) {
+	if (!switchpts || (!fBody && !fBorder)) {
 		return bbox;
 	}
 

@@ -37,7 +37,7 @@ CLCDColorText::CLCDColorText(void)
     m_bRecalcExtent = TRUE;
     ZeroMemory(&m_dtp, sizeof(DRAWTEXTPARAMS));
     m_dtp.cbSize = sizeof(DRAWTEXTPARAMS);
-    m_nTextFormat = m_nTextAlignment = (DT_LEFT | DT_NOPREFIX);
+    m_nTextFormat = (DT_LEFT | DT_NOPREFIX);
     m_nTextAlignment = DT_LEFT;
     ZeroMemory(&m_sizeVExtent, sizeof(m_sizeVExtent));
     ZeroMemory(&m_sizeHExtent, sizeof(m_sizeHExtent));

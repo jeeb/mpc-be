@@ -111,7 +111,7 @@ void CDXVADecoderH264::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSi
 				case NALU_TYPE_SLICE:
 				case NALU_TYPE_IDR:
 					// Skip the NALU if the data length is below 0
-					if (Nalu.GetDataLength() < 0) {
+					if ((int)Nalu.GetDataLength() < 0) {
 						break;
 					}
 

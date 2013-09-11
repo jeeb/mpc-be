@@ -300,7 +300,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 			SetFilePointerEx(m_hFile, Pos, NULL, FILE_BEGIN);
 			Pos.QuadPart += ReadShort() + 2;
 			ReadBuffer(Buff, 5);
-			Item.m_strFileName.Format(_T("%s\\STREAM\\%c%c%c%c%c.M2TS"), Path, Buff[0], Buff[1], Buff[2], Buff[3], Buff[4]);
+			Item.m_strFileName.Format(_T("%s\\STREAM\\%c%c%c%c%c.M2TS"), CString(Path), Buff[0], Buff[1], Buff[2], Buff[3], Buff[4]);
 
 			ReadBuffer(Buff, 4);
 			if (memcmp (Buff, "M2TS", 4)) {

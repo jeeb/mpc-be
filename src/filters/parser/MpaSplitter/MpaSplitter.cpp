@@ -165,7 +165,7 @@ HRESULT CMpaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		CString f_name = _T("cover");
 		if (m_pFile->m_CoverMime == _T("image/jpeg")) {
 			f_name.Append(_T(".jpg"));
-		} else if (m_pFile->m_CoverMime == _T("image/jpeg")) {
+		} else if (m_pFile->m_CoverMime == _T("image/png")) {
 			f_name.Append(_T(".png"));
 		}
 		ResAppend(f_name, _T("cover"), m_pFile->m_CoverMime, m_pFile->m_Cover.GetData(), (DWORD)m_pFile->m_Cover.GetCount());

@@ -83,7 +83,7 @@ DWORD ParseWAVECDHeader(CFile &file)
 	if (file.Read(&pcmwf, sizeof(pcmwf)) != sizeof(pcmwf)
 			|| pcmwf.wf.wFormatTag != WAVE_FORMAT_PCM
 			|| pcmwf.wf.nChannels != 2
-			|| pcmwf.wf.nSamplesPerSec != 44100 && pcmwf.wf.nSamplesPerSec != 48000
+			|| (pcmwf.wf.nSamplesPerSec != 44100 && pcmwf.wf.nSamplesPerSec != 48000)
 			|| pcmwf.wf.nBlockAlign != 4
 			|| pcmwf.wf.nAvgBytesPerSec != pcmwf.wf.nSamplesPerSec * pcmwf.wf.nBlockAlign
 			|| pcmwf.wBitsPerSample != 16) {

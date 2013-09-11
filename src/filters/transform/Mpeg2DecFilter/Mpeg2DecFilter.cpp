@@ -1696,7 +1696,7 @@ void CSubpicInputPin::RenderSubpics(REFERENCE_TIME rt, BYTE** yuv, int w, int h)
 	while (pos) {
 		spu* sp = m_sps.GetNext(pos);
 		if (sp->m_rtStart <= rt && rt < sp->m_rtStop
-				&& (m_spon || sp->m_fForced && ((static_cast<CMpeg2DecFilter*>(m_pFilter))->IsForcedSubtitlesEnabled() || sp->m_psphli))) {
+				&& (m_spon || (sp->m_fForced && ((static_cast<CMpeg2DecFilter*>(m_pFilter))->IsForcedSubtitlesEnabled()) || sp->m_psphli))) {
 			sp->Render(rt, yuv, w, h, m_sppal, m_fsppal);
 		}
 	}

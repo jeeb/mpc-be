@@ -666,7 +666,7 @@ UINT CShoutcastStream::SocketThreadProc()
 					break;
 				}
 
-				if (len <= 0 || e - s >= len + 2 && (s[len] != 0xff || (s[len+1]&0xf6) != 0xf0)) {
+				if (len <= 0 || (e - s >= len + 2 && (s[len] != 0xff || (s[len+1]&0xf6) != 0xf0))) {
 					m_p.Free();
 					break;
 				}

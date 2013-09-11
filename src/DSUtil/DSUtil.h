@@ -36,7 +36,6 @@
 #define LCID_NOSUBTITLES	-1
 #define INVALID_TIME		_I64_MIN
 
-extern void DumpStreamConfig(TCHAR* fn, IAMStreamConfig* pAMVSCCap);
 extern int CountPins(IBaseFilter* pBF, int& nIn, int& nOut, int& nInC, int& nOutC);
 extern bool IsSplitter(IBaseFilter* pBF, bool fCountConnectedOnly = false);
 extern bool IsMultiplexer(IBaseFilter* pBF, bool fCountConnectedOnly = false);

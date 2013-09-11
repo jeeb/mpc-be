@@ -133,7 +133,7 @@ HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
 			pRTS->m_dstScreenSize = DEFSCREENSIZE;
 			pRTS->CreateDefaultStyle(DEFAULT_CHARSET);
 
-			if (dwOffset > 0 && m_mt.cbFormat - dwOffset > 0) {
+			if (dwOffset > 0 && m_mt.cbFormat != dwOffset) {
 				CMediaType mt = m_mt;
 				if (mt.pbFormat[dwOffset+0] != 0xef
 						&& mt.pbFormat[dwOffset+1] != 0xbb
@@ -214,12 +214,12 @@ STDMETHODIMP CSubtitleInputPin::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME
 	CAutoLock cAutoLock(&m_csReceive);
 
 	if (m_mt.majortype == MEDIATYPE_Text
-			|| m_mt.majortype == MEDIATYPE_Subtitle
+			|| (m_mt.majortype == MEDIATYPE_Subtitle
 			&& (m_mt.subtype == MEDIASUBTYPE_UTF8
 				/*|| m_mt.subtype == MEDIASUBTYPE_USF*/
 				|| m_mt.subtype == MEDIASUBTYPE_SSA
 				|| m_mt.subtype == MEDIASUBTYPE_ASS
-				|| m_mt.subtype == MEDIASUBTYPE_ASS2)) {
+				|| m_mt.subtype == MEDIASUBTYPE_ASS2))) {
 		CAutoLock cAutoLock(m_pSubLock);
 		CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)(ISubStream*)m_pSubStream;
 		pRTS->RemoveAll();

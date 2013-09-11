@@ -858,7 +858,7 @@ void CFLVSplitterFilter::NormalSeek(REFERENCE_TIME rt)
 	}
 
 	if (!pos) {
-		__int64 pos = m_DataOffset + (__int64)(double(m_pFile->GetLength() - m_DataOffset) * rt / m_rtDuration);
+		pos = m_DataOffset + (__int64)(double(m_pFile->GetLength() - m_DataOffset) * rt / m_rtDuration);
 	}
 
 	if (pos > m_pFile->GetAvailable()) {
