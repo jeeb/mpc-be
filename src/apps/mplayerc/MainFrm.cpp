@@ -19340,7 +19340,11 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return __super::WindowProc(message, wParam, lParam);
 }
 
+#if (_MSC_VER < 1800)
 UINT CMainFrame::OnPowerBroadcast(UINT nPowerEvent, UINT nEventData)
+#else
+UINT CMainFrame::OnPowerBroadcast(UINT nPowerEvent, LPARAM nEventData)
+#endif
 {
 	static BOOL bWasPausedBeforeSuspention;
 	OAFilterState mediaState;
@@ -19352,17 +19356,17 @@ UINT CMainFrame::OnPowerBroadcast(UINT nPowerEvent, UINT nEventData)
 			bWasPausedBeforeSuspention = FALSE; // Reset value
 
 			mediaState = GetMediaState();
-			if ( mediaState == State_Running ) {
+			if (mediaState == State_Running) {
 				bWasPausedBeforeSuspention = TRUE;
-				SendMessage( WM_COMMAND, ID_PLAY_PAUSE ); // Pause
+				SendMessage(WM_COMMAND, ID_PLAY_PAUSE); // Pause
 			}
 			break;
 		case PBT_APMRESUMEAUTOMATIC: // Operation is resuming automatically from a low-power state. This message is sent every time the system resumes.
 			TRACE("OnPowerBroadcast() - resuming\n"); // For user tracking
 
 			// Resume if we paused before suspension.
-			if ( bWasPausedBeforeSuspention ) {
-				SendMessage( WM_COMMAND, ID_PLAY_PLAY );    // Resume
+			if (bWasPausedBeforeSuspention) {
+				SendMessage(WM_COMMAND, ID_PLAY_PLAY);    // Resume
 			}
 			break;
 	}
@@ -19405,7 +19409,6 @@ void CMainFrame::WTSRegisterSessionNotification()
 		WTSREGISTERSESSIONNOTIFICATION fnWtsRegisterSessionNotification;
 
 		fnWtsRegisterSessionNotification = (WTSREGISTERSESSIONNOTIFICATION)GetProcAddress(m_hWtsLib, "WTSRegisterSessionNotification");
-
 		if (fnWtsRegisterSessionNotification) {
 			fnWtsRegisterSessionNotification(m_hWnd, NOTIFY_FOR_THIS_SESSION);
 		}

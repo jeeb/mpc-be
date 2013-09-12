@@ -1165,7 +1165,11 @@ protected:
 	HANDLE					m_hRefreshNotifyRenderThreadEvent;
 
 public:
+#if (_MSC_VER < 1800)
 	afx_msg UINT OnPowerBroadcast(UINT nPowerEvent, UINT nEventData);
+#else
+	afx_msg UINT OnPowerBroadcast(UINT nPowerEvent, LPARAM nEventData);
+#endif
 	afx_msg void OnSessionChange(UINT nSessionState, UINT nId);
 
 	void EnableShaders1(bool enable);
