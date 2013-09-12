@@ -90,7 +90,7 @@ bool CMpegSplitterSettingsWnd::OnActivate()
 	p.x += IPP_SCALE(10);
 	m_cbTrueHD.Create(_T("TrueHD"), dwStyle | BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE | WS_GROUP, CRect(p,  CSize(IPP_SCALE(60), m_fontheight + 2)), this, IDC_PP_TRUEHD);
 	m_cbAC3Core.Create(_T("AC-3"), dwStyle | BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE, CRect(p + CPoint(IPP_SCALE(100), 0), CSize(IPP_SCALE(60), m_fontheight + 2)), this, IDC_PP_AC3CORE);
-	m_cbAsIs.Create(ResStr(IDS_MPEGSPLITTER_THD_NOSPLIT), dwStyle | BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE, CRect(p + CPoint(IPP_SCALE(200), 0), CSize(IPP_SCALE(95), m_fontheight + 2)), this, IDC_PP_ASIS);
+	m_cbAsIs.Create(ResStr(IDS_MPEGSPLITTER_THD_NOSPLIT), dwStyle | BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE, CRect(p + CPoint(IPP_SCALE(200), 0), CSize(IPP_SCALE(80), m_fontheight + 2)), this, IDC_PP_ASIS);
 
 	if (m_pMSF) {
 		m_cbFastStreamChange.SetCheck(m_pMSF->GetFastStreamChange());
