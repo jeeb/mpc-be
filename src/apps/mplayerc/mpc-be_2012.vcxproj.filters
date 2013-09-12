@@ -309,18 +309,6 @@
     <ClCompile Include="WebServer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\ExtLib\mfc\afxctrlcontainer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\ExtLib\mfc\afxglobals.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\ExtLib\mfc\afxmaskededit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\ExtLib\mfc\winmdi.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="vkCodes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -681,9 +669,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AboutDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ExtLib\mfc\afxmaskededit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PPageInterface.h">

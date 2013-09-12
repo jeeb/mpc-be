@@ -33,15 +33,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="udf.cpp">
-      <Filter>vstrip</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\ExtLib\mfc\winmdi.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\ExtLib\mfc\afxglobals.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\ExtLib\mfc\afxctrlcontainer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -73,7 +64,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="udf.h">
-      <Filter>vstrip</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

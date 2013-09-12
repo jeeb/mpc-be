@@ -16,6 +16,7 @@
 // CMDIFrameWnd
 
 BEGIN_MESSAGE_MAP(CMDIFrameWnd, CFrameWnd)
+	//{{AFX_MSG_MAP(CMDIFrameWnd)
 	ON_MESSAGE_VOID(WM_IDLEUPDATECMDUI, CMDIFrameWnd::OnIdleUpdateCmdUI)
 	ON_UPDATE_COMMAND_UI(ID_WINDOW_ARRANGE, &CMDIFrameWnd::OnUpdateMDIWindowCmd)
 	ON_UPDATE_COMMAND_UI(ID_WINDOW_CASCADE, &CMDIFrameWnd::OnUpdateMDIWindowCmd)
@@ -31,6 +32,7 @@ BEGIN_MESSAGE_MAP(CMDIFrameWnd, CFrameWnd)
 	ON_WM_DESTROY()
 	ON_MESSAGE(WM_COMMANDHELP, &CMDIFrameWnd::OnCommandHelp)
 	ON_WM_MENUCHAR()
+	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 CMDIFrameWnd::CMDIFrameWnd()
@@ -82,11 +84,7 @@ BOOL CMDIFrameWnd::OnCmdMsg(UINT nID, int nCode, void* pExtra,
 LRESULT CMDIFrameWnd::OnCommandHelp(WPARAM wParam, LPARAM lParam)
 {
 	if (lParam == 0 && IsTracking())
-#if (_MSC_VER == 1700)
-		lParam = HID_BASE_COMMAND + GetTrackingID();
-#else
 		lParam = HID_BASE_COMMAND+m_nIDTracking;
-#endif
 
 	CMDIChildWnd* pActiveChild = MDIGetActive();
 	if (pActiveChild != NULL && AfxCallWndProc(pActiveChild,
@@ -170,15 +168,9 @@ BOOL CMDIFrameWnd::CreateClient(LPCREATESTRUCT lpCreateStruct,
 	}
 
 	// Create MDICLIENT control with special IDC
-#if (_MSC_VER == 1700)
-	if ((m_hWndMDIClient = CreateWindowEx(dwExStyle, _T("mdiclient"), NULL,
-		dwStyle, 0, 0, 0, 0, m_hWnd, (HMENU)AFX_IDW_PANE_FIRST,
-		AfxGetInstanceHandle(), (LPVOID)&ccs)) == NULL)
-#else
 	if ((m_hWndMDIClient = ::AfxCtxCreateWindowEx(dwExStyle, _T("mdiclient"), NULL,
 		dwStyle, 0, 0, 0, 0, m_hWnd, (HMENU)AFX_IDW_PANE_FIRST,
 		AfxGetInstanceHandle(), (LPVOID)&ccs)) == NULL)
-#endif
 	{
 		TRACE(traceAppMsg, 0, _T("Warning: CMDIFrameWnd::OnCreateClient: failed to create MDICLIENT.")
 			_T(" GetLastError returns 0x%8.8X\n"), ::GetLastError());
@@ -349,6 +341,7 @@ CMDIChildWnd* CMDIFrameWnd::MDIGetActive(BOOL* pbMaximized) const
 	return pWnd;
 }
 
+
 CMDIChildWnd* CMDIFrameWnd::CreateNewChild(CRuntimeClass* pClass,
 		UINT nResources, HMENU hMenu /* = NULL */, HACCEL hAccel /* = NULL */)
 {
@@ -405,6 +398,7 @@ void CMDIFrameWnd::Dump(CDumpContext& dc) const
 // CMDIChildWnd
 
 BEGIN_MESSAGE_MAP(CMDIChildWnd, CFrameWnd)
+	//{{AFX_MSG_MAP(CMDIChildWnd)
 	ON_WM_MOUSEACTIVATE()
 	ON_WM_NCACTIVATE()
 	ON_WM_MDIACTIVATE()
@@ -415,6 +409,7 @@ BEGIN_MESSAGE_MAP(CMDIChildWnd, CFrameWnd)
 	ON_WM_DESTROY()
 	ON_NOTIFY_EX_RANGE(TTN_NEEDTEXTW, 0, 0xFFFF, &CMDIChildWnd::OnToolTipText)
 	ON_NOTIFY_EX_RANGE(TTN_NEEDTEXTA, 0, 0xFFFF, &CMDIChildWnd::OnToolTipText)
+	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 CMDIChildWnd::CMDIChildWnd()
@@ -643,7 +638,8 @@ BOOL CMDIChildWnd::UpdateClientEdge(LPRECT lpRect)
 	// Only adjust for regular MDI child windows, not tabbed windows.  Attempting to set WS_EX_CLIENTEDGE on the tabbed
 	// MDI client area window is subverted by CMDIClientAreaWnd::OnStyleChanging, so we always try to reset the style and
 	// always repaint, none of which is necessary since the tabbed MDI children never change from maximized to restored.
-
+	//CMDIChildWndEx* pChildEx = (pChild == NULL) ? NULL : DYNAMIC_DOWNCAST(CMDIChildWndEx, pChild);
+	//BOOL bIsTabbedMDIChild = (pChildEx == NULL) ? FALSE : pChildEx->GetMDIFrameWndEx() != NULL && pChildEx->GetMDIFrameWndEx()->AreMDITabs();
 	if ((pChild == NULL || pChild == this) /*&& !bIsTabbedMDIChild*/)
 	{
 		// need to adjust the client edge style as max/restore happens
@@ -824,18 +820,6 @@ void CMDIChildWnd::SetHandles(HMENU hMenu, HACCEL hAccel)
 	m_hAccelTable = hAccel;
 }
 
-#if (_MSC_VER == 1700)
-UINT CMDIChildWnd::GetTrackingID()
-{
-	if (GetParentFrame() && GetParentFrame()->IsTracking())
-	{
-		return GetParentFrame()->GetTrackingID();
-	}
-
-	return m_nIDTracking;
-}
-#endif
-
 /////////////////////////////////////////////////////////////////////////////
 // CMDIChildWnd Diagnostics
 
@@ -945,7 +929,7 @@ void CMDIChildWnd::OnUpdateFrameTitle(BOOL bAddToTitle)
 	CDocument* pDocument = GetActiveDocument();
 	if (bAddToTitle)
 	{
-		TCHAR szText[256+_MAX_PATH];
+		TCHAR szText[256+MAX_PATH];
 		if (pDocument == NULL)
 			Checked::tcsncpy_s(szText, _countof(szText), m_strTitle, _TRUNCATE);
 		else
@@ -955,7 +939,7 @@ void CMDIChildWnd::OnUpdateFrameTitle(BOOL bAddToTitle)
 			TCHAR szWinNumber[16+1];
 			_stprintf_s(szWinNumber, _countof(szWinNumber), _T(":%d"), m_nWindow);
 			
-			if( _tcslen(szText) + _tcslen(szWinNumber) < _countof(szText) )
+			if( lstrlen(szText) + lstrlen(szWinNumber) < _countof(szText) )
 			{
 				Checked::tcscat_s( szText, _countof(szText), szWinNumber ); 
 			}

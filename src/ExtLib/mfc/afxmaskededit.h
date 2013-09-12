@@ -47,11 +47,7 @@ public:
 	void EnableSelectByGroup(BOOL bEnable = TRUE) { m_bSelectByGroup = bEnable; }
 
 	void SetWindowText(LPCTSTR lpszString);
-#if (_MSC_VER == 1700)
-	int GetWindowText(_Out_writes_to_(nMaxCount, return + 1) LPTSTR lpszStringBuf, _In_ int nMaxCount) const;
-#else
 	int GetWindowText(_Out_z_cap_post_count_(nMaxCount, return + 1) LPTSTR lpszStringBuf, _In_ int nMaxCount) const;
-#endif
 	void GetWindowText(CString& rstrString) const;
 
 protected:
@@ -84,6 +80,7 @@ private:
 	BOOL    m_bSetTextProcessing;
 
 protected:
+	//{{AFX_MSG(CMFCMaskedEdit)
 	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
@@ -97,6 +94,7 @@ protected:
 	afx_msg LRESULT OnGetText(WPARAM, LPARAM);
 	afx_msg LRESULT OnGetTextLength(WPARAM, LPARAM);
 	afx_msg LRESULT OnInitControl(WPARAM wParam, LPARAM lParam);
+	//}}AFX_MSG
 
 	DECLARE_MESSAGE_MAP()
 };

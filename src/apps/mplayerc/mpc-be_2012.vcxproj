@@ -165,10 +165,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\ExtLib\mfc\afxctrlcontainer.cpp" />
-    <ClCompile Include="..\..\ExtLib\mfc\afxglobals.cpp" />
-    <ClCompile Include="..\..\ExtLib\mfc\afxmaskededit.cpp" />
-    <ClCompile Include="..\..\ExtLib\mfc\winmdi.cpp" />
     <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="AppSettings.cpp" />
     <ClCompile Include="AuthDlg.cpp" />
@@ -284,7 +280,6 @@
     <ClCompile Include="..\..\ExtLib\stb_image\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\ExtLib\mfc\afxmaskededit.h" />
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="AppSettings.h" />
     <ClInclude Include="AuthDlg.h" />

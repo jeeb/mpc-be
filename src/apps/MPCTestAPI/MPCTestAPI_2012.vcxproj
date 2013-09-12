@@ -105,9 +105,6 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\ExtLib\mfc\afxctrlcontainer.cpp" />
-    <ClCompile Include="..\..\ExtLib\mfc\afxglobals.cpp" />
-    <ClCompile Include="..\..\ExtLib\mfc\winmdi.cpp" />
     <ClCompile Include="HScrollListBox.cpp" />
     <ClCompile Include="MPCTestAPI.cpp">
     </ClCompile>
