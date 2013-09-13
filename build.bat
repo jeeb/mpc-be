@@ -268,6 +268,11 @@ EXIT /B
 
 :SubCreateInstaller
 IF "%~1" == "x64" SET ISDefs=/Dx64Build
+IF /I "%COMPILER%" == "VS2012" (
+  SET ISDefs=%ISDefs% /DVS2012
+) ELSE IF /I "%COMPILER%" == "VS2013" (
+  SET ISDefs=%ISDefs% /DVS2013
+)
 
 CALL :SubDetectInnoSetup
 
@@ -277,6 +282,7 @@ IF NOT DEFINED InnoSetupPath (
 )
 
 TITLE Compiling %1 installer...
+
 "%InnoSetupPath%\iscc.exe" /Q /O"%BIN%" "distrib\mpc-be_setup.iss" %ISDefs%
 IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Compilation failed!"
 CALL :SubMsg "INFO" "%1 installer successfully built"

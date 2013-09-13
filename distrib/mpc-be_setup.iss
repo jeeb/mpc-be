@@ -24,6 +24,7 @@
 #define localize
 #define sse_required
 ; #define x64Build
+; #define VS2012
 
 ; Don't forget to update the DirectX SDK number in "include\Version.h" (not updated so often)
 
@@ -47,16 +48,24 @@
 #define app_version_out  str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_PATCH) + "." + str(MPC_VERSION_STATUS)+ "." + str(MPC_VERSION_REV)
 #define quick_launch     "{userappdata}\Microsoft\Internet Explorer\Quick Launch"
 
-#define bindir_x64 = "..\bin\mpc-be_x64"
-#define bindir_x86 = "..\bin\mpc-be_x86"
+#define bin_dir        = "..\bin"
+#if defined(VS2012)
+  #define bin_dir      = "..\bin12"
+#endif
+#if defined(VS2013)
+  #define bin_dir      = "..\bin13"
+#endif
+
+#define bindir_x64 = bin_dir + "\mpc-be_x64"
+#define bindir_x86 = bin_dir + "\mpc-be_x86"
 
 #ifdef x64Build
-  #define bindir       = "..\bin\mpc-be_x64"
+  #define bindir       = bin_dir + "\mpc-be_x64"
   #define mpcbe_exe    = "mpc-be64.exe"
   #define mpcbe_ini    = "mpc-be64.ini"
   #define mpcbe_reg    = "mpc-be64"
 #else
-  #define bindir       = "..\bin\mpc-be_x86"
+  #define bindir       = bin_dir + "\mpc-be_x86"
   #define mpcbe_exe    = "mpc-be.exe"
   #define mpcbe_ini    = "mpc-be.ini"
   #define mpcbe_reg    = "mpc-be"
