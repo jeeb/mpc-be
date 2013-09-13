@@ -125,7 +125,7 @@ bool CMpaDecSettingsWnd::OnActivate()
 	m_spdif_ac3_check.Create(_T("AC-3"), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(50), m_fontheight)), this, IDC_PP_CHECK_SPDIF_AC3);
 	m_spdif_dts_check.Create(_T("DTS"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(IPP_SCALE(110), 0), CSize(IPP_SCALE(50), m_fontheight)), this, IDC_PP_CHECK_SPDIF_DTS);
 	p.y += h20;
-	m_spdif_eac3_check.Create(_T("E-AC3"), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(50), m_fontheight)), this, IDC_PP_CHECK_SPDIF_EAC3);
+	m_spdif_eac3_check.Create(_T("E-AC3"), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(55), m_fontheight)), this, IDC_PP_CHECK_SPDIF_EAC3);
 	m_spdif_dtshd_check.Create(_T("DTS-HD"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(IPP_SCALE(110), 0), CSize(IPP_SCALE(65), m_fontheight)), this, IDC_PP_CHECK_SPDIF_DTSHD);
 	p.y += h20;
 	m_spdif_truehd_check.Create(_T("TrueHD"), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(IPP_SCALE(60), m_fontheight)), this, IDC_PP_CHECK_SPDIF_TRUEHD);
