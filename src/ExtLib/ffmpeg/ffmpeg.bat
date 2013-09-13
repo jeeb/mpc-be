@@ -38,6 +38,17 @@ SET PATH=%MSYS%\bin;%MINGW32%\bin;%PATH%
 IF "%~1" == "64" SET "BIT=64BIT=yes"
 IF /I "%~3" == "Debug" SET "DEBUG=DEBUG=yes"
 
+SET "VS=VS2010=yes"
+
+SET ARG=%*
+SET ARG=%ARG:/=%
+SET ARG=%ARG:-=%
+
+FOR %%A IN (%ARG%) DO (
+	IF /I "%%A" == "VS2012" SET "VS=VS2012=yes"
+	IF /I "%%A" == "VS2013" SET "VS=VS2013=yes"
+)
+
 IF "%~2" == "" (
   SET "BUILDTYPE=build"
   CALL :SubMake
@@ -78,7 +89,7 @@ IF "%BUILDTYPE%" == "clean" (
   )
 )
 
-make.exe -f ffmpeg.mak -j%JOBS% %BIT% %DEBUG% %*
+make.exe -f ffmpeg.mak -j%JOBS% %BIT% %DEBUG% %VS% %*
 
 ENDLOCAL
 EXIT /B
@@ -86,7 +97,7 @@ EXIT /B
 :SHOWHELP
 TITLE "%~nx0 %1"
 ECHO. & ECHO.
-ECHO Usage:   %~nx0 [32^|64] [Clean^|Build^|Rebuild] [Debug]
+ECHO Usage:   %~nx0 [32^|64] [Clean^|Build^|Rebuild] [Debug] [VS2012^|VS2013]
 ECHO.
 ECHO Notes:   The arguments are not case sensitive.
 ECHO. & ECHO.

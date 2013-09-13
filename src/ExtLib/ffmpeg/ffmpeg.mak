@@ -16,6 +16,14 @@ else
 	MY_DIR_PREFIX = Release
 endif
 
+ifeq ($(VS2012),yes)
+	BIN_DIR  = ../../../bin12
+endif
+
+ifeq ($(VS2013),yes)
+	BIN_DIR  = ../../../bin13
+endif
+
 OBJ_DIR		= $(BIN_DIR)/obj/$(MY_DIR_PREFIX)_$(MY_ARCH)/ffmpeg/
 TARGET_LIB_DIR = $(BIN_DIR)/lib/$(MY_DIR_PREFIX)_$(MY_ARCH)
 TARGET_LIB	 = $(TARGET_LIB_DIR)/ffmpeg.lib
