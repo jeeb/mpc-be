@@ -64,6 +64,7 @@ FOR %%A IN (%ARG%) DO (
   IF /I "%%A" == "Zip"        SET "ZIP=True"          & SET /A ARGZI+=1 & SET /A ARGCL+=1 & SET /A ARGM+=1
   IF /I "%%A" == "VS2010"     SET "COMPILER=VS2010"   & SET /A ARGVS+=1
   IF /I "%%A" == "VS2012"     SET "COMPILER=VS2012"   & SET /A ARGVS+=1
+  IF /I "%%A" == "VS2013"     SET "COMPILER=VS2013"   & SET /A ARGVS+=1
 )
 
 REM pre-build checks
@@ -97,6 +98,8 @@ IF /I "%PACKAGES%" == "True" SET "INSTALLER=True" & SET "ZIP=True"
 IF /I "%COMPILER%" == "AUTODETECT" (
   IF DEFINED VS110COMNTOOLS (
     SET "COMPILER=VS2012"
+  ) ELSE IF DEFINED VS120COMNTOOLS (
+    SET "COMPILER=VS2013"
   ) ELSE IF DEFINED VS100COMNTOOLS (
     SET "COMPILER=VS2010"
   ) ELSE GOTO MissingVar
@@ -106,22 +109,35 @@ IF /I "%COMPILER%" == "VS2012" (
   SET SLN=_2012
   SET BUILD=VS2012
   SET "VSCOMNTOOLS=%VS110COMNTOOLS%"
+  SET "BIN=bin12"
+) ELSE IF /I "%COMPILER%" == "VS2013" (
+  SET SLN=_2013
+  SET BUILD=VS2013
+  SET "VSCOMNTOOLS=%VS120COMNTOOLS%"
+  SET "BIN=bin13"
 ) ELSE (
   SET SLN=
   SET BUILD=VS2010
   SET "VSCOMNTOOLS=%VS100COMNTOOLS%"
+  SET "BIN=bin"
 )
 
 IF NOT DEFINED VSCOMNTOOLS GOTO MissingVar
 
 :Start
 REM Check if the %LOG_DIR% folder exists otherwise MSBuild will fail
-SET "LOG_DIR=bin\logs"
+SET "LOG_DIR=%BIN%\logs"
 IF NOT EXIST "%LOG_DIR%" MD "%LOG_DIR%"
 
 CALL :SubDetectWinArch
 
-SET "MSBUILD=%WINDIR%\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe"
+IF DEFINED PROGRAMFILES(x86) (SET "PM=%PROGRAMFILES(x86)%") ELSE (SET "PM=%PROGRAMFILES%")
+IF "%BUILD%" == "VS2013" (
+  SET "MSBUILD=%PM%\MSBuild\12.0\Bin\MSBuild.exe"
+) ELSE (
+  SET "MSBUILD=%WINDIR%\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe"
+)
+
 SET "MSBUILD_SWITCHES=/nologo /consoleloggerparameters:Verbosity=minimal /maxcpucount /nodeReuse:true"
 
 SET START_TIME=%TIME%
@@ -261,7 +277,7 @@ IF NOT DEFINED InnoSetupPath (
 )
 
 TITLE Compiling %1 installer...
-"%InnoSetupPath%\iscc.exe" /Q /O"bin" "distrib\mpc-be_setup.iss" %ISDefs%
+"%InnoSetupPath%\iscc.exe" /Q /O"%BIN%" "distrib\mpc-be_setup.iss" %ISDefs%
 IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Compilation failed!"
 CALL :SubMsg "INFO" "%1 installer successfully built"
 
@@ -283,7 +299,7 @@ IF /I "%~2" == "Win32" (
   SET ARCH=x64
 )
 
-PUSHD "bin"
+PUSHD "%BIN%"
 
 SET PackagesOut=Packages
 
