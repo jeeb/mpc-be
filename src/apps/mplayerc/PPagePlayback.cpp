@@ -131,7 +131,7 @@ BOOL CPPagePlayback::OnInitDialog()
 	for (int idx = 0; idx <= 10; idx++) {
 		CString str;
 		if (idx == 0) {
-			str = _T("Auto");
+			str = ResStr(IDS_AG_AUTO);
 			m_nSpeedStepCtrl.AddString(str);
 			continue;
 		}

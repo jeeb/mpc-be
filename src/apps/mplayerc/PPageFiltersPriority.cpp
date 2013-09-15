@@ -106,31 +106,31 @@ void CPPageFiltersPriority::Init()
 	AppSettings& s = AfxGetAppSettings();
 
 	m_AVI.ResetContent();
-	m_AVI.AddString(_T("Default"));
+	m_AVI.AddString(ResStr(IDS_AG_DEFAULT_L));
 	m_AVI.SetCurSel(0);
 
 	m_MKV.ResetContent();
-	m_MKV.AddString(_T("Default"));
+	m_MKV.AddString(ResStr(IDS_AG_DEFAULT_L));
 	m_MKV.SetCurSel(0);
 
 	m_MPEGTS.ResetContent();
-	m_MPEGTS.AddString(_T("Default"));
+	m_MPEGTS.AddString(ResStr(IDS_AG_DEFAULT_L));
 	m_MPEGTS.SetCurSel(0);
 
 	m_MPEG.ResetContent();
-	m_MPEG.AddString(_T("Default"));
+	m_MPEG.AddString(ResStr(IDS_AG_DEFAULT_L));
 	m_MPEG.SetCurSel(0);
 
 	m_MP4.ResetContent();
-	m_MP4.AddString(_T("Default"));
+	m_MP4.AddString(ResStr(IDS_AG_DEFAULT_L));
 	m_MP4.SetCurSel(0);
 
 	m_FLV.ResetContent();
-	m_FLV.AddString(_T("Default"));
+	m_FLV.AddString(ResStr(IDS_AG_DEFAULT_L));
 	m_FLV.SetCurSel(0);
 
 	m_WMV.ResetContent();
-	m_WMV.AddString(_T("Default"));
+	m_WMV.AddString(ResStr(IDS_AG_DEFAULT_L));
 	m_WMV.SetCurSel(0);
 
 	m_pFilters.RemoveAll();
