@@ -58,6 +58,7 @@ MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
     #if MEDIAINFO_ADVANCED
         File_IgnoreSequenceFileSize=false;
         File_Source_List=false;
+        File_RiskyBitRateEstimation=false;
         #if MEDIAINFO_DEMUX
             File_Demux_Unpacketize_StreamLayoutChange_Skip=false;
         #endif //MEDIAINFO_DEMUX
@@ -142,6 +143,9 @@ MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
     ParseSpeed=MediaInfoLib::Config.ParseSpeed_Get();
     #if MEDIAINFO_DEMUX
         Demux_EventWasSent=false;
+        Demux_Offset_Frame=(int64u)-1;
+        Demux_Offset_DTS=(int64u)-1;
+        Demux_Offset_DTS_FromStream=(int64u)-1;
         Events_Delayed_CurrentSource=NULL;
         #if MEDIAINFO_SEEK
            Demux_IsSeeking=false;
@@ -292,6 +296,15 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
         #else //MEDIAINFO_MD5
             return __T("MD5 is disabled due to compilation options");
         #endif //MEDIAINFO_MD5
+    }
+    else if (Option_Lower==__T("file_riskybitrateestimation"))
+    {
+        #if MEDIAINFO_ADVANCED
+            File_RiskyBitRateEstimation_Set(!(Value==__T("0") || Value.empty()));
+            return Ztring();
+        #else //MEDIAINFO_ADVANCED
+            return __T("Advanced features are disabled due to compilation options");
+        #endif //MEDIAINFO_ADVANCED
     }
     else if (Option_Lower==__T("file_demux_unpacketize_streamlayoutchange_skip"))
     {
@@ -1067,6 +1080,21 @@ bool MediaInfo_Config_MediaInfo::File_Source_List_Get ()
 #endif //MEDIAINFO_ADVANCED
 
 //---------------------------------------------------------------------------
+#if MEDIAINFO_ADVANCED
+void MediaInfo_Config_MediaInfo::File_RiskyBitRateEstimation_Set (bool NewValue)
+{
+    CriticalSectionLocker CSL(CS);
+    File_RiskyBitRateEstimation=NewValue;
+}
+
+bool MediaInfo_Config_MediaInfo::File_RiskyBitRateEstimation_Get ()
+{
+    CriticalSectionLocker CSL(CS);
+    return File_RiskyBitRateEstimation;
+}
+#endif //MEDIAINFO_ADVANCED
+
+//---------------------------------------------------------------------------
 #if MEDIAINFO_DEMUX
 #if MEDIAINFO_ADVANCED
 void MediaInfo_Config_MediaInfo::File_Demux_Unpacketize_StreamLayoutChange_Skip_Set (bool NewValue)
@@ -1673,6 +1701,34 @@ void MediaInfo_Config_MediaInfo::Event_Send (File__Analyze* Source, const int8u*
 {
     CriticalSectionLocker CSL(CS);
 
+    if (Source==NULL)
+    {
+        if (Demux_Offset_Frame!=(int64u)-1)
+        {
+            MediaInfo_Event_Generic* Temp=(MediaInfo_Event_Generic*)Data_Content;
+            if (Temp->FrameNumber!=(int64u)-1)
+                Temp->FrameNumber+=Demux_Offset_Frame;
+            if (Temp->FrameNumber_PresentationOrder!=(int64u)-1)
+                Temp->FrameNumber_PresentationOrder+=Demux_Offset_Frame;
+        }
+        if (Demux_Offset_DTS!=(int64u)-1) // && (Demux_Offset_DTS_FromStream==(int64u)-1 || Demux_Offset_DTS!=Demux_Offset_DTS_FromStream))
+        {
+            MediaInfo_Event_Generic* Temp=(MediaInfo_Event_Generic*)Data_Content;
+            if (Temp->DTS!=(int64u)-1)
+            {
+                Temp->DTS+=Demux_Offset_DTS;
+                if (Demux_Offset_DTS_FromStream!=(int64u)-1)
+                    Temp->DTS-=Demux_Offset_DTS_FromStream;
+            }
+            if (Temp->PTS!=(int64u)-1)
+            {
+                Temp->PTS+=Demux_Offset_DTS;
+                if (Demux_Offset_DTS_FromStream!=(int64u)-1)
+                    Temp->PTS-=Demux_Offset_DTS_FromStream;
+            }
+        }
+    }
+    
     if (Source)
     {
         event_delayed* Event=new event_delayed(Data_Content, Data_Size, File_Name);

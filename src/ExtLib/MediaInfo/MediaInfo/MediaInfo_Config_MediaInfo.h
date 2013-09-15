@@ -49,7 +49,7 @@ public :
     //Constructor/Destructor
     MediaInfo_Config_MediaInfo();
     ~MediaInfo_Config_MediaInfo();
-
+    
     //General
     Ztring Option (const String &Option, const String &Value=Ztring());
 
@@ -94,6 +94,11 @@ public :
     #if MEDIAINFO_ADVANCED
         void          File_Source_List_Set (bool NewValue);
         bool          File_Source_List_Get ();
+    #endif //MEDIAINFO_ADVANCED
+
+    #if MEDIAINFO_ADVANCED
+        void          File_RiskyBitRateEstimation_Set (bool NewValue);
+        bool          File_RiskyBitRateEstimation_Get ();
     #endif //MEDIAINFO_ADVANCED
 
     #if MEDIAINFO_DEMUX
@@ -280,6 +285,9 @@ public :
     #endif //MEDIAINFO_EVENTS
     #if MEDIAINFO_DEMUX
     bool          Demux_EventWasSent;
+    int64u          Demux_Offset_Frame;
+    int64u          Demux_Offset_DTS;
+    int64u          Demux_Offset_DTS_FromStream;
     File__Analyze*  Events_Delayed_CurrentSource;
         #if MEDIAINFO_SEEK
         bool      Demux_IsSeeking;
@@ -301,6 +309,7 @@ private :
     #if MEDIAINFO_ADVANCED
         bool                File_IgnoreSequenceFileSize;
         bool                File_Source_List;
+        bool                File_RiskyBitRateEstimation;
         #if MEDIAINFO_DEMUX
             bool                File_Demux_Unpacketize_StreamLayoutChange_Skip;
         #endif //MEDIAINFO_DEMUX
