@@ -2667,7 +2667,7 @@ BEGIN
     IDS_AG_VIEW_NORMAL      "View Normal"
     IDS_AG_FULLSCREEN       "Fullscreen"
     IDS_MPLAYERC_39         "Fullscreen (w/o res.change)"
-	IDS_AG_WINDOW_TO_PRIMARYSCREEN       "Move Window to PrimaryScreen"
+    IDS_AG_WINDOW_TO_PRIMARYSCREEN       "Move Window to PrimaryScreen"
     IDS_AG_ZOOM_AUTO_FIT    "Zoom Auto Fit"
     IDS_AG_VIDFRM_HALF      "VidFrm Half"
     IDS_AG_VIDFRM_NORMAL    "VidFrm Normal"
@@ -2760,6 +2760,9 @@ END
 STRINGTABLE
 BEGIN
     IDS_PPAGEWEBSERVER_0    "Select the directory"
+    IDS_AG_DEFAULT          "Default"
+    IDS_AG_DEFAULT_L        "default"
+    IDS_AG_AUTO             "Auto"
 END
 
 STRINGTABLE
@@ -2987,7 +2990,7 @@ BEGIN
     IDS_MPEG2_ENABLE_PLANAR 
                             "Enable planar YUV media types (VY12, I420, IYUY)"
     IDS_MPEG2_INTERLACE_FLAG "Set interlaced flag in output media type"
-    IDS_MPEG2_FORCED_SUBS "Always display forced subtitles"
+    IDS_MPEG2_FORCED_SUBS   "Always display forced subtitles"
     IDS_MPEG2_DEINTERLACING "Deinterlacing"
     IDS_MPEG2_BRIGHTNESS    "Brightness"
     IDS_MPEG2_RESET         "Reset"

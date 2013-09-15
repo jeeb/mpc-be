@@ -945,6 +945,9 @@
 #define IDS_MPLAYERC_103                32980
 #define IDS_AG_DISPLAY_STATS            32981
 #define IDS_PPAGEWEBSERVER_0            32996
+#define IDS_AG_DEFAULT                  33000
+#define IDS_AG_DEFAULT_L                33001
+#define IDS_AG_AUTO                     33002
 #define IDS_MAINFRM_2                   33014
 #define IDS_AG_SUBTITLES_SAVED          33015
 #define IDS_MAINFRM_4                   33016
