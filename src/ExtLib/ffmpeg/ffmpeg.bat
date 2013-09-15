@@ -35,9 +35,7 @@ EXIT /B
 :VarOk
 SET PATH=%MSYS%\bin;%MINGW32%\bin;%PATH%
 
-IF "%~1" == "64" SET "BIT=64BIT=yes"
-IF /I "%~3" == "Debug" SET "DEBUG=DEBUG=yes"
-
+SET "BUILDTYPE=build"
 SET "VS=VS2010=yes"
 
 SET ARG=%*
@@ -45,36 +43,22 @@ SET ARG=%ARG:/=%
 SET ARG=%ARG:-=%
 
 FOR %%A IN (%ARG%) DO (
+	IF /I "%%A" == "clean" SET "BUILDTYPE=clean"
+	IF /I "%%A" == "rebuild" SET "BUILDTYPE=rebuild"
+	IF /I "%%A" == "64" SET "BIT=64BIT=yes"
+	IF /I "%%A" == "Debug" SET "DEBUG=DEBUG=yes"
 	IF /I "%%A" == "VS2012" SET "VS=VS2012=yes"
 	IF /I "%%A" == "VS2013" SET "VS=VS2013=yes"
 )
 
-IF "%~2" == "" (
+IF /I "%BUILDTYPE%" == "rebuild" (
+  SET "BUILDTYPE=clean"
+  CALL :SubMake clean
   SET "BUILDTYPE=build"
   CALL :SubMake
   EXIT /B
 ) ELSE (
-  IF /I "%~2" == "Build" (
-    SET "BUILDTYPE=build"
-    CALL :SubMake
-    EXIT /B
-  )
-  IF /I "%~2" == "Clean" (
-    SET "BUILDTYPE=clean"
-    CALL :SubMake clean
-    EXIT /B
-  )
-  IF /I "%~2" == "Rebuild" (
-    SET "BUILDTYPE=clean"
-    CALL :SubMake clean
-    SET "BUILDTYPE=build"
-    CALL :SubMake
-    EXIT /B
-  )
-  ECHO.
-  ECHO Unsupported commandline switch!
-  ECHO Run "%~nx0 help" for details about the commandline switches.
-  ENDLOCAL
+  CALL :SubMake
   EXIT /B
 )
 
@@ -82,6 +66,7 @@ IF "%~2" == "" (
 IF "%BUILDTYPE%" == "clean" (
   SET JOBS=1
 ) ELSE (
+  SET "BUILDTYPE="
   IF DEFINED NUMBER_OF_PROCESSORS (
     SET JOBS=%NUMBER_OF_PROCESSORS%
   ) ELSE (
@@ -89,7 +74,7 @@ IF "%BUILDTYPE%" == "clean" (
   )
 )
 
-make.exe -f ffmpeg.mak -j%JOBS% %BIT% %DEBUG% %VS% %*
+make.exe -f ffmpeg.mak %BUILDTYPE% -j%JOBS% %BIT% %DEBUG% %VS%
 
 ENDLOCAL
 EXIT /B
