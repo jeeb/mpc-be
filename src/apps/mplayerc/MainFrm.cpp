@@ -10255,7 +10255,7 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 		return;
 	}
 
-	if (GetPlaybackMode() == PM_FILE || ((GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1) && i >= 0)) {
+	if ((GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) && i >= 0) {
 
 		CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
 		if (pSS) {
@@ -16619,7 +16619,7 @@ void CMainFrame::OnNavMixStreamSelectSubMenu(UINT id, DWORD dwSelGroup)
 	if (nID >= 0 && pSSA) {
 		DWORD cStreamsA = 0;
 		if (SUCCEEDED(pSSA->Count(&cStreamsA)) && cStreamsA > 0) {
-			UINT i = id;
+			UINT i = (UINT)nID;
 
 			if (bSplitterMenu && (cStreamsA > 1)) {
 				i++;
