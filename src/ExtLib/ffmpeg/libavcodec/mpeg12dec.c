@@ -1217,6 +1217,7 @@ static int mpeg_decode_postinit(AVCodecContext *avctx)
             s->parse_context.buffer = 0;
             ff_MPV_common_end(s);
             s->parse_context = pc;
+            s1->mpeg_enc_ctx_allocated = 0;
         }
 
         if ((s->width == 0) || (s->height == 0))
@@ -2090,6 +2091,7 @@ static int vcr2_init_sequence(AVCodecContext *avctx)
     s->out_format = FMT_MPEG1;
     if (s1->mpeg_enc_ctx_allocated) {
         ff_MPV_common_end(s);
+        s1->mpeg_enc_ctx_allocated = 0;
     }
     s->width  = avctx->coded_width;
     s->height = avctx->coded_height;
