@@ -301,8 +301,10 @@
 #define ID_NAVIGATE_CHAP_SUBITEM_END    4499
 // filters
 #define IDS_FILTER_SETTINGS_CAPTION     7000
+// avi splitter
 #define IDS_AVISPLITTER_NON_INTERLEAVED 7100
 #define IDS_AVISPLITTER_REINDEX_BROKEN  7101
+// mpeg splitter
 #define IDS_MPEGSPLITTER_FSTREAM_CHANGE 7200
 #define IDS_MPEGSPLITTER_SUB_FORCING    7201
 #define IDS_MPEGSPLITTER_ALT_DUR_CALC   7202
@@ -315,7 +317,7 @@
 #define IDS_MPEGSPLITTER_WARNING        7210
 #define IDS_MPEGSPLITTER_WARNING_TEXT   7211
 #define IDS_MPEGSPLITTER_SUB_EMPTY_PIN  7212
-#define IDS_MATROSKAPLITTER_LOAD_EMBEDDED_FONTS 7213
+// audio decoder
 #define IDS_MPADEC_SAMPLE_FMT           7300
 #define IDS_MPADEC_DRC                  7301
 #define IDS_MPADEC_MIXER                7302
@@ -324,6 +326,7 @@
 #define IDS_MPADEC_STEREO               7305
 #define IDS_MPADEC_SPDIF                7306
 #define IDS_MPADEC_AC3ENCODE            7307
+// video decoder
 #define IDS_VDF_SETTINGS                7400
 #define IDS_VDF_AUTO                    7401
 #define IDS_VDF_THREADNUMBER            7402
@@ -352,6 +355,7 @@
 #define IDS_VDF_DEINTER_TOP             7425
 #define IDS_VDF_DEINTER_BOTTOM          7426
 #define IDS_VDF_DEINTER_PROGRESSIVE     7427
+// mpeg2 decoder
 #define IDS_MPEG2_ENABLE_PLANAR         7500
 #define IDS_MPEG2_INTERLACE_FLAG        7501
 #define IDS_MPEG2_FORCED_SUBS           7502
@@ -363,6 +367,7 @@
 #define IDS_MPEG2_HUE                   7508
 #define IDS_MPEG2_SATURATION            7509
 #define IDS_MPEG2_READ_AR               7511
+// audio renderer
 #define IDS_ARS_WASAPI_MODE             7600
 #define IDS_ARS_MUTE_FAST_FORWARD       7601
 #define IDS_ARS_SOUND_DEVICE            7602
@@ -372,8 +377,10 @@
 #define IDS_ARS_WASAPI_MODE_STATUS_3    7606
 #define IDS_ARS_WASAPI_MODE_STATUS_4    7607
 #define IDS_ARS_WASAPI_MODE_STATUS_5    7608
-#define IDS_ARS_USE_BITEXACT_OUTPUT     7609
-#define IDS_ARS_USE_SYSTEM_LAYOUT_CHANNELS 7610
+#define IDS_ARS_BITEXACT_OUTPUT         7609
+#define IDS_ARS_SYSTEM_LAYOUT_CHANNELS  7610
+// matroska splitter
+#define IDS_MKVSPLT_LOAD_EMBEDDED_FONTS 7700
 //
 #define IDD_OPEN_DLG                    10000
 #define IDD_OPENCAPDEVICE_DLG           10001

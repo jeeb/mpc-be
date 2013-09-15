@@ -3193,27 +3193,27 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DVB_CHANNEL_NUMBER      "N"
-    IDS_DVB_CHANNEL_NAME        "Name"
-    IDS_DVB_CHANNEL_FREQUENCY   "Frequency"
-    IDS_DVB_CHANNEL_ENCRYPTION  "Encrypted"
-    IDS_DVB_CHANNEL_ENCRYPTED   "Yes"
-    IDS_DVB_CHANNEL_NOT_ENCRYPTED "No"
-    IDS_DVB_CHANNEL_START_SCAN  "Start"
-    IDS_DVB_CHANNEL_STOP_SCAN   "Stop"
-    IDS_DVB_TVNAV_SEERADIO      "Radio stations"
-    IDS_DVB_TVNAV_SEETV         "TV stations"
-    IDS_ARS_WASAPI_MODE         "Use WASAPI (restart playback):"
-    IDS_ARS_MUTE_FAST_FORWARD   "Mute on fast forward"
-    IDS_ARS_SOUND_DEVICE        "Sound Device:"
-    IDS_ARS_WASAPI_MODE_STATUS   "Status"
-    IDS_ARS_WASAPI_MODE_STATUS_1 "Not running"
-    IDS_ARS_WASAPI_MODE_STATUS_2 "use WASAPI, Exclusive mode"
-    IDS_ARS_WASAPI_MODE_STATUS_3 "use WASAPI, Shared mode"
-    IDS_ARS_WASAPI_MODE_STATUS_4 "use DirectSound"
-    IDS_ARS_WASAPI_MODE_STATUS_5 "use WASAPI, Exclusive mode, Bitstream"
-    IDS_ARS_USE_BITEXACT_OUTPUT  "Allow bit-exact output"
-    IDS_ARS_USE_SYSTEM_LAYOUT_CHANNELS "Use system layout channels"
+    IDS_DVB_CHANNEL_NUMBER          "N"
+    IDS_DVB_CHANNEL_NAME            "Name"
+    IDS_DVB_CHANNEL_FREQUENCY       "Frequency"
+    IDS_DVB_CHANNEL_ENCRYPTION      "Encrypted"
+    IDS_DVB_CHANNEL_ENCRYPTED       "Yes"
+    IDS_DVB_CHANNEL_NOT_ENCRYPTED   "No"
+    IDS_DVB_CHANNEL_START_SCAN      "Start"
+    IDS_DVB_CHANNEL_STOP_SCAN       "Stop"
+    IDS_DVB_TVNAV_SEERADIO          "Radio stations"
+    IDS_DVB_TVNAV_SEETV             "TV stations"
+    IDS_ARS_WASAPI_MODE             "Use WASAPI (restart playback):"
+    IDS_ARS_MUTE_FAST_FORWARD       "Mute on fast forward"
+    IDS_ARS_SOUND_DEVICE            "Sound Device:"
+    IDS_ARS_WASAPI_MODE_STATUS      "Status"
+    IDS_ARS_WASAPI_MODE_STATUS_1    "Not running"
+    IDS_ARS_WASAPI_MODE_STATUS_2    "use WASAPI, Exclusive mode"
+    IDS_ARS_WASAPI_MODE_STATUS_3    "use WASAPI, Shared mode"
+    IDS_ARS_WASAPI_MODE_STATUS_4    "use DirectSound"
+    IDS_ARS_WASAPI_MODE_STATUS_5    "use WASAPI, Exclusive mode, Bitstream"
+    IDS_ARS_BITEXACT_OUTPUT         "Allow bit-exact output"
+    IDS_ARS_SYSTEM_LAYOUT_CHANNELS  "Use system layout channels"
 END
 
 STRINGTABLE
@@ -3494,7 +3494,7 @@ BEGIN
     IDS_FILTER_SETTINGS_CAPTION     "Settings"
     IDS_AVISPLITTER_NON_INTERLEAVED "Support ""Bad"" Interleaved files"
     IDS_AVISPLITTER_REINDEX_BROKEN  "Reindex broken files"
-    IDS_MATROSKAPLITTER_LOAD_EMBEDDED_FONTS "Load Embedded Fonts"
+    IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Load Embedded Fonts"
 END
 
 #endif    // English (United States) resources
