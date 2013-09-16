@@ -3380,6 +3380,8 @@ void CMainFrame::OnNcLButtonDown(UINT nFlags, CPoint point)
 	s_fLDown = false;
 }
 
+static BOOL bFullScreen_LDOWN = FALSE;
+
 void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	if (((GetTickCount()-m_nMenuHideTick)<100)) return;
@@ -3426,6 +3428,7 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 
 		bool fLeftDownMouseBtnUnassigned = !AssignedToCmd(wmcmd::LDOWN, m_fFullScreen);
 		if (!fLeftDownMouseBtnUnassigned && (m_fFullScreen || bFSWnd)) {
+			bFullScreen_LDOWN = TRUE;
 			OnButton(wmcmd::LDOWN, nFlags, point);
 			return;
 		}
@@ -3444,8 +3447,12 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 
 void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 {
-
 	ReleaseCapture();
+
+	if (bFullScreen_LDOWN) {
+		bFullScreen_LDOWN = FALSE;
+		return;
+	}
 
 	if (!m_pFullscreenWnd->IsWindow() || !m_OSD.OnLButtonUp (nFlags, point)) {
 
