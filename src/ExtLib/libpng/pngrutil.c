@@ -2746,7 +2746,6 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
 
    png_debug(1, "in png_handle_unknown");
 
-#ifdef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
    /* NOTE: this code is based on the code in libpng-1.4.12 except for fixing
     * the bug which meant that setting a non-default behavior for a specific
     * chunk would be ignored (the default was always used unless a user
@@ -2759,15 +2758,14 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
     * function.
     */
 #  ifndef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-#     ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
-         keep = png_chunk_unknown_handling(png_ptr, png_ptr->chunk_name);
-#     endif
+   keep = png_chunk_unknown_handling(png_ptr, png_ptr->chunk_name);
 #  endif
 
    /* One of the following methods will read the chunk or skip it (at least one
     * of these is always defined because this is the only way to switch on
     * PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
     */
+#ifdef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
 #  ifdef PNG_READ_USER_CHUNKS_SUPPORTED
       /* The user callback takes precedence over the chunk keep value, but the
        * keep value is still required to validate a save of a critical chunk.
@@ -2853,7 +2851,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
 
          png_crc_finish(png_ptr, length);
       }
-#  endif
+#  endif /* PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED */
 
 #  ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
       /* Now store the chunk in the chunk list if appropriate, and if the limits
@@ -3654,7 +3652,7 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
 
             for (i = 0; i < row_info->width; i++)
             {
-               png_byte v[8];
+               png_byte v[8]; /* SAFE; pixel_depth does not exceed 64 */
                int j;
 
                memcpy(v, sp, pixel_bytes);
@@ -3840,7 +3838,8 @@ png_read_filter_row_paeth_multibyte_pixel(png_row_infop row_info, png_bytep row,
 
 static void
 png_init_filter_functions(png_structrp pp)
-   /* This function is called once for every PNG image to set the
+   /* This function is called once for every PNG image (except for PNG images
+    * that only use PNG_FILTER_VALUE_NONE for all rows) to set the
     * implementations required to reverse the filtering of PNG rows.  Reversing
     * the filter is the first transformation performed on the row data.  It is
     * performed in place, therefore an implementation can be selected based on
@@ -3882,10 +3881,13 @@ png_read_filter_row(png_structrp pp, png_row_infop row_info, png_bytep row,
     * PNG_FILTER_OPTIMIZATIONS to a function that overrides the generic
     * implementations.  See png_init_filter_functions above.
     */
-   if (pp->read_filter[0] == NULL)
-      png_init_filter_functions(pp);
    if (filter > PNG_FILTER_VALUE_NONE && filter < PNG_FILTER_VALUE_LAST)
+   {
+      if (pp->read_filter[0] == NULL)
+         png_init_filter_functions(pp);
+
       pp->read_filter[filter-1](row_info, row, prev_row);
+   }
 }
 
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
