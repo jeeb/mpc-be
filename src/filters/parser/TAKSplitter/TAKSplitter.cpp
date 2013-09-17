@@ -112,6 +112,47 @@ CFilterApp theApp;
 
 #endif
 
+int GetTAKFrameNumber(BYTE* buf, int size) // not tested
+{
+	if (size < 32 || *(WORD*)buf & 0xe0ff != 0xA0FF) { // sync
+		return -1;
+	}
+
+	uint8_t  LastFrame   = buf[2] & 0x1;
+	uint8_t  HasInfo     = buf[2] >> 1 & 0x1;
+	uint32_t FrameNumber = *(uint32_t*)(buf + 1) >> 11;
+
+	int shiftbytes = 5; // (16 + 1 + 1 + 1 + 21) bits
+
+	if (LastFrame) {
+		shiftbytes += 2; // (14 + 2) bits
+	}
+
+	if (HasInfo) {
+		int infobits = (6 + 4) + (4 + 35) + (3 + 18 + 5 + 4 + 1);
+		uint8_t ChannelNum   = (buf[shiftbytes + 9] >> 3 & 0xF) + 1;
+		uint8_t HasExtension = buf[shiftbytes + 9] >> 7;
+		if (HasExtension) {
+			infobits += (5 + 1);
+			uint8_t HasSpeakerAssignment = buf[shiftbytes + 10] >> 5 & 0x1;
+			if (HasSpeakerAssignment) {
+				infobits += ChannelNum * 6;
+			}
+		}
+		infobits += (1 + 5 + 25); // Extra info
+
+		shiftbytes += (infobits + 7) / 8; // 0..7 bits for padding
+	}
+
+	int crc = int(*(uint32_t*)(buf + shiftbytes - 1));
+
+	if (crc != crc_octets(buf, shiftbytes)) {
+		return -1;
+	}
+
+	return (int)FrameNumber;
+}
+
 //
 // CTAKSplitterFilter
 //
