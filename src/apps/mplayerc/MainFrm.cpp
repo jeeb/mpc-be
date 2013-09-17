@@ -6724,7 +6724,17 @@ void CMainFrame::OnUpdateFileISDBDownload(CCmdUI *pCmdUI)
 
 void CMainFrame::OnFileProperties()
 {
-	CPPageFileInfoSheet m_fileinfo(m_wndPlaylistBar.GetCurFileName(), this, GetModalParent());
+	CString fn = m_wndPlaylistBar.GetCurFileName();
+	if (fn.IsEmpty() && m_pMainFSF) {
+		LPOLESTR pFN = NULL;
+		AM_MEDIA_TYPE mt;
+		if (SUCCEEDED(m_pMainFSF->GetCurFile(&pFN, &mt)) && pFN && *pFN) {
+			fn = CString(pFN);
+			CoTaskMemFree(pFN);
+		}
+	}
+
+	CPPageFileInfoSheet m_fileinfo(fn, this, GetModalParent());
 	m_fileinfo.DoModal();
 }
 
@@ -12861,6 +12871,12 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		if (fFirst) {
 			pOFD->title = (m_strTitleAlt.IsEmpty() ? fn : m_strTitleAlt);
 			{
+				BeginEnumFilters(pGB, pEF, pBF);
+				if (m_pMainFSF = pBF) {
+					break;
+				}
+				EndEnumFilters;
+
 				m_pMainSourceFilter = FindFilter(__uuidof(CMpegSplitterFilter), pGB);
 				if (!m_pMainSourceFilter) {
 					m_pMainSourceFilter = FindFilter(__uuidof(CMpegSourceFilter), pGB);
@@ -14486,9 +14502,9 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 	m_fValidDVDOpen	= false;
 
-	OpenFileData *pFileData = dynamic_cast<OpenFileData *>(pOMD.m_p);
-	OpenDVDData* pDVDData = dynamic_cast<OpenDVDData*>(pOMD.m_p);
-	OpenDeviceData* pDeviceData = dynamic_cast<OpenDeviceData*>(pOMD.m_p);
+	OpenFileData *pFileData		= dynamic_cast<OpenFileData *>(pOMD.m_p);
+	OpenDVDData* pDVDData		= dynamic_cast<OpenDVDData*>(pOMD.m_p);
+	OpenDeviceData* pDeviceData	= dynamic_cast<OpenDeviceData*>(pOMD.m_p);
 	if (!pFileData && !pDVDData && !pDeviceData) {
 		ASSERT(0);
 		return false;
@@ -14512,8 +14528,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 	if (pFileData) {
 		POSITION pos = pFileData->fns.GetHeadPosition();
 		UINT index = 0;
-		while (pos != NULL) {
-			CString path = pFileData->fns.GetNext( pos );
+		while (pos) {
+			CString path = pFileData->fns.GetNext(pos);
 			DbgLog((LOG_TRACE, 3, _T("--> CMainFrame::OpenMediaPrivate() - pFileData->fns[%d]:"), index));
 			DbgLog((LOG_TRACE, 3, _T("	%s"), path.GetString()));
 			index++;
@@ -14521,7 +14537,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 	}
 #endif
 
-	CString mi_fn = _T("");
+	CString mi_fn;
 
 	if (pFileData) {
 		if (pFileData->fns.IsEmpty()) {
@@ -14603,8 +14619,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		}
 
 		// Get FPS
-		miFPS = 0.0;
-		s.dFPS = 0.0;
+		miFPS	= 0.0;
+		s.dFPS	= 0.0;
 
 		MediaInfo MI;
 
@@ -14620,15 +14636,14 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 			// 2:3 pulldown
 			if (strFPS == _T("29.970") && (strSO == _T("2:3 Pulldown") || (strST == _T("Progressive") && (strSO == _T("TFF") || strSO  == _T("BFF") || strSO  == _T("2:3 Pulldown"))))) {
-
 				strFPS = _T("23.976");
 			} else if (strST == _T("Interlaced") || strST == _T("MBAFF")) {
 				// double fps for Interlaced video.
 				nFactor = 2;
 			}
-			miFPS = wcstod(strFPS, NULL);
-			miFPS *= nFactor;
-			s.dFPS = miFPS;
+			miFPS	= wcstod(strFPS, NULL);
+			miFPS  *= nFactor;
+			s.dFPS	= miFPS;
 
 			AutoChangeMonitorMode();
 
@@ -15048,6 +15063,8 @@ void CMainFrame::CloseMediaPrivate()
 	pVW.Release();
 	pME.Release();
 	pMC.Release();
+	m_pMainFSF.Release();
+	m_pMainSourceFilter.Release();
 
 	if (pGB) {
 		pGB->RemoveFromROT();
@@ -20216,15 +20233,8 @@ BOOL CMainFrame::CheckMainFilter(IBaseFilter* pBF)
 	m_nMainFilterId = (DWORD_PTR)pBF;
 	while (pBF) {
 		if (CComQIPtr<IFileSourceFilter> pFSF = pBF) {
-			LPOLESTR pszFileName = NULL;
-			AM_MEDIA_TYPE mt;
-			if (SUCCEEDED(pFSF->GetCurFile(&pszFileName, &mt)) && pszFileName) {
-				CString fileName(pszFileName);
-				CoTaskMemFree(pszFileName);
-
-				if (fileName == fName) {
-					return TRUE;
-				}
+			if (pFSF == m_pMainFSF) {
+				return TRUE;
 			}
 
 			break;

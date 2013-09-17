@@ -36,19 +36,18 @@ class CPPageFileInfoRes : public CPPageBase
 	DECLARE_DYNAMIC(CPPageFileInfoRes)
 
 private:
-	CComPtr<IFilterGraph> m_pFG;
-	HICON m_hIcon;
-	CAtlList<CDSMResource> m_res;
+	HICON					m_hIcon;
+	CAtlList<CDSMResource>	m_res;
+
+	CStatic		m_icon;
+	CString		m_fn;
+	CListCtrl	m_list;
 
 public:
 	CPPageFileInfoRes(CString fn, IFilterGraph* pFG);
 	virtual ~CPPageFileInfoRes();
 
 	enum { IDD = IDD_FILEPROPRES };
-
-	CStatic m_icon;
-	CString m_fn;
-	CListCtrl m_list;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);

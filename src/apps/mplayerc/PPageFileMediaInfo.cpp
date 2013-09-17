@@ -54,14 +54,15 @@ String mi_get_lang_file()
 		}
 	}
 
-	return (String)_T("  Config_Text_ColumnSize;30");
+	return _T("  Config_Text_ColumnSize;30");
 }
 
 // CPPageFileMediaInfo dialog
 
 IMPLEMENT_DYNAMIC(CPPageFileMediaInfo, CPropertyPage)
-CPPageFileMediaInfo::CPPageFileMediaInfo(CString fn, IFilterGraph* pFG)
+CPPageFileMediaInfo::CPPageFileMediaInfo(CString fn)
 	: CPropertyPage(CPPageFileMediaInfo::IDD, CPPageFileMediaInfo::IDD)
+	, m_fn(fn)
 	, m_pCFont(NULL)
 {
 }
@@ -118,7 +119,7 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 	MI.Option(_T("ParseSpeed"), _T("0"));
 	MI.Option(_T("Language"), mi_get_lang_file());
 	MI.Option(_T("Complete"));
-	MI.Open(((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strFnFull.GetString());
+	MI.Open(m_fn.GetString());
 	MI_Text = MI.Inform().c_str();
 	MI.Close();
 

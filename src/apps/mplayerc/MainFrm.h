@@ -247,6 +247,8 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 
 	CComQIPtr<IBaseFilter> m_pMainSourceFilter;
 
+	CComQIPtr<IFileSourceFilter> m_pMainFSF;
+
 	void SetVolumeBoost(float fAudioBoost_dB);
 	void SetBalance(int balance);
 

@@ -34,7 +34,6 @@ IMPLEMENT_DYNAMIC(CPPageFileInfoClip, CPropertyPage)
 CPPageFileInfoClip::CPPageFileInfoClip(CString fn, IFilterGraph* pFG)
 	: CPropertyPage(CPPageFileInfoClip::IDD, CPPageFileInfoClip::IDD)
 	, m_fn(fn)
-	, m_pFG(pFG)
 	, m_clip(ResStr(IDS_AG_NONE))
 	, m_author(ResStr(IDS_AG_NONE))
 	, m_copyright(ResStr(IDS_AG_NONE))
@@ -43,6 +42,69 @@ CPPageFileInfoClip::CPPageFileInfoClip(CString fn, IFilterGraph* pFG)
 	, m_album(ResStr(IDS_AG_NONE))
 	, m_hIcon(NULL)
 {
+	m_fn.TrimRight('/');
+
+	if (m_fn.Find(_T("://")) > 0) {
+		if (m_fn.Find(_T("/"), m_fn.Find(_T("://")) + 3) < 0) {
+			m_location_str = m_fn;
+		}
+	}
+
+	if (m_location_str.IsEmpty() || m_location_str == ResStr(IDS_AG_NONE)) {
+		int i = max(m_fn.ReverseFind('\\'), m_fn.ReverseFind('/'));
+
+		if (i >= 0 && i < m_fn.GetLength() - 1) {
+			m_location_str = m_fn.Left(i);
+			m_fn = m_fn.Mid(i + 1);
+
+			if (m_location_str.GetLength() == 2 && m_location_str[1] == ':') {
+				m_location_str += '\\';
+			}
+		}
+	}
+
+	BeginEnumFilters(pFG, pEF, pBF) {
+		if (CComQIPtr<IPropertyBag> pPB = pBF) {
+			if (!((CMainFrame*)AfxGetMainWnd())->CheckMainFilter(pBF)) {
+				continue;
+			}
+
+			CComVariant var;
+			if (SUCCEEDED(pPB->Read(CComBSTR(_T("ALBUM")), &var, NULL))) {
+				m_album = var.bstrVal;
+			}
+		}
+
+		if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
+			if (!((CMainFrame*)AfxGetMainWnd())->CheckMainFilter(pBF)) {
+				continue;
+			}
+
+			CComBSTR bstr;
+			if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
+				m_clip = bstr.m_str;
+				bstr.Empty();
+			}
+			if (SUCCEEDED(pAMMC->get_AuthorName(&bstr)) && bstr.Length()) {
+				m_author = bstr.m_str;
+				bstr.Empty();
+			}
+			if (SUCCEEDED(pAMMC->get_Copyright(&bstr)) && bstr.Length()) {
+				m_copyright = bstr.m_str;
+				bstr.Empty();
+			}
+			if (SUCCEEDED(pAMMC->get_Rating(&bstr)) && bstr.Length()) {
+				m_rating = bstr.m_str;
+				bstr.Empty();
+			}
+			if (SUCCEEDED(pAMMC->get_Description(&bstr)) && bstr.Length()) {
+				m_descText = bstr.m_str;
+				m_descText.Replace(_T(";"), _T("\r\n"));
+				bstr.Empty();
+			}
+		}
+	}
+	EndEnumFilters;
 }
 
 CPPageFileInfoClip::~CPPageFileInfoClip()
@@ -98,96 +160,13 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	if (m_fn.IsEmpty()) {
-		BeginEnumFilters(m_pFG, pEF, pBF) {
-			CComQIPtr<IFileSourceFilter> pFSF = pBF;
-			if (pFSF) {
-				LPOLESTR pFN = NULL;
-				AM_MEDIA_TYPE mt;
-
-				if (SUCCEEDED(pFSF->GetCurFile(&pFN, &mt)) && pFN && *pFN) {
-					m_fn = CStringW(pFN);
-					CoTaskMemFree(pFN);
-				}
-
-				break;
-			}
-		}
-		EndEnumFilters
-	}
-
 	m_hIcon = LoadIcon(m_fn, false);
 	if (m_hIcon) {
 		m_icon.SetIcon(m_hIcon);
 	}
 
-	m_fn.TrimRight('/');
-
-	if (m_fn.Find(_T("://")) > 0) {
-		if (m_fn.Find(_T("/"), m_fn.Find(_T("://")) + 3) < 0) {
-			m_location_str = m_fn;
-		}
-	}
-
-	if (m_location_str.IsEmpty() || m_location_str == ResStr(IDS_AG_NONE)) {
-		int i = max(m_fn.ReverseFind('\\'), m_fn.ReverseFind('/'));
-
-		if (i >= 0 && i < m_fn.GetLength()-1) {
-			m_location_str = m_fn.Left(i);
-			m_fn = m_fn.Mid(i+1);
-
-			if (m_location_str.GetLength() == 2 && m_location_str[1] == ':') {
-				m_location_str += '\\';
-			}
-		}
-	}
-
 	m_location.SetWindowText(m_location_str);
-
-	BeginEnumFilters(m_pFG, pEF, pBF) {
-
-		if (CComQIPtr<IPropertyBag> pPB = pBF) {
-			if (!((CMainFrame*)AfxGetMainWnd())->CheckMainFilter(pBF)) {
-				continue;
-			}
-
-			CComVariant var;
-			if (SUCCEEDED(pPB->Read(CComBSTR(_T("ALBUM")), &var, NULL))) {
-				m_album = var.bstrVal;
-			}
-		}
-
-		if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
-			if (!((CMainFrame*)AfxGetMainWnd())->CheckMainFilter(pBF)) {
-				continue;
-			}
-
-			CComBSTR bstr;
-			if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
-				m_clip = bstr.m_str;
-				bstr.Empty();
-			}
-			if (SUCCEEDED(pAMMC->get_AuthorName(&bstr)) && bstr.Length()) {
-				m_author = bstr.m_str;
-				bstr.Empty();
-			}
-			if (SUCCEEDED(pAMMC->get_Copyright(&bstr)) && bstr.Length()) {
-				m_copyright = bstr.m_str;
-				bstr.Empty();
-			}
-			if (SUCCEEDED(pAMMC->get_Rating(&bstr)) && bstr.Length()) {
-				m_rating = bstr.m_str;
-				bstr.Empty();
-			}
-			if (SUCCEEDED(pAMMC->get_Description(&bstr)) && bstr.Length()) {
-				CString desc(bstr.m_str);
-				desc.Replace(_T(";"), _T("\r\n"));
-				m_desc.SetWindowText(desc);
-				bstr.Empty();
-			}
-		}
-	}
-	EndEnumFilters;
+	m_desc.SetWindowText(m_descText);
 
 	CString strTitleAlt = ((CMainFrame*)AfxGetMyApp()->GetMainWnd())->m_strTitleAlt;
 	if (!strTitleAlt.IsEmpty()) {

@@ -31,8 +31,35 @@ CPPageFileInfoRes::CPPageFileInfoRes(CString fn, IFilterGraph* pFG)
 	: CPPageBase(CPPageFileInfoRes::IDD, CPPageFileInfoRes::IDD)
 	, m_fn(fn)
 	, m_hIcon(NULL)
-	, m_pFG(pFG)
 {
+	m_fn.TrimRight('/');
+	int i = max(m_fn.ReverseFind('\\'), m_fn.ReverseFind('/'));
+
+	if (i >= 0 && i < m_fn.GetLength() - 1) {
+		m_fn = m_fn.Mid(i + 1);
+	}
+
+	BeginEnumFilters(pFG, pEF, pBF) {
+		if (CComQIPtr<IDSMResourceBag> pRB = pBF)
+		if (pRB && pRB->ResGetCount() > 0) {
+			for (DWORD i = 0; i < pRB->ResGetCount(); i++) {
+				CComBSTR name, desc, mime;
+				BYTE* pData = NULL;
+				DWORD len = 0;
+				if (SUCCEEDED(pRB->ResGet(i, &name, &desc, &mime, &pData, &len, NULL))) {
+					CDSMResource r;
+					r.name = name;
+					r.desc = desc;
+					r.mime = mime;
+					r.data.SetCount(len);
+					memcpy(r.data.GetData(), pData, r.data.GetCount());
+					CoTaskMemFree(pData);
+					m_res.AddTail(r);
+				}
+			}
+		}
+	}
+	EndEnumFilters;
 }
 
 CPPageFileInfoRes::~CPPageFileInfoRes()
@@ -70,42 +97,19 @@ BOOL CPPageFileInfoRes::OnInitDialog()
 		m_icon.SetIcon(m_hIcon);
 	}
 
-	m_fn.TrimRight('/');
-	int i = max(m_fn.ReverseFind('\\'), m_fn.ReverseFind('/'));
-
-	if (i >= 0 && i < m_fn.GetLength()-1) {
-		m_fn = m_fn.Mid(i+1);
-	}
-
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle()|LVS_EX_FULLROWSELECT);
 
 	m_list.InsertColumn(0, _T("Name"), LVCFMT_LEFT, 187);
 	m_list.InsertColumn(1, _T("Mime Type"), LVCFMT_LEFT, 127);
 
-	BeginEnumFilters(m_pFG, pEF, pBF) {
-		if (CComQIPtr<IDSMResourceBag> pRB = pBF)
-			if (pRB && pRB->ResGetCount() > 0) {
-				for (DWORD i = 0; i < pRB->ResGetCount(); i++) {
-					CComBSTR name, desc, mime;
-					BYTE* pData = NULL;
-					DWORD len = 0;
-					if (SUCCEEDED(pRB->ResGet(i, &name, &desc, &mime, &pData, &len, NULL))) {
-						CDSMResource r;
-						r.name = name;
-						r.desc = desc;
-						r.mime = mime;
-						r.data.SetCount(len);
-						memcpy(r.data.GetData(), pData, r.data.GetCount());
-						CoTaskMemFree(pData);
-						POSITION pos = m_res.AddTail(r);
-						int iItem = m_list.InsertItem(m_list.GetItemCount(), CString(name));
-						m_list.SetItemText(iItem, 1, CString(mime));
-						m_list.SetItemData(iItem, (DWORD_PTR)pos);
-					}
-				}
-			}
+	POSITION pos = m_res.GetHeadPosition();
+	while (pos) {
+		CDSMResource res = m_res.GetNext(pos);
+
+		int iItem = m_list.InsertItem(m_list.GetItemCount(), res.name);
+		m_list.SetItemText(iItem, 1, res.mime);
+		m_list.SetItemData(iItem, iItem);
 	}
-	EndEnumFilters;
 
 	UpdateData(FALSE);
 

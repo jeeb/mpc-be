@@ -33,25 +33,25 @@ class CPPageFileInfoClip : public CPropertyPage
 	DECLARE_DYNAMIC(CPPageFileInfoClip)
 
 private:
-	CComPtr<IFilterGraph> m_pFG;
-	HICON m_hIcon;
+	HICON	m_hIcon;
+
+	CStatic	m_icon;
+	CString	m_fn;
+	CString	m_clip;
+	CString	m_author;
+	CString	m_album;
+	CString	m_copyright;
+	CString	m_rating;
+	CString	m_location_str;
+	CString	m_descText;
+	CEdit	m_location;
+	CEdit	m_desc;
 
 public:
 	CPPageFileInfoClip(CString fn, IFilterGraph* pFG);
 	virtual ~CPPageFileInfoClip();
 
 	enum { IDD = IDD_FILEPROPCLIP };
-
-	CStatic m_icon;
-	CString m_fn;
-	CString m_clip;
-	CString m_author;
-	CString m_album;
-	CString m_copyright;
-	CString m_rating;
-	CString m_location_str;
-	CEdit   m_location;
-	CEdit   m_desc;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
