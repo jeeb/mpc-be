@@ -151,26 +151,32 @@ int GetTAKFrameNumber(BYTE* buf, int size) // not tested
 	}
 
 	if (HasInfo) {
-		int infobits = (6 + 4) + (4 + 35) + (3 + 18 + 5 + 4 + 1);
-		uint8_t ChannelNum   = (buf[shiftbytes + 9] >> 3 & 0xF) + 1;
-		uint8_t HasExtension = buf[shiftbytes + 9] >> 7;
-		if (HasExtension) {
-			infobits += (5 + 1);
-			uint8_t HasSpeakerAssignment = buf[shiftbytes + 10] >> 5 & 0x1;
-			if (HasSpeakerAssignment) {
-				infobits += ChannelNum * 6;
-			}
+		uint8_t  FrameSizeType  = buf[shiftbytes + 1] >> 2 & 0xF;
+		uint8_t  DataType       = (buf[shiftbytes + 6] >> 1 & 0x7); // 0 - PCM
+		if (FrameSizeType > TAK_FRAME_2048 || DataType != 0) {
+			return -1;
 		}
-		infobits += (1 + 5 + 25); // Extra info
 
-		shiftbytes += (infobits + 7) / 8; // 0..7 bits for padding
+//		int infobits = (6 + 4) + (4 + 35) + (3 + 18 + 5 + 4 + 1);
+//		uint8_t ChannelNum   = (buf[shiftbytes + 9] >> 3 & 0xF) + 1;
+//		uint8_t HasExtension = buf[shiftbytes + 9] >> 7;
+//		if (HasExtension) {
+//			infobits += (5 + 1);
+//			uint8_t HasSpeakerAssignment = buf[shiftbytes + 10] >> 5 & 0x1;
+//			if (HasSpeakerAssignment) {
+//				infobits += ChannelNum * 6;
+//			}
+//		}
+//		infobits += (1 + 5 + 25); // Extra info
+//
+//		shiftbytes += (infobits + 7) / 8; // 0..7 bits for padding
 	}
 
-	int crc = int(*(uint32_t*)(buf + shiftbytes - 1));
-
-	if (crc != crc_octets(buf, shiftbytes)) {
-		return -1;
-	}
+//	int crc = int(*(uint32_t*)(buf + shiftbytes - 1) >> 8);
+//
+//	if (crc != crc_octets(buf, shiftbytes)) {
+//		return -1;
+//	}
 
 	return (int)FrameNumber;
 }
