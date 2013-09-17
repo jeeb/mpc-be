@@ -112,9 +112,31 @@ CFilterApp theApp;
 
 #endif
 
+#define BSWAP24(x) { x = (((x & 0xff) << 16) | (x >> 16) | (x & 0xff00)); }
+
+#define CRC24_INIT 0xb704ceL
+#define CRC24_POLY 0x1864cfbL
+
+inline long crc_octets(BYTE *octets, size_t len)
+{
+	long crc = CRC24_INIT;
+
+	while (len--) {
+		crc ^= (*octets++) << 16;
+		for (int i = 0; i < 8; i++) {
+			crc <<= 1;
+			if (crc & 0x1000000) {
+				crc ^= CRC24_POLY;
+			}
+		}
+	}
+
+	return crc & 0xffffffL;
+}
+
 int GetTAKFrameNumber(BYTE* buf, int size) // not tested
 {
-	if (size < 32 || *(WORD*)buf & 0xe0ff != 0xA0FF) { // sync
+	if (size < 32 || *(WORD*)buf != 0xA0FF) { // sync
 		return -1;
 	}
 
@@ -189,28 +211,6 @@ STDMETHODIMP CTAKSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 	}
 
 	return S_OK;
-}
-
-#define BSWAP24(x) { x = (((x & 0xff) << 16) | (x >> 16) | (x & 0xff00)); }
-
-#define CRC24_INIT 0xb704ceL
-#define CRC24_POLY 0x1864cfbL
-
-inline long crc_octets(BYTE *octets, size_t len)
-{
-	long crc = CRC24_INIT;
-
-	while (len--) {
-		crc ^= (*octets++) << 16;
-		for (int i = 0; i < 8; i++) {
-			crc <<= 1;
-			if (crc & 0x1000000) {
-				crc ^= CRC24_POLY;
-			}
-		}
-	}
-
-	return crc & 0xffffffL;
 }
 
 HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
