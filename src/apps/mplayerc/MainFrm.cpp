@@ -20195,7 +20195,7 @@ int CMainFrame::GetStreamCount(DWORD dwSelGroup)
 
 void CMainFrame::AddSubtitlePathsAddons(CString FileName)
 {
-	CString tmp(GetFolderOnly(FileName).MakeUpper());
+	CString tmp(AddSlash(GetFolderOnly(FileName)).MakeUpper());
 	AppSettings& s = AfxGetAppSettings();
 
 	POSITION pos = s.slSubtitlePathsAddons.Find(tmp);
@@ -20206,7 +20206,7 @@ void CMainFrame::AddSubtitlePathsAddons(CString FileName)
 
 void CMainFrame::AddAudioPathsAddons(CString FileName)
 {
-	CString tmp(GetFolderOnly(FileName).MakeUpper());
+	CString tmp(AddSlash(GetFolderOnly(FileName)).MakeUpper());
 	AppSettings& s = AfxGetAppSettings();
 
 	POSITION pos = s.slAudioPathsAddons.Find(tmp);
