@@ -101,8 +101,6 @@ public IUnknown {
 	STDMETHOD_(int, GetSwOutputFormats()) = 0;
 	STDMETHOD(SetSwChromaToRGB(int nValue)) = 0;
 	STDMETHOD_(int, GetSwChromaToRGB()) = 0;
-	STDMETHOD(SetSwResizeMethodBE(int nValue)) = 0;
-	STDMETHOD_(int, GetSwResizeMethodBE()) = 0;
 	STDMETHOD(SetSwColorspace(int nValue)) = 0;
 	STDMETHOD_(int, GetSwColorspace()) = 0;
 	STDMETHOD(SetSwInputLevels(int nValue)) = 0;

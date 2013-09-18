@@ -66,7 +66,6 @@ extern "C" {
 #define OPT_DisableDXVA_SD   _T("DisableDXVA_SD")
 #define OPT_SwOutputFormats  _T("SwOutputFormats")
 #define OPT_SwChromaToRGB    _T("SwChromaToRGB")
-#define OPT_SwResizeMethodBE _T("SwResizeMethodBE")
 #define OPT_SwColorspace     _T("SwColorspace")
 #define OPT_SwInputLevels    _T("SwInputLevels")
 #define OPT_SwOutputLevels   _T("SwOutputLevels")
@@ -816,7 +815,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		m_nSwOutputFormats = (m_nSwOutputFormats<<4) | (5-i + (i>1 ? 8 : 0));
 	}
 	m_nSwChromaToRGB		= 1;
-	m_nSwResizeMethodBE		= 2;
 	m_nSwColorspace			= 2;
 	m_nSwInputLevels		= 2;
 	m_nSwOutputLevels		= 2;
@@ -860,9 +858,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SwChromaToRGB, dw)) {
 			m_nSwChromaToRGB = dw;
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SwResizeMethodBE, dw)) {
-			m_nSwResizeMethodBE = dw;
-		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SwColorspace, dw)) {
 			m_nSwColorspace = dw;
 		}
@@ -885,7 +880,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	// === New swscaler options
 	m_nSwOutputFormats			= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwOutputFormats, m_nSwOutputFormats);
 	m_nSwChromaToRGB			= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwChromaToRGB, m_nSwChromaToRGB);
-	m_nSwResizeMethodBE			= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwResizeMethodBE, m_nSwResizeMethodBE);
 	m_nSwColorspace				= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwColorspace, m_nSwColorspace);
 	m_nSwInputLevels			= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwInputLevels, m_nSwInputLevels);
 	m_nSwOutputLevels			= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwOutputLevels, m_nSwOutputLevels);
@@ -2044,46 +2038,13 @@ void CMPCVideoDecFilter::InitSwscale()
 				break;
 		}
 
-		switch (m_nSwResizeMethodBE) {
-			case 0  :										// GUI 'Area'
-				sws_FlagsR = SWS_AREA;
-				break;
-			case 1  :										// GUI 'Bicubic'
-				sws_FlagsR = SWS_BICUBIC;
-				break;
-			case 2  :										// GUI 'Bilinear'
-			default :
-				sws_FlagsR = SWS_BILINEAR;
-				break;
-			case 3  :										// GUI 'Fast Bilinear'
-				sws_FlagsR = SWS_FAST_BILINEAR;
-				break;
-			case 4  :										// GUI 'Gauss'
-				sws_FlagsR = SWS_GAUSS;
-				break;
-			case 5  :										// GUI 'Lanczos'
-				sws_FlagsR = SWS_LANCZOS;
-				break;
-			case 6  :										// GUI 'Point'
-				sws_FlagsR = SWS_POINT;
-				break;
-			case 7  :										// GUI 'Sinc'
-				sws_FlagsR = SWS_SINC;
-				break;
-			case 8  :										// GUI 'Spline'
-				sws_FlagsR = SWS_SPLINE;
-				break;
-			case 9  :										// GUI 'X'
-				sws_FlagsR = SWS_X;
-				break;
-		}
-		
+		sws_FlagsR = SWS_BILINEAR;
+
 		int sws_Flags = sws_FlagsR | sws_FlagsO;
 		
 		m_nOutCsp = GetCspFromMediaType(m_pOutput->CurrentMediaType().subtype);
 
 		if (m_nDialogHWND) {
-			EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_RESIZEMETHODBE), TRUE);
 			EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWCHROMATORGB), (m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp)));
 			EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWCOLORSPACE), (m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp)));
 			EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWINPUTLEVELS), (m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp)));
@@ -3051,7 +3012,6 @@ STDMETHODIMP CMPCVideoDecFilter::Apply()
 		// === New swscaler options
 		if (m_nSwRefresh > 0) {
 			key.SetDWORDValue(OPT_SwChromaToRGB, m_nSwChromaToRGB);
-			key.SetDWORDValue(OPT_SwResizeMethodBE, m_nSwResizeMethodBE);
 			key.SetDWORDValue(OPT_SwColorspace, m_nSwColorspace);
 			key.SetDWORDValue(OPT_SwInputLevels, m_nSwInputLevels);
 			key.SetDWORDValue(OPT_SwOutputLevels, m_nSwOutputLevels);
@@ -3072,7 +3032,6 @@ STDMETHODIMP CMPCVideoDecFilter::Apply()
 	// === New swscaler options
 	if (m_nSwRefresh > 0) {
 		AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwChromaToRGB, m_nSwChromaToRGB);
-		AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwResizeMethodBE, m_nSwResizeMethodBE);
 		AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwColorspace, m_nSwColorspace);
 		AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwInputLevels, m_nSwInputLevels);
 		AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwOutputLevels, m_nSwOutputLevels);
@@ -3224,18 +3183,6 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetSwChromaToRGB()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_nSwChromaToRGB;
-}
-
-STDMETHODIMP CMPCVideoDecFilter::SetSwResizeMethodBE(int nValue)
-{
-	CAutoLock cAutoLock(&m_csProps);
-	m_nSwResizeMethodBE = nValue;
-	return S_OK;
-}
-STDMETHODIMP_(int) CMPCVideoDecFilter::GetSwResizeMethodBE()
-{
-	CAutoLock cAutoLock(&m_csProps);
-	return m_nSwResizeMethodBE;
 }
 
 STDMETHODIMP CMPCVideoDecFilter::SetSwColorspace(int nValue)

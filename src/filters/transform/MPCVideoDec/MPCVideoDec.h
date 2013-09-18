@@ -90,7 +90,6 @@ protected:
 	int										m_nSwRefresh;
 	int										m_nSwOutputFormats;
 	int										m_nSwChromaToRGB;
-	int										m_nSwResizeMethodBE;
 	int										m_nSwColorspace;
 	int										m_nSwInputLevels;
 	int										m_nSwOutputLevels;
@@ -252,8 +251,6 @@ public:
 	STDMETHOD_(int, GetSwOutputFormats());
 	STDMETHOD(SetSwChromaToRGB(int nValue));
 	STDMETHOD_(int, GetSwChromaToRGB());
-	STDMETHOD(SetSwResizeMethodBE(int nValue));
-	STDMETHOD_(int, GetSwResizeMethodBE());
 	STDMETHOD(SetSwColorspace(int nValue));
 	STDMETHOD_(int, GetSwColorspace());
 	STDMETHOD(SetSwInputLevels(int nValue));

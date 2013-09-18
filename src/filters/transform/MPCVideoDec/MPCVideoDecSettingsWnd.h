@@ -42,7 +42,6 @@ enum {
 	IDC_PP_SWOUTPUTFORMATUP,
 	IDC_PP_SWOUTPUTFORMATDOWN,
 	IDC_PP_SWCHROMATORGB,
-	IDC_PP_RESIZEMETHODBE,
 	IDC_PP_SWCOLORSPACE,
 	IDC_PP_SWINPUTLEVELS,
 	IDC_PP_SWOUTPUTLEVELS,
@@ -89,9 +88,6 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 
 	CStatic     m_txtSwChromaToRGB;
 	CComboBox   m_cbSwChromaToRGB;
-
-	CStatic     m_txtSwResizeMethodBE;
-	CComboBox   m_cbSwResizeMethodBE;
 
 	CStatic     m_txtSwColorspace;
 	CComboBox   m_cbSwColorspace;

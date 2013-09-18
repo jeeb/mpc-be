@@ -200,23 +200,6 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbSwOutputFormatDown.Create(_T("\x36"), dwStyle|BS_PUSHBUTTON, CRect(p + CPoint(width_s - btn_w, 0), CSize(btn_w, btn_h)), this, IDC_PP_SWOUTPUTFORMATDOWN);
 	p.y += h20;
 
-	// Resize Method
-	m_txtSwResizeMethodBE.Create(_T("Resize Method:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
-	p.y += h16;
-	m_cbSwResizeMethodBE.Create(dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(width_s, 200)), this, IDC_PP_RESIZEMETHODBE);
-	m_cbSwResizeMethodBE.AddString(_T("Area"));          // ResStr(IDS_VDF_CHR_AREA)
-	m_cbSwResizeMethodBE.AddString(_T("Bicubic"));       // ResStr(IDS_VDF_CHR_BICUBIC)
-//	m_cbSwResizeMethodBE.AddString(_T("Bicublin"));      // ResStr(IDS_VDF_CHR_BICUBLIN) //temp rem
-	m_cbSwResizeMethodBE.AddString(_T("Bilinear"));      // ResStr(IDS_VDF_CHR_BILINEAR)
-	m_cbSwResizeMethodBE.AddString(_T("Fast Bilinear")); // ResStr(IDS_VDF_CHR_FAST_BILINEAR)
-	m_cbSwResizeMethodBE.AddString(_T("Gauss"));         // ResStr(IDS_VDF_CHR_FULL_GAUSS)
-	m_cbSwResizeMethodBE.AddString(_T("Lanczos"));       // ResStr(IDS_VDF_CHR_FULL_LANCZOS)
-	m_cbSwResizeMethodBE.AddString(_T("Point"));         // ResStr(IDS_VDF_CHR_FULL_POINT)
-	m_cbSwResizeMethodBE.AddString(_T("Sinc"));          // ResStr(IDS_VDF_CHR_FULL_SINC)
-	m_cbSwResizeMethodBE.AddString(_T("Spline"));        // ResStr(IDS_VDF_CHR_FULL_SPLINE)
-	m_cbSwResizeMethodBE.AddString(_T("X"));             // ResStr(IDS_VDF_CHR_FULL_X)
-	p.y += h25;
-	
 	// Chroma options
 	m_txtSwChromaToRGB.Create(_T("Chroma to RGB:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h16;
@@ -226,7 +209,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 //	m_cbSwChromaToRGB.AddString(_T("High"));   // ResStr(IDS_VDF_CHR_HIGH) //temp rem
 	m_cbSwChromaToRGB.AddString(_T("Full"));   // ResStr(IDS_VDF_CHR_FULL)
 	p.y += h25;
-	
+
 	// Software Colorspace
 	m_txtSwColorspace.Create(_T("Colorspace:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h16;
@@ -287,7 +270,6 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 			m_lstSwOutputFormats.SetCheck(i, m_nSwChecked[i]);
 		}
 		m_cbSwChromaToRGB.SetCurSel(m_pMDF->GetSwChromaToRGB());
-		m_cbSwResizeMethodBE.SetCurSel(m_pMDF->GetSwResizeMethodBE());
 		m_cbSwColorspace.SetCurSel(m_pMDF->GetSwColorspace());
 		m_cbSwInputLevels.SetCurSel(m_pMDF->GetSwInputLevels());
 		m_cbSwOutputLevels.SetCurSel(m_pMDF->GetSwOutputLevels());
@@ -298,7 +280,6 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		m_cbSwOutputFormatUp.EnableWindow(m_nOutCsp != FF_CSP_UNSUPPORTED);
 		m_cbSwOutputFormatDown.EnableWindow(m_nOutCsp != FF_CSP_UNSUPPORTED);
 
-		m_cbSwResizeMethodBE.EnableWindow(m_nOutCsp == 0 || m_nOutCsp != FF_CSP_UNSUPPORTED);
 		m_cbSwChromaToRGB.EnableWindow(m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp));
 		m_cbSwColorspace.EnableWindow(m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp));
 		m_cbSwInputLevels.EnableWindow(m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp));
@@ -339,7 +320,6 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 		int m_nSwRefresh = 0; // no refresh
 
 		if (m_cbSwChromaToRGB.GetCurSel() != m_pMDF->GetSwChromaToRGB() || 
-		m_cbSwResizeMethodBE.GetCurSel() != m_pMDF->GetSwResizeMethodBE() || 
 		m_cbSwColorspace.GetCurSel() != m_pMDF->GetSwColorspace() || 
 		m_cbSwInputLevels.GetCurSel() != m_pMDF->GetSwInputLevels() || 
 		m_cbSwOutputLevels.GetCurSel() != m_pMDF->GetSwOutputLevels()) {
@@ -374,10 +354,9 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 		for (int i=0; i<6; i++) {
 			nSwOF = (nSwOF<<4) | (m_nSwIndex[5-i] + m_nSwChecked[5-i]*8);
 		}
-   		m_pMDF->SetSwOutputFormats(nSwOF);
+		m_pMDF->SetSwOutputFormats(nSwOF);
 
 		m_pMDF->SetSwChromaToRGB(m_cbSwChromaToRGB.GetCurSel());
-		m_pMDF->SetSwResizeMethodBE(m_cbSwResizeMethodBE.GetCurSel());
 		m_pMDF->SetSwColorspace(m_cbSwColorspace.GetCurSel());
 		m_pMDF->SetSwInputLevels(m_cbSwInputLevels.GetCurSel());
 		m_pMDF->SetSwOutputLevels(m_cbSwOutputLevels.GetCurSel());
