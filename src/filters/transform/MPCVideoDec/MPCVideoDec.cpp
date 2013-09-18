@@ -2022,26 +2022,21 @@ void CMPCVideoDecFilter::InitSwscale()
 			m_PixFmt		= AV_PIX_FMT_NB;
 		}
 
-		int sws_FlagsR = 0;
-		int sws_FlagsO = 0;
+		int sws_Flags = 0; //SWS_BILINEAR;
 
 		switch (m_nSwChromaToRGB) {
 			case 0  :										// GUI 'Fast'
-				sws_FlagsO = SWS_ACCURATE_RND;
+				sws_Flags |= SWS_ACCURATE_RND;
 				break;
 			case 1  :										// GUI 'Normal'
 			default :
-				sws_FlagsO = SWS_FULL_CHR_H_INP | SWS_ACCURATE_RND;
+				sws_Flags |= SWS_FULL_CHR_H_INP | SWS_ACCURATE_RND;
 				break;
 			case 2  :										// GUI 'Full'
-				sws_FlagsO = SWS_FULL_CHR_H_INT | SWS_FULL_CHR_H_INP | SWS_ACCURATE_RND;
+				sws_Flags |= SWS_FULL_CHR_H_INT | SWS_FULL_CHR_H_INP | SWS_ACCURATE_RND;
 				break;
 		}
 
-		sws_FlagsR = SWS_BILINEAR;
-
-		int sws_Flags = sws_FlagsR | sws_FlagsO;
-		
 		m_nOutCsp = GetCspFromMediaType(m_pOutput->CurrentMediaType().subtype);
 
 		if (m_nDialogHWND) {
