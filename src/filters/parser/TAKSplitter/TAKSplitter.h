@@ -47,8 +47,10 @@ class __declspec(uuid("AA04C78C-3671-43F6-ABFE-6C265BAB2345"))
 	DWORD   m_layout;
 	__int64 m_samples;
 	int     m_framelen;
+	int     m_totalframes;
 
 	bool ParseTAKStreamInfo(BYTE* buff, int size);
+	bool Sync(int& nFrameNumber);
 
 protected:
 	CAutoPtr<CBaseSplitterFileEx> m_pFile;

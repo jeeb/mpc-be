@@ -197,6 +197,7 @@ CTAKSplitterFilter::CTAKSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	, m_layout(0)
 	, m_samples(0)
 	, m_framelen(0)
+	, m_totalframes(0)
 {
 }
 
@@ -399,6 +400,17 @@ void CTAKSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		m_rtStart = 0;
 	} else {
 		m_pFile->Seek(m_startpos + (__int64)((double)rt / m_rtDuration * (m_endpos - m_startpos)));
+		int FrameNumber = (int)((double)rt / m_rtDuration * m_totalframes);
+
+		int nFrameNumber = 0;
+		while (Sync(nFrameNumber) && nFrameNumber != FrameNumber) {
+			if (nFrameNumber < FrameNumber) {
+				m_pFile->Seek(m_pFile->GetPos() + 10); // skip minimal Frame header
+			} else {
+				m_pFile->Seek(m_pFile->GetPos() - 65 * KILOBYTE);
+			}
+		}
+
 		m_rtStart = rt;
 	}
 }
@@ -512,14 +524,44 @@ bool CTAKSplitterFilter::ParseTAKStreamInfo(BYTE* buf, int size)
 		max_nb_samples = 0;
 	}
 
-	m_samplerate = SampleRate;
-	m_bitdepth   = SampleBits;
-	m_channels   = ChannelNum;
-	m_layout     = ChannelMask;
-	m_samples    = SampleNum;
-	m_framelen   = nb_samples;
+	m_samplerate  = SampleRate;
+	m_bitdepth    = SampleBits;
+	m_channels    = ChannelNum;
+	m_layout      = ChannelMask;
+	m_samples     = SampleNum;
+	m_framelen    = nb_samples;
+	m_totalframes = m_samples / m_framelen;
 
 	return true;
+}
+
+bool CTAKSplitterFilter::Sync(int& nFrameNumber)
+{
+	__int64 start = m_pFile->GetPos();
+
+	WORD w = 0;
+	for (__int64 i = 0; i < min(65 * KILOBYTE, m_pFile->GetRemaining()) && S_OK == m_pFile->ByteRead((BYTE*)&w, sizeof(w)); i++, m_pFile->Seek(start + i)) {
+		if (w == 0xA0FF) {
+			m_pFile->Seek(start + i);
+
+			int size = min(32, m_pFile->GetRemaining());
+
+			BYTE* buf = DNew BYTE[size];
+			m_pFile->ByteRead(buf, size);
+			int FrameNumber = GetTAKFrameNumber(buf, size);
+			delete [] buf;
+
+			if (FrameNumber != -1 && FrameNumber <= m_totalframes) {
+				nFrameNumber = FrameNumber;
+				m_pFile->Seek(start + i);
+				return true;
+			}
+		}
+	}
+
+	m_pFile->Seek(start);
+
+	return false;
 }
 
 //
