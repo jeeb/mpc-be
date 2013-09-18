@@ -190,6 +190,13 @@ CTAKSplitterFilter::CTAKSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	, m_startpos(0)
 	, m_endpos(0)
 	, m_nAvgBytesPerSec(0)
+	, m_rtStart(0)
+	, m_samplerate(0)
+	, m_bitdepth(0)
+	, m_channels(0)
+	, m_layout(0)
+	, m_samples(0)
+	, m_framelen(0)
 {
 }
 
@@ -493,23 +500,24 @@ bool CTAKSplitterFilter::ParseTAKStreamInfo(BYTE* buf, int size)
 	//	ChannelMask = GetDefChannelMask(ChannelNum);
 	//}
 
-	//int nb_samples, max_nb_samples;
-	//if (FrameSizeType <= TAK_FRAME_250ms) {
-	//	nb_samples     = SampleRate * frame_duration_type_quants[FrameSizeType] >> 5;
-	//	max_nb_samples = 16384;
-	//} else if (FrameSizeType < _countof(frame_duration_type_quants)) {
-	//	nb_samples     = frame_duration_type_quants[FrameSizeType];
-	//	max_nb_samples = SampleRate * frame_duration_type_quants[TAK_FRAME_250ms] >> 5;
-	//} else {
-	//	nb_samples     = 0;
-	//	max_nb_samples = 0;
-	//}
+	int nb_samples, max_nb_samples;
+	if (FrameSizeType <= TAK_FRAME_250ms) {
+		nb_samples     = SampleRate * frame_duration_type_quants[FrameSizeType] >> 5;
+		max_nb_samples = 16384;
+	} else if (FrameSizeType < _countof(frame_duration_type_quants)) {
+		nb_samples     = frame_duration_type_quants[FrameSizeType];
+		max_nb_samples = SampleRate * frame_duration_type_quants[TAK_FRAME_250ms] >> 5;
+	} else {
+		nb_samples     = 0;
+		max_nb_samples = 0;
+	}
 
 	m_samplerate = SampleRate;
 	m_bitdepth   = SampleBits;
 	m_channels   = ChannelNum;
 	m_layout     = ChannelMask;
 	m_samples    = SampleNum;
+	m_framelen   = nb_samples;
 
 	return true;
 }

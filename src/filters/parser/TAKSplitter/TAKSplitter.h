@@ -46,6 +46,7 @@ class __declspec(uuid("AA04C78C-3671-43F6-ABFE-6C265BAB2345"))
 	int     m_channels;
 	DWORD   m_layout;
 	__int64 m_samples;
+	int     m_framelen;
 
 	bool ParseTAKStreamInfo(BYTE* buff, int size);
 
