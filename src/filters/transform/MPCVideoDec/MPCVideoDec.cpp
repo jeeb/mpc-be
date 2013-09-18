@@ -2022,7 +2022,8 @@ void CMPCVideoDecFilter::InitSwscale()
 			m_PixFmt		= AV_PIX_FMT_NB;
 		}
 
-		int sws_Flags = 0; //SWS_BILINEAR;
+		int sws_Flags = SWS_BILINEAR; // gag. interpolation is not used, because the frame size is not changed
+		// don't use SWS_FAST_BILINEAR or SWS_POINT, otherwise dither is disabled and will be used low-quality yv12_to_yuy2 conversion
 
 		switch (m_nSwChromaToRGB) {
 			case 0  :										// GUI 'Fast'
