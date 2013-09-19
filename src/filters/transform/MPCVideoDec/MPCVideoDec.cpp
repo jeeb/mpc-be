@@ -65,7 +65,7 @@ extern "C" {
 #define OPT_DXVACheck        _T("DXVACheckCompatibility")
 #define OPT_DisableDXVA_SD   _T("DisableDXVA_SD")
 #define OPT_SwOutputFormats  _T("SwOutputFormats")
-#define OPT_SwChromaToRGB    _T("SwChromaToRGB")
+#define OPT_SwPreset         _T("SwPreset")
 #define OPT_SwColorspace     _T("SwColorspace")
 #define OPT_SwInputLevels    _T("SwInputLevels")
 #define OPT_SwOutputLevels   _T("SwOutputLevels")
@@ -814,7 +814,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	for (int i=0; i<6; i++) {
 		m_nSwOutputFormats = (m_nSwOutputFormats<<4) | (5-i + (i>1 ? 8 : 0));
 	}
-	m_nSwChromaToRGB		= 1;
+	m_nSwPreset				= 2;
 	m_nSwColorspace			= 2;
 	m_nSwInputLevels		= 2;
 	m_nSwOutputLevels		= 2;
@@ -855,8 +855,8 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SwOutputFormats, dw)) {
 			m_nSwOutputFormats = dw;
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SwChromaToRGB, dw)) {
-			m_nSwChromaToRGB = dw;
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SwPreset, dw)) {
+			m_nSwPreset = dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SwColorspace, dw)) {
 			m_nSwColorspace = dw;
@@ -879,7 +879,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 	// === New swscaler options
 	m_nSwOutputFormats			= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwOutputFormats, m_nSwOutputFormats);
-	m_nSwChromaToRGB			= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwChromaToRGB, m_nSwChromaToRGB);
+	m_nSwPreset					= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwPreset, m_nSwPreset);
 	m_nSwColorspace				= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwColorspace, m_nSwColorspace);
 	m_nSwInputLevels			= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwInputLevels, m_nSwInputLevels);
 	m_nSwOutputLevels			= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwOutputLevels, m_nSwOutputLevels);
@@ -2022,26 +2022,29 @@ void CMPCVideoDecFilter::InitSwscale()
 			m_PixFmt		= AV_PIX_FMT_NB;
 		}
 
-		int sws_Flags = SWS_BILINEAR; // gag. interpolation is not used, because the frame size is not changed
-		// don't use SWS_FAST_BILINEAR or SWS_POINT, otherwise dither is disabled and will be used low-quality yv12_to_yuy2 conversion
-
-		switch (m_nSwChromaToRGB) {
-			case 0  :										// GUI 'Fast'
-				sws_Flags |= SWS_ACCURATE_RND;
+		int sws_Flags = 0;
+		switch (m_nSwPreset) {
+			case 0  : // "Fastest"
+				sws_Flags = SWS_FAST_BILINEAR | SWS_ACCURATE_RND;
+				// SWS_FAST_BILINEAR or SWS_POINT disable dither and enable low-quality yv12_to_yuy2 conversion.
+				// any interpolation type has no effect.
 				break;
-			case 1  :										// GUI 'Normal'
+			case 1  : // "Fast"
+				sws_Flags = SWS_BILINEAR | SWS_ACCURATE_RND;
+				break;
+			case 2  :// "Normal"
 			default :
-				sws_Flags |= SWS_FULL_CHR_H_INP | SWS_ACCURATE_RND;
+				sws_Flags = SWS_BILINEAR | SWS_ACCURATE_RND | SWS_FULL_CHR_H_INP;
 				break;
-			case 2  :										// GUI 'Full'
-				sws_Flags |= SWS_FULL_CHR_H_INT | SWS_FULL_CHR_H_INP | SWS_ACCURATE_RND;
+			case 3  : // "Full"
+				sws_Flags = SWS_BILINEAR | SWS_ACCURATE_RND | SWS_FULL_CHR_H_INP | SWS_FULL_CHR_H_INT;
 				break;
 		}
 
 		m_nOutCsp = GetCspFromMediaType(m_pOutput->CurrentMediaType().subtype);
 
 		if (m_nDialogHWND) {
-			EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWCHROMATORGB), (m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp)));
+			EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWPRESET), (m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp)));
 			EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWCOLORSPACE), (m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp)));
 			EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWINPUTLEVELS), (m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp)));
 			EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWOUTPUTLEVELS), (m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp)));
@@ -3007,7 +3010,7 @@ STDMETHODIMP CMPCVideoDecFilter::Apply()
 
 		// === New swscaler options
 		if (m_nSwRefresh > 0) {
-			key.SetDWORDValue(OPT_SwChromaToRGB, m_nSwChromaToRGB);
+			key.SetDWORDValue(OPT_SwPreset, m_nSwPreset);
 			key.SetDWORDValue(OPT_SwColorspace, m_nSwColorspace);
 			key.SetDWORDValue(OPT_SwInputLevels, m_nSwInputLevels);
 			key.SetDWORDValue(OPT_SwOutputLevels, m_nSwOutputLevels);
@@ -3027,7 +3030,7 @@ STDMETHODIMP CMPCVideoDecFilter::Apply()
 
 	// === New swscaler options
 	if (m_nSwRefresh > 0) {
-		AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwChromaToRGB, m_nSwChromaToRGB);
+		AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwPreset, m_nSwPreset);
 		AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwColorspace, m_nSwColorspace);
 		AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwInputLevels, m_nSwInputLevels);
 		AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwOutputLevels, m_nSwOutputLevels);
@@ -3169,16 +3172,16 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetSwOutputFormats()
 	return (int)m_nSwOutputFormats;
 }
 
-STDMETHODIMP CMPCVideoDecFilter::SetSwChromaToRGB(int nValue)
+STDMETHODIMP CMPCVideoDecFilter::SetSwPreset(int nValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
-	m_nSwChromaToRGB = nValue;
+	m_nSwPreset = nValue;
 	return S_OK;
 }
-STDMETHODIMP_(int) CMPCVideoDecFilter::GetSwChromaToRGB()
+STDMETHODIMP_(int) CMPCVideoDecFilter::GetSwPreset()
 {
 	CAutoLock cAutoLock(&m_csProps);
-	return m_nSwChromaToRGB;
+	return m_nSwPreset;
 }
 
 STDMETHODIMP CMPCVideoDecFilter::SetSwColorspace(int nValue)

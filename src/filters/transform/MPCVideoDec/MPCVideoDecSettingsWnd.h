@@ -41,7 +41,7 @@ enum {
 	IDC_PP_DXVA_SD,
 	IDC_PP_SWOUTPUTFORMATUP,
 	IDC_PP_SWOUTPUTFORMATDOWN,
-	IDC_PP_SWCHROMATORGB,
+	IDC_PP_SWPRESET,
 	IDC_PP_SWCOLORSPACE,
 	IDC_PP_SWINPUTLEVELS,
 	IDC_PP_SWOUTPUTLEVELS,
@@ -86,8 +86,8 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	int			m_nSwIndex[6];
 	int			m_nSwChecked[6];
 
-	CStatic     m_txtSwChromaToRGB;
-	CComboBox   m_cbSwChromaToRGB;
+	CStatic     m_txtSwPreset;
+	CComboBox   m_cbSwPreset;
 
 	CStatic     m_txtSwColorspace;
 	CComboBox   m_cbSwColorspace;

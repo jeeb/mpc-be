@@ -201,13 +201,13 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	p.y += h20;
 
 	// Chroma options
-	m_txtSwChromaToRGB.Create(_T("Chroma to RGB:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
+	m_txtSwPreset.Create(_T("Preset:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h16;
-	m_cbSwChromaToRGB.Create (dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(width_s, 200)), this, IDC_PP_SWCHROMATORGB);
-	m_cbSwChromaToRGB.AddString(_T("Fast"));   // ResStr(IDS_VDF_CHR_FAST)
-	m_cbSwChromaToRGB.AddString(_T("Normal")); // ResStr(IDS_VDF_CHR_NORMAL)
-//	m_cbSwChromaToRGB.AddString(_T("High"));   // ResStr(IDS_VDF_CHR_HIGH) //temp rem
-	m_cbSwChromaToRGB.AddString(_T("Full"));   // ResStr(IDS_VDF_CHR_FULL)
+	m_cbSwPreset.Create (dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(width_s, 200)), this, IDC_PP_SWPRESET);
+	m_cbSwPreset.AddString(_T("Fastest")); // ResStr(IDS_VDF_CHR_FASTEST)
+	m_cbSwPreset.AddString(_T("Fast"));    // ResStr(IDS_VDF_CHR_FAST)
+	m_cbSwPreset.AddString(_T("Normal"));  // ResStr(IDS_VDF_CHR_NORMAL)
+	m_cbSwPreset.AddString(_T("Full"));    // ResStr(IDS_VDF_CHR_FULL)
 	p.y += h25;
 
 	// Software Colorspace
@@ -269,7 +269,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		for (int i=0; i<6; i++) {
 			m_lstSwOutputFormats.SetCheck(i, m_nSwChecked[i]);
 		}
-		m_cbSwChromaToRGB.SetCurSel(m_pMDF->GetSwChromaToRGB());
+		m_cbSwPreset.SetCurSel(m_pMDF->GetSwPreset());
 		m_cbSwColorspace.SetCurSel(m_pMDF->GetSwColorspace());
 		m_cbSwInputLevels.SetCurSel(m_pMDF->GetSwInputLevels());
 		m_cbSwOutputLevels.SetCurSel(m_pMDF->GetSwOutputLevels());
@@ -280,7 +280,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		m_cbSwOutputFormatUp.EnableWindow(m_nOutCsp != FF_CSP_UNSUPPORTED);
 		m_cbSwOutputFormatDown.EnableWindow(m_nOutCsp != FF_CSP_UNSUPPORTED);
 
-		m_cbSwChromaToRGB.EnableWindow(m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp));
+		m_cbSwPreset.EnableWindow(m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp));
 		m_cbSwColorspace.EnableWindow(m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp));
 		m_cbSwInputLevels.EnableWindow(m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp));
 		m_cbSwOutputLevels.EnableWindow(m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp));
@@ -319,7 +319,7 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 		// === New swscaler options
 		int m_nSwRefresh = 0; // no refresh
 
-		if (m_cbSwChromaToRGB.GetCurSel() != m_pMDF->GetSwChromaToRGB() || 
+		if (m_cbSwPreset.GetCurSel() != m_pMDF->GetSwPreset() || 
 		m_cbSwColorspace.GetCurSel() != m_pMDF->GetSwColorspace() || 
 		m_cbSwInputLevels.GetCurSel() != m_pMDF->GetSwInputLevels() || 
 		m_cbSwOutputLevels.GetCurSel() != m_pMDF->GetSwOutputLevels()) {
@@ -356,7 +356,7 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 		}
 		m_pMDF->SetSwOutputFormats(nSwOF);
 
-		m_pMDF->SetSwChromaToRGB(m_cbSwChromaToRGB.GetCurSel());
+		m_pMDF->SetSwPreset(m_cbSwPreset.GetCurSel());
 		m_pMDF->SetSwColorspace(m_cbSwColorspace.GetCurSel());
 		m_pMDF->SetSwInputLevels(m_cbSwInputLevels.GetCurSel());
 		m_pMDF->SetSwOutputLevels(m_cbSwOutputLevels.GetCurSel());
