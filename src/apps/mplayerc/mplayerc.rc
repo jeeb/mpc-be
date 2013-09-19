@@ -2999,23 +2999,33 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_VDF_THREADNUMBER    "Decoding thread number"
-    IDS_VDF_SKIPDEBLOCK     "H264 skip deblocking mode"
-    IDS_VDF_DBLK_NONE       "None"
-    IDS_VDF_DBLK_DEFAULT    "Default"
-    IDS_VDF_DBLK_NONREF     "Non Reference"
-    IDS_VDF_DBLK_BIDIR      "Bidirectional"
-    IDS_VDF_DBLK_NONKFRM    "Non keyframes"
-    IDS_VDF_DBLK_ALL        "All frames"
+    IDS_VDF_THREADNUMBER         "Decoding thread number"
+    IDS_VDF_SKIPDEBLOCK          "H264 skip deblocking mode"
+    IDS_VDF_DBLK_NONE            "None"
+    IDS_VDF_DBLK_DEFAULT         "Default"
+    IDS_VDF_DBLK_NONREF          "Non Reference"
+    IDS_VDF_DBLK_BIDIR           "Bidirectional"
+    IDS_VDF_DBLK_NONKFRM         "Non keyframes"
+    IDS_VDF_DBLK_ALL             "All frames"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_VDF_DEINTERLACING		"Deinterlacing"
-    IDS_VDF_AUTO		"Auto"
-    IDS_VDF_DEINTER_TOP			"Top-Field First"
-    IDS_VDF_DEINTER_BOTTOM		"Bottom-Field First"
-    IDS_VDF_DEINTER_PROGRESSIVE	"Progressive"
+    IDS_VDF_DEINTERLACING        "Deinterlacing"
+    IDS_VDF_AUTO                 "Auto"
+    IDS_VDF_DEINTER_TOP          "Top-Field First"
+    IDS_VDF_DEINTER_BOTTOM       "Bottom-Field First"
+    IDS_VDF_DEINTER_PROGRESSIVE  "Progressive"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_VDF_COLOR_FMT_CONVERSION "Format conversion"
+    IDS_VDF_COLOR_OUTPUT_FORMATS "Output formats:"
+    IDS_VDF_COLOR_PRESET         "Preset:"
+    IDS_VDF_COLOR_STANDARD       "Standard:"
+    IDS_VDF_COLOR_INPUT_LEVELS   "Input levels:"
+    IDS_VDF_COLOR_OUTPUT_LEVELS  "Output levels:"
 END
 
 STRINGTABLE

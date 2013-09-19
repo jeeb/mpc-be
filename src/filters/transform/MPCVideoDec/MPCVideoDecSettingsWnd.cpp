@@ -185,7 +185,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 			m_nSwIndex[i]  &= ~8;
 		}
 	}
-	m_txtSwOutputFormats.Create(_T("Output formats:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
+	m_txtSwOutputFormats.Create(ResStr(IDS_VDF_COLOR_OUTPUT_FORMATS), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h16;
 	m_lstSwOutputFormats.Create(dwStyle|WS_BORDER|LBS_OWNERDRAWFIXED|LBS_HASSTRINGS, CRect(p, CSize(width_s, IPP_SCALE(82))), this, 0);
 	for (int i = 0; i < _countof(m_nSwIndex); i++) {
@@ -200,40 +200,40 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbSwOutputFormatDown.Create(_T("\x36"), dwStyle|BS_PUSHBUTTON, CRect(p + CPoint(width_s - btn_w, 0), CSize(btn_w, btn_h)), this, IDC_PP_SWOUTPUTFORMATDOWN);
 	p.y += h20;
 
-	// Chroma options
-	m_txtSwPreset.Create(_T("Preset:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
+	// Preset
+	m_txtSwPreset.Create(ResStr(IDS_VDF_COLOR_PRESET), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h16;
 	m_cbSwPreset.Create (dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(width_s, 200)), this, IDC_PP_SWPRESET);
-	m_cbSwPreset.AddString(_T("Fastest")); // ResStr(IDS_VDF_CHR_FASTEST)
-	m_cbSwPreset.AddString(_T("Fast"));    // ResStr(IDS_VDF_CHR_FAST)
-	m_cbSwPreset.AddString(_T("Normal"));  // ResStr(IDS_VDF_CHR_NORMAL)
-	m_cbSwPreset.AddString(_T("Full"));    // ResStr(IDS_VDF_CHR_FULL)
+	m_cbSwPreset.AddString(_T("Fastest"));
+	m_cbSwPreset.AddString(_T("Fast"));
+	m_cbSwPreset.AddString(_T("Normal"));
+	m_cbSwPreset.AddString(_T("Full"));
 	p.y += h25;
 
 	// Standard (ITU-R Recommendation)
-	m_txtSwStandard.Create(_T("Standard:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
+	m_txtSwStandard.Create(ResStr(IDS_VDF_COLOR_STANDARD), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h16;
 	m_cbSwStandard.Create(dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(width_s, 200)), this, IDC_PP_SWSTANDARD);
-	m_cbSwStandard.AddString(_T("SD (BT.601)")); // ResStr(IDS_VDF_BT601)
-	m_cbSwStandard.AddString(_T("HD (BT.709)")); // ResStr(IDS_VDF_BT709)
+	m_cbSwStandard.AddString(_T("SD (BT.601)"));
+	m_cbSwStandard.AddString(_T("HD (BT.709)"));
 	m_cbSwStandard.AddString(ResStr(IDS_VDF_AUTO));
 	p.y += h25;
 
 	// Input levels
-	m_txtSwInputLevels.Create(_T("Input levels:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
+	m_txtSwInputLevels.Create(ResStr(IDS_VDF_COLOR_INPUT_LEVELS), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h16;
 	m_cbSwInputLevels.Create(dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(width_s, 200)), this, IDC_PP_SWINPUTLEVELS);
-	m_cbSwInputLevels.AddString(_T("TV (16-235)")); // ResStr(IDS_VDF_RANGE_TV)
-	m_cbSwInputLevels.AddString(_T("PC (0-255)"));  // ResStr(IDS_VDF_RANGE_PC)
+	m_cbSwInputLevels.AddString(_T("TV (16-235)"));
+	m_cbSwInputLevels.AddString(_T("PC (0-255)"));
 	m_cbSwInputLevels.AddString(ResStr(IDS_VDF_AUTO));
 	p.y += h25;
 
 	// Output levels
-	m_txtSwOutputLevels.Create(_T("Output levels:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
+	m_txtSwOutputLevels.Create(ResStr(IDS_VDF_COLOR_OUTPUT_LEVELS), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h16;
 	m_cbSwOutputLevels.Create(dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(width_s, 200)), this, IDC_PP_SWOUTPUTLEVELS);
-	m_cbSwOutputLevels.AddString(_T("TV (16-235)")); // ResStr(IDS_VDF_RANGE_TV)
-	m_cbSwOutputLevels.AddString(_T("PC (0-255)"));  // ResStr(IDS_VDF_RANGE_PC)
+	m_cbSwOutputLevels.AddString(_T("TV (16-235)"));
+	m_cbSwOutputLevels.AddString(_T("PC (0-255)"));
 	m_cbSwOutputLevels.AddString(ResStr(IDS_VDF_AUTO));
 	p.y += h25;
 

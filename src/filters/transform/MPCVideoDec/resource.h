@@ -31,6 +31,12 @@
 #define IDS_VDF_DEINTER_TOP             7425
 #define IDS_VDF_DEINTER_BOTTOM          7426
 #define IDS_VDF_DEINTER_PROGRESSIVE     7427
+#define IDS_VDF_COLOR_FMT_CONVERSION    7430
+#define IDS_VDF_COLOR_OUTPUT_FORMATS    7431
+#define IDS_VDF_COLOR_PRESET            7432
+#define IDS_VDF_COLOR_STANDARD          7433
+#define IDS_VDF_COLOR_INPUT_LEVELS      7434
+#define IDS_VDF_COLOR_OUTPUT_LEVELS     7435
 
 // Next default values for new objects
 // 
