@@ -90,7 +90,7 @@ protected:
 	int										m_nSwRefresh;
 	int										m_nSwOutputFormats;
 	int										m_nSwPreset;
-	int										m_nSwColorspace;
+	int										m_nSwStandard;
 	int										m_nSwInputLevels;
 	int										m_nSwOutputLevels;
 	//
@@ -251,8 +251,8 @@ public:
 	STDMETHOD_(int, GetSwOutputFormats());
 	STDMETHOD(SetSwPreset(int nValue));
 	STDMETHOD_(int, GetSwPreset());
-	STDMETHOD(SetSwColorspace(int nValue));
-	STDMETHOD_(int, GetSwColorspace());
+	STDMETHOD(SetSwStandard(int nValue));
+	STDMETHOD_(int, GetSwStandard());
 	STDMETHOD(SetSwInputLevels(int nValue));
 	STDMETHOD_(int, GetSwInputLevels());
 	STDMETHOD(SetSwOutputLevels(int nValue));
