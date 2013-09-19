@@ -167,7 +167,11 @@ int GetTAKFrameNumber(BYTE* buf, int size) // not tested
 				infobits += ChannelNum * 6;
 			}
 		}
-		infobits += (1 + 5 + 25); // Extra info
+		uint8_t PrevFramePos = buf[shiftbytes + infobits/8] >> (infobits % 8) & 0x1;
+		infobits += (1 + 5); // Extra info
+		if (PrevFramePos) {
+			infobits += 25;
+		}
 
 		shiftbytes += (infobits + 7) / 8; // 0..7 bits for padding
 	}
