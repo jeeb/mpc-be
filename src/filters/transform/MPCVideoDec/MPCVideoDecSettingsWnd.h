@@ -77,6 +77,7 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CButton		m_cbDXVA_SD;
 
 	// === New swscaler options
+	CButton			m_grpFmtConv;
 	CStatic			m_txtSwOutputFormats;
 	CCheckListBox	m_lstSwOutputFormats;
 	CImageList		m_onoff;
@@ -143,7 +144,7 @@ public:
 	bool OnApply();
 
 	static LPCTSTR GetWindowTitle() { return _T("Codecs");    }
-	static CSize GetWindowSize()    { return CSize(453, 356); }
+	static CSize GetWindowSize()    { return CSize(555, 273); }
 
 	DECLARE_MESSAGE_MAP()
 };
