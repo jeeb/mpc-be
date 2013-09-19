@@ -960,8 +960,8 @@ int sws_setColorspaceDetails(struct SwsContext *c, const int inv_table[4],
 {
     const AVPixFmtDescriptor *desc_dst;
     const AVPixFmtDescriptor *desc_src;
-    memcpy(c->srcColorspaceTable, inv_table, sizeof(int) * 4);
-    memcpy(c->dstColorspaceTable, table, sizeof(int) * 4);
+    memmove(c->srcColorspaceTable, inv_table, sizeof(int) * 4);
+    memmove(c->dstColorspaceTable, table, sizeof(int) * 4);
 
     handle_formats(c);
     desc_dst = av_pix_fmt_desc_get(c->dstFormat);
@@ -1546,32 +1546,34 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
     av_assert0(c->chrDstH <= dstH);
 
     if (flags & SWS_PRINT_INFO) {
+        const char *scaler, *cpucaps;
         if (flags & SWS_FAST_BILINEAR)
-            av_log(c, AV_LOG_INFO, "FAST_BILINEAR scaler, ");
+            scaler = "FAST_BILINEAR scaler";
         else if (flags & SWS_BILINEAR)
-            av_log(c, AV_LOG_INFO, "BILINEAR scaler, ");
+            scaler = "BILINEAR scaler";
         else if (flags & SWS_BICUBIC)
-            av_log(c, AV_LOG_INFO, "BICUBIC scaler, ");
+            scaler = "BICUBIC scaler";
         else if (flags & SWS_X)
-            av_log(c, AV_LOG_INFO, "Experimental scaler, ");
+            scaler = "Experimental scaler";
         else if (flags & SWS_POINT)
-            av_log(c, AV_LOG_INFO, "Nearest Neighbor / POINT scaler, ");
+            scaler = "Nearest Neighbor / POINT scaler";
         else if (flags & SWS_AREA)
-            av_log(c, AV_LOG_INFO, "Area Averaging scaler, ");
+            scaler = "Area Averaging scaler";
         else if (flags & SWS_BICUBLIN)
-            av_log(c, AV_LOG_INFO, "luma BICUBIC / chroma BILINEAR scaler, ");
+            scaler = "luma BICUBIC / chroma BILINEAR scaler";
         else if (flags & SWS_GAUSS)
-            av_log(c, AV_LOG_INFO, "Gaussian scaler, ");
+            scaler = "Gaussian scaler";
         else if (flags & SWS_SINC)
-            av_log(c, AV_LOG_INFO, "Sinc scaler, ");
+            scaler = "Sinc scaler";
         else if (flags & SWS_LANCZOS)
-            av_log(c, AV_LOG_INFO, "Lanczos scaler, ");
+            scaler = "Lanczos scaler";
         else if (flags & SWS_SPLINE)
-            av_log(c, AV_LOG_INFO, "Bicubic spline scaler, ");
+            scaler = "Bicubic spline scaler";
         else
-            av_log(c, AV_LOG_INFO, "ehh flags invalid?! ");
+            scaler = "ehh flags invalid?!";
 
-        av_log(c, AV_LOG_INFO, "from %s to %s%s ",
+        av_log(c, AV_LOG_INFO, "%s, from %s to %s%s ",
+               scaler,
                av_get_pix_fmt_name(srcFormat),
 #ifdef DITHER1XBPP
                dstFormat == AV_PIX_FMT_BGR555   || dstFormat == AV_PIX_FMT_BGR565   ||
@@ -1584,15 +1586,17 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
                av_get_pix_fmt_name(dstFormat));
 
         if (INLINE_MMXEXT(cpu_flags))
-            av_log(c, AV_LOG_INFO, "using MMXEXT\n");
+            cpucaps = "MMXEXT";
         else if (INLINE_AMD3DNOW(cpu_flags))
-            av_log(c, AV_LOG_INFO, "using 3DNOW\n");
+            cpucaps = "3DNOW";
         else if (INLINE_MMX(cpu_flags))
-            av_log(c, AV_LOG_INFO, "using MMX\n");
+            cpucaps = "MMX";
         else if (PPC_ALTIVEC(cpu_flags))
-            av_log(c, AV_LOG_INFO, "using AltiVec\n");
+            cpucaps = "AltiVec";
         else
-            av_log(c, AV_LOG_INFO, "using C\n");
+            cpucaps = "C";
+
+        av_log(c, AV_LOG_INFO, "using %s\n", cpucaps);
 
         av_log(c, AV_LOG_VERBOSE, "%dx%d -> %dx%d\n", srcW, srcH, dstW, dstH);
         av_log(c, AV_LOG_DEBUG,
@@ -1949,14 +1953,10 @@ void sws_freeFilter(SwsFilter *filter)
     if (!filter)
         return;
 
-    if (filter->lumH)
-        sws_freeVec(filter->lumH);
-    if (filter->lumV)
-        sws_freeVec(filter->lumV);
-    if (filter->chrH)
-        sws_freeVec(filter->chrH);
-    if (filter->chrV)
-        sws_freeVec(filter->chrV);
+    sws_freeVec(filter->lumH);
+    sws_freeVec(filter->lumV);
+    sws_freeVec(filter->chrH);
+    sws_freeVec(filter->chrV);
     av_free(filter);
 }
 
