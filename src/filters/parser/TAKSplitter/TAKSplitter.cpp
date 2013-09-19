@@ -157,26 +157,25 @@ int GetTAKFrameNumber(BYTE* buf, int size) // not tested
 			return -1;
 		}
 
-//		int infobits = (6 + 4) + (4 + 35) + (3 + 18 + 5 + 4 + 1);
-//		uint8_t ChannelNum   = (buf[shiftbytes + 9] >> 3 & 0xF) + 1;
-//		uint8_t HasExtension = buf[shiftbytes + 9] >> 7;
-//		if (HasExtension) {
-//			infobits += (5 + 1);
-//			uint8_t HasSpeakerAssignment = buf[shiftbytes + 10] >> 5 & 0x1;
-//			if (HasSpeakerAssignment) {
-//				infobits += ChannelNum * 6;
-//			}
-//		}
-//		infobits += (1 + 5 + 25); // Extra info
-//
-//		shiftbytes += (infobits + 7) / 8; // 0..7 bits for padding
+		int infobits = (6 + 4) + (4 + 35) + (3 + 18 + 5 + 4 + 1);
+		uint8_t ChannelNum   = (buf[shiftbytes + 9] >> 3 & 0xF) + 1;
+		uint8_t HasExtension = buf[shiftbytes + 9] >> 7;
+		if (HasExtension) {
+			infobits += (5 + 1);
+			uint8_t HasSpeakerAssignment = buf[shiftbytes + 10] >> 5 & 0x1;
+			if (HasSpeakerAssignment) {
+				infobits += ChannelNum * 6;
+			}
+		}
+		infobits += (1 + 5 + 25); // Extra info
+
+		shiftbytes += (infobits + 7) / 8; // 0..7 bits for padding
 	}
 
-//	int crc = int(*(uint32_t*)(buf + shiftbytes - 1) >> 8);
-//
-//	if (crc != crc_octets(buf, shiftbytes)) {
-//		return -1;
-//	}
+	int crc = int(*(uint32_t*)(buf + shiftbytes - 1) >> 8);
+	if (crc != crc_octets(buf, shiftbytes)) {
+		return -1;
+	}
 
 	return (int)FrameNumber;
 }
@@ -538,6 +537,7 @@ bool CTAKSplitterFilter::ParseTAKStreamInfo(BYTE* buf, int size)
 bool CTAKSplitterFilter::Sync(int& nFrameNumber)
 {
 	__int64 start = m_pFile->GetPos();
+	BYTE buf[32];
 
 	WORD w = 0;
 	for (__int64 i = 0; i < min(65 * KILOBYTE, m_pFile->GetRemaining()) && S_OK == m_pFile->ByteRead((BYTE*)&w, sizeof(w)); i++, m_pFile->Seek(start + i)) {
@@ -546,10 +546,9 @@ bool CTAKSplitterFilter::Sync(int& nFrameNumber)
 
 			int size = min(32, m_pFile->GetRemaining());
 
-			BYTE* buf = DNew BYTE[size];
+			memset(buf, 0, size);
 			m_pFile->ByteRead(buf, size);
 			int FrameNumber = GetTAKFrameNumber(buf, size);
-			delete [] buf;
 
 			if (FrameNumber != -1 && FrameNumber <= m_totalframes) {
 				nFrameNumber = FrameNumber;

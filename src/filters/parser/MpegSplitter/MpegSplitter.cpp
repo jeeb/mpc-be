@@ -862,7 +862,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	m_pFile.Free();
 
-	ReadClipInfo (GetPartFilename(pAsyncReader));
+	ReadClipInfo(GetPartFilename(pAsyncReader));
 	m_pFile.Attach(DNew CMpegSplitterFile(pAsyncReader, hr, m_ClipInfo, m_rtPlaylistDuration > 0, m_ForcedSub, m_AC3CoreOnly, m_AlternativeDuration, m_SubEmptyPin));
 
 	if (!m_pFile) {
