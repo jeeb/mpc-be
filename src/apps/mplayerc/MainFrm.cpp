@@ -18520,8 +18520,8 @@ afx_msg void CMainFrame::OnSubtitleDelay(UINT nID)
 
 afx_msg void CMainFrame::OnLanguage(UINT nID)
 {
-	CMenu	DefaultMenu;
-	CMenu*	OldMenu;
+	CMenu	defaultMenu;
+	CMenu*	oldMenu;
 
 	nID -= ID_LANGUAGE_ENGLISH; // resource ID to index
 
@@ -18543,26 +18543,27 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 	m_favorites.DestroyMenu();
 	m_shaders.DestroyMenu();
 	m_recentfiles.DestroyMenu();
+	m_language.DestroyMenu();
 
 	m_popup.DestroyMenu();
 	m_popup.LoadMenu(IDR_POPUP);
 	m_popupmain.DestroyMenu();
 	m_popupmain.LoadMenu(IDR_POPUPMAIN);
 
-	OldMenu = GetMenu();
-	DefaultMenu.LoadMenu(IDR_MAINFRAME);
-
-	SetMenu(&DefaultMenu);
-	m_hMenuDefault = DefaultMenu;
-	DefaultMenu.Detach();
+	oldMenu = GetMenu();
+	defaultMenu.LoadMenu(IDR_MAINFRAME);
+	if (oldMenu) {
+		// Attach the new menu to the window only if there was a menu before
+		SetMenu(&defaultMenu);
+		// and then destroy the old one
+		oldMenu->DestroyMenu();
+	}
+	m_hMenuDefault = defaultMenu.Detach();
 
 	if (AfxGetAppSettings().iCaptionMenuMode != MODE_SHOWCAPTIONMENU) {
 		HMENU hMenu = NULL;
 		::SetMenu(m_hWnd, hMenu);
 	}
-
-	// TODO : destroy old menu ???
-	//OldMenu->DestroyMenu();
 
 	// Re-create Win 7 TaskBar preview button for change button hint
 	CreateThumbnailToolbar();
