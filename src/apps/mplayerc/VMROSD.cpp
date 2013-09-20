@@ -29,8 +29,27 @@
 #define SLIDER_BAR_HEIGHT		10
 #define SLIDER_CURSOR_HEIGHT	30
 #define SLIDER_CURSOR_WIDTH		15
+#define SLIDER_CHAP_WIDTH		4
+#define SLIDER_CHAP_HEIGHT		10
 
-CVMROSD::CVMROSD(void)
+
+CVMROSD::CVMROSD()
+	: m_nMessagePos(OSD_NOMESSAGE)
+	, m_bSeekBarVisible(false)
+	, m_bFlyBarVisible(false)
+	, m_bCursorMoving(false)
+	, m_pMFVMB(NULL)
+	, m_pVMB(NULL)
+	, m_pMVTO(NULL)
+	, m_pWnd(NULL)
+	, m_FontSize(0)
+	, m_OSD_Transparent(0)
+	, bMouseOverExitButton(false)
+	, bMouseOverCloseButton(false)
+	, m_bShowMessage(true)
+	, m_bVisibleMessage(false)
+	, m_OSDType(OSD_TYPE_NONE)
+	, m_pChapterBag(NULL)
 {
 	m_Color[OSD_TRANSPARENT]	= RGB(  0,   0,   0);
 	m_Color[OSD_BACKGROUND]		= RGB( 32,  40,  48);
@@ -44,28 +63,12 @@ CVMROSD::CVMROSD(void)
 	m_penCursor.CreatePen(PS_SOLID, 4, m_Color[OSD_CURSOR]);
 	m_brushBack.CreateSolidBrush(m_Color[OSD_BACKGROUND]);
 	m_brushBar.CreateSolidBrush (m_Color[OSD_BAR]);
+	m_brushChapter.CreateSolidBrush(m_Color[OSD_CURSOR]);
 	m_debugBrushBack.CreateSolidBrush(m_Color[OSD_DEBUGCLR]);
 	m_debugPenBorder.CreatePen(PS_SOLID, 1, m_Color[OSD_BORDER]);
 
-	m_nMessagePos		= OSD_NOMESSAGE;
-	m_bSeekBarVisible	= false;
-	m_bFlyBarVisible	= false;
-	m_bCursorMoving		= false;
-	m_pMFVMB			= NULL;
-	m_pVMB				= NULL;
-	m_pMVTO				= NULL;
-	m_pWnd				= NULL;
 	memset(&m_BitmapInfo, 0, sizeof(m_BitmapInfo));
-
-	m_FontSize				= 0;
-	m_OSD_Transparent		= 0;
-	bMouseOverExitButton	= false;
-	bMouseOverCloseButton	= false;
-	m_bShowMessage			= true;
-	m_bVisibleMessage		= false;
-
-	m_OSDType				= OSD_TYPE_NONE;
-
+	
 	m_MainWndRect = m_MainWndRectCashed = CRect(0,0,0,0);
 
 	int fp = m_bm.FileExists(CString(_T("flybar")));
@@ -379,6 +382,31 @@ void CVMROSD::DrawSlider(CRect* rect, __int64 llMin, __int64 llMax, __int64 llPo
 
 	DrawRect (rect, &m_brushBack, &m_penBorder);
 	DrawRect (&m_rectBar, &m_brushBar);
+
+	if (AfxGetAppSettings().fChapterMarker) {
+		CAutoLock lock(&m_CBLock);
+
+		if (m_pChapterBag && m_pChapterBag->ChapGetCount() > 1 && llMax != llMin) {
+			REFERENCE_TIME rt;
+			for (DWORD i = 0; i < m_pChapterBag->ChapGetCount(); ++i) {
+				if (SUCCEEDED(m_pChapterBag->ChapGet(i, &rt, nullptr))) {
+					__int64 pos = m_rectBar.Width() * rt / (llMax - llMin);
+					if (pos < 0) {
+						continue;
+					}
+
+					CRect r;
+					r.left		= m_rectBar.left + (LONG)pos - SLIDER_CHAP_WIDTH / 2;
+					r.top		= rect->top + (rect->Height() - SLIDER_CHAP_HEIGHT) / 2;
+					r.right		= r.left + SLIDER_CHAP_WIDTH;
+					r.bottom	= r.top + SLIDER_CHAP_HEIGHT;
+
+					DrawRect(&r, &m_brushChapter);
+				}
+			}
+		}
+	}
+
 	DrawRect (&m_rectCursor, NULL, &m_penCursor);
 }
 
@@ -1145,4 +1173,14 @@ void CVMROSD::DrawWnd()
 	mdc.SelectObject(pOldBm);
 	bm.DeleteObject();
 	mdc.DeleteDC();
+}
+
+void CVMROSD::SetChapterBag(CComPtr<IDSMChapterBag>& pCB)
+{
+	CAutoLock lock(&m_CBLock);
+
+	if (pCB) {
+		m_pChapterBag.Release();
+		pCB.CopyTo(&m_pChapterBag);
+	}
 }

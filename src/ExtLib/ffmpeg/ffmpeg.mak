@@ -260,6 +260,7 @@ SRCS_C = \
 	libavcodec/mss3.c \
 	libavcodec/mss34dsp.c \
 	libavcodec/mss4.c \
+	libavcodec/msvideo1.c \
 	libavcodec/nellymoser.c \
 	libavcodec/nellymoserdec.c \
 	libavcodec/options.c \
