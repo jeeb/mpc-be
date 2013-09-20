@@ -58,6 +58,7 @@
 #define FLV_VIDEO_VP6A    5 // On2 VP6 with alpha channel
 #define FLV_VIDEO_SCREEN2 6 // Screen video version 2
 #define FLV_VIDEO_AVC     7 // AVC
+#define FLV_VIDEO_HEVC   12 // HEVC (non-standard?)
 
 #define AMF_END_OF_OBJECT			0x09
 
@@ -798,6 +799,8 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						break;
 					}
+					case FLV_VIDEO_HEVC:
+						// TODO: get video parameters
 					default:
 						fTypeFlagsVideo = true;
 				}
