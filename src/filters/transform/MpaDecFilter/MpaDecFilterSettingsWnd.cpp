@@ -103,7 +103,7 @@ bool CMpaDecSettingsWnd::OnActivate()
 	m_mixer_check.SetCheck(m_mixer);
 	p.y += h20;
 	m_mixer_layout_static.Create(ResStr(IDS_MPADEC_MIX_SPEAKERS), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(120), m_fontheight)), this);
-	m_mixer_layout_combo.Create(dwStyle | CBS_DROPDOWNLIST, CRect(p + CPoint(IPP_SCALE(125), -4), CSize(IPP_SCALE(80), 200)), this, IDC_PP_COMBO_MIXLAYOUT);
+	m_mixer_layout_combo.Create(dwStyle | CBS_DROPDOWNLIST, CRect(p + CPoint(IPP_SCALE(125), -4), CSize(IPP_SCALE(95), 200)), this, IDC_PP_COMBO_MIXLAYOUT);
 	m_mixer_layout_combo.SetItemData(m_mixer_layout_combo.AddString(ResStr(IDS_MPADEC_MONO)),   SPK_MONO);
 	m_mixer_layout_combo.SetItemData(m_mixer_layout_combo.AddString(ResStr(IDS_MPADEC_STEREO)), SPK_STEREO);
 	m_mixer_layout_combo.SetItemData(m_mixer_layout_combo.AddString(_T("4.0")), SPK_4_0);
