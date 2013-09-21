@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 3		"Informazioni"
 7		"MPC-BE"
 8		"Copyright © 2002-2013 vedi file Authors.txt"
@@ -140,11 +140,11 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 END
 
 BEGIN DIALOGEX IDD_PPAGEAUDIOSWITCHER LINES 22
-5		"Attiva il filtro audio switcher interno (riavvio necessario)"
+5		"Attiva il selettore audio interno (riavvio di MPC-BE richesto)"
 8		"Spostamento audio (ms):"
 11		"Attiva la mappatura personalizzata dei canali"
 12		"Configura altoparlanti per "
-15		"canali di input:"
+15		"Canali di input:"
 17		"Premi 'Shift' per applicare immediatamente i cambiamenti cliccando su un elemento"
 18		"Normalizza"
 19		"Aumenta:"
@@ -333,7 +333,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 30
 24		"YUV Mixing"
 25		"EVR Buffers:"
 27		"Proprietà"
-28		"Doppio output"
+28		"Dual output"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
@@ -1144,7 +1144,7 @@ STRING IDD_FILEPROPCLIP		"Clip"
 STRING IDD_FILEPROPDETAILS		"Dettagli"
 STRING IDD_FILEPROPRES		"Risorse"
 STRING IDD_PPAGEACCELTBL		"Lettore::Tasti"
-STRING IDD_PPAGEAUDIOSWITCHER		"Filtri Interni::Audio Switcher"
+STRING IDD_PPAGEAUDIOSWITCHER		"Filtri Interni::Selettore Audio"
 STRING IDD_PPAGECAPTURE		"Riproduzione::Cattura"
 STRING IDD_PPAGEDVD		"Riproduzione::DVD/OGM"
 STRING IDD_PPAGEEXTERNALFILTERS		"Filtri Esterni"
@@ -1956,11 +1956,11 @@ STRING IDS_USAGE		"Utilizzo: mpc-be.exe ""percorso"" [opzioni]\n\n""percorso""\t
 STRING IDS_USING_NEWER_VERSION		"Stai già utilizzando l'ultima %s"
 STRING IDS_VDF_AR_MODE		"Leggi AR dallo stream"
 STRING IDS_VDF_AUTO		"Auto"
-STRING IDS_VDF_COLOR_FMT_CONVERSION		"Format conversion"
-STRING IDS_VDF_COLOR_INPUT_LEVELS		"Input levels:"
-STRING IDS_VDF_COLOR_OUTPUT_FORMATS		"Output formats:"
-STRING IDS_VDF_COLOR_OUTPUT_LEVELS		"Output levels:"
-STRING IDS_VDF_COLOR_PRESET		"Preset:"
+STRING IDS_VDF_COLOR_FMT_CONVERSION		"Conversione formato"
+STRING IDS_VDF_COLOR_INPUT_LEVELS		"Livelli di input:"
+STRING IDS_VDF_COLOR_OUTPUT_FORMATS		"Formati di output:"
+STRING IDS_VDF_COLOR_OUTPUT_LEVELS		"Livelli di output:"
+STRING IDS_VDF_COLOR_PRESET		"Preimpostato:"
 STRING IDS_VDF_COLOR_STANDARD		"Standard:"
 STRING IDS_VDF_DBLK_ALL		"Tutti i frame"
 STRING IDS_VDF_DBLK_BIDIR		"Bidirezionale"
