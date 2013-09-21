@@ -63,8 +63,16 @@
 #endif
 
 #if HAVE_PRAGMA_DEPRECATED
-#    define FF_DISABLE_DEPRECATION_WARNINGS _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
-#    define FF_ENABLE_DEPRECATION_WARNINGS  _Pragma("GCC diagnostic warning \"-Wdeprecated-declarations\"")
+#    if defined(__ICL)
+#        define FF_DISABLE_DEPRECATION_WARNINGS __pragma(warning(push)) __pragma(warning(disable:1478))
+#        define FF_ENABLE_DEPRECATION_WARNINGS  __pragma(warning(pop))
+#    elif defined(_MSC_VER)
+#        define FF_DISABLE_DEPRECATION_WARNINGS __pragma(warning(push)) __pragma(warning(disable:4996))
+#        define FF_ENABLE_DEPRECATION_WARNINGS  __pragma(warning(pop))
+#    else
+#        define FF_DISABLE_DEPRECATION_WARNINGS _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+#        define FF_ENABLE_DEPRECATION_WARNINGS  _Pragma("GCC diagnostic warning \"-Wdeprecated-declarations\"")
+#    endif
 #else
 #    define FF_DISABLE_DEPRECATION_WARNINGS
 #    define FF_ENABLE_DEPRECATION_WARNINGS
@@ -207,6 +215,10 @@ void avpriv_report_missing_feature(void *avc,
  */
 void avpriv_request_sample(void *avc,
                            const char *msg, ...) av_printf_format(2, 3);
+
+#if HAVE_MSVCRT
+#define avpriv_open ff_open
+#endif
 
 /**
  * A wrapper for open() setting O_CLOEXEC.

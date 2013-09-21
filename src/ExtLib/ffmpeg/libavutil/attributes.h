@@ -52,6 +52,8 @@
 
 #if AV_GCC_VERSION_AT_LEAST(3,1)
 #    define av_noinline __attribute__((noinline))
+#elif defined(_MSC_VER)
+#    define av_noinline __declspec(noinline)
 #else
 #    define av_noinline
 #endif
@@ -61,12 +63,6 @@
 #else
 #    define av_pure
 #endif
-
-// ==> Start patch MPC
-//#ifndef av_restrict
-//#define av_restrict restrict
-//#endif
-// <== End patch MPC
 
 #if AV_GCC_VERSION_AT_LEAST(2,6)
 #    define av_const __attribute__((const))
