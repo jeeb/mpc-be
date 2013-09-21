@@ -748,6 +748,8 @@ void CVMROSD::ClearMessage(bool hide)
 		return;
 	}
 
+	m_strMessageCashed.Empty();
+
 	if (!hide) {
 		m_nMessagePos = OSD_NOMESSAGE;
 	}

@@ -2341,16 +2341,24 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 					m_wndStatusBar.SetStatusTimer(str);
 				} else {
 					m_wndStatusBar.SetStatusTimer(pos, stop, !!m_wndSubresyncBar.IsWindowVisible(), &tf);
-					CString str_temp = _T("");
+					CString str_temp;
 					bool bmadvr = (AfxGetAppSettings().iDSVideoRendererType == VIDRNDT_DS_MADVR);
 
-					if (m_bOSDLocalTime) str_temp = GetSystemLocalTime();
+					if (m_bOSDLocalTime) {
+						str_temp = GetSystemLocalTime();
+					}
 
-					if (m_bRemainingTime) str_temp.GetLength() > 0 ? str_temp +=  _T("\n") + m_wndStatusBar.GetStatusTimer() : str_temp = m_wndStatusBar.GetStatusTimer();
+					if (m_bRemainingTime) {
+						str_temp.GetLength() > 0 ? str_temp += L"\n" + m_wndStatusBar.GetStatusTimer() : str_temp = m_wndStatusBar.GetStatusTimer();
+					}
 
-					if (m_bOSDFileName) str_temp.GetLength() > 0 ? str_temp +=  _T("\n") + m_strFn : str_temp = m_strFn;
+					if (m_bOSDFileName) {
+						str_temp.GetLength() > 0 ? str_temp += L"\n" + m_strFn : str_temp = m_strFn;
+					}
 
-					if (bmadvr) str_temp.Replace(_T("\n"), _T(" / ")); // MadVR only singleline
+					if (bmadvr) {
+						str_temp.Replace(L"\n", L" / "); // MadVR support only singleline OSD message
+					}
 
 					if (str_temp.GetLength() > 0) {
 						m_OSD.DisplayMessage(OSD_TOPLEFT, str_temp);
