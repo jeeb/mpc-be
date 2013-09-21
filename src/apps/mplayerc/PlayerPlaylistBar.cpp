@@ -1041,17 +1041,22 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 				pli->m_label = str.Trim();
 			}
 		} else {
+			CString fullPath = MakePath(CombinePath(base, str));
+			if (GetFileExt(fullPath).MakeLower() == L".m3u") {
+				SAFE_DELETE(pli);
+
+				ParseM3UPlayList(fullPath);
+				continue;
+			}
+
 			pli->m_fns.AddTail(MakePath(CombinePath(base, str)));
 			m_pl.AddTail(*pli);
 
-			delete pli;
-			pli = NULL;
+			SAFE_DELETE(pli);
 		}
 	}
 
-	if (pli) {
-		delete pli;
-	}
+	SAFE_DELETE(pli);
 
 	return (m_pl.GetCount() > c);
 }
