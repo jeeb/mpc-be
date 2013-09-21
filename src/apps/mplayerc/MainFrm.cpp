@@ -2756,7 +2756,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 					SystemParametersInfo(SPI_SETPOWEROFFACTIVE, fSaverActive, 0, SPIF_SENDWININICHANGE);
 				}
 				// prevent screensaver activate, monitor sleep/turn off after playback
-				SetThreadExecutionState(ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
+				// SetThreadExecutionState(ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
 			}
 		}
 		break;
@@ -18107,6 +18107,8 @@ void CMainFrame::CloseMedia()
 	SetDwmPreview(FALSE);
 
 	m_wndToolBar.SwitchTheme();
+
+	SetThreadExecutionState(ES_CONTINUOUS);
 }
 
 void CMainFrame::StartTunerScan(CAutoPtr<TunerScanData> pTSD)
@@ -18287,9 +18289,9 @@ void CMainFrame::SetPlayState(MPC_PLAYSTATE iState)
 
 	// Prevent sleep when playing audio and/or video, but allow screensaver when only audio
 	if (!m_fAudioOnly) {
-		SetThreadExecutionState (iState == PS_PLAY ? ES_CONTINUOUS | ES_DISPLAY_REQUIRED | ES_SYSTEM_REQUIRED : ES_CONTINUOUS);
+		SetThreadExecutionState(iState == PS_PLAY ? ES_CONTINUOUS | ES_DISPLAY_REQUIRED | ES_SYSTEM_REQUIRED : ES_CONTINUOUS);
 	} else {
-		SetThreadExecutionState (iState == PS_PLAY ? ES_CONTINUOUS | ES_SYSTEM_REQUIRED : ES_CONTINUOUS);
+		SetThreadExecutionState(iState == PS_PLAY ? ES_CONTINUOUS | ES_SYSTEM_REQUIRED : ES_CONTINUOUS);
 	}
 }
 
