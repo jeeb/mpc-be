@@ -1051,12 +1051,12 @@ public:
 
 	SIZE			m_fullWndSize;
 	CFullscreenWnd*	m_pFullscreenWnd;
-	CComPtr<IVMRMixerControl9>		m_pMC;
-	CComPtr<IMFVideoDisplayControl>	m_pMFVDC;
-	CComPtr<IMFVideoProcessor>		m_pMFVP;
-	CComPtr<IMFVideoDisplayControl>	m_pMFVDC2;
-	CComPtr<IMFVideoProcessor>		m_pMFVP2;
-	CComPtr<IAMLine21Decoder_2>		m_pLN21;
+	CComPtr<IVMRMixerControl9>      m_pVMRMC;
+	CComPtr<IMFVideoDisplayControl> m_pMFVDC;
+	CComPtr<IMFVideoProcessor>      m_pMFVP;
+	CComPtr<IMFVideoDisplayControl> m_pMFVDC2;
+	CComPtr<IMFVideoProcessor>      m_pMFVP2;
+	CComPtr<IAMLine21Decoder_2>     m_pLN21;
 	CVMROSD		m_OSD;
 
 	bool		m_bRemainingTime;
