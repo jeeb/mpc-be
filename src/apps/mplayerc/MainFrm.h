@@ -205,44 +205,51 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 
 	// TODO: wrap these graph objects into a class to make it look cleaner
 
-	CComPtr<IGraphBuilder2> pGB;
-	CComQIPtr<IMediaControl> pMC;
-	CComQIPtr<IMediaEventEx> pME;
+	CComPtr<IGraphBuilder2>         pGB;
+	CComQIPtr<IMediaControl>        pMC;
+	CComQIPtr<IMediaEventEx>        pME;
 
-	CComQIPtr<IVideoWindow> pVW;
-	CComQIPtr<IBasicVideo> pBV;
-	CComQIPtr<IBasicAudio> pBA;
-	CComQIPtr<IMediaSeeking> pMS;
-	CComQIPtr<IVideoFrameStep> pFS;
+	CComQIPtr<IVideoWindow>         pVW;
+	CComQIPtr<IBasicVideo>          pBV;
+	CComQIPtr<IBasicAudio>          pBA;
+	CComQIPtr<IMediaSeeking>        pMS;
+	CComQIPtr<IVideoFrameStep>      pFS;
 	CComQIPtr<IQualProp, &IID_IQualProp> pQP;
-	CComQIPtr<IBufferInfo> pBI;
-	CComQIPtr<IAMOpenProgress> pAMOP;
+	CComQIPtr<IBufferInfo>          pBI;
+	CComQIPtr<IAMOpenProgress>      pAMOP;
 
-	CComQIPtr<IDvdControl2> pDVDC;
-	CComQIPtr<IDvdInfo2> pDVDI;
+	CComQIPtr<IDvdControl2>         pDVDC;
+	CComQIPtr<IDvdInfo2>            pDVDI;
 
 	// SmarkSeek
-	CComPtr<IGraphBuilder2> pGB2;
-	CComQIPtr<IMediaControl> pMC2;
-	CComQIPtr<IMediaEventEx> pME2;
-	CComQIPtr<IMediaSeeking> pMS2;
-	CComQIPtr<IVideoWindow> pVW2;
-	CComQIPtr<IBasicVideo> pBV2;
-	CComQIPtr<IVideoFrameStep> pFS2;
-	CComQIPtr<IDvdControl2> pDVDC2;
-	CComQIPtr<IDvdInfo2> pDVDI2; // VtX: поидеи не нужен, но в некоторых местах может понадобиться.
+	CComPtr<IGraphBuilder2>         m_pGB_preview;
+	CComQIPtr<IMediaControl>        m_pMC_preview;
+	CComQIPtr<IMediaEventEx>        m_pME_preview;
+	CComQIPtr<IMediaSeeking>        m_pMS_preview;
+	CComQIPtr<IVideoWindow>         m_pVW_preview;
+	CComQIPtr<IBasicVideo>          m_pBV_preview;
+	CComQIPtr<IVideoFrameStep>      m_pFS_preview;
+	CComQIPtr<IDvdControl2>         m_pDVDC_preview;
+	CComQIPtr<IDvdInfo2>            m_pDVDI_preview; // VtX: usually not necessary but may sometimes be necessary.
+	CComPtr<IMFVideoDisplayControl> m_pMFVDC_preview;
+	CComPtr<IMFVideoProcessor>      m_pMFVP_preview;
 	//
 
-	CComPtr<ICaptureGraphBuilder2> pCGB;
-	CStringW m_VidDispName, m_AudDispName;
-	CComPtr<IBaseFilter> pVidCap, pAudCap;
-	CComPtr<IAMVideoCompression> pAMVCCap, pAMVCPrev;
-	CComPtr<IAMStreamConfig> pAMVSCCap, pAMVSCPrev, pAMASC;
-	CComPtr<IAMCrossbar> pAMXBar;
-	CComPtr<IAMTVTuner> pAMTuner;
-	CComPtr<IAMDroppedFrames> pAMDF;
+	CComPtr<ICaptureGraphBuilder2>  pCGB;
+	CStringW                        m_VidDispName, m_AudDispName;
+	CComPtr<IBaseFilter>            pVidCap, pAudCap;
+	CComPtr<IAMVideoCompression>    pAMVCCap, pAMVCPrev;
+	CComPtr<IAMStreamConfig>        pAMVSCCap, pAMVSCPrev, pAMASC;
+	CComPtr<IAMCrossbar>            pAMXBar;
+	CComPtr<IAMTVTuner>             pAMTuner;
+	CComPtr<IAMDroppedFrames>       pAMDF;
 
-	CComPtr<ISubPicAllocatorPresenter> m_pCAP;
+	CComPtr<IVMRMixerControl9>      m_pVMRMC;
+	CComPtr<IMFVideoDisplayControl> m_pMFVDC;
+	CComPtr<IMFVideoProcessor>      m_pMFVP;
+	CComPtr<IAMLine21Decoder_2>     m_pLN21;
+
+	CComPtr<ISubPicAllocatorPresenter>  m_pCAP;
 	CComPtr<ISubPicAllocatorPresenter2> m_pCAP2;
 
 	CComQIPtr<IBaseFilter> m_pMainSourceFilter;
@@ -1033,7 +1040,7 @@ public:
 	CPlayerListCtrl		m_wndListCtrl;
 	CPlayerPlaylistBar	m_wndPlaylistBar;
 	CFlyBar				m_wndFlyBar;
-	CPreView			m_wndView2; // SmartSeek
+	CPreView			m_wndPreView; // SmartSeek
 
 	bool			IsMadVRExclusiveMode;
 
@@ -1051,12 +1058,6 @@ public:
 
 	SIZE			m_fullWndSize;
 	CFullscreenWnd*	m_pFullscreenWnd;
-	CComPtr<IVMRMixerControl9>      m_pVMRMC;
-	CComPtr<IMFVideoDisplayControl> m_pMFVDC;
-	CComPtr<IMFVideoProcessor>      m_pMFVP;
-	CComPtr<IMFVideoDisplayControl> m_pMFVDC2;
-	CComPtr<IMFVideoProcessor>      m_pMFVP2;
-	CComPtr<IAMLine21Decoder_2>     m_pLN21;
 	CVMROSD		m_OSD;
 
 	bool		m_bRemainingTime;

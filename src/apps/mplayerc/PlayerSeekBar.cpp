@@ -664,7 +664,7 @@ void CPlayerSeekBar::UpdateTooltip(CPoint point)
 			TrackMouseEvent(&tme);
 
 			m_tooltipState = TOOLTIP_TRIGGERED;
-			m_tooltipTimer = SetTimer(m_tooltipTimer, pFrame->m_wndView2.IsWindowVisible() ? 10 : SHOW_DELAY, NULL);
+			m_tooltipTimer = SetTimer(m_tooltipTimer, pFrame->m_wndPreView.IsWindowVisible() ? 10 : SHOW_DELAY, NULL);
 		}
 	} else {
 		HideToolTip();
@@ -823,7 +823,7 @@ void CPlayerSeekBar::UpdateToolTipPosition(CPoint& point)
 
 	if (pFrame->CanPreviewUse()) {
 		CRect Rect;
-		pFrame->m_wndView2.GetWindowRect(Rect);
+		pFrame->m_wndPreView.GetWindowRect(Rect);
 		int r_width  = Rect.Width();
 		int r_height = Rect.Height();
 
@@ -847,7 +847,7 @@ void CPlayerSeekBar::UpdateToolTipPosition(CPoint& point)
 			}
 		}
 
-		pFrame->m_wndView2.MoveWindow(point.x, point.y, r_width, r_height);
+		pFrame->m_wndPreView.MoveWindow(point.x, point.y, r_width, r_height);
 	} else {
 		CSize size = m_tooltip.GetBubbleSize(&m_ti);
 		CRect r;
@@ -890,7 +890,7 @@ void CPlayerSeekBar::UpdateToolTipText()
 		m_ti.lpszText = (LPTSTR)(LPCTSTR)tooltipText;
 		m_tooltip.SendMessage(TTM_SETTOOLINFO, 0, (LPARAM)&m_ti);
 	} else {
-		pFrame->m_wndView2.SetWindowText(tooltipText);
+		pFrame->m_wndPreView.SetWindowText(tooltipText);
 	}
 
 	{
@@ -918,7 +918,7 @@ void CPlayerSeekBar::OnMButtonDown(UINT nFlags, CPoint point)
 {
 	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
 
-	if (pFrame->m_wndView2) {
+	if (pFrame->m_wndPreView) {
 		pFrame->PreviewWindowHide();
 		AfxGetAppSettings().fSmartSeek = !AfxGetAppSettings().fSmartSeek;
 		OnMouseMove(nFlags,point);

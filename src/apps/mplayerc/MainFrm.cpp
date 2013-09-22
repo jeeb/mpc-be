@@ -747,12 +747,12 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	// Create Preview Window
 	DWORD style = WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS;
-	if (!m_wndView2.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL, style, CRect(0, 0, 160, 109), this, 0, NULL)) {
+	if (!m_wndPreView.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL, style, CRect(0, 0, 160, 109), this, 0, NULL)) {
 		TRACE(_T("Failed to create Preview Window\n"));
 		m_wndView.DestroyWindow();
 		return -1;
 	} else {
-		m_wndView2.ShowWindow(SW_HIDE);
+		m_wndPreView.ShowWindow(SW_HIDE);
 	}
 
 	// static bars
@@ -978,7 +978,7 @@ void CMainFrame::OnDestroy()
 		delete m_pFullscreenWnd;
 	}
 
-	m_wndView2.DestroyWindow();
+	m_wndPreView.DestroyWindow();
 
 	if (AfxGetAppSettings().fReset) {
 		CString strAppPath;
@@ -3602,7 +3602,7 @@ LRESULT CMainFrame::OnXButtonDblClk(WPARAM wParam, LPARAM lParam)
 BOOL CMainFrame::OnMouseWheel(UINT nFlags, short zDelta, CPoint point)
 {
 
-	if (m_wndView2 && m_wndView2.IsWindowVisible()) {
+	if (m_wndPreView && m_wndPreView.IsWindowVisible()) {
 
 		int seek =
 			nFlags == MK_SHIFT ? 10 :
@@ -8516,10 +8516,10 @@ void CMainFrame::OnPlayStop()
 			pMC->Stop();
 			pDVDC->SetOption(DVD_ResetOnStop, FALSE);
 
-			if (b_UseSmartSeek && pDVDC2) {
-				pDVDC2->SetOption(DVD_ResetOnStop, TRUE);
-				pMC2->Stop();
-				pDVDC2->SetOption(DVD_ResetOnStop, FALSE);
+			if (b_UseSmartSeek && m_pDVDC_preview) {
+				m_pDVDC_preview->SetOption(DVD_ResetOnStop, TRUE);
+				m_pMC_preview->Stop();
+				m_pDVDC_preview->SetOption(DVD_ResetOnStop, FALSE);
 			}
 
 		} else if (GetPlaybackMode() == PM_CAPTURE) {
@@ -11899,8 +11899,8 @@ void CMainFrame::MoveVideoWindow(bool fShowStats)
 
 		m_wndView.SetVideoRect(wr);
 
-		if (b_UseSmartSeek && m_wndView2) {
-			m_wndView2.GetVideoRect(&wr2);
+		if (b_UseSmartSeek && m_wndPreView) {
+			m_wndPreView.GetVideoRect(&wr2);
 			CRect vr2 = CRect(0,0,0,0);
 
 			CSize ws2 = wr2.Size();
@@ -11936,13 +11936,13 @@ void CMainFrame::MoveVideoWindow(bool fShowStats)
 
 			vr2 = CRect(pos2, size2);
 
-			if (m_pMFVDC2) {
-				m_pMFVDC2->SetVideoPosition (NULL, wr2);
+			if (m_pMFVDC_preview) {
+				m_pMFVDC_preview->SetVideoPosition (NULL, wr2);
 			}
 
-			pBV2->SetDefaultSourcePosition();
-			pBV2->SetDestinationPosition(vr2.left, vr2.top, vr2.Width(), vr2.Height());
-			pVW2->SetWindowPosition(wr2.left, wr2.top, wr2.Width(), wr2.Height());
+			m_pBV_preview->SetDefaultSourcePosition();
+			m_pBV_preview->SetDestinationPosition(vr2.left, vr2.top, vr2.Width(), vr2.Height());
+			m_pVW_preview->SetWindowPosition(wr2.left, wr2.top, wr2.Width(), wr2.Height());
 		}
 
 		if (fShowStats && vr.Height() > 0) {
@@ -12291,7 +12291,7 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 
 	AppSettings& s = AfxGetAppSettings();
 
-	pGB2 = NULL;
+	m_pGB_preview = NULL;
 
 	if (s.IsD3DFullscreen() &&
 			((s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS) ||
@@ -12395,15 +12395,15 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 			pGB = DNew CFGManagerPlayer(_T("CFGManagerPlayer"), NULL, m_pVideoWnd->m_hWnd);
 
 			// Graph for preview
-			if (b_UseSmartSeek && m_wndView2) {
-				pGB2 = DNew CFGManagerPlayer(_T("CFGManagerPlayer"), NULL, m_wndView2.GetVideoHWND(), true);
+			if (b_UseSmartSeek && m_wndPreView) {
+				m_pGB_preview = DNew CFGManagerPlayer(_T("CFGManagerPlayer"), NULL, m_wndPreView.GetVideoHWND(), true);
 			}
 		}
 	} else if (OpenDVDData* p = dynamic_cast<OpenDVDData*>(pOMD)) {
 		pGB = DNew CFGManagerDVD(_T("CFGManagerDVD"), NULL, m_pVideoWnd->m_hWnd);
 
-		if (b_UseSmartSeek && m_wndView2) {
-			pGB2 = DNew CFGManagerDVD(_T("CFGManagerDVD"), NULL, m_wndView2.GetVideoHWND(), true);
+		if (b_UseSmartSeek && m_wndPreView) {
+			m_pGB_preview = DNew CFGManagerDVD(_T("CFGManagerDVD"), NULL, m_wndPreView.GetVideoHWND(), true);
 		}
 	} else if (OpenDeviceData* p = dynamic_cast<OpenDeviceData*>(pOMD)) {
 		if (s.iDefaultCaptureDevice == 1) {
@@ -12417,7 +12417,7 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 		return ResStr(IDS_MAINFRM_80);
 	}
 
-	if (!pGB2) {
+	if (!m_pGB_preview) {
 		TRACE(_T("=== Disable SmartSeek ===\n"));
 		b_UseSmartSeek = false;
 	}
@@ -12433,16 +12433,16 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 	pFS = pGB;
 
 	if (b_UseSmartSeek) {
-		pGB2->AddToROT();
+		m_pGB_preview->AddToROT();
 
-		pMC2 = pGB2;
-		pME2 = pGB2;
-		pMS2 = pGB2; // general
+		m_pMC_preview = m_pGB_preview;
+		m_pME_preview = m_pGB_preview;
+		m_pMS_preview = m_pGB_preview; // general
 
-		pVW2 = pGB2;
-		pBV2 = pGB2;
+		m_pVW_preview = m_pGB_preview;
+		m_pBV_preview = m_pGB_preview;
 
-		pFS2 = pGB2;
+		m_pFS_preview = m_pGB_preview;
 	}
 
 	if (!(pMC && pME && pMS)
@@ -12470,11 +12470,11 @@ HRESULT CMainFrame::PreviewWindowHide()
 {
 	HRESULT hr = S_OK;
 
-	if (!(b_UseSmartSeek && m_wndView2)) {
+	if (!(b_UseSmartSeek && m_wndPreView)) {
 		return E_FAIL;
 	}
 
-	if (m_wndView2.IsWindowVisible()) {
+	if (m_wndPreView.IsWindowVisible()) {
 		// Disable animation
 		ANIMATIONINFO AnimationInfo;
 		AnimationInfo.cbSize = sizeof(ANIMATIONINFO);
@@ -12483,14 +12483,14 @@ HRESULT CMainFrame::PreviewWindowHide()
 		AnimationInfo.iMinAnimate = 0;
 		::SystemParametersInfo(SPI_SETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
 
-		m_wndView2.ShowWindow(SW_HIDE);
+		m_wndPreView.ShowWindow(SW_HIDE);
 
 		// Enable animation
 		AnimationInfo.iMinAnimate = m_WindowAnimationType;
 		::SystemParametersInfo(SPI_SETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
 
-		if (pGB2) {
-			pMC2->Pause();
+		if (m_pGB_preview) {
+			m_pMC_preview->Pause();
 		}
 	}
 
@@ -12501,7 +12501,7 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 {
 	HRESULT hr = S_OK;
 
-	if (!b_UseSmartSeek || !AfxGetAppSettings().fSmartSeek || !m_wndView2 || m_fAudioOnly || m_pFullscreenWnd->IsWindow()) {
+	if (!b_UseSmartSeek || !AfxGetAppSettings().fSmartSeek || !m_wndPreView || m_fAudioOnly || m_pFullscreenWnd->IsWindow()) {
 		return E_FAIL;
 	}
 
@@ -12512,7 +12512,7 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 		}
 	}
 
-	if (GetPlaybackMode() == PM_DVD && pDVDC2) {
+	if (GetPlaybackMode() == PM_DVD && m_pDVDC_preview) {
 		DVD_PLAYBACK_LOCATION2 Loc, Loc2;
 		double fps = 0;
 
@@ -12521,7 +12521,7 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 			return hr;
 		}
 
-		hr = pDVDI2->GetCurrentLocation(&Loc2);
+		hr = m_pDVDI_preview->GetCurrentLocation(&Loc2);
 
 		fps = Loc.TimeCodeFlags == DVD_TC_FLAG_25fps ? 25.0
 			: Loc.TimeCodeFlags == DVD_TC_FLAG_30fps ? 30.0
@@ -12538,40 +12538,40 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 				//LOG2FILE(_T("DVD - TitleNum changed : Main :%d, Preview :%d"), Loc.TitleNum, Loc2.TitleNum);
 			}
 
-			hr = pDVDC2->PlayTitle(Loc.TitleNum, DVD_CMD_FLAG_Flush, NULL);
+			hr = m_pDVDC_preview->PlayTitle(Loc.TitleNum, DVD_CMD_FLAG_Flush, NULL);
 			if (FAILED(hr)) {
 				return hr;
 			}
-			pDVDC2->Resume(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+			m_pDVDC_preview->Resume(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 			if (SUCCEEDED(hr)) {
-				hr = pDVDC2->PlayAtTime(&dvdTo, DVD_CMD_FLAG_Flush, NULL);
+				hr = m_pDVDC_preview->PlayAtTime(&dvdTo, DVD_CMD_FLAG_Flush, NULL);
 				if (FAILED(hr)) {
 					return hr;
 				}
 			} else {
-				hr = pDVDC2->PlayChapterInTitle(Loc.TitleNum, 1, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-				hr = pDVDC2->PlayAtTime(&dvdTo, DVD_CMD_FLAG_Flush, NULL);
+				hr = m_pDVDC_preview->PlayChapterInTitle(Loc.TitleNum, 1, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+				hr = m_pDVDC_preview->PlayAtTime(&dvdTo, DVD_CMD_FLAG_Flush, NULL);
 				if (FAILED(hr)) {
-					hr = pDVDC2->PlayAtTimeInTitle(Loc.TitleNum, &dvdTo, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+					hr = m_pDVDC_preview->PlayAtTimeInTitle(Loc.TitleNum, &dvdTo, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 					if (FAILED(hr)) {
 						return hr;
 					}
 				}
 			}
 		} else {
-			hr = pDVDC2->PlayAtTime(&dvdTo, DVD_CMD_FLAG_Flush, NULL);
+			hr = m_pDVDC_preview->PlayAtTime(&dvdTo, DVD_CMD_FLAG_Flush, NULL);
 			if (FAILED(hr)) {
 				return hr;
 			}
 		}
 
-		pDVDI2->GetCurrentLocation(&Loc2);
+		m_pDVDI_preview->GetCurrentLocation(&Loc2);
 		//LOG2FILE(_T("DVD - Текущее воспроизведение : Main [%d : %d], Preview [%d : %d]"), Loc.TitleNum, Loc.ChapterNum, Loc2.TitleNum, Loc2.ChapterNum);
 
-		pDVDC2->Pause(FALSE);
-		pMC2->Run();
-	} else if (GetPlaybackMode() == PM_FILE && pMS2) {
-		hr = pMS2->SetPositions(&rtCur2, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
+		m_pDVDC_preview->Pause(FALSE);
+		m_pMC_preview->Run();
+	} else if (GetPlaybackMode() == PM_FILE && m_pMS_preview) {
+		hr = m_pMS_preview->SetPositions(&rtCur2, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
 	}
 
 	if (FAILED(hr)) {
@@ -12587,8 +12587,8 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 	}
 	*/
 
-	if (!m_wndView2.IsWindowVisible()) {
-		m_wndView2.ShowWindow(SW_SHOWNOACTIVATE);
+	if (!m_wndPreView.IsWindowVisible()) {
+		m_wndPreView.ShowWindow(SW_SHOWNOACTIVATE);
 	}
 
 	return hr;
@@ -12841,26 +12841,26 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 			EndEnumFilters;
 
-			if (!bIsVideo || FAILED(pGB2->RenderFile(CStringW(fn), NULL))) {
-				if (pGB2) {
-					m_pMFVP2	= NULL;
-					m_pMFVDC2	= NULL;
+			if (!bIsVideo || FAILED(m_pGB_preview->RenderFile(CStringW(fn), NULL))) {
+				if (m_pGB_preview) {
+					m_pMFVP_preview  = NULL;
+					m_pMFVDC_preview = NULL;
 
-					pMC2.Release();
-					pME2.Release();
-					pMS2.Release();
-					pVW2.Release();
-					pBV2.Release();
-					pFS2.Release();
+					m_pMC_preview.Release();
+					m_pME_preview.Release();
+					m_pMS_preview.Release();
+					m_pVW_preview.Release();
+					m_pBV_preview.Release();
+					m_pFS_preview.Release();
 
-					if (pDVDC2) {
-						pDVDC2.Release();
-						pDVDI2.Release();
+					if (m_pDVDC_preview) {
+						m_pDVDC_preview.Release();
+						m_pDVDI_preview.Release();
 					}
 
-					pGB2->RemoveFromROT();
-					pGB2.Release();
-					pGB2 = NULL;
+					m_pGB_preview->RemoveFromROT();
+					m_pGB_preview.Release();
+					m_pGB_preview = NULL;
 				}
 				b_UseSmartSeek = false;
 			}
@@ -13137,7 +13137,7 @@ CString CMainFrame::OpenDVD(OpenDVDData* pODD)
 	}
 
 	if (SUCCEEDED(hr) && b_UseSmartSeek) {
-		if (FAILED(hr = pGB2->RenderFile(CStringW(pODD->path), NULL))) {
+		if (FAILED(hr = m_pGB_preview->RenderFile(CStringW(pODD->path), NULL))) {
 			b_UseSmartSeek = false;
 		}
 	}
@@ -13150,8 +13150,8 @@ CString CMainFrame::OpenDVD(OpenDVDData* pODD)
 	EndEnumFilters;
 
 	if (b_UseSmartSeek) {
-		BeginEnumFilters(pGB2, pEF, pBF) {
-			if ((pDVDC2 = pBF) && (pDVDI2 = pBF)) {
+		BeginEnumFilters(m_pGB_preview, pEF, pBF) {
+			if ((m_pDVDC_preview = pBF) && (m_pDVDI_preview = pBF)) {
 				break;
 			}
 		}
@@ -13189,9 +13189,9 @@ CString CMainFrame::OpenDVD(OpenDVDData* pODD)
 	pDVDC->SetOption(DVD_ResetOnStop, FALSE);
 	pDVDC->SetOption(DVD_HMSF_TimeCodeEvents, TRUE);
 
-	if (b_UseSmartSeek && pDVDC2) {
-		pDVDC2->SetOption(DVD_ResetOnStop, FALSE);
-		pDVDC2->SetOption(DVD_HMSF_TimeCodeEvents, TRUE);
+	if (b_UseSmartSeek && m_pDVDC_preview) {
+		m_pDVDC_preview->SetOption(DVD_ResetOnStop, FALSE);
+		m_pDVDC_preview->SetOption(DVD_HMSF_TimeCodeEvents, TRUE);
 	}
 
 	if (s.idMenuLang) {
@@ -13542,9 +13542,9 @@ void CMainFrame::OpenSetupVideo()
 			pWnd->EnableWindow(FALSE); // little trick to let WM_SETCURSOR thru
 		}
 
-		if (b_UseSmartSeek && m_wndView2) {
-			pVW2->put_Owner((OAHWND)m_wndView2.GetVideoHWND());
-			pVW2->put_WindowStyle(WS_CHILD|WS_CLIPSIBLINGS|WS_CLIPCHILDREN);
+		if (b_UseSmartSeek && m_wndPreView) {
+			m_pVW_preview->put_Owner((OAHWND)m_wndPreView.GetVideoHWND());
+			m_pVW_preview->put_WindowStyle(WS_CHILD|WS_CLIPSIBLINGS|WS_CLIPCHILDREN);
 		}
 	}
 
@@ -14732,15 +14732,15 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		pGB->FindInterface(__uuidof(IMFVideoDisplayControl),	(void**)&m_pMFVDC,	TRUE);
 		pGB->FindInterface(__uuidof(IMFVideoProcessor),			(void**)&m_pMFVP,	TRUE);
 
-		if (b_UseSmartSeek && m_wndView2) {
-			pGB2->FindInterface(__uuidof(IMFVideoDisplayControl),	(void**)&m_pMFVDC2,	TRUE);
-			pGB2->FindInterface(__uuidof(IMFVideoProcessor),		(void**)&m_pMFVP2,	TRUE);
+		if (b_UseSmartSeek && m_wndPreView) {
+			m_pGB_preview->FindInterface(__uuidof(IMFVideoDisplayControl),	(void**)&m_pMFVDC_preview, TRUE);
+			m_pGB_preview->FindInterface(__uuidof(IMFVideoProcessor),		(void**)&m_pMFVP_preview,  TRUE);
 
-			if (m_pMFVDC2) {
+			if (m_pMFVDC_preview) {
 				RECT Rect2;
-				::GetClientRect (m_wndView2.GetVideoHWND(), &Rect2);
-				m_pMFVDC2->SetVideoWindow (m_wndView2.GetVideoHWND());
-				m_pMFVDC2->SetVideoPosition(NULL, &Rect2);
+				::GetClientRect (m_wndPreView.GetVideoHWND(), &Rect2);
+				m_pMFVDC_preview->SetVideoWindow (m_wndPreView.GetVideoHWND());
+				m_pMFVDC_preview->SetVideoPosition(NULL, &Rect2);
 			}
 		}
 
@@ -14901,8 +14901,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 	EndWaitCursor();
 
-	if (b_UseSmartSeek && pMC2) {
-		pMC2->Pause();
+	if (b_UseSmartSeek && m_pMC_preview) {
+		m_pMC_preview->Pause();
 	}
 
 	if (!err.IsEmpty()) {
@@ -15077,24 +15077,24 @@ void CMainFrame::CloseMediaPrivate()
 		pGB.Release();
 	}
 
-	if (pGB2) {
-		m_pMFVP2.Release();
-		m_pMFVDC2.Release();
+	if (m_pGB_preview) {
+		m_pMFVP_preview.Release();
+		m_pMFVDC_preview.Release();
 
-		pFS2.Release();
-		pMS2.Release();
-		pBV2.Release();
-		pVW2.Release();
-		pME2.Release();
-		pMC2.Release();
+		m_pFS_preview.Release();
+		m_pMS_preview.Release();
+		m_pBV_preview.Release();
+		m_pVW_preview.Release();
+		m_pME_preview.Release();
+		m_pMC_preview.Release();
 
-		if (pDVDC2) {
-			pDVDC2.Release();
-			pDVDI2.Release();
+		if (m_pDVDC_preview) {
+			m_pDVDC_preview.Release();
+			m_pDVDI_preview.Release();
 		}
 
-		pGB2->RemoveFromROT();
-		pGB2.Release();
+		m_pGB_preview->RemoveFromROT();
+		m_pGB_preview.Release();
 	}
 
 	m_pProv.Release();
@@ -19694,7 +19694,7 @@ bool CMainFrame::CanPreviewUse()
 			&& (GetPlaybackMode() == PM_DVD || GetPlaybackMode() == PM_FILE)
 			&& !m_fAudioOnly
 			&& AfxGetAppSettings().fSmartSeek
-			&& m_wndView2) ? 1 : 0;
+			&& m_wndPreView) ? 1 : 0;
 }
 
 bool CheckCoverImgExist(CString &path, CString name) {
