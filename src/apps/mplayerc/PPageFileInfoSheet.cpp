@@ -37,9 +37,9 @@ CMPCPropertySheet::CMPCPropertySheet(LPCTSTR pszCaption, CWnd* pParentWnd, UINT 
 IMPLEMENT_DYNAMIC(CPPageFileInfoSheet, CMPCPropertySheet)
 CPPageFileInfoSheet::CPPageFileInfoSheet(CString fn, CMainFrame* pMainFrame, CWnd* pParentWnd)
 	: CMPCPropertySheet(ResStr(IDS_PROPSHEET_PROPERTIES), pParentWnd, 0)
-	, m_clip(fn, pMainFrame->pGB)
-	, m_details(fn, pMainFrame->pGB, pMainFrame->m_pCAP)
-	, m_res(fn, pMainFrame->pGB)
+	, m_clip(fn, pMainFrame->m_pGB)
+	, m_details(fn, pMainFrame->m_pGB, pMainFrame->m_pCAP)
+	, m_res(fn, pMainFrame->m_pGB)
 	, m_mi(fn)
 	, m_fn(fn)
 	, m_bNeedInit(TRUE)
@@ -49,7 +49,7 @@ CPPageFileInfoSheet::CPPageFileInfoSheet(CString fn, CMainFrame* pMainFrame, CWn
 	AddPage(&m_details);
 	AddPage(&m_clip);
 
-	BeginEnumFilters(pMainFrame->pGB, pEF, pBF) {
+	BeginEnumFilters(pMainFrame->m_pGB, pEF, pBF) {
 		if (CComQIPtr<IDSMResourceBag> pRB = pBF)
 			if (pRB && pRB->ResGetCount() > 0) {
 				AddPage(&m_res);

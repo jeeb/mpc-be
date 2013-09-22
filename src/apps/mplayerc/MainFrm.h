@@ -205,21 +205,21 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 
 	// TODO: wrap these graph objects into a class to make it look cleaner
 
-	CComPtr<IGraphBuilder2>         pGB;
-	CComQIPtr<IMediaControl>        pMC;
-	CComQIPtr<IMediaEventEx>        pME;
+	CComPtr<IGraphBuilder2>         m_pGB;
+	CComQIPtr<IMediaControl>        m_pMC;
+	CComQIPtr<IMediaEventEx>        m_pME;
 
-	CComQIPtr<IVideoWindow>         pVW;
-	CComQIPtr<IBasicVideo>          pBV;
-	CComQIPtr<IBasicAudio>          pBA;
-	CComQIPtr<IMediaSeeking>        pMS;
-	CComQIPtr<IVideoFrameStep>      pFS;
-	CComQIPtr<IQualProp, &IID_IQualProp> pQP;
-	CComQIPtr<IBufferInfo>          pBI;
-	CComQIPtr<IAMOpenProgress>      pAMOP;
+	CComQIPtr<IVideoWindow>         m_pVW;
+	CComQIPtr<IBasicVideo>          m_pBV;
+	CComQIPtr<IBasicAudio>          m_pBA;
+	CComQIPtr<IMediaSeeking>        m_pMS;
+	CComQIPtr<IVideoFrameStep>      m_pFS;
+	CComQIPtr<IQualProp, &IID_IQualProp> m_pQP;
+	CComQIPtr<IBufferInfo>          m_pBI;
+	CComQIPtr<IAMOpenProgress>      m_pAMOP;
 
-	CComQIPtr<IDvdControl2>         pDVDC;
-	CComQIPtr<IDvdInfo2>            pDVDI;
+	CComQIPtr<IDvdControl2>         m_pDVDC;
+	CComQIPtr<IDvdInfo2>            m_pDVDI;
 
 	// SmarkSeek
 	CComPtr<IGraphBuilder2>         m_pGB_preview;
