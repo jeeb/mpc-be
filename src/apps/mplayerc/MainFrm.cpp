@@ -2950,287 +2950,293 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 					}
 				}
 				break;
-			case EC_DVD_TITLE_CHANGE: {
-				// Save current chapter
-				DVD_POSITION*	DvdPos = s.CurrentDVDPosition();
-				if (DvdPos) {
-					DvdPos->lTitle = (DWORD)evParam1;
+			case EC_DVD_TITLE_CHANGE: 
+				if (pDVDC) {
+					// Save current chapter
+					DVD_POSITION*	DvdPos = s.CurrentDVDPosition();
+					if (DvdPos) {
+						DvdPos->lTitle = (DWORD)evParam1;
+					}
+
+					m_iDVDTitle = (DWORD)evParam1;
+
+					if (m_iDVDDomain == DVD_DOMAIN_Title) {
+						CString Domain;
+						Domain.Format(ResStr(IDS_AG_TITLE), m_iDVDTitle);
+						m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_DOMAIN), Domain);
+					}
+					SetupChapters();
 				}
+				break;
+			case EC_DVD_DOMAIN_CHANGE:
+				if (pDVDC) {
+					m_iDVDDomain = (DVD_DOMAIN)evParam1;
 
-				m_iDVDTitle = (DWORD)evParam1;
+					CString Domain('-');
 
-				if (m_iDVDDomain == DVD_DOMAIN_Title) {
-					CString Domain;
-					Domain.Format(ResStr(IDS_AG_TITLE), m_iDVDTitle);
-					m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_DOMAIN), Domain);
-				}
-				SetupChapters();
-			}
-			break;
-			case EC_DVD_DOMAIN_CHANGE: {
-				m_iDVDDomain = (DVD_DOMAIN)evParam1;
+					switch (m_iDVDDomain) {
+						case DVD_DOMAIN_FirstPlay:
+							ULONGLONG	llDVDGuid;
 
-				CString Domain('-');
-
-				switch (m_iDVDDomain) {
-					case DVD_DOMAIN_FirstPlay:
-						ULONGLONG	llDVDGuid;
-
-						Domain = _T("First Play");
-
-						if ( s.fShowDebugInfo ) {
-							m_OSD.DebugMessage(_T("%s"), Domain);
-						}
-
-						if (pDVDI && SUCCEEDED (pDVDI->GetDiscID (NULL, &llDVDGuid))) {
-							m_fValidDVDOpen = true;
+							Domain = _T("First Play");
 
 							if ( s.fShowDebugInfo ) {
-								m_OSD.DebugMessage(_T("DVD Title: %d"), s.lDVDTitle);
+								m_OSD.DebugMessage(_T("%s"), Domain);
 							}
 
-							if (s.lDVDTitle != 0) {
-								s.NewDvd (llDVDGuid);
-								// Set command line position
-								hr = pDVDC->PlayTitle(s.lDVDTitle, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+							if (pDVDI && SUCCEEDED (pDVDI->GetDiscID (NULL, &llDVDGuid))) {
+								m_fValidDVDOpen = true;
 
 								if ( s.fShowDebugInfo ) {
-									m_OSD.DebugMessage(_T("PlayTitle: 0x%08X"), hr);
-									m_OSD.DebugMessage(_T("DVD Chapter: %d"), s.lDVDChapter);
+									m_OSD.DebugMessage(_T("DVD Title: %d"), s.lDVDTitle);
 								}
 
-								if (s.lDVDChapter > 1) {
-									hr = pDVDC->PlayChapterInTitle(s.lDVDTitle, s.lDVDChapter, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+								if (s.lDVDTitle != 0) {
+									s.NewDvd (llDVDGuid);
+									// Set command line position
+									hr = pDVDC->PlayTitle(s.lDVDTitle, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 
 									if ( s.fShowDebugInfo ) {
-										m_OSD.DebugMessage(_T("PlayChapterInTitle: 0x%08X"), hr);
-									}
-								} else {
-									// Trick: skip trailers with some DVDs
-									hr = pDVDC->Resume(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-
-									if ( s.fShowDebugInfo ) {
-										m_OSD.DebugMessage(_T("Resume: 0x%08X"), hr);
+										m_OSD.DebugMessage(_T("PlayTitle: 0x%08X"), hr);
+										m_OSD.DebugMessage(_T("DVD Chapter: %d"), s.lDVDChapter);
 									}
 
-									// If the resume call succeeded, then we skip PlayChapterInTitle
-									// and PlayAtTimeInTitle.
-									if ( hr == S_OK ) {
-										// This might fail if the Title is not available yet?
-										hr = pDVDC->PlayAtTime(&s.DVDPosition,
-															   DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-
-										if ( s.fShowDebugInfo ) {
-											m_OSD.DebugMessage(_T("PlayAtTime: 0x%08X"), hr);
-										}
-									} else {
-										if ( s.fShowDebugInfo )
-											m_OSD.DebugMessage(_T("Timecode requested: %02d:%02d:%02d.%03d"),
-															   s.DVDPosition.bHours, s.DVDPosition.bMinutes,
-															   s.DVDPosition.bSeconds, s.DVDPosition.bFrames);
-
-										// Always play chapter 1 (for now, until something else dumb happens)
-										hr = pDVDC->PlayChapterInTitle(s.lDVDTitle, 1,
-																	   DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+									if (s.lDVDChapter > 1) {
+										hr = pDVDC->PlayChapterInTitle(s.lDVDTitle, s.lDVDChapter, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 
 										if ( s.fShowDebugInfo ) {
 											m_OSD.DebugMessage(_T("PlayChapterInTitle: 0x%08X"), hr);
 										}
+									} else {
+										// Trick: skip trailers with some DVDs
+										hr = pDVDC->Resume(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 
-										// This might fail if the Title is not available yet?
+										if ( s.fShowDebugInfo ) {
+											m_OSD.DebugMessage(_T("Resume: 0x%08X"), hr);
+										}
+
+										// If the resume call succeeded, then we skip PlayChapterInTitle
+										// and PlayAtTimeInTitle.
+										if ( hr == S_OK ) {
+											// This might fail if the Title is not available yet?
+											hr = pDVDC->PlayAtTime(&s.DVDPosition,
+																   DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+
+											if ( s.fShowDebugInfo ) {
+												m_OSD.DebugMessage(_T("PlayAtTime: 0x%08X"), hr);
+											}
+										} else {
+											if ( s.fShowDebugInfo )
+												m_OSD.DebugMessage(_T("Timecode requested: %02d:%02d:%02d.%03d"),
+																   s.DVDPosition.bHours, s.DVDPosition.bMinutes,
+																   s.DVDPosition.bSeconds, s.DVDPosition.bFrames);
+
+											// Always play chapter 1 (for now, until something else dumb happens)
+											hr = pDVDC->PlayChapterInTitle(s.lDVDTitle, 1,
+																		   DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+
+											if ( s.fShowDebugInfo ) {
+												m_OSD.DebugMessage(_T("PlayChapterInTitle: 0x%08X"), hr);
+											}
+
+											// This might fail if the Title is not available yet?
+											hr = pDVDC->PlayAtTime(&s.DVDPosition,
+																   DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+
+											if ( s.fShowDebugInfo ) {
+												m_OSD.DebugMessage(_T("PlayAtTime: 0x%08X"), hr);
+											}
+
+											if ( hr != S_OK ) {
+												hr = pDVDC->PlayAtTimeInTitle(s.lDVDTitle, &s.DVDPosition,
+																			  DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+
+												if ( s.fShowDebugInfo ) {
+													m_OSD.DebugMessage(_T("PlayAtTimeInTitle: 0x%08X"), hr);
+												}
+											}
+										} // Resume
+
 										hr = pDVDC->PlayAtTime(&s.DVDPosition,
 															   DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 
 										if ( s.fShowDebugInfo ) {
-											m_OSD.DebugMessage(_T("PlayAtTime: 0x%08X"), hr);
+											m_OSD.DebugMessage(_T("PlayAtTime: %d"), hr);
 										}
-
-										if ( hr != S_OK ) {
-											hr = pDVDC->PlayAtTimeInTitle(s.lDVDTitle, &s.DVDPosition,
-																		  DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-
-											if ( s.fShowDebugInfo ) {
-												m_OSD.DebugMessage(_T("PlayAtTimeInTitle: 0x%08X"), hr);
-											}
-										}
-									} // Resume
-
-									hr = pDVDC->PlayAtTime(&s.DVDPosition,
-														   DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-
-									if ( s.fShowDebugInfo ) {
-										m_OSD.DebugMessage(_T("PlayAtTime: %d"), hr);
 									}
+
+									m_iDVDTitle	  = s.lDVDTitle;
+									s.lDVDTitle   = 0;
+									s.lDVDChapter = 0;
+								} else if (s.fKeepHistory && s.fRememberDVDPos && !s.NewDvd(llDVDGuid)) {
+									// Set last remembered position (if founded...)
+									DVD_POSITION*	DvdPos = s.CurrentDVDPosition();
+
+									pDVDC->PlayTitle(DvdPos->lTitle, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+									pDVDC->Resume(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+
+	#if 1
+									if (SUCCEEDED (hr = pDVDC->PlayAtTimeInTitle(
+															DvdPos->lTitle, &DvdPos->Timecode,
+															DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL)))
+	#else
+									if (SUCCEEDED (hr = pDVDC->PlayAtTime (&DvdPos->Timecode,
+																		   DVD_CMD_FLAG_Flush, NULL)))
+	#endif
+									{
+										m_iDVDTitle = DvdPos->lTitle;
+									}
+								} else if (s.fStartMainTitle && s.fNormalStartDVD) {
+									pDVDC->ShowMenu(DVD_MENU_Title, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 								}
-
-								m_iDVDTitle	  = s.lDVDTitle;
-								s.lDVDTitle   = 0;
-								s.lDVDChapter = 0;
-							} else if (s.fKeepHistory && s.fRememberDVDPos && !s.NewDvd(llDVDGuid)) {
-								// Set last remembered position (if founded...)
-								DVD_POSITION*	DvdPos = s.CurrentDVDPosition();
-
-								pDVDC->PlayTitle(DvdPos->lTitle, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-								pDVDC->Resume(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-
-#if 1
-								if (SUCCEEDED (hr = pDVDC->PlayAtTimeInTitle(
-														DvdPos->lTitle, &DvdPos->Timecode,
-														DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL)))
-#else
-								if (SUCCEEDED (hr = pDVDC->PlayAtTime (&DvdPos->Timecode,
-																	   DVD_CMD_FLAG_Flush, NULL)))
-#endif
-								{
-									m_iDVDTitle = DvdPos->lTitle;
+								s.fNormalStartDVD = true;
+								if (s.fRememberZoomLevel && !m_fFullScreen && !s.IsD3DFullscreen()) { // Hack to the normal initial zoom for DVD + DXVA ...
+									ZoomVideoWindow();
 								}
-							} else if (s.fStartMainTitle && s.fNormalStartDVD) {
+							}
+							break;
+						case DVD_DOMAIN_VideoManagerMenu:
+							Domain = _T("Video Manager Menu");
+							if ( s.fShowDebugInfo ) {
+								m_OSD.DebugMessage(_T("%s"), Domain);
+							}
+							break;
+						case DVD_DOMAIN_VideoTitleSetMenu:
+							Domain = _T("Video Title Set Menu");
+							if ( s.fShowDebugInfo ) {
+								m_OSD.DebugMessage(_T("%s"), Domain);
+							}
+							break;
+						case DVD_DOMAIN_Title:
+							Domain.Format(ResStr(IDS_AG_TITLE), m_iDVDTitle);
+							if ( s.fShowDebugInfo ) {
+								m_OSD.DebugMessage(_T("%s"), Domain);
+							}
+							DVD_POSITION* DvdPos;
+							DvdPos = s.CurrentDVDPosition();
+							if (DvdPos) {
+								DvdPos->lTitle = m_iDVDTitle;
+							}
+
+							if (!m_fValidDVDOpen) {
+								m_fValidDVDOpen = true;
 								pDVDC->ShowMenu(DVD_MENU_Title, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
 							}
-							s.fNormalStartDVD = true;
-							if (s.fRememberZoomLevel && !m_fFullScreen && !s.IsD3DFullscreen()) { // Hack to the normal initial zoom for DVD + DXVA ...
-								ZoomVideoWindow();
+
+							break;
+						case DVD_DOMAIN_Stop:
+							Domain = ResStr(IDS_AG_STOP);
+							if ( s.fShowDebugInfo ) {
+								m_OSD.DebugMessage(_T("%s"), Domain);
 							}
-						}
-						break;
-					case DVD_DOMAIN_VideoManagerMenu:
-						Domain = _T("Video Manager Menu");
-						if ( s.fShowDebugInfo ) {
-							m_OSD.DebugMessage(_T("%s"), Domain);
-						}
-						break;
-					case DVD_DOMAIN_VideoTitleSetMenu:
-						Domain = _T("Video Title Set Menu");
-						if ( s.fShowDebugInfo ) {
-							m_OSD.DebugMessage(_T("%s"), Domain);
-						}
-						break;
-					case DVD_DOMAIN_Title:
-						Domain.Format(ResStr(IDS_AG_TITLE), m_iDVDTitle);
-						if ( s.fShowDebugInfo ) {
-							m_OSD.DebugMessage(_T("%s"), Domain);
-						}
-						DVD_POSITION* DvdPos;
-						DvdPos = s.CurrentDVDPosition();
-						if (DvdPos) {
-							DvdPos->lTitle = m_iDVDTitle;
-						}
+							break;
+						default:
+							Domain = _T("-");
+							if ( s.fShowDebugInfo ) {
+								m_OSD.DebugMessage(_T("%s"), Domain);
+							}
+							break;
+					}
 
-						if (!m_fValidDVDOpen) {
-							m_fValidDVDOpen = true;
-							pDVDC->ShowMenu(DVD_MENU_Title, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-						}
+					m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_DOMAIN), Domain);
 
-						break;
-					case DVD_DOMAIN_Stop:
-						Domain = ResStr(IDS_AG_STOP);
-						if ( s.fShowDebugInfo ) {
-							m_OSD.DebugMessage(_T("%s"), Domain);
-						}
-						break;
-					default:
-						Domain = _T("-");
-						if ( s.fShowDebugInfo ) {
-							m_OSD.DebugMessage(_T("%s"), Domain);
-						}
-						break;
+	#if 0	// UOPs debug traces
+					if (hr == VFW_E_DVD_OPERATION_INHIBITED) {
+						ULONG UOPfields = 0;
+						pDVDI->GetCurrentUOPS(&UOPfields);
+						CString message;
+						message.Format( _T("UOP bitfield: 0x%08X; domain: %s"), UOPfields, Domain);
+						m_OSD.DisplayMessage( OSD_TOPLEFT, message );
+					} else {
+						m_OSD.DisplayMessage( OSD_TOPRIGHT, Domain );
+					}
+	#endif
+
+					MoveVideoWindow(); // AR might have changed
+					SetupChapters();
 				}
+				break;
+			case EC_DVD_CURRENT_HMSF_TIME:
+				if (pDVDC) {
+					double fps = evParam2 == DVD_TC_FLAG_25fps ? 25.0
+								 : evParam2 == DVD_TC_FLAG_30fps ? 30.0
+								 : evParam2 == DVD_TC_FLAG_DropFrame ? 29.97
+								 : 25.0;
 
-				m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_DOMAIN), Domain);
+					REFERENCE_TIME rtDur = 0;
 
-#if 0	// UOPs debug traces
-				if (hr == VFW_E_DVD_OPERATION_INHIBITED) {
-					ULONG UOPfields = 0;
-					pDVDI->GetCurrentUOPS(&UOPfields);
-					CString message;
-					message.Format( _T("UOP bitfield: 0x%08X; domain: %s"), UOPfields, Domain);
-					m_OSD.DisplayMessage( OSD_TOPLEFT, message );
-				} else {
-					m_OSD.DisplayMessage( OSD_TOPRIGHT, Domain );
+					DVD_HMSF_TIMECODE tcDur;
+					ULONG ulFlags;
+					if (SUCCEEDED(pDVDI->GetTotalTitleTime(&tcDur, &ulFlags))) {
+						rtDur = HMSF2RT(tcDur, fps);
+					}
+
+					g_bNoDuration = rtDur <= 0;
+					m_wndSeekBar.Enable(rtDur > 0);
+					m_wndSeekBar.SetRange(0, rtDur);
+					m_OSD.SetRange (0, rtDur);
+					m_Lcd.SetMediaRange(0, rtDur);
+
+					REFERENCE_TIME rtNow = HMSF2RT(*((DVD_HMSF_TIMECODE*)&evParam1), fps);
+
+					// Save current position in the chapter
+					DVD_POSITION*	DvdPos = s.CurrentDVDPosition();
+					if (DvdPos) {
+						memcpy (&DvdPos->Timecode, (void*)&evParam1, sizeof(DVD_HMSF_TIMECODE));
+					}
+
+					m_wndSeekBar.SetPos(rtNow);
+					m_OSD.SetPos(rtNow);
+					m_Lcd.SetMediaPos(rtNow);
+
+					if (m_pSubClock) {
+						m_pSubClock->SetTime(rtNow);
+					}
 				}
-#endif
+				break;
+			case EC_DVD_ERROR:
+				if (pDVDC) {
+					TRACE(_T("\t%d %d\n"), evParam1, evParam2);
 
-				MoveVideoWindow(); // AR might have changed
-				SetupChapters();
-			}
-			break;
-			case EC_DVD_CURRENT_HMSF_TIME: {
-				double fps = evParam2 == DVD_TC_FLAG_25fps ? 25.0
-							 : evParam2 == DVD_TC_FLAG_30fps ? 30.0
-							 : evParam2 == DVD_TC_FLAG_DropFrame ? 29.97
-							 : 25.0;
+					CString err;
 
-				REFERENCE_TIME rtDur = 0;
+					switch (evParam1) {
+						case DVD_ERROR_Unexpected:
+						default:
+							err = ResStr(IDS_MAINFRM_16);
+							break;
+						case DVD_ERROR_CopyProtectFail:
+							err = ResStr(IDS_MAINFRM_17);
+							break;
+						case DVD_ERROR_InvalidDVD1_0Disc:
+							err = ResStr(IDS_MAINFRM_18);
+							break;
+						case DVD_ERROR_InvalidDiscRegion:
+							err = ResStr(IDS_MAINFRM_19);
+							break;
+						case DVD_ERROR_LowParentalLevel:
+							err = ResStr(IDS_MAINFRM_20);
+							break;
+						case DVD_ERROR_MacrovisionFail:
+							err = ResStr(IDS_MAINFRM_21);
+							break;
+						case DVD_ERROR_IncompatibleSystemAndDecoderRegions:
+							err = ResStr(IDS_MAINFRM_22);
+							break;
+						case DVD_ERROR_IncompatibleDiscAndDecoderRegions:
+							err = ResStr(IDS_MAINFRM_23);
+							break;
+					}
 
-				DVD_HMSF_TIMECODE tcDur;
-				ULONG ulFlags;
-				if (SUCCEEDED(pDVDI->GetTotalTitleTime(&tcDur, &ulFlags))) {
-					rtDur = HMSF2RT(tcDur, fps);
+					SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+
+					m_closingmsg = err;
 				}
-
-				g_bNoDuration = rtDur <= 0;
-				m_wndSeekBar.Enable(rtDur > 0);
-				m_wndSeekBar.SetRange(0, rtDur);
-				m_OSD.SetRange (0, rtDur);
-				m_Lcd.SetMediaRange(0, rtDur);
-
-				REFERENCE_TIME rtNow = HMSF2RT(*((DVD_HMSF_TIMECODE*)&evParam1), fps);
-
-				// Save current position in the chapter
-				DVD_POSITION*	DvdPos = s.CurrentDVDPosition();
-				if (DvdPos) {
-					memcpy (&DvdPos->Timecode, (void*)&evParam1, sizeof(DVD_HMSF_TIMECODE));
-				}
-
-				m_wndSeekBar.SetPos(rtNow);
-				m_OSD.SetPos(rtNow);
-				m_Lcd.SetMediaPos(rtNow);
-
-				if (m_pSubClock) {
-					m_pSubClock->SetTime(rtNow);
-				}
-			}
-			break;
-			case EC_DVD_ERROR: {
-				TRACE(_T("\t%d %d\n"), evParam1, evParam2);
-
-				CString err;
-
-				switch (evParam1) {
-					case DVD_ERROR_Unexpected:
-					default:
-						err = ResStr(IDS_MAINFRM_16);
-						break;
-					case DVD_ERROR_CopyProtectFail:
-						err = ResStr(IDS_MAINFRM_17);
-						break;
-					case DVD_ERROR_InvalidDVD1_0Disc:
-						err = ResStr(IDS_MAINFRM_18);
-						break;
-					case DVD_ERROR_InvalidDiscRegion:
-						err = ResStr(IDS_MAINFRM_19);
-						break;
-					case DVD_ERROR_LowParentalLevel:
-						err = ResStr(IDS_MAINFRM_20);
-						break;
-					case DVD_ERROR_MacrovisionFail:
-						err = ResStr(IDS_MAINFRM_21);
-						break;
-					case DVD_ERROR_IncompatibleSystemAndDecoderRegions:
-						err = ResStr(IDS_MAINFRM_22);
-						break;
-					case DVD_ERROR_IncompatibleDiscAndDecoderRegions:
-						err = ResStr(IDS_MAINFRM_23);
-						break;
-				}
-
-				SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
-
-				m_closingmsg = err;
-			}
-			break;
+				break;
 			case EC_DVD_WARNING:
-				TRACE(_T("\t%d %d\n"), evParam1, evParam2);
+				if (pDVDC) {
+					TRACE(_T("\t%d %d\n"), evParam1, evParam2);
+				}
 				break;
 			case EC_VIDEO_SIZE_CHANGED: {
 				TRACE(_T("\t%dx%d\n"), CSize(evParam1));
@@ -3274,9 +3280,11 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 				}
 				break;
 			case EC_DVD_PLAYBACK_RATE_CHANGE:
-				if (m_fCustomGraph && s.AutoChangeFullscrRes.bEnabled == 1 &&
-						m_fFullScreen && m_iDVDDomain == DVD_DOMAIN_Title) {
-					AutoChangeMonitorMode();
+				if (pDVDC) {
+					if (m_fCustomGraph && s.AutoChangeFullscrRes.bEnabled == 1 &&
+							m_fFullScreen && m_iDVDDomain == DVD_DOMAIN_Title) {
+						AutoChangeMonitorMode();
+					}
 				}
 				break;
 		}
