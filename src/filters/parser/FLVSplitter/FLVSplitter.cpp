@@ -26,6 +26,7 @@
 #include "FLVSplitter.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/VideoParser.h"
+#include "HevcBitstream.h"
 
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
@@ -51,14 +52,16 @@
 // 14 = MP3 8 kHz (reserved)
 // 15 = Device-specific sound (reserved)
 
-//#define FLV_VIDEO_JPEG    1 // non-standard? need samples
-#define FLV_VIDEO_H263    2 // Sorenson H.263
-#define FLV_VIDEO_SCREEN  3 // Screen video
-#define FLV_VIDEO_VP6     4 // On2 VP6
-#define FLV_VIDEO_VP6A    5 // On2 VP6 with alpha channel
-#define FLV_VIDEO_SCREEN2 6 // Screen video version 2
-#define FLV_VIDEO_AVC     7 // AVC
-#define FLV_VIDEO_HEVC   12 // HEVC (non-standard?)
+//#define FLV_VIDEO_JPEG   1 // non-standard? need samples
+#define FLV_VIDEO_H263     2 // Sorenson H.263
+#define FLV_VIDEO_SCREEN   3 // Screen video
+#define FLV_VIDEO_VP6      4 // On2 VP6
+#define FLV_VIDEO_VP6A     5 // On2 VP6 with alpha channel
+#define FLV_VIDEO_SCREEN2  6 // Screen video version 2
+#define FLV_VIDEO_AVC      7 // AVC
+#define FLV_VIDEO_HM62    11 // HM6.2
+#define FLV_VIDEO_HM91    12 // HM9.1
+#define FLV_VIDEO_HM10    13 // HM10.0
 
 #define AMF_END_OF_OBJECT			0x09
 
@@ -253,7 +256,7 @@ bool CFLVSplitterFilter::ParseAMF0(CBaseSplitterFileEx* pFile, UINT64 end, const
 		case AMF_DATA_TYPE_UNDEFINED:
 		case AMF_DATA_TYPE_UNSUPPORTED:
 			return true;
-        case AMF_DATA_TYPE_MIXEDARRAY:
+		case AMF_DATA_TYPE_MIXEDARRAY:
 			{
 				pFile->BitRead(32);
 				for (;;) {
@@ -799,8 +802,316 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						break;
 					}
-					case FLV_VIDEO_HEVC:
-						// TODO: get video parameters
+					case FLV_VIDEO_HM62: { // HEVC HM6.2
+						// check is avc header
+						if(dataSize < 4 || m_pFile->BitRead(8) != 0) {
+							fTypeFlagsVideo = true;
+							break;
+						}
+						m_pFile->BitRead(24); // composition time
+
+						__int64 headerOffset = m_pFile->GetPos();
+						UINT32 headerSize = dataSize - 4;
+						BYTE * headerData = new BYTE[headerSize];
+						m_pFile->ByteRead(headerData, headerSize);
+						m_pFile->Seek(headerOffset + 9);
+
+						mt.formattype = FORMAT_MPEG2Video;
+						MPEG2VIDEOINFO* vih = (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + headerSize);
+						memset(vih, 0, mt.FormatLength());
+						vih->hdr.bmiHeader.biSize = sizeof(vih->hdr.bmiHeader);
+						vih->hdr.bmiHeader.biPlanes = 1;
+						vih->hdr.bmiHeader.biBitCount = 24;
+						vih->dwFlags = (headerData[4] & 0x03) + 1; // nal length size
+
+						vih->dwProfile = (BYTE)m_pFile->BitRead(8); // profile
+						m_pFile->BitRead(8); // compatibility
+						vih->dwLevel = (BYTE)m_pFile->BitRead(8); // level
+
+						// parse SPS
+						UINT ue;
+						ue = (UINT)m_pFile->UExpGolombRead(); // seq_parameter_set_id
+						ue = (UINT)m_pFile->UExpGolombRead(); // ???
+						ue = (UINT)m_pFile->BitRead(3); // max_tid_minus_1
+
+						UINT nWidth  = (UINT)m_pFile->UExpGolombRead(); // video width
+						UINT nHeight = (UINT)m_pFile->UExpGolombRead(); // video height
+
+						INT bit = (INT)m_pFile->BitRead(1);
+						if(bit == 1) {
+							ue = (UINT)m_pFile->UExpGolombRead();
+							ue = (UINT)m_pFile->UExpGolombRead();
+							ue = (UINT)m_pFile->UExpGolombRead();
+							ue = (UINT)m_pFile->UExpGolombRead();
+						}
+						ue = (UINT)m_pFile->UExpGolombRead();
+						ue = (UINT)m_pFile->UExpGolombRead();
+
+						bit = (INT)m_pFile->BitRead(1);
+						bit = (INT)m_pFile->BitRead(1);
+
+						ue = (UINT)m_pFile->UExpGolombRead(); // log2_poc_minus_4
+
+						// Fill media type
+						CSize aspect(nWidth, nHeight);
+						int lnko = LNKO(aspect.cx, aspect.cy);
+						if(lnko > 1) {
+							aspect.cx /= lnko, aspect.cy /= lnko;
+						}
+
+						vih->hdr.dwPictAspectRatioX = aspect.cx;
+						vih->hdr.dwPictAspectRatioY = aspect.cy;
+						vih->hdr.bmiHeader.biWidth  = nWidth;
+						vih->hdr.bmiHeader.biHeight = nHeight;
+
+						// Fill sps-pps
+						BYTE* src = (BYTE*)headerData + 5;
+						BYTE* dst = (BYTE*)vih->dwSequenceHeader;
+						BYTE* src_end = (BYTE*)headerData + headerSize;
+						BYTE* dst_end = (BYTE*)vih->dwSequenceHeader + headerSize;
+						int spsCount = *(src++) & 0x1F;
+						int ppsCount = -1;
+
+						vih->cbSequenceHeader = 0;
+						while(src < src_end - 1) {
+							if (spsCount == 0 && ppsCount == -1) {
+								ppsCount = *(src++);
+								continue;
+							}
+
+							if (spsCount > 0)
+								spsCount--;
+							else if (ppsCount > 0)
+								ppsCount--;
+							else
+								break;
+
+							int len = ((src[0] << 8) | src[1]) + 2;
+							if(src + len > src_end || dst + len > dst_end) {
+								ASSERT(0);
+								break;
+							}
+							memcpy(dst, src, len);
+							src += len;
+							dst += len;
+							vih->cbSequenceHeader += len;
+						}
+
+						delete[] headerData;
+
+						mt.subtype = FOURCCMap(vih->hdr.bmiHeader.biCompression = 'CVEH');
+						break;
+					}
+					case FLV_VIDEO_HM91:   // HEVC HM9.1
+					case FLV_VIDEO_HM10: { // HEVC HM10.0
+						// Source code is provided by Deng James from Strongene Ltd.
+						if (dataSize < 4 || m_pFile->BitRead(8) != 0) { // packet type 0 == avc header
+							fTypeFlagsVideo = true;
+							break;
+						}
+						m_pFile->BitRead(24); // composition time
+
+						__int64 headerOffset = m_pFile->GetPos();
+						UINT32 headerSize = dataSize - 4;
+						BYTE* headerData = DEBUG_NEW BYTE[headerSize]; // this is AVCDecoderConfigurationRecord struct
+
+						m_pFile->ByteRead(headerData, headerSize);
+
+						// find HEVC SPS in AVCDecoderConfigurationRecord struct
+						enum hevc_nal_unit_type_e {
+							NAL_UNIT_SPS = 33,
+						};
+						ASSERT( (headerData[5] & 0xe0) == 0xe0 ); // reserved = 111b
+						int sps_num = headerData[5] & 0x1f;       // numOfSequenceParameterSets
+						int sps_pos = 6;
+						bool has_sps = false;
+						while ( sps_num-- > 0 ) {
+							int sps_len = (headerData[sps_pos] << 8) + headerData[sps_pos+1];
+							sps_pos += 2;
+							ASSERT( (sps_pos + sps_len) < (int)headerSize );
+							hevc_nal_unit_type_e nal_type = (hevc_nal_unit_type_e)((headerData[sps_pos] >> 1) & 0x3f);
+							if ( nal_type == NAL_UNIT_SPS ) {
+								has_sps = true;
+								break;
+							}
+							sps_pos += sps_len;
+						}
+						if ( !has_sps || sps_pos >= (int)headerSize )
+							return E_FAIL; // SPS not found!
+						
+						// decode SPS
+						HevcBitstream bs(headerData + sps_pos, headerSize - sps_pos);
+						bs.GetWord(16); // skip NAL header
+						bs.GetWord(4);  // video_parameter_set_id
+						int sps_max_sub_layers_minus1 = (int)bs.GetWord(3);
+
+						bs.GetWord(1);  // sps_temporal_id_nesting_flag
+
+						// profile_tier_level( 1, sps_max_sub_layers_minus1 )
+						{
+							int i, j;
+							bs.GetWord(2); // XXX_profile_space[]
+							bs.GetWord(1); // XXX_tier_flag[]
+							bs.GetWord(5); // XXX_profile_idc[]
+
+							for ( j = 0; j < 32; j++ )
+								bs.GetWord(1);  // XXX_profile_compatibility_flag[][j]
+							// HM9.1
+							if ( vt.CodecID == FLV_VIDEO_HM91 ) {
+								bs.GetWord(16); // XXX_reserved_zero_16bits[]
+							}
+							// HM10.0
+							else {
+								bs.GetWord(1);  //(uiCode, "general_progressive_source_flag");
+								bs.GetWord(1);  //(uiCode, "general_interlaced_source_flag");
+								bs.GetWord(1);  //(uiCode, "general_non_packed_constraint_flag");
+								bs.GetWord(1);  //(uiCode, "general_frame_only_constraint_flag");
+								bs.GetWord(16); //(16, uiCode, "XXX_reserved_zero_44bits[0..15]");
+								bs.GetWord(16); //(16, uiCode, "XXX_reserved_zero_44bits[16..31]");
+								bs.GetWord(12); //(12, uiCode, "XXX_reserved_zero_44bits[32..43]");
+							}
+
+							bs.GetWord(8);	// general_level_idc
+
+							// HM9.1
+							if ( vt.CodecID == FLV_VIDEO_HM91 ) {
+								for ( i = 0; i < sps_max_sub_layers_minus1; i++ ) {
+									int sub_layer_profile_present_flag, sub_layer_level_present_flag;
+									sub_layer_profile_present_flag = (int)bs.GetWord(1); // sub_layer_profile_present_flag[i]
+									sub_layer_level_present_flag = (int)bs.GetWord(1);   // sub_layer_level_present_flag[i]
+							
+									if ( sub_layer_profile_present_flag ) {
+										bs.GetWord(2); // XXX_profile_space[]
+										bs.GetWord(1); // XXX_tier_flag[]
+										bs.GetWord(5); // XXX_profile_idc[]
+										for(j = 0; j < 32; j++) {
+											bs.GetWord(1); // XXX_profile_compatibility_flag[][j]
+										}
+										bs.GetWord(16);    // XXX_reserved_zero_16bits[]
+									}
+									if ( sub_layer_level_present_flag ) {
+										bs.GetWord(8);     // sub_layer_level_idc[i]
+									}
+								}
+							}
+							// HM10.0
+							else {
+								bool subLayerProfilePresentFlag[6];
+								bool subLayerLevelPresentFlag[6];
+								for(i = 0; i < sps_max_sub_layers_minus1; i++) {
+									subLayerProfilePresentFlag[i] = bs.GetWord(1) != 0; //( uiCode, "sub_layer_profile_present_flag[i]" );
+									subLayerLevelPresentFlag[i]   = bs.GetWord(1) != 0; //( uiCode, "sub_layer_level_present_flag[i]"   ); 
+								}
+								if ( sps_max_sub_layers_minus1 > 0 ) {
+									for ( i = sps_max_sub_layers_minus1; i < 8; i++ )
+										bs.GetWord(2); //(2, uiCode, "reserved_zero_2bits")
+								}
+								for(i = 0; i < sps_max_sub_layers_minus1; i++) {
+									if ( 1 && subLayerProfilePresentFlag[i] ) {
+										bs.GetWord(2); //( 2 , uiCode, "XXX_profile_space[]");
+										bs.GetWord(1); //( uiCode, "XXX_tier_flag[]"    );
+										bs.GetWord(5); //( 5 , uiCode, "XXX_profile_idc[]"  );
+
+										for(j = 0; j < 32; j++){
+											bs.GetWord(1); //(  uiCode, "XXX_profile_compatibility_flag[][j]");
+										}
+										bs.GetWord(1);  //(uiCode, "general_progressive_source_flag");
+										bs.GetWord(1);  //(uiCode, "general_interlaced_source_flag");
+										bs.GetWord(1);  //(uiCode, "general_non_packed_constraint_flag");
+										bs.GetWord(1);  //(uiCode, "general_frame_only_constraint_flag");
+										bs.GetWord(16); //(16, uiCode, "XXX_reserved_zero_44bits[0..15]");
+										bs.GetWord(16); //(16, uiCode, "XXX_reserved_zero_44bits[16..31]");
+										bs.GetWord(12); //(12, uiCode, "XXX_reserved_zero_44bits[32..43]");
+									}
+									if ( subLayerLevelPresentFlag[i] ) {
+										bs.GetWord(8);  //( 8, uiCode, "sub_layer_level_idc[i]" );
+									}
+								}
+							}
+						}
+
+						bs.GetUE(); // seq_parameter_set_id
+
+						int chroma_format_idc = (int)bs.GetUE(); // chroma_format_idc
+						if ( chroma_format_idc == 3 )
+							bs.GetWord(1); // separate_colour_plane_flag
+
+						int pic_width_in_luma_samples = (int)bs.GetUE();
+						int pic_height_in_luma_samples = (int)bs.GetUE();
+
+						struct sar {
+							WORD num;
+							WORD den;
+						} sar;
+						sar.num = 1;
+						sar.den = 1;
+						CSize aspect(pic_width_in_luma_samples * sar.num, pic_height_in_luma_samples * sar.den);
+						int lnko = LNKO(aspect.cx, aspect.cy);
+						if (lnko > 1) {
+							aspect.cx /= lnko, aspect.cy /= lnko;
+						}
+
+						// format type
+						mt.formattype = FORMAT_MPEG2Video;
+						MPEG2VIDEOINFO* vih = (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + headerSize);
+						memset(vih, 0, mt.FormatLength());
+						vih->hdr.bmiHeader.biSize     = sizeof(vih->hdr.bmiHeader);
+						vih->hdr.bmiHeader.biPlanes   = 1;
+						vih->hdr.bmiHeader.biBitCount = 24;
+						vih->dwFlags   = (headerData[4] & 0x03) + 1; // nal length size
+						vih->dwProfile = 0;
+						vih->dwLevel   = 0;
+						vih->hdr.dwPictAspectRatioX = aspect.cx;
+						vih->hdr.dwPictAspectRatioY = aspect.cy;
+						vih->hdr.bmiHeader.biWidth  = pic_width_in_luma_samples;
+						vih->hdr.bmiHeader.biHeight = pic_height_in_luma_samples;
+
+						BYTE* src = (BYTE*)headerData + 5;
+						BYTE* dst = (BYTE*)vih->dwSequenceHeader;
+						BYTE* src_end = (BYTE*)headerData + headerSize;
+						BYTE* dst_end = (BYTE*)vih->dwSequenceHeader + headerSize;
+						int spsCount = *(src++) & 0x1F;
+						int ppsCount = -1;
+
+						vih->cbSequenceHeader = 0;
+
+						while (src < src_end - 1) {
+							if (spsCount == 0 && ppsCount == -1) {
+								ppsCount = *(src++);
+								continue;
+							}
+
+							if (spsCount > 0) {
+								spsCount--;
+							} else if (ppsCount > 0) {
+								ppsCount--;
+							} else {
+								break;
+							}
+
+							int len = ((src[0] << 8) | src[1]) + 2;
+							if (src + len > src_end || dst + len > dst_end) {
+								ASSERT(0);
+								break;
+							}
+							memcpy(dst, src, len);
+							src += len;
+							dst += len;
+							vih->cbSequenceHeader += len;
+						}
+
+						delete [] headerData;
+
+						name += L" HEVC";
+						if ( vt.CodecID == FLV_VIDEO_HM91 ) {
+							mt.subtype = FOURCCMap(vih->hdr.bmiHeader.biCompression = '19MH');
+							name += L" HM9.1";
+						} else if ( vt.CodecID == FLV_VIDEO_HM10 ) {
+							mt.subtype = FOURCCMap(vih->hdr.bmiHeader.biCompression = '01MH');
+							name += L" HM10.0";
+						}
+						break;
+					}
 					default:
 						fTypeFlagsVideo = true;
 				}

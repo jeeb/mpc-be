@@ -72,6 +72,25 @@ class __declspec(uuid("47E792CF-0BBE-4F7A-859C-194B0768650A"))
 
 	bool ReadTag(VideoTag& vt);
 
+	struct MetaInfo {
+		bool    parsed;
+		double  duration;
+		double  videodatarate;
+		double  audiodatarate;
+		double  videocodecid;
+		double  audiocodecid;
+		double  audiosamplerate;
+		double  audiosamplesize;
+		bool    stereo;
+		double  width;
+		double  height;
+		int     HM_compatibility;
+		double  *times;
+		__int64 *filepositions;
+		int     keyframenum;
+	};
+	MetaInfo meta;
+
 	void NormalSeek(REFERENCE_TIME rt);
 	void AlternateSeek(REFERENCE_TIME rt);
 
