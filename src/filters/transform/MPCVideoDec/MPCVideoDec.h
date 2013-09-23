@@ -227,47 +227,47 @@ public:
 	STDMETHODIMP Apply();
 	STDMETHODIMP SetThreadNumber(int nValue);
 	STDMETHODIMP_(int) GetThreadNumber();
-	STDMETHOD(SetDiscardMode(int nValue));
-	STDMETHOD_(int, GetDiscardMode());
-	STDMETHOD(SetDeinterlacing(MPC_DEINTERLACING_FLAGS nValue));
-	STDMETHOD_(MPC_DEINTERLACING_FLAGS, GetDeinterlacing());
-	STDMETHOD_(GUID*, GetDXVADecoderGuid());
-	STDMETHOD(SetActiveCodecs(DWORD nValue));
-	STDMETHOD_(DWORD, GetActiveCodecs());
+	STDMETHODIMP SetDiscardMode(int nValue);
+	STDMETHODIMP_(int) GetDiscardMode();
+	STDMETHODIMP SetDeinterlacing(MPC_DEINTERLACING_FLAGS nValue);
+	STDMETHODIMP_(MPC_DEINTERLACING_FLAGS) GetDeinterlacing();
+	STDMETHODIMP_(GUID*) GetDXVADecoderGuid();
+	STDMETHODIMP SetActiveCodecs(DWORD nValue);
+	STDMETHODIMP_(DWORD) GetActiveCodecs();
 	STDMETHODIMP_(LPCTSTR) GetVideoCardDescription();
 
-	STDMETHOD(SetARMode(int nValue));
-	STDMETHOD_(int, GetARMode());
+	STDMETHODIMP SetARMode(int nValue);
+	STDMETHODIMP_(int) GetARMode();
 
-	STDMETHOD(SetDXVACheckCompatibility(int nValue));
-	STDMETHOD_(int, GetDXVACheckCompatibility());
+	STDMETHODIMP SetDXVACheckCompatibility(int nValue);
+	STDMETHODIMP_(int) GetDXVACheckCompatibility();
 
-	STDMETHOD(SetDXVA_SD(int nValue));
-	STDMETHOD_(int, GetDXVA_SD());
+	STDMETHODIMP SetDXVA_SD(int nValue);
+	STDMETHODIMP_(int) GetDXVA_SD();
 
 	// === New swscaler options
-	STDMETHOD(SetSwRefresh(int nValue));
-	STDMETHOD(SetSwOutputFormats(int nValue));
-	STDMETHOD_(int, GetSwOutputFormats());
-	STDMETHOD(SetSwPreset(int nValue));
-	STDMETHOD_(int, GetSwPreset());
-	STDMETHOD(SetSwStandard(int nValue));
-	STDMETHOD_(int, GetSwStandard());
-	STDMETHOD(SetSwInputLevels(int nValue));
-	STDMETHOD_(int, GetSwInputLevels());
-	STDMETHOD(SetSwOutputLevels(int nValue));
-	STDMETHOD_(int, GetSwOutputLevels());
+	STDMETHODIMP SetSwRefresh(int nValue);
+	STDMETHODIMP SetSwOutputFormats(int nValue);
+	STDMETHODIMP_(int) GetSwOutputFormats();
+	STDMETHODIMP SetSwPreset(int nValue);
+	STDMETHODIMP_(int) GetSwPreset();
+	STDMETHODIMP SetSwStandard(int nValue);
+	STDMETHODIMP_(int) GetSwStandard();
+	STDMETHODIMP SetSwInputLevels(int nValue);
+	STDMETHODIMP_(int) GetSwInputLevels();
+	STDMETHODIMP SetSwOutputLevels(int nValue);
+	STDMETHODIMP_(int) GetSwOutputLevels();
 	//
 
-	STDMETHOD(SetDialogHWND(HWND nValue));
-	STDMETHOD_(unsigned __int64, GetOutputFormat());
+	STDMETHODIMP SetDialogHWND(HWND nValue);
+	STDMETHODIMP_(unsigned __int64) GetOutputFormat();
 
 	// === IMPCVideoDecFilter2
-	STDMETHOD_(int, GetFrameType());
+	STDMETHODIMP_(int) GetFrameType();
 
 	// === IMPCVideoDecFilterCodec
-	STDMETHOD(SetFFMpegCodec(int nCodec, bool bEnabled));
-	STDMETHOD(SetDXVACodec(int nCodec, bool bEnabled));
+	STDMETHODIMP SetFFMpegCodec(int nCodec, bool bEnabled);
+	STDMETHODIMP SetDXVACodec(int nCodec, bool bEnabled);
 
 	// === DXVA common functions
 	BOOL						IsSupportedDecoderConfig(const D3DFORMAT nD3DFormat, const DXVA2_ConfigPictureDecode& config, bool& bIsPrefered);
