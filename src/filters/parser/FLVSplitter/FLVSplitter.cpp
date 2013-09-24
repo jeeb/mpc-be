@@ -1338,7 +1338,7 @@ bool CFLVSplitterFilter::DemuxLoop()
 					m_pFile->BitRead(8);
 				} else if (vt.CodecID == FLV_VIDEO_VP6A) {
 					m_pFile->BitRead(32);
-				} else if (vt.CodecID == FLV_VIDEO_AVC) {
+				} else if (vt.CodecID == FLV_VIDEO_AVC || vt.CodecID == FLV_VIDEO_HM91 || vt.CodecID == FLV_VIDEO_HM10) {
 					if (m_pFile->BitRead(8) != 1) {
 						goto NextTag;
 					}
