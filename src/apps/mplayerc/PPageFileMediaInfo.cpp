@@ -132,20 +132,24 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 	lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
 
 	LPCTSTR fonts[] = {_T("Consolas"), _T("Lucida Console"), _T("Courier New"), _T("") };
-	int fonts_size[] = { -11, -10, -11, -11 };
 
 	UINT i = 0;
 	BOOL success;
 
+	PAINTSTRUCT ps;
+	CDC* cDC = m_mediainfo.BeginPaint(&ps);
+
 	do {
 		_tcscpy_s(lf.lfFaceName, fonts[i]);
-		lf.lfHeight = fonts_size[i];
+		lf.lfHeight = -MulDiv(8, cDC->GetDeviceCaps(LOGPIXELSY), 72);
 		success = IsFontInstalled(fonts[i]) && m_pCFont->CreateFontIndirect(&lf);
 		i++;
 	} while (!success && i < _countof(fonts));
 
 	m_mediainfo.SetFont(m_pCFont);
 	m_mediainfo.SetWindowText(MI_Text);
+
+	m_mediainfo.EndPaint(&ps);
 
 	OldControlProc = (WNDPROC)SetWindowLongPtr(m_mediainfo.m_hWnd, GWLP_WNDPROC, (LONG_PTR)ControlProc);
 
