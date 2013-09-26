@@ -131,8 +131,8 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 	memset(&lf, 0, sizeof(lf));
 	lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
 
-	LPCTSTR fonts[] = { _T("Lucida Console"), _T("Courier New"), _T("") };
-	int fonts_size[] = { -10, -11, -11 };
+	LPCTSTR fonts[] = {_T("Consolas"), _T("Lucida Console"), _T("Courier New"), _T("") };
+	int fonts_size[] = { -11, -10, -11, -11 };
 
 	UINT i = 0;
 	BOOL success;
