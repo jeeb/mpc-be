@@ -61,7 +61,7 @@ struct hevc_hdr
 {
 	DWORD fourcc;
 	unsigned int width, height;
-	CSize sar;
+	SIZE sar;
 	DWORD nal_length_size;
 };
 

@@ -265,7 +265,7 @@ inline int LNKO(int a, int b)
 	return a;
 }
 
-inline void ReduceDim(CSize &dim)
+inline void ReduceDim(SIZE &dim)
 {
 	int lnko = LNKO(dim.cx, dim.cy);
 	if (lnko > 1) {
