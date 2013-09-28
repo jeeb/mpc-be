@@ -26,7 +26,6 @@
 #include "FLVSplitter.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/VideoParser.h"
-#include "HevcBitstream.h"
 
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
@@ -917,138 +916,20 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						m_pFile->ByteRead(headerData, headerSize);
 
-						// find HEVC SPS in AVCDecoderConfigurationRecord struct
-						enum hevc_nal_unit_type_e {
-							NAL_UNIT_SPS = 33,
-						};
-						ASSERT( (headerData[5] & 0xe0) == 0xe0 ); // reserved = 111b
-						int sps_num = headerData[5] & 0x1f;       // numOfSequenceParameterSets
-						int sps_pos = 6;
-						bool has_sps = false;
-						while ( sps_num-- > 0 ) {
-							int sps_len = (headerData[sps_pos] << 8) + headerData[sps_pos+1];
-							sps_pos += 2;
-							ASSERT( (sps_pos + sps_len) < (int)headerSize );
-							hevc_nal_unit_type_e nal_type = (hevc_nal_unit_type_e)((headerData[sps_pos] >> 1) & 0x3f);
-							if ( nal_type == NAL_UNIT_SPS ) {
-								has_sps = true;
+						hevc_hdr h;
+						switch (vt.CodecID) {
+							case FLV_VIDEO_HM91:
+								h.fourcc = mmioFOURCC('H','M','9','1');
 								break;
-							}
-							sps_pos += sps_len;
-						}
-						if ( !has_sps || sps_pos >= (int)headerSize )
-							return E_FAIL; // SPS not found!
-						
-						// decode SPS
-						HevcBitstream bs(headerData + sps_pos, headerSize - sps_pos);
-						bs.GetWord(16); // skip NAL header
-						bs.GetWord(4);  // video_parameter_set_id
-						int sps_max_sub_layers_minus1 = (int)bs.GetWord(3);
-
-						bs.GetWord(1);  // sps_temporal_id_nesting_flag
-
-						// profile_tier_level( 1, sps_max_sub_layers_minus1 )
-						{
-							int i, j;
-							bs.GetWord(2); // XXX_profile_space[]
-							bs.GetWord(1); // XXX_tier_flag[]
-							bs.GetWord(5); // XXX_profile_idc[]
-
-							for ( j = 0; j < 32; j++ )
-								bs.GetWord(1);  // XXX_profile_compatibility_flag[][j]
-							// HM9.1
-							if ( vt.CodecID == FLV_VIDEO_HM91 ) {
-								bs.GetWord(16); // XXX_reserved_zero_16bits[]
-							}
-							// HM10.0
-							else {
-								bs.GetWord(1);  //(uiCode, "general_progressive_source_flag");
-								bs.GetWord(1);  //(uiCode, "general_interlaced_source_flag");
-								bs.GetWord(1);  //(uiCode, "general_non_packed_constraint_flag");
-								bs.GetWord(1);  //(uiCode, "general_frame_only_constraint_flag");
-								bs.GetWord(16); //(16, uiCode, "XXX_reserved_zero_44bits[0..15]");
-								bs.GetWord(16); //(16, uiCode, "XXX_reserved_zero_44bits[16..31]");
-								bs.GetWord(12); //(12, uiCode, "XXX_reserved_zero_44bits[32..43]");
-							}
-
-							bs.GetWord(8);	// general_level_idc
-
-							// HM9.1
-							if ( vt.CodecID == FLV_VIDEO_HM91 ) {
-								for ( i = 0; i < sps_max_sub_layers_minus1; i++ ) {
-									int sub_layer_profile_present_flag, sub_layer_level_present_flag;
-									sub_layer_profile_present_flag = (int)bs.GetWord(1); // sub_layer_profile_present_flag[i]
-									sub_layer_level_present_flag = (int)bs.GetWord(1);   // sub_layer_level_present_flag[i]
-							
-									if ( sub_layer_profile_present_flag ) {
-										bs.GetWord(2); // XXX_profile_space[]
-										bs.GetWord(1); // XXX_tier_flag[]
-										bs.GetWord(5); // XXX_profile_idc[]
-										for(j = 0; j < 32; j++) {
-											bs.GetWord(1); // XXX_profile_compatibility_flag[][j]
-										}
-										bs.GetWord(16);    // XXX_reserved_zero_16bits[]
-									}
-									if ( sub_layer_level_present_flag ) {
-										bs.GetWord(8);     // sub_layer_level_idc[i]
-									}
-								}
-							}
-							// HM10.0
-							else {
-								bool subLayerProfilePresentFlag[6];
-								bool subLayerLevelPresentFlag[6];
-								for(i = 0; i < sps_max_sub_layers_minus1; i++) {
-									subLayerProfilePresentFlag[i] = bs.GetWord(1) != 0; //( uiCode, "sub_layer_profile_present_flag[i]" );
-									subLayerLevelPresentFlag[i]   = bs.GetWord(1) != 0; //( uiCode, "sub_layer_level_present_flag[i]"   ); 
-								}
-								if ( sps_max_sub_layers_minus1 > 0 ) {
-									for ( i = sps_max_sub_layers_minus1; i < 8; i++ )
-										bs.GetWord(2); //(2, uiCode, "reserved_zero_2bits")
-								}
-								for(i = 0; i < sps_max_sub_layers_minus1; i++) {
-									if ( 1 && subLayerProfilePresentFlag[i] ) {
-										bs.GetWord(2); //( 2 , uiCode, "XXX_profile_space[]");
-										bs.GetWord(1); //( uiCode, "XXX_tier_flag[]"    );
-										bs.GetWord(5); //( 5 , uiCode, "XXX_profile_idc[]"  );
-
-										for(j = 0; j < 32; j++){
-											bs.GetWord(1); //(  uiCode, "XXX_profile_compatibility_flag[][j]");
-										}
-										bs.GetWord(1);  //(uiCode, "general_progressive_source_flag");
-										bs.GetWord(1);  //(uiCode, "general_interlaced_source_flag");
-										bs.GetWord(1);  //(uiCode, "general_non_packed_constraint_flag");
-										bs.GetWord(1);  //(uiCode, "general_frame_only_constraint_flag");
-										bs.GetWord(16); //(16, uiCode, "XXX_reserved_zero_44bits[0..15]");
-										bs.GetWord(16); //(16, uiCode, "XXX_reserved_zero_44bits[16..31]");
-										bs.GetWord(12); //(12, uiCode, "XXX_reserved_zero_44bits[32..43]");
-									}
-									if ( subLayerLevelPresentFlag[i] ) {
-										bs.GetWord(8);  //( 8, uiCode, "sub_layer_level_idc[i]" );
-									}
-								}
-							}
+							case FLV_VIDEO_HM10:
+								h.fourcc = mmioFOURCC('H','M','1','0');
+								break;
+							default:
+								h.fourcc = 0;
 						}
 
-						bs.GetUE(); // seq_parameter_set_id
-
-						int chroma_format_idc = (int)bs.GetUE(); // chroma_format_idc
-						if ( chroma_format_idc == 3 )
-							bs.GetWord(1); // separate_colour_plane_flag
-
-						int pic_width_in_luma_samples = (int)bs.GetUE();
-						int pic_height_in_luma_samples = (int)bs.GetUE();
-
-						struct sar {
-							WORD num;
-							WORD den;
-						} sar;
-						sar.num = 1;
-						sar.den = 1;
-						CSize aspect(pic_width_in_luma_samples * sar.num, pic_height_in_luma_samples * sar.den);
-						int lnko = LNKO(aspect.cx, aspect.cy);
-						if (lnko > 1) {
-							aspect.cx /= lnko, aspect.cy /= lnko;
+						if (!ParseHEVCHeader(headerData, headerSize, h)) {
+							return E_FAIL;
 						}
 
 						// format type
@@ -1058,56 +939,23 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						vih->hdr.bmiHeader.biSize     = sizeof(vih->hdr.bmiHeader);
 						vih->hdr.bmiHeader.biPlanes   = 1;
 						vih->hdr.bmiHeader.biBitCount = 24;
-						vih->dwFlags   = (headerData[4] & 0x03) + 1; // nal length size
+						vih->dwFlags   = h.nal_length_size;
 						vih->dwProfile = 0;
 						vih->dwLevel   = 0;
-						vih->hdr.dwPictAspectRatioX = aspect.cx;
-						vih->hdr.dwPictAspectRatioY = aspect.cy;
-						vih->hdr.bmiHeader.biWidth  = pic_width_in_luma_samples;
-						vih->hdr.bmiHeader.biHeight = pic_height_in_luma_samples;
+						vih->hdr.dwPictAspectRatioX = h.sar.cx;
+						vih->hdr.dwPictAspectRatioY = h.sar.cy;
+						vih->hdr.bmiHeader.biWidth  = h.width;
+						vih->hdr.bmiHeader.biHeight = h.height;
 
-						BYTE* src = (BYTE*)headerData + 5;
-						BYTE* dst = (BYTE*)vih->dwSequenceHeader;
-						BYTE* src_end = (BYTE*)headerData + headerSize;
-						BYTE* dst_end = (BYTE*)vih->dwSequenceHeader + headerSize;
-						int spsCount = *(src++) & 0x1F;
-						int ppsCount = -1;
-
-						vih->cbSequenceHeader = 0;
-
-						while (src < src_end - 1) {
-							if (spsCount == 0 && ppsCount == -1) {
-								ppsCount = *(src++);
-								continue;
-							}
-
-							if (spsCount > 0) {
-								spsCount--;
-							} else if (ppsCount > 0) {
-								ppsCount--;
-							} else {
-								break;
-							}
-
-							int len = ((src[0] << 8) | src[1]) + 2;
-							if (src + len > src_end || dst + len > dst_end) {
-								ASSERT(0);
-								break;
-							}
-							memcpy(dst, src, len);
-							src += len;
-							dst += len;
-							vih->cbSequenceHeader += len;
-						}
-
+						CreateHEVCSequenceHeader(headerData, headerSize, vih->dwSequenceHeader, vih->cbSequenceHeader);
 						delete [] headerData;
+
+						mt.subtype = FOURCCMap(vih->hdr.bmiHeader.biCompression = h.fourcc);
 
 						name += L" HEVC";
 						if ( vt.CodecID == FLV_VIDEO_HM91 ) {
-							mt.subtype = FOURCCMap(vih->hdr.bmiHeader.biCompression = '19MH');
 							name += L" HM9.1";
 						} else if ( vt.CodecID == FLV_VIDEO_HM10 ) {
-							mt.subtype = FOURCCMap(vih->hdr.bmiHeader.biCompression = '01MH');
 							name += L" HM10.0";
 						}
 						break;

@@ -57,5 +57,16 @@ struct avc_hdr
 	AV_Rational sar;
 };
 
+struct hevc_hdr
+{
+	DWORD fourcc;
+	unsigned int width, height;
+	CSize sar;
+	DWORD nal_length_size;
+};
+
 bool ParseDiracHeader(CGolombBuffer gb, unsigned* width, unsigned* height, REFERENCE_TIME* AvgTimePerFrame);
 bool ParseAVCHeader(CGolombBuffer gb, avc_hdr& h, bool fullscan = false);
+
+bool ParseHEVCHeader(BYTE* headerData, int headerSize, hevc_hdr& h);
+void CreateHEVCSequenceHeader(BYTE* headerData, int headerSize, DWORD* dwSequenceHeader, DWORD& dwSequenceSize);

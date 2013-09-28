@@ -97,6 +97,9 @@
     <ClInclude Include="HdmvClipInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="HevcBitstream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="MediaTypeEx.h">
       <Filter>Header Files</Filter>
     </ClInclude>

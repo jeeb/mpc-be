@@ -208,7 +208,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FLVSplitter.h" />
-    <ClInclude Include="HevcBitstream.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>

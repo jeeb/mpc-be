@@ -22,6 +22,7 @@
 
 #include "stdafx.h"
 #include "VideoParser.h"
+#include "HevcBitstream.h"
 
 #define REF_SECOND_MULT 10000000LL
 
@@ -402,4 +403,182 @@ bool ParseAVCHeader(CGolombBuffer gb, avc_hdr& h, bool fullscan)
 	}
 
 	return true;
+}
+
+bool ParseHEVCHeader(BYTE* headerData, int headerSize, hevc_hdr& h)
+{
+	// find HEVC SPS in AVCDecoderConfigurationRecord struct
+	enum hevc_nal_unit_type_e {
+		NAL_UNIT_SPS = 33,
+	};
+	ASSERT( (headerData[5] & 0xe0) == 0xe0 ); // reserved = 111b
+	int sps_num = headerData[5] & 0x1f;       // numOfSequenceParameterSets
+	int sps_pos = 6;
+	bool has_sps = false;
+	while ( sps_num-- > 0 ) {
+		int sps_len = (headerData[sps_pos] << 8) + headerData[sps_pos+1];
+		sps_pos += 2;
+		ASSERT( (sps_pos + sps_len) < (int)headerSize );
+		hevc_nal_unit_type_e nal_type = (hevc_nal_unit_type_e)((headerData[sps_pos] >> 1) & 0x3f);
+		if ( nal_type == NAL_UNIT_SPS ) {
+			has_sps = true;
+			break;
+		}
+		sps_pos += sps_len;
+	}
+	if ( !has_sps || sps_pos >= (int)headerSize )
+		return false; // SPS not found!
+	
+	// decode SPS
+	HevcBitstream bs(headerData + sps_pos, headerSize - sps_pos);
+	bs.GetWord(16); // skip NAL header
+	bs.GetWord(4);  // video_parameter_set_id
+	int sps_max_sub_layers_minus1 = (int)bs.GetWord(3);
+
+	bs.GetWord(1);  // sps_temporal_id_nesting_flag
+
+	// profile_tier_level( 1, sps_max_sub_layers_minus1 )
+	{
+		int i, j;
+		bs.GetWord(2); // XXX_profile_space[]
+		bs.GetWord(1); // XXX_tier_flag[]
+		bs.GetWord(5); // XXX_profile_idc[]
+
+		for ( j = 0; j < 32; j++ )
+			bs.GetWord(1);  // XXX_profile_compatibility_flag[][j]
+		// HM9.1
+		if ( h.fourcc == mmioFOURCC('H','M','9','1') ) {
+			bs.GetWord(16); // XXX_reserved_zero_16bits[]
+		}
+		// HM10.0
+		else {
+			bs.GetWord(1);  //(uiCode, "general_progressive_source_flag");
+			bs.GetWord(1);  //(uiCode, "general_interlaced_source_flag");
+			bs.GetWord(1);  //(uiCode, "general_non_packed_constraint_flag");
+			bs.GetWord(1);  //(uiCode, "general_frame_only_constraint_flag");
+			bs.GetWord(16); //(16, uiCode, "XXX_reserved_zero_44bits[0..15]");
+			bs.GetWord(16); //(16, uiCode, "XXX_reserved_zero_44bits[16..31]");
+			bs.GetWord(12); //(12, uiCode, "XXX_reserved_zero_44bits[32..43]");
+		}
+
+		bs.GetWord(8);	// general_level_idc
+
+		// HM9.1
+		if ( h.fourcc == mmioFOURCC('H','M','9','1') ) {
+			for ( i = 0; i < sps_max_sub_layers_minus1; i++ ) {
+				int sub_layer_profile_present_flag, sub_layer_level_present_flag;
+				sub_layer_profile_present_flag = (int)bs.GetWord(1); // sub_layer_profile_present_flag[i]
+				sub_layer_level_present_flag = (int)bs.GetWord(1);   // sub_layer_level_present_flag[i]
+		
+				if ( sub_layer_profile_present_flag ) {
+					bs.GetWord(2); // XXX_profile_space[]
+					bs.GetWord(1); // XXX_tier_flag[]
+					bs.GetWord(5); // XXX_profile_idc[]
+					for(j = 0; j < 32; j++) {
+						bs.GetWord(1); // XXX_profile_compatibility_flag[][j]
+					}
+					bs.GetWord(16);    // XXX_reserved_zero_16bits[]
+				}
+				if ( sub_layer_level_present_flag ) {
+					bs.GetWord(8);     // sub_layer_level_idc[i]
+				}
+			}
+		}
+		// HM10.0
+		else {
+			bool subLayerProfilePresentFlag[6];
+			bool subLayerLevelPresentFlag[6];
+			for(i = 0; i < sps_max_sub_layers_minus1; i++) {
+				subLayerProfilePresentFlag[i] = bs.GetWord(1) != 0; //( uiCode, "sub_layer_profile_present_flag[i]" );
+				subLayerLevelPresentFlag[i]   = bs.GetWord(1) != 0; //( uiCode, "sub_layer_level_present_flag[i]"   ); 
+			}
+			if ( sps_max_sub_layers_minus1 > 0 ) {
+				for ( i = sps_max_sub_layers_minus1; i < 8; i++ )
+					bs.GetWord(2); //(2, uiCode, "reserved_zero_2bits")
+			}
+			for(i = 0; i < sps_max_sub_layers_minus1; i++) {
+				if ( 1 && subLayerProfilePresentFlag[i] ) {
+					bs.GetWord(2); //( 2 , uiCode, "XXX_profile_space[]");
+					bs.GetWord(1); //( uiCode, "XXX_tier_flag[]"    );
+					bs.GetWord(5); //( 5 , uiCode, "XXX_profile_idc[]"  );
+
+					for(j = 0; j < 32; j++){
+						bs.GetWord(1); //(  uiCode, "XXX_profile_compatibility_flag[][j]");
+					}
+					bs.GetWord(1);  //(uiCode, "general_progressive_source_flag");
+					bs.GetWord(1);  //(uiCode, "general_interlaced_source_flag");
+					bs.GetWord(1);  //(uiCode, "general_non_packed_constraint_flag");
+					bs.GetWord(1);  //(uiCode, "general_frame_only_constraint_flag");
+					bs.GetWord(16); //(16, uiCode, "XXX_reserved_zero_44bits[0..15]");
+					bs.GetWord(16); //(16, uiCode, "XXX_reserved_zero_44bits[16..31]");
+					bs.GetWord(12); //(12, uiCode, "XXX_reserved_zero_44bits[32..43]");
+				}
+				if ( subLayerLevelPresentFlag[i] ) {
+					bs.GetWord(8);  //( 8, uiCode, "sub_layer_level_idc[i]" );
+				}
+			}
+		}
+	}
+
+	bs.GetUE(); // seq_parameter_set_id
+
+	int chroma_format_idc = (int)bs.GetUE(); // chroma_format_idc
+	if ( chroma_format_idc == 3 )
+		bs.GetWord(1); // separate_colour_plane_flag
+
+	h.width  = bs.GetUE();
+	h.height = bs.GetUE();
+
+	struct sar {
+		WORD num;
+		WORD den;
+	} sar;
+	sar.num = 1;
+	sar.den = 1;
+
+	h.sar.cx = h.width * sar.num;
+	h.sar.cy = h.height * sar.den;
+
+	ReduceDim(h.sar);
+
+	h.nal_length_size = (headerData[4] & 0x03) + 1;
+
+	return true;
+}
+
+void CreateHEVCSequenceHeader(BYTE* headerData, int headerSize, DWORD* dwSequenceHeader, DWORD& cbSequenceHeader)
+{
+	BYTE* src = (BYTE*)headerData + 5;
+	BYTE* dst = (BYTE*)dwSequenceHeader;
+	BYTE* src_end = (BYTE*)headerData + headerSize;
+	BYTE* dst_end = (BYTE*)dwSequenceHeader + headerSize;
+	int spsCount = *(src++) & 0x1F;
+	int ppsCount = -1;
+
+	cbSequenceHeader = 0;
+
+	while (src < src_end - 1) {
+		if (spsCount == 0 && ppsCount == -1) {
+			ppsCount = *(src++);
+			continue;
+		}
+
+		if (spsCount > 0) {
+			spsCount--;
+		} else if (ppsCount > 0) {
+			ppsCount--;
+		} else {
+			break;
+		}
+
+		int len = ((src[0] << 8) | src[1]) + 2;
+		if (src + len > src_end || dst + len > dst_end) {
+			ASSERT(0);
+			break;
+		}
+		memcpy(dst, src, len);
+		src += len;
+		dst += len;
+		cbSequenceHeader += len;
+	}
 }

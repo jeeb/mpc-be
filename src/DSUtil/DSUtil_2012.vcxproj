@@ -149,6 +149,7 @@
     <ClInclude Include="GUIDString.h" />
     <ClInclude Include="H264Nalu.h" />
     <ClInclude Include="HdmvClipInfo.h" />
+    <ClInclude Include="HevcBitstream.h" />
     <ClInclude Include="MediaTypeEx.h" />
     <ClInclude Include="MediaTypes.h" />
     <ClInclude Include="MPCSocket.h" />
