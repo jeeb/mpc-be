@@ -612,6 +612,7 @@ AP4_IsmaEncryptingProcessor::CreateTrackHandler(AP4_TrakAtom* trak)
 
             case AP4_ATOM_TYPE_MP4V:
             case AP4_ATOM_TYPE_AVC1:
+            case AP4_ATOM_TYPE_HVC1:
                 format = AP4_ATOM_TYPE_ENCV;
                 break;
         }

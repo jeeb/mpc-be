@@ -132,6 +132,7 @@
     <ClInclude Include="Core\Ap4HdlrAtom.h" />
     <ClInclude Include="Core\Ap4HintTrackReader.h" />
     <ClInclude Include="Core\Ap4HmhdAtom.h" />
+    <ClInclude Include="Core\Ap4HvcCAtom.h" />
     <ClInclude Include="Core\Ap4IkmsAtom.h" />
     <ClInclude Include="Core\Ap4Interfaces.h" />
     <ClInclude Include="Core\Ap4IsfmAtom.h" />
@@ -207,6 +208,7 @@
     <ClCompile Include="Core\Ap4HdlrAtom.cpp" />
     <ClCompile Include="Core\Ap4HintTrackReader.cpp" />
     <ClCompile Include="Core\Ap4HmhdAtom.cpp" />
+    <ClCompile Include="Core\Ap4HvcCAtom.cpp" />
     <ClCompile Include="Core\Ap4IkmsAtom.cpp" />
     <ClCompile Include="Core\Ap4IsfmAtom.cpp" />
     <ClCompile Include="Core\Ap4IsmaCryp.cpp" />

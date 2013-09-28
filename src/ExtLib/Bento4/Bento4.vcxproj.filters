@@ -144,6 +144,9 @@
     <ClInclude Include="Core\Ap4NmhdAtom.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="Core\Ap4HvcCAtom.h">
+      <Filter>Core</Filter>
+    </ClInclude>
     <ClInclude Include="Core\Ap4PaspAtom.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -333,6 +336,9 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\Ap4HmhdAtom.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Ap4HvcCAtom.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\Ap4IkmsAtom.cpp">
