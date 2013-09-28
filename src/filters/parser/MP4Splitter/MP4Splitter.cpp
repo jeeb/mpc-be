@@ -39,6 +39,7 @@
 #include <Bento4/Core/Ap4StsdAtom.h>
 #include <Bento4/Core/Ap4IsmaCryp.h>
 #include <Bento4/Core/Ap4AvcCAtom.h>
+#include <Bento4/Core/Ap4HvcCAtom.h>
 #include <Bento4/Core/Ap4ChplAtom.h>
 #include <Bento4/Core/Ap4FtabAtom.h>
 #include <Bento4/Core/Ap4DataAtom.h>
@@ -626,6 +627,45 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					CSize aspect(pbmi.biWidth * num, pbmi.biHeight * den);
 					ReduceDim(aspect);
 					CreateMPEG2VIfromAVC(&mt, &pbmi, AvgTimePerFrame, aspect, (BYTE*)data, size); 
+
+					mts.Add(mt);
+					//b_HasVideo = true;
+				}
+			} else if (AP4_Hvc1SampleEntry* hvc1 = dynamic_cast<AP4_Hvc1SampleEntry*>(
+					track->GetTrakAtom()->FindChild("mdia/minf/stbl/stsd/hvc1"))) {
+				if (AP4_HvcCAtom* hvcC = dynamic_cast<AP4_HvcCAtom*>(hvc1->GetChild(AP4_ATOM_TYPE_HVCC))) {
+					//SetTrackName(&TrackName, _T("HEVC Video (H.265)"));
+
+					const AP4_DataBuffer* di = hvcC->GetDecoderInfo();
+					if (!di) {
+						di = &empty;
+					}
+					int num = 1;
+					int den = 1;
+					if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(hvc1->GetChild(AP4_ATOM_TYPE_PASP))) {
+						num = pasp->GetNum();
+						den = pasp->GetDen();
+					}
+					if (num <= 0 || den <= 0) { // if bad AR
+						num = den = 1; // then reset AR
+					}
+
+					mt.majortype  = MEDIATYPE_Video;
+					mt.formattype = FORMAT_VideoInfo2;
+
+					vih2 = (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2));
+					memset(vih2, 0, mt.FormatLength());
+
+					vih2->bmiHeader.biSize    = sizeof(vih2->bmiHeader);
+					vih2->bmiHeader.biWidth   = (LONG)hvc1->GetWidth();
+					vih2->bmiHeader.biHeight  = (LONG)hvc1->GetHeight();
+					vih2->rcSource            = vih2->rcTarget = CRect(0, 0, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight);
+					if (item->GetData()->GetSampleCount()) {
+						vih2->AvgTimePerFrame = item->GetData()->GetDurationMs() * 10000 / item->GetData()->GetSampleCount();
+					}
+					mt.subtype = FOURCCMap(vih2->bmiHeader.biCompression = '1CVH');
+
+					SetAspect(vih2, Aspect, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight); 
 
 					mts.Add(mt);
 					//b_HasVideo = true;
