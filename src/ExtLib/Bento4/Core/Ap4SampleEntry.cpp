@@ -893,11 +893,11 @@ AP4_Avc1SampleEntry::AP4_Avc1SampleEntry(AP4_UI16          width,
                                          AP4_UI16          depth,
                                          const char*       compressor_name,
                                          AP4_EsDescriptor* descriptor) :
-    AP4_VisualSampleEntry(AP4_ATOM_TYPE_AVC1, 
+    AP4_VisualSampleEntry(AP4_ATOM_TYPE_AVC1,
                           descriptor,
-                          width, 
-                          height, 
-                          depth, 
+                          width,
+                          height,
+                          depth,
                           compressor_name)
 {
 }
@@ -920,11 +920,11 @@ AP4_Hvc1SampleEntry::AP4_Hvc1SampleEntry(AP4_UI16          width,
                                          AP4_UI16          depth,
                                          const char*       compressor_name,
                                          AP4_EsDescriptor* descriptor) :
-    AP4_VisualSampleEntry(AP4_ATOM_TYPE_HVC1, 
+    AP4_VisualSampleEntry(AP4_ATOM_TYPE_HVC1,
                           descriptor,
-                          width, 
-                          height, 
-                          depth, 
+                          width,
+                          height,
+                          depth,
                           compressor_name)
 {
 }
