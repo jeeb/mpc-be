@@ -126,6 +126,7 @@ CFLVSplitterFilter::CFLVSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 {
 	m_nFlag |= PACKET_PTS_DISCONTINUITY;
 	m_nFlag |= PACKET_PTS_VALIDATE_POSITIVE;
+	//memset(&meta, 0, sizeof(meta));
 }
 
 STDMETHODIMP CFLVSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
@@ -444,6 +445,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	REFERENCE_TIME AvgTimePerFrame	= 0;
 	REFERENCE_TIME metaDataDuration	= 0;
 	DWORD nSamplesPerSec			= 0;
+	int   metaHM_compatibility		= 0;
 
 	m_sps.RemoveAll();
 
@@ -476,20 +478,25 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					ParseAMF0(m_pFile, next, CString(name), AMF0Array);
 
 					for (size_t i = 0; i < AMF0Array.GetCount(); i++) {
-						if (AMF0Array[i].type == AMF_DATA_TYPE_NUMBER && AMF0Array[i].name == L"duration") {
-							metaDataDuration = (REFERENCE_TIME)(UNITS * (double)AMF0Array[i]);
-						}
-						if (AMF0Array[i].type == AMF_DATA_TYPE_NUMBER && AMF0Array[i].name == L"framerate") {
-							double value = AMF0Array[i];
-							if (value != 0 && value != 1000) {
-								AvgTimePerFrame = (REFERENCE_TIME)(UNITS / (int)value);
+						if (AMF0Array[i].type == AMF_DATA_TYPE_NUMBER) {
+							if (AMF0Array[i].name == L"duration") {
+								metaDataDuration = (REFERENCE_TIME)(UNITS * (double)AMF0Array[i]);
+							}
+							else if (AMF0Array[i].name == L"framerate") {
+								double value = AMF0Array[i];
+								if (value != 0 && value != 1000) {
+									AvgTimePerFrame = (REFERENCE_TIME)(UNITS / (int)value);
+								}
+							}
+							else if (AMF0Array[i].name == L"audiosamplerate") {
+								double value = AMF0Array[i];
+								if (value != 0) {
+									nSamplesPerSec = value;
+								}
 							}
 						}
-						if (AMF0Array[i].type == AMF_DATA_TYPE_NUMBER && AMF0Array[i].name == L"audiosamplerate") {
-							double value = AMF0Array[i];
-							if (value != 0) {
-								nSamplesPerSec = value;
-							}
+						else if (AMF0Array[i].type == AMF_DATA_TYPE_STRING && AMF0Array[i].name == L"HM compatibility") {
+							metaHM_compatibility = (int)(_tstof(AMF0Array[i].value_s) * 10.0);
 						}
 					}
 				}
@@ -928,13 +935,13 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								h.fourcc = MAKEFOURCC('H','M','1','0');
 								break;
 							case FLV_VIDEO_HEVC:
-								if ( meta.HM_compatibility >= 90 && meta.HM_compatibility < 100 ) {
+								if (metaHM_compatibility >= 90 && metaHM_compatibility < 100) {
 									h.fourcc = MAKEFOURCC('H','M','9','1');
-								} else if ( meta.HM_compatibility >= 100 && meta.HM_compatibility < 110 ) {
+								} else if (metaHM_compatibility >= 100 && metaHM_compatibility < 110) {
 									h.fourcc = MAKEFOURCC('H','M','1','0');
-								} else if ( meta.HM_compatibility >= 110 && meta.HM_compatibility < 120 ) {
+								} else if (metaHM_compatibility >= 110 && metaHM_compatibility < 120) {
 									h.fourcc = MAKEFOURCC('H','M','1','1');
-								} else if ( meta.HM_compatibility >= 120 && meta.HM_compatibility < 130 ) {
+								} else if (metaHM_compatibility >= 120 && metaHM_compatibility < 130) {
 									h.fourcc = MAKEFOURCC('H','M','1','2');
 								}
 								break;
