@@ -410,7 +410,7 @@ bool ParseHEVCHeader(BYTE* headerData, int headerSize, hevc_hdr& h)
 	// find HEVC SPS in AVCDecoderConfigurationRecord struct
 	enum hevc_nal_unit_type_e { NAL_UNIT_SPS = 33, };
 
-	if (headerData[5] & 0xe0 != 0xe0) { // reserved = 111b
+	if ((headerData[5] & 0xe0) != 0xe0) { // reserved = 111b
 		return false;
 	}
 
