@@ -61,6 +61,7 @@
 #define FLV_VIDEO_HM62    11 // HM6.2
 #define FLV_VIDEO_HM91    12 // HM9.1
 #define FLV_VIDEO_HM10    13 // HM10.0
+#define FLV_VIDEO_HEVC    14 // HEVC (HM version write to MetaData "HM compatibility")
 
 #define AMF_END_OF_OBJECT			0x09
 
@@ -902,7 +903,8 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						break;
 					}
 					case FLV_VIDEO_HM91:   // HEVC HM9.1
-					case FLV_VIDEO_HM10: { // HEVC HM10.0
+					case FLV_VIDEO_HM10:   // HEVC HM10.0
+					case FLV_VIDEO_HEVC: { // HEVC HM11.0 & HM12.0 ...
 						// Source code is provided by Deng James from Strongene Ltd.
 						if (dataSize < 4 || m_pFile->BitRead(8) != 0) { // packet type 0 == avc header
 							fTypeFlagsVideo = true;
@@ -917,15 +919,25 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						m_pFile->ByteRead(headerData, headerSize);
 
 						hevc_hdr h;
+						h.fourcc = MAKEFOURCC('H','E','V','C');
 						switch (vt.CodecID) {
 							case FLV_VIDEO_HM91:
-								h.fourcc = mmioFOURCC('H','M','9','1');
+								h.fourcc = MAKEFOURCC('H','M','9','1');
 								break;
 							case FLV_VIDEO_HM10:
-								h.fourcc = mmioFOURCC('H','M','1','0');
+								h.fourcc = MAKEFOURCC('H','M','1','0');
 								break;
-							default:
-								h.fourcc = 0;
+							case FLV_VIDEO_HEVC:
+								if ( meta.HM_compatibility >= 90 && meta.HM_compatibility < 100 ) {
+									h.fourcc = MAKEFOURCC('H','M','9','1');
+								} else if ( meta.HM_compatibility >= 100 && meta.HM_compatibility < 110 ) {
+									h.fourcc = MAKEFOURCC('H','M','1','0');
+								} else if ( meta.HM_compatibility >= 110 && meta.HM_compatibility < 120 ) {
+									h.fourcc = MAKEFOURCC('H','M','1','1');
+								} else if ( meta.HM_compatibility >= 120 && meta.HM_compatibility < 130 ) {
+									h.fourcc = MAKEFOURCC('H','M','1','2');
+								}
+								break;
 						}
 
 						if (!ParseHEVCHeader(headerData, headerSize, h)) {

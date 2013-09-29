@@ -408,17 +408,21 @@ bool ParseAVCHeader(CGolombBuffer gb, avc_hdr& h, bool fullscan)
 bool ParseHEVCHeader(BYTE* headerData, int headerSize, hevc_hdr& h)
 {
 	// find HEVC SPS in AVCDecoderConfigurationRecord struct
-	enum hevc_nal_unit_type_e {
-		NAL_UNIT_SPS = 33,
-	};
-	ASSERT( (headerData[5] & 0xe0) == 0xe0 ); // reserved = 111b
+	enum hevc_nal_unit_type_e { NAL_UNIT_SPS = 33, };
+
+	if (headerData[5] & 0xe0 != 0xe0) { // reserved = 111b
+		return false;
+	}
+
 	int sps_num = headerData[5] & 0x1f;       // numOfSequenceParameterSets
 	int sps_pos = 6;
 	bool has_sps = false;
 	while ( sps_num-- > 0 ) {
 		int sps_len = (headerData[sps_pos] << 8) + headerData[sps_pos+1];
 		sps_pos += 2;
-		ASSERT( (sps_pos + sps_len) < (int)headerSize );
+		if (sps_pos + sps_len >= headerSize) {
+			return false;
+		}
 		hevc_nal_unit_type_e nal_type = (hevc_nal_unit_type_e)((headerData[sps_pos] >> 1) & 0x3f);
 		if ( nal_type == NAL_UNIT_SPS ) {
 			has_sps = true;
@@ -426,7 +430,7 @@ bool ParseHEVCHeader(BYTE* headerData, int headerSize, hevc_hdr& h)
 		}
 		sps_pos += sps_len;
 	}
-	if ( !has_sps || sps_pos >= (int)headerSize )
+	if (!has_sps || sps_pos >= headerSize)
 		return false; // SPS not found!
 	
 	// decode SPS
@@ -447,10 +451,10 @@ bool ParseHEVCHeader(BYTE* headerData, int headerSize, hevc_hdr& h)
 		for ( j = 0; j < 32; j++ )
 			bs.GetWord(1);  // XXX_profile_compatibility_flag[][j]
 		// HM9.1
-		if ( h.fourcc == mmioFOURCC('H','M','9','1') ) {
+		if ( h.fourcc == MAKEFOURCC('H','M','9','1') ) {
 			bs.GetWord(16); // XXX_reserved_zero_16bits[]
 		}
-		// HM10.0
+		// HM10.0 / HM12.0
 		else {
 			bs.GetWord(1);  //(uiCode, "general_progressive_source_flag");
 			bs.GetWord(1);  //(uiCode, "general_interlaced_source_flag");
@@ -464,7 +468,7 @@ bool ParseHEVCHeader(BYTE* headerData, int headerSize, hevc_hdr& h)
 		bs.GetWord(8);	// general_level_idc
 
 		// HM9.1
-		if ( h.fourcc == mmioFOURCC('H','M','9','1') ) {
+		if ( h.fourcc == MAKEFOURCC('H','M','9','1') ) {
 			for ( i = 0; i < sps_max_sub_layers_minus1; i++ ) {
 				int sub_layer_profile_present_flag, sub_layer_level_present_flag;
 				sub_layer_profile_present_flag = (int)bs.GetWord(1); // sub_layer_profile_present_flag[i]
@@ -484,7 +488,7 @@ bool ParseHEVCHeader(BYTE* headerData, int headerSize, hevc_hdr& h)
 				}
 			}
 		}
-		// HM10.0
+		//  HM10.0 / HM12.0
 		else {
 			bool subLayerProfilePresentFlag[6];
 			bool subLayerLevelPresentFlag[6];
