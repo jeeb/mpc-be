@@ -61,8 +61,11 @@ struct hevc_hdr
 {
 	DWORD fourcc;
 	unsigned int width, height;
-	SIZE sar;
+
 	DWORD nal_length_size;
+	DWORD profile, level;
+
+	SIZE sar;
 };
 
 bool ParseDiracHeader(CGolombBuffer gb, unsigned* width, unsigned* height, REFERENCE_TIME* AvgTimePerFrame);

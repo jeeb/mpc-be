@@ -819,7 +819,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						__int64 headerOffset = m_pFile->GetPos();
 						UINT32 headerSize = dataSize - 4;
-						BYTE * headerData = new BYTE[headerSize];
+						BYTE * headerData = DNew BYTE[headerSize];
 						m_pFile->ByteRead(headerData, headerSize);
 						m_pFile->Seek(headerOffset + 9);
 
@@ -871,38 +871,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						vih->hdr.bmiHeader.biWidth  = nWidth;
 						vih->hdr.bmiHeader.biHeight = nHeight;
 
-						// Fill sps-pps
-						BYTE* src = (BYTE*)headerData + 5;
-						BYTE* dst = (BYTE*)vih->dwSequenceHeader;
-						BYTE* src_end = (BYTE*)headerData + headerSize;
-						BYTE* dst_end = (BYTE*)vih->dwSequenceHeader + headerSize;
-						int spsCount = *(src++) & 0x1F;
-						int ppsCount = -1;
-
-						vih->cbSequenceHeader = 0;
-						while(src < src_end - 1) {
-							if (spsCount == 0 && ppsCount == -1) {
-								ppsCount = *(src++);
-								continue;
-							}
-
-							if (spsCount > 0)
-								spsCount--;
-							else if (ppsCount > 0)
-								ppsCount--;
-							else
-								break;
-
-							int len = ((src[0] << 8) | src[1]) + 2;
-							if(src + len > src_end || dst + len > dst_end) {
-								ASSERT(0);
-								break;
-							}
-							memcpy(dst, src, len);
-							src += len;
-							dst += len;
-							vih->cbSequenceHeader += len;
-						}
+						CreateHEVCSequenceHeader(headerData, headerSize, vih->dwSequenceHeader, vih->cbSequenceHeader);
 
 						delete[] headerData;
 
@@ -921,7 +890,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						__int64 headerOffset = m_pFile->GetPos();
 						UINT32 headerSize = dataSize - 4;
-						BYTE* headerData = DEBUG_NEW BYTE[headerSize]; // this is AVCDecoderConfigurationRecord struct
+						BYTE* headerData = DNew BYTE[headerSize]; // this is AVCDecoderConfigurationRecord struct
 
 						m_pFile->ByteRead(headerData, headerSize);
 
@@ -959,22 +928,22 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						vih->hdr.bmiHeader.biPlanes   = 1;
 						vih->hdr.bmiHeader.biBitCount = 24;
 						vih->dwFlags   = h.nal_length_size;
-						vih->dwProfile = 0;
-						vih->dwLevel   = 0;
+						vih->dwProfile = h.profile;
+						vih->dwLevel   = h.level;
 						vih->hdr.dwPictAspectRatioX = h.sar.cx;
 						vih->hdr.dwPictAspectRatioY = h.sar.cy;
 						vih->hdr.bmiHeader.biWidth  = h.width;
 						vih->hdr.bmiHeader.biHeight = h.height;
 
 						CreateHEVCSequenceHeader(headerData, headerSize, vih->dwSequenceHeader, vih->cbSequenceHeader);
-						delete [] headerData;
+						delete[] headerData;
 
 						mt.subtype = FOURCCMap(vih->hdr.bmiHeader.biCompression = h.fourcc);
 
 						name += L" HEVC";
-						if ( vt.CodecID == FLV_VIDEO_HM91 ) {
+						if (vt.CodecID == FLV_VIDEO_HM91) {
 							name += L" HM9.1";
-						} else if ( vt.CodecID == FLV_VIDEO_HM10 ) {
+						} else if (vt.CodecID == FLV_VIDEO_HM10) {
 							name += L" HM10.0";
 						}
 						break;
