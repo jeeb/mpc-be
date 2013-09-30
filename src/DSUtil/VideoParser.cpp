@@ -538,7 +538,8 @@ bool ParseHEVCHeader(BYTE* headerData, int headerSize, hevc_hdr& h)
 	h.width  = bs.GetUE();
 	h.height = bs.GetUE();
 
-	h.sar = {h.width, h.height};
+	h.sar.cx = h.width;
+	h.sar.cy = h.height;
 	ReduceDim(h.sar);
 
 	h.nal_length_size = (headerData[4] & 0x03) + 1;
