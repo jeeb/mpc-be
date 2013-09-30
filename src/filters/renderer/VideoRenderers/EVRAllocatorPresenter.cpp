@@ -787,12 +787,8 @@ HRESULT CEVRAllocatorPresenter::GetMediaTypeFourCC(IMFMediaType* pType, DWORD* p
 		return E_POINTER;
 	}
 
-	HRESULT hr = S_OK;
 	GUID guidSubType = GUID_NULL;
-
-	if (SUCCEEDED(hr)) {
-		hr = pType->GetGUID(MF_MT_SUBTYPE, &guidSubType);
-	}
+	HRESULT hr = pType->GetGUID(MF_MT_SUBTYPE, &guidSubType);
 
 	if (SUCCEEDED(hr)) {
 		*pFourCC = guidSubType.Data1;
@@ -1035,7 +1031,7 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 	pType		= NULL;
 
 	if (m_nRenderState == Started || m_nRenderState == Paused) {
-		m_bChangeMT	= true;
+		m_bChangeMT = true;
 	}
 
 	return hr;
@@ -1538,8 +1534,7 @@ void CEVRAllocatorPresenter::GetMixerThread()
 					CAutoLock AutoLock(&m_ImageProcessingLock);
 					bDoneSomething = GetImageFromMixer();
 				}
-				if ((m_rtTimePerFrame == 0 && bDoneSomething)
-					|| m_bChangeMT) {
+				if ((m_rtTimePerFrame == 0 && bDoneSomething) || m_bChangeMT) {
 					//CAutoLock lock(this);
 					//CAutoLock lock2(&m_ImageProcessingLock);
 					//CAutoLock cRenderLock(&m_RenderLock);

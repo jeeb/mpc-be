@@ -598,8 +598,8 @@ HRESULT CBaseVideoFilter::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_
 }
 
 VIDEO_OUTPUT_FORMATS DefaultFormats[] = {
-	{&MEDIASUBTYPE_P010, 2, 24, '010P'},
-	{&MEDIASUBTYPE_P016, 2, 24, '610P'},
+	{&MEDIASUBTYPE_P010,   2, 24, '010P'},
+	{&MEDIASUBTYPE_P016,   2, 24, '610P'},
 	{&MEDIASUBTYPE_YV12,   3, 12, '21VY'},
 	{&MEDIASUBTYPE_I420,   3, 12, '024I'},
 	{&MEDIASUBTYPE_IYUV,   3, 12, 'VUYI'},
