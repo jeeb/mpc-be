@@ -68,10 +68,7 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_hVSyncThread(NULL)
 	, m_hEvtQuit(NULL)
 	, m_bIsFullscreen(bFullscreen)
-	, m_Decoder(_T(""))
-	, m_InputVCodec(_T(""))
 	, m_nRenderState(Undefined)
-	, m_MonitorName(_T(""))
 	, m_nMonitorHorRes(0), m_nMonitorVerRes(0)
 	, m_rcMonitor(0, 0, 0, 0)
 {

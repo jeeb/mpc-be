@@ -1185,16 +1185,6 @@ void CMpegSplitterFile::UpdatePrograms(CGolombBuffer gb, WORD pid, bool UpdateLa
 	}
 }
 
-uint32 SwapLE(const uint32 &_Value)
-{
-	return (_Value & 0xFF) << 24 | ((_Value>>8) & 0xFF) << 16 | ((_Value>>16) & 0xFF) << 8 | ((_Value>>24) & 0xFF) << 0;
-}
-
-uint16 SwapLE(const uint16 &_Value)
-{
-	return (_Value & 0xFF) << 8 | ((_Value>>8) & 0xFF) << 0;
-}
-
 const CMpegSplitterFile::program* CMpegSplitterFile::FindProgram(WORD pid, int &iStream, const CHdmvClipInfo::Stream * &_pClipInfo)
 {
 	_pClipInfo = m_ClipInfo.FindStream(pid);
