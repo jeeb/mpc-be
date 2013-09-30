@@ -97,9 +97,9 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbThreadNumber.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(IPP_SCALE(230), -4), CSize(IPP_SCALE(110), 200)), this, IDC_PP_THREAD_NUMBER);
 	m_cbThreadNumber.AddString (ResStr (IDS_VDF_AUTO));
 	CString ThreadNumberStr;
-	for (int i=0; i<16; i++) {
-		ThreadNumberStr.Format		(_T("%d"), i+1);
-		m_cbThreadNumber.AddString	(ThreadNumberStr);
+	for (int i = 1; i <= 16; i++) {
+		ThreadNumberStr.Format(_T("%d"), i);
+		m_cbThreadNumber.AddString(ThreadNumberStr);
 	}
 	p.y += h25;
 
@@ -176,32 +176,15 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	p.y += h20;
 
 	// Software output formats
-	static wchar_t *SwOutputFormatNames[] = { _T("NV12 (default)"), _T("YV12"), _T("YUY2"), _T("RGB32"), _T("RGB16"), _T("RGB15") };
-	ASSERT(_countof(SwOutputFormatNames) == _countof(m_nSwIndex));
-	int nSwOF = m_pMDF ? m_pMDF->GetSwOutputFormats() : 0;
-	// get the output formats order from the DWORD nibbles extracting literal values [0x00543210] = 0,1,2,3,4,5
-	// get the output formats with the checked flag (8) from the DWORD nibbles [0x0054ba98] = 0,1,2,3
-	for (int i = 0; i < _countof(m_nSwIndex); i++){
-		if (nSwOF == 0) {
-			m_nSwIndex[i]   = i;
-			m_nSwChecked[i] = 1;
-		} else {
-			m_nSwIndex[i]   = ( nSwOF & ( 0x0000000F << (4*i) ) ) >> (4*i);
-			m_nSwChecked[i] = (m_nSwIndex[i] & 8) != 0;
-			m_nSwIndex[i]  &= ~8;
-		}
-	}
 	m_txtSwOutputFormats.Create(ResStr(IDS_VDF_COLOR_OUTPUT_FORMATS), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h16;
-	m_lstSwOutputFormats.Create(dwStyle|WS_BORDER|LBS_OWNERDRAWFIXED|LBS_HASSTRINGS, CRect(p, CSize(width_s - btn_w, IPP_SCALE(13 * _countof(m_nSwIndex) + 20))), this, 0);
-	for (int i = 0; i < _countof(m_nSwIndex); i++) {
-		m_lstSwOutputFormats.AddString(SwOutputFormatNames[m_nSwIndex[i]]);
-	}
+	m_lstSwOutputFormats.Create(dwStyle|WS_BORDER|LBS_OWNERDRAWFIXED|LBS_HASSTRINGS, CRect(p, CSize(width_s - btn_w, IPP_SCALE(13 * 6 + 20))), this, 0);
+
 	// Software Output formats order
 	m_cbSwOutputFormatUp.Create(_T("\x35"), dwStyle|BS_PUSHBUTTON, CRect(p + CPoint(width_s - btn_w, 0), CSize(btn_w, btn_h)), this, IDC_PP_SWOUTPUTFORMATUP);
 	p.y += btn_h;
 	m_cbSwOutputFormatDown.Create(_T("\x36"), dwStyle|BS_PUSHBUTTON, CRect(p + CPoint(width_s - btn_w, 0), CSize(btn_w, btn_h)), this, IDC_PP_SWOUTPUTFORMATDOWN);
-	p.y += IPP_SCALE(13 * _countof(m_nSwIndex) + 9);
+	p.y += IPP_SCALE(13 * 6 + 9);
 
 	// Preset
 	m_txtSwPreset.Create(ResStr(IDS_VDF_COLOR_PRESET), WS_VISIBLE|WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
@@ -265,8 +248,13 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		m_cbDXVA_SD.SetCheck(m_pMDF->GetDXVA_SD());
 
 		// === New swscaler options
-		for (int i=0; i<6; i++) {
-			m_lstSwOutputFormats.SetCheck(i, m_nSwChecked[i]);
+		int k = 0;
+		while (LPCTSTR str = m_pMDF->GetSwFormatName(k)) {
+			m_lstSwOutputFormats.AddString(str);
+			int nCheck = m_pMDF->GetSwFormatState(k);
+			m_lstSwOutputFormats.SetCheck(k, nCheck);
+			m_lstSwOutputFormats.SetItemData(k, 10 * k + nCheck); // remember the original order and check state
+			k++;
 		}
 		m_cbSwPreset.SetCurSel(m_pMDF->GetSwPreset());
 		m_cbSwStandard.SetCurSel(m_pMDF->GetSwStandard());
@@ -316,49 +304,41 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 		m_pMDF->SetDXVA_SD(m_cbDXVA_SD.GetCheck());
 
 		// === New swscaler options
-		int m_nSwRefresh = 0; // no refresh
+		int refresh = 0; // no refresh
 
 		if (m_cbSwPreset.GetCurSel() != m_pMDF->GetSwPreset() || 
 		m_cbSwStandard.GetCurSel() != m_pMDF->GetSwStandard() || 
 		m_cbSwInputLevels.GetCurSel() != m_pMDF->GetSwInputLevels() || 
 		m_cbSwOutputLevels.GetCurSel() != m_pMDF->GetSwOutputLevels()) {
-			m_nSwRefresh = 1;	// soft refresh - signal new swscaler colorspace details
+			refresh = 1; // soft refresh - signal new swscaler colorspace details
 		}
-
-		int	m_nSwOldIndex[6];
-		int	m_nSwOldChecked[6];
-		int nSwOldOF = m_pMDF ? m_pMDF->GetSwOutputFormats() : 0;
-		// get the output formats order from the DWORD nibbles extracting literal values [0x00543210] = 0,1,2,3,4,5
-		// get the output formats with the checked flag (8) from the DWORD nibbles [0x0054ba98] = 0,1,2,3
-		for (int i=0; i<6; i++){
-			if (nSwOldOF == 0) {
-				m_nSwOldIndex[i] = i;
-				m_nSwOldChecked[i]	= 1;
-			} else {
-				m_nSwOldIndex[i] = ( nSwOldOF & ( 0x0000000F << (4*i) ) ) >> (4*i);
-				m_nSwOldChecked[i] = (m_nSwOldIndex[i] & 8) != 0;
-				m_nSwOldIndex[i]	&= ~8;
+		
+		for (int i = 0; i < m_lstSwOutputFormats.GetCount(); i++) {
+			int k = m_lstSwOutputFormats.GetItemData(i);
+			if (k / 10 != i || k % 10 != m_lstSwOutputFormats.GetCheck(k)) {
+				refresh = 2; // hard refresh - signal new output format
+				break;
 			}
-			if (m_nSwIndex[i] != m_nSwOldIndex[i] || m_lstSwOutputFormats.GetCheck(i) != m_nSwOldChecked[i])
-				m_nSwRefresh = 2; // hard refresh - signal new output format
 		}
- 		m_pMDF->SetSwRefresh(m_nSwRefresh);
 
-		// set the output formats order in the DWORD nibbles with literal values [0x00543210] = 0,1,2,3,4,5
-		// set the output formats with the checked flag (8) in the DWORD nibbles [0x0054ba98] = 0,1,2,3
-		int nSwOF = 0;
-		for (int i=0; i<6; i++) {
-			m_nSwChecked[i] = m_lstSwOutputFormats.GetCheck(i);
-		}
-		for (int i=0; i<6; i++) {
-			nSwOF = (nSwOF<<4) | (m_nSwIndex[5-i] + m_nSwChecked[5-i]*8);
-		}
-		m_pMDF->SetSwOutputFormats(nSwOF);
+		m_pMDF->SetSwRefresh(refresh);
 
-		m_pMDF->SetSwPreset(m_cbSwPreset.GetCurSel());
-		m_pMDF->SetSwStandard(m_cbSwStandard.GetCurSel());
-		m_pMDF->SetSwInputLevels(m_cbSwInputLevels.GetCurSel());
-		m_pMDF->SetSwOutputLevels(m_cbSwOutputLevels.GetCurSel());
+		if (refresh == 2) {
+			CString SwFormatsStr;
+			for (int i = 0; i < m_lstSwOutputFormats.GetCount(); i++) {
+				CString name;
+				m_lstSwOutputFormats.GetText(i, name);
+				SwFormatsStr.AppendFormat(_T("%s%s;"), name, m_lstSwOutputFormats.GetCheck(i) ? _T("+") : _T("-"));
+			}
+			m_pMDF->SetSwFormats(SwFormatsStr);
+		}
+
+		if (refresh >= 1) {
+			m_pMDF->SetSwPreset(m_cbSwPreset.GetCurSel());
+			m_pMDF->SetSwStandard(m_cbSwStandard.GetCurSel());
+			m_pMDF->SetSwInputLevels(m_cbSwInputLevels.GetCurSel());
+			m_pMDF->SetSwOutputLevels(m_cbSwOutputLevels.GetCurSel());
+		}
 		//
 
 		m_pMDF->Apply();
@@ -392,7 +372,6 @@ void CMPCVideoDecSettingsWnd::OnClickedSwOutputFormatUp()
 		m_lstSwOutputFormats.SetCheck(pos-1, selected);
 		m_lstSwOutputFormats.SetCheck(pos, selectedUp);
 		m_lstSwOutputFormats.SetCurSel(pos-1);
-		std::swap(m_nSwIndex[pos],m_nSwIndex[pos-1]);
 	}
 }
 
@@ -413,7 +392,6 @@ void CMPCVideoDecSettingsWnd::OnClickedSwOutputFormatDown()
 		m_lstSwOutputFormats.SetCheck(pos+1,selected);
 		m_lstSwOutputFormats.SetCheck(pos,selectedDown);
 		m_lstSwOutputFormats.SetCurSel(pos+1);
-		std::swap(m_nSwIndex[pos],m_nSwIndex[pos+1]);
 	}
 }
 //

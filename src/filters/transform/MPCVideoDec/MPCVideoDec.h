@@ -58,6 +58,11 @@ typedef struct {
 	__int64	kf_base;	///< timestamp of the prev. video keyframe
 } RMDemuxContext;
 
+typedef struct {
+	int  number;
+	BOOL enable;
+} OUT_FMT_SET;
+
 class __declspec(uuid("008BAC12-FBAF-497b-9670-BC6F6FBAE2C4"))
 	CMPCVideoDecFilter
 	: public CBaseVideoFilter
@@ -88,7 +93,7 @@ protected:
 
 	// === New swscaler options
 	int										m_nSwRefresh;
-	int										m_nSwOutputFormats;
+	CAtlArray<OUT_FMT_SET>					m_SwFormatSets;
 	int										m_nSwPreset;
 	int										m_nSwStandard;
 	int										m_nSwInputLevels;
@@ -187,6 +192,8 @@ protected:
 
 	HRESULT				InitDecoder(const CMediaType *pmt);
 
+	void				ParceSwFormatString();
+
 public:
 
 	CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr);
@@ -247,8 +254,12 @@ public:
 
 	// === New swscaler options
 	STDMETHODIMP SetSwRefresh(int nValue);
-	STDMETHODIMP SetSwOutputFormats(int nValue);
-	STDMETHODIMP_(int) GetSwOutputFormats();
+
+	STDMETHODIMP SetSwFormats(CString SwFormatsStr);
+	//STDMETHODIMP SetSwFormatState(unsigned int index, int nCheck);
+	STDMETHODIMP_(int) GetSwFormatState(unsigned int index);
+	STDMETHODIMP_(LPCTSTR) GetSwFormatName(unsigned int index);
+
 	STDMETHODIMP SetSwPreset(int nValue);
 	STDMETHODIMP_(int) GetSwPreset();
 	STDMETHODIMP SetSwStandard(int nValue);

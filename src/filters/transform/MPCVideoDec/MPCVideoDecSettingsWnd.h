@@ -84,9 +84,6 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CButton			m_cbSwOutputFormatUp;
 	CButton			m_cbSwOutputFormatDown;
 
-	int			m_nSwIndex[6];
-	int			m_nSwChecked[6];
-
 	CStatic     m_txtSwPreset;
 	CComboBox   m_cbSwPreset;
 

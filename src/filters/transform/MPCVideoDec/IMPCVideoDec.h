@@ -97,14 +97,20 @@ public IUnknown {
 	// === New swscaler options
 	STDMETHOD(SetSwRefresh(int nValue)) = 0;
 
-	STDMETHOD(SetSwOutputFormats(int nValue)) = 0;
-	STDMETHOD_(int, GetSwOutputFormats()) = 0;
+	STDMETHOD(SetSwFormats(CString SwFormatsStr)) = 0;
+	//STDMETHOD(SetSwFormatState(unsigned int index, int nCheck)) = 0;
+	STDMETHOD_(int, GetSwFormatState(unsigned int index)) = 0;
+	STDMETHOD_(LPCTSTR, GetSwFormatName(unsigned int index)) = 0;
+
 	STDMETHOD(SetSwPreset(int nValue)) = 0;
 	STDMETHOD_(int, GetSwPreset()) = 0;
+
 	STDMETHOD(SetSwStandard(int nValue)) = 0;
 	STDMETHOD_(int, GetSwStandard()) = 0;
+
 	STDMETHOD(SetSwInputLevels(int nValue)) = 0;
 	STDMETHOD_(int, GetSwInputLevels()) = 0;
+
 	STDMETHOD(SetSwOutputLevels(int nValue)) = 0;
 	STDMETHOD_(int, GetSwOutputLevels()) = 0;
 	//
