@@ -216,6 +216,7 @@ void CEVRAllocatorPresenter::StartWorkerThreads()
 		SetThreadPriority(m_hGetMixerThread, THREAD_PRIORITY_HIGHEST);
 
 		m_nRenderState	= Stopped;
+		m_bChangeMT		= true;
 		TRACE_EVR ("EVR: Worker threads started...\n");
 	}
 }
