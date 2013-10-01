@@ -877,7 +877,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		}
 
 		// === New swscaler options
-		if (ERROR_SUCCESS == key.QueryStringValue(OPT_SwOutputFormats, SwFormatsStr.GetBuffer(255) &len)) {
+		if (ERROR_SUCCESS == key.QueryStringValue(OPT_SwOutputFormats, SwFormatsStr.GetBuffer(255), &len)) {
 			SwFormatsStr.ReleaseBufferSetLength(len);
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SwPreset, dw)) {
