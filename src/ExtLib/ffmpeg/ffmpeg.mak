@@ -102,6 +102,7 @@ SRCS_C = \
 	libavcodec/acelp_pitch_delay.c \
 	libavcodec/acelp_vectors.c \
 	libavcodec/adpcm.c \
+	libavcodec/aic.c \
 	libavcodec/adpcm_data.c \
 	libavcodec/alac.c \
 	libavcodec/alac_data.c \

@@ -473,6 +473,7 @@ Note: when adding a new codec, you have to:
 */
 
 #define CONFIG_AASC_DECODER 0
+#define CONFIG_AIC_DECODER 1
 #define CONFIG_AMV_DECODER 1
 #define CONFIG_ASV1_DECODER 0
 #define CONFIG_ASV2_DECODER 0
