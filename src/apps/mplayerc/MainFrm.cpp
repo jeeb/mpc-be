@@ -10396,12 +10396,12 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 			POSITION pos = m_MPLSPlaylist.GetHeadPosition();
 			int idx = 0;
 			while (pos) {
-				CHdmvClipInfo::PlaylistItem Item = m_MPLSPlaylist.GetNext(pos);
+				CHdmvClipInfo::PlaylistItem* Item = m_MPLSPlaylist.GetNext(pos);
 				if (idx == id) {
 					m_bIsBDPlay = TRUE;
 					m_wndPlaylistBar.Empty();
 					CAtlList<CString> sl;
-					sl.AddTail(CString(Item.m_strFileName));
+					sl.AddTail(CString(Item->m_strFileName));
 					m_wndPlaylistBar.Append(sl, false);
 					OpenCurPlaylistItem();
 					return;
@@ -14601,11 +14601,9 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			if (ext == _T(".mpls")) {
 				CHdmvClipInfo ClipInfo;
 				CHdmvClipInfo::CPlaylist CurPlaylist;
-				CHdmvClipInfo::PlaylistItem Item;
 				REFERENCE_TIME rtDuration;
 				if (SUCCEEDED (ClipInfo.ReadPlaylist(mi_fn, rtDuration, CurPlaylist))) {
-					Item = CurPlaylist.GetHead();
-					mi_fn = Item.m_strFileName;
+					mi_fn = CurPlaylist.GetHead()->m_strFileName;
 				}
 			} else if (ext == _T(".IFO")) {
 				// DVD structure
@@ -16072,9 +16070,9 @@ void CMainFrame::SetupNavChaptersSubMenu()
 				}
 				idx++;
 
-				CHdmvClipInfo::PlaylistItem Item = m_MPLSPlaylist.GetNext(pos);
-				CString time = _T("[") + ReftimeToString2(Item.Duration()) + _T("]");
-				CString name = StripPath(Item.m_strFileName);
+				CHdmvClipInfo::PlaylistItem* Item = m_MPLSPlaylist.GetNext(pos);
+				CString time = _T("[") + ReftimeToString2(Item->Duration()) + _T("]");
+				CString name = StripPath(Item->m_strFileName);
 
 				if (name == m_wndPlaylistBar.m_pl.GetHead().GetLabel()) {
 					flags |= MF_CHECKED;

@@ -166,7 +166,7 @@ HRESULT CHdmvClipInfo::ReadProgramInfo()
 
 HRESULT CHdmvClipInfo::ReadInfo(LPCTSTR strFile)
 {
-	BYTE Buff[100];
+	BYTE Buff[4];
 
 	m_bIsHdmv = false;
 	m_hFile   = CreateFile(strFile, GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE, NULL,
@@ -174,12 +174,12 @@ HRESULT CHdmvClipInfo::ReadInfo(LPCTSTR strFile)
 
 	if (m_hFile != INVALID_HANDLE_VALUE) {
 		ReadBuffer(Buff, 4);
-		if (memcmp (Buff, "HDMV", 4)) {
+		if (memcmp(Buff, "HDMV", 4)) {
 			return CloseFile(VFW_E_INVALID_FILE_FORMAT);
 		}
 
 		ReadBuffer(Buff, 4);
-		if ((memcmp (Buff, "0200", 4)!=0) && (memcmp (Buff, "0100", 4)!=0)) {
+		if ((memcmp(Buff, "0200", 4)) && (memcmp(Buff, "0100", 4))) {
 			return CloseFile(VFW_E_INVALID_FILE_FORMAT);
 		}
 
@@ -255,7 +255,7 @@ LPCTSTR CHdmvClipInfo::Stream::Format()
 HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist)
 {
 
-	BYTE	Buff[100];
+	BYTE	Buff[5];
 	CPath	Path (strPlaylistFile);
 	bool	bDuplicate = false;
 	rtDuration  = 0;
@@ -271,12 +271,12 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 		DbgLog((LOG_TRACE, 3, _T("CHdmvClipInfo::ReadPlaylist() : %s"), strPlaylistFile));
 
 		ReadBuffer(Buff, 4);
-		if (memcmp (Buff, "MPLS", 4)) {
+		if (memcmp(Buff, "MPLS", 4)) {
 			return CloseFile(VFW_E_INVALID_FILE_FORMAT);
 		}
 
 		ReadBuffer(Buff, 4);
-		if ((memcmp (Buff, "0200", 4)!=0) && (memcmp (Buff, "0100", 4)!=0)) {
+		if ((memcmp(Buff, "0200", 4)) && (memcmp(Buff, "0100", 4))) {
 			return CloseFile(VFW_E_INVALID_FILE_FORMAT);
 		}
 
@@ -296,39 +296,40 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 
 		Pos.QuadPart += 10;
 		for (size_t i = 0; i < nPlaylistItems; i++) {
-			PlaylistItem Item;
+			CAutoPtr<PlaylistItem> Item(DNew PlaylistItem);
 			SetFilePointerEx(m_hFile, Pos, NULL, FILE_BEGIN);
 			Pos.QuadPart += ReadShort() + 2;
 			ReadBuffer(Buff, 5);
-			Item.m_strFileName.Format(_T("%s\\STREAM\\%c%c%c%c%c.M2TS"), CString(Path), Buff[0], Buff[1], Buff[2], Buff[3], Buff[4]);
+			Item->m_strFileName.Format(_T("%s\\STREAM\\%c%c%c%c%c.M2TS"), CString(Path), Buff[0], Buff[1], Buff[2], Buff[3], Buff[4]);
 
 			ReadBuffer(Buff, 4);
-			if (memcmp (Buff, "M2TS", 4)) {
+			if (memcmp(Buff, "M2TS", 4)) {
 				return CloseFile(VFW_E_INVALID_FILE_FORMAT);
 			}
 
-			if (!::PathFileExists(Item.m_strFileName)) {
-				DbgLog((LOG_TRACE, 3, _T("		==> %s is missing, skip it"), Item.m_strFileName));
+			if (!::PathFileExists(Item->m_strFileName)) {
+				DbgLog((LOG_TRACE, 3, _T("		==> %s is missing, skip it"), Item->m_strFileName));
 				continue;
 			}
 			ReadBuffer(Buff, 3);
 
 			dwTemp			= ReadDword();
-			Item.m_rtIn		= REFERENCE_TIME(20000.0f*dwTemp/90);
+			Item->m_rtIn	= REFERENCE_TIME(20000.0f*dwTemp/90);
 
 			dwTemp			= ReadDword();
-			Item.m_rtOut	= REFERENCE_TIME(20000.0f*dwTemp/90);
+			Item->m_rtOut	= REFERENCE_TIME(20000.0f*dwTemp/90);
 
-			Item.m_rtStartTime = rtDuration;
+			Item->m_rtStartTime = rtDuration;
 
-			rtDuration += (Item.m_rtOut - Item.m_rtIn);
+			rtDuration += (Item->m_rtOut - Item->m_rtIn);
 
 			if (Playlist.Find(Item) != NULL) {
 				bDuplicate = true;
 			}
-			Playlist.AddTail (Item);
 
-			DbgLog((LOG_TRACE, 3, _T("	==> %s, Duration : %s [%15I64d], Total duration : %s"), Item.m_strFileName, ReftimeToString(Item.m_rtOut - Item.m_rtIn), Item.m_rtOut - Item.m_rtIn, ReftimeToString (rtDuration)));
+			DbgLog((LOG_TRACE, 3, _T("	==> %s, Duration : %s [%15I64d], Total duration : %s"), Item->m_strFileName, ReftimeToString(Item->m_rtOut - Item->m_rtIn), Item->m_rtOut - Item->m_rtIn, ReftimeToString(rtDuration)));
+
+			Playlist.AddTail(Item);
 		}
 
 		CloseFile(S_OK);
@@ -340,7 +341,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 
 HRESULT CHdmvClipInfo::ReadChapters(CString strPlaylistFile, CPlaylist& PlaylistItems, CPlaylistChapter& Chapters)
 {
-	BYTE	Buff[100];
+	BYTE	Buff[4];
 	CPath	Path (strPlaylistFile);
 	bool	bDuplicate = false;
 
@@ -358,21 +359,21 @@ HRESULT CHdmvClipInfo::ReadChapters(CString strPlaylistFile, CPlaylist& Playlist
 
 		POSITION pos = PlaylistItems.GetHeadPosition();
 		while (pos) {
-			CHdmvClipInfo::PlaylistItem& PI = PlaylistItems.GetNext(pos);
+			CHdmvClipInfo::PlaylistItem* PI = PlaylistItems.GetNext(pos);
 
-			rtOffset[nIndex] = rtSum - PI.m_rtIn;
-			rtSum			 = rtSum + PI.Duration();
+			rtOffset[nIndex] = rtSum - PI->m_rtIn;
+			rtSum			 = rtSum + PI->Duration();
 			nIndex++;
 		}
 
 		ReadBuffer(Buff, 4);
-		if (memcmp (Buff, "MPLS", 4)) {
+		if (memcmp(Buff, "MPLS", 4)) {
 			SAFE_DELETE_ARRAY(rtOffset);
 			return CloseFile(VFW_E_INVALID_FILE_FORMAT);
 		}
 
 		ReadBuffer(Buff, 4);
-		if ((memcmp (Buff, "0200", 4)!=0) && (memcmp (Buff, "0100", 4)!=0)) {
+		if ((memcmp(Buff, "0200", 4)!=0) && (memcmp(Buff, "0100", 4)!=0)) {
 			SAFE_DELETE_ARRAY(rtOffset);
 			return CloseFile(VFW_E_INVALID_FILE_FORMAT);
 		}
@@ -471,8 +472,8 @@ HRESULT CHdmvClipInfo::FindMainMovie(LPCTSTR strFolder, CString& strPlaylistFile
 						POSITION pos2	= pl->GetHeadPosition();
 						dublicate		= true;
 						while (pos1 && pos2) {
-							PlaylistItem pli_1 = Playlist.GetNext(pos1);
-							PlaylistItem pli_2 = pl->GetNext(pos2);
+							PlaylistItem* pli_1 = Playlist.GetNext(pos1);
+							PlaylistItem* pli_2 = pl->GetNext(pos2);
 							if (pli_1 == pli_2) {
 								continue;
 							}
@@ -489,10 +490,10 @@ HRESULT CHdmvClipInfo::FindMainMovie(LPCTSTR strFolder, CString& strPlaylistFile
 						continue;
 					}
 
-					PlaylistItem Item;
-					Item.m_strFileName	= strCurrentPlaylist;
-					Item.m_rtIn			= 0;
-					Item.m_rtOut		= rtCurrent;
+					CAutoPtr<PlaylistItem> Item(DNew PlaylistItem);
+					Item->m_strFileName	= strCurrentPlaylist;
+					Item->m_rtIn		= 0;
+					Item->m_rtOut		= rtCurrent;
 					MPLSPlaylists.AddTail(Item);
 
 					POSITION pos = Playlist.GetHeadPosition();
@@ -511,7 +512,7 @@ HRESULT CHdmvClipInfo::FindMainMovie(LPCTSTR strFolder, CString& strPlaylistFile
 		// bubble sort
 		for (size_t j = 0; j < MPLSPlaylists.GetCount(); j++) {
 			for (size_t i = 0; i < MPLSPlaylists.GetCount()-1; i++) {
-				if (MPLSPlaylists.GetAt(MPLSPlaylists.FindIndex(i)).Duration() < MPLSPlaylists.GetAt(MPLSPlaylists.FindIndex(i+1)).Duration()) {
+				if (MPLSPlaylists.GetAt(MPLSPlaylists.FindIndex(i))->Duration() < MPLSPlaylists.GetAt(MPLSPlaylists.FindIndex(i+1))->Duration()) {
 					MPLSPlaylists.SwapElements(MPLSPlaylists.FindIndex(i), MPLSPlaylists.FindIndex(i+1));
 				}
 			}

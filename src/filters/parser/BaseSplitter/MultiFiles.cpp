@@ -59,8 +59,8 @@ BOOL CMultiFiles::OpenFiles(CHdmvClipInfo::CPlaylist& files, UINT nOpenFlags)
 
 	Reset();
 	while (pos) {
-		CHdmvClipInfo::PlaylistItem& s = files.GetNext(pos);
-		m_strFiles.Add(s.m_strFileName);
+		CHdmvClipInfo::PlaylistItem* s = files.GetNext(pos);
+		m_strFiles.Add(s->m_strFileName);
 		if (!OpenPart(nPos)) {
 			return false;
 		}
@@ -69,8 +69,9 @@ BOOL CMultiFiles::OpenFiles(CHdmvClipInfo::CPlaylist& files, UINT nOpenFlags)
 		GetFileSizeEx(m_hFile, &llSize);
 		m_llTotalLength += llSize.QuadPart;
 		m_FilesSize.Add(llSize.QuadPart);
-		m_rtPtsOffsets.Add((s.m_rtStartTime - s.m_rtIn) + files.GetHead().m_rtIn);
-		rtDur += s.Duration();
+
+		m_rtPtsOffsets.Add((s->m_rtStartTime - s->m_rtIn) + files.GetHead()->m_rtIn);
+		rtDur += s->Duration();
 		nPos++;
 	}
 

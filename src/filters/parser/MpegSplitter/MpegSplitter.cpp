@@ -1366,13 +1366,12 @@ bool CMpegSplitterFilter::BuildPlaylist(LPCTSTR pszFileName, CHdmvClipInfo::CPla
 
 	bool res = SUCCEEDED (m_ClipInfo.ReadPlaylist (pszFileName, m_rtPlaylistDuration, Items));
 	if (res) {
-		m_rtMin = Items.GetHead().m_rtIn;
+		m_rtMin = Items.GetHead()->m_rtIn;
 		REFERENCE_TIME rtDur = 0;
 
 		POSITION pos = Items.GetHeadPosition();
 		while (pos) {
-			CHdmvClipInfo::PlaylistItem& s = Items.GetNext(pos);
-			rtDur += s.Duration();
+			rtDur += Items.GetNext(pos)->Duration();
 		}
 
 		m_rtMax = m_rtMin + rtDur;

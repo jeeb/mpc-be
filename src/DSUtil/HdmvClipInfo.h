@@ -104,6 +104,12 @@ public:
 		REFERENCE_TIME			m_rtOut;
 		REFERENCE_TIME			m_rtStartTime;
 
+		struct SyncPoint {
+			REFERENCE_TIME rt;
+			__int64 fp;
+		};
+		CAtlArray<SyncPoint> m_sps;
+
 		REFERENCE_TIME Duration() const {
 			return m_rtOut - m_rtIn;
 		}
@@ -132,7 +138,7 @@ public:
 		REFERENCE_TIME			m_rtDuration;
 	};
 
-	typedef CAtlList<PlaylistItem>		CPlaylist;
+	typedef CAutoPtrList<PlaylistItem>	CPlaylist;
 	typedef CAtlList<PlaylistChapter>	CPlaylistChapter;
 
 	CHdmvClipInfo();
