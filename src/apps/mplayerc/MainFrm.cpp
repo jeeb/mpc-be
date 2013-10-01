@@ -6579,11 +6579,10 @@ void CMainFrame::OnFileLoadAudio()
 	}
 
 	AppSettings& s = AfxGetAppSettings();
-	CAtlList<CString> m_fns;
-	m_fns.RemoveAll();
+	CAtlList<CString> fns;
 	CRecentFileList& MRU = AfxGetAppSettings().MRU;
 	MRU.ReadList();
-	m_fns.AddTail(MRU[0].GetString());
+	fns.AddTail(MRU[0].GetString());
 
 	CString filter;
 	CAtlArray<CString> mask;
@@ -6608,8 +6607,10 @@ void CMainFrame::OnFileLoadAudio()
 
 	AddAudioPathsAddons(fd.GetPathName());
 
-	m_fns.AddTail(fd.GetPathName());
-	m_wndPlaylistBar.Open(m_fns, FALSE);
+	fns.AddTail(fd.GetPathName());
+	if (!m_wndPlaylistBar.Replace(fns.GetHead(), fns)) {
+		m_wndPlaylistBar.Append(fns, FALSE);
+	}
 
 	OpenCurPlaylistItem();
 }

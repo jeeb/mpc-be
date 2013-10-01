@@ -1109,6 +1109,36 @@ void CPlayerPlaylistBar::Append(CAtlList<CString>& fns, bool fMulti, CAtlList<CS
 	SavePlaylist();
 }
 
+bool CPlayerPlaylistBar::Replace(CString filename, CAtlList<CString>& fns)
+{
+	if (filename.IsEmpty()) {
+		return false;
+	}
+
+	CPlaylistItem pli;
+	POSITION pos = fns.GetHeadPosition();
+	while (pos) {
+		CString fn = fns.GetNext(pos);
+		if (!fn.Trim().IsEmpty()) {
+			pli.m_fns.AddTail(MakePath(fn));
+		}
+	}
+	pli.AutoLoadFiles();
+
+	pos = m_pl.GetHeadPosition();
+	while (pos) {
+		CPlaylistItem& pli2 = m_pl.GetAt(pos);
+		if (pli2.FindFile(filename)) {
+			m_pl.SetAt(pos, pli);
+			m_pl.SetPos(pos);
+			EnsureVisible(pos, false);
+			return true;
+		}
+		m_pl.GetNext(pos);
+	}
+	return false;
+}
+
 void CPlayerPlaylistBar::Open(CStringW vdn, CStringW adn, int vinput, int vchannel, int ainput)
 {
 	Empty();
@@ -1391,9 +1421,9 @@ OpenMediaData* CPlayerPlaylistBar::GetCurOMD(REFERENCE_TIME rtStart)
 	return NULL;
 }
 
-bool CPlayerPlaylistBar::SelectFileInPlaylist(LPCTSTR filename)
+bool CPlayerPlaylistBar::SelectFileInPlaylist(CString filename)
 {
-	if (!filename) {
+	if (filename.IsEmpty()) {
 		return false;
 	}
 	POSITION pos = m_pl.GetHeadPosition();
@@ -1409,7 +1439,7 @@ bool CPlayerPlaylistBar::SelectFileInPlaylist(LPCTSTR filename)
 	return false;
 }
 
-void CPlayerPlaylistBar::LoadPlaylist(LPCTSTR filename)
+void CPlayerPlaylistBar::LoadPlaylist(CString filename)
 {
 	CString base;
 

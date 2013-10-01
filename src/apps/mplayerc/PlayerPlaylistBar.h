@@ -157,16 +157,17 @@ public:
 
 	void Open(CAtlList<CString>& fns, bool fMulti, CAtlList<CString>* subs = NULL);
 	void Append(CAtlList<CString>& fns, bool fMulti, CAtlList<CString>* subs = NULL);
+	bool Replace(CString filename, CAtlList<CString>& fns);
 
 	void Open(CStringW vdn, CStringW adn, int vinput, int vchannel, int ainput);
 	void Append(CStringW vdn, CStringW adn, int vinput, int vchannel, int ainput);
 
 	OpenMediaData* GetCurOMD(REFERENCE_TIME rtStart = INVALID_TIME);
 
-	void LoadPlaylist(LPCTSTR filename);
+	void LoadPlaylist(CString filename);
 	void SavePlaylist();
 
-	bool SelectFileInPlaylist(LPCTSTR filename);
+	bool SelectFileInPlaylist(CString filename);
 
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
