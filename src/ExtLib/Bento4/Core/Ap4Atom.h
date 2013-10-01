@@ -389,6 +389,8 @@ const AP4_Atom::Type AP4_ATOM_TYPE_3IVD = AP4_ATOM_TYPE('3','I','V','D');
 const AP4_Atom::Type AP4_ATOM_TYPE_V210 = AP4_ATOM_TYPE('V','2','1','0');
 const AP4_Atom::Type AP4_ATOM_TYPE_v210 = AP4_ATOM_TYPE('v','2','1','0');
 
+const AP4_Atom::Type AP4_ATOM_TYPE_ICOD = AP4_ATOM_TYPE('i','c','o','d');
+
 /*----------------------------------------------------------------------
 |       AP4_AtomListInspector
 +---------------------------------------------------------------------*/
