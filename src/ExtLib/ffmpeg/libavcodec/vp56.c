@@ -311,7 +311,7 @@ static void vp56_deblock_filter(VP56Context *s, uint8_t *yuv,
 }
 
 static void vp56_mc(VP56Context *s, int b, int plane, uint8_t *src,
-                    int stride, int x, int y)
+                    ptrdiff_t stride, int x, int y)
 {
     uint8_t *dst = s->frames[VP56_FRAME_CURRENT]->data[plane] + s->block_offset[b];
     uint8_t *src_block;
@@ -339,7 +339,7 @@ static void vp56_mc(VP56Context *s, int b, int plane, uint8_t *src,
 
     if (x<0 || x+12>=s->plane_width[plane] ||
         y<0 || y+12>=s->plane_height[plane]) {
-        s->vdsp.emulated_edge_mc(s->edge_emu_buffer,
+        s->vdsp.emulated_edge_mc(s->edge_emu_buffer, stride,
                             src + s->block_offset[b] + (dy-2)*stride + (dx-2),
                             stride, 12, 12, x, y,
                             s->plane_width[plane],

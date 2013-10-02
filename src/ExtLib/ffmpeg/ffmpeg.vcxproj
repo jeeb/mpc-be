@@ -414,6 +414,7 @@
     <ClCompile Include="libavcodec\acelp_vectors.c" />
     <ClCompile Include="libavcodec\adpcm.c" />
     <ClCompile Include="libavcodec\adpcm_data.c" />
+    <ClCompile Include="libavcodec\aic.c" />
     <ClCompile Include="libavcodec\alac.c" />
     <ClCompile Include="libavcodec\alac_data.c" />
     <ClCompile Include="libavcodec\allcodecs.c" />
@@ -588,6 +589,7 @@
     <ClCompile Include="libavcodec\mss3.c" />
     <ClCompile Include="libavcodec\mss34dsp.c" />
     <ClCompile Include="libavcodec\mss4.c" />
+    <ClCompile Include="libavcodec\msvideo1.c" />
     <ClCompile Include="libavcodec\nellymoser.c" />
     <ClCompile Include="libavcodec\nellymoserdec.c" />
     <ClCompile Include="libavcodec\options.c" />
