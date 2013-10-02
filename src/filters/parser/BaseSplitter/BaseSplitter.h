@@ -83,7 +83,7 @@ class CBaseSplitterInputPin
 	: public CBasePin
 {
 protected:
-	CComQIPtr<IAsyncReader> m_pAsyncReader;
+	CComQIPtr<IAsyncReader>		m_pAsyncReader;
 
 public:
 	CBaseSplitterInputPin(TCHAR* pName, CBaseSplitterFilter* pFilter, CCritSec* pLock, HRESULT* phr);
@@ -252,7 +252,8 @@ class CBaseSplitterFilter
 
 	CAutoPtrList<CBaseSplitterOutputPin> m_pRetiredOutputs;
 
-	CComQIPtr<ISyncReader> m_pSyncReader;
+	CComQIPtr<ISyncReader>		m_pSyncReader;
+	CHdmvClipInfo::CPlaylist	m_Items;
 
 protected:
 	CStringW m_fn;
@@ -416,4 +417,6 @@ public:
 	DWORD GetMaxQueuePackets() { return m_MaxQueuePackets; }
 
 	DWORD GetFlag() { return m_nFlag; }
+
+	__int64 SeekBD(REFERENCE_TIME rt);
 };

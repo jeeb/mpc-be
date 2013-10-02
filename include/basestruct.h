@@ -84,13 +84,21 @@ struct WAVEFORMATEXFFMPEG
 	}
 };
 
-#pragma pack(push, 1)
-typedef struct {
-	WAVEFORMATEX Format;
-	BYTE bBigEndian;
-	BYTE bsid;
-	BYTE lfeon;
-	BYTE copyrightb;
-	BYTE nAuxBitsCode;  //  Aux bits per frame
+typedef struct tagDOLBYAC3WAVEFORMAT {
+	WAVEFORMATEX	wfx;
+	BYTE			bBigEndian;		// TRUE = Big Endian, FALSE little endian
+	BYTE			bsid;
+	BYTE			lfeon;
+	BYTE			copyrightb;
+	BYTE			nAuxBitsCode;	//  Aux bits per frame
 } DOLBYAC3WAVEFORMAT;
-#pragma pack(pop)
+
+struct AV_Rational {
+	int num;
+	int den;
+};
+
+struct SyncPoint {
+	REFERENCE_TIME rt;
+	__int64 fp;
+};

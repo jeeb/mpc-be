@@ -25,11 +25,11 @@
 
 #include <afxstr.h>
 #include "NullRenderers.h"
-#include "HdmvClipInfo.h"
 #include "H264Nalu.h"
 #include "MediaTypeEx.h"
 #include "vd.h"
 #include "text.h"
+#include "..\..\include\basestruct.h"
 
 #define ResStr(id)			CString(MAKEINTRESOURCE(id))
 
@@ -272,11 +272,6 @@ inline void ReduceDim(SIZE &dim)
 		dim.cx /= lnko, dim.cy /= lnko;
 	}
 }
-
-struct AV_Rational {
-	int num;
-	int den;
-};
 
 #ifndef uint8
 	typedef unsigned char		uint8;

@@ -23,6 +23,7 @@
 #pragma once
 
 #include "Mpeg2Def.h"
+#include "../../include/basestruct.h"
 
 enum BDVM_VideoFormat {
 	BDVM_VideoFormat_Unknown	= 0,
@@ -97,6 +98,10 @@ public:
 	struct PlaylistItem {
 		PlaylistItem() {
 			m_rtIn = m_rtOut = m_rtStartTime = 0;
+			m_SizeIn = m_SizeOut = 0;
+		}
+		PlaylistItem(const PlaylistItem& pi) {
+			*this = pi;
 		}
 
 		CString					m_strFileName;
@@ -104,18 +109,31 @@ public:
 		REFERENCE_TIME			m_rtOut;
 		REFERENCE_TIME			m_rtStartTime;
 
-		struct SyncPoint {
-			REFERENCE_TIME rt;
-			__int64 fp;
-		};
+		__int64					m_SizeIn;
+		__int64					m_SizeOut;
+
 		CAtlArray<SyncPoint> m_sps;
 
 		REFERENCE_TIME Duration() const {
 			return m_rtOut - m_rtIn;
 		}
+		__int64 Size() const {
+			return m_SizeOut - m_SizeIn;
+		}
 
 		bool operator == (const PlaylistItem& pi) const {
 			return pi.m_strFileName == m_strFileName;
+		}
+		PlaylistItem& operator = (const PlaylistItem& pi) {
+			m_strFileName	= pi.m_strFileName;
+			m_rtIn			= pi.m_rtIn;
+			m_rtOut			= pi.m_rtOut;
+			m_rtStartTime	= pi.m_rtStartTime;
+			m_SizeIn		= pi.m_SizeIn;
+			m_SizeOut		= pi.m_SizeOut;
+			m_sps.Copy(pi.m_sps);
+
+			return *this;
 		}
 	};
 
@@ -144,19 +162,20 @@ public:
 	CHdmvClipInfo();
 	~CHdmvClipInfo();
 
-	HRESULT		ReadInfo(LPCTSTR strFile);
+	HRESULT		ReadInfo(LPCTSTR strFile, CAtlArray<SyncPoint>* sps = NULL);
 	Stream*		FindStream(SHORT wPID);
 	bool		IsHdmv() const { return m_bIsHdmv; };
 	size_t		GetStreamNumber() { return m_Streams.GetCount(); };
 	Stream*		GetStreamByIndex(size_t nIndex) {return (nIndex < m_Streams.GetCount()) ? &m_Streams[nIndex] : NULL; };
 
 	HRESULT		FindMainMovie(LPCTSTR strFolder, CString& strPlaylistFile, CPlaylist& MainPlaylist, CPlaylist& MPLSPlaylists);
-	HRESULT		ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist);
+	HRESULT		ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist, BOOL bFullInfoRead = FALSE);
 	HRESULT		ReadChapters(CString strPlaylistFile, CPlaylist& PlaylistItems, CPlaylistChapter& Chapters);
 
 private :
 	DWORD		SequenceInfo_start_address;
 	DWORD		ProgramInfo_start_address;
+	DWORD		Cpi_start_addrress;
 
 	HANDLE		m_hFile;
 
@@ -169,5 +188,50 @@ private :
 	void		ReadBuffer(BYTE* pBuff, DWORD nLen);
 
 	HRESULT		ReadProgramInfo();
+	HRESULT		ReadCpiInfo(CAtlArray<SyncPoint>* sps);
 	HRESULT		CloseFile(HRESULT hr);
+
+private:
+	struct ClpiEpCoarse {
+		ClpiEpCoarse() {
+			memset(this, 0, sizeof(*this));
+		}
+
+		WORD			ref_ep_fine_id;
+		WORD			pts_ep;
+		DWORD			spn_ep;
+	};
+
+	struct ClpiEpFine {
+		ClpiEpFine() {
+			memset(this, 0, sizeof(*this));
+		}
+
+		BYTE			is_angle_change_point;
+		BYTE			i_end_position_offset;
+		SHORT			pts_ep;
+		WORD			spn_ep;
+	};
+
+	struct ClpiEpMapEntry {
+		SHORT			pid;
+		BYTE			ep_stream_type;
+		SHORT			num_ep_coarse;
+		WORD			num_ep_fine;
+		DWORD			ep_map_stream_start_addr;
+
+		ClpiEpCoarse*	coarse;
+		ClpiEpFine*		fine;
+
+		ClpiEpMapEntry() {
+			pid							= 0;
+			ep_stream_type				= 0;
+			num_ep_coarse				= 0;
+			num_ep_fine					= 0;
+			ep_map_stream_start_addr	= 0;
+
+			coarse						= NULL;
+			fine						= NULL;
+		}
+	};
 };

@@ -13184,7 +13184,6 @@ CString CMainFrame::OpenDVD(OpenDVDData* pODD)
 	pMRU->ReadList();
 	pMRU->Add(pODD->title);
 	pMRU->WriteList();
-	SHAddToRecentDocs(SHARD_PATH, pODD->title);
 
 	// TODO: resetdvd
 	m_pDVDC->SetOption(DVD_ResetOnStop, FALSE);
@@ -19535,7 +19534,6 @@ BOOL CMainFrame::OpenBD(CString Path)
 				pMRU->ReadList();
 				pMRU->Add(Path);
 				pMRU->WriteList();
-				SHAddToRecentDocs(SHARD_PATH, Path);
 			}
 
 			if (!InternalMpegSplitter && ext == _T(".bdmv")) {

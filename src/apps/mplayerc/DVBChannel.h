@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include "../../DSUtil/HdmvClipInfo.h"
+
 #define FORMAT_VERSION_0			0
 #define FORMAT_VERSION_1			1
 #define FORMAT_VERSION_CURRENT		2

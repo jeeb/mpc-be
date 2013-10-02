@@ -1230,6 +1230,22 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	if (rt <= UNITS || m_rtDuration <= 0) {
 		m_pFile->Seek(0);
 	} else {
+		__int64 pos = SeekBD(rt);
+		if (pos >= 0) {
+			m_pFile->Seek(pos + 4);
+
+			CMpegSplitterFile::stream stream = pMasterStream->GetHead();
+			REFERENCE_TIME rtmax = rt - UNITS;
+			REFERENCE_TIME rtPTS = m_pFile->NextPTS(stream);
+
+			while (rtPTS <= rtmax) {
+				rtPTS = m_pFile->NextPTS(stream);
+				m_pFile->Seek(m_pFile->GetPos() + 192);
+			}
+
+			return;
+		}
+
 		__int64 len			= m_pFile->GetLength();
 		__int64 seekpos		= (__int64)(1.0*rt/m_rtDuration*len);
 		__int64 minseekpos	= _I64_MIN;
@@ -1364,7 +1380,7 @@ bool CMpegSplitterFilter::BuildPlaylist(LPCTSTR pszFileName, CHdmvClipInfo::CPla
 {
 	m_rtPlaylistDuration = 0;
 
-	bool res = SUCCEEDED (m_ClipInfo.ReadPlaylist (pszFileName, m_rtPlaylistDuration, Items));
+	bool res = SUCCEEDED (m_ClipInfo.ReadPlaylist (pszFileName, m_rtPlaylistDuration, Items, TRUE));
 	if (res) {
 		m_rtMin = Items.GetHead()->m_rtIn;
 		REFERENCE_TIME rtDur = 0;

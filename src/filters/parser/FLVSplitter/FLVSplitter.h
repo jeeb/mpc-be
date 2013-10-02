@@ -134,10 +134,6 @@ class __declspec(uuid("47E792CF-0BBE-4F7A-859C-194B0768650A"))
 		}
 	};
 
-	struct SyncPoint {
-		REFERENCE_TIME rt;
-		__int64 fp;
-	};
 	CAtlArray<SyncPoint> m_sps;
 
 	CString AMF0GetString(CBaseSplitterFileEx* pFile, UINT64 end);

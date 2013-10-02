@@ -37,10 +37,6 @@ public:
 	CAtlMap<BYTE, CMediaType> m_mts;
 	REFERENCE_TIME m_rtFirst, m_rtDuration;
 
-	struct SyncPoint {
-		REFERENCE_TIME rt;
-		__int64 fp;
-	};
 	CAtlArray<SyncPoint> m_sps;
 
 	typedef CAtlMap<CStringA, CStringW, CStringElementTraits<CStringA>, CStringElementTraits<CStringW> > CStreamInfoMap;

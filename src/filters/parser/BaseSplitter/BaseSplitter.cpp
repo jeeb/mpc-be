@@ -51,9 +51,7 @@ void CPacketQueue::Add(CAutoPtr<Packet> p)
 			size_t newsize = tail->GetCount() + p->GetCount();
 			tail->SetCount(newsize, max(1024, (int)newsize)); // doubles the reserved buffer size
 			memcpy(tail->GetData() + oldsize, p->GetData(), p->GetCount());
-			/*
-			GetTail()->Append(*p); // too slow
-			*/
+			//GetTail()->Append(*p); // too slow
 			return;
 		}
 	}
@@ -1271,11 +1269,10 @@ STDMETHODIMP CBaseSplitterFilter::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYP
 	m_fn = pszFileName;
 	HRESULT hr = E_FAIL;
 	CComPtr<IAsyncReader> pAsyncReader;
-	CHdmvClipInfo::CPlaylist Items;
 	CHdmvClipInfo::CPlaylistChapter Chapters;
 
-	if (BuildPlaylist(pszFileName, Items)) {
-		pAsyncReader = (IAsyncReader*)DNew CAsyncFileReader(Items, hr);
+	if (BuildPlaylist(pszFileName, m_Items)) {
+		pAsyncReader = (IAsyncReader*)DNew CAsyncFileReader(m_Items, hr);
 	} else {
 		pAsyncReader = (IAsyncReader*)DNew CAsyncFileReader(CString(pszFileName), hr);
 	}
@@ -1287,7 +1284,7 @@ STDMETHODIMP CBaseSplitterFilter::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYP
 		return hr;
 	}
 
-	if (BuildChapters(pszFileName, Items, Chapters)) {
+	if (BuildChapters(pszFileName, m_Items, Chapters)) {
 		POSITION pos	= Chapters.GetHeadPosition();
 		int	i			= 1;
 		while (pos) {
@@ -1645,4 +1642,28 @@ STDMETHODIMP CBaseSplitterFilter::GetStatus(int i, int& samples, int& size)
 STDMETHODIMP_(DWORD) CBaseSplitterFilter::GetPriority()
 {
 	return m_priority;
+}
+
+__int64 CBaseSplitterFilter::SeekBD(REFERENCE_TIME rt)
+{
+	if (m_Items.GetCount()) {
+		POSITION pos = m_Items.GetHeadPosition();
+		while (pos) {
+			CHdmvClipInfo::PlaylistItem* Item = m_Items.GetNext(pos);
+			if (rt >= Item->m_rtStartTime && rt <= (Item->m_rtStartTime + Item->Duration())) {
+				REFERENCE_TIME _rt = rt - Item->m_rtStartTime + Item->m_rtIn;
+				for (size_t idx = 0; idx < Item->m_sps.GetCount() - 1; idx++) {
+					if (_rt < Item->m_sps[idx].rt) {
+						if (idx > 0) {
+							idx--;
+						}
+
+						return Item->m_sps[idx].fp + Item->m_SizeIn;
+					}
+				}
+			}
+		}
+	}
+
+	return -1;
 }
