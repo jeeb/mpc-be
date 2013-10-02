@@ -72,7 +72,7 @@ void CDXVADecoderH264::Init()
 	m_DXVAPicParams.MinLumaBipredSize8x8Flag			= 1;	// Improve accelerator performances
 	m_DXVAPicParams.StatusReportFeedbackNumber			= 0;	// Use to report status
 
-	for (int i =0; i<16; i++) {
+	for (int i = 0; i < _countof(m_DXVAPicParams.RefFrameList); i++) {
 		m_DXVAPicParams.RefFrameList[i].bPicEntry		= 255;
 	}
 
@@ -311,10 +311,10 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 void CDXVADecoderH264::ClearUnusedRefFrames()
 {
 	// Remove old reference frames (not anymore a short or long ref frame)
-	for (int i=0; i<m_nPicEntryNumber; i++) {
+	for (int i = 0; i < m_nPicEntryNumber; i++) {
 		if (m_pPictureStore[i].bRefPicture && m_pPictureStore[i].bDisplayed) {
-			if (!FFH264IsRefFrameInUse (i, m_pFilter->GetAVCtx())) {
-				RemoveRefFrame (i);
+			if (!FFH264IsRefFrameInUse(i, m_pFilter->GetAVCtx())) {
+				RemoveRefFrame(i);
 			}
 		}
 	}
@@ -342,7 +342,7 @@ int CDXVADecoderH264::FindOldestFrame()
 	int				nPos  = -1;
 	REFERENCE_TIME	rtPos = _I64_MAX;
 
-	for (int i=0; i<m_nPicEntryNumber; i++) {
+	for (int i = 0; i < m_nPicEntryNumber; i++) {
 		if (m_pPictureStore[i].bInUse && !m_pPictureStore[i].bDisplayed) {
 			if ((m_pPictureStore[i].nCodecSpecific == m_nOutPOC) && (m_pPictureStore[i].rtStart < rtPos) && (m_pPictureStore[i].rtStart >= m_rtOutStart)) {
 				nPos  = i;
@@ -353,8 +353,8 @@ int CDXVADecoderH264::FindOldestFrame()
 
 	if (nPos != -1) {
 		m_pPictureStore[nPos].rtStart = m_rtOutStart;
+		m_pFilter->ReorderBFrames(m_pPictureStore[nPos].rtStart, m_pPictureStore[nPos].rtStop);
 		m_pFilter->UpdateFrameTime(m_pPictureStore[nPos].rtStart, m_pPictureStore[nPos].rtStop);
-		m_pFilter->ReorderBFrames (m_pPictureStore[nPos].rtStart, m_pPictureStore[nPos].rtStop);
 	}
 
 	return nPos;

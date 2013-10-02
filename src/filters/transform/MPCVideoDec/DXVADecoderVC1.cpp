@@ -204,8 +204,7 @@ HRESULT CDXVADecoderVC1::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 		}
 	}
 
-	AddToStore (nSurfaceIndex, pSampleToDeliver, (bPicBackwardPrediction != 1), rtStart, rtStop,
-				false, 0);
+	AddToStore (nSurfaceIndex, pSampleToDeliver, (bPicBackwardPrediction != 1), rtStart, rtStop, false, 0);
 
 	m_bFlushed = false;
 
@@ -216,7 +215,7 @@ BYTE* CDXVADecoderVC1::FindNextStartCode(BYTE* pBuffer, UINT nSize, UINT& nPacke
 {
 	BYTE*		pStart	= pBuffer;
 	BYTE		bCode	= 0;
-	for (UINT i=0; i<nSize-4; i++) {
+	for (UINT i = 0; i < nSize-4; i++) {
 		if (((*((DWORD*)(pBuffer+i)) & 0x00FFFFFF) == 0x00010000) || (i >= nSize-5)) {
 			if (bCode == 0) {
 				bCode = pBuffer[i+3];
@@ -294,8 +293,8 @@ void CDXVADecoderVC1::Flush()
 		RemoveRefFrame (m_wRefPictureIndex[1]);
 	}
 
-	m_wRefPictureIndex[0] = NO_REF_FRAME;
-	m_wRefPictureIndex[1] = NO_REF_FRAME;
+	m_wRefPictureIndex[0]	= NO_REF_FRAME;
+	m_wRefPictureIndex[1]	= NO_REF_FRAME;
 
 	__super::Flush();
 }

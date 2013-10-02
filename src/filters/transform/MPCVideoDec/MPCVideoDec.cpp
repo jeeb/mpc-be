@@ -1290,7 +1290,7 @@ STDMETHODIMP CMPCVideoDecFilter::NonDelegatingQueryInterface(REFIID riid, void**
 
 HRESULT CMPCVideoDecFilter::CheckInputType(const CMediaType* mtIn)
 {
-	for (int i=0; i<_countof(sudPinTypesIn); i++) {
+	for (int i = 0; i < _countof(sudPinTypesIn); i++) {
 		if ((mtIn->majortype == *sudPinTypesIn[i].clsMajorType) &&
 				(mtIn->subtype == *sudPinTypesIn[i].clsMinorType)) {
 			return S_OK;
@@ -2459,7 +2459,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 				dst[0] = outData;
 				dstStride[0] = (m_nSwOutBpp>>3) * (outStride);
 			} else {
-				for (unsigned int i=0; i<outcspInfo->numPlanes; i++) {
+				for (unsigned int i = 0; i < outcspInfo->numPlanes; i++) {
 					dstStride[i] = outStride >> outcspInfo->shiftX[i];
 					dst[i] = !i ? outData : dst[i-1] + dstStride[i-1] * (m_pOutSize.cy >> outcspInfo->shiftY[i-1]) ;
 				}
@@ -2476,7 +2476,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 					std::swap(dst[1], dst[2]);
 				}
 				int rowsize = 0, height = 0;
-				for (unsigned int i=0; i<outcspInfo->numPlanes; i++) {
+				for (unsigned int i = 0; i < outcspInfo->numPlanes; i++) {
 					rowsize	= (m_pOutSize.cx*outcspInfo->Bpp) >> outcspInfo->shiftX[i];
 					height	= m_pAVCtx->height >> outcspInfo->shiftY[i];
 					copyPlane(pDataOut, rowsize, dst[i], (outStride*outcspInfo->Bpp) >> outcspInfo->shiftX[i], rowsize, height, (m_nOutCsp == FF_CSP_RGB32));
@@ -2620,8 +2620,8 @@ void CMPCVideoDecFilter::ReorderBFrames(REFERENCE_TIME& rtStart, REFERENCE_TIME&
 {
 	// Re-order B-frames if needed
 	if (m_pAVCtx->has_b_frames && m_bReorderBFrame) {
-		rtStart	= m_BFrames [m_nPosB].rtStart;
-		rtStop	= m_BFrames [m_nPosB].rtStop;
+		rtStart	= m_BFrames[m_nPosB].rtStart;
+		rtStop	= m_BFrames[m_nPosB].rtStop;
 	}
 }
 
@@ -2637,7 +2637,7 @@ void CMPCVideoDecFilter::FillInVideoDescription(DXVA2_VideoDesc *pDesc)
 BOOL CMPCVideoDecFilter::IsSupportedDecoderMode(const GUID& mode)
 {
 	if (IsDXVASupported()) {
-		for (int i=0; i<MAX_SUPPORTED_MODE; i++) {
+		for (int i = 0; i < MAX_SUPPORTED_MODE; i++) {
 			if (*ffCodecs[m_nCodecNb].DXVAModes->Decoder[i] == GUID_NULL) {
 				break;
 			} else if (*ffCodecs[m_nCodecNb].DXVAModes->Decoder[i] == mode) {

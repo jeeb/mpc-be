@@ -88,7 +88,7 @@ void CDXVADecoder::AllocExecuteParams(int nSize)
 {
 	m_ExecuteParams.pCompressedBuffers = DNew DXVA2_DecodeBufferDesc[nSize];
 
-	for (int i=0; i<nSize; i++) {
+	for (int i = 0; i < nSize; i++) {
 		memset(&m_ExecuteParams.pCompressedBuffers[i], 0, sizeof(DXVA2_DecodeBufferDesc));
 	}
 }
@@ -313,7 +313,7 @@ HRESULT CDXVADecoder::Execute()
 			hr = m_pAMVideoAccelerator->Execute (dwFunction, m_DXVA1BufferDesc, sizeof(DXVA_BufferDescription)*m_dwNumBuffersInfo,&dwResult, sizeof(dwResult), m_dwNumBuffersInfo, m_DXVA1BufferInfo);
 			ASSERT(SUCCEEDED(hr));
 
-			for (DWORD i=0; i<m_dwNumBuffersInfo; i++) {
+			for (DWORD i = 0; i < m_dwNumBuffersInfo; i++) {
 				hr2 = m_pAMVideoAccelerator->ReleaseBuffer (m_DXVA1BufferInfo[i].dwTypeIndex, m_DXVA1BufferInfo[i].dwBufferIndex);
 				ASSERT(SUCCEEDED(hr2));
 			}
@@ -322,7 +322,7 @@ HRESULT CDXVADecoder::Execute()
 			break;
 		case ENGINE_DXVA2 :
 
-			for (DWORD i=0; i<m_ExecuteParams.NumCompBuffers; i++) {
+			for (DWORD i = 0; i < m_ExecuteParams.NumCompBuffers; i++) {
 				hr2 = m_pDirectXVideoDec->ReleaseBuffer (m_ExecuteParams.pCompressedBuffers[i].CompressedBufferType);
 				ASSERT(SUCCEEDED(hr2));
 			}
