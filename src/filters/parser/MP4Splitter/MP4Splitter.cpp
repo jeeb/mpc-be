@@ -600,15 +600,6 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					if (!di) {
 						di = &empty;
 					}
-					int num = 1;
-					int den = 1;
-					if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(avc1->GetChild(AP4_ATOM_TYPE_PASP))) {
-						num = pasp->GetNum();
-						den = pasp->GetDen();
-					}
-					if (num <= 0 || den <= 0) { // if bad AR
-						num = den = 1; // then reset AR
-					}
 
 					const AP4_Byte* data = di->GetData();
 					AP4_Size size = di->GetDataSize();
@@ -624,9 +615,16 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					REFERENCE_TIME AvgTimePerFrame = item->GetData()->GetSampleCount() ? item->GetData()->GetDurationMs()*10000 / (item->GetData()->GetSampleCount()) : 0;
 
-					CSize aspect(pbmi.biWidth * num, pbmi.biHeight * den);
-					ReduceDim(aspect);
-					CreateMPEG2VIfromAVC(&mt, &pbmi, AvgTimePerFrame, aspect, (BYTE*)data, size); 
+					Aspect.cx = pbmi.biWidth;
+					Aspect.cy = pbmi.biHeight;
+					if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(avc1->GetChild(AP4_ATOM_TYPE_PASP))) {
+						if (pasp->GetNum() > 0 && pasp->GetDen() > 0) {
+							Aspect.cx *= pasp->GetNum();
+							Aspect.cy *= pasp->GetDen();
+						}
+					}
+					ReduceDim(Aspect);
+					CreateMPEG2VIfromAVC(&mt, &pbmi, AvgTimePerFrame, Aspect, (BYTE*)data, size); 
 
 					mts.Add(mt);
 					//b_HasVideo = true;
@@ -640,15 +638,6 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					const AP4_DataBuffer* di = hvcC->GetDecoderInfo();
 					if (!di) {
 						di = &empty;
-					}
-					int num = 1;
-					int den = 1;
-					if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(hvc1->GetChild(AP4_ATOM_TYPE_PASP))) {
-						num = pasp->GetNum();
-						den = pasp->GetDen();
-					}
-					if (num <= 0 || den <= 0) { // if bad AR
-						num = den = 1; // then reset AR
 					}
 
 					mt.majortype  = MEDIATYPE_Video;
@@ -666,6 +655,15 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 					mt.subtype = FOURCCMap(vih2->bmiHeader.biCompression = '1CVH');
 
+					Aspect.cx = vih2->bmiHeader.biWidth;
+					Aspect.cy = vih2->bmiHeader.biHeight;
+					if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(hvc1->GetChild(AP4_ATOM_TYPE_PASP))) {
+						if (pasp->GetNum() > 0 && pasp->GetDen() > 0) {
+							Aspect.cx *= pasp->GetNum();
+							Aspect.cy *= pasp->GetDen();
+						}
+					}
+					ReduceDim(Aspect);
 					SetAspect(vih2, Aspect, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight); 
 
 					mts.Add(mt);
