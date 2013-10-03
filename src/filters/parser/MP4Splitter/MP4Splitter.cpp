@@ -748,6 +748,13 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							vih2->AvgTimePerFrame		= item->GetData()->GetDurationMs()*10000 / (item->GetData()->GetSampleCount());
 						}
 
+						if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(vse->GetChild(AP4_ATOM_TYPE_PASP))) {
+							if (pasp->GetNum() > 0 && pasp->GetDen() > 0) {
+								Aspect.cx *= pasp->GetNum();
+								Aspect.cy *= pasp->GetDen();
+								ReduceDim(Aspect);
+							}
+						}
 						SetAspect(vih2, Aspect, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight); 
 
 						memcpy(vih2 + 1, db.GetData(), db.GetDataSize());
