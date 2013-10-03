@@ -394,15 +394,10 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, int len, CMediaType* pmt)
 	h.ifps = 10 * h.ifps / 27;
 	h.bitrate = h.bitrate == (1<<30)-1 ? 0 : h.bitrate * 400;
 
-	DWORD a = h.arx, b = h.ary;
-	while (a) {
-		DWORD tmp = a;
-		a = b % tmp;
-		b = tmp;
-	}
-	if (b) {
-		h.arx /= b, h.ary /= b;
-	}
+	CSize aspect(h.arx, h.ary);
+	ReduceDim(aspect);
+	h.arx = aspect.cx;
+	h.ary = aspect.cy;
 
 	if (!pmt) {
 		return true;
@@ -411,18 +406,18 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, int len, CMediaType* pmt)
 	pmt->majortype = MEDIATYPE_Video;
 
 	if (type == mpeg1) {
-		pmt->subtype = MEDIASUBTYPE_MPEG1Payload;
-		pmt->formattype = FORMAT_MPEGVideo;
-		int len = FIELD_OFFSET(MPEG1VIDEOINFO, bSequenceHeader) + int(shlen + shextlen);
-		MPEG1VIDEOINFO* vi = (MPEG1VIDEOINFO*)DNew BYTE[len];
+		pmt->subtype						= MEDIASUBTYPE_MPEG1Payload;
+		pmt->formattype						= FORMAT_MPEGVideo;
+		int len								= FIELD_OFFSET(MPEG1VIDEOINFO, bSequenceHeader) + int(shlen + shextlen);
+		MPEG1VIDEOINFO* vi					= (MPEG1VIDEOINFO*)DNew BYTE[len];
 		memset(vi, 0, len);
-		vi->hdr.dwBitRate = h.bitrate;
-		vi->hdr.AvgTimePerFrame = h.ifps;
-		vi->hdr.bmiHeader.biSize = sizeof(vi->hdr.bmiHeader);
-		vi->hdr.bmiHeader.biWidth = h.width;
-		vi->hdr.bmiHeader.biHeight = h.height;
-		vi->hdr.bmiHeader.biXPelsPerMeter = h.width * h.ary;
-		vi->hdr.bmiHeader.biYPelsPerMeter = h.height * h.arx;
+		vi->hdr.dwBitRate					= h.bitrate;
+		vi->hdr.AvgTimePerFrame				= h.ifps;
+		vi->hdr.bmiHeader.biSize			= sizeof(vi->hdr.bmiHeader);
+		vi->hdr.bmiHeader.biWidth			= h.width;
+		vi->hdr.bmiHeader.biHeight			= h.height;
+		vi->hdr.bmiHeader.biXPelsPerMeter	= h.width * h.ary;
+		vi->hdr.bmiHeader.biYPelsPerMeter	= h.height * h.arx;
 		vi->cbSequenceHeader = DWORD(shlen + shextlen);
 		Seek(shpos);
 		ByteRead((BYTE*)&vi->bSequenceHeader[0], shlen);
@@ -433,21 +428,21 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, int len, CMediaType* pmt)
 		pmt->SetFormat((BYTE*)vi, len);
 		delete [] vi;
 	} else if (type == mpeg2) {
-		pmt->subtype = MEDIASUBTYPE_MPEG2_VIDEO;
-		pmt->formattype = FORMAT_MPEG2_VIDEO;
-		int len = FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + int(shlen + shextlen);
-		MPEG2VIDEOINFO* vi = (MPEG2VIDEOINFO*)DNew BYTE[len];
+		pmt->subtype				= MEDIASUBTYPE_MPEG2_VIDEO;
+		pmt->formattype				= FORMAT_MPEG2_VIDEO;
+		int len						= FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + int(shlen + shextlen);
+		MPEG2VIDEOINFO* vi			= (MPEG2VIDEOINFO*)DNew BYTE[len];
 		memset(vi, 0, len);
-		vi->hdr.dwBitRate = h.bitrate;
-		vi->hdr.AvgTimePerFrame = h.ifps;
-		vi->hdr.dwPictAspectRatioX = h.arx;
-		vi->hdr.dwPictAspectRatioY = h.ary;
-		vi->hdr.bmiHeader.biSize = sizeof(vi->hdr.bmiHeader);
-		vi->hdr.bmiHeader.biWidth = h.width;
-		vi->hdr.bmiHeader.biHeight = h.height;
-		vi->dwProfile = h.profile;
-		vi->dwLevel = h.level;
-		vi->cbSequenceHeader = DWORD(shlen + shextlen);
+		vi->hdr.dwBitRate			= h.bitrate;
+		vi->hdr.AvgTimePerFrame		= h.ifps;
+		vi->hdr.dwPictAspectRatioX	= h.arx;
+		vi->hdr.dwPictAspectRatioY	= h.ary;
+		vi->hdr.bmiHeader.biSize	= sizeof(vi->hdr.bmiHeader);
+		vi->hdr.bmiHeader.biWidth	= h.width;
+		vi->hdr.bmiHeader.biHeight	= h.height;
+		vi->dwProfile				= h.profile;
+		vi->dwLevel					= h.level;
+		vi->cbSequenceHeader		= DWORD(shlen + shextlen);
 		Seek(shpos);
 		ByteRead((BYTE*)&vi->dwSequenceHeader[0], shlen);
 		if (shextpos && shextlen) {

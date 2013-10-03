@@ -289,6 +289,10 @@ void CDXVADecoderMpeg2::UpdateFrameTime (REFERENCE_TIME& rtStart, REFERENCE_TIME
 		rtStart = m_rtLastStart;
 	}
 
+	if (rtStart == INVALID_TIME) {
+		rtStart = m_rtLastStart;
+	}
+
 	REFERENCE_TIME AvgTimePerFrame = m_pFilter->GetDuration() * (m_pFilter->GetFrame()->repeat_pict ? 3 : 2) / 2;
 	
 	rtStop			= rtStart + (AvgTimePerFrame / m_pFilter->GetRate());

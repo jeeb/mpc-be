@@ -38,6 +38,7 @@
 #include "parser/MpegSplitter/MpegSplitter.h"
 #include "parser/MusePackSplitter/MusePackSplitter.h"
 #include "parser/OggSplitter/OggSplitter.h"
+#include "parser/RAWSplitter/RAWSplitter.h"
 #include "parser/RealMediaSplitter/RealMediaSplitter.h"
 #include "parser/RoQSplitter/RoQSplitter.h"
 #include "parser/StreamDriveThru/StreamDriveThru.h"

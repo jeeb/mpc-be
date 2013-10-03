@@ -56,6 +56,7 @@ enum SOURCE_FILTER {
 	SRC_TTA,
 	SRC_UDP,
 	SRC_TAK,
+	SRC_RAW,
 
 	SRC_LAST
 };

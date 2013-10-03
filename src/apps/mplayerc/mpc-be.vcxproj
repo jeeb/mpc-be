@@ -518,6 +518,9 @@
     <ProjectReference Include="..\..\filters\parser\MusePackSplitter\MusePackSplitter.vcxproj">
       <Project>{3ff8d24a-877c-4957-b377-f20a1527f423}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\filters\parser\RAWSplitter\RAWSplitter.vcxproj">
+      <Project>{e73d2ff6-5738-4e17-b895-7d206fba9de2}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\filters\parser\TAKSplitter\TAKSplitter.vcxproj">
       <Project>{0f7d3abb-7ea8-4c94-a72a-58704cc92b14}</Project>
     </ProjectReference>

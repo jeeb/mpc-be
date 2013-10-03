@@ -1916,6 +1916,16 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_source.AddTail(pFGF);
 	}
 
+	if (src[SRC_RAW] || IsPreview) {
+		pFGF = DNew CFGFilterInternal<CRAWSourceFilter>();
+		pFGF->m_chkbytes.AddTail(_T("0,4,,000001B3"));
+		pFGF->m_extensions.AddTail(_T(".mpeg"));
+		pFGF->m_extensions.AddTail(_T(".mpg"));
+		pFGF->m_extensions.AddTail(_T(".m2v"));
+		pFGF->m_extensions.AddTail(_T(".mpv"));
+		m_source.AddTail(pFGF);
+	}
+
 	// hmmm, shouldn't there be an option in the GUI to enable/disable this filter?
 	pFGF = DNew CFGFilterInternal<CAVI2AC3Filter>(AVI2AC3FilterName, MERIT64(0x00680000)+1);
 	pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_WAVE_DOLBY_AC3);
@@ -2077,6 +2087,15 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MPEG2_PROGRAM);
 	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MPEG2_TRANSPORT);
 	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MPEG2_PVA);
+	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
+	m_transform.AddTail(pFGF);
+
+	if (src[SRC_RAW] || IsPreview) {
+		pFGF = DNew CFGFilterInternal<CRAWSplitterFilter>(RAWSplitterName, MERIT64_ABOVE_DSHOW);
+	} else {
+		pFGF = DNew CFGFilterInternal<CRAWSplitterFilter>(LowMerit(RAWSplitterName), MERIT64_DO_USE);
+	}
+	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MPEG1Video);
 	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
 	m_transform.AddTail(pFGF);
 
