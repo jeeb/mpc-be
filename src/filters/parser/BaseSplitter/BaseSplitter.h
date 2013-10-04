@@ -35,6 +35,13 @@
 #include "../../../DSUtil/FontInstaller.h"
 #include "../apps/mplayerc/SettingsDefines.h"
 
+#define MOVE_TO_H264_START_CODE(b, e)	while(b <= e-4 && !((*(DWORD *)b == 0x01000000) || ((*(DWORD *)b & 0x00FFFFFF) == 0x00010000))) b++; if((b <= e-4) && *(DWORD *)b == 0x01000000) b++;
+#define MOVE_TO_AC3_START_CODE(b, e)	while(b <= e-8 && (*(WORD*)b != 0x770b)) b++;
+#define BSWAP32(x)	((x >> 24) & 0x000000ff) | \
+					((x >>  8) & 0x0000ff00) | \
+					((x <<  8) & 0x00ff0000) | \
+					((x << 24) & 0xff000000);
+
 #define PACKET_PTS_DISCONTINUITY		0x0001
 #define PACKET_PTS_VALIDATE_POSITIVE	0x0002
 

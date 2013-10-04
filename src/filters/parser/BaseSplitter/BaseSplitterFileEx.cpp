@@ -1674,50 +1674,41 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt)
 		// Calculate size of extra data
 		int extra = 0;
 		for (int i = 0; i < 4; i++) {
-			if (h.spspps[i].complete)
-				extra += 2+(h.spspps[i].size);
+			if (h.spspps[i].complete) {
+				extra += 2 + (h.spspps[i].size);
+			}
 		}
 
-		pmt->majortype = MEDIATYPE_Video;
-		if (h.spspps[index_subsetsps].complete && !h.spspps[index_sps].complete) {
-			pmt->subtype = FOURCCMap('CVME');  // MVC stream without base view
-		} else if (h.spspps[index_subsetsps].complete && h.spspps[index_sps].complete) {
-			pmt->subtype = FOURCCMap('CVMA');  // MVC stream with base view
-		} else {
-			pmt->subtype = FOURCCMap('1CVA');  // AVC stream
-		}
-		//pmt->subtype = MEDIASUBTYPE_H264;		// TODO : put MEDIASUBTYPE_H264 to support Windows 7 decoder !
-		pmt->formattype = FORMAT_MPEG2_VIDEO;
-		int len = FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + extra;
-		MPEG2VIDEOINFO* vi = (MPEG2VIDEOINFO*)DNew BYTE[len];
-		memset(vi, 0, len);
-		// vi->hdr.dwBitRate = ;
-		vi->hdr.AvgTimePerFrame = h.hdr.AvgTimePerFrame;
-		
 		CSize aspect(h.hdr.width * h.hdr.sar.num, h.hdr.height * h.hdr.sar.den);
 		ReduceDim(aspect);
-
 		if (aspect.cx * 2 < aspect.cy) {
-			delete[] vi;
 			return false;
 		}
 
-		vi->hdr.dwPictAspectRatioX = aspect.cx;
-		vi->hdr.dwPictAspectRatioY = aspect.cy;
+		pmt->majortype				= MEDIATYPE_Video;
+		pmt->formattype				= FORMAT_MPEG2_VIDEO;
+		int len = FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + extra;
+		MPEG2VIDEOINFO* vi			= (MPEG2VIDEOINFO*)DNew BYTE[len];
+		memset(vi, 0, len);
+		// vi->hdr.dwBitRate = ;
+		
+		vi->hdr.AvgTimePerFrame		= h.hdr.AvgTimePerFrame;
+		vi->hdr.dwPictAspectRatioX	= aspect.cx;
+		vi->hdr.dwPictAspectRatioY	= aspect.cy;
 		vi->hdr.bmiHeader.biSize = sizeof(vi->hdr.bmiHeader);
-		vi->hdr.bmiHeader.biWidth = h.hdr.width;
-		vi->hdr.bmiHeader.biHeight = h.hdr.height;
+		vi->hdr.bmiHeader.biWidth	= h.hdr.width;
+		vi->hdr.bmiHeader.biHeight	= h.hdr.height;
 		if (h.spspps[index_subsetsps].complete && !h.spspps[index_sps].complete) {
-			vi->hdr.bmiHeader.biCompression = 'CVME';
+			pmt->subtype			= FOURCCMap(vi->hdr.bmiHeader.biCompression = 'CVME');	// MVC stream without base view
 		} else if (h.spspps[index_subsetsps].complete && h.spspps[index_sps].complete) {
-			vi->hdr.bmiHeader.biCompression = 'CVMA';
+			pmt->subtype			= FOURCCMap(vi->hdr.bmiHeader.biCompression = 'CVMA');	// MVC stream with base view
 		} else {
-			vi->hdr.bmiHeader.biCompression = '1CVA';
+			pmt->subtype			= FOURCCMap(vi->hdr.bmiHeader.biCompression = '1CVA');	// AVC stream
 		}
-		vi->dwProfile = h.hdr.profile;
-		vi->dwFlags = 4; // ?
-		vi->dwLevel = h.hdr.level;
-		vi->cbSequenceHeader = extra;
+		vi->dwProfile				= h.hdr.profile;
+		vi->dwFlags					= 4; // ?
+		vi->dwLevel					= h.hdr.level;
+		vi->cbSequenceHeader		= extra;
 
 		// Copy extra data
 		BYTE* p = (BYTE*)&vi->dwSequenceHeader[0];

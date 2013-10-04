@@ -33,7 +33,8 @@ class __declspec(uuid("486AA463-EE67-4F75-B941-F1FAB217B342"))
 	enum {
 		RAW_NONE,
 		RAW_MPEG1,
-		RAW_MPEG2
+		RAW_MPEG2,
+		RAW_H264
 	} m_RAWType;
 
 	REFERENCE_TIME m_rtStart;
@@ -63,4 +64,22 @@ class __declspec(uuid("E32A3501-04A9-486B-898B-F5A4C8A4AAAC"))
 {
 public:
 	CRAWSourceFilter(LPUNKNOWN pUnk, HRESULT* phr);
+};
+
+class CRAWSplitterOutputPin : public CBaseSplitterOutputPin, protected CCritSec
+{
+	CAutoPtr<Packet> m_p;
+	CAutoPtrList<Packet> m_pl;
+	bool	m_fHasAccessUnitDelimiters;
+	bool	m_bFlushed;
+
+protected:
+	HRESULT DeliverPacket(CAutoPtr<Packet> p);
+	HRESULT DeliverEndFlush();
+
+	HRESULT Flush();
+
+public:
+	CRAWSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
+	virtual ~CRAWSplitterOutputPin();
 };
