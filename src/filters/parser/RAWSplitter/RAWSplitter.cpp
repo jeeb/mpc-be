@@ -54,11 +54,25 @@ int g_cTemplates = _countof(g_Templates);
 
 STDAPI DllRegisterServer()
 {
+	CAtlList<CString> chkbytes;
+	chkbytes.AddTail(_T("0,4,,000001B3"));		// MPEG1/2
+
 	RegisterSourceFilter(
 		CLSID_AsyncReader,
 		MEDIASUBTYPE_MPEG1Video,
-		_T("0,4,,000001B3"),
+		chkbytes,
 		_T(".mpeg"), _T(".mpg"), _T(".m2v"), _T(".mpv"),
+		NULL);
+
+	chkbytes.AddTail(_T("0,5,,0000000109"));	// H.264
+	chkbytes.AddTail(_T("0,4,,0000010F"));		// VC-1
+	chkbytes.AddTail(_T("0,4,,0000010D"));		// VC-1
+
+	RegisterSourceFilter(
+		CLSID_AsyncReader,
+		MEDIASUBTYPE_NULL,
+		chkbytes,
+		_T(".mpeg"), _T(".mpg"), _T(".m2v"), _T(".mpv"), _T(".h264"), _T(".264"), _T(".vc1"),
 		NULL);
 
 	return AMovieDllRegisterServer2(TRUE);
@@ -67,6 +81,7 @@ STDAPI DllRegisterServer()
 STDAPI DllUnregisterServer()
 {
 	UnRegisterSourceFilter(MEDIASUBTYPE_MPEG1Video);
+	UnRegisterSourceFilter(MEDIASUBTYPE_NULL);
 
 	return AMovieDllRegisterServer2(FALSE);
 }
@@ -218,6 +233,25 @@ HRESULT CRAWSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 		
 		}
+
+		if (m_RAWType == RAW_NONE) {
+			BYTE id = 0x00;
+			m_pFile->Seek(0);
+			while (m_pFile->GetPos() < min(5 * MEGABYTE, m_pFile->GetLength()) && m_RAWType == RAW_NONE) {
+				if (!m_pFile->NextMpegStartCode(id)) {
+					continue;
+				}
+
+				if (id == 0x0F) {	// sequence header
+					m_pFile->Seek(m_pFile->GetPos() - 4);
+
+					CBaseSplitterFileEx::vc1hdr h;
+					if (m_pFile->Read(h, 1024, &mt)) {
+						m_RAWType = RAW_VC1;
+					}
+				}
+			}
+		}
 	}
 
 	if (m_RAWType != RAW_NONE) {
@@ -231,6 +265,9 @@ HRESULT CRAWSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				break;
 			case RAW_H264:
 				pName = L"H.264 Video Output";
+				break;
+			case RAW_VC1:
+				pName = L"VC-1 Video Output";
 				break;
 		}
 
@@ -493,6 +530,121 @@ HRESULT CRAWSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 				rtStart	= pPacket->rtStart;
 				rtStop	= pPacket->rtStop;
 			}
+		}
+
+		return S_OK;
+	}
+	// VC1
+	else if (m_mt.subtype == FOURCCMap('1CVW')) {
+		if (!m_p) {
+			m_p.Attach(DNew Packet());
+			m_p->TrackNumber	= p->TrackNumber;
+			m_p->bDiscontinuity	= p->bDiscontinuity;
+			p->bDiscontinuity	= FALSE;
+
+			m_p->bSyncPoint	= p->bSyncPoint;
+			p->bSyncPoint	= FALSE;
+
+			m_p->rtStart	= p->rtStart;
+			p->rtStart		= INVALID_TIME;
+
+			m_p->rtStop	= p->rtStop;
+			p->rtStop	= INVALID_TIME;
+		}
+
+		m_p->Append(*p);
+
+		BYTE* start = m_p->GetData();
+		BYTE* end = start + m_p->GetCount();
+
+		bool bSeqFound = false;
+		while (start <= end-4) {
+			if (*(DWORD*)start == 0x0D010000) {
+				bSeqFound = true;
+				break;
+			} else if (*(DWORD*)start == 0x0F010000) {
+				break;
+			}
+			start++;
+		}
+
+		while (start <= end-4) {
+			BYTE* next = start+1;
+
+			while (next <= end-4) {
+				if (*(DWORD*)next == 0x0D010000) {
+					if (bSeqFound) {
+						break;
+					}
+					bSeqFound = true;
+				} else if (*(DWORD*)next == 0x0F010000) {
+					break;
+				}
+				next++;
+			}
+
+			if (next >= end-4) {
+				break;
+			}
+
+			int size = next - start - 4;
+			UNREFERENCED_PARAMETER(size);
+
+			CAutoPtr<Packet> p2(DNew Packet());
+			p2->TrackNumber		= m_p->TrackNumber;
+			p2->bDiscontinuity	= m_p->bDiscontinuity;
+			m_p->bDiscontinuity	= FALSE;
+
+			p2->bSyncPoint	= m_p->bSyncPoint;
+			m_p->bSyncPoint	= FALSE;
+
+			p2->rtStart		= m_p->rtStart;
+			m_p->rtStart	= INVALID_TIME;
+
+			p2->rtStop		= m_p->rtStop;
+			m_p->rtStop		= INVALID_TIME;
+
+			p2->pmt		= m_p->pmt;
+			m_p->pmt	= NULL;
+
+			p2->SetData(start, next - start);
+
+			if (!p2->pmt && m_bFlushed) {
+				p2->pmt = CreateMediaType(&m_mt);
+				m_bFlushed = false;
+			}
+
+			HRESULT hr = __super::DeliverPacket(p2);
+			if (hr != S_OK) {
+				return hr;
+			}
+
+			if (p->rtStart != INVALID_TIME) {
+				m_p->rtStart = p->rtStart;
+				m_p->rtStop	= p->rtStop;
+				p->rtStart	= INVALID_TIME;
+			}
+			if (p->bDiscontinuity) {
+				m_p->bDiscontinuity	= p->bDiscontinuity;
+				p->bDiscontinuity	= FALSE;
+			}
+			if (p->bSyncPoint) {
+				m_p->bSyncPoint	= p->bSyncPoint;
+				p->bSyncPoint	= FALSE;
+			}
+			if (m_p->pmt) {
+				DeleteMediaType(m_p->pmt);
+			}
+
+			m_p->pmt	= p->pmt;
+			p->pmt		= NULL;
+
+			start		= next;
+			bSeqFound	= (*(DWORD*)start == 0x0D010000);
+		}
+
+		if (start > m_p->GetData()) {
+			m_p->RemoveAt(0, start - m_p->GetData());
 		}
 
 		return S_OK;

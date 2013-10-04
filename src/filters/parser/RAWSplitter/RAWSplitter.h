@@ -34,7 +34,8 @@ class __declspec(uuid("486AA463-EE67-4F75-B941-F1FAB217B342"))
 		RAW_NONE,
 		RAW_MPEG1,
 		RAW_MPEG2,
-		RAW_H264
+		RAW_H264,
+		RAW_VC1
 	} m_RAWType;
 
 	REFERENCE_TIME m_rtStart;

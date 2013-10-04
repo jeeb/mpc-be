@@ -1833,9 +1833,9 @@ bool CBaseSplitterFileEx::Read(vc1hdr& h, int len, CMediaType* pmt)
 
 		}
 
-		Seek(extrapos+4);
-		extralen = 0;
-		int parse = 0; // really need a signed type? may be unsigned will be better
+		Seek(extrapos + 4);
+		extralen	= 0;
+		int parse	= 0; // really need a signed type? may be unsigned will be better
 
 		while (GetPos() < endpos+4 && ((parse == 0x0000010E) || (parse & 0xFFFFFF00) != 0x00000100)) {
 			parse = (parse<<8) | (int)BitRead(8);
@@ -1843,7 +1843,7 @@ bool CBaseSplitterFileEx::Read(vc1hdr& h, int len, CMediaType* pmt)
 		}
 	}
 
-	if (!extrapos || !extralen) {
+	if (!extralen) {
 		return false;
 	}
 
@@ -1852,28 +1852,32 @@ bool CBaseSplitterFileEx::Read(vc1hdr& h, int len, CMediaType* pmt)
 	}
 
 	{
-		pmt->majortype = MEDIATYPE_Video;
-		pmt->subtype = FOURCCMap('1CVW');
-		pmt->formattype = FORMAT_VIDEOINFO2;
-		int vi_len = sizeof(VIDEOINFOHEADER2) + (int)extralen + 1;
-		VIDEOINFOHEADER2* vi = (VIDEOINFOHEADER2*)DNew BYTE[vi_len];
-		memset(vi, 0, vi_len);
-		vi->AvgTimePerFrame = (10000000I64*nFrameRateNum)/nFrameRateDen;
-
-		if (!h.sar.num) h.sar.num = 1;
-		if (!h.sar.den) h.sar.den = 1;
+		if (!h.sar.num) {
+			h.sar.num = 1;
+		}
+		if (!h.sar.den) {
+			h.sar.den = 1;
+		}
 		CSize aspect = CSize(h.width * h.sar.num, h.height * h.sar.den);
 		if (h.width == h.sar.num && h.height == h.sar.den) {
 			aspect = CSize(h.width, h.height);
 		}
 		ReduceDim(aspect);
 
-		vi->dwPictAspectRatioX = aspect.cx;
-		vi->dwPictAspectRatioY = aspect.cy;
-		vi->bmiHeader.biSize = sizeof(vi->bmiHeader);
-		vi->bmiHeader.biWidth = h.width;
-		vi->bmiHeader.biHeight = h.height;
-		vi->bmiHeader.biCompression = '1CVW';
+		pmt->majortype				= MEDIATYPE_Video;
+		pmt->subtype				= FOURCCMap('1CVW');
+		pmt->formattype				= FORMAT_VIDEOINFO2;
+		int vi_len					= sizeof(VIDEOINFOHEADER2) + (int)extralen + 1;
+		VIDEOINFOHEADER2* vi		= (VIDEOINFOHEADER2*)DNew BYTE[vi_len];
+		memset(vi, 0, vi_len);
+		vi->AvgTimePerFrame			= (10000000I64*nFrameRateNum)/nFrameRateDen;
+
+		vi->dwPictAspectRatioX		= aspect.cx;
+		vi->dwPictAspectRatioY		= aspect.cy;
+		vi->bmiHeader.biSize		= sizeof(vi->bmiHeader);
+		vi->bmiHeader.biWidth		= h.width;
+		vi->bmiHeader.biHeight		= h.height;
+		vi->bmiHeader.biCompression	= '1CVW';
 		BYTE* p = (BYTE*)vi + sizeof(VIDEOINFOHEADER2);
 		*p++ = 0;
 		Seek(extrapos);
