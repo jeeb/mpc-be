@@ -314,8 +314,7 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 		}
 		
 		for (int i = 0; i < m_lstSwOutputFormats.GetCount(); i++) {
-			int k = m_lstSwOutputFormats.GetItemData(i);
-			if (k / 10 != i || k % 10 != m_lstSwOutputFormats.GetCheck(k)) {
+			if (i * 10 + m_lstSwOutputFormats.GetCheck(i) != m_lstSwOutputFormats.GetItemData(i)) {
 				refresh = 2; // hard refresh - signal new output format
 				break;
 			}
