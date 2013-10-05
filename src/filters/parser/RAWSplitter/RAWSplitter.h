@@ -27,6 +27,8 @@
 #define RAWSplitterName L"MPC RAW Splitter"
 #define RAWSourceName   L"MPC RAW Source"
 
+#define ENABLE_YUV4MPEG2 0
+
 class __declspec(uuid("486AA463-EE67-4F75-B941-F1FAB217B342"))
 	CRAWSplitterFilter : public CBaseSplitterFilter
 {
@@ -35,9 +37,14 @@ class __declspec(uuid("486AA463-EE67-4F75-B941-F1FAB217B342"))
 		RAW_MPEG1,
 		RAW_MPEG2,
 		RAW_H264,
-		RAW_VC1
+		RAW_VC1,
+#if ENABLE_YUV4MPEG2
+		RAW_Y4M
+#endif
 	} m_RAWType;
 
+	__int64 m_startpos;
+	int     m_framelen;
 	REFERENCE_TIME m_rtStart;
 	REFERENCE_TIME m_AvgTimePerFrame;
 

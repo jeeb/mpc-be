@@ -1933,6 +1933,10 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->m_chkbytes.AddTail(_T("0,4,,0000010F"));
 		pFGF->m_chkbytes.AddTail(_T("0,4,,0000010D"));
 		pFGF->m_extensions.AddTail(_T(".vc1"));
+#if ENABLE_YUV4MPEG2
+		// YUV4MPEG2
+		pFGF->m_chkbytes.AddTail(_T("0,9,,595556344D50454732"));
+#endif
 	}
 
 	// hmmm, shouldn't there be an option in the GUI to enable/disable this filter?
