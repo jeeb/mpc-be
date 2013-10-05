@@ -95,7 +95,7 @@ CFilterApp theApp;
 #endif
 
 #if ENABLE_YUV4MPEG2
-const BYTE FRAME_[6] = {'F','R','A','M','E',0x0A};
+static const BYTE FRAME_[6] = {'F','R','A','M','E',0x0A};
 #endif
 
 //
@@ -106,7 +106,7 @@ CRawVideoSplitterFilter::CRawVideoSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("CRawVideoSplitterFilter"), pUnk, phr, __uuidof(this))
 	, m_RAWType(RAW_NONE)
 	, m_startpos(0)
-	, m_framelen(0)
+	, m_framesize(0)
 	, m_rtStart(0)
 	, m_AvgTimePerFrame(0)
 {
@@ -161,25 +161,29 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	{
 #if ENABLE_YUV4MPEG2
 		{
-			const BYTE YUV4MPEG2_[10] = {'Y','U','V','4','M','P','E','G','2',0x20};
+			static const BYTE YUV4MPEG2_[10] = {'Y','U','V','4','M','P','E','G','2',0x20};
 			BYTE buf[256];
-			if (m_pFile->ByteRead(buf, 10) == S_OK && memcmp(buf, YUV4MPEG2_, 10) == 0 && m_pFile->ByteRead(buf, 255) == S_OK) {
-				buf[255] = 0;
-				CStringA params = CStringA(buf);
+			buf[255] = 0;
+			if (m_pFile->ByteRead(buf, 255) == S_OK && memcmp(buf, YUV4MPEG2_, sizeof(YUV4MPEG2_)) == 0) {
+				CStringA params = CStringA(buf + sizeof(YUV4MPEG2_));
 				params.Truncate(params.Find(0x0A));
 
-				int   width  = 0;
-				int   height = 0;
-				int   fpsnum = 24;
-				int   fpsden = 1;
-				int   sar_x  = 1;
-				int   sar_y  = 1;
-				WORD  bpp    = 0;
-				DWORD interl = 0;
-				FOURCC fourcc;
+				int firstframepos = sizeof(YUV4MPEG2_) + params.GetLength() + 1;
+				if (firstframepos + sizeof(FRAME_) > 255 || memcmp(buf + firstframepos, FRAME_, sizeof(FRAME_)) != 0) {
+					return E_FAIL; // incorrect or unsuppurted YUV4MPEG2 file
+				}
+
+				int    width  = 0;
+				int    height = 0;
+				int    fpsnum = 24;
+				int    fpsden = 1;
+				int    sar_x  = 1;
+				int    sar_y  = 1;
+				FOURCC fourcc = FCC('YV12'); // '420jpeg' by default
+				WORD   bpp    = 12;
+				DWORD  interl = 0; // 
 
 				int k;
-
 				CAtlList<CStringA> sl;
 				Explode(params, sl, 0x20);
 				POSITION pos = sl.GetHeadPosition();
@@ -197,8 +201,8 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							break;
 						case 'F':
 							k = str.Find(':');
-							fpsnum = atoi(str.Mid(1, k-1));
-							fpsden = atoi(str.Mid(k+1));
+							fpsnum = atoi(str.Mid(1, k - 1));
+							fpsden = atoi(str.Mid(k + 1));
 							break;
 						case 'I':
 							if (str.GetLength() == 2) {
@@ -212,8 +216,11 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							break;
 						case 'A':
 							k = str.Find(':');
-							sar_x = atoi(str.Mid(1, k-1));
-							sar_y = atoi(str.Mid(k+1));
+							sar_x = atoi(str.Mid(1, k - 1));
+							sar_y = atoi(str.Mid(k + 1));
+							if (sar_x <= 0 || sar_y <= 0) { // if 'A0:0' = unknown or bad value
+								sar_x = sar_y = 1; // then force 'A1:1' = square pixels
+							}
 							break;
 						case 'C':
 							str = str.Mid(1);
@@ -254,43 +261,45 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 				}
 
-				int frame_length = width * height * bpp / 8;
-				if (frame_length && fpsnum && fpsden && sar_x && sar_y) {
-					m_RAWType = RAW_Y4M;
-					m_startpos = 10 + params.GetLength() + 1;
-					m_framelen = frame_length;
-
-					mt.majortype  = MEDIATYPE_Video;
-					mt.subtype    = FOURCCMap(fourcc);
-					mt.formattype = FORMAT_VIDEOINFO2;
-
-					VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2));
-
-					memset(vih2, 0, sizeof(VIDEOINFOHEADER2));
-
-					vih2->bmiHeader.biSize        = sizeof(vih2->bmiHeader);
-					vih2->bmiHeader.biWidth       = width;
-					vih2->bmiHeader.biHeight      = -height;
-					vih2->bmiHeader.biPlanes      = 1;
-					vih2->bmiHeader.biBitCount    = bpp;
-					vih2->bmiHeader.biCompression = fourcc;
-					vih2->bmiHeader.biSizeImage   = frame_length;
-					vih2->rcSource = vih2->rcTarget = CRect(0, 0, width, height);
-					//vih2->dwBitRate      = frame_length * 8 * fpsnum / fpsden;
-					vih2->AvgTimePerFrame  = 10000000i64 * fpsden / fpsnum;
-					// always tell DirectShow it's interlaced (progressive flags set in IMediaSample struct)
-					vih2->dwInterlaceFlags = AMINTERLACE_IsInterlaced | AMINTERLACE_DisplayModeBobOrWeave;
-
-					sar_x *= width;
-					sar_y *= height;
-					ReduceDim(sar_x, sar_y);
-					vih2->dwPictAspectRatioX = sar_x;
-					vih2->dwPictAspectRatioY = sar_y;
-
-					m_AvgTimePerFrame = vih2->AvgTimePerFrame;
-					m_rtDuration      = (m_pFile->GetLength() - m_startpos) / (6 + m_framelen) * 10000000i64 * fpsden / fpsnum;
-					mt.SetSampleSize(m_framelen);
+				if (width <= 0 || height <= 0 || fpsnum <= 0 || fpsden <= 0) {
+					return E_FAIL; // incorrect YUV4MPEG2 file
 				}
+
+				m_RAWType   = RAW_Y4M;
+				m_startpos  = firstframepos;
+				m_framesize = width * height * bpp / 8;
+
+				mt.majortype  = MEDIATYPE_Video;
+				mt.subtype    = FOURCCMap(fourcc);
+				mt.formattype = FORMAT_VIDEOINFO2;
+
+				VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2));
+
+				memset(vih2, 0, sizeof(VIDEOINFOHEADER2));
+
+				vih2->bmiHeader.biSize        = sizeof(vih2->bmiHeader);
+				vih2->bmiHeader.biWidth       = width;
+				vih2->bmiHeader.biHeight      = -height;
+				vih2->bmiHeader.biPlanes      = 1;
+				vih2->bmiHeader.biBitCount    = bpp;
+				vih2->bmiHeader.biCompression = fourcc;
+				vih2->bmiHeader.biSizeImage   = m_framesize;
+				vih2->rcSource = vih2->rcTarget = CRect(0, 0, width, height);
+				//vih2->dwBitRate      = m_framesize * 8 * fpsnum / fpsden;
+				vih2->AvgTimePerFrame  = 10000000i64 * fpsden / fpsnum;
+				// always tell DirectShow it's interlaced (progressive flags set in IMediaSample struct)
+				vih2->dwInterlaceFlags = AMINTERLACE_IsInterlaced | AMINTERLACE_DisplayModeBobOrWeave;
+
+				sar_x *= width;
+				sar_y *= height;
+				ReduceDim(sar_x, sar_y);
+				vih2->dwPictAspectRatioX = sar_x;
+				vih2->dwPictAspectRatioY = sar_y;
+
+				m_AvgTimePerFrame = vih2->AvgTimePerFrame;
+				m_rtDuration      = (m_pFile->GetLength() - m_startpos) / (sizeof(FRAME_) + m_framesize) * 10000000i64 * fpsden / fpsnum;
+				mt.SetSampleSize(m_framesize);
+				
 			}
 		}
 #endif
@@ -446,7 +455,7 @@ void CRawVideoSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 			m_rtStart = 0;
 		} else {
 			__int64 framenum = m_rtDuration / m_AvgTimePerFrame;
-			m_pFile->Seek(m_startpos + framenum * (6 + m_framelen));
+			m_pFile->Seek(m_startpos + framenum * (sizeof(FRAME_) + m_framesize));
 			m_rtStart = framenum * m_AvgTimePerFrame;
 		}
 		return;
@@ -471,14 +480,14 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 
 #if ENABLE_YUV4MPEG2
 		if (m_RAWType == RAW_Y4M) {
-			BYTE buf[6];
-			if (m_pFile->ByteRead(buf, 6) != S_OK || memcmp(buf, FRAME_, 6) != 0) {
+			BYTE buf[sizeof(FRAME_)];
+			if (m_pFile->ByteRead(buf, sizeof(FRAME_)) != S_OK || memcmp(buf, FRAME_, sizeof(FRAME_)) != 0) {
 				ASSERT(0);
 			}
-			__int64 framenum = (m_pFile->GetPos() - m_startpos) / (6 + m_framelen);
+			__int64 framenum = (m_pFile->GetPos() - m_startpos) / (sizeof(FRAME_) + m_framesize);
 
-			p->SetCount(m_framelen);
-			m_pFile->ByteRead(p->GetData(), m_framelen);
+			p->SetCount(m_framesize);
+			m_pFile->ByteRead(p->GetData(), m_framesize);
 			
 			p->TrackNumber = 0;
 			p->rtStart     = framenum * m_AvgTimePerFrame;
