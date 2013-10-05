@@ -545,7 +545,7 @@
       <Private>false</Private>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\filters\parser\RAWSplitter\RAWSplitter_2012.vcxproj">
+    <ProjectReference Include="..\..\filters\parser\RawVideoSplitter\RawVideoSplitter_2012.vcxproj">
       <Project>{e73d2ff6-5738-4e17-b895-7d206fba9de2}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\filters\parser\TAKSplitter\TAKSplitter_2012.vcxproj">

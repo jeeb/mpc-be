@@ -1917,7 +1917,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	}
 
 	if (src[SRC_RAW] || IsPreview) {
-		pFGF = DNew CFGFilterInternal<CRAWSourceFilter>();
+		pFGF = DNew CFGFilterInternal<CRawVideoSourceFilter>();
 		// MPEG1/2
 		pFGF->m_chkbytes.AddTail(_T("0,4,,000001B3"));
 		pFGF->m_extensions.AddTail(_T(".mpeg"));
@@ -2104,9 +2104,9 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	m_transform.AddTail(pFGF);
 
 	if (src[SRC_RAW] || IsPreview) {
-		pFGF = DNew CFGFilterInternal<CRAWSplitterFilter>(RAWSplitterName, MERIT64_ABOVE_DSHOW);
+		pFGF = DNew CFGFilterInternal<CRawVideoSplitterFilter>(RawVideoSplitterName, MERIT64_ABOVE_DSHOW);
 	} else {
-		pFGF = DNew CFGFilterInternal<CRAWSplitterFilter>(LowMerit(RAWSplitterName), MERIT64_DO_USE);
+		pFGF = DNew CFGFilterInternal<CRawVideoSplitterFilter>(LowMerit(RawVideoSplitterName), MERIT64_DO_USE);
 	}
 	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MPEG1Video);
 	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);

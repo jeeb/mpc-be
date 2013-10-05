@@ -36,9 +36,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E73D2FF6-5738-4E17-B895-7D206FBA9DE2}</ProjectGuid>
-    <RootNamespace>RAWSplitter</RootNamespace>
+    <RootNamespace>RawVideoSplitter</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <ProjectName>RAWSplitter</ProjectName>
+    <ProjectName>RawVideoSplitter</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="..\..\..\platform.props" />
@@ -155,7 +155,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>RAWSplitter.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>RawVideoSplitter.def</ModuleDefinitionFile>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -167,7 +167,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>RAWSplitter.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>RawVideoSplitter.def</ModuleDefinitionFile>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -179,7 +179,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>RAWSplitter.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>RawVideoSplitter.def</ModuleDefinitionFile>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -191,30 +191,30 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>RAWSplitter.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>RawVideoSplitter.def</ModuleDefinitionFile>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="RAWSplitter.cpp" />
+    <ClCompile Include="RawVideoSplitter.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="RAWSplitter.def" />
+    <None Include="RawVideoSplitter.def" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="RAWSplitter.h" />
+    <ClInclude Include="RawVideoSplitter.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="RAWSplitter.rc">
+    <ResourceCompile Include="RawVideoSplitter.rc">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ResourceCompile>
   </ItemGroup>

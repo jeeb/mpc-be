@@ -174,7 +174,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AudioTools", "src\AudioTool
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TAKSplitter", "src\filters\parser\TAKSplitter\TAKSplitter.vcxproj", "{0F7D3ABB-7EA8-4C94-A72A-58704CC92B14}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RAWSplitter", "src\filters\parser\RAWSplitter\RAWSplitter.vcxproj", "{E73D2FF6-5738-4E17-B895-7D206FBA9DE2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RawVideoSplitter", "src\filters\parser\RawVideoSplitter\RawVideoSplitter.vcxproj", "{E73D2FF6-5738-4E17-B895-7D206FBA9DE2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

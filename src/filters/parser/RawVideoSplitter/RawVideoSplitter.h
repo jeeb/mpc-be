@@ -24,13 +24,13 @@
 
 #include "../BaseSplitter/BaseSplitter.h"
 
-#define RAWSplitterName L"MPC RAW Splitter"
-#define RAWSourceName   L"MPC RAW Source"
+#define RawVideoSplitterName L"MPC RAW Video Splitter"
+#define RawVideoSourceName   L"MPC RAW Video Source"
 
 #define ENABLE_YUV4MPEG2 0
 
 class __declspec(uuid("486AA463-EE67-4F75-B941-F1FAB217B342"))
-	CRAWSplitterFilter : public CBaseSplitterFilter
+	CRawVideoSplitterFilter : public CBaseSplitterFilter
 {
 	enum {
 		RAW_NONE,
@@ -57,7 +57,7 @@ protected:
 	bool DemuxLoop();
 
 public:
-	CRAWSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr);
+	CRawVideoSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr);
 
 	DECLARE_IUNKNOWN
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
@@ -68,13 +68,13 @@ public:
 };
 
 class __declspec(uuid("E32A3501-04A9-486B-898B-F5A4C8A4AAAC"))
-	CRAWSourceFilter : public CRAWSplitterFilter
+	CRawVideoSourceFilter : public CRawVideoSplitterFilter
 {
 public:
-	CRAWSourceFilter(LPUNKNOWN pUnk, HRESULT* phr);
+	CRawVideoSourceFilter(LPUNKNOWN pUnk, HRESULT* phr);
 };
 
-class CRAWSplitterOutputPin : public CBaseSplitterOutputPin, protected CCritSec
+class CRawVideoOutputPin : public CBaseSplitterOutputPin, protected CCritSec
 {
 	CAutoPtr<Packet> m_p;
 	CAutoPtrList<Packet> m_pl;
@@ -88,6 +88,6 @@ protected:
 	HRESULT Flush();
 
 public:
-	CRAWSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
-	virtual ~CRAWSplitterOutputPin();
+	CRawVideoOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
+	virtual ~CRawVideoOutputPin();
 };

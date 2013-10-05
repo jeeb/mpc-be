@@ -25,7 +25,7 @@
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
 #endif
-#include "RAWSplitter.h"
+#include "RawVideoSplitter.h"
 #include <moreuuids.h>
 
 #ifndef FCC
@@ -48,13 +48,13 @@ const AMOVIESETUP_PIN sudpPins[] = {
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
-	{&__uuidof(CRAWSplitterFilter), RAWSplitterName, MERIT_NORMAL+1, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
-	{&__uuidof(CRAWSourceFilter), RAWSourceName, MERIT_NORMAL+1, 0, NULL, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CRawVideoSplitterFilter), RawVideoSplitterName, MERIT_NORMAL+1, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CRawVideoSourceFilter), RawVideoSourceName, MERIT_NORMAL+1, 0, NULL, CLSID_LegacyAmFilterCategory},
 };
 
 CFactoryTemplate g_Templates[] = {
-	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CRAWSplitterFilter>, NULL, &sudFilter[0]},
-	{sudFilter[1].strName, sudFilter[1].clsID, CreateInstance<CRAWSourceFilter>, NULL, &sudFilter[1]},
+	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CRawVideoSplitterFilter>, NULL, &sudFilter[0]},
+	{sudFilter[1].strName, sudFilter[1].clsID, CreateInstance<CRawVideoSourceFilter>, NULL, &sudFilter[1]},
 };
 
 int g_cTemplates = _countof(g_Templates);
@@ -99,11 +99,11 @@ const BYTE FRAME_[6] = {'F','R','A','M','E',0x0A};
 #endif
 
 //
-// CRAWSplitterFilter
+// CRawVideoSplitterFilter
 //
 
-CRAWSplitterFilter::CRAWSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
-	: CBaseSplitterFilter(NAME("CRAWSplitterFilter"), pUnk, phr, __uuidof(this))
+CRawVideoSplitterFilter::CRawVideoSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
+	: CBaseSplitterFilter(NAME("CRawVideoSplitterFilter"), pUnk, phr, __uuidof(this))
 	, m_RAWType(RAW_NONE)
 	, m_startpos(0)
 	, m_framelen(0)
@@ -112,7 +112,7 @@ CRAWSplitterFilter::CRAWSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 {
 }
 
-STDMETHODIMP CRAWSplitterFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
+STDMETHODIMP CRawVideoSplitterFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {
 	CheckPointer(ppv, E_POINTER);
 
@@ -120,7 +120,7 @@ STDMETHODIMP CRAWSplitterFilter::NonDelegatingQueryInterface(REFIID riid, void**
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
 
-STDMETHODIMP CRAWSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
+STDMETHODIMP CRawVideoSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 {
 	CheckPointer(pInfo, E_POINTER);
 	ValidateReadWritePtr(pInfo, sizeof(FILTER_INFO));
@@ -128,7 +128,7 @@ STDMETHODIMP CRAWSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 	if (m_pName && m_pName[0]==L'M' && m_pName[1]==L'P' && m_pName[2]==L'C') {
 		(void)StringCchCopyW(pInfo->achName, NUMELMS(pInfo->achName), m_pName);
 	} else {
-		wcscpy_s(pInfo->achName, RAWSourceName);
+		wcscpy_s(pInfo->achName, RawVideoSourceName);
 	}
 	pInfo->pGraph = m_pGraph;
 	if (m_pGraph) {
@@ -138,7 +138,7 @@ STDMETHODIMP CRAWSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 	return S_OK;
 }
 
-HRESULT CRAWSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
+HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 {
 	CheckPointer(pAsyncReader, E_POINTER);
 
@@ -418,16 +418,16 @@ HRESULT CRAWSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		CAtlArray<CMediaType> mts;
 		mts.Add(mt);
-		CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CRAWSplitterOutputPin(mts, pName, this, this, &hr));
+		CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CRawVideoOutputPin(mts, pName, this, this, &hr));
 		EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(0, pPinOut)));
 	}
 
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
 }
 
-bool CRAWSplitterFilter::DemuxInit()
+bool CRawVideoSplitterFilter::DemuxInit()
 {
-	SetThreadName((DWORD)-1, "CRAWSplitterFilter");
+	SetThreadName((DWORD)-1, "CRawVideoSplitterFilter");
 	if (!m_pFile) {
 		return false;
 	}
@@ -437,7 +437,7 @@ bool CRAWSplitterFilter::DemuxInit()
 	return true;
 }
 
-void CRAWSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
+void CRawVideoSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
 #if ENABLE_YUV4MPEG2
 	if (m_RAWType == RAW_Y4M) {
@@ -462,7 +462,7 @@ void CRAWSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	}
 }
 
-bool CRAWSplitterFilter::DemuxLoop()
+bool CRawVideoSplitterFilter::DemuxLoop()
 {
 	HRESULT hr = S_OK;
 	
@@ -507,11 +507,11 @@ bool CRAWSplitterFilter::DemuxLoop()
 }
 
 //
-// CRAWSourceFilter
+// CRawVideoSourceFilter
 //
 
-CRAWSourceFilter::CRAWSourceFilter(LPUNKNOWN pUnk, HRESULT* phr)
-	: CRAWSplitterFilter(pUnk, phr)
+CRawVideoSourceFilter::CRawVideoSourceFilter(LPUNKNOWN pUnk, HRESULT* phr)
+	: CRawVideoSplitterFilter(pUnk, phr)
 {
 	m_clsid = __uuidof(this);
 	m_pInput.Free();
@@ -521,18 +521,18 @@ CRAWSourceFilter::CRAWSourceFilter(LPUNKNOWN pUnk, HRESULT* phr)
 // CMpegSplitterOutputPin
 //
 
-CRAWSplitterOutputPin::CRAWSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
+CRawVideoOutputPin::CRawVideoOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr)
 	, m_fHasAccessUnitDelimiters(false)
 {
 }
 
-CRAWSplitterOutputPin::~CRAWSplitterOutputPin()
+CRawVideoOutputPin::~CRawVideoOutputPin()
 {
 	Flush();
 }
 
-HRESULT CRAWSplitterOutputPin::Flush()
+HRESULT CRawVideoOutputPin::Flush()
 {
 	CAutoLock cAutoLock(this);
 
@@ -544,7 +544,7 @@ HRESULT CRAWSplitterOutputPin::Flush()
 	return S_OK;
 }
 
-HRESULT CRAWSplitterOutputPin::DeliverEndFlush()
+HRESULT CRawVideoOutputPin::DeliverEndFlush()
 {
 	CAutoLock cAutoLock(this);
 
@@ -553,7 +553,7 @@ HRESULT CRAWSplitterOutputPin::DeliverEndFlush()
 	return __super::DeliverEndFlush();
 }
 
-HRESULT CRAWSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
+HRESULT CRawVideoOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 {
 	CAutoLock cAutoLock(this);
 
