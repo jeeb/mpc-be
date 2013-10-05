@@ -658,20 +658,20 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 	pmt->subtype = *fmts[iPosition/2].subtype;
 
 	int w = m_win, h = m_hin, arx = m_arxin, ary = m_aryin;
-	int RealWidth = -1;
+	int RealWidth  = -1;
 	int RealHeight = -1;
 	int vsfilter = 0;
 	GetOutputSize(w, h, arx, ary, RealWidth, RealHeight, vsfilter);
 
 	BITMAPINFOHEADER bihOut;
 	memset(&bihOut, 0, sizeof(bihOut));
-	bihOut.biSize = sizeof(bihOut);
-	bihOut.biWidth = w;
-	bihOut.biHeight = h;
-	bihOut.biPlanes = fmts[iPosition/2].biPlanes;
-	bihOut.biBitCount = fmts[iPosition/2].biBitCount;
+	bihOut.biSize        = sizeof(bihOut);
+	bihOut.biWidth       = w;
+	bihOut.biHeight      = h;
+	bihOut.biPlanes      = fmts[iPosition/2].biPlanes;
+	bihOut.biBitCount    = fmts[iPosition/2].biBitCount;
 	bihOut.biCompression = fmts[iPosition/2].biCompression;
-	bihOut.biSizeImage = w*h*bihOut.biBitCount>>3;
+	bihOut.biSizeImage   = w * h * bihOut.biBitCount>>3;
 
 	if (iPosition&1) {
 		pmt->formattype = FORMAT_VideoInfo;
@@ -682,13 +682,13 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 		vih->bmiHeader.biYPelsPerMeter = vih->bmiHeader.biHeight * arx;
 	} else {
 		pmt->formattype = FORMAT_VideoInfo2;
-		VIDEOINFOHEADER2* vih = (VIDEOINFOHEADER2*)pmt->AllocFormatBuffer(sizeof(VIDEOINFOHEADER2));
-		memset(vih, 0, sizeof(VIDEOINFOHEADER2));
-		vih->bmiHeader = bihOut;
-		vih->dwPictAspectRatioX = arx;
-		vih->dwPictAspectRatioY = ary;
+		VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)pmt->AllocFormatBuffer(sizeof(VIDEOINFOHEADER2));
+		memset(vih2, 0, sizeof(VIDEOINFOHEADER2));
+		vih2->bmiHeader = bihOut;
+		vih2->dwPictAspectRatioX = arx;
+		vih2->dwPictAspectRatioY = ary;
 		if (IsVideoInterlaced()) {
-			vih->dwInterlaceFlags = AMINTERLACE_IsInterlaced | AMINTERLACE_DisplayModeBobOrWeave;
+			vih2->dwInterlaceFlags = AMINTERLACE_IsInterlaced | AMINTERLACE_DisplayModeBobOrWeave;
 		}
 	}
 
@@ -696,8 +696,8 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 
 	// these fields have the same field offset in all four structs
 	((VIDEOINFOHEADER*)pmt->Format())->AvgTimePerFrame = ((VIDEOINFOHEADER*)mt.Format())->AvgTimePerFrame;
-	((VIDEOINFOHEADER*)pmt->Format())->dwBitRate = ((VIDEOINFOHEADER*)mt.Format())->dwBitRate;
-	((VIDEOINFOHEADER*)pmt->Format())->dwBitErrorRate = ((VIDEOINFOHEADER*)mt.Format())->dwBitErrorRate;
+	((VIDEOINFOHEADER*)pmt->Format())->dwBitRate       = ((VIDEOINFOHEADER*)mt.Format())->dwBitRate;
+	((VIDEOINFOHEADER*)pmt->Format())->dwBitErrorRate  = ((VIDEOINFOHEADER*)mt.Format())->dwBitErrorRate;
 
 	CorrectMediaType(pmt);
 

@@ -265,12 +265,17 @@ inline int LNKO(int a, int b)
 	return a;
 }
 
+inline void ReduceDim(LONG& a, LONG& b)
+{
+	int lnko = LNKO(a, b);
+	if (lnko > 1) {
+		a /= lnko, b /= lnko;
+	}
+}
+
 inline void ReduceDim(SIZE &dim)
 {
-	int lnko = LNKO(dim.cx, dim.cy);
-	if (lnko > 1) {
-		dim.cx /= lnko, dim.cy /= lnko;
-	}
+	ReduceDim(dim.cx, dim.cy);
 }
 
 #ifndef uint8
