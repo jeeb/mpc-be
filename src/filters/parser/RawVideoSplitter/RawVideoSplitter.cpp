@@ -179,7 +179,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				int    fpsden = 1;
 				int    sar_x  = 1;
 				int    sar_y  = 1;
-				FOURCC fourcc = FCC('YV12'); // '420jpeg' by default
+				FOURCC fourcc = FCC('I420'); // '420jpeg' by default
 				WORD   bpp    = 12;
 				DWORD  interl = 0; // 
 
@@ -225,35 +225,43 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						case 'C':
 							str = str.Mid(1);
 							// 4:2:0
-							if (str == "420" || "420jpeg" || "420mpeg2" || "420paldv") {
-								fourcc = FCC('YV12'); // AV_PIX_FMT_YUV420P
+							if (str == "420jpeg") {
+								fourcc = FCC('I420');
+								bpp    = 12;
+							}
+							else if (str == "420" || str == "420mpeg2" || str == "420paldv") {
+								fourcc = FCC('YV12');
 								bpp    = 12;
 							}
 							else if (str == "420p10") {
-								fourcc = FCC('P010'); // AV_PIX_FMT_YUV420P10
+								fourcc = FCC('P010');
 								bpp    = 15;
 							}
 							else if (str == "420p16") {
-								fourcc = FCC('P016'); // AV_PIX_FMT_YUV420P16
+								fourcc = FCC('P016');
 								bpp    = 24;
 							}
 							// 4:2:2
 							else if (str == "422") {
-								fourcc = FCC('YV16'); // AV_PIX_FMT_YUV422P
+								fourcc = FCC('YV16');
 								bpp    = 16;
 							}
 							else if (str == "422p10") {
-								fourcc = FCC('P210'); // AV_PIX_FMT_YUV422P10
+								fourcc = FCC('P210');
 								bpp    = 20;
 							}
 							else if (str == "422p16") {
-								fourcc = FCC('P216'); // AV_PIX_FMT_YUV422P16
+								fourcc = FCC('P216');
 								bpp    = 32;
 							}
 							// 4:4:4
 							else if (str == "444") {
-								fourcc = FCC('YV24'); // AV_PIX_FMT_YUV444P
+								fourcc = FCC('YV24');
 								bpp    = 24;
+							}
+							else { // unsuppurted colour space 
+								fourcc = 0;
+								bpp    = 0;
 							}
 							break;
 						//case 'X':
@@ -261,8 +269,8 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 				}
 
-				if (width <= 0 || height <= 0 || fpsnum <= 0 || fpsden <= 0) {
-					return E_FAIL; // incorrect YUV4MPEG2 file
+				if (width <= 0 || height <= 0 || fpsnum <= 0 || fpsden <= 0 || fourcc == 0) {
+					return E_FAIL; // incorrect or unsuppurted YUV4MPEG2 file
 				}
 
 				m_RAWType   = RAW_Y4M;
@@ -279,12 +287,12 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 				vih2->bmiHeader.biSize        = sizeof(vih2->bmiHeader);
 				vih2->bmiHeader.biWidth       = width;
-				vih2->bmiHeader.biHeight      = -height;
+				vih2->bmiHeader.biHeight      = height;
 				vih2->bmiHeader.biPlanes      = 1;
 				vih2->bmiHeader.biBitCount    = bpp;
 				vih2->bmiHeader.biCompression = fourcc;
 				vih2->bmiHeader.biSizeImage   = m_framesize;
-				vih2->rcSource = vih2->rcTarget = CRect(0, 0, width, height);
+				//vih2->rcSource = vih2->rcTarget = CRect(0, 0, width, height);
 				//vih2->dwBitRate      = m_framesize * 8 * fpsnum / fpsden;
 				vih2->AvgTimePerFrame  = 10000000i64 * fpsden / fpsnum;
 				// always tell DirectShow it's interlaced (progressive flags set in IMediaSample struct)
