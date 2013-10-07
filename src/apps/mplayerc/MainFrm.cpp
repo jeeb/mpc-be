@@ -5307,7 +5307,6 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 			dir.ReleaseBufferSetLength(GetCurrentDirectory(_MAX_PATH, dir.GetBuffer(_MAX_PATH)));
 
 			GetCDROMType(dir[0], sl);
-
 			for (TCHAR drive = 'C'; sl.IsEmpty() && drive <= 'Z'; drive++) {
 				GetCDROMType(drive, sl);
 			}
@@ -5527,10 +5526,13 @@ void CMainFrame::OnFileOpenCD(UINT nID)
 	for (TCHAR drive = 'C'; drive <= 'Z'; drive++) {
 		CAtlList<CString> sl;
 
-		switch (GetCDROMType(drive, sl)) {
+		cdrom_t CDRom_t = GetCDROMType(drive, sl);
+
+		switch (CDRom_t) {
 			case CDROM_Audio:
 			case CDROM_VideoCD:
 			case CDROM_DVDVideo:
+			case CDROM_BDVideo:
 				nID--;
 				break;
 			default:
@@ -5540,12 +5542,16 @@ void CMainFrame::OnFileOpenCD(UINT nID)
 		if (nID == 0) {
 			SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 			SetForegroundWindow();
-
 			ShowWindow(SW_SHOW);
 
-			//ShowControlBar(&m_wndPlaylistBar, TRUE, TRUE); // why open playlist ???
-			m_wndPlaylistBar.Open(sl, true);
+			m_bIsBDPlay = FALSE;
+			if (CDRom_t == CDROM_BDVideo && sl.GetCount() == 1) {
+				if (OpenBD(sl.GetHead())) {
+					return;
+				}
+			}
 
+			m_wndPlaylistBar.Open(sl, true);
 			OpenCurPlaylistItem();
 
 			break;
@@ -15307,34 +15313,41 @@ void CMainFrame::SetupOpenCDSubMenu()
 	UINT id = ID_FILE_OPEN_CD_START;
 
 	for (TCHAR drive = 'C'; drive <= 'Z'; drive++) {
-		CString label = GetDriveLabel(drive), str;
-
 		CAtlList<CString> files;
-		switch (GetCDROMType(drive, files)) {
-			case CDROM_Audio:
-				if (label.IsEmpty()) {
-					label = _T("Audio CD");
-				}
-				str.Format(_T("%s (%c:)"), label, drive);
-				break;
-			case CDROM_VideoCD:
-				if (label.IsEmpty()) {
-					label = _T("(S)VCD");
-				}
-				str.Format(_T("%s (%c:)"), label, drive);
-				break;
-			case CDROM_DVDVideo:
-				if (label.IsEmpty()) {
-					label = _T("DVD Video");
-				}
-				str.Format(_T("%s (%c:)"), label, drive);
-				break;
-			default:
-				break;
-		}
+		cdrom_t CDrom_t = GetCDROMType(drive, files);
+		if (CDrom_t != CDROM_NotFound && CDrom_t != CDROM_Unknown) {
+			CString label = GetDriveLabel(drive);
 
-		if (!str.IsEmpty()) {
-			pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, str);
+			CString DiskType;
+			switch (CDrom_t) {
+				case CDROM_Audio:
+					DiskType = L"Audio CD";
+					break;
+				case CDROM_VideoCD:
+					DiskType = L"(S)VCD";
+					break;
+				case CDROM_DVDVideo:
+					DiskType = L"DVD Video";
+					break;
+				case CDROM_BDVideo:
+					DiskType = L"Blu-ray Disc";
+					break;
+				default:
+					ASSERT(FALSE);
+					break;
+			}
+
+			if (label.IsEmpty()) {
+				label = DiskType;
+			} else {
+				label.AppendFormat(L" - %s", DiskType);
+			}
+
+			CString str;
+			str.Format(_T("%s (%c:)"), label, drive);
+			if (!str.IsEmpty()) {
+				pSub->AppendMenu(MF_BYCOMMAND|MF_STRING|MF_ENABLED, id++, str);
+			}
 		}
 	}
 }

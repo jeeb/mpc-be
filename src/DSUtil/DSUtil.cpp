@@ -871,23 +871,29 @@ cdrom_t GetCDROMType(TCHAR drive, CAtlList<CString>& files)
 	path.Format(_T("%c:"), drive);
 
 	if (GetDriveType(path + _T("\\")) == DRIVE_CDROM) {
-		// CDROM_VideoCD
-		FindFiles(path + _T("\\mpegav\\avseq??.dat"), files);
-		FindFiles(path + _T("\\mpegav\\avseq??.mpg"), files);
-		FindFiles(path + _T("\\mpeg2\\avseq??.dat"), files);
-		FindFiles(path + _T("\\mpeg2\\avseq??.mpg"), files);
-		FindFiles(path + _T("\\mpegav\\music??.dat"), files);
-		FindFiles(path + _T("\\mpegav\\music??.mpg"), files);
-		FindFiles(path + _T("\\mpeg2\\music??.dat"), files);
-		FindFiles(path + _T("\\mpeg2\\music??.mpg"), files);
-		if (files.GetCount() > 0) {
-			return CDROM_VideoCD;
-		}
-
 		// CDROM_DVDVideo
 		FindFiles(path + _T("\\VIDEO_TS\\video_ts.ifo"), files);
 		if (files.GetCount() > 0) {
 			return CDROM_DVDVideo;
+		}
+
+        // CDROM_BD
+        FindFiles(path + _T("\\BDMV\\index.bdmv"), files);
+        if (!files.IsEmpty()) {
+            return CDROM_BDVideo;
+        }
+
+		// CDROM_VideoCD
+		FindFiles(path + _T("\\mpegav\\avseq??.dat"),	files);
+		FindFiles(path + _T("\\mpegav\\avseq??.mpg"),	files);
+		FindFiles(path + _T("\\mpeg2\\avseq??.dat"),	files);
+		FindFiles(path + _T("\\mpeg2\\avseq??.mpg"),	files);
+		FindFiles(path + _T("\\mpegav\\music??.dat"),	files);
+		FindFiles(path + _T("\\mpegav\\music??.mpg"),	files);
+		FindFiles(path + _T("\\mpeg2\\music??.dat"),	files);
+		FindFiles(path + _T("\\mpeg2\\music??.mpg"),	files);
+		if (files.GetCount() > 0) {
+			return CDROM_VideoCD;
 		}
 
 		// CDROM_Audio
