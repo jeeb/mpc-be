@@ -138,6 +138,25 @@ STDMETHODIMP CRawVideoSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 	return S_OK;
 }
 
+bool CRawVideoSplitterFilter::ReadGOP(REFERENCE_TIME& rt)
+{
+	m_pFile->BitRead(1);
+	BYTE hour		= m_pFile->BitRead(5);
+	BYTE minute		= m_pFile->BitRead(6);
+	m_pFile->BitRead(1);
+	BYTE second		= m_pFile->BitRead(6);
+	BYTE frame		= m_pFile->BitRead(6);
+	BYTE closedGOP	= m_pFile->BitRead(1);
+	BYTE brokenGOP	= m_pFile->BitRead(1);
+	if (brokenGOP || !frame) {
+		return false;
+	}
+
+	rt = (((hour * 60) + minute) * 60 + second) * UNITS;
+
+	return true;
+}
+
 HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 {
 	CheckPointer(pAsyncReader, E_POINTER);
@@ -162,8 +181,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 #if ENABLE_YUV4MPEG2
 		{
 			static const BYTE YUV4MPEG2_[10] = {'Y','U','V','4','M','P','E','G','2',0x20};
-			BYTE buf[256];
-			buf[255] = 0;
+			BYTE buf[256] = {0};
 			if (m_pFile->ByteRead(buf, 255) == S_OK && memcmp(buf, YUV4MPEG2_, sizeof(YUV4MPEG2_)) == 0) {
 				CStringA params = CStringA(buf + sizeof(YUV4MPEG2_));
 				params.Truncate(params.Find(0x0A));
@@ -324,6 +342,9 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 				REFERENCE_TIME rtStart	= INVALID_TIME;
 				REFERENCE_TIME rtStop	= INVALID_TIME;
+
+				__int64 posMin			= 0;
+				__int64 posMax			= 0;
 				// find start PTS
 				{
 					BYTE id = 0x00;
@@ -334,20 +355,15 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 
 						if (id == 0xb8) {	// GOP
-							m_pFile->BitRead(1);
-							BYTE hour		= m_pFile->BitRead(5);
-							BYTE minute		= m_pFile->BitRead(6);
-							m_pFile->BitRead(1);
-							BYTE second		= m_pFile->BitRead(6);
-							BYTE frame		= m_pFile->BitRead(6);
-							BYTE closedGOP	= m_pFile->BitRead(1);
-							BYTE brokenGOP	= m_pFile->BitRead(1);
-							if (closedGOP || brokenGOP || !frame) {
+							REFERENCE_TIME rt = 0;
+							__int64 pos = m_pFile->GetPos();
+							if (!ReadGOP(rt)) {
 								continue;
 							}
 
 							if (rtStart == INVALID_TIME) {
-								rtStart = (((hour * 60) + minute) * 60 + second) * UNITS;
+								rtStart	= rt;
+								posMin	= pos;
 							}
 						}
 					}
@@ -363,25 +379,17 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 
 						if (id == 0xb8) {	// GOP
-							m_pFile->BitRead(1);
-							BYTE hour		= m_pFile->BitRead(5);
-							BYTE minute		= m_pFile->BitRead(6);
-							m_pFile->BitRead(1);
-							BYTE second		= m_pFile->BitRead(6);
-							BYTE frame		= m_pFile->BitRead(6);
-							BYTE closedGOP	= m_pFile->BitRead(1);
-							BYTE brokenGOP	= m_pFile->BitRead(1);
-							if (closedGOP || brokenGOP || !frame) {
-								continue;
+							__int64 pos = m_pFile->GetPos();
+							if (ReadGOP(rtStop)) {
+								posMax = pos;
 							}
-
-							rtStop = (((hour * 60) + minute) * 60 + second) * UNITS;
 						}
 					}
 				}
 
 				if (rtStart != INVALID_TIME && rtStop != INVALID_TIME && rtStop > rtStart) {
-					m_rtNewStop = m_rtStop = m_rtDuration = rtStop - rtStart;
+					double rate = (double)(posMax - posMin) / (rtStop - rtStart);
+					m_rtNewStop = m_rtStop = m_rtDuration = (REFERENCE_TIME)((double)m_pFile->GetLength() / rate);
 				}
 			}
 		}
@@ -431,6 +439,11 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			case RAW_VC1:
 				pName = L"VC-1 Video Output";
 				break;
+#if ENABLE_YUV4MPEG2
+			case RAW_Y4M:
+				pName = L"YUV4MPEG2 Video Output";
+				break;
+#endif
 		}
 
 		CAtlArray<CMediaType> mts;
