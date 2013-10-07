@@ -11311,7 +11311,7 @@ void CMainFrame::SetDefaultFullscreenState()
 	if (!(s.nCLSwitches&CLSW_ADD) && (s.nCLSwitches&CLSW_FULLSCREEN) && !s.slFiles.IsEmpty()) {
 		ToggleFullscreen(true, true);
 		SetCursor(NULL);
-		AfxGetAppSettings().nCLSwitches &= ~CLSW_FULLSCREEN;
+		s.nCLSwitches &= ~CLSW_FULLSCREEN;
 		m_fFirstFSAfterLaunchOnFS = true;
 	} else if (s.fRememberWindowSize && s.fRememberWindowPos && !m_fFullScreen && s.fLastFullScreen) {
 		// if fullscreen was on, put it on back

@@ -1448,9 +1448,9 @@ void CAppSettings::LoadSettings()
 
 	nLastFileInfoPage		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, 0);
 
-//	if (fLaunchfullscreen && !IsD3DFullscreen()) {
-//		nCLSwitches |= CLSW_FULLSCREEN;
-//	}
+	if (fLaunchfullscreen && !IsD3DFullscreen()) {
+		nCLSwitches |= CLSW_FULLSCREEN;
+	}
 
 	fInitialized = true;
 }
