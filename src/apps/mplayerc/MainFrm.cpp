@@ -8387,16 +8387,7 @@ void CMainFrame::OnPlayPlay()
 					if (m_BDLabel.GetLength() > 0) {
 						strOSD.AppendFormat(L" \"%s\"", m_BDLabel);
 					} else {
-						CString fn = m_wndPlaylistBar.GetCurFileName();
-						fn.Replace('\\', '/');
-						int pos = fn.Find(L"/BDMV");
-						if (pos > 1) {
-							fn.Delete(pos, fn.GetLength() - pos);
-							CString fn3 = fn.Mid(fn.ReverseFind('/')+1);
-							if (!fn3.IsEmpty()) {
-								strOSD.AppendFormat(L" \"%s\"", fn3);
-							}
-						}				
+						MakeBDLavel(m_wndPlaylistBar.GetCurFileName(), strOSD);
 					}
 				} else if (strOSD.GetLength() > 0) {
 					strOSD.TrimRight('/');
@@ -8410,20 +8401,8 @@ void CMainFrame::OnPlayPlay()
 					strOSD.Delete(i, strOSD.GetLength()-i);
 				}
 				strOSD += L" DVD";
-				WCHAR buff[MAX_PATH];
-				ULONG len = 0;
-				if (SUCCEEDED(m_pDVDI->GetDVDDirectory(buff, _countof(buff), &len))) {
-					CString DVDPath(buff);
-					DVDPath.Replace('\\', '/');
-					int pos = DVDPath.Find(L"/VIDEO_TS");
-					if (pos > 1) {
-						DVDPath.Delete(pos, DVDPath.GetLength() - pos);
-						CString fn2 = DVDPath.Mid(DVDPath.ReverseFind('/') + 1);
-						if (!fn2.IsEmpty()) {
-							strOSD.AppendFormat(L" \"%s\"", fn2);
-						}
-					}
-				}
+
+				MakeDVDLavel(strOSD);
 			}
 		}
 	}
@@ -13793,15 +13772,7 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 				if (m_BDLabel.GetLength() > 0) {
 					fn2.AppendFormat(L" \"%s\"", m_BDLabel);
 				} else {
-					fn.Replace('\\', '/');
-					int pos = fn.Find(L"/BDMV");
-					if (pos > 1) {
-						fn.Delete(pos, fn.GetLength() - pos);
-						CString fn3 = fn.Mid(fn.ReverseFind('/')+1);
-						if (!fn3.IsEmpty()) {
-							fn2.AppendFormat(L" \"%s\"", fn3);
-						}
-					}				
+					MakeBDLavel(fn, fn2);
 				}
 				fn = fn2;
 			} else {
@@ -13814,20 +13785,7 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 		} else if (GetPlaybackMode() == PM_DVD) {
 			fn = L"DVD";
 
-			WCHAR buff[MAX_PATH];
-			ULONG len = 0;
-			if (SUCCEEDED(m_pDVDI->GetDVDDirectory(buff, _countof(buff), &len))) {
-				CString DVDPath(buff);
-				DVDPath.Replace('\\', '/');
-				int pos = DVDPath.Find(L"/VIDEO_TS");
-				if (pos > 1) {
-					DVDPath.Delete(pos, DVDPath.GetLength() - pos);
-					CString fn2 = DVDPath.Mid(DVDPath.ReverseFind('/') + 1);
-					if (!fn2.IsEmpty()) {
-						fn.AppendFormat(L" \"%s\"", fn2);
-					}
-				}
-			}
+			MakeDVDLavel(fn);
 		} else if (GetPlaybackMode() == PM_CAPTURE) {
 			fn = ResStr(IDS_CAPTURE_LIVE);
 		}
@@ -20269,4 +20227,63 @@ BOOL CMainFrame::CheckMainFilter(IBaseFilter* pBF)
 
 	m_nMainFilterId = NULL;
 	return FALSE;
+}
+
+void CMainFrame::MakeBDLavel(CString path, CString& label)
+{
+	CString fn(path);
+
+	fn.Replace('\\', '/');
+	int pos = fn.Find(L"/BDMV");
+	if (pos > 1) {
+		fn.Delete(pos, fn.GetLength() - pos);
+		CString fn2 = fn.Mid(fn.ReverseFind('/')+1);
+
+		if (fn2.GetLength() == 2 && fn2[fn2.GetLength() - 1] == ':') {
+			TCHAR drive = fn2[0];
+			CAtlList<CString> sl;
+			cdrom_t CDRom_t = GetCDROMType(drive, sl);
+			if (CDRom_t == CDROM_BDVideo) {
+				CString BDLabel = GetDriveLabel(drive);
+				if (BDLabel.GetLength() > 0) {
+					fn2.AppendFormat(L" (%s)", BDLabel);
+				}
+			}
+		}
+
+		if (!fn2.IsEmpty()) {
+			label.AppendFormat(L" \"%s\"", fn2);
+		}
+	}
+}
+
+void CMainFrame::MakeDVDLavel(CString& label)
+{
+	WCHAR buff[MAX_PATH];
+	ULONG len = 0;
+	if (SUCCEEDED(m_pDVDI->GetDVDDirectory(buff, _countof(buff), &len))) {
+		CString DVDPath(buff);
+		DVDPath.Replace('\\', '/');
+		int pos = DVDPath.Find(L"/VIDEO_TS");
+		if (pos > 1) {
+			DVDPath.Delete(pos, DVDPath.GetLength() - pos);
+			CString fn2 = DVDPath.Mid(DVDPath.ReverseFind('/') + 1);
+
+			if (fn2.GetLength() == 2 && fn2[fn2.GetLength() - 1] == ':') {
+				TCHAR drive = fn2[0];
+				CAtlList<CString> sl;
+				cdrom_t CDRom_t = GetCDROMType(drive, sl);
+				if (CDRom_t == CDROM_DVDVideo) {
+					CString DVDLabel = GetDriveLabel(drive);
+					if (DVDLabel.GetLength() > 0) {
+						fn2.AppendFormat(L" (%s)", DVDLabel);
+					}
+				}
+			}
+
+			if (!fn2.IsEmpty()) {
+				label.AppendFormat(L" \"%s\"", fn2);
+			}
+		}
+	}
 }

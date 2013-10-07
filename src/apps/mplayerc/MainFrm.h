@@ -1219,4 +1219,8 @@ public:
 
 	void		AddSubtitlePathsAddons(CString FileName);
 	void		AddAudioPathsAddons(CString FileName);
+
+private:
+	void		MakeBDLavel(CString path, CString& label);
+	void		MakeDVDLavel(CString& label);
 };
