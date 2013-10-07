@@ -1032,7 +1032,7 @@ int CMPCVideoDecFilter::PictWidthRounded()
 	if (!m_nOutputWidth || m_nOutputWidth < m_pAVCtx->coded_width) {
 		m_nOutputWidth = m_pAVCtx->coded_width;
 	}
-	return ((m_nOutputWidth + 15) / 16) * 16;
+	return ((m_nOutputWidth + 15) & ~15); // rounding to 16
 }
 
 int CMPCVideoDecFilter::PictHeightRounded()
@@ -1041,7 +1041,7 @@ int CMPCVideoDecFilter::PictHeightRounded()
 	if (!m_nOutputHeight || m_nOutputHeight < m_pAVCtx->coded_height) {
 		m_nOutputHeight = m_pAVCtx->coded_height;
 	}
-	return ((m_nOutputHeight + 15) / 16) * 16;
+	return ((m_nOutputHeight + 15) & ~15); // rounding to 16
 }
 
 static bool IsFFMPEGEnabled(FFMPEG_CODECS ffcodec, const bool FFmpegFilters[FFM_LAST + !FFM_LAST])
@@ -1051,8 +1051,6 @@ static bool IsFFMPEGEnabled(FFMPEG_CODECS ffcodec, const bool FFmpegFilters[FFM_
 	}
 
 	return FFmpegFilters[ffcodec.FFMPEGCode];
-
-	return false;
 }
 
 static bool IsDXVAEnabled(FFMPEG_CODECS ffcodec, const bool DXVAFilters[TRA_DXVA_LAST + !TRA_DXVA_LAST])
@@ -1062,8 +1060,6 @@ static bool IsDXVAEnabled(FFMPEG_CODECS ffcodec, const bool DXVAFilters[TRA_DXVA
 	}
 
 	return DXVAFilters[ffcodec.DXVACode];
-
-	return false;
 }
 
 int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, bool bForced)
