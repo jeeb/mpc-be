@@ -3307,6 +3307,14 @@ STDMETHODIMP_(unsigned __int64) CMPCVideoDecFilter::GetOutputFormat()
 	return m_nOutCsp;
 }
 
+STDMETHODIMP CMPCVideoDecFilter::GetOutputMediaType(CMediaType* pmt)
+{
+	CAutoLock cAutoLock(&m_csProps);
+	CopyMediaType(pmt, &m_pOutput->CurrentMediaType());
+
+	return S_OK;
+}
+
 // === IMPCVideoDecFilter2
 STDMETHODIMP_(int) CMPCVideoDecFilter::GetFrameType()
 {

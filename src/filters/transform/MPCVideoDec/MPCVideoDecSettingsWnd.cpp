@@ -306,21 +306,37 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 		// === New swscaler options
 		int refresh = 0; // no refresh
 
-		if (m_cbSwPreset.GetCurSel() != m_pMDF->GetSwPreset() || 
-		m_cbSwStandard.GetCurSel() != m_pMDF->GetSwStandard() || 
-		m_cbSwInputLevels.GetCurSel() != m_pMDF->GetSwInputLevels() || 
-		m_cbSwOutputLevels.GetCurSel() != m_pMDF->GetSwOutputLevels()) {
+		if (m_cbSwPreset.GetCurSel() != m_pMDF->GetSwPreset()
+				|| m_cbSwStandard.GetCurSel() != m_pMDF->GetSwStandard()
+				|| m_cbSwInputLevels.GetCurSel() != m_pMDF->GetSwInputLevels()
+				|| m_cbSwOutputLevels.GetCurSel() != m_pMDF->GetSwOutputLevels()) {
 			refresh = 1; // soft refresh - signal new swscaler colorspace details
 		}
+
+		CMediaType mt;
+		m_pMDF->GetOutputMediaType(&mt);
+		CString OutputType = GetGUIDString(mt.subtype);
+		OutputType.Replace(L"MEDIASUBTYPE_", L"");
+		FreeMediaType(mt);
+
+		CString SettingsOutputType;
+		m_lstSwOutputFormats.GetText(0, SettingsOutputType);
+
+		if (OutputType != SettingsOutputType
+				|| m_lstSwOutputFormats.GetCheck(0) != m_lstSwOutputFormats.GetItemData(0)) {
+			refresh = 2; // hard refresh - signal new output format
+		}
 		
-		for (int i = 0; i < m_lstSwOutputFormats.GetCount(); i++) {
-			if (i * 10 + m_lstSwOutputFormats.GetCheck(i) != m_lstSwOutputFormats.GetItemData(i)) {
-				refresh = 2; // hard refresh - signal new output format
-				break;
+		m_pMDF->SetSwRefresh(refresh);
+
+		if (refresh < 2) {
+			for (int i = 0; i < m_lstSwOutputFormats.GetCount(); i++) {
+				if (i * 10 + m_lstSwOutputFormats.GetCheck(i) != m_lstSwOutputFormats.GetItemData(i)) {
+					refresh = 2;
+					break;
+				}
 			}
 		}
-
-		m_pMDF->SetSwRefresh(refresh);
 
 		if (refresh == 2) {
 			CString SwFormatsStr;
@@ -330,6 +346,17 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 				SwFormatsStr.AppendFormat(_T("%s%s;"), name, m_lstSwOutputFormats.GetCheck(i) ? _T("+") : _T("-"));
 			}
 			m_pMDF->SetSwFormats(SwFormatsStr);
+
+			// re-build output formats
+			m_lstSwOutputFormats.ResetContent();
+			int k = 0;
+			while (LPCTSTR str = m_pMDF->GetSwFormatName(k)) {
+				m_lstSwOutputFormats.AddString(str);
+				int nCheck = m_pMDF->GetSwFormatState(k);
+				m_lstSwOutputFormats.SetCheck(k, nCheck);
+				m_lstSwOutputFormats.SetItemData(k, 10 * k + nCheck); // remember the original order and check state
+				k++;
+			}
 		}
 
 		if (refresh >= 1) {

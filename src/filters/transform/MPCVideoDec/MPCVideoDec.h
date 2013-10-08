@@ -273,6 +273,8 @@ public:
 	STDMETHODIMP SetDialogHWND(HWND nValue);
 	STDMETHODIMP_(unsigned __int64) GetOutputFormat();
 
+	STDMETHODIMP GetOutputMediaType(CMediaType* pmt);
+
 	// === IMPCVideoDecFilter2
 	STDMETHODIMP_(int) GetFrameType();
 
