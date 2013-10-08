@@ -27,9 +27,7 @@
 #define FRAC_BITS 14
 #include "mathops.h"
 #include "lsp.h"
-// ==> Start patch MPC
-//#include "libavcodec/mips/lsp_mips.h"
-// ==> End patch MPC
+#include "libavcodec/mips/lsp_mips.h"
 #include "libavutil/avassert.h"
 
 void ff_acelp_reorder_lsf(int16_t* lsfq, int lsfq_min_distance, int lsfq_min, int lsfq_max, int lp_order)

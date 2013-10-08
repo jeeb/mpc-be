@@ -2156,6 +2156,7 @@ static int webp_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
 
 AVCodec ff_vp8_decoder = {
     .name                  = "vp8",
+    .long_name             = NULL_IF_CONFIG_SMALL("On2 VP8"),
     .type                  = AVMEDIA_TYPE_VIDEO,
     .id                    = AV_CODEC_ID_VP8,
     .priv_data_size        = sizeof(VP8Context),
@@ -2164,13 +2165,13 @@ AVCodec ff_vp8_decoder = {
     .decode                = ff_vp8_decode_frame,
     .capabilities          = CODEC_CAP_DR1 | CODEC_CAP_FRAME_THREADS | CODEC_CAP_SLICE_THREADS,
     .flush                 = vp8_decode_flush,
-    .long_name             = NULL_IF_CONFIG_SMALL("On2 VP8"),
     .init_thread_copy      = ONLY_IF_THREADS_ENABLED(vp8_decode_init_thread_copy),
     .update_thread_context = ONLY_IF_THREADS_ENABLED(vp8_decode_update_thread_context),
 };
 
 // AVCodec ff_webp_decoder = {
 //     .name                  = "webp",
+//     .long_name             = NULL_IF_CONFIG_SMALL("WebP"),
 //     .type                  = AVMEDIA_TYPE_VIDEO,
 //     .id                    = AV_CODEC_ID_WEBP,
 //     .priv_data_size        = sizeof(VP8Context),
@@ -2179,7 +2180,6 @@ AVCodec ff_vp8_decoder = {
 //     .decode                = webp_decode_frame,
 //     .capabilities          = CODEC_CAP_DR1 | CODEC_CAP_FRAME_THREADS | CODEC_CAP_SLICE_THREADS,
 //     .flush                 = vp8_decode_flush,
-//     .long_name             = NULL_IF_CONFIG_SMALL("WebP"),
 //     .init_thread_copy      = ONLY_IF_THREADS_ENABLED(vp8_decode_init_thread_copy),
 //     .update_thread_context = ONLY_IF_THREADS_ENABLED(vp8_decode_update_thread_context),
 // };

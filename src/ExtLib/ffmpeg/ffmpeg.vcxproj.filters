@@ -31,6 +31,9 @@
     <Filter Include="libavutil\ppc">
       <UniqueIdentifier>{00d55032-9d2e-4b3b-a44e-f66126bebf82}</UniqueIdentifier>
     </Filter>
+    <Filter Include="libavcodec\mips">
+      <UniqueIdentifier>{db3d18c0-210c-41b6-9ff1-1bed428de973}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="config.asm" />
@@ -195,6 +198,12 @@
     </ClInclude>
     <ClInclude Include="compat\w32pthreads.h">
       <Filter>compat</Filter>
+    </ClInclude>
+    <ClInclude Include="libavcodec\mips\amrwbdec_mips.h">
+      <Filter>libavcodec\mips</Filter>
+    </ClInclude>
+    <ClInclude Include="libavcodec\mips\lsp_mips.h">
+      <Filter>libavcodec\mips</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\x86\cabac.h">
       <Filter>libavcodec\x86</Filter>
@@ -1154,6 +1163,9 @@
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\dsputil_qns_template.c">
+      <Filter>libavcodec\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\x86\dsputil_x86.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\fdct.c">

@@ -188,6 +188,8 @@
     <ClInclude Include="libavcodec\lsp.h" />
     <ClInclude Include="libavcodec\lzw.h" />
     <ClInclude Include="libavcodec\mathops.h" />
+    <ClInclude Include="libavcodec\mips\amrwbdec_mips.h" />
+    <ClInclude Include="libavcodec\mips\lsp_mips.h" />
     <ClInclude Include="libavcodec\mjpeg.h" />
     <ClInclude Include="libavcodec\mjpegdec.h" />
     <ClInclude Include="libavcodec\mjpegenc.h" />
@@ -685,6 +687,7 @@
     <ClCompile Include="libavcodec\x86\dsputil_init.c" />
     <ClCompile Include="libavcodec\x86\dsputil_mmx.c" />
     <ClCompile Include="libavcodec\x86\dsputil_qns_template.c" />
+    <ClCompile Include="libavcodec\x86\dsputil_x86.c" />
     <ClCompile Include="libavcodec\x86\fdct.c" />
     <ClCompile Include="libavcodec\x86\fft_init.c" />
     <ClCompile Include="libavcodec\x86\fmtconvert_init.c" />

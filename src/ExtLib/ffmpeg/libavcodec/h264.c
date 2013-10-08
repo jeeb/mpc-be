@@ -3563,7 +3563,7 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
         h->avctx->pix_fmt = ret;
 
         av_log(h->avctx, AV_LOG_INFO, "Reinit context to %dx%d, "
-               "pix_fmt: %d\n", h->width, h->height, h->avctx->pix_fmt);
+               "pix_fmt: %s\n", h->width, h->height, av_get_pix_fmt_name(h->avctx->pix_fmt));
 
         if ((ret = h264_slice_header_init(h, 1)) < 0) {
             av_log(h->avctx, AV_LOG_ERROR,
@@ -5337,6 +5337,7 @@ static const AVClass h264_vdpau_class = {
 
 AVCodec ff_h264_decoder = {
     .name                  = "h264",
+    .long_name             = NULL_IF_CONFIG_SMALL("H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"),
     .type                  = AVMEDIA_TYPE_VIDEO,
     .id                    = AV_CODEC_ID_H264,
     .priv_data_size        = sizeof(H264Context),
@@ -5347,7 +5348,6 @@ AVCodec ff_h264_decoder = {
                              CODEC_CAP_DELAY | CODEC_CAP_SLICE_THREADS |
                              CODEC_CAP_FRAME_THREADS,
     .flush                 = flush_dpb,
-    .long_name             = NULL_IF_CONFIG_SMALL("H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"),
     .init_thread_copy      = ONLY_IF_THREADS_ENABLED(decode_init_thread_copy),
     .update_thread_context = ONLY_IF_THREADS_ENABLED(decode_update_thread_context),
     .profiles              = NULL_IF_CONFIG_SMALL(profiles),
@@ -5357,6 +5357,7 @@ AVCodec ff_h264_decoder = {
 #if CONFIG_H264_VDPAU_DECODER
 AVCodec ff_h264_vdpau_decoder = {
     .name           = "h264_vdpau",
+    .long_name      = NULL_IF_CONFIG_SMALL("H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 (VDPAU acceleration)"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_H264,
     .priv_data_size = sizeof(H264Context),
@@ -5365,7 +5366,6 @@ AVCodec ff_h264_vdpau_decoder = {
     .decode         = decode_frame,
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_DELAY | CODEC_CAP_HWACCEL_VDPAU,
     .flush          = flush_dpb,
-    .long_name      = NULL_IF_CONFIG_SMALL("H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 (VDPAU acceleration)"),
     .pix_fmts       = (const enum AVPixelFormat[]) { AV_PIX_FMT_VDPAU_H264,
                                                      AV_PIX_FMT_NONE},
     .profiles       = NULL_IF_CONFIG_SMALL(profiles),

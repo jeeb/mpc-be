@@ -413,25 +413,25 @@ static int decode_tonal_components(GetBitContext *gb,
 static int decode_gain_control(GetBitContext *gb, GainBlock *block,
                                int num_bands)
 {
-    int i, b;
+    int b, j;
     int *level, *loc;
 
     AtracGainInfo *gain = block->g_block;
 
     for (b = 0; b <= num_bands; b++) {
         gain[b].num_points = get_bits(gb, 3);
-        level              = gain[b].levcode;
-        loc                = gain[b].loccode;
+        level              = gain[b].lev_code;
+        loc                = gain[b].loc_code;
 
-        for (i = 0; i < gain[b].num_points; i++) {
-            level[i] = get_bits(gb, 4);
-            loc  [i] = get_bits(gb, 5);
-            if (i && loc[i] <= loc[i-1])
+        for (j = 0; j < gain[b].num_points; j++) {
+            level[j] = get_bits(gb, 4);
+            loc[j]   = get_bits(gb, 5);
+            if (j && loc[j] <= loc[j - 1])
                 return AVERROR_INVALIDDATA;
         }
     }
 
-    /* Clear unused blocks. */
+    /* Clear the unused blocks. */
     for (; b < 4 ; b++)
         gain[b].num_points = 0;
 
