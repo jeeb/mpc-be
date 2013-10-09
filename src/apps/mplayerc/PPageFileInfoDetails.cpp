@@ -187,16 +187,15 @@ BOOL CPPageFileInfoDetails::OnInitDialog()
 {
 	__super::OnInitDialog();
 
+	m_hIcon = LoadIcon(m_fn, false);
+	if (m_hIcon) {
+		m_icon.SetIcon(m_hIcon);
+	}
+
 	CString ext = m_fn.Left(m_fn.Find(_T("://"))+1).TrimRight(':');
 
 	if (ext.IsEmpty() || !ext.CompareNoCase(_T("file"))) {
 		ext = _T(".") + m_fn.Mid(m_fn.ReverseFind('.')+1);
-	}
-
-	m_hIcon = LoadIcon(m_fn, false);
-
-	if (m_hIcon) {
-		m_icon.SetIcon(m_hIcon);
 	}
 
 	if (!LoadType(ext, m_type)) {

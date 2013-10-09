@@ -42,27 +42,6 @@ CPPageFileInfoClip::CPPageFileInfoClip(CString fn, IFilterGraph* pFG)
 	, m_album(ResStr(IDS_AG_NONE))
 	, m_hIcon(NULL)
 {
-	m_fn.TrimRight('/');
-
-	if (m_fn.Find(_T("://")) > 0) {
-		if (m_fn.Find(_T("/"), m_fn.Find(_T("://")) + 3) < 0) {
-			m_location_str = m_fn;
-		}
-	}
-
-	if (m_location_str.IsEmpty() || m_location_str == ResStr(IDS_AG_NONE)) {
-		int i = max(m_fn.ReverseFind('\\'), m_fn.ReverseFind('/'));
-
-		if (i >= 0 && i < m_fn.GetLength() - 1) {
-			m_location_str = m_fn.Left(i);
-			m_fn = m_fn.Mid(i + 1);
-
-			if (m_location_str.GetLength() == 2 && m_location_str[1] == ':') {
-				m_location_str += '\\';
-			}
-		}
-	}
-
 	BeginEnumFilters(pFG, pEF, pBF) {
 		if (CComQIPtr<IPropertyBag> pPB = pBF) {
 			if (!((CMainFrame*)AfxGetMainWnd())->CheckMainFilter(pBF)) {
@@ -163,6 +142,27 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 	m_hIcon = LoadIcon(m_fn, false);
 	if (m_hIcon) {
 		m_icon.SetIcon(m_hIcon);
+	}
+
+	m_fn.TrimRight('/');
+
+	if (m_fn.Find(_T("://")) > 0) {
+		if (m_fn.Find(_T("/"), m_fn.Find(_T("://")) + 3) < 0) {
+			m_location_str = m_fn;
+		}
+	}
+
+	if (m_location_str.IsEmpty() || m_location_str == ResStr(IDS_AG_NONE)) {
+		int i = max(m_fn.ReverseFind('\\'), m_fn.ReverseFind('/'));
+
+		if (i >= 0 && i < m_fn.GetLength() - 1) {
+			m_location_str = m_fn.Left(i);
+			m_fn = m_fn.Mid(i + 1);
+
+			if (m_location_str.GetLength() == 2 && m_location_str[1] == ':') {
+				m_location_str += '\\';
+			}
+		}
 	}
 
 	m_location.SetWindowText(m_location_str);
