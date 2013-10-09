@@ -8387,7 +8387,7 @@ void CMainFrame::OnPlayPlay()
 					if (m_BDLabel.GetLength() > 0) {
 						strOSD.AppendFormat(L" \"%s\"", m_BDLabel);
 					} else {
-						MakeBDLavel(m_wndPlaylistBar.GetCurFileName(), strOSD);
+						MakeBDLabel(m_wndPlaylistBar.GetCurFileName(), strOSD);
 					}
 				} else if (strOSD.GetLength() > 0) {
 					strOSD.TrimRight('/');
@@ -8402,7 +8402,7 @@ void CMainFrame::OnPlayPlay()
 				}
 				strOSD += L" DVD";
 
-				MakeDVDLavel(strOSD);
+				MakeDVDLabel(strOSD);
 			}
 		}
 	}
@@ -13772,7 +13772,7 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 				if (m_BDLabel.GetLength() > 0) {
 					fn2.AppendFormat(L" \"%s\"", m_BDLabel);
 				} else {
-					MakeBDLavel(fn, fn2);
+					MakeBDLabel(fn, fn2);
 				}
 				fn = fn2;
 			} else {
@@ -13785,7 +13785,7 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 		} else if (GetPlaybackMode() == PM_DVD) {
 			fn = L"DVD";
 
-			MakeDVDLavel(fn);
+			MakeDVDLabel(fn);
 		} else if (GetPlaybackMode() == PM_CAPTURE) {
 			fn = ResStr(IDS_CAPTURE_LIVE);
 		}
@@ -20229,7 +20229,7 @@ BOOL CMainFrame::CheckMainFilter(IBaseFilter* pBF)
 	return FALSE;
 }
 
-void CMainFrame::MakeBDLavel(CString path, CString& label)
+void CMainFrame::MakeBDLabel(CString path, CString& label, CString* pBDlabel)
 {
 	CString fn(path);
 
@@ -20239,6 +20239,10 @@ void CMainFrame::MakeBDLavel(CString path, CString& label)
 		fn.Delete(pos, fn.GetLength() - pos);
 		CString fn2 = fn.Mid(fn.ReverseFind('/')+1);
 
+		if (pBDlabel) {
+			*pBDlabel = fn2;
+		}
+
 		if (fn2.GetLength() == 2 && fn2[fn2.GetLength() - 1] == ':') {
 			TCHAR drive = fn2[0];
 			CAtlList<CString> sl;
@@ -20247,6 +20251,9 @@ void CMainFrame::MakeBDLavel(CString path, CString& label)
 				CString BDLabel = GetDriveLabel(drive);
 				if (BDLabel.GetLength() > 0) {
 					fn2.AppendFormat(L" (%s)", BDLabel);
+					if (pBDlabel) {
+						*pBDlabel = BDLabel;
+					}
 				}
 			}
 		}
@@ -20257,17 +20264,21 @@ void CMainFrame::MakeBDLavel(CString path, CString& label)
 	}
 }
 
-void CMainFrame::MakeDVDLavel(CString& label)
+void CMainFrame::MakeDVDLabel(CString& label, CString* pDVDlabel)
 {
 	WCHAR buff[MAX_PATH];
 	ULONG len = 0;
-	if (SUCCEEDED(m_pDVDI->GetDVDDirectory(buff, _countof(buff), &len))) {
+	if (m_pDVDI && SUCCEEDED(m_pDVDI->GetDVDDirectory(buff, _countof(buff), &len))) {
 		CString DVDPath(buff);
 		DVDPath.Replace('\\', '/');
 		int pos = DVDPath.Find(L"/VIDEO_TS");
 		if (pos > 1) {
 			DVDPath.Delete(pos, DVDPath.GetLength() - pos);
 			CString fn2 = DVDPath.Mid(DVDPath.ReverseFind('/') + 1);
+
+			if (pDVDlabel) {
+				*pDVDlabel = fn2;
+			}
 
 			if (fn2.GetLength() == 2 && fn2[fn2.GetLength() - 1] == ':') {
 				TCHAR drive = fn2[0];
@@ -20277,6 +20288,9 @@ void CMainFrame::MakeDVDLavel(CString& label)
 					CString DVDLabel = GetDriveLabel(drive);
 					if (DVDLabel.GetLength() > 0) {
 						fn2.AppendFormat(L" (%s)", DVDLabel);
+						if (pDVDlabel) {
+							*pDVDlabel = DVDLabel;
+						}
 					}
 				}
 			}

@@ -199,6 +199,12 @@ void CPlaylistItem::AutoLoadFiles()
 		name.Truncate(n);
 	}
 
+	CString BDLabel, empty;
+	CMainFrame* pMainFrm = (CMainFrame*)AfxGetMainWnd();
+	if (pMainFrm) {
+		pMainFrm->MakeBDLabel(fn, empty, &BDLabel);
+	}
+
 	AppSettings& s = AfxGetAppSettings();
 
 	if (s.fAutoloadAudio) {
@@ -217,12 +223,15 @@ void CPlaylistItem::AutoLoadFiles()
 				WIN32_FIND_DATA fd = {0};
 
 				HANDLE hFind;
-				for (int j = 1; j <= 2; j++) {
-					if (j == 1) {
-						hFind = FindFirstFile(paths[i] + name + _T(".*"), &fd);
-					} else { // if (j == 2) {
-						hFind = FindFirstFile(paths[i] + name + _T(".*.*"), &fd);
-					}
+				CAtlArray<CString> searchPattern;
+				searchPattern.Add(paths[i] + name + _T(".*"));
+				searchPattern.Add(paths[i] + name + _T(".*.*"));
+				if (BDLabel.GetLength() > 0) {
+					searchPattern.Add(paths[i] + BDLabel + _T(".*"));
+					searchPattern.Add(paths[i] + BDLabel + _T(".*.*"));
+				}
+				for (size_t j = 0; j < searchPattern.GetCount() - 1; j++) {
+					hFind = FindFirstFile(searchPattern[j], &fd);
 
 					if (hFind != INVALID_HANDLE_VALUE) {
 						do {
@@ -264,13 +273,15 @@ void CPlaylistItem::AutoLoadFiles()
 			WIN32_FIND_DATA fd = {0};
 
 			HANDLE hFind;
-			for (int j = 1; j <= 2; j++) {
-				if (j == 1) {
-					hFind = FindFirstFile(paths[i] + name + _T(".*"), &fd);
-				} else { // if (j == 2) {
-					hFind = FindFirstFile(paths[i] + name + _T(".*.*"), &fd);
-				}
-
+			CAtlArray<CString> searchPattern;
+			searchPattern.Add(paths[i] + name + _T(".*"));
+			searchPattern.Add(paths[i] + name + _T(".*.*"));
+			if (BDLabel.GetLength() > 0) {
+				searchPattern.Add(paths[i] + BDLabel + _T(".*"));
+				searchPattern.Add(paths[i] + BDLabel + _T(".*.*"));
+			}
+			for (size_t j = 0; j < searchPattern.GetCount() - 1; j++) {
+				hFind = FindFirstFile(searchPattern[j], &fd);
 				if (hFind != INVALID_HANDLE_VALUE) {
 					do {
 						if (fd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) {
