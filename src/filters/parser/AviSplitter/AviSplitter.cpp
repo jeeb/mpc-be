@@ -253,6 +253,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				// need calculate in double, because the (10000000ui64 * size * 8) can give overflow
 			}
 
+			// building a basic media type
 			mt.majortype = MEDIATYPE_Video;
 			switch (pbmi->biCompression) {
 				case BI_RGB:
@@ -275,52 +276,16 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				case FCC('mpg2'):
 				case FCC('MPG2'):
 				case FCC('MMES'):
-					{
-						size_t scCount = s->cs.GetCount();
-						if (scCount) {
-							__int64 cur_pos = m_pFile->GetPos();
-
-							m_pFile->Seek(s->cs[0].filepos);
-							CBaseSplitterFileEx::seqhdr h;
-							CMediaType mt2;
-							if (m_pFile->Read(h, s->cs[0].size, &mt2)) {
-								mts.Add(mt2);
-								m_pFile->Seek(cur_pos);
-								break;
-							}
-							m_pFile->Seek(cur_pos);
-						}
-						mt.subtype = MEDIASUBTYPE_MPEG2_VIDEO;
-					}
+					mt.subtype = MEDIASUBTYPE_MPEG2_VIDEO;
 					break;
 				case FCC('MPEG'):
 					mt.subtype = MEDIASUBTYPE_MPEG1Payload;
 					break;
-
 				case FCC('DXSB'):
 				case FCC('DXSA'):
 					label = L"XSub";
 				default:
 					mt.subtype = FOURCCMap(pbmi->biCompression);
-			}
-
-			if ((pbmi->biCompression == FCC('H264') || pbmi->biCompression == FCC('avc1')) && s->strf.GetCount() > sizeof(BITMAPINFOHEADER)) {
-				DWORD biCompression = pbmi->biCompression;
-
-				size_t extralen	= s->strf.GetCount() - sizeof(BITMAPINFOHEADER);
-				BYTE* extra		= s->strf.GetData() + (s->strf.GetCount() - extralen);
-
-				pbmi->biCompression = '1CVA';
-
-				CSize aspect(pbmi->biWidth, pbmi->biHeight);
-				ReduceDim(aspect);
-				
-				CMediaType mt2;
-				if (SUCCEEDED(CreateMPEG2VIfromAVC(&mt2, pbmi, AvgTimePerFrame, aspect, extra, extralen))) {
-					mts.Add(mt2);
-				}
-
-				pbmi->biCompression = biCompression;
 			}
 
 			mt.formattype			= FORMAT_VideoInfo;
@@ -335,6 +300,45 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							 ? s->strh.dwSuggestedBufferSize*3/2
 							 : (pvih->bmiHeader.biWidth*pvih->bmiHeader.biHeight*4));
 			mts.Add(mt);
+
+			// building a special media type
+			switch (pbmi->biCompression) {
+				case FCC('mpg2'):
+				case FCC('MPG2'):
+				case FCC('MMES'):
+					if (s->cs.GetCount()) {
+						__int64 cur_pos = m_pFile->GetPos();
+
+						m_pFile->Seek(s->cs[0].filepos);
+						CBaseSplitterFileEx::seqhdr h;
+						CMediaType mt2;
+						if (m_pFile->Read(h, s->cs[0].size, &mt2)) {
+							mts.InsertAt(0, mt2);
+						}
+						m_pFile->Seek(cur_pos);
+					}
+					break;
+				case FCC('H264'):
+				case FCC('avc1'):
+					if (s->strf.GetCount() > sizeof(BITMAPINFOHEADER)) {
+						size_t extralen	= s->strf.GetCount() - sizeof(BITMAPINFOHEADER);
+						BYTE* extra		= s->strf.GetData() + (s->strf.GetCount() - extralen);
+
+						CSize aspect(pbmi->biWidth, pbmi->biHeight);
+						ReduceDim(aspect);
+
+						DWORD biCompression = pbmi->biCompression;
+						pbmi->biCompression = FCC('AVC1');
+
+						CMediaType mt2;
+						if (SUCCEEDED(CreateMPEG2VIfromAVC(&mt2, pbmi, AvgTimePerFrame, aspect, extra, extralen))) {
+							mts.InsertAt(0, mt2);
+						}
+
+						pbmi->biCompression = biCompression;
+					}
+					break;
+			}
 		} else if (s->strh.fccType == FCC('auds') || s->strh.fccType == FCC('amva')) {
 			label = L"Audio";
 
