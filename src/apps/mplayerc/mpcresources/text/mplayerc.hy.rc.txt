@@ -1358,6 +1358,7 @@ STRING IDS_AT_TOGGLE_SHADER		"Միաց/Անջ փիքսելային շեյդեր�
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Միաց/Անջ էկրանային շեյդերները"
 STRING IDS_AUDIO_STREAM		"Ձայնը.: %s"
 STRING IDS_AUTOPLAY_PLAYAUDIOCD		"Նվագարկել Audio CD"
+STRING IDS_AUTOPLAY_PLAYBDMOVIE		"Play Blu-ray Disk"
 STRING IDS_AUTOPLAY_PLAYDVDMOVIE		"Վերարտադրել DVD Ֆիլմ"
 STRING IDS_AUTOPLAY_PLAYMUSIC		"Նվագարկել երաժշտություն"
 STRING IDS_AUTOPLAY_PLAYVIDEO		"Վերարտադրել տեսանյութ"

@@ -46,7 +46,8 @@ private:
 		AP_VIDEO = 0,
 		AP_MUSIC,
 		AP_AUDIOCD,
-		AP_DVDMOVIE
+		AP_DVDMOVIE,
+		AP_BDMOVIE
 	} autoplay_t;
 
 	void AddAutoPlayToRegistry(autoplay_t ap, bool fRegister);

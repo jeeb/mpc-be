@@ -32,7 +32,6 @@
 
 // CPPageFormats dialog
 
-
 CComPtr<IApplicationAssociationRegistration> CPPageFormats::m_pAAR;
 bool CPPageFormats::m_bSetContextFiles = false;
 
@@ -418,8 +417,6 @@ bool CPPageFormats::RegisterShellExt(LPCTSTR lpszLibrary)
 			}
 
 			CString strParameters;
-			//strParameters.Format(_T(" \"%s\",DllRegisterServer"), lpszLibrary);
-			//Execute(_T("rundll32.exe"), strParameters);
 			strParameters.Format(_T(" /s \"%s\""), lpszLibrary);
 			Execute(_T("regsvr32.exe"), strParameters);
 
@@ -454,8 +451,6 @@ bool CPPageFormats::UnRegisterShellExt(LPCTSTR lpszLibrary)
 	if (hDLL == NULL) {
 		if (::PathFileExists(lpszLibrary)) {
 			CString strParameters;
-			//strParameters.Format(_T(" \"%s\",DllUnregisterServer"), lpszLibrary);
-			//Execute(_T("rundll32.exe"), strParameters);
 			strParameters.Format(_T(" /s /u \"%s\""), lpszLibrary);
 			Execute(_T("regsvr32.exe"), strParameters);
 
@@ -485,6 +480,7 @@ static struct {
 	{"MusicFiles",	" %1",		IDS_AUTOPLAY_PLAYMUSIC},
 	{"CDAudio",		" %1 /cd",	IDS_AUTOPLAY_PLAYAUDIOCD},
 	{"DVDMovie",	" %1 /dvd",	IDS_AUTOPLAY_PLAYDVDMOVIE},
+	{"BluRay",		" %1",		IDS_AUTOPLAY_PLAYBDMOVIE},
 };
 
 void CPPageFormats::AddAutoPlayToRegistry(autoplay_t ap, bool fRegister)
@@ -993,13 +989,14 @@ BOOL CPPageFormats::OnApply()
 		SetListItemState(m_list.GetSelectionMark());
 	}
 
-	AddAutoPlayToRegistry(AP_VIDEO, !!m_apvideo.GetCheck());
-	AddAutoPlayToRegistry(AP_MUSIC, !!m_apmusic.GetCheck());
-	AddAutoPlayToRegistry(AP_AUDIOCD, !!m_apaudiocd.GetCheck());
-	AddAutoPlayToRegistry(AP_DVDMOVIE, !!m_apdvd.GetCheck());
+	AddAutoPlayToRegistry(AP_VIDEO,		!!m_apvideo.GetCheck());
+	AddAutoPlayToRegistry(AP_MUSIC,		!!m_apmusic.GetCheck());
+	AddAutoPlayToRegistry(AP_AUDIOCD,	!!m_apaudiocd.GetCheck());
+	AddAutoPlayToRegistry(AP_DVDMOVIE,	!!m_apdvd.GetCheck());
+	AddAutoPlayToRegistry(AP_BDMOVIE,	!!m_apdvd.GetCheck());
 
 	AppSettings& s = AfxGetAppSettings();
-	s.m_Formats.SetRtspHandler(m_iRtspHandler==0?RealMedia:m_iRtspHandler==1?QuickTime:DirectShow, !!m_fRtspFileExtFirst);
+	s.m_Formats.SetRtspHandler(m_iRtspHandler == 0 ? RealMedia : m_iRtspHandler == 1 ? QuickTime:DirectShow, !!m_fRtspFileExtFirst);
 	s.fAssociatedWithIcons = !!m_fAssociatedWithIcons.GetCheck();
 
 	if (m_bFileExtChanged && IsWinEightOrLater()) {

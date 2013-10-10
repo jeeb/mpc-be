@@ -1358,6 +1358,7 @@ STRING IDS_AT_TOGGLE_SHADER		"Укл/Адкл піксельныя шэйдар�
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Укл/Адкл экранныя шэйдары"
 STRING IDS_AUDIO_STREAM		"Аўдыё: %s"
 STRING IDS_AUTOPLAY_PLAYAUDIOCD		"Прайграванне AudioCD"
+STRING IDS_AUTOPLAY_PLAYBDMOVIE		"Play Blu-ray Disk"
 STRING IDS_AUTOPLAY_PLAYDVDMOVIE		"Прайграванне DVD"
 STRING IDS_AUTOPLAY_PLAYMUSIC		"Прайграванне музыкі"
 STRING IDS_AUTOPLAY_PLAYVIDEO		"Прайграванне відэа"
