@@ -129,6 +129,8 @@ IF NOT DEFINED VSCOMNTOOLS GOTO MissingVar
 IF EXIST "%~dp0contrib\signinfo.txt" (
   IF /I "%INSTALLER%" == "True" SET "SIGN=True"
   IF /I "%ZIP%" == "True"       SET "SIGN=True"
+) ELSE (
+  SET "SIGN=False"
 )
 
 :Start
