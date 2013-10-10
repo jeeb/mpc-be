@@ -359,6 +359,18 @@ TITLE Compiling %1 installer...
 IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Compilation failed!"
 CALL :SubMsg "INFO" "%1 installer successfully built"
 
+CALL :SubGetVersion
+
+IF /I "%~1" == "Win32" (
+  SET ARCH=x86
+) ELSE (
+  SET ARCH=x64
+)
+
+IF /I "%SIGN%" == "True" (
+  CALL :SubSign %BIN% MPC-BE.%MPCBE_VER%.%ARCH%.exe
+)
+
 EXIT /B
 
 :SubCreatePackages
