@@ -37,6 +37,7 @@ SET ARGIN=0
 SET ARGZI=0
 SET INPUT=0
 SET ARGVS=0
+SET ARGSIGN=0
 
 IF /I "%ARG%" == "?"          GOTO ShowHelp
 
@@ -65,6 +66,7 @@ FOR %%A IN (%ARG%) DO (
   IF /I "%%A" == "VS2010"     SET "COMPILER=VS2010"   & SET /A ARGVS+=1
   IF /I "%%A" == "VS2012"     SET "COMPILER=VS2012"   & SET /A ARGVS+=1
   IF /I "%%A" == "VS2013"     SET "COMPILER=VS2013"   & SET /A ARGVS+=1
+  IF /I "%%A" == "Sign"       SET "SIGN=True"         & SET /A ARGSIGN+=1
 )
 
 REM pre-build checks
@@ -76,7 +78,7 @@ IF DEFINED MINGW64 (SET MPCBE_MINGW64=%MINGW64%) ELSE (GOTO MissingVar)
 IF DEFINED MSYS    (SET MPCBE_MSYS=%MSYS%)       ELSE (GOTO MissingVar)
 
 FOR %%X IN (%*) DO SET /A INPUT+=1
-SET /A VALID=%ARGB%+%ARGPL%+%ARGC%+%ARGBC%+%ARGPA%+%ARGIN%+%ARGZI%+%ARGVS%
+SET /A VALID=%ARGB%+%ARGPL%+%ARGC%+%ARGBC%+%ARGPA%+%ARGIN%+%ARGZI%+%ARGVS%+%ARGSIGN%
 
 IF %VALID% NEQ %INPUT% GOTO UnsupportedSwitch
 
@@ -123,6 +125,11 @@ IF /I "%COMPILER%" == "VS2012" (
 )
 
 IF NOT DEFINED VSCOMNTOOLS GOTO MissingVar
+
+IF EXIST "%~dp0contrib\signinfo.txt" (
+  IF /I "%INSTALLER%" == "True" SET "SIGN=True"
+  IF /I "%ZIP%" == "True"       SET "SIGN=True"
+)
 
 :Start
 REM Check if the %LOG_DIR% folder exists otherwise MSBuild will fail
@@ -218,6 +225,18 @@ IF %ERRORLEVEL% NEQ 0 (
 ) ELSE (
   CALL :SubMsg "INFO" "mpc-be%SLN%.sln %BUILDCFG% Filter %1 compiled successfully"
 )
+
+IF /I "%1" == "Win32" (
+  SET "DIR=%BIN%\Filters_x86"
+) ELSE (
+  SET "DIR=%BIN%\Filters_x64"
+)
+
+IF /I "%SIGN%" == "True" (
+  CALL :SubSign %DIR% *.ax
+  CALL :SubSign %DIR% VSFilter.dll
+)
+
 EXIT /B
 
 :SubMPCBE
@@ -231,6 +250,18 @@ IF %ERRORLEVEL% NEQ 0 (
 ) ELSE (
   CALL :SubMsg "INFO" "mpc-be%SLN%.sln %BUILDCFG% %1 compiled successfully"
 )
+
+IF /I "%1" == "Win32" (
+  SET "DIR=%BIN%\mpc-be_x86"
+) ELSE (
+  SET "DIR=%BIN%\mpc-be_x64"
+)
+
+IF /I "%SIGN%" == "True" (
+  CALL :SubSign %DIR% mpc-be*.exe
+  CALL :SubSign %DIR% mpciconlib*.dll
+)
+
 TITLE Compiling MPCBEShellExt - %BUILDCFG%...
 "%MSBUILD%" MPCBEShellExt%SLN%.sln %MSBUILD_SWITCHES%^
  /target:%BUILDTYPE% /property:Configuration=%BUILDCFG%;Platform=Win32
@@ -239,6 +270,12 @@ IF %ERRORLEVEL% NEQ 0 (
 ) ELSE (
   CALL :SubMsg "INFO" "MPCBEShellExt%SLN%.sln %BUILDCFG% Win32 compiled successfully"
 )
+
+SET "DIR=%BIN%\mpc-be_x86"
+IF /I "%SIGN%" == "True" (
+  CALL :SubSign %DIR% MPCBEShellExt.dll
+)
+
 "%MSBUILD%" MPCBEShellExt%SLN%.sln %MSBUILD_SWITCHES%^
  /target:%BUILDTYPE% /property:Configuration=%BUILDCFG%;Platform=x64
 IF %ERRORLEVEL% NEQ 0 (
@@ -246,6 +283,12 @@ IF %ERRORLEVEL% NEQ 0 (
 ) ELSE (
   CALL :SubMsg "INFO" "MPCBEShellExt%SLN%.sln %BUILDCFG% x64 compiled successfully"
 )
+
+SET "DIR=%BIN%\mpc-be_x64"
+IF /I "%SIGN%" == "True" (
+  CALL :SubSign %DIR% MPCBEShellExt64.dll
+)
+
 EXIT /B
 
 :SubResources
@@ -264,6 +307,33 @@ FOR %%A IN ("Armenian" "Basque" "Belarusian" "Catalan" "Chinese Simplified"
  /target:%BUILDTYPE% /property:Configuration="Release %%~A";Platform=%1
  IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Compilation failed!"
 )
+
+IF /I "%1" == "Win32" (
+  SET "DIR=%BIN%\mpc-be_x86\Lang"
+) ELSE (
+  SET "DIR=%BIN%\mpc-be_x64\Lang"
+)
+
+IF /I "%SIGN%" == "True" (
+  CALL :SubSign %DIR% mpcresources.??.dll
+)
+
+EXIT /B
+
+:SubSign
+IF %ERRORLEVEL% NEQ 0 EXIT /B
+REM %1 is a path
+REM %2 is mask of the files to sign
+
+PUSHD "%~1"
+
+FOR /F "delims=" %%A IN ('DIR "%2" /b') DO (
+  CALL "%~dp0contrib\sign.cmd" "%%A" || (CALL :SubMsg "ERROR" "Problem signing %%A" & GOTO Break)
+)
+CALL :SubMsg "INFO" "%2 signed successfully."
+
+:Break
+POPD
 EXIT /B
 
 :SubCreateInstaller
@@ -424,14 +494,14 @@ EXIT /B
 TITLE %~nx0 Help
 ECHO.
 ECHO Usage:
-ECHO %~nx0 [Clean^|Build^|Rebuild] [x86^|x64^|Both] [Main^|Resources^|MPCBE^|Filters^|All] [Debug^|Release] [Packages^|Installer^|Zip] [VS2010^|VS2012]
+ECHO %~nx0 [Clean^|Build^|Rebuild] [x86^|x64^|Both] [Main^|Resources^|MPCBE^|Filters^|All] [Debug^|Release] [Packages^|Installer^|Zip] [VS2010^|VS2012^|VS2013] [Sign]
 ECHO.
 ECHO Notes: You can also prefix the commands with "-", "--" or "/".
 ECHO        Debug only applies to mpc-be%SLN%.sln.
 ECHO        The arguments are not case sensitive and can be ommitted.
 ECHO. & ECHO.
 ECHO Executing %~nx0 without any arguments will use the default ones:
-ECHO "%~nx0 Build Both MPCBE Release"
+ECHO "%~nx0 Build Both Release"
 ECHO. & ECHO.
 ECHO Examples:
 ECHO %~nx0 x86 Resources VS2010 -Builds the x86 resources
@@ -441,6 +511,7 @@ ECHO %~nx0 x86 Debug VS2010     -Builds x86 Main Debug exe and x86 resources
 ECHO %~nx0 x86 Filters VS2010   -Builds x86 Filters
 ECHO %~nx0 x86 All VS2010       -Builds x86 Main exe, x86 Filters and the x86 resources
 ECHO %~nx0 x86 Packages VS2010  -Builds x86 Main exe, x86 resources and creates the installer and the .7z package
+ECHO %~nx0 x86 VS2010 Sign      -Builds x86 Main exe and the x86 resources and signing output files
 ECHO.
 ENDLOCAL
 EXIT /B
