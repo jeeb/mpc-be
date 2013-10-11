@@ -156,9 +156,6 @@
     <ClCompile Include="source\vdstl_hashtable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="linearalloc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\bitmath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -1,6 +1,4 @@
 /*
- * $Id$
- *
  * Copyright (C) 2012 Sergey "judelaw" and Sergey "Exodus8"
  *
  * This file is part of MPC-BE.

@@ -2,7 +2,6 @@
 #define _RMAVSRC_H
 /****************************************************************************
  * 
- *  $Id$
  *
  *  Copyright (C) 1999 RealNetworks, Inc. All rights reserved..
  *  

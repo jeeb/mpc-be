@@ -1,6 +1,4 @@
 ﻿/*
- * $Id$
- *
  * (C) 2006-2013 see Authors.txt
  *
  * This file is part of MPC-BE.

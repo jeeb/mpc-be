@@ -1,6 +1,5 @@
 //////////////////////////////////////////////////////////////
 //
-// $Id$
 //
 //         File: WinDebugMonitor.cpp
 //  Description: Implementation of class CWinDebugMonitor

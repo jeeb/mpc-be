@@ -1,7 +1,6 @@
 /*****************************************************************************
  * csri: common subtitle renderer interface
  *****************************************************************************
- $Id$
  * Copyright (C) 2007  David Lamparter
  * All rights reserved.
  *
@@ -30,7 +29,6 @@
  ****************************************************************************/
 
 /** \file csri.h - main CSRI (common subtitle renderer interface) include.
- * $Id$ */
 
 #ifndef _CSRI_H
 /** \cond */

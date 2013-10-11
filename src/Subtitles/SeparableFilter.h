@@ -1,4 +1,3 @@
-// $Id$
 /*
     Copyright 2007  Niels Martin Hansen
 

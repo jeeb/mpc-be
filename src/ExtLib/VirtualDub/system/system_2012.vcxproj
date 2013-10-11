@@ -113,7 +113,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\h\vd2\system\source\registrymemory.cpp" />
-    <ClCompile Include="linearalloc.cpp" />
     <ClCompile Include="source\bitmath.cpp" />
     <ClCompile Include="source\cache.cpp" />
     <ClCompile Include="source\cmdline.cpp" />
