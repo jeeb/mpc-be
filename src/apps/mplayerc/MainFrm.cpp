@@ -1502,9 +1502,11 @@ bool CMainFrame::FlyBarSetPos()
 			return false;
 		}
 
-		CComQIPtr<IMadVRExclusiveModeInfo> pMVEMI = m_pBFmadVR;
-		if (pMVEMI) {
-			if (pMVEMI->IsExclusiveModeActive()) {
+		CComQIPtr<IMadVRInfo> pMVRInfo = m_pBFmadVR;
+		if (pMVRInfo) {
+			bool value = false;
+			pMVRInfo->GetBool("ExclusiveModeActive", &value);
+			if (value) {
 				if (m_wndFlyBar.IsWindowVisible()) {
 					m_wndFlyBar.ShowWindow(SW_HIDE);
 				}

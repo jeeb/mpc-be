@@ -1,11 +1,13 @@
 // ***************************************************************
-//  mvrInterfaces.h           version: 1.0.4  ·  date: 2012-11-18
+//  mvrInterfaces.h           version: 1.0.6  ·  date: 2013-06-04
 //  -------------------------------------------------------------
 //  various interfaces exported by madVR
 //  -------------------------------------------------------------
-//  Copyright (C) 2011 - 2012 www.madshi.net, All Rights Reserved
+//  Copyright (C) 2011 - 2013 www.madshi.net, BSD license
 // ***************************************************************
 
+// 2013-06-04 1.0.6 added IMadVRInfo
+// 2013-01-23 1.0.5 added IMadVRSubclassReplacement
 // 2012-11-18 1.0.4 added IMadVRExternalPixelShaders
 // 2012-10-07 1.0.3 added IMadVRExclusiveModeCallback
 // 2011-08-03 1.0.2 added IMadVRExclusiveModeControl
@@ -156,37 +158,6 @@ interface IMadVRExclusiveModeCallback : public IUnknown
 };
 
 // ---------------------------------------------------------------------------
-// IMadVRExclusiveModeInfo
-// ---------------------------------------------------------------------------
-
-// this interface allows you to ask...
-// ... whether madVR is currently in exclusive mode
-// ... whether the madVR exclusive mode seek bar is currently enabled
-
-// If madVR is in fullscreen exclusive mode, you should be careful with
-// which GUI you show, because showing any window based GUI will make madVR
-// automatically switch back to windowed mode. That's ok if that's what you
-// really want, just be aware of that. A good alternative is to use the
-// graphical or text base OSD interfaces (see above). Using them instead of
-// a window based GUI means that madVR can stay in exclusive mode all the
-// time.
-
-// Since madVR has its own seek bar (which is only shown in fullscreen
-// exclusive mode, though), before showing your own seek bar you should
-// check whether madVR is in fullscreen exclusive mode and whether the
-// user has enabled madVR's own seek bar. If so, you should probably not
-// show your own seek bar. If the user, however, has the madVR seek bar
-// disabled, you should still show your own seek bar, because otherwise
-// the user will have no way to seek at all.
-
-[uuid("D6EE8031-214E-4E9E-A3A7-458925F933AB")]
-interface IMadVRExclusiveModeInfo : public IUnknown
-{
-  STDMETHOD_(BOOL, IsExclusiveModeActive)(void) = 0;
-  STDMETHOD_(BOOL, IsMadVRSeekbarEnabled)(void) = 0;
-};
-
-// ---------------------------------------------------------------------------
 // IMadVRDirect3D9Manager
 // ---------------------------------------------------------------------------
 
@@ -217,18 +188,6 @@ interface IMadVRDirect3D9Manager : public IUnknown
 };
 
 // ---------------------------------------------------------------------------
-// IMadVRRefreshRateInfo
-// ---------------------------------------------------------------------------
-
-// this interface allows you to ask madVR about the detected refresh rate
-
-[uuid("3F6580E8-8DE9-48D0-8E4E-1F26FE02413E")]
-interface IMadVRRefreshRateInfo : public IUnknown
-{
-  STDMETHOD(GetRefreshRate)(double *refreshRate) = 0;
-};
-
-// ---------------------------------------------------------------------------
 // IMadVRExternalPixelShaders
 // ---------------------------------------------------------------------------
 
@@ -243,6 +202,48 @@ interface IMadVRExternalPixelShaders : public IUnknown
   STDMETHOD(ClearPixelShaders)(int stage) = 0;
   STDMETHOD(AddPixelShader)(LPCSTR sourceCode, LPCSTR compileProfile, int stage, LPVOID reserved) = 0;
 };
+
+// ---------------------------------------------------------------------------
+// IMadVRInfo
+// ---------------------------------------------------------------------------
+
+// this interface allows you to get all kinds of information from madVR
+
+[uuid("8FAB7F31-06EF-444C-A798-10314E185532")]
+interface IMadVRInfo : public IUnknown
+{
+  // The memory for strings and binary data is allocated by the callee
+  // by using LocalAlloc. It is the caller's responsibility to release the
+  // memory by calling LocalFree.
+  // Field names and LPWSTR values should be read case insensitive.
+  STDMETHOD(GetBool     )(LPCSTR field, bool      *value) = 0;
+  STDMETHOD(GetInt      )(LPCSTR field, int       *value) = 0;
+  STDMETHOD(GetSize     )(LPCSTR field, SIZE      *value) = 0;
+  STDMETHOD(GetRect     )(LPCSTR field, RECT      *value) = 0;
+  STDMETHOD(GetUlonglong)(LPCSTR field, ULONGLONG *value) = 0;
+  STDMETHOD(GetDouble   )(LPCSTR field, double    *value) = 0;
+  STDMETHOD(GetString   )(LPCSTR field, LPWSTR    *value, int *chars) = 0;
+  STDMETHOD(GetBin      )(LPCSTR field, LPVOID    *value, int *size ) = 0;
+};
+
+// available info fields:
+// ----------------------
+// version,                 string,    madVR version number
+// originalVideoSize,       size,      size of the video before scaling and AR adjustments
+// arAdjustedVideoSize,     size,      size of the video after AR adjustments
+// videoOutputRect,         rect,      final pos/size of the video after all scaling operations
+// subtitleTargetRect,      rect,      consumer wish for where to place the subtitles
+// frameRate,               ulonglong, frame rate of the video after deinterlacing (REFERENCE_TIME)
+// refreshRate,             double,    display refresh rate (0, if unknown)
+// displayModeSize,         size,      display mode width/height
+// yuvMatrix,               string,    RGB Video: "None" (fullrange); YCbCr Video: "Levels.Matrix", Levels: TV|PC, Matrix: 601|709|240M|FCC|2020
+// exclusiveModeActive,     bool,      is madVR currently in exclusive mode?
+// madVRSeekbarEnabled,     bool,      is the madVR exclusive mode seek bar currently enabled?
+// dxvaDecodingActive,      bool,      is DXVA2 decoding      being used at the moment?
+// dxvaDeinterlacingActive, bool,      is DXVA2 deinterlacing being used at the moment?
+// dxvaScalingActive,       bool,      is DXVA2 scaling       being used at the moment?
+// ivtcActive,              bool,      is madVR's IVTC algorithm active at the moment?
+// osdLatency,              int,       how much milliseconds will pass for an OSD change to become visible?
 
 // ---------------------------------------------------------------------------
 // IMadVRSettings
@@ -275,7 +276,7 @@ interface IMadVRSettings : public IUnknown
   STDMETHOD_(BOOL, SettingsGetRevision)(LONGLONG* revision) = 0;
 
   // export the whole settings record to a binary data buffer
-  // the buffer is allocated by mvrSettings_Export by using LocalAlloc
+  // the buffer is allocated by SettingsExport by using LocalAlloc
   // it's the caller's responsibility to free the buffer again by using LocalFree
   STDMETHOD_(BOOL, SettingsExport)(LPVOID* buf, int* size) = 0;
   // import the settings from a binary data buffer
@@ -286,11 +287,11 @@ interface IMadVRSettings : public IUnknown
   STDMETHOD_(BOOL, SettingsSetInteger)(LPCWSTR path, int     value) = 0;
   STDMETHOD_(BOOL, SettingsSetBoolean)(LPCWSTR path, BOOL    value) = 0;
 
-  // The buffer for mvrSettings_GetString must be provided by the caller and
+  // The buffer for SettingsGetString must be provided by the caller and
   // bufLenInChars set to the buffer's length (please note: 1 char -> 2 bytes).
   // If the buffer is too small, the API fails and GetLastError returns
   // ERROR_MORE_DATA. On return, bufLenInChars is set to the required buffer size.
-  // The buffer for mvrSettings_GetBinary is allocated by mvrSettings_GetBinary.
+  // The buffer for SettingsGetBinary is allocated by SettingsGetBinary.
   // The caller is responsible for freeing it by using LocalAlloc().
   STDMETHOD_(BOOL, SettingsGetString )(LPCWSTR path, LPCWSTR value, int* bufLenInChars) = 0;
   STDMETHOD_(BOOL, SettingsGetInteger)(LPCWSTR path, int*    value) = 0;
@@ -303,167 +304,248 @@ interface IMadVRSettings : public IUnknown
 // devices, devices
 //   %monitorId%, %monitorName%
 //     %id%, identification
-//       edid,                      edid,                                                            binary
-//       monitorName,               monitor name,                                                    string
-//       deviceId,                  device id,                                                       string
-//       outputDevice,              output device,                                                   string
+//       edid,                      edid,                                                               binary
+//       monitorName,               monitor name,                                                       string
+//       deviceId,                  device id,                                                          string
+//       outputDevice,              output device,                                                      string
 //     properties, properties
-//       levels,                    levels,                                                          string,  TV Levels|PC Levels|Custom
-//       black,                     black,                                                           integer, 0..32
-//       white,                     white,                                                           integer, 222..255
-//       displayBitdepth,           native display bitdepth,                                         integer, 6..10
+//       levels,                    levels,                                                             string,  TV Levels|PC Levels|Custom
+//       black,                     black,                                                              integer, 0..48
+//       white,                     white,                                                              integer, 200..255
+//       displayBitdepth,           native display bitdepth,                                            integer, 6..10
 //     calibration, calibration
-//       calibrate,                 calibrate display,                                               string,  disable calibration controls for this display|this display is already calibrated|calibrate this display by using yCMS|calibrate this display by using an external 3dlut file
-//       disableGpuGammaRamps,      disable GPU gamma ramps,                                         boolean
-//       external3dlutFile,         external 3dlut file,                                             string
-//       gamutMeasurements,         gamut measurements,                                              string
-//       gammaMeasurements,         gamma measurements,                                              string
-//       displayPrimaries,          display primaries,                                               string,  BT.709 (HD)|BT.601 (SD)|PAL|something else
-//       displayGammaCurve,         display gamma curve,                                             string,  pure power curve|BT.709/601 curve|something else
-//       displayGammaValue,         display gamma value,                                             string,  1.80|1.85|1.90|1.95|2.00|2.05|2.10|2.15|2.20|2.25|2.30|2.35|2.40|2.45|2.50|2.55|2.60|2.65|2.70|2.75|2.80
+//       calibrate,                 calibrate display,                                                  string,  disable calibration controls for this display|this display is already calibrated|calibrate this display by using yCMS|calibrate this display by using an external 3dlut file
+//       disableGpuGammaRamps,      disable GPU gamma ramps,                                            boolean
+//       external3dlutFile,         external 3dlut file,                                                string
+//       gamutMeasurements,         gamut measurements,                                                 string
+//       gammaMeasurements,         gamma measurements,                                                 string
+//       displayPrimaries,          display primaries,                                                  string,  BT.709 (HD)|BT.601 (SD)|PAL|something else
+//       displayGammaCurve,         display gamma curve,                                                string,  pure power curve|BT.709/601 curve|something else
+//       displayGammaValue,         display gamma value,                                                string,  1.80|1.85|1.90|1.95|2.00|2.05|2.10|2.15|2.20|2.25|2.30|2.35|2.40|2.45|2.50|2.55|2.60|2.65|2.70|2.75|2.80
 //     displayModes, display modes
-//       enableDisplayModeChanger,  switch to matching display mode...,                              boolean
-//       changeDisplayModeOnPlay,   ... when playback starts,                                        boolean
-//       restoreDisplayMode,        restore original display mode...,                                boolean
-//       restoreDisplayModeOnClose, ... when media player is closed,                                 boolean
-//       slowdown,                  treat 25p movies as 24p  (requires Reclock),                     boolean
-//       displayModesData,          display modes data,                                              binary
+//       enableDisplayModeChanger,  switch to matching display mode...,                                 boolean
+//       changeDisplayModeOnPlay,   ... when playback starts,                                           boolean
+//       restoreDisplayMode,        restore original display mode...,                                   boolean
+//       restoreDisplayModeOnClose, ... when media player is closed,                                    boolean
+//       slowdown,                  treat 25p movies as 24p  (requires Reclock),                        boolean
+//       displayModesData,          display modes data,                                                 binary
 //     colorGamma, color & gamma
-//       enableGammaProcessing,     enable gamma processing,                                         boolean
-//       currentGammaCurve,         current gamma curve,                                             string,  pure power curve|BT.709/601 curve
-//       currentGammaValue,         current gamma value,                                             string,  1.80|1.85|1.90|1.95|2.00|2.05|2.10|2.15|2.20|2.25|2.30|2.35|2.40|2.45|2.50|2.55|2.60|2.65|2.70|2.75|2.80
+//       brightness,                brightness,                                                         integer, -100..+100
+//       contrast,                  contrast,                                                           integer, -100..+100
+//       saturation,                saturation,                                                         integer, -100..+100
+//       hue,                       hue,                                                                integer, -180..+180
+//       enableGammaProcessing,     enable gamma processing,                                            boolean
+//       currentGammaCurve,         current gamma curve,                                                string,  pure power curve|BT.709/601 curve
+//       currentGammaValue,         current gamma value,                                                string,  1.80|1.85|1.90|1.95|2.00|2.05|2.10|2.15|2.20|2.25|2.30|2.35|2.40|2.45|2.50|2.55|2.60|2.65|2.70|2.75|2.80
 // processing, processing
 //   decoding, processing
-//     decodeH264,                  decode h264,                                                     string,  disable|libav|intel|hardware
-//     decodeVc1,                   decode VC-1,                                                     string,  disable|libav|intel|hardware
-//     decodeMpeg2,                 decode MPEG2,                                                    string,  disable|libav|intel|hardware
+//     decodeH264,                  decode h264,                                                        string,  disable|libav|intel|hardware
+//     decodeVc1,                   decode VC-1,                                                        string,  disable|libav|intel|hardware
+//     decodeMpeg2,                 decode MPEG2,                                                       string,  disable|libav|intel|hardware
 //   deinterlacing, deinterlacing
-//     autoActivateDeinterlacing,   automatically activate deinterlacing when needed,                boolean
-//     ifInDoubtDeinterlace,        if in doubt, activate deinterlacing,                             boolean
-//     contentType,                 source type,                                                     string,  auto|film|video
-//     scanPartialFrame,            only look at pixels in the frame center,                         boolean
-//     deinterlaceThread,           perform deinterlacing in separate thread,                        boolean
+//     autoActivateDeinterlacing,   automatically activate deinterlacing when needed,                   boolean
+//     ifInDoubtDeinterlace,        if in doubt, activate deinterlacing,                                boolean
+//     contentType,                 source type,                                                        string,  auto|film|video
+//     scanPartialFrame,            only look at pixels in the frame center,                            boolean
+//     deinterlaceThread,           perform deinterlacing in separate thread,                           boolean
 // scalingParent, scaling algorithms
 //   chromaUp, chroma upscaling
-//     chromaUp,                    chroma upsampling,                                               string,  Nearest Neighbor|Bilinear|Mitchell-Netravali|Catmull-Rom|Bicubic50|Bicubic60|Bicubic75|Bicubic100|SoftCubic50|SoftCubic60|SoftCubic70|SoftCubic80|SoftCubic100|Lanczos3|Lanczos4|Lanczos8|Spline36|Spline64|Jinc3|Jinc4|Jinc8
-//     chromaAntiRinging,           activate anti-ringing filter for chroma upsampling,              boolean
+//     chromaUp,                    chroma upsampling,                                                  string,  Nearest Neighbor|Bilinear|Mitchell-Netravali|Catmull-Rom|Bicubic50|Bicubic60|Bicubic75|Bicubic100|SoftCubic50|SoftCubic60|SoftCubic70|SoftCubic80|SoftCubic100|Lanczos3|Lanczos4|Lanczos8|Spline36|Spline64|Jinc3|Jinc4|Jinc8
+//     chromaAntiRinging,           activate anti-ringing filter for chroma upsampling,                 boolean
 //   lumaUp, image upscaling
-//     lumaUp,                      image upscaling,                                                 string,  Nearest Neighbor|Bilinear|Dxva|Mitchell-Netravali|Catmull-Rom|Bicubic50|Bicubic60|Bicubic75|Bicubic100|SoftCubic50|SoftCubic60|SoftCubic70|SoftCubic80|SoftCubic100|Lanczos3|Lanczos4|Lanczos8|Spline36|Spline64|Jinc3|Jinc4|Jinc8
-//     lumaUpAntiRinging,           activate anti-ringing filter for luma upsampling,                boolean
-//     lumaUpLinear,                upscale luma in linear light,                                    boolean
+//     lumaUp,                      image upscaling,                                                    string,  Nearest Neighbor|Bilinear|Dxva|Mitchell-Netravali|Catmull-Rom|Bicubic50|Bicubic60|Bicubic75|Bicubic100|SoftCubic50|SoftCubic60|SoftCubic70|SoftCubic80|SoftCubic100|Lanczos3|Lanczos4|Lanczos8|Spline36|Spline64|Jinc3|Jinc4|Jinc8
+//     lumaUpAntiRinging,           activate anti-ringing filter for luma upsampling,                   boolean
+//     lumaUpLinear,                upscale luma in linear light,                                       boolean
 //   lumaDown, image downscaling
-//     lumaDown,                    image downscaling,                                               string,  Nearest Neighbor|Bilinear|Dxva|Mitchell-Netravali|Catmull-Rom|Bicubic50|Bicubic60|Bicubic75|Bicubic100|SoftCubic50|SoftCubic60|SoftCubic70|SoftCubic80|SoftCubic100|Lanczos3|Lanczos4|Lanczos8|Spline36|Spline64
-//     lumaDownAntiRinging,         activate anti-ringing filter for luma downsampling,              boolean
-//     lumaDownLinear,              downscale luma in linear light,                                  boolean
+//     lumaDown,                    image downscaling,                                                  string,  Nearest Neighbor|Bilinear|Dxva|Mitchell-Netravali|Catmull-Rom|Bicubic50|Bicubic60|Bicubic75|Bicubic100|SoftCubic50|SoftCubic60|SoftCubic70|SoftCubic80|SoftCubic100|Lanczos3|Lanczos4|Lanczos8|Spline36|Spline64
+//     lumaDownAntiRinging,         activate anti-ringing filter for luma downsampling,                 boolean
+//     lumaDownLinear,              downscale luma in linear light,                                     boolean
 // rendering, rendering
 //   basicRendering, general settings
-//     managedUpload,               use managed upload textures (XP only),                           boolean
-//     uploadInRenderThread,        upload frames in render thread,                                  boolean
-//     delayPlaybackStart2,         delay playback start until render queue is full,                 boolean
-//     delaySeek,                   delay playback start after seeking, too,                         boolean
-//     enableOverlay,               enable windowed overlay (Windows 7 and newer),                   boolean
-//     enableExclusive,             enable automatic fullscreen exclusive mode,                      boolean
-//     disableAero,                 disable desktop composition (Vista and newer),                   boolean
-//     disableAeroCfg,              disable desktop composition configuration,                       string,  during exclusive - windowed mode switch|while madVR is in exclusive mode|while media player is in fullscreen mode|always
-//     separateDevice,              use a separate device for presentation (Vista and newer),        boolean
-//     useD3d11,                    use D3D11 for presentation,                                      boolean
-//     cpuQueueSize,                CPU queue size,                                                  integer, 4..32
-//     gpuQueueSize,                GPU queue size,                                                  integer, 4..24
+//     managedUpload,               use managed upload textures (XP only),                              boolean
+//     uploadInRenderThread,        upload frames in render thread,                                     boolean
+//     delayPlaybackStart2,         delay playback start until render queue is full,                    boolean
+//     delaySeek,                   delay playback start after seeking, too,                            boolean
+//     enableOverlay,               enable windowed overlay (Windows 7 and newer),                      boolean
+//     enableExclusive,             enable automatic fullscreen exclusive mode,                         boolean
+//     disableAero,                 disable desktop composition (Vista and newer),                      boolean
+//     disableAeroCfg,              disable desktop composition configuration,                          string,  during exclusive - windowed mode switch|while madVR is in exclusive mode|while media player is in fullscreen mode|always
+//     separateDevice,              use a separate device for presentation (Vista and newer),           boolean
+//     useD3d11,                    use D3D11 for presentation,                                         boolean
+//     dxvaDevice,                  use separate device for DXVA processing (Vista and newer),          boolean
+//     cpuQueueSize,                CPU queue size,                                                     integer, 4..32
+//     gpuQueueSize,                GPU queue size,                                                     integer, 4..24
 //   windowedTweaks, windowed mode settings
-//     backbufferCount,             no of backbuffers,                                               integer, 1..8
-//     flushAfterRenderSteps,       after render steps,                                              string,  don''t flush|flush|flush & wait (sleep)|flush & wait (loop)
-//     flushAfterLastStep,          after last step,                                                 string,  don''t flush|flush|flush & wait (sleep)|flush & wait (loop)
-//     flushAfterBackbuffer,        after backbuffer,                                                string,  don''t flush|flush|flush & wait (sleep)|flush & wait (loop)
-//     flushAfterPresent,           after present,                                                   string,  don''t flush|flush|flush & wait (sleep)|flush & wait (loop)
+//     backbufferCount,             no of backbuffers,                                                  integer, 1..8
+//     flushAfterRenderSteps,       after render steps,                                                 string,  don''t flush|flush|flush & wait (sleep)|flush & wait (loop)
+//     flushAfterLastStep,          after last step,                                                    string,  don''t flush|flush|flush & wait (sleep)|flush & wait (loop)
+//     flushAfterBackbuffer,        after backbuffer,                                                   string,  don''t flush|flush|flush & wait (sleep)|flush & wait (loop)
+//     flushAfterPresent,           after present,                                                      string,  don''t flush|flush|flush & wait (sleep)|flush & wait (loop)
 //   exclusiveSettings, exclusive mode settings
-//     enableSeekbar,               show seek bar,                                                   boolean
-//     exclusiveDelay,              delay switch to exclusive mode by 3 seconds,                     boolean
-//     oldExclusivePath,            use old rendering path,                                          boolean
-//     presentThread,               run presentation in a separate thread,                           boolean
-//     avoidGlitches,               limit rendering times to avoid glitches,                         boolean
-//     overshootMaxLatency,         overshoot max frame latency (Vista and newer),                   boolean
-//     preRenderFrames,             no of pre-presented frames,                                      integer, 1..16
-//     backbufferCountExcl,         no of backbuffers,                                               integer, 1..8
-//     flushAfterRenderStepsExcl,   after render steps,                                              string,  don''t flush|flush|flush & wait (sleep)|flush & wait (loop)
-//     flushAfterLastStepExcl,      after last step,                                                 string,  don''t flush|flush|flush & wait (sleep)|flush & wait (loop)
-//     flushAfterBackbufferExcl,    after backbuffer,                                                string,  don''t flush|flush|flush & wait (sleep)|flush & wait (loop)
-//     flushAfterPresentExcl,       after present,                                                   string,  don''t flush|flush|flush & wait (sleep)|flush & wait (loop)
+//     enableSeekbar,               show seek bar,                                                      boolean
+//     exclusiveDelay,              delay switch to exclusive mode by 3 seconds,                        boolean
+//     oldExclusivePath,            use old rendering path,                                             boolean
+//     presentThread,               run presentation in a separate thread,                              boolean
+//     avoidGlitches,               limit rendering times to avoid glitches,                            boolean
+//     overshootMaxLatency,         overshoot max frame latency (Vista and newer),                      boolean
+//     preRenderFrames,             no of pre-presented frames,                                         integer, 1..16
+//     backbufferCountExcl,         no of backbuffers,                                                  integer, 1..8
+//     flushAfterRenderStepsExcl,   after render steps,                                                 string,  don''t flush|flush|flush & wait (sleep)|flush & wait (loop)
+//     flushAfterLastStepExcl,      after last step,                                                    string,  don''t flush|flush|flush & wait (sleep)|flush & wait (loop)
+//     flushAfterBackbufferExcl,    after backbuffer,                                                   string,  don''t flush|flush|flush & wait (sleep)|flush & wait (loop)
+//     flushAfterPresentExcl,       after present,                                                      string,  don''t flush|flush|flush & wait (sleep)|flush & wait (loop)
+//   smoothMotion, smooth motion
+//     smoothMotionEnabled,         enable smooth motion frame rate conversion,                         boolean
+//     smoothMotionMode,            smooth motion mode,                                                 string,  avoidJudder|almostAlways|always
 //   tradeQuality, trade quality for performance
-//     dontDither,                  don''t use dithering,                                            boolean
-//     10bitChroma,                 use 10bit chroma buffer instead of 16bit,                        boolean
-//     10bitLuma,                   use 10bit image buffer instead of 16bit,                         boolean
-//     3dlutLowerBitdepth,          use lower bitdepth for yCMS 3dlut calibration,                   boolean
-//     3dlutBitdepth,               3dlut bitdepth,                                                  integer, 6..7
+//     gammaBlending,               don't use linear light for smooth motion frame blending,            boolean
+//     dontDither,                  don't use dithering,                                                boolean
+//     halfDxvaDeintFramerate,      use half frame rate for DXVA deinterlacing,                         boolean
+//     10bitChroma,                 use 10bit chroma buffer instead of 16bit,                           boolean
+//     10bitLuma,                   use 10bit image buffer instead of 16bit,                            boolean
+//     customShaders16f,            store custom pixel shader results in 16bit buffer instead of 32bit, boolean
+//     customShadersTv,             run custom pixel shaders in video levels instead of PC levels,      boolean
+//     noDeintCopyback,             don't use "copyback" for DXVA deinterlacing,                        boolean
+//     noDecodeCopyback,            don't use "copyback" for DXVA decoding,                             boolean
+//     3dlutLowerBitdepth,          use lower bitdepth for yCMS 3dlut calibration,                      boolean
+//     3dlutBitdepth,               3dlut bitdepth,                                                     integer, 6..7
 // ui, user interface
 //   keys, keyboard shortcuts
-//     keysOnlyIfFocused,           use only if media player has keyboard focus,                     boolean
-//     keyDebugOsd,                 debug OSD - toggle on/off,                                       string
-//     keyResetStats,               debug OSD - reset statistics,                                    string
-//     keyFreezeReport,             create freeze report,                                            string
-//     keyOutputLevels,             output levels - toggle,                                          string
-//     keySourceLevels,             source levels - toggle,                                          string
-//     keyMatrix,                   source decoding matrix - toggle,                                 string
-//     keyPrimaries,                source primaries - toggle,                                       string
-//     keyPrimariesEbu,             source primaries - set to "EBU/PAL",                             string
-//     keyPrimaries709,             source primaries - set to "BT.709",                              string
-//     keyPrimariesSmpteC,          source primaries - set to "SMPTE C",                             string
-//     keyDeint,                    deinterlacing - toggle,                                          string
-//     keyDeintFieldOrder,          deinterlacing field order - toggle,                              string
-//     keyDeintContentType,         deinterlacing content type - toggle,                             string
-//     keyDeintContentTypeFilm,     deinterlacing content type - set to "film",                      string
-//     keyDeintContentTypeVideo,    deinterlacing content type - set to "video",                     string
-//     keyDeintContentTypeAuto,     deinterlacing content type - set to "auto detect",               string
-//     keyDesiredGammaCurve,        desired display gamma curve - toggle,                            string
-//     keyDesiredGammaValueInc,     desired display gamma value - increase,                          string
-//     keyDesiredGammaValueDec,     desired display gamma value - decrease,                          string
-//     keyFseEnable,                automatic fullscreen exclusive mode - enable,                    string
-//     keyFseDisable,               automatic fullscreen exclusive mode - disable,                   string
-//     keyFseDisable10,             automatic fullscreen exclusive mode - disable for 10 seconds,    string
-//     keyChromaAlgo,               chroma upscaling algorithm - toggle,                             string
-//     keyChromaAlgoNearest,        chroma upscaling algorithm - set to "Nearest Neighbor",          string
-//     keyChromaAlgoBilinear,       chroma upscaling algorithm - set to "Bilinear",                  string
-//     keyChromaAlgoMitchell,       chroma upscaling algorithm - set to "Mitchell-Netravali",        string
-//     keyChromaAlgoCatmull,        chroma upscaling algorithm - set to "Catmull-Rom",               string
-//     keyChromaAlgoBicubic,        chroma upscaling algorithm - set to "Bicubic",                   string
-//     keyChromaAlgoSoftCubic,      chroma upscaling algorithm - set to "SoftCubic",                 string
-//     keyChromaAlgoLanczos,        chroma upscaling algorithm - set to "Lanczos",                   string
-//     keyChromaAlgoSpline,         chroma upscaling algorithm - set to "Spline",                    string
-//     keyChromaAlgoJinc,           chroma upscaling algorithm - set to "Jinc",                      string
-//     keyChromaAlgoParamInc,       chroma upscaling algorithm parameter - increase,                 string
-//     keyChromaAlgoParamDec,       chroma upscaling algorithm parameter - decrease,                 string
-//     keyChromaAntiRing,           chroma upscaling anti-ringing filter - toggle on/off,            string
-//     keyImageUpAlgo,              image upscaling algorithm - toggle,                              string
-//     keyImageUpAlgoNearest,       image upscaling algorithm - set to "Nearest Neighbor",           string
-//     keyImageUpAlgoBilinear,      image upscaling algorithm - set to "Bilinear",                   string
-//     keyImageUpAlgoDxva,          image upscaling algorithm - set to "DXVA2",                      string
-//     keyImageUpAlgoMitchell,      image upscaling algorithm - set to "Mitchell-Netravali",         string
-//     keyImageUpAlgoCatmull,       image upscaling algorithm - set to "Catmull-Rom",                string
-//     keyImageUpAlgoBicubic,       image upscaling algorithm - set to "Bicubic",                    string
-//     keyImageUpAlgoSoftCubic,     image upscaling algorithm - set to "SoftCubic",                  string
-//     keyImageUpAlgoLanczos,       image upscaling algorithm - set to "Lanczos",                    string
-//     keyImageUpAlgoSpline,        image upscaling algorithm - set to "Spline",                     string
-//     keyImageUpAlgoJinc,          image upscaling algorithm - set to "Jinc",                       string
-//     keyImageUpAlgoParamInc,      image upscaling algorithm parameter - increase,                  string
-//     keyImageUpAlgoParamDec,      image upscaling algorithm parameter - decrease,                  string
-//     keyImageUpAntiRing,          image upscaling anti-ringing filter - toggle on/off,             string
-//     keyImageUpLinear,            image upscaling in linear light - toggle on/off,                 string
-//     keyImageDownAlgo,            image downscaling algorithm - toggle,                            string
-//     keyImageDownAlgoNearest,     image downscaling algorithm - set to "Nearest Neighbor",         string
-//     keyImageDownAlgoBilinear,    image downscaling algorithm - set to "Bilinear",                 string
-//     keyImageDownAlgoDxva,        image downscaling algorithm - set to "DXVA2",                    string
-//     keyImageDownAlgoMitchell,    image downscaling algorithm - set to "Mitchell-Netravali",       string
-//     keyImageDownAlgoCatmull,     image downscaling algorithm - set to "Catmull-Rom",              string
-//     keyImageDownAlgoBicubic,     image downscaling algorithm - set to "Bicubic",                  string
-//     keyImageDownAlgoSoftCubic,   image downscaling algorithm - set to "SoftCubic",                string
-//     keyImageDownAlgoLanczos,     image downscaling algorithm - set to "Lanczos",                  string
-//     keyImageDownAlgoSpline,      image downscaling algorithm - set to "Spline",                   string
-//     keyImageDownAlgoParamInc,    image downscaling algorithm parameter - increase,                string
-//     keyImageDownAlgoParamDec,    image downscaling algorithm parameter - decrease,                string
-//     keyImageDownAntiRing,        image downscaling anti-ringing filter - toggle on/off,           string
-//     keyImageDownLinear,          image downscaling in linear light - toggle on/off,               string
-//     keyDisplayModeChanger,       display mode switcher - toggle on/off,                           string
-//     keyDisplayBitdepth,          display bitdepth - toggle,                                       string
-//     keyDithering,                dithering - toggle on/off,                                       string
+//     keysOnlyIfFocused,           use only if media player has keyboard focus,                        boolean
+//     keyDebugOsd,                 debug OSD - toggle on/off,                                          string
+//     keyResetStats,               debug OSD - reset statistics,                                       string
+//     keyFreezeReport,             create freeze report,                                               string
+//     keyOutputLevels,             output levels - toggle,                                             string
+//     keySourceLevels,             source levels - toggle,                                             string
+//     keySourceBlackInc,           source black level - increase,                                      string
+//     keySourceBlackDec,           source black level - decrease,                                      string
+//     keySourceWhiteInc,           source white level - increase,                                      string
+//     keySourceWhiteDec,           source white level - decrease,                                      string
+//     keySourceBrightnessInc,      source brightness - increase,                                       string
+//     keySourceBrightnessDec,      source brightness - decrease,                                       string
+//     keySourceContrastInc,        source contrast - increase,                                         string
+//     keySourceContrastDec,        source contrast - decrease,                                         string
+//     keySourceSaturationInc,      source saturation - increase,                                       string
+//     keySourceSaturationDec,      source saturation - decrease,                                       string
+//     keySourceHueInc,             source hue - increase,                                              string
+//     keySourceHueDec,             source hue - decrease,                                              string
+//     keySourceColorControlReset,  source color control - reset,                                       string
+//     keyMatrix,                   source decoding matrix - toggle,                                    string
+//     keyPrimaries,                source primaries - toggle,                                          string
+//     keyPrimariesEbu,             source primaries - set to "EBU/PAL",                                string
+//     keyPrimaries709,             source primaries - set to "BT.709",                                 string
+//     keyPrimariesSmpteC,          source primaries - set to "SMPTE C",                                string
+//     keyPrimaries2020,            source primaries - set to "BT.2020",                                string
+//     keyPrimariesDci,             source primaries - set to "DCI-P3",                                 string
+//     keyDeint,                    deinterlacing - toggle,                                             string
+//     keyDeintFieldOrder,          deinterlacing field order - toggle,                                 string
+//     keyDeintContentType,         deinterlacing content type - toggle,                                string
+//     keyDeintContentTypeFilm,     deinterlacing content type - set to "film",                         string
+//     keyDeintContentTypeVideo,    deinterlacing content type - set to "video",                        string
+//     keyDeintContentTypeAuto,     deinterlacing content type - set to "auto detect",                  string
+//     keyDesiredGammaCurve,        desired display gamma curve - toggle,                               string
+//     keyDesiredGammaValueInc,     desired display gamma value - increase,                             string
+//     keyDesiredGammaValueDec,     desired display gamma value - decrease,                             string
+//     keyFseEnable,                automatic fullscreen exclusive mode - enable,                       string
+//     keyFseDisable,               automatic fullscreen exclusive mode - disable,                      string
+//     keyFseDisable10,             automatic fullscreen exclusive mode - disable for 10 seconds,       string
+//     keyEnableSmoothMotion,       enable smooth motion frame rate conversion,                         string
+//     keyDisableSmoothMotion,      disable smooth motion frame rate conversion,                        string
+//     keyChromaAlgo,               chroma upscaling algorithm - toggle,                                string
+//     keyChromaAlgoNearest,        chroma upscaling algorithm - set to "Nearest Neighbor",             string
+//     keyChromaAlgoBilinear,       chroma upscaling algorithm - set to "Bilinear",                     string
+//     keyChromaAlgoMitchell,       chroma upscaling algorithm - set to "Mitchell-Netravali",           string
+//     keyChromaAlgoCatmull,        chroma upscaling algorithm - set to "Catmull-Rom",                  string
+//     keyChromaAlgoBicubic,        chroma upscaling algorithm - set to "Bicubic",                      string
+//     keyChromaAlgoSoftCubic,      chroma upscaling algorithm - set to "SoftCubic",                    string
+//     keyChromaAlgoLanczos,        chroma upscaling algorithm - set to "Lanczos",                      string
+//     keyChromaAlgoSpline,         chroma upscaling algorithm - set to "Spline",                       string
+//     keyChromaAlgoJinc,           chroma upscaling algorithm - set to "Jinc",                         string
+//     keyChromaAlgoParamInc,       chroma upscaling algorithm parameter - increase,                    string
+//     keyChromaAlgoParamDec,       chroma upscaling algorithm parameter - decrease,                    string
+//     keyChromaAntiRing,           chroma upscaling anti-ringing filter - toggle on/off,               string
+//     keyImageUpAlgo,              image upscaling algorithm - toggle,                                 string
+//     keyImageUpAlgoNearest,       image upscaling algorithm - set to "Nearest Neighbor",              string
+//     keyImageUpAlgoBilinear,      image upscaling algorithm - set to "Bilinear",                      string
+//     keyImageUpAlgoDxva,          image upscaling algorithm - set to "DXVA2",                         string
+//     keyImageUpAlgoMitchell,      image upscaling algorithm - set to "Mitchell-Netravali",            string
+//     keyImageUpAlgoCatmull,       image upscaling algorithm - set to "Catmull-Rom",                   string
+//     keyImageUpAlgoBicubic,       image upscaling algorithm - set to "Bicubic",                       string
+//     keyImageUpAlgoSoftCubic,     image upscaling algorithm - set to "SoftCubic",                     string
+//     keyImageUpAlgoLanczos,       image upscaling algorithm - set to "Lanczos",                       string
+//     keyImageUpAlgoSpline,        image upscaling algorithm - set to "Spline",                        string
+//     keyImageUpAlgoJinc,          image upscaling algorithm - set to "Jinc",                          string
+//     keyImageUpAlgoParamInc,      image upscaling algorithm parameter - increase,                     string
+//     keyImageUpAlgoParamDec,      image upscaling algorithm parameter - decrease,                     string
+//     keyImageUpAntiRing,          image upscaling anti-ringing filter - toggle on/off,                string
+//     keyImageUpLinear,            image upscaling in linear light - toggle on/off,                    string
+//     keyImageDownAlgo,            image downscaling algorithm - toggle,                               string
+//     keyImageDownAlgoNearest,     image downscaling algorithm - set to "Nearest Neighbor",            string
+//     keyImageDownAlgoBilinear,    image downscaling algorithm - set to "Bilinear",                    string
+//     keyImageDownAlgoDxva,        image downscaling algorithm - set to "DXVA2",                       string
+//     keyImageDownAlgoMitchell,    image downscaling algorithm - set to "Mitchell-Netravali",          string
+//     keyImageDownAlgoCatmull,     image downscaling algorithm - set to "Catmull-Rom",                 string
+//     keyImageDownAlgoBicubic,     image downscaling algorithm - set to "Bicubic",                     string
+//     keyImageDownAlgoSoftCubic,   image downscaling algorithm - set to "SoftCubic",                   string
+//     keyImageDownAlgoLanczos,     image downscaling algorithm - set to "Lanczos",                     string
+//     keyImageDownAlgoSpline,      image downscaling algorithm - set to "Spline",                      string
+//     keyImageDownAlgoParamInc,    image downscaling algorithm parameter - increase,                   string
+//     keyImageDownAlgoParamDec,    image downscaling algorithm parameter - decrease,                   string
+//     keyImageDownAntiRing,        image downscaling anti-ringing filter - toggle on/off,              string
+//     keyImageDownLinear,          image downscaling in linear light - toggle on/off,                  string
+//     keyDisplayModeChanger,       display mode switcher - toggle on/off,                              string
+//     keyDisplayBitdepth,          display bitdepth - toggle,                                          string
+//     keyDithering,                dithering - toggle on/off,                                          string
+
+// ---------------------------------------------------------------------------
+// IMadVRExclusiveModeInfo (obsolete)
+// ---------------------------------------------------------------------------
+
+// CAUTION: This interface is obsolete. Use IMadVRInfo instead:
+// IMadVRInfo::InfoGetBoolean("ExclusiveModeActive")
+// IMadVRInfo::InfoGetBoolean("MadVRSeekbarEnabled")
+
+// this interface allows you to ask...
+// ... whether madVR is currently in exclusive mode
+// ... whether the madVR exclusive mode seek bar is currently enabled
+
+// If madVR is in fullscreen exclusive mode, you should be careful with
+// which GUI you show, because showing any window based GUI will make madVR
+// automatically switch back to windowed mode. That's ok if that's what you
+// really want, just be aware of that. A good alternative is to use the
+// graphical or text base OSD interfaces (see above). Using them instead of
+// a window based GUI means that madVR can stay in exclusive mode all the
+// time.
+
+// Since madVR has its own seek bar (which is only shown in fullscreen
+// exclusive mode, though), before showing your own seek bar you should
+// check whether madVR is in fullscreen exclusive mode and whether the
+// user has enabled madVR's own seek bar. If so, you should probably not
+// show your own seek bar. If the user, however, has the madVR seek bar
+// disabled, you should still show your own seek bar, because otherwise
+// the user will have no way to seek at all.
+
+[uuid("D6EE8031-214E-4E9E-A3A7-458925F933AB")]
+interface IMadVRExclusiveModeInfo : public IUnknown
+{
+  STDMETHOD_(BOOL, IsExclusiveModeActive)(void) = 0;
+  STDMETHOD_(BOOL, IsMadVRSeekbarEnabled)(void) = 0;
+};
+
+// ---------------------------------------------------------------------------
+// IMadVRRefreshRateInfo (obsolete)
+// ---------------------------------------------------------------------------
+
+// CAUTION: This interface is obsolete. Use IMadVRInfo instead:
+// IMadVRInfo::InfoGetDouble("RefreshRate")
+
+// this interface allows you to ask madVR about the detected refresh rate
+
+[uuid("3F6580E8-8DE9-48D0-8E4E-1F26FE02413E")]
+interface IMadVRRefreshRateInfo : public IUnknown
+{
+  STDMETHOD(GetRefreshRate)(double *refreshRate) = 0;
+};
 
 // ---------------------------------------------------------------------------
 
