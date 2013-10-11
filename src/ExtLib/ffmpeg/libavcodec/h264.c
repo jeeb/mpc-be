@@ -55,6 +55,8 @@
 #include <dxva.h>
 // <== End patch MPC
 
+static void flush_change(H264Context *h);
+
 const uint16_t ff_h264_mb_sizes[4] = { 256, 384, 512, 768 };
 
 static const uint8_t rem6[QP_MAX_NUM + 1] = {
@@ -1637,6 +1639,8 @@ av_cold int ff_h264_decode_init(AVCodecContext *avctx)
     }
 
     avctx->internal->allocate_progress = 1;
+
+    flush_change(h);
 
     return 0;
 }
