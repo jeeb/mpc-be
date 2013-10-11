@@ -208,8 +208,8 @@ void CMediaFormats::UpdateData(bool fSave)
 {
 	if (fSave) {
 		AfxGetApp()->WriteProfileString(_T("FileFormats"), NULL, NULL);
-		AfxGetApp()->WriteProfileInt(_T("FileFormats"), _T("RtspHandler"), m_iRtspHandler);
-		AfxGetApp()->WriteProfileInt(_T("FileFormats"), _T("RtspFileExtFirst"), m_fRtspFileExtFirst);
+		AfxGetApp()->WriteProfileInt(_T("Settings"), _T("RtspHandler"), m_iRtspHandler);
+		AfxGetApp()->WriteProfileInt(_T("Settings"), _T("RtspFileExtFirst"), m_fRtspFileExtFirst);
 	} else {
 		RemoveAll();
 
@@ -269,8 +269,8 @@ void CMediaFormats::UpdateData(bool fSave)
 		ADDFMT((_T("bdpls"),       ResStr(IDS_MFMT_BDPLS),       _T("mpls bdmv")));
 #undef ADDFMT
 
-		m_iRtspHandler		= (engine_t)AfxGetApp()->GetProfileInt(_T("FileFormats"), _T("RtspHandler"), (int)RealMedia);
-		m_fRtspFileExtFirst	= !!AfxGetApp()->GetProfileInt(_T("FileFormats"), _T("RtspFileExtFirst"), 1);
+		m_iRtspHandler		= (engine_t)AfxGetApp()->GetProfileInt(_T("Settings"), _T("RtspHandler"), (int)RealMedia);
+		m_fRtspFileExtFirst	= !!AfxGetApp()->GetProfileInt(_T("Settings"), _T("RtspFileExtFirst"), 1);
 	}
 
 	for (size_t i = 0; i < GetCount(); i++) {
