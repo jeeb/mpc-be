@@ -1330,8 +1330,8 @@ void MediaInfo_Config_CodecID_Video_Mpeg4 (InfoMap &Info)
     "apcn;ProRes;;;http://www.apple.com/quicktime/download/standalone.html;;;YUV;4:2:2\n"
     "apcs;ProRes;;;http://www.apple.com/quicktime/download/standalone.html;LT;;YUV;4:2:2\n"
     "apco;ProRes;;;http://www.apple.com/quicktime/download/standalone.html;Proxy;;YUV;4:2:2\n"
-    "ap4c;ProRes;;;http://www.apple.com/quicktime/download/standalone.html;;;YUV;4:4:4\n"
-    "ap4h;ProRes;;;http://www.apple.com/quicktime/download/standalone.html;;;YUV;4:4:4\n"
+    "ap4c;ProRes;;;http://www.apple.com/quicktime/download/standalone.html;;;;4:4:4\n"
+    "ap4h;ProRes;;;http://www.apple.com/quicktime/download/standalone.html;;;;4:4:4\n"
     "ai12;AVC;;Advanced Video Coding;http://ffdshow-tryout.sourceforge.net;;\n"
     "ai15;AVC;;Advanced Video Coding;http://ffdshow-tryout.sourceforge.net;;\n"
     "ai1q;AVC;;Advanced Video Coding;http://ffdshow-tryout.sourceforge.net;;\n"
@@ -1430,7 +1430,7 @@ void MediaInfo_Config_CodecID_Video_Mpeg4 (InfoMap &Info)
     "PIM2;MPEG Video;;;;;;YUV\n"
     "PNTG;MacPaint;;Apple MacPaint image format;http://www.apple.com/quicktime/download/standalone.html;;;\n"
     "raw ;RGB;;;http://www.apple.com/quicktime/download/standalone.html;;;RGB\n"
-    "rle ;RLE;;;http://www.apple.com/quicktime/download/standalone.html;;;\n"
+    "rle ;RLE;;;http://www.apple.com/quicktime/download/standalone.html;;;RGB\n"
     "rpza;Road Pizza;;;http://www.apple.com/quicktime/download/standalone.html;;;\n"
     "s263;H.263;;;http://www.apple.com/quicktime/download/standalone.html;;;\n"
     "Shr0;SheerVideo;;Generic SheerVideo codec;http://www.bitjazz.com/;;;\n"
@@ -4405,6 +4405,14 @@ void MediaInfo_Config_Video (ZtringListList &Info)
     "Tagged_Date;;;Y YT;;;UTC time that the tags were done for this item.;;Temporal\n"
     "Encryption;;;Y YT;;;;\n"
     "BufferSize;;;N YT;;;Defines the size of the buffer needed to decode the sequence.\n"
+    "colour_description_present;;;N YT;;;Presence of colour description\n"
+    "colour_primaries;;;Y YT;;;Chromaticity coordinates of the source primaries\n"
+    "transfer_characteristics;;;Y YT;;;Opto-electronic transfer characteristic of the source picture\n"
+    "matrix_coefficients;;;Y YT;;;Matrix coefficients used in deriving luma and chroma signals from the green, blue, and red primaries\n"
+    "colour_description_present_Original;;;N YT;;;Presence of colour description\n"
+    "colour_primaries_Original;;;Y YT;;;Chromaticity coordinates of the source primaries\n"
+    "transfer_characteristics_Original;;;Y YT;;;Opto-electronic transfer characteristic of the source picture\n"
+    "matrix_coefficients_Original;;;Y YT;;;Matrix coefficients used in deriving luma and chroma signals from the green, blue, and red primaries\n"
     ));
     Info.Separator_Set(0, ZenLib::EOL);
 }
@@ -5013,6 +5021,14 @@ void MediaInfo_Config_Image (ZtringListList &Info)
     "Encoded_Date;;;Y YT;;;The time that the encoding of this item was completed began.;;Temporal\n"
     "Tagged_Date;;;Y YT;;;The time that the tags were done for this item.;;Temporal\n"
     "Encryption;;;Y YT;;;;\n"
+    "colour_description_present;;;N YT;;;Presence of colour description\n"
+    "colour_primaries;;;Y YT;;;Chromaticity coordinates of the source primaries\n"
+    "transfer_characteristics;;;Y YT;;;Opto-electronic transfer characteristic of the source picture\n"
+    "matrix_coefficients;;;Y YT;;;Matrix coefficients used in deriving luma and chroma signals from the green, blue, and red primaries\n"
+    "colour_description_present_Original;;;N YT;;;Presence of colour description\n"
+    "colour_primaries_Original;;;Y YT;;;Chromaticity coordinates of the source primaries\n"
+    "transfer_characteristics_Original;;;Y YT;;;Opto-electronic transfer characteristic of the source picture\n"
+    "matrix_coefficients_Original;;;Y YT;;;Matrix coefficients used in deriving luma and chroma signals from the green, blue, and red primaries\n"
     ));
     Info.Separator_Set(0, ZenLib::EOL);
 }
@@ -5095,6 +5111,8 @@ void MediaInfo_Config_Menu (ZtringListList &Info)
     "Original/NetworkName;;;Y YT;;;;;Legal\n"
     "Countries;;;Y YT;;;;;Legal\n"
     "TimeZones;;;Y YT;;;;;Legal\n"
+    "LawRating;;;Y YT;;;Depending on the country it's the format of the rating of a movie (P, R, X in the USA, an age in other countries or a URI defining a logo).;;Classification\n"
+    "LawRating_Reason;;;Y YT;;;Reason for the law rating;;Classification\n"
     "Chapters_Pos_Begin;;;N NI;;;Used by third-party developers to know about the beginning of the chapters list, to be used by Get(Stream_Menu, x, Pos), where Pos is an Integer between Chapters_Pos_Begin and Chapters_Pos_End;\n"
     "Chapters_Pos_End;;;N NI;;;Used by third-party developers to know about the end of the chapters list (this position excluded)\n"
     ));

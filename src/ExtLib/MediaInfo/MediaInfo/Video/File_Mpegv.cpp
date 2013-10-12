@@ -1176,6 +1176,9 @@ void File_Mpegv::Streams_Update()
                     IsNewStream=true;
                 }
                 Merge(*(*Text_Positions[Text_Positions_Pos].Parser), Stream_Text, Pos, Text_Positions[Text_Positions_Pos].StreamPos+Pos);
+                Ztring LawRating=(*Text_Positions[Text_Positions_Pos].Parser)->Retrieve(Stream_General, 0, General_LawRating);
+                if (!LawRating.empty())
+                    Fill(Stream_General, 0, General_LawRating, LawRating, true);
 
                 if (IsNewStream)
                 {
@@ -1330,9 +1333,13 @@ void File_Mpegv::Streams_Fill()
 
     //Standard
     Fill(Stream_Video, 0, Video_Standard, Mpegv_video_format[video_format]);
-    Fill(Stream_Video, 0, "colour_primaries", Mpegv_colour_primaries(colour_primaries));
-    Fill(Stream_Video, 0, "transfer_characteristics", Mpegv_transfer_characteristics(transfer_characteristics));
-    Fill(Stream_Video, 0, "matrix_coefficients", Mpegv_matrix_coefficients(matrix_coefficients));
+    if (colour_description)
+    {
+        Fill(Stream_Video, 0, Video_colour_description_present, "Yes");
+        Fill(Stream_Video, 0, Video_colour_primaries, Mpegv_colour_primaries(colour_primaries));
+        Fill(Stream_Video, 0, Video_transfer_characteristics, Mpegv_transfer_characteristics(transfer_characteristics));
+        Fill(Stream_Video, 0, Video_matrix_coefficients, Mpegv_matrix_coefficients(matrix_coefficients));
+    }
 
     //Matrix
     if (load_intra_quantiser_matrix || load_non_intra_quantiser_matrix)
@@ -1425,7 +1432,12 @@ void File_Mpegv::Streams_Fill()
         if (DTG1_Parser)
             Merge(*DTG1_Parser, Stream_Video, 0, 0);
         if (GA94_06_Parser)
+        {
             Merge(*GA94_06_Parser, Stream_Video, 0, 0);
+            Ztring LawRating=GA94_06_Parser->Retrieve(Stream_General, 0, General_LawRating);
+            if (!LawRating.empty())
+                Fill(Stream_General, 0, General_LawRating, LawRating, true);
+        }
     #endif //defined(MEDIAINFO_AFDBARDATA_YES)
     #if defined(MEDIAINFO_AFDBARDATA_YES)
         if (AfdBarData_Parser)
@@ -1715,6 +1727,7 @@ void File_Mpegv::Synched_Init()
     PTS_LastIFrame=(int64u)-1;
     bit_rate_value_IsValid=false;
     profile_and_level_indication_escape=false;
+    colour_description=false;
     RefFramesCount=0;
     BVOPsSinceLastRefFrames=0;
     temporal_reference_LastIFrame=0;
@@ -3666,7 +3679,7 @@ void File_Mpegv::extension_start()
         case  2 :{ //Sequence Display
                     //Parsing
                     Get_S1 ( 3, video_format,                   "video_format"); Param_Info1(Mpegv_video_format[video_format]);
-                    TEST_SB_SKIP(                               "colour_description");
+                    TEST_SB_GET (  colour_description,          "colour_description");
                         Get_S1 (8, colour_primaries,            "colour_primaries"); Param_Info1(Mpegv_colour_primaries(colour_primaries));
                         Get_S1 (8, transfer_characteristics,    "transfer_characteristics"); Param_Info1(Mpegv_transfer_characteristics(transfer_characteristics));
                         Get_S1 (8, matrix_coefficients,         "matrix_coefficients"); Param_Info1(Mpegv_matrix_coefficients(matrix_coefficients));

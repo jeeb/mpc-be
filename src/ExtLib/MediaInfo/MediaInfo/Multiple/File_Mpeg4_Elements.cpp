@@ -4423,11 +4423,20 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxVideo()
         }
 
         //RGB(A)
-        if (Codec=="raw ")
+        if (Codec=="raw " || Codec=="rle ")
         {
-            if (Depth==32)
+            if (Depth==1)
             {
-                Fill(Stream_Video, StreamPos_Last, Video_Format, "RGBA", Unlimited, true, true);
+                Fill(Stream_Video, StreamPos_Last, Video_ColorSpace, "Y", Unlimited, true, true);
+                Fill(Stream_Video, StreamPos_Last, Video_BitDepth, 1);
+            }
+            else if (Depth<15)
+            {
+                Fill(Stream_Video, StreamPos_Last, Video_ColorSpace, "RGB", Unlimited, true, true);
+                Fill(Stream_Video, StreamPos_Last, Video_BitDepth, 8);
+            }
+            else if (Depth==32 || Depth==36)
+            {
                 Fill(Stream_Video, StreamPos_Last, Video_ColorSpace, "RGBA", Unlimited, true, true);
                 Fill(Stream_Video, StreamPos_Last, Video_BitDepth, Depth/4);
             }
@@ -4765,9 +4774,13 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_colr()
     Get_B2 (matrix_coefficients,                                "Matrix index"); Param_Info1(Mpegv_matrix_coefficients((int8u)matrix_coefficients));
 
     FILLING_BEGIN();
-        Fill(Stream_Video, StreamPos_Last, "colour_primaries", Mpegv_colour_primaries((int8u)colour_primaries));
-        Fill(Stream_Video, StreamPos_Last, "transfer_characteristics", Mpegv_transfer_characteristics((int8u)transfer_characteristics));
-        Fill(Stream_Video, StreamPos_Last, "matrix_coefficients", Mpegv_matrix_coefficients((int8u)matrix_coefficients));
+        if (Retrieve(Stream_Video, StreamPos_Last, Video_colour_description_present).empty()) //Using only the first one met
+        {
+            Fill(Stream_Video, StreamPos_Last, Video_colour_description_present, "Yes");
+            Fill(Stream_Video, StreamPos_Last, Video_colour_primaries, Mpegv_colour_primaries((int8u)colour_primaries));
+            Fill(Stream_Video, StreamPos_Last, Video_transfer_characteristics, Mpegv_transfer_characteristics((int8u)transfer_characteristics));
+            Fill(Stream_Video, StreamPos_Last, Video_matrix_coefficients, Mpegv_matrix_coefficients((int8u)matrix_coefficients));
+        }
     FILLING_END();
 }
 
