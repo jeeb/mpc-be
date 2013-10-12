@@ -245,7 +245,7 @@ void CPlaylistItem::AutoLoadFiles()
 							ext2 = ext2.Mid(n + 1).MakeLower();
 							CString fullpath = paths[i] + fd.cFileName;
 
-							if (ext != ext2 && mf.FindExt(ext2, true) && !FindFileInList(m_fns, fullpath) && mf.IsUsingEngine(fullpath, DirectShow)) {
+							if (ext != ext2 && mf.FindExt(ext2, true) && !FindFileInList(m_fns, fullpath) && s.IsUsingRtspEngine(fullpath, DirectShow)) {
 								m_fns.AddTail(fullpath);
 							}
 						} while (FindNextFile(hFind, &fd));

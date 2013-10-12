@@ -480,6 +480,8 @@ public:
 	// Formats
 	CMediaFormats	m_Formats;
 	bool			fAssociatedWithIcons;
+	engine_t		iRtspHandler;
+	bool			fRtspFileExtFirst;
 
 	// Keys
 	CList<wmcmd>	wmcmds;
@@ -791,6 +793,12 @@ public:
 	CDVBChannel*	FindChannelByPref(int nPrefNumber);
 
 	int				GetMultiInst();
+
+	engine_t		GetRtspHandler(bool& lookext);
+	void			SetRtspHandler(engine_t e, bool lookext);
+	bool			IsUsingRtspEngine(CString path, engine_t e);
+	engine_t		GetRtspEngine(CString path);
+
 private:
 	void			UpdateRenderersData(bool fSave);
 	friend	void	CRenderersSettings::UpdateData(bool bSave);

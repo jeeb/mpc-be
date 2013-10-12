@@ -163,6 +163,8 @@
 #define IDS_RS_JUMPDISTM					_T("JumpDistM")
 #define IDS_RS_JUMPDISTL					_T("JumpDistL")
 #define IDS_RS_REPORTFAILEDPINS				_T("ReportFailedPins")
+#define IDS_RS_RTSPHANDLER					_T("RtspHandler")
+#define IDS_RS_RTSPFILEEXTFIRST				_T("RtspFileExtFirst")
 #define IDS_RS_SRCFILTERS					_T("SrcFilters")
 #define IDS_RS_KEEPHISTORY					_T("KeepHistory")
 #define IDS_RS_LOGOID						_T("LogoID2")

@@ -664,7 +664,7 @@ BOOL CPPageFormats::OnInitDialog()
 
 	AppSettings& s = AfxGetAppSettings();
 	bool fRtspFileExtFirst;
-	engine_t e = s.m_Formats.GetRtspHandler(fRtspFileExtFirst);
+	engine_t e = s.GetRtspHandler(fRtspFileExtFirst);
 	m_iRtspHandler = (e==RealMedia?0:e==QuickTime?1:2);
 	m_fRtspFileExtFirst = fRtspFileExtFirst;
 
@@ -994,7 +994,7 @@ BOOL CPPageFormats::OnApply()
 	AddAutoPlayToRegistry(AP_BDMOVIE,	!!m_apdvd.GetCheck());
 
 	AppSettings& s = AfxGetAppSettings();
-	s.m_Formats.SetRtspHandler(m_iRtspHandler == 0 ? RealMedia : m_iRtspHandler == 1 ? QuickTime:DirectShow, !!m_fRtspFileExtFirst);
+	s.SetRtspHandler(m_iRtspHandler == 0 ? RealMedia : m_iRtspHandler == 1 ? QuickTime:DirectShow, !!m_fRtspFileExtFirst);
 	s.fAssociatedWithIcons = !!m_fAssociatedWithIcons.GetCheck();
 
 	if (m_bFileExtChanged && IsWinEightOrLater()) {

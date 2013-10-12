@@ -12303,7 +12303,7 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 	}
 
 	if (OpenFileData* p = dynamic_cast<OpenFileData*>(pOMD)) {
-		engine_t engine = s.m_Formats.GetEngine(p->fns.GetHead());
+		engine_t engine = s.GetRtspEngine(p->fns.GetHead());
 
 		CStringA ct = GetContentType(p->fns.GetHead());
 
@@ -17987,7 +17987,7 @@ void CMainFrame::OpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 	if (OpenFileData* p = dynamic_cast<OpenFileData*>(pOMD.m_p)) {
 		if (p->fns.GetCount() > 0) {
-			engine_t e = s.m_Formats.GetEngine(p->fns.GetHead());
+			engine_t e = s.GetRtspEngine(p->fns.GetHead());
 			if (e != DirectShow /*&& e != RealMedia && e != QuickTime*/) {
 				fUseThread = false;
 			}

@@ -21,7 +21,6 @@
 
 #include "stdafx.h"
 #include "MainFrm.h"
-#include <atlpath.h>
 #include "MediaFormats.h"
 #include "OpenImage.h"
 
@@ -208,8 +207,6 @@ void CMediaFormats::UpdateData(bool fSave)
 {
 	if (fSave) {
 		AfxGetApp()->WriteProfileString(_T("FileFormats"), NULL, NULL);
-		AfxGetApp()->WriteProfileInt(_T("Settings"), _T("RtspHandler"), m_iRtspHandler);
-		AfxGetApp()->WriteProfileInt(_T("Settings"), _T("RtspFileExtFirst"), m_fRtspFileExtFirst);
 	} else {
 		RemoveAll();
 
@@ -268,67 +265,11 @@ void CMediaFormats::UpdateData(bool fSave)
 		ADDFMT((_T("pls"),         ResStr(IDS_MFMT_PLS),         _T("asx m3u m3u8 pls wvx wax wmx mpcpl xspf")));
 		ADDFMT((_T("bdpls"),       ResStr(IDS_MFMT_BDPLS),       _T("mpls bdmv")));
 #undef ADDFMT
-
-		m_iRtspHandler		= (engine_t)AfxGetApp()->GetProfileInt(_T("Settings"), _T("RtspHandler"), (int)RealMedia);
-		m_fRtspFileExtFirst	= !!AfxGetApp()->GetProfileInt(_T("Settings"), _T("RtspFileExtFirst"), 1);
 	}
 
 	for (size_t i = 0; i < GetCount(); i++) {
 		GetAt(i).UpdateData(fSave);
 	}
-}
-
-engine_t CMediaFormats::GetRtspHandler(bool& fRtspFileExtFirst)
-{
-	fRtspFileExtFirst = m_fRtspFileExtFirst;
-	return m_iRtspHandler;
-}
-
-void CMediaFormats::SetRtspHandler(engine_t e, bool fRtspFileExtFirst)
-{
-	m_iRtspHandler		= e;
-	m_fRtspFileExtFirst	= fRtspFileExtFirst;
-}
-
-bool CMediaFormats::IsUsingEngine(CString path, engine_t e)
-{
-	return (GetEngine(path) == e);
-}
-
-engine_t CMediaFormats::GetEngine(CString path)
-{
-	path.Trim().MakeLower();
-
-	if (!m_fRtspFileExtFirst && path.Find(_T("rtsp://")) == 0) {
-		return m_iRtspHandler;
-	}
-
-	CString ext = CPath(path).GetExtension();
-	ext.MakeLower();
-
-	if (!ext.IsEmpty()) {
-		if (path.Find(_T("rtsp://")) == 0) {
-			if (ext == _T(".ram") || ext == _T(".rm") || ext == _T(".ra")) {
-				return RealMedia;
-			}
-			if (ext == _T(".qt") || ext == _T(".mov")) {
-				return QuickTime;
-			}
-		}
-
-		for (size_t i = 0; i < GetCount(); i++) {
-			CMediaFormatCategory& mfc = GetAt(i);
-			if (mfc.FindExt(ext)) {
-				return mfc.GetEngineType();
-			}
-		}
-	}
-
-	if (m_fRtspFileExtFirst && path.Find(_T("rtsp://")) == 0) {
-		return m_iRtspHandler;
-	}
-
-	return DirectShow;
 }
 
 bool CMediaFormats::FindExt(CString ext, bool fAudioOnly)
