@@ -271,6 +271,14 @@ bool CFLVSplitterFilter::ParseAMF0(CBaseSplitterFileEx* pFile, UINT64 end, const
 				return (pFile->BitRead(8) == AMF_END_OF_OBJECT);
 			}
 		case AMF_DATA_TYPE_ARRAY:
+			{
+				DWORD arraylen = pFile->BitRead(32);
+				for (DWORD i = 0; i < arraylen; i++) {
+					if (ParseAMF0(pFile, end, L"", AMF0Array) == false) {
+						return false;
+					}
+				}
+			}
 			break; // TODO ...
 		case AMF_DATA_TYPE_DATE:
 			pFile->Seek(pFile->GetPos() + 8 + 2);
@@ -279,10 +287,9 @@ bool CFLVSplitterFilter::ParseAMF0(CBaseSplitterFileEx* pFile, UINT64 end, const
 
 	if (amf0.type != AMF_DATA_TYPE_EMPTY) {
 		AMF0Array.Add(amf0);
-		return true;
 	}
 
-	return false;
+	return true;
 }
 
 bool CFLVSplitterFilter::ReadTag(Tag& t)
