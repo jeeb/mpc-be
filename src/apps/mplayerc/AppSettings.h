@@ -526,8 +526,6 @@ public:
 	bool			fReportFailedPins;
 	bool			fAutoloadAudio;
 	CString			strAudioPaths;
-	bool			fAutoloadSubtitles;
-	bool			fBlockVSFilter;
 
 	// DVD/OGM
 	bool			fUseDVDPath;
@@ -604,19 +602,21 @@ public:
 	CAutoPtrList<FilterOverride> m_filters;
 
 	// Subtitles
+	bool			fAutoloadSubtitles;
+	bool			fBlockVSFilter;
+	CString			strSubtitlePaths;
+	bool			fPrioritizeExternalSubtitles;
+	bool			fDisableInternalSubtitles;
+	bool			fAutoReloadExtSubtitles;
+	CString			strISDb;
+
+	// Subtitles - Rendering
 	bool			fOverridePlacement;
 	int				nHorPos, nVerPos;
 	int				nSubDelayInterval;
 
-	// Default Style
+	// Subtitles - Default Style
 	STSStyle		subdefstyle;
-
-	// Misc
-	bool			fPrioritizeExternalSubtitles;
-	bool			fDisableInternalSubtitles;
-	bool			fAutoReloadExtSubtitles;
-	CString			strSubtitlePaths;
-	CString			strISDb;
 
 	// Interface
 	bool			fDisableXPToolbars;
