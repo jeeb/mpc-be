@@ -149,11 +149,11 @@
     <ClInclude Include="GUIDString.h" />
     <ClInclude Include="H264Nalu.h" />
     <ClInclude Include="HdmvClipInfo.h" />
-    <ClInclude Include="HevcBitstream.h" />
     <ClInclude Include="MediaTypeEx.h" />
     <ClInclude Include="MediaTypes.h" />
     <ClInclude Include="MPCSocket.h" />
     <ClInclude Include="Mpeg2Def.h" />
+    <ClInclude Include="NALBitstream.h" />
     <ClInclude Include="NullRenderers.h" />
     <ClInclude Include="SharedInclude.h" />
     <ClInclude Include="simd_common.h" />

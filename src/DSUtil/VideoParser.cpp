@@ -20,7 +20,7 @@
 
 #include "stdafx.h"
 #include "VideoParser.h"
-#include "HevcBitstream.h"
+#include "NALBitstream.h"
 
 #define REF_SECOND_MULT 10000000LL
 
@@ -433,7 +433,7 @@ bool ParseHEVCHeader(BYTE* headerData, int headerSize, hevc_hdr& h)
 	}
 	
 	// decode SPS
-	HevcBitstream bs(headerData + sps_pos, headerSize - sps_pos);
+	NALBitstream bs(headerData + sps_pos, headerSize - sps_pos);
 	bs.GetWord(16); // skip NAL header
 	bs.GetWord(4);  // video_parameter_set_id
 	int sps_max_sub_layers_minus1 = (int)bs.GetWord(3);

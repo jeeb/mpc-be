@@ -1,11 +1,11 @@
 
 // Source code is provided by Deng James from Strongene Ltd.
 
-class HevcBitstream
+class NALBitstream
 {
 public:
-	HevcBitstream() : m_data(NULL), m_len(0), m_idx(0), m_bits(0), m_byte(0), m_zeros(0) {};
-	HevcBitstream(void * data, int len) { Init(data, len); };
+	NALBitstream() : m_data(NULL), m_len(0), m_idx(0), m_bits(0), m_byte(0), m_zeros(0) {};
+	NALBitstream(void * data, int len) { Init(data, len); };
 	void Init(void * data, int len) { m_data = (LPBYTE)data; m_len = len; m_idx = 0; m_bits = 0; m_byte = 0; m_zeros = 0; };
 
 	BYTE GetBYTE() {
