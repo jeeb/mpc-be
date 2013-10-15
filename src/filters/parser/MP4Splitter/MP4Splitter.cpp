@@ -629,7 +629,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			} else if (AP4_Hvc1SampleEntry* hvc1 = dynamic_cast<AP4_Hvc1SampleEntry*>(
 					track->GetTrakAtom()->FindChild("mdia/minf/stbl/stsd/hvc1"))) {
-#if (0) // TODO
+#if (1) // TODO
 				if (AP4_HvcCAtom* hvcC = dynamic_cast<AP4_HvcCAtom*>(hvc1->GetChild(AP4_ATOM_TYPE_HVCC))) {
 					//SetTrackName(&TrackName, _T("HEVC Video (H.265)"));
 
@@ -638,31 +638,32 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						di = &empty;
 					}
 
+					BYTE* headerData = (BYTE*)di->GetData();
+					int headerSize = (int)di->GetDataSize();
+
+					vc_params_t params;
+					if (!ParseHEVCDecoderConfigurationRecord(headerData, headerSize, params)) {
+						return E_FAIL;
+					}
+
 					mt.majortype  = MEDIATYPE_Video;
-					mt.formattype = FORMAT_VideoInfo2;
+					mt.formattype = FORMAT_MPEG2Video;
+					MPEG2VIDEOINFO* vih = (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + headerSize);
+					memset(vih, 0, mt.FormatLength());
+					vih->hdr.bmiHeader.biSize     = sizeof(vih->hdr.bmiHeader);
+					vih->hdr.bmiHeader.biPlanes   = 1;
+					vih->hdr.bmiHeader.biBitCount = 24;
+					vih->dwProfile = params.profile;
+					vih->dwLevel   = params.level;
+					vih->dwFlags   = params.nal_length_size;
+					vih->hdr.dwPictAspectRatioX = 16;
+					vih->hdr.dwPictAspectRatioY = 9;
+					vih->hdr.bmiHeader.biWidth  = params.width;
+					vih->hdr.bmiHeader.biHeight = params.height;
 
-					vih2 = (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2));
-					memset(vih2, 0, mt.FormatLength());
+					CreateSequenceHeaderHEVC(headerData, headerSize, vih->dwSequenceHeader, vih->cbSequenceHeader);
 
-					vih2->bmiHeader.biSize    = sizeof(vih2->bmiHeader);
-					vih2->bmiHeader.biWidth   = (LONG)hvc1->GetWidth();
-					vih2->bmiHeader.biHeight  = (LONG)hvc1->GetHeight();
-					vih2->rcSource            = vih2->rcTarget = CRect(0, 0, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight);
-					if (item->GetData()->GetSampleCount()) {
-						vih2->AvgTimePerFrame = item->GetData()->GetDurationMs() * 10000 / item->GetData()->GetSampleCount();
-					}
-					mt.subtype = FOURCCMap(vih2->bmiHeader.biCompression = '1CVH');
-
-					Aspect.cx = vih2->bmiHeader.biWidth;
-					Aspect.cy = vih2->bmiHeader.biHeight;
-					if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(hvc1->GetChild(AP4_ATOM_TYPE_PASP))) {
-						if (pasp->GetNum() > 0 && pasp->GetDen() > 0) {
-							Aspect.cx *= pasp->GetNum();
-							Aspect.cy *= pasp->GetDen();
-						}
-					}
-					ReduceDim(Aspect);
-					SetAspect(vih2, Aspect, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight); 
+					mt.subtype = FOURCCMap(vih->hdr.bmiHeader.biCompression = '1CVH');
 
 					mts.Add(mt);
 					//b_HasVideo = true;
