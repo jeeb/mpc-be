@@ -2085,6 +2085,7 @@ CAppSettings::CRecentFileAndURLList::CRecentFileAndURLList(UINT nStart, LPCTSTR 
 {
 }
 
+extern BOOL AFXAPI AfxFullPath(LPTSTR lpszPathOut, LPCTSTR lpszFileIn);
 extern BOOL AFXAPI AfxComparePath(LPCTSTR lpszPath1, LPCTSTR lpszPath2);
 
 void CAppSettings::CRecentFileAndURLList::Add(LPCTSTR lpszPathName)
@@ -2093,17 +2094,17 @@ void CAppSettings::CRecentFileAndURLList::Add(LPCTSTR lpszPathName)
 	ASSERT(lpszPathName != NULL);
 	ASSERT(AfxIsValidString(lpszPathName));
 
-	if (CString(lpszPathName).MakeLower().Find(_T("@device:")) >= 0) {
+	CString pathName = lpszPathName;
+	if (pathName.MakeLower().Find(_T("@device:")) >= 0) {
 		return;
 	}
-
-	CString pathName = lpszPathName;
 
 	bool fURL = (pathName.Find(_T("://")) >= 0);
 
 	// fully qualify the path name
 	if (!fURL) {
-		pathName = MakeFullPath(pathName);
+		AfxFullPath(pathName.GetBufferSetLength(pathName.GetLength() + 1024), lpszPathName);
+		pathName.ReleaseBuffer();
 	}
 
 	// update the MRU list, if an existing MRU string matches file name
