@@ -581,3 +581,161 @@ void CreateHEVCSequenceHeader(BYTE* headerData, int headerSize, DWORD* dwSequenc
 		cbSequenceHeader += len;
 	}
 }
+
+////
+
+bool ParseSequenceParameterSet(BYTE* data, int size, vc_params_t& params)
+{
+	if (size < 20) { // 8 + 12
+		return false;
+	}
+
+	NALBitstream bs(data, size);
+
+	// seq_parameter_set_rbsp
+	bs.GetWord(4);		// sps_video_parameter_set_id
+	int sps_max_sub_layers_minus1 = bs.GetWord(3);
+	bs.GetWord(1);		// sps_temporal_id_nesting_flag
+	// profile_tier_level( sps_max_sub_layers_minus1 )
+	{
+		bs.GetWord(2);	// general_profile_space
+		bs.GetWord(1);	// general_tier_flag
+		bs.GetWord(5);	// general_profile_idc
+		bs.GetWord(32);	// general_profile_compatibility_flag[32]
+		bs.GetWord(1);	// general_progressive_source_flag
+		bs.GetWord(1);	// general_interlaced_source_flag
+		bs.GetWord(1);	// general_non_packed_constraint_flag
+		bs.GetWord(1);	// general_frame_only_constraint_flag
+		bs.GetWord(44);	// general_reserved_zero_44bits
+		bs.GetWord(8);	// general_level_idc
+		uint8* sub_layer_profile_present_flag = new uint8[sps_max_sub_layers_minus1];
+		uint8* sub_layer_level_present_flag   = new uint8[sps_max_sub_layers_minus1];
+		for (int i = 0; i < sps_max_sub_layers_minus1; i++) {
+			sub_layer_profile_present_flag[i] = bs.GetWord(1);
+			sub_layer_level_present_flag[i]   = bs.GetWord(1);
+		}
+		if (sps_max_sub_layers_minus1 > 0) {
+			for (int i = sps_max_sub_layers_minus1; i < 8; i++) {
+				uint8 reserved_zero_2bits = bs.GetWord(2);
+			}
+		}
+		for (int i = 0; i < sps_max_sub_layers_minus1; i++) {
+			if (sub_layer_profile_present_flag[i]) {
+				bs.GetWord(2);	// sub_layer_profile_space[i]
+				bs.GetWord(1);	// sub_layer_tier_flag[i]
+				bs.GetWord(5);	// sub_layer_profile_idc[i]
+				bs.GetWord(32);	// sub_layer_profile_compatibility_flag[i][32]
+				bs.GetWord(1);	// sub_layer_progressive_source_flag[i]
+				bs.GetWord(1);	// sub_layer_interlaced_source_flag[i]
+				bs.GetWord(1);	// sub_layer_non_packed_constraint_flag[i]
+				bs.GetWord(1);	// sub_layer_frame_only_constraint_flag[i]
+				bs.GetWord(44);	// sub_layer_reserved_zero_44bits[i]
+			}
+			if (sub_layer_level_present_flag[i]) {
+				bs.GetWord(8);	// sub_layer_level_idc[i]
+			}
+		}
+		delete[] sub_layer_profile_present_flag;
+		delete[] sub_layer_level_present_flag;
+	}
+	uint32 sps_seq_parameter_set_id = bs.GetUE();
+	uint32 chroma_format_idc        = bs.GetUE();
+	if (chroma_format_idc == 3) {
+		bs.GetWord(1); // separate_colour_plane_flag
+	}
+	params.width  = bs.GetUE();	// pic_width_in_luma_samples
+	params.height = bs.GetUE();	// pic_height_in_luma_samples
+	if (bs.GetWord(1)) {	// conformance_window_flag
+		bs.GetUE();			// conf_win_left_offset
+		bs.GetUE();			// conf_win_right_offset
+		bs.GetUE();			// conf_win_top_offset
+		bs.GetUE();			// conf_win_bottom_offset
+	}
+	uint32 bit_depth_luma_minus8   = bs.GetUE();
+	uint32 bit_depth_chroma_minus8 = bs.GetUE();
+	//...
+
+	return true;
+}
+
+enum nal_unit_type_e {
+	NAL_UNIT_VPS = 32,
+	NAL_UNIT_SPS = 33,
+};
+
+bool ParseHEVCDecoderConfigurationRecord(BYTE* data, int size, vc_params_t& params)
+{
+	params.clear();
+	if (size < 23) {
+		return false;
+	}
+	CGolombBuffer gb(data, size);
+
+	// HEVCDecoderConfigurationRecord
+	if (gb.BitRead(8) != 1) {	// configurationVersion = 1
+		return false;
+	}
+	gb.BitRead(2);					// general_profile_space
+	gb.BitRead(1);					// general_tier_flag
+	params.profile = gb.BitRead(5);	// general_profile_idc
+	gb.BitRead(32);					// general_profile_compatibility_flags
+	gb.BitRead(48);					// general_constraint_indicator_flags
+	params.level   = gb.BitRead(8);	// general_level_idc
+	if (gb.BitRead(4) != 15) {		// reserved = ‘1111’b
+		return false;
+	}
+	gb.BitRead(12);				// min_spatial_segmentation_idc
+	if (gb.BitRead(6) != 63) {	// reserved = ‘111111’b
+		return false;
+	}
+	gb.BitRead(2);				// parallelismType
+	if (gb.BitRead(6) != 63) {	// reserved = ‘111111’b
+		return false;
+	}
+	uint8 chromaFormat = gb.BitRead(2); // 0 = monochrome, 1 = 4:2:0, 2 = 4:2:2, 3 = 4:4:4
+	if (gb.BitRead(5) != 31) {	// reserved = ‘11111’b
+		return false;
+	}
+	uint8 bitDepthLumaMinus8 = gb.BitRead(3);
+	if (gb.BitRead(5) != 31) {	// reserved = ‘11111’b
+		return false;
+	}
+	uint8 bitDepthChromaMinus8 = gb.BitRead(3);
+	gb.BitRead(16);				// avgFrameRate
+	gb.BitRead(2);				// constantFrameRate
+	gb.BitRead(3);				// numTemporalLayers
+	gb.BitRead(1);				// temporalIdNested
+	params.nal_length_size = gb.BitRead(2) + 1;	// lengthSizeMinusOne
+	int numOfArrays = gb.BitRead(8);
+
+	int sps_num = 0;
+	int sps_len = 0;
+
+	for (int j = 0; j < numOfArrays; j++) {
+		gb.BitRead(1);				// array_completeness
+		if (gb.BitRead(1) != 0) {	// reserved = 0
+			return false;
+		}
+		int NAL_unit_type = gb.BitRead(6);
+		int numNalus      = gb.BitRead(16);
+		if (NAL_unit_type == (int)NAL_UNIT_SPS) {
+			sps_num = numNalus;
+			sps_len = gb.BitRead(16);
+			break;
+		}
+		for (int i = 0; i < numNalus; i++) {
+			int nalUnitLength = gb.BitRead(16);
+			gb.SkipBytes(nalUnitLength);
+		}
+	}
+
+	if (!sps_num) {
+		return false;
+	}
+
+	if (!ParseSequenceParameterSet(gb.GetBufferPos(), sps_len, params)) {
+		return false;
+	}
+
+	return true;
+}

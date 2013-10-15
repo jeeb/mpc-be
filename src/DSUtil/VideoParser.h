@@ -71,3 +71,18 @@ bool ParseAVCHeader(CGolombBuffer gb, avc_hdr& h, bool fullscan = false);
 
 bool ParseHEVCHeader(BYTE* headerData, int headerSize, hevc_hdr& h);
 void CreateHEVCSequenceHeader(BYTE* headerData, int headerSize, DWORD* dwSequenceHeader, DWORD& dwSequenceSize);
+
+////
+
+struct vc_params_t {
+	DWORD width, height;
+
+	DWORD nal_length_size;
+	DWORD profile, level;
+
+	void clear() {
+		memset(this, 0, sizeof(*this));
+	}
+};
+
+bool ParseHEVCDecoderConfigurationRecord(BYTE* data, int size, vc_params_t& params);
