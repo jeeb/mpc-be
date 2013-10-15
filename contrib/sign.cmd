@@ -23,7 +23,7 @@ IF DEFINED VS110COMNTOOLS (
   EXIT /B 1
 )
 
-CALL "%VSCOMNTOOLS%..\..\VC\vcvarsall.bat" x86
+CALL "%VSCOMNTOOLS%..\..\VC\vcvarsall.bat" x86 > nul
 
 SET SIGN_CMD=
 SET /P SIGN_CMD=<%~dp0signinfo.txt
@@ -31,6 +31,10 @@ SET /P SIGN_CMD=<%~dp0signinfo.txt
 TITLE Signing "%~1"...
 ECHO. & ECHO Signing "%~1"...
 
-signtool.exe sign %SIGN_CMD% "%~1"
+FOR /L %%i IN (1,1,3) DO (
+  IF %%i GTR 1 ECHO %%i attempt
+  signtool.exe sign %SIGN_CMD% "%~1"
+  IF NOT ERRORLEVEL 1 EXIT /B %ERRORLEVEL%
+)
 
 EXIT /B %ERRORLEVEL%
