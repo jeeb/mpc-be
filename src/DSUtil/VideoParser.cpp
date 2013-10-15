@@ -545,12 +545,12 @@ bool ParseHEVCHeader(BYTE* headerData, int headerSize, hevc_hdr& h)
 	return true;
 }
 
-void CreateHEVCSequenceHeader(BYTE* headerData, int headerSize, DWORD* dwSequenceHeader, DWORD& cbSequenceHeader)
+void CreateHEVCSequenceHeader(BYTE* seq_data, int seq_size, DWORD* dwSequenceHeader, DWORD& cbSequenceHeader)
 {
-	BYTE* src = (BYTE*)headerData + 5;
+	BYTE* src = seq_data;
 	BYTE* dst = (BYTE*)dwSequenceHeader;
-	BYTE* src_end = (BYTE*)headerData + headerSize;
-	BYTE* dst_end = (BYTE*)dwSequenceHeader + headerSize;
+	BYTE* src_end = src + seq_size;
+	BYTE* dst_end = dst + seq_size;
 	int spsCount = *(src++) & 0x1F;
 	int ppsCount = -1;
 

@@ -876,7 +876,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						vih->hdr.bmiHeader.biWidth  = nWidth;
 						vih->hdr.bmiHeader.biHeight = nHeight;
 
-						CreateHEVCSequenceHeader(headerData, headerSize, vih->dwSequenceHeader, vih->cbSequenceHeader);
+						CreateHEVCSequenceHeader(headerData + 5, headerSize - 5, vih->dwSequenceHeader, vih->cbSequenceHeader);
 
 						delete[] headerData;
 
@@ -940,7 +940,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						vih->hdr.bmiHeader.biWidth  = h.width;
 						vih->hdr.bmiHeader.biHeight = h.height;
 
-						CreateHEVCSequenceHeader(headerData, headerSize, vih->dwSequenceHeader, vih->cbSequenceHeader);
+						CreateHEVCSequenceHeader(headerData + 5, headerSize - 5, vih->dwSequenceHeader, vih->cbSequenceHeader);
 						delete[] headerData;
 
 						mt.subtype = FOURCCMap(vih->hdr.bmiHeader.biCompression = h.fourcc);

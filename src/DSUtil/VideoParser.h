@@ -70,15 +70,15 @@ bool ParseDiracHeader(CGolombBuffer gb, unsigned* width, unsigned* height, REFER
 bool ParseAVCHeader(CGolombBuffer gb, avc_hdr& h, bool fullscan = false);
 
 bool ParseHEVCHeader(BYTE* headerData, int headerSize, hevc_hdr& h);
-void CreateHEVCSequenceHeader(BYTE* headerData, int headerSize, DWORD* dwSequenceHeader, DWORD& dwSequenceSize);
+void CreateHEVCSequenceHeader(BYTE* seq_data, int seq_size, DWORD* dwSequenceHeader, DWORD& dwSequenceSize);
 
 ////
 
 struct vc_params_t {
 	DWORD width, height;
 
-	DWORD nal_length_size;
 	DWORD profile, level;
+	DWORD nal_length_size;
 
 	void clear() {
 		memset(this, 0, sizeof(*this));
