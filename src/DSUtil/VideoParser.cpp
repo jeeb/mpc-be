@@ -716,7 +716,9 @@ bool ParseHEVCDecoderConfigurationRecord(BYTE* data, int size, vc_params_t& para
 	CGolombBuffer gb(data, size);
 
 	// HEVCDecoderConfigurationRecord
-	if (gb.BitRead(8) != 1) {	// configurationVersion = 1
+	uint8 configurationVersion = gb.BitRead(8); // configurationVersion = 1
+	if (configurationVersion != 1) {
+		TRACE(L"%s", configurationVersion == 0 ? L"WARNING: beta MKV DIVX HEVC\n" : L"");
 		return false;
 	}
 	gb.BitRead(2);					// general_profile_space
@@ -758,6 +760,7 @@ bool ParseHEVCDecoderConfigurationRecord(BYTE* data, int size, vc_params_t& para
 	for (int j = 0; j < numOfArrays; j++) {
 		gb.BitRead(1);				// array_completeness
 		if (gb.BitRead(1) != 0) {	// reserved = 0
+			TRACE(L"WARNING: nonstandard MKV DIVX HEVC\n");
 			return false;
 		}
 		int NAL_unit_type = gb.BitRead(6);
