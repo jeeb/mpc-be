@@ -663,7 +663,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					CreateSequenceHeaderHEVC(headerData, headerSize, vih->dwSequenceHeader, vih->cbSequenceHeader);
 
-					mt.subtype = FOURCCMap(vih->hdr.bmiHeader.biCompression = '1CVH');
+					mt.subtype = FOURCCMap(vih->hdr.bmiHeader.biCompression = FCC('HVC1'));
 
 					mts.Add(mt);
 					//b_HasVideo = true;
