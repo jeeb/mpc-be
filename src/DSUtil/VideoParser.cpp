@@ -545,19 +545,24 @@ bool ParseHEVCHeader(BYTE* headerData, int headerSize, hevc_hdr& h)
 	return true;
 }
 
-void CreateHEVCSequenceHeader(BYTE* seq_data, int seq_size, DWORD* dwSequenceHeader, DWORD& cbSequenceHeader)
+void CreateSequenceHeaderAVC(BYTE* data, int size, DWORD* dwSequenceHeader, DWORD& cbSequenceHeader)
 {
-	BYTE* src = seq_data;
+	// copy SequenceParameterSets and PictureParameterSets from AVCDecoderConfigurationRecord
+
+	cbSequenceHeader = 0;
+	if (size < 7 || (data[5] & 0xe0) != 0xe0) {
+		return;
+	}
+
+	BYTE* src = data + 5;
 	BYTE* dst = (BYTE*)dwSequenceHeader;
-	BYTE* src_end = src + seq_size;
-	BYTE* dst_end = dst + seq_size;
+	BYTE* src_end = data + size;
 	int spsCount = *(src++) & 0x1F;
 	int ppsCount = -1;
 
-	cbSequenceHeader = 0;
-
-	while (src < src_end - 1) {
-		if (spsCount == 0 && ppsCount == -1) {
+	while (src + 2 < src_end) {
+		if (spsCount == 0) {
+			spsCount = -1;
 			ppsCount = *(src++);
 			continue;
 		}
@@ -570,8 +575,8 @@ void CreateHEVCSequenceHeader(BYTE* seq_data, int seq_size, DWORD* dwSequenceHea
 			break;
 		}
 
-		int len = ((src[0] << 8) | src[1]) + 2;
-		if (src + len > src_end || dst + len > dst_end) {
+		int len = (src[0] << 8 | src[1]) + 2;
+		if (src + len > src_end) {
 			ASSERT(0);
 			break;
 		}

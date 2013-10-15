@@ -70,7 +70,7 @@ bool ParseDiracHeader(CGolombBuffer gb, unsigned* width, unsigned* height, REFER
 bool ParseAVCHeader(CGolombBuffer gb, avc_hdr& h, bool fullscan = false);
 
 bool ParseHEVCHeader(BYTE* headerData, int headerSize, hevc_hdr& h);
-void CreateHEVCSequenceHeader(BYTE* seq_data, int seq_size, DWORD* dwSequenceHeader, DWORD& dwSequenceSize);
+void CreateSequenceHeaderAVC(BYTE* data, int size, DWORD* dwSequenceHeader, DWORD& cbSequenceHeader);
 
 ////
 
