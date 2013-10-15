@@ -71,6 +71,7 @@ bool ParseAVCHeader(CGolombBuffer gb, avc_hdr& h, bool fullscan = false);
 
 bool ParseHEVCHeader(BYTE* headerData, int headerSize, hevc_hdr& h);
 void CreateSequenceHeaderAVC(BYTE* data, int size, DWORD* dwSequenceHeader, DWORD& cbSequenceHeader);
+void CreateSequenceHeaderHEVC(BYTE* data, int size, DWORD* dwSequenceHeader, DWORD& cbSequenceHeader);
 
 ////
 

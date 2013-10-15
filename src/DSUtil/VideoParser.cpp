@@ -587,6 +587,44 @@ void CreateSequenceHeaderAVC(BYTE* data, int size, DWORD* dwSequenceHeader, DWOR
 	}
 }
 
+void CreateSequenceHeaderHEVC(BYTE* data, int size, DWORD* dwSequenceHeader, DWORD& cbSequenceHeader)
+{
+	// copy NAL units from HEVCDecoderConfigurationRecord
+
+	cbSequenceHeader = 0;
+	if (size < 23) {
+		return;
+	}
+
+	int numOfArrays = data[22];
+
+	BYTE* src = data + 23;
+	BYTE* dst = (BYTE*)dwSequenceHeader;
+	BYTE* src_end = data + size;
+
+	for (int j = 0; j < numOfArrays; j++) {
+		if (src + 3 > src_end) {
+			ASSERT(0);
+			break;
+		}
+		int NAL_unit_type = src[0] & 0x3f;
+		int numNalus      = src[1] << 8 | src[2];
+		src += 3;
+		for (int i = 0; i < numNalus; i++) {
+			int len = (src[0] << 8 | src[1]) + 2;
+			if (src + len > src_end) {
+				ASSERT(0);
+				break;
+			}
+			memcpy(dst, src, len);
+			src += len;
+			dst += len;
+			cbSequenceHeader += len;
+		}
+	}
+}
+
+
 ////
 
 bool ParseSequenceParameterSet(BYTE* data, int size, vc_params_t& params)
@@ -666,6 +704,7 @@ bool ParseSequenceParameterSet(BYTE* data, int size, vc_params_t& params)
 enum nal_unit_type_e {
 	NAL_UNIT_VPS = 32,
 	NAL_UNIT_SPS = 33,
+	NAL_UNIT_PPS = 34,
 };
 
 bool ParseHEVCDecoderConfigurationRecord(BYTE* data, int size, vc_params_t& params)
