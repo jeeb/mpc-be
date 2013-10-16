@@ -76,7 +76,7 @@ void CreateSequenceHeaderHEVC(BYTE* data, int size, DWORD* dwSequenceHeader, DWO
 ////
 
 struct vc_params_t {
-	DWORD width, height;
+	LONG width, height;
 
 	DWORD profile, level;
 	DWORD nal_length_size;

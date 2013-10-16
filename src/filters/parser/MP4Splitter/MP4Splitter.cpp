@@ -642,8 +642,15 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					vc_params_t params;
 					if (ParseHEVCDecoderConfigurationRecord(headerData, headerSize, params)) {
-						CSize aspect(params.width, params.height);
-						ReduceDim(aspect);
+						Aspect.cx = params.width;
+						Aspect.cy = params.height;
+						if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(hvc1->GetChild(AP4_ATOM_TYPE_PASP))) {
+							if (pasp->GetNum() > 0 && pasp->GetDen() > 0) {
+								Aspect.cx *= pasp->GetNum();
+								Aspect.cy *= pasp->GetDen();
+							}
+						}
+						ReduceDim(Aspect);
 
 						mt.majortype					= MEDIATYPE_Video;
 						mt.formattype					= FORMAT_MPEG2Video;
@@ -655,8 +662,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						vih->dwProfile					= params.profile;
 						vih->dwLevel					= params.level;
 						vih->dwFlags					= params.nal_length_size;
-						vih->hdr.dwPictAspectRatioX		= aspect.cx;
-						vih->hdr.dwPictAspectRatioY		= aspect.cy;
+						vih->hdr.dwPictAspectRatioX		= Aspect.cx;
+						vih->hdr.dwPictAspectRatioY		= Aspect.cy;
 						vih->hdr.bmiHeader.biWidth		= params.width;
 						vih->hdr.bmiHeader.biHeight		= params.height;
 
