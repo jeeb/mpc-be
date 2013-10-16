@@ -425,7 +425,6 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						mts.Add(mt);
 					bHasVideo = true;
 				} else if (CodecID == "V_MPEGH/ISO/HEVC") {
-#if (0) // TODO
 					BYTE* data = pTE->CodecPrivate.GetData();
 					int   size = pTE->CodecPrivate.GetCount();
 
@@ -449,7 +448,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						mvih->hdr.bmiHeader.biWidth		= params.width;
 						mvih->hdr.bmiHeader.biHeight	= params.height;
 
-						CreateSequenceHeaderHEVC(data, size, mvih->dwSequenceHeader, mvih->cbSequenceHeader);
+						mvih->cbSequenceHeader			= size;
+						memcpy(mvih->dwSequenceHeader, data, size);
 
 						mt.subtype = FOURCCMap(mvih->hdr.bmiHeader.biCompression = FCC('HEVC'));
 						mt.SetSampleSize(params.width * params.height * 4);
@@ -457,7 +457,6 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							mts.Add(mt);
 						bHasVideo = true;
 					}
-#endif
 				}
 				REFERENCE_TIME AvgTimePerFrame = 0;
 

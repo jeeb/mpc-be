@@ -660,7 +660,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						vih->hdr.bmiHeader.biWidth		= params.width;
 						vih->hdr.bmiHeader.biHeight		= params.height;
 
-						CreateSequenceHeaderHEVC(headerData, headerSize, vih->dwSequenceHeader, vih->cbSequenceHeader);
+						vih->cbSequenceHeader			= headerSize;
+						memcpy(vih->dwSequenceHeader, headerData, headerSize);
 
 						mt.subtype = FOURCCMap(vih->hdr.bmiHeader.biCompression = FCC('HVC1'));
 

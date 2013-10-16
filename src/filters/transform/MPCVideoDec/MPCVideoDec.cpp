@@ -351,12 +351,11 @@ FFMPEG_CODECS		ffCodecs[] = {
 	{ &MEDIASUBTYPE_CLLC, AV_CODEC_ID_CLLC, NULL, FFM_CLLC, -1 },
 
 	// Hevc
-/*	{ &MEDIASUBTYPE_HEVC, AV_CODEC_ID_HEVC, NULL, FFM_HEVC, -1 },
+	{ &MEDIASUBTYPE_HEVC, AV_CODEC_ID_HEVC, NULL, FFM_HEVC, -1 },
 	{ &MEDIASUBTYPE_HVC1, AV_CODEC_ID_HEVC, NULL, FFM_HEVC, -1 },
 	{ &MEDIASUBTYPE_HM91, AV_CODEC_ID_HEVC, NULL, FFM_HEVC, -1 },
 	{ &MEDIASUBTYPE_HM10, AV_CODEC_ID_HEVC, NULL, FFM_HEVC, -1 },
 	{ &MEDIASUBTYPE_HM12, AV_CODEC_ID_HEVC, NULL, FFM_HEVC, -1 },
-*/
 
 	// Other MPEG-4
 	{ &MEDIASUBTYPE_MP4V, AV_CODEC_ID_MPEG4, NULL, FFM_XVID, -1 },
@@ -643,12 +642,11 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_CLLC },
 
 	// Hevc
-/*	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HEVC },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HEVC },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HVC1 },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HM91 },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HM10 },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HM12 },
-*/
 
 	// Other MPEG-4
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_MP4V },
@@ -950,9 +948,9 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	// Check codec definition table
 	int nCodecs	  = _countof(ffCodecs);
 	int nPinTypes = _countof(sudPinTypesIn);
-	ASSERT (nCodecs == nPinTypes);
+	ASSERT(nCodecs == nPinTypes);
 	for (int i = 0; i < nPinTypes; i++) {
-		ASSERT (ffCodecs[i].clsMinorType == sudPinTypesIn[i].clsMinorType);
+		ASSERT(ffCodecs[i].clsMinorType == sudPinTypesIn[i].clsMinorType);
 	}
 #endif
 }
@@ -1545,7 +1543,10 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 
 		m_pAVCtx->codec_tag		= pBMI->biCompression ? pBMI->biCompression : pmt->subtype.Data1;
 
-		if ((m_pAVCtx->codec_tag == MAKEFOURCC('a','v','c','1')) || (m_pAVCtx->codec_tag == MAKEFOURCC('A','V','C','1'))) {
+		if ((m_pAVCtx->codec_tag == MAKEFOURCC('a','v','c','1'))
+				|| (m_pAVCtx->codec_tag == MAKEFOURCC('A','V','C','1'))
+				|| (m_pAVCtx->codec_tag == MAKEFOURCC('H','V','C','1'))
+				|| (m_pAVCtx->codec_tag == MAKEFOURCC('H','E','V','C'))) {
 			m_bReorderBFrame			= IsAVI() ? true : false;
 		} else if ((m_pAVCtx->codec_tag == MAKEFOURCC('m','p','4','v')) || (m_pAVCtx->codec_tag == MAKEFOURCC('M','P','4','V'))) {
 			m_bReorderBFrame			= false;
@@ -1578,6 +1579,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	m_pAVCtx->err_recognition       = AV_EF_CAREFUL;
 	m_pAVCtx->idct_algo             = FF_IDCT_AUTO;
 	m_pAVCtx->skip_loop_filter      = (AVDiscard)m_nDiscardMode;
+	m_pAVCtx->strict_std_compliance	= FF_COMPLIANCE_EXPERIMENTAL;
 
 	if (m_nCodecId == AV_CODEC_ID_H264) {
 		m_pAVCtx->flags2           |= CODEC_FLAG2_SHOW_ALL;
