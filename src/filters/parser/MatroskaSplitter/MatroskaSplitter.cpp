@@ -430,26 +430,30 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					vc_params_t params;
 					if (ParseHEVCDecoderConfigurationRecord(data, size, params)) {
-						mt.majortype  = MEDIATYPE_Video;
-						mt.formattype = FORMAT_MPEG2Video;
-						MPEG2VIDEOINFO* mvih = (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + size);
+						CSize aspect(params.width, params.height);
+						ReduceDim(aspect);
+
+						mt.majortype					= MEDIATYPE_Video;
+						mt.formattype					= FORMAT_MPEG2Video;
+						MPEG2VIDEOINFO* mvih			= (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + size);
 						memset(mvih, 0, mt.FormatLength());
-						mvih->hdr.bmiHeader.biSize     = sizeof(mvih->hdr.bmiHeader);
-						mvih->hdr.bmiHeader.biPlanes   = 1;
-						mvih->hdr.bmiHeader.biBitCount = 24;
-						mvih->dwProfile = params.profile;
-						mvih->dwLevel   = params.level;
-						mvih->dwFlags   = params.nal_length_size;
-						mvih->hdr.dwPictAspectRatioX = 16;
-						mvih->hdr.dwPictAspectRatioY = 9;
-						mvih->hdr.bmiHeader.biWidth  = params.width;
-						mvih->hdr.bmiHeader.biHeight = params.height;
+						mvih->hdr.bmiHeader.biSize		= sizeof(mvih->hdr.bmiHeader);
+						mvih->hdr.bmiHeader.biPlanes	= 1;
+						mvih->hdr.bmiHeader.biBitCount	= 24;
+						mvih->dwProfile					= params.profile;
+						mvih->dwLevel					= params.level;
+						mvih->dwFlags					= params.nal_length_size;
+						mvih->hdr.dwPictAspectRatioX	= aspect.cx;
+						mvih->hdr.dwPictAspectRatioY	= aspect.cy;
+						mvih->hdr.bmiHeader.biWidth		= params.width;
+						mvih->hdr.bmiHeader.biHeight	= params.height;
 
 						CreateSequenceHeaderHEVC(data, size, mvih->dwSequenceHeader, mvih->cbSequenceHeader);
 
 						mt.subtype = FOURCCMap(mvih->hdr.bmiHeader.biCompression = FCC('HEVC'));
 						mt.SetSampleSize(params.width * params.height * 4);
-						if (!bHasVideo) mts.Add(mt);
+						if (!bHasVideo) 
+							mts.Add(mt);
 						bHasVideo = true;
 					}
 				}

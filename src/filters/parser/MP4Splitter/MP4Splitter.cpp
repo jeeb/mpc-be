@@ -630,7 +630,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			} else if (AP4_Hvc1SampleEntry* hvc1 = dynamic_cast<AP4_Hvc1SampleEntry*>(
 					track->GetTrakAtom()->FindChild("mdia/minf/stbl/stsd/hvc1"))) {
 				if (AP4_HvcCAtom* hvcC = dynamic_cast<AP4_HvcCAtom*>(hvc1->GetChild(AP4_ATOM_TYPE_HVCC))) {
-					//SetTrackName(&TrackName, _T("HEVC Video (H.265)"));
+					SetTrackName(&TrackName, _T("HEVC Video (H.265)"));
 
 					const AP4_DataBuffer* di = hvcC->GetDecoderInfo();
 					if (!di) {
@@ -641,31 +641,32 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					int headerSize = (int)di->GetDataSize();
 
 					vc_params_t params;
-					if (!ParseHEVCDecoderConfigurationRecord(headerData, headerSize, params)) {
-						return E_FAIL;
+					if (ParseHEVCDecoderConfigurationRecord(headerData, headerSize, params)) {
+						CSize aspect(params.width, params.height);
+						ReduceDim(aspect);
+
+						mt.majortype					= MEDIATYPE_Video;
+						mt.formattype					= FORMAT_MPEG2Video;
+						MPEG2VIDEOINFO* vih				= (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + headerSize);
+						memset(vih, 0, mt.FormatLength());
+						vih->hdr.bmiHeader.biSize		= sizeof(vih->hdr.bmiHeader);
+						vih->hdr.bmiHeader.biPlanes		= 1;
+						vih->hdr.bmiHeader.biBitCount	= 24;
+						vih->dwProfile					= params.profile;
+						vih->dwLevel					= params.level;
+						vih->dwFlags					= params.nal_length_size;
+						vih->hdr.dwPictAspectRatioX		= aspect.cx;
+						vih->hdr.dwPictAspectRatioY		= aspect.cy;
+						vih->hdr.bmiHeader.biWidth		= params.width;
+						vih->hdr.bmiHeader.biHeight		= params.height;
+
+						CreateSequenceHeaderHEVC(headerData, headerSize, vih->dwSequenceHeader, vih->cbSequenceHeader);
+
+						mt.subtype = FOURCCMap(vih->hdr.bmiHeader.biCompression = FCC('HVC1'));
+
+						mts.Add(mt);
+						//b_HasVideo = true;
 					}
-
-					mt.majortype  = MEDIATYPE_Video;
-					mt.formattype = FORMAT_MPEG2Video;
-					MPEG2VIDEOINFO* vih = (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + headerSize);
-					memset(vih, 0, mt.FormatLength());
-					vih->hdr.bmiHeader.biSize     = sizeof(vih->hdr.bmiHeader);
-					vih->hdr.bmiHeader.biPlanes   = 1;
-					vih->hdr.bmiHeader.biBitCount = 24;
-					vih->dwProfile = params.profile;
-					vih->dwLevel   = params.level;
-					vih->dwFlags   = params.nal_length_size;
-					vih->hdr.dwPictAspectRatioX = 16;
-					vih->hdr.dwPictAspectRatioY = 9;
-					vih->hdr.bmiHeader.biWidth  = params.width;
-					vih->hdr.bmiHeader.biHeight = params.height;
-
-					CreateSequenceHeaderHEVC(headerData, headerSize, vih->dwSequenceHeader, vih->cbSequenceHeader);
-
-					mt.subtype = FOURCCMap(vih->hdr.bmiHeader.biCompression = FCC('HVC1'));
-
-					mts.Add(mt);
-					//b_HasVideo = true;
 				}
 			} else if (AP4_StsdAtom* stsd = dynamic_cast<AP4_StsdAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stsd"))) {
 				const AP4_DataBuffer& db = stsd->GetDataBuffer();
