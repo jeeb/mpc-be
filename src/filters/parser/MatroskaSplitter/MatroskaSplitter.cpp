@@ -425,6 +425,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						mts.Add(mt);
 					bHasVideo = true;
 				} else if (CodecID == "V_MPEGH/ISO/HEVC") {
+#if (0) // TODO
 					BYTE* data = pTE->CodecPrivate.GetData();
 					int   size = pTE->CodecPrivate.GetCount();
 
@@ -456,6 +457,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							mts.Add(mt);
 						bHasVideo = true;
 					}
+#endif
 				}
 				REFERENCE_TIME AvgTimePerFrame = 0;
 
