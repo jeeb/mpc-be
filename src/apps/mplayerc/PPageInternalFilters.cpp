@@ -102,6 +102,7 @@ static filter_t s_filters[] = {
 	{_T("FLV1/4"),                FFMPEG_DECODER, VIDEO,  FFM_FLV4,       IDS_TRA_FFMPEG},
 	{_T("H263"),                  FFMPEG_DECODER, VIDEO,  FFM_H263,       IDS_TRA_FFMPEG},
 	{_T("H264/AVC (FFmpeg)"),     FFMPEG_DECODER, VIDEO,  FFM_H264,       IDS_TRA_FFMPEG},
+//	{_T("Hevc"),                  FFMPEG_DECODER, VIDEO,  FFM_HEVC,       IDS_TRA_FFMPEG},
 	{_T("Indeo 3/4/5"),           FFMPEG_DECODER, VIDEO,  FFM_INDEO,      IDS_TRA_FFMPEG},
 	{_T("Lagarith"),              FFMPEG_DECODER, VIDEO,  FFM_LAGARITH,   IDS_TRA_FFMPEG},
 	{_T("MJPEG"),                 FFMPEG_DECODER, VIDEO,  FFM_MJPEG,      IDS_TRA_FFMPEG},

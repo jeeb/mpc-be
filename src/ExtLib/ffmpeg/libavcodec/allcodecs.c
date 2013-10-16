@@ -63,6 +63,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (G2M, g2m);
     REGISTER_DECODER (H263, h263);
     REGISTER_DECODER (H264, h264);
+    REGISTER_DECODER (HEVC, hevc);
     REGISTER_DECODER (INDEO3, indeo3);
     REGISTER_DECODER (INDEO4, indeo4);
     REGISTER_DECODER (INDEO5, indeo5);
@@ -174,6 +175,7 @@ void avcodec_register_all(void)
     REGISTER_PARSER (MLP, mlp);
     REGISTER_PARSER (MPEGAUDIO, mpegaudio);
     REGISTER_PARSER (H264, h264);
+    REGISTER_PARSER(HEVC, hevc);
     REGISTER_PARSER (MPEGVIDEO, mpegvideo);
     REGISTER_PARSER (TAK, tak);
 

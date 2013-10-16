@@ -284,7 +284,6 @@ static int decode_band_hdr(IVI45DecContext *ctx, IVIBandDesc *band,
 {
     int plane, band_num, indx, transform_id, scan_indx;
     int i;
-    int quant_mat;
 
     plane    = get_bits(&ctx->gb, 2);
     band_num = get_bits(&ctx->gb, 4);
@@ -295,6 +294,7 @@ static int decode_band_hdr(IVI45DecContext *ctx, IVIBandDesc *band,
 
     band->is_empty = get_bits1(&ctx->gb);
     if (!band->is_empty) {
+        int old_blk_size = band->blk_size;
         /* skip header size
          * If header size is not given, header size is 4 bytes. */
         if (get_bits1(&ctx->gb))
@@ -382,17 +382,29 @@ static int decode_band_hdr(IVI45DecContext *ctx, IVIBandDesc *band,
             band->scan = scan_index_to_tab[scan_indx];
             band->scan_size = band->blk_size;
 
-            quant_mat = get_bits(&ctx->gb, 5);
-            if (quant_mat == 31) {
-                av_log(avctx, AV_LOG_ERROR, "Custom quant matrix encountered!\n");
+            band->quant_mat = get_bits(&ctx->gb, 5);
+            if (band->quant_mat >= FF_ARRAY_ELEMS(quant_index_to_tab)) {
+
+                if (band->quant_mat == 31)
+                    av_log(avctx, AV_LOG_ERROR,
+                           "Custom quant matrix encountered!\n");
+                else
+                    avpriv_request_sample(avctx, "Quantization matrix %d",
+                                          band->quant_mat);
+                band->quant_mat = -1;
                 return AVERROR_INVALIDDATA;
             }
-            if (quant_mat >= FF_ARRAY_ELEMS(quant_index_to_tab)) {
-                avpriv_request_sample(avctx, "Quantization matrix %d",
-                                      quant_mat);
+        } else {
+            if (old_blk_size != band->blk_size) {
+                av_log(avctx, AV_LOG_ERROR,
+                       "The band block size does not match the configuration "
+                       "inherited\n");
                 return AVERROR_INVALIDDATA;
             }
-            band->quant_mat = quant_mat;
+            if (band->quant_mat < 0) {
+                av_log(avctx, AV_LOG_ERROR, "Invalid quant_mat inherited\n");
+                return AVERROR_INVALIDDATA;
+            }
         }
         if (quant_index_to_tab[band->quant_mat] > 4 && band->blk_size == 4) {
             av_log(avctx, AV_LOG_ERROR, "Invalid quant matrix for 4x4 block encountered!\n");

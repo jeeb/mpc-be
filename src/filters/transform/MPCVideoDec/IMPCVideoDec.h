@@ -54,6 +54,7 @@
 #define MPCVD_V210			(1ULL << 29)
 #define MPCVD_MPEG2			(1ULL << 30)
 #define MPCVD_MPEG1			(1ULL << 31)
+//#define MPCVD_HEVC			(1ULL << 32)
 
 typedef enum MPC_DEINTERLACING_FLAGS {
 	AUTO,

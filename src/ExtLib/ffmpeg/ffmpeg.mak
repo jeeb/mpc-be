@@ -189,6 +189,16 @@ SRCS_C = \
 	libavcodec/h264idct.c \
 	libavcodec/h264pred.c \
 	libavcodec/h264qpel.c \
+	libavcodec/hevc.c \
+	libavcodec/hevc_cabac.c \
+	libavcodec/hevc_filter.c \
+	libavcodec/hevc_mvs.c \
+	libavcodec/hevc_parser.c \
+	libavcodec/hevc_ps.c \
+	libavcodec/hevc_refs.c \
+	libavcodec/hevc_sei.c \
+	libavcodec/hevcdsp.c \
+	libavcodec/hevcpred.c \
 	libavcodec/hpeldsp.c \
 	libavcodec/huffman.c \
 	libavcodec/imc.c \
