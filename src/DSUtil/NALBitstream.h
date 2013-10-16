@@ -51,7 +51,7 @@ public:
 		// You have three leading zeros, so there are three data bits (010)
 		// counting up from a base of 111: thus 111 + 010 = 1001 = 9
 		int zeros = 0;
-		while ( GetBit() == 0 ) zeros++;
+		while (m_idx < m_len && GetBit() == 0 ) zeros++;
 		return GetWord(zeros) + ((1 << zeros) - 1);
 	};
 	INT32 GetSE() {
