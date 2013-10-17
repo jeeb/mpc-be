@@ -21,6 +21,9 @@ extern "C" {
 
 #define ALIGN_MASK (32 - 1)
 
+static void ReconstructRow(const VP8Decoder* const dec,
+                           const VP8ThreadContext* ctx);  // TODO(skal): remove
+
 //------------------------------------------------------------------------------
 // Filtering
 
@@ -41,9 +44,10 @@ static WEBP_INLINE int hev_thresh_from_level(int level, int keyframe) {
 
 static void DoFilter(const VP8Decoder* const dec, int mb_x, int mb_y) {
   const VP8ThreadContext* const ctx = &dec->thread_ctx_;
+  const int cache_id = ctx->id_;
   const int y_bps = dec->cache_y_stride_;
   VP8FInfo* const f_info = ctx->f_info_ + mb_x;
-  uint8_t* const y_dst = dec->cache_y_ + ctx->id_ * 16 * y_bps + mb_x * 16;
+  uint8_t* const y_dst = dec->cache_y_ + cache_id * 16 * y_bps + mb_x * 16;
   const int level = f_info->f_level_;
   const int ilevel = f_info->f_ilevel_;
   const int limit = 2 * level + ilevel;
@@ -65,8 +69,8 @@ static void DoFilter(const VP8Decoder* const dec, int mb_x, int mb_y) {
     }
   } else {    // complex
     const int uv_bps = dec->cache_uv_stride_;
-    uint8_t* const u_dst = dec->cache_u_ + ctx->id_ * 8 * uv_bps + mb_x * 8;
-    uint8_t* const v_dst = dec->cache_v_ + ctx->id_ * 8 * uv_bps + mb_x * 8;
+    uint8_t* const u_dst = dec->cache_u_ + cache_id * 8 * uv_bps + mb_x * 8;
+    uint8_t* const v_dst = dec->cache_v_ + cache_id * 8 * uv_bps + mb_x * 8;
     const int hev_thresh =
         hev_thresh_from_level(level, dec->frm_hdr_.key_frame_);
     if (mb_x > 0) {
@@ -164,25 +168,31 @@ static void PrecomputeFilterStrengths(VP8Decoder* const dec) {
 static int FinishRow(VP8Decoder* const dec, VP8Io* const io) {
   int ok = 1;
   const VP8ThreadContext* const ctx = &dec->thread_ctx_;
+  const int cache_id = ctx->id_;
   const int extra_y_rows = kFilterExtraRows[dec->filter_type_];
   const int ysize = extra_y_rows * dec->cache_y_stride_;
   const int uvsize = (extra_y_rows / 2) * dec->cache_uv_stride_;
-  const int y_offset = ctx->id_ * 16 * dec->cache_y_stride_;
-  const int uv_offset = ctx->id_ * 8 * dec->cache_uv_stride_;
+  const int y_offset = cache_id * 16 * dec->cache_y_stride_;
+  const int uv_offset = cache_id * 8 * dec->cache_uv_stride_;
   uint8_t* const ydst = dec->cache_y_ - ysize + y_offset;
   uint8_t* const udst = dec->cache_u_ - uvsize + uv_offset;
   uint8_t* const vdst = dec->cache_v_ - uvsize + uv_offset;
-  const int first_row = (ctx->mb_y_ == 0);
-  const int last_row = (ctx->mb_y_ >= dec->br_mb_y_ - 1);
-  int y_start = MACROBLOCK_VPOS(ctx->mb_y_);
-  int y_end = MACROBLOCK_VPOS(ctx->mb_y_ + 1);
+  const int mb_y = ctx->mb_y_;
+  const int is_first_row = (mb_y == 0);
+  const int is_last_row = (mb_y >= dec->br_mb_y_ - 1);
+
+  if (dec->mt_method_ == 2) {
+    ReconstructRow(dec, ctx);
+  }
 
   if (ctx->filter_row_) {
     FilterRow(dec);
   }
 
   if (io->put != NULL) {
-    if (!first_row) {
+    int y_start = MACROBLOCK_VPOS(mb_y);
+    int y_end = MACROBLOCK_VPOS(mb_y + 1);
+    if (!is_first_row) {
       y_start -= extra_y_rows;
       io->y = ydst;
       io->u = udst;
@@ -193,7 +203,7 @@ static int FinishRow(VP8Decoder* const dec, VP8Io* const io) {
       io->v = dec->cache_v_ + uv_offset;
     }
 
-    if (!last_row) {
+    if (!is_last_row) {
       y_end -= extra_y_rows;
     }
     if (y_end > io->crop_bottom) {
@@ -234,8 +244,8 @@ static int FinishRow(VP8Decoder* const dec, VP8Io* const io) {
     }
   }
   // rotate top samples if needed
-  if (ctx->id_ + 1 == dec->num_caches_) {
-    if (!last_row) {
+  if (cache_id + 1 == dec->num_caches_) {
+    if (!is_last_row) {
       memcpy(dec->cache_y_ - ysize, ydst + 16 * dec->cache_y_stride_, ysize);
       memcpy(dec->cache_u_ - uvsize, udst + 8 * dec->cache_uv_stride_, uvsize);
       memcpy(dec->cache_v_ - uvsize, vdst + 8 * dec->cache_uv_stride_, uvsize);
@@ -255,10 +265,11 @@ int VP8ProcessRow(VP8Decoder* const dec, VP8Io* const io) {
   const int filter_row =
       (dec->filter_type_ > 0) &&
       (dec->mb_y_ >= dec->tl_mb_y_) && (dec->mb_y_ <= dec->br_mb_y_);
-  if (!dec->use_threads_) {
+  if (dec->mt_method_ == 0) {
     // ctx->id_ and ctx->f_info_ are already set
     ctx->mb_y_ = dec->mb_y_;
     ctx->filter_row_ = filter_row;
+    ReconstructRow(dec, ctx);
     ok = FinishRow(dec, io);
   } else {
     WebPWorker* const worker = &dec->worker_;
@@ -270,12 +281,20 @@ int VP8ProcessRow(VP8Decoder* const dec, VP8Io* const io) {
       ctx->id_ = dec->cache_id_;
       ctx->mb_y_ = dec->mb_y_;
       ctx->filter_row_ = filter_row;
-      if (filter_row) {    // just swap filter info
+      if (dec->mt_method_ == 2) {  // swap macroblock data
+        VP8MBData* const tmp = ctx->mb_data_;
+        ctx->mb_data_ = dec->mb_data_;
+        dec->mb_data_ = tmp;
+      } else {
+        // perform reconstruction directly in main thread
+        ReconstructRow(dec, ctx);
+      }
+      if (filter_row) {            // swap filter info
         VP8FInfo* const tmp = ctx->f_info_;
         ctx->f_info_ = dec->f_info_;
         dec->f_info_ = tmp;
       }
-      WebPWorkerLaunch(worker);
+      WebPWorkerLaunch(worker);    // (reconstruct)+filter in parallel
       if (++dec->cache_id_ == dec->num_caches_) {
         dec->cache_id_ = 0;
       }
@@ -344,7 +363,7 @@ VP8StatusCode VP8EnterCritical(VP8Decoder* const dec, VP8Io* const io) {
 
 int VP8ExitCritical(VP8Decoder* const dec, VP8Io* const io) {
   int ok = 1;
-  if (dec->use_threads_) {
+  if (dec->mt_method_ > 0) {
     ok = WebPWorkerSync(&dec->worker_);
   }
 
@@ -384,7 +403,7 @@ int VP8ExitCritical(VP8Decoder* const dec, VP8Io* const io) {
 // Initialize multi/single-thread worker
 static int InitThreadContext(VP8Decoder* const dec) {
   dec->cache_id_ = 0;
-  if (dec->use_threads_) {
+  if (dec->mt_method_ > 0) {
     WebPWorker* const worker = &dec->worker_;
     if (!WebPWorkerReset(worker)) {
       return VP8SetError(dec, VP8_STATUS_OUT_OF_MEMORY,
@@ -399,6 +418,28 @@ static int InitThreadContext(VP8Decoder* const dec) {
     dec->num_caches_ = ST_CACHE_LINES;
   }
   return 1;
+}
+
+int VP8GetThreadMethod(const WebPDecoderOptions* const options,
+                       const WebPHeaderStructure* const headers,
+                       int width, int height) {
+  if (options == NULL || options->use_threads == 0) {
+    return 0;
+  }
+  (void)headers;
+  (void)width;
+  (void)height;
+  assert(!headers->is_lossless);
+#if defined(WEBP_USE_THREAD)
+  if (width < MIN_WIDTH_FOR_THREADS) return 0;
+  // TODO(skal): tune the heuristic further
+#if 0
+  if (height < 2 * width) return 2;
+#endif
+  return 2;
+#else   // !WEBP_USE_THREAD
+  return 0;
+#endif
 }
 
 #undef MT_CACHE_LINES
@@ -416,10 +457,11 @@ static int AllocateMemory(VP8Decoder* const dec) {
   const size_t mb_info_size = (mb_w + 1) * sizeof(VP8MB);
   const size_t f_info_size =
       (dec->filter_type_ > 0) ?
-          mb_w * (dec->use_threads_ ? 2 : 1) * sizeof(VP8FInfo)
+          mb_w * (dec->mt_method_ > 0 ? 2 : 1) * sizeof(VP8FInfo)
         : 0;
   const size_t yuv_size = YUV_SIZE * sizeof(*dec->yuv_b_);
-  const size_t mb_data_size = mb_w * sizeof(*dec->mb_data_);
+  const size_t mb_data_size =
+      (dec->mt_method_ == 2 ? 2 : 1) * mb_w * sizeof(*dec->mb_data_);
   const size_t cache_height = (16 * num_caches
                             + kFilterExtraRows[dec->filter_type_]) * 3 / 2;
   const size_t cache_size = top_size * cache_height;
@@ -459,7 +501,7 @@ static int AllocateMemory(VP8Decoder* const dec) {
   mem += f_info_size;
   dec->thread_ctx_.id_ = 0;
   dec->thread_ctx_.f_info_ = dec->f_info_;
-  if (dec->use_threads_) {
+  if (dec->mt_method_ > 0) {
     // secondary cache line. The deblocking process need to make use of the
     // filtering strength from previous macroblock row, while the new ones
     // are being decoded in parallel. We'll just swap the pointers.
@@ -472,6 +514,10 @@ static int AllocateMemory(VP8Decoder* const dec) {
   mem += yuv_size;
 
   dec->mb_data_ = (VP8MBData*)mem;
+  dec->thread_ctx_.mb_data_ = (VP8MBData*)mem;
+  if (dec->mt_method_ == 2) {
+    dec->thread_ctx_.mb_data_ += mb_w;
+  }
   mem += mb_data_size;
 
   dec->cache_y_stride_ = 16 * mb_w;
@@ -576,14 +622,17 @@ static void DoUVTransform(uint32_t bits, const int16_t* const src,
   }
 }
 
-void VP8ReconstructBlocks(const VP8Decoder* const dec, int mb_y) {
+static void ReconstructRow(const VP8Decoder* const dec,
+                           const VP8ThreadContext* ctx) {
   int j;
   int mb_x;
+  const int mb_y = ctx->mb_y_;
+  const int cache_id = ctx->id_;
   uint8_t* const y_dst = dec->yuv_b_ + Y_OFF;
   uint8_t* const u_dst = dec->yuv_b_ + U_OFF;
   uint8_t* const v_dst = dec->yuv_b_ + V_OFF;
   for (mb_x = 0; mb_x < dec->mb_w_; ++mb_x) {
-    const VP8MBData* const block = dec->mb_data_ + mb_x;
+    const VP8MBData* const block = ctx->mb_data_ + mb_x;
 
     // Rotate in the left samples from previously decoded block. We move four
     // pixels at a time for alignment reason, and because of in-loop filter.
@@ -676,8 +725,8 @@ void VP8ReconstructBlocks(const VP8Decoder* const dec, int mb_y) {
     }
     // Transfer reconstructed samples from yuv_b_ cache to final destination.
     {
-      const int y_offset = dec->cache_id_ * 16 * dec->cache_y_stride_;
-      const int uv_offset = dec->cache_id_ * 8 * dec->cache_uv_stride_;
+      const int y_offset = cache_id * 16 * dec->cache_y_stride_;
+      const int uv_offset = cache_id * 8 * dec->cache_uv_stride_;
       uint8_t* const y_out = dec->cache_y_ + mb_x * 16 + y_offset;
       uint8_t* const u_out = dec->cache_u_ + mb_x * 8 + uv_offset;
       uint8_t* const v_out = dec->cache_v_ + mb_x * 8 + uv_offset;
