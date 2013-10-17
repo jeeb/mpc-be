@@ -13,7 +13,7 @@ Legend:
 Added (+):
 
 Changes (*):
-	* MediaInfo 0.7.64+ svn rev.5958;
+	* MediaInfo 0.7.64+ svn rev.5959;
 	* Little-CMS 2.5 git-ad2cb04b;
 	* ffmpeg 2.0.2 git-d0b7d24b;
 	* libwebp 0.3.1 git-cb221552;
