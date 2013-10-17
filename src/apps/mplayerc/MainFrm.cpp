@@ -6586,9 +6586,7 @@ void CMainFrame::OnFileLoadAudio()
 
 	AppSettings& s = AfxGetAppSettings();
 	CAtlList<CString> fns;
-	CRecentFileList& MRU = AfxGetAppSettings().MRU;
-	MRU.ReadList();
-	fns.AddTail(MRU[0].GetString());
+	fns.AddTail(m_wndPlaylistBar.GetCurFileName());
 
 	CString filter;
 	CAtlArray<CString> mask;
