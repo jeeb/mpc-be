@@ -3043,15 +3043,11 @@ STDMETHODIMP CMPCVideoDecFilter::Apply()
 		key.SetDWORDValue(OPT_DisableDXVA_SD, m_nDXVA_SD);
 
 		// === New swscaler options
-		if (m_nSwRefresh > 0) {
-			key.SetDWORDValue(OPT_SwPreset, m_nSwPreset);
-			key.SetDWORDValue(OPT_SwStandard, m_nSwStandard);
-			key.SetDWORDValue(OPT_SwInputLevels, m_nSwInputLevels);
-			key.SetDWORDValue(OPT_SwOutputLevels, m_nSwOutputLevels);
-		}
-		if (m_nSwRefresh > 1) {
-			key.SetStringValue(OPT_SwOutputFormats, sSwFormats);
-		}
+		key.SetDWORDValue(OPT_SwPreset, m_nSwPreset);
+		key.SetDWORDValue(OPT_SwStandard, m_nSwStandard);
+		key.SetDWORDValue(OPT_SwInputLevels, m_nSwInputLevels);
+		key.SetDWORDValue(OPT_SwOutputLevels, m_nSwOutputLevels);
+		key.SetStringValue(OPT_SwOutputFormats, sSwFormats);
 		//
 	}
 #else
@@ -3063,15 +3059,11 @@ STDMETHODIMP CMPCVideoDecFilter::Apply()
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_DisableDXVA_SD, m_nDXVA_SD);
 
 	// === New swscaler options
-	if (m_nSwRefresh > 0) {
-		AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwPreset, m_nSwPreset);
-		AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwStandard, m_nSwStandard);
-		AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwInputLevels, m_nSwInputLevels);
-		AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwOutputLevels, m_nSwOutputLevels);
-	}
-	if (m_nSwRefresh > 1) {
-		AfxGetApp()->WriteProfileString(OPT_SECTION_VideoDec, OPT_SwOutputFormats, sSwFormats);
-	}
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwPreset, m_nSwPreset);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwStandard, m_nSwStandard);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwInputLevels, m_nSwInputLevels);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwOutputLevels, m_nSwOutputLevels);
+	AfxGetApp()->WriteProfileString(OPT_SECTION_VideoDec, OPT_SwOutputFormats, sSwFormats);
 	//
 #endif
 
