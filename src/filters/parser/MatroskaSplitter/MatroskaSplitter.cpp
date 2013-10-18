@@ -429,7 +429,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					pbmi.biSize			= sizeof(pbmi);
 					pbmi.biWidth		= (LONG)pTE->v.PixelWidth;
 					pbmi.biHeight		= (LONG)pTE->v.PixelHeight;
-					pbmi.biCompression	= FCC('HEVC');
+					pbmi.biCompression	= FCC('HVC1');
 					pbmi.biPlanes		= 1;
 					pbmi.biBitCount		= 24;
 
