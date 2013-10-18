@@ -379,7 +379,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 19		"Recordar posició de la finestra"
 20		"Recordar tamany de la finestra"
 21		"Ajustar als cantons de l'escriptori"
-22		"Save settings in the player folder"
+22		"Store settings in the player folder"
 23		"Mantenir l'historial dels arxius oberts"
 25		"Disable 'Open Disc' menu"
 26		"Més prioritat pel procés"

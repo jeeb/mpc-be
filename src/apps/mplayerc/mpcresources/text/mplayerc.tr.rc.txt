@@ -379,7 +379,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 19		"Son pencere yerleşimini hatırla"
 20		"Son pencere boyutunu hatırla"
 21		"Masaüstü kenarlarına uyarla"
-22		"Save settings in the player folder"
+22		"Store settings in the player folder"
 23		"Dosya geçmişini hatırla"
 25		"CD-ROM Açma özelliğini kapat"
 26		"İşlem önceliğini normalden yüksek tut"

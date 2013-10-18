@@ -379,7 +379,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 19		"Pamiętanie położenie okna"
 20		"Pamiętanie rozmiaru okna"
 21		"Przyciąganie okna do krawędzi pulpitu"
-22		"Save settings in the player folder"
+22		"Store settings in the player folder"
 23		"Przechowywanie historii otwieranych plików"
 25		"Ukrywanie menu „Otwórz płytę”"
 26		"Priorytet programu powyżej normalnego"

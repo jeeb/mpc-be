@@ -379,7 +379,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 19		"זכור את המיקום האחרון של החלון"
 20		"זכור את הגודל האחרון של החלון"
 21		"הדבק לקצוות שולחן העבודה"
-22		"Save settings in the player folder"
+22		"Store settings in the player folder"
 23		"שמור היסטורייה של קבצים שנפתחו לאחרונה"
 25		"Disable 'Open Disc' menu"
 26		"הנגן מקבל קדימות על פני תהליכים אחרים"
