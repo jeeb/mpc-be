@@ -1543,11 +1543,17 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 
 		m_pAVCtx->codec_tag		= pBMI->biCompression ? pBMI->biCompression : pmt->subtype.Data1;
 
-		if ((m_pAVCtx->codec_tag == MAKEFOURCC('a','v','c','1'))
-				|| (m_pAVCtx->codec_tag == MAKEFOURCC('A','V','C','1'))) {
-			m_bReorderBFrame			= IsAVI() ? true : false;
-		} else if ((m_pAVCtx->codec_tag == MAKEFOURCC('m','p','4','v')) || (m_pAVCtx->codec_tag == MAKEFOURCC('M','P','4','V'))) {
-			m_bReorderBFrame			= false;
+		switch (m_pAVCtx->codec_tag) {
+			case FCC('avc1'):
+			case FCC('AVC1'):
+				m_bReorderBFrame = IsAVI() ? true : false;
+				break;
+			case FCC('mp4v'):
+			case FCC('MP4V'):
+			case FCC('HEVC'):
+			case FCC('HVC1'):
+				m_bReorderBFrame = false;
+				break;
 		}
 	} else {
 		return VFW_E_INVALIDMEDIATYPE;
