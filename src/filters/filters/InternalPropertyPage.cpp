@@ -482,11 +482,12 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 
 	PIN_INFO PinInfo;
 	if (SUCCEEDED (pPin->QueryPinInfo(&PinInfo))) {
-		CString		strName;
-		CLSID		FilterClsid;
-		FILTER_INFO	FilterInfo;
+		FILTER_INFO FilterInfo;
 
-		if (SUCCEEDED (PinInfo.pFilter->QueryFilterInfo (&FilterInfo))) {
+		if (SUCCEEDED (PinInfo.pFilter->QueryFilterInfo(&FilterInfo)) && FilterInfo.pGraph) {
+			CString strName;
+			CLSID FilterClsid;
+
 			CRegKey key;
 			PinInfo.pFilter->GetClassID(&FilterClsid);
 			if (ERROR_SUCCESS == key.Open (HKEY_CLASSES_ROOT, _T("CLSID\\{083863F1-70DE-11D0-BD40-00A0C911CE86}\\Instance\\") + CStringFromGUID(FilterClsid), KEY_READ)) {
