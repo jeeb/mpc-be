@@ -379,7 +379,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 19		"Ricorda l'ultima posizione della finestra"
 20		"Ricorda le ultime dimensioni della finestra"
 21		"Incolla ai bordi dello schermo"
-22		"Salva le impostazioni nel file .ini"
+22		"Save settings in the player folder"
 23		"Conserva la cronologia dei file recenti"
 25		"Disabilita il menù 'Apri disco'"
 26		"Priorità del processo sopra il normale"

@@ -379,7 +379,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 19		"&Fensterposition merken"
 20		"Fenstergr&öße merken"
 21		"Am Desktoprand einrasten"
-22		"&Einstellungen in *.ini Datei speichern"
+22		"Save settings in the player folder"
 23		"&Zuletzt geöffnete Dateien merken"
 25		"&CD-ROM Menü ausblenden"
 26		"&Prozesspriorität ""höher als normal"""

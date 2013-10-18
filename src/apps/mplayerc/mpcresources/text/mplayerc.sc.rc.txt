@@ -379,7 +379,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 19		"记住最后的窗口位置"
 20		"记住最后的窗口大小"
 21		"吸附到桌面边缘"
-22		"在 .INI 中保存设置"
+22		"Save settings in the player folder"
 23		"保存最近打开文件的历史记录"
 25		"隐藏打开光盘菜单"
 26		"高于普通进程优先级"

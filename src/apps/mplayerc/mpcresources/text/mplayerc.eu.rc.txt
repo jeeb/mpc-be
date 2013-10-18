@@ -379,7 +379,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 19		"Gogoratu azken leiho kokapena"
 20		"Gogoratu azken leiho neurria"
 21		"Finkatu mahigain hertzetara"
-22		"Biltegiratu ezarpenak .ini agirira"
+22		"Save settings in the player folder"
 23		"Heutsi berriki irekitako agirien historiari"
 25		"Ezgaitu 'Ireki Diska' menua"
 26		"Ekinbide lehentasuna arruntetik gora"

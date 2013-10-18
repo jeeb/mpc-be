@@ -379,7 +379,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 19		"Utolsó ablakpozíció megjegyzése"
 20		"Utolsó ablakméret megjegyzése"
 21		"Asztalszélekhez igazítás"
-22		"Beállítások .ini fájlba tárolása"
+22		"Save settings in the player folder"
 23		"Megnyitott fájlok előzményeinek megtartása"
 25		"Disable 'Open Disc' menu"
 26		"A lejátszó prioritása normál érték felett"

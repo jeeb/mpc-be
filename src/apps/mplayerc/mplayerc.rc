@@ -231,7 +231,7 @@ BEGIN
     CONTROL         "Remember last window position",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,53,156,8
     CONTROL         "Remember last window size",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,65,156,8
     CONTROL         "Snap to desktop edges",IDC_CHECK12,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,183,156,8
-    CONTROL         "Store settings to .ini file",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,195,156,8
+    CONTROL         "Save settings in the player folder",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,195,156,8
     CONTROL         "Keep history of recently opened files",IDC_CHECK1,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,17,156,8
     CONTROL         "Disable 'Open Disc' menu",IDC_CHECK10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,207,156,8

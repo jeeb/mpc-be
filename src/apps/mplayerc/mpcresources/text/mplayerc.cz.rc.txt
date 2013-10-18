@@ -379,7 +379,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 19		"Pamatovat si poslední pozici okna"
 20		"Pamatovat si poslední velikost okna"
 21		"Přichytávat k okrajům obrazovky"
-22		"Ukládat nastavení do .ini souboru"
+22		"Save settings in the player folder"
 23		"Ukládat historii otevřených souborů"
 25		"Zakázat nabídku Otevřít disk"
 26		"Spouštět se zvýšenou prioritou"

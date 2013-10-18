@@ -379,7 +379,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 19		"Remember last window position"
 20		"Remember last window size"
 21		"Snap to desktop edges"
-22		"Store settings to .ini file"
+22		"Save settings in the player folder"
 23		"Keep history of recently opened files"
 25		"Disable 'Open Disc' menu"
 26		"Process priority above normal"
