@@ -882,8 +882,9 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_Deinterlacing, dw)) {
 			m_nDeinterlacing = (MPC_DEINTERLACING_FLAGS)dw;
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("ActiveCodecs"), dw)) {
-			m_nActiveCodecs = dw;
+		ULONGLONG val;
+		if (ERROR_SUCCESS == key.QueryQWORDValue(_T("ActiveCodecs"), val)) {
+			m_nActiveCodecs = val;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_ARMode, dw)) {
 			m_nARMode = dw;
@@ -1207,10 +1208,9 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, bool bForced)
 				case AV_CODEC_ID_V210 :
 					bCodecActivated = (m_nActiveCodecs & MPCVD_V210) != 0;
 					break;
-/*				case AV_CODEC_ID_HEVC :
+				case AV_CODEC_ID_HEVC :
 					bCodecActivated = (m_nActiveCodecs & MPCVD_HEVC) != 0;
 					break;
-*/
 			}
 
 			if (!bCodecActivated && !bForced) {
@@ -1503,10 +1503,10 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 
 	m_bReorderBFrame	= true;
 	m_pAVCodec			= avcodec_find_decoder(m_nCodecId);
-	CheckPointer (m_pAVCodec, VFW_E_UNSUPPORTED_VIDEO);
+	CheckPointer(m_pAVCodec, VFW_E_UNSUPPORTED_VIDEO);
 
 	m_pAVCtx	= avcodec_alloc_context3(m_pAVCodec);
-	CheckPointer (m_pAVCtx, E_POINTER);
+	CheckPointer(m_pAVCtx, E_POINTER);
 
 	if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO || m_nCodecId == AV_CODEC_ID_MPEG1VIDEO) {
 		m_pParser = av_parser_init(m_nCodecId);
@@ -1522,7 +1522,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	}
 
 	m_pFrame = avcodec_alloc_frame();
-	CheckPointer (m_pFrame, E_POINTER);
+	CheckPointer(m_pFrame, E_POINTER);
 
 	m_h264RandomAccess.SetAVCNALSize(0);
 	m_h264RandomAccess.flush(m_pAVCtx->thread_count);
@@ -1544,9 +1544,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		m_pAVCtx->codec_tag		= pBMI->biCompression ? pBMI->biCompression : pmt->subtype.Data1;
 
 		if ((m_pAVCtx->codec_tag == MAKEFOURCC('a','v','c','1'))
-				|| (m_pAVCtx->codec_tag == MAKEFOURCC('A','V','C','1'))
-				|| (m_pAVCtx->codec_tag == MAKEFOURCC('H','V','C','1'))
-				|| (m_pAVCtx->codec_tag == MAKEFOURCC('H','E','V','C'))) {
+				|| (m_pAVCtx->codec_tag == MAKEFOURCC('A','V','C','1'))) {
 			m_bReorderBFrame			= IsAVI() ? true : false;
 		} else if ((m_pAVCtx->codec_tag == MAKEFOURCC('m','p','4','v')) || (m_pAVCtx->codec_tag == MAKEFOURCC('M','P','4','V'))) {
 			m_bReorderBFrame			= false;
@@ -2577,7 +2575,7 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 		case MODE_DXVA1 :
 		case MODE_DXVA2 :
 			{
-				CheckPointer (m_pDXVADecoder, E_UNEXPECTED);
+				CheckPointer(m_pDXVADecoder, E_UNEXPECTED);
 				UpdateAspectRatio();
 
 				// Change aspect ratio for DXVA1
@@ -3037,7 +3035,7 @@ STDMETHODIMP CMPCVideoDecFilter::Apply()
 		key.SetDWORDValue(OPT_ThreadNumber, m_nThreadNumber);
 		key.SetDWORDValue(OPT_DiscardMode, m_nDiscardMode);
 		key.SetDWORDValue(OPT_Deinterlacing, (int)m_nDeinterlacing);
-		key.SetDWORDValue(_T("ActiveCodecs"), m_nActiveCodecs);
+		key.SetQWORDValue(_T("ActiveCodecs"), m_nActiveCodecs);
 		key.SetDWORDValue(OPT_ARMode, m_nARMode);
 		key.SetDWORDValue(OPT_DXVACheck, m_nDXVACheckCompatibility);
 		key.SetDWORDValue(OPT_DisableDXVA_SD, m_nDXVA_SD);
@@ -3120,14 +3118,14 @@ STDMETHODIMP_(GUID*) CMPCVideoDecFilter::GetDXVADecoderGuid()
 	}
 }
 
-STDMETHODIMP CMPCVideoDecFilter::SetActiveCodecs(DWORD nValue)
+STDMETHODIMP CMPCVideoDecFilter::SetActiveCodecs(ULONGLONG nValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
 	m_nActiveCodecs = nValue;
 	return S_OK;
 }
 
-STDMETHODIMP_(DWORD) CMPCVideoDecFilter::GetActiveCodecs()
+STDMETHODIMP_(ULONGLONG) CMPCVideoDecFilter::GetActiveCodecs()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_nActiveCodecs;

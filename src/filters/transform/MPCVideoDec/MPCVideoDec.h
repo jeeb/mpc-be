@@ -84,7 +84,7 @@ protected:
 	int										m_nDiscardMode;
 	MPC_DEINTERLACING_FLAGS					m_nDeinterlacing;
 	bool									m_bDXVACompatible;
-	DWORD									m_nActiveCodecs;
+	ULONGLONG								m_nActiveCodecs;
 	int										m_nARMode;
 	int										m_nDXVACheckCompatibility;
 	int										m_nDXVA_SD;
@@ -237,8 +237,8 @@ public:
 	STDMETHODIMP SetDeinterlacing(MPC_DEINTERLACING_FLAGS nValue);
 	STDMETHODIMP_(MPC_DEINTERLACING_FLAGS) GetDeinterlacing();
 	STDMETHODIMP_(GUID*) GetDXVADecoderGuid();
-	STDMETHODIMP SetActiveCodecs(DWORD nValue);
-	STDMETHODIMP_(DWORD) GetActiveCodecs();
+	STDMETHODIMP SetActiveCodecs(ULONGLONG nValue);
+	STDMETHODIMP_(ULONGLONG) GetActiveCodecs();
 	STDMETHODIMP_(LPCTSTR) GetVideoCardDescription();
 
 	STDMETHODIMP SetARMode(int nValue);

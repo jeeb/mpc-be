@@ -473,7 +473,7 @@ void CMPCVideoDecCodecWnd::OnDisconnect()
 }
 
 typedef struct {
-	DWORD		CodecId;
+	ULONGLONG	CodecId;
 	LPCTSTR		CodeName;
 } MPCFILTER_VIDEO_CODECS;
 
@@ -515,9 +515,9 @@ MPCFILTER_VIDEO_CODECS mpc_codecs[] = {
 
 bool CMPCVideoDecCodecWnd::OnActivate()
 {
-	DWORD dwStyle		= WS_VISIBLE|WS_CHILD|WS_BORDER;
-	int nPos			= 0;
-	DWORD nActiveCodecs	= m_pMDF ? m_pMDF->GetActiveCodecs() : 0;
+	DWORD dwStyle			= WS_VISIBLE|WS_CHILD|WS_BORDER;
+	int nPos				= 0;
+	ULONGLONG nActiveCodecs	= m_pMDF ? m_pMDF->GetActiveCodecs() : 0;
 
 	m_grpSelectedCodec.Create (_T("Selected codecs"), WS_VISIBLE|WS_CHILD | BS_GROUPBOX, CRect (10,  10, 330, 280), this, (UINT)IDC_STATIC);
 
@@ -544,8 +544,8 @@ bool CMPCVideoDecCodecWnd::OnApply()
 	OnDeactivate();
 
 	if (m_pMDF) {
-		int nActiveCodecs = 0;
-		int nPos		  = 0;
+		ULONGLONG nActiveCodecs	= 0;
+		int nPos				= 0;
 
 		for (size_t i = 0; i < _countof(mpc_codecs); i++) {
 			if (m_lstCodecs.GetCheck(nPos++)) {
@@ -553,7 +553,7 @@ bool CMPCVideoDecCodecWnd::OnApply()
 			}
 		}
 
-		m_pMDF->SetActiveCodecs (nActiveCodecs);
+		m_pMDF->SetActiveCodecs(nActiveCodecs);
 
 		m_pMDF->Apply();
 	}

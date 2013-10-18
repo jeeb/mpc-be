@@ -79,8 +79,8 @@ public IUnknown {
 
 	STDMETHOD_(GUID*, GetDXVADecoderGuid()) = 0;
 
-	STDMETHOD(SetActiveCodecs(DWORD nValue)) = 0;
-	STDMETHOD_(DWORD, GetActiveCodecs()) = 0;
+	STDMETHOD(SetActiveCodecs(ULONGLONG nValue)) = 0;
+	STDMETHOD_(ULONGLONG, GetActiveCodecs()) = 0;
 
 	STDMETHOD_(LPCTSTR, GetVideoCardDescription()) = 0;
 
