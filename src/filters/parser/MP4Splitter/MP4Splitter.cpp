@@ -288,6 +288,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			CStringA TrackLanguage = track->GetTrackLanguage().c_str();
 
+			REFERENCE_TIME AvgTimePerFrame = item->GetData()->GetSampleCount() ? item->GetData()->GetDurationMs()*10000 / (item->GetData()->GetSampleCount()) : 0;
+
 			CAtlArray<CMediaType> mts;
 
 			CMediaType mt;
@@ -346,9 +348,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					vih2->bmiHeader.biWidth		= biWidth;
 					vih2->bmiHeader.biHeight	= biHeight;
 					vih2->rcSource				= vih2->rcTarget = CRect(0, 0, biWidth, biHeight);
-					if (item->GetData()->GetSampleCount()) {
-						vih2->AvgTimePerFrame = item->GetData()->GetDurationMs()*10000 / (item->GetData()->GetSampleCount()); 
-					}
+					vih2->AvgTimePerFrame		= AvgTimePerFrame;
 
 					SetAspect(vih2, Aspect, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight); 
 
@@ -356,51 +356,49 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					switch (video_desc->GetObjectTypeId()) {
 						case AP4_MPEG4_VISUAL_OTI:
-							mt.subtype = FOURCCMap('v4pm');
-							mt.formattype = FORMAT_MPEG2Video;
 							{
-								MPEG2VIDEOINFO* mvih			= (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + di->GetDataSize());
-								memset(mvih, 0, mt.FormatLength());
-								mvih->hdr.bmiHeader.biSize		= sizeof(mvih->hdr.bmiHeader);
-								mvih->hdr.bmiHeader.biWidth		= biWidth;
-								mvih->hdr.bmiHeader.biHeight	= biHeight;
-								mvih->hdr.bmiHeader.biCompression = 'v4pm';
-								mvih->hdr.bmiHeader.biPlanes	= 1;
-								mvih->hdr.bmiHeader.biBitCount	= 24;
-								mvih->hdr.dwPictAspectRatioX	= mvih->hdr.bmiHeader.biWidth;
-								mvih->hdr.dwPictAspectRatioY	= mvih->hdr.bmiHeader.biHeight;
-								if (item->GetData()->GetSampleCount()) {
-									mvih->hdr.AvgTimePerFrame	= item->GetData()->GetDurationMs()*10000 / (item->GetData()->GetSampleCount()); 
-								}
-								mvih->cbSequenceHeader			= di->GetDataSize();
-								memcpy(mvih->dwSequenceHeader, di->GetData(), di->GetDataSize());
+								const AP4_Byte* data	= di->GetData();
+								AP4_Size size			= di->GetDataSize();
+
+								BITMAPINFOHEADER pbmi;
+								memset(&pbmi, 0, sizeof(BITMAPINFOHEADER));
+								pbmi.biSize			= sizeof(pbmi);
+								pbmi.biWidth		= biWidth;
+								pbmi.biHeight		= biHeight;
+								pbmi.biCompression	= FCC('mp4v');
+								pbmi.biPlanes		= 1;
+								pbmi.biBitCount		= 24;
+
+								Aspect.cx = pbmi.biWidth;
+								Aspect.cy = pbmi.biHeight;
+								ReduceDim(Aspect);
+								CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, (BYTE*)data, size); 
 								mts.Add(mt);
-								mt.subtype						= FOURCCMap(mvih->hdr.bmiHeader.biCompression = 'V4PM');
+
+								MPEG2VIDEOINFO* mvih	= (MPEG2VIDEOINFO*)mt.pbFormat;
+								mt.subtype				= FOURCCMap(mvih->hdr.bmiHeader.biCompression = 'V4PM');
 								mts.Add(mt);
-								//b_HasVideo = true;
 							}
 							break;
 						case AP4_JPEG_OTI:
-							mt.subtype = FOURCCMap('gepj');
-							mt.formattype = FORMAT_MPEG2Video;
 							{
-								MPEG2VIDEOINFO* mvih			= (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + di->GetDataSize());
-								memset(mvih, 0, mt.FormatLength());
-								mvih->hdr.bmiHeader.biSize		= sizeof(mvih->hdr.bmiHeader);
-								mvih->hdr.bmiHeader.biWidth		= biWidth;
-								mvih->hdr.bmiHeader.biHeight	= biHeight;
-								mvih->hdr.bmiHeader.biCompression = 'gepj';
-								mvih->hdr.bmiHeader.biPlanes	= 1;
-								mvih->hdr.bmiHeader.biBitCount	= 24;
-								mvih->hdr.dwPictAspectRatioX	= mvih->hdr.bmiHeader.biWidth;
-								mvih->hdr.dwPictAspectRatioY	= mvih->hdr.bmiHeader.biHeight;
-								if (item->GetData()->GetSampleCount()) {
-									mvih->hdr.AvgTimePerFrame	= item->GetData()->GetDurationMs()*10000 / (item->GetData()->GetSampleCount()); 
-								}
-								mvih->cbSequenceHeader			= di->GetDataSize();
-								memcpy(mvih->dwSequenceHeader, di->GetData(), di->GetDataSize());
+								const AP4_Byte* data	= di->GetData();
+								AP4_Size size			= di->GetDataSize();
+
+								BITMAPINFOHEADER pbmi;
+								memset(&pbmi, 0, sizeof(BITMAPINFOHEADER));
+								pbmi.biSize			= sizeof(pbmi);
+								pbmi.biWidth		= biWidth;
+								pbmi.biHeight		= biHeight;
+								pbmi.biCompression	= FCC('jpeg');
+								pbmi.biPlanes		= 1;
+								pbmi.biBitCount		= 24;
+
+								Aspect.cx = pbmi.biWidth;
+								Aspect.cy = pbmi.biHeight;
+								ReduceDim(Aspect);
+								CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, (BYTE*)data, size); 
 								mts.Add(mt);
-								//b_HasVideo = true;
 							}
 							break;
 						case AP4_MPEG2_VISUAL_SIMPLE_OTI:
@@ -611,8 +609,6 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					pbmi.biPlanes		= 1;
 					pbmi.biBitCount		= 24;
 
-					REFERENCE_TIME AvgTimePerFrame = item->GetData()->GetSampleCount() ? item->GetData()->GetDurationMs()*10000 / (item->GetData()->GetSampleCount()) : 0;
-
 					Aspect.cx = pbmi.biWidth;
 					Aspect.cy = pbmi.biHeight;
 					if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(avc1->GetChild(AP4_ATOM_TYPE_PASP))) {
@@ -637,44 +633,30 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						di = &empty;
 					}
 
-					BYTE* headerData = (BYTE*)di->GetData();
-					int headerSize = (int)di->GetDataSize();
+					const AP4_Byte* data	= di->GetData();
+					AP4_Size size			= di->GetDataSize();
 
-					vc_params_t params;
-					if (ParseHEVCDecoderConfigurationRecord(headerData, headerSize, params)) {
-						Aspect.cx = params.width;
-						Aspect.cy = params.height;
-						if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(hvc1->GetChild(AP4_ATOM_TYPE_PASP))) {
-							if (pasp->GetNum() > 0 && pasp->GetDen() > 0) {
-								Aspect.cx *= pasp->GetNum();
-								Aspect.cy *= pasp->GetDen();
-							}
+					BITMAPINFOHEADER pbmi;
+					memset(&pbmi, 0, sizeof(BITMAPINFOHEADER));
+					pbmi.biSize			= sizeof(pbmi);
+					pbmi.biWidth		= (LONG)hvc1->GetWidth();
+					pbmi.biHeight		= (LONG)hvc1->GetHeight();
+					pbmi.biCompression	= FCC('HVC1');
+					pbmi.biPlanes		= 1;
+					pbmi.biBitCount		= 24;
+
+					Aspect.cx = pbmi.biWidth;
+					Aspect.cy = pbmi.biHeight;
+					if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(hvc1->GetChild(AP4_ATOM_TYPE_PASP))) {
+						if (pasp->GetNum() > 0 && pasp->GetDen() > 0) {
+							Aspect.cx *= pasp->GetNum();
+							Aspect.cy *= pasp->GetDen();
 						}
-						ReduceDim(Aspect);
-
-						mt.majortype					= MEDIATYPE_Video;
-						mt.formattype					= FORMAT_MPEG2Video;
-						MPEG2VIDEOINFO* vih				= (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + headerSize);
-						memset(vih, 0, mt.FormatLength());
-						vih->hdr.bmiHeader.biSize		= sizeof(vih->hdr.bmiHeader);
-						vih->hdr.bmiHeader.biPlanes		= 1;
-						vih->hdr.bmiHeader.biBitCount	= 24;
-						vih->dwProfile					= params.profile;
-						vih->dwLevel					= params.level;
-						vih->dwFlags					= params.nal_length_size;
-						vih->hdr.dwPictAspectRatioX		= Aspect.cx;
-						vih->hdr.dwPictAspectRatioY		= Aspect.cy;
-						vih->hdr.bmiHeader.biWidth		= params.width;
-						vih->hdr.bmiHeader.biHeight		= params.height;
-
-						vih->cbSequenceHeader			= headerSize;
-						memcpy(vih->dwSequenceHeader, headerData, headerSize);
-
-						mt.subtype = FOURCCMap(vih->hdr.bmiHeader.biCompression = FCC('HVC1'));
-
-						mts.Add(mt);
-						//b_HasVideo = true;
 					}
+					ReduceDim(Aspect);
+					CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, (BYTE*)data, size); 
+
+					mts.Add(mt);
 				}
 			} else if (AP4_StsdAtom* stsd = dynamic_cast<AP4_StsdAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stsd"))) {
 				const AP4_DataBuffer& db = stsd->GetDataBuffer();
@@ -748,9 +730,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						vih2->bmiHeader.biCompression	= fourcc;
 						vih2->bmiHeader.biBitCount		= (LONG)vse->GetDepth();
 						vih2->rcSource					= vih2->rcTarget = CRect(0, 0, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight);
-						if (item->GetData()->GetSampleCount()) {
-							vih2->AvgTimePerFrame		= item->GetData()->GetDurationMs()*10000 / (item->GetData()->GetSampleCount());
-						}
+						vih2->AvgTimePerFrame			= AvgTimePerFrame;
 
 						if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(vse->GetChild(AP4_ATOM_TYPE_PASP))) {
 							if (pasp->GetNum() > 0 && pasp->GetDen() > 0) {

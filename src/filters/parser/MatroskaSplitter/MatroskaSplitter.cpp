@@ -284,19 +284,18 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						mts.Add(mt);
 					bHasVideo = true;
 				} else if (CodecID.Find("V_MPEG4/") == 0) {
-					mt.subtype = FOURCCMap('V4PM');
-					mt.formattype = FORMAT_MPEG2Video;
-					MPEG2VIDEOINFO* pm2vi = (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + pTE->CodecPrivate.GetCount());
-					memset(mt.Format(), 0, mt.FormatLength());
-					pm2vi->hdr.bmiHeader.biSize = sizeof(pm2vi->hdr.bmiHeader);
-					pm2vi->hdr.bmiHeader.biWidth = (LONG)pTE->v.PixelWidth;
-					pm2vi->hdr.bmiHeader.biHeight = (LONG)pTE->v.PixelHeight;
-					pm2vi->hdr.bmiHeader.biCompression = 'V4PM';
-					pm2vi->hdr.bmiHeader.biPlanes = 1;
-					pm2vi->hdr.bmiHeader.biBitCount = 24;
-					BYTE* pSequenceHeader = (BYTE*)pm2vi->dwSequenceHeader;
-					memcpy(pSequenceHeader, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
-					pm2vi->cbSequenceHeader = (DWORD)pTE->CodecPrivate.GetCount();
+					BITMAPINFOHEADER pbmi;
+					memset(&pbmi, 0, sizeof(BITMAPINFOHEADER));
+					pbmi.biSize			= sizeof(pbmi);
+					pbmi.biWidth		= (LONG)pTE->v.PixelWidth;
+					pbmi.biHeight		= (LONG)pTE->v.PixelHeight;
+					pbmi.biCompression	= FCC('MP4V');
+					pbmi.biPlanes		= 1;
+					pbmi.biBitCount		= 24;
+
+					CSize aspect(pbmi.biWidth, pbmi.biHeight);
+					ReduceDim(aspect);
+					CreateMPEG2VISimple(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount()); 
 					if (!bHasVideo)
 						mts.Add(mt);
 					bHasVideo = true;
@@ -425,38 +424,21 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						mts.Add(mt);
 					bHasVideo = true;
 				} else if (CodecID == "V_MPEGH/ISO/HEVC") {
-					BYTE* data = pTE->CodecPrivate.GetData();
-					int   size = pTE->CodecPrivate.GetCount();
+					BITMAPINFOHEADER pbmi;
+					memset(&pbmi, 0, sizeof(BITMAPINFOHEADER));
+					pbmi.biSize			= sizeof(pbmi);
+					pbmi.biWidth		= (LONG)pTE->v.PixelWidth;
+					pbmi.biHeight		= (LONG)pTE->v.PixelHeight;
+					pbmi.biCompression	= FCC('HEVC');
+					pbmi.biPlanes		= 1;
+					pbmi.biBitCount		= 24;
 
-					vc_params_t params;
-					if (ParseHEVCDecoderConfigurationRecord(data, size, params)) {
-						CSize aspect(params.width, params.height);
-						ReduceDim(aspect);
-
-						mt.majortype					= MEDIATYPE_Video;
-						mt.formattype					= FORMAT_MPEG2Video;
-						MPEG2VIDEOINFO* mvih			= (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + size);
-						memset(mvih, 0, mt.FormatLength());
-						mvih->hdr.bmiHeader.biSize		= sizeof(mvih->hdr.bmiHeader);
-						mvih->hdr.bmiHeader.biPlanes	= 1;
-						mvih->hdr.bmiHeader.biBitCount	= 24;
-						mvih->dwProfile					= params.profile;
-						mvih->dwLevel					= params.level;
-						mvih->dwFlags					= params.nal_length_size;
-						mvih->hdr.dwPictAspectRatioX	= aspect.cx;
-						mvih->hdr.dwPictAspectRatioY	= aspect.cy;
-						mvih->hdr.bmiHeader.biWidth		= params.width;
-						mvih->hdr.bmiHeader.biHeight	= params.height;
-
-						mvih->cbSequenceHeader			= size;
-						memcpy(mvih->dwSequenceHeader, data, size);
-
-						mt.subtype = FOURCCMap(mvih->hdr.bmiHeader.biCompression = FCC('HEVC'));
-						mt.SetSampleSize(params.width * params.height * 4);
-						if (!bHasVideo) 
-							mts.Add(mt);
-						bHasVideo = true;
-					}
+					CSize aspect(pbmi.biWidth, pbmi.biHeight);
+					ReduceDim(aspect);
+					CreateMPEG2VISimple(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount()); 
+					if (!bHasVideo)
+						mts.Add(mt);
+					bHasVideo = true;
 				}
 				REFERENCE_TIME AvgTimePerFrame = 0;
 

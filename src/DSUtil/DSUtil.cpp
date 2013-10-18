@@ -2966,32 +2966,32 @@ HRESULT CreateMPEG2VIfromAVC(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_T
 {
 	RECT rc = {0, 0, pbmi->biWidth, abs(pbmi->biHeight)};
 
-	mt->majortype	= MEDIATYPE_Video;
-	mt->formattype	= FORMAT_MPEG2Video;
+	mt->majortype					= MEDIATYPE_Video;
+	mt->formattype					= FORMAT_MPEG2Video;
 
-	MPEG2VIDEOINFO* mvih = (MPEG2VIDEOINFO*)mt->AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + extralen/* - 7*/);
-	memset(mvih, 0, mt->FormatLength());
-	memcpy(&mvih->hdr.bmiHeader, pbmi, sizeof(BITMAPINFOHEADER));
+	MPEG2VIDEOINFO* pm2vi			= (MPEG2VIDEOINFO*)mt->AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + extralen);
+	memset(pm2vi, 0, mt->FormatLength());
+	memcpy(&pm2vi->hdr.bmiHeader, pbmi, sizeof(BITMAPINFOHEADER));
 
-	mvih->hdr.dwPictAspectRatioX	= aspect.cx;
-	mvih->hdr.dwPictAspectRatioY	= aspect.cy;
-	mvih->hdr.AvgTimePerFrame		= AvgTimePerFrame;
-	mvih->hdr.rcSource				= mvih->hdr.rcTarget = rc;
+	pm2vi->hdr.dwPictAspectRatioX	= aspect.cx;
+	pm2vi->hdr.dwPictAspectRatioY	= aspect.cy;
+	pm2vi->hdr.AvgTimePerFrame		= AvgTimePerFrame;
+	pm2vi->hdr.rcSource				= pm2vi->hdr.rcTarget = rc;
 
-	mvih->cbSequenceHeader = 0;
+	pm2vi->cbSequenceHeader = 0;
 
 	HRESULT hr = S_OK;
 
 	if (extra[0] == 1) {
-		mvih->dwProfile	= extra[1];
-		mvih->dwLevel	= extra[3];
-		mvih->dwFlags	= (extra[4] & 3) + 1;
+		pm2vi->dwProfile	= extra[1];
+		pm2vi->dwLevel		= extra[3];
+		pm2vi->dwFlags		= (extra[4] & 3) + 1;
 
 		BYTE* src = (BYTE*)extra + 5;
-		BYTE* dst = (BYTE*)mvih->dwSequenceHeader;
+		BYTE* dst = (BYTE*)pm2vi->dwSequenceHeader;
 
 		BYTE* src_end = (BYTE*)extra + extralen;
-		BYTE* dst_end = (BYTE*)mvih->dwSequenceHeader + extralen;
+		BYTE* dst_end = (BYTE*)pm2vi->dwSequenceHeader + extralen;
 
 		for (int i = 0; i < 2; ++i) {
 			for (int n = *src++ & 0x1f; n > 0; --n) {
@@ -3003,20 +3003,45 @@ HRESULT CreateMPEG2VIfromAVC(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_T
 				memcpy(dst, src, len);
 				src += len;
 				dst += len;
-				mvih->cbSequenceHeader += len;
+				pm2vi->cbSequenceHeader += len;
 			}
 		}
 	} else {
 		hr = E_FAIL;
 
-		mvih->cbSequenceHeader = extralen;
-		memcpy(&mvih->dwSequenceHeader[0], extra, extralen);
+		pm2vi->cbSequenceHeader = extralen;
+		memcpy(&pm2vi->dwSequenceHeader[0], extra, extralen);
 	}
 
-	mt->subtype = FOURCCMap(mvih->hdr.bmiHeader.biCompression);
+	mt->subtype = FOURCCMap(pm2vi->hdr.bmiHeader.biCompression);
 	mt->SetSampleSize(pbmi->biWidth * pbmi-> biHeight * 4);
 
 	return hr;
+}
+
+HRESULT CreateMPEG2VISimple(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_TIME AvgTimePerFrame, CSize aspect, BYTE* extra, size_t extralen)
+{
+	RECT rc = {0, 0, pbmi->biWidth, abs(pbmi->biHeight)};
+
+	mt->majortype					= MEDIATYPE_Video;
+	mt->formattype					= FORMAT_MPEG2Video;
+
+	MPEG2VIDEOINFO* pm2vi			= (MPEG2VIDEOINFO*)mt->AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + extralen);
+	memset(pm2vi, 0, mt->FormatLength());
+	memcpy(&pm2vi->hdr.bmiHeader, pbmi, sizeof(BITMAPINFOHEADER));
+
+	pm2vi->hdr.dwPictAspectRatioX	= aspect.cx;
+	pm2vi->hdr.dwPictAspectRatioY	= aspect.cy;
+	pm2vi->hdr.AvgTimePerFrame		= AvgTimePerFrame;
+	pm2vi->hdr.rcSource				= pm2vi->hdr.rcTarget = rc;
+
+	pm2vi->cbSequenceHeader			= extralen;
+	memcpy(&pm2vi->dwSequenceHeader[0], extra, extralen);
+
+	mt->subtype = FOURCCMap(pm2vi->hdr.bmiHeader.biCompression);
+	mt->SetSampleSize(pbmi->biWidth * pbmi-> biHeight * 4);
+
+	return S_OK;
 }
 
 // log function
