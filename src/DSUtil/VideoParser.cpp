@@ -707,7 +707,7 @@ enum nal_unit_type_e {
 	NAL_UNIT_PPS = 34,
 };
 
-bool ParseHEVCDecoderConfigurationRecord(BYTE* data, int size, vc_params_t& params)
+bool ParseHEVCDecoderConfigurationRecord(BYTE* data, int size, vc_params_t& params, bool parseSPS)
 {
 	params.clear();
 	if (size < 23) {
@@ -754,30 +754,28 @@ bool ParseHEVCDecoderConfigurationRecord(BYTE* data, int size, vc_params_t& para
 	params.nal_length_size = gb.BitRead(2) + 1;	// lengthSizeMinusOne
 	int numOfArrays = gb.BitRead(8);
 
-	int sps_num = 0;
-	int sps_len = 0;
+	if (parseSPS) {
+		int sps_len = 0;
 
-	for (int j = 0; j < numOfArrays; j++) {
-		gb.BitRead(1);				// array_completeness
-		uint8 reserved = gb.BitRead(1);	// reserved = 0 (or 1 for MKV DivX HEVC)
-		int NAL_unit_type = gb.BitRead(6);
-		int numNalus      = gb.BitRead(16);
-		if (NAL_unit_type == (int)NAL_UNIT_SPS) {
-			sps_num = numNalus;
-			sps_len = gb.BitRead(16);
-			break;
+		for (int j = 0; j < numOfArrays; j++) {
+			gb.BitRead(1);						// array_completeness
+			uint8 reserved    = gb.BitRead(1);	// reserved = 0 (or 1 for MKV DivX HEVC)
+			int NAL_unit_type = gb.BitRead(6);
+			int numNalus      = gb.BitRead(16);
+			if (NAL_unit_type == (int)NAL_UNIT_SPS && numNalus > 0) {
+				sps_len = gb.BitRead(16);
+				break;
+			}
+			for (int i = 0; i < numNalus; i++) {
+				int nalUnitLength = gb.BitRead(16);
+				gb.SkipBytes(nalUnitLength);
+			}
 		}
-		for (int i = 0; i < numNalus; i++) {
-			int nalUnitLength = gb.BitRead(16);
-			gb.SkipBytes(nalUnitLength);
+
+		if (sps_len) {
+			return ParseSequenceParameterSet(gb.GetBufferPos(), sps_len, params);
 		}
-	}
 
-	if (!sps_num) {
-		return false;
-	}
-
-	if (!ParseSequenceParameterSet(gb.GetBufferPos(), sps_len, params)) {
 		return false;
 	}
 

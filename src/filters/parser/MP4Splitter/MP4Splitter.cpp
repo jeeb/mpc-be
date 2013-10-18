@@ -659,7 +659,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mts.Add(mt);
 
 					vc_params_t params;
-					if (ParseHEVCDecoderConfigurationRecord((BYTE*)data, size, params)) {
+					if (ParseHEVCDecoderConfigurationRecord((BYTE*)data, size, params, true)) {
 						MPEG2VIDEOINFO* pm2vi	= (MPEG2VIDEOINFO*)mt.pbFormat;
 						pm2vi->dwProfile		= params.profile;
 						pm2vi->dwLevel			= params.level;
