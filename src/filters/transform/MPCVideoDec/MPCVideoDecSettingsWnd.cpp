@@ -492,7 +492,7 @@ MPCFILTER_VIDEO_CODECS mpc_codecs[] = {
 	{MPCVD_FLASH,		_T("FLV1/4")},
 	{MPCVD_H263,		_T("H.263")},
 	{MPCVD_H264,		_T("H.264/AVC (FFmpeg)")},
-	{MPCVD_HEVC,		_T("HEVC")},
+	{MPCVD_HEVC,		_T("HEVC (experimental)")},
 	{MPCVD_INDEO,		_T("Indeo 3/4/5")},
 	{MPCVD_LAGARITH,	_T("Lagarith")},
 	{MPCVD_MJPEG,		_T("MJPEG")},
