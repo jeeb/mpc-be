@@ -379,7 +379,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 19		"마지막 윈도우창위치 기억"
 20		"마지막 윈도우창크기 기억"
 21		"바탕화면 자석효과 사용"
-22		"Store settings in the player folder"
+22		"실행파일 폴더에 설정 저장"
 23		"최근에 열었던 파일목록 기억"
 25		"'디스크 열기' 메뉴 사용안함"
 26		"프로세스 우선순위 높이기"
