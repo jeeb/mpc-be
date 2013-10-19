@@ -597,8 +597,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						di = &empty;
 					}
 
-					const AP4_Byte* data = di->GetData();
-					AP4_Size size = di->GetDataSize();
+					BYTE* data			= (BYTE*)di->GetData();
+					size_t size			= (size_t)di->GetDataSize();
 
 					BITMAPINFOHEADER pbmi;
 					memset(&pbmi, 0, sizeof(BITMAPINFOHEADER));
@@ -618,7 +618,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 					}
 					ReduceDim(Aspect);
-					CreateMPEG2VIfromAVC(&mt, &pbmi, AvgTimePerFrame, Aspect, (BYTE*)data, size); 
+					CreateMPEG2VIfromAVC(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size); 
 
 					mts.Add(mt);
 					//b_HasVideo = true;
@@ -633,8 +633,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						di = &empty;
 					}
 
-					const AP4_Byte* data	= di->GetData();
-					AP4_Size size			= di->GetDataSize();
+					BYTE* data			= (BYTE*)di->GetData();
+					size_t size			= (size_t)di->GetDataSize();
 
 					BITMAPINFOHEADER pbmi;
 					memset(&pbmi, 0, sizeof(BITMAPINFOHEADER));
@@ -654,17 +654,17 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 					}
 					ReduceDim(Aspect);
-					CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, (BYTE*)data, size); 
+					CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size); 
 
 					mts.Add(mt);
 
 					vc_params_t params;
-					if (ParseHEVCDecoderConfigurationRecord((BYTE*)data, size, params, true)) {
+					if (ParseHEVCDecoderConfigurationRecord(data, size, params, true)) {
 						MPEG2VIDEOINFO* pm2vi	= (MPEG2VIDEOINFO*)mt.pbFormat;
 						pm2vi->dwProfile		= params.profile;
 						pm2vi->dwLevel			= params.level;
 						pm2vi->dwFlags			= params.nal_length_size;
-						CreateSequenceHeaderHEVC((BYTE*)data, size, pm2vi->dwSequenceHeader, pm2vi->cbSequenceHeader);
+						CreateSequenceHeaderHEVC(data, size, pm2vi->dwSequenceHeader, pm2vi->cbSequenceHeader);
 
 						mts.InsertAt(0, mt);
 					}
