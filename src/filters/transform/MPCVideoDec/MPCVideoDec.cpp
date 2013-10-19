@@ -1541,6 +1541,10 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		MPEG2VIDEOINFO* mpg2v	= (MPEG2VIDEOINFO*)pmt->pbFormat;
 		pBMI					= &mpg2v->hdr.bmiHeader;
 
+		if (mpg2v->dwProfile) {
+			return VFW_E_TYPE_NOT_ACCEPTED;
+		}
+
 		m_pAVCtx->codec_tag		= pBMI->biCompression ? pBMI->biCompression : pmt->subtype.Data1;
 
 		switch (m_pAVCtx->codec_tag) {
