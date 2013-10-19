@@ -1541,7 +1541,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		MPEG2VIDEOINFO* mpg2v	= (MPEG2VIDEOINFO*)pmt->pbFormat;
 		pBMI					= &mpg2v->hdr.bmiHeader;
 
-		if (mpg2v->dwProfile) {
+		if ((pBMI->biCompression == FCC('HEVC') || pBMI->biCompression == FCC('HVC1')) && mpg2v->dwProfile) {
 			return VFW_E_TYPE_NOT_ACCEPTED;
 		}
 
