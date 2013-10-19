@@ -357,8 +357,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					switch (video_desc->GetObjectTypeId()) {
 						case AP4_MPEG4_VISUAL_OTI:
 							{
-								const AP4_Byte* data	= di->GetData();
-								AP4_Size size			= di->GetDataSize();
+								BYTE* data			= (BYTE*)di->GetData();
+								size_t size			= (size_t)di->GetDataSize();
 
 								BITMAPINFOHEADER pbmi;
 								memset(&pbmi, 0, sizeof(BITMAPINFOHEADER));
@@ -372,7 +372,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								Aspect.cx = pbmi.biWidth;
 								Aspect.cy = pbmi.biHeight;
 								ReduceDim(Aspect);
-								CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, (BYTE*)data, size); 
+								CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size); 
 								mts.Add(mt);
 
 								MPEG2VIDEOINFO* mvih	= (MPEG2VIDEOINFO*)mt.pbFormat;
@@ -382,8 +382,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							break;
 						case AP4_JPEG_OTI:
 							{
-								const AP4_Byte* data	= di->GetData();
-								AP4_Size size			= di->GetDataSize();
+								BYTE* data			= (BYTE*)di->GetData();
+								size_t size			= (size_t)di->GetDataSize();
 
 								BITMAPINFOHEADER pbmi;
 								memset(&pbmi, 0, sizeof(BITMAPINFOHEADER));
@@ -397,7 +397,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								Aspect.cx = pbmi.biWidth;
 								Aspect.cy = pbmi.biHeight;
 								ReduceDim(Aspect);
-								CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, (BYTE*)data, size); 
+								CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size); 
 								mts.Add(mt);
 							}
 							break;
@@ -659,7 +659,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mts.Add(mt);
 
 					vc_params_t params;
-					if (ParseHEVCDecoderConfigurationRecord(data, size, params, true)) {
+					if (ParseHEVCDecoderConfigurationRecord(data, size, params, false)) {
 						MPEG2VIDEOINFO* pm2vi	= (MPEG2VIDEOINFO*)mt.pbFormat;
 						pm2vi->dwProfile		= params.profile;
 						pm2vi->dwLevel			= params.level;
