@@ -379,7 +379,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 19		"記住上次的視窗位置"
 20		"記住上次的視窗大小"
 21		"貼齊視窗邊緣"
-22		"Store settings in the player folder"
+22		"儲存設定到播放程式資料夾"
 23		"保留最近開啟檔案的記錄"
 25		"停用“開啟光碟”選單"
 26		"程式優先順序調成標準以上"
