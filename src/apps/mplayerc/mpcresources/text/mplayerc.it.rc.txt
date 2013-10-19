@@ -294,7 +294,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 16
 10		"AVI Splitter\nconfigurazione"
 11		"MPEG Splitter\nconfigurazione"
 12		"Video decoder\nconfigurazione"
-13		"MPEG-2 decoder\nconfigurazione"
+13		"MPEG-2/DVD\ndecoder\nconfigurazione"
 14		"Audio decoder\nconfigurazione"
 15		"Matroska Splitter\nconfigurazione"
 END

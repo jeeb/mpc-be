@@ -294,7 +294,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 16
 10		"AVI 分離器\n選項"
 11		"MPEG 分離器\n選項"
 12		"影片解碼器\n選項"
-13		"MPEG-2 解碼器\n選項"
+13		"MPEG-2/DVD\n解碼器\n選項"
 14		"音訊解碼器\n選項"
 15		"Matroska 分離器\n選項"
 END

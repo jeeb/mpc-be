@@ -294,7 +294,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 16
 10		"AVI 스플리터\n설정"
 11		"MPEG 스플리터\n설정"
 12		"Video 디코더\n설정"
-13		"MPEG-2 디코더\n설정"
+13		"MPEG-2/DVD\n디코더\n설정"
 14		"Audio 디코더\n설정"
 15		"Matroska 스플리터\n설정"
 END

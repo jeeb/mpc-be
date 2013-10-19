@@ -294,7 +294,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 16
 10		"AVI banantzaile\nitxurapena"
 11		"MPEG banantzaile\nitxurapena"
 12		"Bideo dekodeatzaile\nitxurapena"
-13		"MPEG-2 dekodeatzaile\nitxurapena"
+13		"MPEG-2/DVD\ndekodeatzaile\nitxurapena"
 14		"Audio dekodeatzaile\nitxurapena"
 15		"Matroska banantzaile\nitxurapena"
 END
