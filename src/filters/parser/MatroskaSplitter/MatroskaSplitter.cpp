@@ -370,8 +370,12 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					if (!bHasVideo)
 						mts.Add(mt);
 					bHasVideo = true;
-				} else if (CodecID.Find("V_VP8") == 0) {
-					mt.subtype = FOURCCMap('08PV');
+				} else if (CodecID == "V_VP8" || CodecID == "V_VP9") {
+					if (CodecID[4] == '8') {
+						mt.subtype = MEDIASUBTYPE_VP80;
+					} else if (CodecID[4] == '9') {
+						mt.subtype = MEDIASUBTYPE_VP90;
+					}
 					mt.formattype = FORMAT_VideoInfo;
 					VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + pTE->CodecPrivate.GetCount());
 					memset(mt.Format(), 0, mt.FormatLength());
