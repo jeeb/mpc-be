@@ -347,6 +347,8 @@ SRCS_C = \
 	libavcodec/vp6dsp.c \
 	libavcodec/vp8.c \
 	libavcodec/vp8dsp.c \
+	libavcodec/vp9.c \
+	libavcodec/vp9dsp.c \
 	libavcodec/wavpack.c \
 	libavcodec/wma.c \
 	libavcodec/wma_common.c \
@@ -398,6 +400,7 @@ SRCS_C = \
 	libavcodec/x86/vp3dsp_init.c \
 	libavcodec/x86/vp6dsp_init.c \
 	libavcodec/x86/vp8dsp_init.c \
+	libavcodec/x86/vp9dsp_init.c \
 	libavresample/audio_convert.c \
 	libavresample/audio_data.c \
 	libavresample/audio_mix.c \
@@ -497,6 +500,7 @@ SRCS_YASM = \
 	libavcodec/x86/vp3dsp.asm \
 	libavcodec/x86/vp6dsp.asm \
 	libavcodec/x86/vp8dsp.asm \
+	libavcodec/x86/vp9dsp.asm \
 	libavresample/x86/audio_convert.asm \
 	libavresample/x86/audio_mix.asm \
 	libavresample/x86/dither.asm \

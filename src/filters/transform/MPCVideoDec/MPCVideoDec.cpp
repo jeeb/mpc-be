@@ -156,6 +156,9 @@ FFMPEG_CODECS		ffCodecs[] = {
 	// VP8
 	{ &MEDIASUBTYPE_VP80, AV_CODEC_ID_VP8, NULL, FFM_VP8, -1 },
 
+	// VP9
+	{ &MEDIASUBTYPE_VP90, AV_CODEC_ID_VP9, NULL, FFM_VP8, -1 },
+
 	// Xvid
 	{ &MEDIASUBTYPE_XVID, AV_CODEC_ID_MPEG4, NULL, FFM_XVID, -1 },
 	{ &MEDIASUBTYPE_xvid, AV_CODEC_ID_MPEG4, NULL, FFM_XVID, -1 },
@@ -430,6 +433,9 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 
 	// VP8
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_VP80 },
+
+	// VP9
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_VP90 },
 
 	// Xvid
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_XVID },
@@ -1157,6 +1163,7 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, bool bForced)
 					bCodecActivated = (m_nActiveCodecs & MPCVD_VP356) != 0;
 					break;
 				case AV_CODEC_ID_VP8  :
+				case AV_CODEC_ID_VP9  :
 					bCodecActivated = (m_nActiveCodecs & MPCVD_VP8) != 0;
 					break;
 				case AV_CODEC_ID_MJPEG  :
@@ -1567,8 +1574,9 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 			|| m_nCodecId == AV_CODEC_ID_RV20
 			|| m_nCodecId == AV_CODEC_ID_RV30
 			|| m_nCodecId == AV_CODEC_ID_RV40
-			|| m_nCodecId == AV_CODEC_ID_VP8
 			|| m_nCodecId == AV_CODEC_ID_VP3
+			|| m_nCodecId == AV_CODEC_ID_VP8
+			|| m_nCodecId == AV_CODEC_ID_VP9
 			|| m_nCodecId == AV_CODEC_ID_THEORA
 			|| m_nCodecId == AV_CODEC_ID_MPEG2VIDEO
 			|| m_nCodecId == AV_CODEC_ID_MPEG1VIDEO

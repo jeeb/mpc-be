@@ -926,6 +926,7 @@ int FFGetThreadType (enum AVCodecID nCodecId)
 			break;
 		case AV_CODEC_ID_VP3			:
 		case AV_CODEC_ID_VP8			:
+		case AV_CODEC_ID_VP9			:
 		case AV_CODEC_ID_THEORA			:
 		case AV_CODEC_ID_RV30			:
 		case AV_CODEC_ID_RV40			:
