@@ -58,6 +58,7 @@
     <None Include="libavcodec\x86\vp3dsp.asm" />
     <None Include="libavcodec\x86\vp6dsp.asm" />
     <None Include="libavcodec\x86\vp8dsp.asm" />
+    <None Include="libavcodec\x86\vp9dsp.asm" />
     <None Include="libavresample\x86\audio_convert.asm" />
     <None Include="libavresample\x86\audio_mix.asm" />
     <None Include="libavresample\x86\dither.asm" />
@@ -166,6 +167,9 @@
     <ClInclude Include="libavcodec\h264pred.h" />
     <ClInclude Include="libavcodec\h264qpel.h" />
     <ClInclude Include="libavcodec\h264_mvpred.h" />
+    <ClInclude Include="libavcodec\hevc.h" />
+    <ClInclude Include="libavcodec\hevcdsp.h" />
+    <ClInclude Include="libavcodec\hevcpred.h" />
     <ClInclude Include="libavcodec\hpeldsp.h" />
     <ClInclude Include="libavcodec\huffman.h" />
     <ClInclude Include="libavcodec\imcdata.h" />
@@ -296,6 +300,9 @@
     <ClInclude Include="libavcodec\vp8.h" />
     <ClInclude Include="libavcodec\vp8data.h" />
     <ClInclude Include="libavcodec\vp8dsp.h" />
+    <ClInclude Include="libavcodec\vp9.h" />
+    <ClInclude Include="libavcodec\vp9data.h" />
+    <ClInclude Include="libavcodec\vp9dsp.h" />
     <ClInclude Include="libavcodec\wavpack.h" />
     <ClInclude Include="libavcodec\wma.h" />
     <ClInclude Include="libavcodec\wmadata.h" />
@@ -516,6 +523,18 @@
     <ClCompile Include="libavcodec\h264_ps.c" />
     <ClCompile Include="libavcodec\h264_refs.c" />
     <ClCompile Include="libavcodec\h264_sei.c" />
+    <ClCompile Include="libavcodec\hevc.c" />
+    <ClCompile Include="libavcodec\hevcdsp.c" />
+    <ClCompile Include="libavcodec\hevcdsp_template.c" />
+    <ClCompile Include="libavcodec\hevcpred.c" />
+    <ClCompile Include="libavcodec\hevcpred_template.c" />
+    <ClCompile Include="libavcodec\hevc_cabac.c" />
+    <ClCompile Include="libavcodec\hevc_filter.c" />
+    <ClCompile Include="libavcodec\hevc_mvs.c" />
+    <ClCompile Include="libavcodec\hevc_parser.c" />
+    <ClCompile Include="libavcodec\hevc_ps.c" />
+    <ClCompile Include="libavcodec\hevc_refs.c" />
+    <ClCompile Include="libavcodec\hevc_sei.c" />
     <ClCompile Include="libavcodec\hpeldsp.c" />
     <ClCompile Include="libavcodec\hpeldsp_template.c" />
     <ClCompile Include="libavcodec\hpel_template.c" />
@@ -669,6 +688,8 @@
     <ClCompile Include="libavcodec\vp6dsp.c" />
     <ClCompile Include="libavcodec\vp8.c" />
     <ClCompile Include="libavcodec\vp8dsp.c" />
+    <ClCompile Include="libavcodec\vp9.c" />
+    <ClCompile Include="libavcodec\vp9dsp.c" />
     <ClCompile Include="libavcodec\wavpack.c" />
     <ClCompile Include="libavcodec\wma.c" />
     <ClCompile Include="libavcodec\wmadec.c" />
@@ -723,6 +744,7 @@
     <ClCompile Include="libavcodec\x86\vp3dsp_init.c" />
     <ClCompile Include="libavcodec\x86\vp6dsp_init.c" />
     <ClCompile Include="libavcodec\x86\vp8dsp_init.c" />
+    <ClCompile Include="libavcodec\x86\vp9dsp_init.c" />
     <ClCompile Include="libavcodec\xiph.c" />
     <ClCompile Include="libavresample\audio_convert.c" />
     <ClCompile Include="libavresample\audio_data.c" />
