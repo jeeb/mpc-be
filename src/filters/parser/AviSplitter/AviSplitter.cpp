@@ -301,6 +301,24 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			// building a special media type
 			switch (pbmi->biCompression) {
+				case FCC('HM10'):
+					if (s->cs.GetCount()) {
+						__int64 cur_pos = m_pFile->GetPos();
+						for (size_t i = 0; i < s->cs.GetCount() - 1; i++) {
+							if (s->cs[i].orgsize) {
+								m_pFile->Seek(s->cs[i].filepos);
+								CBaseSplitterFileEx::hevchdr h;
+								CMediaType mt2;
+								if (m_pFile->Read(h, s->cs[i].orgsize, &mt2)) {
+									mts.InsertAt(0, mt2);
+								}
+							
+								break;
+							}
+						}
+
+						m_pFile->Seek(cur_pos);
+					}
 				case FCC('mpg2'):
 				case FCC('MPG2'):
 				case FCC('MMES'):
@@ -325,15 +343,12 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						CSize aspect(pbmi->biWidth, pbmi->biHeight);
 						ReduceDim(aspect);
 
-						DWORD biCompression = pbmi->biCompression;
 						pbmi->biCompression = FCC('AVC1');
 
 						CMediaType mt2;
 						if (SUCCEEDED(CreateMPEG2VIfromAVC(&mt2, pbmi, AvgTimePerFrame, aspect, extra, extralen))) {
 							mts.InsertAt(0, mt2);
 						}
-
-						pbmi->biCompression = biCompression;
 					}
 					break;
 			}

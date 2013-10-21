@@ -1997,17 +1997,21 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt)
 			BYTE* extradata		= NULL;
 			size_t extrasize	= 0;
 
-#if (1)
+#if (0)
 			extrasize			= len;
 			extradata			= (BYTE*)malloc(extrasize);
 			Seek(startpos);
 			ByteRead(extradata, extrasize);
 #else
 			{
-				// fill extradata with VPS/SPS/PPS
+				// fill extradata with VPS/SPS/PPS Nal units
 				Seek(startpos);
 				__int64 nal_pos	= startpos;
 				NAL_unit_type	= -1;
+
+				int vps_present = 0;
+				int sps_present = 0;
+				int pps_present = 0;
 				while (GetPos() < endpos) {
 					BYTE id = 0;
 					if (!NextMpegStartCode(id, len)) {
@@ -2016,22 +2020,34 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt)
 					int nat = (id >> 1) & 0x3F;
 					__int64 tmppos = GetPos();
 
-					Seek(nal_pos);
 					switch (NAL_unit_type) {
 						case NAL_VPS:
 						case NAL_SPS:
-						case NAL_PPS: {
-								int size	= tmppos - nal_pos - 4;
-								extradata	= (BYTE*)realloc(extradata, extrasize + size);
-								ByteRead(extradata + extrasize, size);
-								extrasize	+= size;
+						case NAL_PPS:
+							if (NAL_unit_type == NAL_VPS) {
+								vps_present++;
+							} else if (NAL_unit_type == NAL_SPS) {
+								sps_present++;
+							} else if (NAL_unit_type == NAL_PPS) {
+								pps_present++;
 							}
+							
+							Seek(nal_pos);
+							int size	= tmppos - nal_pos - 4;
+							extradata	= (BYTE*)realloc(extradata, extrasize + size);
+							ByteRead(extradata + extrasize, size);
+							extrasize	+= size;
+
 							break;
 					}
 
 					Seek(tmppos);
 					nal_pos			= GetPos() - 4;
 					NAL_unit_type	= nat;
+
+					if (vps_present && sps_present && pps_present) {
+						break;
+					}
 				}
 			}
 #endif
