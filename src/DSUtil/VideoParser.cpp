@@ -639,10 +639,7 @@ bool ParseSequenceParameterSet(BYTE* data, int size, vc_params_t& params)
 	NALBitstream bs(data, size);
 
 	// seq_parameter_set_rbsp
-	int vps_id = bs.GetWord(4);	// sps_video_parameter_set_id
-	if (vps_id >= MAX_VPS_COUNT) {
-		return false;
-	}
+	bs.GetWord(4);		// sps_video_parameter_set_id
 	int sps_max_sub_layers_minus1 = bs.GetWord(3);
 	if ((sps_max_sub_layers_minus1 + 1) > MAX_SUB_LAYERS) {
 		return false;
