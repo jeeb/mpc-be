@@ -629,13 +629,17 @@ void CreateSequenceHeaderHEVC(BYTE* data, int size, DWORD* dwSequenceHeader, DWO
 
 bool ParseSequenceParameterSet(BYTE* data, int size, vc_params_t& params)
 {
+	// Recommendation H.265 (04/13) ( http://www.itu.int/rec/T-REC-H.265-201304-I )
+	// 7.3.2.2  Sequence parameter set RBSP syntax
+	// 7.3.3  Profile, tier and level syntax 
+
 	if (size < 20) { // 8 + 12
 		return false;
 	}
 
 	NALBitstream bs(data, size);
 
-	// seq_parameter_set_rbsp
+	// seq_parameter_set_rbsp()
 	bs.GetWord(4);		// sps_video_parameter_set_id
 	int sps_max_sub_layers_minus1 = bs.GetWord(3); // "The value of sps_max_sub_layers_minus1 shall be in the range of 0 to 6, inclusive."
 	if (sps_max_sub_layers_minus1 > 6) {
@@ -721,6 +725,9 @@ enum nal_unit_type_e {
 
 bool ParseHEVCDecoderConfigurationRecord(BYTE* data, int size, vc_params_t& params, bool parseSPS)
 {
+	// ISO/IEC 14496-15 Third edition (2013-xx-xx)
+	// 8.3.3.1  HEVC decoder configuration record 
+
 	params.clear();
 	if (size < 23) {
 		return false;
