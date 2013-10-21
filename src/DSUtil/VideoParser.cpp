@@ -626,9 +626,6 @@ void CreateSequenceHeaderHEVC(BYTE* data, int size, DWORD* dwSequenceHeader, DWO
 
 
 ////
-#define MAX_SUB_LAYERS	7
-#define MAX_VPS_COUNT	16
-#define MAX_SPS_COUNT	32
 
 bool ParseSequenceParameterSet(BYTE* data, int size, vc_params_t& params)
 {
@@ -640,8 +637,8 @@ bool ParseSequenceParameterSet(BYTE* data, int size, vc_params_t& params)
 
 	// seq_parameter_set_rbsp
 	bs.GetWord(4);		// sps_video_parameter_set_id
-	int sps_max_sub_layers_minus1 = bs.GetWord(3);
-	if ((sps_max_sub_layers_minus1 + 1) > MAX_SUB_LAYERS) {
+	int sps_max_sub_layers_minus1 = bs.GetWord(3); // "The value of sps_max_sub_layers_minus1 shall be in the range of 0 to 6, inclusive."
+	if (sps_max_sub_layers_minus1 > 6) {
 		return false;
 	}
 	bs.GetWord(1);		// sps_temporal_id_nesting_flag
@@ -687,11 +684,14 @@ bool ParseSequenceParameterSet(BYTE* data, int size, vc_params_t& params)
 		delete[] sub_layer_profile_present_flag;
 		delete[] sub_layer_level_present_flag;
 	}
-	uint32 sps_seq_parameter_set_id	= bs.GetUE();
-	if (sps_seq_parameter_set_id > MAX_SPS_COUNT) {
+	uint32 sps_seq_parameter_set_id	= bs.GetUE(); // "The  value  of sps_seq_parameter_set_id shall be in the range of 0 to 15, inclusive."
+	if (sps_seq_parameter_set_id > 15) {
 		return false;
 	}
-	uint32 chroma_format_idc = bs.GetUE();
+	uint32 chroma_format_idc = bs.GetUE(); // "The value of chroma_format_idc shall be in the range of 0 to 3, inclusive."
+	if (sps_seq_parameter_set_id > 3) {
+		return false;
+	}
 	if (chroma_format_idc == 3) {
 		bs.GetWord(1);				// separate_colour_plane_flag
 	}
