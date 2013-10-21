@@ -512,6 +512,7 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, IAsyncReader*
 #define IsH264Video(stream_type)	(stream_type == VIDEO_STREAM_H264)
 #define IsVC1Video(stream_type)		(stream_type == VIDEO_STREAM_VC1)
 #define IsDiracVideo(stream_type)	(stream_type == VIDEO_STREAM_DIRAC)
+#define IsHEVCVideo(stream_type)	(stream_type == VIDEO_STREAM_HEVC || stream_type == PES_PRIVATE)
 
 DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 {
@@ -532,7 +533,6 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 	int type = unknown;
 
 	if (pesid >= 0xe0 && pesid < 0xf0) { // mpeg video
-
 		// MPEG2
 		if (type == unknown) {
 			CMpegSplitterFile::seqhdr h;
@@ -548,7 +548,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 			}
 		}
 
-		// H.264
+		// AVC/H.264
 		if (type == unknown) {
 			Seek(start);
 			// PPS and SPS can be present on differents packets
@@ -569,6 +569,22 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 					} else {
 						type = video;
 					}
+				}
+			}
+		}
+
+		// HEVC/H.265
+		if (type == unknown) {
+			Seek(start);
+			CMpegSplitterFile::hevchdr h;
+			if (!m_streams[video].Find(s) && Read(h, len, &s.mt)) {
+				PES_STREAM_TYPE stream_type = INVALID;
+				if (GetStreamType(s.pid, stream_type)) {
+					if (IsHEVCVideo(stream_type)) {
+						type = video;
+					}
+				} else {
+					type = video;
 				}
 			}
 		}
@@ -933,15 +949,9 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 
 		if (type == video) {
 			REFERENCE_TIME rtAvgTimePerFrame = 1;
-			if (s.mt.formattype == FORMAT_MPEG2_VIDEO) {
-				rtAvgTimePerFrame = ((MPEG2VIDEOINFO*)s.mt.pbFormat)->hdr.AvgTimePerFrame;
-			} else if (s.mt.formattype == FORMAT_VIDEOINFO2) {
-				rtAvgTimePerFrame = ((VIDEOINFOHEADER2*)s.mt.pbFormat)->AvgTimePerFrame;
-			} else if (s.mt.formattype == FORMAT_VideoInfo) {
-				rtAvgTimePerFrame = ((VIDEOINFOHEADER*)s.mt.pbFormat)->AvgTimePerFrame;
-			}
+			ExtractAvgTimePerFrame(&s.mt, rtAvgTimePerFrame);
 
-			if (!rtAvgTimePerFrame) {
+			if (rtAvgTimePerFrame == 1) {
 				__int64 _pos = GetPos();
 				REFERENCE_TIME rt_start = NextPTS(s.pid);
 				if (rt_start != INVALID_TIME) {
@@ -949,25 +959,28 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 					REFERENCE_TIME rt_end = rt_start;
 					int count = 0;
 					while (count < 30) {
-						rt_end = NextPTS(s.pid);
-						if (rt_end == INVALID_TIME) {
+						REFERENCE_TIME rt = NextPTS(s.pid);
+						if (rt == INVALID_TIME) {
 							break;
 						}
-						count++;
+						if (rt > rt_start) {
+							rt_end = rt;
+							count++;
+						}
 						Seek(GetPos() + 188);
 					}
 
 					if (count && (rt_start < rt_end)) {
-						rtAvgTimePerFrame = (rt_end - rt_start) / count;
+						rtAvgTimePerFrame = (rt_end - rt_start) / (count - 1);
 					}
 
 					if (rtAvgTimePerFrame) {
 						if (s.mt.formattype == FORMAT_MPEG2_VIDEO) {
-							((MPEG2VIDEOINFO*)s.mt.pbFormat)->hdr.AvgTimePerFrame = rtAvgTimePerFrame;
+							((MPEG2VIDEOINFO*)s.mt.pbFormat)->hdr.AvgTimePerFrame	= rtAvgTimePerFrame;
 						} else if (s.mt.formattype == FORMAT_VIDEOINFO2) {
-							((VIDEOINFOHEADER2*)s.mt.pbFormat)->AvgTimePerFrame = rtAvgTimePerFrame;
+							((VIDEOINFOHEADER2*)s.mt.pbFormat)->AvgTimePerFrame		= rtAvgTimePerFrame;
 						} else if (s.mt.formattype == FORMAT_VideoInfo) {
-							((VIDEOINFOHEADER*)s.mt.pbFormat)->AvgTimePerFrame = rtAvgTimePerFrame;
+							((VIDEOINFOHEADER*)s.mt.pbFormat)->AvgTimePerFrame		= rtAvgTimePerFrame;
 						}
 					}
 				}

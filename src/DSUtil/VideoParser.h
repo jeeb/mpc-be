@@ -86,4 +86,5 @@ struct vc_params_t {
 	}
 };
 
+bool ParseSequenceParameterSet(BYTE* data, int size, vc_params_t& params);
 bool ParseHEVCDecoderConfigurationRecord(BYTE* data, int size, vc_params_t& params, bool parseSPS);

@@ -626,6 +626,9 @@ void CreateSequenceHeaderHEVC(BYTE* data, int size, DWORD* dwSequenceHeader, DWO
 
 
 ////
+#define MAX_SUB_LAYERS	7
+#define MAX_VPS_COUNT	16
+#define MAX_SPS_COUNT	32
 
 bool ParseSequenceParameterSet(BYTE* data, int size, vc_params_t& params)
 {
@@ -636,8 +639,14 @@ bool ParseSequenceParameterSet(BYTE* data, int size, vc_params_t& params)
 	NALBitstream bs(data, size);
 
 	// seq_parameter_set_rbsp
-	bs.GetWord(4);		// sps_video_parameter_set_id
+	int vps_id = bs.GetWord(4);	// sps_video_parameter_set_id
+	if (vps_id >= MAX_VPS_COUNT) {
+		return false;
+	}
 	int sps_max_sub_layers_minus1 = bs.GetWord(3);
+	if ((sps_max_sub_layers_minus1 + 1) > MAX_SUB_LAYERS) {
+		return false;
+	}
 	bs.GetWord(1);		// sps_temporal_id_nesting_flag
 	// profile_tier_level( sps_max_sub_layers_minus1 )
 	{
@@ -651,11 +660,11 @@ bool ParseSequenceParameterSet(BYTE* data, int size, vc_params_t& params)
 		bs.GetWord(1);	// general_frame_only_constraint_flag
 		bs.GetWord(44);	// general_reserved_zero_44bits
 		bs.GetWord(8);	// general_level_idc
-		uint8* sub_layer_profile_present_flag = new uint8[sps_max_sub_layers_minus1];
-		uint8* sub_layer_level_present_flag   = new uint8[sps_max_sub_layers_minus1];
+		uint8* sub_layer_profile_present_flag	= new uint8[sps_max_sub_layers_minus1];
+		uint8* sub_layer_level_present_flag		= new uint8[sps_max_sub_layers_minus1];
 		for (int i = 0; i < sps_max_sub_layers_minus1; i++) {
-			sub_layer_profile_present_flag[i] = bs.GetWord(1);
-			sub_layer_level_present_flag[i]   = bs.GetWord(1);
+			sub_layer_profile_present_flag[i]	= bs.GetWord(1);
+			sub_layer_level_present_flag[i]		= bs.GetWord(1);
 		}
 		if (sps_max_sub_layers_minus1 > 0) {
 			for (int i = sps_max_sub_layers_minus1; i < 8; i++) {
@@ -681,21 +690,27 @@ bool ParseSequenceParameterSet(BYTE* data, int size, vc_params_t& params)
 		delete[] sub_layer_profile_present_flag;
 		delete[] sub_layer_level_present_flag;
 	}
-	uint32 sps_seq_parameter_set_id = bs.GetUE();
-	uint32 chroma_format_idc        = bs.GetUE();
+	uint32 sps_seq_parameter_set_id	= bs.GetUE();
+	if (sps_seq_parameter_set_id > MAX_SPS_COUNT) {
+		return false;
+	}
+	uint32 chroma_format_idc = bs.GetUE();
 	if (chroma_format_idc == 3) {
-		bs.GetWord(1); // separate_colour_plane_flag
+		bs.GetWord(1);				// separate_colour_plane_flag
 	}
-	params.width  = bs.GetUE();	// pic_width_in_luma_samples
-	params.height = bs.GetUE();	// pic_height_in_luma_samples
-	if (bs.GetWord(1)) {	// conformance_window_flag
-		bs.GetUE();			// conf_win_left_offset
-		bs.GetUE();			// conf_win_right_offset
-		bs.GetUE();			// conf_win_top_offset
-		bs.GetUE();			// conf_win_bottom_offset
+	params.width	= bs.GetUE();	// pic_width_in_luma_samples
+	params.height	= bs.GetUE();	// pic_height_in_luma_samples
+	if (bs.GetWord(1)) {			// conformance_window_flag
+		bs.GetUE();					// conf_win_left_offset
+		bs.GetUE();					// conf_win_right_offset
+		bs.GetUE();					// conf_win_top_offset
+		bs.GetUE();					// conf_win_bottom_offset
 	}
-	uint32 bit_depth_luma_minus8   = bs.GetUE();
-	uint32 bit_depth_chroma_minus8 = bs.GetUE();
+	uint32 bit_depth_luma_minus8	= bs.GetUE();
+	uint32 bit_depth_chroma_minus8	= bs.GetUE();
+	if (bit_depth_luma_minus8 != bit_depth_chroma_minus8) {
+		return false;
+	}
 	//...
 
 	return true;

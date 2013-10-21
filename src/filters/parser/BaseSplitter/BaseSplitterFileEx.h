@@ -420,6 +420,9 @@ public:
 	struct dvbsub {
 	};
 
+	struct hevchdr {
+	};
+
 #pragma pack(pop)
 
 	bool Read(pshdr& h);
@@ -449,6 +452,7 @@ public:
 	bool Read(dirachdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(dvbsub& h, int len, CMediaType* pmt = NULL);
 	bool Read(avchdr& h, spsppsindex index);
+	bool Read(hevchdr& h, int len, CMediaType* pmt = NULL);
 
 	int  HrdParameters(CGolombBuffer& gb);
 	void RemoveMpegEscapeCode(BYTE* dst, BYTE* src, int length);

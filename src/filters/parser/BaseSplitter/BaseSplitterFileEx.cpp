@@ -1952,6 +1952,102 @@ bool CBaseSplitterFileEx::Read(dvbsub& h, int len, CMediaType* pmt)
 	return false;
 }
 
+#define NAL_VPS	32
+#define NAL_SPS	33
+#define NAL_PPS	34
+bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt)
+{
+	__int64 startpos	= GetPos();
+	__int64 endpos		= startpos + len;
+
+	int NAL_unit_type	= -1;
+	while (GetPos() < endpos && NAL_unit_type != NAL_SPS) {
+		BYTE id = 0;
+		if (!NextMpegStartCode(id, len)) {
+			return false;
+		}
+		NAL_unit_type = (id >> 1) & 0x3F;
+	}
+
+	if (NAL_unit_type != NAL_SPS) {
+		return false;
+	}
+
+	__int64 size = endpos - GetPos();
+	BYTE* buf = DNew BYTE[size];
+	memset(buf, 0, size);
+	ByteRead(buf, size);
+
+	vc_params_t params = {0};
+	if (ParseSequenceParameterSet(buf + 1, size - 1, params)) {
+
+		BITMAPINFOHEADER pbmi;
+		memset(&pbmi, 0, sizeof(BITMAPINFOHEADER));
+		pbmi.biSize			= sizeof(pbmi);
+		pbmi.biWidth		= params.width;
+		pbmi.biHeight		= params.height;
+		pbmi.biCompression	= FCC('HEVC');
+		pbmi.biPlanes		= 1;
+		pbmi.biBitCount		= 24;
+
+		CSize aspect(pbmi.biWidth, pbmi.biHeight);
+		ReduceDim(aspect);
+
+		if (pmt) {
+			BYTE* extradata		= NULL;
+			size_t extrasize	= 0;
+
+#if (1)
+			extrasize			= len;
+			extradata			= (BYTE*)malloc(extrasize);
+			Seek(startpos);
+			ByteRead(extradata, extrasize);
+#else
+			{
+				// fill extradata with VPS/SPS/PPS
+				Seek(startpos);
+				__int64 nal_pos	= startpos;
+				NAL_unit_type	= -1;
+				while (GetPos() < endpos) {
+					BYTE id = 0;
+					if (!NextMpegStartCode(id, len)) {
+						break;
+					}
+					int nat = (id >> 1) & 0x3F;
+					__int64 tmppos = GetPos();
+
+					Seek(nal_pos);
+					switch (NAL_unit_type) {
+						case NAL_VPS:
+						case NAL_SPS:
+						case NAL_PPS: {
+								int size	= tmppos - nal_pos - 4;
+								extradata	= (BYTE*)realloc(extradata, extrasize + size);
+								ByteRead(extradata + extrasize, size);
+								extrasize	+= size;
+							}
+							break;
+					}
+
+					Seek(tmppos);
+					nal_pos			= GetPos() - 4;
+					NAL_unit_type	= nat;
+				}
+			}
+#endif
+
+			CreateMPEG2VISimple(pmt, &pbmi, 0, aspect, extradata, extrasize);
+			free(extradata);
+		}
+
+		delete[] buf;
+		return true;
+	}
+
+	delete[] buf;
+	return false;
+}
+
 /*
 
 To see working buffer in debugger, look :

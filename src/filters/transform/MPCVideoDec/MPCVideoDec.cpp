@@ -1515,7 +1515,9 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	m_pAVCtx	= avcodec_alloc_context3(m_pAVCodec);
 	CheckPointer(m_pAVCtx, E_POINTER);
 
-	if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO || m_nCodecId == AV_CODEC_ID_MPEG1VIDEO) {
+	if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO
+			|| m_nCodecId == AV_CODEC_ID_MPEG1VIDEO
+			|| m_nCodecId == AV_CODEC_ID_HEVC) {
 		m_pParser = av_parser_init(m_nCodecId);
 	}
 
@@ -1561,8 +1563,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 				break;
 			case FCC('mp4v'):
 			case FCC('MP4V'):
-			case FCC('HEVC'):
-			case FCC('HVC1'):
 				m_bReorderBFrame = false;
 				break;
 		}
@@ -1581,7 +1581,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 			|| m_nCodecId == AV_CODEC_ID_MPEG2VIDEO
 			|| m_nCodecId == AV_CODEC_ID_MPEG1VIDEO
 			|| m_nCodecId == AV_CODEC_ID_DIRAC
-			|| m_nCodecId == AV_CODEC_ID_UTVIDEO) {
+			|| m_nCodecId == AV_CODEC_ID_UTVIDEO
+			|| m_nCodecId == AV_CODEC_ID_HEVC) {
 		m_bReorderBFrame = false;
 	}
 
