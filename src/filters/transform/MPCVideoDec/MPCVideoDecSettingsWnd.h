@@ -107,7 +107,7 @@ public:
 	bool OnApply();
 
 	static LPCTSTR GetWindowTitle() { return MAKEINTRESOURCE(IDS_FILTER_SETTINGS_CAPTION); }
-	static CSize GetWindowSize() { return CSize(453, 356); }
+	static CSize GetWindowSize() { return CSize(555, 273); }
 
 	DECLARE_MESSAGE_MAP()
 
@@ -139,7 +139,7 @@ public:
 	bool OnApply();
 
 	static LPCTSTR GetWindowTitle() { return _T("Codecs");    }
-	static CSize GetWindowSize()    { return CSize(555, 273); }
+	static CSize GetWindowSize()    { return CSize(340, 290); }
 
 	DECLARE_MESSAGE_MAP()
 };
