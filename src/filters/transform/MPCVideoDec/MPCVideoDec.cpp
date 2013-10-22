@@ -357,7 +357,7 @@ FFMPEG_CODECS		ffCodecs[] = {
 	{ &MEDIASUBTYPE_HEVC, AV_CODEC_ID_HEVC, NULL, FFM_HEVC, -1 },
 	{ &MEDIASUBTYPE_HVC1, AV_CODEC_ID_HEVC, NULL, FFM_HEVC, -1 },
 //	{ &MEDIASUBTYPE_HM91, AV_CODEC_ID_HEVC, NULL, FFM_HEVC, -1 },
-//	{ &MEDIASUBTYPE_HM10, AV_CODEC_ID_HEVC, NULL, FFM_HEVC, -1 },
+	{ &MEDIASUBTYPE_HM10, AV_CODEC_ID_HEVC, NULL, FFM_HEVC, -1 },
 //	{ &MEDIASUBTYPE_HM12, AV_CODEC_ID_HEVC, NULL, FFM_HEVC, -1 },
 
 	// Other MPEG-4
@@ -651,7 +651,7 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HEVC },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HVC1 },
 //	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HM91 },
-//	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HM10 },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HM10 },
 //	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HM12 },
 
 	// Other MPEG-4
@@ -1550,7 +1550,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		MPEG2VIDEOINFO* mpg2v	= (MPEG2VIDEOINFO*)pmt->pbFormat;
 		pBMI					= &mpg2v->hdr.bmiHeader;
 
-		if ((pBMI->biCompression == FCC('HEVC') || pBMI->biCompression == FCC('HVC1')) && mpg2v->dwProfile) {
+		if ((pBMI->biCompression == FCC('HEVC') || pBMI->biCompression == FCC('HVC1')) && mpg2v->dwProfile) { // TODO - make it better :)
 			return VFW_E_TYPE_NOT_ACCEPTED;
 		}
 
@@ -1607,6 +1607,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	}
 
 	AllocExtradata(m_pAVCtx, pmt);
+
 	ExtractAvgTimePerFrame(&m_pInput->CurrentMediaType(), m_rtAvrTimePerFrame);
 	int wout, hout;
 	ExtractDim(&m_pInput->CurrentMediaType(), wout, hout, m_nARX, m_nARY);
@@ -1826,6 +1827,37 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 		if (m_nCodecId == AV_CODEC_ID_H264 && !bH264avc && extra[0] == 1) {
 			av_freep(&extra);
 			extralen = 0;
+		} else if (m_nCodecId == AV_CODEC_ID_HEVC) {
+			vc_params_t params;
+			bool bTrustExtra = ParseHEVCDecoderConfigurationRecord(extra, extralen, params, true);
+
+			if (!bTrustExtra) {
+				UINT32 state		= -1;
+				int has_vps			= 0;
+				int NAL_unit_type	= 0;
+
+				for (unsigned int i = 0; i < extralen; i++) {
+					state = (state << 8) | extra[i];
+					if (((state >> 8) & 0xFFFFFF) == 0x000001) {
+						int nat = (state >> 1) & 0x3F;
+
+						if (NAL_unit_type >= NAL_UNIT_VPS && NAL_unit_type <= NAL_UNIT_PPS) {
+							has_vps++;
+						}
+
+						NAL_unit_type = nat;
+					}
+				}
+
+				if (has_vps) {
+					bTrustExtra = true;
+				}
+			}
+
+			if (!bTrustExtra) {
+				av_freep(&extra);
+				extralen = 0;
+			}
 		}
 		m_pAVCtx->extradata = extra;
 		m_pAVCtx->extradata_size = (int)extralen;

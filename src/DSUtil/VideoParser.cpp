@@ -717,12 +717,6 @@ bool ParseSequenceParameterSet(BYTE* data, int size, vc_params_t& params)
 	return true;
 }
 
-enum nal_unit_type_e {
-	NAL_UNIT_VPS = 32,
-	NAL_UNIT_SPS = 33,
-	NAL_UNIT_PPS = 34,
-};
-
 bool ParseHEVCDecoderConfigurationRecord(BYTE* data, int size, vc_params_t& params, bool parseSPS)
 {
 	// ISO/IEC 14496-15 Third edition (2013-xx-xx)

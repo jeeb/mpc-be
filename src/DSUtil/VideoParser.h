@@ -69,6 +69,12 @@ struct hevc_hdr
 bool ParseDiracHeader(CGolombBuffer gb, unsigned* width, unsigned* height, REFERENCE_TIME* AvgTimePerFrame);
 bool ParseAVCHeader(CGolombBuffer gb, avc_hdr& h, bool fullscan = false);
 
+enum nal_unit_type_e {
+	NAL_UNIT_VPS = 32,
+	NAL_UNIT_SPS = 33,
+	NAL_UNIT_PPS = 34,
+};
+
 bool ParseHEVCHeader(BYTE* headerData, int headerSize, hevc_hdr& h);
 void CreateSequenceHeaderAVC(BYTE* data, int size, DWORD* dwSequenceHeader, DWORD& cbSequenceHeader);
 void CreateSequenceHeaderHEVC(BYTE* data, int size, DWORD* dwSequenceHeader, DWORD& cbSequenceHeader);

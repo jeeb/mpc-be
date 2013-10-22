@@ -1952,16 +1952,13 @@ bool CBaseSplitterFileEx::Read(dvbsub& h, int len, CMediaType* pmt)
 	return false;
 }
 
-#define NAL_VPS	32
-#define NAL_SPS	33
-#define NAL_PPS	34
 bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt)
 {
 	__int64 startpos	= GetPos();
 	__int64 endpos		= startpos + len;
 
 	int NAL_unit_type	= -1;
-	while (GetPos() < endpos && NAL_unit_type != NAL_SPS) {
+	while (GetPos() < endpos && NAL_unit_type != NAL_UNIT_SPS) {
 		BYTE id = 0;
 		if (!NextMpegStartCode(id, len)) {
 			return false;
@@ -1969,7 +1966,7 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt)
 		NAL_unit_type = (id >> 1) & 0x3F;
 	}
 
-	if (NAL_unit_type != NAL_SPS) {
+	if (NAL_unit_type != NAL_UNIT_SPS) {
 		return false;
 	}
 
@@ -2021,14 +2018,14 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt)
 					__int64 tmppos = GetPos();
 
 					switch (NAL_unit_type) {
-						case NAL_VPS:
-						case NAL_SPS:
-						case NAL_PPS:
-							if (NAL_unit_type == NAL_VPS) {
+						case NAL_UNIT_VPS:
+						case NAL_UNIT_SPS:
+						case NAL_UNIT_PPS:
+							if (NAL_unit_type == NAL_UNIT_VPS) {
 								vps_present++;
-							} else if (NAL_unit_type == NAL_SPS) {
+							} else if (NAL_unit_type == NAL_UNIT_SPS) {
 								sps_present++;
-							} else if (NAL_unit_type == NAL_PPS) {
+							} else if (NAL_unit_type == NAL_UNIT_PPS) {
 								pps_present++;
 							}
 							
