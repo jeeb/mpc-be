@@ -608,7 +608,7 @@ namespace MatroskaReader
 		ChapterAtom* FindChapterAtom(UINT64 id, int nEditionEntry = 0);
 	};
 
-	class CMatroskaFile : public CBaseSplitterFile
+	class CMatroskaFile : public CBaseSplitterFileEx
 	{
 	public:
 		CMatroskaFile(IAsyncReader* pAsyncReader, HRESULT& hr);

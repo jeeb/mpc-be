@@ -255,6 +255,64 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							mt.subtype = MEDIASUBTYPE_WVC1_CYBERLINK;
 							mts.InsertAt(0, mt);
 						}
+
+						if (mt.subtype == MEDIASUBTYPE_HM10) {
+							__int64 pos = m_pFile->GetPos();
+
+							CMatroskaNode Root(m_pFile);
+							m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
+							m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
+							
+							Cluster c;
+							c.ParseTimeCode(m_pCluster);
+
+							if (!m_pBlock) {
+								m_pBlock = m_pCluster->GetFirstBlock();
+							}
+
+							BOOL bIsParse = FALSE;
+							do {
+								CBlockGroupNode bgn;
+
+								__int64 startpos = m_pFile->GetPos();
+
+								if (m_pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
+									bgn.Parse(m_pBlock, true);
+								} else if (m_pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
+									CAutoPtr<BlockGroup> bg(DNew BlockGroup());
+									bg->Block.Parse(m_pBlock, true);
+									if (!(bg->Block.Lacing & 0x80)) {
+										bg->ReferenceBlock.Set(0);    // not a kf
+									}
+									
+									bgn.AddTail(bg);
+								}
+								__int64 endpos = m_pFile->GetPos();
+
+								while (bgn.GetCount() && SUCCEEDED(hr)) {
+									CAutoPtr<MatroskaPacket> p(DNew MatroskaPacket());
+									p->bg = bgn.RemoveHead();
+									if ((DWORD)p->bg->Block.TrackNumber != pTE->TrackNumber) {
+										continue;
+									}
+
+									m_pFile->Seek(startpos);
+									CBaseSplitterFileEx::hevchdr h;
+									CMediaType mt2;
+									if (m_pFile->CBaseSplitterFileEx::Read(h, endpos - startpos, &mt2)) {
+										mts.InsertAt(0, mt2);
+									}
+
+									bIsParse = TRUE;
+									break;
+								}
+							} while (m_pBlock->NextBlock() && SUCCEEDED(hr) && !CheckRequest(NULL) && !bIsParse);
+
+							m_pBlock.Free();
+							m_pCluster.Free();
+
+							m_pFile->Seek(pos);
+						}
 					}
 					bHasVideo = true;
 				} else if (CodecID == "V_UNCOMPRESSED") {
@@ -618,8 +676,6 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 						}
 					}
-
-					m_pCluster.Free();
 				}
 
 				for (size_t i = 0; i < mts.GetCount(); i++) {

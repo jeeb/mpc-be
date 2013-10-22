@@ -3047,7 +3047,7 @@ HRESULT CreateMPEG2VISimple(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_TI
 // log function
 void HexDump(CString fileName, BYTE* buf, int size)
 {
-	if (size<=0) {
+	if (size <= 0) {
 		return;
 	}
 
@@ -3079,6 +3079,7 @@ void HexDump(CString fileName, BYTE* buf, int size)
 		}
 		dump_str.Append(_T("\n"));
 	}
+
 	dump_str.Append(_T("\n"));
 
 	if (!fileName.IsEmpty()) {
