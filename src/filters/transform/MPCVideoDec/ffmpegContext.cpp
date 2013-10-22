@@ -915,6 +915,7 @@ int FFGetThreadType (enum AVCodecID nCodecId)
 	switch (nCodecId)
 	{
 		case AV_CODEC_ID_H264			:
+		case AV_CODEC_ID_HEVC			:
 			return FF_THREAD_FRAME|FF_THREAD_SLICE;
 			break;
 		case AV_CODEC_ID_MPEG1VIDEO		:
@@ -934,7 +935,6 @@ int FFGetThreadType (enum AVCodecID nCodecId)
 		case AV_CODEC_ID_LAGARITH		:
 		case AV_CODEC_ID_JPEG2000		:
 		case AV_CODEC_ID_PNG			:
-		case AV_CODEC_ID_HEVC			:
 			return FF_THREAD_FRAME;
 			break;
 		default :

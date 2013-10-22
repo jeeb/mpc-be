@@ -1879,6 +1879,7 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 			av_freep(&extra);
 			extralen = 0;
 		} else if (m_nCodecId == AV_CODEC_ID_HEVC) {
+#if (0)
 			vc_params_t params;
 			bool bTrustExtra = ParseHEVCDecoderConfigurationRecord(extra, extralen, params, true);
 
@@ -1909,6 +1910,7 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 				av_freep(&extra);
 				extralen = 0;
 			}
+#endif
 		}
 		m_pAVCtx->extradata = extra;
 		m_pAVCtx->extradata_size = (int)extralen;
