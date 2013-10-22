@@ -84,7 +84,7 @@ protected:
 	int										m_nDiscardMode;
 	MPC_DEINTERLACING_FLAGS					m_nDeinterlacing;
 	bool									m_bDXVACompatible;
-	ULONGLONG								m_nActiveCodecs;
+	unsigned __int64						m_nActiveCodecs;
 	int										m_nARMode;
 	int										m_nDXVACheckCompatibility;
 	int										m_nDXVA_SD;
