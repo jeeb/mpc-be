@@ -516,6 +516,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_LIBOPENJPEG_DECODER 1
 #define CONFIG_LIBOPUS_DECODER 1
 #define CONFIG_LIBSPEEX_DECODER 1
+#define CONFIG_LIBVPX_VP9_DECODER 1
 #define CONFIG_LOCO_DECODER 0
 #define CONFIG_MPC7_DECODER 1
 #define CONFIG_MPC8_DECODER 1
@@ -571,7 +572,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_VP6A_DECODER 1
 #define CONFIG_VP6F_DECODER 1
 #define CONFIG_VP8_DECODER 1
-#define CONFIG_VP9_DECODER 1
+#define CONFIG_VP9_DECODER 0
 #define CONFIG_WMV1_DECODER 1
 #define CONFIG_WMV2_DECODER 1
 #define CONFIG_WMV3_DECODER 1
