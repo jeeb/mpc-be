@@ -2746,6 +2746,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
 
    png_debug(1, "in png_handle_unknown");
 
+#ifdef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
    /* NOTE: this code is based on the code in libpng-1.4.12 except for fixing
     * the bug which meant that setting a non-default behavior for a specific
     * chunk would be ignored (the default was always used unless a user
@@ -2758,14 +2759,15 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
     * function.
     */
 #  ifndef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-   keep = png_chunk_unknown_handling(png_ptr, png_ptr->chunk_name);
+#     ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
+         keep = png_chunk_unknown_handling(png_ptr, png_ptr->chunk_name);
+#     endif
 #  endif
 
    /* One of the following methods will read the chunk or skip it (at least one
     * of these is always defined because this is the only way to switch on
     * PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
     */
-#ifdef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
 #  ifdef PNG_READ_USER_CHUNKS_SUPPORTED
       /* The user callback takes precedence over the chunk keep value, but the
        * keep value is still required to validate a save of a critical chunk.
@@ -2790,19 +2792,26 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
             if (ret < 0)
                png_chunk_error(png_ptr, "error in user chunk");
 
-            else if (ret > 0) /* chunk was handled */
+            else if (ret == 0)
+            {
+               /* Use the default handling, note that if there is per-chunk
+                * handling specified it has already been set into 'keep'.
+                *
+                * NOTE: this is an API change in 1.7.0, prior to 1.7.0 libpng
+                * would force keep to PNG_HANDLE_CHUNK_IF_SAFE at this point,
+                * and 1.6.0 would issue a warning if this caused a default of
+                * discarding the chunk to be changed.
+                */
+               if (keep == PNG_HANDLE_CHUNK_AS_DEFAULT)
+                  keep = png_ptr->unknown_default;
+            }
+
+            else /* chunk was handled */
             {
                handled = 1;
                /* Critical chunks can be safely discarded at this point. */
                keep = PNG_HANDLE_CHUNK_NEVER;
             }
-
-            /* else: use the default handling.
-             * NOTE: this is an API change in 1.7.0, prior to 1.7.0 libpng would
-             * force keep to PNG_HANDLE_CHUNK_IF_SAFE at this point, and 1.6.0
-             * would issue a warning if this caused a default of discarding the
-             * chunk to be changed.
-             */
          }
 
          else
@@ -2851,7 +2860,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
 
          png_crc_finish(png_ptr, length);
       }
-#  endif /* PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED */
+#  endif
 
 #  ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
       /* Now store the chunk in the chunk list if appropriate, and if the limits
@@ -2890,9 +2899,8 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
          }
 #     endif
       }
-#  else /* no store support! */
+#  else /* no store support: the chunk must be handled by the user callback */
       PNG_UNUSED(info_ptr)
-#     error untested code (reading unknown chunks with no store support)
 #  endif
 
    /* Regardless of the error handling below the cached data (if any) can be
