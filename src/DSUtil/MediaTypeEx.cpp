@@ -816,6 +816,37 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 		}
 
 		sl.AddTail(_T(""));
+
+		if (fmtsize && fmtsize < (int)cbFormat) {
+			sl.AddTail(_T("extradata:"));
+			ptrdiff_t extrasize = cbFormat - fmtsize;
+			for (ptrdiff_t i = 0, j = (extrasize + 15) & ~15; i < j; i += 16) {
+				str.Format(_T("%04x:"), i);
+
+				for (ptrdiff_t k = i, l = min(i + 16, extrasize); k < l; k++) {
+					CString byte;
+					byte.Format(_T(" %02x"), pbFormat[k + fmtsize]);
+					str += byte;
+				}
+
+				for (ptrdiff_t k = min(i + 16, (int)extrasize), l = i + 16; k < l; k++) {
+					str += _T("   ");
+				}
+
+				str += ' ';
+
+				for (ptrdiff_t k = i, l = min(i + 16, extrasize); k < l; k++) {
+					unsigned char c = (unsigned char)pbFormat[k + fmtsize];
+					CStringA ch;
+					ch.Format("%c", c >= 0x20 ? c : '.');
+					str += ch;
+				}
+
+				sl.AddTail(str);
+			}
+
+			sl.AddTail(_T(""));
+		}
 	}
 }
 
