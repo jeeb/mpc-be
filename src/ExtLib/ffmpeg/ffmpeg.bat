@@ -76,6 +76,9 @@ IF "%BUILDTYPE%" == "clean" (
 
 make.exe -f ffmpeg.mak %BUILDTYPE% -j%JOBS% %BIT% %DEBUG% %VS%
 
+REM Visual Studio creates a "obj" sub-folder. Since there is no way to disable it - just delete it.
+rd "%~dp0obj" /S /Q
+
 ENDLOCAL
 EXIT /B
 
