@@ -19,9 +19,6 @@
     <Filter Include="Resource Files\shaders">
       <UniqueIdentifier>{662236d7-ad89-4026-bb57-bb27667da2e6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\Flybar">
-      <UniqueIdentifier>{b5f20ef9-c920-4d8c-9646-c5098b633974}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AppSettings.cpp">
