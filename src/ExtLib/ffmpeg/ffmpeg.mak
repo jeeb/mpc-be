@@ -1,4 +1,4 @@
-BIN_DIR  = ../../../bin
+BIN_DIR  = ../../../bin13
 ZLIB_DIR = ../zlib
 OPENJPEG_DIR = ../openjpeg
 OPUS_DIR = ../opus
@@ -17,12 +17,12 @@ else
 	MY_DIR_PREFIX = Release
 endif
 
-ifeq ($(VS2012),yes)
-	BIN_DIR  = ../../../bin12
+ifeq ($(VS2010),yes)
+	BIN_DIR  = ../../../bin
 endif
 
-ifeq ($(VS2013),yes)
-	BIN_DIR  = ../../../bin13
+ifeq ($(VS2012),yes)
+	BIN_DIR  = ../../../bin12
 endif
 
 OBJ_DIR		= $(BIN_DIR)/obj/$(MY_DIR_PREFIX)_$(MY_ARCH)/ffmpeg/

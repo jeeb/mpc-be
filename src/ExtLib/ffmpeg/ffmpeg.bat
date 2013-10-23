@@ -36,7 +36,7 @@ EXIT /B
 SET PATH=%MSYS%\bin;%MINGW32%\bin;%PATH%
 
 SET "BUILDTYPE=build"
-SET "VS=VS2010=yes"
+SET "VS=VS2013=yes"
 
 SET ARG=%*
 SET ARG=%ARG:/=%
@@ -47,8 +47,8 @@ FOR %%A IN (%ARG%) DO (
 	IF /I "%%A" == "rebuild" SET "BUILDTYPE=rebuild"
 	IF /I "%%A" == "64" SET "BIT=64BIT=yes"
 	IF /I "%%A" == "Debug" SET "DEBUG=DEBUG=yes"
+	IF /I "%%A" == "VS2010" SET "VS=VS2010=yes"
 	IF /I "%%A" == "VS2012" SET "VS=VS2012=yes"
-	IF /I "%%A" == "VS2013" SET "VS=VS2013=yes"
 )
 
 IF /I "%BUILDTYPE%" == "rebuild" (
@@ -82,7 +82,7 @@ EXIT /B
 :SHOWHELP
 TITLE "%~nx0 %1"
 ECHO. & ECHO.
-ECHO Usage:   %~nx0 [32^|64] [Clean^|Build^|Rebuild] [Debug] [VS2012^|VS2013]
+ECHO Usage:   %~nx0 [32^|64] [Clean^|Build^|Rebuild] [Debug] [VS2010^|VS2012]
 ECHO.
 ECHO Notes:   The arguments are not case sensitive.
 ECHO. & ECHO.
