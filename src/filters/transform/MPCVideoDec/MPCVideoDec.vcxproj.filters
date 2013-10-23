@@ -45,22 +45,10 @@
     <ClCompile Include="DXVAAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\ExtLib\mfc\winmdi.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\ExtLib\mfc\afxctrlcontainer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\ExtLib\mfc\afxglobals.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="H264RandomAccess.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ffmpegContext.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DSUtil\WinAPIUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

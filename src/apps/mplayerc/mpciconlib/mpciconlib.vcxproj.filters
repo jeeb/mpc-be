@@ -33,323 +33,323 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="icons\3g2.ico">
+    <Image Include="icons\3g2.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\3gp.ico">
+    </Image>
+    <Image Include="icons\3gp.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\3gp2.ico">
+    </Image>
+    <Image Include="icons\3gp2.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\3gpp.ico">
+    </Image>
+    <Image Include="icons\3gpp.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\aac.ico">
+    </Image>
+    <Image Include="icons\aac.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\ac3.ico">
+    </Image>
+    <Image Include="icons\ac3.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\aif.ico">
+    </Image>
+    <Image Include="icons\aif.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\aifc.ico">
+    </Image>
+    <Image Include="icons\aifc.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\aiff.ico">
+    </Image>
+    <Image Include="icons\aiff.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\alac.ico">
+    </Image>
+    <Image Include="icons\alac.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\amr.ico">
+    </Image>
+    <Image Include="icons\amr.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\amv.ico">
+    </Image>
+    <Image Include="icons\amv.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\aob.ico">
+    </Image>
+    <Image Include="icons\aob.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\ape.ico">
+    </Image>
+    <Image Include="icons\ape.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\apl.ico">
+    </Image>
+    <Image Include="icons\apl.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\asf.ico">
+    </Image>
+    <Image Include="icons\asf.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\au.ico">
+    </Image>
+    <Image Include="icons\au.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\avi.ico">
+    </Image>
+    <Image Include="icons\avi.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\bik.ico">
+    </Image>
+    <Image Include="icons\bik.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\cda.ico">
+    </Image>
+    <Image Include="icons\cda.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\d2v.ico">
+    </Image>
+    <Image Include="icons\d2v.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\divx.ico">
+    </Image>
+    <Image Include="icons\divx.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\dsa.ico">
+    </Image>
+    <Image Include="icons\dsa.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\dsm.ico">
+    </Image>
+    <Image Include="icons\dsm.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\dss.ico">
+    </Image>
+    <Image Include="icons\dss.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\dsv.ico">
+    </Image>
+    <Image Include="icons\dsv.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\dts.ico">
+    </Image>
+    <Image Include="icons\dts.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\evo.ico">
+    </Image>
+    <Image Include="icons\evo.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\f4v.ico">
+    </Image>
+    <Image Include="icons\f4v.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\flac.ico">
+    </Image>
+    <Image Include="icons\flac.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\flc.ico">
+    </Image>
+    <Image Include="icons\flc.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\fli.ico">
+    </Image>
+    <Image Include="icons\fli.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\flic.ico">
+    </Image>
+    <Image Include="icons\flic.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\flv.ico">
+    </Image>
+    <Image Include="icons\flv.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\hdmov.ico">
+    </Image>
+    <Image Include="icons\hdmov.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\ifo.ico">
+    </Image>
+    <Image Include="icons\ifo.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\ivf.ico">
+    </Image>
+    <Image Include="icons\ivf.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\m1a.ico">
+    </Image>
+    <Image Include="icons\m1a.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\m1v.ico">
+    </Image>
+    <Image Include="icons\m1v.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\m2a.ico">
+    </Image>
+    <Image Include="icons\m2a.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\m2p.ico">
+    </Image>
+    <Image Include="icons\m2p.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\m2t.ico">
+    </Image>
+    <Image Include="icons\m2t.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\m2ts.ico">
+    </Image>
+    <Image Include="icons\m2ts.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\m2v.ico">
+    </Image>
+    <Image Include="icons\m2v.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\m4a.ico">
+    </Image>
+    <Image Include="icons\m4a.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\m4b.ico">
+    </Image>
+    <Image Include="icons\m4b.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\m4v.ico">
+    </Image>
+    <Image Include="icons\m4v.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\mid.ico">
+    </Image>
+    <Image Include="icons\mid.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\midi.ico">
+    </Image>
+    <Image Include="icons\midi.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\mka.ico">
+    </Image>
+    <Image Include="icons\mka.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\mkv.ico">
+    </Image>
+    <Image Include="icons\mkv.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\mlp.ico">
+    </Image>
+    <Image Include="icons\mlp.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\mov.ico">
+    </Image>
+    <Image Include="icons\mov.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\mp2.ico">
+    </Image>
+    <Image Include="icons\mp2.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\mp2v.ico">
+    </Image>
+    <Image Include="icons\mp2v.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\mp3.ico">
+    </Image>
+    <Image Include="icons\mp3.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\mp4.ico">
+    </Image>
+    <Image Include="icons\mp4.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\mp4v.ico">
+    </Image>
+    <Image Include="icons\mp4v.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\mpa.ico">
+    </Image>
+    <Image Include="icons\mpa.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\mpc.ico">
+    </Image>
+    <Image Include="icons\mpc.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\mpe.ico">
+    </Image>
+    <Image Include="icons\mpe.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\mpeg.ico">
+    </Image>
+    <Image Include="icons\mpeg.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\mpg.ico">
+    </Image>
+    <Image Include="icons\mpg.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\mpv2.ico">
+    </Image>
+    <Image Include="icons\mpv2.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\mpv4.ico">
+    </Image>
+    <Image Include="icons\mpv4.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\mts.ico">
+    </Image>
+    <Image Include="icons\mts.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\ofr.ico">
+    </Image>
+    <Image Include="icons\ofr.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\ofs.ico">
+    </Image>
+    <Image Include="icons\ofs.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\oga.ico">
+    </Image>
+    <Image Include="icons\oga.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\ogg.ico">
+    </Image>
+    <Image Include="icons\ogg.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\ogm.ico">
+    </Image>
+    <Image Include="icons\ogm.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\ogv.ico">
+    </Image>
+    <Image Include="icons\ogv.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\playlist.ico">
+    </Image>
+    <Image Include="icons\playlist.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\pva.ico">
+    </Image>
+    <Image Include="icons\pva.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\ra.ico">
+    </Image>
+    <Image Include="icons\ra.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\ram.ico">
+    </Image>
+    <Image Include="icons\ram.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\ratdvd.ico">
+    </Image>
+    <Image Include="icons\ratdvd.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\rec.ico">
+    </Image>
+    <Image Include="icons\rec.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\rm.ico">
+    </Image>
+    <Image Include="icons\rm.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\rmi.ico">
+    </Image>
+    <Image Include="icons\rmi.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\rmm.ico">
+    </Image>
+    <Image Include="icons\rmm.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\rmvb.ico">
+    </Image>
+    <Image Include="icons\rmvb.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\roq.ico">
+    </Image>
+    <Image Include="icons\roq.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\rp.ico">
+    </Image>
+    <Image Include="icons\rp.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\rt.ico">
+    </Image>
+    <Image Include="icons\rt.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\smi.ico">
+    </Image>
+    <Image Include="icons\smi.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\smil.ico">
+    </Image>
+    <Image Include="icons\smil.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\smk.ico">
+    </Image>
+    <Image Include="icons\smk.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\snd.ico">
+    </Image>
+    <Image Include="icons\snd.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\swf.ico">
+    </Image>
+    <Image Include="icons\swf.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\tak.ico">
+    </Image>
+    <Image Include="icons\tak.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\tp.ico">
+    </Image>
+    <Image Include="icons\tp.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\trp.ico">
+    </Image>
+    <Image Include="icons\trp.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\ts.ico">
+    </Image>
+    <Image Include="icons\ts.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\tta.ico">
+    </Image>
+    <Image Include="icons\tta.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\vob.ico">
+    </Image>
+    <Image Include="icons\vob.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\wav.ico">
+    </Image>
+    <Image Include="icons\wav.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\webm.ico">
+    </Image>
+    <Image Include="icons\webm.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\wm.ico">
+    </Image>
+    <Image Include="icons\wm.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\wma.ico">
+    </Image>
+    <Image Include="icons\wma.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\wmp.ico">
+    </Image>
+    <Image Include="icons\wmp.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\wmv.ico">
+    </Image>
+    <Image Include="icons\wmv.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\wv.ico">
+    </Image>
+    <Image Include="icons\wv.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\icon.ico">
+    </Image>
+    <Image Include="icons\icon.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\default_audio.ico">
+    </Image>
+    <Image Include="icons\default_audio.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
-    <None Include="icons\default_video.ico">
+    </Image>
+    <Image Include="icons\default_video.ico">
       <Filter>Resource Files\icons</Filter>
-    </None>
+    </Image>
   </ItemGroup>
 </Project>

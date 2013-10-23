@@ -26,13 +26,13 @@
       <UniqueIdentifier>{9d4ec9b5-51c2-46df-9b8a-0a7003ddd49f}</UniqueIdentifier>
     </Filter>
     <Filter Include="compat">
-      <UniqueIdentifier>{bec01aa5-b1ea-425d-9cea-5a7795907ee5}</UniqueIdentifier>
+      <UniqueIdentifier>{f50612a0-0140-4c19-aed5-1416ee87cbe9}</UniqueIdentifier>
     </Filter>
     <Filter Include="libavutil\ppc">
-      <UniqueIdentifier>{00d55032-9d2e-4b3b-a44e-f66126bebf82}</UniqueIdentifier>
+      <UniqueIdentifier>{b521eba6-e7b7-4cfc-a1cf-07eaec96f7a6}</UniqueIdentifier>
     </Filter>
     <Filter Include="libavcodec\mips">
-      <UniqueIdentifier>{db3d18c0-210c-41b6-9ff1-1bed428de973}</UniqueIdentifier>
+      <UniqueIdentifier>{af60498e-28cf-49cd-8b37-275da59966d2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

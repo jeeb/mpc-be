@@ -22,8 +22,10 @@
     <ProjectGuid>{A1F84246-B9A1-455F-97E4-D730AB089947}</ProjectGuid>
     <RootNamespace>MPCTestAPI</RootNamespace>
     <Keyword>MFCProj</Keyword>
+    <ProjectName>MPCTestAPI</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="..\..\platform.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>Static</UseOfMfc>
@@ -100,9 +102,6 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\ExtLib\mfc\afxctrlcontainer.cpp" />
-    <ClCompile Include="..\..\ExtLib\mfc\afxglobals.cpp" />
-    <ClCompile Include="..\..\ExtLib\mfc\winmdi.cpp" />
     <ClCompile Include="HScrollListBox.cpp" />
     <ClCompile Include="MPCTestAPI.cpp">
     </ClCompile>

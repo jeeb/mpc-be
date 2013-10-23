@@ -25,6 +25,7 @@
     <Keyword>MFCProj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="..\..\platform.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>Static</UseOfMfc>
@@ -67,10 +68,18 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)bin\mpc-be_x86_$(Configuration)\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)bin\mpc-be_x64_$(Configuration)\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)bin\mpc-be_x86\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)bin\mpc-be_x64\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' And '$(PlatformToolsetVersion)'=='100'">$(SolutionDir)bin\mpc-be_x86_$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64' And '$(PlatformToolsetVersion)'=='100'">$(SolutionDir)bin\mpc-be_x64_$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32' And '$(PlatformToolsetVersion)'=='100'">$(SolutionDir)bin\mpc-be_x86\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(PlatformToolsetVersion)'=='100'">$(SolutionDir)bin\mpc-be_x64\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' And '$(PlatformToolsetVersion)'=='110'">$(SolutionDir)bin12\mpc-be_x86_$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64' And '$(PlatformToolsetVersion)'=='110'">$(SolutionDir)bin12\mpc-be_x64_$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32' And '$(PlatformToolsetVersion)'=='110'">$(SolutionDir)bin12\mpc-be_x86\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(PlatformToolsetVersion)'=='110'">$(SolutionDir)bin12\mpc-be_x64\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' And '$(PlatformToolsetVersion)'=='120'">$(SolutionDir)bin13\mpc-be_x86_$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64' And '$(PlatformToolsetVersion)'=='120'">$(SolutionDir)bin13\mpc-be_x64_$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32' And '$(PlatformToolsetVersion)'=='120'">$(SolutionDir)bin13\mpc-be_x86\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(PlatformToolsetVersion)'=='120'">$(SolutionDir)bin13\mpc-be_x64\</OutDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectName)64</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectName)64</TargetName>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenerateManifest>
@@ -96,6 +105,7 @@
       <DelayLoadDLLs>d3d9.dll;gdiplus.dll;psapi.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
       <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -116,6 +126,7 @@
       <DelayLoadDLLs>d3d9.dll;gdiplus.dll;psapi.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
       <TargetMachine>MachineX64</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -135,6 +146,7 @@
       <DelayLoadDLLs>d3d9.dll;gdiplus.dll;psapi.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
       <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -154,13 +166,10 @@
       <DelayLoadDLLs>d3d9.dll;gdiplus.dll;psapi.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
       <TargetMachine>MachineX64</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\ExtLib\mfc\afxctrlcontainer.cpp" />
-    <ClCompile Include="..\..\ExtLib\mfc\afxglobals.cpp" />
-    <ClCompile Include="..\..\ExtLib\mfc\afxmaskededit.cpp" />
-    <ClCompile Include="..\..\ExtLib\mfc\winmdi.cpp" />
     <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="AppSettings.cpp" />
     <ClCompile Include="AuthDlg.cpp" />
@@ -276,7 +285,6 @@
     <ClCompile Include="..\..\ExtLib\stb_image\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\ExtLib\mfc\afxmaskededit.h" />
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="AppSettings.h" />
     <ClInclude Include="AuthDlg.h" />
@@ -395,11 +403,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ani.avi" />
-    <None Include="res\ani_web.avi" />
-    <None Include="res\audio.png" />
-    <None Include="res\empty.psh" />
-    <None Include="res\final.psh" />
-    <None Include="res\gpu.png" />
     <None Include="res\icon.ico">
       <FileType>ICO</FileType>
     </None>
@@ -420,9 +423,12 @@
     <CustomBuildStep Include="res\mplayerc.rc2">
       <FileType>RC2</FileType>
     </CustomBuildStep>
+    <None Include="res\multi.ico" />
     <None Include="res\noaudio.bmp" />
     <None Include="res\onoff.bmp" />
-    <None Include="res\resizer.psh" />
+    <None Include="res\shaders\final.psh" />
+    <None Include="res\shaders\LCDAngleCorrection.psh" />
+    <None Include="res\single.ico" />
     <None Include="res\stereo.bmp" />
     <None Include="res\streamtypes.bmp" />
     <None Include="res\tb_pause_16.ico" />
@@ -489,6 +495,29 @@
     </None>
     <None Include="res\web\vbg.gif" />
     <None Include="res\web\vbs.gif" />
+    <None Include="res\shaders\BT601BT709.psh" />
+    <None Include="res\shaders\contour.psh" />
+    <None Include="res\shaders\deinterlace (blend).psh" />
+    <None Include="res\shaders\denoise.psh" />
+    <None Include="res\shaders\EdgeSharpen.psh" />
+    <None Include="res\shaders\emboss.psh" />
+    <None Include="res\shaders\empty.psh" />
+    <None Include="res\shaders\grayscale.psh" />
+    <None Include="res\shaders\invert.psh" />
+    <None Include="res\shaders\letterbox.psh" />
+    <None Include="res\shaders\levels.psh" />
+    <None Include="res\shaders\levels2.psh" />
+    <None Include="res\shaders\levels3.psh" />
+    <None Include="res\shaders\nightvision.psh" />
+    <None Include="res\shaders\procamp.psh" />
+    <None Include="res\shaders\resizer.psh" />
+    <None Include="res\shaders\sharpen.psh" />
+    <None Include="res\shaders\SharpenComplex.psh" />
+    <None Include="res\shaders\SharpenComplex2.psh" />
+    <None Include="res\shaders\sphere.psh" />
+    <None Include="res\shaders\spotlight.psh" />
+    <None Include="res\shaders\wave.psh" />
+    <None Include="res\shaders\YV12ChromaUpsampling.psh" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuildStep Include="res\mpc-be.exe.manifest" />
@@ -517,6 +546,8 @@
     </ProjectReference>
     <ProjectReference Include="..\..\filters\parser\MusePackSplitter\MusePackSplitter.vcxproj">
       <Project>{3ff8d24a-877c-4957-b377-f20a1527f423}</Project>
+      <Private>false</Private>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="..\..\filters\parser\RawVideoSplitter\RawVideoSplitter.vcxproj">
       <Project>{e73d2ff6-5738-4e17-b895-7d206fba9de2}</Project>
@@ -526,6 +557,8 @@
     </ProjectReference>
     <ProjectReference Include="..\..\filters\parser\WVSplitter\WVSplitter.vcxproj">
       <Project>{f22de3b2-4de9-4013-bbab-1bb39f2b7df7}</Project>
+      <Private>false</Private>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="..\..\ExtLib\BaseClasses\BaseClasses.vcxproj">
       <Project>{e8a3f6fa-ae1c-4c8e-a0b6-9c8480324eaa}</Project>
@@ -771,7 +804,15 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\gpu.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="mplayerc.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>
