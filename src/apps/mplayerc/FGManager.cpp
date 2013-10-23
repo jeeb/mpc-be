@@ -1405,17 +1405,6 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 							hr = ConnectFilterDirect(pPin, pInfPinTee, NULL);
 							if (SUCCEEDED(hr)) {
 								bInfPinTeeConnected = TRUE;
-								// remove AudioSwitcher from filter list ...
-								POSITION pos = m_transform.GetHeadPosition();
-								while (pos) {
-									CFGFilter* pFGF = m_transform.GetAt(pos);
-									if (pFGF->GetCLSID() == __uuidof(CAudioSwitcherFilter)) {
-										m_transform.MoveToTail(pos);
-										delete m_transform.RemoveTail();
-										break;
-									}
-									m_transform.GetNext(pos);
-								}
 
 								for (int ar = 0; ar < 2; ar++) {
 									IPin *infTeeFilterOutPin = GetFirstDisconnectedPin(pInfPinTee, PINDIR_OUTPUT);
@@ -2685,6 +2674,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_armerit += 0x100;
 	}
 
+#if !DBOXVersion
 	// Switchers
 	if (s.fEnableAudioSwitcher && !m_IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSwitcherFilter>(L"Audio Switcher", m_armerit + 0x2000);
@@ -2694,6 +2684,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		// morgan stream switcher
 		m_transform.AddTail(DNew CFGFilterRegistry(CLSID_MorganSwitcher, MERIT64_DO_NOT_USE));
 	}
+#endif
 
 	// Renderers
 	if (!m_IsPreview) {
