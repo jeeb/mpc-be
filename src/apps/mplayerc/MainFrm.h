@@ -1220,4 +1220,6 @@ public:
 
 	void		MakeBDLabel(CString path, CString& label, CString* pBDlabel = NULL);
 	void		MakeDVDLabel(CString& label, CString* pDVDlabel = NULL);
+
+	CString		GetCurFileName();
 };

@@ -26,13 +26,16 @@
 // CFavoriteAddDlg dialog
 
 IMPLEMENT_DYNAMIC(CFavoriteAddDlg, CCmdUIDialog)
-CFavoriteAddDlg::CFavoriteAddDlg(CString shortname, CString fullname, CWnd* pParent)
+CFavoriteAddDlg::CFavoriteAddDlg(CAtlList<CString>& shortnames, CString fullname, CWnd* pParent)
 	: CCmdUIDialog(CFavoriteAddDlg::IDD, pParent)
-	, m_shortname(shortname)
 	, m_fullname(fullname)
 	, m_bRememberPos(TRUE)
 	, m_bRelativeDrive(FALSE)
 {
+	POSITION pos = shortnames.GetHeadPosition();
+	while (pos) {
+		m_shortnames.AddTail(shortnames.GetNext(pos));
+	}
 }
 
 CFavoriteAddDlg::~CFavoriteAddDlg()
@@ -55,22 +58,23 @@ BOOL CFavoriteAddDlg::OnInitDialog()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	if ( !m_shortname.IsEmpty() ) {
-		m_namectrl.AddString( m_shortname );
+	POSITION pos = m_shortnames.GetHeadPosition();
+	while (pos) {
+		m_namectrl.AddString(m_shortnames.GetNext(pos));
 	}
 
-	if ( !m_fullname.IsEmpty() ) {
-		m_namectrl.AddString( m_fullname );
+	if (!m_fullname.IsEmpty()) {
+		m_namectrl.AddString(m_fullname);
 	}
 
 	::CorrectComboListWidth(m_namectrl);
 
-	m_bRememberPos = s.bFavRememberPos;
-	m_bRelativeDrive = s.bFavRelativeDrive;
+	m_bRememberPos		= s.bFavRememberPos;
+	m_bRelativeDrive	= s.bFavRelativeDrive;
 
 	UpdateData(FALSE);
 
-	m_namectrl.SetCurSel( 0 );
+	m_namectrl.SetCurSel(0);
 
 	return TRUE;
 }

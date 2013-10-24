@@ -30,10 +30,11 @@ class CFavoriteAddDlg : public CCmdUIDialog
 	DECLARE_DYNAMIC(CFavoriteAddDlg)
 
 private:
-	CString m_shortname, m_fullname;
+	CString m_fullname;
+	CAtlList<CString> m_shortnames;
 
 public:
-	CFavoriteAddDlg(CString shortname, CString fullname, CWnd* pParent = NULL);
+	CFavoriteAddDlg(CAtlList<CString>& shortnames, CString fullname, CWnd* pParent = NULL);
 	virtual ~CFavoriteAddDlg();
 
 	enum { IDD = IDD_FAVADD };

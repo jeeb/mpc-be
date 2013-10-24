@@ -6208,14 +6208,14 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 
 		DVD_HMSF_TIMECODE hmsf = RT2HMS_r(rtDur);
 
-		CStringW fn = GetFileOnly(m_wndPlaylistBar.GetCurFileName());
+		CStringW fn = GetFileOnly(GetCurFileName());
 		if (!m_strTitleAlt.IsEmpty()) {
 			fn = GetAltFileName();
 		}
 
 		CStringW fs;
 		WIN32_FIND_DATA wfd;
-		HANDLE hFind = FindFirstFile(m_wndPlaylistBar.GetCurFileName(), &wfd);
+		HANDLE hFind = FindFirstFile(GetCurFileName(), &wfd);
 		if (hFind != INVALID_HANDLE_VALUE) {
 			FindClose(hFind);
 
@@ -6340,7 +6340,7 @@ void CMainFrame::OnFileSaveImage()
 
 	CStringW prefix = _T("snapshot");
 	if (GetPlaybackMode() == PM_FILE) {
-		CString path = GetFileOnly(m_wndPlaylistBar.GetCurFileName());
+		CString path = GetFileOnly(GetCurFileName());
 		if (!m_strTitleAlt.IsEmpty()) {
 			path = GetAltFileName();
 		}
@@ -6411,7 +6411,7 @@ void CMainFrame::OnFileSaveImageAuto()
 
 	CStringW prefix = _T("snapshot");
 	if (GetPlaybackMode() == PM_FILE) {
-		prefix.Format(_T("%s_snapshot_%s"), GetFileOnly(m_wndPlaylistBar.GetCurFileName()), GetVidPos());
+		prefix.Format(_T("%s_snapshot_%s"), GetFileOnly(GetCurFileName()), GetVidPos());
 	} else if (GetPlaybackMode() == PM_DVD) {
 		prefix.Format(_T("snapshot_dvd_%s"), GetVidPos());
 	}
@@ -6439,7 +6439,7 @@ void CMainFrame::OnFileSaveThumbnails()
 	CPath psrc(s.strSnapShotPath);
 	CStringW prefix = _T("thumbs");
 	if (GetPlaybackMode() == PM_FILE) {
-		CString path = GetFileOnly(m_wndPlaylistBar.GetCurFileName());
+		CString path = GetFileOnly(GetCurFileName());
 		if (!m_strTitleAlt.IsEmpty()) {
 			path = GetAltFileName();
 		}
@@ -6549,7 +6549,7 @@ void CMainFrame::OnFileLoadSubtitle()
 	CFileDialog fd(TRUE, NULL, NULL,
 				   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY|OFN_NOCHANGEDIR,
 				   szFilter, GetModalParent(), 0);
-	fd.m_ofn.lpstrInitialDir = GetFolderOnly(m_wndPlaylistBar.GetCurFileName()).AllocSysString();
+	fd.m_ofn.lpstrInitialDir = GetFolderOnly(GetCurFileName()).AllocSysString();
 
 	if (fd.DoModal() != IDOK) {
 		return;
@@ -6586,13 +6586,13 @@ void CMainFrame::OnFileLoadAudio()
 
 	AppSettings& s = AfxGetAppSettings();
 	CAtlList<CString> fns;
-	fns.AddTail(m_wndPlaylistBar.GetCurFileName());
+	fns.AddTail(GetCurFileName());
 
 	CString filter;
 	CAtlArray<CString> mask;
 	s.m_Formats.GetAudioFilter(filter, mask);
 
-	CString path = AddSlash(GetFolderOnly(m_wndPlaylistBar.GetCurFileName()));
+	CString path = AddSlash(GetFolderOnly(GetCurFileName()));
 
 	CFileDialog fd(TRUE, NULL, NULL,
 				   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY|OFN_NOCHANGEDIR,
@@ -6637,7 +6637,7 @@ void CMainFrame::OnFileSaveSubtitle()
 			CString suggestedFileName("");
 			if (OpenFileData* p = dynamic_cast<OpenFileData*>(pOMD)) {
 				// HACK: get the file name from the current playlist item
-				suggestedFileName = m_wndPlaylistBar.GetCurFileName();
+				suggestedFileName = GetCurFileName();
 				suggestedFileName = suggestedFileName.Left(suggestedFileName.ReverseFind('.'));	// exclude the extension, it will be auto completed
 			}
 
@@ -6718,7 +6718,7 @@ void CMainFrame::OnFileISDBDownload()
 {
 	AppSettings& s = AfxGetAppSettings();
 	filehash fh;
-	if (!::mpc_filehash((CString)m_wndPlaylistBar.GetCurFileName(), fh)) {
+	if (!::mpc_filehash((CString)GetCurFileName(), fh)) {
 		MessageBeep((UINT)-1);
 		return;
 	}
@@ -6745,17 +6745,7 @@ void CMainFrame::OnUpdateFileISDBDownload(CCmdUI *pCmdUI)
 
 void CMainFrame::OnFileProperties()
 {
-	CString fn = m_wndPlaylistBar.GetCurFileName();
-	if (fn.IsEmpty() && m_pMainFSF) {
-		LPOLESTR pFN = NULL;
-		AM_MEDIA_TYPE mt;
-		if (SUCCEEDED(m_pMainFSF->GetCurFile(&pFN, &mt)) && pFN && *pFN) {
-			fn = CString(pFN);
-			CoTaskMemFree(pFN);
-		}
-	}
-
-	CPPageFileInfoSheet m_fileinfo(fn, this, GetModalParent());
+	CPPageFileInfoSheet m_fileinfo(GetCurFileName(), this, GetModalParent());
 	m_fileinfo.DoModal();
 }
 
@@ -8374,7 +8364,7 @@ void CMainFrame::OnPlayPlay()
 
 		if (strOSD.IsEmpty()) {
 			if (GetPlaybackMode() == PM_FILE) {
-				strOSD = m_wndPlaylistBar.GetCurFileName();
+				strOSD = GetCurFileName();
 				if (m_LastOpenBDPath.GetLength() > 0) {
 					strOSD = ResStr(ID_PLAY_PLAY);
 					int i = strOSD.Find('\n');
@@ -8385,7 +8375,7 @@ void CMainFrame::OnPlayPlay()
 					if (m_BDLabel.GetLength() > 0) {
 						strOSD.AppendFormat(L" \"%s\"", m_BDLabel);
 					} else {
-						MakeBDLabel(m_wndPlaylistBar.GetCurFileName(), strOSD);
+						MakeBDLabel(GetCurFileName(), strOSD);
 					}
 				} else if (strOSD.GetLength() > 0) {
 					strOSD.TrimRight('/');
@@ -10619,29 +10609,8 @@ void CMainFrame::OnFavoritesAdd()
 {
 	AppSettings& s = AfxGetAppSettings();
 
-	bool is_BD = false;
-
 	if (GetPlaybackMode() == PM_FILE) {
-		CString fn =  m_wndPlaylistBar.GetCurFileName();
-		if (fn.IsEmpty()) {
-			BeginEnumFilters(m_pGB, pEF, pBF) {
-				CComQIPtr<IFileSourceFilter> pFSF = pBF;
-				if (pFSF) {
-					LPOLESTR pFN = NULL;
-					AM_MEDIA_TYPE mt;
-					if (SUCCEEDED(pFSF->GetCurFile(&pFN, &mt)) && pFN && *pFN) {
-						fn = CStringW(pFN);
-						CoTaskMemFree(pFN);
-					}
-					break;
-				}
-			}
-			EndEnumFilters
-			if (fn.IsEmpty()) {
-				return;
-			}
-			is_BD = true;
-		}
+		CString fn = GetCurFileName();
 
 		CString desc = fn;
 		desc.Replace('\\', '/');
@@ -10652,7 +10621,18 @@ void CMainFrame::OnFavoritesAdd()
 			desc = desc.Mid(k+1);
 		}
 
-		CFavoriteAddDlg dlg(desc, fn);
+		CAtlList<CString> descList;
+		descList.AddTail(desc);
+
+		CString fn2 = L"Blu-ray";
+		if (m_BDLabel.GetLength() > 0) {
+			fn2.AppendFormat(L" \"%s\"", m_BDLabel);
+		} else {
+			MakeBDLabel(fn, fn2);
+		}
+		descList.AddHead(fn2);
+
+		CFavoriteAddDlg dlg(descList, fn);
 		if (dlg.DoModal() != IDOK) {
 			return;
 		}
@@ -10678,15 +10658,11 @@ void CMainFrame::OnFavoritesAdd()
 		str += relativeDrive;
 
 		// Paths
-		if (is_BD) {
-			str += _T(";") + fn;
-		} else {
-			CPlaylistItem pli;
-			if (m_wndPlaylistBar.GetCur(pli)) {
-				POSITION pos = pli.m_fns.GetHeadPosition();
-				while (pos) {
-					str += _T(";") + pli.m_fns.GetNext(pos);
-				}
+		CPlaylistItem pli;
+		if (m_wndPlaylistBar.GetCur(pli)) {
+			POSITION pos = pli.m_fns.GetHeadPosition();
+			while (pos) {
+				str += _T(";") + pli.m_fns.GetNext(pos);
 			}
 		}
 
@@ -10704,7 +10680,10 @@ void CMainFrame::OnFavoritesAdd()
 		desc.Format(_T("%s - T%02d C%02d - %02d:%02d:%02d"), fn, Location.TitleNum, Location.ChapterNum,
 					Location.TimeCode.bHours, Location.TimeCode.bMinutes, Location.TimeCode.bSeconds);
 
-		CFavoriteAddDlg dlg(fn, desc);
+		CAtlList<CString> fnList;
+		fnList.AddTail(fn);
+
+		CFavoriteAddDlg dlg(fnList, desc);
 		if (dlg.DoModal() != IDOK) {
 			return;
 		}
@@ -10751,44 +10730,21 @@ void CMainFrame::OnFavoritesQuickAddFavorite()
 {
 	AppSettings& s = AfxGetAppSettings();
 
-	bool is_BD = false;
-
 	CString osdMsg;
 
 	if (GetPlaybackMode() == PM_FILE) {
-		CString fn =  m_wndPlaylistBar.GetCurFileName();
-		if (fn.IsEmpty()) {
-			BeginEnumFilters(m_pGB, pEF, pBF) {
-				CComQIPtr<IFileSourceFilter> pFSF = pBF;
-				if (pFSF) {
-					LPOLESTR pFN = NULL;
-					AM_MEDIA_TYPE mt;
-					if (SUCCEEDED(pFSF->GetCurFile(&pFN, &mt)) && pFN && *pFN) {
-						fn = CStringW(pFN);
-						CoTaskMemFree(pFN);
-					}
-					break;
-				}
-			}
-			EndEnumFilters
-			if (fn.IsEmpty()) {
-				return;
-			}
-			is_BD = true;
-		}
+		CString fn =  GetCurFileName();
 
-		CString desc = fn;
-		desc.Replace('\\', '/');
-		int i = desc.Find(_T("://")), j = desc.Find(_T("?")), k = desc.ReverseFind('/');
-		if (i >= 0) {
-			desc = j >= 0 ? desc.Left(j) : desc;
-		} else if (k >= 0) {
-			desc = desc.Mid(k+1);
+		CString desc = L"Blu-ray";
+		if (m_BDLabel.GetLength() > 0) {
+			desc.AppendFormat(L" \"%s\"", m_BDLabel);
+		} else {
+			MakeBDLabel(fn, desc);
 		}
 
 		CString fn_with_pos(desc);
 		if (s.bFavRememberPos) {
-			fn_with_pos.Format(_T("%s_%s"), desc, GetVidPos());    // Add file position (time format) so it will be easier to organize later
+			fn_with_pos.Format(_T("%s - %s"), desc, GetVidPos());    // Add file position (time format) so it will be easier to organize later
 		}
 
 		// Name
@@ -10812,15 +10768,11 @@ void CMainFrame::OnFavoritesQuickAddFavorite()
 		str += relativeDrive;
 
 		// Paths
-		if (is_BD) {
-			str += _T(";") + fn;
-		} else {
-			CPlaylistItem pli;
-			if (m_wndPlaylistBar.GetCur(pli)) {
-				POSITION pos = pli.m_fns.GetHeadPosition();
-				while (pos) {
-					str += _T(";") + pli.m_fns.GetNext(pos);
-				}
+		CPlaylistItem pli;
+		if (m_wndPlaylistBar.GetCur(pli)) {
+			POSITION pos = pli.m_fns.GetHeadPosition();
+			while (pos) {
+				str += _T(";") + pli.m_fns.GetNext(pos);
 			}
 		}
 
@@ -13739,7 +13691,7 @@ void CMainFrame::OpenSetupStatusBar()
 	HICON hIcon = NULL;
 
 	if (GetPlaybackMode() == PM_FILE) {
-		hIcon = LoadIcon(m_wndPlaylistBar.GetCurFileName(), true);
+		hIcon = LoadIcon(GetCurFileName(), true);
 	} else if (GetPlaybackMode() == PM_DVD) {
 		hIcon = LoadIcon(_T(".ifo"), true);
 	}
@@ -16990,7 +16942,7 @@ bool CMainFrame::LoadSubtitle(CString fn, ISubStream **actualStream)
 			CAutoPtr<CSupSubFile> pSSF(DNew CSupSubFile(&m_csSubLock));
 			if (pSSF && GetFileExt(fn).MakeLower() == _T(".sup")) {
 
-				if (pSSF->Open(fn, GetSubName(fn, m_wndPlaylistBar.GetCurFileName()))) {
+				if (pSSF->Open(fn, GetSubName(fn, GetCurFileName()))) {
 					pSubStream = pSSF.Detach();
 				}
 			}
@@ -17006,7 +16958,7 @@ bool CMainFrame::LoadSubtitle(CString fn, ISubStream **actualStream)
 		if (!pSubStream) {
 			CAutoPtr<CRenderedTextSubtitle> pRTS(DNew CRenderedTextSubtitle(&m_csSubLock, &AfxGetAppSettings().subdefstyle, AfxGetAppSettings().fUseDefaultSubtitlesStyle));
 
-			if (pRTS && pRTS->Open(fn, DEFAULT_CHARSET, GetSubName(fn, m_wndPlaylistBar.GetCurFileName())) && pRTS->GetStreamCount() > 0) {
+			if (pRTS && pRTS->Open(fn, DEFAULT_CHARSET, GetSubName(fn, GetCurFileName())) && pRTS->GetStreamCount() > 0) {
 				pSubStream = pRTS.Detach();
 			}
 		}
@@ -20192,7 +20144,7 @@ void CMainFrame::AddAudioPathsAddons(CString FileName)
 
 BOOL CMainFrame::CheckMainFilter(IBaseFilter* pBF)
 {
-	CString fName = m_wndPlaylistBar.GetCurFileName();
+	CString fName = GetCurFileName();
 	if (CString(fName).MakeLower().Find(L"youtube") >= 0) {
 		return TRUE;
 	}
@@ -20298,4 +20250,19 @@ void CMainFrame::MakeDVDLabel(CString& label, CString* pDVDlabel)
 			}
 		}
 	}
+}
+
+CString CMainFrame::GetCurFileName()
+{
+	CString fn = m_wndPlaylistBar.GetCurFileName();
+	if (fn.IsEmpty() && m_pMainFSF) {
+		LPOLESTR pFN = NULL;
+		AM_MEDIA_TYPE mt;
+		if (SUCCEEDED(m_pMainFSF->GetCurFile(&pFN, &mt)) && pFN && *pFN) {
+			fn = CString(pFN);
+			CoTaskMemFree(pFN);
+		}
+	}
+
+	return fn;
 }
