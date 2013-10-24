@@ -1647,6 +1647,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	m_pAVCtx->err_recognition       = AV_EF_CAREFUL;
 	m_pAVCtx->idct_algo             = FF_IDCT_AUTO;
 	m_pAVCtx->skip_loop_filter      = (AVDiscard)m_nDiscardMode;
+	m_pAVCtx->strict_std_compliance	= FF_COMPLIANCE_EXPERIMENTAL;
 
 	if (m_nCodecId == AV_CODEC_ID_H264) {
 		m_pAVCtx->flags2           |= CODEC_FLAG2_SHOW_ALL;
