@@ -10901,24 +10901,26 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 	REFERENCE_TIME rtStart = 0;
 	BOOL bRelativeDrive = FALSE;
 
+	CString desc;
+
 	int i = 0, j = 0;
 	for (CString s2 = fav.Tokenize(_T(";"), i);
 			!s2.IsEmpty();
 			s2 = fav.Tokenize(_T(";"), i), j++) {
 		if (j == 0) {
-			;    // desc / name
+			desc = s2;									// desc / name
 		} else if (j == 1) {
-			_stscanf_s(s2, _T("%I64d"), &rtStart);    // pos
+			_stscanf_s(s2, _T("%I64d"), &rtStart);		// pos
 		} else if (j == 2) {
-			_stscanf_s(s2, _T("%d"), &bRelativeDrive);    // relative drive
+			_stscanf_s(s2, _T("%d"), &bRelativeDrive);	// relative drive
 		} else {
-			fns.AddTail(s2);    // paths
+			fns.AddTail(s2);							// paths
 		}
 	}
 
 	// NOTE: This is just for the favorites but we could add a global settings that does this always when on. Could be useful when using removable devices.
 	//       All you have to do then is plug in your 500 gb drive, full with movies and/or music, start MPC-BE (from the 500 gb drive) with a preloaded playlist and press play.
-	if ( bRelativeDrive ) {
+	if (bRelativeDrive) {
 		// Get the drive MPC-BE is on and apply it to the path list
 		CString exePath;
 		DWORD dwLength = GetModuleFileName(AfxGetInstanceHandle(), exePath.GetBuffer(_MAX_PATH), _MAX_PATH);
@@ -10939,7 +10941,6 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 					if (_tcsicmp(exeDrive, path) != 0) { // Do we need to replace the drive letter ?
 						// Replace drive letter
 						CString newPath(exeDrive);
-
 						newPath += stringPath.Mid(rootLength);//newPath += stringPath.Mid( 3 );
 
 						stringPath = newPath;
@@ -10947,6 +10948,10 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 				}
 			}
 		}
+	}
+
+	if (desc.Find(L"Blu-ray  \"") == 0 && OpenBD(fns.GetHead())) {
+		return;
 	}
 
 	m_wndPlaylistBar.Open(fns, false);
@@ -19410,7 +19415,7 @@ void CMainFrame::EnableShaders2(bool enable)
 	}
 }
 
-BOOL CMainFrame::OpenBD(CString Path)
+BOOL CMainFrame::OpenBD(CString Path, REFERENCE_TIME rtStart)
 {
 	CHdmvClipInfo	ClipInfo;
 	CString			strPlaylistFile;
@@ -19468,7 +19473,7 @@ BOOL CMainFrame::OpenBD(CString Path)
 					sl.AddTail(CString(Path + _T("\\BDMV\\index.bdmv")));
 				}
 				m_wndPlaylistBar.Append(sl, false);
-				if (OpenCurPlaylistItem()) {
+				if (OpenCurPlaylistItem(rtStart)) {
 					return TRUE;
 				}
 			}

@@ -1178,7 +1178,7 @@ public:
 
 	CHdmvClipInfo::CPlaylist m_MPLSPlaylist;
 	BOOL m_bIsBDPlay;
-	BOOL OpenBD(CString Path);
+	BOOL OpenBD(CString Path, REFERENCE_TIME rtStart = INVALID_TIME);
 
 	IBaseFilter*	GetVSFilter();
 	bool			b_UseVSFilter;
