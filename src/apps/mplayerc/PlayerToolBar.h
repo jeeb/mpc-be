@@ -40,7 +40,6 @@ private:
 	int			iMute;
 
 	CImageList	*m_pButtonsImages;
-	CImageList	*m_pButtonDXVA;
 	HICON		m_hDXVAIcon;
 
 	int iDXVAIconHeight;

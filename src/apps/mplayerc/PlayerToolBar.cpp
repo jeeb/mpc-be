@@ -51,17 +51,17 @@ CPlayerToolBar::CPlayerToolBar()
 		CBitmap *bmp = DNew CBitmap();
 		bmp->Attach(hBmp);
 
-		m_pButtonDXVA = DNew CImageList();
-		m_pButtonDXVA->Create(bm.bmWidth, bm.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
-		m_pButtonDXVA->Add(bmp, static_cast<CBitmap*>(0));
+		CImageList	*pButtonDXVA = DNew CImageList();
+		pButtonDXVA->Create(bm.bmWidth, bm.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
+		pButtonDXVA->Add(bmp, static_cast<CBitmap*>(0));
 
-		m_hDXVAIcon = m_pButtonDXVA->ExtractIcon(0);
+		m_hDXVAIcon = pButtonDXVA->ExtractIcon(0);
 
-		delete m_pButtonDXVA;
+		delete pButtonDXVA;
 		delete bmp;
 	}
 
-	iDXVAIconHeight = bm.bmHeight;
+	iDXVAIconHeight	= bm.bmHeight;
 	iDXVAIconWidth	= bm.bmWidth;
 
 	DeleteObject(hBmp);
@@ -71,6 +71,10 @@ CPlayerToolBar::~CPlayerToolBar()
 {
 	if (m_pButtonsImages) {
 		delete m_pButtonsImages;
+	}
+
+	if (m_hDXVAIcon) {
+		DestroyIcon(m_hDXVAIcon);
 	}
 }
 
@@ -190,10 +194,7 @@ void CPlayerToolBar::SwitchTheme()
 
 		SetSizes(CSize(bitmapBmp.bmHeight + 7, bitmapBmp.bmHeight + 6), CSize(bitmapBmp.bmHeight, bitmapBmp.bmHeight));
 
-		if (m_pButtonsImages) {
-			delete m_pButtonsImages;
-			m_pButtonsImages = NULL;
-		}
+		SAFE_DELETE(m_pButtonsImages);
 
 		m_pButtonsImages = DNew CImageList();
 
@@ -460,28 +461,27 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			m_volctrl.Invalidate();
 			lr = CDRF_SKIPDEFAULT;
 			break;
-		case CDDS_PREPAINT:
-			{
-			CDC dc;
-			dc.Attach(pTBCD->nmcd.hdc);
-			CRect r;
+		case CDDS_PREPAINT: {
+				CDC dc;
+				dc.Attach(pTBCD->nmcd.hdc);
+				CRect r;
 
-			GetClientRect(&r);
+				GetClientRect(&r);
 
-			if (NULL != fp) {
-				ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);
-				m_logobm.LoadExternalGradient("background", &dc, r, 21, s.nThemeBrightness, R, G, B);
-			} else {
-				ThemeRGB(50, 55, 60, R, G, B);
-				ThemeRGB(20, 25, 30, R2, G2, B2);
-				TRIVERTEX tv[2] = {
-					{r.left, r.top, R*256, G*256, B*256, 255*256},
-					{r.right, r.bottom, R2*256, G2*256, B2*256, 255*256},
-				};
-				dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
-			}
+				if (NULL != fp) {
+					ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);
+					m_logobm.LoadExternalGradient("background", &dc, r, 21, s.nThemeBrightness, R, G, B);
+				} else {
+					ThemeRGB(50, 55, 60, R, G, B);
+					ThemeRGB(20, 25, 30, R2, G2, B2);
+					TRIVERTEX tv[2] = {
+						{r.left, r.top, R*256, G*256, B*256, 255*256},
+						{r.right, r.bottom, R2*256, G2*256, B2*256, 255*256},
+					};
+					dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+				}
 
-			dc.Detach();
+				dc.Detach();
 			}
 			lr |= CDRF_NOTIFYITEMDRAW;
 			break;
@@ -519,14 +519,14 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 
 			BLENDFUNCTION bf;
-			bf.AlphaFormat	= AC_SRC_ALPHA;
-			bf.BlendFlags	= 0;
-			bf.BlendOp	= AC_SRC_OVER;
-			bf.SourceConstantAlpha = 90;
+			bf.AlphaFormat			= AC_SRC_ALPHA;
+			bf.BlendFlags			= 0;
+			bf.BlendOp				= AC_SRC_OVER;
+			bf.SourceConstantAlpha	= 90;
 
 			CPen penFrHot(PS_SOLID,0,0x00e9e9e9);//clr_resFace
-			CPen *penSaved = dc.SelectObject(&penFrHot);
-			CBrush *brushSaved = (CBrush*)dc.SelectStockObject(NULL_BRUSH);
+			CPen *penSaved		= dc.SelectObject(&penFrHot);
+			CBrush *brushSaved	= (CBrush*)dc.SelectStockObject(NULL_BRUSH);
 
 			//CDIS_SELECTED,CDIS_GRAYED,CDIS_DISABLED,CDIS_CHECKED,CDIS_FOCUS,CDIS_DEFAULT,CDIS_HOT,CDIS_MARKED,CDIS_INDETERMINATE
 
@@ -583,14 +583,13 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			m_volctrl.Invalidate();
 			lr = CDRF_SKIPDEFAULT;
 			break;
-		case CDDS_PREPAINT:
-			{
-			CDC dc;
-			dc.Attach(pTBCD->nmcd.hdc);
-			CRect r;
-			GetClientRect(&r);
-			dc.FillSolidRect(r, GetSysColor(COLOR_BTNFACE));
-			dc.Detach();
+		case CDDS_PREPAINT: {
+				CDC dc;
+				dc.Attach(pTBCD->nmcd.hdc);
+				CRect r;
+				GetClientRect(&r);
+				dc.FillSolidRect(r, GetSysColor(COLOR_BTNFACE));
+				dc.Detach();
 			}
 			lr |= CDRF_NOTIFYITEMDRAW;
 			break;
@@ -635,25 +634,29 @@ void CPlayerToolBar::OnInitialUpdate()
 		return;
 	}
 
-	SwitchTheme();
-
-	CRect r, r10, br, vr2;
+	CRect r, br, vr2;
 
 	GetClientRect(&r);
-	GetItemRect(10, &r10);
 	br = GetBorders();
 
 	if (AfxGetAppSettings().fDisableXPToolbars) {
 		int m_nBMedian = r.bottom - 3 - 0.5 * m_nButtonHeight;
-		vr2.SetRect(r.right + br.right - 60, m_nBMedian - 14, r.right +br.right + 6, m_nBMedian + 10);
+		vr2.SetRect(r.right + br.right - 60, m_nBMedian - 14, r.right + br.right + 6, m_nBMedian + 10);
 	} else {
-		vr2.SetRect(r.right + br.right - 60, r.bottom - 25, r.right +br.right + 6, r.bottom);
+		vr2.SetRect(r.right + br.right - 60, r.bottom - 25, r.right + br.right + 6, r.bottom);
 	}
 
 	m_volctrl.MoveWindow(vr2);
 
+	if (iDisableXPToolbars != (__int64)AfxGetAppSettings().fDisableXPToolbars) {
+		SwitchTheme();
+	}
+
 	SetButtonInfo(7, GetItemID(7), TBBS_SEPARATOR | TBBS_DISABLED, 48);
-	SetButtonInfo(11, GetItemID(11), TBBS_SEPARATOR | TBBS_DISABLED, vr2.left - r10.right - r10.bottom - r10.top);
+	CRect r10, r12;
+	GetItemRect(10, &r10);
+	GetItemRect(12, &r12);
+	SetButtonInfo(11, GetItemID(11), TBBS_SEPARATOR | TBBS_DISABLED, vr2.left - r10.right - r12.Width());
 }
 
 BOOL CPlayerToolBar::OnVolumeMute(UINT nID)

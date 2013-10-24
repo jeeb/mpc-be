@@ -191,26 +191,27 @@ BOOL CPPageInterface::OnApply()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	s.clrFaceABGR		= m_clrFaceABGR;
-	s.clrOutlineABGR	= m_clrOutlineABGR;
-	s.clrFontABGR		= m_clrFontABGR;
-	s.clrGrad1ABGR		= m_clrGrad1ABGR;
-	s.clrGrad2ABGR		= m_clrGrad2ABGR;
-	s.nThemeBrightness	= m_nThemeBrightness;
-	s.nThemeRed			= m_nThemeRed;
-	s.nThemeGreen		= m_nThemeGreen;
-	s.nThemeBlue		= m_nThemeBlue;
-	s.nOSDTransparent	= m_nOSDTransparent;
-	s.fFileNameOnSeekBar = !!m_fFileNameOnSeekBar;
-	s.nOSDBorder = m_OSDBorder;
-	HWND WndToolBar = ((CMainFrame*)AfxGetMainWnd())->m_hWnd_toolbar;
+	s.clrFaceABGR			= m_clrFaceABGR;
+	s.clrOutlineABGR		= m_clrOutlineABGR;
+	s.clrFontABGR			= m_clrFontABGR;
+	s.clrGrad1ABGR			= m_clrGrad1ABGR;
+	s.clrGrad2ABGR			= m_clrGrad2ABGR;
+	s.nThemeBrightness		= m_nThemeBrightness;
+	s.nThemeRed				= m_nThemeRed;
+	s.nThemeGreen			= m_nThemeGreen;
+	s.nThemeBlue			= m_nThemeBlue;
+	s.nOSDTransparent		= m_nOSDTransparent;
+	s.fFileNameOnSeekBar	= !!m_fFileNameOnSeekBar;
+	s.nOSDBorder			= m_OSDBorder;
 
-	if (::IsWindow(WndToolBar) && (s.fDisableXPToolbars != !!m_fDisableXPToolbars)) {
+	HWND WndToolBar			= ((CMainFrame*)AfxGetMainWnd())->m_hWnd_toolbar;
+	BOOL fDisableXPToolbars	= s.fDisableXPToolbars;
+	s.fDisableXPToolbars	= !!m_fDisableXPToolbars;
+	if (::IsWindow(WndToolBar) && (s.fDisableXPToolbars != !!fDisableXPToolbars)) {
 		::PostMessage(WndToolBar,								WM_SIZE, s.nLastWindowType, MAKELPARAM(s.rcLastWindowPos.Width(), s.rcLastWindowPos.Height()));
 		::PostMessage(((CMainFrame*)AfxGetMainWnd())->m_hWnd,	WM_SIZE, s.nLastWindowType, MAKELPARAM(s.rcLastWindowPos.Width(), s.rcLastWindowPos.Height()));
 	}
 
-	s.fDisableXPToolbars	= !!m_fDisableXPToolbars;
 	s.fUseWin7TaskBar		= !!m_fUseWin7TaskBar;
 	s.fUseTimeTooltip		= !!m_fUseTimeTooltip;
 	s.nTimeTooltipPosition	= m_TimeTooltipPosition.GetCurSel();
@@ -218,11 +219,11 @@ BOOL CPPageInterface::OnApply()
 
 	m_FontType.GetLBText(m_FontType.GetCurSel(),s.strOSDFont);
 
-	s.fSmartSeek		= !!m_fSmartSeek;
-	s.fChapterMarker	= !!m_fChapterMarker;
-	s.fFlybar			= !!m_fFlybar;
-	s.fFontShadow		= !!m_fFontShadow;
-	s.fFontAA			= !!m_fFontAA;
+	s.fSmartSeek			= !!m_fSmartSeek;
+	s.fChapterMarker		= !!m_fChapterMarker;
+	s.fFlybar				= !!m_fFlybar;
+	s.fFontShadow			= !!m_fFontShadow;
+	s.fFontAA				= !!m_fFontAA;
 
 	CMainFrame* pFrame = ((CMainFrame*)GetParentFrame());
 
@@ -248,11 +249,11 @@ void CPPageInterface::OnCancel()
 
 	s.nThemeBrightness	= m_nThemeBrightness_Old;
 	s.nThemeRed			= m_nThemeRed_Old;
-	s.nThemeGreen			= m_nThemeGreen_Old;
-	s.nThemeBlue			= m_nThemeBlue_Old;
+	s.nThemeGreen		= m_nThemeGreen_Old;
+	s.nThemeBlue		= m_nThemeBlue_Old;
 	s.nOSDTransparent	= m_nOSDTransparent_Old;
-	s.nOSDBorder = m_OSDBorder_Old;
-	s.fFontShadow = !!m_fFontShadow_Old;
+	s.nOSDBorder		= m_OSDBorder_Old;
+	s.fFontShadow		= !!m_fFontShadow_Old;
 
 	OnThemeChange();
 }
