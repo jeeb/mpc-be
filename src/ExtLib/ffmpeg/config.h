@@ -334,6 +334,8 @@
 #define HAVE_MEMORYBARRIER 1
 #define HAVE_MKSTEMP 0
 #define HAVE_MMAP 0
+#define HAVE_MPROTECT 0
+#define HAVE_MSVCRT 0
 #define HAVE_NANOSLEEP 0
 #define HAVE_OPENJPEG_1_5_OPENJPEG_H 0
 #define HAVE_NETINET_SCTP_H 0
@@ -413,9 +415,8 @@
 #else
 	#define HAVE_ATTRIBUTE_MAY_ALIAS 0
 	#define HAVE_ATTRIBUTE_PACKED 0
-	#define EMULATE_FAST_INT
-	#define HAVE_EXP2 1
-	#define HAVE_EXP2F 1
+	#define HAVE_EXP2 0
+	#define HAVE_EXP2F 0
 	#define HAVE_LLRINT 0
 	#define HAVE_LRINT 0
 	#define HAVE_LRINTF 0
