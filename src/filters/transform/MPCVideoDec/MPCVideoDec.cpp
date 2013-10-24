@@ -402,7 +402,7 @@ FFMPEG_CODECS		ffCodecs[] = {
 	{ &MEDIASUBTYPE_HEVC, AV_CODEC_ID_HEVC, NULL, FFM_HEVC, -1 },
 	{ &MEDIASUBTYPE_HVC1, AV_CODEC_ID_HEVC, NULL, FFM_HEVC, -1 },
 //	{ &MEDIASUBTYPE_HM91, AV_CODEC_ID_HEVC, NULL, FFM_HEVC, -1 },
-//	{ &MEDIASUBTYPE_HM10, AV_CODEC_ID_HEVC, NULL, FFM_HEVC, -1 },
+	{ &MEDIASUBTYPE_HM10, AV_CODEC_ID_HEVC, NULL, FFM_HEVC, -1 },
 //	{ &MEDIASUBTYPE_HM12, AV_CODEC_ID_HEVC, NULL, FFM_HEVC, -1 },
 
 	// Other MPEG-4
@@ -696,7 +696,7 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HEVC },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HVC1 },
 //	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HM91 },
-//	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HM10 },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HM10 },
 //	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HM12 },
 
 	// Other MPEG-4
@@ -1647,7 +1647,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	m_pAVCtx->err_recognition       = AV_EF_CAREFUL;
 	m_pAVCtx->idct_algo             = FF_IDCT_AUTO;
 	m_pAVCtx->skip_loop_filter      = (AVDiscard)m_nDiscardMode;
-	m_pAVCtx->strict_std_compliance	= FF_COMPLIANCE_EXPERIMENTAL;
 
 	if (m_nCodecId == AV_CODEC_ID_H264) {
 		m_pAVCtx->flags2           |= CODEC_FLAG2_SHOW_ALL;
@@ -1878,40 +1877,54 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 		if (m_nCodecId == AV_CODEC_ID_H264 && !bH264avc && extra[0] == 1) {
 			av_freep(&extra);
 			extralen = 0;
-		} else if (m_nCodecId == AV_CODEC_ID_HEVC) {
-#if (0)
-			vc_params_t params;
-			bool bTrustExtra = ParseHEVCDecoderConfigurationRecord(extra, extralen, params, true);
-
-			if (!bTrustExtra) {
-				UINT32 state		= -1;
-				int has_vps			= 0;
-				int NAL_unit_type	= 0;
-
-				for (unsigned int i = 0; i < extralen; i++) {
-					state = (state << 8) | extra[i];
-					if (((state >> 8) & 0xFFFFFF) == 0x000001) {
-						int nat = (state >> 1) & 0x3F;
-
-						if (NAL_unit_type >= NAL_UNIT_VPS && NAL_unit_type <= NAL_UNIT_PPS) {
-							has_vps++;
-						}
-
-						NAL_unit_type = nat;
-					}
+		} 
+		
+		if (m_nCodecId == AV_CODEC_ID_HEVC) {
+			// try Reconstruct NAL units sequence into NAL Units in Byte-Stream Format
+			BYTE* src		= extra;
+			BYTE* src_end	= extra + extralen;
+			BYTE* dst		= NULL;
+			int dst_len		= 0;
+			
+			int NALCount	= 0;
+			while (src + 2 < src_end) {
+				int len = (src[0] << 8 | src[1]);
+				if (len == 0) {
+					break;
+				}
+				if ((len <= 2) || (src + len + 2 > src_end)) {
+					NALCount = 0;
+					break;
+				}
+				src += 2;
+				int nat = (src[0] >> 1) & 0x3F;
+				if (nat < NAL_UNIT_VPS || nat > NAL_UNIT_PPS) {
+					NALCount = 0;
+					break;
 				}
 
-				if (has_vps) {
-					bTrustExtra = true;
-				}
+				dst = (BYTE *)av_realloc_f(dst, dst_len + len + 3 + FF_INPUT_BUFFER_PADDING_SIZE, 1);
+				// put startcode 0x000001
+				dst[dst_len]		= 0x00;
+				dst[dst_len + 1]	= 0x00;
+				dst[dst_len + 2]	= 0x01;
+				memcpy(dst + dst_len + 3, src, len);
+				
+				dst_len += len + 3;
+
+				src += len;
+				NALCount++;
 			}
 
-			if (!bTrustExtra) {
+			if (NALCount > 1) {
 				av_freep(&extra);
-				extralen = 0;
+				extra		= dst;
+				extralen	= dst_len;
+			} else {
+				av_freep(&dst);
 			}
-#endif
 		}
+
 		m_pAVCtx->extradata = extra;
 		m_pAVCtx->extradata_size = (int)extralen;
 	}

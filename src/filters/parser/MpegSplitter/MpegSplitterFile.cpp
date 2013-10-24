@@ -146,7 +146,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		SearchPrograms(0, min(GetLength(), IsStreaming() ? MEGABYTE*2 : MEGABYTE*5)); // max 5Mb for search a valid Program Map Table
 
 		__int64 pfp = 0;
-		const int k = 20;
+		const int k = 10;
 		for (int i = 0; i <= k; i++) {
 			__int64 fp = i * GetLength() / k;
 			fp = min(GetLength() - MEGABYTE/2, fp);
@@ -159,7 +159,6 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		SearchStreams(0, MEGABYTE/2, pAsyncReader);
 	}
 
-
 	if (!m_bIsBD) {
 		bool bAlternativeDuration = m_AlternativeDuration;
 		int step = 1;
@@ -170,19 +169,18 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 					WaitAvailable(3000, MEGABYTE);
 
 					__int64 pfp = 0;
-					const int k = 20;
+					const int k = 10;
 					for (int i = 0; i <= k; i++) {
 						__int64 fp = i * GetLength() / k;
 						fp = min(GetLength() - MEGABYTE/8, fp);
 						fp = max(pfp, fp);
-						__int64 nfp = fp + (pfp == 0 ? 10*MEGABYTE : MEGABYTE/8);
+						__int64 nfp = fp + (pfp == 0 ? MEGABYTE : MEGABYTE/8);
 						SearchStreams(fp, nfp, pAsyncReader, TRUE);
 						pfp = nfp;
 					}
 				} else {
 					SearchStreams(0, MEGABYTE/2, pAsyncReader, TRUE);
 				}
-
 			}
 
 			if (m_posMax - m_posMin <= 0 || m_rtMax - m_rtMin <= 0) {

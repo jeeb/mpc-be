@@ -547,7 +547,7 @@ bool ParseHEVCHeader(BYTE* headerData, int headerSize, hevc_hdr& h)
 
 void CreateSequenceHeaderAVC(BYTE* data, int size, DWORD* dwSequenceHeader, DWORD& cbSequenceHeader)
 {
-	// copy SequenceParameterSets and PictureParameterSets from AVCDecoderConfigurationRecord
+	// copy VideoParameterSets(VPS), SequenceParameterSets(SPS) and PictureParameterSets(PPS) from AVCDecoderConfigurationRecord
 
 	cbSequenceHeader = 0;
 	if (size < 7 || (data[5] & 0xe0) != 0xe0) {
