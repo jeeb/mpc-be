@@ -678,6 +678,22 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 				}
 			}
 		}
+
+		// AC3
+		if (type == unknown) {
+			Seek(start);
+			CMpegSplitterFile::ac3hdr h;
+			if (!m_streams[audio].Find(s) && Read(h, len, &s.mt)) {
+				PES_STREAM_TYPE stream_type = INVALID;
+				if (GetStreamType(s.pid, stream_type)) {
+					if (IsAC3Audio(stream_type)) {
+						type = audio;
+					}
+				} else {
+					type = audio;
+				}
+			}
+		}
 	} else if (pesid == 0xbd || pesid == 0xfd) { // private stream 1
 		if (s.pid) {
 			if (!m_streams[audio].Find(s) && !m_streams[video].Find(s)) {
