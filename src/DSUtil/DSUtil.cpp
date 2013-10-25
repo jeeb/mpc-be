@@ -2249,6 +2249,52 @@ CString ISO6392ToLanguage(LPCSTR code)
 	return CString(code);
 }
 
+bool IsISO639Language(LPCSTR code)
+{
+	size_t nLen = strlen(code) + 1;
+	LPSTR tmp = DEBUG_NEW CHAR[nLen];
+	strncpy_s(tmp, nLen, code, nLen);
+	_strlwr_s(tmp, nLen);
+	tmp[0] = (CHAR)toupper(tmp[0]);
+
+	bool bFound = false;
+	for (size_t i = 0, cnt = _countof(s_isolangs); i < cnt; i++) {
+		if (!strcmp(s_isolangs[i].name, tmp)) {
+			bFound = true;
+			break;
+		}
+	}
+
+	delete [] tmp;
+
+	return bFound;
+}
+
+CString ISO639XToLanguage(LPCSTR code, bool bCheckForFullLangName /*= false*/)
+{
+    CString lang;
+
+    switch (size_t nLen = strlen(code)) {
+		case 2:
+			lang = ISO6391ToLanguage(code);
+			break;
+		case 3:
+			lang = ISO6392ToLanguage(code);
+			if (lang == code) { // When it can't find a match, ISO6392ToLanguage returns the input string
+				lang.Empty();
+			}
+			break;
+		default:
+			if (bCheckForFullLangName
+					&& nLen > 3
+					&& IsISO639Language(code)) {
+				lang = code;
+			}
+    }
+
+    return lang;
+}
+
 LCID ISO6391ToLcid(LPCSTR code)
 {
 	CHAR tmp[3+1];

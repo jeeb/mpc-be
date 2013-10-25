@@ -16915,22 +16915,79 @@ void CMainFrame::AddTextPassThruFilter()
 
 static CString GetSubName(CString fn, CString f_videoName)
 {
-	// The filename of the video file with extension
-	CString videoName = f_videoName.Mid(f_videoName.ReverseFind('\\') + 1);
+	// The filename of the video file
+	CString videoName(f_videoName);
+	int iExtStart = videoName.ReverseFind('.');
+	if (iExtStart < 0) {
+		iExtStart = videoName.GetLength();
+	}
+	CString videoExt = videoName.Mid(iExtStart + 1).MakeLower();
+	videoName = videoName.Left(iExtStart).Mid(videoName.ReverseFind('\\') + 1);
 
 	// The filename of the subtitle file
-	CString subName = fn.Left(fn.ReverseFind('.')).Mid(fn.ReverseFind('\\') + 1);
-	CString subext = _T(" (") + fn.Right(3).MakeUpper() + _T(")");
-	CString name = _T("");
-	if (subName.Find(videoName) != -1 && videoName.CompareNoCase(subName) != 0 && subName.Replace(videoName, _T("")) == 1) {
-		name = subName.TrimLeft('.');
-	} else {
-		// The filename of the video file without extension
-		videoName = f_videoName.Left(f_videoName.ReverseFind('.')).Mid(f_videoName.ReverseFind('\\') + 1);
-		if (subName.Find(videoName) == 0 && videoName.CompareNoCase(subName) != 0 && subName.Replace(videoName, _T("")) == 1) {
-			name = subName.TrimLeft('.') + subext;
-		} else {
-			name = ResStr(IDS_UNDETERMINED).MakeLower() +  _T(" (") + subName + fn.Right(4) + _T(")");
+	iExtStart = fn.ReverseFind('.');
+	if (iExtStart < 0) {
+		iExtStart = fn.GetLength();
+	}
+	CString subName = fn.Left(iExtStart).Mid(fn.ReverseFind('\\') + 1);
+	CString subExt = fn.Mid(iExtStart + 1);
+
+	CString subNameNoCase = CString(subName).MakeLower();
+	CString videoNameNoCase = CString(videoName).MakeLower();
+
+	CString name, lang;
+	bool bHearingImpaired = false;
+	// Check if the subtitle filename starts with the video filename
+	// so that we can try to find a language info right after it
+	if (subNameNoCase.Find(videoNameNoCase) == 0) {
+		int iVideoNameEnd = videoName.GetLength();
+		// Get ride of the video extension if it's in the subtitle filename
+		if (subNameNoCase.Find(videoExt, iVideoNameEnd) == iVideoNameEnd + 1) {
+			iVideoNameEnd += 1 + videoExt.GetLength();
+		}
+		subName = subName.Mid(iVideoNameEnd);
+
+		CAtlRegExp<CAtlRECharTraits> re;
+		CAtlREMatchContext<CAtlRECharTraits> mc;
+		if (REPARSE_ERROR_OK == re.Parse(_T("^[.\\-_ ]+{[^.\\-_ ]+}([.\\-_ ]+{[^.\\-_ ]+})?"), FALSE) && re.Match(subName, &mc)) {
+			LPCTSTR s, e;
+			mc.GetMatch(0, &s, &e);
+			lang = ISO639XToLanguage(CStringA(s, int(e - s)), true);
+			if (!lang.IsEmpty()) {
+				mc.GetMatch(1, &s, &e);
+				bHearingImpaired = (CString(s, int(e - s)).CompareNoCase(_T("hi")) == 0);
+			}
+		}
+	}
+
+	// If we couldn't find any info yet, we try to find the language at the end of the filename
+	if (lang.IsEmpty()) {
+		CAtlRegExp<CAtlRECharTraits> re;
+		CAtlREMatchContext<CAtlRECharTraits> mc;
+		if (REPARSE_ERROR_OK == re.Parse(_T(".*?[.\\-_ ]+{[^.\\-_ ]+}([.\\-_ ]+{[^.\\-_ ]+})?$"), FALSE) && re.Match(subName, &mc)) {
+			LPCTSTR s, e;
+			mc.GetMatch(0, &s, &e);
+			lang = ISO639XToLanguage(CStringA(s, int(e - s)), true);
+
+			mc.GetMatch(1, &s, &e);
+			CStringA str(s, int(e - s));
+
+			if (!lang.IsEmpty() && str.CompareNoCase("hi") == 0) {
+				bHearingImpaired = true;
+			} else {
+				lang = ISO639XToLanguage(str, true);
+			}
+		}
+	}
+
+	name = fn.Mid(fn.ReverseFind('\\') + 1);
+	if (name.GetLength() > 100) { // Cut some part of the filename if it's too long
+		name.Format(_T("%s...%s"), name.Left(50).TrimRight(_T(".-_ ")), name.Right(50).TrimLeft(_T(".-_ ")));
+	}
+	if (!lang.IsEmpty()) {
+		name.AppendFormat(_T(" [%s]"), lang);
+		if (bHearingImpaired) {
+			name.Append(_T(" [hearing impaired]"));
 		}
 	}
 
