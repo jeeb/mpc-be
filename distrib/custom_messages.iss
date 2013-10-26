@@ -749,36 +749,36 @@ nl.langid=00001043
 nl.langcode=nl
 nl.comp_mpciconlib=Iconen voor mediabestanden
 nl.comp_mpcresources=Localisaties
-nl.comp_mpcbeshellext=Install the shell extension
-nl.msg_DeleteSettings=Wil je ook de instellingen vab MPC-BE verwijderen?%n%nAls je MPC-BE opnieuw gaat installeren is dit niet nodig.
-nl.msg_NoD3DX9DLL_found=De nieuwste DirectX runtime is niet geinstalleerd!%n%nGraag de nieuwste DirectX runtime ({#DIRECTX_SDK_DATE}) downloaden en installeren ongeacht je windows versie.
+nl.comp_mpcbeshellext=Shellextensie installeren
+nl.msg_DeleteSettings=Wilt u ook de instellingen van MPC-BE verwijderen?%n%nAls u MPC-BE opnieuw gaat installeren is dit niet nodig.
+nl.msg_NoD3DX9DLL_found=De nieuwste DirectX-runtime is niet geinstalleerd!%n%nGraag de nieuwste DirectX-runtime ({#DIRECTX_SDK_DATE}) downloaden en installeren ongeacht uw Windowsversie.
 nl.msg_SetupIsRunningWarning=MPC-BE installatie is al gestart!
 #if defined(sse_required)
-nl.msg_simd_sse=Deze versie van MPC-BE heeft een processor nodig die SSE ondersteunt.%n%nJouw processor ondersteund dit niet.
+nl.msg_simd_sse=Deze versie van MPC-BE heeft een processor nodig die SSE ondersteunt.%n%nUw processor ondersteunt dit niet.
 #elif defined(sse2_required)
-nl.msg_simd_sse2=Deze versie van MPC-BE heeft een processor nodig die SSE2 ondersteunt.%n%nJouw processor ondersteund dit niet.
+nl.msg_simd_sse2=Deze versie van MPC-BE heeft een processor nodig die SSE2 ondersteunt.%n%nUw processor ondersteunt dit niet.
 #endif
 nl.tsk_AllUsers=Voor alle gebruikers
 nl.tsk_CurrentUser=Alleen voor de huidige gebruiker
 nl.tsk_Other=Andere taken:
 nl.tsk_ResetSettings=Instellingen resetten
-nl.types_DefaultInstallation=Standaard installatie
+nl.types_DefaultInstallation=Standaardinstallatie
 nl.types_CustomInstallation=Aangepaste installatie
 nl.ViewChangelog=Bekijk Wijzigingsoverzicht
-nl.AssociationFormatsAV=Bestandsassociaties met video en audio bestanden aanpassen:
-nl.AssociationFormats=Associatie met video en audio bestanden
-nl.AssociationVideo=Associatie met video bestanden
-nl.AssociationAudio=Associatie met audio bestanden
+nl.AssociationFormatsAV=Bestandsassociaties met video- en audiobestanden aanpassen:
+nl.AssociationFormats=Associatie met video- en audiobestanden
+nl.AssociationVideo=Associatie met videobestanden
+nl.AssociationAudio=Associatie met audiobestanden
 nl.AssociationPlaylist=Associatie met afspeellijsten
 nl.AutoPlayType=Automatisch afspelen:
-nl.AssociationMPCPlayCDAudioOnArrivalF=Audio CD Afspelen
-nl.AssociationMPCPlayCDAudioS=Audio CD
-nl.AssociationMPCPlayDVDMovieArrivalF=DVD Film Afspelen
-nl.AssociationMPCPlayDVDMovieS=DVD Film
-nl.AssociationMPCPlayMusicFilesF=Muziek Afspelen
-nl.AssociationMPCPlayMusicFilesS=Muziek Bestanden
-nl.AssociationMPCPlayVideoFilesF=Video Afspelen
-nl.AssociationMPCPlayVideoFilesS=Video Bestanden
+nl.AssociationMPCPlayCDAudioOnArrivalF=Audio-CD afspelen
+nl.AssociationMPCPlayCDAudioS=Audio-CD
+nl.AssociationMPCPlayDVDMovieArrivalF=DVD-film afspelen
+nl.AssociationMPCPlayDVDMovieS=DVD-film
+nl.AssociationMPCPlayMusicFilesF=Muziek afspelen
+nl.AssociationMPCPlayMusicFilesS=Muziekbestanden
+nl.AssociationMPCPlayVideoFilesF=Video afspelen
+nl.AssociationMPCPlayVideoFilesS=Videobestanden
 nl.PinToTaskBar=Aan de taakbalk vastmaken
 
 
