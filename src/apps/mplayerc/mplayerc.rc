@@ -3000,7 +3000,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_VDF_THREADNUMBER         "Number of threads used for decoding"
+    IDS_VDF_THREADNUMBER         "Number of decoding threads"
     IDS_VDF_SKIPDEBLOCK          "H264 skip deblocking mode"
     IDS_VDF_DBLK_NONE            "None"
     IDS_VDF_DBLK_DEFAULT         "Default"
