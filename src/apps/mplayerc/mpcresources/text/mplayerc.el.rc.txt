@@ -1987,7 +1987,7 @@ STRING IDS_VDF_DXVA_SKIP_LEVELCHECK		"Παράβλεψη ελέγχου επιπ
 STRING IDS_VDF_DXVA_SKIP_REFCHECK		"Παράβλεψη ελέγχου αναφ. καρέ"
 STRING IDS_VDF_SETTINGS		"Video settings"
 STRING IDS_VDF_SKIPDEBLOCK		"H264 παράβλεψη αποτμηματοποίησης"
-STRING IDS_VDF_THREADNUMBER		"Number of decoding threads"
+STRING IDS_VDF_THREADNUMBER		"Αριθμός νημάτων αποκωδικοποίησης"
 STRING IDS_VDF_VIDEOCARD		"Κάρτα γραφικών"
 STRING IDS_VIDEO_STREAM		"Βίντεο: %s"
 STRING IDS_VIEW_BORDERLESS		"Απόκρυψη περιθωρίων\tCtrl+0"
