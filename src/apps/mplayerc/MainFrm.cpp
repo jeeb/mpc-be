@@ -88,6 +88,8 @@
 #define DEFCLIENTH		200
 #define MENUBARBREAK	30
 
+#define BLU_RAY			L"Blu-ray"
+
 static UINT s_uTaskbarRestart	= RegisterWindowMessage(_T("TaskbarCreated"));
 static UINT s_uTBBC				= RegisterWindowMessage(_T("TaskbarButtonCreated"));
 static UINT WM_NOTIFYICON		= RegisterWindowMessage(_T("MYWM_NOTIFYICON"));
@@ -8371,7 +8373,7 @@ void CMainFrame::OnPlayPlay()
 					if (i > 0) {
 						strOSD.Delete(i, strOSD.GetLength()-i);
 					}
-					strOSD += L" Blu-ray";
+					strOSD.AppendFormat(L" %s", BLU_RAY);
 					if (m_BDLabel.GetLength() > 0) {
 						strOSD.AppendFormat(L" \"%s\"", m_BDLabel);
 					} else {
@@ -10624,13 +10626,15 @@ void CMainFrame::OnFavoritesAdd()
 		CAtlList<CString> descList;
 		descList.AddTail(desc);
 
-		CString fn2 = L"Blu-ray";
-		if (m_BDLabel.GetLength() > 0) {
-			fn2.AppendFormat(L" \"%s\"", m_BDLabel);
-		} else {
-			MakeBDLabel(fn, fn2);
+		if (m_LastOpenBDPath.GetLength() > 0) {
+			CString fn2 = BLU_RAY;
+			if (m_BDLabel.GetLength() > 0) {
+				fn2.AppendFormat(L" \"%s\"", m_BDLabel);
+			} else {
+				MakeBDLabel(fn, fn2);
+			}
+			descList.AddHead(fn2);
 		}
-		descList.AddHead(fn2);
 
 		CFavoriteAddDlg dlg(descList, fn);
 		if (dlg.DoModal() != IDOK) {
@@ -10658,11 +10662,15 @@ void CMainFrame::OnFavoritesAdd()
 		str += relativeDrive;
 
 		// Paths
-		CPlaylistItem pli;
-		if (m_wndPlaylistBar.GetCur(pli)) {
-			POSITION pos = pli.m_fns.GetHeadPosition();
-			while (pos) {
-				str += _T(";") + pli.m_fns.GetNext(pos);
+		if (m_LastOpenBDPath.GetLength() > 0) {
+			str += _T(";") + m_LastOpenBDPath;
+		} else {
+			CPlaylistItem pli;
+			if (m_wndPlaylistBar.GetCur(pli)) {
+				POSITION pos = pli.m_fns.GetHeadPosition();
+				while (pos) {
+					str += _T(";") + pli.m_fns.GetNext(pos);
+				}
 			}
 		}
 
@@ -10733,13 +10741,24 @@ void CMainFrame::OnFavoritesQuickAddFavorite()
 	CString osdMsg;
 
 	if (GetPlaybackMode() == PM_FILE) {
-		CString fn =  GetCurFileName();
+		CString fn = GetCurFileName();
 
-		CString desc = L"Blu-ray";
-		if (m_BDLabel.GetLength() > 0) {
-			desc.AppendFormat(L" \"%s\"", m_BDLabel);
+		CString desc = fn;
+		if (m_LastOpenBDPath.GetLength() > 0) {
+			desc = BLU_RAY;
+			if (m_BDLabel.GetLength() > 0) {
+				desc.AppendFormat(L" \"%s\"", m_BDLabel);
+			} else {
+				MakeBDLabel(fn, desc);
+			}
 		} else {
-			MakeBDLabel(fn, desc);
+			desc.Replace('\\', '/');
+			int i = desc.Find(_T("://")), j = desc.Find(_T("?")), k = desc.ReverseFind('/');
+			if (i >= 0) {
+				desc = j >= 0 ? desc.Left(j) : desc;
+			} else if (k >= 0) {
+				desc = desc.Mid(k+1);
+			}
 		}
 
 		CString fn_with_pos(desc);
@@ -10768,11 +10787,15 @@ void CMainFrame::OnFavoritesQuickAddFavorite()
 		str += relativeDrive;
 
 		// Paths
-		CPlaylistItem pli;
-		if (m_wndPlaylistBar.GetCur(pli)) {
-			POSITION pos = pli.m_fns.GetHeadPosition();
-			while (pos) {
-				str += _T(";") + pli.m_fns.GetNext(pos);
+		if (m_LastOpenBDPath.GetLength() > 0) {
+			str += _T(";") + m_LastOpenBDPath;
+		} else {
+			CPlaylistItem pli;
+			if (m_wndPlaylistBar.GetCur(pli)) {
+				POSITION pos = pli.m_fns.GetHeadPosition();
+				while (pos) {
+					str += _T(";") + pli.m_fns.GetNext(pos);
+				}
 			}
 		}
 
@@ -10950,7 +10973,7 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 		}
 	}
 
-	if (desc.Find(L"Blu-ray  \"") == 0 && OpenBD(fns.GetHead())) {
+	if (desc.Find(CString(BLU_RAY) + L" \"") == 0 && OpenBD(fns.GetHead(), rtStart)) {
 		return;
 	}
 
@@ -13723,7 +13746,7 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 	if (!fn.IsEmpty()) {
 		if (GetPlaybackMode() == PM_FILE) {
 			if (m_LastOpenBDPath.GetLength() > 0) {
-				CString fn2 = L"Blu-ray";
+				CString fn2 = BLU_RAY;
 				if (m_BDLabel.GetLength() > 0) {
 					fn2.AppendFormat(L" \"%s\"", m_BDLabel);
 				} else {
@@ -15243,7 +15266,7 @@ void CMainFrame::SetupOpenCDSubMenu()
 					DiskType = L"DVD Video";
 					break;
 				case CDROM_BDVideo:
-					DiskType = L"Blu-ray Disc";
+					DiskType = CString(BLU_RAY) + L" Disc";
 					break;
 				default:
 					ASSERT(FALSE);
@@ -16625,7 +16648,7 @@ void CMainFrame::SetupRecentFilesSubMenu()
 				} else {
 					tmp = path + L"\\BDMV\\index.bdmv";
 					if (::PathFileExists(tmp)) {
-						path = L"Blu-ray - " + path;
+						path.Format(L"%s - %s", BLU_RAY, path);
 					}
 				}
 			}
