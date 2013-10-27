@@ -815,6 +815,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						break;
 					}
 					case FLV_VIDEO_HM62: { // HEVC HM6.2
+						// Source code is provided by Deng James from Strongene Ltd.
 						// check is avc header
 						if(dataSize < 4 || m_pFile->BitRead(8) != 0) {
 							fTypeFlagsVideo = true;
@@ -866,10 +867,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						// Fill media type
 						CSize aspect(nWidth, nHeight);
-						int lnko = LNKO(aspect.cx, aspect.cy);
-						if(lnko > 1) {
-							aspect.cx /= lnko, aspect.cy /= lnko;
-						}
+						ReduceDim(aspect);
 
 						vih->hdr.dwPictAspectRatioX = aspect.cx;
 						vih->hdr.dwPictAspectRatioY = aspect.cy;
@@ -886,7 +884,6 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					case FLV_VIDEO_HM91:   // HEVC HM9.1
 					case FLV_VIDEO_HM10:   // HEVC HM10.0
 					case FLV_VIDEO_HEVC: { // HEVC HM11.0 & HM12.0 ...
-						// Source code is provided by Deng James from Strongene Ltd.
 						if (dataSize < 4 || m_pFile->BitRead(8) != 0) { // packet type 0 == avc header
 							fTypeFlagsVideo = true;
 							break;
