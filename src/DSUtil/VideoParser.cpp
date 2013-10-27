@@ -516,8 +516,8 @@ bool ParseSequenceParameterSet(BYTE* data, int size, vc_params_t& params)
 		bs.GetWord(1);	// general_frame_only_constraint_flag
 		bs.GetWord(44);	// general_reserved_zero_44bits
 		bs.GetWord(8);	// general_level_idc
-		uint8* sub_layer_profile_present_flag	= new uint8[sps_max_sub_layers_minus1];
-		uint8* sub_layer_level_present_flag		= new uint8[sps_max_sub_layers_minus1];
+		uint8 sub_layer_profile_present_flag[6] = {0};
+		uint8 sub_layer_level_present_flag[6]   = {0};
 		for (int i = 0; i < sps_max_sub_layers_minus1; i++) {
 			sub_layer_profile_present_flag[i]	= bs.GetWord(1);
 			sub_layer_level_present_flag[i]		= bs.GetWord(1);
@@ -543,8 +543,6 @@ bool ParseSequenceParameterSet(BYTE* data, int size, vc_params_t& params)
 				bs.GetWord(8);	// sub_layer_level_idc[i]
 			}
 		}
-		delete[] sub_layer_profile_present_flag;
-		delete[] sub_layer_level_present_flag;
 	}
 	uint32 sps_seq_parameter_set_id	= bs.GetUE(); // "The  value  of sps_seq_parameter_set_id shall be in the range of 0 to 15, inclusive."
 	if (sps_seq_parameter_set_id > 15) {
@@ -640,28 +638,25 @@ bool ParseSequenceParameterSetFLV(BYTE* data, int size, vc_params_t& params, int
 			}
 			if (sps_max_sub_layers_minus1 > 0) {
 				for (i = sps_max_sub_layers_minus1; i < 8; i++) {
-					bs.GetWord(2); //(2, uiCode, "reserved_zero_2bits")
+					bs.GetWord(2);	//( 2, uiCode, "reserved_zero_2bits")
 				}
 			}
 			for (i = 0; i < sps_max_sub_layers_minus1; i++) {
 				if (1 && subLayerProfilePresentFlag[i]) {
-					bs.GetWord(2); //( 2 , uiCode, "XXX_profile_space[]");
-					bs.GetWord(1); //( uiCode, "XXX_tier_flag[]"    );
-					bs.GetWord(5); //( 5 , uiCode, "XXX_profile_idc[]"  );
-
-					for (j = 0; j < 32; j++) {
-						bs.GetWord(1); //(  uiCode, "XXX_profile_compatibility_flag[][j]");
-					}
-					bs.GetWord(1);  //(uiCode, "general_progressive_source_flag");
-					bs.GetWord(1);  //(uiCode, "general_interlaced_source_flag");
-					bs.GetWord(1);  //(uiCode, "general_non_packed_constraint_flag");
-					bs.GetWord(1);  //(uiCode, "general_frame_only_constraint_flag");
-					bs.GetWord(16); //(16, uiCode, "XXX_reserved_zero_44bits[0..15]");
-					bs.GetWord(16); //(16, uiCode, "XXX_reserved_zero_44bits[16..31]");
-					bs.GetWord(12); //(12, uiCode, "XXX_reserved_zero_44bits[32..43]");
+					bs.GetWord(2);	//( 2, uiCode, "XXX_profile_space[]");
+					bs.GetWord(1);	//(    uiCode, "XXX_tier_flag[]"    );
+					bs.GetWord(5);	//( 5, uiCode, "XXX_profile_idc[]"  );
+					bs.GetWord(32);	//(    uiCode, "XXX_profile_compatibility_flag[][32]");
+					bs.GetWord(1);	//(    uiCode, "general_progressive_source_flag");
+					bs.GetWord(1);	//(    uiCode, "general_interlaced_source_flag");
+					bs.GetWord(1);	//(    uiCode, "general_non_packed_constraint_flag");
+					bs.GetWord(1);	//(    uiCode, "general_frame_only_constraint_flag");
+					bs.GetWord(16);	//(16, uiCode, "XXX_reserved_zero_44bits[0..15]");
+					bs.GetWord(16);	//(16, uiCode, "XXX_reserved_zero_44bits[16..31]");
+					bs.GetWord(12);	//(12, uiCode, "XXX_reserved_zero_44bits[32..43]");
 				}
 				if (subLayerLevelPresentFlag[i]) {
-					bs.GetWord(8);  //( 8, uiCode, "sub_layer_level_idc[i]" );
+					bs.GetWord(8);	//( 8, uiCode, "sub_layer_level_idc[i]" );
 				}
 			}
 		}
