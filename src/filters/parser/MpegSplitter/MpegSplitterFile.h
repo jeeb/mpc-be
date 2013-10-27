@@ -158,6 +158,7 @@ public:
 		return m_ClipInfo.IsHdmv();
 	};
 
+	// program map table - mpeg-ts
 	struct program {
 		WORD program_number;
 		struct stream {
@@ -174,13 +175,16 @@ public:
 			memset(this, 0, sizeof(*this));
 		}
 	};
-
 	CAtlMap<WORD, program> m_programs;
 
 	void SearchPrograms(__int64 start, __int64 stop);
 	void UpdatePrograms(const trhdr& h, bool UpdateLang = true);
 	void UpdatePrograms(CGolombBuffer gb, WORD pid, bool UpdateLang = true);
 	const program* FindProgram(WORD pid, int &iStream, const CHdmvClipInfo::Stream * &_pClipInfo);
+
+	// program stream map - mpeg-ps
+	PES_STREAM_TYPE m_psm[256];
+	void UpdatePSM();
 
 	CAtlMap<DWORD, CStringA> m_pPMT_Lang;
 
