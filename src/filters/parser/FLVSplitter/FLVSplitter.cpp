@@ -899,29 +899,31 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						m_pFile->ByteRead(headerData, headerSize);
 
-						hevc_hdr h;
-						h.fourcc = MAKEFOURCC('H','E','V','C');
+						DWORD fourcc = MAKEFOURCC('H','E','V','C');
 						switch (vt.CodecID) {
 							case FLV_VIDEO_HM91:
-								h.fourcc = MAKEFOURCC('H','M','9','1');
+								fourcc = MAKEFOURCC('H','M','9','1');
+								metaHM_compatibility = 91;
 								break;
 							case FLV_VIDEO_HM10:
-								h.fourcc = MAKEFOURCC('H','M','1','0');
+								fourcc = MAKEFOURCC('H','M','1','0');
+								metaHM_compatibility = 100;
 								break;
 							case FLV_VIDEO_HEVC:
 								if (metaHM_compatibility >= 90 && metaHM_compatibility < 100) {
-									h.fourcc = MAKEFOURCC('H','M','9','1');
+									fourcc = MAKEFOURCC('H','M','9','1');
 								} else if (metaHM_compatibility >= 100 && metaHM_compatibility < 110) {
-									h.fourcc = MAKEFOURCC('H','M','1','0');
+									fourcc = MAKEFOURCC('H','M','1','0');
 								} else if (metaHM_compatibility >= 110 && metaHM_compatibility < 120) {
-									h.fourcc = MAKEFOURCC('H','M','1','1');
+									fourcc = MAKEFOURCC('H','M','1','1');
 								} else if (metaHM_compatibility >= 120 && metaHM_compatibility < 130) {
-									h.fourcc = MAKEFOURCC('H','M','1','2');
+									fourcc = MAKEFOURCC('H','M','1','2');
 								}
 								break;
 						}
 
-						if (!ParseHEVCHeader(headerData, headerSize, h)) {
+						vc_params_t params;
+						if (!ParseAVCDecoderConfigurationRecord(headerData, headerSize, params, metaHM_compatibility)) {
 							return E_FAIL;
 						}
 
@@ -932,18 +934,21 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						vih->hdr.bmiHeader.biSize     = sizeof(vih->hdr.bmiHeader);
 						vih->hdr.bmiHeader.biPlanes   = 1;
 						vih->hdr.bmiHeader.biBitCount = 24;
-						vih->dwFlags   = h.nal_length_size;
-						vih->dwProfile = h.profile;
-						vih->dwLevel   = h.level;
-						vih->hdr.dwPictAspectRatioX = h.sar.cx;
-						vih->hdr.dwPictAspectRatioY = h.sar.cy;
-						vih->hdr.bmiHeader.biWidth  = h.width;
-						vih->hdr.bmiHeader.biHeight = h.height;
+						vih->dwFlags   = params.nal_length_size;
+						vih->dwProfile = params.profile;
+						vih->dwLevel   = params.level;
+						vih->hdr.bmiHeader.biWidth  = params.width;
+						vih->hdr.bmiHeader.biHeight = params.height;
+
+						CSize aspect(params.width, params.height);
+						ReduceDim(aspect);
+						vih->hdr.dwPictAspectRatioX = aspect.cx;
+						vih->hdr.dwPictAspectRatioY = aspect.cy;
 
 						CreateSequenceHeaderAVC(headerData, headerSize, vih->dwSequenceHeader, vih->cbSequenceHeader);
 						delete[] headerData;
 
-						mt.subtype = FOURCCMap(vih->hdr.bmiHeader.biCompression = h.fourcc);
+						mt.subtype = FOURCCMap(vih->hdr.bmiHeader.biCompression = fourcc);
 
 						name += L" HEVC";
 						if (vt.CodecID == FLV_VIDEO_HM91) {

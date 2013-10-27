@@ -55,19 +55,10 @@ struct avc_hdr
 	AV_Rational sar;
 };
 
-struct hevc_hdr
-{
-	DWORD fourcc;
-	unsigned int width, height;
-
-	DWORD nal_length_size;
-	DWORD profile, level;
-
-	SIZE sar;
-};
-
 bool ParseDiracHeader(CGolombBuffer gb, unsigned* width, unsigned* height, REFERENCE_TIME* AvgTimePerFrame);
 bool ParseAVCHeader(CGolombBuffer gb, avc_hdr& h, bool fullscan = false);
+
+////
 
 enum nal_unit_type_e {
 	NAL_UNIT_VPS = 32,
@@ -75,11 +66,8 @@ enum nal_unit_type_e {
 	NAL_UNIT_PPS = 34,
 };
 
-bool ParseHEVCHeader(BYTE* headerData, int headerSize, hevc_hdr& h);
 void CreateSequenceHeaderAVC(BYTE* data, int size, DWORD* dwSequenceHeader, DWORD& cbSequenceHeader);
 void CreateSequenceHeaderHEVC(BYTE* data, int size, DWORD* dwSequenceHeader, DWORD& cbSequenceHeader);
-
-////
 
 struct vc_params_t {
 	LONG width, height;
@@ -93,4 +81,6 @@ struct vc_params_t {
 };
 
 bool ParseSequenceParameterSet(BYTE* data, int size, vc_params_t& params);
+
+bool ParseAVCDecoderConfigurationRecord(BYTE* data, int size, vc_params_t& params, int FLV_HM = 0);
 bool ParseHEVCDecoderConfigurationRecord(BYTE* data, int size, vc_params_t& params, bool parseSPS);
