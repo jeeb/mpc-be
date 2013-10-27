@@ -489,10 +489,6 @@ _again:
 	h.original = BitRead(1);
 	h.emphasis = BitRead(2);
 
-	if (h.channels == 0) {
-		AGAIN
-	}
-
 	if (h.version == 1 || h.layer == 0 || h.freq == 3 || h.bitrate == 15 || h.emphasis == 2) {
 		AGAIN
 	}

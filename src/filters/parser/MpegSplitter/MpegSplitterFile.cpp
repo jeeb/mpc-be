@@ -681,16 +681,30 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 
 		// AC3
 		if (type == unknown) {
+			static CMpegSplitterFile::ac3hdr h2 = {0};
+			static BYTE bIsAC3Valid = 0;
+
 			Seek(start);
 			CMpegSplitterFile::ac3hdr h;
-			if (!m_streams[audio].Find(s) && Read(h, len, &s.mt)) {
-				PES_STREAM_TYPE stream_type = INVALID;
-				if (GetStreamType(s.pid, stream_type)) {
-					if (IsAC3Audio(stream_type)) {
-						type = audio;
+			if (!m_streams[audio].Find(s)) {
+				if (Read(h, len, &s.mt)) {
+					if (bIsAC3Valid == 3) {
+						PES_STREAM_TYPE stream_type = INVALID;
+						if (GetStreamType(s.pid, stream_type)) {
+							if (IsAC3Audio(stream_type)) {
+								type = audio;
+							}
+						} else {
+							type = audio;
+						}
+					} else {
+						if (h2 == h) {
+							bIsAC3Valid++;
+						} else {
+							bIsAC3Valid = 0;
+						}
+						memcpy(&h2, &h, sizeof(h));
 					}
-				} else {
-					type = audio;
 				}
 			}
 		}

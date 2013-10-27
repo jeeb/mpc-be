@@ -199,6 +199,14 @@ public:
 		BYTE sr_code;
 		BYTE num_blocks;
 		// the rest is unimportant for us
+
+		bool operator == (const struct ac3hdr& h) const {
+			return (frame_size == h.frame_size
+					&& fscod == h.fscod
+					&& frmsizecod == h.frmsizecod
+					&& acmod == h.acmod
+					&& lfeon == h.lfeon);
+		}
 	};
 
 	struct dtshdr
