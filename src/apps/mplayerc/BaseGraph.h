@@ -54,6 +54,13 @@ public IUnknown {
 };
 
 // private use only
+interface __declspec(uuid("F3698B5C-2561-46DB-813E-52D3853A2B5F"))
+IGraphBuilderSub :
+public IUnknown {
+	STDMETHOD(RenderSubFile) (LPCWSTR lpcwstrFileName) = 0;
+};
+
+// private use only
 interface __declspec(uuid("43CDA93D-6A4E-4A07-BD3E-49D161073EE7"))
 IBDATuner :
 public IUnknown {

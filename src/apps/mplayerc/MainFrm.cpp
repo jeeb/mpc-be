@@ -14249,15 +14249,9 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			}
 		}
 
-		m_pSubStreams.RemoveAll();
-
+		pos = m_pSubStreams.GetHeadPosition();
 		while (!subs.IsEmpty()) {
-			m_pSubStreams.AddTail(subs.RemoveHead());
-		}
-
-		pos = pOMD->subs.GetHeadPosition();
-		while (pos) {
-			LoadSubtitle(pOMD->subs.GetNext(pos));
+			m_pSubStreams.InsertBefore(pos, subs.RemoveHead());
 		}
 
 		if (!s.fUseInternalSelectTrackLogic) {
@@ -16880,19 +16874,17 @@ void CMainFrame::SetAlwaysOnTop(int i)
 
 ISubStream *InsertSubStream(CInterfaceList<ISubStream> *subStreams, const CComPtr<ISubStream> &theSubStream)
 {
-	POSITION pos = subStreams->GetHeadPosition();
-	POSITION newPos = NULL;
-	newPos = subStreams->AddTail(theSubStream);
-
-	return subStreams->GetAt(newPos);
+	return subStreams->GetAt(subStreams->AddTail(theSubStream));
 }
 
 void CMainFrame::AddTextPassThruFilter()
 {
 	BeginEnumFilters(m_pGB, pEF, pBF) {
+		/*
 		if (!IsSplitter(pBF)) {
 			continue;
 		}
+		*/
 
 		BeginEnumPins(pBF, pEP, pPin) {
 			CComPtr<IPin> pPinTo;
@@ -17021,6 +17013,29 @@ bool CMainFrame::LoadSubtitle(CString fn, ISubStream **actualStream)
 {
 	CComPtr<ISubStream> pSubStream;
 
+	if (GetFileExt(fn).MakeLower() == L".mks") {
+		if (CComQIPtr<IGraphBuilderSub> pGBS = m_pGB) {
+			HRESULT hr = pGBS->RenderSubFile(fn);
+			if (SUCCEEDED(hr)) {
+				size_t c = m_pSubStreams.GetCount();
+				AddTextPassThruFilter();
+
+				if (m_pSubStreams.GetCount() > c) {
+					ISubStream *r = m_pSubStreams.GetTail();
+					if (actualStream != NULL) {
+						*actualStream = r;
+
+						AfxGetAppSettings().fEnableSubtitles = true;
+					}
+
+					return true;
+				}
+			
+				return false;
+			}
+		}
+	}
+
 	// TMP: maybe this will catch something for those who get a runtime error dialog when opening subtitles from cds
 	try {
 		if (!pSubStream) {
@@ -17052,7 +17067,6 @@ bool CMainFrame::LoadSubtitle(CString fn, ISubStream **actualStream)
 	}
 
 	if (pSubStream) {
-		//m_pSubStreams.AddTail(pSubStream);
 		ISubStream *r = InsertSubStream(&m_pSubStreams, pSubStream);
 		if (actualStream != NULL) {
 			*actualStream = r;

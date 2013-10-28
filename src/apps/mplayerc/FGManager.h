@@ -31,6 +31,7 @@ class CFGManager
 	: public CUnknown
 	, public IGraphBuilder2
 	, public IGraphBuilderDeadEnd
+	, public IGraphBuilderSub
 	, public CCritSec
 {
 public:
@@ -113,6 +114,10 @@ protected:
 
 	STDMETHODIMP_(size_t) GetCount();
 	STDMETHODIMP GetDeadEnd(int iIndex, CAtlList<CStringW>& path, CAtlList<CMediaType>& mts);
+
+	// IGraphBuilderSub
+	STDMETHODIMP RenderSubFile(LPCWSTR lpcwstrFile);
+	BOOL bOnlySub;
 
 	//
 	HWND m_hWnd;

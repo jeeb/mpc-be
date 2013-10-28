@@ -336,7 +336,8 @@ extern BOOL GetTemporaryFilePath(CString strExtension, CString& strFileName);
 static const TCHAR* subext[] = {
 	L"srt", L"sub", L"smi", L"psb",
 	L"ssa", L"ass", L"idx", L"usf",
-	L"xss", L"txt", L"rt",  L"sup"
+	L"xss", L"txt", L"rt",  L"sup",
+	L"mks"
 };
 
 extern void CorrectWaveFormatEx(CMediaType *pmt);

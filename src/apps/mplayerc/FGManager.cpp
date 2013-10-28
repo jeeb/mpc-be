@@ -50,6 +50,7 @@ CFGManager::CFGManager(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview)
 	, m_dwRegister(0)
 	, m_hWnd(hWnd)
 	, m_IsPreview(IsPreview)
+	, bOnlySub(FALSE)
 {
 	m_pUnkInner.CoCreateInstance(CLSID_FilterGraph, GetOwner());
 	m_pFM.CoCreateInstance(CLSID_FilterMapper2);
@@ -81,6 +82,7 @@ STDMETHODIMP CFGManager::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 		QI(IFilterGraph2)
 		QI(IGraphBuilder2)
 		QI(IGraphBuilderDeadEnd)
+		QI(IGraphBuilderSub)
 		m_pUnkInner && (riid != IID_IUnknown && SUCCEEDED(m_pUnkInner->QueryInterface(riid, ppv))) ? S_OK :
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
@@ -701,6 +703,15 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 
 	}
 	EndEnumMediaTypes(pmt)
+
+	if (bOnlySub) {
+		BeginEnumMediaTypes(pPinOut, pEM, pmt) {
+			if (!CMediaTypeEx(*pmt).ValidateSubtitle()) {
+				return S_FALSE;
+			}
+		}
+		EndEnumMediaTypes(pmt)
+	}
 
 	bool fDeadEnd = true;
 
@@ -1734,6 +1745,35 @@ STDMETHODIMP CFGManager::GetDeadEnd(int iIndex, CAtlList<CStringW>& path, CAtlLi
 	return S_OK;
 }
 
+// IGraphBuilderSub
+
+STDMETHODIMP CFGManager::RenderSubFile(LPCWSTR lpcwstrFileName)
+{
+	DbgLog((LOG_TRACE, 3, L"--> CFGManager::RenderSubFile(%s) on thread: %d", lpcwstrFileName, GetCurrentThreadId()));
+	CAutoLock cAutoLock(this);
+
+	HRESULT hr = VFW_E_CANNOT_RENDER;
+	CAutoPtrArray<CStreamDeadEnd> deadends;
+
+	bOnlySub = TRUE;
+
+	// support only .mks - use internal MatroskaSource
+	CFGFilter* pFG = DNew CFGFilterInternal<CMatroskaSourceFilter>();
+
+	CComPtr<IBaseFilter> pBF;
+	if (SUCCEEDED(hr = AddSourceFilter(pFG, lpcwstrFileName, pFG->GetName(), &pBF))) {
+		m_streampath.RemoveAll();
+		m_deadends.RemoveAll();
+
+		hr = ConnectFilter(pBF, NULL);
+	}
+	bOnlySub = FALSE;
+
+	delete pFG;
+
+	return hr;
+}
+
 //
 // 	CFGManagerCustom
 //
@@ -1746,10 +1786,10 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	bool		bOverrideBroadcom = false;
 	CFGFilter*	pFGF;
 
-	bool *src = s.SrcFilters;
-	bool *tra = s.TraFilters;
-	bool *dxva_filters = s.DXVAFilters;
-	bool *ffmpeg_filters = s.FFmpegFilters;
+	bool *src				= s.SrcFilters;
+	bool *tra				= s.TraFilters;
+	bool *dxva_filters		= s.DXVAFilters;
+	bool *ffmpeg_filters	= s.FFmpegFilters;
 
 	// Source filters
 
