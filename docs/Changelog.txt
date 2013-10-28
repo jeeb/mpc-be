@@ -19,7 +19,7 @@ Changes (*):
 	* libwebp 0.3.1 git-241d11f1;
 	* libpng 1.7.0 b21 git-fe6e6cf1;
 	* libopus 1.1 git-d6b56793;
-	* libvpx 1.2 git-47665452;
+	* libvpx 1.2 git-b133cbf5;
 	* ZenLib 0.4.29+ svn rev.447;
 
 Fixes (!):
