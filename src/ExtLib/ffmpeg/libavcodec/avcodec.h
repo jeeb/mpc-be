@@ -2474,14 +2474,21 @@ typedef struct AVCodecContext {
      * - decoding: Set by user.
      */
     int err_recognition;
-#define AV_EF_CRCCHECK  (1<<0)
-#define AV_EF_BITSTREAM (1<<1)
-#define AV_EF_BUFFER    (1<<2)
-#define AV_EF_EXPLODE   (1<<3)
 
-#define AV_EF_CAREFUL    (1<<16)
-#define AV_EF_COMPLIANT  (1<<17)
-#define AV_EF_AGGRESSIVE (1<<18)
+/**
+ * Verify checksums embedded in the bitstream (could be of either encoded or
+ * decoded data, depending on the codec) and print an error message on mismatch.
+ * If AV_EF_EXPLODE is also set, a mismatching checksum will result in the
+ * decoder returning an error.
+ */
+#define AV_EF_CRCCHECK  (1<<0)
+#define AV_EF_BITSTREAM (1<<1)          ///< detect bitstream specification deviations
+#define AV_EF_BUFFER    (1<<2)          ///< detect improper bitstream length
+#define AV_EF_EXPLODE   (1<<3)          ///< abort decoding on minor error detection
+
+#define AV_EF_CAREFUL    (1<<16)        ///< consider things that violate the spec, are fast to calculate and have not been seen in the wild as errors
+#define AV_EF_COMPLIANT  (1<<17)        ///< consider all spec non compliancies as errors
+#define AV_EF_AGGRESSIVE (1<<18)        ///< consider things that a sane encoder should not do as an error
 
 
     /**
@@ -3899,6 +3906,14 @@ int avcodec_decode_video2(AVCodecContext *avctx, AVFrame *picture,
  * simplicity, because the performance difference is expect to be negligible
  * and reusing a get_buffer written for video codecs would probably perform badly
  * due to a potentially very different allocation pattern.
+ *
+ * Some decoders (those marked with CODEC_CAP_DELAY) have a delay between input
+ * and output. This means that for some packets they will not immediately
+ * produce decoded output and need to be flushed at the end of decoding to get
+ * all the decoded data. Flushing is done by calling this function with packets
+ * with avpkt->data set to NULL and avpkt->size set to 0 until it stops
+ * returning subtitles. It is safe to flush even those decoders that are not
+ * marked with CODEC_CAP_DELAY, then no subtitles will be returned.
  *
  * @param avctx the codec context
  * @param[out] sub The AVSubtitle in which the decoded subtitle will be stored, must be
