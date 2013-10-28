@@ -27,8 +27,6 @@
 #define LowMeritSuffix L" (low merit)"
 #define LowMerit(x) (CStringW(x) + LowMeritSuffix)
 
-#define DBOXVersion 0
-
 class CFGManager
 	: public CUnknown
 	, public IGraphBuilder2

@@ -48,6 +48,9 @@ BOOL CAboutDlg::OnInitDialog()
 #endif
 
 	m_strVersionNumber = AfxGetMyApp()->m_strVersion;
+#if DBOXVersion
+	m_strVersionNumber.Append(_T(" (D-BOX)"));
+#endif
 
 #if defined(__INTEL_COMPILER)
 #if (__INTEL_COMPILER >= 1210)
