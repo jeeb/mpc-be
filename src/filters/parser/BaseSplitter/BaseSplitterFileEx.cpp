@@ -763,18 +763,18 @@ bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sy
 
 			int bitrate   = (int)(fsize * 8i64 * aframe.samplerate / aframe.samples); // inaccurate, because fsize is not constant
 
-			pmt->majortype = MEDIATYPE_Audio;
-			pmt->subtype = aframe.param2 ? MEDIASUBTYPE_DOLBY_TRUEHD : MEDIASUBTYPE_MLP;
-			pmt->formattype = FORMAT_WaveFormatEx;
+			pmt->majortype		= MEDIATYPE_Audio;
+			pmt->subtype		= aframe.param2 ? MEDIASUBTYPE_DOLBY_TRUEHD : MEDIASUBTYPE_MLP;
+			pmt->formattype		= FORMAT_WaveFormatEx;
 
-			WAVEFORMATEX* wfe = (WAVEFORMATEX*)pmt->AllocFormatBuffer(sizeof(WAVEFORMATEX));
+			WAVEFORMATEX* wfe	= (WAVEFORMATEX*)pmt->AllocFormatBuffer(sizeof(WAVEFORMATEX));
+			memset(wfe, 0, sizeof(WAVEFORMATEX));
 			wfe->wFormatTag      = WAVE_FORMAT_UNKNOWN;
 			wfe->nChannels       = aframe.channels;
 			wfe->nSamplesPerSec  = aframe.samplerate;
 			wfe->nAvgBytesPerSec = (bitrate + 4) /8;
 			wfe->nBlockAlign     = fsize < WORD_MAX ? fsize : WORD_MAX;
 			wfe->wBitsPerSample  = aframe.param1;
-			wfe->cbSize = 0;
 
 			pmt->SetSampleSize(0);
 
@@ -1170,18 +1170,18 @@ bool CBaseSplitterFileEx::Read(mlphdr& h, int len, CMediaType* pmt, bool find_sy
 		}
 
 		int bitrate   = (int)(fsize * 8i64 * aframe.samplerate / aframe.samples); // inaccurate, because fsize is not constant
-		pmt->majortype = MEDIATYPE_Audio;
-		pmt->subtype = MEDIASUBTYPE_MLP;
-		pmt->formattype = FORMAT_WaveFormatEx;
+		pmt->majortype			= MEDIATYPE_Audio;
+		pmt->subtype			= MEDIASUBTYPE_MLP;
+		pmt->formattype			= FORMAT_WaveFormatEx;
 
-		WAVEFORMATEX* wfe = (WAVEFORMATEX*)pmt->AllocFormatBuffer(sizeof(WAVEFORMATEX));
-		wfe->wFormatTag      = WAVE_FORMAT_UNKNOWN;
-		wfe->nChannels       = aframe.channels;
-		wfe->nSamplesPerSec  = aframe.samplerate;
-		wfe->nAvgBytesPerSec = (bitrate + 4) /8;
-		wfe->nBlockAlign     = fsize < WORD_MAX ? fsize : WORD_MAX;
-		wfe->wBitsPerSample  = aframe.param1;
-		wfe->cbSize = 0;
+		WAVEFORMATEX* wfe		= (WAVEFORMATEX*)pmt->AllocFormatBuffer(sizeof(WAVEFORMATEX));
+		memset(wfe, 0, sizeof(WAVEFORMATEX));
+		wfe->wFormatTag			= WAVE_FORMAT_UNKNOWN;
+		wfe->nChannels			= aframe.channels;
+		wfe->nSamplesPerSec		= aframe.samplerate;
+		wfe->nAvgBytesPerSec	= (bitrate + 4) /8;
+		wfe->nBlockAlign		= fsize < WORD_MAX ? fsize : WORD_MAX;
+		wfe->wBitsPerSample		= aframe.param1;
 
 		pmt->SetSampleSize(0);
 
