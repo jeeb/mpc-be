@@ -585,7 +585,7 @@ bool ParseSequenceParameterSetFLV(BYTE* data, int size, vc_params_t& params, int
 
 	// profile_tier_level( 1, sps_max_sub_layers_minus1 )
 	{
-		int i, j;
+		int i;
 
 		bs.GetWord(2); // XXX_profile_space[]
 		bs.GetWord(1); // XXX_tier_flag[]
