@@ -899,6 +899,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 			m_strTitle.Append(_T(" -rc"));
 			break;
 	}
+#if DBOXVersion
+	m_strTitle.Append(_T(" (D-BOX)"));
+#endif
 
 	SetWindowText(m_strTitle);
 	m_Lcd.SetMediaTitle(LPCTSTR(m_strTitle));

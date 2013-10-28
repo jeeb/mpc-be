@@ -39,8 +39,6 @@
 #include "MediaFormats.h"
 #include <IPinHook.h>
 
-#define DBOXVersion 0
-
 //
 // CFGManager
 //
