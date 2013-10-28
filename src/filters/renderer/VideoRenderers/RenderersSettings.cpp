@@ -33,9 +33,9 @@ void CRenderersSettings::CAdvRendererSettings::SetDefault()
 {
 	fVMR9AlterativeVSync              = 0;
 	iVMR9VSyncOffset                  = 0;
-	iVMR9VSyncAccurate                = 1;
+	iVMR9VSyncAccurate                = 0;
 	iVMR9FullscreenGUISupport         = 0;
-	iVMR9VSync                        = 1;
+	iVMR9VSync                        = 0;
 	iVMR9FullFloatingPointProcessing  = 0;
 	iVMR9HalfFloatingPointProcessing  = 0;
 	iVMR9ColorManagementEnable        = 0;
@@ -43,8 +43,8 @@ void CRenderersSettings::CAdvRendererSettings::SetDefault()
 	iVMR9ColorManagementAmbientLight  = AMBIENT_LIGHT_BRIGHT;
 	iVMR9ColorManagementIntent        = COLOR_RENDERING_INTENT_PERCEPTUAL;
 	iVMRDisableDesktopComposition     = 0;
-	iVMRFlushGPUBeforeVSync           = 1;
-	iVMRFlushGPUAfterPresent          = 1;
+	iVMRFlushGPUBeforeVSync           = 0;
+	iVMRFlushGPUAfterPresent          = 0;
 	iVMRFlushGPUWait                  = 0;
 	iEVRHighColorResolution           = 0;
 	iEVRForceInputHighColorResolution = 0;
@@ -62,11 +62,11 @@ void CRenderersSettings::CAdvRendererSettings::SetDefault()
 
 void CRenderersSettings::CAdvRendererSettings::SetOptimal()
 {
-	fVMR9AlterativeVSync              = 1;
+	fVMR9AlterativeVSync              = 0;
 	iVMR9VSyncOffset                  = 0;
-	iVMR9VSyncAccurate                = 1;
+	iVMR9VSyncAccurate                = 0;
 	iVMR9FullscreenGUISupport         = 0;
-	iVMR9VSync                        = 1;
+	iVMR9VSync                        = 0;
 	iVMR9FullFloatingPointProcessing  = 1;
 	iVMR9HalfFloatingPointProcessing  = 0;
 	iVMR9ColorManagementEnable        = 0;
@@ -74,8 +74,8 @@ void CRenderersSettings::CAdvRendererSettings::SetOptimal()
 	iVMR9ColorManagementAmbientLight  = AMBIENT_LIGHT_BRIGHT;
 	iVMR9ColorManagementIntent        = COLOR_RENDERING_INTENT_PERCEPTUAL;
 	iVMRDisableDesktopComposition     = 1;
-	iVMRFlushGPUBeforeVSync           = 1;
-	iVMRFlushGPUAfterPresent          = 1;
+	iVMRFlushGPUBeforeVSync           = 0;
+	iVMRFlushGPUAfterPresent          = 0;
 	iVMRFlushGPUWait                  = 0;
 	iEVRHighColorResolution           = 0;
 	iEVRForceInputHighColorResolution = 0;
