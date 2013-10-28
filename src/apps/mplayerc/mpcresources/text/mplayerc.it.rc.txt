@@ -384,7 +384,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 25		"Disabilita il menù 'Apri disco'"
 26		"Priorità del processo sopra il normale"
 27		"Sostituisci il nome col titolo"
-28		"Ricorda posizione DVD"
+28		"Ricorda posizione DVD/BD"
 29		"Ricorda posizione File"
 30		"Blocca proporzioni finestra"
 31		"Cronologia"

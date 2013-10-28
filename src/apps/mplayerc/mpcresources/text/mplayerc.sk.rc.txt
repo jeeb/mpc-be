@@ -384,7 +384,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 25		"Zablokovať menu 'Otvoriť disk'"
 26		"Vyššia priorita procesu"
 27		"Nahradiť názov súboru titulkom"
-28		"Pamätať si pozíciu DVD"
+28		"Pamätať si pozíciu DVD/BD"
 29		"Pamätať si pozíciu v súbore"
 30		"Obmedziť rozmery okna pri zmene veľkosti"
 31		"História"

@@ -237,7 +237,7 @@ BEGIN
     CONTROL         "Disable 'Open Disc' menu",IDC_CHECK10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,207,156,8
     CONTROL         "Process priority above normal",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,219,156,8
     CONTROL         "Replace file name with title",IDC_CHECK13,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,10,128,105,18
-    CONTROL         "Remember DVD position",IDC_DVD_POS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,29,156,8
+    CONTROL         "Remember DVD/BD position",IDC_DVD_POS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,29,156,8
     CONTROL         "Remember File position",IDC_FILE_POS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,41,158,8
     CONTROL         "Limit window proportions on resize",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,171,160,8
     GROUPBOX        "History",IDC_STATIC,124,5,167,125

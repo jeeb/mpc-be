@@ -384,7 +384,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 25		"Disable 'Open Disc' menu"
 26		"Prioridade do processo acima do normal"
 27		"Usar título como nome"
-28		"Lembrar a posição do DVD"
+28		"Lembrar a posição do DVD/BD"
 29		"Lembrar a posição do arquivo"
 30		"Limitar proporçoes da janela ao redimensionar"
 31		"Historico"
