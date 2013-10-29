@@ -23,14 +23,6 @@
 #include "MainFrm.h"
 #include "PPageSubStyle.h"
 
-
-// CColorStatic
-
-//IMPLEMENT_DYNAMIC(CColorStatic, CStatic)
-
-//BEGIN_MESSAGE_MAP(CColorStatic, CStatic)
-//END_MESSAGE_MAP()
-
 // CPPageSubStyle dialog
 
 IMPLEMENT_DYNAMIC(CPPageSubStyle, CPPageBase)
@@ -48,34 +40,36 @@ CPPageSubStyle::CPPageSubStyle()
 	, m_margin(0,0,0,0)
 	, m_linkalphasliders(FALSE)
 	, m_relativeTo(FALSE)
+	, m_fUseDefaultStyle(FALSE)
+	, m_stss(&AfxGetAppSettings().subdefstyle)
 {
-	m_stss = AfxGetAppSettings().subdefstyle;
-	m_fUseDefaultStyle = true;
 }
 
 CPPageSubStyle::~CPPageSubStyle()
 {
 }
 
-void CPPageSubStyle::InitSubStyle(CString title, STSStyle& stss)
+void CPPageSubStyle::InitSubStyle(CString title, STSStyle* stss)
 {
-	m_pPSP->pszTitle = (m_title = title);
-	m_psp.dwFlags |= PSP_USETITLE;
+	m_pPSP->pszTitle	= (m_title = title);
+	m_psp.dwFlags		|= PSP_USETITLE;
 
-	m_stss = stss;
-	m_fUseDefaultStyle = false;
+	m_stss				= stss;
+	m_stss_init			= *m_stss;
+
+	m_fUseDefaultStyle	= FALSE;
 }
 
 void CPPageSubStyle::AskColor(int i)
 {
-	CColorDialog dlg(m_stss.colors[i]);
+	CColorDialog dlg(m_stss->colors[i]);
 	dlg.m_cc.Flags |= CC_FULLOPEN|CC_RGBINIT;
 
 	if (dlg.DoModal() == IDOK) {
-		if (m_stss.colors[i] != dlg.m_cc.rgbResult) {
+		if (m_stss->colors[i] != dlg.m_cc.rgbResult) {
 			SetModified();
 		}
-		m_stss.colors[i] = dlg.m_cc.rgbResult;
+		m_stss->colors[i] = dlg.m_cc.rgbResult;
 	}
 }
 
@@ -158,7 +152,7 @@ BOOL CPPageSubStyle::OnInitDialog()
 
 void CPPageSubStyle::Init()
 {
-	m_font.SetWindowText(m_stss.fontName);
+	m_font.SetWindowText(m_stss->fontName);
 	m_iCharset = -1;
 
 	for (int i = 0; i < CharSetLen; i++) {
@@ -167,42 +161,42 @@ void CPPageSubStyle::Init()
 		m_charset.AddString(str);
 		m_charset.SetItemData(i, CharSetList[i]);
 
-		if (m_stss.charSet == CharSetList[i]) {
+		if (m_stss->charSet == CharSetList[i]) {
 			m_iCharset = i;
 		}
 	}
 
 	// TODO: allow floats in these edit boxes
-	m_spacing = (int)m_stss.fontSpacing;
+	m_spacing = (int)m_stss->fontSpacing;
 	m_spacingspin.SetRange32(-10000, 10000);
 
-	while (m_stss.fontAngleZ < 0) {
-		m_stss.fontAngleZ += 360;
+	while (m_stss->fontAngleZ < 0) {
+		m_stss->fontAngleZ += 360;
 	}
 
-	m_angle = (int)fmod(m_stss.fontAngleZ, 360);
+	m_angle = (int)fmod(m_stss->fontAngleZ, 360);
 	m_anglespin.SetRange32(0, 359);
-	m_scalex = (int)m_stss.fontScaleX;
+	m_scalex = (int)m_stss->fontScaleX;
 	m_scalexspin.SetRange32(-10000, 10000);
-	m_scaley = (int)m_stss.fontScaleY;
+	m_scaley = (int)m_stss->fontScaleY;
 	m_scaleyspin.SetRange32(-10000, 10000);
 
-	m_borderstyle = m_stss.borderStyle;
-	m_borderwidth = (int)min(m_stss.outlineWidthX, m_stss.outlineWidthY);
+	m_borderstyle = m_stss->borderStyle;
+	m_borderwidth = (int)min(m_stss->outlineWidthX, m_stss->outlineWidthY);
 	m_borderwidthspin.SetRange32(0, 10000);
-	m_shadowdepth = (int)min(m_stss.shadowDepthX, m_stss.shadowDepthY);
+	m_shadowdepth = (int)min(m_stss->shadowDepthX, m_stss->shadowDepthY);
 	m_shadowdepthspin.SetRange32(0, 10000);
 
-	m_screenalignment = m_stss.scrAlignment-1;
-	m_margin = m_stss.marginRect;
+	m_screenalignment = m_stss->scrAlignment-1;
+	m_margin = m_stss->marginRect;
 	m_marginleftspin.SetRange32(-10000, 10000);
 	m_marginrightspin.SetRange32(-10000, 10000);
 	m_margintopspin.SetRange32(-10000, 10000);
 	m_marginbottomspin.SetRange32(-10000, 10000);
-	m_relativeTo = m_stss.relativeTo;
+	m_relativeTo = m_stss->relativeTo;
 
 	for (int i = 0; i < 4; i++) {
-		m_alpha[i] = 255-m_stss.alpha[i];
+		m_alpha[i] = 255-m_stss->alpha[i];
 		m_alphasliders[i].SetRange(0, 255);
 	}
 
@@ -216,36 +210,43 @@ BOOL CPPageSubStyle::OnApply()
 	UpdateData();
 
 	if (m_iCharset >= 0) {
-		m_stss.charSet = m_charset.GetItemData(m_iCharset);
+		m_stss->charSet		= m_charset.GetItemData(m_iCharset);
 	}
 
-	m_stss.fontSpacing   = m_spacing;
-	m_stss.fontAngleZ    = m_angle;
-	m_stss.fontScaleX    = m_scalex;
-	m_stss.fontScaleY    = m_scaley;
+	m_stss->fontSpacing		= m_spacing;
+	m_stss->fontAngleZ		= m_angle;
+	m_stss->fontScaleX		= m_scalex;
+	m_stss->fontScaleY		= m_scaley;
 
-	m_stss.borderStyle   = m_borderstyle;
-	m_stss.outlineWidthX = m_stss.outlineWidthY = m_borderwidth;
-	m_stss.shadowDepthX  = m_stss.shadowDepthY  = m_shadowdepth;
+	m_stss->borderStyle		= m_borderstyle;
+	m_stss->outlineWidthX	= m_stss->outlineWidthY	= m_borderwidth;
+	m_stss->shadowDepthX	= m_stss->shadowDepthY	= m_shadowdepth;
 
-	m_stss.scrAlignment  = m_screenalignment + 1;
-	m_stss.marginRect    = m_margin;
-	m_stss.relativeTo    = m_relativeTo;
+	m_stss->scrAlignment	= m_screenalignment + 1;
+	m_stss->marginRect		= m_margin;
+	m_stss->relativeTo		= m_relativeTo;
 
 	for (int i = 0; i < 4; i++) {
-		m_stss.alpha[i] = 255 - m_alpha[i];
+		m_stss->alpha[i]	= 255 - m_alpha[i];
 	}
 
+	BOOL bStyleChanged = FALSE;
 	if (m_fUseDefaultStyle) {
 		AppSettings& s = AfxGetAppSettings();
-		STSStyle& stss = s.subdefstyle;
+		STSStyle* stss = &s.subdefstyle;
 
-		if (!(stss == m_stss)) {
-			stss = m_stss;
+		if (!(*stss == *m_stss)) {
+			stss			= m_stss;
+			bStyleChanged	= TRUE;
+		}
+	} else if (!(m_stss_init == *m_stss)) {
+		m_stss_init		= *m_stss;
+		bStyleChanged	= TRUE;
+	}
 
-			if (CMainFrame* pFrame = dynamic_cast<CMainFrame*>(AfxGetMainWnd())) {
-				pFrame->ReloadSubtitle();
-			}
+	if (bStyleChanged) {
+		if (CMainFrame* pFrame = dynamic_cast<CMainFrame*>(AfxGetMainWnd())) {
+			pFrame->UpdateSubtitle();
 		}
 	}
 
@@ -255,7 +256,7 @@ BOOL CPPageSubStyle::OnApply()
 void CPPageSubStyle::OnBnClickedButton1()
 {
 	LOGFONT lf;
-	lf <<= m_stss;
+	lf <<= *m_stss;
 
 	CFontDialog dlg(&lf, CF_SCREENFONTS|CF_INITTOLOGFONTSTRUCT|CF_FORCEFONTEXIST|CF_SCALABLEONLY);
 
@@ -275,7 +276,7 @@ void CPPageSubStyle::OnBnClickedButton1()
 			}
 		}
 
-		m_stss = lf;
+		*m_stss = lf;
 
 		SetModified();
 	}
@@ -283,7 +284,7 @@ void CPPageSubStyle::OnBnClickedButton1()
 
 void CPPageSubStyle::OnBnClickedButton2()
 {
-	m_stss.SetDefault();
+	m_stss->SetDefault();
 
 	Init();
 	SetModified();
@@ -353,16 +354,16 @@ void CPPageSubStyle::OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult)
 			dc.RoundRect(r.left, r.top, r.right, r.bottom, 6, 4);
 			r.DeflateRect(2,2,2,2);
 			if (pNMCD->dwItemSpec == IDC_COLORPRI) {
-				dc.FillSolidRect(&r, m_stss.colors[0]);
+				dc.FillSolidRect(&r, m_stss->colors[0]);
 			}
 			if (pNMCD->dwItemSpec == IDC_COLORSEC) {
-				dc.FillSolidRect(&r, m_stss.colors[1]);
+				dc.FillSolidRect(&r, m_stss->colors[1]);
 			}
 			if (pNMCD->dwItemSpec == IDC_COLOROUTL) {
-				dc.FillSolidRect(&r, m_stss.colors[2]);
+				dc.FillSolidRect(&r, m_stss->colors[2]);
 			}
 			if (pNMCD->dwItemSpec == IDC_COLORSHAD) {
-				dc.FillSolidRect(&r, m_stss.colors[3]);
+				dc.FillSolidRect(&r, m_stss->colors[3]);
 			}
 
 			dc.SelectObject(&penOld);

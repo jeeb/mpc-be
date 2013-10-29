@@ -6590,8 +6590,6 @@ void CMainFrame::OnFileLoadAudio()
 	}
 
 	AppSettings& s = AfxGetAppSettings();
-	CAtlList<CString> fns;
-	fns.AddTail(GetCurFileName());
 
 	CString filter;
 	CAtlArray<CString> mask;
@@ -6609,19 +6607,23 @@ void CMainFrame::OnFileLoadAudio()
 		return;
 	}
 
-	SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 
-	ShowWindow(SW_SHOW);
-	SetForegroundWindow();
+	CPlaylistItem* pli = m_wndPlaylistBar.GetCur();
+	if (pli && pli->m_fns.GetCount()) {
+		const CString pathName = fd.GetPathName();
+		AddAudioPathsAddons(pathName);
+		pli->m_fns.AddTail(pathName);
 
-	AddAudioPathsAddons(fd.GetPathName());
-
-	fns.AddTail(fd.GetPathName());
-	if (!m_wndPlaylistBar.Replace(fns.GetHead(), fns)) {
-		m_wndPlaylistBar.Append(fns, FALSE);
+		if (SUCCEEDED(m_pGB->RenderFile(pathName, NULL))) {
+			CComQIPtr<IAMStreamSelect> pSSa = FindSwitcherFilter();
+			if (pSSa) {
+				DWORD cStreams = 0;
+				if (SUCCEEDED(pSSa->Count(&cStreams)) && cStreams > 0) {
+					pSSa->Enable(cStreams - 1, AMSTREAMSELECTENABLE_ENABLE);
+				}
+			}
+		}
 	}
-
-	OpenCurPlaylistItem();
 }
 
 void CMainFrame::OnFileSaveSubtitle()
@@ -9352,7 +9354,7 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 						pRTS->m_styles.GetNextAssoc(pos, key, val);
 
 						CAutoPtr<CPPageSubStyle> page(DNew CPPageSubStyle());
-						page->InitSubStyle(key, *val);
+						page->InitSubStyle(key, val);
 						pages.Add(page);
 						styles.Add(val);
 					}
@@ -9368,10 +9370,12 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 					}
 
 					if (dlg.DoModal() == IDOK) {
+						/*
 						for (int j = 0; j < (int)pages.GetCount(); j++) {
-							pages[j]->GetSubStyle(*styles[j]);
+							pages[j]->GetSubStyle(styles[j]);
 						}
 						UpdateSubtitle(false, false);
+						*/
 					}
 
 					return;
@@ -16394,28 +16398,23 @@ void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSe
 					flags |= MF_CHECKED|MFT_RADIOCHECK;
 				}
 
+				bool fExternal = false;
 				CString str;
 				CPlaylistItem pli;
 				if (m_wndPlaylistBar.GetCur(pli)) {
 					POSITION pos = pli.m_fns.GetHeadPosition();
-
-					if (pos) {
+					// skip main file
+					pli.m_fns.GetNext(pos);
+					while (pos) {
 						str = pli.m_fns.GetNext(pos);
-					}
-					if (pos) {
-						str = pli.m_fns.GetNext(pos);
-					}
-				}
-				CStringW fn;
-				bool fnsame = false;
-				if (!str.IsEmpty()) {
-					fn = GetFileOnly(str);
-					if (fn == name) {
-						fnsame = true;
+						if (str.GetLength() > 0 && name == GetFileOnly(str)) {
+							fExternal = true;
+							break;
+						}
 					}
 				}
 
-				if (!sep && (cStreamsA > 1) && fnsame) {
+				if (!sep && (cStreamsA > 1) && fExternal) {
 					pSub->AppendMenu(MF_SEPARATOR|MF_ENABLED);
 					sep = true;
 				}
