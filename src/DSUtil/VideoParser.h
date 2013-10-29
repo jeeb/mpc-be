@@ -82,5 +82,5 @@ struct vc_params_t {
 
 bool ParseSequenceParameterSet(BYTE* data, int size, vc_params_t& params);
 
-bool ParseAVCDecoderConfigurationRecord(BYTE* data, int size, vc_params_t& params, int FLV_HM = 0);
+bool ParseAVCDecoderConfigurationRecord(BYTE* data, int size, vc_params_t& params, int flv_hm = 0);
 bool ParseHEVCDecoderConfigurationRecord(BYTE* data, int size, vc_params_t& params, bool parseSPS);
