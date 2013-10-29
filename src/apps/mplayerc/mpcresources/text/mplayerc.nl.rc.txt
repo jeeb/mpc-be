@@ -384,7 +384,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 25		"'Schijf openen' menu uitschakelen"
 26		"Procesprioriteit ""hoger dan normaal"""
 27		"Vervang bestandsnaam door titel"
-28		"DVD/BD-positie bewaren"
+28		"DVD-positie bewaren"
 29		"Bestandspositie bewaren"
 30		"Beperk vensterverhouding bij herschalen"
 31		"Geschiedenis"

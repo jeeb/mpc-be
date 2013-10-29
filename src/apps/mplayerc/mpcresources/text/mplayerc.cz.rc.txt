@@ -384,7 +384,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 25		"Zakázat nabídku Otevřít disk"
 26		"Spouštět se zvýšenou prioritou"
 27		"Nahradit název souboru titulem"
-28		"Pamatovat si pozici u DVD/BD"
+28		"Pamatovat si pozici u DVD"
 29		"Pamatovat si pozici u souborů"
 30		"Při změně velikosti zachovat poměr stran okna"
 31		"Historie"

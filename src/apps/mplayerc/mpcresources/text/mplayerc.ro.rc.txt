@@ -384,7 +384,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 25		"Dezactivează meniul ""Deschide Disc"""
 26		"Prioritatea procesării peste normal"
 27		"Înlocuiește numele fișierului cu titlul filmului"
-28		"Ține minte poziția pe DVD/BD"
+28		"Ține minte poziția pe DVD"
 29		"Ține minte poziția în fișier"
 30		"Limitează proporțiile ferestrei la redimensionare"
 31		"Istoric"

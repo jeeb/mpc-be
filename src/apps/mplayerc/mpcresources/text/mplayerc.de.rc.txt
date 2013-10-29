@@ -384,7 +384,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34
 25		"&CD-ROM Menü ausblenden"
 26		"&Prozesspriorität ""höher als normal"""
 27		"Dateiname durch Titel ers."
-28		"DVD/BD Position speichern"
+28		"DVD Position speichern"
 29		"Datei Position speichern"
 30		"Fenstergr. passend zu A/R veränderbar"
 31		"Verlauf"
