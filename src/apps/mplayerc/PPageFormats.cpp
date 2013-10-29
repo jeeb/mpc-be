@@ -665,7 +665,7 @@ BOOL CPPageFormats::OnInitDialog()
 	AppSettings& s = AfxGetAppSettings();
 	bool fRtspFileExtFirst;
 	engine_t e = s.GetRtspHandler(fRtspFileExtFirst);
-	m_iRtspHandler = (e==RealMedia?0:e==QuickTime?1:2);
+	m_iRtspHandler = (e==RealMedia ? 0 : e == QuickTime ? 1 : 2);
 	m_fRtspFileExtFirst = fRtspFileExtFirst;
 
 	UpdateData(FALSE);
@@ -1142,7 +1142,7 @@ void CPPageFormats::OnBnClickedVideo()
 			SetChecked(i, 0);
 			continue;
 		}
-		SetChecked(i, mf[(int)m_list.GetItemData(i)].IsAudioOnly()?0:1);
+		SetChecked(i, mf[(int)m_list.GetItemData(i)].IsAudioOnly() ? 0 : 1);
 	}
 	m_bFileExtChanged = true;
 
@@ -1159,7 +1159,7 @@ void CPPageFormats::OnBnClickedAudio()
 	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
 
 	for (int i = 0, j = m_list.GetItemCount(); i < j; i++) {
-		SetChecked(i, mf[(int)m_list.GetItemData(i)].IsAudioOnly()?1:0);
+		SetChecked(i, mf[(int)m_list.GetItemData(i)].IsAudioOnly() ? 1 : 0);
 	}
 	m_bFileExtChanged = true;
 
