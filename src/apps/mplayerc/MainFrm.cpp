@@ -6607,7 +6607,6 @@ void CMainFrame::OnFileLoadAudio()
 		return;
 	}
 
-
 	CPlaylistItem* pli = m_wndPlaylistBar.GetCur();
 	if (pli && pli->m_fns.GetCount()) {
 		const CString pathName = fd.GetPathName();

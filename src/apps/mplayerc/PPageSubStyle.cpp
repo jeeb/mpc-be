@@ -42,6 +42,7 @@ CPPageSubStyle::CPPageSubStyle()
 	, m_relativeTo(FALSE)
 	, m_fUseDefaultStyle(FALSE)
 	, m_stss(&AfxGetAppSettings().subdefstyle)
+	, m_stss_init(AfxGetAppSettings().subdefstyle)
 {
 }
 
