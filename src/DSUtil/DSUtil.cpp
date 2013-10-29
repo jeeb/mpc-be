@@ -114,6 +114,9 @@ bool IsVideoDecoder(IBaseFilter* pBF, bool fCountConnectedOnly)
 	CountPins(pBF, nIn, nOut, nInC, nOutC);
 
 	if (nInC > 0 && nOut > 0) {
+		nIn = nInC = 0;
+		nOut = nOutC = 0;
+
 		BeginEnumPins(pBF, pEP, pPin) {
 
 			PIN_DIRECTION dir;
@@ -152,7 +155,7 @@ bool IsVideoDecoder(IBaseFilter* pBF, bool fCountConnectedOnly)
 		}
 		EndEnumPins
 
-		return fCountConnectedOnly ? (nIn && nInC && nOut && nOutC) : (nIn && nInC);
+		return fCountConnectedOnly ? (nInC && nOutC) : (nIn && nOut);
 	}
 
 	return false;

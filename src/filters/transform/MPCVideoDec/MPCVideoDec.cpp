@@ -37,8 +37,6 @@
 #include "../../../DSUtil/SysVersion.h"
 #include "../../../DSUtil/MediaTypes.h"
 #include "../../parser/MpegSplitter/MpegSplitter.h"
-#include "../../parser/OggSplitter/OggSplitter.h"
-#include "../../parser/RealMediaSplitter/RealMediaSplitter.h"
 #include "DXVADecoderH264.h"
 #include <moreuuids.h>
 
@@ -1549,8 +1547,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
 
+	// Prevent connection to the video decoder - need to support decoding of uncompressed(v210) video
 	if (CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected()) ) {
-		// Prevent connection to the video decoder - need to support decoding of uncompressed(v210) video
 		if (IsVideoDecoder(pFilter, true)) {
 			return VFW_E_TYPE_NOT_ACCEPTED;
 		}

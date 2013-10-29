@@ -512,8 +512,9 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, IAsyncReader*
 #define DIRAC_VIDEO					(1ULL << 8)
 #define HEVC_VIDEO					(1ULL << 9)
 #define PGS_SUB						(1ULL << 10)
+#define DVB_SUB						(1ULL << 11)
 
-#define PES_STREAM_TYPE_ANY			(MPEG_AUDIO | AAC_AUDIO | AC3_AUDIO | DTS_AUDIO/* | LPCM_AUDIO */| MPEG2_VIDEO | H264_VIDEO | DIRAC_VIDEO | HEVC_VIDEO/* | PGS_SUB*/)
+#define PES_STREAM_TYPE_ANY			(MPEG_AUDIO | AAC_AUDIO | AC3_AUDIO | DTS_AUDIO/* | LPCM_AUDIO */| MPEG2_VIDEO | H264_VIDEO | DIRAC_VIDEO | HEVC_VIDEO/* | PGS_SUB*/ | DVB_SUB)
 
 struct StreamType {
 	PES_STREAM_TYPE pes_stream_type;
@@ -550,9 +551,11 @@ static const StreamType PES_types[] = {
 	{ VIDEO_STREAM_DIRAC,				DIRAC_VIDEO	},
 	// H.265/HEVC Video
 	{ VIDEO_STREAM_HEVC,				HEVC_VIDEO	},
-	{ VIDEO_STREAM_HEVC,				HEVC_VIDEO	},
+	{ PES_PRIVATE,						HEVC_VIDEO	},
 	// PGS Subtitle
-	{ PRESENTATION_GRAPHICS_STREAM,		PGS_SUB		}
+	{ PRESENTATION_GRAPHICS_STREAM,		PGS_SUB		},
+	// DVB Subtitle
+	{ PES_PRIVATE,						DVB_SUB		}
 };
 
 DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
@@ -754,7 +757,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 				}
 
 				// DVB subtitles
-				if (type == unknown) {
+				if (type == unknown && (stream_type & DVB_SUB)) {
 					Seek(start);
 					CMpegSplitterFile::dvbsub h;
 					if (Read(h, len, &s.mt)) {
