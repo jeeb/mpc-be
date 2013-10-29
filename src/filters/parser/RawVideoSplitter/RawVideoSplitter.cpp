@@ -56,9 +56,10 @@ STDAPI DllRegisterServer()
 {
 	CAtlList<CString> chkbytes;
 	chkbytes.AddTail(_T("0,4,,000001B3"));		// MPEG1/2
-	chkbytes.AddTail(_T("0,5,,0000000109"));	// H.264
+	chkbytes.AddTail(_T("0,5,,0000000109"));	// H.264/AVC1
 	chkbytes.AddTail(_T("0,4,,0000010F"));		// VC-1
 	chkbytes.AddTail(_T("0,4,,0000010D"));		// VC-1
+	chkbytes.AddTail(_T("0,5,,0000000140"));	// H.265/HEVC
 #if ENABLE_YUV4MPEG2
 	chkbytes.AddTail(_T("0,9,,595556344D50454732")); // YUV4MPEG2
 #endif
@@ -67,7 +68,10 @@ STDAPI DllRegisterServer()
 		CLSID_AsyncReader,
 		MEDIASUBTYPE_NULL,
 		chkbytes,
-		_T(".mpeg"), _T(".mpg"), _T(".m2v"), _T(".mpv"), _T(".h264"), _T(".264"), _T(".vc1"),
+		_T(".mpeg"), _T(".mpg"), _T(".m2v"), _T(".mpv"),
+		_T(".h264"), _T(".264"),
+		_T(".vc1"),
+		_T(".h265"), _T(".265"), _T(".hm10"), _T(".hevc"),
 		NULL);
 
 	return AMovieDllRegisterServer2(TRUE);
@@ -391,7 +395,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			m_pFile->Seek(0);
 
 			CBaseSplitterFileEx::avchdr h;
-			if (m_pFile->Read(h, min(5 * MEGABYTE, m_pFile->GetLength()), &mt)) {
+			if (m_pFile->Read(h, min(MEGABYTE, m_pFile->GetLength()), &mt)) {
 				m_RAWType = RAW_H264;
 			}
 		
@@ -400,7 +404,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		if (m_RAWType == RAW_NONE) {
 			BYTE id = 0x00;
 			m_pFile->Seek(0);
-			while (m_pFile->GetPos() < min(5 * MEGABYTE, m_pFile->GetLength()) && m_RAWType == RAW_NONE) {
+			while (m_pFile->GetPos() < min(MEGABYTE, m_pFile->GetLength()) && m_RAWType == RAW_NONE) {
 				if (!m_pFile->NextMpegStartCode(id)) {
 					continue;
 				}
@@ -415,6 +419,21 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			}
 		}
+
+		if (m_RAWType == RAW_NONE) {
+			m_pFile->Seek(0);
+
+			CBaseSplitterFileEx::hevchdr h;
+			if (m_pFile->Read(h, min(MEGABYTE, m_pFile->GetLength()), &mt, false)) {
+				// set 25 fps as default value.
+				// TODO - detect real fps.
+				MPEG2VIDEOINFO* pm2vi		= (MPEG2VIDEOINFO*)mt.pbFormat;
+				pm2vi->hdr.AvgTimePerFrame	= 400000;
+				
+				m_RAWType					= RAW_HEVC;
+			}
+		
+		}
 	}
 
 	if (m_RAWType != RAW_NONE) {
@@ -427,10 +446,13 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				pName = L"MPEG2 Video Output";
 				break;
 			case RAW_H264:
-				pName = L"H.264 Video Output";
+				pName = L"H.264/AVC1 Video Output";
 				break;
 			case RAW_VC1:
 				pName = L"VC-1 Video Output";
+				break;
+			case RAW_HEVC:
+				pName = L"H.265/HEVC Video Output";
 				break;
 #if ENABLE_YUV4MPEG2
 			case RAW_Y4M:

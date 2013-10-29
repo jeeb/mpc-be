@@ -1561,12 +1561,12 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	m_pAVCodec			= avcodec_find_decoder(m_nCodecId);
 	CheckPointer(m_pAVCodec, VFW_E_UNSUPPORTED_VIDEO);
 
-	m_pAVCtx	= avcodec_alloc_context3(m_pAVCodec);
+	m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
 	CheckPointer(m_pAVCtx, E_POINTER);
 
 	if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO
 			|| m_nCodecId == AV_CODEC_ID_MPEG1VIDEO
-			|| m_nCodecId == AV_CODEC_ID_HEVC) {
+			|| pmt->subtype == MEDIASUBTYPE_HEVC) {
 		m_pParser = av_parser_init(m_nCodecId);
 	}
 

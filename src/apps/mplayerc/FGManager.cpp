@@ -1949,7 +1949,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->m_extensions.AddTail(_T(".mpg"));
 		pFGF->m_extensions.AddTail(_T(".m2v"));
 		pFGF->m_extensions.AddTail(_T(".mpv"));
-		// H.264
+		// H.264/AVC1
 		pFGF->m_chkbytes.AddTail(_T("0,5,,0000000109"));
 		pFGF->m_extensions.AddTail(_T(".h264"));
 		pFGF->m_extensions.AddTail(_T(".264"));
@@ -1957,6 +1957,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->m_chkbytes.AddTail(_T("0,4,,0000010F"));
 		pFGF->m_chkbytes.AddTail(_T("0,4,,0000010D"));
 		pFGF->m_extensions.AddTail(_T(".vc1"));
+		// H.265/HEVC
+		pFGF->m_chkbytes.AddTail(_T("0,5,,0000000140"));
+		pFGF->m_extensions.AddTail(_T(".h265"));
+		pFGF->m_extensions.AddTail(_T(".265"));
+		pFGF->m_extensions.AddTail(_T(".hm10"));
+		pFGF->m_extensions.AddTail(_T(".hevc"));
 #if ENABLE_YUV4MPEG2
 		// YUV4MPEG2
 		pFGF->m_chkbytes.AddTail(_T("0,9,,595556344D50454732"));

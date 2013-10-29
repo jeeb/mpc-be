@@ -460,7 +460,7 @@ public:
 	bool Read(dirachdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(dvbsub& h, int len, CMediaType* pmt = NULL);
 	bool Read(avchdr& h, spsppsindex index);
-	bool Read(hevchdr& h, int len, CMediaType* pmt = NULL);
+	bool Read(hevchdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true);
 
 	int  HrdParameters(CGolombBuffer& gb);
 	void RemoveMpegEscapeCode(BYTE* dst, BYTE* src, int length);

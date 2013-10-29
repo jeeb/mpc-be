@@ -1952,7 +1952,7 @@ bool CBaseSplitterFileEx::Read(dvbsub& h, int len, CMediaType* pmt)
 	return false;
 }
 
-bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt)
+bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt, bool find_sync)
 {
 	__int64 startpos	= GetPos();
 	__int64 endpos		= startpos + len;
@@ -1964,6 +1964,9 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt)
 			return false;
 		}
 		NAL_unit_type = (id >> 1) & 0x3F;
+		if (!find_sync && NAL_unit_type != NAL_UNIT_VPS) {
+			break;
+		}
 	}
 
 	if (NAL_unit_type != NAL_UNIT_SPS) {
