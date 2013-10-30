@@ -1252,7 +1252,7 @@
 #define IDS_MFMT_IVF                    39021
 #define IDS_MFMT_ROQ                    39022
 #define IDS_MFMT_RAW_VIDEO              39023
-// other
+// other files
 #define IDS_MFMT_OTHER                  39401
 #define IDS_MFMT_SWF                    39403
 #define IDS_MFMT_OTHER_AUDIO            39404
@@ -1278,7 +1278,7 @@
 #define IDS_MFMT_TTA                    39519
 #define IDS_MFMT_WAV                    39520
 #define IDS_MFMT_WMA                    39521
-#define IDS_MFMT_WV                     39522
+#define IDS_MFMT_WAVPACK                39522
 #define IDS_MFMT_OPUS                   39523
 #define IDS_MFMT_SPEEX                  39524
 #define IDS_MFMT_MLP                    39525

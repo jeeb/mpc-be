@@ -211,7 +211,7 @@ void CMediaFormats::UpdateData(bool fSave)
 		RemoveAll();
 
 #define ADDFMT(f) Add(CMediaFormatCategory##f)
-
+		// video files
 		ADDFMT((_T("avi"),         ResStr(IDS_MFMT_AVI),         _T("avi")));
 		ADDFMT((_T("mpeg"),        ResStr(IDS_MFMT_MPEG),        _T("mpg mpeg mpe m1v m2v mpv2 mp2v pva evo m2p")));
 		ADDFMT((_T("mpegts"),      ResStr(IDS_MFMT_MPEGTS),      _T("ts tp trp m2t m2ts mts rec ssif")));
@@ -237,6 +237,7 @@ void CMediaFormats::UpdateData(bool fSave)
 		ADDFMT((_T("swf"),         ResStr(IDS_MFMT_SWF),         _T("swf"), false, _T("ShockWave ActiveX control"), ShockWave));
 		ADDFMT((_T("other"),       ResStr(IDS_MFMT_OTHER),       _T("divx rmvb amv wtv dvr-ms")));
 		ADDFMT((_T("raw video"),   ResStr(IDS_MFMT_RAW_VIDEO),   _T("h264 264 vc1 h265 265 hm10 hevc")));
+		// audio files
 		ADDFMT((_T("ac3dts"),      ResStr(IDS_MFMT_AC3),         _T("ac3 dts dtshd"), true));
 		ADDFMT((_T("aiff"),        ResStr(IDS_MFMT_AIFF),        _T("aif aifc aiff"), true));
 		ADDFMT((_T("alac"),        ResStr(IDS_MFMT_ALAC),        _T("alac"), true));
@@ -260,9 +261,10 @@ void CMediaFormats::UpdateData(bool fSave)
 		ADDFMT((_T("tta"),         ResStr(IDS_MFMT_TTA),         _T("tta"), true));
 		ADDFMT((_T("wav"),         ResStr(IDS_MFMT_WAV),         _T("wav"), true));
 		ADDFMT((_T("wma"),         ResStr(IDS_MFMT_WMA),         _T("wma"), true));
-		ADDFMT((_T("wavpack"),     ResStr(IDS_MFMT_WV),          _T("wv"), true));
+		ADDFMT((_T("wavpack"),     ResStr(IDS_MFMT_WAVPACK),     _T("wv"), true));
 		ADDFMT((_T("opus"),        ResStr(IDS_MFMT_OPUS),        _T("opus"), true));
 		ADDFMT((_T("speex"),       ResStr(IDS_MFMT_SPEEX),       _T("spx"), true));
+		// playlists
 		ADDFMT((_T("pls"),         ResStr(IDS_MFMT_PLS),         _T("asx m3u m3u8 pls wvx wax wmx mpcpl xspf")));
 		ADDFMT((_T("bdpls"),       ResStr(IDS_MFMT_BDPLS),       _T("mpls bdmv")));
 #undef ADDFMT

@@ -3197,7 +3197,7 @@ BEGIN
     IDS_MFMT_TTA                "True Audio"
     IDS_MFMT_WAV                "WAV"
     IDS_MFMT_WMA                "Windows Media Audio"
-    IDS_MFMT_WV                 "WavPack"
+    IDS_MFMT_WAVPACK            "WavPack"
 END
 
 STRINGTABLE
