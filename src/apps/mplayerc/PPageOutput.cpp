@@ -190,15 +190,17 @@ BOOL CPPageOutput::OnInitDialog()
 	static CString AudioDevAddon[] = {
 		AUDRNDT_NULL_COMP,
 		AUDRNDT_NULL_UNCOMP,
-		AUDRNDT_MPC
+		IsWinVista() ? AUDRNDT_MPC : L""
 	};
 
 	for (size_t idx = 0; idx < _countof(AudioDevAddon); idx++) {
-		m_AudioRendererDisplayNames.Add(AudioDevAddon[idx]);
+		if (AudioDevAddon[idx].GetLength() > 0) {
+			m_AudioRendererDisplayNames.Add(AudioDevAddon[idx]);
 
-		fstr.Format(_T("%d: %s"), i++, AudioDevAddon[idx]);
-		m_iAudioRendererTypeCtrl.AddString(fstr);
-		m_iSecAudioRendererTypeCtrl.AddString(fstr);
+			fstr.Format(_T("%d: %s"), i++, AudioDevAddon[idx]);
+			m_iAudioRendererTypeCtrl.AddString(fstr);
+			m_iSecAudioRendererTypeCtrl.AddString(fstr);
+		}
 	}
 
 	for (INT_PTR idx = 0; idx < m_AudioRendererDisplayNames.GetCount(); idx++) {

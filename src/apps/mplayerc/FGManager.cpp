@@ -2798,7 +2798,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 				pFGF = DNew CFGFilterInternal<CNullUAudioRenderer>(AUDRNDT_NULL_UNCOMP, m_armerit);
 				pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
 				m_transform.AddTail(pFGF);
-			} else if (SelAudioRenderer == AUDRNDT_MPC) {
+			} else if (SelAudioRenderer == AUDRNDT_MPC && IsWinVistaOrLater()) {
 				pFGF = DNew CFGFilterInternal<CMpcAudioRenderer>(AUDRNDT_MPC, m_armerit);
 				pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_PCM);
 				pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_IEEE_FLOAT);

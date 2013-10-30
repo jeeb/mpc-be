@@ -21,18 +21,11 @@
 #pragma once
 
 #include <BaseClasses/streams.h>
-#include <dsound.h>
-
-#include <MMReg.h>	//must be before other Wasapi headers
-#include <strsafe.h>
 #include <mmdeviceapi.h>
-#include <avrt.h>
 #include <audioclient.h>
-#include <endpointvolume.h>
 #include <FunctionDiscoveryKeys_devpkey.h>
 
 #include "MpcAudioRendererSettingsWnd.h"
-#include <SoundTouch/include/SoundTouch.h>
 
 #include "Mixer.h"
 
@@ -56,16 +49,11 @@ public:
 	CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr);
 	virtual ~CMpcAudioRenderer();
 
-	static const AMOVIESETUP_FILTER sudASFilter;
-
 	HRESULT					Receive					(IMediaSample* pSample);
 	HRESULT					CheckInputType			(const CMediaType* mtIn);
 	virtual HRESULT			CheckMediaType			(const CMediaType *pmt);
-	virtual HRESULT			DoRenderSample			(IMediaSample *pMediaSample);
-	virtual void			OnReceiveFirstSample	(IMediaSample *pMediaSample);
-	BOOL					ScheduleSample			(IMediaSample *pMediaSample);
 	virtual HRESULT			SetMediaType			(const CMediaType *pmt);
-	virtual HRESULT			CompleteConnect			(IPin *pReceivePin);
+	virtual HRESULT			DoRenderSample			(IMediaSample *pMediaSample) {return E_NOTIMPL;}
 
 	virtual HRESULT			BeginFlush();
 	virtual HRESULT			EndFlush();
@@ -90,8 +78,8 @@ public:
 	// === IBasicAudio
 	STDMETHOD(put_Volume)		(long lVolume);
 	STDMETHOD(get_Volume)		(long *plVolume);
-	STDMETHOD(put_Balance)		(long lBalance);
-	STDMETHOD(get_Balance)		(long *plBalance);
+	STDMETHOD(put_Balance)		(long lBalance) {return E_NOTIMPL;}
+	STDMETHOD(get_Balance)		(long *plBalance) {return E_NOTIMPL;}
 
 	// === ISpecifyPropertyPages2
 	STDMETHODIMP				GetPages(CAUUID* pPages);
@@ -101,8 +89,6 @@ public:
 	STDMETHODIMP				Apply();
 	STDMETHODIMP				SetWasapiMode(INT nValue);
 	STDMETHODIMP_(INT)			GetWasapiMode();
-	STDMETHODIMP				SetMuteFastForward(BOOL nValue);
-	STDMETHODIMP_(BOOL)			GetMuteFastForward();
 	STDMETHODIMP				SetSoundDevice(CString nValue);
 	STDMETHODIMP_(CString)		GetSoundDevice();
 	STDMETHODIMP_(UINT)			GetMode();
@@ -115,25 +101,16 @@ public:
 	// CMpcAudioRenderer
 private:
 
-	HRESULT					DoRenderSampleDirectSound(IMediaSample *pMediaSample);
-
-	HRESULT					InitCoopLevel();
-	HRESULT					ClearBuffer();
-	HRESULT					CreateDSBuffer();
 	HRESULT					GetReferenceClockInterface(REFIID riid, void **ppv);
-	HRESULT					WriteSampleToDSBuffer(IMediaSample *pMediaSample, bool *looped);
 
-	LPDIRECTSOUND8			m_pDS;
-	LPDIRECTSOUNDBUFFER		m_pDSBuffer;
-	DWORD					m_dwDSWriteOff;
+	CCritSec				m_csProps;
+	CCritSec				m_csCheck;
+
 	WAVEFORMATEX			*m_pWaveFileFormat;
 	WAVEFORMATEX			*m_pWaveFileFormatOutput;
-	int						m_nDSBufSize;
 	CBaseReferenceClock*	m_pReferenceClock;
 	double					m_dRate;
 	long					m_lVolume;
-	soundtouch::SoundTouch*	m_pSoundTouch;
-	CCritSec				m_csProps;
 
 	// CMpcAudioRenderer WASAPI methods
 	HRESULT					GetAvailableAudioDevices(IMMDeviceCollection **ppMMDevices);
@@ -162,30 +139,26 @@ private:
 	// WASAPI variables
 	HMODULE					m_hModule;
 	HANDLE					m_hTask;
-	int						m_useWASAPI;
-	int						m_useWASAPIAfterRestart;
-	bool					m_bMuteFastForward;
+	WASAPI_MODE				m_WASAPIMode;
+	WASAPI_MODE				m_WASAPIModeAfterRestart;
 	CString					m_DeviceName;
 	IMMDevice				*pMMDevice;
 	IAudioClient			*m_pAudioClient;
 	IAudioRenderClient		*m_pRenderClient;
 	UINT32					nFramesInBuffer;
 	REFERENCE_TIME			hnsPeriod;
-	CCritSec				m_csCheck;
 	bool					isAudioClientStarted;
-	DWORD					lastBufferTime;
 	double					m_dVolume;
 	BOOL					m_bIsBitstream;
 	BOOL					m_bUseBitExactOutput;
 	BOOL					m_bUseSystemLayoutChannels;
 	FILTER_STATE			m_filterState;
 
-	// AVRT.dll (Vista or greater
-	typedef HANDLE							(__stdcall *PTR_AvSetMmThreadCharacteristicsW)(LPCWSTR TaskName, LPDWORD TaskIndex);
-	typedef BOOL							(__stdcall *PTR_AvRevertMmThreadCharacteristics)(HANDLE AvrtHandle);
+	typedef HANDLE						(__stdcall *PTR_AvSetMmThreadCharacteristicsW)(LPCWSTR TaskName, LPDWORD TaskIndex);
+	typedef BOOL						(__stdcall *PTR_AvRevertMmThreadCharacteristics)(HANDLE AvrtHandle);
 
-	PTR_AvSetMmThreadCharacteristicsW		pfAvSetMmThreadCharacteristicsW;
-	PTR_AvRevertMmThreadCharacteristics		pfAvRevertMmThreadCharacteristics;
+	PTR_AvSetMmThreadCharacteristicsW	pfAvSetMmThreadCharacteristicsW;
+	PTR_AvRevertMmThreadCharacteristics	pfAvRevertMmThreadCharacteristics;
 	
 	HRESULT					EnableMMCSS();
 	HRESULT					RevertMMCSS();

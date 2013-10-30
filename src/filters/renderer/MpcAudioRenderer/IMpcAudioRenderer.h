@@ -20,12 +20,11 @@
 
 #pragma once
 
-enum {
-	MODE_NONE = 0,
+enum WASAPI_MODE {
 	MODE_WASAPI_EXCLUSIVE,
-	MODE_WASAPI_EXCLUSIVE_BITSTREAM,
 	MODE_WASAPI_SHARED,
-	MODE_DIRECTSOUND
+	MODE_WASAPI_EXCLUSIVE_BITSTREAM,
+	MODE_NONE
 };
 
 interface __declspec(uuid("495D2C66-D430-439b-9DEE-40F9B7929BBA"))
@@ -35,8 +34,6 @@ public IUnknown {
 
 	STDMETHOD(SetWasapiMode(INT nValue)) PURE;
 	STDMETHOD_(INT, GetWasapiMode()) PURE;
-	STDMETHOD(SetMuteFastForward(BOOL nValue)) PURE;
-	STDMETHOD_(BOOL, GetMuteFastForward()) PURE;
 	STDMETHOD(SetSoundDevice(CString nValue)) PURE;
 	STDMETHOD_(CString, GetSoundDevice()) PURE;
 	STDMETHOD_(UINT, GetMode()) PURE;

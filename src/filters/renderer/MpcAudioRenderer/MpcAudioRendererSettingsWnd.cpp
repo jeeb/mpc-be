@@ -22,7 +22,6 @@
 #include "MpcAudioRendererSettingsWnd.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioParser.h"
-#include <MMReg.h>
 
 bool CALLBACK DSEnumProc(LPGUID lpGUID,
 						 LPCTSTR lpszDesc,
@@ -82,7 +81,6 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 	m_txtWasapiMode.Create(ResStr(IDS_ARS_WASAPI_MODE), WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h20;
 	m_cbWasapiMode.Create(WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(IPP_SCALE(320), 200)), this, IDC_PP_WASAPI_MODE);
-	m_cbWasapiMode.AddString(L"Do not use WASAPI");
 	m_cbWasapiMode.AddString(L"Exclusive Mode");
 	m_cbWasapiMode.AddString(L"Shared Mode");
 	p.y += h30;
@@ -94,11 +92,17 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 	m_txtSoundDevice.Create(ResStr(IDS_ARS_SOUND_DEVICE), WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h20;
 	m_cbSoundDevice.Create(WS_VISIBLE|WS_CHILD|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p, CSize(IPP_SCALE(320), 200)), this, IDC_PP_SOUND_DEVICE);
-	p.y += h30;
 
-	m_cbMuteFastForward.Create(ResStr(IDS_ARS_MUTE_FAST_FORWARD), WS_VISIBLE|WS_CHILD|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, IDC_PP_MUTE_FAST_FORWARD);
+	HMODULE hModule = LoadLibrary(L"dsound.dll");
+	if (hModule) {
+		HRESULT (__stdcall * pDirectSoundEnumerate)(__in LPDSENUMCALLBACKW pDSEnumCallback, __in_opt LPVOID pContext);
+		(FARPROC &)pDirectSoundEnumerate = GetProcAddress(hModule, "DirectSoundEnumerateW");
+		if (pDirectSoundEnumerate) {
+			pDirectSoundEnumerate((LPDSENUMCALLBACK)DSEnumProc, (VOID*)&m_cbSoundDevice);
+		}
 
-	DirectSoundEnumerate((LPDSENUMCALLBACK)DSEnumProc, (VOID*)&m_cbSoundDevice);
+		FreeLibrary(hModule);
+	}
 
 	if (m_pMAR) {
 		if (m_cbSoundDevice.GetCount() > 0) {
@@ -112,7 +116,6 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 		m_cbWasapiMode.SetCurSel(m_pMAR->GetWasapiMode());
 		m_cbUseBitExactOutput.SetCheck(m_pMAR->GetBitExactOutput());
 		m_cbUseSystemLayoutChannels.SetCheck(m_pMAR->GetSystemLayoutChannels());
-		m_cbMuteFastForward.SetCheck(m_pMAR->GetMuteFastForward());
 	}
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
@@ -141,7 +144,6 @@ bool CMpcAudioRendererSettingsWnd::OnApply()
 		m_pMAR->SetWasapiMode(m_cbWasapiMode.GetCurSel());
 		m_pMAR->SetBitExactOutput(m_cbUseBitExactOutput.GetCheck());
 		m_pMAR->SetSystemLayoutChannels(m_cbUseBitExactOutput.GetCheck() && m_cbUseSystemLayoutChannels.GetCheck());
-		m_pMAR->SetMuteFastForward(m_cbMuteFastForward.GetCheck());
 		CString str;
 		int idx = m_cbSoundDevice.GetCurSel();
 		if (idx >= 0) {
@@ -163,7 +165,7 @@ END_MESSAGE_MAP()
 void CMpcAudioRendererSettingsWnd::OnClickedWasapiMode()
 {
 	int selected = m_cbWasapiMode.GetCurSel();
-	m_cbUseBitExactOutput.EnableWindow(selected == 1);
+	m_cbUseBitExactOutput.EnableWindow(selected == (int)MODE_WASAPI_EXCLUSIVE);
 	OnClickedBitExact();
 }
 
@@ -271,9 +273,6 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 				break;
 			case MODE_WASAPI_SHARED :
 				m_txtModeText.SetWindowText(ResStr(IDS_ARS_WASAPI_MODE_STATUS_3));
-				break;
-			case MODE_DIRECTSOUND :
-				m_txtModeText.SetWindowText(ResStr(IDS_ARS_WASAPI_MODE_STATUS_4));
 				break;
 			case MODE_WASAPI_EXCLUSIVE_BITSTREAM :
 				m_txtModeText.SetWindowText(ResStr(IDS_ARS_WASAPI_MODE_STATUS_5));

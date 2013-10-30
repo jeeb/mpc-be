@@ -23,7 +23,6 @@
 #include "../../filters/InternalPropertyPage.h"
 #include "IMpcAudioRenderer.h"
 #include "resource.h"
-#include <afxcmn.h>
 
 class __declspec(uuid("1E53BA32-3BCC-4dff-9342-34E46BE3F5A5"))
 	CMpcAudioRendererSettingsWnd : public CInternalPropertyPageWnd
@@ -37,14 +36,11 @@ private :
 	CButton		m_cbUseBitExactOutput;
 	CButton		m_cbUseSystemLayoutChannels;
 
-	CButton		m_cbMuteFastForward;
-
 	CStatic		m_txtSoundDevice;
 	CComboBox	m_cbSoundDevice;
 
 	enum {
 		IDC_PP_WASAPI_MODE = 10000,
-		IDC_PP_MUTE_FAST_FORWARD,
 		IDC_PP_SOUND_DEVICE,
 		IDC_PP_USE_BITEXACT_OUTPUT,
 		IDC_PP_USE_SYSTEM_LAYOUT_CHANNELS
