@@ -1228,6 +1228,7 @@
 #define IDS_SAVE_FILE                   33447
 #define IDS_AG_VIDEOFILES               33448
 #define IDS_VOLUME_OSD_MUTE             33449
+// video files
 #define IDS_MFMT_AVI                    39001
 #define IDS_MFMT_MPEG                   39002
 #define IDS_MFMT_MPEGTS                 39003
@@ -1249,12 +1250,13 @@
 #define IDS_MFMT_FLIC                   39019
 #define IDS_MFMT_DSM                    39020
 #define IDS_MFMT_IVF                    39021
+#define IDS_MFMT_ROQ                    39022
+#define IDS_MFMT_RAW_VIDEO              39023
+// other
 #define IDS_MFMT_OTHER                  39401
-#define IDS_MFMT_RAW_VIDEO              39402
 #define IDS_MFMT_SWF                    39403
 #define IDS_MFMT_OTHER_AUDIO            39404
-#define IDS_MFMT_OPUS                   39405
-#define IDS_MFMT_SPEEX                  39406
+// audio files
 #define IDS_MFMT_AC3                    39501
 #define IDS_MFMT_AIFF                   39502
 #define IDS_MFMT_ALAC                   39503
@@ -1277,11 +1279,14 @@
 #define IDS_MFMT_WAV                    39520
 #define IDS_MFMT_WMA                    39521
 #define IDS_MFMT_WV                     39522
+#define IDS_MFMT_OPUS                   39523
+#define IDS_MFMT_SPEEX                  39524
+#define IDS_MFMT_MLP                    39525
+#define IDS_MFMT_DVDAUDIO               39526
+// playlists
 #define IDS_MFMT_PLS                    39901
 #define IDS_MFMT_BDPLS                  39902
-#define IDS_MFMT_DVDAUDIO               39903
-#define IDS_MFMT_MLP                    39904
-#define IDS_MFMT_ROQ                    39905
+//
 #define IDTB_BUTTON1                    40001
 #define IDTB_BUTTON2                    40002
 #define IDTB_BUTTON3                    40003
