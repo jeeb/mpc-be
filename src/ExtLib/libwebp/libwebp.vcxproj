@@ -114,6 +114,7 @@
     <ClInclude Include="utils\bit_reader.h" />
     <ClInclude Include="utils\bit_writer.h" />
     <ClInclude Include="utils\quant_levels_dec.h" />
+    <ClInclude Include="utils\random.h" />
     <ClInclude Include="webp\decode.h" />
     <ClInclude Include="webp\encode.h" />
     <ClInclude Include="webp\mux_types.h" />
@@ -196,6 +197,7 @@
     <ClCompile Include="utils\huffman_encode.c" />
     <ClCompile Include="utils\quant_levels.c" />
     <ClCompile Include="utils\quant_levels_dec.c" />
+    <ClCompile Include="utils\random.c" />
     <ClCompile Include="utils\rescaler.c" />
     <ClCompile Include="utils\thread.c" />
     <ClCompile Include="utils\utils.c" />
