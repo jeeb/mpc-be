@@ -190,7 +190,7 @@ BOOL CPPageOutput::OnInitDialog()
 	static CString AudioDevAddon[] = {
 		AUDRNDT_NULL_COMP,
 		AUDRNDT_NULL_UNCOMP,
-		IsWinVista() ? AUDRNDT_MPC : L""
+		IsWinVistaOrLater() ? AUDRNDT_MPC : L""
 	};
 
 	for (size_t idx = 0; idx < _countof(AudioDevAddon); idx++) {
