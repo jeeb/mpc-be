@@ -14257,7 +14257,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 
 		pos = m_pSubStreams.GetHeadPosition();
 		while (!subs.IsEmpty()) {
-			m_pSubStreams.InsertBefore(pos, subs.RemoveHead());
+			pos = m_pSubStreams.InsertBefore(pos, subs.RemoveTail());
 		}
 
 		if (!s.fUseInternalSelectTrackLogic) {
