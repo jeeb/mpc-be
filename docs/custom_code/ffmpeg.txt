@@ -28,6 +28,7 @@
 
 * libavutil/attributes.h
 * libavutil/common.h
+* libavutil/file_open.c
 * libavutil/frame.c
 * libavutil/frame.h
 * libavutil/eval.c

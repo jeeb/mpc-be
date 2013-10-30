@@ -151,9 +151,6 @@
     <None Include="libavcodec\x86\vp8dsp.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
-    <None Include="libavcodec\x86\vp9dsp.asm">
-      <Filter>libavcodec\x86</Filter>
-    </None>
     <None Include="libavresample\x86\audio_convert.asm">
       <Filter>libavresample\x86</Filter>
     </None>
@@ -895,15 +892,6 @@
     <ClInclude Include="libavcodec\vp8dsp.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
-    <ClInclude Include="libavcodec\vp9.h">
-      <Filter>libavcodec</Filter>
-    </ClInclude>
-    <ClInclude Include="libavcodec\vp9data.h">
-      <Filter>libavcodec</Filter>
-    </ClInclude>
-    <ClInclude Include="libavcodec\vp9dsp.h">
-      <Filter>libavcodec</Filter>
-    </ClInclude>
     <ClInclude Include="libavcodec\vp56.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
@@ -1058,6 +1046,9 @@
       <Filter>libavutil</Filter>
     </ClInclude>
     <ClInclude Include="libavutil\fifo.h">
+      <Filter>libavutil</Filter>
+    </ClInclude>
+    <ClInclude Include="libavutil\file.h">
       <Filter>libavutil</Filter>
     </ClInclude>
     <ClInclude Include="libavutil\float_dsp.h">
@@ -1292,9 +1283,6 @@
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\vp8dsp_init.c">
-      <Filter>libavcodec\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="libavcodec\x86\vp9dsp_init.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\aac_ac3_parser.c">
@@ -1783,6 +1771,9 @@
     <ClCompile Include="libavcodec\libspeexdec.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
+    <ClCompile Include="libavcodec\libvpxdec.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
     <ClCompile Include="libavcodec\log2_tab.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
@@ -2152,12 +2143,6 @@
     <ClCompile Include="libavcodec\vp8dsp.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
-    <ClCompile Include="libavcodec\vp9.c">
-      <Filter>libavcodec</Filter>
-    </ClCompile>
-    <ClCompile Include="libavcodec\vp9dsp.c">
-      <Filter>libavcodec</Filter>
-    </ClCompile>
     <ClCompile Include="libavcodec\vp56.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
@@ -2282,6 +2267,9 @@
       <Filter>libavutil</Filter>
     </ClCompile>
     <ClCompile Include="libavutil\fifo.c">
+      <Filter>libavutil</Filter>
+    </ClCompile>
+    <ClCompile Include="libavutil\file_open.c">
       <Filter>libavutil</Filter>
     </ClCompile>
     <ClCompile Include="libavutil\float_dsp.c">

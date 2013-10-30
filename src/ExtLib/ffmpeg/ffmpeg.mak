@@ -423,6 +423,7 @@ SRCS_C = \
 	libavutil/error.c \
 	libavutil/eval.c \
 	libavutil/fifo.c \
+	libavutil/file_open.c \
 	libavutil/float_dsp.c \
 	libavutil/frame.c \
 	libavutil/imgutils.c \
