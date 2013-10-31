@@ -129,7 +129,7 @@
 	* ffmpeg 2.1 git-fa6fa216;
 	* libwebp 0.3.1 git-1e898619;
 	* libpng 1.7.0 b21 git-fe6e6cf1;
-	* libopus 1.1 git-d6b56793;
+	* libopus 1.1 git-8f466274;
 	* libvpx 1.2 git-b26ce8b1;
 	* ZenLib 0.4.29+ svn rev.447;
 	 ... и многое другое.
