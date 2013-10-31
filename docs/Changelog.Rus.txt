@@ -125,7 +125,7 @@
 	* Обновлен украинский перевод (автор Arestarh1986);
 	* Обновлен перевод скрипта инсталлятора - Голландский, Китайский Упрощенный и Китайский Традиционный. (автор beter);
 	* MediaInfo 0.7.64+ svn rev.5964;
-	* Little-CMS 2.5 git-fda1211c;
+	* Little-CMS 2.5 git-69ecafd3;
 	* ffmpeg 2.1 git-fa6fa216;
 	* libwebp 0.3.1 git-1e898619;
 	* libpng 1.7.0 b21 git-fe6e6cf1;
