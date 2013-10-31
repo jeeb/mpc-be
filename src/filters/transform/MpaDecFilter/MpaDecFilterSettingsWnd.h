@@ -24,7 +24,6 @@
 #include "../../filters/InternalPropertyPage.h"
 #include "MpaDecFilter.h"
 #include "resource.h"
-#include <afxcmn.h>
 
 class __declspec(uuid("24103041-884B-4772-B0D3-A600E7CBFEC7"))
 	CMpaDecSettingsWnd : public CInternalPropertyPageWnd

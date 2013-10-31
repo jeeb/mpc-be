@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <afxcmn.h>
 #include "IDirectVobSub.h"
 
 class CDVSBasePPage : public CBasePropertyPage

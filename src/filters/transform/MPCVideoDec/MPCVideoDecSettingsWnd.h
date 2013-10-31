@@ -23,7 +23,6 @@
 #include "../../filters/InternalPropertyPage.h"
 #include "IMPCVideoDec.h"
 #include "resource.h"
-#include <afxcmn.h>
 
 // === New swscaler options
 #include "Version.h"

@@ -25,7 +25,6 @@
 #include "../../filters/InternalPropertyPage.h"
 #include "IMatroskaSplitter.h"
 #include "resource.h"
-//#include <afxcmn.h>
 
 class __declspec(uuid("1996C0A9-1F4C-4538-A6FF-ED0F591BE5D6"))
 	CMatroskaSplitterSettingsWnd : public CInternalPropertyPageWnd

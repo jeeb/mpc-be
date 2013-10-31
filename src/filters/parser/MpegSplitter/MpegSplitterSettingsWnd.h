@@ -23,7 +23,6 @@
 #include "../../filters/InternalPropertyPage.h"
 #include "IMpegSplitter.h"
 #include "resource.h"
-#include <afxcmn.h>
 
 class __declspec(uuid("44FCB62D-3AEB-401C-A7E1-8A984C017923"))
 	CMpegSplitterSettingsWnd : public CInternalPropertyPageWnd
