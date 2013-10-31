@@ -1911,8 +1911,10 @@ void CBaseAP::DrawText(const RECT &rc, const CString &strText, int _Priority)
 		return;
 	}
 	int Quality = 1;
-	D3DXCOLOR Color1(1.0f, 0.2f, 0.2f, 1.0f );
-	D3DXCOLOR Color0(0.0f, 0.0f, 0.0f, 1.0f );
+	//D3DXCOLOR Color1(1.0f, 0.2f, 0.2f, 1.0f); // red
+	//D3DXCOLOR Color1(1.0f, 1.0f, 1.0f, 1.0f); // white
+	D3DXCOLOR Color1(1.0f, 0.8f, 0.0f, 1.0f); // yellow
+	D3DXCOLOR Color0(0.0f, 0.0f, 0.0f, 1.0f); // black
 	RECT Rect1 = rc;
 	RECT Rect2 = rc;
 	if (Quality == 1) {
