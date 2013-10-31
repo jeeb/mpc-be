@@ -130,7 +130,7 @@
 	* libwebp 0.3.1 git-596a6d73;
 	* libpng 1.7.0 b21 git-fe6e6cf1;
 	* libopus 1.1 git-d6b56793;
-	* libvpx 1.2 git-b133cbf5;
+	* libvpx 1.2 git-b26ce8b1;
 	* ZenLib 0.4.29+ svn rev.447;
 	 ... и многое другое.
 
