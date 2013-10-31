@@ -14761,6 +14761,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			}
 		}
 
+		b_UseReclock = (FindFilter(CLSID_ReClock, m_pGB) != NULL);
+
 		if (s.fEnableEDLEditor) {
 			m_wndEditListEditor.OpenFile(pOMD->title);
 		}
@@ -17377,6 +17379,11 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool fSeekToKeyFrame)
 		m_nSeekDirection = SEEK_DIRECTION_NONE;
 
 		hr = m_pMS->SetPositions(&rtPos, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
+
+		if (b_UseReclock) {
+			// Crazy ReClock require delay between seek operation or causes crash in EVR :)
+			Sleep(50);
+		}
 	} else if (GetPlaybackMode() == PM_DVD && m_iDVDDomain == DVD_DOMAIN_Title) {
 		DVD_HMSF_TIMECODE tc = RT2HMSF(rtPos);
 		m_pDVDC->PlayAtTime(&tc, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
