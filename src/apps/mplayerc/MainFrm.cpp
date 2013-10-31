@@ -13740,7 +13740,8 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 		return;
 	}
 
-	CString title(MAKEINTRESOURCE(IDR_MAINFRAME));
+	CString title;
+	title.LoadString(IDR_MAINFRAME);
 	CString fname = fn;
 
 	m_strFnFull = fn;

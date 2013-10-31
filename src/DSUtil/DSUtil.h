@@ -29,8 +29,6 @@
 #include "text.h"
 #include "..\..\include\basestruct.h"
 
-#define ResStr(id)			CString(MAKEINTRESOURCE(id))
-
 #define LCID_NOSUBTITLES	-1
 #define INVALID_TIME		_I64_MIN
 
@@ -40,6 +38,8 @@
                   (((DWORD)(ch4) & 0xFF0000) >> 8) |  \
                   (((DWORD)(ch4) & 0xFF000000) >> 24))
 #endif
+
+extern CString ResStr(UINT nID);
 
 extern int CountPins(IBaseFilter* pBF, int& nIn, int& nOut, int& nInC, int& nOutC);
 extern bool IsSplitter(IBaseFilter* pBF, bool fCountConnectedOnly = false);
