@@ -24,6 +24,7 @@
 #include <InitGuid.h>
 #endif
 #include <moreuuids.h>
+#include <math.h>
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioParser.h"
 #include "../../../DSUtil/AudioTools.h"
