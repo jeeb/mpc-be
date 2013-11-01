@@ -276,6 +276,8 @@ enum AVCodecID {
     AV_CODEC_ID_ESCAPE130_DEPRECATED,
     AV_CODEC_ID_G2M_DEPRECATED,
     AV_CODEC_ID_WEBP_DEPRECATED,
+    AV_CODEC_ID_HNM4_VIDEO,
+    AV_CODEC_ID_HEVC_DEPRECATED,
 
     AV_CODEC_ID_BRENDER_PIX= MKBETAG('B','P','I','X'),
     AV_CODEC_ID_Y41P       = MKBETAG('Y','4','1','P'),
@@ -691,6 +693,7 @@ typedef struct RcOverride{
 #define CODEC_FLAG_UNALIGNED 0x0001
 #define CODEC_FLAG_QSCALE 0x0002  ///< Use fixed qscale.
 #define CODEC_FLAG_4MV    0x0004  ///< 4 MV per MB allowed / advanced prediction for H.263.
+#define CODEC_FLAG_OUTPUT_CORRUPT 0x0008 ///< Output even those frames that might be corrupted
 #define CODEC_FLAG_QPEL   0x0010  ///< Use qpel MC.
 #define CODEC_FLAG_GMC    0x0020  ///< Use GMC.
 #define CODEC_FLAG_MV0    0x0040  ///< Always try a MB with MV=<0,0>.
@@ -1323,7 +1326,9 @@ typedef struct AVCodecContext {
      */
     int coded_width, coded_height;
 
+#if FF_API_ASPECT_EXTENDED
 #define FF_ASPECT_EXTENDED 15
+#endif
 
     /**
      * the number of pictures in a group of pictures, or 0 for intra_only
@@ -2390,12 +2395,16 @@ typedef struct AVCodecContext {
      */
     int workaround_bugs;
 #define FF_BUG_AUTODETECT       1  ///< autodetection
+#if FF_API_OLD_MSMPEG4
 #define FF_BUG_OLD_MSMPEG4      2
+#endif
 #define FF_BUG_XVID_ILACE       4
 #define FF_BUG_UMP4             8
 #define FF_BUG_NO_PADDING       16
 #define FF_BUG_AMV              32
+#if FF_API_AC_VLC
 #define FF_BUG_AC_VLC           0  ///< Will be removed, libavcodec can now handle these non-compliant files by default.
+#endif
 #define FF_BUG_QPEL_CHROMA      64
 #define FF_BUG_STD_QPEL         128
 #define FF_BUG_QPEL_CHROMA2     256
@@ -2445,7 +2454,12 @@ typedef struct AVCodecContext {
 #define FF_DEBUG_BITSTREAM   4
 #define FF_DEBUG_MB_TYPE     8
 #define FF_DEBUG_QP          16
+#if FF_API_DEBUG_MV
+/**
+ * @deprecated this option does nothing
+ */
 #define FF_DEBUG_MV          32
+#endif
 #define FF_DEBUG_DCT_COEFF   0x00000040
 #define FF_DEBUG_SKIP        0x00000080
 #define FF_DEBUG_STARTCODE   0x00000100
@@ -2453,13 +2467,17 @@ typedef struct AVCodecContext {
 #define FF_DEBUG_ER          0x00000400
 #define FF_DEBUG_MMCO        0x00000800
 #define FF_DEBUG_BUGS        0x00001000
-#define FF_DEBUG_VIS_QP      0x00002000
-#define FF_DEBUG_VIS_MB_TYPE 0x00004000
+#if FF_API_DEBUG_MV
+#define FF_DEBUG_VIS_QP      0x00002000 ///< only access through AVOptions from outside libavcodec
+#define FF_DEBUG_VIS_MB_TYPE 0x00004000 ///< only access through AVOptions from outside libavcodec
+#endif
 #define FF_DEBUG_BUFFERS     0x00008000
 #define FF_DEBUG_THREADS     0x00010000
 
+#if FF_API_DEBUG_MV
     /**
      * debug
+     * Code outside libavcodec should access this field using AVOptions
      * - encoding: Set by user.
      * - decoding: Set by user.
      */
@@ -2467,6 +2485,7 @@ typedef struct AVCodecContext {
 #define FF_DEBUG_VIS_MV_P_FOR  0x00000001 //visualize forward predicted MVs of P frames
 #define FF_DEBUG_VIS_MV_B_FOR  0x00000002 //visualize forward predicted MVs of B frames
 #define FF_DEBUG_VIS_MV_B_BACK 0x00000004 //visualize backward predicted MVs of B frames
+#endif
 
     /**
      * Error recognition; may misdetect some more or less valid parts as errors.
@@ -2903,6 +2922,19 @@ typedef struct AVCodecContext {
      * - encoding: set by libavcodec
      */
     int seek_preroll;
+
+#if !FF_API_DEBUG_MV
+    /**
+     * debug motion vectors
+     * Code outside libavcodec should access this field using AVOptions
+     * - encoding: Set by user.
+     * - decoding: Set by user.
+     */
+    int debug_mv;
+#define FF_DEBUG_VIS_MV_P_FOR  0x00000001 //visualize forward predicted MVs of P frames
+#define FF_DEBUG_VIS_MV_B_FOR  0x00000002 //visualize forward predicted MVs of B frames
+#define FF_DEBUG_VIS_MV_B_BACK 0x00000004 //visualize backward predicted MVs of B frames
+#endif
 } AVCodecContext;
 
 AVRational av_codec_get_pkt_timebase         (const AVCodecContext *avctx);
@@ -4679,7 +4711,13 @@ enum AVPixelFormat avcodec_default_get_format(struct AVCodecContext *s, const en
  * @}
  */
 
+#if FF_API_SET_DIMENSIONS
+/**
+ * @deprecated this function is not supposed to be used from outside of lavc
+ */
+attribute_deprecated
 void avcodec_set_dimensions(AVCodecContext *s, int width, int height);
+#endif
 
 /**
  * Put a string representing the codec tag codec_tag in buf.

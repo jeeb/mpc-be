@@ -230,12 +230,26 @@ unsigned avcodec_get_edge_width(void)
     return EDGE_WIDTH;
 }
 
+#if FF_API_SET_DIMENSIONS
 void avcodec_set_dimensions(AVCodecContext *s, int width, int height)
 {
+    ff_set_dimensions(s, width, height);
+}
+#endif
+
+int ff_set_dimensions(AVCodecContext *s, int width, int height)
+{
+    int ret = av_image_check_size(width, height, 0, s);
+
+    if (ret < 0)
+        width = height = 0;
+
     s->coded_width  = width;
     s->coded_height = height;
     s->width        = FF_CEIL_RSHIFT(width,  s->lowres);
     s->height       = FF_CEIL_RSHIFT(height, s->lowres);
+
+    return ret;
 }
 
 #if HAVE_NEON || ARCH_PPC || HAVE_MMX
@@ -1219,20 +1233,22 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
     if ((ret = av_opt_set_dict(avctx, &tmp)) < 0)
         goto free_and_end;
 
-    // only call avcodec_set_dimensions() for non H.264/VP6F codecs so as not to overwrite previously setup dimensions
+    // only call ff_set_dimensions() for non H.264/VP6F codecs so as not to overwrite previously setup dimensions
     if (!(avctx->coded_width && avctx->coded_height && avctx->width && avctx->height &&
           (avctx->codec_id == AV_CODEC_ID_H264 || avctx->codec_id == AV_CODEC_ID_VP6F))) {
     if (avctx->coded_width && avctx->coded_height)
-        avcodec_set_dimensions(avctx, avctx->coded_width, avctx->coded_height);
+        ret = ff_set_dimensions(avctx, avctx->coded_width, avctx->coded_height);
     else if (avctx->width && avctx->height)
-        avcodec_set_dimensions(avctx, avctx->width, avctx->height);
+        ret = ff_set_dimensions(avctx, avctx->width, avctx->height);
+    if (ret < 0)
+        goto free_and_end;
     }
 
     if ((avctx->coded_width || avctx->coded_height || avctx->width || avctx->height)
         && (  av_image_check_size(avctx->coded_width, avctx->coded_height, 0, avctx) < 0
            || av_image_check_size(avctx->width,       avctx->height,       0, avctx) < 0)) {
         av_log(avctx, AV_LOG_WARNING, "Ignoring invalid width/height values\n");
-        avcodec_set_dimensions(avctx, 0, 0);
+        ff_set_dimensions(avctx, 0, 0);
     }
 
     /* if the decoder init function was already called previously,
@@ -1963,7 +1979,7 @@ static int64_t guess_correct_pts(AVCodecContext *ctx,
 
 static int apply_param_change(AVCodecContext *avctx, AVPacket *avpkt)
 {
-    int size = 0;
+    int size = 0, ret;
     const uint8_t *data;
     uint32_t flags;
 
@@ -2006,8 +2022,10 @@ static int apply_param_change(AVCodecContext *avctx, AVPacket *avpkt)
             goto fail;
         avctx->width  = bytestream_get_le32(&data);
         avctx->height = bytestream_get_le32(&data);
-        avcodec_set_dimensions(avctx, avctx->width, avctx->height);
         size -= 8;
+        ret = ff_set_dimensions(avctx, avctx->width, avctx->height);
+        if (ret < 0)
+            return ret;
     }
 
     return 0;
@@ -2601,6 +2619,7 @@ static enum AVCodecID remap_deprecated_codec_id(enum AVCodecID id)
         case AV_CODEC_ID_ESCAPE130_DEPRECATED : return AV_CODEC_ID_ESCAPE130;
         case AV_CODEC_ID_G2M_DEPRECATED : return AV_CODEC_ID_G2M;
         case AV_CODEC_ID_WEBP_DEPRECATED: return AV_CODEC_ID_WEBP;
+        case AV_CODEC_ID_HEVC_DEPRECATED: return AV_CODEC_ID_HEVC;
         default                         : return id;
     }
 }
