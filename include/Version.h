@@ -32,9 +32,9 @@
 #define MAKE_STR(x)    DO_MAKE_STR(x)
 
 #define MPC_VERSION_MAJOR  1
-#define MPC_VERSION_MINOR  2
-#define MPC_VERSION_PATCH  1
-#define MPC_VERSION_STATUS 0
+#define MPC_VERSION_MINOR  3
+#define MPC_VERSION_PATCH  0
+#define MPC_VERSION_STATUS 3
 
 // MPC_VERSION_STATUS: 0 - alfa; 1 - beta; 2 - RC; 3 - stable
 
