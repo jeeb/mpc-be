@@ -12716,19 +12716,29 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 						m_YoutubeFile = tmpName;
 						m_YoutubeThread = AfxBeginThread(::tmpYoutubeThreadProc, static_cast<LPVOID>(this), THREAD_PRIORITY_ABOVE_NORMAL);
 						while (m_fYoutubeThreadWork == TH_START) {
-							Sleep(100);
+							Sleep(50);
 						}
 
 						if (m_fYoutubeThreadWork == TH_WORK && ::PathFileExists(m_YoutubeFile)) {
 							tmpName = m_YoutubeFile;
 						} else {
-							tmpName = _T("");
+							tmpName.Empty();
 						}
 					}
 					PlayerYouTubePlaylistDelete();
 				}
 
+				TCHAR path[MAX_PATH]	= {0};
+				BOOL bIsDirSet			= FALSE;
+				if (!::PathIsURL(tmpName) && GetCurrentDirectory(sizeof(path), path)) {
+					bIsDirSet = SetCurrentDirectory(GetFolderOnly(tmpName));
+				}
+
 				hr = m_pGB->RenderFile(tmpName, NULL);
+
+				if (bIsDirSet) {
+					SetCurrentDirectory(path);
+				}
 			}
 		}
 
