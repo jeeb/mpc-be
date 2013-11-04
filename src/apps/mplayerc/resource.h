@@ -585,8 +585,8 @@
 #define IDC_DSDXR                       10707
 #define IDC_DSNULL_COMP                 10708
 #define IDC_DSNULL_UNCOMP               10709
-#define IDC_EVR                         10710
-#define IDC_EVR_CUSTOM                  10711
+#define IDC_DSEVR                       10710
+#define IDC_DSEVR_CUSTOM                10711
 #define IDC_DSMADVR                     10712
 #define IDC_DSSYNC                      10713
 #define IDC_RMSYSDEF                    10720

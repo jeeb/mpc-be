@@ -479,6 +479,9 @@ void CPPageOutput::OnDSRendererChange()
 			GetDlgItem(IDC_DSVMR9ALTERNATIVEVSYNC)->EnableWindow(TRUE);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR9REN), GetDlgItem(IDC_VIDRND_COMBO));
+		case VIDRNDT_DS_EVR:
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSEVR), GetDlgItem(IDC_VIDRND_COMBO));
+			break;
 		case VIDRNDT_DS_EVR_CUSTOM:
 			if (m_iD3D9RenderDeviceCtrl.GetCount() > 1) {
 				GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(TRUE);
@@ -497,6 +500,7 @@ void CPPageOutput::OnDSRendererChange()
 			} else {
 				GetDlgItem(IDC_DX_SURFACE)->EnableWindow(TRUE);
 			}
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSEVR_CUSTOM), GetDlgItem(IDC_VIDRND_COMBO));
 			break;
 		case VIDRNDT_DS_SYNC:
 			GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(TRUE);
@@ -507,11 +511,17 @@ void CPPageOutput::OnDSRendererChange()
 			GetDlgItem(IDC_DX_SURFACE)->EnableWindow(FALSE);
 			((CComboBox*)GetDlgItem(IDC_DX_SURFACE))->SetCurSel(2);
 			break;
+		case VIDRNDT_DS_DXR:
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSDXR), GetDlgItem(IDC_VIDRND_COMBO));
+			break;
 		case VIDRNDT_DS_NULL_COMP:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSNULL_COMP), GetDlgItem(IDC_VIDRND_COMBO));
 			break;
 		case VIDRNDT_DS_NULL_UNCOMP:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSNULL_UNCOMP), GetDlgItem(IDC_VIDRND_COMBO));
+			break;
+		case VIDRNDT_DS_MADVR:
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSMADVR), GetDlgItem(IDC_VIDRND_COMBO));
 			break;
 		default:
 			m_wndToolTip.UpdateTipText(EmptyText, GetDlgItem(IDC_VIDRND_COMBO));
