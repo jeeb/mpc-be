@@ -121,54 +121,48 @@ bool IsVideoDecoder(IBaseFilter* pBF, bool fCountConnectedOnly)
 	}
 
 	int nIn, nOut, nInC, nOutC;
-	CountPins(pBF, nIn, nOut, nInC, nOutC);
+	nIn = nInC = 0;
+	nOut = nOutC = 0;
 
-	if (nInC > 0 && nOut > 0) {
-		nIn = nInC = 0;
-		nOut = nOutC = 0;
+	BeginEnumPins(pBF, pEP, pPin) {
 
-		BeginEnumPins(pBF, pEP, pPin) {
+		PIN_DIRECTION dir;
+		if (SUCCEEDED(pPin->QueryDirection(&dir))) {
+			CComPtr<IPin> pPinConnectedTo;
+			pPin->ConnectedTo(&pPinConnectedTo);
 
-			PIN_DIRECTION dir;
-			if (SUCCEEDED(pPin->QueryDirection(&dir))) {
-				CComPtr<IPin> pPinConnectedTo;
-				pPin->ConnectedTo(&pPinConnectedTo);
+			if (dir == PINDIR_INPUT) {
+				AM_MEDIA_TYPE mt;
+				if (S_OK != pPin->ConnectionMediaType(&mt)) {
+					continue;
+				}
+				FreeMediaType(mt);
 
-				if (dir == PINDIR_INPUT) {
-					AM_MEDIA_TYPE mt;
-					if (S_OK != pPin->ConnectionMediaType(&mt)) {
-						continue;
+				if (mt.majortype == MEDIATYPE_Video || mt.majortype == MEDIATYPE_DVD_ENCRYPTED_PACK) {
+					nIn++;
+					if (pPinConnectedTo) {
+						nInC++;
 					}
-					FreeMediaType(mt);
+				}
+			} else if (dir == PINDIR_OUTPUT) {
+				AM_MEDIA_TYPE mt;
+				if (S_OK != pPin->ConnectionMediaType(&mt)) {
+					continue;
+				}
+				FreeMediaType(mt);
 
-					if (mt.majortype == MEDIATYPE_Video) {
-						nIn++;
-						if (pPinConnectedTo) {
-							nInC++;
-						}
-					}
-				} else if (dir == PINDIR_OUTPUT) {
-					AM_MEDIA_TYPE mt;
-					if (S_OK != pPin->ConnectionMediaType(&mt)) {
-						continue;
-					}
-					FreeMediaType(mt);
-
-					if (mt.majortype == MEDIATYPE_Video) {
-						nOut++;
-						if (pPinConnectedTo) {
-							nOutC++;
-						}
+				if (mt.majortype == MEDIATYPE_Video) {
+					nOut++;
+					if (pPinConnectedTo) {
+						nOutC++;
 					}
 				}
 			}
 		}
-		EndEnumPins
-
-		return fCountConnectedOnly ? (nInC && nOutC) : (nIn && nOut);
 	}
+	EndEnumPins
 
-	return false;
+	return fCountConnectedOnly ? (nInC && nOutC) : (nIn && nOut);
 }
 
 bool IsVideoRenderer(IBaseFilter* pBF)
