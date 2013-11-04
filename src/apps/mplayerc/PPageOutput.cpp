@@ -103,6 +103,8 @@ void CPPageOutput::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CPPageOutput, CPPageBase)
 	ON_CBN_SELCHANGE(IDC_VIDRND_COMBO, OnDSRendererChange)
+	ON_CBN_SELCHANGE(IDC_RMRND_COMBO, OnRMRendererChange)
+	ON_CBN_SELCHANGE(IDC_QTRND_COMBO, OnQTRendererChange)
 	ON_CBN_SELCHANGE(IDC_DX_SURFACE, OnSurfaceChange)
 	ON_BN_CLICKED(IDC_D3D9DEVICE, OnD3D9DeviceCheck)
 	ON_BN_CLICKED(IDC_FULLSCREEN_MONITOR_CHECK, OnFullscreenCheck)
@@ -340,8 +342,12 @@ BOOL CPPageOutput::OnInitDialog()
 
 	CreateToolTip();
 	m_wndToolTip.AddTool(GetDlgItem(IDC_VIDRND_COMBO), EmptyText);
+	m_wndToolTip.AddTool(GetDlgItem(IDC_RMRND_COMBO), EmptyText);
+	m_wndToolTip.AddTool(GetDlgItem(IDC_QTRND_COMBO), EmptyText);
 
 	OnDSRendererChange();
+	OnRMRendererChange();
+	OnQTRendererChange();
 	OnAudioRendererChange();
 
 	// YUV mixing is incompatible with Vista+
@@ -525,6 +531,44 @@ void CPPageOutput::OnDSRendererChange()
 			break;
 		default:
 			m_wndToolTip.UpdateTipText(EmptyText, GetDlgItem(IDC_VIDRND_COMBO));
+	}
+
+	SetModified();
+}
+
+void CPPageOutput::OnRMRendererChange()
+{
+	UpdateData();
+
+	switch (m_iRMVideoRendererType) {
+		case VIDRNDT_RM_DEFAULT:
+			m_wndToolTip.UpdateTipText(ResStr(IDC_RMSYSDEF), GetDlgItem(IDC_RMRND_COMBO));
+			break;
+		case VIDRNDT_RM_DX7:
+			m_wndToolTip.UpdateTipText(ResStr(IDC_RMDX7), GetDlgItem(IDC_RMRND_COMBO));
+			break;
+		case VIDRNDT_RM_DX9:
+			m_wndToolTip.UpdateTipText(ResStr(IDC_RMDX9), GetDlgItem(IDC_RMRND_COMBO));
+			break;
+	}
+
+	SetModified();
+}
+
+void CPPageOutput::OnQTRendererChange()
+{
+	UpdateData();
+
+	switch (m_iQTVideoRendererType) {
+		case VIDRNDT_QT_DEFAULT:
+			m_wndToolTip.UpdateTipText(ResStr(IDC_QTSYSDEF), GetDlgItem(IDC_QTRND_COMBO));
+			break;
+		case VIDRNDT_QT_DX7:
+			m_wndToolTip.UpdateTipText(ResStr(IDC_QTDX7), GetDlgItem(IDC_QTRND_COMBO));
+			break;
+		case VIDRNDT_QT_DX9:
+			m_wndToolTip.UpdateTipText(ResStr(IDC_QTDX9), GetDlgItem(IDC_QTRND_COMBO));
+			break;
 	}
 
 	SetModified();

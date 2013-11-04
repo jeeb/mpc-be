@@ -81,6 +81,8 @@ public:
 	afx_msg void OnUpdateMixerYUV(CCmdUI* pCmdUI);
 	afx_msg void OnSurfaceChange();
 	afx_msg void OnDSRendererChange();
+	afx_msg void OnRMRendererChange();
+	afx_msg void OnQTRendererChange();
 	afx_msg void OnFullscreenCheck();
 	afx_msg void OnD3D9DeviceCheck();
 	afx_msg void OnAudioRendererChange();
