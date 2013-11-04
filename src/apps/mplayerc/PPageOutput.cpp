@@ -29,6 +29,8 @@
 
 // CPPageOutput dialog
 
+static const LPCTSTR EmptyText = _T("");
+
 static bool IsRenderTypeAvailable(UINT VideoRendererType)
 {
 	switch (VideoRendererType) {
@@ -336,6 +338,9 @@ BOOL CPPageOutput::OnInitDialog()
 
 	UpdateData(FALSE);
 
+	CreateToolTip();
+	m_wndToolTip.AddTool(GetDlgItem(IDC_VIDRND_COMBO), EmptyText);
+
 	OnDSRendererChange();
 	OnAudioRendererChange();
 
@@ -366,8 +371,6 @@ BOOL CPPageOutput::OnInitDialog()
 			GetDlgItem(IDC_D3D9DEVICE_COMBO)->EnableWindow(FALSE);
  	}
 	UpdateData(TRUE);
-
-	CreateToolTip();
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 }
@@ -421,9 +424,9 @@ void CPPageOutput::OnSurfaceChange()
 
 void CPPageOutput::OnDSRendererChange()
 {
-	UINT CURRENT_VR = m_iDSVideoRendererTypeCtrl.GetItemData(m_iDSVideoRendererTypeCtrl.GetCurSel());
+	UINT CurrentVR = m_iDSVideoRendererTypeCtrl.GetItemData(m_iDSVideoRendererTypeCtrl.GetCurSel());
 
-	if (!IsRenderTypeAvailable(CURRENT_VR)) {
+	if (!IsRenderTypeAvailable(CurrentVR)) {
 		AfxMessageBox(IDS_PPAGE_OUTPUT_UNAVAILABLEMSG, MB_ICONEXCLAMATION | MB_OK, 0);
 
 		// revert to the last saved renderer
@@ -431,7 +434,7 @@ void CPPageOutput::OnDSRendererChange()
 		for (int i = 0; i < m_iDSVideoRendererTypeCtrl.GetCount(); ++i) {
 			if (m_iDSVideoRendererType_store == m_iDSVideoRendererTypeCtrl.GetItemData(i)) {
 				m_iDSVideoRendererTypeCtrl.SetCurSel(i);
-				CURRENT_VR = m_iDSVideoRendererTypeCtrl.GetItemData(m_iDSVideoRendererTypeCtrl.GetCurSel());
+				CurrentVR = m_iDSVideoRendererTypeCtrl.GetItemData(m_iDSVideoRendererTypeCtrl.GetCurSel());
 				break;
 			}
 		}
@@ -444,21 +447,38 @@ void CPPageOutput::OnDSRendererChange()
 	GetDlgItem(IDC_DSVMR9YUVMIXER)->EnableWindow(FALSE);
 	GetDlgItem(IDC_DSVMR9ALTERNATIVEVSYNC)->EnableWindow(FALSE);
 	GetDlgItem(IDC_RESETDEVICE)->EnableWindow(FALSE);
-	GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(CURRENT_VR == VIDRNDT_DS_EVR_CUSTOM);
-	GetDlgItem(IDC_EVR_BUFFERS_TXT)->EnableWindow(CURRENT_VR == VIDRNDT_DS_EVR_CUSTOM);
+	GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(CurrentVR == VIDRNDT_DS_EVR_CUSTOM);
+	GetDlgItem(IDC_EVR_BUFFERS_TXT)->EnableWindow(CurrentVR == VIDRNDT_DS_EVR_CUSTOM);
 
 	GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(FALSE);
 	GetDlgItem(IDC_D3D9DEVICE_COMBO)->EnableWindow(FALSE);
 
-	switch (CURRENT_VR) {
+	switch (CurrentVR) {
+		case VIDRNDT_DS_DEFAULT:
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSSYSDEF), GetDlgItem(IDC_VIDRND_COMBO));
+			break;
+		case VIDRNDT_DS_OLDRENDERER:
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSOLD), GetDlgItem(IDC_VIDRND_COMBO));
+			break;
+		case VIDRNDT_DS_OVERLAYMIXER:
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSOVERLAYMIXER), GetDlgItem(IDC_VIDRND_COMBO));
+			break;
+		case VIDRNDT_DS_VMR7WINDOWED:
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR7WIN), GetDlgItem(IDC_VIDRND_COMBO));
+			break;
+		case VIDRNDT_DS_VMR9WINDOWED:
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR9WIN), GetDlgItem(IDC_VIDRND_COMBO));
+			break;
 		case VIDRNDT_DS_VMR7RENDERLESS:
 			GetDlgItem(IDC_DX_SURFACE)->EnableWindow(TRUE);
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR7REN), GetDlgItem(IDC_VIDRND_COMBO));
 			break;
 		case VIDRNDT_DS_VMR9RENDERLESS:
 			GetDlgItem(IDC_DSVMR9LOADMIXER)->EnableWindow(TRUE);
 			GetDlgItem(IDC_DSVMR9YUVMIXER)->EnableWindow(TRUE);
 			GetDlgItem(IDC_DSVMR9ALTERNATIVEVSYNC)->EnableWindow(TRUE);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR9REN), GetDlgItem(IDC_VIDRND_COMBO));
 		case VIDRNDT_DS_EVR_CUSTOM:
 			if (m_iD3D9RenderDeviceCtrl.GetCount() > 1) {
 				GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(TRUE);
@@ -471,7 +491,7 @@ void CPPageOutput::OnDSRendererChange()
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
 
 			// Force 3D surface with EVR Custom
-			if (CURRENT_VR == VIDRNDT_DS_EVR_CUSTOM) {
+			if (CurrentVR == VIDRNDT_DS_EVR_CUSTOM) {
 				GetDlgItem(IDC_DX_SURFACE)->EnableWindow(FALSE);
 				((CComboBox*)GetDlgItem(IDC_DX_SURFACE))->SetCurSel(2);
 			} else {
@@ -487,6 +507,14 @@ void CPPageOutput::OnDSRendererChange()
 			GetDlgItem(IDC_DX_SURFACE)->EnableWindow(FALSE);
 			((CComboBox*)GetDlgItem(IDC_DX_SURFACE))->SetCurSel(2);
 			break;
+		case VIDRNDT_DS_NULL_COMP:
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSNULL_COMP), GetDlgItem(IDC_VIDRND_COMBO));
+			break;
+		case VIDRNDT_DS_NULL_UNCOMP:
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSNULL_UNCOMP), GetDlgItem(IDC_VIDRND_COMBO));
+			break;
+		default:
+			m_wndToolTip.UpdateTipText(EmptyText, GetDlgItem(IDC_VIDRND_COMBO));
 	}
 
 	SetModified();
