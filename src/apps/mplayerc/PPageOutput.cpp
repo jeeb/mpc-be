@@ -344,10 +344,12 @@ BOOL CPPageOutput::OnInitDialog()
 	m_wndToolTip.AddTool(GetDlgItem(IDC_VIDRND_COMBO), EmptyText);
 	m_wndToolTip.AddTool(GetDlgItem(IDC_RMRND_COMBO), EmptyText);
 	m_wndToolTip.AddTool(GetDlgItem(IDC_QTRND_COMBO), EmptyText);
+	m_wndToolTip.AddTool(GetDlgItem(IDC_DX_SURFACE), EmptyText);
 
 	OnDSRendererChange();
 	OnRMRendererChange();
 	OnQTRendererChange();
+	OnSurfaceChange();
 	OnAudioRendererChange();
 
 	// YUV mixing is incompatible with Vista+
@@ -425,6 +427,20 @@ void CPPageOutput::OnUpdateMixerYUV(CCmdUI* pCmdUI)
 
 void CPPageOutput::OnSurfaceChange()
 {
+	UpdateData();
+
+	switch (m_iAPSurfaceUsage) {
+		case VIDRNDT_AP_SURFACE:
+			m_wndToolTip.UpdateTipText(ResStr(IDC_REGULARSURF), GetDlgItem(IDC_DX_SURFACE));
+			break;
+		case VIDRNDT_AP_TEXTURE2D:
+			m_wndToolTip.UpdateTipText(ResStr(IDC_TEXTURESURF2D), GetDlgItem(IDC_DX_SURFACE));
+			break;
+		case VIDRNDT_AP_TEXTURE3D:
+			m_wndToolTip.UpdateTipText(ResStr(IDC_TEXTURESURF3D), GetDlgItem(IDC_DX_SURFACE));
+			break;
+	}
+
 	SetModified();
 }
 
