@@ -9778,7 +9778,7 @@ void CMainFrame::OnUpdateNormalizeRegainVolume(CCmdUI* pCmdUI)
 
 void CMainFrame::OnPlayColor(UINT nID)
 {
-	if (m_pVMRMC || m_pMFVP) {
+	if (m_pVMRMC9 || m_pMFVP) {
 		AppSettings& s = AfxGetAppSettings();
 		//ColorRanges* crs = AfxGetMyApp()->ColorControls;
 		int& brightness = s.iBrightness;
@@ -14992,7 +14992,7 @@ void CMainFrame::CloseMediaPrivate()
 	// IMPORTANT: IVMRSurfaceAllocatorNotify/IVMRSurfaceAllocatorNotify9 has to be released before the VMR/VMR9, otherwise it will crash in Release()
 	m_pCAP2.Release();
 	m_pCAP.Release();
-	m_pVMRMC.Release();
+	m_pVMRMC9.Release();
 	m_pMFVP.Release();
 	m_pMFVDC.Release();
 	m_pLN21.Release();
@@ -18423,11 +18423,11 @@ void CMainFrame::SetupEVRColorControl()
 
 void CMainFrame::SetupVMR9ColorControl()
 {
-	if (m_pVMRMC) {
-		if (FAILED(m_pVMRMC->GetProcAmpControlRange(0, AfxGetMyApp()->GetVMR9ColorControl(ProcAmp_Brightness)))) return;
-		if (FAILED(m_pVMRMC->GetProcAmpControlRange(0, AfxGetMyApp()->GetVMR9ColorControl(ProcAmp_Contrast))))   return;
-		if (FAILED(m_pVMRMC->GetProcAmpControlRange(0, AfxGetMyApp()->GetVMR9ColorControl(ProcAmp_Hue))))        return;
-		if (FAILED(m_pVMRMC->GetProcAmpControlRange(0, AfxGetMyApp()->GetVMR9ColorControl(ProcAmp_Saturation)))) return;
+	if (m_pVMRMC9) {
+		if (FAILED(m_pVMRMC9->GetProcAmpControlRange(0, AfxGetMyApp()->GetVMR9ColorControl(ProcAmp_Brightness)))) return;
+		if (FAILED(m_pVMRMC9->GetProcAmpControlRange(0, AfxGetMyApp()->GetVMR9ColorControl(ProcAmp_Contrast))))   return;
+		if (FAILED(m_pVMRMC9->GetProcAmpControlRange(0, AfxGetMyApp()->GetVMR9ColorControl(ProcAmp_Hue))))        return;
+		if (FAILED(m_pVMRMC9->GetProcAmpControlRange(0, AfxGetMyApp()->GetVMR9ColorControl(ProcAmp_Saturation)))) return;
 
 		AfxGetMyApp()->UpdateColorControlRange(false);
 		SetColorControl(ProcAmp_All, AfxGetAppSettings().iBrightness, AfxGetAppSettings().iContrast, AfxGetAppSettings().iHue, AfxGetAppSettings().iSaturation);
@@ -18458,7 +18458,7 @@ void CMainFrame::SetColorControl(DWORD flags, int& brightness, int& contrast, in
 	}
 
 
-	if (m_pVMRMC) {
+	if (m_pVMRMC9) {
 		ClrControl.dwSize     = sizeof(ClrControl);
 		ClrControl.dwFlags    = flags;
 		ClrControl.Brightness = (float)brightness;
@@ -18466,7 +18466,7 @@ void CMainFrame::SetColorControl(DWORD flags, int& brightness, int& contrast, in
 		ClrControl.Hue        = (float)hue;
 		ClrControl.Saturation = (float)(saturation+100)/100;
 
-		m_pVMRMC->SetProcAmpControl(0, &ClrControl);
+		m_pVMRMC9->SetProcAmpControl(0, &ClrControl);
 	} else if (m_pMFVP) {
 		ClrValues.Brightness = IntToFixed(brightness);
 		ClrValues.Contrast   = IntToFixed(contrast+100, 100);
