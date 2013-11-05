@@ -469,9 +469,8 @@ void CPPageOutput::OnDSRendererChange()
 	GetDlgItem(IDC_DSVMR9YUVMIXER)->EnableWindow(FALSE);
 	GetDlgItem(IDC_DSVMR9ALTERNATIVEVSYNC)->EnableWindow(FALSE);
 	GetDlgItem(IDC_RESETDEVICE)->EnableWindow(FALSE);
-	GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(CurrentVR == VIDRNDT_DS_EVR_CUSTOM);
-	GetDlgItem(IDC_EVR_BUFFERS_TXT)->EnableWindow(CurrentVR == VIDRNDT_DS_EVR_CUSTOM);
-
+	GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(FALSE);
+	GetDlgItem(IDC_EVR_BUFFERS_TXT)->EnableWindow(FALSE);
 	GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(FALSE);
 	GetDlgItem(IDC_D3D9DEVICE_COMBO)->EnableWindow(FALSE);
 
@@ -496,11 +495,21 @@ void CPPageOutput::OnDSRendererChange()
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR7REN), GetDlgItem(IDC_VIDRND_COMBO));
 			break;
 		case VIDRNDT_DS_VMR9RENDERLESS:
+			if (m_iD3D9RenderDeviceCtrl.GetCount() > 1) {
+				GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(TRUE);
+				GetDlgItem(IDC_D3D9DEVICE_COMBO)->EnableWindow(IsDlgButtonChecked(IDC_D3D9DEVICE));
+			}
 			GetDlgItem(IDC_DSVMR9LOADMIXER)->EnableWindow(TRUE);
 			GetDlgItem(IDC_DSVMR9YUVMIXER)->EnableWindow(TRUE);
 			GetDlgItem(IDC_DSVMR9ALTERNATIVEVSYNC)->EnableWindow(TRUE);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
+			GetDlgItem(IDC_DX9RESIZER_COMBO)->EnableWindow(TRUE);
+			GetDlgItem(IDC_FULLSCREEN_MONITOR_CHECK)->EnableWindow(TRUE);
+			GetDlgItem(IDC_DSVMR9ALTERNATIVEVSYNC)->EnableWindow(TRUE);
+			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
+			GetDlgItem(IDC_DX_SURFACE)->EnableWindow(TRUE);
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR9REN), GetDlgItem(IDC_VIDRND_COMBO));
+			break;
 		case VIDRNDT_DS_EVR:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSEVR), GetDlgItem(IDC_VIDRND_COMBO));
 			break;
@@ -514,14 +523,13 @@ void CPPageOutput::OnDSRendererChange()
 			GetDlgItem(IDC_FULLSCREEN_MONITOR_CHECK)->EnableWindow(TRUE);
 			GetDlgItem(IDC_DSVMR9ALTERNATIVEVSYNC)->EnableWindow(TRUE);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
+			GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(TRUE);
+			GetDlgItem(IDC_EVR_BUFFERS_TXT)->EnableWindow(TRUE);
 
 			// Force 3D surface with EVR Custom
-			if (CurrentVR == VIDRNDT_DS_EVR_CUSTOM) {
-				GetDlgItem(IDC_DX_SURFACE)->EnableWindow(FALSE);
-				((CComboBox*)GetDlgItem(IDC_DX_SURFACE))->SetCurSel(2);
-			} else {
-				GetDlgItem(IDC_DX_SURFACE)->EnableWindow(TRUE);
-			}
+			GetDlgItem(IDC_DX_SURFACE)->EnableWindow(FALSE);
+			((CComboBox*)GetDlgItem(IDC_DX_SURFACE))->SetCurSel(2);
+
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSEVR_CUSTOM), GetDlgItem(IDC_VIDRND_COMBO));
 			break;
 		case VIDRNDT_DS_SYNC:
@@ -532,6 +540,7 @@ void CPPageOutput::OnDSRendererChange()
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
 			GetDlgItem(IDC_DX_SURFACE)->EnableWindow(FALSE);
 			((CComboBox*)GetDlgItem(IDC_DX_SURFACE))->SetCurSel(2);
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSSYNC), GetDlgItem(IDC_VIDRND_COMBO));
 			break;
 		case VIDRNDT_DS_DXR:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSDXR), GetDlgItem(IDC_VIDRND_COMBO));
