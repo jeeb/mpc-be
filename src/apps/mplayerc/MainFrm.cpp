@@ -14670,11 +14670,11 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		m_pCAP2 = NULL;
 		m_pCAP = NULL;
 
-		m_pGB->FindInterface(__uuidof(ISubPicAllocatorPresenter),  (void**)&m_pCAP,   TRUE);
-		m_pGB->FindInterface(__uuidof(ISubPicAllocatorPresenter2), (void**)&m_pCAP2,  TRUE);
-		m_pGB->FindInterface(__uuidof(IVMRMixerControl9),          (void**)&m_pVMRMC, TRUE);
-		m_pGB->FindInterface(__uuidof(IVMRMixerBitmap9),           (void**)&pVMB,     TRUE);
-		m_pGB->FindInterface(__uuidof(IMFVideoMixerBitmap),        (void**)&pMFVMB,   TRUE);
+		m_pGB->FindInterface(__uuidof(ISubPicAllocatorPresenter),  (void**)&m_pCAP,    TRUE);
+		m_pGB->FindInterface(__uuidof(ISubPicAllocatorPresenter2), (void**)&m_pCAP2,   TRUE);
+		m_pGB->FindInterface(__uuidof(IVMRMixerControl9),          (void**)&m_pVMRMC9, TRUE);
+		m_pGB->FindInterface(__uuidof(IVMRMixerBitmap9),           (void**)&pVMB,      TRUE);
+		m_pGB->FindInterface(__uuidof(IMFVideoMixerBitmap),        (void**)&pMFVMB,    TRUE);
 		pMVTO = m_pCAP;
 
 		SetupVMR9ColorControl();

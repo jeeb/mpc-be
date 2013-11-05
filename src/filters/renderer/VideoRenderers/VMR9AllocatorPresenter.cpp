@@ -116,9 +116,9 @@ STDMETHODIMP CVMR9AllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 				break;
 			}
 
-			if (CComQIPtr<IVMRMixerControl9> pMC = pBF) {
+			if (CComQIPtr<IVMRMixerControl9> pVMRMC9 = pBF) {
 				DWORD dwPrefs;
-				pMC->GetMixingPrefs(&dwPrefs);
+				pVMRMC9->GetMixingPrefs(&dwPrefs);
 
 				// See http://msdn.microsoft.com/en-us/library/dd390928(VS.85).aspx
 				dwPrefs |= MixerPref9_NonSquareMixing;
@@ -128,7 +128,7 @@ STDMETHODIMP CVMR9AllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 					dwPrefs |= MixerPref9_RenderTargetYUV;
 					dwPrefs |= MixerPref9_DynamicSwitchToBOB;
 				}
-				pMC->SetMixingPrefs(dwPrefs);
+				pVMRMC9->SetMixingPrefs(dwPrefs);
 			}
 		}
 

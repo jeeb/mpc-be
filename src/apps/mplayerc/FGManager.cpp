@@ -957,8 +957,8 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 						pARC->SetAspectRatioMode(VMR_ARMODE_NONE);
 					}
 
-					if (CComQIPtr<IVMRMixerControl9> pMC = pBF) {
-						m_pUnks.AddTail (pMC);
+					if (CComQIPtr<IVMRMixerControl9> pVMRMC9 = pBF) {
+						m_pUnks.AddTail (pVMRMC9);
 					}
 
 					if (CComQIPtr<IVMRMixerBitmap9> pMB = pBF) {

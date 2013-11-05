@@ -242,7 +242,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	CComPtr<IAMTVTuner>             pAMTuner;
 	CComPtr<IAMDroppedFrames>       pAMDF;
 
-	CComPtr<IVMRMixerControl9>      m_pVMRMC;
+	CComPtr<IVMRMixerControl9>      m_pVMRMC9;
 	CComPtr<IMFVideoDisplayControl> m_pMFVDC;
 	CComPtr<IMFVideoProcessor>      m_pMFVP;
 	CComPtr<IAMLine21Decoder_2>     m_pLN21;
