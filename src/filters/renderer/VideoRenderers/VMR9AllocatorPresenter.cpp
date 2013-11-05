@@ -123,9 +123,10 @@ STDMETHODIMP CVMR9AllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 				// See http://msdn.microsoft.com/en-us/library/dd390928(VS.85).aspx
 				dwPrefs |= MixerPref9_NonSquareMixing;
 				dwPrefs |= MixerPref9_NoDecimation;
-				if (s.fVMR9MixerYUV && !IsWinVistaOrLater()) {
+				if (s.fVMR9MixerYUV) {
 					dwPrefs &= ~MixerPref9_RenderTargetMask;
 					dwPrefs |= MixerPref9_RenderTargetYUV;
+					dwPrefs |= MixerPref9_DynamicSwitchToBOB;
 				}
 				pMC->SetMixingPrefs(dwPrefs);
 			}

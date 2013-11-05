@@ -352,11 +352,6 @@ BOOL CPPageOutput::OnInitDialog()
 	OnSurfaceChange();
 	OnAudioRendererChange();
 
-	// YUV mixing is incompatible with Vista+
-	if (IsWinVistaOrLater()) {
-		GetDlgItem(IDC_DSVMR9YUVMIXER)->ShowWindow(SW_HIDE);
-	}
-
 	CheckDlgButton(IDC_D3D9DEVICE, BST_UNCHECKED);
 	GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(FALSE);
 	GetDlgItem(IDC_D3D9DEVICE_COMBO)->EnableWindow(FALSE);
