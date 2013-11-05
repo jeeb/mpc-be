@@ -1568,6 +1568,11 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 
 	if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO
 			|| m_nCodecId == AV_CODEC_ID_MPEG1VIDEO
+			|| pmt->subtype == MEDIASUBTYPE_H264
+			|| pmt->subtype == MEDIASUBTYPE_h264
+			|| pmt->subtype == MEDIASUBTYPE_X264
+			|| pmt->subtype == MEDIASUBTYPE_x264
+			|| pmt->subtype == MEDIASUBTYPE_H264_bis
 			|| pmt->subtype == MEDIASUBTYPE_HEVC) {
 		m_pParser = av_parser_init(m_nCodecId);
 	}
@@ -1605,15 +1610,11 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 			return VFW_E_TYPE_NOT_ACCEPTED;
 		}
 
-		m_pAVCtx->codec_tag		= pBMI->biCompression ? pBMI->biCompression : pmt->subtype.Data1;
-
-		switch (m_pAVCtx->codec_tag) {
-			case FCC('avc1'):
-			case FCC('AVC1'):
+		switch (m_nCodecId) {
+			case AV_CODEC_ID_H264:
 				m_bReorderBFrame = IsAVI() ? true : false;
 				break;
-			case FCC('mp4v'):
-			case FCC('MP4V'):
+			case AV_CODEC_ID_MPEG4:
 				m_bReorderBFrame = false;
 				break;
 		}

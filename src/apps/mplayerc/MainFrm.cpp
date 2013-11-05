@@ -12821,7 +12821,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 			EndEnumFilters;
 
-			if (!bIsVideo || FAILED(m_pGB_preview->RenderFile(CStringW(fn), NULL))) {
+			if (!bIsVideo || FAILED(m_pGB_preview->RenderFile(fn, NULL))) {
 				if (m_pGB_preview) {
 					m_pMFVP_preview  = NULL;
 					m_pMFVDC_preview = NULL;
@@ -13105,7 +13105,7 @@ void CMainFrame::SetupChapters()
 
 CString CMainFrame::OpenDVD(OpenDVDData* pODD)
 {
-	HRESULT hr = m_pGB->RenderFile(CStringW(pODD->path), NULL);
+	HRESULT hr = m_pGB->RenderFile(pODD->path, NULL);
 
 	AppSettings& s = AfxGetAppSettings();
 
@@ -13117,7 +13117,7 @@ CString CMainFrame::OpenDVD(OpenDVDData* pODD)
 	}
 
 	if (SUCCEEDED(hr) && b_UseSmartSeek) {
-		if (FAILED(hr = m_pGB_preview->RenderFile(CStringW(pODD->path), NULL))) {
+		if (FAILED(hr = m_pGB_preview->RenderFile(pODD->path, NULL))) {
 			b_UseSmartSeek = false;
 		}
 	}
@@ -13192,7 +13192,7 @@ CString CMainFrame::OpenDVD(OpenDVDData* pODD)
 
 HRESULT CMainFrame::OpenBDAGraph()
 {
-	HRESULT hr = m_pGB->RenderFile (L"",L"");
+	HRESULT hr = m_pGB->RenderFile(L"", NULL);
 	if (!FAILED(hr)) {
 		AddTextPassThruFilter();
 		SetPlaybackMode(PM_CAPTURE);
