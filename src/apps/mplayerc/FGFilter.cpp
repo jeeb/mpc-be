@@ -490,6 +490,46 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 		hr = E_FAIL;
 	}
 
+	CRenderersSettings& s = GetRenderersSettings();
+	if (s.fVMRMixerMode) {
+		// VMR9
+		if (CComQIPtr<IVMRFilterConfig9> pConfig = *ppBF) {
+			pConfig->SetNumberOfStreams(m_clsid == CLSID_VMR9AllocatorPresenter ? 1 : 4);
+
+			if (CComQIPtr<IVMRMixerControl9> pVMRMC9 = *ppBF) {
+				DWORD dwPrefs;
+				pVMRMC9->GetMixingPrefs(&dwPrefs);
+
+				// See http://msdn.microsoft.com/en-us/library/dd390928(VS.85).aspx
+				dwPrefs |= MixerPref9_NonSquareMixing;
+				dwPrefs |= MixerPref9_NoDecimation;
+				if (s.fVMRMixerYUV) {
+					dwPrefs &= ~MixerPref9_RenderTargetMask;
+					dwPrefs |= MixerPref9_RenderTargetYUV;
+					dwPrefs |= MixerPref9_DynamicSwitchToBOB;
+				}
+				pVMRMC9->SetMixingPrefs(dwPrefs);
+			}
+		}
+		// VMR7
+		else if (CComQIPtr<IVMRFilterConfig> pConfig = *ppBF) {
+			pConfig->SetNumberOfStreams(1);
+
+			if (CComQIPtr<IVMRMixerControl> pVMRMC = *ppBF) {
+				DWORD dwPrefs;
+				pVMRMC->GetMixingPrefs(&dwPrefs);
+
+				dwPrefs |= MixerPref_NoDecimation;
+				if (s.fVMRMixerYUV) {
+					dwPrefs &= ~MixerPref_RenderTargetMask;
+					dwPrefs |= MixerPref_RenderTargetYUV;
+					dwPrefs |= MixerPref_DynamicSwitchToBOB;
+				}
+				pVMRMC->SetMixingPrefs(dwPrefs);
+			}
+		}
+	}
+
 	return hr;
 }
 

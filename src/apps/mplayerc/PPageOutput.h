@@ -58,8 +58,8 @@ public:
 	int m_iAudioRendererType;
 	int m_iSecAudioRendererType;
 	int m_iDX9Resizer;
-	BOOL m_fVMR9MixerMode;
-	BOOL m_fVMR9MixerYUV;
+	BOOL m_fVMRMixerMode;
+	BOOL m_fVMRMixerYUV;
 	BOOL m_fD3DFullscreen;
 	BOOL m_fVMR9AlterativeVSync;
 	BOOL m_fResetDevice;

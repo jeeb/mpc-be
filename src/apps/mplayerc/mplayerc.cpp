@@ -698,6 +698,16 @@ BOOL CMPlayerCApp::SendCommandLine(HWND hWnd)
 	return SendMessage(hWnd, WM_COPYDATA, (WPARAM)NULL, (LPARAM)&cds);
 }
 
+typedef struct THREADCopyData {
+	CMPlayerCApp*	pMPlayerCApp;
+	HWND			hWND;
+} THREADCopyData, *PTHREADCopyData;
+
+UINT CMPlayerCApp::RunTHREADCopyData(LPVOID pParam) {
+	PTHREADCopyData pTCD = reinterpret_cast<PTHREADCopyData>(pParam);
+	return (BOOL)pTCD->pMPlayerCApp->SendCommandLine(pTCD->hWND);
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // CMPlayerCApp initialization
 
@@ -1201,9 +1211,24 @@ BOOL CMPlayerCApp::InitInstance()
 				if (!(m_s.nCLSwitches&CLSW_MINIMIZED) && IsIconic(hWnd)) {
 					ShowWindow(hWnd, SW_RESTORE);
 				}
-				SendCommandLine(hWnd);
-				m_mutexOneInstance.Close();
-				return FALSE;
+				BOOL bDataIsSend = TRUE;
+
+				PTHREADCopyData pTCD	= DNew THREADCopyData;
+				pTCD->pMPlayerCApp		= this;
+				pTCD->hWND				= hWnd;
+
+				CWinThread*	pTHREADCopyData = AfxBeginThread(RunTHREADCopyData, static_cast<LPVOID>(pTCD));
+				if (WaitForSingleObject(pTHREADCopyData->m_hThread, 3000) == WAIT_TIMEOUT) {
+					TerminateThread(pTHREADCopyData->m_hThread, 0xDEAD);
+					bDataIsSend = FALSE;
+				}
+
+				delete pTCD;
+
+				if (bDataIsSend) {
+					m_mutexOneInstance.Close();
+					return FALSE;
+				}
 			}
 		}
 	}
@@ -1214,8 +1239,6 @@ BOOL CMPlayerCApp::InitInstance()
 	if (IsIniValid() && !IsIniUTF16LE()) {
 		ChangeSettingsLocation(true);
 	}
-
-	AfxGetMyApp()->m_AudioRendererDisplayName_CL = _T("");
 
 	if (!__super::InitInstance()) {
 		AfxMessageBox(_T("InitInstance failed!"));
@@ -1757,7 +1780,7 @@ void SetDispMode(dispmode& dm, CString& DisplayName)
 void SetAudioRenderer(int AudioDevNo)
 {
 	CStringArray m_AudioRendererDisplayNames;
-	AfxGetMyApp()->m_AudioRendererDisplayName_CL = _T("");
+	AfxGetMyApp()->m_AudioRendererDisplayName_CL.Empty();
 	m_AudioRendererDisplayNames.Add(_T(""));
 	int i=2;
 

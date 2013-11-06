@@ -111,27 +111,6 @@ STDMETHODIMP CVMR9AllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 
 		CRenderersSettings& s = GetRenderersSettings();
 
-		if (s.fVMR9MixerMode) {
-			if (FAILED(hr = pConfig->SetNumberOfStreams(1))) {
-				break;
-			}
-
-			if (CComQIPtr<IVMRMixerControl9> pVMRMC9 = pBF) {
-				DWORD dwPrefs;
-				pVMRMC9->GetMixingPrefs(&dwPrefs);
-
-				// See http://msdn.microsoft.com/en-us/library/dd390928(VS.85).aspx
-				dwPrefs |= MixerPref9_NonSquareMixing;
-				dwPrefs |= MixerPref9_NoDecimation;
-				if (s.fVMR9MixerYUV) {
-					dwPrefs &= ~MixerPref9_RenderTargetMask;
-					dwPrefs |= MixerPref9_RenderTargetYUV;
-					dwPrefs |= MixerPref9_DynamicSwitchToBOB;
-				}
-				pVMRMC9->SetMixingPrefs(dwPrefs);
-			}
-		}
-
 		if (FAILED(hr = pConfig->SetRenderingMode(VMR9Mode_Renderless))) {
 			break;
 		}

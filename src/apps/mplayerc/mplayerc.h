@@ -115,6 +115,7 @@ class CMPlayerCApp : public CWinApp
 	static UINT	GetRemoteControlCodeMicrosoft(UINT nInputcode, HRAWINPUT hRawInput);
 	static UINT	GetRemoteControlCodeSRM7500(UINT nInputcode, HRAWINPUT hRawInput);
 
+	static UINT RunTHREADCopyData(LPVOID pParam);
 public:
 	CMPlayerCApp();
 

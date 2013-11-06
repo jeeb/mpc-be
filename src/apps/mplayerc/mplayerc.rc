@@ -823,9 +823,9 @@ BEGIN
     COMBOBOX        IDC_DX9RESIZER_COMBO,170,170,116,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "D3D Fullscreen",IDC_FULLSCREEN_MONITOR_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,148,100,10
     CONTROL         "Alternative VSync",IDC_DSVMR9ALTERNATIVEVSYNC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,160,100,10
-    CONTROL         "VMR-9 Mixer Mode",IDC_DSVMR9LOADMIXER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,172,100,10
-    CONTROL         "Reset when changing display",IDC_RESETDEVICE,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,12,184,150,10
-    CONTROL         "YUV Mixing",IDC_DSVMR9YUVMIXER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,196,51,10
+    CONTROL         "VMR Mixer Mode",IDC_DSVMRLOADMIXER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,172,100,10
+    CONTROL         "Reset when changing display",IDC_RESETDEVICE,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,12,196,150,10
+    CONTROL         "YUV Mixing",IDC_DSVMRYUVMIXER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,184,51,10
     LTEXT           "EVR Buffers:",IDC_EVR_BUFFERS_TXT,190,191,56,8
     COMBOBOX        IDC_EVR_BUFFERS,252,188,34,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Properties",IDC_BUTTON1,236,15,50,15
@@ -2435,8 +2435,8 @@ BEGIN
     IDC_TEXTURESURF2D               "Video surface will be allocated as a texture but still the 2d functions will be used to copy and stretch it onto the backbuffer. Requires a video card which can allocate 32bit, RGBA, non-power-of-two sized textures and at least in the resolution of the video."
     IDC_TEXTURESURF3D               "Video surface will be allocated as a texture and drawn as two triangles in 3d. Antialiasing turned on at the display settings may have a bad effect on the rendering speed."
     IDC_DX9RESIZER_COMBO            "If there is no Pixel Shader 2.0 support, simple bilinear is used automatically."
-    IDC_DSVMR9LOADMIXER             "Puts VMR-9 (renderless) into mixer mode, this means most of the controls on its property page will work and it will use a separate worker thread to renderer frames."
-    IDC_DSVMR9YUVMIXER              "Improves performance at the cost of some compatability of the renderer."
+    IDC_DSVMRLOADMIXER              "Puts VMR into mixer mode, this means most of the controls on its property page will work and it will use a separate worker thread to renderer frames."
+    IDC_DSVMRYUVMIXER               "Improves performance at the cost of some compatability of the renderer."
     IDC_FULLSCREEN_MONITOR_CHECK    "Reduces tearing but prevents the toolbar from being shown. To exit fullscreen in this mode press Ctrl+C."
     IDC_DSVMR9ALTERNATIVEVSYNC      "Reduces tearing by bypassing the default VSync built into D3D."
 END

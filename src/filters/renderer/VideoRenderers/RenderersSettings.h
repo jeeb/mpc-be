@@ -120,8 +120,9 @@ public:
 
 	int			iAPSurfaceUsage;
 	int			iDX9Resizer;
-	bool		fVMR9MixerMode;
-	bool		fVMR9MixerYUV;
+	bool		fVMRMixerMode;
+	bool		fVMRMixerYUV;
+
 	int			iEvrBuffers;
 
 	int			nSPCSize;
