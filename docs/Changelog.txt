@@ -19,7 +19,7 @@ Changes (*):
 	* Updated Chinese (Traditional) translation (author: beter);
 	* Updated Korean translation (author: kuh3h3);
 	* ffmpeg 2.1 git-66872161;
-
+	* libwebp 0.3.1 git-df3649a2;
 
 Fixes (!):
 
