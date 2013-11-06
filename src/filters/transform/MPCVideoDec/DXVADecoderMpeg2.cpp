@@ -35,14 +35,14 @@ extern "C" {
 	#define TRACE_MPEG2(...)
 #endif
 
-CDXVADecoderMpeg2::CDXVADecoderMpeg2 (CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, DXVAMode nMode, int nPicEntryNumber)
-	: CDXVADecoder (pFilter, pAMVideoAccelerator, nMode, nPicEntryNumber)
+CDXVADecoderMpeg2::CDXVADecoderMpeg2(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, DXVAMode nMode, int nPicEntryNumber)
+	: CDXVADecoder(pFilter, pAMVideoAccelerator, nMode, nPicEntryNumber)
 {
 	Init();
 }
 
-CDXVADecoderMpeg2::CDXVADecoderMpeg2 (CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config)
-	: CDXVADecoder (pFilter, pDirectXVideoDec, nMode, nPicEntryNumber, pDXVA2Config)
+CDXVADecoderMpeg2::CDXVADecoderMpeg2(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config)
+	: CDXVADecoder(pFilter, pDirectXVideoDec, nMode, nPicEntryNumber, pDXVA2Config)
 {
 	Init();
 }
@@ -89,7 +89,7 @@ void CDXVADecoderMpeg2::Init()
 	NewSegment();
 }
 
-HRESULT CDXVADecoderMpeg2::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
+HRESULT CDXVADecoderMpeg2::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
 	TRACE_MPEG2 ("CDXVADecoderMpeg2::DecodeFrame() : %d\n", nSize);
 
@@ -104,7 +104,7 @@ HRESULT CDXVADecoderMpeg2::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIM
 			rtStart = rtStop = INVALID_TIME;
 		}
 
-		hr = DecodeFrameInternal (m_pMPEG2Buffer, m_nMPEG2PicEnd, rtStart, rtStop);
+		hr = DecodeFrameInternal(m_pMPEG2Buffer, m_nMPEG2PicEnd, rtStart, rtStop);
 		ShrinkBuffer();
 	}
 
@@ -123,7 +123,7 @@ static CString FrameType(bool bIsField, BYTE bSecondField)
 	return str;
 }
 
-HRESULT CDXVADecoderMpeg2::DecodeFrameInternal (BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
+HRESULT CDXVADecoderMpeg2::DecodeFrameInternal(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
 	HRESULT					hr					= S_FALSE;
 	int						nSurfaceIndex		= -1;
@@ -131,10 +131,10 @@ HRESULT CDXVADecoderMpeg2::DecodeFrameInternal (BYTE* pDataIn, UINT nSize, REFER
 	bool					bIsField			= false;
 	int						bFrame_repeat_pict	= 0;
 
-	CHECK_HR_FALSE (FFMpeg2DecodeFrame (&m_PictureParams, &m_QMatrixData, m_SliceInfo,
-						m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), pDataIn, nSize,
-						&m_nSliceCount, &m_nNextCodecIndex,
-						&bIsField, &bFrame_repeat_pict));
+	CHECK_HR_FALSE (FFMpeg2DecodeFrame(&m_PictureParams, &m_QMatrixData, m_SliceInfo,
+									   m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), pDataIn, nSize,
+									   &m_nSliceCount, &m_nNextCodecIndex,
+									   &bIsField, &bFrame_repeat_pict));
 
 	// Wait I frame after a flush
 	if (m_bFlushed && (!m_PictureParams.bPicIntra || (bIsField && m_PictureParams.bSecondField))) {
@@ -142,7 +142,7 @@ HRESULT CDXVADecoderMpeg2::DecodeFrameInternal (BYTE* pDataIn, UINT nSize, REFER
 		return S_FALSE;
 	}
 
-	CHECK_HR (GetFreeSurfaceIndex (nSurfaceIndex, &pSampleToDeliver, rtStart, rtStop));
+	CHECK_HR (GetFreeSurfaceIndex(nSurfaceIndex, &pSampleToDeliver, rtStart, rtStop));
 
 	if (!bIsField || (bIsField && !m_PictureParams.bSecondField)) {
 		UpdatePictureParams(nSurfaceIndex);	
@@ -154,20 +154,20 @@ HRESULT CDXVADecoderMpeg2::DecodeFrameInternal (BYTE* pDataIn, UINT nSize, REFER
 	{
 		CHECK_HR (BeginFrame(nSurfaceIndex, pSampleToDeliver));
 		// Send picture parameters
-		CHECK_HR (AddExecuteBuffer (DXVA2_PictureParametersBufferType, sizeof(m_PictureParams), &m_PictureParams));
+		CHECK_HR (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(m_PictureParams), &m_PictureParams));
 		// Add quantization matrix
-		CHECK_HR (AddExecuteBuffer (DXVA2_InverseQuantizationMatrixBufferType, sizeof(m_QMatrixData), &m_QMatrixData));
+		CHECK_HR (AddExecuteBuffer(DXVA2_InverseQuantizationMatrixBufferType, sizeof(m_QMatrixData), &m_QMatrixData));
 		// Add slice control
-		CHECK_HR (AddExecuteBuffer (DXVA2_SliceControlBufferType, sizeof (DXVA_SliceInfo)*m_nSliceCount, &m_SliceInfo));
+		CHECK_HR (AddExecuteBuffer(DXVA2_SliceControlBufferType, sizeof (DXVA_SliceInfo)*m_nSliceCount, &m_SliceInfo));
 		// Add bitstream
-		CHECK_HR (AddExecuteBuffer (DXVA2_BitStreamDateBufferType, nSize, pDataIn, &nSize));
+		CHECK_HR (AddExecuteBuffer(DXVA2_BitStreamDateBufferType, nSize, pDataIn, &nSize));
 		// Decode frame
 		CHECK_HR (Execute());
 		CHECK_HR (EndFrame(nSurfaceIndex));
 	}
 
-	bool bAdded = AddToStore (nSurfaceIndex, pSampleToDeliver, (m_PictureParams.bPicBackwardPrediction != 1), rtStart, rtStop,
-							  bIsField, FFGetCodedPicture(m_pFilter->GetAVCtx()));
+	bool bAdded = AddToStore(nSurfaceIndex, pSampleToDeliver, (m_PictureParams.bPicBackwardPrediction != 1), rtStart, rtStop,
+							 bIsField, FFGetCodedPicture(m_pFilter->GetAVCtx()));
 
 	if (bAdded) {
 		hr = DisplayNextFrame();
@@ -198,13 +198,11 @@ void CDXVADecoderMpeg2::UpdatePictureParams(int nSurfaceIndex)
 	if (cpd->ConfigResidDiffHost == 0 || m_PictureParams.bBPPminus1 > 7) {
 		m_PictureParams.bPicSpatialResid8 = 0;
 	} else {
-		if (m_PictureParams.bBPPminus1 == 7 && m_PictureParams.bPicIntra && cpd->ConfigResidDiffHost)
+		if (m_PictureParams.bBPPminus1 == 7 && m_PictureParams.bPicIntra && cpd->ConfigResidDiffHost) {
 			// Shall be 1 if BPP is 8 and bPicIntra is 1 and bConfigResidDiffHost is 1
-		{
 			m_PictureParams.bPicSpatialResid8 = 1;
-		} else
+		} else {
 			// Shall be 1 if bConfigSpatialResid8 is 1
-		{
 			m_PictureParams.bPicSpatialResid8 = cpd->ConfigSpatialResid8;
 		}
 	}
@@ -281,7 +279,7 @@ int CDXVADecoderMpeg2::FindOldestFrame()
 	return nPos;
 }
 
-void CDXVADecoderMpeg2::UpdateFrameTime (REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
+void CDXVADecoderMpeg2::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
 {
 	if (m_rtLastStart && (rtStart == INVALID_TIME || (rtStart < m_rtLastStart))) {
 		rtStart = m_rtLastStart;
@@ -325,18 +323,18 @@ bool CDXVADecoderMpeg2::FindPicture(int nIndex, int nStartCode)
 	return false;
 }
 
-bool CDXVADecoderMpeg2::AppendBuffer (BYTE* pDataIn, int nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
+bool CDXVADecoderMpeg2::AppendBuffer(BYTE* pDataIn, int nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
 	if (rtStart != INVALID_TIME) {
 		PushBufferTime (m_nMPEG2BufferPos, rtStart, rtStop);
 	}
 
-	if (m_nMPEG2BufferPos+nSize > m_nMPEG2BufferSize) {
-		m_nMPEG2BufferSize	= m_nMPEG2BufferPos+nSize;
+	if (m_nMPEG2BufferPos + nSize > m_nMPEG2BufferSize) {
+		m_nMPEG2BufferSize	= m_nMPEG2BufferPos + nSize;
 		m_pMPEG2Buffer		= (BYTE*)av_realloc(m_pMPEG2Buffer, m_nMPEG2BufferSize);
 	}
 
-	memcpy_sse(m_pMPEG2Buffer+m_nMPEG2BufferPos, pDataIn, nSize);
+	memcpy_sse(m_pMPEG2Buffer + m_nMPEG2BufferPos, pDataIn, nSize);
 
 	m_nMPEG2BufferPos += nSize;
 
@@ -405,8 +403,8 @@ bool CDXVADecoderMpeg2::ShrinkBuffer()
 
 	int nRemaining = m_nMPEG2BufferPos-m_nMPEG2PicEnd;
 
-	PopBufferTime (m_nMPEG2PicEnd);
-	memcpy_sse (m_pMPEG2Buffer, m_pMPEG2Buffer+m_nMPEG2PicEnd, nRemaining);
+	PopBufferTime(m_nMPEG2PicEnd);
+	memcpy_sse(m_pMPEG2Buffer, m_pMPEG2Buffer + m_nMPEG2PicEnd, nRemaining);
 	m_nMPEG2BufferPos = nRemaining;
 
 	m_nMPEG2PicEnd = (m_pMPEG2Buffer[3] == 0x00) ?  0 : INT_MIN;

@@ -203,8 +203,8 @@ bool IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice)
 
 inline MpegEncContext* GetMpegEncContext(struct AVCodecContext* pAVCtx)
 {
-	Mpeg1Context*		s1;
-	MpegEncContext*		s = NULL;
+	Mpeg1Context*	s1	= NULL;
+	MpegEncContext*	s	= NULL;
 
 	switch (pAVCtx->codec_id) {
 		case AV_CODEC_ID_VC1 :
@@ -275,7 +275,7 @@ HRESULT FFH264DecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
 }
 
 // returns TRUE if version is equal to or higher than A.B.C.D, returns FALSE otherwise
-BOOL DriverVersionCheck (LARGE_INTEGER VideoDriverVersion, int A, int B, int C, int D)
+BOOL DriverVersionCheck(LARGE_INTEGER VideoDriverVersion, int A, int B, int C, int D)
 {
 	if (HIWORD(VideoDriverVersion.HighPart) > A) {
 		return TRUE;
@@ -295,8 +295,8 @@ BOOL DriverVersionCheck (LARGE_INTEGER VideoDriverVersion, int A, int B, int C, 
 	return FALSE;
 }
 
-int FFH264CheckCompatibility (int nWidth, int nHeight, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
-							  DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion, bool nIsAtiDXVACompatible)
+int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
+							 DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion, bool nIsAtiDXVACompatible)
 {
 	H264Context*	pContext = (H264Context*) pAVCtx->priv_data;
 
@@ -400,35 +400,34 @@ int FFH264CheckCompatibility (int nWidth, int nHeight, struct AVCodecContext* pA
 	return Flags;
 }
 
-void CopyScalingMatrix (DXVA_Qmatrix_H264* pDest, PPS* pps, DWORD nPCIVendor, DWORD nPCIDevice)
+void CopyScalingMatrix(DXVA_Qmatrix_H264* pDest, PPS* pps, DWORD nPCIVendor, DWORD nPCIDevice)
 {
-	int i, j;
 	memset(pDest, 0, sizeof(DXVA_Qmatrix_H264));
 
 	if (IsATIUVD(nPCIVendor, nPCIDevice)) {
-		for (i = 0; i < 6; i++)
-			for (j = 0; j < 16; j++)
+		for (int i = 0; i < 6; i++)
+			for (int j = 0; j < 16; j++)
 				pDest->bScalingLists4x4[i][j] = pps->scaling_matrix4[i][j];
 
-		for (i = 0; i < 64; i++) {
+		for (int i = 0; i < 64; i++) {
 			pDest->bScalingLists8x8[0][i] = pps->scaling_matrix8[0][i];
 			pDest->bScalingLists8x8[1][i] = pps->scaling_matrix8[3][i];
 		}
 	} else {
-		for (i = 0; i < 6; i++)
-			for (j = 0; j < 16; j++)
+		for (int i = 0; i < 6; i++)
+			for (int j = 0; j < 16; j++)
 				pDest->bScalingLists4x4[i][j] = pps->scaling_matrix4[i][zigzag_scan[j]];
 
-		for (i = 0; i < 64; i++) {
+		for (int i = 0; i < 64; i++) {
 			pDest->bScalingLists8x8[0][i] = pps->scaling_matrix8[0][ff_zigzag_direct[i]];
 			pDest->bScalingLists8x8[1][i] = pps->scaling_matrix8[3][ff_zigzag_direct[i]];
 		}
 	}
 }
 
-USHORT FFH264FindRefFrameIndex (USHORT num_frame, DXVA_PicParams_H264* pDXVAPicParams)
+USHORT FFH264FindRefFrameIndex(USHORT num_frame, DXVA_PicParams_H264* pDXVAPicParams)
 {
-	for (int i=0; i<pDXVAPicParams->num_ref_frames; i++) {
+	for (unsigned i = 0; i < pDXVAPicParams->num_ref_frames; i++) {
 		if (pDXVAPicParams->FrameNumList[i] == num_frame) {
 			return pDXVAPicParams->RefFrameList[i].Index7Bits;
 		}
@@ -441,14 +440,14 @@ USHORT FFH264FindRefFrameIndex (USHORT num_frame, DXVA_PicParams_H264* pDXVAPicP
 	return 127;
 }
 
-HRESULT FFH264BuildPicParams (struct AVCodecContext* pAVCtx, DWORD nPCIVendor, DWORD nPCIDevice, DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_H264* pDXVAScalingMatrix, int* nPictStruct)
+HRESULT FFH264BuildPicParams(struct AVCodecContext* pAVCtx, DWORD nPCIVendor, DWORD nPCIDevice, DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_H264* pDXVAScalingMatrix, int* nPictStruct)
 {
-	H264Context*			h = (H264Context*) pAVCtx->priv_data;
-	SPS*					cur_sps;
-	PPS*					cur_pps;
-	int						field_pic_flag;
-	HRESULT					hr = E_FAIL;
-	const					Picture *current_picture = h->cur_pic_ptr;
+	H264Context*	h = (H264Context*) pAVCtx->priv_data;
+	SPS*			cur_sps;
+	PPS*			cur_pps;
+	int				field_pic_flag;
+	HRESULT			hr = E_FAIL;
+	const			Picture *current_picture = h->cur_pic_ptr;
 
 	field_pic_flag = (h->picture_structure != PICT_FRAME);
 
@@ -522,23 +521,24 @@ HRESULT FFH264BuildPicParams (struct AVCodecContext* pAVCtx, DWORD nPCIVendor, D
 		}
 
 		CopyScalingMatrix (pDXVAScalingMatrix, cur_pps, nPCIVendor, nPCIDevice);
+
 		hr = S_OK;
 	}
 
 	return hr;
 }
 
-void FFH264SetCurrentPicture (int nIndex, DXVA_PicParams_H264* pDXVAPicParams, struct AVCodecContext* pAVCtx)
+void FFH264SetCurrentPicture(int nIndex, DXVA_PicParams_H264* pDXVAPicParams, struct AVCodecContext* pAVCtx)
 {
-	H264Context* h = (H264Context*) pAVCtx->priv_data;
+	H264Context* h = (H264Context*)pAVCtx->priv_data;
 
-	pDXVAPicParams->CurrPic.Index7Bits		= nIndex;
+	pDXVAPicParams->CurrPic.Index7Bits	= nIndex;
 	if (h->cur_pic_ptr) {
-		h->cur_pic_ptr->f.opaque	= (void*)nIndex;
+		h->cur_pic_ptr->f.opaque		= (void*)nIndex;
 	}
 }
 
-void FFH264UpdateRefFramesList (DXVA_PicParams_H264* pDXVAPicParams, struct AVCodecContext* pAVCtx)
+void FFH264UpdateRefFramesList(DXVA_PicParams_H264* pDXVAPicParams, struct AVCodecContext* pAVCtx)
 {
 	H264Context*	h = (H264Context*) pAVCtx->priv_data;
 	UINT			nUsedForReferenceFlags = 0;
@@ -546,7 +546,7 @@ void FFH264UpdateRefFramesList (DXVA_PicParams_H264* pDXVAPicParams, struct AVCo
 	Picture*		pic;
 	UCHAR			AssociatedFlag;
 
-	for (i=0, j=0; i<16; i++) {
+	for (i = 0, j = 0; i < 16; i++) {
 		if (i < h->short_ref_count) {
 			// Short list reference frames
 			pic				= h->short_ref[h->short_ref_count - i - 1];
@@ -578,29 +578,27 @@ void FFH264UpdateRefFramesList (DXVA_PicParams_H264* pDXVAPicParams, struct AVCo
 			pDXVAPicParams->RefFrameList[i].AssociatedFlag	= AssociatedFlag;
 			pDXVAPicParams->RefFrameList[i].Index7Bits		= (UCHAR)pic->f.opaque;
 		} else {
+			pDXVAPicParams->RefFrameList[i].bPicEntry		= 255;
 			pDXVAPicParams->FrameNumList[i]					= 0;
 			pDXVAPicParams->FieldOrderCntList[i][0]			= 0;
 			pDXVAPicParams->FieldOrderCntList[i][1]			= 0;
-			pDXVAPicParams->RefFrameList[i].AssociatedFlag	= 1;
-			pDXVAPicParams->RefFrameList[i].Index7Bits		= 127;
 		}
 	}
 
 	pDXVAPicParams->UsedForReferenceFlags = nUsedForReferenceFlags;
 }
 
-BOOL FFH264IsRefFrameInUse (int nFrameNum, struct AVCodecContext* pAVCtx)
+BOOL FFH264IsRefFrameInUse(int nFrameNum, struct AVCodecContext* pAVCtx)
 {
-	H264Context*	h = (H264Context*) pAVCtx->priv_data;
-	int				i;
+	H264Context*	h = (H264Context*)pAVCtx->priv_data;
 
-	for (i=0; i<h->short_ref_count; i++) {
+	for (int i = 0; i < h->short_ref_count; i++) {
 		if ((int)h->short_ref[i]->f.opaque == nFrameNum) {
 			return TRUE;
 		}
 	}
 
-	for (i=0; i<h->long_ref_count; i++) {
+	for (int i = 0; i < h->long_ref_count; i++) {
 		if ((int)h->long_ref[i]->f.opaque == nFrameNum) {
 			return TRUE;
 		}
@@ -609,40 +607,34 @@ BOOL FFH264IsRefFrameInUse (int nFrameNum, struct AVCodecContext* pAVCtx)
 	return FALSE;
 }
 
-void FF264UpdateRefFrameSliceLong (DXVA_PicParams_H264* pDXVAPicParams, DXVA_Slice_H264_Long* pSlice, struct AVCodecContext* pAVCtx)
+void FF264UpdateRefFrameSliceLong(DXVA_PicParams_H264* pDXVAPicParams, DXVA_Slice_H264_Long* pSlice, struct AVCodecContext* pAVCtx)
 {
-	H264Context*			h	= (H264Context*) pAVCtx->priv_data;
-	HRESULT					hr	= E_FAIL;
-	unsigned				i, list;
+	H264Context* h = (H264Context*)pAVCtx->priv_data;
 
-	for (list = 0; list < 2; list++) {
-		for (i = 0; i < 32; i++) {
-			pSlice->RefPicList[list][i].AssociatedFlag	= 1;
-			pSlice->RefPicList[list][i].Index7Bits		= 127;
-			pSlice->RefPicList[list][i].bPicEntry		= 255;
-		}
+	for (unsigned i = 0; i < _countof(pSlice->RefPicList[0]); i++) {
+		pSlice->RefPicList[0][i].bPicEntry = 255;
+		pSlice->RefPicList[1][i].bPicEntry = 255;
 	}
 
-	for (list = 0; list < 2; list++) {
-		for (i = 0; i < 32; i++) {
+	for (unsigned list = 0; list < 2; list++) {
+		for (unsigned i = 0; i < _countof(pSlice->RefPicList[list]); i++) {
 			if (list < h->list_count && i < h->ref_count[list]) {
 				const Picture *r = &h->ref_list[list][i];
-				pSlice->RefPicList[list][i].Index7Bits		= FFH264FindRefFrameIndex (h->ref_list[list][i].frame_num, pDXVAPicParams);
+				pSlice->RefPicList[list][i].Index7Bits		= FFH264FindRefFrameIndex(h->ref_list[list][i].frame_num, pDXVAPicParams);
 				pSlice->RefPicList[list][i].AssociatedFlag	= r->f.reference == PICT_BOTTOM_FIELD;
 			}
 		}
 	}
 }
 
-void FFH264SetDxvaSliceLong (struct AVCodecContext* pAVCtx, void* pSliceLong)
+void FFH264SetDxvaSliceLong(struct AVCodecContext* pAVCtx, void* pSliceLong)
 {
-	H264Context* h		= (H264Context*) pAVCtx->priv_data;
-	h->dxva_slice_long	= pSliceLong;
+	((H264Context*)pAVCtx->priv_data)->dxva_slice_long = pSliceLong;
 }
 
-HRESULT FFVC1DecodeFrame (DXVA_PictureParameters* pPicParams, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, REFERENCE_TIME rtStart,
-						  BYTE* pBuffer, UINT nSize,
-						  BOOL* b_repeat_pict, UINT* nFrameSize, BOOL b_SecondField)
+HRESULT FFVC1DecodeFrame(DXVA_PictureParameters* pPicParams, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, REFERENCE_TIME rtStart,
+						 BYTE* pBuffer, UINT nSize,
+						 BOOL* b_repeat_pict, UINT* nFrameSize, BOOL b_SecondField)
 {
 	HRESULT	hr			= E_FAIL;
 	VC1Context* vc1		= (VC1Context*) pAVCtx->priv_data;
@@ -764,10 +756,10 @@ HRESULT FFVC1DecodeFrame (DXVA_PictureParameters* pPicParams, struct AVCodecCont
 	return S_OK;
 }
 
-int	MPEG2CheckCompatibility (struct AVCodecContext* pAVCtx, struct AVFrame* pFrame)
+int	MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame)
 {
-	Mpeg1Context*	s1			= (Mpeg1Context*)pAVCtx->priv_data;
-	MpegEncContext*	s			= (MpegEncContext*)&s1->mpeg_enc_ctx;
+	Mpeg1Context*	s1	= (Mpeg1Context*)pAVCtx->priv_data;
+	MpegEncContext*	s	= (MpegEncContext*)&s1->mpeg_enc_ctx;
 
 	int				got_picture	= 0;
 	AVPacket		avpkt;
@@ -783,10 +775,10 @@ int	MPEG2CheckCompatibility (struct AVCodecContext* pAVCtx, struct AVFrame* pFra
 	return (s->chroma_format<2);
 }
 
-HRESULT FFMpeg2DecodeFrame (DXVA_PictureParameters* pPicParams, DXVA_QmatrixData* pQMatrixData, DXVA_SliceInfo* pSliceInfo,
-							struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize,
-							int* nSliceCount, int* nNextCodecIndex,
-							bool* bIsField, int* b_repeat_pict)
+HRESULT FFMpeg2DecodeFrame(DXVA_PictureParameters* pPicParams, DXVA_QmatrixData* pQMatrixData, DXVA_SliceInfo* pSliceInfo,
+						   struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize,
+						   int* nSliceCount, int* nNextCodecIndex,
+						   bool* bIsField, int* b_repeat_pict)
 {
 	HRESULT			hr = E_FAIL;
 	int				i;
@@ -887,7 +879,7 @@ HRESULT FFMpeg2DecodeFrame (DXVA_PictureParameters* pPicParams, DXVA_QmatrixData
 
 	mb_count = s->mb_width * (s->mb_height >> is_field);
 	for (i = 0; i < s1->slice_count; i++) {
-		DXVA_SliceInfo *slice		= &s1->pSliceInfo[i];
+		DXVA_SliceInfo *slice = &s1->pSliceInfo[i];
 
 		if (i < s1->slice_count - 1) {
 			slice->wNumberMBsInSlice = slice[1].wNumberMBsInSlice - slice[0].wNumberMBsInSlice;
@@ -903,14 +895,7 @@ HRESULT FFMpeg2DecodeFrame (DXVA_PictureParameters* pPicParams, DXVA_QmatrixData
 	return S_OK;
 }
 
-unsigned long FFGetMBNumber (struct AVCodecContext* pAVCtx)
-{
-	MpegEncContext* s = GetMpegEncContext(pAVCtx);
-
-	return (s != NULL) ? s->mb_num : 0;
-}
-
-int FFGetThreadType (enum AVCodecID nCodecId)
+int FFGetThreadType(enum AVCodecID nCodecId)
 {
 	switch (nCodecId)
 	{
@@ -942,27 +927,27 @@ int FFGetThreadType (enum AVCodecID nCodecId)
 	}
 }
 
-void FFSetThreadNumber (struct AVCodecContext* pAVCtx, enum AVCodecID nCodecId, int nThreadCount)
+void FFSetThreadNumber(struct AVCodecContext* pAVCtx, enum AVCodecID nCodecId, int nThreadCount)
 {
 	pAVCtx->thread_count	= nThreadCount;
 	pAVCtx->thread_type		= nThreadCount ? FFGetThreadType(nCodecId) : 0;
 }
 
-int FFGetCodedPicture (struct AVCodecContext* pAVCtx)
+int FFGetCodedPicture(struct AVCodecContext* pAVCtx)
 {
 	MpegEncContext* s = GetMpegEncContext(pAVCtx);
 
 	return (s != NULL) ? s->current_picture.f.coded_picture_number : 0;
 }
 
-BOOL FFGetAlternateScan (struct AVCodecContext* pAVCtx)
+BOOL FFGetAlternateScan(struct AVCodecContext* pAVCtx)
 {
 	MpegEncContext* s = GetMpegEncContext(pAVCtx);
 
 	return (s != NULL) ? s->alternate_scan : 0;
 }
 
-void FFGetOutputSize (struct AVCodecContext* pAVCtx, AVFrame* pFrame, int* OutWidth, int* OutHeight)
+void FFGetOutputSize(struct AVCodecContext* pAVCtx, AVFrame* pFrame, int* OutWidth, int* OutHeight)
 {
 	if (pAVCtx->codec_id == AV_CODEC_ID_H264) {
 		H264Context*	h = (H264Context*) pAVCtx->priv_data;
@@ -1017,7 +1002,7 @@ void FFGetOutputSize (struct AVCodecContext* pAVCtx, AVFrame* pFrame, int* OutWi
 }
 
 #define CHECK_AVC_L52_SIZE(w, h) ((w) <= 4096 && (h) <= 4096 && (w) * (h) <= 36864 * 16 * 16)
-BOOL DXVACheckFramesize (int width, int height, DWORD nPCIVendor, DWORD nPCIDevice)
+BOOL DXVACheckFramesize(int width, int height, DWORD nPCIVendor, DWORD nPCIDevice)
 {
 	width = (width + 15) & ~15; // (width + 15) / 16 * 16;
 	height = (height + 15) & ~15; // (height + 15) / 16 * 16;

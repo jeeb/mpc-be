@@ -212,9 +212,6 @@ HRESULT CDXVADecoder::AddExecuteBuffer(DWORD CompressedBufferType, UINT nSize, v
 	DWORD			dwNumMBs	= 0;
 	BYTE*			pDXVABuffer;
 
-	//if (CompressedBufferType != DXVA2_PictureParametersBufferType && CompressedBufferType != DXVA2_InverseQuantizationMatrixBufferType)
-	//	dwNumMBs = FFGetMBNumber (m_pFilter->GetAVCtx());
-
 	switch (m_nEngine) {
 		case ENGINE_DXVA1 :
 			DWORD	dwTypeIndex;

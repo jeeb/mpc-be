@@ -3054,80 +3054,73 @@ int ff_h264_get_profile(SPS *sps)
 // ==> Start patch MPC
 static void fill_dxva_slice_long(H264Context *h)
 {
-	DXVA_Slice_H264_Long*	pSlice = &((DXVA_Slice_H264_Long*) h->dxva_slice_long)[h->current_slice-1];
-	unsigned				i, list;
+    DXVA_Slice_H264_Long* pSlice = &((DXVA_Slice_H264_Long*)h->dxva_slice_long)[h->current_slice-1];
+    unsigned list;
 
-	memset(pSlice, 0, sizeof(DXVA_Slice_H264_Long));
+    memset(pSlice, 0, sizeof(DXVA_Slice_H264_Long));
 
-	pSlice->slice_id						= h->current_slice-1;
-	pSlice->first_mb_in_slice				= h->first_mb_in_slice;
-	pSlice->NumMbsForSlice					= 0; // h->s.mb_num;				// TODO : to be checked !
-	pSlice->BitOffsetToSliceData			= h->bit_offset_to_slice_data;
-	pSlice->slice_type						= h->raw_slice_type; 
-	pSlice->luma_log2_weight_denom			= h->luma_log2_weight_denom;
-	pSlice->chroma_log2_weight_denom		= h->chroma_log2_weight_denom;
-	pSlice->slice_alpha_c0_offset_div2		= h->slice_alpha_c0_offset / 2 - 26;
-	pSlice->slice_beta_offset_div2			= h->slice_beta_offset     / 2 - 26;
-	pSlice->Reserved8Bits					= 0;
+    pSlice->slice_id                     = h->current_slice-1;
+    pSlice->first_mb_in_slice            = h->first_mb_in_slice;
+    pSlice->NumMbsForSlice               = 0;
+    pSlice->BitOffsetToSliceData         = h->bit_offset_to_slice_data;
+    pSlice->slice_type                   = h->raw_slice_type; 
+    pSlice->luma_log2_weight_denom       = h->luma_log2_weight_denom;
+    pSlice->chroma_log2_weight_denom     = h->chroma_log2_weight_denom;
+    pSlice->slice_alpha_c0_offset_div2   = h->slice_alpha_c0_offset / 2 - 26;
+    pSlice->slice_beta_offset_div2       = h->slice_beta_offset     / 2 - 26;
 
-	pSlice->num_ref_idx_l0_active_minus1	= 0;
-	pSlice->num_ref_idx_l1_active_minus1	= 0;
-	if (h->list_count > 0) {
-		pSlice->num_ref_idx_l0_active_minus1 = h->ref_count[0] - 1;
-	}
-	if (h->list_count > 1) {
-		pSlice->num_ref_idx_l1_active_minus1 = h->ref_count[1] - 1;
-	}
+    pSlice->num_ref_idx_l0_active_minus1 = 0;
+    pSlice->num_ref_idx_l1_active_minus1 = 0;
+    if (h->list_count > 0) {
+        pSlice->num_ref_idx_l0_active_minus1 = h->ref_count[0] - 1;
+    }
+    if (h->list_count > 1) {
+        pSlice->num_ref_idx_l1_active_minus1 = h->ref_count[1] - 1;
+    }
 
-	// Fill prediction weights
-	memset (pSlice->Weights, 0, sizeof(pSlice->Weights));
-	for (list = 0; list < 2; list++) {
-		for (i = 0; i < 32; i++) {
-			if (list < h->list_count && i < h->ref_count[list]) {
-				const Picture *r = &h->ref_list[list][i];
-				unsigned plane;
-				for (plane = 0; plane < 3; plane++) {
-					int w, o;
-					if (plane == 0 && h->luma_weight_flag[list]) {
-						w = h->luma_weight[i][list][0];
-						o = h->luma_weight[i][list][1];
-					} else if (plane >= 1 && h->chroma_weight_flag[list]) {
-						w = h->chroma_weight[i][list][plane-1][0];
-						o = h->chroma_weight[i][list][plane-1][1];
-					} else {
-						w = 1 << (plane == 0 ? h->luma_log2_weight_denom :
-										   h->chroma_log2_weight_denom);
-						o = 0;
-					}
-					pSlice->Weights[list][i][plane][0] = w;
-					pSlice->Weights[list][i][plane][1] = o;
-				}
-			} else {
-				unsigned plane;
-				for (plane = 0; plane < 3; plane++) {
-					pSlice->Weights[list][i][plane][0] = 0;
-					pSlice->Weights[list][i][plane][1] = 0;
-				}
-			}
-		}
-	}
+    // Fill prediction weights
+    for (list = 0; list < 2; list++) {
+        unsigned i;
+        for (i = 0; i < FF_ARRAY_ELEMS(pSlice->RefPicList[list]); i++) {
+            if (list < h->list_count && i < h->ref_count[list]) {
+                const Picture *r = &h->ref_list[list][i];
+                unsigned plane;
+                for (plane = 0; plane < 3; plane++) {
+                    int w, o;
+                    if (plane == 0 && h->luma_weight_flag[list]) {
+                        w = h->luma_weight[i][list][0];
+                        o = h->luma_weight[i][list][1];
+                    } else if (plane >= 1 && h->chroma_weight_flag[list]) {
+                        w = h->chroma_weight[i][list][plane-1][0];
+                        o = h->chroma_weight[i][list][plane-1][1];
+                    } else {
+                        w = 1 << (plane == 0 ? h->luma_log2_weight_denom :
+                                           h->chroma_log2_weight_denom);
+                        o = 0;
+                    }
+                    pSlice->Weights[list][i][plane][0] = w;
+                    pSlice->Weights[list][i][plane][1] = o;
+                }
+            } else {
+                unsigned plane;
+                for (plane = 0; plane < 3; plane++) {
+                    pSlice->Weights[list][i][plane][0] = 0;
+                    pSlice->Weights[list][i][plane][1] = 0;
+                }
+            }
+        }
+    }
 
-	pSlice->slice_qs_delta					= h->slice_qs_delta;
-	pSlice->slice_qp_delta					= h->slice_qp_delta;
-	pSlice->redundant_pic_cnt				= h->redundant_pic_count;
-	pSlice->direct_spatial_mv_pred_flag		= h->direct_spatial_mv_pred;
-	pSlice->cabac_init_idc					= h->cabac_init_idc;
-	pSlice->disable_deblocking_filter_idc	= h->deblocking_filter;
-
-	for(i = 0; i < 32; i++) {
-		pSlice->RefPicList[0][i].AssociatedFlag	= 1;
-		pSlice->RefPicList[0][i].bPicEntry		= 255; 
-		pSlice->RefPicList[0][i].Index7Bits		= 127;
-
-		pSlice->RefPicList[1][i].AssociatedFlag	= 1; 
-		pSlice->RefPicList[1][i].bPicEntry		= 255;
-		pSlice->RefPicList[1][i].Index7Bits		= 127;
-	}
+    pSlice->slice_qs_delta    = 0;
+    pSlice->slice_qp_delta    = h->qscale - h->pps.init_qp;;
+    pSlice->redundant_pic_cnt = h->redundant_pic_count;
+    if (h->slice_type == AV_PICTURE_TYPE_B)
+        pSlice->direct_spatial_mv_pred_flag = h->direct_spatial_mv_pred;
+    pSlice->cabac_init_idc = h->pps.cabac ? h->cabac_init_idc : 0;
+    if (h->deblocking_filter < 2)
+        pSlice->disable_deblocking_filter_idc = 1 - h->deblocking_filter;
+    else
+        pSlice->disable_deblocking_filter_idc = h->deblocking_filter;
 }
 // <== End patch MPC
 
