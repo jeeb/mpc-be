@@ -58,6 +58,7 @@
     <None Include="libavcodec\x86\vp3dsp.asm" />
     <None Include="libavcodec\x86\vp6dsp.asm" />
     <None Include="libavcodec\x86\vp8dsp.asm" />
+    <None Include="libavcodec\x86\vp8dsp_loopfilter.asm" />
     <None Include="libavresample\x86\audio_convert.asm" />
     <None Include="libavresample\x86\audio_mix.asm" />
     <None Include="libavresample\x86\dither.asm" />
@@ -232,6 +233,7 @@
     <ClInclude Include="libavcodec\proresdata.h" />
     <ClInclude Include="libavcodec\proresdec.h" />
     <ClInclude Include="libavcodec\proresdsp.h" />
+    <ClInclude Include="libavcodec\pthread_internal.h" />
     <ClInclude Include="libavcodec\put_bits.h" />
     <ClInclude Include="libavcodec\qdm2data.h" />
     <ClInclude Include="libavcodec\qdm2_tablegen.h" />
@@ -620,6 +622,8 @@
     <ClCompile Include="libavcodec\proresdec2.c" />
     <ClCompile Include="libavcodec\proresdsp.c" />
     <ClCompile Include="libavcodec\pthread.c" />
+    <ClCompile Include="libavcodec\pthread_frame.c" />
+    <ClCompile Include="libavcodec\pthread_slice.c" />
     <ClCompile Include="libavcodec\qdm2.c" />
     <ClCompile Include="libavcodec\qtrle.c" />
     <ClCompile Include="libavcodec\ra144.c" />

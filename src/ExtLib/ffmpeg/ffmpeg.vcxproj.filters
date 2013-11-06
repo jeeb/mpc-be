@@ -151,6 +151,9 @@
     <None Include="libavcodec\x86\vp8dsp.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
+    <None Include="libavcodec\x86\vp8dsp_loopfilter.asm">
+      <Filter>libavcodec\x86</Filter>
+    </None>
     <None Include="libavresample\x86\audio_convert.asm">
       <Filter>libavresample\x86</Filter>
     </None>
@@ -698,6 +701,9 @@
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\proresdsp.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
+    <ClInclude Include="libavcodec\pthread_internal.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
     <ClInclude Include="libavcodec\put_bits.h">
@@ -1955,6 +1961,12 @@
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\pthread.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\pthread_frame.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\pthread_slice.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\qdm2.c">

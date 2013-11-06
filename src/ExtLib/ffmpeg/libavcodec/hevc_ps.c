@@ -229,7 +229,7 @@ static int decode_profile_tier_level(HEVCContext *s, PTL *ptl,
     }
     if (max_num_sub_layers - 1 > 0)
         for (i = max_num_sub_layers - 1; i < 8; i++)
-            skip_bits(gb, 2); // reserved_zero_2bits[i]
+            skip_bits(gb, 2);  // reserved_zero_2bits[i]
     for (i = 0; i < max_num_sub_layers - 1; i++) {
         if (ptl->sub_layer_profile_present_flag[i]) {
             ptl->sub_layer_profile_space[i] = get_bits(gb, 2);
@@ -273,7 +273,8 @@ static void decode_sublayer_hrd(HEVCContext *s, int nb_cpb,
     }
 }
 
-static void decode_hrd(HEVCContext *s, int common_inf_present, int max_sublayers)
+static void decode_hrd(HEVCContext *s, int common_inf_present,
+                       int max_sublayers)
 {
     GetBitContext *gb = &s->HEVClc->gb;
     int nal_params_present = 0, vcl_params_present = 0;
@@ -298,7 +299,7 @@ static void decode_hrd(HEVCContext *s, int common_inf_present, int max_sublayers
             skip_bits(gb, 4); // cpb_size_scale
 
             if (subpic_params_present)
-                skip_bits(gb, 4); // cpb_size_du_scale
+                skip_bits(gb, 4);  // cpb_size_du_scale
 
             skip_bits(gb, 5); // initial_cpb_removal_delay_length_minus1
             skip_bits(gb, 5); // au_cpb_removal_delay_length_minus1
@@ -315,7 +316,7 @@ static void decode_hrd(HEVCContext *s, int common_inf_present, int max_sublayers
             fixed_rate = get_bits1(gb);
 
         if (fixed_rate)
-            get_ue_golomb_long(gb); // elemental_duration_in_tc_minus1
+            get_ue_golomb_long(gb);  // elemental_duration_in_tc_minus1
         else
             low_delay = get_bits1(gb);
 
@@ -396,7 +397,7 @@ int ff_hevc_decode_nal_vps(HEVCContext *s)
     vps->vps_num_layer_sets = get_ue_golomb_long(gb) + 1;
     for (i = 1; i < vps->vps_num_layer_sets; i++)
         for (j = 0; j <= vps->vps_max_layer_id; j++)
-            skip_bits(gb, 1); // layer_id_included_flag[i][j]
+            skip_bits(gb, 1);  // layer_id_included_flag[i][j]
 
     vps->vps_timing_info_present_flag = get_bits1(gb);
     if (vps->vps_timing_info_present_flag) {
@@ -456,10 +457,20 @@ static void decode_vui(HEVCContext *s, HEVCSPS *sps)
         vui->video_format                    = get_bits(gb, 3);
         vui->video_full_range_flag           = get_bits1(gb);
         vui->colour_description_present_flag = get_bits1(gb);
+        if (vui->video_full_range_flag && sps->pix_fmt == AV_PIX_FMT_YUV420P)
+            sps->pix_fmt = AV_PIX_FMT_YUVJ420P;
         if (vui->colour_description_present_flag) {
             vui->colour_primaries        = get_bits(gb, 8);
             vui->transfer_characteristic = get_bits(gb, 8);
             vui->matrix_coeffs           = get_bits(gb, 8);
+
+            // Set invalid values to "unspecified"
+            if (vui->colour_primaries >= AVCOL_PRI_NB)
+                vui->colour_primaries = AVCOL_PRI_UNSPECIFIED;
+            if (vui->transfer_characteristic >= AVCOL_TRC_NB)
+                vui->transfer_characteristic = AVCOL_TRC_UNSPECIFIED;
+            if (vui->matrix_coeffs >= AVCOL_SPC_NB)
+                vui->matrix_coeffs = AVCOL_SPC_UNSPECIFIED;
         }
     }
 
@@ -582,7 +593,7 @@ static int scaling_list_data(HEVCContext *s, ScalingList *sl)
                 int32_t scaling_list_delta_coef;
 
                 next_coef = 8;
-                coef_num  = FFMIN(64, 1  <<  (4 + (size_id  <<  1)));
+                coef_num  = FFMIN(64, 1 << (4 + (size_id << 1)));
                 if (size_id > 1) {
                     scaling_list_dc_coef[size_id - 2][matrix_id] = get_se_golomb(gb) + 8;
                     next_coef = scaling_list_dc_coef[size_id - 2][matrix_id];
@@ -643,7 +654,8 @@ int ff_hevc_decode_nal_sps(HEVCContext *s)
     }
 
     skip_bits1(gb); // temporal_id_nesting_flag
-    if (decode_profile_tier_level(s, &sps->ptl, sps->max_sub_layers) < 0) {
+    if (decode_profile_tier_level(s, &sps->ptl,
+                                  sps->max_sub_layers) < 0) {
         av_log(s->avctx, AV_LOG_ERROR, "error decoding profile tier level\n");
         ret = AVERROR_INVALIDDATA;
         goto err;

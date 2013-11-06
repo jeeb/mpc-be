@@ -27,10 +27,10 @@
 * libavresample/x86/audio_mix_init.c
 
 * libavutil/common.h
+* libavutil/eval.c
 * libavutil/file_open.c
 * libavutil/frame.c
 * libavutil/frame.h
-* libavutil/eval.c
 * libavutil/internal.h
 * libavutil/mathematics.h
 * libavutil/utils.c

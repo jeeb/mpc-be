@@ -26,6 +26,14 @@
 #ifndef AVUTIL_COMMON_H
 #define AVUTIL_COMMON_H
 
+// ==> Start patch MPC BE
+#ifdef __GNUC__
+#if defined(__cplusplus) && !defined(__STDC_CONSTANT_MACROS) && !defined(UINT64_C)
+#error missing -D__STDC_CONSTANT_MACROS / #define __STDC_CONSTANT_MACROS
+#endif
+#endif
+// <== End patch MPC BE
+
 #include <errno.h>
 #include <inttypes.h>
 #include <limits.h>

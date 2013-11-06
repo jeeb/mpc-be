@@ -282,6 +282,8 @@ SRCS_C = \
 	libavcodec/pngdec.c \
 	libavcodec/pngdsp.c \
 	libavcodec/pthread.c \
+	libavcodec/pthread_frame.c \
+	libavcodec/pthread_slice.c \
 	libavcodec/qdm2.c \
 	libavcodec/qtrle.c \
 	libavcodec/proresdata.c \
@@ -500,6 +502,7 @@ SRCS_YASM = \
 	libavcodec/x86/vp3dsp.asm \
 	libavcodec/x86/vp6dsp.asm \
 	libavcodec/x86/vp8dsp.asm \
+	libavcodec/x86/vp8dsp_loopfilter.asm \
 	libavresample/x86/audio_convert.asm \
 	libavresample/x86/audio_mix.asm \
 	libavresample/x86/dither.asm \
