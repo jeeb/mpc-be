@@ -836,9 +836,61 @@ BOOL CALLBACK EnumFindProcessWnd (HWND hwnd, LPARAM lParam)
 
 CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CBaseVideoFilter(NAME("MPC - Video decoder"), lpunk, phr, __uuidof(this))
+	, m_pAVCodec(NULL)
+	, m_pAVCtx(NULL)
+	, m_pFrame(NULL)
+	, m_pParser(NULL)
+	, m_nCodecNb(-1)
+	, m_nCodecId(AV_CODEC_ID_NONE)
+	, m_pSwsContext(NULL)
+	, m_nOutCsp(0)
+	, m_PixFmt(AV_PIX_FMT_NB)
+	, m_bReorderBFrame(true)
+	, m_nPosB(1)
+	, m_DXVADecoderGUID(GUID_NULL)
+	, m_nActiveCodecs(CODECS_ALL)
+	, m_rtAvrTimePerFrame(0)
+	, m_rtLastStop(0)
+	, m_rtPrevStop(0)
+	, m_rtStartCache(INVALID_TIME)
+	, m_nWorkaroundBug(FF_BUG_AUTODETECT)
+	, m_nErrorConcealment(FF_EC_DEBLOCK | FF_EC_GUESS_MVS)
+	, m_nThreadNumber(0)
+	, m_nDiscardMode(AVDISCARD_DEFAULT)
+	, m_nDeinterlacing(AUTO)
+	, m_bDXVACompatible(true)
+	, m_pFFBuffer(NULL)
+	, m_nFFBufferSize(0)
+	, m_pFFBuffer2(NULL)
+	, m_nFFBufferSize2(0)
+	, m_pAlignedFFBuffer(NULL)
+	, m_nAlignedFFBufferSize(0)
+	, m_nOutputWidth(0)
+	, m_nOutputHeight(0)
+	, m_nARX(0)
+	, m_nARY(0)
+	, m_bUseDXVA(true)
+	, m_bUseFFmpeg(true)
+	, m_pDXVADecoder(NULL)
+	, m_pVideoOutputFormat(NULL)
+	, m_nVideoOutputCount(0)
+	, m_hDevice(INVALID_HANDLE_VALUE)
+	, m_nARMode(2)
+	, m_nDXVACheckCompatibility(1)
+	, m_nDXVA_SD(0)
+	, m_bWaitingForKeyFrame(TRUE)
+	, m_bIsEVO(FALSE)
+	, m_nFrameType(PICT_FRAME)
+	// === New swscaler options
+	, m_nSwRefresh(0)
+	, m_nSwPreset(2)
+	, m_nSwStandard(2)
+	, m_nSwInputLevels(2)
+	, m_nSwOutputLevels(2)
+	//
+	, m_nDialogHWND(NULL)
+	, m_bIsVMR7_YUV(FALSE)
 {
-	HWND hWnd = NULL;
-
 	if (phr) {
 		*phr = S_OK;
 	}
@@ -855,74 +907,8 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	memset(&m_FFmpegFilters, false, sizeof(m_FFmpegFilters));
 	
 	m_pCpuId				= DNew CCpuId();
-	m_pAVCodec				= NULL;
-	m_pAVCtx				= NULL;
-	m_pFrame				= NULL;
-	m_pParser				= NULL;
-	m_nCodecNb				= -1;
-	m_nCodecId				= AV_CODEC_ID_NONE;
-	m_bReorderBFrame		= true;
-	m_DXVADecoderGUID		= GUID_NULL;
-	m_nActiveCodecs			= CODECS_ALL;
 
-	m_rtAvrTimePerFrame		= 0;
-	m_rtLastStop			= 0;
-	m_rtPrevStop			= 0;
-
-	m_nWorkaroundBug		= FF_BUG_AUTODETECT;
-	m_nErrorConcealment		= FF_EC_DEBLOCK | FF_EC_GUESS_MVS;
-
-	m_nThreadNumber			= 0;
-	m_nDiscardMode			= AVDISCARD_DEFAULT;
-	m_nDeinterlacing		= AUTO;
-	m_bDXVACompatible		= true;
-	m_pFFBuffer				= NULL;
-	m_nFFBufferSize			= 0;
-	m_pFFBuffer2			= NULL;
-	m_nFFBufferSize2		= 0;
-	m_pAlignedFFBuffer		= NULL;
-	m_nAlignedFFBufferSize	= 0;
-
-	m_nOutputWidth			= 0;
-	m_nOutputHeight			= 0;
-
-	m_nARX					= 0;
-	m_nARY					= 0;
-	m_pSwsContext			= NULL;
-
-	m_bUseDXVA				= true;
-	m_bUseFFmpeg			= true;
-
-	m_pDXVADecoder			= NULL;
-	m_pVideoOutputFormat	= NULL;
-	m_nVideoOutputCount		= 0;
-	m_hDevice				= INVALID_HANDLE_VALUE;
-
-	m_nARMode					= 2; // default state - 3rd
-	m_nDXVACheckCompatibility	= 1; // skip level check by default
-	m_nDXVA_SD					= 0;
-
-	m_bWaitingForKeyFrame	= TRUE;
-	m_nPosB					= 1;
-	m_bIsEVO				= false;
-
-	m_nFrameType			= PICT_FRAME;
-	m_nOutCsp				= 0;
-	
-	// === New swscaler options
-	m_nSwRefresh			= 0;
 	CString SwFormatsStr;
-	m_nSwPreset				= 2;
-	m_nSwStandard			= 2;
-	m_nSwInputLevels		= 2;
-	m_nSwOutputLevels		= 2;
-	//
-
-	m_PixFmt				= AV_PIX_FMT_NB;
-
-	m_nDialogHWND			= 0;
-
-	m_rtStartCache			= INVALID_TIME;
 #ifdef REGISTER_FILTER
 	CRegKey key;
 	ULONG len = 255;
@@ -1003,6 +989,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	avcodec_register_all();
 	av_log_set_callback(ff_log);
 
+	HWND hWnd = NULL;
 	EnumWindows(EnumFindProcessWnd, (LPARAM)&hWnd);
 	DetectVideoCard(hWnd);
 
@@ -1019,9 +1006,9 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 void CMPCVideoDecFilter::DetectVideoCard(HWND hWnd)
 {
-	IDirect3D9* pD3D9 = NULL;
-	m_nPCIVendor = 0;
-	m_nPCIDevice = 0;
+	IDirect3D9* pD3D9				= NULL;
+	m_nPCIVendor					= 0;
+	m_nPCIDevice					= 0;
 	m_VideoDriverVersion.HighPart	= 0;
 	m_VideoDriverVersion.LowPart	= 0;
 
@@ -1048,8 +1035,7 @@ CMPCVideoDecFilter::~CMPCVideoDecFilter()
 
 bool CMPCVideoDecFilter::IsVideoInterlaced()
 {
-	// NOT A BUG : always tell DirectShow it's interlaced (progressive flags set in
-	// SetTypeSpecificFlags function)
+	// NOT A BUG : always tell DirectShow it's interlaced - progressive flags set in SetTypeSpecificFlags() function
 	return true;
 };
 
@@ -1086,8 +1072,8 @@ void CMPCVideoDecFilter::GetOutputSize(int& w, int& h, int& arx, int& ary, int& 
 {
 	RealWidth	= PictWidth();
 	RealHeight	= PictHeight();
-	w = PictWidthRounded();
-	h = PictHeightRounded();
+	w			= PictWidthRounded();
+	h			= PictHeightRounded();
 }
 
 int CMPCVideoDecFilter::PictWidth()
@@ -1980,6 +1966,15 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 		if (((m_pOutput->CurrentMediaType().subtype == MEDIASUBTYPE_YUY2) && (m_pAVCtx->width&1 || m_pAVCtx->height&1))) {
 			return VFW_E_INVALIDMEDIATYPE;
 		}
+
+		if (CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pOutput->GetConnected())) {
+			if (CComQIPtr<IVMRMixerControl> pVMRMC = pFilter) {
+				DWORD dwPrefs;
+				if (SUCCEEDED(pVMRMC->GetMixingPrefs(&dwPrefs))) {
+					m_bIsVMR7_YUV = dwPrefs & MixerPref_RenderTargetYUV;
+				}
+			}
+		}
 	}
 
 	return __super::CompleteConnect (direction, pReceivePin);
@@ -2120,14 +2115,14 @@ void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 			switch (m_pFrame->pict_type) {
 				case AV_PICTURE_TYPE_I :
 				case AV_PICTURE_TYPE_SI :
-					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_I_SAMPLE;
+					props.dwTypeSpecificFlags	|= AM_VIDEO_FLAG_I_SAMPLE;
 					break;
 				case AV_PICTURE_TYPE_P :
 				case AV_PICTURE_TYPE_SP :
-					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_P_SAMPLE;
+					props.dwTypeSpecificFlags	|= AM_VIDEO_FLAG_P_SAMPLE;
 					break;
 				default :
-					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_B_SAMPLE;
+					props.dwTypeSpecificFlags	|= AM_VIDEO_FLAG_B_SAMPLE;
 					break;
 			}
 
@@ -2147,12 +2142,8 @@ unsigned __int64 CMPCVideoDecFilter::GetCspFromMediaType(GUID& subtype)
 		return FF_CSP_YUY2;
 	} else if (subtype == MEDIASUBTYPE_RGB32) {
 		return FF_CSP_RGB32;
-	} else if (subtype == MEDIASUBTYPE_RGB565) {
-		return FF_CSP_RGB16;
-	} else if (subtype == MEDIASUBTYPE_RGB555) {
-		return FF_CSP_RGB15;
 	}
-	//
+
 	ASSERT (FALSE);
 	return FF_CSP_NULL;
 }
@@ -2597,7 +2588,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			const TcspInfo *outcspInfo=csp_getInfo(m_nOutCsp);
 
 			// === New swscaler options
-			if (m_nOutCsp == FF_CSP_YUY2 || m_nOutCsp == FF_CSP_RGB32 || m_nOutCsp == FF_CSP_RGBA || m_nOutCsp == FF_CSP_RGB16 || m_nOutCsp == FF_CSP_RGB15) {
+			if (m_nOutCsp == FF_CSP_YUY2 || m_nOutCsp == FF_CSP_RGB32) {
 				dst[0] = outData;
 				dstStride[0] = (m_nSwOutBpp>>3) * (outStride);
 			} else {
@@ -2621,7 +2612,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 				for (unsigned int i = 0; i < outcspInfo->numPlanes; i++) {
 					rowsize	= (m_pOutSize.cx*outcspInfo->Bpp) >> outcspInfo->shiftX[i];
 					height	= m_pAVCtx->height >> outcspInfo->shiftY[i];
-					copyPlane(pDataOut, rowsize, dst[i], (outStride*outcspInfo->Bpp) >> outcspInfo->shiftX[i], rowsize, height, (m_nOutCsp == FF_CSP_RGB32));
+					copyPlane(pDataOut, rowsize, dst[i], (outStride*outcspInfo->Bpp) >> outcspInfo->shiftX[i], rowsize, height, m_nOutCsp == FF_CSP_RGB32 && !m_bIsVMR7_YUV);
 					pDataOut += rowsize * height;
 				}
 			}

@@ -119,7 +119,7 @@ protected:
 	int										m_nOutputHeight;
 	int										m_nARX, m_nARY;
 
-	bool									m_bIsEVO;
+	BOOL									m_bIsEVO;
 
 	// Buffer management for truncated stream (store stream chunks & reference time sent by splitter)
 	BYTE*									m_pFFBuffer;
@@ -172,6 +172,8 @@ protected:
 	HWND									m_nDialogHWND;
 
 	REFERENCE_TIME							m_rtStartCache;
+
+	BOOL									m_bIsVMR7_YUV;
 
 	// === Private functions
 	void				Cleanup();
@@ -295,7 +297,7 @@ public:
 	inline AVFrame*				GetFrame()				{ return m_pFrame; };
 	inline enum AVCodecID		GetCodec()				{ return m_nCodecId; };
 	inline bool					IsReorderBFrame()		{ return m_bReorderBFrame; };
-	inline bool					IsEvo()					{ return m_bIsEVO; };
+	inline BOOL					IsEvo()					{ return m_bIsEVO; };
 	inline DWORD				GetPCIVendor()			{ return m_nPCIVendor; };
 	inline DWORD				GetPCIDevice()			{ return m_nPCIDevice; };
 	inline double				GetRate()				{ return m_dRate; };
