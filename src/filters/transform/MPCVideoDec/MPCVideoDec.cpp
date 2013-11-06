@@ -51,6 +51,8 @@ extern "C" {
 }
 #pragma warning(pop)
 
+#pragma region any_constants
+
 // option names
 #define OPT_REGKEY_VideoDec  _T("Software\\MPC-BE Filters\\MPC Video Decoder")
 #define OPT_SECTION_VideoDec _T("Filters\\MPC Video Decoder")
@@ -814,6 +816,8 @@ STDAPI DllUnregisterServer()
 CFilterApp theApp;
 
 #endif
+
+#pragma endregion any_constants
 
 BOOL CALLBACK EnumFindProcessWnd (HWND hwnd, LPARAM lParam)
 {
