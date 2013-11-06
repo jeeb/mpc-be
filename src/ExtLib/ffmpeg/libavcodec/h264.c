@@ -366,10 +366,10 @@ static int ref_picture(H264Context *h, Picture *dst, Picture *src)
     dst->field_picture = src->field_picture;
     dst->needs_realloc = src->needs_realloc;
     dst->reference     = src->reference;
-    dst->sync          = src->sync;
     dst->crop          = src->crop;
     dst->crop_left     = src->crop_left;
     dst->crop_top      = src->crop_top;
+    dst->recovered     = src->recovered;
 
     return 0;
 fail:
@@ -1907,7 +1907,7 @@ static int decode_update_thread_context(AVCodecContext *dst,
     copy_picture_range(h->delayed_pic, h1->delayed_pic,
                        MAX_DELAYED_PIC_COUNT + 2, h, h1);
 
-    h->sync            = h1->sync;
+    h->frame_recovered       = h1->frame_recovered;
 
     if (context_reinitialized)
         h264_set_parameter_from_sps(h);
@@ -1923,6 +1923,8 @@ static int decode_update_thread_context(AVCodecContext *dst,
     h->prev_frame_num_offset = h->frame_num_offset;
     h->prev_frame_num        = h->frame_num;
     h->outputed_poc          = h->next_outputed_poc;
+
+    h->recovery_frame        = h1->recovery_frame;
 
     return err;
 }
@@ -1964,12 +1966,12 @@ static int h264_frame_start(H264Context *h)
      * See decode_nal_units().
      */
     pic->f.key_frame = 0;
-    pic->sync        = 0;
     pic->mmco_reset  = 0;
+    pic->recovered   = 0;
 
     if ((ret = alloc_picture(h, pic)) < 0)
         return ret;
-    if(!h->sync && !h->avctx->hwaccel &&
+    if(!h->frame_recovered && !h->avctx->hwaccel &&
        !(h->avctx->codec->capabilities & CODEC_CAP_HWACCEL_VDPAU))
         avpriv_color_frame(&pic->f, c);
 
@@ -2162,7 +2164,7 @@ static void decode_postinit(H264Context *h, int setup_finished)
     if (cur->reference == 0)
         cur->reference = DELAYED_PIC_REF;
 
-    out = h->delayed_pic[0];
+    out     = h->delayed_pic[0];
     out_idx = 0;
     for (i = 1; h->delayed_pic[i] &&
                 !h->delayed_pic[i]->f.key_frame &&
@@ -2194,8 +2196,13 @@ static void decode_postinit(H264Context *h, int setup_finished)
         av_log(h->avctx, AV_LOG_DEBUG, "no picture %s\n", out_of_order ? "ooo" : "");
     }
 
-    if (h->next_output_pic && h->next_output_pic->sync) {
-        h->sync |= 2;
+    if (h->next_output_pic) {
+        if (h->next_output_pic->recovered) {
+            // We have reached an recovery point and all frames after it in
+            // display order are "recovered".
+            h->frame_recovered |= FRAME_RECOVERED_SEI;
+        }
+        h->next_output_pic->recovered |= !!(h->frame_recovered & FRAME_RECOVERED_SEI);
     }
 
     if (setup_finished && !h->avctx->hwaccel)
@@ -2786,8 +2793,8 @@ static void flush_change(H264Context *h)
     memset(h->default_ref_list[0], 0, sizeof(h->default_ref_list[0]));
     memset(h->default_ref_list[1], 0, sizeof(h->default_ref_list[1]));
     ff_h264_reset_sei(h);
-    h->recovery_frame= -1;
-    h->sync= 0;
+    h->recovery_frame = -1;
+    h->frame_recovered = 0;
     h->list_count = 0;
     h->current_slice = 0;
     h->mmco_reset = 1;
@@ -2981,8 +2988,7 @@ static int field_end(H264Context *h, int in_setup)
      * past end by one (callers fault) and resync_mb_y != 0
      * causes problems for the first MB line, too.
      */
-    if (CONFIG_ERROR_RESILIENCE &&
-        !FIELD_PICTURE(h) && h->current_slice && !h->sps.new) {
+    if (CONFIG_ERROR_RESILIENCE && !FIELD_PICTURE(h) && h->current_slice && !h->sps.new) {
         h->er.cur_pic  = h->cur_pic_ptr;
         ff_er_frame_end(&h->er);
     }
@@ -3373,8 +3379,8 @@ static int h264_slice_header_init(H264Context *h, int reinit)
             c->height            = h->height;
             c->linesize          = h->linesize;
             c->uvlinesize        = h->uvlinesize;
-            c->chroma_x_shift = h->chroma_x_shift;
-            c->chroma_y_shift = h->chroma_y_shift;
+            c->chroma_x_shift    = h->chroma_x_shift;
+            c->chroma_y_shift    = h->chroma_y_shift;
             c->qscale            = h->qscale;
             c->droppable         = h->droppable;
             c->data_partitioning = h->data_partitioning;
@@ -4874,7 +4880,9 @@ static int decode_nal_units(H264Context *h, const uint8_t *buf, int buf_size,
                                         decode_rbsp_trailing(h, ptr + dst_length - 1));
 
             if (h->avctx->debug & FF_DEBUG_STARTCODE)
-                av_log(h->avctx, AV_LOG_DEBUG, "NAL %d/%d at %d/%d length %d pass %d\n", hx->nal_unit_type, hx->nal_ref_idc, buf_index, buf_size, dst_length, pass);
+                av_log(h->avctx, AV_LOG_DEBUG,
+                       "NAL %d/%d at %d/%d length %d pass %d\n",
+                       hx->nal_unit_type, hx->nal_ref_idc, buf_index, buf_size, dst_length, pass);
 
             if (h->is_avc && (nalsize != consumed) && nalsize)
                 av_log(h->avctx, AV_LOG_DEBUG,
@@ -4964,30 +4972,39 @@ again:
                 if ((err = decode_slice_header(hx, h)))
                     break;
 
-                if (h->sei_recovery_frame_cnt >= 0 && (h->frame_num != h->sei_recovery_frame_cnt || hx->slice_type_nos != AV_PICTURE_TYPE_I))
-                    h->valid_recovery_point = 1;
+                if (h->sei_recovery_frame_cnt >= 0) {
+                    if (h->frame_num != h->sei_recovery_frame_cnt || hx->slice_type_nos != AV_PICTURE_TYPE_I)
+                        h->valid_recovery_point = 1;
 
-                if (   h->sei_recovery_frame_cnt >= 0
-                    && (   h->recovery_frame<0
-                        || ((h->recovery_frame - h->frame_num) & ((1 << h->sps.log2_max_frame_num)-1)) > h->sei_recovery_frame_cnt)) {
-                    h->recovery_frame = (h->frame_num + h->sei_recovery_frame_cnt) %
-                                        (1 << h->sps.log2_max_frame_num);
+                    if (   h->recovery_frame < 0
+                        || ((h->recovery_frame - h->frame_num) & ((1 << h->sps.log2_max_frame_num)-1)) > h->sei_recovery_frame_cnt) {
+                        h->recovery_frame = (h->frame_num + h->sei_recovery_frame_cnt) &
+                                            ((1 << h->sps.log2_max_frame_num) - 1);
 
-                    if (!h->valid_recovery_point)
-                        h->recovery_frame = h->frame_num;
+                        if (!h->valid_recovery_point)
+                            h->recovery_frame = h->frame_num;
+                    }
                 }
 
                 h->cur_pic_ptr->f.key_frame |=
-                        (hx->nal_unit_type == NAL_IDR_SLICE);
+                    (hx->nal_unit_type == NAL_IDR_SLICE);
 
-                if (h->recovery_frame == h->frame_num) {
-                    h->cur_pic_ptr->sync |= 1;
-                    h->recovery_frame = -1;
+                if (hx->nal_unit_type == NAL_IDR_SLICE ||
+                    h->recovery_frame == h->frame_num) {
+                    h->recovery_frame         = -1;
+                    h->cur_pic_ptr->recovered = 1;
                 }
-
-                h->sync |= !!h->cur_pic_ptr->f.key_frame;
-                h->sync |= 3*!!(avctx->flags2 & CODEC_FLAG2_SHOW_ALL);
-                h->cur_pic_ptr->sync |= h->sync;
+                // If we have an IDR, all frames after it in decoded order are
+                // "recovered".
+                if (hx->nal_unit_type == NAL_IDR_SLICE)
+                    h->frame_recovered |= FRAME_RECOVERED_IDR;
+                h->frame_recovered |= 3*!!(avctx->flags2 & CODEC_FLAG2_SHOW_ALL);
+                h->frame_recovered |= 3*!!(avctx->flags & CODEC_FLAG_OUTPUT_CORRUPT);
+#if 1
+                h->cur_pic_ptr->recovered |= h->frame_recovered;
+#else
+                h->cur_pic_ptr->recovered |= !!(h->frame_recovered & FRAME_RECOVERED_IDR);
+#endif
 
                 if (h->current_slice == 1) {
                     // ==> Start patch MPC
@@ -5271,7 +5288,11 @@ not_extra:
 
         /* Wait for second field. */
         *got_frame = 0;
-        if (h->next_output_pic && (h->next_output_pic->sync || h->sync>1)) {
+        if (h->next_output_pic && (
+                                   h->next_output_pic->recovered)) {
+            if (!h->next_output_pic->recovered)
+                h->next_output_pic->f.flags |= AV_FRAME_FLAG_CORRUPT;
+
             ret = output_frame(h, pict, h->next_output_pic);
             if (ret < 0)
                 return ret;

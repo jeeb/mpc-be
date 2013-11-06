@@ -264,7 +264,7 @@ HRESULT FFH264DecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
 				}
 			}
 			if (Sync) {
-				*Sync = h->sync;
+				*Sync = h->frame_recovered;
 			}
 			if (NALLength) {
 				*NALLength = h->nal_length_size;
