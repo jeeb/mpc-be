@@ -12693,7 +12693,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 					break;
 				}
 
-				socket.SetTimeOut(3000, 3000);
+				socket.SetTimeOut(3000);
 				if (!socket.Connect(local, TRUE)) {
 					validateUrl = false;
 				}
@@ -12721,7 +12721,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				m_strUrl = tmpName;
 
 				if (PlayerYouTubeCheck(fn) && s.iYoutubeSource == 0) {
-					if (!m_strTitleAlt.IsEmpty() && tmpName.Find(_T("http://")) == 0) {
+					if (!m_strTitleAlt.IsEmpty() && ::PathIsURL(tmpName)) {
 						m_fYoutubeThreadWork = TH_START;
 						m_YoutubeFile = tmpName;
 						m_YoutubeThread = AfxBeginThread(::tmpYoutubeThreadProc, static_cast<LPVOID>(this), THREAD_PRIORITY_ABOVE_NORMAL);

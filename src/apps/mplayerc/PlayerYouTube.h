@@ -28,43 +28,41 @@
 #define YOUTU_BE_URL	_T("://youtu.be/")
 #define VIMEO_URL		_T("://vimeo.com/")
 
-#define MATCH_START		"\"url_encoded_fmt_stream_map\": \""
-#define MATCH_END		"\""
-
 typedef struct {
 	const int		iTag;
 	const LPCTSTR	Container;
 	const LPCTSTR	Profile;
 	const LPCTSTR	Resolution;
+	const bool		Visible;
 } YOUTUBE_PROFILES;
 
 static const YOUTUBE_PROFILES youtubeProfiles[] = {
-	{38,	_T("MP4"),	_T("High"),			_T("3072p")},
-	{37,	_T("MP4"),	_T("High"),			_T("1080p")},
-	{22,	_T("MP4"),	_T("High"),			_T("720p")},
-	{18,	_T("MP4"),	_T("Baseline"),		_T("360p")},
-	{35,	_T("FLV"),	_T("Main"),			_T("480p")},
-	{34,	_T("FLV"),	_T("Main"),			_T("360p")},
-	{6,		_T("FLV"),	_T("N/A"),			_T("270p")},
-	{5,		_T("FLV"),	_T("N/A"),			_T("240p")},
-	{36,	_T("3GP"),	_T("Simple"),		_T("240p")},
-	{17,	_T("3GP"),	_T("Simple"),		_T("144p")},
-	{13,	_T("3GP"),	_T("N/A"),			_T("N/A")},
-	{46,	_T("WebM"),	_T("N/A"),			_T("1080p")},
-	{45,	_T("WebM"),	_T("N/A"),			_T("720p")},
-	{44,	_T("WebM"),	_T("N/A"),			_T("480p")},
-	{43,	_T("WebM"),	_T("N/A"),			_T("360p")},
-	{82,	_T("MP4"),	_T("3D"),			_T("360p")},
-	{83,	_T("MP4"),	_T("3D"),			_T("240p")},
-	{84,	_T("MP4"),	_T("3D"),			_T("720p")},
-	{85,	_T("MP4"),	_T("3D"),			_T("520p")},
-	{100,	_T("WebM"),	_T("3D"),			_T("360p")},
-	{101,	_T("WebM"),	_T("3D"),			_T("360p")},
-	{102,	_T("WebM"),	_T("3D"),			_T("720p")},
-	{120,	_T("FLV"),	_T("Main@L3.1"),	_T("720p")}
+	{38,	_T("MP4"),	_T("High"),			_T("3072p"),	true},
+	{37,	_T("MP4"),	_T("High"),			_T("1080p"),	true},
+	{22,	_T("MP4"),	_T("High"),			_T("720p"),		true},
+	{18,	_T("MP4"),	_T("Baseline"),		_T("360p"),		true},
+	{35,	_T("FLV"),	_T("Main"),			_T("480p"),		true},
+	{34,	_T("FLV"),	_T("Main"),			_T("360p"),		true},
+	{6,		_T("FLV"),	_T("N/A"),			_T("270p"),		true},
+	{5,		_T("FLV"),	_T("N/A"),			_T("240p"),		true},
+	{36,	_T("3GP"),	_T("Simple"),		_T("240p"),		true},
+	{17,	_T("3GP"),	_T("Simple"),		_T("144p"),		true},
+	{13,	_T("3GP"),	_T("N/A"),			_T("N/A"),		true},
+	{46,	_T("WebM"),	_T("N/A"),			_T("1080p"),	true},
+	{45,	_T("WebM"),	_T("N/A"),			_T("720p"),		true},
+	{44,	_T("WebM"),	_T("N/A"),			_T("480p"),		true},
+	{43,	_T("WebM"),	_T("N/A"),			_T("360p"),		true},
+	{82,	_T("MP4"),	_T("3D"),			_T("360p"),		false},
+	{83,	_T("MP4"),	_T("3D"),			_T("240p"),		false},
+	{84,	_T("MP4"),	_T("3D"),			_T("720p"),		false},
+	{85,	_T("MP4"),	_T("3D"),			_T("520p"),		false},
+	{100,	_T("WebM"),	_T("3D"),			_T("360p"),		false},
+	{101,	_T("WebM"),	_T("3D"),			_T("360p"),		false},
+	{102,	_T("WebM"),	_T("3D"),			_T("720p"),		false},
+	{120,	_T("FLV"),	_T("Main@L3.1"),	_T("720p"),		false}
 };
 
-static const YOUTUBE_PROFILES youtubeProfileEmpty = {0, _T(""), _T("N/A"), _T("")};
+static const YOUTUBE_PROFILES youtubeProfileEmpty = {0, _T(""), _T("N/A"), _T(""), false};
 
 static YOUTUBE_PROFILES getProfile(int iTag) {
 	for (int i = 0; i < _countof(youtubeProfiles); i++)

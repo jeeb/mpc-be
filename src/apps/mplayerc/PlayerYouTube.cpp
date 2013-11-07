@@ -22,6 +22,13 @@
 #include "PlayerYouTube.h"
 #include "PlayerVimeo.h"
 
+#include "../../DSUtil/MPCSocket.h"
+
+#define MATCH_FMT_START			"\"url_encoded_fmt_stream_map\": \""
+#define MATCH_WIDTH_START		"meta property=\"og:video:width\" content=\""
+#define MATCH_DASHMPD_START		"\"dashmpd\": \"http:\\/\\/www.youtube.com\\/api\\/manifest\\/dash\\/"
+#define MATCH_END				"\""
+
 bool PlayerYouTubeCheck(CString fn)
 {
 	CString tmp_fn(CString(fn).MakeLower());
@@ -59,10 +66,10 @@ bool PlayerYouTubePlaylistCheck(CString fn)
 CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 {
 	if (out_Title) {
-		*out_Title = _T("");
+		(*out_Title).Empty();
 	}
 	if (out_Author) {
-		*out_Author = _T("");
+		(*out_Author).Empty();
 	}
 
 	CString tmp_fn(CString(fn).MakeLower());
@@ -80,11 +87,25 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 		LOG2FILE(_T("------"));
 		LOG2FILE(_T("Youtube parser"));
 #endif
+		
+		CString str, Author;
 
 		char* final = NULL;
-		int match_start = 0, match_len = 0;
+		int match_fmt_start = 0, match_fmt_len = 0;
+		int match_width_start = 0, match_width_len = 0;
+		int nMaxWidth = 0;
 
-		CString str, Author;
+		AppSettings& sApp = AfxGetAppSettings();
+		CString tag;
+		tag.Format(_T("itag=%d"), sApp.iYoutubeTag);
+		BOOL match_itag = sApp.iYoutubeTag != 0;
+
+		BOOL bIsFullHD = FALSE;
+		if (sApp.iYoutubeTag == 37) {
+			// Full HD resolution, format .MP4
+			match_itag	= FALSE;
+			bIsFullHD	= TRUE;
+		}
 
 		HINTERNET f, s = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
 		if (s) {
@@ -112,17 +133,38 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 					out = tempData;
 					dataSize += dwBytesRead;
 
-					// optimization - to not download the entire page
-					if (!match_start) {
-						match_start	= strpos(out, MATCH_START);
-					} else {
-						match_len	= strpos(out + match_start + strlen(MATCH_START), MATCH_END);
+					// url_encoded_fmt_stream_map
+					if (!match_fmt_start) {
+						match_fmt_start	= strpos(out, MATCH_FMT_START);
+					} else if (!match_fmt_len) {
+						match_fmt_len	= strpos(out + match_fmt_start + strlen(MATCH_FMT_START), MATCH_END);
 					}
 
-					if (match_start && match_len) {
-						match_start += strlen(MATCH_START);
-						match_len	-= strlen(MATCH_START);
-						break;
+					// <meta property="og:video:width" content="....">
+					if (!match_width_start) {
+						match_width_start	= strpos(out, MATCH_WIDTH_START);
+					} else if (!match_width_len) {
+						match_width_len		= strpos(out + match_width_start + strlen(MATCH_WIDTH_START), MATCH_END);
+					}
+
+					// detect MAX resolution for this video
+					if (bIsFullHD && match_width_start && match_width_len && !nMaxWidth) {
+						match_width_start += strlen(MATCH_WIDTH_START);
+						char *tmp = DNew char[match_width_len + 1];
+						memset(tmp, 0, match_width_len + 1);
+						memcpy(tmp, out + match_width_start, match_width_len);
+
+						if (sscanf_s(tmp, "%d", &nMaxWidth) != 1) {
+							nMaxWidth = -1;
+						}
+						delete [] tmp;
+					}
+
+					// optimization - to not download the entire page
+					if (match_fmt_start && match_fmt_len) {
+						if (nMaxWidth != 1920) {
+							break;
+						}
 					}
 				} while (dwBytesRead);
 
@@ -140,20 +182,85 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 			return fn;
 		}
 
-		if (!match_start || !match_len) {
+		if (!match_fmt_start || !match_fmt_len) {
 			if (strstr(final, YOUTUBE_MP_URL)) {
 				// This is looks like Youtube page, but this page doesn't contains necessary information about video, so may be you have to register on google.com to view it.
 				fn.Empty();
 			}
-			delete[] final;
+			delete [] final;
 			return fn;
 		}
 
 		CString Title = PlayerYouTubeSearchTitle(final);
 
-		char *tmp = DNew char[match_len + 1];
-		memset(tmp, 0, match_len + 1);
-		memcpy(tmp, final + match_start, match_len);
+		DWORD dashmpd_start	= strpos(final, MATCH_DASHMPD_START);
+		if (bIsFullHD && dashmpd_start && nMaxWidth == 1920) {
+			DWORD dashmpd_len = strpos(final + dashmpd_start + strlen(MATCH_DASHMPD_START), MATCH_END);
+			if (dashmpd_len) {
+				dashmpd_start	+= strlen(MATCH_DASHMPD_START);
+				char* dashmpd	= DNew char[dashmpd_len + 1];
+				memset(dashmpd, 0, dashmpd_len + 1);
+				memcpy(dashmpd, final + dashmpd_start, dashmpd_len);
+
+				CString str_dashmpd = UTF8ToString(UrlDecode(UrlDecode(CStringA(dashmpd))));
+				str_dashmpd.Replace(L"\\/", L"&");
+				int fpos = 0;
+
+				CString str_dashmpd_clear;
+				for (int i = 0; i < str_dashmpd.GetLength(); i++) {
+					TCHAR c = str_dashmpd[i];
+					if (c == '&') {
+						fpos++;
+						if (fpos % 2) {
+							c = '=';
+						}
+					}
+
+					str_dashmpd_clear.AppendChar(c);
+				}
+				delete [] dashmpd;
+
+				CString s_url = L"http://www.youtube.com/videoplayback?";
+				s_url.AppendFormat(L"%s&ratebypass=yes&itag=%d", str_dashmpd_clear, sApp.iYoutubeTag);
+
+				BOOL bValidateUrl = FALSE;
+				CMPCSocket socket;
+				if (socket.Create()) {
+					socket.SetTimeOut(3000);
+					if (socket.Connect(s_url, TRUE)) {
+						bValidateUrl = TRUE;
+					}
+
+					socket.Close();
+				}
+
+				if (bValidateUrl) {
+
+					if (out_Title) {
+						CString ext = L".mp4";
+						Title.Replace(ext, _T(""));
+						*out_Title = Title + ext;
+					}
+					if (out_Author) {
+						*out_Author = Author;
+					}
+
+#ifdef _DEBUG
+					LOG2FILE(_T("final url = \'%s\'"), s_url);
+					LOG2FILE(_T("------"));
+#endif
+					delete [] final;
+
+					return s_url;
+				}
+			}
+		}
+
+		match_fmt_start += strlen(MATCH_FMT_START);
+		char *tmp = DNew char[match_fmt_len + 1];
+		memset(tmp, 0, match_fmt_len + 1);
+		memcpy(tmp, final + match_fmt_start, match_fmt_len);
+		delete [] final;
 
 		// because separator is a ',', then replace it with '~' to avoid matches
 		for (size_t i = 0; i < strlen(tmp); i++) {
@@ -188,10 +295,6 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 			}
 		}
 #endif
-
-		CString tag;
-		tag.Format(_T("itag=%d"), AfxGetAppSettings().iYoutubeTag);
-		boolean match_itag = AfxGetAppSettings().iYoutubeTag != 0;
 
 again:
 
@@ -286,30 +389,22 @@ again:
 				slparams.AddTail(_T("fexp"));
 				slparams.AddTail(_T("key"));
 				slparams.AddTail(_T("sig"));
-
-				/*
-				CString tagTmp;
-				UrlFields.Lookup(_T("newshard"), tagTmp);
-				if (!tagTmp.IsEmpty()) {
-					slparams.AddTail(_T("newshard"));
-				}
-				*/
 			}
 
 			POSITION pos = slparams.GetHeadPosition();
 			while (pos) {
 				CString param = slparams.GetNext(pos);
-				if (param == _T("sig")) {
-					url.AppendFormat(_T("signature=%s&"), UrlFields[param]);
+				if (param == L"sig") {
+					url.AppendFormat(L"signature=%s&", UrlFields[param]);
 				} else {
-					url.AppendFormat(_T("%s=%s&"), param, UrlFields[param]);
+					url.AppendFormat(L"%s=%s&", param, UrlFields[param]);
 				}
 			}
 			url.Trim(_T("&"));
 
 #ifdef _DEBUG
 			LOG2FILE(_T("final url = \'%s\'"), url);
-			LOG2FILE(_T("------"), url);
+			LOG2FILE(_T("------"));
 #endif
 
 			if (out_Title) {
@@ -324,7 +419,7 @@ again:
 		}
 
 		if (match_itag) {
-			match_itag = false;
+			match_itag = FALSE;
 			goto again;
 		}
 	}
