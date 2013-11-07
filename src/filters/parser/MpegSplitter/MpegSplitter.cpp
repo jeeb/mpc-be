@@ -1237,8 +1237,8 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 			REFERENCE_TIME rtPTS = m_pFile->NextPTS(stream);
 
 			while (rtPTS <= rtmax) {
-				rtPTS = m_pFile->NextPTS(stream);
 				m_pFile->Seek(m_pFile->GetPos() + 192);
+				rtPTS = m_pFile->NextPTS(stream);
 			}
 
 			return;
