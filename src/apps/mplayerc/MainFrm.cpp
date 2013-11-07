@@ -5203,7 +5203,17 @@ void CMainFrame::OnUpdateFileOpen(CCmdUI* pCmdUI)
 
 BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 {
-	if (m_fClosingState || m_iMediaLoadState == MLS_LOADING) {
+	if (m_fClosingState) {
+		return FALSE;
+	}
+
+	WORD timeOut = 0;
+	while ((m_iMediaLoadState == MLS_LOADING || m_iMediaLoadState == MLS_CLOSING) && timeOut < 3000) {
+		Sleep(50);
+		timeOut += 50;
+	}
+
+	if (m_iMediaLoadState == MLS_LOADING || m_iMediaLoadState == MLS_CLOSING) {
 		return FALSE;
 	}
 

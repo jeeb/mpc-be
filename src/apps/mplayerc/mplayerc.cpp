@@ -1218,7 +1218,7 @@ BOOL CMPlayerCApp::InitInstance()
 				pTCD->hWND				= hWnd;
 
 				CWinThread*	pTHREADCopyData = AfxBeginThread(RunTHREADCopyData, static_cast<LPVOID>(pTCD));
-				if (WaitForSingleObject(pTHREADCopyData->m_hThread, 3000) == WAIT_TIMEOUT) {
+				if (WaitForSingleObject(pTHREADCopyData->m_hThread, 5000) == WAIT_TIMEOUT) {
 					TerminateThread(pTHREADCopyData->m_hThread, 0xDEAD);
 					bDataIsSend = FALSE;
 				}
