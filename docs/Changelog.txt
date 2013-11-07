@@ -21,6 +21,7 @@ Changes (*):
 	* ffmpeg 2.1 git-66872161;
 	* libwebp 0.3.1 git-df3649a2;
 	* libvpx 1.2 git-648e30bc;
+	* VirtualDub 1.10.4;
 
 Fixes (!):
 
