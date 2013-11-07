@@ -683,26 +683,29 @@ BOOL CPPageFormats::OnInitDialog()
 	CreateToolTip();
 
 	if (IsWinVistaOrLater() && !IsUserAnAdmin()) {
-		GetDlgItem(IDC_BUTTON1)->ShowWindow (SW_HIDE);
-		GetDlgItem(IDC_BUTTON3)->ShowWindow (SW_HIDE);
-		GetDlgItem(IDC_BUTTON4)->ShowWindow (SW_HIDE);
-		GetDlgItem(IDC_BUTTON6)->ShowWindow (SW_HIDE);
-		GetDlgItem(IDC_CHECK1)->EnableWindow (FALSE);
-		GetDlgItem(IDC_CHECK2)->EnableWindow (FALSE);
-		GetDlgItem(IDC_CHECK3)->EnableWindow (FALSE);
-		GetDlgItem(IDC_CHECK4)->EnableWindow (FALSE);
-		GetDlgItem(IDC_CHECK5)->EnableWindow (FALSE);
+		GetDlgItem(IDC_BUTTON1)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_BUTTON3)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_BUTTON4)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_BUTTON6)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_CHECK1)->EnableWindow(FALSE);
+		GetDlgItem(IDC_CHECK2)->EnableWindow(FALSE);
+		GetDlgItem(IDC_CHECK3)->EnableWindow(FALSE);
+		GetDlgItem(IDC_CHECK4)->EnableWindow(FALSE);
+		GetDlgItem(IDC_CHECK5)->EnableWindow(FALSE);
+		GetDlgItem(IDC_CHECK6)->EnableWindow(FALSE);
+		GetDlgItem(IDC_CHECK7)->EnableWindow(FALSE);
+		GetDlgItem(IDC_CHECK8)->EnableWindow(FALSE);
 
-		GetDlgItem(IDC_RADIO1)->EnableWindow (FALSE);
-		GetDlgItem(IDC_RADIO2)->EnableWindow (FALSE);
-		GetDlgItem(IDC_RADIO3)->EnableWindow (FALSE);
+		GetDlgItem(IDC_RADIO1)->EnableWindow(FALSE);
+		GetDlgItem(IDC_RADIO2)->EnableWindow(FALSE);
+		GetDlgItem(IDC_RADIO3)->EnableWindow(FALSE);
 
-		GetDlgItem(IDC_BUTTON5)->ShowWindow (SW_SHOW);
-		GetDlgItem(IDC_BUTTON5)->SendMessage (BCM_SETSHIELD, 0, 1);
+		GetDlgItem(IDC_BUTTON5)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_BUTTON5)->SendMessage(BCM_SETSHIELD, 0, 1);
 
 		m_bInsufficientPrivileges = true;
 	} else {
-		GetDlgItem(IDC_BUTTON5)->ShowWindow (SW_HIDE);
+		GetDlgItem(IDC_BUTTON5)->ShowWindow(SW_HIDE);
 	}
 
 	CRegKey key;
