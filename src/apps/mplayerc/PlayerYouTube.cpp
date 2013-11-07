@@ -568,7 +568,7 @@ CString PlayerYouTubePlaylist(CString fn, bool type)
 		}
 
 		CStdioFile fout;
-		TCHAR* file = PlayerYouTubePlaylistCreate();
+		CString file = PlayerYouTubePlaylistCreate();
 
 		if (fout.Open(file, CFile::modeCreate|CFile::modeWrite|CFile::shareDenyWrite|CFile::typeBinary)) {
 
@@ -584,30 +584,24 @@ CString PlayerYouTubePlaylist(CString fn, bool type)
 	return fn;
 }
 
-TCHAR* PlayerYouTubePlaylistCreate()
+CString PlayerYouTubePlaylistCreate()
 {
-	TCHAR *out_file = (TCHAR*)malloc(_MAX_PATH * sizeof(TCHAR));
+	TCHAR lpszTempPath[_MAX_PATH] = { 0 };
 
-	if (GetTempPath(_MAX_PATH, out_file)) {
-
-		CString out_tmp(out_file);
-		out_tmp.Append(_T("mpc_youtube.m3u"));
-		wcsncpy(out_file, out_tmp.GetBuffer(), out_tmp.GetLength());
-		out_tmp.ReleaseBuffer();
-
-		return out_file;
+	CString tmpPlaylist;
+	if (GetTempPath(_MAX_PATH, lpszTempPath)) {
+		tmpPlaylist.AppendFormat(L"%smpc_youtube.m3u", lpszTempPath);
 	}
 
-	return NULL;
+	return tmpPlaylist;
 }
 
 void PlayerYouTubePlaylistDelete()
 {
-	CFileFind find;
-	TCHAR* file = PlayerYouTubePlaylistCreate();
+	CString file = PlayerYouTubePlaylistCreate();
 
-	if (file && find.FindFile(file)) {
-		DeleteFile(file);
+	if (::PathFileExists(file)) {
+		::DeleteFile(file);
 	}
 }
 
@@ -655,12 +649,14 @@ CString PlayerYouTubeGetTitle(CString fn)
 		return fn;
 	}
 
+	delete [] final;
+
 	return PlayerYouTubeSearchTitle(final) + _T(".mp4");
 }
 
 CString PlayerYouTubeSearchTitle(char* final)
 {
-	CString Title = _T("");
+	CString Title;
 
 	int t_start = strpos(final, "<title>");
 	if (t_start > 0) {

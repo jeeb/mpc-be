@@ -96,6 +96,8 @@ CString PlayerVimeo(CString fn)
 			}
 		}
 
+		delete [] final;
+
 		return url;
 	}
 
