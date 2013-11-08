@@ -506,7 +506,6 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 				if (s.fVMRMixerYUV) {
 					dwPrefs &= ~MixerPref9_RenderTargetMask;
 					dwPrefs |= MixerPref9_RenderTargetYUV;
-					dwPrefs |= MixerPref9_DynamicSwitchToBOB;
 				}
 				pVMRMC9->SetMixingPrefs(dwPrefs);
 			}
@@ -523,7 +522,6 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 				if (s.fVMRMixerYUV) {
 					dwPrefs &= ~MixerPref_RenderTargetMask;
 					dwPrefs |= MixerPref_RenderTargetYUV;
-					dwPrefs |= MixerPref_DynamicSwitchToBOB;
 				}
 				pVMRMC->SetMixingPrefs(dwPrefs);
 			}
