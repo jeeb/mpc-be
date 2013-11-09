@@ -97,6 +97,7 @@ protected:
 	int										m_nSwOutputLevels;
 	//
 
+	enum AVPixelFormat						m_pix_fmt;
 	enum AVPixelFormat						m_PixFmt;
 
 	FF_FIELD_TYPE							m_nFrameType;

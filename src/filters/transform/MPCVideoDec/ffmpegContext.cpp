@@ -48,6 +48,10 @@ extern "C" {
 	#include <ffmpeg/libavcodec/mpeg12.h>
 }
 
+#ifndef CHROMA420
+#define CHROMA420(h) (h->sps.chroma_format_idc == 1)
+#endif
+
 static const WORD PCID_NVIDIA_VP5 [] = {
 	// http://us.download.nvidia.com/XFree86/Linux-x86_64/319.49/README/supportedchips.html
 	// http://pci-ids.ucw.cz/read/PC/10de
@@ -947,7 +951,7 @@ BOOL FFGetAlternateScan(struct AVCodecContext* pAVCtx)
 	return (s != NULL) ? s->alternate_scan : 0;
 }
 
-void FFGetOutputSize(struct AVCodecContext* pAVCtx, AVFrame* pFrame, int* OutWidth, int* OutHeight)
+void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int& width, int& height, enum AVPixelFormat& pix_fmt)
 {
 	if (pAVCtx->codec_id == AV_CODEC_ID_H264) {
 		H264Context*	h = (H264Context*) pAVCtx->priv_data;
@@ -965,11 +969,36 @@ void FFGetOutputSize(struct AVCodecContext* pAVCtx, AVFrame* pFrame, int* OutWid
 		cur_sps	= &h->sps;
 
 		if (cur_sps) {
-			if (OutWidth) {
-				*OutWidth	= cur_sps->mb_width * 16;
+			width	= cur_sps->mb_width * 16;
+			height	= cur_sps->mb_height * (2 - cur_sps->frame_mbs_only_flag) * 16;
+
+			if (cur_sps->colorspace == AVCOL_SPC_RGB) {
+				if (cur_sps->bit_depth_luma == 8) {
+					pix_fmt = AV_PIX_FMT_GBRP;
+				}
+				return;
 			}
-			if (OutHeight) {
-				*OutHeight	= cur_sps->mb_height * (2 - cur_sps->frame_mbs_only_flag) * 16;
+
+			if CHROMA420(h) {
+				if (cur_sps->bit_depth_luma == 8) {
+					pix_fmt = AV_PIX_FMT_YUV420P;
+				} else if (cur_sps->bit_depth_luma == 9) {
+					pix_fmt = AV_PIX_FMT_YUV420P9LE;
+				} else if (cur_sps->bit_depth_luma == 10) {
+					pix_fmt = AV_PIX_FMT_YUV420P10LE;
+				}
+			} else if CHROMA422(h) {
+				if (cur_sps->bit_depth_luma == 8) {
+					pix_fmt = AV_PIX_FMT_YUV422P;
+				} else if (cur_sps->bit_depth_luma == 10) {
+					pix_fmt = AV_PIX_FMT_YUV422P10LE;
+				}
+			} else if CHROMA444(h) {
+				if (cur_sps->bit_depth_luma == 8) {
+					pix_fmt = AV_PIX_FMT_YUV444P;
+				} else if (cur_sps->bit_depth_luma == 10) {
+					pix_fmt = AV_PIX_FMT_YUV444P10LE;
+				}
 			}
 		}
 		return;
@@ -989,14 +1018,10 @@ void FFGetOutputSize(struct AVCodecContext* pAVCtx, AVFrame* pFrame, int* OutWid
 			int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
 		}
 
-		if (OutWidth) {
-			*OutWidth	= FFALIGN(s->width, 16);
-		}
-		if (OutHeight) {
-			*OutHeight	= FFALIGN(s->height, 16);
-			if (!s->progressive_sequence) {
-				*OutHeight = int((s->height + 31) / 32 * 2) * 16;
-			}
+		width	= FFALIGN(s->width, 16);
+		height	= FFALIGN(s->height, 16);
+		if (!s->progressive_sequence) {
+			height = int((s->height + 31) / 32 * 2) * 16;
 		}
 	}
 }
