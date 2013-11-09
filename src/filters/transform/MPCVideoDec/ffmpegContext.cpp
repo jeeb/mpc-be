@@ -966,40 +966,82 @@ void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int&
 			int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
 		}
 
-		cur_sps	= &h->sps;
+		cur_sps = &h->sps;
 
 		if (cur_sps) {
 			width	= cur_sps->mb_width * 16;
 			height	= cur_sps->mb_height * (2 - cur_sps->frame_mbs_only_flag) * 16;
 
-			if (cur_sps->colorspace == AVCOL_SPC_RGB) {
-				if (cur_sps->bit_depth_luma == 8) {
-					pix_fmt = AV_PIX_FMT_GBRP;
+			switch (cur_sps->bit_depth_luma) {
+			case 8:
+				if (CHROMA444(h)) {
+					if (cur_sps->colorspace == AVCOL_SPC_RGB) {
+						pix_fmt = AV_PIX_FMT_GBR24P;
+					} else if (cur_sps->colorspace == AVCOL_SPC_YCGCO) {
+						// "Detected unsupported YCgCo colorspace.
+					} else {
+						pix_fmt = cur_sps->full_range > 0 ? AV_PIX_FMT_YUVJ444P : AV_PIX_FMT_YUV444P;
+					}
+				} else if (CHROMA422(h)) {
+					pix_fmt = cur_sps->full_range > 0 ? AV_PIX_FMT_YUVJ422P : AV_PIX_FMT_YUV422P;
+				} else {
+					pix_fmt = cur_sps->full_range > 0 ? AV_PIX_FMT_YUVJ420P: AV_PIX_FMT_YUV420P;
 				}
-				return;
+				break;
+			case 9:
+				if (CHROMA444(h)) {
+					if (cur_sps->colorspace == AVCOL_SPC_RGB) {
+						pix_fmt = AV_PIX_FMT_GBRP9;
+					} else {
+						pix_fmt = AV_PIX_FMT_YUV444P9;
+					}
+				} else if (CHROMA422(h)) {
+					pix_fmt = AV_PIX_FMT_YUV422P9;
+				} else {
+					pix_fmt = AV_PIX_FMT_YUV420P9;
+				}
+				break;
+			case 10:
+				if (CHROMA444(h)) {
+					if (cur_sps->colorspace == AVCOL_SPC_RGB) {
+						pix_fmt = AV_PIX_FMT_GBRP10;
+					} else {
+						pix_fmt = AV_PIX_FMT_YUV444P10;
+					}
+				} else if (CHROMA422(h)) {
+					pix_fmt = AV_PIX_FMT_YUV422P10;
+				} else {
+					pix_fmt = AV_PIX_FMT_YUV420P10;
+				}
+				break;
+			case 12:
+				if (CHROMA444(h)) {
+					if (cur_sps->colorspace == AVCOL_SPC_RGB) {
+						pix_fmt = AV_PIX_FMT_GBRP12;
+					} else {
+						pix_fmt = AV_PIX_FMT_YUV444P12;
+					}
+				} else if (CHROMA422(h)) {
+					pix_fmt = AV_PIX_FMT_YUV422P12;
+				} else {
+					pix_fmt = AV_PIX_FMT_YUV420P12;
+				}
+				break;
+			case 14:
+				if (CHROMA444(h)) {
+					if (cur_sps->colorspace == AVCOL_SPC_RGB) {
+						pix_fmt = AV_PIX_FMT_GBRP14;
+					} else {
+						pix_fmt = AV_PIX_FMT_YUV444P14;
+					}
+				} else if (CHROMA422(h)) {
+					pix_fmt = AV_PIX_FMT_YUV422P14;
+				} else {
+					pix_fmt = AV_PIX_FMT_YUV420P14;
+				}
+				break;
 			}
 
-			if CHROMA420(h) {
-				if (cur_sps->bit_depth_luma == 8) {
-					pix_fmt = AV_PIX_FMT_YUV420P;
-				} else if (cur_sps->bit_depth_luma == 9) {
-					pix_fmt = AV_PIX_FMT_YUV420P9LE;
-				} else if (cur_sps->bit_depth_luma == 10) {
-					pix_fmt = AV_PIX_FMT_YUV420P10LE;
-				}
-			} else if CHROMA422(h) {
-				if (cur_sps->bit_depth_luma == 8) {
-					pix_fmt = AV_PIX_FMT_YUV422P;
-				} else if (cur_sps->bit_depth_luma == 10) {
-					pix_fmt = AV_PIX_FMT_YUV422P10LE;
-				}
-			} else if CHROMA444(h) {
-				if (cur_sps->bit_depth_luma == 8) {
-					pix_fmt = AV_PIX_FMT_YUV444P;
-				} else if (cur_sps->bit_depth_luma == 10) {
-					pix_fmt = AV_PIX_FMT_YUV444P10LE;
-				}
-			}
 		}
 		return;
 	}
