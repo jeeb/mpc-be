@@ -28,7 +28,6 @@
 #include "IMPCVideoDec.h"
 #include "MPCVideoDecSettingsWnd.h"
 #include "DXVADecoder.h"
-#include "H264RandomAccess.h"
 #include <atlpath.h>
 #include "../../../apps/mplayerc/FilterEnum.h"
 
@@ -162,8 +161,6 @@ protected:
 	HANDLE									m_hDevice;
 	DXVA2_VideoDesc							m_VideoDesc;
 
-	CH264RandomAccess						m_h264RandomAccess;
-
 	BOOL									m_bWaitingForKeyFrame;
 
 	RMDemuxContext							rm;
@@ -224,7 +221,6 @@ public:
 
 	HRESULT			BreakConnect(PIN_DIRECTION dir);
 
-
 	// === ISpecifyPropertyPages2
 
 	STDMETHODIMP	GetPages(CAUUID* pPages);
@@ -284,7 +280,7 @@ public:
 
 	// === DXVA common functions
 	BOOL						IsSupportedDecoderConfig(const D3DFORMAT nD3DFormat, const DXVA2_ConfigPictureDecode& config, bool& bIsPrefered);
-	BOOL						IsSupportedDecoderMode(const GUID& mode);
+	BOOL						IsSupportedDecoderMode(const GUID* mode);
 	void						BuildDXVAOutputFormat();
 	int							GetPicEntryNumber();
 	int							PictWidth();
@@ -313,7 +309,7 @@ public:
 	void						SetTypeSpecificFlags(IMediaSample* pMS);
 
 	// === DXVA1 functions
-	DDPIXELFORMAT*				GetPixelFormat()		{ return &m_PixelFormat; }
+	DDPIXELFORMAT*				GetPixelFormat() { return &m_PixelFormat; }
 	HRESULT						FindDXVA1DecoderConfiguration(IAMVideoAccelerator* pAMVideoAccelerator, const GUID* guidDecoder, DDPIXELFORMAT* pPixelFormat);
 	HRESULT						CheckDXVA1Decoder(const GUID *pGuid);
 	void						SetDXVA1Params(const GUID* pGuid, DDPIXELFORMAT* pPixelFormat);
@@ -323,7 +319,7 @@ public:
 
 	// === DXVA2 functions
 	void						FillInVideoDescription(DXVA2_VideoDesc *pDesc);
-	DXVA2_ConfigPictureDecode*	GetDXVA2Config()		{ return &m_DXVA2Config; };
+	DXVA2_ConfigPictureDecode*	GetDXVA2Config() { return &m_DXVA2Config; };
 	HRESULT						ConfigureDXVA2(IPin *pPin);
 	HRESULT						SetEVRForDXVA2(IPin *pPin);
 	HRESULT						FindDXVA2DecoderConfiguration(IDirectXVideoDecoderService *pDecoderService,

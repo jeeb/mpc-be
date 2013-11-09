@@ -150,7 +150,7 @@ DXVA_PARAMS		DXVA_Mpeg2 = {
 	24,		// PicEntryNumber - DXVA2
 	1,		// PreferedConfigBitstream
 	{ &DXVA2_ModeMPEG2_VLD, &GUID_NULL },
-	{ DXVA_RESTRICTED_MODE_UNRESTRICTED, 0 } // Restricted mode for DXVA1?
+	{ DXVA_RESTRICTED_MODE_MPEG2_D, 0 } // Restricted mode for DXVA1?
 };
 
 // DXVA modes supported for H264
@@ -1477,7 +1477,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 				TRACE(_T("Enumerate DXVA mode : %s\n"), GetDXVAMode(&pDecoderGuids[iGuid]));
 
 				// Do we support this mode?
-				if (!IsSupportedDecoderMode(pDecoderGuids[iGuid])) {
+				if (!IsSupportedDecoderMode(&pDecoderGuids[iGuid])) {
 					continue;
 				}
 
@@ -1529,7 +1529,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 
 HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 {
-	bool bReinit = ((m_pAVCtx != NULL) && (m_nDecoderMode != MODE_DXVA1));
+	bool bReinit = ((m_pAVCtx != NULL));
 
 	ffmpegCleanup();
 
@@ -1578,9 +1578,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 
 	m_pFrame = avcodec_alloc_frame();
 	CheckPointer(m_pFrame, E_POINTER);
-
-	m_h264RandomAccess.SetAVCNALSize(0);
-	m_h264RandomAccess.flush(m_pAVCtx->thread_count);
 
 	BITMAPINFOHEADER *pBMI = NULL;
 	if (pmt->formattype == FORMAT_VideoInfo) {
@@ -1640,8 +1637,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	m_pAVCtx->skip_loop_filter      = (AVDiscard)m_nDiscardMode;
 	m_pAVCtx->strict_std_compliance	= FF_COMPLIANCE_EXPERIMENTAL;
 
-	if (m_nCodecId == AV_CODEC_ID_H264) {
-		m_pAVCtx->flags2           |= CODEC_FLAG2_SHOW_ALL;
+	if (m_nCodecId == AV_CODEC_ID_H264 && IsDXVASupported()) {
+		m_pAVCtx->flags2			|= CODEC_FLAG2_SHOW_ALL;
 	}
 
 	if (m_pAVCtx->codec_tag == MAKEFOURCC('m','p','g','2')) {
@@ -1739,11 +1736,20 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	BuildDXVAOutputFormat();
 
 	if (bReinit) {
-		if (IsDXVASupported() && SUCCEEDED(FindDecoderConfiguration())) {
-			dynamic_cast<CVideoDecOutputPin*>(m_pOutput)->Recommit();
-			m_nDecoderMode = MODE_DXVA2;
-		} else {
-			SAFE_DELETE (m_pDXVADecoder);
+		SAFE_DELETE(m_pDXVADecoder);
+
+		if (m_nDecoderMode == MODE_DXVA2) {
+			if (IsDXVASupported() && SUCCEEDED(FindDecoderConfiguration())) {
+				dynamic_cast<CVideoDecOutputPin*>(m_pOutput)->Recommit();
+			}
+		} else if (m_nDecoderMode == MODE_DXVA1) {
+			SAFE_DELETE(m_pDXVADecoder);
+			if (IsDXVASupported()) {
+				ReconnectOutput(PictWidthRounded(), PictHeightRounded(), true, true, GetDuration(), PictWidth(), PictHeight());
+				if (m_pDXVADecoder) {
+					m_pDXVADecoder->ConfigureDXVA1();
+				}
+			}
 		}
 	}
 
@@ -1752,7 +1758,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 
 void CMPCVideoDecFilter::BuildDXVAOutputFormat()
 {
-	SAFE_DELETE_ARRAY (m_pVideoOutputFormat);
+	SAFE_DELETE_ARRAY(m_pVideoOutputFormat);
 
 	// === New swscaler options
 	int nSwIndex[NUM_SW_OUT_FORMATS];
@@ -1859,7 +1865,6 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 			extra[extralen-1] = 0;
 
 			bH264avc = TRUE;
-			m_h264RandomAccess.SetAVCNALSize(mp2vi->dwFlags);
 		} else {
 			// Just copy extradata for other formats
 			extra = (uint8_t *)av_mallocz(extralen + FF_INPUT_BUFFER_PADDING_SIZE);
@@ -1932,7 +1937,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 		if (IsDXVASupported()) {
 			if (m_nDecoderMode == MODE_DXVA1) {
 				m_pDXVADecoder->ConfigureDXVA1();
-			} else if (SUCCEEDED (ConfigureDXVA2(pReceivePin)) && SUCCEEDED (SetEVRForDXVA2(pReceivePin)) ) {
+			} else if (SUCCEEDED(ConfigureDXVA2(pReceivePin)) && SUCCEEDED(SetEVRForDXVA2(pReceivePin)) ) {
 				m_nDecoderMode = MODE_DXVA2;
 			}
 		}
@@ -2032,26 +2037,21 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 		m_pDXVADecoder->NewSegment();
 	}
 	
-	m_nPosB = 1;
 	memset(&m_BFrames, 0, sizeof(m_BFrames));
-	m_rtLastStop		= 0;
-	m_dRate				= dRate;
-
-	m_h264RandomAccess.flush(m_pAVCtx->thread_count);
+	m_nPosB = 1;
+	m_dRate	= dRate;
 
 	m_bWaitingForKeyFrame = TRUE;
 
-	m_rtStartCache = INVALID_TIME;
-
-	m_rtPrevStop = 0;
-
 	rm.video_after_seek	= true;
-	m_rtStart			= rtStart;
 
-	if (m_nCodecId == AV_CODEC_ID_H264 && m_nFrameType != PICT_FRAME && m_nPCIVendor == PCIV_ATI && m_nDecoderMode == MODE_DXVA2) {
-		if (SUCCEEDED(FindDecoderConfiguration())) {
-			dynamic_cast<CVideoDecOutputPin*>(m_pOutput)->Recommit();
-		}
+	m_rtStart		= rtStart;
+	m_rtStartCache	= INVALID_TIME;
+	m_rtPrevStop	= 0;
+	m_rtLastStop	= 0;
+
+	if (m_nCodecId == AV_CODEC_ID_H264) {
+		InitDecoder(&m_pInput->CurrentMediaType());
 	}
 
 	return __super::NewSegment (rtStart, rtStop, dRate);
@@ -2320,12 +2320,6 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 	AVPacket		avpkt;
 	av_init_packet(&avpkt);
 
-	if (!bFlush && m_nCodecId == AV_CODEC_ID_H264) {
-		if (!m_h264RandomAccess.searchRecoveryPoint(pDataIn, nSize)) {
-			return S_OK;
-		}
-	}
-
 	while (nSize > 0 || bFlush) {
 		REFERENCE_TIME rtStart = rtStartIn, rtStop = rtStopIn;
 		
@@ -2445,9 +2439,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 							 || m_nCodecId == AV_CODEC_ID_THEORA
 							 || m_nCodecId == AV_CODEC_ID_MPEG4;
 
-		if (m_nCodecId == AV_CODEC_ID_H264) {
-			m_h264RandomAccess.judgeFrameUsability(m_pFrame, &got_picture);
-		} else if (fWaitKeyFrame) {
+		if (fWaitKeyFrame) {
 			if (m_bWaitingForKeyFrame && got_picture) {
 				if (m_pFrame->key_frame) {
 					m_bWaitingForKeyFrame = FALSE;
@@ -2639,6 +2631,9 @@ HRESULT CMPCVideoDecFilter::ReopenVideo()
 		m_bUseDXVA = false;
 		avcodec_close(m_pAVCtx);
 		m_pAVCtx->using_dxva = false;
+		if (m_nCodecId == AV_CODEC_ID_H264) {
+			m_pAVCtx->flags2 &= ~CODEC_FLAG2_SHOW_ALL;
+		}
 		int nThreadNumber = m_nThreadNumber ? m_nThreadNumber : m_pCpuId->GetProcessorNumber() * 3/2;
 		if ((nThreadNumber > 1) && FFGetThreadType(m_nCodecId)) {
 			FFSetThreadNumber(m_pAVCtx, m_nCodecId, nThreadNumber);
@@ -2767,35 +2762,31 @@ void CMPCVideoDecFilter::FillInVideoDescription(DXVA2_VideoDesc *pDesc)
 	pDesc->UABProtectionLevel	= 1;
 }
 
-BOOL CMPCVideoDecFilter::IsSupportedDecoderMode(const GUID& mode)
+BOOL CMPCVideoDecFilter::IsSupportedDecoderMode(const GUID* mode)
 {
 	if (IsDXVASupported()) {
 		for (int i = 0; i < MAX_SUPPORTED_MODE; i++) {
 			if (*ffCodecs[m_nCodecNb].DXVAModes->Decoder[i] == GUID_NULL) {
 				break;
-			} else if (*ffCodecs[m_nCodecNb].DXVAModes->Decoder[i] == mode) {
-				return true;
+			} else if (*ffCodecs[m_nCodecNb].DXVAModes->Decoder[i] == *mode) {
+				return TRUE;
 			}
 		}
 	}
 
-	return false;
+	return FALSE;
 }
 
 BOOL CMPCVideoDecFilter::IsSupportedDecoderConfig(const D3DFORMAT nD3DFormat, const DXVA2_ConfigPictureDecode& config, bool& bIsPrefered)
 {
-	bool bRet = false;
-
-	bRet = (nD3DFormat == MAKEFOURCC('N', 'V', '1', '2') || nD3DFormat == MAKEFOURCC('I', 'M', 'C', '3'));
-
 	bIsPrefered = (config.ConfigBitstreamRaw == ffCodecs[m_nCodecNb].DXVAModes->PreferedConfigBitstream);
-	return bRet;
+	return (nD3DFormat == MAKEFOURCC('N', 'V', '1', '2') || nD3DFormat == MAKEFOURCC('I', 'M', 'C', '3'));
 }
 
 HRESULT CMPCVideoDecFilter::FindDXVA2DecoderConfiguration(IDirectXVideoDecoderService *pDecoderService,
-		const GUID& guidDecoder,
-		DXVA2_ConfigPictureDecode *pSelectedConfig,
-		BOOL *pbFoundDXVA2Configuration)
+														  const GUID& guidDecoder,
+														  DXVA2_ConfigPictureDecode *pSelectedConfig,
+														  BOOL *pbFoundDXVA2Configuration)
 {
 	HRESULT hr = S_OK;
 	UINT cFormats = 0;
@@ -2947,7 +2938,7 @@ HRESULT CMPCVideoDecFilter::CreateDXVA2Decoder(UINT nNumRenderTargets, IDirect3D
 
 	if (SUCCEEDED(hr)) {
 		// need recreate dxva decoder after "stop" on Intel HD Graphics
-		SAFE_DELETE (m_pDXVADecoder);
+		SAFE_DELETE(m_pDXVADecoder);
 		m_pDXVADecoder = CDXVADecoder::CreateDecoder(this, pDirectXVideoDec, &m_DXVADecoderGUID, GetPicEntryNumber(), &m_DXVA2Config);
 		if (m_pDXVADecoder) {
 			m_pDXVADecoder->SetDirectXVideoDec(pDirectXVideoDec);
@@ -2975,7 +2966,7 @@ HRESULT CMPCVideoDecFilter::FindDXVA1DecoderConfiguration(IAMVideoAccelerator* p
 			// Look for a format that matches our output format.
 			for (DWORD iFormat = 0; iFormat < dwFormats; iFormat++) {
 				if (pPixelFormats[iFormat].dwFourCC == MAKEFOURCC('N', 'V', '1', '2')) {
-					memcpy (pPixelFormat, &pPixelFormats[iFormat], sizeof(DDPIXELFORMAT));
+					memcpy(pPixelFormat, &pPixelFormats[iFormat], sizeof(DDPIXELFORMAT));
 					SAFE_DELETE_ARRAY(pPixelFormats)
 					return S_OK;
 				}
@@ -2989,22 +2980,10 @@ HRESULT CMPCVideoDecFilter::FindDXVA1DecoderConfiguration(IAMVideoAccelerator* p
 	return hr;
 }
 
-HRESULT CMPCVideoDecFilter::CheckDXVA1Decoder(const GUID *pGuid)
-{
-	if (m_nCodecNb != -1) {
-		for (int i = 0; i < MAX_SUPPORTED_MODE; i++)
-			if (*ffCodecs[m_nCodecNb].DXVAModes->Decoder[i] == *pGuid) {
-				return S_OK;
-			}
-	}
-
-	return E_INVALIDARG;
-}
-
 void CMPCVideoDecFilter::SetDXVA1Params(const GUID* pGuid, DDPIXELFORMAT* pPixelFormat)
 {
 	m_DXVADecoderGUID		= *pGuid;
-	memcpy (&m_PixelFormat, pPixelFormat, sizeof (DDPIXELFORMAT));
+	memcpy(&m_PixelFormat, pPixelFormat, sizeof (DDPIXELFORMAT));
 }
 
 WORD CMPCVideoDecFilter::GetDXVA1RestrictedMode()
@@ -3019,12 +2998,9 @@ WORD CMPCVideoDecFilter::GetDXVA1RestrictedMode()
 	return DXVA_RESTRICTED_MODE_UNRESTRICTED;
 }
 
-HRESULT CMPCVideoDecFilter::CreateDXVA1Decoder(IAMVideoAccelerator*  pAMVideoAccelerator, const GUID* pDecoderGuid, DWORD dwSurfaceCount)
+HRESULT CMPCVideoDecFilter::CreateDXVA1Decoder(IAMVideoAccelerator* pAMVideoAccelerator, const GUID* pDecoderGuid, DWORD dwSurfaceCount)
 {
-	if (m_pDXVADecoder && m_DXVADecoderGUID	== *pDecoderGuid) {
-		return S_OK;
-	}
-	SAFE_DELETE (m_pDXVADecoder);
+	SAFE_DELETE(m_pDXVADecoder);
 
 	if (!m_bUseDXVA) {
 		return E_FAIL;
@@ -3492,7 +3468,6 @@ CVideoDecOutputPin::~CVideoDecOutputPin(void)
 
 HRESULT CVideoDecOutputPin::InitAllocator(IMemAllocator **ppAlloc)
 {
-	//TRACE("CVideoDecOutputPin::InitAllocator\n");
 	if (m_pVideoDecFilter->UseDXVA2()) {
 		HRESULT hr = S_FALSE;
 		m_pDXVA2Allocator = DNew CVideoDecDXVAAllocator(m_pVideoDecFilter, &hr);
@@ -3522,16 +3497,16 @@ STDMETHODIMP CVideoDecOutputPin::GetUncompSurfacesInfo(const GUID *pGuid, LPAMVA
 {
 	HRESULT hr = E_INVALIDARG;
 
-	if (SUCCEEDED (m_pVideoDecFilter->CheckDXVA1Decoder (pGuid))) {
-		CComQIPtr<IAMVideoAccelerator>		pAMVideoAccelerator	= GetConnected();
+	if (m_pVideoDecFilter->IsSupportedDecoderMode(pGuid)) {
+		CComQIPtr<IAMVideoAccelerator> pAMVideoAccelerator = GetConnected();
 
 		if (pAMVideoAccelerator) {
 			pUncompBufferInfo->dwMaxNumSurfaces		= m_pVideoDecFilter->GetPicEntryNumber();
 			pUncompBufferInfo->dwMinNumSurfaces		= m_pVideoDecFilter->GetPicEntryNumber();
 
-			hr = m_pVideoDecFilter->FindDXVA1DecoderConfiguration (pAMVideoAccelerator, pGuid, &pUncompBufferInfo->ddUncompPixelFormat);
-			if (SUCCEEDED (hr)) {
-				memcpy (&m_ddUncompPixelFormat, &pUncompBufferInfo->ddUncompPixelFormat, sizeof(DDPIXELFORMAT));
+			hr = m_pVideoDecFilter->FindDXVA1DecoderConfiguration(pAMVideoAccelerator, pGuid, &pUncompBufferInfo->ddUncompPixelFormat);
+			if (SUCCEEDED(hr)) {
+				memcpy(&m_ddUncompPixelFormat, &pUncompBufferInfo->ddUncompPixelFormat, sizeof(DDPIXELFORMAT));
 				m_GuidDecoderDXVA1 = *pGuid;
 			}
 		}
@@ -3556,16 +3531,16 @@ STDMETHODIMP CVideoDecOutputPin::GetCreateVideoAcceleratorData(const GUID *pGuid
 	DXVA_ConnectMode*					pConnectMode;
 
 	if (pAMVideoAccelerator) {
-		memcpy (&UncompInfo.ddUncompPixelFormat, &m_ddUncompPixelFormat, sizeof (DDPIXELFORMAT));
+		memcpy(&UncompInfo.ddUncompPixelFormat, &m_ddUncompPixelFormat, sizeof (DDPIXELFORMAT));
 		UncompInfo.dwUncompWidth		= m_pVideoDecFilter->PictWidthRounded();
 		UncompInfo.dwUncompHeight		= m_pVideoDecFilter->PictHeightRounded();
 		hr = pAMVideoAccelerator->GetCompBufferInfo(&m_GuidDecoderDXVA1, &UncompInfo, &dwNumTypesCompBuffers, CompInfo);
 
-		if (SUCCEEDED (hr)) {
-			hr = m_pVideoDecFilter->CreateDXVA1Decoder (pAMVideoAccelerator, pGuid, m_dwDXVA1SurfaceCount);
+		if (SUCCEEDED(hr)) {
+			hr = m_pVideoDecFilter->CreateDXVA1Decoder(pAMVideoAccelerator, pGuid, m_dwDXVA1SurfaceCount);
 
-			if (SUCCEEDED (hr)) {
-				m_pVideoDecFilter->SetDXVA1Params (&m_GuidDecoderDXVA1, &m_ddUncompPixelFormat);
+			if (SUCCEEDED(hr)) {
+				m_pVideoDecFilter->SetDXVA1Params(&m_GuidDecoderDXVA1, &m_ddUncompPixelFormat);
 
 				pConnectMode					= (DXVA_ConnectMode*)CoTaskMemAlloc (sizeof(DXVA_ConnectMode));
 				pConnectMode->guidMode			= m_GuidDecoderDXVA1;

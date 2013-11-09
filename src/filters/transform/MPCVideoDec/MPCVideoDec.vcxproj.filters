@@ -45,9 +45,6 @@
     <ClCompile Include="DXVAAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="H264RandomAccess.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ffmpegContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -87,9 +84,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DXVAAllocator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="H264RandomAccess.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ffImgfmt.h">
