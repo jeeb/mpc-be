@@ -487,6 +487,9 @@
     <ClInclude Include="libavcodec\h263data.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
+    <ClInclude Include="libavcodec\h263dsp.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
     <ClInclude Include="libavcodec\h264.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
@@ -1198,6 +1201,9 @@
     <ClCompile Include="libavcodec\x86\fpel_mmx.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
+    <ClCompile Include="libavcodec\x86\h263dsp_init.c">
+      <Filter>libavcodec\x86</Filter>
+    </ClCompile>
     <ClCompile Include="libavcodec\x86\h264_intrapred_init.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
@@ -1592,6 +1598,9 @@
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\h263dec.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\h263dsp.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\h264.c">

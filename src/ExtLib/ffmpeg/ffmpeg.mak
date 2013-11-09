@@ -175,6 +175,7 @@ SRCS_C = \
 	libavcodec/h263.c \
 	libavcodec/h263_parser.c \
 	libavcodec/h263dec.c \
+	libavcodec/h263dsp.c \
 	libavcodec/h264.c \
 	libavcodec/h264_cabac.c \
 	libavcodec/h264_cavlc.c \
@@ -374,6 +375,7 @@ SRCS_C = \
 	libavcodec/x86/fft_init.c \
 	libavcodec/x86/fmtconvert_init.c \
 	libavcodec/x86/fpel_mmx.c \
+	libavcodec/x86/h263dsp_init.c \
 	libavcodec/x86/h264_intrapred_init.c \
 	libavcodec/x86/h264chroma_init.c \
 	libavcodec/x86/h264dsp_init.c \
