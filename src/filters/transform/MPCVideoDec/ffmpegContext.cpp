@@ -1046,7 +1046,7 @@ void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int&
 		return;
 	}
 
-	if (pAVCtx->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
+	if (pAVCtx->codec_id == AV_CODEC_ID_MPEG2VIDEO || pAVCtx->codec_id == AV_CODEC_ID_MPEG1VIDEO) {
 		Mpeg1Context*	s1	= (Mpeg1Context*)pAVCtx->priv_data;
 		MpegEncContext*	s	= (MpegEncContext*)&s1->mpeg_enc_ctx;
 
@@ -1064,6 +1064,14 @@ void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int&
 		height	= FFALIGN(s->height, 16);
 		if (!s->progressive_sequence) {
 			height = int((s->height + 31) / 32 * 2) * 16;
+		}
+
+		if(s->chroma_format < 2) {
+			pix_fmt = AV_PIX_FMT_YUV420P;
+		} else if(s->chroma_format == 2) {
+			pix_fmt = AV_PIX_FMT_YUV422P;
+		} else {
+			pix_fmt = AV_PIX_FMT_YUV444P;
 		}
 	}
 }
