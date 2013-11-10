@@ -26,7 +26,7 @@
 #include <AllocatorCommon7.h>
 #include <AllocatorCommon.h>
 #include <SyncAllocatorPresenter.h>
-#include <moreuuids.h>
+#include <moreclsids.h>
 
 //
 // CFGFilter

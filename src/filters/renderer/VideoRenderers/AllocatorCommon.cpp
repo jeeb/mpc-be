@@ -22,7 +22,7 @@
 #include <InitGuid.h>
 #include "AllocatorCommon.h"
 #include "../DSUtil/DSUtil.h"
-#include "moreuuids.h"
+#include <moreclsids.h>
 
 #include "VMR9AllocatorPresenter.h"
 #include "RM9AllocatorPresenter.h"

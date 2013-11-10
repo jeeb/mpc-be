@@ -32,7 +32,7 @@
 #include "../../DSUtil/WinAPIUtils.h"
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/MPCSocket.h"
-#include <moreuuids.h>
+#include <moreclsids.h>
 #include <winddk/ntddcdvd.h>
 #include <detours/detours.h>
 #include <afxsock.h>

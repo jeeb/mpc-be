@@ -38,6 +38,7 @@
 	#include <InitGuid.h>
 #endif
 #include <moreuuids.h>
+#include <moreclsids.h>
 #include <IFilterVersion.h>
 
 // option names

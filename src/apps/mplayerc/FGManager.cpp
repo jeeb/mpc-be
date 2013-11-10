@@ -36,6 +36,7 @@
 #include <evr9.h>
 #include <ksproxy.h>
 #include <moreuuids.h>
+#include <moreclsids.h>
 #include "MediaFormats.h"
 #include <IPinHook.h>
 

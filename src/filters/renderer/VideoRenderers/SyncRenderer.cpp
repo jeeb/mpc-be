@@ -37,7 +37,7 @@
 #include <vector>
 #include "../../../SubPic/DX9SubPic.h"
 #include "../../../SubPic/SubPicQueueImpl.h"
-#include <moreuuids.h>
+#include <moreclsids.h>
 #include "MacrovisionKicker.h"
 #include "IPinHook.h"
 #include "PixelShaderCompiler.h"

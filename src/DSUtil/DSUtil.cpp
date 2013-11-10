@@ -27,6 +27,7 @@
 #include "Mpeg2Def.h"
 #include "AudioParser.h"
 #include <moreuuids.h>
+#include <moreclsids.h>
 #include <emmintrin.h>
 #include <math.h>
 #include <InitGuid.h>
