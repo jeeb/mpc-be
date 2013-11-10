@@ -225,7 +225,7 @@ HRESULT FFH264DecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
 {
 	HRESULT hr = E_FAIL;
 	if (pBuffer != NULL) {
-		H264Context* h	= (H264Context*) pAVCtx->priv_data;
+		H264Context* h	= (H264Context*)pAVCtx->priv_data;
 		int				got_picture	= 0;
 		AVPacket		avpkt;
 		av_init_packet(&avpkt);
@@ -295,31 +295,18 @@ BOOL DriverVersionCheck(LARGE_INTEGER VideoDriverVersion, int A, int B, int C, i
 	return FALSE;
 }
 
-int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
+int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx,
 							 DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion, bool nIsAtiDXVACompatible)
 {
-	H264Context*	pContext = (H264Context*) pAVCtx->priv_data;
+	H264Context* pContext		= (H264Context*)pAVCtx->priv_data;
 
-	int video_is_level51			= 0;
-	int no_level51_support			= 1;
-	int too_much_ref_frames			= 0;
-	int max_ref_frames_dpb41		= min(11, 8388608/(nWidth * nHeight) );
+	int video_is_level51		= 0;
+	int no_level51_support		= 1;
+	int too_much_ref_frames		= 0;
+	int max_ref_frames_dpb41	= min(11, 8388608/(nWidth * nHeight) );
 
-	if (pAVCtx->extradata != NULL) {
-		int				got_picture	= 0;
-		AVPacket		avpkt;
-		av_init_packet(&avpkt);
-		avpkt.data		= pAVCtx->extradata;
-		avpkt.size		= pAVCtx->extradata_size;
-		avpkt.flags		= AV_PKT_FLAG_KEY;
-		int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
-	}
-
-	PPS* cur_pps		= &pContext->pps;
-	SPS* cur_sps		= NULL;
-	if (cur_pps != NULL) {
-		cur_sps			= pContext->sps_buffers[cur_pps->sps_id];
-	}
+	PPS* cur_pps				= &pContext->pps;
+	SPS* cur_sps				= cur_pps != NULL ? pContext->sps_buffers[cur_pps->sps_id] : NULL;
 
 	if (cur_sps != NULL) {
 		if (cur_sps->bit_depth_luma > 8 || cur_sps->chroma_format_idc > 1) {
@@ -442,7 +429,7 @@ USHORT FFH264FindRefFrameIndex(USHORT num_frame, DXVA_PicParams_H264* pDXVAPicPa
 
 HRESULT FFH264BuildPicParams(struct AVCodecContext* pAVCtx, DWORD nPCIVendor, DWORD nPCIDevice, DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_H264* pDXVAScalingMatrix, int* nPictStruct)
 {
-	H264Context*	h = (H264Context*) pAVCtx->priv_data;
+	H264Context*	h = (H264Context*)pAVCtx->priv_data;
 	SPS*			cur_sps;
 	PPS*			cur_pps;
 	int				field_pic_flag;
@@ -540,7 +527,7 @@ void FFH264SetCurrentPicture(int nIndex, DXVA_PicParams_H264* pDXVAPicParams, st
 
 void FFH264UpdateRefFramesList(DXVA_PicParams_H264* pDXVAPicParams, struct AVCodecContext* pAVCtx)
 {
-	H264Context*	h = (H264Context*) pAVCtx->priv_data;
+	H264Context*	h = (H264Context*)pAVCtx->priv_data;
 	UINT			nUsedForReferenceFlags = 0;
 	int				i, j;
 	Picture*		pic;
@@ -637,7 +624,7 @@ HRESULT FFVC1DecodeFrame(DXVA_PictureParameters* pPicParams, struct AVCodecConte
 						 BOOL* b_repeat_pict, UINT* nFrameSize, BOOL b_SecondField)
 {
 	HRESULT	hr			= E_FAIL;
-	VC1Context* vc1		= (VC1Context*) pAVCtx->priv_data;
+	VC1Context* vc1		= (VC1Context*)pAVCtx->priv_data;
 	int out_nFrameSize	= 0;
 
 	if (pBuffer && !b_SecondField) {
@@ -756,18 +743,10 @@ HRESULT FFVC1DecodeFrame(DXVA_PictureParameters* pPicParams, struct AVCodecConte
 	return S_OK;
 }
 
-int	MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame)
+int	MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx)
 {
 	Mpeg1Context*	s1	= (Mpeg1Context*)pAVCtx->priv_data;
 	MpegEncContext*	s	= (MpegEncContext*)&s1->mpeg_enc_ctx;
-
-	int				got_picture	= 0;
-	AVPacket		avpkt;
-	av_init_packet(&avpkt);
-	avpkt.data		= pAVCtx->extradata;
-	avpkt.size		= pAVCtx->extradata_size;
-	avpkt.flags		= AV_PKT_FLAG_KEY;
-	int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
 
 	// restore codec_id value, it's can be changed to AV_CODEC_ID_MPEG1VIDEO on .wtv/.dvr-ms + StreamBufferSource (possible broken extradata)
 	pAVCtx->codec_id = AV_CODEC_ID_MPEG2VIDEO;
@@ -950,7 +929,7 @@ BOOL FFGetAlternateScan(struct AVCodecContext* pAVCtx)
 void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int& width, int& height, enum AVPixelFormat& pix_fmt)
 {
 	if (pAVCtx->codec_id == AV_CODEC_ID_H264) {
-		H264Context*	h = (H264Context*) pAVCtx->priv_data;
+		H264Context*	h = (H264Context*)pAVCtx->priv_data;
 		SPS*			cur_sps;
 		if (pAVCtx->extradata_size) {
 			int				got_picture	= 0;
