@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <InitGuid.h>
+
 // CLSID of some filters
 
 // Ogg
