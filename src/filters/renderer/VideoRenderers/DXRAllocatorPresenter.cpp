@@ -23,7 +23,7 @@
 #include "DXRAllocatorPresenter.h"
 #include "../../../SubPic/DX9SubPic.h"
 #include "../../../SubPic/SubPicQueueImpl.h"
-#include <moreclsids.h>
+#include <moreuuids.h>
 
 using namespace DSObjects;
 

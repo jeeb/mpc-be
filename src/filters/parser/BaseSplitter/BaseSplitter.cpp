@@ -23,7 +23,6 @@
 #include "../../../DSUtil/DSUtil.h"
 #include <InitGuid.h>
 #include <moreuuids.h>
-#include <moreclsids.h>
 #include "../../switcher/AudioSwitcher/AudioSwitcher.h"
 #include "BaseSplitter.h"
 

@@ -53,7 +53,7 @@
 #include <dsound.h>
 #include <InitGuid.h>
 #include <uuids.h>
-#include <moreclsids.h>
+#include <moreuuids.h>
 #include <qnetwork.h>
 #include <psapi.h>
 

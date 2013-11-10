@@ -22,7 +22,7 @@
 #include "stdafx.h"
 #include "PPageFileInfoDetails.h"
 #include <atlbase.h>
-#include <moreclsids.h>
+#include <moreuuids.h>
 
 static bool GetProperty(IFilterGraph* pFG, LPCOLESTR propName, VARIANT* vt)
 {

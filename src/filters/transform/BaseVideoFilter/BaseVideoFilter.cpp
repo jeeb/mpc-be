@@ -28,7 +28,6 @@
 
 #include <InitGuid.h>
 #include <moreuuids.h>
-#include <moreclsids.h>
 
 bool BitBltFromP016ToP016(size_t w, size_t h, BYTE* dstY, BYTE* dstUV, int dstPitch, BYTE* srcY, BYTE* srcUV, int srcPitch)
 {

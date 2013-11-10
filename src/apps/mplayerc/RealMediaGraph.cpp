@@ -29,7 +29,7 @@
 #include <realmedia/rmavsurf.h>
 #include <realmedia/rmaevent.h>
 #include <realmedia/rmaprefs.h>
-#include <moreclsids.h>
+#include <moreuuids.h>
 #include "AuthDlg.h"
 
 using namespace DSObjects;

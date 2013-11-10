@@ -22,7 +22,7 @@
 #include "stdafx.h"
 #include "PPageOutput.h"
 #include "../../DSUtil/SysVersion.h"
-#include <moreclsids.h>
+#include <moreuuids.h>
 #include "MultiMonitor.h"
 #include "ComPropertyPage.h"
 #include "../../filters/filters.h"

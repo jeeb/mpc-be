@@ -24,7 +24,7 @@
 #include "QuicktimeGraph.h"
 #include <IQTVideoSurface.h>
 #include "MainFrm.h"
-#include <moreclsids.h>
+#include <moreuuids.h>
 
 using namespace DSObjects;
 
