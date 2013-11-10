@@ -330,7 +330,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		if (m_RAWType == RAW_NONE) {
 			m_pFile->Seek(0);
 			CBaseSplitterFileEx::seqhdr h;
-			if (m_pFile->Read(h, min(MEGABYTE, m_pFile->GetLength()), &mt)) {
+			if (m_pFile->Read(h, min(MEGABYTE, m_pFile->GetLength()), &mt, false)) {
 				m_RAWType			= RAW_MPEG2;
 				if (mt.subtype == MEDIASUBTYPE_MPEG1Payload) {
 					m_RAWType		= RAW_MPEG1;

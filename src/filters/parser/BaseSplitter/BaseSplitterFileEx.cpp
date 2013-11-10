@@ -306,7 +306,7 @@ error:
 	return false;
 }
 
-bool CBaseSplitterFileEx::Read(seqhdr& h, int len, CMediaType* pmt)
+bool CBaseSplitterFileEx::Read(seqhdr& h, int len, CMediaType* pmt, bool find_sync)
 {
 	__int64 endpos = GetPos() + len; // - sequence header length
 
@@ -315,6 +315,10 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, int len, CMediaType* pmt)
 	while (GetPos() < endpos && id != 0xb3) {
 		if (!NextMpegStartCode(id, len)) {
 			return false;
+		}
+
+		if (!find_sync) {
+			break;
 		}
 	}
 

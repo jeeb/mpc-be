@@ -436,7 +436,7 @@ public:
 	bool Read(pshdr& h);
 	bool Read(pssyshdr& h);
 	bool Read(peshdr& h, BYTE code);
-	bool Read(seqhdr& h, int len, CMediaType* pmt = NULL);
+	bool Read(seqhdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true);
 	bool Read(mpahdr& h, int len, CMediaType* pmt = NULL, bool fAllowV25 = false);
 	bool Read(aachdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true);
 	bool Read(latm_aachdr& h, int len, CMediaType* pmt = NULL);

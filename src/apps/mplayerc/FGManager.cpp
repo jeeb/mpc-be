@@ -2121,6 +2121,15 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_transform.AddTail(pFGF);
 	}
 
+	if (src[SRC_RAWVIDEO] || IsPreview) {
+		pFGF = DNew CFGFilterInternal<CRawVideoSplitterFilter>(RawVideoSplitterName, MERIT64_ABOVE_DSHOW);
+	} else {
+		pFGF = DNew CFGFilterInternal<CRawVideoSplitterFilter>(LowMerit(RawVideoSplitterName), MERIT64_DO_USE);
+	}
+	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MPEG1Video);
+	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
+	m_transform.AddTail(pFGF);
+
 	// add CMpegSplitterFilter last since it can parse the stream for a long time
 	if (src[SRC_MPEG] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CMpegSplitterFilter>(MpegSplitterName, MERIT64_ABOVE_DSHOW);
@@ -2131,15 +2140,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MPEG2_PROGRAM);
 	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MPEG2_TRANSPORT);
 	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MPEG2_PVA);
-	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
-	m_transform.AddTail(pFGF);
-
-	if (src[SRC_RAWVIDEO] || IsPreview) {
-		pFGF = DNew CFGFilterInternal<CRawVideoSplitterFilter>(RawVideoSplitterName, MERIT64_ABOVE_DSHOW);
-	} else {
-		pFGF = DNew CFGFilterInternal<CRawVideoSplitterFilter>(LowMerit(RawVideoSplitterName), MERIT64_DO_USE);
-	}
-	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MPEG1Video);
 	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
 	m_transform.AddTail(pFGF);
 
