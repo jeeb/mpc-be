@@ -848,7 +848,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_nCodecId(AV_CODEC_ID_NONE)
 	, m_pSwsContext(NULL)
 	, m_nOutCsp(0)
-	, m_pix_fmt(AV_PIX_FMT_NONE)
 	, m_PixFmt(AV_PIX_FMT_NB)
 	, m_bReorderBFrame(true)
 	, m_nPosB(1)
@@ -1664,10 +1663,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		return VFW_E_INVALIDMEDIATYPE;
 	}
 
-	FFGetFrameProps(m_pAVCtx, m_pFrame, m_nOutputWidth, m_nOutputHeight, m_pix_fmt);
-	if (m_pix_fmt == AV_PIX_FMT_NONE) {
-		m_pix_fmt = m_pAVCtx->pix_fmt;
-	}
+	FFGetFrameProps(m_pAVCtx, m_pFrame, m_nOutputWidth, m_nOutputHeight);
 
 	if (IsDXVASupported()) {
 		do {

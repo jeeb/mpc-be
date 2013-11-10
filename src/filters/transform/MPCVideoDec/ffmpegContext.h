@@ -76,5 +76,5 @@ void			FFSetThreadNumber(struct AVCodecContext* pAVCtx, enum AVCodecID nCodecId,
 int				FFGetCodedPicture(struct AVCodecContext* pAVCtx);
 BOOL			FFGetAlternateScan(struct AVCodecContext* pAVCtx);
 int				FFGetThreadType(enum AVCodecID nCodecId);
-void			FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int& width, int& height, enum AVPixelFormat& pix_fmt);
+void			FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int& width, int& height);
 BOOL			DXVACheckFramesize(int width, int height, DWORD nPCIVendor, DWORD nPCIDevice);

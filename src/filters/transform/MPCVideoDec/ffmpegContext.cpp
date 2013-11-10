@@ -926,7 +926,7 @@ BOOL FFGetAlternateScan(struct AVCodecContext* pAVCtx)
 	return (s != NULL) ? s->alternate_scan : 0;
 }
 
-void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int& width, int& height, enum AVPixelFormat& pix_fmt)
+void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int& width, int& height)
 {
 	if (pAVCtx->codec_id == AV_CODEC_ID_H264) {
 		H264Context*	h = (H264Context*)pAVCtx->priv_data;
@@ -945,7 +945,6 @@ void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int&
 		if (cur_sps) {
 			width	= cur_sps->mb_width * 16;
 			height	= cur_sps->mb_height * (2 - cur_sps->frame_mbs_only_flag) * 16;
-			pix_fmt = pAVCtx->pix_fmt;
 		}
 		return;
 	}
@@ -971,11 +970,11 @@ void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int&
 		}
 
 		if(s->chroma_format < 2) {
-			pix_fmt = AV_PIX_FMT_YUV420P;
+			pAVCtx->pix_fmt	= AV_PIX_FMT_YUV420P;
 		} else if(s->chroma_format == 2) {
-			pix_fmt = AV_PIX_FMT_YUV422P;
+			pAVCtx->pix_fmt	= AV_PIX_FMT_YUV422P;
 		} else {
-			pix_fmt = AV_PIX_FMT_YUV444P;
+			pAVCtx->pix_fmt	= AV_PIX_FMT_YUV444P;
 		}
 	}
 }
