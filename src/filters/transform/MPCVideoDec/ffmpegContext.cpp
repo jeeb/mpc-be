@@ -926,57 +926,93 @@ BOOL FFGetAlternateScan(struct AVCodecContext* pAVCtx)
 	return (s != NULL) ? s->alternate_scan : 0;
 }
 
-void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int& width, int& height)
+void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BITMAPINFOHEADER* pBIH, int& width, int& height, enum AVPixelFormat& pix_fmt)
 {
-	if (pAVCtx->codec_id == AV_CODEC_ID_H264) {
-		H264Context*	h = (H264Context*)pAVCtx->priv_data;
-		SPS*			cur_sps;
-		if (pAVCtx->extradata_size) {
-			int				got_picture	= 0;
-			AVPacket		avpkt;
-			av_init_packet(&avpkt);
-			avpkt.data		= pAVCtx->extradata;
-			avpkt.size		= pAVCtx->extradata_size;
-			avpkt.flags		= AV_PKT_FLAG_KEY;
-			int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
-		}
+	switch (pAVCtx->codec_id) {
+	case AV_CODEC_ID_H264:
+		{
+			H264Context* h = (H264Context*)pAVCtx->priv_data;
+			SPS* cur_sps = &h->sps;
 
-		cur_sps = &h->sps;
-		if (cur_sps) {
-			width	= cur_sps->mb_width * 16;
-			height	= cur_sps->mb_height * (2 - cur_sps->frame_mbs_only_flag) * 16;
+			if (pAVCtx->extradata_size) {
+				// When this code is needed? Or is it outdated?
+				int				got_picture	= 0;
+				AVPacket		avpkt;
+				av_init_packet(&avpkt);
+				avpkt.data		= pAVCtx->extradata;
+				avpkt.size		= pAVCtx->extradata_size;
+				avpkt.flags		= AV_PKT_FLAG_KEY;
+				int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
+			}
+
+			if (cur_sps) {
+				width	= cur_sps->mb_width * 16;
+				height	= cur_sps->mb_height * (2 - cur_sps->frame_mbs_only_flag) * 16;
+			}
 		}
-		return;
+		break;
+	case AV_CODEC_ID_MPEG1VIDEO:
+	case AV_CODEC_ID_MPEG2VIDEO:
+		{
+			Mpeg1Context*	s1	= (Mpeg1Context*)pAVCtx->priv_data;
+			MpegEncContext*	s	= (MpegEncContext*)&s1->mpeg_enc_ctx;
+
+			if (pAVCtx->extradata_size) {
+				// need to try decode extradata to fill MpegEncContext structure.
+				int				got_picture	= 0;
+				AVPacket		avpkt;
+				av_init_packet(&avpkt);
+				avpkt.data		= pAVCtx->extradata;
+				avpkt.size		= pAVCtx->extradata_size;
+				avpkt.flags		= AV_PKT_FLAG_KEY;
+				int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
+			}
+
+			width	= FFALIGN(s->width, 16);
+			height	= FFALIGN(s->height, 16);
+			if (!s->progressive_sequence) {
+				height = int((s->height + 31) / 32 * 2) * 16;
+			}
+
+			if (pAVCtx->pix_fmt == AV_PIX_FMT_NONE) {
+				if(s->chroma_format < 2) {
+					pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;
+				} else if(s->chroma_format == 2) {
+					pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;
+				} else {
+					pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P;
+				}
+			}
+		}
+		break;
+	case AV_CODEC_ID_LAGARITH:
+		if (pAVCtx->pix_fmt == AV_PIX_FMT_NONE && pAVCtx->extradata_size >= 4) {
+			switch (*(DWORD*)pAVCtx->extradata) {
+			case 0:
+				if (pBIH->biBitCount == 32) {
+					pAVCtx->pix_fmt = AV_PIX_FMT_RGBA;
+				} else if (pBIH->biBitCount == 24) {
+					pAVCtx->pix_fmt = AV_PIX_FMT_RGB24;
+				}
+				break;
+			case 1:
+				pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;
+				break;
+			case 2:
+				pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;
+				break;
+			}
+		}
+		break;
+	case AV_CODEC_ID_HEVC: // TODO
+	default:
+		if (pAVCtx->pix_fmt == AV_PIX_FMT_NONE) {
+			av_log(pAVCtx, AV_LOG_INFO, "WARNING! : pAVCtx->pix_fmt == AV_PIX_FMT_NONE\n");
+			pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P; // bad hack
+		}
 	}
 
-	if (pAVCtx->codec_id == AV_CODEC_ID_MPEG2VIDEO || pAVCtx->codec_id == AV_CODEC_ID_MPEG1VIDEO) {
-		Mpeg1Context*	s1	= (Mpeg1Context*)pAVCtx->priv_data;
-		MpegEncContext*	s	= (MpegEncContext*)&s1->mpeg_enc_ctx;
-
-		if (pAVCtx->extradata_size) {
-			int				got_picture	= 0;
-			AVPacket		avpkt;
-			av_init_packet(&avpkt);
-			avpkt.data		= pAVCtx->extradata;
-			avpkt.size		= pAVCtx->extradata_size;
-			avpkt.flags		= AV_PKT_FLAG_KEY;
-			int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
-		}
-
-		width	= FFALIGN(s->width, 16);
-		height	= FFALIGN(s->height, 16);
-		if (!s->progressive_sequence) {
-			height = int((s->height + 31) / 32 * 2) * 16;
-		}
-
-		if(s->chroma_format < 2) {
-			pAVCtx->pix_fmt	= AV_PIX_FMT_YUV420P;
-		} else if(s->chroma_format == 2) {
-			pAVCtx->pix_fmt	= AV_PIX_FMT_YUV422P;
-		} else {
-			pAVCtx->pix_fmt	= AV_PIX_FMT_YUV444P;
-		}
-	}
+	pix_fmt = pAVCtx->pix_fmt;
 }
 
 #define CHECK_AVC_L52_SIZE(w, h) ((w) <= 4096 && (h) <= 4096 && (w) * (h) <= 36864 * 16 * 16)
