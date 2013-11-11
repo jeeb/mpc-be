@@ -18,7 +18,7 @@ Changes (*):
 	* Updated Dutch translation (author: beter);
 	* Updated Chinese (Traditional) translation (author: beter);
 	* Updated Korean translation (author: kuh3h3);
-	* ffmpeg 2.1 git-76a47d66;
+	* ffmpeg 2.1 git-f66f3819;
 	* libwebp 0.3.1 git-df3649a2;
 	* libvpx 1.2 git-648e30bc;
 	* VirtualDub 1.10.4;
