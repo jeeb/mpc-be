@@ -1540,30 +1540,6 @@ bool CBaseSplitterFileEx::Read(pvahdr& h, bool fSync)
 	return true;
 }
 
-void CBaseSplitterFileEx::RemoveMpegEscapeCode(BYTE* dst, BYTE* src, int length)
-{
-	int		si=0;
-	int		di=0;
-	while (si+2<length) {
-		//remove escapes (very rare 1:2^22)
-		if (src[si+2]>3) {
-			dst[di++]= src[si++];
-			dst[di++]= src[si++];
-		} else if (src[si]==0 && src[si+1]==0) {
-			if (src[si+2]==3) { //escape
-				dst[di++]= 0;
-				dst[di++]= 0;
-				si+=3;
-				continue;
-			} else { //next start code
-				return;
-			}
-		}
-
-		dst[di++]= src[si++];
-	}
-}
-
 bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt)
 {
 	__int64 endpos		= min(GetPos() + len + 4, GetAvailable());
@@ -1725,6 +1701,30 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt)
 	}
 
 	return true;
+}
+
+static void RemoveMpegEscapeCode(BYTE* dst, BYTE* src, int length)
+{
+	int		si=0;
+	int		di=0;
+	while (si+2<length) {
+		//remove escapes (very rare 1:2^22)
+		if (src[si+2]>3) {
+			dst[di++]= src[si++];
+			dst[di++]= src[si++];
+		} else if (src[si]==0 && src[si+1]==0) {
+			if (src[si+2]==3) { //escape
+				dst[di++]= 0;
+				dst[di++]= 0;
+				si+=3;
+				continue;
+			} else { //next start code
+				return;
+			}
+		}
+
+		dst[di++]= src[si++];
+	}
 }
 
 bool CBaseSplitterFileEx::Read(avchdr& h, spsppsindex index)
