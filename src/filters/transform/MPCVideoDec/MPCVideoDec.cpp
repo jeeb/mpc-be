@@ -757,8 +757,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 
 #define ___PIX_FMT_YUY2  AV_PIX_FMT_YUYV422
 #define ___PIX_FMT_YV12  AV_PIX_FMT_YUV420P
-#define ___PIX_FMT_YV16  AV_PIX_FMT_YUV422P;
-#define ___PIX_FMT_YV24  AV_PIX_FMT_YUV444P;
+#define ___PIX_FMT_YV16  AV_PIX_FMT_YUV422P
+#define ___PIX_FMT_YV24  AV_PIX_FMT_YUV444P
 
 typedef struct {
 	const LPCTSTR          name;
