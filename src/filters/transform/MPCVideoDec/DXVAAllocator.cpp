@@ -91,9 +91,9 @@ STDMETHODIMP_(int) CDXVA2Sample::GetDXSurfaceId()
 
 CVideoDecDXVAAllocator::CVideoDecDXVAAllocator(CMPCVideoDecFilter* pVideoDecFilter,  HRESULT* phr)
 	: CBaseAllocator(NAME("CVideoDecDXVAAllocator"), NULL, phr)
+	, m_pVideoDecFilter(pVideoDecFilter)
+	, m_ppRTSurfaceArray(NULL)
 {
-	m_pVideoDecFilter	= pVideoDecFilter;
-	m_ppRTSurfaceArray	= NULL;
 }
 
 CVideoDecDXVAAllocator::~CVideoDecDXVAAllocator()
@@ -103,16 +103,13 @@ CVideoDecDXVAAllocator::~CVideoDecDXVAAllocator()
 
 HRESULT CVideoDecDXVAAllocator::Alloc()
 {
-	//TRACE(_T("CVideoDecDXVAAllocator::Alloc()\n"));
-
 	HRESULT hr;
 	CComPtr<IDirectXVideoDecoderService> pDXVA2Service;
 
 	CheckPointer(m_pVideoDecFilter->m_pDeviceManager, E_UNEXPECTED);
 	hr = m_pVideoDecFilter->m_pDeviceManager->GetVideoService(m_pVideoDecFilter->m_hDevice, IID_IDirectXVideoDecoderService, (void**)&pDXVA2Service);
-	CheckPointer (pDXVA2Service, E_UNEXPECTED);
+	CheckPointer(pDXVA2Service, E_UNEXPECTED);
 	CAutoLock lock(this);
-
 
 	hr = __super::Alloc();
 
@@ -165,7 +162,7 @@ HRESULT CVideoDecDXVAAllocator::Alloc()
 			m_lFree.Add(pSample);
 		}
 
-		hr = m_pVideoDecFilter->CreateDXVA2Decoder (m_lCount, m_ppRTSurfaceArray);
+		hr = m_pVideoDecFilter->CreateDXVA2Decoder(m_lCount, m_ppRTSurfaceArray);
 		if (FAILED (hr)) {
 			Free();
 		}
@@ -179,12 +176,12 @@ HRESULT CVideoDecDXVAAllocator::Alloc()
 
 void CVideoDecDXVAAllocator::Free()
 {
-	//TRACE(_T("CVideoDecDXVAAllocator::Free()\n"));
-
 	CMediaSample *pSample = NULL;
+	CAutoLock lock(this);
 
 	m_pVideoDecFilter->FlushDXVADecoder();
 	//	m_FreeSurface.RemoveAll();
+
 	do {
 		pSample = m_lFree.RemoveHead();
 		if (pSample) {

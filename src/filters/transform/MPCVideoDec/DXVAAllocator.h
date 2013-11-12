@@ -79,7 +79,7 @@ public:
 	//	CAtlList<int>			m_FreeSurface;
 
 	// *** from LAV
-	STDMETHODIMP_(BOOL) DecommitInProgress() { CAutoLock cal(this); return m_bDecommitInProgress; }
+	STDMETHODIMP_(BOOL) DecommitInProgress() { CAutoLock lock(this); return m_bDecommitInProgress; }
 
 protected:
 	HRESULT		Alloc(void);

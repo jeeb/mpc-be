@@ -150,7 +150,6 @@ void CDXVADecoderH264::Flush()
 	m_DXVAPicParams.UsedForReferenceFlags	= 0;
 	m_nOutPOC								= INT_MIN;
 	m_rtOutStart							= INVALID_TIME;
-
 	m_nPictStruct							= PICT_NONE;
 
 	__super::Flush();
@@ -158,21 +157,20 @@ void CDXVADecoderH264::Flush()
 
 HRESULT CDXVADecoderH264::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
-	HRESULT						hr				= S_FALSE;
-	UINT						nSlices			= 0;
-	int							nSurfaceIndex	= -1;
-	int							nFramePOC		= INT_MIN;
-	int							nOutPOC			= INT_MIN;
-	REFERENCE_TIME				rtOutStart		= INVALID_TIME;
-	CH264Nalu					Nalu;
-	UINT						nNalOffset		= 0;
-	CComPtr<IMediaSample>		pSampleToDeliver;
-	int							slice_step		= 1;
+	HRESULT						hr					= S_FALSE;
+	UINT						nSlices				= 0;
+	int							nSurfaceIndex		= -1;
+	int							nFramePOC			= INT_MIN;
+	int							nOutPOC				= INT_MIN;
+	REFERENCE_TIME				rtOutStart			= INVALID_TIME;
+	UINT						nNalOffset			= 0;
+	int							slice_step			= 1;
 	UINT						SecondFieldOffset	= 0;
 	UINT						nSize_Result		= 0;
 	int							Sync				= 0;
-
 	int							nPictStruct			= PICT_NONE;
+	CH264Nalu					Nalu;
+	CComPtr<IMediaSample>		pSampleToDeliver;
 
 	CHECK_HR_FALSE (FFH264DecodeFrame(m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), pDataIn, nSize, rtStart, 
 					&nFramePOC, &nOutPOC, &rtOutStart, 

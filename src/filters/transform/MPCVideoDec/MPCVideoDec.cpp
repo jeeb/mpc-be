@@ -1534,6 +1534,8 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 
 HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 {
+	TRACE(L"CMPCVideoDecFilter::InitDecoder()\n");
+
 	bool bReinit = ((m_pAVCtx != NULL));
 
 	ffmpegCleanup();
@@ -2055,7 +2057,7 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 	m_rtPrevStop	= 0;
 	m_rtLastStop	= 0;
 
-	if (m_nCodecId == AV_CODEC_ID_H264) {
+	if (m_nCodecId == AV_CODEC_ID_H264 && (m_nDecoderMode == MODE_SOFTWARE || (m_nFrameType != PICT_FRAME && m_nPCIVendor == PCIV_ATI))) {
 		InitDecoder(&m_pInput->CurrentMediaType());
 	}
 
@@ -3564,6 +3566,7 @@ HRESULT CVideoDecOutputPin::Recommit()
 	HRESULT hr = S_OK;
 
 	if (m_pDXVA2Allocator) {
+
 		hr = m_pDXVA2Allocator->Decommit();
 		if (m_pDXVA2Allocator->DecommitInProgress()) {
 			TRACE(_T("CVideoDecOutputPin::Recommit() : WARNING! DXVA2 Allocator is still busy, trying to flush downstream\n"));
