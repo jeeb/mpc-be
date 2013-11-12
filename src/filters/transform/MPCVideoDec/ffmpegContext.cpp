@@ -1004,6 +1004,12 @@ void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BITM
 			}
 		}
 		break;
+	case AV_CODEC_ID_PRORES:
+		if (pAVCtx->pix_fmt == AV_PIX_FMT_NONE) {
+			av_log(pAVCtx, AV_LOG_INFO, "WARNING! : pAVCtx->pix_fmt == AV_PIX_FMT_NONE\n");
+			pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10LE; // bad hack
+		}
+		break;
 	case AV_CODEC_ID_MJPEG:
 		if (pAVCtx->pix_fmt == AV_PIX_FMT_NONE) {
 			av_log(pAVCtx, AV_LOG_INFO, "WARNING! : pAVCtx->pix_fmt == AV_PIX_FMT_NONE\n");
