@@ -99,6 +99,9 @@ CVideoDecDXVAAllocator::CVideoDecDXVAAllocator(CMPCVideoDecFilter* pVideoDecFilt
 CVideoDecDXVAAllocator::~CVideoDecDXVAAllocator()
 {
 	Free();
+	if (m_pVideoDecFilter && m_pVideoDecFilter->m_pDXVA2Allocator == this) {
+		m_pVideoDecFilter->m_pDXVA2Allocator = NULL;
+	}
 }
 
 HRESULT CVideoDecDXVAAllocator::Alloc()
@@ -180,7 +183,6 @@ void CVideoDecDXVAAllocator::Free()
 	CAutoLock lock(this);
 
 	m_pVideoDecFilter->FlushDXVADecoder();
-	//	m_FreeSurface.RemoveAll();
 
 	do {
 		pSample = m_lFree.RemoveHead();

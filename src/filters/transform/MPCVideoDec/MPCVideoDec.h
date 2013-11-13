@@ -65,8 +65,6 @@ class __declspec(uuid("008BAC12-FBAF-497b-9670-BC6F6FBAE2C4"))
 {
 protected:
 
-	friend class CVideoDecDXVAAllocator;
-
 	CCpuId*									m_pCpuId;
 	CCritSec								m_csProps;
 
@@ -323,9 +321,19 @@ public:
 															  DXVA2_ConfigPictureDecode *pSelectedConfig,
 															  BOOL *pbFoundDXVA2Configuration);
 	HRESULT						CreateDXVA2Decoder(UINT nNumRenderTargets, IDirect3DSurface9** pDecoderRenderTargets);
+	HRESULT						InitAllocator(IMemAllocator **ppAlloc);
 
 	// === EVR functions
 	HRESULT						DetectVideoCard_EVR(IPin *pPin);
+
+private:
+
+	friend class CVideoDecDXVAAllocator;
+	CVideoDecDXVAAllocator*		m_pDXVA2Allocator;
+
+	// *** from LAV
+	// *** Re-Commit the allocator (creates surfaces and new decoder)
+	HRESULT						RecommitAllocator();
 };
 
 class CMPCVideoDecFilter;
@@ -349,13 +357,8 @@ public:
 	STDMETHODIMP	SetUncompSurfacesInfo(DWORD dwActualUncompSurfacesAllocated);
 	STDMETHODIMP	GetCreateVideoAcceleratorData(const GUID *pGuid, LPDWORD pdwSizeMiscData, LPVOID *ppMiscData);
 
-	// *** from LAV
-	// *** Re-Commit the allocator (creates surfaces and new decoder)
-	HRESULT			Recommit();
-
 private :
 	CMPCVideoDecFilter*			m_pVideoDecFilter;
-	CVideoDecDXVAAllocator*		m_pDXVA2Allocator;
 	DWORD						m_dwDXVA1SurfaceCount;
 	GUID						m_GuidDecoderDXVA1;
 	DDPIXELFORMAT				m_ddUncompPixelFormat;

@@ -1764,8 +1764,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		SAFE_DELETE(m_pDXVADecoder);
 
 		if (m_nDecoderMode == MODE_DXVA2) {
-			if (IsDXVASupported() && SUCCEEDED(FindDecoderConfiguration())) {
-				dynamic_cast<CVideoDecOutputPin*>(m_pOutput)->Recommit();
+			if (m_pDXVA2Allocator && IsDXVASupported() && SUCCEEDED(FindDecoderConfiguration())) {
+				RecommitAllocator();
 			}
 		} else if (m_nDecoderMode == MODE_DXVA1) {
 			SAFE_DELETE(m_pDXVADecoder);
@@ -2123,7 +2123,7 @@ HRESULT CMPCVideoDecFilter::EndOfStream()
 	if (m_nDecoderMode == MODE_SOFTWARE) {
 		REFERENCE_TIME rtStart = 0, rtStop = 0;
 		SoftwareDecode(NULL, NULL, 0, rtStart, rtStop);
-	} else if (m_nDecoderMode == MODE_DXVA2 && m_pDXVADecoder) { // TODO - need check under WinXP on DXVA1
+	} else if (m_nDecoderMode == MODE_DXVA2 && m_pDXVADecoder && m_pDXVA2Allocator) { // TODO - need check under WinXP on DXVA1
 		m_pDXVADecoder->EndOfStream();
 	}
 
@@ -2766,6 +2766,7 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 		case MODE_DXVA2 :
 			{
 				CheckPointer(m_pDXVADecoder, E_UNEXPECTED);
+				CheckPointer(m_pDXVA2Allocator, E_UNEXPECTED);
 				UpdateAspectRatio();
 
 				// Change aspect ratio for DXVA1
@@ -2781,7 +2782,7 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 
 				if (width != PictWidthRounded() || Height != PictHeightRounded()) {
 					FindDecoderConfiguration();
-					dynamic_cast<CVideoDecOutputPin*>(m_pOutput)->Recommit();
+					RecommitAllocator();
 					ReconnectOutput(PictWidth(), PictHeight());
 				}
 			}
@@ -3026,6 +3027,46 @@ HRESULT CMPCVideoDecFilter::CreateDXVA2Decoder(UINT nNumRenderTargets, IDirect3D
 		} else {
 			hr = E_FAIL;
 		}
+	}
+
+	return hr;
+}
+
+HRESULT CMPCVideoDecFilter::InitAllocator(IMemAllocator **ppAlloc)
+{
+	HRESULT hr = S_FALSE;
+	m_pDXVA2Allocator = DNew CVideoDecDXVAAllocator(this, &hr);
+	if (!m_pDXVA2Allocator) {
+		return E_OUTOFMEMORY;
+	}
+	if (FAILED(hr)) {
+		SAFE_DELETE(m_pDXVA2Allocator);
+		return hr;
+	}
+	
+	// Return the IMemAllocator interface.
+	return m_pDXVA2Allocator->QueryInterface(__uuidof(IMemAllocator), (void **)ppAlloc);
+}
+
+HRESULT CMPCVideoDecFilter::RecommitAllocator()
+{
+	HRESULT hr = S_OK;
+
+	if (m_pDXVA2Allocator) {
+
+		hr = m_pDXVA2Allocator->Decommit();
+		if (m_pDXVA2Allocator->DecommitInProgress()) {
+			TRACE(_T("CVideoDecOutputPin::Recommit() : WARNING! DXVA2 Allocator is still busy, trying to flush downstream\n"));
+			if (m_pDXVA2Allocator) {
+				m_pDXVADecoder->EndOfStream();
+			}
+			if (m_pDXVA2Allocator->DecommitInProgress()) {
+				TRACE(_T("CVideoDecOutputPin::Recommit() : WARNING! Flush had no effect, decommit of the allocator still not complete\n"));
+			} else {
+				TRACE(_T("CVideoDecOutputPin::Recommit() : Flush was successfull, decommit completed!\n"));
+			}
+		}
+		hr = m_pDXVA2Allocator->Commit();
 	}
 
 	return hr;
@@ -3488,7 +3529,6 @@ CVideoDecOutputPin::CVideoDecOutputPin(TCHAR* pObjectName, CBaseVideoFilter* pFi
 	: CBaseVideoOutputPin(pObjectName, pFilter, phr, pName)
 {
 	m_pVideoDecFilter		= static_cast<CMPCVideoDecFilter*> (pFilter);
-	m_pDXVA2Allocator		= NULL;
 	m_dwDXVA1SurfaceCount	= 0;
 	m_GuidDecoderDXVA1		= GUID_NULL;
 	memset (&m_ddUncompPixelFormat, 0, sizeof(m_ddUncompPixelFormat));
@@ -3501,17 +3541,7 @@ CVideoDecOutputPin::~CVideoDecOutputPin(void)
 HRESULT CVideoDecOutputPin::InitAllocator(IMemAllocator **ppAlloc)
 {
 	if (m_pVideoDecFilter->UseDXVA2()) {
-		HRESULT hr = S_FALSE;
-		m_pDXVA2Allocator = DNew CVideoDecDXVAAllocator(m_pVideoDecFilter, &hr);
-		if (!m_pDXVA2Allocator) {
-			return E_OUTOFMEMORY;
-		}
-		if (FAILED(hr)) {
-			delete m_pDXVA2Allocator;
-			return hr;
-		}
-		// Return the IMemAllocator interface.
-		return m_pDXVA2Allocator->QueryInterface(__uuidof(IMemAllocator), (void **)ppAlloc);
+		return m_pVideoDecFilter->InitAllocator(ppAlloc);
 	} else {
 		return __super::InitAllocator(ppAlloc);
 	}
@@ -3581,30 +3611,6 @@ STDMETHODIMP CVideoDecOutputPin::GetCreateVideoAcceleratorData(const GUID *pGuid
 				*ppMiscData						= pConnectMode;
 			}
 		}
-	}
-
-	return hr;
-}
-
-HRESULT CVideoDecOutputPin::Recommit()
-{
-	HRESULT hr = S_OK;
-
-	if (m_pDXVA2Allocator) {
-
-		hr = m_pDXVA2Allocator->Decommit();
-		if (m_pDXVA2Allocator->DecommitInProgress()) {
-			TRACE(_T("CVideoDecOutputPin::Recommit() : WARNING! DXVA2 Allocator is still busy, trying to flush downstream\n"));
-			m_pVideoDecFilter->EndOfStream();
-			m_pVideoDecFilter->BeginFlush();
-			m_pVideoDecFilter->EndFlush();
-			if (m_pDXVA2Allocator->DecommitInProgress()) {
-				TRACE(_T("CVideoDecOutputPin::Recommit() : WARNING! Flush had no effect, decommit of the allocator still not complete\n"));
-			} else {
-				TRACE(_T("CVideoDecOutputPin::Recommit() : Flush was successfull, decommit completed!\n"));
-			}
-		}
-		hr = m_pDXVA2Allocator->Commit();
 	}
 
 	return hr;
