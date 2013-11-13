@@ -365,3 +365,12 @@ private :
 	GUID						m_GuidDecoderDXVA1;
 	DDPIXELFORMAT				m_ddUncompPixelFormat;
 };
+
+//
+struct SUPPORTED_FORMATS {
+	const CLSID*	clsMinorType;
+
+	const int		FFMPEGCode;
+	const int		DXVACode;
+};
+void GetFormatList(CAtlList<SUPPORTED_FORMATS>& fmts);

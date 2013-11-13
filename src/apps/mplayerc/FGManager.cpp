@@ -2453,15 +2453,35 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_transform.AddTail(pFGF);
 	}
 
+	// Get supported MEDIASUBTYPE_ from decoder
+	CAtlList<SUPPORTED_FORMATS> fmts;
+	GetFormatList(fmts);
+
 	// High merit MPC Video Decoder
 	pFGF = DNew CFGFilterInternal<CMPCVideoDecFilter>(MPCVideoDecName, MERIT64_ABOVE_DSHOW + 1);
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_NULL);
+	{
+		POSITION pos = fmts.GetHeadPosition();
+		while (pos) {
+			SUPPORTED_FORMATS fmt = fmts.GetNext(pos);
+			if (IsPreview || ffmpeg_filters[fmt.FFMPEGCode] || dxva_filters[fmt.DXVACode]) {
+				pFGF->AddType(MEDIATYPE_Video, *fmt.clsMinorType);
+			}
+		}
+	}
 	m_transform.AddTail(pFGF);
 
 	// Low merit MPC Video Decoder
-	pFGF = DNew CFGFilterInternal<CMPCVideoDecFilter>(LowMerit(MPCVideoDecName), MERIT64_DO_USE + 1);
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_NULL);
-	m_transform.AddTail(pFGF);
+	if (!IsPreview) { // do not need for Preview mode.
+		pFGF = DNew CFGFilterInternal<CMPCVideoDecFilter>(LowMerit(MPCVideoDecName), MERIT64_DO_USE + 1);
+		{
+			POSITION pos = fmts.GetHeadPosition();
+			while (pos) {
+				SUPPORTED_FORMATS fmt = fmts.GetNext(pos);
+				pFGF->AddType(MEDIATYPE_Video, *fmt.clsMinorType);
+			}
+		}
+		m_transform.AddTail(pFGF);
+	}
 
 	// Keep software decoder after DXVA decoder !
 	pFGF = DNew CFGFilterInternal<CMpeg2DecFilter>(

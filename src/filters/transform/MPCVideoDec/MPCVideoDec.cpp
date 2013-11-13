@@ -3584,3 +3584,15 @@ HRESULT CVideoDecOutputPin::Recommit()
 
 	return hr;
 }
+
+//
+void GetFormatList(CAtlList<SUPPORTED_FORMATS>& fmts)
+{
+	fmts.RemoveAll();
+
+	for (size_t i = 0; i < _countof(ffCodecs); i++) {
+		SUPPORTED_FORMATS fmt = {ffCodecs[i].clsMinorType, ffCodecs[i].FFMPEGCode, ffCodecs[i].DXVACode};
+		fmts.AddTail(fmt);
+	}
+
+}
