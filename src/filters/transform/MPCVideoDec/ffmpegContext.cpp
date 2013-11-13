@@ -926,7 +926,7 @@ BOOL FFGetAlternateScan(struct AVCodecContext* pAVCtx)
 	return (s != NULL) ? s->alternate_scan : 0;
 }
 
-void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BITMAPINFOHEADER* pBIH, int& width, int& height, enum AVPixelFormat& pix_fmt)
+void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int& width, int& height, enum AVPixelFormat& pix_fmt)
 {
 	switch (pAVCtx->codec_id) {
 	case AV_CODEC_ID_H264:
@@ -989,9 +989,9 @@ void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BITM
 		if (pAVCtx->pix_fmt == AV_PIX_FMT_NONE && pAVCtx->extradata_size >= 4) {
 			switch (*(DWORD*)pAVCtx->extradata) {
 			case 0:
-				if (pBIH->biBitCount == 32) {
+				if (pAVCtx->bits_per_coded_sample == 32) {
 					pAVCtx->pix_fmt = AV_PIX_FMT_RGBA;
-				} else if (pBIH->biBitCount == 24) {
+				} else if (pAVCtx->bits_per_coded_sample == 24) {
 					pAVCtx->pix_fmt = AV_PIX_FMT_RGB24;
 				}
 				break;

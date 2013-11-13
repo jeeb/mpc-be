@@ -1666,7 +1666,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		return VFW_E_INVALIDMEDIATYPE;
 	}
 
-	FFGetFrameProps(m_pAVCtx, m_pFrame, pBMI, m_nOutputWidth, m_nOutputHeight, m_pix_fmt);
+	FFGetFrameProps(m_pAVCtx, m_pFrame, m_nOutputWidth, m_nOutputHeight, m_pix_fmt);
 
 	if (IsDXVASupported()) {
 		do {
