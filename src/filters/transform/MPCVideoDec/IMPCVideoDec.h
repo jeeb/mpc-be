@@ -68,6 +68,15 @@ typedef enum MPC_DEINTERLACING_FLAGS {
 	PROGRESSIVE
 };
 
+enum MPCPixelFormat {
+	PixFmt_None = -1,
+	PixFmt_YUY2 = 0, // 16 bit, 4:2:2
+	PixFmt_NV12,     // 12 bit, 4:2:0
+	PixFmt_YV12,     // 12 bit, 4:2:0
+	PixFmt_RGB32,    // 24 bit
+	PixFmt_count
+};
+
 interface __declspec(uuid("CDC3B5B3-A8B0-4c70-A805-9FC80CDEF262"))
 IMPCVideoDecFilter :
 public IUnknown {
@@ -101,10 +110,8 @@ public IUnknown {
 	// === New swscaler options
 	STDMETHOD(SetSwRefresh(int nValue)) = 0;
 
-	STDMETHOD(SetSwFormats(CString SwFormatsStr)) = 0;
-	//STDMETHOD(SetSwFormatState(unsigned int index, int nCheck)) = 0;
-	STDMETHOD_(int, GetSwFormatState(unsigned int index)) = 0;
-	STDMETHOD_(LPCTSTR, GetSwFormatName(unsigned int index)) = 0;
+	STDMETHOD(SetSwPixelFormat(MPCPixelFormat pf, bool enable)) = 0;
+	STDMETHOD_(bool, GetSwPixelFormat(MPCPixelFormat pf)) = 0;
 
 	STDMETHOD(SetSwPreset(int nValue)) = 0;
 	STDMETHOD_(int, GetSwPreset()) = 0;

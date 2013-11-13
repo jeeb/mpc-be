@@ -175,14 +175,19 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 	// Software output formats
 	m_txtSwOutputFormats.Create(ResStr(IDS_VDF_COLOR_OUTPUT_FORMATS), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
-	p.y += h16;
-	m_lstSwOutputFormats.Create(dwStyle|WS_BORDER|LBS_OWNERDRAWFIXED|LBS_HASSTRINGS, CRect(p, CSize(width_s - btn_w, IPP_SCALE(13 * 6 + 20))), this, 0);
-
-	// Software Output formats order
-	m_cbSwOutputFormatUp.Create(_T("\x35"), dwStyle|BS_PUSHBUTTON, CRect(p + CPoint(width_s - btn_w, 0), CSize(btn_w, btn_h)), this, IDC_PP_SWOUTPUTFORMATUP);
-	p.y += btn_h;
-	m_cbSwOutputFormatDown.Create(_T("\x36"), dwStyle|BS_PUSHBUTTON, CRect(p + CPoint(width_s - btn_w, 0), CSize(btn_w, btn_h)), this, IDC_PP_SWOUTPUTFORMATDOWN);
-	p.y += IPP_SCALE(13 * 6 + 9);
+	p.y += h20;
+	m_txt420.Create(_T("4:2:0 YUV:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
+	m_cbNV12.Create(_T("NV12"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(60), 0), CSize(IPP_SCALE(55), m_fontheight)), this, IDC_PP_SW_NV12);
+	m_cbYV12.Create(_T("YV12"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(120), 0), CSize(IPP_SCALE(55), m_fontheight)), this, IDC_PP_SW_YV12);
+	p.y += h20;
+	m_txt422.Create(_T("4:2:2 YUV:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
+	m_cbYUY2.Create(_T("YUY2"), dwStyle | BS_3STATE, CRect(p + CSize(IPP_SCALE(60), 0), CSize(IPP_SCALE(55), m_fontheight)), this, IDC_PP_SW_YUY2);
+	p.y += h20;
+	//m_txt444.Create(_T("4:4:4 YUV:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
+	//p.y += h20;
+	m_txtRGB.Create(_T("RGB:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
+	m_cbRGB32.Create(_T("RGB32"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(60), 0), CSize(IPP_SCALE(55), m_fontheight)), this, IDC_PP_SW_RGB32);
+	p.y += h25;
 
 	// Preset
 	m_txtSwPreset.Create(ResStr(IDS_VDF_COLOR_PRESET), WS_VISIBLE|WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
@@ -225,10 +230,6 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
 		pWnd->SetFont(&m_font, FALSE);
 	}
-	LOGFONT lf = {m_fontheight*7/4,0L,0L,0L,FW_NORMAL,0,0,0,SYMBOL_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,FF_DONTCARE|DEFAULT_PITCH,_T("Webdings")};
-	m_arrowsFont.CreateFontIndirect(&lf);
-	m_cbSwOutputFormatUp.SetFont(&m_arrowsFont);
-	m_cbSwOutputFormatDown.SetFont(&m_arrowsFont);
 
 	CorrectComboListWidth(m_cbDXVACompatibilityCheck);
 	CorrectComboListWidth(m_cbDiscardMode);
@@ -246,24 +247,16 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		m_cbDXVA_SD.SetCheck(m_pMDF->GetDXVA_SD());
 
 		// === New swscaler options
-		int k = 0;
-		while (LPCTSTR str = m_pMDF->GetSwFormatName(k)) {
-			m_lstSwOutputFormats.AddString(str);
-			int nCheck = m_pMDF->GetSwFormatState(k);
-			m_lstSwOutputFormats.SetCheck(k, nCheck);
-			m_lstSwOutputFormats.SetItemData(k, 10 * k + nCheck); // remember the original order and check state
-			k++;
-		}
+		m_cbNV12.SetCheck (m_pMDF->GetSwPixelFormat(PixFmt_NV12)  ? BST_CHECKED : BST_UNCHECKED);
+		m_cbYV12.SetCheck (m_pMDF->GetSwPixelFormat(PixFmt_YV12)  ? BST_CHECKED : BST_UNCHECKED);
+		m_cbYUY2.SetCheck (m_pMDF->GetSwPixelFormat(PixFmt_YUY2)  ? BST_CHECKED : BST_INDETERMINATE);
+		m_cbRGB32.SetCheck(m_pMDF->GetSwPixelFormat(PixFmt_RGB32) ? BST_CHECKED : BST_UNCHECKED);
 		m_cbSwPreset.SetCurSel(m_pMDF->GetSwPreset());
 		m_cbSwStandard.SetCurSel(m_pMDF->GetSwStandard());
 		m_cbSwInputLevels.SetCurSel(m_pMDF->GetSwInputLevels());
 		m_cbSwOutputLevels.SetCurSel(m_pMDF->GetSwOutputLevels());
 
 		unsigned __int64 m_nOutCsp = m_pMDF->GetOutputFormat();
-
-		m_lstSwOutputFormats.EnableWindow(m_nOutCsp != FF_CSP_UNSUPPORTED);
-		m_cbSwOutputFormatUp.EnableWindow(m_nOutCsp != FF_CSP_UNSUPPORTED);
-		m_cbSwOutputFormatDown.EnableWindow(m_nOutCsp != FF_CSP_UNSUPPORTED);
 
 		m_cbSwPreset.EnableWindow(m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp));
 		m_cbSwStandard.EnableWindow(m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp));
@@ -311,51 +304,33 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 			refresh = 1; // soft refresh - signal new swscaler colorspace details
 		}
 
-		CMediaType mt;
-		m_pMDF->GetOutputMediaType(&mt);
-		CString OutputType = GetGUIDString(mt.subtype);
-		OutputType.Replace(L"MEDIASUBTYPE_", L"");
-		FreeMediaType(mt);
-
-		CString SettingsOutputType;
-		m_lstSwOutputFormats.GetText(0, SettingsOutputType);
-
-		if (OutputType != SettingsOutputType
-				|| m_lstSwOutputFormats.GetCheck(0) != m_lstSwOutputFormats.GetItemData(0)) {
-			refresh = 2; // hard refresh - signal new output format
+		if ((m_cbNV12.GetCheck()  == BST_CHECKED) != m_pMDF->GetSwPixelFormat(PixFmt_NV12) ||
+			(m_cbYV12.GetCheck()  == BST_CHECKED) != m_pMDF->GetSwPixelFormat(PixFmt_YV12) ||
+			(m_cbYUY2.GetCheck()  == BST_CHECKED) != m_pMDF->GetSwPixelFormat(PixFmt_YUY2) ||
+			(m_cbRGB32.GetCheck() == BST_CHECKED) != m_pMDF->GetSwPixelFormat(PixFmt_RGB32)) {
+				refresh = 2;
 		}
 		
+		/*
+		CMediaType mt;
+		m_pMDF->GetOutputMediaType(&mt);
+		if (mt.subtype == MEDIASUBTYPE_NV12 && m_cbNV12.GetCheck() == BST_UNCHECKED ||
+			mt.subtype == MEDIASUBTYPE_YV12 && m_cbYV12.GetCheck() == BST_UNCHECKED ||
+			mt.subtype == MEDIASUBTYPE_RGB32 && m_cbRGB32.GetCheck() == BST_UNCHECKED) {
+				refresh = 2;
+		}
+		FreeMediaType(mt);
+		*/
+		
+
 		m_pMDF->SetSwRefresh(refresh);
 
-		if (refresh < 2) {
-			for (int i = 0; i < m_lstSwOutputFormats.GetCount(); i++) {
-				if (i * 10 + m_lstSwOutputFormats.GetCheck(i) != m_lstSwOutputFormats.GetItemData(i)) {
-					refresh = 2;
-					break;
-				}
+		if (refresh >= 2) {
+			m_pMDF->SetSwPixelFormat(PixFmt_NV12 , m_cbNV12.GetCheck() == BST_CHECKED);
+			m_pMDF->SetSwPixelFormat(PixFmt_YV12 , m_cbYV12.GetCheck() == BST_CHECKED);
+			m_pMDF->SetSwPixelFormat(PixFmt_YUY2 , m_cbYUY2.GetCheck() == BST_CHECKED);
+			m_pMDF->SetSwPixelFormat(PixFmt_RGB32, m_cbRGB32.GetCheck() == BST_CHECKED);
 			}
-		}
-
-		if (refresh == 2) {
-			CString SwFormatsStr;
-			for (int i = 0; i < m_lstSwOutputFormats.GetCount(); i++) {
-				CString name;
-				m_lstSwOutputFormats.GetText(i, name);
-				SwFormatsStr.AppendFormat(_T("%s%s;"), name, m_lstSwOutputFormats.GetCheck(i) ? _T("+") : _T("-"));
-			}
-			m_pMDF->SetSwFormats(SwFormatsStr);
-
-			// re-build output formats
-			m_lstSwOutputFormats.ResetContent();
-			int k = 0;
-			while (LPCTSTR str = m_pMDF->GetSwFormatName(k)) {
-				m_lstSwOutputFormats.AddString(str);
-				int nCheck = m_pMDF->GetSwFormatState(k);
-				m_lstSwOutputFormats.SetCheck(k, nCheck);
-				m_lstSwOutputFormats.SetItemData(k, 10 * k + nCheck); // remember the original order and check state
-				k++;
-			}
-		}
 
 		if (refresh >= 1) {
 			m_pMDF->SetSwPreset(m_cbSwPreset.GetCurSel());
@@ -373,52 +348,18 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 
 
 BEGIN_MESSAGE_MAP(CMPCVideoDecSettingsWnd, CInternalPropertyPageWnd)
-	// === New swscaler options
-	ON_BN_CLICKED( IDC_PP_SWOUTPUTFORMATUP, OnClickedSwOutputFormatUp)
-	ON_BN_CLICKED( IDC_PP_SWOUTPUTFORMATDOWN, OnClickedSwOutputFormatDown)
-	//
+	ON_BN_CLICKED(IDC_PP_SW_YUY2, OnBnClickedYUY2)
 	ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
 END_MESSAGE_MAP()
 
-// === New swscaler options
-void CMPCVideoDecSettingsWnd::OnClickedSwOutputFormatUp()
+void CMPCVideoDecSettingsWnd::OnBnClickedYUY2()
 {
-	int pos = m_lstSwOutputFormats.GetCurSel();
-	int count = m_lstSwOutputFormats.GetCount();
-	int selected;	int selectedUp; 
-	CString text;
-	if ((pos != LB_ERR) && (count > 1) && (pos-1 >= 0)) {
-		selected = m_lstSwOutputFormats.GetCheck(pos);
-		selectedUp = m_lstSwOutputFormats.GetCheck(pos-1);
-		m_lstSwOutputFormats.GetText(pos, text);        
-		m_lstSwOutputFormats.DeleteString(pos);
-		m_lstSwOutputFormats.InsertString(pos-1, text);
-		m_lstSwOutputFormats.SetCheck(pos-1, selected);
-		m_lstSwOutputFormats.SetCheck(pos, selectedUp);
-		m_lstSwOutputFormats.SetCurSel(pos-1);
+	if (m_cbYUY2.GetCheck() == BST_CHECKED) {
+		m_cbYUY2.SetCheck(BST_INDETERMINATE);
+	} else {
+		m_cbYUY2.SetCheck(BST_CHECKED);
 	}
 }
-
-void CMPCVideoDecSettingsWnd::OnClickedSwOutputFormatDown()
-{
-	int pos		= m_lstSwOutputFormats.GetCurSel();
-	int count	= m_lstSwOutputFormats.GetCount();
-	int selected;
-	int selectedDown; 
-	CString text;
-
-	if ((pos != LB_ERR) && (count > 1) && (pos+1 < count)) {
-		selected = m_lstSwOutputFormats.GetCheck(pos);
-		selectedDown = m_lstSwOutputFormats.GetCheck(pos+1);
-		m_lstSwOutputFormats.GetText(pos,text);
-		m_lstSwOutputFormats.DeleteString(pos);
-		m_lstSwOutputFormats.InsertString(pos+1,text);
-		m_lstSwOutputFormats.SetCheck(pos+1,selected);
-		m_lstSwOutputFormats.SetCheck(pos,selectedDown);
-		m_lstSwOutputFormats.SetCurSel(pos+1);
-	}
-}
-//
 
 BOOL CMPCVideoDecSettingsWnd::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
 {

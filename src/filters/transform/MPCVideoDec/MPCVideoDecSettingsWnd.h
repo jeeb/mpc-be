@@ -36,8 +36,10 @@ enum {
 	IDC_PP_AR,
 	IDC_PP_DXVA_CHECK,
 	IDC_PP_DXVA_SD,
-	IDC_PP_SWOUTPUTFORMATUP,
-	IDC_PP_SWOUTPUTFORMATDOWN,
+	IDC_PP_SW_NV12,
+	IDC_PP_SW_YV12,
+	IDC_PP_SW_YUY2,
+	IDC_PP_SW_RGB32,
 	IDC_PP_SWPRESET,
 	IDC_PP_SWSTANDARD,
 	IDC_PP_SWINPUTLEVELS,
@@ -74,12 +76,16 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CButton		m_cbDXVA_SD;
 
 	// === New swscaler options
-	CButton			m_grpFmtConv;
-	CStatic			m_txtSwOutputFormats;
-	CCheckListBox	m_lstSwOutputFormats;
-	CImageList		m_onoff;
-	CButton			m_cbSwOutputFormatUp;
-	CButton			m_cbSwOutputFormatDown;
+	CButton		m_grpFmtConv;
+	CStatic		m_txtSwOutputFormats;
+	CStatic     m_txt420;
+	CStatic     m_txt422;
+	//CStatic     m_txt444;
+	CStatic     m_txtRGB;
+	CButton		m_cbNV12;
+	CButton		m_cbYV12;
+	CButton		m_cbYUY2;
+	CButton		m_cbRGB32;
 
 	CStatic     m_txtSwPreset;
 	CComboBox   m_cbSwPreset;
@@ -110,13 +116,8 @@ public:
 
 	DECLARE_MESSAGE_MAP()
 
-	// === New swscaler options
-	afx_msg void OnClickedSwOutputFormatUp();
-	afx_msg void OnClickedSwOutputFormatDown();
-
+	afx_msg void OnBnClickedYUY2();
 	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult);
-	//
-
 };
 
 class __declspec(uuid("3C395D46-8B0F-440d-B962-2F4A97355453"))

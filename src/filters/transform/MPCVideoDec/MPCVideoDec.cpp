@@ -48,6 +48,7 @@
 extern "C" {
 	#include <ffmpeg/libavcodec/avcodec.h>
 	#include <ffmpeg/libswscale/swscale.h>
+	#include <ffmpeg/libavutil/pixdesc.h>
 }
 #pragma warning(pop)
 
@@ -62,7 +63,10 @@ extern "C" {
 #define OPT_ARMode           _T("ARMode")
 #define OPT_DXVACheck        _T("DXVACheckCompatibility")
 #define OPT_DisableDXVA_SD   _T("DisableDXVA_SD")
-#define OPT_SwOutputFormats  _T("SwFormats")
+#define OPTION_SW_NV12       _T("Sw_NV12")
+#define OPTION_SW_YV12       _T("Sw_YV12")
+#define OPTION_SW_YUY2       _T("Sw_YUY2")
+#define OPTION_SW_RGB32      _T("Sw_RGB32")
 #define OPT_SwPreset         _T("SwPreset")
 #define OPT_SwStandard       _T("SwStandard")
 #define OPT_SwInputLevels    _T("SwInputLevels")
@@ -765,17 +769,14 @@ typedef struct {
 	VIDEO_OUTPUT_FORMATS   VOF;
 	const unsigned __int64 ff_csp;
 	const AVPixelFormat    av_pix_fmt;
-	BOOL                   enable; // default state
 } SW_OUT_FMT;
 
 static const SW_OUT_FMT s_sw_formats_def[] = {
-	{_T("NV12"),  {&MEDIASUBTYPE_NV12,  2, 12, '21VN'}, FF_CSP_NV12,                      AV_PIX_FMT_NV12, TRUE },
-	{_T("YV12"),  {&MEDIASUBTYPE_YV12,  3, 12, '21VY'}, FF_CSP_420P|FF_CSP_FLAGS_YUV_ADJ, ___PIX_FMT_YV12, TRUE },
-	{_T("YUY2"),  {&MEDIASUBTYPE_YUY2,  1, 16, '2YUY'}, FF_CSP_YUY2,                      ___PIX_FMT_YUY2, TRUE },
-	{_T("RGB32"), {&MEDIASUBTYPE_RGB32, 1, 32, BI_RGB}, FF_CSP_RGB32,                     AV_PIX_FMT_ARGB, TRUE },
+	{_T("YUY2"),  {&MEDIASUBTYPE_YUY2,  1, 16, '2YUY'}, FF_CSP_YUY2,                      ___PIX_FMT_YUY2 }, // PixFmt_YUY2
+	{_T("NV12"),  {&MEDIASUBTYPE_NV12,  2, 12, '21VN'}, FF_CSP_NV12,                      AV_PIX_FMT_NV12 }, // PixFmt_NV12
+	{_T("YV12"),  {&MEDIASUBTYPE_YV12,  3, 12, '21VY'}, FF_CSP_420P|FF_CSP_FLAGS_YUV_ADJ, ___PIX_FMT_YV12 }, // PixFmt_YV12
+	{_T("RGB32"), {&MEDIASUBTYPE_RGB32, 1, 32, BI_RGB}, FF_CSP_RGB32,                     AV_PIX_FMT_ARGB }, // PixFmt_RGB32
 };
-
-#define NUM_SW_OUT_FORMATS _countof(s_sw_formats_def)
 
 VIDEO_OUTPUT_FORMATS DXVAFormats[] = { // DXVA2
 	{&MEDIASUBTYPE_NV12,  1, 12, 'avxd'},
@@ -913,7 +914,14 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	
 	m_pCpuId				= DNew CCpuId();
 
-	CString SwFormatsStr;
+	// default settings
+	ASSERT(PixFmt_count == _countof(s_sw_formats_def));
+
+	m_fPixFmts[PixFmt_NV12]  = true;
+	m_fPixFmts[PixFmt_YV12]  = true;
+	m_fPixFmts[PixFmt_YUY2]  = true;
+	m_fPixFmts[PixFmt_RGB32] = true;
+
 #ifdef REGISTER_FILTER
 	CRegKey key;
 	ULONG len = 255;
@@ -939,8 +947,17 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		}
 
 		// === New swscaler options
-		if (ERROR_SUCCESS == key.QueryStringValue(OPT_SwOutputFormats, SwFormatsStr.GetBuffer(255), &len)) {
-			SwFormatsStr.ReleaseBufferSetLength(len);
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SW_NV12, dw)) {
+			m_fPixFmts[PixFmt_NV12] = !!dw;
+		}
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SW_YV12, dw)) {
+			m_fPixFmts[PixFmt_YV12] = !!dw;
+		}
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SW_YUY2, dw)) {
+			m_fPixFmts[PixFmt_YUY2] = !!dw;
+		}
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SW_RGB32, dw)) {
+			m_fPixFmts[PixFmt_RGB32] = !!dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SwPreset, dw)) {
 			m_nSwPreset = dw;
@@ -975,7 +992,10 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_nDXVA_SD					= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_DisableDXVA_SD, m_nDXVA_SD);
 
 	// === New swscaler options
-	SwFormatsStr				= AfxGetApp()->GetProfileString(OPT_SECTION_VideoDec, OPT_SwOutputFormats, _T(""));
+	m_fPixFmts[PixFmt_NV12]		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_NV12,  m_fPixFmts[PixFmt_NV12]);
+	m_fPixFmts[PixFmt_YV12]		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_YV12,  m_fPixFmts[PixFmt_YV12]);
+	m_fPixFmts[PixFmt_YUY2]		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_YUY2,  m_fPixFmts[PixFmt_YUY2]);
+	m_fPixFmts[PixFmt_RGB32]	= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_RGB32, m_fPixFmts[PixFmt_RGB32]);
 	m_nSwPreset					= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwPreset, m_nSwPreset);
 	m_nSwStandard				= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwStandard, m_nSwStandard);
 	m_nSwInputLevels			= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwInputLevels, m_nSwInputLevels);
@@ -988,8 +1008,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	if (m_nDeinterlacing > PROGRESSIVE) {
 		m_nDeinterlacing = AUTO;
 	}
-
-	SetSwFormats(SwFormatsStr);
 
 	avcodec_register_all();
 	av_log_set_callback(ff_log);
@@ -1768,16 +1786,50 @@ void CMPCVideoDecFilter::BuildDXVAOutputFormat()
 	SAFE_DELETE_ARRAY(m_pVideoOutputFormat);
 
 	// === New swscaler options
-	int nSwIndex[NUM_SW_OUT_FORMATS];
+	int nSwIndex[PixFmt_count];
 	int nSwCount = 0;
-	for (size_t i = 0; i < m_SwFormatSets.GetCount(); i++) {
-		if (m_SwFormatSets[i].enable) {
-			nSwIndex[nSwCount++] = m_SwFormatSets[i].number;
+	bool inqueue[PixFmt_count];
+	for (int i = 0; i < PixFmt_count; i++) {
+		inqueue[i] = m_fPixFmts[i];
+	}
+
+	if (m_pix_fmt != AV_PIX_FMT_NONE) {
+		const AVPixFmtDescriptor* av_pfdesc = av_pix_fmt_desc_get(m_pix_fmt);
+		int bpp = av_get_bits_per_pixel(av_pfdesc);
+
+		// same format
+		MPCPixelFormat pf = GetOutPixFormat(m_pix_fmt);
+		if (pf != PixFmt_None && inqueue[pf]) {
+			nSwIndex[nSwCount++] = pf;
+			inqueue[pf] = false;
+		}
+
+		if (av_pfdesc->flags & AV_PIX_FMT_FLAG_RGB && inqueue[PixFmt_RGB32]) {
+			// if any RGB then next type is RGB32
+			nSwIndex[nSwCount++] = PixFmt_RGB32;
+			inqueue[PixFmt_RGB32] = false;
+		} else {
+			// similar YUV formats
+			for (int i = 0; i < PixFmt_count; i++) {
+				if (inqueue[i] && bpp == s_sw_formats_def[i].VOF.biBitCount) {
+					nSwIndex[nSwCount++] = i;
+					inqueue[i] = false;
+					break;
+				}
+			}
 		}
 	}
-	if (!nSwCount) {
-		nSwIndex[0] = 0; // NV12
-		nSwCount = 1;
+
+	for (int i = 0; i < PixFmt_count; i++) {
+		if (inqueue[i]) {
+			nSwIndex[nSwCount++] = i;
+			inqueue[i] = false;
+		}
+	}
+
+	if (!m_fPixFmts[PixFmt_YUY2]) {
+		// if YUY2 has not been added yet, then add it to the end of the list
+		nSwIndex[nSwCount++] = PixFmt_YUY2;
 	}
 
 	m_nVideoOutputCount = (IsDXVASupported() ? ffCodecs[m_nCodecNb].DXVAModeCount() + _countof (DXVAFormats) : 0) +
@@ -2153,6 +2205,28 @@ unsigned __int64 CMPCVideoDecFilter::GetCspFromMediaType(GUID& subtype)
 
 	ASSERT (FALSE);
 	return FF_CSP_NULL;
+}
+
+MPCPixelFormat CMPCVideoDecFilter::GetOutPixFormat(GUID& subtype)
+{
+	for (int i = 0; i < PixFmt_count; i++) {
+		if (*s_sw_formats_def[i].VOF.subtype == subtype) {
+			return (MPCPixelFormat)i;
+		}
+	}
+
+	return PixFmt_None;
+}
+
+MPCPixelFormat CMPCVideoDecFilter::GetOutPixFormat(AVPixelFormat av_pix_fmt)
+{
+	for (int i = 0; i < PixFmt_count; i++) {
+		if (s_sw_formats_def[i].av_pix_fmt == av_pix_fmt) {
+			return (MPCPixelFormat)i;
+		}
+	}
+
+	return PixFmt_None;
 }
 
 void CMPCVideoDecFilter::InitSwscale()
@@ -3121,11 +3195,6 @@ HRESULT CMPCVideoDecFilter::DetectVideoCard_EVR(IPin *pPin)
 // IFFmpegDecFilter
 STDMETHODIMP CMPCVideoDecFilter::Apply()
 {
-	CString sSwFormats;
-	for (size_t i = 0; i < m_SwFormatSets.GetCount(); i++) {
-		sSwFormats.AppendFormat(_T("%s%s;"), s_sw_formats_def[m_SwFormatSets[i].number].name, m_SwFormatSets[i].enable ? _T("+") : _T("-"));
-	}
-
 #ifdef REGISTER_FILTER
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_VideoDec)) {
@@ -3137,11 +3206,14 @@ STDMETHODIMP CMPCVideoDecFilter::Apply()
 		key.SetDWORDValue(OPT_DisableDXVA_SD, m_nDXVA_SD);
 
 		// === New swscaler options
+		key.SetDWORDValue(OPTION_SW_NV12,  m_fPixFmts[PixFmt_NV12]);
+		key.SetDWORDValue(OPTION_SW_YV12,  m_fPixFmts[PixFmt_YV12]);
+		key.SetDWORDValue(OPTION_SW_YUY2,  m_fPixFmts[PixFmt_YUY2]);
+		key.SetDWORDValue(OPTION_SW_RGB32, m_fPixFmts[PixFmt_RGB32]);
 		key.SetDWORDValue(OPT_SwPreset, m_nSwPreset);
 		key.SetDWORDValue(OPT_SwStandard, m_nSwStandard);
 		key.SetDWORDValue(OPT_SwInputLevels, m_nSwInputLevels);
 		key.SetDWORDValue(OPT_SwOutputLevels, m_nSwOutputLevels);
-		key.SetStringValue(OPT_SwOutputFormats, sSwFormats);
 		//
 	}
 	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_VCodecs)) {
@@ -3159,11 +3231,14 @@ STDMETHODIMP CMPCVideoDecFilter::Apply()
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_DisableDXVA_SD, m_nDXVA_SD);
 
 	// === New swscaler options
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_NV12,  m_fPixFmts[PixFmt_NV12]);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_YV12,  m_fPixFmts[PixFmt_YV12]);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_YUY2,  m_fPixFmts[PixFmt_YUY2]);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_RGB32, m_fPixFmts[PixFmt_RGB32]);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwPreset, m_nSwPreset);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwStandard, m_nSwStandard);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwInputLevels, m_nSwInputLevels);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwOutputLevels, m_nSwOutputLevels);
-	AfxGetApp()->WriteProfileString(OPT_SECTION_VideoDec, OPT_SwOutputFormats, sSwFormats);
 	//
 #endif
 
@@ -3286,76 +3361,26 @@ STDMETHODIMP CMPCVideoDecFilter::SetSwRefresh(int nValue)
 	return S_OK;
 }
 
-STDMETHODIMP CMPCVideoDecFilter::SetSwFormats(CString SwFormatsStr)
+STDMETHODIMP CMPCVideoDecFilter::SetSwPixelFormat(MPCPixelFormat pf, bool enable)
 {
 	CAutoLock cAutoLock(&m_csProps);
-
-	m_SwFormatSets.RemoveAll();
-
-	BYTE fmts_need[NUM_SW_OUT_FORMATS];
-	memset(&fmts_need, 1, sizeof(fmts_need));
-
-	CAtlList<CString> sl;
-	Explode(SwFormatsStr, sl, ';');
-	POSITION pos = sl.GetHeadPosition();
-	while (pos) {
-		CString& str = sl.GetNext(pos);
-		if (str.GetLength() >= 2) {
-			bool fmt_enable = (str[str.GetLength() - 1] == '+');
-			CString fmt_str = str.MakeUpper().Left(str.GetLength() - 1);
-
-			for (int i = 0; i < NUM_SW_OUT_FORMATS; i++) {
-				if (fmts_need[i] && fmt_str == s_sw_formats_def[i].name) {
-					OUT_FMT_SET ofs = {i, fmt_enable};
-					m_SwFormatSets.Add(ofs);
-
-					fmts_need[i] = 0;
-				}
-			}
-		}
+	if (pf < 0 && pf >= PixFmt_count) {
+		return E_INVALIDARG;
 	}
-	for (int i = 0; i < NUM_SW_OUT_FORMATS; i++) {
-		if (fmts_need[i]) {
-			OUT_FMT_SET ofs = {i, s_sw_formats_def[i].enable};
-			m_SwFormatSets.Add(ofs);
 
-			fmts_need[i] = 0;
-		}
-	}
-	ASSERT(m_SwFormatSets.GetCount() == NUM_SW_OUT_FORMATS);
-
+	m_fPixFmts[pf] = enable;
 	return S_OK;
 }
 
-//STDMETHODIMP CMPCVideoDecFilter::SetSwFormatState(unsigned int index, int nCheck)
-//{
-//	CAutoLock cAutoLock(&m_csProps);
-//	if (index >= NUM_SW_OUT_FORMATS || nCheck != FALSE && nCheck != TRUE) {
-//		return E_INVALIDARG;
-//	}
-//	m_SwFormatSets[index].enable = nCheck;
-//
-//	return S_OK;
-//}
-
-STDMETHODIMP_(int) CMPCVideoDecFilter::GetSwFormatState(unsigned int index)
+STDMETHODIMP_(bool) CMPCVideoDecFilter::GetSwPixelFormat(MPCPixelFormat pf)
 {
 	CAutoLock cAutoLock(&m_csProps);
-	if (index >= NUM_SW_OUT_FORMATS) {
-		return -1;
+
+	if (pf < 0 && pf >= PixFmt_count) {
+		return false;
 	}
 
-	return m_SwFormatSets[index].enable;
-}
-
-STDMETHODIMP_(LPCTSTR) CMPCVideoDecFilter::GetSwFormatName(unsigned int index)
-{
-	CAutoLock cAutoLock(&m_csProps);
-	if (index >= NUM_SW_OUT_FORMATS) {
-		return NULL;
-	}
-
-	return s_sw_formats_def[m_SwFormatSets[index].number].name;
+	return m_fPixFmts[pf];
 }
 
 STDMETHODIMP CMPCVideoDecFilter::SetSwPreset(int nValue)
