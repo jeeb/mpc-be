@@ -2458,7 +2458,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	GetFormatList(fmts);
 
 	// High merit MPC Video Decoder
-	pFGF = DNew CFGFilterInternal<CMPCVideoDecFilter>(MPCVideoDecName, MERIT64_ABOVE_DSHOW + 1);
+	pFGF = DNew CFGFilterInternal<CMPCVideoDecFilter>(MPCVideoDecName, MERIT64_ABOVE_DSHOW);
 	{
 		POSITION pos = fmts.GetHeadPosition();
 		while (pos) {
@@ -2472,7 +2472,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	// Low merit MPC Video Decoder
 	if (!IsPreview) { // do not need for Preview mode.
-		pFGF = DNew CFGFilterInternal<CMPCVideoDecFilter>(LowMerit(MPCVideoDecName), MERIT64_DO_USE + 1);
+		pFGF = DNew CFGFilterInternal<CMPCVideoDecFilter>(LowMerit(MPCVideoDecName), MERIT64_DO_USE);
 		{
 			POSITION pos = fmts.GetHeadPosition();
 			while (pos) {
