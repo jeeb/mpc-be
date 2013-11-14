@@ -2223,7 +2223,7 @@ MPCPixelFormat CMPCVideoDecFilter::GetOutPixFormat(GUID& subtype)
 MPCPixelFormat CMPCVideoDecFilter::GetOutPixFormat(AVPixelFormat av_pix_fmt)
 {
 	for (int i = 0; i < PixFmt_count; i++) {
-		if (s_sw_formats_def[i].av_pix_fmt == av_pix_fmt && m_fPixFmts[i]) {
+		if (s_sw_formats_def[i].av_pix_fmt == av_pix_fmt) {
 			return (MPCPixelFormat)i;
 		}
 	}
