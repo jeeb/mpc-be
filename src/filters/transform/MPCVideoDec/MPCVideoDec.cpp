@@ -759,13 +759,6 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 	{&MEDIATYPE_Video, &MEDIASUBTYPE_RGB32},
 };
 
-#define ___PIX_FMT_YUY2  AV_PIX_FMT_YUYV422
-#define ___PIX_FMT_YV12  AV_PIX_FMT_YUV420P
-#define ___PIX_FMT_NV12  ___PIX_FMT_YV12
-#define ___PIX_FMT_YV16  AV_PIX_FMT_YUV422P
-#define ___PIX_FMT_YV24  AV_PIX_FMT_YUV444P
-#define ___PIX_FMR_ARGB  AV_PIX_FMT_ARGB
-
 typedef struct {
 	const LPCTSTR          name;
 	VIDEO_OUTPUT_FORMATS   VOF;
@@ -774,10 +767,10 @@ typedef struct {
 } SW_OUT_FMT;
 
 static const SW_OUT_FMT s_sw_formats_def[] = {
-	{_T("YUY2"),  {&MEDIASUBTYPE_YUY2,  1, 16, '2YUY'}, FF_CSP_YUY2,                      ___PIX_FMT_YUY2 }, // PixFmt_YUY2
-	{_T("NV12"),  {&MEDIASUBTYPE_NV12,  2, 12, '21VN'}, FF_CSP_NV12,                      ___PIX_FMT_NV12 }, // PixFmt_NV12
-	{_T("YV12"),  {&MEDIASUBTYPE_YV12,  3, 12, '21VY'}, FF_CSP_420P|FF_CSP_FLAGS_YUV_ADJ, ___PIX_FMT_YV12 }, // PixFmt_YV12
-	{_T("RGB32"), {&MEDIASUBTYPE_RGB32, 1, 32, BI_RGB}, FF_CSP_RGB32,                     ___PIX_FMR_ARGB }, // PixFmt_RGB32
+	{_T("YUY2"),  {&MEDIASUBTYPE_YUY2,  1, 16, '2YUY'}, FF_CSP_YUY2,                      AV_PIX_FMT_YUYV422 }, // PixFmt_YUY2
+	{_T("NV12"),  {&MEDIASUBTYPE_NV12,  2, 12, '21VN'}, FF_CSP_NV12,                      AV_PIX_FMT_NV12    }, // PixFmt_NV12
+	{_T("YV12"),  {&MEDIASUBTYPE_YV12,  3, 12, '21VY'}, FF_CSP_420P|FF_CSP_FLAGS_YUV_ADJ, AV_PIX_FMT_YUV420P }, // PixFmt_YV12
+	{_T("RGB32"), {&MEDIASUBTYPE_RGB32, 1, 32, BI_RGB}, FF_CSP_RGB32,                     AV_PIX_FMT_ARGB    }, // PixFmt_RGB32
 };
 
 VIDEO_OUTPUT_FORMATS DXVAFormats[] = { // DXVA2
@@ -1801,7 +1794,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 
 		// same format
 		MPCPixelFormat pf = GetOutPixFormat(m_pix_fmt);
-		if (pf != PixFmt_None) {
+		if (pf != PixFmt_None && inqueue[pf]) {
 			nSwIndex[nSwCount++] = pf;
 			inqueue[pf] = false;
 		}
