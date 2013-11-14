@@ -1758,7 +1758,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		}
 	}
 
-	BuildDXVAOutputFormat();
+	BuildOutputFormat();
 
 	if (bReinit) {
 		SAFE_DELETE(m_pDXVADecoder);
@@ -1781,7 +1781,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	return S_OK;
 }
 
-void CMPCVideoDecFilter::BuildDXVAOutputFormat()
+void CMPCVideoDecFilter::BuildOutputFormat()
 {
 	SAFE_DELETE_ARRAY(m_pVideoOutputFormat);
 
@@ -2586,7 +2586,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 				CComPtr<IPinConnection> pRendererConn;
 				CMediaType cmtRenderer;
 
-				BuildDXVAOutputFormat(); // refresh supported media types
+				BuildOutputFormat(); // refresh supported media types
 
 				CAutoLock cObjectLock(m_pLock);
 

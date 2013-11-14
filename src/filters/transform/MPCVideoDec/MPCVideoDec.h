@@ -177,6 +177,7 @@ protected:
 	MPCPixelFormat		GetOutPixFormat(GUID& subtype);
 	MPCPixelFormat		GetOutPixFormat(AVPixelFormat av_pix_fmt);
 	void				InitSwscale();
+	void				BuildOutputFormat();
 
 	HRESULT				SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
 
@@ -275,7 +276,6 @@ public:
 	// === DXVA common functions
 	BOOL						IsSupportedDecoderConfig(const D3DFORMAT nD3DFormat, const DXVA2_ConfigPictureDecode& config, bool& bIsPrefered);
 	BOOL						IsSupportedDecoderMode(const GUID* mode);
-	void						BuildDXVAOutputFormat();
 	int							GetPicEntryNumber();
 	int							PictWidth();
 	int							PictHeight();
@@ -313,7 +313,6 @@ public:
 
 	// === DXVA2 functions
 	void						FillInVideoDescription(DXVA2_VideoDesc *pDesc);
-	DXVA2_ConfigPictureDecode*	GetDXVA2Config() { return &m_DXVA2Config; };
 	HRESULT						ConfigureDXVA2(IPin *pPin);
 	HRESULT						SetEVRForDXVA2(IPin *pPin);
 	HRESULT						FindDXVA2DecoderConfiguration(IDirectXVideoDecoderService *pDecoderService,

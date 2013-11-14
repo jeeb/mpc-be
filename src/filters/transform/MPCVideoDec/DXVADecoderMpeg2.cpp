@@ -158,7 +158,7 @@ HRESULT CDXVADecoderMpeg2::DecodeFrameInternal(BYTE* pDataIn, UINT nSize, REFERE
 		// Add quantization matrix
 		CHECK_HR (AddExecuteBuffer(DXVA2_InverseQuantizationMatrixBufferType, sizeof(m_QMatrixData), &m_QMatrixData));
 		// Add slice control
-		CHECK_HR (AddExecuteBuffer(DXVA2_SliceControlBufferType, sizeof (DXVA_SliceInfo)*m_nSliceCount, &m_SliceInfo));
+		CHECK_HR (AddExecuteBuffer(DXVA2_SliceControlBufferType, sizeof(DXVA_SliceInfo) * m_nSliceCount, &m_SliceInfo));
 		// Add bitstream
 		CHECK_HR (AddExecuteBuffer(DXVA2_BitStreamDateBufferType, nSize, pDataIn, &nSize));
 		// Decode frame
