@@ -1859,7 +1859,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 		}
 	}
 
-	if (nVideoOutputCountPrev && nVideoOutputCountPrev != m_nVideoOutputCount) {
+	if (nVideoOutputCountPrev && nVideoOutputCountPrev != m_nVideoOutputCount && !m_nSwRefresh) {
 		m_nSwRefresh = 2;
 	}
 }
@@ -2014,6 +2014,8 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 			if FAILED(hr = ReopenVideo()) {
 				return hr;
 			}
+
+			BuildOutputFormat();
 		}
 
 		CLSID ClsidSourceFilter = GetCLSID(m_pInput->GetConnected());
