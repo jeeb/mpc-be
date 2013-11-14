@@ -328,7 +328,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 30
 18		"크기조정:"
 20		"Direct3D 전체화면"
 21		"대체 VSync"
-22		"VMR-9 혼합 모드"
+22		"VMR 혼합 모드"
 23		"디스플레이 바꾸면 리셋"
 24		"YUV 믹싱"
 25		"EVR 버퍼:"

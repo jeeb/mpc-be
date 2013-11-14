@@ -328,7 +328,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 30
 18		"Redimensionare:"
 20		"Ecran complet D3D"
 21		"VSync alternativ"
-22		"VMR-9 în mod mixare"
+22		"VMR în mod mixare"
 23		"Reinițializează la schimbarea ecranului"
 24		"Mixare YUV"
 25		"Preîncărcări EVR:"

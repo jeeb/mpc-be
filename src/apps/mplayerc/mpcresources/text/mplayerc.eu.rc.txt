@@ -328,7 +328,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 30
 18		"Birneurr.:"
 20		"D3D Ikusleiho-osoa"
 21		"Aukerazko ZAlb"
-22		"VMR-9 Nahastzaile Modua"
+22		"VMR Nahastzaile Modua"
 23		"Berrezarri erakuspena aldatzerakoan"
 24		"YUV Nahasketa"
 25		"EVR Bufferrak:"

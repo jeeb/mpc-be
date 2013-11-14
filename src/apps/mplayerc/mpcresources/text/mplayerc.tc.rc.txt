@@ -328,7 +328,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 30
 18		"變更大小:"
 20		"Direct3D 全螢幕"
 21		"替代式垂直同步"
-22		"VMR-9 混合模式"
+22		"VMR 混合模式"
 23		"變更螢幕時重新初始化"
 24		"YUV 混合"
 25		"EVR 緩衝區:"
