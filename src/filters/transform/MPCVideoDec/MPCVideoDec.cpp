@@ -1832,6 +1832,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 		nSwIndex[nSwCount++] = PixFmt_YUY2;
 	}
 
+	int nVideoOutputCountPrev = m_nVideoOutputCount;
 	m_nVideoOutputCount = (IsDXVASupported() ? ffCodecs[m_nCodecNb].DXVAModeCount() + _countof (DXVAFormats) : 0) +
 						  (m_bUseFFmpeg   ? nSwCount : 0);
 
@@ -1856,6 +1857,10 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 		for (int i = 0; i < nSwCount; i++) {
 			memcpy(&m_pVideoOutputFormat[nPos + i], &s_sw_formats_def[nSwIndex[i]].VOF, sizeof(VIDEO_OUTPUT_FORMATS));
 		}
+	}
+
+	if (nVideoOutputCountPrev && nVideoOutputCountPrev != m_nVideoOutputCount) {
+		m_nSwRefresh = 2;
 	}
 }
 
