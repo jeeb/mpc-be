@@ -66,6 +66,8 @@ enum OutputFormat {
 #define MAX_THREADS 32
 #define MAX_PICTURE_COUNT 36
 
+#define MAX_B_FRAMES 16
+
 #define ME_MAP_SIZE 64
 #define ME_MAP_SHIFT 3
 #define ME_MAP_MV_BITS 11
@@ -107,6 +109,30 @@ typedef struct Picture{
 
     AVBufferRef *mb_type_buf;
     uint32_t *mb_type;
+
+#if !FF_API_MB_TYPE
+#define MB_TYPE_INTRA4x4   0x0001
+#define MB_TYPE_INTRA16x16 0x0002 //FIXME H.264-specific
+#define MB_TYPE_INTRA_PCM  0x0004 //FIXME H.264-specific
+#define MB_TYPE_16x16      0x0008
+#define MB_TYPE_16x8       0x0010
+#define MB_TYPE_8x16       0x0020
+#define MB_TYPE_8x8        0x0040
+#define MB_TYPE_INTERLACED 0x0080
+#define MB_TYPE_DIRECT2    0x0100 //FIXME
+#define MB_TYPE_ACPRED     0x0200
+#define MB_TYPE_GMC        0x0400
+#define MB_TYPE_SKIP       0x0800
+#define MB_TYPE_P0L0       0x1000
+#define MB_TYPE_P1L0       0x2000
+#define MB_TYPE_P0L1       0x4000
+#define MB_TYPE_P1L1       0x8000
+#define MB_TYPE_L0         (MB_TYPE_P0L0 | MB_TYPE_P1L0)
+#define MB_TYPE_L1         (MB_TYPE_P0L1 | MB_TYPE_P1L1)
+#define MB_TYPE_L0L1       (MB_TYPE_L0   | MB_TYPE_L1)
+#define MB_TYPE_QUANT      0x00010000
+#define MB_TYPE_CBP        0x00020000
+#endif
 
     AVBufferRef *mbskip_table_buf;
     uint8_t *mbskip_table;
@@ -747,6 +773,8 @@ typedef struct MpegEncContext {
     int context_reinit;
 
     ERContext er;
+
+    int error_rate;
 } MpegEncContext;
 
 #define REBASE_PICTURE(pic, new_ctx, old_ctx)             \
@@ -772,7 +800,9 @@ typedef struct MpegEncContext {
                                                                       FF_MPV_OFFSET(luma_elim_threshold), AV_OPT_TYPE_INT, { .i64 = 0 }, INT_MIN, INT_MAX, FF_MPV_OPT_FLAGS },\
 { "chroma_elim_threshold", "single coefficient elimination threshold for chrominance (negative values also consider dc coefficient)",\
                                                                       FF_MPV_OFFSET(chroma_elim_threshold), AV_OPT_TYPE_INT, { .i64 = 0 }, INT_MIN, INT_MAX, FF_MPV_OPT_FLAGS },\
-{ "quantizer_noise_shaping", NULL,                                  FF_MPV_OFFSET(quantizer_noise_shaping), AV_OPT_TYPE_INT, { .i64 = 0 },       0, INT_MAX, FF_MPV_OPT_FLAGS },
+{ "quantizer_noise_shaping", NULL,                                  FF_MPV_OFFSET(quantizer_noise_shaping), AV_OPT_TYPE_INT, { .i64 = 0 },       0, INT_MAX, FF_MPV_OPT_FLAGS },\
+{ "error_rate", "Simulate errors in the bitstream to test error concealment.",                                                                                                  \
+                                                                    FF_MPV_OFFSET(error_rate),              AV_OPT_TYPE_INT, { .i64 = 0 },       0, INT_MAX, FF_MPV_OPT_FLAGS },
 
 extern const AVOption ff_mpv_generic_options[];
 

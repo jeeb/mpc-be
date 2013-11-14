@@ -30,6 +30,7 @@
 #include "libavutil/attributes.h"
 #include "libavutil/avassert.h"
 #include "libavutil/imgutils.h"
+#include "libavutil/internal.h"
 #include "avcodec.h"
 #include "dsputil.h"
 #include "h264chroma.h"
@@ -536,6 +537,15 @@ fail:
     return ret;
 }
 
+static void exchange_uv(MpegEncContext *s)
+{
+    int16_t (*tmp)[64];
+
+    tmp           = s->pblocks[4];
+    s->pblocks[4] = s->pblocks[5];
+    s->pblocks[5] = tmp;
+}
+
 static int init_duplicate_context(MpegEncContext *s)
 {
     int y_size = s->b8_stride * (2 * s->mb_height + 1);
@@ -566,6 +576,8 @@ static int init_duplicate_context(MpegEncContext *s)
     for (i = 0; i < 12; i++) {
         s->pblocks[i] = &s->block[i];
     }
+    if (s->avctx->codec_tag == AV_RL32("VCR2"))
+        exchange_uv(s);
 
     if (s->out_format == FMT_H263) {
         /* ac values */
@@ -640,6 +652,8 @@ int ff_update_duplicate_context(MpegEncContext *dst, MpegEncContext *src)
     for (i = 0; i < 12; i++) {
         dst->pblocks[i] = &dst->block[i];
     }
+    if (dst->avctx->codec_tag == AV_RL32("VCR2"))
+        exchange_uv(dst);
     if (!dst->edge_emu_buffer &&
         (ret = ff_mpv_frame_size_alloc(dst, dst->linesize)) < 0) {
         av_log(dst->avctx, AV_LOG_ERROR, "failed to allocate context "
@@ -1714,8 +1728,12 @@ int ff_MPV_frame_start(MpegEncContext *s, AVCodecContext *avctx)
         update_noise_reduction(s);
     }
 
+#if FF_API_XVMC
+FF_DISABLE_DEPRECATION_WARNINGS
     if (CONFIG_MPEG_XVMC_DECODER && s->avctx->xvmc_acceleration)
         return ff_xvmc_field_start(s, avctx);
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif /* FF_API_XVMC */
 
     return 0;
 }
@@ -1724,11 +1742,16 @@ int ff_MPV_frame_start(MpegEncContext *s, AVCodecContext *avctx)
  * frame has been coded/decoded. */
 void ff_MPV_frame_end(MpegEncContext *s)
 {
+#if FF_API_XVMC
+FF_DISABLE_DEPRECATION_WARNINGS
     /* redraw edges for the frame if decoding didn't complete */
     // just to make sure that all data is rendered.
     if (CONFIG_MPEG_XVMC_DECODER && s->avctx->xvmc_acceleration) {
         ff_xvmc_field_end(s);
-   } else if ((s->er.error_count || s->encoding || !(s->avctx->codec->capabilities&CODEC_CAP_DRAW_HORIZ_BAND)) &&
+    } else
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif /* FF_API_XVMC */
+    if ((s->er.error_count || s->encoding || !(s->avctx->codec->capabilities&CODEC_CAP_DRAW_HORIZ_BAND)) &&
               // ==> Start patch MPC
               !s->avctx->using_dxva &&
               // <== End patch MPC
@@ -2677,10 +2700,15 @@ void MPV_decode_mb_internal(MpegEncContext *s, int16_t block[12][64],
                             int lowres_flag, int is_mpeg12)
 {
     const int mb_xy = s->mb_y * s->mb_stride + s->mb_x;
+
+#if FF_API_XVMC
+FF_DISABLE_DEPRECATION_WARNINGS
     if(CONFIG_MPEG_XVMC_DECODER && s->avctx->xvmc_acceleration){
         ff_xvmc_decode_mb(s);//xvmc uses pblocks
         return;
     }
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif /* FF_API_XVMC */
 
     if(s->avctx->debug&FF_DEBUG_DCT_COEFF) {
        /* print DCT coefficients */
