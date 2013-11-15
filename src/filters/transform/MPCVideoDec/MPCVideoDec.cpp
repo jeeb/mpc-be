@@ -3470,12 +3470,6 @@ STDMETHODIMP CMPCVideoDecFilter::SetDialogHWND(HWND nValue)
 	return S_OK;
 }
 
-STDMETHODIMP_(unsigned __int64) CMPCVideoDecFilter::GetOutputFormat()
-{
-	CAutoLock cAutoLock(&m_csProps);
-	return m_nOutCsp;
-}
-
 STDMETHODIMP CMPCVideoDecFilter::GetOutputMediaType(CMediaType* pmt)
 {
 	CAutoLock cAutoLock(&m_csProps);

@@ -127,7 +127,6 @@ public IUnknown {
 	//
 
 	STDMETHOD(SetDialogHWND(HWND nValue)) = 0;
-	STDMETHOD_(unsigned __int64, GetOutputFormat()) = 0;
 
 	STDMETHOD(GetOutputMediaType(CMediaType* pmt)) = 0;
 };
