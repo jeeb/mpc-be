@@ -30,7 +30,6 @@
 #include "MPCVideoDec.h"
 #include "DXVAAllocator.h"
 #include "CpuId.h"
-#include "ffImgfmt.h"
 #include "FfmpegContext.h"
 
 #include "../../../DSUtil/DSUtil.h"
@@ -764,17 +763,20 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 typedef struct {
 	const LPCTSTR			name;
 	VIDEO_OUTPUT_FORMATS	VOF;
-	const unsigned __int64	ff_csp;
+	int						Bpp;
+	unsigned int			shiftX[4];
+	unsigned int			shiftY[4];
 	const AVPixelFormat		av_pix_fmt;
 	uint8_t					chroma_w;
 	uint8_t					chroma_h;
 } SW_OUT_FMT;
 
 static const SW_OUT_FMT s_sw_formats[] = {
-	{_T("YUY2"),  {&MEDIASUBTYPE_YUY2,  1, 16, FCC('YUY2')}, FF_CSP_YUY2,                      AV_PIX_FMT_YUYV422, 1, 0 }, // PixFmt_YUY2
-	{_T("NV12"),  {&MEDIASUBTYPE_NV12,  2, 12, FCC('NV12')}, FF_CSP_NV12,                      AV_PIX_FMT_NV12,    1, 1 }, // PixFmt_NV12
-	{_T("YV12"),  {&MEDIASUBTYPE_YV12,  3, 12, FCC('YV12')}, FF_CSP_420P|FF_CSP_FLAGS_YUV_ADJ, AV_PIX_FMT_YUV420P, 1, 1 }, // PixFmt_YV12
-	{_T("RGB32"), {&MEDIASUBTYPE_RGB32, 1, 32, BI_RGB     }, FF_CSP_RGB32,                     AV_PIX_FMT_BGRA,    0, 0 }, // PixFmt_RGB32
+	//  name        subtype         planes bpp     FOURCC   Bpp  shiftX     shiftY    av_pix_fmt    chroma_w chroma_h
+	{_T("YUY2"),  {&MEDIASUBTYPE_YUY2,  1, 16, FCC('YUY2')}, 2, {0,0,0,0}, {0,0,0,0}, AV_PIX_FMT_YUYV422, 1, 0 }, // PixFmt_YUY2
+	{_T("NV12"),  {&MEDIASUBTYPE_NV12,  2, 12, FCC('NV12')}, 1, {0,0,0,0}, {0,1,1,0}, AV_PIX_FMT_NV12,    1, 1 }, // PixFmt_NV12
+	{_T("YV12"),  {&MEDIASUBTYPE_YV12,  3, 12, FCC('YV12')}, 1, {0,1,1,0}, {0,1,1,0}, AV_PIX_FMT_YUV420P, 1, 1 }, // PixFmt_YV12
+	{_T("RGB32"), {&MEDIASUBTYPE_RGB32, 1, 32, BI_RGB     }, 4, {0,0,0,0}, {0,0,0,0}, AV_PIX_FMT_BGRA,    0, 0 }, // PixFmt_RGB32
 };
 
 VIDEO_OUTPUT_FORMATS DXVAFormats[] = { // DXVA2
@@ -1730,7 +1732,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 						} else if (!m_strDeviceDescription.Find(RADEON_MOBILITY_HD_IDENTIFY)) {
 							ati_version = m_strDeviceDescription.GetAt(CString(RADEON_MOBILITY_HD_IDENTIFY).GetLength());
 						}
-						IsAtiDXVACompatible = (atoi(&ati_version) >= 4); // HD4xxx/Mobility and above AMD/ATI cards support level 5.1 and ref = 16
+						IsAtiDXVACompatible = (_wtoi(&ati_version) >= 4); // HD4xxx/Mobility and above AMD/ATI cards support level 5.1 and ref = 16
 					}
 				} else if (m_nPCIVendor == PCIV_Intel && !IsWinVistaOrLater() && m_nPCIDevice == 0x8108) {
 					break; // Disable support H.264 DXVA on Intel GMA500 in WinXP
@@ -2051,10 +2053,6 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 			}
 		}
 
-		if (m_nDecoderMode != MODE_SOFTWARE) {
-			m_nOutCsp = FF_CSP_UNSUPPORTED;
-		}
-		
 		// Cannot use YUY2 if horizontal or vertical resolution is not even
 		if (((m_pOutput->CurrentMediaType().subtype == MEDIASUBTYPE_YUY2) && (m_pAVCtx->width&1 || m_pAVCtx->height&1))) {
 			return VFW_E_INVALIDMEDIATYPE;
@@ -2219,23 +2217,6 @@ void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 	}
 }
 
-unsigned __int64 CMPCVideoDecFilter::GetCspFromMediaType(GUID& subtype)
-{
-	// === New swscaler options
-	if (subtype == MEDIASUBTYPE_I420 || subtype == MEDIASUBTYPE_IYUV || subtype == MEDIASUBTYPE_YV12) {
-		return (FF_CSP_420P|FF_CSP_FLAGS_YUV_ADJ);
-	} else if (subtype == MEDIASUBTYPE_NV12) {
-		return FF_CSP_NV12;
-	} else if (subtype == MEDIASUBTYPE_YUY2) {
-		return FF_CSP_YUY2;
-	} else if (subtype == MEDIASUBTYPE_RGB32) {
-		return FF_CSP_RGB32;
-	}
-
-	ASSERT (FALSE);
-	return FF_CSP_NULL;
-}
-
 void CMPCVideoDecFilter::InitSwscale()
 {
 	BITMAPINFOHEADER bihOut;
@@ -2271,15 +2252,6 @@ void CMPCVideoDecFilter::InitSwscale()
 		}
 
 		GUID subtype = m_pOutput->CurrentMediaType().subtype;
-
-		m_nOutCsp = GetCspFromMediaType(subtype);
-
-		if (m_nDialogHWND) {
-			EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWPRESET), (m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp)));
-			EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWSTANDARD), (m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp)));
-			EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWINPUTLEVELS), (m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp)));
-			EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWOUTPUTLEVELS), (m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp)));
-		}
 
 		m_PixFmtOut = s_sw_formats[GetPixFormat(subtype)].av_pix_fmt;
 		if (m_PixFmtOut == AV_PIX_FMT_NONE) {
@@ -2380,7 +2352,7 @@ static int64_t process_rv_timestamp(RMDemuxContext *rm, enum AVCodecID nCodecId,
 	return rm_fix_timestamp(buf, timestamp, nCodecId, &rm->kf_base, &rm->kf_pts);
 }
 
-void copyPlane(BYTE *dstp, stride_t dst_pitch, const BYTE *srcp, stride_t src_pitch, int row_size, int height, bool flip = false)
+void copyPlane(BYTE *dstp, int dst_pitch, const BYTE *srcp, int src_pitch, int row_size, int height, bool flip = false)
 {
 	if (!flip) {
 		for (int y = height; y > 0; --y) {
@@ -2583,6 +2555,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 		if (m_PixFmtDec != m_pAVCtx->pix_fmt) {
 			sws_freeContext(m_pSwsContext);
 			m_pSwsContext	= NULL;
+
 			m_PixFmtDec		= m_pAVCtx->pix_fmt;
 		}
 
@@ -2607,20 +2580,20 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			}
 
 			uint8_t*	dst[4] = {NULL, NULL, NULL, NULL};
-			stride_t	dstStride[4] = {0, 0, 0, 0};
-			const TcspInfo *outcspInfo=csp_getInfo(m_nOutCsp);
+			int			dstStride[4] = {0, 0, 0, 0};
+			const SW_OUT_FMT& swof = s_sw_formats[GetPixFormat(m_PixFmtOut)];
 
 			// === New swscaler options
-			if (m_nOutCsp == FF_CSP_YUY2 || m_nOutCsp == FF_CSP_RGB32) {
+			if (m_PixFmtOut == AV_PIX_FMT_YUYV422 || m_PixFmtOut == AV_PIX_FMT_BGRA) {
 				dst[0] = outData;
 				dstStride[0] = (m_nSwOutBpp>>3) * (outStride);
 			} else {
-				for (unsigned int i = 0; i < outcspInfo->numPlanes; i++) {
-					dstStride[i] = outStride >> outcspInfo->shiftX[i];
-					dst[i] = !i ? outData : dst[i-1] + dstStride[i-1] * (m_pOutSize.cy >> outcspInfo->shiftY[i-1]) ;
+				for (unsigned int i = 0; i < swof.VOF.biPlanes; i++) {
+					dstStride[i] = outStride >> swof.shiftX[i];
+					dst[i] = !i ? outData : dst[i-1] + dstStride[i-1] * (m_pOutSize.cy >> swof.shiftY[i-1]) ;
 				}
 
-				if (m_nOutCsp & FF_CSP_420P) {
+				if (m_PixFmtOut == AV_PIX_FMT_YUV420P) {
 					std::swap(dst[1], dst[2]);
 				}
 			}
@@ -2628,14 +2601,14 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			sws_scale(m_pSwsContext, m_pFrame->data, m_pFrame->linesize, 0, m_pAVCtx->height, dst, dstStride);
 
 			if (outData != pDataOut) {
-				if (m_nOutCsp & FF_CSP_420P) {
+				if (m_PixFmtOut == AV_PIX_FMT_YUV420P) {
 					std::swap(dst[1], dst[2]);
 				}
 				int rowsize = 0, height = 0;
-				for (unsigned int i = 0; i < outcspInfo->numPlanes; i++) {
-					rowsize	= (m_pOutSize.cx*outcspInfo->Bpp) >> outcspInfo->shiftX[i];
-					height	= m_pAVCtx->height >> outcspInfo->shiftY[i];
-					copyPlane(pDataOut, rowsize, dst[i], (outStride*outcspInfo->Bpp) >> outcspInfo->shiftX[i], rowsize, height, m_nOutCsp == FF_CSP_RGB32 && !m_bIsVMR7_YUV);
+				for (unsigned int i = 0; i < swof.VOF.biPlanes; i++) {
+					rowsize	= (m_pOutSize.cx * swof.Bpp) >> swof.shiftX[i];
+					height	= m_pAVCtx->height >> swof.shiftY[i];
+					copyPlane(pDataOut, rowsize, dst[i], (outStride * swof.Bpp) >> swof.shiftX[i], rowsize, height, m_PixFmtOut == AV_PIX_FMT_BGRA && !m_bIsVMR7_YUV);
 					pDataOut += rowsize * height;
 				}
 			}

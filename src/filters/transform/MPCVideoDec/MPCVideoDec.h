@@ -173,7 +173,6 @@ protected:
 	void				AllocExtradata(AVCodecContext* pAVCtx, const CMediaType* mt);
 	void				GetOutputFormats (int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats);
 	void				DetectVideoCard(HWND hWnd);
-	unsigned __int64	GetCspFromMediaType(GUID& subtype);
 	void				InitSwscale();
 	void				BuildOutputFormat();
 

@@ -22,7 +22,6 @@
 #include "MPCVideoDecSettingsWnd.h"
 #include "../../../DSUtil/DSUtil.h"
 #include <ffmpeg/libavcodec/avcodec.h>
-#include "ffImgfmt.h"
 
 //
 // CMPCVideoDecSettingsWnd
@@ -251,17 +250,11 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		m_cbYV12.SetCheck (m_pMDF->GetSwPixelFormat(PixFmt_YV12)  ? BST_CHECKED : BST_UNCHECKED);
 		m_cbYUY2.SetCheck (m_pMDF->GetSwPixelFormat(PixFmt_YUY2)  ? BST_CHECKED : BST_INDETERMINATE);
 		m_cbRGB32.SetCheck(m_pMDF->GetSwPixelFormat(PixFmt_RGB32) ? BST_CHECKED : BST_UNCHECKED);
+
 		m_cbSwPreset.SetCurSel(m_pMDF->GetSwPreset());
 		m_cbSwStandard.SetCurSel(m_pMDF->GetSwStandard());
 		m_cbSwInputLevels.SetCurSel(m_pMDF->GetSwInputLevels());
 		m_cbSwOutputLevels.SetCurSel(m_pMDF->GetSwOutputLevels());
-
-		unsigned __int64 m_nOutCsp = m_pMDF->GetOutputFormat();
-
-		m_cbSwPreset.EnableWindow(m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp));
-		m_cbSwStandard.EnableWindow(m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp));
-		m_cbSwInputLevels.EnableWindow(m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp));
-		m_cbSwOutputLevels.EnableWindow(m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp));
 		//
 	}
 
