@@ -1872,7 +1872,7 @@ int CMPCVideoDecFilter::GetPicEntryNumber()
 	}
 }
 
-void CMPCVideoDecFilter::GetOutputFormats (int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats)
+void CMPCVideoDecFilter::GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats)
 {
 	nNumber		= m_nVideoOutputCount;
 	*ppFormats	= m_pVideoOutputFormat;
@@ -3643,5 +3643,4 @@ void GetFormatList(CAtlList<SUPPORTED_FORMATS>& fmts)
 		SUPPORTED_FORMATS fmt = {ffCodecs[i].clsMinorType, ffCodecs[i].FFMPEGCode, ffCodecs[i].DXVACode};
 		fmts.AddTail(fmt);
 	}
-
 }

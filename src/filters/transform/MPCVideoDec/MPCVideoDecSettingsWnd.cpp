@@ -330,7 +330,7 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 			m_pMDF->SetSwPixelFormat(PixFmt_YV12 , m_cbYV12.GetCheck() == BST_CHECKED);
 			m_pMDF->SetSwPixelFormat(PixFmt_YUY2 , m_cbYUY2.GetCheck() == BST_CHECKED);
 			m_pMDF->SetSwPixelFormat(PixFmt_RGB32, m_cbRGB32.GetCheck() == BST_CHECKED);
-			}
+		}
 
 		if (refresh >= 1) {
 			m_pMDF->SetSwPreset(m_cbSwPreset.GetCurSel());

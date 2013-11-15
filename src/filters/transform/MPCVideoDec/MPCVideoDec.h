@@ -187,8 +187,6 @@ protected:
 
 	HRESULT				InitDecoder(const CMediaType *pmt);
 
-	void				ParceSwFormatString();
-
 public:
 
 	CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr);
@@ -203,7 +201,7 @@ public:
 	}
 
 	REFERENCE_TIME	GetDuration();
-	void			UpdateFrameTime (REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop, bool pulldown_flag = false);
+	void			UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop, bool pulldown_flag = false);
 	bool			IsAVI();
 
 	// === Overriden DirectShow functions
@@ -344,24 +342,23 @@ class CVideoDecOutputPin : public CBaseVideoOutputPin
 {
 public:
 	CVideoDecOutputPin(TCHAR* pObjectName, CBaseVideoFilter* pFilter, HRESULT* phr, LPCWSTR pName);
-
 	~CVideoDecOutputPin();
 
-	HRESULT			InitAllocator(IMemAllocator **ppAlloc);
+	HRESULT				InitAllocator(IMemAllocator **ppAlloc);
 
 	DECLARE_IUNKNOWN
-	STDMETHODIMP	NonDelegatingQueryInterface(REFIID riid, void** ppv);
+	STDMETHODIMP		NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
 	// IAMVideoAcceleratorNotify
-	STDMETHODIMP	GetUncompSurfacesInfo(const GUID *pGuid, LPAMVAUncompBufferInfo pUncompBufferInfo);
-	STDMETHODIMP	SetUncompSurfacesInfo(DWORD dwActualUncompSurfacesAllocated);
-	STDMETHODIMP	GetCreateVideoAcceleratorData(const GUID *pGuid, LPDWORD pdwSizeMiscData, LPVOID *ppMiscData);
+	STDMETHODIMP		GetUncompSurfacesInfo(const GUID *pGuid, LPAMVAUncompBufferInfo pUncompBufferInfo);
+	STDMETHODIMP		SetUncompSurfacesInfo(DWORD dwActualUncompSurfacesAllocated);
+	STDMETHODIMP		GetCreateVideoAcceleratorData(const GUID *pGuid, LPDWORD pdwSizeMiscData, LPVOID *ppMiscData);
 
 private :
-	CMPCVideoDecFilter*			m_pVideoDecFilter;
-	DWORD						m_dwDXVA1SurfaceCount;
-	GUID						m_GuidDecoderDXVA1;
-	DDPIXELFORMAT				m_ddUncompPixelFormat;
+	CMPCVideoDecFilter*	m_pVideoDecFilter;
+	DWORD				m_dwDXVA1SurfaceCount;
+	GUID				m_GuidDecoderDXVA1;
+	DDPIXELFORMAT		m_ddUncompPixelFormat;
 };
 
 //
@@ -371,4 +368,5 @@ struct SUPPORTED_FORMATS {
 	const int		FFMPEGCode;
 	const int		DXVACode;
 };
+
 void GetFormatList(CAtlList<SUPPORTED_FORMATS>& fmts);
