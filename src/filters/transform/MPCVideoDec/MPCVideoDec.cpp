@@ -52,8 +52,6 @@ extern "C" {
 }
 #pragma warning(pop)
 
-#pragma region any_constants
-
 // option names
 #define OPT_REGKEY_VideoDec  _T("Software\\MPC-BE Filters\\MPC Video Decoder")
 #define OPT_SECTION_VideoDec _T("Filters\\MPC Video Decoder")
@@ -71,6 +69,8 @@ extern "C" {
 #define OPT_SwStandard       _T("SwStandard")
 #define OPT_SwInputLevels    _T("SwInputLevels")
 #define OPT_SwOutputLevels   _T("SwOutputLevels")
+
+#pragma region any_constants
 
 #ifdef REGISTER_FILTER
 #define OPT_REGKEY_VCodecs   _T("Software\\MPC-BE Filters\\MPC Video Decoder\\Codecs")
@@ -752,6 +752,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_wv1f }
 };
 
+#pragma endregion any_constants
+
 const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 	{&MEDIATYPE_Video, &MEDIASUBTYPE_NV12},
 	{&MEDIATYPE_Video, &MEDIASUBTYPE_YV12},
@@ -818,8 +820,6 @@ STDAPI DllUnregisterServer()
 CFilterApp theApp;
 
 #endif
-
-#pragma endregion any_constants
 
 BOOL CALLBACK EnumFindProcessWnd (HWND hwnd, LPARAM lParam)
 {
