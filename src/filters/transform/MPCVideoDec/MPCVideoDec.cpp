@@ -872,8 +872,8 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_nCodecId(AV_CODEC_ID_NONE)
 	, m_pSwsContext(NULL)
 	, m_nOutCsp(0)
-	, m_PixFmtDec(AV_PIX_FMT_NONE)
-	, m_PixFmtOut(AV_PIX_FMT_NONE)
+	, m_AVPixFmtDec(AV_PIX_FMT_NONE)
+	, m_PixFmtOut(PixFmt_None)
 	, m_bReorderBFrame(true)
 	, m_nPosB(1)
 	, m_DXVADecoderGUID(GUID_NULL)
@@ -1350,7 +1350,7 @@ void CMPCVideoDecFilter::ffmpegCleanup()
 		}
 		av_freep(&m_pAVCtx);
 	}
-	m_PixFmtDec		= AV_PIX_FMT_NONE;
+	m_AVPixFmtDec	= AV_PIX_FMT_NONE;
 
 	if (m_pFFBuffer) {
 		av_freep(&m_pFFBuffer);
@@ -1370,7 +1370,7 @@ void CMPCVideoDecFilter::ffmpegCleanup()
 		sws_freeContext(m_pSwsContext);
 	}
 	m_pSwsContext	= NULL;
-	m_PixFmtOut		= AV_PIX_FMT_NONE;
+	m_PixFmtOut		= PixFmt_None;
 
 	m_pAVCodec		= NULL;
 	m_pAVCtx		= NULL;
@@ -1707,7 +1707,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		return VFW_E_INVALIDMEDIATYPE;
 	}
 
-	FFGetFrameProps(m_pAVCtx, m_pFrame, m_nOutputWidth, m_nOutputHeight, m_PixFmtDec);
+	FFGetFrameProps(m_pAVCtx, m_pFrame, m_nOutputWidth, m_nOutputHeight, m_AVPixFmtDec);
 
 	if (IsDXVASupported()) {
 		do {
@@ -1816,12 +1816,12 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 		inqueue[i] = m_fPixFmts[i];
 	}
 
-	if (m_PixFmtDec != AV_PIX_FMT_NONE) {
-		const AVPixFmtDescriptor* av_pfdesc = av_pix_fmt_desc_get(m_PixFmtDec);
+	if (m_AVPixFmtDec != AV_PIX_FMT_NONE) {
+		const AVPixFmtDescriptor* av_pfdesc = av_pix_fmt_desc_get(m_AVPixFmtDec);
 		int bpp = av_get_bits_per_pixel(av_pfdesc);
 
 		// same format
-		//MPCPixelFormat pf = GetPixFormat(m_PixFmtDec);
+		//MPCPixelFormat pf = GetPixFormat(m_AVPixFmtDec);
 		//if (pf != PixFmt_None && inqueue[pf]) {
 		//	nSwIndex[nSwCount++] = pf;
 		//	inqueue[pf] = false;
@@ -2229,7 +2229,7 @@ void CMPCVideoDecFilter::InitSwscale()
 		if (m_pSwsContext) {
 			sws_freeContext(m_pSwsContext);
 			m_pSwsContext	= NULL;
-			m_PixFmtOut		= AV_PIX_FMT_NONE;
+			m_PixFmtOut		= PixFmt_None;
 		}
 
 		int sws_Flags = 0;
@@ -2253,20 +2253,21 @@ void CMPCVideoDecFilter::InitSwscale()
 
 		GUID subtype = m_pOutput->CurrentMediaType().subtype;
 
-		m_PixFmtOut = s_sw_formats[GetPixFormat(subtype)].av_pix_fmt;
-		if (m_PixFmtOut == AV_PIX_FMT_NONE) {
+		m_PixFmtOut = GetPixFormat(subtype);
+		if (m_PixFmtOut == PixFmt_None) {
 			ASSERT(0);
 			return;
 		}
+		const SW_OUT_FMT& swof = s_sw_formats[m_PixFmtOut];
 
 		m_pSwsContext = sws_getCachedContext(
 							NULL,
 							m_pAVCtx->width,
 							m_pAVCtx->height,
-							m_PixFmtDec,
+							m_AVPixFmtDec,
 							m_pAVCtx->width,
 							m_pAVCtx->height,
-							m_PixFmtOut,
+							swof.av_pix_fmt,
 							sws_Flags | SWS_PRINT_INFO,
 							NULL,
 							NULL,
@@ -2552,11 +2553,11 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 		pOut->SetTime(&rtStart, &rtStop);
 		pOut->SetMediaTime(NULL, NULL);
 
-		if (m_PixFmtDec != m_pAVCtx->pix_fmt) {
+		if (m_AVPixFmtDec != m_pAVCtx->pix_fmt) {
 			sws_freeContext(m_pSwsContext);
 			m_pSwsContext	= NULL;
 
-			m_PixFmtDec		= m_pAVCtx->pix_fmt;
+			m_AVPixFmtDec		= m_pAVCtx->pix_fmt;
 		}
 
 		InitSwscale();
@@ -2581,10 +2582,10 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 
 			uint8_t*	dst[4] = {NULL, NULL, NULL, NULL};
 			int			dstStride[4] = {0, 0, 0, 0};
-			const SW_OUT_FMT& swof = s_sw_formats[GetPixFormat(m_PixFmtOut)];
+			const SW_OUT_FMT& swof = s_sw_formats[m_PixFmtOut];
 
 			// === New swscaler options
-			if (m_PixFmtOut == AV_PIX_FMT_YUYV422 || m_PixFmtOut == AV_PIX_FMT_BGRA) {
+			if (m_PixFmtOut == PixFmt_YUY2 || m_PixFmtOut == PixFmt_RGB32) {
 				dst[0] = outData;
 				dstStride[0] = (m_nSwOutBpp>>3) * (outStride);
 			} else {
@@ -2593,7 +2594,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 					dst[i] = !i ? outData : dst[i-1] + dstStride[i-1] * (m_pOutSize.cy >> swof.shiftY[i-1]) ;
 				}
 
-				if (m_PixFmtOut == AV_PIX_FMT_YUV420P) {
+				if (m_PixFmtOut == PixFmt_YV12) {
 					std::swap(dst[1], dst[2]);
 				}
 			}
@@ -2601,14 +2602,14 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			sws_scale(m_pSwsContext, m_pFrame->data, m_pFrame->linesize, 0, m_pAVCtx->height, dst, dstStride);
 
 			if (outData != pDataOut) {
-				if (m_PixFmtOut == AV_PIX_FMT_YUV420P) {
+				if (m_PixFmtOut == PixFmt_YV12) {
 					std::swap(dst[1], dst[2]);
 				}
 				int rowsize = 0, height = 0;
 				for (unsigned int i = 0; i < swof.VOF.biPlanes; i++) {
 					rowsize	= (m_pOutSize.cx * swof.Bpp) >> swof.shiftX[i];
 					height	= m_pAVCtx->height >> swof.shiftY[i];
-					copyPlane(pDataOut, rowsize, dst[i], (outStride * swof.Bpp) >> swof.shiftX[i], rowsize, height, m_PixFmtOut == AV_PIX_FMT_BGRA && !m_bIsVMR7_YUV);
+					copyPlane(pDataOut, rowsize, dst[i], (outStride * swof.Bpp) >> swof.shiftX[i], rowsize, height, m_PixFmtOut == PixFmt_RGB32 && !m_bIsVMR7_YUV);
 					pDataOut += rowsize * height;
 				}
 			}
@@ -2639,7 +2640,7 @@ HRESULT CMPCVideoDecFilter::ReconnectRenderer()
 		if (m_pSwsContext) {
 			sws_freeContext(m_pSwsContext);
 			m_pSwsContext	= NULL;
-			m_PixFmtOut		= AV_PIX_FMT_NONE;
+			m_PixFmtOut		= PixFmt_None;
 		}
 	}
 

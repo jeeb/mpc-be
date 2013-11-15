@@ -30,9 +30,6 @@
     <ClCompile Include="DXVADecoderVC1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ffImgfmt.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MPCVideoDec.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -84,9 +81,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DXVAAllocator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ffImgfmt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

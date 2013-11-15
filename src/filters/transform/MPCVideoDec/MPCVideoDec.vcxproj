@@ -251,7 +251,6 @@ update_version.bat</Command>
     <ClCompile Include="DXVADecoderH264.cpp" />
     <ClCompile Include="DXVADecoderMpeg2.cpp" />
     <ClCompile Include="DXVADecoderVC1.cpp" />
-    <ClCompile Include="ffImgfmt.cpp" />
     <ClCompile Include="ffmpegContext.cpp">
       <WarningLevel>Level1</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -269,7 +268,6 @@ update_version.bat</Command>
     <ClInclude Include="DXVADecoderH264.h" />
     <ClInclude Include="DXVADecoderMpeg2.h" />
     <ClInclude Include="DXVADecoderVC1.h" />
-    <ClInclude Include="ffImgfmt.h" />
     <ClInclude Include="ffmpegContext.h" />
     <ClInclude Include="IMPCVideoDec.h" />
     <ClInclude Include="MPCVideoDec.h" />
