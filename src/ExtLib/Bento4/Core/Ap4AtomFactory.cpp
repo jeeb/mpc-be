@@ -461,6 +461,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
 		case AP4_ATOM_TYPE_XDVE:
 		case AP4_ATOM_TYPE_XDVF:
 
+		case AP4_ATOM_TYPE_XD51:
 		case AP4_ATOM_TYPE_XD54:
 		case AP4_ATOM_TYPE_XD55:
 		case AP4_ATOM_TYPE_XD59:
