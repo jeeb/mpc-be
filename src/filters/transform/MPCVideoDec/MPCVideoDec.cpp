@@ -774,7 +774,7 @@ static const SW_OUT_FMT s_sw_formats[] = {
 	{_T("YUY2"),  {&MEDIASUBTYPE_YUY2,  1, 16, FCC('YUY2')}, FF_CSP_YUY2,                      AV_PIX_FMT_YUYV422, 1, 0 }, // PixFmt_YUY2
 	{_T("NV12"),  {&MEDIASUBTYPE_NV12,  2, 12, FCC('NV12')}, FF_CSP_NV12,                      AV_PIX_FMT_NV12,    1, 1 }, // PixFmt_NV12
 	{_T("YV12"),  {&MEDIASUBTYPE_YV12,  3, 12, FCC('YV12')}, FF_CSP_420P|FF_CSP_FLAGS_YUV_ADJ, AV_PIX_FMT_YUV420P, 1, 1 }, // PixFmt_YV12
-	{_T("RGB32"), {&MEDIASUBTYPE_RGB32, 1, 32, BI_RGB     }, FF_CSP_RGB32,                     AV_PIX_FMT_ARGB,    0, 0 }, // PixFmt_RGB32
+	{_T("RGB32"), {&MEDIASUBTYPE_RGB32, 1, 32, BI_RGB     }, FF_CSP_RGB32,                     AV_PIX_FMT_BGRA,    0, 0 }, // PixFmt_RGB32
 };
 
 VIDEO_OUTPUT_FORMATS DXVAFormats[] = { // DXVA2
@@ -2270,7 +2270,9 @@ void CMPCVideoDecFilter::InitSwscale()
 				break;
 		}
 
-		m_nOutCsp = GetCspFromMediaType(m_pOutput->CurrentMediaType().subtype);
+		GUID subtype = m_pOutput->CurrentMediaType().subtype;
+
+		m_nOutCsp = GetCspFromMediaType(subtype);
 
 		if (m_nDialogHWND) {
 			EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWPRESET), (m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp)));
@@ -2279,7 +2281,7 @@ void CMPCVideoDecFilter::InitSwscale()
 			EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWOUTPUTLEVELS), (m_nOutCsp == 0 || csp_isRGB_RGB(m_nOutCsp)));
 		}
 
-		m_PixFmtOut = csp_ffdshow2lavc(m_nOutCsp);
+		m_PixFmtOut = s_sw_formats[GetPixFormat(subtype)].av_pix_fmt;
 		if (m_PixFmtOut == AV_PIX_FMT_NONE) {
 			ASSERT(0);
 			return;
