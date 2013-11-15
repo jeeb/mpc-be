@@ -174,8 +174,6 @@ protected:
 	void				GetOutputFormats (int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats);
 	void				DetectVideoCard(HWND hWnd);
 	unsigned __int64	GetCspFromMediaType(GUID& subtype);
-	MPCPixelFormat		GetOutPixFormat(GUID& subtype);
-	MPCPixelFormat		GetOutPixFormat(AVPixelFormat av_pix_fmt);
 	void				InitSwscale();
 	void				BuildOutputFormat();
 

@@ -770,11 +770,11 @@ typedef struct {
 	uint8_t					chroma_h;
 } SW_OUT_FMT;
 
-static const SW_OUT_FMT s_sw_formats_def[] = {
-	{_T("YUY2"),  {&MEDIASUBTYPE_YUY2,  1, 16, '2YUY'}, FF_CSP_YUY2,                      AV_PIX_FMT_YUYV422, 1, 0 }, // PixFmt_YUY2
-	{_T("NV12"),  {&MEDIASUBTYPE_NV12,  2, 12, '21VN'}, FF_CSP_NV12,                      AV_PIX_FMT_NV12,    1, 1 }, // PixFmt_NV12
-	{_T("YV12"),  {&MEDIASUBTYPE_YV12,  3, 12, '21VY'}, FF_CSP_420P|FF_CSP_FLAGS_YUV_ADJ, AV_PIX_FMT_YUV420P, 1, 1 }, // PixFmt_YV12
-	{_T("RGB32"), {&MEDIASUBTYPE_RGB32, 1, 32, BI_RGB}, FF_CSP_RGB32,                     AV_PIX_FMT_ARGB,    0, 0 }, // PixFmt_RGB32
+static const SW_OUT_FMT s_sw_formats[] = {
+	{_T("YUY2"),  {&MEDIASUBTYPE_YUY2,  1, 16, FCC('YUY2')}, FF_CSP_YUY2,                      AV_PIX_FMT_YUYV422, 1, 0 }, // PixFmt_YUY2
+	{_T("NV12"),  {&MEDIASUBTYPE_NV12,  2, 12, FCC('NV12')}, FF_CSP_NV12,                      AV_PIX_FMT_NV12,    1, 1 }, // PixFmt_NV12
+	{_T("YV12"),  {&MEDIASUBTYPE_YV12,  3, 12, FCC('YV12')}, FF_CSP_420P|FF_CSP_FLAGS_YUV_ADJ, AV_PIX_FMT_YUV420P, 1, 1 }, // PixFmt_YV12
+	{_T("RGB32"), {&MEDIASUBTYPE_RGB32, 1, 32, BI_RGB     }, FF_CSP_RGB32,                     AV_PIX_FMT_ARGB,    0, 0 }, // PixFmt_RGB32
 };
 
 VIDEO_OUTPUT_FORMATS DXVAFormats[] = { // DXVA2
@@ -835,6 +835,30 @@ BOOL CALLBACK EnumFindProcessWnd (HWND hwnd, LPARAM lParam)
 	}
 	return TRUE;
 }
+
+MPCPixelFormat GetPixFormat(GUID& subtype)
+{
+	for (int i = 0; i < PixFmt_count; i++) {
+		if (*s_sw_formats[i].VOF.subtype == subtype) {
+			return (MPCPixelFormat)i;
+		}
+	}
+
+	return PixFmt_None;
+}
+
+MPCPixelFormat GetPixFormat(AVPixelFormat av_pix_fmt)
+{
+	for (int i = 0; i < PixFmt_count; i++) {
+		if (s_sw_formats[i].av_pix_fmt == av_pix_fmt) {
+			return (MPCPixelFormat)i;
+		}
+	}
+
+	return PixFmt_None;
+}
+
+// CMPCVideoDecFilter
 
 CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CBaseVideoFilter(NAME("MPC - Video decoder"), lpunk, phr, __uuidof(this))
@@ -912,7 +936,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_pCpuId				= DNew CCpuId();
 
 	// default settings
-	ASSERT(PixFmt_count == _countof(s_sw_formats_def));
+	ASSERT(PixFmt_count == _countof(s_sw_formats));
 
 	m_fPixFmts[PixFmt_NV12]  = true;
 	m_fPixFmts[PixFmt_YV12]  = true;
@@ -1795,7 +1819,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 		int bpp = av_get_bits_per_pixel(av_pfdesc);
 
 		// same format
-		//MPCPixelFormat pf = GetOutPixFormat(m_pix_fmt);
+		//MPCPixelFormat pf = GetPixFormat(m_pix_fmt);
 		//if (pf != PixFmt_None && inqueue[pf]) {
 		//	nSwIndex[nSwCount++] = pf;
 		//	inqueue[pf] = false;
@@ -1808,7 +1832,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 		} else if (av_pfdesc->nb_components >= 3) {
 			// if YUV then add similar YUV formats
 			for (int i = 0; i < PixFmt_count; i++) {
-				const SW_OUT_FMT& swof = s_sw_formats_def[i];
+				const SW_OUT_FMT& swof = s_sw_formats[i];
 				if (inqueue[i] && bpp == swof.VOF.biBitCount
 						&& av_pfdesc->log2_chroma_w == swof.chroma_w
 						&& av_pfdesc->log2_chroma_h == swof.chroma_h) {
@@ -1856,7 +1880,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 	// Software rendering
 	if (m_bUseFFmpeg) {
 		for (int i = 0; i < nSwCount; i++) {
-			memcpy(&m_pVideoOutputFormat[nPos + i], &s_sw_formats_def[nSwIndex[i]].VOF, sizeof(VIDEO_OUTPUT_FORMATS));
+			memcpy(&m_pVideoOutputFormat[nPos + i], &s_sw_formats[nSwIndex[i]].VOF, sizeof(VIDEO_OUTPUT_FORMATS));
 		}
 	}
 }
@@ -2210,28 +2234,6 @@ unsigned __int64 CMPCVideoDecFilter::GetCspFromMediaType(GUID& subtype)
 
 	ASSERT (FALSE);
 	return FF_CSP_NULL;
-}
-
-MPCPixelFormat CMPCVideoDecFilter::GetOutPixFormat(GUID& subtype)
-{
-	for (int i = 0; i < PixFmt_count; i++) {
-		if (*s_sw_formats_def[i].VOF.subtype == subtype) {
-			return (MPCPixelFormat)i;
-		}
-	}
-
-	return PixFmt_None;
-}
-
-MPCPixelFormat CMPCVideoDecFilter::GetOutPixFormat(AVPixelFormat av_pix_fmt)
-{
-	for (int i = 0; i < PixFmt_count; i++) {
-		if (s_sw_formats_def[i].av_pix_fmt == av_pix_fmt) {
-			return (MPCPixelFormat)i;
-		}
-	}
-
-	return PixFmt_None;
 }
 
 void CMPCVideoDecFilter::InitSwscale()
