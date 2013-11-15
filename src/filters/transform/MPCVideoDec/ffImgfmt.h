@@ -611,7 +611,7 @@ static __inline enum AVPixelFormat csp_ffdshow2lavc(uint64_t pix_fmt)
 		case FF_CSP_444P9:
 			return AV_PIX_FMT_YUV444P9;
 		default		 :
-			return AV_PIX_FMT_NB;
+			return AV_PIX_FMT_NONE;
 	}
 }
 

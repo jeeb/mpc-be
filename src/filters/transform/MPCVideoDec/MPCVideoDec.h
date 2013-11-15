@@ -90,8 +90,8 @@ protected:
 	int										m_nSwOutputLevels;
 	//
 
-	enum AVPixelFormat						m_pix_fmt; // for test version
-	enum AVPixelFormat						m_PixFmt;
+	enum AVPixelFormat						m_PixFmtDec; // format after decoder
+	enum AVPixelFormat						m_PixFmtOut; // format after converter
 
 	FF_FIELD_TYPE							m_nFrameType;
 
