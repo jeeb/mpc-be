@@ -1859,10 +1859,6 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 			memcpy(&m_pVideoOutputFormat[nPos + i], &s_sw_formats_def[nSwIndex[i]].VOF, sizeof(VIDEO_OUTPUT_FORMATS));
 		}
 	}
-
-	if (nVideoOutputCountPrev && nVideoOutputCountPrev != m_nVideoOutputCount && !m_nSwRefresh) {
-		m_nSwRefresh = 2;
-	}
 }
 
 int CMPCVideoDecFilter::GetPicEntryNumber()
@@ -2017,6 +2013,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 			}
 
 			m_nSwRefresh = 2;
+			ReconnectRenderer();
 		}
 
 		CLSID ClsidSourceFilter = GetCLSID(m_pInput->GetConnected());
@@ -2409,6 +2406,10 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 	AVPacket		avpkt;
 	av_init_packet(&avpkt);
 
+	if (m_nSwRefresh && (FAILED(hr = ReconnectRenderer()))) {
+		return hr;
+	}
+
 	while (nSize > 0 || bFlush) {
 		REFERENCE_TIME rtStart = rtStartIn, rtStop = rtStopIn;
 		
@@ -2575,64 +2576,6 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 		pOut->SetTime(&rtStart, &rtStop);
 		pOut->SetMediaTime(NULL, NULL);
 
-		// change colorspace details/output format
-		{
-			//soft refresh - signal new swscaler colorspace details
-			if (m_nSwRefresh == 1){
-				m_nSwRefresh--;
-				if (m_pSwsContext) {
-					sws_freeContext(m_pSwsContext);
-					m_pSwsContext	= NULL;
-					m_PixFmt		= AV_PIX_FMT_NB;
-				}
-			}
-
-			// hard refresh - signal new output format
-			if (m_nSwRefresh == 2){
-				m_nSwRefresh--;
-				CComPtr<IPin> pRendererPin;
-				CComPtr<IPinConnection> pRendererConn;
-				CMediaType cmtRenderer;
-
-				BuildOutputFormat(); // refresh supported media types
-
-				CAutoLock cObjectLock(m_pLock);
-
-				cmtRenderer.InitMediaType();
-				GetMediaType(0, &cmtRenderer);
-
- 				m_pOutput->ConnectedTo(&pRendererPin);
-				hr = pRendererPin->QueryInterface(IID_IPinConnection, (void**)&pRendererConn);
-				if (FAILED(hr)) {
-					// madVR accepts dynamic media type changes but does not support IPinConnection
-					if (S_OK == (hr = pRendererPin->QueryAccept(&cmtRenderer))) {
-						if (S_OK == (hr = m_pOutput->SetMediaType(&cmtRenderer))) {
-							ReconnectOutput(PictWidth(), PictHeight(), true, true);
-						}
-					}
-					return hr;
-				}
-
-				if (S_OK == (hr = NotifyEvent(EC_DISPLAY_CHANGED, (LONG_PTR)m_pOutput->GetConnected(), 0))) {
-					SleepEx(200, TRUE);
-					hr = m_pOutput->SetMediaType(&cmtRenderer);
-				}
-
-				/*
-				// VMR accepts dynamic media type changes - but failed QueryAccept()
-				hr = pRendererConn->DynamicQueryAccept(&cmtRenderer);
-				if (SUCCEEDED(hr)) {
-					//VMR accepts dynamic media type changes.
-					if (S_OK == (hr = m_pOutput->SetMediaType(&cmtRenderer))) {
-						ReconnectOutput(PictWidth(), PictHeight(), true, true);
-					}
-				}
-				*/
-
-				return hr;
-			}
-		}
-
 		AVPixelFormat PixFmt = csp_ffdshow2lavc(csp_lavc2ffdshow(m_pAVCtx->pix_fmt));
 		if (PixFmt == AV_PIX_FMT_NB) {
 			PixFmt = m_pAVCtx->pix_fmt;
@@ -2708,6 +2651,73 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 
 		SetTypeSpecificFlags(pOut);
 		hr = m_pOutput->Deliver(pOut);
+	}
+
+	return hr;
+}
+
+// change colorspace details/output format
+HRESULT CMPCVideoDecFilter::ReconnectRenderer()
+{
+	HRESULT hr = S_OK;
+
+	//soft refresh - signal new swscaler colorspace details
+	if (m_nSwRefresh == 1) {
+		m_nSwRefresh--;
+		if (m_pSwsContext) {
+			sws_freeContext(m_pSwsContext);
+			m_pSwsContext	= NULL;
+			m_PixFmt		= AV_PIX_FMT_NB;
+		}
+	}
+
+	// hard refresh - signal new output format
+	if (m_nSwRefresh == 2) {
+		m_nSwRefresh--;
+
+		CComPtr<IPin> pRendererPin;
+		CComPtr<IPinConnection> pRendererConn;
+		CMediaType cmtRenderer;
+
+		BuildOutputFormat(); // refresh supported media types
+
+		CAutoLock cObjectLock(m_pLock);
+
+		cmtRenderer.InitMediaType();
+		GetMediaType(0, &cmtRenderer);
+
+ 		m_pOutput->ConnectedTo(&pRendererPin);
+		hr = pRendererPin->QueryInterface(IID_IPinConnection, (void**)&pRendererConn);
+		if (FAILED(hr)) {
+			// madVR accepts dynamic media type changes but does not support IPinConnection
+			if (S_OK == (hr = pRendererPin->QueryAccept(&cmtRenderer))) {
+				if (S_OK == (hr = m_pOutput->SetMediaType(&cmtRenderer))) {
+					ReconnectOutput(PictWidth(), PictHeight(), true, true);
+				}
+			}
+
+			return SUCCEEDED(hr) ? ReconnectRenderer() : hr;
+		}
+
+		if (S_OK == (hr = NotifyEvent(EC_DISPLAY_CHANGED, (LONG_PTR)m_pOutput->GetConnected(), 0))) {
+			SleepEx(200, TRUE);
+			hr = m_pOutput->SetMediaType(&cmtRenderer);
+		}
+
+		/*
+		// VMR accepts dynamic media type changes - but failed QueryAccept()
+		hr = pRendererConn->DynamicQueryAccept(&cmtRenderer);
+		if (SUCCEEDED(hr)) {
+			//VMR accepts dynamic media type changes.
+			if (S_OK == (hr = m_pOutput->SetMediaType(&cmtRenderer))) {
+				ReconnectOutput(PictWidth(), PictHeight(), true, true);
+			}
+		}
+		*/
+
+		if (SUCCEEDED(hr)) {
+			return ReconnectRenderer();
+		}
 	}
 
 	return hr;

@@ -180,6 +180,7 @@ protected:
 	void				BuildOutputFormat();
 
 	HRESULT				SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
+	HRESULT				ReconnectRenderer();
 
 	HRESULT				ReopenVideo();
 	HRESULT				FindDecoderConfiguration();
