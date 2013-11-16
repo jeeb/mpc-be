@@ -762,21 +762,24 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 
 typedef struct {
 	const LPCTSTR			name;
-	VIDEO_OUTPUT_FORMATS	VOF;
-	int						Bpp;
-	unsigned int			shiftX[4];
-	unsigned int			shiftY[4];
+	DWORD					biCompression;
+	const GUID*				subtype;
+	int						bpp;
+	int						codedbytes;
+	int						planes;
+	int						planeHeight[4];
+	int						planeWidth[4];
 	const AVPixelFormat		av_pix_fmt;
 	uint8_t					chroma_w;
 	uint8_t					chroma_h;
 } SW_OUT_FMT;
 
 static const SW_OUT_FMT s_sw_formats[] = {
-	//  name        subtype         planes bpp     FOURCC   Bpp  shiftX     shiftY    av_pix_fmt    chroma_w chroma_h
-	{_T("YUY2"),  {&MEDIASUBTYPE_YUY2,  1, 16, FCC('YUY2')}, 2, {0,0,0,0}, {0,0,0,0}, AV_PIX_FMT_YUYV422, 1, 0 }, // PixFmt_YUY2
-	{_T("NV12"),  {&MEDIASUBTYPE_NV12,  2, 12, FCC('NV12')}, 1, {0,0,0,0}, {0,1,1,0}, AV_PIX_FMT_NV12,    1, 1 }, // PixFmt_NV12
-	{_T("YV12"),  {&MEDIASUBTYPE_YV12,  3, 12, FCC('YV12')}, 1, {0,1,1,0}, {0,1,1,0}, AV_PIX_FMT_YUV420P, 1, 1 }, // PixFmt_YV12
-	{_T("RGB32"), {&MEDIASUBTYPE_RGB32, 1, 32, BI_RGB     }, 4, {0,0,0,0}, {0,0,0,0}, AV_PIX_FMT_BGRA,    0, 0 }, // PixFmt_RGB32
+	//  name     biCompression  subtype                                         av_pix_fmt    chroma_w chroma_h
+	{_T("YUY2"),  FCC('YUY2'), &MEDIASUBTYPE_YUY2,  16, 2, 0, {1},     {1},     AV_PIX_FMT_YUYV422, 1, 0 }, // PixFmt_YUY2
+	{_T("NV12"),  FCC('NV12'), &MEDIASUBTYPE_NV12,  12, 1, 2, {1,2},   {1,1},   AV_PIX_FMT_NV12,    1, 1 }, // PixFmt_NV12
+	{_T("YV12"),  FCC('YV12'), &MEDIASUBTYPE_YV12,  12, 1, 3, {1,2,2}, {1,2,2}, AV_PIX_FMT_YUV420P, 1, 1 }, // PixFmt_YV12
+	{_T("RGB32"), BI_RGB,      &MEDIASUBTYPE_RGB32, 32, 4, 0, {1},     {1},     AV_PIX_FMT_BGRA,    0, 0 }, // PixFmt_RGB32
 };
 
 VIDEO_OUTPUT_FORMATS DXVAFormats[] = { // DXVA2
@@ -841,7 +844,7 @@ BOOL CALLBACK EnumFindProcessWnd (HWND hwnd, LPARAM lParam)
 MPCPixelFormat GetPixFormat(GUID& subtype)
 {
 	for (int i = 0; i < PixFmt_count; i++) {
-		if (*s_sw_formats[i].VOF.subtype == subtype) {
+		if (*s_sw_formats[i].subtype == subtype) {
 			return (MPCPixelFormat)i;
 		}
 	}
@@ -1835,7 +1838,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 			// if YUV then add similar YUV formats
 			for (int i = 0; i < PixFmt_count; i++) {
 				const SW_OUT_FMT& swof = s_sw_formats[i];
-				if (inqueue[i] && bpp == swof.VOF.biBitCount
+				if (inqueue[i] && bpp == swof.bpp
 						&& av_pfdesc->log2_chroma_w == swof.chroma_w
 						&& av_pfdesc->log2_chroma_h == swof.chroma_h) {
 					nSwIndex[nSwCount++] = i;
@@ -1882,7 +1885,10 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 	// Software rendering
 	if (m_bUseFFmpeg) {
 		for (int i = 0; i < nSwCount; i++) {
-			memcpy(&m_pVideoOutputFormat[nPos + i], &s_sw_formats[nSwIndex[i]].VOF, sizeof(VIDEO_OUTPUT_FORMATS));
+			m_pVideoOutputFormat[nPos + i].subtype			= s_sw_formats[nSwIndex[i]].subtype;
+			m_pVideoOutputFormat[nPos + i].biCompression	= s_sw_formats[nSwIndex[i]].biCompression;
+			m_pVideoOutputFormat[nPos + i].biBitCount		= s_sw_formats[nSwIndex[i]].bpp;
+			m_pVideoOutputFormat[nPos + i].biPlanes			= s_sw_formats[nSwIndex[i]].planes;
 		}
 	}
 }
@@ -2580,38 +2586,36 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 				outData = m_pAlignedFFBuffer;
 			}
 
-			uint8_t*	dst[4] = {NULL, NULL, NULL, NULL};
-			int			dstStride[4] = {0, 0, 0, 0};
+			uint8_t*	dst[4]			= {NULL, NULL, NULL, NULL};
+			int			dstStride[4]	= {0, 0, 0, 0};
+			int			stride			= (m_nSwOutBpp>>3) * (outStride);
 			const SW_OUT_FMT& swof = s_sw_formats[m_PixFmtOut];
 
-			// === New swscaler options
-			if (m_PixFmtOut == PixFmt_YUY2 || m_PixFmtOut == PixFmt_RGB32) {
-				dst[0] = outData;
-				dstStride[0] = (m_nSwOutBpp>>3) * (outStride);
-			} else {
-				for (unsigned int i = 0; i < swof.VOF.biPlanes; i++) {
-					dstStride[i] = outStride >> swof.shiftX[i];
-					dst[i] = !i ? outData : dst[i-1] + dstStride[i-1] * (m_pOutSize.cy >> swof.shiftY[i-1]) ;
-				}
-
-				if (m_PixFmtOut == PixFmt_YV12) {
-					std::swap(dst[1], dst[2]);
-				}
+			dst[0] = outData;
+			dstStride[0] = stride;
+			for (int i = 1; i < swof.planes; ++i) {
+				dst[i] = dst[i-1] + (stride / swof.planeWidth[i-1]) * (m_pOutSize.cy / swof.planeHeight[i-1]);
+				dstStride[i] = stride / swof.planeWidth[i];
 			}
 
-			sws_scale(m_pSwsContext, m_pFrame->data, m_pFrame->linesize, 0, m_pAVCtx->height, dst, dstStride);
+			if (m_PixFmtOut == PixFmt_YV12) {
+				std::swap(dst[1], dst[2]);
+			}
+
+			int ret = sws_scale(m_pSwsContext, m_pFrame->data, m_pFrame->linesize, 0, m_pAVCtx->height, dst, dstStride);
 
 			if (outData != pDataOut) {
-				if (m_PixFmtOut == PixFmt_YV12) {
-					std::swap(dst[1], dst[2]);
-				}
-				int rowsize = 0, height = 0;
-				for (unsigned int i = 0; i < swof.VOF.biPlanes; i++) {
-					rowsize	= (m_pOutSize.cx * swof.Bpp) >> swof.shiftX[i];
-					height	= m_pAVCtx->height >> swof.shiftY[i];
-					copyPlane(pDataOut, rowsize, dst[i], (outStride * swof.Bpp) >> swof.shiftX[i], rowsize, height, m_PixFmtOut == PixFmt_RGB32 && !m_bIsVMR7_YUV);
-					pDataOut += rowsize * height;
-				}
+				ASSERT(0);
+				//if (m_PixFmtOut == PixFmt_YV12) {
+				//	std::swap(dst[1], dst[2]);
+				//}
+				//int rowsize = 0, height = 0;
+				//for (unsigned int i = 0; i < swof.planes; i++) {
+				//	rowsize	= (m_pOutSize.cx * swof.codedbytes) >> swof.shiftX[i];
+				//	height	= m_pAVCtx->height >> swof.shiftY[i];
+				//	copyPlane(pDataOut, rowsize, dst[i], (outStride * swof.codedbytes) >> swof.shiftX[i], rowsize, height, m_PixFmtOut == PixFmt_RGB32 && !m_bIsVMR7_YUV);
+				//	pDataOut += rowsize * height;
+				//}
 			}
 		}
 
