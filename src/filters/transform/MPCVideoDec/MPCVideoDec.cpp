@@ -2283,7 +2283,6 @@ void CMPCVideoDecFilter::InitSwscale()
 			return;
 		}
 
-		m_nSwOutBpp		= bihOut.biBitCount;
 		m_pOutSize.cx	= bihOut.biWidth;
 		m_pOutSize.cy	= abs(bihOut.biHeight);
 
@@ -2572,12 +2571,13 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 
 			int outStride = m_pOutSize.cx;
 			BYTE *outData = pDataOut;
+			const SW_OUT_FMT& swof = s_sw_formats[m_PixFmtOut];
 
 			// From LAVVideo ...
 			// Check if we have proper pixel alignment and the dst memory is actually aligned
 			if (FFALIGN(outStride, 16) != outStride || ((uintptr_t)pDataOut % 16u)) {
 				outStride = FFALIGN(outStride, 16);
-				int requiredSize = (outStride * m_pAVCtx->height * m_nSwOutBpp) << 3;
+				int requiredSize = (outStride * m_pAVCtx->height * swof.bpp) << 3;
 				if (requiredSize > m_nAlignedFFBufferSize) {
 					av_freep(&m_pAlignedFFBuffer);
 					m_nAlignedFFBufferSize	= requiredSize;
@@ -2588,8 +2588,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 
 			uint8_t*	dst[4]			= {NULL, NULL, NULL, NULL};
 			int			dstStride[4]	= {0, 0, 0, 0};
-			int			stride			= (m_nSwOutBpp>>3) * (outStride);
-			const SW_OUT_FMT& swof = s_sw_formats[m_PixFmtOut];
+			int			stride			= (swof.bpp >> 3) * outStride;
 
 			dst[0] = outData;
 			dstStride[0] = stride;
