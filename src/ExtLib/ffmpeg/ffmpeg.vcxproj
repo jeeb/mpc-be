@@ -133,6 +133,7 @@
     <ClInclude Include="libavcodec\dirac_arith.h" />
     <ClInclude Include="libavcodec\dirac_dwt.h" />
     <ClInclude Include="libavcodec\dsputil.h" />
+    <ClInclude Include="libavcodec\dv.h" />
     <ClInclude Include="libavcodec\dvdata.h" />
     <ClInclude Include="libavcodec\dv_profile.h" />
     <ClInclude Include="libavcodec\dv_tablegen.h" />
