@@ -32,7 +32,7 @@
 class __declspec(uuid("486AA463-EE67-4F75-B941-F1FAB217B342"))
 	CRawVideoSplitterFilter : public CBaseSplitterFilter
 {
-	enum {
+	typedef enum {
 		RAW_NONE,
 		RAW_MPEG1,
 		RAW_MPEG2,
@@ -42,7 +42,8 @@ class __declspec(uuid("486AA463-EE67-4F75-B941-F1FAB217B342"))
 #if ENABLE_YUV4MPEG2
 		RAW_Y4M
 #endif
-	} m_RAWType;
+	} RAWType;
+	RAWType m_RAWType;
 
 	__int64 m_startpos;
 	int     m_framesize;

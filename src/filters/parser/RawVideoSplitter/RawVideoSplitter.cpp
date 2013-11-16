@@ -327,7 +327,39 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 #endif
 
+		RAWType rawType = RAW_NONE;
 		if (m_RAWType == RAW_NONE) {
+			// check sync bytes ...
+			BYTE sync[5] = { 0 };
+
+			struct {
+				BYTE	sync[5];
+				BYTE	count;
+				RAWType	rawType;
+			} SYNCHDR[] = {
+				{ {0x00, 0x00, 0x01, 0xB3, 0x00}, 4, RAW_MPEG1 },
+				{ {0x00, 0x00, 0x00, 0x01, 0x00}, 4, RAW_H264 },
+				{ {0x00, 0x00, 0x01, 0x0F, 0x00}, 4, RAW_VC1 },
+				{ {0x00, 0x00, 0x01, 0x0D, 0x00}, 4, RAW_VC1 },
+				{ {0x00, 0x00, 0x00, 0x01, 0x40}, 5, RAW_HEVC },
+			};
+
+			m_pFile->Seek(0);
+			if (SUCCEEDED(m_pFile->ByteRead(sync, _countof(sync)))) {
+				for (size_t i = 0; i < _countof(SYNCHDR); i++) {
+					if (!memcmp(sync, SYNCHDR[i].sync, SYNCHDR[i].count)) {
+						rawType = SYNCHDR[i].rawType;
+						break;
+					}
+				}
+			}
+
+			if (rawType == RAW_NONE) {
+				return E_FAIL;
+			}
+		}
+
+		if (m_RAWType == RAW_NONE && rawType == RAW_MPEG1) {
 			m_pFile->Seek(0);
 			CBaseSplitterFileEx::seqhdr h;
 			if (m_pFile->Read(h, min(MEGABYTE, m_pFile->GetLength()), &mt, false)) {
@@ -391,7 +423,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 		}
 
-		if (m_RAWType == RAW_NONE) {
+		if (m_RAWType == RAW_NONE && rawType == RAW_H264) {
 			m_pFile->Seek(0);
 
 			CBaseSplitterFileEx::avchdr h;
@@ -401,7 +433,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		
 		}
 
-		if (m_RAWType == RAW_NONE) {
+		if (m_RAWType == RAW_NONE && rawType == RAW_VC1) {
 			BYTE id = 0x00;
 			m_pFile->Seek(0);
 			while (m_pFile->GetPos() < min(MEGABYTE, m_pFile->GetLength()) && m_RAWType == RAW_NONE) {
@@ -420,7 +452,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 		}
 
-		if (m_RAWType == RAW_NONE) {
+		if (m_RAWType == RAW_NONE && rawType == RAW_HEVC) {
 			m_pFile->Seek(0);
 
 			CBaseSplitterFileEx::hevchdr h;
