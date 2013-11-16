@@ -255,6 +255,18 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		m_cbSwStandard.SetCurSel(m_pMDF->GetSwStandard());
 		m_cbSwInputLevels.SetCurSel(m_pMDF->GetSwInputLevels());
 		m_cbSwOutputLevels.SetCurSel(m_pMDF->GetSwOutputLevels());
+
+		if (m_pMDF->IsColorTypeConversion()) {
+			m_cbSwPreset.EnableWindow(TRUE);
+			m_cbSwStandard.EnableWindow(TRUE);
+			m_cbSwInputLevels.EnableWindow(TRUE);
+			m_cbSwOutputLevels.EnableWindow(TRUE);
+		} else {
+			m_cbSwPreset.EnableWindow(FALSE);
+			m_cbSwStandard.EnableWindow(FALSE);
+			m_cbSwInputLevels.EnableWindow(FALSE);
+			m_cbSwOutputLevels.EnableWindow(FALSE);
+		}
 		//
 	}
 

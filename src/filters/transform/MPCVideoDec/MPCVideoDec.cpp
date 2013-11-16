@@ -2306,6 +2306,20 @@ void CMPCVideoDecFilter::InitSwscale()
 			srcRange = m_nSwInputLevels>1 ? 0 : m_nSwInputLevels; // GUI 'Auto' = 'TV(16-235)'
 			sws_setColorspaceDetails(m_pSwsContext, sws_getCoefficients(nStandard), srcRange, tbl, dstRange, brightness, contrast, saturation);
 		}
+
+		if (m_nDialogHWND) {
+			if (IsColorTypeConversion()) {
+				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWPRESET), TRUE);
+				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWSTANDARD), TRUE);
+				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWINPUTLEVELS), TRUE);
+				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWOUTPUTLEVELS), TRUE);
+			} else {
+				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWPRESET), FALSE);
+				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWSTANDARD), FALSE);
+				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWINPUTLEVELS), FALSE);
+				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWOUTPUTLEVELS), FALSE);
+			}
+		}
 	}
 }
 
@@ -3469,6 +3483,23 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetSwOutputLevels()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_nSwOutputLevels;
+}
+
+STDMETHODIMP_(bool) CMPCVideoDecFilter::IsColorTypeConversion()
+{
+	CAutoLock cAutoLock(&m_csProps);
+
+	if (m_AVPixFmtDec != AV_PIX_FMT_NONE && m_PixFmtOut != PixFmt_None) {
+		bool in_rgb = !!(av_pix_fmt_desc_get(m_AVPixFmtDec)->flags & AV_PIX_FMT_FLAG_RGB);
+		bool out_rgb = (m_PixFmtOut == PixFmt_RGB32);
+		if (in_rgb != out_rgb) {
+			// YUV->RGB or RGB->YUV conversion
+			return true;
+		}
+
+	}
+
+	return false;
 }
 
 STDMETHODIMP CMPCVideoDecFilter::SetDialogHWND(HWND nValue)

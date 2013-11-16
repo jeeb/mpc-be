@@ -254,6 +254,8 @@ public:
 	STDMETHODIMP_(int) GetSwInputLevels();
 	STDMETHODIMP SetSwOutputLevels(int nValue);
 	STDMETHODIMP_(int) GetSwOutputLevels();
+
+	STDMETHODIMP_(bool) IsColorTypeConversion();
 	//
 
 	STDMETHODIMP SetDialogHWND(HWND nValue);
