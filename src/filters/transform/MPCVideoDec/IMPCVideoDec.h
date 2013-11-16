@@ -69,11 +69,17 @@ typedef enum MPC_DEINTERLACING_FLAGS {
 };
 
 enum MPCPixelFormat {
+	// YUV formats are grouped according to luma bit depth and sorted in descending order of quality.
 	PixFmt_None = -1,
-	PixFmt_YUY2 = 0, // 16 bit, 4:2:2
-	PixFmt_NV12,     // 12 bit, 4:2:0
-	PixFmt_YV12,     // 12 bit, 4:2:0
-	PixFmt_RGB32,    // 24 bit
+	// YUV 8 bit
+	PixFmt_YUY2,  // 16 bit, 4:2:2
+	PixFmt_NV12,  // 12 bit, 4:2:0
+	PixFmt_YV12,  // 12 bit, 4:2:0
+	// YUV 10 bit
+	//PixFmt_P210,  // 4:2:2
+	//PixFmt_P010,  // 4:2:0
+	// RGB
+	PixFmt_RGB32, // 24 bit
 	PixFmt_count
 };
 

@@ -775,10 +775,15 @@ typedef struct {
 } SW_OUT_FMT;
 
 static const SW_OUT_FMT s_sw_formats[] = {
+	// YUV formats are grouped according to luma bit depth and sorted in descending order of quality.
 	//  name     biCompression  subtype                                         av_pix_fmt    chroma_w chroma_h
+	// YUV 8 bit
 	{_T("YUY2"),  FCC('YUY2'), &MEDIASUBTYPE_YUY2,  16, 2, 0, {1},     {1},     AV_PIX_FMT_YUYV422, 1, 0 }, // PixFmt_YUY2
 	{_T("NV12"),  FCC('NV12'), &MEDIASUBTYPE_NV12,  12, 1, 2, {1,2},   {1,1},   AV_PIX_FMT_NV12,    1, 1 }, // PixFmt_NV12
 	{_T("YV12"),  FCC('YV12'), &MEDIASUBTYPE_YV12,  12, 1, 3, {1,2,2}, {1,2,2}, AV_PIX_FMT_YUV420P, 1, 1 }, // PixFmt_YV12
+	// YUV 10 bit
+	// ...
+	// RGB
 	{_T("RGB32"), BI_RGB,      &MEDIASUBTYPE_RGB32, 32, 4, 0, {1},     {1},     AV_PIX_FMT_BGRA,    0, 0 }, // PixFmt_RGB32
 };
 
