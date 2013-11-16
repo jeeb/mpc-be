@@ -2587,53 +2587,68 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 		InitSwscale();
 
 		if (m_pSwsContext != NULL) {
-
-			int outStride = m_pOutSize.cx;
-			BYTE *outData = pDataOut;
 			const SW_OUT_FMT& swof = s_sw_formats[m_PixFmtOut];
 
 			// From LAVVideo ...
+			uint8_t *out = pDataOut;
+			int outStride = m_pOutSize.cx;
+			int planeHeight = m_pAVCtx->height;
 			// Check if we have proper pixel alignment and the dst memory is actually aligned
 			if (FFALIGN(outStride, 16) != outStride || ((uintptr_t)pDataOut % 16u)) {
 				outStride = FFALIGN(outStride, 16);
-				int requiredSize = (outStride * m_pAVCtx->height * swof.bpp) << 3;
+				int requiredSize = (outStride * planeHeight * swof.bpp) << 3;
 				if (requiredSize > m_nAlignedFFBufferSize) {
 					av_freep(&m_pAlignedFFBuffer);
 					m_nAlignedFFBufferSize	= requiredSize;
 					m_pAlignedFFBuffer		= (BYTE*)av_malloc(m_nAlignedFFBufferSize+FF_INPUT_BUFFER_PADDING_SIZE);
 				}
-				outData = m_pAlignedFFBuffer;
+				out = m_pAlignedFFBuffer;
 			}
 
-			uint8_t*	dst[4]			= {NULL, NULL, NULL, NULL};
-			int			dstStride[4]	= {0, 0, 0, 0};
-			int			stride			= (swof.bpp >> 3) * outStride;
+			uint8_t*	dstArray[4]			= {NULL, NULL, NULL, NULL};
+			int			dstStrideArray[4]	= {0, 0, 0, 0};
+			int			byteStride			= outStride * swof.codedbytes;
 
-			dst[0] = outData;
-			dstStride[0] = stride;
+			dstArray[0] = out;
+			dstStrideArray[0] = byteStride;
 			for (int i = 1; i < swof.planes; ++i) {
-				dst[i] = dst[i-1] + (stride / swof.planeWidth[i-1]) * (m_pOutSize.cy / swof.planeHeight[i-1]);
-				dstStride[i] = stride / swof.planeWidth[i];
+				dstArray[i] = dstArray[i-1] + dstStrideArray[i-1] * (planeHeight / swof.planeWidth[i-1]);
+				dstStrideArray[i] = byteStride / swof.planeWidth[i];
 			}
 
 			if (m_PixFmtOut == PixFmt_YV12) {
-				std::swap(dst[1], dst[2]);
+				std::swap(dstArray[1], dstArray[2]);
 			}
 
-			int ret = sws_scale(m_pSwsContext, m_pFrame->data, m_pFrame->linesize, 0, m_pAVCtx->height, dst, dstStride);
+			int ret = sws_scale(m_pSwsContext, m_pFrame->data, m_pFrame->linesize, 0, m_pAVCtx->height, dstArray, dstStrideArray);
 
-			if (outData != pDataOut) {
-				ASSERT(0);
-				//if (m_PixFmtOut == PixFmt_YV12) {
-				//	std::swap(dst[1], dst[2]);
-				//}
-				//int rowsize = 0, height = 0;
-				//for (unsigned int i = 0; i < swof.planes; i++) {
-				//	rowsize	= (m_pOutSize.cx * swof.codedbytes) >> swof.shiftX[i];
-				//	height	= m_pAVCtx->height >> swof.shiftY[i];
-				//	copyPlane(pDataOut, rowsize, dst[i], (outStride * swof.codedbytes) >> swof.shiftX[i], rowsize, height, m_PixFmtOut == PixFmt_RGB32 && !m_bIsVMR7_YUV);
-				//	pDataOut += rowsize * height;
-				//}
+			if (out != pDataOut) {
+				int line = 0;
+				
+				// Copy first plane
+				const int widthBytes = m_pAVCtx->width * swof.codedbytes;
+				const int srcStrideBytes = outStride * swof.codedbytes;
+				const int dstStrideBytes = m_pOutSize.cx * swof.codedbytes;
+				for (line = 0; line < m_pAVCtx->height; ++line) {
+					memcpy(pDataOut, out, widthBytes);
+					out += srcStrideBytes;
+					pDataOut += dstStrideBytes;
+				}
+				pDataOut += (planeHeight - m_pAVCtx->height) * dstStrideBytes;
+				
+				for (int plane = 1; plane < swof.planes; ++plane) {
+					const int planeWidth        = widthBytes       / swof.planeWidth[plane];
+					const int activePlaneHeight = m_pAVCtx->height / swof.planeHeight[plane];
+					const int totalPlaneHeight  = planeHeight      / swof.planeHeight[plane];
+					const int srcPlaneStride    = srcStrideBytes   / swof.planeWidth[plane];
+					const int dstPlaneStride    = dstStrideBytes   / swof.planeWidth[plane];
+					for (line = 0; line < activePlaneHeight; ++line) {
+						memcpy(pDataOut, out, planeWidth);
+						out += srcPlaneStride;
+						pDataOut += dstPlaneStride;
+					}
+					pDataOut += (totalPlaneHeight - activePlaneHeight) * dstPlaneStride;
+				}
 			}
 		}
 
