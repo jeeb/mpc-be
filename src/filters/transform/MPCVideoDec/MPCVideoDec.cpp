@@ -2308,16 +2308,16 @@ void CMPCVideoDecFilter::InitSwscale()
 		}
 
 		if (m_nDialogHWND) {
-			if (IsColorTypeConversion()) {
-				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWPRESET), TRUE);
-				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWSTANDARD), TRUE);
-				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWINPUTLEVELS), TRUE);
-				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWOUTPUTLEVELS), TRUE);
-			} else {
+			if (IsColorTypeConversion() == 0) {
 				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWPRESET), FALSE);
 				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWSTANDARD), FALSE);
 				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWINPUTLEVELS), FALSE);
 				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWOUTPUTLEVELS), FALSE);
+			} else {
+				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWPRESET), TRUE);
+				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWSTANDARD), TRUE);
+				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWINPUTLEVELS), TRUE);
+				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWOUTPUTLEVELS), TRUE);
 			}
 		}
 	}
@@ -3485,21 +3485,21 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetSwOutputLevels()
 	return m_nSwOutputLevels;
 }
 
-STDMETHODIMP_(bool) CMPCVideoDecFilter::IsColorTypeConversion()
+STDMETHODIMP_(int) CMPCVideoDecFilter::IsColorTypeConversion()
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (m_AVPixFmtDec != AV_PIX_FMT_NONE && m_PixFmtOut != PixFmt_None) {
-		bool in_rgb = !!(av_pix_fmt_desc_get(m_AVPixFmtDec)->flags & AV_PIX_FMT_FLAG_RGB);
-		bool out_rgb = (m_PixFmtOut == PixFmt_RGB32);
-		if (in_rgb != out_rgb) {
-			// YUV->RGB or RGB->YUV conversion
-			return true;
-		}
-
+	if (m_AVPixFmtDec == AV_PIX_FMT_NONE && m_PixFmtOut == PixFmt_None) {
+		return -1; // no decoding or no conversion
+	}
+	
+	bool in_rgb = !!(av_pix_fmt_desc_get(m_AVPixFmtDec)->flags & AV_PIX_FMT_FLAG_RGB);
+	bool out_rgb = (m_PixFmtOut == PixFmt_RGB32);
+	if (in_rgb != out_rgb) {
+		return 1; // YUV->RGB or RGB->YUV conversion
 	}
 
-	return false;
+	return 0; // YUV->YUV or RGB->RGB conversion
 }
 
 STDMETHODIMP CMPCVideoDecFilter::SetDialogHWND(HWND nValue)

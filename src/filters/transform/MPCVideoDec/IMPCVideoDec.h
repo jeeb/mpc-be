@@ -131,7 +131,7 @@ public IUnknown {
 	STDMETHOD(SetSwOutputLevels(int nValue)) = 0;
 	STDMETHOD_(int, GetSwOutputLevels()) = 0;
 
-	STDMETHOD_(bool, IsColorTypeConversion()) = 0;
+	STDMETHOD_(int, IsColorTypeConversion()) = 0;
 	//
 
 	STDMETHOD(SetDialogHWND(HWND nValue)) = 0;
