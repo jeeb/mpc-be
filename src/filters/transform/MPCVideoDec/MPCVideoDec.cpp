@@ -1848,7 +1848,6 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 						&& av_pfdesc->log2_chroma_h == swof.chroma_h) {
 					nSwIndex[nSwCount++] = i;
 					inqueue[i] = false;
-					break;
 				}
 			}
 		}
