@@ -28,6 +28,7 @@
 #include "IMPCVideoDec.h"
 #include "MPCVideoDecSettingsWnd.h"
 #include "DXVADecoder.h"
+#include "FormatConverter.h"
 #include <atlpath.h>
 #include "../../../apps/mplayerc/FilterEnum.h"
 
@@ -40,7 +41,6 @@ struct AVCodec;
 struct AVCodecContext;
 struct AVCodecParserContext;
 struct AVFrame;
-struct SwsContext;
 
 class CCpuId;
 
@@ -90,9 +90,6 @@ protected:
 	int										m_nSwOutputLevels;
 	//
 
-	enum AVPixelFormat						m_AVPixFmtDec; // format after decoder
-	MPCPixelFormat							m_PixFmtOut; // format after converter
-
 	FF_FIELD_TYPE							m_nFrameType;
 
 	// === FFMpeg variables
@@ -119,8 +116,6 @@ protected:
 	int										m_nFFBufferSize;
 	BYTE*									m_pFFBuffer2;
 	int										m_nFFBufferSize2;
-	BYTE*									m_pAlignedFFBuffer;
-	int										m_nAlignedFFBufferSize;
 
 	REFERENCE_TIME							m_rtLastStop;			// rtStop for last delivered frame
 	double									m_dRate;
@@ -128,7 +123,7 @@ protected:
 
 	bool									m_bUseDXVA;
 	bool									m_bUseFFmpeg;
-	SwsContext*								m_pSwsContext;
+	CFormatConverter						m_FormatConverter;
 	CSize									m_pOutSize;				// Picture size on output pin
 
 	// === DXVA common variables
@@ -171,7 +166,6 @@ protected:
 	void				AllocExtradata(AVCodecContext* pAVCtx, const CMediaType* mt);
 	void				GetOutputFormats (int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats);
 	void				DetectVideoCard(HWND hWnd);
-	void				InitSwscale();
 	void				BuildOutputFormat();
 
 	HRESULT				SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);

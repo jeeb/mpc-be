@@ -926,7 +926,7 @@ BOOL FFGetAlternateScan(struct AVCodecContext* pAVCtx)
 	return (s != NULL) ? s->alternate_scan : 0;
 }
 
-void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int& width, int& height, enum AVPixelFormat& pix_fmt)
+void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int& width, int& height)
 {
 	switch (pAVCtx->codec_id) {
 	case AV_CODEC_ID_H264:
@@ -1023,8 +1023,6 @@ void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int&
 			pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P; // bad hack
 		}
 	}
-
-	pix_fmt = pAVCtx->pix_fmt;
 }
 
 #define CHECK_AVC_L52_SIZE(w, h) ((w) <= 4096 && (h) <= 4096 && (w) * (h) <= 36864 * 16 * 16)

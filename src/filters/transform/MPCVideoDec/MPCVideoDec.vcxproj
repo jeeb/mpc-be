@@ -255,6 +255,7 @@ update_version.bat</Command>
       <WarningLevel>Level1</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="FormatConverter.cpp" />
     <ClCompile Include="MPCVideoDec.cpp" />
     <ClCompile Include="MPCVideoDecSettingsWnd.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -269,6 +270,7 @@ update_version.bat</Command>
     <ClInclude Include="DXVADecoderMpeg2.h" />
     <ClInclude Include="DXVADecoderVC1.h" />
     <ClInclude Include="ffmpegContext.h" />
+    <ClInclude Include="FormatConverter.h" />
     <ClInclude Include="IMPCVideoDec.h" />
     <ClInclude Include="MPCVideoDec.h" />
     <ClInclude Include="MPCVideoDecSettingsWnd.h" />
