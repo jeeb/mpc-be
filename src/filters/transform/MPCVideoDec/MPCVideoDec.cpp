@@ -3271,7 +3271,7 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::IsColorTypeConversion()
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (m_pAVCtx->pix_fmt == AV_PIX_FMT_NONE && m_FormatConverter.GetOutPixFormat() == PixFmt_None) {
+	if (!m_pAVCtx || m_pAVCtx->pix_fmt == AV_PIX_FMT_NONE || m_FormatConverter.GetOutPixFormat() == PixFmt_None) {
 		return -1; // no decoding or no conversion
 	}
 	
