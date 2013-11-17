@@ -20,6 +20,7 @@
 
 #pragma once
 
+BOOL IsWinXP();
 BOOL IsWinXPOrLater();
 BOOL IsWinVista();
 BOOL IsWinVistaOrLater();

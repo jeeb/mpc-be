@@ -229,6 +229,7 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput)
 		m_pAVCtx->thread_count			= 1;
 		m_pAVCtx->thread_type			= 0;
 		m_pAVCtx->codec_id				= nCodecId;
+		m_pAVCtx->refcounted_frames		= 1;
 		if (m_pAVCodec->capabilities & CODEC_CAP_TRUNCATED) {
 			m_pAVCtx->flags				|= CODEC_FLAG_TRUNCATED;
 		}
@@ -277,7 +278,8 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput)
 		}
 
 		if (avcodec_open2(m_pAVCtx, m_pAVCodec, NULL) >= 0) {
-			m_pFrame = avcodec_alloc_frame();
+			m_pFrame = av_frame_alloc();
+			CheckPointer(m_pFrame, false);
 			bRet     = true;
 		}
 	}
@@ -333,6 +335,8 @@ HRESULT CFFAudioDecoder::Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, 
 			int ret2 = avcodec_decode_audio4(m_pAVCtx, m_pFrame, &got_frame, &avpkt);
 			if (ret2 < 0) {
 				TRACE(_T("FFAudioDecoder: decoding failed despite successfull parsing\n"));
+
+				av_frame_unref(m_pFrame);
 				return S_FALSE;
 			}
 		}
@@ -345,6 +349,8 @@ HRESULT CFFAudioDecoder::Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, 
 		if (used_bytes < 0) {
 			TRACE(_T("FFAudioDecoder: decoding failed\n"));
 			Init(nCodecId, NULL);
+
+			av_frame_unref(m_pFrame);
 			return E_FAIL;
 		} else if (used_bytes == 0 && !got_frame) {
 			TRACE(_T("FFAudioDecoder: could not process buffer while decoding\n"));
@@ -352,6 +358,8 @@ HRESULT CFFAudioDecoder::Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, 
 			// sometimes avcodec_decode_audio4 cannot identify the garbage and produces incorrect data.
 			// this code does not solve the problem, it only reduces the likelihood of crash.
 			// do it better!
+
+			av_frame_unref(m_pFrame);
 			return E_FAIL;
 		}
 		ASSERT(buffsize >= used_bytes);
@@ -384,6 +392,8 @@ HRESULT CFFAudioDecoder::Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, 
 				memcpy(BuffOut.GetData(), m_pFrame->data[0], BuffOut.GetCount());
 			}
 		}
+
+		av_frame_unref(m_pFrame);
 	}
 
 	return S_OK;
@@ -419,7 +429,7 @@ void CFFAudioDecoder::StreamFinish()
 	}
 
 	if (m_pFrame) {
-		av_freep(&m_pFrame);
+		av_frame_free(&m_pFrame);
 	}
 }
 

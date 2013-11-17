@@ -105,6 +105,8 @@ HRESULT CDXVADecoderMpeg2::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 		}
 
 		hr = DecodeFrameInternal(m_pMPEG2Buffer, m_nMPEG2PicEnd, rtStart, rtStop);
+		av_frame_unref(m_pFilter->GetFrame());
+
 		ShrinkBuffer();
 	}
 

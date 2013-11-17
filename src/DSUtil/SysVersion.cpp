@@ -36,6 +36,11 @@ WORD GetSysVersion()
 	return ver;
 }
 
+BOOL IsWinXP()
+{
+	return (GetSysVersion() == 0x0501);
+}
+
 BOOL IsWinXPOrLater()
 {
 	return (GetSysVersion() >= 0x0501);

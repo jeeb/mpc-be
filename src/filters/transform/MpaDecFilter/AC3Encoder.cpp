@@ -65,7 +65,7 @@ bool CAC3Encoder::Init(int sample_rate, DWORD channel_layout)
 		return false;
 	}
 
-	m_pFrame = avcodec_alloc_frame();
+	m_pFrame = av_frame_alloc();
 	if (!m_pFrame) {
 		TRACE(_T("FFAudioEncoder: avcodec_alloc_frame failed\n"));
 		return false;
@@ -122,6 +122,7 @@ HRESULT CAC3Encoder::Encode(CAtlArray<float>& BuffIn, CAtlArray<BYTE>& BuffOut)
 
 	ret = avcodec_encode_audio2(m_pAVCtx, &avpkt, m_pFrame, &got_packet);
 	if (ret < 0) {
+		av_frame_unref(m_pFrame);
 		return E_FAIL;
 	}
 	if (got_packet) {
@@ -136,6 +137,8 @@ HRESULT CAC3Encoder::Encode(CAtlArray<float>& BuffIn, CAtlArray<BYTE>& BuffOut)
 
 	memmove(pIn, (BYTE*)pIn + m_framesize, new_size);
 	BuffIn.SetCount(new_count);
+
+	av_frame_unref(m_pFrame);
 
 	return S_OK;
 }
@@ -160,7 +163,7 @@ void CAC3Encoder::StreamFinish()
 	}
 
 	if (m_pFrame) {
-		av_freep(&m_pFrame);
+		av_frame_free(&m_pFrame);
 	}
 
 	av_free(m_pSamples);
