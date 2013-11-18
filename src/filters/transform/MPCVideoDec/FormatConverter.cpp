@@ -190,16 +190,6 @@ bool CFormatConverter::Init()
 	return true;
 }
 
-void CFormatConverter::UpdateInput(enum AVPixelFormat in_avpixfmt, int width, int height)
-{
-	if (in_avpixfmt != m_in_avpixfmt || width != m_width || height != m_height) {
-		m_in_avpixfmt	= in_avpixfmt;
-		m_width			= width;
-		m_height		= height;
-		m_ActualContext	= 2;
-	}
-}
-
 void CFormatConverter::UpdateOutput(MPCPixelFormat out_pixfmt, int dstStride, int planeHeight)
 {
 	if (out_pixfmt != m_out_pixfmt) {
@@ -265,6 +255,13 @@ void CFormatConverter::SetOptions(int preset, int standard, int in_levels, int o
 
 int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 {
+	if (pFrame->format != m_in_avpixfmt || pFrame->width != m_width || pFrame->height != m_height) {
+		m_in_avpixfmt	= (AVPixelFormat)pFrame->format;
+		m_width			= pFrame->width;
+		m_height		= pFrame->height;
+		m_ActualContext	= 2;
+	}
+
 	if ((!m_pSwsContext || m_ActualContext) && !Init()) {
 		TRACE(_T("FormatConverter: Init() failed\n"));
 		return 0;

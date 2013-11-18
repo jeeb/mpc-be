@@ -82,7 +82,6 @@ public:
 
 	void Init(CMPCVideoDecFilter* pFilter);
 
-	void UpdateInput(enum AVPixelFormat in_avpixfmt, int width, int height);
 	void UpdateOutput(MPCPixelFormat out_pixfmt, int dstStride, int planeHeight);
 	void UpdateOutput2(DWORD biCompression, LONG biWidth, LONG biHeight);
 	void SetOptions(int preset, int standard, int in_levels, int out_levels);
