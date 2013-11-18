@@ -70,7 +70,7 @@ bool CMPCVideoDecSettingsWnd::OnConnect(const CInterfaceList<IUnknown, &IID_IUnk
 void CMPCVideoDecSettingsWnd::OnDisconnect()
 {
 	if (m_pMDF) {
-		m_pMDF->SetDialogHWND(0);
+		m_pMDF->SetDialogHWND(NULL);
 	}
 
 	m_pMDF.Release();
@@ -84,7 +84,6 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	const int h25 = IPP_SCALE(25);
 	DWORD dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP;
 	CPoint p(10, 10);
-	GUID* DxvaGui = NULL;
 
 	m_grpFFMpeg.Create(ResStr(IDS_VDF_SETTINGS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(350), h20 + h25 * 3 + h20)), this, (UINT)IDC_STATIC);
 	p.y += h20;
@@ -153,13 +152,12 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_edtVideoCardDescription.Create(ES_MULTILINE | WS_CHILD | WS_VISIBLE | WS_DISABLED, CRect(p + CPoint(IPP_SCALE(120), 0), CSize(IPP_SCALE(220), m_fontheight * 2)), this, 0);
 	m_edtVideoCardDescription.SetWindowText (m_pMDF->GetVideoCardDescription());
 
-	DxvaGui = m_pMDF->GetDXVADecoderGuid();
-	if (DxvaGui != NULL) {
-		CString DXVAMode = GetDXVAMode (DxvaGui);
-		m_edtDXVAMode.SetWindowText (DXVAMode);
+	GUID* DxvaGuid = m_pMDF->GetDXVADecoderGuid();
+	if (DxvaGuid != NULL) {
+		m_edtDXVAMode.SetWindowText(GetDXVAMode(DxvaGuid));
 	} else {
-		m_txtDXVAMode.ShowWindow (SW_HIDE);
-		m_edtDXVAMode.ShowWindow (SW_HIDE);
+		m_txtDXVAMode.ShowWindow(SW_HIDE);
+		m_edtDXVAMode.ShowWindow(SW_HIDE);
 	}
 
 	// === New swscaler options
@@ -329,12 +327,10 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 		*/
 		
 
-		m_pMDF->SetSwRefresh(refresh);
-
 		if (refresh >= 2) {
-			m_pMDF->SetSwPixelFormat(PixFmt_NV12 , m_cbNV12.GetCheck() == BST_CHECKED);
-			m_pMDF->SetSwPixelFormat(PixFmt_YV12 , m_cbYV12.GetCheck() == BST_CHECKED);
-			m_pMDF->SetSwPixelFormat(PixFmt_YUY2 , m_cbYUY2.GetCheck() == BST_CHECKED);
+			m_pMDF->SetSwPixelFormat(PixFmt_NV12 , m_cbNV12.GetCheck()  == BST_CHECKED);
+			m_pMDF->SetSwPixelFormat(PixFmt_YV12 , m_cbYV12.GetCheck()  == BST_CHECKED);
+			m_pMDF->SetSwPixelFormat(PixFmt_YUY2 , m_cbYUY2.GetCheck()  == BST_CHECKED);
 			m_pMDF->SetSwPixelFormat(PixFmt_RGB32, m_cbRGB32.GetCheck() == BST_CHECKED);
 		}
 
@@ -344,7 +340,8 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 			m_pMDF->SetSwInputLevels(m_cbSwInputLevels.GetCurSel());
 			m_pMDF->SetSwOutputLevels(m_cbSwOutputLevels.GetCurSel());
 		}
-		//
+		
+		m_pMDF->SetSwRefresh(refresh);
 
 		m_pMDF->Apply();
 	}

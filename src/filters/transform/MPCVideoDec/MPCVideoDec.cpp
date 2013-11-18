@@ -1723,6 +1723,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		}
 	}
 
+	av_frame_unref(m_pFrame);
+
 	BuildOutputFormat();
 
 	if (bReinit) {
@@ -2422,19 +2424,19 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 		m_FormatConverter.UpdateOutput2(bihOut.biCompression, bihOut.biWidth, bihOut.biHeight);
 		m_FormatConverter.Converting(pDataOut, m_pFrame);
 
-		//if (m_nDialogHWND) {
-		//	if (IsColorTypeConversion() == 0) {
-		//		EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWPRESET), FALSE);
-		//		EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWSTANDARD), FALSE);
-		//		EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWINPUTLEVELS), FALSE);
-		//		EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWOUTPUTLEVELS), FALSE);
-		//	} else {
-		//		EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWPRESET), TRUE);
-		//		EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWSTANDARD), TRUE);
-		//		EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWINPUTLEVELS), TRUE);
-		//		EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWOUTPUTLEVELS), TRUE);
-		//	}
-		//}
+		if (m_nDialogHWND) {
+			if (IsColorTypeConversion() == 0) {
+				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWPRESET),		FALSE);
+				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWSTANDARD),		FALSE);
+				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWINPUTLEVELS),	FALSE);
+				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWOUTPUTLEVELS),	FALSE);
+			} else {
+				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWPRESET),		TRUE);
+				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWSTANDARD),		TRUE);
+				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWINPUTLEVELS),	TRUE);
+				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWOUTPUTLEVELS),	TRUE);
+			}
+		}
 
 #if defined(_DEBUG) && 0
 		static REFERENCE_TIME	rtLast = 0;
@@ -3205,6 +3207,10 @@ STDMETHODIMP CMPCVideoDecFilter::SetSwRefresh(int nValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
 	m_nSwRefresh = nValue;
+
+	if (m_nSwRefresh && m_pAVCtx && m_nDecoderMode == MODE_SOFTWARE) {
+		ReconnectRenderer();
+	}
 	return S_OK;
 }
 
@@ -3282,7 +3288,15 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::IsColorTypeConversion()
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (!m_pAVCtx || m_pAVCtx->pix_fmt == AV_PIX_FMT_NONE || m_FormatConverter.GetOutPixFormat() == PixFmt_None) {
+	if (!m_pAVCtx) {
+		return -1; // no decoding or no conversion
+	}
+
+	if (m_nDecoderMode != MODE_SOFTWARE) {
+		return 0;
+	}
+
+	if (m_pAVCtx->pix_fmt == AV_PIX_FMT_NONE || m_FormatConverter.GetOutPixFormat() == PixFmt_None) {
 		return -1; // no decoding or no conversion
 	}
 	
