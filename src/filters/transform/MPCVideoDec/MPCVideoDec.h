@@ -314,6 +314,7 @@ public:
 	// === EVR functions
 	HRESULT						DetectVideoCard_EVR(IPin *pPin);
 
+	HWND						GetDialogHWND() { return m_nDialogHWND; }
 private:
 
 	friend class CVideoDecDXVAAllocator;

@@ -47,6 +47,8 @@ const SW_OUT_FMT* GetSWOF(int pixfmt);
 struct AVFrame;
 struct SwsContext;
 
+class CMPCVideoDecFilter;
+
 class CFormatConverter
 {
 protected:
@@ -70,11 +72,15 @@ protected:
 	size_t				m_nAlignedBufferSize;
 	uint8_t*			m_pAlignedBuffer;
 
+	CMPCVideoDecFilter*	m_pFilter;
+
 	bool Init();
 
 public:
 	CFormatConverter();
 	~CFormatConverter();
+
+	void Init(CMPCVideoDecFilter* pFilter);
 
 	void UpdateInput(enum AVPixelFormat in_avpixfmt, int width, int height);
 	void UpdateOutput(MPCPixelFormat out_pixfmt, int dstStride, int planeHeight);

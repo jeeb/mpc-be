@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "FormatConverter.h"
+#include "MPCVideoDec.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4005)
@@ -111,6 +112,11 @@ CFormatConverter::~CFormatConverter()
 	Cleanup();
 }
 
+void CFormatConverter::Init(CMPCVideoDecFilter* pFilter)
+{
+	m_pFilter = pFilter;
+}
+
 bool CFormatConverter::Init()
 {
 	if (!m_pSwsContext || m_ActualContext == 2) {
@@ -145,6 +151,22 @@ bool CFormatConverter::Init()
 		int ret = sws_getColorspaceDetails(m_pSwsContext, &inv_tbl, &srcRange, &tbl, &dstRange, &brightness, &contrast, &saturation);
 		if (ret >= 0) {
 			ret = sws_setColorspaceDetails(m_pSwsContext, sws_getCoefficients(m_colorspace), m_srcRange, tbl, m_dstRange, brightness, contrast, saturation);
+		}
+
+		if (m_pFilter && m_pFilter->GetDialogHWND()) {
+			HWND hwnd = m_pFilter->GetDialogHWND();
+
+			if (m_pFilter->IsColorTypeConversion() == 0) {
+				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWPRESET),       FALSE);
+				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWSTANDARD),     FALSE);
+				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWINPUTLEVELS),  FALSE);
+				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWOUTPUTLEVELS), FALSE);
+			} else {
+				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWPRESET),       TRUE);
+				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWSTANDARD),     TRUE);
+				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWINPUTLEVELS),  TRUE);
+				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWOUTPUTLEVELS), TRUE);
+			}
 		}
 	}
 

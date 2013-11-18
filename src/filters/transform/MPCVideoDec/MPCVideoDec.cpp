@@ -887,13 +887,15 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	memset(&m_DXVAFilters, false, sizeof(m_DXVAFilters));
 	memset(&m_FFmpegFilters, false, sizeof(m_FFmpegFilters));
 	
-	m_pCpuId				= DNew CCpuId();
+	m_pCpuId = DNew CCpuId();
 
 	// default settings
 	m_fPixFmts[PixFmt_NV12]  = true;
 	m_fPixFmts[PixFmt_YV12]  = true;
 	m_fPixFmts[PixFmt_YUY2]  = true;
 	m_fPixFmts[PixFmt_RGB32] = true;
+
+	m_FormatConverter.Init(this);
 
 #ifdef REGISTER_FILTER
 	CRegKey key;
@@ -2423,20 +2425,6 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 		ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
 		m_FormatConverter.UpdateOutput2(bihOut.biCompression, bihOut.biWidth, bihOut.biHeight);
 		m_FormatConverter.Converting(pDataOut, m_pFrame);
-
-		if (m_nDialogHWND) {
-			if (IsColorTypeConversion() == 0) {
-				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWPRESET),		FALSE);
-				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWSTANDARD),		FALSE);
-				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWINPUTLEVELS),	FALSE);
-				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWOUTPUTLEVELS),	FALSE);
-			} else {
-				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWPRESET),		TRUE);
-				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWSTANDARD),		TRUE);
-				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWINPUTLEVELS),	TRUE);
-				EnableWindow(GetDlgItem(m_nDialogHWND, IDC_PP_SWOUTPUTLEVELS),	TRUE);
-			}
-		}
 
 #if defined(_DEBUG) && 0
 		static REFERENCE_TIME	rtLast = 0;
