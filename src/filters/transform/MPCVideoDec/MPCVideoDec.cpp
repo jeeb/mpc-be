@@ -2333,7 +2333,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 					avpkt.size	= 0;
 				}
 
-				int ret2 = avcodec_decode_video2 (m_pAVCtx, m_pFrame, &got_picture, &avpkt);
+				int ret2 = avcodec_decode_video2(m_pAVCtx, m_pFrame, &got_picture, &avpkt);
 				if (ret2 < 0) {
 					TRACE(_T("CMPCVideoDecFilter::SoftwareDecode() - decoding failed despite successfull parsing\n"));
 					got_picture = 0;
@@ -2342,7 +2342,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 				got_picture = 0;
 			}
 		} else {
-			used_bytes = avcodec_decode_video2 (m_pAVCtx, m_pFrame, &got_picture, &avpkt);
+			used_bytes = avcodec_decode_video2(m_pAVCtx, m_pFrame, &got_picture, &avpkt);
 		}
 
 		if (used_bytes < 0) {

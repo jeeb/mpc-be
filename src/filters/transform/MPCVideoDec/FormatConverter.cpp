@@ -117,6 +117,26 @@ void CFormatConverter::Init(CMPCVideoDecFilter* pFilter)
 	m_pFilter = pFilter;
 }
 
+static inline enum AVPixelFormat GetFmt(enum AVPixelFormat pix_fmt)
+{
+	switch (pix_fmt) {
+		case AV_PIX_FMT_YUV420P :
+		case AV_PIX_FMT_YUVJ420P:
+			return AV_PIX_FMT_YUV420P;
+		case AV_PIX_FMT_YUV422P :
+		case AV_PIX_FMT_YUVJ422P:
+			return AV_PIX_FMT_YUV422P;
+		case AV_PIX_FMT_YUV440P :
+		case AV_PIX_FMT_YUVJ440P:
+			return AV_PIX_FMT_YUV440P;
+		case AV_PIX_FMT_YUV444P :
+		case AV_PIX_FMT_YUVJ444P:
+			return AV_PIX_FMT_YUV444P;
+		default:
+			return pix_fmt;
+	}
+}
+
 bool CFormatConverter::Init()
 {
 	if (!m_pSwsContext || m_ActualContext == 2) {
@@ -128,7 +148,7 @@ bool CFormatConverter::Init()
 							NULL,
 							m_width,
 							m_height,
-							m_in_avpixfmt,
+							GetFmt(m_in_avpixfmt),
 							m_width,
 							m_height,
 							swof.av_pix_fmt,
