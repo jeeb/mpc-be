@@ -86,7 +86,6 @@ protected:
 	bool									m_fPixFmts[PixFmt_count];
 	int										m_nSwPreset;
 	int										m_nSwStandard;
-	int										m_nSwInputLevels;
 	int										m_nSwOutputLevels;
 	//
 
@@ -243,8 +242,6 @@ public:
 	STDMETHODIMP_(int) GetSwPreset();
 	STDMETHODIMP SetSwStandard(int nValue);
 	STDMETHODIMP_(int) GetSwStandard();
-	STDMETHODIMP SetSwInputLevels(int nValue);
-	STDMETHODIMP_(int) GetSwInputLevels();
 	STDMETHODIMP SetSwOutputLevels(int nValue);
 	STDMETHODIMP_(int) GetSwOutputLevels();
 

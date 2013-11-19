@@ -125,9 +125,6 @@ public IUnknown {
 	STDMETHOD(SetSwStandard(int nValue)) = 0;
 	STDMETHOD_(int, GetSwStandard()) = 0;
 
-	STDMETHOD(SetSwInputLevels(int nValue)) = 0;
-	STDMETHOD_(int, GetSwInputLevels()) = 0;
-
 	STDMETHOD(SetSwOutputLevels(int nValue)) = 0;
 	STDMETHOD_(int, GetSwOutputLevels()) = 0;
 

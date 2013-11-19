@@ -42,7 +42,6 @@ enum {
 	IDC_PP_SW_RGB32,
 	IDC_PP_SWPRESET,
 	IDC_PP_SWSTANDARD,
-	IDC_PP_SWINPUTLEVELS,
 	IDC_PP_SWOUTPUTLEVELS,
 	IDC_PP_DEINTERLACING
 };
@@ -92,9 +91,6 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 
 	CStatic     m_txtSwStandard;
 	CComboBox   m_cbSwStandard;
-
-	CStatic     m_txtSwInputLevels;
-	CComboBox   m_cbSwInputLevels;
 
 	CStatic     m_txtSwOutputLevels;
 	CComboBox   m_cbSwOutputLevels;

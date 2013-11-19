@@ -97,7 +97,6 @@ CFormatConverter::CFormatConverter()
 	, m_out_pixfmt(PixFmt_None)
 	, m_swsFlags(SWS_BILINEAR | SWS_ACCURATE_RND | SWS_FULL_CHR_H_INP)
 	, m_colorspace(SWS_CS_DEFAULT)
-	, m_srcRange(0)
 	, m_dstRange(0)
 	, m_dstStride(0)
 	, m_planeHeight(0)
@@ -166,7 +165,7 @@ bool CFormatConverter::Init()
 		int srcRange, dstRange, brightness, contrast, saturation;
 		int ret = sws_getColorspaceDetails(m_pSwsContext, &inv_tbl, &srcRange, &tbl, &dstRange, &brightness, &contrast, &saturation);
 		if (ret >= 0) {
-			ret = sws_setColorspaceDetails(m_pSwsContext, sws_getCoefficients(m_colorspace), m_srcRange, tbl, m_dstRange, brightness, contrast, saturation);
+			ret = sws_setColorspaceDetails(m_pSwsContext, sws_getCoefficients(m_colorspace), srcRange, tbl, m_dstRange, brightness, contrast, saturation);
 		}
 
 		if (m_pFilter && m_pFilter->GetDialogHWND()) {
@@ -175,12 +174,10 @@ bool CFormatConverter::Init()
 			if (m_pFilter->IsColorTypeConversion() == 0) {
 				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWPRESET),       FALSE);
 				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWSTANDARD),     FALSE);
-				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWINPUTLEVELS),  FALSE);
 				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWOUTPUTLEVELS), FALSE);
 			} else {
 				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWPRESET),       TRUE);
 				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWSTANDARD),     TRUE);
-				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWINPUTLEVELS),  TRUE);
 				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWOUTPUTLEVELS), TRUE);
 			}
 		}
@@ -206,7 +203,7 @@ void CFormatConverter::UpdateOutput2(DWORD biCompression, LONG biWidth, LONG biH
 	UpdateOutput(GetPixFormat(biCompression), biWidth, abs(biHeight));
 }
 
-void CFormatConverter::SetOptions(int preset, int standard, int in_levels, int out_levels)
+void CFormatConverter::SetOptions(int preset, int standard, int out_levels)
 {
 	switch (standard) {
 	case 0  : // SD(BT.601)
@@ -222,7 +219,6 @@ void CFormatConverter::SetOptions(int preset, int standard, int in_levels, int o
 		m_colorspace = SWS_CS_DEFAULT;
 	}
 
-	m_srcRange = in_levels  > 1 ? 0 : in_levels;
 	m_dstRange = out_levels > 1 ? 0 : out_levels;
 
 	if (m_ActualContext == 0) {

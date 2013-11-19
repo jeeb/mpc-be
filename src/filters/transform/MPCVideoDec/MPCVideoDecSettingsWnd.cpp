@@ -203,14 +203,6 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbSwStandard.AddString(ResStr(IDS_VDF_AUTO));
 	p.y += h25;
 
-	// Input levels
-	m_txtSwInputLevels.Create(ResStr(IDS_VDF_COLOR_INPUT_LEVELS), WS_VISIBLE|WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbSwInputLevels.Create(dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p + CSize(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_SWINPUTLEVELS);
-	m_cbSwInputLevels.AddString(_T("TV (16-235)"));
-	m_cbSwInputLevels.AddString(_T("PC (0-255)"));
-	m_cbSwInputLevels.AddString(ResStr(IDS_VDF_AUTO));
-	p.y += h25;
-
 	// Output levels
 	m_txtSwOutputLevels.Create(ResStr(IDS_VDF_COLOR_OUTPUT_LEVELS), WS_VISIBLE|WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
 	m_cbSwOutputLevels.Create(dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p + CSize(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_SWOUTPUTLEVELS);
@@ -252,18 +244,15 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 		m_cbSwPreset.SetCurSel(m_pMDF->GetSwPreset());
 		m_cbSwStandard.SetCurSel(m_pMDF->GetSwStandard());
-		m_cbSwInputLevels.SetCurSel(m_pMDF->GetSwInputLevels());
 		m_cbSwOutputLevels.SetCurSel(m_pMDF->GetSwOutputLevels());
 
 		if (m_pMDF->IsColorTypeConversion() == 0) {
 			m_cbSwPreset.EnableWindow(FALSE);
 			m_cbSwStandard.EnableWindow(FALSE);
-			m_cbSwInputLevels.EnableWindow(FALSE);
 			m_cbSwOutputLevels.EnableWindow(FALSE);
 		} else {
 			m_cbSwPreset.EnableWindow(TRUE);
 			m_cbSwStandard.EnableWindow(TRUE);
-			m_cbSwInputLevels.EnableWindow(TRUE);
 			m_cbSwOutputLevels.EnableWindow(TRUE);
 		}
 		//
@@ -303,7 +292,6 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 
 		if (m_cbSwPreset.GetCurSel() != m_pMDF->GetSwPreset()
 				|| m_cbSwStandard.GetCurSel() != m_pMDF->GetSwStandard()
-				|| m_cbSwInputLevels.GetCurSel() != m_pMDF->GetSwInputLevels()
 				|| m_cbSwOutputLevels.GetCurSel() != m_pMDF->GetSwOutputLevels()) {
 			refresh = 1; // soft refresh - signal new swscaler colorspace details
 		}
@@ -337,7 +325,6 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 		if (refresh >= 1) {
 			m_pMDF->SetSwPreset(m_cbSwPreset.GetCurSel());
 			m_pMDF->SetSwStandard(m_cbSwStandard.GetCurSel());
-			m_pMDF->SetSwInputLevels(m_cbSwInputLevels.GetCurSel());
 			m_pMDF->SetSwOutputLevels(m_cbSwOutputLevels.GetCurSel());
 		}
 		
