@@ -35,8 +35,7 @@
 #define IDS_VDF_COLOR_OUTPUT_FORMATS    7431
 #define IDS_VDF_COLOR_PRESET            7432
 #define IDS_VDF_COLOR_STANDARD          7433
-#define IDS_VDF_COLOR_INPUT_LEVELS      7434
-#define IDS_VDF_COLOR_OUTPUT_LEVELS     7435
+#define IDS_VDF_COLOR_RGB_LEVELS        7435
 
 // Next default values for new objects
 // 

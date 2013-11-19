@@ -162,7 +162,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 	// === New swscaler options
 	p = CPoint(5 + IPP_SCALE(350) + 10, 10);
-	int width_s = IPP_SCALE(180);
+	int width_s = IPP_SCALE(205);
 	int btn_w   = m_fontheight + 12;
 	int btn_h   = m_fontheight + 4;
 	int combo_w = IPP_SCALE(85);
@@ -204,7 +204,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	p.y += h25;
 
 	// Output levels
-	m_txtSwOutputLevels.Create(ResStr(IDS_VDF_COLOR_OUTPUT_LEVELS), WS_VISIBLE|WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
+	m_txtSwOutputLevels.Create(ResStr(IDS_VDF_COLOR_RGB_LEVELS), WS_VISIBLE|WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
 	m_cbSwOutputLevels.Create(dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p + CSize(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_SWOUTPUTLEVELS);
 	m_cbSwOutputLevels.AddString(_T("TV (16-235)"));
 	m_cbSwOutputLevels.AddString(_T("PC (0-255)"));
