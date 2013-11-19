@@ -903,7 +903,7 @@ void CAppSettings::LoadSettings()
 	}
 
 	// Set interface language first!
-	CString langcode = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LANGUAGE, _T(""));
+	CString langcode = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LANGUAGE);
 	iLanguage = CMPlayerCApp::GetLanguageIndex(langcode);
 	if (iLanguage < 0) {
 		iLanguage = CMPlayerCApp::GetDefLanguage();
@@ -936,16 +936,16 @@ void CAppSettings::LoadSettings()
 
 	UpdateRenderersData(false);
 
-	strAudioRendererDisplayName			= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIORENDERERTYPE, L"");
-	strSecondAudioRendererDisplayName	= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SECONDAUDIORENDERER, L"");
+	strAudioRendererDisplayName			= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIORENDERERTYPE);
+	strSecondAudioRendererDisplayName	= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SECONDAUDIORENDERER);
 	fDualAudioOutput					= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DUALAUDIOOUTPUT, FALSE);
 
 	fAutoloadAudio = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUTOLOADAUDIO, TRUE);
 	strAudioPaths = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOPATHS, DEFAULT_AUDIO_PATHS);
 	fAutoloadSubtitles = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUTOLOADSUBTITLES, !CMPlayerCApp::IsVSFilterInstalled() || (IsWinVistaOrLater() && CMPlayerCApp::HasEVR()) );
 
-	strSubtitlesLanguageOrder		= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SUBTITLESLANGORDER, _T(""));
-	strAudiosLanguageOrder			= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOSLANGORDER, _T(""));
+	strSubtitlesLanguageOrder		= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SUBTITLESLANGORDER);
+	strAudiosLanguageOrder			= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOSLANGORDER);
 	fUseInternalSelectTrackLogic	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_INTERNALSELECTTRACKLOGIC, TRUE);
 
 	fBlockVSFilter = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_BLOCKVSFILTER, TRUE);
@@ -968,9 +968,9 @@ void CAppSettings::LoadSettings()
 	nShowBarsWhenFullScreenTimeOut = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLSTIMEOUT, 0);
 
 	//Multi-monitor code
-	strFullScreenMonitor = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITOR, _T(""));
+	strFullScreenMonitor = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITOR);
 	// DeviceID
-	strFullScreenMonitorID = pApp->GetProfileString(IDS_R_SETTINGS, _T("FullScreenMonitorID"), _T(""));
+	strFullScreenMonitorID = pApp->GetProfileString(IDS_R_SETTINGS, _T("FullScreenMonitorID"));
 
 	// Prevent Minimize when in Fullscreen mode on non default monitor
 	fPreventMinimize = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_PREVENT_MINIMIZE, 0);
@@ -1015,7 +1015,7 @@ void CAppSettings::LoadSettings()
 	fRestoreResAfterExit = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_RESTORERESAFTEREXIT, 1);
 	fRememberWindowPos = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_REMEMBERWINDOWPOS, 0);
 	fRememberWindowSize = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_REMEMBERWINDOWSIZE, 0);
-	CString str = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_PANSCANZOOM, _T(""));
+	CString str = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_PANSCANZOOM);
 	if ( _stscanf_s(str, _T("%f,%f"), &dZoomX, &dZoomY) == 2 &&
 			dZoomX >=0.196 && dZoomX <=3.06 && // 0.196 = 0.2 / 1.02
 			dZoomY >=0.196 && dZoomY <=3.06) { // 3.06 = 3 * 1.02
@@ -1047,7 +1047,7 @@ void CAppSettings::LoadSettings()
 	bFavRememberPos = !!pApp->GetProfileInt(IDS_R_FAVORITES, IDS_RS_FAV_REMEMBERPOS, TRUE);
 	bFavRelativeDrive = !!pApp->GetProfileInt(IDS_R_FAVORITES, IDS_RS_FAV_RELATIVEDRIVE, FALSE);
 
-	strDVDPath = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_DVDPATH, _T(""));
+	strDVDPath = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_DVDPATH);
 	fUseDVDPath = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_USEDVDPATH, 0);
 	
 	LANGID langID = GetUserDefaultUILanguage();
@@ -1058,7 +1058,7 @@ void CAppSettings::LoadSettings()
 	fClosedCaptions = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CLOSEDCAPTIONS, 0);
 	// TODO: rename subdefstyle -> defStyle, IDS_RS_SPLOGFONT -> IDS_RS_SPSTYLE
 	{
-		CString temp = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SPLOGFONT, _T(""));
+		CString temp = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SPLOGFONT);
 		subdefstyle <<= temp;
 		if (temp.IsEmpty()) {
 			subdefstyle.relativeTo = 1;    //default "Position subtitles relative to the video frame" option is checked
@@ -1133,9 +1133,9 @@ void CAppSettings::LoadSettings()
 			UINT j = pApp->GetProfileInt(key, _T("SourceType"), -1);
 			if (j == 0) {
 				f->type = FilterOverride::REGISTERED;
-				f->dispname = CStringW(pApp->GetProfileString(key, _T("DisplayName"), _T("")));
+				f->dispname = CStringW(pApp->GetProfileString(key, _T("DisplayName")));
 				f->name = pApp->GetProfileString(key, _T("Name"), _T(""));
-				f->clsid = GUIDFromCString(pApp->GetProfileString(key, _T("CLSID"), _T("")));
+				f->clsid = GUIDFromCString(pApp->GetProfileString(key, _T("CLSID")));
 				if (f->clsid == CLSID_NULL) {
 					CComPtr<IBaseFilter> pBF;
 					CStringW FriendlyName;
@@ -1146,9 +1146,9 @@ void CAppSettings::LoadSettings()
 				}
 			} else if (j == 1) {
 				f->type = FilterOverride::EXTERNAL;
-				f->path = pApp->GetProfileString(key, _T("Path"), _T(""));
-				f->name = pApp->GetProfileString(key, _T("Name"), _T(""));
-				f->clsid = GUIDFromCString(pApp->GetProfileString(key, _T("CLSID"), _T("")));
+				f->path = pApp->GetProfileString(key, _T("Path"));
+				f->name = pApp->GetProfileString(key, _T("Name"));
+				f->clsid = GUIDFromCString(pApp->GetProfileString(key, _T("CLSID")));
 			} else {
 				pApp->WriteProfileString(key, NULL, 0);
 				break;
@@ -1158,7 +1158,7 @@ void CAppSettings::LoadSettings()
 			for (unsigned int i = 0; ; i++) {
 				CString val;
 				val.Format(_T("org%04u"), i);
-				CString guid = pApp->GetProfileString(key, val, _T(""));
+				CString guid = pApp->GetProfileString(key, val);
 				if (guid.IsEmpty()) {
 					break;
 				}
@@ -1169,7 +1169,7 @@ void CAppSettings::LoadSettings()
 			for (unsigned int i = 0; ; i++) {
 				CString val;
 				val.Format(_T("mod%04u"), i);
-				CString guid = pApp->GetProfileString(key, val, _T(""));
+				CString guid = pApp->GetProfileString(key, val);
 				if (guid.IsEmpty()) {
 					break;
 				}
@@ -1197,7 +1197,7 @@ void CAppSettings::LoadSettings()
 	for (int i = 0; i < (ID_PANNSCAN_PRESETS_END - ID_PANNSCAN_PRESETS_START); i++) {
 		CString str;
 		str.Format(_T("Preset%d"), i);
-		str = pApp->GetProfileString(IDS_R_SETTINGS _T("\\") IDS_RS_PNSPRESETS, str, _T(""));
+		str = pApp->GetProfileString(IDS_R_SETTINGS _T("\\") IDS_RS_PNSPRESETS, str);
 		if (str.IsEmpty()) {
 			break;
 		}
@@ -1223,7 +1223,7 @@ void CAppSettings::LoadSettings()
 	for (int i = 0; i < wmcmds.GetCount(); i++) {
 		CString str;
 		str.Format(_T("CommandMod%d"), i);
-		str = pApp->GetProfileString(IDS_R_COMMANDS, str, _T(""));
+		str = pApp->GetProfileString(IDS_R_COMMANDS, str);
 		if (str.IsEmpty()) {
 			break;
 		}
@@ -1306,7 +1306,7 @@ void CAppSettings::LoadSettings()
 		FFmpegFilters[f] = !!pApp->GetProfileInt(IDS_R_INTERNAL_FILTERS, FFMFiltersKeys[f], 1);
 	}
 
-	strLogoFileName = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LOGOFILE, _T(""));
+	strLogoFileName = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LOGOFILE);
 	nLogoId = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LOGOID, DEF_LOGO);
 	fLogoExternal = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LOGOEXT, 0);
 
@@ -1324,7 +1324,7 @@ void CAppSettings::LoadSettings()
 	fWebServerLocalhostOnly = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERLOCALHOSTONLY, FALSE);
 	strWebRoot = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_WEBROOT, _T("*./webroot"));
 	strWebDefIndex = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_WEBDEFINDEX, _T("index.html;index.php"));
-	strWebServerCGI = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_WEBSERVERCGI, _T(""));
+	strWebServerCGI = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_WEBSERVERCGI);
 
 	CString MyPictures;
 
@@ -1363,8 +1363,8 @@ void CAppSettings::LoadSettings()
 	iHue			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_HUE, 0);
 	iSaturation		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_SATURATION, 0);
 
-	strShaderList				= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SHADERLIST, _T(""));
-	strShaderListScreenSpace	= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SHADERLISTSCREENSPACE, _T(""));
+	strShaderList				= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SHADERLIST);
+	strShaderListScreenSpace	= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SHADERLISTSCREENSPACE);
 	fToggleShader				= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TOGGLESHADER, 0);
 	fToggleShaderScreenSpace	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TOGGLESHADERSSCREENSPACE, 0);
 
@@ -1388,10 +1388,10 @@ void CAppSettings::LoadSettings()
 	strAnalogAudio			= pApp->GetProfileString(IDS_R_CAPTURE, IDS_RS_AUDIO_DISP_NAME, _T("dummy"));
 	iAnalogCountry			= pApp->GetProfileInt(IDS_R_CAPTURE, IDS_RS_COUNTRY, 1);
 
-	strBDANetworkProvider	= pApp->GetProfileString(IDS_R_DVB, IDS_RS_BDA_NETWORKPROVIDER, _T(""));
-	strBDATuner				= pApp->GetProfileString(IDS_R_DVB, IDS_RS_BDA_TUNER, _T(""));
-	strBDAReceiver			= pApp->GetProfileString(IDS_R_DVB, IDS_RS_BDA_RECEIVER, _T(""));
-	//sBDAStandard			= pApp->GetProfileString(IDS_R_DVB, IDS_RS_BDA_STANDARD, _T(""));
+	strBDANetworkProvider	= pApp->GetProfileString(IDS_R_DVB, IDS_RS_BDA_NETWORKPROVIDER);
+	strBDATuner				= pApp->GetProfileString(IDS_R_DVB, IDS_RS_BDA_TUNER);
+	strBDAReceiver			= pApp->GetProfileString(IDS_R_DVB, IDS_RS_BDA_RECEIVER);
+	//sBDAStandard			= pApp->GetProfileString(IDS_R_DVB, IDS_RS_BDA_STANDARD);
 	iBDAScanFreqStart		= pApp->GetProfileInt(IDS_R_DVB, IDS_RS_BDA_SCAN_FREQ_START, 474000);
 	iBDAScanFreqEnd			= pApp->GetProfileInt(IDS_R_DVB, IDS_RS_BDA_SCAN_FREQ_END, 858000);
 	iBDABandwidth			= pApp->GetProfileInt(IDS_R_DVB, IDS_RS_BDA_BANDWIDTH, 8);
@@ -1405,7 +1405,7 @@ void CAppSettings::LoadSettings()
 		CString strChannel;
 		CDVBChannel	Channel;
 		strTemp.Format(_T("%d"), iChannel);
-		strChannel = pApp->GetProfileString(IDS_R_DVB, strTemp, _T(""));
+		strChannel = pApp->GetProfileString(IDS_R_DVB, strTemp);
 		if (strChannel.IsEmpty()) {
 			break;
 		}
@@ -1422,7 +1422,7 @@ void CAppSettings::LoadSettings()
 		CString		strValue;
 
 		strDVDPos.Format (_T("DVD Position %d"), i);
-		strValue = pApp->GetProfileString(IDS_R_SETTINGS, strDVDPos, _T(""));
+		strValue = pApp->GetProfileString(IDS_R_SETTINGS, strDVDPos);
 		if (strValue.GetLength()/2 == sizeof(DVD_POSITION)) {
 			DeserializeHex(strValue, (BYTE*)&DvdPosition[i], sizeof(DVD_POSITION));
 		}
@@ -1436,10 +1436,10 @@ void CAppSettings::LoadSettings()
 		CString		strValue;
 
 		strFilePos.Format (_T("File Name %d"), i);
-		FilePosition[i].strFile = pApp->GetProfileString(IDS_R_SETTINGS, strFilePos, _T(""));
+		FilePosition[i].strFile = pApp->GetProfileString(IDS_R_SETTINGS, strFilePos);
 
 		strFilePos.Format (_T("File Position %d"), i);
-		strValue = pApp->GetProfileString(IDS_R_SETTINGS, strFilePos, _T(""));
+		strValue = pApp->GetProfileString(IDS_R_SETTINGS, strFilePos);
 		FilePosition[i].llPosition = _tstoi64 (strValue);
 	}
 
@@ -1449,7 +1449,7 @@ void CAppSettings::LoadSettings()
 
 	fRemainingTime			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_REMAINING_TIME, FALSE);
 
-	strLastOpenFilterDir	= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILTER_DIR, _T(""));
+	strLastOpenFilterDir	= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILTER_DIR);
 
 	iYoutubeTag				= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_TAG, 0);
 	iYoutubeSource			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_SOURCE, 0);
@@ -1726,7 +1726,7 @@ void CAppSettings::UpdateRenderersData(bool fSave)
 		r.fSPCAllowAnimationWhenBuffering = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("SPCAllowAnimationWhenBuffering"), TRUE);
 
 		r.iEvrBuffers		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_EVR_BUFFERS, 5);
-		r.D3D9RenderDevice = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_D3D9RENDERDEVICE, _T(""));
+		r.D3D9RenderDevice = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_D3D9RENDERDEVICE);
 	}
 }
 
@@ -2017,7 +2017,7 @@ void CAppSettings::GetFav(favtype ft, CAtlList<CString>& sl)
 	for (int i = 0; ; i++) {
 		CString s;
 		s.Format(_T("Name%d"), i);
-		s = AfxGetApp()->GetProfileString(root, s, NULL);
+		s = AfxGetApp()->GetProfileString(root, s);
 		if (s.IsEmpty()) {
 			break;
 		}
