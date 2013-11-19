@@ -92,8 +92,8 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CStatic     m_txtSwStandard;
 	CComboBox   m_cbSwStandard;
 
-	CStatic     m_txtSwOutputLevels;
-	CComboBox   m_cbSwOutputLevels;
+	CStatic     m_txtSwRGBLevels;
+	CComboBox   m_cbSwRGBLevels;
 
 	CStatic     m_txtSwVersion;
 	CString     m_strSwVersion;

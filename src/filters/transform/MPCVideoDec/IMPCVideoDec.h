@@ -125,8 +125,8 @@ public IUnknown {
 	STDMETHOD(SetSwStandard(int nValue)) = 0;
 	STDMETHOD_(int, GetSwStandard()) = 0;
 
-	STDMETHOD(SetSwOutputLevels(int nValue)) = 0;
-	STDMETHOD_(int, GetSwOutputLevels()) = 0;
+	STDMETHOD(SetSwRGBLevels(int nValue)) = 0;
+	STDMETHOD_(int, GetSwRGBLevels()) = 0;
 
 	STDMETHOD_(int, IsColorTypeConversion()) = 0;
 	//

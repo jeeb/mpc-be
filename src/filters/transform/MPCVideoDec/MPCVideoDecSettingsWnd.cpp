@@ -204,11 +204,10 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	p.y += h25;
 
 	// Output levels
-	m_txtSwOutputLevels.Create(ResStr(IDS_VDF_COLOR_RGB_LEVELS), WS_VISIBLE|WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbSwOutputLevels.Create(dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p + CSize(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_SWOUTPUTLEVELS);
-	m_cbSwOutputLevels.AddString(_T("TV (16-235)"));
-	m_cbSwOutputLevels.AddString(_T("PC (0-255)"));
-	m_cbSwOutputLevels.AddString(ResStr(IDS_VDF_AUTO));
+	m_txtSwRGBLevels.Create(ResStr(IDS_VDF_COLOR_RGB_LEVELS), WS_VISIBLE|WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
+	m_cbSwRGBLevels.Create(dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p + CSize(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_SWOUTPUTLEVELS);
+	m_cbSwRGBLevels.AddString(_T("PC (0-255)"));
+	m_cbSwRGBLevels.AddString(_T("TV (16-235)"));
 	p.y += h25;
 
 	// Software version, useful info for stand-alone filter
@@ -244,16 +243,16 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 		m_cbSwPreset.SetCurSel(m_pMDF->GetSwPreset());
 		m_cbSwStandard.SetCurSel(m_pMDF->GetSwStandard());
-		m_cbSwOutputLevels.SetCurSel(m_pMDF->GetSwOutputLevels());
+		m_cbSwRGBLevels.SetCurSel(m_pMDF->GetSwRGBLevels());
 
 		if (m_pMDF->IsColorTypeConversion() == 0) {
 			m_cbSwPreset.EnableWindow(FALSE);
 			m_cbSwStandard.EnableWindow(FALSE);
-			m_cbSwOutputLevels.EnableWindow(FALSE);
+			m_cbSwRGBLevels.EnableWindow(FALSE);
 		} else {
 			m_cbSwPreset.EnableWindow(TRUE);
 			m_cbSwStandard.EnableWindow(TRUE);
-			m_cbSwOutputLevels.EnableWindow(TRUE);
+			m_cbSwRGBLevels.EnableWindow(TRUE);
 		}
 		//
 	}
@@ -292,7 +291,7 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 
 		if (m_cbSwPreset.GetCurSel() != m_pMDF->GetSwPreset()
 				|| m_cbSwStandard.GetCurSel() != m_pMDF->GetSwStandard()
-				|| m_cbSwOutputLevels.GetCurSel() != m_pMDF->GetSwOutputLevels()) {
+				|| m_cbSwRGBLevels.GetCurSel() != m_pMDF->GetSwRGBLevels()) {
 			refresh = 1; // soft refresh - signal new swscaler colorspace details
 		}
 
@@ -325,7 +324,7 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 		if (refresh >= 1) {
 			m_pMDF->SetSwPreset(m_cbSwPreset.GetCurSel());
 			m_pMDF->SetSwStandard(m_cbSwStandard.GetCurSel());
-			m_pMDF->SetSwOutputLevels(m_cbSwOutputLevels.GetCurSel());
+			m_pMDF->SetSwRGBLevels(m_cbSwRGBLevels.GetCurSel());
 		}
 		
 		m_pMDF->SetSwRefresh(refresh);

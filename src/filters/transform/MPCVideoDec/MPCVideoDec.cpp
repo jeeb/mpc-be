@@ -65,7 +65,7 @@ extern "C" {
 #define OPTION_SW_RGB32      _T("Sw_RGB32")
 #define OPT_SwPreset         _T("SwPreset")
 #define OPT_SwStandard       _T("SwStandard")
-#define OPT_SwOutputLevels   _T("SwOutputLevels")
+#define OPT_SwRGBLevels      _T("SwRGBLevels")
 
 #pragma region any_constants
 
@@ -865,7 +865,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_nSwRefresh(0)
 	, m_nSwPreset(2)
 	, m_nSwStandard(2)
-	, m_nSwOutputLevels(2)
+	, m_nSwRGBLevels(0)
 	//
 	, m_nDialogHWND(NULL)
 	, m_bIsVMR7_YUV(FALSE)
@@ -938,8 +938,8 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SwStandard, dw)) {
 			m_nSwStandard = dw;
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SwOutputLevels, dw)) {
-			m_nSwOutputLevels = dw;
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SwRGBLevels, dw)) {
+			m_nSwRGBLevels = dw;
 		}
 		//
 	}
@@ -968,7 +968,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_fPixFmts[PixFmt_RGB32]	= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_RGB32, m_fPixFmts[PixFmt_RGB32]);
 	m_nSwPreset					= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwPreset, m_nSwPreset);
 	m_nSwStandard				= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwStandard, m_nSwStandard);
-	m_nSwOutputLevels			= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwOutputLevels, m_nSwOutputLevels);
+	m_nSwRGBLevels				= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwRGBLevels, m_nSwRGBLevels);
 	//
 #endif
 
@@ -977,10 +977,13 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	if (m_nDeinterlacing > PROGRESSIVE) {
 		m_nDeinterlacing = AUTO;
 	}
+	if (m_nSwRGBLevels != 1) {
+		m_nSwRGBLevels = 0;
+	}
 
 	avcodec_register_all();
 	av_log_set_callback(ff_log);
-	m_FormatConverter.SetOptions(m_nSwPreset, m_nSwStandard, m_nSwOutputLevels);
+	m_FormatConverter.SetOptions(m_nSwPreset, m_nSwStandard, m_nSwRGBLevels);
 
 	HWND hWnd = NULL;
 	EnumWindows(EnumFindProcessWnd, (LPARAM)&hWnd);
@@ -2442,7 +2445,7 @@ HRESULT CMPCVideoDecFilter::ReconnectRenderer()
 
 	//soft refresh - signal new swscaler colorspace details
 	if (m_nSwRefresh >= 1) {
-		m_FormatConverter.SetOptions(m_nSwPreset, m_nSwStandard, m_nSwOutputLevels);
+		m_FormatConverter.SetOptions(m_nSwPreset, m_nSwStandard, m_nSwRGBLevels);
 	}
 
 	// hard refresh - signal new output format
@@ -3042,7 +3045,7 @@ STDMETHODIMP CMPCVideoDecFilter::Apply()
 		key.SetDWORDValue(OPTION_SW_RGB32, m_fPixFmts[PixFmt_RGB32]);
 		key.SetDWORDValue(OPT_SwPreset, m_nSwPreset);
 		key.SetDWORDValue(OPT_SwStandard, m_nSwStandard);
-		key.SetDWORDValue(OPT_SwOutputLevels, m_nSwOutputLevels);
+		key.SetDWORDValue(OPT_SwRGBLevels, m_nSwRGBLevels);
 		//
 	}
 	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_VCodecs)) {
@@ -3066,7 +3069,7 @@ STDMETHODIMP CMPCVideoDecFilter::Apply()
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_RGB32, m_fPixFmts[PixFmt_RGB32]);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwPreset, m_nSwPreset);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwStandard, m_nSwStandard);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwOutputLevels, m_nSwOutputLevels);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwRGBLevels, m_nSwRGBLevels);
 	//
 #endif
 
@@ -3239,16 +3242,16 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetSwStandard()
 	return m_nSwStandard;
 }
 
-STDMETHODIMP CMPCVideoDecFilter::SetSwOutputLevels(int nValue)
+STDMETHODIMP CMPCVideoDecFilter::SetSwRGBLevels(int nValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
-	m_nSwOutputLevels = nValue;
+	m_nSwRGBLevels = nValue;
 	return S_OK;
 }
-STDMETHODIMP_(int) CMPCVideoDecFilter::GetSwOutputLevels()
+STDMETHODIMP_(int) CMPCVideoDecFilter::GetSwRGBLevels()
 {
 	CAutoLock cAutoLock(&m_csProps);
-	return m_nSwOutputLevels;
+	return m_nSwRGBLevels;
 }
 
 STDMETHODIMP_(int) CMPCVideoDecFilter::IsColorTypeConversion()

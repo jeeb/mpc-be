@@ -97,7 +97,7 @@ CFormatConverter::CFormatConverter()
 	, m_out_pixfmt(PixFmt_None)
 	, m_swsFlags(SWS_BILINEAR | SWS_ACCURATE_RND | SWS_FULL_CHR_H_INP)
 	, m_colorspace(SWS_CS_DEFAULT)
-	, m_dstRange(0)
+	, m_dstRGBRange(0)
 	, m_dstStride(0)
 	, m_planeHeight(0)
 	, m_nAlignedBufferSize(0)
@@ -165,7 +165,10 @@ bool CFormatConverter::Init()
 		int srcRange, dstRange, brightness, contrast, saturation;
 		int ret = sws_getColorspaceDetails(m_pSwsContext, &inv_tbl, &srcRange, &tbl, &dstRange, &brightness, &contrast, &saturation);
 		if (ret >= 0) {
-			ret = sws_setColorspaceDetails(m_pSwsContext, sws_getCoefficients(m_colorspace), srcRange, tbl, m_dstRange, brightness, contrast, saturation);
+			if (m_out_pixfmt == PixFmt_RGB32) {
+				dstRange = m_dstRGBRange;
+			}
+			ret = sws_setColorspaceDetails(m_pSwsContext, sws_getCoefficients(m_colorspace), srcRange, tbl, dstRange, brightness, contrast, saturation);
 		}
 
 		if (m_pFilter && m_pFilter->GetDialogHWND()) {
@@ -203,7 +206,7 @@ void CFormatConverter::UpdateOutput2(DWORD biCompression, LONG biWidth, LONG biH
 	UpdateOutput(GetPixFormat(biCompression), biWidth, abs(biHeight));
 }
 
-void CFormatConverter::SetOptions(int preset, int standard, int out_levels)
+void CFormatConverter::SetOptions(int preset, int standard, int rgblevels)
 {
 	switch (standard) {
 	case 0  : // SD(BT.601)
@@ -219,7 +222,7 @@ void CFormatConverter::SetOptions(int preset, int standard, int out_levels)
 		m_colorspace = SWS_CS_DEFAULT;
 	}
 
-	m_dstRange = out_levels > 1 ? 0 : out_levels;
+	m_dstRGBRange = rgblevels == 1 ? 0 : 1;
 
 	if (m_ActualContext == 0) {
 		m_ActualContext = 1;

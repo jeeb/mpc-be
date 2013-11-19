@@ -63,7 +63,7 @@ protected:
 
 	int					m_swsFlags;
 	int					m_colorspace;
-	int					m_dstRange;
+	int					m_dstRGBRange;
 
 	int					m_dstStride;
 	int					m_planeHeight;
@@ -83,7 +83,7 @@ public:
 
 	void UpdateOutput(MPCPixelFormat out_pixfmt, int dstStride, int planeHeight);
 	void UpdateOutput2(DWORD biCompression, LONG biWidth, LONG biHeight);
-	void SetOptions(int preset, int standard, int out_levels);
+	void SetOptions(int preset, int standard, int rgblevels);
 
 	MPCPixelFormat GetOutPixFormat() { return m_out_pixfmt; }
 

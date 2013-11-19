@@ -86,7 +86,7 @@ protected:
 	bool									m_fPixFmts[PixFmt_count];
 	int										m_nSwPreset;
 	int										m_nSwStandard;
-	int										m_nSwOutputLevels;
+	int										m_nSwRGBLevels;
 	//
 
 	FF_FIELD_TYPE							m_nFrameType;
@@ -242,8 +242,8 @@ public:
 	STDMETHODIMP_(int) GetSwPreset();
 	STDMETHODIMP SetSwStandard(int nValue);
 	STDMETHODIMP_(int) GetSwStandard();
-	STDMETHODIMP SetSwOutputLevels(int nValue);
-	STDMETHODIMP_(int) GetSwOutputLevels();
+	STDMETHODIMP SetSwRGBLevels(int nValue);
+	STDMETHODIMP_(int) GetSwRGBLevels();
 
 	STDMETHODIMP_(int) IsColorTypeConversion();
 	//
