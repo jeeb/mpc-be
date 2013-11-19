@@ -29,6 +29,8 @@
 #include "VSFilter.h"
 #include "Systray.h"
 #include "../../../DSUtil/MediaTypes.h"
+#include "../../../DSUtil/FileHandle.h"
+#include "../../../DSUtil/WinAPIUtils.h"
 #include "../../../SubPic/MemSubPic.h"
 #include "../../../SubPic/SubPicQueueImpl.h"
 

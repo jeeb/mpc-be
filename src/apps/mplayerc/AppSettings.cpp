@@ -24,6 +24,7 @@
 #include <atlpath.h>
 #include "MiniDump.h"
 #include "../../DSUtil/SysVersion.h"
+#include "../../DSUtil/WinAPIUtils.h"
 
 CAppSettings::CAppSettings()
 	: fInitialized(false)

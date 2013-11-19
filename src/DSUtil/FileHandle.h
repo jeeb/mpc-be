@@ -20,16 +20,10 @@
 
 #pragma once
 
-struct IDirect3D9;
-
-BOOL				IsCompositionEnabled();
-bool				SetPrivilege(LPCTSTR privilege, bool bEnable=true);
-bool				ExportRegistryKey(CStdioFile& file, HKEY hKeyRoot, CString keyName);
-UINT				GetAdapter(IDirect3D9* pD3D, HWND hWnd);
-bool				IsFontInstalled(LPCTSTR lpszFont);
-bool				ExploreToFile(CString path);
-bool				ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, UINT16* MonitorVerRes);
-CString				GetModulePath(bool bInclModuleName = true);
-
-BOOL				CFileGetStatus(LPCTSTR lpszFileName, CFileStatus& status);
-unsigned __int64	GetFileVersion(LPCTSTR lptstrFilename);
+CString	GetFileOnly(LPCTSTR Path);
+CString	GetFolderOnly(LPCTSTR Path);
+CString	AddSlash(LPCTSTR Path);
+CString	RemoveSlash(LPCTSTR Path);
+CString	GetFileExt(LPCTSTR Path);
+CString	RenameFileExt(LPCTSTR Path, LPCTSTR Ext);
+BOOL	GetTemporaryFilePath(CString strExtension, CString& strFileName);

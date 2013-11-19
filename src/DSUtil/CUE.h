@@ -20,16 +20,18 @@
 
 #pragma once
 
-struct IDirect3D9;
+struct Chapters {
+	REFERENCE_TIME	rt;
+	CString			name;
 
-BOOL				IsCompositionEnabled();
-bool				SetPrivilege(LPCTSTR privilege, bool bEnable=true);
-bool				ExportRegistryKey(CStdioFile& file, HKEY hKeyRoot, CString keyName);
-UINT				GetAdapter(IDirect3D9* pD3D, HWND hWnd);
-bool				IsFontInstalled(LPCTSTR lpszFont);
-bool				ExploreToFile(CString path);
-bool				ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, UINT16* MonitorVerRes);
-CString				GetModulePath(bool bInclModuleName = true);
+	Chapters() {
+		rt		= 0;
+	}
 
-BOOL				CFileGetStatus(LPCTSTR lpszFileName, CFileStatus& status);
-unsigned __int64	GetFileVersion(LPCTSTR lptstrFilename);
+	Chapters(CString s, REFERENCE_TIME t) {
+		rt		= t;
+		name	= s;
+	}
+};
+
+bool ParseCUESheet(CString cueData, CAtlList<Chapters> &ChaptersList, CString& Title, CString& Performer);

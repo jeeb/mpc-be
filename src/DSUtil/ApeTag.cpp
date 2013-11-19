@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include "ApeTag.h"
 #include "DSUtil.h"
+#include "CUE.h"
 #include "DSMPropertyBag.h"
 
 //

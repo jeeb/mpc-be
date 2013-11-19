@@ -25,6 +25,7 @@
 #include <atlpath.h>
 #include "MainFrm.h"
 #include "../../DSUtil/SysVersion.h"
+#include "../../DSUtil/Filehandle.h"
 #include "SaveTextFileDialog.h"
 #include "PlayerPlaylistBar.h"
 #include "SettingsDefines.h"

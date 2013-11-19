@@ -29,6 +29,7 @@
 #include <moreuuids.h>
 #include "FLACSource.h"
 #include "../../../DSUtil/DSUtil.h"
+#include "../../../DSUtil/CUE.h"
 #include <libflac/src/libflac/include/protected/stream_decoder.h>
 
 #define _DECODER_   (FLAC__StreamDecoder*)m_pDecoder

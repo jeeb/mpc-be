@@ -29,6 +29,7 @@
 #include <madVRAllocatorPresenter.h>
 #include "DeinterlacerFilter.h"
 #include "../../DSUtil/SysVersion.h"
+#include "../../DSUtil/WinAPIUtils.h"
 #include "../../filters/transform/DeCSSFilter/VobFile.h"
 #include <InitGuid.h>
 #include <dmodshow.h>

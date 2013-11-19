@@ -445,3 +445,40 @@ CString GetModulePath(bool bInclModuleName)
 
 	return path;
 }
+
+BOOL CFileGetStatus(LPCTSTR lpszFileName, CFileStatus& status)
+{
+	try {
+		return CFile::GetStatus(lpszFileName, status);
+	} catch (CException* e) {
+		// MFCBUG: E_INVALIDARG / "Parameter is incorrect" is thrown for certain cds (vs2003)
+		// http://groups.google.co.uk/groups?hl=en&lr=&ie=UTF-8&threadm=OZuXYRzWDHA.536%40TK2MSFTNGP10.phx.gbl&rnum=1&prev=/groups%3Fhl%3Den%26lr%3D%26ie%3DISO-8859-1
+		TRACE(_T("CFile::GetStatus has thrown an exception\n"));
+		e->Delete();
+		return false;
+	}
+}
+
+unsigned __int64 GetFileVersion(LPCTSTR lptstrFilename)
+{
+	unsigned __int64 ret = 0;
+
+	DWORD buff[4];
+	VS_FIXEDFILEINFO* pvsf = (VS_FIXEDFILEINFO*)buff;
+	DWORD d; // a variable that GetFileVersionInfoSize sets to zero (but why is it needed ?????????????????????????????? :)
+	DWORD len = GetFileVersionInfoSize((LPTSTR)lptstrFilename, &d);
+
+	if (len) {
+		TCHAR* b1 = DNew TCHAR[len];
+		if (b1) {
+			UINT uLen;
+			if (GetFileVersionInfo((LPTSTR)lptstrFilename, 0, len, b1) && VerQueryValue(b1, _T("\\"), (void**)&pvsf, &uLen)) {
+				ret = ((unsigned __int64)pvsf->dwFileVersionMS<<32) | pvsf->dwFileVersionLS;
+			}
+
+			delete [] b1;
+		}
+	}
+
+	return ret;
+}

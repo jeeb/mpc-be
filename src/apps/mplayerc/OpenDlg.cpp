@@ -26,6 +26,7 @@
 #include "OpenDlg.h"
 #include "PlayerYouTube.h"
 #include "MainFrm.h"
+#include "../../DSUtil/Filehandle.h"
 
 // COpenDlg dialog
 

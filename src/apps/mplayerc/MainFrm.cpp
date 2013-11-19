@@ -28,6 +28,8 @@
 
 #include "../../DSUtil/WinAPIUtils.h"
 #include "../../DSUtil/SysVersion.h"
+#include "../../DSUtil/Filehandle.h"
+#include "../../DSUtil/Log.h"
 #include "OpenDlg.h"
 #include "SaveDlg.h"
 #include "GoToDlg.h"

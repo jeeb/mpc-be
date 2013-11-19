@@ -25,6 +25,7 @@
 #include "RealTextParser.h"
 #include <fstream>
 #include "USFSubtitles.h"
+#include "../DSUtil/WinAPIUtils.h"
 
 // gathered from http://www.netwave.or.jp/~shikai/shikai/shcolor.htm
 

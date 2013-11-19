@@ -23,6 +23,7 @@
 #include "PlayerVimeo.h"
 
 #include "../../DSUtil/MPCSocket.h"
+#include "../../DSUtil/Log.h"
 
 #define MATCH_FMT_START			"\"url_encoded_fmt_stream_map\": \""
 #define MATCH_WIDTH_START		"meta property=\"og:video:width\" content=\""

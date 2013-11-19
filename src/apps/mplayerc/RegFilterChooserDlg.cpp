@@ -23,6 +23,7 @@
 #include <dmo.h>
 #include "RegFilterChooserDlg.h"
 #include "FGFilter.h"
+#include "../../DSUtil/FileHandle.h"
 
 // CRegFilterChooserDlg dialog
 
