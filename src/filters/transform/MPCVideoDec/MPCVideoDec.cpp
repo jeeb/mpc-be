@@ -3258,12 +3258,16 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetColorSpaceConversion()
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (!m_pAVCtx || m_nDecoderMode != MODE_SOFTWARE || m_pAVCtx->pix_fmt == AV_PIX_FMT_NONE || m_FormatConverter.GetOutPixFormat() == PixFmt_None) {
-		return -1; // no decoding or no conversion
+	if (!m_pAVCtx) {
+		return -1; // no decoder
+	}
+
+	if (m_nDecoderMode != MODE_SOFTWARE || m_pAVCtx->pix_fmt == AV_PIX_FMT_NONE || m_FormatConverter.GetOutPixFormat() == PixFmt_None) {
+		return -2; // no conversion
 	}
 	
-	bool in_rgb = !!(av_pix_fmt_desc_get(m_pAVCtx->pix_fmt)->flags & AV_PIX_FMT_FLAG_RGB);
-	bool out_rgb = (m_FormatConverter.GetOutPixFormat() == PixFmt_RGB32);
+	bool in_rgb		= !!(av_pix_fmt_desc_get(m_pAVCtx->pix_fmt)->flags & AV_PIX_FMT_FLAG_RGB);
+	bool out_rgb	= (m_FormatConverter.GetOutPixFormat() == PixFmt_RGB32);
 	if (in_rgb < out_rgb) {
 		return 1; // YUV->RGB conversion
 	}
