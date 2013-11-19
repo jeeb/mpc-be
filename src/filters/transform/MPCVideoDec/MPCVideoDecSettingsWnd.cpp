@@ -85,7 +85,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	DWORD dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP;
 	CPoint p(10, 10);
 
-	m_grpFFMpeg.Create(ResStr(IDS_VDF_SETTINGS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(350), h20 + h25 * 3 + h20)), this, (UINT)IDC_STATIC);
+	m_grpFFMpeg.Create(ResStr(IDS_VDF_SETTINGS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(350), IPP_SCALE(115))), this, (UINT)IDC_STATIC);
 	p.y += h20;
 
 	// Decoding threads
@@ -122,10 +122,10 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	// Read AR from stream
 	m_cbARMode.Create(ResStr(IDS_VDF_AR_MODE), dwStyle | BS_AUTO3STATE | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(340), m_fontheight)), this, IDC_PP_AR);
 	m_cbARMode.SetCheck(FALSE);
-	p.y += h25;
 
 	//
-	m_grpDXVA.Create(ResStr(IDS_VDF_DXVA_SETTING), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(350), h20 + h25 +h20 * 3 + m_fontheight)), this, (UINT)IDC_STATIC);
+	p.y = 10 + IPP_SCALE(115) + 5;
+	m_grpDXVA.Create(ResStr(IDS_VDF_DXVA_SETTING), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(350), IPP_SCALE(120))), this, (UINT)IDC_STATIC);
 	p.y += h20;
 
 	// DXVA Compatibility check
@@ -161,13 +161,13 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	}
 
 	// === New swscaler options
-	p = CPoint(IPP_SCALE(365), 10);
+	p = CPoint(5 + IPP_SCALE(350) + 10, 10);
 	int width_s = IPP_SCALE(180);
 	int btn_w   = m_fontheight + 12;
 	int btn_h   = m_fontheight + 4;
 	int combo_w = IPP_SCALE(85);
 	int label_w = width_s - combo_w;
-	m_grpFmtConv.Create(ResStr(IDS_VDF_COLOR_FMT_CONVERSION), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, IPP_SCALE(225) + m_fontheight)), this, (UINT)IDC_STATIC);
+	m_grpFmtConv.Create(ResStr(IDS_VDF_COLOR_FMT_CONVERSION), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, IPP_SCALE(115) + 5 +  IPP_SCALE(120))), this, (UINT)IDC_STATIC);
 	p.y += h20;
 
 	// Software output formats
