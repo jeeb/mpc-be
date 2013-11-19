@@ -245,14 +245,14 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		m_cbSwStandard.SetCurSel(m_pMDF->GetSwStandard());
 		m_cbSwRGBLevels.SetCurSel(m_pMDF->GetSwRGBLevels());
 
-		if (m_pMDF->IsColorTypeConversion() == 0) {
-			m_cbSwPreset.EnableWindow(FALSE);
-			m_cbSwStandard.EnableWindow(FALSE);
-			m_cbSwRGBLevels.EnableWindow(FALSE);
-		} else {
+		if (m_pMDF->GetColorSpaceConversion() == 1) {
 			m_cbSwPreset.EnableWindow(TRUE);
 			m_cbSwStandard.EnableWindow(TRUE);
 			m_cbSwRGBLevels.EnableWindow(TRUE);
+		} else {
+			m_cbSwPreset.EnableWindow(FALSE);
+			m_cbSwStandard.EnableWindow(FALSE);
+			m_cbSwRGBLevels.EnableWindow(FALSE);
 		}
 		//
 	}

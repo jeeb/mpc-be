@@ -28,6 +28,7 @@
 extern "C" {
 	#include <ffmpeg/libavcodec/avcodec.h>
 	#include <ffmpeg/libswscale/swscale.h>
+	#include <ffmpeg/libavutil/pixdesc.h>
 }
 #pragma warning(pop)
 
@@ -165,7 +166,7 @@ bool CFormatConverter::Init()
 		int srcRange, dstRange, brightness, contrast, saturation;
 		int ret = sws_getColorspaceDetails(m_pSwsContext, &inv_tbl, &srcRange, &tbl, &dstRange, &brightness, &contrast, &saturation);
 		if (ret >= 0) {
-			if (m_out_pixfmt == PixFmt_RGB32) {
+			if (!(av_pix_fmt_desc_get(m_in_avpixfmt)->flags & AV_PIX_FMT_FLAG_RGB) && m_out_pixfmt == PixFmt_RGB32) {
 				dstRange = m_dstRGBRange;
 			}
 			ret = sws_setColorspaceDetails(m_pSwsContext, sws_getCoefficients(m_colorspace), srcRange, tbl, dstRange, brightness, contrast, saturation);
@@ -174,14 +175,14 @@ bool CFormatConverter::Init()
 		if (m_pFilter && m_pFilter->GetDialogHWND()) {
 			HWND hwnd = m_pFilter->GetDialogHWND();
 
-			if (m_pFilter->IsColorTypeConversion() == 0) {
-				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWPRESET),       FALSE);
-				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWSTANDARD),     FALSE);
-				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWOUTPUTLEVELS), FALSE);
-			} else {
+			if (m_pFilter->GetColorSpaceConversion() == 1) {
 				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWPRESET),       TRUE);
 				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWSTANDARD),     TRUE);
 				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWOUTPUTLEVELS), TRUE);
+			} else {
+				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWPRESET),       FALSE);
+				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWSTANDARD),     FALSE);
+				EnableWindow(GetDlgItem(hwnd, IDC_PP_SWOUTPUTLEVELS), FALSE);
 			}
 		}
 	}

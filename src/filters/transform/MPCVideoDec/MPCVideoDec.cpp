@@ -3254,26 +3254,21 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetSwRGBLevels()
 	return m_nSwRGBLevels;
 }
 
-STDMETHODIMP_(int) CMPCVideoDecFilter::IsColorTypeConversion()
+STDMETHODIMP_(int) CMPCVideoDecFilter::GetColorSpaceConversion()
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (!m_pAVCtx) {
-		return -1; // no decoding or no conversion
-	}
-
-	if (m_nDecoderMode != MODE_SOFTWARE) {
-		return 0;
-	}
-
-	if (m_pAVCtx->pix_fmt == AV_PIX_FMT_NONE || m_FormatConverter.GetOutPixFormat() == PixFmt_None) {
+	if (!m_pAVCtx || m_nDecoderMode != MODE_SOFTWARE || m_pAVCtx->pix_fmt == AV_PIX_FMT_NONE || m_FormatConverter.GetOutPixFormat() == PixFmt_None) {
 		return -1; // no decoding or no conversion
 	}
 	
 	bool in_rgb = !!(av_pix_fmt_desc_get(m_pAVCtx->pix_fmt)->flags & AV_PIX_FMT_FLAG_RGB);
 	bool out_rgb = (m_FormatConverter.GetOutPixFormat() == PixFmt_RGB32);
-	if (in_rgb != out_rgb) {
-		return 1; // YUV->RGB or RGB->YUV conversion
+	if (in_rgb < out_rgb) {
+		return 1; // YUV->RGB conversion
+	}
+	if (in_rgb > out_rgb) {
+		return 2; // RGB->YUV conversion
 	}
 
 	return 0; // YUV->YUV or RGB->RGB conversion

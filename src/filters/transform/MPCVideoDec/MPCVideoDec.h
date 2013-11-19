@@ -245,7 +245,7 @@ public:
 	STDMETHODIMP SetSwRGBLevels(int nValue);
 	STDMETHODIMP_(int) GetSwRGBLevels();
 
-	STDMETHODIMP_(int) IsColorTypeConversion();
+	STDMETHODIMP_(int) GetColorSpaceConversion();
 	//
 
 	STDMETHODIMP SetDialogHWND(HWND nValue);

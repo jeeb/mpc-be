@@ -128,7 +128,7 @@ public IUnknown {
 	STDMETHOD(SetSwRGBLevels(int nValue)) = 0;
 	STDMETHOD_(int, GetSwRGBLevels()) = 0;
 
-	STDMETHOD_(int, IsColorTypeConversion()) = 0;
+	STDMETHOD_(int, GetColorSpaceConversion()) = 0;
 	//
 
 	STDMETHOD(SetDialogHWND(HWND nValue)) = 0;
