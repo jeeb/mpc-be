@@ -360,6 +360,11 @@
 #define IDS_VDF_COLOR_PRESET            7432
 #define IDS_VDF_COLOR_STANDARD          7433
 #define IDS_VDF_COLOR_RGB_LEVELS        7435
+#define IDS_VDF_TT_AR                   7450
+#define IDS_VDF_TT_PRESET               7451
+#define IDS_VDF_TT_STANDARD             7452
+#define IDS_VDF_TT_RGB_LEVELS           7453
+
 // mpeg2 decoder
 #define IDS_MPEG2_ENABLE_PLANAR         7500
 #define IDS_MPEG2_INTERLACE_FLAG        7501

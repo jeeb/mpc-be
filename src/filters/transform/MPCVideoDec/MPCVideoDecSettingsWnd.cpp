@@ -205,7 +205,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 	// Output levels
 	m_txtSwRGBLevels.Create(ResStr(IDS_VDF_COLOR_RGB_LEVELS), WS_VISIBLE|WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbSwRGBLevels.Create(dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p + CSize(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_SWOUTPUTLEVELS);
+	m_cbSwRGBLevels.Create(dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p + CSize(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_SWRGBLEVELS);
 	m_cbSwRGBLevels.AddString(_T("PC (0-255)"));
 	m_cbSwRGBLevels.AddString(_T("TV (16-235)"));
 	p.y += h25;
@@ -366,12 +366,25 @@ BOOL CMPCVideoDecSettingsWnd::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT *
 	UINT_PTR nID = pNMHDR->idFrom;
 	if (pTTT->uFlags & TTF_IDISHWND) {
 		nID = ::GetDlgCtrlID((HWND)nID);
-		if (nID == IDC_PP_AR) {
-			pTTT->lpszText = _T("Checked - will be used AR from stream.\nUnchecked - will be used AR from container.\nIndeterminate - AR from stream will not be used on files with a container AR (recommended).");
-			*pResult = 0;
-
-			return TRUE;
+		switch (nID) {
+		case IDC_PP_AR:
+			pTTT->lpszText = MAKEINTRESOURCE(IDS_VDF_TT_AR);
+			break;
+		case IDC_PP_SWPRESET:
+			pTTT->lpszText = MAKEINTRESOURCE(IDS_VDF_TT_PRESET);
+			break;
+		case IDC_PP_SWSTANDARD:
+			pTTT->lpszText = MAKEINTRESOURCE(IDS_VDF_TT_STANDARD);
+			break;
+		case IDC_PP_SWRGBLEVELS:
+			pTTT->lpszText = MAKEINTRESOURCE(IDS_VDF_TT_RGB_LEVELS);
+			break;
+		default:
+			return FALSE;
 		}
+		
+		*pResult = 0;
+		return TRUE;
 	}
 
 	return FALSE;

@@ -149,6 +149,14 @@ BEGIN
     IDS_VDF_COLOR_RGB_LEVELS     "RGB output levels:"
 END
 
+STRINGTABLE
+BEGIN
+    IDS_VDF_TT_AR                "Checked - will be used AR from stream.\nUnchecked - will be used AR from container.\nIndeterminate - AR from stream will not be used on files with a container AR (recommended)."
+    IDS_VDF_TT_PRESET            "Changes the relationship between speed and quality."
+    IDS_VDF_TT_STANDARD          "This setting are used only when filter is doing YCbCr<->RGB conversion."
+    IDS_VDF_TT_RGB_LEVELS        "This setting are used only when filter is doing YCbCr to RGB conversion."
+END
+
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
