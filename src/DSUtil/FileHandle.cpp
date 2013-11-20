@@ -106,6 +106,8 @@ BOOL GetTemporaryFilePath(CString strExtension, CString& strFileName)
 			return FALSE;
 		}
 
+		DeleteFile(lpszFilePath);
+
 		strFileName = lpszFilePath;
 		strFileName.Replace(_T(".tmp"), strExtension);
 		
