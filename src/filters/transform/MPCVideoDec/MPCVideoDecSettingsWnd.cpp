@@ -244,6 +244,11 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		m_cbSwPreset.SetCurSel(m_pMDF->GetSwPreset());
 		m_cbSwStandard.SetCurSel(m_pMDF->GetSwStandard());
 		m_cbSwRGBLevels.SetCurSel(m_pMDF->GetSwRGBLevels());
+
+		if (m_cbRGB32.GetCheck() == BST_UNCHECKED) {
+			m_cbSwRGBLevels.EnableWindow(FALSE);
+		}
+	}
 		//
 	}
 
@@ -343,10 +348,10 @@ void CMPCVideoDecSettingsWnd::OnBnClickedYUY2()
 
 void CMPCVideoDecSettingsWnd::OnBnClickedRGB32()
 {
-	if (m_cbRGB32.GetCheck() == BST_CHECKED) {
-		m_cbSwRGBLevels.EnableWindow(TRUE);
-	} else {
+	if (m_cbRGB32.GetCheck() == BST_UNCHECKED) {
 		m_cbSwRGBLevels.EnableWindow(FALSE);
+	} else {
+		m_cbSwRGBLevels.EnableWindow(TRUE);
 	}
 }
 
