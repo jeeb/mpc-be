@@ -1997,7 +1997,7 @@ STRING IDS_VDF_THREADNUMBER		"Αριθμός νημάτων αποκωδικοπ
 STRING IDS_VDF_TT_AR		"Checked - will be used AR from stream.\nUnchecked - will be used AR from container.\nIndeterminate - AR from stream will not be used on files with a container AR (recommended)."
 STRING IDS_VDF_TT_PRESET		"Changes the relationship between speed and quality."
 STRING IDS_VDF_TT_RGB_LEVELS		"This setting are used only when filter is doing YCbCr to RGB conversion."
-STRING IDS_VDF_TT_STANDARD		"This setting are used only when filter is doing YCbCr \x2194 RGB conversion."
+STRING IDS_VDF_TT_STANDARD		"This setting are used only when filter is doing YCbCr<->RGB conversion."
 STRING IDS_VDF_VIDEOCARD		"Κάρτα γραφικών"
 STRING IDS_VIDEO_STREAM		"Βίντεο: %s"
 STRING IDS_VIEW_BORDERLESS		"Απόκρυψη περιθωρίων\tCtrl+0"
