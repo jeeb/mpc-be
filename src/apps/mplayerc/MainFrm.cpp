@@ -12587,7 +12587,7 @@ CWnd *CMainFrame::GetModalParent()
 	return pParentWnd;
 }
 
-static UINT tmpYoutubeThreadProc(LPVOID pParam)
+static UINT YoutubeThreadProc(LPVOID pParam)
 {
 	return (static_cast<CMainFrame*>(pParam))->YoutubeThreadProc();
 }
@@ -12603,22 +12603,32 @@ UINT CMainFrame::YoutubeThreadProc()
 		if (f) {
 
 			DWORD cb = sizeof(DWORD);
-
 			if (!HttpQueryInfo(f, HTTP_QUERY_CONTENT_LENGTH|HTTP_QUERY_FLAG_NUMBER, &m_YoutubeTotal, &cb, 0)) {
 				m_YoutubeTotal = 0;
 			}
 
 			if (GetTemporaryFilePath(GetFileExt(GetAltFileName()).MakeLower(), m_YoutubeFile)) {
-				CFile file;
-				if (file.Open(m_YoutubeFile, CFile::modeCreate|CFile::modeWrite|CFile::shareDenyWrite|CFile::typeBinary)) {
-
+				HANDLE hFile;
+				hFile = CreateFile(m_YoutubeFile, GENERIC_READ|GENERIC_WRITE, FILE_SHARE_READ, 0 ,CREATE_ALWAYS, FILE_ATTRIBUTE_HIDDEN, NULL);
+				if (hFile != INVALID_HANDLE_VALUE) {
 					AfxGetAppSettings().slTMPFilesList.AddTail(m_YoutubeFile);
 
-					DWORD dwBytesRead	= 0;
-					DWORD dataSize		= 0;
-					BYTE buf[1024*16];
+					HANDLE hMapping = INVALID_HANDLE_VALUE;
+					if (m_YoutubeTotal > 0) {
+						hMapping = CreateFileMapping(hFile, 0, PAGE_READWRITE, 0, m_YoutubeTotal, NULL);
+						if (hMapping != INVALID_HANDLE_VALUE) {
+							CloseHandle(hMapping);
+						}
+					}
+
+					DWORD dwBytesWritten	= 0;
+					DWORD dwBytesRead		= 0;
+					DWORD dataSize			= 0;
+					BYTE buf[64 * KILOBYTE];
 					while (InternetReadFile(f, (LPVOID)buf, sizeof(buf), &dwBytesRead) && dwBytesRead && m_fYoutubeThreadWork != TH_CLOSE) {
-						file.Write((void*)buf, dwBytesRead);
+						if (FALSE == WriteFile(hFile, (LPCVOID)buf, dwBytesRead, &dwBytesWritten, NULL) || dwBytesRead != dwBytesWritten) {
+							break;
+						}
 
 						m_YoutubeCurrent += dwBytesRead;
 						if (m_YoutubeCurrent > min(MEGABYTE, m_YoutubeTotal/2)) {
@@ -12632,7 +12642,7 @@ UINT CMainFrame::YoutubeThreadProc()
 						LOG2FILE(_T("Open Youtube, FAILED from \'%s\'"), tmp);
 					}
 #endif
-					file.Close();
+					CloseHandle(hFile);
 				}
 			}
 			InternetCloseHandle(f);
@@ -12651,7 +12661,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		return ResStr(IDS_MAINFRM_81);
 	}
 
-	m_YoutubeFile			= _T("");
+	m_YoutubeFile.Empty();
 	m_YoutubeThread			= NULL;
 	m_fYoutubeThreadWork	= TH_CLOSE;
 	m_YoutubeTotal			= 0;
@@ -12727,7 +12737,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 					if (!m_strTitleAlt.IsEmpty() && ::PathIsURL(tmpName)) {
 						m_fYoutubeThreadWork = TH_START;
 						m_YoutubeFile = tmpName;
-						m_YoutubeThread = AfxBeginThread(::tmpYoutubeThreadProc, static_cast<LPVOID>(this), THREAD_PRIORITY_ABOVE_NORMAL);
+						m_YoutubeThread = AfxBeginThread(::YoutubeThreadProc, static_cast<LPVOID>(this), THREAD_PRIORITY_ABOVE_NORMAL);
 						while (m_fYoutubeThreadWork == TH_START) {
 							Sleep(50);
 						}

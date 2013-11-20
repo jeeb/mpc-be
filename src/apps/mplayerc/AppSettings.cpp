@@ -2097,7 +2097,7 @@ void CAppSettings::CRecentFileAndURLList::Add(LPCTSTR lpszPathName)
 	ASSERT(AfxIsValidString(lpszPathName));
 
 	CString pathName = lpszPathName;
-	if (pathName.MakeLower().Find(_T("@device:")) >= 0) {
+	if (CString(pathName).MakeLower().Find(_T("@device:")) >= 0) {
 		return;
 	}
 
