@@ -2384,7 +2384,7 @@ void CMPlayerCApp::SetLanguage(int nLanguage)
 	strSatellite = GetSatelliteDll(nLanguage);
 	if (!strSatellite.IsEmpty()) {
 		CString strSatVersion = CFileVersionInfo::GetFileVersionEx(strSatellite);
-		if (strSatellite.GetLength()) {
+		if (strSatVersion.GetLength()) {
 			CString strNeededVersion = MPC_VERSION_STR;
 			strNeededVersion.Replace(_T(", "), _T("."));
 
