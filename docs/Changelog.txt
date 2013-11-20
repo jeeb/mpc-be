@@ -23,7 +23,7 @@ Changes (*):
 	* libvpx 1.2 git-7fb5e738;
 	* libopus 1.1 git-db5b1945;
 	* libpng 1.7.0 b23 git-ebe7945b;
-	* MediaInfo 0.7.64+ svn rev.5968;
+	* MediaInfo 0.7.64+ svn rev.5972;
 	* VirtualDub 1.10.4;
 
 Fixes (!):
