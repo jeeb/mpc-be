@@ -244,16 +244,6 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		m_cbSwPreset.SetCurSel(m_pMDF->GetSwPreset());
 		m_cbSwStandard.SetCurSel(m_pMDF->GetSwStandard());
 		m_cbSwRGBLevels.SetCurSel(m_pMDF->GetSwRGBLevels());
-
-		if ((m_pMDF->GetColorSpaceConversion() == 1 || m_pMDF->GetColorSpaceConversion() == -1)) {
-			m_cbSwPreset.EnableWindow(TRUE);
-			m_cbSwStandard.EnableWindow(TRUE);
-			m_cbSwRGBLevels.EnableWindow(TRUE);
-		} else {
-			m_cbSwPreset.EnableWindow(FALSE);
-			m_cbSwStandard.EnableWindow(FALSE);
-			m_cbSwRGBLevels.EnableWindow(FALSE);
-		}
 		//
 	}
 
@@ -338,6 +328,7 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 
 BEGIN_MESSAGE_MAP(CMPCVideoDecSettingsWnd, CInternalPropertyPageWnd)
 	ON_BN_CLICKED(IDC_PP_SW_YUY2, OnBnClickedYUY2)
+	ON_BN_CLICKED(IDC_PP_SW_RGB32, OnBnClickedRGB32)
 	ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
 END_MESSAGE_MAP()
 
@@ -347,6 +338,15 @@ void CMPCVideoDecSettingsWnd::OnBnClickedYUY2()
 		m_cbYUY2.SetCheck(BST_INDETERMINATE);
 	} else {
 		m_cbYUY2.SetCheck(BST_CHECKED);
+	}
+}
+
+void CMPCVideoDecSettingsWnd::OnBnClickedRGB32()
+{
+	if (m_cbRGB32.GetCheck() == BST_CHECKED) {
+		m_cbSwRGBLevels.EnableWindow(TRUE);
+	} else {
+		m_cbSwRGBLevels.EnableWindow(FALSE);
 	}
 }
 

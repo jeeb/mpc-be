@@ -113,6 +113,7 @@ public:
 	DECLARE_MESSAGE_MAP()
 
 	afx_msg void OnBnClickedYUY2();
+	afx_msg void OnBnClickedRGB32();
 	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult);
 };
 

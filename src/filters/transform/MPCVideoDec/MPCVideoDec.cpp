@@ -893,8 +893,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_fPixFmts[PixFmt_YUY2]  = true;
 	m_fPixFmts[PixFmt_RGB32] = true;
 
-	m_FormatConverter.Init(this);
-
 #ifdef REGISTER_FILTER
 	CRegKey key;
 	ULONG len = 255;
