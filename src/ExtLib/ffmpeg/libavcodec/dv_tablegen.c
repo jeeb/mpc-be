@@ -22,13 +22,6 @@
 
 #include <stdlib.h>
 #define CONFIG_HARDCODED_TABLES 0
-// ==> Start patch MPC
-/*
-#ifndef CONFIG_SMALL
-#error CONFIG_SMALL must be defined to generate tables
-#endif
-*/
-// ==> End patch MPC
 #include "dv_tablegen.h"
 #include "tableprint.h"
 #include <inttypes.h>

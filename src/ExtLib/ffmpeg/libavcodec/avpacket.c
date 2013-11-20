@@ -237,6 +237,7 @@ int av_copy_packet_side_data(AVPacket *pkt, AVPacket *src)
             pkt->side_data[i].type = src->side_data[i].type;
         }
     }
+    pkt->side_data_elems = src->side_data_elems;
     return 0;
 
 failed_alloc:
@@ -424,6 +425,64 @@ int av_packet_split_side_data(AVPacket *pkt){
         return 1;
     }
     return 0;
+}
+
+uint8_t *av_packet_pack_dictionary(AVDictionary *dict, int *size)
+{
+    AVDictionaryEntry *t = NULL;
+    uint8_t *data = NULL;
+    *size = 0;
+
+    if (!dict)
+        return NULL;
+
+    while ((t = av_dict_get(dict, "", t, AV_DICT_IGNORE_SUFFIX))) {
+        const size_t keylen   = strlen(t->key);
+        const size_t valuelen = strlen(t->value);
+        const size_t new_size = *size + keylen + 1 + valuelen + 1;
+        uint8_t *const new_data = av_realloc(data, new_size);
+
+        if (!new_data || new_size > INT_MAX)
+            goto fail;
+        data = new_data;
+
+        memcpy(data + *size, t->key, keylen + 1);
+        memcpy(data + *size + keylen + 1, t->value, valuelen + 1);
+
+        *size = new_size;
+    }
+
+    return data;
+
+fail:
+    av_freep(&data);
+    *size = 0;
+    return NULL;
+}
+
+int av_packet_unpack_dictionary(const uint8_t *data, int size, AVDictionary **dict)
+{
+    const uint8_t *end = data + size;
+    int ret = 0;
+
+    if (!dict || !data || !size)
+        return ret;
+    if (size && end[-1])
+        return AVERROR_INVALIDDATA;
+    while (data < end) {
+        const uint8_t *key = data;
+        const uint8_t *val = data + strlen(key) + 1;
+
+        if (val >= end)
+            return AVERROR_INVALIDDATA;
+
+        ret = av_dict_set(dict, key, val, 0);
+        if (ret < 0)
+            break;
+        data = val + strlen(val) + 1;
+    }
+
+    return ret;
 }
 
 int av_packet_shrink_side_data(AVPacket *pkt, enum AVPacketSideDataType type,
