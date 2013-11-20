@@ -248,7 +248,6 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		if (m_cbRGB32.GetCheck() == BST_UNCHECKED) {
 			m_cbSwRGBLevels.EnableWindow(FALSE);
 		}
-	}
 		//
 	}
 
