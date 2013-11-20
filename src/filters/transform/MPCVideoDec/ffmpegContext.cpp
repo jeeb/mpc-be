@@ -29,7 +29,29 @@
 #include "ffmpegContext.h"
 #include <math.h>
 
-extern unsigned __int64 GetFileVersion(LPCTSTR fn);	// requires linking with DSUtils which is always the case
+static unsigned __int64 GetFileVersion(LPCTSTR lptstrFilename)
+{
+	unsigned __int64 ret = 0;
+
+	DWORD buff[4];
+	VS_FIXEDFILEINFO* pvsf = (VS_FIXEDFILEINFO*)buff;
+	DWORD d; // a variable that GetFileVersionInfoSize sets to zero (but why is it needed ?????????????????????????????? :)
+	DWORD len = GetFileVersionInfoSize((LPTSTR)lptstrFilename, &d);
+
+	if (len) {
+		TCHAR* b1 = new TCHAR[len];
+		if (b1) {
+			UINT uLen;
+			if (GetFileVersionInfo((LPTSTR)lptstrFilename, 0, len, b1) && VerQueryValue(b1, L"\\", (void**)&pvsf, &uLen)) {
+				ret = ((unsigned __int64)pvsf->dwFileVersionMS << 32) | pvsf->dwFileVersionLS;
+			}
+
+			delete [] b1;
+		}
+	}
+
+	return ret;
+}
 
 extern "C" {
 	#include <ffmpeg/libavcodec/dsputil.h>

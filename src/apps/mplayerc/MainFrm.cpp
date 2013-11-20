@@ -30,6 +30,7 @@
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/Filehandle.h"
 #include "../../DSUtil/Log.h"
+#include "../../DSUtil/FileVersionInfo.h"
 #include "OpenDlg.h"
 #include "SaveDlg.h"
 #include "GoToDlg.h"
@@ -83,7 +84,6 @@
 #include "../../Subtitles/XSUBSubtitle.h"
 
 #include "MultiMonitor.h"
-#include "FileVersionInfo.h"
 #include <mvrInterfaces.h>
 
 #define DEFCLIENTW		292
@@ -6303,11 +6303,12 @@ BOOL CMainFrame::IsRendererCompatibleWithSaveImage()
 
 		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, _T("CLSID\\") + clsid + _T("\\InprocServer32"), KEY_READ)
 				&& ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len)) {
-			CFileVersionInfo Version;
-			if (Version.Create(buff)) {
+			VS_FIXEDFILEINFO	FileInfo;
+			FullFileInfo		fullFileInfo;
+			if (CFileVersionInfo::Create(buff, FileInfo)) {
 				result = FALSE;
-				WORD versionLS = Version.GetFileVersion(0);
-				WORD versionMS = Version.GetFileVersion(2);
+				WORD versionLS = (WORD)FileInfo.dwFileVersionLS & 0x0000FFFF;
+				WORD versionMS = (WORD)FileInfo.dwFileVersionMS & 0x0000FFFF;
 				if ((versionLS == 0 && versionMS >= 84) || (versionLS > 1)) {
 					result = TRUE;
 				}

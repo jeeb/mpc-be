@@ -117,6 +117,7 @@
     <ClCompile Include="DSMPropertyBag.cpp" />
     <ClCompile Include="DSUtil.cpp" />
     <ClCompile Include="FileHandle.cpp" />
+    <ClCompile Include="FileVersionInfo.cpp" />
     <ClCompile Include="FontInstaller.cpp" />
     <ClCompile Include="GolombBuffer.cpp" />
     <ClCompile Include="GUIDString.cpp" />
@@ -148,6 +149,7 @@
     <ClInclude Include="DSUtil.h" />
     <ClInclude Include="ff_log.h" />
     <ClInclude Include="FileHandle.h" />
+    <ClInclude Include="FileVersionInfo.h" />
     <ClInclude Include="FontInstaller.h" />
     <ClInclude Include="GolombBuffer.h" />
     <ClInclude Include="GUIDString.h" />

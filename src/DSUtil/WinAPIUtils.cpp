@@ -458,27 +458,3 @@ BOOL CFileGetStatus(LPCTSTR lpszFileName, CFileStatus& status)
 		return false;
 	}
 }
-
-unsigned __int64 GetFileVersion(LPCTSTR lptstrFilename)
-{
-	unsigned __int64 ret = 0;
-
-	DWORD buff[4];
-	VS_FIXEDFILEINFO* pvsf = (VS_FIXEDFILEINFO*)buff;
-	DWORD d; // a variable that GetFileVersionInfoSize sets to zero (but why is it needed ?????????????????????????????? :)
-	DWORD len = GetFileVersionInfoSize((LPTSTR)lptstrFilename, &d);
-
-	if (len) {
-		TCHAR* b1 = DNew TCHAR[len];
-		if (b1) {
-			UINT uLen;
-			if (GetFileVersionInfo((LPTSTR)lptstrFilename, 0, len, b1) && VerQueryValue(b1, _T("\\"), (void**)&pvsf, &uLen)) {
-				ret = ((unsigned __int64)pvsf->dwFileVersionMS<<32) | pvsf->dwFileVersionLS;
-			}
-
-			delete [] b1;
-		}
-	}
-
-	return ret;
-}

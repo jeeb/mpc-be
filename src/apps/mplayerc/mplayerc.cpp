@@ -24,13 +24,13 @@
 #include <Tlhelp32.h>
 #include "MainFrm.h"
 #include <winternl.h>
-#include "FileVersionInfo.h"
 #include <psapi.h>
 #include "Ifo.h"
 #include "MultiMonitor.h"
 #define NO_VERSION_REV_NEEDED
 #include "../../DSUtil/WinAPIUtils.h"
 #include "../../DSUtil/SysVersion.h"
+#include "../../DSUtil/FileVersionInfo.h"
 #include "../../DSUtil/MPCSocket.h"
 #include <moreuuids.h>
 #include <winddk/ntddcdvd.h>
@@ -382,12 +382,10 @@ END_MESSAGE_MAP()
 CMPlayerCApp::CMPlayerCApp()
 //	: m_hMutexOneInstance(NULL)
 {
-	CFileVersionInfo	Version;
-	TCHAR				strApp [_MAX_PATH];
+	TCHAR strApp [_MAX_PATH] = { 0 };
 
-	GetModuleFileNameEx (GetCurrentProcess(), AfxGetMyApp()->m_hInstance, strApp, _MAX_PATH);
-	Version.Create (strApp);
-	m_strVersion = Version.GetFileVersionEx();
+	GetModuleFileNameEx(GetCurrentProcess(), AfxGetMyApp()->m_hInstance, strApp, _MAX_PATH);
+	m_strVersion = CFileVersionInfo::GetFileVersionEx(strApp);
 
 	memset (&m_ColorControl, 0, sizeof(m_ColorControl));
 	ResetColorControlRange();
@@ -2385,12 +2383,8 @@ void CMPlayerCApp::SetLanguage(int nLanguage)
 
 	strSatellite = GetSatelliteDll(nLanguage);
 	if (!strSatellite.IsEmpty()) {
-		CFileVersionInfo	Version;
-		CString				strSatVersion;
-
-		if (Version.Create(strSatellite)) {
-			strSatVersion = Version.GetFileVersionEx();
-
+		CString strSatVersion = CFileVersionInfo::GetFileVersionEx(strSatellite);
+		if (strSatellite.GetLength()) {
 			CString strNeededVersion = MPC_VERSION_STR;
 			strNeededVersion.Replace(_T(", "), _T("."));
 
