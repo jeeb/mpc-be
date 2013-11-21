@@ -866,9 +866,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_nSwPreset(2)
 	, m_nSwStandard(2)
 	, m_nSwRGBLevels(0)
-	//
-	, m_nDialogHWND(NULL)
-	, m_bIsVMR7_YUV(FALSE)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -1792,28 +1789,26 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 		nSwIndex[nSwCount++] = PixFmt_YUY2;
 	}
 
-	int nVideoOutputCountPrev = m_nVideoOutputCount;
-	m_nVideoOutputCount = (IsDXVASupported() ? (IsWinXP() ? ffCodecs[m_nCodecNb].DXVAModeCount() : _countof (DXVAFormats)) : 0) +
+	m_nVideoOutputCount = (IsDXVASupported() ? ffCodecs[m_nCodecNb].DXVAModeCount() + _countof (DXVAFormats) : 0) +
 						  (m_bUseFFmpeg   ? nSwCount : 0);
 
 	m_pVideoOutputFormat = DNew VIDEO_OUTPUT_FORMATS[m_nVideoOutputCount];
 
 	int nPos = 0;
 	if (IsDXVASupported()) {
-		if (IsWinXP()) {
-			// Dynamic DXVA media types for DXVA1
-			for (nPos = 0; nPos < ffCodecs[m_nCodecNb].DXVAModeCount(); nPos++) {
-				m_pVideoOutputFormat[nPos].subtype			= ffCodecs[m_nCodecNb].DXVAModes->Decoder[nPos];
-				m_pVideoOutputFormat[nPos].biCompression	= 'avxd';
-				m_pVideoOutputFormat[nPos].biBitCount		= 12;
-				m_pVideoOutputFormat[nPos].biPlanes			= 1;
-			}
-		} else {
-			// Static list for DXVA2
-			memcpy(&m_pVideoOutputFormat[nPos], DXVAFormats, sizeof(DXVAFormats));
-			nPos += _countof (DXVAFormats);
+		// Dynamic DXVA media types for DXVA1
+		for (nPos = 0; nPos < ffCodecs[m_nCodecNb].DXVAModeCount(); nPos++) {
+			m_pVideoOutputFormat[nPos].subtype			= ffCodecs[m_nCodecNb].DXVAModes->Decoder[nPos];
+			m_pVideoOutputFormat[nPos].biCompression	= 'avxd';
+			m_pVideoOutputFormat[nPos].biBitCount		= 12;
+			m_pVideoOutputFormat[nPos].biPlanes			= 1;
 		}
+
+		// Static list for DXVA2
+		memcpy(&m_pVideoOutputFormat[nPos], DXVAFormats, sizeof(DXVAFormats));
+		nPos += _countof (DXVAFormats);
 	}
+
 	// Software rendering
 	if (m_bUseFFmpeg) {
 		for (int i = 0; i < nSwCount; i++) {
@@ -1995,15 +1990,6 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 		// Cannot use YUY2 if horizontal or vertical resolution is not even
 		if (((m_pOutput->CurrentMediaType().subtype == MEDIASUBTYPE_YUY2) && (m_pAVCtx->width&1 || m_pAVCtx->height&1))) {
 			return VFW_E_INVALIDMEDIATYPE;
-		}
-
-		if (CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pOutput->GetConnected())) {
-			if (CComQIPtr<IVMRMixerControl> pVMRMC = pFilter) {
-				DWORD dwPrefs;
-				if (SUCCEEDED(pVMRMC->GetMixingPrefs(&dwPrefs))) {
-					m_bIsVMR7_YUV = dwPrefs & MixerPref_RenderTargetYUV;
-				}
-			}
 		}
 	}
 
@@ -3274,13 +3260,6 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetColorSpaceConversion()
 	}
 
 	return 0; // YUV->YUV or RGB->RGB conversion
-}
-
-STDMETHODIMP CMPCVideoDecFilter::SetDialogHWND(HWND nValue)
-{
-	CAutoLock cAutoLock(&m_csProps);
-	m_nDialogHWND = nValue;
-	return S_OK;
 }
 
 STDMETHODIMP CMPCVideoDecFilter::GetOutputMediaType(CMediaType* pmt)

@@ -131,8 +131,6 @@ public IUnknown {
 	STDMETHOD_(int, GetColorSpaceConversion()) = 0;
 	//
 
-	STDMETHOD(SetDialogHWND(HWND nValue)) = 0;
-
 	STDMETHOD(GetOutputMediaType(CMediaType* pmt)) = 0;
 };
 

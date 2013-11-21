@@ -69,10 +69,6 @@ bool CMPCVideoDecSettingsWnd::OnConnect(const CInterfaceList<IUnknown, &IID_IUnk
 
 void CMPCVideoDecSettingsWnd::OnDisconnect()
 {
-	if (m_pMDF) {
-		m_pMDF->SetDialogHWND(NULL);
-	}
-
 	m_pMDF.Release();
 }
 
@@ -224,8 +220,6 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	CorrectComboListWidth(m_cbDiscardMode);
 
 	if (m_pMDF) {
-		m_pMDF->SetDialogHWND(this->GetSafeHwnd());
-
 		m_cbThreadNumber.SetCurSel		(m_pMDF->GetThreadNumber());
 		m_cbDiscardMode.SetCurSel		(FindDiscardIndex (m_pMDF->GetDiscardMode()));
 		m_cbDeinterlacing.SetCurSel		((int)m_pMDF->GetDeinterlacing());

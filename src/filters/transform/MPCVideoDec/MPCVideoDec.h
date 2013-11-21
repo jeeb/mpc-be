@@ -44,16 +44,11 @@ struct AVFrame;
 
 class CCpuId;
 
-typedef struct {
-	REFERENCE_TIME	rtStart;
-	REFERENCE_TIME	rtStop;
-} B_FRAME;
-
-typedef struct {
+struct RMDemuxContext {
 	bool	video_after_seek;
 	__int32	kf_pts;		///< timestamp of next video keyframe
 	__int64	kf_base;	///< timestamp of the prev. video keyframe
-} RMDemuxContext;
+};
 
 class __declspec(uuid("008BAC12-FBAF-497b-9670-BC6F6FBAE2C4"))
 	CMPCVideoDecFilter
@@ -64,7 +59,6 @@ class __declspec(uuid("008BAC12-FBAF-497b-9670-BC6F6FBAE2C4"))
 	, public IMPCVideoDecFilterCodec
 {
 protected:
-
 	CCpuId*									m_pCpuId;
 	CCritSec								m_csProps;
 
@@ -102,8 +96,14 @@ protected:
 	int										m_nErrorConcealment;
 	REFERENCE_TIME							m_rtAvrTimePerFrame;
 	bool									m_bReorderBFrame;
+
+	struct B_FRAME {
+		REFERENCE_TIME	rtStart;
+		REFERENCE_TIME	rtStop;
+	};
 	B_FRAME									m_BFrames[2];
 	int										m_nPosB;
+
 	int										m_nOutputWidth;
 	int										m_nOutputHeight;
 	int										m_nARX, m_nARY;
@@ -152,11 +152,7 @@ protected:
 	RMDemuxContext							rm;
 	REFERENCE_TIME							m_rtStart;
 
-	HWND									m_nDialogHWND;
-
 	REFERENCE_TIME							m_rtStartCache;
-
-	BOOL									m_bIsVMR7_YUV;
 
 	// === Private functions
 	void				Cleanup();
@@ -176,7 +172,6 @@ protected:
 	HRESULT				InitDecoder(const CMediaType *pmt);
 
 public:
-
 	CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr);
 	virtual ~CMPCVideoDecFilter();
 
@@ -248,8 +243,6 @@ public:
 	STDMETHODIMP_(int) GetColorSpaceConversion();
 	//
 
-	STDMETHODIMP SetDialogHWND(HWND nValue);
-
 	STDMETHODIMP GetOutputMediaType(CMediaType* pmt);
 
 	// === IMPCVideoDecFilter2
@@ -311,9 +304,7 @@ public:
 	// === EVR functions
 	HRESULT						DetectVideoCard_EVR(IPin *pPin);
 
-	HWND						GetDialogHWND() { return m_nDialogHWND; }
 private:
-
 	friend class CVideoDecDXVAAllocator;
 	CVideoDecDXVAAllocator*		m_pDXVA2Allocator;
 
