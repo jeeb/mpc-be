@@ -1427,7 +1427,7 @@ bool CMPCVideoDecFilter::IsDXVASupported()
 
 HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 {
-	TRACE(_T("CMPCVideoDecFilter::FindDecoderConfiguration()\n"));
+	TRACE(_T("CMPCVideoDecFilter::FindDecoderConfiguration(DXVA2)\n"));
 
 	HRESULT hr = E_FAIL;
 
@@ -2622,11 +2622,14 @@ void CMPCVideoDecFilter::FillInVideoDescription(DXVA2_VideoDesc *pDesc)
 
 BOOL CMPCVideoDecFilter::IsSupportedDecoderMode(const GUID* mode)
 {
+	TRACE(_T("CMPCVideoDecFilter::IsSupportedDecoderMode(DXVA1) => trying : %s\n"), GetDXVAMode(mode));
+
 	if (IsDXVASupported()) {
 		for (int i = 0; i < MAX_SUPPORTED_MODE; i++) {
 			if (*ffCodecs[m_nCodecNb].DXVAModes->Decoder[i] == GUID_NULL) {
 				break;
 			} else if (*ffCodecs[m_nCodecNb].DXVAModes->Decoder[i] == *mode) {
+				TRACE(_T("	=> Found : %s\n"), GetDXVAMode(mode));
 				return TRUE;
 			}
 		}
