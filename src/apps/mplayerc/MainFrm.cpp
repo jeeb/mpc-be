@@ -12609,7 +12609,7 @@ UINT CMainFrame::YoutubeThreadProc()
 
 			if (GetTemporaryFilePath(GetFileExt(GetAltFileName()).MakeLower(), m_YoutubeFile)) {
 				HANDLE hFile;
-				hFile = CreateFile(m_YoutubeFile, GENERIC_READ|GENERIC_WRITE, FILE_SHARE_READ, 0 ,CREATE_ALWAYS, FILE_ATTRIBUTE_HIDDEN, NULL);
+				hFile = CreateFile(m_YoutubeFile, GENERIC_READ|GENERIC_WRITE, FILE_SHARE_READ, 0 ,CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL);
 				if (hFile != INVALID_HANDLE_VALUE) {
 					AfxGetAppSettings().slTMPFilesList.AddTail(m_YoutubeFile);
 
