@@ -47,19 +47,26 @@ const SW_OUT_FMT* GetSWOF(int pixfmt);
 struct AVFrame;
 struct SwsContext;
 
+typedef struct {
+	// basic properties
+	enum AVPixelFormat	avpixfmt;
+	int					width;
+	int					height;
+	// additional properties
+	enum AVColorSpace	colorspace;
+	enum AVColorRange	colorrange;
+} FrameProps;
+
 class CFormatConverter
 {
 protected:
 	SwsContext*			m_pSwsContext;
-	int					m_ActualContext; // 0 -actual, 1 - need update options, 2 - nead reinit
+	FrameProps			m_FProps;
 
-	int					m_width;
-	int					m_height;
-
-	enum AVPixelFormat	m_in_avpixfmt;
 	MPCPixelFormat		m_out_pixfmt;
 
 	int					m_swsFlags;
+	bool				m_autocolorspace;
 	int					m_colorspace;
 	int					m_dstRGBRange;
 
@@ -70,6 +77,7 @@ protected:
 	uint8_t*			m_pAlignedBuffer;
 
 	bool Init();
+	void UpdateDetails();
 
 public:
 	CFormatConverter();

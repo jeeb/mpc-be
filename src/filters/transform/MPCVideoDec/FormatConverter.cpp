@@ -90,10 +90,6 @@ MPCPixelFormat GetPixFormat(DWORD biCompression)
 
 CFormatConverter::CFormatConverter()
 	: m_pSwsContext(NULL)
-	, m_ActualContext(2)
-	, m_width(0)
-	, m_height(0)
-	, m_in_avpixfmt(AV_PIX_FMT_NONE)
 	, m_out_pixfmt(PixFmt_None)
 	, m_swsFlags(SWS_BILINEAR | SWS_ACCURATE_RND | SWS_FULL_CHR_H_INP)
 	, m_colorspace(SWS_CS_DEFAULT)
@@ -104,6 +100,12 @@ CFormatConverter::CFormatConverter()
 	, m_pAlignedBuffer(NULL)
 {
 	ASSERT(PixFmt_count == _countof(s_sw_formats));
+
+	m_FProps.avpixfmt	= AV_PIX_FMT_NONE;
+	m_FProps.width		= 0;
+	m_FProps.height		= 0;
+	m_FProps.colorspace	= AVCOL_SPC_UNSPECIFIED;
+	m_FProps.colorrange	= AVCOL_RANGE_UNSPECIFIED;
 }
 
 CFormatConverter::~CFormatConverter()
@@ -129,53 +131,56 @@ static inline enum AVPixelFormat SelectFmt(enum AVPixelFormat pix_fmt)
 
 bool CFormatConverter::Init()
 {
-	if (!m_pSwsContext || m_ActualContext == 2) {
-		Cleanup();
-
-		const SW_OUT_FMT& swof = s_sw_formats[m_out_pixfmt];
-
-		m_pSwsContext = sws_getCachedContext(
-							NULL,
-							m_width,
-							m_height,
-							SelectFmt(m_in_avpixfmt),
-							m_width,
-							m_height,
-							swof.av_pix_fmt,
-							m_swsFlags | SWS_PRINT_INFO,
-							NULL,
-							NULL,
-							NULL);
-
-		if (m_pSwsContext == NULL) {
-			TRACE(_T("FormatConverter: sws_getCachedContext failed\n"));
-			return false;
-		}
-
-		m_ActualContext = 1;
+	Cleanup();
+	if (m_FProps.avpixfmt == AV_PIX_FMT_NONE) {
+		// check the input data, which can cause a crash.
+		TRACE(_T("FormatConverter: incorrect source format\n"));
+		return false;
 	}
 
-	if (m_ActualContext == 1) {
+	const SW_OUT_FMT& swof = s_sw_formats[m_out_pixfmt];
+
+	m_pSwsContext = sws_getCachedContext(
+						NULL,
+						m_FProps.width,
+						m_FProps.height,
+						SelectFmt(m_FProps.avpixfmt),
+						m_FProps.width,
+						m_FProps.height,
+						swof.av_pix_fmt,
+						m_swsFlags | SWS_PRINT_INFO,
+						NULL,
+						NULL,
+						NULL);
+
+	if (m_pSwsContext == NULL) {
+		TRACE(_T("FormatConverter: sws_getCachedContext failed\n"));
+		return false;
+	}
+
+	return true;
+}
+
+void  CFormatConverter::UpdateDetails()
+{
+	if (m_pSwsContext) {
 		int *inv_tbl = NULL, *tbl = NULL;
 		int srcRange, dstRange, brightness, contrast, saturation;
 		int ret = sws_getColorspaceDetails(m_pSwsContext, &inv_tbl, &srcRange, &tbl, &dstRange, &brightness, &contrast, &saturation);
 		if (ret >= 0) {
-			if (!(av_pix_fmt_desc_get(m_in_avpixfmt)->flags & AV_PIX_FMT_FLAG_RGB) && m_out_pixfmt == PixFmt_RGB32) {
+			if (m_out_pixfmt == PixFmt_RGB32 && !(av_pix_fmt_desc_get(m_FProps.avpixfmt)->flags & AV_PIX_FMT_FLAG_RGB)) {
 				dstRange = m_dstRGBRange;
 			}
 			ret = sws_setColorspaceDetails(m_pSwsContext, sws_getCoefficients(m_colorspace), srcRange, tbl, dstRange, brightness, contrast, saturation);
 		}
 	}
-
-	m_ActualContext = 0;
-	return true;
 }
 
 void CFormatConverter::UpdateOutput(MPCPixelFormat out_pixfmt, int dstStride, int planeHeight)
 {
 	if (out_pixfmt != m_out_pixfmt) {
-		m_out_pixfmt	= out_pixfmt;
-		m_ActualContext = 2;
+		m_out_pixfmt = out_pixfmt;
+		Cleanup();
 	}
 
 	m_dstStride   = dstStride;
@@ -191,23 +196,21 @@ void CFormatConverter::SetOptions(int preset, int standard, int rgblevels)
 {
 	switch (standard) {
 	case 0  : // SD(BT.601)
+		m_autocolorspace = false;
 		m_colorspace = SWS_CS_ITU601;
 		break;
 	case 1  : // HD(BT.709)
+		m_autocolorspace = false;
 		m_colorspace = SWS_CS_ITU709;
 		break;
 	case 2  : // Auto
-		m_colorspace = m_width > 768 ? SWS_CS_ITU709 : SWS_CS_ITU601;
-		break;
 	default :
-		m_colorspace = SWS_CS_DEFAULT;
+		m_autocolorspace = true;
+		m_colorspace = m_FProps.width > 768 ? SWS_CS_ITU709 : SWS_CS_ITU601;
+		break;
 	}
 
 	m_dstRGBRange = rgblevels == 1 ? 0 : 1;
-
-	if (m_ActualContext == 0) {
-		m_ActualContext = 1;
-	}
 
 	int swsFlags = 0;
 	switch (preset) {
@@ -227,29 +230,35 @@ void CFormatConverter::SetOptions(int preset, int standard, int rgblevels)
 		swsFlags = SWS_BILINEAR | SWS_ACCURATE_RND | SWS_FULL_CHR_H_INP | SWS_FULL_CHR_H_INT;
 		break;
 	}
+
 	if (swsFlags != m_swsFlags) {
 		m_swsFlags = swsFlags;
-		m_ActualContext = 2;
+		Cleanup();
+	} else {
+		UpdateDetails();
 	}
 }
 
 int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 {
-	if (pFrame->format != m_in_avpixfmt || pFrame->width != m_width || pFrame->height != m_height) {
-		m_in_avpixfmt	= (AVPixelFormat)pFrame->format;
-		m_width			= pFrame->width;
-		m_height		= pFrame->height;
-		m_ActualContext	= 2;
-	}
-
-	if ((!m_pSwsContext || m_ActualContext) && !Init()) {
-		TRACE(_T("FormatConverter: Init() failed\n"));
-		return 0;
+	if (!m_pSwsContext || pFrame->format != m_FProps.avpixfmt || pFrame->width != m_FProps.width || pFrame->height != m_FProps.height) {
+		// update the basic properties
+		m_FProps.avpixfmt	= (AVPixelFormat)pFrame->format;
+		m_FProps.width		= pFrame->width;
+		m_FProps.height		= pFrame->height;
+		if (!Init()) {
+			TRACE(_T("FormatConverter: Init() failed\n"));
+			return 0;
+		}
+		// update the additional properties (updated only when changing basic properties.)
+		m_FProps.colorspace	= pFrame->colorspace;
+		m_FProps.colorrange	= pFrame->color_range;
+		UpdateDetails();
 	}
 
 	const SW_OUT_FMT& swof = s_sw_formats[m_out_pixfmt];
 
-	// From LAVVideo ...
+	// From LAVVideo...
 	uint8_t *out = dst;
 	int outStride = m_dstStride;
 	// Check if we have proper pixel alignment and the dst memory is actually aligned
@@ -279,28 +288,28 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 		std::swap(dstArray[1], dstArray[2]);
 	}
 
-	int ret = sws_scale(m_pSwsContext, pFrame->data, pFrame->linesize, 0, m_height, dstArray, dstStrideArray);
+	int ret = sws_scale(m_pSwsContext, pFrame->data, pFrame->linesize, 0, m_FProps.height, dstArray, dstStrideArray);
 
 	if (out != dst) {
 		int line = 0;
 
 		// Copy first plane
-		const int widthBytes = m_width * swof.codedbytes;
+		const int widthBytes = m_FProps.width * swof.codedbytes;
 		const int srcStrideBytes = outStride * swof.codedbytes;
 		const int dstStrideBytes = m_dstStride * swof.codedbytes;
-		for (line = 0; line < m_height; ++line) {
+		for (line = 0; line < m_FProps.height; ++line) {
 			memcpy(dst, out, widthBytes);
 			out += srcStrideBytes;
 			dst += dstStrideBytes;
 		}
-		dst += (m_planeHeight - m_height) * dstStrideBytes;
+		dst += (m_planeHeight - m_FProps.height) * dstStrideBytes;
 		
 		for (int plane = 1; plane < swof.planes; ++plane) {
-			const int planeWidth        = widthBytes     / swof.planeWidth[plane];
-			const int activePlaneHeight = m_height       / swof.planeHeight[plane];
-			const int totalPlaneHeight  = m_planeHeight  / swof.planeHeight[plane];
-			const int srcPlaneStride    = srcStrideBytes / swof.planeWidth[plane];
-			const int dstPlaneStride    = dstStrideBytes / swof.planeWidth[plane];
+			const int planeWidth        = widthBytes      / swof.planeWidth[plane];
+			const int activePlaneHeight = m_FProps.height / swof.planeHeight[plane];
+			const int totalPlaneHeight  = m_planeHeight   / swof.planeHeight[plane];
+			const int srcPlaneStride    = srcStrideBytes  / swof.planeWidth[plane];
+			const int dstPlaneStride    = dstStrideBytes  / swof.planeWidth[plane];
 			for (line = 0; line < activePlaneHeight; ++line) {
 				memcpy(dst, out, planeWidth);
 				out += srcPlaneStride;
