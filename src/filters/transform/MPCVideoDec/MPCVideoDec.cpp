@@ -1993,11 +1993,6 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 				}
 			}
 		}
-
-		// Cannot use YUY2 if horizontal or vertical resolution is not even
-		if (((m_pOutput->CurrentMediaType().subtype == MEDIASUBTYPE_YUY2) && (m_pAVCtx->width&1 || m_pAVCtx->height&1))) {
-			return VFW_E_INVALIDMEDIATYPE;
-		}
 	}
 
 	return __super::CompleteConnect (direction, pReceivePin);
