@@ -113,22 +113,6 @@ CFormatConverter::~CFormatConverter()
 	Cleanup();
 }
 
-static inline enum AVPixelFormat SelectFmt(enum AVPixelFormat pix_fmt)
-{
-	switch (pix_fmt) {
-		case AV_PIX_FMT_YUVJ420P:
-			return AV_PIX_FMT_YUV420P;
-		case AV_PIX_FMT_YUVJ422P:
-			return AV_PIX_FMT_YUV422P;
-		case AV_PIX_FMT_YUVJ440P:
-			return AV_PIX_FMT_YUV440P;
-		case AV_PIX_FMT_YUVJ444P:
-			return AV_PIX_FMT_YUV444P;
-		default:
-			return pix_fmt;
-	}
-}
-
 bool CFormatConverter::Init()
 {
 	Cleanup();
@@ -144,7 +128,7 @@ bool CFormatConverter::Init()
 						NULL,
 						m_FProps.width,
 						m_FProps.height,
-						SelectFmt(m_FProps.avpixfmt),
+						m_FProps.avpixfmt,
 						m_FProps.width,
 						m_FProps.height,
 						swof.av_pix_fmt,

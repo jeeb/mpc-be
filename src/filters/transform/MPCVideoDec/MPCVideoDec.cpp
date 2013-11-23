@@ -2401,6 +2401,26 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 		pOut->SetTime(&rtStart, &rtStop);
 		pOut->SetMediaTime(NULL, NULL);
 
+		if (m_nCodecId == AV_CODEC_ID_H264) {
+			switch (m_pFrame->format) {
+			case AV_PIX_FMT_YUVJ420P:
+				// fixed range problem
+				m_pFrame->format = AV_PIX_FMT_YUV420P;
+				m_pFrame->color_range = AVCOL_RANGE_UNSPECIFIED;
+				break;
+			case AV_PIX_FMT_YUVJ422P:
+				// no samples
+				m_pFrame->format = AV_PIX_FMT_YUV422P;
+				m_pFrame->color_range = AVCOL_RANGE_UNSPECIFIED;
+				break;
+			case AV_PIX_FMT_YUVJ444P:
+				// no samples
+				m_pFrame->format = AV_PIX_FMT_YUV444P;
+				m_pFrame->color_range = AVCOL_RANGE_UNSPECIFIED;
+				break;
+			}
+		}
+
 		BITMAPINFOHEADER bihOut;
 		ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
 		m_FormatConverter.UpdateOutput2(bihOut.biCompression, bihOut.biWidth, bihOut.biHeight);
