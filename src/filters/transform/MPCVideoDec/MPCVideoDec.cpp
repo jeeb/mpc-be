@@ -62,6 +62,7 @@ extern "C" {
 #define OPTION_SW_NV12       _T("Sw_NV12")
 #define OPTION_SW_YV12       _T("Sw_YV12")
 #define OPTION_SW_YUY2       _T("Sw_YUY2")
+#define OPTION_SW_AYUV       _T("Sw_AYUV")
 #define OPTION_SW_RGB32      _T("Sw_RGB32")
 #define OPT_SwPreset         _T("SwPreset")
 #define OPT_SwStandard       _T("SwStandard")
@@ -755,6 +756,7 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 	{&MEDIATYPE_Video, &MEDIASUBTYPE_NV12},
 	{&MEDIATYPE_Video, &MEDIASUBTYPE_YV12},
 	{&MEDIATYPE_Video, &MEDIASUBTYPE_YUY2},
+	{&MEDIATYPE_Video, &MEDIASUBTYPE_AYUV},
 	{&MEDIATYPE_Video, &MEDIASUBTYPE_RGB32},
 };
 
@@ -888,6 +890,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_fPixFmts[PixFmt_NV12]  = true;
 	m_fPixFmts[PixFmt_YV12]  = true;
 	m_fPixFmts[PixFmt_YUY2]  = true;
+	m_fPixFmts[PixFmt_AYUV]  = false;
 	m_fPixFmts[PixFmt_RGB32] = true;
 
 #ifdef REGISTER_FILTER
@@ -923,6 +926,9 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SW_YUY2, dw)) {
 			m_fPixFmts[PixFmt_YUY2] = !!dw;
+		}
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SW_AYUV, dw)) {
+			m_fPixFmts[PixFmt_AYUV] = !!dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SW_RGB32, dw)) {
 			m_fPixFmts[PixFmt_RGB32] = !!dw;
@@ -960,6 +966,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_fPixFmts[PixFmt_NV12]		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_NV12,  m_fPixFmts[PixFmt_NV12]);
 	m_fPixFmts[PixFmt_YV12]		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_YV12,  m_fPixFmts[PixFmt_YV12]);
 	m_fPixFmts[PixFmt_YUY2]		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_YUY2,  m_fPixFmts[PixFmt_YUY2]);
+	m_fPixFmts[PixFmt_AYUV]		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_AYUV,  m_fPixFmts[PixFmt_AYUV]);
 	m_fPixFmts[PixFmt_RGB32]	= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_RGB32, m_fPixFmts[PixFmt_RGB32]);
 	m_nSwPreset					= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwPreset, m_nSwPreset);
 	m_nSwStandard				= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwStandard, m_nSwStandard);
@@ -3049,6 +3056,7 @@ STDMETHODIMP CMPCVideoDecFilter::Apply()
 		key.SetDWORDValue(OPTION_SW_NV12,  m_fPixFmts[PixFmt_NV12]);
 		key.SetDWORDValue(OPTION_SW_YV12,  m_fPixFmts[PixFmt_YV12]);
 		key.SetDWORDValue(OPTION_SW_YUY2,  m_fPixFmts[PixFmt_YUY2]);
+		key.SetDWORDValue(OPTION_SW_AYUV,  m_fPixFmts[PixFmt_AYUV]);
 		key.SetDWORDValue(OPTION_SW_RGB32, m_fPixFmts[PixFmt_RGB32]);
 		key.SetDWORDValue(OPT_SwPreset, m_nSwPreset);
 		key.SetDWORDValue(OPT_SwStandard, m_nSwStandard);
@@ -3073,6 +3081,7 @@ STDMETHODIMP CMPCVideoDecFilter::Apply()
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_NV12,  m_fPixFmts[PixFmt_NV12]);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_YV12,  m_fPixFmts[PixFmt_YV12]);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_YUY2,  m_fPixFmts[PixFmt_YUY2]);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_AYUV,  m_fPixFmts[PixFmt_AYUV]);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_RGB32, m_fPixFmts[PixFmt_RGB32]);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwPreset, m_nSwPreset);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwStandard, m_nSwStandard);

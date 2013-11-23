@@ -38,6 +38,7 @@ enum {
 	IDC_PP_SW_NV12,
 	IDC_PP_SW_YV12,
 	IDC_PP_SW_YUY2,
+	IDC_PP_SW_AYUV,
 	IDC_PP_SW_RGB32,
 	IDC_PP_SWPRESET,
 	IDC_PP_SWSTANDARD,
@@ -78,11 +79,12 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CStatic		m_txtSwOutputFormats;
 	CStatic     m_txt420;
 	CStatic     m_txt422;
-	//CStatic     m_txt444;
+	CStatic     m_txt444;
 	CStatic     m_txtRGB;
 	CButton		m_cbNV12;
 	CButton		m_cbYV12;
 	CButton		m_cbYUY2;
+	CButton		m_cbAYUV;
 	CButton		m_cbRGB32;
 
 	CStatic     m_txtSwPreset;

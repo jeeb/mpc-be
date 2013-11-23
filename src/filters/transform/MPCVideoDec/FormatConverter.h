@@ -79,6 +79,8 @@ protected:
 	bool Init();
 	void UpdateDetails();
 
+	HRESULT ConvertToAYUV(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[]);
+
 public:
 	CFormatConverter();
 	~CFormatConverter();

@@ -36,6 +36,7 @@ static const SW_OUT_FMT s_sw_formats[] = {
 	// YUV formats are grouped according to luma bit depth and sorted in descending order of quality.
 	//  name     biCompression  subtype                                         av_pix_fmt    chroma_w chroma_h
 	// YUV 8 bit
+	{_T("AYUV"),  FCC('AYUV'), &MEDIASUBTYPE_AYUV,  32, 4, 0, {1},     {1},     AV_PIX_FMT_YUV444P, 0, 0 }, // PixFmt_AYUV
 	{_T("YUY2"),  FCC('YUY2'), &MEDIASUBTYPE_YUY2,  16, 2, 0, {1},     {1},     AV_PIX_FMT_YUYV422, 1, 0 }, // PixFmt_YUY2
 	{_T("NV12"),  FCC('NV12'), &MEDIASUBTYPE_NV12,  12, 1, 2, {1,2},   {1,1},   AV_PIX_FMT_NV12,    1, 1 }, // PixFmt_NV12
 	{_T("YV12"),  FCC('YV12'), &MEDIASUBTYPE_YV12,  12, 1, 3, {1,2,2}, {1,2,2}, AV_PIX_FMT_YUV420P, 1, 1 }, // PixFmt_YV12
@@ -43,6 +44,8 @@ static const SW_OUT_FMT s_sw_formats[] = {
 	// ...
 	// RGB
 	{_T("RGB32"), BI_RGB,      &MEDIASUBTYPE_RGB32, 32, 4, 0, {1},     {1},     AV_PIX_FMT_BGRA,    0, 0 }, // PixFmt_RGB32
+	//
+	// PS: AV_PIX_FMT_YUV444P not equal to AYUV, but is used as an intermediate format.
 };
 
 const SW_OUT_FMT* GetSWOF(int pixfmt)
@@ -160,6 +163,73 @@ void  CFormatConverter::UpdateDetails()
 	}
 }
 
+HRESULT CFormatConverter::ConvertToAYUV(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[])
+{
+  const BYTE *y = NULL;
+  const BYTE *u = NULL;
+  const BYTE *v = NULL;
+  int line, i = 0;
+  int sourceStride = 0;
+  BYTE *pTmpBuffer = NULL;
+
+  if (m_FProps.avpixfmt != AV_PIX_FMT_YUV444P) {
+    uint8_t *tmp[4] = {NULL};
+    int     tmpStride[4] = {0};
+    int scaleStride = FFALIGN(width, 32);
+
+    pTmpBuffer = (BYTE *)av_malloc(height * scaleStride * 3);
+
+    tmp[0] = pTmpBuffer;
+    tmp[1] = tmp[0] + (height * scaleStride);
+    tmp[2] = tmp[1] + (height * scaleStride);
+    tmp[3] = NULL;
+    tmpStride[0] = scaleStride;
+    tmpStride[1] = scaleStride;
+    tmpStride[2] = scaleStride;
+    tmpStride[3] = 0;
+
+    sws_scale(m_pSwsContext, src, srcStride, 0, height, tmp, tmpStride);
+
+    y = tmp[0];
+    u = tmp[1];
+    v = tmp[2];
+    sourceStride = scaleStride;
+  } else {
+    y = src[0];
+    u = src[1];
+    v = src[2];
+    sourceStride = srcStride[0];
+  }
+
+#define YUV444_PACK_AYUV(offset) *idst++ = v[i+offset] | (u[i+offset] << 8) | (y[i+offset] << 16) | (0xff << 24);
+
+  BYTE *out = dst[0];
+  for (line = 0; line < height; ++line) {
+    int32_t *idst = (int32_t *)out;
+    for (i = 0; i < (width-7); i+=8) {
+      YUV444_PACK_AYUV(0)
+      YUV444_PACK_AYUV(1)
+      YUV444_PACK_AYUV(2)
+      YUV444_PACK_AYUV(3)
+      YUV444_PACK_AYUV(4)
+      YUV444_PACK_AYUV(5)
+      YUV444_PACK_AYUV(6)
+      YUV444_PACK_AYUV(7)
+    }
+    for (; i < width; ++i) {
+      YUV444_PACK_AYUV(0)
+    }
+    y += sourceStride;
+    u += sourceStride;
+    v += sourceStride;
+    out += dstStride[0];
+  }
+
+  av_freep(&pTmpBuffer);
+
+  return S_OK;
+}
+
 void CFormatConverter::UpdateOutput(MPCPixelFormat out_pixfmt, int dstStride, int planeHeight)
 {
 	if (out_pixfmt != m_out_pixfmt) {
@@ -272,7 +342,13 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 		std::swap(dstArray[1], dstArray[2]);
 	}
 
-	int ret = sws_scale(m_pSwsContext, pFrame->data, pFrame->linesize, 0, m_FProps.height, dstArray, dstStrideArray);
+	switch (m_out_pixfmt) {
+	case PixFmt_AYUV:
+		ConvertToAYUV(pFrame->data, pFrame->linesize, dstArray, m_FProps.width, m_FProps.height, dstStrideArray);
+		break;
+	default:
+		int ret = sws_scale(m_pSwsContext, pFrame->data, pFrame->linesize, 0, m_FProps.height, dstArray, dstStrideArray);
+	}
 
 	if (out != dst) {
 		int line = 0;
