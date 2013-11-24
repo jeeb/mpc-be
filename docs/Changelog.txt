@@ -24,6 +24,7 @@ Changes (*):
 	* libopus 1.1 git-db5b1945;
 	* libpng 1.7.0 b23 git-ebe7945b;
 	* MediaInfo 0.7.65+ svn rev.5989;
+	* Little-CMS 2.5 git-579b3aad;
 	* VirtualDub 1.10.4;
 
 Fixes (!):
