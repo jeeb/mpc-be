@@ -278,10 +278,7 @@ bool LoadType(CString fn, CString& type)
 		} else { // Fallback to registry
 			CRegKey key;
 
-			TCHAR buff[256];
-			ULONG len;
-
-			CString tmp = _T("");
+			CString tmp;
 			CString mplayerc_ext = _T("mplayerc") + ext;
 
 			if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, mplayerc_ext)) {
@@ -294,6 +291,9 @@ bool LoadType(CString fn, CString& type)
 				if (tmp.IsEmpty()) {
 					tmp = ext;
 				}
+
+				TCHAR buff[256] = { 0 };
+				ULONG len;
 
 				while (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, tmp)) {
 					len = _countof(buff);
@@ -387,10 +387,10 @@ CMPlayerCApp::CMPlayerCApp()
 	GetModuleFileNameEx(GetCurrentProcess(), AfxGetMyApp()->m_hInstance, strApp, _MAX_PATH);
 	m_strVersion = CFileVersionInfo::GetFileVersionEx(strApp);
 
-	memset (&m_ColorControl, 0, sizeof(m_ColorControl));
+	memset(&m_ColorControl, 0, sizeof(m_ColorControl));
 	ResetColorControlRange();
 
-	memset (&m_VMR9ColorControl, 0, sizeof(m_VMR9ColorControl));
+	memset(&m_VMR9ColorControl, 0, sizeof(m_VMR9ColorControl));
 	m_VMR9ColorControl[0].dwSize		= sizeof (VMR9ProcAmpControlRange);
 	m_VMR9ColorControl[0].dwProperty	= ProcAmpControl9_Brightness;
 	m_VMR9ColorControl[1].dwSize		= sizeof (VMR9ProcAmpControlRange);
@@ -400,7 +400,7 @@ CMPlayerCApp::CMPlayerCApp()
 	m_VMR9ColorControl[3].dwSize		= sizeof (VMR9ProcAmpControlRange);
 	m_VMR9ColorControl[3].dwProperty	= ProcAmpControl9_Saturation;
 
-	memset (&m_EVRColorControl, 0, sizeof(m_EVRColorControl));
+	memset(&m_EVRColorControl, 0, sizeof(m_EVRColorControl));
 
 	GetRemoteControlCode = GetRemoteControlCodeMicrosoft;
 }

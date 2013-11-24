@@ -686,6 +686,8 @@ public:
 	afx_msg LRESULT OnRepaintRenderLess(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnResumeFromState(WPARAM wParam, LPARAM lParam);
 
+	afx_msg LRESULT OnPostOpen(WPARAM wParam, LPARAM lParam);
+
 	BOOL OnButton(UINT id, UINT nFlags, CPoint point);
 
 	bool bDVDMenuClicked;
@@ -1212,6 +1214,7 @@ private:
 	int			GetStreamCount(DWORD dwSelGroup);
 
 	DWORD_PTR	m_nMainFilterId;
+	CString		m_ErrMsg;
 
 public:
 	BOOL		CheckMainFilter(IBaseFilter* pBF);
