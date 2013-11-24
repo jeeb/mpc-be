@@ -282,11 +282,13 @@
 %define HAVE_TRUNCF 1
 %define HAVE_UNISTD_H 1
 %define HAVE_USLEEP 1
+%define HAVE_VDPAU_X11 0
 %define HAVE_VFP_ARGS 0
 %define HAVE_VIRTUALALLOC 1
 %define HAVE_WINDOWS_H 1
 %define HAVE_WINSOCK2_H 0
 %define HAVE_XFORM_ASM 0
+%define HAVE_XLIB 0
 %define CONFIG_ICONV 0
 %define HAVE_YASM 1
 %define CONFIG_DCT 1

@@ -331,9 +331,7 @@ static void hybrid6_cx(PSDSPContext *dsp, float (*in)[2], float (*out)[32][2], f
     LOCAL_ALIGNED_16(float, temp, [8], [2]);
 
     for (i = 0; i < len; i++, in++) {
-        // ==> Start patch MPC
-        dsp->hybrid_analysis(temp, in, (const float (*)[8][2])filter, 1, N);
-        // ==> End patch MPC
+        dsp->hybrid_analysis(temp, in, (const float (*)[8][2]) filter, 1, N);
         out[0][i][0] = temp[6][0];
         out[0][i][1] = temp[6][1];
         out[1][i][0] = temp[7][0];
@@ -355,9 +353,7 @@ static void hybrid4_8_12_cx(PSDSPContext *dsp, float (*in)[2], float (*out)[32][
     int i;
 
     for (i = 0; i < len; i++, in++) {
-        // ==> Start patch MPC
-        dsp->hybrid_analysis(out[0] + i, in, (const float (*)[8][2])filter, 32, N);
-        // ==> End patch MPC
+        dsp->hybrid_analysis(out[0] + i, in, (const float (*)[8][2]) filter, 32, N);
     }
 }
 
@@ -695,7 +691,8 @@ static void decorrelation(PSContext *ps, float (*out)[32][2], float (*s)[32][2],
             memcpy(ap_delay[k][m],   ap_delay[k][m]+numQMFSlots,           5*sizeof(ap_delay[k][m][0]));
         }
         ps->dsp.decorrelate(out[k], delay[k] + PS_MAX_DELAY - 2, ap_delay[k],
-                            phi_fract[is34][k], Q_fract_allpass[is34][k],
+                            phi_fract[is34][k],
+                            (const float (*)[2]) Q_fract_allpass[is34][k],
                             transient_gain[b], g_decay_slope, nL - n0);
     }
     for (; k < SHORT_DELAY_BAND[is34]; k++) {
@@ -926,7 +923,7 @@ int ff_ps_apply(AVCodecContext *avctx, PSContext *ps, float L[2][38][64], float 
         memset(ps->ap_delay + top, 0, (NR_ALLPASS_BANDS[is34] - top)*sizeof(ps->ap_delay[0]));
 
     hybrid_analysis(&ps->dsp, Lbuf, ps->in_buf, L, is34, len);
-    decorrelation(ps, Rbuf, Lbuf, is34);
+    decorrelation(ps, Rbuf, (const float (*)[32][2]) Lbuf, is34);
     stereo_processing(ps, Lbuf, Rbuf, is34);
     hybrid_synthesis(&ps->dsp, L, Lbuf, is34, len);
     hybrid_synthesis(&ps->dsp, R, Rbuf, is34, len);

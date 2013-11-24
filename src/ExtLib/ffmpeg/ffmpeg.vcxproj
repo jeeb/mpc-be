@@ -457,8 +457,8 @@
     <ClCompile Include="libavcodec\dcadsp.c" />
     <ClCompile Include="libavcodec\dca_parser.c" />
     <ClCompile Include="libavcodec\dct.c" />
-    <ClCompile Include="libavcodec\dct32.c" />
     <ClCompile Include="libavcodec\dct32_float.c" />
+    <ClCompile Include="libavcodec\dct32_template.c" />
     <ClCompile Include="libavcodec\dirac.c" />
     <ClCompile Include="libavcodec\diracdec.c" />
     <ClCompile Include="libavcodec\diracdsp.c" />
@@ -478,11 +478,11 @@
     <ClCompile Include="libavcodec\exif.c" />
     <ClCompile Include="libavcodec\faandct.c" />
     <ClCompile Include="libavcodec\faanidct.c" />
-    <ClCompile Include="libavcodec\fft.c" />
     <ClCompile Include="libavcodec\fft_fixed.c" />
     <ClCompile Include="libavcodec\fft_fixed_32.c" />
     <ClCompile Include="libavcodec\fft_float.c" />
     <ClCompile Include="libavcodec\fft_init_table.c" />
+    <ClCompile Include="libavcodec\fft_template.c" />
     <ClCompile Include="libavcodec\flac.c" />
     <ClCompile Include="libavcodec\flacdata.c" />
     <ClCompile Include="libavcodec\flacdec.c" />
@@ -568,10 +568,10 @@
     <ClCompile Include="libavcodec\log2_tab.c" />
     <ClCompile Include="libavcodec\lsp.c" />
     <ClCompile Include="libavcodec\mathtables.c" />
-    <ClCompile Include="libavcodec\mdct.c" />
     <ClCompile Include="libavcodec\mdct_fixed.c" />
     <ClCompile Include="libavcodec\mdct_fixed_32.c" />
     <ClCompile Include="libavcodec\mdct_float.c" />
+    <ClCompile Include="libavcodec\mdct_template.c" />
     <ClCompile Include="libavcodec\mjpeg.c" />
     <ClCompile Include="libavcodec\mjpegbdec.c" />
     <ClCompile Include="libavcodec\mjpegdec.c" />
@@ -591,9 +591,10 @@
     <ClCompile Include="libavcodec\mpeg4video_parser.c" />
     <ClCompile Include="libavcodec\mpegaudio.c" />
     <ClCompile Include="libavcodec\mpegaudiodata.c" />
-    <ClCompile Include="libavcodec\mpegaudiodec.c" />
     <ClCompile Include="libavcodec\mpegaudiodecheader.c" />
+    <ClCompile Include="libavcodec\mpegaudiodec_fixed.c" />
     <ClCompile Include="libavcodec\mpegaudiodec_float.c" />
+    <ClCompile Include="libavcodec\mpegaudiodec_template.c" />
     <ClCompile Include="libavcodec\mpegaudiodsp.c" />
     <ClCompile Include="libavcodec\mpegaudiodsp_data.c" />
     <ClCompile Include="libavcodec\mpegaudiodsp_float.c" />
@@ -798,6 +799,7 @@
     <ClCompile Include="libavutil\samplefmt.c" />
     <ClCompile Include="libavutil\sha.c" />
     <ClCompile Include="libavutil\timecode.c" />
+    <ClCompile Include="libavutil\utf8.c" />
     <ClCompile Include="libavutil\utils.c" />
     <ClCompile Include="libavutil\x86\cpu.c" />
     <ClCompile Include="libavutil\x86\float_dsp_init.c" />

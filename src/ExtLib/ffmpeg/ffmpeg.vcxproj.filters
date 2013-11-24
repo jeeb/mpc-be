@@ -1471,10 +1471,10 @@
     <ClCompile Include="libavcodec\dct.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
-    <ClCompile Include="libavcodec\dct32.c">
+    <ClCompile Include="libavcodec\dct32_float.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
-    <ClCompile Include="libavcodec\dct32_float.c">
+    <ClCompile Include="libavcodec\dct32_template.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\dirac.c">
@@ -1534,9 +1534,6 @@
     <ClCompile Include="libavcodec\faanidct.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
-    <ClCompile Include="libavcodec\fft.c">
-      <Filter>libavcodec</Filter>
-    </ClCompile>
     <ClCompile Include="libavcodec\fft_fixed.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
@@ -1547,6 +1544,9 @@
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\fft_init_table.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\fft_template.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\flac.c">
@@ -1804,9 +1804,6 @@
     <ClCompile Include="libavcodec\mathtables.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
-    <ClCompile Include="libavcodec\mdct.c">
-      <Filter>libavcodec</Filter>
-    </ClCompile>
     <ClCompile Include="libavcodec\mdct_fixed.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
@@ -1814,6 +1811,9 @@
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\mdct_float.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\mdct_template.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\mjpeg.c">
@@ -1876,10 +1876,13 @@
     <ClCompile Include="libavcodec\mpegaudiodata.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
-    <ClCompile Include="libavcodec\mpegaudiodec.c">
+    <ClCompile Include="libavcodec\mpegaudiodec_fixed.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\mpegaudiodec_float.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\mpegaudiodec_template.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\mpegaudiodecheader.c">
@@ -2366,6 +2369,9 @@
       <Filter>libavutil</Filter>
     </ClCompile>
     <ClCompile Include="libavutil\timecode.c">
+      <Filter>libavutil</Filter>
+    </ClCompile>
+    <ClCompile Include="libavutil\utf8.c">
       <Filter>libavutil</Filter>
     </ClCompile>
     <ClCompile Include="libavutil\utils.c">

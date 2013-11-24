@@ -135,7 +135,7 @@ SRCS_C = \
 	libavcodec/dcadec.c \
 	libavcodec/dcadsp.c \
 	libavcodec/dct.c \
-	libavcodec/dct32.c \
+	libavcodec/dct32_template.c \
 	libavcodec/dct32_float.c \
 	libavcodec/dirac.c \
 	libavcodec/dirac_arith.c \
@@ -155,7 +155,7 @@ SRCS_C = \
 	libavcodec/exif.c \
 	libavcodec/faandct.c \
 	libavcodec/faanidct.c \
-	libavcodec/fft.c \
+	libavcodec/fft_template.c \
 	libavcodec/fft_fixed.c \
 	libavcodec/fft_fixed_32.c \
 	libavcodec/fft_float.c \
@@ -228,7 +228,7 @@ SRCS_C = \
 	libavcodec/libvpxdec.c \
 	libavcodec/lsp.c \
 	libavcodec/mathtables.c \
-	libavcodec/mdct.c \
+	libavcodec/mdct_template.c \
 	libavcodec/mdct_fixed.c \
 	libavcodec/mdct_fixed_32.c \
 	libavcodec/mdct_float.c \
@@ -252,7 +252,7 @@ SRCS_C = \
 	libavcodec/mpegaudio.c \
 	libavcodec/mpegaudio_parser.c \
 	libavcodec/mpegaudiodata.c \
-	libavcodec/mpegaudiodec.c \
+	libavcodec/mpegaudiodec_fixed.c \
 	libavcodec/mpegaudiodsp_data.c \
 	libavcodec/mpegaudiodec_float.c \
 	libavcodec/mpegaudiodecheader.c \
@@ -450,6 +450,7 @@ SRCS_C = \
 	libavutil/samplefmt.c \
 	libavutil/sha.c \
 	libavutil/timecode.c \
+	libavutil/utf8.c \
 	libavutil/utils.c \
 	libavutil/x86/cpu.c \
 	libavutil/x86/float_dsp_init.c \
