@@ -529,7 +529,7 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 
 	sl.RemoveAll();
 
-	int fmtsize = 0;
+	ULONG fmtsize = 0;
 
 	CString major = CStringFromGUID(majortype);
 	CString sub = CStringFromGUID(subtype);
@@ -787,8 +787,8 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 		sl.AddTail(_T(""));
 	}
 
+	/*
 	if (cbFormat > 0) {
-		/*
 		sl.AddTail(_T("pbFormat:"));
 
 		for (ptrdiff_t i = 0, j = (cbFormat + 15) & ~15; i < j; i += 16) {
@@ -816,38 +816,35 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 			sl.AddTail(str);
 		}
 		sl.AddTail(_T(""));
-		*/
+	}
+	*/
+	if (fmtsize && fmtsize < cbFormat) {
+		size_t extrasize = cbFormat - fmtsize;
+		str.Format(_T("Extradata: %d"), extrasize);
+		sl.AddTail(str);
+		for (size_t i = 0, j = (extrasize + 15) & ~15; i < j; i += 16) {
+			str.Format(_T("%04x:"), i);
 
-		if (fmtsize && fmtsize < (int)cbFormat) {
-			size_t extrasize = cbFormat - fmtsize;
-			str.Format(_T("Extradata: %d"), extrasize);
-			sl.AddTail(str);
-			for (size_t i = 0, j = (extrasize + 15) & ~15; i < j; i += 16) {
-				str.Format(_T("%04x:"), i);
-
-				for (size_t k = i, l = min(i + 16, extrasize); k < l; k++) {
-					CString byte;
-					byte.Format(_T(" %02x"), pbFormat[k + fmtsize]);
-					str += byte;
-				}
-
-				for (size_t k = min(i + 16, (int)extrasize), l = i + 16; k < l; k++) {
-					str += _T("   ");
-				}
-
-				str += ' ';
-
-				for (size_t k = i, l = min(i + 16, extrasize); k < l; k++) {
-					unsigned char c = (unsigned char)pbFormat[k + fmtsize];
-					CStringA ch;
-					ch.Format("%c", c >= 0x20 ? c : '.');
-					str += ch;
-				}
-
-				sl.AddTail(str);
+			for (size_t k = i, l = min(i + 16, extrasize); k < l; k++) {
+				str.AppendFormat(_T(" %02x"), pbFormat[k + fmtsize]);
 			}
-			sl.AddTail(_T(""));
+
+			for (size_t k = min(i + 16, (int)extrasize), l = i + 16; k < l; k++) {
+				str += _T("   ");
+			}
+
+			str += ' ';
+
+			CStringA ch;
+			for (size_t k = i, l = min(i + 16, extrasize); k < l; k++) {
+				unsigned char c = (unsigned char)pbFormat[k + fmtsize];
+				ch.AppendFormat("%c", c >= 0x20 ? c : '.');
+			}
+			str += ch;
+
+			sl.AddTail(str);
 		}
+		sl.AddTail(_T(""));
 	}
 }
 
