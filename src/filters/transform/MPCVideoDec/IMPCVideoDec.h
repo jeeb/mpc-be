@@ -20,7 +20,7 @@
 
 #pragma once
 
-#define ENABLE_AYUV 1
+#define ENABLE_AYUV 0
 
 // Internal codec list (use to enable/disable codec in standalone mode)
 

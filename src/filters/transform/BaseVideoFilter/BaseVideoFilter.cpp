@@ -698,6 +698,7 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 	((VIDEOINFOHEADER*)pmt->Format())->dwBitErrorRate  = ((VIDEOINFOHEADER*)mt.Format())->dwBitErrorRate;
 
 	CorrectMediaType(pmt);
+	pmt->SetSampleSize(bihOut.biSizeImage);
 
 	if (!vsfilter) {
 		// copy source and target rectangles from input pin
