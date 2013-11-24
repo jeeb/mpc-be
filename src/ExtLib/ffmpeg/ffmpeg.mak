@@ -450,7 +450,6 @@ SRCS_C = \
 	libavutil/samplefmt.c \
 	libavutil/sha.c \
 	libavutil/timecode.c \
-	libavutil/utf8.c \
 	libavutil/utils.c \
 	libavutil/x86/cpu.c \
 	libavutil/x86/float_dsp_init.c \
