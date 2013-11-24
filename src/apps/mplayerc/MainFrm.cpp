@@ -15165,13 +15165,11 @@ int CMainFrame::SearchInDir(bool DirForward)
 	// Use CStringElementTraitsI so that the search is case insensitive
 	CAtlList<CString, CStringElementTraitsI<CString>> sl;
 	CAtlArray<fileName> f_array;
-	Play_sl.RemoveAll();
-	sl.RemoveAll();
 
 	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
 
-	CString dir = m_LastOpenFile.Mid(0,m_LastOpenFile.ReverseFind('\\')+1);
-	CString mask = dir + _T("*.*");
+	CString dir		= AddSlash(GetFolderOnly(m_LastOpenFile));
+	CString mask	= dir + L"*.*";
 	WIN32_FIND_DATA fd;
 	HANDLE h = FindFirstFile(mask, &fd);
 	if (h != INVALID_HANDLE_VALUE) {
@@ -15180,9 +15178,9 @@ int CMainFrame::SearchInDir(bool DirForward)
 				continue;
 			}
 
-			CString fn = fd.cFileName;
-			CString ext = fn.Mid(fn.ReverseFind('.')).MakeLower();
-			CString path = dir + fd.cFileName;
+			CString fn		= fd.cFileName;
+			CString ext		= fn.Mid(fn.ReverseFind('.')).MakeLower();
+			CString path	= dir + fd.cFileName;
 			if (mf.FindExt(ext) && mf.GetCount() > 0) {
 				fileName f_name;
 				f_name.fn = path;
@@ -15201,8 +15199,11 @@ int CMainFrame::SearchInDir(bool DirForward)
 		sl.AddTail(f_array[i].fn);
 	}
 
-	POSITION Pos;
-	Pos = sl.Find(m_LastOpenFile);
+	POSITION Pos = sl.Find(m_LastOpenFile);
+	if (Pos == NULL) {
+		return false;
+	}
+
 	if (DirForward) {
 		if (Pos == sl.GetTailPosition()) {
 			return false;
@@ -15215,10 +15216,12 @@ int CMainFrame::SearchInDir(bool DirForward)
 		}
 		sl.GetPrev(Pos);
 	}
+
 	Play_sl.AddHead(sl.GetAt(Pos));
-	m_wndPlaylistBar.Open(Play_sl,false);
+	m_wndPlaylistBar.Open(Play_sl, false);
 	OpenCurPlaylistItem();
-	return(sl.GetCount());
+
+	return (sl.GetCount());
 }
 
 void CMainFrame::DoTunerScan(TunerScanData* pTSD)
