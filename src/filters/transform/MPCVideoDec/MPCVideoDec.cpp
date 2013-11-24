@@ -1833,7 +1833,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 			m_pVideoOutputFormat[nPos + i].subtype			= swof->subtype;
 			m_pVideoOutputFormat[nPos + i].biCompression	= swof->biCompression;
 			m_pVideoOutputFormat[nPos + i].biBitCount		= swof->bpp;
-			m_pVideoOutputFormat[nPos + i].biPlanes			= swof->planes;
+			m_pVideoOutputFormat[nPos + i].biPlanes			= 1; // This value must be set to 1.
 		}
 	}
 }
