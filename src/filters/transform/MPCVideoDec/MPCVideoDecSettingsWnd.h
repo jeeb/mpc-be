@@ -38,7 +38,9 @@ enum {
 	IDC_PP_SW_NV12,
 	IDC_PP_SW_YV12,
 	IDC_PP_SW_YUY2,
+#if ENABLE_AYUV
 	IDC_PP_SW_AYUV,
+#endif
 	IDC_PP_SW_RGB32,
 	IDC_PP_SWPRESET,
 	IDC_PP_SWSTANDARD,
@@ -84,7 +86,9 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CButton		m_cbNV12;
 	CButton		m_cbYV12;
 	CButton		m_cbYUY2;
+#if ENABLE_AYUV
 	CButton		m_cbAYUV;
+#endif
 	CButton		m_cbRGB32;
 
 	CStatic     m_txtSwPreset;

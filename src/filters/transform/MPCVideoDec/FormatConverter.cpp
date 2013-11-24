@@ -36,7 +36,9 @@ static const SW_OUT_FMT s_sw_formats[] = {
 	// YUV formats are grouped according to luma bit depth and sorted in descending order of quality.
 	//  name     biCompression  subtype                                         av_pix_fmt    chroma_w chroma_h
 	// YUV 8 bit
+#if ENABLE_AYUV
 	{_T("AYUV"),  FCC('AYUV'), &MEDIASUBTYPE_AYUV,  32, 4, 0, {1},     {1},     AV_PIX_FMT_YUV444P, 0, 0 }, // PixFmt_AYUV
+#endif
 	{_T("YUY2"),  FCC('YUY2'), &MEDIASUBTYPE_YUY2,  16, 2, 0, {1},     {1},     AV_PIX_FMT_YUYV422, 1, 0 }, // PixFmt_YUY2
 	{_T("NV12"),  FCC('NV12'), &MEDIASUBTYPE_NV12,  12, 1, 2, {1,2},   {1,1},   AV_PIX_FMT_NV12,    1, 1 }, // PixFmt_NV12
 	{_T("YV12"),  FCC('YV12'), &MEDIASUBTYPE_YV12,  12, 1, 3, {1,2,2}, {1,2,2}, AV_PIX_FMT_YUV420P, 1, 1 }, // PixFmt_YV12
@@ -163,6 +165,7 @@ void  CFormatConverter::UpdateDetails()
 	}
 }
 
+#if ENABLE_AYUV
 HRESULT CFormatConverter::ConvertToAYUV(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[])
 {
   const BYTE *y = NULL;
@@ -229,6 +232,7 @@ HRESULT CFormatConverter::ConvertToAYUV(const uint8_t* const src[4], const int s
 
   return S_OK;
 }
+#endif
 
 void CFormatConverter::UpdateOutput(MPCPixelFormat out_pixfmt, int dstStride, int planeHeight)
 {
@@ -343,9 +347,11 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 	}
 
 	switch (m_out_pixfmt) {
+#if ENABLE_AYUV
 	case PixFmt_AYUV:
 		ConvertToAYUV(pFrame->data, pFrame->linesize, dstArray, m_FProps.width, m_FProps.height, dstStrideArray);
 		break;
+#endif
 	default:
 		int ret = sws_scale(m_pSwsContext, pFrame->data, pFrame->linesize, 0, m_FProps.height, dstArray, dstStrideArray);
 	}

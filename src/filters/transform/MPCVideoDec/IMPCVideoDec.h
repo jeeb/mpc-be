@@ -20,6 +20,8 @@
 
 #pragma once
 
+#define ENABLE_AYUV 0
+
 // Internal codec list (use to enable/disable codec in standalone mode)
 
 #define CODEC_H264			(1ULL << 0)
@@ -72,7 +74,9 @@ enum MPCPixelFormat {
 	// YUV formats are grouped according to luma bit depth and sorted in descending order of quality.
 	PixFmt_None = -1,
 	// YUV 8 bit
+#if ENABLE_AYUV
 	PixFmt_AYUV,  // 24+8 bit, 4:4:4
+#endif
 	PixFmt_YUY2,  // 16 bit, 4:2:2
 	PixFmt_NV12,  // 12 bit, 4:2:0
 	PixFmt_YV12,  // 12 bit, 4:2:0
