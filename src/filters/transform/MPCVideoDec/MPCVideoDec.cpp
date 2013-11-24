@@ -1807,7 +1807,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 	}
 
 	m_nVideoOutputCount = (IsDXVASupported() ? ffCodecs[m_nCodecNb].DXVAModeCount() + _countof (DXVAFormats) : 0) +
-						  (m_bUseFFmpeg   ? nSwCount : 0);
+						  (m_bUseFFmpeg ? nSwCount : 0);
 
 	m_pVideoOutputFormat = DNew VIDEO_OUTPUT_FORMATS[m_nVideoOutputCount];
 

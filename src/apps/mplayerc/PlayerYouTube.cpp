@@ -30,6 +30,16 @@
 #define MATCH_DASHMPD_START		"\"dashmpd\": \"http:\\/\\/www.youtube.com\\/api\\/manifest\\/dash\\/"
 #define MATCH_END				"\""
 
+static const YOUTUBE_PROFILES youtubeProfileEmpty = {0, _T(""), _T("N/A"), _T(""), false};
+static YOUTUBE_PROFILES getProfile(int iTag) {
+	for (int i = 0; i < _countof(youtubeProfiles); i++)
+		if (iTag == youtubeProfiles[i].iTag) {
+			return youtubeProfiles[i];
+	}
+
+	return youtubeProfileEmpty;
+}
+
 bool PlayerYouTubeCheck(CString fn)
 {
 	CString tmp_fn(CString(fn).MakeLower());
@@ -102,11 +112,13 @@ CString PlayerYouTube(CString fn, CString* out_Title, CString* out_Author)
 		BOOL match_itag = sApp.iYoutubeTag != 0;
 
 		BOOL bIsFullHD = FALSE;
+#if 0
 		if (sApp.iYoutubeTag == 37) {
 			// Full HD resolution, format .MP4
 			match_itag	= FALSE;
 			bIsFullHD	= TRUE;
 		}
+#endif
 
 		HINTERNET f, s = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
 		if (s) {
@@ -362,7 +374,8 @@ again:
 			int itagValue = 0;
 			if (_stscanf_s(itagValueStr, _T("%d"), &itagValue) == 1) {
 				YOUTUBE_PROFILES youtubePtofile = getProfile(itagValue);
-				if (youtubePtofile.iTag == 0
+				if (youtubePtofile.Visible == false
+					|| youtubePtofile.iTag == 0
 					|| ((youtubePtofile.Container == _T("WebM") && !match_itag))
 					|| youtubePtofile.Profile == _T("3D")) {
 					continue;

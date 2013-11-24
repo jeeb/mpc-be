@@ -37,8 +37,8 @@ typedef struct {
 } YOUTUBE_PROFILES;
 
 static const YOUTUBE_PROFILES youtubeProfiles[] = {
-	{38,	_T("MP4"),	_T("High"),			_T("3072p"),	true},
-	{37,	_T("MP4"),	_T("High"),			_T("1080p"),	true},
+	{38,	_T("MP4"),	_T("High"),			_T("3072p"),	false},
+	{37,	_T("MP4"),	_T("High"),			_T("1080p"),	false},
 	{22,	_T("MP4"),	_T("High"),			_T("720p"),		true},
 	{18,	_T("MP4"),	_T("Baseline"),		_T("360p"),		true},
 	{35,	_T("FLV"),	_T("Main"),			_T("480p"),		true},
@@ -48,7 +48,7 @@ static const YOUTUBE_PROFILES youtubeProfiles[] = {
 	{36,	_T("3GP"),	_T("Simple"),		_T("240p"),		true},
 	{17,	_T("3GP"),	_T("Simple"),		_T("144p"),		true},
 	{13,	_T("3GP"),	_T("N/A"),			_T("N/A"),		true},
-	{46,	_T("WebM"),	_T("N/A"),			_T("1080p"),	true},
+	{46,	_T("WebM"),	_T("N/A"),			_T("1080p"),	false},
 	{45,	_T("WebM"),	_T("N/A"),			_T("720p"),		true},
 	{44,	_T("WebM"),	_T("N/A"),			_T("480p"),		true},
 	{43,	_T("WebM"),	_T("N/A"),			_T("360p"),		true},
@@ -61,17 +61,6 @@ static const YOUTUBE_PROFILES youtubeProfiles[] = {
 	{102,	_T("WebM"),	_T("3D"),			_T("720p"),		false},
 	{120,	_T("FLV"),	_T("Main@L3.1"),	_T("720p"),		false}
 };
-
-static const YOUTUBE_PROFILES youtubeProfileEmpty = {0, _T(""), _T("N/A"), _T(""), false};
-
-static YOUTUBE_PROFILES getProfile(int iTag) {
-	for (int i = 0; i < _countof(youtubeProfiles); i++)
-		if (iTag == youtubeProfiles[i].iTag) {
-			return youtubeProfiles[i];
-	}
-
-	return youtubeProfileEmpty;
-}
 
 static DWORD strpos(char* h, char* n)
 {
