@@ -94,6 +94,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (TSCC, tscc);
     REGISTER_DECODER (TSCC2, tscc2);
     REGISTER_DECODER (VC1, vc1);
+    REGISTER_DECODER (VC1IMAGE, vc1image);
     REGISTER_DECODER (VMNC, vmnc);
     REGISTER_DECODER (VP3, vp3);
     REGISTER_DECODER (VP5, vp5);
@@ -105,6 +106,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (WMV1, wmv1);
     REGISTER_DECODER (WMV2, wmv2);
     REGISTER_DECODER (WMV3, wmv3);
+    REGISTER_DECODER (WMV3IMAGE, wmv3image);
     REGISTER_DECODER (UTVIDEO, utvideo);
     REGISTER_DECODER (V210, v210);
 
