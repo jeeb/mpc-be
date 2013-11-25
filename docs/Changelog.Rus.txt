@@ -20,7 +20,7 @@
 	* Обновлен Корейский перевод (автор kuh3h3);
 	* ffmpeg 2.1 git-e043298c;
 	* libwebp 0.3.1 git-ff379db3;
-	* libvpx 1.2 git-7fb5e738;
+	* libvpx 1.2 git-2d50c849;
 	* libopus 1.1 git-93e10960;
 	* libpng 1.7.0 b24 git-b1f0c7d0;
 	* MediaInfo 0.7.65+ svn rev.5989;
