@@ -1975,15 +1975,13 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 
 HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pReceivePin)
 {
-	if (direction == PINDIR_INPUT && m_pOutput->IsConnected()) {
-		ReconnectOutput(PictWidth(), PictHeight());
-	} else if (direction == PINDIR_OUTPUT) {
+	if (direction == PINDIR_OUTPUT) {
 		DetectVideoCard_EVR(pReceivePin);
 
 		if (IsDXVASupported()) {
 			if (m_nDecoderMode == MODE_DXVA1) {
 				m_pDXVADecoder->ConfigureDXVA1();
-			} else if (SUCCEEDED(ConfigureDXVA2(pReceivePin)) && SUCCEEDED(SetEVRForDXVA2(pReceivePin)) ) {
+			} else if (SUCCEEDED(ConfigureDXVA2(pReceivePin)) && SUCCEEDED(SetEVRForDXVA2(pReceivePin))) {
 				m_nDecoderMode = MODE_DXVA2;
 			}
 		}
@@ -1993,7 +1991,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 
 		if (m_nDecoderMode == MODE_SOFTWARE && IsDXVASupported()) {
 			HRESULT hr;
-			if FAILED(hr = ReopenVideo()) {
+			if (FAILED(hr = ReopenVideo())) {
 				return hr;
 			}
 
