@@ -799,7 +799,6 @@
     <ClCompile Include="libavutil\samplefmt.c" />
     <ClCompile Include="libavutil\sha.c" />
     <ClCompile Include="libavutil\timecode.c" />
-    <ClCompile Include="libavutil\utf8.c" />
     <ClCompile Include="libavutil\utils.c" />
     <ClCompile Include="libavutil\x86\cpu.c" />
     <ClCompile Include="libavutil\x86\float_dsp_init.c" />

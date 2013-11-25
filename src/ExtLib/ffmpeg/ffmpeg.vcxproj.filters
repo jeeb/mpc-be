@@ -2371,9 +2371,6 @@
     <ClCompile Include="libavutil\timecode.c">
       <Filter>libavutil</Filter>
     </ClCompile>
-    <ClCompile Include="libavutil\utf8.c">
-      <Filter>libavutil</Filter>
-    </ClCompile>
     <ClCompile Include="libavutil\utils.c">
       <Filter>libavutil</Filter>
     </ClCompile>
