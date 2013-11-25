@@ -228,6 +228,8 @@ FFMPEG_CODECS		ffCodecs[] = {
 	{ &MEDIASUBTYPE_wmv2, AV_CODEC_ID_WMV2, NULL, FFM_WMV, -1 },
 	{ &MEDIASUBTYPE_WMV3, AV_CODEC_ID_WMV3, &DXVA_VC1, FFM_WMV, TRA_DXVA_WMV3 },
 	{ &MEDIASUBTYPE_wmv3, AV_CODEC_ID_WMV3, &DXVA_VC1, FFM_WMV, TRA_DXVA_WMV3 },
+	// WMVP
+	{ &MEDIASUBTYPE_WMVP, AV_CODEC_ID_WMV3IMAGE, NULL, FFM_WMV, -1 },
 
 	// MPEG-2
 	{ &MEDIASUBTYPE_MPEG2_VIDEO, AV_CODEC_ID_MPEG2VIDEO, &DXVA_Mpeg2, FFM_MPEG2, TRA_DXVA_MPEG2 },
@@ -387,9 +389,6 @@ FFMPEG_CODECS		ffCodecs[] = {
 
 	// WMVA
 	{ &MEDIASUBTYPE_WMVA, AV_CODEC_ID_VC1, &DXVA_VC1, FFM_VC1, TRA_DXVA_VC1 },
-
-	// WMVP
-	{ &MEDIASUBTYPE_WMVP, AV_CODEC_ID_WMV3IMAGE, NULL, FFM_WMV, -1 },
 
 	// WVP2
 	{ &MEDIASUBTYPE_WVP2, AV_CODEC_ID_VC1IMAGE, NULL, FFM_VC1, -1 },
@@ -1011,10 +1010,10 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 #ifdef _DEBUG
 	// Check codec definition table
-	int nCodecs	  = _countof(ffCodecs);
-	int nPinTypes = _countof(sudPinTypesIn);
+	size_t nCodecs		= _countof(ffCodecs);
+	size_t nPinTypes	= _countof(sudPinTypesIn);
 	ASSERT(nCodecs == nPinTypes);
-	for (int i = 0; i < nPinTypes; i++) {
+	for (size_t i = 0; i < nPinTypes; i++) {
 		ASSERT(ffCodecs[i].clsMinorType == sudPinTypesIn[i].clsMinorType);
 	}
 #endif
@@ -1142,7 +1141,7 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, bool bForced)
 {
 	m_bUseFFmpeg	= false;
 	m_bUseDXVA		= false;
-	for (int i = 0; i < _countof(ffCodecs); i++)
+	for (size_t i = 0; i < _countof(ffCodecs); i++)
 		if (mtIn->subtype == *ffCodecs[i].clsMinorType) {
 #ifndef REGISTER_FILTER
 			m_bUseFFmpeg	= bForced || IsFFMPEGEnabled(ffCodecs[i], m_FFmpegFilters);
@@ -1169,12 +1168,13 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, bool bForced)
 					break;
 				case AV_CODEC_ID_WMV1 :
 				case AV_CODEC_ID_WMV2 :
+				case AV_CODEC_ID_WMV3IMAGE :
 					bCodecActivated = (m_nActiveCodecs & CODEC_WMV) != 0;
 					break;
 				case AV_CODEC_ID_WMV3 :
-					m_bUseDXVA = (m_nActiveCodecs & CODEC_WMV3_DXVA) != 0;
-					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_WMV) != 0;
-					bCodecActivated = m_bUseDXVA || m_bUseFFmpeg;
+					m_bUseDXVA		= (m_nActiveCodecs & CODEC_WMV3_DXVA) != 0;
+					m_bUseFFmpeg	= (m_nActiveCodecs & CODEC_WMV) != 0;
+					bCodecActivated	= m_bUseDXVA || m_bUseFFmpeg;
 					break;
 				case AV_CODEC_ID_MSMPEG4V3 :
 				case AV_CODEC_ID_MSMPEG4V2 :
@@ -1182,9 +1182,9 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, bool bForced)
 					bCodecActivated = (m_nActiveCodecs & CODEC_MSMPEG4) != 0;
 					break;
 				case AV_CODEC_ID_H264 :
-					m_bUseDXVA = (m_nActiveCodecs & CODEC_H264_DXVA) != 0;
-					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_H264) != 0;
-					bCodecActivated = m_bUseDXVA || m_bUseFFmpeg;
+					m_bUseDXVA		= (m_nActiveCodecs & CODEC_H264_DXVA) != 0;
+					m_bUseFFmpeg	= (m_nActiveCodecs & CODEC_H264) != 0;
+					bCodecActivated	= m_bUseDXVA || m_bUseFFmpeg;
 					break;
 				case AV_CODEC_ID_SVQ3 :
 				case AV_CODEC_ID_SVQ1 :
@@ -1203,9 +1203,12 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, bool bForced)
 					bCodecActivated = (m_nActiveCodecs & CODEC_THEORA) != 0;
 					break;
 				case AV_CODEC_ID_VC1 :
-					m_bUseDXVA = (m_nActiveCodecs & CODEC_VC1_DXVA) != 0;
-					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_VC1) != 0;
-					bCodecActivated = m_bUseDXVA || m_bUseFFmpeg;
+					m_bUseDXVA		= (m_nActiveCodecs & CODEC_VC1_DXVA) != 0;
+					m_bUseFFmpeg	= (m_nActiveCodecs & CODEC_VC1) != 0;
+					bCodecActivated	= m_bUseDXVA || m_bUseFFmpeg;
+					break;
+				case AV_CODEC_ID_VC1IMAGE :
+					bCodecActivated = (m_nActiveCodecs & CODEC_VC1) != 0;
 					break;
 				case AV_CODEC_ID_AMV :
 					bCodecActivated = (m_nActiveCodecs & CODEC_AMVV) != 0;
@@ -1250,9 +1253,9 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, bool bForced)
 					bCodecActivated = (m_nActiveCodecs & CODEC_REALV) != 0;
 					break;
 				case AV_CODEC_ID_MPEG2VIDEO :
-					m_bUseDXVA = (m_nActiveCodecs & CODEC_MPEG2_DXVA) != 0;
-					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_MPEG2) != 0;
-					bCodecActivated = m_bUseDXVA || m_bUseFFmpeg;
+					m_bUseDXVA		= (m_nActiveCodecs & CODEC_MPEG2_DXVA) != 0;
+					m_bUseFFmpeg	= (m_nActiveCodecs & CODEC_MPEG2) != 0;
+					bCodecActivated	= m_bUseDXVA || m_bUseFFmpeg;
 					break;
 				case AV_CODEC_ID_MPEG1VIDEO :
 					bCodecActivated = (m_nActiveCodecs & CODEC_MPEG1) != 0;
@@ -1353,7 +1356,6 @@ STDMETHODIMP CMPCVideoDecFilter::NonDelegatingQueryInterface(REFIID riid, void**
 	return
 		QI(IMPCVideoDecFilter)
 		QI(IMPCVideoDecFilter2)
-		QI(IMPCVideoDecFilterCodec)
 		QI(ISpecifyPropertyPages)
 		QI(ISpecifyPropertyPages2)
 		__super::NonDelegatingQueryInterface(riid, ppv);
@@ -1361,7 +1363,7 @@ STDMETHODIMP CMPCVideoDecFilter::NonDelegatingQueryInterface(REFIID riid, void**
 
 HRESULT CMPCVideoDecFilter::CheckInputType(const CMediaType* mtIn)
 {
-	for (int i = 0; i < _countof(sudPinTypesIn); i++) {
+	for (size_t i = 0; i < _countof(sudPinTypesIn); i++) {
 		if ((mtIn->majortype == *sudPinTypesIn[i].clsMajorType) &&
 				(mtIn->subtype == *sudPinTypesIn[i].clsMinorType)) {
 			return S_OK;
@@ -2361,6 +2363,9 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 		}
 
 		bool fWaitKeyFrame =	m_nCodecId == AV_CODEC_ID_VC1
+							 || m_nCodecId == AV_CODEC_ID_VC1IMAGE
+							 || m_nCodecId == AV_CODEC_ID_WMV3
+							 || m_nCodecId == AV_CODEC_ID_WMV3IMAGE
 							 || m_nCodecId == AV_CODEC_ID_MPEG2VIDEO
 							 || m_nCodecId == AV_CODEC_ID_RV30
 							 || m_nCodecId == AV_CODEC_ID_RV40
@@ -3050,6 +3055,30 @@ HRESULT CMPCVideoDecFilter::DetectVideoCard_EVR(IPin *pPin)
 	return hr;
 }
 
+HRESULT CMPCVideoDecFilter::SetFFMpegCodec(int nCodec, bool bEnabled)
+{
+	CAutoLock cAutoLock(&m_csProps);
+
+	if (nCodec < 0 || nCodec >= FFM_LAST) {
+		return E_FAIL;
+	}
+
+	m_FFmpegFilters[nCodec] = bEnabled;
+	return S_OK;
+}
+
+HRESULT CMPCVideoDecFilter::SetDXVACodec(int nCodec, bool bEnabled)
+{
+	CAutoLock cAutoLock(&m_csProps);
+
+	if (nCodec < 0 || nCodec >= TRA_DXVA_LAST) {
+		return E_FAIL;
+	}
+
+	m_DXVAFilters[nCodec] = bEnabled;
+	return S_OK;
+}
+
 // IFFmpegDecFilter
 STDMETHODIMP CMPCVideoDecFilter::Apply()
 {
@@ -3322,31 +3351,6 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetFrameType()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_nFrameType;
-}
-
-// === IMPCVideoDecFilterCodec
-STDMETHODIMP CMPCVideoDecFilter::SetFFMpegCodec(int nCodec, bool bEnabled)
-{
-	CAutoLock cAutoLock(&m_csProps);
-
-	if (nCodec < 0 || nCodec >= FFM_LAST) {
-		return E_FAIL;
-	}
-
-	m_FFmpegFilters[nCodec] = bEnabled;
-	return S_OK;
-}
-
-STDMETHODIMP CMPCVideoDecFilter::SetDXVACodec(int nCodec, bool bEnabled)
-{
-	CAutoLock cAutoLock(&m_csProps);
-
-	if (nCodec < 0 || nCodec >= TRA_DXVA_LAST) {
-		return E_FAIL;
-	}
-
-	m_DXVAFilters[nCodec] = bEnabled;
-	return S_OK;
 }
 
 CVideoDecOutputPin::CVideoDecOutputPin(TCHAR* pObjectName, CBaseVideoFilter* pFilter, HRESULT* phr, LPCWSTR pName)

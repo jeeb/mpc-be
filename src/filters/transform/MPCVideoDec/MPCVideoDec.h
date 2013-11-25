@@ -56,7 +56,6 @@ class __declspec(uuid("008BAC12-FBAF-497b-9670-BC6F6FBAE2C4"))
 	, public ISpecifyPropertyPages2
 	, public IMPCVideoDecFilter
 	, public IMPCVideoDecFilter2
-	, public IMPCVideoDecFilterCodec
 {
 protected:
 	CCpuId*									m_pCpuId;
@@ -248,10 +247,6 @@ public:
 	// === IMPCVideoDecFilter2
 	STDMETHODIMP_(int) GetFrameType();
 
-	// === IMPCVideoDecFilterCodec
-	STDMETHODIMP SetFFMpegCodec(int nCodec, bool bEnabled);
-	STDMETHODIMP SetDXVACodec(int nCodec, bool bEnabled);
-
 	// === DXVA common functions
 	BOOL						IsSupportedDecoderConfig(const D3DFORMAT nD3DFormat, const DXVA2_ConfigPictureDecode& config, bool& bIsPrefered);
 	BOOL						IsSupportedDecoderMode(const GUID* mode);
@@ -303,6 +298,10 @@ public:
 
 	// === EVR functions
 	HRESULT						DetectVideoCard_EVR(IPin *pPin);
+
+	// === Codec functions
+	HRESULT						SetFFMpegCodec(int nCodec, bool bEnabled);
+	HRESULT						SetDXVACodec(int nCodec, bool bEnabled);
 
 private:
 	friend class CVideoDecDXVAAllocator;

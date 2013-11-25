@@ -144,10 +144,3 @@ IMPCVideoDecFilter2 :
 public IUnknown {
 	STDMETHOD_(int, GetFrameType()) = 0;
 };
-
-interface __declspec(uuid("EAAE8911-3EB7-49F4-A255-67D84651EE8F"))
-IMPCVideoDecFilterCodec :
-public IUnknown {
-	STDMETHOD(SetFFMpegCodec(int nCodec, bool bEnabled)) = 0;
-	STDMETHOD(SetDXVACodec(int nCodec, bool bEnabled)) = 0;
-};

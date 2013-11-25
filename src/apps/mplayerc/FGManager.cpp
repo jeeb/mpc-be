@@ -40,6 +40,81 @@
 #include "MediaFormats.h"
 #include <IPinHook.h>
 
+class CFGMPCVideoDecoderInternal : public CFGFilterInternal<CMPCVideoDecFilter>
+{
+	bool	m_IsPreview;
+	UINT64	m_merit;
+
+public:
+	CFGMPCVideoDecoderInternal(CStringW name = L"", UINT64 merit = MERIT64_DO_USE, bool IsPreview = false)
+		: CFGFilterInternal<CMPCVideoDecFilter>(name, merit)
+		, m_IsPreview(IsPreview)
+		, m_merit(merit) {
+
+		AppSettings& s = AfxGetAppSettings();
+
+		// Get supported MEDIASUBTYPE_ from decoder
+		CAtlList<SUPPORTED_FORMATS> fmts;
+		GetFormatList(fmts);
+
+		if (m_merit == MERIT64_ABOVE_DSHOW) {
+			// High merit MPC Video Decoder
+			POSITION pos = fmts.GetHeadPosition();
+			while (pos) {
+				SUPPORTED_FORMATS fmt = fmts.GetNext(pos);
+				if (m_IsPreview || s.FFmpegFilters[fmt.FFMPEGCode] || s.DXVAFilters[fmt.DXVACode]) {
+					AddType(MEDIATYPE_Video, *fmt.clsMinorType);
+				}
+			}
+		} else if (!m_IsPreview) {
+			// Low merit MPC Video Decoder
+			POSITION pos = fmts.GetHeadPosition();
+			while (pos) {
+				SUPPORTED_FORMATS fmt = fmts.GetNext(pos);
+				AddType(MEDIATYPE_Video, *fmt.clsMinorType);
+			}
+		}
+	}
+
+	HRESULT Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_IUnknown>& pUnks) {
+		CheckPointer(ppBF, E_POINTER);
+
+		HRESULT hr = S_OK;
+		CComPtr<CMPCVideoDecFilter> pBF = DNew CMPCVideoDecFilter(NULL, &hr);
+		if (FAILED(hr)) {
+			return hr;
+		}
+
+		bool ffmpeg_filters[FFM_LAST + !FFM_LAST];
+		bool dxva_filters[TRA_DXVA_LAST + !TRA_DXVA_LAST];
+
+		AppSettings& s = AfxGetAppSettings();
+
+		memcpy(&ffmpeg_filters, &s.FFmpegFilters, sizeof(s.FFmpegFilters));
+		memcpy(&dxva_filters, &s.DXVAFilters, sizeof(s.DXVAFilters));
+
+		if (m_merit == MERIT64_DO_USE) {
+			memset(&ffmpeg_filters, true, sizeof(ffmpeg_filters));
+			memset(&dxva_filters, true, sizeof(dxva_filters));
+		}
+		if (m_IsPreview) {
+			memset(&ffmpeg_filters, true, sizeof(ffmpeg_filters));
+			memset(&dxva_filters, false, sizeof(dxva_filters));
+		}
+
+		for (size_t i = 0; i < TRA_DXVA_LAST + !TRA_DXVA_LAST; i++) {
+			pBF->SetDXVACodec(i, dxva_filters[i]);
+		}
+		for (size_t i = 0; i < FFM_LAST + !FFM_LAST; i++) {
+			pBF->SetFFMpegCodec(i, ffmpeg_filters[i]);
+		}
+
+		*ppBF = pBF.Detach();
+
+		return hr;
+	}
+};
+
 //
 // CFGManager
 //
@@ -2454,33 +2529,13 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_transform.AddTail(pFGF);
 	}
 
-	// Get supported MEDIASUBTYPE_ from decoder
-	CAtlList<SUPPORTED_FORMATS> fmts;
-	GetFormatList(fmts);
-
 	// High merit MPC Video Decoder
-	pFGF = DNew CFGFilterInternal<CMPCVideoDecFilter>(MPCVideoDecName, MERIT64_ABOVE_DSHOW);
-	{
-		POSITION pos = fmts.GetHeadPosition();
-		while (pos) {
-			SUPPORTED_FORMATS fmt = fmts.GetNext(pos);
-			if (IsPreview || ffmpeg_filters[fmt.FFMPEGCode] || dxva_filters[fmt.DXVACode]) {
-				pFGF->AddType(MEDIATYPE_Video, *fmt.clsMinorType);
-			}
-		}
-	}
+	pFGF = DNew CFGMPCVideoDecoderInternal(MPCVideoDecName, MERIT64_ABOVE_DSHOW, IsPreview);
 	m_transform.AddTail(pFGF);
 
 	// Low merit MPC Video Decoder
 	if (!IsPreview) { // do not need for Preview mode.
-		pFGF = DNew CFGFilterInternal<CMPCVideoDecFilter>(LowMerit(MPCVideoDecName), MERIT64_DO_USE);
-		{
-			POSITION pos = fmts.GetHeadPosition();
-			while (pos) {
-				SUPPORTED_FORMATS fmt = fmts.GetNext(pos);
-				pFGF->AddType(MEDIATYPE_Video, *fmt.clsMinorType);
-			}
-		}
+		pFGF = DNew CFGMPCVideoDecoderInternal(LowMerit(MPCVideoDecName));
 		m_transform.AddTail(pFGF);
 	}
 
@@ -2652,31 +2707,6 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 		pASF->SetSpeakerConfig(s.fCustomChannelMapping, s.pSpeakerToChannelMap);
 		pASF->SetAudioTimeShift(s.fAudioTimeShift ? 10000i64*s.iAudioTimeShift : 0);
 		pASF->SetNormalizeBoost(s.fAudioNormalize, s.fAudioNormalizeRecover, s.dAudioBoost_dB);
-	}
-
-	if (CComQIPtr<IMPCVideoDecFilterCodec> MPCVideoDecFilter = pBF) {
-		CString name = GetFilterName(pBF);
-		bool ffmpeg_filters[FFM_LAST + !FFM_LAST];
-		bool dxva_filters[TRA_DXVA_LAST + !TRA_DXVA_LAST];
-
-		memcpy(&ffmpeg_filters, &s.FFmpegFilters, sizeof(s.FFmpegFilters));
-		memcpy(&dxva_filters, &s.DXVAFilters, sizeof(s.DXVAFilters));
-
-		if (name == LowMerit(MPCVideoDecName)) {
-			memset(&ffmpeg_filters, true, sizeof(ffmpeg_filters));
-			memset(&dxva_filters, true, sizeof(dxva_filters));
-		}
-		if (m_IsPreview) {
-			memset(&ffmpeg_filters, true, sizeof(ffmpeg_filters));
-			memset(&dxva_filters, false, sizeof(dxva_filters));
-		}
-
-		for (int f=0; f<TRA_DXVA_LAST; f++) {
-			MPCVideoDecFilter->SetDXVACodec(f, dxva_filters[f]);
-		}
-		for (int f=0; f<FFM_LAST; f++) {
-			MPCVideoDecFilter->SetFFMpegCodec(f, ffmpeg_filters[f]);
-		}
 	}
 
 	return hr;
