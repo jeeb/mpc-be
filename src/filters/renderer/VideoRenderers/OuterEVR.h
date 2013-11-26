@@ -29,12 +29,12 @@ namespace DSObjects
 		, public IVMRMixerBitmap9
 		, public IBaseFilter
 	{
-		CComPtr<IUnknown>	m_pEVR;
-		VMR9AlphaBitmap*	m_pVMR9AlphaBitmap;
-		CEVRAllocatorPresenter *m_pAllocatorPresenter;
+		CComPtr<IUnknown> m_pEVR;
+		VMR9AlphaBitmap*  m_pVMR9AlphaBitmap;
+		CEVRAllocatorPresenter* m_pAllocatorPresenter;
 
 	public:
-		COuterEVR(const TCHAR* pName, LPUNKNOWN pUnk, HRESULT& hr, VMR9AlphaBitmap* pVMR9AlphaBitmap, CEVRAllocatorPresenter *pAllocatorPresenter) : CUnknown(pName, pUnk) {
+		COuterEVR(const TCHAR* pName, LPUNKNOWN pUnk, HRESULT& hr, VMR9AlphaBitmap* pVMR9AlphaBitmap, CEVRAllocatorPresenter* pAllocatorPresenter) : CUnknown(pName, pUnk) {
 			hr = m_pEVR.CoCreateInstance(CLSID_EnhancedVideoRenderer, GetOwner());
 			m_pVMR9AlphaBitmap = pVMR9AlphaBitmap;
 			m_pAllocatorPresenter = pAllocatorPresenter;
@@ -70,18 +70,18 @@ namespace DSObjects
 		}
 
 		// IBaseFilter
-		STDMETHODIMP EnumPins(__out  IEnumPins **ppEnum);
-		STDMETHODIMP FindPin(LPCWSTR Id, __out  IPin **ppPin);
-		STDMETHODIMP QueryFilterInfo(__out  FILTER_INFO *pInfo);
-		STDMETHODIMP JoinFilterGraph(__in_opt  IFilterGraph *pGraph, __in_opt  LPCWSTR pName);
-		STDMETHODIMP QueryVendorInfo(__out  LPWSTR *pVendorInfo);
+		STDMETHODIMP EnumPins(__out  IEnumPins** ppEnum);
+		STDMETHODIMP FindPin(LPCWSTR Id, __out  IPin** ppPin);
+		STDMETHODIMP QueryFilterInfo(__out  FILTER_INFO* pInfo);
+		STDMETHODIMP JoinFilterGraph(__in_opt  IFilterGraph* pGraph, __in_opt  LPCWSTR pName);
+		STDMETHODIMP QueryVendorInfo(__out  LPWSTR* pVendorInfo);
 		STDMETHODIMP Stop();
 		STDMETHODIMP Pause();
 		STDMETHODIMP Run(REFERENCE_TIME tStart);
-		STDMETHODIMP GetState( DWORD dwMilliSecsTimeout, __out  FILTER_STATE *State);
-		STDMETHODIMP SetSyncSource(__in_opt  IReferenceClock *pClock);
-		STDMETHODIMP GetSyncSource(__deref_out_opt  IReferenceClock **pClock);
-		STDMETHODIMP GetClassID(__RPC__out CLSID *pClassID);
+		STDMETHODIMP GetState(DWORD dwMilliSecsTimeout, __out  FILTER_STATE* State);
+		STDMETHODIMP SetSyncSource(__in_opt  IReferenceClock* pClock);
+		STDMETHODIMP GetSyncSource(__deref_out_opt  IReferenceClock** pClock);
+		STDMETHODIMP GetClassID(__RPC__out CLSID* pClassID);
 
 		// IVMRffdshow9
 		STDMETHODIMP support_ffdshow() {
@@ -91,7 +91,7 @@ namespace DSObjects
 
 		// IVMRMixerBitmap9
 		STDMETHODIMP GetAlphaBitmapParameters(VMR9AlphaBitmap* pBmpParms);
-		STDMETHODIMP SetAlphaBitmap(const VMR9AlphaBitmap*  pBmpParms);
+		STDMETHODIMP SetAlphaBitmap(const VMR9AlphaBitmap* pBmpParms);
 		STDMETHODIMP UpdateAlphaBitmapParameters(const VMR9AlphaBitmap* pBmpParms);
 	};
 }

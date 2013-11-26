@@ -25,7 +25,8 @@
 
 using namespace DSObjects;
 
-STDMETHODIMP COuterEVR::EnumPins(__out  IEnumPins **ppEnum) {
+STDMETHODIMP COuterEVR::EnumPins(__out  IEnumPins** ppEnum)
+{
 	CComPtr<IBaseFilter> pEVRBase;
 	if (m_pEVR) {
 		m_pEVR->QueryInterface(&pEVRBase);
@@ -36,7 +37,8 @@ STDMETHODIMP COuterEVR::EnumPins(__out  IEnumPins **ppEnum) {
 	return E_NOTIMPL;
 }
 
-STDMETHODIMP COuterEVR::FindPin(LPCWSTR Id, __out  IPin **ppPin) {
+STDMETHODIMP COuterEVR::FindPin(LPCWSTR Id, __out  IPin** ppPin)
+{
 	CComPtr<IBaseFilter> pEVRBase;
 	if (m_pEVR) {
 		m_pEVR->QueryInterface(&pEVRBase);
@@ -47,7 +49,8 @@ STDMETHODIMP COuterEVR::FindPin(LPCWSTR Id, __out  IPin **ppPin) {
 	return E_NOTIMPL;
 }
 
-STDMETHODIMP COuterEVR::QueryFilterInfo(__out  FILTER_INFO *pInfo) {
+STDMETHODIMP COuterEVR::QueryFilterInfo(__out  FILTER_INFO* pInfo)
+{
 	CComPtr<IBaseFilter> pEVRBase;
 	if (m_pEVR) {
 		m_pEVR->QueryInterface(&pEVRBase);
@@ -58,7 +61,8 @@ STDMETHODIMP COuterEVR::QueryFilterInfo(__out  FILTER_INFO *pInfo) {
 	return E_NOTIMPL;
 }
 
-STDMETHODIMP COuterEVR::JoinFilterGraph(__in_opt  IFilterGraph *pGraph, __in_opt  LPCWSTR pName) {
+STDMETHODIMP COuterEVR::JoinFilterGraph(__in_opt  IFilterGraph* pGraph, __in_opt  LPCWSTR pName)
+{
 	CComPtr<IBaseFilter> pEVRBase;
 	if (m_pEVR) {
 		m_pEVR->QueryInterface(&pEVRBase);
@@ -69,7 +73,8 @@ STDMETHODIMP COuterEVR::JoinFilterGraph(__in_opt  IFilterGraph *pGraph, __in_opt
 	return E_NOTIMPL;
 }
 
-STDMETHODIMP COuterEVR::QueryVendorInfo(__out  LPWSTR *pVendorInfo) {
+STDMETHODIMP COuterEVR::QueryVendorInfo(__out  LPWSTR* pVendorInfo)
+{
 	CComPtr<IBaseFilter> pEVRBase;
 	if (m_pEVR) {
 		m_pEVR->QueryInterface(&pEVRBase);
@@ -80,7 +85,8 @@ STDMETHODIMP COuterEVR::QueryVendorInfo(__out  LPWSTR *pVendorInfo) {
 	return E_NOTIMPL;
 }
 
-STDMETHODIMP COuterEVR::Stop() {
+STDMETHODIMP COuterEVR::Stop()
+{
 	CComPtr<IBaseFilter> pEVRBase;
 	if (m_pEVR) {
 		m_pEVR->QueryInterface(&pEVRBase);
@@ -91,7 +97,8 @@ STDMETHODIMP COuterEVR::Stop() {
 	return E_NOTIMPL;
 }
 
-STDMETHODIMP COuterEVR::Pause() {
+STDMETHODIMP COuterEVR::Pause()
+{
 	CComPtr<IBaseFilter> pEVRBase;
 	if (m_pEVR) {
 		m_pEVR->QueryInterface(&pEVRBase);
@@ -102,7 +109,8 @@ STDMETHODIMP COuterEVR::Pause() {
 	return E_NOTIMPL;
 }
 
-STDMETHODIMP COuterEVR::Run(REFERENCE_TIME tStart) {
+STDMETHODIMP COuterEVR::Run(REFERENCE_TIME tStart)
+{
 	CComPtr<IBaseFilter> pEVRBase;
 	if (m_pEVR) {
 		m_pEVR->QueryInterface(&pEVRBase);
@@ -113,7 +121,7 @@ STDMETHODIMP COuterEVR::Run(REFERENCE_TIME tStart) {
 	return E_NOTIMPL;
 }
 
-STDMETHODIMP COuterEVR::GetState(DWORD dwMilliSecsTimeout, __out  FILTER_STATE *State)
+STDMETHODIMP COuterEVR::GetState(DWORD dwMilliSecsTimeout, __out  FILTER_STATE* State)
 {
 	HRESULT ReturnValue;
 	if (m_pAllocatorPresenter->GetState(dwMilliSecsTimeout, State, ReturnValue)) {
@@ -129,7 +137,8 @@ STDMETHODIMP COuterEVR::GetState(DWORD dwMilliSecsTimeout, __out  FILTER_STATE *
 	return E_NOTIMPL;
 }
 
-STDMETHODIMP COuterEVR::SetSyncSource(__in_opt  IReferenceClock *pClock) {
+STDMETHODIMP COuterEVR::SetSyncSource(__in_opt  IReferenceClock* pClock)
+{
 	CComPtr<IBaseFilter> pEVRBase;
 	if (m_pEVR) {
 		m_pEVR->QueryInterface(&pEVRBase);
@@ -140,7 +149,8 @@ STDMETHODIMP COuterEVR::SetSyncSource(__in_opt  IReferenceClock *pClock) {
 	return E_NOTIMPL;
 }
 
-STDMETHODIMP COuterEVR::GetSyncSource(__deref_out_opt  IReferenceClock **pClock) {
+STDMETHODIMP COuterEVR::GetSyncSource(__deref_out_opt  IReferenceClock** pClock)
+{
 	CComPtr<IBaseFilter> pEVRBase;
 	if (m_pEVR) {
 		m_pEVR->QueryInterface(&pEVRBase);
@@ -151,7 +161,8 @@ STDMETHODIMP COuterEVR::GetSyncSource(__deref_out_opt  IReferenceClock **pClock)
 	return E_NOTIMPL;
 }
 
-STDMETHODIMP COuterEVR::GetClassID(__RPC__out CLSID *pClassID) {
+STDMETHODIMP COuterEVR::GetClassID(__RPC__out CLSID* pClassID)
+{
 	CComPtr<IBaseFilter> pEVRBase;
 	if (m_pEVR) {
 		m_pEVR->QueryInterface(&pEVRBase);
@@ -166,7 +177,7 @@ STDMETHODIMP COuterEVR::GetAlphaBitmapParameters(VMR9AlphaBitmap* pBmpParms)
 {
 	CheckPointer(pBmpParms, E_POINTER);
 	CAutoLock BitMapLock(&m_pAllocatorPresenter->m_VMR9AlphaBitmapLock);
-	memcpy (pBmpParms, m_pVMR9AlphaBitmap, sizeof(VMR9AlphaBitmap));
+	memcpy(pBmpParms, m_pVMR9AlphaBitmap, sizeof(VMR9AlphaBitmap));
 	return S_OK;
 }
 
@@ -174,7 +185,7 @@ STDMETHODIMP COuterEVR::SetAlphaBitmap(const VMR9AlphaBitmap*  pBmpParms)
 {
 	CheckPointer(pBmpParms, E_POINTER);
 	CAutoLock BitMapLock(&m_pAllocatorPresenter->m_VMR9AlphaBitmapLock);
-	memcpy (m_pVMR9AlphaBitmap, pBmpParms, sizeof(VMR9AlphaBitmap));
+	memcpy(m_pVMR9AlphaBitmap, pBmpParms, sizeof(VMR9AlphaBitmap));
 	m_pVMR9AlphaBitmap->dwFlags |= VMRBITMAP_UPDATE;
 	m_pAllocatorPresenter->UpdateAlphaBitmap();
 	return S_OK;
@@ -184,7 +195,7 @@ STDMETHODIMP COuterEVR::UpdateAlphaBitmapParameters(const VMR9AlphaBitmap* pBmpP
 {
 	CheckPointer(pBmpParms, E_POINTER);
 	CAutoLock BitMapLock(&m_pAllocatorPresenter->m_VMR9AlphaBitmapLock);
-	memcpy (m_pVMR9AlphaBitmap, pBmpParms, sizeof(VMR9AlphaBitmap));
+	memcpy(m_pVMR9AlphaBitmap, pBmpParms, sizeof(VMR9AlphaBitmap));
 	m_pVMR9AlphaBitmap->dwFlags |= VMRBITMAP_UPDATE;
 	m_pAllocatorPresenter->UpdateAlphaBitmap();
 	return S_OK;
