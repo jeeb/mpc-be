@@ -1373,6 +1373,11 @@ HRESULT CMPCVideoDecFilter::CheckInputType(const CMediaType* mtIn)
 	return VFW_E_TYPE_NOT_ACCEPTED;
 }
 
+HRESULT CMPCVideoDecFilter::CheckTransform(const CMediaType* mtIn, const CMediaType* mtOut)
+{
+	return CheckInputType(mtIn); // TODO - add check output MediaType
+}
+
 bool CMPCVideoDecFilter::IsAVI()
 {
 	static DWORD SYNC = 0;

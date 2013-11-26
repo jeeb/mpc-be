@@ -82,8 +82,6 @@ public:
 	HRESULT GetMediaType(int iPosition, CMediaType* pMediaType);
 	HRESULT SetMediaType(PIN_DIRECTION dir, const CMediaType* pmt);
 
-	HRESULT DoCheckTransform(const CMediaType* mtIn, const CMediaType* mtOut, bool checkReconnection);
-
 	void SetAspect(CSize aspect);
 
 	bool GetSendMediaType()				{ return m_bSendMediaType;  }

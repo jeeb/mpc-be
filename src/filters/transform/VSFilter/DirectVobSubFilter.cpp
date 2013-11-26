@@ -569,6 +569,99 @@ HRESULT CDirectVobSubFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tS
 	return __super::NewSegment(tStart, tStop, dRate);
 }
 
+HRESULT CDirectVobSubFilter::CheckInputType(const CMediaType* mtIn)
+{
+	BITMAPINFOHEADER bih;
+	ExtractBIH(mtIn, &bih);
+
+	return mtIn->majortype == MEDIATYPE_Video
+		&& (mtIn->subtype == MEDIASUBTYPE_P016
+		       || mtIn->subtype == MEDIASUBTYPE_P010
+		       || mtIn->subtype == MEDIASUBTYPE_YV12
+			   || mtIn->subtype == MEDIASUBTYPE_I420
+			   || mtIn->subtype == MEDIASUBTYPE_IYUV
+			   || mtIn->subtype == MEDIASUBTYPE_YUY2
+			   || mtIn->subtype == MEDIASUBTYPE_ARGB32
+			   || mtIn->subtype == MEDIASUBTYPE_RGB32
+			   || mtIn->subtype == MEDIASUBTYPE_RGB24
+			   || mtIn->subtype == MEDIASUBTYPE_RGB565)
+		   && (mtIn->formattype == FORMAT_VideoInfo
+			   || mtIn->formattype == FORMAT_VideoInfo2)
+		   && bih.biHeight > 0
+		   ? S_OK
+		   : VFW_E_TYPE_NOT_ACCEPTED;
+}
+
+HRESULT CDirectVobSubFilter::CheckOutputType(const CMediaType& mtOut)
+{
+	int wout = 0, hout = 0, arxout = 0, aryout = 0;
+	return ExtractDim(&mtOut, wout, hout, arxout, aryout)
+		   && m_h == abs((int)hout)
+		   && mtOut.subtype != MEDIASUBTYPE_ARGB32
+		   ? S_OK
+		   : VFW_E_TYPE_NOT_ACCEPTED;
+}
+
+HRESULT CDirectVobSubFilter::CheckTransform(const CMediaType* mtIn, const CMediaType* mtOut)
+{
+	return DoCheckTransform(mtIn, mtOut, false);
+}
+
+HRESULT CDirectVobSubFilter::DoCheckTransform(const CMediaType* mtIn, const CMediaType* mtOut, bool checkReconnection)
+{
+	if (FAILED(CheckInputType(mtIn)) || mtOut->majortype != MEDIATYPE_Video) {
+		return VFW_E_TYPE_NOT_ACCEPTED;
+	}
+
+	if (mtIn->majortype == MEDIATYPE_Video
+				&& (mtIn->subtype == MEDIASUBTYPE_P016 || mtIn->subtype == MEDIASUBTYPE_P010)) {
+		if (mtOut->subtype != mtIn->subtype && checkReconnection) {
+			return VFW_E_TYPE_NOT_ACCEPTED;
+		}
+	} else if (mtIn->majortype == MEDIATYPE_Video
+				&& (mtIn->subtype == MEDIASUBTYPE_YV12
+				|| mtIn->subtype == MEDIASUBTYPE_I420
+				|| mtIn->subtype == MEDIASUBTYPE_IYUV)) {
+		if (mtOut->subtype != MEDIASUBTYPE_YV12
+				&& mtOut->subtype != MEDIASUBTYPE_I420
+				&& mtOut->subtype != MEDIASUBTYPE_IYUV
+				&& mtOut->subtype != MEDIASUBTYPE_YUY2
+				&& mtOut->subtype != MEDIASUBTYPE_ARGB32
+				&& mtOut->subtype != MEDIASUBTYPE_RGB32
+				&& mtOut->subtype != MEDIASUBTYPE_RGB24
+				&& mtOut->subtype != MEDIASUBTYPE_RGB565) {
+			return VFW_E_TYPE_NOT_ACCEPTED;
+		}
+	} else if (mtOut->majortype == MEDIATYPE_Video
+				&& (mtOut->subtype == MEDIASUBTYPE_P016 || mtOut->subtype == MEDIASUBTYPE_P010)) {
+		if (mtOut->subtype != mtIn->subtype) {
+			return VFW_E_TYPE_NOT_ACCEPTED;
+		}
+	} else if (mtIn->majortype == MEDIATYPE_Video
+			   && (mtIn->subtype == MEDIASUBTYPE_YUY2)) {
+		if (mtOut->subtype != MEDIASUBTYPE_YUY2
+				&& mtOut->subtype != MEDIASUBTYPE_ARGB32
+				&& mtOut->subtype != MEDIASUBTYPE_RGB32
+				&& mtOut->subtype != MEDIASUBTYPE_RGB24
+				&& mtOut->subtype != MEDIASUBTYPE_RGB565) {
+			return VFW_E_TYPE_NOT_ACCEPTED;
+		}
+	} else if (mtIn->majortype == MEDIATYPE_Video
+			   && (mtIn->subtype == MEDIASUBTYPE_ARGB32
+				   || mtIn->subtype == MEDIASUBTYPE_RGB32
+				   || mtIn->subtype == MEDIASUBTYPE_RGB24
+				   || mtIn->subtype == MEDIASUBTYPE_RGB565)) {
+		if (mtOut->subtype != MEDIASUBTYPE_ARGB32
+				&& mtOut->subtype != MEDIASUBTYPE_RGB32
+				&& mtOut->subtype != MEDIASUBTYPE_RGB24
+				&& mtOut->subtype != MEDIASUBTYPE_RGB565) {
+			return VFW_E_TYPE_NOT_ACCEPTED;
+		}
+	}
+
+	return S_OK;
+}
+
 //
 
 REFERENCE_TIME CDirectVobSubFilter::CalcCurrentTime()

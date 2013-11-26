@@ -189,6 +189,7 @@ public:
 	// === Overriden DirectShow functions
 	HRESULT			SetMediaType(PIN_DIRECTION direction, const CMediaType *pmt);
 	HRESULT			CheckInputType(const CMediaType* mtIn);
+	HRESULT			CheckTransform(const CMediaType* mtIn, const CMediaType* mtOut);
 	HRESULT			Transform(IMediaSample* pIn);
 	HRESULT			CompleteConnect(PIN_DIRECTION direction,IPin *pReceivePin);
 	HRESULT			DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_PROPERTIES* pProperties);

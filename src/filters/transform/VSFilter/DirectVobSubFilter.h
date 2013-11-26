@@ -82,6 +82,11 @@ public:
 			StopStreaming(),
 			NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
 
+	HRESULT CheckInputType(const CMediaType* mtIn);
+	HRESULT CheckOutputType(const CMediaType& mtOut);
+	HRESULT CheckTransform(const CMediaType* mtIn, const CMediaType* mtOut);
+	HRESULT	DoCheckTransform(const CMediaType* mtIn, const CMediaType* mtOut, bool checkReconnection);
+
 	CAtlArray<CTextInputPin*> m_pTextInput;
 
 	// IDirectVobSub
