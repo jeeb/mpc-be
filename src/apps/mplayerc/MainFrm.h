@@ -69,6 +69,7 @@
 #include "../../filters/transform/DecSSFilter/VobFile.h"
 #include <sizecbar/scbarg.h>
 #include <afxinet.h>
+#include <afxmt.h>
 
 #define USE_MEDIAINFO_STATIC
 #include <MediaInfo/MediaInfo.h>
@@ -1166,6 +1167,9 @@ protected:
 	HANDLE					m_hNotifyRenderThread;
 	HANDLE					m_hStopNotifyRenderThreadEvent;
 	HANDLE					m_hRefreshNotifyRenderThreadEvent;
+
+	::CEvent				m_hGraphThreadEventOpen;
+	::CEvent				m_hGraphThreadEventClose;
 
 public:
 #if (_MSC_VER < 1800)
