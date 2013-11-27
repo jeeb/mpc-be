@@ -2475,6 +2475,10 @@ HRESULT CMPCVideoDecFilter::ReconnectRenderer()
 {
 	HRESULT hr = S_OK;
 
+	if (!m_pOutput || !m_pOutput->IsConnected()) {
+		return hr;
+	}
+
 	//soft refresh - signal new swscaler colorspace details
 	if (m_nSwRefresh >= 1) {
 		m_FormatConverter.SetOptions(m_nSwPreset, m_nSwStandard, m_nSwRGBLevels);
