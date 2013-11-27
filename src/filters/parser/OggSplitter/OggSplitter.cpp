@@ -193,10 +193,7 @@ HRESULT COggSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		return hres;
 	}
 
-	m_rtNewStart = m_rtCurrent = 0;
-	m_rtNewStop = m_rtStop = 0;
-
-	m_rtDuration = 0;
+	m_rtDuration = m_rtNewStart = m_rtCurrent = m_rtNewStop = m_rtStop = 0;
 
 	__int64 start_pos = 0;
 
@@ -205,7 +202,7 @@ start:
 	m_pFile->Seek(start_pos);
 
 	OggPage page;
-	for (int i = 0, nWaitForMore = 0; m_pFile->Read(page), i<100; i++) {
+	for (int i = 0, nWaitForMore = 0; m_pFile->Read(page), i < 100; i++) {
 		BYTE* p = page.GetData();
 		if (!p) {
 			continue;
@@ -237,7 +234,7 @@ start:
 				if (!memcmp(p, "vorbis", 6)) {
 					if ((*(OggVorbisIdHeader*)(p + 6)).audio_sample_rate == 0) return E_FAIL; // fix crash on broken files
 					name.Format(L"Vorbis %d", i);
-					pPinOut.Attach(DNew COggVorbisOutputPin((OggVorbisIdHeader*)(p+6), name, this, this, &hr));
+					pPinOut.Attach(DNew COggVorbisOutputPin((OggVorbisIdHeader*)(p + 6), name, this, this, &hr));
 					m_bitstream_serial_number_start = m_bitstream_serial_number_last = page.m_hdr.bitstream_serial_number;
 					nWaitForMore++;
 				} else if (!memcmp(p, "video", 5)) {
@@ -251,23 +248,22 @@ start:
 					pPinOut.Attach(DNew COggTextOutputPin((OggStreamHeader*)p, name, this, this, &hr));
 				} else if (!memcmp(p, "Direct Show Samples embedded in Ogg", 35)) {
 					name.Format(L"DirectShow %d", i);
-					pPinOut.Attach(DNew COggDirectShowOutputPin((AM_MEDIA_TYPE*)(p+35+sizeof(GUID)), name, this, this, &hr));
+					pPinOut.Attach(DNew COggDirectShowOutputPin((AM_MEDIA_TYPE*)(p + 35 + sizeof(GUID)), name, this, this, &hr));
 				}
 
 				AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 			} else if (type == 3 && !memcmp(p, "vorbis", 6)) {
 				if (COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
-					pOggPin->AddComment(p+6, page.GetCount()-6-1);
+					pOggPin->AddComment(p + 6, page.GetCount() - 6 - 1);
 				}
-			} else if (type == 0x7F && page.GetCount()>12 && *(long*)(p+8) == 0x43614C66) {	// Flac
+			} else if (type == 0x7F && page.GetCount() > 12 && *(DWORD*)(p + 8) == FCC('fLaC')) {	// Flac
 				// Ogg Flac : method 1
 				CAutoPtr<CBaseSplitterOutputPin> pPinOut;
 				name.Format(L"FLAC %d", i);
-				pPinOut.Attach(DNew COggFlacOutputPin(p+12, page.GetCount()-14, name, this, this, &hr));
+				pPinOut.Attach(DNew COggFlacOutputPin(p + 12, page.GetCount() - 14, name, this, this, &hr));
 				AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
-			} else if (*(long*)(p-1) == 0x43614C66) {
-				//bFlac = true;
-				//nWaitForMore++;
+			} else if (*(DWORD*)(p-1) == FCC('fLaC')) {
+				// Ogg Flac : method 2
 				if (m_pFile->Read(page)) {
 					CAutoPtr<CBaseSplitterOutputPin> pPinOut;
 					name.Format(L"FLAC %d", i);
@@ -276,11 +272,13 @@ start:
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 				}
 			} else if (!memcmp(page.GetData(), "BBCD\x00", 5) || !memcmp(page.GetData(), "KW-DIRAC\x00", 9)) {
-				name.Format(L"Dirac %d", i);
-				CAutoPtr<CBaseSplitterOutputPin> pPinOut;
-				pPinOut.Attach(DNew COggDiracOutputPin(page.GetData(), page.GetCount(), name, this, this, &hr));
-				AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
-				nWaitForMore++;
+				if (GetOutputPin(page.m_hdr.bitstream_serial_number) == NULL) {
+					name.Format(L"Dirac %d", i);
+					CAutoPtr<CBaseSplitterOutputPin> pPinOut;
+					pPinOut.Attach(DNew COggDiracOutputPin(page.GetData(), page.GetCount(), name, this, this, &hr));
+					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
+					nWaitForMore++;
+				}
 			} else if (!memcmp(page.GetData(), "OpusHead", 8) && page.GetCount() > 8) {
 				name.Format(L"Opus %d", i);
 				CAutoPtr<CBaseSplitterOutputPin> pPinOut;
@@ -288,7 +286,7 @@ start:
 				AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 			} else if (!memcmp(page.GetData(), "OpusTags", 8) && page.GetCount() > 8) {
 				if (COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
-					pOggPin->AddComment(page.GetData()+8, page.GetCount()-8-1);
+					pOggPin->AddComment(page.GetData() + 8, page.GetCount() - 8 - 1);
 				}
 			} else if (!memcmp(page.GetData(), "Speex   ", 8) && page.GetCount() > 8) {
 				name.Format(L"Speex %d", i);
@@ -301,12 +299,10 @@ start:
 		}
 
 		if (COggDiracOutputPin* pPin = dynamic_cast<COggDiracOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
-			if (!pPin->IsInitialized()) {
-				pPin->UnpackInitPage(page);
-				if (pPin->IsInitialized()) {
-					nWaitForMore--;
-				}
-			}
+			pPin->UnpackInitPage(page);
+			if (pPin->IsInitialized()) {
+				nWaitForMore--;
+			}			
 		}
 
 		if (COggTheoraOutputPin* pPin = dynamic_cast<COggTheoraOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
@@ -337,7 +333,7 @@ start:
 	if (m_bitstream_serial_number_start) {
 		__int64 start_pos2 = start_pos;
 		m_pFile->Seek(start_pos2);
-		for (int i = 0; m_pFile->Read(page), i<10; i++) {
+		for (int i = 0; m_pFile->Read(page), i < 10; i++) {
 			COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
 			if (!pOggPin) {
 				BYTE* p = page.GetData();
@@ -370,7 +366,7 @@ start:
 		// get min pts to calculate duration
 		REFERENCE_TIME rtMin = 0;
 		m_pFile->Seek(start_pos);
-		for (int i = 0; m_pFile->Read(page2), i<10; i++) {
+		for (int i = 0; m_pFile->Read(page2), i < 10; i++) {
 			COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page2.m_hdr.bitstream_serial_number));
 			if (!pOggPin || page2.m_hdr.granule_position == -1 || page2.m_hdr.header_type_flag & OggPageHeader::first) {
 				continue;
@@ -900,7 +896,7 @@ HRESULT COggVorbisOutputPin::UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int 
 
 	p->bSyncPoint	= TRUE;
 	p->rtStart		= m_rtLast;
-	p->rtStop		= m_rtLast+1;
+	p->rtStop		= m_rtLast + 1;
 	p->SetData(pData, len);
 
 	return S_OK;
@@ -908,7 +904,7 @@ HRESULT COggVorbisOutputPin::UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int 
 
 HRESULT COggVorbisOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 {
-	if (p->GetCount() > 0 && (p->GetAt(0)&1)) {
+	if (p->GetCount() > 0 && (p->GetAt(0) & 1)) {
 		return S_OK;
 	}
 
@@ -944,7 +940,7 @@ HRESULT COggVorbisOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_
 COggFlacOutputPin::COggFlacOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: COggSplitterOutputPin(pName, pFilter, pLock, phr)
 {
-	CGolombBuffer	Buffer(h, nCount);
+	CGolombBuffer Buffer(h, nCount);
 
 	Buffer.BitRead(1);		// Last-metadata-block flag
 
@@ -999,19 +995,10 @@ HRESULT COggFlacOutputPin::UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int le
 
 	p->bSyncPoint	= TRUE;
 	p->rtStart		= m_rtLast;
-	p->rtStop		= m_rtLast+1; // TODO : find packet duration !
+	p->rtStop		= m_rtLast + 1; // TODO : find packet duration !
 	p->SetData(pData, len);
 
 	return S_OK;
-}
-
-HRESULT COggFlacOutputPin::DeliverPacket(CAutoPtr<Packet> p)
-{
-	if (p->GetCount() > 0 && (p->GetAt(0)&1)) {
-		return S_OK;
-	}
-
-	return __super::DeliverPacket(p);
 }
 
 HRESULT COggFlacOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
@@ -1313,18 +1300,14 @@ HRESULT COggTheoraOutputPin::UnpackInitPage(OggPage& page)
 
 REFERENCE_TIME COggTheoraOutputPin::GetRefTime(__int64 granule_position)
 {
-	LONGLONG	iframe;
-	LONGLONG	pframe;
-
-	iframe = granule_position>>m_KfgShift;
-	pframe = granule_position-(iframe<<m_KfgShift);
+	LONGLONG iframe = granule_position >> m_KfgShift;
+	LONGLONG pframe = granule_position - (iframe << m_KfgShift);
 	/*3.2.0 streams store the frame index in the granule position.
 	  3.2.1 and later store the frame count.
 	  We return the index, so adjust the value if we have a 3.2.1 or later
 	   stream.*/
 
-	REFERENCE_TIME rt = 0;
-	rt = (iframe+pframe-m_nIndexOffset) * m_rtAvgTimePerFrame;
+	REFERENCE_TIME rt = (iframe + pframe - m_nIndexOffset) * m_rtAvgTimePerFrame;
 	return rt;
 }
 
@@ -1334,7 +1317,7 @@ HRESULT COggTheoraOutputPin::UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int 
 		return E_FAIL;
 	}
 
-	if (len >= 7 && !memcmp(pData+1, "theora", 6)) {
+	if (len >= 7 && !memcmp(pData + 1, "theora", 6)) {
 		if (IsInitialized()) {
 			return E_FAIL; // skip Theora header packets ...
 		}
@@ -1352,7 +1335,7 @@ HRESULT COggTheoraOutputPin::UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int 
 
 	p->bSyncPoint	= bKeyFrame;
 	p->rtStart		= m_rtLast;
-	p->rtStop		= m_rtLast+1;
+	p->rtStop		= m_rtLast + 1;
 	p->SetData(pData, len);
 
 	if (!(*pData & 0x80) && m_mt.majortype == MEDIATYPE_Video) {
@@ -1377,12 +1360,16 @@ HRESULT COggDiracOutputPin::UnpackInitPage(OggPage& page)
 {
 	HRESULT hr = __super::UnpackPage(page);
 
-	while (m_packets.GetCount() && !m_IsInitialized) {
-		Packet* p = m_packets.GetHead();
-		BYTE* buf = p->GetData();
+	while (m_packets.GetCount()) {
+		if (!m_IsInitialized) {
+			Packet* p = m_packets.GetHead();
+			if (p->GetCount() > 5) {
+				BYTE* buf = p->GetData();
 		
-		if (!memcmp(buf, "BBCD\x00", 5)) {
-			m_IsInitialized = SUCCEEDED(InitDirac(buf, p->GetCount()));
+				if (!memcmp(buf, "BBCD\x00", 5)) {
+					m_IsInitialized = SUCCEEDED(InitDirac(buf, p->GetCount()));
+				}
+			}
 		}
 
 		m_packets.RemoveHead();
@@ -1435,12 +1422,12 @@ REFERENCE_TIME COggDiracOutputPin::GetRefTime(__int64 granule_position)
 	REFERENCE_TIME pts = 0;
 	
 	if (m_bOldDirac) {
-		__int64 iframe = granule_position >> 30;
-		__int64 pframe = granule_position & 0x3fffffff;
-		pts = (iframe + pframe) * m_rtAvgTimePerFrame;
+		LONGLONG iframe		= granule_position >> 30;
+		LONGLONG pframe		= granule_position & 0x3fffffff;
+		pts					= (iframe + pframe) * m_rtAvgTimePerFrame;
 	} else {
-		REFERENCE_TIME dts = (granule_position >> 31);
-		pts = (dts + ((granule_position >> 9) & 0x1fff)) * m_rtAvgTimePerFrame / 2;
+		REFERENCE_TIME dts	= (granule_position >> 31);
+		pts					= (dts + ((granule_position >> 9) & 0x1fff)) * m_rtAvgTimePerFrame / 2;
 	}
 
 	return pts;
@@ -1452,13 +1439,13 @@ HRESULT COggDiracOutputPin::UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int l
 		return E_FAIL;
 	}
 
-	if (*(DWORD*)pData != 0x44434242) { // not found Dirac SYNC 'BBCD'
+	if (*(DWORD*)pData != FCC('BBCD')) { // not found Dirac SYNC 'BBCD'
 		return E_FAIL;
 	}
 
 	p->bSyncPoint	= TRUE;
 	p->rtStart		= m_rtLast;
-	p->rtStop		= m_rtLast+1;
+	p->rtStop		= m_rtLast + (m_rtAvgTimePerFrame > 0 ? m_rtAvgTimePerFrame : 1);
 	p->SetData(pData, len);
 
 	return S_OK;
@@ -1611,7 +1598,7 @@ HRESULT COggSpeexOutputPin::UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int l
 {
 	p->bSyncPoint	= TRUE;
 	p->rtStart		= m_rtLast;
-	p->rtStop		= m_rtLast+1; // TODO : find packet duration !
+	p->rtStop		= m_rtLast + 1; // TODO : find packet duration !
 	p->SetData(pData, len);
 
 	return S_OK;

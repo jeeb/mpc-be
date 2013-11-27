@@ -107,7 +107,6 @@ class COggFlacOutputPin : public COggSplitterOutputPin
 	virtual HRESULT UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int len);
 	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
 
-	HRESULT DeliverPacket(CAutoPtr<Packet> p);
 	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
 
 public:
