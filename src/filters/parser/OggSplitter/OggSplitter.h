@@ -210,7 +210,7 @@ public:
 
 class COggSpeexOutputPin : public COggSplitterOutputPin
 {
-	int  m_SampleRate;
+	int m_SampleRate;
 
 	virtual HRESULT UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int len);
 	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);

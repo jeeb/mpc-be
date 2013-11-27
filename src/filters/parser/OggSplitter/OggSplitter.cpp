@@ -730,6 +730,9 @@ HRESULT COggSplitterOutputPin::UnpackPage(OggPage& page)
 						CAutoLock csAutoLock(&m_csPackets);
 
 						m_rtLast = p->rtStop;
+						if (COggDiracOutputPin* pOggPin = dynamic_cast<COggDiracOutputPin*>(this)) {
+							m_rtLast = INVALID_TIME;
+						}
 
 						if (len < 255) {
 							m_packets.AddTail(p);
@@ -1443,9 +1446,9 @@ HRESULT COggDiracOutputPin::UnpackPacket(CAutoPtr<Packet>& p, BYTE* pData, int l
 		return E_FAIL;
 	}
 
-	p->bSyncPoint	= TRUE;
 	p->rtStart		= m_rtLast;
-	p->rtStop		= m_rtLast + (m_rtAvgTimePerFrame > 0 ? m_rtAvgTimePerFrame : 1);
+	p->rtStop		= m_rtLast == INVALID_TIME ? m_rtLast : (m_rtLast + (m_rtAvgTimePerFrame > 0 ? m_rtAvgTimePerFrame : 1));
+	p->bSyncPoint	= (p->rtStart != INVALID_TIME);
 	p->SetData(pData, len);
 
 	return S_OK;
