@@ -22,6 +22,7 @@
 
 #include <afxsock.h>
 #include <atlutil.h>
+#include "Log.h"
 
 #define SOCKET_DUMPLOGFILE	0
 

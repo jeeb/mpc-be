@@ -32,6 +32,7 @@
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/FileVersionInfo.h"
 #include "../../DSUtil/MPCSocket.h"
+#include "PlayerYouTube.h"
 #include <moreuuids.h>
 #include <winddk/ntddcdvd.h>
 #include <detours/detours.h>
@@ -1971,6 +1972,7 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 
 			int ContentLength = 0;
 
+			CStringA location;
 			CAtlList<CStringA> sl;
 			Explode(hdr, sl, '\n');
 			POSITION pos = sl.GetHeadPosition();
@@ -1980,7 +1982,10 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 				Explode(hdrline, sl2, ':', 2);
 				CStringA field = sl2.RemoveHead().MakeLower();
 				if (field == "location" && !sl2.IsEmpty()) {
-					return GetContentType(CString(sl2.GetHead()), redir);
+					location = sl2.GetHead();
+					if (!PlayerYouTubeCheck(CString(sl2.GetHead()))) {
+						return GetContentType(CString(sl2.GetHead()), redir);
+					}
 				}
 				if (field == "content-type" && !sl2.IsEmpty()) {
 					ct = sl2.GetHead();
@@ -1990,6 +1995,11 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 				if (1 == sscanf_s(hdrline, "content-length:%d", &ContentLength)) {
 					ContentLength = ContentLength;
 				}
+			}
+
+			if (location.GetLength() > 0 &&  PlayerYouTubeCheck(CString(location)) && CString(location) != fn) {
+				redir->AddTail(CString(location));
+				return TToA(ct);
 			}
 
 			if (ct.IsEmpty() || ct == _T("application/octet-stream")) {
