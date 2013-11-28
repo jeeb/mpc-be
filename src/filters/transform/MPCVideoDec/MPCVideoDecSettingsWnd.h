@@ -41,6 +41,10 @@ enum {
 #if ENABLE_AYUV
 	IDC_PP_SW_AYUV,
 #endif
+	IDC_PP_SW_P010,
+	IDC_PP_SW_P210,
+	IDC_PP_SW_P016,
+	IDC_PP_SW_P216,
 	IDC_PP_SW_RGB32,
 	IDC_PP_SWPRESET,
 	IDC_PP_SWSTANDARD,
@@ -89,6 +93,10 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 #if ENABLE_AYUV
 	CButton		m_cbAYUV;
 #endif
+	CButton		m_cbP010;
+	CButton		m_cbP210;
+	CButton		m_cbP016;
+	CButton		m_cbP216;
 	CButton		m_cbRGB32;
 
 	CStatic     m_txtSwPreset;

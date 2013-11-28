@@ -172,9 +172,13 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_txt420.Create(_T("4:2:0 YUV:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
 	m_cbNV12.Create(_T("NV12"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(60), 0), CSize(IPP_SCALE(55), m_fontheight)), this, IDC_PP_SW_NV12);
 	m_cbYV12.Create(_T("YV12"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(120), 0), CSize(IPP_SCALE(55), m_fontheight)), this, IDC_PP_SW_YV12);
+	m_cbP010.Create(_T("P010"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(180), 0), CSize(IPP_SCALE(55), m_fontheight)), this, IDC_PP_SW_P010);
+	m_cbP016.Create(_T("P016"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(240), 0), CSize(IPP_SCALE(55), m_fontheight)), this, IDC_PP_SW_P016);
 	p.y += h20;
 	m_txt422.Create(_T("4:2:2 YUV:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
 	m_cbYUY2.Create(_T("YUY2"), dwStyle | BS_3STATE, CRect(p + CSize(IPP_SCALE(60), 0), CSize(IPP_SCALE(55), m_fontheight)), this, IDC_PP_SW_YUY2);
+	m_cbP210.Create(_T("P210"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(180), 0), CSize(IPP_SCALE(55), m_fontheight)), this, IDC_PP_SW_P210);
+	m_cbP216.Create(_T("P216"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(240), 0), CSize(IPP_SCALE(55), m_fontheight)), this, IDC_PP_SW_P216);
 	p.y += h20;
 #if ENABLE_AYUV
 	m_txt444.Create(_T("4:4:4 YUV:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
@@ -239,6 +243,10 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 #if ENABLE_AYUV
 		m_cbAYUV.SetCheck (m_pMDF->GetSwPixelFormat(PixFmt_AYUV)  ? BST_CHECKED : BST_UNCHECKED);
 #endif
+		m_cbP010.SetCheck (m_pMDF->GetSwPixelFormat(PixFmt_P010)  ? BST_CHECKED : BST_UNCHECKED);
+		m_cbP210.SetCheck (m_pMDF->GetSwPixelFormat(PixFmt_P210)  ? BST_CHECKED : BST_UNCHECKED);
+		m_cbP016.SetCheck (m_pMDF->GetSwPixelFormat(PixFmt_P016)  ? BST_CHECKED : BST_UNCHECKED);
+		m_cbP216.SetCheck (m_pMDF->GetSwPixelFormat(PixFmt_P216)  ? BST_CHECKED : BST_UNCHECKED);
 		m_cbRGB32.SetCheck(m_pMDF->GetSwPixelFormat(PixFmt_RGB32) ? BST_CHECKED : BST_UNCHECKED);
 
 		m_cbSwPreset.SetCurSel(m_pMDF->GetSwPreset());
@@ -295,6 +303,10 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 #if ENABLE_AYUV
 			(m_cbAYUV.GetCheck()  == BST_CHECKED) != m_pMDF->GetSwPixelFormat(PixFmt_AYUV) ||
 #endif
+			(m_cbP010.GetCheck()  == BST_CHECKED) != m_pMDF->GetSwPixelFormat(PixFmt_P010) ||
+			(m_cbP210.GetCheck()  == BST_CHECKED) != m_pMDF->GetSwPixelFormat(PixFmt_P210) ||
+			(m_cbP016.GetCheck()  == BST_CHECKED) != m_pMDF->GetSwPixelFormat(PixFmt_P016) ||
+			(m_cbP216.GetCheck()  == BST_CHECKED) != m_pMDF->GetSwPixelFormat(PixFmt_P216) ||
 			(m_cbRGB32.GetCheck() == BST_CHECKED) != m_pMDF->GetSwPixelFormat(PixFmt_RGB32)) {
 				refresh = 2;
 		}
@@ -310,7 +322,6 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 		FreeMediaType(mt);
 		*/
 		
-
 		if (refresh >= 2) {
 			m_pMDF->SetSwPixelFormat(PixFmt_NV12 , m_cbNV12.GetCheck()  == BST_CHECKED);
 			m_pMDF->SetSwPixelFormat(PixFmt_YV12 , m_cbYV12.GetCheck()  == BST_CHECKED);
@@ -318,6 +329,10 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 #if ENABLE_AYUV
 			m_pMDF->SetSwPixelFormat(PixFmt_AYUV , m_cbAYUV.GetCheck()  == BST_CHECKED);
 #endif
+			m_pMDF->SetSwPixelFormat(PixFmt_P010 , m_cbP010.GetCheck()  == BST_CHECKED);
+			m_pMDF->SetSwPixelFormat(PixFmt_P210 , m_cbP210.GetCheck()  == BST_CHECKED);
+			m_pMDF->SetSwPixelFormat(PixFmt_P016 , m_cbP016.GetCheck()  == BST_CHECKED);
+			m_pMDF->SetSwPixelFormat(PixFmt_P216 , m_cbP216.GetCheck()  == BST_CHECKED);
 			m_pMDF->SetSwPixelFormat(PixFmt_RGB32, m_cbRGB32.GetCheck() == BST_CHECKED);
 		}
 

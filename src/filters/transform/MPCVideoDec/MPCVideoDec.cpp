@@ -65,6 +65,10 @@ extern "C" {
 #if ENABLE_AYUV
 #define OPTION_SW_AYUV       _T("Sw_AYUV")
 #endif
+#define OPTION_SW_P010       _T("Sw_P010")
+#define OPTION_SW_P210       _T("Sw_P210")
+#define OPTION_SW_P016       _T("Sw_P016")
+#define OPTION_SW_P216       _T("Sw_P216")
 #define OPTION_SW_RGB32      _T("Sw_RGB32")
 #define OPT_SwPreset         _T("SwPreset")
 #define OPT_SwStandard       _T("SwStandard")
@@ -768,6 +772,10 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 #if ENABLE_AYUV
 	{&MEDIATYPE_Video, &MEDIASUBTYPE_AYUV},
 #endif
+	{&MEDIATYPE_Video, &MEDIASUBTYPE_P010},
+	{&MEDIATYPE_Video, &MEDIASUBTYPE_P210},
+	{&MEDIATYPE_Video, &MEDIASUBTYPE_P016},
+	{&MEDIATYPE_Video, &MEDIASUBTYPE_P216},
 	{&MEDIATYPE_Video, &MEDIASUBTYPE_RGB32},
 };
 
@@ -904,6 +912,10 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 #if ENABLE_AYUV
 	m_fPixFmts[PixFmt_AYUV]  = false;
 #endif
+	m_fPixFmts[PixFmt_P010]  = false;
+	m_fPixFmts[PixFmt_P210]  = false;
+	m_fPixFmts[PixFmt_P016]  = false;
+	m_fPixFmts[PixFmt_P216]  = false;
 	m_fPixFmts[PixFmt_RGB32] = true;
 
 #ifdef REGISTER_FILTER
@@ -945,6 +957,18 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 			m_fPixFmts[PixFmt_AYUV] = !!dw;
 		}
 #endif
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SW_P010, dw)) {
+			m_fPixFmts[PixFmt_P010] = !!dw;
+		}
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SW_P210, dw)) {
+			m_fPixFmts[PixFmt_P210] = !!dw;
+		}
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SW_P016, dw)) {
+			m_fPixFmts[PixFmt_P016] = !!dw;
+		}
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SW_P216, dw)) {
+			m_fPixFmts[PixFmt_P216] = !!dw;
+		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SW_RGB32, dw)) {
 			m_fPixFmts[PixFmt_RGB32] = !!dw;
 		}
@@ -984,6 +1008,10 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 #if ENABLE_AYUV
 	m_fPixFmts[PixFmt_AYUV]		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_AYUV,  m_fPixFmts[PixFmt_AYUV]);
 #endif
+	m_fPixFmts[PixFmt_P010]		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_P010,  m_fPixFmts[PixFmt_P010]);
+	m_fPixFmts[PixFmt_P210]		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_P210,  m_fPixFmts[PixFmt_P210]);
+	m_fPixFmts[PixFmt_P016]		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_P016,  m_fPixFmts[PixFmt_P016]);
+	m_fPixFmts[PixFmt_P216]		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_P216,  m_fPixFmts[PixFmt_P216]);
 	m_fPixFmts[PixFmt_RGB32]	= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_RGB32, m_fPixFmts[PixFmt_RGB32]);
 	m_nSwPreset					= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwPreset, m_nSwPreset);
 	m_nSwStandard				= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwStandard, m_nSwStandard);
@@ -3108,6 +3136,10 @@ STDMETHODIMP CMPCVideoDecFilter::Apply()
 #if ENABLE_AYUV
 		key.SetDWORDValue(OPTION_SW_AYUV,  m_fPixFmts[PixFmt_AYUV]);
 #endif
+		key.SetDWORDValue(OPTION_SW_P010,  m_fPixFmts[PixFmt_P010]);
+		key.SetDWORDValue(OPTION_SW_P210,  m_fPixFmts[PixFmt_P210]);
+		key.SetDWORDValue(OPTION_SW_P016,  m_fPixFmts[PixFmt_P016]);
+		key.SetDWORDValue(OPTION_SW_P216,  m_fPixFmts[PixFmt_P216]);
 		key.SetDWORDValue(OPTION_SW_RGB32, m_fPixFmts[PixFmt_RGB32]);
 		key.SetDWORDValue(OPT_SwPreset, m_nSwPreset);
 		key.SetDWORDValue(OPT_SwStandard, m_nSwStandard);
@@ -3135,6 +3167,10 @@ STDMETHODIMP CMPCVideoDecFilter::Apply()
 #if ENABLE_AYUV
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_AYUV,  m_fPixFmts[PixFmt_AYUV]);
 #endif
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_P010,  m_fPixFmts[PixFmt_P010]);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_P210,  m_fPixFmts[PixFmt_P210]);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_P016,  m_fPixFmts[PixFmt_P016]);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_P216,  m_fPixFmts[PixFmt_P216]);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_RGB32, m_fPixFmts[PixFmt_RGB32]);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwPreset, m_nSwPreset);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwStandard, m_nSwStandard);

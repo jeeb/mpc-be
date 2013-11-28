@@ -28,6 +28,7 @@ extern "C" {
 	#include <ffmpeg/libavcodec/avcodec.h>
 	#include <ffmpeg/libswscale/swscale.h>
 	#include <ffmpeg/libavutil/pixdesc.h>
+	#include <ffmpeg/libavutil/intreadwrite.h>
 }
 #pragma warning(pop)
 
@@ -39,13 +40,17 @@ static const SW_OUT_FMT s_sw_formats[] = {
 #if ENABLE_AYUV
 	{_T("AYUV"),  FCC('AYUV'), &MEDIASUBTYPE_AYUV,  32, 4, 0, {1},     {1},     AV_PIX_FMT_YUV444P, 0, 0 }, // PixFmt_AYUV
 #endif
-	{_T("YUY2"),  FCC('YUY2'), &MEDIASUBTYPE_YUY2,  16, 2, 0, {1},     {1},     AV_PIX_FMT_YUYV422, 1, 0 }, // PixFmt_YUY2
-	{_T("NV12"),  FCC('NV12'), &MEDIASUBTYPE_NV12,  12, 1, 2, {1,2},   {1,1},   AV_PIX_FMT_NV12,    1, 1 }, // PixFmt_NV12
-	{_T("YV12"),  FCC('YV12'), &MEDIASUBTYPE_YV12,  12, 1, 3, {1,2,2}, {1,2,2}, AV_PIX_FMT_YUV420P, 1, 1 }, // PixFmt_YV12
+	{_T("YUY2"),  FCC('YUY2'), &MEDIASUBTYPE_YUY2,  16, 2, 0, {1},     {1},     AV_PIX_FMT_YUYV422,     1, 0 }, // PixFmt_YUY2
+	{_T("NV12"),  FCC('NV12'), &MEDIASUBTYPE_NV12,  12, 1, 2, {1,2},   {1,1},   AV_PIX_FMT_NV12,        1, 1 }, // PixFmt_NV12
+	{_T("YV12"),  FCC('YV12'), &MEDIASUBTYPE_YV12,  12, 1, 3, {1,2,2}, {1,2,2}, AV_PIX_FMT_YUV420P,     1, 1 }, // PixFmt_YV12
 	// YUV 10 bit
-	// ...
+	{_T("P210"),  FCC('P210'), &MEDIASUBTYPE_P210,  32, 2, 2, {1,1},   {1,1},   AV_PIX_FMT_YUV422P16LE, 1, 0 }, // PixFmt_P210
+	{_T("P010"),  FCC('P010'), &MEDIASUBTYPE_P010,  24, 2, 2, {1,2},   {1,1},   AV_PIX_FMT_YUV420P16LE, 1, 1 }, // PixFmt_P010
+	// YUV 16 bit
+	{_T("P216"),  FCC('P216'), &MEDIASUBTYPE_P216,  32, 2, 2, {1,1},   {1,1},   AV_PIX_FMT_YUV422P16LE, 1, 0 }, // PixFmt_P216
+	{_T("P016"),  FCC('P016'), &MEDIASUBTYPE_P016,  24, 2, 2, {1,2},   {1,1},   AV_PIX_FMT_YUV420P16LE, 1, 1 }, // PixFmt_P016
 	// RGB
-	{_T("RGB32"), BI_RGB,      &MEDIASUBTYPE_RGB32, 32, 4, 0, {1},     {1},     AV_PIX_FMT_BGRA,    0, 0 }, // PixFmt_RGB32
+	{_T("RGB32"), BI_RGB,      &MEDIASUBTYPE_RGB32, 32, 4, 0, {1},     {1},     AV_PIX_FMT_BGRA,        0, 0 }, // PixFmt_RGB32
 	//
 	// PS: AV_PIX_FMT_YUV444P not equal to AYUV, but is used as an intermediate format.
 };
@@ -234,6 +239,102 @@ HRESULT CFormatConverter::ConvertToAYUV(const uint8_t* const src[4], const int s
 }
 #endif
 
+HRESULT CFormatConverter::ConvertToPX1X(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[], int chromaVertical)
+{
+  const BYTE *y = NULL;
+  const BYTE *u = NULL;
+  const BYTE *v = NULL;
+  int line, i = 0;
+  int sourceStride = 0;
+
+  int shift = 0;
+
+  BYTE *pTmpBuffer = NULL;
+
+  const AVPixFmtDescriptor* in_pfdesc = av_pix_fmt_desc_get(m_FProps.avpixfmt);
+  bool isPx1x =	(in_pfdesc->flags & AV_PIX_FMT_FLAG_PLANAR ^ (AV_PIX_FMT_FLAG_BE + AV_PIX_FMT_FLAG_ALPHA)) == AV_PIX_FMT_FLAG_PLANAR &&
+				in_pfdesc->nb_components == 3 + (in_pfdesc->flags & AV_PIX_FMT_FLAG_ALPHA ? 1 : 0) && // YUV or YUVA
+				in_pfdesc->log2_chroma_w == 1 && (in_pfdesc->log2_chroma_h == 1 || in_pfdesc->log2_chroma_h == 0) && // 4:2:2 or // 4:2:0
+				in_pfdesc->comp->depth_minus1 >= (9-1) && in_pfdesc->comp->depth_minus1 <= (16-1); // 9..16 bits
+
+
+  if (!isPx1x) {
+    uint8_t *tmp[4] = {NULL};
+    int     tmpStride[4] = {0};
+    int scaleStride = FFALIGN(width, 32) * 2;
+
+    pTmpBuffer = (BYTE *)av_malloc(height * scaleStride * 2);
+
+    tmp[0] = pTmpBuffer;
+    tmp[1] = tmp[0] + (height * scaleStride);
+    tmp[2] = tmp[1] + ((height / chromaVertical) * (scaleStride / 2));
+    tmp[3] = NULL;
+    tmpStride[0] = scaleStride;
+    tmpStride[1] = scaleStride / 2;
+    tmpStride[2] = scaleStride / 2;
+    tmpStride[3] = 0;
+
+    sws_scale(m_pSwsContext, src, srcStride, 0, height, tmp, tmpStride);
+
+    y = tmp[0];
+    u = tmp[1];
+    v = tmp[2];
+    sourceStride = scaleStride;
+  } else {
+    y = src[0];
+    u = src[1];
+    v = src[2];
+    sourceStride = srcStride[0];
+
+    shift = (16 - 1) - in_pfdesc->comp->depth_minus1;
+  }
+
+  // copy Y
+  BYTE *pLineOut = dst[0];
+  const BYTE *pLineIn = y;
+  for (line = 0; line < height; ++line) {
+    if (shift == 0) {
+      memcpy(pLineOut, pLineIn, width * 2);
+    } else {
+      const int16_t *yc = (int16_t *)pLineIn;
+      int16_t *idst = (int16_t *)pLineOut;
+      for (i = 0; i < width; ++i) {
+        int32_t yv = AV_RL16(yc+i);
+        if (shift) yv <<= shift;
+        *idst++ = yv;
+      }
+    }
+    pLineOut += dstStride[0];
+    pLineIn += sourceStride;
+  }
+
+  sourceStride >>= 2;
+
+  // Merge U/V
+  BYTE *out = dst[1];
+  const int16_t *uc = (int16_t *)u;
+  const int16_t *vc = (int16_t *)v;
+  for (line = 0; line < height/chromaVertical; ++line) {
+    int32_t *idst = (int32_t *)out;
+    for (i = 0; i < width/2; ++i) {
+      int32_t uv = AV_RL16(uc+i);
+      int32_t vv = AV_RL16(vc+i);
+      if (shift) {
+        uv <<= shift;
+        vv <<= shift;
+      }
+      *idst++ = uv | (vv << 16);
+    }
+    uc += sourceStride;
+    vc += sourceStride;
+    out += dstStride[1];
+  }
+
+  av_freep(&pTmpBuffer);
+
+  return S_OK;
+}
+
 void CFormatConverter::UpdateOutput(MPCPixelFormat out_pixfmt, int dstStride, int planeHeight)
 {
 	if (out_pixfmt != m_out_pixfmt) {
@@ -352,6 +453,14 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 		ConvertToAYUV(pFrame->data, pFrame->linesize, dstArray, m_FProps.width, m_FProps.height, dstStrideArray);
 		break;
 #endif
+	case PixFmt_P010:
+	case PixFmt_P016:
+		ConvertToPX1X(pFrame->data, pFrame->linesize, dstArray, m_FProps.width, m_FProps.height, dstStrideArray, 2);
+		break;
+	case PixFmt_P210:
+	case PixFmt_P216:
+		ConvertToPX1X(pFrame->data, pFrame->linesize, dstArray, m_FProps.width, m_FProps.height, dstStrideArray, 1);
+		break;
 	default:
 		int ret = sws_scale(m_pSwsContext, pFrame->data, pFrame->linesize, 0, m_FProps.height, dstArray, dstStrideArray);
 	}

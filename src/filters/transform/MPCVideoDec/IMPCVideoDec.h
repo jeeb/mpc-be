@@ -81,8 +81,11 @@ enum MPCPixelFormat {
 	PixFmt_NV12,  // 12 bit, 4:2:0
 	PixFmt_YV12,  // 12 bit, 4:2:0
 	// YUV 10 bit
-	//PixFmt_P210,  // 4:2:2
-	//PixFmt_P010,  // 4:2:0
+	PixFmt_P210,  // 4:2:2
+	PixFmt_P010,  // 4:2:0
+	// YUV 16 bit
+	PixFmt_P216,  // 32 bit, 4:2:2
+	PixFmt_P016,  // 24 bit, 4:2:0
 	// RGB
 	PixFmt_RGB32, // 24+8 bit
 	PixFmt_count
