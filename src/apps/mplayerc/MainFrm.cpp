@@ -219,11 +219,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_UPDATE_COMMAND_UI(IDC_PLAYERSTATUS, OnUpdatePlayerStatus)
 
-	ON_COMMAND(ID_FILE_POST_OPENMEDIA, OnFilePostOpenMedia)
-	ON_UPDATE_COMMAND_UI(ID_FILE_POST_OPENMEDIA, OnUpdateFilePostOpenMedia)
-	ON_COMMAND(ID_FILE_POST_CLOSEMEDIA, OnFilePostCloseMedia)
-	ON_UPDATE_COMMAND_UI(ID_FILE_POST_CLOSEMEDIA, OnUpdateFilePostCloseMedia)
-
 	ON_COMMAND(ID_BOSS, OnBossKey)
 
 	ON_COMMAND_RANGE(ID_STREAM_AUDIO_NEXT, ID_STREAM_AUDIO_PREV, OnStreamAudio)
@@ -683,7 +678,7 @@ CMainFrame::CMainFrame() :
 	m_flastnID(0),
 	bDVDMenuClicked(false),
 	m_bfirstPlay(false),
-	m_nLastRunTicket(0),
+	m_dwLastRun(0),
 	b_UseVSFilter(false),
 	IsMadVRExclusiveMode(false),
 	m_fYoutubeThreadWork(TH_CLOSE),
@@ -944,9 +939,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_hNotifyRenderThread = ::CreateThread(NULL, 0, NotifyRenderThreadEntryPoint, (LPVOID)this, 0, &ThreadId);
 	if (m_hNotifyRenderThread) {
 		SetThreadPriority(m_hNotifyRenderThread, THREAD_PRIORITY_LOWEST);
-		return S_OK;
-	} else {
-		return S_FALSE;
 	}
 
 	return 0;
@@ -1999,7 +1991,7 @@ void CMainFrame::OnActivateApp(BOOL bActive, DWORD dwThreadID)
 	mi.cbSize = sizeof(MONITORINFO);
 	GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
 
-	if (!bActive && (mi.dwFlags&MONITORINFOF_PRIMARY) && m_fFullScreen && m_iMediaLoadState == MLS_LOADED) {
+	if (!bActive && (mi.dwFlags & MONITORINFOF_PRIMARY) && m_fFullScreen && m_iMediaLoadState == MLS_LOADED) {
 		bool fExitFullscreen = true;
 
 		if (CWnd* pWnd = GetForegroundWindow()) {
@@ -3374,29 +3366,23 @@ LRESULT CMainFrame::OnPostOpen(WPARAM wParam, LPARAM lParam)
 	CAutoPtr<OpenMediaData> pOMD;
 	pOMD.Attach((OpenMediaData*)wParam);
 
-	CString err = m_ErrMsg;
-	m_ErrMsg.Empty();
-
 	AppSettings& s = AfxGetAppSettings();
 
-	if (!err.IsEmpty()) {
-		//CloseMediaPrivate();
-		//OnFilePostCloseMedia();
-		CloseMedia();
-
-		m_closingmsg = err;
-
+	if (!m_closingmsg.IsEmpty()) {
 		CString aborted(ResStr(IDS_AG_ABORTED));
 
-		if (err != aborted) {
+		CloseMedia();
+
+		if (m_closingmsg != aborted) {
+
 			if (OpenFileData *pFileData	= dynamic_cast<OpenFileData*>(pOMD.m_p)) {
 				m_wndPlaylistBar.SetCurValid(false);
 
 				if (GetAsyncKeyState(VK_ESCAPE)) {
-					err = aborted;
+					m_closingmsg = aborted;
 				}
 
-				if (err != aborted) {
+				if (m_closingmsg != aborted) {
 					if (m_wndPlaylistBar.IsAtEnd()) {
 						m_nLoops++;
 					}
@@ -3422,45 +3408,18 @@ LRESULT CMainFrame::OnPostOpen(WPARAM wParam, LPARAM lParam)
 			}
 		}
 	} else {
-		m_wndPlaylistBar.SetCurValid(true);
-
-		// Apply command line audio shift
-		if (s.rtShift != 0) {
-			SetAudioDelay (s.rtShift);
-			s.rtShift = 0;
-		}
-
-		if (!m_strTitleAlt.IsEmpty()) {
-			CPlaylistItem pli;
-			if (m_wndPlaylistBar.GetCur(pli)) {
-				m_wndPlaylistBar.SetCurLabel(m_strTitleAlt.Left(m_strTitleAlt.GetLength() - 4));
-			}
-		}
+		OnFilePostOpenMedia(pOMD);
 	}
 
 	m_flastnID = 0;
 
-	if (s.AutoChangeFullscrRes.bEnabled == 1 && m_fFullScreen) {
-		AutoChangeMonitorMode();
-	}
-	if (m_fFullScreen && s.fRememberZoomLevel) {
-		m_fFirstFSAfterLaunchOnFS = true;
-	}
-
-	m_LastOpenFile = pOMD->title;
-
-	if (m_bIsBDPlay == FALSE) {
-		m_MPLSPlaylist.RemoveAll();
-		m_LastOpenBDPath.Empty();
-	}
-
-	SetDwmPreview();
-
-	UpdateThumbarButton();
-
+    RecalcLayout();
 	if (IsWindow(m_wndToolBar.m_hWnd) && m_wndToolBar.IsVisible()) {
 		m_wndToolBar.Invalidate();
 	}
+
+	SetDwmPreview();
+	UpdateThumbarButton();
 
 	return 0L;
 }
@@ -3777,8 +3736,7 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 		CSize diff = m_lastMouseMove - point;
 		AppSettings& s = AfxGetAppSettings();
 
-		if (m_pFullscreenWnd->IsWindow() && (abs(diff.cx)+abs(diff.cy)) >= 1) {
-			//TRACE ("==> SHOW!\n");
+		if (m_pFullscreenWnd->IsWindow() && (abs(diff.cx) + abs(diff.cy)) >= 1) {
 			m_pFullscreenWnd->ShowCursor(true);
 
 			// hide the cursor if we are not in the DVD menu
@@ -3786,7 +3744,7 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 				KillTimer(TIMER_FULLSCREENMOUSEHIDER);
 				SetTimer(TIMER_FULLSCREENMOUSEHIDER, 2000, NULL);
 			}
-		} else if (m_fFullScreen && (abs(diff.cx)+abs(diff.cy)) >= 1) {
+		} else if (m_fFullScreen && (abs(diff.cx) + abs(diff.cy)) >= 1) {
 			int nTimeOut = s.nShowBarsWhenFullScreenTimeOut;
 
 			if (nTimeOut < 0) {
@@ -4236,26 +4194,77 @@ void CMainFrame::OnUpdatePlayerStatus(CCmdUI* pCmdUI)
 	}
 }
 
-void CMainFrame::OnFilePostOpenMedia()
+void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 {
+	ASSERT(m_iMediaLoadState == MLS_LOADING);
+	SetLoadState(MLS_LOADED);
+
+	AppSettings& s = AfxGetAppSettings();
+
+	if (s.fEnableEDLEditor) {
+		m_wndEditListEditor.OpenFile(pOMD->title);
+	}
+
+	m_AngleZ = 0;
+	if (OpenFileData *pFileData = dynamic_cast<OpenFileData*>(pOMD.m_p)) {
+		// Rotation flag;
+		BeginEnumFilters(m_pGB, pEF, pBF) {
+			if (CComQIPtr<IPropertyBag> pPB = pBF) {
+				CComVariant var;
+				if (SUCCEEDED(pPB->Read(CComBSTR(_T("ROTATION")), &var, NULL))) {
+					CString fstr = var.bstrVal;
+					if (!fstr.IsEmpty()) {
+						int rotationValue = 0;
+						if ((_stscanf_s(fstr, _T("%d"), &rotationValue) == 1) && rotationValue) {
+							m_AngleZ = -rotationValue;
+						}
+					}
+				}
+				break;
+			}
+		}
+		EndEnumFilters;
+	}
+
+	if (OpenDeviceData *pDeviceData = dynamic_cast<OpenDeviceData*>(pOMD.m_p)) {
+		m_wndCaptureBar.m_capdlg.SetVideoInput(pDeviceData->vinput);
+		m_wndCaptureBar.m_capdlg.SetVideoChannel(pDeviceData->vchannel);
+		m_wndCaptureBar.m_capdlg.SetAudioInput(pDeviceData->ainput);
+	}
+
+    REFERENCE_TIME rtDur = 0;
+	if (m_pMS && m_pMS->GetDuration(&rtDur) == S_OK) {
+		m_wndPlaylistBar.SetCurTime(rtDur);
+	}
+
+	m_wndPlaylistBar.SetCurValid(true);
+	if (!m_strTitleAlt.IsEmpty()) {
+		CPlaylistItem pli;
+		if (m_wndPlaylistBar.GetCur(pli)) {
+			m_wndPlaylistBar.SetCurLabel(m_strTitleAlt.Left(m_strTitleAlt.GetLength() - 4));
+		}
+	}
+
+	// Waffs : PnS command line
+	if (!s.strPnSPreset.IsEmpty()) {
+		for (int i = 0; i < s.m_pnspresets.GetCount(); i++) {
+			int j = 0;
+			CString str = s.m_pnspresets[i];
+			CString label = str.Tokenize(_T(","), j);
+			if (s.strPnSPreset == label) {
+				OnViewPanNScanPresets(i+ID_PANNSCAN_PRESETS_START);
+			}
+		}
+		s.strPnSPreset.Empty();
+	}
+
 	OpenSetupInfoBar();
-
 	OpenSetupStatsBar();
-
 	OpenSetupStatusBar();
-
-	//OpenSetupToolBar();
-
 	OpenSetupCaptureBar();
-
-	REFERENCE_TIME rtDur = 0;
-	m_pMS->GetDuration(&rtDur);
-	m_wndPlaylistBar.SetCurTime(rtDur);
 
 	if (GetPlaybackMode() == PM_CAPTURE) {
 		ShowControlBar(&m_wndSubresyncBar, FALSE, TRUE);
-		//ShowControlBar(&m_wndPlaylistBar, FALSE, TRUE);
-		//ShowControlBar(&m_wndCaptureBar, TRUE, TRUE);
 	}
 
 	m_nCurSubtitle		= -1;
@@ -4264,13 +4273,8 @@ void CMainFrame::OnFilePostOpenMedia()
 		m_pCAP->SetSubtitleDelay(0);
 	}
 
-	SetLoadState(MLS_LOADED);
-	AppSettings& s = AfxGetAppSettings();
-
-	// IMPORTANT: must not call any windowing msgs before
-	// this point, it will deadlock when OpenMediaPrivate is
-	// still running and the renderer window was created on
-	// the same worker-thread
+	OnTimer(TIMER_STREAMPOSPOLLER);
+	OnTimer(TIMER_STREAMPOSPOLLER2);
 
 	if (s.fLaunchfullscreen && !s.IsD3DFullscreen() && !m_fFullScreen && !m_fAudioOnly) {
 		ToggleFullscreen(true, true);
@@ -4289,7 +4293,6 @@ void CMainFrame::OnFilePostOpenMedia()
 			wp.showCmd = SW_SHOWMAXIMIZED;
 		}
 
-
 		// restore magnification
 		if (IsWindowVisible() && s.fRememberZoomLevel
 				&& !(m_fFullScreen || wp.showCmd == SW_SHOWMAXIMIZED || wp.showCmd == SW_SHOWMINIMIZED)) {
@@ -4297,26 +4300,40 @@ void CMainFrame::OnFilePostOpenMedia()
 		}
 	}
 
-	// Waffs : PnS command line
-	if (!s.strPnSPreset.IsEmpty()) {
-		for (int i = 0; i < s.m_pnspresets.GetCount(); i++) {
-			int j = 0;
-			CString str = s.m_pnspresets[i];
-			CString label = str.Tokenize(_T(","), j);
-			if (s.strPnSPreset == label) {
-				OnViewPanNScanPresets(i+ID_PANNSCAN_PRESETS_START);
-			}
-		}
-		s.strPnSPreset.Empty();
+    // start playback if requested
+	if (!(s.nCLSwitches & CLSW_OPEN) && (s.nLoops > 0)) {
+		SendMessage(WM_COMMAND, ID_PLAY_PLAY);
+	} else {
+		SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
 	}
-	SendNowPlayingToApi();
+	s.nCLSwitches &= ~CLSW_OPEN;
+
+    SendNowPlayingToApi();
 
 	SetupChapters();
-}
 
-void CMainFrame::OnUpdateFilePostOpenMedia(CCmdUI* pCmdUI)
-{
-	pCmdUI->Enable(m_iMediaLoadState == MLS_LOADING);
+	if (s.AutoChangeFullscrRes.bEnabled == 1 && m_fFullScreen) {
+		AutoChangeMonitorMode();
+	}
+	if (m_fFullScreen && s.fRememberZoomLevel) {
+		m_fFirstFSAfterLaunchOnFS = true;
+	}
+
+	m_bfirstPlay	= true;
+	m_LastOpenFile	= pOMD->title;
+
+	if (m_bIsBDPlay == FALSE) {
+		m_MPLSPlaylist.RemoveAll();
+		m_LastOpenBDPath.Empty();
+	}
+
+	// correct window size if "Limit window proportions on resize" enable.
+	if (!s.fRememberZoomLevel) {
+		CRect r;
+		GetWindowRect(&r);
+		OnSizing(WMSZ_LEFT, r);
+		MoveWindow(r);
+	}
 }
 
 void CMainFrame::OnFilePostCloseMedia()
@@ -4391,10 +4408,7 @@ void CMainFrame::OnFilePostCloseMedia()
 	}
 
 	RecalcLayout();
-
-	if (IsWindow(m_wndToolBar.m_hWnd) && m_wndToolBar.IsVisible()) {
-		m_wndToolBar.Invalidate();
-	}
+	UpdateWindow();
 
 	SetWindowText(m_strTitle);
 	m_Lcd.SetMediaTitle(LPCTSTR(m_strTitle));
@@ -4422,11 +4436,6 @@ void CMainFrame::OnFilePostCloseMedia()
 	m_wndToolBar.SwitchTheme();
 
 	SetThreadExecutionState(ES_CONTINUOUS);
-}
-
-void CMainFrame::OnUpdateFilePostCloseMedia(CCmdUI* pCmdUI)
-{
-	pCmdUI->Enable(!!m_hWnd && m_iMediaLoadState == MLS_CLOSING);
 }
 
 void CMainFrame::OnBossKey()
@@ -5366,16 +5375,6 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 		return FALSE;
 	}
 
-	WORD timeOut = 0;
-	while ((m_iMediaLoadState == MLS_LOADING || m_iMediaLoadState == MLS_CLOSING) && timeOut < 3000) {
-		Sleep(50);
-		timeOut += 50;
-	}
-
-	if (m_iMediaLoadState == MLS_LOADING || m_iMediaLoadState == MLS_CLOSING) {
-		return FALSE;
-	}
-
 	AppSettings& s = AfxGetAppSettings();
 
 	if (pCDS->dwData != 0x6ABE51 || pCDS->cbData < sizeof(DWORD)) {
@@ -5387,9 +5386,9 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 		}
 	}
 
-	DWORD len = *((DWORD*)pCDS->lpData);
-	TCHAR* pBuff = (TCHAR*)((DWORD*)pCDS->lpData + 1);
-	TCHAR* pBuffEnd = (TCHAR*)((BYTE*)pBuff + pCDS->cbData - sizeof(DWORD));
+	DWORD len		= *((DWORD*)pCDS->lpData);
+	TCHAR* pBuff	= (TCHAR*)((DWORD*)pCDS->lpData + 1);
+	TCHAR* pBuffEnd	= (TCHAR*)((BYTE*)pBuff + pCDS->cbData - sizeof(DWORD));
 
 	CAtlList<CString> cmdln;
 
@@ -5404,7 +5403,7 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 
 	s.ParseCommandLine(cmdln);
 
-	if (s.nCLSwitches&CLSW_SLAVE) {
+	if (s.nCLSwitches & CLSW_SLAVE) {
 		SendAPICommand(CMD_CONNECT, L"%d", PtrToInt(GetSafeHwnd()));
 	}
 
@@ -5453,7 +5452,7 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 
 	bool fSetForegroundWindow = false;
 
-	if ((s.nCLSwitches&CLSW_DVD) && !s.slFiles.IsEmpty()) {
+	if ((s.nCLSwitches & CLSW_DVD) && !s.slFiles.IsEmpty()) {
 		SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 		fSetForegroundWindow = true;
 
@@ -5463,7 +5462,7 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 			p->subs.AddTailList(&s.slSubs);
 		}
 		OpenMedia(p);
-	} else if (s.nCLSwitches&CLSW_CD) {
+	} else if (s.nCLSwitches & CLSW_CD) {
 		SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 		fSetForegroundWindow = true;
 
@@ -5496,7 +5495,7 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 		}
 
 		if (OpenBD(s.slFiles.GetHead())) {
-			if (fSetForegroundWindow && !(s.nCLSwitches&CLSW_NOFOCUS)) {
+			if (fSetForegroundWindow && !(s.nCLSwitches & CLSW_NOFOCUS)) {
 				SetForegroundWindow();
 			}
 			s.nCLSwitches &= ~CLSW_NOFOCUS;
@@ -5512,12 +5511,12 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 			}
 			OpenMedia(p);
 		} else {
-			if (m_nLastRunTicket && ((GetTickCount() - m_nLastRunTicket)<500)) {
+			if (m_dwLastRun && ((GetTickCount() - m_dwLastRun)<500)) {
 				s.nCLSwitches |= CLSW_ADD;
 			}
-			m_nLastRunTicket = GetTickCount();
+			m_dwLastRun = GetTickCount();
 
-			if ((s.nCLSwitches&CLSW_ADD) && m_wndPlaylistBar.GetCount() > 0) {
+			if ((s.nCLSwitches & CLSW_ADD) && m_wndPlaylistBar.GetCount() > 0) {
 				m_wndPlaylistBar.Append(sl, fMulti, &s.slSubs);
 
 				if (s.nCLSwitches&(CLSW_OPEN|CLSW_PLAY)) {
@@ -5527,13 +5526,13 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 			} else {
 				UINT nCLSwitches = s.nCLSwitches;	// backup cmdline params
 
-				SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+				//SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 				fSetForegroundWindow = true;
 
 				s.nCLSwitches = nCLSwitches;		// restore cmdline params
 				m_wndPlaylistBar.Open(sl, fMulti, &s.slSubs);
 
-				OpenCurPlaylistItem((s.nCLSwitches&CLSW_STARTVALID) ? s.rtStart : INVALID_TIME);
+				OpenCurPlaylistItem((s.nCLSwitches & CLSW_STARTVALID) ? s.rtStart : INVALID_TIME);
 
 				s.nCLSwitches &= ~CLSW_STARTVALID;
 				s.rtStart = 0;
@@ -5543,7 +5542,7 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 		s.nCLSwitches = CLSW_NONE;
 	}
 
-	if (fSetForegroundWindow && !(s.nCLSwitches&CLSW_NOFOCUS)) {
+	if (fSetForegroundWindow && !(s.nCLSwitches & CLSW_NOFOCUS)) {
 		SetForegroundWindow();
 	}
 
@@ -5570,25 +5569,6 @@ void CMainFrame::OnFileOpenDVD()
 	if ((m_iMediaLoadState == MLS_LOADING) || m_pFullscreenWnd->IsWindow()) {
 		return;
 	}
-
-	/*
-	SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
-	SetForegroundWindow();
-
-	ShowWindow(SW_SHOW);
-
-	CAutoPtr<OpenDVDData> p(DNew OpenDVDData());
-	if (p)
-	{
-	    AppSettings& s = AfxGetAppSettings();
-		if (s.fUseDVDPath && !s.strDVDPath.IsEmpty())
-		{
-			p->path = s.strDVDPath;
-			p->path.Replace('/', '\\');
-			if (p->path[p->path.GetLength()-1] != '\\') p->path += '\\';
-		}
-	}
-	OpenMedia(p);*/
 
 	AppSettings& s = AfxGetAppSettings();
 	CString strTitle = ResStr(IDS_MAINFRM_46);
@@ -11436,7 +11416,7 @@ void CMainFrame::SetDefaultFullscreenState()
 	AppSettings& s = AfxGetAppSettings();
 
 	// Waffs : fullscreen command line
-	if (!(s.nCLSwitches&CLSW_ADD) && (s.nCLSwitches&CLSW_FULLSCREEN) && !s.slFiles.IsEmpty()) {
+	if (!(s.nCLSwitches & CLSW_ADD) && (s.nCLSwitches & CLSW_FULLSCREEN) && !s.slFiles.IsEmpty()) {
 		ToggleFullscreen(true, true);
 		SetCursor(NULL);
 		s.nCLSwitches &= ~CLSW_FULLSCREEN;
@@ -13115,7 +13095,9 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 void CMainFrame::SetupChapters()
 {
-	ASSERT(m_pCB);
+	if (!m_pCB) {
+		return;
+	}
 
 	if (GetPlaybackMode() == PM_FILE) {
 		m_pCB->ChapRemoveAll();
@@ -14837,8 +14819,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			BREAK(aborted)
 		}
 
-		m_pCAP2 = NULL;
-		m_pCAP = NULL;
+		m_pCAP2	= NULL;
+		m_pCAP	= NULL;
 
 		m_pGB->FindInterface(__uuidof(ISubPicAllocatorPresenter),  (void**)&m_pCAP,    TRUE);
 		m_pGB->FindInterface(__uuidof(ISubPicAllocatorPresenter2), (void**)&m_pCAP2,   TRUE);
@@ -14852,6 +14834,12 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		// === EVR !
 		m_pGB->FindInterface(__uuidof(IMFVideoDisplayControl), (void**)&m_pMFVDC, TRUE);
 		m_pGB->FindInterface(__uuidof(IMFVideoProcessor),      (void**)&m_pMFVP,  TRUE);
+		if (m_pMFVDC) {
+			RECT Rect;
+			::GetClientRect (m_pVideoWnd->m_hWnd, &Rect);
+			m_pMFVDC->SetVideoWindow (m_pVideoWnd->m_hWnd);
+			m_pMFVDC->SetVideoPosition(NULL, &Rect);
+		}
 
 		if (b_UseSmartSeek && m_wndPreView) {
 			m_pGB_preview->FindInterface(__uuidof(IMFVideoDisplayControl), (void**)&m_pMFVDC_preview, TRUE);
@@ -14865,17 +14853,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			}
 		}
 
-		if (m_pMFVDC) {
-			RECT Rect;
-			::GetClientRect (m_pVideoWnd->m_hWnd, &Rect);
-			m_pMFVDC->SetVideoWindow (m_pVideoWnd->m_hWnd);
-			m_pMFVDC->SetVideoPosition(NULL, &Rect);
-		}
-
-		//SetupEVRColorControl();
-		//does not work at this location
-		//need to choose the correct mode (IMFVideoProcessor::SetVideoProcessorMode)
-
 		BeginEnumFilters(m_pGB, pEF, pBF) {
 			if (m_pLN21 = pBF) {
 				m_pLN21->SetServiceState(s.fClosedCaptions ? AM_L21_CCSTATE_On : AM_L21_CCSTATE_Off);
@@ -14883,10 +14860,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			}
 		}
 		EndEnumFilters;
-
-		if (m_fOpeningAborted) {
-			BREAK(aborted)
-		}
 
 		OpenCustomizeGraph();
 		if (m_fOpeningAborted) {
@@ -14923,13 +14896,23 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		if (m_fOpeningAborted) {
 			BREAK(aborted)
 		}
+		// Apply command line audio shift
+		if (s.rtShift != 0) {
+			SetAudioDelay(s.rtShift);
+			s.rtShift = 0;
+		}
+
+		OpenSetupWindowTitle(pOMD->title);
 
 		OpenSetupSubStream(pOMD);
 		if (m_fOpeningAborted) {
 			BREAK(aborted)
 		}
 
-		OpenSetupWindowTitle(pOMD->title);
+		OpenSetupAudioStream();
+		if (m_fOpeningAborted) {
+			BREAK(aborted)
+		}
 
 		IsMadVRExclusiveMode = false;
 		// madVR - register Callback function for detect Entered to ExclusiveMode
@@ -14943,79 +14926,23 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 		b_UseReclock = (FindFilter(CLSID_ReClock, m_pGB) != NULL);
 
-		if (s.fEnableEDLEditor) {
-			m_wndEditListEditor.OpenFile(pOMD->title);
-		}
-
-		if (::GetCurrentThreadId() == AfxGetApp()->m_nThreadID) {
-			OnFilePostOpenMedia();
-		} else {
-			PostMessage(WM_COMMAND, ID_FILE_POST_OPENMEDIA);
-		}
-
-		while (m_iMediaLoadState != MLS_LOADED
-				&& m_iMediaLoadState != MLS_CLOSING // FIXME
-			  ) {
-			Sleep(50);
-		}
-
-		// correct window size if "Limit window proportions on resize" enable.
-		if (!s.fRememberZoomLevel) {
-			CRect r;
-			GetWindowRect(&r);
-			OnSizing(WMSZ_LEFT, r);
-			MoveWindow(r);
-		}
-		// PostMessage instead of SendMessage because the user might call CloseMedia and then we would deadlock
-		PostMessage(WM_COMMAND, ID_PLAY_PAUSE);
-
-		OpenSetupAudioStream();
-
-		m_bfirstPlay = true;
-
-		if (!(AfxGetAppSettings().nCLSwitches&CLSW_OPEN) && (AfxGetAppSettings().nLoops > 0)) {
-			PostMessage(WM_COMMAND, ID_PLAY_PLAY);
-		} else {
-			// If we don't start playing immediately, we need to initialize
-			// the seekbar and the time counter.
-			OnTimer(TIMER_STREAMPOSPOLLER);
-			OnTimer(TIMER_STREAMPOSPOLLER2);
-		}
-
-		AfxGetAppSettings().nCLSwitches &= ~CLSW_OPEN;
-
-		m_AngleZ = 0;
 		if (pFileData) {
-			// Rotation flag;
-			BeginEnumFilters(m_pGB, pEF, pBF) {
-				if (CComQIPtr<IPropertyBag> pPB = pBF) {
-					CComVariant var;
-					if (SUCCEEDED(pPB->Read(CComBSTR(_T("ROTATION")), &var, NULL))) {
-						CString fstr = var.bstrVal;
-						if (!fstr.IsEmpty()) {
-							int rotationValue = 0;
-							if ((_stscanf_s(fstr, _T("%d"), &rotationValue) == 1) && rotationValue) {
-								m_AngleZ = -rotationValue;
-							}
-						}
-					}
-					break;
-				}
-			}
-			EndEnumFilters;
-			//
-
-			if (pFileData->rtStart >= 0) {
-				PostMessage(WM_RESUMEFROMSTATE, (WPARAM)PM_FILE, (LPARAM)(pFileData->rtStart/10000));    // REFERENCE_TIME doesn't fit in LPARAM under a 32bit env.
+			if (pFileData->rtStart > 0 && m_pMS) {
+				REFERENCE_TIME rtPos = pFileData->rtStart;
+				VERIFY(SUCCEEDED(m_pMS->SetPositions(&rtPos, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning)));
 			}
 		} else if (pDVDData) {
-			if (pDVDData->pDvdState) {
-				PostMessage(WM_RESUMEFROMSTATE, (WPARAM)PM_DVD, (LPARAM)(CComPtr<IDvdState>(pDVDData->pDvdState).Detach()));    // must be released by the called message handler
+			if (pDVDData->pDvdState && m_pDVDC) {
+				VERIFY(m_pDVDC->SetState(pDVDData->pDvdState, DVD_CMD_FLAG_Block, NULL) == S_OK);
 			}
-		} else if (pDeviceData) {
-			m_wndCaptureBar.m_capdlg.SetVideoInput(pDeviceData->vinput);
-			m_wndCaptureBar.m_capdlg.SetVideoChannel(pDeviceData->vchannel);
-			m_wndCaptureBar.m_capdlg.SetAudioInput(pDeviceData->ainput);
+		}
+
+		if (m_pMC) {
+			m_pMC->Pause();
+		}
+
+		if (b_UseSmartSeek && m_pMC_preview) {
+			m_pMC_preview->Pause();
 		}
 
 		break;
@@ -15023,19 +14950,15 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 	EndWaitCursor();
 
-	if (b_UseSmartSeek && m_pMC_preview) {
-		m_pMC_preview->Pause();
-	}
-
-	m_ErrMsg	= err;
-	WPARAM wp	= (WPARAM)pOMD.Detach();
+	m_closingmsg	= err;
+	WPARAM wp		= (WPARAM)pOMD.Detach();
 	if (::GetCurrentThreadId() == AfxGetApp()->m_nThreadID) {
 		OnPostOpen(wp, NULL);
 	} else {
 		PostMessage(WM_POSTOPEN, wp, NULL);
 	}
 
-	return(err.IsEmpty());
+	return (err.IsEmpty());
 }
 
 void CMainFrame::CloseMediaPrivate()
@@ -18147,7 +18070,6 @@ bool CMainFrame::DisplayChange()
 void CMainFrame::CloseMedia()
 {
 	if (m_iMediaLoadState == MLS_CLOSING || m_iMediaLoadState == MLS_CLOSED) {
-		//ASSERT(FALSE);
 		return;
 	}
 
@@ -18169,15 +18091,19 @@ void CMainFrame::CloseMedia()
 				if (m_pGraphThread) {
 					m_pGraphThread->SetMainFrame(this);
 				}
+
 				m_bOpenedThruThread = false;
 			}
 			EndWaitCursor();
+
+			MSG msg;
+			if (PeekMessage(&msg, m_hWnd, WM_POSTOPEN, WM_POSTOPEN, PM_REMOVE | PM_NOYIELD)) {
+				delete ((OpenMediaData*)msg.wParam);
+			}
 		}
 	}
 
 	m_fOpeningAborted = false;
-
-	m_closingmsg.Empty();
 
 	SetLoadState(MLS_CLOSING);
 
@@ -19305,7 +19231,7 @@ HRESULT CMainFrame::UpdateThumbnailClip()
 		return E_FAIL;
 	}
 
-	if ( (!AfxGetAppSettings().fUseWin7TaskBar) || (m_iMediaLoadState != MLS_LOADED) || m_fAudioOnly || m_fFullScreen ) {
+	if (!AfxGetAppSettings().fUseWin7TaskBar || m_iMediaLoadState != MLS_LOADED || m_fAudioOnly || m_fFullScreen) {
 		return m_pTaskbarList->SetThumbnailClip( m_hWnd, NULL );
 	}
 

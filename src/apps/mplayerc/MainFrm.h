@@ -534,7 +534,7 @@ protected:
 
 	UINT	m_flastnID;
 	bool	m_bfirstPlay;
-	DWORD	m_nLastRunTicket;
+	DWORD	m_dwLastRun;
 
 public:
 	BOOL OpenCurPlaylistItem(REFERENCE_TIME rtStart = INVALID_TIME);
@@ -743,11 +743,6 @@ public:
 	afx_msg void OnUpdateMenuNavAudio(CCmdUI* pCmdUI);
 
 	afx_msg void OnUpdatePlayerStatus(CCmdUI* pCmdUI);
-
-	afx_msg void OnFilePostOpenMedia();
-	afx_msg void OnUpdateFilePostOpenMedia(CCmdUI* pCmdUI);
-	afx_msg void OnFilePostCloseMedia();
-	afx_msg void OnUpdateFilePostCloseMedia(CCmdUI* pCmdUI);
 
 	afx_msg void OnBossKey();
 
@@ -1031,6 +1026,9 @@ public:
 	afx_msg void OnLanguage(UINT nID);
 	afx_msg void OnUpdateLanguage(CCmdUI* pCmdUI);
 
+	void OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD);
+	void OnFilePostCloseMedia();
+
 	CMPC_Lcd m_Lcd;
 
 	// Main Window
@@ -1218,7 +1216,6 @@ private:
 	int			GetStreamCount(DWORD dwSelGroup);
 
 	DWORD_PTR	m_nMainFilterId;
-	CString		m_ErrMsg;
 
 public:
 	BOOL		CheckMainFilter(IBaseFilter* pBF);

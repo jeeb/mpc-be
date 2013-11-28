@@ -1197,10 +1197,11 @@ BOOL CMPlayerCApp::InitInstance()
 
 	m_mutexOneInstance.Create(NULL, TRUE, _T(MPC_WND_CLASS_NAME));
 
-	if ( GetLastError() == ERROR_ALREADY_EXISTS && !(m_s.nCLSwitches&CLSW_NEW) &&
-			(m_s.nCLSwitches&CLSW_ADD ||
-			(m_s.GetMultiInst() == 1 && !m_cmdln.IsEmpty()) ||
-			m_s.GetMultiInst() == 0) ) {
+	if (GetLastError() == ERROR_ALREADY_EXISTS
+			&& !(m_s.nCLSwitches&CLSW_NEW)
+			&& (m_s.nCLSwitches&CLSW_ADD ||
+				(m_s.GetMultiInst() == 1 && !m_cmdln.IsEmpty()) ||
+				m_s.GetMultiInst() == 0)) {
 
 		DWORD res = WaitForSingleObject(m_mutexOneInstance.m_h, 5000);
 		if (res == WAIT_OBJECT_0 || res == WAIT_ABANDONED) {
@@ -1217,7 +1218,7 @@ BOOL CMPlayerCApp::InitInstance()
 				pTCD->hWND				= hWnd;
 
 				CWinThread*	pTHREADCopyData = AfxBeginThread(RunTHREADCopyData, static_cast<LPVOID>(pTCD));
-				if (WaitForSingleObject(pTHREADCopyData->m_hThread, 5000) == WAIT_TIMEOUT) {
+				if (WaitForSingleObject(pTHREADCopyData->m_hThread, 7000) == WAIT_TIMEOUT) { // in CMainFrame::CloseMedia() wait to graph thread is complete 5000
 					TerminateThread(pTHREADCopyData->m_hThread, 0xDEAD);
 					bDataIsSend = FALSE;
 				}
