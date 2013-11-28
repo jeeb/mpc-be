@@ -72,18 +72,18 @@ enum MPCPixelFormat {
 	// YUV formats are grouped according to luma bit depth and sorted in descending order of quality.
 	PixFmt_None = -1,
 	// YUV 8 bit
-	PixFmt_AYUV,  // 24+8 bit, 4:4:4
+	PixFmt_AYUV,  // 24(32) bit, 4:4:4
 	PixFmt_YUY2,  // 16 bit, 4:2:2
 	PixFmt_NV12,  // 12 bit, 4:2:0
 	PixFmt_YV12,  // 12 bit, 4:2:0
 	// YUV 10 bit
-	PixFmt_P210,  // 4:2:2
-	PixFmt_P010,  // 4:2:0
+	PixFmt_P210,  // 20(32) bit, 4:2:2
+	PixFmt_P010,  // 15(24) bit, 4:2:0
 	// YUV 16 bit
 	PixFmt_P216,  // 32 bit, 4:2:2
 	PixFmt_P016,  // 24 bit, 4:2:0
 	// RGB
-	PixFmt_RGB32, // 24+8 bit
+	PixFmt_RGB32, // 24(32) bit
 	PixFmt_count
 };
 

@@ -1816,7 +1816,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 			// if YUV then add similar YUV formats
 			for (int i = 0; i < PixFmt_count; i++) {
 				const SW_OUT_FMT* swof = GetSWOF(i);
-				if (inqueue[i] && bpp == swof->bpp
+				if (inqueue[i] && bpp == swof->actual_bpp
 						&& av_pfdesc->log2_chroma_w == swof->chroma_w
 						&& av_pfdesc->log2_chroma_h == swof->chroma_h) {
 					nSwIndex[nSwCount++] = i;

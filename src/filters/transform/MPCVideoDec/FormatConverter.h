@@ -40,6 +40,7 @@ typedef struct {
 	const enum AVPixelFormat	av_pix_fmt;
 	const uint8_t				chroma_w;
 	const uint8_t				chroma_h;
+	const int					actual_bpp;
 } SW_OUT_FMT;
 
 const SW_OUT_FMT* GetSWOF(int pixfmt);
