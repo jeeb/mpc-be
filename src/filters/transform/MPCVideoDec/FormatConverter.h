@@ -79,9 +79,7 @@ protected:
 	bool Init();
 	void UpdateDetails();
 
-#if ENABLE_AYUV
 	HRESULT ConvertToAYUV(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[]);
-#endif
 	HRESULT ConvertToPX1X(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[], int chromaVertical);
 
 public:
