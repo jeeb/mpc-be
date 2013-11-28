@@ -158,7 +158,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 	// === New swscaler options
 	p = CPoint(5 + IPP_SCALE(350) + 10, 10);
-	int width_s = IPP_SCALE(205);
+	int width_s = IPP_SCALE(270);
 	int btn_w   = m_fontheight + 12;
 	int btn_h   = m_fontheight + 4;
 	int combo_w = IPP_SCALE(85);
@@ -170,15 +170,15 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_txtSwOutputFormats.Create(ResStr(IDS_VDF_COLOR_OUTPUT_FORMATS), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h20;
 	m_txt420.Create(_T("4:2:0 YUV:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbNV12.Create(_T("NV12"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(60), 0), CSize(IPP_SCALE(55), m_fontheight)), this, IDC_PP_SW_NV12);
-	m_cbYV12.Create(_T("YV12"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(120), 0), CSize(IPP_SCALE(55), m_fontheight)), this, IDC_PP_SW_YV12);
-	m_cbP010.Create(_T("P010"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(180), 0), CSize(IPP_SCALE(55), m_fontheight)), this, IDC_PP_SW_P010);
-	m_cbP016.Create(_T("P016"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(240), 0), CSize(IPP_SCALE(55), m_fontheight)), this, IDC_PP_SW_P016);
+	m_cbNV12.Create(_T("NV12"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(60), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_SW_NV12);
+	m_cbYV12.Create(_T("YV12"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(115), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_SW_YV12);
+	m_cbP010.Create(_T("P010"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(170), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_SW_P010);
+	m_cbP016.Create(_T("P016"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(225), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_SW_P016);
 	p.y += h20;
 	m_txt422.Create(_T("4:2:2 YUV:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbYUY2.Create(_T("YUY2"), dwStyle | BS_3STATE, CRect(p + CSize(IPP_SCALE(60), 0), CSize(IPP_SCALE(55), m_fontheight)), this, IDC_PP_SW_YUY2);
-	m_cbP210.Create(_T("P210"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(180), 0), CSize(IPP_SCALE(55), m_fontheight)), this, IDC_PP_SW_P210);
-	m_cbP216.Create(_T("P216"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(240), 0), CSize(IPP_SCALE(55), m_fontheight)), this, IDC_PP_SW_P216);
+	m_cbYUY2.Create(_T("YUY2"), dwStyle | BS_3STATE, CRect(p + CSize(IPP_SCALE(60), 0), CSize(IPP_SCALE(50), m_fontheight)), this, IDC_PP_SW_YUY2);
+	m_cbP210.Create(_T("P210"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(170), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_SW_P210);
+	m_cbP216.Create(_T("P216"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(225), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_SW_P216);
 	p.y += h20;
 #if ENABLE_AYUV
 	m_txt444.Create(_T("4:4:4 YUV:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
