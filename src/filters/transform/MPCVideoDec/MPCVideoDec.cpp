@@ -2607,11 +2607,11 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 		case MODE_SOFTWARE :
 			hr = SoftwareDecode(pIn, pDataIn, nSize, rtStart, rtStop);
 			break;
-		case MODE_DXVA1 :
 		case MODE_DXVA2 :
+			CheckPointer(m_pDXVA2Allocator, E_UNEXPECTED);
+		case MODE_DXVA1 :
 			{
 				CheckPointer(m_pDXVADecoder, E_UNEXPECTED);
-				CheckPointer(m_pDXVA2Allocator, E_UNEXPECTED);
 				UpdateAspectRatio();
 
 				// Change aspect ratio for DXVA1
