@@ -4179,6 +4179,8 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	ASSERT(m_iMediaLoadState == MLS_LOADING);
 	SetLoadState(MLS_LOADED);
 
+	SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
+
 	AppSettings& s = AfxGetAppSettings();
 
 	if (s.fEnableEDLEditor) {
@@ -14798,8 +14800,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		if (m_fOpeningAborted) {
 			BREAK(aborted)
 		}
-
-		PostMessage(WM_COMMAND, ID_PLAY_PAUSE);
 
 		m_pCAP2	= NULL;
 		m_pCAP	= NULL;
