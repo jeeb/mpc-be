@@ -685,7 +685,6 @@ public:
 	afx_msg LRESULT OnGraphNotify(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnResetDevice(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnRepaintRenderLess(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnResumeFromState(WPARAM wParam, LPARAM lParam);
 
 	afx_msg LRESULT OnPostOpen(WPARAM wParam, LPARAM lParam);
 

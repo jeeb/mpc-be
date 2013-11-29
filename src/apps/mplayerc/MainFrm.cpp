@@ -185,7 +185,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_MESSAGE(WM_GRAPHNOTIFY, OnGraphNotify)
 	ON_MESSAGE(WM_RESET_DEVICE, OnResetDevice)
 	ON_MESSAGE(WM_REARRANGERENDERLESS, OnRepaintRenderLess)
-	ON_MESSAGE(WM_RESUMEFROMSTATE, OnResumeFromState)
 
 	ON_MESSAGE(WM_POSTOPEN, OnPostOpen)
 
@@ -1401,11 +1400,11 @@ BOOL CMainFrame::OnCmdMsg(UINT nID, int nCode, void* pExtra, AFX_CMDHANDLERINFO*
 
 void CMainFrame::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 {
-	AppSettings &s = AfxGetAppSettings();
-	DWORD style = GetStyle();
+	AppSettings &s	= AfxGetAppSettings();
+	DWORD style		= GetStyle();
 
 	lpMMI->ptMinTrackSize.x = 16;
-	if ( !IsMenuHidden() ) {
+	if (!IsMenuHidden()) {
 		MENUBARINFO mbi;
 		memset(&mbi, 0, sizeof(mbi));
 		mbi.cbSize = sizeof(mbi);
@@ -1418,15 +1417,15 @@ void CMainFrame::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 			lpMMI->ptMinTrackSize.x += r.Width();
 		}
 	}
-	if ( IsWindow(m_wndToolBar.m_hWnd) && m_wndToolBar.IsVisible() ) {
-		lpMMI->ptMinTrackSize.x = max( m_wndToolBar.GetMinWidth(), lpMMI->ptMinTrackSize.x );
+	if (IsWindow(m_wndToolBar.m_hWnd) && m_wndToolBar.IsVisible()) {
+		lpMMI->ptMinTrackSize.x = max(m_wndToolBar.GetMinWidth(), lpMMI->ptMinTrackSize.x);
 	}
 
 	lpMMI->ptMinTrackSize.y = 0;
-	if ( style & WS_CAPTION ) {
-		lpMMI->ptMinTrackSize.y += GetSystemMetrics( SM_CYCAPTION );
+	if (style & WS_CAPTION ) {
+		lpMMI->ptMinTrackSize.y += GetSystemMetrics(SM_CYCAPTION);
 		if (s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU) {
-			lpMMI->ptMinTrackSize.y += GetSystemMetrics( SM_CYMENU );    //(mbi.rcBar.bottom - mbi.rcBar.top);
+			lpMMI->ptMinTrackSize.y += GetSystemMetrics(SM_CYMENU);    //(mbi.rcBar.bottom - mbi.rcBar.top);
 		}
 		//else MODE_HIDEMENU
 	}
@@ -1441,34 +1440,37 @@ void CMainFrame::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 	}
 
 	POSITION pos = m_bars.GetHeadPosition();
-	while ( pos ) {
+	while (pos) {
 		CControlBar *pCB = m_bars.GetNext( pos );
-		if ( !IsWindow(pCB->m_hWnd) || !pCB->IsVisible() ) {
+		if (!IsWindow(pCB->m_hWnd) || !pCB->IsVisible()) {
 			continue;
 		}
 		lpMMI->ptMinTrackSize.y += pCB->CalcFixedLayout(TRUE, TRUE).cy;
 	}
 
 	pos = m_dockingbars.GetHeadPosition();
-	while ( pos ) {
+	while (pos) {
 		CSizingControlBar *pCB = m_dockingbars.GetNext( pos );
-		if ( IsWindow(pCB->m_hWnd) && pCB->IsWindowVisible() && !pCB->IsFloating() ) {
+		if (IsWindow(pCB->m_hWnd) && pCB->IsWindowVisible() && !pCB->IsFloating()) {
 			lpMMI->ptMinTrackSize.y += pCB->CalcFixedLayout(TRUE, TRUE).cy - 2;    // 2 is a magic value from CSizingControlBar class, i guess this should be GetSystemMetrics( SM_CXBORDER ) or similar
 		}
 	}
 	if (lpMMI->ptMinTrackSize.y<16) {
 		lpMMI->ptMinTrackSize.y = 16;
 	}
+
 	FlyBarSetPos();
 	OSDBarSetPos();
-	__super::OnGetMinMaxInfo( lpMMI );
+
+	__super::OnGetMinMaxInfo(lpMMI);
 }
 
 void CMainFrame::CreateFlyBar()
 {
 	if (AfxGetAppSettings().fFlybar) {
 		if (!m_wndFlyBar.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL, WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS, CRect(0, 0, 0, 0), this, 0, NULL)) {
-		TRACE(_T("Failed to create Flybar Window\n"));
+			TRACE(_T("Failed to create Flybar Window\n"));
+			return;
 		}
 		SetWindowLongPtr(m_wndFlyBar.m_hWnd, GWL_EXSTYLE, WS_EX_LAYERED);
 		m_wndFlyBar.SetLayeredWindowAttributes(RGB(255,0,255), 150, LWA_ALPHA|LWA_COLORKEY);
@@ -3336,28 +3338,6 @@ LRESULT CMainFrame::OnResetDevice( WPARAM wParam, LPARAM lParam )
 LRESULT CMainFrame::OnRepaintRenderLess(WPARAM wParam, LPARAM lParam)
 {
 	MoveVideoWindow();
-	return TRUE;
-}
-
-LRESULT CMainFrame::OnResumeFromState(WPARAM wParam, LPARAM lParam)
-{
-	int iPlaybackMode = (int)wParam;
-
-	if (iPlaybackMode == PM_FILE) {
-		SeekTo(10000i64*int(lParam), false);
-	} else if (iPlaybackMode == PM_DVD) {
-		CComPtr<IDvdState> pDvdState;
-		pDvdState.Attach((IDvdState*)lParam);
-		if (m_pDVDC) {
-			m_pDVDC->SetState(pDvdState, DVD_CMD_FLAG_Block, NULL);
-		}
-	} else if (iPlaybackMode == PM_CAPTURE) {
-		// not implemented
-	} else {
-		ASSERT(0);
-		return FALSE;
-	}
-
 	return TRUE;
 }
 
@@ -12763,7 +12743,7 @@ UINT CMainFrame::YoutubeThreadProc()
 						}
 
 						m_YoutubeCurrent += dwBytesRead;
-						if (m_YoutubeCurrent > min(MEGABYTE, m_YoutubeTotal/2)) {
+						if (m_YoutubeCurrent > min(MEGABYTE, m_YoutubeTotal ? m_YoutubeTotal/2 : MEGABYTE)) {
 							m_fYoutubeThreadWork = TH_WORK;
 						}
 					}
@@ -14819,6 +14799,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			BREAK(aborted)
 		}
 
+		PostMessage(WM_COMMAND, ID_PLAY_PAUSE);
+
 		m_pCAP2	= NULL;
 		m_pCAP	= NULL;
 
@@ -14935,10 +14917,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			if (pDVDData->pDvdState && m_pDVDC) {
 				VERIFY(m_pDVDC->SetState(pDVDData->pDvdState, DVD_CMD_FLAG_Block, NULL) == S_OK);
 			}
-		}
-
-		if (m_pMC) {
-			m_pMC->Pause();
 		}
 
 		if (b_UseSmartSeek && m_pMC_preview) {
