@@ -59,15 +59,7 @@ extern "C" {
 #define OPT_ARMode           _T("ARMode")
 #define OPT_DXVACheck        _T("DXVACheckCompatibility")
 #define OPT_DisableDXVA_SD   _T("DisableDXVA_SD")
-#define OPTION_SW_NV12       _T("Sw_NV12")
-#define OPTION_SW_YV12       _T("Sw_YV12")
-#define OPTION_SW_YUY2       _T("Sw_YUY2")
-#define OPTION_SW_AYUV       _T("Sw_AYUV")
-#define OPTION_SW_P010       _T("Sw_P010")
-#define OPTION_SW_P210       _T("Sw_P210")
-#define OPTION_SW_P016       _T("Sw_P016")
-#define OPTION_SW_P216       _T("Sw_P216")
-#define OPTION_SW_RGB32      _T("Sw_RGB32")
+#define OPT_SW_prefix        _T("Sw_")
 #define OPT_SwPreset         _T("SwPreset")
 #define OPT_SwStandard       _T("SwStandard")
 #define OPT_SwRGBLevels      _T("SwRGBLevels")
@@ -937,32 +929,12 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		}
 
 		// === New swscaler options
-		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SW_NV12, dw)) {
-			m_fPixFmts[PixFmt_NV12] = !!dw;
-		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SW_YV12, dw)) {
-			m_fPixFmts[PixFmt_YV12] = !!dw;
-		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SW_YUY2, dw)) {
-			m_fPixFmts[PixFmt_YUY2] = !!dw;
-		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SW_AYUV, dw)) {
-			m_fPixFmts[PixFmt_AYUV] = !!dw;
-		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SW_P010, dw)) {
-			m_fPixFmts[PixFmt_P010] = !!dw;
-		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SW_P210, dw)) {
-			m_fPixFmts[PixFmt_P210] = !!dw;
-		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SW_P016, dw)) {
-			m_fPixFmts[PixFmt_P016] = !!dw;
-		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SW_P216, dw)) {
-			m_fPixFmts[PixFmt_P216] = !!dw;
-		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SW_RGB32, dw)) {
-			m_fPixFmts[PixFmt_RGB32] = !!dw;
+		for (int i = 0; i < PixFmt_count; i++) {
+			CString optname = OPT_SW_prefix;
+			optname += GetSWOF(i)->name;
+			if (ERROR_SUCCESS == key.QueryDWORDValue(optname, dw)) {
+				m_fPixFmts[i] = !!dw;
+			}
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SwPreset, dw)) {
 			m_nSwPreset = dw;
@@ -994,15 +966,11 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_nDXVA_SD					= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_DisableDXVA_SD, m_nDXVA_SD);
 
 	// === New swscaler options
-	m_fPixFmts[PixFmt_NV12]		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_NV12,  m_fPixFmts[PixFmt_NV12]);
-	m_fPixFmts[PixFmt_YV12]		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_YV12,  m_fPixFmts[PixFmt_YV12]);
-	m_fPixFmts[PixFmt_YUY2]		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_YUY2,  m_fPixFmts[PixFmt_YUY2]);
-	m_fPixFmts[PixFmt_AYUV]		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_AYUV,  m_fPixFmts[PixFmt_AYUV]);
-	m_fPixFmts[PixFmt_P010]		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_P010,  m_fPixFmts[PixFmt_P010]);
-	m_fPixFmts[PixFmt_P210]		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_P210,  m_fPixFmts[PixFmt_P210]);
-	m_fPixFmts[PixFmt_P016]		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_P016,  m_fPixFmts[PixFmt_P016]);
-	m_fPixFmts[PixFmt_P216]		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_P216,  m_fPixFmts[PixFmt_P216]);
-	m_fPixFmts[PixFmt_RGB32]	= !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPTION_SW_RGB32, m_fPixFmts[PixFmt_RGB32]);
+	for (int i = 0; i < PixFmt_count; i++) {
+		CString optname = OPT_SW_prefix;
+		optname += GetSWOF(i)->name;
+		m_fPixFmts[i] = !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, optname, m_fPixFmts[i]);
+	}
 	m_nSwPreset					= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwPreset, m_nSwPreset);
 	m_nSwStandard				= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwStandard, m_nSwStandard);
 	m_nSwRGBLevels				= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwRGBLevels, m_nSwRGBLevels);
@@ -3120,15 +3088,11 @@ STDMETHODIMP CMPCVideoDecFilter::Apply()
 		key.SetDWORDValue(OPT_DisableDXVA_SD, m_nDXVA_SD);
 
 		// === New swscaler options
-		key.SetDWORDValue(OPTION_SW_NV12,  m_fPixFmts[PixFmt_NV12]);
-		key.SetDWORDValue(OPTION_SW_YV12,  m_fPixFmts[PixFmt_YV12]);
-		key.SetDWORDValue(OPTION_SW_YUY2,  m_fPixFmts[PixFmt_YUY2]);
-		key.SetDWORDValue(OPTION_SW_AYUV,  m_fPixFmts[PixFmt_AYUV]);
-		key.SetDWORDValue(OPTION_SW_P010,  m_fPixFmts[PixFmt_P010]);
-		key.SetDWORDValue(OPTION_SW_P210,  m_fPixFmts[PixFmt_P210]);
-		key.SetDWORDValue(OPTION_SW_P016,  m_fPixFmts[PixFmt_P016]);
-		key.SetDWORDValue(OPTION_SW_P216,  m_fPixFmts[PixFmt_P216]);
-		key.SetDWORDValue(OPTION_SW_RGB32, m_fPixFmts[PixFmt_RGB32]);
+		for (int i = 0; i < PixFmt_count; i++) {
+			CString optname = OPT_SW_prefix;
+			optname += GetSWOF(i)->name;
+			key.SetDWORDValue(optname, m_fPixFmts[i]);
+		}
 		key.SetDWORDValue(OPT_SwPreset, m_nSwPreset);
 		key.SetDWORDValue(OPT_SwStandard, m_nSwStandard);
 		key.SetDWORDValue(OPT_SwRGBLevels, m_nSwRGBLevels);
@@ -3149,15 +3113,11 @@ STDMETHODIMP CMPCVideoDecFilter::Apply()
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_DisableDXVA_SD, m_nDXVA_SD);
 
 	// === New swscaler options
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_NV12,  m_fPixFmts[PixFmt_NV12]);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_YV12,  m_fPixFmts[PixFmt_YV12]);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_YUY2,  m_fPixFmts[PixFmt_YUY2]);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_AYUV,  m_fPixFmts[PixFmt_AYUV]);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_P010,  m_fPixFmts[PixFmt_P010]);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_P210,  m_fPixFmts[PixFmt_P210]);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_P016,  m_fPixFmts[PixFmt_P016]);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_P216,  m_fPixFmts[PixFmt_P216]);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPTION_SW_RGB32, m_fPixFmts[PixFmt_RGB32]);
+	for (int i = 0; i < PixFmt_count; i++) {
+		CString optname = OPT_SW_prefix;
+		optname += GetSWOF(i)->name;
+		AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, optname, m_fPixFmts[i]);
+	}
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwPreset, m_nSwPreset);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwStandard, m_nSwStandard);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwRGBLevels, m_nSwRGBLevels);
