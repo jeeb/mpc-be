@@ -375,6 +375,8 @@ static int kempf_decode_tile(G2MContext *c, int tile_x, int tile_y,
         src += 3;
     }
     npal = *src++ + 1;
+    if (src_end - src < npal * 3)
+        return AVERROR_INVALIDDATA;
     memcpy(pal, src, npal * 3); src += npal * 3;
     if (sub_type != 2) {
         for (i = 0; i < npal; i++) {
@@ -490,7 +492,7 @@ static int g2m_load_cursor(AVCodecContext *avctx, G2MContext *c,
     cursor_hot_y  = bytestream2_get_byte(gb);
     cursor_fmt    = bytestream2_get_byte(gb);
 
-    cursor_stride = FFALIGN(cursor_w, c->cursor_fmt==1 ? 32 : 1) * 4;
+    cursor_stride = FFALIGN(cursor_w, cursor_fmt==1 ? 32 : 1) * 4;
 
     if (cursor_w < 1 || cursor_w > 256 ||
         cursor_h < 1 || cursor_h > 256) {
