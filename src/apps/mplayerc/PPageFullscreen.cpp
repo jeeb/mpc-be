@@ -444,6 +444,8 @@ void CPPageFullscreen::OnUpdateSetFullscreenRes()
 		m_iMonitorTypeCtrl.SetCurSel(iCurMon);
 		m_f_hmonitor = strCurMon;
 	}
+
+	SetModified();
 }
 
 void CPPageFullscreen::OnUpdateRestoreRes(CCmdUI* pCmdUI)

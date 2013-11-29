@@ -22,6 +22,7 @@
 #pragma once
 
 #include "PPageBase.h"
+#include "PlayerYouTube.h"
 
 // CPPageYoutube dialog
 
@@ -31,6 +32,8 @@ class CPPageYoutube : public CPPageBase
 
 private:
 	CComboBox m_iYoutubeFormatCtrl;
+
+	CAtlArray<YOUTUBE_PROFILES> m_YoutubeProfiles;
 public:
 	CPPageYoutube();
 	virtual ~CPPageYoutube();
