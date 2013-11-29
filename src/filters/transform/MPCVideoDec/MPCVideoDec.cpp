@@ -894,15 +894,13 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_pCpuId = DNew CCpuId();
 
 	// default settings
-	m_fPixFmts[PixFmt_NV12]  = true;
-	m_fPixFmts[PixFmt_YV12]  = true;
-	m_fPixFmts[PixFmt_YUY2]  = true;
-	m_fPixFmts[PixFmt_AYUV]  = false;
-	m_fPixFmts[PixFmt_P010]  = false;
-	m_fPixFmts[PixFmt_P210]  = false;
-	m_fPixFmts[PixFmt_P016]  = false;
-	m_fPixFmts[PixFmt_P216]  = false;
-	m_fPixFmts[PixFmt_RGB32] = true;
+	for (int i = 0; i < PixFmt_count; i++) {
+		if (i == PixFmt_AYUV) {
+			m_fPixFmts[i] = false;
+		} else {
+			m_fPixFmts[i] = true;
+		}
+	}
 
 #ifdef REGISTER_FILTER
 	CRegKey key;
