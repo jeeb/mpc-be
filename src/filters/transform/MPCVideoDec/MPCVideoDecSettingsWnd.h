@@ -85,15 +85,7 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CStatic     m_txt422;
 	CStatic     m_txt444;
 	CStatic     m_txtRGB;
-	CButton		m_cbNV12;
-	CButton		m_cbYV12;
-	CButton		m_cbYUY2;
-	CButton		m_cbAYUV;
-	CButton		m_cbP010;
-	CButton		m_cbP210;
-	CButton		m_cbP016;
-	CButton		m_cbP216;
-	CButton		m_cbRGB32;
+	CButton		m_cbFormat[PixFmt_count];
 
 	CStatic     m_txtSwPreset;
 	CComboBox   m_cbSwPreset;
