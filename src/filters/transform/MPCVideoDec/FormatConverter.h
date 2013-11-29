@@ -80,8 +80,11 @@ protected:
 	bool Init();
 	void UpdateDetails();
 
+	// from LAV Filters
 	HRESULT ConvertToAYUV(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[]);
 	HRESULT ConvertToPX1X(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[], int chromaVertical);
+	HRESULT ConvertToY410(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[]);
+	HRESULT ConvertToY416(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[]);
 
 public:
 	CFormatConverter();

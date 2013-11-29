@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "FormatConverter.h"
+#include <moreuuids.h>
 
 #pragma warning(push)
 #pragma warning(disable: 4005)
@@ -42,9 +43,11 @@ static const SW_OUT_FMT s_sw_formats[] = {
 	{_T("NV12"),  FCC('NV12'), &MEDIASUBTYPE_NV12,  12, 1, 2, {1,2},   {1,1},   AV_PIX_FMT_NV12,        1, 1, 12 }, // PixFmt_NV12
 	{_T("YV12"),  FCC('YV12'), &MEDIASUBTYPE_YV12,  12, 1, 3, {1,2,2}, {1,2,2}, AV_PIX_FMT_YUV420P,     1, 1, 12 }, // PixFmt_YV12
 	// YUV 10 bit
+	{_T("Y410"),  FCC('Y410'), &MEDIASUBTYPE_Y410,  32, 4, 0, {1},     {1},     AV_PIX_FMT_YUV444P10LE, 0, 0, 30}, // PixFmt_Y410
 	{_T("P210"),  FCC('P210'), &MEDIASUBTYPE_P210,  32, 2, 2, {1,1},   {1,1},   AV_PIX_FMT_YUV422P16LE, 1, 0, 20}, // PixFmt_P210
 	{_T("P010"),  FCC('P010'), &MEDIASUBTYPE_P010,  24, 2, 2, {1,2},   {1,1},   AV_PIX_FMT_YUV420P16LE, 1, 1, 15}, // PixFmt_P010
 	// YUV 16 bit
+	{_T("Y416"),  FCC('Y416'), &MEDIASUBTYPE_Y416,  64, 8, 0, {1},     {1},     AV_PIX_FMT_YUV444P16LE, 0, 0, 48}, // PixFmt_Y416
 	{_T("P216"),  FCC('P216'), &MEDIASUBTYPE_P216,  32, 2, 2, {1,1},   {1,1},   AV_PIX_FMT_YUV422P16LE, 1, 0, 32}, // PixFmt_P216
 	{_T("P016"),  FCC('P016'), &MEDIASUBTYPE_P016,  24, 2, 2, {1,2},   {1,1},   AV_PIX_FMT_YUV420P16LE, 1, 1, 24}, // PixFmt_P016
 	// RGB
@@ -248,10 +251,11 @@ HRESULT CFormatConverter::ConvertToPX1X(const uint8_t* const src[4], const int s
   BYTE *pTmpBuffer = NULL;
 
   const AVPixFmtDescriptor* in_pfdesc = av_pix_fmt_desc_get(m_FProps.avpixfmt);
+  int InBpp = in_pfdesc->comp->depth_minus1 + 1;
   bool isPx1x =	(in_pfdesc->flags & AV_PIX_FMT_FLAG_PLANAR ^ (AV_PIX_FMT_FLAG_BE + AV_PIX_FMT_FLAG_ALPHA)) == AV_PIX_FMT_FLAG_PLANAR &&
 				in_pfdesc->nb_components == 3 + (in_pfdesc->flags & AV_PIX_FMT_FLAG_ALPHA ? 1 : 0) && // YUV or YUVA
 				in_pfdesc->log2_chroma_w == 1 && (in_pfdesc->log2_chroma_h == 1 || in_pfdesc->log2_chroma_h == 0) && // 4:2:2 or // 4:2:0
-				in_pfdesc->comp->depth_minus1 >= (9-1) && in_pfdesc->comp->depth_minus1 <= (16-1); // 9..16 bits
+				InBpp >= 10 && InBpp <= 16; // 9..16 bits
 
 
   if (!isPx1x) {
@@ -282,7 +286,7 @@ HRESULT CFormatConverter::ConvertToPX1X(const uint8_t* const src[4], const int s
     v = src[2];
     sourceStride = srcStride[0];
 
-    shift = (16 - 1) - in_pfdesc->comp->depth_minus1;
+    shift = (16 - InBpp);
   }
 
   // copy Y
@@ -325,6 +329,149 @@ HRESULT CFormatConverter::ConvertToPX1X(const uint8_t* const src[4], const int s
     vc += sourceStride;
     out += dstStride[1];
   }
+
+  av_freep(&pTmpBuffer);
+
+  return S_OK;
+}
+
+#define YUV444_PACKED_LOOP_HEAD(width, height, y, u, v, out) \
+  for (int line = 0; line < height; ++line) { \
+    int32_t *idst = (int32_t *)out; \
+    for(int i = 0; i < width; ++i) { \
+      int32_t yv, uv, vv;
+
+#define YUV444_PACKED_LOOP_HEAD_LE(width, height, y, u, v, out) \
+  YUV444_PACKED_LOOP_HEAD(width, height, y, u, v, out) \
+    yv = AV_RL16(y+i); uv = AV_RL16(u+i); vv = AV_RL16(v+i);
+
+#define YUV444_PACKED_LOOP_END(y, u, v, out, srcStride, dstStride) \
+    } \
+    y += srcStride; \
+    u += srcStride; \
+    v += srcStride; \
+    out += dstStride; \
+  }
+
+HRESULT CFormatConverter::ConvertToY410(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[])
+{
+  const int16_t *y = NULL;
+  const int16_t *u = NULL;
+  const int16_t *v = NULL;
+  int sourceStride = 0;
+  bool b9Bit = false;
+
+  BYTE *pTmpBuffer = NULL;
+
+  const AVPixFmtDescriptor* in_pfdesc = av_pix_fmt_desc_get(m_FProps.avpixfmt);
+  int InBpp = in_pfdesc->comp->depth_minus1 + 1;
+  bool is444bX	= (in_pfdesc->flags & AV_PIX_FMT_FLAG_PLANAR ^ (AV_PIX_FMT_FLAG_BE + AV_PIX_FMT_FLAG_ALPHA)) == AV_PIX_FMT_FLAG_PLANAR &&
+				  in_pfdesc->nb_components == 3 + (in_pfdesc->flags & AV_PIX_FMT_FLAG_ALPHA ? 1 : 0) && // YUV or YUVA
+				  in_pfdesc->log2_chroma_w == 0 && in_pfdesc->log2_chroma_h == 0 && // 4:4:4
+				  InBpp >= 10 && InBpp <= 16; // 9..16 bits
+
+  if (!is444bX || InBpp > 10) {
+    uint8_t *tmp[4] = {NULL};
+    int     tmpStride[4] = {0};
+    int scaleStride = FFALIGN(width, 32);
+
+    pTmpBuffer = (BYTE *)av_malloc(height * scaleStride * 6);
+
+    tmp[0] = pTmpBuffer;
+    tmp[1] = tmp[0] + (height * scaleStride * 2);
+    tmp[2] = tmp[1] + (height * scaleStride * 2);
+    tmp[3] = NULL;
+    tmpStride[0] = scaleStride * 2;
+    tmpStride[1] = scaleStride * 2;
+    tmpStride[2] = scaleStride * 2;
+    tmpStride[3] = 0;
+
+    sws_scale(m_pSwsContext, src, srcStride, 0, height, tmp, tmpStride);
+
+    y = (int16_t *)tmp[0];
+    u = (int16_t *)tmp[1];
+    v = (int16_t *)tmp[2];
+    sourceStride = scaleStride;
+  } else {
+    y = (int16_t *)src[0];
+    u = (int16_t *)src[1];
+    v = (int16_t *)src[2];
+    sourceStride = srcStride[0] / 2;
+
+    b9Bit = (InBpp == 9);
+  }
+
+#define YUV444_Y410_PACK \
+  *idst++ = (uv & 0x3FF) | ((yv & 0x3FF) << 10) | ((vv & 0x3FF) << 20) | (3 << 30);
+
+  BYTE *out = dst[0];
+  YUV444_PACKED_LOOP_HEAD_LE(width, height, y, u, v, out)
+    if (b9Bit) {
+      yv <<= 1;
+      uv <<= 1;
+      vv <<= 1;
+    }
+    YUV444_Y410_PACK
+  YUV444_PACKED_LOOP_END(y, u, v, out, sourceStride, dstStride[0])
+
+  av_freep(&pTmpBuffer);
+
+  return S_OK;
+}
+
+HRESULT CFormatConverter::ConvertToY416(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[])
+{
+  const int16_t *y = NULL;
+  const int16_t *u = NULL;
+  const int16_t *v = NULL;
+  int sourceStride = 0;
+
+  BYTE *pTmpBuffer = NULL;
+
+  const AVPixFmtDescriptor* in_pfdesc = av_pix_fmt_desc_get(m_FProps.avpixfmt);
+  int InBpp = in_pfdesc->comp->depth_minus1 + 1;
+  bool is444bX	= (in_pfdesc->flags & AV_PIX_FMT_FLAG_PLANAR ^ (AV_PIX_FMT_FLAG_BE + AV_PIX_FMT_FLAG_ALPHA)) == AV_PIX_FMT_FLAG_PLANAR &&
+				  in_pfdesc->nb_components == 3 + (in_pfdesc->flags & AV_PIX_FMT_FLAG_ALPHA ? 1 : 0) && // YUV or YUVA
+				  in_pfdesc->log2_chroma_w == 0 && in_pfdesc->log2_chroma_h == 0 && // 4:4:4
+				  InBpp >= 10 && InBpp <= 16; // 9..16 bits
+
+  if (!is444bX || InBpp != 16) {
+    uint8_t *tmp[4] = {NULL};
+    int     tmpStride[4] = {0};
+    int scaleStride = FFALIGN(width, 32);
+
+    pTmpBuffer = (BYTE *)av_malloc(height * scaleStride * 6);
+
+    tmp[0] = pTmpBuffer;
+    tmp[1] = tmp[0] + (height * scaleStride * 2);
+    tmp[2] = tmp[1] + (height * scaleStride * 2);
+    tmp[3] = NULL;
+    tmpStride[0] = scaleStride * 2;
+    tmpStride[1] = scaleStride * 2;
+    tmpStride[2] = scaleStride * 2;
+    tmpStride[3] = 0;
+
+    sws_scale(m_pSwsContext, src, srcStride, 0, height, tmp, tmpStride);
+
+    y = (int16_t *)tmp[0];
+    u = (int16_t *)tmp[1];
+    v = (int16_t *)tmp[2];
+    sourceStride = scaleStride;
+  } else {
+    y = (int16_t *)src[0];
+    u = (int16_t *)src[1];
+    v = (int16_t *)src[2];
+    sourceStride = srcStride[0] / 2;
+  }
+
+#define YUV444_Y416_PACK \
+  *idst++ = 0xFFFF | (vv << 16); \
+  *idst++ = yv | (uv << 16);
+
+  BYTE *out = dst[0];
+  YUV444_PACKED_LOOP_HEAD_LE(width, height, y, u, v, out)
+    YUV444_Y416_PACK
+  YUV444_PACKED_LOOP_END(y, u, v, out, sourceStride, dstStride[0])
 
   av_freep(&pTmpBuffer);
 
@@ -451,9 +598,15 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 	case PixFmt_P016:
 		ConvertToPX1X(pFrame->data, pFrame->linesize, dstArray, m_FProps.width, m_FProps.height, dstStrideArray, 2);
 		break;
+	case PixFmt_Y410:
+		ConvertToY410(pFrame->data, pFrame->linesize, dstArray, m_FProps.width, m_FProps.height, dstStrideArray);
+		break;
 	case PixFmt_P210:
 	case PixFmt_P216:
 		ConvertToPX1X(pFrame->data, pFrame->linesize, dstArray, m_FProps.width, m_FProps.height, dstStrideArray, 1);
+		break;
+	case PixFmt_Y416:
+		ConvertToY416(pFrame->data, pFrame->linesize, dstArray, m_FProps.width, m_FProps.height, dstStrideArray);
 		break;
 	default:
 		int ret = sws_scale(m_pSwsContext, pFrame->data, pFrame->linesize, 0, m_FProps.height, dstArray, dstStrideArray);
