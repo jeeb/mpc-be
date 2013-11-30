@@ -102,7 +102,7 @@ MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
 	const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(av_pix_fmt);
 	int lumabits = pfdesc->comp->depth_minus1 + 1;
 
-	if (pfdesc->flags & AV_PIX_FMT_FLAG_RGB || av_pix_fmt == AV_PIX_FMT_PAL8) {
+	if (pfdesc->flags & (AV_PIX_FMT_FLAG_RGB|AV_PIX_FMT_FLAG_PAL)) {
 		return PFType_RGB;
 	}
 
@@ -195,7 +195,7 @@ void  CFormatConverter::UpdateDetails()
 		int srcRange, dstRange, brightness, contrast, saturation;
 		int ret = sws_getColorspaceDetails(m_pSwsContext, &inv_tbl, &srcRange, &tbl, &dstRange, &brightness, &contrast, &saturation);
 		if (ret >= 0) {
-			if (m_out_pixfmt == PixFmt_RGB32 && !(av_pix_fmt_desc_get(m_FProps.avpixfmt)->flags & AV_PIX_FMT_FLAG_RGB)) {
+			if (m_out_pixfmt == PixFmt_RGB32 && !(av_pix_fmt_desc_get(m_FProps.avpixfmt)->flags & (AV_PIX_FMT_FLAG_RGB|AV_PIX_FMT_FLAG_PAL))) {
 				dstRange = m_dstRGBRange;
 			}
 			ret = sws_setColorspaceDetails(m_pSwsContext, sws_getCoefficients(m_colorspace), srcRange, tbl, dstRange, brightness, contrast, saturation);

@@ -1776,7 +1776,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 		const AVPixFmtDescriptor* av_pfdesc = av_pix_fmt_desc_get(m_pAVCtx->pix_fmt);
 		int bpp = av_get_bits_per_pixel(av_pfdesc);
 
-		if ((av_pfdesc->flags & AV_PIX_FMT_FLAG_RGB || m_pAVCtx->pix_fmt == AV_PIX_FMT_PAL8) && inqueue[PixFmt_RGB32]) {
+		if (av_pfdesc->flags & (AV_PIX_FMT_FLAG_RGB|AV_PIX_FMT_FLAG_PAL) && inqueue[PixFmt_RGB32]) {
 			// if any RGB then add RGB32
 			nSwIndex[nSwCount++] = PixFmt_RGB32;
 			inqueue[PixFmt_RGB32] = false;
@@ -3317,7 +3317,7 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetColorSpaceConversion()
 		return -2; // no conversion
 	}
 	
-	bool in_rgb		= !!(av_pix_fmt_desc_get(m_pAVCtx->pix_fmt)->flags & AV_PIX_FMT_FLAG_RGB);
+	bool in_rgb		= !!(av_pix_fmt_desc_get(m_pAVCtx->pix_fmt)->flags & (AV_PIX_FMT_FLAG_RGB|AV_PIX_FMT_FLAG_PAL));
 	bool out_rgb	= (m_FormatConverter.GetOutPixFormat() == PixFmt_RGB32);
 	if (in_rgb < out_rgb) {
 		return 1; // YUV->RGB conversion
