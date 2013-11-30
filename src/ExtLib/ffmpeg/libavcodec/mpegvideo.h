@@ -585,7 +585,8 @@ typedef struct MpegEncContext {
     int custom_pcf;
 
     /* mpeg4 specific */
-    int time_increment_bits;        ///< number of bits to represent the fractional part of time
+    ///< number of bits to represent the fractional part of time (encoder only)
+    int time_increment_bits;
     int last_time_base;
     int time_base;                  ///< time in seconds of last I,P,S Frame
     int64_t time;                   ///< time of current frame
@@ -594,34 +595,16 @@ typedef struct MpegEncContext {
     uint16_t pb_time;               ///< time distance between the last b and p,s,i frame
     uint16_t pp_field_time;
     uint16_t pb_field_time;         ///< like above, just for interlaced
-    int shape;
-    int vol_sprite_usage;
-    int sprite_width;
-    int sprite_height;
-    int sprite_left;
-    int sprite_top;
-    int sprite_brightness_change;
-    int num_sprite_warping_points;
     int real_sprite_warping_points;
-    uint16_t sprite_traj[4][2];      ///< sprite trajectory points
     int sprite_offset[2][2];         ///< sprite offset[isChroma][isMVY]
     int sprite_delta[2][2];          ///< sprite_delta [isY][isMVY]
-    int sprite_shift[2];             ///< sprite shift [isChroma]
     int mcsel;
     int quant_precision;
     int quarter_sample;              ///< 1->qpel, 0->half pel ME/MC
-    int scalability;
-    int hierachy_type;
-    int enhancement_type;
-    int new_pred;
-    int reduced_res_vop;
     int aspect_ratio_info; //FIXME remove
     int sprite_warping_accuracy;
-    int low_latency_sprite;
     int data_partitioning;           ///< data partitioning flag from header
     int partitioned_frame;           ///< is current frame partitioned
-    int rvlc;                        ///< reversible vlc
-    int resync_marker;               ///< could this stream contain resync markers
     int low_delay;                   ///< no reordering needed / has no b-frames
     int vo_type;
     int vol_control_parameters;      ///< does the stream contain the low_delay flag, used to workaround buggy encoders
@@ -630,24 +613,13 @@ typedef struct MpegEncContext {
     PutBitContext tex_pb;            ///< used for data partitioned VOPs
     PutBitContext pb2;               ///< used for data partitioned VOPs
     int mpeg_quant;
-    int t_frame;                       ///< time distance of first I -> B, used for interlaced b frames
     int padding_bug_score;             ///< used to detect the VERY common padding bug in MPEG4
-    int cplx_estimation_trash_i;
-    int cplx_estimation_trash_p;
-    int cplx_estimation_trash_b;
 
     /* divx specific, used to workaround (many) bugs in divx5 */
-    int divx_version;
-    int divx_build;
     int divx_packed;
     uint8_t *bitstream_buffer; //Divx 5.01 puts several frames in a single one, this is used to reorder them
     int bitstream_buffer_size;
     unsigned int allocated_bitstream_buffer_size;
-
-    int xvid_build;
-
-    /* lavc specific stuff, used to workaround bugs in libavcodec */
-    int lavc_build;
 
     /* RV10 specific */
     int rv10_version; ///< RV10 version: 0 or 3

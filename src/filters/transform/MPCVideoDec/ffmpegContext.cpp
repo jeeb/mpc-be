@@ -710,7 +710,7 @@ HRESULT FFVC1DecodeFrame(DXVA_PictureParameters* pPicParams, struct AVCodecConte
 
 	// Section 3.2.20.4
 	pPicParams->bPicOverflowBlocks  = (vc1->quantizer_mode  << 6) | (vc1->multires << 5) |
-									  (vc1->s.resync_marker << 4) | (vc1->rangered << 3) |
+									  (vc1->resync_marker << 4) | (vc1->rangered << 3) |
 									  (vc1->s.max_b_frames);
 
 	// Section 3.2.20.2
