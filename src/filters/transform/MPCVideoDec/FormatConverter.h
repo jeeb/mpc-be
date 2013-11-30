@@ -48,12 +48,24 @@ const SW_OUT_FMT* GetSWOF(int pixfmt);
 struct AVFrame;
 struct SwsContext;
 
+enum MPCPixFmtType {
+	PFType_unspecified,
+	PFType_RGB,
+	PFType_YUV420,
+	PFType_YUV420bX,
+	PFType_YUV422,
+	PFType_YUV422bX,
+	PFType_YUV444,
+	PFType_YUV444bX,
+};
+
 typedef struct {
 	// basic properties
 	enum AVPixelFormat	avpixfmt;
 	int					width;
 	int					height;
 	// additional properties
+	MPCPixFmtType		pftype;
 	enum AVColorSpace	colorspace;
 	enum AVColorRange	colorrange;
 } FrameProps;

@@ -38,10 +38,10 @@ static const SW_OUT_FMT s_sw_formats[] = {
 	// YUV formats are grouped according to luma bit depth and sorted in descending order of quality.
 	//  name     biCompression  subtype                                         av_pix_fmt    chroma_w chroma_h
 	// YUV 8 bit
-	{_T("AYUV"),  FCC('AYUV'), &MEDIASUBTYPE_AYUV,  32, 4, 0, {1},     {1},     AV_PIX_FMT_YUV444P,     0, 0, 24 }, // PixFmt_AYUV
-	{_T("YUY2"),  FCC('YUY2'), &MEDIASUBTYPE_YUY2,  16, 2, 0, {1},     {1},     AV_PIX_FMT_YUYV422,     1, 0, 16 }, // PixFmt_YUY2
-	{_T("NV12"),  FCC('NV12'), &MEDIASUBTYPE_NV12,  12, 1, 2, {1,2},   {1,1},   AV_PIX_FMT_NV12,        1, 1, 12 }, // PixFmt_NV12
-	{_T("YV12"),  FCC('YV12'), &MEDIASUBTYPE_YV12,  12, 1, 3, {1,2,2}, {1,2,2}, AV_PIX_FMT_YUV420P,     1, 1, 12 }, // PixFmt_YV12
+	{_T("AYUV"),  FCC('AYUV'), &MEDIASUBTYPE_AYUV,  32, 4, 0, {1},     {1},     AV_PIX_FMT_YUV444P,     0, 0, 24}, // PixFmt_AYUV
+	{_T("YUY2"),  FCC('YUY2'), &MEDIASUBTYPE_YUY2,  16, 2, 0, {1},     {1},     AV_PIX_FMT_YUYV422,     1, 0, 16}, // PixFmt_YUY2
+	{_T("NV12"),  FCC('NV12'), &MEDIASUBTYPE_NV12,  12, 1, 2, {1,2},   {1,1},   AV_PIX_FMT_NV12,        1, 1, 12}, // PixFmt_NV12
+	{_T("YV12"),  FCC('YV12'), &MEDIASUBTYPE_YV12,  12, 1, 3, {1,2,2}, {1,2,2}, AV_PIX_FMT_YUV420P,     1, 1, 12}, // PixFmt_YV12
 	// YUV 10 bit
 	{_T("Y410"),  FCC('Y410'), &MEDIASUBTYPE_Y410,  32, 4, 0, {1},     {1},     AV_PIX_FMT_YUV444P10LE, 0, 0, 30}, // PixFmt_Y410
 	{_T("P210"),  FCC('P210'), &MEDIASUBTYPE_P210,  32, 2, 2, {1,1},   {1,1},   AV_PIX_FMT_YUV422P16LE, 1, 0, 20}, // PixFmt_P210
@@ -97,6 +97,37 @@ MPCPixelFormat GetPixFormat(DWORD biCompression)
 	return PixFmt_None;
 }
 
+MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
+{
+	const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(av_pix_fmt);
+	int lumabits = pfdesc->comp->depth_minus1 + 1;
+
+	if (pfdesc->flags & AV_PIX_FMT_FLAG_RGB) {
+		return PFType_RGB;
+	}
+
+	if (lumabits < 8 || lumabits > 16 || pfdesc->nb_components != 3 + (pfdesc->flags & AV_PIX_FMT_FLAG_ALPHA ? 1 : 0)) {
+		return PFType_unspecified;
+	}
+
+	if ((pfdesc->flags & AV_PIX_FMT_FLAG_PLANAR ^ (AV_PIX_FMT_FLAG_BE + AV_PIX_FMT_FLAG_ALPHA)) == AV_PIX_FMT_FLAG_PLANAR) {
+
+		if (pfdesc->log2_chroma_w == 1 && pfdesc->log2_chroma_h == 1) {
+			return (lumabits == 8) ? PFType_YUV420 : PFType_YUV420bX;
+		}
+
+		if (pfdesc->log2_chroma_w == 1 && pfdesc->log2_chroma_h == 0) {
+			return (lumabits == 8) ? PFType_YUV422 : PFType_YUV422bX;
+		}
+
+		if (pfdesc->log2_chroma_w == 0 && pfdesc->log2_chroma_h == 0) {
+			return (lumabits == 8) ? PFType_YUV444 : PFType_YUV444bX;
+		}
+	}
+
+	return PFType_unspecified;
+}
+
 // CFormatConverter
 
 CFormatConverter::CFormatConverter()
@@ -115,6 +146,7 @@ CFormatConverter::CFormatConverter()
 	m_FProps.avpixfmt	= AV_PIX_FMT_NONE;
 	m_FProps.width		= 0;
 	m_FProps.height		= 0;
+	m_FProps.pftype		= PFType_unspecified;
 	m_FProps.colorspace	= AVCOL_SPC_UNSPECIFIED;
 	m_FProps.colorrange	= AVCOL_RANGE_UNSPECIFIED;
 }
@@ -252,13 +284,8 @@ HRESULT CFormatConverter::ConvertToPX1X(const uint8_t* const src[4], const int s
 
   const AVPixFmtDescriptor* in_pfdesc = av_pix_fmt_desc_get(m_FProps.avpixfmt);
   int InBpp = in_pfdesc->comp->depth_minus1 + 1;
-  bool isPx1x =	(in_pfdesc->flags & AV_PIX_FMT_FLAG_PLANAR ^ (AV_PIX_FMT_FLAG_BE + AV_PIX_FMT_FLAG_ALPHA)) == AV_PIX_FMT_FLAG_PLANAR &&
-				in_pfdesc->nb_components == 3 + (in_pfdesc->flags & AV_PIX_FMT_FLAG_ALPHA ? 1 : 0) && // YUV or YUVA
-				in_pfdesc->log2_chroma_w == 1 && (in_pfdesc->log2_chroma_h == 1 || in_pfdesc->log2_chroma_h == 0) && // 4:2:2 or // 4:2:0
-				InBpp >= 10 && InBpp <= 16; // 9..16 bits
 
-
-  if (!isPx1x) {
+  if ((m_FProps.pftype != PFType_YUV422bX && chromaVertical == 1) || (m_FProps.pftype != PFType_YUV420bX && chromaVertical == 2)) {
     uint8_t *tmp[4] = {NULL};
     int     tmpStride[4] = {0};
     int scaleStride = FFALIGN(width, 32) * 2;
@@ -365,12 +392,8 @@ HRESULT CFormatConverter::ConvertToY410(const uint8_t* const src[4], const int s
 
   const AVPixFmtDescriptor* in_pfdesc = av_pix_fmt_desc_get(m_FProps.avpixfmt);
   int InBpp = in_pfdesc->comp->depth_minus1 + 1;
-  bool is444bX	= (in_pfdesc->flags & AV_PIX_FMT_FLAG_PLANAR ^ (AV_PIX_FMT_FLAG_BE + AV_PIX_FMT_FLAG_ALPHA)) == AV_PIX_FMT_FLAG_PLANAR &&
-				  in_pfdesc->nb_components == 3 + (in_pfdesc->flags & AV_PIX_FMT_FLAG_ALPHA ? 1 : 0) && // YUV or YUVA
-				  in_pfdesc->log2_chroma_w == 0 && in_pfdesc->log2_chroma_h == 0 && // 4:4:4
-				  InBpp >= 10 && InBpp <= 16; // 9..16 bits
 
-  if (!is444bX || InBpp > 10) {
+  if (m_FProps.pftype != PFType_YUV444bX || InBpp > 10) {
     uint8_t *tmp[4] = {NULL};
     int     tmpStride[4] = {0};
     int scaleStride = FFALIGN(width, 32);
@@ -430,12 +453,8 @@ HRESULT CFormatConverter::ConvertToY416(const uint8_t* const src[4], const int s
 
   const AVPixFmtDescriptor* in_pfdesc = av_pix_fmt_desc_get(m_FProps.avpixfmt);
   int InBpp = in_pfdesc->comp->depth_minus1 + 1;
-  bool is444bX	= (in_pfdesc->flags & AV_PIX_FMT_FLAG_PLANAR ^ (AV_PIX_FMT_FLAG_BE + AV_PIX_FMT_FLAG_ALPHA)) == AV_PIX_FMT_FLAG_PLANAR &&
-				  in_pfdesc->nb_components == 3 + (in_pfdesc->flags & AV_PIX_FMT_FLAG_ALPHA ? 1 : 0) && // YUV or YUVA
-				  in_pfdesc->log2_chroma_w == 0 && in_pfdesc->log2_chroma_h == 0 && // 4:4:4
-				  InBpp >= 10 && InBpp <= 16; // 9..16 bits
 
-  if (!is444bX || InBpp != 16) {
+  if (m_FProps.pftype != PFType_YUV444bX || InBpp != 16) {
     uint8_t *tmp[4] = {NULL};
     int     tmpStride[4] = {0};
     int scaleStride = FFALIGN(width, 32);
@@ -552,7 +571,8 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 			TRACE(_T("FormatConverter: Init() failed\n"));
 			return 0;
 		}
-		// update the additional properties (updated only when changing basic properties.)
+		// update the additional properties (updated only when changing basic properties)
+		m_FProps.pftype		= GetPixFmtType((AVPixelFormat)pFrame->format);
 		m_FProps.colorspace	= pFrame->colorspace;
 		m_FProps.colorrange	= pFrame->color_range;
 		UpdateDetails();
