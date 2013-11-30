@@ -1821,15 +1821,6 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 		}
 	}
 
-	// add other active formats
-	for (int i = 0; i < PixFmt_count; i++) {
-		if (inqueue[i]) {
-			ASSERT(0);
-			nSwIndex[nSwCount++] = i;
-			inqueue[i] = false;
-		}
-	}
-
 	if (!m_fPixFmts[PixFmt_YUY2]) {
 		// if YUY2 has not been added yet, then add it to the end of the list
 		nSwIndex[nSwCount++] = PixFmt_YUY2;
