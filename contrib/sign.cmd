@@ -31,7 +31,7 @@ SET /P SIGN_CMD=<%~dp0signinfo.txt
 TITLE Signing "%~1"...
 ECHO. & ECHO Signing "%~1"...
 
-FOR /L %%i IN (1,1,3) DO (
+FOR /L %%i IN (1,1,5) DO (
   IF %%i GTR 1 ECHO %%i attempt
   signtool.exe sign %SIGN_CMD% "%~1"
   IF NOT ERRORLEVEL 1 EXIT /B %ERRORLEVEL%
