@@ -51,12 +51,9 @@ struct SwsContext;
 enum MPCPixFmtType {
 	PFType_unspecified,
 	PFType_RGB,
-	PFType_YUV420,
-	PFType_YUV420bX,
-	PFType_YUV422,
-	PFType_YUV422bX,
-	PFType_YUV444,
-	PFType_YUV444bX,
+	PFType_YUV420Px,
+	PFType_YUV422Px,
+	PFType_YUV444Px,
 };
 
 typedef struct {

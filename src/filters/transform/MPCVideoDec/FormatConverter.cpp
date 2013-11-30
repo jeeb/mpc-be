@@ -106,22 +106,22 @@ MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
 		return PFType_RGB;
 	}
 
-	if (lumabits < 8 || lumabits > 16 || pfdesc->nb_components != 3 + (pfdesc->flags & AV_PIX_FMT_FLAG_ALPHA ? 1 : 0)) {
+	if (lumabits <= 8 || lumabits > 16 || pfdesc->nb_components != 3 + (pfdesc->flags & AV_PIX_FMT_FLAG_ALPHA ? 1 : 0)) {
 		return PFType_unspecified;
 	}
 
 	if ((pfdesc->flags & AV_PIX_FMT_FLAG_PLANAR ^ (AV_PIX_FMT_FLAG_BE + AV_PIX_FMT_FLAG_ALPHA)) == AV_PIX_FMT_FLAG_PLANAR) {
 
 		if (pfdesc->log2_chroma_w == 1 && pfdesc->log2_chroma_h == 1) {
-			return (lumabits == 8) ? PFType_YUV420 : PFType_YUV420bX;
+			return PFType_YUV420Px;
 		}
 
 		if (pfdesc->log2_chroma_w == 1 && pfdesc->log2_chroma_h == 0) {
-			return (lumabits == 8) ? PFType_YUV422 : PFType_YUV422bX;
+			return PFType_YUV422Px;
 		}
 
 		if (pfdesc->log2_chroma_w == 0 && pfdesc->log2_chroma_h == 0) {
-			return (lumabits == 8) ? PFType_YUV444 : PFType_YUV444bX;
+			return PFType_YUV444Px;
 		}
 	}
 
@@ -285,7 +285,7 @@ HRESULT CFormatConverter::ConvertToPX1X(const uint8_t* const src[4], const int s
   const AVPixFmtDescriptor* in_pfdesc = av_pix_fmt_desc_get(m_FProps.avpixfmt);
   int InBpp = in_pfdesc->comp->depth_minus1 + 1;
 
-  if ((m_FProps.pftype != PFType_YUV422bX && chromaVertical == 1) || (m_FProps.pftype != PFType_YUV420bX && chromaVertical == 2)) {
+  if ((m_FProps.pftype != PFType_YUV422Px && chromaVertical == 1) || (m_FProps.pftype != PFType_YUV420Px && chromaVertical == 2)) {
     uint8_t *tmp[4] = {NULL};
     int     tmpStride[4] = {0};
     int scaleStride = FFALIGN(width, 32) * 2;
@@ -393,7 +393,7 @@ HRESULT CFormatConverter::ConvertToY410(const uint8_t* const src[4], const int s
   const AVPixFmtDescriptor* in_pfdesc = av_pix_fmt_desc_get(m_FProps.avpixfmt);
   int InBpp = in_pfdesc->comp->depth_minus1 + 1;
 
-  if (m_FProps.pftype != PFType_YUV444bX || InBpp > 10) {
+  if (m_FProps.pftype != PFType_YUV444Px || InBpp > 10) {
     uint8_t *tmp[4] = {NULL};
     int     tmpStride[4] = {0};
     int scaleStride = FFALIGN(width, 32);
@@ -454,7 +454,7 @@ HRESULT CFormatConverter::ConvertToY416(const uint8_t* const src[4], const int s
   const AVPixFmtDescriptor* in_pfdesc = av_pix_fmt_desc_get(m_FProps.avpixfmt);
   int InBpp = in_pfdesc->comp->depth_minus1 + 1;
 
-  if (m_FProps.pftype != PFType_YUV444bX || InBpp != 16) {
+  if (m_FProps.pftype != PFType_YUV444Px || InBpp != 16) {
     uint8_t *tmp[4] = {NULL};
     int     tmpStride[4] = {0};
     int scaleStride = FFALIGN(width, 32);
