@@ -3393,7 +3393,7 @@ LRESULT CMainFrame::OnPostOpen(WPARAM wParam, LPARAM lParam)
 
 	m_flastnID = 0;
 
-    RecalcLayout();
+	RecalcLayout();
 	if (IsWindow(m_wndToolBar.m_hWnd) && m_wndToolBar.IsVisible()) {
 		m_wndToolBar.Invalidate();
 	}
@@ -4214,7 +4214,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		m_wndCaptureBar.m_capdlg.SetAudioInput(pDeviceData->ainput);
 	}
 
-    REFERENCE_TIME rtDur = 0;
+	REFERENCE_TIME rtDur = 0;
 	if (m_pMS && m_pMS->GetDuration(&rtDur) == S_OK) {
 		m_wndPlaylistBar.SetCurTime(rtDur);
 	}
@@ -4282,16 +4282,12 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		}
 	}
 
-    // start playback if requested
 	if (!(s.nCLSwitches & CLSW_OPEN) && (s.nLoops > 0)) {
 		SendMessage(WM_COMMAND, ID_PLAY_PLAY);
-	} else {
-		SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
 	}
 	s.nCLSwitches &= ~CLSW_OPEN;
 
-    SendNowPlayingToApi();
-
+	SendNowPlayingToApi();
 	SetupChapters();
 
 	if (s.AutoChangeFullscrRes.bEnabled == 1 && m_fFullScreen) {
