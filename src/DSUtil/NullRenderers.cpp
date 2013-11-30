@@ -321,6 +321,8 @@ HRESULT CNullUVideoRenderer::CheckMediaType(const CMediaType* pmt)
 			   || pmt->subtype == MEDIASUBTYPE_UYVY
 			   || pmt->subtype == MEDIASUBTYPE_Y211
 			   || pmt->subtype == MEDIASUBTYPE_AYUV
+			   || pmt->subtype == MEDIASUBTYPE_YV16
+			   || pmt->subtype == MEDIASUBTYPE_YV24
 			   || pmt->subtype == MEDIASUBTYPE_RGB1
 			   || pmt->subtype == MEDIASUBTYPE_RGB4
 			   || pmt->subtype == MEDIASUBTYPE_RGB8
