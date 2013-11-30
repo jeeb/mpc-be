@@ -83,6 +83,9 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	// === New swscaler options
 	CButton		m_grpFmtConv;
 	CStatic		m_txtSwOutputFormats;
+	CStatic     m_txt8bit;
+	CStatic     m_txt10bit;
+	CStatic     m_txt16bit;
 	CStatic     m_txt420;
 	CStatic     m_txt422;
 	CStatic     m_txt444;
