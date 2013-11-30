@@ -13962,7 +13962,7 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 
 void CMainFrame::OpenSetupAudioStream()
 {
-	if (m_iMediaLoadState != MLS_LOADED) {
+	if (m_iMediaLoadState != MLS_LOADING) {
 		return;
 	}
 
