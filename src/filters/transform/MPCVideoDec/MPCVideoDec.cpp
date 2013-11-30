@@ -1767,10 +1767,6 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 	// === New swscaler options
 	int nSwIndex[PixFmt_count];
 	int nSwCount = 0;
-	bool inqueue[PixFmt_count];
-	for (int i = 0; i < PixFmt_count; i++) {
-		inqueue[i] = m_fPixFmts[i];
-	}
 
 	if (m_pAVCtx->pix_fmt != AV_PIX_FMT_NONE) {
 		const AVPixFmtDescriptor* av_pfdesc = av_pix_fmt_desc_get(m_pAVCtx->pix_fmt);
@@ -1814,14 +1810,13 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 
 		for (int i = 0; i < PixFmt_count; i++) {
 			int index = InOutList[i];
-			if (inqueue[index]) {
+			if (m_fPixFmts[index]) {
 				nSwIndex[nSwCount++] = index;
-				inqueue[index] = false;
 			}
 		}
 	}
 
-	if (!m_fPixFmts[PixFmt_YUY2]) {
+	if (!m_fPixFmts[PixFmt_YUY2] || nSwCount == 0) {
 		// if YUY2 has not been added yet, then add it to the end of the list
 		nSwIndex[nSwCount++] = PixFmt_YUY2;
 	}
