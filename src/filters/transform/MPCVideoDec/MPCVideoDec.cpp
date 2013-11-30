@@ -1774,29 +1774,49 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 
 	if (m_pAVCtx->pix_fmt != AV_PIX_FMT_NONE) {
 		const AVPixFmtDescriptor* av_pfdesc = av_pix_fmt_desc_get(m_pAVCtx->pix_fmt);
-		int eqlumabits = av_pfdesc->comp->depth_minus1 + 1;
-		if (eqlumabits <= 8) {
-			eqlumabits = 8;
-		} else if (eqlumabits <= 10) {
-			eqlumabits = 10;
-		} else {
-			eqlumabits = 16;
+		int lumabits = av_pfdesc->comp->depth_minus1 + 1;
+
+		const MPCPixelFormat* InOutList = NULL;
+
+		if (av_pfdesc->flags & (AV_PIX_FMT_FLAG_RGB|AV_PIX_FMT_FLAG_PAL)) {
+			InOutList = RGB_8;
+		} else if (av_pfdesc->nb_components >= 3) {
+			if (av_pfdesc->log2_chroma_w == 1 && av_pfdesc->log2_chroma_h == 1) { // 4:2:0
+				if (lumabits <= 8) {
+					InOutList = YUV420_8;
+				} else if (lumabits <= 10) {
+					InOutList = YUV420_10;
+				} else {
+					InOutList = YUV420_16;
+				}
+			} else if (av_pfdesc->log2_chroma_w == 1 && av_pfdesc->log2_chroma_h == 0) { // 4:2:2
+				if (lumabits <= 8) {
+					InOutList = YUV422_8;
+				} else if (lumabits <= 10) {
+					InOutList = YUV422_10;
+				} else {
+					InOutList = YUV422_16;
+				}
+			} else if (av_pfdesc->log2_chroma_w == 0 && av_pfdesc->log2_chroma_h == 0) { // 4:4:4
+				if (lumabits <= 8) {
+					InOutList = YUV444_8;
+				} else if (lumabits <= 10) {
+					InOutList = YUV444_10;
+				} else {
+					InOutList = YUV444_16;
+				}
+			}
+		}
+		
+		if (InOutList == NULL) {
+			InOutList = YUV420_8;
 		}
 
-		if (av_pfdesc->flags & (AV_PIX_FMT_FLAG_RGB|AV_PIX_FMT_FLAG_PAL) && inqueue[PixFmt_RGB32]) {
-			// if any RGB then add RGB32
-			nSwIndex[nSwCount++] = PixFmt_RGB32;
-			inqueue[PixFmt_RGB32] = false;
-		} else if (av_pfdesc->nb_components >= 3) {
-			// if YUV then add similar YUV formats
-			for (int i = 0; i < PixFmt_count; i++) {
-				const SW_OUT_FMT* swof = GetSWOF(i);
-				if (inqueue[i] && eqlumabits == swof->luma_bits
-						&& av_pfdesc->log2_chroma_w == swof->chroma_w
-						&& av_pfdesc->log2_chroma_h == swof->chroma_h) {
-					nSwIndex[nSwCount++] = i;
-					inqueue[i] = false;
-				}
+		for (int i = 0; i < PixFmt_count; i++) {
+			int index = InOutList[i];
+			if (inqueue[index]) {
+				nSwIndex[nSwCount++] = index;
+				inqueue[index] = false;
 			}
 		}
 	}
@@ -1804,6 +1824,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 	// add other active formats
 	for (int i = 0; i < PixFmt_count; i++) {
 		if (inqueue[i]) {
+			ASSERT(0);
 			nSwIndex[nSwCount++] = i;
 			inqueue[i] = false;
 		}
