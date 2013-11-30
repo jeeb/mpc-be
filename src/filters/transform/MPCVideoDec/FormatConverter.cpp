@@ -102,7 +102,7 @@ MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
 	const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(av_pix_fmt);
 	int lumabits = pfdesc->comp->depth_minus1 + 1;
 
-	if (pfdesc->flags & AV_PIX_FMT_FLAG_RGB) {
+	if (pfdesc->flags & AV_PIX_FMT_FLAG_RGB || av_pix_fmt == AV_PIX_FMT_PAL8) {
 		return PFType_RGB;
 	}
 
