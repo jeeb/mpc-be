@@ -1774,7 +1774,14 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 
 	if (m_pAVCtx->pix_fmt != AV_PIX_FMT_NONE) {
 		const AVPixFmtDescriptor* av_pfdesc = av_pix_fmt_desc_get(m_pAVCtx->pix_fmt);
-		int bpp = av_get_bits_per_pixel(av_pfdesc);
+		int eqlumabits = av_pfdesc->comp->depth_minus1 + 1;
+		if (eqlumabits <= 8) {
+			eqlumabits = 8;
+		} else if (eqlumabits <= 10) {
+			eqlumabits = 10;
+		} else {
+			eqlumabits = 16;
+		}
 
 		if (av_pfdesc->flags & (AV_PIX_FMT_FLAG_RGB|AV_PIX_FMT_FLAG_PAL) && inqueue[PixFmt_RGB32]) {
 			// if any RGB then add RGB32
@@ -1784,7 +1791,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 			// if YUV then add similar YUV formats
 			for (int i = 0; i < PixFmt_count; i++) {
 				const SW_OUT_FMT* swof = GetSWOF(i);
-				if (inqueue[i] && bpp == swof->actual_bpp
+				if (inqueue[i] && eqlumabits == swof->luma_bits
 						&& av_pfdesc->log2_chroma_w == swof->chroma_w
 						&& av_pfdesc->log2_chroma_h == swof->chroma_h) {
 					nSwIndex[nSwCount++] = i;
