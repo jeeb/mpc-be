@@ -900,11 +900,10 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					case FLV_VIDEO_HM91:   // HEVC HM9.1
 					case FLV_VIDEO_HM10:   // HEVC HM10.0
 					case FLV_VIDEO_HEVC: { // HEVC HM11.0 & HM12.0 ...
-						if (dataSize < 4 || m_pFile->BitRead(8) != 0) { // packet type 0 == avc header
+						if (dataSize < 4 || vt.AVCPacketType != 0) {
 							fTypeFlagsVideo = true;
 							break;
 						}
-						m_pFile->BitRead(24); // composition time
 
 						__int64 headerOffset = m_pFile->GetPos();
 						UINT32 headerSize = dataSize - 4;
@@ -937,7 +936,8 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						vc_params_t params;
 						if (!ParseAVCDecoderConfigurationRecord(headerData, headerSize, params, metaHM_compatibility)) {
-							return E_FAIL;
+							fTypeFlagsVideo = true;
+							break;
 						}
 
 						// format type
