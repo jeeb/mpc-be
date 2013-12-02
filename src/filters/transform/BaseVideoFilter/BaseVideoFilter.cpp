@@ -229,8 +229,6 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 		}
 	}
 
-	HRESULT hr = S_OK;
-
 	if (bForce || m_update_aspect || fForceReconnection || m_w != m_wout || m_h != m_hout || m_arx != m_arxout || m_ary != m_aryout) {
 		CLSID clsid = GetCLSID(m_pOutput->GetConnected());
 
@@ -241,14 +239,14 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 
 		CRect vih_rect(0, 0, RealWidth > 0 ? RealWidth : m_w, RealHeight > 0 ? RealHeight : m_h);
 
-		TRACE(_T("CBaseVideoFilter::ReconnectOutput()\n"));
+		TRACE(L"CBaseVideoFilter::ReconnectOutput()\n");
 		if (m_w != vih_rect.Width() || m_h != vih_rect.Height()) {
-		TRACE(_T("		SIZE : %d:%d => %d:%d(%d:%d)\n"), w_org, h_org, m_w, m_h, vih_rect.Width(), vih_rect.Height());		
+		TRACE(L"		SIZE : %d:%d => %d:%d(%d:%d)\n", w_org, h_org, m_w, m_h, vih_rect.Width(), vih_rect.Height());		
 		} else {
-		TRACE(_T("		SIZE : %d:%d => %d:%d\n"), w_org, h_org, vih_rect.Width(), vih_rect.Height());
+		TRACE(L"		SIZE : %d:%d => %d:%d\n", w_org, h_org, vih_rect.Width(), vih_rect.Height());
 		}
-		TRACE(_T("		AR   : %d:%d => %d:%d\n"), m_arxout, m_aryout, m_arx, m_ary);
-		TRACE(_T("		FPS  : %I64d => %I64d\n"), nAvgTimePerFrame, AvgTimePerFrame);
+		TRACE(L"		AR   : %d:%d => %d:%d\n", m_arxout, m_aryout, m_arx, m_ary);
+		TRACE(L"		FPS  : %I64d => %I64d\n", nAvgTimePerFrame, AvgTimePerFrame);
 
 		CMediaType& pmtInput	= m_pInput->CurrentMediaType();
 		BITMAPINFOHEADER* bmi	= NULL;
@@ -277,49 +275,61 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 		bmi->biHeight		= m_h;
 		bmi->biSizeImage	= m_w*m_h*bmi->biBitCount>>3;
 
-		hr = m_pOutput->GetConnected()->QueryAccept(&mt);
-		ASSERT(SUCCEEDED(hr)); // should better not fail, after all "mt" is the current media type, just with a different resolution
-		HRESULT hr1 = S_OK;
+		HRESULT hrQA = m_pOutput->GetConnected()->QueryAccept(&mt);
+		ASSERT(SUCCEEDED(hrQA)); // should better not fail, after all "mt" is the current media type, just with a different resolution
+		HRESULT hr = S_OK;
 
 		if (m_nDecoderMode == MODE_DXVA2) {
 			m_pOutput->SetMediaType(&mt);
 			m_bSendMediaType = true;
 		} else {
-			
-			if (clsid == CLSID_VMR9AllocatorPresenter || clsid == CLSID_VideoMixingRenderer9) {
-				// call IPin::ReceiveConnection may return VFW_E_BUFFERS_OUTSTANDING(One or more buffers are still active) with VMR9. So - Flush data before this.
-				m_pOutput->GetConnected()->BeginFlush();
-				m_pOutput->GetConnected()->EndFlush();
-			}
-
-			if (SUCCEEDED(hr1 = m_pOutput->GetConnected()->ReceiveConnection(m_pOutput, &mt))) {
-				if (bSendSample) {
-					HRESULT hr2 = 0;
-					CComPtr<IMediaSample> pOut;
-					if (SUCCEEDED(hr2 = m_pOutput->GetDeliveryBuffer(&pOut, NULL, NULL, 0))) {
-						AM_MEDIA_TYPE* pmt;
-						if (SUCCEEDED(pOut->GetMediaType(&pmt)) && pmt) {
-							CMediaType mt = *pmt;
-							m_pOutput->SetMediaType(&mt);
-							DeleteMediaType(pmt);
-						} else { // stupid overlay mixer won't let us know the new pitch...
-							long size = pOut->GetSize();
-							bmi->biWidth = size ? (size / abs(bmi->biHeight) * 8 / bmi->biBitCount) : bmi->biWidth;
-							m_pOutput->SetMediaType(&mt);
+			int tryTimeout = 100;
+			for (;;) {
+				hr = m_pOutput->GetConnected()->ReceiveConnection(m_pOutput, &mt);
+				if (SUCCEEDED(hr)) {
+					if (bSendSample) {
+						CComPtr<IMediaSample> pOut;
+						if (SUCCEEDED(hr = m_pOutput->GetDeliveryBuffer(&pOut, NULL, NULL, 0))) {
+							AM_MEDIA_TYPE* pmt;
+							if (SUCCEEDED(pOut->GetMediaType(&pmt)) && pmt) {
+								CMediaType mt = *pmt;
+								m_pOutput->SetMediaType(&mt);
+								DeleteMediaType(pmt);
+							} else { // stupid overlay mixer won't let us know the new pitch...
+								long size = pOut->GetSize();
+								bmi->biWidth = size ? (size / abs(bmi->biHeight) * 8 / bmi->biBitCount) : bmi->biWidth;
+								m_pOutput->SetMediaType(&mt);
+							}
+						} else {
+							m_w = w_org;
+							m_h = h_org;
+							return E_FAIL;
 						}
-					} else {
-						m_w = w_org;
-						m_h = h_org;
-						return E_FAIL;
 					}
+				} else if (hr == VFW_E_BUFFERS_OUTSTANDING && tryTimeout >= 0) {
+					if (tryTimeout > 0) {
+						TRACE(L"		VFW_E_BUFFERS_OUTSTANDING, retrying in 10ms ...\n");
+						Sleep(10);
+					} else {
+						TRACE(L"		VFW_E_BUFFERS_OUTSTANDING, flush data ...\n");
+						m_pOutput->BeginFlush();
+						m_pOutput->EndFlush();
+					}
+
+					tryTimeout -= 10;
+					continue;
+				} else {
+					TRACE(L"		ReceiveConnection() failed (hr: %x); QueryAccept: %x\n", hr, hrQA);
 				}
+				
+				break;
 			}
 		}
 
-		m_wout = m_w;
-		m_hout = m_h;
-		m_arxout = m_arx;
-		m_aryout = m_ary;
+		m_wout		= m_w;
+		m_hout		= m_h;
+		m_arxout	= m_arx;
+		m_aryout	= m_ary;
 
 		// some renderers don't send this
 		if (m_nDecoderMode != MODE_DXVA2) {
