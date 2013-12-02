@@ -85,8 +85,8 @@ class AP4_Track {
     AP4_UI64     GetDuration();
     AP4_Duration GetDurationMs();
     AP4_Cardinal GetSampleCount();
-	AP4_Result   GetSample(AP4_Ordinal index, AP4_Sample& sample);
-	AP4_Result   ReadSample(AP4_Ordinal     index, 
+    AP4_Result   GetSample(AP4_Ordinal index, AP4_Sample& sample);
+    AP4_Result   ReadSample(AP4_Ordinal     index, 
                             AP4_Sample&     sample,
                             AP4_DataBuffer& data);
     AP4_Result   GetSampleIndexForTimeStampMs(AP4_TimeStamp ts, 
@@ -101,8 +101,12 @@ class AP4_Track {
     AP4_Result    SetMovieTimeScale(AP4_UI32 time_scale);
     AP4_UI32      GetMediaTimeScale();
 
-	AP4_String    GetTrackName();
-	AP4_String    GetTrackLanguage();
+    AP4_String    GetTrackName();
+    AP4_String    GetTrackLanguage();
+
+    AP4_UI32*     GetPalette() { return m_Palette; }
+    AP4_Result    SetPalette(AP4_UI32* Palette);
+    bool          m_hasPalette;
 
  protected:
     // members
@@ -113,6 +117,8 @@ class AP4_Track {
     bool             m_SampleTableIsOwned;
     AP4_UI32         m_MovieTimeScale;
     AP4_UI32         m_MediaTimeScale;
+
+    AP4_UI32         m_Palette[256];
 };
 
 #endif // _AP4_TRAK_H_

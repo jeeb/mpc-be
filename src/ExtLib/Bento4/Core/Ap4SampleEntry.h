@@ -266,6 +266,8 @@ class AP4_VisualSampleEntry : public AP4_MpegSampleEntry
 
     // methods
     AP4_SampleDescription* ToSampleDescription();
+    AP4_UI32*   GetPalette()        { return m_Palette; }
+    bool        m_hasPalette;
 
 protected:
     // methods
@@ -286,7 +288,9 @@ protected:
 	AP4_UI16   m_FrameCount;      // = 1
 	AP4_String m_CompressorName;       
 	AP4_UI16   m_Depth;           // = 0x0018
-	AP4_UI16   m_Predefined3;     // = 0xFFFF
+	AP4_UI16   m_ColorTableId;    // = 0
+
+	AP4_UI32   m_Palette[256];    // = palette
 };
 
 /*----------------------------------------------------------------------

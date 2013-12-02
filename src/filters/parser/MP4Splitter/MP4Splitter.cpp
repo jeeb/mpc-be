@@ -733,7 +733,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						mt.majortype	= MEDIATYPE_Video;
 						mt.formattype	= FORMAT_VideoInfo2;
 
-						vih2							= (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2)+db.GetDataSize());
+						vih2							= (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2) + db.GetDataSize());
 						memset(vih2, 0, mt.FormatLength());
 						vih2->bmiHeader.biSize			= sizeof(vih2->bmiHeader);
 						vih2->bmiHeader.biWidth			= (LONG)vse->GetWidth();
@@ -787,6 +787,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							mt.subtype = FOURCCMap(vih2->bmiHeader.biCompression = typeupr);
 							mts.Add(mt);
 							//b_HasVideo = true;
+						}
+
+						if (vse->m_hasPalette) {
+							track->SetPalette(vse->GetPalette());
 						}
 
 						break;
@@ -1426,7 +1430,21 @@ bool CMP4SplitterFilter::DemuxLoop()
 				}
 			} else {
 				p->SetData(data.GetData(), data.GetDataSize());
+
+				if (track->m_hasPalette) {
+					track->m_hasPalette = false;
+					CAutoPtr<Packet> p2(DNew Packet());
+					p2->SetData(track->GetPalette(), 1024);
+					p->Append(*p2);
+
+					// TODO - understand how these figures are obtained in ffmpeg's mov demuxer :)
+					CAutoPtr<Packet> p3(DNew Packet());
+					static BYTE add[13] = {0x00, 0x00, 0x04, 0x00, 0x80, 0x8C, 0x4D, 0x9D, 0x10, 0x8E, 0x25, 0xE9, 0xFE};
+					p3->SetData(add, _countof(add));
+					p->Append(*p3);
+				}
 			}
+
 			hr = DeliverPacket(p);
 		}
 
