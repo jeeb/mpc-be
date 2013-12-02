@@ -391,6 +391,36 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, int len, CMediaType* pmt, bool find_sy
 		h.ary = ar[i].y;
 
 		type = mpeg2;
+
+		while (GetPos() < endpos) {
+			if (NextMpegStartCode(id, len)) {
+				if (id != 0xb5) {
+					continue;
+				}
+
+				BYTE startcodeid = BitRead(4);
+				if (startcodeid == 0x02) {
+					BYTE video_format			= BitRead(3);
+					BYTE color_description		= BitRead(1);
+					if (color_description) {
+						BYTE color_primaries	= BitRead(8);
+						BYTE color_trc			= BitRead(8);
+						BYTE colorspace			= BitRead(8);
+					}
+
+					WORD panscan_width			= (WORD)BitRead(14);
+					MARKER;
+					WORD panscan_height			= (WORD)BitRead(14);
+
+					if (panscan_width && panscan_height) {
+						h.arx = h.width * h.height * h.arx/h.ary/panscan_width;
+						h.ary = h.height;
+					}
+			
+					break;
+				}
+			}
+		}
 	}
 
 	h.ifps = 10 * h.ifps / 27;
