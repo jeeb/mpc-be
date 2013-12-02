@@ -60,6 +60,9 @@ typedef struct {
 } SW_OUT_FMT;
 
 const SW_OUT_FMT* GetSWOF(int pixfmt);
+LPCTSTR GetChromaSubsamplingStr(AVPixelFormat av_pix_fmt);
+
+// CFormatConverter
 
 struct AVFrame;
 struct SwsContext;

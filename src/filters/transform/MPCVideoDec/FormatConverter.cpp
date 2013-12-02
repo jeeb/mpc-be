@@ -33,7 +33,6 @@ extern "C" {
 }
 #pragma warning(pop)
 
-
 static const SW_OUT_FMT s_sw_formats[] = {
 	//  name     biCompression  subtype                                         av_pix_fmt    chroma_w chroma_h
 	// YUV 8 bit
@@ -125,6 +124,30 @@ MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
 	}
 
 	return PFType_unspecified;
+}
+
+LPCTSTR GetChromaSubsamplingStr(AVPixelFormat av_pix_fmt)
+{
+	int h_shift, v_shift;
+
+	if (0 == av_pix_fmt_get_chroma_sub_sample(av_pix_fmt, &h_shift, &v_shift)) {
+		const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(av_pix_fmt);
+		if (h_shift == 0 && v_shift == 0) {
+			return _T("4:4:4");
+		} else if (h_shift == 0 && v_shift == 1) {
+			return _T("4:4:0");
+		} else if (h_shift == 1 && v_shift == 0) {
+			return _T("4:2:2");
+		} else if (h_shift == 1 && v_shift == 1) {
+			return _T("4:2:0");
+		} else if (h_shift == 2 && v_shift == 0) {
+			return _T("4:1:1");
+		} else if (h_shift == 2 && v_shift == 2) {
+			return _T("4:1:0");
+		}
+	}
+
+	return _T("");
 }
 
 // CFormatConverter
