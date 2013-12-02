@@ -1437,7 +1437,6 @@ bool CMP4SplitterFilter::DemuxLoop()
 					p2->SetData(track->GetPalette(), 1024);
 					p->Append(*p2);
 
-					// TODO - understand how these figures are obtained in ffmpeg's mov demuxer :)
 					CAutoPtr<Packet> p3(DNew Packet());
 					static BYTE add[13] = {0x00, 0x00, 0x04, 0x00, 0x80, 0x8C, 0x4D, 0x9D, 0x10, 0x8E, 0x25, 0xE9, 0xFE};
 					p3->SetData(add, _countof(add));
