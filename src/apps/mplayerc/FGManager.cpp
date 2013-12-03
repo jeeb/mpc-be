@@ -63,7 +63,7 @@ public:
 			while (pos) {
 				SUPPORTED_FORMATS fmt = fmts.GetNext(pos);
 				if (m_IsPreview || s.FFmpegFilters[fmt.FFMPEGCode] || s.DXVAFilters[fmt.DXVACode]) {
-					AddType(MEDIATYPE_Video, *fmt.clsMinorType);
+					AddType(*fmt.clsMajorType, *fmt.clsMinorType);
 				}
 			}
 		} else if (!m_IsPreview) {
@@ -71,7 +71,7 @@ public:
 			POSITION pos = fmts.GetHeadPosition();
 			while (pos) {
 				SUPPORTED_FORMATS fmt = fmts.GetNext(pos);
-				AddType(MEDIATYPE_Video, *fmt.clsMinorType);
+				AddType(*fmt.clsMajorType, *fmt.clsMinorType);
 			}
 		}
 	}
@@ -770,8 +770,8 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 	}
 
 	BeginEnumMediaTypes(pPinOut, pEM, pmt) {
-		// DVR-MS Caption (WTV Subtitle) pin - disable
-		if (pmt->majortype == MEDIATYPE_MSTVCaption) {
+		// DVR-MS Caption (WTV Subtitle)/MPEG2_SECTIONS pin - disable
+		if (pmt->majortype == MEDIATYPE_MSTVCaption || pmt->majortype == MEDIATYPE_MPEG2_SECTIONS) {
 			return S_FALSE;
 		}
 

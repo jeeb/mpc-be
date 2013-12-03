@@ -342,6 +342,7 @@ private :
 
 //
 struct SUPPORTED_FORMATS {
+	const CLSID*	clsMajorType;
 	const CLSID*	clsMinorType;
 
 	const int		FFMPEGCode;
