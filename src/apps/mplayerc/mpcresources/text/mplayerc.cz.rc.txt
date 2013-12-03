@@ -1645,7 +1645,7 @@ STRING IDS_MPC_MINIDUMP_FAIL		"Nepodařilo se vytvořit soubor výpisu paměti '
 STRING IDS_MPEG2_BRIGHTNESS		"Jas"
 STRING IDS_MPEG2_CONTRAST		"Kontrast"
 STRING IDS_MPEG2_DEINTERLACING		"Deinterlacing"
-STRING IDS_MPEG2_ENABLE_PLANAR		"Povolit planární YUV (VY12, I420, IYUY) výstup"
+STRING IDS_MPEG2_ENABLE_PLANAR		"Povolit planární YUV (NV12, VY12, I420, IYUY) výstup"
 STRING IDS_MPEG2_FORCED_SUBS		"Vždy zobrazit vynucené titulky"
 STRING IDS_MPEG2_HUE		"Odstín"
 STRING IDS_MPEG2_INTERLACE_FLAG		"Nastavit ve výstupu příznak prokládání"

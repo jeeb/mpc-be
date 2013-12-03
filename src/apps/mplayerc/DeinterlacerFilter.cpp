@@ -47,6 +47,7 @@ HRESULT CDeinterlacerFilter::CheckInputType(const CMediaType* mtIn)
 
 	return mtIn->subtype == MEDIASUBTYPE_YUY2 || mtIn->subtype == MEDIASUBTYPE_UYVY
 		   || mtIn->subtype == MEDIASUBTYPE_I420 || mtIn->subtype == MEDIASUBTYPE_YV12 || mtIn->subtype == MEDIASUBTYPE_IYUV
+		   || mtIn->subtype == MEDIASUBTYPE_NV12
 		   ? S_OK
 		   : E_FAIL;
 }
@@ -104,7 +105,7 @@ HRESULT CDeinterlacerFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 
 	if (mtIn.subtype == MEDIASUBTYPE_YUY2 || mtIn.subtype == MEDIASUBTYPE_UYVY) {
 		DeinterlaceBlend(pDataOut, pDataIn, pitchIn, bihIn.biHeight, pitchOut, pitchIn);
-	} else if (mtIn.subtype == MEDIASUBTYPE_I420 || mtIn.subtype == MEDIASUBTYPE_YV12 || mtIn.subtype == MEDIASUBTYPE_IYUV) {
+	} else if (mtIn.subtype == MEDIASUBTYPE_I420 || mtIn.subtype == MEDIASUBTYPE_YV12 || mtIn.subtype == MEDIASUBTYPE_IYUV || mtIn.subtype == MEDIASUBTYPE_NV12) {
 		DeinterlaceBlend(pDataOut, pDataIn, pitchIn, bihIn.biHeight, pitchOut, pitchIn);
 
 		int sizeIn = bihIn.biHeight*pitchIn, sizeOut = abs(bihOut.biHeight)*pitchOut;

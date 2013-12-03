@@ -406,6 +406,8 @@ HRESULT CBaseVideoFilter::CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, int 
 			}
 		} else if (bihOut.biCompression == '024I' || bihOut.biCompression == 'VUYI' || bihOut.biCompression == '21VY') {
 			BitBltFromI420ToI420(w, h, pOut, pOutU, pOutV, bihOut.biWidth, pIn, pInU, pInV, pitchIn);
+		} else if(bihOut.biCompression == '21VN') {
+			BitBltFromI420ToNV12(w, h, pOut, pOutU, pOutV, bihOut.biWidth, pIn, pInU, pInV, pitchIn);
 		} else if (bihOut.biCompression == BI_RGB || bihOut.biCompression == BI_BITFIELDS) {
 			if (!BitBltFromI420ToRGB(w, h, pOut, pitchOut, bihOut.biBitCount, pIn, pInU, pInV, pitchIn)) {
 				for (int y = 0; y < h; y++, pOut += pitchOut) {
@@ -494,10 +496,10 @@ HRESULT CBaseVideoFilter::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_
 	long cBuffers = m_pOutput->CurrentMediaType().formattype == FORMAT_VideoInfo ? 1 : m_cBuffers;
 	UNREFERENCED_PARAMETER(cBuffers);
 
-	pProperties->cBuffers = m_cBuffers;
-	pProperties->cbBuffer = bih.biSizeImage;
-	pProperties->cbAlign = 1;
-	pProperties->cbPrefix = 0;
+	pProperties->cBuffers	= m_cBuffers;
+	pProperties->cbBuffer	= bih.biSizeImage;
+	pProperties->cbAlign	= 1;
+	pProperties->cbPrefix	= 0;
 
 	HRESULT hr;
 	ALLOCATOR_PROPERTIES Actual;
@@ -513,6 +515,7 @@ HRESULT CBaseVideoFilter::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_
 VIDEO_OUTPUT_FORMATS DefaultFormats[] = {
 	{&MEDIASUBTYPE_P010,   2, 24, '010P'},
 	{&MEDIASUBTYPE_P016,   2, 24, '610P'},
+	{&MEDIASUBTYPE_NV12,   3, 12, '21VN'},
 	{&MEDIASUBTYPE_YV12,   3, 12, '21VY'},
 	{&MEDIASUBTYPE_I420,   3, 12, '024I'},
 	{&MEDIASUBTYPE_IYUV,   3, 12, 'VUYI'},

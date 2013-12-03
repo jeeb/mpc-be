@@ -679,7 +679,6 @@ HRESULT CMpeg2DecFilter::DeliverFast()
 	}
 
 	{
-
 		CAutoLock cAutoLock2(&m_csProps);
 
 		if (GetCLSID(m_pInput->GetConnected()) == CLSID_DVDNavigator
@@ -1047,7 +1046,8 @@ HRESULT CMpeg2DecFilter::CheckInputType(const CMediaType* mtIn)
 
 HRESULT CMpeg2DecFilter::CheckTransform(const CMediaType* mtIn, const CMediaType* mtOut)
 {
-	bool fPlanarYUV = mtOut->subtype == MEDIASUBTYPE_YV12
+	bool fPlanarYUV = mtOut->subtype == MEDIASUBTYPE_NV12
+					  || mtOut->subtype == MEDIASUBTYPE_YV12
 					  || mtOut->subtype == MEDIASUBTYPE_I420
 					  || mtOut->subtype == MEDIASUBTYPE_IYUV;
 
