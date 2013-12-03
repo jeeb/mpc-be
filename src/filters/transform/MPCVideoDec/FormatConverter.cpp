@@ -131,7 +131,6 @@ LPCTSTR GetChromaSubsamplingStr(AVPixelFormat av_pix_fmt)
 	int h_shift, v_shift;
 
 	if (0 == av_pix_fmt_get_chroma_sub_sample(av_pix_fmt, &h_shift, &v_shift)) {
-		const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(av_pix_fmt);
 		if (h_shift == 0 && v_shift == 0) {
 			return _T("4:4:4");
 		} else if (h_shift == 0 && v_shift == 1) {
@@ -148,6 +147,13 @@ LPCTSTR GetChromaSubsamplingStr(AVPixelFormat av_pix_fmt)
 	}
 
 	return _T("");
+}
+
+int GetLumaBits(AVPixelFormat av_pix_fmt)
+{
+	const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(av_pix_fmt);
+
+	return (pfdesc ? pfdesc->comp->depth_minus1 + 1 : 0);
 }
 
 // CFormatConverter

@@ -61,6 +61,7 @@ typedef struct {
 
 const SW_OUT_FMT* GetSWOF(int pixfmt);
 LPCTSTR GetChromaSubsamplingStr(AVPixelFormat av_pix_fmt);
+int GetLumaBits(AVPixelFormat av_pix_fmt);
 
 // CFormatConverter
 
