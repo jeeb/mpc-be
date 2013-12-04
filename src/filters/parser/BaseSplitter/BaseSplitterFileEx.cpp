@@ -413,8 +413,8 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, int len, CMediaType* pmt, bool find_sy
 					WORD panscan_height			= (WORD)BitRead(14);
 
 					if (panscan_width && panscan_height) {
-						h.arx = h.width * h.height * h.arx/h.ary/panscan_width;
-						h.ary = h.height;
+						h.arx *= h.width  * panscan_height;
+						h.ary *= h.height * panscan_width;
 					}
 			
 					break;
