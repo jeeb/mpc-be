@@ -479,12 +479,17 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		UINT64 next = m_pFile->GetPos() + t.DataSize;
 
+		if (!IsValidTag(t.TagType)) {
+			m_pFile->Seek(next);
+			continue;
+		}
+
 		CString name;
 
 		CMediaType mt;
 		mt.subtype = GUID_NULL;
 
-		if (i != 0 && t.PreviousTagSize != prevTagSize) {
+		if (prevTagSize != 0 && t.PreviousTagSize != prevTagSize) {
 			m_IgnorePrevSizes = true;
 		}
 		prevTagSize = t.DataSize + 11;
