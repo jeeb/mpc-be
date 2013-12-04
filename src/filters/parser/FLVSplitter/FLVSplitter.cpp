@@ -481,6 +481,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		if (!IsValidTag(t.TagType)) {
 			m_pFile->Seek(next);
+			prevTagSize = 0;
 			continue;
 		}
 
