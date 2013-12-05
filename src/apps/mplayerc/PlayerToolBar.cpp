@@ -884,7 +884,7 @@ void CPlayerToolBar::OnRButtonDown(UINT nFlags, CPoint point)
 	int Idx				= getHitButtonIdx(point);
 
 	if (Idx == 1) {
-		pFrame->PostMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+		pFrame->PostMessage(WM_COMMAND, ID_FILE_CLOSEPLAYLIST);
 	} else if (Idx == 5) {
 		pFrame->OnMenuNavJumpTo();
 	} else if (Idx == 6) {
