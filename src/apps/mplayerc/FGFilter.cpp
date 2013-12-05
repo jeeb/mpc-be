@@ -620,11 +620,14 @@ void CFGFilterList::Insert(CFGFilter* pFGF, int group, bool exactmatch, bool aut
 		  pFGF->GetType()));
 
 	CString name = pFGF->GetName();
-	CString external;
-	external.Format(L" (%s)", ResStr(IDS_EXTERNAL));
-	if (name.GetLength() && pFGF->GetType() != L"CFGFilterInternal" && name.Find(L"MPC ") == 0 && name.Find(external) < 0) {
-		name.Append(external);
-		pFGF->SetName(name);
+	if (name.GetLength() && name.Find(L"MPC ") == 0 && pFGF->GetType() != L"CFGFilterInternal") {
+		CString external;
+		external.Format(L" (%s)", ResStr(IDS_EXTERNAL));
+
+		if (name.Find(external) < 0) {
+			name.Append(external);
+			pFGF->SetName(name);
+		}
 	}
 
 	filter_t f = {m_filters.GetCount(), pFGF, group, exactmatch, autodelete};
