@@ -64,6 +64,7 @@ public:
 	const CAtlList<GUID>& GetTypes() const;
 	void SetTypes(const CAtlList<GUID>& types);
 	void SetMerit(UINT64 merit);
+	void SetName(CString name);
 	void AddType(const GUID& majortype, const GUID& subtype);
 	bool CheckTypes(const CAtlArray<GUID>& types, bool fExactMatch);
 

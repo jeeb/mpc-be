@@ -1619,6 +1619,7 @@
 #define IDC_CHECK_AA                    44015
 #define ID_WINDOW_TO_PRIMARYSCREEN      44101
 #define IDS_AG_WINDOW_TO_PRIMARYSCREEN  44102
+#define IDS_EXTERNAL                    44103
 
 // Next default values for new objects
 // 

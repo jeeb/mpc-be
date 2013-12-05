@@ -55,6 +55,11 @@ void CFGFilter::SetMerit(UINT64 merit)
 	m_merit.val = merit;
 }
 
+void CFGFilter::SetName(CString name)
+{
+	m_name = name;
+}
+
 void CFGFilter::AddType(const GUID& majortype, const GUID& subtype)
 {
 	m_types.AddTail(majortype);
@@ -613,6 +618,14 @@ void CFGFilterList::Insert(CFGFilter* pFGF, int group, bool exactmatch, bool aut
 		  group, exactmatch, pFGF->GetMerit(),
 		  pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName()),
 		  pFGF->GetType()));
+
+	CString name = pFGF->GetName();
+	CString external;
+	external.Format(L" (%s)", ResStr(IDS_EXTERNAL));
+	if (name.GetLength() && pFGF->GetType() != L"CFGFilterInternal" && name.Find(L"MPC ") == 0 && name.Find(external) < 0) {
+		name.Append(external);
+		pFGF->SetName(name);
+	}
 
 	filter_t f = {m_filters.GetCount(), pFGF, group, exactmatch, autodelete};
 	m_filters.AddTail(f);
