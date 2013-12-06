@@ -620,8 +620,9 @@ void CFGFilterList::Insert(CFGFilter* pFGF, int group, bool exactmatch, bool aut
 		  pFGF->GetType()));
 
 	CString name = pFGF->GetName();
-	if (name.Left(4).Compare(_T("MPC ")) == 0 && pFGF->GetType() != L"CFGFilterInternal") {
-		CString external = L" (" + ResStr(IDS_EXTERNAL) + L")";
+	if (name.GetLength() && name.Find(L"MPC ") == 0 && pFGF->GetType() != L"CFGFilterInternal") {
+		CString external;
+		external.Format(L" (%s)", ResStr(IDS_EXTERNAL));
 
 		if (name.Find(external) < 0) {
 			name.Append(external);
