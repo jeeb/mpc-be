@@ -1027,9 +1027,18 @@ void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int&
 		}
 		break;
 	case AV_CODEC_ID_PRORES:
-		if (pAVCtx->pix_fmt == AV_PIX_FMT_NONE) {
-			av_log(pAVCtx, AV_LOG_INFO, "WARNING! : pAVCtx->pix_fmt == AV_PIX_FMT_NONE\n");
-			pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10LE; // bad hack
+		if (pAVCtx->pix_fmt == AV_PIX_FMT_NONE && pAVCtx->extradata_size >= 8) {
+			switch (*(DWORD*)(pAVCtx->extradata + 4)) {
+			case 'hcpa': // Apple ProRes 422 High Quality
+			case 'ncpa': // Apple ProRes 422 Standard Definition
+			case 'scpa': // Apple ProRes 422 LT
+			case 'ocpa': // Apple ProRes 422 Proxy
+				pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10LE;
+				break;
+			case 'h4pa': // Apple ProRes 4444
+				pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P10LE;
+				break;
+			}
 		}
 		break;
 	case AV_CODEC_ID_MJPEG:
