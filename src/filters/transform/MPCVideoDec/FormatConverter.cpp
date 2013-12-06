@@ -109,7 +109,8 @@ MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
 		return PFType_unspecified;
 	}
 
-	if ((pfdesc->flags & AV_PIX_FMT_FLAG_PLANAR ^ (AV_PIX_FMT_FLAG_BE + AV_PIX_FMT_FLAG_ALPHA)) == AV_PIX_FMT_FLAG_PLANAR) {
+	if (pfdesc->flags == AV_PIX_FMT_FLAG_PLANAR) {
+		// ignore bigendian format & with alpha channel
 
 		if (pfdesc->log2_chroma_w == 1 && pfdesc->log2_chroma_h == 1) {
 			return PFType_YUV420Px;
