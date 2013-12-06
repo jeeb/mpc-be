@@ -137,6 +137,7 @@
     <ClInclude Include="MediaInfo\Audio\File_TwinVQ.h" />
     <ClInclude Include="MediaInfo\Audio\File_Vorbis.h" />
     <ClInclude Include="MediaInfo\Audio\File_Wvpk.h" />
+    <ClInclude Include="MediaInfo\Export\Export_EbuCore.h" />
     <ClInclude Include="MediaInfo\Image\File_Pcx.h" />
     <ClInclude Include="MediaInfo\Image\File_Psd.h" />
     <ClInclude Include="MediaInfo\Multiple\File_DashMpd.h" />
@@ -340,6 +341,7 @@
     <ClCompile Include="MediaInfo\Duplicate\File__Duplicate_MpegTs.cpp" />
     <ClCompile Include="MediaInfo\Duplicate\File__Duplicate__Base.cpp" />
     <ClCompile Include="MediaInfo\Duplicate\File__Duplicate__Writer.cpp" />
+    <ClCompile Include="MediaInfo\Export\Export_EbuCore.cpp" />
     <ClCompile Include="MediaInfo\Export\Export_Mpeg7.cpp" />
     <ClCompile Include="MediaInfo\Export\Export_PBCore.cpp" />
     <ClCompile Include="MediaInfo\Export\Export_reVTMD.cpp" />
