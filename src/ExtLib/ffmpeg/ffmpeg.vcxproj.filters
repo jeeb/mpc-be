@@ -418,9 +418,6 @@
     <ClInclude Include="libavcodec\dv_tablegen.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
-    <ClInclude Include="libavcodec\dv_vlc_data.h">
-      <Filter>libavcodec</Filter>
-    </ClInclude>
     <ClInclude Include="libavcodec\dvdata.h">
       <Filter>libavcodec</Filter>
     </ClInclude>

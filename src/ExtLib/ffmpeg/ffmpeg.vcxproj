@@ -137,7 +137,6 @@
     <ClInclude Include="libavcodec\dvdata.h" />
     <ClInclude Include="libavcodec\dv_profile.h" />
     <ClInclude Include="libavcodec\dv_tablegen.h" />
-    <ClInclude Include="libavcodec\dv_vlc_data.h" />
     <ClInclude Include="libavcodec\eac3enc.h" />
     <ClInclude Include="libavcodec\eac3_data.h" />
     <ClInclude Include="libavcodec\error_resilience.h" />

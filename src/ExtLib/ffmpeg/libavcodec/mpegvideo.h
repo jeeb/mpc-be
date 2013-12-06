@@ -568,7 +568,6 @@ typedef struct MpegEncContext {
     /* H.263 specific */
     int gob_index;
     int obmc;                       ///< overlapped block motion compensation
-    int showed_packed_warning;      ///< flag for having shown the warning about divxs invalid b frames
     int mb_info;                    ///< interval for outputting info about mb offsets as side data
     int prev_mb_info, last_mb_info;
     uint8_t *mb_info_ptr;
@@ -608,8 +607,6 @@ typedef struct MpegEncContext {
     int low_delay;                   ///< no reordering needed / has no b-frames
     int vo_type;
     int vol_control_parameters;      ///< does the stream contain the low_delay flag, used to workaround buggy encoders
-    int intra_dc_threshold;          ///< QP above whch the ac VLC should be used for intra dc
-    int use_intra_dc_vlc;
     PutBitContext tex_pb;            ///< used for data partitioned VOPs
     PutBitContext pb2;               ///< used for data partitioned VOPs
     int mpeg_quant;
@@ -628,8 +625,6 @@ typedef struct MpegEncContext {
 
     /* MJPEG specific */
     struct MJpegContext *mjpeg_ctx;
-    int mjpeg_vsample[3];       ///< vertical sampling factors, default = {2, 1, 1}
-    int mjpeg_hsample[3];       ///< horizontal sampling factors, default = {2, 1, 1}
     int esc_pos;
 
     /* MSMPEG4 specific */
@@ -656,7 +651,6 @@ typedef struct MpegEncContext {
     /* Mpeg1 specific */
     int gop_picture_number;  ///< index of the first picture of a GOP based on fake_pic_num & mpeg1 specific
     int last_mv_dir;         ///< last mv_dir, used for b frame encoding
-    int broken_link;         ///< no_output_of_prior_pics_flag
     uint8_t *vbv_delay_ptr;  ///< pointer to vbv_delay in the bitstream
 
     /* MPEG-2-specific - I wished not to have to support this mess. */
@@ -687,7 +681,6 @@ typedef struct MpegEncContext {
     int progressive_frame;
     int full_pel[2];
     int interlaced_dct;
-    int first_slice;
     int first_field;         ///< is 1 for the first field of a field picture 0 otherwise
     int drop_frame_timecode; ///< timecode is in drop frame format.
     int scan_offset;         ///< reserve space for SVCD scan offset user data.
@@ -798,7 +791,6 @@ void ff_MPV_common_defaults(MpegEncContext *s);
 
 void ff_MPV_decode_defaults(MpegEncContext *s);
 int ff_MPV_common_init(MpegEncContext *s);
-int ff_mpv_frame_size_alloc(MpegEncContext *s, int linesize);
 int ff_MPV_common_frame_size_change(MpegEncContext *s);
 void ff_MPV_common_end(MpegEncContext *s);
 void ff_MPV_decode_mb(MpegEncContext *s, int16_t block[12][64]);
@@ -830,7 +822,6 @@ void ff_print_debug_info2(AVCodecContext *avctx, Picture *p, AVFrame *pict, uint
 int ff_mpv_export_qp_table(MpegEncContext *s, AVFrame *f, Picture *p, int qp_type);
 
 void ff_write_quant_matrix(PutBitContext *pb, uint16_t *matrix);
-void ff_release_unused_pictures(MpegEncContext *s, int remove_current);
 int ff_find_unused_picture(MpegEncContext *s, int shared);
 void ff_denoise_dct(MpegEncContext *s, int16_t *block);
 int ff_update_duplicate_context(MpegEncContext *dst, MpegEncContext *src);
@@ -962,6 +953,7 @@ void ff_wmv2_encode_mb(MpegEncContext * s,
 
 int ff_mpeg_ref_picture(MpegEncContext *s, Picture *dst, Picture *src);
 void ff_mpeg_unref_picture(MpegEncContext *s, Picture *picture);
+void ff_free_picture_tables(Picture *pic);
 
 
 #endif /* AVCODEC_MPEGVIDEO_H */

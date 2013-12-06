@@ -5984,15 +5984,6 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
         }
     }
 
-    /* We need to set current_picture_ptr before reading the header,
-     * otherwise we cannot store anything in there. */
-    if (s->current_picture_ptr == NULL || s->current_picture_ptr->f.data[0]) {
-        int i = ff_find_unused_picture(s, 0);
-        if (i < 0)
-            goto err;
-        s->current_picture_ptr = &s->picture[i];
-    }
-
     // do parse frame header
     v->pic_header_flag = 0;
     v->first_pic_header_flag = 1;
@@ -6019,18 +6010,6 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
     if ((s->mb_height >> v->field_mode) == 0) {
         av_log(v->s.avctx, AV_LOG_ERROR, "image too short\n");
         goto err;
-    }
-
-    // process pulldown flags
-    s->current_picture_ptr->f.repeat_pict = 0;
-    // Pulldown flags are only valid when 'broadcast' has been set.
-    // So ticks_per_frame will be 2
-    if (v->rff) {
-        // repeat field
-        s->current_picture_ptr->f.repeat_pict = 1;
-    } else if (v->rptfrm) {
-        // repeat frames
-        s->current_picture_ptr->f.repeat_pict = v->rptfrm * 2;
     }
 
     // for skipping the frame
@@ -6060,6 +6039,18 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
 
     v->s.current_picture_ptr->f.interlaced_frame = (v->fcm != PROGRESSIVE);
     v->s.current_picture_ptr->f.top_field_first  = v->tff;
+
+    // process pulldown flags
+    s->current_picture_ptr->f.repeat_pict = 0;
+    // Pulldown flags are only valid when 'broadcast' has been set.
+    // So ticks_per_frame will be 2
+    if (v->rff) {
+        // repeat field
+        s->current_picture_ptr->f.repeat_pict = 1;
+    } else if (v->rptfrm) {
+        // repeat frames
+        s->current_picture_ptr->f.repeat_pict = v->rptfrm * 2;
+    }
 
     s->me.qpel_put = s->dsp.put_qpel_pixels_tab;
     s->me.qpel_avg = s->dsp.avg_qpel_pixels_tab;

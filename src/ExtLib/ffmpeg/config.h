@@ -309,6 +309,7 @@
 #define HAVE_GETTIMEOFDAY 1
 #define HAVE_GLOB 0
 #define HAVE_GNU_AS 1
+#define HAVE_GNU_WINDRES 0
 #define HAVE_IBM_ASM 0
 #define HAVE_INET_ATON 0
 #define HAVE_INLINE_ASM_LABELS 1
@@ -406,6 +407,7 @@
 #define HAVE_WINSOCK2_H 0
 #define HAVE_XFORM_ASM 0
 #define HAVE_XLIB 0
+#define CONFIG_DOC 0
 #define CONFIG_ICONV 0
 #define HAVE_YASM 1
 
