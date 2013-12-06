@@ -62,7 +62,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_FILTER_SETTINGS_CAPTION     "Settings"
-    IDS_MPEGSPLITTER_FSTREAM_CHANGE "Fast stream change"
     IDS_MPEGSPLITTER_LANG_ORDER     "Audio language order:"
     IDS_MPEGSPLITTER_SUB_ORDER      "Subtitles language order:"
     IDS_MPEGSPLITTER_SUB_FORCING    "Forced load all subtitles"
