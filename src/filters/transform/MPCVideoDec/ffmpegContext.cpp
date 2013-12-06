@@ -1043,6 +1043,7 @@ void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int&
 		}
 		break;
 	case AV_CODEC_ID_MJPEG:
+	case AV_CODEC_ID_DNXHD:
 		if (pAVCtx->pix_fmt == AV_PIX_FMT_NONE) {
 			av_log(pAVCtx, AV_LOG_INFO, "WARNING! : pAVCtx->pix_fmt == AV_PIX_FMT_NONE\n");
 			pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P; // bad hack
