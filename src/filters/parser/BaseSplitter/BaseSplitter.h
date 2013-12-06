@@ -269,7 +269,7 @@ protected:
 	CBaseSplitterOutputPin* GetOutputPin(DWORD TrackNum);
 	DWORD GetOutputTrackNum(CBaseSplitterOutputPin* pPin);
 	HRESULT AddOutputPin(DWORD TrackNum, CAutoPtr<CBaseSplitterOutputPin> pPin);
-	HRESULT RenameOutputPin(DWORD TrackNumSrc, DWORD TrackNumDst, const AM_MEDIA_TYPE* pmt);
+	HRESULT RenameOutputPin(DWORD TrackNumSrc, DWORD TrackNumDst, const AM_MEDIA_TYPE* pmt, BOOL bNeedReconnect = FALSE);
 	virtual HRESULT DeleteOutputs();
 	virtual HRESULT CreateOutputs(IAsyncReader* pAsyncReader) = 0; // override this ...
 	virtual LPCTSTR GetPartFilename(IAsyncReader* pAsyncReader);

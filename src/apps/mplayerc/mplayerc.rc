@@ -3245,7 +3245,6 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_MPEGSPLITTER_FSTREAM_CHANGE "Fast stream change"
     IDS_MPEGSPLITTER_LANG_ORDER     "Audio language order:"
     IDS_MPEGSPLITTER_SUB_ORDER      "Subtitles language order:"
     IDS_MPEGSPLITTER_SUB_FORCING    "Force loading of all subtitles"

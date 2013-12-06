@@ -883,15 +883,21 @@ DWORD CBaseSplitterFilter::GetOutputTrackNum(CBaseSplitterOutputPin* pPin)
 	return (DWORD)-1;
 }
 
-HRESULT CBaseSplitterFilter::RenameOutputPin(DWORD TrackNumSrc, DWORD TrackNumDst, const AM_MEDIA_TYPE* pmt)
+HRESULT CBaseSplitterFilter::RenameOutputPin(DWORD TrackNumSrc, DWORD TrackNumDst, const AM_MEDIA_TYPE* pmt, BOOL bNeedReconnect /*= FALSE*/)
 {
 	CAutoLock cAutoLock(&m_csPinMap);
 
 	CBaseSplitterOutputPin* pPin;
 	if (m_pPinMap.Lookup(TrackNumSrc, pPin)) {
-		if (CComQIPtr<IPin> pPinTo = pPin->GetConnected()) {
-			if (pmt && S_OK != pPinTo->QueryAccept(pmt)) {
-				return VFW_E_TYPE_NOT_ACCEPTED;
+		if (pmt) {
+			if (CComQIPtr<IPin> pPinTo = pPin->GetConnected()) {
+				if (S_OK != pPinTo->QueryAccept(pmt)) {
+					return VFW_E_TYPE_NOT_ACCEPTED;
+				}
+
+				if (bNeedReconnect) {
+					ReconnectPin(pPinTo, pmt);
+				}
 			}
 		}
 

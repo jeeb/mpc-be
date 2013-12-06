@@ -36,7 +36,6 @@
 // option names
 #define OPT_REGKEY_MPEGSplit  _T("Software\\MPC-BE Filters\\MPEG Splitter")
 #define OPT_SECTION_MPEGSplit _T("Filters\\MPEG Splitter")
-#define OPT_FastStreamChange  _T("UseFastStreamChange")
 #define OPT_FastSeek          _T("UseFastSeek")
 #define OPT_ForcedSub         _T("ForcedSub")
 #define OPT_AudioLangOrder    _T("AudioLanguageOrder")
@@ -542,7 +541,6 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	, m_rtPlaylistDuration(0)
 	, m_rtMin(0)
 	, m_rtMax(0)
-	, m_useFastStreamChange(true)
 	, m_useFastSeek(false)
 	, m_ForcedSub(false)
 	, m_AC3CoreOnly(0)
@@ -556,10 +554,6 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 
 	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, OPT_REGKEY_MPEGSplit, KEY_READ)) {
 		DWORD dw;
-
-		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_FastStreamChange, dw)) {
-			m_useFastStreamChange = !!dw;
-		}
 
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_FastSeek, dw)) {
 			m_useFastSeek = !!dw;
@@ -594,7 +588,6 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 		}
 	}
 #else
-	m_useFastStreamChange		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGSplit, OPT_FastStreamChange, m_useFastStreamChange);
 	m_useFastSeek				= !!AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGSplit, OPT_FastSeek, m_useFastSeek);
 	m_ForcedSub					= !!AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGSplit, OPT_ForcedSub, m_ForcedSub);
 
@@ -1440,47 +1433,28 @@ STDMETHODIMP CMpegSplitterFilter::Enable(long lIndex, DWORD dwFlags)
 					continue;
 				}
 
-				if (m_useFastStreamChange) {
-					PauseGraph;
-					ResumeGraph;
+				CComQIPtr<IMediaControl> pMC(m_pGraph);
+				OAFilterState fs = -1;
+				if(pMC) {
+					pMC->GetState(100, &fs);
+					pMC->Stop();
 				}
+				Lock();
 
-				HRESULT hr;
-				if (FAILED(hr = RenameOutputPin(from, to, &to.mt))) {
-					return hr;
-				}
+				HRESULT hr = RenameOutputPin(from, to, &to.mt, i == CMpegSplitterFile::subpic);
 
-#if 0
-				// Don't rename other pin for Hdmv!
-				int iProgram;
-				const CHdmvClipInfo::Stream *pClipInfo;
-				const CMpegSplitterFile::program* p = m_pFile->FindProgram(to.pid, iProgram, pClipInfo);
-
-				if (p!=NULL && !m_ClipInfo.IsHdmv() && !m_pFile->IsHdmv()) {
-					for (int k = 0; k < _countof(m_pFile->m_streams); k++) {
-						if (k == i) {
-							continue;
-						}
-
-						pos = m_pFile->m_streams[k].GetHeadPosition();
-						while (pos) {
-							CMpegSplitterFile::stream& from = m_pFile->m_streams[k].GetNext(pos);
-							if (!GetOutputPin(from)) {
-								continue;
-							}
-
-							for (int l = 0; l < _countof(p->streams); l++) {
-								if (const CMpegSplitterFile::stream* s = m_pFile->m_streams[k].FindStream(p->streams[l].pid)) {
-									if (from != *s) {
-										hr = RenameOutputPin(from, *s, &s->mt);
-									}
-									break;
-								}
-							}
-						}
+				Unlock();
+				if (pMC) {
+					if(fs == State_Running) {
+						pMC->Run();
+					} else if (fs == State_Paused) {
+						pMC->Pause();
 					}
 				}
-#endif
+
+				if (FAILED(hr)) {
+					return hr;
+				}
 
 				return S_OK;
 			}
@@ -1683,7 +1657,6 @@ STDMETHODIMP CMpegSplitterFilter::Apply()
 #ifdef REGISTER_FILTER
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_MPEGSplit)) {
-		key.SetDWORDValue(OPT_FastStreamChange, m_useFastStreamChange);
 		key.SetDWORDValue(OPT_FastSeek, m_useFastSeek);
 		key.SetDWORDValue(OPT_ForcedSub, m_ForcedSub);
 		key.SetStringValue(OPT_AudioLangOrder, m_csAudioLanguageOrder);
@@ -1693,7 +1666,6 @@ STDMETHODIMP CMpegSplitterFilter::Apply()
 		key.SetDWORDValue(OPT_SubEmptyOutput, m_SubEmptyPin);
 	}
 #else
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGSplit, OPT_FastStreamChange, m_useFastStreamChange);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGSplit, OPT_FastSeek, m_useFastSeek);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGSplit, OPT_ForcedSub, m_ForcedSub);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGSplit, OPT_AC3CoreOnly, m_AC3CoreOnly);
@@ -1702,19 +1674,6 @@ STDMETHODIMP CMpegSplitterFilter::Apply()
 #endif
 
 	return S_OK;
-}
-
-STDMETHODIMP CMpegSplitterFilter::SetFastStreamChange(BOOL nValue)
-{
-	CAutoLock cAutoLock(&m_csProps);
-	m_useFastStreamChange = !!nValue;
-	return S_OK;
-}
-
-STDMETHODIMP_(BOOL) CMpegSplitterFilter::GetFastStreamChange()
-{
-	CAutoLock cAutoLock(&m_csProps);
-	return m_useFastStreamChange;
 }
 
 STDMETHODIMP CMpegSplitterFilter::SetFastSeek(BOOL nValue)

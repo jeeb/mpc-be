@@ -1809,7 +1809,7 @@ void SetAudioRenderer(int AudioDevNo)
 
 void SetHandCursor(HWND m_hWnd, UINT nID)
 {
-	SetClassLongPtr(GetDlgItem(m_hWnd, nID), GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
+	SetClassLongPtr(GetDlgItem(m_hWnd, nID), GCLP_HCURSOR, (long)AfxGetApp()->LoadStandardCursor(IDC_HAND));
 }
 
 typedef CAtlRegExp<CAtlRECharTraits> CAtlRegExpT;

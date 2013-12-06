@@ -30,7 +30,6 @@ class __declspec(uuid("44FCB62D-3AEB-401C-A7E1-8A984C017923"))
 private :
 	CComQIPtr<IMpegSplitterFilter> m_pMSF;
 
-	CButton		m_cbFastStreamChange;
 	CButton		m_cbForcedSub;
 	CButton		m_cbAlternativeDuration;
 	CStatic		m_txtAudioLanguageOrder;
@@ -47,8 +46,7 @@ private :
 	CButton		m_cbSubEmptyPin;
 
 	enum {
-		IDC_PP_FAST_STREAM_SELECT = 10000,
-		IDC_PP_SUBTITLE_FORCED,
+		IDC_PP_SUBTITLE_FORCED = 10000,
 		IDC_PP_AUDIO_LANGUAGE_ORDER,
 		IDC_PP_SUBTITLES_LANGUAGE_ORDER,
 		IDC_PP_TRUEHD,

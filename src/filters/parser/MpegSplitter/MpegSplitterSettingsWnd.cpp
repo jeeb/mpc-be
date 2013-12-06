@@ -58,9 +58,6 @@ bool CMpegSplitterSettingsWnd::OnActivate()
 	DWORD dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP;
 	CPoint p(10, 10);
 
-	m_cbFastStreamChange.Create(ResStr(IDS_MPEGSPLITTER_FSTREAM_CHANGE), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(305), m_fontheight)), this, IDC_PP_FAST_STREAM_SELECT);
-	p.y += h20;
-
 	m_cbFastSeek.Create(ResStr(IDS_MPEGSPLITTER_FAST_SEEK), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(305), m_fontheight)), this, IDC_PP_FAST_SEEK);
 	p.y += h20;
 
@@ -91,7 +88,6 @@ bool CMpegSplitterSettingsWnd::OnActivate()
 	m_cbAsIs.Create(ResStr(IDS_MPEGSPLITTER_THD_NOSPLIT), dwStyle | BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE, CRect(p + CPoint(IPP_SCALE(200), 0), CSize(IPP_SCALE(80), m_fontheight + 2)), this, IDC_PP_ASIS);
 
 	if (m_pMSF) {
-		m_cbFastStreamChange.SetCheck(m_pMSF->GetFastStreamChange());
 		m_cbFastSeek.SetCheck(m_pMSF->GetFastSeek());
 		m_cbForcedSub.SetCheck(m_pMSF->GetForcedSub());
 		m_edtAudioLanguageOrder.SetWindowText(m_pMSF->GetAudioLanguageOrder());
@@ -113,8 +109,8 @@ bool CMpegSplitterSettingsWnd::OnActivate()
 		pWnd->SetFont(&m_font, FALSE);
 	}
 
-	SetClassLongPtr(m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_ARROW));
-	SetClassLongPtr(GetDlgItem(IDC_PP_FAST_STREAM_SELECT)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
+	SetClassLongPtr(m_hWnd, GCLP_HCURSOR, (long)AfxGetApp()->LoadStandardCursor(IDC_ARROW));
+	SetClassLongPtr(GetDlgItem(IDC_PP_SUBTITLE_FORCED)->m_hWnd, GCLP_HCURSOR, (long)AfxGetApp()->LoadStandardCursor(IDC_HAND));
 
 	SetDirty(false);
 
@@ -130,7 +126,6 @@ bool CMpegSplitterSettingsWnd::OnApply()
 	OnDeactivate();
 
 	if (m_pMSF) {
-		m_pMSF->SetFastStreamChange(m_cbFastStreamChange.GetCheck());
 		m_pMSF->SetFastSeek(m_cbFastSeek.GetCheck());
 		m_pMSF->SetForcedSub(m_cbForcedSub.GetCheck());
 		m_pMSF->SetTrueHD(m_cbTrueHD.GetCheck() ? 0 : m_cbAC3Core.GetCheck() ? 1 : 2);
@@ -138,7 +133,7 @@ bool CMpegSplitterSettingsWnd::OnApply()
 		m_pMSF->SetSubEmptyPin(m_cbSubEmptyPin.GetCheck());
 
 #ifdef REGISTER_FILTER
-		CString str = _T("");
+		CString str;
 		m_edtAudioLanguageOrder.GetWindowText(str);
 		m_pMSF->SetAudioLanguageOrder(str.GetBuffer());
 		m_edtSubtitlesLanguageOrder.GetWindowText(str);

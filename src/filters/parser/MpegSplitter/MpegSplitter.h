@@ -30,25 +30,6 @@
 #define MpegSplitterName L"MPC MPEG Splitter"
 #define MpegSourceName   L"MPC MPEG Source"
 
-#define PauseGraph \
-	CComQIPtr<IMediaControl> _pMC(m_pGraph); \
-	OAFilterState _fs = -1; \
-	if(_pMC) _pMC->GetState(1000, &_fs); \
-	if(_fs == State_Running) \
-		_pMC->Pause(); \
-	\
-	HRESULT _hr = E_FAIL; \
-	CComQIPtr<IMediaSeeking> _pMS((IUnknown*)(INonDelegatingUnknown*)m_pGraph); \
-	LONGLONG _rtNow = 0; \
-	if(_pMS) _hr = _pMS->GetCurrentPosition(&_rtNow); \
- 
-#define ResumeGraph \
-	if(SUCCEEDED(_hr) && _pMS && _fs != State_Stopped) \
-		_hr = _pMS->SetPositions(&_rtNow, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning); \
-	\
-	if(_fs == State_Running && _pMS) \
-		_pMC->Run(); \
- 
 class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 	CMpegSplitterFilter
 	: public CBaseSplitterFilter
@@ -80,7 +61,7 @@ protected:
 
 private:
 	CString m_csAudioLanguageOrder, m_csSubtitlesLanguageOrder;
-	bool m_useFastStreamChange, m_useFastSeek, m_ForcedSub, m_AlternativeDuration, m_SubEmptyPin;
+	bool m_useFastSeek, m_ForcedSub, m_AlternativeDuration, m_SubEmptyPin;
 	int m_AC3CoreOnly;
 	CCritSec m_csProps;
 
@@ -114,9 +95,6 @@ public:
 
 	// IMpegSplitterFilter
 	STDMETHODIMP Apply();
-
-	STDMETHODIMP SetFastStreamChange(BOOL nValue);
-	STDMETHODIMP_(BOOL) GetFastStreamChange();
 
 	STDMETHODIMP SetFastSeek(BOOL nValue);
 	STDMETHODIMP_(BOOL) GetFastSeek();
