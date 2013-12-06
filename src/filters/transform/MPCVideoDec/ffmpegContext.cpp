@@ -1036,7 +1036,7 @@ void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int&
 				pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10LE;
 				break;
 			case 'h4pa': // Apple ProRes 4444
-				pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P10LE;
+				pAVCtx->pix_fmt = pAVCtx->bits_per_coded_sample == 32 ? AV_PIX_FMT_YUVA444P10LE : AV_PIX_FMT_YUV444P10LE;
 				break;
 			}
 		}
