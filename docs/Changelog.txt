@@ -21,7 +21,7 @@ Changes (*):
 	* Updated Korean translation (author: kuh3h3);
 	* ffmpeg 2.1 git-f068aed7;
 	* libwebp 0.3.1 git-bab30fca;
-	* libvpx 1.2 git-2d50c849;
+	* libvpx 1.2 git-d77b9d1c;
 	* libopus 1.1 git-93e10960;
 	* libpng 1.7.0 b24 git-5a1b8d10;
 	* MediaInfo 0.7.65+ svn rev.5993;
