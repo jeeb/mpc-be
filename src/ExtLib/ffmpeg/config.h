@@ -497,6 +497,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_CSCD_DECODER 1
 #define CONFIG_CYUV_DECODER 0
 #define CONFIG_DIRAC_DECODER 1
+#define CONFIG_DNXHD_DECODER 1
 #define CONFIG_DVVIDEO_DECODER 1
 #define CONFIG_EIGHTBPS_DECODER 0
 #define CONFIG_FFV1_DECODER 0
@@ -734,6 +735,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_AAC_LATM_PARSER 1
 #define CONFIG_AC3_PARSER 1
 #define CONFIG_DCA_PARSER 1
+#define CONFIG_DNXHD_PARSER 1
 #define CONFIG_H263_PARSER 0
 #define CONFIG_H264_PARSER 1
 #define CONFIG_HEVC_PARSER 1

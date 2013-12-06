@@ -136,6 +136,7 @@ CAppSettings::CAppSettings()
 	FFMFiltersKeys[FFM_MPEG2]		= _T("FFM_MPEG2");
 	FFMFiltersKeys[FFM_MPEG1]		= _T("FFM_MPEG1");
 	FFMFiltersKeys[FFM_HEVC]		= _T("FFM_HEVC");
+	FFMFiltersKeys[FFM_DNXHD]		= _T("FFM_DNXHD");
 }
 
 void CAppSettings::CreateCommands()

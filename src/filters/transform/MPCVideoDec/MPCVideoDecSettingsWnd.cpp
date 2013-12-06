@@ -427,6 +427,7 @@ MPCFILTER_VIDEO_CODECS mpc_codecs[] = {
 	{CODEC_WMV3_DXVA,	_T("WMV3 (DXVA)")},
 	{CODEC_AMVV,		_T("AMV video")},
 	{CODEC_PRORES,		_T("Apple ProRes")},
+	{CODEC_DNXHD,		_T("Avid DNxHD")},
 	{CODEC_BINKV,		_T("Bink video")},
 	{CODEC_CLLC,		_T("Canopus Lossless")},
 	{CODEC_DIRAC,		_T("Dirac")},

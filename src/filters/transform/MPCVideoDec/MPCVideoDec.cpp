@@ -103,6 +103,7 @@ vcodecs[] = {
 	{_T("utvd"),		CODEC_UTVD		},
 	{_T("png"),			CODEC_PNG		},
 	{_T("v210"),		CODEC_V210		},
+	{_T("dnxhd"),		CODEC_DNXHD		},
 	// dxva codecs
 	{_T("h264_dxva"),	CODEC_H264_DXVA	},
 	{_T("mpeg2_dxva"),	CODEC_MPEG2_DXVA},
@@ -412,6 +413,9 @@ FFMPEG_CODECS		ffCodecs[] = {
 	{ &MEDIASUBTYPE_HM10, AV_CODEC_ID_HEVC, NULL, FFM_HEVC, -1 },
 //	{ &MEDIASUBTYPE_HM12, AV_CODEC_ID_HEVC, NULL, FFM_HEVC, -1 },
 
+	// Avid DNxHD
+	{ &MEDIASUBTYPE_AVdn, AV_CODEC_ID_DNXHD, NULL, FFM_DNXHD, -1 },
+
 	// Other MPEG-4
 	{ &MEDIASUBTYPE_MP4V, AV_CODEC_ID_MPEG4, NULL, FFM_XVID, -1 },
 	{ &MEDIASUBTYPE_mp4v, AV_CODEC_ID_MPEG4, NULL, FFM_XVID, -1 },
@@ -709,6 +713,9 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 //	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HM91 },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HM10 },
 //	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HM12 },
+
+	// Avid DNxHD
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_AVdn },
 
 	// Other MPEG-4
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_MP4V },
@@ -1265,6 +1272,9 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, bool bForced)
 				case AV_CODEC_ID_HEVC :
 					bCodecActivated = (m_nActiveCodecs & CODEC_HEVC) != 0;
 					break;
+				case AV_CODEC_ID_DNXHD :
+					bCodecActivated = (m_nActiveCodecs & CODEC_DNXHD) != 0;
+					break;
 			}
 
 			if (!bCodecActivated && !bForced) {
@@ -1623,7 +1633,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 			|| m_nCodecId == AV_CODEC_ID_MPEG1VIDEO
 			|| m_nCodecId == AV_CODEC_ID_DIRAC
 			|| m_nCodecId == AV_CODEC_ID_UTVIDEO
-			|| m_nCodecId == AV_CODEC_ID_HEVC) {
+			|| m_nCodecId == AV_CODEC_ID_HEVC
+			|| m_nCodecId == AV_CODEC_ID_DNXHD) {
 		m_bReorderBFrame = false;
 	}
 

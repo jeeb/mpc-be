@@ -142,6 +142,9 @@ SRCS_C = \
 	libavcodec/dirac_dwt.c \
 	libavcodec/diracdec.c \
 	libavcodec/diracdsp.c \
+	libavcodec/dnxhd_parser.c \
+	libavcodec/dnxhddata.c \
+	libavcodec/dnxhddec.c \
 	libavcodec/dsputil.c \
 	libavcodec/dv.c \
 	libavcodec/dv_profile.c \
