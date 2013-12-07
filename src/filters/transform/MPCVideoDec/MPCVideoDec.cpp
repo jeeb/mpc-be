@@ -102,7 +102,7 @@ vcodecs[] = {
 	{_T("flash"),		CODEC_FLASH		},
 	{_T("utvd"),		CODEC_UTVD		},
 	{_T("png"),			CODEC_PNG		},
-	{_T("v210"),		CODEC_V210		},
+	{_T("uncompressed"),CODEC_UNCOMPRESSED},
 	{_T("dnxhd"),		CODEC_DNXHD		},
 	// dxva codecs
 	{_T("h264_dxva"),	CODEC_H264_DXVA	},
@@ -339,8 +339,9 @@ FFMPEG_CODECS		ffCodecs[] = {
 	{ &MEDIASUBTYPE_IV41, AV_CODEC_ID_INDEO4, NULL, FFM_INDEO, -1 },
 	{ &MEDIASUBTYPE_IV50, AV_CODEC_ID_INDEO5, NULL, FFM_INDEO, -1 },
 
-	// v210 (QT video)
-	{ &MEDIASUBTYPE_v210, AV_CODEC_ID_V210, NULL, FFM_V210, -1 },
+	// // QT uncompressed video
+	{ &MEDIASUBTYPE_v210, AV_CODEC_ID_V210, NULL, FFM_UNCOMPRESSED, -1 },
+	{ &MEDIASUBTYPE_V410, AV_CODEC_ID_V410, NULL, FFM_UNCOMPRESSED, -1 },
 
 	// H264/AVC
 	{ &MEDIASUBTYPE_H264,	  AV_CODEC_ID_H264, &DXVA_H264, FFM_H264, TRA_DXVA_H264 },
@@ -642,8 +643,9 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_IV41 },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_IV50 },
 
-	// v210 (QT video)
+	// QT uncompressed video
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_v210 },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_V410 },
 
 	// H264/AVC
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_H264     },
@@ -1267,7 +1269,8 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, bool bForced)
 					bCodecActivated = (m_nActiveCodecs & CODEC_CLLC) != 0;
 					break;
 				case AV_CODEC_ID_V210 :
-					bCodecActivated = (m_nActiveCodecs & CODEC_V210) != 0;
+				case AV_CODEC_ID_V410 :
+					bCodecActivated = (m_nActiveCodecs & CODEC_UNCOMPRESSED) != 0;
 					break;
 				case AV_CODEC_ID_HEVC :
 					bCodecActivated = (m_nActiveCodecs & CODEC_HEVC) != 0;
@@ -1551,7 +1554,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
 
-	// Prevent connection to the video decoder - need to support decoding of uncompressed(v210) video
+	// Prevent connection to the video decoder - need to support decoding of uncompressed(v210, V410) video
 	if (CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected()) ) {
 		if (IsVideoDecoder(pFilter, true)) {
 			return VFW_E_TYPE_NOT_ACCEPTED;

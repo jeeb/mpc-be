@@ -110,6 +110,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (WMV3IMAGE, wmv3image);
     REGISTER_DECODER (UTVIDEO, utvideo);
     REGISTER_DECODER (V210, v210);
+    REGISTER_DECODER (V410, v410);
 
     /* audio codecs */
     REGISTER_DECODER (AAC, aac);

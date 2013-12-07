@@ -2116,6 +2116,9 @@
     <ClCompile Include="libavcodec\v210dec.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
+    <ClCompile Include="libavcodec\v410dec.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
     <ClCompile Include="libavcodec\vc1.c">
       <Filter>libavcodec</Filter>
     </ClCompile>

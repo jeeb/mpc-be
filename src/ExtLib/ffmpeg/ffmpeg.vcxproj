@@ -672,6 +672,7 @@
     <ClCompile Include="libavcodec\utvideo.c" />
     <ClCompile Include="libavcodec\utvideodec.c" />
     <ClCompile Include="libavcodec\v210dec.c" />
+    <ClCompile Include="libavcodec\v410dec.c" />
     <ClCompile Include="libavcodec\vc1.c" />
     <ClCompile Include="libavcodec\vc1data.c" />
     <ClCompile Include="libavcodec\vc1dec.c" />

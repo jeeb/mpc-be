@@ -334,6 +334,7 @@ SRCS_C = \
 	libavcodec/utvideodec.c \
 	libavcodec/utils.c \
 	libavcodec/v210dec.c \
+	libavcodec/v410dec.c \
 	libavcodec/vc1.c \
 	libavcodec/vc1data.c \
 	libavcodec/vc1dec.c \
