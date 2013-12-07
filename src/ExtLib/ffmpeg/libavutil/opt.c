@@ -252,6 +252,49 @@ static int set_string_number(void *obj, void *target_obj, const AVOption *o, con
     return 0;
 }
 
+static int set_string_image_size(void *obj, const AVOption *o, const char *val, int *dst)
+{
+    int ret;
+
+    if (!val || !strcmp(val, "none")) {
+        dst[0] =
+        dst[1] = 0;
+        return 0;
+    }
+    ret = av_parse_video_size(dst, dst + 1, val);
+    if (ret < 0)
+        av_log(obj, AV_LOG_ERROR, "Unable to parse option value \"%s\" as image size\n", val);
+    return ret;
+}
+
+static int set_string_video_rate(void *obj, const AVOption *o, const char *val, AVRational *dst)
+{
+    int ret;
+    if (!val) {
+        ret = AVERROR(EINVAL);
+    } else {
+        ret = av_parse_video_rate(dst, val);
+    }
+    if (ret < 0)
+        av_log(obj, AV_LOG_ERROR, "Unable to parse option value \"%s\" as video rate\n", val);
+    return ret;
+}
+
+static int set_string_color(void *obj, const AVOption *o, const char *val, uint8_t *dst)
+{
+    int ret;
+
+    if (!val) {
+        return 0;
+    } else {
+        ret = av_parse_color(dst, val, -1, obj);
+        if (ret < 0)
+            av_log(obj, AV_LOG_ERROR, "Unable to parse option value \"%s\" as color\n", val);
+        return ret;
+    }
+    return 0;
+}
+
 #if FF_API_OLD_AVOPTIONS
 int av_set_string3(void *obj, const char *name, const char *val, int alloc, const AVOption **o_out)
 {
@@ -286,24 +329,8 @@ int av_opt_set(void *obj, const char *name, const char *val, int search_flags)
     case AV_OPT_TYPE_FLOAT:
     case AV_OPT_TYPE_DOUBLE:
     case AV_OPT_TYPE_RATIONAL: return set_string_number(obj, target_obj, o, val, dst);
-    case AV_OPT_TYPE_IMAGE_SIZE:
-        if (!val || !strcmp(val, "none")) {
-            *(int *)dst = *((int *)dst + 1) = 0;
-            return 0;
-        }
-        ret = av_parse_video_size(dst, ((int *)dst) + 1, val);
-        if (ret < 0)
-            av_log(obj, AV_LOG_ERROR, "Unable to parse option value \"%s\" as image size\n", val);
-        return ret;
-    case AV_OPT_TYPE_VIDEO_RATE:
-        if (!val) {
-            ret = AVERROR(EINVAL);
-        } else {
-            ret = av_parse_video_rate(dst, val);
-        }
-        if (ret < 0)
-            av_log(obj, AV_LOG_ERROR, "Unable to parse option value \"%s\" as video rate\n", val);
-        return ret;
+    case AV_OPT_TYPE_IMAGE_SIZE: return set_string_image_size(obj, o, val, dst);
+    case AV_OPT_TYPE_VIDEO_RATE: return set_string_video_rate(obj, o, val, dst);
     case AV_OPT_TYPE_PIXEL_FMT:
         if (!val || !strcmp(val, "none")) {
             ret = AV_PIX_FMT_NONE;
@@ -346,16 +373,7 @@ int av_opt_set(void *obj, const char *name, const char *val, int search_flags)
             return ret;
         }
         break;
-    case AV_OPT_TYPE_COLOR:
-        if (!val) {
-            return 0;
-        } else {
-            ret = av_parse_color(dst, val, -1, obj);
-            if (ret < 0)
-                av_log(obj, AV_LOG_ERROR, "Unable to parse option value \"%s\" as color\n", val);
-            return ret;
-        }
-        break;
+    case AV_OPT_TYPE_COLOR:      return set_string_color(obj, o, val, dst);
     case AV_OPT_TYPE_CHANNEL_LAYOUT:
         if (!val || !strcmp(val, "none")) {
             *(int64_t *)dst = 0;
@@ -1083,6 +1101,7 @@ void av_opt_set_defaults2(void *s, int mask, int flags)
     const AVClass *class = *(AVClass **)s;
     const AVOption *opt = NULL;
     while ((opt = av_opt_next(s, opt)) != NULL) {
+        void *dst = ((uint8_t*)s) + opt->offset;
 #if FF_API_OLD_AVOPTIONS
         if ((opt->flags & mask) != flags)
             continue;
@@ -1096,26 +1115,32 @@ void av_opt_set_defaults2(void *s, int mask, int flags)
             case AV_OPT_TYPE_INT64:
             case AV_OPT_TYPE_DURATION:
             case AV_OPT_TYPE_CHANNEL_LAYOUT:
-                av_opt_set_int(s, opt->name, opt->default_val.i64, 0);
+                write_number(s, opt, dst, 1, 1, opt->default_val.i64);
             break;
             case AV_OPT_TYPE_DOUBLE:
             case AV_OPT_TYPE_FLOAT: {
                 double val;
                 val = opt->default_val.dbl;
-                av_opt_set_double(s, opt->name, val, 0);
+                write_number(s, opt, dst, val, 1, 1);
             }
             break;
             case AV_OPT_TYPE_RATIONAL: {
                 AVRational val;
                 val = av_d2q(opt->default_val.dbl, INT_MAX);
-                av_opt_set_q(s, opt->name, val, 0);
+                write_number(s, opt, dst, 1, val.den, val.num);
             }
             break;
             case AV_OPT_TYPE_COLOR:
+                set_string_color(s, opt, opt->default_val.str, dst);
+                break;
             case AV_OPT_TYPE_STRING:
+                set_string(s, opt, opt->default_val.str, dst);
+                break;
             case AV_OPT_TYPE_IMAGE_SIZE:
+                set_string_image_size(s, opt, opt->default_val.str, dst);
+                break;
             case AV_OPT_TYPE_VIDEO_RATE:
-                av_opt_set(s, opt->name, opt->default_val.str, 0);
+                set_string_video_rate(s, opt, opt->default_val.str, dst);
                 break;
             case AV_OPT_TYPE_PIXEL_FMT:
 #if LIBAVUTIL_VERSION_MAJOR < 53
@@ -1123,7 +1148,7 @@ void av_opt_set_defaults2(void *s, int mask, int flags)
                     av_opt_set(s, opt->name, opt->default_val.str, 0);
                 else
 #endif
-                    av_opt_set_pixel_fmt(s, opt->name, opt->default_val.i64, 0);
+                    write_number(s, opt, dst, 1, 1, opt->default_val.i64);
                 break;
             case AV_OPT_TYPE_SAMPLE_FMT:
 #if LIBAVUTIL_VERSION_MAJOR < 53
@@ -1131,7 +1156,7 @@ void av_opt_set_defaults2(void *s, int mask, int flags)
                     av_opt_set(s, opt->name, opt->default_val.str, 0);
                 else
 #endif
-                    av_opt_set_sample_fmt(s, opt->name, opt->default_val.i64, 0);
+                    write_number(s, opt, dst, 1, 1, opt->default_val.i64);
                 break;
             case AV_OPT_TYPE_BINARY:
                 /* Cannot set default for binary */
