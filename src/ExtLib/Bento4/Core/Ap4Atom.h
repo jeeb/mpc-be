@@ -326,6 +326,7 @@ const AP4_Atom::Type AP4_ATOM_TYPE_YV12 = AP4_ATOM_TYPE('y','v','1','2');
 const AP4_Atom::Type AP4_ATOM_TYPE_2VUY = AP4_ATOM_TYPE('2','v','u','y');
 const AP4_Atom::Type AP4_ATOM_TYPE_v210 = AP4_ATOM_TYPE('v','2','1','0');
 const AP4_Atom::Type AP4_ATOM_TYPE_V210 = AP4_ATOM_TYPE('V','2','1','0'); // typo? need a sample
+const AP4_Atom::Type AP4_ATOM_TYPE_v410 = AP4_ATOM_TYPE('v','4','1','0');
 //
 const AP4_Atom::Type AP4_ATOM_TYPE_CVID = AP4_ATOM_TYPE('c','v','i','d');
 const AP4_Atom::Type AP4_ATOM_TYPE_SVQ1 = AP4_ATOM_TYPE('S','V','Q','1');
