@@ -438,7 +438,7 @@ CALL :SubMsg "INFO" "%PCKG_NAME%-installer.zip successfully created"
 
 TITLE Creating archive %PCKG_NAME%.7z...
 START "7z" /B /WAIT "%SEVENZIP%" a -t7z "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.(%BUILD%).7z" "%PCKG_NAME%"^
- -m0=lzma2:d128m -mx9 -mmt -ms=on
+ -m0=lzma2:d48m -mx9 -mmt -ms=on
 IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Unable to create %PCKG_NAME%.7z!"
 CALL :SubMsg "INFO" "%PCKG_NAME%.7z successfully created"
 
