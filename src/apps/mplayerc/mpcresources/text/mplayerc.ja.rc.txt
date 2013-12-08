@@ -1115,7 +1115,7 @@ STRING IDC_CHECK_SPCANIMWITHBUFFER		"サブピクチャーバッファを使用�
 STRING IDC_CHECK_SPCPOW2TEX		"チェックを外すとビデオメモリの消費量とシステムメモリとビデオメモリ間の負荷を抑えられますが、古いビデオカードでは動作しない可能性があります。"
 STRING IDC_DSDXR		"Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
 STRING IDC_DSEVR		"Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."
-STRING IDC_DSEVR_CUSTOM		"Same as the EVR, but with the Allocator-Presenter of MPC-HC for subtitling and postprocessing. Recommended for Windows Vista or later."
+STRING IDC_DSEVR_CUSTOM		"Same as the EVR, but with the Allocator-Presenter of MPC-BE for subtitling and postprocessing. Recommended for Windows Vista or later."
 STRING IDC_DSMADVR		"High-quality renderer, requires a GPU that supports D3D9 or later."
 STRING IDC_DSNULL_COMP		"すべての動画の (ような) メディア タイプに接続して入力サンプルをどこにも出力しません。映像の表示が不要で無駄な CPU 負荷を無くしたい場合に使用してください。"
 STRING IDC_DSNULL_UNCOMP		"無効 (すべて) と同じですが、こちらは無圧縮タイプにのみ接続します。"

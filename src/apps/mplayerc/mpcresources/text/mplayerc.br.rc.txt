@@ -1115,7 +1115,7 @@ STRING IDC_CHECK_SPCANIMWITHBUFFER		"Permite animação de legendas quando usand
 STRING IDC_CHECK_SPCPOW2TEX		"Desmarcando isto se libera um pouco de memória de vídeo e salva banda das transferências locais da memoria de vídeo, mas pode não funcionar com placas de vídeo antigas."
 STRING IDC_DSDXR		"Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
 STRING IDC_DSEVR		"Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."
-STRING IDC_DSEVR_CUSTOM		"Same as the EVR, but with the Allocator-Presenter of MPC-HC for subtitling and postprocessing. Recommended for Windows Vista or later."
+STRING IDC_DSEVR_CUSTOM		"Same as the EVR, but with the Allocator-Presenter of MPC-BE for subtitling and postprocessing. Recommended for Windows Vista or later."
 STRING IDC_DSMADVR		"High-quality renderer, requires a GPU that supports D3D9 or later."
 STRING IDC_DSNULL_COMP		"Se conecta a qualquer tipo de arquivo de vídeo e manda as amostras a nenhum lugar. Utilíza-lo quando não necesitar ver o vídeo, e quiser evitar o uso da CPU desnecessáriamente."
 STRING IDC_DSNULL_UNCOMP		"Igual ao renderizador Nulo normal, porem este somente conectará a tipos sem compressão."

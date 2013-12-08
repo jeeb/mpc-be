@@ -1115,7 +1115,7 @@ STRING IDC_CHECK_SPCANIMWITHBUFFER		"Дазваляе анімацыю субт�
 STRING IDC_CHECK_SPCPOW2TEX		"Адключэнне гэтае опцыі вызваляе трохі відэапамяці і вызваляе паласу прапускання на перасоўваннях з лакальнай памяці ў відэапамяць, але можа не працаваць на старых відэакартах."
 STRING IDC_DSDXR		"Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
 STRING IDC_DSEVR		"Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."
-STRING IDC_DSEVR_CUSTOM		"Same as the EVR, but with the Allocator-Presenter of MPC-HC for subtitling and postprocessing. Recommended for Windows Vista or later."
+STRING IDC_DSEVR_CUSTOM		"Same as the EVR, but with the Allocator-Presenter of MPC-BE for subtitling and postprocessing. Recommended for Windows Vista or later."
 STRING IDC_DSMADVR		"High-quality renderer, requires a GPU that supports D3D9 or later."
 STRING IDC_DSNULL_COMP		"Падлучаецца да любога тыпу відэададзеных і адсылае ўваходныя кадры ў нікуды. Рэжым можа спатрэбіцца для захавання рэсурсаў працэсара ў выпадку калі патрэбны толькі гук."
 STRING IDC_DSNULL_UNCOMP		"Тое ж што і нармалёвы Null-рэндэр, але падлучаецца толькі да несціснутых тыпаў дадзеных."

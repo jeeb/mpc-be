@@ -1115,7 +1115,7 @@ STRING IDC_CHECK_SPCANIMWITHBUFFER		"Ak je použitá vyrovnávacia pamäť pre p
 STRING IDC_CHECK_SPCPOW2TEX		"Vypnutie tejto voľby spôsobí menšie vyťažovanie pamäti grafickej karty a zníži prenosovú rýchlosť karty, staršie graf. karty však môžu mať s týmto problémy."
 STRING IDC_DSDXR		"Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
 STRING IDC_DSEVR		"Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."
-STRING IDC_DSEVR_CUSTOM		"Same as the EVR, but with the Allocator-Presenter of MPC-HC for subtitling and postprocessing. Recommended for Windows Vista or later."
+STRING IDC_DSEVR_CUSTOM		"Same as the EVR, but with the Allocator-Presenter of MPC-BE for subtitling and postprocessing. Recommended for Windows Vista or later."
 STRING IDC_DSMADVR		"High-quality renderer, requires a GPU that supports D3D9 or later."
 STRING IDC_DSNULL_COMP		"Pripája sa k videu, neodosiela však prichádzajúce pakety. Môžete ho použiť vtedy, ak nepotrebujete obrazový výstup videa a chcete obmedziť zbytočnú prácu procesora."
 STRING IDC_DSNULL_UNCOMP		"To isté, ako voľba Null renderer, ale spracovávať sa dajú iba nekomprimované súbory."
