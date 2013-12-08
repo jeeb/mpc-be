@@ -393,31 +393,34 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, int len, CMediaType* pmt, bool find_sy
 		type = mpeg2;
 
 		while (GetPos() < endpos) {
-			if (NextMpegStartCode(id, len)) {
+			if (NextMpegStartCode(id, endpos - GetPos())) {
 				if (id != 0xb5) {
 					continue;
 				}
 
-				BYTE startcodeid = BitRead(4);
-				if (startcodeid == 0x02) {
-					BYTE video_format			= BitRead(3);
-					BYTE color_description		= BitRead(1);
-					if (color_description) {
-						BYTE color_primaries	= BitRead(8);
-						BYTE color_trc			= BitRead(8);
-						BYTE colorspace			= BitRead(8);
-					}
+				if ((endpos - GetPos()) >= 5) {
 
-					WORD panscan_width			= (WORD)BitRead(14);
-					MARKER;
-					WORD panscan_height			= (WORD)BitRead(14);
+					BYTE startcodeid = BitRead(4);
+					if (startcodeid == 0x02) {
+						BYTE video_format = BitRead(3);
+						BYTE color_description = BitRead(1);
+						if (color_description) {
+							BYTE color_primaries = BitRead(8);
+							BYTE color_trc = BitRead(8);
+							BYTE colorspace = BitRead(8);
+						}
 
-					if (panscan_width && panscan_height) {
-						h.arx *= h.width  * panscan_height;
-						h.ary *= h.height * panscan_width;
+						WORD panscan_width = (WORD)BitRead(14);
+						MARKER;
+						WORD panscan_height = (WORD)BitRead(14);
+
+						if (panscan_width && panscan_height) {
+							h.arx *= h.width  * panscan_height;
+							h.ary *= h.height * panscan_width;
+						}
+
+						break;
 					}
-			
-					break;
 				}
 			}
 		}
