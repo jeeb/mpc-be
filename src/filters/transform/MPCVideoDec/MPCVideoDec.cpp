@@ -883,10 +883,10 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_bIsEVO(FALSE)
 	, m_nFrameType(PICT_FRAME)
 	// === New swscaler options
-	, m_nSwRefresh(0)
 	, m_nSwPreset(2)
 	, m_nSwStandard(2)
 	, m_nSwRGBLevels(0)
+	, m_PixelFormat(AV_PIX_FMT_NONE)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -899,6 +899,8 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	if (!m_pOutput) {
 		*phr = E_OUTOFMEMORY;
 	}
+
+	memset(&m_DDPixelFormat, 0, sizeof(m_DDPixelFormat));
 
 	memset(&m_DXVAFilters, false, sizeof(m_DXVAFilters));
 	memset(&m_FFmpegFilters, false, sizeof(m_FFmpegFilters));
@@ -1677,6 +1679,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	}
 
 	FFGetFrameProps(m_pAVCtx, m_pFrame, m_nOutputWidth, m_nOutputHeight);
+	m_PixelFormat = m_pAVCtx->pix_fmt;
 
 	if (IsDXVASupported()) {
 		do {
@@ -2017,8 +2020,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 				return hr;
 			}
 
-			m_nSwRefresh = 2;
-			ReconnectRenderer();
+			ChangeOutputMediaFormat(2);
 		}
 
 		CLSID ClsidSourceFilter = GetCLSID(m_pInput->GetConnected());
@@ -2266,10 +2268,6 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 	AVPacket		avpkt;
 	av_init_packet(&avpkt);
 
-	if (m_nSwRefresh && (FAILED(hr = ReconnectRenderer()))) {
-		return hr;
-	}
-
 	while (nSize > 0 || bFlush) {
 		REFERENCE_TIME rtStart = rtStartIn, rtStop = rtStopIn;
 		
@@ -2432,18 +2430,6 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			continue;
 		}
 
-		CComPtr<IMediaSample>	pOut;
-		BYTE*					pDataOut = NULL;
-
-		UpdateAspectRatio();
-		if (FAILED(hr = GetDeliveryBuffer(m_pAVCtx->width, m_pAVCtx->height, &pOut, GetDuration())) || FAILED(hr = pOut->GetPointer(&pDataOut))) {
-			av_frame_unref(m_pFrame);
-			continue;//return hr;
-		}
-
-		pOut->SetTime(&rtStart, &rtStop);
-		pOut->SetMediaTime(NULL, NULL);
-
 		if (m_nCodecId == AV_CODEC_ID_H264) {
 			switch (m_pFrame->format) {
 			case AV_PIX_FMT_YUVJ420P:
@@ -2463,6 +2449,23 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 				break;
 			}
 		}
+
+		if (m_PixelFormat != m_pFrame->format) {
+			ChangeOutputMediaFormat(2);
+		}
+		m_PixelFormat = (AVPixelFormat)m_pFrame->format;
+
+		CComPtr<IMediaSample>	pOut;
+		BYTE*					pDataOut = NULL;
+
+		UpdateAspectRatio();
+		if (FAILED(hr = GetDeliveryBuffer(m_pAVCtx->width, m_pAVCtx->height, &pOut, GetDuration())) || FAILED(hr = pOut->GetPointer(&pDataOut))) {
+			av_frame_unref(m_pFrame);
+			continue;//return hr;
+		}
+
+		pOut->SetTime(&rtStart, &rtStop);
+		pOut->SetMediaTime(NULL, NULL);
 
 		BITMAPINFOHEADER bihOut;
 		ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
@@ -2485,8 +2488,10 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 	return hr;
 }
 
-// change colorspace details/output format
-HRESULT CMPCVideoDecFilter::ReconnectRenderer()
+// change colorspace details/output media format
+// 1 - change swscaler colorspace details
+// 2 - change output media format
+HRESULT CMPCVideoDecFilter::ChangeOutputMediaFormat(int nType)
 {
 	HRESULT hr = S_OK;
 
@@ -2494,54 +2499,21 @@ HRESULT CMPCVideoDecFilter::ReconnectRenderer()
 		return hr;
 	}
 
-	//soft refresh - signal new swscaler colorspace details
-	if (m_nSwRefresh >= 1) {
+	// change swscaler colorspace details
+	if (nType >= 1) {
 		m_FormatConverter.SetOptions(m_nSwPreset, m_nSwStandard, m_nSwRGBLevels);
 	}
 
-	// hard refresh - signal new output format
-	if (m_nSwRefresh == 2) {
-		m_nSwRefresh--;
-
-		CComPtr<IPin> pRendererPin;
-		CComPtr<IPinConnection> pRendererConn;
-		CMediaType cmtRenderer;
-
-		BuildOutputFormat(); // refresh supported media types
+	// change output media format
+	if (nType == 2) {
+		BuildOutputFormat();
 
 		CAutoLock cObjectLock(m_pLock);
 
-		cmtRenderer.InitMediaType();
-		GetMediaType(0, &cmtRenderer);
-
- 		m_pOutput->ConnectedTo(&pRendererPin);
-		hr = pRendererPin->QueryInterface(IID_IPinConnection, (void**)&pRendererConn);
-		if (FAILED(hr)) {
-			// madVR accepts dynamic media type changes but does not support IPinConnection
-			if (S_OK == (hr = pRendererPin->QueryAccept(&cmtRenderer))) {
-				if (S_OK == (hr = m_pOutput->SetMediaType(&cmtRenderer))) {
-					ReconnectOutput(PictWidth(), PictHeight(), true, true);
-				}
-			}
-
-			return hr;
+		hr = NotifyEvent(EC_DISPLAY_CHANGED, (LONG_PTR)m_pOutput->GetConnected(), NULL);
+		if (S_OK != hr) {
+			hr = E_FAIL;
 		}
-
-		if (S_OK == (hr = NotifyEvent(EC_DISPLAY_CHANGED, (LONG_PTR)m_pOutput->GetConnected(), 0))) {
-			SleepEx(200, TRUE);
-			hr = m_pOutput->SetMediaType(&cmtRenderer);
-		}
-
-		/*
-		// VMR accepts dynamic media type changes - but failed QueryAccept()
-		hr = pRendererConn->DynamicQueryAccept(&cmtRenderer);
-		if (SUCCEEDED(hr)) {
-			//VMR accepts dynamic media type changes.
-			if (S_OK == (hr = m_pOutput->SetMediaType(&cmtRenderer))) {
-				ReconnectOutput(PictWidth(), PictHeight(), true, true);
-			}
-		}
-		*/
 	}
 
 	return hr;
@@ -2680,7 +2652,7 @@ void CMPCVideoDecFilter::ReorderBFrames(REFERENCE_TIME& rtStart, REFERENCE_TIME&
 
 void CMPCVideoDecFilter::FillInVideoDescription(DXVA2_VideoDesc *pDesc)
 {
-	memset (pDesc, 0, sizeof(DXVA2_VideoDesc));
+	memset(pDesc, 0, sizeof(DXVA2_VideoDesc));
 	pDesc->SampleWidth			= PictWidthRounded();
 	pDesc->SampleHeight			= PictHeightRounded();
 	pDesc->Format				= D3DFMT_A8R8G8B8;
@@ -2950,8 +2922,8 @@ HRESULT CMPCVideoDecFilter::FindDXVA1DecoderConfiguration(IAMVideoAccelerator* p
 
 void CMPCVideoDecFilter::SetDXVA1Params(const GUID* pGuid, DDPIXELFORMAT* pPixelFormat)
 {
-	m_DXVADecoderGUID		= *pGuid;
-	memcpy(&m_PixelFormat, pPixelFormat, sizeof (DDPIXELFORMAT));
+	m_DXVADecoderGUID = *pGuid;
+	memcpy(&m_DDPixelFormat, pPixelFormat, sizeof(DDPIXELFORMAT));
 }
 
 WORD CMPCVideoDecFilter::GetDXVA1RestrictedMode()
@@ -3268,10 +3240,9 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetDXVA_SD()
 STDMETHODIMP CMPCVideoDecFilter::SetSwRefresh(int nValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
-	m_nSwRefresh = nValue;
 
-	if (m_nSwRefresh && m_pAVCtx && m_nDecoderMode == MODE_SOFTWARE) {
-		ReconnectRenderer();
+	if (nValue && m_pAVCtx && m_nDecoderMode == MODE_SOFTWARE) {
+		ChangeOutputMediaFormat(nValue);
 	}
 	return S_OK;
 }
@@ -3376,10 +3347,10 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetFrameType()
 CVideoDecOutputPin::CVideoDecOutputPin(TCHAR* pObjectName, CBaseVideoFilter* pFilter, HRESULT* phr, LPCWSTR pName)
 	: CBaseVideoOutputPin(pObjectName, pFilter, phr, pName)
 {
-	m_pVideoDecFilter		= static_cast<CMPCVideoDecFilter*> (pFilter);
+	m_pVideoDecFilter		= static_cast<CMPCVideoDecFilter*>(pFilter);
 	m_dwDXVA1SurfaceCount	= 0;
 	m_GuidDecoderDXVA1		= GUID_NULL;
-	memset (&m_ddUncompPixelFormat, 0, sizeof(m_ddUncompPixelFormat));
+	memset(&m_ddUncompPixelFormat, 0, sizeof(m_ddUncompPixelFormat));
 }
 
 CVideoDecOutputPin::~CVideoDecOutputPin(void)
@@ -3441,7 +3412,7 @@ STDMETHODIMP CVideoDecOutputPin::GetCreateVideoAcceleratorData(const GUID *pGuid
 	DXVA_ConnectMode*					pConnectMode;
 
 	if (pAMVideoAccelerator) {
-		memcpy(&UncompInfo.ddUncompPixelFormat, &m_ddUncompPixelFormat, sizeof (DDPIXELFORMAT));
+		memcpy(&UncompInfo.ddUncompPixelFormat, &m_ddUncompPixelFormat, sizeof(DDPIXELFORMAT));
 		UncompInfo.dwUncompWidth		= m_pVideoDecFilter->PictWidthRounded();
 		UncompInfo.dwUncompHeight		= m_pVideoDecFilter->PictHeightRounded();
 		hr = pAMVideoAccelerator->GetCompBufferInfo(&m_GuidDecoderDXVA1, &UncompInfo, &dwNumTypesCompBuffers, CompInfo);

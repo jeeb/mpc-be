@@ -532,7 +532,7 @@ VIDEO_OUTPUT_FORMATS DefaultFormats[] = {
 	{&MEDIASUBTYPE_RGB555, 1, 16, BI_BITFIELDS},
 };
 
-void CBaseVideoFilter::GetOutputFormats (int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats)
+void CBaseVideoFilter::GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats)
 {
 	nNumber		= _countof(DefaultFormats);
 	*ppFormats	= DefaultFormats;

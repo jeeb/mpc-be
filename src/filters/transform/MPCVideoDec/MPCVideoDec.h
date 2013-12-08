@@ -75,11 +75,11 @@ protected:
 	int										m_nDXVA_SD;
 
 	// === New swscaler options
-	int										m_nSwRefresh;
 	bool									m_fPixFmts[PixFmt_count];
 	int										m_nSwPreset;
 	int										m_nSwStandard;
 	int										m_nSwRGBLevels;
+	AVPixelFormat							m_PixelFormat;
 	//
 
 	FF_FIELD_TYPE							m_nFrameType;
@@ -136,7 +136,7 @@ protected:
 	CString									m_strDeviceDescription;
 
 	// === DXVA1 variables
-	DDPIXELFORMAT							m_PixelFormat;
+	DDPIXELFORMAT							m_DDPixelFormat;
 
 	// === DXVA2 variables
 	CComPtr<IDirect3DDeviceManager9>		m_pDeviceManager;
@@ -163,7 +163,7 @@ protected:
 	void				BuildOutputFormat();
 
 	HRESULT				SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
-	HRESULT				ReconnectRenderer();
+	HRESULT				ChangeOutputMediaFormat(int nType);
 
 	HRESULT				ReopenVideo();
 	HRESULT				FindDecoderConfiguration();
@@ -278,7 +278,7 @@ public:
 	void						SetTypeSpecificFlags(IMediaSample* pMS);
 
 	// === DXVA1 functions
-	DDPIXELFORMAT*				GetPixelFormat() { return &m_PixelFormat; }
+	DDPIXELFORMAT*				GetPixelFormat() { return &m_DDPixelFormat; }
 	HRESULT						FindDXVA1DecoderConfiguration(IAMVideoAccelerator* pAMVideoAccelerator, const GUID* guidDecoder, DDPIXELFORMAT* pPixelFormat);
 	HRESULT						CheckDXVA1Decoder(const GUID *pGuid);
 	void						SetDXVA1Params(const GUID* pGuid, DDPIXELFORMAT* pPixelFormat);
