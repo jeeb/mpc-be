@@ -405,6 +405,7 @@ IF NOT EXIST "%PCKG_NAME%" MD "%PCKG_NAME%"
 
 IF /I "%NAME%" == "MPC-BE" (
   IF NOT EXIST "%PCKG_NAME%\Lang" MD "%PCKG_NAME%\Lang"
+  IF NOT EXIST "%PCKG_NAME%\Shaders" MD "%PCKG_NAME%\Shaders"
   IF /I "%ARCH%" == "x64" (
     COPY /Y /V "%~1_%ARCH%\mpc-be64.exe"        "%PCKG_NAME%\mpc-be64.exe" >NUL
     COPY /Y /V "%~1_%ARCH%\MPCBEShellExt64.dll" "%PCKG_NAME%\MPCBEShellExt64.dll" >NUL
@@ -414,6 +415,7 @@ IF /I "%NAME%" == "MPC-BE" (
   )
   COPY /Y /V "%~1_%ARCH%\mpciconlib.dll"           "%PCKG_NAME%\*.dll" >NUL
   COPY /Y /V "%~1_%ARCH%\Lang\mpcresources.??.dll" "%PCKG_NAME%\Lang\mpcresources.??.dll" >NUL
+  COPY /Y /V "..\distrib\Shaders\*.psh"            "%PCKG_NAME%\Shaders\*.psh" >NUL
 ) ELSE (
   COPY /Y /V "%~1_%ARCH%\*.ax"           "%PCKG_NAME%\*.ax" >NUL
   COPY /Y /V "%~1_%ARCH%\VSFilter.dll"   "%PCKG_NAME%\VSFilter.dll" >NUL
@@ -425,8 +427,6 @@ COPY /Y /V "..\docs\Authors mpc-hc team.txt" "%PCKG_NAME%" >NUL
 COPY /Y /V "..\docs\Changelog.txt"           "%PCKG_NAME%" >NUL
 COPY /Y /V "..\docs\Changelog.Rus.txt"       "%PCKG_NAME%" >NUL
 COPY /Y /V "..\docs\Readme.txt"              "%PCKG_NAME%" >NUL
-IF NOT EXIST "%PCKG_NAME%\Shaders" MD "%PCKG_NAME%\Shaders"
-COPY /Y /V "..\distrib\Shaders\*.psh"        "%PCKG_NAME%\Shaders\*.psh" >NUL
 
 IF /I "%NAME%" == "MPC-BE" (
 TITLE Creating archive %PCKG_NAME%.zip...
