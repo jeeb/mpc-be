@@ -577,7 +577,6 @@
 #define IDC_PLAYERTIME                  10627
 #define IDC_EDITLIST                    10628
 #define IDC_DSSYSDEF                    10700
-#define IDC_DSOLD                       10701
 #define IDC_DSOVERLAYMIXER              10702
 #define IDC_DSVMR7WIN                   10703
 #define IDC_DSVMR9WIN                   10704
@@ -1579,7 +1578,6 @@
 #define IDS_THUMB_THUMBNAILS            41507
 #define IDS_THUMB_PIXELS                41508
 #define IDS_THUMB_LEVEL                 41509
-#define IDS_PPAGE_OUTPUT_OLDRENDERER    42001
 #define IDS_PPAGE_OUTPUT_OVERLAYMIXER   42002
 #define IDS_PPAGE_OUTPUT_VMR7WINDOWED   42003
 #define IDS_PPAGE_OUTPUT_VMR9WINDOWED   42004

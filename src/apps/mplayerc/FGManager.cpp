@@ -2784,9 +2784,6 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	// Renderers
 	if (!m_IsPreview) {
 		switch (s.iDSVideoRendererType) {
-			case VIDRNDT_DS_OLDRENDERER:
-				m_transform.AddTail(DNew CFGFilterRegistry(CLSID_VideoRenderer, m_vrmerit));
-				break;
 			case VIDRNDT_DS_OVERLAYMIXER:
 				m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_OverlayMixer, L"Overlay Mixer", m_vrmerit));
 				break;
@@ -2889,11 +2886,6 @@ CFGManagerDVD::CFGManagerDVD(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPr
 	: CFGManagerPlayer(pName, pUnk, hWnd, IsPreview)
 {
 	AppSettings& s = AfxGetAppSettings();
-
-	// have to avoid the old video renderer
-	if (s.iDSVideoRendererType == VIDRNDT_DS_OLDRENDERER) {
-		m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_OverlayMixer, L"Overlay Mixer", m_vrmerit-1));
-	}
 
 	// elecard's decoder isn't suited for dvd playback (atm)
 	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(_T("{F50B3F13-19C4-11CF-AA9A-02608C9BABA2}")), MERIT64_DO_NOT_USE));
