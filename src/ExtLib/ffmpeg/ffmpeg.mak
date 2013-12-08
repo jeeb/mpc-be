@@ -163,6 +163,8 @@ SRCS_C = \
 	libavcodec/fft_fixed_32.c \
 	libavcodec/fft_float.c \
 	libavcodec/fft_init_table.c \
+	libavcodec/ffv1.c \
+	libavcodec/ffv1dec.c \
 	libavcodec/flac.c \
 	libavcodec/flacdata.c \
 	libavcodec/flacdec.c \

@@ -57,6 +57,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (DIRAC, dirac);
     REGISTER_DECODER (DNXHD, dnxhd);
     REGISTER_DECODER (DVVIDEO, dvvideo);
+    REGISTER_DECODER (FFV1, ffv1);
     REGISTER_DECODER (FLASHSV, flashsv);
     REGISTER_DECODER (FLASHSV2, flashsv2);
     REGISTER_DECODER (FLV, flv);
@@ -149,7 +150,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (WMAV2, wmav2);
     REGISTER_DECODER (WMAVOICE, wmavoice);
     REGISTER_DECODER (TTA, tta);
-    REGISTER_DECODER(TAK, tak);
+    REGISTER_DECODER (TAK, tak);
 
     REGISTER_ENCDEC  (AC3, ac3);
     REGISTER_ENCDEC  (EAC3, eac3);
@@ -181,7 +182,7 @@ void avcodec_register_all(void)
     REGISTER_PARSER (MLP, mlp);
     REGISTER_PARSER (MPEGAUDIO, mpegaudio);
     REGISTER_PARSER (H264, h264);
-    REGISTER_PARSER(HEVC, hevc);
+    REGISTER_PARSER (HEVC, hevc);
     REGISTER_PARSER (MPEGVIDEO, mpegvideo);
     REGISTER_PARSER (TAK, tak);
 
