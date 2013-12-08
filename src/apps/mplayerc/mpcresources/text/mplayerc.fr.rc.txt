@@ -731,10 +731,10 @@ BEGIN MENU IDR_MAINFRAME LINES 247
 233		"Menu &chapitrage"
 235		"F&avoris"
 236		"&Aide"
-238		"Site Web de &MPC Home Cinema"
+238		"Site Web de &MPC-BE"
 240		"Options de la ligne de commandes"
 242		"Download &Toolbar Images"
-245		"&A propos de MPC Home Cinema..."
+245		"&A propos de MPC-BE..."
 END
 
 BEGIN MENU IDR_POPUP LINES 235
@@ -1037,9 +1037,9 @@ BEGIN MENU IDR_POPUPMAIN LINES 318
 205		"Menu &chapitrage"
 207		"F&avoris"
 208		"&Aide"
-210		"Site Web de &MPC Home Cinema"
+210		"Site Web de &MPC-BE"
 212		"Options de la ligne de commandes"
-216		"&A propos de MPC Home Cinema..."
+216		"&A propos de MPC-BE..."
 219		"&Filtres"
 220		"S&haders"
 222		"&Audio"

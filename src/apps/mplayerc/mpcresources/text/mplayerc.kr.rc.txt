@@ -1115,7 +1115,7 @@ STRING IDC_CHECK_SPCANIMWITHBUFFER		"서브픽쳐 버퍼가 0보다 클때 자�
 STRING IDC_CHECK_SPCPOW2TEX		"이것을 선택하지않으면 비디오 메모리 및 전송대역을 절약하지만, 구형 비디오 카드에서는 동작하지 않을수 있습니다."
 STRING IDC_DSDXR		"VMR-9 (renderless)와 같지만 true two-pass bicubic resizer 사용."
 STRING IDC_DSEVR		"최소한 Vista 이상이나 XP(.NET Framework 3.5)에서만 사용가능."
-STRING IDC_DSEVR_CUSTOM		"Same as the EVR, but with the Allocator-Presenter of MPC-BE for subtitling and postprocessing. Recommended for Windows Vista or later."
+STRING IDC_DSEVR_CUSTOM		"EVR(자막과 후처리를 위해 MPC-BE 의 Allocator-Presenter 사용). 비스타 이상을 추천."
 STRING IDC_DSMADVR		"고품질 렌더러,  D3D9 이상을 지원하는GPU 필요."
 STRING IDC_DSNULL_COMP		"모든 비디오형식의 샘플을 출력하지 않습니다. 비디오를 출력하지않으면서 CPU가 작동하도록 할때 사용합니다."
 STRING IDC_DSNULL_UNCOMP		"일반적인 Null 렌더러와 같지만 압축되지않은 형식만을 연결합니다."

@@ -1115,7 +1115,7 @@ STRING IDC_CHECK_SPCANIMWITHBUFFER		"Ahalbidetzen du azpidatzi animazioa 0 baino
 STRING IDC_CHECK_SPCPOW2TEX		"Hau ez-hautatzeak bideo oroimen apur bat askatu eta bandazabalera gordetzen du tokian bideo oroimen eskualdaketarako, baina badaiteke ez lan egitea bideo txartel zaharrekin."
 STRING IDC_DSDXR		"VMR-9 (aurkezgabe)-ren berdina, baina egizko bi-pasaldi bikubiko birneurriratzaile bat erabiltzen du."
 STRING IDC_DSEVR		"Vista edo berriagoetan bakarrik eskuragarri edo XP-an gutxinez .NET Framework 3.5 ezarrita dagoela."
-STRING IDC_DSEVR_CUSTOM		"Same as the EVR, but with the Allocator-Presenter of MPC-BE for subtitling and postprocessing. Recommended for Windows Vista or later."
+STRING IDC_DSEVR_CUSTOM		"EVR-ren berdina, baina MPC-BE-ren Esleitzaile-Aurkezlearekin azpidatzi eta prozesapen-ondorenerako. Gomendatua Windows Vista edo berriagoentzat."
 STRING IDC_DSMADVR		"Ontasun-handiko aurkezlea, D3D9 edo berriagoa sostengatzen duen GPU-a behar du."
 STRING IDC_DSNULL_COMP		"Edozein bideo-erako multimedia motarekn elkarketatzen da eta barrurako laginak inora ez bidaliko ditu. Erabili bideo erakuspenik behar ez duzunean eta cpu-a gordetzea nahi duzunean alperrik lan egitetik."
 STRING IDC_DSNULL_UNCOMP		"Null aurkezle arrunta bezalakoa, baina honek hertsatugabeko motak bakarrik elkartzen ditu."

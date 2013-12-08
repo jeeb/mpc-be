@@ -1115,7 +1115,7 @@ STRING IDC_CHECK_SPCANIMWITHBUFFER		"Maakt ondertitelings-animatie mogelijk bij 
 STRING IDC_CHECK_SPCPOW2TEX		"Dit uitvinken, maakt een beetje grafisch geheugen vrij en spaart bandbreedte bij de overdracht van lokaal naar grafisch geheugen. Dit werkt waarschijnlijk niet bij oudere grafische kaarten."
 STRING IDC_DSDXR		"Hetzelfde als VMR-9 (renderless), maar met een echte two-pass bicubic resizer."
 STRING IDC_DSEVR		"Enkel beschikbaar voor Vista of hoger, of voor XP met .NET Framework 3.5 geïnstalleerd zijn."
-STRING IDC_DSEVR_CUSTOM		"Same as the EVR, but with the Allocator-Presenter of MPC-BE for subtitling and postprocessing. Recommended for Windows Vista or later."
+STRING IDC_DSEVR_CUSTOM		"Hetzelfde als EVR, maar met de Allocator-Presenter plugin van MPC-BE voor ondertiteling en nabewerking. Voor Windows Vista of hoger aanbevolen."
 STRING IDC_DSMADVR		"Hoge-kwaliteit-renderer, vereist een GPU die D3D9 of hoger ondersteunt."
 STRING IDC_DSNULL_COMP		"Verbind met elk video-achtig mediatype en zal de inkomende signalen in het, grote dan wel kleine, niets zenden. Gebruik dit als geen uitvoersignaal nodig is en de om de CPU te ontlasten."
 STRING IDC_DSNULL_UNCOMP		"Hetzelfde als de normale Null renderer, maar deze zal alleen verbinding maken met ongecomprimeerde types."
