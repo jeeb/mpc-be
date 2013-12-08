@@ -15,6 +15,7 @@ Added (+):
 
 
 Changes (*):
+	* Updated Basque translation (author: azpidatziak);
 	* Updated Dutch translation (author: beter);
 	* Updated Chinese (Traditional) translation (author: beter);
 	* Updated Chinese (Simplified) translation (authors: insolo;
