@@ -730,10 +730,15 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							fourcc = BI_RGB;
 						}
 
+						AP4_Size ExtraSize = db.GetDataSize();
+						if (type == AP4_ATOM_TYPE_FFV1) {
+							ExtraSize = 0;
+						}
+
 						mt.majortype	= MEDIATYPE_Video;
 						mt.formattype	= FORMAT_VideoInfo2;
 
-						vih2							= (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2) + db.GetDataSize());
+						vih2							= (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2) + ExtraSize);
 						memset(vih2, 0, mt.FormatLength());
 						vih2->bmiHeader.biSize			= sizeof(vih2->bmiHeader);
 						vih2->bmiHeader.biWidth			= (LONG)vse->GetWidth();
@@ -752,7 +757,9 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 						SetAspect(vih2, Aspect, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight); 
 
-						memcpy(vih2 + 1, db.GetData(), db.GetDataSize());
+						if (ExtraSize) {
+							memcpy(vih2 + 1, db.GetData(), ExtraSize);
+						}
 
 						if (fourcc == BI_RGB) {
 							WORD &bitcount = vih2->bmiHeader.biBitCount;
