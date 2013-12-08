@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include "AviFile.h"
 #include <math.h>
+#include "../../../DSUtil/AudioParser.h"
 
 //
 // CAviFile
@@ -72,6 +73,12 @@ HRESULT CAviFile::Init()
 			// correcting encoder bugs...
 			s->strh.dwScale = 1152;
 			s->strh.dwRate = wfe->nSamplesPerSec;
+		} else if (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE) {
+			WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)s->strf.GetData();
+			if (wfex->dwChannelMask == 0) {
+				// correcting muxer bugs...
+				wfex->dwChannelMask = GetDefChannelMask(wfe->nChannels);
+			}
 		}
 	}
 
