@@ -178,7 +178,7 @@ CFormatConverter::CFormatConverter()
 	m_FProps.avpixfmt	= AV_PIX_FMT_NONE;
 	m_FProps.width		= 0;
 	m_FProps.height		= 0;
-	m_FProps.inBpp		= 0;
+	m_FProps.lumabits	= 0;
 	m_FProps.pftype		= PFType_unspecified;
 	m_FProps.colorspace	= AVCOL_SPC_UNSPECIFIED;
 	m_FProps.colorrange	= AVCOL_RANGE_UNSPECIFIED;
@@ -343,7 +343,7 @@ HRESULT CFormatConverter::ConvertToPX1X(const uint8_t* const src[4], const int s
     v = src[2];
     sourceStride = srcStride[0];
 
-    shift = (16 - m_FProps.inBpp);
+    shift = (16 - m_FProps.lumabits);
   }
 
   // copy Y
@@ -420,7 +420,7 @@ HRESULT CFormatConverter::ConvertToY410(const uint8_t* const src[4], const int s
 
   BYTE *pTmpBuffer = NULL;
 
-  if (m_FProps.pftype != PFType_YUV444Px || m_FProps.inBpp > 10) {
+  if (m_FProps.pftype != PFType_YUV444Px || m_FProps.lumabits > 10) {
     uint8_t *tmp[4] = {NULL};
     int     tmpStride[4] = {0};
     int scaleStride = FFALIGN(width, 32);
@@ -448,7 +448,7 @@ HRESULT CFormatConverter::ConvertToY410(const uint8_t* const src[4], const int s
     v = (int16_t *)src[2];
     sourceStride = srcStride[0] / 2;
 
-    b9Bit = (m_FProps.inBpp == 9);
+    b9Bit = (m_FProps.lumabits == 9);
   }
 
 #define YUV444_Y410_PACK \
@@ -478,7 +478,7 @@ HRESULT CFormatConverter::ConvertToY416(const uint8_t* const src[4], const int s
 
   BYTE *pTmpBuffer = NULL;
 
-  if (m_FProps.pftype != PFType_YUV444Px || m_FProps.inBpp != 16) {
+  if (m_FProps.pftype != PFType_YUV444Px || m_FProps.lumabits != 16) {
     uint8_t *tmp[4] = {NULL};
     int     tmpStride[4] = {0};
     int scaleStride = FFALIGN(width, 32);
@@ -591,17 +591,13 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 		m_FProps.avpixfmt	= (AVPixelFormat)pFrame->format;
 		m_FProps.width		= pFrame->width;
 		m_FProps.height		= pFrame->height;
-		const AVPixFmtDescriptor* in_pfdesc = av_pix_fmt_desc_get(m_FProps.avpixfmt);
-		if (in_pfdesc) {
-			m_FProps.inBpp	= in_pfdesc->comp->depth_minus1 + 1;
-		}
-
 		if (!Init()) {
 			TRACE(_T("FormatConverter: Init() failed\n"));
 			return 0;
 		}
 		// update the additional properties (updated only when changing basic properties)
-		m_FProps.pftype		= GetPixFmtType((AVPixelFormat)pFrame->format);
+		m_FProps.lumabits	= GetLumaBits(m_FProps.avpixfmt);
+		m_FProps.pftype		= GetPixFmtType(m_FProps.avpixfmt);
 		m_FProps.colorspace	= pFrame->colorspace;
 		m_FProps.colorrange	= pFrame->color_range;
 
