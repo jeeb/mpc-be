@@ -171,7 +171,11 @@ CString CFLVSplitterFilter::AMF0GetString(CBaseSplitterFileEx* pFile, UINT64 end
 		return L"";
 	}
 
-	memset(name, 0, sizeof(name));
+	if (length > sizeof(name)) {
+		pFile->Seek(pFile->GetPos() + length);
+		return L"";
+	}
+
 	pFile->ByteRead((BYTE*)name, length);
 
 	return CString(name);
@@ -344,9 +348,10 @@ bool CFLVSplitterFilter::ReadTag(VideoTag& vt)
 		//return false;
 	}
 
-	vt.FrameType	= (BYTE)m_pFile->BitRead(4);
-	vt.CodecID		= (BYTE)m_pFile->BitRead(4);
-	vt.tsOffset		= 0;
+	vt.FrameType		= (BYTE)m_pFile->BitRead(4);
+	vt.CodecID			= (BYTE)m_pFile->BitRead(4);
+	vt.AVCPacketType	= 0;
+	vt.tsOffset			= 0;
 
 	if (IsAVCCodec(vt.CodecID)) {
 		vt.AVCPacketType	= (BYTE)m_pFile->BitRead(8);
