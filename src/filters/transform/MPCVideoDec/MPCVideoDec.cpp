@@ -1644,6 +1644,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 			|| m_nCodecId == AV_CODEC_ID_MPEG1VIDEO
 			|| m_nCodecId == AV_CODEC_ID_DIRAC
 			|| m_nCodecId == AV_CODEC_ID_UTVIDEO
+			|| m_nCodecId == AV_CODEC_ID_HUFFYUV
+			|| m_nCodecId == AV_CODEC_ID_FFVHUFF
 			|| m_nCodecId == AV_CODEC_ID_HEVC
 			|| m_nCodecId == AV_CODEC_ID_DNXHD) {
 		m_bReorderBFrame = false;

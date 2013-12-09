@@ -922,6 +922,8 @@ int FFGetThreadType(enum AVCodecID nCodecId)
 		case AV_CODEC_ID_JPEG2000		:
 		case AV_CODEC_ID_PNG			:
 		case AV_CODEC_ID_DNXHD			:
+		case AV_CODEC_ID_HUFFYUV		:
+		case AV_CODEC_ID_FFVHUFF		:
 			return FF_THREAD_FRAME;
 			break;
 		default :
