@@ -208,6 +208,8 @@ SRCS_C = \
 	libavcodec/hevcpred.c \
 	libavcodec/hpeldsp.c \
 	libavcodec/huffman.c \
+	libavcodec/huffyuv.c \
+	libavcodec/huffyuvdec.c \
 	libavcodec/imc.c \
 	libavcodec/imgconvert.c \
 	libavcodec/indeo3.c \

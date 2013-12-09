@@ -111,7 +111,7 @@ CAppSettings::CAppSettings()
 	FFMFiltersKeys[FFM_INDEO]		= _T("FFM_INDEO");
 	FFMFiltersKeys[FFM_SCREC]		= _T("FFM_SCREC");
 	FFMFiltersKeys[FFM_UTVD]		= _T("FFM_UTVD");
-	FFMFiltersKeys[FFM_LAGARITH]	= _T("FFM_LAGARITH");
+	FFMFiltersKeys[FFM_LOSSLESS]	= _T("FFM_LOSSLESS");
 	FFMFiltersKeys[FFM_WPAC]		= _T("FFM_WPAC");
 	FFMFiltersKeys[FFM_MPAC]		= _T("FFM_MPAC");
 	FFMFiltersKeys[FFM_QDM2]		= _T("FFM_QDM2");
@@ -137,7 +137,6 @@ CAppSettings::CAppSettings()
 	FFMFiltersKeys[FFM_MPEG1]		= _T("FFM_MPEG1");
 	FFMFiltersKeys[FFM_HEVC]		= _T("FFM_HEVC");
 	FFMFiltersKeys[FFM_DNXHD]		= _T("FFM_DNXHD");
-	FFMFiltersKeys[FFM_FFV1]		= _T("FFM_FFV1");
 }
 
 void CAppSettings::CreateCommands()

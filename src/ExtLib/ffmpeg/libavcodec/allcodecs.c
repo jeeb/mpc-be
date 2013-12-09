@@ -58,6 +58,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (DNXHD, dnxhd);
     REGISTER_DECODER (DVVIDEO, dvvideo);
     REGISTER_DECODER (FFV1, ffv1);
+    REGISTER_DECODER (FFVHUFF, ffvhuff);
     REGISTER_DECODER (FLASHSV, flashsv);
     REGISTER_DECODER (FLASHSV2, flashsv2);
     REGISTER_DECODER (FLV, flv);
@@ -66,6 +67,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (H263, h263);
     REGISTER_DECODER (H264, h264);
     REGISTER_DECODER (HEVC, hevc);
+    REGISTER_DECODER (HUFFYUV, huffyuv);
     REGISTER_DECODER (INDEO3, indeo3);
     REGISTER_DECODER (INDEO4, indeo4);
     REGISTER_DECODER (INDEO5, indeo5);
