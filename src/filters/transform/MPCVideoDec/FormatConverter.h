@@ -80,6 +80,7 @@ typedef struct {
 	enum AVPixelFormat	avpixfmt;
 	int					width;
 	int					height;
+	int					inBpp;
 	// additional properties
 	MPCPixFmtType		pftype;
 	enum AVColorSpace	colorspace;
