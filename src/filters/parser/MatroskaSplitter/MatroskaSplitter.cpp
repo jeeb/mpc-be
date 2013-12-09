@@ -1554,43 +1554,60 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 
 STDMETHODIMP CMatroskaSplitterFilter::GetKeyFrameCount(UINT& nKFs)
 {
-	if (!m_pFile) {
-		return E_UNEXPECTED;
-	}
+	CheckPointer(m_pFile, E_UNEXPECTED);
 
-	HRESULT hr = S_OK;
+	nKFs				= 0;
+	Segment& s			= m_pFile->m_segment;
+	UINT64 TrackNumber	= s.GetMasterTrack();
 
-	nKFs = 0;
-
-	POSITION pos = m_pFile->m_segment.Cues.GetHeadPosition();
+	POSITION pos = s.Cues.GetHeadPosition();
 	while (pos) {
-		nKFs += (UINT)m_pFile->m_segment.Cues.GetNext(pos)->CuePoints.GetCount();
+		Cue* pCue = s.Cues.GetNext(pos);
+		if (pCue) {
+			POSITION pos2 = pCue->CuePoints.GetHeadPosition();
+			while (pos2) {
+				CuePoint* pCuePoint = pCue->CuePoints.GetNext(pos2);
+				if (pCuePoint && pCuePoint->CueTrackPositions.GetCount()) {
+					CueTrackPosition* pCueTrackPositions = pCuePoint->CueTrackPositions.GetHead();
+					if (pCueTrackPositions->CueTrack == TrackNumber) {
+						nKFs++;
+					}
+				}
+			}
+		}
 	}
 
-	return hr;
+	return S_OK;
 }
 
 STDMETHODIMP CMatroskaSplitterFilter::GetKeyFrames(const GUID* pFormat, REFERENCE_TIME* pKFs, UINT& nKFs)
 {
+	CheckPointer(m_pFile, E_UNEXPECTED);
 	CheckPointer(pFormat, E_POINTER);
 	CheckPointer(pKFs, E_POINTER);
 
-	if (!m_pFile) {
-		return E_UNEXPECTED;
-	}
 	if (*pFormat != TIME_FORMAT_MEDIA_TIME) {
 		return E_INVALIDARG;
 	}
 
-	UINT nKFsTmp = 0;
+	UINT nKFsTmp		= 0;
+	Segment& s			= m_pFile->m_segment;
+	UINT64 TrackNumber	= s.GetMasterTrack();
 
-	POSITION pos1 = m_pFile->m_segment.Cues.GetHeadPosition();
-	while (pos1 && nKFsTmp < nKFs) {
-		Cue* pCue = m_pFile->m_segment.Cues.GetNext(pos1);
-
-		POSITION pos2 = pCue->CuePoints.GetHeadPosition();
-		while (pos2 && nKFsTmp < nKFs) {
-			pKFs[nKFsTmp++] = m_pFile->m_segment.GetRefTime(pCue->CuePoints.GetNext(pos2)->CueTime);
+	POSITION pos = s.Cues.GetHeadPosition();
+	while (pos) {
+		Cue* pCue = s.Cues.GetNext(pos);
+		if (pCue) {
+			POSITION pos2 = pCue->CuePoints.GetHeadPosition();
+			while (pos2) {
+				CuePoint* pCuePoint = pCue->CuePoints.GetNext(pos2);
+				if (pCuePoint && pCuePoint->CueTrackPositions.GetCount()) {
+					CueTrackPosition* pCueTrackPositions = pCuePoint->CueTrackPositions.GetHead();
+					if (pCueTrackPositions->CueTrack == TrackNumber) {
+						pKFs[nKFsTmp++] = s.GetRefTime(pCuePoint->CueTime);
+					}
+				}
+			}
 		}
 	}
 
