@@ -493,83 +493,292 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, int len, CMediaType* pmt, bool find_sy
 	return true;
 }
 
-#define AGAIN Seek(pos); BitRead(8); goto _again;
+static int NextMpegStartCodeGb(CGolombBuffer& gb, BYTE& code)
+{
+	gb.BitByteAlign();
+	DWORD dw = (DWORD)-1;
+	do {
+		if (gb.IsEOF()) {
+			return false;
+		}
+		dw = (dw << 8) | (BYTE)gb.BitRead(8);
+	} while ((dw&0xffffff00) != 0x00000100);
+	code = (BYTE)(dw&0xff);
+	return true;
+}
+
+#define MARKERGB if (gb.BitRead(1) != 1) {ASSERT(0); return false;}
+bool CBaseSplitterFileEx::Read(seqhdr& h, CAtlArray<BYTE>& buf, CMediaType* pmt, bool find_sync)
+{
+	BYTE id = 0;
+
+	CGolombBuffer gb(buf.GetData(), buf.GetCount());
+
+	while (!gb.IsEOF() && id != 0xb3) {
+		if (!NextMpegStartCodeGb(gb, id)) {
+			return false;
+		}
+
+		if (!find_sync) {
+			break;
+		}
+	}
+
+	if (id != 0xb3) {
+		return false;
+	}
+
+	__int64 shpos = gb.GetPos() - 4;
+
+	h.width = (WORD)gb.BitRead(12);
+	h.height = (WORD)gb.BitRead(12);
+	h.ar = gb.BitRead(4);
+	static int ifps[16] = {0, 1126125, 1125000, 1080000, 900900, 900000, 540000, 450450, 450000, 0, 0, 0, 0, 0, 0, 0};
+	h.ifps = ifps[gb.BitRead(4)];
+	h.bitrate = (DWORD)gb.BitRead(18);
+	MARKERGB;
+	h.vbv = (DWORD)gb.BitRead(10);
+	h.constrained = gb.BitRead(1);
+
+	h.fiqm = gb.BitRead(1);
+	if (h.fiqm)
+		for (int i = 0; i < _countof(h.iqm); i++) {
+			h.iqm[i] = (BYTE)gb.BitRead(8);
+		}
+
+	h.fniqm = gb.BitRead(1);
+	if (h.fniqm)
+		for (int i = 0; i < _countof(h.niqm); i++) {
+			h.niqm[i] = (BYTE)gb.BitRead(8);
+		}
+
+	__int64 shlen = gb.GetPos() - shpos;
+
+	static float ar[] = {
+		1.0000f,1.0000f,0.6735f,0.7031f,0.7615f,0.8055f,0.8437f,0.8935f,
+		0.9157f,0.9815f,1.0255f,1.0695f,1.0950f,1.1575f,1.2015f,1.0000f
+	};
+
+	h.arx = (int)((float)h.width / ar[h.ar] + 0.5);
+	h.ary = h.height;
+
+	mpeg_t type = mpeg1;
+
+	__int64 shextpos = 0, shextlen = 0;
+
+	if (NextMpegStartCodeGb(gb, id) && id == 0xb5) { // sequence header ext
+		shextpos = gb.GetPos() - 4;
+
+		h.startcodeid = gb.BitRead(4);
+		h.profile_levelescape = gb.BitRead(1); // reserved, should be 0
+		h.profile = gb.BitRead(3);
+		h.level = gb.BitRead(4);
+		h.progressive = gb.BitRead(1);
+		h.chroma = gb.BitRead(2);
+		h.width |= (gb.BitRead(2)<<12);
+		h.height |= (gb.BitRead(2)<<12);
+		h.bitrate |= (gb.BitRead(12)<<18);
+		MARKERGB;
+		h.vbv |= (gb.BitRead(8)<<10);
+		h.lowdelay = gb.BitRead(1);
+		h.ifps = (DWORD)(h.ifps * (gb.BitRead(2)+1) / (gb.BitRead(5)+1));
+
+		shextlen = gb.GetPos() - shextpos;
+
+		struct {
+			DWORD x, y;
+		} ar[] = {{h.width,h.height},{4,3},{16,9},{221,100},{h.width,h.height}};
+		int i = min(max(h.ar, 1), 5)-1;
+		h.arx = ar[i].x;
+		h.ary = ar[i].y;
+
+		type = mpeg2;
+
+		while (!gb.IsEOF()) {
+			if (NextMpegStartCodeGb(gb, id)) {
+				if (id != 0xb5) {
+					continue;
+				}
+
+				if (gb.RemainingSize() >= 5) {
+
+					BYTE startcodeid = gb.BitRead(4);
+					if (startcodeid == 0x02) {
+						BYTE video_format = gb.BitRead(3);
+						BYTE color_description = gb.BitRead(1);
+						if (color_description) {
+							BYTE color_primaries = gb.BitRead(8);
+							BYTE color_trc = gb.BitRead(8);
+							BYTE colorspace = gb.BitRead(8);
+						}
+
+						WORD panscan_width = (WORD)gb.BitRead(14);
+						MARKERGB;
+						WORD panscan_height = (WORD)gb.BitRead(14);
+
+						if (panscan_width && panscan_height) {
+							h.arx *= h.width  * panscan_height;
+							h.ary *= h.height * panscan_width;
+						}
+
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	h.ifps = 10 * h.ifps / 27;
+	h.bitrate = h.bitrate == (1<<30)-1 ? 0 : h.bitrate * 400;
+
+	CSize aspect(h.arx, h.ary);
+	ReduceDim(aspect);
+	h.arx = aspect.cx;
+	h.ary = aspect.cy;
+
+	if (!pmt) {
+		return true;
+	}
+
+	pmt->majortype = MEDIATYPE_Video;
+
+	if (type == mpeg1) {
+		pmt->subtype						= MEDIASUBTYPE_MPEG1Payload;
+		pmt->formattype						= FORMAT_MPEGVideo;
+		int len								= FIELD_OFFSET(MPEG1VIDEOINFO, bSequenceHeader) + int(shlen + shextlen);
+		MPEG1VIDEOINFO* vi					= (MPEG1VIDEOINFO*)DNew BYTE[len];
+		memset(vi, 0, len);
+		vi->hdr.dwBitRate					= h.bitrate;
+		vi->hdr.AvgTimePerFrame				= h.ifps;
+		vi->hdr.bmiHeader.biSize			= sizeof(vi->hdr.bmiHeader);
+		vi->hdr.bmiHeader.biWidth			= h.width;
+		vi->hdr.bmiHeader.biHeight			= h.height;
+		vi->hdr.bmiHeader.biXPelsPerMeter	= h.width * h.ary;
+		vi->hdr.bmiHeader.biYPelsPerMeter	= h.height * h.arx;
+		vi->cbSequenceHeader				= DWORD(shlen + shextlen);
+		gb.Reset();
+		gb.SkipBytes(shextpos);
+		gb.ReadBuffer((BYTE*)&vi->bSequenceHeader[0], shlen);
+		if (shextpos && shextlen) {
+			gb.Reset();
+			gb.SkipBytes(shextpos);
+		}
+		gb.ReadBuffer((BYTE*)&vi->bSequenceHeader[0] + shlen, shextlen);
+		pmt->SetFormat((BYTE*)vi, len);
+		delete [] vi;
+	} else if (type == mpeg2) {
+		pmt->subtype						= MEDIASUBTYPE_MPEG2_VIDEO;
+		pmt->formattype						= FORMAT_MPEG2_VIDEO;
+		int len								= FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + int(shlen + shextlen);
+		MPEG2VIDEOINFO* vi					= (MPEG2VIDEOINFO*)DNew BYTE[len];
+		memset(vi, 0, len);
+		vi->hdr.dwBitRate					= h.bitrate;
+		vi->hdr.AvgTimePerFrame				= h.ifps;
+		vi->hdr.dwPictAspectRatioX			= h.arx;
+		vi->hdr.dwPictAspectRatioY			= h.ary;
+		vi->hdr.bmiHeader.biSize			= sizeof(vi->hdr.bmiHeader);
+		vi->hdr.bmiHeader.biWidth			= h.width;
+		vi->hdr.bmiHeader.biHeight			= h.height;
+		vi->dwProfile						= h.profile;
+		vi->dwLevel							= h.level;
+		vi->cbSequenceHeader				= DWORD(shlen + shextlen);
+		gb.Reset();
+		gb.SkipBytes(shpos);
+		ByteRead((BYTE*)&vi->dwSequenceHeader[0], shlen);
+		if (shextpos && shextlen) {
+			gb.Reset();
+			gb.SkipBytes(shextpos);
+		}
+		gb.ReadBuffer((BYTE*)&vi->dwSequenceHeader[0] + shlen, shextlen);
+		pmt->SetFormat((BYTE*)vi, len);
+		delete [] vi;
+	} else {
+		return false;
+	}
+
+	return true;
+}
+
+#define AGAIN Seek(pos); BitRead(8); continue;
 bool CBaseSplitterFileEx::Read(mpahdr& h, int len, CMediaType* pmt, bool fAllowV25)
 {
 	memset(&h, 0, sizeof(h));
 
 	int syncbits = fAllowV25 ? 11 : 12;
+	int bitrate = 0;
 
-_again:
+	for (;;) {
+		for (; len >= 4 && BitRead(syncbits, true) != (1<<syncbits) - 1; len--) {
+			BitRead(8);
+		}
 
-	for (; len >= 4 && BitRead(syncbits, true) != (1<<syncbits) - 1; len--) {
-		BitRead(8);
-	}
+		if (len < 4) {
+			return false;
+		}
 
-	if (len < 4) {
-		return false;
-	}
+		__int64 pos = GetPos();
 
-	__int64 pos = GetPos();
+		h.sync = BitRead(11);
+		h.version = BitRead(2);
+		h.layer = BitRead(2);
+		h.crc = BitRead(1);
+		h.bitrate = BitRead(4);
+		h.freq = BitRead(2);
+		h.padding = BitRead(1);
+		h.privatebit = BitRead(1);
+		h.channels = BitRead(2);
+		h.modeext = BitRead(2);
+		h.copyright = BitRead(1);
+		h.original = BitRead(1);
+		h.emphasis = BitRead(2);
 
-	h.sync = BitRead(11);
-	h.version = BitRead(2);
-	h.layer = BitRead(2);
-	h.crc = BitRead(1);
-	h.bitrate = BitRead(4);
-	h.freq = BitRead(2);
-	h.padding = BitRead(1);
-	h.privatebit = BitRead(1);
-	h.channels = BitRead(2);
-	h.modeext = BitRead(2);
-	h.copyright = BitRead(1);
-	h.original = BitRead(1);
-	h.emphasis = BitRead(2);
+		if (h.version == 1 || h.layer == 0 || h.freq == 3 || h.bitrate == 15 || h.emphasis == 2) {
+			AGAIN
+		}
 
-	if (h.version == 1 || h.layer == 0 || h.freq == 3 || h.bitrate == 15 || h.emphasis == 2) {
-		AGAIN
-	}
-
-	if (h.version == 3 && h.layer == 2) {
-		if (h.channels == 3) {
-			if (h.bitrate >= 11 && h.bitrate <= 14) {
-				AGAIN
-			}
-		} else {
-			if (h.bitrate == 1 || h.bitrate == 2 || h.bitrate == 3 || h.bitrate == 5) {
-				AGAIN
+		if (h.version == 3 && h.layer == 2) {
+			if (h.channels == 3) {
+				if (h.bitrate >= 11 && h.bitrate <= 14) {
+					AGAIN
+				}
+			} else {
+				if (h.bitrate == 1 || h.bitrate == 2 || h.bitrate == 3 || h.bitrate == 5) {
+					AGAIN
+				}
 			}
 		}
-	}
 
-	h.layer = 4 - h.layer;
+		h.layer = 4 - h.layer;
 
-	static int brtbl[][5] = {
-		{  0,   0,   0,   0,   0},
-		{ 32,  32,  32,  32,   8},
-		{ 64,  48,  40,  48,  16},
-		{ 96,  56,  48,  56,  24},
-		{128,  64,  56,  64,  32},
-		{160,  80,  64,  80,  40},
-		{192,  96,  80,  96,  48},
-		{224, 112,  96, 112,  56},
-		{256, 128, 112, 128,  64},
-		{288, 160, 128, 144,  80},
-		{320, 192, 160, 160,  96},
-		{352, 224, 192, 176, 112},
-		{384, 256, 224, 192, 128},
-		{416, 320, 256, 224, 144},
-		{448, 384, 320, 256, 160},
-		{  0,   0,   0,   0,   0},
-	};
+		static int brtbl[][5] = {
+			{  0,   0,   0,   0,   0},
+			{ 32,  32,  32,  32,   8},
+			{ 64,  48,  40,  48,  16},
+			{ 96,  56,  48,  56,  24},
+			{128,  64,  56,  64,  32},
+			{160,  80,  64,  80,  40},
+			{192,  96,  80,  96,  48},
+			{224, 112,  96, 112,  56},
+			{256, 128, 112, 128,  64},
+			{288, 160, 128, 144,  80},
+			{320, 192, 160, 160,  96},
+			{352, 224, 192, 176, 112},
+			{384, 256, 224, 192, 128},
+			{416, 320, 256, 224, 144},
+			{448, 384, 320, 256, 160},
+			{  0,   0,   0,   0,   0},
+		};
 
-	static int brtblcol[][4] = {
-		{0, 3, 4, 4},
-		{0, 0, 1, 2}
-	};
-	int bitrate = 1000 * brtbl[h.bitrate][brtblcol[h.version&1][h.layer]];
-	if (bitrate == 0) {
-		AGAIN
+		static int brtblcol[][4] = {
+			{0, 3, 4, 4},
+			{0, 0, 1, 2}
+		};
+		bitrate = 1000 * brtbl[h.bitrate][brtblcol[h.version&1][h.layer]];
+		if (bitrate == 0) {
+			AGAIN
+		}
+
+		break;
 	}
 
 	static int freq[][4] = {

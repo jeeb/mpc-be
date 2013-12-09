@@ -35,6 +35,7 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 {
 	CAtlMap<WORD, BYTE> m_pid2pes;
 	CAtlMap<WORD, CMpegSplitterFile::avchdr> avch;
+	CAtlMap<WORD, CMpegSplitterFile::seqhdr> seqh;
 	bool m_init;
 
 	HRESULT Init(IAsyncReader* pAsyncReader);
@@ -67,7 +68,7 @@ public:
 		char lang[4];
 		bool lang_set;
 
-		struct stream() {
+		stream() {
 			memset(this, 0, sizeof(*this));
 		}
 		operator DWORD() const {

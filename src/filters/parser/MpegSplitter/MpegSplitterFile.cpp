@@ -591,9 +591,31 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 	if (pesid >= 0xe0 && pesid < 0xf0) { // mpeg video
 		// MPEG2
 		if (type == unknown && (stream_type & MPEG2_VIDEO)) {
-			CMpegSplitterFile::seqhdr h;
-			if (!m_streams[video].Find(s) && Read(h, len, &s.mt)) {
-				type = video;
+			// Sequence/extension header can be split into multiple packets
+			if (!m_streams[video].Find(s)) {
+				if (!seqh.Lookup(pid)) {
+					seqh[pid].Init();
+				}
+
+				if (seqh[pid].data.GetCount()) {
+					if (seqh[pid].data.GetCount() < 512) {
+						size_t size = seqh[pid].data.GetCount();
+						seqh[pid].data.SetCount(size + (size_t)len);
+						ByteRead(seqh[pid].data.GetData() + size, len);
+					} else {
+						CMpegSplitterFile::seqhdr h;
+						if (Read(h, seqh[pid].data, &s.mt)) {
+							type = video;
+						}
+					}
+				} else {
+					CMediaType mt;
+					if (Read(seqh[pid], len, &mt)) {
+						Seek(start);
+						seqh[pid].data.SetCount((size_t)len);
+						ByteRead(seqh[pid].data.GetData(), len);
+					}
+				}
 			}
 		}
 

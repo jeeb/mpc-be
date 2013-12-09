@@ -40,8 +40,6 @@ public:
 	CBaseSplitterFileEx(IAsyncReader* pReader, HRESULT& hr, bool fRandomAccess = true, bool fStreaming = false, bool fStreamingDetect = false);
 	virtual ~CBaseSplitterFileEx();
 
-	// using CBaseSplitterFile::Read;
-
 	bool NextMpegStartCode(BYTE& b, __int64 len = 65536);
 
 #pragma pack(push, 1)
@@ -103,6 +101,16 @@ public:
 		BYTE lowdelay:1;
 		// misc
 		int arx, ary;
+		//
+		CAtlArray<BYTE> data;
+
+		void Init() {
+			memset(this, 0, sizeof(*this));
+		}
+
+		seqhdr() {
+			Init();
+		}
 	};
 
 	struct mpahdr
@@ -437,6 +445,7 @@ public:
 	bool Read(pssyshdr& h);
 	bool Read(peshdr& h, BYTE code);
 	bool Read(seqhdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true);
+	bool Read(seqhdr& h, CAtlArray<BYTE>& buf, CMediaType* pmt = NULL, bool find_sync = true);
 	bool Read(mpahdr& h, int len, CMediaType* pmt = NULL, bool fAllowV25 = false);
 	bool Read(aachdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true);
 	bool Read(latm_aachdr& h, int len, CMediaType* pmt = NULL);
