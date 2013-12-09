@@ -232,6 +232,7 @@ SRCS_C = \
 	libavcodec/libopus.c \
 	libavcodec/libopusdec.c \
 	libavcodec/libspeexdec.c \
+	libavcodec/libvpx.c \
 	libavcodec/libvpxdec.c \
 	libavcodec/lsp.c \
 	libavcodec/mathtables.c \

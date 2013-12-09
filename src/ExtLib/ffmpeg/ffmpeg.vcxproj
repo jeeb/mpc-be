@@ -132,6 +132,7 @@
     <ClInclude Include="libavcodec\diracdsp.h" />
     <ClInclude Include="libavcodec\dirac_arith.h" />
     <ClInclude Include="libavcodec\dirac_dwt.h" />
+    <ClInclude Include="libavcodec\dnxhddata.h" />
     <ClInclude Include="libavcodec\dsputil.h" />
     <ClInclude Include="libavcodec\dv.h" />
     <ClInclude Include="libavcodec\dvdata.h" />
@@ -147,6 +148,7 @@
     <ClInclude Include="libavcodec\fft-internal.h" />
     <ClInclude Include="libavcodec\fft.h" />
     <ClInclude Include="libavcodec\fft_table.h" />
+    <ClInclude Include="libavcodec\ffv1.h" />
     <ClInclude Include="libavcodec\flac.h" />
     <ClInclude Include="libavcodec\flacdata.h" />
     <ClInclude Include="libavcodec\flacdsp.h" />
@@ -173,6 +175,7 @@
     <ClInclude Include="libavcodec\hevcpred.h" />
     <ClInclude Include="libavcodec\hpeldsp.h" />
     <ClInclude Include="libavcodec\huffman.h" />
+    <ClInclude Include="libavcodec\huffyuv.h" />
     <ClInclude Include="libavcodec\imcdata.h" />
     <ClInclude Include="libavcodec\imgconvert.h" />
     <ClInclude Include="libavcodec\indeo3data.h" />
@@ -189,6 +192,7 @@
     <ClInclude Include="libavcodec\kbdwin.h" />
     <ClInclude Include="libavcodec\lagarithrac.h" />
     <ClInclude Include="libavcodec\libopus.h" />
+    <ClInclude Include="libavcodec\libvpx.h" />
     <ClInclude Include="libavcodec\lpc.h" />
     <ClInclude Include="libavcodec\lsp.h" />
     <ClInclude Include="libavcodec\lzw.h" />
@@ -463,6 +467,9 @@
     <ClCompile Include="libavcodec\diracdsp.c" />
     <ClCompile Include="libavcodec\dirac_arith.c" />
     <ClCompile Include="libavcodec\dirac_dwt.c" />
+    <ClCompile Include="libavcodec\dnxhddata.c" />
+    <ClCompile Include="libavcodec\dnxhddec.c" />
+    <ClCompile Include="libavcodec\dnxhd_parser.c" />
     <ClCompile Include="libavcodec\dsputil.c" />
     <ClCompile Include="libavcodec\dsputil_template.c" />
     <ClCompile Include="libavcodec\dv.c" />
@@ -482,6 +489,8 @@
     <ClCompile Include="libavcodec\fft_float.c" />
     <ClCompile Include="libavcodec\fft_init_table.c" />
     <ClCompile Include="libavcodec\fft_template.c" />
+    <ClCompile Include="libavcodec\ffv1.c" />
+    <ClCompile Include="libavcodec\ffv1dec.c" />
     <ClCompile Include="libavcodec\flac.c" />
     <ClCompile Include="libavcodec\flacdata.c" />
     <ClCompile Include="libavcodec\flacdec.c" />
@@ -541,6 +550,8 @@
     <ClCompile Include="libavcodec\hpeldsp_template.c" />
     <ClCompile Include="libavcodec\hpel_template.c" />
     <ClCompile Include="libavcodec\huffman.c" />
+    <ClCompile Include="libavcodec\huffyuv.c" />
+    <ClCompile Include="libavcodec\huffyuvdec.c" />
     <ClCompile Include="libavcodec\imc.c" />
     <ClCompile Include="libavcodec\imgconvert.c" />
     <ClCompile Include="libavcodec\indeo3.c" />
@@ -563,6 +574,7 @@
     <ClCompile Include="libavcodec\libopus.c" />
     <ClCompile Include="libavcodec\libopusdec.c" />
     <ClCompile Include="libavcodec\libspeexdec.c" />
+    <ClCompile Include="libavcodec\libvpx.c" />
     <ClCompile Include="libavcodec\libvpxdec.c" />
     <ClCompile Include="libavcodec\log2_tab.c" />
     <ClCompile Include="libavcodec\lsp.c" />
