@@ -1438,11 +1438,16 @@ bool CMPCVideoDecFilter::IsAVI()
 HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction, const CMediaType *pmt)
 {
 	if (direction == PINDIR_INPUT) {
-
 		HRESULT hr = InitDecoder(pmt);
 		if (FAILED(hr)) {
 			return hr;
 		}
+	} else if (direction == PINDIR_OUTPUT) {
+		BITMAPINFOHEADER bihOut;
+		if (!ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut)) {
+			return E_FAIL;
+		}
+		m_FormatConverter.UpdateOutput2(bihOut.biCompression, bihOut.biWidth, bihOut.biHeight);
 	}
 
 	return __super::SetMediaType(direction, pmt);
@@ -2474,9 +2479,6 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 		pOut->SetTime(&rtStart, &rtStop);
 		pOut->SetMediaTime(NULL, NULL);
 
-		BITMAPINFOHEADER bihOut;
-		ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
-		m_FormatConverter.UpdateOutput2(bihOut.biCompression, bihOut.biWidth, bihOut.biHeight);
 		m_FormatConverter.Converting(pDataOut, m_pFrame);
 
 #if defined(_DEBUG) && 0

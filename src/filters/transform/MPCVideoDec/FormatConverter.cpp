@@ -67,6 +67,36 @@ const SW_OUT_FMT* GetSWOF(int pixfmt)
 	return &s_sw_formats[pixfmt];
 }
 
+LPCTSTR GetChromaSubsamplingStr(AVPixelFormat av_pix_fmt)
+{
+	int h_shift, v_shift;
+
+	if (0 == av_pix_fmt_get_chroma_sub_sample(av_pix_fmt, &h_shift, &v_shift)) {
+		if (h_shift == 0 && v_shift == 0) {
+			return _T("4:4:4");
+		} else if (h_shift == 0 && v_shift == 1) {
+			return _T("4:4:0");
+		} else if (h_shift == 1 && v_shift == 0) {
+			return _T("4:2:2");
+		} else if (h_shift == 1 && v_shift == 1) {
+			return _T("4:2:0");
+		} else if (h_shift == 2 && v_shift == 0) {
+			return _T("4:1:1");
+		} else if (h_shift == 2 && v_shift == 2) {
+			return _T("4:1:0");
+		}
+	}
+
+	return _T("");
+}
+
+int GetLumaBits(AVPixelFormat av_pix_fmt)
+{
+	const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(av_pix_fmt);
+
+	return (pfdesc ? pfdesc->comp->depth_minus1 + 1 : 0);
+}
+
 MPCPixelFormat GetPixFormat(GUID& subtype)
 {
 	for (int i = 0; i < PixFmt_count; i++) {
@@ -132,36 +162,6 @@ MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
 	return PFType_unspecified;
 }
 
-LPCTSTR GetChromaSubsamplingStr(AVPixelFormat av_pix_fmt)
-{
-	int h_shift, v_shift;
-
-	if (0 == av_pix_fmt_get_chroma_sub_sample(av_pix_fmt, &h_shift, &v_shift)) {
-		if (h_shift == 0 && v_shift == 0) {
-			return _T("4:4:4");
-		} else if (h_shift == 0 && v_shift == 1) {
-			return _T("4:4:0");
-		} else if (h_shift == 1 && v_shift == 0) {
-			return _T("4:2:2");
-		} else if (h_shift == 1 && v_shift == 1) {
-			return _T("4:2:0");
-		} else if (h_shift == 2 && v_shift == 0) {
-			return _T("4:1:1");
-		} else if (h_shift == 2 && v_shift == 2) {
-			return _T("4:1:0");
-		}
-	}
-
-	return _T("");
-}
-
-int GetLumaBits(AVPixelFormat av_pix_fmt)
-{
-	const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(av_pix_fmt);
-
-	return (pfdesc ? pfdesc->comp->depth_minus1 + 1 : 0);
-}
-
 // CFormatConverter
 
 CFormatConverter::CFormatConverter()
@@ -188,6 +188,8 @@ CFormatConverter::CFormatConverter()
 
 	CCpuId cpuId;
 	m_nCPUFlag = cpuId.GetFeatures();
+
+	pConvertFn			= &CFormatConverter::ConvertGeneric;
 }
 
 CFormatConverter::~CFormatConverter()
@@ -224,6 +226,8 @@ bool CFormatConverter::Init()
 		return false;
 	}
 
+	SetConvertFunc();
+
 	return true;
 }
 
@@ -238,6 +242,43 @@ void  CFormatConverter::UpdateDetails()
 				dstRange = m_dstRGBRange;
 			}
 			ret = sws_setColorspaceDetails(m_pSwsContext, sws_getCoefficients(m_colorspace), srcRange, tbl, dstRange, brightness, contrast, saturation);
+		}
+	}
+}
+
+void CFormatConverter::SetConvertFunc()
+{
+	pConvertFn = &CFormatConverter::ConvertGeneric;
+
+	if (m_nCPUFlag & CCpuId::MPC_MM_SSE2) {
+		switch (m_out_pixfmt) {
+		case PixFmt_AYUV:
+			if (m_FProps.pftype == PFType_YUV444Px) {
+				pConvertFn = &CFormatConverter::convert_yuv444_ayuv_dither_le;
+			}
+			break;
+		case PixFmt_P010:
+		case PixFmt_P016:
+			if (m_FProps.pftype == PFType_YUV420Px) {
+				pConvertFn = &CFormatConverter::convert_yuv420_px1x_le;
+			}
+			break;
+		case PixFmt_Y410:
+			if (m_FProps.pftype == PFType_YUV444Px && m_FProps.lumabits <= 10) {
+				pConvertFn = &CFormatConverter::convert_yuv444_y410;
+			}
+			break;
+		case PixFmt_P210:
+		case PixFmt_P216:
+			if (m_FProps.pftype == PFType_YUV422Px) {
+				pConvertFn = &CFormatConverter::convert_yuv420_px1x_le;
+			}
+			break;
+		case PixFmt_YUY2:
+			if (m_FProps.pftype == PFType_YUV422Px) {
+				pConvertFn = &CFormatConverter::convert_yuv422_yuy2_uyvy_dither_le;
+				break;
+			}
 		}
 	}
 }
@@ -525,6 +566,33 @@ HRESULT CFormatConverter::ConvertToY416(const uint8_t* const src[4], const int s
   av_freep(&pTmpBuffer);
 
   return S_OK;
+}
+
+HRESULT CFormatConverter::ConvertGeneric(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[])
+{
+	switch (m_out_pixfmt) {
+	case PixFmt_AYUV:
+		ConvertToAYUV(src, srcStride, dst, width, height, dstStride);
+		break;
+	case PixFmt_P010:
+	case PixFmt_P016:
+		ConvertToPX1X(src, srcStride, dst, width, height, dstStride, 2);
+		break;
+	case PixFmt_Y410:
+		ConvertToY410(src, srcStride, dst, width, height, dstStride);
+		break;
+	case PixFmt_P210:
+	case PixFmt_P216:
+		ConvertToPX1X(src, srcStride, dst, width, height, dstStride, 1);
+		break;
+	case PixFmt_Y416:
+		ConvertToY416(src, srcStride, dst, width, height, dstStride);
+		break;
+	default:
+		int ret = sws_scale(m_pSwsContext, src, srcStride, 0, height, dst, dstStride);
+	}
+
+	return S_OK;
 }
 
 HRESULT CFormatConverter::convert_yuv444_y410(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[])
@@ -884,15 +952,17 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 		m_FProps.avpixfmt	= (AVPixelFormat)pFrame->format;
 		m_FProps.width		= pFrame->width;
 		m_FProps.height		= pFrame->height;
-		if (!Init()) {
-			TRACE(_T("FormatConverter: Init() failed\n"));
-			return 0;
-		}
+
 		// update the additional properties (updated only when changing basic properties)
 		m_FProps.lumabits	= GetLumaBits(m_FProps.avpixfmt);
 		m_FProps.pftype		= GetPixFmtType(m_FProps.avpixfmt);
 		m_FProps.colorspace	= pFrame->colorspace;
 		m_FProps.colorrange	= pFrame->color_range;
+
+		if (!Init()) {
+			TRACE(_T("FormatConverter: Init() failed\n"));
+			return 0;
+		}
 
 		UpdateDetails();
 	}
@@ -929,48 +999,7 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 		std::swap(dstArray[1], dstArray[2]);
 	}
 
-	switch (m_out_pixfmt) {
-	case PixFmt_AYUV:
-		if (m_nCPUFlag & CCpuId::MPC_MM_SSE2 && (m_FProps.pftype == PFType_YUV444Px)) {
-			convert_yuv444_ayuv_dither_le(pFrame->data, pFrame->linesize, dstArray, m_FProps.width, m_FProps.height, dstStrideArray);
-		} else {
-			ConvertToAYUV(pFrame->data, pFrame->linesize, dstArray, m_FProps.width, m_FProps.height, dstStrideArray);
-		}
-		break;
-	case PixFmt_P010:
-	case PixFmt_P016:
-		if (m_nCPUFlag & CCpuId::MPC_MM_SSE2 && (m_FProps.pftype == PFType_YUV420Px)) {
-			convert_yuv420_px1x_le(pFrame->data, pFrame->linesize, dstArray, m_FProps.width, m_FProps.height, dstStrideArray);
-		} else {
-			ConvertToPX1X(pFrame->data, pFrame->linesize, dstArray, m_FProps.width, m_FProps.height, dstStrideArray, 2);
-		}
-		break;
-	case PixFmt_Y410:
-		if (m_nCPUFlag & CCpuId::MPC_MM_SSE2 && (m_FProps.pftype == PFType_YUV444Px && m_FProps.lumabits <= 10)) {
-			convert_yuv444_y410(pFrame->data, pFrame->linesize, dstArray, m_FProps.width, m_FProps.height, dstStrideArray);
-		} else {
-			ConvertToY410(pFrame->data, pFrame->linesize, dstArray, m_FProps.width, m_FProps.height, dstStrideArray);
-		}
-		break;
-	case PixFmt_P210:
-	case PixFmt_P216:
-		if (m_nCPUFlag & CCpuId::MPC_MM_SSE2 && (m_FProps.pftype == PFType_YUV422Px)) {
-			convert_yuv420_px1x_le(pFrame->data, pFrame->linesize, dstArray, m_FProps.width, m_FProps.height, dstStrideArray);
-		} else {
-			ConvertToPX1X(pFrame->data, pFrame->linesize, dstArray, m_FProps.width, m_FProps.height, dstStrideArray, 1);
-		}
-		break;
-	case PixFmt_Y416:
-		ConvertToY416(pFrame->data, pFrame->linesize, dstArray, m_FProps.width, m_FProps.height, dstStrideArray);
-		break;
-	case PixFmt_YUY2:
-		if (m_nCPUFlag & CCpuId::MPC_MM_SSE2 && (m_FProps.pftype == PFType_YUV422Px)) {
-			convert_yuv422_yuy2_uyvy_dither_le(pFrame->data, pFrame->linesize, dstArray, m_FProps.width, m_FProps.height, dstStrideArray);
-			break;
-		}
-	default:
-		int ret = sws_scale(m_pSwsContext, pFrame->data, pFrame->linesize, 0, m_FProps.height, dstArray, dstStrideArray);
-	}
+	(this->*pConvertFn)(pFrame->data, pFrame->linesize, dstArray, m_FProps.width, m_FProps.height, dstStrideArray);
 
 	if (out != dst) {
 		int line = 0;

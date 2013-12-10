@@ -89,6 +89,8 @@ typedef struct {
 
 class CFormatConverter
 {
+#define CONV_FUNC_PARAMS const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[]
+
 protected:
 	SwsContext*			m_pSwsContext;
 	FrameProps			m_FProps;
@@ -110,18 +112,25 @@ protected:
 
 	bool Init();
 	void UpdateDetails();
+	void SetConvertFunc();
 
 	// from LAV Filters
-	HRESULT ConvertToAYUV(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[]);
-	HRESULT ConvertToPX1X(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[], int chromaVertical);
-	HRESULT ConvertToY410(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[]);
-	HRESULT ConvertToY416(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[]);
+	HRESULT ConvertToAYUV(CONV_FUNC_PARAMS);
+	HRESULT ConvertToPX1X(CONV_FUNC_PARAMS, int chromaVertical);
+	HRESULT ConvertToY410(CONV_FUNC_PARAMS);
+	HRESULT ConvertToY416(CONV_FUNC_PARAMS);
+	
+	// Conversion function pointer
+	typedef HRESULT (CFormatConverter::*ConverterFn)(CONV_FUNC_PARAMS);
+	ConverterFn pConvertFn;
+
+	HRESULT ConvertGeneric(CONV_FUNC_PARAMS);
 	// optimized function
-	HRESULT convert_yuv444_y410(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[]);
-	HRESULT convert_yuv444_ayuv(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[]);
-	HRESULT convert_yuv444_ayuv_dither_le(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[]);
-	HRESULT convert_yuv420_px1x_le(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[]);
-	HRESULT convert_yuv422_yuy2_uyvy_dither_le(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[]);
+	HRESULT convert_yuv444_y410(CONV_FUNC_PARAMS);
+	HRESULT convert_yuv444_ayuv(CONV_FUNC_PARAMS);
+	HRESULT convert_yuv444_ayuv_dither_le(CONV_FUNC_PARAMS);
+	HRESULT convert_yuv420_px1x_le(CONV_FUNC_PARAMS);
+	HRESULT convert_yuv422_yuy2_uyvy_dither_le(CONV_FUNC_PARAMS);
 
 public:
 	CFormatConverter();
