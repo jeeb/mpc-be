@@ -275,8 +275,8 @@ void CFormatConverter::SetConvertFunc()
 		case PixFmt_YUY2:
 			if (m_FProps.pftype == PFType_YUV422Px) {
 				pConvertFn = &CFormatConverter::convert_yuv422_yuy2_uyvy_dither_le;
-				break;
 			}
+			break;
 		}
 	}
 }

@@ -35,11 +35,11 @@
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/SysVersion.h"
 #include "../../../DSUtil/MediaTypes.h"
+#include "../../../DSUtil/WinAPIUtils.h"
 #include "../../parser/MpegSplitter/MpegSplitter.h"
 #include "DXVADecoderH264.h"
 #include <moreuuids.h>
 
-#include "../../../DSUtil/WinAPIUtils.h"
 #include "Version.h"
 
 #pragma warning(push)
@@ -2031,16 +2031,14 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 			if (FAILED(hr = ReopenVideo())) {
 				return hr;
 			}
-
-			ChangeOutputMediaFormat(2);
 		}
 
 		CLSID ClsidSourceFilter = GetCLSID(m_pInput->GetConnected());
 		if ((ClsidSourceFilter == __uuidof(CMpegSourceFilter)) || (ClsidSourceFilter == __uuidof(CMpegSplitterFilter))) {
 			m_bReorderBFrame = false;
 
-			if (CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected()) ) {
-				if (CComQIPtr<IMpegSplitterFilter> MpegSplitterFilter = pFilter ) {
+			if (CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected())) {
+				if (CComQIPtr<IMpegSplitterFilter> MpegSplitterFilter = pFilter) {
 					m_bIsEVO = (m_nCodecId == AV_CODEC_ID_VC1 && mpeg_ps == MpegSplitterFilter->GetMPEGType());
 				}
 			}
