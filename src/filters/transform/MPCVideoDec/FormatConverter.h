@@ -106,6 +106,8 @@ protected:
 	size_t				m_nAlignedBufferSize;
 	uint8_t*			m_pAlignedBuffer;
 
+	int					m_nCPUFlag;
+
 	bool Init();
 	void UpdateDetails();
 
@@ -114,6 +116,12 @@ protected:
 	HRESULT ConvertToPX1X(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[], int chromaVertical);
 	HRESULT ConvertToY410(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[]);
 	HRESULT ConvertToY416(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[]);
+	// optimized function
+	HRESULT convert_yuv444_y410(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[]);
+	HRESULT convert_yuv444_ayuv(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[]);
+	HRESULT convert_yuv444_ayuv_dither_le(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[]);
+	HRESULT convert_yuv420_px1x_le(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[]);
+	HRESULT convert_yuv422_yuy2_uyvy_dither_le(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[]);
 
 public:
 	CFormatConverter();

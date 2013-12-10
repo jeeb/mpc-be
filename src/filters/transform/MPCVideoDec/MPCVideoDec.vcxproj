@@ -274,6 +274,7 @@ update_version.bat</Command>
     <ClInclude Include="IMPCVideoDec.h" />
     <ClInclude Include="MPCVideoDec.h" />
     <ClInclude Include="MPCVideoDecSettingsWnd.h" />
+    <ClInclude Include="pixconv_sse2_templates.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>

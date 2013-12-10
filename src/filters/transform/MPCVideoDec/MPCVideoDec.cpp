@@ -2610,7 +2610,7 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 			}
 			break;
 		default :
-			ASSERT (FALSE);
+			ASSERT(FALSE);
 			hr = E_UNEXPECTED;
 	}
 
