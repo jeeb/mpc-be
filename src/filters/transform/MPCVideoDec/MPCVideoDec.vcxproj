@@ -258,6 +258,7 @@ update_version.bat</Command>
     <ClCompile Include="FormatConverter.cpp" />
     <ClCompile Include="MPCVideoDec.cpp" />
     <ClCompile Include="MPCVideoDecSettingsWnd.cpp" />
+    <ClCompile Include="pixconv_functions.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
