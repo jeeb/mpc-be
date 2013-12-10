@@ -70,6 +70,9 @@ struct SwsContext;
 enum MPCPixFmtType {
 	PFType_unspecified,
 	PFType_RGB,
+	PFType_YUV420,
+	PFType_YUV422,
+	PFType_YUV444,
 	PFType_YUV420Px,
 	PFType_YUV422Px,
 	PFType_YUV444Px,
@@ -130,6 +133,7 @@ protected:
 	HRESULT convert_yuv444_ayuv(CONV_FUNC_PARAMS);
 	HRESULT convert_yuv444_ayuv_dither_le(CONV_FUNC_PARAMS);
 	HRESULT convert_yuv420_px1x_le(CONV_FUNC_PARAMS);
+	HRESULT convert_yuv420_yuy2(CONV_FUNC_PARAMS);
 	HRESULT convert_yuv422_yuy2_uyvy_dither_le(CONV_FUNC_PARAMS);
 
 public:

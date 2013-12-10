@@ -137,7 +137,7 @@ MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
 		return PFType_RGB;
 	}
 
-	if (lumabits <= 8 || lumabits > 16 || pfdesc->nb_components != 3 + (pfdesc->flags & AV_PIX_FMT_FLAG_ALPHA ? 1 : 0)) {
+	if (lumabits < 8 || lumabits > 16 || pfdesc->nb_components != 3 + (pfdesc->flags & AV_PIX_FMT_FLAG_ALPHA ? 1 : 0)) {
 		return PFType_unspecified;
 	}
 
@@ -145,15 +145,15 @@ MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
 		// must be planar type, ignore alpha channel, other flags are forbidden
 
 		if (pfdesc->log2_chroma_w == 1 && pfdesc->log2_chroma_h == 1) {
-			return PFType_YUV420Px;
+			return lumabits == 8 ? PFType_YUV420 : PFType_YUV420Px;
 		}
 
 		if (pfdesc->log2_chroma_w == 1 && pfdesc->log2_chroma_h == 0) {
-			return PFType_YUV422Px;
+			return lumabits == 8 ? PFType_YUV422 : PFType_YUV422Px;
 		}
 
 		if (pfdesc->log2_chroma_w == 0 && pfdesc->log2_chroma_h == 0) {
-			return PFType_YUV444Px;
+			return lumabits == 8 ? PFType_YUV444 : PFType_YUV444Px;
 		}
 	}
 
@@ -275,6 +275,8 @@ void CFormatConverter::SetConvertFunc()
 		case PixFmt_YUY2:
 			if (m_FProps.pftype == PFType_YUV422Px) {
 				pConvertFn = &CFormatConverter::convert_yuv422_yuy2_uyvy_dither_le;
+			} else if (m_FProps.pftype == PFType_YUV420 || PFType_YUV420Px && m_FProps.lumabits <= 14) {
+				pConvertFn = &CFormatConverter::convert_yuv420_yuy2;
 			}
 			break;
 		}
