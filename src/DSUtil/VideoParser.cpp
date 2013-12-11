@@ -183,7 +183,7 @@ int HrdParameters(CGolombBuffer& gb)
 bool ParseAVCHeader(CGolombBuffer gb, avc_hdr& h, bool fullscan)
 {
 	static BYTE profiles[] = {44, 66, 77, 88, 100, 110, 118, 122, 128, 144, 244};
-	static BYTE levels[] = {10, 11, 12, 13, 20, 21, 22, 30, 31, 32, 40, 41, 42, 50, 51};
+	static BYTE levels[] = {10, 11, 12, 13, 20, 21, 22, 30, 31, 32, 40, 41, 42, 50, 51, 52};
 
 	memset((void*)&h, 0, sizeof(h));
 
