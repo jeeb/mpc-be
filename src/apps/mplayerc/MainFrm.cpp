@@ -4282,6 +4282,9 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		}
 	}
 
+	m_bfirstPlay	= true;
+	m_LastOpenFile	= pOMD->title;
+
 	if (!(s.nCLSwitches & CLSW_OPEN) && (s.nLoops > 0)) {
 		SendMessage(WM_COMMAND, ID_PLAY_PLAY);
 	}
@@ -4296,9 +4299,6 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	if (m_fFullScreen && s.fRememberZoomLevel) {
 		m_fFirstFSAfterLaunchOnFS = true;
 	}
-
-	m_bfirstPlay	= true;
-	m_LastOpenFile	= pOMD->title;
 
 	if (m_bIsBDPlay == FALSE) {
 		m_MPLSPlaylist.RemoveAll();
