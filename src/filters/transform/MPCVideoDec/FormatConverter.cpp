@@ -279,6 +279,19 @@ void CFormatConverter::SetConvertFunc()
 				pConvertFn = &CFormatConverter::convert_yuv420_yuy2;
 			}
 			break;
+		case PixFmt_NV12:
+		case PixFmt_YV12:
+			if (m_FProps.pftype == PFType_YUV420Px) {
+				pConvertFn = &CFormatConverter::convert_yuv_yv_nv12_dither_le;
+			}
+			break;
+		case PixFmt_YV24:
+			if (m_FProps.pftype == PFType_YUV444Px) {
+				pConvertFn = &CFormatConverter::convert_yuv_yv_nv12_dither_le;
+			} else if (m_FProps.pftype == PFType_YUV444) {
+				pConvertFn = &CFormatConverter::convert_yuv_yv;
+			}
+			break;
 		}
 	}
 }
@@ -323,7 +336,7 @@ void CFormatConverter::SetOptions(int preset, int standard, int rgblevels)
 	int swsFlags = 0;
 	switch (preset) {
 	case 0  : // "Fastest"
-		swsFlags = SWS_FAST_BILINEAR | SWS_ACCURATE_RND;
+		swsFlags = SWS_FAST_BILINEAR/* | SWS_ACCURATE_RND*/;
 		// SWS_FAST_BILINEAR or SWS_POINT disable dither and enable low-quality yv12_to_yuy2 conversion.
 		// any interpolation type has no effect.
 		break;
@@ -395,10 +408,6 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 	for (int i = 1; i < swof.planes; ++i) {
 		dstArray[i] = dstArray[i-1] + dstStrideArray[i-1] * (m_planeHeight / swof.planeWidth[i-1]);
 		dstStrideArray[i] = byteStride / swof.planeWidth[i];
-	}
-
-	if (m_out_pixfmt == PixFmt_YV12 || m_out_pixfmt == PixFmt_YV24) {
-		std::swap(dstArray[1], dstArray[2]);
 	}
 
 	(this->*pConvertFn)(pFrame->data, pFrame->linesize, dstArray, m_FProps.width, m_FProps.height, dstStrideArray);

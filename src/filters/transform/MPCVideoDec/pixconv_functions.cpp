@@ -340,6 +340,9 @@ HRESULT CFormatConverter::ConvertGeneric(const uint8_t* const src[4], const int 
 		ConvertToY416(src, srcStride, dst, width, height, dstStride);
 		break;
 	default:
+		if (m_out_pixfmt == PixFmt_YV12 || m_out_pixfmt == PixFmt_YV24) {
+			std::swap(dst[1], dst[2]);
+		}
 		int ret = sws_scale(m_pSwsContext, src, srcStride, 0, height, dst, dstStride);
 	}
 
@@ -832,6 +835,153 @@ HRESULT CFormatConverter::convert_yuv422_yuy2_uyvy_dither_le(const uint8_t* cons
     y += inLumaStride;
     u += inChromaStride;
     v += inChromaStride;
+  }
+
+  return S_OK;
+}
+
+HRESULT CFormatConverter::convert_yuv_yv_nv12_dither_le(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[])
+{
+  const uint16_t *y = (const uint16_t *)src[0];
+  const uint16_t *u = (const uint16_t *)src[1];
+  const uint16_t *v = (const uint16_t *)src[2];
+
+  const ptrdiff_t inYStride   = srcStride[0] >> 1;
+  const ptrdiff_t inUVStride  = srcStride[1] >> 1;
+
+  const ptrdiff_t outYStride  = dstStride[0];
+  const ptrdiff_t outUVStride = dstStride[1];
+
+  ptrdiff_t chromaWidth       = width;
+  ptrdiff_t chromaHeight      = height;
+
+  const uint16_t *dithers = NULL;
+
+  if (m_FProps.pftype == PFType_YUV420Px)
+    chromaHeight = chromaHeight >> 1;
+  if (m_FProps.pftype == PFType_YUV420Px || m_FProps.pftype == PFType_YUV422Px)
+    chromaWidth = (chromaWidth + 1) >> 1;
+
+  ptrdiff_t line, i;
+
+  __m128i xmm0,xmm1,xmm2,xmm3,xmm4,xmm5,xmm6,xmm7;
+
+  _mm_sfence();
+
+  // Process Y
+  for (line = 0; line < height; ++line) {
+    // Load dithering coefficients for this line
+    PIXCONV_LOAD_DITHER_COEFFS(xmm7,line,8,dithers);
+    xmm4 = xmm5 = xmm6 = xmm7;
+
+    __m128i *dst128Y = (__m128i *)(dst[0] + line * outYStride);
+
+    for (i = 0; i < width; i+=32) {
+      // Load pixels into registers, and apply dithering
+      PIXCONV_LOAD_PIXEL16_DITHER(xmm0, xmm4, (y+i+ 0), m_FProps.lumabits);  /* Y0Y0Y0Y0 */
+      PIXCONV_LOAD_PIXEL16_DITHER(xmm1, xmm5, (y+i+ 8), m_FProps.lumabits);  /* Y0Y0Y0Y0 */
+      PIXCONV_LOAD_PIXEL16_DITHER(xmm2, xmm6, (y+i+16), m_FProps.lumabits);  /* Y0Y0Y0Y0 */
+      PIXCONV_LOAD_PIXEL16_DITHER(xmm3, xmm7, (y+i+24), m_FProps.lumabits);  /* Y0Y0Y0Y0 */
+      xmm0 = _mm_packus_epi16(xmm0, xmm1);                     /* YYYYYYYY */
+      xmm2 = _mm_packus_epi16(xmm2, xmm3);                     /* YYYYYYYY */
+
+      // Write data back
+      _mm_stream_si128(dst128Y++, xmm0);
+      _mm_stream_si128(dst128Y++, xmm2);
+    }
+
+    // Process U/V for chromaHeight lines
+    if (line < chromaHeight) {
+      __m128i *dst128UV = (__m128i *)(dst[1] + line * outUVStride);
+      __m128i *dst128U = (__m128i *)(dst[2] + line * outUVStride);
+      __m128i *dst128V = (__m128i *)(dst[1] + line * outUVStride);
+
+       for (i = 0; i < chromaWidth; i+=16) {
+        PIXCONV_LOAD_PIXEL16_DITHER(xmm0, xmm4, (u+i+0), m_FProps.lumabits);  /* U0U0U0U0 */
+        PIXCONV_LOAD_PIXEL16_DITHER(xmm1, xmm5, (u+i+8), m_FProps.lumabits);  /* U0U0U0U0 */
+        PIXCONV_LOAD_PIXEL16_DITHER(xmm2, xmm6, (v+i+0), m_FProps.lumabits);  /* V0V0V0V0 */
+        PIXCONV_LOAD_PIXEL16_DITHER(xmm3, xmm7, (v+i+8), m_FProps.lumabits);  /* V0V0V0V0 */
+
+        xmm0 = _mm_packus_epi16(xmm0, xmm1);                    /* UUUUUUUU */
+        xmm2 = _mm_packus_epi16(xmm2, xmm3);                    /* VVVVVVVV */
+        if (m_out_pixfmt == PixFmt_NV12) {
+          xmm1 = xmm0;
+          xmm0 = _mm_unpacklo_epi8(xmm0, xmm2);
+          xmm1 = _mm_unpackhi_epi8(xmm1, xmm2);
+
+          _mm_stream_si128(dst128UV++, xmm0);
+          _mm_stream_si128(dst128UV++, xmm1);
+        } else {
+          _mm_stream_si128(dst128U++, xmm0);
+          _mm_stream_si128(dst128V++, xmm2);
+        }
+      }
+
+      u += inUVStride;
+      v += inUVStride;
+    }
+
+    y += inYStride;
+  }
+
+  return S_OK;
+}
+
+HRESULT CFormatConverter::convert_yuv_yv(const uint8_t* const src[4], const int srcStride[4], uint8_t* dst[], int width, int height, int dstStride[])
+{
+  const uint8_t *y = src[0];
+  const uint8_t *u = src[1];
+  const uint8_t *v = src[2];
+
+  const ptrdiff_t inLumaStride    = srcStride[0];
+  const ptrdiff_t inChromaStride  = srcStride[1];
+
+  const ptrdiff_t outLumaStride   = dstStride[0];
+  const ptrdiff_t outChromaStride = dstStride[1];
+
+  ptrdiff_t line;
+  ptrdiff_t chromaWidth       = width;
+  ptrdiff_t chromaHeight      = height;
+
+  if (m_FProps.pftype == PFType_YUV420)
+    chromaHeight = chromaHeight >> 1;
+  if (m_FProps.pftype == PFType_YUV420 || m_FProps.pftype == PFType_YUV422)
+    chromaWidth = (chromaWidth + 1) >> 1;
+
+  // Copy planes
+
+  _mm_sfence();
+
+  // Y
+  if ((outLumaStride % 16) == 0 && ((intptr_t)dst % 16u) == 0) {
+    for(line = 0; line < height; ++line) {
+      PIXCONV_MEMCPY_ALIGNED(dst[0] + outLumaStride * line, y, width);
+      y += inLumaStride;
+    }
+  } else {
+    for(line = 0; line < height; ++line) {
+      memcpy(dst[0] + outLumaStride * line, y, width);
+      y += inLumaStride;
+    }
+  }
+
+  // U/V
+  if ((outChromaStride % 16) == 0 && ((intptr_t)dst % 16u) == 0) {
+    for(line = 0; line < chromaHeight; ++line) {
+      PIXCONV_MEMCPY_ALIGNED_TWO(
+        dst[2] + outChromaStride * line, u,
+        dst[1] + outChromaStride * line, v,
+        chromaWidth);
+      u += inChromaStride;
+      v += inChromaStride;
+    }
+  } else {
+    for(line = 0; line < chromaHeight; ++line) {
+      memcpy(dst[2] + outChromaStride * line, u, chromaWidth);
+      memcpy(dst[1] + outChromaStride * line, v, chromaWidth);
+      u += inChromaStride;
+      v += inChromaStride;
+    }
   }
 
   return S_OK;

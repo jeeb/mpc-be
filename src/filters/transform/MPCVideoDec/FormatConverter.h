@@ -135,6 +135,8 @@ protected:
 	HRESULT convert_yuv420_px1x_le(CONV_FUNC_PARAMS);
 	HRESULT convert_yuv420_yuy2(CONV_FUNC_PARAMS);
 	HRESULT convert_yuv422_yuy2_uyvy_dither_le(CONV_FUNC_PARAMS);
+	HRESULT convert_yuv_yv_nv12_dither_le(CONV_FUNC_PARAMS);
+	HRESULT convert_yuv_yv(CONV_FUNC_PARAMS);
 
 public:
 	CFormatConverter();
