@@ -280,8 +280,12 @@ void CFormatConverter::SetConvertFunc()
 				pConvertFn = &CFormatConverter::convert_yuv420_yuy2;
 			}
 			break;
-		case PixFmt_NV12:
 		case PixFmt_YV12:
+			if (m_FProps.pftype == PFType_YUV420) {
+				pConvertFn = &CFormatConverter::convert_yuv_yv;
+			}
+			// no break!
+		case PixFmt_NV12:
 			if (m_FProps.pftype == PFType_YUV420Px) {
 				pConvertFn = &CFormatConverter::convert_yuv_yv_nv12_dither_le;
 			}
@@ -289,6 +293,8 @@ void CFormatConverter::SetConvertFunc()
 		case PixFmt_YV16:
 			if (m_FProps.pftype == PFType_YUV422Px) {
 				pConvertFn = &CFormatConverter::convert_yuv_yv_nv12_dither_le;
+			} else if (m_FProps.pftype == PFType_YUV422) {
+				pConvertFn = &CFormatConverter::convert_yuv_yv;
 			}
 			break;
 		case PixFmt_YV24:
