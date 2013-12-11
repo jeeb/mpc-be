@@ -340,7 +340,7 @@ HRESULT CFormatConverter::ConvertGeneric(const uint8_t* const src[4], const int 
 		ConvertToY416(src, srcStride, dst, width, height, dstStride);
 		break;
 	default:
-		if (m_out_pixfmt == PixFmt_YV12 || m_out_pixfmt == PixFmt_YV24) {
+		if (m_out_pixfmt == PixFmt_YV12 || m_out_pixfmt == PixFmt_YV16 || m_out_pixfmt == PixFmt_YV24) {
 			std::swap(dst[1], dst[2]);
 		}
 		int ret = sws_scale(m_pSwsContext, src, srcStride, 0, height, dst, dstStride);

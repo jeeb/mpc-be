@@ -39,6 +39,7 @@ static const SW_OUT_FMT s_sw_formats[] = {
 	{_T("NV12"),  FCC('NV12'), &MEDIASUBTYPE_NV12,  12, 1, 2, {1,2},   {1,1},   AV_PIX_FMT_NV12,        1, 1, 12,  8}, // PixFmt_NV12
 	{_T("YV12"),  FCC('YV12'), &MEDIASUBTYPE_YV12,  12, 1, 3, {1,2,2}, {1,2,2}, AV_PIX_FMT_YUV420P,     1, 1, 12,  8}, // PixFmt_YV12
 	{_T("YUY2"),  FCC('YUY2'), &MEDIASUBTYPE_YUY2,  16, 2, 0, {1},     {1},     AV_PIX_FMT_YUYV422,     1, 0, 16,  8}, // PixFmt_YUY2
+	{_T("YV16"),  FCC('YV16'), &MEDIASUBTYPE_YV16,  16, 1, 3, {1,1,1}, {1,2,2}, AV_PIX_FMT_YUV422P,     1, 0, 16,  8}, // PixFmt_YV16
 	{_T("AYUV"),  FCC('AYUV'), &MEDIASUBTYPE_AYUV,  32, 4, 0, {1},     {1},     AV_PIX_FMT_YUV444P,     0, 0, 24,  8}, // PixFmt_AYUV
 	{_T("YV24"),  FCC('YV24'), &MEDIASUBTYPE_YV24,  24, 1, 3, {1,1,1}, {1,1,1}, AV_PIX_FMT_YUV444P,     0, 0, 24,  8}, // PixFmt_YV24
 	// YUV 10 bit
@@ -406,7 +407,7 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 	dstArray[0] = out;
 	dstStrideArray[0] = byteStride;
 	for (int i = 1; i < swof.planes; ++i) {
-		dstArray[i] = dstArray[i-1] + dstStrideArray[i-1] * (m_planeHeight / swof.planeWidth[i-1]);
+		dstArray[i] = dstArray[i-1] + dstStrideArray[i-1] * (m_planeHeight / swof.planeHeight[i-1]);
 		dstStrideArray[i] = byteStride / swof.planeWidth[i];
 	}
 

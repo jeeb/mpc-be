@@ -181,6 +181,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	p.y += h20;
 	m_txt422.Create(_T("4:2:2 YUV:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(60), m_fontheight)), this, (UINT)IDC_STATIC);
 	m_cbFormat[PixFmt_YUY2].Create(_T("YUY2"), dwStyle | BS_3STATE, CRect(p + CSize(IPP_SCALE(60), 0), CSize(IPP_SCALE(50), m_fontheight)), this, IDC_PP_SW_YUY2);
+	m_cbFormat[PixFmt_YV16].Create(_T("YV16"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(115), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_SW_YV16);
 	m_cbFormat[PixFmt_P210].Create(_T("P210"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(170), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_SW_P210);
 	m_cbFormat[PixFmt_P216].Create(_T("P216"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(225), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_SW_P216);
 	p.y += h20;
