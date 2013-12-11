@@ -590,6 +590,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						break;
 					case FLV_AUDIO_SPEEX:
 						mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_SPEEX);
+						wfe->nSamplesPerSec = 16000;
 						name += L" Speex";
 						break;
 					case FLV_AUDIO_AAC: {
