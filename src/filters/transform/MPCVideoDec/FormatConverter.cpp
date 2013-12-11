@@ -275,7 +275,7 @@ void CFormatConverter::SetConvertFunc()
 		case PixFmt_YUY2:
 			if (m_FProps.pftype == PFType_YUV422Px) {
 				pConvertFn = &CFormatConverter::convert_yuv422_yuy2_uyvy_dither_le;
-			} else if (m_FProps.pftype == PFType_YUV420 || PFType_YUV420Px && m_FProps.lumabits <= 14) {
+			} else if (m_FProps.pftype == PFType_YUV420 || m_FProps.pftype == PFType_YUV420Px && m_FProps.lumabits <= 14) {
 				pConvertFn = &CFormatConverter::convert_yuv420_yuy2;
 			}
 			break;
