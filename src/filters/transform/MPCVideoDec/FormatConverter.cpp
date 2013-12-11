@@ -286,6 +286,11 @@ void CFormatConverter::SetConvertFunc()
 				pConvertFn = &CFormatConverter::convert_yuv_yv_nv12_dither_le;
 			}
 			break;
+		case PixFmt_YV16:
+			if (m_FProps.pftype == PFType_YUV422Px) {
+				pConvertFn = &CFormatConverter::convert_yuv_yv_nv12_dither_le;
+			}
+			break;
 		case PixFmt_YV24:
 			if (m_FProps.pftype == PFType_YUV444Px) {
 				pConvertFn = &CFormatConverter::convert_yuv_yv_nv12_dither_le;
