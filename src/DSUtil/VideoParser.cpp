@@ -180,6 +180,17 @@ int HrdParameters(CGolombBuffer& gb)
 	return 0;
 }
 
+static inline bool MatchValue(BYTE array[], size_t size, BYTE value)
+{
+	for (size_t i = 0; i < size; i++) {
+		if (value == array[i]) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool ParseAVCHeader(CGolombBuffer gb, avc_hdr& h, bool fullscan)
 {
 	static BYTE profiles[] = {44, 66, 77, 88, 100, 110, 118, 122, 128, 144, 244};
@@ -188,27 +199,15 @@ bool ParseAVCHeader(CGolombBuffer gb, avc_hdr& h, bool fullscan)
 	memset((void*)&h, 0, sizeof(h));
 
 	h.profile = (BYTE)gb.BitRead(8);
-	bool b_ident = false;
-	for (int i = 0; i<sizeof(profiles); i++) {
-		if (h.profile == profiles[i]) {
-			b_ident = true;
-			break;
-		}
-	}
-	if (!b_ident)
+	if (!MatchValue(profiles, _countof(profiles), h.profile)) {
 		return false;
+	}
 
 	gb.BitRead(8);
 	h.level = (BYTE)gb.BitRead(8);
-	b_ident = false;
-	for (int i = 0; i<sizeof(levels); i++) {
-		if (h.level == levels[i]) {
-			b_ident = true;
-			break;
-		}
-	}
-	if (!b_ident)
+	if (!MatchValue(levels, _countof(levels), h.level)) {
 		return false;
+	}
 
 	UINT64 sps_id = gb.UExpGolombRead();	// seq_parameter_set_id
 	if (sps_id >= 32) {
@@ -344,13 +343,13 @@ bool ParseAVCHeader(CGolombBuffer gb, avc_hdr& h, bool fullscan)
 		if (fullscan) {
 			bool nalflag = !!gb.BitRead(1);		// nal_hrd_parameters_present_flag
 			if (nalflag) {
-				if (HrdParameters(gb)<0) {
+				if (HrdParameters(gb) < 0) {
 					return false;
 				}
 			}
 			bool vlcflag = !!gb.BitRead(1);		// vlc_hrd_parameters_present_flag
 			if (vlcflag) {
-				if (HrdParameters(gb)<0) {
+				if (HrdParameters(gb) < 0) {
 					return false;
 				}
 			}
@@ -383,7 +382,7 @@ bool ParseAVCHeader(CGolombBuffer gb, avc_hdr& h, bool fullscan)
 
 	unsigned int mb_Width	= (unsigned int)pic_width_in_mbs_minus1 + 1;
 	unsigned int mb_Height	= ((unsigned int)pic_height_in_map_units_minus1 + 1) * (2 - !h.interlaced);
-	BYTE CHROMA444 = (chroma_format_idc == 3);
+	BYTE CHROMA444			= (chroma_format_idc == 3);
 
 	h.width = 16 * mb_Width - (2u>>CHROMA444) * min(h.crop_right, (8u<<CHROMA444)-1);
 	if (!h.interlaced) {
@@ -392,7 +391,7 @@ bool ParseAVCHeader(CGolombBuffer gb, avc_hdr& h, bool fullscan)
 		h.height = 16 * mb_Height - (4u>>CHROMA444) * min(h.crop_bottom, (8u<<CHROMA444)-1);
 	}
 
-	if (h.height<100 || h.width<100) {
+	if (h.height < 100 || h.width < 100) {
 		return false;
 	}
 
