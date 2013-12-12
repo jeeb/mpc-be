@@ -60,7 +60,7 @@ static const SW_OUT_FMT s_sw_formats[] = {
 
 const SW_OUT_FMT* GetSWOF(int pixfmt)
 {
-	if (pixfmt < 0 && pixfmt >= PixFmt_count) {
+	if (pixfmt < 0 || pixfmt >= PixFmt_count) {
 		return NULL;
 	}
 	return &s_sw_formats[pixfmt];
