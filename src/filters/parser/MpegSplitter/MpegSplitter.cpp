@@ -1223,15 +1223,17 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	} else {
 		__int64 pos = SeekBD(rt);
 		if (pos >= 0) {
-			m_pFile->Seek(pos + 4);
+			if (pos < m_pFile->GetLength()) {
+				m_pFile->Seek(pos + 4);
 
-			CMpegSplitterFile::stream stream = pMasterStream->GetHead();
-			REFERENCE_TIME rtmax = rt - UNITS;
-			REFERENCE_TIME rtPTS = m_pFile->NextPTS(stream);
+				CMpegSplitterFile::stream stream = pMasterStream->GetHead();
+				REFERENCE_TIME rtmax = rt - UNITS;
+				REFERENCE_TIME rtPTS = m_pFile->NextPTS(stream);
 
-			while (rtPTS <= rtmax) {
-				m_pFile->Seek(m_pFile->GetPos() + 192);
-				rtPTS = m_pFile->NextPTS(stream);
+				while (rtPTS <= rtmax && rtPTS != INVALID_TIME && (m_pFile->GetPos() + 192) < m_pFile->GetLength()) {
+					m_pFile->Seek(m_pFile->GetPos() + 192);
+					rtPTS = m_pFile->NextPTS(stream);
+				}
 			}
 
 			return;

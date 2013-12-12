@@ -413,7 +413,7 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 
 	uint8_t*	dstArray[4]			= {NULL};
 	int			dstStrideArray[4]	= {0};
-	int			byteStride			= outStride * swof.codedbytes;
+	int			byteStride			= outStride *swof.codedbytes;
 
 	dstArray[0] = out;
 	dstStrideArray[0] = byteStride;
@@ -460,9 +460,10 @@ void CFormatConverter::Cleanup()
 {
 	if (m_pSwsContext) {
 		sws_freeContext(m_pSwsContext);
-		m_pSwsContext	= NULL;
+		m_pSwsContext = NULL;
 	}
 	if (m_pAlignedBuffer) {
 		av_freep(&m_pAlignedBuffer);
 	}
+	m_nAlignedBufferSize = 0;
 }
