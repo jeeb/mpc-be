@@ -115,8 +115,8 @@ protected:
 
 	bool Init();
 	void UpdateDetails();
-	void SetConvertFunc();
 
+	void SetConvertFunc();
 	// from LAV Filters
 	HRESULT ConvertToAYUV(CONV_FUNC_PARAMS);
 	HRESULT ConvertToPX1X(CONV_FUNC_PARAMS, int chromaVertical);
