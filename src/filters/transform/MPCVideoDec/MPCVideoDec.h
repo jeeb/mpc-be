@@ -216,7 +216,6 @@ public:
 	STDMETHODIMP_(GUID*) GetDXVADecoderGuid();
 	STDMETHODIMP SetActiveCodecs(ULONGLONG nValue);
 	STDMETHODIMP_(ULONGLONG) GetActiveCodecs();
-	STDMETHODIMP_(LPCTSTR) GetVideoCardDescription();
 
 	STDMETHODIMP SetARMode(int nValue);
 	STDMETHODIMP_(int) GetARMode();
@@ -241,9 +240,10 @@ public:
 	STDMETHODIMP_(int) GetSwRGBLevels();
 
 	STDMETHODIMP_(int) GetColorSpaceConversion();
-	//
 
 	STDMETHODIMP GetOutputMediaType(CMediaType* pmt);
+
+	STDMETHODIMP_(CString) GetInformation(MPCInfo index);
 
 	// === IMPCVideoDecFilter2
 	STDMETHODIMP_(int) GetFrameType();

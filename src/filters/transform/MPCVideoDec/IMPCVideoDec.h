@@ -91,6 +91,14 @@ enum MPCPixelFormat {
 	PixFmt_count
 };
 
+enum MPCInfo {
+	INFO_InputFormat,
+	INFO_FrameSize,
+	INFO_OutputFormat,
+	INFO_GraphicsAdapter,
+	INFO_MPCVersion,
+};
+
 interface __declspec(uuid("CDC3B5B3-A8B0-4c70-A805-9FC80CDEF262"))
 IMPCVideoDecFilter :
 public IUnknown {
@@ -109,8 +117,6 @@ public IUnknown {
 
 	STDMETHOD(SetActiveCodecs(ULONGLONG nValue)) = 0;
 	STDMETHOD_(ULONGLONG, GetActiveCodecs()) = 0;
-
-	STDMETHOD_(LPCTSTR, GetVideoCardDescription()) = 0;
 
 	STDMETHOD(SetARMode(int nValue)) = 0;
 	STDMETHOD_(int, GetARMode()) = 0;
@@ -140,6 +146,8 @@ public IUnknown {
 	//
 
 	STDMETHOD(GetOutputMediaType(CMediaType* pmt)) = 0;
+
+	STDMETHOD_(CString, GetInformation(MPCInfo index)) = 0;
 };
 
 interface __declspec(uuid("F0ABC515-19ED-4D65-9D5F-59E36AE7F2AF"))

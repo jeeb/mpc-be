@@ -72,6 +72,16 @@ void CMPCVideoDecSettingsWnd::OnDisconnect()
 	m_pMDF.Release();
 }
 
+void CMPCVideoDecSettingsWnd::UpdateStatusInfo()
+{
+	CString str;
+	str.Format(_T("Input format: %s\r\n"), m_pMDF->GetInformation(INFO_InputFormat));
+	str.AppendFormat(_T("Frame size: %s\r\n"), m_pMDF->GetInformation(INFO_FrameSize));
+	str.AppendFormat(_T("Output format: %s\r\n"), m_pMDF->GetInformation(INFO_OutputFormat));
+	str.AppendFormat(_T("Graphics Adapter: %s"), m_pMDF->GetInformation(INFO_GraphicsAdapter));
+	m_edtStatus.SetWindowText(str);
+}
+
 bool CMPCVideoDecSettingsWnd::OnActivate()
 {
 	ASSERT(IPP_FONTSIZE == 13);
@@ -79,14 +89,19 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	const int h20 = IPP_SCALE(20);
 	const int h25 = IPP_SCALE(25);
 	DWORD dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP;
-	CPoint p(10, 10);
 
-	m_grpFFMpeg.Create(ResStr(IDS_VDF_SETTINGS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(350), IPP_SCALE(115))), this, (UINT)IDC_STATIC);
+	int label_w = IPP_SCALE(225);
+	int combo_w = IPP_SCALE(110);
+	int width_s = label_w + combo_w;
+
+	////////// Video settings //////////
+	CPoint p(10, 10);
+	m_grpDecoder.Create(ResStr(IDS_VDF_SETTINGS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, IPP_SCALE(115))), this, (UINT)IDC_STATIC);
 	p.y += h20;
 
 	// Decoding threads
-	m_txtThreadNumber.Create(ResStr(IDS_VDF_THREADNUMBER), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(220), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbThreadNumber.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(IPP_SCALE(230), -4), CSize(IPP_SCALE(110), 200)), this, IDC_PP_THREAD_NUMBER);
+	m_txtThreadNumber.Create(ResStr(IDS_VDF_THREADNUMBER), WS_VISIBLE | WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
+	m_cbThreadNumber.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_THREAD_NUMBER);
 	m_cbThreadNumber.AddString (ResStr (IDS_VDF_AUTO));
 	CString ThreadNumberStr;
 	for (int i = 1; i <= 16; i++) {
@@ -96,8 +111,8 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	p.y += h25;
 
 	// H264 deblocking mode
-	m_txtDiscardMode.Create(ResStr(IDS_VDF_SKIPDEBLOCK), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(220), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbDiscardMode.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(IPP_SCALE(230), -4), CSize(IPP_SCALE(110), 200)), this, IDC_PP_DISCARD_MODE);
+	m_txtDiscardMode.Create(ResStr(IDS_VDF_SKIPDEBLOCK), WS_VISIBLE | WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
+	m_cbDiscardMode.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_DISCARD_MODE);
 	m_cbDiscardMode.AddString (ResStr (IDS_VDF_DBLK_NONE));
 	m_cbDiscardMode.AddString (ResStr (IDS_VDF_DBLK_DEFAULT));
 	m_cbDiscardMode.AddString (ResStr (IDS_VDF_DBLK_NONREF));
@@ -107,8 +122,8 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	p.y += h25;
 
 	// Deinterlacing
-	m_txtDeinterlacing.Create(ResStr(IDS_VDF_DEINTERLACING), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(220), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbDeinterlacing.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(IPP_SCALE(230), -4), CSize(IPP_SCALE(110), 200)), this, IDC_PP_DEINTERLACING);
+	m_txtDeinterlacing.Create(ResStr(IDS_VDF_DEINTERLACING), WS_VISIBLE | WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
+	m_cbDeinterlacing.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_DEINTERLACING);
 	m_cbDeinterlacing.AddString (ResStr(IDS_VDF_AUTO));
 	m_cbDeinterlacing.AddString (ResStr(IDS_VDF_DEINTER_TOP));
 	m_cbDeinterlacing.AddString (ResStr(IDS_VDF_DEINTER_BOTTOM));
@@ -116,17 +131,18 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	p.y += h25;
 
 	// Read AR from stream
-	m_cbARMode.Create(ResStr(IDS_VDF_AR_MODE), dwStyle | BS_AUTO3STATE | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(340), m_fontheight)), this, IDC_PP_AR);
+	m_cbARMode.Create(ResStr(IDS_VDF_AR_MODE), dwStyle | BS_AUTO3STATE | BS_LEFTTEXT, CRect(p, CSize(width_s, m_fontheight)), this, IDC_PP_AR);
 	m_cbARMode.SetCheck(FALSE);
 
-	//
+
+	////////// DXVA settings //////////
 	p.y = 10 + IPP_SCALE(115) + 5;
-	m_grpDXVA.Create(ResStr(IDS_VDF_DXVA_SETTING), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(350), IPP_SCALE(120))), this, (UINT)IDC_STATIC);
+	m_grpDXVA.Create(ResStr(IDS_VDF_DXVA_SETTING), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, IPP_SCALE(65))), this, (UINT)IDC_STATIC);
 	p.y += h20;
 
 	// DXVA Compatibility check
-	m_txtDXVACompatibilityCheck.Create(ResStr(IDS_VDF_DXVACOMPATIBILITY), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(225), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbDXVACompatibilityCheck.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(IPP_SCALE(230), -4), CSize(IPP_SCALE(110), 200)), this, IDC_PP_DXVA_CHECK);
+	m_txtDXVACompatibilityCheck.Create(ResStr(IDS_VDF_DXVACOMPATIBILITY), WS_VISIBLE | WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
+	m_cbDXVACompatibilityCheck.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_DXVA_CHECK);
 	m_cbDXVACompatibilityCheck.AddString (ResStr(IDS_VDF_DXVA_FULLCHECK));
 	m_cbDXVACompatibilityCheck.AddString (ResStr(IDS_VDF_DXVA_SKIP_LEVELCHECK));
 	m_cbDXVACompatibilityCheck.AddString (ResStr(IDS_VDF_DXVA_SKIP_REFCHECK));
@@ -134,36 +150,24 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	p.y += h25;
 
 	// Set DXVA for SD (H.264)
-	m_cbDXVA_SD.Create(ResStr(IDS_VDF_DXVA_SD), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(340), m_fontheight)), this, IDC_PP_DXVA_SD);
+	m_cbDXVA_SD.Create(ResStr(IDS_VDF_DXVA_SD), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(width_s, m_fontheight)), this, IDC_PP_DXVA_SD);
 	m_cbDXVA_SD.SetCheck (FALSE);
-	p.y += h20;
+	p.y += h25;
 
+	////////// Status //////////
+	p.y = 10 + IPP_SCALE(115) + 5 + IPP_SCALE(65) + 5;
+	m_grpStatus.Create(_T("Status"), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, h25 + m_fontheight * 5)), this, (UINT)IDC_STATIC);
+	p.y += h20;
 	// DXVA mode
-	m_txtDXVAMode.Create(ResStr(IDS_VDF_DXVA_MODE), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(120), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_edtDXVAMode.Create(WS_CHILD | WS_VISIBLE | WS_DISABLED, CRect(p + CPoint(IPP_SCALE(120), 0), CSize(IPP_SCALE(220), m_fontheight)), this, 0);
+	m_edtStatus.Create(WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_READONLY, CRect(p, CSize(width_s, m_fontheight * 5)), this, 0);
 	p.y += h20;
 
-	// Video card description
-	m_txtVideoCardDescription.Create(ResStr(IDS_VDF_VIDEOCARD), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(120), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_edtVideoCardDescription.Create(ES_MULTILINE | WS_CHILD | WS_VISIBLE | WS_DISABLED, CRect(p + CPoint(IPP_SCALE(120), 0), CSize(IPP_SCALE(220), m_fontheight * 2)), this, 0);
-	m_edtVideoCardDescription.SetWindowText (m_pMDF->GetVideoCardDescription());
-
-	GUID* DxvaGuid = m_pMDF->GetDXVADecoderGuid();
-	if (DxvaGuid != NULL) {
-		m_edtDXVAMode.SetWindowText(GetDXVAMode(DxvaGuid));
-	} else {
-		m_txtDXVAMode.ShowWindow(SW_HIDE);
-		m_edtDXVAMode.ShowWindow(SW_HIDE);
-	}
-
-	// === New swscaler options
-	p = CPoint(5 + IPP_SCALE(350) + 10, 10);
-	int width_s = IPP_SCALE(270);
-	int btn_w   = m_fontheight + 12;
-	int btn_h   = m_fontheight + 4;
-	int combo_w = IPP_SCALE(85);
-	int label_w = width_s - combo_w;
-	m_grpFmtConv.Create(ResStr(IDS_VDF_COLOR_FMT_CONVERSION), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, IPP_SCALE(115) + 5 +  IPP_SCALE(120))), this, (UINT)IDC_STATIC);
+	////////// Format conversion //////////
+	p = CPoint(10 + width_s + 15, 10);
+	combo_w = IPP_SCALE(85);
+	label_w = IPP_SCALE(185);
+	width_s = label_w + combo_w;
+	m_grpFmtConv.Create(ResStr(IDS_VDF_COLOR_FMT_CONVERSION), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, IPP_SCALE(220))), this, (UINT)IDC_STATIC);
 	p.y += h20;
 
 	// Software output formats
@@ -219,12 +223,6 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbSwRGBLevels.AddString(_T("TV (16-235)"));
 	p.y += h25;
 
-	// Software version, useful info for stand-alone filter
-	p.y = IPP_SCALE(230);
-	m_strSwVersion.Format(_T("v%d.%d.%d.%d"),MPC_VERSION_MAJOR,MPC_VERSION_MINOR,MPC_VERSION_PATCH,MPC_VERSION_STATUS);
-	m_txtSwVersion.Create(m_strSwVersion, WS_DISABLED|WS_VISIBLE|WS_CHILD|SS_RIGHT|SS_PATHELLIPSIS, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
-	//
-
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
 		pWnd->SetFont(&m_font, FALSE);
 	}
@@ -258,7 +256,8 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		if (m_cbFormat[PixFmt_RGB32].GetCheck() == BST_UNCHECKED) {
 			m_cbSwRGBLevels.EnableWindow(FALSE);
 		}
-		//
+
+		UpdateStatusInfo();
 	}
 
 	SetClassLongPtr(m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_ARROW));
@@ -319,6 +318,8 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 		}
 		
 		m_pMDF->SetSwRefresh(refresh);
+
+		UpdateStatusInfo();
 
 		m_pMDF->Apply();
 	}

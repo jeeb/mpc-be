@@ -3199,12 +3199,6 @@ STDMETHODIMP_(ULONGLONG) CMPCVideoDecFilter::GetActiveCodecs()
 	return m_nActiveCodecs;
 }
 
-STDMETHODIMP_(LPCTSTR) CMPCVideoDecFilter::GetVideoCardDescription()
-{
-	CAutoLock cAutoLock(&m_csProps);
-	return m_strDeviceDescription;
-}
-
 STDMETHODIMP CMPCVideoDecFilter::SetARMode(int nValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
@@ -3343,6 +3337,55 @@ STDMETHODIMP CMPCVideoDecFilter::GetOutputMediaType(CMediaType* pmt)
 	CopyMediaType(pmt, &m_pOutput->CurrentMediaType());
 
 	return S_OK;
+}
+
+STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
+{
+	CAutoLock cAutoLock(&m_csProps);
+	CString infostr;
+
+	switch (index) {
+	case INFO_InputFormat:
+		if (m_pAVCtx) {
+			infostr = m_pAVCtx->codec->name;
+			if (const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(m_pAVCtx->pix_fmt)) {
+				if (pfdesc->flags & (AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_PAL)) {
+					infostr.AppendFormat(_T(", %d-bit"), GetLumaBits(m_pAVCtx->pix_fmt));
+				}
+				else {
+					infostr.AppendFormat(_T(", %d-bit %s"), GetLumaBits(m_pAVCtx->pix_fmt), GetChromaSubsamplingStr(m_pAVCtx->pix_fmt));
+				}
+			}
+		}
+		break;
+	case INFO_FrameSize:
+		if (m_pAVCtx) {
+			int sarx = m_pAVCtx->width * m_nARY;
+			int sary = m_pAVCtx->height * m_nARX;
+			ReduceDim(sarx, sary);
+			infostr.Format(_T("%dx%d, SAR %d:%d, DAR %d:%d"), m_pAVCtx->width, m_pAVCtx->height, sarx, sary, m_nARX, m_nARY);
+		}
+		break;
+	case INFO_OutputFormat:
+		if (GUID* DxvaGuid = GetDXVADecoderGuid()) {
+			if (*DxvaGuid != GUID_NULL) {
+				infostr.Format(_T("DXVA (%s)"), GetDXVAMode(DxvaGuid));
+				break;
+			}
+		}
+		if (const SW_OUT_FMT* swof = GetSWOF(m_FormatConverter.GetOutPixFormat())) {
+			infostr.Format(_T("%s (%d-bit %s)"), swof->name, swof->luma_bits, GetChromaSubsamplingStr(swof->av_pix_fmt));
+		}
+		break;
+	case INFO_GraphicsAdapter:
+		infostr = m_strDeviceDescription;
+		break;
+	case INFO_MPCVersion:
+		infostr.Format(_T("v%d.%d.%d.%d (build %d)"),MPC_VERSION_MAJOR,MPC_VERSION_MINOR,MPC_VERSION_PATCH,MPC_VERSION_STATUS,MPC_VERSION_REV);
+		break;
+	}
+
+	return infostr;
 }
 
 // === IMPCVideoDecFilter2

@@ -24,10 +24,6 @@
 #include "IMPCVideoDec.h"
 #include "resource.h"
 
-// === New swscaler options
-#include "Version.h"
-//
-
 enum {
 	IDC_PP_THREAD_NUMBER = 10000,
 	IDC_PP_DISCARD_MODE,
@@ -61,28 +57,23 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 
 	CFont		m_arrowsFont;
 
-	CButton		m_grpFFMpeg;
+	CButton		m_grpDecoder;
 	CStatic		m_txtThreadNumber;
 	CComboBox	m_cbThreadNumber;
 	CStatic		m_txtDiscardMode;
 	CComboBox	m_cbDiscardMode;
 	CStatic		m_txtDeinterlacing;
 	CComboBox	m_cbDeinterlacing;
-
-	CButton		m_grpDXVA;
-	CStatic		m_txtDXVAMode;
-	CEdit		m_edtDXVAMode;
-	CStatic		m_txtVideoCardDescription;
-	CEdit		m_edtVideoCardDescription;
-
 	CButton		m_cbARMode;
 
+	CButton		m_grpDXVA;
 	CStatic		m_txtDXVACompatibilityCheck;
 	CComboBox	m_cbDXVACompatibilityCheck;
-
 	CButton		m_cbDXVA_SD;
 
-	// === New swscaler options
+	CButton		m_grpStatus;
+	CEdit		m_edtStatus;
+
 	CButton		m_grpFmtConv;
 	CStatic		m_txtSwOutputFormats;
 	CStatic     m_txt8bit;
@@ -93,18 +84,14 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CStatic     m_txt444;
 	CStatic     m_txtRGB;
 	CButton		m_cbFormat[PixFmt_count];
-
 	CStatic     m_txtSwPreset;
 	CComboBox   m_cbSwPreset;
-
 	CStatic     m_txtSwStandard;
 	CComboBox   m_cbSwStandard;
-
 	CStatic     m_txtSwRGBLevels;
 	CComboBox   m_cbSwRGBLevels;
 
-	CStatic     m_txtSwVersion;
-	CString     m_strSwVersion;
+	void		UpdateStatusInfo();
 
 public:
 	CMPCVideoDecSettingsWnd();
