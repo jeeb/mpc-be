@@ -22,14 +22,13 @@
  */
 
 #pragma once
-#include <windows.h>
 
 class CpuUsage
 {
 public:
 	CpuUsage();
 	
-	short  GetUsage();
+	const short GetUsage();
 private:
 	ULONGLONG SubtractTimes(const FILETIME& ftA, const FILETIME& ftB);
 	bool EnoughTimePassed();

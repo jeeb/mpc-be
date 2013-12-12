@@ -22,11 +22,10 @@
  */
 
 #include "StdAfx.h"
-#include <windows.h>
 #include "CpuUsage.h"
 
 CpuUsage::CpuUsage()
-	: m_nCpuUsage(-1)
+	: m_nCpuUsage(0)
 	, m_dwLastRun(0)
 	, m_lRunCount(0)
 {
@@ -48,7 +47,7 @@ CpuUsage::CpuUsage()
 * If the method is recalled to quickly, the previous value
 * is returned.
 ***********************************************/
-short CpuUsage::GetUsage()
+const short CpuUsage::GetUsage()
 {
 	//create a local copy to protect against race conditions in setting the 
 	//member variable
@@ -123,7 +122,6 @@ ULONGLONG CpuUsage::SubtractTimes(const FILETIME& ftA, const FILETIME& ftB)
 
 bool CpuUsage::EnoughTimePassed()
 {
-	const int minElapsedMS = 250;//milliseconds
-
-	return (GetTickCount() - m_dwLastRun) > minElapsedMS; 
+	const int minElapsedMS = 1000;
+	return (GetTickCount() - m_dwLastRun) >= minElapsedMS; 
 }
