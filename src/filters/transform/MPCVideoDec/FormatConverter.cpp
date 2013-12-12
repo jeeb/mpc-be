@@ -413,7 +413,7 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 
 	uint8_t*	dstArray[4]			= {NULL};
 	int			dstStrideArray[4]	= {0};
-	int			byteStride			= outStride *swof.codedbytes;
+	int			byteStride			= outStride * swof.codedbytes;
 
 	dstArray[0] = out;
 	dstStrideArray[0] = byteStride;
