@@ -23,7 +23,7 @@
 #pragma once
 #include <adl/adl_sdk.h>
 
-class GPUUsage
+class CGPUUsage
 {
 	typedef int (*ADL_MAIN_CONTROL_CREATE)(ADL_MAIN_MALLOC_CALLBACK, int);
 	typedef int (*ADL_MAIN_CONTROL_DESTROY)();
@@ -41,8 +41,8 @@ class GPUUsage
 public:
 	enum GPUType { ATI_GPU, NVIDIA_GPU, UNKNOWN_GPU };
 
-	GPUUsage();
-	~GPUUsage();
+	CGPUUsage();
+	~CGPUUsage();
 	HRESULT Init(CString DeviceName);
 	
 	const short		GetUsage();

@@ -2366,12 +2366,12 @@ void CDX9AllocatorPresenter::DrawStats()
 			}
 
 			{
-				strText.Format(L"CPU Usage    : %2d%%", m_CpuUsage.GetUsage());
+				strText.Format(L"CPU Usage    : %2d%%", m_CPUUsage.GetUsage());
 				DrawText(rc, strText, 1);
 				OffsetRect(&rc, 0, TextHeight);
 			}
 
-			if (m_GPUUsage.GetType() != GPUUsage::UNKNOWN_GPU) {
+			if (m_GPUUsage.GetType() != CGPUUsage::UNKNOWN_GPU) {
 				strText.Format(L"GPU Usage    : %2d%%", m_GPUUsage.GetUsage());
 				DrawText(rc, strText, 1);
 				OffsetRect(&rc, 0, TextHeight);

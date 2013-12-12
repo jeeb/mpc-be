@@ -30,7 +30,7 @@ static void* __stdcall ADL_Main_Memory_Alloc(int iSize)
 	return lpBuffer;
 }
 
-GPUUsage::GPUUsage()
+CGPUUsage::CGPUUsage()
 	: m_nGPUUsage(0)
 	, m_dwLastRun(0)
 	, m_lRunCount(0)
@@ -38,12 +38,12 @@ GPUUsage::GPUUsage()
 	Clean();
 }
 
-GPUUsage::~GPUUsage()
+CGPUUsage::~CGPUUsage()
 {
 	Clean();
 }
 
-void GPUUsage::Clean()
+void CGPUUsage::Clean()
 {
 	if (m_GPUType == ATI_GPU) {
 		if (ATIData.ADL_Main_Control_Destroy) {
@@ -64,7 +64,7 @@ void GPUUsage::Clean()
 }
 
 
-HRESULT GPUUsage::Init(CString DeviceName)
+HRESULT CGPUUsage::Init(CString DeviceName)
 {
 	Clean();
 
@@ -175,7 +175,7 @@ HRESULT GPUUsage::Init(CString DeviceName)
 	return m_GPUType == UNKNOWN_GPU ? E_FAIL : S_OK;
 }
 
-const short GPUUsage::GetUsage()
+const short CGPUUsage::GetUsage()
 {
 	short nGPUCopy = m_nGPUUsage;
 	if (m_GPUType != UNKNOWN_GPU && ::InterlockedIncrement(&m_lRunCount) == 1) {
@@ -208,7 +208,7 @@ const short GPUUsage::GetUsage()
 	return nGPUCopy;
 }
 
-bool GPUUsage::EnoughTimePassed()
+bool CGPUUsage::EnoughTimePassed()
 {
 	const int minElapsedMS = 1000;
 	return (GetTickCount() - m_dwLastRun) >= minElapsedMS; 
