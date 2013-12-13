@@ -83,10 +83,10 @@
     <ClCompile Include="OuterVMR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CpuUsage.cpp">
+    <ClCompile Include="GPUUsage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GPUUsage.cpp">
+    <ClCompile Include="CPUUsage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -166,10 +166,10 @@
     <ClInclude Include="OuterVMR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CpuUsage.h">
+    <ClInclude Include="GPUUsage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GPUUsage.h">
+    <ClInclude Include="CPUUsage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

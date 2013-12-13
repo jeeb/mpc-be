@@ -111,7 +111,7 @@
   <ItemGroup>
     <ClCompile Include="AllocatorCommon.cpp" />
     <ClCompile Include="AllocatorCommon7.cpp" />
-    <ClCompile Include="CpuUsage.cpp" />
+    <ClCompile Include="CPUUsage.cpp" />
     <ClCompile Include="D3DFont.cpp" />
     <ClCompile Include="Dither.cpp" />
     <ClCompile Include="DX7AllocatorPresenter.cpp" />
@@ -141,7 +141,7 @@
   <ItemGroup>
     <ClInclude Include="AllocatorCommon.h" />
     <ClInclude Include="AllocatorCommon7.h" />
-    <ClInclude Include="CpuUsage.h" />
+    <ClInclude Include="CPUUsage.h" />
     <ClInclude Include="D3DFont.h" />
     <ClInclude Include="Dither.h" />
     <ClInclude Include="DX7AllocatorPresenter.h" />
