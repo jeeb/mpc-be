@@ -102,8 +102,13 @@ END
 STRINGTABLE
 BEGIN
     IDS_FILTER_SETTINGS_CAPTION  "Settings"
+END
+
+STRINGTABLE
+BEGIN
     IDS_VDF_SETTINGS             "Video settings"
-    IDS_VDF_THREADNUMBER         "Decoding thread number"
+    IDS_VDF_AUTO                 "Auto"
+    IDS_VDF_THREADNUMBER         "Number of decoding threads"
     IDS_VDF_SKIPDEBLOCK          "H264 skip deblocking mode"
     IDS_VDF_DBLK_NONE            "None"
     IDS_VDF_DBLK_DEFAULT         "Default"
@@ -116,28 +121,21 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_VDF_DXVA_SETTING         "DXVA settings"
-    IDS_VDF_DXVA_MODE            "DXVA Mode"
-    IDS_VDF_DXVA_SD              "Disable DXVA for SD"
-    IDS_VDF_VIDEOCARD            "Videocard"
+    IDS_VDF_DEINTERLACING        "Deinterlacing"
+    IDS_VDF_DEINTER_TOP          "Top-Field First"
+    IDS_VDF_DEINTER_BOTTOM       "Bottom-Field First"
+    IDS_VDF_DEINTER_PROGRESSIVE  "Progressive"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_VDF_DXVA_SETTING         "DXVA settings"
     IDS_VDF_DXVACOMPATIBILITY    "DXVA (H.264) Compatibility check"
     IDS_VDF_DXVA_FULLCHECK       "Full check"
     IDS_VDF_DXVA_SKIP_LEVELCHECK "Skip level check"
     IDS_VDF_DXVA_SKIP_REFCHECK   "Skip ref frame check"
     IDS_VDF_DXVA_SKIP_ALLCHECK   "Skip all checks"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_VDF_DEINTERLACING        "Deinterlacing"
-    IDS_VDF_AUTO                 "Auto"
-    IDS_VDF_DEINTER_TOP          "Top-Field First"
-    IDS_VDF_DEINTER_BOTTOM       "Bottom-Field First"
-    IDS_VDF_DEINTER_PROGRESSIVE "Progressive"
+    IDS_VDF_DXVA_SD              "Disable DXVA for SD (H.264)"
 END
 
 STRINGTABLE
@@ -147,6 +145,15 @@ BEGIN
     IDS_VDF_COLOR_PRESET         "Preset:"
     IDS_VDF_COLOR_STANDARD       "Standard:"
     IDS_VDF_COLOR_RGB_LEVELS     "RGB output levels:"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_VDF_STATUS               "Status"
+    IDS_VDF_STATUS_INPUT         "Input format\t: %s"
+    IDS_VDF_STATUS_FRAMESIZE     "Frame size\t: %s"
+    IDS_VDF_STATUS_OUTPUT        "Output format\t: %s"
+    IDS_VDF_STATUS_ADAPTER       "Graphics Adapter\t: %s"
 END
 
 STRINGTABLE

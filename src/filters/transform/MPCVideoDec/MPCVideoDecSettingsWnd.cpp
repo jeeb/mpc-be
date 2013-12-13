@@ -75,10 +75,13 @@ void CMPCVideoDecSettingsWnd::OnDisconnect()
 void CMPCVideoDecSettingsWnd::UpdateStatusInfo()
 {
 	CString str;
-	str.Format(_T("Input format:\t%s\r\n"), m_pMDF->GetInformation(INFO_InputFormat));
-	str.AppendFormat(_T("Frame size:\t%s\r\n"), m_pMDF->GetInformation(INFO_FrameSize));
-	str.AppendFormat(_T("Output format:\t%s\r\n"), m_pMDF->GetInformation(INFO_OutputFormat));
-	str.AppendFormat(_T("Graphics Adapter:\t%s"), m_pMDF->GetInformation(INFO_GraphicsAdapter));
+	str.Format(ResStr(IDS_VDF_STATUS_INPUT), m_pMDF->GetInformation(INFO_InputFormat));
+	str.Append(_T("\r\n"));
+	str.AppendFormat(ResStr(IDS_VDF_STATUS_FRAMESIZE), m_pMDF->GetInformation(INFO_FrameSize));
+	str.Append(_T("\r\n"));
+	str.AppendFormat(ResStr(IDS_VDF_STATUS_OUTPUT), m_pMDF->GetInformation(INFO_OutputFormat));
+	str.Append(_T("\r\n"));
+	str.AppendFormat(ResStr(IDS_VDF_STATUS_ADAPTER), m_pMDF->GetInformation(INFO_GraphicsAdapter));
 	m_edtStatus.SetWindowText(str);
 }
 
@@ -156,7 +159,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 	////////// Status //////////
 	p.y = 10 + IPP_SCALE(115) + 5 + IPP_SCALE(65) + 5;
-	m_grpStatus.Create(_T("Status"), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, h25 + m_fontheight * 5)), this, (UINT)IDC_STATIC);
+	m_grpStatus.Create(ResStr(IDS_VDF_STATUS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, h25 + m_fontheight * 5)), this, (UINT)IDC_STATIC);
 	p.y += h20;
 	// DXVA mode
 	m_edtStatus.Create(WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_READONLY, CRect(p, CSize(width_s, m_fontheight * 5)), this, 0);
