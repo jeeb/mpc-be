@@ -33,10 +33,17 @@ class CGPUUsage
 	typedef int (*ADL_OVERDRIVE_CAPS)(int iAdapterIndex, int *iSupported, int *iEnabled, int *iVersion);
 
 	typedef int (*ADL_OVERDRIVE5_ODPARAMETERS_GET)(int iAdapterIndex,  ADLODParameters *lpOdParameters);
-	typedef int (*ADL_OVERDRIVE5_CURRENTACTIVITY_GET )(int iAdapterIndex, ADLPMActivity *lpActivity);
+	typedef int (*ADL_OVERDRIVE5_CURRENTACTIVITY_GET)(int iAdapterIndex, ADLPMActivity *lpActivity);
 
 	typedef int (*ADL_OVERDRIVE6_CAPABILITIES_GET)(int iAdapterIndex, ADLOD6Capabilities *lpODCapabilities);
 	typedef int	(*ADL_OVERDRIVE6_CURRENTSTATUS_GET)(int iAdapterIndex, ADLOD6CurrentStatus *lpCurrentStatus);
+
+	#define NVAPI_MAX_PHYSICAL_GPUS		64
+	#define NVAPI_MAX_USAGES_PER_GPU	34
+	typedef int *(*NvAPI_QueryInterface_t)(unsigned int offset);
+	typedef int (*NvAPI_Initialize_t)();
+	typedef int (*NvAPI_EnumPhysicalGPUs_t)(int **handles, int *count);
+	typedef int (*NvAPI_GPU_GetUsages_t)(int *handle, unsigned int *usages);
 
 public:
 	enum GPUType { ATI_GPU, NVIDIA_GPU, UNKNOWN_GPU };
@@ -67,6 +74,14 @@ private:
 
 		int									iOverdriveVersion;
 	} ATIData;
+
+	struct {
+		HMODULE								hNVApi;
+		int									*gpuHandles[NVAPI_MAX_PHYSICAL_GPUS];
+		unsigned int						gpuUsages[NVAPI_MAX_USAGES_PER_GPU];
+		NvAPI_GPU_GetUsages_t				NvAPI_GPU_GetUsages;
+	
+	} NVData;
 
 	void Clean();
 };

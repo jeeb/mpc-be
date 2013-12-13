@@ -49,8 +49,9 @@ void CGPUUsage::Clean()
 		if (ATIData.ADL_Main_Control_Destroy) {
 			ATIData.ADL_Main_Control_Destroy();
 		}
-
 		FreeLibrary(ATIData.hAtiADL);
+	} else if (m_GPUType == NVIDIA_GPU) {
+		FreeLibrary(NVData.hNVApi);
 	}
 
 	m_GPUType = UNKNOWN_GPU;
@@ -61,6 +62,12 @@ void CGPUUsage::Clean()
 	ATIData.ADL_Main_Control_Destroy			= NULL;
 	ATIData.ADL_Overdrive5_CurrentActivity_Get	= NULL;
 	ATIData.ADL_Overdrive6_CurrentStatus_Get	= NULL;
+
+	ZeroMemory(&NVData.gpuHandles, sizeof(NVData.gpuHandles));
+	ZeroMemory(&NVData.gpuUsages, sizeof(NVData.gpuUsages));
+	NVData.gpuUsages[0]							= (NVAPI_MAX_USAGES_PER_GPU * 4) | 0x10000;
+	NVData.hNVApi								= NULL;
+	NVData.NvAPI_GPU_GetUsages					= NULL;
 }
 
 
@@ -172,6 +179,41 @@ HRESULT CGPUUsage::Init(CString DeviceName)
 		}
 	}
 
+	if (m_GPUType == UNKNOWN_GPU) {
+		// NVApi
+		NVData.hNVApi = LoadLibrary(L"nvapi64.dll");
+		if (NVData.hNVApi == NULL) {
+			NVData.hNVApi = LoadLibrary(L"nvapi.dll");
+		}
+
+		if (NVData.hNVApi) {
+			NvAPI_QueryInterface_t		NvAPI_QueryInterface	= (NvAPI_QueryInterface_t)GetProcAddress(NVData.hNVApi, "nvapi_QueryInterface");;
+			NvAPI_Initialize_t			NvAPI_Initialize		= (NvAPI_Initialize_t)(NvAPI_QueryInterface)(0x0150E828);
+			NvAPI_EnumPhysicalGPUs_t	NvAPI_EnumPhysicalGPUs	= (NvAPI_EnumPhysicalGPUs_t)(NvAPI_QueryInterface)(0xE5AC921F);
+			NVData.NvAPI_GPU_GetUsages							= (NvAPI_GPU_GetUsages_t)(NvAPI_QueryInterface)(0x189A1FDF);
+			if (NULL == NvAPI_QueryInterface ||
+					NULL == NvAPI_Initialize ||
+					NULL == NvAPI_EnumPhysicalGPUs ||
+					NULL == NVData.NvAPI_GPU_GetUsages) {
+				Clean();
+			}
+
+			if (NVData.hNVApi) {
+				NvAPI_Initialize();
+
+				int gpuCount = 0;
+				NvAPI_EnumPhysicalGPUs(NVData.gpuHandles, &gpuCount);
+				if (!gpuCount) {
+					Clean();
+				}
+			}
+		}
+
+		if (NVData.hNVApi && NVData.NvAPI_GPU_GetUsages) {
+			m_GPUType = NVIDIA_GPU;
+		}
+	}
+
 	return m_GPUType == UNKNOWN_GPU ? E_FAIL : S_OK;
 }
 
@@ -197,6 +239,9 @@ const short CGPUUsage::GetUsage()
 					m_nGPUUsage = currentStatus.iActivityPercent;
 				}
 			}
+		} else if (m_GPUType == NVIDIA_GPU) {
+			NVData.NvAPI_GPU_GetUsages(NVData.gpuHandles[0], NVData.gpuUsages);
+			m_nGPUUsage = NVData.gpuUsages[3];
 		}
 
 		m_dwLastRun	= GetTickCount();
