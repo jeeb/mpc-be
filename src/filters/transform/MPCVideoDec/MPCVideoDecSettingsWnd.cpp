@@ -75,10 +75,10 @@ void CMPCVideoDecSettingsWnd::OnDisconnect()
 void CMPCVideoDecSettingsWnd::UpdateStatusInfo()
 {
 	CString str;
-	str.Format(_T("Input format: %s\r\n"), m_pMDF->GetInformation(INFO_InputFormat));
-	str.AppendFormat(_T("Frame size: %s\r\n"), m_pMDF->GetInformation(INFO_FrameSize));
-	str.AppendFormat(_T("Output format: %s\r\n"), m_pMDF->GetInformation(INFO_OutputFormat));
-	str.AppendFormat(_T("Graphics Adapter: %s"), m_pMDF->GetInformation(INFO_GraphicsAdapter));
+	str.Format(_T("Input format:\t%s\r\n"), m_pMDF->GetInformation(INFO_InputFormat));
+	str.AppendFormat(_T("Frame size:\t%s\r\n"), m_pMDF->GetInformation(INFO_FrameSize));
+	str.AppendFormat(_T("Output format:\t%s\r\n"), m_pMDF->GetInformation(INFO_OutputFormat));
+	str.AppendFormat(_T("Graphics Adapter:\t%s"), m_pMDF->GetInformation(INFO_GraphicsAdapter));
 	m_edtStatus.SetWindowText(str);
 }
 

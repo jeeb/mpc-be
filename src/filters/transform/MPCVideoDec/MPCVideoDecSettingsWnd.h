@@ -55,8 +55,6 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 {
 	CComQIPtr<IMPCVideoDecFilter> m_pMDF;
 
-	CFont		m_arrowsFont;
-
 	CButton		m_grpDecoder;
 	CStatic		m_txtThreadNumber;
 	CComboBox	m_cbThreadNumber;
