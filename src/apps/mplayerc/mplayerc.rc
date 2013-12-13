@@ -2773,7 +2773,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_FAVORITES_QUICKADDFAVORITE "Quick add favorite"
-    IDS_MPEG2_READ_AR "Read AR from stream"
 END
 
 STRINGTABLE
@@ -2792,9 +2791,6 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_MPEG2_CONTRAST      "Contrast"
-    IDS_MPEG2_HUE           "Hue"
-    IDS_MPEG2_SATURATION    "Saturation"
     IDS_ADD_TO_PLAYLIST     "Add to MPC-BE Playlist"
     IDS_OPEN_WITH_MPC       "Play with MPC-BE"
     IDS_CANNOT_CHANGE_FORMAT 
@@ -2962,7 +2958,7 @@ BEGIN
     IDS_VOLUME_BOOST_MAX    "Volume boost Max"
     IDS_USAGE               "Usage: mpc-be.exe ""pathname"" [switches]\n\n""pathname""\tThe main file or directory to be loaded (wildcards\n\t\tallowed)\n/dub ""dubname""\tLoad an additional audio file\n/dubdelay ""file""\tLoad an additional audio file shifted with XXms (if\n\t\tthe file contains ""...DELAY XXms..."")\n/d3dfs\t\tStart rendering in D3D fullscreen mode\n/sub ""subname""\tLoad an additional subtitle file\n/filter ""filtername""\tLoad DirectShow filters from a dynamic link\n\t\tlibrary (wildcards allowed)\n/dvd\t\tRun in dvd mode, ""pathname"" means the dvd\n\t\tfolder (optional)\n/dvdpos T#C\tStart playback at title T, chapter C\n/dvdpos T#hh:mm\tStart playback at title T, position hh:mm:ss\n/cd\t\tLoad all the tracks of an audio cd or (s)vcd,\n\t\t""pathname"" means the drive path (optional)\n/open\t\tOpen the file, don't automatically start playback\n/play\t\tStart playing the file as soon the player is\n\t\tlaunched\n/close\t\tClose the player after playback (only works when\n\t\tused with /play)\n/shutdown\tShutdown the operating system after playback\n/fullscreen\tStart in full-screen mode\n/minimized\tStart in minimized mode\n/new\t\tUse a new instance of the player\n/add\t\tAdd ""pathname"" to playlist, can be combined\n\t\twith /open and /play\n/regvid\t\tCreate file associations for video files\n/regaud\t\tCreate file associations for audio files\n/regpl\t\tCreate file associations for playlist files\n/regall\t\tCreate file associations for all supported file types\n/unregall\t\tRemove all file associations\n/start ms\t\tStart playing at ""ms"" (= milliseconds)\n/startpos hh:mm:ss\tStart playing at position hh:mm:ss\n/fixedsize w,h\tSet a fixed window size\n/monitor N\tStart player on monitor N, where N starts from 1\n/audiorenderer N\tStart using audiorenderer N, where N starts from 1\n\t\t(see ""Output"" settings)\n/reset\t\tRestore default settings\n/help /h /?\tShow help about command line switches\n"
     IDS_UNKNOWN_SWITCH      "Unrecognized switch(es) found in command line string: \n\n"
-    IDS_MPADEC_SAMPLE_FMT   "Output sample format:"
+	IDS_AG_SETTINGS         "Settings"
 END
 
 STRINGTABLE
@@ -2977,82 +2973,113 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_MPADEC_DRC          "Apply DRC for AC-3 and E-AC3"
-    IDS_MPADEC_MIXER        "Mixer:"
-    IDS_MPADEC_MIX_SPEAKERS "Output speakers:"
-    IDS_MPADEC_MONO         "Mono"
-    IDS_MPADEC_STEREO       "Stereo"
-    IDS_MPADEC_SPDIF        "Pass-through (S/PDIF, HDMI)"
-    IDS_MPADEC_AC3ENCODE    "Encode to AC-3"
-    IDS_AG_SETTINGS         "Settings"
-    IDS_MPEG2_ENABLE_PLANAR 
-                            "Enable planar YUV media types (NV12, YV12, I420, IYUY)"
-    IDS_MPEG2_INTERLACE_FLAG "Set interlaced flag in output media type"
-    IDS_MPEG2_FORCED_SUBS   "Always display forced subtitles"
-    IDS_MPEG2_DEINTERLACING "Deinterlacing"
-    IDS_MPEG2_BRIGHTNESS    "Brightness"
-    IDS_MPEG2_RESET         "Reset"
-    IDS_MPEG2_NOTE1         "Note: Using a non-planar output format, bob deinterlacer, or adjusting color properies can degrade performance. ""Auto"" deinterlacer will switch to ""Blend"" when necessary."
+    IDS_FILTER_SETTINGS_CAPTION     "Settings"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_VDF_SETTINGS             "Video settings"
-    IDS_VDF_AUTO                 "Auto"
-    IDS_VDF_THREADNUMBER         "Number of decoding threads"
-    IDS_VDF_SKIPDEBLOCK          "H264 skip deblocking mode"
-    IDS_VDF_DBLK_NONE            "None"
-    IDS_VDF_DBLK_DEFAULT         "Default"
-    IDS_VDF_DBLK_NONREF          "Non Reference"
-    IDS_VDF_DBLK_BIDIR           "Bidirectional"
-    IDS_VDF_DBLK_NONKFRM         "Non keyframes"
-    IDS_VDF_DBLK_ALL             "All frames"
-    IDS_VDF_AR_MODE              "Read AR from stream"
+    IDS_AVISPLITTER_NON_INTERLEAVED "Support ""Bad"" Interleaved files"
+    IDS_AVISPLITTER_REINDEX_BROKEN  "Reindex broken files"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_VDF_DEINTERLACING        "Deinterlacing"
-    IDS_VDF_DEINTER_TOP          "Top-Field First"
-    IDS_VDF_DEINTER_BOTTOM       "Bottom-Field First"
-    IDS_VDF_DEINTER_PROGRESSIVE  "Progressive"
+    IDS_MPEGSPLITTER_SUB_FORCING    "Force loading of all subtitles"
+    IDS_MPEGSPLITTER_ALT_DUR_CALC   "Use alternate method to calculate duration"
+    IDS_MPEGSPLITTER_LANG_ORDER     "Audio language order:"
+    IDS_MPEGSPLITTER_SUB_ORDER      "Subtitles language order:"
+    IDS_MPEGSPLITTER_TRUEHD_OUTPUT  "TrueHD+AC3 streams output"
+    IDS_MPEGSPLITTER_THD_NOSPLIT    "As is"
+    IDS_MPEGSPLITTER_FAST_SEEK      "Fast(inaccurate) seek"
+    IDS_MPEGSPLITTER_WARNING        "Warning"
+    IDS_MPEGSPLITTER_WARNING_TEXT   "Enabling this option can lead to inaccurate seeking. Are you sure?"
+    IDS_MPEGSPLITTER_SUB_EMPTY_PIN  "Output empty Subtitle pin"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_VDF_DXVA_SETTING         "DXVA settings"
-    IDS_VDF_DXVACOMPATIBILITY    "DXVA (H.264) Compatibility check"
-    IDS_VDF_DXVA_FULLCHECK       "Full check"
-    IDS_VDF_DXVA_SKIP_LEVELCHECK "Skip level check"
-    IDS_VDF_DXVA_SKIP_REFCHECK   "Skip ref frame check"
-    IDS_VDF_DXVA_SKIP_ALLCHECK   "Skip all checks"
-    IDS_VDF_DXVA_SD              "Disable DXVA for SD (H.264)"
+    IDS_MPADEC_SAMPLE_FMT           "Output sample format:"
+    IDS_MPADEC_DRC                  "Apply DRC for AC-3 and E-AC3"
+    IDS_MPADEC_MIXER                "Mixer:"
+    IDS_MPADEC_MIX_SPEAKERS         "Output speakers:"
+    IDS_MPADEC_MONO                 "Mono"
+    IDS_MPADEC_STEREO               "Stereo"
+    IDS_MPADEC_SPDIF                "Pass-through (S/PDIF, HDMI)"
+    IDS_MPADEC_AC3ENCODE            "Encode to AC-3"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_VDF_COLOR_FMT_CONVERSION "Format conversion"
-    IDS_VDF_COLOR_OUTPUT_FORMATS "Output formats:"
-    IDS_VDF_COLOR_PRESET         "Preset:"
-    IDS_VDF_COLOR_STANDARD       "Standard:"
-    IDS_VDF_COLOR_RGB_LEVELS     "RGB output levels:"
+    IDS_VDF_SETTINGS                "Video settings"
+    IDS_VDF_AUTO                    "Auto"
+    IDS_VDF_THREADNUMBER            "Number of decoding threads"
+    IDS_VDF_SKIPDEBLOCK             "H264 skip deblocking mode"
+    IDS_VDF_DBLK_NONE               "None"
+    IDS_VDF_DBLK_DEFAULT            "Default"
+    IDS_VDF_DBLK_NONREF             "Non Reference"
+    IDS_VDF_DBLK_BIDIR              "Bidirectional"
+    IDS_VDF_DBLK_NONKFRM            "Non keyframes"
+    IDS_VDF_DBLK_ALL                "All frames"
+    IDS_VDF_AR_MODE                 "Read AR from stream"
+    IDS_VDF_DEINTERLACING           "Deinterlacing"
+    IDS_VDF_DEINTER_TOP             "Top-Field First"
+    IDS_VDF_DEINTER_BOTTOM          "Bottom-Field First"
+    IDS_VDF_DEINTER_PROGRESSIVE     "Progressive"
+    IDS_VDF_DXVA_SETTING            "DXVA settings"
+    IDS_VDF_DXVACOMPATIBILITY       "DXVA (H.264) Compatibility check"
+    IDS_VDF_DXVA_FULLCHECK          "Full check"
+    IDS_VDF_DXVA_SKIP_LEVELCHECK    "Skip level check"
+    IDS_VDF_DXVA_SKIP_REFCHECK      "Skip ref frame check"
+    IDS_VDF_DXVA_SKIP_ALLCHECK      "Skip all checks"
+    IDS_VDF_DXVA_SD                 "Disable DXVA for SD (H.264)"
+    IDS_VDF_COLOR_FMT_CONVERSION    "Format conversion"
+    IDS_VDF_COLOR_OUTPUT_FORMATS    "Output formats:"
+    IDS_VDF_COLOR_PRESET            "Preset:"
+    IDS_VDF_COLOR_STANDARD          "Standard:"
+    IDS_VDF_COLOR_RGB_LEVELS        "RGB output levels:"
+    IDS_VDF_STATUS                  "Status"
+    IDS_VDF_STATUS_INPUT            "Input format\t: %s"
+    IDS_VDF_STATUS_FRAMESIZE        "Frame size\t: %s"
+    IDS_VDF_STATUS_OUTPUT           "Output format\t: %s"
+    IDS_VDF_STATUS_ADAPTER          "Graphics Adapter\t: %s"
+    IDS_VDF_TT_AR                   "Checked - will be used AR from stream.\nUnchecked - will be used AR from container.\nIndeterminate - AR from stream will not be used on files with a container AR (recommended)."
+    IDS_VDF_TT_PRESET               "Changes the relationship between speed and quality."
+    IDS_VDF_TT_STANDARD             "This setting are used only when filter is doing YCbCr<->RGB conversion."
+    IDS_VDF_TT_RGB_LEVELS           "This setting are used only when filter is doing YCbCr to RGB conversion."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_VDF_STATUS               "Status"
-    IDS_VDF_STATUS_INPUT         "Input format\t: %s"
-    IDS_VDF_STATUS_FRAMESIZE     "Frame size\t: %s"
-    IDS_VDF_STATUS_OUTPUT        "Output format\t: %s"
-    IDS_VDF_STATUS_ADAPTER       "Graphics Adapter\t: %s"
+    IDS_MPEG2_ENABLE_PLANAR         "Enable planar YUV media types (NV12, YV12, I420, IYUY)"
+    IDS_MPEG2_INTERLACE_FLAG        "Set interlaced flag in output media type"
+    IDS_MPEG2_FORCED_SUBS           "Always display forced subtitles"
+    IDS_MPEG2_DEINTERLACING         "Deinterlacing"
+    IDS_MPEG2_BRIGHTNESS            "Brightness"
+    IDS_MPEG2_RESET                 "Reset"
+    IDS_MPEG2_NOTE1                 "Note: Using a non-planar output format, bob deinterlacer, or adjusting color properies can degrade performance. ""Auto"" deinterlacer will switch to ""Blend"" when necessary."
+    IDS_MPEG2_CONTRAST              "Contrast"
+    IDS_MPEG2_HUE                   "Hue"
+    IDS_MPEG2_SATURATION            "Saturation"
+    IDS_MPEG2_READ_AR               "Read AR from stream"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_VDF_TT_AR                "Checked - will be used AR from stream.\nUnchecked - will be used AR from container.\nIndeterminate - AR from stream will not be used on files with a container AR (recommended)."
-    IDS_VDF_TT_PRESET            "Changes the relationship between speed and quality."
-    IDS_VDF_TT_STANDARD          "This setting are used only when filter is doing YCbCr<->RGB conversion."
-    IDS_VDF_TT_RGB_LEVELS        "This setting are used only when filter is doing YCbCr to RGB conversion."
+    IDS_ARS_WASAPI_MODE             "Use WASAPI (restart playback):"
+    IDS_ARS_MUTE_FAST_FORWARD       "Mute on fast forward"
+    IDS_ARS_SOUND_DEVICE            "Sound Device:"
+    IDS_ARS_WASAPI_MODE_STATUS      "Status"
+    IDS_ARS_WASAPI_MODE_STATUS_1    "Not running"
+    IDS_ARS_WASAPI_MODE_STATUS_2    "use WASAPI, Exclusive mode"
+    IDS_ARS_WASAPI_MODE_STATUS_3    "use WASAPI, Shared mode"
+    IDS_ARS_WASAPI_MODE_STATUS_5    "use WASAPI, Exclusive mode, Bitstream"
+    IDS_ARS_BITEXACT_OUTPUT         "Allow bit-exact output"
+    IDS_ARS_SYSTEM_LAYOUT_CHANNELS  "Use system layout channels"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Load Embedded Fonts"
 END
 
 STRINGTABLE
@@ -3236,30 +3263,6 @@ BEGIN
     IDS_DVB_CHANNEL_STOP_SCAN       "Stop"
     IDS_DVB_TVNAV_SEERADIO          "Radio stations"
     IDS_DVB_TVNAV_SEETV             "TV stations"
-    IDS_ARS_WASAPI_MODE             "Use WASAPI (restart playback):"
-    IDS_ARS_MUTE_FAST_FORWARD       "Mute on fast forward"
-    IDS_ARS_SOUND_DEVICE            "Sound Device:"
-    IDS_ARS_WASAPI_MODE_STATUS      "Status"
-    IDS_ARS_WASAPI_MODE_STATUS_1    "Not running"
-    IDS_ARS_WASAPI_MODE_STATUS_2    "use WASAPI, Exclusive mode"
-    IDS_ARS_WASAPI_MODE_STATUS_3    "use WASAPI, Shared mode"
-    IDS_ARS_WASAPI_MODE_STATUS_5    "use WASAPI, Exclusive mode, Bitstream"
-    IDS_ARS_BITEXACT_OUTPUT         "Allow bit-exact output"
-    IDS_ARS_SYSTEM_LAYOUT_CHANNELS  "Use system layout channels"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_MPEGSPLITTER_LANG_ORDER     "Audio language order:"
-    IDS_MPEGSPLITTER_SUB_ORDER      "Subtitles language order:"
-    IDS_MPEGSPLITTER_SUB_FORCING    "Force loading of all subtitles"
-    IDS_MPEGSPLITTER_TRUEHD_OUTPUT  "TrueHD+AC3 streams output"
-    IDS_MPEGSPLITTER_THD_NOSPLIT    "As is"
-    IDS_MPEGSPLITTER_ALT_DUR_CALC   "Use alternate method to calculate duration"
-    IDS_MPEGSPLITTER_FAST_SEEK      "Fast(inaccurate) seek"
-    IDS_MPEGSPLITTER_WARNING        "Warning"
-    IDS_MPEGSPLITTER_WARNING_TEXT   "Enabling this option can lead to inaccurate seeking. Are you sure?"
-    IDS_MPEGSPLITTER_SUB_EMPTY_PIN  "Output empty Subtitle pin"
 END
 
 STRINGTABLE
@@ -3518,14 +3521,6 @@ BEGIN
     IDC_MINQUEUE_SIZE                   "The minimum size of memory in the queue (in kilobytes), when begins playing\n\rThe number of queues is equal the number of active output pins"
     IDC_MAXQUEUE_SIZE                   "The maximum size of memory in the queue (in megabytes), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
     IDC_CACH_SIZE                       "Cache size for file operations (in kilobytes)"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_FILTER_SETTINGS_CAPTION     "Settings"
-    IDS_AVISPLITTER_NON_INTERLEAVED "Support ""Bad"" Interleaved files"
-    IDS_AVISPLITTER_REINDEX_BROKEN  "Reindex broken files"
-    IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Load Embedded Fonts"
 END
 
 STRINGTABLE
