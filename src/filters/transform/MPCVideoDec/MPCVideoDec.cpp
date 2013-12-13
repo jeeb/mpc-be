@@ -3345,6 +3345,9 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 	CString infostr;
 
 	switch (index) {
+	case INFO_MPCVersion:
+		infostr.Format(_T("v%d.%d.%d.%d (build %d)"),MPC_VERSION_MAJOR,MPC_VERSION_MINOR,MPC_VERSION_PATCH,MPC_VERSION_STATUS,MPC_VERSION_REV);
+		break;
 	case INFO_InputFormat:
 		if (m_pAVCtx) {
 			infostr = m_pAVCtx->codec->name;
@@ -3379,9 +3382,6 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 		break;
 	case INFO_GraphicsAdapter:
 		infostr = m_strDeviceDescription;
-		break;
-	case INFO_MPCVersion:
-		infostr.Format(_T("v%d.%d.%d.%d (build %d)"),MPC_VERSION_MAJOR,MPC_VERSION_MINOR,MPC_VERSION_PATCH,MPC_VERSION_STATUS,MPC_VERSION_REV);
 		break;
 	}
 

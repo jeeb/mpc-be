@@ -221,7 +221,9 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbSwRGBLevels.Create(dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p + CSize(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_SWRGBLEVELS);
 	m_cbSwRGBLevels.AddString(_T("PC (0-255)"));
 	m_cbSwRGBLevels.AddString(_T("TV (16-235)"));
-	p.y += h25;
+
+	p.y = 10 + IPP_SCALE(115) + 5 + IPP_SCALE(65) + 5 + h25 + m_fontheight * 4;
+	m_txtMPCVersion.Create(_T(""), WS_VISIBLE|WS_CHILD|ES_RIGHT, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
 		pWnd->SetFont(&m_font, FALSE);
@@ -256,6 +258,8 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		if (m_cbFormat[PixFmt_RGB32].GetCheck() == BST_UNCHECKED) {
 			m_cbSwRGBLevels.EnableWindow(FALSE);
 		}
+
+		m_txtMPCVersion.SetWindowText(m_pMDF->GetInformation(INFO_MPCVersion));
 
 		UpdateStatusInfo();
 	}

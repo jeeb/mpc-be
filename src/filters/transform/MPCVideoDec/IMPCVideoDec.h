@@ -92,11 +92,11 @@ enum MPCPixelFormat {
 };
 
 enum MPCInfo {
+	INFO_MPCVersion,
 	INFO_InputFormat,
 	INFO_FrameSize,
 	INFO_OutputFormat,
-	INFO_GraphicsAdapter,
-	INFO_MPCVersion,
+	INFO_GraphicsAdapter
 };
 
 interface __declspec(uuid("CDC3B5B3-A8B0-4c70-A805-9FC80CDEF262"))
