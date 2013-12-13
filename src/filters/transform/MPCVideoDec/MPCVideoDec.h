@@ -58,29 +58,28 @@ class __declspec(uuid("008BAC12-FBAF-497b-9670-BC6F6FBAE2C4"))
 	, public IMPCVideoDecFilter2
 {
 protected:
+	// === Persistants parameters (registry)
+	int										m_nThreadNumber;
+	int										m_nDiscardMode;
+	MPC_DEINTERLACING_FLAGS					m_nDeinterlacing;
+	int										m_nARMode;
+	int										m_nDXVACheckCompatibility;
+	int										m_nDXVA_SD;
+	bool									m_fPixFmts[PixFmt_count];
+	int										m_nSwPreset;
+	int										m_nSwStandard;
+	int										m_nSwRGBLevels;
+	//
+
 	CCpuId*									m_pCpuId;
 	CCritSec								m_csProps;
 
 	bool									m_FFmpegFilters[FFM_LAST + !FFM_LAST];
 	bool									m_DXVAFilters[TRA_DXVA_LAST + !TRA_DXVA_LAST];
 
-	// === Persistants parameters (registry)
-	int										m_nThreadNumber;
-	int										m_nDiscardMode;
-	MPC_DEINTERLACING_FLAGS					m_nDeinterlacing;
 	bool									m_bDXVACompatible;
 	unsigned __int64						m_nActiveCodecs;
-	int										m_nARMode;
-	int										m_nDXVACheckCompatibility;
-	int										m_nDXVA_SD;
-
-	// === New swscaler options
-	bool									m_fPixFmts[PixFmt_count];
-	int										m_nSwPreset;
-	int										m_nSwStandard;
-	int										m_nSwRGBLevels;
 	AVPixelFormat							m_PixelFormat;
-	//
 
 	FF_FIELD_TYPE							m_nFrameType;
 
@@ -154,6 +153,7 @@ protected:
 	REFERENCE_TIME							m_rtStartCache;
 
 	// === Private functions
+	void				SetOptionsDefault();
 	void				Cleanup();
 	void				ffmpegCleanup();
 	int					FindCodec(const CMediaType* mtIn, bool bForced = false);

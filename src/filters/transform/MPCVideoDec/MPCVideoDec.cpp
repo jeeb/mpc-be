@@ -865,9 +865,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_rtStartCache(INVALID_TIME)
 	, m_nWorkaroundBug(FF_BUG_AUTODETECT)
 	, m_nErrorConcealment(FF_EC_DEBLOCK | FF_EC_GUESS_MVS)
-	, m_nThreadNumber(0)
-	, m_nDiscardMode(AVDISCARD_DEFAULT)
-	, m_nDeinterlacing(AUTO)
 	, m_bDXVACompatible(true)
 	, m_pFFBuffer(NULL)
 	, m_nFFBufferSize(0)
@@ -883,18 +880,13 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_pVideoOutputFormat(NULL)
 	, m_nVideoOutputCount(0)
 	, m_hDevice(INVALID_HANDLE_VALUE)
-	, m_nARMode(2)
-	, m_nDXVACheckCompatibility(1)
-	, m_nDXVA_SD(0)
 	, m_bWaitingForKeyFrame(TRUE)
 	, m_bIsEVO(FALSE)
 	, m_nFrameType(PICT_FRAME)
-	// === New swscaler options
-	, m_nSwPreset(2)
-	, m_nSwStandard(2)
-	, m_nSwRGBLevels(0)
 	, m_PixelFormat(AV_PIX_FMT_NONE)
 {
+	SetOptionsDefault();
+
 	if (phr) {
 		*phr = S_OK;
 	}
@@ -913,15 +905,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	memset(&m_FFmpegFilters, false, sizeof(m_FFmpegFilters));
 	
 	m_pCpuId = DNew CCpuId();
-
-	// default settings
-	for (int i = 0; i < PixFmt_count; i++) {
-		if (i == PixFmt_AYUV) {
-			m_fPixFmts[i] = false;
-		} else {
-			m_fPixFmts[i] = true;
-		}
-	}
 
 #ifdef REGISTER_FILTER
 	CRegKey key;
@@ -947,7 +930,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 			m_nDXVA_SD = dw;
 		}
 
-		// === New swscaler options
 		for (int i = 0; i < PixFmt_count; i++) {
 			CString optname = OPT_SW_prefix;
 			optname += GetSWOF(i)->name;
@@ -964,7 +946,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SwRGBLevels, dw)) {
 			m_nSwRGBLevels = dw;
 		}
-		//
 	}
 	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, OPT_REGKEY_VCodecs, KEY_READ)) {
 		m_nActiveCodecs = 0;
@@ -981,10 +962,10 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_nDiscardMode				= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_DiscardMode, m_nDiscardMode);
 	m_nDeinterlacing			= (MPC_DEINTERLACING_FLAGS)AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_Deinterlacing, m_nDeinterlacing);
 	m_nARMode					= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_ARMode, m_nARMode);
+
 	m_nDXVACheckCompatibility	= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_DXVACheck, m_nDXVACheckCompatibility);
 	m_nDXVA_SD					= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_DisableDXVA_SD, m_nDXVA_SD);
 
-	// === New swscaler options
 	for (int i = 0; i < PixFmt_count; i++) {
 		CString optname = OPT_SW_prefix;
 		optname += GetSWOF(i)->name;
@@ -993,7 +974,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_nSwPreset					= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwPreset, m_nSwPreset);
 	m_nSwStandard				= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwStandard, m_nSwStandard);
 	m_nSwRGBLevels				= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwRGBLevels, m_nSwRGBLevels);
-	//
 #endif
 
 	m_nDXVACheckCompatibility = max(0, min(m_nDXVACheckCompatibility, 3));
@@ -1024,6 +1004,35 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 #endif
 }
 
+CMPCVideoDecFilter::~CMPCVideoDecFilter()
+{
+	Cleanup();
+
+	SAFE_DELETE(m_pCpuId);
+}
+
+void CMPCVideoDecFilter::SetOptionsDefault()
+{
+	m_nThreadNumber				= 0;
+	m_nDiscardMode				= AVDISCARD_DEFAULT;
+	m_nDeinterlacing			= AUTO;
+	m_nARMode					= 2;
+
+	m_nDXVACheckCompatibility	= 1;
+	m_nDXVA_SD					= 0;
+
+	for (int i = 0; i < PixFmt_count; i++) {
+		if (i == PixFmt_AYUV) {
+			m_fPixFmts[i] = false;
+		} else {
+			m_fPixFmts[i] = true;
+		}
+	}
+	m_nSwPreset					= 2;
+	m_nSwStandard				= 2;
+	m_nSwRGBLevels				= 0;
+}
+
 void CMPCVideoDecFilter::DetectVideoCard(HWND hWnd)
 {
 	IDirect3D9* pD3D9				= NULL;
@@ -1044,13 +1053,6 @@ void CMPCVideoDecFilter::DetectVideoCard(HWND hWnd)
 		}
 		pD3D9->Release();
 	}
-}
-
-CMPCVideoDecFilter::~CMPCVideoDecFilter()
-{
-	Cleanup();
-
-	SAFE_DELETE(m_pCpuId);
 }
 
 bool CMPCVideoDecFilter::IsVideoInterlaced()
