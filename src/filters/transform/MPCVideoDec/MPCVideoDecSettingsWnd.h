@@ -92,6 +92,7 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CStatic		m_txtMPCVersion;
 
 	void		UpdateStatusInfo();
+	void		SetOptionsDefault();
 
 public:
 	CMPCVideoDecSettingsWnd();

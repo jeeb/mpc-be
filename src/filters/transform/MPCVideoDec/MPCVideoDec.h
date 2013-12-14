@@ -153,7 +153,6 @@ protected:
 	REFERENCE_TIME							m_rtStartCache;
 
 	// === Private functions
-	void				SetOptionsDefault();
 	void				Cleanup();
 	void				ffmpegCleanup();
 	int					FindCodec(const CMediaType* mtIn, bool bForced = false);

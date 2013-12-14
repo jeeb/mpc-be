@@ -849,6 +849,15 @@ BOOL CALLBACK EnumFindProcessWnd (HWND hwnd, LPARAM lParam)
 
 CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CBaseVideoFilter(NAME("MPC - Video decoder"), lpunk, phr, __uuidof(this))
+	, m_nThreadNumber(0)
+	, m_nDiscardMode(AVDISCARD_DEFAULT)
+	, m_nDeinterlacing(AUTO)
+	, m_nARMode(2)
+	, m_nDXVACheckCompatibility(1)
+	, m_nDXVA_SD(0)
+	, m_nSwPreset(2)
+	, m_nSwStandard(2)
+	, m_nSwRGBLevels(0)
 	, m_pAVCodec(NULL)
 	, m_pAVCtx(NULL)
 	, m_pFrame(NULL)
@@ -885,7 +894,13 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_nFrameType(PICT_FRAME)
 	, m_PixelFormat(AV_PIX_FMT_NONE)
 {
-	SetOptionsDefault();
+	for (int i = 0; i < PixFmt_count; i++) {
+		if (i == PixFmt_AYUV) {
+			m_fPixFmts[i] = false;
+		} else {
+			m_fPixFmts[i] = true;
+		}
+	}
 
 	if (phr) {
 		*phr = S_OK;
@@ -1009,28 +1024,6 @@ CMPCVideoDecFilter::~CMPCVideoDecFilter()
 	Cleanup();
 
 	SAFE_DELETE(m_pCpuId);
-}
-
-void CMPCVideoDecFilter::SetOptionsDefault()
-{
-	m_nThreadNumber				= 0;
-	m_nDiscardMode				= AVDISCARD_DEFAULT;
-	m_nDeinterlacing			= AUTO;
-	m_nARMode					= 2;
-
-	m_nDXVACheckCompatibility	= 1;
-	m_nDXVA_SD					= 0;
-
-	for (int i = 0; i < PixFmt_count; i++) {
-		if (i == PixFmt_AYUV) {
-			m_fPixFmts[i] = false;
-		} else {
-			m_fPixFmts[i] = true;
-		}
-	}
-	m_nSwPreset					= 2;
-	m_nSwStandard				= 2;
-	m_nSwRGBLevels				= 0;
 }
 
 void CMPCVideoDecFilter::DetectVideoCard(HWND hWnd)

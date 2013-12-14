@@ -85,6 +85,28 @@ void CMPCVideoDecSettingsWnd::UpdateStatusInfo()
 	m_edtStatus.SetWindowText(str);
 }
 
+void CMPCVideoDecSettingsWnd::SetOptionsDefault()
+{
+	m_cbThreadNumber.SetCurSel(0);
+	m_cbDiscardMode.SetCurSel(FindDiscardIndex(AVDISCARD_DEFAULT));
+	m_cbDeinterlacing.SetCurSel(AUTO);
+	m_cbARMode.SetCheck(BST_INDETERMINATE);
+
+	m_cbDXVACompatibilityCheck.SetCurSel(1);
+	m_cbDXVA_SD.SetCheck(BST_UNCHECKED);
+
+	for (int i = 0; i < PixFmt_count; i++) {
+		if (i == PixFmt_AYUV) {
+			m_cbFormat[i].SetCheck(BST_UNCHECKED);
+		} else {
+			m_cbFormat[i].SetCheck(BST_CHECKED);
+		}
+	}
+	m_cbSwPreset.SetCurSel(2);
+	m_cbSwStandard.SetCurSel(2);
+	m_cbSwRGBLevels.SetCurSel(0);
+}
+
 bool CMPCVideoDecSettingsWnd::OnActivate()
 {
 	ASSERT(IPP_FONTSIZE == 13);
