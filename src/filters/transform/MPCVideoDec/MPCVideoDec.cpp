@@ -1798,7 +1798,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 	SAFE_DELETE_ARRAY(m_pVideoOutputFormat);
 
 	// === New swscaler options
-	int nSwIndex[PixFmt_count];
+	int nSwIndex[PixFmt_count] = { 0 };
 	int nSwCount = 0;
 
 	if (m_pAVCtx->pix_fmt != AV_PIX_FMT_NONE) {
@@ -1854,24 +1854,33 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 		nSwIndex[nSwCount++] = PixFmt_YUY2;
 	}
 
-	m_nVideoOutputCount = (IsDXVASupported() ? ffCodecs[m_nCodecNb].DXVAModeCount() + _countof (DXVAFormats) : 0) +
-						  (m_bUseFFmpeg ? nSwCount : 0);
+	m_nVideoOutputCount = m_bUseFFmpeg ? nSwCount : 0;
+	if (IsDXVASupported()) {
+		if (IsWinVistaOrLater()) {
+			m_nVideoOutputCount += _countof(DXVAFormats);
+		} else {
+			m_nVideoOutputCount += ffCodecs[m_nCodecNb].DXVAModeCount();
+		}
+	}
 
 	m_pVideoOutputFormat = DNew VIDEO_OUTPUT_FORMATS[m_nVideoOutputCount];
 
 	int nPos = 0;
 	if (IsDXVASupported()) {
-		// Dynamic DXVA media types for DXVA1
-		for (nPos = 0; nPos < ffCodecs[m_nCodecNb].DXVAModeCount(); nPos++) {
-			m_pVideoOutputFormat[nPos].subtype			= ffCodecs[m_nCodecNb].DXVAModes->Decoder[nPos];
-			m_pVideoOutputFormat[nPos].biCompression	= 'avxd';
-			m_pVideoOutputFormat[nPos].biBitCount		= 12;
-			m_pVideoOutputFormat[nPos].biPlanes			= 1;
+		if (IsWinVistaOrLater()) {
+			// Static list for DXVA2
+			memcpy(&m_pVideoOutputFormat[nPos], DXVAFormats, sizeof(DXVAFormats));
+			nPos += _countof(DXVAFormats);
+		} else {
+			// Dynamic DXVA media types for DXVA1
+			for (int pos = 0; pos < ffCodecs[m_nCodecNb].DXVAModeCount(); pos++) {
+				m_pVideoOutputFormat[nPos + pos].subtype		= ffCodecs[m_nCodecNb].DXVAModes->Decoder[nPos];
+				m_pVideoOutputFormat[nPos + pos].biCompression	= FCC('dxva');
+				m_pVideoOutputFormat[nPos + pos].biBitCount		= 12;
+				m_pVideoOutputFormat[nPos + pos].biPlanes		= 1;
+			}
+			nPos += ffCodecs[m_nCodecNb].DXVAModeCount();
 		}
-
-		// Static list for DXVA2
-		memcpy(&m_pVideoOutputFormat[nPos], DXVAFormats, sizeof(DXVAFormats));
-		nPos += _countof (DXVAFormats);
 	}
 
 	// Software rendering
