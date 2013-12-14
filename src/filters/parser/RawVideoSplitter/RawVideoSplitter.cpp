@@ -537,7 +537,7 @@ void CRawVideoSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 			m_pFile->Seek(m_startpos);
 			m_rtStart = 0;
 		} else {
-			__int64 framenum = m_rtDuration / m_AvgTimePerFrame - 1;
+			__int64 framenum = rt / m_AvgTimePerFrame;
 			m_pFile->Seek(m_startpos + framenum * (sizeof(FRAME_) + m_framesize));
 			m_rtStart = framenum * m_AvgTimePerFrame;
 		}
@@ -560,6 +560,8 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 	
 	while (SUCCEEDED(hr) && !CheckRequest(NULL) && m_pFile->GetRemaining()) {
 		CAutoPtr<Packet> p(DNew Packet());
+		p->TrackNumber	= 0;
+		p->bSyncPoint	= FALSE;
 
 #if ENABLE_YUV4MPEG2
 		if (m_RAWType == RAW_Y4M) {
@@ -577,10 +579,8 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 			p->SetCount(m_framesize);
 			m_pFile->ByteRead(p->GetData(), m_framesize);
 			
-			p->TrackNumber = 0;
 			p->rtStart     = framenum * m_AvgTimePerFrame;
 			p->rtStop      = p->rtStart + m_AvgTimePerFrame;
-			p->bSyncPoint  = FALSE;
 
 			hr = DeliverPacket(p);
 			continue;
@@ -592,10 +592,8 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 		p->SetCount(size);
 		m_pFile->ByteRead(p->GetData(), size);
 
-		p->TrackNumber	= 0;
 		p->rtStart		= INVALID_TIME;
 		p->rtStop		= INVALID_TIME;
-		p->bSyncPoint	= FALSE;
 
 		hr = DeliverPacket(p);
 	}
