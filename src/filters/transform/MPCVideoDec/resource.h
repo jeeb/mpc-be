@@ -3,6 +3,7 @@
 // Used by MPCVideoDecFilter.rc
 //
 #define IDS_FILTER_SETTINGS_CAPTION     7000
+#define IDS_FILTER_RESET_SETTINGS       7010
 #define IDS_VDF_SETTINGS                7400
 #define IDS_VDF_AUTO                    7401
 #define IDS_VDF_THREADNUMBER            7402

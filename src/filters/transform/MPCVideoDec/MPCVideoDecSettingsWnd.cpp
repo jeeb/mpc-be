@@ -226,8 +226,8 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbSwRGBLevels.AddString(_T("TV (16-235)"));
 
 	p.y = 10 + IPP_SCALE(115) + 5 + IPP_SCALE(65) + 5 + h25 + m_fontheight * 4;
-	m_btnReset.Create(_T("Reset"), dwStyle, CRect(p + CPoint(0, - 6), CSize(IPP_SCALE(80), m_fontheight + 6)), this, IDC_PP_RESET);
-	m_txtMPCVersion.Create(_T(""), WS_VISIBLE|WS_CHILD|ES_RIGHT, CRect(p + CPoint(IPP_SCALE(80), - 3), CSize(width_s - IPP_SCALE(80), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_btnReset.Create(ResStr(IDS_FILTER_RESET_SETTINGS), dwStyle, CRect(p + CPoint(0, - 6), CSize(IPP_SCALE(110), m_fontheight + 6)), this, IDC_PP_RESET);
+	m_txtMPCVersion.Create(_T(""), WS_VISIBLE|WS_CHILD|ES_RIGHT, CRect(p + CPoint(IPP_SCALE(110), - 3), CSize(width_s - IPP_SCALE(80), m_fontheight)), this, (UINT)IDC_STATIC);
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
 		pWnd->SetFont(&m_font, FALSE);
