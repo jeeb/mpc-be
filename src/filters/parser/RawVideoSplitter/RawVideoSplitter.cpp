@@ -245,7 +245,12 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						case 'C':
 							str = str.Mid(1);
 							// 8-bit
-							if (str == "420" || str == "420jpeg" || str == "420mpeg2" || str == "420paldv") {
+							if (str == "mono") {
+								fourcc		= FCC('Y800');
+								fourccRAW	= FCC('Y800');
+								bpp			= 8;
+							}
+							else if (str == "420" || str == "420jpeg" || str == "420mpeg2" || str == "420paldv") {
 								fourcc		= FCC('I420');
 								fourccRAW	= FCC('I420');
 								bpp			= 12;
