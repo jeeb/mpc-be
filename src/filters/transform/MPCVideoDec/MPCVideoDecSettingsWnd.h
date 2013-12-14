@@ -47,7 +47,7 @@ enum {
 	IDC_PP_SWPRESET,
 	IDC_PP_SWSTANDARD,
 	IDC_PP_SWRGBLEVELS,
-	
+	IDC_PP_RESET,
 };
 
 class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
@@ -89,10 +89,10 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CStatic     m_txtSwRGBLevels;
 	CComboBox   m_cbSwRGBLevels;
 
+	CButton		m_btnReset;
 	CStatic		m_txtMPCVersion;
 
 	void		UpdateStatusInfo();
-	void		SetOptionsDefault();
 
 public:
 	CMPCVideoDecSettingsWnd();
@@ -110,6 +110,7 @@ public:
 
 	afx_msg void OnBnClickedYUY2();
 	afx_msg void OnBnClickedRGB32();
+	afx_msg void OnBnClickedReset();
 	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult);
 };
 

@@ -85,28 +85,6 @@ void CMPCVideoDecSettingsWnd::UpdateStatusInfo()
 	m_edtStatus.SetWindowText(str);
 }
 
-void CMPCVideoDecSettingsWnd::SetOptionsDefault()
-{
-	m_cbThreadNumber.SetCurSel(0);
-	m_cbDiscardMode.SetCurSel(FindDiscardIndex(AVDISCARD_DEFAULT));
-	m_cbDeinterlacing.SetCurSel(AUTO);
-	m_cbARMode.SetCheck(BST_INDETERMINATE);
-
-	m_cbDXVACompatibilityCheck.SetCurSel(1);
-	m_cbDXVA_SD.SetCheck(BST_UNCHECKED);
-
-	for (int i = 0; i < PixFmt_count; i++) {
-		if (i == PixFmt_AYUV) {
-			m_cbFormat[i].SetCheck(BST_UNCHECKED);
-		} else {
-			m_cbFormat[i].SetCheck(BST_CHECKED);
-		}
-	}
-	m_cbSwPreset.SetCurSel(2);
-	m_cbSwStandard.SetCurSel(2);
-	m_cbSwRGBLevels.SetCurSel(0);
-}
-
 bool CMPCVideoDecSettingsWnd::OnActivate()
 {
 	ASSERT(IPP_FONTSIZE == 13);
@@ -248,7 +226,8 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbSwRGBLevels.AddString(_T("TV (16-235)"));
 
 	p.y = 10 + IPP_SCALE(115) + 5 + IPP_SCALE(65) + 5 + h25 + m_fontheight * 4;
-	m_txtMPCVersion.Create(_T(""), WS_VISIBLE|WS_CHILD|ES_RIGHT, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
+	m_btnReset.Create(_T("Reset"), dwStyle, CRect(p + CPoint(0, - 6), CSize(IPP_SCALE(80), m_fontheight + 6)), this, IDC_PP_RESET);
+	m_txtMPCVersion.Create(_T(""), WS_VISIBLE|WS_CHILD|ES_RIGHT, CRect(p + CPoint(IPP_SCALE(80), - 3), CSize(width_s - IPP_SCALE(80), m_fontheight)), this, (UINT)IDC_STATIC);
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
 		pWnd->SetFont(&m_font, FALSE);
@@ -360,6 +339,7 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 BEGIN_MESSAGE_MAP(CMPCVideoDecSettingsWnd, CInternalPropertyPageWnd)
 	ON_BN_CLICKED(IDC_PP_SW_YUY2, OnBnClickedYUY2)
 	ON_BN_CLICKED(IDC_PP_SW_RGB32, OnBnClickedRGB32)
+	ON_BN_CLICKED(IDC_PP_RESET, OnBnClickedReset)
 	ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
 END_MESSAGE_MAP()
 
@@ -379,6 +359,28 @@ void CMPCVideoDecSettingsWnd::OnBnClickedRGB32()
 	} else {
 		m_cbSwRGBLevels.EnableWindow(TRUE);
 	}
+}
+
+void CMPCVideoDecSettingsWnd::OnBnClickedReset()
+{
+	m_cbThreadNumber.SetCurSel(0);
+	m_cbDiscardMode.SetCurSel(FindDiscardIndex(AVDISCARD_DEFAULT));
+	m_cbDeinterlacing.SetCurSel(AUTO);
+	m_cbARMode.SetCheck(BST_INDETERMINATE);
+
+	m_cbDXVACompatibilityCheck.SetCurSel(1);
+	m_cbDXVA_SD.SetCheck(BST_UNCHECKED);
+
+	for (int i = 0; i < PixFmt_count; i++) {
+		if (i == PixFmt_AYUV) {
+			m_cbFormat[i].SetCheck(BST_UNCHECKED);
+		} else {
+			m_cbFormat[i].SetCheck(BST_CHECKED);
+		}
+	}
+	m_cbSwPreset.SetCurSel(2);
+	m_cbSwStandard.SetCurSel(2);
+	m_cbSwRGBLevels.SetCurSel(0);
 }
 
 BOOL CMPCVideoDecSettingsWnd::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
