@@ -199,6 +199,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				int    sar_y		= 1;
 				FOURCC fourcc		= FCC('I420'); // 4:2:0 - I420 by default
 				FOURCC fourccRAW	= FCC('I420'); // 4:2:0 - I420 by default
+				// fourcc for madVR, fourccRAW for LAV Video Decoder
 				WORD   bpp			= 12;
 				DWORD  interl		= 0; // 
 
@@ -243,39 +244,17 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							break;
 						case 'C':
 							str = str.Mid(1);
-							// 4:2:0
+							// 8-bit
 							if (str == "420" || str == "420jpeg" || str == "420mpeg2" || str == "420paldv") {
 								fourcc		= FCC('I420');
 								fourccRAW	= FCC('I420');
 								bpp			= 12;
 							}
-							else if (str == "420p10") {
-								fourcc		= FCC('P010');
-								fourccRAW	= FCC('I420');
-								bpp			= 15;
-							}
-							else if (str == "420p16") {
-								fourcc		= FCC('P016');
-								fourccRAW	= FCC('I420');
-								bpp			= 24;
-							}
-							// 4:2:2
 							else if (str == "422") {
 								fourcc		= FCC('I422');
 								fourccRAW	= FCC('422P');
 								bpp			= 16;
 							}
-							else if (str == "422p10") {
-								fourcc		= FCC('P210');
-								fourccRAW	= FCC('422P');
-								bpp			= 20;
-							}
-							else if (str == "422p16") {
-								fourcc		= FCC('P216');
-								fourccRAW	= FCC('422P');
-								bpp			= 32;
-							}
-							// 4:4:4
 							else if (str == "444") {
 								fourcc		= FCC('I444');
 								fourccRAW	= FCC('444P');
