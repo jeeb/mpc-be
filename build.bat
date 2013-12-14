@@ -126,10 +126,7 @@ IF /I "%COMPILER%" == "VS2013" (
 
 IF NOT DEFINED VSCOMNTOOLS GOTO MissingVar
 
-IF EXIST "%~dp0contrib\signinfo.txt" (
-  IF /I "%INSTALLER%" == "True" SET "SIGN=True"
-  IF /I "%ZIP%" == "True"       SET "SIGN=True"
-) ELSE (
+IF NOT EXIST "%~dp0contrib\signinfo.txt" (
   SET "SIGN=False"
 )
 
