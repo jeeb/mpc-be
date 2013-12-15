@@ -317,15 +317,15 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				m_rtDuration      = (m_pFile->GetLength() - m_startpos) / (sizeof(FRAME_) + m_framesize) * 10000000i64 * fpsden / fpsnum;
 				mt.SetSampleSize(m_framesize);
 
-				if (fourccLAV) {
-					vih2->bmiHeader.biCompression = fourccLAV;
-					mt.subtype = MEDIASUBTYPE_LAV_RAWVIDEO;
-					mts.Add(mt);
-				}
-
 				if (fourcc) {
 					vih2->bmiHeader.biCompression = fourcc;
 					mt.subtype = FOURCCMap(fourcc);
+					mts.Add(mt);
+				}
+
+				if (fourccLAV) {
+					vih2->bmiHeader.biCompression = fourccLAV;
+					mt.subtype = MEDIASUBTYPE_LAV_RAWVIDEO;
 					mts.Add(mt);
 				}
 
