@@ -303,6 +303,8 @@ SRCS_C = \
 	libavcodec/ra288.c \
 	libavcodec/ralf.c \
 	libavcodec/rangecoder.c \
+	libavcodec/raw.c \
+	libavcodec/rawdec.c \
 	libavcodec/rdft.c \
 	libavcodec/rv10.c \
 	libavcodec/rv30.c \

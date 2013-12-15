@@ -247,6 +247,7 @@
     <ClInclude Include="libavcodec\ralfdata.h" />
     <ClInclude Include="libavcodec\rangecoder.h" />
     <ClInclude Include="libavcodec\ratecontrol.h" />
+    <ClInclude Include="libavcodec\raw.h" />
     <ClInclude Include="libavcodec\rdft.h" />
     <ClInclude Include="libavcodec\rectangle.h" />
     <ClInclude Include="libavcodec\rl.h" />
@@ -647,6 +648,8 @@
     <ClCompile Include="libavcodec\ra288.c" />
     <ClCompile Include="libavcodec\ralf.c" />
     <ClCompile Include="libavcodec\rangecoder.c" />
+    <ClCompile Include="libavcodec\raw.c" />
+    <ClCompile Include="libavcodec\rawdec.c" />
     <ClCompile Include="libavcodec\rdft.c" />
     <ClCompile Include="libavcodec\rv10.c" />
     <ClCompile Include="libavcodec\rv30.c" />

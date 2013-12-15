@@ -487,7 +487,7 @@ MPCFILTER_VIDEO_CODECS mpc_codecs[] = {
 	{CODEC_WMV,			_T("WMV1/2/3")},
 	{CODEC_XVID,		_T("Xvid/MPEG-4")},
 	{CODEC_REALV,		_T("Real Video")},
-	{CODEC_UNCOMPRESSED,_T("Uncompressed video (v210, V410)")},
+	{CODEC_UNCOMPRESSED,_T("Uncompressed video (v210, V410, Y800, I420)")},
 };
 
 bool CMPCVideoDecCodecWnd::OnActivate()

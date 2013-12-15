@@ -458,9 +458,13 @@ FFMPEG_CODECS		ffCodecs[] = {
 	{ &MEDIASUBTYPE_WV1F, AV_CODEC_ID_MPEG4, NULL, FFM_XVID, -1 },
 	{ &MEDIASUBTYPE_wv1f, AV_CODEC_ID_MPEG4, NULL, FFM_XVID, -1 },
 
-	// // QT uncompressed video
+	// QT uncompressed video
 	{ &MEDIASUBTYPE_v210, AV_CODEC_ID_V210, NULL, FFM_UNCOMPRESSED, -1 },
 	{ &MEDIASUBTYPE_V410, AV_CODEC_ID_V410, NULL, FFM_UNCOMPRESSED, -1 },
+
+	// uncompressed video
+	{ &MEDIASUBTYPE_Y800, AV_CODEC_ID_RAWVIDEO, NULL, FFM_UNCOMPRESSED, -1 },
+	{ &MEDIASUBTYPE_I420, AV_CODEC_ID_RAWVIDEO, NULL, FFM_UNCOMPRESSED, -1 },
 };
 
 /* Important: the order should be exactly the same as in ffCodecs[] */
@@ -766,6 +770,10 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	// QT uncompressed video
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_v210 },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_V410 },
+
+	// uncompressed video
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_Y800 },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_I420 },
 };
 
 #pragma endregion any_constants
@@ -1274,6 +1282,7 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, bool bForced)
 					break;
 				case AV_CODEC_ID_V210 :
 				case AV_CODEC_ID_V410 :
+				case AV_CODEC_ID_RAWVIDEO :
 					bCodecActivated = (m_nActiveCodecs & CODEC_UNCOMPRESSED) != 0;
 					break;
 				case AV_CODEC_ID_HEVC :
@@ -1563,7 +1572,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
 
-	// Prevent connection to the video decoder - need to support decoding of uncompressed(v210, V410) video
+	// Prevent connection to the video decoder - need to support decoding of uncompressed video (v210, V410, Y800, I420)
 	if (CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected()) ) {
 		if (IsVideoDecoder(pFilter, true)) {
 			return VFW_E_TYPE_NOT_ACCEPTED;
