@@ -123,7 +123,7 @@ static filter_t s_filters[] = {
 	{_T("WMV1/2/3"),              FFMPEG_DECODER, VIDEO,  FFM_WMV,        IDS_TRA_FFMPEG},
 	{_T("Xvid/MPEG-4"),           FFMPEG_DECODER, VIDEO,  FFM_XVID,       IDS_TRA_FFMPEG},
 	{_T("RealVideo"),             FFMPEG_DECODER, VIDEO,  FFM_RV,         IDS_TRA_RV},
-	{_T("Uncompressed video (v210, V410, Y800, I420)"),   FFMPEG_DECODER, VIDEO, FFM_UNCOMPRESSED, IDS_TRA_FFMPEG},
+	{_T("Uncompressed video (v210, V410, Y800, I420, ...)"),   FFMPEG_DECODER, VIDEO, FFM_UNCOMPRESSED, IDS_TRA_FFMPEG},
 
 	// End
 	{NULL, 0, 0, 0, NULL}
