@@ -258,17 +258,15 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 							else if (str == "422") {
 								fourcc		= FCC('Y42B');
-								fourcc_2	= FCC('I422'); // for madVR
 								bpp			= 16;
 							}
 							else if (str == "444") {
-								fourcc		= FCC('444P');
+								fourcc		= FCC('444P'); // for libavcodec
 								fourcc_2	= FCC('I444'); // for madVR
 								bpp			= 24;
 							}
 							else { // unsuppurted colour space 
 								fourcc		= 0;
-								fourcc_2	= 0;
 								bpp			= 0;
 							}
 							break;
@@ -277,7 +275,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 				}
 
-				if (width <= 0 || height <= 0 || fpsnum <= 0 || fpsden <= 0 || fourcc == 0 && fourcc_2 == 0) {
+				if (width <= 0 || height <= 0 || fpsnum <= 0 || fpsden <= 0 || fourcc == 0) {
 					return E_FAIL; // incorrect or unsuppurted YUV4MPEG2 file
 				}
 
@@ -313,11 +311,9 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				m_rtDuration      = (m_pFile->GetLength() - m_startpos) / (sizeof(FRAME_) + m_framesize) * 10000000i64 * fpsden / fpsnum;
 				mt.SetSampleSize(m_framesize);
 
-				if (fourcc) {
-					vih2->bmiHeader.biCompression = fourcc;
-					mt.subtype = FOURCCMap(fourcc);
-					mts.Add(mt);
-				}
+				vih2->bmiHeader.biCompression = fourcc;
+				mt.subtype = FOURCCMap(fourcc);
+				mts.Add(mt);
 
 				if (fourcc_2) {
 					vih2->bmiHeader.biCompression = fourcc_2;
