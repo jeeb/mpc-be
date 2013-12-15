@@ -198,8 +198,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				int    sar_x		= 1;
 				int    sar_y		= 1;
 				FOURCC fourcc		= FCC('I420'); // 4:2:0 - I420 by default
-				FOURCC fourccLAV	= FCC('I420'); // 4:2:0 - I420 by default
-				// fourcc for madVR, fourccLAV for LAV Video Decoder
+				FOURCC fourcc_2		= 0;
 				WORD   bpp			= 12;
 				DWORD  interl		= 0; // 
 
@@ -247,32 +246,29 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							// 8-bit
 							if (str == "mono") {
 								fourcc		= FCC('Y800');
-								fourccLAV	= 0; // unknown
 								bpp			= 8;
-							}
-							else if (str == "411") {
-								fourcc		= 0; // unknown
-								fourccLAV	= FCC('411P');
-								bpp			= 12;
 							}
 							else if (str == "420" || str == "420jpeg" || str == "420mpeg2" || str == "420paldv") {
 								fourcc		= FCC('I420');
-								fourccLAV	= FCC('I420');
+								bpp			= 12;
+							}
+							else if (str == "411") {
+								fourcc		= FCC('Y41B');
 								bpp			= 12;
 							}
 							else if (str == "422") {
-								fourcc		= FCC('I422');
-								fourccLAV	= FCC('422P');
+								fourcc		= FCC('Y42B');
+								fourcc_2	= FCC('I422'); // for madVR
 								bpp			= 16;
 							}
 							else if (str == "444") {
-								fourcc		= FCC('I444');
-								fourccLAV	= FCC('444P');
+								fourcc		= FCC('444P');
+								fourcc_2	= FCC('I444'); // for madVR
 								bpp			= 24;
 							}
 							else { // unsuppurted colour space 
 								fourcc		= 0;
-								fourccLAV	= 0;
+								fourcc_2	= 0;
 								bpp			= 0;
 							}
 							break;
@@ -281,7 +277,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 				}
 
-				if (width <= 0 || height <= 0 || fpsnum <= 0 || fpsden <= 0 || fourcc == 0 && fourccLAV == 0) {
+				if (width <= 0 || height <= 0 || fpsnum <= 0 || fpsden <= 0 || fourcc == 0 && fourcc_2 == 0) {
 					return E_FAIL; // incorrect or unsuppurted YUV4MPEG2 file
 				}
 
@@ -323,9 +319,9 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mts.Add(mt);
 				}
 
-				if (fourccLAV) {
-					vih2->bmiHeader.biCompression = fourccLAV;
-					mt.subtype = MEDIASUBTYPE_LAV_RAWVIDEO;
+				if (fourcc_2) {
+					vih2->bmiHeader.biCompression = fourcc_2;
+					mt.subtype = FOURCCMap(fourcc_2);
 					mts.Add(mt);
 				}
 
