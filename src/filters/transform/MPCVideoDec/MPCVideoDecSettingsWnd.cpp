@@ -75,14 +75,10 @@ void CMPCVideoDecSettingsWnd::OnDisconnect()
 void CMPCVideoDecSettingsWnd::UpdateStatusInfo()
 {
 	CString str;
-	str.Format(ResStr(IDS_VDF_STATUS_INPUT), m_pMDF->GetInformation(INFO_InputFormat));
-	str.Append(_T("\r\n"));
-	str.AppendFormat(ResStr(IDS_VDF_STATUS_FRAMESIZE), m_pMDF->GetInformation(INFO_FrameSize));
-	str.Append(_T("\r\n"));
-	str.AppendFormat(ResStr(IDS_VDF_STATUS_OUTPUT), m_pMDF->GetInformation(INFO_OutputFormat));
-	str.Append(_T("\r\n"));
-	str.AppendFormat(ResStr(IDS_VDF_STATUS_ADAPTER), m_pMDF->GetInformation(INFO_GraphicsAdapter));
-	m_edtStatus.SetWindowText(str);
+	m_edtInputFormat.SetWindowText(m_pMDF->GetInformation(INFO_InputFormat));
+	m_edtFrameSize.SetWindowText(m_pMDF->GetInformation(INFO_FrameSize));
+	m_edtOutputFormat.SetWindowText(m_pMDF->GetInformation(INFO_OutputFormat));
+	m_edtGraphicsAdapter.SetWindowText(m_pMDF->GetInformation(INFO_GraphicsAdapter));
 }
 
 bool CMPCVideoDecSettingsWnd::OnActivate()
@@ -159,11 +155,21 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 	////////// Status //////////
 	p.y = 10 + IPP_SCALE(115) + 5 + IPP_SCALE(65) + 5;
-	m_grpStatus.Create(ResStr(IDS_VDF_STATUS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, h25 + m_fontheight * 5)), this, (UINT)IDC_STATIC);
+	int w1 = IPP_SCALE(115);
+	int w2 = width_s - w1;
+	m_grpStatus.Create(ResStr(IDS_VDF_STATUS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, IPP_SCALE(95))), this, (UINT)IDC_STATIC);
 	p.y += h20;
-	// DXVA mode
-	m_edtStatus.Create(WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_READONLY, CRect(p, CSize(width_s, m_fontheight * 5)), this, 0);
-	p.y += h20;
+	m_txtInputFormat.Create(ResStr(IDS_VDF_STATUS_INPUT), WS_VISIBLE | WS_CHILD, CRect(p, CSize(w1, m_fontheight)), this, (UINT)IDC_STATIC);
+	m_edtInputFormat.Create(WS_CHILD | WS_VISIBLE | ES_READONLY, CRect(p + CPoint(w1, 0), CSize(w2, m_fontheight)), this, 0);
+	p.y += h16;
+	m_txtFrameSize.Create(ResStr(IDS_VDF_STATUS_FRAMESIZE), WS_VISIBLE | WS_CHILD, CRect(p, CSize(w1, m_fontheight)), this, (UINT)IDC_STATIC);
+	m_edtFrameSize.Create(WS_CHILD | WS_VISIBLE | ES_READONLY, CRect(p + CPoint(w1, 0), CSize(w2, m_fontheight)), this, 0);
+	p.y += h16;
+	m_txtOutputFormat.Create(ResStr(IDS_VDF_STATUS_OUTPUT), WS_VISIBLE | WS_CHILD, CRect(p, CSize(w1, m_fontheight)), this, (UINT)IDC_STATIC);
+	m_edtOutputFormat.Create(WS_CHILD | WS_VISIBLE | ES_READONLY, CRect(p + CPoint(w1, 0), CSize(w2, m_fontheight)), this, 0);
+	p.y += h16;
+	m_txtGraphicsAdapter.Create(/*ResStr(IDS_VDF_STATUS_ADAPTER)*/L"Графический адаптер:", WS_VISIBLE | WS_CHILD, CRect(p, CSize(w1, m_fontheight)), this, (UINT)IDC_STATIC);
+	m_edtGraphicsAdapter.Create(WS_CHILD|WS_VISIBLE|ES_MULTILINE|ES_READONLY, CRect(p + CPoint(w1, 0), CSize(w2, m_fontheight * 2)), this, 0);
 
 	////////// Format conversion //////////
 	p = CPoint(10 + width_s + 15, 10);
@@ -225,7 +231,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbSwRGBLevels.AddString(_T("PC (0-255)"));
 	m_cbSwRGBLevels.AddString(_T("TV (16-235)"));
 
-	p.y = 10 + IPP_SCALE(115) + 5 + IPP_SCALE(65) + 5 + h25 + m_fontheight * 4;
+	p.y = 10 + IPP_SCALE(115) + 5 + IPP_SCALE(65) + 5 + IPP_SCALE(95) - m_fontheight;
 	int btn_w = IPP_SCALE(70);
 	m_btnReset.Create(ResStr(IDS_FILTER_RESET_SETTINGS), dwStyle|BS_MULTILINE, CRect(p + CPoint(0, - (m_fontheight + 6)), CSize(btn_w, m_fontheight*2 + 6)), this, IDC_PP_RESET);
 	m_txtMPCVersion.Create(_T(""), WS_VISIBLE|WS_CHILD|ES_RIGHT, CRect(p + CPoint(btn_w, - 3), CSize(width_s - btn_w, m_fontheight)), this, (UINT)IDC_STATIC);

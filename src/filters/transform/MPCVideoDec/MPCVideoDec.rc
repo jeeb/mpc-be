@@ -151,10 +151,10 @@ END
 STRINGTABLE
 BEGIN
     IDS_VDF_STATUS               "Status"
-    IDS_VDF_STATUS_INPUT         "Input format\t: %s"
-    IDS_VDF_STATUS_FRAMESIZE     "Frame size\t: %s"
-    IDS_VDF_STATUS_OUTPUT        "Output format\t: %s"
-    IDS_VDF_STATUS_ADAPTER       "Graphics Adapter\t: %s"
+    IDS_VDF_STATUS_INPUT         "Input format:"
+    IDS_VDF_STATUS_FRAMESIZE     "Frame size:"
+    IDS_VDF_STATUS_OUTPUT        "Output format:"
+    IDS_VDF_STATUS_ADAPTER       "Graphics Adapter:"
 END
 
 STRINGTABLE

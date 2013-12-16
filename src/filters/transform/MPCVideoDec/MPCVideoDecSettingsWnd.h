@@ -70,7 +70,14 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CButton		m_cbDXVA_SD;
 
 	CButton		m_grpStatus;
-	CEdit		m_edtStatus;
+	CStatic		m_txtInputFormat;
+	CEdit		m_edtInputFormat;
+	CStatic		m_txtFrameSize;
+	CEdit		m_edtFrameSize;
+	CStatic		m_txtOutputFormat;
+	CEdit		m_edtOutputFormat;
+	CStatic		m_txtGraphicsAdapter;
+	CEdit		m_edtGraphicsAdapter;
 
 	CButton		m_grpFmtConv;
 	CStatic		m_txtSwOutputFormats;
