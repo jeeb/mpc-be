@@ -376,6 +376,10 @@ void CFormatConverter::SetOptions(int preset, int standard, int rgblevels)
 
 int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 {
+	if (m_out_pixfmt == PixFmt_None) {
+		return -1;
+	}
+
 	if (!m_pSwsContext || pFrame->format != m_FProps.avpixfmt || pFrame->width != m_FProps.width || pFrame->height != m_FProps.height) {
 		// update the basic properties
 		m_FProps.avpixfmt	= (AVPixelFormat)pFrame->format;

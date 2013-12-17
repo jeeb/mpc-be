@@ -2051,6 +2051,8 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 			if (FAILED(hr = ReopenVideo())) {
 				return hr;
 			}
+
+			ChangeOutputMediaFormat(2);
 		}
 
 		CLSID ClsidSourceFilter = GetCLSID(m_pInput->GetConnected());
@@ -2533,13 +2535,34 @@ HRESULT CMPCVideoDecFilter::ChangeOutputMediaFormat(int nType)
 
 	// change output media format
 	if (nType == 2) {
+		CAutoLock cObjectLock(m_pLock);
 		BuildOutputFormat();
 
-		CAutoLock cObjectLock(m_pLock);
+		CComQIPtr<IPin> pPin = m_pOutput->GetConnected();
+		CComQIPtr<IBaseFilter> pBF = GetFilterFromPin(pPin);
+		if (IsVideoRenderer(pBF)) {
+			hr = NotifyEvent(EC_DISPLAY_CHANGED, (LONG_PTR)(IPin*)pPin, NULL);
+			if (S_OK != hr) {
+				hr = E_FAIL;
+			}
+		} else {
+			int nNumber;
+			VIDEO_OUTPUT_FORMATS* pFormats;
+			GetOutputFormats(nNumber, &pFormats);
+			for (int i = 0; i < nNumber * 2; i++) {
+				CMediaType mt;
+				if (SUCCEEDED(GetMediaType(i, &mt))) {
+					hr = pPin->QueryAccept(&mt);
+					if (hr == S_OK) {
+						hr = ReconnectPin(pPin, &mt);
+						if (hr == S_OK) {
+							return hr;
+						}
+					}
+				}
+			}
 
-		hr = NotifyEvent(EC_DISPLAY_CHANGED, (LONG_PTR)m_pOutput->GetConnected(), NULL);
-		if (S_OK != hr) {
-			hr = E_FAIL;
+			return E_FAIL;
 		}
 	}
 
@@ -2688,7 +2711,7 @@ void CMPCVideoDecFilter::FillInVideoDescription(DXVA2_VideoDesc *pDesc)
 
 BOOL CMPCVideoDecFilter::IsSupportedDecoderMode(const GUID* mode)
 {
-	TRACE(_T("CMPCVideoDecFilter::IsSupportedDecoderMode(DXVA1) => trying : %s\n"), GetDXVAMode(mode));
+	TRACE(_T("CMPCVideoDecFilter::IsSupportedDecoderMode() => trying : %s\n"), GetDXVAMode(mode));
 
 	if (IsDXVASupported()) {
 		for (int i = 0; i < MAX_SUPPORTED_MODE; i++) {
