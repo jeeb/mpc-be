@@ -47,6 +47,7 @@
 extern "C" {
 	#include <ffmpeg/libavcodec/avcodec.h>
 	#include <ffmpeg/libavutil/pixdesc.h>
+	#include <ffmpeg/libavutil/imgutils.h>
 }
 #pragma warning(pop)
 
@@ -2495,7 +2496,32 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 		pOut->SetTime(&rtStart, &rtStop);
 		pOut->SetMediaTime(NULL, NULL);
 
-		m_FormatConverter.Converting(pDataOut, m_pFrame);
+		// Check alignment on rawvideo, which can be off depending on the source file
+		AVFrame* pTmpFrame = NULL;
+		if (m_nCodecId == AV_CODEC_ID_RAWVIDEO) {
+			for (size_t i = 0; i < 4; i++) {
+				if ((intptr_t)m_pFrame->data[i] % 16u || m_pFrame->linesize[i] % 16u) {
+					// copy the frame, its not aligned properly and would crash later
+					pTmpFrame = av_frame_alloc();
+					pTmpFrame->format = m_pFrame->format;
+					pTmpFrame->width  = m_pFrame->width;
+					pTmpFrame->height = m_pFrame->height;
+					pTmpFrame->colorspace  = m_pFrame->colorspace;
+					pTmpFrame->color_range = m_pFrame->color_range;
+					av_frame_get_buffer(pTmpFrame, 16);
+					av_image_copy(pTmpFrame->data, pTmpFrame->linesize, (const uint8_t**)m_pFrame->data, m_pFrame->linesize, (AVPixelFormat)m_pFrame->format, m_pFrame->width, m_pFrame->height);
+					break;
+				}
+			}
+		}
+		if (pTmpFrame) {
+			m_FormatConverter.Converting(pDataOut, pTmpFrame);
+			av_frame_free(&pTmpFrame);
+		}
+		else {
+			m_FormatConverter.Converting(pDataOut, m_pFrame);
+		}
+		av_frame_unref(m_pFrame);
 
 #if defined(_DEBUG) && 0
 		static REFERENCE_TIME	rtLast = 0;
@@ -2506,8 +2532,6 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 
 		SetTypeSpecificFlags(pOut);
 		hr = m_pOutput->Deliver(pOut);
-
-		av_frame_unref(m_pFrame);
 	}
 
 	return hr;
