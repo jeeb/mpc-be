@@ -157,7 +157,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	p.y = 10 + IPP_SCALE(115) + 5 + IPP_SCALE(65) + 5;
 	int w1 = IPP_SCALE(117);
 	int w2 = width_s - w1;
-	m_grpStatus.Create(ResStr(IDS_VDF_STATUS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, IPP_SCALE(95))), this, (UINT)IDC_STATIC);
+	m_grpStatus.Create(ResStr(IDS_VDF_STATUS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, IPP_SCALE(97))), this, (UINT)IDC_STATIC);
 	p.y += h20;
 	m_txtInputFormat.Create(ResStr(IDS_VDF_STATUS_INPUT), WS_VISIBLE | WS_CHILD, CRect(p, CSize(w1, m_fontheight)), this, (UINT)IDC_STATIC);
 	m_edtInputFormat.Create(WS_CHILD | WS_VISIBLE | ES_READONLY, CRect(p + CPoint(w1, 0), CSize(w2, m_fontheight)), this, 0);
