@@ -199,9 +199,13 @@ CFormatConverter::~CFormatConverter()
 bool CFormatConverter::Init()
 {
 	Cleanup();
+
 	if (m_FProps.avpixfmt == AV_PIX_FMT_NONE) {
-		// check the input data, which can cause a crash.
 		TRACE(_T("FormatConverter: incorrect source format\n"));
+		return false;
+	}
+	if (m_out_pixfmt == PixFmt_None) {
+		TRACE(_T("FormatConverter: incorrect output format\n"));
 		return false;
 	}
 
@@ -314,8 +318,8 @@ void CFormatConverter::SetConvertFunc()
 void CFormatConverter::UpdateOutput(MPCPixelFormat out_pixfmt, int dstStride, int planeHeight)
 {
 	if (out_pixfmt != m_out_pixfmt) {
-		m_out_pixfmt = out_pixfmt;
 		Cleanup();
+		m_out_pixfmt = out_pixfmt;
 	}
 
 	m_dstStride   = dstStride;
@@ -367,8 +371,8 @@ void CFormatConverter::SetOptions(int preset, int standard, int rgblevels)
 	}
 
 	if (swsFlags != m_swsFlags) {
-		m_swsFlags = swsFlags;
 		Cleanup();
+		m_swsFlags = swsFlags;
 	} else {
 		UpdateDetails();
 	}
@@ -376,10 +380,6 @@ void CFormatConverter::SetOptions(int preset, int standard, int rgblevels)
 
 int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 {
-	if (m_out_pixfmt == PixFmt_None) {
-		return -1;
-	}
-
 	if (!m_pSwsContext || pFrame->format != m_FProps.avpixfmt || pFrame->width != m_FProps.width || pFrame->height != m_FProps.height) {
 		// update the basic properties
 		m_FProps.avpixfmt	= (AVPixelFormat)pFrame->format;
