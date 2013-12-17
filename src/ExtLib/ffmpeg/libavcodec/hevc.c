@@ -30,6 +30,7 @@
 #include "libavutil/md5.h"
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
+#include "libavutil/stereo3d.h"
 
 #include "bytestream.h"
 #include "cabac_functions.h"
@@ -282,6 +283,7 @@ static int decode_lt_rps(HEVCContext *s, LongTermRPS *rps, GetBitContext *gb)
 static int set_sps(HEVCContext *s, const HEVCSPS *sps)
 {
     int ret;
+    int num = 0, den = 0;
 
     pic_arrays_free(s);
     ret = pic_arrays_init(s, sps);
@@ -326,6 +328,19 @@ static int set_sps(HEVCContext *s, const HEVCSPS *sps)
 
     s->sps = sps;
     s->vps = (HEVCVPS*) s->vps_list[s->sps->vps_id]->data;
+
+    if (s->vps->vps_timing_info_present_flag) {
+        num = s->vps->vps_num_units_in_tick;
+        den = s->vps->vps_time_scale;
+    } else if (sps->vui.vui_timing_info_present_flag) {
+        num = sps->vui.vui_num_units_in_tick;
+        den = sps->vui.vui_time_scale;
+    }
+
+    if (num != 0 && den != 0)
+        av_reduce(&s->avctx->time_base.num, &s->avctx->time_base.den,
+                  num, den, 1 << 30);
+
     return 0;
 
 fail:
@@ -374,8 +389,8 @@ static int hls_slice_header(HEVCContext *s)
         s->max_ra     = INT_MAX;
     }
 
-    s->avctx->profile = s->sps->ptl.general_PTL.profile_idc;
-    s->avctx->level   = s->sps->ptl.general_PTL.level_idc;
+    s->avctx->profile = s->sps->ptl.general_ptl.profile_idc;
+    s->avctx->level   = s->sps->ptl.general_ptl.level_idc;
 
     sh->dependent_slice_segment_flag = 0;
     if (!sh->first_slice_in_pic_flag) {
@@ -2072,6 +2087,41 @@ static void restore_tqb_pixels(HEVCContext *s)
     }
 }
 
+static int set_side_data(HEVCContext *s)
+{
+    AVFrame *out = s->ref->frame;
+
+    if (s->sei_frame_packing_present &&
+        s->frame_packing_arrangement_type >= 3 &&
+        s->frame_packing_arrangement_type <= 5 &&
+        s->content_interpretation_type > 0 &&
+        s->content_interpretation_type < 3) {
+        AVStereo3D *stereo = av_stereo3d_create_side_data(out);
+        if (!stereo)
+            return AVERROR(ENOMEM);
+
+        switch (s->frame_packing_arrangement_type) {
+        case 3:
+            if (s->quincunx_subsampling)
+                stereo->type = AV_STEREO3D_SIDEBYSIDE_QUINCUNX;
+            else
+                stereo->type = AV_STEREO3D_SIDEBYSIDE;
+            break;
+        case 4:
+            stereo->type = AV_STEREO3D_TOPBOTTOM;
+            break;
+        case 5:
+            stereo->type = AV_STEREO3D_FRAMESEQUENCE;
+            break;
+        }
+
+        if (s->content_interpretation_type == 2)
+            stereo->flags = AV_STEREO3D_FLAG_INVERT;
+    }
+
+    return 0;
+}
+
 static int hevc_frame_start(HEVCContext *s)
 {
     HEVCLocalContext *lc = s->HEVClc;
@@ -2105,6 +2155,10 @@ static int hevc_frame_start(HEVCContext *s)
         av_log(s->avctx, AV_LOG_ERROR, "Error constructing the frame RPS.\n");
         goto fail;
     }
+
+    ret = set_side_data(s);
+    if (ret < 0)
+        goto fail;
 
     av_frame_unref(s->output_frame);
     ret = ff_hevc_output_frame(s, s->output_frame, 0);
@@ -2254,7 +2308,7 @@ static int decode_nal_unit(HEVCContext *s, const uint8_t *nal, int length)
 }
 
 /* FIXME: This is adapted from ff_h264_decode_nal, avoiding duplication
-   between these functions would be nice. */
+ * between these functions would be nice. */
 int ff_hevc_extract_rbsp(HEVCContext *s, const uint8_t *src, int length,
                          HEVCNAL *nal)
 {
@@ -2817,7 +2871,7 @@ static int hevc_decode_extradata(HEVCContext *s)
          avctx->extradata[2] > 1)) {
         /* It seems the extradata is encoded as hvcC format.
          * Temporarily, we support configurationVersion==0 until 14496-15 3rd
-         * finalized. When finalized, configurationVersion will be 1 and we
+         * is finalized. When finalized, configurationVersion will be 1 and we
          * can recognize hvcC by checking if avctx->extradata[0]==1 or not. */
         int i, j, num_arrays, nal_len_size;
 

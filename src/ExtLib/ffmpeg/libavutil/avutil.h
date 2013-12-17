@@ -41,7 +41,7 @@
  * @li @ref lavu "libavutil" common utility library
  * @li @ref lswr "libswresample" audio resampling, format conversion and mixing
  * @li @ref lpp  "libpostproc" post processing library
- * @li @ref lsws "libswscale" color conversion and scaling library
+ * @li @ref libsws "libswscale" color conversion and scaling library
  *
  * @section ffmpeg_versioning Versioning and compatibility
  *
@@ -279,7 +279,6 @@ char av_get_picture_type_char(enum AVPictureType pict_type);
 #include "version.h"
 #include "mathematics.h"
 #include "rational.h"
-#include "intfloat_readwrite.h"
 #include "log.h"
 #include "pixfmt.h"
 

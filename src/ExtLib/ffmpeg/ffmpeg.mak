@@ -460,6 +460,7 @@ SRCS_C = \
 	libavutil/rational.c \
 	libavutil/samplefmt.c \
 	libavutil/sha.c \
+	libavutil/stereo3d.c \
 	libavutil/timecode.c \
 	libavutil/utils.c \
 	libavutil/x86/cpu.c \

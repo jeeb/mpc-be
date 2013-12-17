@@ -140,7 +140,7 @@
 // <== End patch MPC
 // ==> Start patch MPC
 /**
-#if defined(_MSC_VER) && !CONFIG_SHARED
+#if defined(_MSC_VER)
 #pragma comment(linker, "/include:"EXTERN_PREFIX"avpriv_strtod")
 #pragma comment(linker, "/include:"EXTERN_PREFIX"avpriv_snprintf")
 #endif
@@ -217,7 +217,7 @@ void avpriv_report_missing_feature(void *avc,
 void avpriv_request_sample(void *avc,
                            const char *msg, ...) av_printf_format(2, 3);
 
-#if HAVE_MSVCRT
+#if HAVE_LIBC_MSVCRT
 #define avpriv_open ff_open
 #endif
 

@@ -1153,6 +1153,9 @@
     <ClInclude Include="libavutil\sha.h">
       <Filter>libavutil</Filter>
     </ClInclude>
+    <ClInclude Include="libavutil\stereo3d.h">
+      <Filter>libavutil</Filter>
+    </ClInclude>
     <ClInclude Include="libavutil\timecode.h">
       <Filter>libavutil</Filter>
     </ClInclude>
@@ -2411,6 +2414,9 @@
       <Filter>libavutil</Filter>
     </ClCompile>
     <ClCompile Include="libavutil\sha.c">
+      <Filter>libavutil</Filter>
+    </ClCompile>
+    <ClCompile Include="libavutil\stereo3d.c">
       <Filter>libavutil</Filter>
     </ClCompile>
     <ClCompile Include="libavutil\timecode.c">
