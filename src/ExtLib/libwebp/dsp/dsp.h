@@ -16,7 +16,7 @@
 
 #include "../webp/types.h"
 
-#if defined(__cplusplus) || defined(c_plusplus)
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -85,6 +85,11 @@ struct VP8Matrix;   // forward declaration
 typedef int (*VP8QuantizeBlock)(int16_t in[16], int16_t out[16],
                                 int n, const struct VP8Matrix* const mtx);
 extern VP8QuantizeBlock VP8EncQuantizeBlock;
+
+// specific to 2nd transform:
+typedef int (*VP8QuantizeBlockWHT)(int16_t in[16], int16_t out[16],
+                                   const struct VP8Matrix* const mtx);
+extern VP8QuantizeBlockWHT VP8EncQuantizeBlockWHT;
 
 // Collect histogram for susceptibility calculation and accumulate in histo[].
 struct VP8Histogram;
@@ -212,7 +217,7 @@ void WebPInitPremultiplyNEON(void);
 
 //------------------------------------------------------------------------------
 
-#if defined(__cplusplus) || defined(c_plusplus)
+#ifdef __cplusplus
 }    // extern "C"
 #endif
 
