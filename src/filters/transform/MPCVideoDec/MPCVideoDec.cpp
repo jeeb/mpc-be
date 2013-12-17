@@ -1632,10 +1632,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		MPEG2VIDEOINFO* mpg2v	= (MPEG2VIDEOINFO*)pmt->pbFormat;
 		pBMI					= &mpg2v->hdr.bmiHeader;
 
-		if ((pBMI->biCompression == FCC('HEVC') || pBMI->biCompression == FCC('HVC1')) && mpg2v->dwProfile) { // TODO - make it better :)
-			return VFW_E_TYPE_NOT_ACCEPTED;
-		}
-
 		switch (m_nCodecId) {
 			case AV_CODEC_ID_H264:
 				m_bReorderBFrame = IsAVI() ? true : false;
