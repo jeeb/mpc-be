@@ -57,7 +57,7 @@ int GetDTSHDFrameSize(const BYTE* buf)
 
 // LATM AAC
 
-inline UINT64 LatmGetValue(CGolombBuffer gb) {
+static inline UINT64 LatmGetValue(CGolombBuffer gb) {
 	int length = gb.BitRead(2);
 	UINT64 value = 0;
 
@@ -69,36 +69,36 @@ inline UINT64 LatmGetValue(CGolombBuffer gb) {
 	return value;
 }
 
-bool ReadAudioConfig(CGolombBuffer gb, int* samplingFrequency, int* channelConfiguration)
+static bool ReadAudioConfig(CGolombBuffer gb, int& samplingFrequency, int& channelConfiguration)
 {
 	static int channels_layout[] = {0, 1, 2, 3, 4, 5, 6, 8};
 	static int freq[] = {96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350, 0, 0, 0};
 
-	int sbr_present = -1;
+	int sbr_present = 0;
 
 	int audioObjectType = gb.BitRead(5);
 	if (audioObjectType == 31) {
 		audioObjectType = 32 + gb.BitRead(6);
 	}
 	int samplingFrequencyIndex = gb.BitRead(4);
-	*samplingFrequency = 0;
-	*samplingFrequency = freq[samplingFrequencyIndex];
+	samplingFrequency = 0;
+	samplingFrequency = freq[samplingFrequencyIndex];
 	if (samplingFrequencyIndex == 0x0f) {
-		*samplingFrequency = gb.BitRead(24);
+		samplingFrequency = gb.BitRead(24);
 	}
-	*channelConfiguration = 0;
+	channelConfiguration = 0;
 	int channelconfig = gb.BitRead(4);
 	if (channelconfig < 8) {
-		*channelConfiguration = channels_layout[channelconfig];
+		channelConfiguration = channels_layout[channelconfig];
 	}
 
 	if (audioObjectType == 5) {
 		sbr_present = 1;
 
 		samplingFrequencyIndex = gb.BitRead(4);
-		*samplingFrequency = freq[samplingFrequencyIndex];
+		samplingFrequency = freq[samplingFrequencyIndex];
 		if (samplingFrequencyIndex == 0x0f) {
-			*samplingFrequency = gb.BitRead(24);
+			samplingFrequency = gb.BitRead(24);
 		}
 
 		audioObjectType = gb.BitRead(5);
@@ -111,18 +111,18 @@ bool ReadAudioConfig(CGolombBuffer gb, int* samplingFrequency, int* channelConfi
 		}
 	}
 
-	if (sbr_present == -1) {
-		if (*samplingFrequency <= 24000) {
-			*samplingFrequency *= 2;
+	if (!sbr_present) {
+		if (samplingFrequency <= 24000) {
+			samplingFrequency *= 2;
 		}
 	}
 
 	return true;
 }
 
-bool StreamMuxConfig(CGolombBuffer gb, int* samplingFrequency, int* channelConfiguration, int* nExtraPos)
+static bool StreamMuxConfig(CGolombBuffer gb, int& samplingFrequency, int& channelConfiguration, int& nExtraPos)
 {
-	*nExtraPos = 0;
+	nExtraPos = 0;
 
 	BYTE audio_mux_version_A = 0;
 	BYTE audio_mux_version = gb.BitRead(1);
@@ -141,7 +141,7 @@ bool StreamMuxConfig(CGolombBuffer gb, int* samplingFrequency, int* channelConfi
 
 		if (!audio_mux_version) {
 			// audio specific config.
-			*nExtraPos = gb.GetPos();
+			nExtraPos = gb.GetPos();
 			return ReadAudioConfig(gb, samplingFrequency, channelConfiguration);
 		}
 	} else {
@@ -151,7 +151,7 @@ bool StreamMuxConfig(CGolombBuffer gb, int* samplingFrequency, int* channelConfi
 	return true;
 }
 
-bool ParseAACLatmHeader(const BYTE* buf, int len, int* samplerate, int* channels, BYTE* extra, unsigned int* extralen)
+bool ParseAACLatmHeader(const BYTE* buf, int len, int& samplerate, int& channels, BYTE* extra, unsigned int& extralen)
 {
 	CGolombBuffer gb((BYTE*)buf, len);
 
@@ -159,18 +159,16 @@ bool ParseAACLatmHeader(const BYTE* buf, int len, int* samplerate, int* channels
 		return false;
 	}
 
-	*samplerate = 0;
-	*channels   = 0;
-	if (extralen) {
-		*extralen = 0;
-	}
+	samplerate = 0;
+	channels   = 0;
+	extralen = 0;
 
 	int nExtraPos = 0;
 
 	gb.BitRead(13); // muxlength
 	BYTE use_same_mux = gb.BitRead(1);
 	if (!use_same_mux) {
-		bool ret = StreamMuxConfig(gb, samplerate, channels, &nExtraPos);
+		bool ret = StreamMuxConfig(gb, samplerate, channels, nExtraPos);
 		if (!ret) {
 			return ret;
 		}
@@ -178,12 +176,12 @@ bool ParseAACLatmHeader(const BYTE* buf, int len, int* samplerate, int* channels
 		return false;
 	}
 
-	if (*samplerate < 8000 || *samplerate > 96000 || *channels < 1 || *channels > 7) {
+	if (samplerate < 8000 || samplerate > 96000 || channels < 1 || channels > 7) {
 		return false;
 	}
 
 	if (extralen && extra && nExtraPos) {
-		*extralen = 4; // max size of extradata ... TODO - calculate/detect right extralen.
+		extralen = 4; // max size of extradata ... TODO - calculate/detect right extralen.
 		gb.Reset();
 		gb.SkipBytes(nExtraPos);
 		gb.ReadBuffer(extra, 4);

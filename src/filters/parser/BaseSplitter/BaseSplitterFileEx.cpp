@@ -870,12 +870,12 @@ bool CBaseSplitterFileEx::Read(latm_aachdr& h, int len, CMediaType* pmt)
 		return false;
 	}
 
-	BYTE buffer[64];
+	BYTE buffer[64] = { 0 };
 	ByteRead(buffer, min(len, 64));
 
-	BYTE extra[64];
+	BYTE extra[64] = { 0 };
 	unsigned int extralen;
-	if (!ParseAACLatmHeader(buffer, min(len, 64), &h.samplerate, &h.channels, extra, &extralen)) {
+	if (!ParseAACLatmHeader(buffer, min(len, 64), h.samplerate, h.channels, extra, extralen)) {
 		return false;
 	}
 
@@ -900,13 +900,13 @@ bool CBaseSplitterFileEx::Read(latm_aachdr& h, int len, CMediaType* pmt)
 	wfe->nAvgBytesPerSec = 0;
 	wfe->cbSize = extralen;
 	if(extralen) {
-		memcpy((BYTE*)(wfe+1), extra, extralen);
+		memcpy((BYTE*)(wfe + 1), extra, extralen);
 	}
 
 	pmt->majortype = MEDIATYPE_Audio;
 	pmt->subtype = MEDIASUBTYPE_LATM_AAC;
 	pmt->formattype = FORMAT_WaveFormatEx;
-	pmt->SetFormat((BYTE*)wfe, sizeof(WAVEFORMATEX)+wfe->cbSize);
+	pmt->SetFormat((BYTE*)wfe, sizeof(WAVEFORMATEX) + wfe->cbSize);
 
 	delete [] wfe;
 

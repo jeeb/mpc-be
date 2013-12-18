@@ -40,7 +40,7 @@
 #define EAC3_FRAME_TYPE_RESERVED     3
 
 int GetDTSHDFrameSize(const BYTE* buf); // DTS-HD, need >= 10 bytes
-bool ParseAACLatmHeader(const BYTE* buf, int len, int* samplerate, int* channels, BYTE* extra, unsigned int* extralen);
+bool ParseAACLatmHeader(const BYTE* buf, int len, int& samplerate, int& channels, BYTE* extra, unsigned int& extralen);
 
 DWORD GetDefChannelMask(WORD nChannels);
 DWORD GetVorbisChannelMask(WORD nChannels);
