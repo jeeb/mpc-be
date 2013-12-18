@@ -656,18 +656,14 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					ReduceDim(Aspect);
 					CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size); 
 
-					mts.Add(mt);
-
 					vc_params_t params;
 					if (ParseHEVCDecoderConfigurationRecord(data, size, params, false)) {
 						MPEG2VIDEOINFO* pm2vi	= (MPEG2VIDEOINFO*)mt.pbFormat;
 						pm2vi->dwProfile		= params.profile;
 						pm2vi->dwLevel			= params.level;
 						pm2vi->dwFlags			= params.nal_length_size;
-						CreateSequenceHeaderHEVC(data, size, pm2vi->dwSequenceHeader, pm2vi->cbSequenceHeader);
-
-						mts.InsertAt(0, mt);
 					}
+					mts.Add(mt);
 				}
 			} else if (AP4_StsdAtom* stsd = dynamic_cast<AP4_StsdAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stsd"))) {
 				const AP4_DataBuffer& db = stsd->GetDataBuffer();
