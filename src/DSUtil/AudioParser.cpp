@@ -178,7 +178,7 @@ bool ParseAACLatmHeader(const BYTE* buf, int len, int* samplerate, int* channels
 		return false;
 	}
 
-	if (*samplerate > 96000 || (*channels < 1 || *channels > 7)) {
+	if (*samplerate < 8000 || *samplerate > 96000 || *channels < 1 || *channels > 7) {
 		return false;
 	}
 
