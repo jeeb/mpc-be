@@ -874,7 +874,7 @@ bool CBaseSplitterFileEx::Read(latm_aachdr& h, int len, CMediaType* pmt)
 	ByteRead(buffer, min(len, 64));
 
 	BYTE extra[64] = { 0 };
-	unsigned int extralen;
+	unsigned int extralen = 0;
 	if (!ParseAACLatmHeader(buffer, min(len, 64), h.samplerate, h.channels, extra, extralen)) {
 		return false;
 	}

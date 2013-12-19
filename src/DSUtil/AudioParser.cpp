@@ -159,9 +159,9 @@ bool ParseAACLatmHeader(const BYTE* buf, int len, int& samplerate, int& channels
 		return false;
 	}
 
-	samplerate = 0;
-	channels   = 0;
-	extralen = 0;
+	samplerate	= 0;
+	channels	= 0;
+	extralen	= 0;
 
 	int nExtraPos = 0;
 
@@ -180,7 +180,7 @@ bool ParseAACLatmHeader(const BYTE* buf, int len, int& samplerate, int& channels
 		return false;
 	}
 
-	if (extralen && extra && nExtraPos) {
+	if (nExtraPos) {
 		extralen = 4; // max size of extradata ... TODO - calculate/detect right extralen.
 		gb.Reset();
 		gb.SkipBytes(nExtraPos);
