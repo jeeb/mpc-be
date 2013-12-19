@@ -270,6 +270,15 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				case FCC('Y8  '): // uncommon fourcc
 					mt.subtype = FOURCCMap(pbmi->biCompression = FCC('Y800'));
 					break;
+				case FCC('V422'): // uncommon fourcc
+					mt.subtype = FOURCCMap(pbmi->biCompression = FCC('YUY2'));
+					break;
+				case FCC('HDYC'): // UYVY with BT709
+				case FCC('cyuv'): // uncommon fourcc
+				case FCC('UYNV'): // uncommon fourcc
+				case FCC('UYNY'): // uncommon fourcc
+					mt.subtype = FOURCCMap(pbmi->biCompression = FCC('UYVY'));
+					break;
 				case FCC('AVRn'): // uncommon fourcc
 				case FCC('JPGL'): // uncommon fourcc
 					mt.subtype = MEDIASUBTYPE_MJPG;
