@@ -883,6 +883,7 @@ bool CBaseSplitterFileEx::Read(latm_aachdr& h, int len, CMediaType* pmt)
 		return true;
 	}
 
+	/*
 	// try detect ADTS header
 	aachdr aac_h;
 	Seek(pos);
@@ -890,6 +891,7 @@ bool CBaseSplitterFileEx::Read(latm_aachdr& h, int len, CMediaType* pmt)
 		memset(&h, 0, sizeof(h));
 		return true;
 	}
+	*/
 
 	WAVEFORMATEX* wfe = (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + extralen];
 	memset(wfe, 0, sizeof(WAVEFORMATEX));

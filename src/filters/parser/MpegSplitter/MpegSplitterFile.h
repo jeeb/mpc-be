@@ -27,7 +27,7 @@
 #include "../../../DSUtil/GolombBuffer.h"
 
 #define NO_SUBTITLE_PID		1 // Fake PID use for the "No subtitle" entry
-#define NO_SUBTITLE_NAME	_T("No subtitle")
+#define NO_SUBTITLE_NAME	L"No subtitle"
 
 #define ISVALIDPID(pid)		(pid >= 0x10 && pid < 0x1fff)
 
@@ -36,10 +36,54 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 	CAtlMap<WORD, BYTE> m_pid2pes;
 	CAtlMap<WORD, CMpegSplitterFile::avchdr> avch;
 	CAtlMap<WORD, CMpegSplitterFile::seqhdr> seqh;
+
+	class CValidStream {
+	public:
+		CValidStream() { nValidStream = 0; }
+		BOOL IsValid() { return nValidStream >= 3; }
+		BYTE nValidStream;
+	};
+
+	class CValidStreamAACLatm : public CValidStream {
+	public:
+		CValidStreamAACLatm() : CValidStream() {
+			memset(&h, 0, sizeof(h));
+		}
+		CMpegSplitterFile::latm_aachdr h;
+	};
+
+	class CValidStreamAAC : public CValidStream {
+	public:
+		CValidStreamAAC() : CValidStream() {
+			memset(&h, 0, sizeof(h));
+		}
+		CMpegSplitterFile::aachdr h;
+	};
+
+	class CValidStreamMPA : public CValidStream {
+	public:
+		CValidStreamMPA() : CValidStream() {
+			memset(&h, 0, sizeof(h));
+		}
+		CMpegSplitterFile::mpahdr h;
+	};
+
+	class CValidStreamAC3 : public CValidStream {
+	public:
+		CValidStreamAC3() : CValidStream() {
+			memset(&h, 0, sizeof(h));
+		}
+		CMpegSplitterFile::ac3hdr h;
+	};
+
+	CAtlMap<WORD, CValidStreamAACLatm>	m_aaclatmValid;
+	CAtlMap<WORD, CValidStreamAAC>		m_aacValid;
+	CAtlMap<WORD, CValidStreamMPA>		m_mpaValid;
+	CAtlMap<WORD, CValidStreamAC3>		m_ac3Valid;
+
 	bool m_init;
 
 	HRESULT Init(IAsyncReader* pAsyncReader);
-
 	void OnComplete(IAsyncReader* pAsyncReader);
 
 public:
