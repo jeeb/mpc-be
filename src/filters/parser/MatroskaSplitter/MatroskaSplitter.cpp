@@ -510,7 +510,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					AvgTimePerFrame = (REFERENCE_TIME)pTE->DefaultDuration / 100;
 				} 
 
-				if (!AvgTimePerFrame || AvgTimePerFrame < 166666) { // incorrect fps - calculate avarage value
+				if (AvgTimePerFrame < 166666) { // incorrect fps - calculate avarage value
 					DbgLog((LOG_TRACE, 3, _T("CMatroskaSplitterFilter::CreateOutputs() : calculate AvgTimePerFrame")));
 
 					CMatroskaNode Root(m_pFile);
@@ -676,6 +676,10 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 						}
 					}
+				}
+
+				if (AvgTimePerFrame < 166666) {
+					AvgTimePerFrame = 417082; // set 23.976 as default
 				}
 
 				for (size_t i = 0; i < mts.GetCount(); i++) {
