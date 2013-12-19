@@ -330,17 +330,17 @@ void File_Aac::program_config_element()
 //---------------------------------------------------------------------------
 void File_Aac::raw_data_block()
 {
-    if (audioObjectType!=2)
-    {
-        Skip_BS(Data_BS_Remain(),                               "Data");
-        return; //We test only AAC LC
-    }
-
     if (sampling_frequency_index>=16 || Aac_sampling_frequency[sampling_frequency_index]==0)
     {
         Trusted_IsNot("(Problem)");
         Skip_BS(Data_BS_Remain(),                               "(Problem)");
         return;
+    }
+
+    if (audioObjectType!=2)
+    {
+        Skip_BS(Data_BS_Remain(),                               "Data");
+        return; //We test only AAC LC
     }
 
     //Parsing
@@ -1278,9 +1278,12 @@ void File_Aac::ELDSpecificConfig ()
     }
 
     int8u eldExtType;
-    Get_S1(4,eldExtType,"eldExtType");
-    while (eldExtType != 0/*ELDEXT_TERM*/)
+    for (;;)
     {
+        Get_S1(4,eldExtType,"eldExtType");
+        if (eldExtType == 0/*ELDEXT_TERM*/)
+            break;
+
         int8u eldExtLen,eldExtLenAdd=0;
         int16u eldExtLenAddAdd;
         Get_S1(4,eldExtLen,"eldExtLen");
