@@ -49,8 +49,11 @@ void CGPUUsage::Clean()
 		if (ATIData.ADL_Main_Control_Destroy) {
 			ATIData.ADL_Main_Control_Destroy();
 		}
-		FreeLibrary(ATIData.hAtiADL);
-	} else if (m_GPUType == NVIDIA_GPU) {
+
+		if (ATIData.hAtiADL) {
+			FreeLibrary(ATIData.hAtiADL);
+		}
+	} else if (m_GPUType == NVIDIA_GPU && NVData.hNVApi) {
 		FreeLibrary(NVData.hNVApi);
 	}
 
