@@ -322,8 +322,12 @@ const AP4_Atom::Type AP4_ATOM_TYPE_DMB1 = AP4_ATOM_TYPE('d','m','b','1');
 const AP4_Atom::Type AP4_ATOM_TYPE_IV32 = AP4_ATOM_TYPE('I','V','3','2');
 const AP4_Atom::Type AP4_ATOM_TYPE_IV41 = AP4_ATOM_TYPE('I','V','4','1');
 // RAW
-const AP4_Atom::Type AP4_ATOM_TYPE_YV12 = AP4_ATOM_TYPE('y','v','1','2');
-const AP4_Atom::Type AP4_ATOM_TYPE_2VUY = AP4_ATOM_TYPE('2','v','u','y');
+const AP4_Atom::Type AP4_ATOM_TYPE_yv12 = AP4_ATOM_TYPE('y','v','1','2');
+const AP4_Atom::Type AP4_ATOM_TYPE_2vuy = AP4_ATOM_TYPE('2','v','u','y'); // = 'UYVY'
+const AP4_Atom::Type AP4_ATOM_TYPE_2Vuy = AP4_ATOM_TYPE('2','V','u','y'); // = 'UYVY'
+const AP4_Atom::Type AP4_ATOM_TYPE_DVOO = AP4_ATOM_TYPE('D','V','O','O'); // = 'YUY2'
+const AP4_Atom::Type AP4_ATOM_TYPE_yuvs = AP4_ATOM_TYPE('y','u','v','s'); // = 'YUY2'
+const AP4_Atom::Type AP4_ATOM_TYPE_yuv2 = AP4_ATOM_TYPE('y','u','v','2'); // modified YUY2
 const AP4_Atom::Type AP4_ATOM_TYPE_v210 = AP4_ATOM_TYPE('v','2','1','0');
 const AP4_Atom::Type AP4_ATOM_TYPE_V210 = AP4_ATOM_TYPE('V','2','1','0'); // typo? need a sample
 const AP4_Atom::Type AP4_ATOM_TYPE_v308 = AP4_ATOM_TYPE('v','3','0','8');

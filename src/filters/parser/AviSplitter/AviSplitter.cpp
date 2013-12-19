@@ -274,10 +274,12 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mt.subtype = FOURCCMap(pbmi->biCompression = FCC('YUY2'));
 					break;
 				case FCC('HDYC'): // UYVY with BT709
-				case FCC('cyuv'): // uncommon fourcc
 				case FCC('UYNV'): // uncommon fourcc
 				case FCC('UYNY'): // uncommon fourcc
 					mt.subtype = FOURCCMap(pbmi->biCompression = FCC('UYVY'));
+					break;
+				case FCC('P422'):
+					mt.subtype = FOURCCMap(pbmi->biCompression = FCC('Y42B'));
 					break;
 				case FCC('AVRn'): // uncommon fourcc
 				case FCC('JPGL'): // uncommon fourcc

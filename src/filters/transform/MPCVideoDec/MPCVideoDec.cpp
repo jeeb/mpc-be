@@ -469,6 +469,8 @@ FFMPEG_CODECS		ffCodecs[] = {
 	{ &MEDIASUBTYPE_Y41B, AV_CODEC_ID_RAWVIDEO, NULL, FFM_UNCOMPRESSED, -1 },
 	{ &MEDIASUBTYPE_Y42B, AV_CODEC_ID_RAWVIDEO, NULL, FFM_UNCOMPRESSED, -1 },
 	{ &MEDIASUBTYPE_444P, AV_CODEC_ID_RAWVIDEO, NULL, FFM_UNCOMPRESSED, -1 },
+	{ &MEDIASUBTYPE_cyuv, AV_CODEC_ID_RAWVIDEO, NULL, FFM_UNCOMPRESSED, -1 },
+	{ &MEDIASUBTYPE_yuv2, AV_CODEC_ID_RAWVIDEO, NULL, FFM_UNCOMPRESSED, -1 },
 };
 
 /* Important: the order should be exactly the same as in ffCodecs[] */
@@ -777,10 +779,12 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 
 	// uncompressed video
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_Y800 },
-	{ &MEDIATYPE_Video, &MEDIASUBTYPE_I420 },
-	{ &MEDIATYPE_Video, &MEDIASUBTYPE_Y41B },
-	{ &MEDIATYPE_Video, &MEDIASUBTYPE_Y42B },
-	{ &MEDIATYPE_Video, &MEDIASUBTYPE_444P },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_I420 }, // YUV 4:2:0 Planar
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_Y41B }, // YUV 4:1:1 Planar
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_Y42B }, // YUV 4:2:2 Planar
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_444P }, // YUV 4:4:4 Planar
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_cyuv }, // UYVY flipped vertically
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_yuv2 }, // modified YUY2, used in QuickTime
 };
 
 #pragma endregion any_constants
