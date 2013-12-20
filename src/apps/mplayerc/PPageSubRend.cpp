@@ -76,46 +76,41 @@ END_MESSAGE_MAP()
 
 // CPPageSubRend message handlers
 
-int TranslateResIn(int _In)
-{
-	switch (_In) {
-		case 0:
-			return 0;
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-			return _In + 4;
-		case 6:
-		case 7:
-		case 8:
-		case 9:
-			return _In - 5;
-	}
+static struct MAX_TEX_RES {
+	const int width;
+	const LPCTSTR name;
+}
+s_maxTexRes[] = {
+	{   0, _T("Desktop") },
+	{2560, _T("2560x1600")},
+	{1920, _T("1920x1080")},
+	{1320, _T("1320x900") },
+	{1280, _T("1280x720") },
+	{1024, _T("1024x768") },
+	{ 800, _T("800x600")  },
+	{ 640, _T("640x480")  },
+	{ 512, _T("512x384")  },
+	{ 384, _T("384x288")  }
+};
 
-	return _In;
+int TexWidth2Index(int w)
+{
+	for (int i = 0; i < _countof(s_maxTexRes); i++) {
+		if (s_maxTexRes[i].width == w) {
+			return i;
+		}
+	}
+	ASSERT(s_maxTexRes[4].width == 1280);
+	return 4; // default 1280x720
 }
 
-int TranslateResOut(int _In)
+int TexIndex2Width(int i)
 {
-	switch (_In) {
-		case 0:
-			return 0;
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-			return _In + 5;
-		case 5:
-		case 6:
-		case 7:
-		case 8:
-		case 9:
-			return _In - 4;
+	if (i >= 0 && i < _countof(s_maxTexRes)) {
+		return s_maxTexRes[i].width;
 	}
 
-	return _In;
+	return 1280; // default 1280x720
 }
 
 BOOL CPPageSubRend::OnInitDialog()
@@ -133,17 +128,10 @@ BOOL CPPageSubRend::OnInitDialog()
 	m_nVerPosCtrl.SetRange(110,-10);
 	m_nSPCSize = s.m_RenderersSettings.nSPCSize;
 	m_nSPCSizeCtrl.SetRange(0, 60);
-	m_spmaxres.AddString(_T("Desktop"));
-	m_spmaxres.AddString(_T("2560x1600"));
-	m_spmaxres.AddString(_T("1920x1080"));
-	m_spmaxres.AddString(_T("1320x900"));
-	m_spmaxres.AddString(_T("1280x720"));
-	m_spmaxres.AddString(_T("1024x768"));
-	m_spmaxres.AddString(_T("800x600"));
-	m_spmaxres.AddString(_T("640x480"));
-	m_spmaxres.AddString(_T("512x384"));
-	m_spmaxres.AddString(_T("384x288"));
-	m_spmaxres.SetCurSel(TranslateResIn(s.m_RenderersSettings.nSPCMaxRes));
+	for (int i = 0; i < _countof(s_maxTexRes); i++) {
+		m_spmaxres.AddString(s_maxTexRes[i].name);
+	}
+	m_spmaxres.SetCurSel(TexWidth2Index(s.m_RenderersSettings.nSPMaxTexRes));
 	m_fSPCPow2Tex = s.m_RenderersSettings.fSPCPow2Tex;
 	m_fSPCAllowAnimationWhenBuffering = s.m_RenderersSettings.fSPCAllowAnimationWhenBuffering;
 	m_nSubDelayInterval = s.nSubDelayInterval;
@@ -166,7 +154,7 @@ BOOL CPPageSubRend::OnApply()
 			|| s.nVerPos != m_nVerPos
 			|| s.m_RenderersSettings.nSPCSize != m_nSPCSize
 			|| s.nSubDelayInterval != m_nSubDelayInterval
-			|| s.m_RenderersSettings.nSPCMaxRes != TranslateResOut(m_spmaxres.GetCurSel())
+			|| s.m_RenderersSettings.nSPMaxTexRes != TexIndex2Width(m_spmaxres.GetCurSel())
 			|| s.m_RenderersSettings.fSPCPow2Tex != !!m_fSPCPow2Tex
 			|| s.m_RenderersSettings.fSPCAllowAnimationWhenBuffering != !!m_fSPCAllowAnimationWhenBuffering) {
 		s.fOverridePlacement = !!m_fOverridePlacement;
@@ -174,7 +162,7 @@ BOOL CPPageSubRend::OnApply()
 		s.nVerPos = m_nVerPos;
 		s.m_RenderersSettings.nSPCSize = m_nSPCSize;
 		s.nSubDelayInterval = m_nSubDelayInterval;
-		s.m_RenderersSettings.nSPCMaxRes = TranslateResOut(m_spmaxres.GetCurSel());
+		s.m_RenderersSettings.nSPMaxTexRes = TexIndex2Width(m_spmaxres.GetCurSel());
 		s.m_RenderersSettings.fSPCPow2Tex = !!m_fSPCPow2Tex;
 		s.m_RenderersSettings.fSPCAllowAnimationWhenBuffering = !!m_fSPCAllowAnimationWhenBuffering;
 

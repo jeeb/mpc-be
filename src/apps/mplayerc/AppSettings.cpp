@@ -1660,7 +1660,7 @@ void CAppSettings::UpdateRenderersData(bool fSave)
 		pApp->WriteProfileInt(IDS_R_SETTINGS, _T("ResetDevice"), r.fResetDevice);
 
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPCSIZE, r.nSPCSize);
-		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPCMAXRES, r.nSPCMaxRes);
+		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPMAXTEXRES, r.nSPMaxTexRes);
 		pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_POW2TEX, r.fSPCPow2Tex);
 		pApp->WriteProfileInt(IDS_R_SETTINGS, _T("SPCAllowAnimationWhenBuffering"), r.fSPCAllowAnimationWhenBuffering);
 
@@ -1723,7 +1723,7 @@ void CAppSettings::UpdateRenderersData(bool fSave)
 		r.fResetDevice = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("ResetDevice"), TRUE);
 
 		r.nSPCSize = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPCSIZE, 4);
-		r.nSPCMaxRes = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPCMAXRES, 2);
+		r.nSPMaxTexRes = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPMAXTEXRES, 1280);
 		r.fSPCPow2Tex = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_POW2TEX, TRUE);
 		r.fSPCAllowAnimationWhenBuffering = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("SPCAllowAnimationWhenBuffering"), TRUE);
 

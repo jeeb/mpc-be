@@ -126,7 +126,7 @@ public:
 	int			iEvrBuffers;
 
 	int			nSPCSize;
-	int			nSPCMaxRes;
+	int			nSPMaxTexRes;
 	bool		fSPCPow2Tex;
 	bool		fSPCAllowAnimationWhenBuffering;
 

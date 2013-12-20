@@ -103,7 +103,7 @@
 #define IDS_RS_SPHORPOS						_T("SPHorPos")
 #define IDS_RS_SPVERPOS						_T("SPVerPos")
 #define IDS_RS_SPCSIZE						_T("SPCSize")
-#define IDS_RS_SPCMAXRES					_T("SPCMaxRes")
+#define IDS_RS_SPMAXTEXRES					_T("SPMaxTexRes")
 #define IDS_RS_INTREALMEDIA					_T("IntRealMedia")
 #define IDS_RS_DISABLEXPTOOLBARS			_T("DisableXPToolbars")
 
