@@ -2525,7 +2525,6 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 		else {
 			m_FormatConverter.Converting(pDataOut, m_pFrame);
 		}
-		av_frame_unref(m_pFrame);
 
 #if defined(_DEBUG) && 0
 		static REFERENCE_TIME	rtLast = 0;
@@ -2535,6 +2534,8 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 #endif
 
 		SetTypeSpecificFlags(pOut);
+		av_frame_unref(m_pFrame);
+
 		hr = m_pOutput->Deliver(pOut);
 	}
 
