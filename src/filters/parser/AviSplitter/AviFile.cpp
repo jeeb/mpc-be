@@ -391,7 +391,7 @@ HRESULT CAviFile::BuildIndex()
 				Seek(idx->aIndex[j].qwOffset);
 
 				AVISTDINDEX stdidx;
-				if (S_OK != ByteRead((BYTE*)&stdidx, FIELD_OFFSET(AVISTDINDEX, aIndex))) {
+				if (S_OK != ByteRead((BYTE*)&stdidx, FIELD_OFFSET(AVISTDINDEX, aIndex)) || (WORD)stdidx.fcc != 'xi') { // fcc = 'ix00', 'ix01', 'ix02',...
 					EmptyIndex();
 					return E_FAIL;
 				}
