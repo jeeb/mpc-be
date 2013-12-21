@@ -70,6 +70,10 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 };
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
+	{&MEDIATYPE_Video, &MEDIASUBTYPE_NV12},
+	{&MEDIATYPE_Video, &MEDIASUBTYPE_YV12},
+	{&MEDIATYPE_Video, &MEDIASUBTYPE_YUY2},
+	{&MEDIATYPE_Video, &MEDIASUBTYPE_I420},
 	{&MEDIATYPE_Video, &MEDIASUBTYPE_IYUV},
 };
 
@@ -399,6 +403,20 @@ HRESULT CMpeg2DecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop,
 	m_pClosedCaptionOutput->DeliverNewSegment(tStart, tStop, dRate);
 	m_fDropFrames = false;
 	return __super::NewSegment(tStart, tStop, dRate);
+}
+
+static VIDEO_OUTPUT_FORMATS DefaultFormats[] = {
+	{&MEDIASUBTYPE_NV12, 3, 12, '21VN'},
+	{&MEDIASUBTYPE_YV12, 3, 12, '21VY'},
+	{&MEDIASUBTYPE_I420, 3, 12, '024I'},
+	{&MEDIASUBTYPE_IYUV, 3, 12, 'VUYI'},
+	{&MEDIASUBTYPE_YUY2, 1, 16, '2YUY'},
+};
+
+void CMpeg2DecFilter::GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats)
+{
+	nNumber		= _countof(DefaultFormats);
+	*ppFormats	= DefaultFormats;
 }
 
 void CMpeg2DecFilter::InputTypeChanged()

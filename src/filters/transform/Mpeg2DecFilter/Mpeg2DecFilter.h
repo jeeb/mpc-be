@@ -106,6 +106,7 @@ class __declspec(uuid("39F498AF-1A09-4275-B193-673B0BA3D478"))
 	AM_SimpleRateChange m_rate;
 
 protected:
+	void GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats);
 	void InputTypeChanged();
 	HRESULT Transform(IMediaSample* pIn);
 	bool IsVideoInterlaced();

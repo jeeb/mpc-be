@@ -1915,6 +1915,16 @@ void CRealVideoDecoder::ResizeRow(BYTE* pIn, DWORD wi, DWORD dpi, BYTE* pOut, DW
 	}
 }
 
+static VIDEO_OUTPUT_FORMATS DefaultFormats[] = {
+	{&MEDIASUBTYPE_I420, 3, 12, '024I'},
+};
+
+void CRealVideoDecoder::GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats)
+{
+	nNumber		= _countof(DefaultFormats);
+	*ppFormats	= DefaultFormats;
+}
+
 HRESULT CRealVideoDecoder::CheckInputType(const CMediaType* mtIn)
 {
 	if (mtIn->majortype != MEDIATYPE_Video

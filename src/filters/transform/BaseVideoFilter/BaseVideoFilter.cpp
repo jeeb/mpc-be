@@ -512,32 +512,6 @@ HRESULT CBaseVideoFilter::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_
 		   : NOERROR;
 }
 
-VIDEO_OUTPUT_FORMATS DefaultFormats[] = {
-	{&MEDIASUBTYPE_P010,   2, 24, '010P'},
-	{&MEDIASUBTYPE_P016,   2, 24, '610P'},
-	{&MEDIASUBTYPE_NV12,   3, 12, '21VN'},
-	{&MEDIASUBTYPE_YV12,   3, 12, '21VY'},
-	{&MEDIASUBTYPE_I420,   3, 12, '024I'},
-	{&MEDIASUBTYPE_IYUV,   3, 12, 'VUYI'},
-	{&MEDIASUBTYPE_YUY2,   1, 16, '2YUY'},
-	{&MEDIASUBTYPE_ARGB32, 1, 32, BI_RGB},
-	{&MEDIASUBTYPE_RGB32,  1, 32, BI_RGB},
-	{&MEDIASUBTYPE_RGB24,  1, 24, BI_RGB},
-	{&MEDIASUBTYPE_RGB565, 1, 16, BI_RGB},
-	{&MEDIASUBTYPE_RGB555, 1, 16, BI_RGB},
-	{&MEDIASUBTYPE_ARGB32, 1, 32, BI_BITFIELDS},
-	{&MEDIASUBTYPE_RGB32,  1, 32, BI_BITFIELDS},
-	{&MEDIASUBTYPE_RGB24,  1, 24, BI_BITFIELDS},
-	{&MEDIASUBTYPE_RGB565, 1, 16, BI_BITFIELDS},
-	{&MEDIASUBTYPE_RGB555, 1, 16, BI_BITFIELDS},
-};
-
-void CBaseVideoFilter::GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats)
-{
-	nNumber		= _countof(DefaultFormats);
-	*ppFormats	= DefaultFormats;
-}
-
 HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 {
 	VIDEO_OUTPUT_FORMATS*	fmts;

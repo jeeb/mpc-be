@@ -286,6 +286,8 @@ class __declspec(uuid("238D0F23-5DC9-45A6-9BE2-666160C324DD"))
 
 	BYTE* m_pI420, *m_pI420Tmp;
 
+	void GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats);
+
 public:
 	CRealVideoDecoder(LPUNKNOWN lpunk, HRESULT* phr);
 	virtual ~CRealVideoDecoder();
