@@ -659,12 +659,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 					if (m_aaclatmValid[nPid].IsValid()) {
 						type = audio;
 					} else {
-						if (m_aaclatmValid[nPid].h == h) {
-							m_aaclatmValid[nPid].nValidStream++;
-						} else {
-							m_aaclatmValid[nPid].nValidStream = 0;
-						}
-						memcpy(&m_aaclatmValid[nPid].h, &h, sizeof(h));
+						m_aaclatmValid[nPid].Handle(h);
 					}
 				}
 			}
@@ -680,12 +675,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 					if (m_aacValid[nPid].IsValid()) {
 						type = audio;
 					} else {
-						if (m_aacValid[nPid].h == h) {
-							m_aacValid[nPid].nValidStream++;
-						} else {
-							m_aacValid[nPid].nValidStream = 0;
-						}
-						memcpy(&m_aacValid[nPid].h, &h, sizeof(h));
+						m_aacValid[nPid].Handle(h);
 					}
 				}
 			}
@@ -701,12 +691,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 					if (m_mpaValid[nPid].IsValid()) {
 						type = audio;
 					} else {
-						if (m_mpaValid[nPid].h == h) {
-							m_mpaValid[nPid].nValidStream++;
-						} else {
-							m_mpaValid[nPid].nValidStream = 0;
-						}
-						memcpy(&m_mpaValid[nPid].h, &h, sizeof(h));
+						m_mpaValid[nPid].Handle(h);
 					}
 				}
 			}
@@ -722,12 +707,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 					if (m_ac3Valid[nPid].IsValid()) {
 						type = audio;
 					} else {
-						if (m_ac3Valid[nPid].h == h) {
-							m_ac3Valid[nPid].nValidStream++;
-						} else {
-							m_ac3Valid[nPid].nValidStream = 0;
-						}
-						memcpy(&m_ac3Valid[nPid].h, &h, sizeof(h));
+						m_ac3Valid[nPid].Handle(h);
 					}
 				}
 			}

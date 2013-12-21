@@ -37,49 +37,30 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 	CAtlMap<WORD, CMpegSplitterFile::avchdr> avch;
 	CAtlMap<WORD, CMpegSplitterFile::seqhdr> seqh;
 
+	template<class T>
 	class CValidStream {
+		BYTE m_nValidStream;
+		T m_val;
 	public:
-		CValidStream() { nValidStream = 0; }
-		BOOL IsValid() { return nValidStream >= 3; }
-		BYTE nValidStream;
-	};
-
-	class CValidStreamAACLatm : public CValidStream {
-	public:
-		CValidStreamAACLatm() : CValidStream() {
-			memset(&h, 0, sizeof(h));
+		CValidStream() {
+			m_nValidStream = 0;
+			memset(&m_val, 0, sizeof(m_val));
 		}
-		CMpegSplitterFile::latm_aachdr h;
-	};
-
-	class CValidStreamAAC : public CValidStream {
-	public:
-		CValidStreamAAC() : CValidStream() {
-			memset(&h, 0, sizeof(h));
+		void Handle(T& val) {
+			if (m_val == val) {
+				m_nValidStream++;
+			} else {
+				m_nValidStream = 0;
+			}
+			memcpy(&m_val, &val, sizeof(val));
 		}
-		CMpegSplitterFile::aachdr h;
+		BOOL IsValid() { return m_nValidStream >= 3; }
 	};
 
-	class CValidStreamMPA : public CValidStream {
-	public:
-		CValidStreamMPA() : CValidStream() {
-			memset(&h, 0, sizeof(h));
-		}
-		CMpegSplitterFile::mpahdr h;
-	};
-
-	class CValidStreamAC3 : public CValidStream {
-	public:
-		CValidStreamAC3() : CValidStream() {
-			memset(&h, 0, sizeof(h));
-		}
-		CMpegSplitterFile::ac3hdr h;
-	};
-
-	CAtlMap<WORD, CValidStreamAACLatm>	m_aaclatmValid;
-	CAtlMap<WORD, CValidStreamAAC>		m_aacValid;
-	CAtlMap<WORD, CValidStreamMPA>		m_mpaValid;
-	CAtlMap<WORD, CValidStreamAC3>		m_ac3Valid;
+	CAtlMap<WORD, CValidStream<CMpegSplitterFile::latm_aachdr>>	m_aaclatmValid;
+	CAtlMap<WORD, CValidStream<CMpegSplitterFile::aachdr>>		m_aacValid;
+	CAtlMap<WORD, CValidStream<CMpegSplitterFile::mpahdr>>		m_mpaValid;
+	CAtlMap<WORD, CValidStream<CMpegSplitterFile::ac3hdr>>		m_ac3Valid;
 
 	bool m_init;
 
