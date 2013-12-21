@@ -408,9 +408,9 @@ HRESULT CMpeg2DecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop,
 static VIDEO_OUTPUT_FORMATS DefaultFormats[] = {
 	{&MEDIASUBTYPE_NV12, 3, 12, '21VN'},
 	{&MEDIASUBTYPE_YV12, 3, 12, '21VY'},
+	{&MEDIASUBTYPE_YUY2, 1, 16, '2YUY'},
 	{&MEDIASUBTYPE_I420, 3, 12, '024I'},
 	{&MEDIASUBTYPE_IYUV, 3, 12, 'VUYI'},
-	{&MEDIASUBTYPE_YUY2, 1, 16, '2YUY'},
 };
 
 void CMpeg2DecFilter::GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats)
