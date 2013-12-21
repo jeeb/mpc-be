@@ -1916,11 +1916,11 @@ void CRealVideoDecoder::ResizeRow(BYTE* pIn, DWORD wi, DWORD dpi, BYTE* pOut, DW
 }
 
 static VIDEO_OUTPUT_FORMATS DefaultFormats[] = {
-	{&MEDIASUBTYPE_NV12, 3, 12, '21VN'},
-	{&MEDIASUBTYPE_YV12, 3, 12, '21VY'},
-	{&MEDIASUBTYPE_YUY2, 1, 16, '2YUY'},
-	{&MEDIASUBTYPE_I420, 3, 12, '024I'},
-	{&MEDIASUBTYPE_IYUV, 3, 12, 'VUYI'},
+	{&MEDIASUBTYPE_NV12, 3, 12, FCC('NV12')},
+	{&MEDIASUBTYPE_YV12, 3, 12, FCC('YV12')},
+	{&MEDIASUBTYPE_YUY2, 1, 16, FCC('YUY2')},
+	{&MEDIASUBTYPE_I420, 3, 12, FCC('I420')},
+	{&MEDIASUBTYPE_IYUV, 3, 12, FCC('IYUV')},
 };
 
 void CRealVideoDecoder::GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats)
