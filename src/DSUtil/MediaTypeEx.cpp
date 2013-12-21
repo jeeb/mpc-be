@@ -279,6 +279,8 @@ CString CMediaTypeEx::GetVideoCodecName(const GUID& subtype, DWORD biCompression
 			str = _T("RGB555");
 		else if (subtype == MEDIASUBTYPE_RGB565)
 			str = _T("RGB565");
+        else if (subtype == MEDIASUBTYPE_ARGB32)
+            str = _T("ARGB32");
 	}
 
 	return str;
