@@ -684,7 +684,7 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, CAtlArray<BYTE>& buf, CMediaType* pmt,
 		vi->cbSequenceHeader				= DWORD(shlen + shextlen);
 		gb.Reset();
 		gb.SkipBytes(shpos);
-		ByteRead((BYTE*)&vi->dwSequenceHeader[0], shlen);
+		gb.ReadBuffer((BYTE*)&vi->dwSequenceHeader[0], shlen);
 		if (shextpos && shextlen) {
 			gb.Reset();
 			gb.SkipBytes(shextpos);
