@@ -551,9 +551,7 @@ bool CVobFile::Open(CString fn, CAtlList<CString>& vobs)
 	m_ifoFile.Seek(pcgITPosition, CFile::begin);
 	WORD NumberOfProgramChains = ReadShort();
 
-	// first - get Program Chains with maximum duration
 	m_rtDuration		= 0;
-	int ProgramChains	= 0;
 
 	for (int i = 0; i < NumberOfProgramChains; i++) {
 		m_ifoFile.Seek(pcgITPosition + 4 + 8 * (i + 1), CFile::begin);
@@ -563,11 +561,6 @@ bool CVobFile::Open(CString fn, CAtlList<CString>& vobs)
 		
 		BYTE bytes[4];
 		ReadBuffer(bytes, 4);
-		REFERENCE_TIME rtPlaybackTime = FormatTime(bytes);
-		if (rtPlaybackTime > m_rtDuration) {
-			m_rtDuration	= rtPlaybackTime;
-			ProgramChains	= i;
-		}
 
 		// PGC_AST_CTL
 		m_ifoFile.Seek(pcgITPosition + chainOffset + 0x0C, CFile::begin);
@@ -598,25 +591,22 @@ bool CVobFile::Open(CString fn, CAtlList<CString>& vobs)
 
 	}
 
-	/*for (int i = 0; i < NumberOfProgramChains; i++) */
-	{
-		m_ifoFile.Seek(pcgITPosition + 4 + 8 * (ProgramChains + 1), CFile::begin);
+	m_pChapters[0] = 0;
+	m_ChaptersCount = 1;
+	for (int nProgramChains = 0; nProgramChains < NumberOfProgramChains; nProgramChains++) {
+		m_ifoFile.Seek(pcgITPosition + 4 + 8 * (nProgramChains + 1), CFile::begin);
 		DWORD chainOffset = ReadDword();
 		m_ifoFile.Seek(pcgITPosition + chainOffset + 2, CFile::begin);
 		BYTE programChainPrograms = ReadByte();
 		
 		BYTE bytes[4];
 		ReadBuffer(bytes, 4);
-		REFERENCE_TIME rtPlaybackTime = FormatTime(bytes);
 
-		m_ChaptersCount = programChainPrograms;
 		m_ifoFile.Seek(pcgITPosition + chainOffset + 230, CFile::begin);
 		int programMapOffset = ReadShort();
 		m_ifoFile.Seek(pcgITPosition + chainOffset + 0xE8, CFile::begin);
 		int cellTableOffset = ReadShort();
-		REFERENCE_TIME rtDuration = 0;
-		m_pChapters[0] = 0;
-		for (int currentProgram=0; currentProgram<programChainPrograms; currentProgram++) {
+		for (int currentProgram = 0; currentProgram < programChainPrograms; currentProgram++) {
 			m_ifoFile.Seek(pcgITPosition + chainOffset + programMapOffset + currentProgram, CFile::begin);
 			byte entryCell = ReadByte();
 			byte exitCell = entryCell;
@@ -638,14 +628,10 @@ bool CVobFile::Open(CString fn, CAtlList<CString>& vobs)
 					rtTotalTime += FormatTime(bytes);
 				}
 			}
-			rtDuration += rtTotalTime;
-			m_pChapters[currentProgram + 1] = rtDuration;
+			m_rtDuration += rtTotalTime;
+			m_pChapters[m_ChaptersCount++] = m_rtDuration;
 		}
-
-		// to clarify the overall duration - calculate from cells duration
-		m_rtDuration = rtDuration;
 	}
-
 	m_ifoFile.Close();
 
 	int offset = -1;
@@ -890,7 +876,7 @@ bool CVobFile::Read(BYTE* buff)
 
 BSTR CVobFile::GetTrackName(UINT aTrackIdx)
 {
-	CString TrackName = _T("");
+	CString TrackName;
 	m_pStream_Lang.Lookup(aTrackIdx, TrackName);
 	return TrackName.AllocSysString();
 }
