@@ -34,6 +34,7 @@ CGPUUsage::CGPUUsage()
 	: m_nGPUUsage(0)
 	, m_dwLastRun(0)
 	, m_lRunCount(0)
+	, m_GPUType(UNKNOWN_GPU)
 {
 	Clean();
 }
