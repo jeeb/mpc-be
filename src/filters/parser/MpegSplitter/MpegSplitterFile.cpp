@@ -1256,7 +1256,7 @@ void CMpegSplitterFile::UpdatePSM()
 	}
 	WORD es_map_length	= (WORD)BitRead(16);
 
-	while (es_map_length >= 4) {
+	while (es_map_length > 4) {
 		BYTE type			= (BYTE)BitRead(8);
 		BYTE es_id			= (BYTE)BitRead(8);
 		WORD es_info_length	= (WORD)BitRead(16);
