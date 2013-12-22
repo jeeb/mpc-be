@@ -5544,7 +5544,7 @@ int CALLBACK BrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lp, LPARAM pData)
 
 void CMainFrame::OnFileOpenDVD()
 {
-	if ((m_iMediaLoadState == MLS_LOADING) || m_pFullscreenWnd->IsWindow()) {
+	if (m_iMediaLoadState == MLS_LOADING) {
 		return;
 	}
 
@@ -5582,7 +5582,7 @@ void CMainFrame::OnFileOpenDVD()
 			openDlgPtr->Release();
 		}
 	} else {
-		TCHAR _path[_MAX_PATH];
+		TCHAR _path[_MAX_PATH] = { 0 };
 
 		BROWSEINFO bi;
 		bi.hwndOwner = m_hWnd;
