@@ -102,11 +102,13 @@ BOOL CPPageFileInfoRes::OnInitDialog()
 
 	POSITION pos = m_res.GetHeadPosition();
 	while (pos) {
-		CDSMResource res = m_res.GetNext(pos);
+		CDSMResource res = m_res.GetAt(pos);
 
 		int iItem = m_list.InsertItem(m_list.GetItemCount(), res.name);
 		m_list.SetItemText(iItem, 1, res.mime);
-		m_list.SetItemData(iItem, iItem);
+		m_list.SetItemData(iItem, (DWORD_PTR)pos);
+
+		m_res.GetNext(pos);
 	}
 
 	UpdateData(FALSE);
@@ -119,6 +121,10 @@ void CPPageFileInfoRes::OnSaveAs()
 	int i = m_list.GetSelectionMark();
 
 	if (i < 0) {
+		return;
+	}
+
+	if (m_list.GetItemData(i) == NULL) {
 		return;
 	}
 
