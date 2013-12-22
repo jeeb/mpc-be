@@ -22,7 +22,7 @@
 
 #include "../BaseSplitter/BaseSplitter.h"
 
-class CDTSSplitterFile : public CBaseSplitterFileEx
+class CDTSSplitterFile : public CBaseSplitterFile
 {
 	CMediaType m_mt;
 
