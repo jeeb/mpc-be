@@ -236,7 +236,7 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	HRESULT hr = E_FAIL;
 
 	m_pFile.Free();
-	m_pFile.Attach(DNew CBaseSplitterFileEx(pAsyncReader, hr));
+	m_pFile.Attach(DNew CBaseSplitterFile(pAsyncReader, hr));
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
 	}

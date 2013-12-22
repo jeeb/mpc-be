@@ -53,7 +53,7 @@ class __declspec(uuid("AA04C78C-3671-43F6-ABFE-6C265BAB2345"))
 	bool Sync(int& nFrameNumber);
 
 protected:
-	CAutoPtr<CBaseSplitterFileEx> m_pFile;
+	CAutoPtr<CBaseSplitterFile> m_pFile;
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
 
 	bool DemuxInit();
