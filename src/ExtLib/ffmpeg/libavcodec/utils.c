@@ -117,13 +117,19 @@ static int volatile entangled_thread_counter = 0;
 static void *codec_mutex;
 static void *avformat_mutex;
 
+#if CONFIG_RAISE_MAJOR
+#    define LIBNAME "LIBAVCODEC_155"
+#else
+#    define LIBNAME "LIBAVCODEC_55"
+#endif
+
 #if FF_API_FAST_MALLOC && CONFIG_SHARED && HAVE_SYMVER
-FF_SYMVER(void*, av_fast_realloc, (void *ptr, unsigned int *size, size_t min_size), "LIBAVCODEC_55")
+FF_SYMVER(void*, av_fast_realloc, (void *ptr, unsigned int *size, size_t min_size), LIBNAME)
 {
     return av_fast_realloc(ptr, size, min_size);
 }
 
-FF_SYMVER(void, av_fast_malloc, (void *ptr, unsigned int *size, size_t min_size), "LIBAVCODEC_55")
+FF_SYMVER(void, av_fast_malloc, (void *ptr, unsigned int *size, size_t min_size), LIBNAME)
 {
     av_fast_malloc(ptr, size, min_size);
 }
@@ -1478,8 +1484,10 @@ end:
 free_and_end:
     av_dict_free(&tmp);
     av_freep(&avctx->priv_data);
-    if (avctx->internal)
+    if (avctx->internal) {
         av_freep(&avctx->internal->pool);
+        av_frame_free(&avctx->internal->to_free);
+    }
     av_freep(&avctx->internal);
     avctx->codec = NULL;
     goto end;

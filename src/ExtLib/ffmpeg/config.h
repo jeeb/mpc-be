@@ -462,6 +462,7 @@
 #define CONFIG_MPEGAUDIODSP 1
 #define CONFIG_MPEGVIDEO 1
 #define CONFIG_VIDEODSP 1
+#define CONFIG_RAISE_MAJOR 0
 #define CONFIG_RDFT 1
 #define CONFIG_RUNTIME_CPUDETECT 1
 #define CONFIG_SMALL 0
@@ -755,5 +756,8 @@ Note: when adding a new codec, you have to:
 
 #define CONFIG_EATGQ_DECODER 0
 #define CONFIG_VDPAU 0
+#define CONFIG_XVMC 0
+#define CONFIG_MPEG1_XVMC_HWACCEL 0
+#define CONFIG_MPEG2_XVMC_HWACCEL 0
 
 #endif /* FFMPEG_CONFIG_H */
