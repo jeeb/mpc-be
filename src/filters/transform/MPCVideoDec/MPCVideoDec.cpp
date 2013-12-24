@@ -3148,7 +3148,7 @@ HRESULT CMPCVideoDecFilter::SetDXVACodec(int nCodec, bool bEnabled)
 }
 
 // IFFmpegDecFilter
-STDMETHODIMP CMPCVideoDecFilter::Apply()
+STDMETHODIMP CMPCVideoDecFilter::SaveSettings()
 {
 #ifdef REGISTER_FILTER
 	CRegKey key;

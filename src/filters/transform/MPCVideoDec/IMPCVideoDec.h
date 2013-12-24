@@ -102,52 +102,41 @@ enum MPCInfo {
 interface __declspec(uuid("CDC3B5B3-A8B0-4c70-A805-9FC80CDEF262"))
 IMPCVideoDecFilter :
 public IUnknown {
-	STDMETHOD(Apply()) = 0;
 
 	STDMETHOD(SetThreadNumber(int nValue)) = 0;
 	STDMETHOD_(int, GetThreadNumber()) = 0;
-
 	STDMETHOD(SetDiscardMode(int nValue)) = 0;
 	STDMETHOD_(int, GetDiscardMode()) = 0;
-
 	STDMETHOD(SetDeinterlacing(MPC_DEINTERLACING_FLAGS nValue)) = 0;
 	STDMETHOD_(MPC_DEINTERLACING_FLAGS, GetDeinterlacing()) = 0;
-
-	STDMETHOD_(GUID*, GetDXVADecoderGuid()) = 0;
-
-	STDMETHOD(SetActiveCodecs(ULONGLONG nValue)) = 0;
-	STDMETHOD_(ULONGLONG, GetActiveCodecs()) = 0;
-
 	STDMETHOD(SetARMode(int nValue)) = 0;
 	STDMETHOD_(int, GetARMode()) = 0;
 
 	STDMETHOD(SetDXVACheckCompatibility(int nValue)) = 0;
 	STDMETHOD_(int, GetDXVACheckCompatibility()) = 0;
-
 	STDMETHOD(SetDXVA_SD(int nValue)) = 0;
 	STDMETHOD_(int, GetDXVA_SD()) = 0;
 
-	// === New swscaler options
 	STDMETHOD(SetSwRefresh(int nValue)) = 0;
-
 	STDMETHOD(SetSwPixelFormat(MPCPixelFormat pf, bool enable)) = 0;
 	STDMETHOD_(bool, GetSwPixelFormat(MPCPixelFormat pf)) = 0;
-
 	STDMETHOD(SetSwPreset(int nValue)) = 0;
 	STDMETHOD_(int, GetSwPreset()) = 0;
-
 	STDMETHOD(SetSwStandard(int nValue)) = 0;
 	STDMETHOD_(int, GetSwStandard()) = 0;
-
 	STDMETHOD(SetSwRGBLevels(int nValue)) = 0;
 	STDMETHOD_(int, GetSwRGBLevels()) = 0;
 
-	STDMETHOD_(int, GetColorSpaceConversion()) = 0;
-	//
+	STDMETHOD(SetActiveCodecs(ULONGLONG nValue)) = 0;
+	STDMETHOD_(ULONGLONG, GetActiveCodecs()) = 0;
 
-	STDMETHOD(GetOutputMediaType(CMediaType* pmt)) = 0;
+	STDMETHOD(SaveSettings()) = 0;
 
 	STDMETHOD_(CString, GetInformation(MPCInfo index)) = 0;
+
+	STDMETHOD_(GUID*, GetDXVADecoderGuid()) = 0;
+	STDMETHOD_(int, GetColorSpaceConversion()) = 0;
+	STDMETHOD(GetOutputMediaType(CMediaType* pmt)) = 0;
 };
 
 interface __declspec(uuid("F0ABC515-19ED-4D65-9D5F-59E36AE7F2AF"))

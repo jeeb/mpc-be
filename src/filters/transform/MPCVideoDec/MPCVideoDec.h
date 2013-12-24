@@ -204,32 +204,23 @@ public:
 	STDMETHODIMP	CreatePage(const GUID& guid, IPropertyPage** ppPage);
 
 	// === IMPCVideoDecFilter
-	STDMETHODIMP Apply();
 	STDMETHODIMP SetThreadNumber(int nValue);
 	STDMETHODIMP_(int) GetThreadNumber();
 	STDMETHODIMP SetDiscardMode(int nValue);
 	STDMETHODIMP_(int) GetDiscardMode();
 	STDMETHODIMP SetDeinterlacing(MPC_DEINTERLACING_FLAGS nValue);
 	STDMETHODIMP_(MPC_DEINTERLACING_FLAGS) GetDeinterlacing();
-	STDMETHODIMP_(GUID*) GetDXVADecoderGuid();
-	STDMETHODIMP SetActiveCodecs(ULONGLONG nValue);
-	STDMETHODIMP_(ULONGLONG) GetActiveCodecs();
-
 	STDMETHODIMP SetARMode(int nValue);
 	STDMETHODIMP_(int) GetARMode();
 
 	STDMETHODIMP SetDXVACheckCompatibility(int nValue);
 	STDMETHODIMP_(int) GetDXVACheckCompatibility();
-
 	STDMETHODIMP SetDXVA_SD(int nValue);
 	STDMETHODIMP_(int) GetDXVA_SD();
 
-	// === New swscaler options
 	STDMETHODIMP SetSwRefresh(int nValue);
-
 	STDMETHODIMP SetSwPixelFormat(MPCPixelFormat pf, bool enable);
 	STDMETHODIMP_(bool) GetSwPixelFormat(MPCPixelFormat pf);
-
 	STDMETHODIMP SetSwPreset(int nValue);
 	STDMETHODIMP_(int) GetSwPreset();
 	STDMETHODIMP SetSwStandard(int nValue);
@@ -237,11 +228,16 @@ public:
 	STDMETHODIMP SetSwRGBLevels(int nValue);
 	STDMETHODIMP_(int) GetSwRGBLevels();
 
-	STDMETHODIMP_(int) GetColorSpaceConversion();
+	STDMETHODIMP SetActiveCodecs(ULONGLONG nValue);
+	STDMETHODIMP_(ULONGLONG) GetActiveCodecs();
 
-	STDMETHODIMP GetOutputMediaType(CMediaType* pmt);
+	STDMETHODIMP SaveSettings();
 
 	STDMETHODIMP_(CString) GetInformation(MPCInfo index);
+
+	STDMETHODIMP_(GUID*) GetDXVADecoderGuid();
+	STDMETHODIMP_(int) GetColorSpaceConversion();
+	STDMETHODIMP GetOutputMediaType(CMediaType* pmt);
 
 	// === IMPCVideoDecFilter2
 	STDMETHODIMP_(int) GetFrameType();

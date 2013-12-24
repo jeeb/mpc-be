@@ -336,7 +336,7 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 
 		UpdateStatusInfo();
 
-		m_pMDF->Apply();
+		m_pMDF->SaveSettings();
 	}
 
 	return true;
