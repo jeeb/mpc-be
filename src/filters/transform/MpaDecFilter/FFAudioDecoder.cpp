@@ -77,6 +77,7 @@ static const FFMPEG_AUDIO_CODECS ffAudioCodecs[] = {
 	{ &MEDIASUBTYPE_ATRC,              AV_CODEC_ID_ATRAC3 },
 	{ &MEDIASUBTYPE_COOK,              AV_CODEC_ID_COOK   },
 	{ &MEDIASUBTYPE_SIPR,              AV_CODEC_ID_SIPR   },
+	{ &MEDIASUBTYPE_SIPR_WAVE,         AV_CODEC_ID_SIPR   },
 	{ &MEDIASUBTYPE_RAAC,              AV_CODEC_ID_AAC    },
 	{ &MEDIASUBTYPE_RACP,              AV_CODEC_ID_AAC    },
 	{ &MEDIASUBTYPE_RALF,              AV_CODEC_ID_RALF   },
