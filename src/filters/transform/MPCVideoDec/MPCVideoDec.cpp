@@ -1503,9 +1503,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 		DXVA2_ConfigPictureDecode config;
 		ZeroMemory(&config, sizeof(config));
 
-		hr = m_pDecoderService->GetDecoderDeviceGuids(&cDecoderGuids, &pDecoderGuids);
-
-		if (SUCCEEDED(hr)) {
+		if (SUCCEEDED(hr = m_pDecoderService->GetDecoderDeviceGuids(&cDecoderGuids, &pDecoderGuids))) {
 
 			//Intel patch for Ivy Bridge and Sandy Bridge
 			if (m_nPCIVendor == PCIV_Intel) {
@@ -1516,19 +1514,15 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 			}
 			// Look for the decoder GUIDs we want.
 			for (UINT iGuid = 0; iGuid < cDecoderGuids; iGuid++) {
-				DbgLog((LOG_TRACE, 3, L"Enumerate DXVA mode : %s", GetDXVAMode(&pDecoderGuids[iGuid])));
-
 				// Do we support this mode?
 				if (!IsSupportedDecoderMode(&pDecoderGuids[iGuid])) {
 					continue;
 				}
 
-				DbgLog((LOG_TRACE, 3, L"	=> trying : %s", GetDXVAMode(&pDecoderGuids[iGuid])));
+				DbgLog((LOG_TRACE, 3, L"	=> Attempt : %s", GetDXVAMode(&pDecoderGuids[iGuid])));
 
 				// Find a configuration that we support.
-				hr = FindDXVA2DecoderConfiguration(m_pDecoderService, pDecoderGuids[iGuid], &config, &bFoundDXVA2Configuration);
-
-				if (FAILED(hr)) {
+				if (FAILED(hr = FindDXVA2DecoderConfiguration(m_pDecoderService, pDecoderGuids[iGuid], &config, &bFoundDXVA2Configuration))) {
 					break;
 				}
 
@@ -1540,7 +1534,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 				if (bFoundDXVA2Configuration) {
 					// Found a good configuration. Save the GUID.
 					guidDecoder = pDecoderGuids[iGuid];
-					DbgLog((LOG_TRACE, 3, L"	=> Found : %s", GetDXVAMode(&guidDecoder)));
+					DbgLog((LOG_TRACE, 3, L"	=> Use : %s", GetDXVAMode(&guidDecoder)));
 					if (!bHasIntelGuid) {
 						break;
 					}
@@ -2737,7 +2731,7 @@ void CMPCVideoDecFilter::FillInVideoDescription(DXVA2_VideoDesc *pDesc)
 BOOL CMPCVideoDecFilter::IsSupportedDecoderMode(const GUID* mode)
 {
 	const CString dxvaMode = GetDXVAMode(mode);
-	DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::IsSupportedDecoderMode() => trying : %s", dxvaMode));
+	DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::IsSupportedDecoderMode() : %s", dxvaMode));
 
 	if (IsDXVASupported()) {
 		for (int i = 0; i < MAX_SUPPORTED_MODE; i++) {
