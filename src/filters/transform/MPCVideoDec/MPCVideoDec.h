@@ -52,9 +52,8 @@ struct RMDemuxContext {
 class __declspec(uuid("008BAC12-FBAF-497b-9670-BC6F6FBAE2C4"))
 	CMPCVideoDecFilter
 	: public CBaseVideoFilter
-	, public ISpecifyPropertyPages2
 	, public IMPCVideoDecFilter
-	, public IMPCVideoDecFilter2
+	, public ISpecifyPropertyPages2
 {
 protected:
 	// === Persistants parameters (registry)
@@ -238,8 +237,6 @@ public:
 	STDMETHODIMP_(GUID*) GetDXVADecoderGuid();
 	STDMETHODIMP_(int) GetColorSpaceConversion();
 	STDMETHODIMP GetOutputMediaType(CMediaType* pmt);
-
-	// === IMPCVideoDecFilter2
 	STDMETHODIMP_(int) GetFrameType();
 
 	// === DXVA common functions

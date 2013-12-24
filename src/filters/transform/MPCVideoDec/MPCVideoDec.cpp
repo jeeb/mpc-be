@@ -1379,7 +1379,6 @@ STDMETHODIMP CMPCVideoDecFilter::NonDelegatingQueryInterface(REFIID riid, void**
 {
 	return
 		QI(IMPCVideoDecFilter)
-		QI(IMPCVideoDecFilter2)
 		QI(ISpecifyPropertyPages)
 		QI(ISpecifyPropertyPages2)
 		__super::NonDelegatingQueryInterface(riid, ppv);
@@ -3452,7 +3451,6 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 	return infostr;
 }
 
-// === IMPCVideoDecFilter2
 STDMETHODIMP_(int) CMPCVideoDecFilter::GetFrameType()
 {
 	CAutoLock cAutoLock(&m_csProps);

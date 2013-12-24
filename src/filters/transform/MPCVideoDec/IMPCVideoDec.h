@@ -137,10 +137,5 @@ public IUnknown {
 	STDMETHOD_(GUID*, GetDXVADecoderGuid()) = 0;
 	STDMETHOD_(int, GetColorSpaceConversion()) = 0;
 	STDMETHOD(GetOutputMediaType(CMediaType* pmt)) = 0;
-};
-
-interface __declspec(uuid("F0ABC515-19ED-4D65-9D5F-59E36AE7F2AF"))
-IMPCVideoDecFilter2 :
-public IUnknown {
 	STDMETHOD_(int, GetFrameType()) = 0;
 };
