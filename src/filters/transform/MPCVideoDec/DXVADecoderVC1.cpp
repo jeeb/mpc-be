@@ -44,13 +44,13 @@ CDXVADecoderVC1::CDXVADecoderVC1(CMPCVideoDecFilter* pFilter, IDirectXVideoDecod
 
 CDXVADecoderVC1::~CDXVADecoderVC1(void)
 {
-	TRACE(_T("CDXVADecoderVC1::Destroy()\n"));
+	DbgLog((LOG_TRACE, 3, L"CDXVADecoderVC1::Destroy()"));
 	Flush();
 }
 
 void CDXVADecoderVC1::Init()
 {
-	TRACE(_T("CDXVADecoderVC1::Init()\n"));
+	DbgLog((LOG_TRACE, 3, L"CDXVADecoderVC1::Init()"));
 
 	memset (&m_PictureParams, 0, sizeof(m_PictureParams));
 	memset (&m_SliceInfo,     0, sizeof(m_SliceInfo));

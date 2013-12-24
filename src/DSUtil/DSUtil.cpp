@@ -2590,9 +2590,9 @@ static const DXVA2_DECODER DXVA2Decoder[] = {
 
 CString GetDXVAMode(const GUID* guidDecoder)
 {
-	int nPos = 0;
+	size_t nPos = 0;
 
-	for (int i=1; i<_countof(DXVA2Decoder); i++) {
+	for (size_t i = 1; i < _countof(DXVA2Decoder); i++) {
 		if (*guidDecoder == *DXVA2Decoder[i].Guid) {
 			nPos = i;
 			break;

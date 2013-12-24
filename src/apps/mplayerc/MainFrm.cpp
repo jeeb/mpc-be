@@ -1012,6 +1012,8 @@ void CMainFrame::OnDestroy()
 
 void CMainFrame::OnClose()
 {
+	DbgLog((LOG_TRACE, 3, L"CMainFrame::OnClose() : start"));
+
 	m_fClosingState = true;
 
 	// Destroy flybar-window
@@ -1025,7 +1027,7 @@ void CMainFrame::OnClose()
 	// save shaders list
 	{
 		POSITION	pos;
-		CString		strList = "";
+		CString		strList;
 
 		pos = m_shaderlabels.GetHeadPosition();
 		while (pos) {
@@ -1036,7 +1038,7 @@ void CMainFrame::OnClose()
 	}
 	{
 		POSITION	pos;
-		CString		strList = "";
+		CString		strList;
 
 		pos = m_shaderlabelsScreenSpace.GetHeadPosition();
 		while (pos) {
@@ -1084,6 +1086,7 @@ void CMainFrame::OnClose()
 		}
 	}
 
+	DbgLog((LOG_TRACE, 3, L"CMainFrame::OnClose() : end"));
 	__super::OnClose();
 }
 
@@ -2912,7 +2915,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 	LONG_PTR evParam1, evParam2;
 	while (m_pME && SUCCEEDED(m_pME->GetEvent(&evCode, &evParam1, &evParam2, 0))) {
 #ifdef _DEBUG
-		TRACE("--> CMainFrame::OnGraphNotify on thread: %d; event: 0x%08x (%ws)\n", GetCurrentThreadId(), evCode, GetEventString(evCode));
+		DbgLog((LOG_TRACE, 3, L"--> CMainFrame::OnGraphNotify on thread: %d; event: 0x%08x (%s)", GetCurrentThreadId(), evCode, GetEventString(evCode)));
 #endif
 		CString str;
 
@@ -4316,6 +4319,8 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 void CMainFrame::OnFilePostCloseMedia()
 {
+	DbgLog((LOG_TRACE, 3, L"CMainFrame::OnFilePostCloseMedia() : start"));
+
 	SetPlaybackMode(PM_NONE);
 	SetLoadState(MLS_CLOSED);
 
@@ -4414,6 +4419,8 @@ void CMainFrame::OnFilePostCloseMedia()
 	m_wndToolBar.SwitchTheme();
 
 	SetThreadExecutionState(ES_CONTINUOUS);
+
+	DbgLog((LOG_TRACE, 3, L"CMainFrame::OnFilePostCloseMedia() : end"));
 }
 
 void CMainFrame::OnBossKey()
@@ -12511,7 +12518,6 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 	}
 
 	if (!m_pGB_preview) {
-		TRACE(_T("=== Disable SmartSeek ===\n"));
 		b_UseSmartSeek = false;
 	}
 
@@ -14937,6 +14943,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 void CMainFrame::CloseMediaPrivate()
 {
+	DbgLog((LOG_TRACE, 3, L"CMainFrame::CloseMediaPrivate() : start"));
+
 	ASSERT(m_iMediaLoadState == MLS_CLOSING);
 
 	m_strFn.Empty();
@@ -15049,6 +15057,8 @@ void CMainFrame::CloseMediaPrivate()
 
 	m_VidDispName.Empty();
 	m_AudDispName.Empty();
+
+	DbgLog((LOG_TRACE, 3, L"CMainFrame::CloseMediaPrivate() : end"));
 }
 
 void CMainFrame::ParseDirs(CAtlList<CString>& sl)
@@ -18047,6 +18057,8 @@ void CMainFrame::CloseMedia()
 		return;
 	}
 
+	DbgLog((LOG_TRACE, 3, L"CMainFrame::CloseMedia() : start"));
+
 	if (m_iMediaLoadState == MLS_LOADING) {
 		m_fOpeningAborted = true;
 
@@ -18090,6 +18102,8 @@ void CMainFrame::CloseMedia()
 	}
 
 	OnFilePostCloseMedia();
+
+	DbgLog((LOG_TRACE, 3, L"CMainFrame::CloseMedia() : end"));
 }
 
 void CMainFrame::StartTunerScan(CAutoPtr<TunerScanData> pTSD)
@@ -18159,16 +18173,16 @@ void CMainFrame::SetLoadState(MPC_LOADSTATE iState)
 
 	switch (m_iMediaLoadState) {
 		case MLS_CLOSED:
-			TRACE(_T("CMainFrame::SetLoadState() : CLOSED\n"));
+			DbgLog((LOG_TRACE, 3, L"CMainFrame::SetLoadState() : CLOSED"));
 			break;
 		case MLS_LOADING:
-			TRACE(_T("CMainFrame::SetLoadState() : LOADING\n"));
+			DbgLog((LOG_TRACE, 3, L"CMainFrame::SetLoadState() : LOADING"));
 			break;
 		case MLS_LOADED:
-			TRACE(_T("CMainFrame::SetLoadState() : LOADED\n"));
+			DbgLog((LOG_TRACE, 3, L"CMainFrame::SetLoadState() : LOADED"));
 			break;
 		case MLS_CLOSING:
-			TRACE(_T("CMainFrame::SetLoadState() : CLOSING\n"));
+			DbgLog((LOG_TRACE, 3, L"CMainFrame::SetLoadState() : CLOSING"));
 			break;
 		default:
 			break;

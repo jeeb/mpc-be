@@ -508,13 +508,13 @@ CMediaType CAudioSwitcherFilter::CreateNewOutputMediaType(CMediaType mt, long& c
 
 void CAudioSwitcherFilter::OnNewOutputMediaType(const CMediaType& mtIn, const CMediaType& mtOut)
 {
-	TRACE(_T("CAudioSwitcherFilter::OnNewOutputMediaType\n"));
+	DbgLog((LOG_TRACE, 3, L"CAudioSwitcherFilter::OnNewOutputMediaType()"));
 	m_normalizeFactor = 4.0;
 }
 
 HRESULT CAudioSwitcherFilter::DeliverEndFlush()
 {
-	TRACE(_T("CAudioSwitcherFilter::DeliverEndFlush\n"));
+	DbgLog((LOG_TRACE, 3, L"CAudioSwitcherFilter::DeliverEndFlush()"));
 	m_normalizeFactor = 4.0;
 
 	return __super::DeliverEndFlush();
@@ -522,7 +522,7 @@ HRESULT CAudioSwitcherFilter::DeliverEndFlush()
 
 HRESULT CAudioSwitcherFilter::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
 {
-	TRACE(_T("CAudioSwitcherFilter::DeliverNewSegment\n"));
+	DbgLog((LOG_TRACE, 3, L"CAudioSwitcherFilter::DeliverNewSegment()"));
 	m_normalizeFactor = 4.0;
 	return __super::DeliverNewSegment(tStart, tStop, dRate);
 }

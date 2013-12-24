@@ -48,12 +48,12 @@ CDXVADecoderH264::CDXVADecoderH264(CMPCVideoDecFilter* pFilter, IDirectXVideoDec
 
 CDXVADecoderH264::~CDXVADecoderH264()
 {
-	TRACE(_T("CDXVADecoderH264::Destroy()\n"));
+	DbgLog((LOG_TRACE, 3, L"CDXVADecoderH264::Destroy()"));
 }
 
 void CDXVADecoderH264::Init()
 {
-	TRACE(_T("CDXVADecoderH264::Init()\n"));
+	DbgLog((LOG_TRACE, 3, L"CDXVADecoderH264::Init()"));
 
 	memset (&m_DXVAPicParams,	0, sizeof(DXVA_PicParams_H264));
 	memset (&m_pSliceLong,		0, sizeof(DXVA_Slice_H264_Long)  * MAX_SLICES);

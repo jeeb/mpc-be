@@ -584,9 +584,9 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 
 #if 0
 	if (SUCCEEDED(hr)) {
-		TRACE(_T("CMpaDecFilter::Receive(): rtStart = %10I64d, rtStop = %10I64d\n"), rtStart, rtStop);
+		DbgLog((LOG_TRACE, 3, L"CMpaDecFilter::Receive(): rtStart = %10I64d, rtStop = %10I64d", rtStart, rtStop));
 	} else {
-		TRACE(_T("CMpaDecFilter::Receive(): frame without timestamp\n"));
+		DbgLog((LOG_TRACE, 3, L"CMpaDecFilter::Receive(): frame without timestamp"));
 	}
 #endif
 
@@ -599,7 +599,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 		// LOOKATTHIS // m_rtStart = rtStart;
 		m_bResync = true;
 		if (FAILED(hr)) {
-			TRACE(_T("CMpaDecFilter::Receive() : Discontinuity without timestamp\n"));
+			DbgLog((LOG_TRACE, 3, L"CMpaDecFilter::Receive() : Discontinuity without timestamp"));
 			// LOOKATTHIS // return S_OK;
 		}
 	}
@@ -1167,7 +1167,7 @@ HRESULT CMpaDecFilter::ProcessDTS_SPDIF()
 					type = IEC61937_DTS3;
 					break;
 				default:
-					TRACE(_T("CMpaDecFilter:ProcessDTS_SPDIF() - framelength is not supported\n"));
+					DbgLog((LOG_TRACE, 3, L"CMpaDecFilter:ProcessDTS_SPDIF() - framelength is not supported"));
 					return E_FAIL;
 			}
 			if (FAILED(hr = DeliverBitstream(p, size, type, aframe.samplerate, aframe.samples))) {
@@ -1683,7 +1683,7 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, int size, WORD type, int sa
 			isHDMI = true;
 			break;
 		default:
-			TRACE(_T("CMpaDecFilter::DeliverBitstream() - type is not supported\n"));
+			DbgLog((LOG_TRACE, 3, L"CMpaDecFilter::DeliverBitstream() - type is not supported"));
 			return E_INVALIDARG;
 	}
 

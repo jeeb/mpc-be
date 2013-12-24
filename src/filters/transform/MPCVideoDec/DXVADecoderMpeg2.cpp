@@ -49,13 +49,13 @@ CDXVADecoderMpeg2::CDXVADecoderMpeg2(CMPCVideoDecFilter* pFilter, IDirectXVideoD
 
 CDXVADecoderMpeg2::~CDXVADecoderMpeg2(void)
 {
-	TRACE(_T("CDXVADecoderMpeg2::Destroy()\n"));
+	DbgLog((LOG_TRACE, 3, L"CDXVADecoderMpeg2::Destroy()"));
 	NewSegment();
 }
 
 void CDXVADecoderMpeg2::Init()
 {
-	TRACE(_T("CDXVADecoderMpeg2::Init()\n"));
+	DbgLog((LOG_TRACE, 3, L"CDXVADecoderMpeg2::Init()"));
 
 	memset (&m_PictureParams,	0, sizeof(m_PictureParams));
 	memset (&m_SliceInfo,		0, sizeof(m_SliceInfo));

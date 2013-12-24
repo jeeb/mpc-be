@@ -635,7 +635,7 @@ bool CDX9AllocatorPresenter::SettingsNeedResetDevice()
 
 HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 {
-	TRACE("CDX9AllocatorPresenter::CreateDevice()\n");
+	DbgLog((LOG_TRACE, 3, L"CDX9AllocatorPresenter::CreateDevice()"));
 
 	CAutoLock cRenderLock(&m_CreateLock);
 
@@ -918,16 +918,16 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	}
 
 	while (hr == D3DERR_DEVICELOST) {
-		TRACE("D3DERR_DEVICELOST. Trying to Reset.\n");
+		DbgLog((LOG_TRACE, 3, L"	=> D3DERR_DEVICELOST. Trying to Reset."));
 		hr = m_pD3DDev->TestCooperativeLevel();
 	}
 	if (hr == D3DERR_DEVICENOTRESET) {
-		TRACE("D3DERR_DEVICENOTRESET\n");
+		DbgLog((LOG_TRACE, 3, L"	=> D3DERR_DEVICENOTRESET"));
 		hr = m_pD3DDev->Reset(&m_pp);
 	}
 
-	TRACE("CreateDevice: %d\n", (LONG)hr);
-	ASSERT (SUCCEEDED (hr));
+	DbgLog((LOG_TRACE, 3, L"	=> CreateDevice() : 0x%08x", hr));
+	ASSERT(SUCCEEDED (hr));
 
 	m_MainThreadId = GetCurrentThreadId();
 
@@ -938,7 +938,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	if (FAILED(hr)) {
 		_Error += L"CreateDevice failed\n";
 		CStringW str;
-		str.Format(L"Error code: 0x%X\n", hr);
+		str.Format(L"Error code: 0x%08x\n", hr);
 		_Error += str;
 
 		return hr;
@@ -1756,7 +1756,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		bool fResetDevice = false;
 
 		if (hr == D3DERR_DEVICELOST && m_pD3DDev->TestCooperativeLevel() == D3DERR_DEVICENOTRESET) {
-			TRACE("Reset Device: D3D Device Lost\n");
+			DbgLog((LOG_TRACE, 3, L"D3D Device Lost - need Reset Device"));
 			fResetDevice = true;
 		}
 
@@ -1767,7 +1767,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		//}
 
 		if (SettingsNeedResetDevice()) {
-			TRACE("Reset Device: settings changed\n");
+			DbgLog((LOG_TRACE, 3, L"Settings Changed - need Reset Device"));
 			fResetDevice = true;
 		}
 
@@ -1779,7 +1779,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 			if (m_bIsFullscreen) {
 				m_bCompositionEnabled = (bCompositionEnabled != 0);
 			} else {
-				TRACE("Reset Device: DWM composition changed\n");
+				DbgLog((LOG_TRACE, 3, L"DWM Composition Changed - need Reset Device"));
 				fResetDevice = true;
 			}
 		}
@@ -1795,7 +1795,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 				}
 #endif
 				if (m_CurrentAdapter != GetAdapter(m_pD3D)) {
-					TRACE("Reset Device: D3D adapter changed\n");
+					DbgLog((LOG_TRACE, 3, L"D3D adapter changed - need Reset Device"));
 					fResetDevice = true;
 				}
 #ifdef _DEBUG
@@ -1849,9 +1849,9 @@ void CDX9AllocatorPresenter::SendResetRequest()
 
 STDMETHODIMP_(bool) CDX9AllocatorPresenter::ResetDevice()
 {
-	TRACE(_T("CDX9AllocatorPresenter::ResetDevice()\n"));
+	DbgLog((LOG_TRACE, 3, L"CDX9AllocatorPresenter::ResetDevice()"));
 
-	_ASSERT(m_MainThreadId == GetCurrentThreadId());
+	ASSERT(m_MainThreadId == GetCurrentThreadId());
 	StopWorkerThreads();
 
 	// In VMR-9 deleting the surfaces before we are told to is bad !
@@ -1870,7 +1870,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::ResetDevice()
 		// TODO: We should probably pause player
 #ifdef _DEBUG
 		Error += GetWindowsErrorMessage(hr, NULL);
-		TRACE("D3D Reset Error\n%ws\n\n", Error.GetBuffer());
+		DbgLog((LOG_TRACE, 3, L"D3D Reset Error:\n%s\n", CString(Error.GetBuffer())));
 #endif
 		m_bDeviceResetRequested = false;
 		return false;
@@ -1884,7 +1884,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::ResetDevice()
 
 STDMETHODIMP_(bool) CDX9AllocatorPresenter::DisplayChange()
 {
-	TRACE(_T("CDX9AllocatorPresenter::DisplayChange()\n"));
+	DbgLog((LOG_TRACE, 3, L"CDX9AllocatorPresenter::DisplayChange()"));
 
 	CAutoLock cRenderLock(&m_CreateLock);
 

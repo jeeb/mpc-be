@@ -413,12 +413,13 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, IAsyncReader*
 					if (m_rtMin == _I64_MAX) {
 						m_rtMin = h.pts;
 						m_posMin = GetPos();
+						DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() : m_rtMin = %s [%10I64d], pesID = %d", ReftimeToString(m_rtMin), m_rtMin, b));
 						TRACE ("m_rtMin(SearchStreams) = %S [%10I64d]\n", ReftimeToString(m_rtMin), m_rtMin);
 					}
 					if (m_rtMin < h.pts && m_rtMax < h.pts) {
 						m_rtMax = h.pts;
 						m_posMax = GetPos();
-						TRACE ("m_rtMax(SearchStreams) = %S [%10I64d]\n", ReftimeToString(m_rtMax), m_rtMax);
+						DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() : m_rtMax = %s [%10I64d], pesID = %d", ReftimeToString(m_rtMax), m_rtMax, b));
 					}
 				}
 
@@ -447,13 +448,13 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, IAsyncReader*
 						if ((m_rtMin == _I64_MAX)/* || (m_rtMin > h2.pts)*/) {
 							m_rtMin = h2.pts;
 							m_posMin = GetPos();
-							TRACE ("m_rtMin(SearchStreams) = %S [%10I64d], PID=%d\n", ReftimeToString(m_rtMin), m_rtMin, h.pid);
+							DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() : m_rtMin = %s [%10I64d], pID = %d", ReftimeToString(m_rtMin), m_rtMin, h.pid));
 						}
 
 						if (m_rtMin < h2.pts && m_rtMax < h2.pts) {
 							m_rtMax = h2.pts;
 							m_posMax = GetPos();
-							TRACE ("m_rtMax(SearchStreams) = %S [%10I64d], PID=%d\n", ReftimeToString(m_rtMax), m_rtMax, h.pid);
+							DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() : m_rtMax = %s [%10I64d], pID = %d", ReftimeToString(m_rtMax), m_rtMax, h.pid));
 						}
 					}
 				} else {

@@ -29,13 +29,13 @@ inline void ff_log(void* par, int level, const char *fmt, va_list valist)
 {
 #ifdef _DEBUG
 	if (level <= AV_LOG_VERBOSE) {
-		char Msg [500];
-		memset(Msg, 0, sizeof(Msg));
+		char Msg[500] = { 0 };
 
 		CStringA fmtStr(fmt);
 		fmtStr.Replace("%td", "%ld");
+		fmtStr.Replace("\n", "");
 		vsnprintf_s(Msg, sizeof(Msg), _TRUNCATE, fmtStr, valist);
-		TRACE(_T("FF_LOG : %s"), CString(Msg));
+		DbgLog((LOG_TRACE, 3, L"FF_LOG : %s", CString(Msg)));
 	}
 #endif
 }

@@ -1488,7 +1488,7 @@ bool CMPCVideoDecFilter::IsDXVASupported()
 
 HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 {
-	TRACE(_T("CMPCVideoDecFilter::FindDecoderConfiguration(DXVA2)\n"));
+	DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::FindDecoderConfiguration(DXVA2)"));
 
 	HRESULT hr = E_FAIL;
 
@@ -1516,14 +1516,14 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 			}
 			// Look for the decoder GUIDs we want.
 			for (UINT iGuid = 0; iGuid < cDecoderGuids; iGuid++) {
-				TRACE(_T("Enumerate DXVA mode : %s\n"), GetDXVAMode(&pDecoderGuids[iGuid]));
+				DbgLog((LOG_TRACE, 3, L"Enumerate DXVA mode : %s", GetDXVAMode(&pDecoderGuids[iGuid])));
 
 				// Do we support this mode?
 				if (!IsSupportedDecoderMode(&pDecoderGuids[iGuid])) {
 					continue;
 				}
 
-				TRACE(_T("	=> trying : %s\n"), GetDXVAMode(&pDecoderGuids[iGuid]));
+				DbgLog((LOG_TRACE, 3, L"	=> trying : %s", GetDXVAMode(&pDecoderGuids[iGuid])));
 
 				// Find a configuration that we support.
 				hr = FindDXVA2DecoderConfiguration(m_pDecoderService, pDecoderGuids[iGuid], &config, &bFoundDXVA2Configuration);
@@ -1540,7 +1540,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 				if (bFoundDXVA2Configuration) {
 					// Found a good configuration. Save the GUID.
 					guidDecoder = pDecoderGuids[iGuid];
-					TRACE(_T("	=> Found : %s\n"), GetDXVAMode(&guidDecoder));
+					DbgLog((LOG_TRACE, 3, L"	=> Found : %s", GetDXVAMode(&guidDecoder)));
 					if (!bHasIntelGuid) {
 						break;
 					}
@@ -1571,7 +1571,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 
 HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 {
-	TRACE(L"CMPCVideoDecFilter::InitDecoder()\n");
+	DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::InitDecoder()"));
 
 	bool bReinit = ((m_pAVCtx != NULL));
 
@@ -1931,7 +1931,7 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 
 	BOOL bH264avc = FALSE;
 	if (extralen > 0) {
-		TRACE(_T("CMPCVideoDecFilter::AllocExtradata() : processing extradata of %d bytes\n"), extralen);
+		DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::AllocExtradata() : processing extradata of %d bytes", extralen));
 		// Reconstruct AVC1 extradata format
 		if (pmt->formattype == FORMAT_MPEG2Video && (m_pAVCtx->codec_tag == MAKEFOURCC('a','v','c','1') || m_pAVCtx->codec_tag == MAKEFOURCC('A','V','C','1') || m_pAVCtx->codec_tag == MAKEFOURCC('C','C','V','1'))) {
 			MPEG2VIDEOINFO *mp2vi = (MPEG2VIDEOINFO *)pmt->Format();
@@ -2339,7 +2339,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			used_bytes = av_parser_parse2(m_pParser, m_pAVCtx, &pOut, &pOut_size, avpkt.data, avpkt.size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
 
 			if (used_bytes == 0 && pOut_size == 0 && !bFlush) {
-				TRACE(_T("CMPCVideoDecFilter::SoftwareDecode() - could not process buffer, starving?\n"));
+				DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::SoftwareDecode() - could not process buffer, starving?"));
 				break;
 			}
 
@@ -2387,7 +2387,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 
 				int ret2 = avcodec_decode_video2(m_pAVCtx, m_pFrame, &got_picture, &avpkt);
 				if (ret2 < 0) {
-					TRACE(_T("CMPCVideoDecFilter::SoftwareDecode() - decoding failed despite successfull parsing\n"));
+					DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::SoftwareDecode() - decoding failed despite successfull parsing"));
 					got_picture = 0;
 				}
 			} else {
@@ -2736,14 +2736,15 @@ void CMPCVideoDecFilter::FillInVideoDescription(DXVA2_VideoDesc *pDesc)
 
 BOOL CMPCVideoDecFilter::IsSupportedDecoderMode(const GUID* mode)
 {
-	TRACE(_T("CMPCVideoDecFilter::IsSupportedDecoderMode() => trying : %s\n"), GetDXVAMode(mode));
+	const CString dxvaMode = GetDXVAMode(mode);
+	DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::IsSupportedDecoderMode() => trying : %s", dxvaMode));
 
 	if (IsDXVASupported()) {
 		for (int i = 0; i < MAX_SUPPORTED_MODE; i++) {
 			if (*ffCodecs[m_nCodecNb].DXVAModes->Decoder[i] == GUID_NULL) {
 				break;
 			} else if (*ffCodecs[m_nCodecNb].DXVAModes->Decoder[i] == *mode) {
-				TRACE(_T("	=> Found : %s\n"), GetDXVAMode(mode));
+				DbgLog((LOG_TRACE, 3, L"	=> Found : %s", dxvaMode));
 				return TRUE;
 			}
 		}
@@ -2897,7 +2898,7 @@ HRESULT CMPCVideoDecFilter::SetEVRForDXVA2(IPin *pPin)
 
 HRESULT CMPCVideoDecFilter::CreateDXVA2Decoder(UINT nNumRenderTargets, IDirect3DSurface9** pDecoderRenderTargets)
 {
-	TRACE(_T("CMPCVideoDecFilter::CreateDXVA2Decoder()\n"));
+	DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::CreateDXVA2Decoder()"));
 
 	HRESULT							hr;
 	CComPtr<IDirectXVideoDecoder>	pDirectXVideoDec;
@@ -2949,14 +2950,14 @@ HRESULT CMPCVideoDecFilter::RecommitAllocator()
 
 		hr = m_pDXVA2Allocator->Decommit();
 		if (m_pDXVA2Allocator->DecommitInProgress()) {
-			TRACE(_T("CVideoDecOutputPin::Recommit() : WARNING! DXVA2 Allocator is still busy, trying to flush downstream\n"));
+			DbgLog((LOG_TRACE, 3, L"CVideoDecOutputPin::Recommit() : WARNING! DXVA2 Allocator is still busy, trying to flush downstream"));
 			if (m_pDXVA2Allocator) {
 				m_pDXVADecoder->EndOfStream();
 			}
 			if (m_pDXVA2Allocator->DecommitInProgress()) {
-				TRACE(_T("CVideoDecOutputPin::Recommit() : WARNING! Flush had no effect, decommit of the allocator still not complete\n"));
+				DbgLog((LOG_TRACE, 3, L"CVideoDecOutputPin::Recommit() : WARNING! Flush had no effect, decommit of the allocator still not complete"));
 			} else {
-				TRACE(_T("CVideoDecOutputPin::Recommit() : Flush was successfull, decommit completed!\n"));
+				DbgLog((LOG_TRACE, 3, L"CVideoDecOutputPin::Recommit() : Flush was successfull, decommit completed!"));
 			}
 		}
 		hr = m_pDXVA2Allocator->Commit();

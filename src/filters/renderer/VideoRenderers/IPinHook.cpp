@@ -1552,13 +1552,13 @@ static HRESULT STDMETHODCALLTYPE CreateVideoDecoderMine(
 			(*ppDecode)->AddRef();
 		}
 
-		for (DWORD i=0; i<NumRenderTargets; i++) {
+		for (UINT i = 0; i < NumRenderTargets; i++) {
 			LOG(_T(" - Surf %d : %08x"), i, ppDecoderRenderTargets[i]);
 		}
 	}
 #endif
 
-	TRACE(_T("DXVA Decoder : %s\n"), GetDXVADecoderDescription());
+	DbgLog((LOG_TRACE, 3, L"DXVA Decoder : %s", GetDXVADecoderDescription()));
 #ifdef _DEBUG
 	LOG(_T("IDirectXVideoDecoderService::CreateVideoDecoder  %s  (%d render targets) hr = %08x"), GetDXVAMode(&g_guidDXVADecoder), NumRenderTargets, hr);
 #endif
