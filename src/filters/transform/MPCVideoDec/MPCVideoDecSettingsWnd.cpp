@@ -427,7 +427,7 @@ BOOL CMPCVideoDecSettingsWnd::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT *
 }
 
 // ====== Codec filter property page (for standalone filter only)
-
+#ifdef REGISTER_FILTER
 CMPCVideoDecCodecWnd::CMPCVideoDecCodecWnd()
 {
 }
@@ -547,3 +547,5 @@ bool CMPCVideoDecCodecWnd::OnApply()
 
 BEGIN_MESSAGE_MAP(CMPCVideoDecCodecWnd, CInternalPropertyPageWnd)
 END_MESSAGE_MAP()
+
+#endif

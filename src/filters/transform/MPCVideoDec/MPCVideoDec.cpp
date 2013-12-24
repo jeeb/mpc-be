@@ -3034,12 +3034,11 @@ STDMETHODIMP CMPCVideoDecFilter::GetPages(CAUUID* pPages)
 #else
 	pPages->cElems		= 1;
 #endif
-
 	pPages->pElems		= (GUID*)CoTaskMemAlloc(sizeof(GUID) * pPages->cElems);
 	pPages->pElems[0]	= __uuidof(CMPCVideoDecSettingsWnd);
-	if (pPages->cElems>1) {
-		pPages->pElems[1] = __uuidof(CMPCVideoDecCodecWnd);
-	}
+#ifdef REGISTER_FILTER
+	pPages->pElems[1]	= __uuidof(CMPCVideoDecCodecWnd);
+#endif
 
 	return S_OK;
 }
@@ -3056,9 +3055,12 @@ STDMETHODIMP CMPCVideoDecFilter::CreatePage(const GUID& guid, IPropertyPage** pp
 
 	if (guid == __uuidof(CMPCVideoDecSettingsWnd)) {
 		(*ppPage = DNew CInternalPropertyPageTempl<CMPCVideoDecSettingsWnd>(NULL, &hr))->AddRef();
-	} else if (guid == __uuidof(CMPCVideoDecCodecWnd)) {
+	}
+#ifdef REGISTER_FILTER
+	else if (guid == __uuidof(CMPCVideoDecCodecWnd)) {
 		(*ppPage = DNew CInternalPropertyPageTempl<CMPCVideoDecCodecWnd>(NULL, &hr))->AddRef();
 	}
+#endif
 
 	return *ppPage ? S_OK : E_FAIL;
 }

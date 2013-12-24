@@ -121,6 +121,7 @@ public:
 	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult);
 };
 
+#ifdef REGISTER_FILTER
 class __declspec(uuid("3C395D46-8B0F-440d-B962-2F4A97355453"))
 	CMPCVideoDecCodecWnd : public CInternalPropertyPageWnd
 {
@@ -144,3 +145,4 @@ public:
 
 	DECLARE_MESSAGE_MAP()
 };
+#endif
