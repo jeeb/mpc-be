@@ -126,8 +126,11 @@ IF /I "%COMPILER%" == "VS2013" (
 
 IF NOT DEFINED VSCOMNTOOLS GOTO MissingVar
 
-IF NOT EXIST "%~dp0contrib\signinfo.txt" (
-  SET "SIGN=False"
+IF /I "%SIGN%" == "True" (
+  IF NOT EXIST "%~dp0contrib\signinfo.txt" (
+    ECHO WARNING: signinfo.txt not found.
+    SET "SIGN=False"
+  )
 )
 
 :Start
