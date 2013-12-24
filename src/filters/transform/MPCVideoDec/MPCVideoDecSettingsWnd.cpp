@@ -539,7 +539,7 @@ bool CMPCVideoDecCodecWnd::OnApply()
 
 		m_pMDF->SetActiveCodecs(nActiveCodecs);
 
-		m_pMDF->Apply();
+		m_pMDF->SaveSettings();
 	}
 
 	return true;
