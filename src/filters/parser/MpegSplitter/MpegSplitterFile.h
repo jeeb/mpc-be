@@ -37,7 +37,7 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 	CAtlMap<WORD, avchdr> avch;
 	CAtlMap<WORD, seqhdr> seqh;
 
-	CAtlMap<BYTE, int> pesIdCount;
+	CAtlMap<DWORD, int> streamPTSCount;
 
 	template<class T>
 	class CValidStream {

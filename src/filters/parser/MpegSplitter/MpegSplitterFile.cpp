@@ -227,12 +227,12 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	for (int type = stream_type::video; type <= stream_type::audio; type++) {
 		POSITION pos = m_streams[type].GetHeadPosition();
 		while (pos) {
-			BYTE pesid = m_streams[type].GetNext(pos).pesid;
-			if (pesIdCount.Lookup(pesid)) {
+			DWORD TrackNum = m_streams[type].GetNext(pos);
+			if (streamPTSCount.Lookup(TrackNum)) {
 				if (type == stream_type::video) {
-					videoCount += pesIdCount[pesid];
+					videoCount += streamPTSCount[TrackNum];
 				} else {
-					audioCount += pesIdCount[pesid];
+					audioCount += streamPTSCount[TrackNum];
 				}
 			}
 		}
@@ -441,15 +441,16 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, IAsyncReader*
 						m_posMax = GetPos();
 						DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() : m_rtMax = %s [%10I64d], pesID = %d", ReftimeToString(m_rtMax), m_rtMax, b));
 					}
-
-					if (!pesIdCount.Lookup(b)) {
-						pesIdCount[b] = 0;
-					}
-					pesIdCount[b]++;
 				}
 
 				__int64 pos = GetPos();
-				AddStream(0, b, h.id_ext, h.len);
+				DWORD TrackNum = AddStream(0, b, h.id_ext, h.len);
+				if (h.fpts) {
+					if (!streamPTSCount.Lookup(TrackNum)) {
+						streamPTSCount[TrackNum] = 0;
+					}
+					streamPTSCount[TrackNum]++;
+				}
 				if (h.len) {
 					Seek(pos + h.len);
 				}
