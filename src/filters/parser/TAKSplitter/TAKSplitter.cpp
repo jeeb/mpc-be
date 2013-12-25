@@ -309,7 +309,7 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								m_pFile->Seek(file_size - tag_size);
 								BYTE *p = DNew BYTE[tag_size];
 								if (SUCCEEDED(m_pFile->ByteRead(p, tag_size)) && APETag->ReadTags(p, tag_size)) {
-									APETag->ParseTags(this);
+									SetAPETagProperties(this, APETag);
 								}
 
 								delete [] p;

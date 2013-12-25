@@ -233,7 +233,7 @@ HRESULT CMusePackSplitter::CompleteConnect(PIN_DIRECTION Dir, CBasePin *pCaller,
 					reader->Seek(file_size - tag_size);
 					BYTE *p = DNew BYTE[tag_size];
 					if (reader->Read(p, tag_size) >= 0 && APETag->ReadTags(p, tag_size)) {
-						APETag->ParseTags(this);
+						SetAPETagProperties(this, APETag);
 					}
 
 					delete [] p;

@@ -375,7 +375,7 @@ HRESULT CWavPackSplitterFilterInputPin::CompleteConnect(IPin *pReceivePin)
 				io->set_pos_rel(io, file_size - tag_size, SEEK_SET);
 				BYTE *p = DNew BYTE[tag_size];
 				if (io->read_bytes(io, p, tag_size) == tag_size && APETag->ReadTags(p, tag_size)) {
-					APETag->ParseTags(m_pParentFilter);
+					SetAPETagProperties(m_pParentFilter, APETag);
 				}
 
 				delete [] p;

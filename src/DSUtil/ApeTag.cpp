@@ -158,7 +158,29 @@ bool CAPETag::ReadTags(BYTE *buf, size_t len)
 	return true;
 }
 
-void CAPETag::ParseTags(IBaseFilter* pBF)
+CApeTagItem* CAPETag::Find(CString key)
+{
+	CString key_lc = key;
+	key_lc.MakeLower();
+
+	POSITION pos = TagItems.GetHeadPosition();
+	while (pos) {
+		CApeTagItem* item	= TagItems.GetAt(pos);
+		CString TagKey		= item->GetKey();
+		TagKey.MakeLower();
+		if (TagKey == key_lc) {
+			return item;
+		}
+
+		TagItems.GetNext(pos);
+	}
+
+	return NULL;
+}
+
+// additional functions
+
+void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* apetag)
 {
 	CAtlArray<BYTE>		CoverData;
 	CString				CoverMime;
@@ -166,9 +188,9 @@ void CAPETag::ParseTags(IBaseFilter* pBF)
 
 	CString Artist, Comment, Title, Year, Album;
 
-	POSITION pos = TagItems.GetHeadPosition();
+	POSITION pos = apetag->TagItems.GetHeadPosition();
 	while (pos) {
-		CApeTagItem* item	= TagItems.GetAt(pos);
+		CApeTagItem* item	= apetag->TagItems.GetAt(pos);
 		CString TagKey		= item->GetKey();
 		TagKey.MakeLower();
 
@@ -227,7 +249,7 @@ void CAPETag::ParseTags(IBaseFilter* pBF)
 			}
 		}
 		
-		TagItems.GetNext(pos);
+		apetag->TagItems.GetNext(pos);
 	}
 
 	if (CComQIPtr<IDSMPropertyBag> pPB = pBF) {
@@ -243,24 +265,4 @@ void CAPETag::ParseTags(IBaseFilter* pBF)
 			pRB->ResAppend(CoverFileName, L"cover", CoverMime, CoverData.GetData(), (DWORD)CoverData.GetCount(), 0);
 		}
 	}
-}
-
-CApeTagItem* CAPETag::Find(CString key)
-{
-	CString key_lc = key;
-	key_lc.MakeLower();
-
-	POSITION pos = TagItems.GetHeadPosition();
-	while (pos) {
-		CApeTagItem* item	= TagItems.GetAt(pos);
-		CString TagKey		= item->GetKey();
-		TagKey.MakeLower();
-		if (TagKey == key_lc) {
-			return item;
-		}
-
-		TagItems.GetNext(pos);
-	}
-
-	return NULL;
 }

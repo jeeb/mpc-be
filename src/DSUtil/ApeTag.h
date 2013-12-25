@@ -84,8 +84,10 @@ public:
 	// tag reading
 	bool ReadFooter(BYTE *buf, size_t len);
 	bool ReadTags(BYTE *buf, size_t len);
-	void ParseTags(IBaseFilter* pBF);
 
 	size_t GetTagSize() const { return m_TagSize; }
 	CApeTagItem* Find(CString key);
 };
+
+// additional functions
+void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* apetag);
