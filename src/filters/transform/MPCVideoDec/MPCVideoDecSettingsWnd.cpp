@@ -157,7 +157,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	p.y = 10 + IPP_SCALE(115) + 5 + IPP_SCALE(65) + 5;
 	int w1 = IPP_SCALE(117);
 	int w2 = width_s - w1;
-	m_grpStatus.Create(ResStr(IDS_VDF_STATUS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, IPP_SCALE(97))), this, (UINT)IDC_STATIC);
+	m_grpStatus.Create(ResStr(IDS_VDF_STATUS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, IPP_SCALE(85))), this, (UINT)IDC_STATIC);
 	p.y += h20;
 	m_txtInputFormat.Create(ResStr(IDS_VDF_STATUS_INPUT), WS_VISIBLE | WS_CHILD, CRect(p, CSize(w1, m_fontheight)), this, (UINT)IDC_STATIC);
 	m_edtInputFormat.Create(WS_CHILD | WS_VISIBLE | ES_READONLY, CRect(p + CPoint(w1, 0), CSize(w2, m_fontheight)), this, 0);
@@ -169,7 +169,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_edtOutputFormat.Create(WS_CHILD | WS_VISIBLE | ES_READONLY, CRect(p + CPoint(w1, 0), CSize(w2, m_fontheight)), this, 0);
 	p.y += h16;
 	m_txtGraphicsAdapter.Create(ResStr(IDS_VDF_STATUS_ADAPTER), WS_VISIBLE | WS_CHILD, CRect(p, CSize(w1, m_fontheight)), this, (UINT)IDC_STATIC);
-	m_edtGraphicsAdapter.Create(WS_CHILD|WS_VISIBLE|ES_MULTILINE|ES_READONLY, CRect(p + CPoint(w1, 0), CSize(w2, m_fontheight * 2)), this, 0);
+	m_edtGraphicsAdapter.Create(WS_CHILD|WS_VISIBLE|ES_AUTOHSCROLL|ES_READONLY, CRect(p + CPoint(w1, 0), CSize(w2, m_fontheight)), this, 0);
 
 	////////// Format conversion //////////
 	p = CPoint(10 + width_s + 15, 10);
@@ -231,7 +231,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbSwRGBLevels.AddString(_T("PC (0-255)"));
 	m_cbSwRGBLevels.AddString(_T("TV (16-235)"));
 
-	p.y = 10 + IPP_SCALE(115) + 5 + IPP_SCALE(65) + 5 + IPP_SCALE(95) - m_fontheight;
+	p.y = 10 + IPP_SCALE(115) + 5 + IPP_SCALE(65) + 5 + IPP_SCALE(85) - m_fontheight;
 	int btn_w = IPP_SCALE(70);
 	m_btnReset.Create(ResStr(IDS_FILTER_RESET_SETTINGS), dwStyle|BS_MULTILINE, CRect(p + CPoint(0, - (m_fontheight + 6)), CSize(btn_w, m_fontheight*2 + 6)), this, IDC_PP_RESET);
 	m_txtMPCVersion.Create(_T(""), WS_VISIBLE|WS_CHILD|ES_RIGHT, CRect(p + CPoint(btn_w, - 3), CSize(width_s - btn_w, m_fontheight)), this, (UINT)IDC_STATIC);
