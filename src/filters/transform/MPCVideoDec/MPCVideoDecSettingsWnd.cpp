@@ -287,6 +287,10 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 void CMPCVideoDecSettingsWnd::OnDeactivate()
 {
+	m_edtInputFormat.SetSel(-1);
+	m_edtFrameSize.SetSel(-1);
+	m_edtOutputFormat.SetSel(-1);
+	m_edtGraphicsAdapter.SetSel(-1);
 }
 
 bool CMPCVideoDecSettingsWnd::OnApply()
@@ -388,6 +392,7 @@ void CMPCVideoDecSettingsWnd::OnBnClickedReset()
 	m_cbSwPreset.SetCurSel(2);
 	m_cbSwStandard.SetCurSel(2);
 	m_cbSwRGBLevels.SetCurSel(0);
+	m_cbSwRGBLevels.EnableWindow(TRUE);
 }
 
 BOOL CMPCVideoDecSettingsWnd::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
