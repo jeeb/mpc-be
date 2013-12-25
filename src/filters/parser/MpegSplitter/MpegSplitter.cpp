@@ -1427,6 +1427,10 @@ STDMETHODIMP CMpegSplitterFilter::Enable(long lIndex, DWORD dwFlags)
 					continue;
 				}
 
+				if (from == to) {
+					return S_OK;
+				}
+
 				CComQIPtr<IMediaControl> pMC(m_pGraph);
 				OAFilterState fs = -1;
 				if(pMC) {
