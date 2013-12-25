@@ -94,7 +94,8 @@ BOOL CInternalPropertyPageWnd::Create(IPropertyPageSite* pPageSite, LPCRECT pRec
 BOOL CInternalPropertyPageWnd::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
 	if (message == WM_COMMAND || message == WM_HSCROLL || message == WM_VSCROLL) {
-		if (HIWORD(wParam) != CBN_SETFOCUS && HIWORD(wParam) != CBN_KILLFOCUS) {
+		WORD notify = HIWORD(wParam);
+		if (notify == BN_CLICKED || notify == CBN_SELCHANGE || notify == EN_CHANGE) {
 			SetDirty(true);
 		}
 	}
