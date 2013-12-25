@@ -883,21 +883,29 @@ DWORD CBaseSplitterFilter::GetOutputTrackNum(CBaseSplitterOutputPin* pPin)
 	return (DWORD)-1;
 }
 
-HRESULT CBaseSplitterFilter::RenameOutputPin(DWORD TrackNumSrc, DWORD TrackNumDst, const AM_MEDIA_TYPE* pmt, BOOL bNeedReconnect /*= FALSE*/)
+HRESULT CBaseSplitterFilter::RenameOutputPin(DWORD TrackNumSrc, DWORD TrackNumDst, std::vector<CMediaType> mts, BOOL bNeedReconnect /*= FALSE*/)
 {
 	CAutoLock cAutoLock(&m_csPinMap);
 
+	AM_MEDIA_TYPE* pmt = NULL;
+
 	CBaseSplitterOutputPin* pPin;
 	if (m_pPinMap.Lookup(TrackNumSrc, pPin)) {
-		if (pmt) {
-			if (CComQIPtr<IPin> pPinTo = pPin->GetConnected()) {
-				if (S_OK != pPinTo->QueryAccept(pmt)) {
-					return VFW_E_TYPE_NOT_ACCEPTED;
+		HRESULT hr = S_OK;
+		if (CComQIPtr<IPin> pPinTo = pPin->GetConnected()) {
+			for (size_t i = 0; i < mts.size(); i++) {
+				if (S_OK == pPinTo->QueryAccept(&mts[i])) {
+					pmt = &mts[i];
+					break;
 				}
+			}
 
-				if (bNeedReconnect) {
-					ReconnectPin(pPinTo, pmt);
-				}
+			if (!pmt) {
+				pmt = &mts[0];
+			}
+
+			if (bNeedReconnect) {
+				hr = ReconnectPin(pPinTo, pmt);
 			}
 		}
 
@@ -909,7 +917,7 @@ HRESULT CBaseSplitterFilter::RenameOutputPin(DWORD TrackNumSrc, DWORD TrackNumDs
 			m_mtnew[TrackNumDst] = *pmt;
 		}
 
-		return S_OK;
+		return hr;
 	}
 
 	return E_FAIL;

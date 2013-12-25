@@ -43,7 +43,7 @@
 #define OPT_AltDuration       _T("AlternativeDuration")
 #define OPT_SubEmptyOutput    _T("SubtitleEmptyOutput")
 
-TCHAR* MPEG2_Profile[]=
+const TCHAR* MPEG2_Profile[]=
 {
 	L"0",
 	L"High Profile",
@@ -55,7 +55,7 @@ TCHAR* MPEG2_Profile[]=
 	L"7",
 };
 
-TCHAR* MPEG2_Level[]=
+const TCHAR* MPEG2_Level[]=
 {
 	L"0",
 	L"1",
@@ -150,7 +150,7 @@ static int GetHighestBitSet32(unsigned long _Value)
 	}
 }
 
-CString FormatBitrate(double _Bitrate)
+static CString FormatBitrate(double _Bitrate)
 {
 	CString Temp;
 	if (_Bitrate > 20000000) { // More than 2 mbit
@@ -162,20 +162,20 @@ CString FormatBitrate(double _Bitrate)
 	return Temp;
 }
 
-CString FormatString(const wchar_t *pszFormat, ... )
+static CString FormatString(const wchar_t *pszFormat, ...)
 {
 	CString Temp;
-	ATLASSERT( AtlIsValidString( pszFormat ) );
+	ATLASSERT(AtlIsValidString(pszFormat));
 
 	va_list argList;
-	va_start( argList, pszFormat );
-	Temp.FormatV( pszFormat, argList );
-	va_end( argList );
+	va_start(argList, pszFormat);
+	Temp.FormatV(pszFormat, argList);
+	va_end(argList);
 
 	return Temp;
 }
 
-CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipInfo::Stream *pClipInfo, int _PresentationType, CStringA lang)
+static CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipInfo::Stream *pClipInfo, int _PresentationType, CStringA lang)
 {
 	const WCHAR *pPresentationDesc = NULL;
 
@@ -527,7 +527,7 @@ CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipInfo::Str
 
 		return Ret;
 	}
-	return CString();
+	return L"";
 }
 
 //
@@ -882,7 +882,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	// Create
 	if (m_ClipInfo.IsHdmv()) {
-		for (size_t i=0; i < m_ClipInfo.GetStreamNumber(); i++) {
+		for (size_t i = 0; i < m_ClipInfo.GetStreamNumber(); i++) {
 			CHdmvClipInfo::Stream* stream = m_ClipInfo.GetStreamByIndex (i);
 			if (stream->m_Type == PRESENTATION_GRAPHICS_STREAM) {
 				m_pFile->AddHdmvPGStream (stream->m_PID, stream->m_LanguageCode);
@@ -989,9 +989,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	m_rtNewStart = m_rtCurrent = 0;
-	m_rtNewStop = m_rtStop = m_rtDuration = 0;
-
+	//
 	int vid_width	= 0;
 	int vid_height	= 0;
 
@@ -999,7 +997,6 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		POSITION pos = m_pFile->m_streams[type].GetHeadPosition();
 		while (pos) {
 			CMpegSplitterFile::stream& s = m_pFile->m_streams[type].GetNext(pos);
-			CAtlArray<CMediaType> mts;
 
 			// correct Aspect Ratio for DVD structure.
 			if (s.mt.subtype == MEDIASUBTYPE_MPEG2_VIDEO && IfoASpect.num && IfoASpect.den) {
@@ -1007,8 +1004,6 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				vih2.dwPictAspectRatioX = IfoASpect.num;
 				vih2.dwPictAspectRatioY = IfoASpect.den;
 			}
-
-			mts.Add(s.mt);
 
 			// Get resolution for first video track
 			if (type == CMpegSplitterFile::stream_type::video && !vid_width) {
@@ -1020,9 +1015,9 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			CMediaType mt = s.mt;
 			if (mt.subtype == MEDIASUBTYPE_WVC1) {
 				mt.subtype = MEDIASUBTYPE_WVC1_CYBERLINK;
-				mts.InsertAt(0, mt);
+				s.mts.insert(s.mts.begin(), mt);
 				mt.subtype = MEDIASUBTYPE_WVC1_ARCSOFT;
-				mts.InsertAt(0, mt);
+				s.mts.insert(s.mts.begin(), mt);
 			}
 
 			// Add addition VobSub type
@@ -1112,8 +1107,18 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				strncpy_s(si->IsoLang, pTI ? CStringA(pTI->GetTrackName(s.ps1id)) : "eng", _countof(si->IsoLang)-1);
 
 				memcpy(si + 1, (LPCSTR)hdr, hdr.GetLength());
-				mts.InsertAt(0, mt);
+				s.mts.insert(s.mts.begin(), mt);
 			}
+		}
+	}
+
+	m_rtNewStart = m_rtCurrent = 0;
+	m_rtNewStop = m_rtStop = m_rtDuration = 0;
+
+	for (int type = CMpegSplitterFile::stream_type::video; type < _countof(m_pFile->m_streams); type++) {
+		POSITION pos = m_pFile->m_streams[type].GetHeadPosition();
+		while (pos) {
+			CMpegSplitterFile::stream& s = m_pFile->m_streams[type].GetNext(pos);
 
 			CStringW name = CMpegSplitterFile::CStreamList::ToString(type);
 			CStringW str;
@@ -1142,6 +1147,10 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			}
 
+			CAtlArray<CMediaType> mts;
+			for(size_t i = 0; i < s.mts.size(); i++) {
+				mts.Add(s.mts[i]);
+			}
 			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CMpegSplitterOutputPin(mts, str, this, this, &hr, m_pFile->m_type, (type != CMpegSplitterFile::stream_type::video) ? 20 : 1));
 
 			if (type == CMpegSplitterFile::stream_type::audio) {
@@ -1426,7 +1435,7 @@ STDMETHODIMP CMpegSplitterFilter::Enable(long lIndex, DWORD dwFlags)
 				}
 				Lock();
 
-				HRESULT hr = RenameOutputPin(from, to, &to.mt, type == CMpegSplitterFile::stream_type::subpic);
+				HRESULT hr = RenameOutputPin(from, to, to.mts, type == CMpegSplitterFile::stream_type::subpic);
 
 				Unlock();
 				if (pMC) {
@@ -1451,74 +1460,6 @@ STDMETHODIMP CMpegSplitterFilter::Enable(long lIndex, DWORD dwFlags)
 	return S_FALSE;
 }
 
-LONGLONG GetMediaTypeQuality(const CMediaType *_pMediaType, int _PresentationFormat)
-{
-	if (_pMediaType->formattype == FORMAT_WaveFormatEx) {
-		__int64 Ret = 0;
-
-		const WAVEFORMATEX *pInfo = GetFormatHelper(pInfo, _pMediaType);
-		int TypePriority = 0;
-
-		if (_pMediaType->subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {
-			TypePriority = 12;
-		} else if (_pMediaType->subtype == MEDIASUBTYPE_HDMV_LPCM_AUDIO) {
-			TypePriority = 12;
-		} else {
-			if (_PresentationFormat == AUDIO_STREAM_DTS_HD_MASTER_AUDIO) {
-				TypePriority = 12;
-			} else if (_PresentationFormat == AUDIO_STREAM_DTS_HD) {
-				TypePriority = 11;
-			} else if (_PresentationFormat == AUDIO_STREAM_AC3_TRUE_HD) {
-				TypePriority = 12;
-			} else if (_PresentationFormat == AUDIO_STREAM_AC3_PLUS) {
-				TypePriority = 10;
-			} else {
-				switch (pInfo->wFormatTag) {
-					case WAVE_FORMAT_PS2_PCM: {
-						TypePriority = 12;
-					}
-					break;
-					case WAVE_FORMAT_PS2_ADPCM: {
-						TypePriority = 4;
-					}
-					break;
-					case WAVE_FORMAT_DTS2: {
-						TypePriority = 9;
-					}
-					break;
-					case WAVE_FORMAT_DOLBY_AC3: {
-						TypePriority = 8;
-					}
-					break;
-					case WAVE_FORMAT_RAW_AAC1: {
-						TypePriority = 7;
-					}
-					break;
-					case WAVE_FORMAT_MPEGLAYER3: {
-						TypePriority = 6;
-					}
-					break;
-					case WAVE_FORMAT_MPEG: {
-						TypePriority = 5;
-					}
-					break;
-				}
-			}
-		}
-
-		Ret += __int64(TypePriority) * 100000000i64 * 1000000000i64;
-
-		Ret += __int64(pInfo->nChannels) * 1000000i64 * 1000000000i64;
-		Ret += __int64(pInfo->nSamplesPerSec) * 10i64  * 1000000000i64;
-		Ret += __int64(pInfo->wBitsPerSample)  * 10000000i64;
-		Ret += __int64(pInfo->nAvgBytesPerSec);
-
-		return Ret;
-	}
-
-	return 0;
-}
-
 STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD* pdwFlags, LCID* plcid, DWORD* pdwGroup, WCHAR** ppszName, IUnknown** ppObject, IUnknown** ppUnk)
 {
 	for (int type = CMpegSplitterFile::stream_type::video, j = 0; type < _countof(m_pFile->m_streams); type++) {
@@ -1536,7 +1477,7 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 			CHdmvClipInfo::Stream* pStream	= m_ClipInfo.FindStream(s.pid);
 
 			if (ppmt) {
-				*ppmt = CreateMediaType(&s.mt);
+				*ppmt = CreateMediaType(&s.mts[0]);
 			}
 			if (pdwFlags) {
 				*pdwFlags = GetOutputPin(s) ? (AMSTREAMSELECTINFO_ENABLED|AMSTREAMSELECTINFO_EXCLUSIVE) : 0;

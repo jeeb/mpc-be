@@ -32,6 +32,7 @@
 #include "../../../DSUtil/DSMPropertyBag.h"
 #include "../../../DSUtil/FontInstaller.h"
 #include "../apps/mplayerc/SettingsDefines.h"
+#include <vector>
 
 #define MOVE_TO_H264_START_CODE(b, e)	while(b <= e-4 && !((*(DWORD *)b == 0x01000000) || ((*(DWORD *)b & 0x00FFFFFF) == 0x00010000))) b++; if((b <= e-4) && *(DWORD *)b == 0x01000000) b++;
 #define MOVE_TO_AC3_START_CODE(b, e)	while(b <= e-8 && (*(WORD*)b != 0x770b)) b++;
@@ -269,7 +270,7 @@ protected:
 	CBaseSplitterOutputPin* GetOutputPin(DWORD TrackNum);
 	DWORD GetOutputTrackNum(CBaseSplitterOutputPin* pPin);
 	HRESULT AddOutputPin(DWORD TrackNum, CAutoPtr<CBaseSplitterOutputPin> pPin);
-	HRESULT RenameOutputPin(DWORD TrackNumSrc, DWORD TrackNumDst, const AM_MEDIA_TYPE* pmt, BOOL bNeedReconnect = FALSE);
+	HRESULT RenameOutputPin(DWORD TrackNumSrc, DWORD TrackNumDst, std::vector<CMediaType> mts, BOOL bNeedReconnect = FALSE);
 	virtual HRESULT DeleteOutputs();
 	virtual HRESULT CreateOutputs(IAsyncReader* pAsyncReader) = 0; // override this ...
 	virtual LPCTSTR GetPartFilename(IAsyncReader* pAsyncReader);

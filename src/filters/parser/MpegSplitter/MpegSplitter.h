@@ -151,5 +151,7 @@ public:
 	CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int type, int QueueMaxPackets);
 	virtual ~CMpegSplitterOutputPin();
 
+	HRESULT CheckMediaType(const CMediaType* pmt) { return S_OK; }
+
 	STDMETHODIMP Connect(IPin* pReceivePin, const AM_MEDIA_TYPE* pmt);
 };

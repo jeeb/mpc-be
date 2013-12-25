@@ -60,9 +60,9 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 	};
 
 	CAtlMap<WORD, CValidStream<latm_aachdr>>	m_aaclatmValid;
-	CAtlMap<WORD, CValidStream<aachdr>>		m_aacValid;
-	CAtlMap<WORD, CValidStream<mpahdr>>		m_mpaValid;
-	CAtlMap<WORD, CValidStream<ac3hdr>>		m_ac3Valid;
+	CAtlMap<WORD, CValidStream<aachdr>>			m_aacValid;
+	CAtlMap<WORD, CValidStream<mpahdr>>			m_mpaValid;
+	CAtlMap<WORD, CValidStream<ac3hdr>>			m_ac3Valid;
 
 	BOOL m_init;
 
@@ -88,19 +88,26 @@ public:
 	bool m_ForcedSub, m_AlternativeDuration, m_SubEmptyPin;
 
 	struct stream {
-		CMpegSplitterFile *m_pFile;
 		CMediaType mt;
+		std::vector<CMediaType> mts;
 		WORD pid;
 		BYTE pesid, ps1id;
-		char lang[4];
 		bool lang_set;
+		char lang[4];
 
 		stream() {
-			memset(this, 0, sizeof(*this));
+			pid			= 0;
+			pesid		= 0;
+			ps1id		= 0;
+			lang_set	= false;
+			mt.InitMediaType();
+			memset(lang, 0, _countof(lang));
 		}
+
 		operator DWORD() const {
 			return pid ? pid : ((pesid<<8)|ps1id);
 		}
+
 		bool operator == (const struct stream& s) const {
 			return (DWORD)*this == (DWORD)s;
 		}
@@ -111,8 +118,8 @@ public:
 	class CStreamList : public CAtlList<stream>
 	{
 	public:
-		void Insert(stream& s, CMpegSplitterFile *_pFile, int type) {
-			if (type == subpic) {
+		void Insert(stream& s, int type) {
+			if (type == stream_type::subpic) {
 				if (s.pid == NO_SUBTITLE_PID) {
 					AddTail(s);
 					return;
@@ -126,16 +133,15 @@ public:
 				}
 				AddTail(s);
 			} else {
-				Insert(s, _pFile);
+				Insert(s);
 			}
 		}
 
-		void Insert(stream& s, CMpegSplitterFile *_pFile) {
-			s.m_pFile = _pFile;
+		void Insert(stream& s) {
 			AddTail(s);
 			if (GetCount() > 1) {
-				for (size_t j=0; j<GetCount(); j++) {
-					for (size_t i=0; i<GetCount()-1; i++) {
+				for (size_t j = 0; j < GetCount(); j++) {
+					for (size_t i = 0; i < GetCount() - 1; i++) {
 						if (GetAt(FindIndex(i)) > GetAt(FindIndex(i+1))) {
 							SwapElements(FindIndex(i), FindIndex(i+1));
 						}
@@ -144,9 +150,7 @@ public:
 			}
 		}
 
-		void Replace(stream& source, stream& dest, CMpegSplitterFile *_pFile) {
-			source.m_pFile = _pFile;
-			dest.m_pFile = _pFile;
+		void Replace(stream& source, stream& dest) {
 			for (POSITION pos = GetHeadPosition(); pos; GetNext(pos)) {
 				stream& s = GetAt(pos);
 				if (source == s) {
