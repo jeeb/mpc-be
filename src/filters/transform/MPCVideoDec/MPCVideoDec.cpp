@@ -1611,7 +1611,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	}
 
 	int nThreadNumber = m_nThreadNumber ? m_nThreadNumber : m_pCpuId->GetProcessorNumber() * 3/2;
-	m_pAVCtx->thread_count = max(1, min(nThreadNumber, MAX_AUTO_THREADS));
+	m_pAVCtx->thread_count = max(1, min(IsDXVASupported() ? 1 : nThreadNumber, MAX_AUTO_THREADS));
 
 	m_pFrame = av_frame_alloc();
 	CheckPointer(m_pFrame, E_POINTER);
