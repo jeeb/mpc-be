@@ -61,7 +61,7 @@ protected:
 
 private:
 	CString m_csAudioLanguageOrder, m_csSubtitlesLanguageOrder;
-	bool m_useFastSeek, m_ForcedSub, m_AlternativeDuration, m_SubEmptyPin;
+	bool m_ForcedSub, m_AlternativeDuration, m_SubEmptyPin;
 	int m_AC3CoreOnly;
 	CCritSec m_csProps;
 
@@ -95,9 +95,6 @@ public:
 
 	// IMpegSplitterFilter
 	STDMETHODIMP Apply();
-
-	STDMETHODIMP SetFastSeek(BOOL nValue);
-	STDMETHODIMP_(BOOL) GetFastSeek();
 
 	STDMETHODIMP SetForcedSub(BOOL nValue);
 	STDMETHODIMP_(BOOL) GetForcedSub();

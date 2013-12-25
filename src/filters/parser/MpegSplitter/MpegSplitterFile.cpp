@@ -40,7 +40,8 @@ CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CH
 	, m_AC3CoreOnly(AC3CoreOnly)
 	, m_AlternativeDuration(AlternativeDuration)
 	, m_SubEmptyPin(SubEmptyPin)
-	, m_init(false)
+	, m_init(FALSE)
+	, bIsBadPacked(FALSE)
 {
 	memset(m_psm, 0, sizeof(m_psm));
 	if (SUCCEEDED(hr)) {
@@ -139,7 +140,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	m_rtMin = m_posMin = _I64_MAX;
 	m_rtMax = m_posMax = 0;
 
-	m_init = true;
+	m_init = TRUE;
 
 	if (IsRandomAccess() || IsStreaming()) {
 		
@@ -219,31 +220,51 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		m_posMax = GetLength();
 	}
 
-	m_init = false;
+	m_init = FALSE;
+
+	int videoCount = 0;
+	int audioCount = 0;
+	for (int type = stream_type::video; type <= stream_type::audio; type++) {
+		POSITION pos = m_streams[type].GetHeadPosition();
+		while (pos) {
+			BYTE pesid = m_streams[type].GetNext(pos).pesid;
+			if (pesIdCount.Lookup(pesid)) {
+				if (type == stream_type::video) {
+					videoCount += pesIdCount[pesid];
+				} else {
+					audioCount += pesIdCount[pesid];
+				}
+			}
+		}
+	}
+
+	if (audioCount && videoCount) {
+		bIsBadPacked = (audioCount > videoCount * 5);
+	}
 
 	if (m_SubEmptyPin) {
 		// Add fake Subtitle stream ...
 		if (m_type == mpeg_ts) {
-			if (m_streams[video].GetCount()) {
-				if (!m_ClipInfo.IsHdmv() && m_streams[subpic].GetCount()) {
+			if (m_streams[stream_type::video].GetCount()) {
+				if (!m_ClipInfo.IsHdmv() && m_streams[stream_type::subpic].GetCount()) {
 					stream s;
 					s.pid = NO_SUBTITLE_PID;
-					s.mt.majortype	= m_streams[subpic].GetHead().mt.majortype;
-					s.mt.subtype	= m_streams[subpic].GetHead().mt.subtype;
-					s.mt.formattype	= m_streams[subpic].GetHead().mt.formattype;
-					m_streams[subpic].AddTail(s);
+					s.mt.majortype	= m_streams[stream_type::subpic].GetHead().mt.majortype;
+					s.mt.subtype	= m_streams[stream_type::subpic].GetHead().mt.subtype;
+					s.mt.formattype	= m_streams[stream_type::subpic].GetHead().mt.formattype;
+					m_streams[stream_type::subpic].AddTail(s);
 				} else {
 					AddHdmvPGStream(NO_SUBTITLE_PID, "---");
 				}
 			}
 		} else {
-			if (m_streams[video].GetCount()) {
+			if (m_streams[stream_type::video].GetCount()) {
 				stream s;
 				s.pid = NO_SUBTITLE_PID;
-				s.mt.majortype	= m_streams[subpic].GetCount() ? m_streams[subpic].GetHead().mt.majortype	: MEDIATYPE_Video;
-				s.mt.subtype	= m_streams[subpic].GetCount() ? m_streams[subpic].GetHead().mt.subtype		: MEDIASUBTYPE_DVD_SUBPICTURE;
-				s.mt.formattype	= m_streams[subpic].GetCount() ? m_streams[subpic].GetHead().mt.formattype	: FORMAT_None;
-				m_streams[subpic].AddTail(s);
+				s.mt.majortype	= m_streams[stream_type::subpic].GetCount() ? m_streams[stream_type::subpic].GetHead().mt.majortype		: MEDIATYPE_Video;
+				s.mt.subtype	= m_streams[stream_type::subpic].GetCount() ? m_streams[stream_type::subpic].GetHead().mt.subtype		: MEDIASUBTYPE_DVD_SUBPICTURE;
+				s.mt.formattype	= m_streams[stream_type::subpic].GetCount() ? m_streams[stream_type::subpic].GetHead().mt.formattype	: FORMAT_None;
+				m_streams[stream_type::subpic].AddTail(s);
 			}
 		}
 	}
@@ -414,13 +435,17 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, IAsyncReader*
 						m_rtMin = h.pts;
 						m_posMin = GetPos();
 						DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() : m_rtMin = %s [%10I64d], pesID = %d", ReftimeToString(m_rtMin), m_rtMin, b));
-						TRACE ("m_rtMin(SearchStreams) = %S [%10I64d]\n", ReftimeToString(m_rtMin), m_rtMin);
 					}
 					if (m_rtMin < h.pts && m_rtMax < h.pts) {
 						m_rtMax = h.pts;
 						m_posMax = GetPos();
 						DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() : m_rtMax = %s [%10I64d], pesID = %d", ReftimeToString(m_rtMax), m_rtMax, b));
 					}
+
+					if (!pesIdCount.Lookup(b)) {
+						pesIdCount[b] = 0;
+					}
+					pesIdCount[b]++;
 				}
 
 				__int64 pos = GetPos();
@@ -576,8 +601,8 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 
 	BYTE nPid = pid ? pid : pesid;
 
-	const __int64 start = GetPos();
-	int type = unknown;
+	const __int64 start		= GetPos();
+	enum stream_type type	= stream_type::unknown;
 
 	ULONGLONG stream_type			= PES_STREAM_TYPE_ANY;
 	PES_STREAM_TYPE pes_stream_type	= INVALID;
@@ -593,9 +618,9 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 
 	if (pesid >= 0xe0 && pesid < 0xf0) { // mpeg video
 		// MPEG2
-		if (type == unknown && (stream_type & MPEG2_VIDEO)) {
+		if (type == stream_type::unknown && (stream_type & MPEG2_VIDEO)) {
 			// Sequence/extension header can be split into multiple packets
-			if (!m_streams[video].Find(s)) {
+			if (!m_streams[stream_type::video].Find(s)) {
 				if (!seqh.Lookup(nPid)) {
 					seqh[nPid].Init();
 				}
@@ -606,9 +631,9 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 						seqh[nPid].data.SetCount(size + (size_t)len);
 						ByteRead(seqh[nPid].data.GetData() + size, len);
 					} else {
-						CMpegSplitterFile::seqhdr h;
+						seqhdr h;
 						if (Read(h, seqh[nPid].data, &s.mt)) {
-							type = video;
+							type = stream_type::video;
 						}
 					}
 				} else {
@@ -623,42 +648,42 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 		}
 
 		// AVC/H.264
-		if (type == unknown && (stream_type & H264_VIDEO)) {
+		if (type == stream_type::unknown && (stream_type & H264_VIDEO)) {
 			Seek(start);
 			// PPS and SPS can be present on differents packets
 			// and can also be split into multiple packets
 			if (!avch.Lookup(nPid)) {
-				memset(&avch[nPid], 0, sizeof(CMpegSplitterFile::avchdr));
+				memset(&avch[nPid], 0, sizeof(avchdr));
 			}
 
-			if (!m_streams[video].Find(s) && !m_streams[stereo].Find(s) && Read(avch[nPid], len, &s.mt)) {
+			if (!m_streams[stream_type::video].Find(s) && !m_streams[stream_type::stereo].Find(s) && Read(avch[nPid], len, &s.mt)) {
 				if (avch[nPid].spspps[index_subsetsps].complete) {
-					type = stereo;
+					type = stream_type::stereo;
 				} else {
-					type = video;
+					type = stream_type::video;
 				}
 			}
 		}
 
 		// HEVC/H.265
-		if (type == unknown && (stream_type & HEVC_VIDEO)) {
+		if (type == stream_type::unknown && (stream_type & HEVC_VIDEO)) {
 			Seek(start);
-			CMpegSplitterFile::hevchdr h;
-			if (!m_streams[video].Find(s) && Read(h, len, &s.mt)) {
-				type = video;
+			hevchdr h;
+			if (!m_streams[stream_type::video].Find(s) && Read(h, len, &s.mt)) {
+				type = stream_type::video;
 			}
 		}
 	} else if (pesid >= 0xc0 && pesid < 0xe0) { // mpeg audio
 
 		// AAC_LATM
-		if (type == unknown && (stream_type & AAC_AUDIO)) {
+		if (type == stream_type::unknown && (stream_type & AAC_AUDIO)) {
 			Seek(start);
-			CMpegSplitterFile::latm_aachdr h = { 0 };
+			latm_aachdr h = { 0 };
 
-			if (!m_streams[audio].Find(s)) {
+			if (!m_streams[stream_type::audio].Find(s)) {
 				if (Read(h, len, &s.mt) && m_type == mpeg_ts) {
 					if (m_aaclatmValid[nPid].IsValid()) {
-						type = audio;
+						type = stream_type::audio;
 					} else {
 						m_aaclatmValid[nPid].Handle(h);
 					}
@@ -667,14 +692,14 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 		}
 
 		// AAC
-		if (type == unknown && (stream_type & AAC_AUDIO)) {
+		if (type == stream_type::unknown && (stream_type & AAC_AUDIO)) {
 			Seek(start);
-			CMpegSplitterFile::aachdr h = { 0 };
+			aachdr h = { 0 };
 
-			if (!m_streams[audio].Find(s)) {
+			if (!m_streams[stream_type::audio].Find(s)) {
 				if (Read(h, len, &s.mt)) {
 					if (m_aacValid[nPid].IsValid()) {
-						type = audio;
+						type = stream_type::audio;
 					} else {
 						m_aacValid[nPid].Handle(h);
 					}
@@ -683,14 +708,14 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 		}
 
 		// MPEG Audio
-		if (type == unknown && (stream_type & MPEG_AUDIO)) {
+		if (type == stream_type::unknown && (stream_type & MPEG_AUDIO)) {
 			Seek(start);
-			CMpegSplitterFile::mpahdr h = { 0 };
+			mpahdr h = { 0 };
 
-			if (!m_streams[audio].Find(s)) {
+			if (!m_streams[stream_type::audio].Find(s)) {
 				if (Read(h, len, &s.mt)) {
 					if (m_mpaValid[nPid].IsValid()) {
-						type = audio;
+						type = stream_type::audio;
 					} else {
 						m_mpaValid[nPid].Handle(h);
 					}
@@ -699,14 +724,14 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 		}
 
 		// AC3
-		if (type == unknown && (stream_type & AC3_AUDIO)) {
+		if (type == stream_type::unknown && (stream_type & AC3_AUDIO)) {
 			Seek(start);
-			CMpegSplitterFile::ac3hdr h = { 0 };
+			ac3hdr h = { 0 };
 
-			if (!m_streams[audio].Find(s)) {
+			if (!m_streams[stream_type::audio].Find(s)) {
 				if (Read(h, len, &s.mt)) {
 					if (m_ac3Valid[nPid].IsValid()) {
-						type = audio;
+						type = stream_type::audio;
 					} else {
 						m_ac3Valid[nPid].Handle(h);
 					}
@@ -715,92 +740,92 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 		}
 	} else if (pesid == 0xbd || pesid == 0xfd) { // private stream 1
 		if (s.pid) {
-			if (!m_streams[audio].Find(s) && !m_streams[video].Find(s) && !m_streams[subpic].Find(s)) {
+			if (!m_streams[stream_type::audio].Find(s) && !m_streams[stream_type::video].Find(s) && !m_streams[stream_type::subpic].Find(s)) {
 
 				// AC3, E-AC3, TrueHD
-				if (type == unknown && (stream_type & AC3_AUDIO)) {
-					CMpegSplitterFile::ac3hdr h;
+				if (type == stream_type::unknown && (stream_type & AC3_AUDIO)) {
+					ac3hdr h;
 					if (Read(h, len, &s.mt, true, (m_AC3CoreOnly == 1))) {
-						type = audio;
+						type = stream_type::audio;
 					}
 				}
 
 				// DTS, DTS HD, DTS HD MA
-				if (type == unknown && (stream_type & DTS_AUDIO)) {
+				if (type == stream_type::unknown && (stream_type & DTS_AUDIO)) {
 					Seek(start);
-					CMpegSplitterFile::dtshdr h;
+					dtshdr h;
 					if (Read(h, len, &s.mt, false)) {
-						type = audio;
+						type = stream_type::audio;
 					}
 				}
 
 				// VC1
-				if (type == unknown && (stream_type & VC1_VIDEO)) {
+				if (type == stream_type::unknown && (stream_type & VC1_VIDEO)) {
 					Seek(start);
-					CMpegSplitterFile::vc1hdr h;
+					vc1hdr h;
 					if (Read(h, len, &s.mt)) {
-						type = video;
+						type = stream_type::video;
 					}
 				}
 
 				// DIRAC
-				if (type == unknown && (stream_type & DIRAC_VIDEO)) {
+				if (type == stream_type::unknown && (stream_type & DIRAC_VIDEO)) {
 					Seek(start);
-					CMpegSplitterFile::dirachdr h;
+					dirachdr h;
 					if (Read(h, len, &s.mt)) {
-						type = video;
+						type = stream_type::video;
 					}
 				}
 
 				// DVB subtitles
-				if (type == unknown && (stream_type & DVB_SUB)) {
+				if (type == stream_type::unknown && (stream_type & DVB_SUB)) {
 					Seek(start);
-					CMpegSplitterFile::dvbsub h;
+					dvbsub h;
 					if (Read(h, len, &s.mt)) {
-						type = subpic;
+						type = stream_type::subpic;
 					}
 				}
 
 				// LPCM Audio
-				if (type == unknown && (stream_type & LPCM_AUDIO)) {
+				if (type == stream_type::unknown && (stream_type & LPCM_AUDIO)) {
 					Seek(start);
-					CMpegSplitterFile::hdmvlpcmhdr h;
+					hdmvlpcmhdr h;
 					if (Read(h, &s.mt)) {
-						type = audio;
+						type = stream_type::audio;
 					}
 				}
 
 				// PGS subtitles
-				if (type == unknown && (stream_type & PGS_SUB)) {
+				if (type == stream_type::unknown && (stream_type & PGS_SUB)) {
 					Seek(start);
 
 					int iProgram;
 					const CHdmvClipInfo::Stream *pClipInfo;
 					const program* pProgram = FindProgram(s.pid, iProgram, pClipInfo);
 
-					CMpegSplitterFile::hdmvsubhdr h;
+					hdmvsubhdr h;
 					if (!m_ClipInfo.IsHdmv() && Read(h, &s.mt, pClipInfo ? pClipInfo->m_LanguageCode : NULL)) {
-						type = subpic;
+						type = stream_type::subpic;
 					}
 				}
 			} else if ((m_AC3CoreOnly != 1) && m_init) {
 				int iProgram;
 				const CHdmvClipInfo::Stream *pClipInfo;
 				const program* pProgram = FindProgram(s.pid, iProgram, pClipInfo);
-				if ((type == unknown) && (pProgram != NULL) && AUDIO_STREAM_AC3_TRUE_HD == pProgram->streams[iProgram].type) {
-					const stream* source = m_streams[audio].FindStream(s.pid);
+				if ((type == stream_type::unknown) && (pProgram != NULL) && AUDIO_STREAM_AC3_TRUE_HD == pProgram->streams[iProgram].type) {
+					const stream* source = m_streams[stream_type::audio].FindStream(s.pid);
 					if (source && source->mt.subtype == MEDIASUBTYPE_DOLBY_AC3) {
-						CMpegSplitterFile::ac3hdr h;
+						ac3hdr h;
 						if (Read(h, len, &s.mt, false, (m_AC3CoreOnly == 1)) && s.mt.subtype == MEDIASUBTYPE_DOLBY_TRUEHD) {
-							m_streams[audio].Replace((stream&)*source, s, this);
+							m_streams[stream_type::audio].Replace((stream&)*source, s, this);
 						}
 					}
 				}
 			}
 		} else if (pesid == 0xfd) {
-			CMpegSplitterFile::vc1hdr h;
-			if (!m_streams[video].Find(s) && Read(h, len, &s.mt)) {
-				type = video;
+			vc1hdr h;
+			if (!m_streams[stream_type::video].Find(s) && Read(h, len, &s.mt)) {
+				type = stream_type::video;
 			}
 		} else {
 			BYTE b		= (BYTE)BitRead(8, true);
@@ -810,16 +835,16 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 			if (b >= 0x80 && b < 0x88 || w == 0x0b77) { // ac3
 				s.ps1id = (b >= 0x80 && b < 0x88) ? (BYTE)(BitRead(32) >> 24) : 0x80;
 
-				CMpegSplitterFile::ac3hdr h;
-				if (!m_streams[audio].Find(s) && Read(h, len, &s.mt)) {
-					type = audio;
+				ac3hdr h;
+				if (!m_streams[stream_type::audio].Find(s) && Read(h, len, &s.mt)) {
+					type = stream_type::audio;
 				}
 			} else if (b >= 0x88 && b < 0x90 || dw == 0x7ffe8001) { // dts
 				s.ps1id = (b >= 0x88 && b < 0x90) ? (BYTE)(BitRead(32) >> 24) : 0x88;
 
-				CMpegSplitterFile::dtshdr h;
-				if (!m_streams[audio].Find(s) && Read(h, len, &s.mt)) {
-					type = audio;
+				dtshdr h;
+				if (!m_streams[stream_type::audio].Find(s) && Read(h, len, &s.mt)) {
+					type = stream_type::audio;
 				}
 			} else if (b >= 0xa0 && b < 0xa8) { // lpcm
 				s.ps1id = (BYTE)BitRead(8);
@@ -830,10 +855,10 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 						BitRead(8); // Continuity Counter - counts from 0x00 to 0x1f and then wraps to 0x00.
 						DWORD headersize = (DWORD)BitRead(16); // LPCM_header_length
 						if (headersize >= 8 && headersize+4 < len) {
-							CMpegSplitterFile::dvdalpcmhdr h;
+							dvdalpcmhdr h;
 							if (Read(h, len-4, &s.mt)) {
 								Seek(start + 4 + headersize);
-								type = audio;
+								type = stream_type::audio;
 								break;
 							}
 						}
@@ -847,11 +872,11 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 						WORD unknown1 = (WORD)BitRead(16); // 0x0000 or 0x0400
 						if (counter <= 0x5f && headersize == 6 && (unknown1 == 0x0000 || unknown1 == 0x0400)) { // Maybe it's MLP?
 							// MLP header may be missing in the first package
-							CMpegSplitterFile::mlphdr h;
-							if (!m_streams[audio].Find(s) && Read(h, len-10, &s.mt, true)) {
+							mlphdr h;
+							if (!m_streams[stream_type::audio].Find(s) && Read(h, len-10, &s.mt, true)) {
 								// This is exactly the MLP.
 								Seek(start + 10);
-								type = audio;
+								type = stream_type::audio;
 							}
 							Seek(start + 10);
 							break; 
@@ -859,44 +884,44 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 					}
 
 					// DVD LPCM
-					if (m_streams[audio].Find(s)) {
+					if (m_streams[stream_type::audio].Find(s)) {
 						Seek(start + 7);
 					} else {
 						Seek(start + 4);
-						CMpegSplitterFile::lpcmhdr h;
+						lpcmhdr h;
 						if (Read(h, &s.mt)) {
-							type = audio;
+							type = stream_type::audio;
 						}
 					}
 				} while (false);
 			} else if (b >= 0x20 && b < 0x40) { // DVD subpic
 				s.ps1id = (BYTE)BitRead(8);
 
-				CMpegSplitterFile::dvdspuhdr h;
-				if (!m_streams[subpic].Find(s) && Read(h, &s.mt)) {
-					type = subpic;
+				dvdspuhdr h;
+				if (!m_streams[stream_type::subpic].Find(s) && Read(h, &s.mt)) {
+					type = stream_type::subpic;
 				}
 			} else if (b >= 0x70 && b < 0x80) { // SVCD subpic
 				s.ps1id = (BYTE)BitRead(8);
 
-				CMpegSplitterFile::svcdspuhdr h;
-				if (!m_streams[subpic].Find(s) && Read(h, &s.mt)) {
-					type = subpic;
+				svcdspuhdr h;
+				if (!m_streams[stream_type::subpic].Find(s) && Read(h, &s.mt)) {
+					type = stream_type::subpic;
 				}
 			} else if (b >= 0x00 && b < 0x10) { // CVD subpic
 				s.ps1id = (BYTE)BitRead(8);
 
-				CMpegSplitterFile::cvdspuhdr h;
-				if (!m_streams[subpic].Find(s) && Read(h, &s.mt)) {
-					type = subpic;
+				cvdspuhdr h;
+				if (!m_streams[stream_type::subpic].Find(s) && Read(h, &s.mt)) {
+					type = stream_type::subpic;
 				}
 			} else if (w == 0xffa0 || w == 0xffa1) { // ps2-mpg audio
 				s.ps1id = (BYTE)BitRead(8);
 				s.pid = (WORD)((BitRead(8) << 8) | BitRead(16)); // pid = 0xa000 | track id
 
-				CMpegSplitterFile::ps2audhdr h;
-				if (!m_streams[audio].Find(s) && Read(h, &s.mt)) {
-					type = audio;
+				ps2audhdr h;
+				if (!m_streams[stream_type::audio].Find(s) && Read(h, &s.mt)) {
+					type = stream_type::audio;
 				}
 			} else if (w == 0xff90) { // ps2-mpg ac3 or subtitles
 				s.ps1id = (BYTE)BitRead(8);
@@ -905,31 +930,31 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 				w = (WORD)BitRead(16, true);
 
 				if (w == 0x0b77) {
-					CMpegSplitterFile::ac3hdr h;
-					if (!m_streams[audio].Find(s) && Read(h, len, &s.mt)) {
-						type = audio;
+					ac3hdr h;
+					if (!m_streams[stream_type::audio].Find(s) && Read(h, len, &s.mt)) {
+						type = stream_type::audio;
 					}
 				} else if (w == 0x0000) { // usually zero...
-					CMpegSplitterFile::ps2subhdr h;
-					if (!m_streams[subpic].Find(s) && Read(h, &s.mt)) {
-						type = subpic;
+					ps2subhdr h;
+					if (!m_streams[stream_type::subpic].Find(s) && Read(h, &s.mt)) {
+						type = stream_type::subpic;
 					}
 				}
 			} else if (b >= 0xc0 && b < 0xcf) { // dolby digital/dolby digital +
 				s.ps1id = (BYTE)BitRead(8);
 				// skip audio header - 3-byte
 				BitRead(24);
-				CMpegSplitterFile::ac3hdr h;
-				if (!m_streams[audio].Find(s) && Read(h, len, &s.mt)) {
-					type = audio;
+				ac3hdr h;
+				if (!m_streams[stream_type::audio].Find(s) && Read(h, len, &s.mt)) {
+					type = stream_type::audio;
 				}
 			} else if (b >= 0xb0 && b < 0xbf) { // truehd
 				s.ps1id = (BYTE)BitRead(8);
 				// TrueHD audio has a 4-byte header
 				BitRead(32);
-				CMpegSplitterFile::ac3hdr h;
-				if (!m_streams[audio].Find(s) && Read(h, len, &s.mt, false, false)) {
-					type = audio;
+				ac3hdr h;
+				if (!m_streams[stream_type::audio].Find(s) && Read(h, len, &s.mt, false, false)) {
+					type = stream_type::audio;
 				}
 			}
 		}
@@ -937,7 +962,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 	} else if (pesid == 0xbf) { // private stream 2
 	}
 
-	if (type != unknown && !m_streams[type].Find(s)) {
+	if (type != stream_type::unknown && !m_streams[type].Find(s)) {
 		if (s.pid) {
 			if (!s.lang_set) {
 				CStringA lang_name;
@@ -948,14 +973,14 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 				}
 			}
 
-			for (int i = 0; i < unknown; i++) {
-				if (m_streams[i].Find(s)) {
+			for (int t = stream_type::video; t < stream_type::unknown; t++) {
+				if (m_streams[t].Find(s)) {
 					return s;
 				}
 			}
 		}
 
-		if (type == video) {
+		if (type == stream_type::video) {
 			REFERENCE_TIME rtAvgTimePerFrame = 1;
 			ExtractAvgTimePerFrame(&s.mt, rtAvgTimePerFrame);
 
@@ -1011,18 +1036,18 @@ void CMpegSplitterFile::AddHdmvPGStream(WORD pid, const char* language_code)
 	s.pesid		= 0xbd;
 
 	CMpegSplitterFile::hdmvsubhdr h;
-	if (!m_streams[subpic].Find(s) && Read(h, &s.mt, language_code)) {
-		m_streams[subpic].Insert(s, this, subpic);
+	if (!m_streams[stream_type::subpic].Find(s) && Read(h, &s.mt, language_code)) {
+		m_streams[stream_type::subpic].Insert(s, this, subpic);
 	}
 }
 
 CAtlList<CMpegSplitterFile::stream>* CMpegSplitterFile::GetMasterStream()
 {
 	return
-		!m_streams[video].IsEmpty()		? &m_streams[video] :
-		!m_streams[audio].IsEmpty()		? &m_streams[audio] :
-		!m_streams[subpic].IsEmpty()	? &m_streams[subpic] :
-		!m_streams[stereo].IsEmpty()	? &m_streams[stereo] :
+		!m_streams[stream_type::video].IsEmpty()	? &m_streams[stream_type::video]  :
+		!m_streams[stream_type::audio].IsEmpty()	? &m_streams[stream_type::audio]  :
+		!m_streams[stream_type::subpic].IsEmpty()	? &m_streams[stream_type::subpic] :
+		!m_streams[stream_type::stereo].IsEmpty()	? &m_streams[stream_type::stereo] :
 		NULL;
 }
 
@@ -1192,8 +1217,8 @@ void CMpegSplitterFile::UpdatePrograms(CGolombBuffer gb, WORD pid, bool UpdateLa
 
 					CMpegSplitterFile::hdmvsubhdr hdr;
 					if (Read(hdr, &s.mt, NULL)) {
-						if (!m_streams[subpic].Find(s)) {
-							m_streams[subpic].Insert(s, this, subpic);
+						if (!m_streams[stream_type::subpic].Find(s)) {
+							m_streams[stream_type::subpic].Insert(s, this, subpic);
 						}
 					}
 				}

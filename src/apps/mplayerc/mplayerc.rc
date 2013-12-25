@@ -2991,9 +2991,6 @@ BEGIN
     IDS_MPEGSPLITTER_SUB_ORDER      "Subtitles language order:"
     IDS_MPEGSPLITTER_TRUEHD_OUTPUT  "TrueHD+AC3 streams output"
     IDS_MPEGSPLITTER_THD_NOSPLIT    "As is"
-    IDS_MPEGSPLITTER_FAST_SEEK      "Fast(inaccurate) seek"
-    IDS_MPEGSPLITTER_WARNING        "Warning"
-    IDS_MPEGSPLITTER_WARNING_TEXT   "Enabling this option can lead to inaccurate seeking. Are you sure?"
     IDS_MPEGSPLITTER_SUB_EMPTY_PIN  "Output empty Subtitle pin"
 END
 

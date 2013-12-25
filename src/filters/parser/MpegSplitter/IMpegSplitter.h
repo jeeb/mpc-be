@@ -25,9 +25,6 @@ IMpegSplitterFilter :
 public IUnknown {
 	STDMETHOD(Apply()) = 0;
 
-	STDMETHOD(SetFastSeek(BOOL nValue)) = 0;
-	STDMETHOD_(BOOL, GetFastSeek()) = 0;
-
 	STDMETHOD(SetForcedSub(BOOL nValue)) = 0;
 	STDMETHOD_(BOOL, GetForcedSub()) = 0;
 

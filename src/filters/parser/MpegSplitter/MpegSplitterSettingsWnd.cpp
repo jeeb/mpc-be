@@ -58,9 +58,6 @@ bool CMpegSplitterSettingsWnd::OnActivate()
 	DWORD dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP;
 	CPoint p(10, 10);
 
-	m_cbFastSeek.Create(ResStr(IDS_MPEGSPLITTER_FAST_SEEK), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(305), m_fontheight)), this, IDC_PP_FAST_SEEK);
-	p.y += h20;
-
 	m_cbForcedSub.Create(ResStr(IDS_MPEGSPLITTER_SUB_FORCING), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(305), m_fontheight)), this, IDC_PP_SUBTITLE_FORCED);
 	p.y += h20;
 
@@ -88,7 +85,6 @@ bool CMpegSplitterSettingsWnd::OnActivate()
 	m_cbAsIs.Create(ResStr(IDS_MPEGSPLITTER_THD_NOSPLIT), dwStyle | BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE, CRect(p + CPoint(IPP_SCALE(200), 0), CSize(IPP_SCALE(80), m_fontheight + 2)), this, IDC_PP_ASIS);
 
 	if (m_pMSF) {
-		m_cbFastSeek.SetCheck(m_pMSF->GetFastSeek());
 		m_cbForcedSub.SetCheck(m_pMSF->GetForcedSub());
 		m_edtAudioLanguageOrder.SetWindowText(m_pMSF->GetAudioLanguageOrder());
 		m_edtSubtitlesLanguageOrder.SetWindowText(m_pMSF->GetSubtitlesLanguageOrder());
@@ -126,7 +122,6 @@ bool CMpegSplitterSettingsWnd::OnApply()
 	OnDeactivate();
 
 	if (m_pMSF) {
-		m_pMSF->SetFastSeek(m_cbFastSeek.GetCheck());
 		m_pMSF->SetForcedSub(m_cbForcedSub.GetCheck());
 		m_pMSF->SetTrueHD(m_cbTrueHD.GetCheck() ? 0 : m_cbAC3Core.GetCheck() ? 1 : 2);
 		m_pMSF->SetAlternativeDuration(m_cbAlternativeDuration.GetCheck());
@@ -146,14 +141,4 @@ bool CMpegSplitterSettingsWnd::OnApply()
 }
 
 BEGIN_MESSAGE_MAP(CMpegSplitterSettingsWnd, CInternalPropertyPageWnd)
-	ON_BN_CLICKED(IDC_PP_FAST_SEEK, OnClickedFastSeek)
 END_MESSAGE_MAP()
-
-void CMpegSplitterSettingsWnd::OnClickedFastSeek()
-{
-	if (m_cbFastSeek.GetCheck()) {
-		if (MessageBox(ResStr(IDS_MPEGSPLITTER_WARNING_TEXT), ResStr(IDS_MPEGSPLITTER_WARNING), MB_OKCANCEL | MB_ICONWARNING) == IDCANCEL) {
-			m_cbFastSeek.SetCheck(0);
-		}
-	}
-}

@@ -34,8 +34,10 @@
 class CMpegSplitterFile : public CBaseSplitterFileEx
 {
 	CAtlMap<WORD, BYTE> m_pid2pes;
-	CAtlMap<WORD, CMpegSplitterFile::avchdr> avch;
-	CAtlMap<WORD, CMpegSplitterFile::seqhdr> seqh;
+	CAtlMap<WORD, avchdr> avch;
+	CAtlMap<WORD, seqhdr> seqh;
+
+	CAtlMap<BYTE, int> pesIdCount;
 
 	template<class T>
 	class CValidStream {
@@ -57,12 +59,12 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 		BOOL IsValid() { return m_nValidStream >= 3; }
 	};
 
-	CAtlMap<WORD, CValidStream<CMpegSplitterFile::latm_aachdr>>	m_aaclatmValid;
-	CAtlMap<WORD, CValidStream<CMpegSplitterFile::aachdr>>		m_aacValid;
-	CAtlMap<WORD, CValidStream<CMpegSplitterFile::mpahdr>>		m_mpaValid;
-	CAtlMap<WORD, CValidStream<CMpegSplitterFile::ac3hdr>>		m_ac3Valid;
+	CAtlMap<WORD, CValidStream<latm_aachdr>>	m_aaclatmValid;
+	CAtlMap<WORD, CValidStream<aachdr>>		m_aacValid;
+	CAtlMap<WORD, CValidStream<mpahdr>>		m_mpaValid;
+	CAtlMap<WORD, CValidStream<ac3hdr>>		m_ac3Valid;
 
-	bool m_init;
+	BOOL m_init;
 
 	HRESULT Init(IAsyncReader* pAsyncReader);
 	void OnComplete(IAsyncReader* pAsyncReader);
@@ -215,4 +217,6 @@ public:
 	CAtlMap<DWORD, CStringA> m_pPMT_Lang;
 
 	bool GetStreamType(WORD pid, PES_STREAM_TYPE &stream_type);
+
+	BOOL bIsBadPacked;
 };

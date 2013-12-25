@@ -42,7 +42,6 @@ private :
 	CButton		m_cbAC3Core;
 	CButton		m_cbAsIs;
 
-	CButton		m_cbFastSeek;
 	CButton		m_cbSubEmptyPin;
 
 	enum {
@@ -53,7 +52,6 @@ private :
 		IDC_PP_AC3CORE,
 		IDC_PP_ASIS,
 		IDC_PP_ALTERNATIVE_DURATION,
-		IDC_PP_FAST_SEEK,
 		IDC_PP_ENABLE_SUB_EMPTY_PIN
 	};
 
@@ -70,6 +68,4 @@ public:
 	static CSize GetWindowSize() { return CSize(325, 250); }
 
 	DECLARE_MESSAGE_MAP()
-
-	afx_msg void OnClickedFastSeek();
 };
