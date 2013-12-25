@@ -37,10 +37,10 @@ enum PCI_Vendors {
 
 // Bitmasks for DXVA compatibility check
 #define DXVA_UNSUPPORTED_LEVEL			1
-#define DXVA_TOO_MANY_REF_FRAMES		2
-#define DXVA_INCOMPATIBLE_SAR			4
-#define DXVA_PROFILE_HIGHER_THAN_HIGH	8
-#define DXVA_HIGH_BIT					16
+#define DXVA_TOO_MANY_REF_FRAMES		DXVA_UNSUPPORTED_LEVEL << 1
+#define DXVA_INCOMPATIBLE_SAR			DXVA_UNSUPPORTED_LEVEL << 2
+#define DXVA_PROFILE_HIGHER_THAN_HIGH	DXVA_UNSUPPORTED_LEVEL << 3
+#define DXVA_HIGH_BIT					DXVA_UNSUPPORTED_LEVEL << 4
 
 bool			IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice);
 
@@ -72,9 +72,7 @@ HRESULT			FFMpeg2DecodeFrame(DXVA_PictureParameters* pPicParams, DXVA_QmatrixDat
 									bool* bIsField, int* b_repeat_pict);
 
 // === Common functions
-void			FFSetThreadNumber(struct AVCodecContext* pAVCtx, enum AVCodecID nCodecId, int nThreadCount);
 int				FFGetCodedPicture(struct AVCodecContext* pAVCtx);
 BOOL			FFGetAlternateScan(struct AVCodecContext* pAVCtx);
-int				FFGetThreadType(enum AVCodecID nCodecId);
 void			FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int& width, int& height);
 BOOL			DXVACheckFramesize(int width, int height, DWORD nPCIVendor, DWORD nPCIDevice);

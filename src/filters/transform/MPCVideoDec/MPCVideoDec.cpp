@@ -65,6 +65,8 @@ extern "C" {
 #define OPT_SwStandard       _T("SwStandard")
 #define OPT_SwRGBLevels      _T("SwRGBLevels")
 
+#define MAX_AUTO_THREADS 16
+
 #pragma region any_constants
 
 #ifdef REGISTER_FILTER
@@ -1609,9 +1611,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	}
 
 	int nThreadNumber = m_nThreadNumber ? m_nThreadNumber : m_pCpuId->GetProcessorNumber() * 3/2;
-	if ((nThreadNumber > 1) && FFGetThreadType(m_nCodecId)) {
-		FFSetThreadNumber(m_pAVCtx, m_nCodecId, IsDXVASupported() ? 1 : nThreadNumber);
-	}
+	m_pAVCtx->thread_count = max(1, min(nThreadNumber, MAX_AUTO_THREADS));
 
 	m_pFrame = av_frame_alloc();
 	CheckPointer(m_pFrame, E_POINTER);
@@ -2334,6 +2334,9 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			if (used_bytes == 0 && pOut_size == 0 && !bFlush) {
 				DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::SoftwareDecode() - could not process buffer, starving?"));
 				break;
+			} else if (used_bytes > 0) {
+				nSize	-= used_bytes;
+				pDataIn	+= used_bytes;
 			}
 
 			// Update start time cache
@@ -2370,12 +2373,13 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 					memcpy(m_pFFBuffer2, pOut, pOut_size);
 					memset(m_pFFBuffer2 + pOut_size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
 
-					avpkt.data	= m_pFFBuffer2;
-					avpkt.size	= pOut_size;
-					avpkt.pts	= rtStart;
+					avpkt.data		= m_pFFBuffer2;
+					avpkt.size		= pOut_size;
+					avpkt.pts		= rtStart;
+					avpkt.duration	= 0;
 				} else {
-					avpkt.data	= NULL;
-					avpkt.size	= 0;
+					avpkt.data		= NULL;
+					avpkt.size		= 0;
 				}
 
 				int ret2 = avcodec_decode_video2(m_pAVCtx, m_pFrame, &got_picture, &avpkt);
@@ -2387,23 +2391,13 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 				got_picture = 0;
 			}
 		} else {
-			used_bytes = avcodec_decode_video2(m_pAVCtx, m_pFrame, &got_picture, &avpkt);
+			used_bytes	= avcodec_decode_video2(m_pAVCtx, m_pFrame, &got_picture, &avpkt);
+			nSize		= 0;
 		}
 
 		if (used_bytes < 0) {
 			av_frame_unref(m_pFrame);
 			return S_OK;
-		}
-
-		// Comment from LAV Video code:
-		// When Frame Threading, we won't know how much data has been consumed, so it by default eats everything.
-		// In addition, if no data got consumed, and no picture was extracted, the frame probably isn't all that useufl.
-		// The MJPEB decoder is somewhat buggy and doesn't let us know how much data was consumed really...
-		if ((!m_pParser && (m_pAVCtx->active_thread_type & FF_THREAD_FRAME || (!got_picture && used_bytes == 0))) || m_nCodecId == AV_CODEC_ID_MJPEGB || bFlush) {
-			nSize = 0;
-		} else {
-			nSize   -= used_bytes;
-			pDataIn += used_bytes;
 		}
 
 		bool fWaitKeyFrame =	m_nCodecId == AV_CODEC_ID_VC1
@@ -2487,7 +2481,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 		UpdateAspectRatio();
 		if (FAILED(hr = GetDeliveryBuffer(m_pAVCtx->width, m_pAVCtx->height, &pOut, GetDuration())) || FAILED(hr = pOut->GetPointer(&pDataOut))) {
 			av_frame_unref(m_pFrame);
-			continue;//return hr;
+			continue;
 		}
 
 		pOut->SetTime(&rtStart, &rtStop);
@@ -2514,8 +2508,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 		if (pTmpFrame) {
 			m_FormatConverter.Converting(pDataOut, pTmpFrame);
 			av_frame_free(&pTmpFrame);
-		}
-		else {
+		} else {
 			m_FormatConverter.Converting(pDataOut, m_pFrame);
 		}
 
@@ -2598,9 +2591,8 @@ HRESULT CMPCVideoDecFilter::ReopenVideo()
 			m_pAVCtx->flags2 &= ~CODEC_FLAG2_SHOW_ALL;
 		}
 		int nThreadNumber = m_nThreadNumber ? m_nThreadNumber : m_pCpuId->GetProcessorNumber() * 3/2;
-		if ((nThreadNumber > 1) && FFGetThreadType(m_nCodecId)) {
-			FFSetThreadNumber(m_pAVCtx, m_nCodecId, nThreadNumber);
-		}
+		m_pAVCtx->thread_count = max(1, min(nThreadNumber, MAX_AUTO_THREADS));
+		
 		if (avcodec_open2(m_pAVCtx, m_pAVCodec, NULL) < 0) {
 			return VFW_E_INVALIDMEDIATYPE;
 		}

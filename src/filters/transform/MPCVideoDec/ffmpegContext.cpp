@@ -896,47 +896,6 @@ HRESULT FFMpeg2DecodeFrame(DXVA_PictureParameters* pPicParams, DXVA_QmatrixData*
 	return S_OK;
 }
 
-int FFGetThreadType(enum AVCodecID nCodecId)
-{
-	switch (nCodecId)
-	{
-		case AV_CODEC_ID_H264			:
-		case AV_CODEC_ID_HEVC			:
-		case AV_CODEC_ID_VP8			:
-		case AV_CODEC_ID_FFV1			:
-			return FF_THREAD_FRAME|FF_THREAD_SLICE;
-			break;
-		case AV_CODEC_ID_MPEG1VIDEO		:
-		case AV_CODEC_ID_MPEG2VIDEO		:
-		case AV_CODEC_ID_DVVIDEO		:
-		case AV_CODEC_ID_PRORES			:
-		case AV_CODEC_ID_VP6A			:
-			return FF_THREAD_SLICE;
-			break;
-		case AV_CODEC_ID_VP3			:
-		case AV_CODEC_ID_THEORA			:
-		case AV_CODEC_ID_RV30			:
-		case AV_CODEC_ID_RV40			:
-		case AV_CODEC_ID_UTVIDEO		:
-		case AV_CODEC_ID_LAGARITH		:
-		case AV_CODEC_ID_JPEG2000		:
-		case AV_CODEC_ID_PNG			:
-		case AV_CODEC_ID_DNXHD			:
-		case AV_CODEC_ID_HUFFYUV		:
-		case AV_CODEC_ID_FFVHUFF		:
-			return FF_THREAD_FRAME;
-			break;
-		default :
-			return 0;
-	}
-}
-
-void FFSetThreadNumber(struct AVCodecContext* pAVCtx, enum AVCodecID nCodecId, int nThreadCount)
-{
-	pAVCtx->thread_count	= nThreadCount;
-	pAVCtx->thread_type		= nThreadCount ? FFGetThreadType(nCodecId) : 0;
-}
-
 int FFGetCodedPicture(struct AVCodecContext* pAVCtx)
 {
 	MpegEncContext* s = GetMpegEncContext(pAVCtx);
