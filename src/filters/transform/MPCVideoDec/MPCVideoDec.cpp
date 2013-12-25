@@ -1611,7 +1611,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	}
 
 	int nThreadNumber = m_nThreadNumber ? m_nThreadNumber : m_pCpuId->GetProcessorNumber() * 3/2;
-	m_pAVCtx->thread_count = max(1, min(IsDXVASupported() ? 1 : nThreadNumber, MAX_AUTO_THREADS));
+	m_pAVCtx->thread_count = max(1, min((IsDXVASupported() || m_nCodecId == AV_CODEC_ID_MPEG4) ? 1 : nThreadNumber, MAX_AUTO_THREADS));
 
 	m_pFrame = av_frame_alloc();
 	CheckPointer(m_pFrame, E_POINTER);
@@ -2591,7 +2591,7 @@ HRESULT CMPCVideoDecFilter::ReopenVideo()
 			m_pAVCtx->flags2 &= ~CODEC_FLAG2_SHOW_ALL;
 		}
 		int nThreadNumber = m_nThreadNumber ? m_nThreadNumber : m_pCpuId->GetProcessorNumber() * 3/2;
-		m_pAVCtx->thread_count = max(1, min(nThreadNumber, MAX_AUTO_THREADS));
+		m_pAVCtx->thread_count = max(1, min(m_nCodecId == AV_CODEC_ID_MPEG4 ? 1 : nThreadNumber, MAX_AUTO_THREADS));
 		
 		if (avcodec_open2(m_pAVCtx, m_pAVCodec, NULL) < 0) {
 			return VFW_E_INVALIDMEDIATYPE;
