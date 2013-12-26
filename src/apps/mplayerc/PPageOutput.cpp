@@ -171,15 +171,7 @@ BOOL CPPageOutput::OnInitDialog()
 			pPB->Read(CComBSTR(_T("FriendlyName")), &var, NULL);
 
 			fstr = var.bstrVal;
-
 			var.Clear();
-			if (SUCCEEDED(pPB->Read(CComBSTR(_T("FilterData")), &var, NULL))) {
-				BSTR* pbstr;
-				if (SUCCEEDED(SafeArrayAccessData(var.parray, (void**)&pbstr))) {
-					fstr.Format(_T("%s (%08x)"), CString(fstr), *((DWORD*)pbstr + 1));
-					SafeArrayUnaccessData(var.parray);
-				}
-			}
 		} else {
 			fstr = str;
 		}
