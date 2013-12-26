@@ -1205,6 +1205,16 @@ bool CMpegSplitterFilter::DemuxInit()
 	return true;
 }
 
+#define SimpleSeek														\
+	REFERENCE_TIME rtPTS = m_pFile->NextPTS(pMasterStream->GetHead());	\
+	if (rtPTS != INVALID_TIME) {										\
+		m_rtStartOffset = m_pFile->m_rtMin + rtPTS - rt;				\
+	}																	\
+	if (m_rtStartOffset > m_pFile->m_rtMax)  {							\
+		m_rtStartOffset = 0;											\
+	}																	\
+
+
 void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
 	CAtlList<CMpegSplitterFile::stream>* pMasterStream = m_pFile->GetMasterStream();
@@ -1222,6 +1232,9 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 	if (rt <= UNITS || m_rtDuration <= 0) {
 		m_pFile->Seek(0);
+		if (m_rtDuration && m_pFile->bIsBadPacked) {
+			SimpleSeek;
+		}
 	} else {
 		__int64 pos = SeekBD(rt);
 		if (pos >= 0) {
@@ -1317,18 +1330,12 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 			seekpos			= minseekpos;
 			m_rtStartOffset	= 0;
 		} else {
-			// simply seek by bitrate
+			// simple seek by bitrate
 
 			seekpos	= (__int64)(1.0*rt/m_rtDuration*len);
 			m_pFile->Seek(seekpos);
-			REFERENCE_TIME rtPTS = m_pFile->NextPTS(pMasterStream->GetHead());
-			if (rtPTS != INVALID_TIME) {
-				m_rtStartOffset = m_pFile->m_rtMin + rtPTS - rt;
-			}
 
-			if (m_rtStartOffset > m_pFile->m_rtMax)  {
-				m_rtStartOffset = 0;
-			}
+			SimpleSeek;
 		}
 
 		m_pFile->Seek(seekpos);
