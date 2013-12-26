@@ -2670,7 +2670,7 @@ void CMPCVideoDecFilter::UpdateAspectRatio()
 			if (!bSetAR && (m_nARX && m_nARY)) {
 				CSize aspect(m_nARX, m_nARY);
 				ReduceDim(aspect);
-				SetAspect(aspect);			
+				SetAspect(aspect);
 			}
 		}
 
@@ -3404,11 +3404,11 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 		}
 		break;
 	case INFO_FrameSize:
-		if (m_pAVCtx) {
-			int sarx = m_pAVCtx->width * m_nARY;
-			int sary = m_pAVCtx->height * m_nARX;
+		if (m_w && m_h) {
+			int sarx = m_w * m_ary;
+			int sary = m_h * m_arx;
 			ReduceDim(sarx, sary);
-			infostr.Format(_T("%dx%d, SAR %d:%d, DAR %d:%d"), m_pAVCtx->width, m_pAVCtx->height, sarx, sary, m_nARX, m_nARY);
+			infostr.Format(_T("%dx%d, SAR %d:%d, DAR %d:%d"), m_w, m_h, sarx, sary, m_arx, m_ary);
 		}
 		break;
 	case INFO_OutputFormat:
