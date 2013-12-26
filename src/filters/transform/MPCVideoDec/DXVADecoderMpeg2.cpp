@@ -246,8 +246,6 @@ void CDXVADecoderMpeg2::Flush()
 	m_wRefPictureIndex[0]	= NO_REF_FRAME;
 	m_wRefPictureIndex[1]	= NO_REF_FRAME;
 
-	m_rtLastStart			= 0;
-
 	ResetBuffer();
 
 	__super::Flush();
@@ -266,26 +264,10 @@ int CDXVADecoderMpeg2::FindOldestFrame()
 	}
 
 	if (nPos != -1) {
-		UpdateFrameTime(m_pPictureStore[nPos].rtStart, m_pPictureStore[nPos].rtStop);
+		m_pFilter->UpdateFrameTime(m_pPictureStore[nPos].rtStart, m_pPictureStore[nPos].rtStop);
 	}
 
 	return nPos;
-}
-
-void CDXVADecoderMpeg2::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
-{
-	if (m_rtLastStart && (rtStart == INVALID_TIME || (rtStart < m_rtLastStart))) {
-		rtStart = m_rtLastStart;
-	}
-
-	if (rtStart == INVALID_TIME) {
-		rtStart = m_rtLastStart;
-	}
-
-	REFERENCE_TIME AvgTimePerFrame = m_pFilter->GetDuration() * (m_pFilter->GetFrame()->repeat_pict ? 3 : 2) / 2;
-	
-	rtStop			= rtStart + (AvgTimePerFrame / m_pFilter->GetRate());
-	m_rtLastStart	= rtStop;
 }
 
 bool CDXVADecoderMpeg2::FindPicture(int nIndex, int nStartCode)

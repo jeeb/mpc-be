@@ -59,14 +59,11 @@ private:
 
 	int						m_nNextCodecIndex;
 
-	REFERENCE_TIME			m_rtLastStart;
-
 	bool 					m_bFrame_repeat_pict;
 
 	// Private functions
 	void					Init();
 	void					UpdatePictureParams(int nSurfaceIndex);
-	void					UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
 
 protected:
 	BYTE*			m_pMPEG2Buffer;
