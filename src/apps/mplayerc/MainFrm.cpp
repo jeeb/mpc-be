@@ -2938,10 +2938,10 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 				}
 				break;
 			case EC_ERRORABORT:
-				TRACE(_T("\thr = %08x\n"), (HRESULT)evParam1);
+				DbgLog((LOG_TRACE, 3, L"\thr = %08x", (HRESULT)evParam1));
 				break;
 			case EC_BUFFERING_DATA:
-				TRACE(_T("\t%d, %d\n"), (HRESULT)evParam1, evParam2);
+				DbgLog((LOG_TRACE, 3, L"\t%d, %d", evParam1, evParam2));
 
 				m_fBuffering = ((HRESULT)evParam1 != S_OK);
 				break;
@@ -3206,7 +3206,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 				break;
 			case EC_DVD_ERROR:
 				if (m_pDVDC) {
-					TRACE(_T("\t%d %d\n"), evParam1, evParam2);
+					DbgLog((LOG_TRACE, 3, L"\t%d, %d", evParam1, evParam2));
 
 					CString err;
 
@@ -3245,11 +3245,11 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 				break;
 			case EC_DVD_WARNING:
 				if (m_pDVDC) {
-					TRACE(_T("\t%d %d\n"), evParam1, evParam2);
+					DbgLog((LOG_TRACE, 3, L"\t%d, %d", evParam1, evParam2));
 				}
 				break;
 			case EC_VIDEO_SIZE_CHANGED: {
-				TRACE(_T("\t%dx%d\n"), CSize(evParam1));
+				DbgLog((LOG_TRACE, 3, L"\t%dx%d", CSize(evParam1)));
 
 				WINDOWPLACEMENT wp;
 				wp.length = sizeof(wp);
@@ -3284,7 +3284,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 			case EC_BG_ERROR:
 				if (m_fCustomGraph) {
 					SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
-					m_closingmsg = !str.IsEmpty() ? str : _T("Unspecified graph error");
+					m_closingmsg = !str.IsEmpty() ? str : L"Unspecified graph error";
 					m_wndPlaylistBar.SetCurValid(false);
 					return hr;
 				}
@@ -3303,7 +3303,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 	return hr;
 }
 
-LRESULT CMainFrame::OnResetDevice( WPARAM wParam, LPARAM lParam )
+LRESULT CMainFrame::OnResetDevice(WPARAM wParam, LPARAM lParam)
 {
 	OAFilterState fs = State_Stopped;
 	m_pMC->GetState(0, &fs);

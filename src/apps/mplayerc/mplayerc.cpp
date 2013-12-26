@@ -774,7 +774,7 @@ NTSTATUS (* Real_NtQueryInformationProcess) (HANDLE				ProcessHandle,
 
 BOOL WINAPI Mine_IsDebuggerPresent()
 {
-	TRACE(_T("Oops, somebody was trying to be naughty! (called IsDebuggerPresent)\n"));
+	DbgLog((LOG_TRACE, 3, L"Oops, somebody was trying to be naughty! (called IsDebuggerPresent)"));
 	return FALSE;
 }
 
@@ -811,11 +811,11 @@ LONG WINAPI Mine_ChangeDisplaySettingsEx(LONG ret, DWORD dwFlags, LPVOID lParam)
 			if (vp->dwCommand == VP_COMMAND_GET) {
 				if ((vp->dwTVStandard&VP_TV_STANDARD_WIN_VGA)
 						&& vp->dwTVStandard != VP_TV_STANDARD_WIN_VGA) {
-					TRACE(_T("Ooops, tv-out enabled? macrovision checks suck..."));
+					DbgLog((LOG_TRACE, 3, L"Ooops, tv-out enabled? macrovision checks suck..."));
 					vp->dwTVStandard = VP_TV_STANDARD_WIN_VGA;
 				}
 			} else if (vp->dwCommand == VP_COMMAND_SET) {
-				TRACE(_T("Ooops, as I already told ya, no need for any macrovision bs here"));
+				DbgLog((LOG_TRACE, 3, L"Ooops, as I already told ya, no need for any macrovision bs here"));
 				return 0;
 			}
 		}
@@ -957,16 +957,14 @@ BOOL SetHeapOptions()
 BOOL CMPlayerCApp::InitInstance()
 {
 	// Remove the working directory from the search path to work around the DLL preloading vulnerability
-	SetDllDirectory(_T(""));
+	SetDllDirectory(L"");
 
 	long lError;
 
 	if (SetHeapOptions()) {
-		TRACE(_T("Terminate on corruption enabled\n"));
+		DbgLog((LOG_TRACE, 3, L"Terminate on corruption enabled"));
 	} else {
-		CString heap_err;
-		heap_err.Format(_T("Terminate on corruption error = %d\n"), GetLastError());
-		TRACE(heap_err);
+		DbgLog((LOG_TRACE, 3, L"Terminate on corruption error = %d", GetLastError()));
 	}
 
 	DetourRestoreAfterWith();
@@ -1292,7 +1290,7 @@ BOOL CMPlayerCApp::InitInstance()
 			ULONG IoPriority = 3;
 			ULONG ProcessIoPriority = 0x21;
 			NTSTATUS NtStatus = NtSetInformationProcess(GetCurrentProcess(), ProcessIoPriority, &IoPriority, sizeof(ULONG));
-			TRACE(_T("Set I/O Priority - %d\n"), NtStatus);
+			DbgLog((LOG_TRACE, 3, L"Set I/O Priority - %d", NtStatus));
 		}
 
 		FreeLibrary( hNTDLL );
