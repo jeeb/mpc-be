@@ -2071,6 +2071,7 @@ static void decode_postinit(H264Context *h, int setup_finished)
     if (h->sps.pic_struct_present_flag) {
         switch (h->sei_pic_struct) {
         case SEI_PIC_STRUCT_FRAME:
+            cur->f.interlaced_frame = FIELD_OR_MBAFF_PICTURE(h);
             break;
         case SEI_PIC_STRUCT_TOP_FIELD:
         case SEI_PIC_STRUCT_BOTTOM_FIELD:
@@ -3299,17 +3300,13 @@ static enum AVPixelFormat get_pixel_format(H264Context *h, int force_callback)
             } else if (h->avctx->colorspace == AVCOL_SPC_YCGCO) {
                 av_log(h->avctx, AV_LOG_WARNING, "Detected unsupported YCgCo colorspace.\n");
             }
-            return h->avctx->color_range == AVCOL_RANGE_JPEG ? AV_PIX_FMT_YUVJ444P
-                                                                : AV_PIX_FMT_YUV444P;
+            return AV_PIX_FMT_YUV444P;
         } else if (CHROMA422(h)) {
-            return h->avctx->color_range == AVCOL_RANGE_JPEG ? AV_PIX_FMT_YUVJ422P
-                                                             : AV_PIX_FMT_YUV422P;
+            return AV_PIX_FMT_YUV422P;
         } else {
             int i;
             const enum AVPixelFormat * fmt = h->avctx->codec->pix_fmts ?
                                         h->avctx->codec->pix_fmts :
-                                        h->avctx->color_range == AVCOL_RANGE_JPEG ?
-                                        h264_hwaccel_pixfmt_list_jpeg_420 :
                                         h264_hwaccel_pixfmt_list_420;
 
             for (i=0; fmt[i] != AV_PIX_FMT_NONE; i++)
@@ -3629,9 +3626,7 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
                      || 16*h->sps.mb_height * (2 - h->sps.frame_mbs_only_flag) != h->avctx->coded_height
                      || h->avctx->bits_per_raw_sample != h->sps.bit_depth_luma
                      || h->cur_chroma_format_idc != h->sps.chroma_format_idc
-                     // ==> Start patch MPC
-                     /*|| av_cmp_q(h->sps.sar, h->avctx->sample_aspect_ratio)))*/
-                     // ==> End patch MPC
+                     || av_cmp_q(h->sps.sar, h->avctx->sample_aspect_ratio)
                      || h->mb_width  != h->sps.mb_width
                      || h->mb_height != h->sps.mb_height * (2 - h->sps.frame_mbs_only_flag)
                     ));
@@ -3709,11 +3704,6 @@ static int decode_slice_header(H264Context *h, H264Context *h0)
             return ret;
         }
     }
-
-    // ==> Start patch MPC
-    h->avctx->sample_aspect_ratio= h->sps.sar;
-    av_assert0(h->avctx->sample_aspect_ratio.den);
-    // ==> End patch MPC
 
     if (h == h0 && h->dequant_coeff_pps != pps_id) {
         h->dequant_coeff_pps = pps_id;
@@ -4583,9 +4573,7 @@ static void decode_finish_row(H264Context *h)
 
     ff_h264_draw_horiz_band(h, top, height);
 
-    // ==> Start patch MPC
-    if (h->droppable)
-    // <== End patch MPC
+    if (h->droppable || h->er.error_occurred)
         return;
 
     ff_thread_report_progress(&h->cur_pic_ptr->tf, top + height - 1,
@@ -4615,8 +4603,6 @@ static int decode_slice(struct AVCodecContext *avctx, void *arg)
                     avctx->codec_id != AV_CODEC_ID_H264 ||
                     (CONFIG_GRAY && (h->flags & CODEC_FLAG_GRAY));
 
-    // ==> Start patch MPC
-    /*
     if (!(h->avctx->active_thread_type & FF_THREAD_SLICE) && h->picture_structure == PICT_FRAME && h->er.error_status_table) {
         const int start_i  = av_clip(h->resync_mb_x + h->resync_mb_y * h->mb_width, 0, h->mb_num - 1);
         if (start_i) {
@@ -4626,8 +4612,6 @@ static int decode_slice(struct AVCodecContext *avctx, void *arg)
                 h->er.error_occurred = 1;
         }
     }
-    */
-    // <== End patch MPC
 
     if (h->pps.cabac) {
         /* realign */
