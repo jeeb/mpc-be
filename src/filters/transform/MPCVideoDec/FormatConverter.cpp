@@ -468,8 +468,6 @@ void CFormatConverter::Cleanup()
 		sws_freeContext(m_pSwsContext);
 		m_pSwsContext = NULL;
 	}
-	if (m_pAlignedBuffer) {
-		av_freep(&m_pAlignedBuffer);
-	}
+	av_freep(&m_pAlignedBuffer);
 	m_nAlignedBufferSize = 0;
 }

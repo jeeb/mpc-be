@@ -1338,38 +1338,25 @@ void CMPCVideoDecFilter::Cleanup()
 void CMPCVideoDecFilter::ffmpegCleanup()
 {
 	// Release FFMpeg
+	m_pAVCodec = NULL;
+
 	if (m_pParser) {
 		av_parser_close(m_pParser);
+		m_pParser = NULL;
 	}
 
 	if (m_pAVCtx) {
 		avcodec_close(m_pAVCtx);
-		if (m_pAVCtx->extradata) {
-			av_freep(&m_pAVCtx->extradata);
-		}
+		av_freep(&m_pAVCtx->extradata);
 		av_freep(&m_pAVCtx);
 	}
 
-	if (m_pFFBuffer) {
-		av_freep(&m_pFFBuffer);
-	}
-	if (m_pFFBuffer2) {
-		av_freep(&m_pFFBuffer2);
-	}
+	av_frame_free(&m_pFrame);
 
-	if (m_pFrame) {
-		av_frame_free(&m_pFrame);
-	}
-
-	m_pAVCodec		= NULL;
-	m_pAVCtx		= NULL;
-	m_pFrame		= NULL;
-	m_pParser		= NULL;
-	
-	m_pFFBuffer				= NULL;
-	m_nFFBufferSize			= 0;
-	m_pFFBuffer2			= NULL;
-	m_nFFBufferSize2		= 0;
+	av_freep(&m_pFFBuffer);
+	m_nFFBufferSize = 0;
+	av_freep(&m_pFFBuffer2);
+	m_nFFBufferSize2 = 0;
 
 	m_FormatConverter.Cleanup();
 	
@@ -2113,7 +2100,7 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 	}
 
 	if (m_pDXVADecoder) {
-		m_pDXVADecoder->NewSegment();
+		m_pDXVADecoder->Flush();
 	}
 	
 	memset(&m_BFrames, 0, sizeof(m_BFrames));

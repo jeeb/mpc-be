@@ -50,25 +50,22 @@ CDXVADecoderMpeg2::CDXVADecoderMpeg2(CMPCVideoDecFilter* pFilter, IDirectXVideoD
 CDXVADecoderMpeg2::~CDXVADecoderMpeg2(void)
 {
 	DbgLog((LOG_TRACE, 3, L"CDXVADecoderMpeg2::Destroy()"));
-	NewSegment();
 }
 
 void CDXVADecoderMpeg2::Init()
 {
 	DbgLog((LOG_TRACE, 3, L"CDXVADecoderMpeg2::Init()"));
 
-	memset (&m_PictureParams,	0, sizeof(m_PictureParams));
-	memset (&m_SliceInfo,		0, sizeof(m_SliceInfo));
-	memset (&m_QMatrixData,		0, sizeof(m_QMatrixData));
+	memset(&m_PictureParams, 0, sizeof(m_PictureParams));
+	memset(&m_SliceInfo, 0, sizeof(m_SliceInfo));
+	memset(&m_QMatrixData, 0, sizeof(m_QMatrixData));
 
-	m_PictureParams.bMacroblockWidthMinus1			= 15;	// This is equal to "15" for MPEG-1, MPEG-2, H.263, and MPEG-4
-	m_PictureParams.bMacroblockHeightMinus1			= 15;	// This is equal to "15" for MPEG-1, MPEG-2, H.261, H.263, and MPEG-4
-	m_PictureParams.bBlockWidthMinus1				= 7;	// This is equal to "7" for MPEG-1, MPEG-2, H.261, H.263, and MPEG-4
-	m_PictureParams.bBlockHeightMinus1				= 7;	// This is equal to "7" for MPEG-1, MPEG-2, H.261, H.263, and MPEG-4
-	m_PictureParams.bBPPminus1						= 7;	// It is equal to "7" for MPEG-1, MPEG-2, H.261, and H.263
-
-	m_PictureParams.bChromaFormat					= 0x01;	// For MPEG-1, MPEG-2 "Main Profile," H.261 and H.263 bitstreams, this value shall always be set to "01", indicating "4:2:0" format
-
+	m_PictureParams.bMacroblockWidthMinus1	= 15;
+	m_PictureParams.bMacroblockHeightMinus1	= 15;
+	m_PictureParams.bBlockWidthMinus1		= 7;
+	m_PictureParams.bBlockHeightMinus1		= 7;
+	m_PictureParams.bBPPminus1				= 7;
+	m_PictureParams.bChromaFormat			= 1;
 
 	m_nMaxWaiting			= 5;
 	m_wRefPictureIndex[0]	= NO_REF_FRAME;
@@ -83,20 +80,19 @@ void CDXVADecoderMpeg2::Init()
 			ASSERT(FALSE);
 	}
 
-	m_pMPEG2Buffer			= NULL;
-	m_nMPEG2BufferSize		= 0;
+	m_pMPEG2Buffer = NULL;
 
-	NewSegment();
+	Flush();
 }
 
 HRESULT CDXVADecoderMpeg2::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
 	TRACE_MPEG2 ("CDXVADecoderMpeg2::DecodeFrame() : %d\n", nSize);
 
-	AppendBuffer (pDataIn, nSize, rtStart, rtStop);
+	AppendBuffer(pDataIn, nSize, rtStart, rtStop);
 	HRESULT hr = S_OK;
 
-	while (FindPicture (max (m_nMPEG2BufferPos-int(nSize)-4, 0), 0x00)) {
+	while (FindPicture(max(m_nMPEG2BufferPos - int(nSize) - 4, 0), 0x00)) {
 		if (m_MPEG2BufferTime[0].nBuffPos != INT_MIN && m_MPEG2BufferTime[0].nBuffPos < m_nMPEG2PicEnd) {
 			rtStart = m_MPEG2BufferTime[0].rtStart;
 			rtStop  = m_MPEG2BufferTime[0].rtStop;
@@ -117,9 +113,9 @@ static CString FrameType(bool bIsField, BYTE bSecondField)
 {
 	CString str;
 	if (bIsField) {
-		str.Format(_T("Field [%d]"), bSecondField);
+		str.Format(L"Field [%d]", bSecondField);
 	} else {
-		str = _T("Frame");
+		str = L"Frame";
 	}
 
 	return str;
@@ -129,9 +125,9 @@ HRESULT CDXVADecoderMpeg2::DecodeFrameInternal(BYTE* pDataIn, UINT nSize, REFERE
 {
 	HRESULT					hr					= S_FALSE;
 	int						nSurfaceIndex		= -1;
-	CComPtr<IMediaSample>	pSampleToDeliver;
 	bool					bIsField			= false;
 	int						bFrame_repeat_pict	= 0;
+	CComPtr<IMediaSample>	pSampleToDeliver;
 
 	CHECK_HR_FALSE (FFMpeg2DecodeFrame(&m_PictureParams, &m_QMatrixData, m_SliceInfo,
 									   m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), pDataIn, nSize,
@@ -140,7 +136,7 @@ HRESULT CDXVADecoderMpeg2::DecodeFrameInternal(BYTE* pDataIn, UINT nSize, REFERE
 
 	// Wait I frame after a flush
 	if (m_bFlushed && (!m_PictureParams.bPicIntra || (bIsField && m_PictureParams.bSecondField))) {
-		TRACE_MPEG2 ("CDXVADecoderMpeg2::DecodeFrame() : Flush - wait I frame, %ws\n", FrameType(bIsField, m_PictureParams.bSecondField));
+		TRACE_MPEG2 ("CDXVADecoderMpeg2::DecodeFrame() : Flush - wait I frame, %s\n", FrameType(bIsField, m_PictureParams.bSecondField));
 		return S_FALSE;
 	}
 
@@ -235,7 +231,7 @@ void CDXVADecoderMpeg2::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nS
 		pBuffer++;
 		nSize--;
 
-		if (nSize <= 0) {
+		if (nSize == 0) {
 			return;
 		}
 	}
@@ -245,22 +241,17 @@ void CDXVADecoderMpeg2::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nS
 
 void CDXVADecoderMpeg2::Flush()
 {
-	m_nNextCodecIndex = INT_MIN;
+	m_nNextCodecIndex		= INT_MIN;
 
 	m_wRefPictureIndex[0]	= NO_REF_FRAME;
 	m_wRefPictureIndex[1]	= NO_REF_FRAME;
 
 	m_rtLastStart			= 0;
 
+	ResetBuffer();
+
 	__super::Flush();
 }
-
-void CDXVADecoderMpeg2::NewSegment()
-{
-	Flush();
-	ResetBuffer();
-}
-
 
 int CDXVADecoderMpeg2::FindOldestFrame()
 {
@@ -299,22 +290,21 @@ void CDXVADecoderMpeg2::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME&
 
 bool CDXVADecoderMpeg2::FindPicture(int nIndex, int nStartCode)
 {
-	DWORD dw = 0;
-
 	CheckPointer(m_pMPEG2Buffer, false);
 
-	for (int i = 0; i < m_nMPEG2BufferPos-nIndex; i++) {
-		dw = (dw<<8) + m_pMPEG2Buffer[i+nIndex];
+	DWORD dw = 0;
+	for (int i = 0; i < m_nMPEG2BufferPos - nIndex; i++) {
+		dw = (dw << 8) + m_pMPEG2Buffer[i + nIndex];
 		if (i >= 4) {
 			if (m_nMPEG2PicEnd == INT_MIN) {
-				if ( (dw & 0xffffff00) == 0x00000100 &&
-						(dw & 0x000000FF) == (DWORD)nStartCode ) {
-					m_nMPEG2PicEnd = i+nIndex-3;
+				if ((dw & 0xffffff00) == 0x00000100 &&
+						(dw & 0x000000FF) == (DWORD)nStartCode) {
+					m_nMPEG2PicEnd = i + nIndex - 3;
 				}
 			} else {
-				if ( (dw & 0xffffff00) == 0x00000100 &&
-						((dw & 0x000000FF) == (DWORD)nStartCode || (dw & 0x000000FF) == 0xB3 )) {
-					m_nMPEG2PicEnd = i+nIndex-3;
+				if ((dw & 0xffffff00) == 0x00000100 &&
+						((dw & 0x000000FF) == (DWORD)nStartCode || (dw & 0x000000FF) == 0xB3)) {
+					m_nMPEG2PicEnd = i + nIndex - 3;
 					return true;
 				}
 			}
@@ -381,14 +371,11 @@ void CDXVADecoderMpeg2::PushBufferTime(int nPos, REFERENCE_TIME& rtStart, REFERE
 
 void CDXVADecoderMpeg2::ResetBuffer()
 {
-	TRACE_MPEG2 ("CDXVADecoder::ResetBuffer()\n");
+	TRACE_MPEG2 ("CDXVADecoderMpeg2::ResetBuffer()\n");
 
-	if (m_pMPEG2Buffer) {
-		av_freep(&m_pMPEG2Buffer);
-	}
-	m_pMPEG2Buffer		= NULL;
+	av_freep(&m_pMPEG2Buffer);
+	
 	m_nMPEG2BufferSize	= 0;
-
 	m_nMPEG2BufferPos	= 0;
 	m_nMPEG2PicEnd		= INT_MIN;
 
@@ -403,7 +390,7 @@ bool CDXVADecoderMpeg2::ShrinkBuffer()
 {
 	CheckPointer(m_pMPEG2Buffer, false);
 
-	int nRemaining = m_nMPEG2BufferPos-m_nMPEG2PicEnd;
+	int nRemaining = m_nMPEG2BufferPos - m_nMPEG2PicEnd;
 
 	PopBufferTime(m_nMPEG2PicEnd);
 	memcpy_sse(m_pMPEG2Buffer, m_pMPEG2Buffer + m_nMPEG2PicEnd, nRemaining);

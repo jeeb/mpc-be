@@ -115,11 +115,6 @@ void CDXVADecoder::Flush()
 	m_pFieldSample		= NULL;
 }
 
-void CDXVADecoder::NewSegment()
-{
-	Flush();
-}
-
 HRESULT CDXVADecoder::ConfigureDXVA1()
 {
 	HRESULT						hr = S_FALSE;
