@@ -295,6 +295,52 @@ static int set_string_color(void *obj, const AVOption *o, const char *val, uint8
     return 0;
 }
 
+static int set_string_fmt(void *obj, const AVOption *o, const char *val, uint8_t *dst,
+                          int fmt_nb, int ((*get_fmt)(const char *)), const char *desc)
+{
+    int fmt, min, max;
+
+    if (!val || !strcmp(val, "none")) {
+        fmt = -1;
+    } else {
+        fmt = get_fmt(val);
+        if (fmt == -1) {
+            char *tail;
+            fmt = strtol(val, &tail, 0);
+            if (*tail || (unsigned)fmt >= fmt_nb) {
+                av_log(obj, AV_LOG_ERROR,
+                       "Unable to parse option value \"%s\" as %s\n", val, desc);
+                return AVERROR(EINVAL);
+            }
+        }
+    }
+
+    min = FFMAX(o->min, -1);
+    max = FFMIN(o->max, fmt_nb-1);
+
+    if (fmt < min || fmt > max) {
+        av_log(obj, AV_LOG_ERROR,
+               "Value %d for parameter '%s' out of %s format range [%d - %d]\n",
+               fmt, o->name, desc, min, max);
+        return AVERROR(ERANGE);
+    }
+
+    *(int *)dst = fmt;
+    return 0;
+}
+
+static int set_string_pixel_fmt(void *obj, const AVOption *o, const char *val, uint8_t *dst)
+{
+    return set_string_fmt(obj, o, val, dst,
+                          AV_PIX_FMT_NB, av_get_pix_fmt, "pixel format");
+}
+
+static int set_string_sample_fmt(void *obj, const AVOption *o, const char *val, uint8_t *dst)
+{
+    return set_string_fmt(obj, o, val, dst,
+                          AV_SAMPLE_FMT_NB, av_get_sample_fmt, "sample format");
+}
+
 #if FF_API_OLD_AVOPTIONS
 int av_set_string3(void *obj, const char *name, const char *val, int alloc, const AVOption **o_out)
 {
@@ -331,38 +377,8 @@ int av_opt_set(void *obj, const char *name, const char *val, int search_flags)
     case AV_OPT_TYPE_RATIONAL: return set_string_number(obj, target_obj, o, val, dst);
     case AV_OPT_TYPE_IMAGE_SIZE: return set_string_image_size(obj, o, val, dst);
     case AV_OPT_TYPE_VIDEO_RATE: return set_string_video_rate(obj, o, val, dst);
-    case AV_OPT_TYPE_PIXEL_FMT:
-        if (!val || !strcmp(val, "none")) {
-            ret = AV_PIX_FMT_NONE;
-        } else {
-            ret = av_get_pix_fmt(val);
-            if (ret == AV_PIX_FMT_NONE) {
-                char *tail;
-                ret = strtol(val, &tail, 0);
-                if (*tail || (unsigned)ret >= AV_PIX_FMT_NB) {
-                    av_log(obj, AV_LOG_ERROR, "Unable to parse option value \"%s\" as pixel format\n", val);
-                    return AVERROR(EINVAL);
-                }
-            }
-        }
-        *(enum AVPixelFormat *)dst = ret;
-        return 0;
-    case AV_OPT_TYPE_SAMPLE_FMT:
-        if (!val || !strcmp(val, "none")) {
-            ret = AV_SAMPLE_FMT_NONE;
-        } else {
-            ret = av_get_sample_fmt(val);
-            if (ret == AV_SAMPLE_FMT_NONE) {
-                char *tail;
-                ret = strtol(val, &tail, 0);
-                if (*tail || (unsigned)ret >= AV_SAMPLE_FMT_NB) {
-                    av_log(obj, AV_LOG_ERROR, "Unable to parse option value \"%s\" as sample format\n", val);
-                    return AVERROR(EINVAL);
-                }
-            }
-        }
-        *(enum AVSampleFormat *)dst = ret;
-        return 0;
+    case AV_OPT_TYPE_PIXEL_FMT:  return set_string_pixel_fmt(obj, o, val, dst);
+    case AV_OPT_TYPE_SAMPLE_FMT: return set_string_sample_fmt(obj, o, val, dst);
     case AV_OPT_TYPE_DURATION:
         if (!val) {
             *(int64_t *)dst = 0;
@@ -559,8 +575,8 @@ static int set_format(void *obj, const char *name, int fmt, int search_flags,
     } else
 #endif
     {
-        min = FFMIN(o->min, -1);
-        max = FFMAX(o->max, nb_fmts-1);
+        min = FFMAX(o->min, -1);
+        max = FFMIN(o->max, nb_fmts-1);
     }
     if (fmt < min || fmt > max) {
         av_log(obj, AV_LOG_ERROR,
@@ -1584,8 +1600,8 @@ static const AVOption test_options[]= {
 {"lame",     "set lame flag ", 0,                AV_OPT_TYPE_CONST,    {.i64 = TEST_FLAG_LAME}, INT_MIN,  INT_MAX, 0, "flags" },
 {"mu",       "set mu flag ",   0,                AV_OPT_TYPE_CONST,    {.i64 = TEST_FLAG_MU},   INT_MIN,  INT_MAX, 0, "flags" },
 {"size",     "set size",       OFFSET(w),        AV_OPT_TYPE_IMAGE_SIZE,{0},             0,        0                   },
-{"pix_fmt",  "set pixfmt",     OFFSET(pix_fmt),  AV_OPT_TYPE_PIXEL_FMT, {.i64 = AV_PIX_FMT_NONE}, -1, AV_PIX_FMT_NB-1},
-{"sample_fmt", "set samplefmt", OFFSET(sample_fmt), AV_OPT_TYPE_SAMPLE_FMT, {.i64 = AV_SAMPLE_FMT_NONE}, -1, AV_SAMPLE_FMT_NB-1},
+{"pix_fmt",  "set pixfmt",     OFFSET(pix_fmt),  AV_OPT_TYPE_PIXEL_FMT, {.i64 = AV_PIX_FMT_NONE}, -1, INT_MAX},
+{"sample_fmt", "set samplefmt", OFFSET(sample_fmt), AV_OPT_TYPE_SAMPLE_FMT, {.i64 = AV_SAMPLE_FMT_NONE}, -1, INT_MAX},
 {"video_rate", "set videorate", OFFSET(video_rate), AV_OPT_TYPE_VIDEO_RATE,  {.str = "25"}, 0,     0                   },
 {"duration", "set duration",   OFFSET(duration), AV_OPT_TYPE_DURATION, {.i64 = 0}, 0, INT64_MAX},
 {"color", "set color",   OFFSET(color), AV_OPT_TYPE_COLOR, {.str = "pink"}, 0, 0},

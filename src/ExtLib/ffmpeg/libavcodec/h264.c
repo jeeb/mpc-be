@@ -2071,7 +2071,9 @@ static void decode_postinit(H264Context *h, int setup_finished)
     if (h->sps.pic_struct_present_flag) {
         switch (h->sei_pic_struct) {
         case SEI_PIC_STRUCT_FRAME:
+// ==> Start patch MPC
             cur->f.interlaced_frame = FIELD_OR_MBAFF_PICTURE(h);
+// <== End patch MPC
             break;
         case SEI_PIC_STRUCT_TOP_FIELD:
         case SEI_PIC_STRUCT_BOTTOM_FIELD:
@@ -3300,13 +3302,31 @@ static enum AVPixelFormat get_pixel_format(H264Context *h, int force_callback)
             } else if (h->avctx->colorspace == AVCOL_SPC_YCGCO) {
                 av_log(h->avctx, AV_LOG_WARNING, "Detected unsupported YCgCo colorspace.\n");
             }
+// ==> Start patch MPC
+/*
+            return h->avctx->color_range == AVCOL_RANGE_JPEG ? AV_PIX_FMT_YUVJ444P
+                                                                : AV_PIX_FMT_YUV444P;
+*/
             return AV_PIX_FMT_YUV444P;
+// <== End patch MPC
         } else if (CHROMA422(h)) {
+// ==> Start patch MPC
+/*
+            return h->avctx->color_range == AVCOL_RANGE_JPEG ? AV_PIX_FMT_YUVJ422P
+                                                             : AV_PIX_FMT_YUV422P;
+*/
             return AV_PIX_FMT_YUV422P;
+// <== End patch MPC
         } else {
             int i;
             const enum AVPixelFormat * fmt = h->avctx->codec->pix_fmts ?
                                         h->avctx->codec->pix_fmts :
+// ==> Start patch MPC
+/*
+                                        h->avctx->color_range == AVCOL_RANGE_JPEG ?
+                                        h264_hwaccel_pixfmt_list_jpeg_420 :
+*/
+// <== End patch MPC
                                         h264_hwaccel_pixfmt_list_420;
 
             for (i=0; fmt[i] != AV_PIX_FMT_NONE; i++)
