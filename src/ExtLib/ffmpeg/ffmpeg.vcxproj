@@ -197,6 +197,7 @@
     <ClInclude Include="libavcodec\lsp.h" />
     <ClInclude Include="libavcodec\lzw.h" />
     <ClInclude Include="libavcodec\mathops.h" />
+    <ClInclude Include="libavcodec\metasound_data.h" />
     <ClInclude Include="libavcodec\mips\amrwbdec_mips.h" />
     <ClInclude Include="libavcodec\mips\lsp_mips.h" />
     <ClInclude Include="libavcodec\mjpeg.h" />
@@ -285,6 +286,7 @@
     <ClInclude Include="libavcodec\truespeech_data.h" />
     <ClInclude Include="libavcodec\tscc2data.h" />
     <ClInclude Include="libavcodec\ttadata.h" />
+    <ClInclude Include="libavcodec\twinvq.h" />
     <ClInclude Include="libavcodec\unary.h" />
     <ClInclude Include="libavcodec\utvideo.h" />
     <ClInclude Include="libavcodec\v210dec.h" />
@@ -585,6 +587,8 @@
     <ClCompile Include="libavcodec\mdct_fixed_32.c" />
     <ClCompile Include="libavcodec\mdct_float.c" />
     <ClCompile Include="libavcodec\mdct_template.c" />
+    <ClCompile Include="libavcodec\metasound.c" />
+    <ClCompile Include="libavcodec\metasound_data.c" />
     <ClCompile Include="libavcodec\mjpeg.c" />
     <ClCompile Include="libavcodec\mjpegbdec.c" />
     <ClCompile Include="libavcodec\mjpegdec.c" />
@@ -684,6 +688,7 @@
     <ClCompile Include="libavcodec\tscc2.c" />
     <ClCompile Include="libavcodec\tta.c" />
     <ClCompile Include="libavcodec\ttadata.c" />
+    <ClCompile Include="libavcodec\twinvq.c" />
     <ClCompile Include="libavcodec\utils.c" />
     <ClCompile Include="libavcodec\utvideo.c" />
     <ClCompile Include="libavcodec\utvideodec.c" />

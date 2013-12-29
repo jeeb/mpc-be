@@ -240,6 +240,8 @@ SRCS_C = \
 	libavcodec/mdct_fixed.c \
 	libavcodec/mdct_fixed_32.c \
 	libavcodec/mdct_float.c \
+	libavcodec/metasound.c \
+	libavcodec/metasound_data.c \
 	libavcodec/mjpeg.c \
 	libavcodec/mjpegbdec.c \
 	libavcodec/mjpegdec.c \
@@ -337,6 +339,7 @@ SRCS_C = \
 	libavcodec/tscc2.c \
 	libavcodec/tta.c \
 	libavcodec/ttadata.c \
+	libavcodec/twinvq.c \
 	libavcodec/utvideo.c \
 	libavcodec/utvideodec.c \
 	libavcodec/utils.c \

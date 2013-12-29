@@ -129,8 +129,9 @@ void avcodec_register_all(void)
     REGISTER_DECODER (DCA, dca);
     REGISTER_DECODER (FLAC, flac);
     REGISTER_DECODER (IAC, iac);
+    REGISTER_DECODER (METASOUND, metasound);
     REGISTER_DECODER (MPC7, mpc7);
-    REGISTER_DECODER (MPC8, mpc8);    
+    REGISTER_DECODER (MPC8, mpc8);
     REGISTER_DECODER (MLP, mlp);
     REGISTER_DECODER (MP1FLOAT, mp1float);
     REGISTER_DECODER (MP2FLOAT, mp2float);

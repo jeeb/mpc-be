@@ -618,6 +618,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_IMC_DECODER 0
 #define CONFIG_MACE3_DECODER 0
 #define CONFIG_MACE6_DECODER 0
+#define CONFIG_METASOUND_DECODER 1
 #define CONFIG_MLP_DECODER 1
 #define CONFIG_MP1_DECODER 0
 #define CONFIG_MP1FLOAT_DECODER 1
