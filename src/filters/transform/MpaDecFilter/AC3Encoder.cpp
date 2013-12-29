@@ -85,7 +85,7 @@ bool CAC3Encoder::Init(int sample_rate, DWORD channel_layout)
 		return false;
 	}
 	/* setup the data pointers in the AVFrame */
-	ret = avcodec_fill_audio_frame(m_pFrame, m_pAVCtx->channels, m_pAVCtx->sample_fmt, (uint8_t*)m_pSamples, m_buffersize, 0);
+	ret = avcodec_fill_audio_frame(m_pFrame, m_pAVCtx->channels, m_pAVCtx->sample_fmt, (const uint8_t*)m_pSamples, m_buffersize, 0);
 	if (ret < 0) {
 		DbgLog((LOG_TRACE, 3, L"CAC3Encoder::Init() : avcodec_fill_audio_frame() failed"));
 		return false;
@@ -122,7 +122,6 @@ HRESULT CAC3Encoder::Encode(CAtlArray<float>& BuffIn, CAtlArray<BYTE>& BuffOut)
 
 	ret = avcodec_encode_audio2(m_pAVCtx, &avpkt, m_pFrame, &got_packet);
 	if (ret < 0) {
-		av_frame_unref(m_pFrame);
 		return E_FAIL;
 	}
 	if (got_packet) {
@@ -138,8 +137,6 @@ HRESULT CAC3Encoder::Encode(CAtlArray<float>& BuffIn, CAtlArray<BYTE>& BuffOut)
 	memmove(pIn, (BYTE*)pIn + m_framesize, new_size);
 	BuffIn.SetCount(new_count);
 
-	av_frame_unref(m_pFrame);
-
 	return S_OK;
 }
 
@@ -153,20 +150,14 @@ void CAC3Encoder::FlushBuffers()
 void CAC3Encoder::StreamFinish()
 {
 	if (m_pAVCtx) {
-		if (m_pAVCtx->extradata) {
-			av_freep(&m_pAVCtx->extradata);
-		}
-		if (m_pAVCtx->codec) {
-			avcodec_close(m_pAVCtx);
-		}
+		avcodec_close(m_pAVCtx);
+		av_freep(&m_pAVCtx->extradata);
 		av_freep(&m_pAVCtx);
 	}
 
-	if (m_pFrame) {
-		av_frame_free(&m_pFrame);
-	}
+	av_frame_free(&m_pFrame);
 
-	av_free(m_pSamples);
+	av_freep(&m_pSamples);
 	m_buffersize = 0;
 }
 
