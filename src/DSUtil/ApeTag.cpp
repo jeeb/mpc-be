@@ -248,7 +248,7 @@ void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* apetag)
 				}
 			}
 		}
-		
+
 		apetag->TagItems.GetNext(pos);
 	}
 

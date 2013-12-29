@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <atlcoll.h>
 #include "GolombBuffer.h"
 
 #define APE_TAG_FOOTER_BYTES		32
@@ -55,7 +56,7 @@ protected:
 	CString			m_key;
 
 	// text value
-	CString			m_value;		
+	CString			m_value;
 
 	// binary value
 	CAtlArray<BYTE>	m_Data;
