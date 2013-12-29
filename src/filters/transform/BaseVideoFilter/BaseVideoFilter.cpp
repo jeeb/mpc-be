@@ -186,53 +186,38 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 {
 	CMediaType& mt = m_pOutput->CurrentMediaType();
 
-	bool m_update_aspect = false;
+	bool bNeedReconnect = bForce;
 	{
 		int wout = 0, hout = 0, arxout = 0, aryout = 0;
 		ExtractDim(&mt, wout, hout, arxout, aryout);
 		if (arxout != m_arx || aryout != m_ary) {
-			m_update_aspect = true;
+			bNeedReconnect = true;
 		}
 	}
 
 	int w_org = m_w;
 	int h_org = m_h;
 
-	bool fForceReconnection = false;
 	if (w != m_w || h != m_h) {
-		fForceReconnection = true;
+		bNeedReconnect = true;
 		m_w = w;
 		m_h = h;
 	}
 
 	REFERENCE_TIME nAvgTimePerFrame = 0;
-
-	if (mt.formattype == FORMAT_VideoInfo) {
-		VIDEOINFOHEADER* vih = (VIDEOINFOHEADER*)mt.Format();
-		nAvgTimePerFrame = vih->AvgTimePerFrame;
+	{
+		ExtractAvgTimePerFrame(&mt, nAvgTimePerFrame);
 		if (!AvgTimePerFrame) {
 			AvgTimePerFrame = nAvgTimePerFrame;
 		}
 
 		if (abs(nAvgTimePerFrame - AvgTimePerFrame) > 10) {
-			fForceReconnection = true;	
-		}
-	} else if (mt.formattype == FORMAT_VideoInfo2) {
-		VIDEOINFOHEADER2* vih = (VIDEOINFOHEADER2*)mt.Format();
-		nAvgTimePerFrame = vih->AvgTimePerFrame;
-		if (!AvgTimePerFrame) {
-			AvgTimePerFrame = nAvgTimePerFrame;
-		}
-
-		if (abs(nAvgTimePerFrame - AvgTimePerFrame) > 10) {
-			fForceReconnection = true;	
+			bNeedReconnect = true;
 		}
 	}
 
-	if (bForce || m_update_aspect || fForceReconnection || m_w != m_wout || m_h != m_hout || m_arx != m_arxout || m_ary != m_aryout) {
-		CLSID clsid = GetCLSID(m_pOutput->GetConnected());
-
-		if (clsid == CLSID_VideoRenderer) {
+	if (bNeedReconnect) {
+		if (CLSID_VideoRenderer == GetCLSID(m_pOutput->GetConnected())) {
 			NotifyEvent(EC_ERRORABORT, 0, 0);
 			return E_FAIL;
 		}
@@ -248,32 +233,30 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 		TRACE(L"		AR   : %d:%d => %d:%d\n", m_arxout, m_aryout, m_arx, m_ary);
 		TRACE(L"		FPS  : %I64d => %I64d\n", nAvgTimePerFrame, AvgTimePerFrame);
 
-		CMediaType& pmtInput	= m_pInput->CurrentMediaType();
-		BITMAPINFOHEADER* bmi	= NULL;
-
+		BITMAPINFOHEADER* pBMI	= NULL;
 		if (mt.formattype == FORMAT_VideoInfo) {
-			VIDEOINFOHEADER* vih = (VIDEOINFOHEADER*)mt.Format();
-			vih->rcSource = vih->rcTarget = vih_rect;
-			vih->AvgTimePerFrame = AvgTimePerFrame;
+			VIDEOINFOHEADER* vih	= (VIDEOINFOHEADER*)mt.Format();
+			vih->rcSource			= vih->rcTarget = vih_rect;
+			vih->AvgTimePerFrame	= AvgTimePerFrame;
 
-			bmi = &vih->bmiHeader;
-			bmi->biXPelsPerMeter = m_w * m_ary;
-			bmi->biYPelsPerMeter = m_h * m_arx;
+			pBMI					= &vih->bmiHeader;
+			pBMI->biXPelsPerMeter	= m_w * m_ary;
+			pBMI->biYPelsPerMeter	= m_h * m_arx;
 		} else if (mt.formattype == FORMAT_VideoInfo2) {
-			VIDEOINFOHEADER2* vih = (VIDEOINFOHEADER2*)mt.Format();
-			vih->rcSource = vih->rcTarget = vih_rect;
-			vih->AvgTimePerFrame = AvgTimePerFrame;
+			VIDEOINFOHEADER2* vih	= (VIDEOINFOHEADER2*)mt.Format();
+			vih->rcSource			= vih->rcTarget = vih_rect;
+			vih->AvgTimePerFrame	= AvgTimePerFrame;
+			vih->dwPictAspectRatioX	= m_arx;
+			vih->dwPictAspectRatioY	= m_ary;
 
-			bmi = &vih->bmiHeader;
-			vih->dwPictAspectRatioX = m_arx;
-			vih->dwPictAspectRatioY = m_ary;
+			pBMI					= &vih->bmiHeader;
 		} else {
 			return E_FAIL;	//should never be here? prevent null pointer refs for bmi
 		}
 
-		bmi->biWidth		= m_w;
-		bmi->biHeight		= m_h;
-		bmi->biSizeImage	= m_w*m_h*bmi->biBitCount>>3;
+		pBMI->biWidth		= m_w;
+		pBMI->biHeight		= m_h;
+		pBMI->biSizeImage	= m_w * m_h * pBMI->biBitCount >> 3;
 
 		HRESULT hrQA = m_pOutput->GetConnected()->QueryAccept(&mt);
 		ASSERT(SUCCEEDED(hrQA)); // should better not fail, after all "mt" is the current media type, just with a different resolution
@@ -297,7 +280,7 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 								DeleteMediaType(pmt);
 							} else { // stupid overlay mixer won't let us know the new pitch...
 								long size = pOut->GetSize();
-								bmi->biWidth = size ? (size / abs(bmi->biHeight) * 8 / bmi->biBitCount) : bmi->biWidth;
+								pBMI->biWidth = size ? (size / abs(pBMI->biHeight) * 8 / pBMI->biBitCount) : pBMI->biWidth;
 								m_pOutput->SetMediaType(&mt);
 							}
 						} else {
