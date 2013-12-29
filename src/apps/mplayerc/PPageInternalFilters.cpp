@@ -78,6 +78,7 @@ static filter_t s_filters[] = {
 	{_T("TAK"),                   FFMPEG_DECODER, AUDIO,  FFM_TAK,        IDS_TRA_FFMPEG,},
 	{_T("TTA"),                   FFMPEG_DECODER, AUDIO,  FFM_TTA,        IDS_TRA_FFMPEG,},
 	{_T("Vorbis"),                FFMPEG_DECODER, AUDIO,  FFM_VORBIS,     IDS_TRA_FFMPEG,},
+	{_T("Voxware MetaSound"),     FFMPEG_DECODER, AUDIO,  FFM_VOXWARE,    IDS_TRA_FFMPEG,},
 	{_T("WavPack lossless audio"),FFMPEG_DECODER, AUDIO,  FFM_WPAC,       IDS_TRA_FFMPEG,},
 	{_T("WMA v.1/v.2"),           FFMPEG_DECODER, AUDIO,  FFM_WMA2,       IDS_TRA_FFMPEG,},
 	{_T("WMA v.9 Professional"),  FFMPEG_DECODER, AUDIO,  FFM_WMAPRO,     IDS_TRA_FFMPEG,},

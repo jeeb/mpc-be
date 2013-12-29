@@ -106,8 +106,10 @@ static const FFMPEG_AUDIO_CODECS ffAudioCodecs[] = {
 	{ &MEDIASUBTYPE_TAK,               AV_CODEC_ID_TAK },
 	// TTA
 	{ &MEDIASUBTYPE_TTA1,              AV_CODEC_ID_TTA },
-	// TRUESPEECH
+	// DSP Group TrueSpeech
 	{ &MEDIASUBTYPE_TRUESPEECH,        AV_CODEC_ID_TRUESPEECH },
+	// Voxware MetaSound
+	{ &MEDIASUBTYPE_VOXWARE_RT29,      AV_CODEC_ID_METASOUND },
 	// Windows Media Audio 9 Professional
 	{ &MEDIASUBTYPE_WMAUDIO3,          AV_CODEC_ID_WMAPRO },
 	// Windows Media Audio Lossless

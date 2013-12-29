@@ -180,8 +180,10 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_TAK},
 	// TTA
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_TTA1},
-	// TRUESPEECH
+	// DSP Group TrueSpeech
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_TRUESPEECH},
+	// Voxware MetaSound
+	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_VOXWARE_RT29},
 	// Windows Media Audio 9 Professional
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_WMAUDIO3},
 	// Windows Media Audio Lossless

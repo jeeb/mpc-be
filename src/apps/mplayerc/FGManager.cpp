@@ -2446,11 +2446,18 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_TTA1);
 		m_transform.AddTail(pFGF);
 
-		// TRUESPEECH
+		// DSP Group TrueSpeech
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 					(ffmpeg_filters[FFM_TRUESPEECH]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 					(ffmpeg_filters[FFM_TRUESPEECH]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_TRUESPEECH);
+		m_transform.AddTail(pFGF);
+
+		// Voxware MetaSound
+		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
+					(ffmpeg_filters[FFM_VOXWARE]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
+					(ffmpeg_filters[FFM_VOXWARE]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_VOXWARE_RT29);
 		m_transform.AddTail(pFGF);
 
 		// Bink Audio
