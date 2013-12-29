@@ -804,9 +804,9 @@ HRESULT CRoQVideoDecoder::GetMediaType(int iPosition, CMediaType* pmt)
 	struct {const GUID* subtype; WORD biPlanes, biBitCount; DWORD biCompression;} fmts[] =
 	{
 		{&MEDIASUBTYPE_YV12, 3, 12, '21VY'},
+		{&MEDIASUBTYPE_YUY2, 1, 16, '2YUY'},
 		{&MEDIASUBTYPE_I420, 3, 12, '024I'},
 		{&MEDIASUBTYPE_IYUV, 3, 12, 'VUYI'},
-		{&MEDIASUBTYPE_YUY2, 1, 16, '2YUY'},
 		{&MEDIASUBTYPE_ARGB32, 1, 32, BI_RGB},
 		{&MEDIASUBTYPE_RGB32, 1, 32, BI_RGB},
 		{&MEDIASUBTYPE_RGB24, 1, 24, BI_RGB},
