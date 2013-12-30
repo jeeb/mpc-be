@@ -42,7 +42,7 @@
 // TODO: rename option values
 
 // set to 1 to enable more detail debug log
-#define DBGLOG_LEVEL 1
+#define DBGLOG_LEVEL 0
 
 #ifdef REGISTER_FILTER
 
