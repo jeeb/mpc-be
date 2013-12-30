@@ -377,6 +377,7 @@
     <ClInclude Include="libavutil\lls2.h" />
     <ClInclude Include="libavutil\log.h" />
     <ClInclude Include="libavutil\lzo.h" />
+    <ClInclude Include="libavutil\macros.h" />
     <ClInclude Include="libavutil\mathematics.h" />
     <ClInclude Include="libavutil\md5.h" />
     <ClInclude Include="libavutil\mem.h" />

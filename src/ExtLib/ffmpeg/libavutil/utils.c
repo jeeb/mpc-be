@@ -17,7 +17,7 @@
  */
 
 #include "config.h"
-#include "version.h"
+#include "avutil.h"
 #include "avassert.h"
 #include "samplefmt.h"
 #include "pixdesc.h"
@@ -102,10 +102,8 @@ unsigned av_int_list_length_for_size(unsigned elsize,
 
     if (!list)
         return 0;
-// ==> Start patch MPC
 #define LIST_LENGTH(type) \
-    { type t = term, *l = (void*)list; for (i = 0; l[i] != t; i++); }
-    // ==> End patch MPC
+    { type t = term, *l = (type *)list; for (i = 0; l[i] != t; i++); }
     switch (elsize) {
     case 1: LIST_LENGTH(uint8_t);  break;
     case 2: LIST_LENGTH(uint16_t); break;

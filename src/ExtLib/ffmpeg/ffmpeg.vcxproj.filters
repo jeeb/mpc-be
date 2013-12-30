@@ -1123,6 +1123,9 @@
     <ClInclude Include="libavutil\lzo.h">
       <Filter>libavutil</Filter>
     </ClInclude>
+    <ClInclude Include="libavutil\macros.h">
+      <Filter>libavutil</Filter>
+    </ClInclude>
     <ClInclude Include="libavutil\mathematics.h">
       <Filter>libavutil</Filter>
     </ClInclude>

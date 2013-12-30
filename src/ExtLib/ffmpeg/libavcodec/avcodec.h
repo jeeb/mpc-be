@@ -5077,9 +5077,4 @@ const AVCodecDescriptor *avcodec_descriptor_get_by_name(const char *name);
  * @}
  */
 
-// ==> Start patch MPC
-int avcodec_h264_search_recovery_point(AVCodecContext *avctx, const uint8_t *buf, int buf_size, int *recovery_frame_cnt);
-int av_vc1_decode_frame(AVCodecContext *avctx, const uint8_t *buf, int buf_size, int *nFrameSize);
-// <== End patch MPC
-
 #endif /* AVCODEC_AVCODEC_H */

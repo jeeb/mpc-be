@@ -1,7 +1,4 @@
 /*
- * MSVC Compatible va_copy macro
- * Copyright (c) 2012 Derek Buitenhuis
- *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -19,11 +16,33 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <stdarg.h>
+/**
+ * @file
+ * @ingroup lavu
+ * Utility Preprocessor macros
+ */
 
-#if !defined(va_copy) && defined(_MSC_VER)
-#define va_copy(dst, src) ((dst) = (src))
-#endif
-#if !defined(va_copy) && defined(__GNUC__) && __GNUC__ < 3
-#define va_copy(dst, src) __va_copy(dst, src)
-#endif
+#ifndef AVUTIL_MACROS_H
+#define AVUTIL_MACROS_H
+
+/**
+ * @addtogroup preproc_misc Preprocessor String Macros
+ *
+ * String manipulation macros
+ *
+ * @{
+ */
+
+#define AV_STRINGIFY(s)         AV_TOSTRING(s)
+#define AV_TOSTRING(s) #s
+
+#define AV_GLUE(a, b) a ## b
+#define AV_JOIN(a, b) AV_GLUE(a, b)
+
+/**
+ * @}
+ */
+
+#define AV_PRAGMA(s) _Pragma(#s)
+
+#endif /* AVUTIL_MACROS_H */
