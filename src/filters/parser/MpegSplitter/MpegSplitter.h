@@ -41,7 +41,6 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 	bool			m_pPipoBimbo;
 	CHdmvClipInfo	m_ClipInfo;
 
-protected:
 	CAutoPtr<CMpegSplitterFile> m_pFile;
 	CComQIPtr<ITrackInfo> pTI;
 
@@ -55,6 +54,10 @@ protected:
 	bool BuildChapters(LPCTSTR pszFileName, CHdmvClipInfo::CPlaylist& PlaylistItems, CHdmvClipInfo::CPlaylistChapter& Items);
 
 	HRESULT DemuxNextPacket(REFERENCE_TIME rtStartOffset);
+
+	bool StreamIsTrueHD(const WORD pid);
+
+	void HandleStream(CMpegSplitterFile::stream& s, CString fName, DWORD dwPictAspectRatioX, DWORD dwPictAspectRatioY);
 
 	REFERENCE_TIME m_rtPlaylistDuration;
 	REFERENCE_TIME m_rtMin, m_rtMax;
@@ -70,8 +73,6 @@ public:
 	void SetPipo(bool bPipo) {
 		m_pPipoBimbo = bPipo;
 	};
-
-	bool StreamIsTrueHD(const WORD pid);
 
 	DECLARE_IUNKNOWN
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);

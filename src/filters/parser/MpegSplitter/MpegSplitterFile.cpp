@@ -40,7 +40,7 @@ CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CH
 	, m_AC3CoreOnly(AC3CoreOnly)
 	, m_AlternativeDuration(AlternativeDuration)
 	, m_SubEmptyPin(SubEmptyPin)
-	, m_init(FALSE)
+	, m_bOpeningCompleted(FALSE)
 	, bIsBadPacked(FALSE)
 {
 	memset(m_psm, 0, sizeof(m_psm));
@@ -140,8 +140,6 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	m_rtMin = m_posMin = _I64_MAX;
 	m_rtMax = m_posMax = 0;
 
-	m_init = TRUE;
-
 	if (IsRandomAccess() || IsStreaming()) {
 		
 		WaitAvailable(5000, MEGABYTE*2);
@@ -220,7 +218,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		m_posMax = GetLength();
 	}
 
-	m_init = FALSE;
+	m_bOpeningCompleted = TRUE;
 
 	int videoCount = 0;
 	int audioCount = 0;
@@ -252,7 +250,6 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 					s.mt.majortype	= m_streams[stream_type::subpic].GetHead().mt.majortype;
 					s.mt.subtype	= m_streams[stream_type::subpic].GetHead().mt.subtype;
 					s.mt.formattype	= m_streams[stream_type::subpic].GetHead().mt.formattype;
-					s.mts.push_back(s.mt);
 					m_streams[stream_type::subpic].AddTail(s);
 				} else {
 					AddHdmvPGStream(NO_SUBTITLE_PID, "---");
@@ -265,7 +262,6 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 				s.mt.majortype	= m_streams[stream_type::subpic].GetCount() ? m_streams[stream_type::subpic].GetHead().mt.majortype		: MEDIATYPE_Video;
 				s.mt.subtype	= m_streams[stream_type::subpic].GetCount() ? m_streams[stream_type::subpic].GetHead().mt.subtype		: MEDIASUBTYPE_DVD_SUBPICTURE;
 				s.mt.formattype	= m_streams[stream_type::subpic].GetCount() ? m_streams[stream_type::subpic].GetHead().mt.formattype	: FORMAT_None;
-				s.mts.push_back(s.mt);
 				m_streams[stream_type::subpic].AddTail(s);
 			}
 		}
@@ -811,7 +807,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 						type = stream_type::subpic;
 					}
 				}
-			} else if ((m_AC3CoreOnly != 1) && m_init) {
+			} else if ((m_AC3CoreOnly != 1) && !m_bOpeningCompleted) {
 				int iProgram;
 				const CHdmvClipInfo::Stream *pClipInfo;
 				const program* pProgram = FindProgram(s.pid, iProgram, pClipInfo);
@@ -820,7 +816,6 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 					if (source && source->mt.subtype == MEDIASUBTYPE_DOLBY_AC3) {
 						ac3hdr h;
 						if (Read(h, len, &s.mt, false, (m_AC3CoreOnly == 1)) && s.mt.subtype == MEDIASUBTYPE_DOLBY_TRUEHD) {
-							s.mts.push_back(s.mt);
 							m_streams[stream_type::audio].Replace((stream&)*source, s);
 						}
 					}
@@ -1026,7 +1021,9 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 			}
 		}
 
-		s.mts.push_back(s.mt);
+		if (m_bOpeningCompleted) {
+			s.mts.push_back(s.mt);
+		}
 		m_streams[type].Insert(s, type);
 	}
 
@@ -1042,7 +1039,6 @@ void CMpegSplitterFile::AddHdmvPGStream(WORD pid, const char* language_code)
 
 	hdmvsubhdr h;
 	if (!m_streams[stream_type::subpic].Find(s) && Read(h, &s.mt, language_code)) {
-		s.mts.push_back(s.mt);
 		m_streams[stream_type::subpic].Insert(s, subpic);
 	}
 }
@@ -1224,7 +1220,6 @@ void CMpegSplitterFile::UpdatePrograms(CGolombBuffer gb, WORD pid, bool UpdateLa
 					CMpegSplitterFile::hdmvsubhdr hdr;
 					if (Read(hdr, &s.mt, NULL)) {
 						if (!m_streams[stream_type::subpic].Find(s)) {
-							s.mts.push_back(s.mt);
 							m_streams[stream_type::subpic].Insert(s, subpic);
 						}
 					}

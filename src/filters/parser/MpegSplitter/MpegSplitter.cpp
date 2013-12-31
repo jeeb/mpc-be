@@ -598,15 +598,6 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 #endif
 }
 
-bool CMpegSplitterFilter::StreamIsTrueHD(const WORD pid)
-{
-	int iProgram = -1;
-	const CHdmvClipInfo::Stream *pClipInfo;
-	const CMpegSplitterFile::program * pProgram = m_pFile->FindProgram(pid, iProgram, pClipInfo);
-	int StreamType = pClipInfo ? pClipInfo->m_Type : pProgram ? pProgram->streams[iProgram].type : 0;
-	return (StreamType == AUDIO_STREAM_AC3_TRUE_HD);
-}
-
 STDMETHODIMP CMpegSplitterFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {
 	CheckPointer(ppv, E_POINTER);
@@ -830,7 +821,14 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 	return S_OK;
 }
 
-//
+bool CMpegSplitterFilter::StreamIsTrueHD(const WORD pid)
+{
+	int iProgram = -1;
+	const CHdmvClipInfo::Stream *pClipInfo;
+	const CMpegSplitterFile::program * pProgram = m_pFile->FindProgram(pid, iProgram, pClipInfo);
+	int StreamType = pClipInfo ? pClipInfo->m_Type : pProgram ? pProgram->streams[iProgram].type : 0;
+	return (StreamType == AUDIO_STREAM_AC3_TRUE_HD);
+}
 
 #define ReadBEdw(var) \
 	f.Read(&((BYTE*)&var)[3], 1); \
@@ -838,6 +836,115 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 	f.Read(&((BYTE*)&var)[1], 1); \
 	f.Read(&((BYTE*)&var)[0], 1); \
 
+void CMpegSplitterFilter::HandleStream(CMpegSplitterFile::stream& s, CString fName, DWORD dwPictAspectRatioX, DWORD dwPictAspectRatioY)
+{
+	CMediaType mt = s.mt;
+
+	// correct Aspect Ratio for DVD structure.
+	if (s.mt.subtype == MEDIASUBTYPE_MPEG2_VIDEO && dwPictAspectRatioX && dwPictAspectRatioY) {
+		VIDEOINFOHEADER2& vih2 = *(VIDEOINFOHEADER2*)s.mt.pbFormat;
+		vih2.dwPictAspectRatioX = dwPictAspectRatioX;
+		vih2.dwPictAspectRatioY = dwPictAspectRatioY;
+	}
+
+	// Add addition GUID for compatible with Cyberlink & Arcsoft VC1 Decoder
+	if (mt.subtype == MEDIASUBTYPE_WVC1) {
+		mt.subtype = MEDIASUBTYPE_WVC1_CYBERLINK;
+		s.mts.push_back(mt);
+		mt.subtype = MEDIASUBTYPE_WVC1_ARCSOFT;
+		s.mts.push_back(mt);
+	}
+
+	// Add addition VobSub type
+	if (mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE) {
+		CStringA palette;
+
+		for (;;) {
+			if (::PathFileExists(fName)) {
+				CPath fname(fName);
+				fname.StripPath();
+				if (!CString(fname).Find(_T("VTS_"))) {
+					fName = fName.Left(fName.ReverseFind('.') + 1);
+					fName.TrimRight(_T(".0123456789")) += _T("0.ifo");
+
+					if (::PathFileExists(fname)) {
+						// read palette from .ifo file, code from CVobSubFile::ReadIfo()
+						CFile f;
+						if (!f.Open(fName, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone)) {
+							break;
+						}
+
+						/* PGC1 */
+						f.Seek(0xc0 + 0x0c, SEEK_SET);
+
+						DWORD pos;
+						ReadBEdw(pos);
+
+						f.Seek(pos * 0x800 + 0x0c, CFile::begin);
+
+						DWORD offset;
+						ReadBEdw(offset);
+
+						/* Subpic palette */
+						f.Seek(pos * 0x800 + offset + 0xa4, CFile::begin);
+
+						CAtlList<CStringA> sl;
+						for (size_t i = 0; i < 16; i++) {
+							BYTE y, u, v, tmp;
+
+							f.Read(&tmp, 1);
+							f.Read(&y, 1);
+							f.Read(&u, 1);
+							f.Read(&v, 1);
+
+							y = (y - 16) * 255 / 219;
+
+							BYTE r = (BYTE)min(max(1.0*y + 1.4022*(v - 128), 0), 255);
+							BYTE g = (BYTE)min(max(1.0*y - 0.3456*(u - 128) - 0.7145*(v - 128), 0), 255);
+							BYTE b = (BYTE)min(max(1.0*y + 1.7710*(u - 128), 0), 255);
+
+							CStringA str;
+							str.Format("%02x%02x%02x", r, g, b);
+							sl.AddTail(str);
+						}
+						palette = Implode(sl, ',');
+
+						f.Close();
+					}
+				}
+			}
+
+			break;
+		}
+
+		// Get resolution for first video track
+		int vid_width = 0;
+		int vid_height = 0;
+		POSITION pos = m_pFile->m_streams[CMpegSplitterFile::stream_type::video].GetHeadPosition();
+		if (pos) {
+			CMpegSplitterFile::stream& sVideo = m_pFile->m_streams[CMpegSplitterFile::stream_type::video].GetHead();
+			int arx, ary;
+			ExtractDim(&s.mt, vid_width, vid_height, arx, ary);
+		}
+
+		CStringA hdr		= VobSubDefHeader(vid_width ? vid_width : 720, vid_height ? vid_height : 576, palette);
+
+		mt.majortype		= MEDIATYPE_Subtitle;
+		mt.subtype			= MEDIASUBTYPE_VOBSUB;
+		mt.formattype		= FORMAT_SubtitleInfo;
+		SUBTITLEINFO* si	= (SUBTITLEINFO*)mt.AllocFormatBuffer(sizeof(SUBTITLEINFO) + hdr.GetLength());
+		memset(si, 0, mt.FormatLength());
+		si->dwOffset		= sizeof(SUBTITLEINFO);
+		strncpy_s(si->IsoLang, pTI ? CStringA(pTI->GetTrackName(s.ps1id)) : "eng", _countof(si->IsoLang)-1);
+
+		memcpy(si + 1, (LPCSTR)hdr, hdr.GetLength());
+		s.mts.push_back(mt);
+	}
+
+	s.mts.push_back(s.mt);
+}
+
+//
 HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 {
 	CheckPointer(pAsyncReader, E_POINTER);
@@ -880,12 +987,11 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	CString cs_audioProgram, cs_subpicProgram;
 
-	// Create
 	if (m_ClipInfo.IsHdmv()) {
-		for (size_t i = 0; i < m_ClipInfo.GetStreamNumber(); i++) {
+		for (size_t i = 0; i < m_ClipInfo.GetStreamCount(); i++) {
 			CHdmvClipInfo::Stream* stream = m_ClipInfo.GetStreamByIndex (i);
 			if (stream->m_Type == PRESENTATION_GRAPHICS_STREAM) {
-				m_pFile->AddHdmvPGStream (stream->m_PID, stream->m_LanguageCode);
+				m_pFile->AddHdmvPGStream(stream->m_PID, stream->m_LanguageCode);
 			}
 		}
 	}
@@ -989,126 +1095,29 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	//
-	int vid_width	= 0;
-	int vid_height	= 0;
+	CString fullName = GetPartFilename(pAsyncReader);
+	if (fullName.IsEmpty()) {
+		// trying to get file name from FileSource
+		BeginEnumFilters(m_pGraph, pEF, pBF) {
+			CComQIPtr<IFileSourceFilter> pFSF = pBF;
+			if (pFSF) {
+				LPOLESTR pFN = NULL;
+				AM_MEDIA_TYPE mt;
+				if (SUCCEEDED(pFSF->GetCurFile(&pFN, &mt)) && pFN && *pFN) {
+					fullName = CString(pFN);
+					CoTaskMemFree(pFN);
+				}
+				break;
+			}
+		}
+		EndEnumFilters
+	}
 
 	for (int type = CMpegSplitterFile::stream_type::video; type < _countof(m_pFile->m_streams); type++) {
 		POSITION pos = m_pFile->m_streams[type].GetHeadPosition();
 		while (pos) {
 			CMpegSplitterFile::stream& s = m_pFile->m_streams[type].GetNext(pos);
-
-			// correct Aspect Ratio for DVD structure.
-			if (s.mt.subtype == MEDIASUBTYPE_MPEG2_VIDEO && IfoASpect.num && IfoASpect.den) {
-				VIDEOINFOHEADER2& vih2 = *(VIDEOINFOHEADER2*)s.mt.pbFormat;
-				vih2.dwPictAspectRatioX = IfoASpect.num;
-				vih2.dwPictAspectRatioY = IfoASpect.den;
-			}
-
-			// Get resolution for first video track
-			if (type == CMpegSplitterFile::stream_type::video && !vid_width) {
-				int arx, ary;
-				ExtractDim(&s.mt, vid_width, vid_height, arx, ary);
-			}
-			
-			// Add addition GUID for compatible with Cyberlink & Arcsoft VC1 Decoder
-			CMediaType mt = s.mt;
-			if (mt.subtype == MEDIASUBTYPE_WVC1) {
-				mt.subtype = MEDIASUBTYPE_WVC1_CYBERLINK;
-				s.mts.insert(s.mts.begin(), mt);
-				mt.subtype = MEDIASUBTYPE_WVC1_ARCSOFT;
-				s.mts.insert(s.mts.begin(), mt);
-			}
-
-			// Add addition VobSub type
-			if (mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE) {
-				CStringA palette;
-
-				CString fullname = GetPartFilename(pAsyncReader);
-				if (fullname.IsEmpty()) {
-					// trying to get file name from FileSource
-					BeginEnumFilters(m_pGraph, pEF, pBF) {
-						CComQIPtr<IFileSourceFilter> pFSF = pBF;
-						if (pFSF) {
-							LPOLESTR pFN = NULL;
-							AM_MEDIA_TYPE mt;
-							if (SUCCEEDED(pFSF->GetCurFile(&pFN, &mt)) && pFN && *pFN) {
-								fullname = CString(pFN);
-								CoTaskMemFree(pFN);
-							}
-							break;
-						}
-					}
-					EndEnumFilters
-				}
-
-				if (::PathFileExists(fullname)) {
-					CPath fname(fullname);
-					fname.StripPath();
-					if (!CString(fname).Find(_T("VTS_"))) {
-						fullname = fullname.Left(fullname.ReverseFind('.')+1);
-						fullname.TrimRight(_T(".0123456789")) += _T("0.ifo");
-
-						if (::PathFileExists(fullname)) {
-							// read palette from .ifo file, code from CVobSubFile::ReadIfo()
-							CFile f;
-							if (!f.Open(fullname, CFile::modeRead|CFile::typeBinary|CFile::shareDenyNone)) {
-								return false;
-							}
-
-							/* PGC1 */
-							f.Seek(0xc0+0x0c, SEEK_SET);
-
-							DWORD pos;
-							ReadBEdw(pos);
-
-							f.Seek(pos*0x800 + 0x0c, CFile::begin);
-
-							DWORD offset;
-							ReadBEdw(offset);
-
-							/* Subpic palette */
-							f.Seek(pos*0x800 + offset + 0xa4, CFile::begin);
-
-							CAtlList<CStringA> sl;
-							for (size_t i = 0; i < 16; i++) {
-								BYTE y, u, v, tmp;
-
-								f.Read(&tmp, 1);
-								f.Read(&y, 1);
-								f.Read(&u, 1);
-								f.Read(&v, 1);
-
-								y = (y-16)*255/219;
-
-								BYTE r = (BYTE)min(max(1.0*y + 1.4022*(v-128), 0), 255);
-								BYTE g = (BYTE)min(max(1.0*y - 0.3456*(u-128) - 0.7145*(v-128), 0), 255);
-								BYTE b = (BYTE)min(max(1.0*y + 1.7710*(u-128), 0) , 255);
-								
-								CStringA str;
-								str.Format("%02x%02x%02x", r, g, b);
-								sl.AddTail(str);
-							}
-							palette = Implode(sl, ',');
-
-							f.Close();
-						}
-					}
-				}
-
-				CStringA hdr		= VobSubDefHeader(vid_width ? vid_width : 720, vid_height ? vid_height : 576, palette);
-
-				mt.majortype		= MEDIATYPE_Subtitle;
-				mt.subtype			= MEDIASUBTYPE_VOBSUB;
-				mt.formattype		= FORMAT_SubtitleInfo;
-				SUBTITLEINFO* si	= (SUBTITLEINFO*)mt.AllocFormatBuffer(sizeof(SUBTITLEINFO) + hdr.GetLength());
-				memset(si, 0, mt.FormatLength());
-				si->dwOffset		= sizeof(SUBTITLEINFO);
-				strncpy_s(si->IsoLang, pTI ? CStringA(pTI->GetTrackName(s.ps1id)) : "eng", _countof(si->IsoLang)-1);
-
-				memcpy(si + 1, (LPCSTR)hdr, hdr.GetLength());
-				s.mts.insert(s.mts.begin(), mt);
-			}
+			HandleStream(s, fullName, IfoASpect.num, IfoASpect.den);
 		}
 	}
 

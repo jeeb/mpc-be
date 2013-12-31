@@ -64,7 +64,7 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 	CAtlMap<WORD, CValidStream<mpahdr>>			m_mpaValid;
 	CAtlMap<WORD, CValidStream<ac3hdr>>			m_ac3Valid;
 
-	BOOL m_init;
+	BOOL m_bOpeningCompleted;
 
 	HRESULT Init(IAsyncReader* pAsyncReader);
 	void OnComplete(IAsyncReader* pAsyncReader);
