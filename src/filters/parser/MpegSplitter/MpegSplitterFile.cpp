@@ -820,6 +820,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 					if (source && source->mt.subtype == MEDIASUBTYPE_DOLBY_AC3) {
 						ac3hdr h;
 						if (Read(h, len, &s.mt, false, (m_AC3CoreOnly == 1)) && s.mt.subtype == MEDIASUBTYPE_DOLBY_TRUEHD) {
+							s.mts.push_back(s.mt);
 							m_streams[stream_type::audio].Replace((stream&)*source, s);
 						}
 					}
