@@ -343,18 +343,18 @@ HRESULT CFLACStream::CheckMediaType(const CMediaType* pmt)
 	}
 }
 
-static bool ParseVorbisComment(const LPCSTR field_name, const FLAC__StreamMetadata_VorbisComment_Entry *entry, CString* TagValue) {
+static bool ParseVorbisTag(const CString field_name, const CString VorbisTag, CString* TagValue) {
 	TagValue->Empty();
 
-	CStringA comment(entry->entry);
-	comment.MakeLower().Trim();
-	if (comment.Find(CStringA(field_name) + "=") != 0) {
+	CString vorbis_data = VorbisTag;
+	vorbis_data.MakeLower().Trim();
+	if (vorbis_data.Find(field_name + '=') != 0) {
 		return false;
 	}
-	
-	CStringA vorbis_data(entry->entry);
-	vorbis_data.Delete(0, vorbis_data.Find("=") + 1);
-	*TagValue = UTF8ToString(vorbis_data);
+
+	vorbis_data = VorbisTag;
+	vorbis_data.Delete(0, vorbis_data.Find('=') + 1);
+	*TagValue = vorbis_data;
 
 	return true;
 }
@@ -410,33 +410,36 @@ void CFLACStream::UpdateFromMetadata (void* pBuffer)
 		file_info.got_vorbis_comments = (vc->num_comments > 0);
 		for(unsigned i = 0; i < vc->num_comments; i++) {
 			CString TagValue;
-			if (ParseVorbisComment("artist", &vc->comments[i], &TagValue)) {
-				file_info.artist	= TagValue.GetLength() > 0 ? TagValue : L"";
-			} else  if (ParseVorbisComment("title", &vc->comments[i], &TagValue)) {
-				file_info.title		= TagValue.GetLength() > 0 ? TagValue : L"";
-			} else  if (ParseVorbisComment("description", &vc->comments[i], &TagValue)) {
-				file_info.comment	= TagValue.GetLength() > 0 ? TagValue : L"";
-			} else  if (ParseVorbisComment("comment", &vc->comments[i], &TagValue)) {
-				file_info.comment	= TagValue.GetLength() > 0 ? TagValue : L"";
-			} else  if (ParseVorbisComment("date", &vc->comments[i], &TagValue)) {
-				file_info.year		= TagValue.GetLength() > 0 ? TagValue : L"";
-			} else  if (ParseVorbisComment("album", &vc->comments[i], &TagValue)) {
-				file_info.album		= TagValue.GetLength() > 0 ? TagValue : L"";
-			} else  if (ParseVorbisComment("cuesheet", &vc->comments[i], &TagValue)) {
-				CAtlList<Chapters> ChaptersList;
-				CString Title, Performer;
-				if (ParseCUESheet(TagValue, ChaptersList, Title, Performer)) {
-					if (Title.GetLength() > 0 && file_info.title.IsEmpty()) {
-						file_info.title		= Title;
-					}
-					if (Title.GetLength() > 0 && file_info.artist.IsEmpty()) {
-						file_info.artist	= Performer;
-					}
+			CString VorbisTag = AltUTF8ToStringW((const char *)vc->comments[i].entry);
+			if (VorbisTag.GetLength() > 0) {
+				if (ParseVorbisTag(L"artist", VorbisTag, &TagValue)) {
+					file_info.artist = TagValue;
+				} else if (ParseVorbisTag(L"title", VorbisTag, &TagValue)) {
+					file_info.title = TagValue;
+				} else if (ParseVorbisTag(L"description", VorbisTag, &TagValue)) {
+					file_info.comment = TagValue;
+				} else if (ParseVorbisTag(L"comment", VorbisTag, &TagValue)) {
+					file_info.comment = TagValue;
+				} else if (ParseVorbisTag(L"date", VorbisTag, &TagValue)) {
+					file_info.year = TagValue;
+				} else if (ParseVorbisTag(L"album", VorbisTag, &TagValue)) {
+					file_info.album = TagValue;
+				} else if (ParseVorbisTag(L"cuesheet", VorbisTag, &TagValue)) {
+					CAtlList<Chapters> ChaptersList;
+					CString Title, Performer;
+					if (ParseCUESheet(TagValue, ChaptersList, Title, Performer)) {
+						if (Title.GetLength() > 0 && file_info.title.IsEmpty()) {
+							file_info.title = Title;
+						}
+						if (Title.GetLength() > 0 && file_info.artist.IsEmpty()) {
+							file_info.artist = Performer;
+						}
 
-					((CFLACSource*)m_pFilter)->ChapRemoveAll();
-					while (ChaptersList.GetCount()) {
-						Chapters cp = ChaptersList.RemoveHead();
-						((CFLACSource*)m_pFilter)->ChapAppend(cp.rt, cp.name);
+						((CFLACSource*)m_pFilter)->ChapRemoveAll();
+						while (ChaptersList.GetCount()) {
+							Chapters cp = ChaptersList.RemoveHead();
+							((CFLACSource*)m_pFilter)->ChapAppend(cp.rt, cp.name);
+						}
 					}
 				}
 			}
