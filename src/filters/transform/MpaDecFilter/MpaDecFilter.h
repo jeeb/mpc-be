@@ -49,6 +49,7 @@ enum {
 	SPK_MONO = 0,
 	SPK_STEREO,
 	SPK_4_0,
+	SPK_5_0,
 	SPK_5_1,
 	SPK_7_1
 };

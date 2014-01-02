@@ -101,7 +101,11 @@ bool CMixer::Init()
 	int out_ch = av_popcount(m_out_layout);
 	m_matrix_dbl = (double*)av_mallocz(in_ch * out_ch * sizeof(*m_matrix_dbl));
 	// expand stereo
-	if (m_in_layout == AV_CH_LAYOUT_STEREO && (m_out_layout == AV_CH_LAYOUT_QUAD || m_out_layout == AV_CH_LAYOUT_5POINT1 || m_out_layout == AV_CH_LAYOUT_7POINT1)) {
+	if (m_in_layout == AV_CH_LAYOUT_STEREO
+			&& (m_out_layout == AV_CH_LAYOUT_QUAD
+			|| m_out_layout == AV_CH_LAYOUT_5POINT0
+			|| m_out_layout == AV_CH_LAYOUT_5POINT1
+			|| m_out_layout == AV_CH_LAYOUT_7POINT1)) {
 		m_matrix_dbl[0] = 1.0;
 		m_matrix_dbl[1] = 0.0;
 		m_matrix_dbl[2] = 0.0;
@@ -111,6 +115,13 @@ bool CMixer::Init()
 			m_matrix_dbl[5] = (-0.2222);
 			m_matrix_dbl[6] = (-0.2222);
 			m_matrix_dbl[7] = 0.6666;
+		} else if (m_out_layout == AV_CH_LAYOUT_5POINT0) {
+			m_matrix_dbl[4] = 0.5;
+			m_matrix_dbl[5] = 0.5;
+			m_matrix_dbl[6] =  0.6666;
+			m_matrix_dbl[7] =  (-0.2222);
+			m_matrix_dbl[8] = (-0.2222);
+			m_matrix_dbl[9] = 0.6666;
 		} else if (m_out_layout == AV_CH_LAYOUT_5POINT1 || m_out_layout == AV_CH_LAYOUT_7POINT1) {
 			m_matrix_dbl[4] = 0.5;
 			m_matrix_dbl[5] = 0.5;
