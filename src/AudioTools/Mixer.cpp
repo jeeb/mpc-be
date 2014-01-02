@@ -106,37 +106,32 @@ bool CMixer::Init()
 			|| m_out_layout == AV_CH_LAYOUT_5POINT0
 			|| m_out_layout == AV_CH_LAYOUT_5POINT1
 			|| m_out_layout == AV_CH_LAYOUT_7POINT1)) {
-		m_matrix_dbl[0] = 1.0;
-		m_matrix_dbl[1] = 0.0;
-		m_matrix_dbl[2] = 0.0;
-		m_matrix_dbl[3] = 1.0;
-		if (m_out_layout == AV_CH_LAYOUT_QUAD) {
-			m_matrix_dbl[4] = 0.6666;
-			m_matrix_dbl[5] = (-0.2222);
-			m_matrix_dbl[6] = (-0.2222);
-			m_matrix_dbl[7] = 0.6666;
-		} else {
-			m_matrix_dbl[4] = 0.5;
-			m_matrix_dbl[5] = 0.5;
-			if (m_out_layout == AV_CH_LAYOUT_5POINT0) {
-				m_matrix_dbl[6] = 0.6666;
-				m_matrix_dbl[7] = (-0.2222);
-				m_matrix_dbl[8] = (-0.2222);
-				m_matrix_dbl[9] = 0.6666;
-			} else {
-				m_matrix_dbl[6] = 0.0;
-				m_matrix_dbl[7] = 0.0;
-				m_matrix_dbl[8] =  0.6666;
-				m_matrix_dbl[9] =  (-0.2222);
-				m_matrix_dbl[10] = (-0.2222);
-				m_matrix_dbl[11] = 0.6666;
-				if (m_out_layout == AV_CH_LAYOUT_7POINT1) {
-					m_matrix_dbl[12] = 0.6666;
-					m_matrix_dbl[13] = (-0.2222);
-					m_matrix_dbl[14] = (-0.2222);
-					m_matrix_dbl[15] = 0.6666;
-				}
-			}
+		int i = 0;
+		if (m_out_layout & (AV_CH_FRONT_LEFT | AV_CH_FRONT_RIGHT)) {
+			m_matrix_dbl[i++] = 1.0;
+			m_matrix_dbl[i++] = 0.0;
+			m_matrix_dbl[i++] = 0.0;
+			m_matrix_dbl[i++] = 1.0;
+		}
+		if (m_out_layout & AV_CH_FRONT_CENTER) {
+			m_matrix_dbl[i++] = 0.5;
+			m_matrix_dbl[i++] = 0.5;
+		}
+		if (m_out_layout & AV_CH_LOW_FREQUENCY) {
+			m_matrix_dbl[i++] = 0.0;
+			m_matrix_dbl[i++] = 0.0;
+		}
+		if (m_out_layout & (AV_CH_BACK_LEFT | AV_CH_BACK_RIGHT)) {
+			m_matrix_dbl[i++] = 0.6666;
+			m_matrix_dbl[i++] = (-0.2222);
+			m_matrix_dbl[i++] = (-0.2222);
+			m_matrix_dbl[i++] = 0.6666;
+		}
+		if (m_out_layout & (AV_CH_SIDE_LEFT | AV_CH_SIDE_RIGHT)) {
+			m_matrix_dbl[i++] =  0.6666;
+			m_matrix_dbl[i++] =  (-0.2222);
+			m_matrix_dbl[i++] = (-0.2222);
+			m_matrix_dbl[i++] = 0.6666;
 		}
 	} else {
 		const double center_mix_level   = M_SQRT1_2;
