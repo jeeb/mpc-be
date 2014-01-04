@@ -34,6 +34,9 @@
     <Filter Include="libavcodec\mips">
       <UniqueIdentifier>{af60498e-28cf-49cd-8b37-275da59966d2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="libavfilter">
+      <UniqueIdentifier>{7cbae717-7440-49b2-adfc-6e24433597e8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="config.asm" />
@@ -192,6 +195,9 @@
     </None>
     <None Include="libswscale\x86\scale.asm">
       <Filter>libswscale\x86</Filter>
+    </None>
+    <None Include="libavfilter\all_channel_layouts.inc">
+      <Filter>libavfilter</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -1188,6 +1194,36 @@
     </ClInclude>
     <ClInclude Include="libswscale\version.h">
       <Filter>libswscale</Filter>
+    </ClInclude>
+    <ClInclude Include="libavfilter\audio.h">
+      <Filter>libavfilter</Filter>
+    </ClInclude>
+    <ClInclude Include="libavfilter\avfilter.h">
+      <Filter>libavfilter</Filter>
+    </ClInclude>
+    <ClInclude Include="libavfilter\avfiltergraph.h">
+      <Filter>libavfilter</Filter>
+    </ClInclude>
+    <ClInclude Include="libavfilter\formats.h">
+      <Filter>libavfilter</Filter>
+    </ClInclude>
+    <ClInclude Include="libavfilter\internal.h">
+      <Filter>libavfilter</Filter>
+    </ClInclude>
+    <ClInclude Include="libavfilter\thread.h">
+      <Filter>libavfilter</Filter>
+    </ClInclude>
+    <ClInclude Include="libavfilter\video.h">
+      <Filter>libavfilter</Filter>
+    </ClInclude>
+    <ClInclude Include="libavfilter\version.h">
+      <Filter>libavfilter</Filter>
+    </ClInclude>
+    <ClInclude Include="libavfilter\buffersink.h">
+      <Filter>libavfilter</Filter>
+    </ClInclude>
+    <ClInclude Include="libavfilter\buffersrc.h">
+      <Filter>libavfilter</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2487,6 +2523,30 @@
     </ClCompile>
     <ClCompile Include="libswscale\yuv2rgb.c">
       <Filter>libswscale</Filter>
+    </ClCompile>
+    <ClCompile Include="libavfilter\af_biquads.c">
+      <Filter>libavfilter</Filter>
+    </ClCompile>
+    <ClCompile Include="libavfilter\audio.c">
+      <Filter>libavfilter</Filter>
+    </ClCompile>
+    <ClCompile Include="libavfilter\avfilter.c">
+      <Filter>libavfilter</Filter>
+    </ClCompile>
+    <ClCompile Include="libavfilter\avfiltergraph.c">
+      <Filter>libavfilter</Filter>
+    </ClCompile>
+    <ClCompile Include="libavfilter\formats.c">
+      <Filter>libavfilter</Filter>
+    </ClCompile>
+    <ClCompile Include="libavfilter\video.c">
+      <Filter>libavfilter</Filter>
+    </ClCompile>
+    <ClCompile Include="libavfilter\buffersink.c">
+      <Filter>libavfilter</Filter>
+    </ClCompile>
+    <ClCompile Include="libavfilter\buffersrc.c">
+      <Filter>libavfilter</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
