@@ -347,16 +347,16 @@ REFERENCE_TIME CTAKFile::Seek(REFERENCE_TIME rt)
 	}
 
 	const int FrameNumber = (int)((double)rt / m_rtduration * m_totalframes);
-	__int64 pos			= m_startpos + (__int64)((double)rt / m_rtduration * (m_endpos - m_startpos));
-	__int64 blkpos		= pos;
-	__int64 startpos	= m_startpos;
-	__int64 endpos		= m_endpos - BUFSIZE;
+	__int64 pos		= m_startpos + (__int64)((double)rt / m_rtduration * (m_endpos - m_startpos));
+	__int64 start	= pos;
+	__int64 end		= m_endpos - BUFSIZE;
 
 	BYTE buf[BUFSIZE];
+	int direction		= 0;
 	int CurFrmNum		= -1;
 	__int64 CurFrmPos	= m_endpos;
 
-	while (pos >= startpos && pos <= endpos) {
+	while (pos >= m_startpos && pos < end) {
 		m_pFile->Seek(pos);
 		WORD sync = 0;
 		m_pFile->ByteRead((BYTE*)&sync, sizeof(sync));
@@ -368,24 +368,30 @@ REFERENCE_TIME CTAKFile::Seek(REFERENCE_TIME rt)
 			if (ret >= 0) {
 				CurFrmNum = ret;
 				CurFrmPos = pos;
-				if (CurFrmNum > FrameNumber) {
-					endpos = blkpos;
-					blkpos = max(startpos, blkpos - 4096);
-					pos = blkpos;
+				if (direction <= 0 && CurFrmNum > FrameNumber) {
+					direction = -1;
+					end = start;
+					start = max(m_startpos, start - 4096);
+					pos = start;
 					continue;
 				}
-				if (CurFrmNum < FrameNumber) {
-					pos = min(endpos, pos + 32 * (FrameNumber - CurFrmNum));
-					startpos = blkpos = pos;
+				if (direction >= 0 && CurFrmNum < FrameNumber) {
+					direction = +1;
+					pos = min(end, pos + 32 * (FrameNumber - CurFrmNum));
 					continue;
 				}
-				if (CurFrmNum == FrameNumber) {
-					break;
-				}
+				break; // CurFrmNum == FrameNumber or direction changed
 			}
 		}
 		pos++;
+		if (pos == end && direction == -1) {
+			end = start;
+			start = max(m_startpos, start - 4096);
+			pos = start;
+		}
 	}
+
+	TRACE(L"TAKFile: Seek to frame number %d (%d)\n", CurFrmNum, FrameNumber);
 
 	m_pFile->Seek(CurFrmPos);
 
