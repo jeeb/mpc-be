@@ -197,6 +197,8 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AudioFile.cpp" />
+    <ClCompile Include="TAKFile.cpp" />
     <ClCompile Include="TAKSplitter.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -206,6 +208,8 @@
     <None Include="TAKSplitter.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AudioFile.h" />
+    <ClInclude Include="TAKFile.h" />
     <ClInclude Include="TAKSplitter.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>

@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../BaseSplitter/BaseSplitter.h"
+#include "TAKFile.h"
 
 #pragma warning(disable: 4005 4244)
 extern "C" {
@@ -35,22 +36,10 @@ extern "C" {
 class __declspec(uuid("AA04C78C-3671-43F6-ABFE-6C265BAB2345"))
 	CTAKSplitterFilter : public CBaseSplitterFilter
 {
-	__int64 m_startpos;
-	__int64 m_endpos;
-	
 	REFERENCE_TIME m_rtStart;
 	DWORD m_nAvgBytesPerSec;
 
-	int     m_samplerate;
-	int     m_bitdepth;
-	int     m_channels;
-	DWORD   m_layout;
-	__int64 m_samples;
-	int     m_framelen;
-	int     m_totalframes;
-
-	bool ParseTAKStreamInfo(BYTE* buff, int size);
-	bool Sync(int& nFrameNumber);
+	CTAKFile m_TAKFile;
 
 protected:
 	CAutoPtr<CBaseSplitterFile> m_pFile;
