@@ -155,7 +155,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 	////////// Status //////////
 	p.y = 10 + IPP_SCALE(115) + 5 + IPP_SCALE(65) + 5;
-	int w1 = IPP_SCALE(117);
+	int w1 = IPP_SCALE(122);
 	int w2 = width_s - w1;
 	m_grpStatus.Create(ResStr(IDS_VDF_STATUS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, IPP_SCALE(85))), this, (UINT)IDC_STATIC);
 	p.y += h20;
