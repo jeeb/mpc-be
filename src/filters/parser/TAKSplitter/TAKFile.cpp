@@ -340,6 +340,7 @@ HRESULT CTAKFile::Open(CBaseSplitterFile* pFile)
 REFERENCE_TIME CTAKFile::Seek(REFERENCE_TIME rt)
 {
 #define BUFSIZE 32
+#define BACKSTEP (12288 - BUFSIZE)
 
 	if (rt <= 0) {
 		m_pFile->Seek(m_startpos);
@@ -371,7 +372,7 @@ REFERENCE_TIME CTAKFile::Seek(REFERENCE_TIME rt)
 				if (direction <= 0 && CurFrmNum > FrameNumber) {
 					direction = -1;
 					end = start;
-					start = max(m_startpos, start - 4096);
+					start = max(m_startpos, start - BACKSTEP);
 					pos = start;
 					continue;
 				}
@@ -386,7 +387,7 @@ REFERENCE_TIME CTAKFile::Seek(REFERENCE_TIME rt)
 		pos++;
 		if (pos == end && direction == -1) {
 			end = start;
-			start = max(m_startpos, start - 4096);
+			start = max(m_startpos, start - BACKSTEP);
 			pos = start;
 		}
 	}
