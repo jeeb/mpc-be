@@ -84,6 +84,7 @@ CFilterApp theApp;
 
 CTAKSplitterFilter::CTAKSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("CTAKSplitterFilter"), pUnk, phr, __uuidof(this))
+	, m_id(0)
 	, m_nAvgBytesPerSec(0)
 	, m_rtStart(0)
 {
@@ -134,26 +135,22 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = 0;
 
-	if (m_pFile->BitRead(32) != 'tBaK') {
-		return E_FAIL;
+	m_id = m_pFile->BitRead(32);
+	if (m_id == ID_TAK && SUCCEEDED(m_TAKFile.Open(m_pFile))) {
+		CMediaType mt;
+		if (m_TAKFile.SetMediaType(mt)) {
+			WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.pbFormat;
+			m_nAvgBytesPerSec = wfe->nAvgBytesPerSec;
+			m_rtDuration = m_TAKFile.GetDuration();
+
+			CAtlArray<CMediaType> mts;
+			mts.Add(mt);
+			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Tak Audio Output", this, this, &hr));
+			EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(0, pPinOut)));
+		}
 	}
-
-	if (FAILED(m_TAKFile.Open(m_pFile))) {
+	else {
 		return E_FAIL;
-	}
-
-	CMediaType mt;
-	if (m_TAKFile.SetMediaType(mt)) {
-		WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.pbFormat;
-		m_nAvgBytesPerSec		= wfe->nAvgBytesPerSec;
-		m_rtDuration			= m_TAKFile.GetDuration();
-
-		CAtlArray<CMediaType> mts;
-		mts.Add(mt);
-		CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Tak Audio Output", this, this, &hr));
-		EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(0, pPinOut)));
-
-
 	}
 
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;

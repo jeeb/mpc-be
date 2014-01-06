@@ -3,6 +3,8 @@
 #include "../DSUtil/ApeTag.h"
 #include "AudioFile.h"
 
+#define ID_TAK 'tBaK'
+
 class CTAKFile : public CAudioFile
 {
 	__int64		m_samples;

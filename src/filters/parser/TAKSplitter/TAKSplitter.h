@@ -36,6 +36,8 @@ extern "C" {
 class __declspec(uuid("AA04C78C-3671-43F6-ABFE-6C265BAB2345"))
 	CTAKSplitterFilter : public CBaseSplitterFilter
 {
+	DWORD m_id;
+
 	REFERENCE_TIME m_rtStart;
 	DWORD m_nAvgBytesPerSec;
 
