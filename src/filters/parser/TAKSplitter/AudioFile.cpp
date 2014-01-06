@@ -12,6 +12,7 @@ CAudioFile::CAudioFile()
 	, m_bitdepth(0)
 	, m_channels(0)
 	, m_layout(0)
+	, m_rtduration(0)
 	, m_subtype(GUID_NULL)
 	, m_extradata(NULL)
 	, m_extrasize(0)
@@ -52,7 +53,8 @@ bool CAudioFile::SetMediaType(CMediaType& mt)
 
 REFERENCE_TIME CAudioFile::Seek(REFERENCE_TIME rt)
 {
-	return (rt > 0 ? rt : 0);
+	m_pFile->Seek(m_startpos);
+	return 0;
 }
 
 //int CAudioFile::GetAudioFrame(BYTE* buf, REFERENCE_TIME& rt, int& samples)
