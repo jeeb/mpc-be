@@ -16,6 +16,7 @@ CAudioFile::CAudioFile()
 	, m_subtype(GUID_NULL)
 	, m_extradata(NULL)
 	, m_extrasize(0)
+	, m_APETag(NULL)
 {
 }
 

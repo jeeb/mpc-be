@@ -23,8 +23,8 @@
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
 #endif
-#include "TAKSplitter.h"
 #include <moreuuids.h>
+#include "TAKSplitter.h"
 
 #ifdef REGISTER_FILTER
 
@@ -147,6 +147,10 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			m_nAvgBytesPerSec = wfe->nAvgBytesPerSec;
 			m_rtDuration = m_TAKFile.GetDuration();
 
+			if (m_TAKFile.m_APETag) {
+				SetAPETagProperties(this, m_TAKFile.m_APETag);
+			}
+
 			CAtlArray<CMediaType> mts;
 			mts.Add(mt);
 			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"TAK Audio Output", this, this, &hr));
@@ -159,6 +163,10 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.pbFormat;
 			m_nAvgBytesPerSec = wfe->nAvgBytesPerSec;
 			m_rtDuration = m_APEFile.GetDuration();
+
+			if (m_APEFile.m_APETag) {
+				SetAPETagProperties(this, m_APEFile.m_APETag);
+			}
 
 			CAtlArray<CMediaType> mts;
 			mts.Add(mt);

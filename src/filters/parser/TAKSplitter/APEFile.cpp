@@ -59,7 +59,6 @@ typedef struct {
 CAPEFile::CAPEFile()
 	: CAudioFile()
 	, m_curentframe(0)
-	, m_APETag(NULL)
 {
 	m_subtype = MEDIASUBTYPE_APE;
 }
@@ -212,7 +211,7 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 	}
 	m_frames[ape.totalframes - 1].nblocks = ape.finalframeblocks;
 	/* calculate final packet size from total file size, if available */
-	__int64 file_size = m_pFile->GetLength(); //?
+	const __int64 file_size = m_pFile->GetLength();
 	int final_size = 0;
 	if (file_size > 0) {
 		int final_size = file_size - m_frames[ape.totalframes - 1].pos - ape.wavtaillength;
@@ -265,7 +264,38 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 	memcpy(m_extradata + 4, &ape.formatflags, 2);
 
 	m_startpos = m_pFile->GetPos();
-	m_endpos = m_pFile->GetLength();
+
+	if (m_frames[ape.totalframes-1].pos + APE_TAG_FOOTER_BYTES <= file_size) {
+		BYTE buf[APE_TAG_FOOTER_BYTES];
+		memset(buf, 0, sizeof(buf));
+
+		m_pFile->Seek(file_size - APE_TAG_FOOTER_BYTES);
+		if (SUCCEEDED(m_pFile->ByteRead(buf, APE_TAG_FOOTER_BYTES))) {
+			m_APETag = new CAPETag;
+			size_t tag_size = 0;
+			if (m_APETag->ReadFooter(buf, APE_TAG_FOOTER_BYTES) && m_APETag->GetTagSize()) {
+				tag_size = m_APETag->GetTagSize();
+				m_pFile->Seek(file_size - tag_size);
+				BYTE *p = new BYTE[tag_size];
+				if (SUCCEEDED(m_pFile->ByteRead(p, tag_size))) {
+					m_APETag->ReadTags(p, tag_size);
+				}
+
+				delete [] p;
+			}
+
+			if (m_frames[ape.totalframes - 1].size > tag_size) {
+				m_frames[ape.totalframes - 1].size -= tag_size;
+			}
+
+			if (m_APETag->TagItems.IsEmpty()) {
+				delete m_APETag;
+				m_APETag = NULL;
+			}
+		}
+	}
+
+	m_endpos = min(m_frames[ape.totalframes-1].pos + m_frames[ape.totalframes-1].size, file_size);
 
 	m_pFile->Seek(m_startpos);
 

@@ -1,11 +1,8 @@
 #pragma once
 
-#include "../DSUtil/ApeTag.h"
 #include "AudioFile.h"
 
 #define ID_APE 'MAC '
-
-
 
 class CAPEFile : public CAudioFile
 {
@@ -19,7 +16,6 @@ class CAPEFile : public CAudioFile
 
 	size_t				m_curentframe;
 	CAtlArray<APEFrame>	m_frames;
-	CAPETag*			m_APETag;
 
 public:
 	CAPEFile();

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../BaseSplitter/BaseSplitter.h"
+#include "../DSUtil/ApeTag.h"
 
 #pragma warning(disable: 4005 4244)
 extern "C" {
@@ -23,7 +24,6 @@ protected:
 	//__int64			m_totalsamples;
 	REFERENCE_TIME	m_rtduration;
 
-
 	GUID			m_subtype;
 	BYTE*			m_extradata;
 	int				m_extrasize;
@@ -31,6 +31,8 @@ protected:
 public:
 	CAudioFile();
 	~CAudioFile();
+
+	CAPETag*		m_APETag;
 
 	__int64 GetStartPos() { return m_startpos; }
 	__int64 GetEndPos() { return m_endpos; }
