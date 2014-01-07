@@ -552,7 +552,7 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 #if ENABLE_YUV4MPEG2
 		if (m_RAWType == RAW_Y4M) {
 
-			if (m_pFile->GetRemaining() < sizeof(FRAME_) + m_framesize) {
+			if (m_pFile->GetRemaining() < m_framesize + (int)sizeof(FRAME_)) {
 				break;
 			}
 

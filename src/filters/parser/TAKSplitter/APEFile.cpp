@@ -296,7 +296,7 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 				delete [] p;
 			}
 
-			if (m_frames[ape.totalframes - 1].size > tag_size) {
+			if (m_frames[ape.totalframes - 1].size > (int)tag_size) {
 				m_endpos -= tag_size;
 			}
 
