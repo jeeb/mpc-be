@@ -399,3 +399,16 @@ REFERENCE_TIME CTAKFile::Seek(REFERENCE_TIME rt)
 	rt = CurFrmNum < 0 ? m_rtduration :(REFERENCE_TIME)(10000000.0 * CurFrmNum * m_framelen / m_samplerate);
 	return rt;
 }
+
+int CTAKFile::GetAudioFrame(Packet* packet)
+{
+	if (m_pFile->GetPos() >= m_endpos) {
+		return 0;
+	}
+	int size = min(1024, m_endpos - m_pFile->GetPos());
+	packet->SetCount(size);
+
+	m_pFile->ByteRead(packet->GetData(), size);
+
+	return size;
+}

@@ -27,6 +27,9 @@
     <ClCompile Include="TAKFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="APEFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="TAKSplitter.def">
@@ -47,6 +50,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TAKFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="APEFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

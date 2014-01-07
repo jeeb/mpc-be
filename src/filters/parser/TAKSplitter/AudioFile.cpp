@@ -57,9 +57,7 @@ REFERENCE_TIME CAudioFile::Seek(REFERENCE_TIME rt)
 	return 0;
 }
 
-//int CAudioFile::GetAudioFrame(BYTE* buf, REFERENCE_TIME& rt, int& samples)
-//{
-//	rt = 0;
-//	samples = 0;
-//	return 0;
-//}
+int CAudioFile::GetAudioFrame(Packet* packet)
+{
+	return 0;
+}

@@ -39,5 +39,5 @@ public:
 	HRESULT Open(CBaseSplitterFile* pFile);
 	bool SetMediaType(CMediaType& mt);
 	REFERENCE_TIME Seek(REFERENCE_TIME rt);
-	//int GetAudioFrame(BYTE* buf, REFERENCE_TIME& rt, int& samples);
+	int GetAudioFrame(Packet* packet);
 };

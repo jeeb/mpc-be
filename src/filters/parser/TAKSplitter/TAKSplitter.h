@@ -24,14 +24,15 @@
 
 #include "../BaseSplitter/BaseSplitter.h"
 #include "TAKFile.h"
+#include "APEFile.h"
 
 #pragma warning(disable: 4005 4244)
 extern "C" {
 	#include <stdint.h>
 }
 
-#define TAKSplitterName L"MPC TAK Splitter"
-#define TAKSourceName   L"MPC TAK Source"
+#define TAKSplitterName L"MPC APE/TAK Splitter"
+#define TAKSourceName   L"MPC APE/TAK Source"
 
 class __declspec(uuid("AA04C78C-3671-43F6-ABFE-6C265BAB2345"))
 	CTAKSplitterFilter : public CBaseSplitterFilter
@@ -42,6 +43,7 @@ class __declspec(uuid("AA04C78C-3671-43F6-ABFE-6C265BAB2345"))
 	DWORD m_nAvgBytesPerSec;
 
 	CTAKFile m_TAKFile;
+	CAPEFile m_APEFile;
 
 protected:
 	CAutoPtr<CBaseSplitterFile> m_pFile;

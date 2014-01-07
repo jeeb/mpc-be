@@ -197,6 +197,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="APEFile.cpp" />
     <ClCompile Include="AudioFile.cpp" />
     <ClCompile Include="TAKFile.cpp" />
     <ClCompile Include="TAKSplitter.cpp" />
@@ -208,6 +209,7 @@
     <None Include="TAKSplitter.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="APEFile.h" />
     <ClInclude Include="AudioFile.h" />
     <ClInclude Include="TAKFile.h" />
     <ClInclude Include="TAKSplitter.h" />

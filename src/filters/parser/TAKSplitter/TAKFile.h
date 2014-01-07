@@ -19,4 +19,5 @@ public:
 
 	HRESULT Open(CBaseSplitterFile* pFile);
 	REFERENCE_TIME Seek(REFERENCE_TIME rt);
+	int GetAudioFrame(Packet* packet);
 };

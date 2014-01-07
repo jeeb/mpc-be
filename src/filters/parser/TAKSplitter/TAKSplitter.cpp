@@ -56,11 +56,15 @@ int g_cTemplates = _countof(g_Templates);
 
 STDAPI DllRegisterServer()
 {
+	CAtlList<CString>chkbytes;
+	chkbytes.AddTail(_T("0,4,,7442614B")); // 'tBaK'
+	chkbytes.AddTail(_T("0,4,,4D414320")); // 'MAC '
+
 	RegisterSourceFilter(
 		CLSID_AsyncReader,
 		MEDIASUBTYPE_TAK_Stream,
-		_T("0,4,,7442614B"), // tBaK
-		_T(".tak"), NULL);
+		chkbytes,
+		NULL);
 
 	return AMovieDllRegisterServer2(TRUE);
 }
@@ -145,7 +149,20 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			CAtlArray<CMediaType> mts;
 			mts.Add(mt);
-			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Tak Audio Output", this, this, &hr));
+			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"TAK Audio Output", this, this, &hr));
+			EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(0, pPinOut)));
+		}
+	}
+	else if (m_id == ID_APE && SUCCEEDED(m_APEFile.Open(m_pFile))) {
+		CMediaType mt;
+		if (m_APEFile.SetMediaType(mt)) {
+			WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.pbFormat;
+			m_nAvgBytesPerSec = wfe->nAvgBytesPerSec;
+			m_rtDuration = m_APEFile.GetDuration();
+
+			CAtlArray<CMediaType> mts;
+			mts.Add(mt);
+			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"APE Audio Output", this, this, &hr));
 			EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(0, pPinOut)));
 		}
 	}
@@ -168,30 +185,42 @@ bool CTAKSplitterFilter::DemuxInit()
 
 void CTAKSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
-	m_rtStart = m_TAKFile.Seek(rt);
+	if (m_id == ID_TAK) {
+		m_rtStart = m_TAKFile.Seek(rt);
+	}
+	else if (m_id == ID_APE) {
+		m_rtStart = m_APEFile.Seek(rt);
+	}
 }
 
 bool CTAKSplitterFilter::DemuxLoop()
 {
 	HRESULT hr = S_OK;
 
-	while (SUCCEEDED(hr) && !CheckRequest(NULL) && m_pFile->GetPos() < m_TAKFile.GetEndPos()) {
+	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
 
 		CAutoPtr<Packet> p(DNew Packet());
 
-		size_t size		= min(1024, m_pFile->GetRemaining());
+		size_t size = 0;
+		if (m_id == ID_TAK) {
+			size = m_TAKFile.GetAudioFrame(p);
+			p->rtStart = m_rtStart;
+			p->rtStop  = m_rtStart + m_nAvgBytesPerSec; // Hmm. WTF?
+		}
+		else if (m_id == ID_APE) {
+			size = m_APEFile.GetAudioFrame(p);
+		}
 
-		p->SetCount(size);
-		m_pFile->ByteRead(p->GetData(), size);
+		if (!size) {
+			break;
+		}
 
-		p->TrackNumber	= 0;
-		p->rtStart		= m_rtStart;
-		p->rtStop		= m_rtStart + m_nAvgBytesPerSec;
-		p->bSyncPoint	= TRUE;
+		p->TrackNumber = 0;
+		p->bSyncPoint = TRUE;
+
+		m_rtStart = p->rtStop;
 
 		hr = DeliverPacket(p);
-
-		m_rtStart += m_nAvgBytesPerSec;
 	}
 
 	return true;
