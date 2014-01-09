@@ -784,6 +784,7 @@
     <ClCompile Include="libavcodec\x86\vp6dsp_init.c" />
     <ClCompile Include="libavcodec\x86\vp8dsp_init.c" />
     <ClCompile Include="libavcodec\xiph.c" />
+    <ClCompile Include="libavfilter\af_atempo.c" />
     <ClCompile Include="libavfilter\af_biquads.c" />
     <ClCompile Include="libavfilter\audio.c" />
     <ClCompile Include="libavfilter\avfilter.c" />

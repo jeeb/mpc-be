@@ -419,6 +419,7 @@ SRCS_C = \
 	libavcodec/x86/vp3dsp_init.c \
 	libavcodec/x86/vp6dsp_init.c \
 	libavcodec/x86/vp8dsp_init.c \
+	libavfilter\af_atempo.c \
 	libavfilter\af_biquads.c \
 	libavfilter\audio.c \
 	libavfilter\avfilter.c \

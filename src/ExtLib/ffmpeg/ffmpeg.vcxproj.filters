@@ -2524,6 +2524,9 @@
     <ClCompile Include="libswscale\yuv2rgb.c">
       <Filter>libswscale</Filter>
     </ClCompile>
+    <ClCompile Include="libavfilter\af_atempo.c">
+      <Filter>libavfilter</Filter>
+    </ClCompile>
     <ClCompile Include="libavfilter\af_biquads.c">
       <Filter>libavfilter</Filter>
     </ClCompile>
