@@ -1881,7 +1881,6 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt)
 
 	// Exit and wait for next packet if there is no SPS and PPS yet
 	if ((!h.spspps[index_sps].complete && !h.spspps[index_subsetsps].complete) || !h.spspps[index_pps1].complete || repeat) {
-
 		return false;
 	}
 
@@ -1909,7 +1908,6 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt)
 		int len = FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + extra;
 		MPEG2VIDEOINFO* vi			= (MPEG2VIDEOINFO*)DNew BYTE[len];
 		memset(vi, 0, len);
-		// vi->hdr.dwBitRate = ;
 		
 		vi->hdr.AvgTimePerFrame		= h.hdr.AvgTimePerFrame;
 		vi->hdr.dwPictAspectRatioX	= aspect.cx;

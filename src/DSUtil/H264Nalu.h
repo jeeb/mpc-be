@@ -58,18 +58,18 @@ public :
 	CH264Nalu() { SetBuffer(NULL, 0, 0); }
 
 	NALU_TYPE GetType() const { return nal_unit_type; };
-	bool IsRefFrame()   const { return (nal_reference_idc != 0); };
+	bool IsRefFrame() const { return (nal_reference_idc != 0); };
 
 	size_t GetDataLength() const { return m_nCurPos - m_nNALDataPos; };
-	BYTE* GetDataBuffer()     { return m_pBuffer + m_nNALDataPos; };
+	BYTE* GetDataBuffer() { return m_pBuffer + m_nNALDataPos; };
 	size_t GetRoundedDataLength() const {
 		size_t nSize = m_nCurPos - m_nNALDataPos;
 		return nSize + 128 - (nSize %128);
 	}
 
 	size_t GetLength() const { return m_nCurPos - m_nNALStartPos; };
-	BYTE* GetNALBuffer()  { return m_pBuffer + m_nNALStartPos; };
-	bool IsEOF() const    { return m_nCurPos >= m_nSize; };
+	BYTE* GetNALBuffer() { return m_pBuffer + m_nNALStartPos; };
+	bool IsEOF() const { return m_nCurPos >= m_nSize; };
 
 	void SetBuffer(BYTE* pBuffer, size_t nSize, int nNALSize);
 	bool ReadNext();

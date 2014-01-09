@@ -306,6 +306,10 @@ bool CFLVSplitterFilter::ReadTag(Tag& t)
 		//return false;
 	}
 
+	if (m_pFile->GetRemaining(true) < 15) {
+		return false;
+	}
+
 	t.PreviousTagSize	= (UINT32)m_pFile->BitRead(32);
 	t.TagType			= (BYTE)m_pFile->BitRead(8);
 	t.DataSize			= (UINT32)m_pFile->BitRead(24);
@@ -334,6 +338,10 @@ bool CFLVSplitterFilter::ReadTag(AudioTag& at)
 		//return false;
 	}
 
+	if (!m_pFile->GetRemaining(true)) {
+		return false;
+	}
+
 	at.SoundFormat	= (BYTE)m_pFile->BitRead(4);
 	at.SoundRate	= (BYTE)m_pFile->BitRead(2);
 	at.SoundSize	= (BYTE)m_pFile->BitRead(1);
@@ -348,12 +356,20 @@ bool CFLVSplitterFilter::ReadTag(VideoTag& vt)
 		//return false;
 	}
 
+	if (!m_pFile->GetRemaining(true)) {
+		return false;
+	}
+
 	vt.FrameType		= (BYTE)m_pFile->BitRead(4);
 	vt.CodecID			= (BYTE)m_pFile->BitRead(4);
 	vt.AVCPacketType	= 0;
 	vt.tsOffset			= 0;
 
 	if (IsAVCCodec(vt.CodecID)) {
+		if (m_pFile->GetRemaining(true) < 3) {
+			return false;
+		}
+
 		vt.AVCPacketType	= (BYTE)m_pFile->BitRead(8);
 		if (vt.AVCPacketType == 1) {
 			vt.tsOffset		= (UINT32)m_pFile->BitRead(24);

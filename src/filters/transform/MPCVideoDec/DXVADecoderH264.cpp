@@ -101,7 +101,7 @@ void CDXVADecoderH264::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSi
 	m_nSlices				= 0;
 
 	while (!m_nSlices && slice_step <= 2) {
-		Nalu.SetBuffer (pBuffer, m_nSize, slice_step == 1 ? m_nNALLength : 0);
+		Nalu.SetBuffer(pBuffer, m_nSize, slice_step == 1 ? m_nNALLength : 0);
 		nSize = 0;
 		while (Nalu.ReadNext()) {
 			switch (Nalu.GetType()) {
@@ -176,7 +176,7 @@ HRESULT CDXVADecoderH264::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 					&SecondFieldOffset, &Sync, &m_nNALLength));
 
 	while (!nSlices && slice_step <= 2) {
-		Nalu.SetBuffer (pDataIn, nSize, slice_step == 1 ? m_nNALLength : 0);
+		Nalu.SetBuffer(pDataIn, nSize, slice_step == 1 ? m_nNALLength : 0);
 		while (Nalu.ReadNext()) {
 			switch (Nalu.GetType()) {
 				case NALU_TYPE_SLICE:

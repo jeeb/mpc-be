@@ -1907,7 +1907,7 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			int size = next - start;
 
 			CH264Nalu Nalu;
-			Nalu.SetBuffer (start, size, 0);
+			Nalu.SetBuffer(start, size, 0);
 
 			CAutoPtr<Packet> p2;
 
