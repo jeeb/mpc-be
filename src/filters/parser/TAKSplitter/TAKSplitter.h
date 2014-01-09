@@ -37,13 +37,8 @@ extern "C" {
 class __declspec(uuid("AA04C78C-3671-43F6-ABFE-6C265BAB2345"))
 	CTAKSplitterFilter : public CBaseSplitterFilter
 {
-	DWORD m_id;
-
+	CAudioFile* m_pAudioFile;
 	REFERENCE_TIME m_rtStart;
-	DWORD m_nAvgBytesPerSec;
-
-	CTAKFile m_TAKFile;
-	CAPEFile m_APEFile;
 
 protected:
 	CAutoPtr<CBaseSplitterFile> m_pFile;
@@ -55,6 +50,7 @@ protected:
 
 public:
 	CTAKSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr);
+	~CTAKSplitterFilter();
 
 	DECLARE_IUNKNOWN
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);

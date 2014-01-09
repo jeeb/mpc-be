@@ -88,10 +88,14 @@ CFilterApp theApp;
 
 CTAKSplitterFilter::CTAKSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("CTAKSplitterFilter"), pUnk, phr, __uuidof(this))
-	, m_id(0)
-	, m_nAvgBytesPerSec(0)
+	, m_pAudioFile(NULL)
 	, m_rtStart(0)
 {
+}
+
+CTAKSplitterFilter::~CTAKSplitterFilter()
+{
+	SAFE_DELETE(m_pAudioFile);
 }
 
 STDMETHODIMP CTAKSplitterFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -139,37 +143,19 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = 0;
 
-	m_id = m_pFile->BitRead(32);
-	if (m_id == ID_TAK && SUCCEEDED(m_TAKFile.Open(m_pFile))) {
+	m_pAudioFile = CAudioFile::CreateFilter(m_pFile);
+	if (m_pAudioFile) {
 		CMediaType mt;
-		if (m_TAKFile.SetMediaType(mt)) {
-			WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.pbFormat;
-			m_nAvgBytesPerSec = wfe->nAvgBytesPerSec;
-			m_rtDuration = m_TAKFile.GetDuration();
+		if (m_pAudioFile->SetMediaType(mt)) {
+			m_rtDuration = m_pAudioFile->GetDuration();
 
-			if (m_TAKFile.m_APETag) {
-				SetAPETagProperties(this, m_TAKFile.m_APETag);
+			if (m_pAudioFile->m_APETag) {
+				SetAPETagProperties(this, m_pAudioFile->m_APETag);
 			}
 
 			CAtlArray<CMediaType> mts;
 			mts.Add(mt);
-			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"TAK Audio Output", this, this, &hr));
-			EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(0, pPinOut)));
-		}
-	} else if (m_id == ID_APE && SUCCEEDED(m_APEFile.Open(m_pFile))) {
-		CMediaType mt;
-		if (m_APEFile.SetMediaType(mt)) {
-			WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.pbFormat;
-			m_nAvgBytesPerSec = wfe->nAvgBytesPerSec;
-			m_rtDuration = m_APEFile.GetDuration();
-
-			if (m_APEFile.m_APETag) {
-				SetAPETagProperties(this, m_APEFile.m_APETag);
-			}
-
-			CAtlArray<CMediaType> mts;
-			mts.Add(mt);
-			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"APE Audio Output", this, this, &hr));
+			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, m_pAudioFile->GetName() + L" Audio Output", this, this, &hr));
 			EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(0, pPinOut)));
 		}
 	}
@@ -180,7 +166,7 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 bool CTAKSplitterFilter::DemuxInit()
 {
 	SetThreadName((DWORD)-1, "CTAKSplitterFilter");
-	if (!m_pFile) {
+	if (!m_pFile || !m_pAudioFile) {
 		return false;
 	}
 
@@ -189,36 +175,22 @@ bool CTAKSplitterFilter::DemuxInit()
 
 void CTAKSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
-	if (m_id == ID_TAK) {
-		m_rtStart = m_TAKFile.Seek(rt);
-	} else if (m_id == ID_APE) {
-		m_rtStart = m_APEFile.Seek(rt);
-	}
+	m_rtStart = m_pAudioFile ? m_pAudioFile->Seek(rt) : 0;
 }
 
 bool CTAKSplitterFilter::DemuxLoop()
 {
 	HRESULT hr = S_OK;
 
-	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
-
+	while (m_pAudioFile && SUCCEEDED(hr) && !CheckRequest(NULL)) {
 		CAutoPtr<Packet> p(DNew Packet());
 
-		size_t size = 0;
-		if (m_id == ID_TAK) {
-			size = m_TAKFile.GetAudioFrame(p);
-			p->rtStart = m_rtStart;
-			p->rtStop  = m_rtStart + m_nAvgBytesPerSec; // Hmm. WTF?
-		} else if (m_id == ID_APE) {
-			size = m_APEFile.GetAudioFrame(p);
-		}
-
-		if (!size) {
+		if (!m_pAudioFile->GetAudioFrame(p, m_rtStart)) {
 			break;
 		}
 
-		p->TrackNumber = 0;
-		p->bSyncPoint = TRUE;
+		p->TrackNumber	= 0;
+		p->bSyncPoint	= TRUE;
 
 		m_rtStart = p->rtStop;
 
