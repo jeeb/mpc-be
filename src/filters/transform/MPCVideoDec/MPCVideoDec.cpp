@@ -1958,7 +1958,7 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 		if (m_nCodecId == AV_CODEC_ID_H264 && !bH264avc && extra[0] == 1) {
 			av_freep(&extra);
 			extralen = 0;
-		} 
+		}
 		
 		if (m_nCodecId == AV_CODEC_ID_HEVC) {
 			// try Reconstruct NAL units sequence into NAL Units in Byte-Stream Format
@@ -2120,7 +2120,7 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 		InitDecoder(&m_pInput->CurrentMediaType());
 	}
 
-	return __super::NewSegment (rtStart, rtStop, dRate);
+	return __super::NewSegment(rtStart, rtStop, dRate);
 }
 
 HRESULT CMPCVideoDecFilter::EndOfStream()
@@ -2367,6 +2367,13 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 				} else {
 					avpkt.data		= NULL;
 					avpkt.size		= 0;
+				}
+
+				if (m_nDecoderMode != MODE_SOFTWARE) {
+					// use ffmpeg's parser for DXVA decoder - MPEG2 & H.264 AnnexB format
+					hr = m_pDXVADecoder->DecodeFrame(avpkt.data, avpkt.size, avpkt.pts, avpkt.pts + 1);
+					av_frame_unref(m_pFrame);
+					continue;
 				}
 
 				int ret2 = avcodec_decode_video2(m_pAVCtx, m_pFrame, &got_picture, &avpkt);
@@ -2616,13 +2623,17 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 					m_pDXVADecoder->ConfigureDXVA1();
 				}
 
-				int width	= PictWidthRounded();
-				int Height	= PictHeightRounded();
+				int nWidth	= PictWidthRounded();
+				int nHeight	= PictHeightRounded();
 
-				hr = m_pDXVADecoder->DecodeFrame(pDataIn, nSize, rtStart, rtStop);
-				av_frame_unref(m_pFrame);
+				if (m_pParser) {
+					hr = SoftwareDecode(pIn, pDataIn, nSize, rtStart, rtStop);
+				} else {
+					hr = m_pDXVADecoder->DecodeFrame(pDataIn, nSize, rtStart, rtStop);
+					av_frame_unref(m_pFrame);
+				}
 
-				if (width != PictWidthRounded() || Height != PictHeightRounded()) {
+				if (nWidth != PictWidthRounded() || nHeight != PictHeightRounded()) {
 					FindDecoderConfiguration();
 					RecommitAllocator();
 					ReconnectOutput(PictWidth(), PictHeight());

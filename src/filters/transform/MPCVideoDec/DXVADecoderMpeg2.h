@@ -25,15 +25,6 @@
 
 #define MAX_SLICE		1024 // Max slice number for Mpeg2 streams
 
-#define MAX_BUFF_TIME	20
-
-typedef struct {
-	REFERENCE_TIME	rtStart;
-	REFERENCE_TIME	rtStop;
-	int				nBuffPos;
-} BUFFER_TIME;
-
-
 class CDXVADecoderMpeg2 : public CDXVADecoder
 {
 public:
@@ -48,7 +39,6 @@ public:
 
 protected :
 
-	HRESULT			DecodeFrameInternal(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 	virtual int		FindOldestFrame();
 private:
 	DXVA_PictureParameters	m_PictureParams;
@@ -59,24 +49,7 @@ private:
 
 	int						m_nNextCodecIndex;
 
-	bool 					m_bFrame_repeat_pict;
-
 	// Private functions
 	void					Init();
 	void					UpdatePictureParams(int nSurfaceIndex);
-
-protected:
-	BYTE*			m_pMPEG2Buffer;
-	int				m_nMPEG2BufferSize;
-
-	int				m_nMPEG2BufferPos;
-	int				m_nMPEG2PicEnd;
-	BUFFER_TIME		m_MPEG2BufferTime[MAX_BUFF_TIME];
-
-	bool			FindPicture(int nIndex, int nStartCode);
-	bool			AppendBuffer(BYTE* pDataIn, int nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-	void			PopBufferTime(int nPos);
-	void			PushBufferTime(int nPos, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
-	void			ResetBuffer();
-	bool			ShrinkBuffer();
 };

@@ -80,33 +80,7 @@ void CDXVADecoderMpeg2::Init()
 			ASSERT(FALSE);
 	}
 
-	m_pMPEG2Buffer = NULL;
-
 	Flush();
-}
-
-HRESULT CDXVADecoderMpeg2::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
-{
-	TRACE_MPEG2 ("CDXVADecoderMpeg2::DecodeFrame() : %d\n", nSize);
-
-	AppendBuffer(pDataIn, nSize, rtStart, rtStop);
-	HRESULT hr = S_OK;
-
-	while (FindPicture(max(m_nMPEG2BufferPos - int(nSize) - 4, 0), 0x00)) {
-		if (m_MPEG2BufferTime[0].nBuffPos != INT_MIN && m_MPEG2BufferTime[0].nBuffPos < m_nMPEG2PicEnd) {
-			rtStart = m_MPEG2BufferTime[0].rtStart;
-			rtStop  = m_MPEG2BufferTime[0].rtStop;
-		} else {
-			rtStart = rtStop = INVALID_TIME;
-		}
-
-		hr = DecodeFrameInternal(m_pMPEG2Buffer, m_nMPEG2PicEnd, rtStart, rtStop);
-		av_frame_unref(m_pFilter->GetFrame());
-
-		ShrinkBuffer();
-	}
-
-	return hr;
 }
 
 static CString FrameType(bool bIsField, BYTE bSecondField)
@@ -121,7 +95,7 @@ static CString FrameType(bool bIsField, BYTE bSecondField)
 	return str;
 }
 
-HRESULT CDXVADecoderMpeg2::DecodeFrameInternal(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
+HRESULT CDXVADecoderMpeg2::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
 	HRESULT					hr					= S_FALSE;
 	int						nSurfaceIndex		= -1;
@@ -246,8 +220,6 @@ void CDXVADecoderMpeg2::Flush()
 	m_wRefPictureIndex[0]	= NO_REF_FRAME;
 	m_wRefPictureIndex[1]	= NO_REF_FRAME;
 
-	ResetBuffer();
-
 	__super::Flush();
 }
 
@@ -268,117 +240,4 @@ int CDXVADecoderMpeg2::FindOldestFrame()
 	}
 
 	return nPos;
-}
-
-bool CDXVADecoderMpeg2::FindPicture(int nIndex, int nStartCode)
-{
-	CheckPointer(m_pMPEG2Buffer, false);
-
-	DWORD dw = 0;
-	for (int i = 0; i < m_nMPEG2BufferPos - nIndex; i++) {
-		dw = (dw << 8) + m_pMPEG2Buffer[i + nIndex];
-		if (i >= 4) {
-			if (m_nMPEG2PicEnd == INT_MIN) {
-				if ((dw & 0xffffff00) == 0x00000100 &&
-						(dw & 0x000000FF) == (DWORD)nStartCode) {
-					m_nMPEG2PicEnd = i + nIndex - 3;
-				}
-			} else {
-				if ((dw & 0xffffff00) == 0x00000100 &&
-						((dw & 0x000000FF) == (DWORD)nStartCode || (dw & 0x000000FF) == 0xB3)) {
-					m_nMPEG2PicEnd = i + nIndex - 3;
-					return true;
-				}
-			}
-		}
-
-	}
-
-	return false;
-}
-
-bool CDXVADecoderMpeg2::AppendBuffer(BYTE* pDataIn, int nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
-{
-	if (rtStart != INVALID_TIME) {
-		PushBufferTime (m_nMPEG2BufferPos, rtStart, rtStop);
-	}
-
-	if (m_nMPEG2BufferPos + nSize > m_nMPEG2BufferSize) {
-		m_nMPEG2BufferSize	= m_nMPEG2BufferPos + nSize;
-		m_pMPEG2Buffer		= (BYTE*)av_realloc(m_pMPEG2Buffer, m_nMPEG2BufferSize);
-	}
-
-	memcpy_sse(m_pMPEG2Buffer + m_nMPEG2BufferPos, pDataIn, nSize);
-
-	m_nMPEG2BufferPos += nSize;
-
-	return true;
-}
-
-void CDXVADecoderMpeg2::PopBufferTime(int nPos)
-{
-	int nDestPos	= 0;
-	int i			= 0;
-
-	// Shift buffer time list
-	while (i < MAX_BUFF_TIME && m_MPEG2BufferTime[i].nBuffPos != INT_MIN) {
-		if (m_MPEG2BufferTime[i].nBuffPos >= nPos) {
-			m_MPEG2BufferTime[nDestPos].nBuffPos	= m_MPEG2BufferTime[i].nBuffPos - nPos;
-			m_MPEG2BufferTime[nDestPos].rtStart		= m_MPEG2BufferTime[i].rtStart;
-			m_MPEG2BufferTime[nDestPos].rtStop		= m_MPEG2BufferTime[i].rtStop;
-			nDestPos++;
-		}
-		i++;
-	}
-
-	// Free unused slots
-	for (i = nDestPos; i < MAX_BUFF_TIME; i++) {
-		m_MPEG2BufferTime[i].nBuffPos	= INT_MIN;
-		m_MPEG2BufferTime[i].rtStart	= INVALID_TIME;
-		m_MPEG2BufferTime[i].rtStop		= INVALID_TIME;
-	}
-}
-
-void CDXVADecoderMpeg2::PushBufferTime(int nPos, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
-{
-	for (int i = 0; i < MAX_BUFF_TIME; i++) {
-		if (m_MPEG2BufferTime[i].nBuffPos == INT_MIN) {
-			m_MPEG2BufferTime[i].nBuffPos	= nPos;
-			m_MPEG2BufferTime[i].rtStart	= rtStart;
-			m_MPEG2BufferTime[i].rtStop		= rtStop;
-			break;
-		}
-	}
-}
-
-void CDXVADecoderMpeg2::ResetBuffer()
-{
-	TRACE_MPEG2 ("CDXVADecoderMpeg2::ResetBuffer()\n");
-
-	av_freep(&m_pMPEG2Buffer);
-	
-	m_nMPEG2BufferSize	= 0;
-	m_nMPEG2BufferPos	= 0;
-	m_nMPEG2PicEnd		= INT_MIN;
-
-	for (int i = 0; i < MAX_BUFF_TIME; i++) {
-		m_MPEG2BufferTime[i].nBuffPos	= INT_MIN;
-		m_MPEG2BufferTime[i].rtStart	= INVALID_TIME;
-		m_MPEG2BufferTime[i].rtStop		= INVALID_TIME;
-	}
-}
-
-bool CDXVADecoderMpeg2::ShrinkBuffer()
-{
-	CheckPointer(m_pMPEG2Buffer, false);
-
-	int nRemaining = m_nMPEG2BufferPos - m_nMPEG2PicEnd;
-
-	PopBufferTime(m_nMPEG2PicEnd);
-	memcpy_sse(m_pMPEG2Buffer, m_pMPEG2Buffer + m_nMPEG2PicEnd, nRemaining);
-	m_nMPEG2BufferPos = nRemaining;
-
-	m_nMPEG2PicEnd = (m_pMPEG2Buffer[3] == 0x00) ?  0 : INT_MIN;
-
-	return true;
 }
