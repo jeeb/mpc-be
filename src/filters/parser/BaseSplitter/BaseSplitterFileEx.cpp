@@ -1955,7 +1955,7 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt)
 		pmt->formattype						= FORMAT_MPEG2_VIDEO;
 		pmt->subtype						= FOURCCMap(FCC('H264'));
 
-		MPEG2VIDEOINFO* mp2vi				= (MPEG2VIDEOINFO*)pmt->AllocFormatBuffer(sizeof(MPEG2VIDEOINFO) + extra);
+		MPEG2VIDEOINFO* mp2vi				= (MPEG2VIDEOINFO*)pmt->AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + extra);
 		memset(pmt->Format(), 0, pmt->FormatLength());
 
 		mp2vi->hdr.AvgTimePerFrame			= h.hdr.AvgTimePerFrame;
