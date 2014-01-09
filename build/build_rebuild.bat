@@ -1,7 +1,7 @@
 @ECHO OFF
 REM $Id$
 REM
-REM (C) 2009-2013 see Authors.txt
+REM (C) 2009-2014 see Authors.txt
 REM
 REM This file is part of MPC-BE.
 REM
