@@ -171,6 +171,7 @@ extern int				MakeAACInitData(BYTE* pData, int profile, int freq, int channels);
 extern bool				MakeMPEG2MediaType(CMediaType& mt, BYTE* seqhdr, DWORD len, int w, int h);
 extern HRESULT			CreateMPEG2VIfromAVC(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_TIME AvgTimePerFrame, CSize aspect, BYTE* extra, size_t extralen);
 extern HRESULT			CreateMPEG2VISimple(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_TIME AvgTimePerFrame, CSize aspect, BYTE* extra, size_t extralen);
+extern HRESULT			CreateAVCfromH264(CMediaType* mt);
 
 extern CStringA			VobSubDefHeader(int w, int h, CStringA palette = "");
 extern void				CorrectWaveFormatEx(CMediaType *pmt);

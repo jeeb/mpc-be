@@ -1861,8 +1861,6 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt)
 				Seek(pos);
 				h.spspps[index].size += len;
 
-				//ASSERT(h.spspps[index].size < bufsize); // disable for better debug ...
-
 				if (h.spspps[index].size >= bufsize || dwStartCode == 0x00000001 || (dwStartCode & 0xFFFFFF00) == 0x00000100) {
 					if (Read(h, index)) {
 						h.spspps[index].complete = true;
@@ -1889,6 +1887,13 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt)
 	}
 
 	{
+		CSize aspect(h.hdr.width * h.hdr.sar.num, h.hdr.height * h.hdr.sar.den);
+		ReduceDim(aspect);
+		if (aspect.cx * 2 < aspect.cy) {
+			return false;
+		}
+
+		/*
 		// Calculate size of extra data
 		int extra = 0;
 		for (int i = 0; i < 4; i++) {
@@ -1897,35 +1902,31 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt)
 			}
 		}
 
-		CSize aspect(h.hdr.width * h.hdr.sar.num, h.hdr.height * h.hdr.sar.den);
-		ReduceDim(aspect);
-		if (aspect.cx * 2 < aspect.cy) {
-			return false;
+		pmt->majortype					= MEDIATYPE_Video;
+		pmt->formattype					= FORMAT_MPEG2_VIDEO;
+		if (h.spspps[index_subsetsps].complete && !h.spspps[index_sps].complete) {
+			pmt->subtype				= FOURCCMap('CVME');	// MVC stream without base view
+		} else if (h.spspps[index_subsetsps].complete && h.spspps[index_sps].complete) {
+			pmt->subtype				= FOURCCMap('CVMA');	// MVC stream with base view
+		} else {
+			pmt->subtype				= FOURCCMap('1CVA');	// AVC stream
 		}
 
-		pmt->majortype				= MEDIATYPE_Video;
-		pmt->formattype				= FORMAT_MPEG2_VIDEO;
 		int len = FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + extra;
-		MPEG2VIDEOINFO* vi			= (MPEG2VIDEOINFO*)DNew BYTE[len];
+		MPEG2VIDEOINFO* vi				= (MPEG2VIDEOINFO*)DNew BYTE[len];
 		memset(vi, 0, len);
 		
-		vi->hdr.AvgTimePerFrame		= h.hdr.AvgTimePerFrame;
-		vi->hdr.dwPictAspectRatioX	= aspect.cx;
-		vi->hdr.dwPictAspectRatioY	= aspect.cy;
-		vi->hdr.bmiHeader.biSize = sizeof(vi->hdr.bmiHeader);
-		vi->hdr.bmiHeader.biWidth	= h.hdr.width;
-		vi->hdr.bmiHeader.biHeight	= h.hdr.height;
-		if (h.spspps[index_subsetsps].complete && !h.spspps[index_sps].complete) {
-			pmt->subtype			= FOURCCMap(vi->hdr.bmiHeader.biCompression = 'CVME');	// MVC stream without base view
-		} else if (h.spspps[index_subsetsps].complete && h.spspps[index_sps].complete) {
-			pmt->subtype			= FOURCCMap(vi->hdr.bmiHeader.biCompression = 'CVMA');	// MVC stream with base view
-		} else {
-			pmt->subtype			= FOURCCMap(vi->hdr.bmiHeader.biCompression = '1CVA');	// AVC stream
-		}
-		vi->dwProfile				= h.hdr.profile;
-		vi->dwFlags					= 4; // ?
-		vi->dwLevel					= h.hdr.level;
-		vi->cbSequenceHeader		= extra;
+		vi->hdr.AvgTimePerFrame			= h.hdr.AvgTimePerFrame;
+		vi->hdr.dwPictAspectRatioX		= aspect.cx;
+		vi->hdr.dwPictAspectRatioY		= aspect.cy;
+		vi->hdr.bmiHeader.biSize		= sizeof(vi->hdr.bmiHeader);
+		vi->hdr.bmiHeader.biWidth		= h.hdr.width;
+		vi->hdr.bmiHeader.biHeight		= h.hdr.height;
+		vi->hdr.bmiHeader.biCompression	= pmt->subtype.Data1;
+		vi->dwProfile					= h.hdr.profile;
+		vi->dwFlags						= 4; // ?
+		vi->dwLevel						= h.hdr.level;
+		vi->cbSequenceHeader			= extra;
 
 		// Copy extra data
 		BYTE* p = (BYTE*)&vi->dwSequenceHeader[0];
@@ -1937,9 +1938,46 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt)
 				p += h.spspps[i].size;
 			}
 		}
-
+		
 		pmt->SetFormat((BYTE*)vi, len);
 		delete [] vi;
+		*/
+
+		// Calculate size of extra data
+		DWORD extra = 0;
+		for (int i = 0; i < 4; i++) {
+			if (h.spspps[i].complete) {
+				extra += 4 + (h.spspps[i].size);
+			}
+		}
+
+		pmt->majortype						= MEDIATYPE_Video;
+		pmt->formattype						= FORMAT_MPEG2_VIDEO;
+		pmt->subtype						= FOURCCMap(FCC('H264'));
+
+		MPEG2VIDEOINFO* mp2vi				= (MPEG2VIDEOINFO*)pmt->AllocFormatBuffer(sizeof(MPEG2VIDEOINFO) + extra);
+		memset(pmt->Format(), 0, pmt->FormatLength());
+
+		mp2vi->hdr.AvgTimePerFrame			= h.hdr.AvgTimePerFrame;
+		mp2vi->hdr.dwPictAspectRatioX		= aspect.cx;
+		mp2vi->hdr.dwPictAspectRatioY		= aspect.cy;
+		mp2vi->hdr.bmiHeader.biSize			= sizeof(mp2vi->hdr.bmiHeader);
+		mp2vi->hdr.bmiHeader.biWidth		= h.hdr.width;
+		mp2vi->hdr.bmiHeader.biHeight		= h.hdr.height;
+		mp2vi->hdr.bmiHeader.biCompression	= pmt->subtype.Data1;
+		mp2vi->dwProfile					= h.hdr.profile;
+		mp2vi->dwFlags						= 4; // ?
+		mp2vi->dwLevel						= h.hdr.level;
+		mp2vi->cbSequenceHeader				= extra;
+
+		BYTE* p = (BYTE*)&mp2vi->dwSequenceHeader[0];
+		for (int i = 0; i < 4; i++) {
+			if (h.spspps[i].complete) {
+				*p++ = 0x00; *p++ = 0x00; *p++ = 0x00; *p++ = 0x01;
+				memcpy(p, h.spspps[i].buffer, h.spspps[i].size);
+				p += h.spspps[i].size;
+			}
+		}
 	}
 
 	return true;
@@ -2106,19 +2144,20 @@ bool CBaseSplitterFileEx::Read(vc1hdr& h, int len, CMediaType* pmt)
 		ReduceDim(aspect);
 
 		pmt->majortype				= MEDIATYPE_Video;
-		pmt->subtype				= FOURCCMap('1CVW');
+		pmt->subtype				= FOURCCMap(FCC('WVC1'));
 		pmt->formattype				= FORMAT_VIDEOINFO2;
+
 		int vi_len					= sizeof(VIDEOINFOHEADER2) + (int)extralen + 1;
 		VIDEOINFOHEADER2* vi		= (VIDEOINFOHEADER2*)DNew BYTE[vi_len];
 		memset(vi, 0, vi_len);
-		vi->AvgTimePerFrame			= (10000000I64*nFrameRateNum)/nFrameRateDen;
 
+		vi->AvgTimePerFrame			= (10000000I64*nFrameRateNum)/nFrameRateDen;
 		vi->dwPictAspectRatioX		= aspect.cx;
 		vi->dwPictAspectRatioY		= aspect.cy;
 		vi->bmiHeader.biSize		= sizeof(vi->bmiHeader);
 		vi->bmiHeader.biWidth		= h.width;
 		vi->bmiHeader.biHeight		= h.height;
-		vi->bmiHeader.biCompression	= '1CVW';
+		vi->bmiHeader.biCompression	= pmt->subtype.Data1;
 		BYTE* p = (BYTE*)vi + sizeof(VIDEOINFOHEADER2);
 		*p++ = 0;
 		Seek(extrapos);
@@ -2157,21 +2196,21 @@ bool CBaseSplitterFileEx::Read(dirachdr& h, int len, CMediaType* pmt)
 		}
 
 		{
-			pmt->majortype = MEDIATYPE_Video;
-			pmt->formattype = FORMAT_VideoInfo;
-			pmt->subtype = FOURCCMap('card');
+			pmt->majortype					= MEDIATYPE_Video;
+			pmt->formattype					= FORMAT_VideoInfo;
+			pmt->subtype					= FOURCCMap(FCC('drac'));
 
-			VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)pmt->AllocFormatBuffer(sizeof(VIDEOINFOHEADER));
+			VIDEOINFOHEADER* pvih			= (VIDEOINFOHEADER*)pmt->AllocFormatBuffer(sizeof(VIDEOINFOHEADER));
 			memset(pmt->Format(), 0, pmt->FormatLength());
 
-			pvih->AvgTimePerFrame = h.AvgTimePerFrame;
-			pvih->bmiHeader.biSize = sizeof(pvih->bmiHeader);
-			pvih->bmiHeader.biWidth = h.width;
-			pvih->bmiHeader.biHeight = h.height;
-			pvih->bmiHeader.biPlanes = 1;
-			pvih->bmiHeader.biBitCount = 12;
-			pvih->bmiHeader.biCompression = 'card';
-			pvih->bmiHeader.biSizeImage = DIBSIZE(pvih->bmiHeader);
+			pvih->AvgTimePerFrame			= h.AvgTimePerFrame;
+			pvih->bmiHeader.biSize			= sizeof(pvih->bmiHeader);
+			pvih->bmiHeader.biWidth			= h.width;
+			pvih->bmiHeader.biHeight		= h.height;
+			pvih->bmiHeader.biPlanes		= 1;
+			pvih->bmiHeader.biBitCount		= 12;
+			pvih->bmiHeader.biCompression	= pmt->subtype.Data1;
+			pvih->bmiHeader.biSizeImage		= DIBSIZE(pvih->bmiHeader);
 		}
 	
 		return true;

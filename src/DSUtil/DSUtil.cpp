@@ -3057,6 +3057,51 @@ HRESULT CreateMPEG2VISimple(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_TI
 	return S_OK;
 }
 
+HRESULT CreateAVCfromH264(CMediaType* mt)
+{
+	if (mt->formattype != FORMAT_MPEG2_VIDEO) {
+		return E_FAIL;
+	}
+
+	MPEG2VIDEOINFO* pm2vi = (MPEG2VIDEOINFO*)mt->pbFormat;
+	if (!pm2vi->cbSequenceHeader) {
+		return E_FAIL;
+	}
+
+	BYTE* extra		= (BYTE*)&pm2vi->dwSequenceHeader[0];
+	DWORD extrasize	= pm2vi->cbSequenceHeader;
+
+	BYTE* dst		= DNew BYTE[extrasize];
+	DWORD dstSize	= 0;
+
+	CH264Nalu Nalu;
+	Nalu.SetBuffer(extra, extrasize, 0);
+	while (Nalu.ReadNext()) {
+		if (Nalu.GetType() == NALU_TYPE_SPS || Nalu.GetType() == NALU_TYPE_PPS) {
+			size_t nalLength = Nalu.GetDataLength();
+			*(dst + dstSize++) = nalLength >> 8;
+			*(dst + dstSize++) = nalLength & 0xff;
+
+			memcpy(dst + dstSize, Nalu.GetDataBuffer(), Nalu.GetDataLength());
+			dstSize += Nalu.GetDataLength();
+		}
+	}
+
+	if (dstSize) {
+		pm2vi = (MPEG2VIDEOINFO*)mt->ReallocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + dstSize);
+
+		mt->subtype = MEDIASUBTYPE_AVC1;
+		pm2vi->hdr.bmiHeader.biCompression = mt->subtype.Data1;
+
+		pm2vi->cbSequenceHeader = dstSize;
+		memcpy(&pm2vi->dwSequenceHeader[0], dst, dstSize);
+	}
+
+	delete dst;
+
+	return dstSize ? S_OK : E_FAIL;
+} 
+
 CStringA VobSubDefHeader(int w, int h, CStringA palette)
 {
 	CStringA def_palette = "000000,e0e0e0,808080,202020,3333fa,1111bb,fa3333,bb1111,33fa33,11bb11,fafa33,bbbb11,fa33fa,bb11bb,33fafa,11bbbb";

@@ -216,7 +216,7 @@ static CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipIn
 		if (_pMediaType->formattype == FORMAT_VideoInfo) {
 			pVideoInfo = GetFormatHelper(pVideoInfo, _pMediaType);
 
-			if (pVideoInfo->bmiHeader.biCompression == 'card') {
+			if (pVideoInfo->bmiHeader.biCompression == FCC('drac')) {
 				Infos.AddTail(L"DIRAC");
 			}
 
@@ -235,13 +235,13 @@ static CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipIn
 			bool bIsAVC = false;
 			bool bIsMPEG2 = false;
 
-			if (pInfo->hdr.bmiHeader.biCompression == '1CVA') {
+			if (pInfo->hdr.bmiHeader.biCompression == FCC('AVC1') || pInfo->hdr.bmiHeader.biCompression == FCC('H264')) {
 				bIsAVC = true;
 				Infos.AddTail(L"AVC (H.264)");
-			} else if (pInfo->hdr.bmiHeader.biCompression == 'CVMA') {
+			} else if (pInfo->hdr.bmiHeader.biCompression == FCC('AMVC')) {
 				bIsAVC = true;
 				Infos.AddTail(L"MVC (Full)");
-			} else if (pInfo->hdr.bmiHeader.biCompression == 'CVME') {
+			} else if (pInfo->hdr.bmiHeader.biCompression == FCC('EMVC')) {
 				bIsAVC = true;
 				Infos.AddTail(L"MVC (Subset)");
 			} else if (pInfo->hdr.bmiHeader.biCompression == 0) {
@@ -317,7 +317,7 @@ static CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipIn
 			bool bIsVC1 = false;
 
 			DWORD CodecType = pInfo->bmiHeader.biCompression;
-			if (CodecType == '1CVW') {
+			if (CodecType == FCC('WVC1')) {
 				bIsVC1 = true;
 				Infos.AddTail(L"VC-1");
 			} else if (CodecType) {
@@ -821,15 +821,6 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 	return S_OK;
 }
 
-bool CMpegSplitterFilter::StreamIsTrueHD(const WORD pid)
-{
-	int iProgram = -1;
-	const CHdmvClipInfo::Stream *pClipInfo;
-	const CMpegSplitterFile::program * pProgram = m_pFile->FindProgram(pid, iProgram, pClipInfo);
-	int StreamType = pClipInfo ? pClipInfo->m_Type : pProgram ? pProgram->streams[iProgram].type : 0;
-	return (StreamType == AUDIO_STREAM_AC3_TRUE_HD);
-}
-
 #define ReadBEdw(var) \
 	f.Read(&((BYTE*)&var)[3], 1); \
 	f.Read(&((BYTE*)&var)[2], 1); \
@@ -942,6 +933,10 @@ void CMpegSplitterFilter::HandleStream(CMpegSplitterFile::stream& s, CString fNa
 	}
 
 	s.mts.push_back(s.mt);
+
+	if (mt.subtype == MEDIASUBTYPE_H264 && SUCCEEDED(CreateAVCfromH264(&mt))) {
+		s.mts.push_back(mt);
+	}
 }
 
 //
