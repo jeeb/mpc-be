@@ -1989,6 +1989,10 @@ static int h264_frame_start(H264Context *h)
 
     h->cur_pic_ptr = pic;
     unref_picture(h, &h->cur_pic);
+    if (CONFIG_ERROR_RESILIENCE) {
+        h->er.cur_pic = NULL;
+    }
+
     if ((ret = ref_picture(h, &h->cur_pic, h->cur_pic_ptr)) < 0)
         return ret;
 
@@ -3204,12 +3208,6 @@ static int h264_set_parameter_from_sps(H264Context *h)
     if (h->avctx->has_b_frames < 2)
         h->avctx->has_b_frames = !h->low_delay;
 
-    if (h->sps.bit_depth_luma != h->sps.bit_depth_chroma) {
-        avpriv_request_sample(h->avctx,
-                              "Different chroma and luma bit depth");
-        return AVERROR_PATCHWELCOME;
-    }
-
     if (h->avctx->bits_per_raw_sample != h->sps.bit_depth_luma ||
         h->cur_chroma_format_idc      != h->sps.chroma_format_idc) {
         if (h->avctx->codec &&
@@ -3485,11 +3483,12 @@ static int h264_slice_header_init(H264Context *h, int reinit)
 
 int ff_set_ref_count(H264Context *h)
 {
+    int ref_count[2], list_count;
     int num_ref_idx_active_override_flag;
 
     // set defaults, might be overridden a few lines later
-    h->ref_count[0] = h->pps.ref_count[0];
-    h->ref_count[1] = h->pps.ref_count[1];
+    ref_count[0] = h->pps.ref_count[0];
+    ref_count[1] = h->pps.ref_count[1];
 
     if (h->slice_type_nos != AV_PICTURE_TYPE_I) {
         unsigned max[2];
@@ -3500,27 +3499,37 @@ int ff_set_ref_count(H264Context *h)
         num_ref_idx_active_override_flag = get_bits1(&h->gb);
 
         if (num_ref_idx_active_override_flag) {
-            h->ref_count[0] = get_ue_golomb(&h->gb) + 1;
+            ref_count[0] = get_ue_golomb(&h->gb) + 1;
             if (h->slice_type_nos == AV_PICTURE_TYPE_B) {
-                h->ref_count[1] = get_ue_golomb(&h->gb) + 1;
+                ref_count[1] = get_ue_golomb(&h->gb) + 1;
             } else
                 // full range is spec-ok in this case, even for frames
-                h->ref_count[1] = 1;
+                ref_count[1] = 1;
         }
 
-        if (h->ref_count[0]-1 > max[0] || h->ref_count[1]-1 > max[1]){
-            av_log(h->avctx, AV_LOG_ERROR, "reference overflow %u > %u or %u > %u\n", h->ref_count[0]-1, max[0], h->ref_count[1]-1, max[1]);
+        if (ref_count[0]-1 > max[0] || ref_count[1]-1 > max[1]){
+            av_log(h->avctx, AV_LOG_ERROR, "reference overflow %u > %u or %u > %u\n", ref_count[0]-1, max[0], ref_count[1]-1, max[1]);
             h->ref_count[0] = h->ref_count[1] = 0;
+            h->list_count   = 0;
             return AVERROR_INVALIDDATA;
         }
 
         if (h->slice_type_nos == AV_PICTURE_TYPE_B)
-            h->list_count = 2;
+            list_count = 2;
         else
-            h->list_count = 1;
+            list_count = 1;
     } else {
-        h->list_count   = 0;
-        h->ref_count[0] = h->ref_count[1] = 0;
+        list_count   = 0;
+        ref_count[0] = ref_count[1] = 0;
+    }
+
+    if (list_count != h->list_count ||
+        ref_count[0] != h->ref_count[0] ||
+        ref_count[1] != h->ref_count[1]) {
+        h->ref_count[0] = ref_count[0];
+        h->ref_count[1] = ref_count[1];
+        h->list_count   = list_count;
+        return 1;
     }
 
     return 0;
@@ -4795,6 +4804,8 @@ static int execute_decode_slices(H264Context *h, int context_count)
     H264Context *hx;
     int i;
 
+    av_assert0(h->mb_y < h->mb_height);
+
     // ==> Start patch MPC
     if (h->avctx->using_dxva)
         return 0;
@@ -5114,8 +5125,13 @@ again:
                 hx->intra_gb_ptr =
                 hx->inter_gb_ptr = NULL;
 
-                if ((err = decode_slice_header(hx, h)) < 0)
+                if ((err = decode_slice_header(hx, h)) < 0) {
+                    /* make sure data_partitioning is cleared if it was set
+                     * before, so we don't try decoding a slice without a valid
+                     * slice header later */
+                    h->data_partitioning = 0;
                     break;
+                }
 
                 hx->data_partitioning = 1;
                 break;

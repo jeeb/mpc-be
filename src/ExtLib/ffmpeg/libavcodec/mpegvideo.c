@@ -42,21 +42,6 @@
 #include "thread.h"
 #include <limits.h>
 
-static void dct_unquantize_mpeg1_intra_c(MpegEncContext *s,
-                                   int16_t *block, int n, int qscale);
-static void dct_unquantize_mpeg1_inter_c(MpegEncContext *s,
-                                   int16_t *block, int n, int qscale);
-static void dct_unquantize_mpeg2_intra_c(MpegEncContext *s,
-                                   int16_t *block, int n, int qscale);
-static void dct_unquantize_mpeg2_intra_bitexact(MpegEncContext *s,
-                                   int16_t *block, int n, int qscale);
-static void dct_unquantize_mpeg2_inter_c(MpegEncContext *s,
-                                   int16_t *block, int n, int qscale);
-static void dct_unquantize_h263_intra_c(MpegEncContext *s,
-                                  int16_t *block, int n, int qscale);
-static void dct_unquantize_h263_inter_c(MpegEncContext *s,
-                                  int16_t *block, int n, int qscale);
-
 static const uint8_t ff_default_chroma_qscale_table[32] = {
 //   0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
      0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
@@ -123,6 +108,213 @@ const enum AVPixelFormat ff_pixfmt_list_420[] = {
     AV_PIX_FMT_NONE
 };
 
+static void dct_unquantize_mpeg1_intra_c(MpegEncContext *s,
+                                   int16_t *block, int n, int qscale)
+{
+    int i, level, nCoeffs;
+    const uint16_t *quant_matrix;
+
+    nCoeffs= s->block_last_index[n];
+
+    block[0] *= n < 4 ? s->y_dc_scale : s->c_dc_scale;
+    /* XXX: only mpeg1 */
+    quant_matrix = s->intra_matrix;
+    for(i=1;i<=nCoeffs;i++) {
+        int j= s->intra_scantable.permutated[i];
+        level = block[j];
+        if (level) {
+            if (level < 0) {
+                level = -level;
+                level = (int)(level * qscale * quant_matrix[j]) >> 3;
+                level = (level - 1) | 1;
+                level = -level;
+            } else {
+                level = (int)(level * qscale * quant_matrix[j]) >> 3;
+                level = (level - 1) | 1;
+            }
+            block[j] = level;
+        }
+    }
+}
+
+static void dct_unquantize_mpeg1_inter_c(MpegEncContext *s,
+                                   int16_t *block, int n, int qscale)
+{
+    int i, level, nCoeffs;
+    const uint16_t *quant_matrix;
+
+    nCoeffs= s->block_last_index[n];
+
+    quant_matrix = s->inter_matrix;
+    for(i=0; i<=nCoeffs; i++) {
+        int j= s->intra_scantable.permutated[i];
+        level = block[j];
+        if (level) {
+            if (level < 0) {
+                level = -level;
+                level = (((level << 1) + 1) * qscale *
+                         ((int) (quant_matrix[j]))) >> 4;
+                level = (level - 1) | 1;
+                level = -level;
+            } else {
+                level = (((level << 1) + 1) * qscale *
+                         ((int) (quant_matrix[j]))) >> 4;
+                level = (level - 1) | 1;
+            }
+            block[j] = level;
+        }
+    }
+}
+
+static void dct_unquantize_mpeg2_intra_c(MpegEncContext *s,
+                                   int16_t *block, int n, int qscale)
+{
+    int i, level, nCoeffs;
+    const uint16_t *quant_matrix;
+
+    if(s->alternate_scan) nCoeffs= 63;
+    else nCoeffs= s->block_last_index[n];
+
+    block[0] *= n < 4 ? s->y_dc_scale : s->c_dc_scale;
+    quant_matrix = s->intra_matrix;
+    for(i=1;i<=nCoeffs;i++) {
+        int j= s->intra_scantable.permutated[i];
+        level = block[j];
+        if (level) {
+            if (level < 0) {
+                level = -level;
+                level = (int)(level * qscale * quant_matrix[j]) >> 3;
+                level = -level;
+            } else {
+                level = (int)(level * qscale * quant_matrix[j]) >> 3;
+            }
+            block[j] = level;
+        }
+    }
+}
+
+static void dct_unquantize_mpeg2_intra_bitexact(MpegEncContext *s,
+                                   int16_t *block, int n, int qscale)
+{
+    int i, level, nCoeffs;
+    const uint16_t *quant_matrix;
+    int sum=-1;
+
+    if(s->alternate_scan) nCoeffs= 63;
+    else nCoeffs= s->block_last_index[n];
+
+    block[0] *= n < 4 ? s->y_dc_scale : s->c_dc_scale;
+    sum += block[0];
+    quant_matrix = s->intra_matrix;
+    for(i=1;i<=nCoeffs;i++) {
+        int j= s->intra_scantable.permutated[i];
+        level = block[j];
+        if (level) {
+            if (level < 0) {
+                level = -level;
+                level = (int)(level * qscale * quant_matrix[j]) >> 3;
+                level = -level;
+            } else {
+                level = (int)(level * qscale * quant_matrix[j]) >> 3;
+            }
+            block[j] = level;
+            sum+=level;
+        }
+    }
+    block[63]^=sum&1;
+}
+
+static void dct_unquantize_mpeg2_inter_c(MpegEncContext *s,
+                                   int16_t *block, int n, int qscale)
+{
+    int i, level, nCoeffs;
+    const uint16_t *quant_matrix;
+    int sum=-1;
+
+    if(s->alternate_scan) nCoeffs= 63;
+    else nCoeffs= s->block_last_index[n];
+
+    quant_matrix = s->inter_matrix;
+    for(i=0; i<=nCoeffs; i++) {
+        int j= s->intra_scantable.permutated[i];
+        level = block[j];
+        if (level) {
+            if (level < 0) {
+                level = -level;
+                level = (((level << 1) + 1) * qscale *
+                         ((int) (quant_matrix[j]))) >> 4;
+                level = -level;
+            } else {
+                level = (((level << 1) + 1) * qscale *
+                         ((int) (quant_matrix[j]))) >> 4;
+            }
+            block[j] = level;
+            sum+=level;
+        }
+    }
+    block[63]^=sum&1;
+}
+
+static void dct_unquantize_h263_intra_c(MpegEncContext *s,
+                                  int16_t *block, int n, int qscale)
+{
+    int i, level, qmul, qadd;
+    int nCoeffs;
+
+    av_assert2(s->block_last_index[n]>=0 || s->h263_aic);
+
+    qmul = qscale << 1;
+
+    if (!s->h263_aic) {
+        block[0] *= n < 4 ? s->y_dc_scale : s->c_dc_scale;
+        qadd = (qscale - 1) | 1;
+    }else{
+        qadd = 0;
+    }
+    if(s->ac_pred)
+        nCoeffs=63;
+    else
+        nCoeffs= s->inter_scantable.raster_end[ s->block_last_index[n] ];
+
+    for(i=1; i<=nCoeffs; i++) {
+        level = block[i];
+        if (level) {
+            if (level < 0) {
+                level = level * qmul - qadd;
+            } else {
+                level = level * qmul + qadd;
+            }
+            block[i] = level;
+        }
+    }
+}
+
+static void dct_unquantize_h263_inter_c(MpegEncContext *s,
+                                  int16_t *block, int n, int qscale)
+{
+    int i, level, qmul, qadd;
+    int nCoeffs;
+
+    av_assert2(s->block_last_index[n]>=0);
+
+    qadd = (qscale - 1) | 1;
+    qmul = qscale << 1;
+
+    nCoeffs= s->inter_scantable.raster_end[ s->block_last_index[n] ];
+
+    for(i=0; i<=nCoeffs; i++) {
+        level = block[i];
+        if (level) {
+            if (level < 0) {
+                level = level * qmul - qadd;
+            } else {
+                level = level * qmul + qadd;
+            }
+            block[i] = level;
+        }
+    }
+}
+
 static void mpeg_er_decode_mb(void *opaque, int ref, int mv_dir, int mv_type,
                               int (*mv)[2][4][2],
                               int mb_x, int mb_y, int mb_intra, int mb_skipped)
@@ -172,8 +364,6 @@ av_cold int ff_dct_common_init(MpegEncContext *s)
         ff_MPV_common_init_axp(s);
     if (ARCH_ARM)
         ff_MPV_common_init_arm(s);
-    if (ARCH_BFIN)
-        ff_MPV_common_init_bfin(s);
     if (ARCH_PPC)
         ff_MPV_common_init_ppc(s);
     if (ARCH_X86)
@@ -552,6 +742,9 @@ static int init_duplicate_context(MpegEncContext *s)
     int yc_size = y_size + 2 * c_size;
     int i;
 
+    if (s->mb_height & 1)
+        yc_size += 2*s->b8_stride + 2*s->mb_stride;
+
     s->edge_emu_buffer =
     s->me.scratchpad   =
     s->me.temp         =
@@ -899,6 +1092,9 @@ static int init_context_frame(MpegEncContext *s)
     c_size  = s->mb_stride * (s->mb_height + 1);
     yc_size = y_size + 2   * c_size;
 
+    if (s->mb_height & 1)
+        yc_size += 2*s->b8_stride + 2*s->mb_stride;
+
     FF_ALLOCZ_OR_GOTO(s->avctx, s->mb_index2xy, (s->mb_num + 1) * sizeof(int), fail); // error ressilience code looks cleaner with this
     for (y = 0; y < s->mb_height; y++)
         for (x = 0; x < s->mb_width; x++)
@@ -956,7 +1152,7 @@ static int init_context_frame(MpegEncContext *s)
     }
     if (s->out_format == FMT_H263) {
         /* cbp values */
-        FF_ALLOCZ_OR_GOTO(s->avctx, s->coded_block_base, y_size, fail);
+        FF_ALLOCZ_OR_GOTO(s->avctx, s->coded_block_base, y_size + (s->mb_height&1)*2*s->b8_stride, fail);
         s->coded_block = s->coded_block_base + s->b8_stride + 1;
 
         /* cbp, ac_pred, pred_dir */
@@ -1427,30 +1623,9 @@ int ff_find_unused_picture(MpegEncContext *s, int shared)
     return ret;
 }
 
-static void update_noise_reduction(MpegEncContext *s)
-{
-    int intra, i;
-
-    for (intra = 0; intra < 2; intra++) {
-        if (s->dct_count[intra] > (1 << 16)) {
-            for (i = 0; i < 64; i++) {
-                s->dct_error_sum[intra][i] >>= 1;
-            }
-            s->dct_count[intra] >>= 1;
-        }
-
-        for (i = 0; i < 64; i++) {
-            s->dct_offset[intra][i] = (s->avctx->noise_reduction *
-                                       s->dct_count[intra] +
-                                       s->dct_error_sum[intra][i] / 2) /
-                                      (s->dct_error_sum[intra][i] + 1);
-        }
-    }
-}
-
 /**
- * generic function for encode/decode called after coding/decoding
- * the header and before a frame is coded/decoded.
+ * generic function called after decoding
+ * the header and before a frame is decoded.
  */
 int ff_MPV_frame_start(MpegEncContext *s, AVCodecContext *avctx)
 {
@@ -1472,62 +1647,58 @@ int ff_MPV_frame_start(MpegEncContext *s, AVCodecContext *avctx)
 
     /* release forgotten pictures */
     /* if (mpeg124/h263) */
-    if (!s->encoding) {
-        for (i = 0; i < MAX_PICTURE_COUNT; i++) {
-            if (&s->picture[i] != s->last_picture_ptr &&
-                &s->picture[i] != s->next_picture_ptr &&
-                s->picture[i].reference && !s->picture[i].needs_realloc) {
-                if (!(avctx->active_thread_type & FF_THREAD_FRAME))
-                    av_log(avctx, AV_LOG_ERROR,
-                           "releasing zombie picture\n");
-                ff_mpeg_unref_picture(s, &s->picture[i]);
-            }
+    for (i = 0; i < MAX_PICTURE_COUNT; i++) {
+        if (&s->picture[i] != s->last_picture_ptr &&
+            &s->picture[i] != s->next_picture_ptr &&
+            s->picture[i].reference && !s->picture[i].needs_realloc) {
+            if (!(avctx->active_thread_type & FF_THREAD_FRAME))
+                av_log(avctx, AV_LOG_ERROR,
+                       "releasing zombie picture\n");
+            ff_mpeg_unref_picture(s, &s->picture[i]);
         }
     }
 
     ff_mpeg_unref_picture(s, &s->current_picture);
 
-    if (!s->encoding) {
-        release_unused_pictures(s);
+    release_unused_pictures(s);
 
-        if (s->current_picture_ptr &&
-            s->current_picture_ptr->f.buf[0] == NULL) {
-            // we already have a unused image
-            // (maybe it was set before reading the header)
-            pic = s->current_picture_ptr;
-        } else {
-            i   = ff_find_unused_picture(s, 0);
-            if (i < 0) {
-                av_log(s->avctx, AV_LOG_ERROR, "no frame buffer available\n");
-                return i;
-            }
-            pic = &s->picture[i];
+    if (s->current_picture_ptr &&
+        s->current_picture_ptr->f.buf[0] == NULL) {
+        // we already have a unused image
+        // (maybe it was set before reading the header)
+        pic = s->current_picture_ptr;
+    } else {
+        i   = ff_find_unused_picture(s, 0);
+        if (i < 0) {
+            av_log(s->avctx, AV_LOG_ERROR, "no frame buffer available\n");
+            return i;
         }
-
-        pic->reference = 0;
-        if (!s->droppable) {
-            if (s->pict_type != AV_PICTURE_TYPE_B)
-                pic->reference = 3;
-        }
-
-        pic->f.coded_picture_number = s->coded_picture_number++;
-
-        if (ff_alloc_picture(s, pic, 0) < 0)
-            return -1;
-
-        s->current_picture_ptr = pic;
-        // FIXME use only the vars from current_pic
-        s->current_picture_ptr->f.top_field_first = s->top_field_first;
-        if (s->codec_id == AV_CODEC_ID_MPEG1VIDEO ||
-            s->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
-            if (s->picture_structure != PICT_FRAME)
-                s->current_picture_ptr->f.top_field_first =
-                    (s->picture_structure == PICT_TOP_FIELD) == s->first_field;
-        }
-        s->current_picture_ptr->f.interlaced_frame = !s->progressive_frame &&
-                                                     !s->progressive_sequence;
-        s->current_picture_ptr->field_picture      =  s->picture_structure != PICT_FRAME;
+        pic = &s->picture[i];
     }
+
+    pic->reference = 0;
+    if (!s->droppable) {
+        if (s->pict_type != AV_PICTURE_TYPE_B)
+            pic->reference = 3;
+    }
+
+    pic->f.coded_picture_number = s->coded_picture_number++;
+
+    if (ff_alloc_picture(s, pic, 0) < 0)
+        return -1;
+
+    s->current_picture_ptr = pic;
+    // FIXME use only the vars from current_pic
+    s->current_picture_ptr->f.top_field_first = s->top_field_first;
+    if (s->codec_id == AV_CODEC_ID_MPEG1VIDEO ||
+        s->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
+        if (s->picture_structure != PICT_FRAME)
+            s->current_picture_ptr->f.top_field_first =
+                (s->picture_structure == PICT_TOP_FIELD) == s->first_field;
+    }
+    s->current_picture_ptr->f.interlaced_frame = !s->progressive_frame &&
+                                                 !s->progressive_sequence;
+    s->current_picture_ptr->field_picture      =  s->picture_structure != PICT_FRAME;
 
     s->current_picture_ptr->f.pict_type = s->pict_type;
     // if (s->flags && CODEC_FLAG_QSCALE)
@@ -1574,7 +1745,11 @@ int ff_MPV_frame_start(MpegEncContext *s, AVCodecContext *avctx)
             return i;
         }
         s->last_picture_ptr = &s->picture[i];
+
+        s->last_picture_ptr->reference   = 3;
         s->last_picture_ptr->f.key_frame = 0;
+        s->last_picture_ptr->f.pict_type = AV_PICTURE_TYPE_P;
+
         if (ff_alloc_picture(s, s->last_picture_ptr, 0) < 0) {
             s->last_picture_ptr = NULL;
             return -1;
@@ -1607,7 +1782,11 @@ int ff_MPV_frame_start(MpegEncContext *s, AVCodecContext *avctx)
             return i;
         }
         s->next_picture_ptr = &s->picture[i];
+
+        s->next_picture_ptr->reference   = 3;
         s->next_picture_ptr->f.key_frame = 0;
+        s->next_picture_ptr->f.pict_type = AV_PICTURE_TYPE_P;
+
         if (ff_alloc_picture(s, s->next_picture_ptr, 0) < 0) {
             s->next_picture_ptr = NULL;
             return -1;
@@ -1671,46 +1850,12 @@ int ff_MPV_frame_start(MpegEncContext *s, AVCodecContext *avctx)
         s->dct_unquantize_inter = s->dct_unquantize_mpeg1_inter;
     }
 
-    if (s->dct_error_sum) {
-        av_assert2(s->avctx->noise_reduction && s->encoding);
-        update_noise_reduction(s);
-    }
-
     return 0;
 }
 
 /* called after a frame has been decoded. */
 void ff_MPV_frame_end(MpegEncContext *s)
 {
-    if ((s->er.error_count || !(s->avctx->codec->capabilities&CODEC_CAP_DRAW_HORIZ_BAND)) &&
-              // ==> Start patch MPC
-              !s->avctx->using_dxva &&
-              // <== End patch MPC
-        !s->avctx->hwaccel &&
-        !(s->avctx->codec->capabilities & CODEC_CAP_HWACCEL_VDPAU) &&
-        s->unrestricted_mv &&
-        s->current_picture.reference &&
-        !s->intra_only &&
-        !(s->flags & CODEC_FLAG_EMU_EDGE) &&
-        !s->avctx->lowres
-       ) {
-        const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(s->avctx->pix_fmt);
-        int hshift = desc->log2_chroma_w;
-        int vshift = desc->log2_chroma_h;
-        s->dsp.draw_edges(s->current_picture.f.data[0], s->current_picture.f.linesize[0],
-                          s->h_edge_pos, s->v_edge_pos,
-                          EDGE_WIDTH, EDGE_WIDTH,
-                          EDGE_TOP | EDGE_BOTTOM);
-        s->dsp.draw_edges(s->current_picture.f.data[1], s->current_picture.f.linesize[1],
-                          s->h_edge_pos >> hshift, s->v_edge_pos >> vshift,
-                          EDGE_WIDTH >> hshift, EDGE_WIDTH >> vshift,
-                          EDGE_TOP | EDGE_BOTTOM);
-        s->dsp.draw_edges(s->current_picture.f.data[2], s->current_picture.f.linesize[2],
-                          s->h_edge_pos >> hshift, s->v_edge_pos >> vshift,
-                          EDGE_WIDTH >> hshift, EDGE_WIDTH >> vshift,
-                          EDGE_TOP | EDGE_BOTTOM);
-    }
-
     emms_c();
 
     if (s->current_picture.reference)
@@ -2867,43 +3012,15 @@ void ff_MPV_decode_mb(MpegEncContext *s, int16_t block[12][64]){
  */
 void ff_draw_horiz_band(AVCodecContext *avctx, DSPContext *dsp, Picture *cur,
                         Picture *last, int y, int h, int picture_structure,
-                        int first_field, int draw_edges, int low_delay,
+                        int first_field, int low_delay,
                         int v_edge_pos, int h_edge_pos)
 {
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(avctx->pix_fmt);
-    int hshift = desc->log2_chroma_w;
     int vshift = desc->log2_chroma_h;
     const int field_pic = picture_structure != PICT_FRAME;
     if(field_pic){
         h <<= 1;
         y <<= 1;
-    }
-
-    if (!avctx->hwaccel &&
-        !(avctx->codec->capabilities & CODEC_CAP_HWACCEL_VDPAU) &&
-       // ==> Start patch MPC
-       !avctx->using_dxva &&
-       // <== End patch MPC
-        draw_edges &&
-        cur->reference &&
-        !(avctx->flags & CODEC_FLAG_EMU_EDGE)) {
-        int *linesize = cur->f.linesize;
-        int sides = 0, edge_h;
-        if (y==0) sides |= EDGE_TOP;
-        if (y + h >= v_edge_pos)
-            sides |= EDGE_BOTTOM;
-
-        edge_h= FFMIN(h, v_edge_pos - y);
-
-        dsp->draw_edges(cur->f.data[0] + y * linesize[0],
-                        linesize[0], h_edge_pos, edge_h,
-                        EDGE_WIDTH, EDGE_WIDTH, sides);
-        dsp->draw_edges(cur->f.data[1] + (y >> vshift) * linesize[1],
-                        linesize[1], h_edge_pos >> hshift, edge_h >> vshift,
-                        EDGE_WIDTH >> hshift, EDGE_WIDTH >> vshift, sides);
-        dsp->draw_edges(cur->f.data[2] + (y >> vshift) * linesize[2],
-                        linesize[2], h_edge_pos >> hshift, edge_h >> vshift,
-                        EDGE_WIDTH >> hshift, EDGE_WIDTH >> vshift, sides);
     }
 
     h = FFMIN(h, avctx->height - y);
@@ -2945,10 +3062,9 @@ void ff_draw_horiz_band(AVCodecContext *avctx, DSPContext *dsp, Picture *cur,
 
 void ff_mpeg_draw_horiz_band(MpegEncContext *s, int y, int h)
 {
-    int draw_edges = s->unrestricted_mv && !s->intra_only;
     ff_draw_horiz_band(s->avctx, &s->dsp, s->current_picture_ptr,
                        s->last_picture_ptr, y, h, s->picture_structure,
-                       s->first_field, draw_edges, s->low_delay,
+                       s->first_field, s->low_delay,
                        s->v_edge_pos, s->h_edge_pos);
 }
 
@@ -3039,213 +3155,6 @@ void ff_mpeg_flush(AVCodecContext *avctx){
     s->parse_context.last_index= 0;
     s->bitstream_buffer_size=0;
     s->pp_time=0;
-}
-
-static void dct_unquantize_mpeg1_intra_c(MpegEncContext *s,
-                                   int16_t *block, int n, int qscale)
-{
-    int i, level, nCoeffs;
-    const uint16_t *quant_matrix;
-
-    nCoeffs= s->block_last_index[n];
-
-    block[0] *= n < 4 ? s->y_dc_scale : s->c_dc_scale;
-    /* XXX: only mpeg1 */
-    quant_matrix = s->intra_matrix;
-    for(i=1;i<=nCoeffs;i++) {
-        int j= s->intra_scantable.permutated[i];
-        level = block[j];
-        if (level) {
-            if (level < 0) {
-                level = -level;
-                level = (int)(level * qscale * quant_matrix[j]) >> 3;
-                level = (level - 1) | 1;
-                level = -level;
-            } else {
-                level = (int)(level * qscale * quant_matrix[j]) >> 3;
-                level = (level - 1) | 1;
-            }
-            block[j] = level;
-        }
-    }
-}
-
-static void dct_unquantize_mpeg1_inter_c(MpegEncContext *s,
-                                   int16_t *block, int n, int qscale)
-{
-    int i, level, nCoeffs;
-    const uint16_t *quant_matrix;
-
-    nCoeffs= s->block_last_index[n];
-
-    quant_matrix = s->inter_matrix;
-    for(i=0; i<=nCoeffs; i++) {
-        int j= s->intra_scantable.permutated[i];
-        level = block[j];
-        if (level) {
-            if (level < 0) {
-                level = -level;
-                level = (((level << 1) + 1) * qscale *
-                         ((int) (quant_matrix[j]))) >> 4;
-                level = (level - 1) | 1;
-                level = -level;
-            } else {
-                level = (((level << 1) + 1) * qscale *
-                         ((int) (quant_matrix[j]))) >> 4;
-                level = (level - 1) | 1;
-            }
-            block[j] = level;
-        }
-    }
-}
-
-static void dct_unquantize_mpeg2_intra_c(MpegEncContext *s,
-                                   int16_t *block, int n, int qscale)
-{
-    int i, level, nCoeffs;
-    const uint16_t *quant_matrix;
-
-    if(s->alternate_scan) nCoeffs= 63;
-    else nCoeffs= s->block_last_index[n];
-
-    block[0] *= n < 4 ? s->y_dc_scale : s->c_dc_scale;
-    quant_matrix = s->intra_matrix;
-    for(i=1;i<=nCoeffs;i++) {
-        int j= s->intra_scantable.permutated[i];
-        level = block[j];
-        if (level) {
-            if (level < 0) {
-                level = -level;
-                level = (int)(level * qscale * quant_matrix[j]) >> 3;
-                level = -level;
-            } else {
-                level = (int)(level * qscale * quant_matrix[j]) >> 3;
-            }
-            block[j] = level;
-        }
-    }
-}
-
-static void dct_unquantize_mpeg2_intra_bitexact(MpegEncContext *s,
-                                   int16_t *block, int n, int qscale)
-{
-    int i, level, nCoeffs;
-    const uint16_t *quant_matrix;
-    int sum=-1;
-
-    if(s->alternate_scan) nCoeffs= 63;
-    else nCoeffs= s->block_last_index[n];
-
-    block[0] *= n < 4 ? s->y_dc_scale : s->c_dc_scale;
-    sum += block[0];
-    quant_matrix = s->intra_matrix;
-    for(i=1;i<=nCoeffs;i++) {
-        int j= s->intra_scantable.permutated[i];
-        level = block[j];
-        if (level) {
-            if (level < 0) {
-                level = -level;
-                level = (int)(level * qscale * quant_matrix[j]) >> 3;
-                level = -level;
-            } else {
-                level = (int)(level * qscale * quant_matrix[j]) >> 3;
-            }
-            block[j] = level;
-            sum+=level;
-        }
-    }
-    block[63]^=sum&1;
-}
-
-static void dct_unquantize_mpeg2_inter_c(MpegEncContext *s,
-                                   int16_t *block, int n, int qscale)
-{
-    int i, level, nCoeffs;
-    const uint16_t *quant_matrix;
-    int sum=-1;
-
-    if(s->alternate_scan) nCoeffs= 63;
-    else nCoeffs= s->block_last_index[n];
-
-    quant_matrix = s->inter_matrix;
-    for(i=0; i<=nCoeffs; i++) {
-        int j= s->intra_scantable.permutated[i];
-        level = block[j];
-        if (level) {
-            if (level < 0) {
-                level = -level;
-                level = (((level << 1) + 1) * qscale *
-                         ((int) (quant_matrix[j]))) >> 4;
-                level = -level;
-            } else {
-                level = (((level << 1) + 1) * qscale *
-                         ((int) (quant_matrix[j]))) >> 4;
-            }
-            block[j] = level;
-            sum+=level;
-        }
-    }
-    block[63]^=sum&1;
-}
-
-static void dct_unquantize_h263_intra_c(MpegEncContext *s,
-                                  int16_t *block, int n, int qscale)
-{
-    int i, level, qmul, qadd;
-    int nCoeffs;
-
-    av_assert2(s->block_last_index[n]>=0 || s->h263_aic);
-
-    qmul = qscale << 1;
-
-    if (!s->h263_aic) {
-        block[0] *= n < 4 ? s->y_dc_scale : s->c_dc_scale;
-        qadd = (qscale - 1) | 1;
-    }else{
-        qadd = 0;
-    }
-    if(s->ac_pred)
-        nCoeffs=63;
-    else
-        nCoeffs= s->inter_scantable.raster_end[ s->block_last_index[n] ];
-
-    for(i=1; i<=nCoeffs; i++) {
-        level = block[i];
-        if (level) {
-            if (level < 0) {
-                level = level * qmul - qadd;
-            } else {
-                level = level * qmul + qadd;
-            }
-            block[i] = level;
-        }
-    }
-}
-
-static void dct_unquantize_h263_inter_c(MpegEncContext *s,
-                                  int16_t *block, int n, int qscale)
-{
-    int i, level, qmul, qadd;
-    int nCoeffs;
-
-    av_assert2(s->block_last_index[n]>=0);
-
-    qadd = (qscale - 1) | 1;
-    qmul = qscale << 1;
-
-    nCoeffs= s->inter_scantable.raster_end[ s->block_last_index[n] ];
-
-    for(i=0; i<=nCoeffs; i++) {
-        level = block[i];
-        if (level) {
-            if (level < 0) {
-                level = level * qmul - qadd;
-            } else {
-                level = level * qmul + qadd;
-            }
-            block[i] = level;
-        }
-    }
 }
 
 /**

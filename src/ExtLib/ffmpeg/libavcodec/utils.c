@@ -252,6 +252,26 @@ int ff_set_dimensions(AVCodecContext *s, int width, int height)
     return ret;
 }
 
+int ff_side_data_update_matrix_encoding(AVFrame *frame,
+                                        enum AVMatrixEncoding matrix_encoding)
+{
+    AVFrameSideData *side_data;
+    enum AVMatrixEncoding *data;
+
+    side_data = av_frame_get_side_data(frame, AV_FRAME_DATA_MATRIXENCODING);
+    if (!side_data)
+        side_data = av_frame_new_side_data(frame, AV_FRAME_DATA_MATRIXENCODING,
+                                           sizeof(enum AVMatrixEncoding));
+
+    if (!side_data)
+        return AVERROR(ENOMEM);
+
+    data  = (enum AVMatrixEncoding*)side_data->data;
+    *data = matrix_encoding;
+
+    return 0;
+}
+
 #if HAVE_NEON || ARCH_PPC || HAVE_MMX
 #   define STRIDE_ALIGN 16
 #else
@@ -294,6 +314,12 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
     case AV_PIX_FMT_YUV420P14BE:
     case AV_PIX_FMT_YUV420P16LE:
     case AV_PIX_FMT_YUV420P16BE:
+    case AV_PIX_FMT_YUVA420P9LE:
+    case AV_PIX_FMT_YUVA420P9BE:
+    case AV_PIX_FMT_YUVA420P10LE:
+    case AV_PIX_FMT_YUVA420P10BE:
+    case AV_PIX_FMT_YUVA420P16LE:
+    case AV_PIX_FMT_YUVA420P16BE:
     case AV_PIX_FMT_YUV422P9LE:
     case AV_PIX_FMT_YUV422P9BE:
     case AV_PIX_FMT_YUV422P10LE:
@@ -304,6 +330,12 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
     case AV_PIX_FMT_YUV422P14BE:
     case AV_PIX_FMT_YUV422P16LE:
     case AV_PIX_FMT_YUV422P16BE:
+    case AV_PIX_FMT_YUVA422P9LE:
+    case AV_PIX_FMT_YUVA422P9BE:
+    case AV_PIX_FMT_YUVA422P10LE:
+    case AV_PIX_FMT_YUVA422P10BE:
+    case AV_PIX_FMT_YUVA422P16LE:
+    case AV_PIX_FMT_YUVA422P16BE:
     case AV_PIX_FMT_YUV444P9LE:
     case AV_PIX_FMT_YUV444P9BE:
     case AV_PIX_FMT_YUV444P10LE:
@@ -314,18 +346,6 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
     case AV_PIX_FMT_YUV444P14BE:
     case AV_PIX_FMT_YUV444P16LE:
     case AV_PIX_FMT_YUV444P16BE:
-    case AV_PIX_FMT_YUVA420P9LE:
-    case AV_PIX_FMT_YUVA420P9BE:
-    case AV_PIX_FMT_YUVA420P10LE:
-    case AV_PIX_FMT_YUVA420P10BE:
-    case AV_PIX_FMT_YUVA420P16LE:
-    case AV_PIX_FMT_YUVA420P16BE:
-    case AV_PIX_FMT_YUVA422P9LE:
-    case AV_PIX_FMT_YUVA422P9BE:
-    case AV_PIX_FMT_YUVA422P10LE:
-    case AV_PIX_FMT_YUVA422P10BE:
-    case AV_PIX_FMT_YUVA422P16LE:
-    case AV_PIX_FMT_YUVA422P16BE:
     case AV_PIX_FMT_YUVA444P9LE:
     case AV_PIX_FMT_YUVA444P9BE:
     case AV_PIX_FMT_YUVA444P10LE:
@@ -1484,8 +1504,8 @@ free_and_end:
     av_dict_free(&tmp);
     av_freep(&avctx->priv_data);
     if (avctx->internal) {
-        av_freep(&avctx->internal->pool);
         av_frame_free(&avctx->internal->to_free);
+        av_freep(&avctx->internal->pool);
     }
     av_freep(&avctx->internal);
     avctx->codec = NULL;

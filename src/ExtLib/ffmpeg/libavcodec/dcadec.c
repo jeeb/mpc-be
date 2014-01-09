@@ -2190,6 +2190,7 @@ static int dca_decode_frame(AVCodecContext *avctx, void *data,
                     s->downmix_coef[i][1] = (!code ? 0.0f :
                                              sign * dca_dmixtable[code - 1]);
                 }
+                s->output = s->core_downmix_amode;
             } else {
                 int am = s->amode & DCA_CHANNEL_MASK;
                 if (am >= FF_ARRAY_ELEMS(dca_default_coeffs)) {
@@ -2375,7 +2376,7 @@ FF_ENABLE_DEPRECATION_WARNINGS
             if (s->prim_channels + !!s->lfe > 2 &&
                 avctx->request_channel_layout == AV_CH_LAYOUT_STEREO) {
                 channels = 2;
-                s->output = DCA_STEREO;
+                s->output = s->prim_channels == 2 ? s->amode : DCA_STEREO;
                 avctx->channel_layout = AV_CH_LAYOUT_STEREO;
             }
             else if (avctx->request_channel_layout & AV_CH_LAYOUT_NATIVE) {
@@ -2558,6 +2559,15 @@ FF_ENABLE_DEPRECATION_WARNINGS
     lfe_samples = 2 * s->lfe * (s->sample_blocks / 8);
     for (i = 0; i < 2 * s->lfe * 4; i++)
         s->lfe_data[i] = s->lfe_data[i + lfe_samples];
+
+    /* AVMatrixEncoding
+     *
+     * DCA_STEREO_TOTAL (Lt/Rt) is equivalent to Dolby Surround */
+    ret = ff_side_data_update_matrix_encoding(frame,
+                                              (s->output & ~DCA_LFE) == DCA_STEREO_TOTAL ?
+                                              AV_MATRIX_ENCODING_DOLBY : AV_MATRIX_ENCODING_NONE);
+    if (ret < 0)
+        return ret;
 
     *got_frame_ptr = 1;
 
