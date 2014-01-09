@@ -25,7 +25,7 @@ Changes (*):
 	* libwebp 0.3.1 git-fff2a11b;
 	* libvpx 1.2 git-47d482cb;
 	* libopus 1.1 git-253e15f7;
-	* libpng 1.7.0 b25 git-9e168ea2;
+	* libpng 1.7.0 b27 git-4e5c8003;
 	* MediaInfo 0.7.66+ svn rev.6056;
 	* Little-CMS 2.5 git-579b3aad;
 	* VirtualDub 1.10.4;

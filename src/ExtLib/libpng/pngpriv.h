@@ -2,7 +2,7 @@
 /* pngpriv.h - private declarations for use inside libpng
  *
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2013 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -172,7 +172,7 @@
 
    /* By default the 'intrinsics' code in arm/filter_neon_intrinsics.c is used
     * if possible - if __ARM_NEON__ is set and the compiler version is not known
-    * to be broken.  This is control by PNG_ARM_NEON_IMPLEMENTATION which can
+    * to be broken.  This is controlled by PNG_ARM_NEON_IMPLEMENTATION which can
     * be:
     *
     *    1  The intrinsics code (the default with __ARM_NEON__)

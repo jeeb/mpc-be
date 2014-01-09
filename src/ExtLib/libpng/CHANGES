@@ -4749,10 +4749,33 @@ Version 1.7.0beta24 [December 15, 2013]
     instead of png_chunk_report(), which by default issues a warning
     rather than an error, leading to later reading from a NULL pointer
     (png_ptr->palette) in png_do_expand_palette(). This is CVE-2013-6954
-    and VU#650142.
+    and VU#650142.  Libpng-1.6.1 through 1.6.7 and libpng-1.7.0beta03
+    through 1.7.0beta23 are vulnerable.  Libpng-1.6.0 and earlier do not
+    have the bug.
 
-Version 1.7.0beta25 [December 20, 2013]
+Version 1.7.0beta25 [December 26, 2013]
   Merged files with version 1.6.8 that have not changed since then.
+  Rebuilt configure scripts with automake-1.14.1 and autoconf-2.69
+
+Version 1.7.0beta26 [January 1, 2014]
+  Added libpng 1.5 checks to pngvalid.c
+  Merged with 1.5 and 1.6 changes to create a single pngvalid.c
+  Added dSIG to chunk list in png.h
+  Removed #error macro from contrib/tools/pngfix.c (Thomas Klausner).
+  Merged pngrio.c, pngtrans.c, and pngwio.c with libpng-1.6.9
+  Fixed test programs for interlace options. Made pngvalid.c and
+    pngtest.c work correctly when READ_INTERLACING and/or WRITE_INTERLACING
+    are switched off.
+  Changed pngvalid.c to support libpng 1.5, which does not support
+    the PNG_MAXIMUM_INFLATE_WINDOW option, so #define it out when
+    appropriate in pngvalid.c
+  Allow unversioned links created on install to be disabled in configure.
+    In configure builds 'make install' changes/adds links like png.h
+    and libpng.a to point to the newly installed, versioned, files (e.g.
+    libpng17/png.h and libpng17.a). Three new configure options and some
+    rearrangement of Makefile.am allow creation of these links to be disabled.
+
+Version 1.7.0beta27 [January 1, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
