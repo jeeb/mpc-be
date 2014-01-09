@@ -140,6 +140,7 @@
     <ClInclude Include="MediaInfo\Export\Export_EbuCore.h" />
     <ClInclude Include="MediaInfo\Image\File_Pcx.h" />
     <ClInclude Include="MediaInfo\Image\File_Psd.h" />
+    <ClInclude Include="MediaInfo\Multiple\File_Aaf.h" />
     <ClInclude Include="MediaInfo\Multiple\File_DashMpd.h" />
     <ClInclude Include="MediaInfo\Multiple\File_DcpAm.h" />
     <ClInclude Include="MediaInfo\Multiple\File_DcpCpl.h" />
@@ -378,6 +379,7 @@
     <ClCompile Include="MediaInfo\MediaInfo_File.cpp" />
     <ClCompile Include="MediaInfo\MediaInfo_Inform.cpp" />
     <ClCompile Include="MediaInfo\MediaInfo_Internal.cpp" />
+    <ClCompile Include="MediaInfo\Multiple\File_Aaf.cpp" />
     <ClCompile Include="MediaInfo\Multiple\File_DashMpd.cpp" />
     <ClCompile Include="MediaInfo\Multiple\File_DcpAm.cpp" />
     <ClCompile Include="MediaInfo\Multiple\File_DcpCpl.cpp" />

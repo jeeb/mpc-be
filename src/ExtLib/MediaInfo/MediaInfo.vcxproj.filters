@@ -638,6 +638,9 @@
     <ClInclude Include="MediaInfo\Multiple\File_Ptx.h">
       <Filter>Header Files\Multiple</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Multiple\File_Aaf.h">
+      <Filter>Header Files\Multiple</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
@@ -1217,6 +1220,9 @@
       <Filter>Source Files\Export</Filter>
     </ClCompile>
     <ClCompile Include="MediaInfo\Multiple\File_Ptx.cpp">
+      <Filter>Source Files\Multiple</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Multiple\File_Aaf.cpp">
       <Filter>Source Files\Multiple</Filter>
     </ClCompile>
   </ItemGroup>
