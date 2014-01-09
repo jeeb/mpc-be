@@ -30,16 +30,16 @@ protected:
 
 public:
 	CAudioFile();
-	~CAudioFile();
+	virtual ~CAudioFile();
 
 	CAPETag*		m_APETag;
 
-	__int64 GetStartPos() { return m_startpos; }
-	__int64 GetEndPos() { return m_endpos; }
-	REFERENCE_TIME	GetDuration() { return m_rtduration;}
-
-	HRESULT Open(CBaseSplitterFile* pFile);
+	__int64 GetStartPos() const { return m_startpos; }
+	__int64 GetEndPos() const { return m_endpos; }
+	REFERENCE_TIME GetDuration() const { return m_rtduration;}
 	bool SetMediaType(CMediaType& mt);
-	REFERENCE_TIME Seek(REFERENCE_TIME rt);
-	int GetAudioFrame(Packet* packet);
+
+	virtual HRESULT Open(CBaseSplitterFile* pFile) PURE;
+	virtual REFERENCE_TIME Seek(REFERENCE_TIME rt) PURE;
+	virtual int GetAudioFrame(Packet* packet) PURE;
 };

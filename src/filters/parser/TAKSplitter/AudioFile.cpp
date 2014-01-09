@@ -25,13 +25,6 @@ CAudioFile::~CAudioFile()
 	m_pFile = NULL;
 }
 
-HRESULT CAudioFile::Open(CBaseSplitterFile* pFile)
-{
-	m_pFile = pFile;
-
-	return S_OK;
-}
-
 bool CAudioFile::SetMediaType(CMediaType& mt)
 {
 	mt.majortype		= MEDIATYPE_Audio;
@@ -50,15 +43,4 @@ bool CAudioFile::SetMediaType(CMediaType& mt)
 	memcpy(wfe + 1, m_extradata, m_extrasize);
 
 	return true;
-}
-
-REFERENCE_TIME CAudioFile::Seek(REFERENCE_TIME rt)
-{
-	m_pFile->Seek(m_startpos);
-	return 0;
-}
-
-int CAudioFile::GetAudioFrame(Packet* packet)
-{
-	return 0;
 }

@@ -156,8 +156,7 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"TAK Audio Output", this, this, &hr));
 			EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(0, pPinOut)));
 		}
-	}
-	else if (m_id == ID_APE && SUCCEEDED(m_APEFile.Open(m_pFile))) {
+	} else if (m_id == ID_APE && SUCCEEDED(m_APEFile.Open(m_pFile))) {
 		CMediaType mt;
 		if (m_APEFile.SetMediaType(mt)) {
 			WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.pbFormat;
@@ -173,9 +172,6 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"APE Audio Output", this, this, &hr));
 			EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(0, pPinOut)));
 		}
-	}
-	else {
-		return E_FAIL;
 	}
 
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
@@ -195,8 +191,7 @@ void CTAKSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
 	if (m_id == ID_TAK) {
 		m_rtStart = m_TAKFile.Seek(rt);
-	}
-	else if (m_id == ID_APE) {
+	} else if (m_id == ID_APE) {
 		m_rtStart = m_APEFile.Seek(rt);
 	}
 }
@@ -214,8 +209,7 @@ bool CTAKSplitterFilter::DemuxLoop()
 			size = m_TAKFile.GetAudioFrame(p);
 			p->rtStart = m_rtStart;
 			p->rtStop  = m_rtStart + m_nAvgBytesPerSec; // Hmm. WTF?
-		}
-		else if (m_id == ID_APE) {
+		} else if (m_id == ID_APE) {
 			size = m_APEFile.GetAudioFrame(p);
 		}
 

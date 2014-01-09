@@ -66,7 +66,6 @@ CAPEFile::CAPEFile()
 HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 {
 	m_pFile = pFile;
-
 	
 	int version = 0;
 	m_pFile->ByteRead((BYTE*)&version, 2);
@@ -361,4 +360,3 @@ int CAPEFile::GetAudioFrame(Packet* packet)
 
 	return size;
 }
-
