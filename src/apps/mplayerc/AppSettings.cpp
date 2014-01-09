@@ -1991,6 +1991,8 @@ void CAppSettings::ParseCommandLine(CAtlList<CString>& cmdln)
 			} else {
 				nCLSwitches |= CLSW_HELP|CLSW_UNRECOGNIZEDSWITCH;
 			}
+		} else if (param == _T("-")) { // Special case: standard input
+			slFiles.AddTail(_T("pipe:0"));
 		} else {
 			slFiles.AddTail(ParseFileName(param));
 		}
