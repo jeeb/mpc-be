@@ -1560,6 +1560,8 @@ bool CDirectVobSubFilter2::ShouldWeAutoload(IFilterGraph* pGraph)
 				|| (pBF = FindFilter(L"{61F47056-E400-43d3-AF1E-AB7DFFD4C4AD}", pGraph)) // mp4 splitter
 				|| (pBF = FindFilter(L"{1365BE7A-C86A-473C-9A41-C0A6E82C9FA3}", pGraph)) // MPEG source
 				|| (pBF = FindFilter(L"{DC257063-045F-4BE2-BD5B-E12279C464F0}", pGraph)) // MPEG splitter
+				|| (pBF = FindFilter(L"{D8980E15-E1F6-4916-A10F-D7EB4E9E10B8}", pGraph)) // AV Source
+				|| (pBF = FindFilter(L"{529A00DB-0C43-4F5B-8EF2-05004CBE0C6F}", pGraph)) // AV Splitter
 				) {
 			BeginEnumPins(pBF, pEP, pPin) {
 				BeginEnumMediaTypes(pPin, pEM, pmt) {
