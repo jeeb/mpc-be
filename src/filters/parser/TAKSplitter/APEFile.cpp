@@ -168,15 +168,15 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 	}
 
 	if(!ape.totalframes){
-		TRACE(L"No frames in the file!\n");
+		TRACE(L"CAPEFile::Open() : No frames in the file!\n");
 		return E_FAIL;
 	}
 	if(ape.totalframes > UINT_MAX / sizeof(APEFrame)){
-		TRACE(L"Too many frames: %d\n", ape.totalframes);
+		TRACE(L"CAPEFile::Open() : Too many frames: %d\n", ape.totalframes);
 		return E_FAIL;
 	}
 	if (ape.seektablelength / sizeof(*ape.seektable) < ape.totalframes) {
-		TRACE(L"Number of seek entries is less than number of frames: %zu vs. %d\n", ape.seektablelength / sizeof(*ape.seektable), ape.totalframes);
+		TRACE(L"CAPEFile::Open() : Number of seek entries is less than number of frames: %zu vs. %d\n", ape.seektablelength / sizeof(*ape.seektable), ape.totalframes);
 		return E_FAIL;
 	}
 	if (!m_frames.SetCount(ape.totalframes)) {
@@ -212,7 +212,7 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 			}
 		}
 		if (!m_pFile->GetAvailable()) {
-			TRACE(L"File truncated\n");
+			TRACE(L"CAPEFile::Open() : File truncated\n");
 		}
 	}
 
@@ -253,6 +253,13 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 			m_frames[i].skip <<= 3;
 			m_frames[i].skip  += ape.bittable[i];
 		}
+	}
+
+	if (ape.seektable) {
+		free(ape.seektable);
+	}
+	if (ape.bittable) {
+		free(ape.bittable);
 	}
 
 	int total_blocks = (ape.totalframes == 0) ? 0 : ((ape.totalframes - 1) * ape.blocksperframe) + ape.finalframeblocks;
@@ -299,12 +306,12 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 
 		m_pFile->Seek(m_endpos - APE_TAG_FOOTER_BYTES);
 		if (SUCCEEDED(m_pFile->ByteRead(buf, APE_TAG_FOOTER_BYTES))) {
-			m_APETag = new CAPETag;
+			m_APETag = DNew CAPETag;
 			size_t tag_size = 0;
 			if (m_APETag->ReadFooter(buf, APE_TAG_FOOTER_BYTES) && m_APETag->GetTagSize()) {
 				tag_size = m_APETag->GetTagSize();
 				m_pFile->Seek(m_endpos - tag_size);
-				BYTE *p = new BYTE[tag_size];
+				BYTE *p = DNew BYTE[tag_size];
 				if (SUCCEEDED(m_pFile->ByteRead(p, tag_size))) {
 					m_APETag->ReadTags(p, tag_size);
 				}
@@ -317,8 +324,7 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 			}
 
 			if (m_APETag->TagItems.IsEmpty()) {
-				delete m_APETag;
-				m_APETag = NULL;
+				SAFE_DELETE(m_APETag);
 			}
 		}
 	}

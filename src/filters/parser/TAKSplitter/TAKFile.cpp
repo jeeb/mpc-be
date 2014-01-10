@@ -251,7 +251,7 @@ HRESULT CTAKFile::Open(CBaseSplitterFile* pFile)
 			case TAK_METADATA_STREAMINFO:
 			case TAK_METADATA_LAST_FRAME:
 				{
-					buffer = new BYTE[size];
+					buffer = DNew BYTE[size];
 					if (!buffer) {
 						return E_FAIL;
 					}
@@ -287,20 +287,20 @@ HRESULT CTAKFile::Open(CBaseSplitterFile* pFile)
 					if (cur_pos + APE_TAG_FOOTER_BYTES <= file_size) {
 						m_pFile->Seek(file_size - APE_TAG_FOOTER_BYTES);
 						if (SUCCEEDED(m_pFile->ByteRead(buf, APE_TAG_FOOTER_BYTES))) {
-							m_APETag = new CAPETag;
+							m_APETag = DNew CAPETag;
 							if (m_APETag->ReadFooter(buf, APE_TAG_FOOTER_BYTES) && m_APETag->GetTagSize()) {
 								size_t tag_size = m_APETag->GetTagSize();
 								m_pFile->Seek(file_size - tag_size);
-								BYTE *p = new BYTE[tag_size];
-								if (SUCCEEDED(m_pFile->ByteRead(p, tag_size)) && m_APETag->ReadTags(p, tag_size)) {
+								BYTE *p = DNew BYTE[tag_size];
+								if (SUCCEEDED(m_pFile->ByteRead(p, tag_size))) {
+									m_APETag->ReadTags(p, tag_size);
 								}
 
 								delete [] p;
 							}
 
 							if (m_APETag->TagItems.IsEmpty()) {
-								delete m_APETag;
-								m_APETag = NULL;
+								SAFE_DELETE(m_APETag);
 							}
 						}
 
@@ -408,11 +408,11 @@ REFERENCE_TIME CTAKFile::Seek(REFERENCE_TIME rt)
 		}
 	}
 
-	TRACE(L"TAKFile: Seek to frame number %d (%d)\n", CurFrmNum, FrameNumber);
+	TRACE(L"CTAKFile::Seek() : Seek to frame number %d (%d)\n", CurFrmNum, FrameNumber);
 
 	m_pFile->Seek(CurFrmPos);
 
-	rt = CurFrmNum < 0 ? m_rtduration :(REFERENCE_TIME)(10000000.0 * CurFrmNum * m_framelen / m_samplerate);
+	rt = CurFrmNum < 0 ? m_rtduration : (REFERENCE_TIME)(10000000.0 * CurFrmNum * m_framelen / m_samplerate);
 	return rt;
 }
 

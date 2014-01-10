@@ -46,6 +46,10 @@ CAudioFile::CAudioFile()
 
 CAudioFile::~CAudioFile()
 {
+	SAFE_DELETE(m_APETag);
+	if (m_extradata) {
+		free(m_extradata);
+	}
 	m_pFile = NULL;
 }
 
