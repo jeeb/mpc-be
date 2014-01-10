@@ -100,13 +100,11 @@ HRESULT CDXVADecoderMpeg2::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 	HRESULT					hr					= S_FALSE;
 	int						nSurfaceIndex		= -1;
 	bool					bIsField			= false;
-	int						bFrame_repeat_pict	= 0;
 	CComPtr<IMediaSample>	pSampleToDeliver;
 
 	CHECK_HR_FALSE (FFMpeg2DecodeFrame(&m_PictureParams, &m_QMatrixData, m_SliceInfo,
 									   m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), pDataIn, nSize,
-									   &m_nSliceCount, &m_nNextCodecIndex,
-									   &bIsField, &bFrame_repeat_pict));
+									   &m_nSliceCount, &m_nNextCodecIndex, &bIsField));
 
 	// Wait I frame after a flush
 	if (m_bFlushed && (!m_PictureParams.bPicIntra || (bIsField && m_PictureParams.bSecondField))) {
