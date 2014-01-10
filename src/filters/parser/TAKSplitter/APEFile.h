@@ -21,7 +21,7 @@
 
 #include "AudioFile.h"
 
-#define ID_APE 'MAC '
+#define ID_APE FCC('MAC ')
 
 class CAPEFile : public CAudioFile
 {

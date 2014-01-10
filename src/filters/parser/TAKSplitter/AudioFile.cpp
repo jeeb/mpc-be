@@ -56,9 +56,10 @@ CAudioFile::~CAudioFile()
 CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* m_pFile)
 {
 	CAudioFile* pAudioFile = NULL;
+	DWORD id = 0;
 	
 	m_pFile->Seek(0);
-	DWORD id = m_pFile->BitRead(32);
+	m_pFile->ByteRead((BYTE*)&id, 4);
 	if (id == ID_TAK) {
 		pAudioFile = DNew CTAKFile();
 	} else if (id == ID_APE) {

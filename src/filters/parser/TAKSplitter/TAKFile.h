@@ -22,7 +22,7 @@
 
 #include "AudioFile.h"
 
-#define ID_TAK 'tBaK'
+#define ID_TAK FCC('tBaK')
 
 class CTAKFile : public CAudioFile
 {
