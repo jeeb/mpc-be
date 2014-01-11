@@ -63,7 +63,7 @@ public:
 	__int64 GetStartPos() const { return m_startpos; }
 	__int64 GetEndPos() const { return m_endpos; }
 	REFERENCE_TIME GetDuration() const { return m_rtduration;}
-	bool SetMediaType(CMediaType& mt);
+	virtual bool SetMediaType(CMediaType& mt);
 
 	virtual HRESULT Open(CBaseSplitterFile* pFile) PURE;
 	virtual REFERENCE_TIME Seek(REFERENCE_TIME rt) PURE;

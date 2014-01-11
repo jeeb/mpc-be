@@ -21,8 +21,6 @@
 
 #include "AudioFile.h"
 
-#define ID_APE FCC('MAC ')
-
 class CAPEFile : public CAudioFile
 {
 	typedef struct {

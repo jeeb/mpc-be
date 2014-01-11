@@ -201,6 +201,7 @@
     <ClCompile Include="AudioFile.cpp" />
     <ClCompile Include="TAKFile.cpp" />
     <ClCompile Include="TAKSplitter.cpp" />
+    <ClCompile Include="WAVFile.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -213,6 +214,7 @@
     <ClInclude Include="AudioFile.h" />
     <ClInclude Include="TAKFile.h" />
     <ClInclude Include="TAKSplitter.h" />
+    <ClInclude Include="WAVFile.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>

@@ -83,7 +83,13 @@ CAPEFile::CAPEFile()
 HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 {
 	m_pFile = pFile;
-	
+
+	m_pFile->Seek(0);
+	DWORD id = 0;
+	if (FAILED(m_pFile->ByteRead((BYTE*)&id, 4)) || id != FCC('MAC ')) {
+		return NULL;
+	}
+
 	int version = 0;
 	m_pFile->ByteRead((BYTE*)&version, 2);
 	if (version < APE_MIN_VERSION || version > APE_MAX_VERSION) {

@@ -31,8 +31,8 @@ extern "C" {
 	#include <stdint.h>
 }
 
-#define TAKSplitterName L"MPC APE/TAK Splitter"
-#define TAKSourceName   L"MPC APE/TAK Source"
+#define TAKSplitterName L"MPC WAV/APE/TAK Splitter"
+#define TAKSourceName   L"MPC WAV/APE/TAK Source"
 
 class __declspec(uuid("AA04C78C-3671-43F6-ABFE-6C265BAB2345"))
 	CTAKSplitterFilter : public CBaseSplitterFilter

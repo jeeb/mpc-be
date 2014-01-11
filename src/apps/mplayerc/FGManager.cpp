@@ -1980,12 +1980,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	if (src[SRC_DTSAC3] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CDTSAC3Source>();
-		pFGF->m_chkbytes.AddTail(_T("0,4,,7FFE8001"));                      // DTS
-		pFGF->m_chkbytes.AddTail(_T("0,4,,fE7f0180"));                      // DTS LE
-		pFGF->m_chkbytes.AddTail(_T("0,2,,0B77"));                          // AC3, E-AC3
-		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,8,,57415645666D7420"));// RIFFxxxxWAVEfmt_ for DTSWAV
-		pFGF->m_chkbytes.AddTail(_T("4,4,,F8726FBB"));                      // MLP
-		pFGF->m_chkbytes.AddTail(_T("0,8,,4454534844484452"));              // DTSHDHDR
+		pFGF->m_chkbytes.AddTail(_T("0,4,,7FFE8001"));               // DTS
+		pFGF->m_chkbytes.AddTail(_T("0,4,,fE7f0180"));               // DTS LE
+		pFGF->m_chkbytes.AddTail(_T("0,2,,0B77"));                   // AC3, E-AC3
+		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,57415645")); // RIFFxxxxWAVE for DTSWAV
+		pFGF->m_chkbytes.AddTail(_T("4,4,,F8726FBB"));               // MLP
+		pFGF->m_chkbytes.AddTail(_T("0,8,,4454534844484452"));       // DTSHDHDR
 		pFGF->m_extensions.AddTail(_T(".ac3"));
 		pFGF->m_extensions.AddTail(_T(".dts"));
 		pFGF->m_extensions.AddTail(_T(".dtshd"));
@@ -1995,8 +1995,9 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	if (src[SRC_APE_TAK] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CTAKSourceFilter>();
-		pFGF->m_chkbytes.AddTail(_T("0,4,,7442614B")); // 'tBaK'
-		pFGF->m_chkbytes.AddTail(_T("0,4,,4D414320")); // 'MAC '
+		pFGF->m_chkbytes.AddTail(_T("0,4,,7442614B"));               // 'tBaK'
+		pFGF->m_chkbytes.AddTail(_T("0,4,,4D414320"));               // 'MAC '
+		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,57415645")); // RIFFxxxxWAVE
 		m_source.AddTail(pFGF);
 	}
 

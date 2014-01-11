@@ -22,6 +22,7 @@
 #include "AudioFile.h"
 #include "APEFile.h"
 #include "TAKFile.h"
+#include "WAVFile.h"
 
 //
 // CAudioFile
@@ -56,14 +57,20 @@ CAudioFile::~CAudioFile()
 CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* m_pFile)
 {
 	CAudioFile* pAudioFile = NULL;
-	DWORD id = 0;
-	
+	BYTE data[12];
+
 	m_pFile->Seek(0);
-	m_pFile->ByteRead((BYTE*)&id, 4);
-	if (id == ID_TAK) {
+	if (FAILED(m_pFile->ByteRead(data, sizeof(data)))) {
+		return NULL;
+	}
+
+	DWORD* id = (DWORD*)data;
+	if (*id == FCC('tBaK')) {
 		pAudioFile = DNew CTAKFile();
-	} else if (id == ID_APE) {
+	} else if (*id == FCC('MAC ')) {
 		pAudioFile = DNew CAPEFile();
+	} else if (*id == FCC('RIFF') && *(DWORD*)(data+8) == FCC('WAVE')) {
+		pAudioFile = DNew CWAVFile();
 	} else {
 		return NULL;
 	}

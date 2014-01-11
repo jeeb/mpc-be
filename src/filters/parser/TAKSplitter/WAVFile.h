@@ -22,19 +22,24 @@
 
 #include "AudioFile.h"
 
-class CTAKFile : public CAudioFile
+class CWAVFile : public CAudioFile
 {
-	__int64		m_samples;
-	int			m_framelen;
-	int			m_totalframes;
+	BYTE*	m_fmtdata;
+	DWORD	m_fmtsize;
 
-	bool ParseTAKStreamInfo(BYTE* buf, int size);
+	WORD	m_nBlockAlign;
+	int		m_blocksize;
+
+	bool ProcessWAVEFORMATEX();
 
 public:
-	CTAKFile();
+	CWAVFile();
+	virtual ~CWAVFile();
+
+	bool SetMediaType(CMediaType& mt);
 
 	HRESULT Open(CBaseSplitterFile* pFile);
 	REFERENCE_TIME Seek(REFERENCE_TIME rt);
 	int GetAudioFrame(Packet* packet, REFERENCE_TIME rtStart);
-	CString GetName() const { return L"TAK"; };
+	CString GetName() const { return L"WAVE"; };
 };
