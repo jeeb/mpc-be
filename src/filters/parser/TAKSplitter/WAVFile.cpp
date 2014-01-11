@@ -28,6 +28,7 @@
 
 CWAVFile::CWAVFile()
 	: CAudioFile()
+	, m_length(0)
 	, m_fmtdata(NULL)
 	, m_fmtsize(0)
 	, m_nBlockAlign(0)
@@ -190,10 +191,10 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 	}
 
 	m_startpos		= m_pFile->GetPos();
-	__int64 len		= min(Chunk.size, m_pFile->GetLength() - m_startpos);
-	len				-= len % m_nBlockAlign;
-	m_endpos		= m_startpos + len;
-	m_rtduration	= 10000000i64 * len / m_nAvgBytesPerSec;
+	m_length		= min(Chunk.size, m_pFile->GetLength() - m_startpos);
+	m_length		-= m_length % m_nBlockAlign;
+	m_endpos		= m_startpos + m_length;
+	m_rtduration	= 10000000i64 * m_length / m_nAvgBytesPerSec;
 
 	return S_OK;
 }
@@ -205,7 +206,7 @@ REFERENCE_TIME CWAVFile::Seek(REFERENCE_TIME rt)
 		return 0;
 	}
 
-	__int64 len = (m_endpos - m_startpos) * rt / m_rtduration;
+	__int64 len = m_length * rt / m_rtduration;
 	len -= len % m_nBlockAlign;
 	m_pFile->Seek(m_startpos + len);
 
@@ -224,8 +225,8 @@ int CWAVFile::GetAudioFrame(Packet* packet, REFERENCE_TIME rtStart)
 	m_pFile->ByteRead(packet->GetData(), size);
 
 	__int64 len = m_pFile->GetPos() - m_startpos;
-	packet->rtStart	= m_rtduration * len / (m_endpos - m_startpos);
-	packet->rtStop	= m_rtduration * (len + size) / (m_endpos - m_startpos);
+	packet->rtStart	= m_rtduration * len / m_length;
+	packet->rtStop	= m_rtduration * (len + size) / m_length;
 
 	return size;
 }
