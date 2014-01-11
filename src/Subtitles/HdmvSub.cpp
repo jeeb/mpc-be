@@ -351,19 +351,23 @@ void CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 
 		if (pObject && rt >= pObject->m_rtStart && rt < pObject->m_rtStop) {
 
-			// To fit in current surface size on render - looks very crooked
-			/*
-			int delta_x = (m_VideoDescriptor.nVideoWidth - (pObject->m_horizontal_position + pObject->m_width)) * spd.w/m_VideoDescriptor.nVideoWidth;
-			int delta_y = (m_VideoDescriptor.nVideoHeight - (pObject->m_vertical_position + pObject->m_height)) * spd.h/m_VideoDescriptor.nVideoHeight;
+			{
+				// To fit in current surface size on render - looks very crooked, but better then nothing ...
+				int delta_y = (m_VideoDescriptor.nVideoHeight - (pObject->m_vertical_position + pObject->m_height)) * spd.h / m_VideoDescriptor.nVideoHeight;
+				if (spd.w < (pObject->m_horizontal_position + pObject->m_width)) {
+					pObject->m_horizontal_position = max(0, spd.w / 2 - pObject->m_width / 2);
+					if (spd.w < (pObject->m_horizontal_position + pObject->m_width)) {
+						pObject->m_horizontal_position = max(0, spd.w - pObject->m_width - 10);
+					}
+				}
 
-			if (spd.w < (pObject->m_horizontal_position + pObject->m_width)) {
-				pObject->m_horizontal_position = max(0, spd.w - pObject->m_width - delta_x);
+				if (spd.h < (pObject->m_vertical_position + pObject->m_height)) {
+					pObject->m_vertical_position = max(0, spd.h - pObject->m_height - delta_y);
+					if (spd.h < (pObject->m_vertical_position + pObject->m_height)) {
+						pObject->m_vertical_position = max(0, spd.h - pObject->m_height - 10);
+					}
+				}
 			}
-
-			if (spd.h < (pObject->m_vertical_position + pObject->m_height)) {
-				pObject->m_vertical_position = max(0, spd.h - pObject->m_height - delta_y);
-			}
-			*/
 
 			if (pObject->GetRLEDataSize() && pObject->m_width > 0 && pObject->m_height > 0 &&
 					spd.w >= (pObject->m_horizontal_position + pObject->m_width) &&
