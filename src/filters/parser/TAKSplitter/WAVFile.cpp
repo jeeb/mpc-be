@@ -157,7 +157,7 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 			m_fmtsize = max(Chunk.size, sizeof(WAVEFORMATEX)); // PCMWAVEFORMAT to WAVEFORMATEX
 			m_fmtdata = new BYTE[m_fmtsize];
 			memset(m_fmtdata, 0, m_fmtsize);
-			if (FAILED(m_pFile->ByteRead(m_fmtdata, Chunk.size)) || !ProcessWAVEFORMATEX()) {
+			if (FAILED(m_pFile->ByteRead(m_fmtdata, Chunk.size))) {
 				TRACE(L"CWAVFile::Open() : format can not be read.\n");
 				return E_FAIL;
 			}
@@ -194,7 +194,7 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 		m_pFile->Seek(pos + Chunk.size);
 	}
 
-	if (Chunk.id != FCC('data') || !m_fmtdata) {
+	if (Chunk.id != FCC('data') || !ProcessWAVEFORMATEX()) {
 		return E_FAIL;
 	}
 
