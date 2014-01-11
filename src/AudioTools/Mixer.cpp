@@ -100,8 +100,17 @@ bool CMixer::Init()
 	int in_ch  = av_popcount(m_in_layout);
 	int out_ch = av_popcount(m_out_layout);
 	m_matrix_dbl = (double*)av_mallocz(in_ch * out_ch * sizeof(*m_matrix_dbl));
+	// expand mono to front left and front right channels
+	if (m_in_layout == AV_CH_LAYOUT_MONO && m_out_layout & (AV_CH_FRONT_LEFT|AV_CH_FRONT_RIGHT)) {
+		int i = 0;
+		m_matrix_dbl[i++] = 1.0;
+		m_matrix_dbl[i++] = 1.0;
+		while (i < out_ch) {
+			m_matrix_dbl[i++] = 0.0;
+		}
+	}
 	// expand stereo
-	if (m_in_layout == AV_CH_LAYOUT_STEREO && out_ch >= 4
+	else if (m_in_layout == AV_CH_LAYOUT_STEREO && out_ch >= 4
 			&& (m_out_layout & ~(AV_CH_FRONT_LEFT|AV_CH_FRONT_RIGHT|AV_CH_FRONT_CENTER|AV_CH_LOW_FREQUENCY|AV_CH_BACK_LEFT|AV_CH_BACK_RIGHT|AV_CH_SIDE_LEFT|AV_CH_SIDE_RIGHT)) == 0) {
 		int i = 0;
 		if (m_out_layout & (AV_CH_FRONT_LEFT | AV_CH_FRONT_RIGHT)) {
