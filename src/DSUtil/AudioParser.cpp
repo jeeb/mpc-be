@@ -265,6 +265,13 @@ DWORD GetVorbisChannelMask(WORD nChannels)
 	}
 }
 
+DWORD CountBits(DWORD v) { // used code from \VirtualDub\h\vd2\system\bitmath.h (VDCountBits)
+	v -= (v >> 1) & 0x55555555;
+	v = ((v & 0xcccccccc) >> 2) + (v & 0x33333333);
+	v = (v + (v >> 4)) & 0x0f0f0f0f;
+	return (v * 0x01010101) >> 24;
+}
+
 // MPEG Audio
 
 // http://mpgedit.org/mpgedit/mpeg_format/mpeghdr.htm

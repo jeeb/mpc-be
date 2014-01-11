@@ -44,6 +44,7 @@ bool ParseAACLatmHeader(const BYTE* buf, int len, int& samplerate, int& channels
 
 DWORD GetDefChannelMask(WORD nChannels);
 DWORD GetVorbisChannelMask(WORD nChannels);
+DWORD CountBits(DWORD v);
 
 struct audioframe_t {
 	int size;
