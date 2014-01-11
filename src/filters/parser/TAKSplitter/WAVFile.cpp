@@ -117,62 +117,56 @@ bool CWAVFile::SetMediaType(CMediaType& mt)
 
 HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 {
+	m_pFile = pFile;
+
+	m_pFile->Seek(0);
+	BYTE data[12];
+	if (FAILED(m_pFile->ByteRead(data, sizeof(data)))
+			|| *(DWORD*)(data+0) != FCC('RIFF')
+			|| *(DWORD*)(data+4) < (4 + 8 + sizeof(PCMWAVEFORMAT) + 8) // 'WAVE' + ('fmt ' + fmt.size) + sizeof(PCMWAVEFORMAT) + (data + data.size)
+			|| *(DWORD*)(data+8) != FCC('WAVE')) {
+		return NULL;
+	}
+	__int64 end = min((__int64)*(DWORD*)(data + 4) + 8, m_pFile->GetLength());
+
 #pragma pack(push, 4)
 	union {
 		struct {
 			DWORD id;
 			DWORD size;
-			DWORD fmt; // for 'RIFF'
 		};
-		BYTE data[12];
+		BYTE data[8];
 	} Chunk;
 #pragma pack(pop)
 
-	m_pFile = pFile;
+	while (SUCCEEDED(m_pFile->ByteRead(Chunk.data, sizeof(Chunk))) && Chunk.id != FCC('data') && m_pFile->GetPos() < end) {
+		__int64 pos = m_pFile->GetPos();
 
-	m_pFile->Seek(0);
-	if (FAILED(m_pFile->ByteRead(Chunk.data, 12))
-			|| Chunk.id   != FCC('RIFF')
-			|| Chunk.size < (4 + 8 + sizeof(PCMWAVEFORMAT) + 8) // 'WAVE' + ('fmt ' + fmt.size) + MINFMTSIZE + (data + data.size)
-			|| Chunk.fmt  != FCC('WAVE')) {
-		return E_FAIL;
-	}
-	DWORD filesize = Chunk.size + 8;
+		TRACE(L"CWAVFile::Open() : found '%c%c%c%c' chunk.\n",
+			TCHAR((Chunk.id>>0)&0xff),
+			TCHAR((Chunk.id>>8)&0xff),
+			TCHAR((Chunk.id>>16)&0xff),
+			TCHAR((Chunk.id>>24)&0xff));
 
-	while (SUCCEEDED(m_pFile->ByteRead(Chunk.data, 8)) && Chunk.id != FCC('data') && m_pFile->GetAvailable()) {
 		switch (Chunk.id) {
 		case FCC('fmt '):
 			if (m_fmtdata || Chunk.size < sizeof(PCMWAVEFORMAT) || Chunk.size > 65536) {
+				TRACE(L"CWAVFile::Open() : bad format\n");
 				return E_FAIL;
 			}
 			m_fmtsize = max(Chunk.size, sizeof(WAVEFORMATEX)); // PCMWAVEFORMAT to WAVEFORMATEX
 			m_fmtdata = new BYTE[m_fmtsize];
 			memset(m_fmtdata, 0, m_fmtsize);
 			if (FAILED(m_pFile->ByteRead(m_fmtdata, Chunk.size)) || !ProcessWAVEFORMATEX()) {
+				TRACE(L"CWAVFile::Open() : format can not be read.\n");
 				return E_FAIL;
 			}
-			break;
-		case FCC('fact'):
-			// TODO
-		case FCC('JUNK'):
-		case FCC('PAD '):
-		case FCC('cue '):
-		case FCC('plst'):
-		case FCC('list'): // contains 'labl', 'note' and 'ltxt' subchunks
-		case FCC('LIST'):
-		case FCC('PEAK'):
-		case FCC('smpl'):
-		case FCC('inst'):
-		case FCC('bext'):
-		case FCC('minf'):
-		case FCC('elm1'):
-			m_pFile->Seek(m_pFile->GetPos() + Chunk.size); // skip chunks
 			break;
 		case FCC('wavl'): // not supported
 		case FCC('slnt'): // not supported
 			TRACE(L"CWAVFile::Open() : WAVE file is not supported!\n");
 			return E_FAIL;
-		default: // broken file or unknown chunk
+		default:
 			for (int i = 0; i < sizeof(Chunk.id); i++) {
 				BYTE ch = Chunk.data[i];
 				if (ch != 0x20 && (ch < '0' || ch > '9') && (ch < 'A' || ch > 'Z') && (ch < 'a' || ch > 'z')) {
@@ -180,10 +174,24 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 					return E_FAIL;
 				}
 			}
-			TRACE(L"CWAVFile::Open() : found unknown chunk?!\n");
-			m_pFile->Seek(m_pFile->GetPos() + Chunk.size); // skip chunk
+			// Known chunks:
+			// 'fact'
+			// 'LIST'
+			// 'JUNK'
+			// 'PAD '
+			// 'cue '
+			// 'plst'
+			// 'list' (contains 'labl', 'note' and 'ltxt' subchunks)
+			// 'PEAK'
+			// 'smpl'
+			// 'inst'
+			// 'bext'
+			// 'minf'
+			// 'elm1'
 			break;
 		}
+
+		m_pFile->Seek(pos + Chunk.size);
 	}
 
 	if (Chunk.id != FCC('data') || !m_fmtdata) {
