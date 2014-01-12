@@ -113,18 +113,6 @@ DWORD ParseWAVECDHeader(CFile &file)
 	return 0;
 }
 
-int ParseAC3IEC61937Header(const BYTE *buf)
-{
-	WORD* wbuf = (WORD*)buf;
-	if (*(DWORD*)buf == IEC61937_SYNC_WORD
-	   && wbuf[2] ==  0x0001
-	   && wbuf[3] > 0 && wbuf[3] < (6144-8)*8
-	   && wbuf[4] == 0x0B77 ) {
-		return 6144;
-	}
-	return 0;
-}
-
 #ifdef REGISTER_FILTER
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {

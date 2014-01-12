@@ -99,6 +99,60 @@ bool CWAVFile::ProcessWAVEFORMATEX()
 	return true;
 }
 
+bool CWAVFile::CheckDTSAC3CD()
+{
+	WAVEFORMATEX* wfe = (WAVEFORMATEX*)m_fmtdata;
+	if (m_fmtsize != sizeof(WAVEFORMATEX)
+			|| wfe->wFormatTag != WAVE_FORMAT_PCM
+			|| wfe->nChannels != 2
+			|| wfe->nSamplesPerSec != 44100 && wfe->nSamplesPerSec != 48000
+			|| wfe->nBlockAlign != 4
+			|| wfe->nAvgBytesPerSec != wfe->nSamplesPerSec * wfe->nBlockAlign
+			|| wfe->wBitsPerSample != 16
+			|| wfe->cbSize != 0) {
+		return false;
+	}
+
+	size_t buflen = min(64 * 1024, m_length);
+	BYTE* buffer = DNew BYTE[buflen];
+
+	m_pFile->Seek(m_startpos);
+	if (SUCCEEDED(m_pFile->ByteRead(buffer, buflen))) {
+		audioframe_t aframe;
+
+		for (size_t i = 0; i + 16 < buflen; i++) {
+			if (ParseDTSHeader(buffer + i, &aframe)) {
+				m_subtype		= MEDIASUBTYPE_DTS;
+				m_samplerate	= aframe.samplerate;
+				m_channels		= aframe.channels;
+				m_nBlockAlign	= aframe.size;
+				m_blocksize		= aframe.size;
+				break;
+			}
+			if (int ret = ParseAC3IEC61937Header(buffer + i)) {
+				m_subtype = MEDIASUBTYPE_DOLBY_AC3_SPDIF;
+				m_blocksize		= ret;
+				break;
+			}
+		}
+	}
+
+	SAFE_DELETE_ARRAY(buffer);
+
+	if (m_subtype == MEDIASUBTYPE_DTS) {
+		wfe->wFormatTag = WAVE_FORMAT_DTS;
+		wfe->nChannels		= m_channels;
+		wfe->nSamplesPerSec	= m_samplerate;
+		wfe->nBlockAlign	= m_nBlockAlign;
+	} else if (m_subtype == MEDIASUBTYPE_DOLBY_AC3_SPDIF) {
+		wfe->wFormatTag = WAVE_FORMAT_DOLBY_AC3_SPDIF;
+	} else {
+		return false;
+	}
+
+	return true;
+}
+
 bool CWAVFile::SetMediaType(CMediaType& mt)
 {
 	if (!m_fmtdata || !m_fmtsize) {
@@ -203,6 +257,8 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 	m_length		-= m_length % m_nBlockAlign;
 	m_endpos		= m_startpos + m_length;
 	m_rtduration	= 10000000i64 * m_length / m_nAvgBytesPerSec;
+
+	CheckDTSAC3CD();
 
 	return S_OK;
 }

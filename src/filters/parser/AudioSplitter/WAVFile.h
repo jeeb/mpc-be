@@ -33,6 +33,7 @@ class CWAVFile : public CAudioFile
 	int		m_blocksize;
 
 	bool ProcessWAVEFORMATEX();
+	bool CheckDTSAC3CD();
 
 public:
 	CWAVFile();

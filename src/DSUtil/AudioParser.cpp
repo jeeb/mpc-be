@@ -272,6 +272,22 @@ DWORD CountBits(DWORD v) { // used code from \VirtualDub\h\vd2\system\bitmath.h 
 	return (v * 0x01010101) >> 24;
 }
 
+// S/PDIF AC3
+
+int ParseAC3IEC61937Header(const BYTE* buf)
+{
+	WORD* wbuf = (WORD*)buf;
+	if (*(DWORD*)buf != IEC61937_SYNC_WORD
+			|| wbuf[2] !=  0x0001
+			|| wbuf[3] == 0
+			|| wbuf[3] >= (6144-8)*8
+			|| wbuf[4] != 0x0B77 ) {
+		return 0;
+	}
+
+	return 6144;
+}
+
 // MPEG Audio
 
 // http://mpgedit.org/mpgedit/mpeg_format/mpeghdr.htm
