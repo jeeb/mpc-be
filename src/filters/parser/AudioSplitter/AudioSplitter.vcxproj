@@ -35,10 +35,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{0F7D3ABB-7EA8-4C94-A72A-58704CC92B14}</ProjectGuid>
-    <RootNamespace>TAKSplitter</RootNamespace>
+    <ProjectGuid>{0A836E1E-C383-4F70-8129-4A0C22E356AA}</ProjectGuid>
+    <RootNamespace>AudioSplitter</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <ProjectName>TAKSplitter</ProjectName>
+    <ProjectName>AudioSplitter</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="..\..\..\platform.props" />
@@ -154,7 +154,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>TAKSplitter.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>AudioSplitter.def</ModuleDefinitionFile>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -166,7 +166,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>TAKSplitter.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>AudioSplitter.def</ModuleDefinitionFile>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -178,7 +178,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>TAKSplitter.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>AudioSplitter.def</ModuleDefinitionFile>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -190,7 +190,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>TAKSplitter.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>AudioSplitter.def</ModuleDefinitionFile>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -200,20 +200,20 @@
     <ClCompile Include="APEFile.cpp" />
     <ClCompile Include="AudioFile.cpp" />
     <ClCompile Include="TAKFile.cpp" />
-    <ClCompile Include="TAKSplitter.cpp" />
+    <ClCompile Include="AudioSplitter.cpp" />
     <ClCompile Include="WAVFile.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="TAKSplitter.def" />
+    <None Include="AudioSplitter.def" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="APEFile.h" />
     <ClInclude Include="AudioFile.h" />
     <ClInclude Include="TAKFile.h" />
-    <ClInclude Include="TAKSplitter.h" />
+    <ClInclude Include="AudioSplitter.h" />
     <ClInclude Include="WAVFile.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
@@ -221,7 +221,7 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="TAKSplitter.rc">
+    <ResourceCompile Include="AudioSplitter.rc">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ResourceCompile>
   </ItemGroup>

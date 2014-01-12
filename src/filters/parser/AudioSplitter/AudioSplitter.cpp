@@ -24,7 +24,7 @@
 #include <InitGuid.h>
 #endif
 #include <moreuuids.h>
-#include "TAKSplitter.h"
+#include "AudioSplitter.h"
 
 #ifdef REGISTER_FILTER
 
@@ -43,13 +43,13 @@ const AMOVIESETUP_PIN sudpPins[] = {
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
-	{&__uuidof(CTAKSplitterFilter), TAKSplitterName, MERIT_NORMAL+1, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
-	{&__uuidof(CTAKSourceFilter), TAKSourceName, MERIT_NORMAL+1, 0, NULL, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CAudioSplitterFilter), AudioSplitterName, MERIT_NORMAL+1, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CAudioSourceFilter), AudioSourceName, MERIT_NORMAL+1, 0, NULL, CLSID_LegacyAmFilterCategory},
 };
 
 CFactoryTemplate g_Templates[] = {
-	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CTAKSplitterFilter>, NULL, &sudFilter[0]},
-	{sudFilter[1].strName, sudFilter[1].clsID, CreateInstance<CTAKSourceFilter>, NULL, &sudFilter[1]},
+	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CAudioSplitterFilter>, NULL, &sudFilter[0]},
+	{sudFilter[1].strName, sudFilter[1].clsID, CreateInstance<CAudioSourceFilter>, NULL, &sudFilter[1]},
 };
 
 int g_cTemplates = _countof(g_Templates);
@@ -84,22 +84,22 @@ CFilterApp theApp;
 #endif
 
 //
-// CTAKSplitterFilter
+// CAudioSplitterFilter
 //
 
-CTAKSplitterFilter::CTAKSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
-	: CBaseSplitterFilter(NAME("CTAKSplitterFilter"), pUnk, phr, __uuidof(this))
+CAudioSplitterFilter::CAudioSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
+	: CBaseSplitterFilter(NAME("CAudioSplitterFilter"), pUnk, phr, __uuidof(this))
 	, m_pAudioFile(NULL)
 	, m_rtStart(0)
 {
 }
 
-CTAKSplitterFilter::~CTAKSplitterFilter()
+CAudioSplitterFilter::~CAudioSplitterFilter()
 {
 	SAFE_DELETE(m_pAudioFile);
 }
 
-STDMETHODIMP CTAKSplitterFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
+STDMETHODIMP CAudioSplitterFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {
 	CheckPointer(ppv, E_POINTER);
 
@@ -107,7 +107,7 @@ STDMETHODIMP CTAKSplitterFilter::NonDelegatingQueryInterface(REFIID riid, void**
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
 
-STDMETHODIMP CTAKSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
+STDMETHODIMP CAudioSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 {
 	CheckPointer(pInfo, E_POINTER);
 	ValidateReadWritePtr(pInfo, sizeof(FILTER_INFO));
@@ -115,7 +115,7 @@ STDMETHODIMP CTAKSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 	if (m_pName && m_pName[0]==L'M' && m_pName[1]==L'P' && m_pName[2]==L'C') {
 		(void)StringCchCopyW(pInfo->achName, NUMELMS(pInfo->achName), m_pName);
 	} else {
-		wcscpy_s(pInfo->achName, TAKSourceName);
+		wcscpy_s(pInfo->achName, AudioSourceName);
 	}
 	pInfo->pGraph = m_pGraph;
 	if (m_pGraph) {
@@ -125,7 +125,7 @@ STDMETHODIMP CTAKSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 	return S_OK;
 }
 
-HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
+HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 {
 	CheckPointer(pAsyncReader, E_POINTER);
 
@@ -164,9 +164,9 @@ HRESULT CTAKSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
 }
 
-bool CTAKSplitterFilter::DemuxInit()
+bool CAudioSplitterFilter::DemuxInit()
 {
-	SetThreadName((DWORD)-1, "CTAKSplitterFilter");
+	SetThreadName((DWORD)-1, "CAudioSplitterFilter");
 	if (!m_pFile || !m_pAudioFile) {
 		return false;
 	}
@@ -174,12 +174,12 @@ bool CTAKSplitterFilter::DemuxInit()
 	return true;
 }
 
-void CTAKSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
+void CAudioSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
 	m_rtStart = m_pAudioFile ? m_pAudioFile->Seek(rt) : 0;
 }
 
-bool CTAKSplitterFilter::DemuxLoop()
+bool CAudioSplitterFilter::DemuxLoop()
 {
 	HRESULT hr = S_OK;
 
@@ -202,11 +202,11 @@ bool CTAKSplitterFilter::DemuxLoop()
 }
 
 //
-// CTAKSourceFilter
+// CAudioSourceFilter
 //
 
-CTAKSourceFilter::CTAKSourceFilter(LPUNKNOWN pUnk, HRESULT* phr)
-	: CTAKSplitterFilter(pUnk, phr)
+CAudioSourceFilter::CAudioSourceFilter(LPUNKNOWN pUnk, HRESULT* phr)
+	: CAudioSplitterFilter(pUnk, phr)
 {
 	m_clsid = __uuidof(this);
 	m_pInput.Free();

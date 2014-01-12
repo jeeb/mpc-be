@@ -40,7 +40,7 @@
 #include "parser/RealMediaSplitter/RealMediaSplitter.h"
 #include "parser/RoQSplitter/RoQSplitter.h"
 #include "parser/StreamDriveThru/StreamDriveThru.h"
-#include "parser/TAKSplitter/TAKSplitter.h"
+#include "parser/AudioSplitter/AudioSplitter.h"
 #include "parser/TTASplitter/TTASplitter.h"
 #include "parser/WVSplitter/WVSplitter.h"
 

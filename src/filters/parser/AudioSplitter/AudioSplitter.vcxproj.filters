@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TAKSplitter.cpp">
+    <ClCompile Include="AudioSplitter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
@@ -35,12 +35,12 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="TAKSplitter.def">
+    <None Include="AudioSplitter.def">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="TAKSplitter.h">
+    <ClInclude Include="AudioSplitter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
@@ -63,7 +63,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="TAKSplitter.rc">
+    <ResourceCompile Include="AudioSplitter.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

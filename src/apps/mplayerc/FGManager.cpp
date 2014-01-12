@@ -1994,7 +1994,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	}
 
 	if (src[SRC_APE_TAK] && !IsPreview) {
-		pFGF = DNew CFGFilterInternal<CTAKSourceFilter>();
+		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>();
 		pFGF->m_chkbytes.AddTail(_T("0,4,,7442614B"));               // 'tBaK'
 		pFGF->m_chkbytes.AddTail(_T("0,4,,4D414320"));               // 'MAC '
 		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,57415645")); // RIFFxxxxWAVE
@@ -2190,9 +2190,9 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	if (!IsPreview) {
 		if (src[SRC_APE_TAK]) {
-			pFGF = DNew CFGFilterInternal<CTAKSplitterFilter>(TAKSplitterName, MERIT64_ABOVE_DSHOW);
+			pFGF = DNew CFGFilterInternal<CAudioSplitterFilter>(AudioSplitterName, MERIT64_ABOVE_DSHOW);
 		} else {
-			pFGF = DNew CFGFilterInternal<CTAKSplitterFilter>(LowMerit(TAKSplitterName), MERIT64_DO_USE);
+			pFGF = DNew CFGFilterInternal<CAudioSplitterFilter>(LowMerit(AudioSplitterName), MERIT64_DO_USE);
 		}
 		pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_TAK_Stream);
 		pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);

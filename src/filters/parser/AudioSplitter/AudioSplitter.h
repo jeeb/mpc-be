@@ -31,11 +31,11 @@ extern "C" {
 	#include <stdint.h>
 }
 
-#define TAKSplitterName L"MPC WAV/APE/TAK Splitter"
-#define TAKSourceName   L"MPC WAV/APE/TAK Source"
+#define AudioSplitterName L"MPC Audio Splitter"
+#define AudioSourceName   L"MPC Audio Source"
 
-class __declspec(uuid("AA04C78C-3671-43F6-ABFE-6C265BAB2345"))
-	CTAKSplitterFilter : public CBaseSplitterFilter
+class __declspec(uuid("AA77A669-E10F-4C70-BBD7-77923DF34BF3"))
+	CAudioSplitterFilter : public CBaseSplitterFilter
 {
 	CAudioFile* m_pAudioFile;
 	REFERENCE_TIME m_rtStart;
@@ -49,8 +49,8 @@ protected:
 	bool DemuxLoop();
 
 public:
-	CTAKSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr);
-	~CTAKSplitterFilter();
+	CAudioSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr);
+	~CAudioSplitterFilter();
 
 	DECLARE_IUNKNOWN
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
@@ -60,9 +60,9 @@ public:
 	STDMETHODIMP QueryFilterInfo(FILTER_INFO* pInfo);
 };
 
-class __declspec(uuid("A98DC1BA-E70D-47A0-BAD1-28C64A859FB1"))
-	CTAKSourceFilter : public CTAKSplitterFilter
+class __declspec(uuid("A3CE2805-8E16-4E1E-84AA-4EF57F27E644"))
+	CAudioSourceFilter : public CAudioSplitterFilter
 {
 public:
-	CTAKSourceFilter(LPUNKNOWN pUnk, HRESULT* phr);
+	CAudioSourceFilter(LPUNKNOWN pUnk, HRESULT* phr);
 };

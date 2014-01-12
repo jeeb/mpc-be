@@ -549,8 +549,8 @@
     <ProjectReference Include="..\..\filters\parser\RawVideoSplitter\RawVideoSplitter.vcxproj">
       <Project>{e73d2ff6-5738-4e17-b895-7d206fba9de2}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\filters\parser\TAKSplitter\TAKSplitter.vcxproj">
-      <Project>{0f7d3abb-7ea8-4c94-a72a-58704cc92b14}</Project>
+    <ProjectReference Include="..\..\filters\parser\AudioSplitter\AudioSplitter.vcxproj">
+      <Project>{0A836E1E-C383-4F70-8129-4A0C22E356AA}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\filters\parser\WVSplitter\WVSplitter.vcxproj">
       <Project>{f22de3b2-4de9-4013-bbab-1bb39f2b7df7}</Project>
