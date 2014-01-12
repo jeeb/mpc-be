@@ -45,7 +45,7 @@
 
 const TCHAR* MPEG2_Profile[]=
 {
-	L"0",
+	L"4:2:2",
 	L"High Profile",
 	L"Spatially Scalable Profile",
 	L"SNR Scalable Profile",
@@ -59,10 +59,10 @@ const TCHAR* MPEG2_Level[]=
 {
 	L"0",
 	L"1",
-	L"2",
+	L"Main Level",
 	L"3",
 	L"High Level",
-	L"4",
+	L"High Level",
 	L"High1440 Level",
 	L"5",
 	L"Main Level",
