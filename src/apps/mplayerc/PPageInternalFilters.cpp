@@ -30,6 +30,7 @@ static filter_t s_filters[] = {
 	// Source filters
 	{_T("AMR"),                   SOURCE_FILTER,  SOURCE, SRC_AMR,        0},
 	{_T("AVI"),                   SOURCE_FILTER,  SOURCE, SRC_AVI,        IDS_SRC_AVI},
+	{_T("APE"),                   SOURCE_FILTER,  SOURCE, SRC_APE,        0},
 	{_T("CDDA (Audio CD)"),       SOURCE_FILTER,  SOURCE, SRC_CDDA,       IDS_SRC_CDDA},
 	{_T("CDXA (VCD/SVCD/XCD)"),   SOURCE_FILTER,  SOURCE, SRC_CDXA,       0},
 	{_T("DirectShow Media"),      SOURCE_FILTER,  SOURCE, SRC_DSM,        0},
@@ -49,8 +50,9 @@ static filter_t s_filters[] = {
 	{_T("RealMedia"),             SOURCE_FILTER,  SOURCE, SRC_REALMEDIA,  IDS_SRC_REALMEDIA},
 	{_T("RoQ"),                   SOURCE_FILTER,  SOURCE, SRC_ROQ,        IDS_SRC_ROQ},
 	{_T("SHOUTcast"),             SOURCE_FILTER,  SOURCE, SRC_SHOUTCAST,  0},
-	{_T("WAV/APE/TAK"),           SOURCE_FILTER,  SOURCE, SRC_AUDIO,    0},
+	{_T("TAK"),                   SOURCE_FILTER,  SOURCE, SRC_TAK,        0},
 	{_T("TTA"),                   SOURCE_FILTER,  SOURCE, SRC_TTA,        0},
+	{_T("WAV"),                   SOURCE_FILTER,  SOURCE, SRC_WAV,        0},
 	{_T("WavPack"),               SOURCE_FILTER,  SOURCE, SRC_WPAC,       0},
 	{_T("UDP/HTTP"),              SOURCE_FILTER,  SOURCE, SRC_UDP,        0},
 

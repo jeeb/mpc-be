@@ -29,7 +29,7 @@
 #ifdef REGISTER_FILTER
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
-	{&MEDIATYPE_Stream, &MEDIASUBTYPE_TAK_Stream},
+	{&MEDIATYPE_Stream, &MEDIASUBTYPE_WAVE},
 	{&MEDIATYPE_Stream, &MEDIASUBTYPE_NULL},
 };
 
@@ -63,7 +63,7 @@ STDAPI DllRegisterServer()
 
 	RegisterSourceFilter(
 		CLSID_AsyncReader,
-		MEDIASUBTYPE_TAK_Stream,
+		MEDIASUBTYPE_WAVE,
 		chkbytes,
 		NULL);
 
@@ -72,7 +72,7 @@ STDAPI DllRegisterServer()
 
 STDAPI DllUnregisterServer()
 {
-	UnRegisterSourceFilter(MEDIASUBTYPE_TAK_Stream);
+	UnRegisterSourceFilter(MEDIASUBTYPE_WAVE);
 
 	return AMovieDllRegisterServer2(FALSE);
 }

@@ -1992,10 +1992,20 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_source.AddTail(pFGF);
 	}
 
-	if (src[SRC_AUDIO] && !IsPreview) {
+	if (src[SRC_APE] && !IsPreview) {
+		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>();
+		pFGF->m_chkbytes.AddTail(_T("0,4,,4D414320"));               // 'MAC '
+		m_source.AddTail(pFGF);
+	}
+
+	if (src[SRC_TAK] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>();
 		pFGF->m_chkbytes.AddTail(_T("0,4,,7442614B"));               // 'tBaK'
-		pFGF->m_chkbytes.AddTail(_T("0,4,,4D414320"));               // 'MAC '
+		m_source.AddTail(pFGF);
+	}
+
+	if (src[SRC_WAV] && !IsPreview) {
+		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>();
 		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,57415645")); // RIFFxxxxWAVE
 		m_source.AddTail(pFGF);
 	}
@@ -2188,12 +2198,22 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	m_transform.AddTail(pFGF);
 
 	if (!IsPreview) {
-		if (src[SRC_AUDIO]) {
-			pFGF = DNew CFGFilterInternal<CAudioSplitterFilter>(AudioSplitterName, MERIT64_ABOVE_DSHOW);
-		} else {
-			pFGF = DNew CFGFilterInternal<CAudioSplitterFilter>(LowMerit(AudioSplitterName), MERIT64_DO_USE);
-		}
-		pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_TAK_Stream);
+		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
+					(src[SRC_APE]) ? AudioSplitterName : LowMerit(AudioSplitterName),
+					(src[SRC_APE]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+		pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
+		m_transform.AddTail(pFGF);
+
+		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
+					(src[SRC_TAK]) ? AudioSplitterName : LowMerit(AudioSplitterName),
+					(src[SRC_TAK]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+		pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
+		m_transform.AddTail(pFGF);
+
+		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
+					(src[SRC_WAV]) ? AudioSplitterName : LowMerit(AudioSplitterName),
+					(src[SRC_WAV]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+		pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_WAVE);
 		pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
 		m_transform.AddTail(pFGF);
 	}
