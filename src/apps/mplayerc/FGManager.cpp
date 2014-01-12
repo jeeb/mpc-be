@@ -1983,7 +1983,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->m_chkbytes.AddTail(_T("0,4,,7FFE8001"));               // DTS
 		pFGF->m_chkbytes.AddTail(_T("0,4,,fE7f0180"));               // DTS LE
 		pFGF->m_chkbytes.AddTail(_T("0,2,,0B77"));                   // AC3, E-AC3
-		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,57415645")); // RIFFxxxxWAVE for DTSWAV
 		pFGF->m_chkbytes.AddTail(_T("4,4,,F8726FBB"));               // MLP
 		pFGF->m_chkbytes.AddTail(_T("0,8,,4454534844484452"));       // DTSHDHDR
 		pFGF->m_extensions.AddTail(_T(".ac3"));

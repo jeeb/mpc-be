@@ -48,70 +48,7 @@ enum {
 	DTS,
 	DTSHD,
 	DTSPaded,
-	SPDIF_AC3,
 };
-
-DWORD ParseWAVECDHeader(CFile &file)
-{
-	union {
-		struct {
-			DWORD id;
-			DWORD size;
-			DWORD fmt; // for 'RIFF'
-		};
-		BYTE data[12];
-	} Chunk;
-	PCMWAVEFORMAT pcmwf;
-
-	file.SeekToBegin();
-	if (file.Read(&Chunk.data, 12) != 12
-			|| Chunk.id   != FCC('RIFF')
-			|| Chunk.size < (4 + 8 + sizeof(pcmwf) + 8) // 'WAVE' + ('fmt ' + fmt.size) + PCMWAVEFORMAT + (data + data.size)
-			|| Chunk.fmt  != FCC('WAVE')) {
-		return 0;
-	}
-	DWORD filesize = Chunk.size + 8;
-
-	if (file.Read(&Chunk.data, 8) != 8
-			|| Chunk.id   != FCC('fmt ')
-			|| Chunk.size < sizeof(pcmwf)) {
-		return 0;
-	}
-
-	if (file.Read(&pcmwf, sizeof(pcmwf)) != sizeof(pcmwf)
-			|| pcmwf.wf.wFormatTag != WAVE_FORMAT_PCM
-			|| pcmwf.wf.nChannels != 2
-			|| (pcmwf.wf.nSamplesPerSec != 44100 && pcmwf.wf.nSamplesPerSec != 48000)
-			|| pcmwf.wf.nBlockAlign != 4
-			|| pcmwf.wf.nAvgBytesPerSec != pcmwf.wf.nSamplesPerSec * pcmwf.wf.nBlockAlign
-			|| pcmwf.wBitsPerSample != 16) {
-		return 0;
-	}
-	file.Seek(Chunk.size - sizeof(pcmwf), CFile::current); // skip extra
-
-	while (file.Read(&Chunk.data, 8) == 8 && file.GetPosition() + Chunk.size <= filesize) {
-		switch (Chunk.id) {
-			case FCC('data'):
-				return Chunk.size; // end parsing
-			case FCC('JUNK'):
-			case FCC('PAD '):
-			case FCC('fact'):
-			case FCC('cue '):
-			case FCC('plst'):
-			case FCC('list'): // contains 'labl', 'note' and 'ltxt' subchunks
-			case FCC('smpl'):
-			case FCC('inst'):
-				file.Seek(Chunk.size, CFile::current); // skip some chunks
-				break;
-			case FCC('wavl'): // not supported
-			case FCC('slnt'): // not supported
-			default: // broken file or unknown chunk
-				return 0;
-		}
-	}
-
-	return 0;
-}
 
 #ifdef REGISTER_FILTER
 
@@ -149,10 +86,6 @@ STDAPI DllRegisterServer()
 	SetRegKeyValue(
 		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"),
 		_T("1"), _T("0,2,,0B77")); // AC3, E-AC3
-
-	SetRegKeyValue(
-		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"),
-		_T("2"), _T("0,16,,52494646xxxx57415645666D7420")); // RIFFxxxxWAVEfmt_ for DTSWAV
 
 	SetRegKeyValue(
 		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"),
@@ -251,8 +184,6 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 	HRESULT hr = E_FAIL;
 	m_AvgTimePerFrame = 0;
 
-	bool wavecd = false;
-
 	do {
 		if (!m_file.Open(fn, CFile::modeRead|CFile::shareDenyNone, &ex)) {
 			hr = AmHresultFromWin32 (ex.m_lOsError);
@@ -270,14 +201,8 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 		}
 
 		if (id == RIFF_DWORD) {
-			// check WAVE-CD header
-			DWORD datasize = ParseWAVECDHeader(m_file);
-			if (datasize == 0) {
-				break;
-			}
-			wavecd = true;
-			m_dataStart = m_file.GetPosition();
-			m_dataEnd   = m_dataStart + datasize;
+			// ignore RIFF files
+			break;
 		}
 
 		if ((__int64)m_file.GetLength() < m_dataEnd) {
@@ -286,7 +211,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 		{ // search first audio frame
 			bool deepsearch = false;
-			if (ext == _T(".dtswav") || ext == _T(".dts") || ext == _T(".dtshd") || ext == _T(".wav") || ext == _T(".ac3") || ext == _T(".eac3")) { //check only specific extensions
+			if (ext == _T(".dts") || ext == _T(".dtshd") || ext == _T(".ac3") || ext == _T(".eac3")) { //check only specific extensions
 				deepsearch = true; // deep search for specific extensions only
 			}
 
@@ -300,23 +225,18 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			m_streamtype = unknown;
 			UINT i;
 			for (i = 0; i + 12 < buflen; i++) { // looking for DTS or AC3 sync
-				if (wavecd && ParseAC3IEC61937Header(buffer + i)) {
-					m_streamtype = SPDIF_AC3;
-					break;
-				} else if (ParseDTSHeader(buffer + i)) {
+				if (ParseDTSHeader(buffer + i)) {
 					m_streamtype = DTS;
 					break;
-				} else if (!wavecd) {
-					if (ParseAC3Header(buffer + i)) {
-						m_streamtype = AC3;
-						break;
-					} else if (ParseEAC3Header(buffer + i)) {
-						m_streamtype = EAC3;
-						break;
-					} else if (ParseMLPHeader(buffer + i)) {
-						m_streamtype = MLP;
-						break;
-					}
+				} else if (ParseAC3Header(buffer + i)) {
+					m_streamtype = AC3;
+					break;
+				} else if (ParseEAC3Header(buffer + i)) {
+					m_streamtype = EAC3;
+					break;
+				} else if (ParseMLPHeader(buffer + i)) {
+					m_streamtype = MLP;
+					break;
 				}
 
 				if (!deepsearch) {
@@ -422,22 +342,6 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			m_wFormatTag = WAVE_FORMAT_UNKNOWN;
 			m_subtype = MEDIASUBTYPE_DOLBY_DDPLUS;
 		}
-		// SPDIF AC3
-		else if (m_streamtype == SPDIF_AC3) {
-			m_framesize = ParseAC3IEC61937Header(buf);
-			if (m_framesize == 0) {
-				break;
-			}
-
-			m_wFormatTag  = WAVE_FORMAT_DOLBY_AC3_SPDIF;
-			m_channels    = 2;
-			m_samplerate  = 44100;
-			m_bitrate     = 1411200;
-			m_bitdepth    = 16;
-			m_framelength = 1536;
-
-			m_subtype = MEDIASUBTYPE_DOLBY_AC3_SPDIF;
-		}
 		// MLP
 		else if (m_streamtype == MLP && ParseMLPHeader(buf, &aframe)) {
 			m_framesize   = aframe.size;
@@ -542,10 +446,7 @@ HRESULT CDTSAC3Stream::GetMediaType(int iPosition, CMediaType* pmt)
 		wfe->wBitsPerSample  = m_bitdepth;
 		wfe->cbSize = 0;
 
-		if (m_streamtype == SPDIF_AC3) {
-			wfe->nBlockAlign = 4;
-			pmt->SetSampleSize(m_framesize);
-		} else if (m_streamtype == MLP /*|| m_streamtype == TrueHD*/) {
+		if (m_streamtype == MLP /*|| m_streamtype == TrueHD*/) {
 			pmt->SetSampleSize(0);
 		}
 
@@ -570,8 +471,6 @@ HRESULT CDTSAC3Stream::CheckMediaType(const CMediaType* pmt)
 		} else if (pmt->subtype == MEDIASUBTYPE_DOLBY_AC3 && (wFmtTag == WAVE_FORMAT_UNKNOWN || wFmtTag == WAVE_FORMAT_DOLBY_AC3)) {
 			return S_OK;
 		} else if (pmt->subtype == MEDIASUBTYPE_DOLBY_DDPLUS && wFmtTag == WAVE_FORMAT_UNKNOWN) {
-			return S_OK;
-		} else if (pmt->subtype == MEDIASUBTYPE_DOLBY_AC3_SPDIF && wFmtTag == WAVE_FORMAT_DOLBY_AC3_SPDIF) {
 			return S_OK;
 		} else if (pmt->subtype == MEDIASUBTYPE_MLP && wFmtTag == WAVE_FORMAT_UNKNOWN) {
 			return S_OK;
