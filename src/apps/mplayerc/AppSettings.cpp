@@ -44,7 +44,6 @@ CAppSettings::CAppSettings()
 	SrcFiltersKeys[SRC_CDXA]		= _T("SRC_CDXA");
 	SrcFiltersKeys[SRC_VTS]			= _T("SRC_VTS");
 	SrcFiltersKeys[SRC_FLIC]		= _T("SRC_FLIC");
-	SrcFiltersKeys[SRC_DTS]			= _T("SRC_DTS");
 	SrcFiltersKeys[SRC_DTSAC3]		= _T("SRC_DTSAC3");
 	SrcFiltersKeys[SRC_MATROSKA]	= _T("SRC_MATROSKA");
 	SrcFiltersKeys[SRC_SHOUTCAST]	= _T("SRC_SHOUTCAST");

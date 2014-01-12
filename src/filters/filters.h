@@ -28,7 +28,6 @@
 #include "parser/AMRSplitter/AMRSplitter.h"
 #include "parser/AviSplitter/AviSplitter.h"
 #include "parser/DSMSplitter/DSMSplitter.h"
-#include "parser/DTSSplitter/DTSSplitter.h"
 #include "parser/FLVSplitter/FLVSplitter.h"
 #include "parser/MatroskaSplitter/MatroskaSplitter.h"
 #include "parser/MP4Splitter/MP4Splitter.h"
