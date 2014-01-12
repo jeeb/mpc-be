@@ -1993,7 +1993,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_source.AddTail(pFGF);
 	}
 
-	if (src[SRC_APE_TAK] && !IsPreview) {
+	if (src[SRC_AUDIO] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>();
 		pFGF->m_chkbytes.AddTail(_T("0,4,,7442614B"));               // 'tBaK'
 		pFGF->m_chkbytes.AddTail(_T("0,4,,4D414320"));               // 'MAC '
@@ -2189,7 +2189,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	m_transform.AddTail(pFGF);
 
 	if (!IsPreview) {
-		if (src[SRC_APE_TAK]) {
+		if (src[SRC_AUDIO]) {
 			pFGF = DNew CFGFilterInternal<CAudioSplitterFilter>(AudioSplitterName, MERIT64_ABOVE_DSHOW);
 		} else {
 			pFGF = DNew CFGFilterInternal<CAudioSplitterFilter>(LowMerit(AudioSplitterName), MERIT64_DO_USE);

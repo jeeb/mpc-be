@@ -64,7 +64,7 @@ CAppSettings::CAppSettings()
 	SrcFiltersKeys[SRC_AMR]			= _T("SRC_AMR");
 	SrcFiltersKeys[SRC_TTA]			= _T("SRC_TTA");
 	SrcFiltersKeys[SRC_UDP]			= _T("SRC_UDP");
-	SrcFiltersKeys[SRC_APE_TAK]		= _T("SRC_APE_TAK");
+	SrcFiltersKeys[SRC_AUDIO]		= _T("SRC_AUDIO");
 	SrcFiltersKeys[SRC_RAWVIDEO]	= _T("SRC_RAWVIDEO");
 
 	// Internal decoders
