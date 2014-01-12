@@ -147,6 +147,7 @@ STDMETHODIMP CDirectVobSubFilter::NonDelegatingQueryInterface(REFIID riid, void*
 static VIDEO_OUTPUT_FORMATS DefaultFormats[] = {
 	{&MEDIASUBTYPE_P010,   2, 24, FCC('P010')},
 	{&MEDIASUBTYPE_P016,   2, 24, FCC('P016')},
+	{&MEDIASUBTYPE_NV12,   3, 12, FCC('NV12')},
 	{&MEDIASUBTYPE_YV12,   3, 12, FCC('YV12')},
 	{&MEDIASUBTYPE_YUY2,   1, 16, FCC('YUY2')},
 	{&MEDIASUBTYPE_I420,   3, 12, FCC('I420')},
@@ -239,11 +240,13 @@ HRESULT CDirectVobSubFilter::Transform(IMediaSample* pIn)
 
 	bool fYV12 = (mt.subtype == MEDIASUBTYPE_YV12 || mt.subtype == MEDIASUBTYPE_I420 || mt.subtype == MEDIASUBTYPE_IYUV);
 	int bpp = fYV12 ? 8 : bihIn.biBitCount;
-	DWORD black = fYV12 ? 0x10101010 : (bihIn.biCompression == '2YUY') ? 0x80108010 : 0;
+	DWORD black = fYV12 ? 0x10101010 : (bihIn.biCompression == FCC('YUY2')) ? 0x80108010 : 0;
 
-	if (mt.subtype == MEDIASUBTYPE_P010 || mt.subtype == MEDIASUBTYPE_P016)
-	{
+	if (mt.subtype == MEDIASUBTYPE_P010 || mt.subtype == MEDIASUBTYPE_P016) {
 		bpp = 16;
+		black = 0x10001000;
+	} else if (mt.subtype == MEDIASUBTYPE_NV12) {
+		bpp = 8;
 		black = 0x10001000;
 	}
 	CSize sub(m_w, m_h);
@@ -270,13 +273,13 @@ HRESULT CDirectVobSubFilter::Transform(IMediaSample* pIn)
 		}
 	}
 
-	if (mt.subtype == MEDIASUBTYPE_P010 || mt.subtype == MEDIASUBTYPE_P016)
-	{
+	if (mt.subtype == MEDIASUBTYPE_P010 || mt.subtype == MEDIASUBTYPE_P016 || mt.subtype == MEDIASUBTYPE_NV12) {
 		BYTE* pSubUV = (BYTE*)m_pTempPicBuff + (sub.cx*bpp >> 3) * sub.cy;
 		BYTE* pInUV = pDataIn + (in.cx*bpp >> 3) * in.cy;
 		sub.cy >>= 1; in.cy >>= 1;
-		if (FAILED(Copy(pSubUV, pInUV, sub, in, bpp, mt.subtype, 0x80008000)))
+		if (FAILED(Copy(pSubUV, pInUV, sub, in, bpp, mt.subtype, 0x80008000))) {
 			return E_FAIL;
+		}
 	}
 	//
 
@@ -316,8 +319,6 @@ HRESULT CDirectVobSubFilter::Transform(IMediaSample* pIn)
 	if (m_fFlipSubtitles) {
 		fFlipSub = !fFlipSub;
 	}
-
-	//
 
 	{
 		CAutoLock cAutoLock(&m_csQueueLock);
@@ -602,6 +603,7 @@ HRESULT CDirectVobSubFilter::CheckInputType(const CMediaType* mtIn)
 	return mtIn->majortype == MEDIATYPE_Video
 		&& (mtIn->subtype == MEDIASUBTYPE_P016
 		       || mtIn->subtype == MEDIASUBTYPE_P010
+		       || mtIn->subtype == MEDIASUBTYPE_NV12
 		       || mtIn->subtype == MEDIASUBTYPE_YV12
 			   || mtIn->subtype == MEDIASUBTYPE_I420
 			   || mtIn->subtype == MEDIASUBTYPE_IYUV
@@ -648,6 +650,7 @@ HRESULT CDirectVobSubFilter::DoCheckTransform(const CMediaType* mtIn, const CMed
 				|| mtIn->subtype == MEDIASUBTYPE_I420
 				|| mtIn->subtype == MEDIASUBTYPE_IYUV)) {
 		if (mtOut->subtype != MEDIASUBTYPE_YV12
+				&& mtOut->subtype != MEDIASUBTYPE_NV12
 				&& mtOut->subtype != MEDIASUBTYPE_I420
 				&& mtOut->subtype != MEDIASUBTYPE_IYUV
 				&& mtOut->subtype != MEDIASUBTYPE_YUY2
@@ -658,7 +661,7 @@ HRESULT CDirectVobSubFilter::DoCheckTransform(const CMediaType* mtIn, const CMed
 			return VFW_E_TYPE_NOT_ACCEPTED;
 		}
 	} else if (mtOut->majortype == MEDIATYPE_Video
-				&& (mtOut->subtype == MEDIASUBTYPE_P016 || mtOut->subtype == MEDIASUBTYPE_P010)) {
+				&& (mtOut->subtype == MEDIASUBTYPE_P016 || mtOut->subtype == MEDIASUBTYPE_P010 || mtOut->subtype == MEDIASUBTYPE_NV12)) {
 		if (mtOut->subtype != mtIn->subtype) {
 			return VFW_E_TYPE_NOT_ACCEPTED;
 		}
@@ -713,16 +716,13 @@ void CDirectVobSubFilter::InitSubPicQueue()
 	m_spd.type = -1;
 	if (subtype == MEDIASUBTYPE_YV12) {
 		m_spd.type = MSP_YV12;
-	} 
-	else if (subtype == MEDIASUBTYPE_P010)
-	{
+	} else if (subtype == MEDIASUBTYPE_P010) {
 		m_spd.type = MSP_P010;
-	}
-	else if (subtype == MEDIASUBTYPE_P016)
-	{
+	} else if (subtype == MEDIASUBTYPE_P016) {
 		m_spd.type = MSP_P016;
-	}
-    else if (subtype == MEDIASUBTYPE_I420 || subtype == MEDIASUBTYPE_IYUV) {
+	} else if (subtype == MEDIASUBTYPE_NV12) {
+		m_spd.type = MSP_NV12;
+	} else if (subtype == MEDIASUBTYPE_I420 || subtype == MEDIASUBTYPE_IYUV) {
 		m_spd.type = MSP_IYUV;
 	} else if (subtype == MEDIASUBTYPE_YUY2) {
 		m_spd.type = MSP_YUY2;
@@ -737,17 +737,14 @@ void CDirectVobSubFilter::InitSubPicQueue()
 	}
 	m_spd.w = m_w;
 	m_spd.h = m_h;
-	m_spd.bpp = (m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV) ? 8 : bihIn.biBitCount;
+	m_spd.bpp = (m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV || m_spd.type == MSP_NV12) ? 8 : bihIn.biBitCount;
 	m_spd.bpp = (m_spd.type == MSP_P010 || m_spd.type == MSP_P016) ? 16 : m_spd.bpp;
 	m_spd.pitch = m_spd.w*m_spd.bpp>>3;
 
 	m_pTempPicBuff.Free();
-	if (m_spd.type == MSP_P010 || m_spd.type == MSP_P016)
-	{
+	if (m_spd.type == MSP_P010 || m_spd.type == MSP_P016) {
 		m_pTempPicBuff.Allocate(m_spd.pitch * m_spd.h + m_spd.pitch * m_spd.h/2);
-	}
-	else
-	{
+	} else {
 		m_pTempPicBuff.Allocate(4*m_w*m_h);
 	}
 	m_spd.bits = (void*)m_pTempPicBuff;

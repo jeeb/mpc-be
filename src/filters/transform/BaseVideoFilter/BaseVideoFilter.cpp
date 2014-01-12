@@ -29,29 +29,6 @@
 #include <InitGuid.h>
 #include <moreuuids.h>
 
-bool BitBltFromP016ToP016(size_t w, size_t h, BYTE* dstY, BYTE* dstUV, int dstPitch, BYTE* srcY, BYTE* srcUV, int srcPitch)
-{
-	// Copy Y plane
-	for (size_t row = 0; row < h; row++)
-	{
-		BYTE* src = srcY + row * srcPitch;
-		BYTE* dst = dstY + row * dstPitch;
-		
-		memcpy(dst, src, dstPitch);
-	}
-
-	// Copy UV plane. UV plane is half height.
-	for (size_t row = 0; row < h/2; row++)
-	{
-		BYTE* src = srcUV + row * srcPitch;
-		BYTE* dst = dstUV + row * dstPitch;
-
-		memcpy(dst, src, dstPitch);
-	}
-
-	return true;
-}
-
 //
 // CBaseVideoFilter
 //
@@ -373,7 +350,7 @@ HRESULT CBaseVideoFilter::CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, int 
 		BYTE* pOutU = pOut + bihOut.biWidth*h;
 		BYTE* pOutV = pOut + bihOut.biWidth*h*5/4;
 
-		if (bihOut.biCompression == '21VY') {
+		if (bihOut.biCompression == FCC('YV12')) {
 			BYTE* tmp = pOutU;
 			pOutU = pOutV;
 			pOutV = tmp;
@@ -381,15 +358,15 @@ HRESULT CBaseVideoFilter::CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, int 
 
 		ASSERT(w <= abs(pitchIn));
 
-		if (bihOut.biCompression == '2YUY') {
+		if (bihOut.biCompression == FCC('YUY2')) {
 			if (!fInterlaced) {
 				BitBltFromI420ToYUY2(w, h, pOut, bihOut.biWidth*2, pIn, pInU, pInV, pitchIn);
 			} else {
 				BitBltFromI420ToYUY2Interlaced(w, h, pOut, bihOut.biWidth*2, pIn, pInU, pInV, pitchIn);
 			}
-		} else if (bihOut.biCompression == '024I' || bihOut.biCompression == 'VUYI' || bihOut.biCompression == '21VY') {
+		} else if (bihOut.biCompression == FCC('I420') || bihOut.biCompression == FCC('IYUV') || bihOut.biCompression == FCC('YV12')) {
 			BitBltFromI420ToI420(w, h, pOut, pOutU, pOutV, bihOut.biWidth, pIn, pInU, pInV, pitchIn);
-		} else if(bihOut.biCompression == '21VN') {
+		} else if(bihOut.biCompression == FCC('NV12')) {
 			BitBltFromI420ToNV12(w, h, pOut, pOutU, pOutV, bihOut.biWidth, pIn, pInU, pInV, pitchIn);
 		} else if (bihOut.biCompression == BI_RGB || bihOut.biCompression == BI_BITFIELDS) {
 			if (!BitBltFromI420ToRGB(w, h, pOut, pitchOut, bihOut.biBitCount, pIn, pInU, pInV, pitchIn)) {
@@ -399,28 +376,16 @@ HRESULT CBaseVideoFilter::CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, int 
 			}
 		}
 	} 
-	else if (subtype == MEDIASUBTYPE_P010 || subtype == MEDIASUBTYPE_P016)
-	{
-		BYTE* pInY = ppIn[0];
-
-		// UV plane is packed
-		BYTE* pInUV = ppIn[1];
-
+	else if ((subtype == MEDIASUBTYPE_P010 || subtype == MEDIASUBTYPE_P016)
+			 && (bihOut.biCompression == FCC('P010') || bihOut.biCompression == FCC('P016'))) {
 		// We currently don't support outputting P010/P016 input to something other than P010/P016
-		if (bihOut.biCompression == '010P' || bihOut.biCompression == '610P')
-		{
-			BYTE* pOutUV = pOut + bihOut.biWidth*2*h; // 2 bytes per pixel
-
-			// P010 and P016 share the same memory layout
-			BitBltFromP016ToP016(w, h, pOut, pOutUV, bihOut.biWidth*2, pInY, pInUV, pitchIn);
-		}
-		else
-		{
-			return VFW_E_TYPE_NOT_ACCEPTED;
-		}
-	}
-    else if (subtype == MEDIASUBTYPE_YUY2) {
-		if (bihOut.biCompression == '2YUY') {
+		// P010 and P016 share the same memory layout
+		BitBltFromP010ToP010(w, h, pOut, bihOut.biWidth*2, ppIn[0], pitchIn);
+	} else if (subtype == MEDIASUBTYPE_NV12 && bihOut.biCompression == FCC('NV12')) {
+		// We currently don't support outputting NV12 input to something other than NV12
+		BitBltFromNV12ToNV12(w, h, pOut, bihOut.biWidth, ppIn[0], pitchIn);
+	} else if (subtype == MEDIASUBTYPE_YUY2) {
+		if (bihOut.biCompression == FCC('YUY2')) {
 			BitBltFromYUY2ToYUY2(w, h, pOut, bihOut.biWidth*2, ppIn[0], pitchIn);
 		} else if (bihOut.biCompression == BI_RGB || bihOut.biCompression == BI_BITFIELDS) {
 			if (!BitBltFromYUY2ToRGB(w, h, pOut, pitchOut, bihOut.biBitCount, ppIn[0], pitchIn)) {
@@ -435,7 +400,7 @@ HRESULT CBaseVideoFilter::CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, int 
 			subtype == MEDIASUBTYPE_RGB24 ? 24 :
 			subtype == MEDIASUBTYPE_RGB565 ? 16 : 0;
 
-		if (bihOut.biCompression == '2YUY') {
+		if (bihOut.biCompression == FCC('YUY2')) {
 			// TODO
 			// BitBltFromRGBToYUY2();
 		} else if (bihOut.biCompression == BI_RGB || bihOut.biCompression == BI_BITFIELDS) {

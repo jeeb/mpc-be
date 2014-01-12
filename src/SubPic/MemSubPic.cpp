@@ -194,17 +194,17 @@ STDMETHODIMP CMemSubPic::Unlock(RECT* pDirtyRect)
 	}
 
 	if(m_spd.type == MSP_YUY2 || m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV || m_spd.type == MSP_AYUV
-		|| m_spd.type == MSP_P010 || m_spd.type == MSP_P016) {
+		|| m_spd.type == MSP_P010 || m_spd.type == MSP_P016 || m_spd.type == MSP_NV12) {
 		ColorConvInit();
 
 		if(m_spd.type == MSP_YUY2 || m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV 
-			|| m_spd.type == MSP_P010 || m_spd.type == MSP_P016) 
+			|| m_spd.type == MSP_P010 || m_spd.type == MSP_P016 || m_spd.type == MSP_NV12) 
 		{
 			m_rcDirty.left &= ~1;
 			m_rcDirty.right = (m_rcDirty.right+1)&~1;
 
 			if(m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV 
-				|| m_spd.type == MSP_P010 || m_spd.type == MSP_P016) {
+				|| m_spd.type == MSP_P010 || m_spd.type == MSP_P016 || m_spd.type == MSP_NV12) {
 				m_rcDirty.top &= ~1;
 				m_rcDirty.bottom = (m_rcDirty.bottom+1)&~1;
 			}
@@ -235,7 +235,7 @@ STDMETHODIMP CMemSubPic::Unlock(RECT* pDirtyRect)
 		}
 	} 
 	else if(m_spd.type == MSP_YUY2 || m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV
-		|| m_spd.type == MSP_P010 || m_spd.type == MSP_P016) 
+		|| m_spd.type == MSP_P010 || m_spd.type == MSP_P016 || m_spd.type == MSP_NV12) 
 	{
 		for(; top < bottom ; top += m_spd.pitch) {
 			BYTE* s = top;
@@ -551,7 +551,8 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 			}
 			break;
 		case MSP_YV12:
-			case MSP_IYUV:
+		case MSP_NV12:
+		case MSP_IYUV:
 					for (ptrdiff_t j = 0; j < h; j++, s += src.pitch, d += dst.pitch) {
 						BYTE* s2 = s;
 						BYTE* s2end = s2 + w*4;
@@ -569,8 +570,7 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 
 	dst.pitch = abs(dst.pitch);
 
-	if (dst.type == MSP_P010 || dst.type == MSP_P016)
-	{
+	if (dst.type == MSP_P010 || dst.type == MSP_P016) {
 		// Alpha blend UV plane. UV is interleaved. Each UV represents a 2x2 block of pixels
 		// so we need to sample the current row and the row after for source color info.
 		// Source is UYxAVYxA.
@@ -583,18 +583,15 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 		// by 2 because each row of UV values is 2 rows of pixels in the source.
 		dstUV = dstUV + dst.pitch*rd.top/2 + rd.left*2;
 
-		for(ptrdiff_t j = 0; j < h2; j++, ss += src.pitch*2, dstUV += dst.pitch) 
-		{
+		for(ptrdiff_t j = 0; j < h2; j++, ss += src.pitch*2, dstUV += dst.pitch) {
 			BYTE* srcData = ss;
 			BYTE* srcDataEnd = srcData + w*4;
 			WORD* dstData = reinterpret_cast<WORD*>(dstUV);
-			for (; srcData < srcDataEnd; srcData += 8, dstData += 2)
-			{
+			for (; srcData < srcDataEnd; srcData += 8, dstData += 2) {
 				// Sample 2x2 block of alpha values
 				unsigned int ia = (srcData[3] + srcData[3+src.pitch] + srcData[7] + srcData[7+src.pitch]) >> 2;
 
-				if (ia < 255)
-				{
+				if (ia < 255) {
 					WORD result;
 
 					// Convert U to 8-bit
@@ -613,8 +610,7 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 				}
 			}
 		}
-	}
-	else if (dst.type == MSP_YV12 || dst.type == MSP_IYUV) {
+	} else if (dst.type == MSP_YV12 || dst.type == MSP_IYUV) {
 		int h2 = h/2;
 
 		if (!dst.pitchUV) {
@@ -658,6 +654,38 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 				for (; s2 < s2end; s2 += 8, d2++, is2 += 8) {
 					unsigned int ia = (s2[3]+s2[3+src.pitch]+is2[3]+is2[3+src.pitch])>>2;
 					if (ia < 0xff) {
+						*d2 = (((*d2-0x80)*ia)>>8) + ((s2[0]+s2[src.pitch])>>1);
+					}
+				}
+			}
+		}
+	} else if (dst.type == MSP_NV12) {
+		int h2 = h/2;
+ 
+		BYTE* ss[2];
+		ss[0] = (BYTE*)src.bits + src.pitch*rs.top + rs.left*4;
+		ss[1] = ss[0] + 4;
+ 
+		if (!dst.bitsU) {
+			dst.bitsU = (BYTE*)dst.bits + dst.pitch*dst.h;
+		}
+
+		BYTE* dd[2];
+		dd[0] = dst.bitsU + dst.pitch*rd.top/2 + rd.left;
+		dd[1] = dd[0] + 1;
+
+		for (ptrdiff_t i = 0; i < 2; i++) {
+			s = ss[i];
+			d = dd[i];
+			BYTE* is = ss[1-i];
+			for (ptrdiff_t j = 0; j < h2; j++, s += src.pitch*2, d += dst.pitch, is += src.pitch*2) {
+				BYTE* s2 = s;
+				BYTE* s2end = s2 + w*4;
+				BYTE* d2 = d;
+				BYTE* is2 = is;
+				for (; s2 < s2end; s2 += 8, d2+=2, is2 += 8) {
+					unsigned int ia = (s2[3]+s2[3+src.pitch]+is2[3]+is2[3+src.pitch])>>2;
+					if (ia < 255) {
 						*d2 = (((*d2-0x80)*ia)>>8) + ((s2[0]+s2[src.pitch])>>1);
 					}
 				}
