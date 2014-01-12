@@ -2442,7 +2442,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_SRC_CDDA            "AudioCD playback"
-    IDS_SRC_DTS             "DTS AudioCD support with CDDA"
     IDS_SRC_AVI             "Non-interleaved files are not welcomed"
     IDS_SRC_VTS             "Open VTS_xx_0.ifo to load VTS_xx_x.vob files in one piece"
     IDS_SRC_REALMEDIA       "RealMedia format categories must be set to 'DirectShow' to make it load\nDoesn't support streaming"

@@ -616,7 +616,6 @@
 #define IDS_SRC_AVI                     14002
 #define IDS_SRC_VTS                     14004
 #define IDS_SRC_REALMEDIA               14009
-#define IDS_SRC_DTS                     14010
 #define IDS_SRC_ROQ                     14011
 #define IDS_SRC_MPA                     14016
 #define IDS_TRA_RV                      14018
