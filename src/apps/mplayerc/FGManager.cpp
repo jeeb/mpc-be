@@ -2199,21 +2199,14 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	if (!IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSplitterFilter>(
-					(src[SRC_APE]) ? AudioSplitterName : LowMerit(AudioSplitterName),
-					(src[SRC_APE]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
-		pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
-		m_transform.AddTail(pFGF);
-
-		pFGF = DNew CFGFilterInternal<CAudioSplitterFilter>(
-					(src[SRC_TAK]) ? AudioSplitterName : LowMerit(AudioSplitterName),
-					(src[SRC_TAK]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
-		pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
-		m_transform.AddTail(pFGF);
-
-		pFGF = DNew CFGFilterInternal<CAudioSplitterFilter>(
 					(src[SRC_WAV]) ? AudioSplitterName : LowMerit(AudioSplitterName),
 					(src[SRC_WAV]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
 		pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_WAVE);
+		m_transform.AddTail(pFGF);
+
+		pFGF = DNew CFGFilterInternal<CAudioSplitterFilter>(
+					(src[SRC_APE] && src[SRC_TAK] && src[SRC_WAV]) ? AudioSplitterName : LowMerit(AudioSplitterName),
+					(src[SRC_APE] && src[SRC_TAK] && src[SRC_WAV]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
 		pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
 		m_transform.AddTail(pFGF);
 	}
