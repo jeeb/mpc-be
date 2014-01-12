@@ -1195,18 +1195,6 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 
 			if (!title.IsEmpty()) {
-				if (!track.IsEmpty()) {
-					title = track + L" - " + title;
-				}
-				if (!album.IsEmpty()) {
-					title = album + L" - " + title;
-				}
-				if (!year.IsEmpty()) {
-					title += L" - " +  year;
-				}
-				if (!gen.IsEmpty()) {
-					title += L" - " + gen;
-				}
 				SetProperty(L"TITL", title);
 			}
 
