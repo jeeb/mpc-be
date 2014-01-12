@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2014 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -178,7 +178,7 @@ bool CTAKFile::ParseTAKStreamInfo(BYTE* buf, int size)
 		return false;
 	}
 
-	// Audio format 
+	// Audio format
 	uint8_t  DataType       = (buf[6] >> 1 & 0x7); // 0 - PCM
 	uint32_t SampleRate     = (*(uint32_t*)&buf[6] >> 4 & 0x3FFFF) + 6000;
 	uint16_t SampleBits     = (*(uint16_t*)&buf[8] >> 6 & 0x1F) + 8;
