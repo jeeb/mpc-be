@@ -42,7 +42,7 @@ public:
 	STDMETHODIMP Render(SubPicDesc& spd, REFERENCE_TIME rt, double fps, RECT& bbox);
 	STDMETHODIMP GetTextureSize (POSITION pos, SIZE& MaxTextureSize, SIZE& VirtualSize, POINT& VirtualTopLeft);
 
-	STDMETHODIMP_(SUBTITLE_TYPE) GetType(POSITION pos);
+	STDMETHODIMP_(SUBTITLE_TYPE) GetType(POSITION pos) { return ST_XSUB; };
 
 	// IPersist
 	STDMETHODIMP GetClassID(CLSID* pClassID);

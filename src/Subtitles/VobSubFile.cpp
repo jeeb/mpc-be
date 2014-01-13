@@ -1311,11 +1311,6 @@ STDMETHODIMP CVobSubFile::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fps,
 	return __super::Render(spd, bbox);
 }
 
-STDMETHODIMP_(SUBTITLE_TYPE) CVobSubFile::GetType(POSITION pos)
-{
-	return ST_VOBSUB;
-}
-
 // IPersist
 
 STDMETHODIMP CVobSubFile::GetClassID(CLSID* pClassID)
@@ -2492,11 +2487,6 @@ STDMETHODIMP CVobSubStream::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fp
 	}
 
 	return E_FAIL;
-}
-
-STDMETHODIMP_(SUBTITLE_TYPE) CVobSubStream::GetType(POSITION pos)
-{
-	return ST_VOBSUB;
 }
 
 // IPersist

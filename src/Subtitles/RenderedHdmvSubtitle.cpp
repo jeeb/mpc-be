@@ -109,11 +109,6 @@ STDMETHODIMP CRenderedHdmvSubtitle::GetTextureSize (POSITION pos, SIZE& MaxTextu
 	return hr;
 };
 
-STDMETHODIMP_(SUBTITLE_TYPE) CRenderedHdmvSubtitle::GetType(POSITION pos)
-{
-	return m_nType;
-}
-
 // IPersist
 
 STDMETHODIMP CRenderedHdmvSubtitle::GetClassID(CLSID* pClassID)

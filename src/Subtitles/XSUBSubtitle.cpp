@@ -156,11 +156,6 @@ STDMETHODIMP CXSUBSubtitle::GetTextureSize (POSITION pos, SIZE& MaxTextureSize, 
 	return S_OK;
 };
 
-STDMETHODIMP_(SUBTITLE_TYPE) CXSUBSubtitle::GetType(POSITION pos)
-{
-	return ST_XSUB;
-}
-
 // IPersist
 
 STDMETHODIMP CXSUBSubtitle::GetClassID(CLSID* pClassID)

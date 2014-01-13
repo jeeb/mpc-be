@@ -27,6 +27,8 @@
 
 IMPLEMENT_DYNAMIC(CPlayerSubresyncBar, CPlayerBar)
 
+#define GetStr GetStrW
+
 CPlayerSubresyncBar::CPlayerSubresyncBar()
 {
 	m_rt = 0;

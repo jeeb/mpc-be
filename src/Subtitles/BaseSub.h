@@ -28,16 +28,16 @@ public:
 	CBaseSub(SUBTITLE_TYPE nType);
 	virtual ~CBaseSub();
 
-	virtual HRESULT			ParseSample (IMediaSample* pSample) = NULL;
-	virtual void			Reset() = NULL;
-	virtual POSITION		GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld = false) = NULL;
-	virtual POSITION		GetNext(POSITION pos) = NULL;
-	virtual REFERENCE_TIME	GetStart(POSITION nPos) = NULL;
-	virtual REFERENCE_TIME	GetStop(POSITION nPos)  = NULL;
-	virtual void			Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox) = NULL;
-	virtual HRESULT			GetTextureSize (POSITION pos, SIZE& MaxTextureSize, SIZE& VideoSize, POINT& VideoTopLeft) = NULL;
-	virtual void			CleanOld(REFERENCE_TIME rt) = NULL;
-	virtual HRESULT			EndOfStream() = NULL;
+	virtual HRESULT			ParseSample (IMediaSample* pSample) PURE;
+	virtual void			Reset() PURE;
+	virtual POSITION		GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld = false) PURE;
+	virtual POSITION		GetNext(POSITION pos) PURE;
+	virtual REFERENCE_TIME	GetStart(POSITION nPos) PURE;
+	virtual REFERENCE_TIME	GetStop(POSITION nPos)  PURE;
+	virtual void			Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox) PURE;
+	virtual HRESULT			GetTextureSize (POSITION pos, SIZE& MaxTextureSize, SIZE& VideoSize, POINT& VideoTopLeft) PURE;
+	virtual void			CleanOld(REFERENCE_TIME rt) PURE;
+	virtual HRESULT			EndOfStream() PURE;
 
 protected :
 	SUBTITLE_TYPE			m_nType;
