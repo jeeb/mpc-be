@@ -718,7 +718,7 @@ CClipper::CClipper(CStringW str, CSize size, double scalex, double scaley, bool 
 		return;
 	}
 
-	m_pAlphaMask = DNew BYTE[size.cx*size.cy];
+	m_pAlphaMask = DNew BYTE[size.cx * size.cy];
 	if (!m_pAlphaMask) {
 		return;
 	}
@@ -731,9 +731,9 @@ CClipper::CClipper(CStringW str, CSize size, double scalex, double scaley, bool 
 
 	Paint(CPoint(0, 0), CPoint(0, 0));
 
-	int w = mOverlayWidth, h = mOverlayHeight;
+	int w = m_overlayData.mOverlayWidth, h = m_overlayData.mOverlayHeight;
 
-	int x = (mOffsetX+cpOffset.x+4)>>3, y = (mOffsetY+cpOffset.y+4)>>3;
+	int x = (m_overlayData.mOffsetX + cpOffset.x + 4) >> 3, y = (m_overlayData.mOffsetY + cpOffset.y + 4) >>3;
 	int xo = 0, yo = 0;
 
 	if (x < 0) {
@@ -746,32 +746,32 @@ CClipper::CClipper(CStringW str, CSize size, double scalex, double scaley, bool 
 		h -= -y;
 		y = 0;
 	}
-	if (x+w > m_size.cx) {
-		w = m_size.cx-x;
+	if (x + w > m_size.cx) {
+		w = m_size.cx - x;
 	}
-	if (y+h > m_size.cy) {
-		h = m_size.cy-y;
+	if (y + h > m_size.cy) {
+		h = m_size.cy - y;
 	}
 
 	if (w <= 0 || h <= 0) {
 		return;
 	}
 
-	const BYTE* src = mpOverlayBuffer + 2*(mOverlayWidth * yo + xo);
+	const BYTE* src = m_overlayData.mpOverlayBufferBody + m_overlayData.mOverlayPitch * yo + xo;
 	BYTE* dst = m_pAlphaMask + m_size.cx * y + x;
 
 	while (h--) {
-		for (ptrdiff_t wt=0; wt<w; ++wt) {
+		for (ptrdiff_t wt = 0; wt < w; ++wt) {
 			dst[wt] = src[wt*2];
 		}
 
-		src += 2*mOverlayWidth;
+		src += m_overlayData.mOverlayPitch;
 		dst += m_size.cx;
 	}
 
 	if (inverse) {
 		BYTE* dst = m_pAlphaMask;
-		for (ptrdiff_t i = size.cx*size.cy; i>0; --i, ++dst) {
+		for (ptrdiff_t i = size.cx * size.cy; i > 0; --i, ++dst) {
 			*dst = 0x40 - *dst;    // mask is 6 bit
 		}
 	}

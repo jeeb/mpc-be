@@ -131,7 +131,7 @@ HRESULT CHdmvSub::ParseSample(BYTE* pData, int lSampleLen, REFERENCE_TIME rtStar
 
 			if (m_nCurSegment != NO_SEGMENT) {
 				if (m_nSegBufferPos < m_nSegSize) {
-					int nSize = min (m_nSegSize-m_nSegBufferPos, lSampleLen);
+					int nSize = min(m_nSegSize-m_nSegBufferPos, lSampleLen);
 					SampleBuffer.ReadBuffer (m_pSegBuffer+m_nSegBufferPos, nSize);
 					m_nSegBufferPos += nSize;
 				}
