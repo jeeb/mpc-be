@@ -40,7 +40,6 @@ private :
 	CButton		m_grpTrueHD;
 	CButton		m_cbTrueHD;
 	CButton		m_cbAC3Core;
-	CButton		m_cbAsIs;
 
 	CButton		m_cbSubEmptyPin;
 
@@ -50,7 +49,6 @@ private :
 		IDC_PP_SUBTITLES_LANGUAGE_ORDER,
 		IDC_PP_TRUEHD,
 		IDC_PP_AC3CORE,
-		IDC_PP_ASIS,
 		IDC_PP_ALTERNATIVE_DURATION,
 		IDC_PP_ENABLE_SUB_EMPTY_PIN
 	};

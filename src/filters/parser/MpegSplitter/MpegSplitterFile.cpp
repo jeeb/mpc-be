@@ -744,7 +744,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 				// AC3, E-AC3, TrueHD
 				if (type == stream_type::unknown && (stream_type & AC3_AUDIO)) {
 					ac3hdr h;
-					if (Read(h, len, &s.mt, true, (m_AC3CoreOnly == 1))) {
+					if (Read(h, len, &s.mt, true, (m_AC3CoreOnly != 0))) {
 						type = stream_type::audio;
 					}
 				}
@@ -807,7 +807,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 						type = stream_type::subpic;
 					}
 				}
-			} else if ((m_AC3CoreOnly != 1) && !m_bOpeningCompleted) {
+			} else if ((!m_AC3CoreOnly) && !m_bOpeningCompleted) {
 				int iProgram;
 				const CHdmvClipInfo::Stream *pClipInfo;
 				const program* pProgram = FindProgram(s.pid, iProgram, pClipInfo);
@@ -815,7 +815,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 					const stream* source = m_streams[stream_type::audio].FindStream(s.pid);
 					if (source && source->mt.subtype == MEDIASUBTYPE_DOLBY_AC3) {
 						ac3hdr h;
-						if (Read(h, len, &s.mt, false, (m_AC3CoreOnly == 1)) && s.mt.subtype == MEDIASUBTYPE_DOLBY_TRUEHD) {
+						if (Read(h, len, &s.mt, false, false) && s.mt.subtype == MEDIASUBTYPE_DOLBY_TRUEHD) {
 							m_streams[stream_type::audio].Replace((stream&)*source, s);
 						}
 					}

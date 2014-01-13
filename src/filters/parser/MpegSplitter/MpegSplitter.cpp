@@ -2225,7 +2225,7 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 		return S_OK;
 	}
 	// TrueHD only - skip AC3 core
-	else if (m_mt.subtype == MEDIASUBTYPE_DOLBY_TRUEHD && (static_cast<CMpegSplitterFilter*>(m_pFilter))->GetTrueHD() != 2) {
+	else if (m_mt.subtype == MEDIASUBTYPE_DOLBY_TRUEHD) {
 		if (!m_p) {
 			m_p.Attach(DNew Packet());
 			m_p->TrackNumber	= p->TrackNumber;
@@ -2419,8 +2419,8 @@ STDMETHODIMP CMpegSplitterOutputPin::Connect(IPin* pReceivePin, const AM_MEDIA_T
 	PIN_INFO	PinInfo;
 	GUID		FilterClsid;
 
-	if (SUCCEEDED (pReceivePin->QueryPinInfo (&PinInfo))) {
-		if (SUCCEEDED (PinInfo.pFilter->GetClassID(&FilterClsid))) {
+	if (SUCCEEDED(pReceivePin->QueryPinInfo(&PinInfo))) {
+		if (SUCCEEDED(PinInfo.pFilter->GetClassID(&FilterClsid))) {
 			if (FilterClsid == CLSID_DMOWrapperFilter) {
 				(static_cast<CMpegSplitterFilter*>(m_pFilter))->SetPipo(true);
 			}

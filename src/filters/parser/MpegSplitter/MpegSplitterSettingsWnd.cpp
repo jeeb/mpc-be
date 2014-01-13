@@ -65,8 +65,9 @@ bool CMpegSplitterSettingsWnd::OnActivate()
 	p.y += h20;
 
 	m_cbSubEmptyPin.Create(ResStr(IDS_MPEGSPLITTER_SUB_EMPTY_PIN), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(305), m_fontheight)), this, IDC_PP_ENABLE_SUB_EMPTY_PIN);
-	p.y += h20;
+	p.y += h25;
 
+#ifdef REGISTER_FILTER
 	m_txtAudioLanguageOrder.Create(ResStr(IDS_MPEGSPLITTER_LANG_ORDER), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(200), m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h20;
 	m_edtAudioLanguageOrder.CreateEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""), WS_CHILD | WS_VISIBLE | WS_TABSTOP, CRect(p, CSize(IPP_SCALE(305), m_fontheight + 6)), this, IDC_PP_AUDIO_LANGUAGE_ORDER);
@@ -76,30 +77,25 @@ bool CMpegSplitterSettingsWnd::OnActivate()
 	p.y += h20;
 	m_edtSubtitlesLanguageOrder.CreateEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""), WS_CHILD | WS_VISIBLE | WS_TABSTOP, CRect(p, CSize(IPP_SCALE(305), m_fontheight + 6)), this, IDC_PP_SUBTITLES_LANGUAGE_ORDER);
 	p.y += h25;
+#endif
 
 	m_grpTrueHD.Create(ResStr(IDS_MPEGSPLITTER_TRUEHD_OUTPUT), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p, CSize(IPP_SCALE(305), h20 + h20)), this, (UINT)IDC_STATIC);
 	p.y += IPP_SCALE(15);
 	p.x += IPP_SCALE(10);
 	m_cbTrueHD.Create(_T("TrueHD"), dwStyle | BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE | WS_GROUP, CRect(p,  CSize(IPP_SCALE(60), m_fontheight + 2)), this, IDC_PP_TRUEHD);
-	m_cbAC3Core.Create(_T("AC-3"), dwStyle | BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE, CRect(p + CPoint(IPP_SCALE(100), 0), CSize(IPP_SCALE(60), m_fontheight + 2)), this, IDC_PP_AC3CORE);
-	m_cbAsIs.Create(ResStr(IDS_MPEGSPLITTER_THD_NOSPLIT), dwStyle | BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE, CRect(p + CPoint(IPP_SCALE(200), 0), CSize(IPP_SCALE(80), m_fontheight + 2)), this, IDC_PP_ASIS);
+	m_cbAC3Core.Create(_T("AC-3"), dwStyle | BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE, CRect(p + CPoint(IPP_SCALE(160), 0), CSize(IPP_SCALE(60), m_fontheight + 2)), this, IDC_PP_AC3CORE);
 
 	if (m_pMSF) {
 		m_cbForcedSub.SetCheck(m_pMSF->GetForcedSub());
+#ifdef REGISTER_FILTER
 		m_edtAudioLanguageOrder.SetWindowText(m_pMSF->GetAudioLanguageOrder());
 		m_edtSubtitlesLanguageOrder.SetWindowText(m_pMSF->GetSubtitlesLanguageOrder());
-		m_cbTrueHD.SetCheck	(m_pMSF->GetTrueHD() == 0);
-		m_cbAC3Core.SetCheck(m_pMSF->GetTrueHD() == 1);
-		m_cbAsIs.SetCheck(!m_cbTrueHD.GetCheck() && !m_cbAC3Core.GetCheck());
+#endif
+		m_cbTrueHD.SetCheck(m_pMSF->GetTrueHD() == 0);
+		m_cbAC3Core.SetCheck(!m_cbTrueHD.GetCheck());
 		m_cbAlternativeDuration.SetCheck(m_pMSF->GetAlternativeDuration());
 		m_cbSubEmptyPin.SetCheck(m_pMSF->GetSubEmptyPin());
 	}
-
-#ifndef REGISTER_FILTER
-	m_edtAudioLanguageOrder.EnableWindow(FALSE);
-	m_edtSubtitlesLanguageOrder.EnableWindow(FALSE);
-#endif
-
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
 		pWnd->SetFont(&m_font, FALSE);
@@ -123,7 +119,7 @@ bool CMpegSplitterSettingsWnd::OnApply()
 
 	if (m_pMSF) {
 		m_pMSF->SetForcedSub(m_cbForcedSub.GetCheck());
-		m_pMSF->SetTrueHD(m_cbTrueHD.GetCheck() ? 0 : m_cbAC3Core.GetCheck() ? 1 : 2);
+		m_pMSF->SetTrueHD(m_cbTrueHD.GetCheck() ? 0 : 1);
 		m_pMSF->SetAlternativeDuration(m_cbAlternativeDuration.GetCheck());
 		m_pMSF->SetSubEmptyPin(m_cbSubEmptyPin.GetCheck());
 
