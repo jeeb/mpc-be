@@ -1717,11 +1717,9 @@ CMpegSplitterOutputPin::CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWS
 	, m_fHasAccessUnitDelimiters(false)
 	, m_type(type)
 	, m_bFlushed(false)
-	, m_AC3_count(0)
 	, m_truehd_framelength(0)
 	, m_hdmvLPCM_samplerate(0), m_hdmvLPCM_channels(0), m_hdmvLPCM_packetsize(0)
 {
-	m_AC3_frame.clear();
 }
 
 CMpegSplitterOutputPin::~CMpegSplitterOutputPin()
@@ -1753,6 +1751,57 @@ HRESULT CMpegSplitterOutputPin::DeliverEndFlush()
 	return __super::DeliverEndFlush();
 }
 
+#define HandlePacket \
+	CAutoPtr<Packet> p2(DNew Packet());			\
+	p2->TrackNumber		= m_p->TrackNumber;		\
+	p2->bDiscontinuity	= m_p->bDiscontinuity;	\
+	m_p->bDiscontinuity	= FALSE;				\
+	\
+	p2->bSyncPoint	= m_p->bSyncPoint;			\
+	m_p->bSyncPoint	= FALSE;					\
+	\
+	p2->rtStart		= m_p->rtStart;				\
+	m_p->rtStart	= INVALID_TIME;				\
+	\
+	p2->rtStop		= m_p->rtStop;				\
+	m_p->rtStop		= INVALID_TIME;				\
+	\
+	p2->pmt		= m_p->pmt;						\
+	m_p->pmt	= NULL;							\
+	\
+	p2->SetData(start, size);					\
+	\
+	if (!p2->pmt && m_bFlushed) {				\
+		p2->pmt		= CreateMediaType(&m_mt);	\
+		m_bFlushed	= false;					\
+	}											\
+	\
+	HRESULT hr = __super::DeliverPacket(p2);	\
+	if (hr != S_OK) {							\
+		return hr;								\
+	}											\
+	\
+	if (p->rtStart != INVALID_TIME) {			\
+		m_p->rtStart	= p->rtStart;			\
+		m_p->rtStop		= p->rtStop;			\
+		p->rtStart		= INVALID_TIME;			\
+	}											\
+	if (p->bDiscontinuity) {					\
+		m_p->bDiscontinuity	= p->bDiscontinuity;\
+		p->bDiscontinuity	= FALSE;			\
+	}											\
+	if (p->bSyncPoint) {						\
+		m_p->bSyncPoint	= p->bSyncPoint;		\
+		p->bSyncPoint	= FALSE;				\
+	}											\
+	if (m_p->pmt) {								\
+		DeleteMediaType(m_p->pmt);				\
+	}											\
+	\
+	m_p->pmt	= p->pmt;						\
+	p->pmt		= NULL;							\
+
+
 HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 {
 	CAutoLock cAutoLock(this);
@@ -1760,8 +1809,6 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 	if (p->pmt) {
 		if (*((CMediaType *)p->pmt) != m_mt) {
 			SetMediaType ((CMediaType*)p->pmt);
-			m_AC3_frame.clear();
-			m_AC3_count = 0;
 			Flush();
 		}
 	}
@@ -2048,7 +2095,7 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 		}
 
 		while (start <= end-4) {
-			BYTE* next = start+1;
+			BYTE* next = start + 1;
 
 			while (next <= end-4) {
 				if (*(DWORD*)next == 0x0D010000) {
@@ -2066,57 +2113,9 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 				break;
 			}
 
-			int size = next - start - 4;
-			UNREFERENCED_PARAMETER(size);
+			int size = next - start;
 
-			CAutoPtr<Packet> p2(DNew Packet());
-			p2->TrackNumber		= m_p->TrackNumber;
-			p2->bDiscontinuity	= m_p->bDiscontinuity;
-			m_p->bDiscontinuity	= FALSE;
-
-			p2->bSyncPoint	= m_p->bSyncPoint;
-			m_p->bSyncPoint	= FALSE;
-
-			p2->rtStart		= m_p->rtStart;
-			m_p->rtStart	= INVALID_TIME;
-
-			p2->rtStop		= m_p->rtStop;
-			m_p->rtStop		= INVALID_TIME;
-
-			p2->pmt		= m_p->pmt;
-			m_p->pmt	= NULL;
-
-			p2->SetData(start, next - start);
-
-			if (!p2->pmt && m_bFlushed) {
-				p2->pmt = CreateMediaType(&m_mt);
-				m_bFlushed = false;
-			}
-
-			HRESULT hr = __super::DeliverPacket(p2);
-			if (hr != S_OK) {
-				return hr;
-			}
-
-			if (p->rtStart != INVALID_TIME) {
-				m_p->rtStart = p->rtStop; //p->rtStart; //Sebastiii for enable VC1 decoding in FFDshow (no more shutter)
-				m_p->rtStop	= p->rtStop;
-				p->rtStart	= INVALID_TIME;
-			}
-			if (p->bDiscontinuity) {
-				m_p->bDiscontinuity	= p->bDiscontinuity;
-				p->bDiscontinuity	= FALSE;
-			}
-			if (p->bSyncPoint) {
-				m_p->bSyncPoint	= p->bSyncPoint;
-				p->bSyncPoint	= FALSE;
-			}
-			if (m_p->pmt) {
-				DeleteMediaType(m_p->pmt);
-			}
-
-			m_p->pmt	= p->pmt;
-			p->pmt		= NULL;
+			HandlePacket;
 
 			start		= next;
 			bSeqFound	= (*(DWORD*)start == 0x0D010000);
@@ -2172,7 +2171,7 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 		m_p.Free();
 	}
 	// Dolby AC3 - core only
-	else if (m_type == mpeg_ts && m_mt.subtype == MEDIASUBTYPE_DOLBY_AC3) {
+	else if (m_mt.subtype == MEDIASUBTYPE_DOLBY_AC3) {
 		if (!m_p) {
 			m_p.Attach(DNew Packet());
 			m_p->TrackNumber	= p->TrackNumber;
@@ -2200,91 +2199,20 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 
 		for(;;) {
 			MOVE_TO_AC3_START_CODE(start, end);
-
 			if (start <= end-8) {
-				audioframe_t af;
-				if (ParseAC3Header(start, &af) > 0) {
-
-					if (af.size <= (end - start)) {
-
-						if (af.samples == m_AC3_frame.samples
-								&& af.samplerate == m_AC3_frame.samplerate
-								&& af.channels == m_AC3_frame.channels
-								&& af.param1 == m_AC3_frame.param1) {
-							m_AC3_count++;
-						} else if (m_AC3_count < 10) {
-							m_AC3_frame.samples		= af.samples;
-							m_AC3_frame.samplerate	= af.samplerate;
-							m_AC3_frame.channels	= af.channels;
-							m_AC3_frame.param1		= af.param1;
-							m_AC3_count	= 0;
-						}
-
-						if (m_AC3_count >= 10
-								&& (af.samples != m_AC3_frame.samples
-									|| af.samplerate != m_AC3_frame.samplerate
-									|| af.channels != m_AC3_frame.channels
-									|| af.param1 != m_AC3_frame.param1)) {
-							start++;
-							continue;
-						}
-
-						CAutoPtr<Packet> p2(DNew Packet());
-						p2->TrackNumber		= m_p->TrackNumber;
-						p2->bDiscontinuity	= m_p->bDiscontinuity;
-						m_p->bDiscontinuity	= FALSE;
-
-						p2->bSyncPoint	= m_p->bSyncPoint;
-						m_p->bSyncPoint	= FALSE;
-
-						p2->rtStart		= m_p->rtStart;
-						m_p->rtStart	= INVALID_TIME;
-
-						p2->rtStop		= m_p->rtStop;
-						m_p->rtStop		= INVALID_TIME;
-
-						p2->pmt		= m_p->pmt;
-						m_p->pmt	= NULL;
-
-						p2->SetData(start, af.size);
-
-						if (!p2->pmt && m_bFlushed) {
-							p2->pmt = CreateMediaType(&m_mt);
-							m_bFlushed = false;
-						}
-
-						HRESULT hr = __super::DeliverPacket(p2);
-						if (hr != S_OK) {
-							return hr;
-						}
-
-						if (p->rtStart != INVALID_TIME) {
-							m_p->rtStart	= p->rtStart;
-							m_p->rtStop		= p->rtStop;
-							p->rtStart		= INVALID_TIME;
-						}
-						if (p->bDiscontinuity) {
-							m_p->bDiscontinuity	= p->bDiscontinuity;
-							p->bDiscontinuity	= FALSE;
-						}
-						if (p->bSyncPoint) {
-							m_p->bSyncPoint	= p->bSyncPoint;
-							p->bSyncPoint	= FALSE;
-						}
-						if (m_p->pmt) {
-							DeleteMediaType(m_p->pmt);
-						}
-
-						m_p->pmt	= p->pmt;
-						p->pmt		= NULL;
-							
-						start += af.size;
-					} else {
-						break;
-					}
-				} else {
+				audioframe_t aframe;
+				int size = ParseAC3Header(start, &aframe);
+				if (size == 0) {
 					start++;
+					continue;
 				}
+				if (start + size > end) {
+					break;
+				}
+
+				HandlePacket;
+							
+				start += size;
 			} else {
 				break;
 			}
@@ -2356,54 +2284,7 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 				break;
 			}
 
-			CAutoPtr<Packet> p2(DNew Packet());
-			p2->TrackNumber		= m_p->TrackNumber;
-			p2->bDiscontinuity	= m_p->bDiscontinuity;
-			m_p->bDiscontinuity	= FALSE;
-
-			p2->bSyncPoint	= m_p->bSyncPoint;
-			m_p->bSyncPoint	= FALSE;
-
-			p2->rtStart		= m_p->rtStart;
-			m_p->rtStart	= INVALID_TIME;
-
-			p2->rtStop		= m_p->rtStop;
-			m_p->rtStop		= INVALID_TIME;
-
-			p2->pmt		= m_p->pmt;
-			m_p->pmt	= NULL;
-
-			p2->SetData(start, size);
-
-			if (!p2->pmt && m_bFlushed) {
-				p2->pmt = CreateMediaType(&m_mt);
-				m_bFlushed = false;
-			}
-
-			HRESULT hr = __super::DeliverPacket(p2);
-			if (hr != S_OK) {
-				return hr;
-			}
-
-			if (p->rtStart != INVALID_TIME) {
-				m_p->rtStart	= p->rtStart;
-				m_p->rtStop		= p->rtStop;
-				p->rtStart		= INVALID_TIME;
-			}
-			if (p->bDiscontinuity) {
-				m_p->bDiscontinuity	= p->bDiscontinuity;
-				p->bDiscontinuity	= FALSE;
-			}
-			if (p->bSyncPoint) {
-				m_p->bSyncPoint	= p->bSyncPoint;
-				p->bSyncPoint	= FALSE;
-			}
-			if (m_p->pmt) {
-				DeleteMediaType(m_p->pmt);
-			}
-
-			m_p->pmt	= p->pmt;
-			p->pmt		= NULL;
+			HandlePacket;
 							
 			start += size;
 		}

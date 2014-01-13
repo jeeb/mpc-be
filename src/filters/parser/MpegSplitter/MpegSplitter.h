@@ -137,9 +137,6 @@ class CMpegSplitterOutputPin : public CBaseSplitterOutputPin, protected CCritSec
 
 	int		m_hdmvLPCM_samplerate, m_hdmvLPCM_channels, m_hdmvLPCM_packetsize;
 
-	audioframe_t	m_AC3_frame;
-	UINT			m_AC3_count;
-
 protected:
 	HRESULT DeliverPacket(CAutoPtr<Packet> p);
 	HRESULT DeliverEndFlush();
