@@ -8352,7 +8352,7 @@ void CMainFrame::OnViewRotate(UINT nID)
 			return;
 	}
 
-	m_pCAP->SetVideoAngle(Vector(DegToRad(m_AngleX), DegToRad(m_AngleY), DegToRad(m_AngleZ)));
+	m_pCAP->SetVideoAngle(Vector(Vector::DegToRad(m_AngleX), Vector::DegToRad(m_AngleY), Vector::DegToRad(m_AngleZ)));
 
 	CString info;
 	info.Format(_T("x: %d, y: %d, z: %d"), m_AngleX, m_AngleY, m_AngleZ);
@@ -11985,7 +11985,7 @@ void CMainFrame::MoveVideoWindow(bool fShowStats)
 
 		if (m_pCAP) {
 			m_pCAP->SetPosition(wr, vr);
-			m_pCAP->SetVideoAngle(Vector(DegToRad(m_AngleX), DegToRad(m_AngleY), DegToRad(m_AngleZ)));
+			m_pCAP->SetVideoAngle(Vector(Vector::DegToRad(m_AngleX), Vector::DegToRad(m_AngleY), Vector::DegToRad(m_AngleZ)));
 		} else {
 			HRESULT hr;
 			hr = m_pBV->SetDefaultSourcePosition();
