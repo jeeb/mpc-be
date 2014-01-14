@@ -79,4 +79,3 @@ VirtualDub          GPLv2                      http://virtualdub.org/
 WavPackLib          BSD License                http://wavpack.com/
 ZenLib              zlib / libpng License      http://sourceforge.net/projects/zenlib/
 zlib                zlib License               http://zlib.net/
-utfcpp              -                          http://sourceforge.net/projects/utfcpp/

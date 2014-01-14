@@ -63,8 +63,8 @@ void CHdmvSub::AllocSegment(int nSize)
 		m_pSegBuffer		= DNew BYTE[nSize];
 		m_nTotalSegBuffer	= nSize;
 	}
-	m_nSegBufferPos	 = 0;
-	m_nSegSize       = nSize;
+	m_nSegBufferPos		= 0;
+	m_nSegSize			= nSize;
 }
 
 POSITION CHdmvSub::GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld)
@@ -302,7 +302,7 @@ void CHdmvSub::ParseObject(CGolombBuffer* pGBuffer, USHORT nUnitSize)
 		return;
 	}
 
-    CompositionObject &pObject = m_ParsedObjects[object_id];
+	CompositionObject &pObject = m_ParsedObjects[object_id];
 
 	pObject.m_version_number	= pGBuffer->ReadByte();
 	BYTE m_sequence_desc		= pGBuffer->ReadByte();

@@ -1793,13 +1793,13 @@ struct OpenFunctStruct {
 };
 
 static OpenFunctStruct OpenFuncts[] = {
+	OpenSubStationAlpha, TIME, EXTSSA,
 	OpenSubRipper, TIME, EXTSRT,
 	OpenOldSubRipper, TIME, EXTSRT,
 	OpenSubViewer, TIME, EXTSUB,
 	OpenMicroDVD, FRAME, EXTSSA,
 	OpenSami, TIME, EXTSMI,
 	OpenVPlayer, TIME, EXTSRT,
-	OpenSubStationAlpha, TIME, EXTSSA,
 	OpenXombieSub, TIME, EXTXSS,
 	OpenUSF, TIME, EXTUSF,
 	OpenMPL2, TIME, EXTSRT,

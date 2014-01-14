@@ -84,18 +84,18 @@ void Rasterizer::_TrashPath()
 
 void Rasterizer::_TrashOverlay()
 {
-    m_overlayData.DeleteOverlay();
+	m_overlayData.DeleteOverlay();
 }
 
 void Rasterizer::_ReallocEdgeBuffer(int edges)
 {
-    Edge* pNewEdgeBuffer = (Edge*)realloc(mpEdgeBuffer, sizeof(Edge) * edges);
-    if (pNewEdgeBuffer) {
-        mpEdgeBuffer = pNewEdgeBuffer;
-        mEdgeHeapSize = edges;
-    } else { // TODO: Improve error handling...
-        DebugBreak();
-    }
+	Edge* pNewEdgeBuffer = (Edge*)realloc(mpEdgeBuffer, sizeof(Edge) * edges);
+	if (pNewEdgeBuffer) {
+		mpEdgeBuffer = pNewEdgeBuffer;
+		mEdgeHeapSize = edges;
+	} else { // TODO: Improve error handling...
+		DebugBreak();
+	}
 }
 
 void Rasterizer::_EvaluateBezier(int ptbase, bool fBSpline)
@@ -124,30 +124,30 @@ void Rasterizer::_EvaluateBezier(int ptbase, bool fBSpline)
 
 		double _1div6 = 1.0/6.0;
 
-		cx3 = _1div6*(-  x0+3*x1-3*x2+x3);
+		cx3 = _1div6*(-x0+3*x1-3*x2+x3);
 		cx2 = _1div6*( 3*x0-6*x1+3*x2);
-		cx1 = _1div6*(-3*x0	   +3*x2);
-		cx0 = _1div6*(   x0+4*x1+1*x2);
+		cx1 = _1div6*(-3*x0+3*x2);
+		cx0 = _1div6*( x0+4*x1+1*x2);
 
-		cy3 = _1div6*(-  y0+3*y1-3*y2+y3);
+		cy3 = _1div6*(-y0+3*y1-3*y2+y3);
 		cy2 = _1div6*( 3*y0-6*y1+3*y2);
-		cy1 = _1div6*(-3*y0     +3*y2);
-		cy0 = _1div6*(   y0+4*y1+1*y2);
+		cy1 = _1div6*(-3*y0	 +3*y2);
+		cy0 = _1div6*( y0+4*y1+1*y2);
 	} else { // bezier
 		// [-1 +3 -3 +1]
 		// [+3 -6 +3  0]
 		// [-3 +3  0  0]
 		// [+1  0  0  0]
 
-		cx3 = -  x0+3*x1-3*x2+x3;
+		cx3 = -x0+3*x1-3*x2+x3;
 		cx2 =  3*x0-6*x1+3*x2;
 		cx1 = -3*x0+3*x1;
-		cx0 =    x0;
+		cx0 =  x0;
 
-		cy3 = -  y0+3*y1-3*y2+y3;
+		cy3 = -y0+3*y1-3*y2+y3;
 		cy2 =  3*y0-6*y1+3*y2;
 		cy1 = -3*y0+3*y1;
-		cy0 =    y0;
+		cy0 =  y0;
 	}
 
 	//
@@ -384,16 +384,16 @@ bool Rasterizer::ScanConvert()
 
 	// Drop any outlines we may have.
 
-    m_outlineData.mOutline.clear();
-    m_outlineData.mWideOutline.clear();
-    m_outlineData.mWideBorder = 0;
+	m_outlineData.mOutline.clear();
+	m_outlineData.mWideOutline.clear();
+	m_outlineData.mWideBorder = 0;
 
 	// Determine bounding box
 
 	if (!mPathPoints) {
-        m_outlineData.mPathOffsetX = m_outlineData.mPathOffsetY = 0;
-        m_outlineData.mWidth = m_outlineData.mHeight = 0;
-        return false;
+		m_outlineData.mPathOffsetX = m_outlineData.mPathOffsetY = 0;
+		m_outlineData.mWidth = m_outlineData.mHeight = 0;
+		return false;
 	}
 
 	int minx = INT_MAX;
@@ -582,7 +582,7 @@ bool Rasterizer::ScanConvert()
 	if (!mpScanBuffer) {
 		TRACE(_T("Error in Rasterizer::ScanConvert: mpScanBuffer is NULL\n"));
 		return false;
-    }
+	}
 	memset(mpScanBuffer, 0, m_outlineData.mHeight * sizeof(unsigned int));
 
 	// Scan convert the outline.  Yuck, Bezier curves....
@@ -695,7 +695,7 @@ bool Rasterizer::ScanConvert()
 				x2 = (x >> 1);
 
 				if (x2 > x1) {
-					m_outlineData.mOutline.push_back(std::pair<__int64,__int64>((y<<32)+x1+0x4000000040000000i64, (y<<32)+x2+0x4000000040000000i64));    // G: damn Avery, this is evil! :)
+					m_outlineData.mOutline.push_back(std::pair<__int64,__int64>((y<<32)+x1+0x4000000040000000i64, (y<<32)+x2+0x4000000040000000i64));	// G: damn Avery, this is evil! :)
 				}
 			}
 		}
@@ -1591,7 +1591,7 @@ void Rasterizer::Draw_Alpha_sp_noBody_sse2(RasterizerNfo& rnfo)
 // pAlphaMask is an alpha clipping mask.
 // xsub and ysub ???
 // switchpts seems to be an array of fill colours interlaced with coordinates.
-//    switchpts[i*2] contains a colour and switchpts[i*2+1] contains the coordinate to use that colour from
+//	switchpts[i*2] contains a colour and switchpts[i*2+1] contains the coordinate to use that colour from
 // fBody tells whether to render the body of the subs.
 // fBorder tells whether to render the border of the subs.
 CRect Rasterizer::Draw(SubPicDesc& spd, CRect& clipRect, byte* pAlphaMask, int xsub, int ysub,
