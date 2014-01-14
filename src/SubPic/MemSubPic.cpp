@@ -83,15 +83,6 @@ void ColorConvInit()
 	fColorConvInitOK = true;
 }
 
-#define rgb2yuv(r1,g1,b1,r2,g2,b2) \
-	int y1 = (c2y_yb[b1] + c2y_yg[g1] + c2y_yr[r1] + 0x108000) >> 16; \
-	int y2 = (c2y_yb[b2] + c2y_yg[g2] + c2y_yr[r2] + 0x108000) >> 16; \
-\
-	int scaled_y = (y1+y2-32) * cy_cy2; \
-\
-	unsigned char u = Clip[(((((b1+b2)<<15) - scaled_y) >> 10) * c2y_cu + 0x800000 + 0x8000) >> 16]; \
-	unsigned char v = Clip[(((((r1+r2)<<15) - scaled_y) >> 10) * c2y_cv + 0x800000 + 0x8000) >> 16]; \
- 
 //
 // CMemSubPic
 //
@@ -314,9 +305,9 @@ void AlphaBlt_YUY2_SSE2(int w, int h, BYTE* d, int dstpitch, BYTE* s, int srcpit
 		}
 	}
 }
-#endif
 
-#ifndef _WIN64
+#else
+
 void AlphaBlt_YUY2_MMX(int w, int h, BYTE* d, int dstpitch, BYTE* s, int srcpitch)
 {
 	unsigned int ia;
@@ -354,6 +345,7 @@ void AlphaBlt_YUY2_MMX(int w, int h, BYTE* d, int dstpitch, BYTE* s, int srcpitc
 			}
 		}
 	}
+	_mm_empty();
 }
 #endif
 
