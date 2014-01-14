@@ -70,7 +70,7 @@ HRESULT CWave64File::Open(CBaseSplitterFile* pFile)
 				return E_FAIL;
 			}
 			m_fmtsize = max(Chunk64.size, sizeof(WAVEFORMATEX)); // PCMWAVEFORMAT to WAVEFORMATEX
-			m_fmtdata = new BYTE[m_fmtsize];
+			m_fmtdata = DNew BYTE[m_fmtsize];
 			memset(m_fmtdata, 0, m_fmtsize);
 			if (FAILED(m_pFile->ByteRead(m_fmtdata, Chunk64.size))) {
 				TRACE(L"CWave64File::Open() : format can not be read.\n");

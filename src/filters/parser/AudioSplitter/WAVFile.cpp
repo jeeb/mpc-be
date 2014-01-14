@@ -63,7 +63,7 @@ bool CWAVFile::ProcessWAVEFORMATEX()
 			|| wfe->wFormatTag == WAVE_FORMAT_IEEE_FLOAT && wfe->nChannels > 2) {
 		// convert incorrect WAVEFORMATEX to WAVEFORMATEXTENSIBLE
 
-		WAVEFORMATEXTENSIBLE* wfex = new WAVEFORMATEXTENSIBLE;
+		WAVEFORMATEXTENSIBLE* wfex = DNew WAVEFORMATEXTENSIBLE;
 		wfex->Format.wFormatTag				= WAVE_FORMAT_EXTENSIBLE;
 		wfex->Format.nChannels				= wfe->nChannels;
 		wfex->Format.nSamplesPerSec			= wfe->nSamplesPerSec;
@@ -209,7 +209,7 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 				return E_FAIL;
 			}
 			m_fmtsize = max(Chunk.size, sizeof(WAVEFORMATEX)); // PCMWAVEFORMAT to WAVEFORMATEX
-			m_fmtdata = new BYTE[m_fmtsize];
+			m_fmtdata = DNew BYTE[m_fmtsize];
 			memset(m_fmtdata, 0, m_fmtsize);
 			if (FAILED(m_pFile->ByteRead(m_fmtdata, Chunk.size))) {
 				TRACE(L"CWAVFile::Open() : format can not be read.\n");
