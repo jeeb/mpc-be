@@ -2375,7 +2375,10 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 					}
 				}
 
-				m_wndSubresyncBar.SetTime(pos);
+				if (m_pCAP) {
+					m_wndSubresyncBar.SetFPS(m_pCAP->GetFPS());
+					m_wndSubresyncBar.SetTime(pos);
+				}
 
 				if (m_pCAP && GetMediaState() == State_Paused) {
 					m_pCAP->Paint(false);
@@ -17250,6 +17253,7 @@ void CMainFrame::ReloadSubtitle()
 		m_pSubStreams.GetNext(pos)->Reload();
 	}
 	UpdateSubtitle();
+	m_wndSubresyncBar.ReloadSubtitle();
 }
 
 void CMainFrame::SetSubtitleTrackIdx(int index)
@@ -18376,8 +18380,8 @@ afx_msg void CMainFrame::OnGotoSubtitle(UINT nID)
 {
 	m_rtCurSubPos		= m_wndSeekBar.GetPosReal();
 	m_lSubtitleShift	= 0;
-	m_nCurSubtitle		= m_wndSubresyncBar.FindNearestSub (m_rtCurSubPos, (nID == ID_GOTO_NEXT_SUB));
-	if ((m_nCurSubtitle != -1) && m_pMS) {
+	m_nCurSubtitle		= m_wndSubresyncBar.FindNearestSub(m_rtCurSubPos, (nID == ID_GOTO_NEXT_SUB));
+	if (m_nCurSubtitle >= 0 && m_pMS && m_pMS) {
 		m_pMS->SetPositions (&m_rtCurSubPos, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
 	}
 }
