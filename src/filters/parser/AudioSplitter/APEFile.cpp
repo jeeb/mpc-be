@@ -42,7 +42,6 @@ typedef struct {
     int currentframe;
 
     /* Info from Descriptor Block */
-    char magic[4];
     int16_t fileversion;
     int16_t padding1;
     uint32_t descriptorlength;

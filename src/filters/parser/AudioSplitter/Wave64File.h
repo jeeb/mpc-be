@@ -37,7 +37,7 @@ const uint8_t w64_guid_summarylist[16] = {0xBC, 0x94, 0x5F, 0x92, 0x5A, 0x52, 0x
 class CWave64File : public CWAVFile
 {
 public:
-	CWave64File::CWave64File();
+	CWave64File();
 
 	HRESULT Open(CBaseSplitterFile* pFile);
 	CString GetName() const { return L"Wave64"; };

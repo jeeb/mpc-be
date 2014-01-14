@@ -55,9 +55,9 @@ public:
 	REFERENCE_TIME rtStart, rtStop;
 	AM_MEDIA_TYPE* pmt;
 	Packet() {
-		TrackNumber = 0;	
+		TrackNumber = 0;
 		pmt = NULL;
-		bDiscontinuity = bAppendable = FALSE;
+		bDiscontinuity = bSyncPoint = bAppendable = FALSE;
 		rtStart = rtStop = INVALID_TIME;
 	}
 	virtual ~Packet() {

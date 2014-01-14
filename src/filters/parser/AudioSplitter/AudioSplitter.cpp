@@ -91,7 +91,7 @@ CFilterApp theApp;
 CAudioSplitterFilter::CAudioSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("CAudioSplitterFilter"), pUnk, phr, __uuidof(this))
 	, m_pAudioFile(NULL)
-	, m_rtStart(0)
+	, m_rtime(0)
 {
 }
 
@@ -177,7 +177,7 @@ bool CAudioSplitterFilter::DemuxInit()
 
 void CAudioSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
-	m_rtStart = m_pAudioFile ? m_pAudioFile->Seek(rt) : 0;
+	m_rtime = m_pAudioFile ? m_pAudioFile->Seek(rt) : 0;
 }
 
 bool CAudioSplitterFilter::DemuxLoop()
@@ -187,14 +187,14 @@ bool CAudioSplitterFilter::DemuxLoop()
 	while (m_pAudioFile && SUCCEEDED(hr) && !CheckRequest(NULL)) {
 		CAutoPtr<Packet> p(DNew Packet());
 
-		if (!m_pAudioFile->GetAudioFrame(p, m_rtStart)) {
+		if (!m_pAudioFile->GetAudioFrame(p, m_rtime)) {
 			break;
 		}
 
 		p->TrackNumber	= 0;
 		p->bSyncPoint	= TRUE;
 
-		m_rtStart = p->rtStop;
+		m_rtime = p->rtStop;
 
 		hr = DeliverPacket(p);
 	}

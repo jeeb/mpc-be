@@ -36,7 +36,7 @@ class __declspec(uuid("AA77A669-E10F-4C70-BBD7-77923DF34BF3"))
 	CAudioSplitterFilter : public CBaseSplitterFilter
 {
 	CAudioFile* m_pAudioFile;
-	REFERENCE_TIME m_rtStart;
+	REFERENCE_TIME m_rtime;
 
 protected:
 	CAutoPtr<CBaseSplitterFile> m_pFile;
