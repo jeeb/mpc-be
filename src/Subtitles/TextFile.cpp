@@ -26,10 +26,15 @@
 #include <string>
 #include <utfcpp/source/utf8.h>
 
+#define CACHE_SIZE (64 * 1024)
+
 CTextFile::CTextFile(enc e)
 	: m_encoding(e)
 	, m_defaultencoding(e)
 	, m_offset(0)
+	, m_pos(0), m_len(0)
+	, m_cachepos(0), m_cachelen(0)
+	, m_pCache(NULL)
 {
 }
 
@@ -43,8 +48,8 @@ bool CTextFile::isUTF8Valid()
 {
 	SeekToBegin();
 
-	UINT len = min(1024*1024, GetLength());
-	char* buf = new char[len + 1];
+	UINT len = min(1024 * 1024, GetLength());
+	char* buf = DNew char[len + 1];
 	memset(buf, 0, len + 1);
 	UINT num = Read(buf, len);
 	std::string str(buf, num);
@@ -80,6 +85,15 @@ bool CTextFile::Open(LPCTSTR lpszFileName)
 	if (!__super::Open(lpszFileName, modeRead|typeBinary|shareDenyNone)) {
 		return false;
 	}
+
+	m_cachetotal = 0;
+	m_pCache.Allocate(CACHE_SIZE);
+	if (!m_pCache) {
+		return false;
+	}
+	m_cachetotal = CACHE_SIZE;
+	m_cachelen = 0;
+	m_len = __super::GetLength();
 
 	m_encoding = m_defaultencoding;
 	m_offset = 0;
@@ -131,23 +145,25 @@ bool CTextFile::Open(LPCTSTR lpszFileName)
 		ReopenAsText();
 	}
 
+	m_len -= m_offset;
+
 	return true;
 }
 
 bool CTextFile::Save(LPCTSTR lpszFileName, enc e)
 {
-	if (!__super::Open(lpszFileName, modeCreate|modeWrite|shareDenyWrite|(e==ASCII?typeText:typeBinary))) {
+	if (!__super::Open(lpszFileName, modeCreate | modeWrite | shareDenyWrite | (e == ASCII ? typeText : typeBinary))) {
 		return false;
 	}
 
 	if (e == UTF8) {
-		BYTE b[3] = {0xef,0xbb,0xbf};
+		BYTE b[3] = {0xef, 0xbb, 0xbf};
 		Write(b, sizeof(b));
 	} else if (e == LE16) {
-		BYTE b[2] = {0xff,0xfe};
+		BYTE b[2] = {0xff, 0xfe};
 		Write(b, sizeof(b));
 	} else if (e == BE16) {
-		BYTE b[2] = {0xfe,0xff};
+		BYTE b[2] = {0xfe, 0xff};
 		Write(b, sizeof(b));
 	}
 
@@ -183,12 +199,12 @@ CString CTextFile::GetFilePath() const
 
 ULONGLONG CTextFile::GetPosition() const
 {
-	return (CStdioFile::GetPosition() - m_offset);
+	return m_pos - m_offset;
 }
 
 ULONGLONG CTextFile::GetLength() const
 {
-	return (CStdioFile::GetLength() - m_offset);
+	return m_len - m_offset;
 }
 
 ULONGLONG CTextFile::Seek(LONGLONG lOff, UINT nFrom)
@@ -210,9 +226,83 @@ ULONGLONG CTextFile::Seek(LONGLONG lOff, UINT nFrom)
 
 	lOff = max(min((ULONGLONG)lOff, len), 0) + m_offset;
 
-	pos = CStdioFile::Seek(lOff, begin) - m_offset;
+	m_pos = lOff;
+	pos = m_pos - m_offset;
 
 	return pos;
+}
+
+UINT CTextFile::SyncRead(LONGLONG llPosition, UINT lLength, void* pBuffer)
+{
+	if ((ULONGLONG)(llPosition + lLength) > __super::GetLength()) {
+		return 0;
+	}
+	if (llPosition != __super::Seek(llPosition, begin)) {
+		return 0;
+	}
+
+	return __super::Read(pBuffer, lLength);
+}
+
+UINT CTextFile::Read(void* lpBuf, UINT nCount)
+{
+	if (m_cachetotal == 0 || !m_pCache) {
+		UINT len = SyncRead(m_pos, nCount, lpBuf);
+		m_pos += len;
+		return len;
+	}
+
+	UINT nCountStart = nCount;
+
+	BYTE* pCache = m_pCache;
+	BYTE* pData = (BYTE*)lpBuf;
+
+	if (m_cachepos <= m_pos && m_pos < m_cachepos + m_cachelen) {
+		__int64 minlen = min(nCount, m_cachelen - (m_pos - m_cachepos));
+
+		memcpy(pData, &pCache[m_pos - m_cachepos], (size_t)minlen);
+
+		nCount -= minlen;
+		m_pos += minlen;
+		pData += minlen;
+	}
+
+	while (nCount > m_cachetotal) {
+		UINT len = SyncRead(m_pos, m_cachetotal, lpBuf);
+		if (!len) {
+			return len;
+		}
+
+		nCount -= m_cachetotal;
+		m_pos += m_cachetotal;
+		pData += m_cachetotal;
+	}
+
+	while (nCount > 0) {
+		__int64 tmplen = GetLength();
+		__int64 maxlen = min(tmplen - m_pos, m_cachetotal);
+		__int64 minlen = min(nCount, maxlen);
+		if (minlen <= 0) {
+			return 0;
+		}
+
+		UINT len = SyncRead(m_pos, maxlen, pCache);
+		if (!len) {
+			return len;
+		}
+
+		m_cachepos = m_pos;
+		m_cachelen = maxlen;
+
+		memcpy(pData, pCache, (size_t)minlen);
+
+		nCount -= minlen;
+		m_pos += minlen;
+		pData += minlen;
+	}
+
+	return nCountStart - nCount;
+
 }
 
 void CTextFile::WriteString(LPCSTR lpsz/*CStringA str*/)
@@ -252,11 +342,11 @@ void CTextFile::WriteString(LPCWSTR lpsz/*CStringW str*/)
 			if (0 <= c && c < 0x80) {				// 0xxxxxxx
 				Write(&c, 1);
 			} else if (0x80 <= c && c < 0x800) {	// 110xxxxx 10xxxxxx
-				c = 0xc080|((c<<2)&0x1f00)|(c&0x003f);
+				c = 0xc080 | ((c << 2) & 0x1f00) | (c & 0x003f);
 				Write((BYTE*)&c+1, 1);
 				Write(&c, 1);
 			} else if (0x800 <= c && c < 0xFFFF) {	// 1110xxxx 10xxxxxx 10xxxxxx
-				c = 0xe08080|((c<<4)&0x0f0000)|((c<<2)&0x3f00)|(c&0x003f);
+				c = 0xe08080 | ((c << 4) & 0x0f0000) | ((c << 2) & 0x3f00) | (c & 0x003f);
 				Write((BYTE*)&c+2, 1);
 				Write((BYTE*)&c+1, 1);
 				Write(&c, 1);
@@ -306,13 +396,13 @@ BOOL CTextFile::ReadString(CStringA& str)
 		while (Read(&b, sizeof(b)) == sizeof(b)) {
 			fEOF		= false;
 			char c		= '?';
-			if (!(b&0x80)) {				// 0xxxxxxx
-				c = b&0x7f;
-			} else if ((b&0xe0) == 0xc0) {	// 110xxxxx 10xxxxxx
+			if (!(b & 0x80)) {				// 0xxxxxxx
+				c = b & 0x7f;
+			} else if ((b & 0xe0) == 0xc0) {	// 110xxxxx 10xxxxxx
 				if (Read(&b, sizeof(b)) != sizeof(b)) {
 					break;
 				}
-			} else if ((b&0xf0) == 0xe0) {	// 1110xxxx 10xxxxxx 10xxxxxx
+			} else if ((b & 0xf0) == 0xe0) {	// 1110xxxx 10xxxxxx 10xxxxxx
 				if (Read(&b, sizeof(b)) != sizeof(b)) {
 					break;
 				}
@@ -334,8 +424,8 @@ BOOL CTextFile::ReadString(CStringA& str)
 		while (Read(&w, sizeof(w)) == sizeof(w)) {
 			fEOF = false;
 			char c = '?';
-			if (!(w&0xff00)) {
-				c = w&0xff;
+			if (!(w & 0xff00)) {
+				c = w & 0xff;
 			}
 			if (c == '\r') {
 				continue;
@@ -350,8 +440,8 @@ BOOL CTextFile::ReadString(CStringA& str)
 		while (Read(&w, sizeof(w)) == sizeof(w)) {
 			fEOF = false;
 			char c = '?';
-			if (!(w&0xff)) {
-				c = w>>8;
+			if (!(w & 0xff)) {
+				c = w >> 8;
 			}
 			if (c == '\r') {
 				continue;
@@ -394,24 +484,24 @@ BOOL CTextFile::ReadString(CStringW& str)
 		while (Read(&b, sizeof(b)) == sizeof(b)) {
 			fEOF		= false;
 			WCHAR c		= '?';
-			if (!(b&0x80)) {				// 0xxxxxxx
-				c = b&0x7f;
-			} else if ((b&0xe0) == 0xc0) {	// 110xxxxx 10xxxxxx
-				c = (b&0x1f)<<6;
+			if (!(b & 0x80)) {				// 0xxxxxxx
+				c = b & 0x7f;
+			} else if ((b & 0xe0) == 0xc0) {	// 110xxxxx 10xxxxxx
+				c = (b & 0x1f) << 6;
 				if (Read(&b, sizeof(b)) != sizeof(b)) {
 					break;
 				}
-				c |= (b&0x3f);
-			} else if ((b&0xf0) == 0xe0) {	// 1110xxxx 10xxxxxx 10xxxxxx
-				c = (b&0x0f)<<12;
+				c |= (b & 0x3f);
+			} else if ((b & 0xf0) == 0xe0) {	// 1110xxxx 10xxxxxx 10xxxxxx
+				c = (b & 0x0f) << 12;
 				if (Read(&b, sizeof(b)) != sizeof(b)) {
 					break;
 				}
-				c |= (b&0x3f)<<6;
+				c |= (b & 0x3f) << 6;
 				if (Read(&b, sizeof(b)) != sizeof(b)) {
 					break;
 				}
-				c |= (b&0x3f);
+				c |= (b & 0x3f);
 			}
 
 			if (c == '\r') {
@@ -438,7 +528,7 @@ BOOL CTextFile::ReadString(CStringW& str)
 		WCHAR wc;
 		while (Read(&wc, sizeof(wc)) == sizeof(wc)) {
 			fEOF = false;
-			wc = ((wc>>8)&0x00ff)|((wc<<8)&0xff00);
+			wc = ((wc >> 8) & 0x00ff) | ((wc << 8) & 0xff00);
 			if (wc == '\r') {
 				continue;
 			}
@@ -477,8 +567,8 @@ bool CWebTextFile::Open(LPCTSTR lpszFileName)
 			return false;
 		}
 
-		TCHAR path[_MAX_PATH];
-		GetTempPath(_MAX_PATH, path);
+		TCHAR path[MAX_PATH];
+		GetTempPath(MAX_PATH, path);
 
 		fn = path + fn.Mid(fn.ReverseFind('/')+1);
 		int i = fn.Find(_T("?"));
@@ -486,14 +576,14 @@ bool CWebTextFile::Open(LPCTSTR lpszFileName)
 			fn = fn.Left(i);
 		}
 		CFile temp;
-		if (!temp.Open(fn, modeCreate|modeWrite|typeBinary|shareDenyWrite)) {
+		if (!temp.Open(fn, modeCreate | modeWrite | typeBinary | shareDenyWrite)) {
 			f->Close();
 			return false;
 		}
 
 		BYTE buff[1024];
 		int len, total = 0;
-		while ((len = f->Read(buff, 1024)) == 1024 && (m_llMaxSize < 0 || (total+=1024) < m_llMaxSize)) {
+		while ((len = f->Read(buff, 1024)) == 1024 && (m_llMaxSize < 0 || (total += 1024) < m_llMaxSize)) {
 			temp.Write(buff, len);
 		}
 		if (len > 0) {

@@ -32,6 +32,11 @@ private:
 	enc m_encoding, m_defaultencoding;
 	int m_offset;
 
+	CAutoVectorPtr<BYTE> m_pCache;
+	__int64 m_cachepos, m_cachelen, m_cachetotal;
+	__int64 m_pos, m_len;
+	UINT SyncRead(LONGLONG llPosition, UINT lLength, void* pBuffer);
+
 	bool isUTF8Valid();
 	void SkipBOM(const BYTE bom[3], UINT sizeBOM);
 
@@ -54,6 +59,7 @@ public:
 	ULONGLONG GetPosition() const;
 	ULONGLONG GetLength() const;
 	ULONGLONG Seek(LONGLONG lOff, UINT nFrom);
+	UINT Read(void* lpBuf, UINT nCount);
 
 	void WriteString(LPCSTR lpsz/*CStringA str*/);
 	void WriteString(LPCWSTR lpsz/*CStringW str*/);
@@ -67,7 +73,7 @@ class CWebTextFile : public CTextFile
 	CString m_tempfn;
 
 public:
-	CWebTextFile(LONGLONG llMaxSize = 1024*1024);
+	CWebTextFile(LONGLONG llMaxSize = 1024 * 1024);
 
 	bool Open(LPCTSTR lpszFileName);
 	bool Save(LPCTSTR lpszFileName, enc e /*= ASCII*/);
