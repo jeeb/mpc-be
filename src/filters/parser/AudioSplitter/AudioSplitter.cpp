@@ -59,7 +59,8 @@ STDAPI DllRegisterServer()
 	CAtlList<CString>chkbytes;
 	chkbytes.AddTail(_T("0,4,,7442614B")); // 'tBaK'
 	chkbytes.AddTail(_T("0,4,,4D414320")); // 'MAC '
-	chkbytes.AddTail(_T("0,12,,52494646xxxx57415645")); // RIFFxxxxWAVE
+	chkbytes.AddTail(_T("0,4,,52494646,8,4,,57415645")); // RIFFxxxxWAVE
+	chkbytes.AddTail(_T("0,16,,726966662E91CF11A5D628DB04C10000,24,16,,77617665F3ACD3118CD100C04F8EDB8A")); // Wave64
 
 	RegisterSourceFilter(
 		CLSID_AsyncReader,

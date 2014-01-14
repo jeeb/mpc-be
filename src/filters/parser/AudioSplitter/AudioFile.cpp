@@ -23,6 +23,7 @@
 #include "APEFile.h"
 #include "TAKFile.h"
 #include "WAVFile.h"
+#include "Wave64File.h"
 
 //
 // CAudioFile
@@ -57,7 +58,7 @@ CAudioFile::~CAudioFile()
 CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* m_pFile)
 {
 	CAudioFile* pAudioFile = NULL;
-	BYTE data[12];
+	BYTE data[40];
 
 	m_pFile->Seek(0);
 	if (FAILED(m_pFile->ByteRead(data, sizeof(data)))) {
@@ -71,6 +72,8 @@ CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* m_pFile)
 		pAudioFile = DNew CAPEFile();
 	} else if (*id == FCC('RIFF') && *(DWORD*)(data+8) == FCC('WAVE')) {
 		pAudioFile = DNew CWAVFile();
+	} else if (memcmp(data, w64_guid_riff, 16) == 0 &&  memcmp(data+24, w64_guid_wave, 16) == 0) {
+		pAudioFile = DNew CWave64File();
 	} else {
 		return NULL;
 	}

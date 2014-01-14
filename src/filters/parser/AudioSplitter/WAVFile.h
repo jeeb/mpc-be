@@ -24,6 +24,7 @@
 
 class CWAVFile : public CAudioFile
 {
+protected:
 	__int64	m_length;
 
 	BYTE*	m_fmtdata;

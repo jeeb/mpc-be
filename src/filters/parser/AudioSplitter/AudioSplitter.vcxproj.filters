@@ -24,10 +24,13 @@
     <ClCompile Include="AudioFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="APEFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="TAKFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="APEFile.cpp">
+    <ClCompile Include="Wave64File.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WAVFile.cpp">
@@ -52,10 +55,13 @@
     <ClInclude Include="AudioFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="APEFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="TAKFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="APEFile.h">
+    <ClInclude Include="Wave64File.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WAVFile.h">

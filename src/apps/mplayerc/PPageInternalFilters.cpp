@@ -51,7 +51,7 @@ static filter_t s_filters[] = {
 	{_T("SHOUTcast"),             SOURCE_FILTER,  SOURCE, SRC_SHOUTCAST,  0},
 	{_T("TAK"),                   SOURCE_FILTER,  SOURCE, SRC_TAK,        0},
 	{_T("TTA"),                   SOURCE_FILTER,  SOURCE, SRC_TTA,        0},
-	{_T("WAV"),                   SOURCE_FILTER,  SOURCE, SRC_WAV,        0},
+	{_T("WAV/Wave64"),            SOURCE_FILTER,  SOURCE, SRC_WAV,        0},
 	{_T("WavPack"),               SOURCE_FILTER,  SOURCE, SRC_WPAC,       0},
 	{_T("UDP/HTTP"),              SOURCE_FILTER,  SOURCE, SRC_UDP,        0},
 
