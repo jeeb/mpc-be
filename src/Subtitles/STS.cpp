@@ -1974,6 +1974,14 @@ void CSimpleTextSubtitle::Add(CStringW str, bool fUnicode, int start, int end, C
 		STSSegment stss(start, end);
 		stss.subs.Add(n);
 		m_segments.Add(stss);
+	} else if (end <= m_segments[0].start) {
+		STSSegment stss(start, end);
+		stss.subs.Add(n);
+		m_segments.InsertAt(0, stss);
+	} else if (start >= m_segments[segmentsCount - 1].end) {
+		STSSegment stss(start, end);
+		stss.subs.Add(n);
+		m_segments.Add(stss);
 	} else {
 		STSSegment* segmentsStart = m_segments.GetData();
 		STSSegment* segmentsEnd   = segmentsStart + segmentsCount;
