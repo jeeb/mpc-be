@@ -63,26 +63,21 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_MainThreadId(0)
 	, m_bNeedCheckSample(true)
 	, m_pDirectDraw(NULL)
-	, m_hVSyncThread(NULL)
-	, m_hEvtQuit(NULL)
 	, m_bIsFullscreen(bFullscreen)
-	, m_nRenderState(Undefined)
 	, m_nMonitorHorRes(0), m_nMonitorVerRes(0)
 	, m_rcMonitor(0, 0, 0, 0)
+	, m_pD3DXLoadSurfaceFromMemory(NULL)
+	, m_pD3DXLoadSurfaceFromSurface(NULL)
+	, m_pD3DXCreateLine(NULL)
+	, m_pD3DXCreateFont(NULL)
+	, m_pD3DXCreateSprite(NULL)
 {
-	HINSTANCE hDll;
-
 	if (FAILED(hr)) {
 		_Error += L"ISubPicAllocatorPresenterImpl failed\n";
 		return;
 	}
 
-	m_pD3DXLoadSurfaceFromMemory	= NULL;
-	m_pD3DXLoadSurfaceFromSurface	= NULL;
-	m_pD3DXCreateLine				= NULL;
-	m_pD3DXCreateFont				= NULL;
-	m_pD3DXCreateSprite				= NULL;
-	hDll							= GetRenderersData()->GetD3X9Dll();
+	HINSTANCE hDll = GetRenderersData()->GetD3X9Dll();
 	if (hDll) {
 		(FARPROC&)m_pD3DXLoadSurfaceFromMemory	= GetProcAddress(hDll, "D3DXLoadSurfaceFromMemory");
 		(FARPROC&)m_pD3DXLoadSurfaceFromSurface = GetProcAddress(hDll, "D3DXLoadSurfaceFromSurface");
@@ -149,7 +144,6 @@ CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
 		}
 	}
 
-	StopWorkerThreads();
 	m_pFont		= NULL;
 	m_pLine		= NULL;
 	m_pD3DDev	= NULL;
@@ -382,216 +376,6 @@ public:
 };
 #endif
 
-void CDX9AllocatorPresenter::VSyncThread()
-{
-	HANDLE				hEvts[]		= { m_hEvtQuit};
-	bool				bQuit		= false;
-	TIMECAPS			tc;
-	DWORD				dwResolution;
-	DWORD				dwUser		= 0;
-
-	// Tell Vista Multimedia Class Scheduler we are a playback thread (increase priority)
-	//DWORD				dwTaskIndex = 0;
-	//if (pfAvSetMmThreadCharacteristicsW)
-	//	hAvrt = pfAvSetMmThreadCharacteristicsW (L"Playback", &dwTaskIndex);
-	//if (pfAvSetMmThreadPriority)
-	//	pfAvSetMmThreadPriority (hAvrt, AVRT_PRIORITY_HIGH /*AVRT_PRIORITY_CRITICAL*/);
-
-	timeGetDevCaps(&tc, sizeof(TIMECAPS));
-	dwResolution	= min(max(tc.wPeriodMin, 0), tc.wPeriodMax);
-	dwUser			= timeBeginPeriod(dwResolution);
-	CRenderersData *pApp = GetRenderersData();
-	CRenderersSettings& s = GetRenderersSettings();
-
-	while (!bQuit) {
-
-		DWORD dwObject = WaitForMultipleObjects (_countof(hEvts), hEvts, FALSE, 1);
-		switch (dwObject) {
-			case WAIT_OBJECT_0 :
-				bQuit = true;
-				break;
-			case WAIT_TIMEOUT : {
-				// Do our stuff
-				if (m_pD3DDev && s.m_AdvRendSets.iVMR9VSync) {
-
-					if (m_nRenderState != Undefined && m_nRenderState != Started) {
-						// we do not need clear m_DetectedRefreshRate & m_DetectedScanlinesPerFrame variable, so do continue
-						continue;
-					}
-
-					int VSyncPos = GetVBlackPos();
-					int WaitRange = max(m_ScreenSize.cy / 40, 5);
-					int MinRange = max(min(int(0.003 * double(m_ScreenSize.cy) * double(m_RefreshRate) + 0.5), m_ScreenSize.cy/3), 5); // 1.8  ms or max 33 % of Time
-
-					VSyncPos += MinRange + WaitRange;
-
-					VSyncPos = VSyncPos % m_ScreenSize.cy;
-					if (VSyncPos < 0) {
-						VSyncPos += m_ScreenSize.cy;
-					}
-
-					int ScanLine = 0;
-					int StartScanLine = ScanLine;
-					UNREFERENCED_PARAMETER(StartScanLine);
-					int LastPos = ScanLine;
-					UNREFERENCED_PARAMETER(LastPos);
-					ScanLine = (VSyncPos + 1) % m_ScreenSize.cy;
-					if (ScanLine < 0) {
-						ScanLine += m_ScreenSize.cy;
-					}
-					int ScanLineMiddle = ScanLine + m_ScreenSize.cy/2;
-					ScanLineMiddle = ScanLineMiddle % m_ScreenSize.cy;
-					if (ScanLineMiddle < 0) {
-						ScanLineMiddle += m_ScreenSize.cy;
-					}
-
-					int ScanlineStart = ScanLine;
-					bool bTakenLock;
-					WaitForVBlankRange(ScanlineStart, 5, true, true, false, bTakenLock);
-					LONGLONG TimeStart = pApp->GetPerfCounter();
-
-					WaitForVBlankRange(ScanLineMiddle, 5, true, true, false, bTakenLock);
-					LONGLONG TimeMiddle = pApp->GetPerfCounter();
-
-					int ScanlineEnd = ScanLine;
-					WaitForVBlankRange(ScanlineEnd, 5, true, true, false, bTakenLock);
-					LONGLONG TimeEnd = pApp->GetPerfCounter();
-
-					double nSeconds = double(TimeEnd - TimeStart) / 10000000.0;
-					LONGLONG DiffMiddle = TimeMiddle - TimeStart;
-					LONGLONG DiffEnd = TimeEnd - TimeMiddle;
-					double DiffDiff;
-					if (DiffEnd > DiffMiddle) {
-						DiffDiff = double(DiffEnd) / double(DiffMiddle);
-					} else {
-						DiffDiff = double(DiffMiddle) / double(DiffEnd);
-					}
-					if (nSeconds > 0.003 && DiffDiff < 1.3) {
-						double ScanLineSeconds;
-						double nScanLines;
-						if (ScanLineMiddle > ScanlineEnd) {
-							ScanLineSeconds = double(TimeMiddle - TimeStart) / 10000000.0;
-							nScanLines = ScanLineMiddle - ScanlineStart;
-						} else {
-							ScanLineSeconds = double(TimeEnd - TimeMiddle) / 10000000.0;
-							nScanLines = ScanlineEnd - ScanLineMiddle;
-						}
-
-						double ScanLineTime = ScanLineSeconds / nScanLines;
-
-						int iPos = m_DetectedRefreshRatePos	% 100;
-						m_ldDetectedScanlineRateList[iPos] = ScanLineTime;
-						if (m_DetectedScanlineTime && ScanlineStart != ScanlineEnd) {
-							int Diff = ScanlineEnd - ScanlineStart;
-							nSeconds -= double(Diff) * m_DetectedScanlineTime;
-						}
-						m_ldDetectedRefreshRateList[iPos] = nSeconds;
-						double Average = 0;
-						double AverageScanline = 0;
-						int nPos = min(iPos + 1, 100);
-						for (int i = 0; i < nPos; ++i) {
-							Average += m_ldDetectedRefreshRateList[i];
-							AverageScanline += m_ldDetectedScanlineRateList[i];
-						}
-
-						if (nPos) {
-							Average /= double(nPos);
-							AverageScanline /= double(nPos);
-						} else {
-							Average = 0;
-							AverageScanline = 0;
-						}
-
-						double ThisValue = Average;
-
-						if (Average > 0.0 && AverageScanline > 0.0) {
-							CAutoLock Lock(&m_RefreshRateLock);
-							++m_DetectedRefreshRatePos;
-							if (m_DetectedRefreshTime == 0 || m_DetectedRefreshTime / ThisValue > 1.01 || m_DetectedRefreshTime / ThisValue < 0.99) {
-								m_DetectedRefreshTime = ThisValue;
-								m_DetectedRefreshTimePrim = 0;
-							}
-							if (_isnan(m_DetectedRefreshTime)) {m_DetectedRefreshTime = 0.0;}
-							if (_isnan(m_DetectedRefreshTimePrim)) {m_DetectedRefreshTimePrim = 0.0;}
-
-							ModerateFloat(m_DetectedRefreshTime, ThisValue, m_DetectedRefreshTimePrim, 1.5);
-							if (m_DetectedRefreshTime > 0.0) {
-								m_DetectedRefreshRate = 1.0/m_DetectedRefreshTime;
-							} else {
-								m_DetectedRefreshRate = 0.0;
-							}
-
-							if (m_DetectedScanlineTime == 0 || m_DetectedScanlineTime / AverageScanline > 1.01 || m_DetectedScanlineTime / AverageScanline < 0.99) {
-								m_DetectedScanlineTime = AverageScanline;
-								m_DetectedScanlineTimePrim = 0;
-							}
-							ModerateFloat(m_DetectedScanlineTime, AverageScanline, m_DetectedScanlineTimePrim, 1.5);
-							if (m_DetectedScanlineTime > 0.0) {
-								m_DetectedScanlinesPerFrame = m_DetectedRefreshTime / m_DetectedScanlineTime;
-							} else {
-								m_DetectedScanlinesPerFrame = 0;
-							}
-						}
-						//TRACE("Refresh: %f\n", RefreshRate);
-					}
-				} else {
-					m_DetectedRefreshRate = 0.0;
-					m_DetectedScanlinesPerFrame = 0.0;
-				}
-			}
-			break;
-		}
-	}
-
-	timeEndPeriod (dwResolution);
-	//if (pfAvRevertMmThreadCharacteristics) pfAvRevertMmThreadCharacteristics (hAvrt);
-}
-
-DWORD WINAPI CDX9AllocatorPresenter::VSyncThreadStatic(LPVOID lpParam)
-{
-	SetThreadName((DWORD)-1, "CDX9Presenter::VSyncThread");
-	CDX9AllocatorPresenter*		pThis = (CDX9AllocatorPresenter*) lpParam;
-	pThis->VSyncThread();
-	return 0;
-}
-
-void CDX9AllocatorPresenter::StartWorkerThreads()
-{
-	DWORD dwThreadId;
-
-	if ( m_bIsEVR ) {
-		m_hEvtQuit = CreateEvent( NULL, TRUE, FALSE, NULL );
-		if ( m_hEvtQuit != NULL ) { // Don't create a thread with no stop switch
-			m_hVSyncThread = ::CreateThread( NULL, 0, VSyncThreadStatic, (LPVOID)this, 0, &dwThreadId );
-			if ( m_hVSyncThread != NULL ) {
-				SetThreadPriority( m_hVSyncThread, THREAD_PRIORITY_HIGHEST );
-			}
-		}
-	}
-}
-
-void CDX9AllocatorPresenter::StopWorkerThreads()
-{
-	if ( m_bIsEVR ) {
-		if ( m_hEvtQuit != NULL ) {
-			SetEvent( m_hEvtQuit );
-
-			if ( m_hVSyncThread != NULL ) {
-				if ( WaitForSingleObject(m_hVSyncThread, 10000) == WAIT_TIMEOUT ) {
-					ASSERT(FALSE);
-					TerminateThread( m_hVSyncThread, 0xDEAD );
-				}
-
-				CloseHandle( m_hVSyncThread );
-				m_hVSyncThread = NULL;
-			}
-
-			CloseHandle( m_hEvtQuit );
-			m_hEvtQuit = NULL;
-		}
-	}
-}
-
 bool CDX9AllocatorPresenter::SettingsNeedResetDevice()
 {
 	CRenderersSettings& s = GetRenderersSettings();
@@ -639,8 +423,6 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 
 	CAutoLock cRenderLock(&m_CreateLock);
 
-	StopWorkerThreads();
-
 	// extern variable
 	g_bGetFrameType	= FALSE;
 	g_nFrameType	= PICT_NONE;
@@ -659,59 +441,59 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 
 	ZeroMemory(m_ldDetectedRefreshRateList, sizeof(m_ldDetectedRefreshRateList));
 	ZeroMemory(m_ldDetectedScanlineRateList, sizeof(m_ldDetectedScanlineRateList));
-	m_DetectedRefreshRatePos = 0;
-	m_DetectedRefreshTimePrim = 0;
-	m_DetectedScanlineTime = 0;
-	m_DetectedScanlineTimePrim = 0;
-	m_DetectedRefreshRate = 0;
+	m_DetectedRefreshRatePos	= 0;
+	m_DetectedRefreshTimePrim	= 0;
+	m_DetectedScanlineTime		= 0;
+	m_DetectedScanlineTimePrim	= 0;
+	m_DetectedRefreshRate		= 0;
 
 	memset (m_pllJitter, 0, sizeof(m_pllJitter));
 	memset (m_pllSyncOffset, 0, sizeof(m_pllSyncOffset));
-	m_nNextJitter		= 0;
-	m_nNextSyncOffset = 0;
-	m_llLastPerf		= 0;
-	m_fAvrFps			= 0.0;
-	m_fJitterStdDev		= 0.0;
-	m_fSyncOffsetStdDev = 0.0;
-	m_fSyncOffsetAvr	= 0.0;
-	m_bSyncStatsAvailable = false;
+	m_nNextJitter			= 0;
+	m_nNextSyncOffset		= 0;
+	m_llLastPerf			= 0;
+	m_fAvrFps				= 0.0;
+	m_fJitterStdDev			= 0.0;
+	m_fSyncOffsetStdDev		= 0.0;
+	m_fSyncOffsetAvr		= 0.0;
+	m_bSyncStatsAvailable	= false;
 
-	m_VBlankEndWait = 0;
-	m_VBlankMin = 300000;
-	m_VBlankMinCalc = 300000;
-	m_VBlankMax = 0;
-	m_VBlankStartWait = 0;
-	m_VBlankWaitTime = 0;
-	m_VBlankLockTime = 0;
-	m_PresentWaitTime = 0;
-	m_PresentWaitTimeMin = 3000000000;
-	m_PresentWaitTimeMax = 0;
+	m_VBlankEndWait			= 0;
+	m_VBlankMin				= 300000;
+	m_VBlankMinCalc			= 300000;
+	m_VBlankMax				= 0;
+	m_VBlankStartWait		= 0;
+	m_VBlankWaitTime		= 0;
+	m_VBlankLockTime		= 0;
+	m_PresentWaitTime		= 0;
+	m_PresentWaitTimeMin	= 3000000000;
+	m_PresentWaitTimeMax	= 0;
 
-	m_LastRendererSettings = s.m_AdvRendSets;
+	m_LastRendererSettings	= s.m_AdvRendSets;
 
-	m_VBlankEndPresent = -100000;
-	m_VBlankStartMeasureTime = 0;
-	m_VBlankStartMeasure = 0;
+	m_VBlankEndPresent			= -100000;
+	m_VBlankStartMeasureTime	= 0;
+	m_VBlankStartMeasure		= 0;
 
-	m_PaintTime = 0;
-	m_PaintTimeMin = 3000000000;
-	m_PaintTimeMax = 0;
+	m_PaintTime		= 0;
+	m_PaintTimeMin	= 3000000000;
+	m_PaintTimeMax	= 0;
 
-	m_RasterStatusWaitTime = 0;
-	m_RasterStatusWaitTimeMin = 3000000000;
-	m_RasterStatusWaitTimeMax = 0;
-	m_RasterStatusWaitTimeMaxCalc = 0;
+	m_RasterStatusWaitTime			= 0;
+	m_RasterStatusWaitTimeMin		= 3000000000;
+	m_RasterStatusWaitTimeMax		= 0;
+	m_RasterStatusWaitTimeMaxCalc	= 0;
 
-	m_ClockDiff = 0.0;
-	m_ClockDiffPrim = 0.0;
-	m_ClockDiffCalc = 0.0;
+	m_ClockDiff		= 0.0;
+	m_ClockDiffPrim	= 0.0;
+	m_ClockDiffCalc	= 0.0;
 
-	m_ModeratedTimeSpeed = 1.0;
-	m_ModeratedTimeSpeedDiff = 0.0;
-	m_ModeratedTimeSpeedPrim = 0;
+	m_ModeratedTimeSpeed		= 1.0;
+	m_ModeratedTimeSpeedDiff	= 0.0;
+	m_ModeratedTimeSpeedPrim	= 0;
 	ZeroMemory(m_TimeChangeHistory, sizeof(m_TimeChangeHistory));
 	ZeroMemory(m_ClockChangeHistory, sizeof(m_ClockChangeHistory));
-	m_ClockTimeChangeHistoryPos = 0;
+	m_ClockTimeChangeHistoryPos	= 0;
 
 	m_pD3DDev		= NULL;
 	m_pD3DDevEx		= NULL;
@@ -728,41 +510,6 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	m_CurrentAdapter = GetAdapter(m_pD3D);
 
 	m_GPUUsage.Init(m_D3D9DeviceName);
-
-	/*		// TODO : add nVidia PerfHUD !!!
-
-	// Set default settings
-	UINT AdapterToUse=D3DADAPTER_DEFAULT;
-	D3DDEVTYPE DeviceType=D3DDEVTYPE_HAL;
-
-	#if SHIPPING_VERSION
-	// When building a shipping version, disable PerfHUD (opt-out)
-	#else
-	// Look for 'NVIDIA PerfHUD' adapter
-	// If it is present, override default settings
-	for (UINT Adapter=0;Adapter<g_pD3D->GetAdapterCount();Adapter++)
-	{
-	  D3DADAPTER_IDENTIFIER9  Identifier;
-	  HRESULT       Res;
-
-	Res = g_pD3D->GetAdapterIdentifier(Adapter,0,&Identifier);
-	  if (strstr(Identifier.Description,"PerfHUD") != 0)
-	 {
-	  AdapterToUse=Adapter;
-	  DeviceType=D3DDEVTYPE_REF;
-	  break;
-	 }
-	}
-	#endif
-
-	if (FAILED(g_pD3D->CreateDevice( AdapterToUse, DeviceType, hWnd,
-	  D3DCREATE_HARDWARE_VERTEXPROCESSING,
-	&d3dpp, &g_pd3dDevice) ) )
-	{
-	 return E_FAIL;
-	}
-	*/
-
 
 //#define ENABLE_DDRAWSYNC
 #ifdef ENABLE_DDRAWSYNC
@@ -1033,8 +780,6 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		m_rcMonitor = mi.rcMonitor;
 	}
 
-	StartWorkerThreads();
-
 	return S_OK;
 }
 
@@ -1140,26 +885,26 @@ void CDX9AllocatorPresenter::CalculateJitter(LONGLONG PerfCounter)
 		// Calculate the real FPS
 		LONGLONG		llJitterSum = 0;
 		LONGLONG		llJitterSumAvg = 0;
-		for (int i=0; i<NB_JITTER; i++) {
+		for (int i = 0; i < NB_JITTER; i++) {
 			LONGLONG Jitter = m_pllJitter[i];
 			llJitterSum += Jitter;
 			llJitterSumAvg += Jitter;
 		}
-		double FrameTimeMean = double(llJitterSumAvg)/NB_JITTER;
+		double FrameTimeMean = double(llJitterSumAvg) / NB_JITTER;
 		m_fJitterMean = FrameTimeMean;
 		double DeviationSum = 0;
-		for (int i=0; i<NB_JITTER; i++) {
+		for (int i = 0; i < NB_JITTER; i++) {
 			LONGLONG DevInt = m_pllJitter[i] - (LONGLONG)FrameTimeMean;
 			double Deviation = (double)DevInt;
 			DeviationSum += Deviation*Deviation;
 			m_MaxJitter = max(m_MaxJitter, DevInt);
 			m_MinJitter = min(m_MinJitter, DevInt);
 		}
-		double StdDev = sqrt(DeviationSum/NB_JITTER);
+		double StdDev = sqrt(DeviationSum / NB_JITTER);
 
 		m_fJitterStdDev = StdDev;
 
-		m_fAvrFps = 10000000.0/(double(llJitterSum)/NB_JITTER);
+		m_fAvrFps = 10000000.0/(double(llJitterSum) / NB_JITTER);
 	}
 
 	m_llLastPerf = llPerf;
@@ -1852,7 +1597,6 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::ResetDevice()
 	DbgLog((LOG_TRACE, 3, L"CDX9AllocatorPresenter::ResetDevice()"));
 
 	ASSERT(m_MainThreadId == GetCurrentThreadId());
-	StopWorkerThreads();
 
 	// In VMR-9 deleting the surfaces before we are told to is bad !
 	// Can't comment out this because CDX9AllocatorPresenter is used by EVR Custom

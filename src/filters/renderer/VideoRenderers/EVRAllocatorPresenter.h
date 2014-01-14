@@ -164,6 +164,23 @@ namespace DSObjects
 		LONGLONG		GetClockTime(LONGLONG PerformanceCounter);
 
 	private :
+		enum RENDER_STATE {
+			Started		= State_Running,
+			Stopped		= State_Stopped,
+			Paused		= State_Paused,
+			Shutdown	= State_Running + 1
+		};
+		RENDER_STATE							m_nRenderState;
+
+		HANDLE									m_hThread;
+		HANDLE									m_hGetMixerThread;
+		HANDLE									m_hVSyncThread;
+
+		HANDLE									m_hEvtQuit;			// Stop rendering thread event
+		bool									m_bEvtQuit;
+		HANDLE									m_hEvtFlush;		// Discard all buffers
+		bool									m_bEvtFlush;
+
 		COuterEVR*								m_pOuterEVR;
 		CComPtr<IMFClock>						m_pClock;
 		CComPtr<IDirect3DDeviceManager9>		m_pD3DManager;
@@ -174,18 +191,10 @@ namespace DSObjects
 		MFVideoRenderPrefs						m_dwVideoRenderPrefs;
 		COLORREF								m_BorderColor;
 
-		HANDLE									m_hEvtQuit;			// Stop rendering thread event
-		bool									m_bEvtQuit;
-		HANDLE									m_hEvtFlush;		// Discard all buffers
-		bool									m_bEvtFlush;
-
 		bool									m_fUseInternalTimer;
 		int32									m_LastSetOutputRange;
 		bool									m_bPendingRenegotiate;
 		bool									m_bPendingMediaFinished;
-
-		HANDLE									m_hThread;
-		HANDLE									m_hGetMixerThread;
 
 		CCritSec								m_SampleQueueLock;
 		CCritSec								m_ImageProcessingLock;
@@ -231,6 +240,8 @@ namespace DSObjects
 		HRESULT									CheckShutdown() const;
 		void									CompleteFrameStep(bool bCancel);
 		void									CheckWaitingSampleFromMixer();
+		static DWORD WINAPI						VSyncThreadStatic(LPVOID lpParam);
+		void									VSyncThread();
 
 		void									RemoveAllSamples();
 		HRESULT									GetFreeSample(IMFSample** ppSample);

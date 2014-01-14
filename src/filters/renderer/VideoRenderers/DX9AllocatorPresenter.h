@@ -43,15 +43,6 @@ namespace DSObjects
 		void					UpdateAlphaBitmap();
 
 	protected:
-		typedef enum {
-			Undefined	= State_Stopped-1,
-			Started		= State_Running,
-			Stopped		= State_Stopped,
-			Paused		= State_Paused,
-			Shutdown	= State_Running + 1
-		} RENDER_STATE;
-		RENDER_STATE			m_nRenderState;
-
 		UINT	m_RefreshRate;
 		bool	m_bAlternativeVSync;
 		bool	m_bCompositionEnabled;
@@ -115,15 +106,7 @@ namespace DSObjects
 		virtual HRESULT AllocSurfaces();
 		virtual void DeleteSurfaces();
 
-		// Thread stuff
-		HANDLE			m_hEvtQuit;			// Stop rendering thread event
-		HANDLE			m_hVSyncThread;
-		static DWORD WINAPI VSyncThreadStatic(LPVOID lpParam);
-		void VSyncThread();
-		void StartWorkerThreads();
-		void StopWorkerThreads();
-
-		LONGLONG		m_LastAdapterCheck;
+		LONGLONG m_LastAdapterCheck;
 		UINT GetAdapter(IDirect3D9 *pD3D, bool bGetAdapter = true);
 		DWORD GetVertexProcessing();
 

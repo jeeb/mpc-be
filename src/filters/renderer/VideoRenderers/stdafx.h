@@ -36,3 +36,5 @@
 #endif
 
 #include "../../../DSUtil/DSUtil.h"
+
+#define CHECK_HR(exp) { if (FAILED(hr = exp)) return hr; }
