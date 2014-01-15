@@ -63,8 +63,8 @@ void CHdmvSub::AllocSegment(int nSize)
 		m_pSegBuffer		= DNew BYTE[nSize];
 		m_nTotalSegBuffer	= nSize;
 	}
-	m_nSegBufferPos	 = 0;
-	m_nSegSize       = nSize;
+	m_nSegBufferPos		= 0;
+	m_nSegSize			= nSize;
 }
 
 POSITION CHdmvSub::GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld)
@@ -131,7 +131,7 @@ HRESULT CHdmvSub::ParseSample(BYTE* pData, int lSampleLen, REFERENCE_TIME rtStar
 
 			if (m_nCurSegment != NO_SEGMENT) {
 				if (m_nSegBufferPos < m_nSegSize) {
-					int nSize = min (m_nSegSize-m_nSegBufferPos, lSampleLen);
+					int nSize = min(m_nSegSize-m_nSegBufferPos, lSampleLen);
 					SampleBuffer.ReadBuffer (m_pSegBuffer+m_nSegBufferPos, nSize);
 					m_nSegBufferPos += nSize;
 				}
@@ -302,7 +302,7 @@ void CHdmvSub::ParseObject(CGolombBuffer* pGBuffer, USHORT nUnitSize)
 		return;
 	}
 
-    CompositionObject &pObject = m_ParsedObjects[object_id];
+	CompositionObject &pObject = m_ParsedObjects[object_id];
 
 	pObject.m_version_number	= pGBuffer->ReadByte();
 	BYTE m_sequence_desc		= pGBuffer->ReadByte();

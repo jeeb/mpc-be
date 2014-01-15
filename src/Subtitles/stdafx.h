@@ -37,3 +37,4 @@
 #include <BaseClasses/streams.h>
 
 #include "../DSUtil/DSUtil.h"
+#include <algorithm>

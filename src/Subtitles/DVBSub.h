@@ -78,16 +78,16 @@ public:
 
 	// EN 300-743, table 6
 	enum DVB_OBJECT_TYPE {
-		OT_BASIC_BITMAP       = 0x00,
-		OT_BASIC_CHAR         = 0x01,
-		OT_COMPOSITE_STRING   = 0x02
+		OT_BASIC_BITMAP			= 0x00,
+		OT_BASIC_CHAR			= 0x01,
+		OT_COMPOSITE_STRING		= 0x02
 	};
 
 	enum DVB_PAGE_STATE {
-		DPS_NORMAL			  = 0x00,
-		DPS_ACQUISITION		  = 0x01,
-		DPS_MODE			  = 0x02,
-		DPS_RESERVED		  = 0x03
+		DPS_NORMAL				= 0x00,
+		DPS_ACQUISITION			= 0x01,
+		DPS_MODE				= 0x02,
+		DPS_RESERVED			= 0x03
 	};
 
 	struct DVB_CLUT {

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2013 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,14 +26,20 @@
 class CTextFile : protected CStdioFile
 {
 public:
-	typedef enum {ASCII, UTF8, LE16, BE16, ANSI} enc;
+	enum enc {
+		ASCII,
+		UTF8,
+		LE16,
+		BE16,
+		ANSI
+	};
 
 private:
 	enc m_encoding, m_defaultencoding;
 	int m_offset;
-
-	bool isUTF8Valid();
-	void SkipBOM(const BYTE bom[3], UINT sizeBOM);
+	CAutoVectorPtr<char> m_buffer;
+	CAutoVectorPtr<WCHAR> m_wbuffer;
+	LONGLONG m_posInBuffer, m_nInBuffer;
 
 public:
 	CTextFile(enc e = ASCII);
@@ -59,6 +65,10 @@ public:
 	void WriteString(LPCWSTR lpsz/*CStringW str*/);
 	BOOL ReadString(CStringA& str);
 	BOOL ReadString(CStringW& str);
+
+protected:
+	virtual bool ReopenAsText();
+	bool FillBuffer();
 };
 
 class CWebTextFile : public CTextFile
@@ -67,16 +77,16 @@ class CWebTextFile : public CTextFile
 	CString m_tempfn;
 
 public:
-	CWebTextFile(LONGLONG llMaxSize = 1024*1024);
+	CWebTextFile(CTextFile::enc e = ASCII, LONGLONG llMaxSize = 1024 * 1024);
 
 	bool Open(LPCTSTR lpszFileName);
 	bool Save(LPCTSTR lpszFileName, enc e /*= ASCII*/);
 	void Close();
 };
 
-extern CStringW AToW(CStringA str);
-extern CStringA WToA(CStringW str);
-extern CString AToT(CStringA str);
-extern CString WToT(CStringW str);
-extern CStringA TToA(CString str);
-extern CStringW TToW(CString str);
+extern CStringW	AToW(CStringA str);
+extern CStringA	WToA(CStringW str);
+extern CString	AToT(CStringA str);
+extern CString	WToT(CStringW str);
+extern CStringA	TToA(CString  str);
+extern CStringW	TToW(CString  str);

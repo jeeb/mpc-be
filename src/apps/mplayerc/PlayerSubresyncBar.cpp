@@ -20,18 +20,22 @@
  */
 
 #include "stdafx.h"
+#include "mplayerc.h"
 #include "MainFrm.h"
 #include "PlayerSubresyncBar.h"
+
 
 // CPlayerSubresyncBar
 
 IMPLEMENT_DYNAMIC(CPlayerSubresyncBar, CPlayerBar)
-
 CPlayerSubresyncBar::CPlayerSubresyncBar()
+	: m_pSubLock(NULL)
+	, m_fps(0.0)
+	, m_mode(0)
+	, m_rt(0)
+	, m_fUnlink(false)
+	, m_lastSegment(-1)
 {
-	m_rt = 0;
-	m_fUnlink = false;
-	m_lastSegment = -1;
 }
 
 CPlayerSubresyncBar::~CPlayerSubresyncBar()
@@ -47,18 +51,18 @@ BOOL CPlayerSubresyncBar::Create(CWnd* pParentWnd, UINT defDockBarID, CCritSec* 
 	m_pSubLock = pSubLock;
 
 	m_list.CreateEx(
-		WS_EX_DLGMODALFRAME|WS_EX_CLIENTEDGE,
-		WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|WS_CLIPCHILDREN|WS_TABSTOP|LVS_REPORT/*|LVS_SHOWSELALWAYS*/|LVS_AUTOARRANGE|LVS_NOSORTHEADER,
-		CRect(0,0,100,100), this, IDC_SUBRESYNCLIST);
+		WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE,
+		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_TABSTOP | LVS_REPORT/*|LVS_SHOWSELALWAYS*/ | LVS_AUTOARRANGE | LVS_NOSORTHEADER,
+		CRect(0, 0, 100, 100), this, IDC_SUBRESYNCLIST);
 
-	m_list.SetExtendedStyle(m_list.GetExtendedStyle()|LVS_EX_FULLROWSELECT|LVS_EX_DOUBLEBUFFER);
+	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
 
 	return TRUE;
 }
 
 BOOL CPlayerSubresyncBar::PreCreateWindow(CREATESTRUCT& cs)
 {
-	if (!CSizingControlBarG::PreCreateWindow(cs)) {
+	if (!__super::PreCreateWindow(cs)) {
 		return FALSE;
 	}
 
@@ -78,16 +82,15 @@ BOOL CPlayerSubresyncBar::PreTranslateMessage(MSG* pMsg)
 		}
 	}
 
-	return CSizingControlBarG::PreTranslateMessage(pMsg);
+	return __super::PreTranslateMessage(pMsg);
 }
 
-void CPlayerSubresyncBar::SetTime(__int64 rt)
+void CPlayerSubresyncBar::SetTime(REFERENCE_TIME rt)
 {
 	m_rt = rt;
-
 	int curSegment;
 
-	if (!m_sts.SearchSubs((int)(rt/10000), 25, &curSegment)) {
+	if (!m_sts.SearchSubs((int)(rt / 10000), 25, &curSegment)) {
 		curSegment = -1;
 	}
 
@@ -97,10 +100,28 @@ void CPlayerSubresyncBar::SetTime(__int64 rt)
 	m_lastSegment = curSegment;
 }
 
+void CPlayerSubresyncBar::SetFPS(double fps)
+{
+	if (m_fps != fps) {
+		m_fps = fps;
+
+		ReloadSubtitle();
+	}
+}
+
 void CPlayerSubresyncBar::SetSubtitle(ISubStream* pSubStream, double fps)
 {
-	m_pSubStream = pSubStream;
+	// Avoid reloading the same subtitles again
+	if (m_pSubStream != pSubStream || m_fps != fps) {
+		m_pSubStream = pSubStream;
+		m_fps = fps;
 
+		ReloadSubtitle();
+	}
+}
+
+void CPlayerSubresyncBar::ReloadSubtitle()
+{
 	m_mode = NONE;
 	m_lastSegment = -1;
 	m_sts.Empty();
@@ -119,12 +140,12 @@ void CPlayerSubresyncBar::SetSubtitle(ISubStream* pSubStream, double fps)
 
 		m_mode = VOBSUB;
 
-		_ASSERT(pVSF->m_iLang >= 0);
+		ASSERT(pVSF->m_iLang >= 0);
 		CAtlArray<CVobSubFile::SubPos>& sp = pVSF->m_langs[pVSF->m_iLang].subpos;
 
-		for (int i = 0, j = sp.GetCount(); i < j; i++) {
+		for (size_t i = 0, j = sp.GetCount(); i < j; i++) {
 			CString str;
-			str.Format(_T("%d,%d,%d,%d"), sp[i].vobid, sp[i].cellid, sp[i].fForced, i);
+			str.Format(_T("%d,%d,%d,%Iu"), sp[i].vobid, sp[i].cellid, sp[i].fForced, i);
 			m_sts.Add(TToW(str), false, (int)sp[i].start, (int)sp[i].stop);
 		}
 
@@ -148,7 +169,7 @@ void CPlayerSubresyncBar::SetSubtitle(ISubStream* pSubStream, double fps)
 		m_mode = TEXTSUB;
 
 		m_sts.Copy(*pRTS);
-		m_sts.ConvertToTimeBased(fps);
+		m_sts.ConvertToTimeBased(m_fps);
 		m_sts.Sort(true); /*!!m_fUnlink*/
 
 		for (int i = 0, j = m_list.GetHeaderCtrl()->GetItemCount(); i < j; i++) {
@@ -170,7 +191,7 @@ void CPlayerSubresyncBar::SetSubtitle(ISubStream* pSubStream, double fps)
 
 	m_subtimes.SetCount(m_sts.GetCount());
 
-	for (int i = 0, j = m_sts.GetCount(); i < j; i++) {
+	for (size_t i = 0, j = m_sts.GetCount(); i < j; i++) {
 		m_subtimes[i].orgstart = m_sts[i].start;
 		m_subtimes[i].orgend = m_sts[i].end;
 	}
@@ -180,36 +201,47 @@ void CPlayerSubresyncBar::SetSubtitle(ISubStream* pSubStream, double fps)
 
 void CPlayerSubresyncBar::ResetSubtitle()
 {
+	m_list.SetRedraw(FALSE);
 	m_list.DeleteAllItems();
 
 	if (m_mode == VOBSUB || m_mode == TEXTSUB) {
-		TCHAR buff[32];
+		TCHAR buff[32] = { 0 };
 
 		int prevstart = INT_MIN;
 
-		for (int i = 0, j = m_sts.GetCount(); i < j; i++) {
+		int nCount = (int)m_sts.GetCount();
+		m_list.SetItemCount(nCount);
+
+		for (int i = 0; i < nCount; i++) {
 			m_subtimes[i].newstart = m_subtimes[i].orgstart;
 			m_subtimes[i].newend = m_subtimes[i].orgend;
+
 			FormatTime(i, buff, _countof(buff), 0, false);
-			m_list.InsertItem(i, buff, COL_START);
+			m_list.InsertItem(i, buff);
+			m_list.SetItemText(i, COL_PREVSTART, buff);
 			FormatTime(i, buff, _countof(buff), 0, true);
 			m_list.SetItemText(i, COL_END, buff);
+			m_list.SetItemText(i, COL_PREVEND, buff);
 
 			if (prevstart > m_subtimes[i].orgstart) {
 				m_list.SetItemData(i, (DWORD_PTR)TSEP);
 			}
 			prevstart = m_subtimes[i].orgstart;
 
-			SetCheck(i, false, false);
+			// Since all items in COL_START and COL_PREVSTART have the same text size,
+			// we can compute it for the first element only so that it's faster.
+			if (i == 0) {
+				m_list.SetColumnWidth(COL_START, LVSCW_AUTOSIZE);
+				m_list.SetColumnWidth(COL_PREVSTART, LVSCW_AUTOSIZE);
+			}
 		}
 
-		UpdatePreview();
-
-		m_list.SetColumnWidth(COL_START, LVSCW_AUTOSIZE);
-		m_list.SetColumnWidth(COL_PREVSTART, LVSCW_AUTOSIZE);
+		UpdateStrings();
 	}
 
-	UpdateStrings();
+	m_list.SetRedraw(TRUE);
+	m_list.Invalidate();
+	m_list.UpdateWindow();
 }
 
 void CPlayerSubresyncBar::SaveSubtitle()
@@ -227,17 +259,18 @@ void CPlayerSubresyncBar::SaveSubtitle()
 
 		CAutoLock cAutoLock(m_pSubLock);
 
-		_ASSERT(pVSF->m_iLang >= 0);
+		ASSERT(pVSF->m_iLang >= 0);
 		CAtlArray<CVobSubFile::SubPos>& sp = pVSF->m_langs[pVSF->m_iLang].subpos;
 
-		for (int i = 0, j = sp.GetCount(); i < j; i++) {
+		for (size_t i = 0, j = sp.GetCount(); i < j; i++) {
 			sp[i].fValid = false;
 		}
 
-		for (int i = 0, j = m_sts.GetCount(); i < j; i++) {
+		for (int i = 0, j = (int)m_sts.GetCount(); i < j; i++) {
 			int vobid, cellid, forced, spnum;
 			TCHAR c;
-			if (_stscanf_s(m_sts.GetStr(i), _T("%d%c%d%c%d%c%d"), &vobid, &c, sizeof(TCHAR), &cellid, &c, sizeof(TCHAR), &forced, &c, sizeof(TCHAR), &spnum) != 7) {
+			if (_stscanf_s(m_sts.GetStrW(i), _T("%d%c%d%c%d%c%d"), &vobid,
+						   &c, 1, &cellid, &c, 1, &forced, &c, 1, &spnum) != 7) {
 				continue;
 			}
 			sp[spnum].start = m_sts[i].start;
@@ -261,31 +294,31 @@ void CPlayerSubresyncBar::UpdatePreview()
 {
 	if (m_mode == VOBSUB || m_mode == TEXTSUB) {
 		if (0/*m_fUnlink*/) {
-			for (int i = 0, j = m_sts.GetCount(); i < j; i++) {
+			for (int i = 0, j = (int)m_sts.GetCount(); i < j; i++) {
 				bool fStartMod, fEndMod, fStartAdj, fEndAdj;
 				GetCheck(i, fStartMod, fEndMod, fStartAdj, fEndAdj);
-				m_sts[i].start = (fStartMod||fStartAdj) ? m_subtimes[i].newstart : m_subtimes[i].orgstart;
-				m_sts[i].end = (fEndMod||fEndAdj) ? m_subtimes[i].newend : m_subtimes[i].orgend;
+				m_sts[i].start = (fStartMod || fStartAdj) ? m_subtimes[i].newstart : m_subtimes[i].orgstart;
+				m_sts[i].end = (fEndMod || fEndAdj) ? m_subtimes[i].newend : m_subtimes[i].orgend;
 			}
 		} else {
 			CAtlArray<int> schk;
 
-			for (int i = 0, j = m_sts.GetCount(); i < j;) {
+			for (int i = 0, j = (int)m_sts.GetCount(); i < j;) {
 				schk.RemoveAll();
 
 				int start = i, end;
 
 				for (end = i; end < j; end++) {
 					int data = (int)m_list.GetItemData(end);
-					if ((data&TSEP) && end > i) {
+					if ((data & TSEP) && end > i) {
 						break;
 					}
-					if (data&(TSMOD|TSADJ)) {
+					if (data & (TSMOD | TSADJ)) {
 						schk.Add(end);
 					}
 				}
 
-				if (schk.GetCount() == 0) {
+				if (schk.IsEmpty()) {
 					for (; start < end; start++) {
 						m_sts[start].start = m_subtimes[start].orgstart;
 						m_sts[start].end = m_subtimes[start].orgend;
@@ -307,9 +340,9 @@ void CPlayerSubresyncBar::UpdatePreview()
 					double m = 0;
 
 					int k, l;
-					for (k = 0, l = schk.GetCount()-1; k < l; k++) {
+					for (k = 0, l = (int)schk.GetCount() - 1; k < l; k++) {
 						i0 = schk[k];
-						i1 = schk[k+1];
+						i1 = schk[k + 1];
 
 						ti0 = m_subtimes[i0].orgstart;
 						ds = m_subtimes[i1].orgstart - ti0;
@@ -337,7 +370,7 @@ void CPlayerSubresyncBar::UpdatePreview()
 
 		m_sts.CreateSegments();
 
-		for (int i = 0, j = m_sts.GetCount(); i < j; i++) {
+		for (int i = 0, j = (int)m_sts.GetCount(); i < j; i++) {
 			TCHAR buff[32];
 			FormatTime(i, buff, _countof(buff), 2, false);
 			m_list.SetItemText(i, COL_PREVSTART, buff);
@@ -351,7 +384,7 @@ void CPlayerSubresyncBar::UpdatePreview()
 	}
 }
 
-void CPlayerSubresyncBar::SetSTS0( int &start, int end, int ti0 )
+void CPlayerSubresyncBar::SetSTS0(int& start, int end, int ti0)
 {
 	for (; start < end; start++) {
 		m_sts[start].start = ti0;
@@ -365,10 +398,10 @@ void CPlayerSubresyncBar::SetSTS0( int &start, int end, int ti0 )
 	}
 }
 
-void CPlayerSubresyncBar::SetSTS1( int &start, int end, int ti0, double m, int i0 )
+void CPlayerSubresyncBar::SetSTS1(int& start, int end, int ti0, double m, int i0)
 {
 	for (; start < end; start++) {
-		m_sts[start].start = int((m_subtimes[start].orgstart - ti0)*m + m_subtimes[i0].newstart);
+		m_sts[start].start = int((m_subtimes[start].orgstart - ti0) * m + m_subtimes[i0].newstart);
 		int endpos;
 		if (m_list.GetItemData(start)&TEMOD) {
 			endpos = m_subtimes[start].newend;
@@ -377,7 +410,7 @@ void CPlayerSubresyncBar::SetSTS1( int &start, int end, int ti0, double m, int i
 			if (m_mode == VOBSUB) {
 				endpos = m_sts[start].start + diff;
 			} else {
-				endpos = m_sts[start].start + int(diff*m);
+				endpos = m_sts[start].start + int(diff * m);
 			}
 		}
 		m_sts[start].end = endpos;
@@ -389,11 +422,11 @@ void CPlayerSubresyncBar::UpdateStrings()
 	CString str;
 
 	if (m_mode == TEXTSUB) {
-		for (int i = 0, j = m_sts.GetCount(); i < j; i++) {
+		for (int i = 0, j = (int)m_sts.GetCount(); i < j; i++) {
 			STSStyle stss;
 			m_sts.GetStyle(i, stss);
 
-			m_list.SetItemText(i, COL_TEXT, m_sts.GetStr(i, true));
+			m_list.SetItemText(i, COL_TEXT, m_sts.GetStrW(i, true));
 			m_list.SetItemText(i, COL_STYLE, m_sts[i].style);
 			m_list.SetItemText(i, COL_FONT, stss.fontName);
 			str.Format(_T("%d"), stss.charSet);
@@ -405,10 +438,11 @@ void CPlayerSubresyncBar::UpdateStrings()
 			m_list.SetItemText(i, COL_EFFECT, m_sts[i].effect);
 		}
 	} else if (m_mode == VOBSUB) {
-		for (int i = 0, j = m_sts.GetCount(); i < j; i++) {
+		for (int i = 0, j = (int)m_sts.GetCount(); i < j; i++) {
 			int vobid, cellid, forced;
 			TCHAR c;
-			if (_stscanf_s(m_sts.GetStr(i), _T("%d%c%d%c%d"), &vobid, &c, sizeof(TCHAR), &cellid, &c, sizeof(TCHAR), &forced) != 5) {
+			if (_stscanf_s(m_sts.GetStrW(i), _T("%d%c%d%c%d"), &vobid,
+						   &c, 1, &cellid, &c, 1, &forced) != 5) {
 				continue;
 			}
 			if (vobid < 0) {
@@ -423,7 +457,7 @@ void CPlayerSubresyncBar::UpdateStrings()
 				str.Format(_T("%d"), cellid);
 			}
 			m_list.SetItemText(i, COL_CELLID, str);
-			str = forced?_T("Yes"):_T("");
+			str = forced ? _T("Yes") : _T("");
 			m_list.SetItemText(i, COL_FORCED, str);
 		}
 	}
@@ -433,10 +467,10 @@ void CPlayerSubresyncBar::GetCheck(int iItem, bool& fStartMod, bool& fEndMod, bo
 {
 	if (0 <= iItem && (size_t)iItem < m_sts.GetCount()) {
 		int nCheck = (int)m_list.GetItemData(iItem);
-		fStartMod = !!(nCheck&TSMOD);
-		fEndMod = !!(nCheck&TEMOD);
-		fStartAdj = !!(nCheck&TSADJ);
-		fEndAdj = !!(nCheck&TEADJ);
+		fStartMod = !!(nCheck & TSMOD);
+		fEndMod = !!(nCheck & TEMOD);
+		fStartAdj = !!(nCheck & TSADJ);
+		fEndAdj = !!(nCheck & TEADJ);
 	}
 }
 
@@ -449,12 +483,12 @@ void CPlayerSubresyncBar::SetCheck(int iItem, bool fStart, bool fEnd)
 
 		if (fStart) {
 			nCheck |= TSMOD;
-		} else if (abs(st.orgstart-st.newstart)) {
+		} else if (abs(st.orgstart - st.newstart)) {
 			nCheck |= TSADJ;
 		}
 		if (fEnd) {
 			nCheck |= TEMOD;
-		} else if (abs(st.orgend-st.newend)) {
+		} else if (abs(st.orgend - st.newend)) {
 			nCheck |= TEADJ;
 		}
 
@@ -471,8 +505,8 @@ void CPlayerSubresyncBar::SetCheck(int iItem, bool fStart, bool fEnd)
 bool CPlayerSubresyncBar::ModStart(int iItem, int t, bool fReset)
 {
 	bool fRet = false;
-
 	bool fStartMod, fEndMod, fStartAdj, fEndAdj;
+
 	GetCheck(iItem, fStartMod, fEndMod, fStartAdj, fEndAdj);
 
 	SubTime& st = m_subtimes[iItem];
@@ -491,14 +525,14 @@ bool CPlayerSubresyncBar::ModStart(int iItem, int t, bool fReset)
 		SetCheck(iItem, !fReset, fEndMod);
 	}
 
-	return(fRet);
+	return fRet;
 }
 
 bool CPlayerSubresyncBar::ModEnd(int iItem, int t, bool fReset)
 {
 	bool fRet = false;
-
 	bool fStartMod, fEndMod, fStartAdj, fEndAdj;
+
 	GetCheck(iItem, fStartMod, fEndMod, fStartAdj, fEndAdj);
 
 	SubTime& st = m_subtimes[iItem];
@@ -517,30 +551,30 @@ bool CPlayerSubresyncBar::ModEnd(int iItem, int t, bool fReset)
 		SetCheck(iItem, fStartMod, !fReset);
 	}
 
-	return(fRet);
+	return fRet;
 }
 
 void CPlayerSubresyncBar::FormatTime(int iItem, TCHAR* buff, size_t buffLen, int time, bool fEnd)
 {
 	int t = !fEnd
-			?(time == 2 ? m_sts[iItem].start
-			  : time == 1 ? m_subtimes[iItem].newstart
-			  : m_subtimes[iItem].orgstart)
-				: (time == 2 ? m_sts[iItem].end
-				   : time == 1 ? m_subtimes[iItem].newend
-				   : m_subtimes[iItem].orgend);
+			? (time == 2 ? m_sts[iItem].start
+			   : time == 1 ? m_subtimes[iItem].newstart
+			   : m_subtimes[iItem].orgstart)
+			: (time == 2 ? m_sts[iItem].end
+			   : time == 1 ? m_subtimes[iItem].newend
+			   : m_subtimes[iItem].orgend);
 
 	_stprintf_s(buff, buffLen, t >= 0
-			  ? _T("%02d:%02d:%02d.%03d")
-			  : _T("-%02d:%02d:%02d.%03d"),
-			  abs(t)/60/60/1000,
-			  (abs(t)/60/1000)%60,
-			  (abs(t)/1000)%60,
-			  abs(t)%1000);
+				? _T("%02d:%02d:%02d.%03d")
+				: _T("-%02d:%02d:%02d.%03d"),
+				abs(t) / 60 / 60 / 1000,
+				(abs(t) / 60 / 1000) % 60,
+				(abs(t) / 1000) % 60,
+				abs(t) % 1000);
 }
 
 
-BEGIN_MESSAGE_MAP(CPlayerSubresyncBar, CSizingControlBarG)
+BEGIN_MESSAGE_MAP(CPlayerSubresyncBar, CPlayerBar)
 	ON_WM_SIZE()
 	ON_NOTIFY(LVN_BEGINLABELEDIT, IDC_SUBRESYNCLIST, OnBeginlabeleditList)
 	ON_NOTIFY(LVN_DOLABELEDIT, IDC_SUBRESYNCLIST, OnDolabeleditList)
@@ -556,7 +590,7 @@ END_MESSAGE_MAP()
 
 void CPlayerSubresyncBar::OnSize(UINT nType, int cx, int cy)
 {
-	CSizingControlBarG::OnSize(nType, cx, cy);
+	__super::OnSize(nType, cx, cy);
 
 	if (::IsWindow(m_list.m_hWnd)) {
 		CRect r;
@@ -572,12 +606,11 @@ static bool ParseTime(CString str, int& ret, bool fWarn = true)
 	TCHAR c;
 
 	str.Trim();
-	if (str.GetLength() > 0 && str[0] == '-') {
+	if (!str.IsEmpty() && str[0] == '-') {
 		sign = -1;
 	}
 
-	int n = _stscanf_s(str, _T("%d%c%d%c%d%c%d"), &h, &c, sizeof(TCHAR),
-					   &m, &c, sizeof(TCHAR), &s, &c, sizeof(TCHAR), &ms);
+	int n = _stscanf_s(str, _T("%d%c%d%c%d%c%d"), &h, &c, 1, &m, &c, 1, &s, &c, 1, &ms);
 
 	h = abs(h);
 
@@ -586,12 +619,12 @@ static bool ParseTime(CString str, int& ret, bool fWarn = true)
 			&& 0 <= m && m < 60
 			&& 0 <= s && s < 60
 			&& 0 <= ms && ms < 1000) {
-		ret = sign*(h*60*60*1000+m*60*1000+s*1000+ms);
+		ret = sign * (h * 60 * 60 * 1000 + m * 60 * 1000 + s * 1000 + ms);
 		return true;
 	}
 
 	if (fWarn) {
-		AfxMessageBox(ResStr(IDS_SUBRESYNC_TIME_FORMAT), MB_ICONEXCLAMATION | MB_OK);
+		AfxMessageBox(ResStr(IDS_SUBRESYNC_TIME_FORMAT), MB_ICONEXCLAMATION | MB_OK, 0);
 	}
 	return false;
 }
@@ -674,12 +707,12 @@ void CPlayerSubresyncBar::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 				break;
 			case COL_TEXT:
 				if (m_mode == TEXTSUB) {
-					CString str = m_sts.GetStr(pItem->iItem, true);
+					CString str = m_sts.GetStrW(pItem->iItem, true);
 
 					if (str != pItem->pszText) {
 						fNeedsUpdate = true;
 						m_sts.SetStr(pItem->iItem, CString(pItem->pszText), true);
-						m_list.SetItemText(pItem->iItem, pItem->iSubItem, m_sts.GetStr(pItem->iItem, true));
+						m_list.SetItemText(pItem->iItem, pItem->iSubItem, m_sts.GetStrW(pItem->iItem, true));
 					}
 				}
 				break;
@@ -692,7 +725,7 @@ void CPlayerSubresyncBar::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 						fNeedsUpdate = true;
 
 						if (!m_sts.m_styles.Lookup(str)) {
-							m_sts.AddStyle(str, DNew STSStyle());
+							m_sts.AddStyle(str, DEBUG_NEW STSStyle());
 						}
 
 						m_sts[pItem->iItem].style = str;
@@ -745,7 +778,7 @@ void CPlayerSubresyncBar::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 
 static int uintcomp(const void* i1, const void* i2)
 {
-	return(*((UINT*)i2) - *((UINT*)i1));
+	return (*((UINT*)i2) - * ((UINT*)i1));
 }
 
 void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
@@ -754,14 +787,14 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 
 	if (lpnmlv->iItem >= 0 && lpnmlv->iSubItem >= 0) {
 		enum {
-			TOGSEP=1,
+			TOGSEP = 1,
 			DUPITEM, DELITEM,
 			RESETS, SETOS, SETCS, RESETE, SETOE, SETCE,
-			STYLEFIRST, STYLELAST=STYLEFIRST+1000, STYLEEDIT,
+			STYLEFIRST, STYLELAST = STYLEFIRST + 1000, STYLEEDIT,
 			UNICODEYES, UNICODENO,
 			LAYERDEC, LAYERINC,
-			ACTORFIRST, ACTORLAST=ACTORFIRST+1000,
-			EFFECTFIRST, EFFECTLAST=EFFECTFIRST+1000
+			ACTORFIRST, ACTORLAST = ACTORFIRST + 1000,
+			EFFECTFIRST, EFFECTLAST = EFFECTFIRST + 1000
 		};
 
 		CStringArray styles;
@@ -772,29 +805,29 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 		m.CreatePopupMenu();
 
 		if (m_mode == VOBSUB || m_mode == TEXTSUB) {
-			m.AppendMenu(MF_STRING|MF_ENABLED, TOGSEP, ResStr(IDS_SUBRESYNC_SEPARATOR));
+			m.AppendMenu(MF_STRING | MF_ENABLED, TOGSEP, ResStr(IDS_SUBRESYNC_SEPARATOR));
 			m.AppendMenu(MF_SEPARATOR);
 			if (m_mode == TEXTSUB) {
-				m.AppendMenu(MF_STRING|MF_ENABLED, DUPITEM, ResStr(IDS_SUBRESYNC_DUPLICATE));
+				m.AppendMenu(MF_STRING | MF_ENABLED, DUPITEM, ResStr(IDS_SUBRESYNC_DUPLICATE));
 			}
-			m.AppendMenu(MF_STRING|MF_ENABLED, DELITEM, ResStr(IDS_SUBRESYNC_DELETE));
+			m.AppendMenu(MF_STRING | MF_ENABLED, DELITEM, ResStr(IDS_SUBRESYNC_DELETE));
 		}
 
 		switch (lpnmlv->iSubItem) {
 			case COL_START:
 				if (m_mode == VOBSUB || m_mode == TEXTSUB) {
 					m.AppendMenu(MF_SEPARATOR);
-					m.AppendMenu(MF_STRING|MF_ENABLED, RESETS, ResStr(IDS_SUBRESYNC_RESET) + _T("\tF1"));
-					m.AppendMenu(MF_STRING|MF_ENABLED, SETOS, ResStr(IDS_SUBRESYNC_ORIGINAL) + _T("\tF3"));
-					m.AppendMenu(MF_STRING|MF_ENABLED, SETCS, ResStr(IDS_SUBRESYNC_CURRENT) + _T("\tF5"));
+					m.AppendMenu(MF_STRING | MF_ENABLED, RESETS, ResStr(IDS_SUBRESYNC_RESET) + _T("\tF1"));
+					m.AppendMenu(MF_STRING | MF_ENABLED, SETOS, ResStr(IDS_SUBRESYNC_ORIGINAL) + _T("\tF3"));
+					m.AppendMenu(MF_STRING | MF_ENABLED, SETCS, ResStr(IDS_SUBRESYNC_CURRENT) + _T("\tF5"));
 				}
 				break;
 			case COL_END:
 				if (m_mode == TEXTSUB) {
 					m.AppendMenu(MF_SEPARATOR);
-					m.AppendMenu(MF_STRING|MF_ENABLED, RESETE, ResStr(IDS_SUBRESYNC_RESET) + _T("\tF2"));
-					m.AppendMenu(MF_STRING|MF_ENABLED, SETOE, ResStr(IDS_SUBRESYNC_ORIGINAL) + _T("\tF4"));
-					m.AppendMenu(MF_STRING|MF_ENABLED, SETCE, ResStr(IDS_SUBRESYNC_CURRENT) + _T("\tF6"));
+					m.AppendMenu(MF_STRING | MF_ENABLED, RESETE, ResStr(IDS_SUBRESYNC_RESET) + _T("\tF2"));
+					m.AppendMenu(MF_STRING | MF_ENABLED, SETOE, ResStr(IDS_SUBRESYNC_ORIGINAL) + _T("\tF4"));
+					m.AppendMenu(MF_STRING | MF_ENABLED, SETCE, ResStr(IDS_SUBRESYNC_CURRENT) + _T("\tF6"));
 				}
 				break;
 			case COL_STYLE:
@@ -809,40 +842,40 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 						STSStyle* val;
 						m_sts.m_styles.GetNextAssoc(pos, key, val);
 						styles.Add(key);
-						m.AppendMenu(MF_STRING|MF_ENABLED, id++, key);
+						m.AppendMenu(MF_STRING | MF_ENABLED, id++, key);
 					}
 
 					if (id > STYLEFIRST && m_list.GetSelectedCount() == 1) {
 						m.AppendMenu(MF_SEPARATOR);
-						m.AppendMenu(MF_STRING|MF_ENABLED, STYLEEDIT, ResStr(IDS_SUBRESYNC_EDIT));
+						m.AppendMenu(MF_STRING | MF_ENABLED, STYLEEDIT, ResStr(IDS_SUBRESYNC_EDIT));
 					}
 				}
 				break;
 			case COL_UNICODE:
 				if (m_mode == TEXTSUB) {
 					m.AppendMenu(MF_SEPARATOR);
-					m.AppendMenu(MF_STRING|MF_ENABLED, UNICODEYES, ResStr(IDS_SUBRESYNC_YES));
-					m.AppendMenu(MF_STRING|MF_ENABLED, UNICODENO, ResStr(IDS_SUBRESYNC_NO));
+					m.AppendMenu(MF_STRING | MF_ENABLED, UNICODEYES, ResStr(IDS_SUBRESYNC_YES));
+					m.AppendMenu(MF_STRING | MF_ENABLED, UNICODENO, ResStr(IDS_SUBRESYNC_NO));
 				}
 				break;
 			case COL_LAYER:
 				if (m_mode == TEXTSUB) {
 					m.AppendMenu(MF_SEPARATOR);
-					m.AppendMenu(MF_STRING|MF_ENABLED, LAYERDEC, ResStr(IDS_SUBRESYNC_DECREASE));
-					m.AppendMenu(MF_STRING|MF_ENABLED, LAYERINC, ResStr(IDS_SUBRESYNC_INCREASE));
+					m.AppendMenu(MF_STRING | MF_ENABLED, LAYERDEC, ResStr(IDS_SUBRESYNC_DECREASE));
+					m.AppendMenu(MF_STRING | MF_ENABLED, LAYERINC, ResStr(IDS_SUBRESYNC_INCREASE));
 				}
 				break;
 			case COL_ACTOR:
 				if (m_mode == TEXTSUB) {
 					CMapStringToPtr actormap;
 
-					for (int i = 0, j = m_sts.GetCount(); i < j; i++) {
+					for (size_t i = 0, j = m_sts.GetCount(); i < j; i++) {
 						actormap[m_sts[i].actor] = NULL;
 					}
 
 					actormap.RemoveKey(_T(""));
 
-					if (actormap.GetCount() > 0) {
+					if (!actormap.IsEmpty()) {
 						m.AppendMenu(MF_SEPARATOR);
 
 						int id = ACTORFIRST;
@@ -855,7 +888,7 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 
 							actors.Add(key);
 
-							m.AppendMenu(MF_STRING|MF_ENABLED, id++, key);
+							m.AppendMenu(MF_STRING | MF_ENABLED, id++, key);
 						}
 					}
 				}
@@ -864,13 +897,13 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 				if (m_mode == TEXTSUB) {
 					CMapStringToPtr effectmap;
 
-					for (int i = 0, j = m_sts.GetCount(); i < j; i++) {
+					for (size_t i = 0, j = m_sts.GetCount(); i < j; i++) {
 						effectmap[m_sts[i].effect] = NULL;
 					}
 
 					effectmap.RemoveKey(_T(""));
 
-					if (effectmap.GetCount() > 0) {
+					if (!effectmap.IsEmpty()) {
 						m.AppendMenu(MF_SEPARATOR);
 
 						int id = EFFECTFIRST;
@@ -883,7 +916,7 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 
 							effects.Add(key);
 
-							m.AppendMenu(MF_STRING|MF_ENABLED, id++, key);
+							m.AppendMenu(MF_STRING | MF_ENABLED, id++, key);
 						}
 					}
 				}
@@ -893,7 +926,7 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 		CPoint p = lpnmlv->ptAction;
 		::MapWindowPoints(pNMHDR->hwndFrom, HWND_DESKTOP, &p, 1);
 
-		UINT id = m.TrackPopupMenu(TPM_LEFTBUTTON|TPM_RETURNCMD, p.x, p.y, this);
+		UINT id = m.TrackPopupMenu(TPM_LEFTBUTTON | TPM_RETURNCMD, p.x, p.y, this);
 
 		bool fNeedsUpdate = false;
 
@@ -905,7 +938,7 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 
 			switch (id) {
 				case TOGSEP:
-					m_list.SetItemData(iItem, m_list.GetItemData(iItem)^TSEP);
+					m_list.SetItemData(iItem, m_list.GetItemData(iItem) ^ TSEP);
 					m_list.Invalidate();
 					fNeedsUpdate = true;
 					break;
@@ -918,14 +951,14 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 
 					qsort(items.GetData(), items.GetCount(), sizeof(UINT), uintcomp);
 
-					for (int i = 0; i < items.GetCount(); i++) {
+					for (INT_PTR i = 0, l = items.GetCount(); i < l; i++) {
 						iItem = items[i];
 
 						STSEntry stse = m_sts[iItem];
-						m_sts.InsertAt(iItem+1, stse);
+						m_sts.InsertAt(iItem + 1, stse);
 
 						SubTime st = m_subtimes[iItem];
-						m_subtimes.InsertAt(iItem+1, st);
+						m_subtimes.InsertAt(iItem + 1, st);
 
 						CHeaderCtrl* pHeader = (CHeaderCtrl*)m_list.GetDlgItem(0);
 						int nColumnCount = pHeader->GetItemCount();
@@ -936,11 +969,11 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 							sa[col] = m_list.GetItemText(iItem, col);
 						}
 
-						DWORD data = m_list.GetItemData(iItem);
-						m_list.InsertItem(iItem+1, sa[0]);
-						m_list.SetItemData(iItem+1, data);
+						DWORD_PTR data = m_list.GetItemData(iItem);
+						m_list.InsertItem(iItem + 1, sa[0]);
+						m_list.SetItemData(iItem + 1, data);
 						for (int col = 1; col < nColumnCount; col++) {
-							m_list.SetItemText(iItem+1, col, sa[col]);
+							m_list.SetItemText(iItem + 1, col, sa[col]);
 						}
 					}
 				}
@@ -956,16 +989,16 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 
 					qsort(items.GetData(), items.GetCount(), sizeof(UINT), uintcomp);
 
-					for (int i = 0; i < items.GetCount(); i++) {
+					for (INT_PTR i = 0, l = items.GetCount(); i < l; i++) {
 						iItem = items[i];
 						m_sts.RemoveAt(iItem);
 						m_subtimes.RemoveAt(iItem);
 						m_list.DeleteItem(iItem);
 					}
 
-					iItem = items[items.GetCount()-1];
+					iItem = items[items.GetCount() - 1];
 					if (iItem >= m_list.GetItemCount()) {
-						iItem = m_list.GetItemCount()-1;
+						iItem = m_list.GetItemCount() - 1;
 					}
 
 					m_list.SetSelectionMark(iItem);
@@ -981,7 +1014,7 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 					fNeedsUpdate = true;
 					break;
 				case SETCS: /*if (*/
-					ModStart(iItem, (int)(m_rt/10000));/*)*/
+					ModStart(iItem, (int)(m_rt / 10000)); /*)*/
 					fNeedsUpdate = true;
 					break;
 				case RESETE: /*if (*/
@@ -993,7 +1026,7 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 					fNeedsUpdate = true;
 					break;
 				case SETCE: /*if (*/
-					ModEnd(iItem, (int)(m_rt/10000));/*)*/
+					ModEnd(iItem, (int)(m_rt / 10000)); /*)*/
 					fNeedsUpdate = true;
 					break;
 				default:
@@ -1017,7 +1050,7 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 							STSStyle* val;
 							m_sts.m_styles.GetNextAssoc(pos, key, val);
 
-							CAutoPtr<CPPageSubStyle> page(DNew CPPageSubStyle());
+							CAutoPtr<CPPageSubStyle> page(DEBUG_NEW CPPageSubStyle());
 							page->InitSubStyle(key, val);
 							pages.Add(page);
 							styles.Add(val);
@@ -1028,19 +1061,19 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 						}
 
 						CPropertySheet dlg(_T("Styles..."), this, iSelPage);
-						for (int i = 0; i < (int)pages.GetCount(); i++) {
+						for (size_t i = 0, l = pages.GetCount(); i < l; i++) {
 							dlg.AddPage(pages[i]);
 						}
 
 						if (dlg.DoModal() == IDOK) {
-							for (int j = 0; j < (int)pages.GetCount(); j++) {
+							for (size_t j = 0, l = pages.GetCount(); j < l; j++) {
 								stss = styles[j];
 								pages[j]->GetSubStyle(stss);
 
-								for (size_t i = 0; i < m_sts.GetCount(); i++) {
+								for (int i = 0; i < (int)m_sts.GetCount(); i++) {
 									if (m_sts.GetStyle(i) == stss) {
 										CString str;
-										m_list.SetItemText(i, COL_TEXT, m_sts.GetStr(i, true));
+										m_list.SetItemText(i, COL_TEXT, m_sts.GetStrW(i, true));
 										m_list.SetItemText(i, COL_FONT, stss->fontName);
 										str.Format(_T("%d"), stss->charSet);
 										m_list.SetItemText(i, COL_CHARSET, str);
@@ -1053,14 +1086,12 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 						}
 					} else if (id == UNICODEYES || id == UNICODENO) {
 						m_sts.ConvertUnicode(iItem, id == UNICODEYES);
-						m_list.SetItemText(iItem, COL_TEXT, m_sts.GetStr(iItem, true));
+						m_list.SetItemText(iItem, COL_TEXT, m_sts.GetStrW(iItem, true));
 						m_list.SetItemText(iItem, COL_UNICODE, m_sts.IsEntryUnicode(iItem) ? _T("yes") : _T("no"));
 						fNeedsUpdate = true;
 					} else if (id == LAYERDEC || id == LAYERINC) {
-						int d = (id == LAYERDEC) ? -1 : (id == LAYERINC) ? +1 : 0;
-						if (d != 0) {
-							fNeedsUpdate = true;
-						}
+						int d = (id == LAYERDEC) ? -1 : 1;
+						fNeedsUpdate = true;
 						m_sts[iItem].layer += d;
 						CString s;
 						s.Format(_T("%d"), m_sts[iItem].layer);
@@ -1103,7 +1134,7 @@ void CPlayerSubresyncBar::OnNMDblclkList(NMHDR* pNMHDR, LRESULT* pResult)
 				t = m_sts[lpnmlv->iItem].start;
 			}
 
-			REFERENCE_TIME rt = (REFERENCE_TIME)t*10000;
+			REFERENCE_TIME rt = (REFERENCE_TIME)t * 10000;
 
 			pFrame->SeekTo(rt);
 		}
@@ -1139,12 +1170,12 @@ void CPlayerSubresyncBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 			m_itemGroups[i] = m_totalGroups;
 		}
 
-		*pResult = CDRF_NOTIFYPOSTPAINT|CDRF_NOTIFYITEMDRAW;
+		*pResult = CDRF_NOTIFYPOSTPAINT | CDRF_NOTIFYITEMDRAW;
 	} else if (CDDS_ITEMPREPAINT == pLVCD->nmcd.dwDrawStage) {
 		pLVCD->nmcd.uItemState &= ~CDIS_FOCUS;
 
-		*pResult = CDRF_NOTIFYPOSTPAINT|CDRF_NOTIFYSUBITEMDRAW;
-	} else if ((CDDS_ITEMPREPAINT|CDDS_SUBITEM) == pLVCD->nmcd.dwDrawStage) {
+		*pResult = CDRF_NOTIFYPOSTPAINT | CDRF_NOTIFYSUBITEMDRAW;
+	} else if ((CDDS_ITEMPREPAINT | CDDS_SUBITEM) == pLVCD->nmcd.dwDrawStage) {
 		COLORREF clrText;
 		COLORREF clrTextBk;
 
@@ -1160,24 +1191,24 @@ void CPlayerSubresyncBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 		}
 
 		clrTextBk = 0xffffff;
-		//		if (m_totalGroups > 0)
-		clrTextBk -= ((m_itemGroups[pLVCD->nmcd.dwItemSpec]&1) ? 0x100010 : 0x200020);
+		//	  if (m_totalGroups > 0)
+		clrTextBk -= ((m_itemGroups[pLVCD->nmcd.dwItemSpec] & 1) ? 0x100010 : 0x200020);
 
-		if (m_sts[pLVCD->nmcd.dwItemSpec].start <= m_rt/10000 && m_rt/10000 < m_sts[pLVCD->nmcd.dwItemSpec].end) {
+		if (m_sts[pLVCD->nmcd.dwItemSpec].start <= m_rt / 10000 && m_rt / 10000 < m_sts[pLVCD->nmcd.dwItemSpec].end) {
 			clrText |= 0xFF;
 		}
 
-		int nCheck = (int)m_list.GetItemData(pLVCD->nmcd.dwItemSpec);
+		int nCheck = (int)m_list.GetItemData((int)pLVCD->nmcd.dwItemSpec);
 
-		if ((nCheck&1) && (pLVCD->iSubItem == COL_START || pLVCD->iSubItem == COL_PREVSTART)) {
+		if ((nCheck & 1) && (pLVCD->iSubItem == COL_START || pLVCD->iSubItem == COL_PREVSTART)) {
 			clrTextBk = 0xffddbb;
-		} else if ((nCheck&4) && (/*pLVCD->iSubItem == COL_START ||*/ pLVCD->iSubItem == COL_PREVSTART)) {
+		} else if ((nCheck & 4) && (/*pLVCD->iSubItem == COL_START ||*/ pLVCD->iSubItem == COL_PREVSTART)) {
 			clrTextBk = 0xffeedd;
 		}
 
-		if ((nCheck&2) && (pLVCD->iSubItem == COL_END || pLVCD->iSubItem == COL_PREVEND)) {
+		if ((nCheck & 2) && (pLVCD->iSubItem == COL_END || pLVCD->iSubItem == COL_PREVEND)) {
 			clrTextBk = 0xffddbb;
-		} else if ((nCheck&8) && (/*pLVCD->iSubItem == COL_END ||*/ pLVCD->iSubItem == COL_PREVEND)) {
+		} else if ((nCheck & 8) && (/*pLVCD->iSubItem == COL_END ||*/ pLVCD->iSubItem == COL_PREVEND)) {
 			clrTextBk = 0xffeedd;
 		}
 
@@ -1185,8 +1216,8 @@ void CPlayerSubresyncBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 		pLVCD->clrTextBk = clrTextBk;
 
 		*pResult = CDRF_NOTIFYPOSTPAINT;
-	} else if ((CDDS_ITEMPOSTPAINT|CDDS_SUBITEM) == pLVCD->nmcd.dwDrawStage) {
-		//		*pResult = CDRF_DODEFAULT;
+	} else if ((CDDS_ITEMPOSTPAINT | CDDS_SUBITEM) == pLVCD->nmcd.dwDrawStage) {
+		//	  *pResult = CDRF_DODEFAULT;
 	} else if (CDDS_ITEMPOSTPAINT == pLVCD->nmcd.dwDrawStage) {
 		int nItem = static_cast<int>(pLVCD->nmcd.dwItemSpec);
 
@@ -1204,11 +1235,11 @@ void CPlayerSubresyncBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 			m_list.GetItemRect(nItem, &rcItem, LVIR_BOUNDS);
 
 			{
-				bool fSeparator = nItem < m_list.GetItemCount()-1 && (m_list.GetItemData(nItem+1)&TSEP);
+				bool fSeparator = nItem < m_list.GetItemCount() - 1 && (m_list.GetItemData(nItem + 1)&TSEP);
 				CPen p(PS_INSIDEFRAME, 1, fSeparator ? 0x404040 : 0xe0e0e0);
 				CPen* old = pDC->SelectObject(&p);
-				pDC->MoveTo(CPoint(rcItem.left, rcItem.bottom-1));
-				pDC->LineTo(CPoint(rcItem.right, rcItem.bottom-1));
+				pDC->MoveTo(CPoint(rcItem.left, rcItem.bottom - 1));
+				pDC->LineTo(CPoint(rcItem.right, rcItem.bottom - 1));
 				pDC->SelectObject(old);
 			}
 
@@ -1236,7 +1267,7 @@ void CPlayerSubresyncBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 	}
 }
 
-bool CPlayerSubresyncBar::IsShortCut(MSG* pMsg)
+bool CPlayerSubresyncBar::IsShortCut(const MSG* pMsg)
 {
 	if (pMsg->message == WM_KEYDOWN && VK_F1 <= pMsg->wParam && pMsg->wParam <= VK_F6) {
 		int iItem = -1;
@@ -1260,7 +1291,7 @@ bool CPlayerSubresyncBar::IsShortCut(MSG* pMsg)
 					fNeedsUpdate = true;
 					break;
 				case VK_F5: /*if (*/
-					ModStart(iItem, (int)(m_rt/10000));/*)*/
+					ModStart(iItem, (int)(m_rt / 10000)); /*)*/
 					fNeedsUpdate = true;
 					break;
 				case VK_F2: /*if (*/
@@ -1272,18 +1303,18 @@ bool CPlayerSubresyncBar::IsShortCut(MSG* pMsg)
 					fNeedsUpdate = true;
 					break;
 				case VK_F6: /*if (*/
-					ModEnd(iItem, (int)(m_rt/10000));/*)*/
+					ModEnd(iItem, (int)(m_rt / 10000)); /*)*/
 					fNeedsUpdate = fStep = true;
 					break;
 			}
 		}
 
 		if (fNeedsUpdate) {
-			if (fStep && m_list.GetSelectedCount() == 1 && iItem < m_list.GetItemCount()-1) {
+			if (fStep && m_list.GetSelectedCount() == 1 && iItem < m_list.GetItemCount() - 1) {
 				m_list.SetItemState(iItem, 0, LVIS_SELECTED);
-				m_list.SetItemState(iItem+1, LVIS_SELECTED, LVIS_SELECTED);
-				m_list.SetSelectionMark(iItem+1);
-				m_list.EnsureVisible(iItem+1, false);
+				m_list.SetItemState(iItem + 1, LVIS_SELECTED, LVIS_SELECTED);
+				m_list.SetSelectionMark(iItem + 1);
+				m_list.EnsureVisible(iItem + 1, false);
 			}
 
 			UpdatePreview();
@@ -1295,36 +1326,40 @@ bool CPlayerSubresyncBar::IsShortCut(MSG* pMsg)
 	return false;
 }
 
-int CPlayerSubresyncBar::FindNearestSub(__int64& rtPos, bool bForward)
+int CPlayerSubresyncBar::FindNearestSub(REFERENCE_TIME& rtPos, bool bForward)
 {
 	int lCurTime = (int)(rtPos / 10000) + (bForward ? 1 : -1);
 
-	if (m_subtimes.GetCount() == 0) {
-		rtPos = max (0, rtPos + (bForward ? 1 : -1) * 50000000);
+	if (m_subtimes.IsEmpty()) {
 		return -2;
 	}
 
+	int subCount = (int)m_sts.GetCount();
+
 	if (lCurTime < m_subtimes[0].newstart) {
-		rtPos = m_subtimes[0].newstart * 10000;
-		return 0;
+		rtPos = (REFERENCE_TIME)m_subtimes[0].newstart * 10000;
+		return bForward ? 0 : -1;
+	} else if (lCurTime > m_subtimes[subCount - 1].newstart) {
+		rtPos = (REFERENCE_TIME)m_subtimes[subCount - 1].newstart * 10000;
+		return bForward ? -1 : subCount - 1;
 	}
 
-	for (int i = 1, j = m_sts.GetCount(); i < j; i++) {
-		if ((lCurTime >= m_subtimes[i-1].newstart) && (lCurTime < m_subtimes[i].newstart)) {
-			rtPos = bForward ? (__int64)m_subtimes[i].newstart * 10000 : (__int64)m_subtimes[i-1].newstart * 10000;
-			return bForward ? i : i-1;
+	for (int i = 1; i < subCount; i++) {
+		if ((lCurTime >= m_subtimes[i - 1].newstart) && (lCurTime < m_subtimes[i].newstart)) {
+			rtPos = bForward ? (REFERENCE_TIME)m_subtimes[i].newstart * 10000 : (REFERENCE_TIME)m_subtimes[i - 1].newstart * 10000;
+			return bForward ? i : i - 1;
 		}
 	}
 
 	return -1;
 }
 
-bool CPlayerSubresyncBar::ShiftSubtitle(int nItem, long lValue, __int64& rtPos)
+bool CPlayerSubresyncBar::ShiftSubtitle(int nItem, long lValue, REFERENCE_TIME& rtPos)
 {
 	bool bRet = false;
 
-	if ((nItem == 0) || (m_subtimes[nItem-1].newend < m_subtimes[nItem].newstart + lValue)) {
-		for (size_t i= nItem; i<m_sts.GetCount(); i++) {
+	if ((nItem == 0) || (m_subtimes[nItem - 1].newend < m_subtimes[nItem].newstart + lValue)) {
+		for (size_t i = nItem; i < m_sts.GetCount(); i++) {
 			m_subtimes[i].newstart += lValue;
 			m_subtimes[i].newend   += lValue;
 			m_subtimes[i].orgstart += lValue;
@@ -1333,12 +1368,12 @@ bool CPlayerSubresyncBar::ShiftSubtitle(int nItem, long lValue, __int64& rtPos)
 		UpdatePreview();
 		SaveSubtitle();
 		bRet = true;
-		rtPos = (__int64)m_subtimes[nItem].newstart * 10000;
+		rtPos = (REFERENCE_TIME)m_subtimes[nItem].newstart * 10000;
 	}
 	return bRet;
 }
 
 bool CPlayerSubresyncBar::SaveToDisk()
 {
-	return m_sts.SaveAs (m_sts.m_path, m_sts.m_exttype);
+	return m_sts.SaveAs(m_sts.m_path, m_sts.m_exttype);
 }

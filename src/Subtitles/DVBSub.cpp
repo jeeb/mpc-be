@@ -169,7 +169,7 @@ HRESULT CDVBSub::ParseSample(IMediaSample* pSample)
 		UNREFERENCED_PARAMETER(wLength);
 
 		if (gb.BitRead(2) != 2) {
-			return E_FAIL;    // type
+			return E_FAIL;	// type
 		}
 
 		gb.BitRead(2);	// scrambling
