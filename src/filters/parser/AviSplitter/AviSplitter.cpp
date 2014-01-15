@@ -58,9 +58,9 @@ int g_cTemplates = _countof(g_Templates);
 STDAPI DllRegisterServer()
 {
 	CAtlList<CString> chkbytes;
-	chkbytes.AddTail(_T("0,4,,52494646,8,4,,41564920")); // 'RIFFxxxxAVI '
-	chkbytes.AddTail(_T("0,4,,52494646,8,4,,41564958")); // 'RIFFxxxxAVIX'
-	chkbytes.AddTail(_T("0,4,,52494646,8,4,,414D5620")); // 'RIFFxxxxAMV '
+	chkbytes.AddTail(_T("0,4,,52494646,8,4,,41564920")); // 'RIFF....AVI '
+	chkbytes.AddTail(_T("0,4,,52494646,8,4,,41564958")); // 'RIFF....AVIX'
+	chkbytes.AddTail(_T("0,4,,52494646,8,4,,414D5620")); // 'RIFF....AMV '
 
 	RegisterSourceFilter(
 		CLSID_AsyncReader,

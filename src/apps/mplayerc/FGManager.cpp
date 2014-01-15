@@ -1882,9 +1882,9 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	if (src[SRC_AVI] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAviSourceFilter>();
-		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,41564920")); // 'RIFFxxxxAVI '
-		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,41564958")); // 'RIFFxxxxAVIX'
-		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,414D5620")); // 'RIFFxxxxAMV '
+		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,41564920")); // 'RIFF....AVI '
+		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,41564958")); // 'RIFF....AVIX'
+		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,414D5620")); // 'RIFF....AMV '
 		m_source.AddTail(pFGF);
 	}
 
@@ -2011,7 +2011,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	if (src[SRC_WAV] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>();
-		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,57415645")); // RIFFxxxxWAVE
+		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,57415645")); // 'RIFF....WAVE'
 		pFGF->m_chkbytes.AddTail(_T("0,16,,726966662E91CF11A5D628DB04C10000,24,16,,77617665F3ACD3118CD100C04F8EDB8A")); // Wave64
 		m_source.AddTail(pFGF);
 	}
