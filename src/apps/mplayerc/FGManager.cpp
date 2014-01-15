@@ -2036,6 +2036,8 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	if (src[SRC_RAWVIDEO] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CRawVideoSourceFilter>();
+		// YUV4MPEG2
+		pFGF->m_chkbytes.AddTail(_T("0,9,,595556344D50454732"));
 		// MPEG1/2
 		pFGF->m_chkbytes.AddTail(_T("0,4,,000001B3"));
 		pFGF->m_extensions.AddTail(_T(".mpeg"));
@@ -2056,8 +2058,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->m_extensions.AddTail(_T(".265"));
 		pFGF->m_extensions.AddTail(_T(".hm10"));
 		pFGF->m_extensions.AddTail(_T(".hevc"));
-		// YUV4MPEG2
-		pFGF->m_chkbytes.AddTail(_T("0,9,,595556344D50454732"));
 		m_source.AddTail(pFGF);
 	}
 

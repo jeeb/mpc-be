@@ -55,12 +55,12 @@ int g_cTemplates = _countof(g_Templates);
 STDAPI DllRegisterServer()
 {
 	CAtlList<CString> chkbytes;
+	chkbytes.AddTail(_T("0,9,,595556344D50454732")); // YUV4MPEG2
 	chkbytes.AddTail(_T("0,4,,000001B3"));		// MPEG1/2
 	chkbytes.AddTail(_T("0,5,,0000000109"));	// H.264/AVC1
 	chkbytes.AddTail(_T("0,4,,0000010F"));		// VC-1
 	chkbytes.AddTail(_T("0,4,,0000010D"));		// VC-1
 	chkbytes.AddTail(_T("0,5,,0000000140"));	// H.265/HEVC
-	chkbytes.AddTail(_T("0,9,,595556344D50454732")); // YUV4MPEG2
 
 	RegisterSourceFilter(
 		CLSID_AsyncReader,
@@ -89,7 +89,14 @@ CFilterApp theApp;
 
 #endif
 
-static const BYTE FRAME_[6] = {'F','R','A','M','E',0x0A};
+static const BYTE YUV4MPEG2_[10] = {'Y','U','V','4','M','P','E','G','2',0x20};
+static const BYTE FRAME_[6]      = {'F','R','A','M','E',0x0A};
+
+static const BYTE SYNC_MPEG1[4]  = {0x00, 0x00, 0x01, 0xB3};
+static const BYTE SYNC_H264[4]   = {0x00, 0x00, 0x00, 0x01};
+static const BYTE SYNC_VC1_f[4]  = {0x00, 0x00, 0x01, 0x0F};
+static const BYTE SYNC_VC1_d[4]  = {0x00, 0x00, 0x01, 0x0D};
+static const BYTE SYNC_HEVC[5]   = {0x00, 0x00, 0x00, 0x01, 0x40};
 
 //
 // CRawVideoSplitterFilter
@@ -166,331 +173,286 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		return hr;
 	}
 
+	BYTE buf[256] = {0};
+	if (FAILED(m_pFile->ByteRead(buf, 255))) {
+		return E_FAIL;
+	}
+
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = 0;
 
 	CAtlArray<CMediaType> mts;
 	CMediaType mt;
-	{
-		RAWType rawType = RAW_NONE;
+	CString pName;
 
-		{
-			static const BYTE YUV4MPEG2_[10] = {'Y','U','V','4','M','P','E','G','2',0x20};
-			BYTE buf[256] = {0};
-			if (m_pFile->ByteRead(buf, 255) == S_OK && memcmp(buf, YUV4MPEG2_, sizeof(YUV4MPEG2_)) == 0) {
-				CStringA params = CStringA(buf + sizeof(YUV4MPEG2_));
-				params.Truncate(params.Find(0x0A));
+	if (memcmp(buf, YUV4MPEG2_, sizeof(YUV4MPEG2_)) == 0) {
+		CStringA params = CStringA(buf + sizeof(YUV4MPEG2_));
+		params.Truncate(params.Find(0x0A));
 
-				int firstframepos = sizeof(YUV4MPEG2_) + params.GetLength() + 1;
-				if (firstframepos + sizeof(FRAME_) > 255 || memcmp(buf + firstframepos, FRAME_, sizeof(FRAME_)) != 0) {
-					return E_FAIL; // incorrect or unsuppurted YUV4MPEG2 file
+		int firstframepos = sizeof(YUV4MPEG2_) + params.GetLength() + 1;
+		if (firstframepos + sizeof(FRAME_) > 255 || memcmp(buf + firstframepos, FRAME_, sizeof(FRAME_)) != 0) {
+			return E_FAIL; // incorrect or unsuppurted YUV4MPEG2 file
+		}
+
+		int    width		= 0;
+		int    height		= 0;
+		int    fpsnum		= 24;
+		int    fpsden		= 1;
+		int    sar_x		= 1;
+		int    sar_y		= 1;
+		FOURCC fourcc		= FCC('I420'); // 4:2:0 - I420 by default
+		FOURCC fourcc_2		= 0;
+		WORD   bpp			= 12;
+		DWORD  interl		= 0; // 
+
+		int k;
+		CAtlList<CStringA> sl;
+		Explode(params, sl, 0x20);
+		POSITION pos = sl.GetHeadPosition();
+		while (pos) {
+			CStringA& str = sl.GetNext(pos);
+			if (str.GetLength() < 2) {
+				continue;
+			}
+
+			switch (str[0]) {
+			case 'W':
+				width = atoi(str.Mid(1));
+				break;
+			case 'H':
+				height = atoi(str.Mid(1));
+				break;
+			case 'F':
+				k = str.Find(':');
+				fpsnum = atoi(str.Mid(1, k - 1));
+				fpsden = atoi(str.Mid(k + 1));
+				break;
+			case 'I':
+				if (str.GetLength() == 2) {
+					switch (str[1]) {
+					case 'p': interl = 0; break;
+					case 't': interl = 1; break;
+					case 'b': interl = 2; break;
+					case 'm': interl = 3; break;
+					}
 				}
+				break;
+			case 'A':
+				k = str.Find(':');
+				sar_x = atoi(str.Mid(1, k - 1));
+				sar_y = atoi(str.Mid(k + 1));
+				if (sar_x <= 0 || sar_y <= 0) { // if 'A0:0' = unknown or bad value
+					sar_x = sar_y = 1; // then force 'A1:1' = square pixels
+				}
+				break;
+			case 'C':
+				str = str.Mid(1);
+				// 8-bit
+				if (str == "mono") {
+					fourcc		= FCC('Y800');
+					bpp			= 8;
+				}
+				else if (str == "420" || str == "420jpeg" || str == "420mpeg2" || str == "420paldv") {
+					fourcc		= FCC('I420');
+					bpp			= 12;
+				}
+				else if (str == "411") {
+					fourcc		= FCC('Y41B');
+					bpp			= 12;
+				}
+				else if (str == "422") {
+					fourcc		= FCC('Y42B');
+					bpp			= 16;
+				}
+				else if (str == "444") {
+					fourcc		= FCC('444P'); // for libavcodec
+					fourcc_2	= FCC('I444'); // for madVR
+					bpp			= 24;
+				}
+				else { // unsuppurted colour space 
+					fourcc		= 0;
+					bpp			= 0;
+				}
+				break;
+			//case 'X':
+			//	break;
+			}
+		}
 
-				int    width		= 0;
-				int    height		= 0;
-				int    fpsnum		= 24;
-				int    fpsden		= 1;
-				int    sar_x		= 1;
-				int    sar_y		= 1;
-				FOURCC fourcc		= FCC('I420'); // 4:2:0 - I420 by default
-				FOURCC fourcc_2		= 0;
-				WORD   bpp			= 12;
-				DWORD  interl		= 0; // 
+		if (width <= 0 || height <= 0 || fpsnum <= 0 || fpsden <= 0 || fourcc == 0) {
+			return E_FAIL; // incorrect or unsuppurted YUV4MPEG2 file
+		}
 
-				int k;
-				CAtlList<CStringA> sl;
-				Explode(params, sl, 0x20);
-				POSITION pos = sl.GetHeadPosition();
-				while (pos) {
-					CStringA& str = sl.GetNext(pos);
-					if (str.GetLength() < 2) {
+		m_startpos  = firstframepos;
+		m_framesize = width * height * bpp >> 3;
+
+		mt.majortype  = MEDIATYPE_Video;
+		mt.formattype = FORMAT_VIDEOINFO2;
+
+		VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2));
+
+		memset(vih2, 0, sizeof(VIDEOINFOHEADER2));
+
+		vih2->bmiHeader.biSize        = sizeof(vih2->bmiHeader);
+		vih2->bmiHeader.biWidth       = width;
+		vih2->bmiHeader.biHeight      = height;
+		vih2->bmiHeader.biPlanes      = 1;
+		vih2->bmiHeader.biBitCount    = bpp;
+		vih2->bmiHeader.biSizeImage   = m_framesize;
+		//vih2->rcSource = vih2->rcTarget = CRect(0, 0, width, height);
+		//vih2->dwBitRate      = m_framesize * 8 * fpsnum / fpsden;
+		vih2->AvgTimePerFrame  = 10000000i64 * fpsden / fpsnum;
+		// always tell DirectShow it's interlaced (progressive flags set in IMediaSample struct)
+		vih2->dwInterlaceFlags = AMINTERLACE_IsInterlaced | AMINTERLACE_DisplayModeBobOrWeave;
+
+		sar_x *= width;
+		sar_y *= height;
+		ReduceDim(sar_x, sar_y);
+		vih2->dwPictAspectRatioX = sar_x;
+		vih2->dwPictAspectRatioY = sar_y;
+
+		m_AvgTimePerFrame = vih2->AvgTimePerFrame;
+		m_rtDuration      = (m_pFile->GetLength() - m_startpos) / (sizeof(FRAME_) + m_framesize) * 10000000i64 * fpsden / fpsnum;
+		mt.SetSampleSize(m_framesize);
+
+		vih2->bmiHeader.biCompression = fourcc;
+		mt.subtype = FOURCCMap(fourcc);
+		mts.Add(mt);
+
+		if (fourcc_2) {
+			vih2->bmiHeader.biCompression = fourcc_2;
+			mt.subtype = FOURCCMap(fourcc_2);
+			mts.Add(mt);
+		}
+
+		m_RAWType   = RAW_Y4M;
+		pName = L"YUV4MPEG2 Video Output";
+	}
+
+	if (m_RAWType == RAW_NONE && memcmp(buf, SYNC_MPEG1, sizeof(SYNC_MPEG1)) == 0) {
+		m_pFile->Seek(0);
+		CBaseSplitterFileEx::seqhdr h;
+		if (m_pFile->Read(h, min(MEGABYTE, m_pFile->GetLength()), &mt, false)) {
+			mts.Add(mt);
+
+			if (mt.subtype == MEDIASUBTYPE_MPEG1Payload) {
+				m_RAWType = RAW_MPEG1;
+				pName = L"MPEG1 Video Output";
+			} else {
+				m_RAWType = RAW_MPEG2;
+				pName = L"MPEG2 Video Output";
+			}
+
+			m_AvgTimePerFrame	= h.ifps;
+
+			REFERENCE_TIME rtStart	= INVALID_TIME;
+			REFERENCE_TIME rtStop	= INVALID_TIME;
+
+			__int64 posMin			= 0;
+			__int64 posMax			= 0;
+			// find start PTS
+			{
+				BYTE id = 0x00;
+				m_pFile->Seek(0);
+				while (m_pFile->GetPos() < min(MEGABYTE, m_pFile->GetLength()) && rtStart == INVALID_TIME) {
+					if (!m_pFile->NextMpegStartCode(id)) {
 						continue;
 					}
-					switch (str[0]) {
-						case 'W':
-							width = atoi(str.Mid(1));
-							break;
-						case 'H':
-							height = atoi(str.Mid(1));
-							break;
-						case 'F':
-							k = str.Find(':');
-							fpsnum = atoi(str.Mid(1, k - 1));
-							fpsden = atoi(str.Mid(k + 1));
-							break;
-						case 'I':
-							if (str.GetLength() == 2) {
-								switch (str[1]) {
-									case 'p': interl = 0; break;
-									case 't': interl = 1; break;
-									case 'b': interl = 2; break;
-									case 'm': interl = 3; break;
-								}
-							}
-							break;
-						case 'A':
-							k = str.Find(':');
-							sar_x = atoi(str.Mid(1, k - 1));
-							sar_y = atoi(str.Mid(k + 1));
-							if (sar_x <= 0 || sar_y <= 0) { // if 'A0:0' = unknown or bad value
-								sar_x = sar_y = 1; // then force 'A1:1' = square pixels
-							}
-							break;
-						case 'C':
-							str = str.Mid(1);
-							// 8-bit
-							if (str == "mono") {
-								fourcc		= FCC('Y800');
-								bpp			= 8;
-							}
-							else if (str == "420" || str == "420jpeg" || str == "420mpeg2" || str == "420paldv") {
-								fourcc		= FCC('I420');
-								bpp			= 12;
-							}
-							else if (str == "411") {
-								fourcc		= FCC('Y41B');
-								bpp			= 12;
-							}
-							else if (str == "422") {
-								fourcc		= FCC('Y42B');
-								bpp			= 16;
-							}
-							else if (str == "444") {
-								fourcc		= FCC('444P'); // for libavcodec
-								fourcc_2	= FCC('I444'); // for madVR
-								bpp			= 24;
-							}
-							else { // unsuppurted colour space 
-								fourcc		= 0;
-								bpp			= 0;
-							}
-							break;
-						//case 'X':
-						//	break;
-					}
-				}
 
-				if (width <= 0 || height <= 0 || fpsnum <= 0 || fpsden <= 0 || fourcc == 0) {
-					return E_FAIL; // incorrect or unsuppurted YUV4MPEG2 file
-				}
-
-				m_startpos  = firstframepos;
-				m_framesize = width * height * bpp >> 3;
-
-				mt.majortype  = MEDIATYPE_Video;
-				mt.formattype = FORMAT_VIDEOINFO2;
-
-				VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2));
-
-				memset(vih2, 0, sizeof(VIDEOINFOHEADER2));
-
-				vih2->bmiHeader.biSize        = sizeof(vih2->bmiHeader);
-				vih2->bmiHeader.biWidth       = width;
-				vih2->bmiHeader.biHeight      = height;
-				vih2->bmiHeader.biPlanes      = 1;
-				vih2->bmiHeader.biBitCount    = bpp;
-				vih2->bmiHeader.biSizeImage   = m_framesize;
-				//vih2->rcSource = vih2->rcTarget = CRect(0, 0, width, height);
-				//vih2->dwBitRate      = m_framesize * 8 * fpsnum / fpsden;
-				vih2->AvgTimePerFrame  = 10000000i64 * fpsden / fpsnum;
-				// always tell DirectShow it's interlaced (progressive flags set in IMediaSample struct)
-				vih2->dwInterlaceFlags = AMINTERLACE_IsInterlaced | AMINTERLACE_DisplayModeBobOrWeave;
-
-				sar_x *= width;
-				sar_y *= height;
-				ReduceDim(sar_x, sar_y);
-				vih2->dwPictAspectRatioX = sar_x;
-				vih2->dwPictAspectRatioY = sar_y;
-
-				m_AvgTimePerFrame = vih2->AvgTimePerFrame;
-				m_rtDuration      = (m_pFile->GetLength() - m_startpos) / (sizeof(FRAME_) + m_framesize) * 10000000i64 * fpsden / fpsnum;
-				mt.SetSampleSize(m_framesize);
-
-				vih2->bmiHeader.biCompression = fourcc;
-				mt.subtype = FOURCCMap(fourcc);
-				mts.Add(mt);
-
-				if (fourcc_2) {
-					vih2->bmiHeader.biCompression = fourcc_2;
-					mt.subtype = FOURCCMap(fourcc_2);
-					mts.Add(mt);
-				}
-
-				m_RAWType   = RAW_Y4M;
-			}
-		}
-
-		if (m_RAWType == RAW_NONE) {
-			// check sync bytes ...
-			BYTE sync[5] = { 0 };
-
-			struct {
-				const BYTE		sync[5];
-				const BYTE		count;
-				const RAWType	rawType;
-			} SYNCHDR[] = {
-				{ {0x00, 0x00, 0x00, 0x01, 0x40}, 5, RAW_HEVC  },
-				{ {0x00, 0x00, 0x01, 0xB3},       4, RAW_MPEG1 },
-				{ {0x00, 0x00, 0x00, 0x01},       4, RAW_H264  },
-				{ {0x00, 0x00, 0x01, 0x0F},       4, RAW_VC1   },
-				{ {0x00, 0x00, 0x01, 0x0D},       4, RAW_VC1   },
-			};
-
-			m_pFile->Seek(0);
-			if (SUCCEEDED(m_pFile->ByteRead(sync, _countof(sync)))) {
-				for (size_t i = 0; i < _countof(SYNCHDR); i++) {
-					if (!memcmp(sync, SYNCHDR[i].sync, SYNCHDR[i].count)) {
-						rawType = SYNCHDR[i].rawType;
-						break;
-					}
-				}
-			}
-
-			if (rawType == RAW_NONE) {
-				return E_FAIL;
-			}
-		}
-
-		if (m_RAWType == RAW_NONE && rawType == RAW_MPEG1) {
-			m_pFile->Seek(0);
-			CBaseSplitterFileEx::seqhdr h;
-			if (m_pFile->Read(h, min(MEGABYTE, m_pFile->GetLength()), &mt, false)) {
-				mts.Add(mt);
-
-				m_RAWType			= RAW_MPEG2;
-				if (mt.subtype == MEDIASUBTYPE_MPEG1Payload) {
-					m_RAWType		= RAW_MPEG1;
-				}
-				m_AvgTimePerFrame	= h.ifps;
-
-				REFERENCE_TIME rtStart	= INVALID_TIME;
-				REFERENCE_TIME rtStop	= INVALID_TIME;
-
-				__int64 posMin			= 0;
-				__int64 posMax			= 0;
-				// find start PTS
-				{
-					BYTE id = 0x00;
-					m_pFile->Seek(0);
-					while (m_pFile->GetPos() < min(MEGABYTE, m_pFile->GetLength()) && rtStart == INVALID_TIME) {
-						if (!m_pFile->NextMpegStartCode(id)) {
+					if (id == 0xb8) {	// GOP
+						REFERENCE_TIME rt = 0;
+						__int64 pos = m_pFile->GetPos();
+						if (!ReadGOP(rt)) {
 							continue;
 						}
 
-						if (id == 0xb8) {	// GOP
-							REFERENCE_TIME rt = 0;
-							__int64 pos = m_pFile->GetPos();
-							if (!ReadGOP(rt)) {
-								continue;
-							}
-
-							if (rtStart == INVALID_TIME) {
-								rtStart	= rt;
-								posMin	= pos;
-							}
+						if (rtStart == INVALID_TIME) {
+							rtStart	= rt;
+							posMin	= pos;
 						}
 					}
 				}
+			}
 
-				// find end PTS
-				{
-					BYTE id = 0x00;
-					m_pFile->Seek(m_pFile->GetLength() - min(MEGABYTE, m_pFile->GetLength()));
-					while (m_pFile->GetPos() < m_pFile->GetLength()) {
-						if (!m_pFile->NextMpegStartCode(id)) {
-							continue;
-						}
+			// find end PTS
+			{
+				BYTE id = 0x00;
+				m_pFile->Seek(m_pFile->GetLength() - min(MEGABYTE, m_pFile->GetLength()));
+				while (m_pFile->GetPos() < m_pFile->GetLength()) {
+					if (!m_pFile->NextMpegStartCode(id)) {
+						continue;
+					}
 
-						if (id == 0xb8) {	// GOP
-							__int64 pos = m_pFile->GetPos();
-							if (ReadGOP(rtStop)) {
-								posMax = pos;
-							}
+					if (id == 0xb8) {	// GOP
+						__int64 pos = m_pFile->GetPos();
+						if (ReadGOP(rtStop)) {
+							posMax = pos;
 						}
 					}
 				}
-
-				if (rtStart != INVALID_TIME && rtStop != INVALID_TIME && rtStop > rtStart) {
-					double rate = (double)(posMax - posMin) / (rtStop - rtStart);
-					m_rtNewStop = m_rtStop = m_rtDuration = (REFERENCE_TIME)((double)m_pFile->GetLength() / rate);
-				}
 			}
-		}
 
-		if (m_RAWType == RAW_NONE && rawType == RAW_H264) {
-			m_pFile->Seek(0);
-
-			CBaseSplitterFileEx::avchdr h;
-			if (m_pFile->Read(h, min(MEGABYTE, m_pFile->GetLength()), &mt)) {
-				mts.Add(mt);
-				if (mt.subtype == MEDIASUBTYPE_H264 && SUCCEEDED(CreateAVCfromH264(&mt))) {
-					mts.Add(mt);
-				}
-				m_RAWType = RAW_H264;
+			if (rtStart != INVALID_TIME && rtStop != INVALID_TIME && rtStop > rtStart) {
+				double rate = (double)(posMax - posMin) / (rtStop - rtStart);
+				m_rtNewStop = m_rtStop = m_rtDuration = (REFERENCE_TIME)((double)m_pFile->GetLength() / rate);
 			}
-		
-		}
-
-		if (m_RAWType == RAW_NONE && rawType == RAW_VC1) {
-			BYTE id = 0x00;
-			m_pFile->Seek(0);
-			while (m_pFile->GetPos() < min(MEGABYTE, m_pFile->GetLength()) && m_RAWType == RAW_NONE) {
-				if (!m_pFile->NextMpegStartCode(id)) {
-					continue;
-				}
-
-				if (id == 0x0F) {	// sequence header
-					m_pFile->Seek(m_pFile->GetPos() - 4);
-
-					CBaseSplitterFileEx::vc1hdr h;
-					if (m_pFile->Read(h, 1024, &mt)) {
-						mts.Add(mt);
-						m_RAWType = RAW_VC1;
-					}
-				}
-			}
-		}
-
-		if (m_RAWType == RAW_NONE && rawType == RAW_HEVC) {
-			m_pFile->Seek(0);
-
-			CBaseSplitterFileEx::hevchdr h;
-			if (m_pFile->Read(h, min(MEGABYTE, m_pFile->GetLength()), &mt, false)) {
-				// set 25 fps as default value.
-				// TODO - detect real fps.
-				MPEG2VIDEOINFO* pm2vi		= (MPEG2VIDEOINFO*)mt.pbFormat;
-				pm2vi->hdr.AvgTimePerFrame	= 400000;
-				
-				mts.Add(mt);
-				m_RAWType					= RAW_HEVC;
-			}
-		
 		}
 	}
 
-	if (m_RAWType != RAW_NONE) {
-		CString pName;
-		switch (m_RAWType) {
-			case RAW_MPEG1:
-				pName = L"MPEG1 Video Output";
-				break;
-			case RAW_MPEG2:
-				pName = L"MPEG2 Video Output";
-				break;
-			case RAW_H264:
-				pName = L"H.264/AVC1 Video Output";
-				break;
-			case RAW_VC1:
-				pName = L"VC-1 Video Output";
-				break;
-			case RAW_HEVC:
-				pName = L"H.265/HEVC Video Output";
-				break;
-			case RAW_Y4M:
-				pName = L"YUV4MPEG2 Video Output";
-				break;
-		}
+	if (m_RAWType == RAW_NONE && memcmp(buf, SYNC_H264, sizeof(SYNC_H264)) == 0) {
+		m_pFile->Seek(0);
 
+		CBaseSplitterFileEx::avchdr h;
+		if (m_pFile->Read(h, min(MEGABYTE, m_pFile->GetLength()), &mt)) {
+			mts.Add(mt);
+			if (mt.subtype == MEDIASUBTYPE_H264 && SUCCEEDED(CreateAVCfromH264(&mt))) {
+				mts.Add(mt);
+			}
+			m_RAWType = RAW_H264;
+			pName = L"H.264/AVC1 Video Output";
+		}
+	
+	}
+
+	if (m_RAWType == RAW_NONE && (memcmp(buf, SYNC_VC1_f, sizeof(SYNC_VC1_f)) == 0 || memcmp(buf, SYNC_VC1_d, sizeof(SYNC_VC1_d)) == 0)) {
+		BYTE id = 0x00;
+		m_pFile->Seek(0);
+		while (m_pFile->GetPos() < min(MEGABYTE, m_pFile->GetLength()) && m_RAWType == RAW_NONE) {
+			if (!m_pFile->NextMpegStartCode(id)) {
+				continue;
+			}
+
+			if (id == 0x0F) {	// sequence header
+				m_pFile->Seek(m_pFile->GetPos() - 4);
+
+				CBaseSplitterFileEx::vc1hdr h;
+				if (m_pFile->Read(h, 1024, &mt)) {
+					mts.Add(mt);
+					m_RAWType = RAW_VC1;
+					pName = L"VC-1 Video Output";
+				}
+			}
+		}
+	}
+
+	if (m_RAWType == RAW_NONE && memcmp(buf, SYNC_HEVC, sizeof(SYNC_HEVC)) == 0) {
+		m_pFile->Seek(0);
+
+		CBaseSplitterFileEx::hevchdr h;
+		if (m_pFile->Read(h, min(MEGABYTE, m_pFile->GetLength()), &mt, false)) {
+			// set 25 fps as default value.
+			// TODO - detect real fps.
+			MPEG2VIDEOINFO* pm2vi		= (MPEG2VIDEOINFO*)mt.pbFormat;
+			pm2vi->hdr.AvgTimePerFrame	= 400000;
+			
+			mts.Add(mt);
+			m_RAWType = RAW_HEVC;
+			pName = L"H.265/HEVC Video Output";
+		}
+	}
+
+
+	if (m_RAWType != RAW_NONE) {
 		CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CRawVideoOutputPin(mts, pName, this, this, &hr));
 		EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(0, pPinOut)));
 	}
