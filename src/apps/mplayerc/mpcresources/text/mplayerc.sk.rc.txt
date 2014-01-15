@@ -441,7 +441,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
 5		"Aut. načítanie titulkov"
 6		"Uprednostniť externé titulky, ak sú dostupné"
 8		"Nenačítavať vložené titulky"
@@ -451,6 +451,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
 14		"Otestovať"
 16		"Online-databáza"
 17		"Auto-reload subtitle files after detecting modification"
+18		"Use Subresync"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
@@ -1113,6 +1114,7 @@ STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_RELATIVETO		"Predvolené hodnoty sa nastavia aj v iných štýloch, ak užívateľ nastavenia nezmení"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Ak je použitá vyrovnávacia pamäť pre podobrázky väčšia ako 0, môžu sa titulky animovať. Zablokovaním tejto voľby znížite vyťaženie procesora. Voľbu zablokujte aj v prípade, že titulky blikajú."
 STRING IDC_CHECK_SPCPOW2TEX		"Vypnutie tejto voľby spôsobí menšie vyťažovanie pamäti grafickej karty a zníži prenosovú rýchlosť karty, staršie graf. karty však môžu mať s týmto problémy."
+STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."
 STRING IDC_DSDXR		"Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
 STRING IDC_DSEVR		"Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."
 STRING IDC_DSEVR_CUSTOM		"Same as the EVR, but with the Allocator-Presenter of MPC-BE for subtitling and postprocessing. Recommended for Windows Vista or later."

@@ -441,7 +441,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Berrezarri"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
 5		"Berez-gertatu azpidatziak"
 6		"Hobetsi kanpoko azpidatziak barneko azpidatziei"
 8		"Ezikusi barneratutako azpidatziak"
@@ -451,6 +451,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
 14		"Azterketa"
 16		"Online datubasea"
 17		"Berez-birgertatu azpidatzi agiriak aldaketa atzeman ondoren"
+18		"Use Subresync"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
@@ -1113,6 +1114,7 @@ STRING IDC_CACH_SIZE		"Katxe neurria agiri eragiketarako (kilobyte-tan)"
 STRING IDC_CHECK_RELATIVETO		"Berezko egoera beste estilo batzuetatik lortzen da oraindik zehaztugabe dagoenean."
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Ahalbidetzen du azpidatzi animazioa 0 baino handiagoa den azpirudi buffer bat erabiltzerakoan. Aukera hau ezgaitzeak CPU erabilera gutxiago izango du. Ezgaitu ere azpidatziak keinuka ikusten badituzu."
 STRING IDC_CHECK_SPCPOW2TEX		"Hau ez-hautatzeak bideo oroimen apur bat askatu eta bandazabalera gordetzen du tokian bideo oroimen eskualdaketarako, baina badaiteke ez lan egitea bideo txartel zaharrekin."
+STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."
 STRING IDC_DSDXR		"VMR-9 (aurkezgabe)-ren berdina, baina egizko bi-pasaldi bikubiko birneurriratzaile bat erabiltzen du."
 STRING IDC_DSEVR		"Vista edo berriagoetan bakarrik eskuragarri edo XP-an gutxinez .NET Framework 3.5 ezarrita dagoela."
 STRING IDC_DSEVR_CUSTOM		"EVR-ren berdina, baina MPC-BE-ren Esleitzaile-Aurkezlearekin azpidatzi eta prozesapen-ondorenerako. Gomendatua Windows Vista edo berriagoentzat."

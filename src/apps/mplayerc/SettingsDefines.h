@@ -67,6 +67,7 @@
 #define IDS_RS_PRIORITIZEEXTERNALSUBTITLES	_T("PrioritizeExternalSubtitles")
 #define IDS_RS_DISABLEINTERNALSUBTITLES		_T("DisableInternalSubtitles")
 #define IDS_RS_AUTORELOADEXTSUBTITLES		_T("AutoReloadExtSubtitles")
+#define IDS_RS_USE_SUBRESYNC				_T("UseSubresync")
 #define IDS_RS_SUBTITLEPATHS				_T("SubtitlePaths")
 #define IDS_RS_USEDEFAULTSUBTITLESSTYLE		_T("UseDefaultsubtitlesStyle")
 #define IDS_RS_MPEGINTERLACED				_T("MPEGInterlaced")

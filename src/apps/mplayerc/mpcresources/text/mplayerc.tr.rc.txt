@@ -441,7 +441,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
 5		"Altyazıları oto-yükle"
 6		"Her zaman harici alt yazıları tercih et"
 8		"Gömülü altyazıları yükleme"
@@ -451,6 +451,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
 14		"Dene"
 16		"Çevrimiçi veritabanı"
 17		"Auto-reload subtitle files after detecting modification"
+18		"Use Subresync"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
@@ -1113,6 +1114,7 @@ STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_RELATIVETO		"Varsayılan durum hala tanımsız olduğu için diğer biçimlerden etkileniyor"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"0'dan büyük bir görüntü tamponu kullanırken alt yazı animasyonlarına izin verir. Bu ayarı kapatmak işlemci kullanımını düşürecektir. Eğer alt yazılar parlak gösterilirse, yine ilgili ayarı kapatmanız önerilir."
 STRING IDC_CHECK_SPCPOW2TEX		"Bunu kapatmak yerel video hafızası bant genişliğini korur ve az bir miktar video hafızasını boşaltır, ancak eski ekran kartları ile çalışmayabilir."
+STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."
 STRING IDC_DSDXR		"Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
 STRING IDC_DSEVR		"Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."
 STRING IDC_DSEVR_CUSTOM		"Same as the EVR, but with the Allocator-Presenter of MPC-BE for subtitling and postprocessing. Recommended for Windows Vista or later."

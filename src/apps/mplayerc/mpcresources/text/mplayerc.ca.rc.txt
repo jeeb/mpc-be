@@ -441,7 +441,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
 5		"Carga auto. de subtítols"
 6		"Subtítols externs er defecte si hi són"
 8		"No carregar subtítols incrustats"
@@ -451,6 +451,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
 14		"Provar"
 16		"Base de dades on-line"
 17		"Auto-reload subtitle files after detecting modification"
+18		"Use Subresync"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
@@ -1113,6 +1114,7 @@ STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_RELATIVETO		"L'estat predeterminat s'hereda cap a altres estils encara indeterminats "
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Permet subtítols amb animació al utilitzar una memoria intermitja per sub-imágenes més grans que 0. Inhabilitant auquesta opció es minimitza l'ús de CPU. Inhabilitar també si els subtítols pipillejent."
 STRING IDC_CHECK_SPCPOW2TEX		"Si desmarcas això es llibera una mica de memòria de vídeo i guardes amplada de banda en transferencias de memoria local a memòria de vídeo, però no funcionar amb tarjetas gràficas antigues."
+STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."
 STRING IDC_DSDXR		"Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
 STRING IDC_DSEVR		"Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."
 STRING IDC_DSEVR_CUSTOM		"Same as the EVR, but with the Allocator-Presenter of MPC-BE for subtitling and postprocessing. Recommended for Windows Vista or later."

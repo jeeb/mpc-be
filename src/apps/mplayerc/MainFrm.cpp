@@ -17218,7 +17218,9 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, bool fApplyDefStyle)
 
 	if (m_pCAP) {
 		m_pCAP->SetSubPicProvider(CComQIPtr<ISubPicProvider>(pSubStream));
-		m_wndSubresyncBar.SetSubtitle(pSubStream, m_pCAP->GetFPS());
+		if (s.fUseSybresync) {
+			m_wndSubresyncBar.SetSubtitle(pSubStream, m_pCAP->GetFPS());
+		}
 	}
 }
 
@@ -17253,7 +17255,10 @@ void CMainFrame::ReloadSubtitle()
 		m_pSubStreams.GetNext(pos)->Reload();
 	}
 	UpdateSubtitle();
-	m_wndSubresyncBar.ReloadSubtitle();
+
+	if (AfxGetAppSettings().fUseSybresync) {
+		m_wndSubresyncBar.ReloadSubtitle();
+	}
 }
 
 void CMainFrame::SetSubtitleTrackIdx(int index)

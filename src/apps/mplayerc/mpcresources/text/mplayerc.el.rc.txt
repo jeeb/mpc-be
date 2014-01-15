@@ -441,7 +441,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
 5		"Αυτόματη φόρτωση υποτίτλων"
 6		"Προτίμηση εξωτερικών υπότιτλων πάνω στους ενσωματωμένους υπότιτλους"
 8		"Παράβλεψη ενσωματωμένων υπότιτλων"
@@ -451,6 +451,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
 14		"Έλεγχος"
 16		"Βάση δεδομένων σε σύνδεση"
 17		"Auto-reload subtitle files after detecting modification"
+18		"Use Subresync"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
@@ -1117,6 +1118,7 @@ STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_RELATIVETO		"Η προεπιλεγμένη τιμή χρησιμοποιείται και σε άλλα στυλ, όπου δεν έχει καθοριστεί"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Επιτρέπετε η κίνηση του υπότιτλου όταν χρησιμοποιείται μια προσωρινή επιμέρους εικόνα μεγαλύτερη από 0. Η απενεργοποίηση αυτής της επιλογής θα μειώσει τη χρήση της CPU. Επίσης να το απενεργοποιήσετε εάν οι υπότιτλοι αναβοσβήνουν."
 STRING IDC_CHECK_SPCPOW2TEX		"Αν το αποεπιλέξετε αυτό, απελευθερώνετε λίγη μνήμη βίντεο και εξοικονομείται εύρος ζώνης μεταφοράς βίντεο στην τοπική μνήμη, αλλά μπορεί να μην λειτουργεί με παλαιότερες κάρτες γραφικών."
+STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."
 STRING IDC_DSDXR		"Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
 STRING IDC_DSEVR		"Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."
 STRING IDC_DSEVR_CUSTOM		"Same as the EVR, but with the Allocator-Presenter of MPC-BE for subtitling and postprocessing. Recommended for Windows Vista or later."

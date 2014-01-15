@@ -441,7 +441,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
 5		"Wczytywanie napisów"
 6		"Wczytywanie zewnętrznych napisów zamiast zawartych w kontenerze"
 8		"Zaniechanie wczytywania napisów zawartych w kontenerze"
@@ -451,6 +451,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
 14		"Przetestuj"
 16		"Internetowa baza napisów"
 17		"Auto-reload subtitle files after detecting modification"
+18		"Use Subresync"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
@@ -1112,6 +1113,7 @@ STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_RELATIVETO		"Umieszcza napisy na ekranie zależnie od rozmiaru i położenia obrazu. Domyślny stan zostanie przypisany innym stylom w których nie został zdefiniowany."
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Wyświetla animacje napisów w przypadku, gdy liczba buforowanych wierszy jest większa od zera. Zmniejsza w niewielkim stopniu obciążenie procesora. Opcja pomocna w przypadku, gdy napisy migają."
 STRING IDC_CHECK_SPCPOW2TEX		"Odznaczenie opcji zmniejsza w niewielkim stopniu ilość używanej pamięci karty graficznej oraz wielkość transferu do niej. Może nie działać ze starszymi kartami graficznymi."
+STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."
 STRING IDC_DSDXR		"Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
 STRING IDC_DSEVR		"Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."
 STRING IDC_DSEVR_CUSTOM		"Same as the EVR, but with the Allocator-Presenter of MPC-BE for subtitling and postprocessing. Recommended for Windows Vista or later."

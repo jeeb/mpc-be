@@ -569,6 +569,7 @@
 #define IDC_PLAYERSTATUS                10626
 #define IDC_PLAYERTIME                  10627
 #define IDC_EDITLIST                    10628
+#define IDC_CHECK_SUBRESYNC             10629
 #define IDC_DSSYSDEF                    10700
 #define IDC_DSOVERLAYMIXER              10702
 #define IDC_DSVMR7WIN                   10703

@@ -1094,12 +1094,13 @@ BEGIN
     EDITTEXT        IDC_EDIT1,10,30,224,13,ES_AUTOHSCROLL
     GROUPBOX        "Autoload paths",IDC_STATIC,5,17,286,31
     PUSHBUTTON      "Reset",IDC_BUTTON1,237,30,50,13
-    LTEXT           "Base URL of the online subtitle database:",IDC_STATIC,10,101,222,8
-    COMBOBOX        IDC_COMBO1,35,113,199,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Test",IDC_BUTTON2,237,112,50,14
-    LTEXT           "http://",IDC_STATIC,10,115,22,8
-    GROUPBOX        "Online database",IDC_STATIC,5,90,286,45
+    LTEXT           "Base URL of the online subtitle database:",IDC_STATIC,10,113,222,8
+    COMBOBOX        IDC_COMBO1,35,125,199,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Test",IDC_BUTTON2,237,124,50,14
+    LTEXT           "http://",IDC_STATIC,10,127,22,8
+    GROUPBOX        "Online database",IDC_STATIC,5,102,286,45
     CONTROL         "Auto-reload subtitle files after detecting modification",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,76,285,8
+    CONTROL         "Use Subresync",IDC_CHECK_SUBRESYNC,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,5,88,285,8
 END
 
 IDD_UPDATE_DIALOG DIALOGEX 0, 0, 238, 60
@@ -2475,6 +2476,7 @@ BEGIN
     IDC_CHECK_SPCANIMWITHBUFFER 
                             "Allows subtitle animation when using a subpicture buffer larger than 0. Disabling this option will lower CPU usage. Also disable if you experience flashing subtitles."
     IDC_BUTTON_EXT_SET      "After clicking this button, the checked state of the format group will reflect the actual file association for MPC-BE. A newly added extension will usually make it grayed, so don't forget to check it again before closing this dialog!"
+    IDC_CHECK_SUBRESYNC     "Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."
 END
 
 STRINGTABLE

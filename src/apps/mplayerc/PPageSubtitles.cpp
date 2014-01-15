@@ -32,6 +32,7 @@ CPPageSubtitles::CPPageSubtitles()
 	, m_fPrioritizeExternalSubtitles(FALSE)
 	, m_fDisableInternalSubtitles(FALSE)
 	, m_fAutoReloadExtSubtitles(FALSE)
+	, m_fUseSybresync(FALSE)
 {
 
 }
@@ -48,6 +49,7 @@ void CPPageSubtitles::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK1, m_fPrioritizeExternalSubtitles);
 	DDX_Check(pDX, IDC_CHECK2, m_fDisableInternalSubtitles);
 	DDX_Check(pDX, IDC_CHECK3, m_fAutoReloadExtSubtitles);
+	DDX_Check(pDX, IDC_CHECK_SUBRESYNC, m_fUseSybresync);
 	DDX_Text(pDX, IDC_EDIT1, m_szAutoloadPaths);
 	DDX_Control(pDX, IDC_COMBO1, m_ISDbCombo);
 	DDX_CBString(pDX, IDC_COMBO1, m_ISDb);
@@ -63,6 +65,7 @@ BOOL CPPageSubtitles::OnInitDialog()
 	m_fPrioritizeExternalSubtitles	= s.fPrioritizeExternalSubtitles;
 	m_fDisableInternalSubtitles		= s.fDisableInternalSubtitles;
 	m_fAutoReloadExtSubtitles		= s.fAutoReloadExtSubtitles;
+	m_fUseSybresync					= s.fUseSybresync;
 	m_szAutoloadPaths				= s.strSubtitlePaths;
 
 	m_ISDb = s.strISDb;
@@ -73,6 +76,8 @@ BOOL CPPageSubtitles::OnInitDialog()
 	}
 
 	UpdateData(FALSE);
+
+	CreateToolTip();
 
 	return TRUE;
 }
@@ -87,6 +92,7 @@ BOOL CPPageSubtitles::OnApply()
 	s.fPrioritizeExternalSubtitles	= !!m_fPrioritizeExternalSubtitles;
 	s.fDisableInternalSubtitles		= !!m_fDisableInternalSubtitles;
 	s.fAutoReloadExtSubtitles		= !!m_fAutoReloadExtSubtitles;
+	s.fUseSybresync					= !!m_fUseSybresync;
 	s.strSubtitlePaths				= m_szAutoloadPaths;
 
 	s.strISDb = m_ISDb;

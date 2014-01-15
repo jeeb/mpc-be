@@ -441,7 +441,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
 5		"자막파일을 자동으로 열기"
 6		"항상 외부 자막보기(사용가능한경우)"
 8		"내장 자막 불러오지않음"
@@ -451,6 +451,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
 14		"테스트"
 16		"온라인 데이터베이스"
 17		"변경사항 탐지후 자막 파일 자동 다시 불러오기"
+18		"Use Subresync"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
@@ -1113,6 +1114,7 @@ STRING IDC_CACH_SIZE		"파일 작업용 캐시크기(킬로바이트)"
 STRING IDC_CHECK_RELATIVETO		"기본 상태가 다른 스타일을 상속합니다."
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"서브픽쳐 버퍼가 0보다 클때 자막 애니메이션을 허용합니다. 이 옵션을 선택하면 CPU사용률이 증가할수있습니다. 자막이 깜박이거나 비정상적으로 출력되면 이 옵션을 해제하십시오."
 STRING IDC_CHECK_SPCPOW2TEX		"이것을 선택하지않으면 비디오 메모리 및 전송대역을 절약하지만, 구형 비디오 카드에서는 동작하지 않을수 있습니다."
+STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."
 STRING IDC_DSDXR		"VMR-9 (renderless)와 같지만 true two-pass bicubic resizer 사용."
 STRING IDC_DSEVR		"최소한 Vista 이상이나 XP(.NET Framework 3.5)에서만 사용가능."
 STRING IDC_DSEVR_CUSTOM		"EVR(자막과 후처리를 위해 MPC-BE 의 Allocator-Presenter 사용). 비스타 이상을 추천."

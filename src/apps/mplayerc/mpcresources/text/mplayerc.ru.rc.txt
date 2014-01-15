@@ -441,7 +441,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Сброс"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
 5		"Автозагрузка субтитров"
 6		"Всегда использовать внешние субтитры как основные"
 8		"Не использовать встроенные субтитры"
@@ -451,6 +451,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
 14		"Тест"
 16		"База данных в интернете"
 17		"Автоматическое переоткрытие файлов с субтитрами в случае изменения"
+18		"Use Subresync"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
@@ -1113,6 +1114,7 @@ STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_RELATIVETO		"Стандартное состояние наследуется другими стилями там, где оно ещё не определено."
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Позволяет анимировать субтитры, если число кэшируемых страниц больше 0. Отключение опции освобождает немного ресурсов ЦПУ. Отключите, если присутствует мерцание субтитров"
 STRING IDC_CHECK_SPCPOW2TEX		"Отключение этой опции освобождает немного видеопамяти и освобождает полосу пропускания на перемещениях из локальной памяти в видеoпамять, но может не работать на старых видеокартах."
+STRING IDC_CHECK_SUBRESYNC		"Позволяет просматривать и редактировать субтитры(включая временные метки), осуществлять навигацию по субтитрам. Но - может существенно замедлить время их загрузки."
 STRING IDC_DSDXR		"То же, что и VMR-9 (renderless), но использует двухпроходное бикубическое изменения размера."
 STRING IDC_DSEVR		"Только для Vista или новее. Возможен на XP с установленным .NET Framework 3.5"
 STRING IDC_DSEVR_CUSTOM		"То же, что и EVR, но использует Allocator-Presenter для субтитров и обработки. Рекомендуется для Windows Vista и новее."

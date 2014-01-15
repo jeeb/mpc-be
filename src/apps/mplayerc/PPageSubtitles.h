@@ -38,6 +38,7 @@ public:
 	BOOL m_fPrioritizeExternalSubtitles;
 	BOOL m_fDisableInternalSubtitles;
 	BOOL m_fAutoReloadExtSubtitles;
+	BOOL m_fUseSybresync;
 	CString m_szAutoloadPaths;
 	CComboBox m_ISDbCombo;
 	CString m_ISDb;
