@@ -27,8 +27,6 @@
 #define RawVideoSplitterName	L"MPC RAW Video Splitter"
 #define RawVideoSourceName		L"MPC RAW Video Source"
 
-#define ENABLE_YUV4MPEG2		1
-
 class __declspec(uuid("486AA463-EE67-4F75-B941-F1FAB217B342"))
 	CRawVideoSplitterFilter : public CBaseSplitterFilter
 {
@@ -39,9 +37,7 @@ class __declspec(uuid("486AA463-EE67-4F75-B941-F1FAB217B342"))
 		RAW_H264,
 		RAW_VC1,
 		RAW_HEVC,
-#if ENABLE_YUV4MPEG2
 		RAW_Y4M
-#endif
 	} RAWType;
 	RAWType m_RAWType;
 

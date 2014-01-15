@@ -60,9 +60,7 @@ STDAPI DllRegisterServer()
 	chkbytes.AddTail(_T("0,4,,0000010F"));		// VC-1
 	chkbytes.AddTail(_T("0,4,,0000010D"));		// VC-1
 	chkbytes.AddTail(_T("0,5,,0000000140"));	// H.265/HEVC
-#if ENABLE_YUV4MPEG2
 	chkbytes.AddTail(_T("0,9,,595556344D50454732")); // YUV4MPEG2
-#endif
 
 	RegisterSourceFilter(
 		CLSID_AsyncReader,
@@ -91,9 +89,7 @@ CFilterApp theApp;
 
 #endif
 
-#if ENABLE_YUV4MPEG2
 static const BYTE FRAME_[6] = {'F','R','A','M','E',0x0A};
-#endif
 
 //
 // CRawVideoSplitterFilter
@@ -178,7 +174,6 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	{
 		RAWType rawType = RAW_NONE;
 
-#if ENABLE_YUV4MPEG2
 		{
 			static const BYTE YUV4MPEG2_[10] = {'Y','U','V','4','M','P','E','G','2',0x20};
 			BYTE buf[256] = {0};
@@ -324,7 +319,6 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				m_RAWType   = RAW_Y4M;
 			}
 		}
-#endif
 
 		if (m_RAWType == RAW_NONE) {
 			// check sync bytes ...
@@ -492,11 +486,9 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			case RAW_HEVC:
 				pName = L"H.265/HEVC Video Output";
 				break;
-#if ENABLE_YUV4MPEG2
 			case RAW_Y4M:
 				pName = L"YUV4MPEG2 Video Output";
 				break;
-#endif
 		}
 
 		CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CRawVideoOutputPin(mts, pName, this, this, &hr));
@@ -520,7 +512,6 @@ bool CRawVideoSplitterFilter::DemuxInit()
 
 void CRawVideoSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
-#if ENABLE_YUV4MPEG2
 	if (m_RAWType == RAW_Y4M) {
 		if (rt <= 0) {
 			m_pFile->Seek(m_startpos);
@@ -532,7 +523,6 @@ void CRawVideoSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		}
 		return;
 	}
-#endif
 
 	if (rt <= 0 || m_rtDuration <= 0) {
 		m_pFile->Seek(0);
@@ -552,7 +542,6 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 		p->TrackNumber	= 0;
 		p->bSyncPoint	= FALSE;
 
-#if ENABLE_YUV4MPEG2
 		if (m_RAWType == RAW_Y4M) {
 
 			if (m_pFile->GetRemaining() < m_framesize + (int)sizeof(FRAME_)) {
@@ -574,7 +563,6 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 			hr = DeliverPacket(p);
 			continue;
 		}
-#endif
 
 		size_t size		= min(64 * KILOBYTE, m_pFile->GetRemaining());
 

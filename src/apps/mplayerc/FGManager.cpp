@@ -2056,10 +2056,8 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->m_extensions.AddTail(_T(".265"));
 		pFGF->m_extensions.AddTail(_T(".hm10"));
 		pFGF->m_extensions.AddTail(_T(".hevc"));
-#if ENABLE_YUV4MPEG2
 		// YUV4MPEG2
 		pFGF->m_chkbytes.AddTail(_T("0,9,,595556344D50454732"));
-#endif
 		m_source.AddTail(pFGF);
 	}
 
