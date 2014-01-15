@@ -1112,11 +1112,6 @@ static int mjpeg_decode_scan(MJpegDecodeContext *s, int nb_components, int Ah,
     if (mb_bitmask)
         init_get_bits(&mb_bitmask_gb, mb_bitmask, s->mb_width * s->mb_height);
 
-    if (s->flipped && s->avctx->lowres) {
-        av_log(s->avctx, AV_LOG_ERROR, "Can not flip image with lowres\n");
-        s->flipped = 0;
-    }
-
     s->restart_count = 0;
 
     for (i = 0; i < nb_components; i++) {
@@ -1909,15 +1904,6 @@ eoi_parser:
             }
             if ((ret = av_frame_ref(frame, s->picture_ptr)) < 0)
                 return ret;
-            if (s->flipped) {
-                int i;
-                for (i = 0; frame->data[i]; i++) {
-                    int h = frame->height >> ((i == 1 || i == 2) ?
-                                              s->pix_desc->log2_chroma_h : 0);
-                    frame->data[i] += frame->linesize[i] * (h - 1);
-                    frame->linesize[i] *= -1;
-                }
-            }
             *got_frame = 1;
             s->got_picture = 0;
 
@@ -2009,13 +1995,13 @@ the_end:
             dst -= s->linesize[s->upscale_v];
         }
     }
-    if (s->flipped && (s->avctx->flags & CODEC_FLAG_EMU_EDGE)) {
+    if (s->flipped) {
         int j;
         avcodec_get_chroma_sub_sample(s->avctx->pix_fmt, &hshift, &vshift);
         for (index=0; index<4; index++) {
             uint8_t *dst = s->picture_ptr->data[index];
-            int w = s->width;
-            int h = s->height;
+            int w = s->picture_ptr->width;
+            int h = s->picture_ptr->height;
             if(index && index<3){
                 w = FF_CEIL_RSHIFT(w, hshift);
                 h = FF_CEIL_RSHIFT(h, vshift);
