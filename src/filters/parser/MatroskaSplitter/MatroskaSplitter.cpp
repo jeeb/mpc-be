@@ -69,7 +69,7 @@ STDAPI DllRegisterServer()
 		__uuidof(CMatroskaSourceFilter),
 		MEDIASUBTYPE_Matroska,
 		_T("0,4,,1A45DFA3"),
-		_T(".mkv"), _T(".mka"), _T(".mks"), NULL);
+		, NULL);
 
 	return AMovieDllRegisterServer2(TRUE);
 }
