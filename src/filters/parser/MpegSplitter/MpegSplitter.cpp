@@ -1266,66 +1266,59 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		REFERENCE_TIME rtmin	= rtmax - UNITS/2;
 
 		if (!m_pFile->bIsBadPacked) {
-			for (int type = CMpegSplitterFile::stream_type::video; type <= CMpegSplitterFile::stream_type::audio; type++) {
+			POSITION pos = pMasterStream->GetHeadPosition();
+			while (pos) {
+				DWORD TrackNum = pMasterStream->GetNext(pos);
 
-				POSITION pos = m_pFile->m_streams[type].GetHeadPosition();
-				while (pos) {
-					DWORD TrackNum = m_pFile->m_streams[type].GetNext(pos);
+				CBaseSplitterOutputPin* pPin = GetOutputPin(TrackNum);
+				if (pPin && pPin->IsConnected()) {
+					m_pFile->Seek(seekpos);
+					__int64 curpos = seekpos;
 
-					CBaseSplitterOutputPin* pPin = GetOutputPin(TrackNum);
-					if (pPin && pPin->IsConnected()) {
-						m_pFile->Seek(seekpos);
-						__int64 curpos = seekpos;
-
-						if (m_pFile->m_type == mpeg_ts) {
-							double div = 1.0;
-							for (;;) {
-								REFERENCE_TIME rt2 = m_pFile->NextPTS(TrackNum);
-								if (rt2 == INVALID_TIME) {
-									break;
-								}
-
-								if (rtmin <= rt2 && rt2 <= rtmax) {
-									minseekpos = curpos;
-									break;
-								}
-
-								REFERENCE_TIME dt = rt2 - rtmax;
-								if (rt2 < 0) {
-									dt = 20*UNITS / div;
-								}
-								dt /= div;
-								div += 0.05;
-
-								if (div >= 5.0) {
-									break;
-								}
-
-								curpos -= (__int64)(1.0*dt/m_rtDuration*len);
-								m_pFile->Seek(curpos);
+					if (m_pFile->m_type == mpeg_ts) {
+						double div = 1.0;
+						for (;;) {
+							REFERENCE_TIME rt2 = m_pFile->NextPTS(TrackNum);
+							if (rt2 == INVALID_TIME) {
+								break;
 							}
-						} else {
-							for (int j = 0; j < 10; j++) {
-								REFERENCE_TIME rt2 = m_pFile->NextPTS(TrackNum);
-								if (rt2 < 0) {
-									break;
-								}
 
-								if (rtmin <= rt2 && rt2 <= rtmax) {
-									minseekpos = curpos;
-									break;
-								}
-
-								REFERENCE_TIME dt = rt2 - rtmax;
-								curpos -= (__int64)(1.0*dt/m_rtDuration*len);
-								m_pFile->Seek(curpos);
+							if (rtmin <= rt2 && rt2 <= rtmax) {
+								minseekpos = curpos;
+								break;
 							}
+
+							REFERENCE_TIME dt = rt2 - rtmax;
+							if (rt2 < 0) {
+								dt = 20*UNITS / div;
+							}
+							dt /= div;
+							div += 0.05;
+
+							if (div >= 5.0) {
+								break;
+							}
+
+							curpos -= (__int64)(1.0*dt/m_rtDuration*len);
+							m_pFile->Seek(curpos);
+						}
+					} else {
+						for (int j = 0; j < 10; j++) {
+							REFERENCE_TIME rt2 = m_pFile->NextPTS(TrackNum);
+							if (rt2 < 0) {
+								break;
+							}
+
+							if (rtmin <= rt2 && rt2 <= rtmax) {
+								minseekpos = curpos;
+								break;
+							}
+
+							REFERENCE_TIME dt = rt2 - rtmax;
+							curpos -= (__int64)(1.0*dt/m_rtDuration*len);
+							m_pFile->Seek(curpos);
 						}
 					}
-				}
-
-				if (minseekpos != _I64_MIN) {
-					break;
 				}
 			}
 		}
