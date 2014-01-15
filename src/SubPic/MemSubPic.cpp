@@ -392,9 +392,9 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	CRect rs(*pSrc), rd(*pDst);
 
 	if (dst.h < 0) {
-		dst.h = -dst.h;
-		rd.bottom = dst.h - rd.bottom;
-		rd.top = dst.h - rd.top;
+		dst.h		= -dst.h;
+		rd.bottom	= dst.h - rd.bottom;
+		rd.top		= dst.h - rd.top;
 	}
 
 	if (rs.Width() != rd.Width() || rs.Height() != abs(rd.Height())) {
@@ -402,16 +402,20 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	}
 
 	int w = rs.Width(), h = rs.Height();
-	BYTE* s = (BYTE*)src.bits + src.pitch*rs.top + rs.left*4;
-	BYTE* d = (BYTE*)dst.bits + dst.pitch*rd.top + ((rd.left*dst.bpp)>>3);
+	BYTE* s = (BYTE*)src.bits + src.pitch * rs.top + ((rs.left * src.bpp) >> 3); //rs.left * 4;
+	BYTE* d = (BYTE*)dst.bits + dst.pitch * rd.top + ((rd.left * dst.bpp) >> 3);
 
 	if (rd.top > rd.bottom) {
 		if (dst.type == MSP_RGB32 || dst.type == MSP_RGB24
 				|| dst.type == MSP_RGB16 || dst.type == MSP_RGB15
 				|| dst.type == MSP_YUY2 || dst.type == MSP_AYUV) {
-			d = (BYTE*)dst.bits + dst.pitch*(rd.top-1) + (rd.left*dst.bpp>>3);
+			d = (BYTE*)dst.bits + dst.pitch * (rd.top - 1) + (rd.left * dst.bpp >> 3);
 		} else if (dst.type == MSP_YV12 || dst.type == MSP_IYUV) {
-			d = (BYTE*)dst.bits + dst.pitch*(rd.top-1) + (rd.left*8>>3);
+			d = (BYTE*)dst.bits + dst.pitch * (rd.top - 1) + (rd.left * 8 >> 3);
+		} else if (dst.type == MSP_NV12) {
+			d = (BYTE*)dst.bits + dst.pitch * (rd.top - 1) + rd.left;
+		} else if (dst.type == MSP_P010 || dst.type == MSP_P016) {
+			d = (BYTE*)dst.bits + dst.pitch * (rd.top - 1) + rd.left * 2;
 		} else {
 			return E_NOTIMPL;
 		}
@@ -430,8 +434,8 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 				for(ptrdiff_t j = 0; j < h; j++, s += src.pitch, d += dst.pitch) 
 				{
 					BYTE* s2 = s;
-					BYTE* s2end = s2 + w*4;
-					WORD* d2 = reinterpret_cast<WORD*>(d);
+					BYTE* s2end = s2 + w * 4;
+					WORD* d2 = (WORD*)d;
 					for(; s2 < s2end; s2 += 4, d2++) 
 					{
 						if(s2[3] < 0xff) 
@@ -440,7 +444,7 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 							WORD dstLum = d2[0] >> 8;
 
 							// Perform calculation in 8-bit.
-							WORD result = (((dstLum-0x10)*s2[3])>>8) + s2[1];
+							WORD result = (((dstLum - 0x10) * s2[3]) >> 8) + s2[1];
 
 							// Convert to 10/16 bit value.
 							d2[0] = result << 8;
@@ -453,7 +457,7 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 		case MSP_RGBA:
 				for (ptrdiff_t j = 0; j < h; j++, s += src.pitch, d += dst.pitch) {
 					BYTE* s2 = s;
-					BYTE* s2end = s2 + w*4;
+					BYTE* s2end = s2 + w * 4;
 					DWORD* d2 = (DWORD*)d;
 					for (; s2 < s2end; s2 += 4, d2++) {
 						if (s2[3] < 0xff) {
@@ -493,13 +497,13 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 		case MSP_RGB24:
 				for (ptrdiff_t j = 0; j < h; j++, s += src.pitch, d += dst.pitch) {
 					BYTE* s2 = s;
-					BYTE* s2end = s2 + w*4;
+					BYTE* s2end = s2 + w * 4;
 					BYTE* d2 = d;
 					for (; s2 < s2end; s2 += 4, d2 += 3) {
 						if (s2[3] < 0xff) {
-							d2[0] = ((d2[0]*s2[3])>>8) + s2[0];
-							d2[1] = ((d2[1]*s2[3])>>8) + s2[1];
-							d2[2] = ((d2[2]*s2[3])>>8) + s2[2];
+							d2[0] = ((d2[0] *s2[3]) >> 8) + s2[0];
+							d2[1] = ((d2[1] *s2[3]) >> 8) + s2[1];
+							d2[2] = ((d2[2] *s2[3]) >> 8) + s2[2];
 						}
 					}
 				}
@@ -547,11 +551,11 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 		case MSP_IYUV:
 					for (ptrdiff_t j = 0; j < h; j++, s += src.pitch, d += dst.pitch) {
 						BYTE* s2 = s;
-						BYTE* s2end = s2 + w*4;
+						BYTE* s2end = s2 + w * 4;
 						BYTE* d2 = d;
 						for (; s2 < s2end; s2 += 4, d2++) {
 							if (s2[3] < 0xff) {
-								d2[0] = (((d2[0]-0x10)*s2[3])>>8) + s2[1];
+								d2[0] = (((d2[0] - 0x10) * s2[3]) >> 8) + s2[1];
 							}
 						}
 					}
