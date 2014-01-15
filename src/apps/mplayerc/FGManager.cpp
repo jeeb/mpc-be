@@ -1882,8 +1882,9 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	if (src[SRC_AVI] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAviSourceFilter>();
-		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,41564920"));
-		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,41564958"));
+		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,41564920")); // 'RIFFxxxxAVI '
+		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,41564958")); // 'RIFFxxxxAVIX'
+		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,414D5620")); // 'RIFFxxxxAMV '
 		m_source.AddTail(pFGF);
 	}
 
