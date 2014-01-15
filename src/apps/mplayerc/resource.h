@@ -417,7 +417,6 @@
 #define IDD_PPAGEVIDREND                10038
 #define IDD_PPAGEOUTPUT                 10039
 #define IDD_PPAGEWEBSERVER              10040
-#define IDD_PPAGESUBDB                  10042
 #define IDD_SAVETEXTFILEDIALOGTEMPL     10043
 #define IDD_CAPTURE_DLG                 10045
 #define IDD_ADDREGFILTER                10046
