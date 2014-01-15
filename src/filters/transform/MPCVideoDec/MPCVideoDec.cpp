@@ -2626,7 +2626,7 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 				int nWidth	= PictWidthRounded();
 				int nHeight	= PictHeightRounded();
 
-				if (m_pParser) {
+				if (m_nCodecId == AV_CODEC_ID_H264 && m_pParser) {
 					hr = SoftwareDecode(pIn, pDataIn, nSize, rtStart, rtStop);
 				} else {
 					hr = m_pDXVADecoder->DecodeFrame(pDataIn, nSize, rtStart, rtStop);
