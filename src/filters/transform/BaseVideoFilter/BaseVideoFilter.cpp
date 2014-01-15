@@ -25,6 +25,7 @@
 #include "BaseVideoFilter.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/MediaTypes.h"
+#include "../MPCVideoDec/memcpy_sse.h"
 
 #include <InitGuid.h>
 #include <moreuuids.h>
@@ -36,7 +37,7 @@ static inline bool BitBltFromP016ToP016(size_t w, size_t h, BYTE* dstY, BYTE* ds
 		BYTE* src = srcY + row * srcPitch;
 		BYTE* dst = dstY + row * dstPitch;
 		
-		memcpy(dst, src, dstPitch);
+		memcpy_sse(dst, src, dstPitch);
 	}
 
 	// Copy UV plane. UV plane is half height.
@@ -44,7 +45,7 @@ static inline bool BitBltFromP016ToP016(size_t w, size_t h, BYTE* dstY, BYTE* ds
 		BYTE* src = srcUV + row * srcPitch;
 		BYTE* dst = dstUV + row * dstPitch;
 
-		memcpy(dst, src, dstPitch);
+		memcpy_sse(dst, src, dstPitch);
 	}
 
 	return true;
@@ -395,7 +396,7 @@ HRESULT CBaseVideoFilter::CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, int 
 		} else if (bihOut.biCompression == BI_RGB || bihOut.biCompression == BI_BITFIELDS) {
 			if (!BitBltFromI420ToRGB(w, h, pOut, pitchOut, bihOut.biBitCount, pIn, pInU, pInV, pitchIn)) {
 				for (int y = 0; y < h; y++, pOut += pitchOut) {
-					memset(pOut, 0, pitchOut);
+					memsetd(pOut, 0, pitchOut);
 				}
 			}
 		}
@@ -420,7 +421,7 @@ HRESULT CBaseVideoFilter::CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, int 
 		} else if (bihOut.biCompression == BI_RGB || bihOut.biCompression == BI_BITFIELDS) {
 			if (!BitBltFromYUY2ToRGB(w, h, pOut, pitchOut, bihOut.biBitCount, ppIn[0], pitchIn)) {
 				for (int y = 0; y < h; y++, pOut += pitchOut) {
-					memset(pOut, 0, pitchOut);
+					memsetd(pOut, 0, pitchOut);
 				}
 			}
 		}
@@ -436,7 +437,7 @@ HRESULT CBaseVideoFilter::CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, int 
 		} else if (bihOut.biCompression == BI_RGB || bihOut.biCompression == BI_BITFIELDS) {
 			if (!BitBltFromRGBToRGB(w, h, pOut, pitchOut, bihOut.biBitCount, ppIn[0], pitchIn, sbpp)) {
 				for (int y = 0; y < h; y++, pOut += pitchOut) {
-					memset(pOut, 0, pitchOut);
+					memsetd(pOut, 0, pitchOut);
 				}
 			}
 		}

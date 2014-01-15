@@ -25,6 +25,7 @@
 #include "Scale2x.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/MediaTypes.h"
+#include "..//MPCVideoDec/memcpy_sse.h"
 
 #include <InitGuid.h>
 #include <moreuuids.h>
@@ -162,7 +163,7 @@ HRESULT CDirectVobSubFilter::Copy(BYTE* pSub, BYTE* pIn, CSize sub, CSize in, in
 		} else {
 			for (ptrdiff_t k = min(j, hSub); i < k; i++, pIn += pitchIn, pSub += pitchSub) {
 				memsetd(pSub, black, dpLeft);
-				memcpy(pSub + dpLeft, pIn, dpMid);
+				memcpy_sse(pSub + dpLeft, pIn, dpMid);
 				memsetd(pSub + dpLeft+dpMid, black, dpRight);
 			}
 		}

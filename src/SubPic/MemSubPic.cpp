@@ -24,6 +24,7 @@
 
 // For CPUID usage
 #include "../DSUtil/vd.h"
+#include "../filters/transform/MPCVideoDec/memcpy_sse.h"
 #include <emmintrin.h>
 
 // color conv
@@ -96,7 +97,7 @@ CMemSubPic::CMemSubPic(SubPicDesc& spd)
 
 CMemSubPic::~CMemSubPic()
 {
-	delete [] m_spd.bits, m_spd.bits = NULL;
+	SAFE_DELETE_ARRAY(m_spd.bits);
 }
 
 // ISubPic
@@ -134,11 +135,11 @@ STDMETHODIMP CMemSubPic::CopyTo(ISubPic* pSubPic)
 	}
 
 	int w = m_rcDirty.Width(), h = m_rcDirty.Height();
-	BYTE* s = (BYTE*)src.bits + src.pitch*m_rcDirty.top + m_rcDirty.left*4;
-	BYTE* d = (BYTE*)dst.bits + dst.pitch*m_rcDirty.top + m_rcDirty.left*4;
+	BYTE* s = (BYTE*)src.bits + src.pitch*m_rcDirty.top + m_rcDirty.left * 4;
+	BYTE* d = (BYTE*)dst.bits + dst.pitch*m_rcDirty.top + m_rcDirty.left * 4;
 
 	for (ptrdiff_t j = 0; j < h; j++, s += src.pitch, d += dst.pitch) {
-		memcpy(d, s, w*4);
+		memcpy_sse(d, s, w * 4);
 	}
 
 	return S_OK;
