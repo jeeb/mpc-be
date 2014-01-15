@@ -29,6 +29,26 @@
 #include <InitGuid.h>
 #include <moreuuids.h>
 
+static inline bool BitBltFromP016ToP016(size_t w, size_t h, BYTE* dstY, BYTE* dstUV, int dstPitch, BYTE* srcY, BYTE* srcUV, int srcPitch)
+{
+	// Copy Y plane
+	for (size_t row = 0; row < h; row++) {
+		BYTE* src = srcY + row * srcPitch;
+		BYTE* dst = dstY + row * dstPitch;
+		
+		memcpy(dst, src, dstPitch);
+	}
+
+	// Copy UV plane. UV plane is half height.
+	for (size_t row = 0; row < h / 2; row++) {
+		BYTE* src = srcUV + row * srcPitch;
+		BYTE* dst = dstUV + row * dstPitch;
+
+		memcpy(dst, src, dstPitch);
+	}
+
+	return true;
+}
 //
 // CBaseVideoFilter
 //
@@ -305,7 +325,7 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 HRESULT CBaseVideoFilter::CopyBuffer(BYTE* pOut, BYTE* pIn, int w, int h, int pitchIn, const GUID& subtype, bool fInterlaced)
 {
 	int abs_h = abs(h);
-	BYTE* pInYUV[3] = {pIn, pIn + pitchIn*abs_h, pIn + pitchIn*abs_h + (pitchIn>>1)*(abs_h>>1)};
+	BYTE* pInYUV[3] = {pIn, pIn + pitchIn * abs_h, pIn + pitchIn * abs_h + (pitchIn >> 1) * (abs_h >> 1)};
 	return CopyBuffer(pOut, pInYUV, w, h, pitchIn, subtype, fInterlaced);
 }
 
@@ -317,10 +337,10 @@ HRESULT CBaseVideoFilter::CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, int 
 	int pitchOut = 0;
 
 	if (bihOut.biCompression == BI_RGB || bihOut.biCompression == BI_BITFIELDS) {
-		pitchOut = bihOut.biWidth*bihOut.biBitCount>>3;
+		pitchOut = bihOut.biWidth * bihOut.biBitCount >> 3;
 
 		if (bihOut.biHeight > 0) {
-			pOut += pitchOut*(h-1);
+			pOut += pitchOut * (h - 1);
 			pitchOut = -pitchOut;
 			if (h < 0) {
 				h = -h;
@@ -330,9 +350,13 @@ HRESULT CBaseVideoFilter::CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, int 
 
 	if (h < 0) {
 		h = -h;
-		ppIn[0] += pitchIn*(h-1);
-		ppIn[1] += (pitchIn>>1)*((h>>1)-1);
-		ppIn[2] += (pitchIn>>1)*((h>>1)-1);
+		ppIn[0] += pitchIn * (h - 1);
+		if (subtype == MEDIASUBTYPE_I420 || subtype == MEDIASUBTYPE_IYUV || subtype == MEDIASUBTYPE_YV12) {
+			ppIn[1] += (pitchIn >> 1) * ((h >> 1) - 1);
+			ppIn[2] += (pitchIn >> 1) * ((h >> 1) - 1);
+		} else if(subtype == MEDIASUBTYPE_P010 || subtype == MEDIASUBTYPE_P016 || subtype == MEDIASUBTYPE_NV12) {
+			ppIn[1] += pitchIn * ((h >> 1) - 1);
+		}
 		pitchIn = -pitchIn;
 	}
 
@@ -347,8 +371,8 @@ HRESULT CBaseVideoFilter::CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, int 
 			pInV = tmp;
 		}
 
-		BYTE* pOutU = pOut + bihOut.biWidth*h;
-		BYTE* pOutV = pOut + bihOut.biWidth*h*5/4;
+		BYTE* pOutU = pOut + bihOut.biWidth * h;
+		BYTE* pOutV = pOut + bihOut.biWidth * h * 5 / 4;
 
 		if (bihOut.biCompression == FCC('YV12')) {
 			BYTE* tmp = pOutU;
@@ -360,9 +384,9 @@ HRESULT CBaseVideoFilter::CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, int 
 
 		if (bihOut.biCompression == FCC('YUY2')) {
 			if (!fInterlaced) {
-				BitBltFromI420ToYUY2(w, h, pOut, bihOut.biWidth*2, pIn, pInU, pInV, pitchIn);
+				BitBltFromI420ToYUY2(w, h, pOut, bihOut.biWidth * 2, pIn, pInU, pInV, pitchIn);
 			} else {
-				BitBltFromI420ToYUY2Interlaced(w, h, pOut, bihOut.biWidth*2, pIn, pInU, pInV, pitchIn);
+				BitBltFromI420ToYUY2Interlaced(w, h, pOut, bihOut.biWidth * 2, pIn, pInU, pInV, pitchIn);
 			}
 		} else if (bihOut.biCompression == FCC('I420') || bihOut.biCompression == FCC('IYUV') || bihOut.biCompression == FCC('YV12')) {
 			BitBltFromI420ToI420(w, h, pOut, pOutU, pOutV, bihOut.biWidth, pIn, pInU, pInV, pitchIn);
@@ -380,13 +404,19 @@ HRESULT CBaseVideoFilter::CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, int 
 			 && (bihOut.biCompression == FCC('P010') || bihOut.biCompression == FCC('P016'))) {
 		// We currently don't support outputting P010/P016 input to something other than P010/P016
 		// P010 and P016 share the same memory layout
-		BitBltFromP010ToP010(w, h, pOut, bihOut.biWidth*2, ppIn[0], pitchIn);
+		BYTE* pInY = ppIn[0];
+		BYTE* pInUV = ppIn[1];
+		BYTE* pOutUV = pOut + bihOut.biWidth * h * 2; // 2 bytes per pixel
+		BitBltFromP016ToP016(w, h, pOut, pOutUV, bihOut.biWidth * 2, pInY, pInUV, pitchIn);
 	} else if (subtype == MEDIASUBTYPE_NV12 && bihOut.biCompression == FCC('NV12')) {
 		// We currently don't support outputting NV12 input to something other than NV12
-		BitBltFromNV12ToNV12(w, h, pOut, bihOut.biWidth, ppIn[0], pitchIn);
+		BYTE* pInY = ppIn[0];
+		BYTE* pInUV = ppIn[1];
+		BYTE* pOutUV = pOut + bihOut.biWidth * h; // 1 bytes per pixel
+		BitBltFromP016ToP016(w, h, pOut, pOutUV, bihOut.biWidth, pInY, pInUV, pitchIn);
 	} else if (subtype == MEDIASUBTYPE_YUY2) {
 		if (bihOut.biCompression == FCC('YUY2')) {
-			BitBltFromYUY2ToYUY2(w, h, pOut, bihOut.biWidth*2, ppIn[0], pitchIn);
+			BitBltFromYUY2ToYUY2(w, h, pOut, bihOut.biWidth * 2, ppIn[0], pitchIn);
 		} else if (bihOut.biCompression == BI_RGB || bihOut.biCompression == BI_BITFIELDS) {
 			if (!BitBltFromYUY2ToRGB(w, h, pOut, pitchOut, bihOut.biBitCount, ppIn[0], pitchIn)) {
 				for (int y = 0; y < h; y++, pOut += pitchOut) {

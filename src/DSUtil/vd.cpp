@@ -105,29 +105,29 @@ bool BitBltFromI420ToI420(int w, int h, BYTE* dsty, BYTE* dstu, BYTE* dstv, int 
 
 bool BitBltFromI420ToNV12(int w, int h, BYTE* dsty, BYTE* dstu, BYTE* dstv, int dstpitch, BYTE* srcy, BYTE* srcu, BYTE* srcv, int srcpitch) 
 { 
-	VDPixmap srcbm = {0}; 
+	VDPixmap srcbm = {0};
 
-	srcbm.data		= srcy; 
-	srcbm.pitch		= srcpitch; 
-	srcbm.w			= w; 
-	srcbm.h			= h; 
-	srcbm.format	= nsVDPixmap::kPixFormat_YUV420_Planar; 
-	srcbm.data2		= srcu; 
-	srcbm.pitch2	= srcpitch / 2; 
-	srcbm.data3		= srcv; 
-	srcbm.pitch3	= srcpitch / 2; 
+	srcbm.data		= srcy;
+	srcbm.pitch		= srcpitch;
+	srcbm.w			= w;
+	srcbm.h			= h;
+	srcbm.format	= nsVDPixmap::kPixFormat_YUV420_Planar;
+	srcbm.data2		= srcu;
+	srcbm.pitch2	= srcpitch / 2;
+	srcbm.data3		= srcv;
+	srcbm.pitch3	= srcpitch / 2;
 
-	VDPixmap dstpxm	= {0}; 
+	VDPixmap dstpxm	= {0};
 
-	dstpxm.data		= dsty; 
-	dstpxm.pitch	= dstpitch; 
-	dstpxm.w		= w; 
-	dstpxm.h		= h; 
-	dstpxm.format	= nsVDPixmap::kPixFormat_YUV420_NV12; 
-	dstpxm.data2	= dstu; 
-	dstpxm.pitch2	= dstpitch; 
-	dstpxm.data3	= dstv; 
-	dstpxm.pitch3	= dstpitch; 
+	dstpxm.data		= dsty;
+	dstpxm.pitch	= dstpitch;
+	dstpxm.w		= w;
+	dstpxm.h		= h;
+	dstpxm.format	= nsVDPixmap::kPixFormat_YUV420_NV12;
+	dstpxm.data2	= dstu;
+	dstpxm.pitch2	= dstpitch;
+	dstpxm.data3	= dstv;
+	dstpxm.pitch3	= dstpitch;
 
 	return VDPixmapBlt(dstpxm, srcbm); 
 } 
@@ -404,26 +404,4 @@ bool BitBltFromI420ToYUY2Interlaced(int w, int h, BYTE* dst, int dstpitch, BYTE*
 #endif
 
 	return true;
-}
-
-bool BitBltFromP010ToP010(int w, int h, BYTE* dst, int dstpitch, const BYTE* src, int srcpitch)
-{
-    if (w <= 0 || h <= 0) {
-        return true;
-    }
-    ASSERT(dst && src && w*2<=srcpitch && w*2<=dstpitch && ((h&1)==0));
-    VDMemcpyRect(dst, dstpitch, src, srcpitch, w*2, h+h/2);
-
-    return true;
-}
-
-bool BitBltFromNV12ToNV12(int w, int h, BYTE* dst, int dstpitch, const BYTE* src, int srcpitch)
-{
-    if (w <= 0 || h <= 0) {
-        return true;
-    }
-    ASSERT(dst && src && w<=srcpitch && w<=dstpitch && ((h&1)==0));
-    VDMemcpyRect(dst, dstpitch, src, srcpitch, w, h+h/2);
-
-    return true;
 }
