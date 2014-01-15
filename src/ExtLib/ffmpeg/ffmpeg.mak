@@ -419,15 +419,15 @@ SRCS_C = \
 	libavcodec/x86/vp3dsp_init.c \
 	libavcodec/x86/vp6dsp_init.c \
 	libavcodec/x86/vp8dsp_init.c \
-	libavfilter\af_atempo.c \
-	libavfilter\af_biquads.c \
-	libavfilter\audio.c \
-	libavfilter\avfilter.c \
-	libavfilter\avfiltergraph.c \
-	libavfilter\buffersink.c \
-	libavfilter\buffersrc.c \
-	libavfilter\formats.c \
-	libavfilter\video.c \
+	libavfilter/af_atempo.c \
+	libavfilter/af_biquads.c \
+	libavfilter/audio.c \
+	libavfilter/avfilter.c \
+	libavfilter/avfiltergraph.c \
+	libavfilter/buffersink.c \
+	libavfilter/buffersrc.c \
+	libavfilter/formats.c \
+	libavfilter/video.c \
 	libavresample/audio_convert.c \
 	libavresample/audio_data.c \
 	libavresample/audio_mix.c \
