@@ -1890,11 +1890,15 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	if (src[SRC_MP4] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CMP4SourceFilter>();
-		pFGF->m_chkbytes.AddTail(_T("4,4,,66747970")); // ftyp
-		pFGF->m_chkbytes.AddTail(_T("4,4,,6d6f6f76")); // moov
-		pFGF->m_chkbytes.AddTail(_T("4,4,,6d646174")); // mdat
-		pFGF->m_chkbytes.AddTail(_T("4,4,,736b6970")); // skip
-		pFGF->m_chkbytes.AddTail(_T("4,12,ffffffff00000000ffffffff,77696465027fe3706d646174")); // wide ? mdat
+		// mov, mp4
+		pFGF->m_chkbytes.AddTail(_T("4,4,,66747970")); // '....ftyp'
+		pFGF->m_chkbytes.AddTail(_T("4,4,,6d6f6f76")); // '....moov'
+		pFGF->m_chkbytes.AddTail(_T("4,4,,6d646174")); // '....mdat'
+		pFGF->m_chkbytes.AddTail(_T("4,4,,77696465")); // '....wide'
+		pFGF->m_chkbytes.AddTail(_T("4,4,,736b6970")); // '....skip'
+		pFGF->m_chkbytes.AddTail(_T("4,4,,66726565")); // '....free'
+		pFGF->m_chkbytes.AddTail(_T("4,4,,706e6f74")); // '....pnot'
+
 		pFGF->m_chkbytes.AddTail(_T("3,3,,000001")); // raw mpeg4 video
 		pFGF->m_extensions.AddTail(_T(".mov"));
 		m_source.AddTail(pFGF);

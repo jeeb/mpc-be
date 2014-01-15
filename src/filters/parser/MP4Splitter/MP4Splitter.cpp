@@ -79,14 +79,15 @@ STDAPI DllRegisterServer()
 
 	CAtlList<CString> chkbytes;
 
-	// mp4
-	chkbytes.AddTail(_T("4,4,,66747970")); // ftyp
-	chkbytes.AddTail(_T("4,4,,6d6f6f76")); // moov
-	chkbytes.AddTail(_T("4,4,,6d646174")); // mdat
-	chkbytes.AddTail(_T("4,4,,736b6970")); // skip
-	chkbytes.AddTail(_T("4,12,ffffffff00000000ffffffff,77696465027fe3706d646174")); // wide ? mdat
-
-	// mpeg4 video
+	// mov, mp4
+	chkbytes.AddTail(_T("4,4,,66747970")); // '....ftyp'
+	chkbytes.AddTail(_T("4,4,,6d6f6f76")); // '....moov'
+	chkbytes.AddTail(_T("4,4,,6d646174")); // '....mdat'
+	chkbytes.AddTail(_T("4,4,,77696465")); // '....wide'
+	chkbytes.AddTail(_T("4,4,,736b6970")); // '....skip'
+	chkbytes.AddTail(_T("4,4,,66726565")); // '....free'
+	chkbytes.AddTail(_T("4,4,,706e6f74")); // '....pnot'
+	// raw mpeg4 video
 	chkbytes.AddTail(_T("3,3,,000001"));
 
 	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_MP4, chkbytes, NULL);
