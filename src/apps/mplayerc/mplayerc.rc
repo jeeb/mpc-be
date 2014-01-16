@@ -3237,7 +3237,7 @@ BEGIN
     IDS_MFMT_RA                 "Real Audio"
     IDS_MFMT_TAK                "TAK"
     IDS_MFMT_TTA                "True Audio"
-    IDS_MFMT_WAV                "WAV"
+    IDS_MFMT_WAV                "WAV/Wave64"
     IDS_MFMT_WMA                "Windows Media Audio"
     IDS_MFMT_WAVPACK            "WavPack"
 END

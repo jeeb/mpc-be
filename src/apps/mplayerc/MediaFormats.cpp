@@ -259,7 +259,7 @@ void CMediaFormats::UpdateData(bool fSave)
 		ADDFMT((_T("ra"),          ResStr(IDS_MFMT_RA),          _T("ra"), true));
 		ADDFMT((_T("tak"),         ResStr(IDS_MFMT_TAK),         _T("tak"), true));
 		ADDFMT((_T("tta"),         ResStr(IDS_MFMT_TTA),         _T("tta"), true));
-		ADDFMT((_T("wav"),         ResStr(IDS_MFMT_WAV),         _T("wav"), true));
+		ADDFMT((_T("wav"),         ResStr(IDS_MFMT_WAV),         _T("wav w64"), true));
 		ADDFMT((_T("wma"),         ResStr(IDS_MFMT_WMA),         _T("wma"), true));
 		ADDFMT((_T("wavpack"),     ResStr(IDS_MFMT_WAVPACK),     _T("wv"), true));
 		ADDFMT((_T("opus"),        ResStr(IDS_MFMT_OPUS),        _T("opus"), true));
