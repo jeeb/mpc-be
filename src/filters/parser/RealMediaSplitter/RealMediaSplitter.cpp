@@ -759,19 +759,19 @@ bool CRealMediaSplitterFilter::DemuxLoop()
 
 		m_pFile->Seek(m_seekfilepos > 0 ? m_seekfilepos : pdc->pos);
 
-		for (UINT32 i = m_seekpacket; i < pdc->nPackets && SUCCEEDED(hr) && !CheckRequest(NULL); i++) {
+		for (UINT32 i = m_seekpacket; (pdc->nPackets ? i < pdc->nPackets : TRUE) && SUCCEEDED(hr) && !CheckRequest(NULL); i++) {
 			MediaPacketHeader mph;
 			if (S_OK != (hr = m_pFile->Read(mph))) {
 				break;
 			}
 
 			CAutoPtr<Packet> p(DNew Packet);
-			p->TrackNumber = mph.stream;
-			p->bSyncPoint = !!(mph.flags&MediaPacketHeader::PN_KEYFRAME_FLAG);
-			p->rtStart = 10000i64*(mph.tStart);
-			p->rtStop = p->rtStart+1;
+			p->TrackNumber	= mph.stream;
+			p->bSyncPoint	= !!(mph.flags & MediaPacketHeader::PN_KEYFRAME_FLAG);
+			p->rtStart		= 10000i64 * mph.tStart;
+			p->rtStop		= p->rtStart + 1;
 			p->Copy(mph.pData);
-			hr = DeliverPacket(p);
+			hr				= DeliverPacket(p);
 		}
 
 		m_seekpacket = 0;
