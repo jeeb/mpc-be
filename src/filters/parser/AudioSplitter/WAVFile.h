@@ -45,5 +45,5 @@ public:
 	HRESULT Open(CBaseSplitterFile* pFile);
 	REFERENCE_TIME Seek(REFERENCE_TIME rt);
 	int GetAudioFrame(Packet* packet, REFERENCE_TIME rtStart);
-	CString GetName() const { return m_subtype == MEDIASUBTYPE_DTS ? L"DTS-WAVE" : L"WAVE"; };
+	CString GetName() const { return L"WAVE"; };
 };
