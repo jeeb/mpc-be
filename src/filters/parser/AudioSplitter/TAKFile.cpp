@@ -134,8 +134,21 @@ CTAKFile::CTAKFile()
 	, m_samples(0)
 	, m_framelen(0)
 	, m_totalframes(0)
+	, m_APETag(NULL)
 {
 	m_subtype = MEDIASUBTYPE_TAK;
+}
+
+CTAKFile::~CTAKFile()
+{
+	SAFE_DELETE(m_APETag);
+}
+
+void CTAKFile::SetProperties(IBaseFilter* pBF)
+{
+	if (m_APETag) {
+		SetAPETagProperties(pBF, m_APETag);
+	}
 }
 
 bool CTAKFile::ParseTAKStreamInfo(BYTE* buf, int size)

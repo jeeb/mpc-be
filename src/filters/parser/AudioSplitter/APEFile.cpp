@@ -75,8 +75,21 @@ typedef struct {
 CAPEFile::CAPEFile()
 	: CAudioFile()
 	, m_curentframe(0)
+	, m_APETag(NULL)
 {
 	m_subtype = MEDIASUBTYPE_APE;
+}
+
+CAPEFile::~CAPEFile()
+{
+	SAFE_DELETE(m_APETag);
+}
+
+void CAPEFile::SetProperties(IBaseFilter* pBF)
+{
+	if (m_APETag) {
+		SetAPETagProperties(pBF, m_APETag);
+	}
 }
 
 HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)

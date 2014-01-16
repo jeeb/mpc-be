@@ -28,10 +28,15 @@ class CTAKFile : public CAudioFile
 	int			m_framelen;
 	int			m_totalframes;
 
+	CAPETag*	m_APETag;
+
 	bool ParseTAKStreamInfo(BYTE* buf, int size);
 
 public:
 	CTAKFile();
+	~CTAKFile();
+
+	void SetProperties(IBaseFilter* pBF);
 
 	HRESULT Open(CBaseSplitterFile* pFile);
 	REFERENCE_TIME Seek(REFERENCE_TIME rt);

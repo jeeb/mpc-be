@@ -35,8 +35,13 @@ class CAPEFile : public CAudioFile
 	size_t				m_curentframe;
 	CAtlArray<APEFrame>	m_frames;
 
+	CAPETag*			m_APETag;
+
 public:
 	CAPEFile();
+	~CAPEFile();
+
+	void SetProperties(IBaseFilter* pBF);
 
 	HRESULT Open(CBaseSplitterFile* pFile);
 	REFERENCE_TIME Seek(REFERENCE_TIME rt);

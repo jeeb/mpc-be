@@ -151,31 +151,7 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		if (m_pAudioFile->SetMediaType(mt)) {
 			m_rtDuration = m_pAudioFile->GetDuration();
 
-			if (m_pAudioFile->m_APETag) {
-				SetAPETagProperties(this, m_pAudioFile->m_APETag);
-			} else if (m_pAudioFile->m_info.GetCount() > 0) {
-				POSITION pos = m_pAudioFile->m_info.GetStartPosition();
-				while (pos) {
-					DWORD fcc;
-					CStringA value;
-					m_pAudioFile->m_info.GetNextAssoc(pos, fcc, value);
-
-					switch (fcc) {
-						case FCC('INAM'):
-							SetProperty(L"TITL", CStringW(value));
-							break;
-						case FCC('IART'):
-							SetProperty(L"AUTH", CStringW(value));
-							break;
-						case FCC('ICOP'):
-							SetProperty(L"CPYR", CStringW(value));
-							break;
-						case FCC('ISBJ'):
-							SetProperty(L"DESC", CStringW(value));
-							break;
-					}
-				}
-			}
+			m_pAudioFile->SetProperties(this);
 
 			CAtlArray<CMediaType> mts;
 			mts.Add(mt);

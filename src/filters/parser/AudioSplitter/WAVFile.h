@@ -33,6 +33,8 @@ protected:
 	WORD	m_nBlockAlign;
 	int		m_blocksize;
 
+	CAtlMap<DWORD, CStringA> m_info;
+
 	bool ProcessWAVEFORMATEX();
 	HRESULT ReadRIFFINFO(const __int64 info_pos, const int info_size);
 	bool CheckDTSAC3CD();
@@ -42,6 +44,7 @@ public:
 	virtual ~CWAVFile();
 
 	bool SetMediaType(CMediaType& mt);
+	void SetProperties(IBaseFilter* pBF);
 
 	HRESULT Open(CBaseSplitterFile* pFile);
 	REFERENCE_TIME Seek(REFERENCE_TIME rt);

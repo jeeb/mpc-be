@@ -56,15 +56,13 @@ public:
 	CAudioFile();
 	virtual ~CAudioFile();
 
-	CAPETag*		m_APETag;
-	CAtlMap<DWORD, CStringA> m_info;
-
 	static CAudioFile* CreateFilter(CBaseSplitterFile* m_pFile);
 
 	__int64 GetStartPos() const { return m_startpos; }
 	__int64 GetEndPos() const { return m_endpos; }
 	REFERENCE_TIME GetDuration() const { return m_rtduration;}
 	virtual bool SetMediaType(CMediaType& mt);
+	virtual void SetProperties(IBaseFilter* pBF);
 
 	virtual HRESULT Open(CBaseSplitterFile* pFile) PURE;
 	virtual REFERENCE_TIME Seek(REFERENCE_TIME rt) PURE;

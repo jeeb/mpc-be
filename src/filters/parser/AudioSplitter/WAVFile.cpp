@@ -179,6 +179,35 @@ bool CWAVFile::SetMediaType(CMediaType& mt)
 	return true;
 }
 
+void CWAVFile::SetProperties(IBaseFilter* pBF)
+{
+	if (m_info.GetCount() > 0) {
+		if (CComQIPtr<IDSMPropertyBag> pPB = pBF) {
+			POSITION pos = m_info.GetStartPosition();
+			while (pos) {
+				DWORD fcc;
+				CStringA value;
+				m_info.GetNextAssoc(pos, fcc, value);
+
+				switch (fcc) {
+				case FCC('INAM'):
+					pPB->SetProperty(L"TITL", CStringW(value));
+					break;
+				case FCC('IART'):
+					pPB->SetProperty(L"AUTH", CStringW(value));
+					break;
+				case FCC('ICOP'):
+					pPB->SetProperty(L"CPYR", CStringW(value));
+					break;
+				case FCC('ISBJ'):
+					pPB->SetProperty(L"DESC", CStringW(value));
+					break;
+				}
+			}
+		}
+	}
+}
+
 HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 {
 	m_pFile = pFile;
@@ -325,11 +354,13 @@ HRESULT CWAVFile::ReadRIFFINFO(const __int64 info_pos, const int info_size)
 		if (Chunk.size > 0 && (Chunk.id == FCC('INAM') || Chunk.id == FCC('IART') || Chunk.id == FCC('ICOP') || Chunk.id == FCC('ISBJ'))) {
 			CStringA value;
 			if (S_OK != m_pFile->ByteRead((BYTE*)value.GetBufferSetLength(Chunk.size), Chunk.size)) {
-				return E_FAIL;
+				return S_FALSE;
 			}
 			m_info[Chunk.id] = value;
 		}
 
 		m_pFile->Seek(pos + Chunk.size);
 	}
+
+	return S_OK;
 }

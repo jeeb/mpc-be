@@ -42,13 +42,11 @@ CAudioFile::CAudioFile()
 	, m_extradata(NULL)
 	, m_extrasize(0)
 	, m_nAvgBytesPerSec(0)
-	, m_APETag(NULL)
 {
 }
 
 CAudioFile::~CAudioFile()
 {
-	SAFE_DELETE(m_APETag);
 	if (m_extradata) {
 		free(m_extradata);
 	}
@@ -105,4 +103,8 @@ bool CAudioFile::SetMediaType(CMediaType& mt)
 	m_nAvgBytesPerSec		= wfe->nAvgBytesPerSec;
 
 	return true;
+}
+
+void CAudioFile::SetProperties(IBaseFilter* pBF)
+{
 }
