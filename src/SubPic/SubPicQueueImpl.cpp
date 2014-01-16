@@ -406,9 +406,8 @@ void CSubPicQueue::AppendQueue(ISubPic* pSubPic)
 DWORD CSubPicQueue::ThreadProc()
 {
 	BOOL bDisableAnim = m_bDisableAnim;
-	int m_nPriority = bDisableAnim ? THREAD_PRIORITY_LOWEST : THREAD_PRIORITY_ABOVE_NORMAL;
 	SetThreadName(DWORD(-1), "Subtitle Renderer Thread");
-	SetThreadPriority(m_hThread, m_nPriority);
+	SetThreadPriority(m_hThread, bDisableAnim ? THREAD_PRIORITY_LOWEST : THREAD_PRIORITY_ABOVE_NORMAL);
 
 	bool bAgain = true;
 	for (;;) {
@@ -435,20 +434,6 @@ DWORD CSubPicQueue::ThreadProc()
 				REFERENCE_TIME rtStart = pSubPicProvider->GetStart(pos, fps);
 				REFERENCE_TIME rtStop = pSubPicProvider->GetStop(pos, fps);
 
-				// change the priority of the thread, as for bitmap subtitles do not need a high priority
-				{
-					bool bIsAnimated = pSubPicProvider->IsAnimated(pos) && !bDisableAnim && (pSubPicProvider->GetType(pos) == ST_TEXT);
-					int nPriorityNew = m_nPriority;
-					if (bIsAnimated && m_nPriority != THREAD_PRIORITY_ABOVE_NORMAL) {
-						nPriorityNew = THREAD_PRIORITY_ABOVE_NORMAL;
-					} else if (!bIsAnimated && m_nPriority != THREAD_PRIORITY_LOWEST) {
-						nPriorityNew = THREAD_PRIORITY_LOWEST;
-					}
-					if (nPriorityNew != m_nPriority) {
-						m_nPriority = nPriorityNew;
-						SetThreadPriority(m_hThread, m_nPriority);
-					}
-				}
 
 				if (m_rtNow >= rtStop) {
 					continue;
@@ -477,12 +462,6 @@ DWORD CSubPicQueue::ThreadProc()
 
 						HRESULT hr;
 						if (bIsAnimated) {
-							/*
-							if (rtCurrent < m_rtNow + rtTimePerFrame) {
-								rtCurrent = min(m_rtNow + rtTimePerFrame, rtStop-1);
-							}
-							*/
-
 							REFERENCE_TIME rtEndThis = min(rtCurrent + rtTimePerFrame, rtStop);
 							hr = RenderTo(pStatic, rtCurrent, rtEndThis, fps, bIsAnimated);
 							pStatic->SetSegmentStart(rtStart);
@@ -500,6 +479,9 @@ DWORD CSubPicQueue::ThreadProc()
 
 						} else {
 							hr = RenderTo(pStatic, rtStart, rtStop, fps, bIsAnimated);
+							// Non-animated subtitles aren't part of a segment
+							pStatic->SetSegmentStart(0);
+							pStatic->SetSegmentStop(0);
 							rtCurrent = rtStop;
 						}
 #if DSubPicTraceLevel > 0
