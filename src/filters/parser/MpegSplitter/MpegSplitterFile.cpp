@@ -1169,27 +1169,32 @@ void CMpegSplitterFile::UpdatePrograms(CGolombBuffer gb, WORD pid, bool UpdateLa
 			pPair->m_value.streams[i].type	= (PES_STREAM_TYPE)stream_type;
 
 			len -= (5 + ES_info_length);
-			if (len < 0)
+			if (len < 0) {
 				break;
-			if (ES_info_length<=2)
+			}
+			if (ES_info_length <= 2) {
 				continue;
+			}
 
+			BOOL DVB_SUBTITLE = FALSE;
 			if (UpdateLang) {
 				int	info_length = ES_info_length;
 				for (;;) {
 					BYTE descriptor_tag		= (BYTE)gb.BitRead(8);
 					BYTE descriptor_length	= (BYTE)gb.BitRead(8);
-					info_length -= (2 + descriptor_length);
+					info_length			   -= (2 + descriptor_length);
 					if (info_length < 0)
 						break;
-					char ch[4];
+					char ch[4] = { 0 };
+
 					switch (descriptor_tag) {
+						case 0x59: // Subtitling descriptor
+							DVB_SUBTITLE = TRUE;
 						case 0x0a: // ISO 639 language descriptor
 						case 0x56: // Teletext descriptor
-						case 0x59: // Subtitling descriptor
 							gb.ReadBuffer((BYTE *)ch, 3);
 							ch[3] = 0;
-							for (int i = 3; i < descriptor_length; i++) {
+							for (BYTE i = 3; i < descriptor_length; i++) {
 								gb.BitRead(8);
 							}
 							if (!(ch[0] == 'u' && ch[1] == 'n' && ch[2] == 'd')) {
@@ -1202,7 +1207,7 @@ void CMpegSplitterFile::UpdatePrograms(CGolombBuffer gb, WORD pid, bool UpdateLa
 							}
 							break;
 					}
-					if (info_length<=2) break;
+					if (info_length <= 2) break;
 				}
 			} else {
 				while (ES_info_length-- > 0) {
@@ -1211,21 +1216,28 @@ void CMpegSplitterFile::UpdatePrograms(CGolombBuffer gb, WORD pid, bool UpdateLa
 			}
 
 			if (m_ForcedSub) {
-				if (stream_type == PRESENTATION_GRAPHICS_STREAM) {
+				if (stream_type == PRESENTATION_GRAPHICS_STREAM || DVB_SUBTITLE) {
 					stream s;
 					s.pid = pid;
-					
-					CStringA lang_name;
-					m_pPMT_Lang.Lookup(s.pid, lang_name);
-					if (!lang_name.IsEmpty()) {
-						memcpy(s.lang, lang_name, 4);
-						s.lang_set = true;
-					}
 
-					CMpegSplitterFile::hdmvsubhdr hdr;
-					if (Read(hdr, &s.mt, NULL)) {
-						if (!m_streams[stream_type::subpic].Find(s)) {
-							m_streams[stream_type::subpic].Insert(s, subpic);
+					if (!m_streams[stream_type::subpic].Find(s)) {
+						CStringA lang_name;
+						m_pPMT_Lang.Lookup(s.pid, lang_name);
+						if (!lang_name.IsEmpty()) {
+							memcpy(s.lang, lang_name, 4);
+							s.lang_set = true;
+						}
+
+						if (stream_type == PRESENTATION_GRAPHICS_STREAM) {
+							CMpegSplitterFile::hdmvsubhdr hdr;
+							if (Read(hdr, &s.mt, NULL)) {
+								m_streams[stream_type::subpic].Insert(s, subpic);
+							}
+						} else {
+							CMpegSplitterFile::dvbsub hdr;
+							if (Read(hdr, 0, &s.mt, true)) {
+								m_streams[stream_type::subpic].Insert(s, subpic);
+							}
 						}
 					}
 				}

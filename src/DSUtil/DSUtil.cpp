@@ -1748,6 +1748,7 @@ static struct {
 	{"Chichewa; Chewa; Nyanja", "nya", "ny"},
 	{"Chinese", "chi", "zh",					MAKELCID( MAKELANGID(LANG_CHINESE, SUBLANG_DEFAULT), SORT_DEFAULT)},
 	{"Chinese", "zho", "zh"},
+	{"Chinese (Simplified)", "chs", "zh",		MAKELCID( MAKELANGID(LANG_CHINESE_SIMPLIFIED, SUBLANG_DEFAULT), SORT_DEFAULT)},
 	{"Chinook jargon", "chn", ""},
 	{"Chipewyan", "chp", ""},
 	{"Choctaw", "cho", ""},

@@ -2219,11 +2219,11 @@ bool CBaseSplitterFileEx::Read(dirachdr& h, int len, CMediaType* pmt)
 	return false;
 }
 
-bool CBaseSplitterFileEx::Read(dvbsub& h, int len, CMediaType* pmt)
+bool CBaseSplitterFileEx::Read(dvbsub& h, int len, CMediaType* pmt, bool bSimpleAdd)
 {
 	memset(&h, 0, sizeof(h));
 
-	if ((BitRead(32, true) & 0xFFFFFF00) == 0x20000f00) {
+	if ((BitRead(32, true) & 0xFFFFFF00) == 0x20000f00 || bSimpleAdd) {
 		static const SUBTITLEINFO SubFormat = { 0, "", L"" };
 
 		pmt->majortype		= MEDIATYPE_Subtitle;

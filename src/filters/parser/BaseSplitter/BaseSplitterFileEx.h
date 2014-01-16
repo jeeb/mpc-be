@@ -467,7 +467,7 @@ public:
 	bool Read(avchdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(vc1hdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(dirachdr& h, int len, CMediaType* pmt = NULL);
-	bool Read(dvbsub& h, int len, CMediaType* pmt = NULL);
+	bool Read(dvbsub& h, int len, CMediaType* pmt = NULL, bool bSimpleAdd = false);
 	bool Read(avchdr& h, spsppsindex index);
 	bool Read(hevchdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true);
 };
