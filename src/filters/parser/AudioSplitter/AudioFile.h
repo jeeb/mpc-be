@@ -57,6 +57,7 @@ public:
 	virtual ~CAudioFile();
 
 	CAPETag*		m_APETag;
+	CAtlMap<DWORD, CStringA> m_info;
 
 	static CAudioFile* CreateFilter(CBaseSplitterFile* m_pFile);
 

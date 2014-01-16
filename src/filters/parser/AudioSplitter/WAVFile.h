@@ -34,6 +34,7 @@ protected:
 	int		m_blocksize;
 
 	bool ProcessWAVEFORMATEX();
+	HRESULT ReadRIFFINFO(const __int64 info_pos, const int info_size);
 	bool CheckDTSAC3CD();
 
 public:

@@ -22,6 +22,16 @@
 #include "../../../DSUtil/AudioParser.h"
 #include "WAVFile.h"
 
+#pragma pack(push, 1)
+typedef union {
+	struct {
+		DWORD id;
+		DWORD size;
+	};
+	BYTE data[8];
+} chunk_t;
+#pragma pack(pop)
+
 //
 // CWAVFile
 //
@@ -172,6 +182,7 @@ bool CWAVFile::SetMediaType(CMediaType& mt)
 HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 {
 	m_pFile = pFile;
+	m_startpos = 0;
 
 	m_pFile->Seek(0);
 	BYTE data[12];
@@ -183,17 +194,9 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 	}
 	__int64 end = min((__int64)*(DWORD*)(data + 4) + 8, m_pFile->GetLength());
 
-#pragma pack(push, 4)
-	union {
-		struct {
-			DWORD id;
-			DWORD size;
-		};
-		BYTE data[8];
-	} Chunk;
-#pragma pack(pop)
+	chunk_t Chunk;
 
-	while (SUCCEEDED(m_pFile->ByteRead(Chunk.data, sizeof(Chunk))) && Chunk.id != FCC('data') && m_pFile->GetPos() < end) {
+	while (SUCCEEDED(m_pFile->ByteRead(Chunk.data, sizeof(Chunk))) && m_pFile->GetPos() < end) {
 		__int64 pos = m_pFile->GetPos();
 
 		TRACE(L"CWAVFile::Open() : found '%c%c%c%c' chunk.\n",
@@ -216,6 +219,17 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 				return E_FAIL;
 			}
 			break;
+		case FCC('data'):
+			if (m_endpos) {
+				TRACE(L"CWAVFile::Open() : bad format\n");
+				return E_FAIL;
+			}
+			m_startpos	= pos;
+			m_length	= min(Chunk.size, m_pFile->GetLength() - m_startpos);
+			break;
+		case FCC('LIST'):
+			ReadRIFFINFO(pos, Chunk.size);
+			break;
 		case FCC('wavl'): // not supported
 		case FCC('slnt'): // not supported
 			TRACE(L"CWAVFile::Open() : WAVE file is not supported!\n");
@@ -230,7 +244,6 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 			}
 			// Known chunks:
 			// 'fact'
-			// 'LIST'
 			// 'JUNK'
 			// 'PAD '
 			// 'cue '
@@ -248,14 +261,12 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 		m_pFile->Seek(pos + Chunk.size);
 	}
 
-	if (Chunk.id != FCC('data') || !ProcessWAVEFORMATEX()) {
+	if (!m_startpos || !ProcessWAVEFORMATEX()) {
 		return E_FAIL;
 	}
 
-	m_startpos		= m_pFile->GetPos();
-	m_length		= min(Chunk.size, m_pFile->GetLength() - m_startpos);
-	m_length		-= m_length % m_nBlockAlign;
-	m_endpos		= m_startpos + m_length;
+	m_length	-= m_length % m_nBlockAlign;
+	m_endpos	= m_startpos + m_length;
 	m_rtduration	= 10000000i64 * m_length / m_nAvgBytesPerSec;
 
 	CheckDTSAC3CD();
@@ -293,4 +304,32 @@ int CWAVFile::GetAudioFrame(Packet* packet, REFERENCE_TIME rtStart)
 	packet->rtStop	= m_rtduration * (len + size) / m_length;
 
 	return size;
+}
+
+HRESULT CWAVFile::ReadRIFFINFO(const __int64 info_pos, const int info_size)
+{
+	m_info.RemoveAll();
+	DWORD id = 0;
+	m_pFile->Seek(info_pos);
+
+	if (info_size < 4 || FAILED(m_pFile->ByteRead((BYTE*)&id, 4)) || id != FCC('INFO')) {
+		return E_FAIL;
+	}
+
+	__int64 end = info_pos + info_size;
+	chunk_t Chunk;
+
+	while (m_pFile->GetPos() + sizeof(Chunk) < end && SUCCEEDED(m_pFile->ByteRead(Chunk.data, sizeof(Chunk))) && m_pFile->GetPos() + Chunk.size <= end) {
+		__int64 pos = m_pFile->GetPos();
+
+		if (Chunk.size > 0 && (Chunk.id == FCC('INAM') || Chunk.id == FCC('IART') || Chunk.id == FCC('ICOP') || Chunk.id == FCC('ISBJ'))) {
+			CStringA value;
+			if (S_OK != m_pFile->ByteRead((BYTE*)value.GetBufferSetLength(Chunk.size), Chunk.size)) {
+				return E_FAIL;
+			}
+			m_info[Chunk.id] = value;
+		}
+
+		m_pFile->Seek(pos + Chunk.size);
+	}
 }
