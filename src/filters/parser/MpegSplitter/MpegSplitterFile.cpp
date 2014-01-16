@@ -983,7 +983,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 			REFERENCE_TIME rtAvgTimePerFrame = 1;
 			ExtractAvgTimePerFrame(&s.mt, rtAvgTimePerFrame);
 
-			if (rtAvgTimePerFrame == 1) {
+			if (rtAvgTimePerFrame < 166666) {
 				__int64 _pos = GetPos();
 				REFERENCE_TIME rt_start = NextPTS(s.pid);
 				if (rt_start != INVALID_TIME) {
@@ -1004,6 +1004,10 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 
 					if (count && (rt_start < rt_end)) {
 						rtAvgTimePerFrame = (rt_end - rt_start) / (count - 1);
+					}
+
+					if (rtAvgTimePerFrame < 166666) {
+						rtAvgTimePerFrame = 417082; // set 23.976 as default
 					}
 
 					if (rtAvgTimePerFrame) {
