@@ -451,7 +451,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
 14		"Тест"
 16		"База данных в интернете"
 17		"Автоматическое переоткрытие файлов с субтитрами в случае изменения"
-18		"Use Subresync"
+18		"Использовать редактор ""Синхронизация субтитров"""
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
