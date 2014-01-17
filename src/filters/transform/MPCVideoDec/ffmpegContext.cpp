@@ -206,10 +206,10 @@ static const WORD PCID_INTEL_4K [] = {
 	0x0D26, // Intel Iris Graphics 5200
 };
 
-bool CheckPCID(DWORD pcid, const WORD* pPCIDs, size_t len)
+static bool CheckPCID(DWORD pcid, const WORD* pPCIDs, size_t count)
 {
 	WORD wPCID = (WORD)pcid;
-	for (size_t i = 0; i < len; i++) {
+	for (size_t i = 0; i < count; i++) {
 		if (wPCID == pPCIDs[i]) {
 			return true;
 		}
@@ -1027,12 +1027,6 @@ BOOL DXVACheckFramesize(int width, int height, DWORD nPCIVendor, DWORD nPCIDevic
 			return TRUE;
 		} else if (width <= 2032 && height <= 2032 && width * height <= 8190 * 16 * 16) {
 			// tested H.264, VC-1 and MPEG-2 on VP4 (feature set C) (G210M, GT220)
-			return TRUE;
-		}
-	} else if (nPCIVendor == PCIV_ATI) {
-		if (width <= 2048 && height <= 2304 && width * height <= 2048 * 2048) {
-			// tested H.264 on UVD 2.2 (HD5670, HD5770, HD5850)
-			// it may also work if width = 2064, but unstable
 			return TRUE;
 		}
 	} else if (nPCIVendor == PCIV_Intel && nPCIDevice == PCID_Intel_HD4000) {
