@@ -290,6 +290,7 @@
     <ClInclude Include="ComPropertyPage.h" />
     <ClInclude Include="CShockwaveFlash.h" />
     <ClInclude Include="PlayerFlyBar.h" />
+    <ClInclude Include="PlayerVimeo.h" />
     <ClInclude Include="PlayerYouTube.h" />
     <ClInclude Include="PPageFiltersPerformance.h" />
     <ClInclude Include="PPageFiltersPriority.h" />

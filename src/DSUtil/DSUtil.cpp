@@ -912,7 +912,7 @@ cdrom_t GetCDROMType(TCHAR drive, CAtlList<CString>& files)
 			DWORD BytesReturned;
 			CDROM_TOC TOC;
 			if (DeviceIoControl(hDrive, IOCTL_CDROM_READ_TOC, NULL, 0, &TOC, sizeof(TOC), &BytesReturned, 0)) {
-				for (ptrdiff_t i = TOC.FirstTrack; i <= TOC.LastTrack; i++) {
+				for (int i = TOC.FirstTrack; i <= TOC.LastTrack; i++) {
 					// MMC-3 Draft Revision 10g: Table 222 - Q Sub-channel control field
 					TOC.TrackData[i-1].Control &= 5;
 					if (TOC.TrackData[i-1].Control == 0 || TOC.TrackData[i-1].Control == 1) {
@@ -2503,7 +2503,7 @@ void RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, const CAtlLi
 	CString subtype = CStringFromGUID(subtype2);
 
 	POSITION pos = chkbytes.GetHeadPosition();
-	for (ptrdiff_t i = 0; pos; i++) {
+	for (int i = 0; pos; i++) {
 		CString idx;
 		idx.Format(_T("%d"), i);
 		SetRegKeyValue(_T("Media Type\\") + majortype, subtype, idx, chkbytes.GetNext(pos));
@@ -3102,7 +3102,7 @@ HRESULT CreateAVCfromH264(CMediaType* mt)
 		memcpy(&pm2vi->dwSequenceHeader[0], dst, dstSize);
 	}
 
-	delete dst;
+	delete[] dst;
 
 	return dstSize ? S_OK : E_FAIL;
 } 

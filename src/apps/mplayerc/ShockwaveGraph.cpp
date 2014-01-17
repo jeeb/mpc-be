@@ -119,7 +119,7 @@ STDMETHODIMP CShockwaveGraph::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPla
 							BYTE* dst = NULL;
 							int n = 0;
 							do {
-								dst = (unsigned char *)realloc(dst, ++n*1000);
+								dst = (BYTE*)realloc(dst, ++n*1000);
 								d_stream.next_out	= &dst[(n-1)*1000];
 								d_stream.avail_out	= 1000;
 								if (Z_OK != (res = inflate(&d_stream, Z_NO_FLUSH)) && Z_STREAM_END != res) {
