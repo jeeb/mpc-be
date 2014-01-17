@@ -86,32 +86,33 @@ Update_Status UpdateChecker::isUpdateAvailable(const Version& currentVersion)
 	t_start = strpos(final, "MPC-BE v") + strlen("MPC-BE ");
 	final += t_start;
 	t_stop = strpos(final, "<");
+
 	str = DNew char[t_stop + 1];
 	memset(str, 0, t_stop + 1);
 	memcpy(str, final, t_stop);
-
 	CString versionStr = CString(str);
+	delete[] str;
 
 	t_start = strpos(final, "build") + strlen("build ");
 	final += t_start;
 	t_stop = strpos(final, "<");
+
 	str = DNew char[t_stop + 1];
 	memset(str, 0, t_stop + 1);
 	memcpy(str, final, t_stop);
-
 	latestVersion.rev = (UINT)atoi(str);
+	delete[] str;
 
 	final -= 160;
 	t_start = strpos(final, "http");
 	final += t_start;
 	t_stop = strpos(final, "\"");
+
 	str = DNew char[t_stop + 1];
 	memset(str, 0, t_stop + 1);
 	memcpy(str, final, t_stop);
-
 	latestVersion.url = CString(str);
-
-	delete [] str;
+	delete[] str;
 
 	if (!parseVersion(versionStr)) {
 		updateAvailable = UPDATER_ERROR;
