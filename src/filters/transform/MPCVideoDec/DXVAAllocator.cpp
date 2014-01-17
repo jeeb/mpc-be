@@ -93,6 +93,7 @@ CVideoDecDXVAAllocator::CVideoDecDXVAAllocator(CMPCVideoDecFilter* pVideoDecFilt
 	: CBaseAllocator(NAME("CVideoDecDXVAAllocator"), NULL, phr)
 	, m_pVideoDecFilter(pVideoDecFilter)
 	, m_ppRTSurfaceArray(NULL)
+	, m_nSurfaceArrayCount(0)
 {
 }
 

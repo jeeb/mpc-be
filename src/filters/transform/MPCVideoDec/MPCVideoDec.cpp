@@ -1750,8 +1750,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		} while (false);
 
 		if (!m_bDXVACompatible) {
-			HRESULT hr;
-			if FAILED(hr = ReopenVideo()) {
+			HRESULT hr = ReopenVideo();
+			if FAILED(hr) {
 				return hr;
 			}
 		}

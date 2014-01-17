@@ -217,7 +217,7 @@ void CDirectVobSubFilter::PrintMessages(BYTE* pOut)
 			tmp.Format(_T("queue stats: %I64d - %I64d [ms]\n"), rtStart/10000, rtStop/10000);
 			msg += tmp;
 
-			for (ptrdiff_t i = 0; i < nSubPics; i++) {
+			for (int i = 0; i < nSubPics; i++) {
 				m_pSubPicQueue->GetStats(i, rtStart, rtStop);
 				tmp.Format(_T("%d: %I64d - %I64d [ms]\n"), i, rtStart/10000, rtStop/10000);
 				msg += tmp;
