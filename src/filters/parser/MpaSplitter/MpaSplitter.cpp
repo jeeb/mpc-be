@@ -202,10 +202,10 @@ void CMpaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 	if (rt <= 0 || m_pFile->GetDuration() <= 0) {
 		m_pFile->Seek(startpos);
-		m_rtStart = 0;
+		m_rtime = 0;
 	} else {
 		m_pFile->Seek(startpos + (__int64)((1.0 * rt / m_pFile->GetDuration()) * (endpos - startpos)));
-		m_rtStart = rt;
+		m_rtime = rt;
 	}
 }
 
@@ -227,13 +227,13 @@ bool CMpaSplitterFilter::DemuxLoop()
 		m_pFile->ByteRead(p->GetData(), FrameSize);
 
 		p->TrackNumber = 0;
-		p->rtStart = m_rtStart;
-		p->rtStop = m_rtStart + rtDuration;
+		p->rtStart = m_rtime;
+		p->rtStop  = m_rtime + rtDuration;
 		p->bSyncPoint = TRUE;
 
 		hr = DeliverPacket(p);
 
-		m_rtStart += rtDuration;
+		m_rtime += rtDuration;
 	}
 
 	return true;
