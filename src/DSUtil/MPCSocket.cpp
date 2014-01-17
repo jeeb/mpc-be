@@ -42,15 +42,13 @@ CMPCSocket::CMPCSocket()
 
 			CAtlList<CString> sl;
 			m_sProxyServer = Explode(m_sProxyServer, sl, ';');
-			if (sl.GetCount() > 1) {
-				POSITION pos = sl.GetHeadPosition();
-				while (pos) {
-					CAtlList<CString> sl2;
-					if (!Explode(sl.GetNext(pos), sl2, '=', 2).CompareNoCase(L"http")
-							&& sl2.GetCount() == 2) {
-						m_sProxyServer = sl2.GetTail();
-						break;
-					}
+			POSITION pos = sl.GetHeadPosition();
+			while (pos) {
+				CAtlList<CString> sl2;
+				if (!Explode(sl.GetNext(pos), sl2, '=', 2).CompareNoCase(L"http")
+						&& sl2.GetCount() == 2) {
+					m_sProxyServer = sl2.GetTail();
+					break;
 				}
 			}
 
