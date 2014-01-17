@@ -1218,18 +1218,18 @@ bool CMpegSplitterFilter::DemuxInit()
 		m_rtStartOffset = 0;											\
 	}																	\
 
+#define SeekPos(t) (__int64)(1.0 * t / m_rtDuration * len)
 
 void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
 	CAtlList<CMpegSplitterFile::stream>* pMasterStream = m_pFile->GetMasterStream();
-
 	if (!pMasterStream) {
 		ASSERT(0);
 		return;
 	}
 
 	if (m_pFile->IsStreaming()) {
-		m_pFile->Seek(max(0, m_pFile->GetLength() - 100*1024));
+		m_pFile->Seek(max(0, m_pFile->GetLength() - 256 * KILOBYTE));
 		m_rtStartOffset = m_pFile->m_rtMin + m_pFile->NextPTS(pMasterStream->GetHead());
 		return;
 	}
@@ -1259,7 +1259,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		}
 
 		__int64 len				= m_pFile->GetLength();
-		__int64 seekpos			= (__int64)(1.0*rt/m_rtDuration*len);
+		__int64 seekpos			= SeekPos(rt);
 		__int64 minseekpos		= _I64_MIN;
 
 		REFERENCE_TIME rtmax	= rt - UNITS;
@@ -1284,7 +1284,8 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 							}
 
 							if (rtmin <= rt2 && rt2 <= rtmax) {
-								minseekpos = curpos;
+								//minseekpos = curpos;
+								minseekpos = m_pFile->GetPos();
 								break;
 							}
 
@@ -1299,7 +1300,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 								break;
 							}
 
-							curpos -= (__int64)(1.0*dt/m_rtDuration*len);
+							curpos -= SeekPos(dt);
 							m_pFile->Seek(curpos);
 						}
 					} else {
@@ -1310,12 +1311,13 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 							}
 
 							if (rtmin <= rt2 && rt2 <= rtmax) {
-								minseekpos = curpos;
+								//minseekpos = curpos;
+								minseekpos = m_pFile->GetPos();
 								break;
 							}
 
 							REFERENCE_TIME dt = rt2 - rtmax;
-							curpos -= (__int64)(1.0*dt/m_rtDuration*len);
+							curpos -= SeekPos(dt);
 							m_pFile->Seek(curpos);
 						}
 					}
@@ -1329,10 +1331,13 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		} else {
 			// simple seek by bitrate
 
-			seekpos	= (__int64)(1.0*rt/m_rtDuration*len);
+			seekpos	= SeekPos(rt);
 			m_pFile->Seek(seekpos);
 
 			SimpleSeek;
+			if (rtPTS != INVALID_TIME) {
+				seekpos = m_pFile->GetPos();
+			}
 		}
 
 		m_pFile->Seek(seekpos);

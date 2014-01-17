@@ -311,7 +311,7 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum)
 				break;
 			}
 
-			rtpos = GetPos()-4;
+			__int64 pos2 = GetPos() - 4;
 
 			if ((b >= 0xbd && b < 0xf0) || (b == 0xfd)) {
 				peshdr h;
@@ -319,29 +319,32 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum)
 					continue;
 				}
 
-				__int64 pos = GetPos();
+				__int64 pos3 = GetPos();
 
 				if (h.fpts && AddStream(0, b, h.id_ext, h.len) == TrackNum) {
 					//ASSERT(h.pts >= m_rtMin && h.pts <= m_rtMax);
-					rt = h.pts;
+					rt		= h.pts;
+					rtpos	= pos2;
 					break;
 				}
 
-				Seek(pos + h.len);
+				Seek(pos3 + h.len);
 			}
 		} else if (m_type == mpeg_ts) {
 			trhdr h;
-			__int64 pos = Read(h);
-			if (pos == -1) {
+			__int64 pos2 = Read(h);
+			if (pos2 == -1) {
 				continue;
 			}
 
 			if (h.payloadstart && ISVALIDPID(h.pid) && h.pid == TrackNum) {
-				peshdr h2;
-				if (NextMpegStartCode(b, 4) && Read(h2, b) && h2.fpts) { // pes packet
-					rt		= h2.pts;
-					rtpos	= pos;
-					break;
+				if (NextMpegStartCode(b, 4)) {
+					peshdr h2;
+					if (Read(h2, b) && h2.fpts) { // pes packet
+						rt		= h2.pts;
+						rtpos	= pos2;
+						break;
+					}
 				}
 			}
 
