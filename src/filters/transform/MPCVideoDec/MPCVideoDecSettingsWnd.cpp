@@ -398,31 +398,35 @@ void CMPCVideoDecSettingsWnd::OnBnClickedReset()
 BOOL CMPCVideoDecSettingsWnd::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
 {
 	TOOLTIPTEXT* pTTT = (TOOLTIPTEXT*)pNMHDR;
-
-	CToolTipCtrl* pToolTip = AfxGetModuleThreadState()->m_pToolTip;
-	if (pToolTip) {
-		pToolTip->SetMaxTipWidth(SHRT_MAX);
-	}
-
+	static CString strTipText;
 	UINT_PTR nID = pNMHDR->idFrom;
-	if (pTTT->uFlags & TTF_IDISHWND) {
+
+	if (pNMHDR->code == TTN_NEEDTEXT && (pTTT->uFlags & TTF_IDISHWND)) {
+
+		CToolTipCtrl* pToolTip = AfxGetModuleThreadState()->m_pToolTip;
+		if (pToolTip) {
+			pToolTip->SetMaxTipWidth(SHRT_MAX);
+		}
+
 		nID = ::GetDlgCtrlID((HWND)nID);
 		switch (nID) {
 		case IDC_PP_AR:
-			pTTT->lpszText = MAKEINTRESOURCE(IDS_VDF_TT_AR);
+			strTipText = ResStr(IDS_VDF_TT_AR);
 			break;
 		case IDC_PP_SWPRESET:
-			pTTT->lpszText = MAKEINTRESOURCE(IDS_VDF_TT_PRESET);
+			strTipText = ResStr(IDS_VDF_TT_PRESET);
 			break;
 		case IDC_PP_SWSTANDARD:
-			pTTT->lpszText = MAKEINTRESOURCE(IDS_VDF_TT_STANDARD);
+			strTipText = ResStr(IDS_VDF_TT_STANDARD);
 			break;
 		case IDC_PP_SWRGBLEVELS:
-			pTTT->lpszText = MAKEINTRESOURCE(IDS_VDF_TT_RGB_LEVELS);
+			strTipText = ResStr(IDS_VDF_TT_RGB_LEVELS);
 			break;
 		default:
 			return FALSE;
 		}
+
+		pTTT->lpszText = strTipText.GetBuffer();
 		
 		*pResult = 0;
 		return TRUE;
