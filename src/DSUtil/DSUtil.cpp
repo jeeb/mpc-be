@@ -116,7 +116,11 @@ bool IsVideoDecoder(IBaseFilter* pBF, bool fCountConnectedOnly)
 {
 	// All popular video decoders includes in the name the "video"
 	CString filterName = GetFilterName(pBF).MakeLower();
-	if (filterName.Find(_T("video")) < 0) {
+
+	if (filterName.Find(L"directvobsub") == 0) {
+		return true;
+	}
+	if (filterName.Find(L"video") < 0) {
 		return false;
 	}
 
