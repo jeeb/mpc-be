@@ -17108,7 +17108,6 @@ void CMainFrame::UpdateSubtitle(bool fDisplayMessage, bool fApplyDefStyle)
 
 		if (i < pSubStream->GetStreamCount()) {
 			CAutoLock cAutoLock(&m_csSubLock);
-			pSubStream->SetStream(i);
 			SetSubtitle(pSubStream, fApplyDefStyle);
 
 			if (fDisplayMessage) {
@@ -17211,6 +17210,22 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, bool fApplyDefStyle)
 
 				i += pSubStream2->GetStreamCount();
 			}
+		}
+	}
+
+	{
+		int i = m_iSubtitleSel;
+		POSITION pos = m_pSubStreams.GetHeadPosition();
+		while (pos && i >= 0) {
+			CComPtr<ISubStream> pSubStream = m_pSubStreams.GetNext(pos);
+
+			if (i < pSubStream->GetStreamCount()) {
+				CAutoLock cAutoLock(&m_csSubLock);
+				pSubStream->SetStream(i);
+				break;
+			}
+
+			i -= pSubStream->GetStreamCount();
 		}
 	}
 
