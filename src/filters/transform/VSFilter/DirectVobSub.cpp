@@ -640,7 +640,7 @@ STDMETHODIMP CDirectVobSub::get_ExtendPicture(int* horizontal, int* vertical, in
 		*vertical = theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_EXTPIC), 0);
 	}
 	if (resx2) {
-		*resx2 = theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_RESX2), 2) & 3;
+		*resx2 = 0;//theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_RESX2), 2) & 3;
 	}
 	if (resx2minw) {
 		*resx2minw = theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_RESX2MINW), 384);

@@ -739,13 +739,15 @@ void CDirectVobSubFilter::InitSubPicQueue()
 	m_spd.h = m_h;
 	m_spd.bpp = (m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV || m_spd.type == MSP_NV12) ? 8 : bihIn.biBitCount;
 	m_spd.bpp = (m_spd.type == MSP_P010 || m_spd.type == MSP_P016) ? 16 : m_spd.bpp;
-	m_spd.pitch = m_spd.w*m_spd.bpp>>3;
+	m_spd.pitch = m_spd.w * m_spd.bpp >> 3;
 
 	m_pTempPicBuff.Free();
-	if (m_spd.type == MSP_P010 || m_spd.type == MSP_P016) {
-		m_pTempPicBuff.Allocate(m_spd.pitch * m_spd.h + m_spd.pitch * m_spd.h/2);
+	if(m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV || m_spd.type == MSP_NV12) {
+		m_pTempPicBuff.Allocate(4 * m_spd.pitch * m_spd.h);
+	} else if (m_spd.type == MSP_P010 || m_spd.type == MSP_P016) {
+		m_pTempPicBuff.Allocate(m_spd.pitch * m_spd.h + m_spd.pitch * m_spd.h / 2);
 	} else {
-		m_pTempPicBuff.Allocate(4*m_w*m_h);
+		m_pTempPicBuff.Allocate(m_spd.pitch * m_spd.h);
 	}
 	m_spd.bits = (void*)m_pTempPicBuff;
 
@@ -927,9 +929,12 @@ void CDirectVobSubFilter::UpdatePreferedLanguages(CString l)
 	// move the selected to the top of the list
 
 	while (k > 0) {
+		std::swap(langs[k], langs[k - 1]);
+		/*
 		CString tmp = langs[k];
 		langs[k] = langs[k-1];
 		langs[k-1] = tmp;
+		*/
 		k--;
 	}
 
@@ -945,9 +950,12 @@ void CDirectVobSubFilter::UpdatePreferedLanguages(CString l)
 	}
 
 	while (k < j-1) {
+		std::swap(langs[k], langs[k + 1]);
+		/*
 		CString tmp = langs[k];
 		langs[k] = langs[k+1];
 		langs[k+1] = tmp;
+		*/
 		k++;
 	}
 
