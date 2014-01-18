@@ -4435,7 +4435,7 @@ void CMainFrame::OnBossKey()
 	ANIMATIONINFO AnimationInfo;
 	AnimationInfo.cbSize = sizeof(ANIMATIONINFO);
 	::SystemParametersInfo(SPI_GETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
-	int m_WindowAnimationType = AnimationInfo.iMinAnimate;
+	int WindowAnimationType = AnimationInfo.iMinAnimate;
 	AnimationInfo.iMinAnimate = 0;
 	::SystemParametersInfo(SPI_SETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
 
@@ -4446,7 +4446,7 @@ void CMainFrame::OnBossKey()
 	SendMessage(WM_SYSCOMMAND, SC_MINIMIZE, -1);
 
 	// Enable animation
-	AnimationInfo.iMinAnimate = m_WindowAnimationType;
+	AnimationInfo.iMinAnimate = WindowAnimationType;
 	::SystemParametersInfo(SPI_SETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
 }
 
@@ -12581,14 +12581,14 @@ HRESULT CMainFrame::PreviewWindowHide()
 		ANIMATIONINFO AnimationInfo;
 		AnimationInfo.cbSize = sizeof(ANIMATIONINFO);
 		::SystemParametersInfo(SPI_GETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
-		int m_WindowAnimationType = AnimationInfo.iMinAnimate;
+		int WindowAnimationType = AnimationInfo.iMinAnimate;
 		AnimationInfo.iMinAnimate = 0;
 		::SystemParametersInfo(SPI_SETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
 
 		m_wndPreView.ShowWindow(SW_HIDE);
 
 		// Enable animation
-		AnimationInfo.iMinAnimate = m_WindowAnimationType;
+		AnimationInfo.iMinAnimate = WindowAnimationType;
 		::SystemParametersInfo(SPI_SETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
 
 		if (m_pGB_preview) {

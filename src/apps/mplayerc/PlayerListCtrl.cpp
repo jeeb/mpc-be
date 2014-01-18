@@ -888,12 +888,12 @@ void CPlayerListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 
 	KillTimer(1);
 
-	int m_nItemClickedNow, m_nSubItemClickedNow;
+	int nItemClickedNow, nSubItemClickedNow;
 
-	if ((m_nItemClickedNow = HitTestEx(point, &m_nSubItemClickedNow)) < 0) {
+	if ((nItemClickedNow = HitTestEx(point, &nSubItemClickedNow)) < 0) {
 		m_nItemClicked = -1;
-	} else if (m_nItemClicked == m_nItemClickedNow /*&& m_nSubItemClicked == m_nSubItemClickedNow*/) {
-		m_nSubItemClicked = m_nSubItemClickedNow;
+	} else if (m_nItemClicked == nItemClickedNow /*&& m_nSubItemClicked == m_nSubItemClickedNow*/) {
+		m_nSubItemClicked = nSubItemClickedNow;
 
 		LV_DISPINFO dispinfo;
 		dispinfo.hdr.hwndFrom = m_hWnd;
@@ -911,8 +911,8 @@ void CPlayerListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 			}
 		}
 	} else {
-		m_nItemClicked = m_nItemClickedNow;
-		m_nSubItemClicked = m_nSubItemClickedNow;
+		m_nItemClicked = nItemClickedNow;
+		m_nSubItemClicked = nSubItemClickedNow;
 
 		SetItemState(m_nItemClicked, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED);
 	}

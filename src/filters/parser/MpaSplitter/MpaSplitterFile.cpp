@@ -446,14 +446,14 @@ HRESULT CMpaSplitterFile::Init()
 	m_startpos = startpos;
 
 	if (m_mode == mpa) {
-		DWORD m_dwFrames = 0;		// total number of frames
+		DWORD dwFrames = 0;		// total number of frames
 		Seek(m_startpos + MPA_HEADER_SIZE + 32);
 		if (BitRead(32, true) == 'Xing' || BitRead(32, true) == 'Info') {
 			BitRead(32); // Skip ID tag
 			DWORD dwFlags = (DWORD)BitRead(32);
 			// extract total number of frames in file
 			if (dwFlags & FRAMES_FLAG) {
-				m_dwFrames = (DWORD)BitRead(32);
+				dwFrames = (DWORD)BitRead(32);
 			}
 		} else if (BitRead(32, true) == 'VBRI') {
 			BitRead(32); // Skip ID tag
@@ -462,15 +462,15 @@ HRESULT CMpaSplitterFile::Init()
 			BitRead(16); // delay
 			BitRead(16); // quality
 			BitRead(32); // bytes
-			m_dwFrames = (DWORD)BitRead(32); // extract total number of frames in file
+			dwFrames = (DWORD)BitRead(32); // extract total number of frames in file
 		}
 
-		if (m_dwFrames) {
+		if (dwFrames) {
 			bool l3ext = m_mpahdr.layer == 3 && !(m_mpahdr.version&1);
-			DWORD m_dwSamplesPerFrame = m_mpahdr.layer == 1 ? 384 : l3ext ? 576 : 1152;
+			DWORD dwSamplesPerFrame = m_mpahdr.layer == 1 ? 384 : l3ext ? 576 : 1152;
 
 			m_bIsVBR = true;
-			m_rtDuration = 10000000i64 * (m_dwFrames * m_dwSamplesPerFrame / m_mpahdr.nSamplesPerSec);
+			m_rtDuration = 10000000i64 * (dwFrames * dwSamplesPerFrame / m_mpahdr.nSamplesPerSec);
 		}
 	}
 

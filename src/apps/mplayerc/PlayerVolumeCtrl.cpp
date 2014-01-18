@@ -120,9 +120,9 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					InvalidateRect(&r);
 					CDC memdc;
 
-					int m_nHeight = ((CMainFrame*)AfxGetMainWnd())->m_wndToolBar.m_nButtonHeight;
-					int m_nBMedian = m_nHeight - 3 - 0.5 * m_nHeight - 8;
-					int height = r.Height() + m_nBMedian + 4;
+					int nHeight = ((CMainFrame*)AfxGetMainWnd())->m_wndToolBar.m_nButtonHeight;
+					int nBMedian = nHeight - 3 - 0.5 * nHeight - 8;
+					int height = r.Height() + nBMedian + 4;
 
 					int fp = m_logobm.FileExists(CString(_T("background")));
 
@@ -133,7 +133,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						ThemeRGB(50, 55, 60, R, G, B);
 						ThemeRGB(20, 25, 30, R2, G2, B2);
 						TRIVERTEX tv[2] = {
-							{r.left, r.top - m_nBMedian, R*256, G*256, B*256, 255*256},
+							{r.left, r.top - nBMedian, R*256, G*256, B*256, 255*256},
 							{r.Width(), height, R2*256, G2*256, B2*256, 255*256},
 						};
 						dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
@@ -195,7 +195,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						nVolume = 0;
 					}
 
-					int m_nVolPos = r.left + (nVolume * 0.43) + 4;
+					int nVolPos = r.left + (nVolume * 0.43) + 4;
 
 					int fp = m_logobm.FileExists(CString(_T("volume")));
 
@@ -216,7 +216,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_H);
 					}
 
-					unsigned p3 = m_nVolPos > 30 ? dc.GetPixel(m_nVolPos, 0) : dc.GetPixel(30, 0);
+					unsigned p3 = nVolPos > 30 ? dc.GetPixel(nVolPos, 0) : dc.GetPixel(30, 0);
 					CPen penLeft(p2 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p3);
 
 					dc.BitBlt(0, 0, r.Width(), r.Height(), &memdc, 0, 0, SRCCOPY);
@@ -236,7 +236,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						nposx = r.left + i;
 						nposy = r.bottom - (r.Height() * i) / (r.Width() + 6);
 
-						i < m_nVolPos ? dc.SelectObject(penLeft) : dc.SelectObject(penRight);
+						i < nVolPos ? dc.SelectObject(penLeft) : dc.SelectObject(penRight);
 
 						dc.MoveTo(nposx, nposy);			//top_left
 						dc.LineTo(nposx + 2, nposy);		//top_right
