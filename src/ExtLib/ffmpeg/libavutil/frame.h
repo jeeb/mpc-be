@@ -17,6 +17,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+/**
+ * @file
+ * @ingroup lavu_frame
+ * reference-counted frame API
+ */
+
 #ifndef AVUTIL_FRAME_H
 #define AVUTIL_FRAME_H
 
@@ -28,6 +34,7 @@
 #include "rational.h"
 #include "samplefmt.h"
 #include "version.h"
+
 
 enum AVColorSpace{
     AVCOL_SPC_RGB         =  0,
@@ -51,6 +58,14 @@ enum AVColorRange{
     AVCOL_RANGE_NB             , ///< Not part of ABI
 };
 
+
+/**
+ * @defgroup lavu_frame AVFrame
+ * @ingroup lavu_data
+ *
+ * @{
+ * AVFrame is an abstraction for reference-counted raw multimedia data.
+ */
 
 enum AVFrameSideDataType {
     /**
@@ -404,12 +419,22 @@ typedef struct AVFrame {
     int            nb_side_data;
 
 /**
+ * @defgroup lavu_frame_flags AV_FRAME_FLAGS
+ * Flags describing additional frame properties.
+ *
+ * @{
+ */
+
+/**
  * The frame data may be corrupted, e.g. due to decoding errors.
  */
 #define AV_FRAME_FLAG_CORRUPT       (1 << 0)
+/**
+ * @}
+ */
 
     /**
-     * Frame flags, a combination of AV_FRAME_FLAG_*
+     * Frame flags, a combination of @ref lavu_frame_flags
      */
     int flags;
 
@@ -689,5 +714,9 @@ AVFrameSideData *av_frame_new_side_data(AVFrame *frame,
  */
 AVFrameSideData *av_frame_get_side_data(const AVFrame *frame,
                                         enum AVFrameSideDataType type);
+
+/**
+ * @}
+ */
 
 #endif /* AVUTIL_FRAME_H */
