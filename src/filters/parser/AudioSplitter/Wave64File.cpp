@@ -53,7 +53,7 @@ HRESULT CWave64File::Open(CBaseSplitterFile* pFile)
 			|| *(LONGLONG*)(data+16) < (16 + 16 + 4 + sizeof(PCMWAVEFORMAT) + 16 + 16)
 			// w64_guid_wave + w64_guid_fmt + fmt.size + sizeof(PCMWAVEFORMAT) + w64_guid_data + data.size)
 			|| memcmp(data+24, w64_guid_wave, 16) != 0) {
-		return NULL;
+		return E_FAIL;
 	}
 	__int64 end = min((__int64)*(LONGLONG*)(data + 16), m_pFile->GetLength());
 

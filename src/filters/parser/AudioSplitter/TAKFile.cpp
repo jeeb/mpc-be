@@ -252,7 +252,7 @@ HRESULT CTAKFile::Open(CBaseSplitterFile* pFile)
 	m_pFile->Seek(0);
 	DWORD id = 0;
 	if (FAILED(m_pFile->ByteRead((BYTE*)&id, 4)) || id != FCC('tBaK')) {
-		return NULL;
+		return E_FAIL;
 	}
 
 	BOOL bLastFrame	= FALSE;

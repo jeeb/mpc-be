@@ -219,7 +219,7 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 			|| *(DWORD*)(data+0) != FCC('RIFF')
 			|| *(DWORD*)(data+4) < (4 + 8 + sizeof(PCMWAVEFORMAT) + 8) // 'WAVE' + ('fmt ' + fmt.size) + sizeof(PCMWAVEFORMAT) + (data + data.size)
 			|| *(DWORD*)(data+8) != FCC('WAVE')) {
-		return NULL;
+		return E_FAIL;
 	}
 	__int64 end = min((__int64)*(DWORD*)(data + 4) + 8, m_pFile->GetLength());
 

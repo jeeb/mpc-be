@@ -99,7 +99,7 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 	m_pFile->Seek(0);
 	DWORD id = 0;
 	if (FAILED(m_pFile->ByteRead((BYTE*)&id, 4)) || id != FCC('MAC ')) {
-		return NULL;
+		return E_FAIL;
 	}
 
 	int version = 0;
