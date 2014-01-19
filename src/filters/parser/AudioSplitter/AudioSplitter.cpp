@@ -184,6 +184,16 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			CString sTitle, sPerformer;
 
 			if (ParseCUESheet(cuetextW, ChaptersList, sTitle, sPerformer)) {
+				if (CComQIPtr<IDSMPropertyBag> pPB = this) {
+					if (sTitle.GetLength() > 0) {
+						pPB->SetProperty(L"TITL", sTitle);
+						
+					}
+					if (sPerformer.GetLength() > 0) {
+						pPB->SetProperty(L"AUTH", sPerformer);
+					}
+				}
+
 				if (CComQIPtr<IDSMChapterBag> pCB = this) {
 					pCB->ChapRemoveAll();
 					while (ChaptersList.GetCount()) {
