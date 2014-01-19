@@ -114,7 +114,7 @@ HRESULT CTTAFile::Open(CBaseSplitterFile* pFile)
 		return E_FAIL;
 	}
 
-	for (size_t i = 0; i < m_totalframes; i++) {
+	for (int i = 0; i < m_totalframes; i++) {
 		uint32_t size;
 		if (FAILED(m_pFile->ByteRead((BYTE*)&size, 4))) {
 			return E_FAIL;
