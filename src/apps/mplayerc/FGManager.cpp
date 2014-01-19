@@ -2011,6 +2011,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	if (src[SRC_TTA] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>();
 		pFGF->m_chkbytes.AddTail(_T("0,4,,54544131"));               // 'TTA1'
+		pFGF->m_chkbytes.AddTail(_T("0,3,,494433"));                 // 'ID3'
 		m_source.AddTail(pFGF);
 	}
 

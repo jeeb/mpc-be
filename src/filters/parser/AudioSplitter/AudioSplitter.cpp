@@ -62,6 +62,7 @@ STDAPI DllRegisterServer()
 	chkbytes.AddTail(_T("0,4,,54544131"));               // 'TTA1'
 	chkbytes.AddTail(_T("0,4,,52494646,8,4,,57415645")); // 'RIFF....WAVE'
 	chkbytes.AddTail(_T("0,16,,726966662E91CF11A5D628DB04C10000,24,16,,77617665F3ACD3118CD100C04F8EDB8A")); // Wave64
+	chkbytes.AddTail(_T("0,3,,494433"));                 // 'ID3' for TTA
 
 	RegisterSourceFilter(
 		CLSID_AsyncReader,
