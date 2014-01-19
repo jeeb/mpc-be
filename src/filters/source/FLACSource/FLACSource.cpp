@@ -431,7 +431,7 @@ void CFLACStream::UpdateFromMetadata (void* pBuffer)
 						if (Title.GetLength() > 0 && file_info.title.IsEmpty()) {
 							file_info.title = Title;
 						}
-						if (Title.GetLength() > 0 && file_info.artist.IsEmpty()) {
+						if (Performer.GetLength() > 0 && file_info.artist.IsEmpty()) {
 							file_info.artist = Performer;
 						}
 
