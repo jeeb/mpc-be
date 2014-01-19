@@ -19,6 +19,8 @@
  */
 
 #include "stdafx.h"
+#include "../../../DSUtil/CUE.h"
+#include <atlpath.h>
 #include <MMReg.h>
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
@@ -162,7 +164,37 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
+	if (m_pOutputs.GetCount() == 0) {
+		return E_FAIL;
+	}
+
+	// read cue file
+	CPath path = GetPartFilename(pAsyncReader);
+	path.RenameExtension(L".cue");
+	if (path.FileExists()) {
+		CStdioFile cuefile(path, CFile::modeRead|CFile::typeText|CFile::shareDenyNone);
+
+		CString cuetext;
+		CString str;
+		while (cuefile.ReadString(str)) {
+			cuetext.Append(str);
+			cuetext.AppendChar('\n');
+		}
+
+		CAtlList<Chapters> ChaptersList;
+		CString sTitle, sPerformer;
+		if (ParseCUESheet(cuetext, ChaptersList, sTitle, sPerformer)) {
+			if (CComQIPtr<IDSMChapterBag> pCB = this) {
+				pCB->ChapRemoveAll();
+				while (ChaptersList.GetCount()) {
+					Chapters cp = ChaptersList.RemoveHead();
+					pCB->ChapAppend(cp.rt, cp.name);
+				}
+			}
+		}
+	}
+
+	return S_OK;
 }
 
 bool CAudioSplitterFilter::DemuxInit()

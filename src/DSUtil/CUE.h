@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <atlcoll.h>
+
 struct Chapters {
 	REFERENCE_TIME	rt;
 	CString			name;
