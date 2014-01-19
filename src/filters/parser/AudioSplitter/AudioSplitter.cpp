@@ -172,23 +172,24 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	CPath path = GetPartFilename(pAsyncReader);
 	path.RenameExtension(L".cue");
 	if (path.FileExists()) {
-		CStdioFile cuefile(path, CFile::modeRead|CFile::typeText|CFile::shareDenyNone);
+		CFile cuefile(path, CFile::modeRead|CFile::shareDenyNone);
 
-		CString cuetext;
-		CString str;
-		while (cuefile.ReadString(str)) {
-			cuetext.Append(str);
-			cuetext.AppendChar('\n');
-		}
+		if (cuefile.GetLength() <= 16384) {
+			int size = (int)cuefile.GetLength();
+			CStringA cuetextA;
+			cuefile.Read(cuetextA.GetBufferSetLength(size), size);
 
-		CAtlList<Chapters> ChaptersList;
-		CString sTitle, sPerformer;
-		if (ParseCUESheet(cuetext, ChaptersList, sTitle, sPerformer)) {
-			if (CComQIPtr<IDSMChapterBag> pCB = this) {
-				pCB->ChapRemoveAll();
-				while (ChaptersList.GetCount()) {
-					Chapters cp = ChaptersList.RemoveHead();
-					pCB->ChapAppend(cp.rt, cp.name);
+			CStringW cuetextW = UTF8ToString(cuetextA);
+			CAtlList<Chapters> ChaptersList;
+			CString sTitle, sPerformer;
+
+			if (ParseCUESheet(cuetextW, ChaptersList, sTitle, sPerformer)) {
+				if (CComQIPtr<IDSMChapterBag> pCB = this) {
+					pCB->ChapRemoveAll();
+					while (ChaptersList.GetCount()) {
+						Chapters cp = ChaptersList.RemoveHead();
+						pCB->ChapAppend(cp.rt, cp.name);
+					}
 				}
 			}
 		}
