@@ -22,6 +22,7 @@
 #include "AudioFile.h"
 #include "APEFile.h"
 #include "TAKFile.h"
+#include "TTAFile.h"
 #include "WAVFile.h"
 #include "Wave64File.h"
 
@@ -64,14 +65,27 @@ CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* m_pFile)
 	}
 
 	DWORD* id = (DWORD*)data;
-	if (*id == FCC('tBaK')) {
-		pAudioFile = DNew CTAKFile();
-	} else if (*id == FCC('MAC ')) {
+	if (*id == FCC('MAC ')) {
 		pAudioFile = DNew CAPEFile();
+	} else if (*id == FCC('tBaK')) {
+		pAudioFile = DNew CTAKFile();
+	} else if (*id == FCC('TTA1')) {
+		pAudioFile = DNew CTTAFile();
 	} else if (*id == FCC('RIFF') && *(DWORD*)(data+8) == FCC('WAVE')) {
 		pAudioFile = DNew CWAVFile();
 	} else if (memcmp(data, w64_guid_riff, 16) == 0 &&  memcmp(data+24, w64_guid_wave, 16) == 0) {
 		pAudioFile = DNew CWave64File();
+	} else if (int id3v2_size = id3v2_match_len(data)) {
+		// skip ID3V2 metadata for formats that can contain it
+		m_pFile->Seek(id3v2_size);
+		if FAILED(m_pFile->ByteRead(data, 4)) {
+			return NULL;
+		}
+		if (*id == FCC('TTA1')) {
+			pAudioFile = DNew CTTAFile();
+		} else {
+			return NULL;
+		}
 	} else {
 		return NULL;
 	}

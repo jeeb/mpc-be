@@ -266,3 +266,28 @@ void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* apetag)
 		}
 	}
 }
+
+
+// ID3v2
+// TODO: remove it from here
+
+int id3v2_match_len(const unsigned char *buf)
+{
+	if (buf[0] == 'I' && buf[1] == 'D' && buf[2] == '3'
+			&& buf[3] != 0xff && buf[4] != 0xff
+			&& (buf[6] & 0x80) == 0
+			&& (buf[7] & 0x80) == 0
+			&& (buf[8] & 0x80) == 0
+			&& (buf[9] & 0x80) == 0) {
+		int len = ((buf[6] & 0x7f) << 21) +
+			((buf[7] & 0x7f) << 14) +
+			((buf[8] & 0x7f) << 7) +
+			(buf[9] & 0x7f) + ID3v2_HEADER_SIZE;
+
+		if (buf[5] & 0x10) {
+			len += ID3v2_HEADER_SIZE;
+		}
+		return len;
+	}
+	return 0;
+}

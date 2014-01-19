@@ -525,8 +525,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 	AppSettings& s	= AfxGetAppSettings();
 	bool *src		= s.SrcFilters;
-	if ((ext == _T(".tta") && src[SRC_TTA])
-			|| (ext == _T(".amr") && src[SRC_AMR])
+	if ((ext == _T(".amr") && src[SRC_AMR])
 			|| (ext == _T(".wv") && src[SRC_WPAC])
 			|| (ext == _T(".mpc") && src[SRC_MPAC])) { // hack for internal Splitter without Source - add File Source (Async) with high merit
 		CFGFilter* pFGF = LookupFilterRegistry(CLSID_AsyncReader, m_override, MERIT64_ABOVE_DSHOW - 1);
@@ -2009,6 +2008,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_source.AddTail(pFGF);
 	}
 
+	if (src[SRC_TTA] && !IsPreview) {
+		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>();
+		pFGF->m_chkbytes.AddTail(_T("0,4,,54544131"));               // 'TTA1'
+		m_source.AddTail(pFGF);
+	}
+
 	if (src[SRC_WAV] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>();
 		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,57415645")); // 'RIFF....WAVE'
@@ -2141,17 +2146,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 			pFGF = DNew CFGFilterInternal<CMusePackSplitter>(LowMerit(MusePackSplitterName), MERIT64_DO_USE);
 		}
 		pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MUSEPACK_Stream);
-		pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
-		m_transform.AddTail(pFGF);
-	}
-
-	if (!IsPreview) {
-		if (src[SRC_TTA]) {
-			pFGF = DNew CFGFilterInternal<CTTASplitter>(TTASplitterName, MERIT64_ABOVE_DSHOW);
-		} else {
-			pFGF = DNew CFGFilterInternal<CTTASplitter>(LowMerit(TTASplitterName), MERIT64_DO_USE);
-		}
-		pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_TTA1_Stream);
 		pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
 		m_transform.AddTail(pFGF);
 	}

@@ -92,3 +92,10 @@ public:
 
 // additional functions
 void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* apetag);
+
+
+// ID3v2
+// TODO: remove it from here
+#define ID3v2_HEADER_SIZE 10
+
+int id3v2_match_len(const unsigned char *buf);
