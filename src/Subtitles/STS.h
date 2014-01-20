@@ -193,6 +193,7 @@ public:
 
 	STSStyle* GetStyle(int i);
 	bool GetStyle(int i, STSStyle& stss);
+	bool GetStyle(CString styleName, STSStyle& stss);
 	int GetCharSet(int i);
 	bool IsEntryUnicode(int i);
 	void ConvertUnicode(int i, bool fUnicode);
