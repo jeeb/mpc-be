@@ -42,5 +42,5 @@ public:
 	HRESULT Open(CBaseSplitterFile* pFile);
 	REFERENCE_TIME Seek(REFERENCE_TIME rt);
 	int GetAudioFrame(Packet* packet, REFERENCE_TIME rtStart);
-	CString GetName() const { return L"APE"; };
+	CString GetName() const { return L"TTA"; };
 };
