@@ -5499,7 +5499,7 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 			}
 			OpenMedia(p);
 		} else {
-			if (m_dwLastRun && ((GetTickCount() - m_dwLastRun)<500)) {
+			if (m_dwLastRun && ((GetTickCount() - m_dwLastRun) < 500)) {
 				s.nCLSwitches |= CLSW_ADD;
 			}
 			m_dwLastRun = GetTickCount();
@@ -10808,7 +10808,7 @@ void CMainFrame::OnFavoritesAdd()
 			if (m_wndPlaylistBar.GetCur(pli)) {
 				POSITION pos = pli.m_fns.GetHeadPosition();
 				while (pos) {
-					str += _T(";") + pli.m_fns.GetNext(pos);
+					str += _T(";") + pli.m_fns.GetNext(pos).GetName();
 				}
 			}
 		}
@@ -10933,7 +10933,7 @@ void CMainFrame::OnFavoritesQuickAddFavorite()
 			if (m_wndPlaylistBar.GetCur(pli)) {
 				POSITION pos = pli.m_fns.GetHeadPosition();
 				while (pos) {
-					str += _T(";") + pli.m_fns.GetNext(pos);
+					str += _T(";") + pli.m_fns.GetNext(pos).GetName();
 				}
 			}
 		}
@@ -12794,7 +12794,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 	POSITION pos = pOFD->fns.GetHeadPosition();
 	while (pos) {
-		CString fn = pOFD->fns.GetNext(pos);
+		CFileItem fi = pOFD->fns.GetNext(pos);
+		CString fn = fi;
 
 		fn.Trim();
 		if (fn.IsEmpty() && !fFirst) {
@@ -16379,7 +16380,7 @@ void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSe
 					// skip main file
 					pli.m_fns.GetNext(pos);
 					while (pos) {
-						str = pli.m_fns.GetNext(pos);
+						str = pli.m_fns.GetNext(pos).GetName();
 						if (str.GetLength() > 0 && name == GetFileOnly(str)) {
 							fExternal = true;
 							break;
@@ -18679,7 +18680,7 @@ void CMainFrame::SendNowPlayingToApi()
 
 			m_wndPlaylistBar.GetCur(pli);
 			if (!pli.m_fns.IsEmpty()) {
-				label = !pli.m_label.IsEmpty() ? pli.m_label : pli.m_fns.GetHead();
+				label = !pli.m_label.IsEmpty() ? pli.m_label : pli.m_fns.GetHead().GetName();
 
 				m_pMS->GetDuration(&rtDur);
 				DVD_HMSF_TIMECODE tcDur = RT2HMSF(rtDur);

@@ -91,7 +91,7 @@ POSITION CPlaylistItem::FindFile(LPCTSTR path)
 {
 	POSITION pos = m_fns.GetHeadPosition();
 	while (pos) {
-		if (m_fns.GetAt(pos).CompareNoCase(path) == 0) {
+		if (m_fns.GetAt(pos).GetName().CompareNoCase(path) == 0) {
 			return pos;
 		}
 		m_fns.GetNext(pos);
@@ -129,12 +129,13 @@ CString CPlaylistItem::GetLabel(int i)
 	return str;
 }
 
-bool FindFileInList(CAtlList<CString>& sl, CString fn)
+template<class T>
+bool FindFileInList(CAtlList<T>& sl, CString fn)
 {
 	bool fFound = false;
 	POSITION pos = sl.GetHeadPosition();
 	while (pos && !fFound) {
-		if (!sl.GetNext(pos).CompareNoCase(fn)) {
+		if (!CString(sl.GetNext(pos)).CompareNoCase(fn)) {
 			fFound = true;
 		}
 	}
@@ -183,7 +184,7 @@ void CPlaylistItem::AutoLoadFiles()
 		return;
 	}
 
-	CString& fn = m_fns.GetHead();
+	CString fn = m_fns.GetHead();
 	if (fn.Find(_T("://")) >= 0) { // skip URLs
 		return;
 	}
@@ -383,7 +384,7 @@ void CPlaylist::SortByName()
 	a.SetCount(GetCount());
 	POSITION pos = GetHeadPosition();
 	for (int i = 0; pos; i++, GetNext(pos)) {
-		CString& fn = GetAt(pos).m_fns.GetHead();
+		CString fn = GetAt(pos).m_fns.GetHead();
 		a[i].str = (LPCTSTR)fn + max(fn.ReverseFind('/'), fn.ReverseFind('\\')) + 1;
 		a[i].pos = pos;
 	}
@@ -987,8 +988,8 @@ bool CPlayerPlaylistBar::SaveMPCPlayList(CString fn, CTextFile::enc e, bool fRem
 				f.WriteString(idx + _T(",subtitle,") + fn + _T("\n"));
 			}
 		} else if (pli.m_type == CPlaylistItem::device && pli.m_fns.GetCount() == 2) {
-			f.WriteString(idx + _T(",video,") + pli.m_fns.GetHead() + _T("\n"));
-			f.WriteString(idx + _T(",audio,") + pli.m_fns.GetTail() + _T("\n"));
+			f.WriteString(idx + _T(",video,") + pli.m_fns.GetHead().GetName() + _T("\n"));
+			f.WriteString(idx + _T(",audio,") + pli.m_fns.GetTail().GetName() + _T("\n"));
 			str.Format(_T("%d,vinput,%d"), i, pli.m_vinput);
 			f.WriteString(str + _T("\n"));
 			str.Format(_T("%d,vchannel,%d"), i, pli.m_vchannel);
@@ -1291,7 +1292,7 @@ CString CPlayerPlaylistBar::GetCurFileName()
 	CString fn;
 	CPlaylistItem* pli = GetCur();
 	if (pli && !pli->m_fns.IsEmpty()) {
-		fn = pli->m_fns.GetHead();
+		fn = pli->m_fns.GetHead().GetName();
 	}
 	return(fn);
 }
@@ -1397,12 +1398,12 @@ OpenMediaData* CPlayerPlaylistBar::GetCurOMD(REFERENCE_TIME rtStart)
 
 	pli->AutoLoadFiles();
 
-	CString fn = CString(pli->m_fns.GetHead()).MakeLower();
+	CString fn = pli->m_fns.GetHead().GetName().MakeLower();
 
 	if (fn.Find(_T("video_ts.ifo")) >= 0
 			|| fn.Find(_T(".ratdvd")) >= 0) {
 		if (OpenDVDData* p = DNew OpenDVDData()) {
-			p->path = pli->m_fns.GetHead();
+			p->path = pli->m_fns.GetHead().GetName();
 			p->subs.AddTailList(&pli->m_subs);
 			return p;
 		}
@@ -1412,7 +1413,7 @@ OpenMediaData* CPlayerPlaylistBar::GetCurOMD(REFERENCE_TIME rtStart)
 		if (OpenDeviceData* p = DNew OpenDeviceData()) {
 			POSITION pos = pli->m_fns.GetHeadPosition();
 			for (int i = 0; i < _countof(p->DisplayName) && pos; i++) {
-				p->DisplayName[i] = pli->m_fns.GetNext(pos);
+				p->DisplayName[i] = pli->m_fns.GetNext(pos).GetName();
 			}
 			p->vinput = pli->m_vinput;
 			p->vchannel = pli->m_vchannel;
@@ -1932,7 +1933,7 @@ BOOL CPlayerPlaylistBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResul
 	if (col == COL_NAME) {
 		POSITION pos = pli.m_fns.GetHeadPosition();
 		while (pos) {
-			strTipText += _T("\n") + pli.m_fns.GetNext(pos);
+			strTipText += _T("\n") + pli.m_fns.GetNext(pos).GetName();
 		}
 		strTipText.Trim();
 
@@ -2107,7 +2108,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 					CPlaylistItem &pli = m_pl.GetAt(FindPos(i));
 					POSITION pos2 = pli.m_fns.GetHeadPosition();
 					while (pos2) {
-						str += _T("\r\n") + pli.m_fns.GetNext(pos2);
+						str += _T("\r\n") + pli.m_fns.GetNext(pos2).GetName();
 					}
 				}
 

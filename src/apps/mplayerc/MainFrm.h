@@ -96,7 +96,7 @@ class OpenFileData : public OpenMediaData
 {
 public:
 	OpenFileData() : rtStart(INVALID_TIME) {}
-	CAtlList<CString> fns;
+	CFileItemList fns;
 	REFERENCE_TIME rtStart;
 };
 

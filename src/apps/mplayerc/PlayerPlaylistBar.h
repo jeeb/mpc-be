@@ -24,6 +24,67 @@
 #include <afxcoll.h>
 #include "PlayerBar.h"
 #include "PlayerListCtrl.h"
+#include "../../DSUtil/CUE.h"
+#include <vector>
+
+typedef std::vector<Chapters> ChaptersList;
+class CFileItem
+{
+	CString m_fn;
+	ChaptersList m_ChaptersList;
+
+public:
+	CFileItem() {};
+	CFileItem(const CString& str) {
+		m_fn = str;
+	}
+	CFileItem(const WCHAR* str) {
+		m_fn = str;
+	}
+
+	const CFileItem& operator = (const CFileItem& fi) {
+		m_fn = fi.m_fn;
+		m_ChaptersList.assign(fi.m_ChaptersList.begin(), fi.m_ChaptersList.end());
+
+		return *this;
+	}
+
+	const CFileItem& operator = (const CString& str) {
+		m_fn = str;
+
+		return *this;
+	}
+
+	operator CString() const {
+		return m_fn;
+	}
+
+	operator LPCTSTR() const {
+		return m_fn;
+	}
+
+	CString GetName() const {
+		return m_fn;
+	};
+
+	// Chapters
+	void AddChapter(Chapters chap) {
+		m_ChaptersList.push_back(chap);
+	}
+
+	void ClearChapter() {
+		m_ChaptersList.clear();
+	}
+
+	size_t GetChapterCount() {
+		return m_ChaptersList.size();
+	}
+
+	void GetChapters(ChaptersList& chaplist) {
+		chaplist.assign(m_ChaptersList.begin(), m_ChaptersList.end());
+	}
+};
+typedef CAtlList<CFileItem> CFileItemList;
 
 class CPlaylistItem
 {
@@ -32,9 +93,14 @@ class CPlaylistItem
 public:
 	UINT m_id;
 	CString m_label;
-	CAtlList<CString> m_fns;
+	
+	CFileItemList m_fns;
 	CAtlList<CString> m_subs;
-	enum type_t {file, device} m_type;
+
+	enum type_t {
+		file,
+		device
+	} m_type;
 	REFERENCE_TIME m_duration;
 	int m_vinput, m_vchannel;
 	int m_ainput;
