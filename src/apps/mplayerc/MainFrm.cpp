@@ -96,6 +96,30 @@ static UINT s_uTaskbarRestart	= RegisterWindowMessage(_T("TaskbarCreated"));
 static UINT s_uTBBC				= RegisterWindowMessage(_T("TaskbarButtonCreated"));
 static UINT WM_NOTIFYICON		= RegisterWindowMessage(_T("MYWM_NOTIFYICON"));
 
+class __declspec(uuid("5933BB4F-EC4D-454E-8E11-B74DDA92E6F9")) ChaptersSouce : public CSource, public IDSMChapterBagImpl 
+{ 
+	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv); 
+
+public: 
+	ChaptersSouce(); 
+	virtual ~ChaptersSouce() {} 
+
+	DECLARE_IUNKNOWN; 
+}; 
+
+ChaptersSouce::ChaptersSouce() : CSource(NAME("Chapters Source"), NULL, __uuidof(this)) 
+{ 
+} 
+
+STDMETHODIMP ChaptersSouce::NonDelegatingQueryInterface(REFIID riid, void** ppv) 
+{ 
+	CheckPointer(ppv, E_POINTER); 
+
+	return 
+		QI(IDSMChapterBag) 
+		__super::NonDelegatingQueryInterface(riid, ppv); 
+} 
+
 class CSubClock : public CUnknown, public ISubClock
 {
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv) {
@@ -13032,6 +13056,33 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 					m_pMainSourceFilter = FindFilter(L"{D8980E15-E1F6-4916-A10F-D7EB4E9E10B8}", m_pGB); // AV Source
 				}
 			}
+
+			if (fi.GetChapterCount()) {
+				CComQIPtr<IDSMChapterBag> pCB;
+
+				BeginEnumFilters(m_pGB, pE, pBF) {
+					if (CComQIPtr<IDSMChapterBag> pCB2 = pBF) {
+						pCB = pBF;
+						break;
+					}
+				}
+				EndEnumFilters;
+
+				if (!pCB) {
+					ChaptersSouce* pCS = DNew ChaptersSouce;
+					m_pGB->AddFilter(pCS, L"Chapters");
+					pCB = pCS;
+				}
+
+				if (pCB) {
+					pCB->ChapRemoveAll();
+					ChaptersList chaplist;
+					fi.GetChapters(chaplist);
+					for (size_t i = 0; i < chaplist.size(); i++) {
+						pCB->ChapAppend(chaplist[i].rt, chaplist[i].name);
+					}
+				}
+			}
 		}
 
 		fFirst = false;
@@ -15321,8 +15372,10 @@ void CMainFrame::SetupFiltersSubMenu()
 					WORD c = ((WAVEFORMATEX*)mt.pbFormat)->wFormatTag;
 					name.Format(_T("%s (0x%04x)"), CString(name), (int)c);
 				}
-			} else if (clsid == __uuidof(CTextPassThruFilter) || clsid == __uuidof(CNullTextRenderer)
-					   || clsid == GUIDFromCString(_T("{48025243-2D39-11CE-875D-00608CB78066}"))) { // ISCR
+			} else if (clsid == __uuidof(CTextPassThruFilter)
+						|| clsid == __uuidof(CNullTextRenderer)
+						|| clsid == __uuidof(ChaptersSouce)
+						|| clsid == GUIDFromCString(_T("{48025243-2D39-11CE-875D-00608CB78066}"))) { // ISCR
 				// hide these
 				continue;
 			}
