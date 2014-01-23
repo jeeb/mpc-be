@@ -112,6 +112,9 @@
     <None Include="libavcodec\x86\imdct36.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
+    <None Include="libavcodec\x86\lossless_videodsp.asm">
+      <Filter>libavcodec\x86</Filter>
+    </None>
     <None Include="libavcodec\x86\mpeg4qpel.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
@@ -157,6 +160,9 @@
     <None Include="libavcodec\x86\vp8dsp_loopfilter.asm">
       <Filter>libavcodec\x86</Filter>
     </None>
+    <None Include="libavfilter\all_channel_layouts.inc">
+      <Filter>libavfilter</Filter>
+    </None>
     <None Include="libavresample\x86\audio_convert.asm">
       <Filter>libavresample\x86</Filter>
     </None>
@@ -195,9 +201,6 @@
     </None>
     <None Include="libswscale\x86\scale.asm">
       <Filter>libswscale\x86</Filter>
-    </None>
-    <None Include="libavfilter\all_channel_layouts.inc">
-      <Filter>libavfilter</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -595,6 +598,9 @@
     <ClInclude Include="libavcodec\libvpx.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
+    <ClInclude Include="libavcodec\lossless_videodsp.h">
+      <Filter>libavcodec</Filter>
+    </ClInclude>
     <ClInclude Include="libavcodec\lpc.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
@@ -967,6 +973,36 @@
     <ClInclude Include="libavcodec\xvmc_internal.h">
       <Filter>libavcodec</Filter>
     </ClInclude>
+    <ClInclude Include="libavfilter\audio.h">
+      <Filter>libavfilter</Filter>
+    </ClInclude>
+    <ClInclude Include="libavfilter\avfilter.h">
+      <Filter>libavfilter</Filter>
+    </ClInclude>
+    <ClInclude Include="libavfilter\avfiltergraph.h">
+      <Filter>libavfilter</Filter>
+    </ClInclude>
+    <ClInclude Include="libavfilter\buffersink.h">
+      <Filter>libavfilter</Filter>
+    </ClInclude>
+    <ClInclude Include="libavfilter\buffersrc.h">
+      <Filter>libavfilter</Filter>
+    </ClInclude>
+    <ClInclude Include="libavfilter\formats.h">
+      <Filter>libavfilter</Filter>
+    </ClInclude>
+    <ClInclude Include="libavfilter\internal.h">
+      <Filter>libavfilter</Filter>
+    </ClInclude>
+    <ClInclude Include="libavfilter\thread.h">
+      <Filter>libavfilter</Filter>
+    </ClInclude>
+    <ClInclude Include="libavfilter\version.h">
+      <Filter>libavfilter</Filter>
+    </ClInclude>
+    <ClInclude Include="libavfilter\video.h">
+      <Filter>libavfilter</Filter>
+    </ClInclude>
     <ClInclude Include="libavresample\audio_convert.h">
       <Filter>libavresample</Filter>
     </ClInclude>
@@ -1195,36 +1231,6 @@
     <ClInclude Include="libswscale\version.h">
       <Filter>libswscale</Filter>
     </ClInclude>
-    <ClInclude Include="libavfilter\audio.h">
-      <Filter>libavfilter</Filter>
-    </ClInclude>
-    <ClInclude Include="libavfilter\avfilter.h">
-      <Filter>libavfilter</Filter>
-    </ClInclude>
-    <ClInclude Include="libavfilter\avfiltergraph.h">
-      <Filter>libavfilter</Filter>
-    </ClInclude>
-    <ClInclude Include="libavfilter\formats.h">
-      <Filter>libavfilter</Filter>
-    </ClInclude>
-    <ClInclude Include="libavfilter\internal.h">
-      <Filter>libavfilter</Filter>
-    </ClInclude>
-    <ClInclude Include="libavfilter\thread.h">
-      <Filter>libavfilter</Filter>
-    </ClInclude>
-    <ClInclude Include="libavfilter\video.h">
-      <Filter>libavfilter</Filter>
-    </ClInclude>
-    <ClInclude Include="libavfilter\version.h">
-      <Filter>libavfilter</Filter>
-    </ClInclude>
-    <ClInclude Include="libavfilter\buffersink.h">
-      <Filter>libavfilter</Filter>
-    </ClInclude>
-    <ClInclude Include="libavfilter\buffersrc.h">
-      <Filter>libavfilter</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="config.c" />
@@ -1295,6 +1301,9 @@
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\idct_sse2_xvid.c">
+      <Filter>libavcodec\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="libavcodec\x86\lossless_videodsp_init.c">
       <Filter>libavcodec\x86</Filter>
     </ClCompile>
     <ClCompile Include="libavcodec\x86\mlpdsp.c">
@@ -1882,6 +1891,9 @@
     <ClCompile Include="libavcodec\log2_tab.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
+    <ClCompile Include="libavcodec\lossless_videodsp.c">
+      <Filter>libavcodec</Filter>
+    </ClCompile>
     <ClCompile Include="libavcodec\lsp.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
@@ -2320,6 +2332,33 @@
     <ClCompile Include="libavcodec\xiph.c">
       <Filter>libavcodec</Filter>
     </ClCompile>
+    <ClCompile Include="libavfilter\af_atempo.c">
+      <Filter>libavfilter</Filter>
+    </ClCompile>
+    <ClCompile Include="libavfilter\af_biquads.c">
+      <Filter>libavfilter</Filter>
+    </ClCompile>
+    <ClCompile Include="libavfilter\audio.c">
+      <Filter>libavfilter</Filter>
+    </ClCompile>
+    <ClCompile Include="libavfilter\avfilter.c">
+      <Filter>libavfilter</Filter>
+    </ClCompile>
+    <ClCompile Include="libavfilter\avfiltergraph.c">
+      <Filter>libavfilter</Filter>
+    </ClCompile>
+    <ClCompile Include="libavfilter\buffersink.c">
+      <Filter>libavfilter</Filter>
+    </ClCompile>
+    <ClCompile Include="libavfilter\buffersrc.c">
+      <Filter>libavfilter</Filter>
+    </ClCompile>
+    <ClCompile Include="libavfilter\formats.c">
+      <Filter>libavfilter</Filter>
+    </ClCompile>
+    <ClCompile Include="libavfilter\video.c">
+      <Filter>libavfilter</Filter>
+    </ClCompile>
     <ClCompile Include="libavresample\x86\audio_convert_init.c">
       <Filter>libavresample\x86</Filter>
     </ClCompile>
@@ -2523,33 +2562,6 @@
     </ClCompile>
     <ClCompile Include="libswscale\yuv2rgb.c">
       <Filter>libswscale</Filter>
-    </ClCompile>
-    <ClCompile Include="libavfilter\af_atempo.c">
-      <Filter>libavfilter</Filter>
-    </ClCompile>
-    <ClCompile Include="libavfilter\af_biquads.c">
-      <Filter>libavfilter</Filter>
-    </ClCompile>
-    <ClCompile Include="libavfilter\audio.c">
-      <Filter>libavfilter</Filter>
-    </ClCompile>
-    <ClCompile Include="libavfilter\avfilter.c">
-      <Filter>libavfilter</Filter>
-    </ClCompile>
-    <ClCompile Include="libavfilter\avfiltergraph.c">
-      <Filter>libavfilter</Filter>
-    </ClCompile>
-    <ClCompile Include="libavfilter\formats.c">
-      <Filter>libavfilter</Filter>
-    </ClCompile>
-    <ClCompile Include="libavfilter\video.c">
-      <Filter>libavfilter</Filter>
-    </ClCompile>
-    <ClCompile Include="libavfilter\buffersink.c">
-      <Filter>libavfilter</Filter>
-    </ClCompile>
-    <ClCompile Include="libavfilter\buffersrc.c">
-      <Filter>libavfilter</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

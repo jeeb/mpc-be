@@ -227,20 +227,20 @@ static int ac3_parse_header(AC3DecodeContext *s)
 
     skip_bits(gbc, 2); //skip copyright bit and original bitstream bit
 
-    /* default dolby matrix encoding modes */
-    s->dolby_surround_ex_mode = AC3_DSUREXMOD_NOTINDICATED;
-    s->dolby_headphone_mode   = AC3_DHEADPHONMOD_NOTINDICATED;
-
-    /* skip the timecodes or parse the Alternate Bit Stream Syntax
-       TODO: read & use the xbsi1 downmix levels */
+    /* skip the timecodes or parse the Alternate Bit Stream Syntax */
     if (s->bitstream_id != 6) {
         if (get_bits1(gbc))
             skip_bits(gbc, 14); //skip timecode1
         if (get_bits1(gbc))
             skip_bits(gbc, 14); //skip timecode2
     } else {
-        if (get_bits1(gbc))
-            skip_bits(gbc, 14); //skip xbsi1
+        if (get_bits1(gbc)) {
+            s->preferred_downmix       = get_bits(gbc, 2);
+            s->center_mix_level_ltrt   = get_bits(gbc, 3);
+            s->surround_mix_level_ltrt = av_clip(get_bits(gbc, 3), 3, 7);
+            s->center_mix_level        = get_bits(gbc, 3);
+            s->surround_mix_level      = av_clip(get_bits(gbc, 3), 3, 7);
+        }
         if (get_bits1(gbc)) {
             s->dolby_surround_ex_mode = get_bits(gbc, 2);
             s->dolby_headphone_mode   = get_bits(gbc, 2);
@@ -284,12 +284,18 @@ static int parse_frame_header(AC3DecodeContext *s)
     s->fbw_channels                 = s->channels - s->lfe_on;
     s->lfe_ch                       = s->fbw_channels + 1;
     s->frame_size                   = hdr.frame_size;
+    s->preferred_downmix            = AC3_DMIXMOD_NOTINDICATED;
     s->center_mix_level             = hdr.center_mix_level;
+    s->center_mix_level_ltrt        = 4; // -3.0dB
     s->surround_mix_level           = hdr.surround_mix_level;
+    s->surround_mix_level_ltrt      = 4; // -3.0dB
+    s->lfe_mix_level_exists         = 0;
     s->num_blocks                   = hdr.num_blocks;
     s->frame_type                   = hdr.frame_type;
     s->substreamid                  = hdr.substreamid;
     s->dolby_surround_mode          = hdr.dolby_surround_mode;
+    s->dolby_surround_ex_mode       = AC3_DSUREXMOD_NOTINDICATED;
+    s->dolby_headphone_mode         = AC3_DHEADPHONMOD_NOTINDICATED;
 
     if (s->lfe_on) {
         s->start_freq[s->lfe_ch]     = 0;

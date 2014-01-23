@@ -341,32 +341,27 @@ int ff_eac3_parse_header(AC3DecodeContext *s)
         }
     }
 
-    /* default dolby matrix encoding modes */
-    s->dolby_surround_mode    = AC3_DSURMOD_NOTINDICATED;
-    s->dolby_surround_ex_mode = AC3_DSUREXMOD_NOTINDICATED;
-    s->dolby_headphone_mode   = AC3_DHEADPHONMOD_NOTINDICATED;
-
     /* mixing metadata */
     if (get_bits1(gbc)) {
         /* center and surround mix levels */
         if (s->channel_mode > AC3_CHMODE_STEREO) {
-            skip_bits(gbc, 2);  // skip preferred stereo downmix mode
+            s->preferred_downmix = get_bits(gbc, 2);
             if (s->channel_mode & 1) {
                 /* if three front channels exist */
-                skip_bits(gbc, 3); //skip Lt/Rt center mix level
-                s->center_mix_level = get_bits(gbc, 3);
+                s->center_mix_level_ltrt = get_bits(gbc, 3);
+                s->center_mix_level      = get_bits(gbc, 3);
             }
             if (s->channel_mode & 4) {
                 /* if a surround channel exists */
-                skip_bits(gbc, 3); //skip Lt/Rt surround mix level
-                s->surround_mix_level = get_bits(gbc, 3);
+                s->surround_mix_level_ltrt = av_clip(get_bits(gbc, 3), 3, 7);
+                s->surround_mix_level      = av_clip(get_bits(gbc, 3), 3, 7);
             }
         }
 
         /* lfe mix level */
-        if (s->lfe_on && get_bits1(gbc)) {
+        if (s->lfe_on && (s->lfe_mix_level_exists = get_bits1(gbc))) {
             // TODO: use LFE mix level
-            skip_bits(gbc, 5); // skip LFE mix level code
+            s->lfe_mix_level = get_bits(gbc, 5);
         }
 
         /* info for mixing with other streams and substreams */

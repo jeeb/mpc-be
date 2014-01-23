@@ -235,6 +235,7 @@ SRCS_C = \
 	libavcodec/libspeexdec.c \
 	libavcodec/libvpx.c \
 	libavcodec/libvpxdec.c \
+	libavcodec/lossless_videodsp.c \
 	libavcodec/lsp.c \
 	libavcodec/mathtables.c \
 	libavcodec/mdct_template.c \
@@ -399,6 +400,7 @@ SRCS_C = \
 	libavcodec/x86/hpeldsp_mmx.c \
 	libavcodec/x86/idct_mmx_xvid.c \
 	libavcodec/x86/idct_sse2_xvid.c \
+	libavcodec/x86/lossless_videodsp_init.c \
 	libavcodec/x86/mlpdsp.c \
 	libavcodec/x86/motion_est.c \
 	libavcodec/x86/mpegaudiodsp.c \
@@ -517,6 +519,7 @@ SRCS_YASM = \
 	libavcodec/x86/h264_weight_10bit.asm \
 	libavcodec/x86/hpeldsp.asm \
 	libavcodec/x86/imdct36.asm \
+	libavcodec/x86/lossless_videodsp.asm \
 	libavcodec/x86/mpeg4qpel.asm \
 	libavcodec/x86/pngdsp.asm \
 	libavcodec/x86/proresdsp.asm \

@@ -44,6 +44,7 @@
     <None Include="libavcodec\x86\h264_weight_10bit.asm" />
     <None Include="libavcodec\x86\hpeldsp.asm" />
     <None Include="libavcodec\x86\imdct36.asm" />
+    <None Include="libavcodec\x86\lossless_videodsp.asm" />
     <None Include="libavcodec\x86\mpeg4qpel.asm" />
     <None Include="libavcodec\x86\pngdsp.asm" />
     <None Include="libavcodec\x86\proresdsp.asm" />
@@ -194,6 +195,7 @@
     <ClInclude Include="libavcodec\lagarithrac.h" />
     <ClInclude Include="libavcodec\libopus.h" />
     <ClInclude Include="libavcodec\libvpx.h" />
+    <ClInclude Include="libavcodec\lossless_videodsp.h" />
     <ClInclude Include="libavcodec\lpc.h" />
     <ClInclude Include="libavcodec\lsp.h" />
     <ClInclude Include="libavcodec\lzw.h" />
@@ -593,6 +595,7 @@
     <ClCompile Include="libavcodec\libvpx.c" />
     <ClCompile Include="libavcodec\libvpxdec.c" />
     <ClCompile Include="libavcodec\log2_tab.c" />
+    <ClCompile Include="libavcodec\lossless_videodsp.c" />
     <ClCompile Include="libavcodec\lsp.c" />
     <ClCompile Include="libavcodec\mathtables.c" />
     <ClCompile Include="libavcodec\mdct_fixed.c" />
@@ -761,6 +764,7 @@
     <ClCompile Include="libavcodec\x86\hpeldsp_rnd_template.c" />
     <ClCompile Include="libavcodec\x86\idct_mmx_xvid.c" />
     <ClCompile Include="libavcodec\x86\idct_sse2_xvid.c" />
+    <ClCompile Include="libavcodec\x86\lossless_videodsp_init.c" />
     <ClCompile Include="libavcodec\x86\mlpdsp.c" />
     <ClCompile Include="libavcodec\x86\motion_est.c" />
     <ClCompile Include="libavcodec\x86\mpegaudiodsp.c" />

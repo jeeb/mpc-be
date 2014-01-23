@@ -261,7 +261,6 @@ static av_cold int decode_init(AVCodecContext *avctx)
 {
     HYuvContext *s = avctx->priv_data;
 
-    ff_huffyuv_common_init(avctx);
     memset(s->vlc, 0, 4 * sizeof(VLC));
 
     s->interlaced = s->height > 288;
@@ -470,6 +469,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
         }
     }
 
+    ff_huffyuv_common_init(avctx);
 
     if ((avctx->pix_fmt == AV_PIX_FMT_YUV422P || avctx->pix_fmt == AV_PIX_FMT_YUV420P) && avctx->width & 1) {
         av_log(avctx, AV_LOG_ERROR, "width must be even for this colorspace\n");
@@ -680,26 +680,7 @@ static int left_prediction(HYuvContext *s, uint8_t *dst, const uint8_t *src, int
     if (s->bps <= 8) {
         return s->dsp.add_hfyu_left_prediction(dst, src, w, acc);
     } else {
-        //FIXME optimize
-        unsigned mask = s->n-1;
-        int i;
-        const uint16_t *src16 = (const uint16_t *)src;
-        uint16_t       *dst16 = (      uint16_t *)dst;
-
-        for(i=0; i<w-1; i++){
-            acc+= src16[i];
-            dst16[i]= acc & mask;
-            i++;
-            acc+= src16[i];
-            dst16[i]= acc & mask;
-        }
-
-        for(; i<w; i++){
-            acc+= src16[i];
-            dst16[i]= acc & mask;
-        }
-
-        return acc;
+        return s->llviddsp.add_hfyu_left_prediction_int16((      uint16_t *)dst, (const uint16_t *)src, s->n-1, w, acc);
     }
 }
 
@@ -708,20 +689,7 @@ static void add_bytes(HYuvContext *s, uint8_t *dst, uint8_t *src, int w)
     if (s->bps <= 8) {
         s->dsp.add_bytes(dst, src, w);
     } else {
-        //FIXME optimize
-        const uint16_t *src16 = (const uint16_t *)src;
-        uint16_t       *dst16 = (      uint16_t *)dst;
-        long i;
-        unsigned long msb = 0x1000100010001ULL << (s->bps-1);
-        unsigned long lsb = msb - 0x1000100010001ULL;
-        unsigned long mask = lsb + msb;
-        for (i = 0; i <= w - (int)sizeof(long)/2; i += sizeof(long)/2) {
-            long a = *(long*)(src16+i);
-            long b = *(long*)(dst16+i);
-            *(long*)(dst16+i) = ((a&lsb) + (b&lsb)) ^ ((a^b)&msb);
-        }
-        for(; i<w; i++)
-            dst16[i] = (dst16[i] + src16[i]) & mask;
+        s->llviddsp.add_int16((uint16_t*)dst, (const uint16_t*)src, s->n - 1, w);
     }
 }
 
@@ -730,25 +698,7 @@ static void add_median_prediction(HYuvContext *s, uint8_t *dst, const uint8_t *s
     if (s->bps <= 8) {
         s->dsp.add_hfyu_median_prediction(dst, src, diff, w, left, left_top);
     } else {
-        //FIXME optimize
-        unsigned mask = s->n-1;
-        int i;
-        uint16_t l, lt;
-        const uint16_t *src16  = (const uint16_t *)src;
-        const uint16_t *diff16 = (const uint16_t *)diff;
-        uint16_t       *dst16  = (      uint16_t *)dst;
-
-        l  = *left;
-        lt = *left_top;
-
-        for(i=0; i<w; i++){
-            l  = (mid_pred(l, src16[i], (l + src16[i] - lt) & mask) + diff16[i]) & mask;
-            lt = src16[i];
-            dst16[i] = l;
-        }
-
-        *left     = l;
-        *left_top = lt;
+        s->llviddsp.add_hfyu_median_prediction_int16((uint16_t *)dst, (const uint16_t *)src, (const uint16_t *)diff, s->n-1, w, left, left_top);
     }
 }
 static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
