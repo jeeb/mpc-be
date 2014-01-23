@@ -80,7 +80,7 @@ BEGIN DIALOGEX IDD_FILEPROPDETAILS LINES 20
 END
 
 BEGIN DIALOGEX IDD_FILEPROPRES LINES 10
-7		"Statico"
+7		"static"
 8		"Salva con nome..."
 END
 
@@ -451,7 +451,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
 14		"Prova"
 16		"Database online"
 17		"Ricarica file sottotitoli se rilevate modifiche"
-18		"Use Subresync"
+18		"Usa Subresync"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
@@ -1114,7 +1114,7 @@ STRING IDC_CACH_SIZE		"Dimensione cache per le operazioni sui file"
 STRING IDC_CHECK_RELATIVETO		"Lo stato di default eredita da altri stili finché non viene definito"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Consente l'animazione dei sottotitoli utilizzando un subpicture buffer maggiore di 0. Disabilitando questa opzione, l'uso della CPU sarà inferiore. Disabilitare anche in caso di sottotitoli lampeggianti."
 STRING IDC_CHECK_SPCPOW2TEX		"Deselezionandolo si libera un po' di memoria video e si salva banda nei trasferimenti dalla memoria locale a quella video, ma potrebbe non funzionare con schede video meno recenti."
-STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."
+STRING IDC_CHECK_SUBRESYNC		"Permette di visualizzare e modificare i sottotitoli (incluso il time code).Può significare rallentare il caricamento degli stessi sottotitoli."
 STRING IDC_DSDXR		"Come il VMR-9 (renderless), ma usa un vero two-pass bicubic resizer."
 STRING IDC_DSEVR		"Disponibile solo per Vista or later o su XP con .NET Framework 3.5 installato."
 STRING IDC_DSEVR_CUSTOM		"Come il EVR, ma con il Allocator-Presenter di MPC-BE per subtitling e postprocessing. Consigliato per Windows Vista o successivi."
