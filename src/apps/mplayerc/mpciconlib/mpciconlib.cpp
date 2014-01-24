@@ -254,29 +254,18 @@ extern "C" __declspec(dllexport) int get_icon_index(LPCTSTR ext)
 	} else if (_tcsicmp(ext, _T(".opus")) == 0) {
 		iconindex = IDI_OPUS_ICON;
 // Playlist
-	} else if (_tcsicmp(ext, _T(".asx")) == 0) {
-		iconindex = IDI_PLAYLIST_ICON;
-	} else if (_tcsicmp(ext, _T(".bdmv")) == 0) {
-		iconindex = IDI_PLAYLIST_ICON;
-	} else if (_tcsicmp(ext, _T(".m3u")) == 0) {
-		iconindex = IDI_PLAYLIST_ICON;
-	} else if (_tcsicmp(ext, _T(".m3u8")) == 0) {
-		iconindex = IDI_PLAYLIST_ICON;
-	} else if (_tcsicmp(ext, _T(".mpcpl")) == 0) {
-		iconindex = IDI_PLAYLIST_ICON;
-	} else if (_tcsicmp(ext, _T(".mpls")) == 0) {
-		iconindex = IDI_PLAYLIST_ICON;
-	} else if (_tcsicmp(ext, _T(".pls")) == 0) {
-		iconindex = IDI_PLAYLIST_ICON;
-	} else if (_tcsicmp(ext, _T(".wax")) == 0) {
-		iconindex = IDI_PLAYLIST_ICON;
-	} else if (_tcsicmp(ext, _T(".wmx")) == 0) {
-		iconindex = IDI_PLAYLIST_ICON;
-	} else if (_tcsicmp(ext, _T(".wvx")) == 0) {
-		iconindex = IDI_PLAYLIST_ICON;
-	} else if (_tcsicmp(ext, _T(".xspf")) == 0) {
-		iconindex = IDI_PLAYLIST_ICON;
-	} else if (_tcsicmp(ext, _T(".cue")) == 0) {
+	} else if (_tcsicmp(ext, _T(".asx")) == 0
+			|| _tcsicmp(ext, _T(".bdmv")) == 0
+			|| _tcsicmp(ext, _T(".m3u")) == 0
+			|| _tcsicmp(ext, _T(".m3u8")) == 0
+			|| _tcsicmp(ext, _T(".mpcpl")) == 0
+			|| _tcsicmp(ext, _T(".mpls")) == 0
+			|| _tcsicmp(ext, _T(".pls")) == 0
+			|| _tcsicmp(ext, _T(".wax")) == 0
+			|| _tcsicmp(ext, _T(".wmx")) == 0
+			|| _tcsicmp(ext, _T(".wvx")) == 0
+			|| _tcsicmp(ext, _T(".xspf")) == 0
+			|| _tcsicmp(ext, _T(".cue")) == 0) {
 		iconindex = IDI_PLAYLIST_ICON;
 // Other
 	} else if (_tcsicmp(ext, _T(".wtv")) == 0
