@@ -827,6 +827,10 @@ void CPlayerPlaylistBar::ParsePlayList(CAtlList<CString>& fns, CAtlList<CString>
 	} else if (ct == _T("audio/x-mpegurl")) {
 		ParseM3UPlayList(fns.GetHead());
 		return;
+	} else if (ct == _T("application/x-cue-metadata")) {
+		if (ParseCUEPlayList(fns.GetHead())) {
+			return;
+		}
 	}
 
 	AddItem(fns, subs);
@@ -1068,6 +1072,102 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 	}
 
 	SAFE_DELETE(pli);
+
+	return (m_pl.GetCount() > c);
+}
+
+bool CPlayerPlaylistBar::ParseCUEPlayList(CString fn)
+{
+	CString Title, Performer;
+	CAtlList<CUETrack> CUETrackList;
+	if (!ParseCUESheetFile(fn, CUETrackList, Title, Performer)) {
+		return false;
+	}
+
+	CAtlList<CString> fileNames;
+	POSITION pos = CUETrackList.GetHeadPosition();
+	while (pos) {
+		CUETrack cueTrack = CUETrackList.GetNext(pos);
+		if (!fileNames.Find(cueTrack.m_fn)) {
+			fileNames.AddTail(cueTrack.m_fn);
+		}
+	}
+
+	CPath base(fn);
+	base.RemoveFileSpec();
+
+	INT_PTR c = m_pl.GetCount();
+
+	pos = fileNames.GetHeadPosition();
+	while (pos) {
+		CString fName = fileNames.GetNext(pos);
+		CString fullPath = MakePath(CombinePath(base, fName));
+		BOOL bExists = TRUE;
+		if (!::PathFileExists(fullPath)) {
+			CString ext = GetFileExt(fullPath);
+			bExists = FALSE;
+
+			CString filter;
+			CAtlArray<CString> mask;
+			AfxGetAppSettings().m_Formats.GetAudioFilter(filter, mask);
+			CAtlList<CString> sl;
+			Explode(mask[0], sl, ';');
+
+			POSITION pos = sl.GetHeadPosition();
+			while (pos) {
+				CString _mask = sl.GetNext(pos);
+				_mask.Delete(0, 1);
+
+				CString newPath = fullPath;
+				newPath.Replace(ext, _mask);
+
+				if (::PathFileExists(newPath)) {
+					fullPath = newPath;
+					bExists = TRUE;
+					break;
+				}
+			}
+		}
+
+		if (bExists) {
+			CPlaylistItem pli;
+			MakeCUETitle(pli.m_label, Title, Performer);
+
+			CFileItem fi = fullPath;
+			POSITION posCue = CUETrackList.GetHeadPosition();
+			BOOL bFirst = TRUE;
+			while (posCue) {
+				CUETrack cueTrack = CUETrackList.GetNext(posCue);
+				if (cueTrack.m_fn == fName) {
+					CString cueTrackTitle;
+					MakeCUETitle(cueTrackTitle, cueTrack.m_Title, cueTrack.m_Performer, cueTrack.m_trackNum);
+					fi.AddChapter(Chapters(cueTrackTitle, cueTrack.m_rt));
+
+					if (bFirst && fileNames.GetCount() > 1) {
+						MakeCUETitle(pli.m_label, cueTrack.m_Title, cueTrack.m_Performer);
+					}
+					bFirst = FALSE;
+				}
+			}
+
+			ChaptersList chaplist;
+			fi.GetChapters(chaplist);
+			BOOL bTrustedChap = FALSE;
+			for (size_t i = 0; i < chaplist.size(); i++) {
+				if (chaplist[i].rt > 0) {
+					bTrustedChap = TRUE;
+					break;
+				}
+			}
+			if (!bTrustedChap) {
+				fi.ClearChapter();
+			}
+
+			pli.m_fns.AddHead(fi);
+
+			m_pl.AddTail(pli);
+		}
+	}
 
 	return (m_pl.GetCount() > c);
 }

@@ -265,7 +265,7 @@ void CMediaFormats::UpdateData(bool fSave)
 		ADDFMT((_T("opus"),        ResStr(IDS_MFMT_OPUS),        _T("opus"), true));
 		ADDFMT((_T("speex"),       ResStr(IDS_MFMT_SPEEX),       _T("spx"), true));
 		// playlists
-		ADDFMT((_T("pls"),         ResStr(IDS_MFMT_PLS),         _T("asx m3u m3u8 pls wvx wax wmx mpcpl xspf")));
+		ADDFMT((_T("pls"),         ResStr(IDS_MFMT_PLS),         _T("asx m3u m3u8 pls wvx wax wmx mpcpl xspf cue")));
 		ADDFMT((_T("bdpls"),       ResStr(IDS_MFMT_BDPLS),       _T("mpls bdmv")));
 #undef ADDFMT
 	}

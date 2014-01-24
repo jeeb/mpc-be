@@ -1006,7 +1006,7 @@ void CMainFrame::OnDestroy()
 	if (AfxGetAppSettings().fReset) {
 		CString strAppPath;
 		GetModuleFileName(NULL, strAppPath.GetBuffer(MAX_PATH), MAX_PATH);
-		ShellExecute(NULL, _T("open"), strAppPath, _T("/reset"), NULL, SW_SHOWNORMAL) ;
+		ShellExecute(NULL, _T("open"), strAppPath, _T("/reset"), NULL, SW_SHOWNORMAL);
 	}
 
 	if (m_hNotifyRenderThread) {
@@ -13076,6 +13076,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 				if (pCB) {
 					pCB->ChapRemoveAll();
+
 					ChaptersList chaplist;
 					fi.GetChapters(chaplist);
 					for (size_t i = 0; i < chaplist.size(); i++) {

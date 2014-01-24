@@ -2112,6 +2112,8 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 			ct = _T("application/x-bdmv-playlist");
 		} else if (ext == _T(".xspf")) {
 			ct = _T("application/xspf+xml");
+		} else if (ext == _T(".cue")) {
+			ct = _T("application/x-cue-metadata");
 		}
 
 		FILE* f = NULL;

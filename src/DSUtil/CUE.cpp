@@ -21,10 +21,12 @@
 #include "stdafx.h"
 #include "CUE.h"
 #include "text.h"
+#include "../Subtitles/TextFile.h"
 
 static CString GetCUECommand(CString& ln)
 {
 	CString c;
+	ln.Trim();
 	int i = ln.Find(' ');
 	if (i < 0) {
 		c = ln;
@@ -37,14 +39,18 @@ static CString GetCUECommand(CString& ln)
 	return c;
 }
 
-static void MakeCUETitle(CString &Title, CString title, CString performer, int track_no)
+void MakeCUETitle(CString &Title, CString title, CString performer, UINT trackNum)
 {
-	if (!performer.IsEmpty() || !title.IsEmpty()) {
-		Title.Format(_T("%02d. %s - %s"), track_no, performer, title);
-	} else if (!performer.IsEmpty()) {
-		Title.Format(_T("%02d. %s"), track_no, performer);
-	} else if (!title.IsEmpty()) {
-		Title.Format(_T("%02d. %s"), track_no, title);
+	if (performer.GetLength() > 0 && title.GetLength() > 0) {
+		Title.Format(_T("%02d. %s - %s"), trackNum, performer, title);
+	} else if (performer.GetLength() > 0) {
+		Title.Format(_T("%02d. %s"), trackNum, performer);
+	} else if (title.GetLength() > 0) {
+		Title.Format(_T("%02d. %s"), trackNum, title);
+	}
+
+	if (trackNum == UINT_MAX && Title.GetLength() > 0) {
+		Title.Delete(0, Title.Find('.') + 2);
 	}
 }
 
@@ -52,7 +58,7 @@ bool ParseCUESheet(CString cueData, CAtlList<Chapters> &ChaptersList, CString& T
 {
 	BOOL fAudioTrack;
 	int track_no = -1, /*index, */index_cnt = 0;
-	REFERENCE_TIME rt = _I64_MAX;
+	REFERENCE_TIME rt = _I64_MIN;
 	CString TrackTitle;
 	CString title, performer;
 
@@ -71,13 +77,13 @@ bool ParseCUESheet(CString cueData, CAtlList<Chapters> &ChaptersList, CString& T
 		CString cmd		= GetCUECommand(cueLine);
 
 		if (cmd == _T("TRACK")) {
-			if (rt != _I64_MAX && track_no != -1 && index_cnt) {
+			if (rt != _I64_MIN && track_no != -1 && index_cnt) {
 				MakeCUETitle(TrackTitle, title, performer, track_no);
 				if (!TrackTitle.IsEmpty()) {
 					ChaptersList.AddTail(Chapters(TrackTitle, rt));
 				}
 			}
-			rt = _I16_MAX;
+			rt = _I64_MIN;
 			index_cnt = 0;
 
 			TCHAR type[256];
@@ -105,7 +111,7 @@ bool ParseCUESheet(CString cueData, CAtlList<Chapters> &ChaptersList, CString& T
 			if (fAudioTrack) {
 				index_cnt++;
 
-				rt = MILLISECONDS_TO_100NS_UNITS((mm*60+ss)*1000);
+				rt = MILLISECONDS_TO_100NS_UNITS((mm * 60 + ss) * 1000);
 			}
 		}
 	}
@@ -122,4 +128,101 @@ bool ParseCUESheet(CString cueData, CAtlList<Chapters> &ChaptersList, CString& T
 	} else {
 		return false;
 	}
+}
+
+bool ParseCUESheetFile(CString fn, CAtlList<CUETrack> &CUETrackList, CString& Title, CString& Performer)
+{
+	CWebTextFile f;
+	if (!f.Open(fn) || f.GetLength() > 32 * 1024) {
+		return false;
+	}
+
+	if (f.GetEncoding() == CTextFile::ASCII) {
+		f.SetEncoding(CTextFile::ANSI);
+	}
+
+	Title.Empty();
+	Performer.Empty();
+
+	CString cueLine;
+
+	CAtlArray<CString> sFilesArray;
+	CAtlArray<CString> sTrackArray;
+	while (f.ReadString(cueLine)) {
+		CString cmd = GetCUECommand(cueLine);
+		if (cmd == L"TRACK") {
+			sTrackArray.Add(cueLine);
+		} else if (cmd == L"FILE" && cueLine.Find(L" WAVE") > 0) {
+			cueLine.Replace(L" WAVE", L"");
+			cueLine.Trim(L" \"");
+			sFilesArray.Add(cueLine);
+		}
+	};
+
+	if (sTrackArray.IsEmpty() || sFilesArray.IsEmpty()) {
+		return false;
+	}
+
+	BOOL bMultiple = sTrackArray.GetCount() == sFilesArray.GetCount();
+
+	CString sTitle, sPerformer, sFileName, sFileName2;
+	REFERENCE_TIME rt = _I64_MIN;
+	BOOL fAudioTrack = FALSE;
+	UINT trackNum = 0;
+
+	UINT idx = 0;
+	f.Seek(0, CFile::SeekPosition::begin);
+	while (f.ReadString(cueLine)) {
+		CString cmd = GetCUECommand(cueLine);
+
+		if (cmd == L"TRACK") {
+			if (rt != _I64_MIN) {
+				CString fName = bMultiple ? sFilesArray[idx++] : sFilesArray.GetCount() == 1 ? sFilesArray[0] : sFileName;
+				CUETrackList.AddTail(CUETrack(fName, rt, trackNum, sTitle, sPerformer));
+			}
+			rt = _I64_MIN;
+			sFileName = sFileName2;
+
+			TCHAR type[256] = { 0 };
+			trackNum = 0;
+			fAudioTrack = FALSE;
+			if (2 == swscanf_s(cueLine, L"%d %s", &trackNum, type, _countof(type) - 1)) {
+				fAudioTrack = (wcscmp(type, L"AUDIO") == 0);
+			}
+		} else if (cmd == L"TITLE") {
+			cueLine.Trim(L" \"");
+			sTitle = cueLine;
+
+			if (sFileName2.IsEmpty()) {
+				Title = sTitle;
+			}
+		} else if (cmd == L"PERFORMER") {
+			cueLine.Trim(L" \"");
+			sPerformer = cueLine;
+
+			if (sFileName2.IsEmpty()) {
+				Performer = sPerformer;
+			}
+		} else if (cmd == L"FILE" && cueLine.Find(L" WAVE") > 0) {
+			cueLine.Replace(L" WAVE", L"");
+			cueLine.Trim(L" \"");
+			if (sFileName.IsEmpty()) {
+				sFileName = sFileName2 = cueLine;
+			} else {
+				sFileName2 = cueLine;
+			}
+		} else if (cmd == L"INDEX") {
+			int idx, mm, ss, ff;
+			if (4 == swscanf_s(cueLine, L"%d %d:%d:%d", &idx, &mm, &ss, &ff) && fAudioTrack) {
+				rt = MILLISECONDS_TO_100NS_UNITS((mm * 60 + ss) * 1000);
+			}
+		}
+	}
+
+	if (rt != _I64_MIN) {
+		CString fName = bMultiple ? sFilesArray[idx] : sFilesArray.GetCount() == 1 ? sFilesArray[0] : sFileName2;
+		CUETrackList.AddTail(CUETrack(fName, rt, trackNum, sTitle, sPerformer));
+	}
+
+	return CUETrackList.GetCount() > 0;
 }
