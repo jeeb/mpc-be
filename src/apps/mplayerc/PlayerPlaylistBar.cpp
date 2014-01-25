@@ -1150,6 +1150,8 @@ bool CPlayerPlaylistBar::ParseCUEPlayList(CString fn)
 				}
 			}
 
+			fi.SetTitle(pli.m_label);
+
 			ChaptersList chaplist;
 			fi.GetChapters(chaplist);
 			BOOL bTrustedChap = FALSE;

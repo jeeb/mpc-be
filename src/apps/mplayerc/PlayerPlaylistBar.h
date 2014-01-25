@@ -31,6 +31,7 @@ typedef std::vector<Chapters> ChaptersList;
 class CFileItem
 {
 	CString m_fn;
+	CString m_Title;
 	ChaptersList m_ChaptersList;
 
 public:
@@ -65,6 +66,15 @@ public:
 
 	CString GetName() const {
 		return m_fn;
+	};
+
+	// Title
+	void SetTitle(CString Title) {
+		m_Title = Title;
+	}
+
+	CString GetTitle() const {
+		return m_Title;
 	};
 
 	// Chapters
