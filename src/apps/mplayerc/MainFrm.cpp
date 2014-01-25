@@ -16665,7 +16665,7 @@ void CMainFrame::SetupRecentFilesSubMenu()
 		UINT flags = MF_BYCOMMAND|MF_STRING|MF_ENABLED;
 		if (!MRU[i].IsEmpty()) {
 			CString path(MRU[i]);
-			if (::PathIsDirectory(path)) {
+			if (path.Find(L"\\") != 0 && ::PathIsDirectory(path)) {
 				CString tmp = path + L"\\VIDEO_TS.IFO";
 				if (::PathFileExists(tmp)) {
 					path = L"DVD - " + path;
