@@ -3246,6 +3246,7 @@ STRINGTABLE
 BEGIN
     IDS_MFMT_PLS                "Playlist"
     IDS_MFMT_BDPLS              "Blu-ray playlist"
+    IDS_MFMT_CUE                "Cue sheet"
 END
 
 STRINGTABLE

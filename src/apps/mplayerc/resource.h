@@ -1291,6 +1291,7 @@
 // playlists
 #define IDS_MFMT_PLS                    39901
 #define IDS_MFMT_BDPLS                  39902
+#define IDS_MFMT_CUE                    39903
 //
 #define IDTB_BUTTON1                    40001
 #define IDTB_BUTTON2                    40002
