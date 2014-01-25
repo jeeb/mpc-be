@@ -5550,7 +5550,10 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 				s.rtStart = 0;
 			}
 		}
-	} else {
+	} else { // s.slFiles.IsEmpty()
+		if ((s.nCLSwitches & CLSW_PLAY) && m_wndPlaylistBar.GetCount() > 0) {
+			OpenCurPlaylistItem();
+		}
 		s.nCLSwitches = CLSW_NONE;
 	}
 
