@@ -31,8 +31,9 @@ extern "C" __declspec(dllexport) int get_icon_index(LPCTSTR ext)
 		iconindex = IDI_DEFAULT_VIDEO_ICON;
 	} else if (_tcsicmp(ext, _T(":audio")) == 0) {
 		iconindex = IDI_DEFAULT_AUDIO_ICON;
+	}
 	// icons by extension
-	} else if (_tcsicmp(ext, _T(".3g2")) == 0) {
+	else if (_tcsicmp(ext, _T(".3g2")) == 0) {
 		iconindex = IDI_3G2_ICON;
 	} else if (_tcsicmp(ext, _T(".3ga")) == 0
 			|| _tcsicmp(ext, _T(".3gp")) == 0) {
@@ -246,8 +247,9 @@ extern "C" __declspec(dllexport) int get_icon_index(LPCTSTR ext)
 		iconindex = IDI_WV_ICON;
 	} else if (_tcsicmp(ext, _T(".opus")) == 0) {
 		iconindex = IDI_OPUS_ICON;
-// Playlist
-	} else if (_tcsicmp(ext, _T(".asx")) == 0
+	}
+	// playlists
+	else if (_tcsicmp(ext, _T(".asx")) == 0
 			|| _tcsicmp(ext, _T(".bdmv")) == 0
 			|| _tcsicmp(ext, _T(".m3u")) == 0
 			|| _tcsicmp(ext, _T(".m3u8")) == 0
