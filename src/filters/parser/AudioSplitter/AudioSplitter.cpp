@@ -168,6 +168,7 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		return E_FAIL;
 	}
 
+#if(0)
 	// read cue file
 	CPath path = GetPartFilename(pAsyncReader);
 	path.RenameExtension(L".cue");
@@ -204,6 +205,7 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 		}
 	}
+#endif
 
 	return S_OK;
 }
