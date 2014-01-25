@@ -260,18 +260,6 @@ extern "C" __declspec(dllexport) int get_icon_index(LPCTSTR ext)
 			|| _tcsicmp(ext, _T(".xspf")) == 0
 			|| _tcsicmp(ext, _T(".cue")) == 0) {
 		iconindex = IDI_PLAYLIST_ICON;
-// Other
-	} else if (_tcsicmp(ext, _T(".wtv")) == 0
-			|| _tcsicmp(ext, _T(".dvr-ms")) == 0
-			// raw video
-			|| _tcsicmp(ext, _T(".h264")) == 0
-			|| _tcsicmp(ext, _T(".264")) == 0
-			|| _tcsicmp(ext, _T(".vc1")) == 0
-			|| _tcsicmp(ext, _T(".h265")) == 0
-			|| _tcsicmp(ext, _T(".265")) == 0
-			|| _tcsicmp(ext, _T(".hm10")) == 0
-			|| _tcsicmp(ext, _T(".hevc")) == 0) {
-		iconindex = IDI_DEFAULT_VIDEO_ICON;
 	}
 
 	return iconindex;
