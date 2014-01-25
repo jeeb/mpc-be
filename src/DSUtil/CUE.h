@@ -36,28 +36,7 @@ struct Chapters {
 	}
 };
 
-struct CUETrack {
-	REFERENCE_TIME m_rt;
-	UINT m_trackNum;
-	CString m_fn;
-	CString m_Title;
-	CString m_Performer;
-
-	CUETrack() {
-		m_rt		= _I64_MIN;
-		m_trackNum	= 0;
-	}
-
-	CUETrack(CString fn, REFERENCE_TIME rt, UINT trackNum, CString Title, CString Performer) {
-		m_rt		= rt;
-		m_trackNum = trackNum;
-		m_fn		= fn;
-		m_Title		= Title;
-		m_Performer	= Performer;
-	}
-};
-
+CString GetCUECommand(CString& ln);
 void MakeCUETitle(CString &Title, CString title, CString performer, UINT trackNum = UINT_MAX);
-
 bool ParseCUESheet(CString cueData, CAtlList<Chapters> &ChaptersList, CString& Title, CString& Performer);
-bool ParseCUESheetFile(CString fn, CAtlList<CUETrack> &CUETrackList, CString& Title, CString& Performer);
+
