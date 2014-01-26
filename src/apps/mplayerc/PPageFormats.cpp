@@ -235,7 +235,7 @@ bool CPPageFormats::RegisterApp()
 	return true;
 }
 
-bool CPPageFormats::RegisterExt(CString ext, CString strLabel, bool fAudioOnly, bool setAssociatedWithIcon)
+bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filetype, bool setAssociatedWithIcon)
 {
 	CRegKey key;
 	CString strProgID = PROGID + ext;
@@ -314,9 +314,13 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, bool fAudioOnly, 
 			if (::PathFileExists(mpciconlib)) {
 				int icon_index = GetIconIndex(ext);
 				if (icon_index < 0) {
-					if (fAudioOnly) {
+					if (filetype == TAudio) {
 						icon_index = GetIconIndex(_T(":audio"));
-					} else {
+					} else if (filetype == TPlaylist) {
+						icon_index = GetIconIndex(_T(":playlist"));
+					}
+
+					if (icon_index < 0) {
 						icon_index = GetIconIndex(_T(":video"));
 					}
 				}
@@ -949,7 +953,7 @@ BOOL CPPageFormats::OnApply()
 			POSITION pos = exts.GetHeadPosition();
 			while (pos) {
 				if (iChecked) {
-					RegisterExt(exts.GetNext(pos), mf[(int)m_list.GetItemData(i)].GetDescription(), mf[i].IsAudioOnly(), m_bSetAssociatedWithIcon);
+					RegisterExt(exts.GetNext(pos), mf[(int)m_list.GetItemData(i)].GetDescription(), mf[i].GetFileType(), m_bSetAssociatedWithIcon);
 				} else {
 					UnRegisterExt(exts.GetNext(pos));
 				}

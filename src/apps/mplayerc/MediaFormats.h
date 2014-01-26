@@ -24,22 +24,24 @@
 #include <atlcoll.h>
 #include "BaseGraph.h"
 
+typedef enum {TMedia = 0, TAudio, TPlaylist} filetype_t;
+
 class CMediaFormatCategory
 {
 protected:
 	CString m_label, m_description, m_specreqnote;
 	CAtlList<CString> m_exts, m_backupexts;
-	bool m_fAudioOnly;
-	engine_t m_engine;
+	filetype_t	m_filetype;
+	engine_t	m_engine;
 
 public:
 	CMediaFormatCategory();
 	CMediaFormatCategory(
-		CString label, CString description, CAtlList<CString>& exts, bool fAudioOnly = false,
-		CString specreqnote =  _T(""), engine_t e = DirectShow);
+		CString label, CString description, CAtlList<CString>& exts, filetype_t filetype = TMedia,
+		CString specreqnote = _T(""), engine_t engine = DirectShow);
 	CMediaFormatCategory(
-		CString label, CString description, CString exts, bool fAudioOnly = false,
-		CString specreqnote =  _T(""), engine_t e = DirectShow);
+		CString label, CString description, CString exts, filetype_t filetype = TMedia,
+		CString specreqnote = _T(""), engine_t engine = DirectShow);
 	virtual ~CMediaFormatCategory();
 
 	void UpdateData(bool fSave);
@@ -69,8 +71,11 @@ public:
 	CString GetSpecReqNote() const {
 		return m_specreqnote;
 	}
+	filetype_t GetFileType() const {
+		return m_filetype;
+	}
 	bool IsAudioOnly() const {
-		return m_fAudioOnly;
+		return (m_filetype == TAudio);
 	}
 	engine_t GetEngineType() const {
 		return m_engine;

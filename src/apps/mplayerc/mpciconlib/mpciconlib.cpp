@@ -31,6 +31,8 @@ extern "C" __declspec(dllexport) int get_icon_index(LPCTSTR ext)
 		iconindex = IDI_DEFAULT_VIDEO_ICON;
 	} else if (_tcsicmp(ext, _T(":audio")) == 0) {
 		iconindex = IDI_DEFAULT_AUDIO_ICON;
+	} else if (_tcsicmp(ext, _T(":playlist")) == 0) {
+		iconindex = IDI_PLAYLIST_ICON;
 	}
 	// icons by extension
 	else if (_tcsicmp(ext, _T(".3g2")) == 0) {
@@ -248,7 +250,7 @@ extern "C" __declspec(dllexport) int get_icon_index(LPCTSTR ext)
 	} else if (_tcsicmp(ext, _T(".opus")) == 0) {
 		iconindex = IDI_OPUS_ICON;
 	}
-	// playlists
+	// playlists (need for compatibility with older versions)
 	else if (_tcsicmp(ext, _T(".asx")) == 0
 			|| _tcsicmp(ext, _T(".bdmv")) == 0
 			|| _tcsicmp(ext, _T(".m3u")) == 0

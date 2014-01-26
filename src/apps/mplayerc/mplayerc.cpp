@@ -1120,7 +1120,7 @@ BOOL CMPlayerCApp::InitInstance()
 					if (((m_s.nCLSwitches & CLSW_REGEXTVID) && !bAudioOnly) ||
 							((m_s.nCLSwitches & CLSW_REGEXTAUD) && bAudioOnly) ||
 							((m_s.nCLSwitches & CLSW_REGEXTPL) && bPlaylist)) {
-						CPPageFormats::RegisterExt(ext, mf[i].GetDescription(), mf[i].IsAudioOnly());
+						CPPageFormats::RegisterExt(ext, mf[i].GetDescription(), mf[i].GetFileType());
 					}
 				}
 			}
