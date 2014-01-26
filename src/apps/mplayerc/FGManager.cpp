@@ -2944,7 +2944,7 @@ STDMETHODIMP CFGManagerDVD::AddSourceFilter(LPCWSTR lpcwstrFileName, LPCWSTR lpc
 	CStringW protocol = fn.Left(fn.Find(':')+1).TrimRight(':').MakeLower();
 	CStringW ext = CPathW(fn).GetExtension().MakeLower();
 
-	GUID clsid = ext == L".ratdvd" ? GUIDFromCString(_T("{482d10b6-376e-4411-8a17-833800A065DB}")) : CLSID_DVDNavigator;
+	GUID clsid = ext == L".ratdvd" ? CLSID_RatDVDNavigator : CLSID_DVDNavigator;
 
 	CComPtr<IBaseFilter> pBF;
 	if (FAILED(hr = pBF.CoCreateInstance(clsid))
