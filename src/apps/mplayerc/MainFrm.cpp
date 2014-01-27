@@ -13284,16 +13284,23 @@ void CMainFrame::SetupChapters()
 			&& SUCCEEDED(m_pDVDI->GetCurrentLocation(&loc))
 			&& SUCCEEDED(m_pDVDI->GetNumberOfChapters(loc.TitleNum, &ulNumOfChapters))) {
  			CStringW path;
- 			path.Format(L"%s\\VTS_%02d_0.IFO", buff, loc.TitleNum);
- 			CVobFile vob;
- 			CAtlList<CString> files;
- 			if(vob.Open(path, files) && ulNumOfChapters == vob.GetChaptersCount()) {
- 				for(size_t i = 0; i < vob.GetChaptersCount(); i++) {
- 					REFERENCE_TIME rt = vob.GetChapterOffset(i);
-					CStringW str;
-					str.Format(IDS_AG_CHAPTER, i + 1);
-					m_pCB->ChapAppend(rt, str);
- 				}
+			path.Format(L"%s\\video_ts.IFO", buff);
+
+			ULONG VTSN, TTN;
+			if (::PathFileExists(path) && CVobFile::GetTitleInfo(path, loc.TitleNum, VTSN, TTN)) {
+				path.Format(L"%s\\VTS_%02lu_0.IFO", buff, VTSN);
+				
+				CAtlList<CString> files;
+				CVobFile vob;
+				if (::PathFileExists(path) && vob.Open(path, files, TTN) && ulNumOfChapters + 1 == vob.GetChaptersCount()) {
+					for (UINT i = 0; i < vob.GetChaptersCount(); i++) {
+						REFERENCE_TIME rt = vob.GetChapterOffset(i);
+						CString str;
+						str.Format(IDS_AG_CHAPTER, i + 1);
+						m_pCB->ChapAppend(rt, str);
+					}
+					vob.Close();
+				}
 			}
 		}
 	}

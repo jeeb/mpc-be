@@ -50,12 +50,8 @@ public:
 	bool Open(LPCTSTR path);
 	void Close();
 
-	operator HANDLE() const {
-		return m_hDrive;
-	}
-	operator DVD_SESSION_ID() const {
-		return m_session;
-	}
+	operator HANDLE() const { return m_hDrive; }
+	operator DVD_SESSION_ID() const { return m_session; }
 
 	bool SendKey(DVD_KEY_TYPE KeyType, BYTE* pKeyData);
 	bool ReadKey(DVD_KEY_TYPE KeyType, BYTE* pKeyData, int lba = 0);
@@ -67,13 +63,13 @@ public:
 	CLBAFile();
 	virtual ~CLBAFile();
 
-	bool IsOpen();
+	bool IsOpen() const;
 
 	bool Open(LPCTSTR path);
 	void Close();
 
-	int GetLength();
-	int GetPosition();
+	int GetLengthLBA() const;
+	int GetPositionLBA() const;
 	int Seek(int lba);
 	bool Read(BYTE* buff);
 };
@@ -81,10 +77,11 @@ public:
 class CVobFile : public CDVDSession
 {
 	// all files
-	typedef struct {
+	struct file_t {
 		CString fn;
 		int size;
-	} file_t;
+	};
+
 	CAtlArray<file_t> m_files;
 	int m_iFile;
 	int m_pos, m_size, m_offset;
@@ -107,27 +104,28 @@ public:
 	CVobFile();
 	virtual ~CVobFile();
 
-	bool IsDVD();
-	bool HasDiscKey(BYTE* key);
-	bool HasTitleKey(BYTE* key);
+	static bool GetTitleInfo(LPCTSTR fn, ULONG nTitleNum, ULONG& VTSN /* out */, ULONG& TTN /* out */); // video_ts.ifo
 
-	bool Open(CString fn, CAtlList<CString>& files /* out */); // vts ifo
-	bool Open(CAtlList<CString>& files, int offset = -1); // vts vobs, video vob offset in lba
+	bool IsDVD() const;
+	bool HasDiscKey(BYTE* key) const;
+	bool HasTitleKey(BYTE* key) const;
+
+	bool Open(CString fn, CAtlList<CString>& files /* out */, ULONG nProgNum = ULONG_MAX); // vts ifo
+	bool Open(const CAtlList<CString>& files, int offset = -1); // vts vobs, video vob offset in lba
 	void Close();
 
-	int GetLength();
-	int GetPosition();
+	int GetLength() const;
+	int GetPosition() const;
 	int Seek(int pos);
 	bool Read(BYTE* buff);
 
-	BSTR GetTrackName(UINT aTrackIdx);
+	BSTR GetTrackName(UINT aTrackIdx) const;
 
-	UINT			GetChaptersCount() { return m_ChaptersCount; }
-	LONGLONG		GetChapterOffset(UINT ChapterNumber);
+	UINT			GetChaptersCount() const { return m_ChaptersCount; }
+	LONGLONG		GetChapterOffset(UINT ChapterNumber) const;
 
-	REFERENCE_TIME	GetDuration() { return m_rtDuration; }
-
-	AV_Rational		GetAspect() { return m_Aspect; }
+	REFERENCE_TIME	GetDuration() const { return m_rtDuration; }
+	AV_Rational		GetAspect() const { return m_Aspect; }
 
 private:
 	CFile		m_ifoFile;
