@@ -18177,7 +18177,22 @@ void CMainFrame::CloseMedia()
 	if (m_pGraphThread && m_bOpenedThruThread) {
 		m_hGraphThreadEventClose.ResetEvent();
 		m_pGraphThread->PostThreadMessage(CGraphThread::TM_CLOSE, 0, 0);
-		WaitForSingleObject(m_hGraphThreadEventClose, INFINITE);
+		//WaitForSingleObject(m_hGraphThreadEventClose, INFINITE);
+
+		HANDLE handle = m_hGraphThreadEventClose;
+		DWORD dwWait;
+		// We don't want to block messages processing completely so we stop waiting
+		// on new message received from another thread or application.
+		while ((dwWait = MsgWaitForMultipleObjects(1, &handle, FALSE, INFINITE, QS_SENDMESSAGE)) != WAIT_OBJECT_0) {
+			// If we haven't got the event we were waiting for, we ensure that we have got a new message instead
+			if (dwWait == WAIT_OBJECT_0 + 1) {
+				// and we make sure it is handled before resuming waiting
+				MSG msg;
+				PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE);
+			} else {
+				ASSERT(FALSE);
+			}
+		}
 	} else {
 		CloseMediaPrivate();
 	}
