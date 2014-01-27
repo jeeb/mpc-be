@@ -247,7 +247,7 @@ HRESULT CDirectVobSubFilter::Transform(IMediaSample* pIn)
 		black = 0x10001000;
 	} else if (mt.subtype == MEDIASUBTYPE_NV12) {
 		bpp = 8;
-		black = 0x10001000;
+		black = 0x10101010;
 	}
 	CSize sub(m_w, m_h);
 	CSize in(bihIn.biWidth, bihIn.biHeight);
@@ -274,10 +274,11 @@ HRESULT CDirectVobSubFilter::Transform(IMediaSample* pIn)
 	}
 
 	if (mt.subtype == MEDIASUBTYPE_P010 || mt.subtype == MEDIASUBTYPE_P016 || mt.subtype == MEDIASUBTYPE_NV12) {
-		BYTE* pSubUV = (BYTE*)m_pTempPicBuff + (sub.cx*bpp >> 3) * sub.cy;
-		BYTE* pInUV = pDataIn + (in.cx*bpp >> 3) * in.cy;
-		sub.cy >>= 1; in.cy >>= 1;
-		if (FAILED(Copy(pSubUV, pInUV, sub, in, bpp, mt.subtype, 0x80008000))) {
+		BYTE* pSubUV = (BYTE*)m_pTempPicBuff + (sub.cx * bpp >> 3) * sub.cy;
+		BYTE* pInUV = pDataIn + (in.cx * bpp >> 3) * in.cy;
+		sub.cy >>= 1;
+		in.cy >>= 1;
+		if (FAILED(Copy(pSubUV, pInUV, sub, in, bpp, mt.subtype, mt.subtype == MEDIASUBTYPE_NV12 ? 0x80808080 : 0x80008000))) {
 			return E_FAIL;
 		}
 	}

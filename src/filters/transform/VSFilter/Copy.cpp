@@ -37,11 +37,12 @@ extern void ColorConvInit();
 
 void BltLineRGB32(DWORD* d, BYTE* sub, int w, const GUID& subtype)
 {
-	if (subtype == MEDIASUBTYPE_YV12 || subtype == MEDIASUBTYPE_I420 || subtype == MEDIASUBTYPE_IYUV) {
+	if (subtype == MEDIASUBTYPE_YV12 || subtype == MEDIASUBTYPE_I420 || subtype == MEDIASUBTYPE_IYUV
+		|| subtype == MEDIASUBTYPE_NV12) {
 		BYTE* db = (BYTE*)d;
 		BYTE* dbtend = db + w;
 
-		for (; db < dbtend; sub+=4, db++) {
+		for (; db < dbtend; sub += 4, db++) {
 			if (sub[3] < 0xff) {
 				int y = (c2y_yb[sub[0]] + c2y_yg[sub[1]] + c2y_yr[sub[2]] + 0x108000) >> 16;
 				*db = y; // w/o colors
@@ -54,7 +55,7 @@ void BltLineRGB32(DWORD* d, BYTE* sub, int w, const GUID& subtype)
 		WORD* dstY = reinterpret_cast<WORD*>(d);
 		WORD* dstYEnd = dstY + w; // What units is w given in?
 
-		for (; dstY < dstYEnd; dstY++, sub+=4)
+		for (; dstY < dstYEnd; dstY++, sub += 4)
 		{
 			if (sub[3] < 0xff)
 			{
@@ -80,7 +81,7 @@ void BltLineRGB32(DWORD* d, BYTE* sub, int w, const GUID& subtype)
 		WORD* ds = (WORD*)d;
 		WORD* dstend = ds + w;
 
-		for (; ds < dstend; sub+=4, ds++) {
+		for (; ds < dstend; sub += 4, ds++) {
 			if (sub[3] < 0xff) {
 				*ds = ((*((DWORD*)sub)>>9)&0x7c00)|((*((DWORD*)sub)>>6)&0x03e0)|((*((DWORD*)sub)>>3)&0x001f);
 			}
@@ -89,7 +90,7 @@ void BltLineRGB32(DWORD* d, BYTE* sub, int w, const GUID& subtype)
 		WORD* ds = (WORD*)d;
 		WORD* dstend = ds + w;
 
-		for (; ds < dstend; sub+=4, ds++) {
+		for (; ds < dstend; sub += 4, ds++) {
 			if (sub[3] < 0xff) {
 				*ds = ((*((DWORD*)sub)>>8)&0xf800)|((*((DWORD*)sub)>>5)&0x07e0)|((*((DWORD*)sub)>>3)&0x001f);
 			}
@@ -98,7 +99,7 @@ void BltLineRGB32(DWORD* d, BYTE* sub, int w, const GUID& subtype)
 		BYTE* dt = (BYTE*)d;
 		BYTE* dstend = dt + w*3;
 
-		for (; dt < dstend; sub+=4, dt+=3) {
+		for (; dt < dstend; sub += 4, dt+=3) {
 			if (sub[3] < 0xff) {
 				dt[0] = sub[0];
 				dt[1] = sub[1];
@@ -252,8 +253,11 @@ void CDirectVobSubFilter::PrintMessages(BYTE* pOut)
 	int pitchIn = bm.bmWidthBytes;
 	int pitchOut = bihOut.biWidth * bihOut.biBitCount >> 3;
 
-	if (subtype == MEDIASUBTYPE_YV12 || subtype == MEDIASUBTYPE_I420 || subtype == MEDIASUBTYPE_IYUV) {
+	if (subtype == MEDIASUBTYPE_YV12 || subtype == MEDIASUBTYPE_I420 || subtype == MEDIASUBTYPE_IYUV
+		|| subtype== MEDIASUBTYPE_NV12) {
 		pitchOut = bihOut.biWidth;
+	} else if (subtype == MEDIASUBTYPE_P010 || subtype == MEDIASUBTYPE_P016) {
+		pitchOut = bihOut.biWidth * 2;
 	}
 
 	pitchIn = (pitchIn+3)&~3;

@@ -225,10 +225,8 @@ STDMETHODIMP CMemSubPic::Unlock(RECT* pDirtyRect)
 				//				*s = (*s&0xff000000)|((*s>>9)&0x7c00)|((*s>>6)&0x03e0)|((*s>>3)&0x001f);
 			}
 		}
-	} 
-	else if(m_spd.type == MSP_YUY2 || m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV
-		|| m_spd.type == MSP_P010 || m_spd.type == MSP_P016 || m_spd.type == MSP_NV12) 
-	{
+	} else if(m_spd.type == MSP_YUY2 || m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV
+		|| m_spd.type == MSP_P010 || m_spd.type == MSP_P016 || m_spd.type == MSP_NV12) {
 		for(; top < bottom ; top += m_spd.pitch) {
 			BYTE* s = top;
 			BYTE* e = s + w*4;
