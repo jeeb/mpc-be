@@ -133,7 +133,7 @@ enum MCE_RAW_INPUT {
 #define DEFAULT_JUMPDISTANCE_2  5000
 #define DEFAULT_JUMPDISTANCE_3 20000
 
-typedef enum {
+enum dvstype {
 	DVS_HALF,
 	DVS_NORMAL,
 	DVS_DOUBLE,
@@ -142,26 +142,26 @@ typedef enum {
 	DVS_FROMOUTSIDE,
 	DVS_ZOOM1,
 	DVS_ZOOM2
-} dvstype;
+};
 
-typedef enum {
+enum favtype {
 	FAV_FILE,
 	FAV_DVD,
 	FAV_DEVICE
-} favtype;
+};
 
 #define MAX_DVD_POSITION 20
-typedef struct {
+struct DVD_POSITION {
 	ULONGLONG			llDVDGuid;
 	ULONG				lTitle;
 	DVD_HMSF_TIMECODE	Timecode;
-} DVD_POSITION;
+};
 
 #define MAX_FILE_POSITION 20
-typedef struct {
+struct FILE_POSITION {
 	CString				strFile;
 	LONGLONG			llPosition;
-} FILE_POSITION;
+};
 
 enum {
 	TIME_TOOLTIP_ABOVE_SEEKBAR,
@@ -169,30 +169,30 @@ enum {
 };
 
 #pragma pack(push, 1)
-typedef struct {
+struct dispmode {
 	bool fValid;
 	CSize size;
 	int bpp, freq;
 	DWORD dmDisplayFlags;
-} dispmode;
+};
 
-typedef struct {
+struct fpsmode {
 	double vfr_from;
 	double vfr_to;
 	bool fChecked;
 	dispmode dmFSRes;
 	bool fIsData;
-} fpsmode;
+};
 
 #define MaxFpsCount 30
-typedef struct {
+struct AChFR { //AutoChangeFullscrRes
 	int bEnabled;
 	fpsmode dmFullscreenRes[MaxFpsCount];
 	bool bApplyDefault;
 	bool bSetGlobal;
-}	AChFR; //AutoChangeFullscrRes
+};
 
-typedef struct {
+struct AccelTbl {
 	bool bEnable;
 	int cmd;
 	int key;
@@ -202,7 +202,7 @@ typedef struct {
 	int appcmd;
 	int remcmd;
 	int repcnt;
-}	AccelTbl;
+};
 
 #pragma pack(pop)
 
@@ -216,7 +216,27 @@ class wmcmd : public ACCEL
 public:
 	DWORD dwname;
 	UINT appcmd;
-	enum {NONE,LDOWN,LUP,LDBLCLK,MDOWN,MUP,MDBLCLK,RDOWN,RUP,RDBLCLK,X1DOWN,X1UP,X1DBLCLK,X2DOWN,X2UP,X2DBLCLK,WUP,WDOWN,LAST};
+	enum {
+		NONE,
+		LDOWN,
+		LUP,
+		LDBLCLK,
+		MDOWN,
+		MUP,
+		MDBLCLK,
+		RDOWN,
+		RUP,
+		RDBLCLK,
+		X1DOWN,
+		X1UP,
+		X1DBLCLK,
+		X2DOWN,
+		X2UP,
+		X2DBLCLK,
+		WUP,
+		WDOWN,
+		LAST
+	};
 	UINT mouse;
 	UINT mouseFS;
 	CStringA rmcmd;
@@ -315,7 +335,7 @@ public:
 		SetDefault();
 	}
 	void SetDefault() {
-		static CString formats[] = {_T("avi"), _T("mkv"), _T("mpegts"), _T("mpeg"), _T("mp4"), _T("flv"), _T("wmv")};
+		static CString formats[] = {L"avi", L"mkv", L"mpegts", L"mpeg", L"mp4", L"flv", L"wmv"};
 
 		values.RemoveAll();
 		for (size_t i = 0; i < _countof(formats); i++) {

@@ -2990,7 +2990,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 			case EC_DVD_TITLE_CHANGE: 
 				if (m_pDVDC) {
 					// Save current chapter
-					DVD_POSITION*	DvdPos = s.CurrentDVDPosition();
+					DVD_POSITION* DvdPos = s.CurrentDVDPosition();
 					if (DvdPos) {
 						DvdPos->lTitle = (DWORD)evParam1;
 					}
