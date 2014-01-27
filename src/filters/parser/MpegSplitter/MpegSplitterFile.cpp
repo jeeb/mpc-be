@@ -602,7 +602,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 	s.pesid	= pesid;
 	s.ps1id	= ps1id;
 
-	BYTE nPid = pid ? pid : pesid;
+	WORD nPid = pid ? pid : pesid;
 
 	const __int64 start		= GetPos();
 	enum stream_type type	= stream_type::unknown;
@@ -619,7 +619,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 		}
 	}
 
-	if (pesid >= 0xe0 && pesid < 0xf0) { // mpeg video
+	if (pesid >= 0xe0 && pesid < 0xf0 || pesid == 0xfe) { // mpeg video
 		// MPEG2
 		if (type == stream_type::unknown && (stream_type & MPEG2_VIDEO)) {
 			// Sequence/extension header can be split into multiple packets

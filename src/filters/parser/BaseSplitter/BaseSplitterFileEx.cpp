@@ -147,7 +147,7 @@ bool CBaseSplitterFileEx::Read(peshdr& h, BYTE code)
 {
 	memset(&h, 0, sizeof(h));
 
-	if (!(code >= 0xbd && code < 0xf0 || code == 0xfd)) { // 0xfd => blu-ray (.m2ts)
+	if (!(code >= 0xbd && code < 0xf0 || code == 0xfd || code == 0xfe)) { // 0xfd => blu-ray (.m2ts)
 		return false;
 	}
 
