@@ -214,6 +214,10 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 		}
 	}
 
+	if (m_w != m_wout || m_h != m_hout || m_arx != m_arxout || m_ary != m_aryout) {
+		bNeedReconnect = true;
+	}
+
 	if (bNeedReconnect) {
 		if (CLSID_VideoRenderer == GetCLSID(m_pOutput->GetConnected())) {
 			NotifyEvent(EC_ERRORABORT, 0, 0);
