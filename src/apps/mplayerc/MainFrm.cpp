@@ -3107,20 +3107,21 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 									s.lDVDChapter = 0;
 								} else if (s.fKeepHistory && s.fRememberDVDPos && !s.NewDvd(llDVDGuid)) {
 									// Set last remembered position (if founded...)
-									DVD_POSITION*	DvdPos = s.CurrentDVDPosition();
+									DVD_POSITION* DvdPos = s.CurrentDVDPosition();
 
-									m_pDVDC->PlayTitle(DvdPos->lTitle, DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
-									m_pDVDC->Resume(DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL);
+									if (SUCCEEDED(hr = m_pDVDC->PlayTitle(DvdPos->lTitle, DVD_CMD_FLAG_Flush, NULL))) {
+										if (SUCCEEDED(hr = m_pDVDC->Resume(DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, NULL))) {
+											hr = m_pDVDC->PlayAtTime(&DvdPos->Timecode, DVD_CMD_FLAG_Flush, NULL);
+										} else {
+											if (SUCCEEDED(hr = m_pDVDC->PlayChapterInTitle(DvdPos->lTitle, 1, DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, NULL))) {
+												if (FAILED(hr = m_pDVDC->PlayAtTime(&DvdPos->Timecode, DVD_CMD_FLAG_Flush, NULL))) {
+													hr = m_pDVDC->PlayAtTimeInTitle(DvdPos->lTitle, &DvdPos->Timecode, DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, NULL);
+												}
+											}
+										}
+									}
 
-	#if 1
-									if (SUCCEEDED (hr = m_pDVDC->PlayAtTimeInTitle(
-															DvdPos->lTitle, &DvdPos->Timecode,
-															DVD_CMD_FLAG_Block|DVD_CMD_FLAG_Flush, NULL)))
-	#else
-									if (SUCCEEDED (hr = pDVDC->PlayAtTime (&DvdPos->Timecode,
-																		   DVD_CMD_FLAG_Flush, NULL)))
-	#endif
-									{
+									if (SUCCEEDED(hr)) {
 										m_iDVDTitle = DvdPos->lTitle;
 									}
 								} else if (s.fStartMainTitle && s.fNormalStartDVD) {
@@ -3217,9 +3218,9 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 					REFERENCE_TIME rtNow = HMSF2RT(*((DVD_HMSF_TIMECODE*)&evParam1), fps);
 
 					// Save current position in the chapter
-					DVD_POSITION*	DvdPos = s.CurrentDVDPosition();
+					DVD_POSITION* DvdPos = s.CurrentDVDPosition();
 					if (DvdPos) {
-						memcpy (&DvdPos->Timecode, (void*)&evParam1, sizeof(DVD_HMSF_TIMECODE));
+						memcpy(&DvdPos->Timecode, (void*)&evParam1, sizeof(DVD_HMSF_TIMECODE));
 					}
 
 					m_wndSeekBar.SetPos(rtNow);
