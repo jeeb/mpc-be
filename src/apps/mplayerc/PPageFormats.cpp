@@ -1145,11 +1145,7 @@ void CPPageFormats::OnBnClickedVideo()
 	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
 
 	for (int i = 0, j = m_list.GetItemCount(); i < j; i++) {
-		if (!mf[m_list.GetItemData(i)].GetLabel().CompareNoCase(_T("pls"))) {
-			SetChecked(i, 0);
-			continue;
-		}
-		SetChecked(i, mf[(int)m_list.GetItemData(i)].IsAudioOnly() ? 0 : 1);
+		SetChecked(i, mf[(int)m_list.GetItemData(i)].GetFileType() == TVideo ? 1 : 0);
 	}
 	m_bFileExtChanged = true;
 
@@ -1166,7 +1162,7 @@ void CPPageFormats::OnBnClickedAudio()
 	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
 
 	for (int i = 0, j = m_list.GetItemCount(); i < j; i++) {
-		SetChecked(i, mf[(int)m_list.GetItemData(i)].IsAudioOnly() ? 1 : 0);
+		SetChecked(i, mf[(int)m_list.GetItemData(i)].GetFileType() == TAudio ? 1 : 0);
 	}
 	m_bFileExtChanged = true;
 
