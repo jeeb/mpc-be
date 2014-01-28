@@ -34,8 +34,9 @@
 #include "../apps/mplayerc/SettingsDefines.h"
 #include <vector>
 
-#define MOVE_TO_H264_START_CODE(b, e)	while(b <= e-4 && !((*(DWORD *)b == 0x01000000) || ((*(DWORD *)b & 0x00FFFFFF) == 0x00010000))) b++; if((b <= e-4) && *(DWORD *)b == 0x01000000) b++;
-#define MOVE_TO_AC3_START_CODE(b, e)	while(b <= e-8 && (*(WORD*)b != 0x770b)) b++;
+#define MOVE_TO_H264_START_CODE(b, e)	while(b <= e - 4 && !((*(DWORD*)b == 0x01000000) || ((*(DWORD*)b & 0x00FFFFFF) == 0x00010000))) b++; if((b <= e - 4) && *(DWORD*)b == 0x01000000) b++;
+#define MOVE_TO_AC3_START_CODE(b, e)	while(b <= e - 8 && (*(WORD*)b != 0x770b)) b++;
+#define MOVE_TO_AAC_START_CODE(b, e)	while(b <= e - 9 && ((*(WORD*)b & 0xf0ff) != 0xf0ff)) b++;
 
 #ifndef BSWAP32
 #define BSWAP32(x)	((x >> 24) & 0x000000ff) | \

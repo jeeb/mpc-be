@@ -1813,99 +1813,62 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 
 	// AAC
 	if (m_mt.subtype == MEDIASUBTYPE_RAW_AAC1) { // special code for aac, the currently available decoders only like whole frame samples
-		if (m_p && m_p->GetCount() == 1 && m_p->GetAt(0) == 0xff && !(!p->IsEmpty() && (p->GetAt(0) & 0xf6) == 0xf0)) {
-			m_p.Free();
+		if (!m_p) {
+			m_p.Attach(DNew Packet());
+			m_p->TrackNumber	= p->TrackNumber;
+			m_p->bDiscontinuity	= p->bDiscontinuity;
+			p->bDiscontinuity	= FALSE;
+
+			m_p->bSyncPoint	= p->bSyncPoint;
+			p->bSyncPoint	= FALSE;
+
+			m_p->rtStart	= p->rtStart;
+			p->rtStart		= INVALID_TIME;
+
+			m_p->rtStop	= p->rtStop;
+			p->rtStop	= INVALID_TIME;
 		}
 
-		if (!m_p) {
-			BYTE* base = p->GetData();
-			BYTE* s = base;
-			BYTE* e = s + p->GetCount();
+		m_p->Append(*p);
 
-			for (; s < e; s++) {
-				if (*s != 0xff) {
+		if (m_p->GetCount() < 9) {
+			return S_OK;	// Should be invalid packet
+		}
+
+		BYTE* start	= m_p->GetData();
+		BYTE* end	= start + m_p->GetCount();
+
+		for(;;) {
+			MOVE_TO_AAC_START_CODE(start, end);
+			if (start <= end - 9) {
+				audioframe_t aframe;
+				int size = ParseADTSAACHeader(start, &aframe);
+				if (size == 0) {
+					start++;
 					continue;
 				}
-
-				if (s == e-1 || (s[1]&0xf6) == 0xf0) {
-					memmove(base, s, e - s);
-					p->SetCount(e - s);
-					m_p = p;
+				if (start + size > end) {
 					break;
 				}
-			}
-		} else {
-			m_p->Append(*p);
-		}
 
-		while (m_p && m_p->GetCount() > 9) {
-			BYTE* base	= m_p->GetData();
-			BYTE* s		= base;
-			BYTE* e		= s + m_p->GetCount();
-			int len		= ((s[3]&3)<<11)|(s[4]<<3)|(s[5]>>5);
-			bool crc	= !(s[1]&1);
-			s	+= 7;
-			len	-= 7;
-			if (crc) {
-				s += 2, len -= 2;
-			}
+				if (start + size + 9 <= end) {
+					int size2 = ParseADTSAACHeader(start + size, &aframe);
+					if (size2 == 0) {
+						start++;
+						continue;
+					}
+				}
 
-			if (e - s < len) {
+				HandlePacket;
+							
+				start += size;
+			} else {
 				break;
-			}
-
-			if (len <= 0 || (e - s >= len + 2 && (s[len] != 0xff || (s[len+1]&0xf6) != 0xf0))) {
-				m_p.Free();
-				break;
-			}
-
-			CAutoPtr<Packet> p2(DNew Packet());
-
-			p2->TrackNumber		= m_p->TrackNumber;
-			p2->bDiscontinuity	|= m_p->bDiscontinuity;
-			m_p->bDiscontinuity	= false;
-
-			p2->bSyncPoint	= m_p->rtStart != INVALID_TIME;
-			p2->rtStart		= m_p->rtStart;
-			m_p->rtStart	= INVALID_TIME;
-
-			p2->rtStop	= m_p->rtStop;
-			m_p->rtStop	= INVALID_TIME;
-			p2->pmt		= m_p->pmt;
-			m_p->pmt	= NULL;
-			p2->SetData(s, len);
-
-			s += len;
-			memmove(base, s, e - s);
-			m_p->SetCount(e - s);
-
-			if (!p2->pmt && m_bFlushed) {
-				p2->pmt = CreateMediaType(&m_mt);
-				m_bFlushed = false;
-			}
-
-			HRESULT hr = __super::DeliverPacket(p2);
-			if (hr != S_OK) {
-				return hr;
 			}
 		}
 
-		if (m_p && p) {
-			if (!m_p->bDiscontinuity) {
-				m_p->bDiscontinuity = p->bDiscontinuity;
-			}
-			if (!m_p->bSyncPoint) {
-				m_p->bSyncPoint = p->bSyncPoint;
-			}
-			if (m_p->rtStart == INVALID_TIME) {
-				m_p->rtStart = p->rtStart, m_p->rtStop = p->rtStop;
-			}
-			if (m_p->pmt) {
-				DeleteMediaType(m_p->pmt);
-			}
-
-			m_p->pmt = p->pmt;
-			p->pmt = NULL;
+		if (start > m_p->GetData()) {
+			m_p->RemoveAt(0, start - m_p->GetData());
 		}
 
 		return S_OK;
@@ -1935,12 +1898,12 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 
 		MOVE_TO_H264_START_CODE(start, end);
 
-		while (start <= end-4) {
-			BYTE* next = start+1;
+		while (start <= end - 4) {
+			BYTE* next = start + 1;
 
 			MOVE_TO_H264_START_CODE(next, end);
 
-			if (next >= end-4) {
+			if (next >= end - 4) {
 				break;
 			}
 
@@ -2082,7 +2045,7 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 		BYTE* end = start + m_p->GetCount();
 
 		bool bSeqFound = false;
-		while (start <= end-4) {
+		while (start <= end - 4) {
 			if (*(DWORD*)start == 0x0D010000) {
 				bSeqFound = true;
 				break;
@@ -2092,10 +2055,10 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 			start++;
 		}
 
-		while (start <= end-4) {
+		while (start <= end - 4) {
 			BYTE* next = start + 1;
 
-			while (next <= end-4) {
+			while (next <= end - 4) {
 				if (*(DWORD*)next == 0x0D010000) {
 					if (bSeqFound) {
 						break;
@@ -2107,7 +2070,7 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 				next++;
 			}
 
-			if (next >= end-4) {
+			if (next >= end - 4) {
 				break;
 			}
 
@@ -2197,7 +2160,7 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 
 		for(;;) {
 			MOVE_TO_AC3_START_CODE(start, end);
-			if (start <= end-8) {
+			if (start <= end - 8) {
 				audioframe_t aframe;
 				int size = ParseAC3Header(start, &aframe);
 				if (size == 0) {
@@ -2369,7 +2332,7 @@ HRESULT CMpegSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 		m_p->Append(*p);
 
 		BYTE* pData = m_p->GetData();
-		int len = (pData[0]<<8)|pData[1];
+		int len = (pData[0] << 8) | pData[1];
 
 		if (!len) {
 			if (m_p) {
