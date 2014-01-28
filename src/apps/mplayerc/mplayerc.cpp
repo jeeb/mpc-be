@@ -1103,24 +1103,16 @@ BOOL CMPlayerCApp::InitInstance()
 			CMediaFormats& mf = m_s.m_Formats;
 			mf.UpdateData(false);
 
-			bool bAudioOnly, bPlaylist;
-
 			for (unsigned int i = 0; i < mf.GetCount(); i++) {
-				bPlaylist = !mf[i].GetLabel().CompareNoCase(_T("pls"));
+				filetype_t filetype = mf[i].GetFileType();
 
-				if (bPlaylist && !(m_s.nCLSwitches & CLSW_REGEXTPL)) {
-					continue;
-				}
-
-				bAudioOnly = mf[i].IsAudioOnly();
-
-				int j = 0;
-				CString str = mf[i].GetExtsWithPeriod();
-				for (CString ext = str.Tokenize(_T(" "), j); !ext.IsEmpty(); ext = str.Tokenize(_T(" "), j)) {
-					if (((m_s.nCLSwitches & CLSW_REGEXTVID) && !bAudioOnly) ||
-							((m_s.nCLSwitches & CLSW_REGEXTAUD) && bAudioOnly) ||
-							((m_s.nCLSwitches & CLSW_REGEXTPL) && bPlaylist)) {
-						CPPageFormats::RegisterExt(ext, mf[i].GetDescription(), mf[i].GetFileType());
+				if ((m_s.nCLSwitches & CLSW_REGEXTVID) && filetype == TVideo
+						|| (m_s.nCLSwitches & CLSW_REGEXTAUD) && filetype == TAudio
+						|| (m_s.nCLSwitches & CLSW_REGEXTPL) && filetype == TPlaylist) {
+					int j = 0;
+					CString str = mf[i].GetExtsWithPeriod();
+					for (CString ext = str.Tokenize(_T(" "), j); !ext.IsEmpty(); ext = str.Tokenize(_T(" "), j)) {
+						CPPageFormats::RegisterExt(ext, mf[i].GetDescription(), filetype);
 					}
 				}
 			}
