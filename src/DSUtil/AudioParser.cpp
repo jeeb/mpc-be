@@ -838,7 +838,8 @@ int ParseADTSAACHeader(const BYTE* buf, audioframe_t* audioframe)
 		audioframe->param1     = headersize; // header size
 		audioframe->samplerate = mp4a_samplerates[(buf[2] & 0x3c) >> 2];
 		BYTE channel_index = ((buf[2] & 0x01) << 2) | ((buf[3] & 0xc0) >> 6);
-		if (audioframe->samplerate == 0 || channel_index == 0 || channel_index >= 8) {
+		if (audioframe->samplerate == 0/* || channel_index == 0*/ || channel_index >= 8) {
+			// Channel Configurations - 0: Defined in AOT Specific Config, so do not ignore it;
 			return 0;
 		}
 		audioframe->channels   = mp4a_channels[channel_index];
