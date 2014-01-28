@@ -37,6 +37,7 @@
 //#include "time.h"
 // <== End patch MPC BE
 #include "avstring.h"
+#include "timer.h"
 
 typedef struct Parser {
     const AVClass *class;
