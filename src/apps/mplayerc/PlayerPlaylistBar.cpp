@@ -335,7 +335,7 @@ void CPlaylistItem::AutoLoadFiles()
 		}
 
 		CMediaFormats& mf = s.m_Formats;
-		if (!mf.FindExt(ext, true)) {
+		if (!mf.FindAudioExt(ext)) {
 			for (size_t i = 0; i < paths.GetCount(); i++) {
 				WIN32_FIND_DATA fd = {0};
 
@@ -364,7 +364,7 @@ void CPlaylistItem::AutoLoadFiles()
 							ext2 = ext2.Mid(n + 1).MakeLower();
 							CString fullpath = paths[i] + fd.cFileName;
 
-							if (ext != ext2 && mf.FindExt(ext2, true) && !FindFileInList(m_fns, fullpath) && s.IsUsingRtspEngine(fullpath, DirectShow)) {
+							if (ext != ext2 && mf.FindAudioExt(ext2) && !FindFileInList(m_fns, fullpath) && s.IsUsingRtspEngine(fullpath, DirectShow)) {
 								m_fns.AddTail(fullpath);
 							}
 						} while (FindNextFile(hFind, &fd));

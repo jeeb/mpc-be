@@ -74,9 +74,6 @@ public:
 	filetype_t GetFileType() const {
 		return m_filetype;
 	}
-	bool IsAudioOnly() const {
-		return (m_filetype == TAudio);
-	}
 	engine_t GetEngineType() const {
 		return m_engine;
 	}
@@ -93,8 +90,9 @@ public:
 
 	void UpdateData(bool fSave);
 
-	bool FindExt(CString ext, bool fAudioOnly = false);
-	CMediaFormatCategory* FindMediaByExt(CString ext, bool fAudioOnly = false);
+	bool FindExt(CString ext);
+	bool FindAudioExt(CString ext);
+	CMediaFormatCategory* FindMediaByExt(CString ext);
 
 	void GetFilter(CString& filter, CAtlArray<CString>& mask);
 	void GetAudioFilter(CString& filter, CAtlArray<CString>& mask);
