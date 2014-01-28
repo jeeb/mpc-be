@@ -321,13 +321,11 @@ void CMediaFormats::GetFilter(CString& filter, CAtlArray<CString>& mask)
 	mask.Add(_T(""));
 
 	for (size_t i = 0; i < GetCount(); i++) {
-		if (GetAt(i).IsAudioOnly() || !GetAt(i).GetLabel().CompareNoCase(_T("pls"))) {
-			continue;
+		if (GetAt(i).GetFileType() == TVideo) {
+			strTemp = GetAt(i).GetFilter() + _T(";");
+			mask[1] += strTemp;
+			filter += strTemp;
 		}
-
-		strTemp	= GetAt(i).GetFilter() + _T(";");
-		mask[1]	+= strTemp;
-		filter	+= strTemp;
 	}
 	filter.TrimRight(_T(';'));
 	filter += _T("|");
@@ -337,7 +335,7 @@ void CMediaFormats::GetFilter(CString& filter, CAtlArray<CString>& mask)
 	mask.Add(_T(""));
 
 	for (size_t i = 0; i < GetCount(); i++) {
-		if (GetAt(i).IsAudioOnly()) {
+		if (GetAt(i).GetFileType() == TAudio) {
 			strTemp	= GetAt(i).GetFilter() + _T(";");
 			mask[1]	+= strTemp;
 			filter	+= strTemp;
