@@ -29,7 +29,7 @@
 //
 
 CMediaFormatCategory::CMediaFormatCategory()
-	: m_filetype(TMedia)
+	: m_filetype(TVideo)
 	, m_engine(DirectShow)
 {
 }
@@ -230,12 +230,12 @@ void CMediaFormats::UpdateData(bool fSave)
 		ADDFMT((_T("rt"),          ResStr(IDS_MFMT_RT),          _T("rt rp smil")));
 		ADDFMT((_T("wmv"),         ResStr(IDS_MFMT_WMV),         _T("wmv wmp wm asf")));
 //		ADDFMT((_T("videocd"),     ResStr(IDS_MFMT_VIDEOCD),     _T("dat")));
-		ADDFMT((_T("ratdvd"),      ResStr(IDS_MFMT_RATDVD),      _T("ratdvd"), TMedia, _T("ratdvd media file")));
-		ADDFMT((_T("bink"),        ResStr(IDS_MFMT_BINK),        _T("smk bik"), TMedia, _T("smackw32/binkw32.dll in dll path")));
+		ADDFMT((_T("ratdvd"),      ResStr(IDS_MFMT_RATDVD),      _T("ratdvd"), TVideo, _T("ratdvd media file")));
+		ADDFMT((_T("bink"),        ResStr(IDS_MFMT_BINK),        _T("smk bik"), TVideo, _T("smackw32/binkw32.dll in dll path")));
 		ADDFMT((_T("flic"),        ResStr(IDS_MFMT_FLIC),        _T("fli flc flic")));
 		ADDFMT((_T("dsm"),         ResStr(IDS_MFMT_DSM),         _T("dsm dsv dsa dss")));
 		ADDFMT((_T("ivf"),         ResStr(IDS_MFMT_IVF),         _T("ivf")));
-		ADDFMT((_T("swf"),         ResStr(IDS_MFMT_SWF),         _T("swf"), TMedia, _T("ShockWave ActiveX control"), ShockWave));
+		ADDFMT((_T("swf"),         ResStr(IDS_MFMT_SWF),         _T("swf"), TVideo, _T("ShockWave ActiveX control"), ShockWave));
 		ADDFMT((_T("other"),       ResStr(IDS_MFMT_OTHER),       _T("divx rmvb amv wtv dvr-ms")));
 		ADDFMT((_T("raw video"),   ResStr(IDS_MFMT_RAW_VIDEO),   _T("h264 264 vc1 h265 265 hm10 hevc")));
 		// audio files

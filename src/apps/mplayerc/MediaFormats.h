@@ -24,7 +24,7 @@
 #include <atlcoll.h>
 #include "BaseGraph.h"
 
-typedef enum {TMedia = 0, TAudio, TPlaylist} filetype_t;
+typedef enum {TVideo = 0, TAudio, TPlaylist} filetype_t;
 
 class CMediaFormatCategory
 {
@@ -37,10 +37,10 @@ protected:
 public:
 	CMediaFormatCategory();
 	CMediaFormatCategory(
-		CString label, CString description, CAtlList<CString>& exts, filetype_t filetype = TMedia,
+		CString label, CString description, CAtlList<CString>& exts, filetype_t filetype = TVideo,
 		CString specreqnote = _T(""), engine_t engine = DirectShow);
 	CMediaFormatCategory(
-		CString label, CString description, CString exts, filetype_t filetype = TMedia,
+		CString label, CString description, CString exts, filetype_t filetype = TVideo,
 		CString specreqnote = _T(""), engine_t engine = DirectShow);
 	virtual ~CMediaFormatCategory();
 
