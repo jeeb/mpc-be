@@ -4321,6 +4321,12 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	}
 	s.nCLSwitches &= ~CLSW_OPEN;
 
+	if (OpenDVDData *pDVDData = dynamic_cast<OpenDVDData*>(pOMD.m_p)) {
+		if (pDVDData->pDvdState && m_pDVDC) {
+			VERIFY(SUCCEEDED(m_pDVDC->SetState(pDVDData->pDvdState, DVD_CMD_FLAG_Block, NULL)));
+		}
+	}
+
 	SendNowPlayingToApi();
 	SetupChapters();
 
@@ -14980,10 +14986,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			if (pFileData->rtStart > 0 && m_pMS) {
 				REFERENCE_TIME rtPos = pFileData->rtStart;
 				VERIFY(SUCCEEDED(m_pMS->SetPositions(&rtPos, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning)));
-			}
-		} else if (pDVDData) {
-			if (pDVDData->pDvdState && m_pDVDC) {
-				VERIFY(m_pDVDC->SetState(pDVDData->pDvdState, DVD_CMD_FLAG_Block, NULL) == S_OK);
 			}
 		}
 
