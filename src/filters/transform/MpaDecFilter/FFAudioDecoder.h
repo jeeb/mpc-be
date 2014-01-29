@@ -66,6 +66,7 @@ public:
 
 	// info
 	enum AVCodecID GetCodecId(); // safe
+	const char* GetCodecName();  // unsafe
 	SampleFormat GetSampleFmt(); // unsafe
 	DWORD GetSampleRate();  // unsafe
 	WORD  GetChannels();    // unsafe

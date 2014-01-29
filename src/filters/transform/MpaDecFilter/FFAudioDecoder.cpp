@@ -572,6 +572,11 @@ enum AVCodecID CFFAudioDecoder::GetCodecId()
 	return AV_CODEC_ID_NONE;
 }
 
+const char* CFFAudioDecoder::GetCodecName()
+{
+	return (m_pAVCtx->codec_descriptor)->name;
+}
+
 SampleFormat CFFAudioDecoder::GetSampleFmt()
 {
 	return (SampleFormat)m_pAVCtx->sample_fmt;
