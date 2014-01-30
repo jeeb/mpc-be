@@ -466,7 +466,7 @@ HRESULT FFH264BuildPicParams(struct AVCodecContext* pAVCtx, DWORD nPCIVendor, DW
 	if (cur_sps && cur_pps) {
 		*nPictStruct = h->picture_structure;
 
-		if (cur_sps->mb_width == 0 || cur_sps->mb_height == 0) {
+		if (!cur_sps->mb_width || !cur_sps->mb_height) {
 			return VFW_E_INVALID_FILE_FORMAT;
 		}
 
@@ -500,6 +500,9 @@ HRESULT FFH264BuildPicParams(struct AVCodecContext* pAVCtx, DWORD nPCIVendor, DW
 
 		pDXVAPicParams->log2_max_frame_num_minus4				= cur_sps->log2_max_frame_num - 4;
 		pDXVAPicParams->pic_order_cnt_type						= cur_sps->poc_type;
+
+		pDXVAPicParams->log2_max_pic_order_cnt_lsb_minus4		= 0;
+		pDXVAPicParams->delta_pic_order_always_zero_flag		= 0;
 		if (cur_sps->poc_type == 0)
 			pDXVAPicParams->log2_max_pic_order_cnt_lsb_minus4	= cur_sps->log2_max_poc_lsb - 4;
 		else if (cur_sps->poc_type == 1)
@@ -519,14 +522,14 @@ HRESULT FFH264BuildPicParams(struct AVCodecContext* pAVCtx, DWORD nPCIVendor, DW
 		pDXVAPicParams->pic_init_qp_minus26						= cur_pps->init_qp - 26;
 		pDXVAPicParams->pic_init_qs_minus26						= cur_pps->init_qs - 26;
 
-		pDXVAPicParams->CurrPic.AssociatedFlag = field_pic_flag && (h->picture_structure == PICT_BOTTOM_FIELD);
-		pDXVAPicParams->CurrFieldOrderCnt[0] = 0;
+		pDXVAPicParams->CurrPic.AssociatedFlag					= field_pic_flag && (h->picture_structure == PICT_BOTTOM_FIELD);
+		pDXVAPicParams->CurrFieldOrderCnt[0]					= 0;
 		if ((h->picture_structure & PICT_TOP_FIELD) && current_picture->field_poc[0] != INT_MAX) {
-			pDXVAPicParams->CurrFieldOrderCnt[0] = current_picture->field_poc[0];
+			pDXVAPicParams->CurrFieldOrderCnt[0]				= current_picture->field_poc[0];
 		}
-		pDXVAPicParams->CurrFieldOrderCnt[1] = 0;
+		pDXVAPicParams->CurrFieldOrderCnt[1]					= 0;
 		if ((h->picture_structure & PICT_BOTTOM_FIELD) && current_picture->field_poc[1] != INT_MAX) {
-			pDXVAPicParams->CurrFieldOrderCnt[1] = current_picture->field_poc[1];
+			pDXVAPicParams->CurrFieldOrderCnt[1]				= current_picture->field_poc[1];
 		}
 
 		CopyScalingMatrix (pDXVAScalingMatrix, cur_pps, nPCIVendor, nPCIDevice);
