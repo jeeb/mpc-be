@@ -100,6 +100,8 @@ protected:
 	B_FRAME									m_BFrames[2];
 	int										m_nPosB;
 
+	bool									m_bWaitKeyFrame;
+
 	int										m_nOutputWidth;
 	int										m_nOutputHeight;
 	int										m_nARX, m_nARY;

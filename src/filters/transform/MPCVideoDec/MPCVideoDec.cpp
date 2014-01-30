@@ -887,6 +887,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_nCodecId(AV_CODEC_ID_NONE)
 	, m_bReorderBFrame(true)
 	, m_nPosB(1)
+	, m_bWaitKeyFrame(false)
 	, m_DXVADecoderGUID(GUID_NULL)
 	, m_nActiveCodecs(CODECS_ALL)
 	, m_rtAvrTimePerFrame(0)
@@ -1648,6 +1649,17 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		m_bReorderBFrame = false;
 	}
 
+	m_bWaitKeyFrame =	m_nCodecId == AV_CODEC_ID_VC1
+					 || m_nCodecId == AV_CODEC_ID_VC1IMAGE
+					 || m_nCodecId == AV_CODEC_ID_WMV3
+					 || m_nCodecId == AV_CODEC_ID_WMV3IMAGE
+					 || m_nCodecId == AV_CODEC_ID_MPEG2VIDEO
+					 || m_nCodecId == AV_CODEC_ID_RV30
+					 || m_nCodecId == AV_CODEC_ID_RV40
+					 || m_nCodecId == AV_CODEC_ID_VP3
+					 || m_nCodecId == AV_CODEC_ID_THEORA
+					 || m_nCodecId == AV_CODEC_ID_MPEG4;
+
 	m_pAVCtx->codec_id              = m_nCodecId;
 	m_pAVCtx->codec_tag             = pBMI->biCompression ? pBMI->biCompression : pmt->subtype.Data1;
 	m_pAVCtx->coded_width           = pBMI->biWidth;
@@ -2370,7 +2382,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 				}
 
 				if (m_nDecoderMode != MODE_SOFTWARE) {
-					// use ffmpeg's parser for DXVA decoder - MPEG2 & H.264 AnnexB format
+					// use ffmpeg's parser for DXVA decoder - H.264 AnnexB format
 					hr = m_pDXVADecoder->DecodeFrame(avpkt.data, avpkt.size, avpkt.pts, avpkt.pts + 1);
 					av_frame_unref(m_pFrame);
 					continue;
@@ -2394,18 +2406,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			return S_OK;
 		}
 
-		bool fWaitKeyFrame =	m_nCodecId == AV_CODEC_ID_VC1
-							 || m_nCodecId == AV_CODEC_ID_VC1IMAGE
-							 || m_nCodecId == AV_CODEC_ID_WMV3
-							 || m_nCodecId == AV_CODEC_ID_WMV3IMAGE
-							 || m_nCodecId == AV_CODEC_ID_MPEG2VIDEO
-							 || m_nCodecId == AV_CODEC_ID_RV30
-							 || m_nCodecId == AV_CODEC_ID_RV40
-							 || m_nCodecId == AV_CODEC_ID_VP3
-							 || m_nCodecId == AV_CODEC_ID_THEORA
-							 || m_nCodecId == AV_CODEC_ID_MPEG4;
-
-		if (fWaitKeyFrame) {
+		if (m_bWaitKeyFrame) {
 			if (m_bWaitingForKeyFrame && got_picture) {
 				if (m_pFrame->key_frame) {
 					m_bWaitingForKeyFrame = FALSE;
