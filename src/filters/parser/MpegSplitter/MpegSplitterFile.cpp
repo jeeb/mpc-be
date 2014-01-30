@@ -306,7 +306,7 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum)
 
 	while (GetRemaining()) {
 		if (m_type == mpeg_ps || m_type == mpeg_es) {
-			if (!NextMpegStartCode(b)) {	// continue;
+			if (!NextMpegStartCode(b)) {
 				ASSERT(0);
 				break;
 			}
@@ -321,7 +321,7 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum)
 
 				__int64 pos3 = GetPos();
 
-				if (h.fpts && AddStream(0, b, h.id_ext, h.len) == TrackNum) {
+				if (h.fpts && AddStream(0, b, h.id_ext, h.len, FALSE) == TrackNum) {
 					//ASSERT(h.pts >= m_rtMin && h.pts <= m_rtMax);
 					rt		= h.pts;
 					rtpos	= pos2;
@@ -587,7 +587,7 @@ static const StreamType PES_types[] = {
 	{ PES_PRIVATE,						DVB_SUB		}
 };
 
-DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
+DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, BOOL bAddStream/* = TRUE*/)
 {
 	if (pid) {
 		if (pesid) {
@@ -609,7 +609,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 
 	ULONGLONG stream_type			= PES_STREAM_TYPE_ANY;
 	PES_STREAM_TYPE pes_stream_type	= INVALID;
-	if (GetStreamType(s.pid, pes_stream_type)) {
+	if (GetStreamType(s.pid ? s.pid : s.pesid, pes_stream_type)) {
 		stream_type = 0ULL;
 
 		for (size_t i = 0; i < _countof(PES_types); i++) {
@@ -965,7 +965,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 	} else if (pesid == 0xbf) { // private stream 2
 	}
 
-	if (type != stream_type::unknown && !m_streams[type].Find(s)) {
+	if (bAddStream && type != stream_type::unknown && !m_streams[type].Find(s)) {
 		if (s.pid) {
 			if (!s.lang_set) {
 				CStringA lang_name;
@@ -989,13 +989,13 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len)
 
 			if (rtAvgTimePerFrame < 166666) {
 				__int64 _pos = GetPos();
-				REFERENCE_TIME rt_start = NextPTS(s.pid);
+				REFERENCE_TIME rt_start = NextPTS(s);
 				if (rt_start != INVALID_TIME) {
 					Seek(GetPos() + 188);
 					REFERENCE_TIME rt_end = rt_start;
 					int count = 0;
 					while (count < 30) {
-						REFERENCE_TIME rt = NextPTS(s.pid);
+						REFERENCE_TIME rt = NextPTS(s);
 						if (rt == INVALID_TIME) {
 							break;
 						}
@@ -1288,6 +1288,11 @@ bool CMpegSplitterFile::GetStreamType(WORD pid, PES_STREAM_TYPE &stream_type)
 				return true;
 			}
 		}
+
+		if (pid < _countof(m_psm) && m_psm[pid] != 0) {
+			stream_type = m_psm[pid];
+			return true;
+		}
 	}
 
 	return false;
@@ -1300,10 +1305,10 @@ void CMpegSplitterFile::UpdatePSM()
 	BitRead(8);
 	WORD ps_info_length	= (WORD)BitRead(16);
 	while (ps_info_length-- > 0) {
-		BitRead(1);
+		BitRead(8);
 	}
+	
 	WORD es_map_length	= (WORD)BitRead(16);
-
 	while (es_map_length > 4) {
 		BYTE type			= (BYTE)BitRead(8);
 		BYTE es_id			= (BYTE)BitRead(8);
@@ -1311,9 +1316,9 @@ void CMpegSplitterFile::UpdatePSM()
 
 		m_psm[es_id]		= (PES_STREAM_TYPE)type;
         
-		es_map_length		-= 4 + min(es_info_length, es_map_length - 4);
+		es_map_length		-= 4 + es_info_length;
 		while (es_info_length-- > 0) {
-			BitRead(1);
+			BitRead(8);
 		}
 	}
 

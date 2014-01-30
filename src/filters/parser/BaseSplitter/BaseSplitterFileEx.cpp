@@ -103,7 +103,8 @@ bool CBaseSplitterFileEx::Read(pshdr& h)
 		BitRead(5); // reserved
 		UINT64 stuffing = BitRead(3);
 		while (stuffing-- > 0) {
-			EXECUTE_ASSERT(BitRead(8) == 0xff);
+			//EXECUTE_ASSERT(BitRead(8) == 0xff);
+			BitRead(8);
 		}
 	} else {
 		return false;

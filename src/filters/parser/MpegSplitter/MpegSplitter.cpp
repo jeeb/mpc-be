@@ -115,6 +115,11 @@ STDAPI DllRegisterServer()
 	chkbytes.AddTail(_T("0,1,,47,188,1,,47,376,1,,47"));
 	chkbytes.AddTail(_T("4,1,,47,196,1,,47,388,1,,47"));
 	chkbytes.AddTail(_T("0,4,,54467263,1660,1,,47")); // TFrc
+
+	chkbytes.AddTail(_T("0,8,,4D504C5330323030")); // MPLS0200
+	chkbytes.AddTail(_T("0,8,,4D504C5330313030")); // MPLS0100
+	chkbytes.AddTail(_T("0,4,,494D4B48"));			// IMKH
+
 	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_MPEG2_TRANSPORT, chkbytes, NULL);
 
 	return AMovieDllRegisterServer2(TRUE);
