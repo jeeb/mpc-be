@@ -431,7 +431,7 @@ REFERENCE_TIME CTAKFile::Seek(REFERENCE_TIME rt)
 
 	m_pFile->Seek(CurFrmPos);
 
-	rt = CurFrmNum < 0 ? m_rtduration : (REFERENCE_TIME)(10000000.0 * CurFrmNum * m_framelen / m_samplerate);
+	rt = CurFrmNum < 0 ? m_rtduration : (10000000i64 * CurFrmNum * m_framelen / m_samplerate);
 	return rt;
 }
 
