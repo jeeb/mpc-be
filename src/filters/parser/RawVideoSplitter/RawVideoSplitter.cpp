@@ -404,10 +404,12 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		CBaseSplitterFileEx::avchdr h;
 		if (m_pFile->Read(h, min(MEGABYTE, m_pFile->GetLength()), &mt)) {
-			mts.Add(mt);
-			if (mt.subtype == MEDIASUBTYPE_H264 && SUCCEEDED(CreateAVCfromH264(&mt))) {
-				mts.Add(mt);
+			CMediaType mtAVC = mt;
+			if (mtAVC.subtype == MEDIASUBTYPE_H264 && SUCCEEDED(CreateAVCfromH264(&mtAVC))) {
+				mts.Add(mtAVC);
 			}
+
+			mts.Add(mt);
 			m_RAWType = RAW_H264;
 			pName = L"H.264/AVC1 Video Output";
 		}
