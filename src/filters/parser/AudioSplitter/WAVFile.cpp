@@ -310,7 +310,7 @@ REFERENCE_TIME CWAVFile::Seek(REFERENCE_TIME rt)
 		return 0;
 	}
 
-	__int64 len = m_length * rt / m_rtduration;
+	__int64 len = (REFERENCE_TIME)((double)m_length * rt / m_rtduration);
 	len -= len % m_nBlockAlign;
 	m_pFile->Seek(m_startpos + len);
 
@@ -329,8 +329,8 @@ int CWAVFile::GetAudioFrame(Packet* packet, REFERENCE_TIME rtStart)
 	m_pFile->ByteRead(packet->GetData(), size);
 
 	__int64 len = m_pFile->GetPos() - m_startpos;
-	packet->rtStart	= m_rtduration * len / m_length;
-	packet->rtStop	= m_rtduration * (len + size) / m_length;
+	packet->rtStart	= (REFERENCE_TIME)((double)m_rtduration * len / m_length);
+	packet->rtStop	= (REFERENCE_TIME)((double)m_rtduration * (len + size) / m_length);
 
 	return size;
 }
