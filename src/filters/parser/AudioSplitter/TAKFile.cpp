@@ -382,8 +382,8 @@ REFERENCE_TIME CTAKFile::Seek(REFERENCE_TIME rt)
 		return 0;
 	}
 
-	const int FrameNumber = (int)((double)rt / m_rtduration * m_totalframes);
-	__int64 pos		= m_startpos + (__int64)((double)rt / m_rtduration * (m_endpos - m_startpos));
+	const int FrameNumber = (int)SCALE64(m_totalframes, rt, m_rtduration);
+	__int64 pos		= m_startpos + SCALE64(m_endpos - m_startpos, rt , m_rtduration);
 	__int64 start	= pos;
 	__int64 end		= m_endpos - BUFSIZE;
 

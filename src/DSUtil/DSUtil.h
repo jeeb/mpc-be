@@ -39,6 +39,8 @@
                   (((DWORD)(ch4) & 0xFF000000) >> 24))
 #endif
 
+#define SCALE64(a, b, c) (__int64)((double)(a) * (b) / (c))
+
 extern CString			ResStr(UINT nID);
 
 extern int				CountPins(IBaseFilter* pBF, int& nIn, int& nOut, int& nInC, int& nOutC);
