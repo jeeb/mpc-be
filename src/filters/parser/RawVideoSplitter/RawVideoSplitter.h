@@ -1,7 +1,5 @@
 /*
- * $Id:
- *
- * Copyright (C) 2013 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
+ * (C) 2006-2014 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -71,22 +69,4 @@ class __declspec(uuid("E32A3501-04A9-486B-898B-F5A4C8A4AAAC"))
 {
 public:
 	CRawVideoSourceFilter(LPUNKNOWN pUnk, HRESULT* phr);
-};
-
-class CRawVideoOutputPin : public CBaseSplitterOutputPin, protected CCritSec
-{
-	CAutoPtr<Packet> m_p;
-	CAutoPtrList<Packet> m_pl;
-	bool	m_fHasAccessUnitDelimiters;
-	bool	m_bFlushed;
-
-protected:
-	HRESULT DeliverPacket(CAutoPtr<Packet> p);
-	HRESULT DeliverEndFlush();
-
-	HRESULT Flush();
-
-public:
-	CRawVideoOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
-	virtual ~CRawVideoOutputPin();
 };

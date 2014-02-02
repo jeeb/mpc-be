@@ -126,26 +126,10 @@ public:
 	CMpegSourceFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLSID& clsid = __uuidof(CMpegSourceFilter));
 };
 
-class CMpegSplitterOutputPin : public CBaseSplitterOutputPin, protected CCritSec
+class CMpegSplitterOutputPin : public CBaseSplitterParserOutputPin
 {
-	CAutoPtr<Packet> m_p;
-	CAutoPtrList<Packet> m_pl;
-	bool	m_fHasAccessUnitDelimiters;
-	bool	m_bFlushed;
-	int		m_type;
-	int		m_truehd_framelength;
-
-	int		m_hdmvLPCM_samplerate, m_hdmvLPCM_channels, m_hdmvLPCM_packetsize;
-
-protected:
-	HRESULT DeliverPacket(CAutoPtr<Packet> p);
-	HRESULT DeliverEndFlush();
-
-	HRESULT Flush();
-
 public:
-	CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int type, int QueueMaxPackets);
-	virtual ~CMpegSplitterOutputPin();
+	CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int QueueMaxPackets);
 
 	HRESULT CheckMediaType(const CMediaType* pmt) { return S_OK; }
 

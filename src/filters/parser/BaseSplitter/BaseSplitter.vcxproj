@@ -97,7 +97,11 @@
     <ClCompile Include="BaseSplitter.cpp" />
     <ClCompile Include="BaseSplitterFile.cpp" />
     <ClCompile Include="BaseSplitterFileEx.cpp" />
+    <ClCompile Include="BaseSplitterInputPin.cpp" />
+    <ClCompile Include="BaseSplitterOutputPin.cpp" />
+    <ClCompile Include="BaseSplitterParserOutputPin.cpp" />
     <ClCompile Include="MultiFiles.cpp" />
+    <ClCompile Include="Packet.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -107,7 +111,11 @@
     <ClInclude Include="BaseSplitter.h" />
     <ClInclude Include="BaseSplitterFile.h" />
     <ClInclude Include="BaseSplitterFileEx.h" />
+    <ClInclude Include="BaseSplitterInputPin.h" />
+    <ClInclude Include="BaseSplitterOutputPin.h" />
+    <ClInclude Include="BaseSplitterParserOutputPin.h" />
     <ClInclude Include="MultiFiles.h" />
+    <ClInclude Include="Packet.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>

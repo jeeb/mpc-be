@@ -1,7 +1,5 @@
 /*
- * $Id:
- *
- * Copyright (C) 2013 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
+ * (C) 2006-2014 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -55,12 +53,12 @@ int g_cTemplates = _countof(g_Templates);
 STDAPI DllRegisterServer()
 {
 	CAtlList<CString> chkbytes;
-	chkbytes.AddTail(_T("0,9,,595556344D50454732")); // YUV4MPEG2
-	chkbytes.AddTail(_T("0,4,,000001B3"));		// MPEG1/2
-	chkbytes.AddTail(_T("0,5,,0000000109"));	// H.264/AVC1
-	chkbytes.AddTail(_T("0,4,,0000010F"));		// VC-1
-	chkbytes.AddTail(_T("0,4,,0000010D"));		// VC-1
-	chkbytes.AddTail(_T("0,5,,0000000140"));	// H.265/HEVC
+	chkbytes.AddTail(_T("0,9,,595556344D50454732"));	// YUV4MPEG2
+	chkbytes.AddTail(_T("0,4,,000001B3"));				// MPEG1/2
+	chkbytes.AddTail(_T("0,5,,0000000109"));			// H.264/AVC1
+	chkbytes.AddTail(_T("0,4,,0000010F"));				// VC-1
+	chkbytes.AddTail(_T("0,4,,0000010D"));				// VC-1
+	chkbytes.AddTail(_T("0,5,,0000000140"));			// H.265/HEVC
 
 	RegisterSourceFilter(
 		CLSID_AsyncReader,
@@ -89,13 +87,13 @@ CFilterApp theApp;
 
 #endif
 
-static const BYTE YUV4MPEG2_[10] = {'Y','U','V','4','M','P','E','G','2',0x20};
-static const BYTE FRAME_[6]      = {'F','R','A','M','E',0x0A};
+static const BYTE YUV4MPEG2_[10] = {'Y', 'U', 'V', '4', 'M', 'P', 'E', 'G', '2', 0x20};
+static const BYTE FRAME_[6]      = {'F', 'R', 'A', 'M', 'E', 0x0A};
 
 static const BYTE SYNC_MPEG1[4]  = {0x00, 0x00, 0x01, 0xB3};
 static const BYTE SYNC_H264[4]   = {0x00, 0x00, 0x00, 0x01};
-static const BYTE SYNC_VC1_f[4]  = {0x00, 0x00, 0x01, 0x0F};
-static const BYTE SYNC_VC1_d[4]  = {0x00, 0x00, 0x01, 0x0D};
+static const BYTE SYNC_VC1_F[4]  = {0x00, 0x00, 0x01, 0x0F};
+static const BYTE SYNC_VC1_D[4]  = {0x00, 0x00, 0x01, 0x0D};
 static const BYTE SYNC_HEVC[5]   = {0x00, 0x00, 0x00, 0x01, 0x40};
 
 //
@@ -416,7 +414,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	
 	}
 
-	if (m_RAWType == RAW_NONE && (memcmp(buf, SYNC_VC1_f, sizeof(SYNC_VC1_f)) == 0 || memcmp(buf, SYNC_VC1_d, sizeof(SYNC_VC1_d)) == 0)) {
+	if (m_RAWType == RAW_NONE && (memcmp(buf, SYNC_VC1_F, sizeof(SYNC_VC1_F)) == 0 || memcmp(buf, SYNC_VC1_D, sizeof(SYNC_VC1_D)) == 0)) {
 		BYTE id = 0x00;
 		m_pFile->Seek(0);
 		while (m_pFile->GetPos() < min(MEGABYTE, m_pFile->GetLength()) && m_RAWType == RAW_NONE) {
@@ -428,8 +426,13 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				m_pFile->Seek(m_pFile->GetPos() - 4);
 
 				CBaseSplitterFileEx::vc1hdr h;
-				if (m_pFile->Read(h, 1024, &mt)) {
+				if (m_pFile->Read(h, min(m_pFile->GetAvailable(), 1024), &mt)) {
 					mts.Add(mt);
+					mt.subtype = MEDIASUBTYPE_WVC1_CYBERLINK;
+					mts.Add(mt);
+					mt.subtype = MEDIASUBTYPE_WVC1_ARCSOFT;
+					mts.Add(mt);
+
 					m_RAWType = RAW_VC1;
 					pName = L"VC-1 Video Output";
 				}
@@ -455,7 +458,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 
 	if (m_RAWType != RAW_NONE) {
-		CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CRawVideoOutputPin(mts, pName, this, this, &hr));
+		CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterParserOutputPin(mts, pName, this, this, &hr));
 		EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(0, pPinOut)));
 	}
 
@@ -552,324 +555,3 @@ CRawVideoSourceFilter::CRawVideoSourceFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	m_clsid = __uuidof(this);
 	m_pInput.Free();
 }
-
-//
-// CMpegSplitterOutputPin
-//
-
-CRawVideoOutputPin::CRawVideoOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
-	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr)
-	, m_fHasAccessUnitDelimiters(false)
-{
-}
-
-CRawVideoOutputPin::~CRawVideoOutputPin()
-{
-	Flush();
-}
-
-HRESULT CRawVideoOutputPin::Flush()
-{
-	CAutoLock cAutoLock(this);
-
-	m_p.Free();
-	m_pl.RemoveAll();
-
-	m_bFlushed = true;
-
-	return S_OK;
-}
-
-HRESULT CRawVideoOutputPin::DeliverEndFlush()
-{
-	CAutoLock cAutoLock(this);
-
-	Flush();
-
-	return __super::DeliverEndFlush();
-}
-
-HRESULT CRawVideoOutputPin::DeliverPacket(CAutoPtr<Packet> p)
-{
-	CAutoLock cAutoLock(this);
-
-	if (p->pmt) {
-		if (*((CMediaType *)p->pmt) != m_mt) {
-			SetMediaType ((CMediaType*)p->pmt);
-			Flush();
-		}
-	}
-
-	// H.264/AVC/CVMA/CVME
-	if (m_mt.subtype == FOURCCMap('1CVA') || m_mt.subtype == FOURCCMap('1cva') || m_mt.subtype == FOURCCMap('CVMA') || m_mt.subtype == FOURCCMap('CVME')) {
-		if (!m_p) {
-			m_p.Attach(DNew Packet());
-			m_p->TrackNumber	= p->TrackNumber;
-			m_p->bDiscontinuity	= p->bDiscontinuity;
-			p->bDiscontinuity	= FALSE;
-
-			m_p->bSyncPoint	= p->bSyncPoint;
-			p->bSyncPoint	= FALSE;
-
-			m_p->rtStart	= p->rtStart;
-			p->rtStart		= INVALID_TIME;
-
-			m_p->rtStop	= p->rtStop;
-			p->rtStop	= INVALID_TIME;
-		}
-
-		m_p->Append(*p);
-
-		BYTE* start	= m_p->GetData();
-		BYTE* end	= start + m_p->GetCount();
-
-		MOVE_TO_H264_START_CODE(start, end);
-
-		while (start <= end-4) {
-			BYTE* next = start+1;
-
-			MOVE_TO_H264_START_CODE(next, end);
-
-			if (next >= end-4) {
-				break;
-			}
-
-			int size = next - start;
-
-			CH264Nalu Nalu;
-			Nalu.SetBuffer (start, size, 0);
-
-			CAutoPtr<Packet> p2;
-
-			while (Nalu.ReadNext()) {
-				DWORD dwNalLength = Nalu.GetDataLength();
-				dwNalLength = BSWAP32(dwNalLength);
-
-				CAutoPtr<Packet> p3(DNew Packet());
-
-				p3->SetCount(Nalu.GetDataLength() + sizeof(dwNalLength));
-				memcpy(p3->GetData(), &dwNalLength, sizeof(dwNalLength));
-				memcpy(p3->GetData() + sizeof(dwNalLength), Nalu.GetDataBuffer(), Nalu.GetDataLength());
-
-				if (p2 == NULL) {
-					p2 = p3;
-				} else {
-					p2->Append(*p3);
-				}
-			}
-			start = next;
-
-			if (!p2) {
-				continue;
-			}
-
-			p2->TrackNumber		= m_p->TrackNumber;
-			p2->bDiscontinuity	= m_p->bDiscontinuity;
-			m_p->bDiscontinuity	= FALSE;
-
-			p2->bSyncPoint	= m_p->bSyncPoint;
-			m_p->bSyncPoint	= FALSE;
-
-			p2->rtStart		= m_p->rtStart;
-			m_p->rtStart	= INVALID_TIME;
-			p2->rtStop		= m_p->rtStop;
-			m_p->rtStop		= INVALID_TIME;
-
-			p2->pmt		= m_p->pmt;
-			m_p->pmt	= NULL;
-
-			m_pl.AddTail(p2);
-
-			if (p->rtStart != INVALID_TIME) {
-				m_p->rtStart	= p->rtStart;
-				m_p->rtStop		= p->rtStop;
-				p->rtStart		= INVALID_TIME;
-			}
-			if (p->bDiscontinuity) {
-				m_p->bDiscontinuity	= p->bDiscontinuity;
-				p->bDiscontinuity	= FALSE;
-			}
-			if (p->bSyncPoint) {
-				m_p->bSyncPoint	= p->bSyncPoint;
-				p->bSyncPoint	= FALSE;
-			}
-			if (m_p->pmt) {
-				DeleteMediaType(m_p->pmt);
-			}
-
-			m_p->pmt = p->pmt;
-			p->pmt = NULL;
-		}
-		if (start > m_p->GetData()) {
-			m_p->RemoveAt(0, start - m_p->GetData());
-		}
-
-		REFERENCE_TIME rtStart = INVALID_TIME, rtStop = INVALID_TIME;
-
-		for (POSITION pos = m_pl.GetHeadPosition(); pos; m_pl.GetNext(pos)) {
-			if (pos == m_pl.GetHeadPosition()) {
-				continue;
-			}
-
-			Packet* pPacket = m_pl.GetAt(pos);
-			BYTE* pData = pPacket->GetData();
-
-			/*
-			if ((pData[4] & 0x1f) == 0x09) {
-				m_fHasAccessUnitDelimiters = true;
-			}
-			*/
-
-			if ((pData[4] & 0x1f) == 0x09/* || (!m_fHasAccessUnitDelimiters && pPacket->rtStart != INVALID_TIME)*/) {
-				if (pPacket->rtStart == INVALID_TIME && rtStart != INVALID_TIME) {
-					pPacket->rtStart	= rtStart;
-					pPacket->rtStop		= rtStop;
-				}
-
-				p = m_pl.RemoveHead();
-
-				while (pos != m_pl.GetHeadPosition()) {
-					CAutoPtr<Packet> p2 = m_pl.RemoveHead();
-					p->Append(*p2);
-				}
-
-				if (!p->pmt && m_bFlushed) {
-					p->pmt = CreateMediaType(&m_mt);
-					m_bFlushed = false;
-				}
-
-				HRESULT hr = __super::DeliverPacket(p);
-				if (hr != S_OK) {
-					return hr;
-				}
-			} else if (rtStart == INVALID_TIME) {
-				rtStart	= pPacket->rtStart;
-				rtStop	= pPacket->rtStop;
-			}
-		}
-
-		return S_OK;
-	}
-	// VC1
-	else if (m_mt.subtype == FOURCCMap('1CVW')) {
-		if (!m_p) {
-			m_p.Attach(DNew Packet());
-			m_p->TrackNumber	= p->TrackNumber;
-			m_p->bDiscontinuity	= p->bDiscontinuity;
-			p->bDiscontinuity	= FALSE;
-
-			m_p->bSyncPoint	= p->bSyncPoint;
-			p->bSyncPoint	= FALSE;
-
-			m_p->rtStart	= p->rtStart;
-			p->rtStart		= INVALID_TIME;
-
-			m_p->rtStop	= p->rtStop;
-			p->rtStop	= INVALID_TIME;
-		}
-
-		m_p->Append(*p);
-
-		BYTE* start = m_p->GetData();
-		BYTE* end = start + m_p->GetCount();
-
-		bool bSeqFound = false;
-		while (start <= end-4) {
-			if (*(DWORD*)start == 0x0D010000) {
-				bSeqFound = true;
-				break;
-			} else if (*(DWORD*)start == 0x0F010000) {
-				break;
-			}
-			start++;
-		}
-
-		while (start <= end-4) {
-			BYTE* next = start+1;
-
-			while (next <= end-4) {
-				if (*(DWORD*)next == 0x0D010000) {
-					if (bSeqFound) {
-						break;
-					}
-					bSeqFound = true;
-				} else if (*(DWORD*)next == 0x0F010000) {
-					break;
-				}
-				next++;
-			}
-
-			if (next >= end-4) {
-				break;
-			}
-
-			int size = next - start - 4;
-			UNREFERENCED_PARAMETER(size);
-
-			CAutoPtr<Packet> p2(DNew Packet());
-			p2->TrackNumber		= m_p->TrackNumber;
-			p2->bDiscontinuity	= m_p->bDiscontinuity;
-			m_p->bDiscontinuity	= FALSE;
-
-			p2->bSyncPoint	= m_p->bSyncPoint;
-			m_p->bSyncPoint	= FALSE;
-
-			p2->rtStart		= m_p->rtStart;
-			m_p->rtStart	= INVALID_TIME;
-
-			p2->rtStop		= m_p->rtStop;
-			m_p->rtStop		= INVALID_TIME;
-
-			p2->pmt		= m_p->pmt;
-			m_p->pmt	= NULL;
-
-			p2->SetData(start, next - start);
-
-			if (!p2->pmt && m_bFlushed) {
-				p2->pmt = CreateMediaType(&m_mt);
-				m_bFlushed = false;
-			}
-
-			HRESULT hr = __super::DeliverPacket(p2);
-			if (hr != S_OK) {
-				return hr;
-			}
-
-			if (p->rtStart != INVALID_TIME) {
-				m_p->rtStart = p->rtStart;
-				m_p->rtStop	= p->rtStop;
-				p->rtStart	= INVALID_TIME;
-			}
-			if (p->bDiscontinuity) {
-				m_p->bDiscontinuity	= p->bDiscontinuity;
-				p->bDiscontinuity	= FALSE;
-			}
-			if (p->bSyncPoint) {
-				m_p->bSyncPoint	= p->bSyncPoint;
-				p->bSyncPoint	= FALSE;
-			}
-			if (m_p->pmt) {
-				DeleteMediaType(m_p->pmt);
-			}
-
-			m_p->pmt	= p->pmt;
-			p->pmt		= NULL;
-
-			start		= next;
-			bSeqFound	= (*(DWORD*)start == 0x0D010000);
-		}
-
-		if (start > m_p->GetData()) {
-			m_p->RemoveAt(0, start - m_p->GetData());
-		}
-
-		return S_OK;
-	} else {
-		m_p.Free();
-		m_pl.RemoveAll();
-	}
-
-	return __super::DeliverPacket(p);
-}
-
-
