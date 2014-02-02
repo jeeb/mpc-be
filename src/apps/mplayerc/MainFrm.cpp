@@ -2266,8 +2266,8 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 						rtDur = m_rtDurationOverride;
 					}
 
-					g_bNoDuration = rtDur <= 0;
-					m_wndSeekBar.Enable(rtDur > 0);
+					g_bNoDuration = rtDur < UNITS/2;
+					m_wndSeekBar.Enable(g_bNoDuration);
 					m_wndSeekBar.SetRange(0, rtDur);
 					m_wndSeekBar.SetPos(rtNow);
 					m_OSD.SetRange (0, rtDur);
@@ -2287,7 +2287,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 						rtDur = m_rtDurationOverride;
 					}
 
-					g_bNoDuration = rtDur <= 0;
+					g_bNoDuration = rtDur < UNITS/2;
 					m_wndSeekBar.Enable(false);
 					m_wndSeekBar.SetRange(0, rtDur);
 					m_wndSeekBar.SetPos(rtNow);

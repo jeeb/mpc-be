@@ -2033,17 +2033,17 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 
 			if (body.GetLength() >= 8) {
 				CStringA str = TToA(body);
-				if (!strncmp((LPCSTR)str, ".ra", 3)) {
-					return "audio/x-pn-realaudio";
-				}
-				if (!strncmp((LPCSTR)str, ".RMF", 4)) {
+				if (!strncmp((LPCSTR)str, ".ra", 3) || !strncmp((LPCSTR)str, ".RMF", 4)) {
 					return "audio/x-pn-realaudio";
 				}
 				if (*(DWORD*)(LPCSTR)str == 0x75b22630) {
 					return "video/x-ms-wmv";
 				}
-				if (!strncmp((LPCSTR)str+4, "moov", 4)) {
+				if (!strncmp((LPCSTR)str + 4, "moov", 4)) {
 					return "video/quicktime";
+				}
+				if (str.Find("#EXTM3U") == 0 && str.Find("#EXT-X-MEDIA-SEQUENCE") > 0) {
+					return "application/http-live-streaming";
 				}
 				if ((ct.Find(L"text/plain") == 0 || ct.Find(L"application/vnd.apple.mpegurl") == 0) && str.Find("#EXTM3U") == 0) {
 					ct = L"audio/x-mpegurl";
@@ -2051,7 +2051,7 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 			}
 
 			if (redir && (ct == _T("audio/x-scpls") || ct == _T("audio/x-mpegurl") || ct == _T("application/xspf+xml"))) {
-				int nMaxSize = 16*1024;
+				int nMaxSize = 16 * KILOBYTE;
 				if (ContentLength) {
 					nMaxSize = min(ContentLength, nMaxSize);
 				}
@@ -2112,7 +2112,7 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 		_tfopen_s(&f, fn, _T("rb"));
 		if (f) {
 			CStringA str;
-			str.ReleaseBufferSetLength(fread(str.GetBuffer(10240), 1, 10240, f));
+			str.ReleaseBufferSetLength(fread(str.GetBuffer(10 * KILOBYTE), 1, 10 * KILOBYTE, f));
 			body = AToT(str);
 			fclose(f);
 		}
