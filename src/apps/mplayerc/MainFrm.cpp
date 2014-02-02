@@ -2267,7 +2267,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 					}
 
 					g_bNoDuration = rtDur < UNITS/2;
-					m_wndSeekBar.Enable(g_bNoDuration);
+					m_wndSeekBar.Enable(!g_bNoDuration);
 					m_wndSeekBar.SetRange(0, rtDur);
 					m_wndSeekBar.SetPos(rtNow);
 					m_OSD.SetRange (0, rtDur);
