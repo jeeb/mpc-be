@@ -66,13 +66,9 @@ struct CUETrack {
 };
 static bool ParseCUESheetFile(CString fn, CAtlList<CUETrack> &CUETrackList, CString& Title, CString& Performer)
 {
-	CTextFile f;
+	CTextFile f(CTextFile::UTF8);
 	if (!f.Open(fn) || f.GetLength() > 32 * 1024) {
 		return false;
-	}
-
-	if (f.GetEncoding() == CTextFile::ASCII) {
-		f.SetEncoding(CTextFile::ANSI);
 	}
 
 	Title.Empty();
@@ -992,13 +988,9 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn)
 	CAtlMap<int, CPlaylistItem> pli;
 	CAtlArray<int> idx;
 
-	CWebTextFile f;
+	CWebTextFile f(CTextFile::UTF8);
 	if (!f.Open(fn) || !f.ReadString(str) || str != _T("MPCPLAYLIST") || f.GetLength() > MEGABYTE) {
 		return false;
-	}
-
-	if (f.GetEncoding() == CTextFile::ASCII) {
-		f.SetEncoding(CTextFile::ANSI);
 	}
 
 	CPath base(fn);
@@ -1129,13 +1121,9 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 {
 	CString str;
 
-	CWebTextFile f;
+	CWebTextFile f(CTextFile::UTF8);
 	if (!f.Open(fn)) {
 		return false;
-	}
-
-	if (f.GetEncoding() == CTextFile::ASCII) {
-		f.SetEncoding(CTextFile::ANSI);
 	}
 
 	CPath base(fn);
