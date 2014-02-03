@@ -1213,7 +1213,7 @@ void Rasterizer::Draw_noAlpha_spFF_Body_0(RasterizerNfo& rnfo)
 	// only have one here. (No alpha mask.)
 
 	while (h--) {
-		for (int wt=0; wt<rnfo.w; ++wt) {
+		for (int wt = 0; wt < rnfo.w; ++wt) {
 			pixmix(&dst[wt], color, s[wt]);
 		}
 		s += rnfo.overlayp;
@@ -1239,7 +1239,7 @@ void Rasterizer::Draw_noAlpha_spFF_noBody_0(RasterizerNfo& rnfo)
 	// This happens when blur edges is used.
 
 	while (h--) {
-		for (int wt=0; wt<rnfo.w; ++wt) {
+		for (int wt = 0; wt < rnfo.w; ++wt) {
 			pixmix(&dst[wt], color, safe_subtract(srcBorder[wt], srcBody[wt]));
 		}
 		srcBody += rnfo.overlayp;
@@ -1258,14 +1258,14 @@ void Rasterizer::Draw_noAlpha_sp_Body_0(RasterizerNfo& rnfo)
 	// xo is the offset (usually negative) we have moved into the image
 	// So if we have passed the switchpoint (?) switch to another colour
 	// (So switchpts stores both colours *and* coordinates?)
-	int gran = min((int)rnfo.sw[3]+1-rnfo.xo,rnfo.w);
+	int gran = min((int)rnfo.sw[3] - rnfo.xo, rnfo.w);
 	int color2 = rnfo.sw[2];
 
 	while (h--) {
-		for (int wt=0; wt<gran; ++wt) {
+		for (int wt = 0; wt < gran; ++wt) {
 			pixmix(&dst[wt], color, s[wt]);
 		}
-		for (int wt=gran; wt<rnfo.w; ++wt) {
+		for (int wt = gran; wt < rnfo.w; ++wt) {
 			pixmix(&dst[wt], color2, s[wt]);
 		}
 		s += rnfo.overlayp;
@@ -1280,14 +1280,14 @@ void Rasterizer::Draw_noAlpha_sp_noBody_0(RasterizerNfo& rnfo)
 	byte* srcBody = rnfo.srcBody;
 	byte* srcBorder = rnfo.srcBorder;
 	DWORD* dst = rnfo.dst;
-	int gran = min((int)rnfo.sw[3] + 1 - rnfo.xo, rnfo.w);
+	int gran = min((int)rnfo.sw[3] - rnfo.xo, rnfo.w);
 	int color2 = rnfo.sw[2];
 
 	while (h--) {
-		for (int wt=0; wt<gran; ++wt) {
+		for (int wt = 0; wt < gran; ++wt) {
 			pixmix(&dst[wt], color, safe_subtract(srcBorder[wt], srcBody[wt]));
 		}
-		for (int wt=gran; wt<rnfo.w; ++wt) {
+		for (int wt = gran; wt < rnfo.w; ++wt) {
 			pixmix(&dst[wt], color2, safe_subtract(srcBorder[wt], srcBody[wt]));
 		}
 		srcBody += rnfo.overlayp;
@@ -1310,7 +1310,7 @@ void Rasterizer::Draw_Alpha_spFF_Body_0(RasterizerNfo& rnfo)
 	// I think some imprecision is introduced here??
 
 	while (h--) {
-		for (int wt=0; wt<rnfo.w; ++wt) {
+		for (int wt = 0; wt < rnfo.w; ++wt) {
 			pixmix2(&dst[wt], color, s[wt], am[wt]);
 		}
 		am += rnfo.spdw;
@@ -1327,14 +1327,14 @@ void Rasterizer::Draw_Alpha_spFF_noBody_0(RasterizerNfo& rnfo)
 	byte* srcBody = rnfo.srcBody;
 	byte* srcBorder = rnfo.srcBorder;
 	DWORD* dst = rnfo.dst;
-	int gran = min((int)rnfo.sw[3]+1-rnfo.xo,rnfo.w);
+	int gran = min((int)rnfo.sw[3] - rnfo.xo, rnfo.w);
 	int color2 = rnfo.sw[2];
 
 	while (h--) {
-		for (int wt=0; wt<gran; ++wt) {
+		for (int wt = 0; wt < gran; ++wt) {
 			pixmix2(&dst[wt], color, safe_subtract(srcBorder[wt], srcBody[wt]), am[wt]);
 		}
-		for (int wt=gran; wt<rnfo.w; ++wt) {
+		for (int wt = gran; wt < rnfo.w; ++wt) {
 			pixmix2(&dst[wt], color2, safe_subtract(srcBorder[wt], srcBody[wt]), am[wt]);
 		}
 		am += rnfo.spdw;
@@ -1353,7 +1353,7 @@ void Rasterizer::Draw_Alpha_sp_Body_0(RasterizerNfo& rnfo)
 	DWORD* dst = rnfo.dst;
 
 	while (h--) {
-		for (int wt=0; wt<rnfo.w; ++wt) {
+		for (int wt = 0; wt < rnfo.w; ++wt) {
 			pixmix2(&dst[wt], color, s[wt], am[wt]);
 		}
 		am += rnfo.spdw;
@@ -1370,14 +1370,14 @@ void Rasterizer::Draw_Alpha_sp_noBody_0(RasterizerNfo& rnfo)
 	byte* srcBody = rnfo.srcBody;
 	byte* srcBorder = rnfo.srcBorder;
 	DWORD* dst = rnfo.dst;
-	int gran = min((int)rnfo.sw[3]+1-rnfo.xo,rnfo.w);
+	int gran = min((int)rnfo.sw[3] - rnfo.xo, rnfo.w);
 	int color2 = rnfo.sw[2];
 
 	while (h--) {
-		for (int wt=0; wt<gran; ++wt) {
+		for (int wt = 0; wt < gran; ++wt) {
 			pixmix2(&dst[wt], color, safe_subtract(srcBorder[wt], srcBody[wt]), am[wt]);
 		}
-		for (int wt=gran; wt<rnfo.w; ++wt) {
+		for (int wt = gran; wt < rnfo.w; ++wt) {
 			pixmix2(&dst[wt], color2, safe_subtract(srcBorder[wt], srcBody[wt]), am[wt]);
 		}
 		am += rnfo.spdw;
@@ -1397,10 +1397,10 @@ void Rasterizer::Draw_noAlpha_spFF_Body_sse2(RasterizerNfo& rnfo)
 	// the multiplication of two 6-bit unsigned numbers but we
 	// only have one here. (No alpha mask.)
 	int w = rnfo.w;
-	int end_w = ((w-1)/8)*8;
+	int end_w = ((w - 1) / 8) * 8;
 
 	while (h--) {
-		for (int wt = 0; wt < end_w; wt+=8) {
+		for (int wt = 0; wt < end_w; wt += 8) {
 			alpha_blend_sse2(dst, color, s, wt);
 		}
 		for (int wt = end_w; wt < w; ++wt) {
@@ -1428,7 +1428,7 @@ void Rasterizer::Draw_noAlpha_spFF_noBody_sse2(RasterizerNfo& rnfo)
 	// This happens when blur edges is used.
 
 	while (h--) {
-		for (int wt=0; wt<rnfo.w; ++wt) {
+		for (int wt = 0; wt < rnfo.w; ++wt) {
 			pixmix_sse2(&dst[wt], color, safe_subtract_sse2(srcBorder[wt], srcBody[wt]));
 		}
 		srcBody += rnfo.overlayp;
@@ -1447,9 +1447,9 @@ void Rasterizer::Draw_noAlpha_sp_Body_sse2(RasterizerNfo& rnfo)
 	// xo is the offset (usually negative) we have moved into the image
 	// So if we have passed the switchpoint (?) switch to another colour
 	// (So switchpts stores both colours *and* coordinates?)
-	int gran = min((int)rnfo.sw[3]+1-rnfo.xo,rnfo.w);
-	int end_gran = ((gran-1)/8)*8;
-	int end_w = gran+((rnfo.w-gran-1)/8)*8;
+	int gran = min((int)rnfo.sw[3] - rnfo.xo, rnfo.w);
+	int end_gran = ((gran - 1) / 8) * 8;
+	int end_w = gran + ((rnfo.w - gran - 1) / 8) * 8;
 	int color2 = rnfo.sw[2];
 
 	while (h--) {
@@ -1477,14 +1477,14 @@ void Rasterizer::Draw_noAlpha_sp_noBody_sse2(RasterizerNfo& rnfo)
 	byte* srcBody = rnfo.srcBody;
 	byte* srcBorder = rnfo.srcBorder;
 	DWORD* dst = rnfo.dst;
-	int gran = min((int)rnfo.sw[3]+1-rnfo.xo,rnfo.w);
+	int gran = min((int)rnfo.sw[3] - rnfo.xo, rnfo.w);
 	int color2 = rnfo.sw[2];
 
 	while (h--) {
-		for (int wt=0; wt<gran; ++wt) {
+		for (int wt = 0; wt < gran; ++wt) {
 			pixmix_sse2(&dst[wt], color, safe_subtract_sse2(srcBorder[wt], srcBody[wt]));
 		}
-		for (int wt=gran; wt<rnfo.w; ++wt) {
+		for (int wt = gran; wt < rnfo.w; ++wt) {
 			pixmix_sse2(&dst[wt], color2, safe_subtract_sse2(srcBorder[wt], srcBody[wt]));
 		}
 		srcBody += rnfo.overlayp;
@@ -1506,7 +1506,7 @@ void Rasterizer::Draw_Alpha_spFF_Body_sse2(RasterizerNfo& rnfo)
 	// clipping mask.
 	// Multiplying them together yields a 12-bit number.
 	// I think some imprecision is introduced here??
-	while(h--) {
+	while (h--) {
 		for (int wt = 0; wt < rnfo.w; ++wt) {
 			pixmix2_sse2(&dst[wt], color, s[wt], am[wt]);
 		}
@@ -1526,7 +1526,7 @@ void Rasterizer::Draw_Alpha_spFF_noBody_sse2(RasterizerNfo& rnfo)
 	DWORD* dst = rnfo.dst;
 
 	while (h--) {
-		for (int wt=0; wt<rnfo.w; ++wt) {
+		for (int wt = 0; wt < rnfo.w; ++wt) {
 			pixmix2_sse2(&dst[wt], color, safe_subtract_sse2(srcBorder[wt], srcBody[wt]), am[wt]);
 		}
 		am += rnfo.spdw;
@@ -1543,7 +1543,7 @@ void Rasterizer::Draw_Alpha_sp_Body_sse2(RasterizerNfo& rnfo)
 	int color = rnfo.color;
 	byte* s = rnfo.s;
 	DWORD* dst = rnfo.dst;
-	int gran = min((int)rnfo.sw[3] + 1 - rnfo.xo, rnfo.w);
+	int gran = min((int)rnfo.sw[3] - rnfo.xo, rnfo.w);
 	int color2 = rnfo.sw[2];
 
 	while (h--) {
@@ -1567,15 +1567,15 @@ void Rasterizer::Draw_Alpha_sp_noBody_sse2(RasterizerNfo& rnfo)
 	byte* srcBody = rnfo.srcBody;
 	byte* srcBorder = rnfo.srcBorder;
 	DWORD* dst = rnfo.dst;
-	int gran = min((int)rnfo.sw[3]+1-rnfo.xo,rnfo.w);
+	int gran = min((int)rnfo.sw[3] - rnfo.xo, rnfo.w);
 	int color2 = rnfo.sw[2];
 	UNREFERENCED_PARAMETER(color2);
 
 	while (h--) {
-		for (int wt=0; wt<gran; ++wt) {
+		for (int wt = 0; wt < gran; ++wt) {
 			pixmix2_sse2(&dst[wt], color, safe_subtract_sse2(srcBorder[wt], srcBody[wt]), am[wt]);
 		}
-		for (int wt=gran; wt<rnfo.w; ++wt) {
+		for (int wt = gran; wt < rnfo.w; ++wt) {
 			pixmix2_sse2(&dst[wt], color, safe_subtract_sse2(srcBorder[wt], srcBody[wt]), am[wt]);
 		}
 		am += rnfo.spdw;
