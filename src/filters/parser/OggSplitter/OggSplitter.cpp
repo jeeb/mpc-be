@@ -839,6 +839,8 @@ COggVorbisOutputPin::COggVorbisOutputPin(OggVorbisIdHeader* h, LPCWSTR pName, CB
 	vf2->SamplesPerSec	= h->audio_sample_rate;
 	mt.SetSampleSize(8192);
 	m_mts.InsertAt(0, mt);
+
+	SetName(GetMediaTypeDesc(m_mts, pName, pFilter));
 }
 
 HRESULT COggVorbisOutputPin::UnpackInitPage(OggPage& page)
@@ -1001,6 +1003,8 @@ COggFlacOutputPin::COggFlacOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFi
 	wfe->wBitsPerSample		= m_wBitsPerSample;
 
 	m_mts.InsertAt(0, mt);
+
+	SetName(GetMediaTypeDesc(m_mts, pName, pFilter));
 	*phr = S_OK;
 }
 
@@ -1059,6 +1063,8 @@ COggDirectShowOutputPin::COggDirectShowOutputPin(AM_MEDIA_TYPE* pmt, LPCWSTR pNa
 	if (mt.majortype == MEDIATYPE_Video) { // TODO: find samples for audio and find out what to return in GetRefTime...
 		m_mts.Add(mt);
 	}
+
+	SetName(GetMediaTypeDesc(m_mts, pName, pFilter));
 }
 
 REFERENCE_TIME COggDirectShowOutputPin::GetRefTime(__int64 granule_position)
@@ -1195,6 +1201,8 @@ COggVideoOutputPin::COggVideoOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseF
 	}
 	mt.SetSampleSize(max(h->buffersize, 1));
 	m_mts.Add(mt);
+
+	SetName(GetMediaTypeDesc(m_mts, pName, pFilter));
 }
 
 //
@@ -1225,6 +1233,8 @@ COggAudioOutputPin::COggAudioOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseF
 	wfe->nBlockAlign		= h->a.nBlockAlign; // TODO: verify for PCM
 	mt.SetSampleSize(max(h->buffersize, 1));
 	m_mts.Add(mt);
+
+	SetName(GetMediaTypeDesc(m_mts, pName, pFilter));
 }
 
 //
@@ -1282,6 +1292,8 @@ COggTheoraOutputPin::COggTheoraOutputPin(BYTE* p, LPCWSTR pName, CBaseFilter* pF
 
 	mt.bFixedSizeSamples = 0;
 	m_mts.Add(mt);
+
+	SetName(GetMediaTypeDesc(m_mts, pName, pFilter));
 }
 
 HRESULT COggTheoraOutputPin::UnpackInitPage(OggPage& page)
@@ -1378,6 +1390,9 @@ COggDiracOutputPin::COggDiracOutputPin(BYTE* p, int nCount, LPCWSTR pName, CBase
 	m_rtAvgTimePerFrame	= 0;
 	m_IsInitialized		= false;
 	m_bOldDirac			= !memcmp(p, "KW-DIRAC\x00", 9);
+
+	m_pFilter			= pFilter;
+	m_pName				= pName;
 }
 
 HRESULT COggDiracOutputPin::UnpackInitPage(OggPage& page)
@@ -1435,6 +1450,8 @@ HRESULT COggDiracOutputPin::InitDirac(BYTE* p, int nCount)
 
 	mt.bFixedSizeSamples = 0;
 	m_mts.Add(mt);
+
+	SetName(GetMediaTypeDesc(m_mts, m_pName, m_pFilter));
 
 	m_IsInitialized = true;
 
@@ -1515,6 +1532,8 @@ COggOpusOutputPin::COggOpusOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFi
 	delete [] wfe;
 
 	m_mts.InsertAt(0, mt);
+
+	SetName(GetMediaTypeDesc(m_mts, pName, pFilter));
 
 	*phr = S_OK;
 }
@@ -1608,6 +1627,8 @@ COggSpeexOutputPin::COggSpeexOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBase
 	delete [] wfe;
 
 	m_mts.InsertAt(0, mt);
+
+	SetName(GetMediaTypeDesc(m_mts, pName, pFilter));
 
 	*phr = S_OK;
 }

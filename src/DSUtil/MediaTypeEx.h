@@ -32,9 +32,10 @@ public:
 	void Dump(CAtlList<CString>& sl);
 	bool ValidateSubtitle();
 
+	static CString GetVideoCodecName(const GUID& subtype, DWORD biCompression);
+	static CString GetAudioCodecName(const GUID& subtype, WORD wFormatTag);
+
 private:
-	CString GetVideoCodecName(const GUID& subtype, DWORD biCompression);
-	CString GetAudioCodecName(const GUID& subtype, WORD wFormatTag);
 	CString GetSubtitleCodecName(const GUID& subtype);
 };
 

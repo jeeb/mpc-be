@@ -215,10 +215,9 @@ CString CMediaTypeEx::ToString(IPin* pPin)
 
 CString CMediaTypeEx::GetVideoCodecName(const GUID& subtype, DWORD biCompression)
 {
-	CString str = _T("");
+	CString str;
 
 	static CAtlMap<DWORD, CString> names;
-
 	if (names.IsEmpty()) {
 		names['WMV1'] = _T("Windows Media Video 7");
 		names['WMV2'] = _T("Windows Media Video 8");
@@ -227,6 +226,7 @@ CString CMediaTypeEx::GetVideoCodecName(const GUID& subtype, DWORD biCompression
 		names['MP43'] = _T("MSMPEG4v3");
 		names['MP42'] = _T("MSMPEG4v2");
 		names['MP41'] = _T("MSMPEG4v1");
+		names['DX30'] = _T("DivX 3");
 		names['DX50'] = _T("DivX 5");
 		names['DIVX'] = _T("DivX 6");
 		names['XVID'] = _T("Xvid");
@@ -244,7 +244,13 @@ CString CMediaTypeEx::GetVideoCodecName(const GUID& subtype, DWORD biCompression
 		names['SVQ3'] = _T("SVQ3");
 		names['SVQ1'] = _T("SVQ1");
 		names['H263'] = _T("H263");
-		// names[''] = _T("");
+		names['DRAC'] = _T("Dirac");
+		names['WVC1'] = _T("VC-1");
+		names['THEO'] = _T("Theora");
+		names['HVC1'] = _T("HEVC");
+		names['HM91'] = _T("HEVC(HM9.1)");
+		names['HM10'] = _T("HEVC(HM10)");
+		names['HM12'] = _T("HEVC(HM12)");
 	}
 
 	if (biCompression) {
@@ -291,7 +297,6 @@ CString CMediaTypeEx::GetAudioCodecName(const GUID& subtype, WORD wFormatTag)
 	CString str;
 
 	static CAtlMap<WORD, CString> names;
-
 	if (names.IsEmpty()) {
 		// MMReg.h
 		names[WAVE_FORMAT_ADPCM]                 = _T("MS ADPCM");
@@ -362,7 +367,6 @@ CString CMediaTypeEx::GetAudioCodecName(const GUID& subtype, WORD wFormatTag)
 		names[WAVE_FORMAT_PS2_PCM]               = _T("PS2 PCM");
 		names[WAVE_FORMAT_PS2_ADPCM]             = _T("PS2 ADPCM");
 		names[WAVE_FORMAT_SPEEX]                 = _T("Speex");
-		// names[] = _T("");
 	}
 
 	if (!names.Lookup(wFormatTag, str)) {
@@ -433,7 +437,6 @@ CString CMediaTypeEx::GetSubtitleCodecName(const GUID& subtype)
 	CString str;
 
 	static CAtlMap<GUID, CString> names;
-
 	if (names.IsEmpty()) {
 		names[MEDIASUBTYPE_UTF8]	= _T("UTF-8");
 		names[MEDIASUBTYPE_SSA]		= _T("SubStation Alpha");
@@ -441,7 +444,6 @@ CString CMediaTypeEx::GetSubtitleCodecName(const GUID& subtype)
 		names[MEDIASUBTYPE_ASS2]	= _T("Advanced SubStation Alpha");
 		names[MEDIASUBTYPE_USF]		= _T("Universal Subtitle Format");
 		names[MEDIASUBTYPE_VOBSUB]	= _T("VobSub");
-		// names[''] = _T("");
 	}
 
 	if (names.Lookup(subtype, str)) {
