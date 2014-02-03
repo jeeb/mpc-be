@@ -324,11 +324,12 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	CInterfaceArray<IUnknown, &IID_IUnknown> m_pparray;
 	CInterfaceArray<IAMStreamSelect> m_ssarray;
 
-	typedef struct AudStreams {
+	struct AudStreams {
 		int iFilter;
 		int iIndex;
 		int iNum;
 		int iSel;
+		bool ExtAudio;
 		bool forced;
 		bool def;
 		CString Name;
@@ -336,11 +337,11 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 		AudStreams() {
 			iFilter = iIndex = 0;
 			iNum = iSel = -1;
-			forced = def = false;
+			ExtAudio = forced = def = false;
 		};
 	};
 
-	typedef struct SubStreams {
+	struct SubStreams {
 		int iFilter;
 		int iIndex;
 		int iNum;

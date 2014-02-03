@@ -14041,163 +14041,187 @@ void CMainFrame::OpenSetupAudioStream()
 		return;
 	}
 
-	AppSettings& s = AfxGetAppSettings();
-	if (s.fUseInternalSelectTrackLogic) {
-
-		if (GetPlaybackMode() == PM_FILE) {
-
-			// build list of audio stream
-			AudStreams as;
-			CAtlArray<AudStreams> MixAS;
-			int iSel	= -1;
-			as.iNum		= -1;
-
-			CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
-			if (pSS) {
-				CComQIPtr<ITrackInfo> pInfo = pSS;
-				DWORD cStreamsS = 0;
-				if (SUCCEEDED(pSS->Count(&cStreamsS)) && cStreamsS > 0) {
-					for (int i = 0; i < (int)cStreamsS; i++) {
-						//iSel = 0;
-						AM_MEDIA_TYPE* pmt	= NULL;
-						DWORD dwFlags		= 0;
-						LCID lcid			= 0;
-						DWORD dwGroup		= 0;
-						WCHAR* pszName		= NULL;
-						if (FAILED(pSS->Info(i, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))) {
-							continue;
-						}
-
-						if (dwGroup == 1) {
-							if (dwFlags&(AMSTREAMSELECTINFO_ENABLED|AMSTREAMSELECTINFO_EXCLUSIVE)) {
-								iSel = MixAS.GetCount();
-								//iSel = 1;
-							}
-
-							as.forced = as.def = false;
-							if (pInfo) {
-								TrackElement TrackInfo;
-								TrackInfo.Size = sizeof(TrackInfo);
-								if (pInfo->GetTrackInfo((UINT)i, &TrackInfo) && TrackInfo.Type == TypeAudio) {
-									as.def		= !!TrackInfo.FlagDefault;
-									as.forced	= !!TrackInfo.FlagForced;
-								}
-							}
-
-							as.iFilter	= 1;
-							as.iIndex	= i;
-							as.iNum++;
-							as.iSel		= iSel;
-							as.Name		= CString(pszName);
-							MixAS.Add(as);
-						}
-
-						if (pmt) {
-							DeleteMediaType(pmt);
-						}
-						if (pszName) {
-							CoTaskMemFree(pszName);
-						}
-					}
-				}
+	if (GetPlaybackMode() == PM_FILE) {
+			
+		CAtlList<CString> extAudioList;
+		CPlaylistItem pli;
+		if (m_wndPlaylistBar.GetCur(pli)) {
+			POSITION pos = pli.m_fns.GetHeadPosition();
+			// skip main file
+			pli.m_fns.GetNext(pos);
+			while (pos) {
+				CString str = pli.m_fns.GetNext(pos);
+				extAudioList.AddTail(GetFileOnly(str));
 			}
+		}
 
-			CComQIPtr<IAMStreamSelect> pSSa = FindSwitcherFilter();
-			if (pSSa) {
+		// build list of audio stream
+		AudStreams as;
+		CAtlArray<AudStreams> MixAS;
+		int iSel	= -1;
+		as.iNum		= -1;
 
-				UINT maxAudioTrack = 0;
-				CComQIPtr<ITrackInfo> pInfo = FindFilter(__uuidof(CMatroskaSourceFilter), m_pGB);
-				if (!pInfo) {
-					pInfo = FindFilter(__uuidof(CMatroskaSplitterFilter), m_pGB);
-				}
-				if (pInfo) {
-					for (UINT i = 0; i < pInfo->GetTrackCount(); i++) {
-						TrackElement TrackInfo;
-						TrackInfo.Size = sizeof(TrackInfo);
-						if (pInfo->GetTrackInfo(i, &TrackInfo) && TrackInfo.Type == TypeAudio) {
-							maxAudioTrack = max(maxAudioTrack, i);
-						}
+		CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
+		if (pSS) {
+			CComQIPtr<ITrackInfo> pInfo = pSS;
+			DWORD cStreamsS = 0;
+			if (SUCCEEDED(pSS->Count(&cStreamsS)) && cStreamsS > 0) {
+				for (int i = 0; i < (int)cStreamsS; i++) {
+					//iSel = 0;
+					AM_MEDIA_TYPE* pmt	= NULL;
+					DWORD dwFlags		= 0;
+					LCID lcid			= 0;
+					DWORD dwGroup		= 0;
+					WCHAR* pszName		= NULL;
+					if (FAILED(pSS->Info(i, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))) {
+						continue;
 					}
-				}
 
-				DWORD cStreamsA = 0;
-				int i;
-				MixAS.GetCount() > 0 ? i = 1 : i = 0;
-				if (SUCCEEDED(pSSa->Count(&cStreamsA)) && cStreamsA > 0) {
-					for (i; i < (int)cStreamsA; i++) {
-						//iSel = 0;
-						AM_MEDIA_TYPE* pmt	= NULL;
-						DWORD dwFlags		= 0;
-						LCID lcid			= 0;
-						DWORD dwGroup		= 0;
-						WCHAR* pszName		= NULL;
-						if (FAILED(pSSa->Info(i, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))) {
-							continue;
+					if (dwGroup == 1) {
+						if (dwFlags&(AMSTREAMSELECTINFO_ENABLED|AMSTREAMSELECTINFO_EXCLUSIVE)) {
+							iSel = MixAS.GetCount();
+							//iSel = 1;
 						}
 
 						as.forced = as.def = false;
-						UINT l = i+1;
-						if (pInfo && l <= maxAudioTrack) {
+						if (pInfo) {
 							TrackElement TrackInfo;
 							TrackInfo.Size = sizeof(TrackInfo);
-							if (pInfo->GetTrackInfo(l, &TrackInfo) && TrackInfo.Type == TypeAudio) {
+							if (pInfo->GetTrackInfo((UINT)i, &TrackInfo) && TrackInfo.Type == TypeAudio) {
 								as.def		= !!TrackInfo.FlagDefault;
 								as.forced	= !!TrackInfo.FlagForced;
 							}
 						}
 
-						if (dwFlags&(AMSTREAMSELECTINFO_ENABLED|AMSTREAMSELECTINFO_EXCLUSIVE)) {
-							//iSel = 1;
-							iSel = MixAS.GetCount();
-							for (size_t i = 0; i < MixAS.GetCount(); i++) {
-								if (MixAS[i].iSel == 1) {
-									MixAS[i].iSel = 0;
-								}
-							}
-						}
-
-						as.iFilter	= 2;
+						as.iFilter	= 1;
 						as.iIndex	= i;
 						as.iNum++;
 						as.iSel		= iSel;
 						as.Name		= CString(pszName);
 						MixAS.Add(as);
+					}
 
-						if (pmt) {
-							DeleteMediaType(pmt);
-						}
+					if (pmt) {
+						DeleteMediaType(pmt);
+					}
+					if (pszName) {
+						CoTaskMemFree(pszName);
+					}
+				}
+			}
+		}
 
-						if (pszName) {
-							CoTaskMemFree(pszName);
-						}
+		CComQIPtr<IAMStreamSelect> pSSa = FindSwitcherFilter();
+		if (pSSa) {
+
+			UINT maxAudioTrack = 0;
+			CComQIPtr<ITrackInfo> pInfo = FindFilter(__uuidof(CMatroskaSourceFilter), m_pGB);
+			if (!pInfo) {
+				pInfo = FindFilter(__uuidof(CMatroskaSplitterFilter), m_pGB);
+			}
+			if (pInfo) {
+				for (UINT i = 0; i < pInfo->GetTrackCount(); i++) {
+					TrackElement TrackInfo;
+					TrackInfo.Size = sizeof(TrackInfo);
+					if (pInfo->GetTrackInfo(i, &TrackInfo) && TrackInfo.Type == TypeAudio) {
+						maxAudioTrack = max(maxAudioTrack, i);
 					}
 				}
 			}
 
-			// processing the stream list
-			if (MixAS.GetCount() > 1) {
-#ifdef DEBUG
-				DbgLog((LOG_TRACE, 3, L"Audio Track list :"));
-				for (size_t i = 0; i < MixAS.GetCount(); i++) {
-					DbgLog((LOG_TRACE, 3, L"	%s, type = %s", MixAS[i].Name, MixAS[i].iFilter == 1 ? L"Splitter" : L"AudioSwitcher"));
+			DWORD cStreamsA = 0;
+			int i = MixAS.GetCount() > 0 ? 1 : 0;
+			if (SUCCEEDED(pSSa->Count(&cStreamsA)) && cStreamsA > 0) {
+				for (i; i < (int)cStreamsA; i++) {
+					//iSel = 0;
+					AM_MEDIA_TYPE* pmt	= NULL;
+					DWORD dwFlags		= 0;
+					LCID lcid			= 0;
+					DWORD dwGroup		= 0;
+					WCHAR* pszName		= NULL;
+					if (FAILED(pSSa->Info(i, &pmt, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))) {
+						continue;
+					}
+
+					as.forced = as.def = false;
+					UINT l = i + 1;
+					if (pInfo && l <= maxAudioTrack) {
+						TrackElement TrackInfo;
+						TrackInfo.Size = sizeof(TrackInfo);
+						if (pInfo->GetTrackInfo(l, &TrackInfo) && TrackInfo.Type == TypeAudio) {
+							as.def		= !!TrackInfo.FlagDefault;
+							as.forced	= !!TrackInfo.FlagForced;
+						}
+					}
+
+					if (dwFlags&(AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE)) {
+						//iSel = 1;
+						iSel = MixAS.GetCount();
+						for (size_t i = 0; i < MixAS.GetCount(); i++) {
+							if (MixAS[i].iSel == 1) {
+								MixAS[i].iSel = 0;
+							}
+						}
+					}
+
+					as.iFilter	= 2;
+					as.iIndex	= i;
+					as.iNum++;
+					as.iSel		= iSel;
+					as.Name		= CString(pszName);
+					as.ExtAudio	= extAudioList.Find(as.Name) != NULL;
+					MixAS.Add(as);
+
+					if (pmt) {
+						DeleteMediaType(pmt);
+					}
+
+					if (pszName) {
+						CoTaskMemFree(pszName);
+					}
 				}
+			}
+		}
+
+#ifdef DEBUG
+		DbgLog((LOG_TRACE, 3, L"Audio Track list :"));
+		for (size_t i = 0; i < MixAS.GetCount(); i++) {
+			DbgLog((LOG_TRACE, 3, L"	%s, type = %s", MixAS[i].Name, MixAS[i].iFilter == 1 ? L"Splitter" : L"AudioSwitcher"));
+		}
 #endif
 
-				bool bLangMatch	= false;
-				size_t bLangIdx	= 0;
-
-				CStringW alo = s.strAudiosLanguageOrder;
-				if (alo.IsEmpty()) {
-					alo = _T("forced default");
-				} else {
-					alo.Replace(_T("[fc]"), _T("forced"));
-					alo.Replace(_T("[def]"), _T("default"));
+		AppSettings& s = AfxGetAppSettings();
+		if (!s.fUseInternalSelectTrackLogic) {
+			if (s.fPrioritizeExternalAudio && extAudioList.GetCount() > 0 && pSSa) {
+				for (size_t i = 0; i < MixAS.GetCount(); i++) {
+					if (MixAS[i].ExtAudio) {
+						AudStreams as = MixAS[i];
+						pSSa->Enable(as.iIndex, AMSTREAMSELECTENABLE_ENABLE);
+						return;
+					}
 				}
+			}
+		} else if (MixAS.GetCount() > 1) {
+			bool bLangMatch	= false;
+			size_t bLangIdx	= 0;
 
-				int tPos = 0;
-				CStringW lang = alo.Tokenize(_T(",; "), tPos);
+			CStringW alo = s.strAudiosLanguageOrder;
+			if (alo.IsEmpty()) {
+				alo = _T("forced default");
+			} else {
+				alo.Replace(_T("[fc]"), _T("forced"));
+				alo.Replace(_T("[def]"), _T("default"));
+			}
+
+			int tPos = 0;
+			CStringW lang = alo.Tokenize(_T(",; "), tPos);
+
+			if (s.fPrioritizeExternalAudio && extAudioList.GetCount() > 0 && pSSa) {
 				while (tPos != -1 && !bLangMatch) {
 					for (size_t iIndex = 0; iIndex < MixAS.GetCount(); iIndex++) {
+						if (!MixAS[iIndex].ExtAudio) {
+							continue;
+						}
 
 						CString name(MixAS[iIndex].Name);
 						name.MakeLower();
@@ -14230,15 +14254,67 @@ void CMainFrame::OpenSetupAudioStream()
 					lang = alo.Tokenize(_T(",; "), tPos);
 				}
 
+				AudStreams as;
 				if (bLangMatch) {
-					AudStreams as = MixAS[bLangIdx];
-					if (as.iFilter == 1) {
-						pSS->Enable(as.iIndex, AMSTREAMSELECTENABLE_ENABLE);
-					} else if (as.iFilter == 2) {
-						pSSa->Enable(as.iIndex, AMSTREAMSELECTENABLE_ENABLE);
+					as = MixAS[bLangIdx];
+				} else {
+					for (size_t i = 0; i < MixAS.GetCount(); i++) {
+						if (MixAS[i].ExtAudio) {
+							as = MixAS[i];
+							break;
+						}
 					}
-					return;
 				}
+
+				if (as.ExtAudio) {
+					pSSa->Enable(as.iIndex, AMSTREAMSELECTENABLE_ENABLE);
+				}
+
+				return;
+			}
+
+			while (tPos != -1 && !bLangMatch) {
+				for (size_t iIndex = 0; iIndex < MixAS.GetCount(); iIndex++) {
+
+					CString name(MixAS[iIndex].Name);
+					name.MakeLower();
+					lang.MakeLower();
+
+					CAtlList<CString> sl;
+					Explode(lang, sl, '|');
+					POSITION pos = sl.GetHeadPosition();
+
+					int nLangMatch = 0;
+					while (pos) {
+						CString pattern = sl.GetNext(pos);
+
+						if ((MixAS[iIndex].forced && pattern == _T("forced")) || (MixAS[iIndex].def && pattern == _T("default"))) {
+							nLangMatch++;
+							continue;
+						}
+
+						if (name.Find(pattern) >= 0) {
+							nLangMatch++;
+						}
+					}
+
+					if (nLangMatch == sl.GetCount()) {
+						bLangIdx	= iIndex;
+						bLangMatch	= true;
+						break;
+					}
+				}
+				lang = alo.Tokenize(_T(",; "), tPos);
+			}
+
+			if (bLangMatch) {
+				AudStreams as = MixAS[bLangIdx];
+				if (as.iFilter == 1) {
+					pSS->Enable(as.iIndex, AMSTREAMSELECTENABLE_ENABLE);
+				} else if (as.iFilter == 2) {
+					pSSa->Enable(as.iIndex, AMSTREAMSELECTENABLE_ENABLE);
+				}
+				return;
 			}
 		}
 	}

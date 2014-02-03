@@ -151,9 +151,6 @@ BOOL CPPagePlayback::OnInitDialog()
 		SetDlgItemText(IDC_STATIC2, dlgText);
 	}
 
-	// Temporary disable PrioritizeExternalAudio features ...
-	GetDlgItem(IDC_CHECK3)->EnableWindow(FALSE);
-
 	UpdateData(FALSE);
 
 	return TRUE;
