@@ -17252,7 +17252,7 @@ void CMainFrame::UpdateSubtitle(bool fDisplayMessage, bool fApplyDefStyle)
 
 		if (i < pSubStream->GetStreamCount()) {
 			CAutoLock cAutoLock(&m_csSubLock);
-			SetSubtitle(pSubStream, fApplyDefStyle);
+			SetSubtitle(pSubStream, i, fApplyDefStyle);
 
 			if (fDisplayMessage) {
 				WCHAR* pName = NULL;
@@ -17275,7 +17275,7 @@ void CMainFrame::UpdateSubtitle(bool fDisplayMessage, bool fApplyDefStyle)
 	m_pCAP->SetSubPicProvider(NULL);
 }
 
-void CMainFrame::SetSubtitle(ISubStream* pSubStream, bool fApplyDefStyle)
+void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, bool fApplyDefStyle/* = false*/)
 {
 	AppSettings& s = AfxGetAppSettings();
 
@@ -17336,13 +17336,11 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, bool fApplyDefStyle)
 		}
 	}
 
-	if (!fApplyDefStyle) {
-		m_iSubtitleSel = -1;
-
+	if (!fApplyDefStyle && iSubtitleSel == -1) {
+		m_iSubtitleSel = iSubtitleSel;
 		if (pSubStream) {
-
 			int i = 0;
-
+			
 			POSITION pos = m_pSubStreams.GetHeadPosition();
 			while (pos) {
 				CComPtr<ISubStream> pSubStream2 = m_pSubStreams.GetNext(pos);

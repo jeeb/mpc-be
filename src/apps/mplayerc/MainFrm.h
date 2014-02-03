@@ -571,7 +571,7 @@ public:
 	bool LoadSubtitle(CString fn, ISubStream **actualStream = NULL);
 
 	void UpdateSubtitle(bool fDisplayMessage = false, bool fApplyDefStyle = false);
-	void SetSubtitle(ISubStream* pSubStream, bool fApplyDefStyle = false);
+	void SetSubtitle(ISubStream* pSubStream, int iSubtitleSel = -1, bool fApplyDefStyle = false);
 	void ReplaceSubtitle(ISubStream* pSubStreamOld, ISubStream* pSubStreamNew);
 	void InvalidateSubtitle(DWORD_PTR nSubtitleId = -1, REFERENCE_TIME rtInvalidate = -1);
 	void ReloadSubtitle();
