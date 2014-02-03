@@ -2099,7 +2099,7 @@ void CSimpleTextSubtitle::ChangeUnknownStylesToDefault()
 				if (fReport) {
 					CString msg;
 					msg.Format(_T("Unknown style found: \"%s\", changed to \"Default\"!\n\nPress Cancel to ignore further warnings."), stse.style);
-					if (MessageBox(NULL, msg, _T("Warning"), MB_OKCANCEL|MB_ICONWARNING) != IDOK) {
+					if (MessageBox(NULL, msg, _T("Warning"), MB_OKCANCEL|MB_ICONWARNING|MB_SYSTEMMODAL) != IDOK) {
 						fReport = false;
 					}
 				}
