@@ -386,7 +386,7 @@ BOOL CTextFile::ReadString(CStringA& str)
 				}
 			} else {
 				// Switch to text and read again
-				m_encoding = ANSI;
+				m_encoding = ASCII;
 				// Stop using the buffer
 				m_posInBuffer = m_nInBuffer = 0;
 
@@ -603,7 +603,7 @@ BOOL CTextFile::ReadString(CStringW& str)
 				}
 			} else {
 				// Switch to text and read again
-				m_encoding = ANSI;
+				m_encoding = ASCII;
 				// Stop using the buffer
 				m_posInBuffer = m_nInBuffer = 0;
 

@@ -2733,7 +2733,7 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
 
 		// No need to call Sort() or CreateSegments(), everything is done on the fly
 
-		CWebTextFile f2;
+		CWebTextFile f2(CTextFile::UTF8);
 		if (f2.Open(f->GetFilePath() + _T(".style"))) {
 			OpenSubStationAlpha(&f2, *this, CharSet);
 		}

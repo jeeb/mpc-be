@@ -71,6 +71,15 @@ static bool ParseCUESheetFile(CString fn, CAtlList<CUETrack> &CUETrackList, CStr
 		return false;
 	}
 
+	// check Encoding
+	CString str;
+	while (f.ReadString(str)) {
+	}
+	if (f.GetEncoding() == CTextFile::ASCII) {
+		f.SetEncoding(CTextFile::ANSI);
+	}
+	f.Seek(0, CFile::SeekPosition::begin);
+
 	Title.Empty();
 	Performer.Empty();
 
@@ -993,6 +1002,14 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn)
 		return false;
 	}
 
+	// check Encoding
+	while (f.ReadString(str)) {
+	}
+	if (f.GetEncoding() == CTextFile::ASCII) {
+		f.SetEncoding(CTextFile::ANSI);
+	}
+	f.Seek(0, CFile::SeekPosition::begin);
+
 	CPath base(fn);
 	base.RemoveFileSpec();
 
@@ -1125,6 +1142,14 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 	if (!f.Open(fn)) {
 		return false;
 	}
+
+	// check Encoding
+	while (f.ReadString(str)) {
+	}
+	if (f.GetEncoding() == CTextFile::ASCII) {
+		f.SetEncoding(CTextFile::ANSI);
+	}
+	f.Seek(0, CFile::SeekPosition::begin);
 
 	CPath base(fn);
 	base.RemoveFileSpec();
