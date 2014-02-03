@@ -281,6 +281,11 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				case FCC('P422'):
 					mt.subtype = FOURCCMap(pbmi->biCompression = FCC('Y42B'));
 					break;
+				case FCC('RV24'): // uncommon fourcc
+					pbmi->biCompression = BI_RGB;
+					mt.subtype = MEDIASUBTYPE_RGB24;
+					pbmi->biHeight = -pbmi->biHeight;
+					break;
 				case FCC('AVRn'): // uncommon fourcc
 				case FCC('JPGL'): // uncommon fourcc
 					mt.subtype = MEDIASUBTYPE_MJPG;
