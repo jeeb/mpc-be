@@ -1879,7 +1879,7 @@ bool FindRedir(CString& fn, CString ct, CAtlList<CString>& fns, CAutoPtrList<CAt
 {
 	CString body;
 
-	CTextFile f(CTextFile::ANSI);
+	CTextFile f(CTextFile::UTF8, CTextFile::ANSI);
 	if (f.Open(fn)) for (CString tmp; f.ReadString(tmp); body += tmp + '\n') {
 			;
 		}

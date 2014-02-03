@@ -27,9 +27,9 @@
 
 #define TEXTFILE_BUFFER_SIZE (64 * 1024)
 
-CTextFile::CTextFile(enc e)
-	: m_encoding(e)
-	, m_defaultencoding(e)
+CTextFile::CTextFile(enc encoding/* = ASCII*/, enc defaultencoding/* = ASCII*/)
+	: m_encoding(encoding)
+	, m_defaultencoding(defaultencoding)
 	, m_offset(0)
 	, m_posInBuffer(0)
 	, m_nInBuffer(0)
@@ -44,7 +44,6 @@ bool CTextFile::Open(LPCTSTR lpszFileName)
 		return false;
 	}
 
-	m_encoding = m_defaultencoding;
 	m_offset = 0;
 	m_nInBuffer = m_posInBuffer = 0;
 
@@ -386,7 +385,7 @@ BOOL CTextFile::ReadString(CStringA& str)
 				}
 			} else {
 				// Switch to text and read again
-				m_encoding = ASCII;
+				m_encoding = m_defaultencoding;
 				// Stop using the buffer
 				m_posInBuffer = m_nInBuffer = 0;
 
@@ -603,7 +602,7 @@ BOOL CTextFile::ReadString(CStringW& str)
 				}
 			} else {
 				// Switch to text and read again
-				m_encoding = ASCII;
+				m_encoding = m_defaultencoding;
 				// Stop using the buffer
 				m_posInBuffer = m_nInBuffer = 0;
 
@@ -688,8 +687,8 @@ BOOL CTextFile::ReadString(CStringW& str)
 // CWebTextFile
 //
 
-CWebTextFile::CWebTextFile(CTextFile::enc e, LONGLONG llMaxSize)
-	: CTextFile(e)
+CWebTextFile::CWebTextFile(CTextFile::enc encoding/* = ASCII*/, CTextFile::enc defaultencoding/* = ASCII*/, LONGLONG llMaxSize)
+	: CTextFile(encoding, defaultencoding)
 	, m_llMaxSize(llMaxSize)
 {
 }
