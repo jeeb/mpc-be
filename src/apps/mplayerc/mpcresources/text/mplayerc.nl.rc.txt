@@ -335,7 +335,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 30
 28		"Dual output"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 44
 5		"Audio"
 6		"Volume"
 7		"Min"
@@ -361,6 +361,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 35		"Voorkeurstrack in standaard"
 37		"Snelheidsstap"
 40		"Resetten"
+41		"Audio open settings"
+42		"Prefer external audio files over embedded audio track"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34

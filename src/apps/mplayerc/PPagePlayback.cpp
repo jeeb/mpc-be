@@ -38,6 +38,7 @@ CPPagePlayback::CPPagePlayback()
 	, m_nVolume(0)
 	, m_nBalance(0)
 	, m_fAutoloadAudio(FALSE)
+	, m_fPrioritizeExternalAudio(FALSE)
 	, m_fEnableWorkerThreadForOpening(FALSE)
 	, m_fReportFailedPins(FALSE)
 	, m_nVolumeStep(1)
@@ -64,6 +65,7 @@ void CPPagePlayback::DoDataExchange(CDataExchange* pDX)
 	DDX_CBIndex(pDX, IDC_COMBO1, m_iZoomLevel);
 	DDX_Check(pDX, IDC_CHECK5, m_iRememberZoomLevel);
 	DDX_Check(pDX, IDC_CHECK2, m_fAutoloadAudio);
+	DDX_Check(pDX, IDC_CHECK3, m_fPrioritizeExternalAudio);
 	DDX_Check(pDX, IDC_CHECK7, m_fEnableWorkerThreadForOpening);
 	DDX_Check(pDX, IDC_CHECK6, m_fReportFailedPins);
 	DDX_Text(pDX, IDC_EDIT2, m_subtitlesLanguageOrder);
@@ -113,6 +115,7 @@ BOOL CPPagePlayback::OnInitDialog()
 	m_iZoomLevel = s.iZoomLevel;
 	m_iRememberZoomLevel = s.fRememberZoomLevel;
 	m_fAutoloadAudio = s.fAutoloadAudio;
+	m_fPrioritizeExternalAudio = s.fPrioritizeExternalAudio;
 	m_sAudioPaths = s.strAudioPaths;
 	m_fEnableWorkerThreadForOpening = s.fEnableWorkerThreadForOpening;
 	m_fReportFailedPins = s.fReportFailedPins;
@@ -148,6 +151,9 @@ BOOL CPPagePlayback::OnInitDialog()
 		SetDlgItemText(IDC_STATIC2, dlgText);
 	}
 
+	// Temporary disable PrioritizeExternalAudio features ...
+	GetDlgItem(IDC_CHECK3)->EnableWindow(FALSE);
+
 	UpdateData(FALSE);
 
 	return TRUE;
@@ -167,6 +173,7 @@ BOOL CPPagePlayback::OnApply()
 	s.iZoomLevel = m_iZoomLevel;
 	s.fRememberZoomLevel = !!m_iRememberZoomLevel;
 	s.fAutoloadAudio = !!m_fAutoloadAudio;
+	s.fPrioritizeExternalAudio = !!m_fPrioritizeExternalAudio;
 	s.strAudioPaths = m_sAudioPaths;
 	s.fEnableWorkerThreadForOpening = !!m_fEnableWorkerThreadForOpening;
 	s.fReportFailedPins = !!m_fReportFailedPins;

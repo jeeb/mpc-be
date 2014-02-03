@@ -143,6 +143,7 @@
 #define IDS_RS_ENABLEWORKERTHREADFOROPENING	_T("EnableWorkerThreadForOpening")
 #define IDS_RS_PNSPRESETS					_T("PnSPresets")
 #define IDS_RS_AUTOLOADAUDIO				_T("AutoloadAudio")
+#define IDS_RS_PRIORITIZEEXTERNALAUDIO		_T("PrioritizeExternalAudio")
 #define IDS_RS_AUDIOPATHS					_T("AudioPaths")
 #define IDS_RS_AUTOLOADSUBTITLES			_T("AutoloadSubtitles")
 #define IDS_RS_SUBTITLESLANGORDER			_T("SubtitlesLanguageOrder")

@@ -335,7 +335,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 30
 28		"2-ой вывод"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 44
 5		"Аудио"
 6		"Громкость"
 7		"Тише"
@@ -361,6 +361,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 35		"Приоритет дорожек"
 37		"Шаг изменения скорости воспр."
 40		"Сброс"
+41		"Настройки открытия аудио"
+42		"Всегда использовать внешние аудио-файлы как основные"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34

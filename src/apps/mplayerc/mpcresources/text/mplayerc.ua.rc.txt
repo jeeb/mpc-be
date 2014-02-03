@@ -335,7 +335,7 @@ BEGIN DIALOGEX IDD_PPAGEOUTPUT LINES 30
 28		"Подвійний вивід"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 44
 5		"Аудіо"
 6		"Гучність"
 7		"Мін."
@@ -361,6 +361,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 41
 35		"Уподобання користувача щодо вибору:"
 37		"Крок зміни швидкості відтвор."
 40		"Скинути"
+41		"Audio open settings"
+42		"Prefer external audio files over embedded audio track"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 34

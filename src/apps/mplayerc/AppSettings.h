@@ -543,7 +543,10 @@ public:
 	bool			fUseInternalSelectTrackLogic;
 	bool			fEnableWorkerThreadForOpening;
 	bool			fReportFailedPins;
+
+	// Audio
 	bool			fAutoloadAudio;
+	bool			fPrioritizeExternalAudio;
 	CString			strAudioPaths;
 
 	// DVD/OGM
