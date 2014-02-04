@@ -501,6 +501,19 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					if (!bHasVideo)
 						mts.Add(mt);
 					bHasVideo = true;
+				} else if (CodecID == "V_PRORES") {
+					mt.subtype = MEDIASUBTYPE_icpf;
+					mt.formattype = FORMAT_VideoInfo;
+					VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER));
+					memset(mt.Format(), 0, mt.FormatLength());
+					pvih->bmiHeader.biSize = sizeof(pvih->bmiHeader);
+					pvih->bmiHeader.biWidth = (LONG)pTE->v.PixelWidth;
+					pvih->bmiHeader.biHeight = (LONG)pTE->v.PixelHeight;
+					pvih->bmiHeader.biBitCount = 24;
+					pvih->bmiHeader.biCompression = mt.subtype.Data1;
+					if (!bHasVideo)
+						mts.Add(mt);
+					bHasVideo = true;
 				}
 				REFERENCE_TIME AvgTimePerFrame = 0;
 
@@ -1884,6 +1897,14 @@ HRESULT CMatroskaSplitterOutputPin::DeliverBlock(MatroskaPacket* p)
 			if (!ParseWavpack(&m_mt, gb, tmp)) {
 				continue;
 			}
+		} else if (m_mt.subtype == MEDIASUBTYPE_icpf) {
+			CAutoPtr<CBinary> ptr(DNew CBinary());
+			ptr->SetCount(2 * sizeof(DWORD));
+			DWORD* pData = (DWORD*)ptr->GetData();
+			pData[0] = p->bg->Block.BlockData.GetCount();
+			pData[1] = FCC('icpf');
+			tmp->Copy(*ptr);
+			tmp->Append(*p->bg->Block.BlockData.GetNext(pos));
 		} else {
 			tmp->Copy(*p->bg->Block.BlockData.GetNext(pos));
 		}
