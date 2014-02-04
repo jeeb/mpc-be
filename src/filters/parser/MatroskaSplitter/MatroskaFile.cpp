@@ -124,27 +124,27 @@ case MATROSKA_ID_SEGMENT:
 HRESULT EBML::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0x4286:
-	EBMLVersion.Parse(pMN);
-	break;
-case 0x42F7:
-	EBMLReadVersion.Parse(pMN);
-	break;
-case 0x42F2:
-	EBMLMaxIDLength.Parse(pMN);
-	break;
-case 0x42F3:
-	EBMLMaxSizeLength.Parse(pMN);
-	break;
-case 0x4282:
-	DocType.Parse(pMN);
-	break;
-case 0x4287:
-	DocTypeVersion.Parse(pMN);
-	break;
-case 0x4285:
-	DocTypeReadVersion.Parse(pMN);
-	break;
+	case 0x4286:
+		EBMLVersion.Parse(pMN);
+		break;
+	case 0x42F7:
+		EBMLReadVersion.Parse(pMN);
+		break;
+	case 0x42F2:
+		EBMLMaxIDLength.Parse(pMN);
+		break;
+	case 0x42F3:
+		EBMLMaxSizeLength.Parse(pMN);
+		break;
+	case 0x4282:
+		DocType.Parse(pMN);
+		break;
+	case 0x4287:
+		DocTypeVersion.Parse(pMN);
+		break;
+	case 0x4285:
+		DocTypeReadVersion.Parse(pMN);
+		break;
 	EndChunk
 }
 
@@ -153,30 +153,30 @@ HRESULT Segment::Parse(CMatroskaNode* pMN0)
 	pos = pMN0->GetPos();
 
 	BeginChunk
-case MATROSKA_ID_INFO:
-	SegmentInfo.Parse(pMN);
-	break;
-case MATROSKA_ID_SEEKHEAD:
-	MetaSeekInfo.Parse(pMN);
-	break;
-case MATROSKA_ID_TRACKS:
-	Tracks.Parse(pMN);
-	break;
-case MATROSKA_ID_CLUSTER:
-	Clusters.Parse(pMN);
-	break;
-case MATROSKA_ID_CUES:
-	Cues.Parse(pMN);
-	break;
-case MATROSKA_ID_ATTACHMENTS:
-	Attachments.Parse(pMN);
-	break;
-case MATROSKA_ID_CHAPTERS:
-	Chapters.Parse(pMN);
-	break;
-case MATROSKA_ID_TAGS:
-	Tags.Parse(pMN);
-	break;
+	case MATROSKA_ID_INFO:
+		SegmentInfo.Parse(pMN);
+		break;
+	case MATROSKA_ID_SEEKHEAD:
+		MetaSeekInfo.Parse(pMN);
+		break;
+	case MATROSKA_ID_TRACKS:
+		Tracks.Parse(pMN);
+		break;
+	case MATROSKA_ID_CLUSTER:
+		Clusters.Parse(pMN);
+		break;
+	case MATROSKA_ID_CUES:
+		Cues.Parse(pMN);
+		break;
+	case MATROSKA_ID_ATTACHMENTS:
+		Attachments.Parse(pMN);
+		break;
+	case MATROSKA_ID_CHAPTERS:
+		Chapters.Parse(pMN);
+		break;
+	case MATROSKA_ID_TAGS:
+		Tags.Parse(pMN);
+		break;
 	EndChunk
 }
 
@@ -335,155 +335,155 @@ ChapterAtom* Segment::FindChapterAtom(UINT64 id, int nEditionEntry)
 HRESULT Info::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0x73A4:
-	SegmentUID.Parse(pMN);
-	break;
-case 0x7384:
-	SegmentFilename.Parse(pMN);
-	break;
-case 0x3CB923:
-	PrevUID.Parse(pMN);
-	break;
-case 0x3C83AB:
-	PrevFilename.Parse(pMN);
-	break;
-case 0x3EB923:
-	NextUID.Parse(pMN);
-	break;
-case 0x3E83BB:
-	NextFilename.Parse(pMN);
-	break;
-case 0x2AD7B1:
-	TimeCodeScale.Parse(pMN);
-	break;
-case 0x4489:
-	Duration.Parse(pMN);
-	break;
-case 0x4461:
-	DateUTC.Parse(pMN);
-	break;
-case 0x7BA9:
-	Title.Parse(pMN);
-	break;
-case 0x4D80:
-	MuxingApp.Parse(pMN);
-	break;
-case 0x5741:
-	WritingApp.Parse(pMN);
-	break;
+	case 0x73A4:
+		SegmentUID.Parse(pMN);
+		break;
+	case 0x7384:
+		SegmentFilename.Parse(pMN);
+		break;
+	case 0x3CB923:
+		PrevUID.Parse(pMN);
+		break;
+	case 0x3C83AB:
+		PrevFilename.Parse(pMN);
+		break;
+	case 0x3EB923:
+		NextUID.Parse(pMN);
+		break;
+	case 0x3E83BB:
+		NextFilename.Parse(pMN);
+		break;
+	case 0x2AD7B1:
+		TimeCodeScale.Parse(pMN);
+		break;
+	case 0x4489:
+		Duration.Parse(pMN);
+		break;
+	case 0x4461:
+		DateUTC.Parse(pMN);
+		break;
+	case 0x7BA9:
+		Title.Parse(pMN);
+		break;
+	case 0x4D80:
+		MuxingApp.Parse(pMN);
+		break;
+	case 0x5741:
+		WritingApp.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT Seek::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0x4DBB:
-	SeekHeads.Parse(pMN);
-	break;
+	case 0x4DBB:
+		SeekHeads.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT SeekHead::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0x53AB:
-	SeekID.Parse(pMN);
-	break;
-case 0x53AC:
-	SeekPosition.Parse(pMN);
-	break;
+	case 0x53AB:
+		SeekID.Parse(pMN);
+		break;
+	case 0x53AC:
+		SeekPosition.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT Track::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0xAE:
-	TrackEntries.Parse(pMN);
-	break;
+	case 0xAE:
+		TrackEntries.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT TrackEntry::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0xD7:
-	TrackNumber.Parse(pMN);
-	break;
-case 0x73C5:
-	TrackUID.Parse(pMN);
-	break;
-case 0x83:
-	TrackType.Parse(pMN);
-	break;
-case 0xB9:
-	FlagEnabled.Parse(pMN);
-	break;
-case 0x88:
-	FlagDefault.Parse(pMN);
-	break;
-case 0x9C:
-	FlagLacing.Parse(pMN);
-	break;
-case 0x55AA:
-	FlagForced.Parse(pMN);
-	break;
-case 0x6DE7:
-	MinCache.Parse(pMN);
-	break;
-case 0x6DF8:
-	MaxCache.Parse(pMN);
-	break;
-case 0x536E:
-	Name.Parse(pMN);
-	break;
-case 0x22B59C:
-	Language.Parse(pMN);
-	break;
-case 0x86:
-	CodecID.Parse(pMN);
-	break;
-case 0x63A2:
-	CodecPrivate.Parse(pMN);
-	break;
-case 0x258688:
-	CodecName.Parse(pMN);
-	break;
-case 0x3A9697:
-	CodecSettings.Parse(pMN);
-	break;
-case 0x3B4040:
-	CodecInfoURL.Parse(pMN);
-	break;
-case 0x26B240:
-	CodecDownloadURL.Parse(pMN);
-	break;
-case 0xAA:
-	CodecDecodeAll.Parse(pMN);
-	break;
-case 0x6FAB:
-	TrackOverlay.Parse(pMN);
-	break;
-case 0x23E383:
-case 0x2383E3:
-	DefaultDuration.Parse(pMN);
-	break;
-case 0x23314F:
-	TrackTimecodeScale.Parse(pMN);
-	break;
-case 0xE0:
-	if (S_OK == v.Parse(pMN)) {
-		DescType |= DescVideo;
-	}
-	break;
-case 0xE1:
-	if (S_OK == a.Parse(pMN)) {
-		DescType |= DescAudio;
-	}
-	break;
-case 0x6D80:
-	ces.Parse(pMN);
-	break;
+	case 0xD7:
+		TrackNumber.Parse(pMN);
+		break;
+	case 0x73C5:
+		TrackUID.Parse(pMN);
+		break;
+	case 0x83:
+		TrackType.Parse(pMN);
+		break;
+	case 0xB9:
+		FlagEnabled.Parse(pMN);
+		break;
+	case 0x88:
+		FlagDefault.Parse(pMN);
+		break;
+	case 0x9C:
+		FlagLacing.Parse(pMN);
+		break;
+	case 0x55AA:
+		FlagForced.Parse(pMN);
+		break;
+	case 0x6DE7:
+		MinCache.Parse(pMN);
+		break;
+	case 0x6DF8:
+		MaxCache.Parse(pMN);
+		break;
+	case 0x536E:
+		Name.Parse(pMN);
+		break;
+	case 0x22B59C:
+		Language.Parse(pMN);
+		break;
+	case 0x86:
+		CodecID.Parse(pMN);
+		break;
+	case 0x63A2:
+		CodecPrivate.Parse(pMN);
+		break;
+	case 0x258688:
+		CodecName.Parse(pMN);
+		break;
+	case 0x3A9697:
+		CodecSettings.Parse(pMN);
+		break;
+	case 0x3B4040:
+		CodecInfoURL.Parse(pMN);
+		break;
+	case 0x26B240:
+		CodecDownloadURL.Parse(pMN);
+		break;
+	case 0xAA:
+		CodecDecodeAll.Parse(pMN);
+		break;
+	case 0x6FAB:
+		TrackOverlay.Parse(pMN);
+		break;
+	case 0x23E383:
+	case 0x2383E3:
+		DefaultDuration.Parse(pMN);
+		break;
+	case 0x23314F:
+		TrackTimecodeScale.Parse(pMN);
+		break;
+	case 0xE0:
+		if (S_OK == v.Parse(pMN)) {
+			DescType |= DescVideo;
+		}
+		break;
+	case 0xE1:
+		if (S_OK == a.Parse(pMN)) {
+			DescType |= DescAudio;
+		}
+		break;
+	case 0x6D80:
+		ces.Parse(pMN);
+		break;
 	EndChunk
 }
 
@@ -531,216 +531,216 @@ bool TrackEntry::Expand(CBinary& data, UINT64 Scope)
 HRESULT Video::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0x9A:
-	FlagInterlaced.Parse(pMN);
-	break;
-case 0x53B8:
-	StereoMode.Parse(pMN);
-	break;
-case 0xB0:
-	PixelWidth.Parse(pMN);
-	if (!DisplayWidth) {
-		DisplayWidth.Set(PixelWidth);
-	}
-	break;
-case 0xBA:
-	PixelHeight.Parse(pMN);
-	if (!DisplayHeight) {
-		DisplayHeight.Set(PixelHeight);
-	}
-	break;
-case 0x54B0:
-	DisplayWidth.Parse(pMN);
-	break;
-case 0x54BA:
-	DisplayHeight.Parse(pMN);
-	break;
-case 0x54B2:
-	DisplayUnit.Parse(pMN);
-	break;
-case 0x54B3:
-	AspectRatioType.Parse(pMN);
-	break;
-case 0x54AA:
-	VideoPixelCropBottom.Parse(pMN);
-	if ((INT64)VideoPixelCropBottom < 0) VideoPixelCropBottom.Set(0); // fix bad value
-	break;
-case 0x54BB:
-	VideoPixelCropTop.Parse(pMN);
-	if ((INT64)VideoPixelCropTop < 0) VideoPixelCropTop.Set(0); // fix bad value
-	break;
-case 0x54CC:
-	VideoPixelCropLeft.Parse(pMN);
-	if ((INT64)VideoPixelCropLeft < 0) VideoPixelCropLeft.Set(0); // fix bad value
-	break;
-case 0x54DD:
-	VideoPixelCropRight.Parse(pMN);
-	if ((INT64)VideoPixelCropRight < 0) VideoPixelCropRight.Set(0); // fix bad value
-	break;
-case 0x2EB524:
-	ColourSpace.Parse(pMN);
-	break;
-case 0x2FB523:
-	GammaValue.Parse(pMN);
-	break;
-case 0x2383E3:
-	FramePerSec.Parse(pMN);
-	break;
+	case 0x9A:
+		FlagInterlaced.Parse(pMN);
+		break;
+	case 0x53B8:
+		StereoMode.Parse(pMN);
+		break;
+	case 0xB0:
+		PixelWidth.Parse(pMN);
+		if (!DisplayWidth) {
+			DisplayWidth.Set(PixelWidth);
+		}
+		break;
+	case 0xBA:
+		PixelHeight.Parse(pMN);
+		if (!DisplayHeight) {
+			DisplayHeight.Set(PixelHeight);
+		}
+		break;
+	case 0x54B0:
+		DisplayWidth.Parse(pMN);
+		break;
+	case 0x54BA:
+		DisplayHeight.Parse(pMN);
+		break;
+	case 0x54B2:
+		DisplayUnit.Parse(pMN);
+		break;
+	case 0x54B3:
+		AspectRatioType.Parse(pMN);
+		break;
+	case 0x54AA:
+		VideoPixelCropBottom.Parse(pMN);
+		if ((INT64)VideoPixelCropBottom < 0) VideoPixelCropBottom.Set(0); // fix bad value
+		break;
+	case 0x54BB:
+		VideoPixelCropTop.Parse(pMN);
+		if ((INT64)VideoPixelCropTop < 0) VideoPixelCropTop.Set(0); // fix bad value
+		break;
+	case 0x54CC:
+		VideoPixelCropLeft.Parse(pMN);
+		if ((INT64)VideoPixelCropLeft < 0) VideoPixelCropLeft.Set(0); // fix bad value
+		break;
+	case 0x54DD:
+		VideoPixelCropRight.Parse(pMN);
+		if ((INT64)VideoPixelCropRight < 0) VideoPixelCropRight.Set(0); // fix bad value
+		break;
+	case 0x2EB524:
+		ColourSpace.Parse(pMN);
+		break;
+	case 0x2FB523:
+		GammaValue.Parse(pMN);
+		break;
+	case 0x2383E3:
+		FramePerSec.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT Audio::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0xB5:
-	SamplingFrequency.Parse(pMN);
-	if (!OutputSamplingFrequency) {
-		OutputSamplingFrequency.Set(SamplingFrequency);
-	}
-	break;
-case 0x78B5:
-	OutputSamplingFrequency.Parse(pMN);
-	break;
-case 0x9F:
-	Channels.Parse(pMN);
-	break;
-case 0x7D7B:
-	ChannelPositions.Parse(pMN);
-	break;
-case 0x6264:
-	BitDepth.Parse(pMN);
-	break;
+	case 0xB5:
+		SamplingFrequency.Parse(pMN);
+		if (!OutputSamplingFrequency) {
+			OutputSamplingFrequency.Set(SamplingFrequency);
+		}
+		break;
+	case 0x78B5:
+		OutputSamplingFrequency.Parse(pMN);
+		break;
+	case 0x9F:
+		Channels.Parse(pMN);
+		break;
+	case 0x7D7B:
+		ChannelPositions.Parse(pMN);
+		break;
+	case 0x6264:
+		BitDepth.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT ContentEncodings::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0x6240:
-	ce.Parse(pMN);
-	break;
+	case 0x6240:
+		ce.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT ContentEncoding::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0x5031:
-	ContentEncodingOrder.Parse(pMN);
-	break;
-case 0x5032:
-	ContentEncodingScope.Parse(pMN);
-	break;
-case 0x5033:
-	ContentEncodingType.Parse(pMN);
-	break;
-case 0x5034:
-	cc.Parse(pMN);
-	break;
-case 0x5035:
-	ce.Parse(pMN);
-	break;
+	case 0x5031:
+		ContentEncodingOrder.Parse(pMN);
+		break;
+	case 0x5032:
+		ContentEncodingScope.Parse(pMN);
+		break;
+	case 0x5033:
+		ContentEncodingType.Parse(pMN);
+		break;
+	case 0x5034:
+		cc.Parse(pMN);
+		break;
+	case 0x5035:
+		ce.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT ContentCompression::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0x4254:
-	ContentCompAlgo.Parse(pMN);
-	break;
-case 0x4255:
-	ContentCompSettings.Parse(pMN);
-	break;
+	case 0x4254:
+		ContentCompAlgo.Parse(pMN);
+		break;
+	case 0x4255:
+		ContentCompSettings.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT ContentEncryption::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0x47e1:
-	ContentEncAlgo.Parse(pMN);
-	break;
-case 0x47e2:
-	ContentEncKeyID.Parse(pMN);
-	break;
-case 0x47e3:
-	ContentSignature.Parse(pMN);
-	break;
-case 0x47e4:
-	ContentSigKeyID.Parse(pMN);
-	break;
-case 0x47e5:
-	ContentSigAlgo.Parse(pMN);
-	break;
-case 0x47e6:
-	ContentSigHashAlgo.Parse(pMN);
-	break;
+	case 0x47e1:
+		ContentEncAlgo.Parse(pMN);
+		break;
+	case 0x47e2:
+		ContentEncKeyID.Parse(pMN);
+		break;
+	case 0x47e3:
+		ContentSignature.Parse(pMN);
+		break;
+	case 0x47e4:
+		ContentSigKeyID.Parse(pMN);
+		break;
+	case 0x47e5:
+		ContentSigAlgo.Parse(pMN);
+		break;
+	case 0x47e6:
+		ContentSigHashAlgo.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT Cluster::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0xE7:
-	TimeCode.Parse(pMN);
-	break;
-case 0xA7:
-	Position.Parse(pMN);
-	break;
-case 0xAB:
-	PrevSize.Parse(pMN);
-	break;
-case MATROSKA_ID_BLOCKGROUP:
-	BlockGroups.Parse(pMN, true);
-	break;
-case MATROSKA_ID_SIMPLEBLOCK:
-	SimpleBlocks.Parse(pMN, true);
-	break;
+	case 0xE7:
+		TimeCode.Parse(pMN);
+		break;
+	case 0xA7:
+		Position.Parse(pMN);
+		break;
+	case 0xAB:
+		PrevSize.Parse(pMN);
+		break;
+	case MATROSKA_ID_BLOCKGROUP:
+		BlockGroups.Parse(pMN, true);
+		break;
+	case MATROSKA_ID_SIMPLEBLOCK:
+		SimpleBlocks.Parse(pMN, true);
+		break;
 	EndChunk
 }
 
 HRESULT Cluster::ParseTimeCode(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0xE7:
-	TimeCode.Parse(pMN);
-	return S_OK;
+	case 0xE7:
+		TimeCode.Parse(pMN);
+		return S_OK;
 	EndChunk
 }
 
 HRESULT BlockGroup::Parse(CMatroskaNode* pMN0, bool fFull)
 {
 	BeginChunk
-case 0xA1:
-	Block.Parse(pMN, fFull);
-	break;
-case 0xA2: /* TODO: multiple virt blocks? */
-	;
-	break;
-case 0x9B:
-	BlockDuration.Parse(pMN);
-	break;
-case 0xFA:
-	ReferencePriority.Parse(pMN);
-	break;
-case 0xFB:
-	ReferenceBlock.Parse(pMN);
-	break;
-case 0xFD:
-	ReferenceVirtual.Parse(pMN);
-	break;
-case 0xA4:
-	CodecState.Parse(pMN);
-	break;
-case 0xE8:
-	TimeSlices.Parse(pMN);
-	break;
-case 0x75A1:
-	if (fFull) {
-		ba.Parse(pMN);
-	}
-	break;
+	case 0xA1:
+		Block.Parse(pMN, fFull);
+		break;
+	case 0xA2: /* TODO: multiple virt blocks? */
+		;
+		break;
+	case 0x9B:
+		BlockDuration.Parse(pMN);
+		break;
+	case 0xFA:
+		ReferencePriority.Parse(pMN);
+		break;
+	case 0xFB:
+		ReferenceBlock.Parse(pMN);
+		break;
+	case 0xFD:
+		ReferenceVirtual.Parse(pMN);
+		break;
+	case 0xA4:
+		CodecState.Parse(pMN);
+		break;
+	case 0xE8:
+		TimeSlices.Parse(pMN);
+		break;
+	case 0x75A1:
+		if (fFull) {
+			ba.Parse(pMN);
+		}
+		break;
 	EndChunk
 }
 
@@ -833,250 +833,250 @@ HRESULT SimpleBlock::Parse(CMatroskaNode* pMN, bool fFull)
 HRESULT BlockAdditions::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0xA6:
-	bm.Parse(pMN);
-	break;
+	case 0xA6:
+		bm.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT BlockMore::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0xEE:
-	BlockAddID.Parse(pMN);
-	break;
-case 0xA5:
-	BlockAdditional.Parse(pMN);
-	break;
+	case 0xEE:
+		BlockAddID.Parse(pMN);
+		break;
+	case 0xA5:
+		BlockAdditional.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT TimeSlice::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0xCC:
-	LaceNumber.Parse(pMN);
-	break;
-case 0xCD:
-	FrameNumber.Parse(pMN);
-	break;
-case 0xCE:
-	Delay.Parse(pMN);
-	break;
-case 0xCF:
-	Duration.Parse(pMN);
-	break;
+	case 0xCC:
+		LaceNumber.Parse(pMN);
+		break;
+	case 0xCD:
+		FrameNumber.Parse(pMN);
+		break;
+	case 0xCE:
+		Delay.Parse(pMN);
+		break;
+	case 0xCF:
+		Duration.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT Cue::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0xBB:
-	CuePoints.Parse(pMN);
-	break;
+	case 0xBB:
+		CuePoints.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT CuePoint::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0xB3:
-	CueTime.Parse(pMN);
-	break;
-case 0xB7:
-	CueTrackPositions.Parse(pMN);
-	break;
+	case 0xB3:
+		CueTime.Parse(pMN);
+		break;
+	case 0xB7:
+		CueTrackPositions.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT CueTrackPosition::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0xF7:
-	CueTrack.Parse(pMN);
-	break;
-case 0xF1:
-	CueClusterPosition.Parse(pMN);
-	break;
-case 0x5387:
-	CueBlockNumber.Parse(pMN);
-	break;
-case 0xEA:
-	CueCodecState.Parse(pMN);
-	break;
-case 0xDB:
-	CueReferences.Parse(pMN);
-	break;
+	case 0xF7:
+		CueTrack.Parse(pMN);
+		break;
+	case 0xF1:
+		CueClusterPosition.Parse(pMN);
+		break;
+	case 0x5387:
+		CueBlockNumber.Parse(pMN);
+		break;
+	case 0xEA:
+		CueCodecState.Parse(pMN);
+		break;
+	case 0xDB:
+		CueReferences.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT CueReference::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0x96:
-	CueRefTime.Parse(pMN);
-	break;
-case 0x97:
-	CueRefCluster.Parse(pMN);
-	break;
-case 0x535F:
-	CueRefNumber.Parse(pMN);
-	break;
-case 0xEB:
-	CueRefCodecState.Parse(pMN);
-	break;
+	case 0x96:
+		CueRefTime.Parse(pMN);
+		break;
+	case 0x97:
+		CueRefCluster.Parse(pMN);
+		break;
+	case 0x535F:
+		CueRefNumber.Parse(pMN);
+		break;
+	case 0xEB:
+		CueRefCodecState.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT Attachment::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0x61A7:
-	AttachedFiles.Parse(pMN);
-	break;
+	case 0x61A7:
+		AttachedFiles.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT AttachedFile::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0x467E:
-	FileDescription.Parse(pMN);
-	break;
-case 0x466E:
-	FileName.Parse(pMN);
-	break;
-case 0x4660:
-	FileMimeType.Parse(pMN);
-	break;
-case 0x465C: // binary
-	FileDataLen = (INT_PTR)pMN->m_len;
-	FileDataPos = pMN->m_start;
-	break;
-case 0x46AE:
-	FileUID.Parse(pMN);
-	break;
+	case 0x467E:
+		FileDescription.Parse(pMN);
+		break;
+	case 0x466E:
+		FileName.Parse(pMN);
+		break;
+	case 0x4660:
+		FileMimeType.Parse(pMN);
+		break;
+	case 0x465C: // binary
+		FileDataLen = (INT_PTR)pMN->m_len;
+		FileDataPos = pMN->m_start;
+		break;
+	case 0x46AE:
+		FileUID.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT Chapter::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0x45B9:
-	EditionEntries.Parse(pMN);
-	break;
+	case 0x45B9:
+		EditionEntries.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT EditionEntry::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0xB6:
-	ChapterAtoms.Parse(pMN);
-	break;
+	case 0xB6:
+		ChapterAtoms.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT ChapterAtom::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0x73C4:
-	ChapterUID.Parse(pMN);
-	break;
-case 0x91:
-	ChapterTimeStart.Parse(pMN);
-	break;
-case 0x92:
-	ChapterTimeEnd.Parse(pMN);
-	break;
-	//	case 0x8F: // TODO
-case 0x80:
-	ChapterDisplays.Parse(pMN);
-	break;
-case 0xB6:
-	ChapterAtoms.Parse(pMN);
-	break;
-case 0x98:
-	ChapterFlagHidden.Parse(pMN);
-	break;
-case 0x4598:
-	ChapterFlagEnabled.Parse(pMN);
-	break;
+	case 0x73C4:
+		ChapterUID.Parse(pMN);
+		break;
+	case 0x91:
+		ChapterTimeStart.Parse(pMN);
+		break;
+	case 0x92:
+		ChapterTimeEnd.Parse(pMN);
+		break;
+		//	case 0x8F: // TODO
+	case 0x80:
+		ChapterDisplays.Parse(pMN);
+		break;
+	case 0xB6:
+		ChapterAtoms.Parse(pMN);
+		break;
+	case 0x98:
+		ChapterFlagHidden.Parse(pMN);
+		break;
+	case 0x4598:
+		ChapterFlagEnabled.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT ChapterDisplay::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0x85:
-	ChapString.Parse(pMN);
-	break;
-case 0x437C:
-	ChapLanguage.Parse(pMN);
-	break;
-case 0x437E:
-	ChapCountry.Parse(pMN);
-	break;
+	case 0x85:
+		ChapString.Parse(pMN);
+		break;
+	case 0x437C:
+		ChapLanguage.Parse(pMN);
+		break;
+	case 0x437E:
+		ChapCountry.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT Tags::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0x7373:
-	Tag.Parse(pMN);
-	break;
+	case 0x7373:
+		Tag.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT Tag::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0x67C8:
-	SimpleTag.Parse(pMN);
-case 0x63C0:
-	Targets.Parse(pMN);
-	break;
+	case 0x67C8:
+		SimpleTag.Parse(pMN);
+	case 0x63C0:
+		Targets.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT SimpleTag::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0x45A3:
-	TagName.Parse(pMN);
-	break;
-case 0x447A:
-	TagLanguage.Parse(pMN);
-	break;
-case 0x4487:
-	TagString.Parse(pMN);
-	break;
+	case 0x45A3:
+		TagName.Parse(pMN);
+		break;
+	case 0x447A:
+		TagLanguage.Parse(pMN);
+		break;
+	case 0x4487:
+		TagString.Parse(pMN);
+		break;
 	EndChunk
 }
 
 HRESULT Targets::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
-case 0x68CA:
-	TargetTypeValue.Parse(pMN);
-	break;
-case 0x63CA:
-	TargetType.Parse(pMN);
-	break;
-case 0x63C5:
-	TrackUID.Parse(pMN);
-	break;
-case 0x63C9:
-	EditionUID.Parse(pMN);
-	break;
-case 0x63C4:
-	ChapterUID.Parse(pMN);
-	break;
-case 0x63C6:
-	AttachmentUID.Parse(pMN);
-	break;
+	case 0x68CA:
+		TargetTypeValue.Parse(pMN);
+		break;
+	case 0x63CA:
+		TargetType.Parse(pMN);
+		break;
+	case 0x63C5:
+		TrackUID.Parse(pMN);
+		break;
+	case 0x63C9:
+		EditionUID.Parse(pMN);
+		break;
+	case 0x63C4:
+		ChapterUID.Parse(pMN);
+		break;
+	case 0x63C6:
+		AttachmentUID.Parse(pMN);
+		break;
 	EndChunk
 }
 
