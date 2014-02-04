@@ -428,27 +428,6 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					if (!bHasVideo)
 						mts.Add(mt);
 					bHasVideo = true;
-				} else if (CodecID == "V_QUICKTIME" && pTE->CodecPrivate.GetCount() >= 8) {
-					DWORD* type;
-					if (m_pFile->m_ebml.DocTypeReadVersion == 1) {
-						type = (DWORD*)(pTE->CodecPrivate.GetData());
-					} else {
-						type = (DWORD*)(pTE->CodecPrivate.GetData() + 4);
-					}
-					if (*type == MAKEFOURCC('S','V','Q','3') || *type == MAKEFOURCC('S','V','Q','1') || *type == MAKEFOURCC('c','v','i','d')) {
-						mt.subtype = FOURCCMap(*type);
-						mt.formattype = FORMAT_VideoInfo;
-						VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + pTE->CodecPrivate.GetCount());
-						memset(mt.Format(), 0, mt.FormatLength());
-						memcpy(mt.Format() + sizeof(VIDEOINFOHEADER), pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
-						pvih->bmiHeader.biSize = sizeof(pvih->bmiHeader);
-						pvih->bmiHeader.biWidth = (LONG)pTE->v.PixelWidth;
-						pvih->bmiHeader.biHeight = (LONG)pTE->v.PixelHeight;
-						pvih->bmiHeader.biCompression = mt.subtype.Data1;
-						if (!bHasVideo)
-							mts.Add(mt);
-						bHasVideo = true;
-					}
 				} else if (CodecID == "V_DSHOW/MPEG1VIDEO" || CodecID == "V_MPEG1") {
 					mt.majortype	= MEDIATYPE_Video;
 					mt.subtype		= MEDIASUBTYPE_MPEG1Payload;
@@ -485,18 +464,27 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						mts.Add(mt);
 					bHasVideo = true;
 				} else {
+					DWORD fourcc = 0;
 					if (CodecID == "V_MJPEG") {
-						mt.subtype = MEDIASUBTYPE_MJPG;
+						fourcc = FCC('MJPG');
 					} else if (CodecID == "V_PRORES") {
+						fourcc = FCC('icpf');
 						mt.subtype = MEDIASUBTYPE_icpf;
 					} else if (CodecID == "V_VP8") {
-						mt.subtype = MEDIASUBTYPE_VP80;
+						fourcc = FCC('VP80');
 					} else if (CodecID == "V_VP9") {
-						mt.subtype = MEDIASUBTYPE_VP90;
+						fourcc = FCC('VP90');
+					} else if (CodecID == "V_QUICKTIME" && pTE->CodecPrivate.GetCount() >= 8) {
+						if (m_pFile->m_ebml.DocTypeReadVersion == 1) {
+							fourcc = *(DWORD*)(pTE->CodecPrivate.GetData());
+						} else {
+							fourcc = *(DWORD*)(pTE->CodecPrivate.GetData() + 4);
+						}
 					}
 
-					if (mt.subtype != MEDIASUBTYPE_NULL) {
+					if (fourcc) {
 						mt.formattype = FORMAT_VideoInfo;
+						mt.subtype = FOURCCMap(fourcc);
 						VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + pTE->CodecPrivate.GetCount());
 						memset(mt.Format(), 0, mt.FormatLength());
 						memcpy(mt.Format() + sizeof(VIDEOINFOHEADER), pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
@@ -504,7 +492,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						pvih->bmiHeader.biWidth = (LONG)pTE->v.PixelWidth;
 						pvih->bmiHeader.biHeight = (LONG)pTE->v.PixelHeight;
 						//pvih->bmiHeader.biBitCount = 24;
-						pvih->bmiHeader.biCompression = mt.subtype.Data1;
+						pvih->bmiHeader.biCompression = fourcc;
 						if (!bHasVideo) {
 							mts.Add(mt);
 						}
