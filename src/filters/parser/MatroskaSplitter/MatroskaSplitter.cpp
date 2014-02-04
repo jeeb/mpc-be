@@ -428,23 +428,6 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					if (!bHasVideo)
 						mts.Add(mt);
 					bHasVideo = true;
-				} else if (CodecID == "V_VP8" || CodecID == "V_VP9") {
-					if (CodecID[4] == '8') {
-						mt.subtype = MEDIASUBTYPE_VP80;
-					} else if (CodecID[4] == '9') {
-						mt.subtype = MEDIASUBTYPE_VP90;
-					}
-					mt.formattype = FORMAT_VideoInfo;
-					VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + pTE->CodecPrivate.GetCount());
-					memset(mt.Format(), 0, mt.FormatLength());
-					memcpy(mt.Format() + sizeof(VIDEOINFOHEADER), pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
-					pvih->bmiHeader.biSize = sizeof(pvih->bmiHeader);
-					pvih->bmiHeader.biWidth = (LONG)pTE->v.PixelWidth;
-					pvih->bmiHeader.biHeight = (LONG)pTE->v.PixelHeight;
-					pvih->bmiHeader.biCompression = mt.subtype.Data1;
-					if (!bHasVideo)
-						mts.Add(mt);
-					bHasVideo = true;
 				} else if (CodecID == "V_QUICKTIME" && pTE->CodecPrivate.GetCount() >= 8) {
 					DWORD* type;
 					if (m_pFile->m_ebml.DocTypeReadVersion == 1) {
@@ -506,19 +489,25 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						mt.subtype = MEDIASUBTYPE_MJPG;
 					} else if (CodecID == "V_PRORES") {
 						mt.subtype = MEDIASUBTYPE_icpf;
+					} else if (CodecID == "V_VP8") {
+						mt.subtype = MEDIASUBTYPE_VP80;
+					} else if (CodecID == "V_VP9") {
+						mt.subtype = MEDIASUBTYPE_VP90;
 					}
 
 					if (mt.subtype != MEDIASUBTYPE_NULL) {
 						mt.formattype = FORMAT_VideoInfo;
-						VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER));
+						VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + pTE->CodecPrivate.GetCount());
 						memset(mt.Format(), 0, mt.FormatLength());
+						memcpy(mt.Format() + sizeof(VIDEOINFOHEADER), pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 						pvih->bmiHeader.biSize = sizeof(pvih->bmiHeader);
 						pvih->bmiHeader.biWidth = (LONG)pTE->v.PixelWidth;
 						pvih->bmiHeader.biHeight = (LONG)pTE->v.PixelHeight;
-						pvih->bmiHeader.biBitCount = 24;
+						//pvih->bmiHeader.biBitCount = 24;
 						pvih->bmiHeader.biCompression = mt.subtype.Data1;
-						if (!bHasVideo)
+						if (!bHasVideo) {
 							mts.Add(mt);
+						}
 						bHasVideo = true;
 					}
 				}
