@@ -501,19 +501,26 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					if (!bHasVideo)
 						mts.Add(mt);
 					bHasVideo = true;
-				} else if (CodecID == "V_PRORES") {
-					mt.subtype = MEDIASUBTYPE_icpf;
-					mt.formattype = FORMAT_VideoInfo;
-					VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER));
-					memset(mt.Format(), 0, mt.FormatLength());
-					pvih->bmiHeader.biSize = sizeof(pvih->bmiHeader);
-					pvih->bmiHeader.biWidth = (LONG)pTE->v.PixelWidth;
-					pvih->bmiHeader.biHeight = (LONG)pTE->v.PixelHeight;
-					pvih->bmiHeader.biBitCount = 24;
-					pvih->bmiHeader.biCompression = mt.subtype.Data1;
-					if (!bHasVideo)
-						mts.Add(mt);
-					bHasVideo = true;
+				} else {
+					if (CodecID == "V_MJPEG") {
+						mt.subtype = MEDIASUBTYPE_MJPG;
+					} else if (CodecID == "V_PRORES") {
+						mt.subtype = MEDIASUBTYPE_icpf;
+					}
+
+					if (mt.subtype != MEDIASUBTYPE_NULL) {
+						mt.formattype = FORMAT_VideoInfo;
+						VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER));
+						memset(mt.Format(), 0, mt.FormatLength());
+						pvih->bmiHeader.biSize = sizeof(pvih->bmiHeader);
+						pvih->bmiHeader.biWidth = (LONG)pTE->v.PixelWidth;
+						pvih->bmiHeader.biHeight = (LONG)pTE->v.PixelHeight;
+						pvih->bmiHeader.biBitCount = 24;
+						pvih->bmiHeader.biCompression = mt.subtype.Data1;
+						if (!bHasVideo)
+							mts.Add(mt);
+						bHasVideo = true;
+					}
 				}
 				REFERENCE_TIME AvgTimePerFrame = 0;
 
