@@ -426,6 +426,7 @@ HRESULT CBaseSplitterFilter::CompleteConnect(PIN_DIRECTION dir, CBasePin* pPin)
 			return hr;
 		}
 
+		SortOutputPin();
 		ChapSort();
 
 		m_pSyncReader = pAsyncReader;
@@ -529,6 +530,8 @@ STDMETHODIMP CBaseSplitterFilter::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYP
 		m_fn = "";
 		return hr;
 	}
+
+	SortOutputPin();
 
 	if (BuildChapters(pszFileName, m_Items, Chapters)) {
 		POSITION pos	= Chapters.GetHeadPosition();
@@ -912,4 +915,40 @@ __int64 CBaseSplitterFilter::SeekBD(REFERENCE_TIME rt)
 	}
 
 	return -1;
+}
+
+void CBaseSplitterFilter::SortOutputPin()
+{
+	// Sorting output pin - video at the beginning of the list.
+
+	CAutoPtrList<CBaseSplitterOutputPin> m_pOutputsVideo;
+	CAutoPtrList<CBaseSplitterOutputPin> m_pOutputsOther;
+	
+	POSITION pos = m_pOutputs.GetHeadPosition();
+	while (pos) {
+		CAutoPtr<CBaseSplitterOutputPin> pin;
+		pin.Attach(m_pOutputs.GetNext(pos).Detach());
+		CMediaType mt;
+		if (SUCCEEDED(pin->GetMediaType(0, &mt))) {
+			if (mt.majortype == MEDIATYPE_Video) {
+				m_pOutputsVideo.AddTail(pin);
+			} else {
+				m_pOutputsOther.AddTail(pin);
+			}
+		}
+	}
+
+	m_pOutputs.RemoveAll();
+	pos = m_pOutputsVideo.GetHeadPosition();
+	while (pos) {
+		CAutoPtr<CBaseSplitterOutputPin> pin;
+		pin.Attach(m_pOutputsVideo.GetNext(pos).Detach());
+		m_pOutputs.AddTail(pin);
+	}
+	pos = m_pOutputsOther.GetHeadPosition();
+	while (pos) {
+		CAutoPtr<CBaseSplitterOutputPin> pin;
+		pin.Attach(m_pOutputsOther.GetNext(pos).Detach());
+		m_pOutputs.AddTail(pin);
+	}
 }

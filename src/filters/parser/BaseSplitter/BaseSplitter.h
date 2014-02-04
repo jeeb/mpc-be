@@ -229,4 +229,7 @@ public:
 	DWORD GetFlag() { return m_nFlag; }
 
 	__int64 SeekBD(REFERENCE_TIME rt);
+
+protected:
+	void SortOutputPin();
 };
